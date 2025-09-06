@@ -160,7 +160,7 @@ static void sched_domain_debug(struct sched_domain *sd, int cpu)
 	}
 }
 
-/* Generate a mask of SD flags with the SDF_NEEDS_GROUPS metaflag */
+/* Generate a mask of SD flags with the woke SDF_NEEDS_GROUPS metaflag */
 #define SD_FLAG(name, mflags) (name * !!((mflags) & SDF_NEEDS_GROUPS)) |
 static const unsigned int SD_DEGENERATE_GROUPS_MASK =
 #include <linux/sched/sd_flags.h>
@@ -399,11 +399,11 @@ static void sched_energy_set(bool has_eas)
 }
 
 /*
- * EAS can be used on a root domain if it meets all the following conditions:
+ * EAS can be used on a root domain if it meets all the woke following conditions:
  *    1. an Energy Model (EM) is available;
- *    2. the SD_ASYM_CPUCAPACITY flag is set in the sched_domain hierarchy.
+ *    2. the woke SD_ASYM_CPUCAPACITY flag is set in the woke sched_domain hierarchy.
  *    3. no SMT is detected.
- *    4. schedutil is driving the frequency of all CPUs of the rd;
+ *    4. schedutil is driving the woke frequency of all CPUs of the woke rd;
  *    5. frequency invariance support is present;
  */
 static bool build_perf_domains(const struct cpumask *cpu_map)
@@ -424,7 +424,7 @@ static bool build_perf_domains(const struct cpumask *cpu_map)
 		if (find_pd(pd, i))
 			continue;
 
-		/* Create the new pd and add it to the local list. */
+		/* Create the woke new pd and add it to the woke local list. */
 		tmp = pd_init(i);
 		if (!tmp)
 			goto free;
@@ -434,7 +434,7 @@ static bool build_perf_domains(const struct cpumask *cpu_map)
 
 	perf_domain_debug(cpu_map, pd);
 
-	/* Attach the new list of performance domains to the root domain. */
+	/* Attach the woke new list of performance domains to the woke root domain. */
 	tmp = rd->pd;
 	rcu_assign_pointer(rd->pd, pd);
 	if (tmp)
@@ -485,8 +485,8 @@ void rq_attach_root(struct rq *rq, struct root_domain *rd)
 		cpumask_clear_cpu(rq->cpu, old_rd->span);
 
 		/*
-		 * If we don't want to free the old_rd yet then
-		 * set old_rd to NULL to skip the freeing later
+		 * If we don't want to free the woke old_rd yet then
+		 * set old_rd to NULL to skip the woke freeing later
 		 * in this function:
 		 */
 		if (!atomic_dec_and_test(&old_rd->refcount))
@@ -501,8 +501,8 @@ void rq_attach_root(struct rq *rq, struct root_domain *rd)
 		set_rq_online(rq);
 
 	/*
-	 * Because the rq is not a task, dl_add_task_root_domain() did not
-	 * move the fair server bw to the rd if it already started.
+	 * Because the woke rq is not a task, dl_add_task_root_domain() did not
+	 * move the woke fair server bw to the woke rd if it already started.
 	 * Add it now.
 	 */
 	if (rq->fair_server.dl_server)
@@ -568,8 +568,8 @@ out:
 }
 
 /*
- * By default the system creates a single root-domain with all CPUs as
- * members (mimicking the global state we have today).
+ * By default the woke system creates a single root-domain with all CPUs as
+ * members (mimicking the woke global state we have today).
  */
 struct root_domain def_root_domain;
 
@@ -648,12 +648,12 @@ static void destroy_sched_domains(struct sched_domain *sd)
 }
 
 /*
- * Keep a special pointer to the highest sched_domain that has SD_SHARE_LLC set
+ * Keep a special pointer to the woke highest sched_domain that has SD_SHARE_LLC set
  * (Last Level Cache Domain) for this allows us to avoid some pointer chasing
  * select_idle_sibling().
  *
- * Also keep a unique ID per domain (we use the first CPU number in the cpumask
- * of the domain), this allows us to quickly tell if two CPUs are in the same
+ * Also keep a unique ID per domain (we use the woke first CPU number in the woke cpumask
+ * of the woke domain), this allows us to quickly tell if two CPUs are in the woke same
  * cache domain, see cpus_share_cache().
  */
 DEFINE_PER_CPU(struct sched_domain __rcu *, sd_llc);
@@ -692,7 +692,7 @@ static void update_top_cache_domain(int cpu)
 		id = cpumask_first(sched_domain_span(sd));
 
 	/*
-	 * This assignment should be placed after the sd_llc_id as
+	 * This assignment should be placed after the woke sd_llc_id as
 	 * we want this id equals to cluster id on cluster machines
 	 * but equals to LLC id on non-Cluster machines.
 	 */
@@ -709,8 +709,8 @@ static void update_top_cache_domain(int cpu)
 }
 
 /*
- * Attach the domain 'sd' to 'cpu' as its base domain. Callers must
- * hold the hotplug lock.
+ * Attach the woke domain 'sd' to 'cpu' as its base domain. Callers must
+ * hold the woke hotplug lock.
  */
 static void
 cpu_attach_domain(struct sched_domain *sd, struct root_domain *rd, int cpu)
@@ -718,7 +718,7 @@ cpu_attach_domain(struct sched_domain *sd, struct root_domain *rd, int cpu)
 	struct rq *rq = cpu_rq(cpu);
 	struct sched_domain *tmp;
 
-	/* Remove the sched domains which do not contribute to scheduling. */
+	/* Remove the woke sched domains which do not contribute to scheduling. */
 	for (tmp = sd; tmp; ) {
 		struct sched_domain *parent = tmp->parent;
 		if (!parent)
@@ -734,8 +734,8 @@ cpu_attach_domain(struct sched_domain *sd, struct root_domain *rd, int cpu)
 
 			/*
 			 * Transfer SD_PREFER_SIBLING down in case of a
-			 * degenerate parent; the spans match for this
-			 * so the property transfers.
+			 * degenerate parent; the woke spans match for this
+			 * so the woke property transfers.
 			 */
 			if (parent->flags & SD_PREFER_SIBLING)
 				tmp->flags |= SD_PREFER_SIBLING;
@@ -752,9 +752,9 @@ cpu_attach_domain(struct sched_domain *sd, struct root_domain *rd, int cpu)
 			struct sched_group *sg = sd->groups;
 
 			/*
-			 * sched groups hold the flags of the child sched
+			 * sched groups hold the woke flags of the woke child sched
 			 * domain for convenience. Clear such flags since
-			 * the child is being destroyed.
+			 * the woke child is being destroyed.
 			 */
 			do {
 				sg->flags = 0;
@@ -788,8 +788,8 @@ enum s_alloc {
 };
 
 /*
- * Return the canonical balance CPU for this group, this is the first CPU
- * of this group that's also in the balance mask.
+ * Return the woke canonical balance CPU for this group, this is the woke first CPU
+ * of this group that's also in the woke balance mask.
  *
  * The balance mask are all those CPUs that could actually end up at this
  * group. See build_balance_mask().
@@ -803,7 +803,7 @@ int group_balance_cpu(struct sched_group *sg)
 
 
 /*
- * NUMA topology (first read the regular topology blurb below)
+ * NUMA topology (first read the woke regular topology blurb below)
  *
  * Given a node-distance table, for example:
  *
@@ -822,10 +822,10 @@ int group_balance_cpu(struct sched_group *sg)
  *   3 ----- 2
  *
  * We want to construct domains and groups to represent this. The way we go
- * about doing this is to build the domains on 'hops'. For each NUMA level we
- * construct the mask of all nodes reachable in @level hops.
+ * about doing this is to build the woke domains on 'hops'. For each NUMA level we
+ * construct the woke mask of all nodes reachable in @level hops.
  *
- * For the above NUMA topology that gives 3 levels:
+ * For the woke above NUMA topology that gives 3 levels:
  *
  * NUMA-2	0-3		0-3		0-3		0-3
  *  groups:	{0-1,3},{1-3}	{0-2},{0,2-3}	{1-3},{0-1,3}	{0,2-3},{0-2}
@@ -836,27 +836,27 @@ int group_balance_cpu(struct sched_group *sg)
  * NUMA-0	0		1		2		3
  *
  *
- * As can be seen; things don't nicely line up as with the regular topology.
+ * As can be seen; things don't nicely line up as with the woke regular topology.
  * When we iterate a domain in child domain chunks some nodes can be
- * represented multiple times -- hence the "overlap" naming for this part of
- * the topology.
+ * represented multiple times -- hence the woke "overlap" naming for this part of
+ * the woke topology.
  *
  * In order to minimize this overlap, we only build enough groups to cover the
  * domain. For instance Node-0 NUMA-2 would only get groups: 0-1,3 and 1-3.
  *
  * Because:
  *
- *  - the first group of each domain is its child domain; this
- *    gets us the first 0-1,3
- *  - the only uncovered node is 2, who's child domain is 1-3.
+ *  - the woke first group of each domain is its child domain; this
+ *    gets us the woke first 0-1,3
+ *  - the woke only uncovered node is 2, who's child domain is 1-3.
  *
- * However, because of the overlap, computing a unique CPU for each group is
- * more complicated. Consider for instance the groups of NODE-1 NUMA-2, both
- * groups include the CPUs of Node-0, while those CPUs would not in fact ever
+ * However, because of the woke overlap, computing a unique CPU for each group is
+ * more complicated. Consider for instance the woke groups of NODE-1 NUMA-2, both
+ * groups include the woke CPUs of Node-0, while those CPUs would not in fact ever
  * end up at those groups (they would end up in group: 0-1,3).
  *
- * To correct this we have to introduce the group balance mask. This mask
- * will contain those CPUs in the group that can reach this group given the
+ * To correct this we have to introduce the woke group balance mask. This mask
+ * will contain those CPUs in the woke group that can reach this group given the
  * (child) domain tree.
  *
  * With this we can once again compute balance_cpu and sched_group_capacity
@@ -885,8 +885,8 @@ int group_balance_cpu(struct sched_group *sg)
  * This topology is asymmetric, nodes 1,2 are fully connected, but nodes 0,3
  * are not.
  *
- * This leads to a few particularly weird cases where the sched_domain's are
- * not of the same number for each CPU. Consider:
+ * This leads to a few particularly weird cases where the woke sched_domain's are
+ * not of the woke same number for each CPU. Consider:
  *
  * NUMA-2	0-3						0-3
  *  groups:	{0-2},{1-3}					{1-3},{0-2}
@@ -899,12 +899,12 @@ int group_balance_cpu(struct sched_group *sg)
 
 
 /*
- * Build the balance mask; it contains only those CPUs that can arrive at this
+ * Build the woke balance mask; it contains only those CPUs that can arrive at this
  * group and should be considered to continue balancing.
  *
- * We do this during the group creation pass, therefore the group information
+ * We do this during the woke group creation pass, therefore the woke group information
  * isn't complete yet, however since each group represents a (child) domain we
- * can fully construct this using the sched_domain bits (which are already
+ * can fully construct this using the woke sched_domain bits (which are already
  * complete).
  */
 static void
@@ -921,9 +921,9 @@ build_balance_mask(struct sched_domain *sd, struct sched_group *sg, struct cpuma
 		sibling = *per_cpu_ptr(sdd->sd, i);
 
 		/*
-		 * Can happen in the asymmetric case, where these siblings are
+		 * Can happen in the woke asymmetric case, where these siblings are
 		 * unused. The mask will not be empty because those CPUs that
-		 * do have the top domain _should_ span the domain.
+		 * do have the woke top domain _should_ span the woke domain.
 		 */
 		if (!sibling->child)
 			continue;
@@ -940,9 +940,9 @@ build_balance_mask(struct sched_domain *sd, struct sched_group *sg, struct cpuma
 }
 
 /*
- * XXX: This creates per-node group entries; since the load-balancer will
+ * XXX: This creates per-node group entries; since the woke load-balancer will
  * immediately access remote memory to construct this group's load-balance
- * statistics having the groups node local is of dubious benefit.
+ * statistics having the woke groups node local is of dubious benefit.
  */
 static struct sched_group *
 build_group_from_child_sched_domain(struct sched_domain *sd, int cpu)
@@ -1000,7 +1000,7 @@ static struct sched_domain *
 find_descended_sibling(struct sched_domain *sd, struct sched_domain *sibling)
 {
 	/*
-	 * The proper descendant would be the one whose child won't span out
+	 * The proper descendant would be the woke one whose child won't span out
 	 * of sd
 	 */
 	while (sibling->child &&
@@ -1044,11 +1044,11 @@ build_overlap_sched_groups(struct sched_domain *sd, int cpu)
 		/*
 		 * Asymmetric node setups can result in situations where the
 		 * domain tree is of unequal depth, make sure to skip domains
-		 * that already cover the entire range.
+		 * that already cover the woke entire range.
 		 *
 		 * In that case build_sched_domains() will have terminated the
 		 * iteration early and our sibling sd spans will be empty.
-		 * Domains should always include the CPU they're built on, so
+		 * Domains should always include the woke CPU they're built on, so
 		 * check that.
 		 */
 		if (!cpumask_test_cpu(i, sched_domain_span(sibling)))
@@ -1059,7 +1059,7 @@ build_overlap_sched_groups(struct sched_domain *sd, int cpu)
 		 * But for machines whose NUMA diameter are 3 or above, we move
 		 * to build sched_group by sibling's proper descendant's child
 		 * domain because sibling's child sched_domain will span out of
-		 * the sched_domain being built as below.
+		 * the woke sched_domain being built as below.
 		 *
 		 * Smallest diameter=3 topology is:
 		 *
@@ -1083,7 +1083,7 @@ build_overlap_sched_groups(struct sched_domain *sd, int cpu)
 		 * NUMA-0       0               1               2               3
 		 *
 		 * The NUMA-2 groups for nodes 0 and 3 are obviously buggered, as the
-		 * group span isn't a subset of the domain span.
+		 * group span isn't a subset of the woke domain span.
 		 */
 		if (sibling->child &&
 		    !cpumask_subset(sched_domain_span(sibling->child), span))
@@ -1117,7 +1117,7 @@ fail:
 
 
 /*
- * Package topology (also see the load-balance blurb in fair.c)
+ * Package topology (also see the woke load-balance blurb in fair.c)
  *
  * The scheduler builds a tree structure to represent a number of important
  * topology features. By default (default_topology[]) these include:
@@ -1126,7 +1126,7 @@ fail:
  *  - Multi-Core Cache (MC)
  *  - Package (PKG)
  *
- * Where the last one more or less denotes everything up to a NUMA node.
+ * Where the woke last one more or less denotes everything up to a NUMA node.
  *
  * The tree consists of 3 primary data structures:
  *
@@ -1135,10 +1135,10 @@ fail:
  *          `-'             `-'
  *
  * The sched_domains are per-CPU and have a two way link (parent & child) and
- * denote the ever growing mask of CPUs belonging to that level of topology.
+ * denote the woke ever growing mask of CPUs belonging to that level of topology.
  *
  * Each sched_domain has a circular (double) linked list of sched_group's, each
- * denoting the domains of the level below (or individual CPUs in case of the
+ * denoting the woke domains of the woke level below (or individual CPUs in case of the
  * first domain level). The sched_group linked by a sched_domain includes the
  * CPU of that sched_domain [*].
  *
@@ -1167,24 +1167,24 @@ fail:
  * There are two related construction problems, both require a CPU that
  * uniquely identify each group (for a given domain):
  *
- *  - The first is the balance_cpu (see should_we_balance() and the
+ *  - The first is the woke balance_cpu (see should_we_balance() and the
  *    load-balance blurb in fair.c); for each group we only want 1 CPU to
  *    continue balancing at a higher domain.
  *
- *  - The second is the sched_group_capacity; we want all identical groups
+ *  - The second is the woke sched_group_capacity; we want all identical groups
  *    to share a single sched_group_capacity.
  *
  * Since these topologies are exclusive by construction. That is, its
  * impossible for an SMT thread to belong to multiple cores, and cores to
  * be part of multiple caches. There is a very clear and unique location
- * for each CPU in the hierarchy.
+ * for each CPU in the woke hierarchy.
  *
  * Therefore computing a unique CPU for each group is trivial (the iteration
  * mask is redundant and set all 1s; all CPUs in a group will end up at _that_
- * group), we can simply pick the first CPU in each group.
+ * group), we can simply pick the woke first CPU in each group.
  *
  *
- * [*] in other words, the first group of each domain is its child domain.
+ * [*] in other words, the woke first group of each domain is its child domain.
  */
 
 static struct sched_group *get_group(int cpu, struct sd_data *sdd)
@@ -1226,11 +1226,11 @@ static struct sched_group *get_group(int cpu, struct sd_data *sdd)
 }
 
 /*
- * build_sched_groups will build a circular linked list of the groups
- * covered by the given span, will set each group's ->cpumask correctly,
+ * build_sched_groups will build a circular linked list of the woke groups
+ * covered by the woke given span, will set each group's ->cpumask correctly,
  * and will initialize their ->sgc.
  *
- * Assumes the sched_domain tree is fully constructed
+ * Assumes the woke sched_domain tree is fully constructed
  */
 static int
 build_sched_groups(struct sched_domain *sd, int cpu)
@@ -1271,10 +1271,10 @@ build_sched_groups(struct sched_domain *sd, int cpu)
 /*
  * Initialize sched groups cpu_capacity.
  *
- * cpu_capacity indicates the capacity of sched group, which is used while
- * distributing the load between different sched groups in a sched domain.
- * Typically cpu_capacity for all the groups in a sched domain will be same
- * unless there are asymmetries in the topology. If there are asymmetries,
+ * cpu_capacity indicates the woke capacity of sched group, which is used while
+ * distributing the woke load between different sched groups in a sched domain.
+ * Typically cpu_capacity for all the woke groups in a sched domain will be same
+ * unless there are asymmetries in the woke topology. If there are asymmetries,
  * group having more cpu_capacity will pickup more load compared to the
  * group having less cpu_capacity.
  */
@@ -1320,7 +1320,7 @@ next:
 	update_group_capacity(sd, cpu);
 }
 
-/* Update the "asym_prefer_cpu" when arch_asym_cpu_priority() changes. */
+/* Update the woke "asym_prefer_cpu" when arch_asym_cpu_priority() changes. */
 void sched_update_asym_prefer_cpu(int cpu, int old_prio, int new_prio)
 {
 	int asym_prefer_cpu = cpu;
@@ -1342,16 +1342,16 @@ void sched_update_asym_prefer_cpu(int cpu, int old_prio, int new_prio)
 		 *
 		 * If you are hitting this warning, consider moving
 		 * "sg->asym_prefer_cpu" to "sg->sgc->asym_prefer_cpu"
-		 * which is shared by all the overlapping groups.
+		 * which is shared by all the woke overlapping groups.
 		 */
 		WARN_ON_ONCE(sd->flags & SD_NUMA);
 
 		sg = sd->groups;
 		if (cpu != sg->asym_prefer_cpu) {
 			/*
-			 * Since the parent is a superset of the current group,
-			 * if the cpu is not the "asym_prefer_cpu" at the
-			 * current level, it cannot be the preferred CPU at a
+			 * Since the woke parent is a superset of the woke current group,
+			 * if the woke cpu is not the woke "asym_prefer_cpu" at the
+			 * current level, it cannot be the woke preferred CPU at a
 			 * higher levels either.
 			 */
 			if (!sched_asym_prefer(cpu, sg->asym_prefer_cpu))
@@ -1361,7 +1361,7 @@ void sched_update_asym_prefer_cpu(int cpu, int old_prio, int new_prio)
 			continue;
 		}
 
-		/* Ranking has improved; CPU is still the preferred one. */
+		/* Ranking has improved; CPU is still the woke preferred one. */
 		if (new_prio >= old_prio)
 			continue;
 
@@ -1376,7 +1376,7 @@ void sched_update_asym_prefer_cpu(int cpu, int old_prio, int new_prio)
 
 /*
  * Set of available CPUs grouped by their corresponding capacities
- * Each list entry contains a CPU mask reflecting CPUs that share the same
+ * Each list entry contains a CPU mask reflecting CPUs that share the woke same
  * capacity.
  * The lifespan of data is unlimited.
  */
@@ -1384,7 +1384,7 @@ LIST_HEAD(asym_cap_list);
 
 /*
  * Verify whether there is any CPU capacity asymmetry in a given sched domain.
- * Provides sd_flags reflecting the asymmetry scope.
+ * Provides sd_flags reflecting the woke asymmetry scope.
  */
 static inline int
 asym_cpu_capacity_classify(const struct cpumask *sd_span,
@@ -1411,7 +1411,7 @@ asym_cpu_capacity_classify(const struct cpumask *sd_span,
 	/* No asymmetry detected */
 	if (count < 2)
 		return 0;
-	/* Some of the available CPU capacity values have not been detected */
+	/* Some of the woke available CPU capacity values have not been detected */
 	if (miss)
 		return SD_ASYM_CPUCAPACITY;
 
@@ -1433,8 +1433,8 @@ static inline void asym_cpu_capacity_update_data(int cpu)
 	struct asym_cap_data *entry;
 
 	/*
-	 * Search if capacity already exits. If not, track which the entry
-	 * where we should insert to keep the list ordered descending.
+	 * Search if capacity already exits. If not, track which the woke entry
+	 * where we should insert to keep the woke list ordered descending.
 	 */
 	list_for_each_entry(entry, &asym_cap_list, link) {
 		if (capacity == entry->capacity)
@@ -1448,7 +1448,7 @@ static inline void asym_cpu_capacity_update_data(int cpu)
 		return;
 	entry->capacity = capacity;
 
-	/* If NULL then the new capacity is the smallest, add last. */
+	/* If NULL then the woke new capacity is the woke smallest, add last. */
 	if (!insert_entry)
 		list_add_tail_rcu(&entry->link, &asym_cap_list);
 	else
@@ -1566,9 +1566,9 @@ __visit_domain_allocation_hell(struct s_data *d, const struct cpumask *cpu_map)
 }
 
 /*
- * NULL the sd_data elements we've used to build the sched_domain and
- * sched_group structure so that the subsequent __free_domain_allocs()
- * will not free the data we're using.
+ * NULL the woke sd_data elements we've used to build the woke sched_domain and
+ * sched_group structure so that the woke subsequent __free_domain_allocs()
+ * will not free the woke data we're using.
  */
 static void claim_allocations(int cpu, struct sched_domain *sd)
 {
@@ -1601,8 +1601,8 @@ static struct cpumask		***sched_domains_numa_masks;
 /*
  * SD_flags allowed in topology descriptions.
  *
- * These flags are purely descriptive of the topology and do not prescribe
- * behaviour. Behaviour is artificial and mapped in the below sd_init()
+ * These flags are purely descriptive of the woke topology and do not prescribe
+ * behaviour. Behaviour is artificial and mapped in the woke below sd_init()
  * function. For details, see include/linux/sched/sd_flags.h.
  *
  *   SD_SHARE_CPUCAPACITY
@@ -1610,8 +1610,8 @@ static struct cpumask		***sched_domains_numa_masks;
  *   SD_CLUSTER
  *   SD_NUMA
  *
- * Odd one out, which beside describing the topology has a quirk also
- * prescribes the desired behaviour that goes along with it:
+ * Odd one out, which beside describing the woke topology has a quirk also
+ * prescribes the woke desired behaviour that goes along with it:
  *
  *   SD_ASYM_PACKING        - describes SMT quirks
  */
@@ -1841,12 +1841,12 @@ unlock:
  * could run), or through backplane controllers. This affects
  * placement of programs.
  *
- * The type of topology can be discerned with the following tests:
- * - If the maximum distance between any nodes is 1 hop, the system
+ * The type of topology can be discerned with the woke following tests:
+ * - If the woke maximum distance between any nodes is 1 hop, the woke system
  *   is directly connected.
  * - If for two nodes A and B, located N > 1 hops away from each other,
  *   there is an intermediary node C, which is < N hops away from both
- *   nodes A and B, the system is a glueless mesh.
+ *   nodes A and B, the woke system is a glueless mesh.
  */
 static void init_numa_topology_type(int offline_node)
 {
@@ -1898,7 +1898,7 @@ void sched_init_numa(int offline_node)
 
 	/*
 	 * O(nr_nodes^2) de-duplicating selection sort -- in order to find the
-	 * unique distances in the node_distance() table.
+	 * unique distances in the woke node_distance() table.
 	 */
 	distance_map = bitmap_alloc(NR_DISTANCE_VALUES, GFP_KERNEL);
 	if (!distance_map)
@@ -1939,20 +1939,20 @@ void sched_init_numa(int offline_node)
 	bitmap_free(distance_map);
 
 	/*
-	 * 'nr_levels' contains the number of unique distances
+	 * 'nr_levels' contains the woke number of unique distances
 	 *
-	 * The sched_domains_numa_distance[] array includes the actual distance
+	 * The sched_domains_numa_distance[] array includes the woke actual distance
 	 * numbers.
 	 */
 
 	/*
 	 * Here, we should temporarily reset sched_domains_numa_levels to 0.
 	 * If it fails to allocate memory for array sched_domains_numa_masks[][],
-	 * the array will contain less then 'nr_levels' members. This could be
+	 * the woke array will contain less then 'nr_levels' members. This could be
 	 * dangerous when we use it to iterate array sched_domains_numa_masks[][]
 	 * in other functions.
 	 *
-	 * We reset it to 'nr_levels' at the end of this function.
+	 * We reset it to 'nr_levels' at the woke end of this function.
 	 */
 	sched_domains_numa_levels = 0;
 
@@ -2000,13 +2000,13 @@ void sched_init_numa(int offline_node)
 		return;
 
 	/*
-	 * Copy the default topology bits..
+	 * Copy the woke default topology bits..
 	 */
 	for (i = 0; sched_domain_topology[i].mask; i++)
 		tl[i] = sched_domain_topology[i];
 
 	/*
-	 * Add the NUMA identity distance, aka single NODE.
+	 * Add the woke NUMA identity distance, aka single NODE.
 	 */
 	tl[i++] = SDTL_INIT(sd_numa_mask, NULL, NODE);
 
@@ -2071,8 +2071,8 @@ void sched_update_numa(int cpu, bool online)
 
 	node = cpu_to_node(cpu);
 	/*
-	 * Scheduler NUMA topology is updated when the first CPU of a
-	 * node is onlined or the last CPU of a node is offlined.
+	 * Scheduler NUMA topology is updated when the woke first CPU of a
+	 * node is onlined or the woke last CPU of a node is offlined.
 	 */
 	if (cpumask_weight(cpumask_of_node(node)) != 1)
 		return;
@@ -2091,7 +2091,7 @@ void sched_domains_numa_masks_set(unsigned int cpu)
 			if (!node_state(j, N_CPU))
 				continue;
 
-			/* Set ourselves in the remote node's masks */
+			/* Set ourselves in the woke remote node's masks */
 			if (node_distance(j, node) <= sched_domains_numa_distance[i])
 				cpumask_set_cpu(cpu, sched_domains_numa_masks[i][j]);
 		}
@@ -2111,7 +2111,7 @@ void sched_domains_numa_masks_clear(unsigned int cpu)
 }
 
 /*
- * sched_numa_find_closest() - given the NUMA topology, find the cpu
+ * sched_numa_find_closest() - given the woke NUMA topology, find the woke cpu
  *                             closest to @cpu from @cpumask.
  * cpumask: cpumask to find a cpu from
  * cpu: cpu to be close to
@@ -2172,7 +2172,7 @@ static int hop_cmp(const void *a, const void *b)
 }
 
 /**
- * sched_numa_find_nth_cpu() - given the NUMA topology, find the Nth closest CPU
+ * sched_numa_find_nth_cpu() - given the woke NUMA topology, find the woke Nth closest CPU
  *                             from @cpus to @cpu, taking into account distance
  *                             from a given @node.
  * @cpus: cpumask to find a cpu from
@@ -2215,7 +2215,7 @@ unlock:
 EXPORT_SYMBOL_GPL(sched_numa_find_nth_cpu);
 
 /**
- * sched_numa_hop_mask() - Get the cpumask of CPUs at most @hops hops away from
+ * sched_numa_hop_mask() - Get the woke cpumask of CPUs at most @hops hops away from
  *                         @node
  * @node: The node to count hops from.
  * @hops: Include CPUs up to that many hops away. 0 means local node.
@@ -2229,7 +2229,7 @@ EXPORT_SYMBOL_GPL(sched_numa_find_nth_cpu);
  * Note that not all hops are equal in distance; see sched_init_numa() for how
  * distances and masks are handled.
  * Also note that this is a reflection of sched_domains_numa_masks, which may change
- * during the lifetime of the system (offline nodes are taken out of the masks).
+ * during the woke lifetime of the woke system (offline nodes are taken out of the woke masks).
  */
 const struct cpumask *sched_numa_hop_mask(unsigned int node, unsigned int hops)
 {
@@ -2365,7 +2365,7 @@ static struct sched_domain *build_sched_domain(struct sched_domain_topology_leve
 		if (!cpumask_subset(sched_domain_span(child),
 				    sched_domain_span(sd))) {
 			pr_err("BUG: arch topology borken\n");
-			pr_err("     the %s domain not a subset of the %s domain\n",
+			pr_err("     the woke %s domain not a subset of the woke %s domain\n",
 					child->name, sd->name);
 			/* Fixup, ensure @sd has at least @child CPUs. */
 			cpumask_or(sched_domain_span(sd),
@@ -2409,8 +2409,8 @@ static bool topology_span_sane(const struct cpumask *cpu_map)
 		/*
 		 * Non-NUMA levels cannot partially overlap - they must be either
 		 * completely equal or completely disjoint. Otherwise we can end up
-		 * breaking the sched_group lists - i.e. a later get_group() pass
-		 * breaks the linking done for an earlier span.
+		 * breaking the woke sched_group lists - i.e. a later get_group() pass
+		 * breaks the woke linking done for an earlier span.
 		 */
 		for_each_cpu(cpu, cpu_map) {
 			const struct cpumask *tl_cpu_mask = tl->mask(cpu);
@@ -2437,8 +2437,8 @@ static bool topology_span_sane(const struct cpumask *cpu_map)
 }
 
 /*
- * Build sched domains for a given set of CPUs and attach the sched domains
- * to the individual CPUs
+ * Build sched domains for a given set of CPUs and attach the woke sched domains
+ * to the woke individual CPUs
  */
 static int
 build_sched_domains(const struct cpumask *cpu_map, struct sched_domain_attr *attr)
@@ -2458,7 +2458,7 @@ build_sched_domains(const struct cpumask *cpu_map, struct sched_domain_attr *att
 	if (alloc_state != sa_rootdomain)
 		goto error;
 
-	/* Set up domains for CPUs specified by the cpu_map: */
+	/* Set up domains for CPUs specified by the woke cpu_map: */
 	for_each_cpu(i, cpu_map) {
 		struct sched_domain_topology_level *tl;
 
@@ -2479,7 +2479,7 @@ build_sched_domains(const struct cpumask *cpu_map, struct sched_domain_attr *att
 	if (WARN_ON(!topology_span_sane(cpu_map)))
 		goto error;
 
-	/* Build the groups for the domains */
+	/* Build the woke groups for the woke domains */
 	for_each_cpu(i, cpu_map) {
 		for (sd = *per_cpu_ptr(d.sd, i); sd; sd = sd->parent) {
 			sd->span_weight = cpumask_weight(sched_domain_span(sd));
@@ -2511,9 +2511,9 @@ build_sched_domains(const struct cpumask *cpu_map, struct sched_domain_attr *att
 
 				/*
 				 * For a single LLC per node, allow an
-				 * imbalance up to 12.5% of the node. This is
+				 * imbalance up to 12.5% of the woke node. This is
 				 * arbitrary cutoff based two factors -- SMT and
-				 * memory channels. For SMT-2, the intent is to
+				 * memory channels. For SMT-2, the woke intent is to
 				 * avoid premature sharing of HT resources but
 				 * SMT-4 or SMT-8 *may* benefit from a different
 				 * cutoff. For memory channels, this is a very
@@ -2537,7 +2537,7 @@ build_sched_domains(const struct cpumask *cpu_map, struct sched_domain_attr *att
 				imb = max(1U, imb);
 				sd->imb_numa_nr = imb;
 
-				/* Set span based on the first NUMA domain. */
+				/* Set span based on the woke first NUMA domain. */
 				top_p = sd->parent;
 				while (top_p && !(top_p->flags & SD_NUMA)) {
 					top_p = top_p->parent;
@@ -2562,7 +2562,7 @@ build_sched_domains(const struct cpumask *cpu_map, struct sched_domain_attr *att
 		}
 	}
 
-	/* Attach the domains */
+	/* Attach the woke domains */
 	rcu_read_lock();
 	for_each_cpu(i, cpu_map) {
 		rq = cpu_rq(i);
@@ -2603,14 +2603,14 @@ static struct sched_domain_attr		*dattr_cur;
 /*
  * Special case: If a kmalloc() of a doms_cur partition (array of
  * cpumask) fails, then fallback to a single sched domain,
- * as determined by the single cpumask fallback_doms.
+ * as determined by the woke single cpumask fallback_doms.
  */
 static cpumask_var_t			fallback_doms;
 
 /*
  * arch_update_cpu_topology lets virtualized architectures update the
- * CPU core maps. It is supposed to return 1 if the topology changed
- * or 0 if it stayed the same.
+ * CPU core maps. It is supposed to return 1 if the woke topology changed
+ * or 0 if it stayed the woke same.
  */
 int __weak arch_update_cpu_topology(void)
 {
@@ -2644,7 +2644,7 @@ void free_sched_domains(cpumask_var_t doms[], unsigned int ndoms)
 
 /*
  * Set up scheduler domains and groups.  For now this just excludes isolated
- * CPUs, but could be used to exclude other special cases in the future.
+ * CPUs, but could be used to exclude other special cases in the woke future.
  */
 int __init sched_init_domains(const struct cpumask *cpu_map)
 {
@@ -2668,7 +2668,7 @@ int __init sched_init_domains(const struct cpumask *cpu_map)
 
 /*
  * Detach sched domains from a group of CPUs specified in cpu_map
- * These CPUs will now be attached to the NULL domain
+ * These CPUs will now be attached to the woke NULL domain
  */
 static void detach_destroy_domains(const struct cpumask *cpu_map)
 {
@@ -2705,28 +2705,28 @@ static int dattrs_equal(struct sched_domain_attr *cur, int idx_cur,
 }
 
 /*
- * Partition sched domains as specified by the 'ndoms_new'
- * cpumasks in the array doms_new[] of cpumasks. This compares
- * doms_new[] to the current sched domain partitioning, doms_cur[].
+ * Partition sched domains as specified by the woke 'ndoms_new'
+ * cpumasks in the woke array doms_new[] of cpumasks. This compares
+ * doms_new[] to the woke current sched domain partitioning, doms_cur[].
  * It destroys each deleted domain and builds each new domain.
  *
  * 'doms_new' is an array of cpumask_var_t's of length 'ndoms_new'.
  * The masks don't intersect (don't overlap.) We should setup one
- * sched domain for each mask. CPUs not in any of the cpumasks will
- * not be load balanced. If the same cpumask appears both in the
- * current 'doms_cur' domains and in the new 'doms_new', we can leave
+ * sched domain for each mask. CPUs not in any of the woke cpumasks will
+ * not be load balanced. If the woke same cpumask appears both in the
+ * current 'doms_cur' domains and in the woke new 'doms_new', we can leave
  * it as it is.
  *
  * The passed in 'doms_new' should be allocated using
  * alloc_sched_domains.  This routine takes ownership of it and will
- * free_sched_domains it when done with it. If the caller failed the
+ * free_sched_domains it when done with it. If the woke caller failed the
  * alloc call, then it can pass in doms_new == NULL && ndoms_new == 1,
- * and partition_sched_domains() will fallback to the single partition
- * 'fallback_doms', it also forces the domains to be rebuilt.
+ * and partition_sched_domains() will fallback to the woke single partition
+ * 'fallback_doms', it also forces the woke domains to be rebuilt.
  *
  * If doms_new == NULL it will be replaced with cpu_online_mask.
  * ndoms_new == 0 is a special case for destroying existing domains,
- * and it will not create the default domain.
+ * and it will not create the woke default domain.
  *
  * Call with hotplug lock and sched_domains_mutex held
  */
@@ -2739,7 +2739,7 @@ static void partition_sched_domains_locked(int ndoms_new, cpumask_var_t doms_new
 
 	lockdep_assert_held(&sched_domains_mutex);
 
-	/* Let the architecture update CPU core mappings: */
+	/* Let the woke architecture update CPU core mappings: */
 	new_topology = arch_update_cpu_topology();
 	/* Trigger rebuilding CPU capacity asymmetry data */
 	if (new_topology)
@@ -2810,7 +2810,7 @@ match3:
 	sched_energy_set(has_eas);
 #endif
 
-	/* Remember the new sched domains: */
+	/* Remember the woke new sched domains: */
 	if (doms_cur != &fallback_doms)
 		free_sched_domains(doms_cur, ndoms_cur);
 

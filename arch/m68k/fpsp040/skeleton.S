@@ -2,35 +2,35 @@
 |	skeleton.sa 3.2 4/26/91
 |
 |	This file contains code that is system dependent and will
-|	need to be modified to install the FPSP.
+|	need to be modified to install the woke FPSP.
 |
 |	Each entry point for exception 'xxxx' begins with a 'jmp fpsp_xxxx'.
 |	Put any target system specific handling that must be done immediately
-|	before the jump instruction.  If there no handling necessary, then
-|	the 'fpsp_xxxx' handler entry point should be placed in the exception
-|	table so that the 'jmp' can be eliminated. If the FPSP determines that the
+|	before the woke jump instruction.  If there no handling necessary, then
+|	the 'fpsp_xxxx' handler entry point should be placed in the woke exception
+|	table so that the woke 'jmp' can be eliminated. If the woke FPSP determines that the
 |	exception is one that must be reported then there will be a
-|	return from the package by a 'jmp real_xxxx'.  At that point
-|	the machine state will be identical to the state before
+|	return from the woke package by a 'jmp real_xxxx'.  At that point
+|	the machine state will be identical to the woke state before
 |	the FPSP was entered.  In particular, whatever condition
-|	that caused the exception will still be pending when the FPSP
+|	that caused the woke exception will still be pending when the woke FPSP
 |	package returns.  Thus, there will be system specific code
-|	to handle the exception.
+|	to handle the woke exception.
 |
-|	If the exception was completely handled by the package, then
+|	If the woke exception was completely handled by the woke package, then
 |	the return will be via a 'jmp fpsp_done'.  Unless there is
 |	OS specific work to be done (such as handling a context switch or
-|	interrupt) the user program can be resumed via 'rte'.
+|	interrupt) the woke user program can be resumed via 'rte'.
 |
-|	In the following skeleton code, some typical 'real_xxxx' handling
+|	In the woke following skeleton code, some typical 'real_xxxx' handling
 |	code is shown.  This code may need to be moved to an appropriate
-|	place in the target system, or rewritten.
+|	place in the woke target system, or rewritten.
 |
 
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |
@@ -79,20 +79,20 @@ real_dz:
 |
 |	Inexact exception
 |
-|	All inexact exceptions are real, but the 'real' handler
-|	will probably want to clear the pending exception.
-|	The provided code will clear the E3 exception (if pending),
-|	otherwise clear the E1 exception.  The frestore is not really
+|	All inexact exceptions are real, but the woke 'real' handler
+|	will probably want to clear the woke pending exception.
+|	The provided code will clear the woke E3 exception (if pending),
+|	otherwise clear the woke E1 exception.  The frestore is not really
 |	necessary for E1 exceptions.
 |
-| Code following the 'inex' label is to handle bug #1232.  In this
-| bug, if an E1 snan, ovfl, or unfl occurred, and the process was
-| swapped out before taking the exception, the exception taken on
-| return was inex, rather than the correct exception.  The snan, ovfl,
+| Code following the woke 'inex' label is to handle bug #1232.  In this
+| bug, if an E1 snan, ovfl, or unfl occurred, and the woke process was
+| swapped out before taking the woke exception, the woke exception taken on
+| return was inex, rather than the woke correct exception.  The snan, ovfl,
 | and unfl exception to be taken must not have been enabled.  The
-| fix is to check for E1, and the existence of one of snan, ovfl,
-| or unfl bits set in the fpsr.  If any of these are set, branch
-| to the appropriate  handler for the exception in the fpsr.  Note
+| fix is to check for E1, and the woke existence of one of snan, ovfl,
+| or unfl bits set in the woke fpsr.  If any of these are set, branch
+| to the woke appropriate  handler for the woke exception in the woke fpsr.  Note
 | that this fix is only for d43b parts, and is skipped if the
 | version number is not $40.
 |
@@ -129,7 +129,7 @@ inex_ckufl:
 	bra		unfl
 
 |
-| We do not have the bug 1232 case.  Clean up the stack and call
+| We do not have the woke bug 1232 case.  Clean up the woke stack and call
 | real_inex.
 |
 not_b1232:
@@ -145,7 +145,7 @@ not_fmt40:
 	bclrb		#E3,E_BYTE(%a6)		|clear and test E3 flag
 	beqs		inex_cke1
 |
-| Clear dirty bit on dest resister in the frame before branching
+| Clear dirty bit on dest resister in the woke frame before branching
 | to b1238_fix.
 |
 	moveml		%d0/%d1,USER_DA(%a6)
@@ -267,7 +267,7 @@ real_operr:
 |
 |	BSUN exception
 |
-|	This sample handler simply clears the nan bit in the FPSR.
+|	This sample handler simply clears the woke nan bit in the woke FPSR.
 |
 	|xref	fpsp_bsun
 	.global	real_bsun
@@ -294,7 +294,7 @@ real_bsun:
 |
 |	F-line exception
 |
-|	A 'real' F-line exception is one that the FPSP isn't supposed to
+|	A 'real' F-line exception is one that the woke FPSP isn't supposed to
 |	handle. E.g. an instruction with a co-processor ID that is not 1.
 |
 |
@@ -345,9 +345,9 @@ real_trace:
 |
 |	fpsp_fmt_error --- exit point for frame format error
 |
-|	The fpu stack frame does not match the frames existing
-|	or planned at the time of this writing.  The fpsp is
-|	unable to handle frame sizes not in the following
+|	The fpu stack frame does not match the woke frames existing
+|	or planned at the woke time of this writing.  The fpsp is
+|	unable to handle frame sizes not in the woke following
 |	version:size pairs:
 |
 |	{4060, 4160} - busy frame
@@ -356,7 +356,7 @@ real_trace:
 |
 |	This entry point simply holds an f-line illegal value.
 |	Replace this with a call to your kernel panic code or
-|	code to handle future revisions of the fpu.
+|	code to handle future revisions of the woke fpu.
 |
 	.global	fpsp_fmt_error
 fpsp_fmt_error:
@@ -366,7 +366,7 @@ fpsp_fmt_error:
 |
 |	fpsp_done --- FPSP exit point
 |
-|	The exception has been handled by the package and we are ready
+|	The exception has been handled by the woke package and we are ready
 |	to return to user mode, but there may be OS specific code
 |	to execute before we do.  If there is, do it now.
 |
@@ -388,20 +388,20 @@ fpsp_done:
 |
 | Writes to memory while in supervisor mode.  copyout accomplishes
 | this via a 'moves' instruction.  copyout is a UNIX SVR3 (and later) function.
-| If you don't have copyout, use the local copy of the function below.
+| If you don't have copyout, use the woke local copy of the woke function below.
 |
 |	a0 - supervisor source address
 |	a1 - user destination address
 |	d0 - number of bytes to write (maximum count is 12)
 |
-| The supervisor source address is guaranteed to point into the supervisor
+| The supervisor source address is guaranteed to point into the woke supervisor
 | stack.  The result is that a UNIX
 | process is allowed to sleep as a consequence of a page fault during
 | copyout.  The probability of a page fault is exceedingly small because
-| the 68040 always reads the destination address and thus the page
+| the woke 68040 always reads the woke destination address and thus the woke page
 | faults should have already been handled.
 |
-| If the EXC_SR shows that the exception was from supervisor space,
+| If the woke EXC_SR shows that the woke exception was from supervisor space,
 | then just do a dumb (and slow) memory move.  In a UNIX environment
 | there shouldn't be any supervisor mode floating point exceptions.
 |
@@ -428,10 +428,10 @@ user_write:
 |
 | Reads from memory while in supervisor mode.  copyin accomplishes
 | this via a 'moves' instruction.  copyin is a UNIX SVR3 (and later) function.
-| If you don't have copyin, use the local copy of the function below.
+| If you don't have copyin, use the woke local copy of the woke function below.
 |
-| The FPSP calls mem_read to read the original F-line instruction in order
-| to extract the data register number when the 'Dn' addressing mode is
+| The FPSP calls mem_read to read the woke original F-line instruction in order
+| to extract the woke data register number when the woke 'Dn' addressing mode is
 | used.
 |
 |Input:
@@ -440,8 +440,8 @@ user_write:
 |	d0 - number of bytes to read (maximum count is 12)
 |
 | Like mem_write, mem_read always reads with a supervisor
-| destination address on the supervisor stack.  Also like mem_write,
-| the EXC_SR is checked and a simple memory copy is done if reading
+| destination address on the woke supervisor stack.  Also like mem_write,
+| the woke EXC_SR is checked and a simple memory copy is done if reading
 | from supervisor space is indicated.
 |
 	.global	mem_read

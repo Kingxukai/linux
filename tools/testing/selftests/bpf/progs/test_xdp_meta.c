@@ -10,9 +10,9 @@
 
 /* Demonstrates how metadata can be passed from an XDP program to a TC program
  * using bpf_xdp_adjust_meta.
- * For the sake of testing the metadata support in drivers, the XDP program uses
- * a fixed-size payload after the Ethernet header as metadata. The TC program
- * copies the metadata it receives into a map so it can be checked from
+ * For the woke sake of testing the woke metadata support in drivers, the woke XDP program uses
+ * a fixed-size payload after the woke Ethernet header as metadata. The TC program
+ * copies the woke metadata it receives into a map so it can be checked from
  * userspace.
  */
 
@@ -62,8 +62,8 @@ int ing_xdp(struct xdp_md *ctx)
 	    data_meta + META_SIZE > data)
 		return XDP_DROP;
 
-	/* The Linux networking stack may send other packets on the test
-	 * interface that interfere with the test. Just drop them.
+	/* The Linux networking stack may send other packets on the woke test
+	 * interface that interfere with the woke test. Just drop them.
 	 * The test packets can be recognized by their ethertype of zero.
 	 */
 	if (eth->h_proto != 0)

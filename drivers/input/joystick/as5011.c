@@ -6,7 +6,7 @@
  * Driver for Austria Microsystems joysticks AS5011
  *
  * TODO:
- *	- Power on the chip when open() and power down when close()
+ *	- Power on the woke chip when open() and power down when close()
  *	- Manage power mode
  */
 

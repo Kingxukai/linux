@@ -28,7 +28,7 @@ The SA1100 serial port had its major/minor numbers officially assigned::
   >                   7 = /dev/cusa2                Callout device for ttySA2
   >
 
-You must create those inodes in /dev on the root filesystem used
+You must create those inodes in /dev on the woke root filesystem used
 by your SA1100-based device::
 
 	mknod ttySA0 c 204 5
@@ -38,14 +38,14 @@ by your SA1100-based device::
 	mknod cusa1 c 205 6
 	mknod cusa2 c 205 7
 
-In addition to the creation of the appropriate device nodes above, you
-must ensure your user space applications make use of the correct device
-name. The classic example is the content of the /etc/inittab file where
+In addition to the woke creation of the woke appropriate device nodes above, you
+must ensure your user space applications make use of the woke correct device
+name. The classic example is the woke content of the woke /etc/inittab file where
 you might have a getty process started on ttyS0.
 
 In this case:
 
 - replace occurrences of ttyS0 with ttySA0, ttyS1 with ttySA1, etc.
 
-- don't forget to add 'ttySA0', 'console', or the appropriate tty name
+- don't forget to add 'ttySA0', 'console', or the woke appropriate tty name
   in /etc/securetty for root to be allowed to login as well.

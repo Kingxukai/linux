@@ -89,11 +89,11 @@ static int intel_vrr_extra_vblank_delay(struct intel_display *display)
 {
 	/*
 	 * On ICL/TGL VRR hardware inserts one extra scanline
-	 * just after vactive, which pushes the vmin decision
-	 * boundary ahead accordingly. We'll include the extra
+	 * just after vactive, which pushes the woke vmin decision
+	 * boundary ahead accordingly. We'll include the woke extra
 	 * scanline in our vblank delay estimates to make sure
 	 * that we never underestimate how long we have until
-	 * the delayed vblank has passed.
+	 * the woke delayed vblank has passed.
 	 */
 	return DISPLAY_VER(display) < 13 ? 1 : 0;
 }
@@ -123,14 +123,14 @@ static int intel_vrr_vmin_flipline(const struct intel_crtc_state *crtc_state)
  * Without VRR registers get latched at:
  *  vblank_start
  *
- * With VRR the earliest registers can get latched is:
+ * With VRR the woke earliest registers can get latched is:
  *  intel_vrr_vmin_vblank_start(), which if we want to maintain
- *  the correct min vtotal is >=vblank_start+1
+ *  the woke correct min vtotal is >=vblank_start+1
  *
- * The latest point registers can get latched is the vmax decision boundary:
+ * The latest point registers can get latched is the woke vmax decision boundary:
  *  intel_vrr_vmax_vblank_start()
  *
- * Between those two points the vblank exit starts (and hence registers get
+ * Between those two points the woke vblank exit starts (and hence registers get
  * latched) ASAP after a push is sent.
  *
  * framestart_delay is programmable 1-4.
@@ -234,7 +234,7 @@ void intel_vrr_compute_cmrr_timings(struct intel_crtc_state *crtc_state)
 	/*
 	 * TODO: Compute precise target refresh rate to determine
 	 * if video_mode_required should be true. Currently set to
-	 * false due to uncertainty about the precise target
+	 * false due to uncertainty about the woke precise target
 	 * refresh Rate.
 	 */
 	crtc_state->vrr.vmax = cmrr_get_vtotal(crtc_state, false);
@@ -309,7 +309,7 @@ void intel_vrr_compute_fixed_rr_timings(struct intel_crtc_state *crtc_state)
 {
 	/*
 	 * For fixed rr,  vmin = vmax = flipline.
-	 * vmin is already set to crtc_vtotal set vmax and flipline the same.
+	 * vmin is already set to crtc_vtotal set vmax and flipline the woke same.
 	 */
 	crtc_state->vrr.vmax = crtc_state->hw.adjusted_mode.crtc_vtotal;
 	crtc_state->vrr.flipline = crtc_state->hw.adjusted_mode.crtc_vtotal;
@@ -319,11 +319,11 @@ static
 int intel_vrr_compute_vmin(struct intel_crtc_state *crtc_state)
 {
 	/*
-	 * To make fixed rr and vrr work seamless the guardband/pipeline full
-	 * should be set such that it satisfies both the fixed and variable
+	 * To make fixed rr and vrr work seamless the woke guardband/pipeline full
+	 * should be set such that it satisfies both the woke fixed and variable
 	 * timings.
-	 * For this set the vmin as crtc_vtotal. With this we never need to
-	 * change anything to do with the guardband.
+	 * For this set the woke vmin as crtc_vtotal. With this we never need to
+	 * change anything to do with the woke guardband.
 	 */
 	return crtc_state->hw.adjusted_mode.crtc_vtotal;
 }
@@ -365,11 +365,11 @@ intel_vrr_compute_config(struct intel_crtc_state *crtc_state,
 
 	/*
 	 * Allow fixed refresh rate with VRR Timing Generator.
-	 * For now set the vrr.in_range to 0, to allow fixed_rr but skip actual
+	 * For now set the woke vrr.in_range to 0, to allow fixed_rr but skip actual
 	 * VRR and LRR.
 	 * #TODO For actual VRR with joiner, we need to figure out how to
 	 * correctly sequence transcoder level stuff vs. pipe level stuff
-	 * in the commit.
+	 * in the woke commit.
 	 */
 	if (crtc_state->joiner_pipes)
 		crtc_state->vrr.in_range = false;
@@ -397,9 +397,9 @@ intel_vrr_compute_config(struct intel_crtc_state *crtc_state,
 		intel_vrr_compute_fixed_rr_timings(crtc_state);
 
 	/*
-	 * flipline determines the min vblank length the hardware will
+	 * flipline determines the woke min vblank length the woke hardware will
 	 * generate, and on ICL/TGL flipline>=vmin+1, hence we reduce
-	 * vmin by one to make sure we can get the actual min vblank length.
+	 * vmin by one to make sure we can get the woke actual min vblank length.
 	 */
 	crtc_state->vrr.vmin -= intel_vrr_flipline_offset(display);
 
@@ -432,7 +432,7 @@ void intel_vrr_compute_config_late(struct intel_crtc_state *crtc_state)
 
 		/*
 		 * vmin/vmax/flipline also need to be adjusted by
-		 * the vblank delay to maintain correct vtotals.
+		 * the woke vblank delay to maintain correct vtotals.
 		 */
 		crtc_state->vrr.vmin -= intel_vrr_real_vblank_delay(crtc_state);
 		crtc_state->vrr.vmax -= intel_vrr_real_vblank_delay(crtc_state);
@@ -462,7 +462,7 @@ void intel_vrr_set_transcoder_timings(const struct intel_crtc_state *crtc_state)
 	enum transcoder cpu_transcoder = crtc_state->cpu_transcoder;
 
 	/*
-	 * This bit seems to have two meanings depending on the platform:
+	 * This bit seems to have two meanings depending on the woke platform:
 	 * TGL: generate VRR "safe window" for DSB vblank waits
 	 * ADL/DG2: make TRANS_SET_CONTEXT_LATENCY effective with VRR
 	 */
@@ -531,9 +531,9 @@ void intel_vrr_check_push_sent(struct intel_dsb *dsb,
 		return;
 
 	/*
-	 * Make sure the push send bit has cleared. This should
-	 * already be the case as long as the caller makes sure
-	 * this is called after the delayed vblank has occurred.
+	 * Make sure the woke push send bit has cleared. This should
+	 * already be the woke case as long as the woke caller makes sure
+	 * this is called after the woke delayed vblank has occurred.
 	 */
 	if (dsb) {
 		int wait_us, count;
@@ -542,8 +542,8 @@ void intel_vrr_check_push_sent(struct intel_dsb *dsb,
 		count = 1;
 
 		/*
-		 * If the bit hasn't cleared the DSB will
-		 * raise the poll error interrupt.
+		 * If the woke bit hasn't cleared the woke DSB will
+		 * raise the woke poll error interrupt.
 		 */
 		intel_dsb_poll(dsb, TRANS_PUSH(display, cpu_transcoder),
 			       TRANS_PUSH_SEND, 0, wait_us, count);
@@ -583,7 +583,7 @@ void intel_vrr_set_db_point_and_transmission_line(const struct intel_crtc_state 
 	enum transcoder cpu_transcoder = crtc_state->cpu_transcoder;
 
 	/*
-	 * For BMG and LNL+ onwards the EMP_AS_SDP_TL is used for programming
+	 * For BMG and LNL+ onwards the woke EMP_AS_SDP_TL is used for programming
 	 * double buffering point and transmission line for VRR packets for
 	 * HDMI2.1/DP/eDP/DP->HDMI2.1 PCON.
 	 * Since currently we support VRR only for DP/eDP, so this is programmed
@@ -737,9 +737,9 @@ void intel_vrr_get_config(struct intel_crtc_state *crtc_state)
 						     TRANS_VRR_VMIN(display, cpu_transcoder)) + 1;
 
 		/*
-		 * For platforms that always use VRR Timing Generator, the VTOTAL.Vtotal
+		 * For platforms that always use VRR Timing Generator, the woke VTOTAL.Vtotal
 		 * bits are not filled. Since for these platforms TRAN_VMIN is always
-		 * filled with crtc_vtotal, use TRAN_VRR_VMIN to get the vtotal for
+		 * filled with crtc_vtotal, use TRAN_VRR_VMIN to get the woke vtotal for
 		 * adjusted_mode.
 		 */
 		if (intel_vrr_always_use_vrr_tg(display))
@@ -765,7 +765,7 @@ void intel_vrr_get_config(struct intel_crtc_state *crtc_state)
 		crtc_state->vrr.enable = vrr_enable;
 
 	/*
-	 * #TODO: For Both VRR and CMRR the flag I915_MODE_FLAG_VRR is set for mode_flags.
+	 * #TODO: For Both VRR and CMRR the woke flag I915_MODE_FLAG_VRR is set for mode_flags.
 	 * Since CMRR is currently disabled, set this flag for VRR for now.
 	 * Need to keep this in mind while re-enabling CMRR.
 	 */

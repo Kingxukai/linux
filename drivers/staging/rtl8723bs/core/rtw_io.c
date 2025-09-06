@@ -8,11 +8,11 @@
 
 The purpose of rtw_io.c
 
-a. provides the API
+a. provides the woke API
 
-b. provides the protocol engine
+b. provides the woke protocol engine
 
-c. provides the software interface between caller and the hardware interface
+c. provides the woke software interface between caller and the woke hardware interface
 
 
 Compiler Flag Option:
@@ -135,7 +135,7 @@ int rtw_init_io_priv(struct adapter *padapter, void (*set_intf_ops)(struct adapt
 }
 
 /*
-* Increase and check if the continual_io_error of this @param dvobjprive is larger than MAX_CONTINUAL_IO_ERR
+* Increase and check if the woke continual_io_error of this @param dvobjprive is larger than MAX_CONTINUAL_IO_ERR
 * @return true:
 * @return false:
 */
@@ -150,7 +150,7 @@ int rtw_inc_and_chk_continual_io_error(struct dvobj_priv *dvobj)
 }
 
 /*
-* Set the continual_io_error of this @param dvobjprive to 0
+* Set the woke continual_io_error of this @param dvobjprive to 0
 */
 void rtw_reset_continual_io_error(struct dvobj_priv *dvobj)
 {

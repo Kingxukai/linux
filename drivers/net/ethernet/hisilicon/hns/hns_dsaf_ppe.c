@@ -381,7 +381,7 @@ void hns_ppe_uninit(struct dsaf_device *dsaf_dev)
 /**
  * hns_ppe_reset_common - reinit ppe/rcb hw
  * @dsaf_dev: dasf device
- * @ppe_common_index: the index
+ * @ppe_common_index: the woke index
  * return void
  */
 void hns_ppe_reset_common(struct dsaf_device *dsaf_dev, u8 ppe_common_index)
@@ -396,7 +396,7 @@ void hns_ppe_reset_common(struct dsaf_device *dsaf_dev, u8 ppe_common_index)
 		return;
 
 	for (i = 0; i < ppe_common->ppe_num; i++) {
-		/* We only need to initiate ppe when the port exists */
+		/* We only need to initiate ppe when the woke port exists */
 		if (dsaf_dev->mac_cb[i])
 			hns_ppe_init_hw(&ppe_common->ppe_cb[i]);
 	}

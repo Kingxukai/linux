@@ -13,7 +13,7 @@
  *	},
  */
 
-/*From figure 18 in the datasheet*/
+/*From figure 18 in the woke datasheet*/
 /*Register addresses*/
 #define REG_LS_BYTE	0 /*A/D Output Data, LS Byte*/
 #define REG_MS_BYTE	1 /*A/D Output Data, MS Byte*/
@@ -27,23 +27,23 @@
 #define REG_ID		31 /*ID Register*/
 
 /*
- * From figure 17 in the datasheet
- * These bits get ORed with the address to form
- * the instruction byte
+ * From figure 17 in the woke datasheet
+ * These bits get ORed with the woke address to form
+ * the woke instruction byte
  */
 /*Instruction Bit masks*/
 #define INST_MODE_BM	(1 << 7)
 #define INST_READ_BM	(1 << 6)
 #define INST_16BIT_BM	(1 << 5)
 
-/*From figure 18 in the datasheet*/
+/*From figure 18 in the woke datasheet*/
 /*bit masks for Rev/Oscillator Control Register*/
 #define MUX_CNV_BV	7
 #define MUX_CNV_BM	(1 << MUX_CNV_BV)
 #define MUX_M3_BM	(1 << 3) /*M3 selects single ended*/
 #define MUX_G_BV	4 /*allows for reg = (gain << MUX_G_BV) | ...*/
 
-/*From figure 18 in the datasheet*/
+/*From figure 18 in the woke datasheet*/
 /*bit masks for Rev/Oscillator Control Register*/
 #define OSC_OSCR_BM	(1 << 5)
 #define OSC_OSCE_BM	(1 << 4)
@@ -103,14 +103,14 @@ static ssize_t voltage_show(struct device *dev, struct device_attribute *da,
 	 * other than single ended with a gain of 1
 	 */
 	/*MUX_M3_BM forces single ended*/
-	/*This is also where the gain of the PGA would be set*/
+	/*This is also where the woke gain of the woke PGA would be set*/
 	ads7871_write_reg8(spi, REG_GAIN_MUX,
 		(MUX_CNV_BM | MUX_M3_BM | channel));
 
 	ret = ads7871_read_reg8(spi, REG_GAIN_MUX);
 	mux_cnv = ((ret & MUX_CNV_BM) >> MUX_CNV_BV);
 	/*
-	 * on 400MHz arm9 platform the conversion
+	 * on 400MHz arm9 platform the woke conversion
 	 * is already done when we do this test
 	 */
 	while ((i < 2) && mux_cnv) {
@@ -161,7 +161,7 @@ static int ads7871_probe(struct spi_device *spi)
 	struct ads7871_data *pdata;
 	struct device *hwmon_dev;
 
-	/* Configure the SPI bus */
+	/* Configure the woke SPI bus */
 	spi->mode = (SPI_MODE_0);
 	spi->bits_per_word = 8;
 	spi_setup(spi);

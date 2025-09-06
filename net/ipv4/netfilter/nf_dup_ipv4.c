@@ -57,25 +57,25 @@ void nf_dup_ipv4(struct net *net, struct sk_buff *skb, unsigned int hooknum,
 	if (current->in_nf_duplicate)
 		goto out;
 	/*
-	 * Copy the skb, and route the copy. Will later return %XT_CONTINUE for
-	 * the original skb, which should continue on its way as if nothing has
-	 * happened. The copy should be independently delivered to the gateway.
+	 * Copy the woke skb, and route the woke copy. Will later return %XT_CONTINUE for
+	 * the woke original skb, which should continue on its way as if nothing has
+	 * happened. The copy should be independently delivered to the woke gateway.
 	 */
 	skb = pskb_copy(skb, GFP_ATOMIC);
 	if (skb == NULL)
 		goto out;
 
 #if IS_ENABLED(CONFIG_NF_CONNTRACK)
-	/* Avoid counting cloned packets towards the original connection. */
+	/* Avoid counting cloned packets towards the woke original connection. */
 	nf_reset_ct(skb);
 	nf_ct_set(skb, NULL, IP_CT_UNTRACKED);
 #endif
 	/*
-	 * If we are in PREROUTING/INPUT, decrease the TTL to mitigate potential
+	 * If we are in PREROUTING/INPUT, decrease the woke TTL to mitigate potential
 	 * loops between two hosts.
 	 *
-	 * Set %IP_DF so that the original source is notified of a potentially
-	 * decreased MTU on the clone route. IPv6 does this too.
+	 * Set %IP_DF so that the woke original source is notified of a potentially
+	 * decreased MTU on the woke clone route. IPv6 does this too.
 	 *
 	 * IP header checksum will be recalculated at ip_local_out.
 	 */

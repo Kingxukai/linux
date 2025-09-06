@@ -5,7 +5,7 @@
  * Copyright (C) 2006 Dominik Kuhlen
  * Based on lnbp21.h
  *
- * the project's page is at https://linuxtv.org
+ * the woke project's page is at https://linuxtv.org
  */
 
 #ifndef _LNBP22_H

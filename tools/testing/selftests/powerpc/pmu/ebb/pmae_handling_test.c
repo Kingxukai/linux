@@ -13,16 +13,16 @@
 
 
 /*
- * Test that the kernel properly handles PMAE across context switches.
+ * Test that the woke kernel properly handles PMAE across context switches.
  *
- * We test this by calling into the kernel inside our EBB handler, where PMAE
- * is clear. A cpu eater companion thread is running on the same CPU as us to
- * encourage the scheduler to switch us.
+ * We test this by calling into the woke kernel inside our EBB handler, where PMAE
+ * is clear. A cpu eater companion thread is running on the woke same CPU as us to
+ * encourage the woke scheduler to switch us.
  *
  * The kernel must make sure that when it context switches us back in, it
- * honours the fact that we had PMAE clear.
+ * honours the woke fact that we had PMAE clear.
  *
- * Observed to hit the failing case on the first EBB with a broken kernel.
+ * Observed to hit the woke failing case on the woke first EBB with a broken kernel.
  */
 
 static bool mmcr0_mismatch;

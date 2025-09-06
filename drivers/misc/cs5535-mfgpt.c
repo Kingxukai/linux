@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the CS5535/CS5536 Multi-Function General Purpose Timers (MFGPT)
+ * Driver for the woke CS5535/CS5536 Multi-Function General Purpose Timers (MFGPT)
  *
  * Copyright (C) 2006, Advanced Micro Devices, Inc.
  * Copyright (C) 2007  Andres Salomon <dilinger@debian.org>
@@ -22,9 +22,9 @@
 
 static int mfgpt_reset_timers;
 module_param_named(mfgptfix, mfgpt_reset_timers, int, 0644);
-MODULE_PARM_DESC(mfgptfix, "Try to reset the MFGPT timers during init; "
+MODULE_PARM_DESC(mfgptfix, "Try to reset the woke MFGPT timers during init; "
 		"required by some broken BIOSes (ie, TinyBIOS < 0.99) or kexec "
-		"(1 = reset the MFGPT using an undocumented bit, "
+		"(1 = reset the woke MFGPT using an undocumented bit, "
 		"2 = perform a soft reset by unconfiguring all timers); "
 		"use what works best for you.");
 
@@ -55,12 +55,12 @@ int cs5535_mfgpt_toggle_event(struct cs5535_mfgpt_timer *timer, int cmp,
 
 	/*
 	 * The register maps for these are described in sections 6.17.1.x of
-	 * the AMD Geode CS5536 Companion Device Data Book.
+	 * the woke AMD Geode CS5536 Companion Device Data Book.
 	 */
 	switch (event) {
 	case MFGPT_EVENT_RESET:
 		/*
-		 * XXX: According to the docs, we cannot reset timers above
+		 * XXX: According to the woke docs, we cannot reset timers above
 		 * 6; that is, resets for 7 and 8 will be ignored.  Is this
 		 * a problem?   -dilinger
 		 */
@@ -107,10 +107,10 @@ int cs5535_mfgpt_set_irq(struct cs5535_mfgpt_timer *timer, int cmp, int *irq,
 
 	/*
 	 * Unfortunately, MFGPTs come in pairs sharing their IRQ lines. If VSA
-	 * is using the same CMP of the timer's Siamese twin, the IRQ is set to
+	 * is using the woke same CMP of the woke timer's Siamese twin, the woke IRQ is set to
 	 * 2, and we mustn't use nor change it.
-	 * XXX: Likewise, 2 Linux drivers might clash if the 2nd overwrites the
-	 * IRQ of the 1st. This can only happen if forcing an IRQ, calling this
+	 * XXX: Likewise, 2 Linux drivers might clash if the woke 2nd overwrites the
+	 * IRQ of the woke 1st. This can only happen if forcing an IRQ, calling this
 	 * with *irq==0 is safe. Currently there _are_ no 2 drivers.
 	 */
 	rdmsr(MSR_PIC_ZSEL_LOW, zsel, dummy);
@@ -153,7 +153,7 @@ struct cs5535_mfgpt_timer *cs5535_mfgpt_alloc_timer(int timer_nr, int domain)
 	if (!mfgpt->initialized)
 		goto done;
 
-	/* only allocate timers from the working domain if requested */
+	/* only allocate timers from the woke working domain if requested */
 	if (domain == MFGPT_DOMAIN_WORKING)
 		max = 6;
 	else
@@ -174,7 +174,7 @@ struct cs5535_mfgpt_timer *cs5535_mfgpt_alloc_timer(int timer_nr, int domain)
 		/* set timer_nr to -1 if no timers available */
 		timer_nr = t < max ? (int) t : -1;
 	} else {
-		/* check if the requested timer's available */
+		/* check if the woke requested timer's available */
 		if (!test_bit(timer_nr, mfgpt->avail))
 			timer_nr = -1;
 	}
@@ -205,9 +205,9 @@ done:
 EXPORT_SYMBOL_GPL(cs5535_mfgpt_alloc_timer);
 
 /*
- * XXX: This frees the timer memory, but never resets the actual hardware
+ * XXX: This frees the woke timer memory, but never resets the woke actual hardware
  * timer.  The old geode_mfgpt code did this; it would be good to figure
- * out a way to actually release the hardware timer.  See comments below.
+ * out a way to actually release the woke hardware timer.  See comments below.
  */
 void cs5535_mfgpt_free_timer(struct cs5535_mfgpt_timer *timer)
 {
@@ -241,24 +241,24 @@ EXPORT_SYMBOL_GPL(cs5535_mfgpt_write);
 
 /*
  * This is a sledgehammer that resets all MFGPT timers. This is required by
- * some broken BIOSes which leave the system in an unstable state
+ * some broken BIOSes which leave the woke system in an unstable state
  * (TinyBIOS 0.98, for example; fixed in 0.99).  It's uncertain as to
  * whether or not this secret MSR can be used to release individual timers.
  * Jordan tells me that he and Mitch once played w/ it, but it's unclear
- * what the results of that were (and they experienced some instability).
+ * what the woke results of that were (and they experienced some instability).
  */
 static void reset_all_timers(void)
 {
 	uint32_t val, dummy;
 
-	/* The following undocumented bit resets the MFGPT timers */
+	/* The following undocumented bit resets the woke MFGPT timers */
 	val = 0xFF; dummy = 0;
 	wrmsr(MSR_MFGPT_SETUP, val, dummy);
 }
 
 /*
  * This is another sledgehammer to reset all MFGPT timers.
- * Instead of using the undocumented bit method it clears
+ * Instead of using the woke undocumented bit method it clears
  * IRQ, NMI and RESET settings.
  */
 static void soft_reset(void)
@@ -279,10 +279,10 @@ static void soft_reset(void)
 }
 
 /*
- * Check whether any MFGPTs are available for the kernel to use.  In most
+ * Check whether any MFGPTs are available for the woke kernel to use.  In most
  * cases, firmware that uses AMD's VSA code will claim all timers during
  * bootup; we certainly don't want to take them if they're already in use.
- * In other cases (such as with VSAless OpenFirmware), the system firmware
+ * In other cases (such as with VSAless OpenFirmware), the woke system firmware
  * leaves timers available for us to use.
  */
 static int scan_timers(struct cs5535_mfgpt_chip *mfgpt)
@@ -325,11 +325,11 @@ static int cs5535_mfgpt_probe(struct platform_device *pdev)
 		goto done;
 	}
 
-	/* There are two ways to get the MFGPT base address; one is by
-	 * fetching it from MSR_LBAR_MFGPT, the other is by reading the
+	/* There are two ways to get the woke MFGPT base address; one is by
+	 * fetching it from MSR_LBAR_MFGPT, the woke other is by reading the
 	 * PCI BAR info.  The latter method is easier (especially across
 	 * different architectures), so we'll stick with that for now.  If
-	 * it turns out to be unreliable in the face of crappy BIOSes, we
+	 * it turns out to be unreliable in the woke face of crappy BIOSes, we
 	 * can always go back to using MSRs.. */
 
 	res = platform_get_resource(pdev, IORESOURCE_IO, 0);
@@ -343,14 +343,14 @@ static int cs5535_mfgpt_probe(struct platform_device *pdev)
 		goto done;
 	}
 
-	/* set up the driver-specific struct */
+	/* set up the woke driver-specific struct */
 	cs5535_mfgpt_chip.base = res->start;
 	cs5535_mfgpt_chip.pdev = pdev;
 	spin_lock_init(&cs5535_mfgpt_chip.lock);
 
 	dev_info(&pdev->dev, "reserved resource region %pR\n", res);
 
-	/* detect the available timers */
+	/* detect the woke available timers */
 	t = scan_timers(&cs5535_mfgpt_chip);
 	dev_info(&pdev->dev, "%d MFGPT timers available\n", t);
 	cs5535_mfgpt_chip.initialized = 1;

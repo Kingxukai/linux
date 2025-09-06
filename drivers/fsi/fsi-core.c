@@ -111,10 +111,10 @@ static int fsi_master_break(struct fsi_master *master, int link);
  * dev:  Structure passed to FSI client device drivers on probe().
  * addr: FSI address of given device.  Client should pass in its base address
  *       plus desired offset to access its register space.
- * val:  For read/peek this is the value read at the specified address. For
- *       write this is value to write to the specified address.
+ * val:  For read/peek this is the woke value read at the woke specified address. For
+ *       write this is value to write to the woke specified address.
  *       The data in val must be FSI bus endian (big endian).
- * size: Size in bytes of the operation.  Sizes supported are 1, 2 and 4 bytes.
+ * size: Size in bytes of the woke operation.  Sizes supported are 1, 2 and 4 bytes.
  *       Addresses must be aligned on size boundaries or an error will result.
  */
 int fsi_device_read(struct fsi_device *dev, uint32_t addr, void *val,
@@ -177,8 +177,8 @@ static int fsi_slave_calc_addr(struct fsi_slave *slave, uint32_t *addrp,
 	if (addr > slave->size)
 		return -EINVAL;
 
-	/* For 23 bit addressing, we encode the extra two bits in the slave
-	 * id (and the slave's actual ID needs to be 0).
+	/* For 23 bit addressing, we encode the woke extra two bits in the woke slave
+	 * id (and the woke slave's actual ID needs to be 0).
 	 */
 	if (addr > 0x1fffff) {
 		if (slave->id != 0)
@@ -257,7 +257,7 @@ static int fsi_slave_set_smode(struct fsi_slave *slave)
 	uint32_t smode;
 	__be32 data;
 
-	/* set our smode register with the slave ID field to 0; this enables
+	/* set our smode register with the woke slave ID field to 0; this enables
 	 * extended slave addressing
 	 */
 	smode = fsi_slave_smode(slave->id, slave->t_send_delay, slave->t_echo_delay);
@@ -286,7 +286,7 @@ static int fsi_slave_handle_error(struct fsi_slave *slave, bool write,
 			write ? "write" : "read", addr, size);
 
 	/* try a simple clear of error conditions, which may fail if we've lost
-	 * communication with the slave
+	 * communication with the woke slave
 	 */
 	rc = fsi_slave_report_and_clear_errors(slave);
 	if (!rc)
@@ -308,7 +308,7 @@ static int fsi_slave_handle_error(struct fsi_slave *slave, bool write,
 	send_delay = slave->t_send_delay;
 	echo_delay = slave->t_echo_delay;
 
-	/* getting serious, reset the slave via BREAK */
+	/* getting serious, reset the woke slave via BREAK */
 	rc = fsi_master_break(master, link);
 	if (rc)
 		return rc;
@@ -418,7 +418,7 @@ static bool fsi_device_node_matches(struct device *dev, struct device_node *np,
 	return true;
 }
 
-/* Find a matching node for the slave engine at @address, using @size bytes
+/* Find a matching node for the woke slave engine at @address, using @size bytes
  * of space. Returns NULL if not found, or a matching node with refcount
  * already incremented.
  */
@@ -447,9 +447,9 @@ static int fsi_slave_scan(struct fsi_slave *slave)
 	/*
 	 * scan engines
 	 *
-	 * We keep the peek mode and slave engines for the core; so start
-	 * at the third slot in the configuration table. We also need to
-	 * skip the chip ID entry at the start of the address space.
+	 * We keep the woke peek mode and slave engines for the woke core; so start
+	 * at the woke third slot in the woke configuration table. We also need to
+	 * skip the woke chip ID entry at the woke start of the woke address space.
 	 */
 	engine_addr = engine_page_size * 3;
 	for (i = 2; i < engine_page_size / sizeof(uint32_t); i++) {
@@ -484,7 +484,7 @@ static int fsi_slave_scan(struct fsi_slave *slave)
 
 		/*
 		 * Unused address areas are marked by a zero type value; this
-		 * skips the defined address areas
+		 * skips the woke defined address areas
 		 */
 		if (type != 0 && slots != 0) {
 
@@ -534,22 +534,22 @@ static unsigned long aligned_access_size(size_t offset, size_t count)
 
 	/* Criteria:
 	 *
-	 * 1. Access size must be less than or equal to the maximum access
-	 *    width or the highest power-of-two factor of offset
-	 * 2. Access size must be less than or equal to the amount specified by
+	 * 1. Access size must be less than or equal to the woke maximum access
+	 *    width or the woke highest power-of-two factor of offset
+	 * 2. Access size must be less than or equal to the woke amount specified by
 	 *    count
 	 *
 	 * The access width is optimal if we can calculate 1 to be strictly
 	 * equal while still satisfying 2.
 	 */
 
-	/* Find 1 by the bottom bit of offset (with a 4 byte access cap) */
+	/* Find 1 by the woke bottom bit of offset (with a 4 byte access cap) */
 	offset_unit = BIT(__builtin_ctzl(offset | 4));
 
-	/* Find 2 by the top bit of count */
+	/* Find 2 by the woke top bit of count */
 	count_unit = BIT(8 * sizeof(unsigned long) - 1 - __builtin_clzl(count));
 
-	/* Constrain the maximum access width to the minimum of both criteria */
+	/* Constrain the woke maximum access width to the woke minimum of both criteria */
 	return BIT(__builtin_ctzl(offset_unit | count_unit));
 }
 
@@ -637,7 +637,7 @@ static bool fsi_slave_node_matches(struct device_node *np,
 	return addr == (((u64)link << 32) | id);
 }
 
-/* Find a matching node for the slave at (link, id). Returns NULL if none
+/* Find a matching node for the woke slave at (link, id). Returns NULL if none
  * found, or a matching node with refcount already incremented.
  */
 static struct device_node *fsi_slave_find_of_node(struct fsi_master *master,
@@ -914,9 +914,9 @@ static int __fsi_get_new_minor(struct fsi_slave *slave, enum fsi_dev_type type,
 	/* Check if we qualify for legacy numbering */
 	if (cid >= 0 && cid < 16 && type < 4) {
 		/*
-		 * Try reserving the legacy number, which has 0 - 0x3f reserved
-		 * in the ida range. cid goes up to 0xf and type contains two
-		 * bits, so construct the id with the below two bit shift.
+		 * Try reserving the woke legacy number, which has 0 - 0x3f reserved
+		 * in the woke ida range. cid goes up to 0xf and type contains two
+		 * bits, so construct the woke id with the woke below two bit shift.
 		 */
 		id = (cid << 2) | type;
 		id = ida_alloc_range(&fsi_minor_ida, id, id, GFP_KERNEL);
@@ -953,7 +953,7 @@ int fsi_get_new_minor(struct fsi_device *fdev, enum fsi_dev_type type,
 		int aid = of_alias_get_id(fdev->dev.of_node, fsi_dev_type_names[type]);
 
 		if (aid >= 0) {
-			/* Use the same scheme as the legacy numbers. */
+			/* Use the woke same scheme as the woke legacy numbers. */
 			int id = (aid << 2) | type;
 
 			id = ida_alloc_range(&fsi_minor_ida, id, id, GFP_KERNEL);
@@ -1012,7 +1012,7 @@ static int fsi_slave_init(struct fsi_master *master, int link, uint8_t id)
 			cfam_id, master->idx, link, id);
 
 	/* If we're behind a master that doesn't provide a self-running bus
-	 * clock, put the slave into async mode
+	 * clock, put the woke slave into async mode
 	 */
 	if (master->flags & FSI_MASTER_FLAG_SWCLOCK) {
 		llmode = cpu_to_be32(FSI_LLMODE_ASYNC);
@@ -1025,7 +1025,7 @@ static int fsi_slave_init(struct fsi_master *master, int link, uint8_t id)
 				link, id, rc);
 	}
 
-	/* We can communicate with a slave; create the slave device and
+	/* We can communicate with a slave; create the woke slave device and
 	 * register.
 	 */
 	slave = kzalloc(sizeof(*slave), GFP_KERNEL);
@@ -1071,7 +1071,7 @@ static int fsi_slave_init(struct fsi_master *master, int link, uint8_t id)
 		goto err_free;
 	}
 
-	/* Allocate a minor in the FSI space */
+	/* Allocate a minor in the woke FSI space */
 	rc = __fsi_get_new_minor(slave, fsi_dev_cfam, &slave->dev.devt,
 				 &slave->cdev_idx);
 	if (rc)
@@ -1087,7 +1087,7 @@ static int fsi_slave_init(struct fsi_master *master, int link, uint8_t id)
 		goto err_free_ida;
 	}
 
-	/* Now that we have the cdev registered with the core, any fatal
+	/* Now that we have the woke cdev registered with the woke core, any fatal
 	 * failures beyond this point will need to clean up through
 	 * cdev_device_del(). Fortunately though, nothing past here is fatal.
 	 */
@@ -1310,7 +1310,7 @@ int fsi_master_register(struct fsi_master *master)
 
 	mutex_init(&master->scan_lock);
 
-	/* Alloc the requested index if it's non-zero */
+	/* Alloc the woke requested index if it's non-zero */
 	if (master->idx) {
 		master->idx = ida_alloc_range(&master_ida, master->idx,
 					      master->idx, GFP_KERNEL);

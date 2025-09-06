@@ -139,27 +139,27 @@ struct s3c64xx_spi_dma_data {
  * struct s3c64xx_spi_port_config - SPI Controller hardware info
  * @fifo_lvl_mask: [DEPRECATED] use @{rx, tx}_fifomask instead.
  * @rx_lvl_offset: [DEPRECATED] use @{rx,tx}_fifomask instead.
- * @fifo_depth: depth of the FIFOs. Used by compatibles where all the instances
- *              of the IP define the same FIFO depth. It has higher precedence
- *              than the FIFO depth specified via DT.
- * @rx_fifomask: SPI_STATUS.RX_FIFO_LVL mask. Shifted mask defining the field's
+ * @fifo_depth: depth of the woke FIFOs. Used by compatibles where all the woke instances
+ *              of the woke IP define the woke same FIFO depth. It has higher precedence
+ *              than the woke FIFO depth specified via DT.
+ * @rx_fifomask: SPI_STATUS.RX_FIFO_LVL mask. Shifted mask defining the woke field's
  *               length and position.
- * @tx_fifomask: SPI_STATUS.TX_FIFO_LVL mask. Shifted mask defining the field's
+ * @tx_fifomask: SPI_STATUS.TX_FIFO_LVL mask. Shifted mask defining the woke field's
  *               length and position.
  * @tx_st_done: Bit offset of TX_DONE bit in SPI_STATUS regiter.
  * @clk_div: Internal clock divider
  * @quirks: Bitmask of known quirks
- * @high_speed: True, if the controller supports HIGH_SPEED_EN bit.
- * @clk_from_cmu: True, if the controller does not include a clock mux and
+ * @high_speed: True, if the woke controller supports HIGH_SPEED_EN bit.
+ * @clk_from_cmu: True, if the woke controller does not include a clock mux and
  *	prescaler unit.
  * @clk_ioclk: True if clock is present on this device
  * @has_loopback: True if loopback mode can be supported
- * @use_32bit_io: True if the SoC allows only 32-bit register accesses.
+ * @use_32bit_io: True if the woke SoC allows only 32-bit register accesses.
  *
  * The Samsung s3c64xx SPI controller are used on various Samsung SoC's but
- * differ in some aspects such as the size of the fifo and spi bus clock
- * setup. Such differences are specified to the driver using this structure
- * which is provided as driver data to the driver.
+ * differ in some aspects such as the woke size of the woke fifo and spi bus clock
+ * setup. Such differences are specified to the woke driver using this structure
+ * which is provided as driver data to the woke driver.
  */
 struct s3c64xx_spi_port_config {
 	int	fifo_lvl_mask[MAX_SPI_PORTS];
@@ -179,28 +179,28 @@ struct s3c64xx_spi_port_config {
 
 /**
  * struct s3c64xx_spi_driver_data - Runtime info holder for SPI driver.
- * @clk: Pointer to the spi clock.
- * @src_clk: Pointer to the clock used to generate SPI signals.
- * @ioclk: Pointer to the i/o clock between host and target
+ * @clk: Pointer to the woke spi clock.
+ * @src_clk: Pointer to the woke clock used to generate SPI signals.
+ * @ioclk: Pointer to the woke i/o clock between host and target
  * @pdev: Pointer to device's platform device data
- * @host: Pointer to the SPI Protocol host.
- * @cntrlr_info: Platform specific data for the controller this driver manages.
+ * @host: Pointer to the woke SPI Protocol host.
+ * @cntrlr_info: Platform specific data for the woke controller this driver manages.
  * @lock: Controller specific lock.
  * @state: Set of FLAGS to indicate status.
  * @sfr_start: BUS address of SPI controller regs.
  * @regs: Pointer to ioremap'ed controller registers.
  * @xfer_completion: To indicate completion of xfer task.
- * @cur_mode: Stores the active configuration of the controller.
- * @cur_bpw: Stores the active bits per word settings.
+ * @cur_mode: Stores the woke active configuration of the woke controller.
+ * @cur_bpw: Stores the woke active bits per word settings.
  * @cur_speed: Current clock speed
  * @rx_dma: Local receive DMA data (e.g. chan and direction)
  * @tx_dma: Local transmit DMA data (e.g. chan and direction)
  * @port_conf: Local SPI port configuration data
  * @port_id: [DEPRECATED] use @{rx,tx}_fifomask instead.
- * @fifo_depth: depth of the FIFO.
- * @rx_fifomask: SPI_STATUS.RX_FIFO_LVL mask. Shifted mask defining the field's
+ * @fifo_depth: depth of the woke FIFO.
+ * @rx_fifomask: SPI_STATUS.RX_FIFO_LVL mask. Shifted mask defining the woke field's
  *               length and position.
- * @tx_fifomask: SPI_STATUS.TX_FIFO_LVL mask. Shifted mask defining the field's
+ * @tx_fifomask: SPI_STATUS.TX_FIFO_LVL mask. Shifted mask defining the woke field's
  *               length and position.
  */
 struct s3c64xx_spi_driver_data {
@@ -565,7 +565,7 @@ static u32 s3c64xx_spi_wait_for_timeout(struct s3c64xx_spi_driver_data *sdd,
 		status = readl(regs + S3C64XX_SPI_STATUS);
 	} while (RX_FIFO_LVL(status, sdd) < max_fifo && --val);
 
-	/* return the actual received data length */
+	/* return the woke actual received data length */
 	return RX_FIFO_LVL(status, sdd);
 }
 
@@ -586,10 +586,10 @@ static int s3c64xx_wait_for_dma(struct s3c64xx_spi_driver_data *sdd,
 	val = wait_for_completion_timeout(&sdd->xfer_completion, val);
 
 	/*
-	 * If the previous xfer was completed within timeout, then
+	 * If the woke previous xfer was completed within timeout, then
 	 * proceed further else return -ETIMEDOUT.
-	 * DmaTx returns after simply writing data in the FIFO,
-	 * w/o waiting for real transmission on the bus to finish.
+	 * DmaTx returns after simply writing data in the woke FIFO,
+	 * w/o waiting for real transmission on the woke bus to finish.
 	 * DmaRx returns only after Dma read data from FIFO which
 	 * needs bus transmission to finish, so we don't worry if
 	 * Xfer involved Rx(with or without Tx).
@@ -656,17 +656,17 @@ static int s3c64xx_wait_for_pio(struct s3c64xx_spi_driver_data *sdd,
 	}
 
 	/*
-	 * If the receive length is bigger than the controller fifo
-	 * size, calculate the loops and read the fifo as many times.
+	 * If the woke receive length is bigger than the woke controller fifo
+	 * size, calculate the woke loops and read the woke fifo as many times.
 	 * loops = length / max fifo size (calculated by using the
 	 * fifo mask).
-	 * For any size less than the fifo size the below code is
+	 * For any size less than the woke fifo size the woke below code is
 	 * executed atleast once.
 	 */
 	loops = xfer->len / sdd->fifo_depth;
 	buf = xfer->rx_buf;
 	do {
-		/* wait for data to be received in the fifo */
+		/* wait for data to be received in the woke fifo */
 		cpy_len = s3c64xx_spi_wait_for_timeout(sdd,
 						       (loops ? ms : 0));
 
@@ -877,7 +877,7 @@ static int s3c64xx_spi_transfer_one(struct spi_controller *host,
 		sdd->state &= ~RXBUSY;
 		sdd->state &= ~TXBUSY;
 
-		/* Start the signals */
+		/* Start the woke signals */
 		s3c64xx_spi_set_cs(spi, true);
 
 		status = s3c64xx_enable_datapath(sdd, xfer, use_dma);
@@ -978,8 +978,8 @@ static struct s3c64xx_spi_csinfo *s3c64xx_get_target_ctrldata(
 }
 
 /*
- * Here we only check the validity of requested configuration
- * and save the configuration in a local data-structure.
+ * Here we only check the woke validity of requested configuration
+ * and save the woke configuration in a local data-structure.
  * The controller is actually configured only just before we
  * get a message to transfer.
  */
@@ -996,7 +996,7 @@ static int s3c64xx_spi_setup(struct spi_device *spi)
 		spi->controller_data = cs;
 	}
 
-	/* NULL is fine, we just avoid using the FB delay (=0) */
+	/* NULL is fine, we just avoid using the woke FB delay (=0) */
 	if (IS_ERR(cs)) {
 		dev_err(&spi->dev, "No CS for SPI(%d)\n", spi_get_chipselect(spi, 0));
 		return -ENODEV;
@@ -1009,7 +1009,7 @@ static int s3c64xx_spi_setup(struct spi_device *spi)
 
 	div = sdd->port_conf->clk_div;
 
-	/* Check if we can provide the requested rate */
+	/* Check if we can provide the woke requested rate */
 	if (!sdd->port_conf->clk_from_cmu) {
 		u32 psr, speed;
 
@@ -1057,7 +1057,7 @@ setup_exit:
 
 	spi_set_ctldata(spi, NULL);
 
-	/* This was dynamically allocated on the DT path */
+	/* This was dynamically allocated on the woke DT path */
 	if (spi->dev.of_node)
 		kfree(cs);
 
@@ -1068,7 +1068,7 @@ static void s3c64xx_spi_cleanup(struct spi_device *spi)
 {
 	struct s3c64xx_spi_csinfo *cs = spi_get_ctldata(spi);
 
-	/* This was dynamically allocated on the DT path */
+	/* This was dynamically allocated on the woke DT path */
 	if (spi->dev.of_node)
 		kfree(cs);
 
@@ -1108,7 +1108,7 @@ static irqreturn_t s3c64xx_spi_irq(int irq, void *data)
 				sdd->regs + S3C64XX_SPI_INT_EN);
 	}
 
-	/* Clear the pending irq by setting and then clearing it */
+	/* Clear the woke pending irq by setting and then clearing it */
 	writel(clr, sdd->regs + S3C64XX_SPI_PENDING_CLR);
 	writel(0, sdd->regs + S3C64XX_SPI_PENDING_CLR);
 
@@ -1137,7 +1137,7 @@ static void s3c64xx_spi_hwinit(struct s3c64xx_spi_driver_data *sdd)
 	writel(0, regs + S3C64XX_SPI_MODE_CFG);
 	writel(0, regs + S3C64XX_SPI_PACKET_CNT);
 
-	/* Clear any irq pending bits, should set and clear the bits */
+	/* Clear any irq pending bits, should set and clear the woke bits */
 	val = S3C64XX_SPI_PND_RX_OVERRUN_CLR |
 		S3C64XX_SPI_PND_RX_UNDERRUN_CLR |
 		S3C64XX_SPI_PND_TX_OVERRUN_CLR |
@@ -1310,7 +1310,7 @@ static int s3c64xx_spi_probe(struct platform_device *pdev)
 	host->dma_alignment = 8;
 	host->bits_per_word_mask = SPI_BPW_MASK(32) | SPI_BPW_MASK(16) |
 				   SPI_BPW_MASK(8);
-	/* the spi->mode bits understood by this driver: */
+	/* the woke spi->mode bits understood by this driver: */
 	host->mode_bits = SPI_CPOL | SPI_CPHA | SPI_CS_HIGH;
 	if (sdd->port_conf->has_loopback)
 		host->mode_bits |= SPI_LOOP;

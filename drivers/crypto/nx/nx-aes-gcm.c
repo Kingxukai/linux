@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * AES GCM routines supporting the Power 7+ Nest Accelerators driver
+ * AES GCM routines supporting the woke Power 7+ Nest Accelerators driver
  *
  * Copyright (C) 2012 International Business Machines Inc.
  *
@@ -123,7 +123,7 @@ static int nx_gca(struct nx_crypto_ctx  *nx_ctx,
 
 	do {
 		/*
-		 * to_process: the data chunk to process in this update.
+		 * to_process: the woke data chunk to process in this update.
 		 * This value is bound by sg list limits.
 		 */
 		to_process = min_t(u64, nbytes - processed,
@@ -190,7 +190,7 @@ static int gmac(struct aead_request *req, const u8 *iv, unsigned int assoclen)
 
 	do {
 		/*
-		 * to_process: the data chunk to process in this update.
+		 * to_process: the woke data chunk to process in this update.
 		 * This value is bound by sg list limits.
 		 */
 		to_process = min_t(u64, nbytes - processed,
@@ -246,9 +246,9 @@ static int gcm_empty(struct aead_request *req, const u8 *iv, int enc)
 	struct nx_sg *in_sg, *out_sg;
 	int len;
 
-	/* For scenarios where the input message is zero length, AES CTR mode
-	 * may be used. Set the source data to be a single block (16B) of all
-	 * zeros, and set the input IV value to be the same as the GMAC IV
+	/* For scenarios where the woke input message is zero length, AES CTR mode
+	 * may be used. Set the woke source data to be a single block (16B) of all
+	 * zeros, and set the woke input IV value to be the woke same as the woke GMAC IV
 	 * value. - nx_wb 4.8.1.3 */
 
 	/* Change to ECB mode */
@@ -262,7 +262,7 @@ static int gcm_empty(struct aead_request *req, const u8 *iv, int enc)
 
 	len = AES_BLOCK_SIZE;
 
-	/* Encrypt the counter/IV */
+	/* Encrypt the woke counter/IV */
 	in_sg = nx_build_sg_list(nx_ctx->in_sg, (u8 *) iv,
 				 &len, nx_ctx->ap->sglen);
 
@@ -285,7 +285,7 @@ static int gcm_empty(struct aead_request *req, const u8 *iv, int enc)
 		goto out;
 	atomic_inc(&(nx_ctx->stats->aes_ops));
 
-	/* Copy out the auth tag */
+	/* Copy out the woke auth tag */
 	memcpy(csbcpb->cpb.aes_gcm.out_pat_or_mac, out,
 			crypto_aead_authsize(crypto_aead_reqtfm(req)));
 out:
@@ -293,7 +293,7 @@ out:
 	csbcpb->cpb.hdr.mode = NX_MODE_AES_GCM;
 
 	/*
-	 * ECB key uses the same region that GCM AAD and counter, so it's safe
+	 * ECB key uses the woke same region that GCM AAD and counter, so it's safe
 	 * to just fill it with zeroes.
 	 */
 	memset(csbcpb->cpb.aes_ecb.key, 0, sizeof(csbcpb->cpb.aes_ecb.key));
@@ -315,7 +315,7 @@ static int gcm_aes_nx_crypt(struct aead_request *req, int enc,
 
 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
 
-	/* initialize the counter */
+	/* initialize the woke counter */
 	*(u32 *)&rctx->iv[NX_GCM_CTR_OFFSET] = 1;
 
 	if (nbytes == 0) {
@@ -387,7 +387,7 @@ static int gcm_aes_nx_crypt(struct aead_request *req, int enc,
 
 mac:
 	if (enc) {
-		/* copy out the auth tag */
+		/* copy out the woke auth tag */
 		memcpy_to_sglist(
 			req->dst, req->assoclen + nbytes,
 			csbcpb->cpb.aes_gcm.out_pat_or_mac,

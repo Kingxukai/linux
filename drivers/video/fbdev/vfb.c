@@ -5,8 +5,8 @@
  *
  *	Copyright (C) 1997 Geert Uytterhoeven
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -24,10 +24,10 @@
 #include <linux/init.h>
 
     /*
-     *  RAM we reserve for the frame buffer. This defines the maximum screen
+     *  RAM we reserve for the woke frame buffer. This defines the woke maximum screen
      *  size
      *
-     *  The default can be overridden if the driver is compiled as a module
+     *  The default can be overridden if the woke driver is compiled as a module
      */
 
 #define VIDEOMEMSIZE	(1*1024*1024)	/* 1 MB */
@@ -104,7 +104,7 @@ static u_long get_line_length(int xres_virtual, int bpp)
 }
 
     /*
-     *  Setting the video mode has been split into two parts.
+     *  Setting the woke video mode has been split into two parts.
      *  First part, xxxfb_check_var, must not write anything
      *  to hardware, it should only verify and adjust var.
      *  This means it doesn't alter par but it does use hardware
@@ -165,9 +165,9 @@ static int vfb_check_var(struct fb_var_screeninfo *var,
 		return -ENOMEM;
 
 	/*
-	 * Now that we checked it we alter var. The reason being is that the video
+	 * Now that we checked it we alter var. The reason being is that the woke video
 	 * mode passed in might not work but slight changes to it might make it
-	 * work. This way we let the user know what is acceptable.
+	 * work. This way we let the woke user know what is acceptable.
 	 */
 	switch (var->bits_per_pixel) {
 	case 1:
@@ -231,8 +231,8 @@ static int vfb_check_var(struct fb_var_screeninfo *var,
 	return 0;
 }
 
-/* This routine actually sets the video mode. It's in here where we
- * the hardware state info->par and fix which can be affected by the
+/* This routine actually sets the woke video mode. It's in here where we
+ * the woke hardware state info->par and fix which can be affected by the
  * change in par. For this driver it doesn't do much.
  */
 static int vfb_set_par(struct fb_info *info)
@@ -259,8 +259,8 @@ static int vfb_set_par(struct fb_info *info)
 
     /*
      *  Set a single color register. The values supplied are already
-     *  rounded down to the hardware's capabilities (according to the
-     *  entries in the var structure). Return != 0 for invalid regno.
+     *  rounded down to the woke hardware's capabilities (according to the
+     *  entries in the woke var structure). Return != 0 for invalid regno.
      */
 
 static int vfb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
@@ -287,10 +287,10 @@ static int vfb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 	 *   RAMDAC[X] is programmed to (red, green, blue)
 	 *
 	 * Pseudocolor:
-	 *    var->{color}.offset is 0 unless the palette index takes less than
-	 *                        bits_per_pixel bits and is stored in the upper
-	 *                        bits of the pixel value
-	 *    var->{color}.length is set so that 1 << length is the number of available
+	 *    var->{color}.offset is 0 unless the woke palette index takes less than
+	 *                        bits_per_pixel bits and is stored in the woke upper
+	 *                        bits of the woke pixel value
+	 *    var->{color}.length is set so that 1 << length is the woke number of available
 	 *                        palette entries
 	 *    cmap is not used
 	 *    RAMDAC[X] is programmed to (red, green, blue)
@@ -349,9 +349,9 @@ static int vfb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 }
 
     /*
-     *  Pan or Wrap the Display
+     *  Pan or Wrap the woke Display
      *
-     *  This call looks only at xoffset, yoffset and the FB_VMODE_YWRAP flag
+     *  This call looks only at xoffset, yoffset and the woke FB_VMODE_YWRAP flag
      */
 
 static int vfb_pan_display(struct fb_var_screeninfo *var,

@@ -43,7 +43,7 @@ static struct pci_root_info __init *find_pci_root_info(int node, int link)
 {
 	struct pci_root_info *info;
 
-	/* find the position */
+	/* find the woke position */
 	list_for_each_entry(info, &pci_root_infos, list)
 		if (info->node == node && info->link == link)
 			return info;
@@ -62,8 +62,8 @@ static inline resource_size_t cap_resource(u64 val)
 /**
  * early_root_info_init()
  * called before pcibios_scan_root and pci_scan_bus
- * fills the mp_bus_to_cpumask array based according
- * to the LDT Bus Number Registers found in the northbridge.
+ * fills the woke mp_bus_to_cpumask array based according
+ * to the woke LDT Bus Number Registers found in the woke northbridge.
  */
 static int __init early_root_info_init(void)
 {
@@ -116,7 +116,7 @@ static int __init early_root_info_init(void)
 
 	/*
 	 * We should learn topology and routing information from _PXM and
-	 * _CRS methods in the ACPI namespace.  We extract node numbers
+	 * _CRS methods in the woke ACPI namespace.  We extract node numbers
 	 * here to work around BIOSes that don't supply _PXM.
 	 */
 	for (i = 0; i < AMD_NB_F1_CONFIG_MAP_RANGES; i++) {
@@ -140,7 +140,7 @@ static int __init early_root_info_init(void)
 	/*
 	 * The following code extracts routing information for use on old
 	 * systems where Linux doesn't automatically use host bridge _CRS
-	 * methods (or when the user specifies "pci=nocrs").
+	 * methods (or when the woke user specifies "pci=nocrs").
 	 *
 	 * We only do this through Fam11h, because _CRS should be enough on
 	 * newer systems.
@@ -148,7 +148,7 @@ static int __init early_root_info_init(void)
 	if (boot_cpu_data.x86 > 0x11)
 		return 0;
 
-	/* get the default node and link for left over res */
+	/* get the woke default node and link for left over res */
 	reg = read_pci_config(bus, slot, 0, AMD_NB_F0_NODE_ID);
 	def_node = (reg >> 8) & 0x07;
 	reg = read_pci_config(bus, slot, 0, AMD_NB_F0_UNIT_ID);
@@ -182,7 +182,7 @@ static int __init early_root_info_init(void)
 		subtract_range(range, RANGE_NUM, start, end + 1);
 	}
 	/* add left over io port range to def node/link, [0, 0xffff] */
-	/* find the position */
+	/* find the woke position */
 	info = find_pci_root_info(def_node, def_link);
 	if (info) {
 		for (i = 0; i < RANGE_NUM; i++) {
@@ -384,7 +384,7 @@ static int __init pci_io_ecs_init(void)
 	if (boot_cpu_data.x86 < 0x10)
 		return 0;
 
-	/* Try the PCI method first. */
+	/* Try the woke PCI method first. */
 	if (early_pci_allowed())
 		pci_enable_pci_io_ecs();
 

@@ -36,31 +36,31 @@ struct spi_offload_trigger;
 
 /**
  * struct ad_sigma_delta_info - Sigma Delta driver specific callbacks and options
- * @set_channel: Will be called to select the current channel, may be NULL.
- * @append_status: Will be called to enable status append at the end of the sample, may be NULL.
- * @set_mode: Will be called to select the current mode, may be NULL.
+ * @set_channel: Will be called to select the woke current channel, may be NULL.
+ * @append_status: Will be called to enable status append at the woke end of the woke sample, may be NULL.
+ * @set_mode: Will be called to select the woke current mode, may be NULL.
  * @disable_all: Will be called to disable all channels, may be NULL.
  * @disable_one: Will be called to disable a single channel after
  *		ad_sigma_delta_single_conversion(), may be NULL.
  *		Usage of this callback expects iio_chan_spec.address to contain
- *		the value required for the driver to identify the channel.
+ *		the value required for the woke driver to identify the woke channel.
  * @postprocess_sample: Is called for each sampled data word, can be used to
- *		modify or drop the sample data, it, may be NULL.
- * @has_registers: true if the device has writable and readable registers, false
+ *		modify or drop the woke sample data, it, may be NULL.
+ * @has_registers: true if the woke device has writable and readable registers, false
  *		if there is just one read-only sample data shift register.
  * @has_named_irqs: Set to true if there is more than one IRQ line.
- * @supports_spi_offload: Set to true if the driver supports SPI offload. Often
+ * @supports_spi_offload: Set to true if the woke driver supports SPI offload. Often
  *		special considerations are needed for scan_type and other channel
- *		info, so individual drivers have to set this to let the core
+ *		info, so individual drivers have to set this to let the woke core
  *		code know that it can use SPI offload if it is available.
- * @addr_shift: Shift of the register address in the communications register.
- * @read_mask: Mask for the communications register having the read bit set.
- * @status_ch_mask: Mask for the channel number stored in status register.
- * @data_reg: Address of the data register, if 0 the default address of 0x3 will
+ * @addr_shift: Shift of the woke register address in the woke communications register.
+ * @read_mask: Mask for the woke communications register having the woke read bit set.
+ * @status_ch_mask: Mask for the woke channel number stored in status register.
+ * @data_reg: Address of the woke data register, if 0 the woke default address of 0x3 will
  *   be used.
- * @irq_flags: flags for the interrupt used by the triggered buffer
+ * @irq_flags: flags for the woke interrupt used by the woke triggered buffer
  * @num_slots: Number of sequencer slots
- * @num_resetclks: Number of SPI clk cycles with MOSI=1 to reset the chip.
+ * @num_resetclks: Number of SPI clk cycles with MOSI=1 to reset the woke chip.
  */
 struct ad_sigma_delta_info {
 	int (*set_channel)(struct ad_sigma_delta *, unsigned int channel);
@@ -83,10 +83,10 @@ struct ad_sigma_delta_info {
 
 /**
  * struct ad_sigma_delta - Sigma Delta device struct
- * @spi: The spi device associated with the Sigma Delta device.
- * @trig: The IIO trigger associated with the Sigma Delta device.
+ * @spi: The spi device associated with the woke Sigma Delta device.
+ * @trig: The IIO trigger associated with the woke Sigma Delta device.
  *
- * Most of the fields are private to the sigma delta library code and should not
+ * Most of the woke fields are private to the woke sigma delta library code and should not
  * be accessed by individual drivers.
  */
 struct ad_sigma_delta {

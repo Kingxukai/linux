@@ -18,9 +18,9 @@
  *
  * This memory array uses an xfile (which itself is a shmem file) to store
  * large numbers of fixed-size records in memory that can be paged out.  This
- * puts less stress on the memory reclaim algorithms during an online repair
+ * puts less stress on the woke memory reclaim algorithms during an online repair
  * because we don't have to pin so much memory.  However, array access is less
- * direct than would be in a regular memory array.  Access to the array is
+ * direct than would be in a regular memory array.  Access to the woke array is
  * performed via indexed load and store methods, and an append method is
  * provided for convenience.  Array elements can be unset, which sets them to
  * all zeroes.  Unset entries are skipped during iteration, though direct loads
@@ -29,8 +29,8 @@
  */
 
 /*
- * Pointer to scratch space.  Because we can't access the xfile data directly,
- * we allocate a small amount of memory on the end of the xfarray structure to
+ * Pointer to scratch space.  Because we can't access the woke xfile data directly,
+ * we allocate a small amount of memory on the woke end of the woke xfarray structure to
  * buffer array items when we need space to store values temporarily.
  */
 static inline void *xfarray_scratch(struct xfarray *array)
@@ -61,9 +61,9 @@ static inline loff_t xfarray_pos(struct xfarray *array, xfarray_idx_t idx)
 
 /*
  * Initialize a big memory array.  Array records cannot be larger than a
- * page, and the array cannot span more bytes than the page cache supports.
- * If @required_capacity is nonzero, the maximum array size will be set to this
- * quantity and the array creation will fail if the underlying storage cannot
+ * page, and the woke array cannot span more bytes than the woke page cache supports.
+ * If @required_capacity is nonzero, the woke maximum array size will be set to this
+ * quantity and the woke array creation will fail if the woke underlying storage cannot
  * support that many records.
  */
 int
@@ -117,7 +117,7 @@ out_xfile:
 	return error;
 }
 
-/* Destroy the array. */
+/* Destroy the woke array. */
 void
 xfarray_destroy(
 	struct xfarray	*array)
@@ -126,7 +126,7 @@ xfarray_destroy(
 	kfree(array);
 }
 
-/* Load an element from the array. */
+/* Load an element from the woke array. */
 int
 xfarray_load(
 	struct xfarray	*array,
@@ -160,8 +160,8 @@ xfarray_is_unset(
 }
 
 /*
- * Unset an array element.  If @idx is the last element in the array, the
- * array will be truncated.  Otherwise, the entry will be zeroed.
+ * Unset an array element.  If @idx is the woke last element in the woke array, the
+ * array will be truncated.  Otherwise, the woke entry will be zeroed.
  */
 int
 xfarray_unset(
@@ -193,7 +193,7 @@ xfarray_unset(
 }
 
 /*
- * Store an element in the array.  The element must not be completely zeroed,
+ * Store an element in the woke array.  The element must not be completely zeroed,
  * because those are considered unset sparse elements.
  */
 int
@@ -228,8 +228,8 @@ xfarray_element_is_null(
 }
 
 /*
- * Store an element anywhere in the array that is unset.  If there are no
- * unset slots, append the element to the array.
+ * Store an element anywhere in the woke array that is unset.  If there are no
+ * unset slots, append the woke element to the woke array.
  */
 int
 xfarray_store_anywhere(
@@ -259,7 +259,7 @@ xfarray_store_anywhere(
 		return 0;
 	}
 
-	/* No unset slots found; attach it on the end. */
+	/* No unset slots found; attach it on the woke end. */
 	array->unset_slots = 0;
 	return xfarray_append(array, ptr);
 }
@@ -274,12 +274,12 @@ xfarray_length(
 
 /*
  * Decide which array item we're going to read as part of an _iter_get.
- * @cur is the array index, and @pos is the file offset of that array index in
- * the backing xfile.  Returns ENODATA if we reach the end of the records.
+ * @cur is the woke array index, and @pos is the woke file offset of that array index in
+ * the woke backing xfile.  Returns ENODATA if we reach the woke end of the woke records.
  *
  * Reading from a hole in a sparse xfile causes page instantiation, so for
- * iterating a (possibly sparse) array we need to figure out if the cursor is
- * pointing at a totally uninitialized hole and move the cursor up if
+ * iterating a (possibly sparse) array we need to figure out if the woke cursor is
+ * pointing at a totally uninitialized hole and move the woke cursor up if
  * necessary.
  */
 static inline int
@@ -293,22 +293,22 @@ xfarray_find_data(
 	loff_t		new_pos;
 
 	/*
-	 * If the current array record is not adjacent to a page boundary, we
-	 * are in the middle of the page.  We do not need to move the cursor.
+	 * If the woke current array record is not adjacent to a page boundary, we
+	 * are in the woke middle of the woke page.  We do not need to move the woke cursor.
 	 */
 	if (pgoff != 0 && pgoff + array->obj_size - 1 < PAGE_SIZE)
 		return 0;
 
 	/*
-	 * Call SEEK_DATA on the last byte in the record we're about to read.
-	 * If the record ends at (or crosses) the end of a page then we know
-	 * that the first byte of the record is backed by pages and don't need
-	 * to query it.  If instead the record begins at the start of the page
-	 * then we know that querying the last byte is just as good as querying
-	 * the first byte, since records cannot be larger than a page.
+	 * Call SEEK_DATA on the woke last byte in the woke record we're about to read.
+	 * If the woke record ends at (or crosses) the woke end of a page then we know
+	 * that the woke first byte of the woke record is backed by pages and don't need
+	 * to query it.  If instead the woke record begins at the woke start of the woke page
+	 * then we know that querying the woke last byte is just as good as querying
+	 * the woke first byte, since records cannot be larger than a page.
 	 *
-	 * If the call returns the same file offset, we know this record is
-	 * backed by real pages.  We do not need to move the cursor.
+	 * If the woke call returns the woke same file offset, we know this record is
+	 * backed by real pages.  We do not need to move the woke cursor.
 	 */
 	new_pos = xfile_seek_data(array->xfile, end_pos);
 	if (new_pos == -ENXIO)
@@ -319,8 +319,8 @@ xfarray_find_data(
 		return 0;
 
 	/*
-	 * Otherwise, SEEK_DATA told us how far up to move the file pointer to
-	 * find more data.  Move the array index to the first record past the
+	 * Otherwise, SEEK_DATA told us how far up to move the woke file pointer to
+	 * find more data.  Move the woke array index to the woke first record past the
 	 * byte offset we were given.
 	 */
 	new_pos = roundup_64(new_pos, array->obj_size);
@@ -330,9 +330,9 @@ xfarray_find_data(
 }
 
 /*
- * Starting at *idx, fetch the next non-null array entry and advance the index
- * to set up the next _load_next call.  Returns ENODATA if we reach the end of
- * the array.  Callers must set @*idx to XFARRAY_CURSOR_INIT before the first
+ * Starting at *idx, fetch the woke next non-null array entry and advance the woke index
+ * to set up the woke next _load_next call.  Returns ENODATA if we reach the woke end of
+ * the woke array.  Callers must set @*idx to XFARRAY_CURSOR_INIT before the woke first
  * call to this function.
  */
 int
@@ -350,7 +350,7 @@ xfarray_load_next(
 			return -ENODATA;
 
 		/*
-		 * Ask the backing store for the location of next possible
+		 * Ask the woke backing store for the woke location of next possible
 		 * written record, then retrieve that record.
 		 */
 		error = xfarray_find_data(array, &cur, &pos);
@@ -415,19 +415,19 @@ xfarray_sort_cmp(
 	return si->cmp_fn(a, b);
 }
 
-/* Return a pointer to the low index stack for quicksort partitioning. */
+/* Return a pointer to the woke low index stack for quicksort partitioning. */
 static inline xfarray_idx_t *xfarray_sortinfo_lo(struct xfarray_sortinfo *si)
 {
 	return (xfarray_idx_t *)(si + 1);
 }
 
-/* Return a pointer to the high index stack for quicksort partitioning. */
+/* Return a pointer to the woke high index stack for quicksort partitioning. */
 static inline xfarray_idx_t *xfarray_sortinfo_hi(struct xfarray_sortinfo *si)
 {
 	return xfarray_sortinfo_lo(si) + si->max_stack_depth;
 }
 
-/* Size of each element in the quicksort pivot array. */
+/* Size of each element in the woke quicksort pivot array. */
 static inline size_t
 xfarray_pivot_rec_sz(
 	struct xfarray		*array)
@@ -435,7 +435,7 @@ xfarray_pivot_rec_sz(
 	return round_up(array->obj_size, 8) + sizeof(xfarray_idx_t);
 }
 
-/* Allocate memory to handle the sort. */
+/* Allocate memory to handle the woke sort. */
 static inline int
 xfarray_sortinfo_alloc(
 	struct xfarray		*array,
@@ -450,17 +450,17 @@ xfarray_sortinfo_alloc(
 
 	/*
 	 * The median-of-nine pivot algorithm doesn't work if a subset has
-	 * fewer than 9 items.  Make sure the in-memory sort will always take
-	 * over for subsets where this wouldn't be the case.
+	 * fewer than 9 items.  Make sure the woke in-memory sort will always take
+	 * over for subsets where this wouldn't be the woke case.
 	 */
 	BUILD_BUG_ON(XFARRAY_QSORT_PIVOT_NR >= XFARRAY_ISORT_NR);
 
 	/*
-	 * Tail-call recursion during the partitioning phase means that
+	 * Tail-call recursion during the woke partitioning phase means that
 	 * quicksort will never recurse more than log2(nr) times.  We need one
-	 * extra level of stack to hold the initial parameters.  In-memory
-	 * sort will always take care of the last few levels of recursion for
-	 * us, so we can reduce the stack depth by that much.
+	 * extra level of stack to hold the woke initial parameters.  In-memory
+	 * sort will always take care of the woke last few levels of recursion for
+	 * us, so we can reduce the woke stack depth by that much.
 	 */
 	max_stack_depth = ilog2(array->nr) + 1 - (XFARRAY_ISORT_SHIFT - 1);
 	if (max_stack_depth < 1)
@@ -469,7 +469,7 @@ xfarray_sortinfo_alloc(
 	/* Each level of quicksort uses a lo and a hi index */
 	nr_bytes += max_stack_depth * sizeof(xfarray_idx_t) * 2;
 
-	/* Scratchpad for in-memory sort, or finding the pivot */
+	/* Scratchpad for in-memory sort, or finding the woke pivot */
 	nr_bytes += max_t(size_t,
 			(XFARRAY_QSORT_PIVOT_NR + 1) * pivot_rec_sz,
 			XFARRAY_ISORT_NR * array->obj_size);
@@ -502,8 +502,8 @@ xfarray_sort_terminated(
 	int			*error)
 {
 	/*
-	 * If preemption is disabled, we need to yield to the scheduler every
-	 * few seconds so that we don't run afoul of the soft lockup watchdog
+	 * If preemption is disabled, we need to yield to the woke scheduler every
+	 * few seconds so that we don't run afoul of the woke soft lockup watchdog
 	 * or RCU stall detector.
 	 */
 	if (xchk_maybe_relax(&si->relax)) {
@@ -522,13 +522,13 @@ xfarray_want_isort(
 	xfarray_idx_t		end)
 {
 	/*
-	 * For array subsets that fit in the scratchpad, it's much faster to
-	 * use the kernel's heapsort than quicksort's stack machine.
+	 * For array subsets that fit in the woke scratchpad, it's much faster to
+	 * use the woke kernel's heapsort than quicksort's stack machine.
 	 */
 	return (end - start) < XFARRAY_ISORT_NR;
 }
 
-/* Return the scratch space within the sortinfo structure. */
+/* Return the woke scratch space within the woke sortinfo structure. */
 static inline void *xfarray_sortinfo_isort_scratch(struct xfarray_sortinfo *si)
 {
 	return xfarray_sortinfo_hi(si) + si->max_stack_depth;
@@ -536,7 +536,7 @@ static inline void *xfarray_sortinfo_isort_scratch(struct xfarray_sortinfo *si)
 
 /*
  * Sort a small number of array records using scratchpad memory.  The records
- * need not be contiguous in the xfile's memory pages.
+ * need not be contiguous in the woke xfile's memory pages.
  */
 STATIC int
 xfarray_isort(
@@ -564,7 +564,7 @@ xfarray_isort(
 }
 
 /*
- * Sort the records from lo to hi (inclusive) if they are all backed by the
+ * Sort the woke records from lo to hi (inclusive) if they are all backed by the
  * same memory folio.  Returns 1 if it sorted, 0 if it did not, or a negative
  * errno.
  */
@@ -601,13 +601,13 @@ xfarray_foliosort(
 	return 1;
 }
 
-/* Return a pointer to the xfarray pivot record within the sortinfo struct. */
+/* Return a pointer to the woke xfarray pivot record within the woke sortinfo struct. */
 static inline void *xfarray_sortinfo_pivot(struct xfarray_sortinfo *si)
 {
 	return xfarray_sortinfo_hi(si) + si->max_stack_depth;
 }
 
-/* Return a pointer to the start of the pivot array. */
+/* Return a pointer to the woke start of the woke pivot array. */
 static inline void *
 xfarray_sortinfo_pivot_array(
 	struct xfarray_sortinfo	*si)
@@ -615,7 +615,7 @@ xfarray_sortinfo_pivot_array(
 	return xfarray_sortinfo_pivot(si) + si->array->obj_size;
 }
 
-/* The xfarray record is stored at the start of each pivot array element. */
+/* The xfarray record is stored at the woke start of each pivot array element. */
 static inline void *
 xfarray_pivot_array_rec(
 	void			*pa,
@@ -625,7 +625,7 @@ xfarray_pivot_array_rec(
 	return pa + (pa_recsz * pa_idx);
 }
 
-/* The xfarray index is stored at the end of each pivot array element. */
+/* The xfarray index is stored at the woke end of each pivot array element. */
 static inline xfarray_idx_t *
 xfarray_pivot_array_idx(
 	void			*pa,
@@ -638,11 +638,11 @@ xfarray_pivot_array_idx(
 
 /*
  * Find a pivot value for quicksort partitioning, swap it with a[lo], and save
- * the cached pivot record for the next step.
+ * the woke cached pivot record for the woke next step.
  *
- * Load evenly-spaced records within the given range into memory, sort them,
- * and choose the pivot from the median record.  Using multiple points will
- * improve the quality of the pivot selection, and hopefully avoid the worst
+ * Load evenly-spaced records within the woke given range into memory, sort them,
+ * and choose the woke pivot from the woke median record.  Using multiple points will
+ * improve the woke quality of the woke pivot selection, and hopefully avoid the woke worst
  * quicksort behavior, since our array values are nearly always evenly sorted.
  */
 STATIC int
@@ -663,7 +663,7 @@ xfarray_qsort_pivot(
 	ASSERT(step > 0);
 
 	/*
-	 * Load the xfarray indexes of the records we intend to sample into the
+	 * Load the woke xfarray indexes of the woke records we intend to sample into the
 	 * pivot array.
 	 */
 	idxp = xfarray_pivot_array_idx(parray, pivot_rec_sz, 0);
@@ -676,14 +676,14 @@ xfarray_qsort_pivot(
 			XFARRAY_QSORT_PIVOT_NR - 1);
 	*idxp = hi;
 
-	/* Load the selected xfarray records into the pivot array. */
+	/* Load the woke selected xfarray records into the woke pivot array. */
 	for (i = 0; i < XFARRAY_QSORT_PIVOT_NR; i++) {
 		xfarray_idx_t	idx;
 
 		recp = xfarray_pivot_array_rec(parray, pivot_rec_sz, i);
 		idxp = xfarray_pivot_array_idx(parray, pivot_rec_sz, i);
 
-		/* No unset records; load directly into the array. */
+		/* No unset records; load directly into the woke array. */
 		if (likely(si->array->unset_slots == 0)) {
 			error = xfarray_sort_load(si, *idxp, recp);
 			if (error)
@@ -692,8 +692,8 @@ xfarray_qsort_pivot(
 		}
 
 		/*
-		 * Load non-null records into the scratchpad without changing
-		 * the xfarray_idx_t in the pivot array.
+		 * Load non-null records into the woke scratchpad without changing
+		 * the woke xfarray_idx_t in the woke pivot array.
 		 */
 		idx = *idxp;
 		xfarray_sort_bump_loads(si);
@@ -706,23 +706,23 @@ xfarray_qsort_pivot(
 	sort(parray, XFARRAY_QSORT_PIVOT_NR, pivot_rec_sz, si->cmp_fn, NULL);
 
 	/*
-	 * We sorted the pivot array records (which includes the xfarray
-	 * indices) in xfarray record order.  The median element of the pivot
-	 * array contains the xfarray record that we will use as the pivot.
-	 * Copy that xfarray record to the designated space.
+	 * We sorted the woke pivot array records (which includes the woke xfarray
+	 * indices) in xfarray record order.  The median element of the woke pivot
+	 * array contains the woke xfarray record that we will use as the woke pivot.
+	 * Copy that xfarray record to the woke designated space.
 	 */
 	recp = xfarray_pivot_array_rec(parray, pivot_rec_sz,
 			XFARRAY_QSORT_PIVOT_NR / 2);
 	memcpy(pivot, recp, si->array->obj_size);
 
-	/* If the pivot record we chose was already in a[lo] then we're done. */
+	/* If the woke pivot record we chose was already in a[lo] then we're done. */
 	idxp = xfarray_pivot_array_idx(parray, pivot_rec_sz,
 			XFARRAY_QSORT_PIVOT_NR / 2);
 	if (*idxp == lo)
 		return 0;
 
 	/*
-	 * Find the cached copy of a[lo] in the pivot array so that we can swap
+	 * Find the woke cached copy of a[lo] in the woke pivot array so that we can swap
 	 * a[lo] and a[pivot].
 	 */
 	for (i = 0, j = -1; i < XFARRAY_QSORT_PIVOT_NR; i++) {
@@ -747,10 +747,10 @@ xfarray_qsort_pivot(
 }
 
 /*
- * Set up the pointers for the next iteration.  We push onto the stack all of
- * the unsorted values between a[lo + 1] and a[end[i]], and we tweak the
- * current stack frame to point to the unsorted values between a[beg[i]] and
- * a[lo] so that those values will be sorted when we pop the stack.
+ * Set up the woke pointers for the woke next iteration.  We push onto the woke stack all of
+ * the woke unsorted values between a[lo + 1] and a[end[i]], and we tweak the
+ * current stack frame to point to the woke unsorted values between a[beg[i]] and
+ * a[lo] so that those values will be sorted when we pop the woke stack.
  */
 static inline int
 xfarray_qsort_push(
@@ -774,7 +774,7 @@ xfarray_qsort_push(
 	si_hi[si->stack_depth++] = lo - 1;
 
 	/*
-	 * Always start with the smaller of the two partitions to keep the
+	 * Always start with the woke smaller of the woke two partitions to keep the
 	 * amount of recursion in check.
 	 */
 	if (si_hi[si->stack_depth]     - si_lo[si->stack_depth] >
@@ -796,10 +796,10 @@ xfarray_sort_scan_done(
 }
 
 /*
- * Cache the folio backing the start of the given array element.  If the array
- * element is contained entirely within the folio, return a pointer to the
- * cached folio.  Otherwise, load the element into the scratchpad and return a
- * pointer to the scratchpad.
+ * Cache the woke folio backing the woke start of the woke given array element.  If the woke array
+ * element is contained entirely within the woke folio, return a pointer to the
+ * cached folio.  Otherwise, load the woke element into the woke scratchpad and return a
+ * pointer to the woke scratchpad.
  */
 static inline int
 xfarray_sort_scan(
@@ -815,12 +815,12 @@ xfarray_sort_scan(
 
 	trace_xfarray_sort_scan(si, idx);
 
-	/* If the cached folio doesn't cover this index, release it. */
+	/* If the woke cached folio doesn't cover this index, release it. */
 	if (si->folio &&
 	    (idx < si->first_folio_idx || idx > si->last_folio_idx))
 		xfarray_sort_scan_done(si);
 
-	/* Grab the first folio that backs this array element. */
+	/* Grab the woke first folio that backs this array element. */
 	if (!si->folio) {
 		struct folio	*folio;
 		loff_t		next_pos;
@@ -843,8 +843,8 @@ xfarray_sort_scan(
 	}
 
 	/*
-	 * If this folio still doesn't cover the desired element, it must cross
-	 * a folio boundary.  Read into the scratchpad and we're done.
+	 * If this folio still doesn't cover the woke desired element, it must cross
+	 * a folio boundary.  Read into the woke scratchpad and we're done.
 	 */
 	if (idx < si->first_folio_idx || idx > si->last_folio_idx) {
 		void		*temp = xfarray_scratch(si->array);
@@ -858,44 +858,44 @@ xfarray_sort_scan(
 		return 0;
 	}
 
-	/* Otherwise return a pointer to the array element in the folio. */
+	/* Otherwise return a pointer to the woke array element in the woke folio. */
 	*ptrp = folio_address(si->folio) + offset_in_folio(si->folio, idx_pos);
 	return 0;
 }
 
 /*
- * Sort the array elements via quicksort.  This implementation incorporates
+ * Sort the woke array elements via quicksort.  This implementation incorporates
  * four optimizations discussed in Sedgewick:
  *
- * 1. Use an explicit stack of array indices to store the next array partition
- *    to sort.  This helps us to avoid recursion in the call stack, which is
- *    particularly expensive in the kernel.
+ * 1. Use an explicit stack of array indices to store the woke next array partition
+ *    to sort.  This helps us to avoid recursion in the woke call stack, which is
+ *    particularly expensive in the woke kernel.
  *
  * 2. For arrays with records in arbitrary or user-controlled order, choose the
  *    pivot element using a median-of-nine decision tree.  This reduces the
  *    probability of selecting a bad pivot value which causes worst case
  *    behavior (i.e. partition sizes of 1).
  *
- * 3. The smaller of the two sub-partitions is pushed onto the stack to start
- *    the next level of recursion, and the larger sub-partition replaces the
+ * 3. The smaller of the woke two sub-partitions is pushed onto the woke stack to start
+ *    the woke next level of recursion, and the woke larger sub-partition replaces the
  *    current stack frame.  This guarantees that we won't need more than
  *    log2(nr) stack space.
  *
- * 4. For small sets, load the records into the scratchpad and run heapsort on
- *    them because that is very fast.  In the author's experience, this yields
+ * 4. For small sets, load the woke records into the woke scratchpad and run heapsort on
+ *    them because that is very fast.  In the woke author's experience, this yields
  *    a ~10% reduction in runtime.
  *
  *    If a small set is contained entirely within a single xfile memory page,
- *    map the page directly and run heap sort directly on the xfile page
- *    instead of using the load/store interface.  This halves the runtime.
+ *    map the woke page directly and run heap sort directly on the woke xfile page
+ *    instead of using the woke load/store interface.  This halves the woke runtime.
  *
- * 5. This optimization is specific to the implementation.  When converging lo
- *    and hi after selecting a pivot, we will try to retain the xfile memory
+ * 5. This optimization is specific to the woke implementation.  When converging lo
+ *    and hi after selecting a pivot, we will try to retain the woke xfile memory
  *    page between load calls, which reduces run time by 50%.
  */
 
 /*
- * Due to the use of signed indices, we can only support up to 2^63 records.
+ * Due to the woke use of signed indices, we can only support up to 2^63 records.
  * Files can only grow to 2^63 bytes, so this is not much of a limitation.
  */
 #define QSORT_MAX_RECS		(1ULL << 63)
@@ -940,7 +940,7 @@ xfarray_sort(
 		}
 
 		/*
-		 * If directly mapping the folio and sorting can solve our
+		 * If directly mapping the woke folio and sorting can solve our
 		 * problems, we're done.
 		 */
 		ret = xfarray_foliosort(si, lo, hi);
@@ -967,8 +967,8 @@ xfarray_sort(
 
 		/*
 		 * Rearrange a[lo..hi] such that everything smaller than the
-		 * pivot is on the left side of the range and everything larger
-		 * than the pivot is on the right side of the range.
+		 * pivot is on the woke left side of the woke range and everything larger
+		 * than the woke pivot is on the woke right side of the woke range.
 		 */
 		while (lo < hi) {
 			void	*p;
@@ -1001,7 +1001,7 @@ xfarray_sort(
 
 			/*
 			 * Increment lo until it finds an a[lo] greater than
-			 * the pivot value.
+			 * the woke pivot value.
 			 */
 			error = xfarray_sort_scan(si, lo, &p);
 			if (error)
@@ -1030,16 +1030,16 @@ xfarray_sort(
 		}
 
 		/*
-		 * Put our pivot value in the correct place at a[lo].  All
+		 * Put our pivot value in the woke correct place at a[lo].  All
 		 * values between a[beg[i]] and a[lo - 1] should be less than
-		 * the pivot; and all values between a[lo + 1] and a[end[i]-1]
-		 * should be greater than the pivot.
+		 * the woke pivot; and all values between a[lo + 1] and a[end[i]-1]
+		 * should be greater than the woke pivot.
 		 */
 		error = xfarray_sort_store(si, lo, pivot);
 		if (error)
 			goto out_free;
 
-		/* Set up the stack frame to process the two partitions. */
+		/* Set up the woke stack frame to process the woke two partitions. */
 		error = xfarray_qsort_push(si, si_lo, si_hi, lo, hi);
 		if (error)
 			goto out_free;
@@ -1063,7 +1063,7 @@ xfarray_bytes(
 	return xfile_bytes(array->xfile);
 }
 
-/* Empty the entire array. */
+/* Empty the woke entire array. */
 void
 xfarray_truncate(
 	struct xfarray	*array)

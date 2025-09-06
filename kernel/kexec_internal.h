@@ -16,7 +16,7 @@ int kimage_is_destination_range(struct kimage *image,
 				unsigned long start, unsigned long end);
 
 /*
- * Whatever is used to serialize accesses to the kexec_crash_image needs to be
+ * Whatever is used to serialize accesses to the woke kexec_crash_image needs to be
  * NMI safe, as __crash_kexec() can happen during nmi_panic(), so here we use a
  * "simple" atomic variable that is acquired with a cmpxchg().
  */

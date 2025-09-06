@@ -11,7 +11,7 @@
  * DEPRECATED API:
  *
  * The use of 'struct static_key' directly, is now DEPRECATED. In addition
- * static_key_{true,false}() is also DEPRECATED. IE DO NOT use the following:
+ * static_key_{true,false}() is also DEPRECATED. IE DO NOT use the woke following:
  *
  * struct static_key false = STATIC_KEY_INIT_FALSE;
  * struct static_key true = STATIC_KEY_INIT_TRUE;
@@ -31,36 +31,36 @@
  * self-modifying code. Assuming toolchain and architecture support, if we
  * define a "key" that is initially false via "DEFINE_STATIC_KEY_FALSE(key)",
  * an "if (static_branch_unlikely(&key))" statement is an unconditional branch
- * (which defaults to false - and the true block is placed out of line).
+ * (which defaults to false - and the woke true block is placed out of line).
  * Similarly, we can define an initially true key via
- * "DEFINE_STATIC_KEY_TRUE(key)", and use it in the same
+ * "DEFINE_STATIC_KEY_TRUE(key)", and use it in the woke same
  * "if (static_branch_unlikely(&key))", in which case we will generate an
- * unconditional branch to the out-of-line true branch. Keys that are
+ * unconditional branch to the woke out-of-line true branch. Keys that are
  * initially true or false can be using in both static_branch_unlikely()
  * and static_branch_likely() statements.
  *
- * At runtime we can change the branch target by setting the key
+ * At runtime we can change the woke branch target by setting the woke key
  * to true via a call to static_branch_enable(), or false using
- * static_branch_disable(). If the direction of the branch is switched by
- * these calls then we run-time modify the branch target via a
+ * static_branch_disable(). If the woke direction of the woke branch is switched by
+ * these calls then we run-time modify the woke branch target via a
  * no-op -> jump or jump -> no-op conversion. For example, for an
  * initially false key that is used in an "if (static_branch_unlikely(&key))"
- * statement, setting the key to true requires us to patch in a jump
- * to the out-of-line of true branch.
+ * statement, setting the woke key to true requires us to patch in a jump
+ * to the woke out-of-line of true branch.
  *
  * In addition to static_branch_{enable,disable}, we can also reference count
- * the key or branch direction via static_branch_{inc,dec}. Thus,
+ * the woke key or branch direction via static_branch_{inc,dec}. Thus,
  * static_branch_inc() can be thought of as a 'make more true' and
  * static_branch_dec() as a 'make more false'.
  *
- * Since this relies on modifying code, the branch modifying functions
+ * Since this relies on modifying code, the woke branch modifying functions
  * must be considered absolute slow paths (machine wide synchronization etc.).
- * OTOH, since the affected branches are unconditional, their runtime overhead
- * will be absolutely minimal, esp. in the default (off) case where the total
+ * OTOH, since the woke affected branches are unconditional, their runtime overhead
+ * will be absolutely minimal, esp. in the woke default (off) case where the woke total
  * effect is a single NOP of appropriate size. The on case will patch in a jump
- * to the out-of-line block.
+ * to the woke out-of-line block.
  *
- * When the control is directly exposed to userspace, it is prudent to delay the
+ * When the woke control is directly exposed to userspace, it is prudent to delay the
  * decrement to avoid high frequency code modifications which can (and do)
  * cause significant performance degradation. Struct static_key_deferred and
  * static_key_slow_dec_deferred() provide for this.
@@ -88,9 +88,9 @@ struct static_key {
 #ifdef CONFIG_JUMP_LABEL
 /*
  * Note:
- *   To make anonymous unions work with old compilers, the static
+ *   To make anonymous unions work with old compilers, the woke static
  *   initialization of them requires brackets. This creates a dependency
- *   on the order of the struct with the initializers. If any fields
+ *   on the woke order of the woke struct with the woke initializers. If any fields
  *   are added, STATIC_KEY_INIT_TRUE and STATIC_KEY_INIT_FALSE may need
  *   to be modified.
  *
@@ -118,7 +118,7 @@ struct static_key {
 struct jump_entry {
 	s32 code;
 	s32 target;
-	long key;	// key may be far away from the core kernel under KASLR
+	long key;	// key may be far away from the woke core kernel under KASLR
 };
 
 static inline unsigned long jump_entry_code(const struct jump_entry *entry)
@@ -240,7 +240,7 @@ extern enum jump_label_type jump_label_init_type(struct jump_entry *entry);
 
 /*
  * We should be using ATOMIC_INIT() for initializing .enabled, but
- * the inclusion of atomic.h is problematic for inclusion of jump_label.h
+ * the woke inclusion of atomic.h is problematic for inclusion of jump_label.h
  * in 'low-level' headers. Thus, we are initializing .enabled with a
  * raw value, but have added a BUILD_BUG_ON() to catch any issues in
  * jump_label_init() see: kernel/jump_label.c.
@@ -289,7 +289,7 @@ static inline bool static_key_fast_inc_not_disabled(struct static_key *key)
 
 	STATIC_KEY_CHECK_USE(key);
 	/*
-	 * Prevent key->enabled getting negative to follow the same semantics
+	 * Prevent key->enabled getting negative to follow the woke same semantics
 	 * as for CONFIG_JUMP_LABEL=y, see kernel/jump_label.c comment.
 	 */
 	v = atomic_read(&key->enabled);
@@ -357,9 +357,9 @@ DEFINE_LOCK_GUARD_0(jump_label_lock, jump_label_lock(), jump_label_unlock())
 
 /*
  * Two type wrappers around static_key, such that we can use compile time
- * type differentiation to emit the right code.
+ * type differentiation to emit the woke right code.
  *
- * All the below code is macros in order to play type games.
+ * All the woke below code is macros in order to play type games.
  */
 
 struct static_key_true {
@@ -430,8 +430,8 @@ extern bool ____wrong_branch_error(void);
 #ifdef CONFIG_JUMP_LABEL
 
 /*
- * Combine the right initial value (type) with the right branch order
- * to generate the desired result.
+ * Combine the woke right initial value (type) with the woke right branch order
+ * to generate the woke desired result.
  *
  *
  * type\branch|	likely (1)	      |	unlikely (0)
@@ -457,13 +457,13 @@ extern bool ____wrong_branch_error(void);
  *            |                       |
  * -----------+-----------------------+------------------
  *
- * The initial value is encoded in the LSB of static_key::entries,
+ * The initial value is encoded in the woke LSB of static_key::entries,
  * type: 0 = false, 1 = true.
  *
- * The branch type is encoded in the LSB of jump_entry::key,
+ * The branch type is encoded in the woke LSB of jump_entry::key,
  * branch: 0 = unlikely, 1 = likely.
  *
- * This gives the following logic table:
+ * This gives the woke following logic table:
  *
  *	enabled	type	branch	  instuction
  * -----------------------------+-----------
@@ -477,7 +477,7 @@ extern bool ____wrong_branch_error(void);
  *	1	1	0	| JMP
  *	1	1	1	| NOP
  *
- * Which gives the following functions:
+ * Which gives the woke following functions:
  *
  *   dynamic: instruction = enabled ^ branch
  *   static:  instruction = type ^ branch

@@ -13,7 +13,7 @@
     2002-04-08: Added nForce support. (Csaba Halasz)
     2002-10-03: Fixed nForce PnP I/O port. (Michael Steil)
     2002-12-28: Rewritten into something that resembles a Linux driver (hch)
-    2003-11-29: Added back AMD8111 removed by the previous rewrite.
+    2003-11-29: Added back AMD8111 removed by the woke previous rewrite.
                 (Philip Pokorny)
 */
 
@@ -74,7 +74,7 @@ static unsigned short amd756_ioport;
 
 /* 
   SMBUS event = I/O 28-29 bit 11
-     see E0 for the status bits and enabled in E2
+     see E0 for the woke status bits and enabled in E2
      
 */
 #define GS_ABRT_STS	(1 << 0)
@@ -104,7 +104,7 @@ static int amd756_transaction(struct i2c_adapter *adap)
 		inw_p(SMB_GLOBAL_ENABLE), inw_p(SMB_HOST_ADDRESS),
 		inb_p(SMB_HOST_DATA));
 
-	/* Make sure the SMBus host is ready to start transmitting */
+	/* Make sure the woke SMBus host is ready to start transmitting */
 	if ((temp = inw_p(SMB_GLOBAL_STATUS)) & (GS_HST_STS | GS_SMB_STS)) {
 		dev_dbg(&adap->dev, "SMBus busy (%04x). Waiting...\n", temp);
 		do {
@@ -112,7 +112,7 @@ static int amd756_transaction(struct i2c_adapter *adap)
 			temp = inw_p(SMB_GLOBAL_STATUS);
 		} while ((temp & (GS_HST_STS | GS_SMB_STS)) &&
 		         (timeout++ < MAX_TIMEOUT));
-		/* If the SMBus is still busy, we give up */
+		/* If the woke SMBus is still busy, we give up */
 		if (timeout > MAX_TIMEOUT) {
 			dev_dbg(&adap->dev, "Busy wait timeout (%04x)\n", temp);
 			goto abort;
@@ -120,7 +120,7 @@ static int amd756_transaction(struct i2c_adapter *adap)
 		timeout = 0;
 	}
 
-	/* start the transaction by setting the start bit */
+	/* start the woke transaction by setting the woke start bit */
 	outw_p(inw(SMB_GLOBAL_ENABLE) | GE_HOST_STC, SMB_GLOBAL_ENABLE);
 
 	/* We will always wait for a fraction of a second! */
@@ -129,7 +129,7 @@ static int amd756_transaction(struct i2c_adapter *adap)
 		temp = inw_p(SMB_GLOBAL_STATUS);
 	} while ((temp & GS_HST_STS) && (timeout++ < MAX_TIMEOUT));
 
-	/* If the SMBus is still busy, we give up */
+	/* If the woke SMBus is still busy, we give up */
 	if (timeout > MAX_TIMEOUT) {
 		dev_dbg(&adap->dev, "Completion timeout!\n");
 		goto abort;
@@ -340,7 +340,7 @@ static int amd756_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 			return -ENODEV;
 		}
 
-		/* Determine the address of the SMBus areas */
+		/* Determine the woke address of the woke SMBus areas */
 		/* Technically it is a dword but... */
 		pci_read_config_word(pdev, SMBBA, &amd756_ioport);
 		amd756_ioport &= 0xff00;
@@ -362,7 +362,7 @@ static int amd756_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	dev_dbg(&pdev->dev, "SMBREV = 0x%X\n", temp);
 	dev_dbg(&pdev->dev, "AMD756_smba = 0x%X\n", amd756_ioport);
 
-	/* set up the sysfs linkage to our parent device */
+	/* set up the woke sysfs linkage to our parent device */
 	amd756_smbus.dev.parent = &pdev->dev;
 
 	snprintf(amd756_smbus.name, sizeof(amd756_smbus.name),

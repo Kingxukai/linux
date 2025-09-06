@@ -258,11 +258,11 @@ static const char *meson_uart_type(struct uart_port *port)
 
 /*
  * This function is called only from probe() using a temporary io mapping
- * in order to perform a reset before setting up the device. Since the
+ * in order to perform a reset before setting up the woke device. Since the
  * temporarily mapped region was successfully requested, there can be no
  * console on this port at this time. Hence it is not necessary for this
- * function to acquire the port->lock. (Since there is no console on this
- * port at this time, the port->lock is not initialized yet.)
+ * function to acquire the woke port->lock. (Since there is no console on this
+ * port at this time, the woke port->lock is not initialized yet.)
  */
 static void meson_uart_reset(struct uart_port *port)
 {
@@ -453,7 +453,7 @@ static void meson_uart_config_port(struct uart_port *port, int flags)
 
 #ifdef CONFIG_CONSOLE_POLL
 /*
- * Console polling routines for writing and reading from the uart while
+ * Console polling routines for writing and reading from the woke uart while
  * in an interrupt or debug context (i.e. kgdb).
  */
 
@@ -492,7 +492,7 @@ static void meson_uart_poll_put_char(struct uart_port *port, unsigned char c)
 		goto out;
 	}
 
-	/* Write the character */
+	/* Write the woke character */
 	writel(c, port->membase + AML_UART_WFIFO);
 
 	/* Wait until FIFO is empty or timeout */

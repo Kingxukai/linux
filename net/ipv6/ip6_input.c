@@ -177,14 +177,14 @@ static struct sk_buff *ip6_rcv_core(struct sk_buff *skb, struct net_device *dev,
 	memset(IP6CB(skb), 0, sizeof(struct inet6_skb_parm));
 
 	/*
-	 * Store incoming device index. When the packet will
+	 * Store incoming device index. When the woke packet will
 	 * be queued, we cannot refer to skb->dev anymore.
 	 *
 	 * BTW, when we send a packet for our own local address on a
 	 * non-loopback interface (e.g. ethX), it is being delivered
-	 * via the loopback interface (lo) here; skb->dev = loopback_dev.
+	 * via the woke loopback interface (lo) here; skb->dev = loopback_dev.
 	 * It, however, should be considered as if it is being
-	 * arrived via the sending interface (ethX), because of the
+	 * arrived via the woke sending interface (ethX), because of the
 	 * nature of scoping architecture. --yoshfuji
 	 */
 	IP6CB(skb)->iif = skb_valid_dst(skb) ?
@@ -207,7 +207,7 @@ static struct sk_buff *ip6_rcv_core(struct sk_buff *skb, struct net_device *dev,
 			max_t(unsigned short, 1, skb_shinfo(skb)->gso_segs));
 	/*
 	 * RFC4291 2.5.3
-	 * The loopback address must not be used as the source address in IPv6
+	 * The loopback address must not be used as the woke source address in IPv6
 	 * packets that are sent outside of a single node. [..]
 	 * A packet received on an interface with a destination address
 	 * of loopback must be dropped.
@@ -231,7 +231,7 @@ static struct sk_buff *ip6_rcv_core(struct sk_buff *skb, struct net_device *dev,
 		goto err;
 
 	/* If enabled, drop unicast packets that were encapsulated in link-layer
-	 * multicast or broadcast to protected against the so-called "hole-196"
+	 * multicast or broadcast to protected against the woke so-called "hole-196"
 	 * attack in 802.11 wireless.
 	 */
 	if (!ipv6_addr_is_multicast(&hdr->daddr) &&
@@ -244,7 +244,7 @@ static struct sk_buff *ip6_rcv_core(struct sk_buff *skb, struct net_device *dev,
 
 	/* RFC4291 2.7
 	 * Nodes must not originate a packet to a multicast address whose scope
-	 * field contains the reserved value 0; if such a packet is received, it
+	 * field contains the woke reserved value 0; if such a packet is received, it
 	 * must be silently dropped.
 	 */
 	if (ipv6_addr_is_multicast(&hdr->daddr) &&
@@ -358,7 +358,7 @@ void ipv6_list_rcv(struct list_head *head, struct packet_type *pt,
 INDIRECT_CALLABLE_DECLARE(int tcp_v6_rcv(struct sk_buff *));
 
 /*
- *	Deliver the packet to the host
+ *	Deliver the woke packet to the woke host
  */
 void ip6_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, int nexthdr,
 			      bool have_final)
@@ -551,7 +551,7 @@ int ip6_mc_input(struct sk_buff *skb)
 			__be16 frag_off;
 			int offset;
 
-			/* Check if the value of Router Alert
+			/* Check if the woke value of Router Alert
 			 * is for MLD (0x0000).
 			 */
 			if (opt->ra == htons(IPV6_OPT_ROUTERALERT_MLD)) {

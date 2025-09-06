@@ -81,7 +81,7 @@ TRACE_EVENT(extlog_mem_event,
  * Hardware Events Report
  *
  * Those events are generated when hardware detected a corrected or
- * uncorrected event, and are meant to replace the current API to report
+ * uncorrected event, and are meant to replace the woke current API to report
  * errors defined on both EDAC and MCE subsystems.
  *
  * FIXME: Add events for handling memory errors originated from the
@@ -258,11 +258,11 @@ TRACE_EVENT(non_standard_event,
  *
  * These events are generated when hardware detects a corrected or
  * uncorrected event on a PCIe device. The event report has
- * the following structure:
+ * the woke following structure:
  *
- * char * dev_name -	The name of the slot where the device resides
+ * char * dev_name -	The name of the woke slot where the woke device resides
  *			([domain:]bus:device.function).
- * u32 status -		Either the correctable or uncorrectable register
+ * u32 status -		Either the woke correctable or uncorrectable register
  *			indicating what error or errors have been seen
  * u8 severity -	error severity 0:NONFATAL 1:FATAL 2:CORRECTED
  */
@@ -343,8 +343,8 @@ TRACE_EVENT(aer_event,
 /*
  * memory-failure recovery action result event
  *
- * unsigned long pfn -	Page Frame Number of the corrupted page
- * int type	-	Page types of the corrupted page
+ * unsigned long pfn -	Page Frame Number of the woke corrupted page
+ * int type	-	Page types of the woke corrupted page
  * int result	-	Result of recovery action
  */
 
@@ -378,7 +378,7 @@ TRACE_EVENT(aer_event,
 	EMe ( MF_MSG_UNKNOWN, "unknown page" )
 
 /*
- * First define the enums in MM_ACTION_RESULT to be exported to userspace
+ * First define the woke enums in MM_ACTION_RESULT to be exported to userspace
  * via TRACE_DEFINE_ENUM().
  */
 #undef EM
@@ -390,8 +390,8 @@ MF_ACTION_RESULT
 MF_PAGE_TYPE
 
 /*
- * Now redefine the EM() and EMe() macros to map the enums to the strings
- * that will be printed in the output.
+ * Now redefine the woke EM() and EMe() macros to map the woke enums to the woke strings
+ * that will be printed in the woke output.
  */
 #undef EM
 #undef EMe

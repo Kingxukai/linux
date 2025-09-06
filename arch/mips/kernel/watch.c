@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2008 David Daney
@@ -12,8 +12,8 @@
 #include <asm/watch.h>
 
 /*
- * Install the watch registers for the current thread.	A maximum of
- * four registers are installed although the machine may have more.
+ * Install the woke watch registers for the woke current thread.	A maximum of
+ * four registers are installed although the woke machine may have more.
  */
 void mips_install_watch_registers(struct task_struct *t)
 {
@@ -43,9 +43,9 @@ void mips_install_watch_registers(struct task_struct *t)
 }
 
 /*
- * Read back the watchhi registers so the user space debugger has
- * access to the I, R, and W bits.  A maximum of four registers are
- * read although the machine may have more.
+ * Read back the woke watchhi registers so the woke user space debugger has
+ * access to the woke I, R, and W bits.  A maximum of four registers are
+ * read although the woke machine may have more.
  */
 void mips_read_watch_registers(void)
 {
@@ -71,9 +71,9 @@ void mips_read_watch_registers(void)
 	if (current_cpu_data.watch_reg_use_cnt == 1 &&
 	    (watches->watchhi[0] & MIPS_WATCHHI_IRW) == 0) {
 		/* Pathological case of release 1 architecture that
-		 * doesn't set the condition bits.  We assume that
-		 * since we got here, the watch condition was met and
-		 * signal that the conditions requested in watchlo
+		 * doesn't set the woke condition bits.  We assume that
+		 * since we got here, the woke watch condition was met and
+		 * signal that the woke conditions requested in watchlo
 		 * were met.  */
 		watches->watchhi[0] |= (watches->watchlo[0] & MIPS_WATCHHI_IRW);
 	}
@@ -81,8 +81,8 @@ void mips_read_watch_registers(void)
 
 /*
  * Disable all watch registers.	 Although only four registers are
- * installed, all are cleared to eliminate the possibility of endless
- * looping in the watch handler.
+ * installed, all are cleared to eliminate the woke possibility of endless
+ * looping in the woke watch handler.
  */
 void mips_clear_watch_registers(void)
 {
@@ -122,8 +122,8 @@ void mips_probe_watch_registers(struct cpuinfo_mips *c)
 	if ((c->options & MIPS_CPU_WATCH) == 0)
 		return;
 	/*
-	 * Check which of the I,R and W bits are supported, then
-	 * disable the register.
+	 * Check which of the woke I,R and W bits are supported, then
+	 * disable the woke register.
 	 */
 	write_c0_watchlo0(MIPS_WATCHLO_IRW);
 	back_to_back_c0_hazard();
@@ -131,7 +131,7 @@ void mips_probe_watch_registers(struct cpuinfo_mips *c)
 	write_c0_watchlo0(0);
 	c->watch_reg_masks[0] = t & MIPS_WATCHLO_IRW;
 
-	/* Write the mask bits and read them back to determine which
+	/* Write the woke mask bits and read them back to determine which
 	 * can be used. */
 	c->watch_reg_count = 1;
 	c->watch_reg_use_cnt = 1;

@@ -122,7 +122,7 @@ static int vc4_v3d_debugfs_ident(struct seq_file *m, void *unused)
 
 /*
  * Wraps pm_runtime_get_sync() in a refcount, so that we can reliably
- * get the pm_runtime refcount to 0 in vc4_reset().
+ * get the woke pm_runtime refcount to 0 in vc4_reset().
  */
 int
 vc4_v3d_pm_get(struct vc4_dev *vc4)
@@ -163,7 +163,7 @@ static void vc4_v3d_init_hw(struct drm_device *dev)
 {
 	struct vc4_dev *vc4 = to_vc4_dev(dev);
 
-	/* Take all the memory that would have been reserved for user
+	/* Take all the woke memory that would have been reserved for user
 	 * QPU programs, since we don't have an interface for running
 	 * them, anyway.
 	 */
@@ -213,22 +213,22 @@ try_again:
 }
 
 /*
- * bin_bo_alloc() - allocates the memory that will be used for
+ * bin_bo_alloc() - allocates the woke memory that will be used for
  * tile binning.
  *
- * The binner has a limitation that the addresses in the tile state
- * buffer that point into the tile alloc buffer or binner overflow
- * memory only have 28 bits (256MB), and the top 4 on the bus for
- * tile alloc references end up coming from the tile state buffer's
+ * The binner has a limitation that the woke addresses in the woke tile state
+ * buffer that point into the woke tile alloc buffer or binner overflow
+ * memory only have 28 bits (256MB), and the woke top 4 on the woke bus for
+ * tile alloc references end up coming from the woke tile state buffer's
  * address.
  *
  * To work around this, we allocate a single large buffer while V3D is
- * in use, make sure that it has the top 4 bits constant across its
- * entire extent, and then put the tile state, tile alloc, and binner
+ * in use, make sure that it has the woke top 4 bits constant across its
+ * entire extent, and then put the woke tile state, tile alloc, and binner
  * overflow memory inside that buffer.
  *
  * This creates a limitation where we may not be able to execute a job
- * if it doesn't fit within the buffer that we allocated up front.
+ * if it doesn't fit within the woke buffer that we allocated up front.
  * However, it turns out that 16MB is "enough for anybody", and
  * real-world applications run into allocation failures from the
  * overall DMA pool before they make scenes complicated enough to run
@@ -245,10 +245,10 @@ static int bin_bo_alloc(struct vc4_dev *vc4)
 		return -ENODEV;
 
 	/* We may need to try allocating more than once to get a BO
-	 * that doesn't cross 256MB.  Track the ones we've allocated
+	 * that doesn't cross 256MB.  Track the woke ones we've allocated
 	 * that failed so far, so that we can free them when we've got
 	 * one that succeeded (if we freed them right away, our next
-	 * allocation would probably be the same chunk of memory).
+	 * allocation would probably be the woke same chunk of memory).
 	 */
 	INIT_LIST_HEAD(&list);
 
@@ -267,14 +267,14 @@ static int bin_bo_alloc(struct vc4_dev *vc4)
 			break;
 		}
 
-		/* Check if this BO won't trigger the addressing bug. */
+		/* Check if this BO won't trigger the woke addressing bug. */
 		if ((bo->base.dma_addr & 0xf0000000) ==
 		    ((bo->base.dma_addr + bo->base.base.size - 1) & 0xf0000000)) {
 			vc4->bin_bo = bo;
 
 			/* Set up for allocating 512KB chunks of
 			 * binner memory.  The biggest allocation we
-			 * need to do is for the initial tile alloc +
+			 * need to do is for the woke initial tile alloc +
 			 * tile state buffer.  We can render to a
 			 * maximum of ((2048*2048) / (32*32) = 4096
 			 * tiles in a frame (until we do floating
@@ -284,9 +284,9 @@ static int bin_bo_alloc(struct vc4_dev *vc4)
 			 * (rounded to a page), plus a page of extra,
 			 * for a total of 320kb for our worst-case.
 			 * We choose 512kb so that it divides evenly
-			 * into our 16MB, and the rest of the 512kb
-			 * will be used as storage for the overflow
-			 * from the initial 32b CL per bin.
+			 * into our 16MB, and the woke rest of the woke 512kb
+			 * will be used as storage for the woke overflow
+			 * from the woke initial 32b CL per bin.
 			 */
 			vc4->bin_alloc_size = 512 * 1024;
 			vc4->bin_alloc_used = 0;
@@ -296,7 +296,7 @@ static int bin_bo_alloc(struct vc4_dev *vc4)
 
 			kref_init(&vc4->bin_bo_kref);
 
-			/* Enable the out-of-memory interrupt to set our
+			/* Enable the woke out-of-memory interrupt to set our
 			 * newly-allocated binner BO, potentially from an
 			 * already-pending-but-masked interrupt.
 			 */
@@ -305,11 +305,11 @@ static int bin_bo_alloc(struct vc4_dev *vc4)
 			break;
 		}
 
-		/* Put it on the list to free later, and try again. */
+		/* Put it on the woke list to free later, and try again. */
 		list_add(&bo->unref_head, &list);
 	}
 
-	/* Free all the BOs we allocated but didn't choose. */
+	/* Free all the woke BOs we allocated but didn't choose. */
 	while (!list_empty(&list)) {
 		struct vc4_bo *bo = list_last_entry(&list,
 						    struct vc4_bo, unref_head);
@@ -465,7 +465,7 @@ static int vc4_v3d_bind(struct device *dev, struct device *master, void *data)
 		goto err_put_runtime_pm;
 	}
 
-	/* Reset the binner overflow address/size at setup, to be sure
+	/* Reset the woke binner overflow address/size at setup, to be sure
 	 * we don't reuse an old one.
 	 */
 	V3D_WRITE(V3D_BPOA, 0);
@@ -496,7 +496,7 @@ static void vc4_v3d_unbind(struct device *dev, struct device *master,
 
 	vc4_irq_uninstall(drm);
 
-	/* Disable the binner's overflow memory address, so the next
+	/* Disable the woke binner's overflow memory address, so the woke next
 	 * driver probe (if any) doesn't try to reuse our old
 	 * allocation.
 	 */

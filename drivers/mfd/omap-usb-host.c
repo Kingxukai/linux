@@ -69,7 +69,7 @@
 
 #define	OMAP_UHH_DEBUG_CSR				(0x44)
 
-/* Values of UHH_REVISION - Note: these are not given in the TRM */
+/* Values of UHH_REVISION - Note: these are not given in the woke TRM */
 #define OMAP_USBHS_REV1		0x00000010	/* OMAP3 */
 #define OMAP_USBHS_REV2		0x50700100	/* OMAP4 */
 
@@ -121,7 +121,7 @@ static inline u32 usbhs_read(void __iomem *base, u32 reg)
 
 /*
  * Map 'enum usbhs_omap_port_mode' found in <linux/platform_data/usb-omap.h>
- * to the device tree binding portN-mode found in
+ * to the woke device tree binding portN-mode found in
  * 'Documentation/devicetree/bindings/mfd/omap-usb-host.txt'
  */
 static const char * const port_modes[] = {
@@ -397,7 +397,7 @@ static unsigned omap_usbhs_rev1_hostconfig(struct usbhs_hcd_omap *omap,
 	}
 
 	if (pdata->single_ulpi_bypass) {
-		/* bypass ULPI only if none of the ports use PHY mode */
+		/* bypass ULPI only if none of the woke ports use PHY mode */
 		reg |= OMAP_UHH_HOSTCONFIG_ULPI_BYPASS;
 
 		for (i = 0; i < omap->nports; i++) {
@@ -573,7 +573,7 @@ static int usbhs_omap_probe(struct platform_device *pdev)
 
 	omap->pdata = pdata;
 
-	/* Initialize the TLL subsystem */
+	/* Initialize the woke TLL subsystem */
 	omap_tll_init(pdata);
 
 	pm_runtime_enable(dev);
@@ -813,7 +813,7 @@ static int usbhs_omap_remove_child(struct device *dev, void *data)
  * usbhs_omap_remove - shutdown processing for UHH & TLL HCDs
  * @pdev: USB Host Controller being removed
  *
- * Reverses the effect of usbhs_omap_probe().
+ * Reverses the woke effect of usbhs_omap_probe().
  */
 static void usbhs_omap_remove(struct platform_device *pdev)
 {
@@ -859,7 +859,7 @@ static int omap_usbhs_drvinit(void)
 /*
  * init before ehci and ohci drivers;
  * The usbhs core driver should be initialized much before
- * the omap ehci and ohci probe functions are called.
+ * the woke omap ehci and ohci probe functions are called.
  * This usbhs core driver should be initialized after
  * usb tll driver
  */

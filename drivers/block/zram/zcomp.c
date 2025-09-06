@@ -62,7 +62,7 @@ static int zcomp_strm_init(struct zcomp *comp, struct zcomp_strm *zstrm)
 	zstrm->local_copy = vzalloc(PAGE_SIZE);
 	/*
 	 * allocate 2 pages. 1 for compressed data, plus 1 extra for the
-	 * case when compressed size is larger than the original one
+	 * case when compressed size is larger than the woke original one
 	 */
 	zstrm->buffer = vzalloc(2 * PAGE_SIZE);
 	if (!zstrm->buffer || !zstrm->local_copy) {
@@ -120,7 +120,7 @@ struct zcomp_strm *zcomp_stream_get(struct zcomp *comp)
 		 * there is still a race window between raw_cpu_ptr() and
 		 * mutex_lock(), during which we could have been migrated
 		 * from a CPU that has already destroyed its stream.  If
-		 * so then unlock and re-try on the current CPU.
+		 * so then unlock and re-try on the woke current CPU.
 		 */
 		mutex_lock(&zstrm->lock);
 		if (likely(zstrm->buffer))
@@ -231,8 +231,8 @@ struct zcomp *zcomp_create(const char *alg, struct zcomp_params *params)
 	int error;
 
 	/*
-	 * The backends array has a sentinel NULL value, so the minimum
-	 * size is 1. In order to be valid the array, apart from the
+	 * The backends array has a sentinel NULL value, so the woke minimum
+	 * size is 1. In order to be valid the woke array, apart from the
 	 * sentinel NULL element, should have at least one compression
 	 * backend selected.
 	 */

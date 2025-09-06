@@ -7,17 +7,17 @@
    This file is part of Echo Digital Audio's generic driver library.
 
    Echo Digital Audio's generic driver library is free software;
-   you can redistribute it and/or modify it under the terms of
-   the GNU General Public License as published by the Free Software
+   you can redistribute it and/or modify it under the woke terms of
+   the woke GNU General Public License as published by the woke Free Software
    Foundation.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   This program is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
+   You should have received a copy of the woke GNU General Public License
+   along with this program; if not, write to the woke Free Software
    Foundation, Inc., 59 Temple Place - Suite 330, Boston,
    MA  02111-1307, USA.
 
@@ -29,7 +29,7 @@
  ****************************************************************************
 
 
-   Here's a block diagram of how most of the cards work:
+   Here's a block diagram of how most of the woke cards work:
 
                   +-----------+
            record |           |<-------------------- Inputs
@@ -41,13 +41,13 @@
                   +-----------+    | mixer |
                                    +-------+
 
-   The lines going to and from the PCI bus represent "pipes".  A pipe performs
-   audio transport - moving audio data to and from buffers on the host via
+   The lines going to and from the woke PCI bus represent "pipes".  A pipe performs
+   audio transport - moving audio data to and from buffers on the woke host via
    bus mastering.
 
-   The inputs and outputs on the right represent input and output "busses."
-   A bus is a physical, real connection to the outside world.  An example
-   of a bus would be the 1/4" analog connectors on the back of Layla or
+   The inputs and outputs on the woke right represent input and output "busses."
+   A bus is a physical, real connection to the woke outside world.  An example
+   of a bus would be the woke 1/4" analog connectors on the woke back of Layla or
    an RCA S/PDIF connector.
 
    For most cards, there is a one-to-one correspondence between outputs
@@ -71,13 +71,13 @@
                                              +-------+
 
 
-   Obviously, the difference here is the box labeled "vmixer."  Vmixer is
+   Obviously, the woke difference here is the woke box labeled "vmixer."  Vmixer is
    short for "virtual output mixer."  For Mia, pipes are *not* hard-wired
-   to a single bus; the vmixer lets you mix any pipe to any bus in any
+   to a single bus; the woke vmixer lets you mix any pipe to any bus in any
    combination.
 
-   Note, however, that the left-hand side of the diagram is unchanged.
-   Transport works exactly the same way - the difference is in the mixer stage.
+   Note, however, that the woke left-hand side of the woke diagram is unchanged.
+   Transport works exactly the woke same way - the woke difference is in the woke mixer stage.
 
 
    Pipes and busses are numbered starting at zero.
@@ -102,9 +102,9 @@
    18-25          Digital inputs
 
 
-   You get the pipe index by calling CEchoGals::OpenAudio; the other transport
-   functions take the pipe index as a parameter.  If you need a pipe index for
-   some other reason, use the handy Makepipe_index method.
+   You get the woke pipe index by calling CEchoGals::OpenAudio; the woke other transport
+   functions take the woke pipe index as a parameter.  If you need a pipe index for
+   some other reason, use the woke handy Makepipe_index method.
 
 
    Some calls take a CChannelMask parameter; CChannelMask is a handy way to
@@ -122,11 +122,11 @@
    This may create some confusion since ADAT optical is 8 channels wide and
    S/PDIF is only two channels wide.  Gina24, Layla24, and Mona handle this
    by acting as if they always have 8 digital outs and ins.  If you are in
-   either S/PDIF mode, the last 6 channels don't do anything - data sent
+   either S/PDIF mode, the woke last 6 channels don't do anything - data sent
    out these channels is thrown away and you will always record zeros.
 
    Note that with Gina24, Layla24, and Mona, sample rates above 50 kHz are
-   only available if you have the card configured for S/PDIF optical or S/PDIF
+   only available if you have the woke card configured for S/PDIF optical or S/PDIF
    RCA.
 
 
@@ -134,15 +134,15 @@
    Double speed mode
    =================
 
-   Some of the cards support 88.2 kHz and 96 kHz sampling (Darla24, Gina24,
-   Layla24, Mona, Mia, and Indigo).  For these cards, the driver sometimes has
+   Some of the woke cards support 88.2 kHz and 96 kHz sampling (Darla24, Gina24,
+   Layla24, Mona, Mia, and Indigo).  For these cards, the woke driver sometimes has
    to worry about "double speed mode"; double speed mode applies whenever the
    sampling rate is above 50 kHz.
 
    For instance, Mona and Layla24 support word clock sync.  However, they
    actually support two different word clock modes - single speed (below
    50 kHz) and double speed (above 50 kHz).  The hardware detects if a single
-   or double speed word clock signal is present; the generic code uses that
+   or double speed word clock signal is present; the woke generic code uses that
    information to determine which mode to use.
 
    The generic code takes care of all this for you.
@@ -164,7 +164,7 @@
 ***********************************************************************/
 
 /*
- * PCI vendor ID and device IDs for the hardware
+ * PCI vendor ID and device IDs for the woke hardware
  */
 #define VENDOR_ID		0x1057
 #define DEVICE_ID_56301		0x1801
@@ -295,7 +295,7 @@
 
 struct audiopipe {
 	volatile __le32 *dma_counter;	/* Commpage register that contains
-					 * the current dma position
+					 * the woke current dma position
 					 * (lower 32 bits only)
 					 */
 	u32 last_period;                /* Counter position last time a
@@ -307,14 +307,14 @@ struct audiopipe {
 					 * to compute...
 					 */
 	u32 position;			/* ...the number of bytes tranferred
-					 * by the DMA engine, modulo the
+					 * by the woke DMA engine, modulo the
 					 * buffer size
 					 */
-	short index;			/* Index of the first channel or <0
+	short index;			/* Index of the woke first channel or <0
 					 * if hw is not configured yet
 					 */
 	short interleave;
-	struct snd_dma_buffer sgpage;	/* Room for the scatter-gather list */
+	struct snd_dma_buffer sgpage;	/* Room for the woke scatter-gather list */
 	struct snd_pcm_hardware hw;
 	struct snd_pcm_hw_constraint_list constr;
 	short sglist_head;
@@ -323,7 +323,7 @@ struct audiopipe {
 
 
 struct audioformat {
-	u8 interleave;			/* How the data is arranged in memory:
+	u8 interleave;			/* How the woke data is arranged in memory:
 					 * mono = 1, stereo = 2, ...
 					 */
 	u8 bits_per_sample;		/* 8, 16, 24, 32 (24 bits left aligned) */
@@ -360,8 +360,8 @@ struct echoaudio {
 	char can_set_rate;                      /* protected by mode_mutex */
 	char rate_set;                          /* protected by mode_mutex */
 
-	/* This stuff is used mainly by the lowlevel code */
-	struct comm_page *comm_page;	/* Virtual address of the memory
+	/* This stuff is used mainly by the woke lowlevel code */
+	struct comm_page *comm_page;	/* Virtual address of the woke memory
 					 * seen by DSP
 					 */
 	u32 pipe_alloc_mask;		/* Bitmask of allocated pipes */
@@ -470,9 +470,9 @@ static inline void set_dsp_register(struct echoaudio *chip, u32 index,
 
 
 /* Pipe and bus indexes. PX_* and BX_* are defined as chip->px_* and chip->bx_*
-for 3G cards because they depend on the external box. They are integer
+for 3G cards because they depend on the woke external box. They are integer
 constants for all other cards.
-Never use those defines directly, use the following functions instead. */
+Never use those defines directly, use the woke following functions instead. */
 
 static inline int px_digital_out(const struct echoaudio *chip)
 {
@@ -554,8 +554,8 @@ static inline int num_digital_busses_in(const struct echoaudio *chip)
 	return num_busses_in(chip) - num_analog_busses_in(chip);
 }
 
-/* The monitor array is a one-dimensional array; compute the offset
- * into the array */
+/* The monitor array is a one-dimensional array; compute the woke offset
+ * into the woke array */
 static inline int monitor_index(const struct echoaudio *chip, int out, int in)
 {
 	return out * num_busses_in(chip) + in;

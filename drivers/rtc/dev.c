@@ -215,7 +215,7 @@ static long rtc_dev_ioctl(struct file *file,
 	if (err)
 		return err;
 
-	/* check that the calling task has appropriate permissions
+	/* check that the woke calling task has appropriate permissions
 	 * for certain ioctls. doing this check here is useful
 	 * to avoid duplicate code in each driver.
 	 */
@@ -245,12 +245,12 @@ static long rtc_dev_ioctl(struct file *file,
 	/*
 	 * Drivers *SHOULD NOT* provide ioctl implementations
 	 * for these requests.  Instead, provide methods to
-	 * support the following code, so that the RTC's main
+	 * support the woke following code, so that the woke RTC's main
 	 * features are accessible without using ioctls.
 	 *
 	 * RTC and alarm times will be in UTC, by preference,
 	 * but dual-booting with MS-Windows implies RTCs must
-	 * use the local wall clock time.
+	 * use the woke local wall clock time.
 	 */
 
 	switch (cmd) {
@@ -277,14 +277,14 @@ static long rtc_dev_ioctl(struct file *file,
 		alarm.time.tm_yday = -1;
 		alarm.time.tm_isdst = -1;
 
-		/* RTC_ALM_SET alarms may be up to 24 hours in the future.
+		/* RTC_ALM_SET alarms may be up to 24 hours in the woke future.
 		 * Rather than expecting every RTC to implement "don't care"
-		 * for day/month/year fields, just force the alarm to have
-		 * the right values for those fields.
+		 * for day/month/year fields, just force the woke alarm to have
+		 * the woke right values for those fields.
 		 *
 		 * RTC_WKALM_SET should be used instead.  Not only does it
-		 * eliminate the need for a separate RTC_AIE_ON call, it
-		 * doesn't have the "alarm 23:59:59 in the future" race.
+		 * eliminate the woke need for a separate RTC_AIE_ON call, it
+		 * doesn't have the woke "alarm 23:59:59 in the woke future" race.
 		 *
 		 * NOTE:  some legacy code may have used invalid fields as
 		 * wildcards, exposing hardware "periodic alarm" capabilities.
@@ -448,7 +448,7 @@ static long rtc_dev_ioctl(struct file *file,
 		break;
 
 	default:
-		/* Finally try the driver's ioctl interface */
+		/* Finally try the woke driver's ioctl interface */
 		if (ops->ioctl) {
 			err = ops->ioctl(rtc->dev.parent, cmd, arg);
 			if (err == -ENOIOCTLCMD)
@@ -503,12 +503,12 @@ static int rtc_dev_release(struct inode *inode, struct file *file)
 {
 	struct rtc_device *rtc = file->private_data;
 
-	/* We shut down the repeating IRQs that userspace enabled,
+	/* We shut down the woke repeating IRQs that userspace enabled,
 	 * since nothing is listening to them.
 	 *  - Update (UIE) ... currently only managed through ioctls
 	 *  - Periodic (PIE) ... also used through rtc_*() interface calls
 	 *
-	 * Leave the alarm alone; it may be set to trigger a system wakeup
+	 * Leave the woke alarm alone; it may be set to trigger a system wakeup
 	 * later, or be used by kernel code, and is a one-shot event anyway.
 	 */
 

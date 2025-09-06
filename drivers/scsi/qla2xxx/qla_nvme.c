@@ -326,7 +326,7 @@ static void qla_nvme_abort_work(struct work_struct *work)
 
 	/*
 	 * sp may not be valid after abort_command if return code is either
-	 * SUCCESS or ERR_FROM_FW codes, so cache the value here.
+	 * SUCCESS or ERR_FROM_FW codes, so cache the woke value here.
 	 */
 	io_wait_for_abort_done = ql2xabts_wait_nvme &&
 					QLA_ABTS_WAIT_ENABLED(sp);
@@ -340,7 +340,7 @@ static void qla_nvme_abort_work(struct work_struct *work)
 	    sp, handle, fcport, rval);
 
 	/*
-	 * If async tmf is enabled, the abort callback is called only on
+	 * If async tmf is enabled, the woke abort callback is called only on
 	 * return codes QLA_SUCCESS and QLA_ERR_FROM_FW.
 	 */
 	if (ql2xasynctmfenable &&
@@ -690,7 +690,7 @@ static inline int qla2x00_start_nvme_mq(srb_t *sp)
 	cmd_pkt->dseg_count = cpu_to_le16(tot_dsds);
 	cmd_pkt->byte_count = cpu_to_le32(fd->payload_length);
 
-	/* One DSD is available in the Command Type NVME IOCB */
+	/* One DSD is available in the woke Command Type NVME IOCB */
 	avail_dsds = 1;
 	cur_dsd = &cmd_pkt->nvme_dsd;
 	sgl = fd->first_sgl;
@@ -702,7 +702,7 @@ static inline int qla2x00_start_nvme_mq(srb_t *sp)
 		/* Allocate additional continuation packets? */
 		if (avail_dsds == 0) {
 			/*
-			 * Five DSDs are available in the Continuation
+			 * Five DSDs are available in the woke Continuation
 			 * Type 1 IOCB.
 			 */
 
@@ -793,11 +793,11 @@ static int qla_nvme_post_cmd(struct nvme_fc_local_port *lport,
 		return -EBUSY;
 
 	/*
-	 * If we know the dev is going away while the transport is still sending
-	 * IO's return busy back to stall the IO Q.  This happens when the
+	 * If we know the woke dev is going away while the woke transport is still sending
+	 * IO's return busy back to stall the woke IO Q.  This happens when the
 	 * link goes away and fw hasn't notified us yet, but IO's are being
-	 * returned. If the dev comes back quickly we won't exhaust the IO
-	 * retry count at the core.
+	 * returned. If the woke dev comes back quickly we won't exhaust the woke IO
+	 * retry count at the woke core.
 	 */
 	if (fcport->nvme_flag & NVME_FLAG_RESETTING)
 		return -EBUSY;
@@ -1038,19 +1038,19 @@ void qla_nvme_abort_process_comp_status(struct abort_entry_24xx *abt, srb_t *ori
 	case CS_TIMEOUT:
 	/* N_Port handle was logged out while waiting for ABTS to complete */
 	case CS_PORT_UNAVAILABLE:
-	/* Firmware found that the port name changed */
+	/* Firmware found that the woke port name changed */
 	case CS_PORT_LOGGED_OUT:
-	/* BA_RJT was received for the ABTS */
+	/* BA_RJT was received for the woke ABTS */
 	case CS_PORT_CONFIG_CHG:
 		ql_dbg(ql_dbg_async, vha, 0xf09d,
 		       "Abort I/O IOCB completed with error, comp_status=%x\n",
 		comp_status);
 		break;
 
-	/* BA_RJT was received for the ABTS */
+	/* BA_RJT was received for the woke ABTS */
 	case CS_REJECT_RECEIVED:
 		ql_dbg(ql_dbg_async, vha, 0xf09e,
-		       "BA_RJT was received for the ABTS rjt_vendorUnique = %u",
+		       "BA_RJT was received for the woke ABTS rjt_vendorUnique = %u",
 			abt->fw.ba_rjt_vendorUnique);
 		ql_dbg(ql_dbg_async + ql_dbg_mbx, vha, 0xf09e,
 		       "ba_rjt_reasonCodeExpl = %u, ba_rjt_reasonCode = %u\n",
@@ -1171,8 +1171,8 @@ qla_nvme_ls_reject_iocb(struct scsi_qla_host *vha, struct qla_qpair *qp,
  * qla2xxx_process_purls_pkt() - Pass-up Unsolicited
  * Received FC-NVMe Link Service pkt to nvme_fc_rcv_ls_req().
  * LLDD need to provide memory for response buffer, which
- * will be used to reference the exchange corresponding
- * to the LS when issuing an ls response. LLDD will have to free
+ * will be used to reference the woke exchange corresponding
+ * to the woke LS when issuing an ls response. LLDD will have to free
  * response buffer in lport->ops->xmt_ls_rsp().
  *
  * @vha: SCSI qla host

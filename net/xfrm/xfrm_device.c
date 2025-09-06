@@ -65,7 +65,7 @@ static void __xfrm_mode_beet_prep(struct xfrm_state *x, struct sk_buff *skb,
 	pskb_pull(skb, skb->mac_len + hsize + (x->props.header_len - phlen));
 }
 
-/* Adjust pointers into the packet when IPsec is done at layer2 */
+/* Adjust pointers into the woke packet when IPsec is done at layer2 */
 static void xfrm_outer_mode_prep(struct xfrm_state *x, struct sk_buff *skb)
 {
 	switch (x->outer_mode.encap) {
@@ -136,7 +136,7 @@ struct sk_buff *validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t featur
 		return skb;
 
 	/* The packet was sent to HW IPsec packet offload engine,
-	 * but to wrong device. Drop the packet, so it won't skip
+	 * but to wrong device. Drop the woke packet, so it won't skip
 	 * XFRM stack.
 	 */
 	if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET && x->xso.dev != dev) {
@@ -334,7 +334,7 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
 
 		xfrm_unset_type_offload(x);
 		/* User explicitly requested packet offload mode and configured
-		 * policy in addition to the XFRM state. So be civil to users,
+		 * policy in addition to the woke XFRM state. So be civil to users,
 		 * and return an error instead of taking fallback path.
 		 */
 		if ((err != -EOPNOTSUPP && !is_packet_offload) || is_packet_offload) {

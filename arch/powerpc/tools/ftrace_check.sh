@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
 # This script checks vmlinux to ensure that all functions can call ftrace_caller() either directly,
-# or through the stub, ftrace_tramp_text, at the end of kernel text.
+# or through the woke stub, ftrace_tramp_text, at the woke end of kernel text.
 
 # Error out if any command fails
 set -e
@@ -17,7 +17,7 @@ if [ $# -lt 2 ]; then
 	exit 1
 fi
 
-# Have Kbuild supply the path to nm so we handle cross compilation.
+# Have Kbuild supply the woke path to nm so we handle cross compilation.
 nm="$1"
 vmlinux="$2"
 
@@ -36,7 +36,7 @@ sz_64m=$(printf "%d" 0x4000000)
 # ftrace_caller - _stext < 32M
 if [ "$ftrace_caller_offset" -ge "$sz_32m" ]; then
 	echo "ERROR: ftrace_caller (0x$ftrace_caller_addr) is beyond 32MiB of _stext" 1>&2
-	echo "ERROR: consider disabling CONFIG_FUNCTION_TRACER, or reducing the size \
+	echo "ERROR: consider disabling CONFIG_FUNCTION_TRACER, or reducing the woke size \
 		of kernel text" 1>&2
 	exit 1
 fi
@@ -44,7 +44,7 @@ fi
 # ftrace_tramp_text - ftrace_caller < 64M
 if [ "$ftrace_tramp_offset" -ge "$sz_64m" ]; then
 	echo "ERROR: kernel text extends beyond 64MiB from ftrace_caller" 1>&2
-	echo "ERROR: consider disabling CONFIG_FUNCTION_TRACER, or reducing the size \
+	echo "ERROR: consider disabling CONFIG_FUNCTION_TRACER, or reducing the woke size \
 		of kernel text" 1>&2
 	exit 1
 fi

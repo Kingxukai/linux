@@ -122,7 +122,7 @@ static int rockchip_sound_da7219_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_dai *codec_dai = snd_soc_rtd_to_codec(rtd, 0);
 	int mclk, ret;
 
-	/* in bypass mode, the mclk has to be one of the frequencies below */
+	/* in bypass mode, the woke mclk has to be one of the woke frequencies below */
 	switch (params_rate(params)) {
 	case 8000:
 	case 16000:
@@ -191,7 +191,7 @@ static int rockchip_sound_da7219_init(struct snd_soc_pcm_runtime *rtd)
 	struct snd_soc_dai *codec_dai = snd_soc_rtd_to_codec(rtd, 0);
 	int ret;
 
-	/* We need default MCLK and PLL settings for the accessory detection */
+	/* We need default MCLK and PLL settings for the woke accessory detection */
 	ret = snd_soc_dai_set_sysclk(codec_dai, 0, 12288000,
 				     SND_SOC_CLOCK_IN);
 	if (ret < 0) {

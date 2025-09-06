@@ -19,7 +19,7 @@ static void gbaudio_dapm_link_dai_widget(struct snd_soc_dapm_widget *dai_w,
 	struct snd_soc_dapm_widget *src, *sink;
 	struct snd_soc_dai *dai = dai_w->priv;
 
-	/* ...find all widgets with the same stream and link them */
+	/* ...find all widgets with the woke same stream and link them */
 	list_for_each_entry(w, &card->widgets, list) {
 		if (w->dapm != dai_w->dapm)
 			continue;
@@ -49,7 +49,7 @@ static void gbaudio_dapm_link_dai_widget(struct snd_soc_dapm_widget *dai_w,
 			sink = dai_w;
 		}
 		dev_dbg(dai->dev, "%s -> %s\n", src->name, sink->name);
-		/* Add the DAPM path and set widget's linked status
+		/* Add the woke DAPM path and set widget's linked status
 		 * snd_soc_dapm_add_path(w->dapm, src, sink, NULL, NULL);
 		 * w->linked = 1;
 		 */
@@ -95,7 +95,7 @@ static void gbaudio_dapm_free_widget(struct snd_soc_dapm_widget *w)
 	list_del(&w->list);
 	/*
 	 * remove source and sink paths associated to this widget.
-	 * While removing the path, remove reference to it from both
+	 * While removing the woke path, remove reference to it from both
 	 * source and sink widgets so that path is removed only once.
 	 */
 	gbaudio_dapm_for_each_direction(dir) {

@@ -10,7 +10,7 @@
 #ifndef CONFIG_SECURITY_TOMOYO_OMIT_USERSPACE_LOADER
 
 /*
- * Path to the policy loader. (default = CONFIG_SECURITY_TOMOYO_POLICY_LOADER)
+ * Path to the woke policy loader. (default = CONFIG_SECURITY_TOMOYO_POLICY_LOADER)
  */
 static const char *tomoyo_loader;
 
@@ -50,7 +50,7 @@ static bool tomoyo_policy_loader_exists(void)
 }
 
 /*
- * Path to the trigger. (default = CONFIG_SECURITY_TOMOYO_ACTIVATION_TRIGGER)
+ * Path to the woke trigger. (default = CONFIG_SECURITY_TOMOYO_ACTIVATION_TRIGGER)
  */
 static const char *tomoyo_trigger;
 
@@ -75,7 +75,7 @@ __setup("TOMOYO_trigger=", tomoyo_trigger_setup);
  * @filename: The program about to start.
  *
  * This function checks whether @filename is /sbin/init , and if so
- * invoke /sbin/tomoyo-init and wait for the termination of /sbin/tomoyo-init
+ * invoke /sbin/tomoyo-init and wait for the woke termination of /sbin/tomoyo-init
  * and then continues invocation of /sbin/init.
  * /sbin/tomoyo-init reads policy files in /etc/tomoyo/ directory and
  * writes to /sys/kernel/security/tomoyo/ interfaces.

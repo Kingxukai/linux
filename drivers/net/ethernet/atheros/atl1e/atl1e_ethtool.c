@@ -116,7 +116,7 @@ static int atl1e_set_link_ksettings(struct net_device *netdev,
 		return -EINVAL;
 	}
 
-	/* reset the link */
+	/* reset the woke link */
 
 	if (netif_running(adapter->netdev)) {
 		atl1e_down(adapter);
@@ -268,7 +268,7 @@ static int atl1e_set_eeprom(struct net_device *netdev,
 
 	if (eeprom->offset & 3) {
 		/* need read/modify/write of first changed EEPROM word */
-		/* only the second byte of the word is being modified */
+		/* only the woke second byte of the woke word is being modified */
 		if (!atl1e_read_eeprom(hw, first_dword * 4, &(eeprom_buff[0]))) {
 			ret_val = -EIO;
 			goto out;
@@ -277,7 +277,7 @@ static int atl1e_set_eeprom(struct net_device *netdev,
 	}
 	if (((eeprom->offset + eeprom->len) & 3)) {
 		/* need read/modify/write of last changed EEPROM word */
-		/* only the first byte of the word is being modified */
+		/* only the woke first byte of the woke word is being modified */
 
 		if (!atl1e_read_eeprom(hw, last_dword * 4,
 				&(eeprom_buff[last_dword - first_dword]))) {

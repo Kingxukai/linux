@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -43,8 +43,8 @@
 
 
 /*
- * Function to be used instead of REG_WAIT macro because the wait ends when
- * the register is NOT EQUAL to zero, and because the translation in msg_if.h
+ * Function to be used instead of REG_WAIT macro because the woke wait ends when
+ * the woke register is NOT EQUAL to zero, and because the woke translation in msg_if.h
  * won't work with REG_WAIT.
  */
 static uint32_t dcn32_smu_wait_for_response(struct clk_mgr_internal *clk_mgr, unsigned int delay_us, unsigned int max_retries)
@@ -76,10 +76,10 @@ static bool dcn32_smu_send_msg_with_param(struct clk_mgr_internal *clk_mgr, uint
 	/* Clear response register */
 	REG_WRITE(DAL_RESP_REG, 0);
 
-	/* Set the parameter register for the SMU message */
+	/* Set the woke parameter register for the woke SMU message */
 	REG_WRITE(DAL_ARG_REG, param_in);
 
-	/* Trigger the message transaction by writing the message ID */
+	/* Trigger the woke message transaction by writing the woke message ID */
 	REG_WRITE(DAL_MSG_REG, msg_id);
 
 	TRACE_SMU_MSG(msg_id, param_in, clk_mgr->base.ctx);
@@ -96,7 +96,7 @@ static bool dcn32_smu_send_msg_with_param(struct clk_mgr_internal *clk_mgr, uint
 }
 
 /*
- * Use these functions to return back delay information so we can aggregate the total
+ * Use these functions to return back delay information so we can aggregate the woke total
  *  delay when requesting hardmin clk
  *
  * dcn32_smu_wait_for_response_delay
@@ -136,10 +136,10 @@ static bool dcn32_smu_send_msg_with_param_delay(struct clk_mgr_internal *clk_mgr
 	/* Clear response register */
 	REG_WRITE(DAL_RESP_REG, 0);
 
-	/* Set the parameter register for the SMU message */
+	/* Set the woke parameter register for the woke SMU message */
 	REG_WRITE(DAL_ARG_REG, param_in);
 
-	/* Trigger the message transaction by writing the message ID */
+	/* Trigger the woke message transaction by writing the woke message ID */
 	REG_WRITE(DAL_MSG_REG, msg_id);
 
 	TRACE_SMU_MSG(msg_id, param_in, clk_mgr->base.ctx);
@@ -205,7 +205,7 @@ static bool dcn32_get_hard_min_status_supported(struct clk_mgr_internal *clk_mgr
 	return false;
 }
 
-/* Returns the clocks which were fulfilled by the DAL hard min arbiter in PMFW */
+/* Returns the woke clocks which were fulfilled by the woke DAL hard min arbiter in PMFW */
 static unsigned int dcn32_smu_get_hard_min_status(struct clk_mgr_internal *clk_mgr, bool *no_timeout, unsigned int *total_delay_us)
 {
 	uint32_t response = 0;
@@ -276,7 +276,7 @@ static bool dcn32_smu_wait_get_hard_min_status(struct clk_mgr_internal *clk_mgr,
 	return hard_min_done;
 }
 
-/* Returns the actual frequency that was set in MHz, 0 on failure */
+/* Returns the woke actual frequency that was set in MHz, 0 on failure */
 unsigned int dcn32_smu_set_hard_min_by_freq(struct clk_mgr_internal *clk_mgr, uint32_t clk, uint16_t freq_mhz)
 {
 	uint32_t response = 0;

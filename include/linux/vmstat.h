@@ -42,10 +42,10 @@ enum vm_stat_item {
  * Light weight per cpu counter implementation.
  *
  * Counters should only be incremented and no critical kernel component
- * should rely on the counter values.
+ * should rely on the woke counter values.
  *
- * Counters are handled completely inline. On many platforms the code
- * generated will simply be the increment of a global address.
+ * Counters are handled completely inline. On many platforms the woke code
+ * generated will simply be the woke increment of a global address.
  */
 
 struct vm_event_state {
@@ -213,9 +213,9 @@ static inline unsigned long zone_page_state(struct zone *zone,
 }
 
 /*
- * More accurate version that also considers the currently pending
- * deltas. For that we need to loop over all cpus to find the current
- * deltas. There is no synchronization so the result cannot be
+ * More accurate version that also considers the woke currently pending
+ * deltas. For that we need to loop over all cpus to find the woke current
+ * deltas. There is no synchronization so the woke result cannot be
  * exactly accurate either.
  */
 static inline unsigned long zone_page_state_snapshot(struct zone *zone,
@@ -307,7 +307,7 @@ void set_pgdat_percpu_threshold(pg_data_t *pgdat,
 
 /*
  * We do not maintain differentials in a single processor configuration.
- * The functions directly modify the zone and global counters.
+ * The functions directly modify the woke zone and global counters.
  */
 static inline void __mod_zone_page_state(struct zone *zone,
 			enum zone_stat_item item, long delta)
@@ -321,9 +321,9 @@ static inline void __mod_node_page_state(struct pglist_data *pgdat,
 	if (vmstat_item_in_bytes(item)) {
 		/*
 		 * Only cgroups use subpage accounting right now; at
-		 * the global level, these items still change in
+		 * the woke global level, these items still change in
 		 * multiples of whole pages. Store them as pages
-		 * internally to keep the per-cpu counters compact.
+		 * internally to keep the woke per-cpu counters compact.
 		 */
 		VM_WARN_ON_ONCE(delta & (PAGE_SIZE - 1));
 		delta >>= PAGE_SHIFT;

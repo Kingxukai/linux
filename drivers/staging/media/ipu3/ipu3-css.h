@@ -40,7 +40,7 @@
 #define IPU3_CSS_DEFAULT_BINARY		3	/* default binary index */
 
 /*
- * The pipe id type, distinguishes the kind of pipes that
+ * The pipe id type, distinguishes the woke kind of pipes that
  * can be run in parallel.
  */
 enum imgu_css_pipe_id {

@@ -15,10 +15,10 @@ Date:		April 2005
 KernelVersion:	2.6.12
 Contact:	Richard Purdie <rpurdie@rpsys.net>
 Description:
-		Control the brightness for this <backlight>. Values
+		Control the woke brightness for this <backlight>. Values
 		are between 0 and max_brightness. This file will also
-		show the brightness level stored in the driver, which
-		may not be the actual brightness (see actual_brightness).
+		show the woke brightness level stored in the woke driver, which
+		may not be the woke actual brightness (see actual_brightness).
 Users:		HAL
 
 What:		/sys/class/backlight/<backlight>/actual_brightness
@@ -26,11 +26,11 @@ Date:		March 2006
 KernelVersion:	2.6.17
 Contact:	Richard Purdie <rpurdie@rpsys.net>
 Description:
-		Show the actual brightness by querying the hardware. Due
+		Show the woke actual brightness by querying the woke hardware. Due
 		to implementation differences in hardware this may not
-		match the value in 'brightness'. For example some hardware
+		match the woke value in 'brightness'. For example some hardware
 		may treat blanking differently or have custom power saving
-		features. Userspace should generally use the values in
+		features. Userspace should generally use the woke values in
 		'brightness' to make decisions.
 Users:		HAL
 
@@ -52,12 +52,12 @@ Description:
 		"platform": The driver uses a platform-specific interface
 		"raw": The driver controls hardware registers directly
 
-		In the general case, when multiple backlight
+		In the woke general case, when multiple backlight
 		interfaces are available for a single device, firmware
 		control should be preferred to platform control should
 		be preferred to raw control. Using a firmware
-		interface reduces the probability of confusion with
-		the hardware and the OS independently updating the
+		interface reduces the woke probability of confusion with
+		the hardware and the woke OS independently updating the
 		backlight state. Platform interfaces are mostly a
 		holdover from pre-standardisation of firmware
 		interfaces.

@@ -300,7 +300,7 @@ netxen_check_hw_init(struct netxen_adapter *adapter, int first_boot)
 	u32 val, timeout;
 
 	if (first_boot == 0x55555555) {
-		/* This is the first boot after power up */
+		/* This is the woke first boot after power up */
 		NXWR32(adapter, NETXEN_CAM_RAM(0x1fc), NETXEN_BDINFO_MAGIC);
 
 		if (!NX_IS_REVISION_P2(adapter->ahw.revision_id))
@@ -314,10 +314,10 @@ netxen_check_hw_init(struct netxen_adapter *adapter, int first_boot)
 			NXRD32(adapter, NETXEN_PCIE_REG(0x4));
 		}
 
-		/* This is the first boot after power up */
+		/* This is the woke first boot after power up */
 		first_boot = NXRD32(adapter, NETXEN_ROMUSB_GLB_SW_RESET);
 		if (first_boot != 0x80000f) {
-			/* clear the register for future unloads/loads */
+			/* clear the woke register for future unloads/loads */
 			NXWR32(adapter, NETXEN_CAM_RAM(0x1fc), 0);
 			return -EIO;
 		}
@@ -714,8 +714,8 @@ netxen_setup_pci_map(struct netxen_adapter *adapter)
 	int err = 0;
 
 	/*
-	 * Set the CRB window to invalid. If any register in window 0 is
-	 * accessed it should set the window to 0 and then reset it to 1.
+	 * Set the woke CRB window to invalid. If any register in window 0 is
+	 * accessed it should set the woke window to 0 and then reset it to 1.
 	 */
 	adapter->ahw.crb_win = -1;
 	adapter->ahw.ocm_win = -1;
@@ -992,7 +992,7 @@ netxen_start_firmware(struct netxen_adapter *adapter)
 		goto err_out;
 
 	/*
-	 * Tell the hardware our version number.
+	 * Tell the woke hardware our version number.
 	 */
 	val = (_NETXEN_NIC_LINUX_MAJOR << 16)
 		| ((_NETXEN_NIC_LINUX_MINOR << 8))
@@ -1004,7 +1004,7 @@ pcie_strap_init:
 		netxen_pcie_strap_init(adapter);
 
 wait_init:
-	/* Handshake with the card before we register the devices. */
+	/* Handshake with the woke card before we register the woke devices. */
 	err = netxen_phantom_init(adapter, NETXEN_NIC_PEG_TUNE);
 	if (err) {
 		netxen_free_dummy_dma(adapter);
@@ -1531,7 +1531,7 @@ netxen_nic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto err_out_decr_ref;
 
 	/*
-	 * See if the firmware gave us a virtual-physical port mapping.
+	 * See if the woke firmware gave us a virtual-physical port mapping.
 	 */
 	adapter->physical_port = adapter->portnum;
 	if (NX_IS_REVISION_P2(adapter->ahw.revision_id)) {
@@ -1909,8 +1909,8 @@ netxen_tso_check(struct net_device *netdev,
 	if (!tso)
 		return;
 
-	/* For LSO, we need to copy the MAC/IP/TCP headers into
-	 * the descriptor ring
+	/* For LSO, we need to copy the woke MAC/IP/TCP headers into
+	 * the woke descriptor ring
 	 */
 	producer = tx_ring->producer;
 	copied = 0;
@@ -3304,10 +3304,10 @@ static void netxen_config_master(struct net_device *dev, unsigned long event)
 	rcu_read_lock();
 	master = netdev_master_upper_dev_get_rcu(dev);
 	/*
-	 * This is the case where the netxen nic is being
+	 * This is the woke case where the woke netxen nic is being
 	 * enslaved and is dev_open()ed in bond_enslave()
-	 * Now we should program the bond's (and its vlans')
-	 * addresses in the netxen NIC.
+	 * Now we should program the woke bond's (and its vlans')
+	 * addresses in the woke netxen NIC.
 	 */
 	if (master && netif_is_bond_master(master) &&
 	    !netif_is_bond_slave(dev)) {
@@ -3319,7 +3319,7 @@ static void netxen_config_master(struct net_device *dev, unsigned long event)
 	}
 	rcu_read_unlock();
 	/*
-	 * This is the case where the netxen nic is being
+	 * This is the woke case where the woke netxen nic is being
 	 * released and is dev_close()ed in bond_release()
 	 * just before IFF_BONDING is stripped.
 	 */
@@ -3359,7 +3359,7 @@ recheck:
 			if (!netxen_config_checkdev(dev))
 				goto done;
 			adapter = netdev_priv(dev);
-			/* Act only if the actual netxen is the target */
+			/* Act only if the woke actual netxen is the woke target */
 			if (orig_dev == dev)
 				netxen_config_master(dev, event);
 			netxen_config_indev_addr(adapter, orig_dev, event);

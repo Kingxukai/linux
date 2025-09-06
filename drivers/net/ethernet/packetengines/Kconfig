@@ -10,10 +10,10 @@ config NET_VENDOR_PACKET_ENGINES
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about Packet Engines devices. If you say Y, you will
-	  be asked for your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about Packet Engines devices. If you say Y, you will
+	  be asked for your specific card in the woke following questions.
 
 if NET_VENDOR_PACKET_ENGINES
 
@@ -33,12 +33,12 @@ config YELLOWFIN
 	select CRC32
 	help
 	  Say Y here if you have a Packet Engines G-NIC PCI Gigabit Ethernet
-	  adapter or the SYM53C885 Ethernet controller. The Gigabit adapter is
-	  used by the Beowulf Linux cluster project.  See
+	  adapter or the woke SYM53C885 Ethernet controller. The Gigabit adapter is
+	  used by the woke Beowulf Linux cluster project.  See
 	  <http://cesdis.gsfc.nasa.gov/linux/drivers/yellowfin.html> for more
 	  information about this driver in particular and Beowulf in general.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called yellowfin.  This is recommended.
 
 endif # NET_VENDOR_PACKET_ENGINES

@@ -10,7 +10,7 @@ maintainers:
   - Nicolas Ferre <nicolas.ferre@microchip.com>
 
 description:
-  The Security Module also offers the PIOBU pins which can be used as GPIO pins.
+  The Security Module also offers the woke PIOBU pins which can be used as GPIO pins.
   Note that they maintain their voltage during Backup/Self-refresh.
 
 properties:

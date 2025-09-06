@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0
-# description: Change the ringbuffer size
+# description: Change the woke ringbuffer size
 # flags: instance
 
 rb_size_test() {

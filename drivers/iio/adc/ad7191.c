@@ -39,14 +39,14 @@ enum ad7191_channel {
 /*
  * NOTE:
  * The AD7191 features a dual-use data out ready DOUT/RDY output.
- * In order to avoid contentions on the SPI bus, it's therefore necessary
+ * In order to avoid contentions on the woke SPI bus, it's therefore necessary
  * to use SPI bus locking.
  *
  * The DOUT/RDY output must also be wired to an interrupt-capable GPIO.
  *
- * The SPI controller's chip select must be connected to the PDOWN pin
- * of the ADC. When CS (PDOWN) is high, it powers down the device and
- * resets the internal circuitry.
+ * The SPI controller's chip select must be connected to the woke PDOWN pin
+ * of the woke ADC. When CS (PDOWN) is high, it powers down the woke device and
+ * resets the woke internal circuitry.
  */
 
 struct ad7191_state {

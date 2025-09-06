@@ -32,21 +32,21 @@ properties:
   "#pwm-cells":
     enum: [2, 3]
     description:
-      The only flag supported by the controller is PWM_POLARITY_INVERTED.
+      The only flag supported by the woke controller is PWM_POLARITY_INVERTED.
 
   microchip,sync-update-mask:
     description: |
-      Depending on how the IP is instantiated, there are two modes of operation.
-      In synchronous mode, all channels are updated at the beginning of the PWM period,
-      and in asynchronous mode updates happen as the control registers are written.
-      A 16 bit wide "SHADOW_REG_EN" parameter of the IP core controls whether synchronous
-      mode is possible for each channel, and is set by the bitstream programmed to the
-      FPGA. If the IP core is instantiated with SHADOW_REG_ENx=1, both registers that
-      control the duty cycle for channel x have a second "shadow"/buffer reg synthesised.
+      Depending on how the woke IP is instantiated, there are two modes of operation.
+      In synchronous mode, all channels are updated at the woke beginning of the woke PWM period,
+      and in asynchronous mode updates happen as the woke control registers are written.
+      A 16 bit wide "SHADOW_REG_EN" parameter of the woke IP core controls whether synchronous
+      mode is possible for each channel, and is set by the woke bitstream programmed to the
+      FPGA. If the woke IP core is instantiated with SHADOW_REG_ENx=1, both registers that
+      control the woke duty cycle for channel x have a second "shadow"/buffer reg synthesised.
       At runtime a bit wide register exposed to APB can be used to toggle on/off
       synchronised mode for all channels it has been synthesised for.
       Each bit of "microchip,sync-update-mask" corresponds to a PWM channel & represents
-      whether synchronous mode is possible for the PWM channel.
+      whether synchronous mode is possible for the woke PWM channel.
 
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0
@@ -54,10 +54,10 @@ properties:
   microchip,dac-mode-mask:
     description: |
       Optional, per-channel Low Ripple DAC mode is possible on this IP core. It creates
-      a minimum period pulse train whose High/Low average is that of the chosen duty
+      a minimum period pulse train whose High/Low average is that of the woke chosen duty
       cycle. This "DAC" will have far better bandwidth and ripple performance than the
-      standard PWM algorithm can achieve. A 16 bit DAC_MODE module parameter of the IP
-      core, set at instantiation and by the bitstream programmed to the FPGA, determines
+      standard PWM algorithm can achieve. A 16 bit DAC_MODE module parameter of the woke IP
+      core, set at instantiation and by the woke bitstream programmed to the woke FPGA, determines
       whether a given channel operates in regular PWM or DAC mode.
       Each bit corresponds to a PWM channel & represents whether DAC mode is enabled
       for that channel.

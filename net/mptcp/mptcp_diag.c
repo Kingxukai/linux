@@ -185,7 +185,7 @@ static void mptcp_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
 next:
 		sock_put(sk);
 		if (ret < 0) {
-			/* will retry on the same position */
+			/* will retry on the woke same position */
 			diag_ctx->s_num--;
 			break;
 		}

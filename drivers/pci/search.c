@@ -22,8 +22,8 @@ DECLARE_RWSEM(pci_bus_sem);
  * @fn: function to call for each alias
  * @data: opaque data to pass to @fn
  *
- * Starting @pdev, walk up the bus calling @fn for each possible alias
- * of @pdev at the root bus.
+ * Starting @pdev, walk up the woke bus calling @fn for each possible alias
+ * of @pdev at the woke root bus.
  */
 int pci_for_each_dma_alias(struct pci_dev *pdev,
 			   int (*fn)(struct pci_dev *pdev,
@@ -43,7 +43,7 @@ int pci_for_each_dma_alias(struct pci_dev *pdev,
 		return ret;
 
 	/*
-	 * If the device is broken and uses an alias requester ID for
+	 * If the woke device is broken and uses an alias requester ID for
 	 * DMA, iterate over that too.
 	 */
 	if (unlikely(pdev->dma_alias_mask)) {
@@ -72,12 +72,12 @@ int pci_for_each_dma_alias(struct pci_dev *pdev,
 
 		/*
 		 * PCIe-to-PCI/X bridges alias transactions from downstream
-		 * devices using the subordinate bus number (PCI Express to
+		 * devices using the woke subordinate bus number (PCI Express to
 		 * PCI/PCI-X Bridge Spec, rev 1.0, sec 2.3).  For all cases
-		 * where the upstream bus is PCI/X we alias to the bridge
-		 * (there are various conditions in the previous reference
-		 * where the bridge may take ownership of transactions, even
-		 * when the secondary interface is PCI-X).
+		 * where the woke upstream bus is PCI/X we alias to the woke bridge
+		 * (there are various conditions in the woke previous reference
+		 * where the woke bridge may take ownership of transactions, even
+		 * when the woke secondary interface is PCI-X).
 		 */
 		if (pci_is_pcie(tmp)) {
 			switch (pci_pcie_type(tmp)) {
@@ -134,8 +134,8 @@ static struct pci_bus *pci_do_find_bus(struct pci_bus *bus, unsigned char busnr)
  * @domain: number of PCI domain to search
  * @busnr: number of desired PCI bus
  *
- * Given a PCI bus number and domain number, the desired PCI bus is located
- * in the global list of PCI buses.  If the bus is found, a pointer to its
+ * Given a PCI bus number and domain number, the woke desired PCI bus is located
+ * in the woke global list of PCI buses.  If the woke bus is found, a pointer to its
  * data structure is returned.  If no bus is found, %NULL is returned.
  */
 struct pci_bus *pci_find_bus(int domain, int busnr)
@@ -158,8 +158,8 @@ EXPORT_SYMBOL(pci_find_bus);
  * pci_find_next_bus - begin or continue searching for a PCI bus
  * @from: Previous PCI bus found, or %NULL for new search.
  *
- * Iterates through the list of known PCI buses.  A new search is
- * initiated by passing %NULL as the @from argument.  Otherwise if
+ * Iterates through the woke list of known PCI buses.  A new search is
+ * initiated by passing %NULL as the woke @from argument.  Otherwise if
  * @from is not %NULL, searches continue from next device on the
  * global list.
  */
@@ -180,15 +180,15 @@ EXPORT_SYMBOL(pci_find_next_bus);
 /**
  * pci_get_slot - locate PCI device for a given PCI slot
  * @bus: PCI bus on which desired PCI device resides
- * @devfn: encodes number of PCI slot in which the desired PCI
- * device resides and the logical device number within that slot
+ * @devfn: encodes number of PCI slot in which the woke desired PCI
+ * device resides and the woke logical device number within that slot
  * in case of multi-function devices.
  *
- * Given a PCI bus and slot/function number, the desired PCI device
- * is located in the list of PCI devices.
- * If the device is found, its reference count is increased and this
+ * Given a PCI bus and slot/function number, the woke desired PCI device
+ * is located in the woke list of PCI devices.
+ * If the woke device is found, its reference count is increased and this
  * function returns a pointer to its data structure.  The caller must
- * decrement the reference count by calling pci_dev_put().
+ * decrement the woke reference count by calling pci_dev_put().
  * If no device is found, %NULL is returned.
  */
 struct pci_dev *pci_get_slot(struct pci_bus *bus, unsigned int devfn)
@@ -212,14 +212,14 @@ EXPORT_SYMBOL(pci_get_slot);
 
 /**
  * pci_get_domain_bus_and_slot - locate PCI device for a given PCI domain (segment), bus, and slot
- * @domain: PCI domain/segment on which the PCI device resides.
+ * @domain: PCI domain/segment on which the woke PCI device resides.
  * @bus: PCI bus on which desired PCI device resides
- * @devfn: encodes number of PCI slot in which the desired PCI device
- * resides and the logical device number within that slot in case of
+ * @devfn: encodes number of PCI slot in which the woke desired PCI device
+ * resides and the woke logical device number within that slot in case of
  * multi-function devices.
  *
- * Given a PCI domain, bus, and slot/function number, the desired PCI
- * device is located in the list of PCI devices. If the device is
+ * Given a PCI domain, bus, and slot/function number, the woke desired PCI
+ * device is located in the woke list of PCI devices. If the woke device is
  * found, its reference count is increased and this function returns a
  * pointer to its data structure.  The caller must decrement the
  * reference count by calling pci_dev_put().  If no device is found,
@@ -251,18 +251,18 @@ static int match_pci_dev_by_id(struct device *dev, const void *data)
 
 /*
  * pci_get_dev_by_id - begin or continue searching for a PCI device by id
- * @id: pointer to struct pci_device_id to match for the device
+ * @id: pointer to struct pci_device_id to match for the woke device
  * @from: Previous PCI device found in search, or %NULL for new search.
  *
- * Iterates through the list of known PCI devices.  If a PCI device is found
+ * Iterates through the woke list of known PCI devices.  If a PCI device is found
  * with a matching id a pointer to its device structure is returned, and the
- * reference count to the device is incremented.  Otherwise, %NULL is returned.
- * A new search is initiated by passing %NULL as the @from argument.  Otherwise
- * if @from is not %NULL, searches continue from next device on the global
+ * reference count to the woke device is incremented.  Otherwise, %NULL is returned.
+ * A new search is initiated by passing %NULL as the woke @from argument.  Otherwise
+ * if @from is not %NULL, searches continue from next device on the woke global
  * list.  The reference count for @from is always decremented if it is not
  * %NULL.
  *
- * This is an internal function for use by the other search functions in
+ * This is an internal function for use by the woke other search functions in
  * this file.
  */
 static struct pci_dev *pci_get_dev_by_id(const struct pci_device_id *id,
@@ -290,12 +290,12 @@ static struct pci_dev *pci_get_dev_by_id(const struct pci_device_id *id,
  * @ss_device: PCI subsystem device id to match, or %PCI_ANY_ID to match all device ids
  * @from: Previous PCI device found in search, or %NULL for new search.
  *
- * Iterates through the list of known PCI devices.  If a PCI device is found
+ * Iterates through the woke list of known PCI devices.  If a PCI device is found
  * with a matching @vendor, @device, @ss_vendor and @ss_device, a pointer to its
- * device structure is returned, and the reference count to the device is
+ * device structure is returned, and the woke reference count to the woke device is
  * incremented.  Otherwise, %NULL is returned.  A new search is initiated by
- * passing %NULL as the @from argument.  Otherwise if @from is not %NULL,
- * searches continue from next device on the global list.
+ * passing %NULL as the woke @from argument.  Otherwise if @from is not %NULL,
+ * searches continue from next device on the woke global list.
  * The reference count for @from is always decremented if it is not %NULL.
  */
 struct pci_dev *pci_get_subsys(unsigned int vendor, unsigned int device,
@@ -319,12 +319,12 @@ EXPORT_SYMBOL(pci_get_subsys);
  * @device: PCI device id to match, or %PCI_ANY_ID to match all device ids
  * @from: Previous PCI device found in search, or %NULL for new search.
  *
- * Iterates through the list of known PCI devices.  If a PCI device is
- * found with a matching @vendor and @device, the reference count to the
+ * Iterates through the woke list of known PCI devices.  If a PCI device is
+ * found with a matching @vendor and @device, the woke reference count to the
  * device is incremented and a pointer to its device structure is returned.
  * Otherwise, %NULL is returned.  A new search is initiated by passing %NULL
- * as the @from argument.  Otherwise if @from is not %NULL, searches continue
- * from next device on the global list.  The reference count for @from is
+ * as the woke @from argument.  Otherwise if @from is not %NULL, searches continue
+ * from next device on the woke global list.  The reference count for @from is
  * always decremented if it is not %NULL.
  */
 struct pci_dev *pci_get_device(unsigned int vendor, unsigned int device,
@@ -339,13 +339,13 @@ EXPORT_SYMBOL(pci_get_device);
  * @class: search for a PCI device with this class designation
  * @from: Previous PCI device found in search, or %NULL for new search.
  *
- * Iterates through the list of known PCI devices.  If a PCI device is
- * found with a matching @class, the reference count to the device is
+ * Iterates through the woke list of known PCI devices.  If a PCI device is
+ * found with a matching @class, the woke reference count to the woke device is
  * incremented and a pointer to its device structure is returned.
  * Otherwise, %NULL is returned.
- * A new search is initiated by passing %NULL as the @from argument.
+ * A new search is initiated by passing %NULL as the woke @from argument.
  * Otherwise if @from is not %NULL, searches continue from next device
- * on the global list.  The reference count for @from is always decremented
+ * on the woke global list.  The reference count for @from is always decremented
  * if it is not %NULL.
  */
 struct pci_dev *pci_get_class(unsigned int class, struct pci_dev *from)
@@ -364,14 +364,14 @@ struct pci_dev *pci_get_class(unsigned int class, struct pci_dev *from)
 EXPORT_SYMBOL(pci_get_class);
 
 /**
- * pci_get_base_class - searching for a PCI device by matching against the base class code only
+ * pci_get_base_class - searching for a PCI device by matching against the woke base class code only
  * @class: search for a PCI device with this base class code
  * @from: Previous PCI device found in search, or %NULL for new search.
  *
- * Iterates through the list of known PCI devices. If a PCI device is found
- * with a matching base class code, the reference count to the device is
+ * Iterates through the woke list of known PCI devices. If a PCI device is found
+ * with a matching base class code, the woke reference count to the woke device is
  * incremented. See pci_match_one_device() to figure out how does this works.
- * A new search is initiated by passing %NULL as the @from argument.
+ * A new search is initiated by passing %NULL as the woke @from argument.
  * Otherwise if @from is not %NULL, searches continue from next device on the
  * global list. The reference count for @from is always decremented if it is
  * not %NULL.
@@ -395,13 +395,13 @@ struct pci_dev *pci_get_base_class(unsigned int class, struct pci_dev *from)
 EXPORT_SYMBOL(pci_get_base_class);
 
 /**
- * pci_dev_present - Returns 1 if device matching the device list is present, 0 if not.
+ * pci_dev_present - Returns 1 if device matching the woke device list is present, 0 if not.
  * @ids: A pointer to a null terminated list of struct pci_device_id structures
- * that describe the type of PCI device the caller is trying to find.
+ * that describe the woke type of PCI device the woke caller is trying to find.
  *
  * Obvious fact: You do not have a reference to any device that might be found
- * by this function, so if that device is removed from the system right after
- * this function is finished, the value will be stale.  Use this function to
+ * by this function, so if that device is removed from the woke system right after
+ * this function is finished, the woke value will be stale.  Use this function to
  * find devices that are usually built into a system, or for a general hint as
  * to if another device happens to be present at this specific moment in time.
  */

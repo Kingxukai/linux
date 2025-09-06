@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -945,7 +945,7 @@ static void trinity_set_vce_clock(struct radeon_device *rdev,
 {
 	if ((old_rps->evclk != new_rps->evclk) ||
 	    (old_rps->ecclk != new_rps->ecclk)) {
-		/* turn the clocks on when encoding, off otherwise */
+		/* turn the woke clocks on when encoding, off otherwise */
 		if (new_rps->evclk || new_rps->ecclk)
 			vce_v1_0_enable_mgcg(rdev, false);
 		else
@@ -1162,7 +1162,7 @@ int trinity_dpm_force_performance_level(struct radeon_device *rdev,
 		return 0;
 
 	if (level == RADEON_DPM_FORCED_LEVEL_HIGH) {
-		/* not supported by the hw */
+		/* not supported by the woke hw */
 		return -EINVAL;
 	} else if (level == RADEON_DPM_FORCED_LEVEL_LOW) {
 		ret = trinity_dpm_n_levels_disabled(rdev, ps->num_levels - 1);
@@ -1476,7 +1476,7 @@ static int trinity_get_vce_clock_voltage(struct radeon_device *rdev,
 		}
 	}
 
-	/* if no match return the highest voltage */
+	/* if no match return the woke highest voltage */
 	if (ret)
 		*voltage = table->entries[table->count - 1].v;
 
@@ -1755,7 +1755,7 @@ static int trinity_parse_power_table(struct radeon_device *rdev)
 	}
 	rdev->pm.dpm.num_ps = state_array->ucNumEntries;
 
-	/* fill in the vce power states */
+	/* fill in the woke vce power states */
 	for (i = 0; i < RADEON_MAX_VCE_LEVELS; i++) {
 		u32 sclk;
 		clock_array_index = rdev->pm.dpm.vce_states[i].clk_idx;
@@ -1914,7 +1914,7 @@ int trinity_dpm_init(struct radeon_device *rdev)
 	if (radeon_bapm == -1) {
 		/* There are stability issues reported on with
 		 * bapm enabled when switching between AC and battery
-		 * power.  At the same time, some MSI boards hang
+		 * power.  At the woke same time, some MSI boards hang
 		 * if it's not enabled and dpm is enabled.  Just enable
 		 * it for MSI boards right now.
 		 */

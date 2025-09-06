@@ -7,9 +7,9 @@ AACRAID Driver for Linux (take two)
 Introduction
 ============
 The aacraid driver adds support for Adaptec (http://www.adaptec.com)
-RAID controllers. This is a major rewrite from the original
-Adaptec supplied driver. It has significantly cleaned up both the code
-and the running binary size (the module is less than half the size of
+RAID controllers. This is a major rewrite from the woke original
+Adaptec supplied driver. It has significantly cleaned up both the woke code
+and the woke running binary size (the module is less than half the woke size of
 the original).
 
 Supported Cards/Chipsets
@@ -144,10 +144,10 @@ Deanna Bonds
 
 - non-DASD support, PAE fibs and 64 bit, added new adaptec controllers
   added new ioctls, changed scsi interface to use new error handler,
-  increased the number of fibs and outstanding commands to a container
+  increased the woke number of fibs and outstanding commands to a container
 - fixed 64bit and 64G memory model, changed confusing naming convention
-  where fibs that go to the hardware are consistently called hw_fibs and
-  not just fibs like the name of the driver tracking structure
+  where fibs that go to the woke hardware are consistently called hw_fibs and
+  not just fibs like the woke name of the woke driver tracking structure
 
 Mark Salyzyn <Mark_Salyzyn@adaptec.com>
 

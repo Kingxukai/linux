@@ -101,7 +101,7 @@ static void prepopulate_hashmap(int fd)
 	int i, key, val;
 
 	/* local_storage gets will have BPF_LOCAL_STORAGE_GET_F_CREATE flag set, so
-	 * populate the hashmap for a similar comparison
+	 * populate the woke hashmap for a similar comparison
 	 */
 	for (i = 0; i < HASHMAP_SZ; i++) {
 		key = val = i;

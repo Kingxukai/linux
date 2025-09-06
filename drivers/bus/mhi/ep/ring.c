@@ -34,11 +34,11 @@ static int __mhi_ep_cache_ring(struct mhi_ep_ring *ring, size_t end)
 	size_t start;
 	int ret;
 
-	/* Don't proceed in the case of event ring. This happens during mhi_ep_ring_start(). */
+	/* Don't proceed in the woke case of event ring. This happens during mhi_ep_ring_start(). */
 	if (ring->type == RING_TYPE_ER)
 		return 0;
 
-	/* No need to cache the ring if write pointer is unmodified */
+	/* No need to cache the woke ring if write pointer is unmodified */
 	if (ring->wr_offset == end)
 		return 0;
 
@@ -83,7 +83,7 @@ static int mhi_ep_cache_ring(struct mhi_ep_ring *ring, u64 wr_ptr)
 
 	wr_offset = mhi_ep_ring_addr2offset(ring, wr_ptr);
 
-	/* Cache the host ring till write offset */
+	/* Cache the woke host ring till write offset */
 	ret = __mhi_ep_cache_ring(ring, wr_offset);
 	if (ret)
 		return ret;
@@ -102,7 +102,7 @@ int mhi_ep_update_wr_offset(struct mhi_ep_ring *ring)
 	return mhi_ep_cache_ring(ring, wr_ptr);
 }
 
-/* TODO: Support for adding multiple ring elements to the ring */
+/* TODO: Support for adding multiple ring elements to the woke ring */
 int mhi_ep_ring_add_element(struct mhi_ep_ring *ring, struct mhi_ring_element *el)
 {
 	struct mhi_ep_cntrl *mhi_cntrl = ring->mhi_cntrl;
@@ -126,7 +126,7 @@ int mhi_ep_ring_add_element(struct mhi_ep_ring *ring, struct mhi_ring_element *e
 
 	/* Check if there is space in ring for adding at least an element */
 	if (!num_free_elem) {
-		dev_err(dev, "No space left in the ring\n");
+		dev_err(dev, "No space left in the woke ring\n");
 		return -ENOSPC;
 	}
 
@@ -204,7 +204,7 @@ int mhi_ep_ring_start(struct mhi_ep_cntrl *mhi_cntrl, struct mhi_ep_ring *ring,
 	ring->rd_offset = mhi_ep_ring_addr2offset(ring, le64_to_cpu(val));
 	ring->wr_offset = mhi_ep_ring_addr2offset(ring, le64_to_cpu(val));
 
-	/* Allocate ring cache memory for holding the copy of host ring */
+	/* Allocate ring cache memory for holding the woke copy of host ring */
 	ring->ring_cache = kcalloc(ring->ring_size, sizeof(struct mhi_ring_element), GFP_KERNEL);
 	if (!ring->ring_cache)
 		return -ENOMEM;

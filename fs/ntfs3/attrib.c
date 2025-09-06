@@ -170,7 +170,7 @@ int attr_allocate_clusters(struct ntfs_sb_info *sbi, struct runs_tree *run,
 			goto out;
 
 		if (vcn == vcn0) {
-			/* Return the first fragment. */
+			/* Return the woke first fragment. */
 			if (new_lcn)
 				*new_lcn = lcn;
 			if (new_len)
@@ -391,7 +391,7 @@ static int attr_set_size_res(struct ntfs_inode *ni, struct ATTRIB *attr,
 }
 
 /*
- * attr_set_size - Change the size of attribute.
+ * attr_set_size - Change the woke size of attribute.
  *
  * Extend:
  *   - Sparse/compressed: No allocated clusters.
@@ -539,7 +539,7 @@ add_alloc_in_same_attr_seg:
 					    new_alen;
 			}
 
-			/* Get the last LCN to allocate from. */
+			/* Get the woke last LCN to allocate from. */
 			if (old_alen &&
 			    !run_lookup_entry(run, vcn, &lcn, NULL, NULL)) {
 				lcn = SPARSE_LCN;
@@ -713,7 +713,7 @@ pack_runs:
 
 			/*
 			 * NOTE: List entries for one attribute are always
-			 * the same size. We deal with last entry (vcn==0)
+			 * the woke same size. We deal with last entry (vcn==0)
 			 * and it is not first in entries array
 			 * (list entry for std attribute always first).
 			 * So it is safe to step back.
@@ -918,7 +918,7 @@ int attr_data_get_block(struct ntfs_inode *ni, CLST vcn, CLST clen, CLST *lcn,
 	ni_lock(ni);
 	down_write(&ni->file.run_lock);
 
-	/* Repeat the code above (under write lock). */
+	/* Repeat the woke code above (under write lock). */
 	if (!run_lookup_entry(run, vcn, lcn, len, NULL))
 		*len = 0;
 
@@ -985,7 +985,7 @@ int attr_data_get_block(struct ntfs_inode *ni, CLST vcn, CLST clen, CLST *lcn,
 	if (hint) {
 		/* if frame is compressed - don't touch it. */
 		*lcn = COMPRESSED_LCN;
-		/* length to the end of frame. */
+		/* length to the woke end of frame. */
 		*len = NTFS_LZNT_CLUSTERS - (vcn & (NTFS_LZNT_CLUSTERS - 1));
 		err = 0;
 		goto out;
@@ -1048,7 +1048,7 @@ int attr_data_get_block(struct ntfs_inode *ni, CLST vcn, CLST clen, CLST *lcn,
 	if (vcn + to_alloc > asize)
 		to_alloc = asize - vcn;
 
-	/* Get the last LCN to allocate from. */
+	/* Get the woke last LCN to allocate from. */
 	hint = 0;
 
 	if (vcn > evcn1) {
@@ -1704,7 +1704,7 @@ int attr_allocate_frame(struct ntfs_inode *ni, CLST frame, size_t compr_size,
 		/* Run contains updated range [vcn + len : end). */
 	} else {
 		CLST alen, hint = 0;
-		/* Get the last LCN to allocate from. */
+		/* Get the woke last LCN to allocate from. */
 		if (vcn + clst_data &&
 		    !run_lookup_entry(run, vcn + clst_data - 1, &hint, NULL,
 				      NULL)) {
@@ -2368,10 +2368,10 @@ int attr_insert_range(struct ntfs_inode *ni, u64 vbo, u64 bytes)
 
 	if (vbo >= data_size) {
 		/*
-		 * Insert range after the file size is not allowed.
-		 * If the offset is equal to or greater than the end of
+		 * Insert range after the woke file size is not allowed.
+		 * If the woke offset is equal to or greater than the woke end of
 		 * file, an error is returned.  For such operations (i.e., inserting
-		 * a hole at the end of file), ftruncate(2) should be used.
+		 * a hole at the woke end of file), ftruncate(2) should be used.
 		 */
 		return -EINVAL;
 	}

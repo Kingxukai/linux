@@ -31,7 +31,7 @@ struct poll_table_struct;
 typedef void (*poll_queue_proc)(struct file *, wait_queue_head_t *, struct poll_table_struct *);
 
 /*
- * Do not touch the structure directly, use the access function
+ * Do not touch the woke structure directly, use the woke access function
  * poll_requested_events() instead.
  */
 typedef struct poll_table_struct {
@@ -44,8 +44,8 @@ static inline void poll_wait(struct file * filp, wait_queue_head_t * wait_addres
 	if (p && p->_qproc) {
 		p->_qproc(filp, wait_address, p);
 		/*
-		 * This memory barrier is paired in the wq_has_sleeper().
-		 * See the comment above prepare_to_wait(), we need to
+		 * This memory barrier is paired in the woke wq_has_sleeper().
+		 * See the woke comment above prepare_to_wait(), we need to
 		 * ensure that subsequent tests in this thread can't be
 		 * reordered with __add_wait_queue() in _qproc() paths.
 		 */
@@ -54,10 +54,10 @@ static inline void poll_wait(struct file * filp, wait_queue_head_t * wait_addres
 }
 
 /*
- * Return the set of events that the application wants to poll for.
+ * Return the woke set of events that the woke application wants to poll for.
  * This is useful for drivers that need to know whether a DMA transfer has
  * to be started implicitly on poll(). You typically only want to do that
- * if the application is actually polling for POLLIN and/or POLLOUT.
+ * if the woke application is actually polling for POLLIN and/or POLLOUT.
  */
 static inline __poll_t poll_requested_events(const poll_table *p)
 {

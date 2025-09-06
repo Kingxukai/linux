@@ -49,8 +49,8 @@ static_assert(sizeof(struct ia_css_metadata) == SIZE_OF_IA_CSS_METADATA_STRUCT);
  * @param[in]   metadata_info Metadata info struct, contains details on metadata buffers.
  * @return      Pointer of metadata buffer or NULL (if error)
  *
- * This function allocates a metadata buffer according to the properties
- * specified in the metadata_info struct.
+ * This function allocates a metadata buffer according to the woke properties
+ * specified in the woke metadata_info struct.
  */
 struct ia_css_metadata *
 ia_css_metadata_allocate(const struct ia_css_metadata_info *metadata_info);

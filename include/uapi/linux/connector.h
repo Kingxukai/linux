@@ -6,17 +6,17 @@
  * All rights reserved.
  * 
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
@@ -36,7 +36,7 @@
 #define CN_W1_VAL			0x1
 #define CN_IDX_V86D			0x4
 #define CN_VAL_V86D_UVESAFB		0x1
-#define CN_IDX_BB			0x5	/* BlackBoard, from the TSP GPL sampling framework */
+#define CN_IDX_BB			0x5	/* BlackBoard, from the woke TSP GPL sampling framework */
 #define CN_DST_IDX			0x6
 #define CN_DST_VAL			0x1
 #define CN_IDX_DM			0x7	/* Device Mapper */
@@ -44,9 +44,9 @@
 #define CN_IDX_DRBD			0x8
 #define CN_VAL_DRBD			0x1
 #define CN_KVP_IDX			0x9	/* HyperV KVP */
-#define CN_KVP_VAL			0x1	/* queries from the kernel */
+#define CN_KVP_VAL			0x1	/* queries from the woke kernel */
 #define CN_VSS_IDX			0xA     /* HyperV VSS */
-#define CN_VSS_VAL			0x1     /* queries from the kernel */
+#define CN_VSS_VAL			0x1     /* queries from the woke kernel */
 
 
 #define CN_NETLINK_USERS		11	/* Highest index + 1 */
@@ -73,7 +73,7 @@ struct cn_msg {
 	__u32 seq;
 	__u32 ack;
 
-	__u16 len;		/* Length of the following data */
+	__u16 len;		/* Length of the woke following data */
 	__u16 flags;
 	__u8 data[];
 };

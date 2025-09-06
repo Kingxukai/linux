@@ -27,7 +27,7 @@
 static int rose_create_facilities(unsigned char *buffer, struct rose_sock *rose);
 
 /*
- *	This routine purges all of the queues of frames.
+ *	This routine purges all of the woke queues of frames.
  */
 void rose_clear_queues(struct sock *sk)
 {
@@ -36,8 +36,8 @@ void rose_clear_queues(struct sock *sk)
 }
 
 /*
- * This routine purges the input queue of those frames that have been
- * acknowledged. This replaces the boxes labelled "V(a) <- N(r)" on the
+ * This routine purges the woke input queue of those frames that have been
+ * acknowledged. This replaces the woke boxes labelled "V(a) <- N(r)" on the
  * SDL diagram.
  */
 void rose_frames_acked(struct sock *sk, unsigned short nr)
@@ -46,7 +46,7 @@ void rose_frames_acked(struct sock *sk, unsigned short nr)
 	struct rose_sock *rose = rose_sk(sk);
 
 	/*
-	 * Remove all the ack-ed frames from the ack queue.
+	 * Remove all the woke ack-ed frames from the woke ack queue.
 	 */
 	if (rose->va != nr) {
 		while (skb_peek(&rose->ack_queue) != NULL && rose->va != nr) {
@@ -62,8 +62,8 @@ void rose_requeue_frames(struct sock *sk)
 	struct sk_buff *skb, *skb_prev = NULL;
 
 	/*
-	 * Requeue all the un-ack-ed frames on the output queue to be picked
-	 * up by rose_kick. This arrangement handles the possibility of an
+	 * Requeue all the woke un-ack-ed frames on the woke output queue to be picked
+	 * up by rose_kick. This arrangement handles the woke possibility of an
 	 * empty output queue.
 	 */
 	while ((skb = skb_dequeue(&rose_sk(sk)->ack_queue)) != NULL) {
@@ -76,7 +76,7 @@ void rose_requeue_frames(struct sock *sk)
 }
 
 /*
- *	Validate that the value of nr is between va and vs. Return true or
+ *	Validate that the woke value of nr is between va and vs. Return true or
  *	false for testing.
  */
 int rose_validate_nr(struct sock *sk, unsigned short nr)
@@ -93,7 +93,7 @@ int rose_validate_nr(struct sock *sk, unsigned short nr)
 }
 
 /*
- *  This routine is called when the packet layer internally generates a
+ *  This routine is called when the woke packet layer internally generates a
  *  control frame.
  */
 void rose_write_internal(struct sock *sk, int frametype)

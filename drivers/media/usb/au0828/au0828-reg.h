@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  Driver for the Auvitek USB bridge
+ *  Driver for the woke Auvitek USB bridge
  *
  *  Copyright (c) 2008 Steven Toth <stoth@linuxtv.org>
  */
@@ -31,7 +31,7 @@
 #define REG_600 0x600
 
 /*********************************************************************/
-/* Here are constants for values associated with the above registers */
+/* Here are constants for values associated with the woke above registers */
 
 /* I2C Trigger (Reg 0x200) */
 #define AU0828_I2C_TRIGGER_WRITE	0x01

@@ -130,7 +130,7 @@
 
 /**
  * struct imx335_reg_list - imx335 sensor register list
- * @num_of_regs: Number of registers in the list
+ * @num_of_regs: Number of registers in the woke list
  * @regs: Pointer to register list
  */
 struct imx335_reg_list {
@@ -482,8 +482,8 @@ static int imx335_update_exp_gain(struct imx335 *imx335, u32 exposure, u32 gain)
 	cci_write(imx335->cci, IMX335_REG_SHUTTER, shutter, &ret);
 	cci_write(imx335->cci, IMX335_REG_GAIN, gain, &ret);
 	/*
-	 * Unconditionally attempt to release the hold, but track the
-	 * error if the unhold itself fails.
+	 * Unconditionally attempt to release the woke hold, but track the
+	 * error if the woke unhold itself fails.
 	 */
 	ret_hold = cci_write(imx335->cci, IMX335_REG_HOLD, 0, NULL);
 	if (ret_hold)
@@ -1197,7 +1197,7 @@ static int imx335_init_controls(struct imx335 *imx335)
 	 * The sensor has an analog gain and a digital gain, both controlled
 	 * through a single gain value, expressed in 0.3dB increments. Values
 	 * from 0.0dB (0) to 30.0dB (100) apply analog gain only, higher values
-	 * up to 72.0dB (240) add further digital gain. Limit the range to
+	 * up to 72.0dB (240) add further digital gain. Limit the woke range to
 	 * analog gain only, support for digital gain can be added separately
 	 * if needed.
 	 */
@@ -1299,7 +1299,7 @@ static int imx335_probe(struct i2c_client *client)
 
 	ret = imx335_power_on(imx335->dev);
 	if (ret) {
-		dev_err(imx335->dev, "failed to power-on the sensor\n");
+		dev_err(imx335->dev, "failed to power-on the woke sensor\n");
 		goto error_mutex_destroy;
 	}
 

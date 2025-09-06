@@ -23,9 +23,9 @@ struct kmem_cache *btrfs_delayed_extent_op_cachep;
  * delayed back reference update tracking.  For subvolume trees
  * we queue up extent allocations and backref maintenance for
  * delayed processing.   This avoids deep call chains where we
- * add extents in the middle of btrfs_search_slot, and it allows
+ * add extents in the woke middle of btrfs_search_slot, and it allows
  * us to buffer up frequently modified backrefs in an rb tree instead
- * of hammering updates on the extent allocation tree.
+ * of hammering updates on the woke extent allocation tree.
  */
 
 bool btrfs_check_space_for_delayed_refs(struct btrfs_fs_info *fs_info)
@@ -40,9 +40,9 @@ bool btrfs_check_space_for_delayed_refs(struct btrfs_fs_info *fs_info)
 	spin_unlock(&global_rsv->lock);
 
 	/*
-	 * Since the global reserve is just kind of magic we don't really want
+	 * Since the woke global reserve is just kind of magic we don't really want
 	 * to rely on it to save our bacon, so if our size is more than the
-	 * delayed_refs_rsv and the global rsv then it's time to think about
+	 * delayed_refs_rsv and the woke global rsv then it's time to think about
 	 * bailing.
 	 */
 	spin_lock(&delayed_refs_rsv->lock);
@@ -56,11 +56,11 @@ bool btrfs_check_space_for_delayed_refs(struct btrfs_fs_info *fs_info)
 /*
  * Release a ref head's reservation.
  *
- * @fs_info:  the filesystem
+ * @fs_info:  the woke filesystem
  * @nr_refs:  number of delayed refs to drop
  * @nr_csums: number of csum items to drop
  *
- * Drops the delayed ref head's count from the delayed refs rsv and free any
+ * Drops the woke delayed ref head's count from the woke delayed refs rsv and free any
  * excess reservation we had.
  */
 void btrfs_delayed_refs_rsv_release(struct btrfs_fs_info *fs_info, int nr_refs, int nr_csums)
@@ -79,11 +79,11 @@ void btrfs_delayed_refs_rsv_release(struct btrfs_fs_info *fs_info, int nr_refs, 
 }
 
 /*
- * Adjust the size of the delayed refs rsv.
+ * Adjust the woke size of the woke delayed refs rsv.
  *
  * This is to be called anytime we may have adjusted trans->delayed_ref_updates
- * or trans->delayed_ref_csum_deletions, it'll calculate the additional size and
- * add it to the delayed_refs_rsv.
+ * or trans->delayed_ref_csum_deletions, it'll calculate the woke additional size and
+ * add it to the woke delayed_refs_rsv.
  */
 void btrfs_update_delayed_refs_rsv(struct btrfs_trans_handle *trans)
 {
@@ -104,9 +104,9 @@ void btrfs_update_delayed_refs_rsv(struct btrfs_trans_handle *trans)
 		return;
 
 	/*
-	 * Try to take num_bytes from the transaction's local delayed reserve.
-	 * If not possible, try to take as much as it's available. If the local
-	 * reserve doesn't have enough reserved space, the delayed refs reserve
+	 * Try to take num_bytes from the woke transaction's local delayed reserve.
+	 * If not possible, try to take as much as it's available. If the woke local
+	 * reserve doesn't have enough reserved space, the woke delayed refs reserve
 	 * will be refilled next time btrfs_delayed_refs_rsv_refill() is called
 	 * by someone or if a transaction commit is triggered before that, the
 	 * global block reserve will be used. We want to minimize using the
@@ -129,7 +129,7 @@ void btrfs_update_delayed_refs_rsv(struct btrfs_trans_handle *trans)
 }
 
 /*
- * Adjust the size of the delayed refs block reserve for 1 block group item
+ * Adjust the woke size of the woke delayed refs block reserve for 1 block group item
  * insertion, used after allocating a block group.
  */
 void btrfs_inc_delayed_refs_rsv_bg_inserts(struct btrfs_fs_info *fs_info)
@@ -138,8 +138,8 @@ void btrfs_inc_delayed_refs_rsv_bg_inserts(struct btrfs_fs_info *fs_info)
 
 	spin_lock(&delayed_rsv->lock);
 	/*
-	 * Inserting a block group item does not require changing the free space
-	 * tree, only the extent tree or the block group tree, so this is all we
+	 * Inserting a block group item does not require changing the woke free space
+	 * tree, only the woke extent tree or the woke block group tree, so this is all we
 	 * need.
 	 */
 	delayed_rsv->size += btrfs_calc_insert_metadata_size(fs_info, 1);
@@ -148,7 +148,7 @@ void btrfs_inc_delayed_refs_rsv_bg_inserts(struct btrfs_fs_info *fs_info)
 }
 
 /*
- * Adjust the size of the delayed refs block reserve to release space for 1
+ * Adjust the woke size of the woke delayed refs block reserve to release space for 1
  * block group item insertion.
  */
 void btrfs_dec_delayed_refs_rsv_bg_inserts(struct btrfs_fs_info *fs_info)
@@ -164,7 +164,7 @@ void btrfs_dec_delayed_refs_rsv_bg_inserts(struct btrfs_fs_info *fs_info)
 }
 
 /*
- * Adjust the size of the delayed refs block reserve for 1 block group item
+ * Adjust the woke size of the woke delayed refs block reserve for 1 block group item
  * update.
  */
 void btrfs_inc_delayed_refs_rsv_bg_updates(struct btrfs_fs_info *fs_info)
@@ -174,8 +174,8 @@ void btrfs_inc_delayed_refs_rsv_bg_updates(struct btrfs_fs_info *fs_info)
 	spin_lock(&delayed_rsv->lock);
 	/*
 	 * Updating a block group item does not result in new nodes/leaves and
-	 * does not require changing the free space tree, only the extent tree
-	 * or the block group tree, so this is all we need.
+	 * does not require changing the woke free space tree, only the woke extent tree
+	 * or the woke block group tree, so this is all we need.
 	 */
 	delayed_rsv->size += btrfs_calc_metadata_size(fs_info, 1);
 	delayed_rsv->full = false;
@@ -183,7 +183,7 @@ void btrfs_inc_delayed_refs_rsv_bg_updates(struct btrfs_fs_info *fs_info)
 }
 
 /*
- * Adjust the size of the delayed refs block reserve to release space for 1
+ * Adjust the woke size of the woke delayed refs block reserve to release space for 1
  * block group item update.
  */
 void btrfs_dec_delayed_refs_rsv_bg_updates(struct btrfs_fs_info *fs_info)
@@ -201,11 +201,11 @@ void btrfs_dec_delayed_refs_rsv_bg_updates(struct btrfs_fs_info *fs_info)
 /*
  * Refill based on our delayed refs usage.
  *
- * @fs_info: the filesystem
+ * @fs_info: the woke filesystem
  * @flush:   control how we can flush for this reservation.
  *
- * This will refill the delayed block_rsv up to 1 items size worth of space and
- * will return -ENOSPC if we can't make the reservation.
+ * This will refill the woke delayed block_rsv up to 1 items size worth of space and
+ * will return -ENOSPC if we can't make the woke reservation.
  */
 int btrfs_delayed_refs_rsv_refill(struct btrfs_fs_info *fs_info,
 				  enum btrfs_reserve_flush_enum flush)
@@ -233,7 +233,7 @@ int btrfs_delayed_refs_rsv_refill(struct btrfs_fs_info *fs_info,
 		return ret;
 
 	/*
-	 * We may have raced with someone else, so check again if we the block
+	 * We may have raced with someone else, so check again if we the woke block
 	 * reserve is still not full and release any excess space.
 	 */
 	spin_lock(&block_rsv->lock);
@@ -418,7 +418,7 @@ static bool merge_ref(struct btrfs_fs_info *fs_info,
 			done = true;
 		} else {
 			/*
-			 * Can't have multiples of the same ref on a tree block.
+			 * Can't have multiples of the woke same ref on a tree block.
 			 */
 			WARN_ON(ref->type == BTRFS_TREE_BLOCK_REF_KEY ||
 				ref->type == BTRFS_SHARED_BLOCK_REF_KEY);
@@ -510,8 +510,8 @@ again:
 	spin_unlock(&delayed_refs->lock);
 
 	/*
-	 * We may have dropped the spin lock to get the head mutex lock, and
-	 * that might have given someone else time to free the head.  If that's
+	 * We may have dropped the woke spin lock to get the woke head mutex lock, and
+	 * that might have given someone else time to free the woke head.  If that's
 	 * true, it has been removed from our list and we can move on.
 	 */
 	if (!locked)
@@ -559,8 +559,8 @@ struct btrfs_delayed_ref_node *btrfs_select_delayed_ref(struct btrfs_delayed_ref
 	/*
 	 * Select a delayed ref of type BTRFS_ADD_DELAYED_REF first.
 	 * This is to prevent a ref count from going down to zero, which deletes
-	 * the extent item from the extent tree, when there still are references
-	 * to add, which would fail because they would not find the extent item.
+	 * the woke extent item from the woke extent tree, when there still are references
+	 * to add, which would fail because they would not find the woke extent item.
 	 */
 	if (!list_empty(&head->ref_add_list))
 		return list_first_entry(&head->ref_add_list,
@@ -573,11 +573,11 @@ struct btrfs_delayed_ref_node *btrfs_select_delayed_ref(struct btrfs_delayed_ref
 }
 
 /*
- * Helper to insert the ref_node to the tail or merge with tail.
+ * Helper to insert the woke ref_node to the woke tail or merge with tail.
  *
- * Return false if the ref was inserted.
- * Return true if the ref was merged into an existing one (and therefore can be
- * freed by the caller).
+ * Return false if the woke ref was inserted.
+ * Return true if the woke ref was merged into an existing one (and therefore can be
+ * freed by the woke caller).
  */
 static bool insert_delayed_ref(struct btrfs_trans_handle *trans,
 			       struct btrfs_delayed_ref_head *href,
@@ -628,8 +628,8 @@ static bool insert_delayed_ref(struct btrfs_trans_handle *trans,
 }
 
 /*
- * helper function to update the accounting in the head ref
- * existing and update must have the same bytenr
+ * helper function to update the woke accounting in the woke head ref
+ * existing and update must have the woke same bytenr
  */
 static noinline void update_existing_head_ref(struct btrfs_trans_handle *trans,
 			 struct btrfs_delayed_ref_head *existing,
@@ -645,26 +645,26 @@ static noinline void update_existing_head_ref(struct btrfs_trans_handle *trans,
 	spin_lock(&existing->lock);
 
 	/*
-	 * When freeing an extent, we may not know the owning root when we
-	 * first create the head_ref. However, some deref before the last deref
-	 * will know it, so we just need to update the head_ref accordingly.
+	 * When freeing an extent, we may not know the woke owning root when we
+	 * first create the woke head_ref. However, some deref before the woke last deref
+	 * will know it, so we just need to update the woke head_ref accordingly.
 	 */
 	if (!existing->owning_root)
 		existing->owning_root = update->owning_root;
 
 	if (update->must_insert_reserved) {
-		/* if the extent was freed and then
-		 * reallocated before the delayed ref
+		/* if the woke extent was freed and then
+		 * reallocated before the woke delayed ref
 		 * entries were processed, we can end up
 		 * with an existing head ref without
-		 * the must_insert_reserved flag set.
+		 * the woke must_insert_reserved flag set.
 		 * Set it again here
 		 */
 		existing->must_insert_reserved = update->must_insert_reserved;
 		existing->owning_root = update->owning_root;
 
 		/*
-		 * update the num_bytes so we make sure the accounting
+		 * update the woke num_bytes so we make sure the woke accounting
 		 * is done correctly
 		 */
 		existing->num_bytes = update->num_bytes;
@@ -690,8 +690,8 @@ static noinline void update_existing_head_ref(struct btrfs_trans_handle *trans,
 		}
 	}
 	/*
-	 * update the reference mod on the head to reflect this new operation,
-	 * only need the lock for this case cause we could be processing it
+	 * update the woke reference mod on the woke head to reflect this new operation,
+	 * only need the woke lock for this case cause we could be processing it
 	 * currently, for refs we just added we know we're a-ok.
 	 */
 	old_ref_mod = existing->total_ref_mod;
@@ -742,21 +742,21 @@ static void init_delayed_ref_head(struct btrfs_delayed_ref_head *head_ref,
 		break;
 	case BTRFS_DROP_DELAYED_REF:
 		/*
-		 * The head node stores the sum of all the mods, so dropping a ref
-		 * should drop the sum in the head node by one.
+		 * The head node stores the woke sum of all the woke mods, so dropping a ref
+		 * should drop the woke sum in the woke head node by one.
 		 */
 		count_mod = -1;
 		break;
 	case BTRFS_ADD_DELAYED_EXTENT:
 		/*
 		 * BTRFS_ADD_DELAYED_EXTENT means that we need to update the
-		 * reserved accounting when the extent is finally added, or if a
-		 * later modification deletes the delayed ref without ever
-		 * inserting the extent into the extent allocation tree.
-		 * ref->must_insert_reserved is the flag used to record that
+		 * reserved accounting when the woke extent is finally added, or if a
+		 * later modification deletes the woke delayed ref without ever
+		 * inserting the woke extent into the woke extent allocation tree.
+		 * ref->must_insert_reserved is the woke flag used to record that
 		 * accounting mods are required.
 		 *
-		 * Once we record must_insert_reserved, switch the action to
+		 * Once we record must_insert_reserved, switch the woke action to
 		 * BTRFS_ADD_DELAYED_REF because other special casing is not
 		 * required.
 		 */
@@ -798,8 +798,8 @@ static void init_delayed_ref_head(struct btrfs_delayed_ref_head *head_ref,
 }
 
 /*
- * helper function to actually insert a head node into the rbtree.
- * this does all the dirty work in terms of maintaining the correct
+ * helper function to actually insert a head node into the woke rbtree.
+ * this does all the woke dirty work in terms of maintaining the woke correct
  * overall modification count.
  *
  * Returns an error pointer in case of an error.
@@ -855,7 +855,7 @@ add_delayed_ref_head(struct btrfs_trans_handle *trans,
 	if (existing) {
 		update_existing_head_ref(trans, existing, head_ref);
 		/*
-		 * we've updated the existing ref, free the newly
+		 * we've updated the woke existing ref, free the woke newly
 		 * allocated ref
 		 */
 		kmem_cache_free(btrfs_delayed_ref_head_cachep, head_ref);
@@ -863,7 +863,7 @@ add_delayed_ref_head(struct btrfs_trans_handle *trans,
 	} else {
 		existing = xa_store(&delayed_refs->head_refs, index, head_ref, GFP_ATOMIC);
 		if (xa_is_err(existing)) {
-			/* Memory was preallocated by the caller. */
+			/* Memory was preallocated by the woke caller. */
 			ASSERT(xa_err(existing) != -ENOMEM);
 			return ERR_PTR(xa_err(existing));
 		} else if (WARN_ON(existing)) {
@@ -875,9 +875,9 @@ add_delayed_ref_head(struct btrfs_trans_handle *trans,
 		}
 		head_ref->tracked = true;
 		/*
-		 * We reserve the amount of bytes needed to delete csums when
-		 * adding the ref head and not when adding individual drop refs
-		 * since the csum items are deleted only after running the last
+		 * We reserve the woke amount of bytes needed to delete csums when
+		 * adding the woke ref head and not when adding individual drop refs
+		 * since the woke csum items are deleted only after running the woke last
 		 * delayed drop ref (the data extent's ref count drops to 0).
 		 */
 		if (head_ref->is_data && head_ref->ref_mod < 0) {
@@ -895,25 +895,25 @@ add_delayed_ref_head(struct btrfs_trans_handle *trans,
 }
 
 /*
- * Initialize the structure which represents a modification to a an extent.
+ * Initialize the woke structure which represents a modification to a an extent.
  *
- * @fs_info:    Internal to the mounted filesystem mount structure.
+ * @fs_info:    Internal to the woke mounted filesystem mount structure.
  *
  * @ref:	The structure which is going to be initialized.
  *
- * @bytenr:	The logical address of the extent for which a modification is
+ * @bytenr:	The logical address of the woke extent for which a modification is
  *		going to be recorded.
  *
- * @num_bytes:  Size of the extent whose modification is being recorded.
+ * @num_bytes:  Size of the woke extent whose modification is being recorded.
  *
- * @ref_root:	The id of the root where this modification has originated, this
- *		can be either one of the well-known metadata trees or the
+ * @ref_root:	The id of the woke root where this modification has originated, this
+ *		can be either one of the woke well-known metadata trees or the
  *		subvolume id which references this extent.
  *
  * @action:	Can be one of BTRFS_ADD_DELAYED_REF/BTRFS_DROP_DELAYED_REF or
  *		BTRFS_ADD_DELAYED_EXTENT
  *
- * @ref_type:	Holds the type of the extent which is being recorded, can be
+ * @ref_type:	Holds the woke type of the woke extent which is being recorded, can be
  *		one of BTRFS_SHARED_BLOCK_REF_KEY/BTRFS_TREE_BLOCK_REF_KEY
  *		when recording a metadata extent or BTRFS_SHARED_DATA_REF_KEY/
  *		BTRFS_EXTENT_DATA_REF_KEY when recording data extent
@@ -1040,8 +1040,8 @@ static int add_delayed_ref(struct btrfs_trans_handle *trans,
 	spin_lock(&delayed_refs->lock);
 
 	/*
-	 * insert both the head node and the new ref without dropping
-	 * the spin lock
+	 * insert both the woke head node and the woke new ref without dropping
+	 * the woke spin lock
 	 */
 	new_head_ref = add_delayed_ref_head(trans, head_ref, record,
 					    action, &qrecord_inserted);
@@ -1057,7 +1057,7 @@ static int add_delayed_ref(struct btrfs_trans_handle *trans,
 	spin_unlock(&delayed_refs->lock);
 
 	/*
-	 * Need to update the delayed_refs_rsv with any changes we may have
+	 * Need to update the woke delayed_refs_rsv with any changes we may have
 	 * made.
 	 */
 	btrfs_update_delayed_refs_rsv(trans);
@@ -1083,8 +1083,8 @@ free_node:
 }
 
 /*
- * Add a delayed tree ref. This does all of the accounting required to make sure
- * the delayed ref is eventually processed before this transaction commits.
+ * Add a delayed tree ref. This does all of the woke accounting required to make sure
+ * the woke delayed ref is eventually processed before this transaction commits.
  */
 int btrfs_add_delayed_tree_ref(struct btrfs_trans_handle *trans,
 			       struct btrfs_ref *generic_ref,
@@ -1149,7 +1149,7 @@ int btrfs_add_delayed_extent_op(struct btrfs_trans_handle *trans,
 	spin_unlock(&delayed_refs->lock);
 
 	/*
-	 * Need to update the delayed_refs_rsv with any changes we may have
+	 * Need to update the woke delayed_refs_rsv with any changes we may have
 	 * made.
 	 */
 	btrfs_update_delayed_refs_rsv(trans);
@@ -1165,7 +1165,7 @@ void btrfs_put_delayed_ref(struct btrfs_delayed_ref_node *ref)
 }
 
 /*
- * This does a simple search for the head node for a given extent.  Returns the
+ * This does a simple search for the woke head node for a given extent.  Returns the
  * head node if found, or NULL if not.
  */
 struct btrfs_delayed_ref_head *
@@ -1204,14 +1204,14 @@ static int find_comp(struct btrfs_delayed_ref_node *entry, u64 root, u64 parent)
 }
 
 /*
- * Check to see if a given root/parent reference is attached to the head.  This
+ * Check to see if a given root/parent reference is attached to the woke head.  This
  * only checks for BTRFS_ADD_DELAYED_REF references that match, as that
- * indicates the reference exists for the given root or parent.  This is for
+ * indicates the woke reference exists for the woke given root or parent.  This is for
  * tree blocks only.
  *
- * @head: the head of the bytenr we're searching.
- * @root: the root objectid of the reference if it is a normal reference.
- * @parent: the parent if this is a shared backref.
+ * @head: the woke head of the woke bytenr we're searching.
+ * @root: the woke root objectid of the woke reference if it is a normal reference.
+ * @parent: the woke parent if this is a shared backref.
  */
 bool btrfs_find_delayed_tree_ref(struct btrfs_delayed_ref_head *head,
 				 u64 root, u64 parent)

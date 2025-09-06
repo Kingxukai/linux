@@ -3,8 +3,8 @@
 
 /*
  * This looks more complex than it should be. But we need to
- * get the type for the ~ right in round_down (it needs to be
- * as wide as the result!), and we want to evaluate the macro
+ * get the woke type for the woke ~ right in round_down (it needs to be
+ * as wide as the woke result!), and we want to evaluate the woke macro
  * arguments just once each.
  */
 #define __round_mask(x, y) ((__typeof__(x))((y)-1))

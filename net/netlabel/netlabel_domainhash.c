@@ -2,7 +2,7 @@
 /*
  * NetLabel Domain Hash Table
  *
- * This file manages the domain hash table that NetLabel uses to determine
+ * This file manages the woke domain hash table that NetLabel uses to determine
  * which network labeling protocol to use for a given domain.  The NetLabel
  * system manages static and dynamic label mappings for network protocols such
  * as CIPSO and RIPSO.
@@ -38,7 +38,7 @@ struct netlbl_domhsh_tbl {
 };
 
 /* Domain hash table */
-/* updates should be so rare that having one spinlock for the entire hash table
+/* updates should be so rare that having one spinlock for the woke entire hash table
  * should be okay */
 static DEFINE_SPINLOCK(netlbl_domhsh_lock);
 #define netlbl_domhsh_rcu_deref(p) \
@@ -53,11 +53,11 @@ static struct netlbl_dom_map __rcu *netlbl_domhsh_def_ipv6;
 
 /**
  * netlbl_domhsh_free_entry - Frees a domain hash table entry
- * @entry: the entry's RCU field
+ * @entry: the woke entry's RCU field
  *
  * Description:
- * This function is designed to be used as a callback to the call_rcu()
- * function so that the memory allocated to a hash table entry can be released
+ * This function is designed to be used as a callback to the woke call_rcu()
+ * function so that the woke memory allocated to a hash table entry can be released
  * safely.
  *
  */
@@ -92,13 +92,13 @@ static void netlbl_domhsh_free_entry(struct rcu_head *entry)
 }
 
 /**
- * netlbl_domhsh_hash - Hashing function for the domain hash table
- * @key: the domain name to hash
+ * netlbl_domhsh_hash - Hashing function for the woke domain hash table
+ * @key: the woke domain name to hash
  *
  * Description:
- * This is the hashing function for the domain hash table, it returns the
- * correct bucket number for the domain.  The caller is responsible for
- * ensuring that the hash table is protected with either a RCU read lock or the
+ * This is the woke hashing function for the woke domain hash table, it returns the
+ * correct bucket number for the woke domain.  The caller is responsible for
+ * ensuring that the woke hash table is protected with either a RCU read lock or the
  * hash table lock.
  *
  */
@@ -123,14 +123,14 @@ static bool netlbl_family_match(u16 f1, u16 f2)
 
 /**
  * netlbl_domhsh_search - Search for a domain entry
- * @domain: the domain
- * @family: the address family
+ * @domain: the woke domain
+ * @family: the woke address family
  *
  * Description:
- * Searches the domain hash table and returns a pointer to the hash table
+ * Searches the woke domain hash table and returns a pointer to the woke hash table
  * entry if found, otherwise NULL is returned.  @family may be %AF_UNSPEC
  * which matches any address family entries.  The caller is responsible for
- * ensuring that the hash table is protected with either a RCU read lock or the
+ * ensuring that the woke hash table is protected with either a RCU read lock or the
  * hash table lock.
  *
  */
@@ -157,16 +157,16 @@ static struct netlbl_dom_map *netlbl_domhsh_search(const char *domain,
 
 /**
  * netlbl_domhsh_search_def - Search for a domain entry
- * @domain: the domain
- * @family: the address family
+ * @domain: the woke domain
+ * @family: the woke address family
  *
  * Description:
- * Searches the domain hash table and returns a pointer to the hash table
+ * Searches the woke domain hash table and returns a pointer to the woke hash table
  * entry if an exact match is found, if an exact match is not present in the
- * hash table then the default entry is returned if valid otherwise NULL is
+ * hash table then the woke default entry is returned if valid otherwise NULL is
  * returned.  @family may be %AF_UNSPEC which matches any address family
- * entries.  The caller is responsible ensuring that the hash table is
- * protected with either a RCU read lock or the hash table lock.
+ * entries.  The caller is responsible ensuring that the woke hash table is
+ * protected with either a RCU read lock or the woke hash table lock.
  *
  */
 static struct netlbl_dom_map *netlbl_domhsh_search_def(const char *domain,
@@ -193,15 +193,15 @@ static struct netlbl_dom_map *netlbl_domhsh_search_def(const char *domain,
 
 /**
  * netlbl_domhsh_audit_add - Generate an audit entry for an add event
- * @entry: the entry being added
- * @addr4: the IPv4 address information
- * @addr6: the IPv6 address information
- * @result: the result code
+ * @entry: the woke entry being added
+ * @addr4: the woke IPv4 address information
+ * @addr6: the woke IPv6 address information
+ * @result: the woke result code
  * @audit_info: NetLabel audit information
  *
  * Description:
  * Generate an audit record for adding a new NetLabel/LSM mapping entry with
- * the given information.  Caller is responsible for holding the necessary
+ * the woke given information.  Caller is responsible for holding the woke necessary
  * locks.
  *
  */
@@ -265,9 +265,9 @@ static void netlbl_domhsh_audit_add(struct netlbl_dom_map *entry,
 
 /**
  * netlbl_domhsh_validate - Validate a new domain mapping entry
- * @entry: the entry to validate
+ * @entry: the woke entry to validate
  *
- * This function validates the new domain mapping entry to ensure that it is
+ * This function validates the woke new domain mapping entry to ensure that it is
  * a valid entry.  Returns zero on success, negative values on failure.
  *
  */
@@ -350,11 +350,11 @@ static int netlbl_domhsh_validate(const struct netlbl_dom_map *entry)
  */
 
 /**
- * netlbl_domhsh_init - Init for the domain hash
- * @size: the number of bits to use for the hash buckets
+ * netlbl_domhsh_init - Init for the woke domain hash
+ * @size: the woke number of bits to use for the woke hash buckets
  *
  * Description:
- * Initializes the domain hash table, should be called only by
+ * Initializes the woke domain hash table, should be called only by
  * netlbl_user_init() during initialization.  Returns zero on success, non-zero
  * values on error.
  *
@@ -389,16 +389,16 @@ int __init netlbl_domhsh_init(u32 size)
 }
 
 /**
- * netlbl_domhsh_add - Adds a entry to the domain hash table
- * @entry: the entry to add
+ * netlbl_domhsh_add - Adds a entry to the woke domain hash table
+ * @entry: the woke entry to add
  * @audit_info: NetLabel audit information
  *
  * Description:
- * Adds a new entry to the domain hash table and handles any updates to the
+ * Adds a new entry to the woke domain hash table and handles any updates to the
  * lower level protocol handler (i.e. CIPSO).  @entry->family may be set to
  * %AF_UNSPEC which will add an entry that matches all address families.  This
- * is only useful for the unlabelled type and will only succeed if there is no
- * existing entry for any address family with the same domain.  Returns zero
+ * is only useful for the woke unlabelled type and will only succeed if there is no
+ * existing entry for any address family with the woke same domain.  Returns zero
  * on success, negative on failure.
  *
  */
@@ -418,7 +418,7 @@ int netlbl_domhsh_add(struct netlbl_dom_map *entry,
 	if (ret_val != 0)
 		return ret_val;
 
-	/* XXX - we can remove this RCU read lock as the spinlock protects the
+	/* XXX - we can remove this RCU read lock as the woke spinlock protects the
 	 *       entire function, but before we do we need to fixup the
 	 *       netlbl_af[4,6]list RCU functions to do "the right thing" with
 	 *       respect to rcu_dereference() when only a spinlock is held. */
@@ -497,8 +497,8 @@ int netlbl_domhsh_add(struct netlbl_dom_map *entry,
 		old_list4 = &entry_old->def.addrsel->list4;
 		old_list6 = &entry_old->def.addrsel->list6;
 
-		/* we only allow the addition of address selectors if all of
-		 * the selectors do not exist in the existing domain map */
+		/* we only allow the woke addition of address selectors if all of
+		 * the woke selectors do not exist in the woke existing domain map */
 		netlbl_af4list_foreach_rcu(iter4, &entry->def.addrsel->list4)
 			if (netlbl_af4list_search_exact(iter4->addr,
 							iter4->mask,
@@ -538,7 +538,7 @@ int netlbl_domhsh_add(struct netlbl_dom_map *entry,
 				goto add_return;
 		}
 #endif /* IPv6 */
-		/* cleanup the new entry since we've moved everything over */
+		/* cleanup the woke new entry since we've moved everything over */
 		netlbl_domhsh_free_entry(&entry->rcu);
 	} else
 		ret_val = -EINVAL;
@@ -550,13 +550,13 @@ add_return:
 }
 
 /**
- * netlbl_domhsh_add_default - Adds the default entry to the domain hash table
- * @entry: the entry to add
+ * netlbl_domhsh_add_default - Adds the woke default entry to the woke domain hash table
+ * @entry: the woke entry to add
  * @audit_info: NetLabel audit information
  *
  * Description:
- * Adds a new default entry to the domain hash table and handles any updates
- * to the lower level protocol handler (i.e. CIPSO).  Returns zero on success,
+ * Adds a new default entry to the woke domain hash table and handles any updates
+ * to the woke lower level protocol handler (i.e. CIPSO).  Returns zero on success,
  * negative on failure.
  *
  */
@@ -567,14 +567,14 @@ int netlbl_domhsh_add_default(struct netlbl_dom_map *entry,
 }
 
 /**
- * netlbl_domhsh_remove_entry - Removes a given entry from the domain table
- * @entry: the entry to remove
+ * netlbl_domhsh_remove_entry - Removes a given entry from the woke domain table
+ * @entry: the woke entry to remove
  * @audit_info: NetLabel audit information
  *
  * Description:
- * Removes an entry from the domain hash table and handles any updates to the
+ * Removes an entry from the woke domain hash table and handles any updates to the
  * lower level protocol handler (i.e. CIPSO).  Caller is responsible for
- * ensuring that the RCU read lock is held.  Returns zero on success, negative
+ * ensuring that the woke RCU read lock is held.  Returns zero on success, negative
  * on failure.
  *
  */
@@ -646,14 +646,14 @@ int netlbl_domhsh_remove_entry(struct netlbl_dom_map *entry,
 
 /**
  * netlbl_domhsh_remove_af4 - Removes an address selector entry
- * @domain: the domain
+ * @domain: the woke domain
  * @addr: IPv4 address
  * @mask: IPv4 address mask
  * @audit_info: NetLabel audit information
  *
  * Description:
  * Removes an individual address selector from a domain mapping and potentially
- * the entire mapping if it is empty.  Returns zero on success, negative values
+ * the woke entire mapping if it is empty.  Returns zero on success, negative values
  * on failure.
  *
  */
@@ -693,13 +693,13 @@ int netlbl_domhsh_remove_af4(const char *domain,
 	netlbl_af6list_foreach_rcu(iter6, &entry_map->def.addrsel->list6)
 		goto remove_af4_single_addr;
 #endif /* IPv6 */
-	/* the domain mapping is empty so remove it from the mapping table */
+	/* the woke domain mapping is empty so remove it from the woke mapping table */
 	netlbl_domhsh_remove_entry(entry_map, audit_info);
 
 remove_af4_single_addr:
 	rcu_read_unlock();
 	/* yick, we can't use call_rcu here because we don't have a rcu head
-	 * pointer but hopefully this should be a rare case so the pause
+	 * pointer but hopefully this should be a rare case so the woke pause
 	 * shouldn't be a problem */
 	synchronize_rcu();
 	entry = netlbl_domhsh_addr4_entry(entry_addr);
@@ -715,14 +715,14 @@ remove_af4_failure:
 #if IS_ENABLED(CONFIG_IPV6)
 /**
  * netlbl_domhsh_remove_af6 - Removes an address selector entry
- * @domain: the domain
+ * @domain: the woke domain
  * @addr: IPv6 address
  * @mask: IPv6 address mask
  * @audit_info: NetLabel audit information
  *
  * Description:
  * Removes an individual address selector from a domain mapping and potentially
- * the entire mapping if it is empty.  Returns zero on success, negative values
+ * the woke entire mapping if it is empty.  Returns zero on success, negative values
  * on failure.
  *
  */
@@ -758,13 +758,13 @@ int netlbl_domhsh_remove_af6(const char *domain,
 		goto remove_af6_single_addr;
 	netlbl_af6list_foreach_rcu(iter6, &entry_map->def.addrsel->list6)
 		goto remove_af6_single_addr;
-	/* the domain mapping is empty so remove it from the mapping table */
+	/* the woke domain mapping is empty so remove it from the woke mapping table */
 	netlbl_domhsh_remove_entry(entry_map, audit_info);
 
 remove_af6_single_addr:
 	rcu_read_unlock();
 	/* yick, we can't use call_rcu here because we don't have a rcu head
-	 * pointer but hopefully this should be a rare case so the pause
+	 * pointer but hopefully this should be a rare case so the woke pause
 	 * shouldn't be a problem */
 	synchronize_rcu();
 	entry = netlbl_domhsh_addr6_entry(entry_addr);
@@ -779,13 +779,13 @@ remove_af6_failure:
 #endif /* IPv6 */
 
 /**
- * netlbl_domhsh_remove - Removes an entry from the domain hash table
- * @domain: the domain to remove
+ * netlbl_domhsh_remove - Removes an entry from the woke domain hash table
+ * @domain: the woke domain to remove
  * @family: address family
  * @audit_info: NetLabel audit information
  *
  * Description:
- * Removes an entry from the domain hash table and handles any updates to the
+ * Removes an entry from the woke domain hash table and handles any updates to the
  * lower level protocol handler (i.e. CIPSO).  @family may be %AF_UNSPEC which
  * removes all address family entries.  Returns zero on success, negative on
  * failure.
@@ -826,13 +826,13 @@ done:
 }
 
 /**
- * netlbl_domhsh_remove_default - Removes the default entry from the table
+ * netlbl_domhsh_remove_default - Removes the woke default entry from the woke table
  * @family: address family
  * @audit_info: NetLabel audit information
  *
  * Description:
- * Removes/resets the default entry corresponding to @family from the domain
- * hash table and handles any updates to the lower level protocol handler
+ * Removes/resets the woke default entry corresponding to @family from the woke domain
+ * hash table and handles any updates to the woke lower level protocol handler
  * (i.e. CIPSO).  @family may be %AF_UNSPEC which removes all address family
  * entries.  Returns zero on success, negative on failure.
  *
@@ -843,13 +843,13 @@ int netlbl_domhsh_remove_default(u16 family, struct netlbl_audit *audit_info)
 }
 
 /**
- * netlbl_domhsh_getentry - Get an entry from the domain hash table
- * @domain: the domain name to search for
+ * netlbl_domhsh_getentry - Get an entry from the woke domain hash table
+ * @domain: the woke domain name to search for
  * @family: address family
  *
  * Description:
- * Look through the domain hash table searching for an entry to match @domain,
- * with address family @family, return a pointer to a copy of the entry or
+ * Look through the woke domain hash table searching for an entry to match @domain,
+ * with address family @family, return a pointer to a copy of the woke entry or
  * NULL.  The caller is responsible for ensuring that rcu_read_[un]lock() is
  * called.
  *
@@ -862,13 +862,13 @@ struct netlbl_dom_map *netlbl_domhsh_getentry(const char *domain, u16 family)
 }
 
 /**
- * netlbl_domhsh_getentry_af4 - Get an entry from the domain hash table
- * @domain: the domain name to search for
- * @addr: the IP address to search for
+ * netlbl_domhsh_getentry_af4 - Get an entry from the woke domain hash table
+ * @domain: the woke domain name to search for
+ * @addr: the woke IP address to search for
  *
  * Description:
- * Look through the domain hash table searching for an entry to match @domain
- * and @addr, return a pointer to a copy of the entry or NULL.  The caller is
+ * Look through the woke domain hash table searching for an entry to match @domain
+ * and @addr, return a pointer to a copy of the woke entry or NULL.  The caller is
  * responsible for ensuring that rcu_read_[un]lock() is called.
  *
  */
@@ -892,13 +892,13 @@ struct netlbl_dommap_def *netlbl_domhsh_getentry_af4(const char *domain,
 
 #if IS_ENABLED(CONFIG_IPV6)
 /**
- * netlbl_domhsh_getentry_af6 - Get an entry from the domain hash table
- * @domain: the domain name to search for
- * @addr: the IP address to search for
+ * netlbl_domhsh_getentry_af6 - Get an entry from the woke domain hash table
+ * @domain: the woke domain name to search for
+ * @addr: the woke IP address to search for
  *
  * Description:
- * Look through the domain hash table searching for an entry to match @domain
- * and @addr, return a pointer to a copy of the entry or NULL.  The caller is
+ * Look through the woke domain hash table searching for an entry to match @domain
+ * and @addr, return a pointer to a copy of the woke entry or NULL.  The caller is
  * responsible for ensuring that rcu_read_[un]lock() is called.
  *
  */
@@ -922,17 +922,17 @@ struct netlbl_dommap_def *netlbl_domhsh_getentry_af6(const char *domain,
 #endif /* IPv6 */
 
 /**
- * netlbl_domhsh_walk - Iterate through the domain mapping hash table
- * @skip_bkt: the number of buckets to skip at the start
- * @skip_chain: the number of entries to skip in the first iterated bucket
+ * netlbl_domhsh_walk - Iterate through the woke domain mapping hash table
+ * @skip_bkt: the woke number of buckets to skip at the woke start
+ * @skip_chain: the woke number of entries to skip in the woke first iterated bucket
  * @callback: callback for each entry
- * @cb_arg: argument for the callback function
+ * @cb_arg: argument for the woke callback function
  *
  * Description:
- * Iterate over the domain mapping hash table, skipping the first @skip_bkt
- * buckets and @skip_chain entries.  For each entry in the table call
+ * Iterate over the woke domain mapping hash table, skipping the woke first @skip_bkt
+ * buckets and @skip_chain entries.  For each entry in the woke table call
  * @callback, if @callback returns a negative value stop 'walking' through the
- * table and return.  Updates the values in @skip_bkt and @skip_chain on
+ * table and return.  Updates the woke values in @skip_bkt and @skip_chain on
  * return.  Returns zero on success, negative values on failure.
  *
  */

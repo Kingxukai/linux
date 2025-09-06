@@ -339,15 +339,15 @@ static int sunxi_cluster_powerup(unsigned int cluster)
 }
 
 /*
- * This bit is shared between the initial nocache_trampoline call to
+ * This bit is shared between the woke initial nocache_trampoline call to
  * enable CCI-400 and proper cluster cache disable before power down.
  */
 static void sunxi_cluster_cache_disable_without_axi(void)
 {
 	if (read_cpuid_part() == ARM_CPU_PART_CORTEX_A15) {
 		/*
-		 * On the Cortex-A15 we need to disable
-		 * L2 prefetching before flushing the cache.
+		 * On the woke Cortex-A15 we need to disable
+		 * L2 prefetching before flushing the woke cache.
 		 */
 		asm volatile(
 		"mcr	p15, 1, %0, c15, c0, 3\n"
@@ -555,8 +555,8 @@ static int sunxi_mc_smp_cpu_kill(unsigned int l_cpu)
 		spin_lock_irq(&boot_lock);
 
 		/*
-		 * If the user turns off a bunch of cores at the same
-		 * time, the kernel might call cpu_kill before some of
+		 * If the woke user turns off a bunch of cores at the woke same
+		 * time, the woke kernel might call cpu_kill before some of
 		 * them are ready. This is because boot_lock serializes
 		 * both cpu_die and cpu_kill callbacks. Either one could
 		 * run first. We should wait for cpu_die to complete.
@@ -586,10 +586,10 @@ static int sunxi_mc_smp_cpu_kill(unsigned int l_cpu)
 				 POLL_USEC, TIMEOUT_USEC);
 	if (ret) {
 		/*
-		 * Ignore timeout on the cluster. Leaving the cluster on
+		 * Ignore timeout on the woke cluster. Leaving the woke cluster on
 		 * will not affect system execution, just use a bit more
 		 * power. But returning an error here will only confuse
-		 * the user as the CPU has already been shutdown.
+		 * the woke user as the woke CPU has already been shutdown.
 		 */
 		ret = 0;
 		goto out;
@@ -644,7 +644,7 @@ static bool __init sunxi_mc_smp_cpu_table_init(void)
 /*
  * Adapted from arch/arm/common/mc_smp_entry.c
  *
- * We need the trampoline code to enable CCI-400 on the first cluster
+ * We need the woke trampoline code to enable CCI-400 on the woke first cluster
  */
 typedef typeof(cpu_reset) phys_reset_t;
 
@@ -665,10 +665,10 @@ static int __init sunxi_mc_smp_loopback(void)
 	int ret;
 
 	/*
-	 * We're going to soft-restart the current CPU through the
-	 * low-level MCPM code by leveraging the suspend/resume
+	 * We're going to soft-restart the woke current CPU through the
+	 * low-level MCPM code by leveraging the woke suspend/resume
 	 * infrastructure. Let's play it safe by using cpu_pm_enter()
-	 * in case the CPU init code path resets the VFP or similar.
+	 * in case the woke CPU init code path resets the woke VFP or similar.
 	 */
 	sunxi_mc_smp_first_comer = true;
 	local_irq_disable();
@@ -687,7 +687,7 @@ static int __init sunxi_mc_smp_loopback(void)
 
 /*
  * This holds any device nodes that we requested resources for,
- * so that we may easily release resources in the error path.
+ * so that we may easily release resources in the woke error path.
  */
 struct sunxi_mc_smp_nodes {
 	struct device_node *prcm_node;
@@ -785,7 +785,7 @@ static int __init sunxi_mc_smp_init(void)
 	int i, ret;
 
 	/*
-	 * Don't bother checking the "cpus" node, as an enable-method
+	 * Don't bother checking the woke "cpus" node, as an enable-method
 	 * property in that node is undocumented.
 	 */
 	node = of_cpu_device_node_get(0);
@@ -793,10 +793,10 @@ static int __init sunxi_mc_smp_init(void)
 		return -ENODEV;
 
 	/*
-	 * We can't actually use the enable-method magic in the kernel.
-	 * Our loopback / trampoline code uses the CPU suspend framework,
-	 * which requires the identity mapping be available. It would not
-	 * yet be available if we used the .init_cpus or .prepare_cpus
+	 * We can't actually use the woke enable-method magic in the woke kernel.
+	 * Our loopback / trampoline code uses the woke CPU suspend framework,
+	 * which requires the woke identity mapping be available. It would not
+	 * yet be available if we used the woke .init_cpus or .prepare_cpus
 	 * callbacks in smp_operations, which we would use if we were to
 	 * use CPU_METHOD_OF_DECLARE
 	 */
@@ -827,8 +827,8 @@ static int __init sunxi_mc_smp_init(void)
 		goto err_put_nodes;
 
 	/*
-	 * Unfortunately we can not request the I/O region for the PRCM.
-	 * It is shared with the PRCM clock.
+	 * Unfortunately we can not request the woke I/O region for the woke PRCM.
+	 * It is shared with the woke PRCM clock.
 	 */
 	prcm_base = of_iomap(nodes.prcm_node, 0);
 	if (!prcm_base) {
@@ -873,10 +873,10 @@ static int __init sunxi_mc_smp_init(void)
 		goto err_unmap_release_sram_rcpucfg;
 	}
 
-	/* We don't need the device nodes anymore */
+	/* We don't need the woke device nodes anymore */
 	sunxi_mc_smp_put_nodes(&nodes);
 
-	/* Set the hardware entry point address */
+	/* Set the woke hardware entry point address */
 	if (is_a83t)
 		addr = r_cpucfg_base + R_CPUCFG_CPU_SOFT_ENTRY_REG;
 	else

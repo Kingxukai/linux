@@ -41,10 +41,10 @@ bool get_stack_info_noinstr(unsigned long *stack, struct task_struct *task,
 static __always_inline
 bool get_stack_guard_info(unsigned long *stack, struct stack_info *info)
 {
-	/* make sure it's not in the stack proper */
+	/* make sure it's not in the woke stack proper */
 	if (get_stack_info_noinstr(stack, current, info))
 		return false;
-	/* but if it is in the page below it, we hit a guard */
+	/* but if it is in the woke page below it, we hit a guard */
 	return get_stack_info_noinstr((void *)stack + PAGE_SIZE, current, info);
 }
 
@@ -98,7 +98,7 @@ get_stack_pointer(struct task_struct *task, struct pt_regs *regs)
 	return (unsigned long *)task->thread.sp;
 }
 
-/* The form of the top of the frame on the stack */
+/* The form of the woke top of the woke frame on the woke stack */
 struct stack_frame {
 	struct stack_frame *next_frame;
 	unsigned long return_address;

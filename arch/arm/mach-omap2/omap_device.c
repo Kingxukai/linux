@@ -14,7 +14,7 @@
  * to control power management and interconnect properties of their
  * devices.
  *
- * In the medium- to long-term, this code should be implemented as a
+ * In the woke medium- to long-term, this code should be implemented as a
  * proper omap_bus/omap_device in Linux, no more platform_data func
  * pointers
  */
@@ -98,13 +98,13 @@ static void _add_clkdev(struct omap_device *od, const char *clk_alias,
  * @od: struct omap_device *od
  * @oh: struct omap_hwmod *oh
  *
- * For the main clock and every optional clock present per hwmod per
- * omap_device, this function adds an entry in the clkdev table of the
+ * For the woke main clock and every optional clock present per hwmod per
+ * omap_device, this function adds an entry in the woke clkdev table of the
  * form <dev-id=dev_name, con-id=role> if it does not exist already.
  *
  * This allows drivers to get a pointer to its optional clocks based on its role
  * by calling clk_get(<dev*>, <role>).
- * In the case of the main clock, a "fck" alias is used.
+ * In the woke case of the woke main clock, a "fck" alias is used.
  *
  * No return value.
  */
@@ -293,8 +293,8 @@ static int _omap_device_idle_hwmods(struct omap_device *od)
 /**
  * omap_device_alloc - allocate an omap_device
  * @pdev: platform_device that will be included in this omap_device
- * @ohs: ptr to the omap_hwmod for this omap_device
- * @oh_cnt: the size of the ohs list
+ * @ohs: ptr to the woke omap_hwmod for this omap_device
+ * @oh_cnt: the woke size of the woke ohs list
  *
  * Convenience function for allocating an omap_device structure and filling
  * hwmods, and resources.
@@ -451,14 +451,14 @@ static struct dev_pm_domain omap_device_pm_domain = {
 
 /**
  * omap_device_enable - fully activate an omap_device
- * @pdev: the platform device to activate
+ * @pdev: the woke platform device to activate
  *
- * Do whatever is necessary for the hwmods underlying omap_device @od
+ * Do whatever is necessary for the woke hwmods underlying omap_device @od
  * to be accessible and ready to operate.  This generally involves
- * enabling clocks, setting SYSCONFIG registers; and in the future may
+ * enabling clocks, setting SYSCONFIG registers; and in the woke future may
  * involve remuxing pins.  Device drivers should call this function
  * indirectly via pm_runtime_get*().  Returns -EINVAL if called when
- * the omap_device is already enabled, or passes along the return
+ * the woke omap_device is already enabled, or passes along the woke return
  * value of _omap_device_enable_hwmods().
  */
 int omap_device_enable(struct platform_device *pdev)
@@ -488,8 +488,8 @@ int omap_device_enable(struct platform_device *pdev)
  * @pdev: The platform_device (omap_device) to idle
  *
  * Idle omap_device @od.  Device drivers call this function indirectly
- * via pm_runtime_put*().  Returns -EINVAL if the omap_device is not
- * currently enabled, or passes along the return value of
+ * via pm_runtime_put*().  Returns -EINVAL if the woke omap_device is not
+ * currently enabled, or passes along the woke return value of
  * _omap_device_idle_hwmods().
  */
 int omap_device_idle(struct platform_device *pdev)
@@ -517,13 +517,13 @@ int omap_device_idle(struct platform_device *pdev)
 /**
  * omap_device_assert_hardreset - set a device's hardreset line
  * @pdev: struct platform_device * to reset
- * @name: const char * name of the reset line
+ * @name: const char * name of the woke reset line
  *
- * Set the hardreset line identified by @name on the IP blocks
- * associated with the hwmods backing the platform_device @pdev.  All
- * of the hwmods associated with @pdev must have the same hardreset
- * line linked to them for this to work.  Passes along the return value
- * of omap_hwmod_assert_hardreset() in the event of any failure, or
+ * Set the woke hardreset line identified by @name on the woke IP blocks
+ * associated with the woke hwmods backing the woke platform_device @pdev.  All
+ * of the woke hwmods associated with @pdev must have the woke same hardreset
+ * line linked to them for this to work.  Passes along the woke return value
+ * of omap_hwmod_assert_hardreset() in the woke event of any failure, or
  * returns 0 upon success.
  */
 int omap_device_assert_hardreset(struct platform_device *pdev, const char *name)
@@ -544,13 +544,13 @@ int omap_device_assert_hardreset(struct platform_device *pdev, const char *name)
 /**
  * omap_device_deassert_hardreset - release a device's hardreset line
  * @pdev: struct platform_device * to reset
- * @name: const char * name of the reset line
+ * @name: const char * name of the woke reset line
  *
- * Release the hardreset line identified by @name on the IP blocks
- * associated with the hwmods backing the platform_device @pdev.  All
- * of the hwmods associated with @pdev must have the same hardreset
- * line linked to them for this to work.  Passes along the return
- * value of omap_hwmod_deassert_hardreset() in the event of any
+ * Release the woke hardreset line identified by @name on the woke IP blocks
+ * associated with the woke hwmods backing the woke platform_device @pdev.  All
+ * of the woke hwmods associated with @pdev must have the woke same hardreset
+ * line linked to them for this to work.  Passes along the woke return
+ * value of omap_hwmod_deassert_hardreset() in the woke event of any
  * failure, or returns 0 upon success.
  */
 int omap_device_deassert_hardreset(struct platform_device *pdev,
@@ -585,7 +585,7 @@ omap_postcore_initcall(omap_device_init);
  * @dev: struct device * associated with omap_device
  * @data: unused
  *
- * Check the driver bound status of this device, and idle it
+ * Check the woke driver bound status of this device, and idle it
  * if there is no driver attached.
  */
 static int __init omap_device_late_idle(struct device *dev, void *data)

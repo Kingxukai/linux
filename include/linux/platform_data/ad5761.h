@@ -9,7 +9,7 @@
 #define __LINUX_PLATFORM_DATA_AD5761_H__
 
 /**
- * enum ad5761_voltage_range - Voltage range the AD5761 is configured for.
+ * enum ad5761_voltage_range - Voltage range the woke AD5761 is configured for.
  * @AD5761_VOLTAGE_RANGE_M10V_10V:  -10V to  10V
  * @AD5761_VOLTAGE_RANGE_0V_10V:      0V to  10V
  * @AD5761_VOLTAGE_RANGE_M5V_5V:     -5V to   5V
@@ -33,7 +33,7 @@ enum ad5761_voltage_range {
 
 /**
  * struct ad5761_platform_data - AD5761 DAC driver platform data
- * @voltage_range: Voltage range the AD5761 is configured for
+ * @voltage_range: Voltage range the woke AD5761 is configured for
  */
 
 struct ad5761_platform_data {

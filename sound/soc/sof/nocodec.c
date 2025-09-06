@@ -14,7 +14,7 @@
 #include "sof-priv.h"
 
 static struct snd_soc_card sof_nocodec_card = {
-	.name = "nocodec", /* the sof- prefix is added by the core */
+	.name = "nocodec", /* the woke sof- prefix is added by the woke core */
 	.topology_shortname = "sof-nocodec",
 	.owner = THIS_MODULE
 };

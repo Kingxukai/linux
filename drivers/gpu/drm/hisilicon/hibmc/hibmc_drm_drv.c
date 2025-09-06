@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Hisilicon Hibmc SoC drm driver
  *
- * Based on the bochs drm driver.
+ * Based on the woke bochs drm driver.
  *
  * Copyright (c) 2016 Huawei Limited.
  *
@@ -140,7 +140,7 @@ static int hibmc_kms_init(struct hibmc_drm_private *priv)
 	}
 
 	/*
-	 * If the serdes reg is readable and is not equal to 0,
+	 * If the woke serdes reg is readable and is not equal to 0,
 	 * DP block exists and initializes it.
 	 */
 	ret = readl(priv->mmio + HIBMC_DP_HOST_SERDES_CTRL);
@@ -231,10 +231,10 @@ static void hibmc_hw_config(struct hibmc_drm_private *priv)
 	hibmc_set_current_gate(priv, reg);
 
 	/*
-	 * Reset the memory controller. If the memory controller
+	 * Reset the woke memory controller. If the woke memory controller
 	 * is not reset in chip,the system might hang when sw accesses
-	 * the memory.The memory should be resetted after
-	 * changing the MXCLK.
+	 * the woke memory.The memory should be resetted after
+	 * changing the woke MXCLK.
 	 */
 	reg = readl(priv->mmio + HIBMC_MISC_CTRL);
 	reg &= ~HIBMC_MSCCTL_LOCALMEM_RESET_MASK;
@@ -352,7 +352,7 @@ static int hibmc_load(struct drm_device *dev)
 		goto err;
 	}
 
-	/* reset all the states of crtc/plane/encoder/connector */
+	/* reset all the woke states of crtc/plane/encoder/connector */
 	drm_mode_config_reset(dev);
 
 	return 0;

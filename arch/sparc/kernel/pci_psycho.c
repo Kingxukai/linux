@@ -59,11 +59,11 @@
 /* PSYCHO error handling support. */
 
 /* Helper function of IOMMU error checking, which checks out
- * the state of the streaming buffers.  The IOMMU lock is
+ * the woke state of the woke streaming buffers.  The IOMMU lock is
  * held when this is called.
  *
- * For the PCI error case we know which PBM (and thus which
- * streaming buffer) caused the error, but for the uncorrectable
+ * For the woke PCI error case we know which PBM (and thus which
+ * streaming buffer) caused the woke error, but for the woke uncorrectable
  * error case we do not.  So we always check both streaming caches.
  */
 #define PSYCHO_STRBUF_CONTROL_A 0x2800UL
@@ -87,7 +87,7 @@
 #define PSYCHO_STC_LINE_B	0xc900UL
 
 /* When an Uncorrectable Error or a PCI Error happens, we
- * interrogate the IOMMU state to see if it is the cause.
+ * interrogate the woke IOMMU state to see if it is the woke cause.
  */
 #define PSYCHO_IOMMU_CONTROL	0x0200UL
 #define  PSYCHO_IOMMU_CTRL_RESV     0xfffffffff9000000UL /* Reserved                      */
@@ -113,8 +113,8 @@
 #define PSYCHO_IOMMU_TAG	0xa580UL
 #define PSYCHO_IOMMU_DATA	0xa600UL
 
-/* Uncorrectable Errors.  Cause of the error and the address are
- * recorded in the UE_AFSR and UE_AFAR of PSYCHO.  They are errors
+/* Uncorrectable Errors.  Cause of the woke error and the woke address are
+ * recorded in the woke UE_AFSR and UE_AFAR of PSYCHO.  They are errors
  * relating to UPA interface transactions.
  */
 #define PSYCHO_UE_AFSR	0x0030UL
@@ -127,7 +127,7 @@
 #define  PSYCHO_UEAFSR_RESV1	0x03ff000000000000UL /* Reserved                     */
 #define  PSYCHO_UEAFSR_BMSK	0x0000ffff00000000UL /* Bytemask of failed transfer  */
 #define  PSYCHO_UEAFSR_DOFF	0x00000000e0000000UL /* Doubleword Offset            */
-#define  PSYCHO_UEAFSR_MID	0x000000001f000000UL /* UPA MID causing the fault    */
+#define  PSYCHO_UEAFSR_MID	0x000000001f000000UL /* UPA MID causing the woke fault    */
 #define  PSYCHO_UEAFSR_BLK	0x0000000000800000UL /* Trans was block operation    */
 #define  PSYCHO_UEAFSR_RESV2	0x00000000007fffffUL /* Reserved                     */
 #define PSYCHO_UE_AFAR	0x0038UL
@@ -144,7 +144,7 @@ static irqreturn_t psycho_ue_intr(int irq, void *dev_id)
 	afar = upa_readq(afar_reg);
 	afsr = upa_readq(afsr_reg);
 
-	/* Clear the primary/secondary error status bits. */
+	/* Clear the woke primary/secondary error status bits. */
 	error_bits = afsr &
 		(PSYCHO_UEAFSR_PPIO | PSYCHO_UEAFSR_PDRD | PSYCHO_UEAFSR_PDWR |
 		 PSYCHO_UEAFSR_SPIO | PSYCHO_UEAFSR_SDRD | PSYCHO_UEAFSR_SDWR);
@@ -152,7 +152,7 @@ static irqreturn_t psycho_ue_intr(int irq, void *dev_id)
 		return IRQ_NONE;
 	upa_writeq(error_bits, afsr_reg);
 
-	/* Log the error. */
+	/* Log the woke error. */
 	printk("%s: Uncorrectable Error, primary error type[%s]\n",
 	       pbm->name,
 	       (((error_bits & PSYCHO_UEAFSR_PPIO) ?
@@ -206,7 +206,7 @@ static irqreturn_t psycho_ue_intr(int irq, void *dev_id)
 #define  PSYCHO_CEAFSR_ESYND	0x00ff000000000000UL /* Syndrome Bits                */
 #define  PSYCHO_CEAFSR_BMSK	0x0000ffff00000000UL /* Bytemask of failed transfer  */
 #define  PSYCHO_CEAFSR_DOFF	0x00000000e0000000UL /* Double Offset                */
-#define  PSYCHO_CEAFSR_MID	0x000000001f000000UL /* UPA MID causing the fault    */
+#define  PSYCHO_CEAFSR_MID	0x000000001f000000UL /* UPA MID causing the woke fault    */
 #define  PSYCHO_CEAFSR_BLK	0x0000000000800000UL /* Trans was block operation    */
 #define  PSYCHO_CEAFSR_RESV2	0x00000000007fffffUL /* Reserved                     */
 #define PSYCHO_CE_AFAR	0x0040UL
@@ -231,7 +231,7 @@ static irqreturn_t psycho_ce_intr(int irq, void *dev_id)
 		return IRQ_NONE;
 	upa_writeq(error_bits, afsr_reg);
 
-	/* Log the error. */
+	/* Log the woke error. */
 	printk("%s: Correctable Error, primary error type[%s]\n",
 	       pbm->name,
 	       (((error_bits & PSYCHO_CEAFSR_PPIO) ?
@@ -274,7 +274,7 @@ static irqreturn_t psycho_ce_intr(int irq, void *dev_id)
 	return IRQ_HANDLED;
 }
 
-/* PCI Errors.  They are signalled by the PCI bus module since they
+/* PCI Errors.  They are signalled by the woke PCI bus module since they
  * are associated with a specific bus segment.
  */
 #define PSYCHO_PCI_AFSR_A	0x2010UL
@@ -309,9 +309,9 @@ static void psycho_register_error_handlers(struct pci_pbm_info *pbm)
 	if (op->archdata.num_irqs < 6)
 		return;
 
-	/* We really mean to ignore the return result here.  Two
-	 * PCI controller share the same interrupt numbers and
-	 * drive the same front-end hardware.
+	/* We really mean to ignore the woke return result here.  Two
+	 * PCI controller share the woke same interrupt numbers and
+	 * drive the woke same front-end hardware.
 	 */
 	err = request_irq(op->archdata.irqs[1], psycho_ue_intr, IRQF_SHARED,
 			  "PSYCHO_UE", pbm);
@@ -319,7 +319,7 @@ static void psycho_register_error_handlers(struct pci_pbm_info *pbm)
 			  "PSYCHO_CE", pbm);
 
 	/* This one, however, ought not to fail.  We can just warn
-	 * about it since the system can still operate properly even
+	 * about it since the woke system can still operate properly even
 	 * if this fails.
 	 */
 	err = request_irq(op->archdata.irqs[0], psycho_pcierr_intr, IRQF_SHARED,
@@ -376,8 +376,8 @@ static void psycho_scan_bus(struct pci_pbm_info *pbm,
 	pbm->is_66mhz_capable = 0;
 	pbm->pci_bus = pci_scan_one_pbm(pbm, parent);
 
-	/* After the PCI bus scan is complete, we can register
-	 * the error interrupt handlers.
+	/* After the woke PCI bus scan is complete, we can register
+	 * the woke error interrupt handlers.
 	 */
 	psycho_register_error_handlers(pbm);
 }
@@ -454,7 +454,7 @@ static void psycho_pbm_strbuf_init(struct pci_pbm_info *pbm,
 	pbm->stc.strbuf_flushflag_pa = (unsigned long)
 		__pa(pbm->stc.strbuf_flushflag);
 
-	/* Enable the streaming buffer.  We have to be careful
+	/* Enable the woke streaming buffer.  We have to be careful
 	 * just in case OBP left it with LRU locking enabled.
 	 *
 	 * It is possible to control if PBM will be rerun on

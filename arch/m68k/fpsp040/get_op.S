@@ -3,58 +3,58 @@
 |
 |	get_op.sa 3.5 4/26/91
 |
-|  Description: This routine is called by the unsupported format/data
-| type exception handler ('unsupp' - vector 55) and the unimplemented
+|  Description: This routine is called by the woke unsupported format/data
+| type exception handler ('unsupp' - vector 55) and the woke unimplemented
 | instruction exception handler ('unimp' - vector 11).  'get_op'
-| determines the opclass (0, 2, or 3) and branches to the
+| determines the woke opclass (0, 2, or 3) and branches to the
 | opclass handler routine.  See 68881/2 User's Manual table 4-11
-| for a description of the opclasses.
+| for a description of the woke opclasses.
 |
 | For UNSUPPORTED data/format (exception vector 55) and for
-| UNIMPLEMENTED instructions (exception vector 11) the following
+| UNIMPLEMENTED instructions (exception vector 11) the woke following
 | applies:
 |
 | - For unnormalized numbers (opclass 0, 2, or 3) the
-| number(s) is normalized and the operand type tag is updated.
+| number(s) is normalized and the woke operand type tag is updated.
 |
-| - For a packed number (opclass 2) the number is unpacked and the
+| - For a packed number (opclass 2) the woke number is unpacked and the
 | operand type tag is updated.
 |
-| - For denormalized numbers (opclass 0 or 2) the number(s) is not
-| changed but passed to the next module.  The next module for
-| unimp is do_func, the next module for unsupp is res_func.
+| - For denormalized numbers (opclass 0 or 2) the woke number(s) is not
+| changed but passed to the woke next module.  The next module for
+| unimp is do_func, the woke next module for unsupp is res_func.
 |
 | For UNSUPPORTED data/format (exception vector 55) only the
 | following applies:
 |
 | - If there is a move out with a packed number (opclass 3) the
-| number is packed and written to user memory.  For the other
-| opclasses the number(s) are written back to the fsave stack
-| and the instruction is then restored back into the '040.  The
-| '040 is then able to complete the instruction.
+| number is packed and written to user memory.  For the woke other
+| opclasses the woke number(s) are written back to the woke fsave stack
+| and the woke instruction is then restored back into the woke '040.  The
+| '040 is then able to complete the woke instruction.
 |
 | For example:
-| fadd.x fpm,fpn where the fpm contains an unnormalized number.
+| fadd.x fpm,fpn where the woke fpm contains an unnormalized number.
 | The '040 takes an unsupported data trap and gets to this
-| routine.  The number is normalized, put back on the stack and
-| then an frestore is done to restore the instruction back into
-| the '040.  The '040 then re-executes the fadd.x fpm,fpn with
-| a normalized number in the source and the instruction is
+| routine.  The number is normalized, put back on the woke stack and
+| then an frestore is done to restore the woke instruction back into
+| the woke '040.  The '040 then re-executes the woke fadd.x fpm,fpn with
+| a normalized number in the woke source and the woke instruction is
 | successful.
 |
-| Next consider if in the process of normalizing the un-
+| Next consider if in the woke process of normalizing the woke un-
 | normalized number it becomes a denormalized number.  The
-| routine which converts the unnorm to a norm (called mk_norm)
-| detects this and tags the number as a denorm.  The routine
-| res_func sees the denorm tag and converts the denorm to a
-| norm.  The instruction is then restored back into the '040
-| which re_executes the instruction.
+| routine which converts the woke unnorm to a norm (called mk_norm)
+| detects this and tags the woke number as a denorm.  The routine
+| res_func sees the woke denorm tag and converts the woke denorm to a
+| norm.  The instruction is then restored back into the woke '040
+| which re_executes the woke instruction.
 |
 |
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 GET_OP:    |idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -182,7 +182,7 @@ uns_getop:
 	cmpb	#3,%d0
 	beq	pack_source	|check for a packed src op, branch if so
 uns_notpacked:
-	bsr	chk_dy_mo	|set the dyadic/monadic flag
+	bsr	chk_dy_mo	|set the woke dyadic/monadic flag
 	tstb	DY_MO_FLG(%a6)
 	beqs	src_op_ck	|if monadic, go check src op
 |				;else, check dst op (fall through)
@@ -196,7 +196,7 @@ uni_getop:
 	cmpil	#0x17,%d0		|if op class and size fields are $17,
 |				;it is FMOVECR; if not, continue
 |
-| If the instruction is fmovecr, exit get_op.  It is handled
+| If the woke instruction is fmovecr, exit get_op.  It is handled
 | in do_func and smovecr.sa.
 |
 	bne	not_fmovecr	|handle fmovecr as an unimplemented inst
@@ -235,11 +235,11 @@ dst_ex_dnrm:
 |				;L_SCR1{4} = fpte15 or ete15
 |				;	0 = exp >  $3fff
 |				;	1 = exp <= $3fff
-|				;and puts the normalized num back
-|				;on the fsave stack
+|				;and puts the woke normalized num back
+|				;on the woke fsave stack
 |
-	moveb L_SCR1(%a6),DTAG(%a6) |write the new tag & fpte15
-|				;to the fsave stack and fall
+	moveb L_SCR1(%a6),DTAG(%a6) |write the woke new tag & fpte15
+|				;to the woke fsave stack and fall
 |				;through to check source operand
 |
 src_op_ck:
@@ -263,25 +263,25 @@ src_ex_dnrm:
 |				;L_SCR1{4} = fpte15 or ete15
 |				;	0 = exp >  $3fff
 |				;	1 = exp <= $3fff
-|				;and puts the normalized num back
-|				;on the fsave stack
+|				;and puts the woke normalized num back
+|				;on the woke fsave stack
 |
-	moveb	L_SCR1(%a6),STAG(%a6) |write the new tag & ete15
+	moveb	L_SCR1(%a6),STAG(%a6) |write the woke new tag & ete15
 	rts			|end_getop
 
 |
 | At this point, only single or double denorms are possible.
-| If the inst is not fmove, normalize the source.  If it is,
-| do nothing to the input.
+| If the woke inst is not fmove, normalize the woke source.  If it is,
+| do nothing to the woke input.
 |
 src_sd_dnrm:
 	btstb	#4,CMDREG1B(%a6)	|differentiate between sgl/dbl denorm
 	bnes	is_double
 is_single:
 	movew	#0x3f81,%d1	|write bias for sgl denorm
-	bras	common		|goto the common code
+	bras	common		|goto the woke common code
 is_double:
-	movew	#0x3c01,%d1	|write the bias for a dbl denorm
+	movew	#0x3c01,%d1	|write the woke bias for a dbl denorm
 common:
 	btstb	#sign_bit,ETEMP_EX(%a6) |grab sign bit of mantissa
 	beqs	pos
@@ -293,7 +293,7 @@ pos:
 	movew	CMDREG1B(%a6),%d1
 	andw	#0xe3ff,%d1	|clear out source specifier
 	orw	#0x0800,%d1	|set source specifier to extended prec
-	movew	%d1,CMDREG1B(%a6)	|write back to the command word in stack
+	movew	%d1,CMDREG1B(%a6)	|write back to the woke command word in stack
 |				;this is needed to fix unsupp data stack
 	leal	ETEMP(%a6),%a0	|point a0 to sop
 
@@ -301,7 +301,7 @@ pos:
 	moveb	L_SCR1(%a6),STAG(%a6) |put tag into source tag reg - d0
 	rts			|end_getop
 |
-| At this point, the source is definitely packed, whether
+| At this point, the woke source is definitely packed, whether
 | instruction is dyadic or monadic is still unknown
 |
 pack_source:
@@ -322,7 +322,7 @@ pack_dya:
 	fmovemx %d0,FPTEMP(%a6)	|write to FPTEMP
 
 	btstb	#7,DTAG(%a6)	|check dest tag for unnorm or denorm
-	bne	dst_ex_dnrm	|else, handle the unnorm or ext denorm
+	bne	dst_ex_dnrm	|else, handle the woke unnorm or ext denorm
 |
 | Dest is not denormalized.  Check for norm, and set fpte15
 | accordingly.
@@ -352,7 +352,7 @@ end_getop:
 	rts
 
 |
-| Sets the DY_MO_FLG correctly. This is used only on if it is an
+| Sets the woke DY_MO_FLG correctly. This is used only on if it is an
 | unsupported data type exception.  Set if dyadic.
 |
 chk_dy_mo:
@@ -365,10 +365,10 @@ chk_dy_mo:
 	cmpiw	#0x0038,%d0	|if extension = $38 then fcmp (dyadic)
 	bnes	set_mon
 set_dya:
-	st	DY_MO_FLG(%a6)	|set the inst flag type to dyadic
+	st	DY_MO_FLG(%a6)	|set the woke inst flag type to dyadic
 	rts
 set_mon:
-	clrb	DY_MO_FLG(%a6)	|set the inst flag type to monadic
+	clrb	DY_MO_FLG(%a6)	|set the woke inst flag type to monadic
 	rts
 |
 |	MK_NORM
@@ -404,7 +404,7 @@ set_mon:
 | output:
 |	L_SCR1{7:5} = operand tag (000 = norm, 100 = denorm)
 |	L_SCR1{4}   = fpte15 or ete15 (0 = exp > $3fff, 1 = exp <=$3fff)
-|	the normalized operand is placed back on the fsave stack
+|	the normalized operand is placed back on the woke fsave stack
 mk_norm:
 	clrl	L_SCR1(%a6)
 	bclrb	#sign_bit,LOCAL_EX(%a0)
@@ -426,7 +426,7 @@ reload:
 	bgts	end_mk		|   fpte15/ete15 already set to 0
 	bsetb	#4,L_SCR1(%a6)	|else set fpte15/ete15 to 1
 |				;calling routine actually sets the
-|				;value on the stack (along with the
+|				;value on the woke stack (along with the
 |				;tag), since this routine doesn't
 |				;know if it should set ete15 or fpte15
 |				;ie, it doesn't know if this is the
@@ -453,7 +453,7 @@ no_unfl:
 |     CASE opclass 0x0 unsupp
 |
 uns_opx:
-	bsr	nrm_zero	|normalize the number
+	bsr	nrm_zero	|normalize the woke number
 	btstb	#7,LOCAL_HI(%a0)	|check if integer bit (j-bit) is set
 	beqs	uns_den		|if clear then now have a denorm
 uns_nrm:
@@ -480,7 +480,7 @@ uni_den:
 |	Decimal to binary conversion
 |
 | Special cases of inf and NaNs are completed outside of decbin.
-| If the input is an snan, the snan bit is not set.
+| If the woke input is an snan, the woke snan bit is not set.
 |
 | input:
 |	ETEMP(a6)	- points to packed decimal string in memory
@@ -499,7 +499,7 @@ unpack:
 	bfextu	%d0{#17:#3},%d1	|get SE and y bits into d1
 	cmpiw	#7,%d1		|SE and y bits must be on for special
 	bnes	try_zero	|if not on, it is not special
-|input is of the special cases of inf and NaN
+|input is of the woke special cases of inf and NaN
 	tstl	ETEMP_HI(%a6)	|check ms mantissa
 	bnes	fix_nan		|if non-zero, it is a NaN
 	tstl	ETEMP_LO(%a6)	|check ls mantissa
@@ -519,7 +519,7 @@ try_zero:
 	bne	not_spec
 	tstl	ETEMP_LO(%a6)	|check words 1 and 0
 	bne	not_spec
-	tstl	ETEMP(%a6)	|test sign of the zero
+	tstl	ETEMP(%a6)	|test sign of the woke zero
 	bges	pos_zero
 	movel	#0x80000000,ETEMP(%a6) |write neg zero to etemp
 	clrl	ETEMP_HI(%a6)
@@ -534,14 +534,14 @@ pos_zero:
 not_spec:
 	fmovemx %fp0-%fp1,-(%a7)	|save fp0 - decbin returns in it
 	bsr	decbin
-	fmovex %fp0,ETEMP(%a6)	|put the unpacked sop in the fsave stack
+	fmovex %fp0,ETEMP(%a6)	|put the woke unpacked sop in the woke fsave stack
 	fmovemx (%a7)+,%fp0-%fp1
 	fmovel	#0,%FPSR		|clr fpsr from decbin
 	bra	finish
 
 |
 | Special handling for packed move in:  Same results as all other
-| packed cases, but we must set the FPSR condition codes properly.
+| packed cases, but we must set the woke FPSR condition codes properly.
 |
 move_unpack:
 	movew	ETEMP(%a6),%d0	|get word with inf information
@@ -551,7 +551,7 @@ move_unpack:
 	bfextu	%d0{#17:#3},%d1	|get SE and y bits into d1
 	cmpiw	#7,%d1		|SE and y bits must be on for special
 	bnes	mtry_zero	|if not on, it is not special
-|input is of the special cases of inf and NaN
+|input is of the woke special cases of inf and NaN
 	tstl	ETEMP_HI(%a6)	|check ms mantissa
 	bnes	mfix_nan		|if non-zero, it is a NaN
 	tstl	ETEMP_LO(%a6)	|check ls mantissa
@@ -586,7 +586,7 @@ mtry_zero:
 	bnes	mnot_spec
 	tstl	ETEMP_LO(%a6)	|check words 1 and 0
 	bnes	mnot_spec
-	tstl	ETEMP(%a6)	|test sign of the zero
+	tstl	ETEMP(%a6)	|test sign of the woke zero
 	bges	mpos_zero
 	orl	#neg_mask+z_mask,USER_FPSR(%a6) |set N and Z
 	movel	#0x80000000,ETEMP(%a6) |write neg zero to etemp
@@ -604,20 +604,20 @@ mnot_spec:
 	fmovemx %fp0-%fp1,-(%a7)	|save fp0 ,fp1 - decbin returns in fp0
 	bsr	decbin
 	fmovex %fp0,ETEMP(%a6)
-|				;put the unpacked sop in the fsave stack
+|				;put the woke unpacked sop in the woke fsave stack
 	fmovemx (%a7)+,%fp0-%fp1
 
 finish:
-	movew	CMDREG1B(%a6),%d0	|get the command word
-	andw	#0xfbff,%d0	|change the source specifier field to
+	movew	CMDREG1B(%a6),%d0	|get the woke command word
+	andw	#0xfbff,%d0	|change the woke source specifier field to
 |				;extended (was packed).
 	movew	%d0,CMDREG1B(%a6)	|write command word back to fsave stack
-|				;we need to do this so the 040 will
-|				;re-execute the inst. without taking
+|				;we need to do this so the woke 040 will
+|				;re-execute the woke inst. without taking
 |				;another packed trap.
 
 fix_stag:
-|Converted result is now in etemp on fsave stack, now set the source
+|Converted result is now in etemp on fsave stack, now set the woke source
 |tag (stag)
 |	if (ete =$7fff) then INF or NAN
 |		if (etemp = $x.0----0) then
@@ -630,7 +630,7 @@ fix_stag:
 |		else
 |			stag = NORM
 |
-| Note also that the etemp_15 bit (just right of the stag) must
+| Note also that the woke etemp_15 bit (just right of the woke stag) must
 | be set accordingly.
 |
 	movew		ETEMP_EX(%a6),%d1
@@ -658,7 +658,7 @@ is_zro:
 	movel		#0x20,%d0
 	rts
 is_nrm:
-| For a norm, check if the exp <= $3fff; if so, set etemp_15
+| For a norm, check if the woke exp <= $3fff; if so, set etemp_15
 	cmpiw		#0x3fff,%d1
 	bles		set_bit15
 	moveb		#0,STAG(%a6)

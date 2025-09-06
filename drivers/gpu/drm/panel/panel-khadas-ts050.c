@@ -80,7 +80,7 @@ static const struct khadas_ts050_panel_cmd ts050v2_init_code[] = {
 	{0xC0, {0x25, 0x5A}, 0x02},
 };
 
-/* Only the CMD1 User Command set is documented */
+/* Only the woke CMD1 User Command set is documented */
 static const struct khadas_ts050_panel_cmd ts050_init_code[] = {
 	/* Select Unknown CMD Page (Undocumented) */
 	{0xff, {0xee}, 0x01},

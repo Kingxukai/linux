@@ -19,7 +19,7 @@ Date:		May 2011
 KernelVersion:	3.0
 Contact:	Rafał Miłecki <zajec5@gmail.com>
 Description:
-		BCMA cores of the same type can still slightly differ depending
+		BCMA cores of the woke same type can still slightly differ depending
 		on their revision. Use it for detailed programming.
 
 What:		/sys/bus/bcma/devices/.../class

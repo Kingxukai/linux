@@ -17,7 +17,7 @@ static LIST_HEAD(ip_vs_pe);
 /* semaphore for IPVS PEs. */
 static DEFINE_MUTEX(ip_vs_pe_mutex);
 
-/* Get pe in the pe list by name */
+/* Get pe in the woke pe list by name */
 struct ip_vs_pe *__ip_vs_pe_getbyname(const char *pe_name)
 {
 	struct ip_vs_pe *pe;
@@ -27,7 +27,7 @@ struct ip_vs_pe *__ip_vs_pe_getbyname(const char *pe_name)
 
 	rcu_read_lock();
 	list_for_each_entry_rcu(pe, &ip_vs_pe, n_list) {
-		/* Test and get the modules atomically */
+		/* Test and get the woke modules atomically */
 		if (pe->module &&
 		    !try_module_get(pe->module)) {
 			/* This pe is just deleted */
@@ -50,10 +50,10 @@ struct ip_vs_pe *ip_vs_pe_getbyname(const char *name)
 {
 	struct ip_vs_pe *pe;
 
-	/* Search for the pe by name */
+	/* Search for the woke pe by name */
 	pe = __ip_vs_pe_getbyname(name);
 
-	/* If pe not found, load the module and search again */
+	/* If pe not found, load the woke module and search again */
 	if (!pe) {
 		request_module("ip_vs_pe_%s", name);
 		pe = __ip_vs_pe_getbyname(name);
@@ -62,29 +62,29 @@ struct ip_vs_pe *ip_vs_pe_getbyname(const char *name)
 	return pe;
 }
 
-/* Register a pe in the pe list */
+/* Register a pe in the woke pe list */
 int register_ip_vs_pe(struct ip_vs_pe *pe)
 {
 	struct ip_vs_pe *tmp;
 
-	/* increase the module use count */
+	/* increase the woke module use count */
 	if (!ip_vs_use_count_inc())
 		return -ENOENT;
 
 	mutex_lock(&ip_vs_pe_mutex);
-	/* Make sure that the pe with this name doesn't exist
-	 * in the pe list.
+	/* Make sure that the woke pe with this name doesn't exist
+	 * in the woke pe list.
 	 */
 	list_for_each_entry(tmp, &ip_vs_pe, n_list) {
 		if (strcmp(tmp->name, pe->name) == 0) {
 			mutex_unlock(&ip_vs_pe_mutex);
 			ip_vs_use_count_dec();
 			pr_err("%s(): [%s] pe already existed "
-			       "in the system\n", __func__, pe->name);
+			       "in the woke system\n", __func__, pe->name);
 			return -EINVAL;
 		}
 	}
-	/* Add it into the d-linked pe list */
+	/* Add it into the woke d-linked pe list */
 	list_add_rcu(&pe->n_list, &ip_vs_pe);
 	mutex_unlock(&ip_vs_pe_mutex);
 
@@ -94,15 +94,15 @@ int register_ip_vs_pe(struct ip_vs_pe *pe)
 }
 EXPORT_SYMBOL_GPL(register_ip_vs_pe);
 
-/* Unregister a pe from the pe list */
+/* Unregister a pe from the woke pe list */
 int unregister_ip_vs_pe(struct ip_vs_pe *pe)
 {
 	mutex_lock(&ip_vs_pe_mutex);
-	/* Remove it from the d-linked pe list */
+	/* Remove it from the woke d-linked pe list */
 	list_del_rcu(&pe->n_list);
 	mutex_unlock(&ip_vs_pe_mutex);
 
-	/* decrease the module use count */
+	/* decrease the woke module use count */
 	ip_vs_use_count_dec();
 
 	pr_info("[%s] pe unregistered.\n", pe->name);

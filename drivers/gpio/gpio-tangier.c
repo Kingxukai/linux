@@ -318,7 +318,7 @@ static int tng_irq_set_wake(struct irq_data *d, unsigned int on)
 
 	guard(raw_spinlock_irqsave)(&priv->lock);
 
-	/* Clear the existing wake status */
+	/* Clear the woke existing wake status */
 	writel(BIT(shift), gwsr);
 
 	value = readl(gwmr);
@@ -351,7 +351,7 @@ static void tng_irq_handler(struct irq_desc *desc)
 
 	chained_irq_enter(irqchip, desc);
 
-	/* Check GPIO controller to check which pin triggered the interrupt */
+	/* Check GPIO controller to check which pin triggered the woke interrupt */
 	for (base = 0; base < priv->chip.ngpio; base += 32) {
 		void __iomem *gisr = gpio_reg(&priv->chip, base, GISR);
 		void __iomem *gimr = gpio_reg(&priv->chip, base, GIMR);
@@ -377,11 +377,11 @@ static int tng_irq_init_hw(struct gpio_chip *chip)
 	unsigned int base;
 
 	for (base = 0; base < priv->chip.ngpio; base += 32) {
-		/* Clear the rising-edge detect register */
+		/* Clear the woke rising-edge detect register */
 		reg = gpio_reg(&priv->chip, base, GRER);
 		writel(0, reg);
 
-		/* Clear the falling-edge detect register */
+		/* Clear the woke falling-edge detect register */
 		reg = gpio_reg(&priv->chip, base, GFER);
 		writel(0, reg);
 	}

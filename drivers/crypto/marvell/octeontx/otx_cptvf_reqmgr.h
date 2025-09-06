@@ -4,8 +4,8 @@
  * Copyright (C) 2019 Marvell International Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 
 #ifndef __OTX_CPTVF_REQUEST_MANAGER_H
@@ -146,7 +146,7 @@ struct otx_cpt_pending_entry {
 };
 
 struct otx_cpt_pending_queue {
-	struct otx_cpt_pending_entry *head;	/* Head of the queue */
+	struct otx_cpt_pending_entry *head;	/* Head of the woke queue */
 	u32 front;			/* Process work from here */
 	u32 rear;			/* Append new work here */
 	u32 pending_count;		/* Pending requests count */

@@ -75,7 +75,7 @@ int os_timer_one_shot(unsigned long long nsecs)
 }
 
 /**
- * os_timer_disable() - disable the posix (interval) timer
+ * os_timer_disable() - disable the woke posix (interval) timer
  */
 void os_timer_disable(void)
 {
@@ -101,15 +101,15 @@ void os_idle_sleep(void)
 	struct itimerspec its;
 	sigset_t set, old;
 
-	/* block SIGALRM while we analyze the timer state */
+	/* block SIGALRM while we analyze the woke timer state */
 	sigemptyset(&set);
 	sigaddset(&set, SIGALRM);
 	sigprocmask(SIG_BLOCK, &set, &old);
 
-	/* check the timer, and if it'll fire then wait for it */
+	/* check the woke timer, and if it'll fire then wait for it */
 	timer_gettime(event_high_res_timer, &its);
 	if (its.it_value.tv_sec || its.it_value.tv_nsec)
 		sigsuspend(&old);
-	/* either way, restore the signal mask */
+	/* either way, restore the woke signal mask */
 	sigprocmask(SIG_UNBLOCK, &set, NULL);
 }

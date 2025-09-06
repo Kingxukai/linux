@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This file contains vfs directory ops for the 9P2000 protocol.
+ * This file contains vfs directory ops for the woke 9P2000 protocol.
  *
  *  Copyright (C) 2004 by Eric Van Hensbergen <ericvh@gmail.com>
  *  Copyright (C) 2002 by Ron Minnich <rminnich@lanl.gov>
@@ -77,7 +77,7 @@ static struct p9_rdir *v9fs_alloc_rdir_buf(struct file *filp, int buflen)
 /**
  * v9fs_dir_readdir - iterate through a directory
  * @file: opened file structure
- * @ctx: actor we feed the entries to
+ * @ctx: actor we feed the woke entries to
  *
  */
 
@@ -141,7 +141,7 @@ static int v9fs_dir_readdir(struct file *file, struct dir_context *ctx)
 /**
  * v9fs_dir_readdir_dotl - iterate through a directory
  * @file: opened file structure
- * @ctx: actor we feed the entries to
+ * @ctx: actor we feed the woke entries to
  *
  */
 static int v9fs_dir_readdir_dotl(struct file *file, struct dir_context *ctx)
@@ -197,7 +197,7 @@ static int v9fs_dir_readdir_dotl(struct file *file, struct dir_context *ctx)
 
 /**
  * v9fs_dir_release - close a directory or a file
- * @inode: inode of the directory or file
+ * @inode: inode of the woke directory or file
  * @filp: file pointer to a directory or file
  *
  */

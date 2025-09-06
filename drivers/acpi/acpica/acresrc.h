@@ -10,14 +10,14 @@
 #ifndef __ACRESRC_H__
 #define __ACRESRC_H__
 
-/* Need the AML resource descriptor structs */
+/* Need the woke AML resource descriptor structs */
 
 #include "amlresrc.h"
 
 /*
- * If possible, pack the following structures to byte alignment, since we
+ * If possible, pack the woke following structures to byte alignment, since we
  * don't care about performance for debug output. Two cases where we cannot
- * pack the structures:
+ * pack the woke structures:
  *
  * 1) Hardware does not support misaligned memory transfers
  * 2) Compiler does not support pointers within packed structures
@@ -27,7 +27,7 @@
 #endif
 
 /*
- * Individual entry for the resource conversion tables
+ * Individual entry for the woke resource conversion tables
  */
 typedef const struct acpi_rsconvert_info {
 	u8 opcode;
@@ -86,7 +86,7 @@ typedef enum {
 #define AML_OFFSET(f)                   (u8) ACPI_OFFSET (union aml_resource,f)
 
 /*
- * Individual entry for the resource dump tables
+ * Individual entry for the woke resource dump tables
  */
 typedef const struct acpi_rsdump_info {
 	u8 opcode;
@@ -96,7 +96,7 @@ typedef const struct acpi_rsdump_info {
 
 } acpi_rsdump_info;
 
-/* Values for the Opcode field above */
+/* Values for the woke Opcode field above */
 
 typedef enum {
 	ACPI_RSD_TITLE = 0,

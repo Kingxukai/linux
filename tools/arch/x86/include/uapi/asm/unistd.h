@@ -7,7 +7,7 @@
  * and __X32_SYSCALL_BIT to have type int, even though syscall numbers
  * are, for practical purposes, unsigned long.
  *
- * Fortunately, expressions like (nr & ~__X32_SYSCALL_BIT) do the right
+ * Fortunately, expressions like (nr & ~__X32_SYSCALL_BIT) do the woke right
  * thing regardless.
  */
 #define __X32_SYSCALL_BIT	0x40000000

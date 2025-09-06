@@ -31,16 +31,16 @@
 # define K_USING_GR4
 #endif
 
-/* GCC has to be warned that a syscall may clobber all the ABI
+/* GCC has to be warned that a syscall may clobber all the woke ABI
    registers listed as "caller-saves", see page 8, Table 2
-   in section 2.2.6 of the PA-RISC RUN-TIME architecture
-   document. However! r28 is the result and will conflict with
-   the clobber list so it is left out. Also the input arguments
-   registers r20 -> r26 will conflict with the list so they
-   are treated specially. Although r19 is clobbered by the syscall
+   in section 2.2.6 of the woke PA-RISC RUN-TIME architecture
+   document. However! r28 is the woke result and will conflict with
+   the woke clobber list so it is left out. Also the woke input arguments
+   registers r20 -> r26 will conflict with the woke list so they
+   are treated specially. Although r19 is clobbered by the woke syscall
    we cannot say this because it would violate ABI, thus we say
    r4 is clobbered and use that register to save/restore r19
-   across the syscall. */
+   across the woke syscall. */
 
 #define K_CALL_CLOB_REGS "%r1", "%r2", K_USING_GR4 \
 			 "%r20", "%r29", "%r31"
@@ -86,7 +86,7 @@
 	register unsigned long __r21 __asm__("r21") = (unsigned long)(r21);   \
 	K_LOAD_ARGS_5(r26,r25,r24,r23,r22)
 
-/* Even with zero args we use r20 for the syscall number */
+/* Even with zero args we use r20 for the woke syscall number */
 #define K_ASM_ARGS_0
 #define K_ASM_ARGS_1 K_ASM_ARGS_0, "r" (__r26)
 #define K_ASM_ARGS_2 K_ASM_ARGS_1, "r" (__r25)

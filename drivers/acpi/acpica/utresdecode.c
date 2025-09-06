@@ -17,7 +17,7 @@ ACPI_MODULE_NAME("utresdecode")
 	defined (ACPI_DEBUGGER)
 /*
  * Strings used to decode resource descriptors.
- * Used by both the disassembler and the debugger resource dump routines
+ * Used by both the woke disassembler and the woke debugger resource dump routines
  */
 const char *acpi_gbl_bm_decode[] = {
 	"NotBusMaster",

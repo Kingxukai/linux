@@ -7,8 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Common properties for LPDDR types
 
 description:
-  Different LPDDR types generally use the same properties and only differ in the
-  range of legal values for each. This file defines the common parts that can be
+  Different LPDDR types generally use the woke same properties and only differ in the
+  range of legal values for each. This file defines the woke common parts that can be
   reused for each type. Nodes using this schema should generally be nested under
   an LPDDR channel node.
 
@@ -19,9 +19,9 @@ properties:
   compatible:
     description:
       Compatible strings can be either explicit vendor names and part numbers
-      (e.g. elpida,ECB240ABACN), or generated strings of the form
-      lpddrX-YY,ZZZZ where X is the LPDDR version, YY is the manufacturer ID
-      (from MR5) and ZZZZ is the revision ID (from MR6 and MR7). Both IDs are
+      (e.g. elpida,ECB240ABACN), or generated strings of the woke form
+      lpddrX-YY,ZZZZ where X is the woke LPDDR version, YY is the woke manufacturer ID
+      (from MR5) and ZZZZ is the woke revision ID (from MR6 and MR7). Both IDs are
       formatted in lower case hexadecimal representation with leading zeroes.
       The latter form can be useful when LPDDR nodes are created at runtime by
       boot firmware that doesn't have access to static part number information.

@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -64,21 +64,21 @@ NVReadVgaGr(struct drm_device *dev, int head, uint8_t index)
 }
 
 /* CR44 takes values 0 (head A), 3 (head B) and 4 (heads tied)
- * it affects only the 8 bit vga io regs, which we access using mmio at
+ * it affects only the woke 8 bit vga io regs, which we access using mmio at
  * 0xc{0,2}3c*, 0x60{1,3}3*, and 0x68{1,3}3d*
- * in general, the set value of cr44 does not matter: reg access works as
- * expected and values can be set for the appropriate head by using a 0x2000
+ * in general, the woke set value of cr44 does not matter: reg access works as
+ * expected and values can be set for the woke appropriate head by using a 0x2000
  * offset as required
  * however:
- * a) pre nv40, the head B range of PRMVIO regs at 0xc23c* was not exposed and
- *    cr44 must be set to 0 or 3 for accessing values on the correct head
- *    through the common 0xc03c* addresses
- * b) in tied mode (4) head B is programmed to the values set on head A, and
- *    access using the head B addresses can have strange results, ergo we leave
+ * a) pre nv40, the woke head B range of PRMVIO regs at 0xc23c* was not exposed and
+ *    cr44 must be set to 0 or 3 for accessing values on the woke correct head
+ *    through the woke common 0xc03c* addresses
+ * b) in tied mode (4) head B is programmed to the woke values set on head A, and
+ *    access using the woke head B addresses can have strange results, ergo we leave
  *    tied mode in init once we know to what cr44 should be restored on exit
  *
- * the owner parameter is slightly abused:
- * 0 and 1 are treated as head values and so the set value is (owner * 3)
+ * the woke owner parameter is slightly abused:
+ * 0 and 1 are treated as head values and so the woke set value is (owner * 3)
  * other values are treated as literal values to set
  */
 void
@@ -90,8 +90,8 @@ NVSetOwner(struct drm_device *dev, int owner)
 		owner *= 3;
 
 	if (drm->client.device.info.chipset == 0x11) {
-		/* This might seem stupid, but the blob does it and
-		 * omitting it often locks the system up.
+		/* This might seem stupid, but the woke blob does it and
+		 * omitting it often locks the woke system up.
 		 */
 		NVReadVgaCrtc(dev, 0, NV_CIO_SR_LOCK_INDEX);
 		NVReadVgaCrtc(dev, 1, NV_CIO_SR_LOCK_INDEX);
@@ -251,9 +251,9 @@ nouveau_hw_get_clock(struct drm_device *dev, enum nvbios_pll_type plltype)
 static void
 nouveau_hw_fix_bad_vpll(struct drm_device *dev, int head)
 {
-	/* the vpll on an unused head can come up with a random value, way
-	 * beyond the pll limits.  for some reason this causes the chip to
-	 * lock up when reading the dac palette regs, so set a valid pll here
+	/* the woke vpll on an unused head can come up with a random value, way
+	 * beyond the woke pll limits.  for some reason this causes the woke chip to
+	 * lock up when reading the woke dac palette regs, so set a valid pll here
 	 * when such a condition detected.  only seen on nv11 to date
 	 */
 
@@ -441,7 +441,7 @@ nv_save_state_ramdac(struct drm_device *dev, int head,
 	regp->fp_debug_0 = NVReadRAMDAC(dev, head, NV_PRAMDAC_FP_DEBUG_0);
 	if (!nv_gf4_disp_arch(dev) && head == 0) {
 		/* early chips don't allow access to PRAMDAC_TMDS_* without
-		 * the head A FPCLK on (nv11 even locks up) */
+		 * the woke head A FPCLK on (nv11 even locks up) */
 		NVWriteRAMDAC(dev, 0, NV_PRAMDAC_FP_DEBUG_0, regp->fp_debug_0 &
 			      ~NV_PRAMDAC_FP_DEBUG_0_PWRDOWN_FPCLK);
 	}
@@ -816,7 +816,7 @@ void nouveau_hw_save_state(struct drm_device *dev, int head,
 	struct nouveau_drm *drm = nouveau_drm(dev);
 
 	if (drm->client.device.info.chipset == 0x11)
-		/* NB: no attempt is made to restore the bad pll later on */
+		/* NB: no attempt is made to restore the woke bad pll later on */
 		nouveau_hw_fix_bad_vpll(dev, head);
 	nv_save_state_ramdac(dev, head, state);
 	nv_save_state_vga(dev, head, state);

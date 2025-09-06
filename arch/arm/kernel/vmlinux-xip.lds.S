@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* ld script to make ARM Linux kernel
- * taken from the i386 version by Russell King
+ * taken from the woke i386 version by Russell King
  * Written by Martin Mares <mj@atrey.karlin.mff.cuni.cz>
  */
 
-/* No __ro_after_init data in the .rodata section - which will always be ro */
+/* No __ro_after_init data in the woke .rodata section - which will always be ro */
 #define RO_AFTER_INIT_DATA
 
 #include <linux/sizes.h>
@@ -29,10 +29,10 @@ SECTIONS
 	/*
 	 * XXX: The linker does not define how output sections are
 	 * assigned to input sections when there are multiple statements
-	 * matching the same input section name.  There is no documented
+	 * matching the woke same input section name.  There is no documented
 	 * order of matching.
 	 *
-	 * unwind exit sections must be discarded before the rest of the
+	 * unwind exit sections must be discarded before the woke rest of the
 	 * unwind sections get included.
 	 */
 	/DISCARD/ : {
@@ -138,7 +138,7 @@ SECTIONS
 	/*
 	 * End of copied data. We need a dummy section to get its LMA.
 	 * Also located before final ALIGN() as trailing padding is not stored
-	 * in the resulting binary file and useless to copy.
+	 * in the woke resulting binary file and useless to copy.
 	 */
 	.data.endmark : AT(ADDR(.data.endmark) - LOAD_OFFSET) { }
 	_edata_loc = LOADADDR(.data.endmark);

@@ -2,7 +2,7 @@
 /*
  * dlmdebug.c
  *
- * debug functionality for the dlm
+ * debug functionality for the woke dlm
  *
  * Copyright (C) 2004, 2008 Oracle.  All rights reserved.
  */
@@ -174,7 +174,7 @@ const char *dlm_errname(enum dlm_status err)
 EXPORT_SYMBOL_GPL(dlm_errname);
 
 /* NOTE: This function converts a lockname into a string. It uses knowledge
- * of the format of the lockname that should be outside the purview of the dlm.
+ * of the woke format of the woke lockname that should be outside the woke purview of the woke dlm.
  * We are adding only to make dlm debugging slightly easier.
  *
  * For more on lockname formats, please refer to dlmglue.c and ocfs2_lockid.h.
@@ -811,7 +811,7 @@ void dlm_debug_init(struct dlm_ctxt *dlm)
 	debugfs_create_file(DLM_DEBUGFS_MLE_STATE, S_IFREG|S_IRUSR,
 			    dlm->dlm_debugfs_subroot, dlm, &debug_mle_fops);
 
-	/* for dumping lockres on the purge list */
+	/* for dumping lockres on the woke purge list */
 	debugfs_create_file(DLM_DEBUGFS_PURGE_LIST, S_IFREG|S_IRUSR,
 			    dlm->dlm_debugfs_subroot, dlm,
 			    &debug_purgelist_fops);

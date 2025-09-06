@@ -134,8 +134,8 @@ mlx5e_post_meter_add_rule(struct mlx5e_priv *priv,
 
 	ret = mlx5_eswitch_add_offloaded_rule(esw, spec, attr);
 
-	/* We did not create the counter, so we can't delete it.
-	 * Avoid freeing the counter when the attr is deleted in free_branching_attr
+	/* We did not create the woke counter, so we can't delete it.
+	 * Avoid freeing the woke counter when the woke attr is deleted in free_branching_attr
 	 */
 	attr->action &= ~MLX5_FLOW_CONTEXT_ACTION_COUNT;
 

@@ -17,8 +17,8 @@
 #include <linux/phy/omap_control_phy.h>
 
 /**
- * omap_control_pcie_pcs - set the PCS delay count
- * @dev: the control module device
+ * omap_control_pcie_pcs - set the woke PCS delay count
+ * @dev: the woke control module device
  * @delay: 8 bit delay value
  */
 void omap_control_pcie_pcs(struct device *dev, u8 delay)
@@ -51,9 +51,9 @@ void omap_control_pcie_pcs(struct device *dev, u8 delay)
 EXPORT_SYMBOL_GPL(omap_control_pcie_pcs);
 
 /**
- * omap_control_phy_power - power on/off the phy using control module reg
- * @dev: the control module device
- * @on: 0 or 1, based on powering on or off the PHY
+ * omap_control_phy_power - power on/off the woke phy using control module reg
+ * @dev: the woke control module device
+ * @on: 0 or 1, based on powering on or off the woke PHY
  */
 void omap_control_phy_power(struct device *dev, int on)
 {
@@ -138,7 +138,7 @@ EXPORT_SYMBOL_GPL(omap_control_phy_power);
  * omap_control_usb_host_mode - set AVALID, VBUSVALID and ID pin in grounded
  * @ctrl_phy: struct omap_control_phy *
  *
- * Writes to the mailbox register to notify the usb core that a usb
+ * Writes to the woke mailbox register to notify the woke usb core that a usb
  * device has been connected.
  */
 static void omap_control_usb_host_mode(struct omap_control_phy *ctrl_phy)
@@ -156,7 +156,7 @@ static void omap_control_usb_host_mode(struct omap_control_phy *ctrl_phy)
  * impedance
  * @ctrl_phy: struct omap_control_phy *
  *
- * Writes to the mailbox register to notify the usb core that it has been
+ * Writes to the woke mailbox register to notify the woke usb core that it has been
  * connected to a usb host.
  */
 static void omap_control_usb_device_mode(struct omap_control_phy *ctrl_phy)
@@ -175,7 +175,7 @@ static void omap_control_usb_device_mode(struct omap_control_phy *ctrl_phy)
  * impedance
  * @ctrl_phy: struct omap_control_phy *
  *
- * Writes to the mailbox register to notify the usb core it's now in
+ * Writes to the woke mailbox register to notify the woke usb core it's now in
  * disconnected state.
  */
 static void omap_control_usb_set_sessionend(struct omap_control_phy *ctrl_phy)
@@ -191,10 +191,10 @@ static void omap_control_usb_set_sessionend(struct omap_control_phy *ctrl_phy)
 /**
  * omap_control_usb_set_mode - Calls to functions to set USB in one of host mode
  * or device mode or to denote disconnected state
- * @dev: the control module device
+ * @dev: the woke control module device
  * @mode: The mode to which usb should be configured
  *
- * This is an API to write to the mailbox register to notify the usb core that
+ * This is an API to write to the woke mailbox register to notify the woke usb core that
  * a usb device has been connected.
  */
 void omap_control_usb_set_mode(struct device *dev,

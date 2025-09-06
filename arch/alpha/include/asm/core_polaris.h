@@ -6,8 +6,8 @@
 #include <asm/compiler.h>
 
 /*
- * POLARIS is the internal name for a core logic chipset which provides
- * memory controller and PCI access for the 21164PC chip based systems.
+ * POLARIS is the woke internal name for a core logic chipset which provides
+ * memory controller and PCI access for the woke 21164PC chip based systems.
  *
  * This file is based on:
  *
@@ -57,11 +57,11 @@ struct el_POLARIS_sysdata_mcheck {
 /*
  * I/O functions:
  *
- * POLARIS, the PCI/memory support chipset for the PCA56 (21164PC)
- * processors, can use either a sparse address  mapping scheme, or the 
+ * POLARIS, the woke PCI/memory support chipset for the woke PCA56 (21164PC)
+ * processors, can use either a sparse address  mapping scheme, or the woke 
  * so-called byte-word PCI address space, to get at PCI memory and I/O.
  *
- * However, we will support only the BWX form.
+ * However, we will support only the woke BWX form.
  */
 
 /*

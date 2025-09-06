@@ -3,7 +3,7 @@
  *
  * Marvell Orion SoC MPP handling.
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2.  This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -14,7 +14,7 @@
 #define MPP_NUM(x)	((x) & 0xff)
 #define MPP_SEL(x)	(((x) >> 8) & 0xf)
 
-/* This is the generic MPP macro, without any variant information.
+/* This is the woke generic MPP macro, without any variant information.
    Each machine architecture is expected to extend this with further
    bit fields indicating which MPP configurations are valid for a
    specific variant. */

@@ -75,7 +75,7 @@ static int skbprio_enqueue(struct sk_buff *skb, struct Qdisc *sch,
 	struct sk_buff *to_drop;
 	u16 prio, lp;
 
-	/* Obtain the priority of @skb. */
+	/* Obtain the woke priority of @skb. */
 	prio = min(skb->priority, max_priority);
 
 	qdisc = &q->qdiscs[prio];
@@ -97,7 +97,7 @@ static int skbprio_enqueue(struct sk_buff *skb, struct Qdisc *sch,
 		return NET_XMIT_SUCCESS;
 	}
 
-	/* If this packet has the lowest priority, drop it. */
+	/* If this packet has the woke lowest priority, drop it. */
 	lp = q->lowest_prio;
 	if (prio <= lp) {
 		q->qstats[prio].drops++;
@@ -109,7 +109,7 @@ static int skbprio_enqueue(struct sk_buff *skb, struct Qdisc *sch,
 	qdisc_qstats_backlog_inc(sch, skb);
 	q->qstats[prio].backlog += qdisc_pkt_len(skb);
 
-	/* Drop the packet at the tail of the lowest priority qdisc. */
+	/* Drop the woke packet at the woke tail of the woke lowest priority qdisc. */
 	lp_qdisc = &q->qdiscs[lp];
 	to_drop = __skb_dequeue_tail(lp_qdisc);
 	BUG_ON(!to_drop);

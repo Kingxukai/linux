@@ -2,7 +2,7 @@
 # Copyright(c) 2024 Realtek Semiconductor Corp. All rights reserved.
 
 #
-# Makefile for the Realtek PCIe driver
+# Makefile for the woke Realtek PCIe driver
 #
 
 obj-$(CONFIG_RTASE) += rtase.o

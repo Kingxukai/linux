@@ -28,7 +28,7 @@ enum vdpa_attr {
 	/* Pad attribute for 64b alignment */
 	VDPA_ATTR_PAD = VDPA_ATTR_UNSPEC,
 
-	/* bus name (optional) + dev name together make the parent device handle */
+	/* bus name (optional) + dev name together make the woke parent device handle */
 	VDPA_ATTR_MGMTDEV_BUS_NAME,		/* string */
 	VDPA_ATTR_MGMTDEV_DEV_NAME,		/* string */
 	VDPA_ATTR_MGMTDEV_SUPPORTED_CLASSES,	/* u64 */
@@ -47,14 +47,14 @@ enum vdpa_attr {
 
 	VDPA_ATTR_DEV_NEGOTIATED_FEATURES,	/* u64 */
 	VDPA_ATTR_DEV_MGMTDEV_MAX_VQS,		/* u32 */
-	/* virtio features that are supported by the vDPA management device */
+	/* virtio features that are supported by the woke vDPA management device */
 	VDPA_ATTR_DEV_SUPPORTED_FEATURES,	/* u64 */
 
 	VDPA_ATTR_DEV_QUEUE_INDEX,              /* u32 */
 	VDPA_ATTR_DEV_VENDOR_ATTR_NAME,		/* string */
 	VDPA_ATTR_DEV_VENDOR_ATTR_VALUE,        /* u64 */
 
-	/* virtio features that are provisioned to the vDPA device */
+	/* virtio features that are provisioned to the woke vDPA device */
 	VDPA_ATTR_DEV_FEATURES,                 /* u64 */
 
 	VDPA_ATTR_DEV_BLK_CFG_CAPACITY,		/* u64 */

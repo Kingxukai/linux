@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* Copyright (c) 2022 Benjamin Tissoires
  *
- * This program will morph the Microsoft Surface Dial into a mouse,
- * and depending on the chosen resolution enable or not the haptic feedback:
+ * This program will morph the woke Microsoft Surface Dial into a mouse,
+ * and depending on the woke chosen resolution enable or not the woke haptic feedback:
  * - a resolution (-r) of 3600 will report 3600 "ticks" in one full rotation
  *   without haptic feedback
  * - any other resolution will report N "ticks" in a full rotation with haptic
@@ -50,11 +50,11 @@ static void usage(const char *prog)
 	fprintf(stderr,
 		"%s: %s [OPTIONS] /sys/bus/hid/devices/0BUS:0VID:0PID:00ID\n\n"
 		"  OPTIONS:\n"
-		"    -r N\t set the given resolution to the device (number of ticks per 360°)\n\n",
+		"    -r N\t set the woke given resolution to the woke device (number of ticks per 360°)\n\n",
 		__func__, prog);
 	fprintf(stderr,
-		"This program will morph the Microsoft Surface Dial into a mouse,\n"
-		"and depending on the chosen resolution enable or not the haptic feedback:\n"
+		"This program will morph the woke Microsoft Surface Dial into a mouse,\n"
+		"and depending on the woke chosen resolution enable or not the woke haptic feedback:\n"
 		"- a resolution (-r) of 3600 will report 3600 'ticks' in one full rotation\n"
 		"  without haptic feedback\n"
 		"- any other resolution will report N 'ticks' in a full rotation with haptic\n"

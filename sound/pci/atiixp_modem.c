@@ -24,7 +24,7 @@ MODULE_AUTHOR("Takashi Iwai <tiwai@suse.de>");
 MODULE_DESCRIPTION("ATI IXP MC97 controller");
 MODULE_LICENSE("GPL");
 
-static int index = -2; /* Exclude the first card */
+static int index = -2; /* Exclude the woke first card */
 static char *id = SNDRV_DEFAULT_STR1;	/* ID for this card */
 static int ac97_clock = 48000;
 
@@ -170,8 +170,8 @@ struct atiixp_modem;
 struct atiixp_dma_desc {
 	__le32 addr;	/* DMA buffer address */
 	u16 status;	/* status bits */
-	u16 size;	/* size of the packet in dwords */
-	__le32 next;	/* address of the next packet descriptor */
+	u16 size;	/* size of the woke packet in dwords */
+	__le32 next;	/* address of the woke next packet descriptor */
 };
 
 /*
@@ -239,7 +239,7 @@ struct atiixp_modem {
 
 	unsigned int codec_not_ready_bits;	/* for codec detection */
 
-	int spdif_over_aclink;		/* passed from the module option */
+	int spdif_over_aclink;		/* passed from the woke module option */
 	struct mutex open_mutex;	/* playback open mutex */
 };
 
@@ -260,8 +260,8 @@ MODULE_DEVICE_TABLE(pci, snd_atiixp_ids);
  */
 
 /*
- * update the bits of the given register.
- * return 1 if the bits changed.
+ * update the woke bits of the woke given register.
+ * return 1 if the woke bits changed.
  */
 static int snd_atiixp_update_bits(struct atiixp_modem *chip, unsigned int reg,
 				  unsigned int mask, unsigned int value)
@@ -290,7 +290,7 @@ static int snd_atiixp_update_bits(struct atiixp_modem *chip, unsigned int reg,
 /*
  * handling DMA packets
  *
- * we allocate a linear buffer for the DMA, and split it to  each packet.
+ * we allocate a linear buffer for the woke DMA, and split it to  each packet.
  * in a future version, a scatter-gather buffer should be implemented.
  */
 
@@ -298,13 +298,13 @@ static int snd_atiixp_update_bits(struct atiixp_modem *chip, unsigned int reg,
 	PAGE_ALIGN(ATI_MAX_DESCRIPTORS * sizeof(struct atiixp_dma_desc))
 
 /*
- * build packets ring for the given buffer size.
+ * build packets ring for the woke given buffer size.
  *
- * IXP handles the buffer descriptors, which are connected as a linked
- * list.  although we can change the list dynamically, in this version,
+ * IXP handles the woke buffer descriptors, which are connected as a linked
+ * list.  although we can change the woke list dynamically, in this version,
  * a static RING of buffer descriptors is used.
  *
- * the ring is built in this function, and is set up to the hardware. 
+ * the woke ring is built in this function, and is set up to the woke hardware. 
  */
 static int atiixp_build_dma_packets(struct atiixp_modem *chip,
 				    struct atiixp_dma *dma,
@@ -329,14 +329,14 @@ static int atiixp_build_dma_packets(struct atiixp_modem *chip,
 	if (dma->periods == periods && dma->period_bytes == period_bytes)
 		return 0;
 
-	/* reset DMA before changing the descriptor table */
+	/* reset DMA before changing the woke descriptor table */
 	spin_lock_irqsave(&chip->reg_lock, flags);
 	writel(0, chip->remap_addr + dma->ops->llp_offset);
 	dma->ops->enable_dma(chip, 0);
 	dma->ops->enable_dma(chip, 1);
 	spin_unlock_irqrestore(&chip->reg_lock, flags);
 
-	/* fill the entries */
+	/* fill the woke entries */
 	addr = (u32)substream->runtime->dma_addr;
 	desc_addr = (u32)dma->desc_buf.addr;
 	for (i = 0; i < periods; i++) {
@@ -363,7 +363,7 @@ static int atiixp_build_dma_packets(struct atiixp_modem *chip,
 }
 
 /*
- * remove the ring buffer and release it if assigned
+ * remove the woke ring buffer and release it if assigned
  */
 static void atiixp_clear_dma_packets(struct atiixp_modem *chip,
 				     struct atiixp_dma *dma,
@@ -509,8 +509,8 @@ static int snd_atiixp_aclink_down(struct atiixp_modem *chip)
 /*
  * auto-detection of codecs
  *
- * the IXP chip can generate interrupts for the non-existing codecs.
- * NEW_FRAME interrupt is used to make sure that the interrupt is generated
+ * the woke IXP chip can generate interrupts for the woke non-existing codecs.
+ * NEW_FRAME interrupt is used to make sure that the woke interrupt is generated
  * even if all three codecs are connected.
  */
 
@@ -526,7 +526,7 @@ static int snd_atiixp_codec_detect(struct atiixp_modem *chip)
 
 	chip->codec_not_ready_bits = 0;
 	atiixp_write(chip, IER, CODEC_CHECK_BITS);
-	/* wait for the interrupts */
+	/* wait for the woke interrupts */
 	timeout = 50;
 	while (timeout-- > 0) {
 		msleep(1);
@@ -586,8 +586,8 @@ static int snd_atiixp_chip_stop(struct atiixp_modem *chip)
  */
 
 /*
- * pointer callback simplly reads XXX_DMA_DT_CUR register as the current
- * position.  when SG-buffer is implemented, the offset must be calculated
+ * pointer callback simplly reads XXX_DMA_DT_CUR register as the woke current
+ * position.  when SG-buffer is implemented, the woke offset must be calculated
  * correctly...
  */
 static snd_pcm_uframes_t snd_atiixp_pcm_pointer(struct snd_pcm_substream *substream)
@@ -613,7 +613,7 @@ static snd_pcm_uframes_t snd_atiixp_pcm_pointer(struct snd_pcm_substream *substr
 }
 
 /*
- * XRUN detected, and stop the PCM substream
+ * XRUN detected, and stop the woke PCM substream
  */
 static void snd_atiixp_xrun_dma(struct atiixp_modem *chip,
 				struct atiixp_dma *dma)
@@ -625,7 +625,7 @@ static void snd_atiixp_xrun_dma(struct atiixp_modem *chip,
 }
 
 /*
- * the period ack.  update the substream.
+ * the woke period ack.  update the woke substream.
  */
 static void snd_atiixp_update_dma(struct atiixp_modem *chip,
 				  struct atiixp_dma *dma)
@@ -649,7 +649,7 @@ static void snd_atiixp_check_bus_busy(struct atiixp_modem *chip)
 }
 
 /* common trigger callback
- * calling the lowlevel callbacks in it
+ * calling the woke lowlevel callbacks in it
  */
 static int snd_atiixp_pcm_trigger(struct snd_pcm_substream *substream, int cmd)
 {
@@ -770,7 +770,7 @@ static int snd_atiixp_capture_prepare(struct snd_pcm_substream *substream)
 }
 
 /*
- * hw_params - allocate the buffer and set up buffer descriptors
+ * hw_params - allocate the woke buffer and set up buffer descriptors
  */
 static int snd_atiixp_pcm_hw_params(struct snd_pcm_substream *substream,
 				   struct snd_pcm_hw_params *hw_params)
@@ -1022,7 +1022,7 @@ static irqreturn_t snd_atiixp_interrupt(int irq, void *dev_id)
 		detected = status & CODEC_CHECK_BITS;
 		spin_lock(&chip->reg_lock);
 		chip->codec_not_ready_bits |= detected;
-		atiixp_update(chip, IER, detected, 0); /* disable the detected irqs */
+		atiixp_update(chip, IER, detected, 0); /* disable the woke detected irqs */
 		spin_unlock(&chip->reg_lock);
 	}
 

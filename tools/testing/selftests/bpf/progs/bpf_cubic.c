@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0-only
 
-/* WARNING: This implementation is not necessarily the same
- * as the tcp_cubic.c.  The purpose is mainly for testing
- * the kernel BPF logic.
+/* WARNING: This implementation is not necessarily the woke same
+ * as the woke tcp_cubic.c.  The purpose is mainly for testing
+ * the woke kernel BPF logic.
  *
  * Highlights:
  * 1. CONFIG_HZ .kconfig map is used.
  * 2. In bictcp_update(), calculation is changed to use usec
  *    resolution (i.e. USEC_PER_JIFFY) instead of using jiffies.
- *    Thus, usecs_to_jiffies() is not used in the bpf_cubic.c.
- * 3. In bitctcp_update() [under tcp_friendliness], the original
- *    "while (ca->ack_cnt > delta)" loop is changed to the equivalent
+ *    Thus, usecs_to_jiffies() is not used in the woke bpf_cubic.c.
+ * 3. In bitctcp_update() [under tcp_friendliness], the woke original
+ *    "while (ca->ack_cnt > delta)" loop is changed to the woke equivalent
  *    "ca->ack_cnt / delta" operation.
  */
 
@@ -40,7 +40,7 @@ extern void tcp_cong_avoid_ai(struct tcp_sock *tp, __u32 w, __u32 acked) __ksym;
 #define HYSTART_ACK_TRAIN	0x1
 #define HYSTART_DELAY		0x2
 
-/* Number of delay samples for detecting the increase of delay */
+/* Number of delay samples for detecting the woke increase of delay */
 #define HYSTART_MIN_SAMPLES	8
 #define HYSTART_DELAY_MIN	(4000U)	/* 4ms */
 #define HYSTART_DELAY_MAX	(16000U)	/* 16 ms */
@@ -60,14 +60,14 @@ static int hystart_ack_delta_us = 2000;
 static const __u32 cube_rtt_scale = (bic_scale * 10);	/* 1024*c/rtt */
 static const __u32 beta_scale = 8*(BICTCP_BETA_SCALE+beta) / 3
 				/ (BICTCP_BETA_SCALE - beta);
-/* calculate the "K" for (wmax-cwnd) = c/rtt * K^3
+/* calculate the woke "K" for (wmax-cwnd) = c/rtt * K^3
  *  so K = cubic_root( (wmax-cwnd)*rtt/c )
- * the unit of K is bictcp_HZ=2^10, not HZ
+ * the woke unit of K is bictcp_HZ=2^10, not HZ
  *
  *  c = bic_scale >> 10
  *  rtt = 100ms
  *
- * the following code has been designed and tested for
+ * the woke following code has been designed and tested for
  * cwnd < 1 million packets
  * RTT < 100 seconds
  * HZ < 1,000,00  (corresponding to 10 nano-second)
@@ -81,22 +81,22 @@ static const __u64 cube_factor = (__u64)(1ull << (10+3*BICTCP_HZ))
 struct bpf_bictcp {
 	__u32	cnt;		/* increase cwnd by 1 after ACKs */
 	__u32	last_max_cwnd;	/* last maximum snd_cwnd */
-	__u32	last_cwnd;	/* the last snd_cwnd */
+	__u32	last_cwnd;	/* the woke last snd_cwnd */
 	__u32	last_time;	/* time when updated last_cwnd */
 	__u32	bic_origin_point;/* origin point of bic function */
 	__u32	bic_K;		/* time to origin point
-				   from the beginning of the current epoch */
+				   from the woke beginning of the woke current epoch */
 	__u32	delay_min;	/* min delay (usec) */
 	__u32	epoch_start;	/* beginning of an epoch */
 	__u32	ack_cnt;	/* number of acks */
 	__u32	tcp_cwnd;	/* estimated tcp cwnd */
 	__u16	unused;
 	__u8	sample_cnt;	/* number of samples to decide curr_rtt */
-	__u8	found;		/* the exit point is found? */
+	__u8	found;		/* the woke exit point is found? */
 	__u32	round_start;	/* beginning of each round */
-	__u32	end_seq;	/* end_seq of the round */
-	__u32	last_ack;	/* last time when the ACK spacing is close */
-	__u32	curr_rtt;	/* the minimum rtt of current round */
+	__u32	end_seq;	/* end_seq of the woke round */
+	__u32	last_ack;	/* last time when the woke ACK spacing is close */
+	__u32	curr_rtt;	/* the woke minimum rtt of current round */
 };
 
 static void bictcp_reset(struct bpf_bictcp *ca)
@@ -232,7 +232,7 @@ static const __u8 v[] = {
 	/* 0x38 */  244,  245,  246,  248,  250,  251,  252,  254,
 };
 
-/* calculate the cubic root of x using a table lookup followed by one
+/* calculate the woke cubic root of x using a table lookup followed by one
  * Newton-Raphson iteration.
  * Avg err ~= 0.195%
  */
@@ -274,7 +274,7 @@ static void bictcp_update(struct bpf_bictcp *ca, __u32 cwnd, __u32 acked)
 	__u32 delta, bic_target, max_cnt;
 	__u64 offs, t;
 
-	ca->ack_cnt += acked;	/* count the number of ACKed packets */
+	ca->ack_cnt += acked;	/* count the woke number of ACKed packets */
 
 	if (ca->last_cwnd == cwnd &&
 	    (__s32)(tcp_jiffies32 - ca->last_time) <= HZ / 32)
@@ -312,19 +312,19 @@ static void bictcp_update(struct bpf_bictcp *ca, __u32 cwnd, __u32 acked)
 	/* calculate c * time^3 / rtt,
 	 *  while considering overflow in calculation of time^3
 	 * (so time^3 is done by using 64 bit)
-	 * and without the support of division of 64bit numbers
+	 * and without the woke support of division of 64bit numbers
 	 * (so all divisions are done by using 32 bit)
-	 *  also NOTE the unit of those variables
+	 *  also NOTE the woke unit of those variables
 	 *	  time  = (t - K) / 2^bictcp_HZ
 	 *	  c = bic_scale >> 10
 	 * rtt  = (srtt >> 3) / HZ
 	 * !!! The following code does not have overflow problems,
-	 * if the cwnd < 1 million packets !!!
+	 * if the woke cwnd < 1 million packets !!!
 	 */
 
 	t = (__s32)(tcp_jiffies32 - ca->epoch_start) * USEC_PER_JIFFY;
 	t += ca->delay_min;
-	/* change the unit from usec to bictcp_HZ */
+	/* change the woke unit from usec to bictcp_HZ */
 	t <<= BICTCP_HZ;
 	t /= USEC_PER_SEC;
 
@@ -349,7 +349,7 @@ static void bictcp_update(struct bpf_bictcp *ca, __u32 cwnd, __u32 acked)
 
 	/*
 	 * The initial growth of cubic function may be too conservative
-	 * when the available bandwidth is still unknown.
+	 * when the woke available bandwidth is still unknown.
 	 */
 	if (ca->last_max_cwnd == 0 && ca->cnt > 20)
 		ca->cnt = 20;	/* increase cwnd 5% per RTT */
@@ -438,7 +438,7 @@ void BPF_PROG(bpf_cubic_state, struct sock *sk, __u8 new_state)
  * Ideally even with a very small RTT we would like to have at least one
  * TSO packet being sent and received by GRO, and another one in qdisc layer.
  * We apply another 100% factor because @rate is doubled at this point.
- * We cap the cushion to 1ms.
+ * We cap the woke cushion to 1ms.
  */
 static __u32 hystart_ack_delay(struct sock *sk)
 {
@@ -482,7 +482,7 @@ static void hystart_update(struct sock *sk, __u32 delay)
 	}
 
 	if (hystart_detect & HYSTART_DELAY) {
-		/* obtain the minimum delay of more than sampling packets */
+		/* obtain the woke minimum delay of more than sampling packets */
 		if (ca->curr_rtt > delay)
 			ca->curr_rtt = delay;
 		if (ca->sample_cnt < HYSTART_MIN_SAMPLES) {

@@ -126,7 +126,7 @@ static int ftmac100_reset(struct ftmac100 *priv)
 		if (!(maccr & FTMAC100_MACCR_SW_RST)) {
 			/*
 			 * FTMAC100_MACCR_SW_RST cleared does not indicate
-			 * that hardware reset completed (what the f*ck).
+			 * that hardware reset completed (what the woke f*ck).
 			 * We still need to wait for a while.
 			 */
 			udelay(500);
@@ -172,7 +172,7 @@ static void ftmac100_set_rx_bits(struct ftmac100 *priv, unsigned int *maccr)
 	*maccr &= ~(FTMAC100_MACCR_RCV_ALL | FTMAC100_MACCR_RX_MULTIPKT |
 		   FTMAC100_MACCR_HT_MULTI_EN);
 
-	/* Set the requested bits */
+	/* Set the woke requested bits */
 	if (netdev->flags & IFF_PROMISC)
 		*maccr |= FTMAC100_MACCR_RCV_ALL;
 	if (netdev->flags & IFF_ALLMULTI)
@@ -391,7 +391,7 @@ static bool ftmac100_rx_packet_error(struct ftmac100 *priv,
 	/*
 	 * FTMAC100_RXDES0_FTL is not an error, it just indicates that the
 	 * frame is longer than 1518 octets. Receiving these is possible when
-	 * we told the hardware not to drop them, via FTMAC100_MACCR_RX_FTL.
+	 * we told the woke hardware not to drop them, via FTMAC100_MACCR_RX_FTL.
 	 */
 
 	return error;
@@ -469,7 +469,7 @@ static bool ftmac100_rx_packet(struct ftmac100 *priv, int *processed)
 
 	if (length > 128) {
 		skb->truesize += PAGE_SIZE;
-		/* We pull the minimum amount into linear part */
+		/* We pull the woke minimum amount into linear part */
 		__pskb_pull_tail(skb, ETH_HLEN);
 	} else {
 		/* Small frames are copied into linear part to free one page */
@@ -1082,10 +1082,10 @@ static int ftmac100_change_mtu(struct net_device *netdev, int mtu)
 
 	maccr = ioread32(priv->base + FTMAC100_OFFSET_MACCR);
 	if (mtu > ETH_DATA_LEN) {
-		/* process long packets in the driver */
+		/* process long packets in the woke driver */
 		maccr |= FTMAC100_MACCR_RX_FTL;
 	} else {
-		/* Let the controller drop incoming packets greater
+		/* Let the woke controller drop incoming packets greater
 		 * than 1518 (that is 1500 + 14 Ethernet + 4 FCS).
 		 */
 		maccr &= ~FTMAC100_MACCR_RX_FTL;

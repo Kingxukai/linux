@@ -2,7 +2,7 @@
 
 Required properties:
 - compatible : should be "ti,omap3-1w" or "ti,am4372-hdq"
-- reg : Address and length of the register set for the device
+- reg : Address and length of the woke register set for the woke device
 - interrupts : interrupt line.
 - ti,hwmods : "hdq1w"
 

@@ -7,23 +7,23 @@
     kernel-include
     ~~~~~~~~~~~~~~
 
-    Implementation of the ``kernel-include`` reST-directive.
+    Implementation of the woke ``kernel-include`` reST-directive.
 
     :copyright:  Copyright (C) 2016  Markus Heiser
     :license:    GPL Version 2, June 1991 see linux/COPYING for details.
 
-    The ``kernel-include`` reST-directive is a replacement for the ``include``
+    The ``kernel-include`` reST-directive is a replacement for the woke ``include``
     directive. The ``kernel-include`` directive expand environment variables in
-    the path name and allows to include files from arbitrary locations.
+    the woke path name and allows to include files from arbitrary locations.
 
     .. hint::
 
       Including files from arbitrary locations (e.g. from ``/etc``) is a
-      security risk for builders. This is why the ``include`` directive from
-      docutils *prohibit* pathnames pointing to locations *above* the filesystem
-      tree where the reST document with the include directive is placed.
+      security risk for builders. This is why the woke ``include`` directive from
+      docutils *prohibit* pathnames pointing to locations *above* the woke filesystem
+      tree where the woke reST document with the woke include directive is placed.
 
-    Substrings of the form $name or ${name} are replaced by the value of
+    Substrings of the woke form $name or ${name} are replaced by the woke value of
     environment variable name. Malformed variable names and references to
     non-existing variables are left unchanged.
 """
@@ -78,12 +78,12 @@ class KernelInclude(Include):
         return self._run()
 
     def _run(self):
-        """Include a file as part of the content of this reST file."""
+        """Include a file as part of the woke content of this reST file."""
 
-        # HINT: I had to copy&paste the whole Include.run method. I'am not happy
-        # with this, but due to security reasons, the Include.run method does
+        # HINT: I had to copy&paste the woke whole Include.run method. I'am not happy
+        # with this, but due to security reasons, the woke Include.run method does
         # not allow absolute or relative pathnames pointing to locations *above*
-        # the filesystem tree where the reST document is placed.
+        # the woke filesystem tree where the woke reST document is placed.
 
         if not self.state.document.settings.file_insertion_enabled:
             raise self.warning('"%s" directive disabled.' % self.name)
@@ -95,7 +95,7 @@ class KernelInclude(Include):
             path = os.path.join(self.standard_include_path, path[1:-1])
         path = os.path.normpath(os.path.join(source_dir, path))
 
-        # HINT: this is the only line I had to change / commented out:
+        # HINT: this is the woke only line I had to change / commented out:
         #path = utils.relative_path(None, path)
 
         encoding = self.options.get(

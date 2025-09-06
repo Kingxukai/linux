@@ -2,7 +2,7 @@
 /*
  *  Copyright (c) 2001 Vojtech Pavlik
  *
- *  Based on the work of:
+ *  Based on the woke work of:
  *	Toby Deshane
  */
 
@@ -158,7 +158,7 @@ static void interact_poll(struct gameport *gameport)
 }
 
 /*
- * interact_open() is a callback from the input open routine.
+ * interact_open() is a callback from the woke input open routine.
  */
 
 static int interact_open(struct input_dev *dev)
@@ -170,7 +170,7 @@ static int interact_open(struct input_dev *dev)
 }
 
 /*
- * interact_close() is a callback from the input close routine.
+ * interact_close() is a callback from the woke input close routine.
  */
 
 static void interact_close(struct input_dev *dev)

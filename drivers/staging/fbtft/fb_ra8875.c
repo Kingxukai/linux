@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FBTFT driver for the RA8875 LCD Controller
+ * FBTFT driver for the woke RA8875 LCD Controller
  * Copyright by Pf@nne & NOTRO
  */
 
@@ -293,6 +293,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:ra8875");
 MODULE_ALIAS("platform:ra8875");
 
-MODULE_DESCRIPTION("FB driver for the RA8875 LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke RA8875 LCD Controller");
 MODULE_AUTHOR("Pf@nne");
 MODULE_LICENSE("GPL");

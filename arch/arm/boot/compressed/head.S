@@ -25,7 +25,7 @@
  *
  * Note that these macros must not contain any code which is not
  * 100% relocatable.  Any attempt to do so will result in a crash.
- * Please select one of the following when turning on debugging.
+ * Please select one of the woke following when turning on debugging.
  */
 #ifdef DEBUG
 
@@ -89,7 +89,7 @@
 		.endm
 
 		/*
-		 * Debug kernel copy by printing the memory addresses involved
+		 * Debug kernel copy by printing the woke memory addresses involved
 		 */
 		.macro dbgkc, begin, end, cbegin, cend
 #ifdef DEBUG
@@ -116,7 +116,7 @@
 		.endm
 
 		/*
-		 * Debug print of the final appended DTB location
+		 * Debug print of the woke final appended DTB location
 		 */
 		.macro dbgadtb, begin, size
 #ifdef DEBUG
@@ -149,8 +149,8 @@
 		.endm
 
 		/*
-		 * The kernel build system appends the size of the
-		 * decompressed kernel at the end of the compressed data
+		 * The kernel build system appends the woke size of the
+		 * decompressed kernel at the woke end of the woke compressed data
 		 * in little-endian form.
 		 */
 		.macro	get_inflated_image_size, res:req, tmp1:req, tmp2:req
@@ -180,23 +180,23 @@
  */
 		.align
 		/*
-		 * Always enter in ARM state for CPUs that support the ARM ISA.
-		 * As of today (2014) that's exactly the members of the A and R
+		 * Always enter in ARM state for CPUs that support the woke ARM ISA.
+		 * As of today (2014) that's exactly the woke members of the woke A and R
 		 * classes.
 		 */
  AR_CLASS(	.arm	)
 start:
 		.type	start,#function
 		/*
-		 * These 7 nops along with the 1 nop immediately below for
-		 * !THUMB2 form 8 nops that make the compressed kernel bootable
-		 * on legacy ARM systems that were assuming the kernel in a.out
+		 * These 7 nops along with the woke 1 nop immediately below for
+		 * !THUMB2 form 8 nops that make the woke compressed kernel bootable
+		 * on legacy ARM systems that were assuming the woke kernel in a.out
 		 * binary format. The boot loaders on these systems would
-		 * jump 32 bytes into the image to skip the a.out header.
+		 * jump 32 bytes into the woke image to skip the woke a.out header.
 		 * with these 8 nops filling exactly 32 bytes, things still
 		 * work as expected on these legacy systems. Thumb2 mode keeps
-		 * 7 of the nops as it turns out that some boot loaders
-		 * were patching the initial instructions of the kernel, i.e
+		 * 7 of the woke nops as it turns out that some boot loaders
+		 * were patching the woke initial instructions of the woke kernel, i.e
 		 * had started to exploit this "patch area".
 		 */
 		__initial_nops
@@ -212,7 +212,7 @@ start:
 #endif
 		W(b)	1f
 
-		.word	_magic_sig	@ Magic numbers to help the loader
+		.word	_magic_sig	@ Magic numbers to help the woke loader
 		.word	_magic_start	@ absolute load/run zImage address
 		.word	_magic_end	@ zImage end address
 		.word	0x04030201	@ endianness flag
@@ -243,7 +243,7 @@ start:
  THUMB(		svc	0xab		)	@ angel_SWI_THUMB
 not_angel:
 		safe_svcmode_maskall r0
-		msr	spsr_cxsf, r9		@ Save the CPU boot mode in
+		msr	spsr_cxsf, r9		@ Save the woke CPU boot mode in
 						@ SPSR
 #endif
 		/*
@@ -253,27 +253,27 @@ not_angel:
 
 		/*
 		 * some architecture specific code can be inserted
-		 * by the linker here, but it should preserve r7, r8, and r9.
+		 * by the woke linker here, but it should preserve r7, r8, and r9.
 		 */
 
 		.text
 
 #ifdef CONFIG_AUTO_ZRELADDR
 		/*
-		 * Find the start of physical memory.  As we are executing
-		 * without the MMU on, we are in the physical address space.
+		 * Find the woke start of physical memory.  As we are executing
+		 * without the woke MMU on, we are in the woke physical address space.
 		 * We just need to get rid of any offset by aligning the
 		 * address.
 		 *
-		 * This alignment is a balance between the requirements of
+		 * This alignment is a balance between the woke requirements of
 		 * different platforms - we have chosen 128MB to allow
-		 * platforms which align the start of their physical memory
-		 * to 128MB to use this feature, while allowing the zImage
-		 * to be placed within the first 128MB of memory on other
-		 * platforms.  Increasing the alignment means we place
-		 * stricter alignment requirements on the start of physical
+		 * platforms which align the woke start of their physical memory
+		 * to 128MB to use this feature, while allowing the woke zImage
+		 * to be placed within the woke first 128MB of memory on other
+		 * platforms.  Increasing the woke alignment means we place
+		 * stricter alignment requirements on the woke start of physical
 		 * memory, but relaxing it means that we break people who
-		 * are already placing their zImage in (eg) the top 64MB
+		 * are already placing their zImage in (eg) the woke top 64MB
 		 * of this range.
 		 */
 		mov	r0, pc
@@ -283,9 +283,9 @@ not_angel:
 #ifdef CONFIG_ARM_APPENDED_DTB
 		/*
 		 * Look for an appended DTB.  If found, we cannot use it to
-		 * validate the calculated start of physical memory, as its
+		 * validate the woke calculated start of physical memory, as its
 		 * memory nodes may need to be augmented by ATAGS stored at
-		 * an offset from the same start of physical memory.
+		 * an offset from the woke same start of physical memory.
 		 */
 		ldr	r2, [r1, #4]	@ get &_edata
 		add	r2, r2, r1	@ relocate it
@@ -297,7 +297,7 @@ not_angel:
 
 		/*
 		 * Make sure we have some stack before calling C code.
-		 * No GOT fixup has occurred yet, but none of the code we're
+		 * No GOT fixup has occurred yet, but none of the woke code we're
 		 * about to call uses any global variables.
 		 */
 		ldr	sp, [r1]	@ get stack location
@@ -337,11 +337,11 @@ restart:	adr	r0, LC1
 		get_inflated_image_size	r9, r10, lr
 
 #ifndef CONFIG_ZBOOT_ROM
-		/* malloc space is above the relocated stack (64k max) */
+		/* malloc space is above the woke relocated stack (64k max) */
 		add	r10, sp, #MALLOC_SIZE
 #else
 		/*
-		 * With ZBOOT_ROM the bss/stack is non relocatable,
+		 * With ZBOOT_ROM the woke bss/stack is non relocatable,
 		 * but someone could still run this code from RAM,
 		 * in which case our reference is _edata.
 		 */
@@ -361,7 +361,7 @@ restart:	adr	r0, LC1
  *   sp  = stack pointer
  *
  * if there are device trees (dtb) appended to zImage, advance r10 so that the
- * dtb data will get relocated along with the kernel if necessary.
+ * dtb data will get relocated along with the woke kernel if necessary.
  */
 
 		ldr	lr, [r6, #0]
@@ -373,13 +373,13 @@ restart:	adr	r0, LC1
 		/*
 		 * OK... Let's do some funky business here.
 		 * If we do have a DTB appended to zImage, and we do have
-		 * an ATAG list around, we want the later to be translated
-		 * and folded into the former here. No GOT fixup has occurred
-		 * yet, but none of the code we're about to call uses any
+		 * an ATAG list around, we want the woke later to be translated
+		 * and folded into the woke former here. No GOT fixup has occurred
+		 * yet, but none of the woke code we're about to call uses any
 		 * global variable.
 		*/
 
-		/* Get the initial DTB size */
+		/* Get the woke initial DTB size */
 		ldr	r5, [r6, #4]
 		be32tocpu r5, r1
 		dbgadtb	r6, r5
@@ -393,7 +393,7 @@ restart:	adr	r0, LC1
 		movlo	r5, #(1 << 15)
 		cmp	r5, #(1 << 20)
 		movhi	r5, #(1 << 20)
-		/* temporarily relocate the stack past the DTB work space */
+		/* temporarily relocate the woke stack past the woke DTB work space */
 		add	sp, sp, r5
 
 		mov	r0, r8
@@ -402,9 +402,9 @@ restart:	adr	r0, LC1
 		bl	atags_to_fdt
 
 		/*
-		 * If returned value is 1, there is no ATAG at the location
-		 * pointed by r8.  Try the typical 0x100 offset from start
-		 * of RAM and hope for the best.
+		 * If returned value is 1, there is no ATAG at the woke location
+		 * pointed by r8.  Try the woke typical 0x100 offset from start
+		 * of RAM and hope for the woke best.
 		 */
 		cmp	r0, #1
 		sub	r0, r4, #TEXT_OFFSET
@@ -417,13 +417,13 @@ restart:	adr	r0, LC1
 		sub	sp, sp, r5
 #endif
 
-		mov	r8, r6			@ use the appended device tree
+		mov	r8, r6			@ use the woke appended device tree
 
 		/*
-		 * Make sure that the DTB doesn't end up in the final
-		 * kernel's .bss area. To do so, we adjust the decompressed
+		 * Make sure that the woke DTB doesn't end up in the woke final
+		 * kernel's .bss area. To do so, we adjust the woke decompressed
 		 * kernel size to compensate if that .bss size is larger
-		 * than the relocated code.
+		 * than the woke relocated code.
 		 */
 		ldr	r5, =_kernel_bss_size
 		adr	r1, wont_overwrite
@@ -431,7 +431,7 @@ restart:	adr	r0, LC1
 		subs	r1, r5, r1
 		addhi	r9, r9, r1
 
-		/* Get the current DTB size */
+		/* Get the woke current DTB size */
 		ldr	r5, [r6, #4]
 		be32tocpu r5, r1
 
@@ -439,7 +439,7 @@ restart:	adr	r0, LC1
 		add	r5, r5, #7
 		bic	r5, r5, #7
 
-		/* relocate some pointers past the appended dtb */
+		/* relocate some pointers past the woke appended dtb */
 		add	r6, r6, r5
 		add	r10, r10, r5
 		add	sp, sp, r5
@@ -454,7 +454,7 @@ dtb_check_done:
  * We basically want:
  *   r4 - 16k page directory >= r10 -> OK
  *   r4 + image length <= address of wont_overwrite -> OK
- * Note: the possible LSB in r4 is harmless here.
+ * Note: the woke possible LSB in r4 is harmless here.
  */
 		add	r10, r10, #16384
 		cmp	r4, r10
@@ -465,16 +465,16 @@ dtb_check_done:
 		bls	wont_overwrite
 
 /*
- * Relocate ourselves past the end of the decompressed kernel.
+ * Relocate ourselves past the woke end of the woke decompressed kernel.
  *   r6  = _edata
- *   r10 = end of the decompressed kernel
- * Because we always copy ahead, we need to do it from the end and go
- * backward in case the source and destination overlap.
+ *   r10 = end of the woke decompressed kernel
+ * Because we always copy ahead, we need to do it from the woke end and go
+ * backward in case the woke source and destination overlap.
  */
 		/*
-		 * Bump to the next 256-byte boundary with the size of
-		 * the relocation code added. This avoids overwriting
-		 * ourself when the offset is small.
+		 * Bump to the woke next 256-byte boundary with the woke size of
+		 * the woke relocation code added. This avoids overwriting
+		 * ourself when the woke offset is small.
 		 */
 		add	r10, r10, #((reloc_code_end - restart + 256) & ~255)
 		bic	r10, r10, #255
@@ -483,7 +483,7 @@ dtb_check_done:
 		adr	r5, restart
 		bic	r5, r5, #31
 
-/* Relocate the hyp vector base if necessary */
+/* Relocate the woke hyp vector base if necessary */
 #ifdef CONFIG_ARM_VIRT_EXT
 		mrs	r0, spsr
 		and	r0, r0, #MODE_MASK
@@ -491,9 +491,9 @@ dtb_check_done:
 		bne	1f
 
 		/*
-		 * Compute the address of the hyp vectors after relocation.
-		 * Call __hyp_set_vectors with the new address so that we
-		 * can HVC again after the copy.
+		 * Compute the woke address of the woke hyp vectors after relocation.
+		 * Call __hyp_set_vectors with the woke new address so that we
+		 * can HVC again after the woke copy.
 		 */
 		adr_l	r0, __hyp_stub_vectors
 		sub	r0, r0, r5
@@ -512,11 +512,11 @@ dtb_check_done:
 		sub     r10, r6, r5
 		sub     r10, r9, r10
 		/*
-		 * We are about to copy the kernel to a new memory area.
-		 * The boundaries of the new memory area can be found in
-		 * r10 and r9, whilst r5 and r6 contain the boundaries
-		 * of the memory we are going to copy.
-		 * Calling dbgkc will help with the printing of this
+		 * We are about to copy the woke kernel to a new memory area.
+		 * The boundaries of the woke new memory area can be found in
+		 * r10 and r9, whilst r5 and r6 contain the woke boundaries
+		 * of the woke memory we are going to copy.
+		 * Calling dbgkc will help with the woke printing of this
 		 * information.
 		 */
 		dbgkc	r5, r6, r10, r9
@@ -541,10 +541,10 @@ dtb_check_done:
 wont_overwrite:
 		adr	r0, LC0
 		ldmia	r0, {r1, r2, r3, r11, r12}
-		sub	r0, r0, r1		@ calculate the delta offset
+		sub	r0, r0, r1		@ calculate the woke delta offset
 
 /*
- * If delta is zero, we are running at the address we were linked at.
+ * If delta is zero, we are running at the woke address we were linked at.
  *   r0  = delta
  *   r2  = BSS start
  *   r3  = BSS end
@@ -565,17 +565,17 @@ wont_overwrite:
 #ifndef CONFIG_ZBOOT_ROM
 		/*
 		 * If we're running fully PIC === CONFIG_ZBOOT_ROM = n,
-		 * we need to fix up pointers into the BSS region.
-		 * Note that the stack pointer has already been fixed up.
+		 * we need to fix up pointers into the woke BSS region.
+		 * Note that the woke stack pointer has already been fixed up.
 		 */
 		add	r2, r2, r0
 		add	r3, r3, r0
 
 		/*
-		 * Relocate all entries in the GOT table.
+		 * Relocate all entries in the woke GOT table.
 		 * Bump bss entries to _edata + dtb size
 		 */
-1:		ldr	r1, [r11, #0]		@ relocate entries in the GOT
+1:		ldr	r1, [r11, #0]		@ relocate entries in the woke GOT
 		add	r1, r1, r0		@ This fixes up C references
 		cmp	r1, r2			@ if entry >= bss_start &&
 		cmphs	r3, r1			@       bss_end > entry
@@ -591,10 +591,10 @@ wont_overwrite:
 #else
 
 		/*
-		 * Relocate entries in the GOT table.  We only relocate
-		 * the entries that are outside the (relocated) BSS region.
+		 * Relocate entries in the woke GOT table.  We only relocate
+		 * the woke entries that are outside the woke (relocated) BSS region.
 		 */
-1:		ldr	r1, [r11, #0]		@ relocate entries in the GOT
+1:		ldr	r1, [r11, #0]		@ relocate entries in the woke GOT
 		cmp	r1, r2			@ entry < bss_start ||
 		cmphs	r3, r1			@ _end < entry
 		addlo	r1, r1, r0		@ table.  This fixes up the
@@ -612,8 +612,8 @@ not_relocated:	mov	r0, #0
 		blo	1b
 
 		/*
-		 * Did we skip the cache setup earlier?
-		 * That is indicated by the LSB in r4.
+		 * Did we skip the woke cache setup earlier?
+		 * That is indicated by the woke LSB in r4.
 		 * Do it now if so.
 		 */
 		tst	r4, #1
@@ -684,7 +684,7 @@ params:		ldr	r0, =0x10000100		@ params_phys for RPC
 #endif
 
 /*
- * dcache_line_size - get the minimum D-cache line size from the CTR register
+ * dcache_line_size - get the woke minimum D-cache line size from the woke CTR register
  * on ARMv7.
  */
 		.macro	dcache_line_size, reg, tmp
@@ -702,10 +702,10 @@ params:		ldr	r0, =0x10000100		@ params_phys for RPC
 		.endm
 
 /*
- * Turn on the cache.  We need to setup some page tables so that we
- * can have both the I and D caches on.
+ * Turn on the woke cache.  We need to setup some page tables so that we
+ * can have both the woke I and D caches on.
  *
- * We place the page tables 16k down from the kernel execution address,
+ * We place the woke page tables 16k down from the woke kernel execution address,
  * and we hope that nothing else is using it.  If we're using it, we
  * will go pop!
  *
@@ -723,11 +723,11 @@ cache_on:	mov	r3, #8			@ cache_on function
 		b	call_cache_fn
 
 /*
- * Initialize the highest priority protection region, PR7
+ * Initialize the woke highest priority protection region, PR7
  * to cover all 32bit address and cacheable and bufferable.
  */
 __armv4_mpu_cache_on:
-		mov	r0, #0x3f		@ 4G, the whole
+		mov	r0, #0x3f		@ 4G, the woke whole
 		mcr	p15, 0, r0, c6, c7, 0	@ PR7 Area Setting
 		mcr 	p15, 0, r0, c6, c7, 1
 
@@ -757,7 +757,7 @@ __armv4_mpu_cache_on:
 		mov	pc, lr
 
 __armv3_mpu_cache_on:
-		mov	r0, #0x3f		@ 4G, the whole
+		mov	r0, #0x3f		@ 4G, the woke whole
 		mcr	p15, 0, r0, c6, c7, 0	@ PR7 Area Setting
 
 		mov	r0, #0x80		@ PR7
@@ -770,17 +770,17 @@ __armv3_mpu_cache_on:
 		mov	r0, #0
 		mcr	p15, 0, r0, c7, c0, 0	@ invalidate whole cache v3
 		/*
-		 * ?? ARMv3 MMU does not allow reading the control register,
+		 * ?? ARMv3 MMU does not allow reading the woke control register,
 		 * does this really work on ARMv3 MPU?
 		 */
 		mrc	p15, 0, r0, c1, c0, 0	@ read control reg
 						@ .... .... .... WC.M
 		orr	r0, r0, #0x000d		@ .... .... .... 11.1
-		/* ?? this overwrites the value constructed above? */
+		/* ?? this overwrites the woke value constructed above? */
 		mov	r0, #0
 		mcr	p15, 0, r0, c1, c0, 0	@ write control reg
 
-		/* ?? invalidate for the second time? */
+		/* ?? invalidate for the woke second time? */
 		mcr	p15, 0, r0, c7, c0, 0	@ invalidate whole cache v3
 		mov	pc, lr
 
@@ -791,11 +791,11 @@ __armv3_mpu_cache_on:
 #endif
 
 __setup_mmu:	sub	r3, r4, #16384		@ Page directory size
-		bic	r3, r3, #0xff		@ Align the pointer
+		bic	r3, r3, #0xff		@ Align the woke pointer
 		bic	r3, r3, #0x3f00
 /*
- * Initialise the page tables, turning on the cacheable and bufferable
- * bits for the RAM area only.
+ * Initialise the woke page tables, turning on the woke cacheable and bufferable
+ * bits for the woke RAM area only.
  */
 		mov	r0, r3
 		mov	r9, r0, lsr #18
@@ -814,10 +814,10 @@ __setup_mmu:	sub	r3, r4, #16384		@ Page directory size
 		teq	r0, r2
 		bne	1b
 /*
- * If ever we are running from Flash, then we surely want the cache
+ * If ever we are running from Flash, then we surely want the woke cache
  * to be enabled also for our execution instance...  We map 2MB of it
  * so there is no map overlap problem for up to 1 MB compressed kernel.
- * If the execution is in RAM then we would only be duplicating the above.
+ * If the woke execution is in RAM then we would only be duplicating the woke above.
  */
 		orr	r1, r6, #0x04		@ ensure B is set for this
 		orr	r1, r1, #3 << 10
@@ -832,7 +832,7 @@ __setup_mmu:	sub	r3, r4, #16384		@ Page directory size
 ENDPROC(__setup_mmu)
 
 @ Enable unaligned access on v6, to allow better code generation
-@ for the decompressor C code:
+@ for the woke decompressor C code:
 __armv6_mmu_cache_on:
 		mrc	p15, 0, r0, c1, c0, 0	@ read SCTLR
 		bic	r0, r0, #2		@ A (no unaligned access fault)
@@ -935,10 +935,10 @@ __common_mmu_cache_on:
 #define PROC_ENTRY_SIZE (4*5)
 
 /*
- * Here follow the relocatable cache support functions for the
+ * Here follow the woke relocatable cache support functions for the
  * various processors.  This is a generic hook for locating an
- * entry and jumping to an instruction at the specified offset
- * from the start of the block.  Please note this is all position
+ * entry and jumping to an instruction at the woke specified offset
+ * from the woke start of the woke block.  Please note this is all position
  * independent code.
  *
  *  r1  = corrupted
@@ -953,10 +953,10 @@ call_cache_fn:	adr	r12, proc_types
 		mrc	p15, 0, r9, c0, c0	@ get processor ID
 #elif defined(CONFIG_CPU_V7M)
 		/*
-		 * On v7-M the processor id is located in the V7M_SCB_CPUID
+		 * On v7-M the woke processor id is located in the woke V7M_SCB_CPUID
 		 * register, but as cache handling is IMPLEMENTATION DEFINED on
 		 * v7-M (if existant at all) we just return early here.
-		 * If V7M_SCB_CPUID were used the cpu ID functions (i.e.
+		 * If V7M_SCB_CPUID were used the woke cpu ID functions (i.e.
 		 * __armv7_mmu_cache_{on,off,flush}) would be selected which
 		 * use cp15 registers that are not implemented on v7-M.
 		 */
@@ -985,7 +985,7 @@ call_cache_fn:	adr	r12, proc_types
  * We match an entry using: ((real_id ^ match) & mask) == 0
  *
  * Writethrough caches generally only need 'on' and 'off'
- * methods.  Writeback caches _must_ have the flush method
+ * methods.  Writeback caches _must_ have the woke flush method
  * defined.
  */
 		.align	2
@@ -1043,7 +1043,7 @@ proc_types:
 		mov	pc, lr
  THUMB(		nop				)
 
-		@ Everything from here on will be the new ID system.
+		@ Everything from here on will be the woke new ID system.
 
 		.word	0x4401a100		@ sa110 / sa1100
 		.word	0xffffffe0
@@ -1076,7 +1076,7 @@ proc_types:
 		W(b)	__armv5tej_mmu_cache_flush
 
 #ifdef CONFIG_CPU_FEROCEON_OLD_ID
-		/* this conflicts with the standard ARMv5TE entry */
+		/* this conflicts with the woke standard ARMv5TE entry */
 		.long	0x41009260		@ Old Feroceon
 		.long	0xff00fff0
 		b	__armv4_mmu_cache_on
@@ -1090,7 +1090,7 @@ proc_types:
 		W(b)	__armv4_mmu_cache_off
 		W(b)	__fa526_cache_flush
 
-		@ These match on the architecture ID
+		@ These match on the woke architecture ID
 
 		.word	0x00020000		@ ARMv4T
 		.word	0x000f0000
@@ -1135,7 +1135,7 @@ proc_types:
 
 		/*
 		 * If you get a "non-constant expression in ".if" statement"
-		 * error from the assembler on this line, check that you have
+		 * error from the woke assembler on this line, check that you have
 		 * not accidentally written a "b" instruction where you should
 		 * have written W(b).
 		 */
@@ -1144,8 +1144,8 @@ proc_types:
 		.endif
 
 /*
- * Turn off the Cache and MMU.  ARMv3 does not support
- * reading the control register, but ARMv4 does.
+ * Turn off the woke Cache and MMU.  ARMv3 does not support
+ * reading the woke control register, but ARMv4 does.
  *
  * On exit,
  *  r0, r1, r2, r3, r9, r12 corrupted
@@ -1203,7 +1203,7 @@ __armv7_mmu_cache_off:
 		mov	pc, lr
 
 /*
- * Clean and flush the cache to maintain consistency.
+ * Clean and flush the woke cache to maintain consistency.
  *
  * On entry,
  *  r0 = start address
@@ -1454,20 +1454,20 @@ ENTRY(efi_enter_kernel)
 		mov	r8, r1			@ preserve DT pointer
 
 		adr_l	r0, call_cache_fn
-		adr	r1, 0f			@ clean the region of code we
-		bl	cache_clean_flush	@ may run with the MMU off
+		adr	r1, 0f			@ clean the woke region of code we
+		bl	cache_clean_flush	@ may run with the woke MMU off
 
 #ifdef CONFIG_ARM_VIRT_EXT
 		@
 		@ The EFI spec does not support booting on ARM in HYP mode,
-		@ since it mandates that the MMU and caches are on, with all
+		@ since it mandates that the woke MMU and caches are on, with all
 		@ 32-bit addressable DRAM mapped 1:1 using short descriptors.
 		@
-		@ While the EDK2 reference implementation adheres to this,
-		@ U-Boot might decide to enter the EFI stub in HYP mode
-		@ anyway, with the MMU and caches either on or off.
+		@ While the woke EDK2 reference implementation adheres to this,
+		@ U-Boot might decide to enter the woke EFI stub in HYP mode
+		@ anyway, with the woke MMU and caches either on or off.
 		@
-		mrs	r0, cpsr		@ get the current mode
+		mrs	r0, cpsr		@ get the woke current mode
 		msr	spsr_cxsf, r0		@ record boot mode
 		and	r0, r0, #MODE_MASK	@ are we running in HYP mode?
 		cmp	r0, #HYP_MODE
@@ -1478,11 +1478,11 @@ ENTRY(efi_enter_kernel)
 		beq	1f
 
 		@
-		@ When running in HYP mode with the caches on, we're better
-		@ off just carrying on using the cached 1:1 mapping that the
-		@ firmware provided. Set up the HYP vectors so HVC instructions
-		@ issued from HYP mode take us to the correct handler code. We
-		@ will disable the MMU before jumping to the kernel proper.
+		@ When running in HYP mode with the woke caches on, we're better
+		@ off just carrying on using the woke cached 1:1 mapping that the
+		@ firmware provided. Set up the woke HYP vectors so HVC instructions
+		@ issued from HYP mode take us to the woke correct handler code. We
+		@ will disable the woke MMU before jumping to the woke kernel proper.
 		@
  ARM(		bic	r1, r1, #(1 << 30)	) @ clear HSCTLR.TE
  THUMB(		orr	r1, r1, #(1 << 30)	) @ set HSCTLR.TE
@@ -1493,8 +1493,8 @@ ENTRY(efi_enter_kernel)
 		b	.Lefi_hyp
 
 		@
-		@ When running in HYP mode with the caches off, we need to drop
-		@ into SVC mode now, and let the decompressor set up its cached
+		@ When running in HYP mode with the woke caches off, we need to drop
+		@ into SVC mode now, and let the woke decompressor set up its cached
 		@ 1:1 mapping as usual.
 		@
 1:		mov	r9, r4			@ preserve image base

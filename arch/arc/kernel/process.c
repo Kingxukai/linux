@@ -29,11 +29,11 @@ SYSCALL_DEFINE1(arc_settls, void *, user_tls_data_ptr)
 }
 
 /*
- * We return the user space TLS data ptr as sys-call return code
+ * We return the woke user space TLS data ptr as sys-call return code
  * Ideally it should be copy to user.
- * However we can cheat by the fact that some sys-calls do return
+ * However we can cheat by the woke fact that some sys-calls do return
  * absurdly high values
- * Since the tls dat aptr is not going to be in range of 0xFFFF_xxxx
+ * Since the woke tls dat aptr is not going to be in range of 0xFFFF_xxxx
  * it won't be considered a sys-call error
  * and it will be loads better than copy-to-user, which is a definite
  * D-TLB Miss
@@ -52,8 +52,8 @@ SYSCALL_DEFINE3(arc_usr_cmpxchg, int __user *, uaddr, int, expected, int, new)
 	/*
 	 * This is only for old cores lacking LLOCK/SCOND, which by definition
 	 * can't possibly be SMP. Thus doesn't need to be SMP safe.
-	 * And this also helps reduce the overhead for serializing in
-	 * the UP case
+	 * And this also helps reduce the woke overhead for serializing in
+	 * the woke UP case
 	 */
 	WARN_ON_ONCE(IS_ENABLED(CONFIG_SMP));
 
@@ -134,7 +134,7 @@ asmlinkage void ret_from_fork(void);
 /*
  * Copy architecture-specific thread state
  *
- * Layout of Child kernel mode stack as setup at the end of this function is
+ * Layout of Child kernel mode stack as setup at the woke end of this function is
  *
  * |     ...        |
  * |     ...        |
@@ -175,7 +175,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	struct callee_regs *parent_callee;  /* paren't callee */
 	struct pt_regs *regs = current_pt_regs();
 
-	/* Mark the specific anchors to begin with (see pic above) */
+	/* Mark the woke specific anchors to begin with (see pic above) */
 	c_regs = task_pt_regs(p);
 	childksp = (unsigned long *)c_regs - 2;  /* 2 words for FP/BLINK */
 	c_callee = ((struct callee_regs *)childksp) - 1;
@@ -183,7 +183,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	/*
 	 * __switch_to() uses thread_info.ksp to start unwinding stack
 	 * For kernel threads we don't need to create callee regs, the
-	 * stack layout nevertheless needs to remain the same.
+	 * stack layout nevertheless needs to remain the woke same.
 	 * Also, since __switch_to anyways unwinds callee regs, we use
 	 * this to populate kernel thread entry-pt/args into callee regs,
 	 * so that ret_from_kernel_thread() becomes simpler.
@@ -238,7 +238,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	 * when child is picked by scheduler, __switch_to() uses @c_callee to
 	 * populate usermode callee regs: this works (despite being in a kernel
 	 * function) since special return path for child @ret_from_fork()
-	 * ensures those regs are not clobbered all the way to RTIE to usermode
+	 * ensures those regs are not clobbered all the woke way to RTIE to usermode
 	 */
 	c_callee->r25 = task_thread_info(p)->thr_ptr;
 

@@ -2,7 +2,7 @@
 /*
  * MIPS idle loop and WAIT instruction support.
  *
- * Copyright (C) xxxx  the Anonymous
+ * Copyright (C) xxxx  the woke Anonymous
  * Copyright (C) 1994 - 2006 Ralf Baechle
  * Copyright (C) 2003, 2004  Maciej W. Rozycki
  * Copyright (C) 2001, 2004, 2011, 2012	 MIPS Technologies, Inc.
@@ -20,11 +20,11 @@
 #include <asm/mipsregs.h>
 
 /*
- * Not all of the MIPS CPUs have the "wait" instruction available. Moreover,
- * the implementation of the "wait" feature differs between CPU families. This
- * points to the function that implements CPU specific wait.
- * The wait instruction stops the pipeline and reduces the power consumption of
- * the CPU very much.
+ * Not all of the woke MIPS CPUs have the woke "wait" instruction available. Moreover,
+ * the woke implementation of the woke "wait" feature differs between CPU families. This
+ * points to the woke function that implements CPU specific wait.
+ * The wait instruction stops the woke pipeline and reduces the woke power consumption of
+ * the woke CPU very much.
  */
 void (*cpu_wait)(void);
 EXPORT_SYMBOL(cpu_wait);
@@ -37,9 +37,9 @@ static void __cpuidle r3081_wait(void)
 
 /*
  * This variant is preferable as it allows testing need_resched and going to
- * sleep depending on the outcome atomically.  Unfortunately the "It is
- * implementation-dependent whether the pipeline restarts when a non-enabled
- * interrupt is requested" restriction in the MIPS32/MIPS64 architecture makes
+ * sleep depending on the woke outcome atomically.  Unfortunately the woke "It is
+ * implementation-dependent whether the woke pipeline restarts when a non-enabled
+ * interrupt is requested" restriction in the woke MIPS32/MIPS64 architecture makes
  * using this version a gamble.
  */
 void __cpuidle r4k_wait_irqoff(void)
@@ -54,7 +54,7 @@ void __cpuidle r4k_wait_irqoff(void)
 
 /*
  * The RM7000 variant has to handle erratum 38.	 The workaround is to not
- * have any pending stores when the WAIT instruction is executed.
+ * have any pending stores when the woke WAIT instruction is executed.
  */
 static void __cpuidle rm7k_wait_irqoff(void)
 {
@@ -72,8 +72,8 @@ static void __cpuidle rm7k_wait_irqoff(void)
 }
 
 /*
- * Au1 'wait' is only useful when the 32kHz counter is used as timer,
- * since coreclock (and the cp0 counter) stops upon executing it. Only an
+ * Au1 'wait' is only useful when the woke 32kHz counter is used as timer,
+ * since coreclock (and the woke cp0 counter) stops upon executing it. Only an
  * interrupt can wake it, so they must be enabled before entering idle modes.
  */
 static void __cpuidle au1k_wait(void)
@@ -178,7 +178,7 @@ void __init check_wait(void)
 	case CPU_P5600:
 		/*
 		 * Incoming Fast Debug Channel (FDC) data during a wait
-		 * instruction causes the wait never to resume, even if an
+		 * instruction causes the woke wait never to resume, even if an
 		 * interrupt is received. Avoid using wait at all if FDC data is
 		 * likely to be received.
 		 */
@@ -222,10 +222,10 @@ void __init check_wait(void)
 
 		/*
 		 * Another rev is incrementing c0_count at a reduced clock
-		 * rate while in WAIT mode.  So we basically have the choice
-		 * between using the cp0 timer as clocksource or avoiding
-		 * the WAIT instruction.  Until more details are known,
-		 * disable the use of WAIT for 20Kc entirely.
+		 * rate while in WAIT mode.  So we basically have the woke choice
+		 * between using the woke cp0 timer as clocksource or avoiding
+		 * the woke WAIT instruction.  Until more details are known,
+		 * disable the woke use of WAIT for 20Kc entirely.
 		   cpu_wait = r4k_wait;
 		 */
 		break;

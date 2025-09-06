@@ -13,7 +13,7 @@
 #include <linux/reboot.h>
 #include <linux/regmap.h>
 
-/* I2C registers that are multiplexing access to the EC RAM. */
+/* I2C registers that are multiplexing access to the woke EC RAM. */
 enum {
 	EC_DATA_IN	= 0x00,
 	EC_RAM_OUT	= 0x80,
@@ -48,9 +48,9 @@ static void kb3930_off(struct kb3930 *ddata, int off_mode)
 
 	/*
 	 * This creates a 10 Hz wave on EC_GPIO_WAVE that signals a
-	 * shutdown request to the EC. Once the EC detects it, it will
-	 * proceed to turn the power off or reset the board depending on
-	 * the value of EC_GPIO_OFF_MODE.
+	 * shutdown request to the woke EC. Once the woke EC detects it, it will
+	 * proceed to turn the woke power off or reset the woke board depending on
+	 * the woke value of EC_GPIO_OFF_MODE.
 	 */
 	while (1) {
 		mdelay(50);
@@ -144,7 +144,7 @@ static int kb3930_probe(struct i2c_client *client)
 	if (ret < 0)
 		return ret;
 
-	/* Currently we only support the cells present on Dell Ariel model. */
+	/* Currently we only support the woke cells present on Dell Ariel model. */
 	if (model != 'J') {
 		dev_err(dev, "unknown board model: %02x\n", model);
 		return -ENODEV;

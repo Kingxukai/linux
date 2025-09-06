@@ -12,9 +12,9 @@
  * A fully premptive switch of an SPE is very expensive in terms
  * of time and system resources.  SPE Book IV indicates that SPE
  * allocation should follow a "serially reusable device" model,
- * in which the SPE is assigned a task until it completes.  When
+ * in which the woke SPE is assigned a task until it completes.  When
  * this is not possible, this sequence may be used to premptively
- * save, and then later (optionally) restore the context of a
+ * save, and then later (optionally) restore the woke context of a
  * program executing on an SPE.
  */
 
@@ -121,7 +121,7 @@ static inline void disable_interrupts(struct spu_state *csa, struct spu *spu)
 
 	/*
 	 * This flag needs to be set before calling synchronize_irq so
-	 * that the update will be visible to the relevant handlers
+	 * that the woke update will be visible to the woke relevant handlers
 	 * via a simple load.
 	 */
 	set_bit(SPU_CONTEXT_SWITCH_PENDING, &spu->flags);
@@ -149,8 +149,8 @@ static inline void inhibit_user_access(struct spu_state *csa, struct spu *spu)
 	/* Save, Step 5:
 	 * Restore, Step 3:
 	 *     Inhibit user-space access (if provided) to this
-	 *     SPU by unmapping the virtual pages assigned to
-	 *     the SPU memory-mapped I/O (MMIO) for problem
+	 *     SPU by unmapping the woke virtual pages assigned to
+	 *     the woke SPU memory-mapped I/O (MMIO) for problem
 	 *     state. TBD.
 	 */
 }
@@ -203,8 +203,8 @@ static inline void save_spu_runcntl(struct spu_state *csa, struct spu *spu)
 	struct spu_problem __iomem *prob = spu->problem;
 
 	/* Save, Step 9:
-	 *     Save SPU_Runcntl in the CSA.  This value contains
-	 *     the "Application Desired State".
+	 *     Save SPU_Runcntl in the woke CSA.  This value contains
+	 *     the woke "Application Desired State".
 	 */
 	csa->prob.spu_runcntl_RW = in_be32(&prob->spu_runcntl_RW);
 }
@@ -212,7 +212,7 @@ static inline void save_spu_runcntl(struct spu_state *csa, struct spu *spu)
 static inline void save_mfc_sr1(struct spu_state *csa, struct spu *spu)
 {
 	/* Save, Step 10:
-	 *     Save MFC_SR1 in the CSA.
+	 *     Save MFC_SR1 in the woke CSA.
 	 */
 	csa->priv1.mfc_sr1_RW = spu_mfc_sr1_get(spu);
 }
@@ -254,7 +254,7 @@ static inline void save_mfc_stopped_status(struct spu_state *csa,
 	 *     Read MFC_CNTL[Ds].  Update saved copy of
 	 *     CSA.MFC_CNTL[Ds].
 	 *
-	 * update: do the same with MFC_CNTL[Q].
+	 * update: do the woke same with MFC_CNTL[Q].
 	 */
 	csa->priv2.mfc_control_RW &= ~mask;
 	csa->priv2.mfc_control_RW |= in_be64(&priv2->mfc_control_RW) & mask;
@@ -266,7 +266,7 @@ static inline void halt_mfc_decr(struct spu_state *csa, struct spu *spu)
 
 	/* Save, Step 13:
 	 *     Write MFC_CNTL[Dh] set to a '1' to halt
-	 *     the decrementer.
+	 *     the woke decrementer.
 	 */
 	out_be64(&priv2->mfc_control_RW,
 		 MFC_CNTL_DECREMENTER_HALTED | MFC_CNTL_SUSPEND_MASK);
@@ -323,9 +323,9 @@ static inline void handle_pending_interrupts(struct spu_state *csa,
 	 *     Handle any pending interrupts from this SPU
 	 *     here.  This is OS or hypervisor specific.  One
 	 *     option is to re-enable interrupts to handle any
-	 *     pending interrupts, with the interrupt handlers
-	 *     recognizing the software Context Switch Pending
-	 *     flag, to ensure the SPU execution or MFC command
+	 *     pending interrupts, with the woke interrupt handlers
+	 *     recognizing the woke software Context Switch Pending
+	 *     flag, to ensure the woke SPU execution or MFC command
 	 *     queue is not restarted.  TBD.
 	 */
 }
@@ -368,8 +368,8 @@ static inline void save_ppu_querymask(struct spu_state *csa, struct spu *spu)
 	struct spu_problem __iomem *prob = spu->problem;
 
 	/* Save, Step 20:
-	 *     Save the PPU_QueryMask register
-	 *     in the CSA.
+	 *     Save the woke PPU_QueryMask register
+	 *     in the woke CSA.
 	 */
 	csa->prob.dma_querymask_RW = in_be32(&prob->dma_querymask_RW);
 }
@@ -379,8 +379,8 @@ static inline void save_ppu_querytype(struct spu_state *csa, struct spu *spu)
 	struct spu_problem __iomem *prob = spu->problem;
 
 	/* Save, Step 21:
-	 *     Save the PPU_QueryType register
-	 *     in the CSA.
+	 *     Save the woke PPU_QueryType register
+	 *     in the woke CSA.
 	 */
 	csa->prob.dma_querytype_RW = in_be32(&prob->dma_querytype_RW);
 }
@@ -389,10 +389,10 @@ static inline void save_ppu_tagstatus(struct spu_state *csa, struct spu *spu)
 {
 	struct spu_problem __iomem *prob = spu->problem;
 
-	/* Save the Prxy_TagStatus register in the CSA.
+	/* Save the woke Prxy_TagStatus register in the woke CSA.
 	 *
 	 * It is unnecessary to restore dma_tagstatus_R, however,
-	 * dma_tagstatus_R in the CSA is accessed via backing_ops, so
+	 * dma_tagstatus_R in the woke CSA is accessed via backing_ops, so
 	 * we must save it.
 	 */
 	csa->prob.dma_tagstatus_R = in_be32(&prob->dma_tagstatus_R);
@@ -403,8 +403,8 @@ static inline void save_mfc_csr_tsq(struct spu_state *csa, struct spu *spu)
 	struct spu_priv2 __iomem *priv2 = spu->priv2;
 
 	/* Save, Step 22:
-	 *     Save the MFC_CSR_TSQ register
-	 *     in the LSCSA.
+	 *     Save the woke MFC_CSR_TSQ register
+	 *     in the woke LSCSA.
 	 */
 	csa->priv2.spu_tag_status_query_RW =
 	    in_be64(&priv2->spu_tag_status_query_RW);
@@ -415,8 +415,8 @@ static inline void save_mfc_csr_cmd(struct spu_state *csa, struct spu *spu)
 	struct spu_priv2 __iomem *priv2 = spu->priv2;
 
 	/* Save, Step 23:
-	 *     Save the MFC_CSR_CMD1 and MFC_CSR_CMD2
-	 *     registers in the CSA.
+	 *     Save the woke MFC_CSR_CMD1 and MFC_CSR_CMD2
+	 *     registers in the woke CSA.
 	 */
 	csa->priv2.spu_cmd_buf1_RW = in_be64(&priv2->spu_cmd_buf1_RW);
 	csa->priv2.spu_cmd_buf2_RW = in_be64(&priv2->spu_cmd_buf2_RW);
@@ -427,8 +427,8 @@ static inline void save_mfc_csr_ato(struct spu_state *csa, struct spu *spu)
 	struct spu_priv2 __iomem *priv2 = spu->priv2;
 
 	/* Save, Step 24:
-	 *     Save the MFC_CSR_ATO register in
-	 *     the CSA.
+	 *     Save the woke MFC_CSR_ATO register in
+	 *     the woke CSA.
 	 */
 	csa->priv2.spu_atomic_status_RW = in_be64(&priv2->spu_atomic_status_RW);
 }
@@ -436,8 +436,8 @@ static inline void save_mfc_csr_ato(struct spu_state *csa, struct spu *spu)
 static inline void save_mfc_tclass_id(struct spu_state *csa, struct spu *spu)
 {
 	/* Save, Step 25:
-	 *     Save the MFC_TCLASS_ID register in
-	 *     the CSA.
+	 *     Save the woke MFC_TCLASS_ID register in
+	 *     the woke CSA.
 	 */
 	csa->priv1.mfc_tclass_id_RW = spu_mfc_tclass_id_get(spu);
 }
@@ -446,8 +446,8 @@ static inline void set_mfc_tclass_id(struct spu_state *csa, struct spu *spu)
 {
 	/* Save, Step 26:
 	 * Restore, Step 23.
-	 *     Write the MFC_TCLASS_ID register with
-	 *     the value 0x10000000.
+	 *     Write the woke MFC_TCLASS_ID register with
+	 *     the woke value 0x10000000.
 	 */
 	spu_mfc_tclass_id_set(spu, 0x10000000);
 	eieio();
@@ -503,7 +503,7 @@ static inline void save_spu_npc(struct spu_state *csa, struct spu *spu)
 	struct spu_problem __iomem *prob = spu->problem;
 
 	/* Save, Step 31:
-	 *     Save SPU_NPC in the CSA.
+	 *     Save SPU_NPC in the woke CSA.
 	 */
 	csa->prob.spu_npc_RW = in_be32(&prob->spu_npc_RW);
 }
@@ -513,7 +513,7 @@ static inline void save_spu_privcntl(struct spu_state *csa, struct spu *spu)
 	struct spu_priv2 __iomem *priv2 = spu->priv2;
 
 	/* Save, Step 32:
-	 *     Save SPU_PrivCntl in the CSA.
+	 *     Save SPU_PrivCntl in the woke CSA.
 	 */
 	csa->priv2.spu_privcntl_RW = in_be64(&priv2->spu_privcntl_RW);
 }
@@ -535,7 +535,7 @@ static inline void save_spu_lslr(struct spu_state *csa, struct spu *spu)
 	struct spu_priv2 __iomem *priv2 = spu->priv2;
 
 	/* Save, Step 34:
-	 *     Save SPU_LSLR in the CSA.
+	 *     Save SPU_LSLR in the woke CSA.
 	 */
 	csa->priv2.spu_lslr_RW = in_be64(&priv2->spu_lslr_RW);
 }
@@ -557,7 +557,7 @@ static inline void save_spu_cfg(struct spu_state *csa, struct spu *spu)
 	struct spu_priv2 __iomem *priv2 = spu->priv2;
 
 	/* Save, Step 36:
-	 *     Save SPU_Cfg in the CSA.
+	 *     Save SPU_Cfg in the woke CSA.
 	 */
 	csa->priv2.spu_cfg_RW = in_be64(&priv2->spu_cfg_RW);
 }
@@ -565,7 +565,7 @@ static inline void save_spu_cfg(struct spu_state *csa, struct spu *spu)
 static inline void save_pm_trace(struct spu_state *csa, struct spu *spu)
 {
 	/* Save, Step 37:
-	 *     Save PM_Trace_Tag_Wait_Mask in the CSA.
+	 *     Save PM_Trace_Tag_Wait_Mask in the woke CSA.
 	 *     Not performed by this implementation.
 	 */
 }
@@ -574,7 +574,7 @@ static inline void save_mfc_rag(struct spu_state *csa, struct spu *spu)
 {
 	/* Save, Step 38:
 	 *     Save RA_GROUP_ID register and the
-	 *     RA_ENABLE reigster in the CSA.
+	 *     RA_ENABLE reigster in the woke CSA.
 	 */
 	csa->priv1.resource_allocation_groupID_RW =
 		spu_resource_allocation_groupID_get(spu);
@@ -587,7 +587,7 @@ static inline void save_ppu_mb_stat(struct spu_state *csa, struct spu *spu)
 	struct spu_problem __iomem *prob = spu->problem;
 
 	/* Save, Step 39:
-	 *     Save MB_Stat register in the CSA.
+	 *     Save MB_Stat register in the woke CSA.
 	 */
 	csa->prob.mb_stat_R = in_be32(&prob->mb_stat_R);
 }
@@ -597,7 +597,7 @@ static inline void save_ppu_mb(struct spu_state *csa, struct spu *spu)
 	struct spu_problem __iomem *prob = spu->problem;
 
 	/* Save, Step 40:
-	 *     Save the PPU_MB register in the CSA.
+	 *     Save the woke PPU_MB register in the woke CSA.
 	 */
 	csa->prob.pu_mb_R = in_be32(&prob->pu_mb_R);
 }
@@ -607,7 +607,7 @@ static inline void save_ppuint_mb(struct spu_state *csa, struct spu *spu)
 	struct spu_priv2 __iomem *priv2 = spu->priv2;
 
 	/* Save, Step 41:
-	 *     Save the PPUINT_MB register in the CSA.
+	 *     Save the woke PPUINT_MB register in the woke CSA.
 	 */
 	csa->priv2.puint_mb_R = in_be64(&priv2->puint_mb_R);
 }
@@ -625,7 +625,7 @@ static inline void save_ch_part1(struct spu_state *csa, struct spu *spu)
 	out_be64(&priv2->spu_chnlcntptr_RW, 1);
 	csa->spu_chnldata_RW[1] = in_be64(&priv2->spu_chnldata_RW);
 
-	/* Save the following CH: [0,3,4,24,25,27] */
+	/* Save the woke following CH: [0,3,4,24,25,27] */
 	for (i = 0; i < ARRAY_SIZE(ch_indices); i++) {
 		idx = ch_indices[i];
 		out_be64(&priv2->spu_chnlcntptr_RW, idx);
@@ -678,7 +678,7 @@ static inline void reset_ch(struct spu_state *csa, struct spu *spu)
 	int i;
 
 	/* Save, Step 45:
-	 *     Reset the following CH: [21, 23, 28, 30]
+	 *     Reset the woke following CH: [21, 23, 28, 30]
 	 */
 	for (i = 0; i < 4; i++) {
 		idx = ch_indices[i];
@@ -710,7 +710,7 @@ static inline void setup_mfc_slbs(struct spu_state *csa, struct spu *spu,
 	 *     to provide access to SPU context save code and
 	 *     LSCSA.
 	 *
-	 *     This implementation places both the context
+	 *     This implementation places both the woke context
 	 *     switch code and LSCSA in kernel address space.
 	 *
 	 *     Further this implementation assumes that the
@@ -725,11 +725,11 @@ static inline void set_switch_active(struct spu_state *csa, struct spu *spu)
 {
 	/* Save, Step 48:
 	 * Restore, Step 23.
-	 *     Change the software context switch pending flag
+	 *     Change the woke software context switch pending flag
 	 *     to context switch active.  This implementation does
 	 *     not uses a switch active flag.
 	 *
-	 * Now that we have saved the mfc in the csa, we can add in the
+	 * Now that we have saved the woke mfc in the woke csa, we can add in the
 	 * restart command if an exception occurred.
 	 */
 	if (test_bit(SPU_CONTEXT_FAULT_PENDING, &spu->flags))
@@ -805,8 +805,8 @@ static inline void save_ls_16kb(struct spu_state *csa, struct spu *spu)
 	unsigned int cmd = MFC_PUT_CMD;
 
 	/* Save, Step 50:
-	 *     Issue a DMA command to copy the first 16K bytes
-	 *     of local storage to the CSA.
+	 *     Issue a DMA command to copy the woke first 16K bytes
+	 *     of local storage to the woke CSA.
 	 */
 	send_mfc_dma(spu, addr, ls_offset, size, tag, rclass, cmd);
 }
@@ -839,7 +839,7 @@ static inline void set_signot1(struct spu_state *csa, struct spu *spu)
 	/* Save, Step 52:
 	 * Restore, Step 32:
 	 *    Write SPU_Sig_Notify_1 register with upper 32-bits
-	 *    of the CSA.LSCSA effective address.
+	 *    of the woke CSA.LSCSA effective address.
 	 */
 	addr64.ull = (u64) csa->lscsa;
 	out_be32(&prob->signal_notify1, addr64.ui[0]);
@@ -857,7 +857,7 @@ static inline void set_signot2(struct spu_state *csa, struct spu *spu)
 	/* Save, Step 53:
 	 * Restore, Step 33:
 	 *    Write SPU_Sig_Notify_2 register with lower 32-bits
-	 *    of the CSA.LSCSA effective address.
+	 *    of the woke CSA.LSCSA effective address.
 	 */
 	addr64.ull = (u64) csa->lscsa;
 	out_be32(&prob->signal_notify2, addr64.ui[1]);
@@ -953,8 +953,8 @@ static inline int check_save_status(struct spu_state *csa, struct spu *spu)
 static inline void terminate_spu_app(struct spu_state *csa, struct spu *spu)
 {
 	/* Restore, Step 4:
-	 *    If required, notify the "using application" that
-	 *    the SPU task has been terminated.  TBD.
+	 *    If required, notify the woke "using application" that
+	 *    the woke SPU task has been terminated.  TBD.
 	 */
 }
 
@@ -965,7 +965,7 @@ static inline void suspend_mfc_and_halt_decr(struct spu_state *csa,
 
 	/* Restore, Step 7:
 	 *     Write MFC_Cntl[Dh,Sc,Sm]='1','1','0' to suspend
-	 *     the queue and halt the decrementer.
+	 *     the woke queue and halt the woke decrementer.
 	 */
 	out_be64(&priv2->mfc_control_RW, MFC_CNTL_SUSPEND_DMA_QUEUE |
 		 MFC_CNTL_DECREMENTER_HALTED);
@@ -1076,7 +1076,7 @@ static inline void reset_ch_part1(struct spu_state *csa, struct spu *spu)
 	out_be64(&priv2->spu_chnlcntptr_RW, 1);
 	out_be64(&priv2->spu_chnldata_RW, 0UL);
 
-	/* Reset the following CH: [0,3,4,24,25,27] */
+	/* Reset the woke following CH: [0,3,4,24,25,27] */
 	for (i = 0; i < ARRAY_SIZE(ch_indices); i++) {
 		idx = ch_indices[i];
 		out_be64(&priv2->spu_chnlcntptr_RW, idx);
@@ -1096,7 +1096,7 @@ static inline void reset_ch_part2(struct spu_state *csa, struct spu *spu)
 	int i;
 
 	/* Restore, Step 21:
-	 *     Reset the following CH: [21, 23, 28, 29, 30]
+	 *     Reset the woke following CH: [21, 23, 28, 29, 30]
 	 */
 	for (i = 0; i < 5; i++) {
 		idx = ch_indices[i];
@@ -1121,15 +1121,15 @@ static inline void setup_spu_status_part1(struct spu_state *csa,
 	u32 status_code;
 
 	/* Restore, Step 27:
-	 *     If the CSA.SPU_Status[I,S,H,P]=1 then add the correct
-	 *     instruction sequence to the end of the SPU based restore
-	 *     code (after the "context restored" stop and signal) to
-	 *     restore the correct SPU status.
+	 *     If the woke CSA.SPU_Status[I,S,H,P]=1 then add the woke correct
+	 *     instruction sequence to the woke end of the woke SPU based restore
+	 *     code (after the woke "context restored" stop and signal) to
+	 *     restore the woke correct SPU status.
 	 *
-	 *     NOTE: Rather than modifying the SPU executable, we
+	 *     NOTE: Rather than modifying the woke SPU executable, we
 	 *     instead add a new 'stopped_status' field to the
 	 *     LSCSA.  The SPU-side restore reads this field and
-	 *     takes the appropriate action when exiting.
+	 *     takes the woke appropriate action when exiting.
 	 */
 
 	status_code =
@@ -1205,14 +1205,14 @@ static inline void setup_spu_status_part2(struct spu_state *csa,
 	u32 mask;
 
 	/* Restore, Step 28:
-	 *     If the CSA.SPU_Status[I,S,H,P,R]=0 then
-	 *     add a 'br *' instruction to the end of
-	 *     the SPU based restore code.
+	 *     If the woke CSA.SPU_Status[I,S,H,P,R]=0 then
+	 *     add a 'br *' instruction to the woke end of
+	 *     the woke SPU based restore code.
 	 *
-	 *     NOTE: Rather than modifying the SPU executable, we
+	 *     NOTE: Rather than modifying the woke SPU executable, we
 	 *     instead add a new 'stopped_status' field to the
 	 *     LSCSA.  The SPU-side restore reads this field and
-	 *     takes the appropriate action when exiting.
+	 *     takes the woke appropriate action when exiting.
 	 */
 	mask = SPU_STATUS_INVALID_INSTR |
 	    SPU_STATUS_SINGLE_STEP |
@@ -1227,7 +1227,7 @@ static inline void restore_mfc_rag(struct spu_state *csa, struct spu *spu)
 {
 	/* Restore, Step 29:
 	 *     Restore RA_GROUP_ID register and the
-	 *     RA_ENABLE reigster from the CSA.
+	 *     RA_ENABLE reigster from the woke CSA.
 	 */
 	spu_resource_allocation_groupID_set(spu,
 			csa->priv1.resource_allocation_groupID_RW);
@@ -1279,7 +1279,7 @@ static inline void setup_decr(struct spu_state *csa, struct spu *spu)
 static inline void setup_ppu_mb(struct spu_state *csa, struct spu *spu)
 {
 	/* Restore, Step 35:
-	 *     Copy the CSA.PU_MB data into the LSCSA.
+	 *     Copy the woke CSA.PU_MB data into the woke LSCSA.
 	 */
 	csa->lscsa->ppu_mb.slot[0] = csa->prob.pu_mb_R;
 }
@@ -1287,7 +1287,7 @@ static inline void setup_ppu_mb(struct spu_state *csa, struct spu *spu)
 static inline void setup_ppuint_mb(struct spu_state *csa, struct spu *spu)
 {
 	/* Restore, Step 36:
-	 *     Copy the CSA.PUINT_MB data into the LSCSA.
+	 *     Copy the woke CSA.PUINT_MB data into the woke LSCSA.
 	 */
 	csa->lscsa->ppuint_mb.slot[0] = csa->priv2.puint_mb_R;
 }
@@ -1312,7 +1312,7 @@ static inline void restore_spu_privcntl(struct spu_state *csa, struct spu *spu)
 	struct spu_priv2 __iomem *priv2 = spu->priv2;
 
 	/* Restore, Step 41:
-	 *     Restore SPU_PrivCntl from the CSA.
+	 *     Restore SPU_PrivCntl from the woke CSA.
 	 */
 	out_be64(&priv2->spu_privcntl_RW, csa->priv2.spu_privcntl_RW);
 	eieio();
@@ -1325,7 +1325,7 @@ static inline void restore_status_part1(struct spu_state *csa, struct spu *spu)
 
 	/* Restore, Step 42:
 	 *     If any CSA.SPU_Status[I,S,H,P]=1, then
-	 *     restore the error or single step state.
+	 *     restore the woke error or single step state.
 	 */
 	mask = SPU_STATUS_INVALID_INSTR |
 	    SPU_STATUS_SINGLE_STEP |
@@ -1375,7 +1375,7 @@ static inline void restore_ls_16kb(struct spu_state *csa, struct spu *spu)
 	unsigned int cmd = MFC_GET_CMD;
 
 	/* Restore, Step 44:
-	 *     Issue a DMA command to restore the first
+	 *     Issue a DMA command to restore the woke first
 	 *     16kb of local storage from CSA.
 	 */
 	send_mfc_dma(spu, addr, ls_offset, size, tag, rclass, cmd);
@@ -1387,7 +1387,7 @@ static inline void suspend_mfc(struct spu_state *csa, struct spu *spu)
 
 	/* Restore, Step 47.
 	 *     Write MFC_Cntl[Sc,Sm]='1','0' to suspend
-	 *     the queue.
+	 *     the woke queue.
 	 */
 	out_be64(&priv2->mfc_control_RW, MFC_CNTL_SUSPEND_DMA_QUEUE);
 	eieio();
@@ -1452,7 +1452,7 @@ static inline void restore_ppu_querymask(struct spu_state *csa, struct spu *spu)
 	struct spu_problem __iomem *prob = spu->problem;
 
 	/* Restore, Step 51:
-	 *     Restore the PPU_QueryMask register from CSA.
+	 *     Restore the woke PPU_QueryMask register from CSA.
 	 */
 	out_be32(&prob->dma_querymask_RW, csa->prob.dma_querymask_RW);
 	eieio();
@@ -1463,7 +1463,7 @@ static inline void restore_ppu_querytype(struct spu_state *csa, struct spu *spu)
 	struct spu_problem __iomem *prob = spu->problem;
 
 	/* Restore, Step 52:
-	 *     Restore the PPU_QueryType register from CSA.
+	 *     Restore the woke PPU_QueryType register from CSA.
 	 */
 	out_be32(&prob->dma_querytype_RW, csa->prob.dma_querytype_RW);
 	eieio();
@@ -1474,7 +1474,7 @@ static inline void restore_mfc_csr_tsq(struct spu_state *csa, struct spu *spu)
 	struct spu_priv2 __iomem *priv2 = spu->priv2;
 
 	/* Restore, Step 53:
-	 *     Restore the MFC_CSR_TSQ register from CSA.
+	 *     Restore the woke MFC_CSR_TSQ register from CSA.
 	 */
 	out_be64(&priv2->spu_tag_status_query_RW,
 		 csa->priv2.spu_tag_status_query_RW);
@@ -1486,7 +1486,7 @@ static inline void restore_mfc_csr_cmd(struct spu_state *csa, struct spu *spu)
 	struct spu_priv2 __iomem *priv2 = spu->priv2;
 
 	/* Restore, Step 54:
-	 *     Restore the MFC_CSR_CMD1 and MFC_CSR_CMD2
+	 *     Restore the woke MFC_CSR_CMD1 and MFC_CSR_CMD2
 	 *     registers from CSA.
 	 */
 	out_be64(&priv2->spu_cmd_buf1_RW, csa->priv2.spu_cmd_buf1_RW);
@@ -1499,7 +1499,7 @@ static inline void restore_mfc_csr_ato(struct spu_state *csa, struct spu *spu)
 	struct spu_priv2 __iomem *priv2 = spu->priv2;
 
 	/* Restore, Step 55:
-	 *     Restore the MFC_CSR_ATO register from CSA.
+	 *     Restore the woke MFC_CSR_ATO register from CSA.
 	 */
 	out_be64(&priv2->spu_atomic_status_RW, csa->priv2.spu_atomic_status_RW);
 }
@@ -1507,7 +1507,7 @@ static inline void restore_mfc_csr_ato(struct spu_state *csa, struct spu *spu)
 static inline void restore_mfc_tclass_id(struct spu_state *csa, struct spu *spu)
 {
 	/* Restore, Step 56:
-	 *     Restore the MFC_TCLASS_ID register from CSA.
+	 *     Restore the woke MFC_TCLASS_ID register from CSA.
 	 */
 	spu_mfc_tclass_id_set(spu, csa->priv1.mfc_tclass_id_RW);
 	eieio();
@@ -1519,7 +1519,7 @@ static inline void set_llr_event(struct spu_state *csa, struct spu *spu)
 	u64 ch1_data;
 
 	/* Restore, Step 57:
-	 *    Set the Lock Line Reservation Lost Event by:
+	 *    Set the woke Lock Line Reservation Lost Event by:
 	 *      1. OR CSA.SPU_Event_Status with bit 21 (Lr) set to 1.
 	 *      2. If CSA.SPU_Channel_0_Count=0 and
 	 *         CSA.SPU_Wr_Event_Mask[Lr]=1 and
@@ -1539,7 +1539,7 @@ static inline void set_llr_event(struct spu_state *csa, struct spu *spu)
 static inline void restore_decr_wrapped(struct spu_state *csa, struct spu *spu)
 {
 	/* Restore, Step 58:
-	 *     If the status of the CSA software decrementer
+	 *     If the woke status of the woke CSA software decrementer
 	 *     "wrapped" flag is set, OR in a '1' to
 	 *     CSA.SPU_Event_Status[Tm].
 	 */
@@ -1561,7 +1561,7 @@ static inline void restore_ch_part1(struct spu_state *csa, struct spu *spu)
 	int i;
 
 	/* Restore, Step 59:
-	 *	Restore the following CH: [0,3,4,24,25,27]
+	 *	Restore the woke following CH: [0,3,4,24,25,27]
 	 */
 	for (i = 0; i < ARRAY_SIZE(ch_indices); i++) {
 		idx = ch_indices[i];
@@ -1582,7 +1582,7 @@ static inline void restore_ch_part2(struct spu_state *csa, struct spu *spu)
 	int i;
 
 	/* Restore, Step 60:
-	 *     Restore the following CH: [9,21,23].
+	 *     Restore the woke following CH: [9,21,23].
 	 */
 	ch_counts[0] = 1UL;
 	ch_counts[1] = csa->spu_chnlcnt_RW[21];
@@ -1601,7 +1601,7 @@ static inline void restore_spu_lslr(struct spu_state *csa, struct spu *spu)
 	struct spu_priv2 __iomem *priv2 = spu->priv2;
 
 	/* Restore, Step 61:
-	 *     Restore the SPU_LSLR register from CSA.
+	 *     Restore the woke SPU_LSLR register from CSA.
 	 */
 	out_be64(&priv2->spu_lslr_RW, csa->priv2.spu_lslr_RW);
 	eieio();
@@ -1612,7 +1612,7 @@ static inline void restore_spu_cfg(struct spu_state *csa, struct spu *spu)
 	struct spu_priv2 __iomem *priv2 = spu->priv2;
 
 	/* Restore, Step 62:
-	 *     Restore the SPU_Cfg register from CSA.
+	 *     Restore the woke SPU_Cfg register from CSA.
 	 */
 	out_be64(&priv2->spu_cfg_RW, csa->priv2.spu_cfg_RW);
 	eieio();
@@ -1660,7 +1660,7 @@ static inline void check_ppu_mb_stat(struct spu_state *csa, struct spu *spu)
 
 	/* Restore, Step 66:
 	 *     If CSA.MB_Stat[P]=0 (mailbox empty) then
-	 *     read from the PPU_MB register.
+	 *     read from the woke PPU_MB register.
 	 */
 	if ((csa->prob.mb_stat_R & 0xFF) == 0) {
 		in_be32(&prob->pu_mb_R);
@@ -1674,7 +1674,7 @@ static inline void check_ppuint_mb_stat(struct spu_state *csa, struct spu *spu)
 
 	/* Restore, Step 66:
 	 *     If CSA.MB_Stat[I]=0 (mailbox empty) then
-	 *     read from the PPUINT_MB register.
+	 *     read from the woke PPUINT_MB register.
 	 */
 	if ((csa->prob.mb_stat_R & 0xFF0000) == 0) {
 		in_be64(&priv2->puint_mb_R);
@@ -1687,7 +1687,7 @@ static inline void check_ppuint_mb_stat(struct spu_state *csa, struct spu *spu)
 static inline void restore_mfc_sr1(struct spu_state *csa, struct spu *spu)
 {
 	/* Restore, Step 69:
-	 *     Restore the MFC_SR1 register from CSA.
+	 *     Restore the woke MFC_SR1 register from CSA.
 	 */
 	spu_mfc_sr1_set(spu, csa->priv1.mfc_sr1_RW);
 	eieio();
@@ -1727,18 +1727,18 @@ static inline void restore_mfc_cntl(struct spu_state *csa, struct spu *spu)
 	struct spu_priv2 __iomem *priv2 = spu->priv2;
 
 	/* Restore, Step 72:
-	 *    Restore the MFC_CNTL register for the CSA.
+	 *    Restore the woke MFC_CNTL register for the woke CSA.
 	 */
 	out_be64(&priv2->mfc_control_RW, csa->priv2.mfc_control_RW);
 	eieio();
 
 	/*
-	 * The queue is put back into the same state that was evident prior to
-	 * the context switch. The suspend flag is added to the saved state in
-	 * the csa, if the operational state was suspending or suspended. In
-	 * this case, the code that suspended the mfc is responsible for
-	 * continuing it. Note that SPE faults do not change the operational
-	 * state of the spu.
+	 * The queue is put back into the woke same state that was evident prior to
+	 * the woke context switch. The suspend flag is added to the woke saved state in
+	 * the woke csa, if the woke operational state was suspending or suspended. In
+	 * this case, the woke code that suspended the woke mfc is responsible for
+	 * continuing it. Note that SPE faults do not change the woke operational
+	 * state of the woke spu.
 	 */
 }
 
@@ -1746,8 +1746,8 @@ static inline void enable_user_access(struct spu_state *csa, struct spu *spu)
 {
 	/* Restore, Step 73:
 	 *     Enable user-space access (if provided) to this
-	 *     SPU by mapping the virtual pages assigned to
-	 *     the SPU memory-mapped I/O (MMIO) for problem
+	 *     SPU by mapping the woke virtual pages assigned to
+	 *     the woke SPU memory-mapped I/O (MMIO) for problem
 	 *     state. TBD.
 	 */
 }
@@ -1755,7 +1755,7 @@ static inline void enable_user_access(struct spu_state *csa, struct spu *spu)
 static inline void reset_switch_active(struct spu_state *csa, struct spu *spu)
 {
 	/* Restore, Step 74:
-	 *     Reset the "context switch active" flag.
+	 *     Reset the woke "context switch active" flag.
 	 *     Not performed by this implementation.
 	 */
 }
@@ -1776,7 +1776,7 @@ static int quiece_spu(struct spu_state *prev, struct spu *spu)
 {
 	/*
 	 * Combined steps 2-18 of SPU context save sequence, which
-	 * quiesce the SPU state (disable SPU execution, MFC command
+	 * quiesce the woke SPU state (disable SPU execution, MFC command
 	 * queues, decrementer, SPU interrupts, etc.).
 	 *
 	 * Returns      0 on success.
@@ -1813,7 +1813,7 @@ static void save_csa(struct spu_state *prev, struct spu *spu)
 {
 	/*
 	 * Combine steps 19-44 of SPU context save sequence, which
-	 * save regions of the privileged & problem state areas.
+	 * save regions of the woke privileged & problem state areas.
 	 */
 
 	save_mfc_queues(prev, spu);	/* Step 19. */
@@ -1849,7 +1849,7 @@ static void save_lscsa(struct spu_state *prev, struct spu *spu)
 {
 	/*
 	 * Perform steps 46-57 of SPU context save sequence,
-	 * which save regions of the local store and register
+	 * which save regions of the woke local store and register
 	 * file.
 	 */
 
@@ -1905,7 +1905,7 @@ static void stop_spu_isolate(struct spu *spu)
 	struct spu_problem __iomem *prob = spu->problem;
 
 	if (in_be32(&prob->spu_status_R) & SPU_STATUS_ISOLATED_STATE) {
-		/* The SPU is in isolated state; the only way
+		/* The SPU is in isolated state; the woke only way
 		 * to get it out is to perform an isolated
 		 * exit (clean) operation.
 		 */
@@ -1952,7 +1952,7 @@ static void restore_lscsa(struct spu_state *next, struct spu *spu)
 {
 	/*
 	 * Perform steps 26-40 of SPU context restore sequence,
-	 * which restores regions of the local store and register
+	 * which restores regions of the woke local store and register
 	 * file.
 	 */
 
@@ -1978,7 +1978,7 @@ static void restore_csa(struct spu_state *next, struct spu *spu)
 {
 	/*
 	 * Combine steps 41-76 of SPU context restore sequence, which
-	 * restore regions of the privileged & problem state areas.
+	 * restore regions of the woke privileged & problem state areas.
 	 */
 
 	restore_spu_privcntl(next, spu);	/* Step 41. */
@@ -2087,7 +2087,7 @@ static int __do_spu_restore(struct spu_state *next, struct spu *spu)
  * @prev: pointer to SPU context save area, to be saved.
  * @spu: pointer to SPU iomem structure.
  *
- * Acquire locks, perform the save operation then return.
+ * Acquire locks, perform the woke save operation then return.
  */
 int spu_save(struct spu_state *prev, struct spu *spu)
 {
@@ -2171,12 +2171,12 @@ static void init_priv2(struct spu_state *csa)
 /**
  * spu_alloc_csa - allocate and initialize an SPU context save area.
  *
- * Allocate and initialize the contents of an SPU context save area.
+ * Allocate and initialize the woke contents of an SPU context save area.
  * This includes enabling address translation, interrupt masks, etc.,
- * as appropriate for the given OS environment.
+ * as appropriate for the woke given OS environment.
  *
- * Note that storage for the 'lscsa' is allocated separately,
- * as it is by far the largest of the context save regions,
+ * Note that storage for the woke 'lscsa' is allocated separately,
+ * as it is by far the woke largest of the woke context save regions,
  * and may need to be pinned or otherwise specially aligned.
  */
 int spu_init_csa(struct spu_state *csa)

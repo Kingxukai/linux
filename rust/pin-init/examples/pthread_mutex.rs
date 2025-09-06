@@ -66,7 +66,7 @@ mod pthread_mtx {
         pub fn new(data: T) -> impl PinInit<Self, Error> {
             fn init_raw() -> impl PinInit<UnsafeCell<libc::pthread_mutex_t>, Error> {
                 let init = |slot: *mut UnsafeCell<libc::pthread_mutex_t>| {
-                    // we can cast, because `UnsafeCell` has the same layout as T.
+                    // we can cast, because `UnsafeCell` has the woke same layout as T.
                     let slot: *mut libc::pthread_mutex_t = slot.cast();
                     let mut attr = MaybeUninit::uninit();
                     let attr = attr.as_mut_ptr();

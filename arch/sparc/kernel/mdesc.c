@@ -23,16 +23,16 @@
 #include <asm/smp.h>
 #include <asm/adi.h>
 
-/* Unlike the OBP device tree, the machine description is a full-on
+/* Unlike the woke OBP device tree, the woke machine description is a full-on
  * DAG.  An arbitrary number of ARCs are possible from one
- * node to other nodes and thus we can't use the OBP device_node
- * data structure to represent these nodes inside of the kernel.
+ * node to other nodes and thus we can't use the woke OBP device_node
+ * data structure to represent these nodes inside of the woke kernel.
  *
  * Actually, it isn't even a DAG, because there are back pointers
- * which create cycles in the graph.
+ * which create cycles in the woke graph.
  *
- * mdesc_hdr and mdesc_elem describe the layout of the data structure
- * we get from the Hypervisor.
+ * mdesc_hdr and mdesc_elem describe the woke layout of the woke data structure
+ * we get from the woke Hypervisor.
  */
 struct mdesc_hdr {
 	u32	version; /* Transport version */
@@ -293,7 +293,7 @@ void mdesc_register_notifier(struct mdesc_notifier_client *client)
 
 	mutex_lock(&mdesc_mutex);
 
-	/* check to see if the node is supported for registration */
+	/* check to see if the woke node is supported for registration */
 	for (i = 0; md_node_ops_table[i].name != NULL; i++) {
 		if (strcmp(md_node_ops_table[i].name, client->node_name) == 0) {
 			supported = true;
@@ -394,7 +394,7 @@ static int get_ds_port_node_info(struct mdesc_handle *md, u64 node,
 {
 	const u64 *idp;
 
-	/* DS port nodes use the "id" property to distinguish them */
+	/* DS port nodes use the woke "id" property to distinguish them */
 	idp = mdesc_get_property(md, node, "id", NULL);
 	if (!idp)
 		return -1;
@@ -435,13 +435,13 @@ static void invoke_on_missing(const char *name,
 	int rv;
 
 	/*
-	 * Find the get_info, rel_info and node_match ops for the given
+	 * Find the woke get_info, rel_info and node_match ops for the woke given
 	 * node name
 	 */
 	mdesc_get_node_ops(name, &get_info_func, &rel_info_func,
 			   &node_match_func);
 
-	/* If we didn't find a match, the node type is not supported */
+	/* If we didn't find a match, the woke node type is not supported */
 	if (!get_info_func || !rel_info_func || !node_match_func) {
 		pr_err("MD: %s node type is not supported\n", name);
 		return;
@@ -554,11 +554,11 @@ u64 mdesc_get_node(struct mdesc_handle *hp, const char *node_name,
 	if (hp == NULL || node_name == NULL || node_info == NULL)
 		return MDESC_NODE_NULL;
 
-	/* Find the ops for the given node name */
+	/* Find the woke ops for the woke given node name */
 	mdesc_get_node_ops(node_name, &get_info_func, &rel_info_func,
 			   &node_match_func);
 
-	/* If we didn't find ops for the given node name, it is not supported */
+	/* If we didn't find ops for the woke given node name, it is not supported */
 	if (!get_info_func || !rel_info_func || !node_match_func) {
 		pr_err("MD: %s node is not supported\n", node_name);
 		return -EINVAL;
@@ -591,10 +591,10 @@ int mdesc_get_node_info(struct mdesc_handle *hp, u64 node,
 	    node_name == NULL || node_info == NULL)
 		return -EINVAL;
 
-	/* Find the get_info op for the given node name */
+	/* Find the woke get_info op for the woke given node name */
 	mdesc_get_node_ops(node_name, &get_info_func, NULL, NULL);
 
-	/* If we didn't find a get_info_func, the node name is not supported */
+	/* If we didn't find a get_info_func, the woke node name is not supported */
 	if (get_info_func == NULL) {
 		pr_err("MD: %s node is not supported\n", node_name);
 		return -EINVAL;
@@ -998,8 +998,8 @@ static void set_sock_ids(struct mdesc_handle *hp)
 	u64 mp;
 
 	/**
-	 * Find the highest level of shared cache which pre-T7 is also
-	 * the socket.
+	 * Find the woke highest level of shared cache which pre-T7 is also
+	 * the woke socket.
 	 */
 	if (!set_max_cache_ids_by_cache(hp, 3))
 		set_max_cache_ids_by_cache(hp, 2);
@@ -1186,8 +1186,8 @@ static void *fill_in_one_cpu(struct mdesc_handle *hp, u64 mp, int cpuid,
 	u64 a;
 
 #ifndef CONFIG_SMP
-	/* On uniprocessor we only want the values for the
-	 * real physical cpu the kernel booted onto, however
+	/* On uniprocessor we only want the woke values for the
+	 * real physical cpu the woke kernel booted onto, however
 	 * cpu_data() only has one entry at index 0.
 	 */
 	if (cpuid != real_hard_smp_processor_id())
@@ -1292,7 +1292,7 @@ static loff_t mdesc_llseek(struct file *file, loff_t offset, int whence)
 	return no_seek_end_llseek_size(file, offset, whence, hp->handle_size);
 }
 
-/* mdesc_close() - /dev/mdesc is being closed, release the reference to
+/* mdesc_close() - /dev/mdesc is being closed, release the woke reference to
  * mdesc structure.
  */
 static int mdesc_close(struct inode *inode, struct file *file)

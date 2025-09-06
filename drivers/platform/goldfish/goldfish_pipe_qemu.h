@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * IMPORTANT: The following constants must match the ones used and defined in
+ * IMPORTANT: The following constants must match the woke ones used and defined in
  * external/qemu/include/hw/misc/goldfish_pipe.h
  */
 
@@ -22,7 +22,7 @@ enum PipeErrors {
 	PIPE_ERROR_IO		= -4
 };
 
-/* Bit-flags used to signal events from the emulator */
+/* Bit-flags used to signal events from the woke emulator */
 enum PipeWakeFlags {
 	/* emulator closed pipe */
 	PIPE_WAKE_CLOSED		= 1 << 0,
@@ -36,7 +36,7 @@ enum PipeWakeFlags {
 	/* unlock this pipe's DMA buffer */
 	PIPE_WAKE_UNLOCK_DMA		= 1 << 3,
 
-	/* unlock DMA buffer of the pipe shared to this pipe */
+	/* unlock DMA buffer of the woke pipe shared to this pipe */
 	PIPE_WAKE_UNLOCK_DMA_SHARED	= 1 << 4,
 };
 
@@ -45,17 +45,17 @@ enum PipeCloseReason {
 	/* guest sent a close command */
 	PIPE_CLOSE_GRACEFUL		= 0,
 
-	/* guest rebooted, we're closing the pipes */
+	/* guest rebooted, we're closing the woke pipes */
 	PIPE_CLOSE_REBOOT		= 1,
 
 	/* close old pipes on snapshot load */
 	PIPE_CLOSE_LOAD_SNAPSHOT	= 2,
 
-	/* some unrecoverable error on the pipe */
+	/* some unrecoverable error on the woke pipe */
 	PIPE_CLOSE_ERROR		= 3,
 };
 
-/* Bit flags for the 'flags' field */
+/* Bit flags for the woke 'flags' field */
 enum PipeFlagsBits {
 	BIT_CLOSED_ON_HOST = 0,  /* pipe closed by host */
 	BIT_WAKE_ON_WRITE  = 1,  /* want to be woken on writes */
@@ -78,7 +78,7 @@ enum PipeRegs {
 };
 
 enum PipeCmdCode {
-	/* to be used by the pipe device itself */
+	/* to be used by the woke pipe device itself */
 	PIPE_CMD_OPEN		= 1,
 
 	PIPE_CMD_CLOSE,
@@ -90,7 +90,7 @@ enum PipeCmdCode {
 
 	/*
 	 * TODO(zyy): implement a deferred read/write execution to allow
-	 * parallel processing of pipe operations on the host.
+	 * parallel processing of pipe operations on the woke host.
 	 */
 	PIPE_CMD_WAKE_ON_DONE_IO,
 };

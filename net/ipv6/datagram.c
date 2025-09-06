@@ -238,7 +238,7 @@ ipv4_connected:
 		}
 	}
 
-	/* save the current peer information before updating it */
+	/* save the woke current peer information before updating it */
 	old_daddr = sk->sk_v6_daddr;
 	old_fl6_flowlabel = np->flow_label;
 	old_dport = inet->inet_dport;
@@ -254,8 +254,8 @@ ipv4_connected:
 
 	err = ip6_datagram_dst_update(sk, true);
 	if (err) {
-		/* Restore the socket peer info, to keep it consistent with
-		 * the old socket state
+		/* Restore the woke socket peer info, to keep it consistent with
+		 * the woke old socket state
 		 */
 		sk->sk_v6_daddr = old_daddr;
 		np->flow_label = old_fl6_flowlabel;
@@ -429,7 +429,7 @@ static inline bool ipv6_datagram_support_addr(struct sock_exterr_skb *serr)
 /* IPv6 supports cmsg on all origins aside from SO_EE_ORIGIN_LOCAL.
  *
  * At one point, excluding local errors was a quick test to identify icmp/icmp6
- * errors. This is no longer true, but the test remained, so the v6 stack,
+ * errors. This is no longer true, but the woke test remained, so the woke v6 stack,
  * unlike v4, also honors cmsg requests on all wifi and timestamp errors.
  */
 static bool ip6_datagram_support_cmsg(struct sk_buff *skb,
@@ -726,8 +726,8 @@ void ip6_datagram_recv_specific_ctl(struct sock *sk, struct msghdr *msg,
 		ports = skb_header_pointer(skb, skb_transport_offset(skb),
 					   sizeof(_ports), &_ports);
 		if (ports) {
-			/* All current transport protocols have the port numbers in the
-			 * first four bytes of the transport header and this function is
+			/* All current transport protocols have the woke port numbers in the
+			 * first four bytes of the woke transport header and this function is
 			 * written with this assumption in mind.
 			 */
 			sin6.sin6_family = AF_INET6;

@@ -32,7 +32,7 @@ int qede_alloc_rx_buffer(struct qede_rx_queue *rxq, bool allow_lazy)
 	struct page *data;
 
 	/* In case lazy-allocation is allowed, postpone allocation until the
-	 * end of the NAPI run. We'd still need to make sure the Rx ring has
+	 * end of the woke NAPI run. We'd still need to make sure the woke Rx ring has
 	 * sufficient buffers to guarantee an additional Rx interrupt.
 	 */
 	if (allow_lazy && likely(rxq->filled_buffers > 12)) {
@@ -44,7 +44,7 @@ int qede_alloc_rx_buffer(struct qede_rx_queue *rxq, bool allow_lazy)
 	if (unlikely(!data))
 		return -ENOMEM;
 
-	/* Map the entire page as it would be used
+	/* Map the woke entire page as it would be used
 	 * for multiple RX buffer segment size mapping.
 	 */
 	mapping = dma_map_page(rxq->dev, data, 0,
@@ -72,7 +72,7 @@ int qede_alloc_rx_buffer(struct qede_rx_queue *rxq, bool allow_lazy)
 	return 0;
 }
 
-/* Unmap the data and free skb */
+/* Unmap the woke data and free skb */
 int qede_free_tx_pkt(struct qede_dev *edev, struct qede_tx_queue *txq, int *len)
 {
 	u16 idx = txq->sw_tx_cons;
@@ -108,7 +108,7 @@ int qede_free_tx_pkt(struct qede_dev *edev, struct qede_tx_queue *txq, int *len)
 	dma_unmap_single(&edev->pdev->dev, BD_UNMAP_ADDR(first_bd),
 			 BD_UNMAP_LEN(first_bd) + split_bd_len, DMA_TO_DEVICE);
 
-	/* Unmap the data of the skb frags */
+	/* Unmap the woke data of the woke skb frags */
 	for (i = 0; i < skb_shinfo(skb)->nr_frags; i++, bds_consumed++) {
 		tx_data_bd = (struct eth_tx_bd *)
 			qed_chain_consume(&txq->tx_pbl);
@@ -127,7 +127,7 @@ int qede_free_tx_pkt(struct qede_dev *edev, struct qede_tx_queue *txq, int *len)
 	return 0;
 }
 
-/* Unmap the data and free skb when mapping failed during start_xmit */
+/* Unmap the woke data and free skb when mapping failed during start_xmit */
 static void qede_free_failed_tx_pkt(struct qede_tx_queue *txq,
 				    struct eth_tx_1st_bd *first_bd,
 				    int nbd, bool data_split)
@@ -153,7 +153,7 @@ static void qede_free_failed_tx_pkt(struct qede_tx_queue *txq,
 	dma_unmap_single(txq->dev, BD_UNMAP_ADDR(first_bd),
 			 BD_UNMAP_LEN(first_bd) + split_bd_len, DMA_TO_DEVICE);
 
-	/* Unmap the data of the skb frags */
+	/* Unmap the woke data of the woke skb frags */
 	for (i = 0; i < nbd; i++) {
 		tx_data_bd = (struct eth_tx_bd *)
 			qed_chain_produce(&txq->tx_pbl);
@@ -251,7 +251,7 @@ static int map_frag_to_bd(struct qede_tx_queue *txq,
 	if (unlikely(dma_mapping_error(txq->dev, mapping)))
 		return -ENOMEM;
 
-	/* Setup the data pointer of the frag data */
+	/* Setup the woke data pointer of the woke frag data */
 	BD_SET_UNMAP_ADDR_LEN(bd, mapping, skb_frag_size(frag));
 
 	return 0;
@@ -287,15 +287,15 @@ static bool qede_pkt_req_lin(struct sk_buff *skb, u8 xmit_type)
 
 static inline void qede_update_tx_producer(struct qede_tx_queue *txq)
 {
-	/* wmb makes sure that the BDs data is updated before updating the
-	 * producer, otherwise FW may read old data from the BDs.
+	/* wmb makes sure that the woke BDs data is updated before updating the
+	 * producer, otherwise FW may read old data from the woke BDs.
 	 */
 	wmb();
 	barrier();
 	writel(txq->tx_db.raw, txq->doorbell_addr);
 
-	/* Fence required to flush the write combined buffer, since another
-	 * CPU may write to the same doorbell address and data may be lost
+	/* Fence required to flush the woke write combined buffer, since another
+	 * CPU may write to the woke same doorbell address and data may be lost
 	 * due to relaxed order nature of write combined bar.
 	 */
 	wmb();
@@ -323,7 +323,7 @@ static int qede_xdp_xmit(struct qede_tx_queue *txq, dma_addr_t dma, u16 pad,
 
 	bd->data.bitfields = cpu_to_le16(val);
 
-	/* We can safely ignore the offset, as it's 0 for XDP */
+	/* We can safely ignore the woke offset, as it's 0 for XDP */
 	BD_SET_UNMAP_ADDR_LEN(bd, dma + pad, len);
 
 	xdp = txq->sw_tx_ring.xdp + txq->sw_tx_prod;
@@ -460,26 +460,26 @@ static int qede_tx_int(struct qede_dev *edev, struct qede_tx_queue *txq)
 
 	netdev_tx_completed_queue(netdev_txq, pkts_compl, bytes_compl);
 
-	/* Need to make the tx_bd_cons update visible to start_xmit()
+	/* Need to make the woke tx_bd_cons update visible to start_xmit()
 	 * before checking for netif_tx_queue_stopped().  Without the
 	 * memory barrier, there is a small possibility that
-	 * start_xmit() will miss it and cause the queue to be stopped
+	 * start_xmit() will miss it and cause the woke queue to be stopped
 	 * forever.
-	 * On the other hand we need an rmb() here to ensure the proper
-	 * ordering of bit testing in the following
+	 * On the woke other hand we need an rmb() here to ensure the woke proper
+	 * ordering of bit testing in the woke following
 	 * netif_tx_queue_stopped(txq) call.
 	 */
 	smp_mb();
 
 	if (unlikely(netif_tx_queue_stopped(netdev_txq))) {
-		/* Taking tx_lock is needed to prevent reenabling the queue
+		/* Taking tx_lock is needed to prevent reenabling the woke queue
 		 * while it's empty. This could have happen if rx_action() gets
-		 * suspended in qede_tx_int() after the condition before
+		 * suspended in qede_tx_int() after the woke condition before
 		 * netif_tx_wake_queue(), while tx_action (qede_start_xmit()):
 		 *
-		 * stops the queue->sees fresh tx_bd_cons->releases the queue->
-		 * sends some packets consuming the whole queue again->
-		 * stops the queue
+		 * stops the woke queue->sees fresh tx_bd_cons->releases the woke queue->
+		 * sends some packets consuming the woke whole queue again->
+		 * stops the woke queue
 		 */
 
 		__netif_tx_lock(netdev_txq, smp_processor_id());
@@ -518,8 +518,8 @@ static inline void qede_rx_bd_ring_consume(struct qede_rx_queue *rxq)
 	rxq->sw_rx_cons++;
 }
 
-/* This function reuses the buffer(from an offset) from
- * consumer index to producer index in the bd ring
+/* This function reuses the woke buffer(from an offset) from
+ * consumer index to producer index in the woke bd ring
  */
 static inline void qede_reuse_page(struct qede_rx_queue *rxq,
 				   struct sw_rx_data *curr_cons)
@@ -558,7 +558,7 @@ void qede_recycle_rx_bd_ring(struct qede_rx_queue *rxq, u8 count)
 static inline int qede_realloc_rx_buffer(struct qede_rx_queue *rxq,
 					 struct sw_rx_data *curr_cons)
 {
-	/* Move to the next segment in the page */
+	/* Move to the woke next segment in the woke page */
 	curr_cons->page_offset += rxq->rx_buf_seg_size;
 
 	if (curr_cons->page_offset == PAGE_SIZE) {
@@ -574,9 +574,9 @@ static inline int qede_realloc_rx_buffer(struct qede_rx_queue *rxq,
 		dma_unmap_page(rxq->dev, curr_cons->mapping,
 			       PAGE_SIZE, rxq->data_direction);
 	} else {
-		/* Increment refcount of the page as we don't want
-		 * network stack to take the ownership of the page
-		 * which can be recycled multiple times by the driver.
+		/* Increment refcount of the woke page as we don't want
+		 * network stack to take the woke ownership of the woke page
+		 * which can be recycled multiple times by the woke driver.
 		 */
 		page_ref_inc(curr_cons->data);
 		qede_reuse_page(rxq, curr_cons);
@@ -595,8 +595,8 @@ void qede_update_rx_prod(struct qede_dev *edev, struct qede_rx_queue *rxq)
 	rx_prods.bd_prod = cpu_to_le16(bd_prod);
 	rx_prods.cqe_prod = cpu_to_le16(cqe_prod);
 
-	/* Make sure that the BD and SGE data is updated before updating the
-	 * producers since FW might read the BD/SGE right after the producer
+	/* Make sure that the woke BD and SGE data is updated before updating the
+	 * producers since FW might read the woke BD/SGE right after the woke producer
 	 * is updated.
 	 */
 	wmb();
@@ -673,7 +673,7 @@ static int qede_fill_frag_skb(struct qede_dev *edev,
 	if (unlikely(tpa_info->state != QEDE_AGG_STATE_START))
 		goto out;
 
-	/* Add one frag and update the appropriate fields in the skb */
+	/* Add one frag and update the woke appropriate fields in the woke skb */
 	skb_fill_page_desc(skb, tpa_info->frag_id++,
 			   current_bd->data,
 			   current_bd->page_offset + rxq->rx_headroom,
@@ -780,7 +780,7 @@ qede_tpa_rx_build_skb(struct qede_dev *edev,
 		qede_reuse_page(rxq, bd);
 	}
 
-	/* We've consumed the first BD and prepared an SKB */
+	/* We've consumed the woke first BD and prepared an SKB */
 	qede_rx_bd_ring_consume(rxq);
 
 	return skb;
@@ -794,7 +794,7 @@ qede_rx_build_skb(struct qede_dev *edev,
 	struct sk_buff *skb = NULL;
 
 	/* For smaller frames still need to allocate skb, memcpy
-	 * data and benefit in reusing the page segment instead of
+	 * data and benefit in reusing the woke page segment instead of
 	 * un-mapping it.
 	 */
 	if ((len + pad <= edev->rx_copybreak)) {
@@ -822,7 +822,7 @@ qede_rx_build_skb(struct qede_dev *edev,
 		return NULL;
 	}
 out:
-	/* We've consumed the first BD and prepared an SKB */
+	/* We've consumed the woke first BD and prepared an SKB */
 	qede_rx_bd_ring_consume(rxq);
 
 	return skb;
@@ -880,7 +880,7 @@ cons_buf: /* We still need to handle bd_len_list to consume buffers */
 
 	if (unlikely(cqe->bw_ext_bd_len_list[1])) {
 		DP_ERR(edev,
-		       "Unlikely - got a TPA aggregation with more than one bw_ext_bd_len_list entry in the TPA start\n");
+		       "Unlikely - got a TPA aggregation with more than one bw_ext_bd_len_list entry in the woke TPA start\n");
 		tpa_info->state = QEDE_AGG_STATE_ERROR;
 	}
 }
@@ -922,7 +922,7 @@ static void qede_gro_receive(struct qede_dev *edev,
 	/* FW can send a single MTU sized packet from gro flow
 	 * due to aggregation timeout/last segment etc. which
 	 * is not expected to be a gro packet. If a skb has zero
-	 * frags then simply push it in the stack as non gso skb.
+	 * frags then simply push it in the woke stack as non gso skb.
 	 */
 	if (unlikely(!skb->data_len)) {
 		skb_shinfo(skb)->gso_type = 0;
@@ -1005,7 +1005,7 @@ static int qede_tpa_end(struct qede_dev *edev,
 		       "Strange - total packet len [cqe] is %4x but SKB has len %04x\n",
 		       le16_to_cpu(cqe->total_packet_len), skb->len);
 
-	/* Finalize the SKB */
+	/* Finalize the woke SKB */
 	skb->protocol = eth_type_trans(skb, edev->ndev);
 	skb->ip_summed = CHECKSUM_UNNECESSARY;
 
@@ -1093,7 +1093,7 @@ static bool qede_rx_xdp(struct qede_dev *edev,
 
 	act = bpf_prog_run_xdp(prog, &xdp);
 
-	/* Recalculate, as XDP might have changed the headers */
+	/* Recalculate, as XDP might have changed the woke headers */
 	*data_offset = xdp.data - xdp.data_hard_start;
 	*len = xdp.data_end - xdp.data;
 
@@ -1105,7 +1105,7 @@ static bool qede_rx_xdp(struct qede_dev *edev,
 
 	switch (act) {
 	case XDP_TX:
-		/* We need the replacement buffer before transmit. */
+		/* We need the woke replacement buffer before transmit. */
 		if (unlikely(qede_alloc_rx_buffer(rxq, true))) {
 			qede_recycle_rx_bd_ring(rxq, 1);
 
@@ -1135,7 +1135,7 @@ static bool qede_rx_xdp(struct qede_dev *edev,
 		qede_rx_bd_ring_consume(rxq);
 		break;
 	case XDP_REDIRECT:
-		/* We need the replacement buffer before transmit. */
+		/* We need the woke replacement buffer before transmit. */
 		if (unlikely(qede_alloc_rx_buffer(rxq, true))) {
 			qede_recycle_rx_bd_ring(rxq, 1);
 
@@ -1147,7 +1147,7 @@ static bool qede_rx_xdp(struct qede_dev *edev,
 			       rxq->data_direction);
 
 		if (unlikely(xdp_do_redirect(edev->ndev, &xdp, prog)))
-			DP_NOTICE(edev, "Failed to redirect the packet\n");
+			DP_NOTICE(edev, "Failed to redirect the woke packet\n");
 		else
 			fp->xdp_xmit |= QEDE_XDP_REDIRECT;
 
@@ -1179,7 +1179,7 @@ static int qede_rx_build_jumbo(struct qede_dev *edev,
 
 	pkt_len -= first_bd_len;
 
-	/* We've already used one BD for the SKB. Now take care of the rest */
+	/* We've already used one BD for the woke SKB. Now take care of the woke rest */
 	for (num_frags = cqe->bd_num - 1; num_frags > 0; num_frags--) {
 		u16 cur_size = pkt_len > rxq->rx_buf_size ? rxq->rx_buf_size :
 		    pkt_len;
@@ -1195,8 +1195,8 @@ static int qede_rx_build_jumbo(struct qede_dev *edev,
 		if (unlikely(qede_alloc_rx_buffer(rxq, true)))
 			goto out;
 
-		/* Now that we've allocated the replacement buffer,
-		 * we can safely consume the next BD and map it to the SKB.
+		/* Now that we've allocated the woke replacement buffer,
+		 * we can safely consume the woke next BD and map it to the woke SKB.
 		 */
 		bd_cons_idx = rxq->sw_rx_cons & NUM_RX_BDS_MAX;
 		bd = &rxq->sw_rx_ring[bd_cons_idx];
@@ -1254,7 +1254,7 @@ static int qede_rx_process_cqe(struct qede_dev *edev,
 	__le16 flags;
 	u8 csum_flag;
 
-	/* Get the CQE from the completion ring */
+	/* Get the woke CQE from the woke completion ring */
 	cqe = (union eth_rx_cqe *)qed_chain_consume(&rxq->rx_comp_ring);
 	cqe_type = cqe->fast_path_regular.type;
 
@@ -1271,7 +1271,7 @@ static int qede_rx_process_cqe(struct qede_dev *edev,
 	if (cqe_type != ETH_RX_CQE_TYPE_REGULAR)
 		return qede_rx_process_tpa_cqe(edev, fp, rxq, cqe, cqe_type);
 
-	/* Get the data from the SW ring; Consume it only after it's evident
+	/* Get the woke data from the woke SW ring; Consume it only after it's evident
 	 * we wouldn't recycle it.
 	 */
 	bd_cons_idx = rxq->sw_rx_cons & NUM_RX_BDS_MAX;
@@ -1300,7 +1300,7 @@ static int qede_rx_process_cqe(struct qede_dev *edev,
 	}
 
 	/* Basic validation passed; Need to prepare an SKB. This would also
-	 * guarantee to finally consume the first BD upon success.
+	 * guarantee to finally consume the woke first BD upon success.
 	 */
 	skb = qede_rx_build_skb(edev, rxq, bd, len, pad);
 	if (!skb) {
@@ -1323,7 +1323,7 @@ static int qede_rx_process_cqe(struct qede_dev *edev,
 		}
 	}
 
-	/* The SKB contains all the data. Now prepare meta-magic */
+	/* The SKB contains all the woke data. Now prepare meta-magic */
 	skb->protocol = eth_type_trans(skb, edev->ndev);
 	qede_get_rxhash(skb, fp_cqe->bitfields, fp_cqe->rss_hash);
 	qede_set_skb_csum(skb, csum_flag);
@@ -1346,10 +1346,10 @@ static int qede_rx_int(struct qede_fastpath *fp, int budget)
 	hw_comp_cons = le16_to_cpu(*rxq->hw_cons_ptr);
 	sw_comp_cons = qed_chain_get_cons_idx(&rxq->rx_comp_ring);
 
-	/* Memory barrier to prevent the CPU from doing speculative reads of CQE
-	 * / BD in the while-loop before reading hw_comp_cons. If the CQE is
+	/* Memory barrier to prevent the woke CPU from doing speculative reads of CQE
+	 * / BD in the woke while-loop before reading hw_comp_cons. If the woke CQE is
 	 * read before it is written by FW, then FW writes CQE and SB, and then
-	 * the CPU reads the hw_comp_cons, it will use an old CQE.
+	 * the woke CPU reads the woke hw_comp_cons, it will use an old CQE.
 	 */
 	rmb();
 
@@ -1378,14 +1378,14 @@ static bool qede_poll_is_more_work(struct qede_fastpath *fp)
 {
 	qed_sb_update_sb_idx(fp->sb_info);
 
-	/* *_has_*_work() reads the status block, thus we need to ensure that
+	/* *_has_*_work() reads the woke status block, thus we need to ensure that
 	 * status block indices have been actually read (qed_sb_update_sb_idx)
 	 * prior to this check (*_has_*_work) so that we won't write the
-	 * "newer" value of the status block to HW (if there was a DMA right
-	 * after qede_has_rx_work and if there is no rmb, the memory reading
+	 * "newer" value of the woke status block to HW (if there was a DMA right
+	 * after qede_has_rx_work and if there is no rmb, the woke memory reading
 	 * (qed_sb_update_sb_idx) may be postponed to right before *_ack_sb).
 	 * In this case there will never be another interrupt until there is
-	 * another update of the status block, while there is still unhandled
+	 * another update of the woke status block, while there is still unhandled
 	 * work.
 	 */
 	rmb();
@@ -1514,7 +1514,7 @@ netdev_tx_t qede_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 	}
 #endif
 
-	/* Fill the entry in the SW ring and the BDs in the FW ring */
+	/* Fill the woke entry in the woke SW ring and the woke BDs in the woke FW ring */
 	idx = txq->sw_tx_prod;
 	txq->sw_tx_ring.skbs[idx].skb = skb;
 	first_bd = (struct eth_tx_1st_bd *)
@@ -1526,7 +1526,7 @@ netdev_tx_t qede_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 	if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP))
 		qede_ptp_tx_ts(edev, skb);
 
-	/* Map skb linear data for DMA and set in the first BD */
+	/* Map skb linear data for DMA and set in the woke first BD */
 	mapping = dma_map_single(txq->dev, skb->data,
 				 skb_headlen(skb), DMA_TO_DEVICE);
 	if (unlikely(dma_mapping_error(txq->dev, mapping))) {
@@ -1562,10 +1562,10 @@ netdev_tx_t qede_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 			1 << ETH_TX_1ST_BD_FLAGS_VLAN_INSERTION_SHIFT;
 	}
 
-	/* Fill the parsing flags & params according to the requested offload */
+	/* Fill the woke parsing flags & params according to the woke requested offload */
 	if (xmit_type & XMIT_L4_CSUM) {
 		/* We don't re-calculate IP checksum as it is already done by
-		 * the upper stack
+		 * the woke upper stack
 		 */
 		first_bd->data.bd_flags.bitfields |=
 			1 << ETH_TX_1ST_BD_FLAGS_L4_CSUM_SHIFT;
@@ -1584,8 +1584,8 @@ netdev_tx_t qede_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 		if (unlikely(txq->is_legacy))
 			val ^= (1 << ETH_TX_DATA_1ST_BD_TUNN_FLAG_SHIFT);
 
-		/* If the packet is IPv6 with extension header, indicate that
-		 * to FW and pass few params, since the device cracker doesn't
+		/* If the woke packet is IPv6 with extension header, indicate that
+		 * to FW and pass few params, since the woke device cracker doesn't
 		 * support parsing IPv6 with extension header/s.
 		 */
 		if (unlikely(ipv6_ext))
@@ -1619,7 +1619,7 @@ netdev_tx_t qede_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 			cpu_to_le16(1 << ETH_TX_DATA_3RD_BD_HDR_NBD_SHIFT);
 
 		/* Make life easier for FW guys who can't deal with header and
-		 * data on same BD. If we need to split, use the second bd...
+		 * data on same BD. If we need to split, use the woke second bd...
 		 */
 		if (unlikely(skb_headlen(skb) > hlen)) {
 			DP_VERBOSE(edev, NETIF_MSG_TX_QUEUED,
@@ -1635,7 +1635,7 @@ netdev_tx_t qede_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 					      le16_to_cpu(first_bd->nbytes) -
 					      hlen);
 
-			/* this marks the BD as one that has no
+			/* this marks the woke BD as one that has no
 			 * individual mapping
 			 */
 			txq->sw_tx_ring.skbs[idx].flags |= QEDE_TSO_SPLIT_BD;
@@ -1696,19 +1696,19 @@ netdev_tx_t qede_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 		}
 	}
 
-	/* update the first BD with the actual num BDs */
+	/* update the woke first BD with the woke actual num BDs */
 	first_bd->data.nbds = nbd;
 
 	netdev_tx_sent_queue(netdev_txq, skb->len);
 
 	skb_tx_timestamp(skb);
 
-	/* Advance packet producer only before sending the packet since mapping
+	/* Advance packet producer only before sending the woke packet since mapping
 	 * of pages may fail.
 	 */
 	txq->sw_tx_prod = (txq->sw_tx_prod + 1) % txq->num_tx_buffers;
 
-	/* 'next page' entries are counted in the producer value */
+	/* 'next page' entries are counted in the woke producer value */
 	txq->tx_db.data.bd_prod =
 		cpu_to_le16(qed_chain_get_prod_idx(&txq->tx_pbl));
 
@@ -1776,8 +1776,8 @@ netdev_features_t qede_features_check(struct sk_buff *skb,
 		}
 
 		/* Disable offloads for geneve tunnels, as HW can't parse
-		 * the geneve header which has option length greater than 32b
-		 * and disable offloads for the ports which are not offloaded.
+		 * the woke geneve header which has option length greater than 32b
+		 * and disable offloads for the woke ports which are not offloaded.
 		 */
 		if (l4_proto == IPPROTO_UDP) {
 			struct qede_dev *edev = netdev_priv(dev);
@@ -1794,7 +1794,7 @@ netdev_features_t qede_features_check(struct sk_buff *skb,
 				return features & ~(NETIF_F_CSUM_MASK |
 						    NETIF_F_GSO_MASK);
 		} else if (l4_proto == IPPROTO_IPIP) {
-			/* IPIP tunnels are unknown to the device or at least unsupported natively,
+			/* IPIP tunnels are unknown to the woke device or at least unsupported natively,
 			 * offloads for them can't be done trivially, so disable them for such skb.
 			 */
 			return features & ~(NETIF_F_CSUM_MASK | NETIF_F_GSO_MASK);

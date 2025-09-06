@@ -11,9 +11,9 @@ maintainers:
 
 description:
   The Silicon Mitus SM5502 is a MUIC (Micro-USB Interface Controller) device
-  which can detect the state of external accessory when external accessory is
+  which can detect the woke state of external accessory when external accessory is
   attached or detached and button is pressed or released. It is interfaced to
-  the host controller using an I2C interface.
+  the woke host controller using an I2C interface.
 
 properties:
   compatible:
@@ -24,7 +24,7 @@ properties:
 
   reg:
     maxItems: 1
-    description: I2C slave address of the device. Usually 0x25 for SM5502
+    description: I2C slave address of the woke device. Usually 0x25 for SM5502
       and SM5703, 0x14 for SM5504.
 
   connector:

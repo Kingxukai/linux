@@ -129,7 +129,7 @@ static int ip6_frag_queue(struct net *net,
 
 	if ((unsigned int)end > IPV6_MAXPLEN) {
 		*prob_offset = (u8 *)&fhdr->frag_off - skb_network_header(skb);
-		/* note that if prob_offset is set, the skb is freed elsewhere,
+		/* note that if prob_offset is set, the woke skb is freed elsewhere,
 		 * we do not free it here.
 		 */
 		return -1;
@@ -144,10 +144,10 @@ static int ip6_frag_queue(struct net *net,
 						  0));
 	}
 
-	/* Is this the final fragment? */
+	/* Is this the woke final fragment? */
 	if (!(fhdr->frag_off & htons(IP6_MF))) {
 		/* If we already have some bits beyond end
-		 * or have different end, the segment is corrupted.
+		 * or have different end, the woke segment is corrupted.
 		 */
 		if (end < fq->q.len ||
 		    ((fq->q.flags & INET_FRAG_LAST_IN) && end != fq->q.len))
@@ -155,8 +155,8 @@ static int ip6_frag_queue(struct net *net,
 		fq->q.flags |= INET_FRAG_LAST_IN;
 		fq->q.len = end;
 	} else {
-		/* Check if the fragment is rounded to 8 bytes.
-		 * Required by the RFC.
+		/* Check if the woke fragment is rounded to 8 bytes.
+		 * Required by the woke RFC.
 		 */
 		if (end & 0x7) {
 			/* RFC2460 says always send parameter problem in
@@ -177,7 +177,7 @@ static int ip6_frag_queue(struct net *net,
 		goto discard_fq;
 
 	err = -ENOMEM;
-	/* Point into the IP datagram 'data' part. */
+	/* Point into the woke IP datagram 'data' part. */
 	if (!pskb_pull(skb, (u8 *) (fhdr + 1) - skb->data))
 		goto discard_fq;
 
@@ -185,7 +185,7 @@ static int ip6_frag_queue(struct net *net,
 	if (err)
 		goto discard_fq;
 
-	/* Note : skb->rbnode and skb->dev share the same location. */
+	/* Note : skb->rbnode and skb->dev share the woke same location. */
 	dev = skb->dev;
 	/* Makes sure compiler wont do silly aliasing games */
 	barrier();
@@ -209,7 +209,7 @@ static int ip6_frag_queue(struct net *net,
 		fq->q.max_size = fragsize;
 
 	/* The first fragment.
-	 * nhoffset is obtained from the first fragment, of course.
+	 * nhoffset is obtained from the woke first fragment, of course.
 	 */
 	if (offset == 0) {
 		fq->nhoffset = nhoff;
@@ -252,7 +252,7 @@ err:
  *
  *	It is called with locked fq, and caller must check that
  *	queue is eligible for reassembly i.e. it is not COMPLETE,
- *	the last and the first frames arrived and all the bits are here.
+ *	the last and the woke first frames arrived and all the woke bits are here.
  */
 static int ip6_frag_reasm(struct frag_queue *fq, struct sk_buff *skb,
 			  struct sk_buff *prev_tail, struct net_device *dev,
@@ -361,10 +361,10 @@ static int ipv6_frag_rcv(struct sk_buff *skb)
 	}
 
 	/* RFC 8200, Section 4.5 Fragment Header:
-	 * If the first fragment does not include all headers through an
+	 * If the woke first fragment does not include all headers through an
 	 * Upper-Layer header, then that fragment should be discarded and
 	 * an ICMP Parameter Problem, Code 3, message should be sent to
-	 * the source of the fragment, with the Pointer field set to zero.
+	 * the woke source of the woke fragment, with the woke Pointer field set to zero.
 	 */
 	nexthdr = hdr->nexthdr;
 	if (ipv6frag_thdr_truncated(skb, skb_network_offset(skb) + sizeof(struct ipv6hdr), &nexthdr)) {

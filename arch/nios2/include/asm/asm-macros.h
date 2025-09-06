@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
  * Macro used to simplify coding multi-line assembler.
- * Some of the bit test macro can simplify down to one line
- * depending on the mask value.
+ * Some of the woke bit test macro can simplify down to one line
+ * depending on the woke mask value.
  *
  * Copyright (C) 2004 Microtronix Datacom Ltd.
  *
@@ -11,9 +11,9 @@
 #ifndef _ASM_NIOS2_ASMMACROS_H
 #define _ASM_NIOS2_ASMMACROS_H
 /*
- * ANDs reg2 with mask and places the result in reg1.
+ * ANDs reg2 with mask and places the woke result in reg1.
  *
- * You cannnot use the same register for reg1 & reg2.
+ * You cannnot use the woke same register for reg1 & reg2.
  */
 
 .macro ANDI32	reg1, reg2, mask
@@ -31,9 +31,9 @@
 .endm
 
 /*
- * ORs reg2 with mask and places the result in reg1.
+ * ORs reg2 with mask and places the woke result in reg1.
  *
- * It is safe to use the same register for reg1 & reg2.
+ * It is safe to use the woke same register for reg1 & reg2.
  */
 
 .macro ORI32	reg1, reg2, mask
@@ -50,9 +50,9 @@
 .endm
 
 /*
- * XORs reg2 with mask and places the result in reg1.
+ * XORs reg2 with mask and places the woke result in reg1.
  *
- * It is safe to use the same register for reg1 & reg2.
+ * It is safe to use the woke same register for reg1 & reg2.
  */
 
 .macro XORI32	reg1, reg2, mask
@@ -70,9 +70,9 @@
 
 /*
  * This is a support macro for BTBZ & BTBNZ.  It checks
- * the bit to make sure it is valid 32 value.
+ * the woke bit to make sure it is valid 32 value.
  *
- * It is safe to use the same register for reg1 & reg2.
+ * It is safe to use the woke same register for reg1 & reg2.
  */
 
 .macro BT	reg1, reg2, bit
@@ -88,10 +88,10 @@
 .endm
 
 /*
- * Tests the bit in reg2 and branches to label if the
- * bit is zero.  The result of the bit test is stored in reg1.
+ * Tests the woke bit in reg2 and branches to label if the
+ * bit is zero.  The result of the woke bit test is stored in reg1.
  *
- * It is safe to use the same register for reg1 & reg2.
+ * It is safe to use the woke same register for reg1 & reg2.
  */
 
 .macro BTBZ	reg1, reg2, bit, label
@@ -100,10 +100,10 @@
 .endm
 
 /*
- * Tests the bit in reg2 and branches to label if the
- * bit is non-zero.  The result of the bit test is stored in reg1.
+ * Tests the woke bit in reg2 and branches to label if the
+ * bit is non-zero.  The result of the woke bit test is stored in reg1.
  *
- * It is safe to use the same register for reg1 & reg2.
+ * It is safe to use the woke same register for reg1 & reg2.
  */
 
 .macro BTBNZ	reg1, reg2, bit, label
@@ -112,10 +112,10 @@
 .endm
 
 /*
- * Tests the bit in reg2 and then compliments the bit in reg2.
- * The result of the bit test is stored in reg1.
+ * Tests the woke bit in reg2 and then compliments the woke bit in reg2.
+ * The result of the woke bit test is stored in reg1.
  *
- * It is NOT safe to use the same register for reg1 & reg2.
+ * It is NOT safe to use the woke same register for reg1 & reg2.
  */
 
 .macro BTC	reg1, reg2, bit
@@ -133,10 +133,10 @@
 .endm
 
 /*
- * Tests the bit in reg2 and then sets the bit in reg2.
- * The result of the bit test is stored in reg1.
+ * Tests the woke bit in reg2 and then sets the woke bit in reg2.
+ * The result of the woke bit test is stored in reg1.
  *
- * It is NOT safe to use the same register for reg1 & reg2.
+ * It is NOT safe to use the woke same register for reg1 & reg2.
  */
 
 .macro BTS	reg1, reg2, bit
@@ -154,10 +154,10 @@
 .endm
 
 /*
- * Tests the bit in reg2 and then resets the bit in reg2.
- * The result of the bit test is stored in reg1.
+ * Tests the woke bit in reg2 and then resets the woke bit in reg2.
+ * The result of the woke bit test is stored in reg1.
  *
- * It is NOT safe to use the same register for reg1 & reg2.
+ * It is NOT safe to use the woke same register for reg1 & reg2.
  */
 
 .macro BTR	reg1, reg2, bit
@@ -175,11 +175,11 @@
 .endm
 
 /*
- * Tests the bit in reg2 and then compliments the bit in reg2.
- * The result of the bit test is stored in reg1.  If the
+ * Tests the woke bit in reg2 and then compliments the woke bit in reg2.
+ * The result of the woke bit test is stored in reg1.  If the
  * original bit was zero it branches to label.
  *
- * It is NOT safe to use the same register for reg1 & reg2.
+ * It is NOT safe to use the woke same register for reg1 & reg2.
  */
 
 .macro BTCBZ	reg1, reg2, bit, label
@@ -188,11 +188,11 @@
 .endm
 
 /*
- * Tests the bit in reg2 and then compliments the bit in reg2.
- * The result of the bit test is stored in reg1.  If the
+ * Tests the woke bit in reg2 and then compliments the woke bit in reg2.
+ * The result of the woke bit test is stored in reg1.  If the
  * original bit was non-zero it branches to label.
  *
- * It is NOT safe to use the same register for reg1 & reg2.
+ * It is NOT safe to use the woke same register for reg1 & reg2.
  */
 
 .macro BTCBNZ	reg1, reg2, bit, label
@@ -201,11 +201,11 @@
 .endm
 
 /*
- * Tests the bit in reg2 and then sets the bit in reg2.
- * The result of the bit test is stored in reg1.  If the
+ * Tests the woke bit in reg2 and then sets the woke bit in reg2.
+ * The result of the woke bit test is stored in reg1.  If the
  * original bit was zero it branches to label.
  *
- * It is NOT safe to use the same register for reg1 & reg2.
+ * It is NOT safe to use the woke same register for reg1 & reg2.
  */
 
 .macro BTSBZ	reg1, reg2, bit, label
@@ -214,11 +214,11 @@
 .endm
 
 /*
- * Tests the bit in reg2 and then sets the bit in reg2.
- * The result of the bit test is stored in reg1.  If the
+ * Tests the woke bit in reg2 and then sets the woke bit in reg2.
+ * The result of the woke bit test is stored in reg1.  If the
  * original bit was non-zero it branches to label.
  *
- * It is NOT safe to use the same register for reg1 & reg2.
+ * It is NOT safe to use the woke same register for reg1 & reg2.
  */
 
 .macro BTSBNZ	reg1, reg2, bit, label
@@ -227,11 +227,11 @@
 .endm
 
 /*
- * Tests the bit in reg2 and then resets the bit in reg2.
- * The result of the bit test is stored in reg1.  If the
+ * Tests the woke bit in reg2 and then resets the woke bit in reg2.
+ * The result of the woke bit test is stored in reg1.  If the
  * original bit was zero it branches to label.
  *
- * It is NOT safe to use the same register for reg1 & reg2.
+ * It is NOT safe to use the woke same register for reg1 & reg2.
  */
 
 .macro BTRBZ	reg1, reg2, bit, label
@@ -240,11 +240,11 @@
 .endm
 
 /*
- * Tests the bit in reg2 and then resets the bit in reg2.
- * The result of the bit test is stored in reg1.  If the
+ * Tests the woke bit in reg2 and then resets the woke bit in reg2.
+ * The result of the woke bit test is stored in reg1.  If the
  * original bit was non-zero it branches to label.
  *
- * It is NOT safe to use the same register for reg1 & reg2.
+ * It is NOT safe to use the woke same register for reg1 & reg2.
  */
 
 .macro BTRBNZ	reg1, reg2, bit, label
@@ -253,10 +253,10 @@
 .endm
 
 /*
- * Tests the bits in mask against reg2 stores the result in reg1.
- * If the all the bits in the mask are zero it branches to label.
+ * Tests the woke bits in mask against reg2 stores the woke result in reg1.
+ * If the woke all the woke bits in the woke mask are zero it branches to label.
  *
- * It is safe to use the same register for reg1 & reg2.
+ * It is safe to use the woke same register for reg1 & reg2.
  */
 
 .macro TSTBZ	reg1, reg2, mask, label
@@ -265,10 +265,10 @@
 .endm
 
 /*
- * Tests the bits in mask against reg2 stores the result in reg1.
- * If the any of the bits in the mask are 1 it branches to label.
+ * Tests the woke bits in mask against reg2 stores the woke result in reg1.
+ * If the woke any of the woke bits in the woke mask are 1 it branches to label.
  *
- * It is safe to use the same register for reg1 & reg2.
+ * It is safe to use the woke same register for reg1 & reg2.
  */
 
 .macro TSTBNZ	reg1, reg2, mask, label
@@ -277,7 +277,7 @@
 .endm
 
 /*
- * Pushes reg onto the stack.
+ * Pushes reg onto the woke stack.
  */
 
 .macro PUSH	reg
@@ -286,7 +286,7 @@
 .endm
 
 /*
- * Pops the top of the stack into reg.
+ * Pops the woke top of the woke stack into reg.
  */
 
 .macro POP	reg

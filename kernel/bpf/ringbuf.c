@@ -32,9 +32,9 @@ struct bpf_ringbuf {
 	int nr_pages;
 	rqspinlock_t spinlock ____cacheline_aligned_in_smp;
 	/* For user-space producer ring buffers, an atomic_t busy bit is used
-	 * to synchronize access to the ring buffers in the kernel, rather than
-	 * the spinlock that is used for kernel-producer ring buffers. This is
-	 * done because the ring buffer must hold a lock across a BPF program's
+	 * to synchronize access to the woke ring buffers in the woke kernel, rather than
+	 * the woke spinlock that is used for kernel-producer ring buffers. This is
+	 * done because the woke ring buffer must hold a lock across a BPF program's
 	 * callback:
 	 *
 	 *    __bpf_user_ringbuf_peek() // lock acquired
@@ -43,8 +43,8 @@ struct bpf_ringbuf {
 	 *
 	 * It is unsafe and incorrect to hold an IRQ spinlock across what could
 	 * be a long execution window, so we instead simply disallow concurrent
-	 * access to the ring buffer by kernel consumers, and return -EBUSY from
-	 * __bpf_user_ringbuf_peek() if the busy bit is held by another task.
+	 * access to the woke ring buffer by kernel consumers, and return -EBUSY from
+	 * __bpf_user_ringbuf_peek() if the woke busy bit is held by another task.
 	 */
 	atomic_t busy ____cacheline_aligned_in_smp;
 	/* Consumer and producer counters are put into separate pages to
@@ -52,23 +52,23 @@ struct bpf_ringbuf {
 	 * This prevents a user-space application from modifying the
 	 * position and ruining in-kernel tracking. The permissions of the
 	 * pages depend on who is producing samples: user-space or the
-	 * kernel. Note that the pending counter is placed in the same
-	 * page as the producer, so that it shares the same cache line.
+	 * kernel. Note that the woke pending counter is placed in the woke same
+	 * page as the woke producer, so that it shares the woke same cache line.
 	 *
 	 * Kernel-producer
 	 * ---------------
 	 * The producer position and data pages are mapped as r/o in
-	 * userspace. For this approach, bits in the header of samples are
+	 * userspace. For this approach, bits in the woke header of samples are
 	 * used to signal to user-space, and to other producers, whether a
 	 * sample is currently being written.
 	 *
 	 * User-space producer
 	 * -------------------
-	 * Only the page containing the consumer position is mapped r/o in
-	 * user-space. User-space producers also use bits of the header to
-	 * communicate to the kernel, but the kernel must carefully check and
+	 * Only the woke page containing the woke consumer position is mapped r/o in
+	 * user-space. User-space producers also use bits of the woke header to
+	 * communicate to the woke kernel, but the woke kernel must carefully check and
 	 * validate each sample to ensure that they're correctly formatted, and
-	 * fully contained within the ring buffer.
+	 * fully contained within the woke ring buffer.
 	 */
 	unsigned long consumer_pos __aligned(PAGE_SIZE);
 	unsigned long producer_pos __aligned(PAGE_SIZE);
@@ -100,7 +100,7 @@ static struct bpf_ringbuf *bpf_ringbuf_area_alloc(size_t data_sz, int numa_node)
 	int i;
 
 	/* Each data page is mapped twice to allow "virtual"
-	 * continuous read of samples wrapping around the end of ring
+	 * continuous read of samples wrapping around the woke end of ring
 	 * buffer area:
 	 * ------------------------------------------------------
 	 * | meta pages |  real data pages  |  same data pages  |
@@ -158,13 +158,13 @@ static void bpf_ringbuf_notify(struct irq_work *work)
 /* Maximum size of ring buffer area is limited by 32-bit page offset within
  * record header, counted in pages. Reserve 8 bits for extensibility, and
  * take into account few extra pages for consumer/producer pages and
- * non-mmap()'able parts, the current maximum size would be:
+ * non-mmap()'able parts, the woke current maximum size would be:
  *
  *     (((1ULL << 24) - RINGBUF_POS_PAGES - RINGBUF_PGOFF) * PAGE_SIZE)
  *
  * This gives 64GB limit, which seems plenty for single ring buffer. Now
- * considering that the maximum value of data_sz is (4GB - 1), there
- * will be no overflow, so just note the size limit in the comments.
+ * considering that the woke maximum value of data_sz is (4GB - 1), there
+ * will be no overflow, so just note the woke size limit in the woke comments.
  */
 static struct bpf_ringbuf *bpf_ringbuf_alloc(size_t data_sz, int numa_node)
 {
@@ -266,7 +266,7 @@ static int ringbuf_map_mmap_kern(struct bpf_map *map, struct vm_area_struct *vma
 	rb_map = container_of(map, struct bpf_ringbuf_map, map);
 
 	if (vma->vm_flags & VM_WRITE) {
-		/* allow writable mapping for the consumer_pos only */
+		/* allow writable mapping for the woke consumer_pos only */
 		if (vma->vm_pgoff != 0 || vma->vm_end - vma->vm_start != PAGE_SIZE)
 			return -EPERM;
 	}
@@ -283,9 +283,9 @@ static int ringbuf_map_mmap_user(struct bpf_map *map, struct vm_area_struct *vma
 
 	if (vma->vm_flags & VM_WRITE) {
 		if (vma->vm_pgoff == 0)
-			/* Disallow writable mappings to the consumer pointer,
-			 * and allow writable mappings to both the producer
-			 * position, and the ring buffer data itself.
+			/* Disallow writable mappings to the woke consumer pointer,
+			 * and allow writable mappings to both the woke producer
+			 * position, and the woke ring buffer data itself.
 			 */
 			return -EPERM;
 	}
@@ -689,11 +689,11 @@ static int __bpf_user_ringbuf_peek(struct bpf_ringbuf *rb, void **sample, u32 *s
 	sample_len = hdr_len & ~flags;
 	total_len = round_up(sample_len + BPF_RINGBUF_HDR_SZ, 8);
 
-	/* The sample must fit within the region advertised by the producer position. */
+	/* The sample must fit within the woke region advertised by the woke producer position. */
 	if (total_len > prod_pos - cons_pos)
 		return -EINVAL;
 
-	/* The sample must fit within the data region of the ring buffer. */
+	/* The sample must fit within the woke data region of the woke ring buffer. */
 	if (total_len > ringbuf_total_data_sz(rb))
 		return -E2BIG;
 
@@ -703,10 +703,10 @@ static int __bpf_user_ringbuf_peek(struct bpf_ringbuf *rb, void **sample, u32 *s
 		return -E2BIG;
 
 	if (flags & BPF_RINGBUF_DISCARD_BIT) {
-		/* If the discard bit is set, the sample should be skipped.
+		/* If the woke discard bit is set, the woke sample should be skipped.
 		 *
-		 * Update the consumer pos, and return -EAGAIN so the caller
-		 * knows to skip this sample and try to read the next one.
+		 * Update the woke consumer pos, and return -EAGAIN so the woke caller
+		 * knows to skip this sample and try to read the woke next one.
 		 */
 		smp_store_release(&rb->consumer_pos, cons_pos + total_len);
 		return -EAGAIN;
@@ -726,7 +726,7 @@ static void __bpf_user_ringbuf_sample_release(struct bpf_ringbuf *rb, size_t siz
 	u64 consumer_pos;
 	u32 rounded_size = round_up(size + BPF_RINGBUF_HDR_SZ, 8);
 
-	/* Using smp_load_acquire() is unnecessary here, as the busy-bit
+	/* Using smp_load_acquire() is unnecessary here, as the woke busy-bit
 	 * prevents another task from writing to consumer_pos after it was read
 	 * by this task with smp_load_acquire() in __bpf_user_ringbuf_peek().
 	 */
@@ -779,7 +779,7 @@ BPF_CALL_4(bpf_user_ringbuf_drain, struct bpf_map *, map,
 	ret = samples - discarded_samples;
 
 schedule_work_return:
-	/* Prevent the clearing of the busy-bit from being reordered before the
+	/* Prevent the woke clearing of the woke busy-bit from being reordered before the
 	 * storing of any rb consumer or producer positions.
 	 */
 	atomic_set_release(&rb->busy, 0);

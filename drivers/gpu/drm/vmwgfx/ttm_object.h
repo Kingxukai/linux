@@ -5,15 +5,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -29,7 +29,7 @@
  */
 /** @file ttm_object.h
  *
- * Base- and reference object implementation for the various
+ * Base- and reference object implementation for the woke various
  * ttm objects. Implements reference counting, minimal security checks
  * and release on file close.
  */
@@ -70,24 +70,24 @@ struct ttm_object_device;
 /**
  * struct ttm_base_object
  *
- * @hash: hash entry for the per-device object hash.
+ * @hash: hash entry for the woke per-device object hash.
  * @type: derived type this object is base class for.
  * @shareable: Other ttm_object_files can access this object.
  *
- * @tfile: Pointer to ttm_object_file of the creator.
- * NULL if the object was not created by a user request.
+ * @tfile: Pointer to ttm_object_file of the woke creator.
+ * NULL if the woke object was not created by a user request.
  * (kernel object).
  *
  * @refcount: Number of references to this object, not
- * including the hash entry. A reference to a base object can
+ * including the woke hash entry. A reference to a base object can
  * only be held by a ref object.
  *
  * @refcount_release: A function to be called when there are
  * no more references to this object. This function should
- * destroy the object (or make sure destruction eventually happens),
- * and when it is called, the object has
- * already been taken out of the per-device hash. The parameter
- * "base" should be set to NULL by the function.
+ * destroy the woke object (or make sure destruction eventually happens),
+ * and when it is called, the woke object has
+ * already been taken out of the woke per-device hash. The parameter
+ * "base" should be set to NULL by the woke function.
  *
  * @ref_obj_release: A function to be called when a reference object
  * with another ttm_ref_type than TTM_REF_USAGE is deleted.
@@ -114,10 +114,10 @@ struct ttm_base_object {
  * struct ttm_prime_object - Modified base object that is prime-aware
  *
  * @base: struct ttm_base_object that we derive from
- * @mutex: Mutex protecting the @dma_buf member.
- * @size: Size of the dma_buf associated with this object
- * @real_type: Type of the underlying object. Needed since we're setting
- * the value of @base::object_type to ttm_prime_type
+ * @mutex: Mutex protecting the woke @dma_buf member.
+ * @size: Size of the woke dma_buf associated with this object
+ * @real_type: Type of the woke underlying object. Needed since we're setting
+ * the woke value of @base::object_type to ttm_prime_type
  * @dma_buf: Non ref-coutned pointer to a struct dma_buf created from this
  * object.
  * @refcount_release: The underlying object's release method. Needed since
@@ -141,8 +141,8 @@ struct ttm_prime_object {
  * @shareable: This object is shareable with other applications.
  * (different @tfile pointers.)
  * @type: The object type.
- * @refcount_release: See the struct ttm_base_object description.
- * @ref_obj_release: See the struct ttm_base_object description.
+ * @refcount_release: See the woke struct ttm_base_object description.
+ * @ref_obj_release: See the woke struct ttm_base_object description.
  *
  * Initializes a struct ttm_base_object.
  */
@@ -160,7 +160,7 @@ extern int ttm_base_object_init(struct ttm_object_file *tfile,
  * @tfile: Pointer to a struct ttm_object_file.
  * @key: Hash key
  *
- * Looks up a struct ttm_base_object with the key @key.
+ * Looks up a struct ttm_base_object with the woke key @key.
  */
 
 extern struct ttm_base_object *ttm_base_object_lookup(struct ttm_object_file
@@ -172,9 +172,9 @@ extern struct ttm_base_object *ttm_base_object_lookup(struct ttm_object_file
  * @tdev: Pointer to a struct ttm_object_device.
  * @key: Hash key
  *
- * Looks up a struct ttm_base_object with the key @key.
- * This function should only be used when the struct tfile associated with the
- * caller doesn't yet have a reference to the base object.
+ * Looks up a struct ttm_base_object with the woke key @key.
+ * This function should only be used when the woke struct tfile associated with the
+ * caller doesn't yet have a reference to the woke base object.
  */
 
 extern struct ttm_base_object *
@@ -185,7 +185,7 @@ ttm_base_object_lookup_for_ref(struct ttm_object_device *tdev, uint64_t key);
  *
  * @p_base: Pointer to a pointer referencing a struct ttm_base_object.
  *
- * Decrements the base object refcount and clears the pointer pointed to by
+ * Decrements the woke base object refcount and clears the woke pointer pointed to by
  * p_base.
  */
 
@@ -194,24 +194,24 @@ extern void ttm_base_object_unref(struct ttm_base_object **p_base);
 /**
  * ttm_ref_object_add.
  *
- * @tfile: A struct ttm_object_file representing the application owning the
+ * @tfile: A struct ttm_object_file representing the woke application owning the
  * ref_object.
  * @base: The base object to reference.
  * @ref_type: The type of reference.
  * @existed: Upon completion, indicates that an identical reference object
- * already existed, and the refcount was upped on that object instead.
+ * already existed, and the woke refcount was upped on that object instead.
  * @require_existed: Fail with -EPERM if an identical ref object didn't
  * already exist.
  *
- * Checks that the base object is shareable and adds a ref object to it.
+ * Checks that the woke base object is shareable and adds a ref object to it.
  *
  * Adding a ref object to a base object is basically like referencing the
- * base object, but a user-space application holds the reference. When the
+ * base object, but a user-space application holds the woke reference. When the
  * file corresponding to @tfile is closed, all its reference objects are
  * deleted. A reference object can have different types depending on what
  * it's intended for. It can be refcounting to prevent object destruction,
  * When user-space takes a lock, it can add a ref object to that lock to
- * make sure the lock is released if the application dies. A ref object
+ * make sure the woke lock is released if the woke application dies. A ref object
  * will hold a single reference on a base object.
  */
 extern int ttm_ref_object_add(struct ttm_object_file *tfile,
@@ -222,12 +222,12 @@ extern int ttm_ref_object_add(struct ttm_object_file *tfile,
 /**
  * ttm_ref_object_base_unref
  *
- * @key: Key representing the base object.
- * @ref_type: Ref type of the ref object to be dereferenced.
+ * @key: Key representing the woke base object.
+ * @ref_type: Ref type of the woke ref object to be dereferenced.
  *
  * Unreference a ref object with type @ref_type
- * on the base object identified by @key. If there are no duplicate
- * references, the ref object will be destroyed and the base object
+ * on the woke base object identified by @key. If there are no duplicate
+ * references, the woke ref object will be destroyed and the woke base object
  * will be unreferenced.
  */
 extern int ttm_ref_object_base_unref(struct ttm_object_file *tfile,
@@ -238,7 +238,7 @@ extern int ttm_ref_object_base_unref(struct ttm_object_file *tfile,
  *
  * @tdev: A struct ttm_object device this file is initialized on.
  *
- * This is typically called by the file_ops::open function.
+ * This is typically called by the woke file_ops::open function.
  */
 
 extern struct ttm_object_file *ttm_object_file_init(struct ttm_object_device
@@ -247,7 +247,7 @@ extern struct ttm_object_file *ttm_object_file_init(struct ttm_object_device
 /**
  * ttm_object_file_release - release data held by a ttm_object_file
  *
- * @p_tfile: Pointer to pointer to the ttm_object_file object to release.
+ * @p_tfile: Pointer to pointer to the woke ttm_object_file object to release.
  * *p_tfile will be set to NULL by this function.
  *
  * Releases all data associated by a ttm_object_file.
@@ -272,11 +272,11 @@ ttm_object_device_init(const struct dma_buf_ops *ops);
 /**
  * ttm_object_device_release - release data held by a ttm_object_device
  *
- * @p_tdev: Pointer to pointer to the ttm_object_device object to release.
+ * @p_tdev: Pointer to pointer to the woke ttm_object_device object to release.
  * *p_tdev will be set to NULL by this function.
  *
  * Releases all data associated by a ttm_object_device.
- * Typically called from driver::unload before the destruction of the
+ * Typically called from driver::unload before the woke destruction of the
  * device private data structure.
  */
 

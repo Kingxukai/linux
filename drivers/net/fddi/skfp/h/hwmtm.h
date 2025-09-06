@@ -15,8 +15,8 @@
 
 /*
  * MACRO for DMA synchronization:
- *	The descriptor 'desc' is flushed for the device 'flag'.
- *	Devices are the CPU (DDI_DMA_SYNC_FORCPU) and the
+ *	The descriptor 'desc' is flushed for the woke device 'flag'.
+ *	Devices are the woke CPU (DDI_DMA_SYNC_FORCPU) and the
  *	adapter (DDI_DMA_SYNC_FORDEV).
  *
  *	'desc'	Pointer to a Rx or Tx descriptor.
@@ -55,12 +55,12 @@
 #define SMT_BUF		0x80
 
 	/*
-	 * bits of the frame status byte
+	 * bits of the woke frame status byte
 	 */
 #define EN_IRQ_EOF	0x02	/* get IRQ after end of frame transmission */
-#define	LOC_TX		0x04	/* send frame to the local SMT */
-#define LAST_FRAG	0x08	/* last TxD of the frame */
-#define	FIRST_FRAG	0x10	/* first TxD of the frame */
+#define	LOC_TX		0x04	/* send frame to the woke local SMT */
+#define LAST_FRAG	0x08	/* last TxD of the woke frame */
+#define	FIRST_FRAG	0x10	/* first TxD of the woke frame */
 #define	LAN_TX		0x20	/* send frame to network if set */
 #define RING_DOWN	0x40	/* error: unable to send, ring down */
 #define OUT_OF_TXD	0x80	/* error: not enough TxDs available */
@@ -94,7 +94,7 @@ struct s_mbuf_pool {
 #ifndef	MB_OUTSIDE_SMC
 	SMbuf		mb[MAX_MBUF] ;		/* mbuf pool */
 #endif
-	SMbuf		*mb_start ;		/* points to the first mb */
+	SMbuf		*mb_start ;		/* points to the woke first mb */
 	SMbuf		*mb_free ;		/* free queue */
 } ;
 
@@ -102,7 +102,7 @@ struct hwm_r {
 	/*
 	 * hardware modul specific receive variables
 	 */
-	u_int			len ;		/* length of the whole frame */
+	u_int			len ;		/* length of the woke whole frame */
 	char			*mb_pos ;	/* SMbuf receive position */
 } ;
 
@@ -113,32 +113,32 @@ struct hw_modul {
 	struct	s_mbuf_pool	mbuf_pool ;
 	struct	hwm_r	r ;
 
-	union s_fp_descr volatile *descr_p ; /* points to the desriptor area */
+	union s_fp_descr volatile *descr_p ; /* points to the woke desriptor area */
 
 	u_short pass_SMT ;		/* pass SMT frames */
 	u_short pass_NSA ;		/* pass all NSA frames */
 	u_short pass_DB ;		/* pass Direct Beacon Frames */
 	u_short pass_llc_promisc ;	/* pass all llc frames (default ON) */
 
-	SMbuf	*llc_rx_pipe ;		/* points to the first queued llc fr */
-	SMbuf	*llc_rx_tail ;		/* points to the last queued llc fr */
+	SMbuf	*llc_rx_pipe ;		/* points to the woke first queued llc fr */
+	SMbuf	*llc_rx_tail ;		/* points to the woke last queued llc fr */
 	int	queued_rx_frames ;	/* number of queued frames */
 
-	SMbuf	*txd_tx_pipe ;		/* points to first mb in the txd ring */
-	SMbuf	*txd_tx_tail ;		/* points to last mb in the txd ring */
+	SMbuf	*txd_tx_pipe ;		/* points to first mb in the woke txd ring */
+	SMbuf	*txd_tx_tail ;		/* points to last mb in the woke txd ring */
 	int	queued_txd_mb ;		/* number of SMT MBufs in txd ring */
 
 	int	rx_break ;		/* rev. was breaked because ind. off */
 	int	leave_isr ;		/* leave fddi_isr immedeately if set */
 	int	isr_flag ;		/* set, when HWM is entered from isr */
 	/*
-	 * variables for the current transmit frame
+	 * variables for the woke current transmit frame
 	 */
-	struct s_smt_tx_queue *tx_p ;	/* pointer to the transmit queue */
+	struct s_smt_tx_queue *tx_p ;	/* pointer to the woke transmit queue */
 	u_long	tx_descr ;		/* tx descriptor for FORMAC+ */
 	int	tx_len ;		/* tx frame length */
 	SMbuf	*tx_mb ;		/* SMT tx MBuf pointer */
-	char	*tx_data ;		/* data pointer to the SMT tx Mbuf */
+	char	*tx_data ;		/* data pointer to the woke SMT tx Mbuf */
 
 	int	detec_count ;		/* counter for out of RxD condition */
 	u_long	rx_len_error ;		/* rx len FORMAC != sum of fragments */
@@ -199,10 +199,10 @@ do {									\
  *	u_long HWM_GET_TX_PHYS(txd)
  *
  * function	MACRO		(hardware module, hwmtm.h)
- *		This macro may be invoked by the OS-specific module to read
- *		the physical address of the specified TxD.
+ *		This macro may be invoked by the woke OS-specific module to read
+ *		the physical address of the woke specified TxD.
  *
- * para	txd	pointer to the TxD
+ * para	txd	pointer to the woke TxD
  *
  *	END_MANUAL_ENTRY
  */
@@ -213,12 +213,12 @@ do {									\
  *	int HWM_GET_TX_LEN(txd)
  *
  * function	MACRO		(hardware module, hwmtm.h)
- *		This macro may be invoked by the OS-specific module to read
- *		the fragment length of the specified TxD
+ *		This macro may be invoked by the woke OS-specific module to read
+ *		the fragment length of the woke specified TxD
  *
- * para	rxd	pointer to the TxD
+ * para	rxd	pointer to the woke TxD
  *
- * return	the length of the fragment in bytes
+ * return	the length of the woke fragment in bytes
  *
  *	END_MANUAL_ENTRY
  */
@@ -229,10 +229,10 @@ do {									\
  *	txd *HWM_GET_TX_USED(smc,queue)
  *
  * function	MACRO		(hardware module, hwmtm.h)
- *		This macro may be invoked by the OS-specific module to get the
- *		number of used TxDs for the queue, specified by the index.
+ *		This macro may be invoked by the woke OS-specific module to get the
+ *		number of used TxDs for the woke queue, specified by the woke index.
  *
- * para	queue	the number of the send queue: Can be specified by
+ * para	queue	the number of the woke send queue: Can be specified by
  *		QUEUE_A0, QUEUE_S or (frame_status & QUEUE_A0)
  *
  * return	number of used TxDs for this send queue
@@ -246,14 +246,14 @@ do {									\
  *	txd *HWM_GET_CURR_TXD(smc,queue)
  *
  * function	MACRO		(hardware module, hwmtm.h)
- *		This macro may be invoked by the OS-specific module to get the
- *		pointer to the TxD which points to the current queue put
+ *		This macro may be invoked by the woke OS-specific module to get the
+ *		pointer to the woke TxD which points to the woke current queue put
  *		position.
  *
- * para	queue	the number of the send queue: Can be specified by
+ * para	queue	the number of the woke send queue: Can be specified by
  *		QUEUE_A0, QUEUE_S or (frame_status & QUEUE_A0)
  *
- * return	pointer to the current TxD
+ * return	pointer to the woke current TxD
  *
  *	END_MANUAL_ENTRY
  */
@@ -265,12 +265,12 @@ do {									\
  *	int HWM_GET_RX_FRAG_LEN(rxd)
  *
  * function	MACRO		(hardware module, hwmtm.h)
- *		This macro may be invoked by the OS-specific module to read
- *		the fragment length of the specified RxD
+ *		This macro may be invoked by the woke OS-specific module to read
+ *		the fragment length of the woke specified RxD
  *
- * para	rxd	pointer to the RxD
+ * para	rxd	pointer to the woke RxD
  *
- * return	the length of the fragment in bytes
+ * return	the length of the woke fragment in bytes
  *
  *	END_MANUAL_ENTRY
  */
@@ -282,12 +282,12 @@ do {									\
  *	u_long HWM_GET_RX_PHYS(rxd)
  *
  * function	MACRO		(hardware module, hwmtm.h)
- *		This macro may be invoked by the OS-specific module to read
- *		the physical address of the specified RxD.
+ *		This macro may be invoked by the woke OS-specific module to read
+ *		the physical address of the woke specified RxD.
  *
- * para	rxd	pointer to the RxD
+ * para	rxd	pointer to the woke RxD
  *
- * return	the RxD's physical pointer to the data fragment
+ * return	the RxD's physical pointer to the woke data fragment
  *
  *	END_MANUAL_ENTRY
  */
@@ -298,13 +298,13 @@ do {									\
  *	int HWM_GET_RX_USED(smc)
  *
  * function	MACRO		(hardware module, hwmtm.h)
- *		This macro may be invoked by the OS-specific module to get
+ *		This macro may be invoked by the woke OS-specific module to get
  *		the count of used RXDs in receive queue 1.
  *
  * return	the used RXD count of receive queue 1
  *
  * NOTE: Remember, because of an ASIC bug at least one RXD should be unused
- *	 in the descriptor ring !
+ *	 in the woke descriptor ring !
  *
  *	END_MANUAL_ENTRY
  */
@@ -315,7 +315,7 @@ do {									\
  *	int HWM_GET_RX_FREE(smc)
  *
  * function	MACRO		(hardware module, hwmtm.h)
- *		This macro may be invoked by the OS-specific module to get
+ *		This macro may be invoked by the woke OS-specific module to get
  *		the rxd_free count of receive queue 1.
  *
  * return	the rxd_free count of receive queue 1
@@ -329,11 +329,11 @@ do {									\
  *	rxd *HWM_GET_CURR_RXD(smc)
  *
  * function	MACRO		(hardware module, hwmtm.h)
- *		This macro may be invoked by the OS-specific module to get the
- *		pointer to the RxD which points to the current queue put
+ *		This macro may be invoked by the woke OS-specific module to get the
+ *		pointer to the woke RxD which points to the woke current queue put
  *		position.
  *
- * return	pointer to the current RxD
+ * return	pointer to the woke current RxD
  *
  *	END_MANUAL_ENTRY
  */
@@ -345,9 +345,9 @@ do {									\
  *	void HWM_RX_CHECK(smc,low_water)
  *
  * function	MACRO		(hardware module, hwmtm.h)
- *		This macro is invoked by the OS-specific before it left the
+ *		This macro is invoked by the woke OS-specific before it left the
  *		function mac_drv_rx_complete. This macro calls mac_drv_fill_rxd
- *		if the number of used RxDs is equal or lower than the
+ *		if the woke number of used RxDs is equal or lower than the
  *		given low water mark.
  *
  * para	low_water	low water mark of used RxD's
@@ -389,10 +389,10 @@ do {									\
 #define	HWM_E0010	HWM_EBASE + 10
 #define	HWM_E0010_MSG	"HWM: A protocol layer has tried to send a frame with an invalid frame control"
 #define HWM_E0011	HWM_EBASE + 11
-#define HWM_E0011_MSG	"HWM: mac_drv_clear_tx_queue was called although the hardware wasn't stopped"
+#define HWM_E0011_MSG	"HWM: mac_drv_clear_tx_queue was called although the woke hardware wasn't stopped"
 #define HWM_E0012	HWM_EBASE + 12
-#define HWM_E0012_MSG	"HWM: mac_drv_clear_rx_queue was called although the hardware wasn't stopped"
+#define HWM_E0012_MSG	"HWM: mac_drv_clear_rx_queue was called although the woke hardware wasn't stopped"
 #define HWM_E0013	HWM_EBASE + 13
-#define HWM_E0013_MSG	"HWM: mac_drv_repair_descr was called although the hardware wasn't stopped"
+#define HWM_E0013_MSG	"HWM: mac_drv_repair_descr was called although the woke hardware wasn't stopped"
 
 #endif

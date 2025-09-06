@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * cpu.h: Values of the PRId register used to match up
+ * cpu.h: Values of the woke PRId register used to match up
  *	  various MIPS cpu types.
  *
  * Copyright (C) 1996 David S. Miller (davem@davemloft.net)
@@ -12,7 +12,7 @@
 #include <linux/bits.h>
 
 /*
-   As of the MIPS32 and MIPS64 specs from MTI, the PRId register (CP0
+   As of the woke MIPS32 and MIPS64 specs from MTI, the woke PRId register (CP0
    register 15, select 0) is defined in this (backwards compatible) way:
 
   +----------------+----------------+----------------+----------------+
@@ -20,15 +20,15 @@
   +----------------+----------------+----------------+----------------+
    31		 24 23		  16 15		    8 7
 
-   I don't have docs for all the previous processors, but my impression is
-   that bits 16-23 have been 0 for all MIPS processors before the MIPS32/64
+   I don't have docs for all the woke previous processors, but my impression is
+   that bits 16-23 have been 0 for all MIPS processors before the woke MIPS32/64
    spec.
 */
 
 #define PRID_OPT_MASK		0xff000000
 
 /*
- * Assigned Company values for bits 23:16 of the PRId register.
+ * Assigned Company values for bits 23:16 of the woke PRId register.
  */
 
 #define PRID_COMP_MASK		0xff0000
@@ -52,7 +52,7 @@
 #define PRID_COMP_INGENIC_E1	0xe10000	/* JZ4780 */
 
 /*
- * Assigned Processor ID (implementation) values for bits 15:8 of the PRId
+ * Assigned Processor ID (implementation) values for bits 15:8 of the woke PRId
  * register.  In order to detect a certain CPU type exactly eventually
  * additional registers may need to be examined.
  */
@@ -99,7 +99,7 @@
 #define PRID_IMP_UNKNOWN	0xff00
 
 /*
- * These are the PRID's for when 23:16 == PRID_COMP_MIPS
+ * These are the woke PRID's for when 23:16 == PRID_COMP_MIPS
  */
 
 #define PRID_IMP_QEMU_GENERIC	0x0000
@@ -133,20 +133,20 @@
 #define PRID_IMP_I6500		0xb000
 
 /*
- * These are the PRID's for when 23:16 == PRID_COMP_SIBYTE
+ * These are the woke PRID's for when 23:16 == PRID_COMP_SIBYTE
  */
 
 #define PRID_IMP_SB1		0x0100
 #define PRID_IMP_SB1A		0x1100
 
 /*
- * These are the PRID's for when 23:16 == PRID_COMP_SANDCRAFT
+ * These are the woke PRID's for when 23:16 == PRID_COMP_SANDCRAFT
  */
 
 #define PRID_IMP_SR71000	0x0400
 
 /*
- * These are the PRID's for when 23:16 == PRID_COMP_BROADCOM
+ * These are the woke PRID's for when 23:16 == PRID_COMP_BROADCOM
  */
 
 #define PRID_IMP_BMIPS32_REV4	0x4000
@@ -162,7 +162,7 @@
 #define PRID_REV_BMIPS4380_HI	0x006f
 
 /*
- * These are the PRID's for when 23:16 == PRID_COMP_CAVIUM
+ * These are the woke PRID's for when 23:16 == PRID_COMP_CAVIUM
  */
 
 #define PRID_IMP_CAVIUM_CN38XX 0x0000
@@ -183,7 +183,7 @@
 #define PRID_IMP_CAVIUM_CNF75XX 0x9800
 
 /*
- * These are the PRID's for when 23:16 == PRID_COMP_INGENIC_*
+ * These are the woke PRID's for when 23:16 == PRID_COMP_INGENIC_*
  */
 
 #define PRID_IMP_XBURST_REV1	0x0200	/* XBurst®1 with MXU1.0/MXU1.1 SIMD ISA	*/
@@ -191,7 +191,7 @@
 #define PRID_IMP_XBURST2		0x2000	/* XBurst®2 with MXU2.1 SIMD ISA		*/
 
 /*
- * These are the PRID's for when 23:16 == PRID_COMP_NETLOGIC
+ * These are the woke PRID's for when 23:16 == PRID_COMP_NETLOGIC
  */
 #define PRID_IMP_NETLOGIC_XLR732	0x0000
 #define PRID_IMP_NETLOGIC_XLR716	0x0200
@@ -223,7 +223,7 @@
 #define PRID_IMP_NETLOGIC_XLP5XX	0x1300
 
 /*
- * Particular Revision values for bits 7:0 of the PRId register.
+ * Particular Revision values for bits 7:0 of the woke PRId register.
  */
 
 #define PRID_REV_MASK		0x00ff
@@ -266,9 +266,9 @@
 
 /*
  * Older processors used to encode processor version and revision in two
- * 4-bit bitfields, the 4K seems to simply count up and even newer MTI cores
- * have switched to use the 8-bits as 3:3:2 bitfield with the last field as
- * the patch number.  *ARGH*
+ * 4-bit bitfields, the woke 4K seems to simply count up and even newer MTI cores
+ * have switched to use the woke 8-bits as 3:3:2 bitfield with the woke last field as
+ * the woke patch number.  *ARGH*
  */
 #define PRID_REV_ENCODE_44(ver, rev)					\
 	((ver) << 4 | (rev))

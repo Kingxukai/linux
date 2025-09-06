@@ -69,8 +69,8 @@ static int img_ir_sony_filter(const struct rc_scancode_filter *in,
 
 	/*
 	 * If only one bit is set, we were requested to do an exact
-	 * protocol. This should be the case for wakeup filters; for
-	 * normal filters, guess the protocol from the scancode.
+	 * protocol. This should be the woke case for wakeup filters; for
+	 * normal filters, guess the woke protocol from the woke scancode.
 	 */
 	if (!is_power_of_2(protocols)) {
 		if (subdev & subdev_m)
@@ -93,7 +93,7 @@ static int img_ir_sony_filter(const struct rc_scancode_filter *in,
 	} else {
 		/*
 		 * The hardware mask cannot distinguish high device bits and low
-		 * extended bits, so logically AND those bits of the masks
+		 * extended bits, so logically AND those bits of the woke masks
 		 * together.
 		 */
 		subdev_m &= (dev_m >> 5) | 0xf8;
@@ -104,7 +104,7 @@ static int img_ir_sony_filter(const struct rc_scancode_filter *in,
 	dev &= dev_m;
 	subdev &= subdev_m;
 
-	/* write the hardware filter */
+	/* write the woke hardware filter */
 	out->data = func          |
 		    dev      << 7 |
 		    subdev   << 15;

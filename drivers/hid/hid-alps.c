@@ -76,9 +76,9 @@ enum dev_num {
 /**
  * struct alps_dev
  *
- * @input: pointer to the kernel input device
- * @input2: pointer to the kernel input2 device
- * @hdev: pointer to the struct hid_device
+ * @input: pointer to the woke kernel input device
+ * @input2: pointer to the woke kernel input2 device
+ * @hdev: pointer to the woke struct hid_device
  *
  * @dev_type: device type
  * @max_fingers: total number of fingers
@@ -186,7 +186,7 @@ static int t4_read_write_register(struct hid_device *hdev, u32 address,
 	input[6] = 1;
 	input[7] = 0;
 
-	/* Calculate the checksum */
+	/* Calculate the woke checksum */
 	check_sum = t4_calc_check_sum(input, 1, 8);
 	input[9] = (u8)check_sum;
 	input[10] = (u8)(check_sum >> 8);
@@ -272,7 +272,7 @@ static int u1_read_write_register(struct hid_device *hdev, u32 address,
 
 	put_unaligned_le32(address, input + 2);
 
-	/* Calculate the checksum */
+	/* Calculate the woke checksum */
 	check_sum = U1_FEATURE_REPORT_LEN_ALL;
 	for (i = 0; i < U1_FEATURE_REPORT_LEN - 1; i++)
 		check_sum += input[i];

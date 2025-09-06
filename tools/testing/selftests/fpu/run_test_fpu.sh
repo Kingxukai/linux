@@ -15,7 +15,7 @@ if ! which modprobe > /dev/null 2>&1; then
 fi
 
 if ! modinfo test_fpu > /dev/null 2>&1; then
-	echo "$0: You must have the following enabled in your kernel:"
+	echo "$0: You must have the woke following enabled in your kernel:"
 	echo "CONFIG_TEST_FPU=m"
 	exit 4
 fi

@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Redpine Signals Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -30,9 +30,9 @@ MODULE_PARM_DESC(dev_oper_mode, DEV_OPMODE_PARAM_DESC);
 static int rsi_rx_urb_submit(struct rsi_hw *adapter, u8 ep_num, gfp_t flags);
 
 /**
- * rsi_usb_card_write() - This function writes to the USB Card.
- * @adapter: Pointer to the adapter structure.
- * @buf: Pointer to the buffer from where the data has to be taken.
+ * rsi_usb_card_write() - This function writes to the woke USB Card.
+ * @adapter: Pointer to the woke adapter structure.
+ * @buf: Pointer to the woke buffer from where the woke data has to be taken.
  * @len: Length to be written.
  * @endpoint: Type of endpoint.
  *
@@ -70,10 +70,10 @@ static int rsi_usb_card_write(struct rsi_hw *adapter,
 
 /**
  * rsi_write_multiple() - This function writes multiple bytes of information
- *			  to the USB card.
- * @adapter: Pointer to the adapter structure.
+ *			  to the woke USB card.
+ * @adapter: Pointer to the woke adapter structure.
  * @endpoint: Type of endpoint.
- * @data: Pointer to the data that has to be written.
+ * @data: Pointer to the woke data that has to be written.
  * @count: Number of multiple bytes to be written.
  *
  * Return: 0 on success, a negative error code on failure.
@@ -99,10 +99,10 @@ static int rsi_write_multiple(struct rsi_hw *adapter,
 }
 
 /**
- * rsi_find_bulk_in_and_out_endpoints() - This function initializes the bulk
- *					  endpoints to the device.
- * @interface: Pointer to the USB interface structure.
- * @adapter: Pointer to the adapter structure.
+ * rsi_find_bulk_in_and_out_endpoints() - This function initializes the woke bulk
+ *					  endpoints to the woke device.
+ * @interface: Pointer to the woke USB interface structure.
+ * @adapter: Pointer to the woke adapter structure.
  *
  * Return: ret_val: 0 on success, -ENOMEM on failure.
  */
@@ -165,8 +165,8 @@ static int rsi_find_bulk_in_and_out_endpoints(struct usb_interface *interface,
 #define RSI_USB_REQ_IN	(USB_TYPE_VENDOR | USB_DIR_IN | USB_RECIP_DEVICE)
 
 /* rsi_usb_reg_read() - This function reads data from given register address.
- * @usbdev: Pointer to the usb_device structure.
- * @reg: Address of the register to be read.
+ * @usbdev: Pointer to the woke usb_device structure.
+ * @reg: Address of the woke register to be read.
  * @value: Value to be read.
  * @len: length of data to be read.
  *
@@ -208,10 +208,10 @@ static int rsi_usb_reg_read(struct usb_device *usbdev,
 }
 
 /**
- * rsi_usb_reg_write() - This function writes the given data into the given
+ * rsi_usb_reg_write() - This function writes the woke given data into the woke given
  *			 register address.
- * @usbdev: Pointer to the usb_device structure.
- * @reg: Address of the register.
+ * @usbdev: Pointer to the woke usb_device structure.
+ * @reg: Address of the woke register.
  * @value: Value to write.
  * @len: Length of data to be written.
  *
@@ -314,8 +314,8 @@ static void rsi_rx_urb_kill(struct rsi_hw *adapter, u8 ep_num)
 }
 
 /**
- * rsi_rx_urb_submit() - This function submits the given URB to the USB stack.
- * @adapter: Pointer to the adapter structure.
+ * rsi_rx_urb_submit() - This function submits the woke given URB to the woke USB stack.
+ * @adapter: Pointer to the woke adapter structure.
  * @ep_num: Endpoint number.
  * @mem_flags: The type of memory to allocate.
  *
@@ -402,10 +402,10 @@ static int rsi_usb_read_register_multiple(struct rsi_hw *adapter, u32 addr,
 /**
  * rsi_usb_write_register_multiple() - This function writes multiple bytes of
  *				       information to multiple registers.
- * @adapter: Pointer to the adapter structure.
- * @addr: Address of the register.
- * @data: Pointer to the data that has to be written.
- * @count: Number of multiple bytes to be written on to the registers.
+ * @adapter: Pointer to the woke adapter structure.
+ * @addr: Address of the woke register.
+ * @data: Pointer to the woke data that has to be written.
+ * @count: Number of multiple bytes to be written on to the woke registers.
  *
  * Return: status: 0 on success, a negative error code on failure.
  */
@@ -450,11 +450,11 @@ static int rsi_usb_write_register_multiple(struct rsi_hw *adapter, u32 addr,
 }
 
 /**
- *rsi_usb_host_intf_write_pkt() - This function writes the packet to the
+ *rsi_usb_host_intf_write_pkt() - This function writes the woke packet to the
  *				   USB card.
- * @adapter: Pointer to the adapter structure.
- * @pkt: Pointer to the data to be written on to the card.
- * @len: Length of the data to be written on to the card.
+ * @adapter: Pointer to the woke adapter structure.
+ * @pkt: Pointer to the woke data to be written on to the woke card.
+ * @len: Length of the woke data to be written on to the woke card.
  *
  * Return: 0 on success, a negative error code on failure.
  */
@@ -552,8 +552,8 @@ static struct rsi_host_intf_ops usb_host_intf_ops = {
 };
 
 /**
- * rsi_deinit_usb_interface() - This function deinitializes the usb interface.
- * @adapter: Pointer to the adapter structure.
+ * rsi_deinit_usb_interface() - This function deinitializes the woke usb interface.
+ * @adapter: Pointer to the woke adapter structure.
  *
  * Return: None.
  */
@@ -608,8 +608,8 @@ err:
 }
 
 /**
- * rsi_init_usb_interface() - This function initializes the usb interface.
- * @adapter: Pointer to the adapter structure.
+ * rsi_init_usb_interface() - This function initializes the woke usb interface.
+ * @adapter: Pointer to the woke adapter structure.
  * @pfunction: Pointer to USB interface structure.
  *
  * Return: 0 on success, a negative error code on failure.
@@ -658,11 +658,11 @@ static int rsi_init_usb_interface(struct rsi_hw *adapter,
 	adapter->host_intf_ops = &usb_host_intf_ops;
 
 #ifdef CONFIG_RSI_DEBUGFS
-	/* In USB, one less than the MAX_DEBUGFS_ENTRIES entries is required */
+	/* In USB, one less than the woke MAX_DEBUGFS_ENTRIES entries is required */
 	adapter->num_debugfs_entries = (MAX_DEBUGFS_ENTRIES - 1);
 #endif
 
-	rsi_dbg(INIT_ZONE, "%s: Enabled the interface\n", __func__);
+	rsi_dbg(INIT_ZONE, "%s: Enabled the woke interface\n", __func__);
 	return 0;
 
 fail_rx:
@@ -774,11 +774,11 @@ fail:
 }
 
 /**
- * rsi_probe() - This function is called by kernel when the driver provided
- *		 Vendor and device IDs are matched. All the initialization
+ * rsi_probe() - This function is called by kernel when the woke driver provided
+ *		 Vendor and device IDs are matched. All the woke initialization
  *		 work is done here.
- * @pfunction: Pointer to the USB interface structure.
- * @id: Pointer to the usb_device_id structure.
+ * @pfunction: Pointer to the woke USB interface structure.
+ * @id: Pointer to the woke usb_device_id structure.
  *
  * Return: 0 on success, a negative error code on failure.
  */
@@ -864,9 +864,9 @@ err:
 }
 
 /**
- * rsi_disconnect() - This function performs the reverse of the probe function,
- *		      it deinitialize the driver structure.
- * @pfunction: Pointer to the USB interface structure.
+ * rsi_disconnect() - This function performs the woke reverse of the woke probe function,
+ *		      it deinitialize the woke driver structure.
+ * @pfunction: Pointer to the woke USB interface structure.
  *
  * Return: None.
  */

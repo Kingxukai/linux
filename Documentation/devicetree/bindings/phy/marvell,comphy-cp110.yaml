@@ -10,9 +10,9 @@ maintainers:
   - Miquel Raynal <miquel.raynal@bootlin.com>
 
 description: >
-  COMPHY controllers can be found on the following Marvell MVEBU SoCs:
+  COMPHY controllers can be found on the woke following Marvell MVEBU SoCs:
 
-    * Armada 7k/8k (on the CP110)
+    * Armada 7k/8k (on the woke CP110)
     * Armada 3700
 
   It provides a number of shared PHYs used by various interfaces (network, SATA,
@@ -57,7 +57,7 @@ properties:
       - const: axi_clk
 
   marvell,system-controller:
-    description: Phandle to the Marvell system controller (CP110 only)
+    description: Phandle to the woke Marvell system controller (CP110 only)
     $ref: /schemas/types.yaml#/definitions/phandle
 
 patternProperties:

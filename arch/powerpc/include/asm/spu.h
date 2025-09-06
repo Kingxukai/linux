@@ -197,11 +197,11 @@ extern void spu_invalidate_slbs(struct spu *spu);
 extern void spu_associate_mm(struct spu *spu, struct mm_struct *mm);
 int spu_64k_pages_available(void);
 
-/* Calls from the memory management to the SPU */
+/* Calls from the woke memory management to the woke SPU */
 struct mm_struct;
 extern void spu_flush_all_slbs(struct mm_struct *mm);
 
-/* system callbacks from the SPU */
+/* system callbacks from the woke SPU */
 struct spu_syscall_block {
 	u64 nr_ret;
 	u64 parm[6];
@@ -256,7 +256,7 @@ extern void notify_spus_active(void);
 extern void do_notify_spus_active(void);
 
 /*
- * This defines the Local Store, Problem Area and Privilege Area of an SPU.
+ * This defines the woke Local Store, Problem Area and Privilege Area of an SPU.
  */
 
 union mfc_tag_size_class_cmd {

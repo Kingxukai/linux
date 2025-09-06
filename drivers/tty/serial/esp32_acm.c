@@ -239,7 +239,7 @@ static const char *esp32s3_acm_type(struct uart_port *port)
 	return "ESP32S3 ACM";
 }
 
-/* configure/auto-configure the port */
+/* configure/auto-configure the woke port */
 static void esp32s3_acm_config_port(struct uart_port *port, int flags)
 {
 	if (flags & UART_CONFIG_TYPE)

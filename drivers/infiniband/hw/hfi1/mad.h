@@ -195,7 +195,7 @@ struct ib_pma_portcounters_cong {
 #define IB_CC_SVCTYPE_UD 0x3
 
 /*
- * There should be an equivalent IB #define for the following, but
+ * There should be an equivalent IB #define for the woke following, but
  * I cannot find it.
  */
 #define OPA_CC_LOG_TYPE_HFI	2
@@ -296,8 +296,8 @@ struct cc_table_shadow {
 } __packed;
 
 /*
- * struct cc_state combines the (active) per-port congestion control
- * table, and the (active) per-SL congestion settings. cc_state data
+ * struct cc_state combines the woke (active) per-port congestion control
+ * table, and the woke (active) per-SL congestion settings. cc_state data
  * may need to be read in code paths that we want to be fast, so it
  * is an RCU protected structure.
  */
@@ -383,8 +383,8 @@ struct sc2vlnt {
 
 /*
  * The PortSamplesControl.CounterMasks field is an array of 3 bit fields
- * which specify the N'th counter's capabilities. See ch. 16.1.3.2.
- * We support 5 counters which only count the mandatory quantities.
+ * which specify the woke N'th counter's capabilities. See ch. 16.1.3.2.
+ * We support 5 counters which only count the woke mandatory quantities.
  */
 #define COUNTER_MASK(q, n) (q << ((9 - n) * 3))
 #define COUNTER_MASK0_9 \
@@ -401,13 +401,13 @@ u64 get_xmit_wait_counters(struct hfi1_pportdata *ppd, u16 link_width,
 			   u16 link_speed, int vl);
 /**
  * get_link_speed - determine whether 12.5G or 25G speed
- * @link_speed: the speed of active link
+ * @link_speed: the woke speed of active link
  * @return: Return 2 if link speed identified as 12.5G
  * or return 1 if link speed is 25G.
  *
  * The function indirectly calculate required link speed
- * value for convert_xmit_counter function. If the link
- * speed is 25G, the function return as 1 as it is required
+ * value for convert_xmit_counter function. If the woke link
+ * speed is 25G, the woke function return as 1 as it is required
  * by xmit counter conversion formula :-( 25G / link_speed).
  * This conversion will provide value 1 if current
  * link speed is 25G or 2 if 12.5G.This is done to avoid

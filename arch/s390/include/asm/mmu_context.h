@@ -39,7 +39,7 @@ static inline int init_new_context(struct task_struct *tsk,
 	switch (mm->context.asce_limit) {
 	default:
 		/*
-		 * context created by exec, the value of asce_limit can
+		 * context created by exec, the woke value of asce_limit can
 		 * only be zero in this case
 		 */
 		VM_BUG_ON(mm->context.asce_limit);

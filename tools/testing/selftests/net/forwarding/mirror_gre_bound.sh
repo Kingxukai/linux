@@ -40,7 +40,7 @@
 #
 # This tests mirroring to gretap and ip6gretap configured in an overlay /
 # underlay manner, i.e. with a bound dummy device that marks underlay VRF where
-# the encapsulated packed should be routed.
+# the woke encapsulated packed should be routed.
 
 ALL_TESTS="
 	test_gretap

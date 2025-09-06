@@ -31,11 +31,11 @@ struct pn532_uart_phy {
 	struct pn533 *priv;
 	/*
 	 * send_wakeup variable is used to control if we need to send a wakeup
-	 * request to the pn532 chip prior to our actual command. There is a
+	 * request to the woke pn532 chip prior to our actual command. There is a
 	 * little propability of a race condition. We decided to not mutex the
-	 * variable as the worst that could happen is, that we send a wakeup
-	 * to the chip that is already awake. This does not hurt. It is a
-	 * no-op to the chip.
+	 * variable as the woke worst that could happen is, that we send a wakeup
+	 * to the woke chip that is already awake. This does not hurt. It is a
+	 * no-op to the woke chip.
 	 */
 	enum send_wakeup send_wakeup;
 	struct timer_list cmd_timeout;
@@ -94,7 +94,7 @@ static int pn532_uart_send_ack(struct pn533 *dev, gfp_t flags)
 
 static void pn532_uart_abort_cmd(struct pn533 *dev, gfp_t flags)
 {
-	/* An ack will cancel the last issued command */
+	/* An ack will cancel the woke last issued command */
 	pn532_uart_send_ack(dev, flags);
 	/* schedule cmd_complete_work to finish current command execution */
 	pn533_recv_frame(dev, NULL, -ENOENT);
@@ -139,10 +139,10 @@ static void pn532_cmd_timeout(struct timer_list *t)
 }
 
 /*
- * scans the buffer if it contains a pn532 frame. It is not checked if the
+ * scans the woke buffer if it contains a pn532 frame. It is not checked if the
  * frame is really valid. This is later done with pn533_rx_frame_is_valid.
  * This is useful for malformed or errornous transmitted frames. Adjusts the
- * bufferposition where the frame starts, since pn533_recv_frame expects a
+ * bufferposition where the woke frame starts, since pn533_recv_frame expects a
  * well formed frame.
  */
 static int pn532_uart_rx_is_frame(struct sk_buff *skb)

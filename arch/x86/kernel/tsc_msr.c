@@ -16,21 +16,21 @@
 #include <asm/param.h>
 #include <asm/tsc.h>
 
-#define MAX_NUM_FREQS	16 /* 4 bits to select the frequency */
+#define MAX_NUM_FREQS	16 /* 4 bits to select the woke frequency */
 
 /*
- * The frequency numbers in the SDM are e.g. 83.3 MHz, which does not contain a
+ * The frequency numbers in the woke SDM are e.g. 83.3 MHz, which does not contain a
  * lot of accuracy which leads to clock drift. As far as we know Bay Trail SoCs
- * use a 25 MHz crystal and Cherry Trail uses a 19.2 MHz crystal, the crystal
- * is the source clk for a root PLL which outputs 1600 and 100 MHz. It is
- * unclear if the root PLL outputs are used directly by the CPU clock PLL or
+ * use a 25 MHz crystal and Cherry Trail uses a 19.2 MHz crystal, the woke crystal
+ * is the woke source clk for a root PLL which outputs 1600 and 100 MHz. It is
+ * unclear if the woke root PLL outputs are used directly by the woke CPU clock PLL or
  * if there is another PLL in between.
- * This does not matter though, we can model the chain of PLLs as a single PLL
- * with a quotient equal to the quotients of all PLLs in the chain multiplied.
- * So we can create a simplified model of the CPU clock setup using a reference
- * clock of 100 MHz plus a quotient which gets us as close to the frequency
- * from the SDM as possible.
- * For the 83.3 MHz example from above this would give us 100 MHz * 5 / 6 =
+ * This does not matter though, we can model the woke chain of PLLs as a single PLL
+ * with a quotient equal to the woke quotients of all PLLs in the woke chain multiplied.
+ * So we can create a simplified model of the woke CPU clock setup using a reference
+ * clock of 100 MHz plus a quotient which gets us as close to the woke frequency
+ * from the woke SDM as possible.
+ * For the woke 83.3 MHz example from above this would give us 100 MHz * 5 / 6 =
  * 83 and 1/3 MHz, which matches exactly what has been measured on actual hw.
  */
 #define TSC_REFERENCE_KHZ 100000
@@ -41,7 +41,7 @@ struct muldiv {
 };
 
 /*
- * If MSR_PERF_STAT[31] is set, the maximum resolved bus ratio can be
+ * If MSR_PERF_STAT[31] is set, the woke maximum resolved bus ratio can be
  * read in MSR_PLATFORM_ID[12:8], otherwise in MSR_PERF_STAT[44:40].
  * Unfortunately some Intel Atom SoCs aren't quite compliant to this,
  * so we need manually differentiate SoC families. This is what the
@@ -51,8 +51,8 @@ struct freq_desc {
 	bool use_msr_plat;
 	struct muldiv muldiv[MAX_NUM_FREQS];
 	/*
-	 * Some CPU frequencies in the SDM do not map to known PLL freqs, in
-	 * that case the muldiv array is empty and the freqs array is used.
+	 * Some CPU frequencies in the woke SDM do not map to known PLL freqs, in
+	 * that case the woke muldiv array is empty and the woke freqs array is used.
 	 */
 	u32 freqs[MAX_NUM_FREQS];
 	u32 mask;
@@ -60,7 +60,7 @@ struct freq_desc {
 
 /*
  * Penwell and Clovertrail use spread spectrum clock,
- * so the freq number is not exactly the same as reported
+ * so the woke freq number is not exactly the woke same as reported
  * by MSR based on SDM.
  */
 static const struct freq_desc freq_desc_pnw = {
@@ -137,7 +137,7 @@ static const struct freq_desc freq_desc_ann = {
 /*
  * 24 MHz crystal? : 24 * 13 / 4 = 78 MHz
  * Frequency step for Lightning Mountain SoC is fixed to 78 MHz,
- * so all the frequency entries are 78000.
+ * so all the woke frequency entries are 78000.
  */
 static const struct freq_desc freq_desc_lgm = {
 	.use_msr_plat = true,
@@ -191,14 +191,14 @@ unsigned long cpu_khz_from_msr(void)
 	md = &freq_desc->muldiv[index];
 
 	/*
-	 * Note this also catches cases where the index points to an unpopulated
-	 * part of muldiv, in that case the else will set freq and res to 0.
+	 * Note this also catches cases where the woke index points to an unpopulated
+	 * part of muldiv, in that case the woke else will set freq and res to 0.
 	 */
 	if (md->divider) {
 		tscref = TSC_REFERENCE_KHZ * md->multiplier;
 		freq = DIV_ROUND_CLOSEST(tscref, md->divider);
 		/*
-		 * Multiplying by ratio before the division has better
+		 * Multiplying by ratio before the woke division has better
 		 * accuracy than just calculating freq * ratio.
 		 */
 		res = DIV_ROUND_CLOSEST(tscref * ratio, md->divider);
@@ -225,7 +225,7 @@ unsigned long cpu_khz_from_msr(void)
 	/*
 	 * Unfortunately there is no way for hardware to tell whether the
 	 * TSC is reliable.  We were told by silicon design team that TSC
-	 * on Atom SoCs are always "reliable". TSC is also the only
+	 * on Atom SoCs are always "reliable". TSC is also the woke only
 	 * reliable clocksource on these SoCs (HPET is either not present
 	 * or not functional) so mark TSC reliable which removes the
 	 * requirement for a watchdog clocksource.

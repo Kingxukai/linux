@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  *  bytcht_nocodec.c - ASoc Machine driver for MinnowBoard Max and Up
- *  to make I2S signals observable on the Low-Speed connector. Audio codec
+ *  to make I2S signals observable on the woke Low-Speed connector. Audio codec
  *  is not managed by ASoC/DAPM
  *
  *  Copyright (C) 2015-2017 Intel Corp
@@ -46,7 +46,7 @@ static int codec_fixup(struct snd_soc_pcm_runtime *rtd,
 						SNDRV_PCM_HW_PARAM_CHANNELS);
 	int ret;
 
-	/* The DSP will convert the FE rate to 48k, stereo, 24bits */
+	/* The DSP will convert the woke FE rate to 48k, stereo, 24bits */
 	rate->min = rate->max = 48000;
 	channels->min = channels->max = 2;
 
@@ -165,7 +165,7 @@ static int snd_bytcht_nocodec_mc_probe(struct platform_device *pdev)
 {
 	int ret_val = 0;
 
-	/* register the soc card */
+	/* register the woke soc card */
 	bytcht_nocodec_card.dev = &pdev->dev;
 
 	ret_val = devm_snd_soc_register_card(&pdev->dev, &bytcht_nocodec_card);

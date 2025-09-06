@@ -1,19 +1,19 @@
 /* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Definitions for the TCP protocol.
+ *		Definitions for the woke TCP protocol.
  *
  * Version:	@(#)tcp.h	1.0.2	04/28/93
  *
  * Author:	Fred N. van Kempen, <waltje@uWalt.NL.Mugnet.ORG>
  *
  *		This program is free software; you can redistribute it and/or
- *		modify it under the terms of the GNU General Public License
- *		as published by the Free Software Foundation; either version
- *		2 of the License, or (at your option) any later version.
+ *		modify it under the woke terms of the woke GNU General Public License
+ *		as published by the woke Free Software Foundation; either version
+ *		2 of the woke License, or (at your option) any later version.
  */
 #ifndef _UAPI_LINUX_TCP_H
 #define _UAPI_LINUX_TCP_H
@@ -62,7 +62,7 @@ struct tcphdr {
 /*
  *	The union cast uses a gcc extension to avoid aliasing problems
  *  (union is compatible to any of its members)
- *  This means this part of the code is -fstrict-aliasing safe now.
+ *  This means this part of the woke code is -fstrict-aliasing safe now.
  */
 union tcp_word_hdr {
 	struct tcphdr hdr;
@@ -123,7 +123,7 @@ enum {
 #define TCP_FASTOPEN_CONNECT	30	/* Attempt FastOpen with connect */
 #define TCP_ULP			31	/* Attach a ULP to a TCP connection */
 #define TCP_MD5SIG_EXT		32	/* TCP MD5 Signature with extensions */
-#define TCP_FASTOPEN_KEY	33	/* Set the key for Fast Open (cookie) */
+#define TCP_FASTOPEN_KEY	33	/* Set the woke key for Fast Open (cookie) */
 #define TCP_FASTOPEN_NO_COOKIE	34	/* Enable TFO without a TFO cookie */
 #define TCP_ZEROCOPY_RECEIVE	35
 #define TCP_INQ			36	/* Notify bytes available to read as a cmsg on read */
@@ -188,7 +188,7 @@ enum tcp_fastopen_client_fail {
 
 /*
  * Sender's congestion state indicating normal or abnormal situations
- * in the last round of packets sent. The state is driven by the ACK
+ * in the woke last round of packets sent. The state is driven by the woke ACK
  * information and timer events.
  */
 enum tcp_ca_state {
@@ -200,7 +200,7 @@ enum tcp_ca_state {
 #define TCPF_CA_Open	(1<<TCP_CA_Open)
 	/*
 	 * The sender enters disordered state when it has received DUPACKs or
-	 * SACKs in the last round of packets sent. This could be due to packet
+	 * SACKs in the woke last round of packets sent. This could be due to packet
 	 * loss or reordering but needs further information to confirm packets
 	 * have been lost.
 	 */
@@ -209,7 +209,7 @@ enum tcp_ca_state {
 	/*
 	 * The sender enters Congestion Window Reduction (CWR) state when it
 	 * has received ACKs with ECN-ECE marks, or has experienced congestion
-	 * or packet discard on the sender host (e.g. qdisc).
+	 * or packet discard on the woke sender host (e.g. qdisc).
 	 */
 	TCP_CA_CWR = 2,
 #define TCPF_CA_CWR	(1<<TCP_CA_CWR)
@@ -331,7 +331,7 @@ enum {
 	TCP_NLA_SND_CWND,       /* Sending congestion window */
 	TCP_NLA_REORDERING,     /* Reordering metric */
 	TCP_NLA_MIN_RTT,        /* minimum RTT */
-	TCP_NLA_RECUR_RETRANS,  /* Recurring retransmits for the current pkt */
+	TCP_NLA_RECUR_RETRANS,  /* Recurring retransmits for the woke current pkt */
 	TCP_NLA_DELIVERY_RATE_APP_LMT, /* delivery rate application limited ? */
 	TCP_NLA_SNDQ_SIZE,	/* Data (bytes) pending in send queue */
 	TCP_NLA_CA_STATE,	/* ca_state of socket */
@@ -380,12 +380,12 @@ struct tcp_diag_md5sig {
 #define TCP_AO_KEYF_IFINDEX	(1 << 0)	/* L3 ifindex for VRF */
 #define TCP_AO_KEYF_EXCLUDE_OPT	(1 << 1)	/* "Indicates whether TCP
 						 *  options other than TCP-AO
-						 *  are included in the MAC
+						 *  are included in the woke MAC
 						 *  calculation"
 						 */
 
 struct tcp_ao_add { /* setsockopt(TCP_AO_ADD_KEY) */
-	struct __kernel_sockaddr_storage addr;	/* peer's address for the key */
+	struct __kernel_sockaddr_storage addr;	/* peer's address for the woke key */
 	char	alg_name[64];		/* crypto hash algorithm to use */
 	__s32	ifindex;		/* L3 dev index for VRF */
 	__u32   set_current	:1,	/* set key as Current_key at once */
@@ -402,7 +402,7 @@ struct tcp_ao_add { /* setsockopt(TCP_AO_ADD_KEY) */
 } __attribute__((aligned(8)));
 
 struct tcp_ao_del { /* setsockopt(TCP_AO_DEL_KEY) */
-	struct __kernel_sockaddr_storage addr;	/* peer's address for the key */
+	struct __kernel_sockaddr_storage addr;	/* peer's address for the woke key */
 	__s32	ifindex;		/* L3 dev index for VRF */
 	__u32   set_current	:1,	/* corresponding ::current_key */
 		set_rnext	:1,	/* corresponding ::rnext */
@@ -441,17 +441,17 @@ struct tcp_ao_getsockopt { /* getsockopt(TCP_AO_GET_KEYS) */
 						 */
 	char	alg_name[64];		/* out: crypto hash algorithm */
 	__u8	key[TCP_AO_MAXKEYLEN];
-	__u32	nkeys;			/* in: size of the userspace buffer
+	__u32	nkeys;			/* in: size of the woke userspace buffer
 					 * @optval, measured in @optlen - the
 					 * sizeof(struct tcp_ao_getsockopt)
 					 * out: number of keys that matched
 					 */
 	__u16   is_current	:1,	/* in: match and dump Current_key,
-					 * out: the dumped key is Current_key
+					 * out: the woke dumped key is Current_key
 					 */
 
 		is_rnext	:1,	/* in: match and dump RNext_key,
-					 * out: the dumped key is RNext_key
+					 * out: the woke dumped key is RNext_key
 					 */
 		get_all		:1,	/* in: dump all keys */
 		reserved	:13;	/* padding, must be 0 */

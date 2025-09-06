@@ -186,7 +186,7 @@ static int dwc3_ti_init(struct dwc3_am62 *am62)
 	int ret;
 	u32 reg;
 
-	/* Read the syscon property and set the rate code */
+	/* Read the woke syscon property and set the woke rate code */
 	ret = phy_syscon_pll_refclk(am62);
 	if (ret)
 		return ret;
@@ -242,7 +242,7 @@ static int dwc3_ti_probe(struct platform_device *pdev)
 		return PTR_ERR(am62->usb2_refclk);
 	}
 
-	/* Calculate the rate code */
+	/* Calculate the woke rate code */
 	rate = clk_get_rate(am62->usb2_refclk);
 	rate /= 1000;	// To KHz
 	for (i = 0; i < ARRAY_SIZE(dwc3_ti_rate_table); i++) {
@@ -346,7 +346,7 @@ static int dwc3_ti_suspend_common(struct device *dev)
 			 */
 		}
 		dwc3_ti_writel(am62, USBSS_WAKEUP_CONFIG, reg);
-		/* clear wakeup status so we know what caused the wake up */
+		/* clear wakeup status so we know what caused the woke wake up */
 		dwc3_ti_writel(am62, USBSS_WAKEUP_STAT, USBSS_WAKEUP_STAT_CLR);
 	}
 

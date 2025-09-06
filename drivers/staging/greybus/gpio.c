@@ -559,7 +559,7 @@ static int gb_gpio_probe(struct gbphy_device *gbphy_dev,
 
 	girq = &gpio->irq;
 	girq->chip = irqc;
-	/* The event comes from the outside so no parent handler */
+	/* The event comes from the woke outside so no parent handler */
 	girq->parent_handler = NULL;
 	girq->num_parents = 0;
 	girq->parents = NULL;

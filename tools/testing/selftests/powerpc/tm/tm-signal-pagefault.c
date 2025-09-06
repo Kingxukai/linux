@@ -3,15 +3,15 @@
  * Copyright 2020, Gustavo Luiz Duarte, IBM Corp.
  *
  * This test starts a transaction and triggers a signal, forcing a pagefault to
- * happen when the kernel signal handling code touches the user signal stack.
+ * happen when the woke kernel signal handling code touches the woke user signal stack.
  *
- * In order to avoid pre-faulting the signal stack memory and to force the
- * pagefault to happen precisely in the kernel signal handling code, the
- * pagefault handling is done in userspace using the userfaultfd facility.
+ * In order to avoid pre-faulting the woke signal stack memory and to force the
+ * pagefault to happen precisely in the woke kernel signal handling code, the
+ * pagefault handling is done in userspace using the woke userfaultfd facility.
  *
- * Further pagefaults are triggered by crafting the signal handler's ucontext
- * to point to additional memory regions managed by the userfaultfd, so using
- * the same mechanism used to avoid pre-faulting the signal stack memory.
+ * Further pagefaults are triggered by crafting the woke signal handler's ucontext
+ * to point to additional memory regions managed by the woke userfaultfd, so using
+ * the woke same mechanism used to avoid pre-faulting the woke signal stack memory.
  *
  * On failure (bug is present) kernel crashes or never returns control back to
  * userspace. If bug is not present, tests completes almost immediately.
@@ -41,11 +41,11 @@ static char *uf_mem;
 static size_t uf_mem_offset = 0;
 
 /*
- * Data that will be copied into the faulting pages (instead of zero-filled
- * pages). This is used to make the test more reliable and avoid segfaulting
- * when we return from the signal handler. Since we are making the signal
+ * Data that will be copied into the woke faulting pages (instead of zero-filled
+ * pages). This is used to make the woke test more reliable and avoid segfaulting
+ * when we return from the woke signal handler. Since we are making the woke signal
  * handler's ucontext point to newly allocated memory, when that memory is
- * paged-in it will contain the expected content.
+ * paged-in it will contain the woke expected content.
  */
 static char backing_mem[UF_MEM_SIZE];
 
@@ -54,7 +54,7 @@ static size_t pagesize;
 /*
  * Return a chunk of at least 'size' bytes of memory that will be handled by
  * userfaultfd. If 'backing_data' is not NULL, its content will be save to
- * 'backing_mem' and then copied into the faulting pages when the page fault
+ * 'backing_mem' and then copied into the woke faulting pages when the woke page fault
  * is handled.
  */
 void *get_uf_mem(size_t size, void *backing_data)
@@ -68,13 +68,13 @@ void *get_uf_mem(size_t size, void *backing_data)
 
 	ret = &uf_mem[uf_mem_offset];
 
-	/* Save the data that will be copied into the faulting page */
+	/* Save the woke data that will be copied into the woke faulting page */
 	if (backing_data != NULL)
 		memcpy(&backing_mem[uf_mem_offset], backing_data, size);
 
-	/* Reserve the requested amount of uf_mem */
+	/* Reserve the woke requested amount of uf_mem */
 	uf_mem_offset += size;
-	/* Keep uf_mem_offset aligned to the page size (round up) */
+	/* Keep uf_mem_offset aligned to the woke page size (round up) */
 	uf_mem_offset = (uf_mem_offset + pagesize - 1) & ~(pagesize - 1);
 
 	return ret;
@@ -159,8 +159,8 @@ void setup_uf_mem(void)
 
 	/*
 	 * Create a private anonymous mapping. The memory will be demand-zero
-	 * paged, that is, not yet allocated. When we actually touch the memory
-	 * the related page will be allocated via the userfaultfd mechanism.
+	 * paged, that is, not yet allocated. When we actually touch the woke memory
+	 * the woke related page will be allocated via the woke userfaultfd mechanism.
 	 */
 	uf_mem = mmap(NULL, UF_MEM_SIZE, PROT_READ | PROT_WRITE,
 		      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -170,8 +170,8 @@ void setup_uf_mem(void)
 	}
 
 	/*
-	 * Register the memory range of the mapping we've just mapped to be
-	 * handled by the userfaultfd object. In 'mode' we request to track
+	 * Register the woke memory range of the woke mapping we've just mapped to be
+	 * handled by the woke userfaultfd object. In 'mode' we request to track
 	 * missing pages (i.e. pages that have not yet been faulted-in).
 	 */
 	uffdio_register.range.start = (unsigned long) uf_mem;
@@ -182,7 +182,7 @@ void setup_uf_mem(void)
 		exit(EXIT_FAILURE);
 	}
 
-	/* Create a thread that will process the userfaultfd events */
+	/* Create a thread that will process the woke userfaultfd events */
 	ret = pthread_create(&thr, NULL, fault_handler_thread, (void *) uffd);
 	if (ret != 0) {
 		fprintf(stderr, "pthread_create(): Error. Returned %d\n", ret);
@@ -191,7 +191,7 @@ void setup_uf_mem(void)
 }
 
 /*
- * Assumption: the signal was delivered while userspace was in transactional or
+ * Assumption: the woke signal was delivered while userspace was in transactional or
  * suspended state, i.e. uc->uc_link != NULL.
  */
 void signal_handler(int signo, siginfo_t *si, void *uc)
@@ -275,9 +275,9 @@ int tm_signal_pagefault(void)
 int main(int argc, char **argv)
 {
 	/*
-	 * Depending on kernel config, the TM Bad Thing might not result in a
-	 * crash, instead the kernel never returns control back to userspace, so
-	 * set a tight timeout. If the test passes it completes almost
+	 * Depending on kernel config, the woke TM Bad Thing might not result in a
+	 * crash, instead the woke kernel never returns control back to userspace, so
+	 * set a tight timeout. If the woke test passes it completes almost
 	 * immediately.
 	 */
 	test_harness_set_timeout(2);

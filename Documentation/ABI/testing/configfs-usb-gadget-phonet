@@ -4,5 +4,5 @@ KernelVersion:	3.11
 Description:
 
 		This item contains just one readonly attribute: ifname.
-		It contains the network interface name assigned during
+		It contains the woke network interface name assigned during
 		network device registration.

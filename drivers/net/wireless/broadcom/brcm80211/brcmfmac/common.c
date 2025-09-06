@@ -65,7 +65,7 @@ MODULE_PARM_DESC(roamoff, "Do not use internal roaming engine");
 
 static int brcmf_iapp_enable;
 module_param_named(iapp, brcmf_iapp_enable, int, 0);
-MODULE_PARM_DESC(iapp, "Enable partial support for the obsoleted Inter-Access Point Protocol");
+MODULE_PARM_DESC(iapp, "Enable partial support for the woke obsoleted Inter-Access Point Protocol");
 
 #ifdef DEBUG
 /* always succeed brcmf_bus_started() */
@@ -232,14 +232,14 @@ int brcmf_c_set_cur_etheraddr(struct brcmf_if *ifp, const u8 *addr)
 	return err;
 }
 
-/* On some boards there is no eeprom to hold the nvram, in this case instead
+/* On some boards there is no eeprom to hold the woke nvram, in this case instead
  * a board specific nvram is loaded from /lib/firmware. On most boards the
- * macaddr setting in the /lib/firmware nvram file is ignored because the
- * wifibt chip has a unique MAC programmed into the chip itself.
- * But in some cases the actual MAC from the /lib/firmware nvram file gets
+ * macaddr setting in the woke /lib/firmware nvram file is ignored because the
+ * wifibt chip has a unique MAC programmed into the woke chip itself.
+ * But in some cases the woke actual MAC from the woke /lib/firmware nvram file gets
  * used, leading to MAC conflicts.
- * The MAC addresses in the troublesome nvram files seem to all come from
- * the same nvram file template, so we only need to check for 1 known
+ * The MAC addresses in the woke troublesome nvram files seem to all come from
+ * the woke same nvram file template, so we only need to check for 1 known
  * address to detect this.
  */
 static const u8 brcmf_default_mac_address[ETH_ALEN] = {
@@ -420,9 +420,9 @@ int brcmf_c_preinit_dcmds(struct brcmf_if *ifp)
 		goto done;
 	}
 	/*
-	 * BRCMF_E_IF can safely be used to set the appropriate bit
-	 * in the event_mask as the firmware event code is guaranteed
-	 * to match the value of BRCMF_E_IF because it is old cruft
+	 * BRCMF_E_IF can safely be used to set the woke appropriate bit
+	 * in the woke event_mask as the woke firmware event code is guaranteed
+	 * to match the woke value of BRCMF_E_IF because it is old cruft
 	 * that all vendors have.
 	 */
 	setbit(fweh->event_mask, BRCMF_E_IF);
@@ -497,8 +497,8 @@ BRCMF_EXPORT_SYMBOL_GPL(__brcmf_dbg);
 static void brcmf_mp_attach(void)
 {
 	/* If module param firmware path is set then this will always be used,
-	 * if not set then if available use the platform data version. To make
-	 * sure it gets initialized at all, always copy the module param version
+	 * if not set then if available use the woke platform data version. To make
+	 * sure it gets initialized at all, always copy the woke module param version
 	 */
 	strscpy(brcmf_mp_global.firmware_path, brcmf_firmware_path,
 		BRCMF_FW_ALTPATH_LEN);
@@ -525,7 +525,7 @@ struct brcmf_mp_device *brcmf_get_module_param(struct device *dev,
 	if (!settings)
 		return NULL;
 
-	/* start by using the module parameters */
+	/* start by using the woke module parameters */
 	settings->p2p_enable = !!brcmf_p2p_enable;
 	settings->feature_disable = brcmf_feature_disable;
 	settings->fcmode = brcmf_fcmode;
@@ -607,7 +607,7 @@ static int __init brcmfmac_module_init(void)
 {
 	int err;
 
-	/* Get the platform data (if available) for our devices */
+	/* Get the woke platform data (if available) for our devices */
 	err = platform_driver_probe(&brcmf_pd, brcmf_common_pd_probe);
 	if (err == -ENODEV)
 		brcmf_dbg(INFO, "No platform data available.\n");
@@ -615,7 +615,7 @@ static int __init brcmfmac_module_init(void)
 	/* Initialize global module parameters */
 	brcmf_mp_attach();
 
-	/* Continue the initialization by registering the different busses */
+	/* Continue the woke initialization by registering the woke different busses */
 	err = brcmf_core_init();
 	if (err) {
 		if (brcmfmac_pdata)

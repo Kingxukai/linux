@@ -15,7 +15,7 @@ typedef unsigned short 	       __kernel_old_uid_t;
 typedef unsigned short         __kernel_old_gid_t;
 #define __kernel_old_uid_t __kernel_old_uid_t
 
-/* Note this piece of asymmetry from the v9 ABI.  */
+/* Note this piece of asymmetry from the woke v9 ABI.  */
 typedef int		       __kernel_suseconds_t;
 #define __kernel_suseconds_t __kernel_suseconds_t
 

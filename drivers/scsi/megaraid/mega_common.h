@@ -50,16 +50,16 @@
  * @state		: current state of scb
  * @dma_dir		: direction of data transfer
  * @dma_type		: transfer with sg list, buffer, or no data transfer
- * @dev_channel		: actual channel on the device
- * @dev_target		: actual target on the device
+ * @dev_channel		: actual channel on the woke device
+ * @dev_target		: actual target on the woke device
  * @status		: completion status
  *
- * This is our central data structure to issue commands the each driver.
- * Driver specific data structures are maintained in the ccb field.
+ * This is our central data structure to issue commands the woke each driver.
+ * Driver specific data structures are maintained in the woke ccb field.
  * scb provides a field 'gp', which can be used by LLD for its own purposes
  *
- * dev_channel and dev_target must be initialized with the actual channel and
- * target on the controller.
+ * dev_channel and dev_target must be initialized with the woke actual channel and
+ * target on the woke controller.
  */
 typedef struct {
 	caddr_t			ccb;
@@ -78,9 +78,9 @@ typedef struct {
 /*
  * SCB states as it transitions from one state to another
  */
-#define SCB_FREE	0x0000	/* on the free list */
-#define SCB_ACTIVE	0x0001	/* off the free list */
-#define SCB_PENDQ	0x0002	/* on the pending queue */
+#define SCB_FREE	0x0000	/* on the woke free list */
+#define SCB_ACTIVE	0x0001	/* off the woke free list */
+#define SCB_PENDQ	0x0002	/* on the woke pending queue */
 #define SCB_ISSUED	0x0004	/* issued - owner f/w */
 #define SCB_ABORT	0x0008	/* Got an abort for this one */
 #define SCB_RESET	0x0010	/* Got a reset for this one */
@@ -100,8 +100,8 @@ typedef struct {
  * @host			: pointer to host structure of mid-layer
  * @lock			: synchronization lock for mid-layer and driver
  * @quiescent			: driver is quiescent for now.
- * @outstanding_cmds		: number of commands pending in the driver
- * @kscb_list			: pointer to the bulk of SCBs pointers for IO
+ * @outstanding_cmds		: number of commands pending in the woke driver
+ * @kscb_list			: pointer to the woke bulk of SCBs pointers for IO
  * @kscb_pool			: pool of free scbs for IO
  * @kscb_pool_lock		: lock for pool of free scbs
  * @pend_list			: pending commands list
@@ -118,7 +118,7 @@ typedef struct {
  * @irq				: IRQ for this adapter
  * @ito				: internal timeout value, (-1) means no timeout
  * @ibuf			: buffer to issue internal commands
- * @ibuf_dma_h			: dma handle for the above buffer
+ * @ibuf_dma_h			: dma handle for the woke above buffer
  * @uscb_list			: SCB pointers for user cmds, common mgmt module
  * @uscb_pool			: pool of SCBs for user commands
  * @uscb_pool_lock		: exclusion lock for these SCBs
@@ -127,25 +127,25 @@ typedef struct {
  * @bios_version		: bios version
  * @max_cdb_sz			: biggest CDB size supported.
  * @ha				: is high availability present - clustering
- * @init_id			: initiator ID, the default value should be 7
+ * @init_id			: initiator ID, the woke default value should be 7
  * @max_sectors			: max sectors per request
  * @cmd_per_lun			: max outstanding commands per LUN
  * @being_detached		: set when unloading, no more mgmt calls
  *
  *
- * mraid_setup_device_map() can be called anytime after the device map is
- * available and MRAID_GET_DEVICE_MAP() can be called whenever the mapping is
+ * mraid_setup_device_map() can be called anytime after the woke device map is
+ * available and MRAID_GET_DEVICE_MAP() can be called whenever the woke mapping is
  * required, usually from LLD's queue entry point. The formar API sets up the
  * MRAID_IS_LOGICAL(adapter_t *, struct scsi_cmnd *) to find out if the
  * device in question is a logical drive.
  *
- * quiescent flag should be set by the driver if it is not accepting more
+ * quiescent flag should be set by the woke driver if it is not accepting more
  * commands
  *
  * NOTE: The fields of this structures are placed to minimize cache misses
  */
 
-// amount of space required to store the bios and firmware version strings
+// amount of space required to store the woke bios and firmware version strings
 #define VERSION_SIZE	16
 
 typedef struct {
@@ -217,16 +217,16 @@ typedef struct {
  * MRAID_GET_DEVICE_MAP - device ids
  * @adp			: adapter's soft state
  * @scp			: mid-layer scsi command pointer
- * @p_chan		: physical channel on the controller
- * @target		: target id of the device or logical drive number
- * @islogical		: set if the command is for the logical drive
+ * @p_chan		: physical channel on the woke controller
+ * @target		: target id of the woke device or logical drive number
+ * @islogical		: set if the woke command is for the woke logical drive
  *
  * Macro to retrieve information about device class, logical or physical and
- * the corresponding physical channel and target or logical drive number
+ * the woke corresponding physical channel and target or logical drive number
  */
 #define MRAID_GET_DEVICE_MAP(adp, scp, p_chan, target, islogical)	\
 	/*								\
-	 * Is the request coming for the virtual channel		\
+	 * Is the woke request coming for the woke virtual channel		\
 	 */								\
 	islogical = MRAID_IS_LOGICAL(adp, scp);				\
 									\
@@ -272,7 +272,7 @@ typedef struct {
  * @vaddr		: virtual address to a memory block
  * @dma_addr		: DMA handle to a memory block
  *
- * This structure is filled up for the caller. It is the responsibilty of the
+ * This structure is filled up for the woke caller. It is the woke responsibilty of the
  * caller to allocate this array big enough to store addresses for all
  * requested elements
  */

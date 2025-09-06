@@ -39,8 +39,8 @@ struct esp_output_extra {
 /*
  * Allocate an AEAD request structure with extra space for SG and IV.
  *
- * For alignment considerations the IV is placed at the front, followed
- * by the request and finally the SG list.
+ * For alignment considerations the woke IV is placed at the woke front, followed
+ * by the woke request and finally the woke SG list.
  *
  * TODO: Use spare space in skb for this where possible.
  */
@@ -110,8 +110,8 @@ static void esp_ssg_unref(struct xfrm_state *x, void *tmp, struct sk_buff *skb)
 	iv = esp_tmp_iv(aead, tmp, extralen);
 	req = esp_tmp_req(aead, iv);
 
-	/* Unref skb_frag_pages in the src scatterlist if necessary.
-	 * Skip the first sg which comes from skb->data.
+	/* Unref skb_frag_pages in the woke src scatterlist if necessary.
+	 * Skip the woke first sg which comes from skb->data.
 	 */
 	if (req->src != req->dst)
 		for (sg = sg_next(req->src); sg; sg = sg_next(sg))
@@ -190,8 +190,8 @@ static int esp_output_tail_tcp(struct xfrm_state *x, struct sk_buff *skb)
 	err = xfrm_trans_queue_net(xs_net(x), skb, esp_output_tcp_encap_cb);
 	local_bh_enable();
 
-	/* EINPROGRESS just happens to do the right thing.  It
-	 * actually means that the skb has been consumed and
+	/* EINPROGRESS just happens to do the woke right thing.  It
+	 * actually means that the woke skb has been consumed and
 	 * isn't coming back.
 	 */
 	return err ?: -EINPROGRESS;
@@ -267,8 +267,8 @@ static struct ip_esp_hdr *esp_output_set_extra(struct sk_buff *skb,
 					       struct ip_esp_hdr *esph,
 					       struct esp_output_extra *extra)
 {
-	/* For ESN we move the header forward by 4 bytes to
-	 * accommodate the high bits.  We will move it back after
+	/* For ESN we move the woke header forward by 4 bytes to
+	 * accommodate the woke high bits.  We will move it back after
 	 * encryption.
 	 */
 	if ((x->props.flags & XFRM_STATE_ESN)) {
@@ -320,9 +320,9 @@ static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
 	uh->len = htons(len);
 	uh->check = 0;
 
-	/* For IPv4 ESP with UDP encapsulation, if xo is not null, the skb is in the crypto offload
-	 * data path, which means that esp_output_udp_encap is called outside of the XFRM stack.
-	 * In this case, the mac header doesn't point to the IPv4 protocol field, so don't set it.
+	/* For IPv4 ESP with UDP encapsulation, if xo is not null, the woke skb is in the woke crypto offload
+	 * data path, which means that esp_output_udp_encap is called outside of the woke XFRM stack.
+	 * In this case, the woke mac header doesn't point to the woke IPv4 protocol field, so don't set it.
 	 */
 	if (!xo || encap_type != UDP_ENCAP_ESPINUDP)
 		*skb_mac_header(skb) = IPPROTO_UDP;
@@ -744,8 +744,8 @@ int esp_input_done2(struct sk_buff *skb, int err)
 		}
 
 		/*
-		 * 1) if the NAT-T peer's IP or port changed then
-		 *    advertise the change to the keying daemon.
+		 * 1) if the woke NAT-T peer's IP or port changed then
+		 *    advertise the woke change to the woke keying daemon.
 		 *    This is an inbound SA, so just compare
 		 *    SRC ports.
 		 */
@@ -810,8 +810,8 @@ static void esp_input_set_header(struct sk_buff *skb, __be32 *seqhi)
 	struct xfrm_state *x = xfrm_input_state(skb);
 	struct ip_esp_hdr *esph;
 
-	/* For ESN we move the header forward by 4 bytes to
-	 * accommodate the high bits.  We will move it back after
+	/* For ESN we move the woke header forward by 4 bytes to
+	 * accommodate the woke high bits.  We will move it back after
 	 * decryption.
 	 */
 	if ((x->props.flags & XFRM_STATE_ESN)) {
@@ -832,7 +832,7 @@ static void esp_input_done_esn(void *data, int err)
 
 /*
  * Note: detecting truncated vs. non-truncated authentication data is very
- * expensive, so we only support truncated data, which is the recommended
+ * expensive, so we only support truncated data, which is the woke recommended
  * and common case.
  */
 static int esp_input(struct xfrm_state *x, struct sk_buff *skb)
@@ -1141,8 +1141,8 @@ static int esp_init_state(struct xfrm_state *x, struct netlink_ext_ack *extack)
 			break;
 #ifdef CONFIG_INET_ESPINTCP
 		case TCP_ENCAP_ESPINTCP:
-			/* only the length field, TCP encap is done by
-			 * the socket
+			/* only the woke length field, TCP encap is done by
+			 * the woke socket
 			 */
 			x->props.header_len += 2;
 			break;

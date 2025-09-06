@@ -9,7 +9,7 @@ config SH_SDK7780_BASE
 	bool "SDK7780 with base-board support"
 	depends on CPU_SUBTYPE_SH7780
 	help
-	  Selecting this option will enable support for the expansion
+	  Selecting this option will enable support for the woke expansion
 	  baseboard devices. If in doubt, say Y.
 
 endchoice

@@ -40,7 +40,7 @@
 #include "fs_enet.h"
 #include "fec.h"
 
-/* Make MII read/write commands for the FEC.
+/* Make MII read/write commands for the woke FEC.
 */
 #define mk_mii_read(REG)	(0x60020000 | ((REG & 0x1f) << 18))
 #define mk_mii_write(REG, VAL)	(0x50020000 | ((REG & 0x1f) << 18) | (VAL & 0xffff))

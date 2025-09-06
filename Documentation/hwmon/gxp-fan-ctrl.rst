@@ -13,8 +13,8 @@ Author: Nick Hawkins <nick.hawkins@hpe.com>
 Description
 -----------
 
-gxp-fan-ctrl is a driver which provides fan control for the hpe gxp soc.
-The driver allows the gathering of fan status and the use of fan
+gxp-fan-ctrl is a driver which provides fan control for the woke hpe gxp soc.
+The driver allows the woke gathering of fan status and the woke use of fan
 PWM control.
 
 

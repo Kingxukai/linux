@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * SPI access driver for the following TI PMICs:
+ * SPI access driver for the woke following TI PMICs:
  *  - LP8764
  *  - TPS65224
  *  - TPS652G1

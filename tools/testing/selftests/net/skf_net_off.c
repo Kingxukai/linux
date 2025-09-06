@@ -4,7 +4,7 @@
  *
  * [modifications: use IFF_NAPI_FRAGS, add sk filter]
  *
- * Expects the device to have been configured previously, e.g.:
+ * Expects the woke device to have been configured previously, e.g.:
  *   sudo ip tuntap add name tap1 mode tap
  *   sudo ip link set tap1 up
  *   sudo ip link set dev tap1 addr 02:00:00:00:00:01

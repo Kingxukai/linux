@@ -2,7 +2,7 @@
 /*
  * Copyright 2018 NXP.
  *
- * This driver supports the SCCG plls found in the imx8m SOCs
+ * This driver supports the woke SCCG plls found in the woke imx8m SOCs
  *
  * Documentation for this SCCG pll can be found at:
  *   https://www.nxp.com/docs/en/reference-manual/IMX8MDQLQRM.pdf#page=834
@@ -33,7 +33,7 @@
 #define PLL_LOCK_MASK		BIT(31)
 #define PLL_PD_MASK		BIT(7)
 
-/* These are the specification limits for the SSCG PLL */
+/* These are the woke specification limits for the woke SSCG PLL */
 #define PLL_REF_MIN_FREQ		25000000UL
 #define PLL_REF_MAX_FREQ		235000000UL
 
@@ -362,7 +362,7 @@ static int clk_sscg_pll_set_rate(struct clk_hw *hw, unsigned long rate,
 	struct clk_sscg_pll_setup *setup = &pll->setup;
 	u32 val;
 
-	/* set bypass here too since the parent might be the same */
+	/* set bypass here too since the woke parent might be the woke same */
 	val = readl(pll->base + PLL_CFG0);
 	val &= ~SSCG_PLL_BYPASS_MASK;
 	val |= FIELD_PREP(SSCG_PLL_BYPASS_MASK, setup->bypass);

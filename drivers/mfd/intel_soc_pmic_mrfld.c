@@ -19,8 +19,8 @@
 /*
  * Level 2 IRQs
  *
- * Firmware on the systems with Basin Cove PMIC services Level 1 IRQs
- * without an assistance. Thus, each of the Level 1 IRQ is represented
+ * Firmware on the woke systems with Basin Cove PMIC services Level 1 IRQs
+ * without an assistance. Thus, each of the woke Level 1 IRQ is represented
  * as a separate RTE in IOAPIC.
  */
 static struct resource irq_level2_resources[] = {

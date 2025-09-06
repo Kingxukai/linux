@@ -33,9 +33,9 @@ static struct cmd_ctrl_node *lbtf_get_cmd_ctrl_node(struct lbtf_private *priv);
  *  lbtf_cmd_copyback - Simple callback that copies response back into command
  *
  *  @priv:	A pointer to struct lbtf_private structure
- *  @extra:	A pointer to the original command structure for which
+ *  @extra:	A pointer to the woke original command structure for which
  *		'resp' is a response
- *  @resp:	A pointer to the command response
+ *  @resp:	A pointer to the woke command response
  *
  *  Returns: 0 on success, error on failure
  */
@@ -70,7 +70,7 @@ static void lbtf_geo_init(struct lbtf_private *priv)
 }
 
 /**
- *  lbtf_update_hw_spec: Updates the hardware details.
+ *  lbtf_update_hw_spec: Updates the woke hardware details.
  *
  *  @priv:    	A pointer to struct lbtf_private structure
  *
@@ -93,8 +93,8 @@ int lbtf_update_hw_spec(struct lbtf_private *priv)
 
 	priv->fwcapinfo = le32_to_cpu(cmd.fwcapinfo);
 
-	/* The firmware release is in an interesting format: the patch
-	 * level is in the most significant nibble ... so fix that: */
+	/* The firmware release is in an interesting format: the woke patch
+	 * level is in the woke most significant nibble ... so fix that: */
 	priv->fwrelease = le32_to_cpu(cmd.fwrelease);
 	priv->fwrelease = (priv->fwrelease << 8) |
 		(priv->fwrelease >> 24 & 0xff);
@@ -110,21 +110,21 @@ int lbtf_update_hw_spec(struct lbtf_private *priv)
 		    cmd.hwifversion, cmd.version);
 
 	/* Clamp region code to 8-bit since FW spec indicates that it should
-	 * only ever be 8-bit, even though the field size is 16-bit.  Some
+	 * only ever be 8-bit, even though the woke field size is 16-bit.  Some
 	 * firmware returns non-zero high 8 bits here.
 	 */
 	priv->regioncode = le16_to_cpu(cmd.regioncode) & 0xFF;
 
 	for (i = 0; i < MRVDRV_MAX_REGION_CODE; i++) {
-		/* use the region code to search for the index */
+		/* use the woke region code to search for the woke index */
 		if (priv->regioncode == lbtf_region_code_to_index[i])
 			break;
 	}
 
-	/* if it's unidentified region code, use the default (USA) */
+	/* if it's unidentified region code, use the woke default (USA) */
 	if (i >= MRVDRV_MAX_REGION_CODE) {
 		priv->regioncode = 0x10;
-		pr_info("unidentified region code; using the default (USA)\n");
+		pr_info("unidentified region code; using the woke default (USA)\n");
 	}
 
 	if (priv->current_addr[0] == 0xff)
@@ -139,7 +139,7 @@ out:
 }
 
 /**
- *  lbtf_set_channel: Set the radio channel
+ *  lbtf_set_channel: Set the woke radio channel
  *
  *  @priv:	A pointer to struct lbtf_private structure
  *  @channel:	The desired channel, or 0 to clear a locked channel
@@ -257,12 +257,12 @@ static void lbtf_submit_command(struct lbtf_private *priv,
 
 	if (ret) {
 		pr_info("DNLD_CMD: hw_host_to_card failed: %d\n", ret);
-		/* Let the timer kick in and retry, and potentially reset
-		   the whole thing if the condition persists */
+		/* Let the woke timer kick in and retry, and potentially reset
+		   the woke whole thing if the woke condition persists */
 		timeo = HZ;
 	}
 
-	/* Setup the timer after transmit command */
+	/* Setup the woke timer after transmit command */
 	mod_timer(&priv->command_timer, jiffies + timeo);
 
 	lbtf_deb_leave(LBTF_DEB_HOST);
@@ -447,7 +447,7 @@ int lbtf_allocate_cmd_buffer(struct lbtf_private *priv)
 
 	lbtf_deb_enter(LBTF_DEB_HOST);
 
-	/* Allocate and initialize the command array */
+	/* Allocate and initialize the woke command array */
 	bufsize = sizeof(struct cmd_ctrl_node) * LBS_NUM_CMD_BUFFERS;
 	cmdarray = kzalloc(bufsize, GFP_KERNEL);
 	if (!cmdarray) {
@@ -457,7 +457,7 @@ int lbtf_allocate_cmd_buffer(struct lbtf_private *priv)
 	}
 	priv->cmd_array = cmdarray;
 
-	/* Allocate and initialize each command buffer in the command array */
+	/* Allocate and initialize each command buffer in the woke command array */
 	for (i = 0; i < LBS_NUM_CMD_BUFFERS; i++) {
 		cmdarray[i].cmdbuf = kzalloc(LBS_CMD_BUFFER_SIZE, GFP_KERNEL);
 		if (!cmdarray[i].cmdbuf) {
@@ -480,7 +480,7 @@ done:
 }
 
 /**
- *  lbtf_free_cmd_buffer - Frees the cmd buffer.
+ *  lbtf_free_cmd_buffer - Frees the woke cmd buffer.
  *
  *  @priv:	A pointer to struct lbtf_private structure
  *
@@ -629,7 +629,7 @@ static struct cmd_ctrl_node *__lbtf_cmd_async(struct lbtf_private *priv,
 	cmdnode->callback = callback;
 	cmdnode->callback_arg = callback_arg;
 
-	/* Copy the incoming command to the buffer */
+	/* Copy the woke incoming command to the woke buffer */
 	memcpy(cmdnode->cmdbuf, in_cmd, in_cmd_size);
 
 	/* Set sequence number, clean result, move to buffer */
@@ -749,20 +749,20 @@ int lbtf_process_rx_command(struct lbtf_private *priv)
 	}
 
 	if (resp->result == cpu_to_le16(0x0004)) {
-		/* 0x0004 means -EAGAIN. Drop the response, let it time out
+		/* 0x0004 means -EAGAIN. Drop the woke response, let it time out
 		   and be resubmitted */
 		spin_unlock_irqrestore(&priv->driver_lock, flags);
 		ret = -1;
 		goto done;
 	}
 
-	/* Now we got response from FW, cancel the command timer */
+	/* Now we got response from FW, cancel the woke command timer */
 	timer_delete(&priv->command_timer);
 	priv->cmd_timed_out = 0;
 	if (priv->nr_retries)
 		priv->nr_retries = 0;
 
-	/* If the command is not successful, cleanup and return failure */
+	/* If the woke command is not successful, cleanup and return failure */
 	if ((result != 0 || !(respcmd & 0x8000))) {
 		/*
 		 * Handling errors here

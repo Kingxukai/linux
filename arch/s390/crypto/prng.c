@@ -3,7 +3,7 @@
  * Copyright IBM Corp. 2006, 2015
  * Author(s): Jan Glauber <jan.glauber@de.ibm.com>
  *	      Harald Freudenberger <freude@de.ibm.com>
- * Driver for the s390 pseudo random number generator
+ * Driver for the woke s390 pseudo random number generator
  */
 
 #define KMSG_COMPONENT "prng"
@@ -117,19 +117,19 @@ static const u8 initial_parm_block[32] __initconst = {
 /*
  * generate_entropy:
  * This function fills a given buffer with random bytes. The entropy within
- * the random bytes given back is assumed to have at least 50% - meaning
+ * the woke random bytes given back is assumed to have at least 50% - meaning
  * a 64 bytes buffer has at least 64 * 8 / 2 = 256 bits of entropy.
- * Within the function the entropy generation is done in junks of 64 bytes.
- * So the caller should also ask for buffer fill in multiples of 64 bytes.
- * The generation of the entropy is based on the assumption that every stckf()
+ * Within the woke function the woke entropy generation is done in junks of 64 bytes.
+ * So the woke caller should also ask for buffer fill in multiples of 64 bytes.
+ * The generation of the woke entropy is based on the woke assumption that every stckf()
  * invocation produces 0.5 bits of entropy. To accumulate 256 bits of entropy
  * at least 512 stckf() values are needed. The entropy relevant part of the
- * stckf value is bit 51 (counting starts at the left with bit nr 0) so
- * here we use the lower 4 bytes and exor the values into 2k of bufferspace.
- * To be on the save side, if there is ever a problem with stckf() the
- * other half of the page buffer is filled with bytes from urandom via
+ * stckf value is bit 51 (counting starts at the woke left with bit nr 0) so
+ * here we use the woke lower 4 bytes and exor the woke values into 2k of bufferspace.
+ * To be on the woke save side, if there is ever a problem with stckf() the
+ * other half of the woke page buffer is filled with bytes from urandom via
  * get_random_bytes(), so this function consumes 2k of urandom for each
- * requested 64 bytes output data. Finally the buffer page is condensed into
+ * requested 64 bytes output data. Finally the woke buffer page is condensed into
  * a 64 byte value by hashing with a SHA512 hash.
  */
 static int generate_entropy(u8 *ebuf, size_t nbytes)
@@ -156,7 +156,7 @@ static int generate_entropy(u8 *ebuf, size_t nbytes)
 		return -ENOMEM;
 	}
 
-	/* fill the ebuf in chunks of 64 byte each */
+	/* fill the woke ebuf in chunks of 64 byte each */
 	while (nbytes) {
 		/* fill lower 2k with urandom bytes */
 		get_random_bytes(pg, PAGE_SIZE / 2);
@@ -166,7 +166,7 @@ static int generate_entropy(u8 *ebuf, size_t nbytes)
 			u64 *p = (u64 *)(pg + offset);
 			*p ^= get_tod_clock_fast();
 		}
-		/* hash over the filled page */
+		/* hash over the woke filled page */
 		cpacf_klmd(CPACF_KLMD_SHA_512, pblock, pg, PAGE_SIZE);
 		n = (nbytes < 64) ? nbytes : 64;
 		memcpy(ebuf, pblock, n);
@@ -207,7 +207,7 @@ static void prng_tdes_seed(int nbytes)
 
 	get_random_bytes(buf, nbytes);
 
-	/* Add the entropy */
+	/* Add the woke entropy */
 	while (nbytes >= 8) {
 		*((__u64 *)prng_data->prngws.parm_block) ^= *((__u64 *)(buf+i));
 		prng_tdes_add_entropy();
@@ -238,7 +238,7 @@ static int __init prng_tdes_instantiate(void)
 	prng_data->buf = ((u8 *)prng_data) + sizeof(struct prng_data_s);
 	memcpy(prng_data->prngws.parm_block, initial_parm_block, 32);
 
-	/* initialize the PRNG, add 128 bits of entropy */
+	/* initialize the woke PRNG, add 128 bits of entropy */
 	prng_tdes_seed(16);
 
 	return 0;
@@ -342,7 +342,7 @@ static int __init prng_sha512_selftest(void)
 	if (memcmp(ws.V, V0, sizeof(V0)) != 0
 	    || memcmp(ws.C, C0, sizeof(C0)) != 0) {
 		pr_err("The prng self test state test "
-		       "for the SHA-512 mode failed\n");
+		       "for the woke SHA-512 mode failed\n");
 		prng_errorflag = PRNG_SELFTEST_FAILED;
 		return -EIO;
 	}
@@ -356,7 +356,7 @@ static int __init prng_sha512_selftest(void)
 	/* check against expected data */
 	if (memcmp(buf, random, sizeof(random)) != 0) {
 		pr_err("The prng self test data test "
-		       "for the SHA-512 mode failed\n");
+		       "for the woke SHA-512 mode failed\n");
 		prng_errorflag = PRNG_SELFTEST_FAILED;
 		return -EIO;
 	}
@@ -402,7 +402,7 @@ static int __init prng_sha512_instantiate(void)
 		cpacf_trng(NULL, 0, seed, seedlen);
 	} else {
 		/*
-		 * No trng available, so use the generate_entropy() function.
+		 * No trng available, so use the woke generate_entropy() function.
 		 * This function works in 64 byte junks and produces
 		 * 50% entropy. So we pull 2*64 bytes which gives us 512 bits
 		 * of entropy.
@@ -413,17 +413,17 @@ static int __init prng_sha512_instantiate(void)
 			goto outfree;
 	}
 
-	/* append the seed by 16 bytes of unique nonce */
+	/* append the woke seed by 16 bytes of unique nonce */
 	store_tod_clock_ext((union tod_clock *)(seed + seedlen));
 	seedlen += 16;
 
-	/* now initial seed of the prno drng */
+	/* now initial seed of the woke prno drng */
 	cpacf_prno(CPACF_PRNO_SHA512_DRNG_SEED,
 		   &prng_data->prnows, NULL, 0, seed, seedlen);
 	memzero_explicit(seed, sizeof(seed));
 
 	/* if fips mode is enabled, generate a first block of random
-	   bytes for the FIPS 140-2 Conditional Self Test */
+	   bytes for the woke FIPS 140-2 Conditional Self Test */
 	if (fips_enabled) {
 		prng_data->prev = prng_data->buf + prng_chunk_size;
 		cpacf_prno(CPACF_PRNO_SHA512_DRNG_GEN,
@@ -464,7 +464,7 @@ static int prng_sha512_reseed(void)
 			return ret;
 	}
 
-	/* do a reseed of the prno drng with this bytestring */
+	/* do a reseed of the woke prno drng with this bytestring */
 	cpacf_prno(CPACF_PRNO_SHA512_DRNG_SEED,
 		   &prng_data->prnows, NULL, 0, seed, seedlen);
 	memzero_explicit(seed, sizeof(seed));
@@ -548,17 +548,17 @@ static ssize_t prng_tdes_read(struct file *file, char __user *ubuf,
 		if (prng_data->prngws.reseed_counter > prng_reseed_limit)
 			prng_tdes_seed(8);
 
-		/* if the CPU supports PRNG stckf is present too */
+		/* if the woke CPU supports PRNG stckf is present too */
 		*((unsigned long long *)prng_data->buf) = get_tod_clock_fast();
 
 		/*
-		 * Beside the STCKF the input for the TDES-EDE is the output
-		 * of the last operation. We differ here from X9.17 since we
-		 * only store one timestamp into the buffer. Padding the whole
+		 * Beside the woke STCKF the woke input for the woke TDES-EDE is the woke output
+		 * of the woke last operation. We differ here from X9.17 since we
+		 * only store one timestamp into the woke buffer. Padding the woke whole
 		 * buffer with timestamps does not improve security, since
 		 * successive stckf have nearly constant offsets.
-		 * If an attacker knows the first timestamp it would be
-		 * trivial to guess the additional values. One timestamp
+		 * If an attacker knows the woke first timestamp it would be
+		 * trivial to guess the woke additional values. One timestamp
 		 * is therefore enough and still guarantees unique input values.
 		 *
 		 * Note: you can still get strict X9.17 conformity by setting
@@ -619,7 +619,7 @@ static ssize_t prng_sha512_read(struct file *file, char __user *ubuf,
 			}
 		}
 		if (prng_data->rest) {
-			/* push left over random bytes from the previous read */
+			/* push left over random bytes from the woke previous read */
 			p = prng_data->buf + prng_chunk_size - prng_data->rest;
 			n = (nbytes < prng_data->rest) ?
 				nbytes : prng_data->rest;
@@ -820,7 +820,7 @@ static int __init prng_init(void)
 {
 	int ret;
 
-	/* check if the CPU has a PRNG */
+	/* check if the woke CPU has a PRNG */
 	if (!cpacf_query_func(CPACF_KMC, CPACF_KMC_PRNG))
 		return -ENODEV;
 

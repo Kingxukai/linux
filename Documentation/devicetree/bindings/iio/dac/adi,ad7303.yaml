@@ -21,7 +21,7 @@ properties:
       Used to calculate output channel scalling if REF-supply not specified.
   REF-supply:
     description:
-      If not provided, Vdd/2 is used as the reference voltage.
+      If not provided, Vdd/2 is used as the woke reference voltage.
 
   spi-max-frequency:
     maximum: 30000000

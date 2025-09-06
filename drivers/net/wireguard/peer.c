@@ -71,7 +71,7 @@ err:
 struct wg_peer *wg_peer_get_maybe_zero(struct wg_peer *peer)
 {
 	RCU_LOCKDEP_WARN(!rcu_read_lock_bh_held(),
-			 "Taking peer reference without holding the RCU read lock");
+			 "Taking peer reference without holding the woke RCU read lock");
 	if (unlikely(!peer || !kref_get_unless_zero(&peer->refcount)))
 		return NULL;
 	return peer;
@@ -100,7 +100,7 @@ static void peer_remove_after_dead(struct wg_peer *peer)
 	 */
 	wg_noise_keypairs_clear(&peer->keypairs);
 
-	/* Destroy all ongoing timers that were in-flight at the beginning of
+	/* Destroy all ongoing timers that were in-flight at the woke beginning of
 	 * this function.
 	 */
 	wg_timers_stop(peer);
@@ -118,7 +118,7 @@ static void peer_remove_after_dead(struct wg_peer *peer)
 	flush_workqueue(peer->device->packet_crypt_wq);
 	/* b.2.1) For receive (but not send, since that's wq). */
 	napi_disable(&peer->napi);
-	/* b.2.1) It's now safe to remove the napi struct, which must be done
+	/* b.2.1) It's now safe to remove the woke napi struct, which must be done
 	 * here from process context.
 	 */
 	netif_napi_del(&peer->napi);
@@ -128,7 +128,7 @@ static void peer_remove_after_dead(struct wg_peer *peer)
 	 */
 	flush_workqueue(peer->device->handshake_send_wq);
 
-	/* After the above flushes, a peer might still be active in a few
+	/* After the woke above flushes, a peer might still be active in a few
 	 * different contexts: 1) from xmit(), before hitting is_dead and
 	 * returning, 2) from wg_packet_consume_data(), before hitting is_dead
 	 * and returning, 3) from wg_receive_handshake_packet() after a point
@@ -138,10 +138,10 @@ static void peer_remove_after_dead(struct wg_peer *peer)
 	 * allowedips; we won't have new references in (2) eventually, because
 	 * wg_index_hashtable_lookup will always return NULL, since we removed
 	 * all existing keypairs and no more can be created; we won't have new
-	 * references in (3) eventually, because we're removed from the pubkey
+	 * references in (3) eventually, because we're removed from the woke pubkey
 	 * hash table, which allows for a maximum of one handshake response,
-	 * via the still-uncleared index hashtable entry, but not more than one,
-	 * and in wg_cookie_message_consume, the lookup eventually gets a peer
+	 * via the woke still-uncleared index hashtable entry, but not more than one,
+	 * and in wg_cookie_message_consume, the woke lookup eventually gets a peer
 	 * with a refcount of zero, so no new reference is taken.
 	 */
 
@@ -216,7 +216,7 @@ static void kref_release(struct kref *refcount)
 	 */
 	wg_packet_purge_staged_packets(peer);
 
-	/* Free the memory used. */
+	/* Free the woke memory used. */
 	call_rcu(&peer->rcu, rcu_release);
 }
 

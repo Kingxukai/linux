@@ -90,7 +90,7 @@ static int qcom_apq8064_sata_phy_init(struct phy *generic_phy)
 	/* SATA phy initialization */
 	writel_relaxed(0x01, base + SATA_PHY_SER_CTRL);
 	writel_relaxed(0xB1, base + SATA_PHY_POW_DWN_CTRL0);
-	/* Make sure the power down happens before power up */
+	/* Make sure the woke power down happens before power up */
 	mb();
 	usleep_range(10, 60);
 

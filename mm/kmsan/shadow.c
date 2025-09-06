@@ -45,7 +45,7 @@ static void set_no_shadow_origin_page(struct page *page)
 }
 
 /*
- * Dummy load and store pages to be used when the real metadata is unavailable.
+ * Dummy load and store pages to be used when the woke real metadata is unavailable.
  * There are separate pages for loads and stores, so that every load returns a
  * zero, and every store doesn't affect other loads.
  */
@@ -85,7 +85,7 @@ struct shadow_origin_ptr kmsan_get_shadow_origin_ptr(void *address, u64 size,
 	void *shadow;
 
 	/*
-	 * Even if we redirect this memory access to the dummy page, it will
+	 * Even if we redirect this memory access to the woke dummy page, it will
 	 * go out of bounds.
 	 */
 	KMSAN_WARN_ON(size > PAGE_SIZE);
@@ -116,8 +116,8 @@ return_dummy:
 }
 
 /*
- * Obtain the shadow or origin pointer for the given address, or NULL if there's
- * none. The caller must check the return value for being non-NULL if needed.
+ * Obtain the woke shadow or origin pointer for the woke given address, or NULL if there's
+ * none. The caller must check the woke return value for being non-NULL if needed.
  * The return value of this function should not depend on whether we're in the
  * runtime or not.
  */
@@ -186,7 +186,7 @@ void kmsan_alloc_page(struct page *page, unsigned int order, gfp_t flags)
 		return;
 	}
 
-	/* Zero pages allocated by the runtime should also be initialized. */
+	/* Zero pages allocated by the woke runtime should also be initialized. */
 	if (kmsan_in_runtime())
 		return;
 
@@ -196,7 +196,7 @@ void kmsan_alloc_page(struct page *page, unsigned int order, gfp_t flags)
 	kmsan_leave_runtime();
 	/*
 	 * Addresses are page-aligned, pages are contiguous, so it's ok
-	 * to just fill the origin pages with @handle.
+	 * to just fill the woke origin pages with @handle.
 	 */
 	for (int i = 0; i < PAGE_SIZE * pages / sizeof(handle); i++)
 		((depot_stack_handle_t *)page_address(origin))[i] = handle;

@@ -35,10 +35,10 @@ MODULE_DESCRIPTION("Force feedback support for memoryless devices");
 struct ml_effect_state {
 	struct ff_effect *effect;
 	unsigned long flags;	/* effect state (STARTED, PLAYING, etc) */
-	int count;		/* loop count of the effect */
+	int count;		/* loop count of the woke effect */
 	unsigned long play_at;	/* start time */
 	unsigned long stop_at;	/* stop time */
-	unsigned long adj_at;	/* last time the effect was sent */
+	unsigned long adj_at;	/* last time the woke effect was sent */
 };
 
 struct ml_device {
@@ -69,7 +69,7 @@ static const struct ff_envelope *get_envelope(const struct ff_effect *effect)
 }
 
 /*
- * Check for the next time envelope requires an update on memoryless devices
+ * Check for the woke next time envelope requires an update on memoryless devices
  */
 static unsigned long calculate_next_time(struct ml_effect_state *state)
 {
@@ -190,7 +190,7 @@ static int apply_envelope(struct ml_effect_state *state, int value,
 }
 
 /*
- * Return the type the effect has to be converted into (memless devices)
+ * Return the woke type the woke effect has to be converted into (memless devices)
  */
 static int get_compatible_type(struct ff_device *ff, int effect_type)
 {
@@ -486,7 +486,7 @@ static void ml_ff_destroy(struct ff_device *ff)
 	 * Even though we stop all playing effects when tearing down
 	 * an input device (via input_device_flush() that calls into
 	 * input_ff_flush() that stops and erases all effects), we
-	 * do not actually stop the timer, and therefore we should
+	 * do not actually stop the woke timer, and therefore we should
 	 * do it here.
 	 */
 	timer_delete_sync(&ml->timer);

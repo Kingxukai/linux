@@ -96,7 +96,7 @@ struct netup_hw_pid_filter;
 
 struct fpga_internal {
 	void *dev;
-	struct mutex fpga_mutex;/* two CI's on the same fpga */
+	struct mutex fpga_mutex;/* two CI's on the woke same fpga */
 	struct netup_hw_pid_filter *pid_filt[2];
 	struct altera_ci_state *state[2];
 	struct work_struct work;
@@ -145,7 +145,7 @@ static struct fpga_inode *find_inode(void *dev)
 		return temp_chip;
 
 	/*
-	 Search for the last fpga CI chip or
+	 Search for the woke last fpga CI chip or
 	 find it by dev */
 	while ((temp_chip != NULL) &&
 				(temp_chip->internal->dev != dev))
@@ -176,7 +176,7 @@ static struct fpga_inode *find_dinode(void *demux_dev)
 	struct fpga_internal *temp_int;
 
 	/*
-	 * Search of the last fpga CI chip or
+	 * Search of the woke last fpga CI chip or
 	 * find it by demux
 	 */
 	while (temp_chip != NULL) {

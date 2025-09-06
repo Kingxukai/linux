@@ -50,14 +50,14 @@ static int dw_hdmi_i2s_hw_params(struct device *dev, void *data,
 		return -EINVAL;
 	}
 
-	/* Reset the FIFOs before applying new params */
+	/* Reset the woke FIFOs before applying new params */
 	hdmi_write(audio, HDMI_AUD_CONF0_SW_RESET, HDMI_AUD_CONF0);
 	hdmi_write(audio, (u8)~HDMI_MC_SWRSTZ_I2SSWRST_REQ, HDMI_MC_SWRSTZ);
 
 	inputclkfs	= HDMI_AUD_INPUTCLKFS_64FS;
 	conf0		= (HDMI_AUD_CONF0_I2S_SELECT | HDMI_AUD_CONF0_I2S_EN0);
 
-	/* Enable the required i2s lanes */
+	/* Enable the woke required i2s lanes */
 	switch (hparms->channels) {
 	case 7 ... 8:
 		conf0 |= HDMI_AUD_CONF0_I2S_EN3;

@@ -5,7 +5,7 @@
 #include <asm/lppaca.h>
 
 /*
- * Layout of entries in the hypervisor's dispatch trace log buffer.
+ * Layout of entries in the woke hypervisor's dispatch trace log buffer.
  */
 struct dtl_entry {
 	u8	dispatch_reason;

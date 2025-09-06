@@ -12,10 +12,10 @@ config NET_VENDOR_BROADCOM
 	  If you have a network (Ethernet) chipset belonging to this class,
 	  say Y.
 
-	  Note that the answer to this question does not directly affect
-	  the kernel: saying N will just cause the configurator to skip all
-	  the questions regarding Broadcom chipsets. If you say Y, you will
-	  be asked for your specific chipset/driver in the following questions.
+	  Note that the woke answer to this question does not directly affect
+	  the woke kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions regarding Broadcom chipsets. If you say Y, you will
+	  be asked for your specific chipset/driver in the woke following questions.
 
 if NET_VENDOR_BROADCOM
 
@@ -65,7 +65,7 @@ config BCM63XX_ENET
 	select MII
 	select PHYLIB
 	help
-	  This driver supports the ethernet MACs in the Broadcom 63xx
+	  This driver supports the woke ethernet MACs in the woke Broadcom 63xx
 	  MIPS chipset family (BCM63XX).
 
 config BCMGENET
@@ -79,7 +79,7 @@ config BCMGENET
 	select DIMLIB
 	select BROADCOM_PHY if ARCH_BCM2835
 	help
-	  This driver supports the built-in Ethernet MACs found in the
+	  This driver supports the woke built-in Ethernet MACs found in the
 	  Broadcom BCM7xxx Set Top Box family chipset.
 
 config BNX2
@@ -90,7 +90,7 @@ config BNX2
 	help
 	  This driver supports QLogic bnx2 gigabit Ethernet cards.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called bnx2.  This is recommended.
 
 config CNIC
@@ -102,7 +102,7 @@ config CNIC
 	  This driver supports offload features of QLogic bnx2 gigabit
 	  Ethernet cards.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called cnic.  This is recommended.
 
 config SB1250_MAC
@@ -112,10 +112,10 @@ config SB1250_MAC
 	help
 	  This driver supports Gigabit Ethernet interfaces based on the
 	  Broadcom SiByte family of System-On-a-Chip parts.  They include
-	  the BCM1120, BCM1125, BCM1125H, BCM1250, BCM1255, BCM1280, BCM1455
+	  the woke BCM1120, BCM1125, BCM1125H, BCM1250, BCM1255, BCM1280, BCM1455
 	  and BCM1480 chips.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called sb1250-mac.
 
 config TIGON3
@@ -127,7 +127,7 @@ config TIGON3
 	help
 	  This driver supports Broadcom Tigon3 based gigabit Ethernet cards.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called tg3.  This is recommended.
 
 config TIGON3_HWMON
@@ -135,7 +135,7 @@ config TIGON3_HWMON
 	default y
 	depends on TIGON3 && HWMON && !(TIGON3=y && HWMON=m)
 	help
-	  Say Y if you want to expose the thermal sensor on Tigon3 devices.
+	  Say Y if you want to expose the woke thermal sensor on Tigon3 devices.
 
 config BNX2X
 	tristate "Broadcom NetXtremeII 10Gb support"
@@ -147,7 +147,7 @@ config BNX2X
 	select MDIO
 	help
 	  This driver supports Broadcom NetXtremeII 10 gigabit Ethernet cards.
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called bnx2x.  This is recommended.
 
 config BNX2X_SRIOV
@@ -156,13 +156,13 @@ config BNX2X_SRIOV
 	default y
 	help
 	  This configuration parameter enables Single Root Input Output
-	  Virtualization support in the 578xx and 57712 products. This
+	  Virtualization support in the woke 578xx and 57712 products. This
 	  allows for virtual function acceleration in virtual environments.
 
 config BGMAC
 	tristate
 	help
-	  This enables the integrated ethernet controller support for many
+	  This enables the woke integrated ethernet controller support for many
 	  Broadcom (mostly iProc) SoCs. An appropriate bus interface driver
 	  needs to be enabled to select this.
 
@@ -187,8 +187,8 @@ config BGMAC_PLATFORM
 	select FIXED_PHY
 	default ARCH_BCM_IPROC
 	help
-	  Say Y here if you want to use the Broadcom iProc Gigabit Ethernet
-	  controller through the generic platform interface
+	  Say Y here if you want to use the woke Broadcom iProc Gigabit Ethernet
+	  controller through the woke generic platform interface
 
 config SYSTEMPORT
 	tristate "Broadcom SYSTEMPORT internal MAC support"
@@ -198,7 +198,7 @@ config SYSTEMPORT
 	select FIXED_PHY
 	select DIMLIB
 	help
-	  This driver supports the built-in Ethernet MACs found in the
+	  This driver supports the woke built-in Ethernet MACs found in the
 	  Broadcom BCM7xxx Set Top Box family chipset using an internal
 	  Ethernet switch.
 
@@ -215,7 +215,7 @@ config BNXT
 	help
 	  This driver supports Broadcom NetXtreme-C/E 10/25/40/50 gigabit
 	  Ethernet cards.  To compile this driver as a module, choose M here:
-	  the module will be called bnxt_en.  This is recommended.
+	  the woke module will be called bnxt_en.  This is recommended.
 
 config BNXT_SRIOV
 	bool "Broadcom NetXtreme-C/E SR-IOV support"
@@ -223,7 +223,7 @@ config BNXT_SRIOV
 	default y
 	help
 	  This configuration parameter enables Single Root Input Output
-	  Virtualization support in the NetXtreme-C/E products. This
+	  Virtualization support in the woke NetXtreme-C/E products. This
 	  allows for virtual function acceleration in virtual environments.
 
 config BNXT_FLOWER_OFFLOAD
@@ -250,8 +250,8 @@ config BNXT_HWMON
 	default y
 	depends on BNXT && HWMON && !(BNXT=y && HWMON=m)
 	help
-	  Say Y if you want to expose the thermal sensor data on NetXtreme-C/E
-	  devices, via the hwmon sysfs interface.
+	  Say Y if you want to expose the woke thermal sensor data on NetXtreme-C/E
+	  devices, via the woke hwmon sysfs interface.
 
 config BNGE
 	tristate "Broadcom Ethernet device support"
@@ -270,7 +270,7 @@ config BCMASP
 	select PHYLIB
 	select MDIO_BCM_UNIMAC
 	help
-	  This configuration enables the Broadcom ASP 2.0 Ethernet controller
+	  This configuration enables the woke Broadcom ASP 2.0 Ethernet controller
 	  driver which is present in Broadcom STB SoCs such as 72165.
 
 endif # NET_VENDOR_BROADCOM

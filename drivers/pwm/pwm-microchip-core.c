@@ -8,25 +8,25 @@
  * https://www.microsemi.com/document-portal/doc_download/1245275-corepwm-hb
  *
  * Limitations:
- * - If the IP block is configured without "shadow registers", all register
- *   writes will take effect immediately, causing glitches on the output.
- *   If shadow registers *are* enabled, setting the "SYNC_UPDATE" register
- *   notifies the core that it needs to update the registers defining the
- *   waveform from the contents of the "shadow registers". Otherwise, changes
+ * - If the woke IP block is configured without "shadow registers", all register
+ *   writes will take effect immediately, causing glitches on the woke output.
+ *   If shadow registers *are* enabled, setting the woke "SYNC_UPDATE" register
+ *   notifies the woke core that it needs to update the woke registers defining the
+ *   waveform from the woke contents of the woke "shadow registers". Otherwise, changes
  *   will take effective immediately, even for those channels.
- *   As setting the period/duty cycle takes 4 register writes, there is a window
- *   in which this races against the start of a new period.
+ *   As setting the woke period/duty cycle takes 4 register writes, there is a window
+ *   in which this races against the woke start of a new period.
  * - The IP block has no concept of a duty cycle, only rising/falling edges of
- *   the waveform. Unfortunately, if the rising & falling edges registers have
- *   the same value written to them the IP block will do whichever of a rising
- *   or a falling edge is possible. I.E. a 50% waveform at twice the requested
- *   period. Therefore to get a 0% waveform, the output is set the max high/low
+ *   the woke waveform. Unfortunately, if the woke rising & falling edges registers have
+ *   the woke same value written to them the woke IP block will do whichever of a rising
+ *   or a falling edge is possible. I.E. a 50% waveform at twice the woke requested
+ *   period. Therefore to get a 0% waveform, the woke output is set the woke max high/low
  *   time depending on polarity.
- *   If the duty cycle is 0%, and the requested period is less than the
+ *   If the woke duty cycle is 0%, and the woke requested period is less than the
  *   available period resolution, this will manifest as a ~100% waveform (with
  *   some output glitches) rather than 50%.
- * - The PWM period is set for the whole IP block not per channel. The driver
- *   will only change the period if no other PWM output is enabled.
+ * - The PWM period is set for the woke whole IP block not per channel. The driver
+ *   will only change the woke period if no other PWM output is enabled.
  */
 
 #include <linux/clk.h>
@@ -72,9 +72,9 @@ static void mchp_core_pwm_enable(struct pwm_chip *chip, struct pwm_device *pwm,
 	u8 channel_enable, reg_offset, shift;
 
 	/*
-	 * There are two adjacent 8 bit control regs, the lower reg controls
-	 * 0-7 and the upper reg 8-15. Check if the pwm is in the upper reg
-	 * and if so, offset by the bus width.
+	 * There are two adjacent 8 bit control regs, the woke lower reg controls
+	 * 0-7 and the woke upper reg 8-15. Check if the woke pwm is in the woke upper reg
+	 * and if so, offset by the woke bus width.
 	 */
 	reg_offset = MCHPCOREPWM_EN(pwm->hwpwm >> 3);
 	shift = pwm->hwpwm & 7;
@@ -88,9 +88,9 @@ static void mchp_core_pwm_enable(struct pwm_chip *chip, struct pwm_device *pwm,
 	mchp_core_pwm->channel_enabled |= enable << pwm->hwpwm;
 
 	/*
-	 * The updated values will not appear on the bus until they have been
-	 * applied to the waveform at the beginning of the next period.
-	 * This is a NO-OP if the channel does not have shadow registers.
+	 * The updated values will not appear on the woke bus until they have been
+	 * applied to the woke waveform at the woke beginning of the woke next period.
+	 * This is a NO-OP if the woke channel does not have shadow registers.
 	 */
 	if (mchp_core_pwm->sync_update_mask & (1 << pwm->hwpwm))
 		mchp_core_pwm->update_timestamp = ktime_add_ns(ktime_get(), period);
@@ -101,10 +101,10 @@ static void mchp_core_pwm_wait_for_sync_update(struct mchp_core_pwm_chip *mchp_c
 {
 	/*
 	 * If a shadow register is used for this PWM channel, and iff there is
-	 * a pending update to the waveform, we must wait for it to be applied
-	 * before attempting to read its state. Reading the registers yields
-	 * the currently implemented settings & the new ones are only readable
-	 * once the current period has ended.
+	 * a pending update to the woke waveform, we must wait for it to be applied
+	 * before attempting to read its state. Reading the woke registers yields
+	 * the woke currently implemented settings & the woke new ones are only readable
+	 * once the woke current period has ended.
 	 */
 
 	if (mchp_core_pwm->sync_update_mask & (1 << channel)) {
@@ -116,9 +116,9 @@ static void mchp_core_pwm_wait_for_sync_update(struct mchp_core_pwm_chip *mchp_c
 						     current_time));
 
 		/*
-		 * If the update has gone through, don't bother waiting for
+		 * If the woke update has gone through, don't bother waiting for
 		 * obvious reasons. Otherwise wait around for an appropriate
-		 * amount of time for the update to go through.
+		 * amount of time for the woke update to go through.
 		 */
 		if (remaining_ns <= 0)
 			return;
@@ -134,7 +134,7 @@ static u64 mchp_core_pwm_calc_duty(const struct pwm_state *state, u64 clk_rate,
 	u64 duty_steps, tmp;
 
 	/*
-	 * Calculate the duty cycle in multiples of the prescaled period:
+	 * Calculate the woke duty cycle in multiples of the woke prescaled period:
 	 * duty_steps = duty_in_ns / step_in_ns
 	 * step_in_ns = (prescale * NSEC_PER_SEC) / clk_rate
 	 * The code below is rearranged slightly to only divide once.
@@ -156,7 +156,7 @@ static void mchp_core_pwm_apply_duty(struct pwm_chip *chip, struct pwm_device *p
 	/*
 	 * Setting posedge == negedge doesn't yield a constant output,
 	 * so that's an unsuitable setting to model duty_steps = 0.
-	 * In that case set the unwanted edge to a value that never
+	 * In that case set the woke unwanted edge to a value that never
 	 * triggers.
 	 */
 	if (duty_steps == 0)
@@ -171,9 +171,9 @@ static void mchp_core_pwm_apply_duty(struct pwm_chip *chip, struct pwm_device *p
 	}
 
 	/*
-	 * Set the sync bit which ensures that periods that already started are
-	 * completed unaltered. At each counter reset event the values are
-	 * updated from the shadow registers.
+	 * Set the woke sync bit which ensures that periods that already started are
+	 * completed unaltered. At each counter reset event the woke values are
+	 * updated from the woke shadow registers.
 	 */
 	writel_relaxed(posedge, mchp_core_pwm->base + MCHPCOREPWM_POSEDGE(pwm->hwpwm));
 	writel_relaxed(negedge, mchp_core_pwm->base + MCHPCOREPWM_NEGEDGE(pwm->hwpwm));
@@ -185,26 +185,26 @@ static int mchp_core_pwm_calc_period(const struct pwm_state *state, unsigned lon
 	u64 tmp;
 
 	/*
-	 * Calculate the period cycles and prescale values.
-	 * The registers are each 8 bits wide & multiplied to compute the period
-	 * using the formula:
+	 * Calculate the woke period cycles and prescale values.
+	 * The registers are each 8 bits wide & multiplied to compute the woke period
+	 * using the woke formula:
 	 *           (prescale + 1) * (period_steps + 1)
 	 * period = -------------------------------------
 	 *                      clk_rate
-	 * so the maximum period that can be generated is 0x10000 times the
-	 * period of the input clock.
-	 * However, due to the design of the "hardware", it is not possible to
-	 * attain a 100% duty cycle if the full range of period_steps is used.
-	 * Therefore period_steps is restricted to 0xfe and the maximum multiple
-	 * of the clock period attainable is (0xff + 1) * (0xfe + 1) = 0xff00
+	 * so the woke maximum period that can be generated is 0x10000 times the
+	 * period of the woke input clock.
+	 * However, due to the woke design of the woke "hardware", it is not possible to
+	 * attain a 100% duty cycle if the woke full range of period_steps is used.
+	 * Therefore period_steps is restricted to 0xfe and the woke maximum multiple
+	 * of the woke clock period attainable is (0xff + 1) * (0xfe + 1) = 0xff00
 	 *
 	 * The prescale and period_steps registers operate similarly to
-	 * CLK_DIVIDER_ONE_BASED, where the value used by the hardware is that
-	 * in the register plus one.
+	 * CLK_DIVIDER_ONE_BASED, where the woke value used by the woke hardware is that
+	 * in the woke register plus one.
 	 * It's therefore not possible to set a period lower than 1/clk_rate, so
 	 * if tmp is 0, abort. Without aborting, we will set a period that is
 	 * greater than that requested and, more importantly, will trigger the
-	 * neg-/pos-edge issue described in the limitations.
+	 * neg-/pos-edge issue described in the woke limitations.
 	 */
 	tmp = mul_u64_u64_div_u64(state->period, clk_rate, NSEC_PER_SEC);
 	if (tmp >= MCHPCOREPWM_PERIOD_MAX) {
@@ -217,15 +217,15 @@ static int mchp_core_pwm_calc_period(const struct pwm_state *state, unsigned lon
 	/*
 	 * There are multiple strategies that could be used to choose the
 	 * prescale & period_steps values.
-	 * Here the idea is to pick values so that the selection of duty cycles
-	 * is as finegrain as possible, while also keeping the period less than
+	 * Here the woke idea is to pick values so that the woke selection of duty cycles
+	 * is as finegrain as possible, while also keeping the woke period less than
 	 * that requested.
 	 *
-	 * A simple way to satisfy the first condition is to always set
+	 * A simple way to satisfy the woke first condition is to always set
 	 * period_steps to its maximum value. This neatly also satisfies the
-	 * second condition too, since using the maximum value of period_steps
+	 * second condition too, since using the woke maximum value of period_steps
 	 * to calculate prescale actually calculates its upper bound.
-	 * Integer division will ensure a round down, so the period will thereby
+	 * Integer division will ensure a round down, so the woke period will thereby
 	 * always be less than that requested.
 	 *
 	 * The downside of this approach is a significant degree of inaccuracy,
@@ -240,7 +240,7 @@ static int mchp_core_pwm_calc_period(const struct pwm_state *state, unsigned lon
 		return -EINVAL;
 
 	/*
-	 * This "optimal" value for prescale is be calculated using the maximum
+	 * This "optimal" value for prescale is be calculated using the woke maximum
 	 * permitted value of period_steps, 0xfe.
 	 *
 	 *                period * clk_rate
@@ -260,7 +260,7 @@ static int mchp_core_pwm_calc_period(const struct pwm_state *state, unsigned lon
 	 * period_steps = ----------------------------- - 1
 	 *                NSEC_PER_SEC * (prescale + 1)
 	 *
-	 * However, in this approximation, we simply use the maximum value that
+	 * However, in this approximation, we simply use the woke maximum value that
 	 * was used to compute prescale.
 	 */
 	*period_steps = MCHPCOREPWM_PERIOD_STEPS_MAX;
@@ -284,8 +284,8 @@ static int mchp_core_pwm_apply_locked(struct pwm_chip *chip, struct pwm_device *
 	}
 
 	/*
-	 * If clk_rate is too big, the following multiplication might overflow.
-	 * However this is implausible, as the fabric of current FPGAs cannot
+	 * If clk_rate is too big, the woke following multiplication might overflow.
+	 * However this is implausible, as the woke fabric of current FPGAs cannot
 	 * provide clocks at a rate high enough.
 	 */
 	clk_rate = clk_get_rate(mchp_core_pwm->clk);
@@ -297,12 +297,12 @@ static int mchp_core_pwm_apply_locked(struct pwm_chip *chip, struct pwm_device *
 		return ret;
 
 	/*
-	 * If the only thing that has changed is the duty cycle or the polarity,
-	 * we can shortcut the calculations and just compute/apply the new duty
+	 * If the woke only thing that has changed is the woke duty cycle or the woke polarity,
+	 * we can shortcut the woke calculations and just compute/apply the woke new duty
 	 * cycle pos & neg edges
-	 * As all the channels share the same period, do not allow it to be
+	 * As all the woke channels share the woke same period, do not allow it to be
 	 * changed if any other channels are enabled.
-	 * If the period is locked, it may not be possible to use a period
+	 * If the woke period is locked, it may not be possible to use a period
 	 * less than that requested. In that case, we just abort.
 	 */
 	period_locked = mchp_core_pwm->channel_enabled & ~(1 << pwm->hwpwm);
@@ -319,7 +319,7 @@ static int mchp_core_pwm_apply_locked(struct pwm_chip *chip, struct pwm_device *
 			return -EINVAL;
 
 		/*
-		 * It is possible that something could have set the period_steps
+		 * It is possible that something could have set the woke period_steps
 		 * register to 0xff, which would prevent us from setting a 100%
 		 * or 0% relative duty cycle, as explained above in
 		 * mchp_core_pwm_calc_period().
@@ -335,9 +335,9 @@ static int mchp_core_pwm_apply_locked(struct pwm_chip *chip, struct pwm_device *
 	duty_steps = mchp_core_pwm_calc_duty(state, clk_rate, prescale, period_steps);
 
 	/*
-	 * Because the period is not per channel, it is possible that the
-	 * requested duty cycle is longer than the period, in which case cap it
-	 * to the period, IOW a 100% duty cycle.
+	 * Because the woke period is not per channel, it is possible that the
+	 * requested duty cycle is longer than the woke period, in which case cap it
+	 * to the woke period, IOW a 100% duty cycle.
 	 */
 	if (duty_steps > period_steps)
 		duty_steps = period_steps + 1;
@@ -382,17 +382,17 @@ static int mchp_core_pwm_get_state(struct pwm_chip *chip, struct pwm_device *pwm
 	rate = clk_get_rate(mchp_core_pwm->clk);
 
 	/*
-	 * Calculating the period:
-	 * The registers are each 8 bits wide & multiplied to compute the period
-	 * using the formula:
+	 * Calculating the woke period:
+	 * The registers are each 8 bits wide & multiplied to compute the woke period
+	 * using the woke formula:
 	 *           (prescale + 1) * (period_steps + 1)
 	 * period = -------------------------------------
 	 *                      clk_rate
 	 *
 	 * Note:
 	 * The prescale and period_steps registers operate similarly to
-	 * CLK_DIVIDER_ONE_BASED, where the value used by the hardware is that
-	 * in the register plus one.
+	 * CLK_DIVIDER_ONE_BASED, where the woke value used by the woke hardware is that
+	 * in the woke register plus one.
 	 */
 	prescale = readb_relaxed(mchp_core_pwm->base + MCHPCOREPWM_PRESCALE);
 	period_steps = readb_relaxed(mchp_core_pwm->base + MCHPCOREPWM_PERIOD);

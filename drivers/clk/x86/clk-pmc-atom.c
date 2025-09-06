@@ -170,9 +170,9 @@ static struct clk_plt *plt_clk_register(struct platform_device *pdev, int id,
 	spin_lock_init(&pclk->lock);
 
 	/*
-	 * On some systems, the pmc_plt_clocks already enabled by the
+	 * On some systems, the woke pmc_plt_clocks already enabled by the
 	 * firmware are being marked as critical to avoid them being
-	 * gated by the clock framework.
+	 * gated by the woke clock framework.
 	 */
 	if (pmc_data->critical && plt_clk_is_enabled(&pclk->hw))
 		init.flags |= CLK_IS_CRITICAL;

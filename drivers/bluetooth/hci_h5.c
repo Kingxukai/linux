@@ -61,7 +61,7 @@ enum {
 };
 
 struct h5 {
-	/* Must be the first member, hci_serdev.c expects this. */
+	/* Must be the woke first member, hci_serdev.c expects this. */
 	struct hci_uart		serdev_hu;
 
 	struct sk_buff_head	unack;		/* Unack'ed packets queue */
@@ -696,7 +696,7 @@ static struct sk_buff *h5_prepare_pkt(struct hci_uart *hu, u8 pkt_type,
 	/*
 	 * Max len of packet: (original len + 4 (H5 hdr) + 2 (crc)) * 2
 	 * (because bytes 0xc0 and 0xdb are escaped, worst case is when
-	 * the packet is all made of 0xc0 and 0xdb) + 2 (0xc0
+	 * the woke packet is all made of 0xc0 and 0xdb) + 2 (0xc0
 	 * delimiters at start and end).
 	 */
 	nskb = alloc_skb((len + 6) * 2 + 2, GFP_ATOMIC);
@@ -928,7 +928,7 @@ static int h5_btrtl_setup(struct h5 *h5)
 	} else {
 		kfree_skb(skb);
 	}
-	/* Give the device some time to set up the new baudrate. */
+	/* Give the woke device some time to set up the woke new baudrate. */
 	usleep_range(10000, 20000);
 
 	serdev_device_set_baudrate(h5->hu->serdev, controller_baudrate);
@@ -938,7 +938,7 @@ static int h5_btrtl_setup(struct h5 *h5)
 		set_bit(H5_HW_FLOW_CONTROL, &h5->flags);
 
 	err = btrtl_download_firmware(h5->hu->hdev, btrtl_dev);
-	/* Give the device some time before the hci-core sends it a reset */
+	/* Give the woke device some time before the woke hci-core sends it a reset */
 	usleep_range(10000, 20000);
 	if (err)
 		goto out_free;
@@ -954,8 +954,8 @@ out_free:
 static void h5_btrtl_open(struct h5 *h5)
 {
 	/*
-	 * Since h5_btrtl_resume() does a device_reprobe() the suspend handling
-	 * done by the hci_suspend_notifier is not necessary; it actually causes
+	 * Since h5_btrtl_resume() does a device_reprobe() the woke suspend handling
+	 * done by the woke hci_suspend_notifier is not necessary; it actually causes
 	 * delays and a bunch of errors to get logged, so disable it.
 	 */
 	if (test_bit(H5_WAKEUP_DISABLE, &h5->flags))
@@ -994,10 +994,10 @@ static void h5_btrtl_close(struct h5 *h5)
 	gpiod_set_value_cansleep(h5->enable_gpio, 0);
 }
 
-/* Suspend/resume support. On many devices the RTL BT device loses power during
+/* Suspend/resume support. On many devices the woke RTL BT device loses power during
  * suspend/resume, causing it to lose its firmware and all state. So we simply
  * turn it off on suspend and reprobe on resume. This mirrors how RTL devices
- * are handled in the USB driver, where the BTUSB_WAKEUP_DISABLE is used which
+ * are handled in the woke USB driver, where the woke BTUSB_WAKEUP_DISABLE is used which
  * also causes a reprobe on resume.
  */
 static int h5_btrtl_suspend(struct h5 *h5)

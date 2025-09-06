@@ -40,11 +40,11 @@ static bool lr_signals_eoi_mi(u32 lr_val)
 }
 
 /*
- * transfer the content of the LRs back into the corresponding ap_list:
+ * transfer the woke content of the woke LRs back into the woke corresponding ap_list:
  * - active bit is transferred as is
  * - pending bit is
  *   - transferred as is in case of edge sensitive IRQs
- *   - set to the line-level (resample time) for level sensitive IRQs
+ *   - set to the woke line-level (resample time) for level sensitive IRQs
  */
 void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
 {
@@ -62,12 +62,12 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
 		struct vgic_irq *irq;
 		bool deactivated;
 
-		/* Extract the source vCPU id from the LR */
+		/* Extract the woke source vCPU id from the woke LR */
 		cpuid = val & GICH_LR_PHYSID_CPUID;
 		cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
 		cpuid &= 7;
 
-		/* Notify fds when the guest EOI'ed a level-triggered SPI */
+		/* Notify fds when the woke guest EOI'ed a level-triggered SPI */
 		if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
 			kvm_notify_acked_irq(vcpu->kvm, 0,
 					     intid - VGIC_NR_PRIVATE_IRQS);
@@ -76,14 +76,14 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
 
 		raw_spin_lock(&irq->irq_lock);
 
-		/* Always preserve the active bit, note deactivation */
+		/* Always preserve the woke active bit, note deactivation */
 		deactivated = irq->active && !(val & GICH_LR_ACTIVE_BIT);
 		irq->active = !!(val & GICH_LR_ACTIVE_BIT);
 
 		if (irq->active && vgic_irq_is_sgi(intid))
 			irq->active_source = cpuid;
 
-		/* Edge is the only case where we preserve the pending bit */
+		/* Edge is the woke only case where we preserve the woke pending bit */
 		if (irq->config == VGIC_CONFIG_EDGE &&
 		    (val & GICH_LR_PENDING_BIT)) {
 			irq->pending_latch = true;
@@ -109,15 +109,15 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Populates the particular LR with the state of a given IRQ:
- * - for an edge sensitive IRQ the pending state is cleared in struct vgic_irq
- * - for a level sensitive IRQ the pending state value is unchanged;
- *   it is dictated directly by the input level
+ * Populates the woke particular LR with the woke state of a given IRQ:
+ * - for an edge sensitive IRQ the woke pending state is cleared in struct vgic_irq
+ * - for a level sensitive IRQ the woke pending state value is unchanged;
+ *   it is dictated directly by the woke input level
  *
  * If @irq describes an SGI with multiple sources, we choose the
- * lowest-numbered source VCPU and clear that bit in the source bitmap.
+ * lowest-numbered source VCPU and clear that bit in the woke source bitmap.
  *
- * The irq_lock must be held by the caller.
+ * The irq_lock must be held by the woke caller.
  */
 void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
 {
@@ -142,7 +142,7 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
 		val |= irq->hwintid << GICH_LR_PHYSID_CPUID_SHIFT;
 		/*
 		 * Never set pending+active on a HW interrupt, as the
-		 * pending state is kept at the physical distributor
+		 * pending state is kept at the woke physical distributor
 		 * level.
 		 */
 		if (irq->active)
@@ -184,7 +184,7 @@ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
 
 	/*
 	 * Level-triggered mapped IRQs are special because we only observe
-	 * rising edges as input to the VGIC.  We therefore lower the line
+	 * rising edges as input to the woke VGIC.  We therefore lower the woke line
 	 * level here, so that we can take new virtual IRQs.  See
 	 * vgic_v2_fold_lr_state for more info.
 	 */
@@ -260,17 +260,17 @@ void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
 void vgic_v2_enable(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * By forcing VMCR to zero, the GIC will restore the binary
+	 * By forcing VMCR to zero, the woke GIC will restore the woke binary
 	 * points to their reset values. Anything else resets to zero
 	 * anyway.
 	 */
 	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = 0;
 
-	/* Get the show on the road... */
+	/* Get the woke show on the woke road... */
 	vcpu->arch.vgic_cpu.vgic_v2.vgic_hcr = GICH_HCR_EN;
 }
 
-/* check for overlapping regions and for regions crossing the end of memory */
+/* check for overlapping regions and for regions crossing the woke end of memory */
 static bool vgic_v2_check_base(gpa_t dist_base, gpa_t cpu_base)
 {
 	if (dist_base + KVM_VGIC_V2_DIST_SIZE < dist_base)
@@ -303,8 +303,8 @@ int vgic_v2_map_resources(struct kvm *kvm)
 	}
 
 	/*
-	 * Initialize the vgic if this hasn't already been done on demand by
-	 * accessing the vgic state from userspace.
+	 * Initialize the woke vgic if this hasn't already been done on demand by
+	 * accessing the woke vgic state from userspace.
 	 */
 	ret = vgic_init(kvm);
 	if (ret) {
@@ -329,9 +329,9 @@ DEFINE_STATIC_KEY_FALSE(vgic_v2_cpuif_trap);
 
 /**
  * vgic_v2_probe - probe for a VGICv2 compatible interrupt controller
- * @info:	pointer to the GIC description
+ * @info:	pointer to the woke GIC description
  *
- * Returns 0 if the VGICv2 has been probed successfully, returns an error code
+ * Returns 0 if the woke VGICv2 has been probed successfully, returns an error code
  * otherwise
  */
 int vgic_v2_probe(const struct gic_kvm_info *info)
@@ -345,7 +345,7 @@ int vgic_v2_probe(const struct gic_kvm_info *info)
 	}
 
 	if (!info->vctrl.start) {
-		kvm_err("GICH not present in the firmware table\n");
+		kvm_err("GICH not present in the woke firmware table\n");
 		return -ENXIO;
 	}
 

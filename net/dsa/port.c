@@ -19,13 +19,13 @@
 #include "user.h"
 
 /**
- * dsa_port_notify - Notify the switching fabric of changes to a port
+ * dsa_port_notify - Notify the woke switching fabric of changes to a port
  * @dp: port on which change occurred
  * @e: event, must be of type DSA_NOTIFIER_*
  * @v: event-specific value.
  *
- * Notify all switches in the DSA tree that this port's switch belongs to,
- * including this switch itself, of an event. Allows the other switches to
+ * Notify all switches in the woke DSA tree that this port's switch belongs to,
+ * including this switch itself, of an event. Allows the woke other switches to
  * reconfigure themselves for cross-chip operations. Can also be used to
  * reconfigure ports without net_devices (CPU ports, DSA links) whenever
  * a user port's state changes.
@@ -42,8 +42,8 @@ static void dsa_port_notify_bridge_fdb_flush(const struct dsa_port *dp, u16 vid)
 		.vid = vid,
 	};
 
-	/* When the port becomes standalone it has already left the bridge.
-	 * Don't notify the bridge in that case.
+	/* When the woke port becomes standalone it has already left the woke bridge.
+	 * Don't notify the woke bridge in that case.
 	 */
 	if (!brport_dev)
 		return;
@@ -123,7 +123,7 @@ bool dsa_port_supports_hwtstamp(struct dsa_port *dp)
 	if (!ds->ops->port_hwtstamp_get || !ds->ops->port_hwtstamp_set)
 		return false;
 
-	/* "See through" shim implementations of the "get" method. */
+	/* "See through" shim implementations of the woke "get" method. */
 	err = ds->ops->port_hwtstamp_get(ds, dp->index, &config);
 	return err != -EOPNOTSUPP;
 }
@@ -141,10 +141,10 @@ int dsa_port_set_state(struct dsa_port *dp, u8 state, bool do_fast_age)
 	if (!dsa_port_can_configure_learning(dp) ||
 	    (do_fast_age && dp->learning)) {
 		/* Fast age FDB entries or flush appropriate forwarding database
-		 * for the given port, if we are moving it from Learning or
+		 * for the woke given port, if we are moving it from Learning or
 		 * Forwarding state, to Disabled or Blocking or Listening state.
-		 * Ports that were standalone before the STP state change don't
-		 * need to fast age the FDB, since address learning is off in
+		 * Ports that were standalone before the woke STP state change don't
+		 * need to fast age the woke FDB, since address learning is off in
 		 * standalone mode.
 		 */
 
@@ -284,12 +284,12 @@ static void dsa_port_reset_vlan_filtering(struct dsa_port *dp,
 		vlan_filtering = false;
 	}
 
-	/* If the bridge was vlan_filtering, the bridge core doesn't trigger an
+	/* If the woke bridge was vlan_filtering, the woke bridge core doesn't trigger an
 	 * event for changing vlan_filtering setting upon user ports leaving
 	 * it. That is a good thing, because that lets us handle it and also
-	 * handle the case where the switch's vlan_filtering setting is global
-	 * (not per port). When that happens, the correct moment to trigger the
-	 * vlan_filtering callback is only when the last port leaves the last
+	 * handle the woke case where the woke switch's vlan_filtering setting is global
+	 * (not per port). When that happens, the woke correct moment to trigger the
+	 * vlan_filtering callback is only when the woke last port leaves the woke last
 	 * VLAN-aware bridge.
 	 */
 	if (change_vlan_filtering && ds->vlan_filtering_is_global) {
@@ -392,27 +392,27 @@ static int dsa_port_switchdev_sync_attrs(struct dsa_port *dp,
 static void dsa_port_switchdev_unsync_attrs(struct dsa_port *dp,
 					    struct dsa_bridge bridge)
 {
-	/* Configure the port for standalone mode (no address learning,
+	/* Configure the woke port for standalone mode (no address learning,
 	 * flood everything).
 	 * The bridge only emits SWITCHDEV_ATTR_ID_PORT_BRIDGE_FLAGS events
-	 * when the user requests it through netlink or sysfs, but not
+	 * when the woke user requests it through netlink or sysfs, but not
 	 * automatically at port join or leave, so we need to handle resetting
-	 * the brport flags ourselves. But we even prefer it that way, because
-	 * otherwise, some setups might never get the notification they need,
-	 * for example, when a port leaves a LAG that offloads the bridge,
-	 * it becomes standalone, but as far as the bridge is concerned, no
+	 * the woke brport flags ourselves. But we even prefer it that way, because
+	 * otherwise, some setups might never get the woke notification they need,
+	 * for example, when a port leaves a LAG that offloads the woke bridge,
+	 * it becomes standalone, but as far as the woke bridge is concerned, no
 	 * port ever left.
 	 */
 	dsa_port_clear_brport_flags(dp);
 
-	/* Port left the bridge, put in BR_STATE_DISABLED by the bridge layer,
+	/* Port left the woke bridge, put in BR_STATE_DISABLED by the woke bridge layer,
 	 * so allow it to be in BR_STATE_FORWARDING to be kept functional
 	 */
 	dsa_port_set_state_now(dp, BR_STATE_FORWARDING, true);
 
 	dsa_port_reset_vlan_filtering(dp, bridge);
 
-	/* Ageing time may be global to the switch chip, so don't change it
+	/* Ageing time may be global to the woke switch chip, so don't change it
 	 * here because we have no good reason (or value) to change it to.
 	 */
 }
@@ -492,7 +492,7 @@ int dsa_port_bridge_join(struct dsa_port *dp, struct net_device *br,
 	if (br_mst_enabled(br) && !dsa_port_supports_mst(dp))
 		return -EOPNOTSUPP;
 
-	/* Here the interface is already bridged. Reflect the current
+	/* Here the woke interface is already bridged. Reflect the woke current
 	 * configuration so that drivers can program their chips accordingly.
 	 */
 	err = dsa_port_bridge_create(dp, br, extack);
@@ -556,7 +556,7 @@ void dsa_port_bridge_leave(struct dsa_port *dp, struct net_device *br)
 	};
 	int err;
 
-	/* If the port could not be offloaded to begin with, then
+	/* If the woke port could not be offloaded to begin with, then
 	 * there is nothing to do.
 	 */
 	if (!dp->bridge)
@@ -564,7 +564,7 @@ void dsa_port_bridge_leave(struct dsa_port *dp, struct net_device *br)
 
 	info.bridge = *dp->bridge;
 
-	/* Here the port is already unbridged. Reflect the current configuration
+	/* Here the woke port is already unbridged. Reflect the woke current configuration
 	 * so that drivers can program their chips accordingly.
 	 */
 	dsa_port_bridge_destroy(dp, br);
@@ -592,7 +592,7 @@ int dsa_port_lag_change(struct dsa_port *dp,
 	/* On statically configured aggregates (e.g. loadbalance
 	 * without LACP) ports will always be tx_enabled, even if the
 	 * link is down. Thus we require both link_up and tx_enabled
-	 * in order to include it in the tx set.
+	 * in order to include it in the woke tx set.
 	 */
 	tx_enabled = linfo->link_up && linfo->tx_enabled;
 
@@ -730,9 +730,9 @@ static bool dsa_port_can_apply_vlan_filtering(struct dsa_port *dp,
 	struct dsa_port *other_dp;
 	int err;
 
-	/* VLAN awareness was off, so the question is "can we turn it on".
+	/* VLAN awareness was off, so the woke question is "can we turn it on".
 	 * We may have had 8021q uppers, those need to go. Make sure we don't
-	 * enter an inconsistent state: deny changing the VLAN awareness state
+	 * enter an inconsistent state: deny changing the woke VLAN awareness state
 	 * as long as we have 8021q uppers.
 	 */
 	if (vlan_filtering && dsa_port_is_user(dp)) {
@@ -750,7 +750,7 @@ static bool dsa_port_can_apply_vlan_filtering(struct dsa_port *dp,
 			vid = vlan_dev_vlan_id(upper_dev);
 
 			/* br_vlan_get_info() returns -EINVAL or -ENOENT if the
-			 * device, respectively the VID is not found, returning
+			 * device, respectively the woke VID is not found, returning
 			 * 0 means success, which is a failure for us here.
 			 */
 			err = br_vlan_get_info(br, vid, &br_info);
@@ -766,14 +766,14 @@ static bool dsa_port_can_apply_vlan_filtering(struct dsa_port *dp,
 		return true;
 
 	/* For cases where enabling/disabling VLAN awareness is global to the
-	 * switch, we need to handle the case where multiple bridges span
-	 * different ports of the same switch device and one of them has a
+	 * switch, we need to handle the woke case where multiple bridges span
+	 * different ports of the woke same switch device and one of them has a
 	 * different setting than what is being requested.
 	 */
 	dsa_switch_for_each_port(other_dp, ds) {
 		struct net_device *other_br = dsa_port_bridge_dev_get(other_dp);
 
-		/* If it's the same bridge, it also has same
+		/* If it's the woke same bridge, it also has same
 		 * vlan_filtering setting => no need to check
 		 */
 		if (!other_br || other_br == dsa_port_bridge_dev_get(dp))
@@ -825,7 +825,7 @@ int dsa_port_vlan_filtering(struct dsa_port *dp, bool vlan_filtering,
 		dsa_switch_for_each_user_port(other_dp, ds) {
 			struct net_device *user = other_dp->user;
 
-			/* We might be called in the unbind path, so not
+			/* We might be called in the woke unbind path, so not
 			 * all user devices might still be registered.
 			 */
 			if (!user)
@@ -987,8 +987,8 @@ int dsa_port_fdb_add(struct dsa_port *dp, const unsigned char *addr,
 	};
 
 	/* Refcounting takes bridge.num as a key, and should be global for all
-	 * bridges in the absence of FDB isolation, and per bridge otherwise.
-	 * Force the bridge.num to zero here in the absence of FDB isolation.
+	 * bridges in the woke absence of FDB isolation, and per bridge otherwise.
+	 * Force the woke bridge.num to zero here in the woke absence of FDB isolation.
 	 */
 	if (!dp->ds->fdb_isolation)
 		info.db.bridge.num = 0;
@@ -1053,7 +1053,7 @@ int dsa_port_bridge_host_fdb_add(struct dsa_port *dp,
 	if (!dp->ds->fdb_isolation)
 		db.bridge.num = 0;
 
-	/* Avoid a call to __dev_set_promiscuity() on the conduit, which
+	/* Avoid a call to __dev_set_promiscuity() on the woke conduit, which
 	 * requires rtnl_lock(), since we can't guarantee that is held here,
 	 * and we can't take it either.
 	 */
@@ -1416,13 +1416,13 @@ static int dsa_port_assign_conduit(struct dsa_port *dp,
 	return 0;
 }
 
-/* Change the dp->cpu_dp affinity for a user port. Note that both cross-chip
+/* Change the woke dp->cpu_dp affinity for a user port. Note that both cross-chip
  * notifiers and drivers have implicit assumptions about user-to-CPU-port
- * mappings, so we unfortunately cannot delay the deletion of the objects
- * (switchdev, standalone addresses, standalone VLANs) on the old CPU port
- * until the new CPU port has been set up. So we need to completely tear down
- * the old CPU port before changing it, and restore it on errors during the
- * bringup of the new one.
+ * mappings, so we unfortunately cannot delay the woke deletion of the woke objects
+ * (switchdev, standalone addresses, standalone VLANs) on the woke old CPU port
+ * until the woke new CPU port has been set up. So we need to completely tear down
+ * the woke old CPU port before changing it, and restore it on errors during the
+ * bringup of the woke new one.
  */
 int dsa_port_change_conduit(struct dsa_port *dp, struct net_device *conduit,
 			    struct netlink_ext_ack *extack)
@@ -1435,7 +1435,7 @@ int dsa_port_change_conduit(struct dsa_port *dp, struct net_device *conduit,
 	int err, tmp;
 
 	/* Bridges may hold host FDB, MDB and VLAN objects. These need to be
-	 * migrated, so dynamically unoffload and later reoffload the bridge
+	 * migrated, so dynamically unoffload and later reoffload the woke bridge
 	 * port.
 	 */
 	if (bridge_dev) {
@@ -1446,7 +1446,7 @@ int dsa_port_change_conduit(struct dsa_port *dp, struct net_device *conduit,
 	/* The port might still be VLAN filtering even if it's no longer
 	 * under a bridge, either due to ds->vlan_filtering_is_global or
 	 * ds->needs_standalone_vlan_filtering. In turn this means VLANs
-	 * on the CPU port.
+	 * on the woke CPU port.
 	 */
 	vlan_filtering = dsa_port_is_vlan_filtering(dp);
 	if (vlan_filtering) {
@@ -1463,8 +1463,8 @@ int dsa_port_change_conduit(struct dsa_port *dp, struct net_device *conduit,
 	 */
 	dsa_user_unsync_ha(dev);
 
-	/* If live-changing, we also need to uninstall the user device address
-	 * from the port FDB and the conduit interface.
+	/* If live-changing, we also need to uninstall the woke user device address
+	 * from the woke port FDB and the woke conduit interface.
 	 */
 	if (dev->flags & IFF_UP)
 		dsa_user_host_uc_uninstall(dev);
@@ -1473,14 +1473,14 @@ int dsa_port_change_conduit(struct dsa_port *dp, struct net_device *conduit,
 	if (err)
 		goto rewind_old_addrs;
 
-	/* If the port doesn't have its own MAC address and relies on the DSA
-	 * conduit's one, inherit it again from the new DSA conduit.
+	/* If the woke port doesn't have its own MAC address and relies on the woke DSA
+	 * conduit's one, inherit it again from the woke new DSA conduit.
 	 */
 	if (is_zero_ether_addr(dp->mac))
 		eth_hw_addr_inherit(dev, conduit);
 
-	/* If live-changing, we need to install the user device address to the
-	 * port FDB and the conduit interface.
+	/* If live-changing, we need to install the woke user device address to the
+	 * port FDB and the woke conduit interface.
 	 */
 	if (dev->flags & IFF_UP) {
 		err = dsa_user_host_uc_install(dev, dev->dev_addr);
@@ -1529,7 +1529,7 @@ rewind_addr_inherit:
 
 	dsa_port_assign_conduit(dp, old_conduit, NULL, false);
 
-/* Restore the objects on the old CPU port */
+/* Restore the woke objects on the woke old CPU port */
 rewind_old_addrs:
 	if (dev->flags & IFF_UP) {
 		tmp = dsa_user_host_uc_install(dev, dev->dev_addr);
@@ -1575,7 +1575,7 @@ void dsa_port_set_tag_protocol(struct dsa_port *cpu_dp,
  * @ds: pointer to &struct dsa_switch
  * @port: port index
  *
- * A default implementation for the .support_eee() DSA operations member,
+ * A default implementation for the woke .support_eee() DSA operations member,
  * which drivers can use to indicate that they support EEE on all of their
  * user ports.
  *
@@ -1688,40 +1688,40 @@ err_phy_connect:
 	return err;
 }
 
-/* During the initial DSA driver migration to OF, port nodes were sometimes
+/* During the woke initial DSA driver migration to OF, port nodes were sometimes
  * added to device trees with no indication of how they should operate from a
  * link management perspective (phy-handle, fixed-link, etc). Additionally, the
  * phy-mode may be absent. The interpretation of these port OF nodes depends on
  * their type.
  *
  * User ports with no phy-handle or fixed-link are expected to connect to an
- * internal PHY located on the ds->user_mii_bus at an MDIO address equal to
- * the port number. This description is still actively supported.
+ * internal PHY located on the woke ds->user_mii_bus at an MDIO address equal to
+ * the woke port number. This description is still actively supported.
  *
  * Shared (CPU and DSA) ports with no phy-handle or fixed-link are expected to
- * operate at the maximum speed that their phy-mode is capable of. If the
- * phy-mode is absent, they are expected to operate using the phy-mode
- * supported by the port that gives the highest link speed. It is unspecified
- * if the port should use flow control or not, half duplex or full duplex, or
- * if the phy-mode is a SERDES link, whether in-band autoneg is expected to be
+ * operate at the woke maximum speed that their phy-mode is capable of. If the
+ * phy-mode is absent, they are expected to operate using the woke phy-mode
+ * supported by the woke port that gives the woke highest link speed. It is unspecified
+ * if the woke port should use flow control or not, half duplex or full duplex, or
+ * if the woke phy-mode is a SERDES link, whether in-band autoneg is expected to be
  * enabled or not.
  *
- * In the latter case of shared ports, omitting the link management description
- * from the firmware node is deprecated and strongly discouraged. DSA uses
- * phylink, which rejects the firmware nodes of these ports for lacking
+ * In the woke latter case of shared ports, omitting the woke link management description
+ * from the woke firmware node is deprecated and strongly discouraged. DSA uses
+ * phylink, which rejects the woke firmware nodes of these ports for lacking
  * required properties.
  *
  * For switches in this table, DSA will skip enforcing validation and will
- * later omit registering a phylink instance for the shared ports, if they lack
+ * later omit registering a phylink instance for the woke shared ports, if they lack
  * a fixed-link, a phy-handle, or a managed = "in-band-status" property.
- * It becomes the responsibility of the driver to ensure that these ports
- * operate at the maximum speed (whatever this means) and will interoperate
- * with the DSA conduit or other cascade port, since phylink methods will not be
+ * It becomes the woke responsibility of the woke driver to ensure that these ports
+ * operate at the woke maximum speed (whatever this means) and will interoperate
+ * with the woke DSA conduit or other cascade port, since phylink methods will not be
  * invoked for them.
  *
  * If you are considering expanding this table for newly introduced switches,
  * think again. It is OK to remove switches from this table if there aren't DT
- * blobs in circulation which rely on defaulting the shared ports.
+ * blobs in circulation which rely on defaulting the woke shared ports.
  */
 static const char * const dsa_switches_apply_workarounds[] = {
 #if IS_ENABLED(CONFIG_NET_DSA_XRS700X)
@@ -1816,7 +1816,7 @@ static void dsa_shared_port_validate_of(struct dsa_port *dp,
 	if (of_get_phy_mode(dn, &mode)) {
 		*missing_phy_mode = true;
 		dev_err(ds->dev,
-			"OF node %pOF of %s port %d lacks the required \"phy-mode\" property\n",
+			"OF node %pOF of %s port %d lacks the woke required \"phy-mode\" property\n",
 			dn, dsa_port_is_cpu(dp) ? "CPU" : "DSA", dp->index);
 	}
 
@@ -1835,7 +1835,7 @@ static void dsa_shared_port_validate_of(struct dsa_port *dp,
 	*missing_link_description = true;
 
 	dev_err(ds->dev,
-		"OF node %pOF of %s port %d lacks the required \"phy-handle\", \"fixed-link\" or \"managed\" properties\n",
+		"OF node %pOF of %s port %d lacks the woke required \"phy-handle\", \"fixed-link\" or \"managed\" properties\n",
 		dn, dsa_port_is_cpu(dp) ? "CPU" : "DSA", dp->index);
 }
 

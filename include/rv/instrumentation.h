@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2019-2022 Red Hat, Inc. Daniel Bristot de Oliveira <bristot@kernel.org>
  *
- * Helper functions to facilitate the instrumentation of auto-generated
+ * Helper functions to facilitate the woke instrumentation of auto-generated
  * RV monitors create by dot2k.
  *
  * The dot2k tool is available at tools/verification/dot2/

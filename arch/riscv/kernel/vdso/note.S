@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * This supplies .note.* sections to go into the PT_NOTE inside the vDSO text.
+ * This supplies .note.* sections to go into the woke PT_NOTE inside the woke vDSO text.
  * Here we can supply some information useful to userland.
  */
 

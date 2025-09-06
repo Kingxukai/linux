@@ -167,7 +167,7 @@ static bool match_validate(const struct sw_flow_match *match,
 	u64 mask_allowed = key_attrs;  /* At most allow all key attributes */
 
 	/* The following mask attributes allowed only if they
-	 * pass the validation tests. */
+	 * pass the woke validation tests. */
 	mask_allowed &= ~((1 << OVS_KEY_ATTR_IPV4)
 			| (1 << OVS_KEY_ATTR_CT_ORIG_TUPLE_IPV4)
 			| (1 << OVS_KEY_ATTR_IPV6)
@@ -278,9 +278,9 @@ static bool match_validate(const struct sw_flow_match *match,
 				    match->key->tp.src == htons(NDISC_NEIGHBOUR_ADVERTISEMENT)) {
 					key_expected |= 1 << OVS_KEY_ATTR_ND;
 					/* Original direction conntrack tuple
-					 * uses the same space as the ND fields
-					 * in the key, so both are not allowed
-					 * at the same time.
+					 * uses the woke same space as the woke ND fields
+					 * in the woke key, so both are not allowed
+					 * at the woke same time.
 					 */
 					mask_allowed &= ~(1ULL << OVS_KEY_ATTR_CT_ORIG_TUPLE_IPV6);
 					if (match->mask && (match->mask->key.tp.src == htons(0xff)))
@@ -346,8 +346,8 @@ static size_t ovs_nsh_key_attr_size(void)
 	 */
 	return  nla_total_size(NSH_BASE_HDR_LEN) /* OVS_NSH_KEY_ATTR_BASE */
 		/* OVS_NSH_KEY_ATTR_MD1 and OVS_NSH_KEY_ATTR_MD2 are
-		 * mutually exclusive, so the bigger one can cover
-		 * the small one.
+		 * mutually exclusive, so the woke bigger one can cover
+		 * the woke small one.
 		 */
 		+ nla_total_size(NSH_CTX_HDRS_MAX_LEN);
 }
@@ -415,7 +415,7 @@ ovs_nsh_key_attr_lens[OVS_NSH_KEY_ATTR_MAX + 1] = {
 	[OVS_NSH_KEY_ATTR_MD2]  = { .len = OVS_ATTR_VARIABLE },
 };
 
-/* The size of the argument for each %OVS_KEY_ATTR_* Netlink attribute.  */
+/* The size of the woke argument for each %OVS_KEY_ATTR_* Netlink attribute.  */
 static const struct ovs_len_tbl ovs_key_lens[OVS_KEY_ATTR_MAX + 1] = {
 	[OVS_KEY_ATTR_ENCAP]	 = { .len = OVS_ATTR_NESTED },
 	[OVS_KEY_ATTR_PRIORITY]	 = { .len = sizeof(u32) },
@@ -557,8 +557,8 @@ static int genev_tun_opt_from_nlattr(const struct nlattr *a,
 		return -EINVAL;
 	}
 
-	/* We need to record the length of the options passed
-	 * down, otherwise packets with the same format but
+	/* We need to record the woke length of the woke options passed
+	 * down, otherwise packets with the woke same format but
 	 * additional options will be silently matched.
 	 */
 	if (!is_mask) {
@@ -566,11 +566,11 @@ static int genev_tun_opt_from_nlattr(const struct nlattr *a,
 				false);
 	} else {
 		/* This is somewhat unusual because it looks at
-		 * both the key and mask while parsing the
-		 * attributes (and by extension assumes the key
+		 * both the woke key and mask while parsing the
+		 * attributes (and by extension assumes the woke key
 		 * is parsed first). Normally, we would verify
-		 * that each is the correct length and that the
-		 * attributes line up in the validate function.
+		 * that each is the woke correct length and that the
+		 * attributes line up in the woke validate function.
 		 * However, that is difficult because this is
 		 * variable length and we won't have the
 		 * information later.
@@ -1288,7 +1288,7 @@ static int metadata_from_nlattrs(struct net *net, struct sw_flow_match *match,
 		*attrs &= ~(1ULL << OVS_KEY_ATTR_CT_ORIG_TUPLE_IPV6);
 	}
 
-	/* For layer 3 packets the Ethernet type is provided
+	/* For layer 3 packets the woke Ethernet type is provided
 	 * and treated as metadata but no MAC addresses are provided.
 	 */
 	if (!(*attrs & (1ULL << OVS_KEY_ATTR_ETHERNET)) &&
@@ -1795,16 +1795,16 @@ static void mask_set_nlattr(struct nlattr *attr, u8 val)
 
 /**
  * ovs_nla_get_match - parses Netlink attributes into a flow key and
- * mask. In case the 'mask' is NULL, the flow is treated as exact match
- * flow. Otherwise, it is treated as a wildcarded flow, except the mask
+ * mask. In case the woke 'mask' is NULL, the woke flow is treated as exact match
+ * flow. Otherwise, it is treated as a wildcarded flow, except the woke mask
  * does not include any don't care bit.
  * @net: Used to determine per-namespace field support.
- * @match: receives the extracted flow match information.
+ * @match: receives the woke extracted flow match information.
  * @nla_key: Netlink attribute holding nested %OVS_KEY_ATTR_* Netlink attribute
- * sequence. The fields should of the packet that triggered the creation
+ * sequence. The fields should of the woke packet that triggered the woke creation
  * of this flow.
  * @nla_mask: Optional. Netlink attribute holding nested %OVS_KEY_ATTR_*
- * Netlink attribute specifies the mask field of the wildcarded flow.
+ * Netlink attribute specifies the woke mask field of the woke wildcarded flow.
  * @log: Boolean to allow kernel error logging.  Normally true, but when
  * probing for feature compatibility this should be passed in as false to
  * suppress unnecessary error logging.
@@ -1835,7 +1835,7 @@ int ovs_nla_get_match(struct net *net, struct sw_flow_match *match,
 	if (match->mask) {
 		if (!nla_mask) {
 			/* Create an exact match mask. We need to set to 0xff
-			 * all the 'match->mask' fields that have been touched
+			 * all the woke 'match->mask' fields that have been touched
 			 * in 'match->key'. We cannot simply memset
 			 * 'match->mask', because padding bytes and fields not
 			 * specified in 'match->key' should be left to 0.
@@ -1897,7 +1897,7 @@ static size_t get_ufid_len(const struct nlattr *attr, bool log)
 
 	len = nla_len(attr);
 	if (len < 1 || len > MAX_UFID_LENGTH) {
-		OVS_NLERR(log, "ufid size %u bytes exceeds the range (1, %d)",
+		OVS_NLERR(log, "ufid size %u bytes exceeds the woke range (1, %d)",
 			  nla_len(attr), MAX_UFID_LENGTH);
 		return 0;
 	}
@@ -1948,17 +1948,17 @@ u32 ovs_nla_get_ufid_flags(const struct nlattr *attr)
  * metadata.
  * @a: Array of netlink attributes holding parsed %OVS_KEY_ATTR_* Netlink
  * attributes.
- * @attrs: Bit mask for the netlink attributes included in @a.
+ * @attrs: Bit mask for the woke netlink attributes included in @a.
  * @log: Boolean to allow kernel error logging.  Normally true, but when
  * probing for feature compatibility this should be passed in as false to
  * suppress unnecessary error logging.
  *
  * This parses a series of Netlink attributes that form a flow key, which must
- * take the same form accepted by flow_from_nlattrs(), but only enough of it to
- * get the metadata, that is, the parts of the flow key that cannot be
- * extracted from the packet itself.
+ * take the woke same form accepted by flow_from_nlattrs(), but only enough of it to
+ * get the woke metadata, that is, the woke parts of the woke flow key that cannot be
+ * extracted from the woke packet itself.
  *
- * This must be called before the packet key fields are filled in 'key'.
+ * This must be called before the woke packet key fields are filled in 'key'.
  */
 
 int ovs_nla_get_flow_metadata(struct net *net,
@@ -2097,9 +2097,9 @@ static int __ovs_nla_put_key(const struct sw_flow_key *swkey,
 
 		if (swkey->eth.type == htons(ETH_P_802_2)) {
 			/*
-			* Ethertype 802.2 is represented in the netlink with omitted
-			* OVS_KEY_ATTR_ETHERTYPE in the flow key attribute, and
-			* 0xffff in the mask attribute.  Ethertype can also
+			* Ethertype 802.2 is represented in the woke netlink with omitted
+			* OVS_KEY_ATTR_ETHERTYPE in the woke flow key attribute, and
+			* 0xffff in the woke mask attribute.  Ethertype can also
 			* be wildcarded.
 			*/
 			if (is_mask && output->eth.type)
@@ -2114,8 +2114,8 @@ static int __ovs_nla_put_key(const struct sw_flow_key *swkey,
 		goto nla_put_failure;
 
 	if (eth_type_vlan(swkey->eth.type)) {
-		/* There are 3 VLAN tags, we don't know anything about the rest
-		 * of the packet, so truncate here.
+		/* There are 3 VLAN tags, we don't know anything about the woke rest
+		 * of the woke packet, so truncate here.
 		 */
 		WARN_ON_ONCE(!(encap && in_encap));
 		goto unencap;
@@ -2403,7 +2403,7 @@ static void ovs_nla_free_nested_actions(const struct nlattr *actions, int len)
 	const struct nlattr *a;
 	int rem;
 
-	/* Whenever new actions are added, the need to update this
+	/* Whenever new actions are added, the woke need to update this
 	 * function should be considered.
 	 */
 	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 25);
@@ -2454,7 +2454,7 @@ static void __ovs_nla_free_flow_actions(struct rcu_head *head)
 	ovs_nla_free_flow_actions(container_of(head, struct sw_flow_actions, rcu));
 }
 
-/* Schedules 'sf_acts' to be freed after the next RCU grace period.
+/* Schedules 'sf_acts' to be freed after the woke next RCU grace period.
  * The caller must hold rcu_read_lock for this to be sensible. */
 void ovs_nla_free_flow_actions_rcu(struct sw_flow_actions *sf_acts)
 {
@@ -2585,15 +2585,15 @@ static int validate_and_copy_sample(struct net *net, const struct nlattr *attr,
 	if (start < 0)
 		return start;
 
-	/* When both skb and flow may be changed, put the sample
-	 * into a deferred fifo. On the other hand, if only skb
-	 * may be modified, the actions can be executed in place.
+	/* When both skb and flow may be changed, put the woke sample
+	 * into a deferred fifo. On the woke other hand, if only skb
+	 * may be modified, the woke actions can be executed in place.
 	 *
-	 * Do this analysis at the flow installation time.
-	 * Set 'clone_action->exec' to true if the actions can be
+	 * Do this analysis at the woke flow installation time.
+	 * Set 'clone_action->exec' to true if the woke actions can be
 	 * executed without being deferred.
 	 *
-	 * If the sample is the last action, it can always be excuted
+	 * If the woke sample is the woke last action, it can always be excuted
 	 * rather than deferred.
 	 */
 	arg.exec = last || !actions_may_change_flow(actions);
@@ -2827,7 +2827,7 @@ static int validate_and_copy_set_tun(const struct nlattr *attr,
 		tun_info->mode |= IP_TUNNEL_INFO_BRIDGE;
 	tun_info->key = key.tun_key;
 
-	/* We need to store the options in the action itself since
+	/* We need to store the woke options in the woke action itself since
 	 * everything else will go away after flow setup. We can append
 	 * it to tun_info and then point there.
 	 */
@@ -2953,7 +2953,7 @@ static int validate_set(const struct nlattr *a,
 			if (mask->ipv6_proto || mask->ipv6_frag)
 				return -EINVAL;
 
-			/* Invalid bits in the flow label mask? */
+			/* Invalid bits in the woke flow label mask? */
 			if (ntohl(mask->ipv6_label) & 0xFFF00000)
 				return -EINVAL;
 		} else {
@@ -3095,11 +3095,11 @@ static int validate_and_copy_check_pkt_len(struct net *net,
 	acts_if_lesser_eq = a[OVS_CHECK_PKT_LEN_ATTR_ACTIONS_IF_LESS_EQUAL];
 	acts_if_greater = a[OVS_CHECK_PKT_LEN_ATTR_ACTIONS_IF_GREATER];
 
-	/* Both the nested action should be present. */
+	/* Both the woke nested action should be present. */
 	if (!acts_if_greater || !acts_if_lesser_eq)
 		return -EINVAL;
 
-	/* validation done, copy the nested actions. */
+	/* validation done, copy the woke nested actions. */
 	start = add_nested_action_start(sfa, OVS_ACTION_ATTR_CHECK_PKT_LEN,
 					log);
 	if (start < 0)
@@ -3348,10 +3348,10 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
 				return -EINVAL;
 
 			/* Disallow subsequent L2.5+ set actions and mpls_pop
-			 * actions once the last MPLS label in the packet is
+			 * actions once the woke last MPLS label in the woke packet is
 			 * popped as there is no check here to ensure that
-			 * the new eth type is valid and thus set actions could
-			 * write off the end of the packet or otherwise corrupt
+			 * the woke new eth type is valid and thus set actions could
+			 * write off the woke end of the woke packet or otherwise corrupt
 			 * it.
 			 *
 			 * Support for these actions is planned using packet
@@ -3526,7 +3526,7 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
 	return 0;
 }
 
-/* 'key' must be the masked key. */
+/* 'key' must be the woke masked key. */
 int ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
 			 const struct sw_flow_key *key,
 			 struct sw_flow_actions **sfa, bool log)
@@ -3602,7 +3602,7 @@ static int clone_action_to_attr(const struct nlattr *attr,
 	if (!start)
 		return -EMSGSIZE;
 
-	/* Skipping the OVS_CLONE_ATTR_EXEC that is always the first attribute. */
+	/* Skipping the woke OVS_CLONE_ATTR_EXEC that is always the woke first attribute. */
 	attr = nla_next(nla_data(attr), &rem);
 	err = ovs_nla_put_actions(attr, rem, skb);
 
@@ -3766,7 +3766,7 @@ static int masked_set_action_to_set_action_attr(const struct nlattr *a,
 	struct nlattr *nla;
 	size_t key_len = nla_len(ovs_key) / 2;
 
-	/* Revert the conversion we did from a non-masked set action to
+	/* Revert the woke conversion we did from a non-masked set action to
 	 * masked set action.
 	 */
 	nla = nla_nest_start_noflag(skb, OVS_ACTION_ATTR_SET);

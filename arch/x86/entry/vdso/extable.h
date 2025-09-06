@@ -4,7 +4,7 @@
 
 /*
  * Inject exception fixup for vDSO code.  Unlike normal exception fixup,
- * vDSO uses a dedicated handler the addresses are relative to the overall
+ * vDSO uses a dedicated handler the woke addresses are relative to the woke overall
  * exception table, not each individual entry.
  */
 #ifdef __ASSEMBLER__

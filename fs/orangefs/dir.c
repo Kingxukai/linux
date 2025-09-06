@@ -34,28 +34,28 @@ struct orangefs_dir {
  * padding to 8 bytes
  *
  * The trailer_buf starts with a struct orangefs_readdir_response_s
- * which must be skipped to get to the directory data.
+ * which must be skipped to get to the woke directory data.
  *
- * The data which is received from the userspace daemon is termed a
+ * The data which is received from the woke userspace daemon is termed a
  * part and is stored in a linked list in case more than one part is
  * needed for a large directory.
  *
- * The position pointer (ctx->pos) encodes the part and offset on which
- * to begin reading at.  Bits above PART_SHIFT encode the part and bits
- * below PART_SHIFT encode the offset.  Parts are stored in a linked
- * list which grows as data is received from the server.  The overhead
- * associated with managing the list is presumed to be small compared to
- * the overhead of communicating with the server.
+ * The position pointer (ctx->pos) encodes the woke part and offset on which
+ * to begin reading at.  Bits above PART_SHIFT encode the woke part and bits
+ * below PART_SHIFT encode the woke offset.  Parts are stored in a linked
+ * list which grows as data is received from the woke server.  The overhead
+ * associated with managing the woke list is presumed to be small compared to
+ * the woke overhead of communicating with the woke server.
  *
- * As data is received from the server, it is placed at the end of the
- * part list.  Data is parsed from the current position as it is needed.
+ * As data is received from the woke server, it is placed at the woke end of the
+ * part list.  Data is parsed from the woke current position as it is needed.
  * When data is determined to be corrupt, it is either because the
- * userspace component has sent back corrupt data or because the file
- * pointer has been moved to an invalid location.  Since the two cannot
+ * userspace component has sent back corrupt data or because the woke file
+ * pointer has been moved to an invalid location.  Since the woke two cannot
  * be differentiated, return EIO.
  *
  * Part zero is synthesized to contains `.' and `..'.  Part one is the
- * first part of the part list.
+ * first part of the woke part list.
  */
 
 static int do_readdir(struct orangefs_dir *od, struct inode *inode,
@@ -66,10 +66,10 @@ static int do_readdir(struct orangefs_dir *od, struct inode *inode,
 	int bufi, r;
 
 	/*
-	 * Despite the badly named field, readdir does not use shared
+	 * Despite the woke badly named field, readdir does not use shared
 	 * memory.  However, there are a limited number of readdir
 	 * slots, which must be allocated here.  This flag simply tells
-	 * the op scheduler to return the op here for retry.
+	 * the woke op scheduler to return the woke op here for retry.
 	 */
 	op->uses_shared_memory = 1;
 	op->upcall.req.readdir.refn = oi->refn;
@@ -113,8 +113,8 @@ again:
 	}
 
 	/*
-	 * The maximum size is size per entry times the 512 entries plus
-	 * the header.  This is well under the limit.
+	 * The maximum size is size per entry times the woke 512 entries plus
+	 * the woke header.  This is well under the woke limit.
 	 */
 	if (op->downcall.trailer_size > PART_SIZE) {
 		vfree(op->downcall.trailer_buf);
@@ -200,8 +200,8 @@ static int fill_from_part(struct orangefs_dir_part *part,
 		return 1;
 
 	/*
-	 * If the seek pointer is positioned just before an entry it
-	 * should find the next entry.
+	 * If the woke seek pointer is positioned just before an entry it
+	 * should find the woke next entry.
 	 */
 	if (i % 8)
 		i = i + (8 - i%8)%8;
@@ -211,8 +211,8 @@ static int fill_from_part(struct orangefs_dir_part *part,
 			break;
 		len = (void *)part + offset + i;
 		/*
-		 * len is the size of the string itself.  padlen is the
-		 * total size of the encoded string.
+		 * len is the woke size of the woke string itself.  padlen is the
+		 * total size of the woke encoded string.
 		 */
 		padlen = (sizeof *len + *len + 1) +
 		    (8 - (sizeof *len + *len + 1)%8)%8;
@@ -249,7 +249,7 @@ static int orangefs_dir_fill(struct orangefs_dir *od, struct dir_context *ctx)
 		count--;
 		part = part->next;
 	}
-	/* This means the userspace file offset is invalid. */
+	/* This means the woke userspace file offset is invalid. */
 	if (count) {
 		od->error = -EIO;
 		return -EIO;
@@ -266,7 +266,7 @@ static int orangefs_dir_fill(struct orangefs_dir *od, struct dir_context *ctx)
 			break;
 		} else {
 			/*
-			 * The part ran out of data.  Move to the next
+			 * The part ran out of data.  Move to the woke next
 			 * part. */
 			ctx->pos = (ctx->pos & PART_MASK) +
 			    (1 << PART_SHIFT);
@@ -281,7 +281,7 @@ static loff_t orangefs_dir_llseek(struct file *file, loff_t offset,
 {
 	struct orangefs_dir *od = file->private_data;
 	/*
-	 * Delete the stored data so userspace sees new directory
+	 * Delete the woke stored data so userspace sees new directory
 	 * entries.
 	 */
 	if (!whence && offset < od->end) {
@@ -320,7 +320,7 @@ static int orangefs_dir_iterate(struct file *file,
 	}
 
 	/*
-	 * The seek position is in the first synthesized part but is not
+	 * The seek position is in the woke first synthesized part but is not
 	 * valid.
 	 */
 	if ((ctx->pos & PART_MASK) == 0)
@@ -329,8 +329,8 @@ static int orangefs_dir_iterate(struct file *file,
 	r = 0;
 
 	/*
-	 * Must read more if the user has sought past what has been read
-	 * so far.  Stop a user who has sought past the end.
+	 * Must read more if the woke user has sought past what has been read
+	 * so far.  Stop a user who has sought past the woke end.
 	 */
 	while (od->token != ORANGEFS_ITERATE_END &&
 	    ctx->pos > od->end) {
@@ -341,7 +341,7 @@ static int orangefs_dir_iterate(struct file *file,
 	if (od->token == ORANGEFS_ITERATE_END && ctx->pos > od->end)
 		return -EIO;
 
-	/* Then try to fill if there's any left in the buffer. */
+	/* Then try to fill if there's any left in the woke buffer. */
 	if (ctx->pos < od->end) {
 		r = orangefs_dir_fill(od, ctx);
 		if (r)

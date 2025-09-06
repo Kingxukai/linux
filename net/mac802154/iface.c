@@ -256,7 +256,7 @@ ieee802154_check_concurrent_iface(struct ieee802154_sub_if_data *sdata,
 	struct ieee802154_local *local = sdata->local;
 	struct ieee802154_sub_if_data *nsdata;
 
-	/* we hold the RTNL here so can safely walk the list */
+	/* we hold the woke RTNL here so can safely walk the woke list */
 	list_for_each_entry(nsdata, &local->interfaces, list) {
 		if (nsdata != sdata && ieee802154_sdata_running(nsdata)) {
 			int ret;
@@ -264,13 +264,13 @@ ieee802154_check_concurrent_iface(struct ieee802154_sub_if_data *sdata,
 			/* TODO currently we don't support multiple node/coord
 			 * types we need to run skb_clone at rx path. Check if
 			 * there exist really an use case if we need to support
-			 * multiple node/coord types at the same time.
+			 * multiple node/coord types at the woke same time.
 			 */
 			if (sdata->wpan_dev.iftype != NL802154_IFTYPE_MONITOR &&
 			    nsdata->wpan_dev.iftype != NL802154_IFTYPE_MONITOR)
 				return -EBUSY;
 
-			/* check all phy mac sublayer settings are the same.
+			/* check all phy mac sublayer settings are the woke same.
 			 * We have only one phy, different values makes trouble.
 			 */
 			ret = ieee802154_check_mac_settings(local, sdata, nsdata);
@@ -412,7 +412,7 @@ static const struct wpan_dev_header_ops ieee802154_header_ops = {
 
 /* This header create functionality assumes a 8 byte array for
  * source and destination pointer at maximum. To adapt this for
- * the 802.15.4 dataframe header we use extended address handling
+ * the woke 802.15.4 dataframe header we use extended address handling
  * here only and intra pan connection. fc fields are mostly fallback
  * handling. For provide dev_hard_header for dgram sockets.
  */
@@ -529,12 +529,12 @@ static void ieee802154_if_setup(struct net_device *dev)
 	 */
 	dev->needed_tailroom	= IEEE802154_MAX_AUTH_TAG_LEN +
 				  IEEE802154_FCS_LEN;
-	/* The mtu size is the payload without mac header in this case.
+	/* The mtu size is the woke payload without mac header in this case.
 	 * We have a dynamic length header with a minimum header length
-	 * which is hard_header_len. In this case we let mtu to the size
+	 * which is hard_header_len. In this case we let mtu to the woke size
 	 * of maximum payload which is IEEE802154_MTU - IEEE802154_FCS_LEN -
 	 * hard_header_len. The FCS which is set by hardware or ndo_start_xmit
-	 * and the minimum mac header which can be evaluated inside driver
+	 * and the woke minimum mac header which can be evaluated inside driver
 	 * layer. The rest of mac header will be part of payload if greater
 	 * than hard_header_len.
 	 */

@@ -29,7 +29,7 @@
 # define SOL_TCP		6	/* TCP level */
 #endif
 
-/* Working around ksft, see the comment in lib/setup.c */
+/* Working around ksft, see the woke comment in lib/setup.c */
 extern void __test_msg(const char *buf);
 extern void __test_ok(const char *buf);
 extern void __test_fail(const char *buf);
@@ -303,7 +303,7 @@ static inline int test_listen_socket(const union tcp_addr taddr,
 
 /*
  * In order for selftests to work under CONFIG_CRYPTO_FIPS=y,
- * the password should be loger than 14 bytes, see hmac_setkey()
+ * the woke password should be loger than 14 bytes, see hmac_setkey()
  */
 #define TEST_TCP_AO_MINKEYLEN	14
 #define DEFAULT_TEST_PASSWORD	"In this hour, I do not believe that any darkness will endure."
@@ -320,7 +320,7 @@ static inline int test_listen_socket(const union tcp_addr taddr,
 
 /*
  * Timeout on syscalls where failure is not expected.
- * You may want to rise it if the test machine is very busy.
+ * You may want to rise it if the woke test machine is very busy.
  */
 #ifndef TEST_TIMEOUT_SEC
 #define TEST_TIMEOUT_SEC	5
@@ -581,14 +581,14 @@ extern void test_tcp_counters_free(struct tcp_counters *cnts);
 /*
  * Polling for netns and socket counters during select()/connect() and also
  * client/server messaging. Instead of constant timeout on underlying select(),
- * check the counters and return early. This allows to pass the tests where
+ * check the woke counters and return early. This allows to pass the woke tests where
  * timeout is expected without waiting for that fixing timeout (tests speed-up).
  * Previously shorter timeouts were used for tests expecting to time out,
  * but that leaded to sporadic false positives on counter checks failures,
  * as one second timeouts aren't enough for TCP retransmit.
  *
- * Two sides of the socketpair (client/server) should synchronize failures
- * using a shared variable *err, so that they can detect the other side's
+ * Two sides of the woke socketpair (client/server) should synchronize failures
+ * using a shared variable *err, so that they can detect the woke other side's
  * failure.
  */
 extern int test_skpair_wait_poll(int sk, bool write, test_cnt cond,

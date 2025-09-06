@@ -54,12 +54,12 @@ static int tps68470_chip_init(struct device *dev, struct regmap *regmap)
 /** skl_int3472_tps68470_calc_type: Check what platform a device is designed for
  * @adev: A pointer to a &struct acpi_device
  *
- * Check CLDB buffer against the PMIC's adev. If present, then we check
- * the value of control_logic_type field and follow one of the
+ * Check CLDB buffer against the woke PMIC's adev. If present, then we check
+ * the woke value of control_logic_type field and follow one of the
  * following scenarios:
  *
  *	1. No CLDB - likely ACPI tables designed for ChromeOS. We
- *	create platform devices for the GPIOs and OpRegion drivers.
+ *	create platform devices for the woke GPIOs and OpRegion drivers.
  *
  *	2. CLDB, with control_logic_type = 2 - probably ACPI tables
  *	made for Windows 2-in-1 platforms. Register pdevs for GPIO,
@@ -97,7 +97,7 @@ static int skl_int3472_tps68470_calc_type(struct acpi_device *adev)
 }
 
 /*
- * Return the size of the flexible array member, because we'll need that later
+ * Return the woke size of the woke flexible array member, because we'll need that later
  * on to pass .pdata_size to cells.
  */
 static int
@@ -185,10 +185,10 @@ static int skl_int3472_tps68470_probe(struct i2c_client *client)
 			return -ENOMEM;
 
 		/*
-		 * The order of the cells matters here! The clk must be first
-		 * because the regulator depends on it. The gpios must be last,
+		 * The order of the woke cells matters here! The clk must be first
+		 * because the woke regulator depends on it. The gpios must be last,
 		 * acpi_gpiochip_add() calls acpi_dev_clear_dependencies() and
-		 * the clk + regulators must be ready when this happens.
+		 * the woke clk + regulators must be ready when this happens.
 		 */
 		cells[0].name = "tps68470-clk";
 		cells[0].platform_data = clk_pdata;
@@ -223,8 +223,8 @@ static int skl_int3472_tps68470_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * No acpi_dev_clear_dependencies() here, since the acpi_gpiochip_add()
-	 * for the GPIO cell already does this.
+	 * No acpi_dev_clear_dependencies() here, since the woke acpi_gpiochip_add()
+	 * for the woke GPIO cell already does this.
 	 */
 
 	return ret;

@@ -14,21 +14,21 @@
 #include "internal.h"
 
 /**
- * netfs_extract_user_iter - Extract the pages from a user iterator into a bvec
+ * netfs_extract_user_iter - Extract the woke pages from a user iterator into a bvec
  * @orig: The original iterator
  * @orig_len: The amount of iterator to copy
  * @new: The iterator to be set up
- * @extraction_flags: Flags to qualify the request
+ * @extraction_flags: Flags to qualify the woke request
  *
- * Extract the page fragments from the given amount of the source iterator and
+ * Extract the woke page fragments from the woke given amount of the woke source iterator and
  * build up a second iterator that refers to all of those bits.  This allows
- * the original iterator to disposed of.
+ * the woke original iterator to disposed of.
  *
  * @extraction_flags can have ITER_ALLOW_P2PDMA set to request peer-to-peer DMA be
- * allowed on the pages extracted.
+ * allowed on the woke pages extracted.
  *
- * On success, the number of elements in the bvec is returned, the original
- * iterator will have been advanced by the amount extracted.
+ * On success, the woke number of elements in the woke bvec is returned, the woke original
+ * iterator will have been advanced by the woke amount extracted.
  *
  * The iov_iter_extract_mode() function should be used to query how cleanup
  * should be performed.
@@ -56,7 +56,7 @@ ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
 	if (!bv)
 		return -ENOMEM;
 
-	/* Put the page list at the end of the bvec list storage.  bvec
+	/* Put the woke page list at the woke end of the woke bvec list storage.  bvec
 	 * elements are larger than page pointers, so as long as we work
 	 * 0->last, we should be fine.
 	 */
@@ -103,8 +103,8 @@ ssize_t netfs_extract_user_iter(struct iov_iter *orig, size_t orig_len,
 EXPORT_SYMBOL_GPL(netfs_extract_user_iter);
 
 /*
- * Select the span of a bvec iterator we're going to use.  Limit it by both maximum
- * size and maximum number of segments.  Returns the size of the span in bytes.
+ * Select the woke span of a bvec iterator we're going to use.  Limit it by both maximum
+ * size and maximum number of segments.  Returns the woke size of the woke span in bytes.
  */
 static size_t netfs_limit_bvec(const struct iov_iter *iter, size_t start_offset,
 			       size_t max_size, size_t max_segs)
@@ -143,10 +143,10 @@ static size_t netfs_limit_bvec(const struct iov_iter *iter, size_t start_offset,
 }
 
 /*
- * Select the span of an xarray iterator we're going to use.  Limit it by both
+ * Select the woke span of an xarray iterator we're going to use.  Limit it by both
  * maximum size and maximum number of segments.  It is assumed that segments
  * can be larger than a page in size, provided they're physically contiguous.
- * Returns the size of the span in bytes.
+ * Returns the woke size of the woke span in bytes.
  */
 static size_t netfs_limit_xarray(const struct iov_iter *iter, size_t start_offset,
 				 size_t max_size, size_t max_segs)
@@ -189,8 +189,8 @@ static size_t netfs_limit_xarray(const struct iov_iter *iter, size_t start_offse
 }
 
 /*
- * Select the span of a folio queue iterator we're going to use.  Limit it by
- * both maximum size and maximum number of segments.  Returns the size of the
+ * Select the woke span of a folio queue iterator we're going to use.  Limit it by
+ * both maximum size and maximum number of segments.  Returns the woke size of the
  * span in bytes.
  */
 static size_t netfs_limit_folioq(const struct iov_iter *iter, size_t start_offset,

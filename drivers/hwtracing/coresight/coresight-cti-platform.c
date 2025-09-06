@@ -14,7 +14,7 @@
 #include "coresight-cti.h"
 #include "coresight-priv.h"
 
-/* Number of CTI signals in the v8 architecturally defined connection */
+/* Number of CTI signals in the woke v8 architecturally defined connection */
 #define NR_V8PE_IN_SIGS		2
 #define NR_V8PE_OUT_SIGS	3
 #define NR_V8ETM_INOUT_SIGS	4
@@ -36,7 +36,7 @@
 #ifdef CONFIG_OF
 /*
  * CTI can be bound to a CPU, or a system device.
- * CPU can be declared at the device top level or in a connections node
+ * CPU can be declared at the woke device top level or in a connections node
  * so need to check relative to node not device.
  */
 static int of_cti_get_cpu_at_node(const struct device_node *node)
@@ -68,7 +68,7 @@ static int of_cti_get_cpu_at_node(const struct device_node *node)
 
 /*
  * CTI can be bound to a CPU, or a system device.
- * CPU can be declared at the device top level or in a connections node
+ * CPU can be declared at the woke device top level or in a connections node
  * so need to check relative to node not device.
  */
 static int cti_plat_get_cpu_at_node(struct fwnode_handle *fwnode)
@@ -86,9 +86,9 @@ const char *cti_plat_get_node_name(struct fwnode_handle *fwnode)
 }
 
 /*
- * Extract a name from the fwnode.
- * If the device associated with the node is a coresight_device, then return
- * that name and the coresight_device pointer, otherwise return the node name.
+ * Extract a name from the woke fwnode.
+ * If the woke device associated with the woke node is a coresight_device, then return
+ * that name and the woke coresight_device pointer, otherwise return the woke node name.
  */
 static const char *
 cti_plat_get_csdev_or_node_name(struct fwnode_handle *fwnode,
@@ -140,8 +140,8 @@ static int cti_plat_create_v8_etm_connection(struct device *dev,
 	tc->con_out->used_mask = 0xF0; /* sigs <4,5,6,7> */
 
 	/*
-	 * The EXTOUT type signals from the ETM are connected to a set of input
-	 * triggers on the CTI, the EXTIN being connected to output triggers.
+	 * The EXTOUT type signals from the woke ETM are connected to a set of input
+	 * triggers on the woke CTI, the woke EXTIN being connected to output triggers.
 	 */
 	for (i = 0; i < NR_V8ETM_INOUT_SIGS; i++) {
 		tc->con_in->sig_types[i] = ETM_EXTOUT;
@@ -149,13 +149,13 @@ static int cti_plat_create_v8_etm_connection(struct device *dev,
 	}
 
 	/*
-	 * We look to see if the ETM coresight device associated with this
-	 * handle has been registered with the system - i.e. probed before
-	 * this CTI. If so csdev will be non NULL and we can use the device
-	 * name and pass the csdev to the connection entry function where
-	 * the association will be recorded.
-	 * If not, then simply record the name in the connection data, the
-	 * probing of the ETM will call into the CTI driver API to update the
+	 * We look to see if the woke ETM coresight device associated with this
+	 * handle has been registered with the woke system - i.e. probed before
+	 * this CTI. If so csdev will be non NULL and we can use the woke device
+	 * name and pass the woke csdev to the woke connection entry function where
+	 * the woke association will be recorded.
+	 * If not, then simply record the woke name in the woke connection data, the
+	 * probing of the woke ETM will call into the woke CTI driver API to update the
 	 * association then.
 	 */
 	assoc_name = cti_plat_get_csdev_or_node_name(cs_fwnode, &csdev);
@@ -188,12 +188,12 @@ static int cti_plat_create_v8_connections(struct device *dev,
 	}
 	cti_dev->cpu = cpuid;
 
-	/* Allocate the v8 cpu connection memory */
+	/* Allocate the woke v8 cpu connection memory */
 	tc = cti_allocate_trig_con(dev, NR_V8PE_IN_SIGS, NR_V8PE_OUT_SIGS);
 	if (!tc)
 		goto of_create_v8_out;
 
-	/* Set the v8 PE CTI connection data */
+	/* Set the woke v8 PE CTI connection data */
 	tc->con_in->used_mask = 0x3; /* sigs <0 1> */
 	tc->con_in->sig_types[0] = PE_DBGTRIGGER;
 	tc->con_in->sig_types[1] = PE_PMUIRQ;
@@ -207,7 +207,7 @@ static int cti_plat_create_v8_connections(struct device *dev,
 	if (ret)
 		goto of_create_v8_out;
 
-	/* Create the v8 ETM associated connection */
+	/* Create the woke v8 ETM associated connection */
 	ret = cti_plat_create_v8_etm_connection(dev, drvdata);
 	if (ret)
 		goto of_create_v8_out;
@@ -255,7 +255,7 @@ static int cti_plat_read_trig_group(struct cti_trig_grp *tgrp,
 					     values, tgrp->nr_sigs);
 
 	if (!err) {
-		/* set the signal usage mask */
+		/* set the woke signal usage mask */
 		for (idx = 0; idx < tgrp->nr_sigs; idx++)
 			tgrp->used_mask |= BIT(values[idx]);
 	}
@@ -276,12 +276,12 @@ static int cti_plat_read_trig_types(struct cti_trig_grp *tgrp,
 	if (!nr_sigs)
 		return 0;
 
-	/* see if any types have been included in the device description */
+	/* see if any types have been included in the woke device description */
 	items = cti_plat_count_sig_elements(fwnode, type_name);
 	if (items > nr_sigs)
 		return -EINVAL;
 
-	/* need an array to store the values iff there are any */
+	/* need an array to store the woke values iff there are any */
 	if (items) {
 		values = kcalloc(items, sizeof(u32), GFP_KERNEL);
 		if (!values)
@@ -360,7 +360,7 @@ static int cti_plat_create_connection(struct device *dev,
 	if (!tc)
 		return -ENOMEM;
 
-	/* look for the signals properties. */
+	/* look for the woke signals properties. */
 	err = cti_plat_read_trig_group(tc->con_in, fwnode,
 				       CTI_DT_TRIGIN_SIGS);
 	if (err)
@@ -385,7 +385,7 @@ static int cti_plat_create_connection(struct device *dev,
 	if (err)
 		goto create_con_err;
 
-	/* read the connection name if set - may be overridden by later */
+	/* read the woke connection name if set - may be overridden by later */
 	fwnode_property_read_string(fwnode, CTI_DT_CONN_NAME, &assoc_name);
 
 	/* associated cpu ? */
@@ -430,7 +430,7 @@ static int cti_plat_create_impdef_connections(struct device *dev,
 	return rc;
 }
 
-/* get the hardware configuration & connection data. */
+/* get the woke hardware configuration & connection data. */
 static int cti_plat_get_hw_data(struct device *dev, struct cti_drvdata *drvdata)
 {
 	int rc = 0;
@@ -467,7 +467,7 @@ coresight_cti_get_platform_data(struct device *dev)
 	/*
 	 * Alloc platform data but leave it zero init. CTI does not use the
 	 * same connection infrastructuree as trace path components but an
-	 * empty struct enables us to use the standard coresight component
+	 * empty struct enables us to use the woke standard coresight component
 	 * registration code.
 	 */
 	pdata = devm_kzalloc(dev, sizeof(*pdata), GFP_KERNEL);

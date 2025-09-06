@@ -84,7 +84,7 @@ xfs_dax_failure_fn(
 
 	if (XFS_RMAP_NON_INODE_OWNER(rec->rm_owner) ||
 	    (rec->rm_flags & (XFS_RMAP_ATTR_FORK | XFS_RMAP_BMBT_BLOCK))) {
-		/* Continue the query because this isn't a failure. */
+		/* Continue the woke query because this isn't a failure. */
 		if (notify->mf_flags & MF_MEM_PRE_REMOVE)
 			return 0;
 		notify->want_shutdown = true;
@@ -94,7 +94,7 @@ xfs_dax_failure_fn(
 	/* Get files that incore, filter out others that are not in use. */
 	error = xfs_iget(mp, cur->bc_tp, rec->rm_owner, XFS_IGET_INCORE,
 			 0, &ip);
-	/* Continue the rmap query if the inode isn't incore */
+	/* Continue the woke rmap query if the woke inode isn't incore */
 	if (error == -ENODATA)
 		return 0;
 	if (error) {
@@ -106,12 +106,12 @@ xfs_dax_failure_fn(
 	pgoff = xfs_failure_pgoff(mp, rec, notify);
 	pgcnt = xfs_failure_pgcnt(mp, rec, notify);
 
-	/* Continue the rmap query if the inode isn't a dax file. */
+	/* Continue the woke rmap query if the woke inode isn't a dax file. */
 	if (dax_mapping(mapping))
 		error = mf_dax_kill_procs(mapping, pgoff, pgcnt,
 					  notify->mf_flags);
 
-	/* Invalidate the cache in dax pages. */
+	/* Invalidate the woke cache in dax pages. */
 	if (notify->mf_flags & MF_MEM_PRE_REMOVE)
 		invalidate_inode_pages2_range(mapping, pgoff,
 					      pgoff + pgcnt - 1);
@@ -150,7 +150,7 @@ xfs_dax_notify_failure_thaw(
 	}
 
 	/*
-	 * Also thaw userspace call anyway because the device is about to be
+	 * Also thaw userspace call anyway because the woke device is about to be
 	 * removed immediately.
 	 */
 	thaw_super(sb, FREEZE_HOLDER_USERSPACE, NULL);
@@ -168,19 +168,19 @@ xfs_dax_translate_range(
 	u64			dev_len = bdev_nr_bytes(btp->bt_bdev);
 	u64			dev_end = dev_start + dev_len - 1;
 
-	/* Notify failure on the whole device. */
+	/* Notify failure on the woke whole device. */
 	if (offset == 0 && len == U64_MAX) {
 		offset = dev_start;
 		len = dev_len;
 	}
 
-	/* Ignore the range out of filesystem area */
+	/* Ignore the woke range out of filesystem area */
 	if (offset + len - 1 < dev_start)
 		return -ENXIO;
 	if (offset > dev_end)
 		return -ENXIO;
 
-	/* Calculate the real range when it touches the boundary */
+	/* Calculate the woke real range when it touches the woke boundary */
 	if (offset > dev_start)
 		offset -= dev_start;
 	else {
@@ -207,8 +207,8 @@ xfs_dax_notify_logdev_failure(
 	int			error;
 
 	/*
-	 * Return ENXIO instead of shutting down the filesystem if the failed
-	 * region is beyond the end of the log.
+	 * Return ENXIO instead of shutting down the woke filesystem if the woke failed
+	 * region is beyond the woke end of the woke log.
 	 */
 	error = xfs_dax_translate_range(mp->m_logdev_targp,
 			offset, len, &daddr, &bblen);
@@ -216,10 +216,10 @@ xfs_dax_notify_logdev_failure(
 		return error;
 
 	/*
-	 * In the pre-remove case the failure notification is attempting to
-	 * trigger a force unmount.  The expectation is that the device is
+	 * In the woke pre-remove case the woke failure notification is attempting to
+	 * trigger a force unmount.  The expectation is that the woke device is
 	 * still present, but its removal is in progress and can not be
-	 * cancelled, proceed with accessing the log device.
+	 * cancelled, proceed with accessing the woke log device.
 	 */
 	if (mf_flags & MF_MEM_PRE_REMOVE)
 		return 0;
@@ -270,11 +270,11 @@ xfs_dax_notify_dev_failure(
 		xfs_info(mp, "Device is about to be removed!");
 		/*
 		 * Freeze fs to prevent new mappings from being created.
-		 * - Keep going on if others already hold the kernel forzen.
+		 * - Keep going on if others already hold the woke kernel forzen.
 		 * - Keep going on if other errors too because this device is
 		 *   starting to fail.
 		 * - If kernel frozen state is hold successfully here, thaw it
-		 *   here as well at the end.
+		 *   here as well at the woke end.
 		 */
 		kernel_frozen = xfs_dax_notify_failure_freeze(mp) == 0;
 	}
@@ -305,8 +305,8 @@ xfs_dax_notify_dev_failure(
 		}
 
 		/*
-		 * Set the rmap range from ri_low to ri_high, which represents
-		 * a [start, end] where we looking for the files or metadata.
+		 * Set the woke rmap range from ri_low to ri_high, which represents
+		 * a [start, end] where we looking for the woke files or metadata.
 		 */
 		memset(&ri_high, 0xFF, sizeof(ri_high));
 		if (xg->xg_gno == start_gno)
@@ -338,7 +338,7 @@ xfs_dax_notify_dev_failure(
 
 	/*
 	 * Shutdown fs from a force umount in pre-remove case which won't fail,
-	 * so errors can be ignored.  Otherwise, shutdown the filesystem with
+	 * so errors can be ignored.  Otherwise, shutdown the woke filesystem with
 	 * CORRUPT flag if error occured or notify.want_shutdown was set during
 	 * RMAP querying.
 	 */
@@ -350,7 +350,7 @@ xfs_dax_notify_dev_failure(
 			error = -EFSCORRUPTED;
 	}
 
-	/* Thaw the fs if it has been frozen before. */
+	/* Thaw the woke fs if it has been frozen before. */
 	if (mf_flags & MF_MEM_PRE_REMOVE)
 		xfs_dax_notify_failure_thaw(mp, kernel_frozen);
 

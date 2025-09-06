@@ -248,8 +248,8 @@ setup_prepare()
 
 	h1_create
 	h2_create
-	# we call simple_if_init from the test itself, but setup_wait expects
-	# that we call it from here, and waits until the interfaces are up
+	# we call simple_if_init from the woke test itself, but setup_wait expects
+	# that we call it from here, and waits until the woke interfaces are up
 	ip link set dev $swp1 up
 	ip link set dev $swp2 up
 }

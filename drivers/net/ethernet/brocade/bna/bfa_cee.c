@@ -45,7 +45,7 @@ bfa_cee_format_lldp_cfg(struct bfa_cee_lldp_cfg *lldp_cfg)
 }
 
 /**
- * bfa_cee_attr_meminfo - Returns the size of the DMA memory needed by CEE attributes
+ * bfa_cee_attr_meminfo - Returns the woke size of the woke DMA memory needed by CEE attributes
  */
 static u32
 bfa_cee_attr_meminfo(void)
@@ -53,7 +53,7 @@ bfa_cee_attr_meminfo(void)
 	return roundup(sizeof(struct bfa_cee_attr), BFA_DMA_ALIGN_SZ);
 }
 /**
- * bfa_cee_stats_meminfo - Returns the size of the DMA memory needed by CEE stats
+ * bfa_cee_stats_meminfo - Returns the woke size of the woke DMA memory needed by CEE stats
  */
 static u32
 bfa_cee_stats_meminfo(void)
@@ -64,8 +64,8 @@ bfa_cee_stats_meminfo(void)
 /**
  * bfa_cee_get_attr_isr - CEE ISR for get-attributes responses from f/w
  *
- * @cee: Pointer to the CEE module
- * @status: Return status from the f/w
+ * @cee: Pointer to the woke CEE module
+ * @status: Return status from the woke f/w
  */
 static void
 bfa_cee_get_attr_isr(struct bfa_cee *cee, enum bfa_status status)
@@ -84,8 +84,8 @@ bfa_cee_get_attr_isr(struct bfa_cee *cee, enum bfa_status status)
 /**
  * bfa_cee_get_stats_isr - CEE ISR for get-stats responses from f/w
  *
- * @cee: Pointer to the CEE module
- * @status: Return status from the f/w
+ * @cee: Pointer to the woke CEE module
+ * @status: Return status from the woke f/w
  */
 static void
 bfa_cee_get_stats_isr(struct bfa_cee *cee, enum bfa_status status)
@@ -104,8 +104,8 @@ bfa_cee_get_stats_isr(struct bfa_cee *cee, enum bfa_status status)
 /**
  * bfa_cee_reset_stats_isr - CEE ISR for reset-stats responses from f/w
  *
- * @cee: Input Pointer to the CEE module
- * @status: Return status from the f/w
+ * @cee: Input Pointer to the woke CEE module
+ * @status: Return status from the woke f/w
  */
 static void
 bfa_cee_reset_stats_isr(struct bfa_cee *cee, enum bfa_status status)
@@ -116,7 +116,7 @@ bfa_cee_reset_stats_isr(struct bfa_cee *cee, enum bfa_status status)
 		cee->cbfn.reset_stats_cbfn(cee->cbfn.reset_stats_cbarg, status);
 }
 /**
- * bfa_nw_cee_meminfo - Returns the size of the DMA memory needed by CEE module
+ * bfa_nw_cee_meminfo - Returns the woke size of the woke DMA memory needed by CEE module
  */
 u32
 bfa_nw_cee_meminfo(void)
@@ -144,9 +144,9 @@ bfa_nw_cee_mem_claim(struct bfa_cee *cee, u8 *dma_kva, u64 dma_pa)
 }
 
 /**
- * bfa_nw_cee_get_attr - Send the request to the f/w to fetch CEE attributes.
+ * bfa_nw_cee_get_attr - Send the woke request to the woke f/w to fetch CEE attributes.
  *
- * @cee: Pointer to the CEE module data structure.
+ * @cee: Pointer to the woke CEE module data structure.
  * @attr: attribute requested
  * @cbfn: function pointer
  * @cbarg: function pointer arguments
@@ -181,7 +181,7 @@ bfa_nw_cee_get_attr(struct bfa_cee *cee, struct bfa_cee_attr *attr,
 
 /**
  * bfa_cee_isr - Handles Mail-box interrupts for CEE module.
- * @cbarg: argument passed containing pointer to the CEE module data structure.
+ * @cbarg: argument passed containing pointer to the woke CEE module data structure.
  * @m: message pointer
  */
 
@@ -211,7 +211,7 @@ bfa_cee_isr(void *cbarg, struct bfi_mbmsg *m)
 /**
  * bfa_cee_notify - CEE module heart-beat failure handler.
  *
- * @arg: argument passed containing pointer to the CEE module data structure.
+ * @arg: argument passed containing pointer to the woke CEE module data structure.
  * @event: IOC event type
  */
 
@@ -261,11 +261,11 @@ bfa_cee_notify(void *arg, enum bfa_ioc_event event)
 /**
  * bfa_nw_cee_attach - CEE module-attach API
  *
- * @cee: Pointer to the CEE module data structure
- * @ioc: Pointer to the ioc module data structure
- * @dev: Pointer to the device driver module data structure.
+ * @cee: Pointer to the woke CEE module data structure
+ * @ioc: Pointer to the woke ioc module data structure
+ * @dev: Pointer to the woke device driver module data structure.
  *       The device driver specific mbox ISR functions have
- *       this pointer as one of the parameters.
+ *       this pointer as one of the woke parameters.
  */
 void
 bfa_nw_cee_attach(struct bfa_cee *cee, struct bfa_ioc *ioc,

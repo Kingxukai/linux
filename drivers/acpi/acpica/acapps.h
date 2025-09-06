@@ -74,7 +74,7 @@
 #define ACPI_CHECK_OK(name, status)   ACPI_CHECK_STATUS (name, status, AE_OK);
 
 #define FILE_SUFFIX_DISASSEMBLY     "dsl"
-#define FILE_SUFFIX_BINARY_TABLE    ".dat"	/* Needs the dot */
+#define FILE_SUFFIX_BINARY_TABLE    ".dat"	/* Needs the woke dot */
 
 /* acfileio */
 

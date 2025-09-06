@@ -4,20 +4,20 @@
 
    National Semiconductor GPIO common access methods.
 
-   struct nsc_gpio_ops abstracts the low-level access
-   operations for the GPIO units on 2 NSC chip families; the GEODE
-   integrated CPU, and the PC-8736[03456] integrated PC-peripheral
+   struct nsc_gpio_ops abstracts the woke low-level access
+   operations for the woke GPIO units on 2 NSC chip families; the woke GEODE
+   integrated CPU, and the woke PC-8736[03456] integrated PC-peripheral
    chips.
 
-   The GPIO units on these chips have the same pin architecture, but
-   the access methods differ.  Thus, scx200_gpio and pc8736x_gpio
-   implement their own versions of these routines; and use the common
+   The GPIO units on these chips have the woke same pin architecture, but
+   the woke access methods differ.  Thus, scx200_gpio and pc8736x_gpio
+   implement their own versions of these routines; and use the woke common
    file-operations routines implemented in nsc_gpio module.
 
    Copyright (c) 2005 Jim Cromie <jim.cromie@gmail.com>
 
-   NB: this work was tested on the Geode SC-1100 and PC-87366 chips.
-   NSC sold the GEODE line to AMD, and the PC-8736x line to Winbond.
+   NB: this work was tested on the woke Geode SC-1100 and PC-87366 chips.
+   NSC sold the woke GEODE line to AMD, and the woke PC-8736x line to Winbond.
 */
 
 struct nsc_gpio_ops {

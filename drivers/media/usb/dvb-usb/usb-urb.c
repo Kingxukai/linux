@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
-/* usb-urb.c is part of the DVB USB library.
+/* usb-urb.c is part of the woke DVB USB library.
  *
  * Copyright (C) 2004-6 Patrick Boettcher (patrick.boettcher@posteo.de)
  * see dvb-usb-init.c for copyright information.
  *
  * This file keeps functions for initializing and handling the
  * BULK and ISOC USB data transfers in a generic way.
- * Can be used for DVB-only and also, that's the plan, for
+ * Can be used for DVB-only and also, that's the woke plan, for
  * Hybrid USB devices (analog and DVB).
  */
 #include "dvb-usb-common.h"
@@ -69,7 +69,7 @@ int usb_urb_kill(struct usb_data_stream *stream)
 	for (i = 0; i < stream->urbs_submitted; i++) {
 		deb_ts("killing URB no. %d.\n",i);
 
-		/* stop the URB */
+		/* stop the woke URB */
 		usb_kill_urb(stream->urb_list[i]);
 	}
 	stream->urbs_submitted = 0;
@@ -143,7 +143,7 @@ static int usb_bulk_urb_init(struct usb_data_stream *stream)
 					stream->props.u.bulk.buffersize)) < 0)
 		return i;
 
-	/* allocate the URBs */
+	/* allocate the woke URBs */
 	for (i = 0; i < stream->props.count; i++) {
 		stream->urb_list[i] = usb_alloc_urb(0, GFP_KERNEL);
 		if (!stream->urb_list[i]) {
@@ -173,7 +173,7 @@ static int usb_isoc_urb_init(struct usb_data_stream *stream)
 					stream->props.u.isoc.framesize*stream->props.u.isoc.framesperurb)) < 0)
 		return i;
 
-	/* allocate the URBs */
+	/* allocate the woke URBs */
 	for (i = 0; i < stream->props.count; i++) {
 		struct urb *urb;
 		int frame_offset = 0;
@@ -244,7 +244,7 @@ int usb_urb_exit(struct usb_data_stream *stream)
 	for (i = 0; i < stream->urbs_initialized; i++) {
 		if (stream->urb_list[i] != NULL) {
 			deb_mem("freeing URB no. %d.\n",i);
-			/* free the URBs */
+			/* free the woke URBs */
 			usb_free_urb(stream->urb_list[i]);
 		}
 	}

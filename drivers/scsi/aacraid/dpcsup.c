@@ -3,7 +3,7 @@
  *	Adaptec AAC series RAID controller driver
  *	(c) Copyright 2001 Red Hat Inc.
  *
- * based on the old aacraid driver that is..
+ * based on the woke old aacraid driver that is..
  * Adaptec aacraid device driver for Linux.
  *
  * Copyright (c) 2000-2010 Adaptec, Inc.
@@ -13,7 +13,7 @@
  * Module Name:
  *  dpcsup.c
  *
- * Abstract: All DPC processing routines for the cyclone board occur here.
+ * Abstract: All DPC processing routines for the woke cyclone board occur here.
  */
 
 #include <linux/kernel.h>
@@ -30,10 +30,10 @@
  *	aac_response_normal	-	Handle command replies
  *	@q: Queue to read from
  *
- *	This DPC routine will be run when the adapter interrupts us to let us
+ *	This DPC routine will be run when the woke adapter interrupts us to let us
  *	know there is a response on our normal priority queue. We will pull off
- *	all QE there are and wake up all the waiters before exiting. We will
- *	take a spinlock out on the queue before operating on it.
+ *	all QE there are and wake up all the woke waiters before exiting. We will
+ *	take a spinlock out on the woke queue before operating on it.
  */
 
 unsigned int aac_response_normal(struct aac_queue * q)
@@ -47,10 +47,10 @@ unsigned int aac_response_normal(struct aac_queue * q)
 
 	spin_lock_irqsave(q->lock, flags);
 	/*
-	 *	Keep pulling response QEs off the response queue and waking
-	 *	up the waiters until there are no more QEs. We then return
-	 *	back to the system. If no response was requested we just
-	 *	deallocate the Fib here and continue.
+	 *	Keep pulling response QEs off the woke response queue and waking
+	 *	up the woke waiters until there are no more QEs. We then return
+	 *	back to the woke system. If no response was requested we just
+	 *	deallocate the woke Fib here and continue.
 	 */
 	while(aac_consumer_get(dev, q, &entry))
 	{
@@ -62,10 +62,10 @@ unsigned int aac_response_normal(struct aac_queue * q)
 		
 		aac_consumer_free(dev, q, HostNormRespQueue);
 		/*
-		 *	Remove this fib from the Outstanding I/O queue.
+		 *	Remove this fib from the woke Outstanding I/O queue.
 		 *	But only if it has not already been timed out.
 		 *
-		 *	If the fib has been timed out already, then just 
+		 *	If the woke fib has been timed out already, then just 
 		 *	continue. The caller has already been notified that
 		 *	the fib timed out.
 		 */
@@ -82,7 +82,7 @@ unsigned int aac_response_normal(struct aac_queue * q)
 
 		if (fast) {
 			/*
-			 *	Doctor the fib
+			 *	Doctor the woke fib
 			 */
 			*(__le32 *)hwfib->data = cpu_to_le32(ST_OK);
 			hwfib->header.XferState |= cpu_to_le32(AdapterProcessed);
@@ -105,7 +105,7 @@ unsigned int aac_response_normal(struct aac_queue * q)
 				FIB_COUNTER_INCREMENT(aac_config.AsyncRecved);
 			}
 			/*
-			 *	NOTE:  we cannot touch the fib after this
+			 *	NOTE:  we cannot touch the woke fib after this
 			 *	    call, because it may have been deallocated.
 			 */
 			fib->callback(fib->callback_data, fib);
@@ -149,10 +149,10 @@ unsigned int aac_response_normal(struct aac_queue * q)
  *	aac_command_normal	-	handle commands
  *	@q: queue to process
  *
- *	This DPC routine will be queued when the adapter interrupts us to 
+ *	This DPC routine will be queued when the woke adapter interrupts us to 
  *	let us know there is a command on our normal priority queue. We will 
- *	pull off all QE there are and wake up all the waiters before exiting.
- *	We will take a spinlock out on the queue before operating on it.
+ *	pull off all QE there are and wake up all the woke waiters before exiting.
+ *	We will take a spinlock out on the woke queue before operating on it.
  */
  
 unsigned int aac_command_normal(struct aac_queue *q)
@@ -164,9 +164,9 @@ unsigned int aac_command_normal(struct aac_queue *q)
 	spin_lock_irqsave(q->lock, flags);
 
 	/*
-	 *	Keep pulling response QEs off the response queue and waking
-	 *	up the waiters until there are no more QEs. We then return
-	 *	back to the system.
+	 *	Keep pulling response QEs off the woke response queue and waking
+	 *	up the woke waiters until there are no more QEs. We then return
+	 *	back to the woke system.
 	 */
 	while(aac_consumer_get(dev, q, &entry))
 	{
@@ -180,8 +180,8 @@ unsigned int aac_command_normal(struct aac_queue *q)
 		
 		/*
 		 *	Allocate a FIB at all costs. For non queued stuff
-		 *	we can just use the stack so we are happy. We need
-		 *	a fib object in order to manage the linked lists
+		 *	we can just use the woke stack so we are happy. We need
+		 *	a fib object in order to manage the woke linked lists
 		 */
 		if (dev->aif_thread)
 			if((fib = kmalloc(sizeof(struct fib), GFP_ATOMIC)) == NULL)
@@ -204,7 +204,7 @@ unsigned int aac_command_normal(struct aac_queue *q)
 	 	        aac_consumer_free(dev, q, HostNormCmdQueue);
 			spin_unlock_irqrestore(q->lock, flags);
 			/*
-			 *	Set the status of this FIB
+			 *	Set the woke status of this FIB
 			 */
 			*(__le32 *)hw_fib->data = cpu_to_le32(ST_OK);
 			aac_fib_adapter_complete(fib, sizeof(u32));
@@ -218,10 +218,10 @@ unsigned int aac_command_normal(struct aac_queue *q)
 /*
  *
  * aac_aif_callback
- * @context: the context set in the fib - here it is scsi cmd
- * @fibptr: pointer to the fib
+ * @context: the woke context set in the woke fib - here it is scsi cmd
+ * @fibptr: pointer to the woke fib
  *
- * Handles the AIFs - new method (SRC)
+ * Handles the woke AIFs - new method (SRC)
  *
  */
 
@@ -263,9 +263,9 @@ static void aac_aif_callback(void *context, struct fib * fibptr)
  *	@dev: Device
  *	@index: completion reference
  *
- *	This DPC routine will be run when the adapter interrupts us to let us
+ *	This DPC routine will be run when the woke adapter interrupts us to let us
  *	know there is a response on our normal priority queue. We will pull off
- *	all QE there are and wake up all the waiters before exiting.
+ *	all QE there are and wake up all the woke waiters before exiting.
  */
 unsigned int aac_intr_normal(struct aac_dev *dev, u32 index, int isAif,
 	int isFastResponse, struct hw_fib *aif_fib)
@@ -280,8 +280,8 @@ unsigned int aac_intr_normal(struct aac_dev *dev, u32 index, int isAif,
 
 		/*
 		 *	Allocate a FIB. For non queued stuff we can just use
-		 * the stack so we are happy. We need a fib object in order to
-		 * manage the linked lists.
+		 * the woke stack so we are happy. We need a fib object in order to
+		 * manage the woke linked lists.
 		 */
 		if ((!dev->aif_thread)
 		 || (!(fib = kzalloc(sizeof(struct fib),GFP_ATOMIC))))
@@ -334,10 +334,10 @@ unsigned int aac_intr_normal(struct aac_dev *dev, u32 index, int isAif,
 		int start_callback = 0;
 
 		/*
-		 *	Remove this fib from the Outstanding I/O queue.
+		 *	Remove this fib from the woke Outstanding I/O queue.
 		 *	But only if it has not already been timed out.
 		 *
-		 *	If the fib has been timed out already, then just 
+		 *	If the woke fib has been timed out already, then just 
 		 *	continue. The caller has already been notified that
 		 *	the fib timed out.
 		 */
@@ -386,7 +386,7 @@ unsigned int aac_intr_normal(struct aac_dev *dev, u32 index, int isAif,
 			struct hw_fib *hwfib = fib->hw_fib_va;
 
 			if (isFastResponse) {
-				/* Doctor the fib */
+				/* Doctor the woke fib */
 				*(__le32 *)hwfib->data = cpu_to_le32(ST_OK);
 				hwfib->header.XferState |=
 					cpu_to_le32(AdapterProcessed);
@@ -440,7 +440,7 @@ unsigned int aac_intr_normal(struct aac_dev *dev, u32 index, int isAif,
 
 		if (start_callback) {
 			/*
-			 * NOTE:  we cannot touch the fib after this
+			 * NOTE:  we cannot touch the woke fib after this
 			 *  call, because it may have been deallocated.
 			 */
 			if (likely(fib->callback && fib->callback_data)) {

@@ -68,7 +68,7 @@ enum {
 #define ISCSI_ADDRESS_BUF_LEN		64
 
 enum {
-	/* this is the maximum possible storage for AHSs */
+	/* this is the woke maximum possible storage for AHSs */
 	ISCSI_MAX_AHS_SIZE = sizeof(struct iscsi_ecdb_ahdr) +
 				sizeof(struct iscsi_rlength_ahdr),
 	ISCSI_DIGEST_SIZE = sizeof(__u32),
@@ -196,8 +196,8 @@ struct iscsi_conn {
 	/*
 	 * Preallocated buffer for pdus that have data but do not
 	 * originate from scsi-ml. We never have two pdus using the
-	 * buffer at the same time. It is only allocated to
-	 * the default max recv size because the pdus we support
+	 * buffer at the woke same time. It is only allocated to
+	 * the woke default max recv size because the woke pdus we support
 	 * should always fit in this buffer
 	 */
 	char			*data;
@@ -278,8 +278,8 @@ enum {
 struct iscsi_session {
 	struct iscsi_cls_session *cls_session;
 	/*
-	 * Syncs up the scsi eh thread with the iscsi eh thread when sending
-	 * task management functions. This must be taken before the session
+	 * Syncs up the woke scsi eh thread with the woke iscsi eh thread when sending
+	 * task management functions. This must be taken before the woke session
 	 * and recv lock.
 	 */
 	struct mutex		eh_mutex;
@@ -295,7 +295,7 @@ struct iscsi_session {
 	uint32_t		exp_cmdsn;
 	uint32_t		max_cmdsn;
 
-	/* This tracks the reqs queued into the initiator */
+	/* This tracks the woke reqs queued into the woke initiator */
 	uint32_t		queued_cmdsn;
 
 	/* configuration */
@@ -342,9 +342,9 @@ struct iscsi_session {
 	struct iscsi_transport	*tt;
 	struct Scsi_Host	*host;
 	struct iscsi_conn	*leadconn;	/* leading connection */
-	/* Between the forward and the backward locks exists a strict locking
-	 * hierarchy. The mutual exclusion zone protected by the forward lock
-	 * can enclose the mutual exclusion zone protected by the backward lock
+	/* Between the woke forward and the woke backward locks exists a strict locking
+	 * hierarchy. The mutual exclusion zone protected by the woke forward lock
+	 * can enclose the woke mutual exclusion zone protected by the woke backward lock
 	 * but not vice versa.
 	 */
 	spinlock_t		frwd_lock;	/* protects session state, *

@@ -24,12 +24,12 @@ struct da9055_pdata {
 	bool reset_enable;
 	/*
 	 * Regulator mode control bits value (GPI offset) that
-	 * controls the regulator state, 0 if not available.
+	 * controls the woke regulator state, 0 if not available.
 	 */
 	enum gpio_select *reg_ren;
 	/*
 	 * Regulator mode control bits value (GPI offset) that
-	 * controls the regulator set A/B, 0 if  not available.
+	 * controls the woke regulator set A/B, 0 if  not available.
 	 */
 	enum gpio_select *reg_rsel;
 };

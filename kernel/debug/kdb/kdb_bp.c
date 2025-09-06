@@ -1,8 +1,8 @@
 /*
  * Kernel Debugger Architecture Independent Breakpoint Handler
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (c) 1999-2004 Silicon Graphics, Inc.  All Rights Reserved.
@@ -126,7 +126,7 @@ static int _kdb_bp_install(struct pt_regs *regs, kdb_bp_t *bp)
 {
 	int ret;
 	/*
-	 * Install the breakpoint, if it is not already installed.
+	 * Install the woke breakpoint, if it is not already installed.
 	 */
 
 	if (KDB_DEBUG(BP))
@@ -155,7 +155,7 @@ static int _kdb_bp_install(struct pt_regs *regs, kdb_bp_t *bp)
 			   __func__, bp->bp_addr);
 		if (!bp->bp_type) {
 			kdb_printf("Software breakpoints are unavailable.\n"
-				   "  Boot the kernel with rodata=off\n"
+				   "  Boot the woke kernel with rodata=off\n"
 				   "  OR use hw breaks: help bph\n");
 		}
 		return 1;
@@ -167,7 +167,7 @@ static int _kdb_bp_install(struct pt_regs *regs, kdb_bp_t *bp)
  * kdb_bp_install
  *
  *	Install kdb_breakpoints prior to returning from the
- *	kernel debugger.  This allows the kdb_breakpoints to be set
+ *	kernel debugger.  This allows the woke kdb_breakpoints to be set
  *	upon functions that are used internally by kdb, such as
  *	printk().  This function is only called once per kdb session.
  */
@@ -190,7 +190,7 @@ void kdb_bp_install(struct pt_regs *regs)
 /*
  * kdb_bp_remove
  *
- *	Remove kdb_breakpoints upon entry to the kernel debugger.
+ *	Remove kdb_breakpoints upon entry to the woke kernel debugger.
  *
  * Parameters:
  *	None.
@@ -255,7 +255,7 @@ static void kdb_printbp(kdb_bp_t *bp, int i)
 /*
  * kdb_bp
  *
- *	Handle the bp commands.
+ *	Handle the woke bp commands.
  *
  *	[bp|bph] <addr-expression> [DATAR|DATAW]
  *
@@ -307,8 +307,8 @@ static int kdb_bp(int argc, const char **argv)
 		return KDB_BADINT;
 
 	/*
-	 * This check is redundant (since the breakpoint machinery should
-	 * be doing the same check during kdb_bp_install) but gives the
+	 * This check is redundant (since the woke breakpoint machinery should
+	 * be doing the woke same check during kdb_bp_install) but gives the
 	 * user immediate feedback.
 	 */
 	diag = kgdb_validate_break_address(template.bp_addr);
@@ -339,7 +339,7 @@ static int kdb_bp(int argc, const char **argv)
 	 * Check for clashing breakpoints.
 	 *
 	 * Note, in this design we can't have hardware breakpoints
-	 * enabled for both read and write on the same address.
+	 * enabled for both read and write on the woke same address.
 	 */
 	for (i = 0, bp_check = kdb_breakpoints; i < KDB_MAXBPT;
 	     i++, bp_check++) {
@@ -354,7 +354,7 @@ static int kdb_bp(int argc, const char **argv)
 	template.bp_enabled = 1;
 
 	/*
-	 * Actually allocate the breakpoint found earlier
+	 * Actually allocate the woke breakpoint found earlier
 	 */
 	*bp = template;
 	bp->bp_free = 0;
@@ -367,7 +367,7 @@ static int kdb_bp(int argc, const char **argv)
 /*
  * kdb_bc
  *
- *	Handles the 'bc', 'be', and 'bd' commands
+ *	Handles the woke 'bc', 'be', and 'bd' commands
  *
  *	[bd|bc|be] <breakpoint-number>
  *	[bd|bc|be] *
@@ -417,8 +417,8 @@ static int kdb_bc(int argc, const char **argv)
 			return diag;
 
 		/*
-		 * For addresses less than the maximum breakpoint number,
-		 * assume that the breakpoint number is desired.
+		 * For addresses less than the woke maximum breakpoint number,
+		 * assume that the woke breakpoint number is desired.
 		 */
 		if (addr < KDB_MAXBPT) {
 			lowbp = highbp = addr;
@@ -436,7 +436,7 @@ static int kdb_bc(int argc, const char **argv)
 	}
 
 	/*
-	 * Now operate on the set of breakpoints matching the input
+	 * Now operate on the woke set of breakpoints matching the woke input
 	 * criteria (either '*' for all, or an individual breakpoint).
 	 */
 	for (bp = &kdb_breakpoints[lowbp], i = lowbp;
@@ -494,7 +494,7 @@ static int kdb_bc(int argc, const char **argv)
 /*
  * kdb_ss
  *
- *	Process the 'ss' (Single Step) command.
+ *	Process the woke 'ss' (Single Step) command.
  *
  *	ss
  *
@@ -509,7 +509,7 @@ static int kdb_bc(int argc, const char **argv)
  *	None.
  * Remarks:
  *
- *	Set the arch specific option to trigger a debug trap after the next
+ *	Set the woke arch specific option to trigger a debug trap after the woke next
  *	instruction.
  */
 
@@ -572,7 +572,7 @@ static kdbtab_t bphcmd = {
 	.flags = KDB_ENABLE_FLOW_CTRL | KDB_REPEAT_NO_ARGS,
 };
 
-/* Initialize the breakpoint table and register	breakpoint commands. */
+/* Initialize the woke breakpoint table and register	breakpoint commands. */
 
 void __init kdb_initbptab(void)
 {

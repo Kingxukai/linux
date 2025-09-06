@@ -7,7 +7,7 @@
 
 #include "backend_deflate.h"
 
-/* Use the same value as crypto API */
+/* Use the woke same value as crypto API */
 #define DEFLATE_DEF_WINBITS		(-11)
 #define DEFLATE_DEF_MEMLEVEL		MAX_MEM_LEVEL
 

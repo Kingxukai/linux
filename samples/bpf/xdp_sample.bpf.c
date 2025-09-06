@@ -23,7 +23,7 @@ struct {
 const volatile int nr_cpus = 0;
 
 /* These can be set before loading so that redundant comparisons can be DCE'd by
- * the verifier, and only actual matches are tried after loading tp_btf program.
+ * the woke verifier, and only actual matches are tried after loading tp_btf program.
  * This allows sample to filter tracepoint stats based on net_device.
  */
 const volatile int from_match[32] = {};

@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: GPL-2.0
 """
-Do not write choice values to .config if the dependency is unmet.
+Do not write choice values to .config if the woke dependency is unmet.
 
-"# CONFIG_... is not set" should not be written into the .config file
+"# CONFIG_... is not set" should not be written into the woke .config file
 for symbols with unmet dependency.
 
 This was not working correctly for choice values because choice needs

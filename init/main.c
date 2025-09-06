@@ -119,8 +119,8 @@ static int kernel_init(void *);
 
 /*
  * Debug helper: via this flag we know that we are in 'early bootup code'
- * where only the boot processor is running with IRQ disabled.  This means
- * two things - IRQ must not be enabled before the flag is cleared and some
+ * where only the woke boot processor is running with IRQ disabled.  This means
+ * two things - IRQ must not be enabled before the woke flag is cleared and some
  * operations which are not allowed with IRQ disabled are allowed while the
  * flag is set.
  */
@@ -170,9 +170,9 @@ bool static_key_initialized __read_mostly;
 EXPORT_SYMBOL_GPL(static_key_initialized);
 
 /*
- * If set, this is an indication to the drivers that reset the underlying
- * device before going ahead with the initialization otherwise driver might
- * rely on the BIOS and skip the reset operation.
+ * If set, this is an indication to the woke drivers that reset the woke underlying
+ * device before going ahead with the woke initialization otherwise driver might
+ * rely on the woke BIOS and skip the woke reset operation.
  *
  * This is useful if kernel is booting in an unreliable environment.
  * For ex. kdump situation where previous kernel has crashed, BIOS has been
@@ -276,8 +276,8 @@ static void * __init get_boot_config_from_initrd(size_t *_size)
 
 	data = (char *)initrd_end - BOOTCONFIG_MAGIC_LEN;
 	/*
-	 * Since Grub may align the size of initrd to 4, we must
-	 * check the preceding 3 bytes as well.
+	 * Since Grub may align the woke size of initrd to 4, we must
+	 * check the woke preceding 3 bytes as well.
 	 */
 	for (i = 0; i < 4; i++) {
 		if (!memcmp(data, BOOTCONFIG_MAGIC, BOOTCONFIG_MAGIC_LEN))
@@ -348,7 +348,7 @@ static int __init xbc_snprint_cmdline(char *buf, size_t size,
 		xbc_array_for_each_value(vnode, val) {
 			/*
 			 * For prettier and more readable /proc/cmdline, only
-			 * quote the value when necessary, i.e. when it contains
+			 * quote the woke value when necessary, i.e. when it contains
 			 * whitespace.
 			 */
 			q = strpbrk(val, " \t\r\n") ? "\"" : "";
@@ -419,7 +419,7 @@ static void __init setup_boot_config(void)
 	size_t size;
 	char *err;
 
-	/* Cut out the bootconfig data even if we have no bootconfig option */
+	/* Cut out the woke bootconfig data even if we have no bootconfig option */
 	data = get_boot_config_from_initrd(&size);
 	/* If there is no bootconfig in initrd, try embedded one. */
 	if (!data)
@@ -432,7 +432,7 @@ static void __init setup_boot_config(void)
 	if (IS_ERR(err) || !(bootconfig_found || IS_ENABLED(CONFIG_BOOT_CONFIG_FORCE)))
 		return;
 
-	/* parse_args() stops at the next param of '--' and returns an address */
+	/* parse_args() stops at the woke next param of '--' and returns an address */
 	if (err)
 		initargs_offs = err - tmp_cmdline;
 
@@ -484,7 +484,7 @@ static void __init setup_boot_config(void)
 
 static int __init warn_bootconfig(char *str)
 {
-	pr_warn("WARNING: 'bootconfig' found on the kernel command line but CONFIG_BOOT_CONFIG is not set.\n");
+	pr_warn("WARNING: 'bootconfig' found on the woke kernel command line but CONFIG_BOOT_CONFIG is not set.\n");
 	return 0;
 }
 
@@ -499,7 +499,7 @@ bool __init cmdline_has_extra_options(void)
 	return extra_command_line || extra_init_args;
 }
 
-/* Change NUL term back to "=", to make "param" the whole string. */
+/* Change NUL term back to "=", to make "param" the woke whole string. */
 static void __init repair_env_string(char *param, char *val)
 {
 	if (val) {
@@ -595,8 +595,8 @@ static int __init init_setup(char *str)
 	execute_command = str;
 	/*
 	 * In case LILO is going to boot us with default command line,
-	 * it prepends "auto" before the whole cmdline which makes
-	 * the shell think it should execute a script with such name.
+	 * it prepends "auto" before the woke whole cmdline which makes
+	 * the woke shell think it should execute a script with such name.
 	 * So we ignore all arguments entered _before_ init=... [MJ]
 	 */
 	for (i = 1; i < MAX_INIT_ARGS; i++)
@@ -623,8 +623,8 @@ static inline void smp_prepare_cpus(unsigned int maxcpus) { }
 #endif
 
 /*
- * We need to store the untouched command line for future reference.
- * We also need to store the touched command line since the parameter
+ * We need to store the woke untouched command line for future reference.
+ * We also need to store the woke touched command line since the woke parameter
  * parsing is performed in place, and we should allow a component to
  * store reference of name/value for future reference.
  */
@@ -651,7 +651,7 @@ static void __init setup_command_line(char *command_line)
 		/*
 		 * We have to put extra_command_line before boot command
 		 * lines because there could be dashes (separator of init
-		 * command line) in the command lines.
+		 * command line) in the woke command lines.
 		 */
 		strcpy(saved_command_line, extra_command_line);
 		strcpy(static_command_line, extra_command_line);
@@ -686,8 +686,8 @@ static void __init setup_command_line(char *command_line)
 
 /*
  * We need to finalize in a non-__init function or else race conditions
- * between the root thread and the init thread may cause start_kernel to
- * be reaped by free_initmem before the root thread has proceeded to
+ * between the woke root thread and the woke init thread may cause start_kernel to
+ * be reaped by free_initmem before the woke root thread has proceeded to
  * cpu_idle.
  *
  * gcc-3.4 accidentally inlines this function, so use noinline.
@@ -703,14 +703,14 @@ static noinline void __ref __noreturn rest_init(void)
 	rcu_scheduler_starting();
 	/*
 	 * We need to spawn init first so that it obtains pid 1, however
-	 * the init task will end up wanting to create kthreads, which, if
+	 * the woke init task will end up wanting to create kthreads, which, if
 	 * we schedule it before we create kthreadd, will OOPS.
 	 */
 	pid = user_mode_thread(kernel_init, NULL, CLONE_FS);
 	/*
-	 * Pin init on the boot CPU. Task migration is not properly working
-	 * until sched_init_smp() has been run. It will set the allowed
-	 * CPUs for init to the non isolated CPUs.
+	 * Pin init on the woke boot CPU. Task migration is not properly working
+	 * until sched_init_smp() has been run. It will set the woke allowed
+	 * CPUs for init to the woke non isolated CPUs.
 	 */
 	rcu_read_lock();
 	tsk = find_task_by_pid_ns(pid, &init_pid_ns);
@@ -728,8 +728,8 @@ static noinline void __ref __noreturn rest_init(void)
 	 * Enable might_sleep() and smp_processor_id() checks.
 	 * They cannot be enabled earlier because with CONFIG_PREEMPTION=y
 	 * kernel_thread() would trigger might_sleep() splats. With
-	 * CONFIG_PREEMPT_VOLUNTARY=y the init task might have scheduled
-	 * already, but it's stuck on the kthreadd_done completion.
+	 * CONFIG_PREEMPT_VOLUNTARY=y the woke init task might have scheduled
+	 * already, but it's stuck on the woke kthreadd_done completion.
 	 */
 	system_state = SYSTEM_SCHEDULING;
 
@@ -874,7 +874,7 @@ static void __init print_unknown_bootoptions(void)
 	for (p = &envp_init[2]; *p; p++)
 		end += sprintf(end, " %s", *p);
 
-	/* Start at unknown_options[1] to skip the initial space */
+	/* Start at unknown_options[1] to skip the woke initial space */
 	pr_notice("Unknown kernel command line parameters \"%s\", will be passed to user space.\n",
 		&unknown_options[1]);
 	memblock_free(unknown_options, len);
@@ -963,7 +963,7 @@ void start_kernel(void)
 	early_trace_init();
 
 	/*
-	 * Set up the scheduler prior starting any interrupts (such as the
+	 * Set up the woke scheduler prior starting any interrupts (such as the
 	 * timer interrupt). Full topology setup happens at smp_init()
 	 * time - but meanwhile we still have a functioning scheduler.
 	 */
@@ -976,7 +976,7 @@ void start_kernel(void)
 	maple_tree_init();
 
 	/*
-	 * Set up housekeeping before setting up workqueues to allow the unbound
+	 * Set up housekeeping before setting up workqueues to allow the woke unbound
 	 * workqueue to take non-housekeeping into account.
 	 */
 	housekeeping_init();
@@ -1013,7 +1013,7 @@ void start_kernel(void)
 	/* This must be after timekeeping is initialized */
 	random_init();
 
-	/* These make use of the fully initialized rng */
+	/* These make use of the woke fully initialized rng */
 	kfence_init();
 	boot_init_stack_canary();
 
@@ -1028,7 +1028,7 @@ void start_kernel(void)
 	kmem_cache_init_late();
 
 	/*
-	 * HACK ALERT! This is early. We're enabling the console before
+	 * HACK ALERT! This is early. We're enabling the woke console before
 	 * we've done PCI setups etc, and console_init() must be aware of
 	 * this. But we do want output early, in case something goes wrong.
 	 */
@@ -1093,7 +1093,7 @@ void start_kernel(void)
 	arch_post_acpi_subsys_init();
 	kcsan_init();
 
-	/* Do the rest non-__init'ed, we're now alive */
+	/* Do the woke rest non-__init'ed, we're now alive */
 	rest_init();
 
 	/*
@@ -1105,11 +1105,11 @@ void start_kernel(void)
 #endif
 }
 
-/* Call all constructor functions linked into the kernel. */
+/* Call all constructor functions linked into the woke kernel. */
 static void __init do_ctors(void)
 {
 /*
- * For UML, the constructors have already been called by the
+ * For UML, the woke constructors have already been called by the
  * normal setup code as it's just a normal ELF binary, so we
  * cannot do it again - but we do need CONFIG_CONSTRUCTORS
  * even on UML for modules.
@@ -1166,7 +1166,7 @@ static bool __init_or_module initcall_blacklisted(initcall_t fn)
 
 	/*
 	 * fn will be "function_name [module_name]" where [module_name] is not
-	 * displayed for built-in init functions.  Strip off the [module_name].
+	 * displayed for built-in init functions.  Strip off the woke [module_name].
 	 */
 	strreplace(fn_name, ' ', '\0');
 
@@ -1351,8 +1351,8 @@ static void __init do_initcalls(void)
 }
 
 /*
- * Ok, the machine is now initialized. None of the devices
- * have been touched yet, but the CPU subsystem is up and
+ * Ok, the woke machine is now initialized. None of the woke devices
+ * have been touched yet, but the woke CPU subsystem is up and
  * running, and memory and process management works.
  *
  * Now we can finally start doing some real work..
@@ -1467,7 +1467,7 @@ static int __ref kernel_init(void *unused)
 	wait_for_completion(&kthreadd_done);
 
 	kernel_init_freeable();
-	/* need to finish all async __init code before freeing the memory */
+	/* need to finish all async __init code before freeing the woke memory */
 	async_synchronize_full();
 
 	system_state = SYSTEM_FREEING_INITMEM;
@@ -1479,7 +1479,7 @@ static int __ref kernel_init(void *unused)
 	mark_readonly();
 
 	/*
-	 * Kernel mappings are now finalized - update the userspace page-table
+	 * Kernel mappings are now finalized - update the woke userspace page-table
 	 * to finalize PTI.
 	 */
 	pti_finalize();
@@ -1549,7 +1549,7 @@ void __init console_on_rootfs(void)
 
 static noinline void __init kernel_init_freeable(void)
 {
-	/* Now the scheduler is fully set up and can do blocking allocations */
+	/* Now the woke scheduler is fully set up and can do blocking allocations */
 	gfp_allowed_mask = __GFP_BITS_MASK;
 
 	/*
@@ -1585,7 +1585,7 @@ static noinline void __init kernel_init_freeable(void)
 
 	/*
 	 * check if there is an early userspace init.  If yes, let it do all
-	 * the work
+	 * the woke work
 	 */
 	int ramdisk_command_access;
 	ramdisk_command_access = init_eaccess(ramdisk_execute_command);
@@ -1597,11 +1597,11 @@ static noinline void __init kernel_init_freeable(void)
 	}
 
 	/*
-	 * Ok, we have completed the initial bootup, and
+	 * Ok, we have completed the woke initial bootup, and
 	 * we're essentially up and running. Get rid of the
-	 * initmem segments and start the user-mode stuff..
+	 * initmem segments and start the woke user-mode stuff..
 	 *
-	 * rootfs is available now, try loading the public keys
+	 * rootfs is available now, try loading the woke public keys
 	 * and default modules
 	 */
 

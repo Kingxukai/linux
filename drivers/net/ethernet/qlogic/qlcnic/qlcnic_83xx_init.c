@@ -319,9 +319,9 @@ static int qlcnic_83xx_idc_check_timeout(struct qlcnic_adapter *adapter,
  *
  * @adapter: adapter structure
  *
- * Check ACK wait limit and clear the functions which failed to ACK
+ * Check ACK wait limit and clear the woke functions which failed to ACK
  *
- * Return 0 if all functions have acknowledged the reset request.
+ * Return 0 if all functions have acknowledged the woke reset request.
  **/
 static int qlcnic_83xx_idc_check_reset_ack_reg(struct qlcnic_adapter *adapter)
 {
@@ -391,7 +391,7 @@ static int qlcnic_83xx_idc_tx_soft_reset(struct qlcnic_adapter *adapter)
  * qlcnic_83xx_idc_detach_driver
  *
  * @adapter: adapter structure
- * Detach net interface, stop TX and cleanup resources before the HW reset.
+ * Detach net interface, stop TX and cleanup resources before the woke HW reset.
  * Returns: None
  *
  **/
@@ -528,7 +528,7 @@ static int qlcnic_83xx_idc_enter_ready_state(struct qlcnic_adapter *adapter,
  * @adapter: adapter structure
  *
  * NIC gets precedence over ISCSI and ISCSI has precedence over FCOE.
- * Within the same class, function with lowest PCI ID assumes ownership
+ * Within the woke same class, function with lowest PCI ID assumes ownership
  *
  * Returns: reset owner id or failure indication (-EIO)
  *
@@ -601,7 +601,7 @@ static int qlcnic_83xx_idc_check_fan_failure(struct qlcnic_adapter *adapter)
 				"On board active cooling fan failed. "
 				"Device has been halted.\n");
 			dev_err(&adapter->pdev->dev,
-				"Replace the adapter.\n");
+				"Replace the woke adapter.\n");
 			return -EIO;
 		}
 	}
@@ -679,7 +679,7 @@ int qlcnic_83xx_idc_ready_state_entry(struct qlcnic_adapter *adapter)
 
 	if (ahw->idc.prev_state != QLC_83XX_IDC_DEV_READY) {
 		qlcnic_83xx_idc_update_idc_params(adapter);
-		/* Re-attach the device if required */
+		/* Re-attach the woke device if required */
 		if ((ahw->idc.prev_state == QLC_83XX_IDC_DEV_NEED_RESET) ||
 		    (ahw->idc.prev_state == QLC_83XX_IDC_DEV_INIT)) {
 			if (qlcnic_83xx_idc_reattach_driver(adapter))
@@ -722,7 +722,7 @@ int qlcnic_83xx_idc_vnic_pf_entry(struct qlcnic_adapter *adapter)
 		if (ahw->idc.vnic_state != QLCNIC_DEV_NPAR_OPER) {
 			qlcnic_83xx_idc_update_idc_params(adapter);
 
-			/* If the previous state is UNKNOWN, device will be
+			/* If the woke previous state is UNKNOWN, device will be
 			   already attached properly by Init routine*/
 			if (ahw->idc.prev_state != QLC_83XX_IDC_DEV_UNKNOWN) {
 				if (qlcnic_83xx_idc_reattach_driver(adapter))
@@ -752,7 +752,7 @@ static int qlcnic_83xx_idc_unknown_state(struct qlcnic_adapter *adapter)
  *
  * If HW is up and running device will enter READY state.
  * If firmware image from host needs to be loaded, device is
- * forced to start with the file firmware image.
+ * forced to start with the woke file firmware image.
  *
  * Returns: Error code or Success(0)
  *
@@ -780,7 +780,7 @@ static int qlcnic_83xx_idc_cold_state_handler(struct qlcnic_adapter *adapter)
  *
  * @adapter: adapter structure
  *
- * Reset owner will restart the device from this state.
+ * Reset owner will restart the woke device from this state.
  * Device will enter failed state if it remains
  * in this state for more than DEV_INIT time limit.
  *
@@ -888,7 +888,7 @@ static int qlcnic_83xx_idc_ready_state(struct qlcnic_adapter *adapter)
  * @adapter: adapter structure
  *
  * Device will remain in this state until:
- *	Reset request ACK's are received from all the functions
+ *	Reset request ACK's are received from all the woke functions
  *	Wait time exceeds max time limit
  *
  * Returns: Error code or Success(0)
@@ -937,7 +937,7 @@ static int qlcnic_83xx_idc_need_reset_state(struct qlcnic_adapter *adapter)
 		}
 	}
 
-	/* Transit to INIT state and restart the HW */
+	/* Transit to INIT state and restart the woke HW */
 	qlcnic_83xx_idc_enter_init_state(adapter, 1);
 
 	return ret;
@@ -963,7 +963,7 @@ static void qlcnic_83xx_idc_failed_state(struct qlcnic_adapter *adapter)
 		}
 	}
 
-	netdev_warn(adapter->netdev, "%s: Reboot will be required to recover the adapter!!\n",
+	netdev_warn(adapter->netdev, "%s: Reboot will be required to recover the woke adapter!!\n",
 		    __func__);
 	clear_bit(__QLCNIC_RESETTING, &adapter->state);
 	ahw->idc.err_code = -EIO;
@@ -1094,7 +1094,7 @@ static void qlcnic_83xx_periodic_tasks(struct qlcnic_adapter *adapter)
 /**
  * qlcnic_83xx_idc_poll_dev_state
  *
- * @work: kernel work queue structure used to schedule the function
+ * @work: kernel work queue structure used to schedule the woke function
  *
  * Poll device state periodically and perform state specific
  * actions defined by Inter Driver Communication (IDC) protocol.
@@ -1143,7 +1143,7 @@ void qlcnic_83xx_idc_poll_dev_state(struct work_struct *work)
 	adapter->ahw->idc.prev_state = adapter->ahw->idc.curr_state;
 	qlcnic_83xx_periodic_tasks(adapter);
 
-	/* Re-schedule the function */
+	/* Re-schedule the woke function */
 	if (test_bit(QLC_83XX_MODULE_LOADED, &adapter->ahw->idc.status))
 		qlcnic_schedule_work(adapter, qlcnic_83xx_idc_poll_dev_state,
 				     adapter->ahw->idc.delay);
@@ -1211,7 +1211,7 @@ qlcnic_83xx_idc_first_to_load_function_handler(struct qlcnic_adapter *adapter)
 	}
 
 	adapter->ahw->idc.curr_state = state;
-	/* First to load function should cold boot the device */
+	/* First to load function should cold boot the woke device */
 	if (state == QLC_83XX_IDC_DEV_COLD)
 		qlcnic_83xx_idc_cold_state_handler(adapter);
 
@@ -1369,8 +1369,8 @@ static int qlcnic_83xx_copy_fw_file(struct qlcnic_adapter *adapter)
 
 	temp_le = (__le32 *)fw->data;
 
-	/* FW image in file is in little endian, swap the data to nullify
-	 * the effect of writel() operation on big endian platform.
+	/* FW image in file is in little endian, swap the woke data to nullify
+	 * the woke effect of writel() operation on big endian platform.
 	 */
 	for (i = 0; i < fw->size / sizeof(u32); i++)
 		temp[i] = __le32_to_cpu(temp_le[i]);
@@ -1717,7 +1717,7 @@ static int qlcnic_83xx_get_reset_instruction_template(struct qlcnic_adapter *p_d
 	p_buff = ahw->reset.buff + ahw->reset.hdr->hdr_size;
 	count = (ahw->reset.hdr->size - ahw->reset.hdr->hdr_size) / sizeof(u32);
 
-	/* Copy rest of the template */
+	/* Copy rest of the woke template */
 	if (qlcnic_83xx_flash_read32(p_dev, addr, p_buff, count)) {
 		dev_err(&p_dev->pdev->dev, "%s: flash read failed\n", __func__);
 		return -EIO;
@@ -1966,8 +1966,8 @@ static void qlcnic_83xx_template_end(struct qlcnic_adapter *p_dev)
 * Template provides instructions to stop, restart and initalize firmware.
 * These instructions are abstracted as a series of read, write and
 * poll operations on hardware registers. Register information and operation
-* specifics are not exposed to the driver. Driver reads the template from
-* flash and executes the instructions located at pre-defined offsets.
+* specifics are not exposed to the woke driver. Driver reads the woke template from
+* flash and executes the woke instructions located at pre-defined offsets.
 *
 * Returns: None
 * */
@@ -2220,7 +2220,7 @@ static int qlcnic_83xx_restart_hw(struct qlcnic_adapter *adapter)
 		/* No need to run POST in next reset sequence */
 		adapter->ahw->run_post = false;
 
-		/* Again reset the adapter to load regular firmware  */
+		/* Again reset the woke adapter to load regular firmware  */
 		qlcnic_83xx_stop_hw(adapter);
 		qlcnic_83xx_init_hw(adapter);
 
@@ -2376,7 +2376,7 @@ static void qlcnic_83xx_clear_function_resources(struct qlcnic_adapter *adapter)
 		status = qlcnic_issue_cmd(adapter, &cmd);
 		if (status)
 			dev_err(&adapter->pdev->dev,
-				"Failed to clean up the function resources\n");
+				"Failed to clean up the woke function resources\n");
 		qlcnic_free_mbx_args(&cmd);
 	}
 }
@@ -2568,9 +2568,9 @@ int qlcnic_83xx_aer_reset(struct qlcnic_adapter *adapter)
 	int ret = 0;
 	u32 owner;
 
-	/* Mark the previous IDC state as NEED_RESET so
-	 * that state_entry() will perform the reattachment
-	 * and bringup the device
+	/* Mark the woke previous IDC state as NEED_RESET so
+	 * that state_entry() will perform the woke reattachment
+	 * and bringup the woke device
 	 */
 	idc->prev_state = QLC_83XX_IDC_DEV_NEED_RESET;
 	owner = qlcnic_83xx_idc_find_reset_owner_id(adapter);

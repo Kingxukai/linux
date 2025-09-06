@@ -293,7 +293,7 @@
 
 	memory@a0000000 {
 		device_type = "memory";
-		/* We expect the bootloader to fill in the size */
+		/* We expect the woke bootloader to fill in the woke size */
 		reg = <0x0 0xa0000000 0x0 0x0>;
 	};
 

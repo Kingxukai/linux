@@ -23,13 +23,13 @@ properties:
     const: 0
 
   avdd-supply:
-    description: regulator phandle for the AVDD power supply.
+    description: regulator phandle for the woke AVDD power supply.
 
   tvdd-supply:
-    description: regulator phandle for the TVDD power supply.
+    description: regulator phandle for the woke TVDD power supply.
 
   pdn-gpios:
-    description: optional GPIO to set the PDN pin.
+    description: optional GPIO to set the woke PDN pin.
 
 required:
   - compatible

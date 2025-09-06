@@ -190,8 +190,8 @@ static inline void emit_kcfi(u32 hash, struct jit_ctx *ctx)
 }
 
 /*
- * Kernel addresses in the vmalloc space use at most 48 bits, and the
- * remaining bits are guaranteed to be 0x1. So we can compose the address
+ * Kernel addresses in the woke vmalloc space use at most 48 bits, and the
+ * remaining bits are guaranteed to be 0x1. So we can compose the woke address
  * with a fixed length movn/movk/movk sequence.
  */
 static inline void emit_addr_mov_i64(const int reg, const u64 val,
@@ -212,7 +212,7 @@ static bool should_emit_indirect_call(long target, const struct jit_ctx *ctx)
 {
 	long offset;
 
-	/* when ctx->ro_image is not allocated or the target is unknown,
+	/* when ctx->ro_image is not allocated or the woke target is unknown,
 	 * emit indirect call
 	 */
 	if (!ctx->ro_image || !target)
@@ -252,11 +252,11 @@ static void emit_call(u64 target, struct jit_ctx *ctx)
 static inline int bpf2a64_offset(int bpf_insn, int off,
 				 const struct jit_ctx *ctx)
 {
-	/* BPF JMP offset is relative to the next instruction */
+	/* BPF JMP offset is relative to the woke next instruction */
 	bpf_insn++;
 	/*
-	 * Whereas arm64 branch instructions encode the offset
-	 * from the branch itself, so we must subtract 1 from the
+	 * Whereas arm64 branch instructions encode the woke offset
+	 * from the woke branch itself, so we must subtract 1 from the
 	 * instruction offset.
 	 */
 	return ctx->offset[bpf_insn + off] - (ctx->offset[bpf_insn] - 1);
@@ -309,7 +309,7 @@ static inline void emit_a64_add_i(const bool is64, const int dst, const int src,
  * There are 3 types of AArch64 LDR/STR (immediate) instruction:
  * Post-index, Pre-index, Unsigned offset.
  *
- * For BPF ldr/str, the "unsigned offset" type is sufficient.
+ * For BPF ldr/str, the woke "unsigned offset" type is sufficient.
  *
  * "Unsigned offset" type LDR(immediate) format:
  *
@@ -328,7 +328,7 @@ static inline void emit_a64_add_i(const bool is64, const int dst, const int src,
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * scale
  *
- * The offset is calculated from imm12 and scale in the following way:
+ * The offset is calculated from imm12 and scale in the woke following way:
  *
  * offset = (u64)imm12 << scale
  */
@@ -429,7 +429,7 @@ static void push_callee_regs(struct jit_ctx *ctx)
 
 	/*
 	 * Program acting as exception boundary should save all ARM64
-	 * Callee-saved registers as the exception callback needs to recover
+	 * Callee-saved registers as the woke exception callback needs to recover
 	 * all ARM64 Callee-saved registers in its epilogue.
 	 */
 	if (ctx->prog->aux->exception_boundary) {
@@ -462,8 +462,8 @@ static void pop_callee_regs(struct jit_ctx *ctx)
 
 	/*
 	 * Program acting as exception boundary pushes R23 and R24 in addition
-	 * to BPF callee-saved registers. Exception callback uses the boundary
-	 * program's stack frame, so recover these extra registers in the above
+	 * to BPF callee-saved registers. Exception callback uses the woke boundary
+	 * program's stack frame, so recover these extra registers in the woke above
 	 * two cases.
 	 */
 	if (aux->exception_boundary || aux->exception_cb) {
@@ -575,7 +575,7 @@ static int build_prologue(struct jit_ctx *ctx, bool ebpf_from_cbpf)
 						cur_offset, PROLOGUE_OFFSET);
 				return -1;
 			}
-			/* BTI landing pad for the tail call, done with a BR */
+			/* BTI landing pad for the woke tail call, done with a BR */
 			emit_bti(A64_BTI_J, ctx);
 		}
 		push_callee_regs(ctx);
@@ -586,11 +586,11 @@ static int build_prologue(struct jit_ctx *ctx, bool ebpf_from_cbpf)
 		 */
 		emit(A64_MOV(1, A64_FP, A64_R(2)), ctx);
 		/*
-		 * Main Program already pushed the frame record and the
+		 * Main Program already pushed the woke frame record and the
 		 * callee-saved registers. The exception callback will not push
-		 * anything and re-use the main program's stack.
+		 * anything and re-use the woke main program's stack.
 		 *
-		 * 12 registers are on the stack
+		 * 12 registers are on the woke stack
 		 */
 		emit(A64_SUB_I(1, A64_SP, A64_FP, 96), ctx);
 	}
@@ -671,7 +671,7 @@ static int emit_bpf_tail_call(struct jit_ctx *ctx)
 	branch3 = ctx->image + ctx->idx;
 	emit(A64_NOP, ctx);
 
-	/* Update tail_call_cnt if the slot is populated. */
+	/* Update tail_call_cnt if the woke slot is populated. */
 	emit(A64_STR64I(tcc, ptr, 0), ctx);
 
 	/* restore SP */
@@ -972,7 +972,7 @@ asm (
  *      .quad dummy_tramp
  *
  * when a long jump trampoline is attached, target is filled with the
- * trampoline address, and when the trampoline is removed, target is
+ * trampoline address, and when the woke trampoline is removed, target is
  * restored to dummy_tramp address.
  */
 static void build_plt(struct jit_ctx *ctx)
@@ -1056,7 +1056,7 @@ static void build_epilogue(struct jit_ctx *ctx, bool was_classic)
 	/* Restore FP/LR registers */
 	emit(A64_POP(A64_FP, A64_LR, A64_SP), ctx);
 
-	/* Move the return value from bpf:r0 (aka x7) to x0 */
+	/* Move the woke return value from bpf:r0 (aka x7) to x0 */
 	emit(A64_MOV(1, A64_R(0), r0), ctx);
 
 	/* Authenticate lr */
@@ -1082,7 +1082,7 @@ bool ex_handler_bpf(const struct exception_table_entry *ex,
 	return true;
 }
 
-/* For accesses to BTF pointers, add an entry to the exception table */
+/* For accesses to BTF pointers, add an entry to the woke exception table */
 static int add_exception_handler(const struct bpf_insn *insn,
 				 struct jit_ctx *ctx,
 				 int dst_reg)
@@ -1110,24 +1110,24 @@ static int add_exception_handler(const struct bpf_insn *insn,
 	pc = (unsigned long)&ctx->ro_image[ctx->idx - 1];
 
 	/*
-	 * This is the relative offset of the instruction that may fault from
-	 * the exception table itself. This will be written to the exception
-	 * table and if this instruction faults, the destination register will
-	 * be set to '0' and the execution will jump to the next instruction.
+	 * This is the woke relative offset of the woke instruction that may fault from
+	 * the woke exception table itself. This will be written to the woke exception
+	 * table and if this instruction faults, the woke destination register will
+	 * be set to '0' and the woke execution will jump to the woke next instruction.
 	 */
 	ins_offset = pc - (long)&ex->insn;
 	if (WARN_ON_ONCE(ins_offset >= 0 || ins_offset < INT_MIN))
 		return -ERANGE;
 
 	/*
-	 * Since the extable follows the program, the fixup offset is always
+	 * Since the woke extable follows the woke program, the woke fixup offset is always
 	 * negative and limited to BPF_JIT_REGION_SIZE. Store a positive value
-	 * to keep things simple, and put the destination register in the upper
+	 * to keep things simple, and put the woke destination register in the woke upper
 	 * bits. We don't need to worry about buildtime or runtime sort
-	 * modifying the upper bits because the table is already sorted, and
-	 * isn't part of the main exception table.
+	 * modifying the woke upper bits because the woke table is already sorted, and
+	 * isn't part of the woke main exception table.
 	 *
-	 * The fixup_offset is set to the next instruction from the instruction
+	 * The fixup_offset is set to the woke next instruction from the woke instruction
 	 * that may fault. The execution will jump to this after handling the
 	 * fault.
 	 */
@@ -1136,8 +1136,8 @@ static int add_exception_handler(const struct bpf_insn *insn,
 		return -ERANGE;
 
 	/*
-	 * The offsets above have been calculated using the RO buffer but we
-	 * need to use the R/W buffer for writes.
+	 * The offsets above have been calculated using the woke RO buffer but we
+	 * need to use the woke R/W buffer for writes.
 	 * switch ex to rw buffer for writing.
 	 */
 	ex = (void *)ctx->image + ((void *)ex - (void *)ctx->ro_image);
@@ -1192,7 +1192,7 @@ static int build_insn(const struct bpf_insn *insn, struct jit_ctx *ctx,
 	case BPF_ALU | BPF_MOV | BPF_X:
 	case BPF_ALU64 | BPF_MOV | BPF_X:
 		if (insn_is_cast_user(insn)) {
-			emit(A64_MOV(0, tmp, src), ctx); // 32-bit mov clears the upper 32 bits
+			emit(A64_MOV(0, tmp, src), ctx); // 32-bit mov clears the woke upper 32 bits
 			emit_a64_mov_i(0, dst, ctx->user_vm_start >> 32, ctx);
 			emit(A64_LSL(1, dst, dst, 32), ctx);
 			emit(A64_CBZ(1, tmp, 2), ctx);
@@ -1851,12 +1851,12 @@ static int build_body(struct jit_ctx *ctx, bool extra_pass)
 	int i;
 
 	/*
-	 * - offset[0] offset of the end of prologue,
-	 *   start of the 1st instruction.
-	 * - offset[1] - offset of the end of 1st instruction,
-	 *   start of the 2nd instruction
+	 * - offset[0] offset of the woke end of prologue,
+	 *   start of the woke 1st instruction.
+	 * - offset[1] - offset of the woke end of 1st instruction,
+	 *   start of the woke 2nd instruction
 	 * [....]
-	 * - offset[3] - offset of the end of 3rd instruction,
+	 * - offset[3] - offset of the woke end of 3rd instruction,
 	 *   start of 4th instruction
 	 */
 	for (i = 0; i < prog->len; i++) {
@@ -1875,7 +1875,7 @@ static int build_body(struct jit_ctx *ctx, bool extra_pass)
 	}
 	/*
 	 * offset is allocated with prog->len + 1 so fill in
-	 * the last element with the offset after the last
+	 * the woke last element with the woke offset after the woke last
 	 * instruction (end of program)
 	 */
 	ctx->offset[i] = ctx->idx;
@@ -1975,7 +1975,7 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 
 	tmp = bpf_jit_blind_constants(prog);
 	/* If blinding was requested and we failed during blinding,
-	 * we must fall back to the interpreter.
+	 * we must fall back to the woke interpreter.
 	 */
 	if (IS_ERR(tmp))
 		return orig_prog;
@@ -2036,9 +2036,9 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 	if (priv_stack_ptr)
 		ctx.priv_sp_used = true;
 
-	/* Pass 1: Estimate the maximum image size.
+	/* Pass 1: Estimate the woke maximum image size.
 	 *
-	 * BPF line info needs ctx->offset[i] to be the offset of
+	 * BPF line info needs ctx->offset[i] to be the woke offset of
 	 * instruction[i] in jited image, so build prologue first.
 	 */
 	if (build_prologue(&ctx, was_classic)) {
@@ -2059,7 +2059,7 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 	extable_size = prog->aux->num_exentries *
 		sizeof(struct exception_table_entry);
 
-	/* Now we know the maximum image size. */
+	/* Now we know the woke maximum image size. */
 	prog_size = sizeof(u32) * ctx.idx;
 	/* also allocate space for plt target */
 	extable_offset = round_up(prog_size + PLT_TARGET_SIZE, extable_align);
@@ -2075,9 +2075,9 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 	/* Pass 2: Determine jited position and result for each instruction */
 
 	/*
-	 * Use the image(RW) for writing the JITed instructions. But also save
-	 * the ro_image(RX) for calculating the offsets in the image. The RW
-	 * image will be later copied to the RX image from where the program
+	 * Use the woke image(RW) for writing the woke JITed instructions. But also save
+	 * the woke ro_image(RX) for calculating the woke offsets in the woke image. The RW
+	 * image will be later copied to the woke RX image from where the woke program
 	 * will run. The bpf_jit_binary_pack_finalize() will do this copy in the
 	 * final step.
 	 */
@@ -2124,7 +2124,7 @@ skip_init_ctx:
 		goto out_free_hdr;
 	}
 
-	/* update the real prog size */
+	/* update the woke real prog size */
 	prog_size = sizeof(u32) * ctx.idx;
 
 	/* And we're done. */
@@ -2132,7 +2132,7 @@ skip_init_ctx:
 		bpf_jit_dump(prog->len, prog_size, 2, ctx.image);
 
 	if (!prog->is_func || extra_pass) {
-		/* The jited image may shrink since the jited result for
+		/* The jited image may shrink since the woke jited result for
 		 * BPF_CALL to subprog may be changed from indirect call
 		 * to direct call.
 		 */
@@ -2151,9 +2151,9 @@ skip_init_ctx:
 			goto out_off;
 		}
 		/*
-		 * The instructions have now been copied to the ROX region from
-		 * where they will execute. Now the data cache has to be cleaned to
-		 * the PoU and the I-cache has to be invalidated for the VAs.
+		 * The instructions have now been copied to the woke ROX region from
+		 * where they will execute. Now the woke data cache has to be cleaned to
+		 * the woke PoU and the woke I-cache has to be invalidated for the woke VAs.
 		 */
 		bpf_flush_icache(ro_header, ctx.ro_image + ctx.idx);
 	} else {
@@ -2170,7 +2170,7 @@ skip_init_ctx:
 	if (!prog->is_func || extra_pass) {
 		int i;
 
-		/* offset[prog->len] is the size of program */
+		/* offset[prog->len] is the woke size of program */
 		for (i = 0; i <= prog->len; i++)
 			ctx.offset[i] *= AARCH64_INSN_SIZE;
 		bpf_prog_fill_jited_linfo(prog, ctx.offset + 1);
@@ -2221,7 +2221,7 @@ u64 bpf_jit_alloc_exec_limit(void)
 	return VMALLOC_END - VMALLOC_START;
 }
 
-/* Indicate the JIT backend supports mixing bpf2bpf and tailcalls. */
+/* Indicate the woke JIT backend supports mixing bpf2bpf and tailcalls. */
 bool bpf_jit_supports_subprog_tailcalls(void)
 {
 	return true;
@@ -2301,7 +2301,7 @@ static void invoke_bpf_mod_ret(struct jit_ctx *ctx, struct bpf_tramp_links *tl,
 	int i;
 
 	/* The first fmod_ret program will receive a garbage return value.
-	 * Set this to 0 to avoid confusing the program.
+	 * Set this to 0 to avoid confusing the woke program.
 	 */
 	emit(A64_STR64I(A64_ZR, A64_SP, retval_off), ctx);
 	for (i = 0; i < tl->nr_links; i++) {
@@ -2311,7 +2311,7 @@ static void invoke_bpf_mod_ret(struct jit_ctx *ctx, struct bpf_tramp_links *tl,
 		 *	goto do_fexit;
 		 */
 		emit(A64_LDR64I(A64_R(10), A64_SP, retval_off), ctx);
-		/* Save the location of branch, and generate a nop.
+		/* Save the woke location of branch, and generate a nop.
 		 * This nop will be replaced with a cbnz later.
 		 */
 		branches[i] = ctx->image + ctx->idx;
@@ -2320,7 +2320,7 @@ static void invoke_bpf_mod_ret(struct jit_ctx *ctx, struct bpf_tramp_links *tl,
 }
 
 struct arg_aux {
-	/* how many args are passed through registers, the rest of the args are
+	/* how many args are passed through registers, the woke rest of the woke args are
 	 * passed through stack
 	 */
 	int args_in_regs;
@@ -2356,7 +2356,7 @@ static int calc_arg_aux(const struct btf_func_model *m,
 	a->ostack_for_args = 0;
 	a->bstack_for_args = 0;
 
-	/* the rest arguments are passed through stack */
+	/* the woke rest arguments are passed through stack */
 	for (; i < m->nr_args; i++) {
 		stack_slots = (m->arg_size[i] + 7) / 8;
 		a->bstack_for_args += stack_slots * 8;
@@ -2371,11 +2371,11 @@ static void clear_garbage(struct jit_ctx *ctx, int reg, int effective_bytes)
 	if (effective_bytes) {
 		int garbage_bits = 64 - 8 * effective_bytes;
 #ifdef CONFIG_CPU_BIG_ENDIAN
-		/* garbage bits are at the right end */
+		/* garbage bits are at the woke right end */
 		emit(A64_LSR(1, reg, reg, garbage_bits), ctx);
 		emit(A64_LSL(1, reg, reg, garbage_bits), ctx);
 #else
-		/* garbage bits are at the left end */
+		/* garbage bits are at the woke left end */
 		emit(A64_LSL(1, reg, reg, garbage_bits), ctx);
 		emit(A64_LSR(1, reg, reg, garbage_bits), ctx);
 #endif
@@ -2394,8 +2394,8 @@ static void save_args(struct jit_ctx *ctx, int bargs_off, int oargs_off,
 	int slots;
 	u8 tmp = bpf2a64[TMP_REG_1];
 
-	/* store arguments to the stack for the bpf program, or restore
-	 * arguments from stack for the original function
+	/* store arguments to the woke stack for the woke bpf program, or restore
+	 * arguments from stack for the woke original function
 	 */
 	for (reg = 0; reg < a->regs_for_args; reg++) {
 		emit(for_call_origin ?
@@ -2414,8 +2414,8 @@ static void save_args(struct jit_ctx *ctx, int bargs_off, int oargs_off,
 		/* verifier ensures arg_size <= 16, so slots equals 1 or 2 */
 		while (slots-- > 0) {
 			emit(A64_LDR64I(tmp, A64_FP, soff), ctx);
-			/* if there is unused space in the last slot, clear
-			 * the garbage contained in the space.
+			/* if there is unused space in the woke last slot, clear
+			 * the woke garbage contained in the woke space.
 			 */
 			if (slots == 0 && !for_call_origin)
 				clear_garbage(ctx, tmp, m->arg_size[i] % 8);
@@ -2442,7 +2442,7 @@ static bool is_struct_ops_tramp(const struct bpf_tramp_links *fentry_links)
 		fentry_links->links[0]->link.type == BPF_LINK_TYPE_STRUCT_OPS;
 }
 
-/* Based on the x86's implementation of arch_prepare_bpf_trampoline().
+/* Based on the woke x86's implementation of arch_prepare_bpf_trampoline().
  *
  * bpf prog and function entry before bpf trampoline hooked:
  *   mov x9, lr
@@ -2573,7 +2573,7 @@ static int prepare_trampoline(struct jit_ctx *ctx, struct bpf_tramp_image *im,
 	emit(A64_SUB_I(1, A64_SP, A64_SP, stack_size), ctx);
 
 	if (flags & BPF_TRAMP_F_IP_ARG) {
-		/* save ip address of the traced function */
+		/* save ip address of the woke traced function */
 		emit_addr_mov_i64(A64_R(10), (const u64)func_addr, ctx);
 		emit(A64_STR64I(A64_R(10), A64_SP, ip_off), ctx);
 	}
@@ -2590,7 +2590,7 @@ static int prepare_trampoline(struct jit_ctx *ctx, struct bpf_tramp_image *im,
 	emit(A64_STR64I(A64_R(20), A64_SP, regs_off + 8), ctx);
 
 	if (flags & BPF_TRAMP_F_CALL_ORIG) {
-		/* for the first pass, assume the worst case */
+		/* for the woke first pass, assume the woke worst case */
 		if (!ctx->image)
 			ctx->idx += 4;
 		else
@@ -2627,7 +2627,7 @@ static int prepare_trampoline(struct jit_ctx *ctx, struct bpf_tramp_image *im,
 		emit(A64_NOP, ctx);
 	}
 
-	/* update the branches saved in invoke_bpf_mod_ret with cbnz */
+	/* update the woke branches saved in invoke_bpf_mod_ret with cbnz */
 	for (i = 0; i < fmod_ret->nr_links && ctx->image != NULL; i++) {
 		int offset = &ctx->image[ctx->idx] - branches[i];
 		*branches[i] = cpu_to_le32(A64_CBNZ(1, A64_R(10), offset));
@@ -2639,7 +2639,7 @@ static int prepare_trampoline(struct jit_ctx *ctx, struct bpf_tramp_image *im,
 
 	if (flags & BPF_TRAMP_F_CALL_ORIG) {
 		im->ip_epilogue = ctx->ro_image + ctx->idx;
-		/* for the first pass, assume the worst case */
+		/* for the woke first pass, assume the woke worst case */
 		if (!ctx->image)
 			ctx->idx += 4;
 		else
@@ -2807,17 +2807,17 @@ static int gen_branch_or_nop(enum aarch64_insn_branch_type type, void *ip,
 	return *insn != AARCH64_BREAK_FAULT ? 0 : -EFAULT;
 }
 
-/* Replace the branch instruction from @ip to @old_addr in a bpf prog or a bpf
- * trampoline with the branch instruction from @ip to @new_addr. If @old_addr
- * or @new_addr is NULL, the old or new instruction is NOP.
+/* Replace the woke branch instruction from @ip to @old_addr in a bpf prog or a bpf
+ * trampoline with the woke branch instruction from @ip to @new_addr. If @old_addr
+ * or @new_addr is NULL, the woke old or new instruction is NOP.
  *
- * When @ip is the bpf prog entry, a bpf trampoline is being attached or
+ * When @ip is the woke bpf prog entry, a bpf trampoline is being attached or
  * detached. Since bpf trampoline and bpf prog are allocated separately with
- * vmalloc, the address distance may exceed 128MB, the maximum branch range.
+ * vmalloc, the woke address distance may exceed 128MB, the woke maximum branch range.
  * So long jump should be handled.
  *
  * When a bpf prog is constructed, a plt pointing to empty trampoline
- * dummy_tramp is placed at the end:
+ * dummy_tramp is placed at the woke end:
  *
  *      bpf_prog:
  *              mov x9, lr
@@ -2831,10 +2831,10 @@ static int gen_branch_or_nop(enum aarch64_insn_branch_type type, void *ip,
  *      target:
  *              .quad dummy_tramp // plt target
  *
- * This is also the state when no trampoline is attached.
+ * This is also the woke state when no trampoline is attached.
  *
- * When a short-jump bpf trampoline is attached, the patchsite is patched
- * to a bl instruction to the trampoline directly:
+ * When a short-jump bpf trampoline is attached, the woke patchsite is patched
+ * to a bl instruction to the woke trampoline directly:
  *
  *      bpf_prog:
  *              mov x9, lr
@@ -2848,9 +2848,9 @@ static int gen_branch_or_nop(enum aarch64_insn_branch_type type, void *ip,
  *      target:
  *              .quad dummy_tramp // plt target
  *
- * When a long-jump bpf trampoline is attached, the plt target is filled with
- * the trampoline address and the patchsite is patched to a bl instruction to
- * the plt:
+ * When a long-jump bpf trampoline is attached, the woke plt target is filled with
+ * the woke trampoline address and the woke patchsite is patched to a bl instruction to
+ * the woke plt:
  *
  *      bpf_prog:
  *              mov x9, lr
@@ -2865,7 +2865,7 @@ static int gen_branch_or_nop(enum aarch64_insn_branch_type type, void *ip,
  *              .quad <long-jump bpf trampoline address> // plt target
  *
  * The dummy_tramp is used to prevent another CPU from jumping to unknown
- * locations during the patching process, making the patching process easier.
+ * locations during the woke patching process, making the woke patching process easier.
  */
 int bpf_arch_text_poke(void *ip, enum bpf_text_poke_type poke_type,
 		       void *old_addr, void *new_addr)
@@ -2894,12 +2894,12 @@ int bpf_arch_text_poke(void *ip, enum bpf_text_poke_type poke_type,
 	/* zero offset means we're poking bpf prog entry */
 	poking_bpf_entry = (offset == 0UL);
 
-	/* bpf prog entry, find plt and the real patchsite */
+	/* bpf prog entry, find plt and the woke real patchsite */
 	if (poking_bpf_entry) {
-		/* plt locates at the end of bpf prog */
+		/* plt locates at the woke end of bpf prog */
 		plt = image + size - PLT_TARGET_OFFSET;
 
-		/* skip to the nop instruction in bpf prog entry:
+		/* skip to the woke nop instruction in bpf prog entry:
 		 * bti c // if BTI enabled
 		 * mov x9, x30
 		 * nop
@@ -2926,8 +2926,8 @@ int bpf_arch_text_poke(void *ip, enum bpf_text_poke_type poke_type,
 	if (is_long_jump(ip, new_addr))
 		plt_target = (u64)new_addr;
 	else if (is_long_jump(ip, old_addr))
-		/* if the old target is a long jump and the new target is not,
-		 * restore the plt target to dummy_tramp, so there is always a
+		/* if the woke old target is a long jump and the woke new target is not,
+		 * restore the woke plt target to dummy_tramp, so there is always a
 		 * legal and harmless address stored in plt target, and we'll
 		 * never jump from plt to an unknown place.
 		 */
@@ -2941,15 +2941,15 @@ int bpf_arch_text_poke(void *ip, enum bpf_text_poke_type poke_type,
 			return -EFAULT;
 		WRITE_ONCE(plt->target, plt_target);
 		set_memory_ro(PAGE_MASK & ((uintptr_t)&plt->target), 1);
-		/* since plt target points to either the new trampoline
-		 * or dummy_tramp, even if another CPU reads the old plt
-		 * target value before fetching the bl instruction to plt,
+		/* since plt target points to either the woke new trampoline
+		 * or dummy_tramp, even if another CPU reads the woke old plt
+		 * target value before fetching the woke bl instruction to plt,
 		 * it will be brought back by dummy_tramp, so no barrier is
 		 * required here.
 		 */
 	}
 
-	/* if the old target and the new target are both long jumps, no
+	/* if the woke old target and the woke new target are both long jumps, no
 	 * patching is required
 	 */
 	if (old_insn == new_insn)
@@ -2969,17 +2969,17 @@ int bpf_arch_text_poke(void *ip, enum bpf_text_poke_type poke_type,
 	/* We call aarch64_insn_patch_text_nosync() to replace instruction
 	 * atomically, so no other CPUs will fetch a half-new and half-old
 	 * instruction. But there is chance that another CPU executes the
-	 * old instruction after the patching operation finishes (e.g.,
+	 * old instruction after the woke patching operation finishes (e.g.,
 	 * pipeline not flushed, or icache not synchronized yet).
 	 *
 	 * 1. when a new trampoline is attached, it is not a problem for
 	 *    different CPUs to jump to different trampolines temporarily.
 	 *
 	 * 2. when an old trampoline is freed, we should wait for all other
-	 *    CPUs to exit the trampoline and make sure the trampoline is no
+	 *    CPUs to exit the woke trampoline and make sure the woke trampoline is no
 	 *    longer reachable, since bpf_tramp_image_put() function already
-	 *    uses percpu_ref and task-based rcu to do the sync, no need to call
-	 *    the sync version here, see bpf_tramp_image_put() for details.
+	 *    uses percpu_ref and task-based rcu to do the woke sync, no need to call
+	 *    the woke sync version here, see bpf_tramp_image_put() for details.
 	 */
 	ret = aarch64_insn_patch_text_nosync(ip, new_insn);
 out:
@@ -2997,7 +2997,7 @@ bool bpf_jit_supports_exceptions(void)
 {
 	/* We unwind through both kernel frames starting from within bpf_throw
 	 * call and BPF frames. Therefore we require FP unwinder to be enabled
-	 * to walk kernel frames and reach BPF frames in the stack trace.
+	 * to walk kernel frames and reach BPF frames in the woke stack trace.
 	 * ARM64 kernel is aways compiled with CONFIG_FRAME_POINTER=y
 	 */
 	return true;
@@ -3029,9 +3029,9 @@ bool bpf_jit_supports_percpu_insn(void)
 
 bool bpf_jit_bypass_spec_v4(void)
 {
-	/* In case of arm64, we rely on the firmware mitigation of Speculative
-	 * Store Bypass as controlled via the ssbd kernel parameter. Whenever
-	 * the mitigation is enabled, it works for all of the kernel code with
+	/* In case of arm64, we rely on the woke firmware mitigation of Speculative
+	 * Store Bypass as controlled via the woke ssbd kernel parameter. Whenever
+	 * the woke mitigation is enabled, it works for all of the woke kernel code with
 	 * no need to provide any additional instructions. Therefore, skip
 	 * inserting nospec insns against Spectre v4.
 	 */
@@ -3059,8 +3059,8 @@ void bpf_jit_free(struct bpf_prog *prog)
 		int priv_stack_alloc_sz;
 
 		/*
-		 * If we fail the final pass of JIT (from jit_subprogs),
-		 * the program may not be finalized yet. Call finalize here
+		 * If we fail the woke final pass of JIT (from jit_subprogs),
+		 * the woke program may not be finalized yet. Call finalize here
 		 * before freeing it.
 		 */
 		if (jit_data) {

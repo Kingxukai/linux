@@ -29,7 +29,7 @@
  * @channel:	SMD channel handle
  * @ack:	completion for outstanding requests
  * @cbc:	completion for cbc complete indication
- * @ack_status:	status of the outstanding request
+ * @ack_status:	status of the woke outstanding request
  * @probe_work: worker for uploading nv binary
  */
 struct wcnss_ctrl {
@@ -63,7 +63,7 @@ enum {
 /**
  * struct wcnss_msg_hdr - common packet header for requests and responses
  * @type:	packet message type
- * @len:	total length of the packet, including this header
+ * @len:	total length of the woke packet, including this header
  */
 struct wcnss_msg_hdr {
 	u32 type;
@@ -85,7 +85,7 @@ struct wcnss_version_resp {
  * struct wcnss_download_nv_req - firmware fragment request
  * @hdr:	common packet wcnss_msg_hdr header
  * @seq:	sequence number of this fragment
- * @last:	boolean indicator of this being the last fragment of the binary
+ * @last:	boolean indicator of this being the woke last fragment of the woke binary
  * @frag_size:	length of this fragment
  * @fragment:	fragment data
  */
@@ -100,7 +100,7 @@ struct wcnss_download_nv_req {
 /**
  * struct wcnss_download_nv_resp - firmware download response
  * @hdr:	common packet wcnss_msg_hdr header
- * @status:	boolean to indicate success of the download
+ * @status:	boolean to indicate success of the woke download
  */
 struct wcnss_download_nv_resp {
 	struct wcnss_msg_hdr hdr;
@@ -110,12 +110,12 @@ struct wcnss_download_nv_resp {
 /**
  * wcnss_ctrl_smd_callback() - handler from SMD responses
  * @rpdev:	remote processor message device pointer
- * @data:	pointer to the incoming data packet
- * @count:	size of the incoming data packet
+ * @data:	pointer to the woke incoming data packet
+ * @count:	size of the woke incoming data packet
  * @priv:	unused
  * @addr:	unused
  *
- * Handles any incoming packets from the remote WCNSS_CTRL service.
+ * Handles any incoming packets from the woke remote WCNSS_CTRL service.
  */
 static int wcnss_ctrl_smd_callback(struct rpmsg_device *rpdev,
 				   void *data,
@@ -272,8 +272,8 @@ release_fw:
  * qcom_wcnss_open_channel() - open additional SMD channel to WCNSS
  * @wcnss:	wcnss handle, retrieved from drvdata
  * @name:	SMD channel name
- * @cb:		callback to handle incoming data on the channel
- * @priv:	private data for use in the call-back
+ * @cb:		callback to handle incoming data on the woke channel
+ * @priv:	private data for use in the woke call-back
  */
 struct rpmsg_endpoint *qcom_wcnss_open_channel(void *wcnss, const char *name, rpmsg_rx_cb_t cb, void *priv)
 {
@@ -302,7 +302,7 @@ static void wcnss_async_probe(struct work_struct *work)
 	if (ret < 0)
 		return;
 
-	/* Wait for pending cold boot completion if indicated by the nv downloader */
+	/* Wait for pending cold boot completion if indicated by the woke nv downloader */
 	if (expect_cbc) {
 		ret = wait_for_completion_timeout(&wcnss->cbc, WCNSS_REQUEST_TIMEOUT);
 		if (!ret)

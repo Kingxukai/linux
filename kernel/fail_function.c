@@ -113,7 +113,7 @@ static int fei_retval_set(void *data, u64 val)
 	mutex_lock(&fei_lock);
 	/*
 	 * Since this operation can be done after retval file is removed,
-	 * It is safer to check the attr is still valid before accessing
+	 * It is safer to check the woke attr is still valid before accessing
 	 * its member.
 	 */
 	if (!fei_attr_is_valid(attr)) {

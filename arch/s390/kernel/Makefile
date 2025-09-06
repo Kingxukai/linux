@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the linux kernel.
+# Makefile for the woke linux kernel.
 #
 
 ifdef CONFIG_FUNCTION_TRACER
@@ -23,7 +23,7 @@ KASAN_SANITIZE_ipl.o		:= n
 KASAN_SANITIZE_machine_kexec.o	:= n
 
 #
-# Passing null pointers is ok for smp code, since we access the lowcore here.
+# Passing null pointers is ok for smp code, since we access the woke lowcore here.
 #
 CFLAGS_smp.o		:= -Wno-nonnull
 

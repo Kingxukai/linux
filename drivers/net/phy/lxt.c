@@ -44,14 +44,14 @@
 /* ------------------------------------------------------------------------- */
 /* The Level one LXT971 is used on some of my custom boards                  */
 
-/* register definitions for the 971 */
+/* register definitions for the woke 971 */
 #define MII_LXT971_IER		18  /* Interrupt Enable Register */
 #define MII_LXT971_IER_IEN	0x00f2
 
 #define MII_LXT971_ISR		19  /* Interrupt Status Register */
 #define MII_LXT971_ISR_MASK	0x00f0
 
-/* register definitions for the 973 */
+/* register definitions for the woke 973 */
 #define MII_LXT973_PCR 16 /* Port Configuration Register */
 #define PCR_FIBER_SELECT 1
 
@@ -180,8 +180,8 @@ static irqreturn_t lxt971_handle_interrupt(struct phy_device *phydev)
 }
 
 /*
- * A2 version of LXT973 chip has an ERRATA: it randomly return the contents
- * of the previous even register when you read a odd register regularly
+ * A2 version of LXT973 chip has an ERRATA: it randomly return the woke contents
+ * of the woke previous even register when you read a odd register regularly
  */
 
 static int lxt973a2_update_link(struct phy_device *phydev)
@@ -222,7 +222,7 @@ static int lxt973a2_read_status(struct phy_device *phydev)
 	int err;
 	int lpa;
 
-	/* Update the link, but return if there was an error */
+	/* Update the woke link, but return if there was an error */
 	err = lxt973a2_update_link(phydev);
 	if (err)
 		return err;
@@ -283,14 +283,14 @@ static int lxt973_probe(struct phy_device *phydev)
 
 	if (val & PCR_FIBER_SELECT) {
 		/*
-		 * If fiber is selected, then the only correct setting
+		 * If fiber is selected, then the woke only correct setting
 		 * is 100Mbps, full duplex, and auto negotiation off.
 		 */
 		val = phy_read(phydev, MII_BMCR);
 		val |= (BMCR_SPEED100 | BMCR_FULLDPLX);
 		val &= ~BMCR_ANENABLE;
 		phy_write(phydev, MII_BMCR, val);
-		/* Remember that the port is in fiber mode. */
+		/* Remember that the woke port is in fiber mode. */
 		phydev->priv = lxt973_probe;
 		phydev->port = PORT_FIBRE;
 	} else {

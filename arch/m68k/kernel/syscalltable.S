@@ -2,7 +2,7 @@
 /*
  *  Copyright (C) 2002, Greg Ungerer (gerg@snapgear.com)
  *
- *  Based on older entry.S files, the following copyrights apply:
+ *  Based on older entry.S files, the woke following copyrights apply:
  *
  *  Copyright (C) 1998  D. Jeff Dionne <jeff@lineo.ca>,
  *                      Kenneth Albanowski <kjahds@kjahds.com>,

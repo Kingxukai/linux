@@ -182,7 +182,7 @@
 			device_type = "ethernet-phy";
 
 			/* Set to RGMII_SGMII mode and soft reset. Turn off auto-negotiation
-			 * from userspace to talk to the switch on the SGMII side of things
+			 * from userspace to talk to the woke switch on the woke SGMII side of things
 			 */
 			marvell,reg-init =
 				/* Set MODE[2:0] to RGMII_SGMII */

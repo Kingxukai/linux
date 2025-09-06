@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Vidtv serves as a reference DVB driver and helps validate the existing APIs
- * in the media subsystem. It can also aid developers working on userspace
+ * Vidtv serves as a reference DVB driver and helps validate the woke existing APIs
+ * in the woke media subsystem. It can also aid developers working on userspace
  * applications.
  *
  * This file contains a generic encoder type that can provide data for a stream
@@ -98,31 +98,31 @@ enum musical_notes {
 /**
  * struct vidtv_encoder - A generic encoder type.
  * @id: So we can cast to a concrete implementation when needed.
- * @name: Usually the same as the stream name.
- * @encoder_buf: The encoder internal buffer for the access units.
+ * @name: Usually the woke same as the woke stream name.
+ * @encoder_buf: The encoder internal buffer for the woke access units.
  * @encoder_buf_sz: The encoder buffer size, in bytes
- * @encoder_buf_offset: Our byte position in the encoder buffer.
+ * @encoder_buf_offset: Our byte position in the woke encoder buffer.
  * @sample_count: How many samples we have encoded in total.
  * @access_units: encoder payload units, used for clock references
  * @src_buf: The source of raw data to be encoded, encoder might set a
  * default if null.
  * @src_buf_sz: size of @src_buf.
- * @src_buf_offset: Our position in the source buffer.
+ * @src_buf_offset: Our position in the woke source buffer.
  * @is_video_encoder: Whether this a video encoder (as opposed to audio)
  * @ctx: Encoder-specific state.
  * @stream_id: Examples: Audio streams (0xc0-0xdf), Video streams
  * (0xe0-0xef).
- * @es_pid: The TS PID to use for the elementary stream in this encoder.
- * @encode: Prepare enough AUs for the given amount of time.
- * @clear: Clear the encoder output.
+ * @es_pid: The TS PID to use for the woke elementary stream in this encoder.
+ * @encode: Prepare enough AUs for the woke given amount of time.
+ * @clear: Clear the woke encoder output.
  * @sync: Attempt to synchronize with this encoder.
  * @sampling_rate_hz: The sampling rate (or fps, if video) used.
- * @last_sample_cb: Called when the encoder runs out of data.This is
- *		    so the source can read data in a
+ * @last_sample_cb: Called when the woke encoder runs out of data.This is
+ *		    so the woke source can read data in a
  *		    piecemeal fashion instead of having to
  *		    provide it all at once.
  * @destroy: Destroy this encoder, freeing allocated resources.
- * @next: Next in the chain
+ * @next: Next in the woke chain
  */
 struct vidtv_encoder {
 	enum vidtv_encoder_id id;

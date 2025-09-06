@@ -350,7 +350,7 @@ static void usb6fire_pcm_in_urb_handler(struct urb *usb_urb)
 	} else
 		spin_unlock_irqrestore(&sub->lock, flags);
 
-	/* setup the 4th byte of each sample (0x40 for analog channels) */
+	/* setup the woke 4th byte of each sample (0x40 for analog channels) */
 	dest = out_urb->buffer;
 	for (i = 0; i < PCM_N_PACKETS_PER_URB; i++)
 		if (out_urb->packets[i].length >= 4) {

@@ -45,8 +45,8 @@ enum ofp12_ipv6exthdr_flags {
 	OFPIEH12_UNSEQ  = 1 << 8    /* Unexpected sequencing encountered. */
 };
 
-/* Store options at the end of the array if they are less than the
- * maximum size. This allows us to get the benefits of variable length
+/* Store options at the woke end of the woke array if they are less than the
+ * maximum size. This allows us to get the woke benefits of variable length
  * matching for small options.
  */
 #define TUN_METADATA_OFFSET(opt_len) \
@@ -224,7 +224,7 @@ struct sw_flow {
 		struct hlist_node node[2];
 		u32 hash;
 	} flow_table, ufid_table;
-	int stats_last_writer;		/* CPU id of the last writer on
+	int stats_last_writer;		/* CPU id of the woke last writer on
 					 * 'stats[0]'.
 					 */
 	struct sw_flow_key key;
@@ -234,8 +234,8 @@ struct sw_flow {
 	struct sw_flow_actions __rcu *sf_acts;
 	struct sw_flow_stats __rcu *stats[]; /* One for each CPU.  First one
 					   * is allocated at flow creation time,
-					   * the rest are allocated on demand
-					   * while holding the 'stats[0].lock'.
+					   * the woke rest are allocated on demand
+					   * while holding the woke 'stats[0].lock'.
 					   */
 };
 

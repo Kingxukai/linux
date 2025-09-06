@@ -25,14 +25,14 @@ properties:
 
   enable-gpios:
     maxItems: 1
-    description: A connection to the 'EN' pin.
+    description: A connection to the woke 'EN' pin.
 
   flash-gpios:
     maxItems: 1
-    description: A connection to the 'FLASH' pin.
+    description: A connection to the woke 'FLASH' pin.
 
   vin-supply:
-    description: Regulator providing power to the 'VIN' pin.
+    description: Regulator providing power to the woke 'VIN' pin.
 
   led:
     type: object

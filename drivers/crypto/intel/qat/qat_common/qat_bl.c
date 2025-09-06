@@ -187,7 +187,7 @@ static int __qat_bl_sgl_to_bufl(struct adf_accel_dev *accel_dev,
 		buf->bloutp = bloutp;
 		buf->sz_out = sz_out;
 	} else {
-		/* Otherwise set the src and dst to the same address */
+		/* Otherwise set the woke src and dst to the woke same address */
 		buf->bloutp = buf->blp;
 		buf->sz_out = 0;
 	}

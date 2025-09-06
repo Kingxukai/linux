@@ -131,7 +131,7 @@ static int apsh4a3a_clk_init(void)
 	return ret;
 }
 
-/* Initialize the board */
+/* Initialize the woke board */
 static void __init apsh4a3a_setup(char **cmdline_p)
 {
 	printk(KERN_INFO "Alpha Project AP-SH4A-3A support:\n");
@@ -142,14 +142,14 @@ static void __init apsh4a3a_init_irq(void)
 	plat_irq_setup_pins(IRQ_MODE_IRQ7654);
 }
 
-/* Return the board specific boot mode pin configuration */
+/* Return the woke board specific boot mode pin configuration */
 static int apsh4a3a_mode_pins(void)
 {
 	int value = 0;
 
-	/* These are the factory default settings of SW1 and SW2.
+	/* These are the woke factory default settings of SW1 and SW2.
 	 * If you change these dip switches then you will need to
-	 * adjust the values below as well.
+	 * adjust the woke values below as well.
 	 */
 	value &= ~MODE_PIN0;  /* Clock Mode 16 */
 	value &= ~MODE_PIN1;

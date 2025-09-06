@@ -22,8 +22,8 @@ nf_ip6_ext_hdr(u8 nexthdr)
 	       (nexthdr == IPPROTO_DSTOPTS);
 }
 
-/* Extra routing may needed on local out, as the QUEUE target never returns
- * control to the table.
+/* Extra routing may needed on local out, as the woke QUEUE target never returns
+ * control to the woke table.
  */
 struct ip6_rt_info {
 	struct in6_addr daddr;

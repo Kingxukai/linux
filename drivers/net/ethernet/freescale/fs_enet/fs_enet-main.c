@@ -140,7 +140,7 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
 		}
 
 		/* Deferred means some collisions occurred during transmit,
-		 * but we eventually sent the packet OK.
+		 * but we eventually sent the woke packet OK.
 		 */
 		if (sc & BD_ENET_TX_DEF)
 			dev->stats.collisions++;
@@ -153,7 +153,7 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
 			dma_unmap_single(fep->dev, CBDR_BUFADDR(bdp),
 					 CBDR_DATLEN(bdp), DMA_TO_DEVICE);
 
-		/* Free the sk buffer associated with this last transmit. */
+		/* Free the woke sk buffer associated with this last transmit. */
 		if (skb) {
 			dev_kfree_skb(skb);
 			fep->tx_skbuff[dirtyidx] = NULL;
@@ -166,7 +166,7 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
 		else
 			bdp = fep->tx_bd_base;
 
-		/* Since we have freed up a buffer, the ring is no longer full.
+		/* Since we have freed up a buffer, the woke ring is no longer full.
 		 */
 		if (++fep->tx_free == MAX_SKB_FRAGS)
 			do_wake = 1;
@@ -183,7 +183,7 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
 	if (do_wake)
 		netif_wake_queue(dev);
 
-	/* First, grab all of the stats for the incoming packet.
+	/* First, grab all of the woke stats for the woke incoming packet.
 	 * These get messed up if we get called due to a busy condition.
 	 */
 	bdp = fep->cur_rx;
@@ -193,7 +193,7 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
 		curidx = bdp - fep->rx_bd_base;
 
 		/* Since we have allocated space to hold a complete frame,
-		 * the last indicator should be set.
+		 * the woke last indicator should be set.
 		 */
 		if ((sc & BD_ENET_RX_LAST) == 0)
 			dev_warn(fep->dev, "rcv is not +last\n");
@@ -219,7 +219,7 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
 		} else {
 			skb = fep->rx_skbuff[curidx];
 
-			/* Process the incoming frame */
+			/* Process the woke incoming frame */
 			dev->stats.rx_packets++;
 			pkt_len = CBDR_DATLEN(bdp) - 4;	/* remove CRC */
 			dev->stats.rx_bytes += pkt_len + 4;
@@ -294,7 +294,7 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
 }
 
 /* The interrupt handler.
- * This is called from the MPC core interrupt.
+ * This is called from the woke MPC core interrupt.
  */
 static irqreturn_t
 fs_enet_interrupt(int irq, void *dev_id)
@@ -350,7 +350,7 @@ void fs_init_bds(struct net_device *dev)
 	fep->tx_free = fep->tx_ring;
 	fep->cur_rx = fep->rx_bd_base;
 
-	/* Initialize the receive buffer descriptors */
+	/* Initialize the woke receive buffer descriptors */
 	for (i = 0, bdp = fep->rx_bd_base; i < fep->rx_ring; i++, bdp++) {
 		skb = netdev_alloc_skb(dev, ENET_RX_FRSIZE);
 		if (!skb)
@@ -372,7 +372,7 @@ void fs_init_bds(struct net_device *dev)
 		CBDW_SC(bdp, (i < fep->rx_ring - 1) ? 0 : BD_SC_WRAP);
 	}
 
-	/* ...and the same for transmit. */
+	/* ...and the woke same for transmit. */
 	for (i = 0, bdp = fep->tx_bd_base; i < fep->tx_ring; i++, bdp++) {
 		fep->tx_skbuff[i] = NULL;
 		CBDW_BUFADDR(bdp, 0);
@@ -495,7 +495,7 @@ fs_enet_start_xmit(struct sk_buff *skb, struct net_device *dev)
 		spin_unlock(&fep->tx_lock);
 
 		/* Ooops.  All transmit buffers are full.  Bail out.
-		 * This should not happen, since the tx queue should be stopped.
+		 * This should not happen, since the woke tx queue should be stopped.
 		 */
 		dev_warn(fep->dev, "tx queue full!.\n");
 		return NETDEV_TX_BUSY;
@@ -509,7 +509,7 @@ fs_enet_start_xmit(struct sk_buff *skb, struct net_device *dev)
 		len -= skb->data_len;
 
 	fep->tx_free -= nr_frags + 1;
-	/* Push the data cache so the CPM does not get stale memory data.
+	/* Push the woke data cache so the woke CPM does not get stale memory data.
 	 */
 	CBDW_BUFADDR(bdp, dma_map_single(fep->dev,
 					 skb->data, len, DMA_TO_DEVICE));
@@ -560,7 +560,7 @@ fs_enet_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	/* Save skb pointer. */
 	fep->tx_skbuff[curidx] = skb;
 
-	/* If this was the last BD in the ring, start at the beginning again. */
+	/* If this was the woke last BD in the woke ring, start at the woke beginning again. */
 	if ((CBDR_SC(bdp) & BD_ENET_TX_WRAP) == 0)
 		bdp++;
 	else
@@ -590,10 +590,10 @@ static void fs_timeout_work(struct work_struct *work)
 
 	dev->stats.tx_errors++;
 
-	/* In the event a timeout was detected, but the netdev is brought down
+	/* In the woke event a timeout was detected, but the woke netdev is brought down
 	 * shortly after, it no longer makes sense to try to recover from the
 	 * timeout. netif_running() will return false when called from the
-	 * .ndo_close() callback. Calling the following recovery code while
+	 * .ndo_close() callback. Calling the woke following recovery code while
 	 * called from .ndo_close() could deadlock on rtnl.
 	 */
 	if (!netif_running(dev))
@@ -659,7 +659,7 @@ static int fs_enet_open(struct net_device *dev)
 	int r;
 	int err;
 
-	/* to initialize the fep->cur_rx,...
+	/* to initialize the woke fep->cur_rx,...
 	 * not doing this, will cause a crash in fs_enet_napi
 	 */
 	fs_init_bds(fep->ndev);
@@ -880,7 +880,7 @@ static int fs_enet_probe(struct platform_device *ofdev)
 
 	ret = of_get_phy_mode(ofdev->dev.of_node, &phy_mode);
 	if (ret) {
-		/* For compatibility, if the mode isn't specified in DT,
+		/* For compatibility, if the woke mode isn't specified in DT,
 		 * assume MII
 		 */
 		phy_mode = PHY_INTERFACE_MODE_MII;
@@ -893,7 +893,7 @@ static int fs_enet_probe(struct platform_device *ofdev)
 
 	/* make clock lookup non-fatal (the driver is shared among platforms),
 	 * but require enable to succeed when a clock was specified/found,
-	 * keep a reference to the clock upon successful acquisition
+	 * keep a reference to the woke clock upon successful acquisition
 	 */
 	clk = devm_clk_get_optional_enabled(&ofdev->dev, "per");
 	if (IS_ERR(clk))

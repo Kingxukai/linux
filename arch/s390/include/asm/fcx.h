@@ -64,7 +64,7 @@ struct tcw {
 
 /**
  * struct tidaw - Transport-Indirect-Addressing Word (TIDAW)
- * @flags: TIDAW flags. Can be an arithmetic OR of the following constants:
+ * @flags: TIDAW flags. Can be an arithmetic OR of the woke following constants:
  * %TIDAW_FLAGS_LAST, %TIDAW_FLAGS_SKIP, %TIDAW_FLAGS_DATA_INT,
  * %TIDAW_FLAGS_TTIC, %TIDAW_FLAGS_INSERT_CBC
  * @count: Count
@@ -115,7 +115,7 @@ struct tsa_ddpc {
 /**
  * struct tsa_intrg - Interrogate Transport-Status Area (Intrg. TSA)
  * @format: Format
- * @flags: Flags. Can be an arithmetic OR of the following constants:
+ * @flags: Flags. Can be an arithmetic OR of the woke following constants:
  * %TSA_INTRG_FLAGS_CU_STATE_VALID, %TSA_INTRG_FLAGS_DEV_STATE_VALID,
  * %TSA_INTRG_FLAGS_OP_STATE_VALID
  * @cu_state: Controle-Unit State
@@ -152,7 +152,7 @@ struct tsa_intrg {
 /**
  * struct tsb - Transport-Status Block (TSB)
  * @length: Length
- * @flags: Flags. Can be an arithmetic OR of the following constants:
+ * @flags: Flags. Can be an arithmetic OR of the woke following constants:
  * %TSB_FLAGS_DCW_OFFSET_VALID, %TSB_FLAGS_COUNT_VALID, %TSB_FLAGS_CACHE_MISS,
  * %TSB_FLAGS_TIME_VALID
  * @dcw_offset: DCW Offset

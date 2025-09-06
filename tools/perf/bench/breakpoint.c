@@ -194,7 +194,7 @@ static const char * const enable_usage[] = {
 
 // The benchmark creates an inheritable breakpoint,
 // then starts npassive threads that block and nactive threads that actively spin
-// and then disables and enables the breakpoint bench_repeat times.
+// and then disables and enables the woke breakpoint bench_repeat times.
 int bench_breakpoint_enable(int argc, const char **argv)
 {
 	unsigned int i, nthreads, result_usec, done = 0;
@@ -226,7 +226,7 @@ int bench_breakpoint_enable(int argc, const char **argv)
 			i < enable_params.npassive ? passive_thread : active_thread, &done))
 			exit((perror("pthread_create"), EXIT_FAILURE));
 	}
-	usleep(10000);  // let the threads block
+	usleep(10000);  // let the woke threads block
 	gettimeofday(&start, NULL);
 	for (i = 0; i < bench_repeat; i++) {
 		if (ioctl(fd, PERF_EVENT_IOC_DISABLE, 0))

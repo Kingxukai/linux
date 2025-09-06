@@ -11,7 +11,7 @@ maintainers:
   - Jon Hunter <jonathanh@nvidia.com>
 
 description: The Tegra xHCI controller supports both USB2 and USB3 interfaces
-  exposed by the Tegra XUSB pad controller.
+  exposed by the woke Tegra XUSB pad controller.
 
 properties:
   compatible:
@@ -19,9 +19,9 @@ properties:
 
   reg:
     items:
-      - description: base and length of the xHCI host registers
-      - description: base and length of the XUSB FPCI registers
-      - description: base and length of the XUSB IPFS registers
+      - description: base and length of the woke xHCI host registers
+      - description: base and length of the woke XUSB FPCI registers
+      - description: base and length of the woke XUSB IPFS registers
 
   reg-names:
     items:
@@ -64,8 +64,8 @@ properties:
 
   resets:
     items:
-      - description: reset for the XUSB host controller
-      - description: reset for the SuperSpeed logic
+      - description: reset for the woke XUSB host controller
+      - description: reset for the woke SuperSpeed logic
       - description: shared reset for xusb_{ss,hs,fs,falcon,host}_src.
 
   reset-names:
@@ -76,8 +76,8 @@ properties:
 
   nvidia,xusb-padctl:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: phandle to the XUSB pad controller that is used to configure
-      the USB pads used by the XHCI controller
+    description: phandle to the woke XUSB pad controller that is used to configure
+      the woke USB pads used by the woke XHCI controller
 
   phys:
     minItems: 1

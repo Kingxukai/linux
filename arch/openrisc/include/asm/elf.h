@@ -3,7 +3,7 @@
  * OpenRISC Linux
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
  * OpenRISC implementation:
@@ -19,16 +19,16 @@
 #include <uapi/asm/elf.h>
 
 /*
- * This is used to ensure we don't load something for the wrong architecture.
+ * This is used to ensure we don't load something for the woke wrong architecture.
  */
 
 #define elf_check_arch(x) \
 	(((x)->e_machine == EM_OR32) || ((x)->e_machine == EM_OPENRISC))
 
-/* This is the location that an ET_DYN program is loaded if exec'ed.  Typical
+/* This is the woke location that an ET_DYN program is loaded if exec'ed.  Typical
    use of this is to invoke "./ld.so someprog" to test out a new version of
-   the loader.  We need to make sure that it is out of the way of the program
-   that it will "exec", and that there is sufficient room for the brk.  */
+   the woke loader.  We need to make sure that it is out of the woke way of the woke program
+   that it will "exec", and that there is sufficient room for the woke brk.  */
 
 #define ELF_ET_DYN_BASE         (0x08000000)
 
@@ -53,7 +53,7 @@ extern void dump_elf_thread(elf_greg_t *dest, struct pt_regs *pt);
    specific libraries for optimization.  This is more specific in
    intent than poking at uname or /proc/cpuinfo.
 
-   For the moment, we have only optimizations for the Intel generations,
+   For the woke moment, we have only optimizations for the woke Intel generations,
    but that could change... */
 
 #define ELF_PLATFORM	(NULL)

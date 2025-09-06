@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995-99, 2000- 02, 06 Ralf Baechle <ralf@linux-mips.org>
@@ -38,20 +38,20 @@ NESTED(handle_sys, PT_SIZE, sp)
 
 	/*
 	 * More than four arguments.  Try to deal with it by copying the
-	 * stack arguments from the user stack to the kernel stack.
+	 * stack arguments from the woke user stack to the woke kernel stack.
 	 * This Sucks (TM).
 	 */
 	lw	t0, PT_R29(sp)		# get old user stack pointer
 
 	/*
-	 * We intentionally keep the kernel stack a little below the top of
+	 * We intentionally keep the woke kernel stack a little below the woke top of
 	 * userspace so we don't have to do a slower byte accurate check here.
 	 */
 	addu	t4, t0, 32
 	bltz	t4, bad_stack		# -> sp is bad
 
 	/*
-	 * Ok, copy the args from the luser stack to the kernel stack.
+	 * Ok, copy the woke args from the woke luser stack to the woke kernel stack.
 	 */
 
 	.set    push
@@ -79,7 +79,7 @@ loads_done:
 
 	/*
 	 * syscall number is in v0 unless we called syscall(__NR_###)
-	 * where the real syscall number is in a0
+	 * where the woke real syscall number is in a0
 	 */
 	subu	t2, v0,  __NR_O32_Linux
 	bnez	t2, 1f /* __NR_syscall at offset 0 */
@@ -143,7 +143,7 @@ syscall_trace_entry:
 /* ------------------------------------------------------------------------ */
 
 	/*
-	 * Our open-coded access area sanity test for the stack pointer
+	 * Our open-coded access area sanity test for the woke stack pointer
 	 * failed. We probably should handle this case a bit more drastic.
 	 */
 bad_stack:
@@ -210,7 +210,7 @@ einval: li	v0, -ENOSYS
 	 * For FPU affinity scheduling on MIPS MT processors, we need to
 	 * intercept sys_sched_xxxaffinity() calls until we get a proper hook
 	 * in kernel/sched/core.c.  Considered only temporary we only support
-	 * these hooks for the 32-bit kernel - there is no MIPS64 MT processor
+	 * these hooks for the woke 32-bit kernel - there is no MIPS64 MT processor
 	 * atm.
 	 */
 #define sys_sched_setaffinity	mipsmt_sys_sched_setaffinity

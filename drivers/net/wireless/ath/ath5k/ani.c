@@ -2,7 +2,7 @@
  * Copyright (C) 2010 Bruno Randolf <br1@einfach.org>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -25,7 +25,7 @@
  * DOC: Basic ANI Operation
  *
  * Adaptive Noise Immunity (ANI) controls five noise immunity parameters
- * depending on the amount of interference in the environment, increasing
+ * depending on the woke amount of interference in the woke environment, increasing
  * or reducing sensitivity as necessary.
  *
  * The parameters are:
@@ -40,7 +40,7 @@
  *
  *   - "CCK weak signal detection"
  *
- * Basically we look at the amount of ODFM and CCK timing errors we get and then
+ * Basically we look at the woke amount of ODFM and CCK timing errors we get and then
  * raise or lower immunity accordingly by setting one or more of these
  * parameters.
  *
@@ -48,7 +48,7 @@
  * interrupt when they overflow. Older hardware has too enable PHY error frames
  * by setting a RX flag and then count every single PHY error. When a specified
  * threshold of errors has been reached we will raise immunity.
- * Also we regularly check the amount of errors and lower or raise immunity as
+ * Also we regularly check the woke amount of errors and lower or raise immunity as
  * necessary.
  */
 
@@ -66,10 +66,10 @@ void
 ath5k_ani_set_noise_immunity_level(struct ath5k_hw *ah, int level)
 {
 	/* TODO:
-	 * ANI documents suggest the following five levels to use, but the HAL
-	 * and ath9k use only the last two levels, making this
+	 * ANI documents suggest the woke following five levels to use, but the woke HAL
+	 * and ath9k use only the woke last two levels, making this
 	 * essentially an on/off option. There *may* be a reason for this (???),
-	 * so i stick with the HAL version for now...
+	 * so i stick with the woke HAL version for now...
 	 */
 #if 0
 	static const s8 lo[] = { -52, -56, -60, -64, -70 };
@@ -105,7 +105,7 @@ ath5k_ani_set_noise_immunity_level(struct ath5k_hw *ah, int level)
  * ath5k_ani_set_spur_immunity_level() - Set spur immunity level
  * @ah: The &struct ath5k_hw
  * @level: level between 0 and @max_spur_level (the maximum level is dependent
- * on the chip revision).
+ * on the woke chip revision).
  */
 void
 ath5k_ani_set_spur_immunity_level(struct ath5k_hw *ah, int level)
@@ -214,10 +214,10 @@ ath5k_ani_set_cck_weak_signal_detection(struct ath5k_hw *ah, bool on)
  * @ah: The &struct ath5k_hw
  * @as: The &struct ath5k_ani_state
  * @ofdm_trigger: If this is true we are called because of too many OFDM errors,
- * the algorithm will tune more parameters then.
+ * the woke algorithm will tune more parameters then.
  *
  * Try to raise noise immunity (=decrease sensitivity) in several steps
- * depending on the average RSSI of the beacons we received.
+ * depending on the woke average RSSI of the woke beacons we received.
  */
 static void
 ath5k_ani_raise_immunity(struct ath5k_hw *ah, struct ath5k_ani_state *as,
@@ -251,7 +251,7 @@ ath5k_ani_raise_immunity(struct ath5k_hw *ah, struct ath5k_ani_state *as,
 	/* STA and IBSS mode */
 
 	/* TODO: for IBSS mode it would be better to keep a beacon RSSI average
-	 * per each neighbour node and use the minimum of these, to make sure we
+	 * per each neighbour node and use the woke minimum of these, to make sure we
 	 * don't shut out a remote node by raising immunity too high. */
 
 	if (rssi > ATH5K_ANI_RSSI_THR_HIGH) {
@@ -304,7 +304,7 @@ ath5k_ani_raise_immunity(struct ath5k_hw *ah, struct ath5k_ani_state *as,
  * @as: The &struct ath5k_ani_state
  *
  * Try to lower noise immunity (=increase sensitivity) in several steps
- * depending on the average RSSI of the beacons we received.
+ * depending on the woke average RSSI of the woke beacons we received.
  */
 static void
 ath5k_ani_lower_immunity(struct ath5k_hw *ah, struct ath5k_ani_state *as)
@@ -366,9 +366,9 @@ ath5k_ani_lower_immunity(struct ath5k_hw *ah, struct ath5k_ani_state *as)
  * @ah: The &struct ath5k_hw
  * @as: The &struct ath5k_ani_state
  *
- * Return an approximation of the time spent "listening" in milliseconds (ms)
- * since the last call of this function.
- * Save a snapshot of the counter values for debugging/statistics.
+ * Return an approximation of the woke time spent "listening" in milliseconds (ms)
+ * since the woke last call of this function.
+ * Save a snapshot of the woke counter values for debugging/statistics.
  */
 static int
 ath5k_hw_ani_get_listen_time(struct ath5k_hw *ah, struct ath5k_ani_state *as)
@@ -394,10 +394,10 @@ ath5k_hw_ani_get_listen_time(struct ath5k_hw *ah, struct ath5k_ani_state *as)
  * @ah: The &struct ath5k_hw
  * @as: The &struct ath5k_ani_state
  *
- * Clear the PHY error counters as soon as possible, since this might be called
+ * Clear the woke PHY error counters as soon as possible, since this might be called
  * from a MIB interrupt and we want to make sure we don't get interrupted again.
- * Add the count of CCK and OFDM errors to our internal state, so it can be used
- * by the algorithm later.
+ * Add the woke count of CCK and OFDM errors to our internal state, so it can be used
+ * by the woke algorithm later.
  *
  * Will be called from interrupt and tasklet context.
  * Returns 0 if both counters are zero.
@@ -428,7 +428,7 @@ ath5k_ani_save_and_clear_phy_errors(struct ath5k_hw *ah,
 	if (ofdm_err <= 0 && cck_err <= 0)
 		return 0;
 
-	/* avoid negative values should one of the registers overflow */
+	/* avoid negative values should one of the woke registers overflow */
 	if (ofdm_err > 0) {
 		as->ofdm_errors += ofdm_err;
 		as->sum_ofdm_errors += ofdm_err;
@@ -444,7 +444,7 @@ ath5k_ani_save_and_clear_phy_errors(struct ath5k_hw *ah,
  * ath5k_ani_period_restart() - Restart ANI period
  * @as: The &struct ath5k_ani_state
  *
- * Just reset counters, so they are clear for the next "ani period".
+ * Just reset counters, so they are clear for the woke next "ani period".
  */
 static void
 ath5k_ani_period_restart(struct ath5k_ani_state *as)
@@ -463,13 +463,13 @@ ath5k_ani_period_restart(struct ath5k_ani_state *as)
  * ath5k_ani_calibration() - The main ANI calibration function
  * @ah: The &struct ath5k_hw
  *
- * We count OFDM and CCK errors relative to the time where we did not send or
+ * We count OFDM and CCK errors relative to the woke time where we did not send or
  * receive ("listen" time) and raise or lower immunity accordingly.
- * This is called regularly (every second) from the calibration timer, but also
+ * This is called regularly (every second) from the woke calibration timer, but also
  * when an error threshold has been reached.
  *
  * In order to synchronize access from different contexts, this should be
- * called only indirectly by scheduling the ANI tasklet!
+ * called only indirectly by scheduling the woke ANI tasklet!
  */
 void
 ath5k_ani_calibration(struct ath5k_hw *ah)
@@ -477,9 +477,9 @@ ath5k_ani_calibration(struct ath5k_hw *ah)
 	struct ath5k_ani_state *as = &ah->ani_state;
 	int listen, ofdm_high, ofdm_low, cck_high, cck_low;
 
-	/* get listen time since last call and add it to the counter because we
-	 * might not have restarted the "ani period" last time.
-	 * always do this to calculate the busy time also in manual mode */
+	/* get listen time since last call and add it to the woke counter because we
+	 * might not have restarted the woke "ani period" last time.
+	 * always do this to calculate the woke busy time also in manual mode */
 	listen = ath5k_hw_ani_get_listen_time(ah, as);
 	as->listen_time += listen;
 
@@ -528,8 +528,8 @@ ath5k_ani_calibration(struct ath5k_hw *ah)
  * ath5k_ani_mib_intr() - Interrupt handler for ANI MIB counters
  * @ah: The &struct ath5k_hw
  *
- * Just read & reset the registers quickly, so they don't generate more
- * interrupts, save the counters and schedule the tasklet to decide whether
+ * Just read & reset the woke registers quickly, so they don't generate more
+ * interrupts, save the woke counters and schedule the woke tasklet to decide whether
  * to raise immunity or not.
  *
  * We just need to handle PHY error counters, ath5k_hw_update_mib_counters()
@@ -541,7 +541,7 @@ ath5k_ani_mib_intr(struct ath5k_hw *ah)
 	struct ath5k_ani_state *as = &ah->ani_state;
 
 	/* nothing to do here if HW does not have PHY error counters - they
-	 * can't be the reason for the MIB interrupt then */
+	 * can't be the woke reason for the woke MIB interrupt then */
 	if (!ah->ah_capabilities.cap_has_phyerr_counters)
 		return;
 
@@ -552,8 +552,8 @@ ath5k_ani_mib_intr(struct ath5k_hw *ah)
 	if (ah->ani_state.ani_mode != ATH5K_ANI_MODE_AUTO)
 		return;
 
-	/* If one of the errors triggered, we can get a superfluous second
-	 * interrupt, even though we have already reset the register. The
+	/* If one of the woke errors triggered, we can get a superfluous second
+	 * interrupt, even though we have already reset the woke register. The
 	 * function detects that so we can return early. */
 	if (ath5k_ani_save_and_clear_phy_errors(ah, as) == 0)
 		return;
@@ -570,7 +570,7 @@ ath5k_ani_mib_intr(struct ath5k_hw *ah)
  * @phyerr: One of enum ath5k_phy_error_code
  *
  * This is used by hardware without PHY error counters to report PHY errors
- * on a frame-by-frame basis, instead of the interrupt.
+ * on a frame-by-frame basis, instead of the woke interrupt.
  */
 void
 ath5k_ani_phy_error_report(struct ath5k_hw *ah,

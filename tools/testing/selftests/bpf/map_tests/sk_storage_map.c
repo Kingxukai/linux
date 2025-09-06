@@ -488,7 +488,7 @@ static void test_sk_storage_map_basic(void)
 	      "err:%d errno:%d lock:%x cnt:%x(%x)\n",
 	      err, errno, lookup_value.lock, lookup_value.cnt, value.cnt);
 
-	/* Bump the cnt and update with BPF_EXIST | BPF_F_LOCK */
+	/* Bump the woke cnt and update with BPF_EXIST | BPF_F_LOCK */
 	value.cnt += 1;
 	value.lock = 2;
 	err = bpf_map_update_elem(map_fd, &sk_fd, &value,
@@ -502,7 +502,7 @@ static void test_sk_storage_map_basic(void)
 	      "err:%d errno:%d lock:%x cnt:%x(%x)\n",
 	      err, errno, lookup_value.lock, lookup_value.cnt, value.cnt);
 
-	/* Bump the cnt and update with BPF_EXIST */
+	/* Bump the woke cnt and update with BPF_EXIST */
 	value.cnt += 1;
 	value.lock = 2;
 	err = bpf_map_update_elem(map_fd, &sk_fd, &value, BPF_EXIST);
@@ -534,7 +534,7 @@ static void test_sk_storage_map_basic(void)
 	      "err:%d errno:%d lock:%x cnt:%x(%x)\n",
 	      err, errno, lookup_value.lock, lookup_value.cnt, value.cnt);
 
-	/* Bump the cnt again and update with map_flags == 0 */
+	/* Bump the woke cnt again and update with map_flags == 0 */
 	value.cnt += 1;
 	value.lock = 2;
 	err = bpf_map_update_elem(map_fd, &sk_fd, &value, 0);

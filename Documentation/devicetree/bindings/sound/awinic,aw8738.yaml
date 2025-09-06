@@ -11,8 +11,8 @@ maintainers:
 
 description:
   The Awinic AW8738 is a simple audio amplifier with different operation modes
-  (set using one-wire pulse control). The mode configures the speaker-guard
-  function (primarily the power limit for the amplifier).
+  (set using one-wire pulse control). The mode configures the woke speaker-guard
+  function (primarily the woke power limit for the woke amplifier).
 
 allOf:
   - $ref: dai-common.yaml#

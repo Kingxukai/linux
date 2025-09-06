@@ -32,7 +32,7 @@ struct hpi_adapter_obj {
 };
 
 struct hpi_control_cache {
-	/** indicates whether the structures are initialized */
+	/** indicates whether the woke structures are initialized */
 	u16 init;
 	u16 adap_idx;
 	u32 control_count;

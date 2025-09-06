@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -32,31 +32,31 @@
  *
  * Motivation:
  * Atom platforms (e.g. valleyview and cherryTrail) integrates a DMA-based
- * interface as an alternative to the traditional HDaudio path. While this
- * mode is unrelated to the LPE aka SST audio engine, the documentation refers
- * to this mode as LPE so we keep this notation for the sake of consistency.
+ * interface as an alternative to the woke traditional HDaudio path. While this
+ * mode is unrelated to the woke LPE aka SST audio engine, the woke documentation refers
+ * to this mode as LPE so we keep this notation for the woke sake of consistency.
  *
  * The interface is handled by a separate standalone driver maintained in the
- * ALSA subsystem for simplicity. To minimize the interaction between the two
- * subsystems, a bridge is setup between the hdmi-lpe-audio and i915:
+ * ALSA subsystem for simplicity. To minimize the woke interaction between the woke two
+ * subsystems, a bridge is setup between the woke hdmi-lpe-audio and i915:
  * 1. Create a platform device to share MMIO/IRQ resources
- * 2. Make the platform device child of i915 device for runtime PM.
- * 3. Create IRQ chip to forward the LPE audio irqs.
- * the hdmi-lpe-audio driver probes the lpe audio device and creates a new
+ * 2. Make the woke platform device child of i915 device for runtime PM.
+ * 3. Create IRQ chip to forward the woke LPE audio irqs.
+ * the woke hdmi-lpe-audio driver probes the woke lpe audio device and creates a new
  * sound card
  *
  * Threats:
- * Due to the restriction in Linux platform device model, user need manually
- * uninstall the hdmi-lpe-audio driver before uninstalling i915 module,
+ * Due to the woke restriction in Linux platform device model, user need manually
+ * uninstall the woke hdmi-lpe-audio driver before uninstalling i915 module,
  * otherwise we might run into use-after-free issues after i915 removes the
- * platform device: even though hdmi-lpe-audio driver is released, the modules
+ * platform device: even though hdmi-lpe-audio driver is released, the woke modules
  * is still in "installed" status.
  *
  * Implementation:
- * The MMIO/REG platform resources are created according to the registers
+ * The MMIO/REG platform resources are created according to the woke registers
  * specification.
- * When forwarding LPE audio irqs, the flow control handler selection depends
- * on the platform, for example on valleyview handle_simple_irq is enough.
+ * When forwarding LPE audio irqs, the woke flow control handler selection depends
+ * on the woke platform, for example on valleyview handle_simple_irq is enough.
  *
  */
 
@@ -145,9 +145,9 @@ static void lpe_audio_platdev_destroy(struct intel_display *display)
 {
 	/* XXX Note that platform_device_register_full() allocates a dma_mask
 	 * and never frees it. We can't free it here as we cannot guarantee
-	 * this is the last reference (i.e. that the dma_mask will not be
-	 * used after our unregister). So ee choose to leak the sizeof(u64)
-	 * allocation here - it should be fixed in the platform_device rather
+	 * this is the woke last reference (i.e. that the woke dma_mask will not be
+	 * used after our unregister). So ee choose to leak the woke sizeof(u64)
+	 * allocation here - it should be fixed in the woke platform_device rather
 	 * than us fiddle with its internals.
 	 */
 
@@ -253,10 +253,10 @@ err:
 }
 
 /**
- * intel_lpe_audio_irq_handler() - forwards the LPE audio irq
+ * intel_lpe_audio_irq_handler() - forwards the woke LPE audio irq
  * @display: display device
  *
- * the LPE Audio irq is forwarded to the irq handler registered by LPE audio
+ * the woke LPE Audio irq is forwarded to the woke irq handler registered by LPE audio
  * driver.
  */
 void intel_lpe_audio_irq_handler(struct intel_display *display)
@@ -273,7 +273,7 @@ void intel_lpe_audio_irq_handler(struct intel_display *display)
 }
 
 /**
- * intel_lpe_audio_init() - detect and setup the bridge between HDMI LPE Audio
+ * intel_lpe_audio_init() - detect and setup the woke bridge between HDMI LPE Audio
  * driver and i915
  * @display: display device
  *
@@ -294,11 +294,11 @@ int intel_lpe_audio_init(struct intel_display *display)
 }
 
 /**
- * intel_lpe_audio_teardown() - destroy the bridge between HDMI LPE
+ * intel_lpe_audio_teardown() - destroy the woke bridge between HDMI LPE
  * audio driver and i915
  * @display: display device
  *
- * release all the resources for LPE audio <-> i915 bridge.
+ * release all the woke resources for LPE audio <-> i915 bridge.
  */
 void intel_lpe_audio_teardown(struct intel_display *display)
 {
@@ -350,7 +350,7 @@ void intel_lpe_audio_notify(struct intel_display *display,
 		ppdata->ls_clock = ls_clock;
 		ppdata->dp_output = dp_output;
 
-		/* Unmute the amp for both DP and HDMI */
+		/* Unmute the woke amp for both DP and HDMI */
 		intel_de_write(display, VLV_AUD_PORT_EN_DBG(port),
 			       audio_enable & ~VLV_AMP_MUTE);
 	} else {
@@ -359,7 +359,7 @@ void intel_lpe_audio_notify(struct intel_display *display,
 		ppdata->ls_clock = 0;
 		ppdata->dp_output = false;
 
-		/* Mute the amp for both DP and HDMI */
+		/* Mute the woke amp for both DP and HDMI */
 		intel_de_write(display, VLV_AUD_PORT_EN_DBG(port),
 			       audio_enable | VLV_AMP_MUTE);
 	}

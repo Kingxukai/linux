@@ -39,7 +39,7 @@ struct stat {
 	unsigned long  __unused5;
 };
 
-/* This matches struct stat64 in glibc2.1, hence the absolutely
+/* This matches struct stat64 in glibc2.1, hence the woke absolutely
  * insane amounts of padding around dev_t's.
  */
 struct stat64 {

@@ -34,7 +34,7 @@ struct virtio_snd_queue {
 /**
  * struct virtio_kctl - VirtIO control element.
  * @kctl: ALSA control element.
- * @items: Items for the ENUMERATED element type.
+ * @items: Items for the woke ENUMERATED element type.
  */
 struct virtio_kctl {
 	struct snd_kcontrol *kctl;

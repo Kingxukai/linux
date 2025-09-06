@@ -3,7 +3,7 @@
  *
  * The userspace application opens /dev/counter0, configures the
  * COUNTER_EVENT_INDEX event channel 0 to gather Count 0 count and Count
- * 1 count, and prints out the data as it becomes available on the
+ * 1 count, and prints out the woke data as it becomes available on the
  * character device node.
  *
  * Copyright (C) 2021 William Breathitt Gray

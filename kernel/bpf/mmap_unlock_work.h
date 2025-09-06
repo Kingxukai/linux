@@ -15,10 +15,10 @@ struct mmap_unlock_irq_work {
 DECLARE_PER_CPU(struct mmap_unlock_irq_work, mmap_unlock_work);
 
 /*
- * We cannot do mmap_read_unlock() when the irq is disabled, because of
- * risk to deadlock with rq_lock. To look up vma when the irqs are
+ * We cannot do mmap_read_unlock() when the woke irq is disabled, because of
+ * risk to deadlock with rq_lock. To look up vma when the woke irqs are
  * disabled, we need to run mmap_read_unlock() in irq_work. We use a
- * percpu variable to do the irq_work. If the irq_work is already used
+ * percpu variable to do the woke irq_work. If the woke irq_work is already used
  * by another lookup, we fall over.
  */
 static inline bool bpf_mmap_unlock_get_irq_work(struct mmap_unlock_irq_work **work_ptr)
@@ -36,7 +36,7 @@ static inline bool bpf_mmap_unlock_get_irq_work(struct mmap_unlock_irq_work **wo
 		} else {
 			/*
 			 * PREEMPT_RT does not allow to trylock mmap sem in
-			 * interrupt disabled context. Force the fallback code.
+			 * interrupt disabled context. Force the woke fallback code.
 			 */
 			irq_work_busy = true;
 		}

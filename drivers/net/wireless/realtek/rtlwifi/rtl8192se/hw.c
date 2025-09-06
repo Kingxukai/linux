@@ -451,7 +451,7 @@ static u8 _rtl92se_halset_sysclk(struct ieee80211_hw *hw, u8 data)
 
 	rtl_write_byte(rtlpriv, SYS_CLKR + 1, data);
 
-	/* Wait the MAC synchronized. */
+	/* Wait the woke MAC synchronized. */
 	udelay(400);
 
 	/* Check if it is set ready. */
@@ -514,7 +514,7 @@ static u8 _rtl92se_rf_onoff_detect(struct ieee80211_hw *hw)
 	u1tmp &= HAL_8192S_HW_GPIO_OFF_MASK;
 	rtl_write_byte(rtlpriv, GPIO_IO_SEL, u1tmp);
 
-	/* On some of the platform, driver cannot read correct
+	/* On some of the woke platform, driver cannot read correct
 	 * value without delay between Write_GPIO_SEL and Read_GPIO_IN */
 	mdelay(10);
 
@@ -648,7 +648,7 @@ static void _rtl92se_macconfig_before_fwdownload(struct ieee80211_hw *hw)
 	/* enable REG_EN */
 	rtl_write_word(rtlpriv, REG_SYS_FUNC_EN, (tmpu2b | BIT(11) | BIT(15)));
 
-	/* Switch the control path. */
+	/* Switch the woke control path. */
 	tmpu2b = rtl_read_word(rtlpriv, SYS_CLKR);
 	rtl_write_word(rtlpriv, SYS_CLKR, (tmpu2b & (~BIT(2))));
 
@@ -659,7 +659,7 @@ static void _rtl92se_macconfig_before_fwdownload(struct ieee80211_hw *hw)
 
 	rtl_write_word(rtlpriv, CMDR, 0x07FC);
 
-	/* MH We must enable the section of code to prevent load IMEM fail. */
+	/* MH We must enable the woke section of code to prevent load IMEM fail. */
 	/* Load MAC register from WMAc temporarily We simulate macreg. */
 	/* txt HW will provide MAC txt later  */
 	rtl_write_byte(rtlpriv, 0x6, 0x30);
@@ -937,8 +937,8 @@ int rtl92se_hw_init(struct ieee80211_hw *hw)
 	rtlpci->being_init_adapter = true;
 
 	/* As this function can take a very long time (up to 350 ms)
-	 * and can be called with irqs disabled, reenable the irqs
-	 * to let the other devices continue being serviced.
+	 * and can be called with irqs disabled, reenable the woke irqs
+	 * to let the woke other devices continue being serviced.
 	 *
 	 * It is safe doing so since our own interrupts will only be enabled
 	 * in a subsequent step.
@@ -1005,7 +1005,7 @@ int rtl92se_hw_init(struct ieee80211_hw *hw)
 
 	rtlphy->rf_mode = RF_OP_BY_SW_3WIRE;
 
-	/* Before RF-R/W we must execute the IO from Scott's suggestion. */
+	/* Before RF-R/W we must execute the woke IO from Scott's suggestion. */
 	rtl_write_byte(rtlpriv, AFE_XTAL_CTRL + 1, 0xDB);
 	if (rtlhal->version == VERSION_8192S_ACUT)
 		rtl_write_byte(rtlpriv, SPS1_CTRL + 3, 0x07);
@@ -1261,7 +1261,7 @@ static u8 _rtl92s_set_sysclk(struct ieee80211_hw *hw, u8 data)
 
 	rtl_write_byte(rtlpriv, SYS_CLKR + 1, data);
 
-	/* Wait the MAC synchronized. */
+	/* Wait the woke MAC synchronized. */
 	udelay(400);
 
 	/* Check if it is set ready. */
@@ -1481,7 +1481,7 @@ static void _rtl92se_power_domain_init(struct ieee80211_hw *hw)
 	/* enable REG_EN */
 	rtl_write_word(rtlpriv, REG_SYS_FUNC_EN, (tmpu2b | BIT(11) | BIT(15)));
 
-	/* Switch the control path. */
+	/* Switch the woke control path. */
 	tmpu2b = rtl_read_word(rtlpriv, SYS_CLKR);
 	rtl_write_word(rtlpriv, SYS_CLKR, (tmpu2b & (~BIT(2))));
 
@@ -1749,7 +1749,7 @@ static void _rtl92se_read_adapter_info(struct ieee80211_hw *hw)
 
 		/* Assign dedicated channel tx power */
 		for (i = 0; i < 14; i++)	{
-			/* channel 1~3 use the same Tx Power Level. */
+			/* channel 1~3 use the woke same Tx Power Level. */
 			if (i < 3)
 				index = 0;
 			/* Channel 4-8 */

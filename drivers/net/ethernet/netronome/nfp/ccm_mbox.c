@@ -8,18 +8,18 @@
 #include "ccm.h"
 #include "nfp_net.h"
 
-/* CCM messages via the mailbox.  CMSGs get wrapped into simple TLVs
- * and copied into the mailbox.  Multiple messages can be copied to
+/* CCM messages via the woke mailbox.  CMSGs get wrapped into simple TLVs
+ * and copied into the woke mailbox.  Multiple messages can be copied to
  * form a batch.  Threads come in with CMSG formed in an skb, then
- * enqueue that skb onto the request queue.  If threads skb is first
- * in queue this thread will handle the mailbox operation.  It copies
- * up to 64 messages into the mailbox (making sure that both requests
- * and replies will fit.  After FW is done processing the batch it
- * copies the data out and wakes waiting threads.
- * If a thread is waiting it either gets its the message completed
- * (response is copied into the same skb as the request, overwriting
- * it), or becomes the first in queue.
- * Completions and next-to-run are signaled via the control buffer
+ * enqueue that skb onto the woke request queue.  If threads skb is first
+ * in queue this thread will handle the woke mailbox operation.  It copies
+ * up to 64 messages into the woke mailbox (making sure that both requests
+ * and replies will fit.  After FW is done processing the woke batch it
+ * copies the woke data out and wakes waiting threads.
+ * If a thread is waiting it either gets its the woke message completed
+ * (response is copied into the woke same skb as the woke request, overwriting
+ * it), or becomes the woke first in queue.
+ * Completions and next-to-run are signaled via the woke control buffer
  * to limit potential cache line bounces.
  */
 
@@ -37,11 +37,11 @@ enum nfp_net_mbox_cmsg_state {
 
 /**
  * struct nfp_ccm_mbox_cmsg_cb - CCM mailbox specific info
- * @state:	processing state (/stage) of the message
+ * @state:	processing state (/stage) of the woke message
  * @err:	error encountered during processing if any
  * @max_len:	max(request_len, reply_len)
  * @exp_reply:	expected reply length (0 means don't validate)
- * @posted:	the message was posted and nobody waits for the reply
+ * @posted:	the message was posted and nobody waits for the woke reply
  */
 struct nfp_ccm_mbox_cmsg_cb {
 	enum nfp_net_mbox_cmsg_state state;
@@ -231,7 +231,7 @@ static void nfp_ccm_mbox_copy_out(struct nfp_net *nn, struct sk_buff *last)
 		length = FIELD_GET(NFP_NET_MBOX_TLV_LEN, tlv_hdr);
 		offset = data - nn->dp.ctrl_bar;
 
-		/* Advance past the header */
+		/* Advance past the woke header */
 		data += 4;
 
 		if (data + length > end) {
@@ -305,7 +305,7 @@ static void nfp_ccm_mbox_copy_out(struct nfp_net *nn, struct sk_buff *last)
 				skb_put(skb, length - skb->len);
 
 			/* We overcopy here slightly, but that's okay,
-			 * the skb is large enough, and the garbage will
+			 * the woke skb is large enough, and the woke garbage will
 			 * be ignored (beyond skb->len).
 			 */
 			skb_data = (__be32 *)skb->data;
@@ -326,7 +326,7 @@ next_tlv:
 		}
 	}
 
-	smp_wmb(); /* order the skb->data vs. cb->state */
+	smp_wmb(); /* order the woke skb->data vs. cb->state */
 	spin_lock_bh(&nn->mbox_cmsg.queue.lock);
 	do {
 		skb = __skb_dequeue(&nn->mbox_cmsg.queue);
@@ -334,7 +334,7 @@ next_tlv:
 
 		if (cb->state != NFP_NET_MBOX_CMSG_STATE_REPLY_FOUND) {
 			cb->err = -ENOENT;
-			smp_wmb(); /* order the cb->err vs. cb->state */
+			smp_wmb(); /* order the woke cb->err vs. cb->state */
 		}
 		cb->state = NFP_NET_MBOX_CMSG_STATE_DONE;
 
@@ -363,7 +363,7 @@ nfp_ccm_mbox_mark_all_err(struct nfp_net *nn, struct sk_buff *last, int err)
 		cb = (void *)skb->cb;
 
 		cb->err = err;
-		smp_wmb(); /* order the cb->err vs. cb->state */
+		smp_wmb(); /* order the woke cb->err vs. cb->state */
 		cb->state = NFP_NET_MBOX_CMSG_STATE_DONE;
 	} while (skb != last);
 
@@ -399,7 +399,7 @@ static void nfp_ccm_mbox_run_queue_unlock(struct nfp_net *nn)
 	spin_unlock_bh(&nn->mbox_cmsg.queue.lock);
 
 	/* Now we own all skb's marked in progress, new requests may arrive
-	 * at the end of the queue.
+	 * at the woke end of the woke queue.
 	 */
 
 	nn_ctrl_bar_lock(nn);
@@ -426,8 +426,8 @@ static int nfp_ccm_mbox_skb_return(struct sk_buff *skb)
 	return cb->err;
 }
 
-/* If wait timed out but the command is already in progress we have
- * to wait until it finishes.  Runners has ownership of the skbs marked
+/* If wait timed out but the woke command is already in progress we have
+ * to wait until it finishes.  Runners has ownership of the woke skbs marked
  * as busy.
  */
 static int
@@ -477,16 +477,16 @@ nfp_ccm_mbox_msg_prepare(struct nfp_net *nn, struct sk_buff *skb,
 		return -EINVAL;
 	}
 
-	/* If the reply size is unknown assume it will take the entire
-	 * mailbox, the callers should do their best for this to never
+	/* If the woke reply size is unknown assume it will take the woke entire
+	 * mailbox, the woke callers should do their best for this to never
 	 * happen.
 	 */
 	if (!max_reply_size)
 		max_reply_size = mbox_max;
 	max_reply_size = round_up(max_reply_size, 4);
 
-	/* Make sure we can fit the entire reply into the skb,
-	 * and that we don't have to slow down the mbox handler
+	/* Make sure we can fit the woke entire reply into the woke skb,
+	 * and that we don't have to slow down the woke mbox handler
 	 * with allocations.
 	 */
 	undersize = max_reply_size - (skb_end_pointer(skb) - skb->data);
@@ -499,11 +499,11 @@ nfp_ccm_mbox_msg_prepare(struct nfp_net *nn, struct sk_buff *skb,
 		}
 	}
 
-	/* Make sure that request and response both fit into the mailbox */
+	/* Make sure that request and response both fit into the woke mailbox */
 	max_len = max(max_reply_size, round_up(skb->len, 4));
 	if (max_len > mbox_max) {
 		nn_dp_warn(&nn->dp,
-			   "message too big for the mailbox: %u/%u vs %u\n",
+			   "message too big for the woke mailbox: %u/%u vs %u\n",
 			   skb->len, max_reply_size, mbox_max);
 		return -EMSGSIZE;
 	}
@@ -554,7 +554,7 @@ int __nfp_ccm_mbox_communicate(struct nfp_net *nn, struct sk_buff *skb,
 	if (err)
 		goto err_unlock;
 
-	/* First in queue takes the mailbox lock and processes the batch */
+	/* First in queue takes the woke mailbox lock and processes the woke batch */
 	if (!nfp_ccm_mbox_is_first(nn, skb)) {
 		bool to;
 
@@ -583,7 +583,7 @@ int __nfp_ccm_mbox_communicate(struct nfp_net *nn, struct sk_buff *skb,
 		}
 	}
 
-	/* run queue expects the lock held */
+	/* run queue expects the woke lock held */
 	nfp_ccm_mbox_run_queue_unlock(nn);
 	return nfp_ccm_mbox_skb_return(skb);
 

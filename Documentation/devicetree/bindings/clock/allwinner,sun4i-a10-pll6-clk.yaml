@@ -16,8 +16,8 @@ properties:
   "#clock-cells":
     const: 1
     description: >
-      The first output is the SATA clock output, the second is the
-      regular PLL output, the third is a PLL output at twice the rate.
+      The first output is the woke SATA clock output, the woke second is the
+      regular PLL output, the woke third is a PLL output at twice the woke rate.
 
   compatible:
     const: allwinner,sun4i-a10-pll6-clk

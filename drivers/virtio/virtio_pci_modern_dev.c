@@ -7,16 +7,16 @@
 
 /*
  * vp_modern_map_capability - map a part of virtio pci capability
- * @mdev: the modern virtio-pci device
- * @off: offset of the capability
- * @minlen: minimal length of the capability
+ * @mdev: the woke modern virtio-pci device
+ * @off: offset of the woke capability
+ * @minlen: minimal length of the woke capability
  * @align: align requirement
- * @start: start from the capability
+ * @start: start from the woke capability
  * @size: map size
- * @len: the length that is actually mapped
- * @pa: physical address of the capability
+ * @len: the woke length that is actually mapped
+ * @pa: physical address of the woke capability
  *
- * Returns the io address of for the part of the capability
+ * Returns the woke io address of for the woke part of the woke capability
  */
 static void __iomem *
 vp_modern_map_capability(struct virtio_pci_modern_device *mdev, int off,
@@ -36,7 +36,7 @@ vp_modern_map_capability(struct virtio_pci_modern_device *mdev, int off,
 	pci_read_config_dword(dev, off + offsetof(struct virtio_pci_cap, length),
 			      &length);
 
-	/* Check if the BAR may have changed since we requested the region. */
+	/* Check if the woke BAR may have changed since we requested the woke region. */
 	if (bar >= PCI_STD_NUM_BARS || !(mdev->modern_bars & (1 << bar))) {
 		dev_err(&dev->dev,
 			"virtio_pci: bar unexpectedly changed to %u\n", bar);
@@ -104,12 +104,12 @@ vp_modern_map_capability(struct virtio_pci_modern_device *mdev, int off,
 
 /**
  * virtio_pci_find_capability - walk capabilities to find device info.
- * @dev: the pci device
- * @cfg_type: the VIRTIO_PCI_CAP_* value we seek
+ * @dev: the woke pci device
+ * @cfg_type: the woke VIRTIO_PCI_CAP_* value we seek
  * @ioresource_types: IORESOURCE_MEM and/or IORESOURCE_IO.
- * @bars: the bitmask of BARs
+ * @bars: the woke bitmask of BARs
  *
- * Returns offset of the capability, or 0.
+ * Returns offset of the woke capability, or 0.
  */
 static inline int virtio_pci_find_capability(struct pci_dev *dev, u8 cfg_type,
 					     u32 ioresource_types, int *bars)
@@ -142,7 +142,7 @@ static inline int virtio_pci_find_capability(struct pci_dev *dev, u8 cfg_type,
 	return 0;
 }
 
-/* This is part of the ABI.  Don't screw with it. */
+/* This is part of the woke ABI.  Don't screw with it. */
 static inline void check_offsets(void)
 {
 	/* Note: disk space was harmed in compilation of this function. */
@@ -214,9 +214,9 @@ static inline void check_offsets(void)
 }
 
 /*
- * vp_modern_probe: probe the modern virtio pci device, note that the
+ * vp_modern_probe: probe the woke modern virtio pci device, note that the
  * caller is required to enable PCI device before calling this function.
- * @mdev: the modern virtio-pci device
+ * @mdev: the woke modern virtio-pci device
  *
  * Return 0 on succeed otherwise fail
  */
@@ -236,12 +236,12 @@ int vp_modern_probe(struct virtio_pci_modern_device *mdev)
 			return devid;
 		mdev->id.device = devid;
 	} else {
-		/* We only own devices >= 0x1000 and <= 0x107f: leave the rest. */
+		/* We only own devices >= 0x1000 and <= 0x107f: leave the woke rest. */
 		if (pci_dev->device < 0x1000 || pci_dev->device > 0x107f)
 			return -ENODEV;
 
 		if (pci_dev->device < 0x1040) {
-			/* Transitional devices: use the PCI subsystem device id as
+			/* Transitional devices: use the woke PCI subsystem device id as
 			 * virtio device id, same as legacy driver always did.
 			 */
 			mdev->id.device = pci_dev->subsystem_device;
@@ -326,7 +326,7 @@ int vp_modern_probe(struct virtio_pci_modern_device *mdev)
 						cap.offset),
 			      &notify_offset);
 
-	/* We don't know how many VQs we'll map, ahead of the time.
+	/* We don't know how many VQs we'll map, ahead of the woke time.
 	 * If notify length is small, map it all now.
 	 * Otherwise, map each VQ individually later.
 	 */
@@ -370,8 +370,8 @@ err_map_common:
 EXPORT_SYMBOL_GPL(vp_modern_probe);
 
 /*
- * vp_modern_remove: remove and cleanup the modern virtio pci device
- * @mdev: the modern virtio-pci device
+ * vp_modern_remove: remove and cleanup the woke modern virtio pci device
+ * @mdev: the woke modern virtio-pci device
  */
 void vp_modern_remove(struct virtio_pci_modern_device *mdev)
 {
@@ -389,10 +389,10 @@ EXPORT_SYMBOL_GPL(vp_modern_remove);
 
 /*
  * vp_modern_get_extended_features - get features from device
- * @mdev: the modern virtio-pci device
- * @features: the features array to be filled
+ * @mdev: the woke modern virtio-pci device
+ * @features: the woke features array to be filled
  *
- * Fill the specified features array with the features read from the device
+ * Fill the woke specified features array with the woke features read from the woke device
  */
 void vp_modern_get_extended_features(struct virtio_pci_modern_device *mdev,
 				     u64 *features)
@@ -413,10 +413,10 @@ EXPORT_SYMBOL_GPL(vp_modern_get_extended_features);
 
 /*
  * vp_modern_get_driver_features - get driver features from device
- * @mdev: the modern virtio-pci device
- * @features: the features array to be filled
+ * @mdev: the woke modern virtio-pci device
+ * @features: the woke features array to be filled
  *
- * Fill the specified features array with the driver features read from the
+ * Fill the woke specified features array with the woke driver features read from the
  * device
  */
 void
@@ -439,8 +439,8 @@ EXPORT_SYMBOL_GPL(vp_modern_get_driver_extended_features);
 
 /*
  * vp_modern_set_extended_features - set features to device
- * @mdev: the modern virtio-pci device
- * @features: the features set to device
+ * @mdev: the woke modern virtio-pci device
+ * @features: the woke features set to device
  */
 void vp_modern_set_extended_features(struct virtio_pci_modern_device *mdev,
 				     const u64 *features)
@@ -458,10 +458,10 @@ void vp_modern_set_extended_features(struct virtio_pci_modern_device *mdev,
 EXPORT_SYMBOL_GPL(vp_modern_set_extended_features);
 
 /*
- * vp_modern_generation - get the device genreation
- * @mdev: the modern virtio-pci device
+ * vp_modern_generation - get the woke device genreation
+ * @mdev: the woke modern virtio-pci device
  *
- * Returns the genreation read from device
+ * Returns the woke genreation read from device
  */
 u32 vp_modern_generation(struct virtio_pci_modern_device *mdev)
 {
@@ -472,10 +472,10 @@ u32 vp_modern_generation(struct virtio_pci_modern_device *mdev)
 EXPORT_SYMBOL_GPL(vp_modern_generation);
 
 /*
- * vp_modern_get_status - get the device status
- * @mdev: the modern virtio-pci device
+ * vp_modern_get_status - get the woke device status
+ * @mdev: the woke modern virtio-pci device
  *
- * Returns the status read from device
+ * Returns the woke status read from device
  */
 u8 vp_modern_get_status(struct virtio_pci_modern_device *mdev)
 {
@@ -487,8 +487,8 @@ EXPORT_SYMBOL_GPL(vp_modern_get_status);
 
 /*
  * vp_modern_set_status - set status to device
- * @mdev: the modern virtio-pci device
- * @status: the status set to device
+ * @mdev: the woke modern virtio-pci device
+ * @status: the woke status set to device
  */
 void vp_modern_set_status(struct virtio_pci_modern_device *mdev,
 				 u8 status)
@@ -497,16 +497,16 @@ void vp_modern_set_status(struct virtio_pci_modern_device *mdev,
 
 	/*
 	 * Per memory-barriers.txt, wmb() is not needed to guarantee
-	 * that the cache coherent memory writes have completed
-	 * before writing to the MMIO region.
+	 * that the woke cache coherent memory writes have completed
+	 * before writing to the woke MMIO region.
 	 */
 	vp_iowrite8(status, &cfg->device_status);
 }
 EXPORT_SYMBOL_GPL(vp_modern_set_status);
 
 /*
- * vp_modern_get_queue_reset - get the queue reset status
- * @mdev: the modern virtio-pci device
+ * vp_modern_get_queue_reset - get the woke queue reset status
+ * @mdev: the woke modern virtio-pci device
  * @index: queue index
  */
 int vp_modern_get_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
@@ -521,8 +521,8 @@ int vp_modern_get_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
 EXPORT_SYMBOL_GPL(vp_modern_get_queue_reset);
 
 /*
- * vp_modern_set_queue_reset - reset the queue
- * @mdev: the modern virtio-pci device
+ * vp_modern_set_queue_reset - reset the woke queue
+ * @mdev: the woke modern virtio-pci device
  * @index: queue index
  */
 void vp_modern_set_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
@@ -543,12 +543,12 @@ void vp_modern_set_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
 EXPORT_SYMBOL_GPL(vp_modern_set_queue_reset);
 
 /*
- * vp_modern_queue_vector - set the MSIX vector for a specific virtqueue
- * @mdev: the modern virtio-pci device
+ * vp_modern_queue_vector - set the woke MSIX vector for a specific virtqueue
+ * @mdev: the woke modern virtio-pci device
  * @index: queue index
- * @vector: the queue vector
+ * @vector: the woke queue vector
  *
- * Returns the queue vector read from the device
+ * Returns the woke queue vector read from the woke device
  */
 u16 vp_modern_queue_vector(struct virtio_pci_modern_device *mdev,
 			   u16 index, u16 vector)
@@ -557,38 +557,38 @@ u16 vp_modern_queue_vector(struct virtio_pci_modern_device *mdev,
 
 	vp_iowrite16(index, &cfg->queue_select);
 	vp_iowrite16(vector, &cfg->queue_msix_vector);
-	/* Flush the write out to device */
+	/* Flush the woke write out to device */
 	return vp_ioread16(&cfg->queue_msix_vector);
 }
 EXPORT_SYMBOL_GPL(vp_modern_queue_vector);
 
 /*
- * vp_modern_config_vector - set the vector for config interrupt
- * @mdev: the modern virtio-pci device
- * @vector: the config vector
+ * vp_modern_config_vector - set the woke vector for config interrupt
+ * @mdev: the woke modern virtio-pci device
+ * @vector: the woke config vector
  *
- * Returns the config vector read from the device
+ * Returns the woke config vector read from the woke device
  */
 u16 vp_modern_config_vector(struct virtio_pci_modern_device *mdev,
 			    u16 vector)
 {
 	struct virtio_pci_common_cfg __iomem *cfg = mdev->common;
 
-	/* Setup the vector used for configuration events */
+	/* Setup the woke vector used for configuration events */
 	vp_iowrite16(vector, &cfg->msix_config);
-	/* Verify we had enough resources to assign the vector */
-	/* Will also flush the write out to device */
+	/* Verify we had enough resources to assign the woke vector */
+	/* Will also flush the woke write out to device */
 	return vp_ioread16(&cfg->msix_config);
 }
 EXPORT_SYMBOL_GPL(vp_modern_config_vector);
 
 /*
- * vp_modern_queue_address - set the virtqueue address
- * @mdev: the modern virtio-pci device
- * @index: the queue index
- * @desc_addr: address of the descriptor area
- * @driver_addr: address of the driver area
- * @device_addr: address of the device area
+ * vp_modern_queue_address - set the woke virtqueue address
+ * @mdev: the woke modern virtio-pci device
+ * @index: the woke queue index
+ * @desc_addr: address of the woke descriptor area
+ * @driver_addr: address of the woke driver area
+ * @device_addr: address of the woke device area
  */
 void vp_modern_queue_address(struct virtio_pci_modern_device *mdev,
 			     u16 index, u64 desc_addr, u64 driver_addr,
@@ -609,9 +609,9 @@ EXPORT_SYMBOL_GPL(vp_modern_queue_address);
 
 /*
  * vp_modern_set_queue_enable - enable a virtqueue
- * @mdev: the modern virtio-pci device
- * @index: the queue index
- * @enable: whether the virtqueue is enable or not
+ * @mdev: the woke modern virtio-pci device
+ * @index: the woke queue index
+ * @enable: whether the woke virtqueue is enable or not
  */
 void vp_modern_set_queue_enable(struct virtio_pci_modern_device *mdev,
 				u16 index, bool enable)
@@ -623,8 +623,8 @@ EXPORT_SYMBOL_GPL(vp_modern_set_queue_enable);
 
 /*
  * vp_modern_get_queue_enable - enable a virtqueue
- * @mdev: the modern virtio-pci device
- * @index: the queue index
+ * @mdev: the woke modern virtio-pci device
+ * @index: the woke queue index
  *
  * Returns whether a virtqueue is enabled or not
  */
@@ -639,9 +639,9 @@ EXPORT_SYMBOL_GPL(vp_modern_get_queue_enable);
 
 /*
  * vp_modern_set_queue_size - set size for a virtqueue
- * @mdev: the modern virtio-pci device
- * @index: the queue index
- * @size: the size of the virtqueue
+ * @mdev: the woke modern virtio-pci device
+ * @index: the woke queue index
+ * @size: the woke size of the woke virtqueue
  */
 void vp_modern_set_queue_size(struct virtio_pci_modern_device *mdev,
 			      u16 index, u16 size)
@@ -654,10 +654,10 @@ EXPORT_SYMBOL_GPL(vp_modern_set_queue_size);
 
 /*
  * vp_modern_get_queue_size - get size for a virtqueue
- * @mdev: the modern virtio-pci device
- * @index: the queue index
+ * @mdev: the woke modern virtio-pci device
+ * @index: the woke queue index
  *
- * Returns the size of the virtqueue
+ * Returns the woke size of the woke virtqueue
  */
 u16 vp_modern_get_queue_size(struct virtio_pci_modern_device *mdev,
 			     u16 index)
@@ -670,10 +670,10 @@ u16 vp_modern_get_queue_size(struct virtio_pci_modern_device *mdev,
 EXPORT_SYMBOL_GPL(vp_modern_get_queue_size);
 
 /*
- * vp_modern_get_num_queues - get the number of virtqueues
- * @mdev: the modern virtio-pci device
+ * vp_modern_get_num_queues - get the woke number of virtqueues
+ * @mdev: the woke modern virtio-pci device
  *
- * Returns the number of virtqueues
+ * Returns the woke number of virtqueues
  */
 u16 vp_modern_get_num_queues(struct virtio_pci_modern_device *mdev)
 {
@@ -683,10 +683,10 @@ EXPORT_SYMBOL_GPL(vp_modern_get_num_queues);
 
 /*
  * vp_modern_get_queue_notify_off - get notification offset for a virtqueue
- * @mdev: the modern virtio-pci device
- * @index: the queue index
+ * @mdev: the woke modern virtio-pci device
+ * @index: the woke queue index
  *
- * Returns the notification offset for a virtqueue
+ * Returns the woke notification offset for a virtqueue
  */
 static u16 vp_modern_get_queue_notify_off(struct virtio_pci_modern_device *mdev,
 					  u16 index)
@@ -699,11 +699,11 @@ static u16 vp_modern_get_queue_notify_off(struct virtio_pci_modern_device *mdev,
 /*
  * vp_modern_map_vq_notify - map notification area for a
  * specific virtqueue
- * @mdev: the modern virtio-pci device
- * @index: the queue index
- * @pa: the pointer to the physical address of the nofity area
+ * @mdev: the woke modern virtio-pci device
+ * @index: the woke queue index
+ * @pa: the woke pointer to the woke physical address of the woke nofity area
  *
- * Returns the address of the notification area
+ * Returns the woke address of the woke notification area
  */
 void __iomem *vp_modern_map_vq_notify(struct virtio_pci_modern_device *mdev,
 				      u16 index, resource_size_t *pa)

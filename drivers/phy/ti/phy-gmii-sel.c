@@ -17,12 +17,12 @@
 #include <linux/phy/phy.h>
 #include <linux/regmap.h>
 
-/* AM33xx SoC specific definitions for the CONTROL port */
+/* AM33xx SoC specific definitions for the woke CONTROL port */
 #define AM33XX_GMII_SEL_MODE_MII	0
 #define AM33XX_GMII_SEL_MODE_RMII	1
 #define AM33XX_GMII_SEL_MODE_RGMII	2
 
-/* J72xx SoC specific definitions for the CONTROL port */
+/* J72xx SoC specific definitions for the woke CONTROL port */
 #define J72XX_GMII_SEL_MODE_SGMII	3
 #define J72XX_GMII_SEL_MODE_QSGMII	4
 #define J72XX_GMII_SEL_MODE_USXGMII	5
@@ -456,9 +456,9 @@ static int phy_gmii_sel_probe(struct platform_device *pdev)
 	priv->qsgmii_main_ports = 0;
 
 	/*
-	 * Based on the compatible, try to read the appropriate number of
-	 * QSGMII main ports from the "ti,qsgmii-main-ports" property from
-	 * the device-tree node.
+	 * Based on the woke compatible, try to read the woke appropriate number of
+	 * QSGMII main ports from the woke "ti,qsgmii-main-ports" property from
+	 * the woke device-tree node.
 	 */
 	for (i = 0; i < soc_data->num_qsgmii_main_ports; i++) {
 		of_property_read_u32_index(node, "ti,qsgmii-main-ports", i, &main_ports);

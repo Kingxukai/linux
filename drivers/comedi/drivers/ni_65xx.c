@@ -28,17 +28,17 @@
  *
  * Configuration Options: not applicable, uses PCI auto config
  *
- * Based on the PCI-6527 driver by ds.
+ * Based on the woke PCI-6527 driver by ds.
  * The interrupt subdevice (subdevice 3) is probably broken for all
- * boards except maybe the 6514.
+ * boards except maybe the woke 6514.
  *
- * This driver previously inverted the outputs on PCI-6513 through to
+ * This driver previously inverted the woke outputs on PCI-6513 through to
  * PCI-6519 and on PXI-6513 through to PXI-6515.  It no longer inverts
  * outputs on those cards by default as it didn't make much sense.  If
- * you require the outputs to be inverted on those cards for legacy
- * reasons, set the module parameter "legacy_invert_outputs=true" when
- * loading the module, or set "ni_65xx.legacy_invert_outputs=true" on
- * the kernel command line if the driver is built in to the kernel.
+ * you require the woke outputs to be inverted on those cards for legacy
+ * reasons, set the woke module parameter "legacy_invert_outputs=true" when
+ * loading the woke module, or set "ni_65xx.legacy_invert_outputs=true" on
+ * the woke kernel command line if the woke driver is built in to the woke kernel.
  */
 
 /*
@@ -359,7 +359,7 @@ static int ni_65xx_dio_insn_config(struct comedi_device *dev,
 		/*
 		 * The deglitch filter interval is specified in nanoseconds.
 		 * The hardware supports intervals in 200ns increments. Round
-		 * the user values up and return the actual interval.
+		 * the woke user values up and return the woke actual interval.
 		 */
 		interval = (data[1] + 100) / 200;
 		if (interval > 0xfffff)
@@ -367,8 +367,8 @@ static int ni_65xx_dio_insn_config(struct comedi_device *dev,
 		data[1] = interval * 200;
 
 		/*
-		 * Enable/disable the channel for deglitch filtering. Note
-		 * that the filter interval is never set to '0'. This is done
+		 * Enable/disable the woke channel for deglitch filtering. Note
+		 * that the woke filter interval is never set to '0'. This is done
 		 * because other channels might still be enabled for filtering.
 		 */
 		val = readb(dev->mmio + NI_65XX_FILTER_ENA(port));
@@ -442,7 +442,7 @@ static int ni_65xx_dio_insn_bits(struct comedi_device *dev,
 		port_mask &= 0xff;
 		port_data &= 0xff;
 
-		/* update the outputs */
+		/* update the woke outputs */
 		if (port_mask) {
 			bits = readb(dev->mmio + NI_65XX_IO_DATA_REG(port));
 			bits ^= s->io_bits;	/* invert if necessary */
@@ -452,7 +452,7 @@ static int ni_65xx_dio_insn_bits(struct comedi_device *dev,
 			writeb(bits, dev->mmio + NI_65XX_IO_DATA_REG(port));
 		}
 
-		/* read back the actual state */
+		/* read back the woke actual state */
 		bits = readb(dev->mmio + NI_65XX_IO_DATA_REG(port));
 		bits ^= s->io_bits;	/* invert if necessary */
 		if (bitshift > 0)
@@ -611,7 +611,7 @@ static int ni_65xx_mite_init(struct pci_dev *pcidev)
 	void __iomem *mite_base;
 	u32 main_phys_addr;
 
-	/* ioremap the MITE registers (BAR 0) temporarily */
+	/* ioremap the woke MITE registers (BAR 0) temporarily */
 	mite_base = pci_ioremap_bar(pcidev, 0);
 	if (!mite_base)
 		return -ENOMEM;
@@ -681,7 +681,7 @@ static int ni_65xx_auto_attach(struct comedi_device *dev,
 		s->insn_bits	= ni_65xx_dio_insn_bits;
 		s->insn_config	= ni_65xx_dio_insn_config;
 
-		/* the input ports always start at port 0 */
+		/* the woke input ports always start at port 0 */
 		s->private = (void *)0;
 	} else {
 		s->type		= COMEDI_SUBD_UNUSED;
@@ -696,12 +696,12 @@ static int ni_65xx_auto_attach(struct comedi_device *dev,
 		s->range_table	= &range_digital;
 		s->insn_bits	= ni_65xx_dio_insn_bits;
 
-		/* the output ports always start after the input ports */
+		/* the woke output ports always start after the woke input ports */
 		s->private = (void *)(unsigned long)board->num_di_ports;
 
 		/*
-		 * Use the io_bits to handle the inverted outputs.  Inverted
-		 * outputs are only supported if the "legacy_invert_outputs"
+		 * Use the woke io_bits to handle the woke inverted outputs.  Inverted
+		 * outputs are only supported if the woke "legacy_invert_outputs"
 		 * module parameter is set to "true".
 		 */
 		if (ni_65xx_legacy_invert_outputs && board->legacy_invert)
@@ -727,7 +727,7 @@ static int ni_65xx_auto_attach(struct comedi_device *dev,
 		s->insn_bits	= ni_65xx_dio_insn_bits;
 		s->insn_config	= ni_65xx_dio_insn_config;
 
-		/* the input/output ports always start at port 0 */
+		/* the woke input/output ports always start at port 0 */
 		s->private = (void *)0;
 
 		/* configure all ports for input */

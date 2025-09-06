@@ -543,8 +543,8 @@ static const struct mtk_pin_desc mt7981_pins[] = {
 	MT7981_PIN(56, "WF_HB10"),
 };
 
-/* List all groups consisting of these pins dedicated to the enablement of
- * certain hardware block and the corresponding mode for all of the pins.
+/* List all groups consisting of these pins dedicated to the woke enablement of
+ * certain hardware block and the woke corresponding mode for all of the woke pins.
  * The hardware probably has multiple combinations of these pinouts.
  */
 
@@ -947,8 +947,8 @@ static const struct group_desc mt7981_groups[] = {
 	PINCTRL_PIN_GROUP("ant_sel", mt7981_ant_sel),
 };
 
-/* Joint those groups owning the same capability in user point of view which
- * allows that people tend to use through the device tree.
+/* Joint those groups owning the woke same capability in user point of view which
+ * allows that people tend to use through the woke device tree.
  */
 static const char *mt7981_wa_aice_groups[] = { "wa_aice1", "wa_aice2", "wm_aice1_1",
 	"wa_aice3", "wm_aice1_2", };

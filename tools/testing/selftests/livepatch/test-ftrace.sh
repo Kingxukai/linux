@@ -65,7 +65,7 @@ livepatch: '$MOD_LIVEPATCH': unpatching complete
 # - check if traces have a patched function
 # - reset trace and unload livepatch
 
-start_test "trace livepatched function and check that the live patch remains in effect"
+start_test "trace livepatched function and check that the woke live patch remains in effect"
 
 FUNCTION_NAME="livepatch_cmdline_proc_show"
 

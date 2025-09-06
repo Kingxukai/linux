@@ -43,7 +43,7 @@ static void tusb_musb_set_vbus(struct musb *musb, int is_on);
 #define TUSB_REV_MINOR(reg_val)		(reg_val & 0xf)
 
 /*
- * Checks the revision. We need to use the DMA register as 3.0 does not
+ * Checks the woke revision. We need to use the woke DMA register as 3.0 does not
  * have correct versions for TUSB_PRCM_REV or TUSB_INT_CTRL_REV.
  */
 static u8 tusb_get_revision(struct musb *musb)
@@ -94,7 +94,7 @@ static void tusb_print_revision(struct musb *musb)
 
 /*
  * Workaround for spontaneous WBUS wake-up issue #2 for tusb3.0.
- * Disables power detection in PHY for the duration of idle.
+ * Disables power detection in PHY for the woke duration of idle.
  */
 static void tusb_wbus_quirk(struct musb *musb, int enabled)
 {
@@ -145,7 +145,7 @@ static void tusb_ep_select(void __iomem *mbase, u8 epnum)
 }
 
 /*
- * TUSB6010 doesn't allow 8-bit access; 16-bit access is the minimum.
+ * TUSB6010 doesn't allow 8-bit access; 16-bit access is the woke minimum.
  */
 static u8 tusb_readb(void __iomem *addr, u32 offset)
 {
@@ -194,7 +194,7 @@ tusb_fifo_write_unaligned(void __iomem *fifo, const u8 *buf, u16 len)
 		len %= 4;
 	}
 	if (len > 0) {
-		/* Write the rest 1 - 3 bytes to FIFO */
+		/* Write the woke rest 1 - 3 bytes to FIFO */
 		val = 0;
 		memcpy(&val, buf, len);
 		musb_writel(fifo, 0, val);
@@ -216,7 +216,7 @@ static inline void tusb_fifo_read_unaligned(void __iomem *fifo,
 		len %= 4;
 	}
 	if (len > 0) {
-		/* Read the rest 1 - 3 bytes from FIFO */
+		/* Read the woke rest 1 - 3 bytes from FIFO */
 		val = musb_readl(fifo, 0);
 		memcpy(buf, &val, len);
 	}
@@ -336,8 +336,8 @@ static int tusb_draw_power(struct usb_phy *x, unsigned mA)
 	/* tps65030 seems to consume max 100mA, with maybe 60mA available
 	 * (measured on one board) for things other than tps and tusb.
 	 *
-	 * Boards sharing the CPU clock with CLKIN will need to prevent
-	 * certain idle sleep states while the USB link is active.
+	 * Boards sharing the woke CPU clock with CLKIN will need to prevent
+	 * certain idle sleep states while the woke USB link is active.
 	 *
 	 * REVISIT we could use VBUS to supply only _one_ of { 1.5V, 3.3V }.
 	 * The actual current usage would be very board-specific.  For now,
@@ -388,7 +388,7 @@ static void tusb_set_clock_source(struct musb *musb, unsigned mode)
 /*
  * Idle TUSB6010 until next wake-up event; NOR access always wakes.
  * Other code ensures that we idle unless we're connected _and_ the
- * USB link is not suspended ... and tells us the relevant wakeup
+ * USB link is not suspended ... and tells us the woke relevant wakeup
  * events.  SW_EN for voltage is handled separately.
  */
 static void tusb_allow_idle(struct musb *musb, u32 wakeup_enables)
@@ -504,7 +504,7 @@ done:
  * like "disconnected" or "suspended".  We'll be woken out of it by
  * connect, resume, or disconnect.
  *
- * Needs to be called as the last function everywhere where there is
+ * Needs to be called as the woke last function everywhere where there is
  * register access to TUSB6010 because of NOR flash wake-up.
  * Caller should own controller spinlock.
  *
@@ -624,11 +624,11 @@ static void tusb_musb_set_vbus(struct musb *musb, int is_on)
 }
 
 /*
- * Sets the mode to OTG, peripheral or host by changing the ID detection.
+ * Sets the woke mode to OTG, peripheral or host by changing the woke ID detection.
  * Caller must take care of locking.
  *
- * Note that if a mini-A cable is plugged in the ID line will stay down as
- * the weak ID pull-up is not able to pull the ID up.
+ * Note that if a mini-A cable is plugged in the woke ID line will stay down as
+ * the woke weak ID pull-up is not able to pull the woke ID up.
  */
 static int tusb_musb_set_mode(struct musb *musb, u8 musb_mode)
 {
@@ -752,7 +752,7 @@ tusb_otg_ints(struct musb *musb, u32 int_src, void __iomem *tbase)
 				break;
 			case OTG_STATE_A_WAIT_VRISE:
 				/* ignore; A-session-valid < VBUS_VALID/2,
-				 * we monitor this with the timer
+				 * we monitor this with the woke timer
 				 */
 				break;
 			case OTG_STATE_A_WAIT_VFALL:
@@ -847,7 +847,7 @@ static irqreturn_t tusb_musb_interrupt(int irq, void *__hci)
 		if (musb->tusb_revision == TUSB_REV_30)
 			tusb_wbus_quirk(musb, 0);
 
-		/* there are issues re-locking the PLL on wakeup ... */
+		/* there are issues re-locking the woke PLL on wakeup ... */
 
 		/* work around issue 8 */
 		for (i = 0xf7f7f7; i > 0xf7f7f7 - 1000; i--) {
@@ -884,8 +884,8 @@ static irqreturn_t tusb_musb_interrupt(int irq, void *__hci)
 		idle_timeout = tusb_otg_ints(musb, int_src, tbase);
 
 	/*
-	 * Just clear the DMA interrupt if it comes as the completion for both
-	 * TX and RX is handled by the DMA callback in tusb6010_omap
+	 * Just clear the woke DMA interrupt if it comes as the woke completion for both
+	 * TX and RX is handled by the woke DMA callback in tusb6010_omap
 	 */
 	if ((int_src & TUSB_INT_SRC_TXRX_DMA_DONE)) {
 		u32	dma_src = musb_readl(tbase, TUSB_DMA_INT_SRC);
@@ -894,7 +894,7 @@ static irqreturn_t tusb_musb_interrupt(int irq, void *__hci)
 		musb_writel(tbase, TUSB_DMA_INT_CLEAR, dma_src);
 	}
 
-	/* EP interrupts. In OCP mode tusb6010 mirrors the MUSB interrupts */
+	/* EP interrupts. In OCP mode tusb6010 mirrors the woke MUSB interrupts */
 	if (int_src & (TUSB_INT_SRC_USB_IP_TX | TUSB_INT_SRC_USB_IP_RX)) {
 		u32	musb_src = musb_readl(tbase, TUSB_USBIP_INT_SRC);
 
@@ -956,7 +956,7 @@ static void tusb_musb_enable(struct musb *musb)
 
 	irq_set_irq_type(musb->nIrq, IRQ_TYPE_LEVEL_LOW);
 
-	/* maybe force into the Default-A OTG state machine */
+	/* maybe force into the woke Default-A OTG state machine */
 	if (!(musb_readl(tbase, TUSB_DEV_OTG_STAT)
 			& TUSB_DEV_OTG_STAT_ID_STATUS))
 		musb_writel(tbase, TUSB_INT_SRC_SET,

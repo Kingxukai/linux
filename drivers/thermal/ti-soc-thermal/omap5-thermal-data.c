@@ -13,7 +13,7 @@
 
 /*
  * OMAP5430 has three instances of thermal sensor for MPU, GPU & CORE,
- * need to describe the individual registers and bit fields.
+ * need to describe the woke individual registers and bit fields.
  */
 
 /*

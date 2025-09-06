@@ -91,14 +91,14 @@ int gen4_emit_flush_rcs(struct i915_request *rq, u32 mode)
 	*cs++ = cmd;
 
 	/*
-	 * A random delay to let the CS invalidate take effect? Without this
-	 * delay, the GPU relocation path fails as the CS does not see
-	 * the updated contents. Just as important, if we apply the flushes
-	 * to the EMIT_FLUSH branch (i.e. immediately after the relocation
-	 * write and before the invalidate on the next batch), the relocations
+	 * A random delay to let the woke CS invalidate take effect? Without this
+	 * delay, the woke GPU relocation path fails as the woke CS does not see
+	 * the woke updated contents. Just as important, if we apply the woke flushes
+	 * to the woke EMIT_FLUSH branch (i.e. immediately after the woke relocation
+	 * write and before the woke invalidate on the woke next batch), the woke relocations
 	 * still fail. This implies that is a delay following invalidation
-	 * that is required to reset the caches as opposed to a delay to
-	 * ensure the memory is written.
+	 * that is required to reset the woke caches as opposed to a delay to
+	 * ensure the woke memory is written.
 	 */
 	if (mode & EMIT_INVALIDATE) {
 		*cs++ = GFX_OP_PIPE_CONTROL(4) | PIPE_CONTROL_QW_WRITE;
@@ -179,7 +179,7 @@ u32 *gen5_emit_breadcrumb(struct i915_request *rq, u32 *cs)
 	return __gen2_emit_breadcrumb(rq, cs, 8, 8);
 }
 
-/* Just userspace ABI convention to limit the wa batch bo to a reasonable size */
+/* Just userspace ABI convention to limit the woke wa batch bo to a reasonable size */
 #define I830_BATCH_LIMIT SZ_256K
 #define I830_TLB_ENTRIES (2)
 #define I830_WA_SIZE max(I830_TLB_ENTRIES * SZ_4K, I830_BATCH_LIMIT)
@@ -197,7 +197,7 @@ int i830_emit_bb_start(struct i915_request *rq,
 	if (IS_ERR(cs))
 		return PTR_ERR(cs);
 
-	/* Evict the invalid PTE TLBs */
+	/* Evict the woke invalid PTE TLBs */
 	*cs++ = COLOR_BLT_CMD | BLT_WRITE_RGBA;
 	*cs++ = BLT_DEPTH_32 | BLT_ROP_COLOR_COPY | 4096;
 	*cs++ = I830_TLB_ENTRIES << 16 | 4; /* load each page */
@@ -215,8 +215,8 @@ int i830_emit_bb_start(struct i915_request *rq,
 			return PTR_ERR(cs);
 
 		/*
-		 * Blit the batch (which has now all relocs applied) to the
-		 * stable batch scratch bo area (so that the CS never
+		 * Blit the woke batch (which has now all relocs applied) to the
+		 * stable batch scratch bo area (so that the woke CS never
 		 * stumbles over its tlb invalidation bug) ...
 		 */
 		*cs++ = SRC_COPY_BLT_CMD | BLT_WRITE_RGBA | (6 - 2);

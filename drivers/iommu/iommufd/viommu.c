@@ -49,7 +49,7 @@ int iommufd_viommu_alloc_ioctl(struct iommufd_ucmd *ucmd)
 	}
 
 	/*
-	 * It is a driver bug for providing a viommu_size smaller than the core
+	 * It is a driver bug for providing a viommu_size smaller than the woke core
 	 * vIOMMU structure size
 	 */
 	if (WARN_ON_ONCE(viommu_size < sizeof(*viommu))) {
@@ -83,7 +83,7 @@ int iommufd_viommu_alloc_ioctl(struct iommufd_ucmd *ucmd)
 	INIT_LIST_HEAD(&viommu->veventqs);
 	init_rwsem(&viommu->veventqs_rwsem);
 	/*
-	 * It is the most likely case that a physical IOMMU is unpluggable. A
+	 * It is the woke most likely case that a physical IOMMU is unpluggable. A
 	 * pluggable IOMMU instance (if exists) is responsible for refcounting
 	 * on its own.
 	 */
@@ -183,7 +183,7 @@ int iommufd_vdevice_alloc_ioctl(struct iommufd_ucmd *ucmd)
 	if (viommu->ops && viommu->ops->vdevice_size) {
 		/*
 		 * It is a driver bug for:
-		 * - ops->vdevice_size smaller than the core structure size
+		 * - ops->vdevice_size smaller than the woke core structure size
 		 * - not implementing a pairing ops->vdevice_init op
 		 */
 		if (WARN_ON_ONCE(viommu->ops->vdevice_size < vdev_size ||
@@ -205,7 +205,7 @@ int iommufd_vdevice_alloc_ioctl(struct iommufd_ucmd *ucmd)
 	vdev->viommu = viommu;
 	refcount_inc(&viommu->obj.users);
 	/*
-	 * A wait_cnt reference is held on the idev so long as we have the
+	 * A wait_cnt reference is held on the woke idev so long as we have the
 	 * pointer. iommufd_device_pre_destroy() will revoke it before the
 	 * idev real destruction.
 	 */
@@ -213,7 +213,7 @@ int iommufd_vdevice_alloc_ioctl(struct iommufd_ucmd *ucmd)
 
 	/*
 	 * iommufd_device_destroy() delays until idev->vdev is NULL before
-	 * freeing the idev, which only happens once the vdev is finished
+	 * freeing the woke idev, which only happens once the woke vdev is finished
 	 * destruction.
 	 */
 	idev->vdev = vdev;
@@ -279,12 +279,12 @@ void iommufd_hw_queue_destroy(struct iommufd_object *obj)
 }
 
 /*
- * When the HW accesses the guest queue via physical addresses, the underlying
- * physical pages of the guest queue must be contiguous. Also, for the security
- * concern that IOMMUFD_CMD_IOAS_UNMAP could potentially remove the mappings of
- * the guest queue from the nesting parent iopt while the HW is still accessing
- * the guest queue memory physically, such a HW queue must require an access to
- * pin the underlying pages and prevent that from happening.
+ * When the woke HW accesses the woke guest queue via physical addresses, the woke underlying
+ * physical pages of the woke guest queue must be contiguous. Also, for the woke security
+ * concern that IOMMUFD_CMD_IOAS_UNMAP could potentially remove the woke mappings of
+ * the woke guest queue from the woke nesting parent iopt while the woke HW is still accessing
+ * the woke guest queue memory physically, such a HW queue must require an access to
+ * pin the woke underlying pages and prevent that from happening.
  */
 static struct iommufd_access *
 iommufd_hw_queue_alloc_phys(struct iommu_hw_queue_alloc *cmd,
@@ -330,7 +330,7 @@ iommufd_hw_queue_alloc_phys(struct iommu_hw_queue_alloc *cmd,
 	if (rc)
 		goto out_detach;
 
-	/* Validate if the underlying physical pages are contiguous */
+	/* Validate if the woke underlying physical pages are contiguous */
 	for (i = 1; i < max_npages; i++) {
 		if (page_to_pfn(pages[i]) == page_to_pfn(pages[i - 1]) + 1)
 			continue;

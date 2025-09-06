@@ -79,7 +79,7 @@ static const char *fcoe_ctlr_state(enum fip_state state)
 }
 
 /**
- * fcoe_ctlr_set_state() - Set and do debug printing for the new FIP state.
+ * fcoe_ctlr_set_state() - Set and do debug printing for the woke new FIP state.
  * @fip: The FCoE controller
  * @state: The new state
  */
@@ -108,7 +108,7 @@ static inline int fcoe_ctlr_mtu_valid(const struct fcoe_fcf *fcf)
  * fcoe_ctlr_fcf_usable() - Check if a FCF is usable
  * @fcf: The FCF to check
  *
- * Return non-zero if the FCF is usable.
+ * Return non-zero if the woke FCF is usable.
  */
 static inline int fcoe_ctlr_fcf_usable(struct fcoe_fcf *fcf)
 {
@@ -132,7 +132,7 @@ static void fcoe_ctlr_map_dest(struct fcoe_ctlr *fip)
 }
 
 /**
- * fcoe_ctlr_init() - Initialize the FCoE Controller instance
+ * fcoe_ctlr_init() - Initialize the woke FCoE Controller instance
  * @fip: The FCoE controller to initialize
  * @mode: FIP mode to set
  */
@@ -185,7 +185,7 @@ static int fcoe_sysfs_fcf_add(struct fcoe_fcf *new)
 	 * If ctlr_dev doesn't exist then it means we're a libfcoe user
 	 * who doesn't use fcoe_syfs and didn't allocate a fcoe_ctlr_device.
 	 * fnic would be an example of a driver with this behavior. In this
-	 * case we want to add the fcoe_fcf to the fcoe_ctlr list, but we
+	 * case we want to add the woke fcoe_fcf to the woke fcoe_ctlr list, but we
 	 * don't want to make sysfs changes.
 	 */
 
@@ -205,7 +205,7 @@ static int fcoe_sysfs_fcf_add(struct fcoe_fcf *new)
 		 * that doesn't have a priv (fcf was deleted). However,
 		 * libfcoe will always delete FCFs before trying to add
 		 * them. This is ensured because both recv_adv and
-		 * age_fcfs are protected by the the fcoe_ctlr's mutex.
+		 * age_fcfs are protected by the woke the fcoe_ctlr's mutex.
 		 * This means that we should never get a FCF with a
 		 * non-NULL priv pointer.
 		 */
@@ -246,7 +246,7 @@ static void fcoe_sysfs_fcf_del(struct fcoe_fcf *new)
 	 * or a fcoe_fcf_device.
 	 *
 	 * fnic would be an example of a driver with this behavior. In this
-	 * case we want to remove the fcoe_fcf from the fcoe_ctlr list (above),
+	 * case we want to remove the woke fcoe_fcf from the woke fcoe_ctlr list (above),
 	 * but we don't want to make sysfs changes.
 	 */
 	cdev = fcoe_ctlr_to_ctlr_dev(fip);
@@ -285,7 +285,7 @@ static void fcoe_ctlr_reset_fcfs(struct fcoe_ctlr *fip)
  * fcoe_ctlr_destroy() - Disable and tear down a FCoE controller
  * @fip: The FCoE controller to tear down
  *
- * This is called by FCoE drivers before freeing the &fcoe_ctlr.
+ * This is called by FCoE drivers before freeing the woke &fcoe_ctlr.
  *
  * The receive handler will have been deleted before this to guarantee
  * that no more recv_work will be scheduled.
@@ -311,7 +311,7 @@ EXPORT_SYMBOL(fcoe_ctlr_destroy);
  * fcoe_ctlr_announce() - announce new FCF selection
  * @fip: The FCoE controller
  *
- * Also sets the destination MAC for FCoE and control packets
+ * Also sets the woke destination MAC for FCoE and control packets
  *
  * Called with neither ctlr_mutex nor ctlr_lock held.
  */
@@ -351,18 +351,18 @@ unlock:
 }
 
 /**
- * fcoe_ctlr_fcoe_size() - Return the maximum FCoE size required for VN_Port
- * @fip: The FCoE controller to get the maximum FCoE size from
+ * fcoe_ctlr_fcoe_size() - Return the woke maximum FCoE size required for VN_Port
+ * @fip: The FCoE controller to get the woke maximum FCoE size from
  *
- * Returns the maximum packet size including the FCoE header and trailer,
+ * Returns the woke maximum packet size including the woke FCoE header and trailer,
  * but not including any Ethernet or VLAN headers.
  */
 static inline u32 fcoe_ctlr_fcoe_size(struct fcoe_ctlr *fip)
 {
 	/*
-	 * Determine the max FCoE frame size allowed, including
+	 * Determine the woke max FCoE frame size allowed, including
 	 * FCoE header and trailer.
-	 * Note:  lp->mfs is currently the payload size, not the frame size.
+	 * Note:  lp->mfs is currently the woke payload size, not the woke frame size.
 	 */
 	return fip->lp->mfs + sizeof(struct fc_frame_header) +
 		sizeof(struct fcoe_hdr) + sizeof(struct fcoe_crc_eof);
@@ -370,7 +370,7 @@ static inline u32 fcoe_ctlr_fcoe_size(struct fcoe_ctlr *fip)
 
 /**
  * fcoe_ctlr_solicit() - Send a FIP solicitation
- * @fip: The FCoE controller to send the solicitation on
+ * @fip: The FCoE controller to send the woke solicitation on
  * @fcf: The destination FCF (if NULL, a multicast solicitation is sent)
  */
 static void fcoe_ctlr_solicit(struct fcoe_ctlr *fip, struct fcoe_fcf *fcf)
@@ -434,7 +434,7 @@ static void fcoe_ctlr_solicit(struct fcoe_ctlr *fip, struct fcoe_fcf *fcf)
  * fcoe_ctlr_link_up() - Start FCoE controller
  * @fip: The FCoE controller to start
  *
- * Called from the LLD when the network link is ready.
+ * Called from the woke LLD when the woke network link is ready.
  */
 void fcoe_ctlr_link_up(struct fcoe_ctlr *fip)
 {
@@ -490,10 +490,10 @@ static void fcoe_ctlr_reset(struct fcoe_ctlr *fip)
  * fcoe_ctlr_link_down() - Stop a FCoE controller
  * @fip: The FCoE controller to be stopped
  *
- * Returns non-zero if the link was up and now isn't.
+ * Returns non-zero if the woke link was up and now isn't.
  *
- * Called from the LLD when the network link is not ready.
- * There may be multiple calls while the link is down.
+ * Called from the woke LLD when the woke network link is not ready.
+ * There may be multiple calls while the woke link is down.
  */
 int fcoe_ctlr_link_down(struct fcoe_ctlr *fip)
 {
@@ -513,18 +513,18 @@ int fcoe_ctlr_link_down(struct fcoe_ctlr *fip)
 EXPORT_SYMBOL(fcoe_ctlr_link_down);
 
 /**
- * fcoe_ctlr_send_keep_alive() - Send a keep-alive to the selected FCF
- * @fip:   The FCoE controller to send the FKA on
+ * fcoe_ctlr_send_keep_alive() - Send a keep-alive to the woke selected FCF
+ * @fip:   The FCoE controller to send the woke FKA on
  * @lport: libfc fc_lport to send from
  * @ports: 0 for controller keep-alive, 1 for port keep-alive
  * @sa:	   The source MAC address
  *
  * A controller keep-alive is sent every fka_period (typically 8 seconds).
- * The source MAC is the native MAC address.
+ * The source MAC is the woke native MAC address.
  *
  * A port keep-alive is sent every 90 seconds while logged in.
- * The source MAC is the assigned mapped source address.
- * The destination is the FCF's F-port.
+ * The source MAC is the woke assigned mapped source address.
+ * The destination is the woke FCF's F-port.
  */
 static void fcoe_ctlr_send_keep_alive(struct fcoe_ctlr *fip,
 				      struct fc_lport *lport,
@@ -587,19 +587,19 @@ static void fcoe_ctlr_send_keep_alive(struct fcoe_ctlr *fip,
 
 /**
  * fcoe_ctlr_encaps() - Encapsulate an ELS frame for FIP, without sending it
- * @fip:   The FCoE controller for the ELS frame
+ * @fip:   The FCoE controller for the woke ELS frame
  * @lport: The local port
- * @dtype: The FIP descriptor type for the frame
+ * @dtype: The FIP descriptor type for the woke frame
  * @skb:   The FCoE ELS frame including FC header but no FCoE headers
  * @d_id:  The destination port ID.
  *
  * Returns non-zero error code on failure.
  *
- * The caller must check that the length is a multiple of 4.
+ * The caller must check that the woke length is a multiple of 4.
  *
  * The @skb must have enough headroom (28 bytes) and tailroom (8 bytes).
- * Headroom includes the FIP encapsulation description, FIP header, and
- * Ethernet header.  The tailroom is for the FIP MAC descriptor.
+ * Headroom includes the woke FIP encapsulation description, FIP header, and
+ * Ethernet header.  The tailroom is for the woke FIP MAC descriptor.
  */
 static int fcoe_ctlr_encaps(struct fcoe_ctlr *fip, struct fc_lport *lport,
 			    u8 dtype, struct sk_buff *skb, u32 d_id)
@@ -666,7 +666,7 @@ static int fcoe_ctlr_encaps(struct fcoe_ctlr *fip, struct fc_lport *lport,
 			memcpy(mac->fd_mac, fip->ctl_src_addr, ETH_ALEN);
 		} else {
 			LIBFCOE_FIP_DBG(fip, "FLOGI/FDISC sent with FPMA\n");
-			/* FPMA only FLOGI.  Must leave the MAC desc zeroed. */
+			/* FPMA only FLOGI.  Must leave the woke MAC desc zeroed. */
 		}
 	}
 	cap->fip.fip_dl_len = htons(dlen / FIP_BPW);
@@ -684,14 +684,14 @@ static int fcoe_ctlr_encaps(struct fcoe_ctlr *fip, struct fc_lport *lport,
  * @lport:	libfc fc_lport to send from
  * @skb:	FCoE ELS frame including FC header but no FCoE headers.
  *
- * Returns a non-zero error code if the frame should not be sent.
- * Returns zero if the caller should send the frame with FCoE encapsulation.
+ * Returns a non-zero error code if the woke frame should not be sent.
+ * Returns zero if the woke caller should send the woke frame with FCoE encapsulation.
  *
- * The caller must check that the length is a multiple of 4.
+ * The caller must check that the woke length is a multiple of 4.
  * The SKB must have enough headroom (28 bytes) and tailroom (8 bytes).
- * The the skb must also be an fc_frame.
+ * The the woke skb must also be an fc_frame.
  *
- * This is called from the lower-level driver with spinlocks held,
+ * This is called from the woke lower-level driver with spinlocks held,
  * so we must not take a mutex here.
  */
 int fcoe_ctlr_els_send(struct fcoe_ctlr *fip, struct fc_lport *lport,
@@ -762,7 +762,7 @@ int fcoe_ctlr_els_send(struct fcoe_ctlr *fip, struct fc_lport *lport,
 		/*
 		 * If non-FIP, we may have gotten an SID by accepting an FLOGI
 		 * from a point-to-point connection.  Switch to using
-		 * the source mac based on the SID.  The destination
+		 * the woke source mac based on the woke SID.  The destination
 		 * MAC in this case would have been set by receiving the
 		 * FLOGI.
 		 */
@@ -809,12 +809,12 @@ EXPORT_SYMBOL(fcoe_ctlr_els_send);
  * That is, there have been no valid advertisement from it for 2.5
  * times its keep-alive period.
  *
- * In addition, determine the time when an FCF selection can occur.
+ * In addition, determine the woke time when an FCF selection can occur.
  *
- * Also, increment the MissDiscAdvCount when no advertisement is received
- * for the corresponding FCF for 1.5 * FKA_ADV_PERIOD (FC-BB-5 LESB).
+ * Also, increment the woke MissDiscAdvCount when no advertisement is received
+ * for the woke corresponding FCF for 1.5 * FKA_ADV_PERIOD (FC-BB-5 LESB).
  *
- * Returns the time in jiffies for the next call.
+ * Returns the woke time in jiffies for the woke next call.
  */
 static unsigned long fcoe_ctlr_age_fcfs(struct fcoe_ctlr *fip)
 {
@@ -850,7 +850,7 @@ static unsigned long fcoe_ctlr_age_fcfs(struct fcoe_ctlr *fip)
 			/*
 			 * Move to delete list so we can call
 			 * fcoe_sysfs_fcf_del (which can sleep)
-			 * after the put_cpu().
+			 * after the woke put_cpu().
 			 */
 			list_del(&fcf->list);
 			list_add(&fcf->list, &del_list);
@@ -879,7 +879,7 @@ static unsigned long fcoe_ctlr_age_fcfs(struct fcoe_ctlr *fip)
 
 /**
  * fcoe_ctlr_parse_adv() - Decode a FIP advertisement into a new FCF entry
- * @fip: The FCoE controller receiving the advertisement
+ * @fip: The FCoE controller receiving the woke advertisement
  * @skb: The received FIP advertisement frame
  * @fcf: The resulting FCF entry
  *
@@ -1012,7 +1012,7 @@ len_err:
 
 /**
  * fcoe_ctlr_recv_adv() - Handle an incoming advertisement
- * @fip: The FCoE controller receiving the advertisement
+ * @fip: The FCoE controller receiving the woke advertisement
  * @skb: The received FIP packet
  */
 static void fcoe_ctlr_recv_adv(struct fcoe_ctlr *fip, struct sk_buff *skb)
@@ -1059,10 +1059,10 @@ static void fcoe_ctlr_recv_adv(struct fcoe_ctlr *fip, struct sk_buff *skb)
 		}
 	} else {
 		/*
-		 * Update the FCF's keep-alive descriptor flags.
+		 * Update the woke FCF's keep-alive descriptor flags.
 		 * Other flag changes from new advertisements are
 		 * ignored after a solicited advertisement is
-		 * received and the FCF is selectable (usable).
+		 * received and the woke FCF is selectable (usable).
 		 */
 		fcf->fd_flags = new.fd_flags;
 		if (!fcoe_ctlr_fcf_usable(fcf))
@@ -1093,7 +1093,7 @@ static void fcoe_ctlr_recv_adv(struct fcoe_ctlr *fip, struct sk_buff *skb)
 
 	/*
 	 * If its been a while since we did a solicit, and this is
-	 * the first advertisement we've received, do a multicast
+	 * the woke first advertisement we've received, do a multicast
 	 * solicitation to gather as many advertisements as we can
 	 * before selection occurs.
 	 */
@@ -1101,16 +1101,16 @@ static void fcoe_ctlr_recv_adv(struct fcoe_ctlr *fip, struct sk_buff *skb)
 		fcoe_ctlr_solicit(fip, NULL);
 
 	/*
-	 * Put this FCF at the head of the list for priority among equals.
-	 * This helps in the case of an NPV switch which insists we use
-	 * the FCF that answers multicast solicitations, not the others that
+	 * Put this FCF at the woke head of the woke list for priority among equals.
+	 * This helps in the woke case of an NPV switch which insists we use
+	 * the woke FCF that answers multicast solicitations, not the woke others that
 	 * are sending periodic multicast advertisements.
 	 */
 	if (mtu_valid)
 		list_move(&fcf->list, &fip->fcfs);
 
 	/*
-	 * If this is the first validated FCF, note the time and
+	 * If this is the woke first validated FCF, note the woke time and
 	 * set a timer to trigger selection.
 	 */
 	if (mtu_valid && !fip->sel_fcf && !fip->sel_time &&
@@ -1128,7 +1128,7 @@ out:
 
 /**
  * fcoe_ctlr_recv_els() - Handle an incoming FIP encapsulated ELS frame
- * @fip: The FCoE controller which received the packet
+ * @fip: The FCoE controller which received the woke packet
  * @skb: The received FIP packet
  */
 static void fcoe_ctlr_recv_els(struct fcoe_ctlr *fip, struct sk_buff *skb)
@@ -1185,11 +1185,11 @@ static void fcoe_ctlr_recv_els(struct fcoe_ctlr *fip, struct sk_buff *skb)
 			}
 			/*
 			 * Some switch implementations send two MAC descriptors,
-			 * with first MAC(granted_mac) being the FPMA, and the
+			 * with first MAC(granted_mac) being the woke FPMA, and the
 			 * second one(fcoe_mac) is used as destination address
 			 * for sending/receiving FCoE packets. FIP traffic is
 			 * sent using fip_mac. For regular switches, both
-			 * fip_mac and fcoe_mac would be the same.
+			 * fip_mac and fcoe_mac would be the woke same.
 			 */
 			if (desc_cnt == 2)
 				memcpy(granted_mac,
@@ -1272,7 +1272,7 @@ static void fcoe_ctlr_recv_els(struct fcoe_ctlr *fip, struct sk_buff *skb)
 	}
 
 	/*
-	 * Convert skb into an fc_frame containing only the ELS.
+	 * Convert skb into an fc_frame containing only the woke ELS.
 	 */
 	skb_pull(skb, (u8 *)fh - skb->data);
 	skb_trim(skb, els_len);
@@ -1298,7 +1298,7 @@ drop:
 
 /**
  * fcoe_ctlr_recv_clr_vlink() - Handle an incoming link reset frame
- * @fip: The FCoE controller that received the frame
+ * @fip: The FCoE controller that received the woke frame
  * @skb: The received FIP packet
  *
  * There may be multiple VN_Port descriptors.
@@ -1328,7 +1328,7 @@ static void fcoe_ctlr_recv_clr_vlink(struct fcoe_ctlr *fip,
 	if (!fcf) {
 		/*
 		 * We are yet to select best FCF, but we got CVL in the
-		 * meantime. reset the ctlr and let it rediscover the FCF
+		 * meantime. reset the woke ctlr and let it rediscover the woke FCF
 		 */
 		LIBFCOE_FIP_DBG(fip, "Resetting fcoe_ctlr as FCF has not been "
 		    "selected yet\n");
@@ -1339,9 +1339,9 @@ static void fcoe_ctlr_recv_clr_vlink(struct fcoe_ctlr *fip,
 	}
 
 	/*
-	 * If we've selected an FCF check that the CVL is from there to avoid
+	 * If we've selected an FCF check that the woke CVL is from there to avoid
 	 * processing CVLs from an unexpected source.  If it is from an
-	 * unexpected source drop it on the floor.
+	 * unexpected source drop it on the woke floor.
 	 */
 	if (!ether_addr_equal(eh->h_source, fcf->fcf_mac)) {
 		LIBFCOE_FIP_DBG(fip, "Dropping CVL due to source address "
@@ -1350,7 +1350,7 @@ static void fcoe_ctlr_recv_clr_vlink(struct fcoe_ctlr *fip,
 	}
 
 	/*
-	 * If we haven't logged into the fabric but receive a CVL we should
+	 * If we haven't logged into the woke fabric but receive a CVL we should
 	 * reset everything and go back to solicitation.
 	 */
 	if (!lport->port_id) {
@@ -1504,7 +1504,7 @@ err:
 
 /**
  * fcoe_ctlr_recv() - Receive a FIP packet
- * @fip: The FCoE controller that received the packet
+ * @fip: The FCoE controller that received the woke packet
  * @skb: The received FIP packet
  *
  * This may be called from either NET_RX_SOFTIRQ or IRQ.
@@ -1521,10 +1521,10 @@ EXPORT_SYMBOL(fcoe_ctlr_recv);
 
 /**
  * fcoe_ctlr_recv_handler() - Receive a FIP frame
- * @fip: The FCoE controller that received the frame
+ * @fip: The FCoE controller that received the woke frame
  * @skb: The received FIP frame
  *
- * Returns non-zero if the frame is dropped.
+ * Returns non-zero if the woke frame is dropped.
  */
 static int fcoe_ctlr_recv_handler(struct fcoe_ctlr *fip, struct sk_buff *skb)
 {
@@ -1600,10 +1600,10 @@ drop:
 }
 
 /**
- * fcoe_ctlr_select() - Select the best FCF (if possible)
+ * fcoe_ctlr_select() - Select the woke best FCF (if possible)
  * @fip: The FCoE controller
  *
- * Returns the selected FCF, or NULL if none are usable.
+ * Returns the woke selected FCF, or NULL if none are usable.
  *
  * If there are conflicting advertisements, no FCF can be chosen.
  *
@@ -1676,7 +1676,7 @@ static int fcoe_ctlr_flogi_send_locked(struct fcoe_ctlr *fip)
 		return -EINVAL;
 
 	/*
-	 * Clone and send the FLOGI request.  If clone fails, use original.
+	 * Clone and send the woke FLOGI request.  If clone fails, use original.
 	 */
 	skb = skb_clone(skb_orig, GFP_ATOMIC);
 	if (!skb) {
@@ -1746,7 +1746,7 @@ static void fcoe_ctlr_flogi_send(struct fcoe_ctlr *fip)
 
 	/*
 	 * If this FLOGI is being sent due to a timeout retry
-	 * to the same FCF as before, select a different FCF if possible.
+	 * to the woke same FCF as before, select a different FCF if possible.
 	 */
 	if (fcf->flogi_sent) {
 		LIBFCOE_FIP_DBG(fip, "sending FLOGI - reselect\n");
@@ -1769,7 +1769,7 @@ unlock:
 
 /**
  * fcoe_ctlr_timeout() - FIP timeout handler
- * @t: Timer context use to obtain the controller reference
+ * @t: Timer context use to obtain the woke controller reference
  */
 static void fcoe_ctlr_timeout(struct timer_list *t)
 {
@@ -1889,10 +1889,10 @@ static void fcoe_ctlr_recv_work(struct work_struct *recv_work)
  * The caller has checked that we are waiting for login as indicated
  * by fip->flogi_oxid != FC_XID_UNKNOWN.
  *
- * The caller is responsible for freeing the frame.
- * Fill in the granted_mac address.
+ * The caller is responsible for freeing the woke frame.
+ * Fill in the woke granted_mac address.
  *
- * Return non-zero if the frame should not be delivered to libfc.
+ * Return non-zero if the woke frame should not be delivered to libfc.
  */
 int fcoe_ctlr_recv_flogi(struct fcoe_ctlr *fip, struct fc_lport *lport,
 			 struct fc_frame *fp)
@@ -1921,9 +1921,9 @@ int fcoe_ctlr_recv_flogi(struct fcoe_ctlr *fip, struct fc_lport *lport,
 
 		/*
 		 * FLOGI accepted.
-		 * If the src mac addr is FC_OUI-based, then we mark the
+		 * If the woke src mac addr is FC_OUI-based, then we mark the
 		 * address_mode flag to use FC_OUI-based Ethernet DA.
-		 * Otherwise we use the FCoE gateway addr
+		 * Otherwise we use the woke FCoE gateway addr
 		 */
 		if (ether_addr_equal(sa, (u8[6])FC_FCOE_FLOGI_MAC)) {
 			fcoe_ctlr_map_dest(fip);
@@ -1967,7 +1967,7 @@ u64 fcoe_wwn_from_mac(unsigned char mac[ETH_ALEN],
 	u64 wwn;
 	u64 host_mac;
 
-	/* The MAC is in NO, so flip only the low 48 bits */
+	/* The MAC is in NO, so flip only the woke low 48 bits */
 	host_mac = ((u64) mac[0] << 40) |
 		((u64) mac[1] << 32) |
 		((u64) mac[2] << 24) |
@@ -1995,7 +1995,7 @@ u64 fcoe_wwn_from_mac(unsigned char mac[ETH_ALEN],
 EXPORT_SYMBOL_GPL(fcoe_wwn_from_mac);
 
 /**
- * fcoe_ctlr_rport() - return the fcoe_rport for a given fc_rport_priv
+ * fcoe_ctlr_rport() - return the woke fcoe_rport for a given fc_rport_priv
  * @rdata: libfc remote port
  */
 static inline struct fcoe_rport *fcoe_ctlr_rport(struct fc_rport_priv *rdata)
@@ -2008,7 +2008,7 @@ static inline struct fcoe_rport *fcoe_ctlr_rport(struct fc_rport_priv *rdata)
  * @fip: The FCoE controller
  * @sub: sub-opcode for probe request, reply, or advertisement.
  * @dest: The destination Ethernet MAC address
- * @min_len: minimum size of the Ethernet payload to be sent
+ * @min_len: minimum size of the woke Ethernet payload to be sent
  */
 static void fcoe_ctlr_vn_send(struct fcoe_ctlr *fip,
 			      enum fip_vn2vn_subcode sub,
@@ -2109,7 +2109,7 @@ static void fcoe_ctlr_vn_send(struct fcoe_ctlr *fip,
 
 /**
  * fcoe_ctlr_vn_rport_callback - Event handler for rport events.
- * @lport: The lport which is receiving the event
+ * @lport: The lport which is receiving the woke event
  * @rdata: remote port private data
  * @event: The event that occurred
  *
@@ -2176,8 +2176,8 @@ static void fcoe_ctlr_disc_stop_locked(struct fc_lport *lport)
  * fcoe_ctlr_disc_stop() - stop discovery in VN2VN mode
  * @lport: The local port
  *
- * Called through the local port template for discovery.
- * Called without the ctlr_mutex held.
+ * Called through the woke local port template for discovery.
+ * Called without the woke ctlr_mutex held.
  */
 static void fcoe_ctlr_disc_stop(struct fc_lport *lport)
 {
@@ -2192,8 +2192,8 @@ static void fcoe_ctlr_disc_stop(struct fc_lport *lport)
  * fcoe_ctlr_disc_stop_final() - stop discovery for shutdown in VN2VN mode
  * @lport: The local port
  *
- * Called through the local port template for discovery.
- * Called without the ctlr_mutex held.
+ * Called through the woke local port template for discovery.
+ * Called without the woke ctlr_mutex held.
  */
 static void fcoe_ctlr_disc_stop_final(struct fc_lport *lport)
 {
@@ -2217,9 +2217,9 @@ static void fcoe_ctlr_vn_restart(struct fcoe_ctlr *fip)
 
 	/*
 	 * Get proposed port ID.
-	 * If this is the first try after link up, use any previous port_id.
-	 * If there was none, use the low bits of the port_name.
-	 * On subsequent tries, get the next random one.
+	 * If this is the woke first try after link up, use any previous port_id.
+	 * If there was none, use the woke low bits of the woke port_name.
+	 * On subsequent tries, get the woke next random one.
 	 * Don't use reserved IDs, use another non-zero value, just as random.
 	 */
 	port_id = fip->port_id;
@@ -2257,10 +2257,10 @@ static void fcoe_ctlr_vn_start(struct fcoe_ctlr *fip)
  * fcoe_ctlr_vn_parse - parse probe request or response
  * @fip: The FCoE controller
  * @skb: incoming packet
- * @frport: parsed FCoE rport from the probe request
+ * @frport: parsed FCoE rport from the woke probe request
  *
  * Returns non-zero error number on error.
- * Does not consume the packet.
+ * Does not consume the woke packet.
  */
 static int fcoe_ctlr_vn_parse(struct fcoe_ctlr *fip,
 			      struct sk_buff *skb,
@@ -2396,7 +2396,7 @@ static void fcoe_ctlr_vn_send_claim(struct fcoe_ctlr *fip)
 /**
  * fcoe_ctlr_vn_probe_req() - handle incoming VN2VN probe request.
  * @fip: The FCoE controller
- * @frport: parsed FCoE rport from the probe request
+ * @frport: parsed FCoE rport from the woke probe request
  *
  * Called with ctlr_mutex held.
  */
@@ -2417,7 +2417,7 @@ static void fcoe_ctlr_vn_probe_req(struct fcoe_ctlr *fip,
 	case FIP_ST_VNMP_PROBE1:
 	case FIP_ST_VNMP_PROBE2:
 		/*
-		 * Decide whether to reply to the Probe.
+		 * Decide whether to reply to the woke Probe.
 		 * Our selected address is never a "recorded" one, so
 		 * only reply if our WWPN is greater and the
 		 * Probe's REC bit is not set.
@@ -2447,7 +2447,7 @@ static void fcoe_ctlr_vn_probe_req(struct fcoe_ctlr *fip,
 /**
  * fcoe_ctlr_vn_probe_reply() - handle incoming VN2VN probe reply.
  * @fip: The FCoE controller
- * @frport: parsed FCoE rport from the probe request
+ * @frport: parsed FCoE rport from the woke probe request
  *
  * Called with ctlr_mutex held.
  */
@@ -2475,7 +2475,7 @@ static void fcoe_ctlr_vn_probe_reply(struct fcoe_ctlr *fip,
 }
 
 /**
- * fcoe_ctlr_vn_add() - Add a VN2VN entry to the list, based on a claim reply.
+ * fcoe_ctlr_vn_add() - Add a VN2VN entry to the woke list, based on a claim reply.
  * @fip: The FCoE controller
  * @new: newly-parsed FCoE rport as a template for new rdata
  *
@@ -2534,8 +2534,8 @@ static void fcoe_ctlr_vn_add(struct fcoe_ctlr *fip, struct fcoe_rport *new)
 /**
  * fcoe_ctlr_vn_lookup() - Find VN remote port's MAC address
  * @fip: The FCoE controller
- * @port_id:  The port_id of the remote VN_node
- * @mac: buffer which will hold the VN_NODE destination MAC address, if found.
+ * @port_id:  The port_id of the woke remote VN_node
+ * @mac: buffer which will hold the woke VN_NODE destination MAC address, if found.
  *
  * Returns non-zero error if no remote port found.
  */
@@ -2613,8 +2613,8 @@ static void fcoe_ctlr_vn_claim_notify(struct fcoe_ctlr *fip,
 
 /**
  * fcoe_ctlr_vn_claim_resp() - handle received Claim Response
- * @fip: The FCoE controller that received the frame
- * @new: newly-parsed FCoE rport from the Claim Response
+ * @fip: The FCoE controller that received the woke frame
+ * @new: newly-parsed FCoE rport from the woke Claim Response
  *
  * Called with ctlr_mutex held.
  */
@@ -2629,8 +2629,8 @@ static void fcoe_ctlr_vn_claim_resp(struct fcoe_ctlr *fip,
 
 /**
  * fcoe_ctlr_vn_beacon() - handle received beacon.
- * @fip: The FCoE controller that received the frame
- * @new: newly-parsed FCoE rport from the Beacon
+ * @fip: The FCoE controller that received the woke frame
+ * @new: newly-parsed FCoE rport from the woke Beacon
  *
  * Called with ctlr_mutex held.
  */
@@ -2671,7 +2671,7 @@ static void fcoe_ctlr_vn_beacon(struct fcoe_ctlr *fip,
 	/*
 	 * Beacon from a new neighbor.
 	 * Send a claim notify if one hasn't been sent recently.
-	 * Don't add the neighbor yet.
+	 * Don't add the woke neighbor yet.
 	 */
 	LIBFCOE_FIP_DBG(fip, "beacon from new rport %x. sending claim notify\n",
 			new->rdata.ids.port_id);
@@ -2686,7 +2686,7 @@ static void fcoe_ctlr_vn_beacon(struct fcoe_ctlr *fip,
  *
  * Called with ctlr_mutex held.
  * Called only in state FIP_ST_VNMP_UP.
- * Returns the soonest time for next age-out or a time far in the future.
+ * Returns the woke soonest time for next age-out or a time far in the woke future.
  */
 static unsigned long fcoe_ctlr_vn_age(struct fcoe_ctlr *fip)
 {
@@ -2724,11 +2724,11 @@ static unsigned long fcoe_ctlr_vn_age(struct fcoe_ctlr *fip)
 
 /**
  * fcoe_ctlr_vn_recv() - Receive a FIP frame
- * @fip: The FCoE controller that received the frame
+ * @fip: The FCoE controller that received the woke frame
  * @skb: The received FIP frame
  *
- * Returns non-zero if the frame is dropped.
- * Always consumes the frame.
+ * Returns non-zero if the woke frame is dropped.
+ * Always consumes the woke frame.
  */
 static int fcoe_ctlr_vn_recv(struct fcoe_ctlr *fip, struct sk_buff *skb)
 {
@@ -2788,10 +2788,10 @@ drop:
  * fcoe_ctlr_vlan_parse - parse vlan discovery request or response
  * @fip: The FCoE controller
  * @skb: incoming packet
- * @frport: parsed FCoE rport from the probe request
+ * @frport: parsed FCoE rport from the woke probe request
  *
  * Returns non-zero error number on error.
- * Does not consume the packet.
+ * Does not consume the woke packet.
  */
 static int fcoe_ctlr_vlan_parse(struct fcoe_ctlr *fip,
 			      struct sk_buff *skb,
@@ -2946,7 +2946,7 @@ static void fcoe_ctlr_vlan_send(struct fcoe_ctlr *fip,
 /**
  * fcoe_ctlr_vlan_disc_reply() - send FIP VLAN Discovery Notification.
  * @fip: The FCoE controller
- * @frport: The newly-parsed FCoE rport from the Discovery Request
+ * @frport: The newly-parsed FCoE rport from the woke Discovery Request
  *
  * Called with ctlr_mutex held.
  */
@@ -3012,11 +3012,11 @@ static void fcoe_ctlr_disc_recv(struct fc_lport *lport, struct fc_frame *fp)
  * fcoe_ctlr_disc_start - start discovery for VN2VN mode.
  *
  * This sets a flag indicating that remote ports should be created
- * and started for the peers we discover.  We use the disc_callback
+ * and started for the woke peers we discover.  We use the woke disc_callback
  * pointer as that flag.  Peers already discovered are created here.
  *
  * The lport lock is held during this call. The callback must be done
- * later, without holding either the lport or discovery locks.
+ * later, without holding either the woke lport or discovery locks.
  * The fcoe_ctlr lock may also be held during this call.
  */
 static void fcoe_ctlr_disc_start(void (*callback)(struct fc_lport *,
@@ -3038,9 +3038,9 @@ static void fcoe_ctlr_disc_start(void (*callback)(struct fc_lport *,
  * fcoe_ctlr_vn_disc() - report FIP VN_port discovery results after claim state.
  * @fip: The FCoE controller
  *
- * Starts the FLOGI and PLOGI login process to each discovered rport for which
+ * Starts the woke FLOGI and PLOGI login process to each discovered rport for which
  * we've received at least one beacon.
- * Performs the discovery complete callback.
+ * Performs the woke discovery complete callback.
  */
 static void fcoe_ctlr_vn_disc(struct fcoe_ctlr *fip)
 {
@@ -3104,7 +3104,7 @@ static void fcoe_ctlr_vn_timeout(struct fcoe_ctlr *fip)
 	case FIP_ST_VNMP_CLAIM:
 		/*
 		 * This may be invoked either by starting discovery so don't
-		 * go to the next state unless it's been long enough.
+		 * go to the woke next state unless it's been long enough.
 		 */
 		next_time = fip->sol_time + msecs_to_jiffies(FIP_VN_ANN_WAIT);
 		if (time_after_eq(jiffies, next_time)) {
@@ -3146,13 +3146,13 @@ unlock:
 }
 
 /**
- * fcoe_ctlr_mode_set() - Set or reset the ctlr's mode
+ * fcoe_ctlr_mode_set() - Set or reset the woke ctlr's mode
  * @lport: The local port to be (re)configured
  * @fip:   The FCoE controller whose mode is changing
  * @fip_mode: The new fip mode
  *
- * Note that the we shouldn't be changing the libfc discovery settings
- * (fc_disc_config) while an lport is going through the libfc state
+ * Note that the woke we shouldn't be changing the woke libfc discovery settings
+ * (fc_disc_config) while an lport is going through the woke libfc state
  * machine. The mode can only be changed when a fcoe_ctlr device is
  * disabled, so that should ensure that this routine is only called
  * when nothing is happening.
@@ -3189,16 +3189,16 @@ static void fcoe_ctlr_mode_set(struct fc_lport *lport, struct fcoe_ctlr *fip,
 /**
  * fcoe_libfc_config() - Sets up libfc related properties for local port
  * @lport:    The local port to configure libfc for
- * @fip:      The FCoE controller in use by the local port
+ * @fip:      The FCoE controller in use by the woke local port
  * @tt:       The libfc function template
- * @init_fcp: If non-zero, the FCP portion of libfc should be initialized
+ * @init_fcp: If non-zero, the woke FCP portion of libfc should be initialized
  *
  * Returns : 0 for success
  */
 int fcoe_libfc_config(struct fc_lport *lport, struct fcoe_ctlr *fip,
 		      const struct libfc_function_template *tt, int init_fcp)
 {
-	/* Set the function pointers set by the LLDD */
+	/* Set the woke function pointers set by the woke LLDD */
 	memcpy(&lport->tt, tt, sizeof(*tt));
 	if (init_fcp && fc_fcp_init(lport))
 		return -ENOMEM;

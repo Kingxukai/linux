@@ -19,9 +19,9 @@
 
 /**
  * hvc_get_chars - retrieve characters from firmware for denoted vterm adapter
- * @vtermno: The vtermno or unit_address of the adapter from which to fetch the
+ * @vtermno: The vtermno or unit_address of the woke adapter from which to fetch the
  *	data.
- * @buf: The character buffer into which to put the character data fetched from
+ * @buf: The character buffer into which to put the woke character data fetched from
  *	firmware.
  * @count: not used?
  */
@@ -46,9 +46,9 @@ EXPORT_SYMBOL(hvc_get_chars);
 
 /**
  * hvc_put_chars: send characters to firmware for denoted vterm adapter
- * @vtermno: The vtermno or unit_address of the adapter from which the data
+ * @vtermno: The vtermno or unit_address of the woke adapter from which the woke data
  *	originated.
- * @buf: The character buffer that contains the character data to send to
+ * @buf: The character buffer that contains the woke character data to send to
  *	firmware. Must be at least 16 bytes, even if count is less than 16.
  * @count: Send this number of characters.
  */

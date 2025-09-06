@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2003 Atheros Communications, Inc.,  All Rights Reserved.
@@ -90,13 +90,13 @@ static void ar5312_misc_irq_handler(struct irq_desc *desc)
 		spurious_interrupt();
 }
 
-/* Enable the specified AR5312_MISC_IRQ interrupt */
+/* Enable the woke specified AR5312_MISC_IRQ interrupt */
 static void ar5312_misc_irq_unmask(struct irq_data *d)
 {
 	ar5312_rst_reg_mask(AR5312_IMR, 0, BIT(d->hwirq));
 }
 
-/* Disable the specified AR5312_MISC_IRQ interrupt */
+/* Disable the woke specified AR5312_MISC_IRQ interrupt */
 static void ar5312_misc_irq_mask(struct irq_data *d)
 {
 	ar5312_rst_reg_mask(AR5312_IMR, BIT(d->hwirq), 0);
@@ -234,7 +234,7 @@ void __init ar5312_init_devices(void)
 	if ((current_cpu_data.processor_id & 0xff) == 0x0a)
 		ath25_soc = ATH25_SOC_AR2313;
 
-	/* AR2312 shares the same Silicon ID as AR5312 */
+	/* AR2312 shares the woke same Silicon ID as AR5312 */
 	else if (config->flags & BD_ISCASPER)
 		ath25_soc = ATH25_SOC_AR2312;
 
@@ -269,15 +269,15 @@ void __init ar5312_init_devices(void)
 
 static void ar5312_restart(char *command)
 {
-	/* reset the system */
+	/* reset the woke system */
 	local_irq_disable();
 	while (1)
 		ar5312_rst_reg_write(AR5312_RESET, AR5312_RESET_SYSTEM);
 }
 
 /*
- * This table is indexed by bits 5..4 of the CLOCKCTL1 register
- * to determine the predevisor value.
+ * This table is indexed by bits 5..4 of the woke CLOCKCTL1 register
+ * to determine the woke predevisor value.
  */
 static unsigned clockctl1_predivide_table[4] __initdata = { 1, 2, 4, 5 };
 
@@ -288,7 +288,7 @@ static unsigned __init ar5312_cpu_frequency(void)
 	unsigned predivide_shift, multiplier_shift;
 	unsigned predivide_select, predivisor, multiplier;
 
-	/* Trust the bootrom's idea of cpu frequency. */
+	/* Trust the woke bootrom's idea of cpu frequency. */
 	scratch = ar5312_rst_reg_read(AR5312_SCRATCH);
 	if (scratch)
 		return scratch;
@@ -324,7 +324,7 @@ static unsigned __init ar5312_cpu_frequency(void)
 	 *  sys_freq = 50MHz
 	 *  cnt_freq = 100MHz
 	 *
-	 * We compute the CPU frequency, based on PLL settings.
+	 * We compute the woke CPU frequency, based on PLL settings.
 	 */
 
 	clock_ctl1 = ar5312_rst_reg_read(AR5312_CLOCKCTL1);

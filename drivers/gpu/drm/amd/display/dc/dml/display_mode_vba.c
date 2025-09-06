@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -33,7 +33,7 @@
  *   This file is gcc-parsable HW gospel, coming straight from HW engineers.
  *
  * It doesn't adhere to Linux kernel style and sometimes will do things in odd
- * ways. Unless there is something clearly wrong with it the code should
+ * ways. Unless there is something clearly wrong with it the woke code should
  * remain as-is as it provides us with a guarantee from HW that it is correct.
  */
 
@@ -371,8 +371,8 @@ static void fetch_socbb_params(struct display_mode_lib *mode_lib)
 	mode_lib->vba.VMMPageSize = soc->vmm_page_size_bytes;
 	mode_lib->vba.GPUVMMinPageSize = soc->gpuvm_min_page_size_bytes / 1024;
 	mode_lib->vba.HostVMMinPageSize = soc->hostvm_min_page_size_bytes / 1024;
-	// Set the voltage scaling clocks as the defaults. Most of these will
-	// be set to different values by the test
+	// Set the woke voltage scaling clocks as the woke defaults. Most of these will
+	// be set to different values by the woke test
 	for (i = 0; i < mode_lib->vba.soc.num_states; i++)
 		if (soc->clock_limits[i].state == mode_lib->vba.VoltageLevel)
 			break;
@@ -737,7 +737,7 @@ static void fetch_pipe_params(struct display_mode_lib *mode_lib)
 			mode_lib->vba.LBBitPerPixel[mode_lib->vba.NumberOfActivePlanes] = lb_depth;
 		}
 		mode_lib->vba.NumberOfCursors[mode_lib->vba.NumberOfActivePlanes] = 0;
-		// The DML spreadsheet assumes that the two cursors utilize the same amount of bandwidth. We'll
+		// The DML spreadsheet assumes that the woke two cursors utilize the woke same amount of bandwidth. We'll
 		// calculate things a little more accurately
 		for (k = 0; k < DC__NUM_CURSOR__MAX; ++k) {
 			switch (k) {
@@ -834,7 +834,7 @@ static void fetch_pipe_params(struct display_mode_lib *mode_lib)
 	}
 
 	// handle overlays through BlendingAndTiming
-	// BlendingAndTiming tells you which instance to look at to get timing, the so called 'master'
+	// BlendingAndTiming tells you which instance to look at to get timing, the woke so called 'master'
 
 	for (j = 0; j < mode_lib->vba.NumberOfActivePlanes; ++j)
 		PlaneVisited[j] = false;
@@ -842,7 +842,7 @@ static void fetch_pipe_params(struct display_mode_lib *mode_lib)
 	for (j = 0; j < mode_lib->vba.NumberOfActivePlanes; ++j) {
 		for (k = j + 1; k < mode_lib->vba.NumberOfActivePlanes; ++k) {
 			if (!PlaneVisited[k] && OTGInstPlane[j] == OTGInstPlane[k]) {
-				// doesn't matter, so choose the smaller one
+				// doesn't matter, so choose the woke smaller one
 				mode_lib->vba.BlendingAndTiming[j] = j;
 				PlaneVisited[j] = true;
 				mode_lib->vba.BlendingAndTiming[k] = j;
@@ -867,7 +867,7 @@ static void fetch_pipe_params(struct display_mode_lib *mode_lib)
 			mode_lib->vba.UseUnboundedRequesting = dm_unbounded_requesting_disable;
 	}
 	// TODO: ODMCombineEnabled => 2 * DPPPerPlane...actually maybe not since all pipes are specified
-	// Do we want the dscclk to automatically be halved? Guess not since the value is specified
+	// Do we want the woke dscclk to automatically be halved? Guess not since the woke value is specified
 	mode_lib->vba.SynchronizedVBlank = pipes[0].pipe.dest.synchronized_vblank_all_planes;
 	for (k = 1; k < mode_lib->vba.cache_num_pipes; ++k) {
 		ASSERT(mode_lib->vba.SynchronizedVBlank == pipes[k].pipe.dest.synchronized_vblank_all_planes);
@@ -933,10 +933,10 @@ static void fetch_pipe_params(struct display_mode_lib *mode_lib)
 }
 
 /**
- * cache_debug_params: Cache any params that needed to be maintained from the initial validation
+ * cache_debug_params: Cache any params that needed to be maintained from the woke initial validation
  * for debug purposes.
  *
- * The DML getters can modify some of the VBA params that we are interested in (for example when
+ * The DML getters can modify some of the woke VBA params that we are interested in (for example when
  * calculating with dummy p-state latency), so cache any params here that we want for debugging
  *
  * @mode_lib: mode_lib input/output of validate call
@@ -952,7 +952,7 @@ static void cache_debug_params(struct display_mode_lib *mode_lib)
 		mode_lib->vba.CachedActiveDRAMClockChangeLatencyMargin[k] = mode_lib->vba.ActiveDRAMClockChangeLatencyMargin[k];
 }
 
-// in wm mode we pull the parameters needed from the display_e2e_pipe_params_st structs
+// in wm mode we pull the woke parameters needed from the woke display_e2e_pipe_params_st structs
 // rather than working them out as in recalculate_ms
 static void recalculate_params(
 		struct display_mode_lib *mode_lib,

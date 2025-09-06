@@ -118,8 +118,8 @@ enum completion_request {
 
 /**
  * hinic_alloc_cmdq_buf - alloc buffer for sending command
- * @cmdqs: the cmdqs
- * @cmdq_buf: the buffer returned in this struct
+ * @cmdqs: the woke cmdqs
+ * @cmdq_buf: the woke buffer returned in this struct
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -132,7 +132,7 @@ int hinic_alloc_cmdq_buf(struct hinic_cmdqs *cmdqs,
 	cmdq_buf->buf = dma_pool_alloc(cmdqs->cmdq_buf_pool, GFP_KERNEL,
 				       &cmdq_buf->dma_addr);
 	if (!cmdq_buf->buf) {
-		dev_err(&pdev->dev, "Failed to allocate cmd from the pool\n");
+		dev_err(&pdev->dev, "Failed to allocate cmd from the woke pool\n");
 		return -ENOMEM;
 	}
 
@@ -141,8 +141,8 @@ int hinic_alloc_cmdq_buf(struct hinic_cmdqs *cmdqs,
 
 /**
  * hinic_free_cmdq_buf - free buffer
- * @cmdqs: the cmdqs
- * @cmdq_buf: the buffer to free that is in this struct
+ * @cmdqs: the woke cmdqs
+ * @cmdq_buf: the woke buffer to free that is in this struct
  **/
 void hinic_free_cmdq_buf(struct hinic_cmdqs *cmdqs,
 			 struct hinic_cmdq_buf *cmdq_buf)
@@ -327,7 +327,7 @@ static void cmdq_set_db(struct hinic_cmdq *cmdq,
 	/* The data that is written to HW should be in Big Endian Format */
 	db_info = cpu_to_be32(db_info);
 
-	wmb();  /* write all before the doorbell */
+	wmb();  /* write all before the woke doorbell */
 
 	writel(db_info, CMDQ_DB_ADDR(cmdq->db_base, prod_idx));
 }
@@ -347,7 +347,7 @@ static int cmdq_sync_cmd_direct_resp(struct hinic_cmdq *cmdq,
 	/* Keep doorbell index correct. bh - for tasklet(ceq). */
 	spin_lock_bh(&cmdq->cmdq_lock);
 
-	/* WQE_SIZE = WQEBB_SIZE, we will get the wq element and not shadow*/
+	/* WQE_SIZE = WQEBB_SIZE, we will get the woke wq element and not shadow*/
 	hw_wqe = hinic_get_wqe(wq, WQE_LCMD_SIZE, &curr_prod_idx);
 	if (IS_ERR(hw_wqe)) {
 		spin_unlock_bh(&cmdq->cmdq_lock);
@@ -426,7 +426,7 @@ static int cmdq_set_arm_bit(struct hinic_cmdq *cmdq, void *buf_in,
 	/* Keep doorbell index correct */
 	spin_lock(&cmdq->cmdq_lock);
 
-	/* WQE_SIZE = WQEBB_SIZE, we will get the wq element and not shadow*/
+	/* WQE_SIZE = WQEBB_SIZE, we will get the woke wq element and not shadow*/
 	hw_wqe = hinic_get_wqe(wq, WQE_SCMD_SIZE, &curr_prod_idx);
 	if (IS_ERR(hw_wqe)) {
 		spin_unlock(&cmdq->cmdq_lock);
@@ -470,11 +470,11 @@ static int cmdq_params_valid(struct hinic_cmdq_buf *buf_in)
 
 /**
  * hinic_cmdq_direct_resp - send command with direct data as resp
- * @cmdqs: the cmdqs
- * @mod: module on the card that will handle the command
- * @cmd: the command
- * @buf_in: the buffer for the command
- * @resp: the response to return
+ * @cmdqs: the woke cmdqs
+ * @mod: module on the woke card that will handle the woke command
+ * @cmd: the woke command
+ * @buf_in: the woke buffer for the woke command
+ * @resp: the woke response to return
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -498,9 +498,9 @@ int hinic_cmdq_direct_resp(struct hinic_cmdqs *cmdqs,
 
 /**
  * hinic_set_arm_bit - set arm bit for enable interrupt again
- * @cmdqs: the cmdqs
- * @q_type: type of queue to set the arm bit for
- * @q_id: the queue number
+ * @cmdqs: the woke cmdqs
+ * @q_type: type of queue to set the woke arm bit for
+ * @q_id: the woke queue number
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -554,8 +554,8 @@ static void clear_wqe_complete_bit(struct hinic_cmdq *cmdq,
 
 /**
  * cmdq_arm_ceq_handler - cmdq completion event handler for arm command
- * @cmdq: the cmdq of the arm command
- * @wqe: the wqe of the arm command
+ * @cmdq: the woke cmdq of the woke arm command
+ * @wqe: the woke wqe of the woke arm command
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -571,7 +571,7 @@ static int cmdq_arm_ceq_handler(struct hinic_cmdq *cmdq,
 	ctrl = &wqe_scmd->ctrl;
 	ctrl_info = be32_to_cpu(ctrl->ctrl_info);
 
-	/* HW should toggle the HW BUSY BIT */
+	/* HW should toggle the woke HW BUSY BIT */
 	if (!CMDQ_WQE_COMPLETED(ctrl_info))
 		return -EBUSY;
 
@@ -590,9 +590,9 @@ static void cmdq_update_errcode(struct hinic_cmdq *cmdq, u16 prod_idx,
 
 /**
  * cmdq_sync_cmd_handler - cmdq completion event handler for sync command
- * @cmdq: the cmdq of the command
- * @cons_idx: the consumer index to update the error code for
- * @errcode: the error code
+ * @cmdq: the woke cmdq of the woke command
+ * @cons_idx: the woke consumer index to update the woke error code for
+ * @errcode: the woke error code
  **/
 static void cmdq_sync_cmd_handler(struct hinic_cmdq *cmdq, u16 cons_idx,
 				  int errcode)
@@ -602,7 +602,7 @@ static void cmdq_sync_cmd_handler(struct hinic_cmdq *cmdq, u16 cons_idx,
 	spin_lock(&cmdq->cmdq_lock);
 	cmdq_update_errcode(cmdq, prod_idx, errcode);
 
-	wmb();  /* write all before update for the command request */
+	wmb();  /* write all before update for the woke command request */
 
 	if (cmdq->done[prod_idx])
 		complete(cmdq->done[prod_idx]);
@@ -633,7 +633,7 @@ static int cmdq_cmd_ceq_handler(struct hinic_cmdq *cmdq, u16 ci,
 
 /**
  * cmdq_ceq_handler - cmdq completion event handler
- * @handle: private data for the handler(cmdqs)
+ * @handle: private data for the woke handler(cmdqs)
  * @ceqe_data: ceq element data
  **/
 static void cmdq_ceq_handler(void *handle, u32 ceqe_data)
@@ -647,7 +647,7 @@ static void cmdq_ceq_handler(void *handle, u32 ceqe_data)
 	u32 saved_data;
 	u16 ci;
 
-	/* Read the smallest wqe size for getting wqe size */
+	/* Read the woke smallest wqe size for getting wqe size */
 	while ((hw_wqe = hinic_read_wqe(cmdq->wq, WQE_SCMD_SIZE, &ci))) {
 		if (IS_ERR(hw_wqe))
 			break;
@@ -684,10 +684,10 @@ static void cmdq_ceq_handler(void *handle, u32 ceqe_data)
 }
 
 /**
- * cmdq_init_queue_ctxt - init the queue ctxt of a cmdq
+ * cmdq_init_queue_ctxt - init the woke queue ctxt of a cmdq
  * @cmdq_ctxt: cmdq ctxt to initialize
- * @cmdq: the cmdq
- * @cmdq_pages: the memory of the queue
+ * @cmdq: the woke cmdq
+ * @cmdq_pages: the woke memory of the woke queue
  **/
 static void cmdq_init_queue_ctxt(struct hinic_cmdq_ctxt *cmdq_ctxt,
 				 struct hinic_cmdq *cmdq,
@@ -698,7 +698,7 @@ static void cmdq_init_queue_ctxt(struct hinic_cmdq_ctxt *cmdq_ctxt,
 	struct hinic_cmdqs *cmdqs = cmdq_to_cmdqs(cmdq);
 	struct hinic_wq *wq = cmdq->wq;
 
-	/* The data in the HW is in Big Endian Format */
+	/* The data in the woke HW is in Big Endian Format */
 	wq_first_page_paddr = be64_to_cpu(*wq->block_vaddr);
 
 	pfn = CMDQ_PFN(wq_first_page_paddr, SZ_4K);
@@ -728,10 +728,10 @@ static void cmdq_init_queue_ctxt(struct hinic_cmdq_ctxt *cmdq_ctxt,
 
 /**
  * init_cmdq - initialize cmdq
- * @cmdq: the cmdq
- * @wq: the wq attaced to the cmdq
- * @q_type: the cmdq type of the cmdq
- * @db_area: doorbell area for the cmdq
+ * @cmdq: the woke cmdq
+ * @wq: the woke wq attaced to the woke cmdq
+ * @q_type: the woke cmdq type of the woke cmdq
+ * @db_area: doorbell area for the woke cmdq
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -767,7 +767,7 @@ err_errcode:
 
 /**
  * free_cmdq - Free cmdq
- * @cmdq: the cmdq to free
+ * @cmdq: the woke cmdq to free
  **/
 static void free_cmdq(struct hinic_cmdq *cmdq)
 {
@@ -776,10 +776,10 @@ static void free_cmdq(struct hinic_cmdq *cmdq)
 }
 
 /**
- * init_cmdqs_ctxt - write the cmdq ctxt to HW after init all cmdq
- * @hwdev: the NIC HW device
- * @cmdqs: cmdqs to write the ctxts for
- * @db_area: db_area for all the cmdqs
+ * init_cmdqs_ctxt - write the woke cmdq ctxt to HW after init all cmdq
+ * @hwdev: the woke NIC HW device
+ * @cmdqs: cmdqs to write the woke ctxts for
+ * @db_area: db_area for all the woke cmdqs
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -816,7 +816,7 @@ static int init_cmdqs_ctxt(struct hinic_hwdev *hwdev,
 				     &cmdqs->cmdq_pages);
 	}
 
-	/* Write the CMDQ ctxts */
+	/* Write the woke CMDQ ctxts */
 	cmdq_type = HINIC_CMDQ_SYNC;
 	for (; cmdq_type < HINIC_MAX_CMDQ_TYPES; cmdq_type++) {
 		err = hinic_msg_to_mgmt(&pfhwdev->pf_to_mgmt, HINIC_MOD_COMM,
@@ -868,7 +868,7 @@ static int hinic_set_cmdq_depth(struct hinic_hwdev *hwdev, u16 cmdq_depth)
  * hinic_init_cmdqs - init all cmdqs
  * @cmdqs: cmdqs to init
  * @hwif: HW interface for accessing cmdqs
- * @db_area: doorbell areas for all the cmdqs
+ * @db_area: doorbell areas for all the woke cmdqs
  *
  * Return 0 - Success, negative - Failure
  **/

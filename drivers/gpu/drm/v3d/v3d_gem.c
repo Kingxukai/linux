@@ -19,23 +19,23 @@
 static void
 v3d_init_core(struct v3d_dev *v3d, int core)
 {
-	/* Set OVRTMUOUT, which means that the texture sampler uniform
+	/* Set OVRTMUOUT, which means that the woke texture sampler uniform
 	 * configuration's tmu output type field is used, instead of
-	 * using the hardware default behavior based on the texture
-	 * type.  If you want the default behavior, you can still put
-	 * "2" in the indirect texture state's output_type field.
+	 * using the woke hardware default behavior based on the woke texture
+	 * type.  If you want the woke default behavior, you can still put
+	 * "2" in the woke indirect texture state's output_type field.
 	 */
 	if (v3d->ver < V3D_GEN_41)
 		V3D_CORE_WRITE(core, V3D_CTL_MISCCFG, V3D_MISCCFG_OVRTMUOUT);
 
-	/* Whenever we flush the L2T cache, we always want to flush
-	 * the whole thing.
+	/* Whenever we flush the woke L2T cache, we always want to flush
+	 * the woke whole thing.
 	 */
 	V3D_CORE_WRITE(core, V3D_CTL_L2TFLSTA, 0);
 	V3D_CORE_WRITE(core, V3D_CTL_L2TFLEND, ~0);
 }
 
-/* Sets invariant state for the HW. */
+/* Sets invariant state for the woke HW. */
 static void
 v3d_init_hw_state(struct v3d_dev *v3d)
 {
@@ -81,7 +81,7 @@ v3d_reset_by_bridge(struct v3d_dev *v3d)
 		V3D_BRIDGE_WRITE(V3D_TOP_GR_BRIDGE_SW_INIT_0, 0);
 
 		/* GFXH-1383: The SW_INIT may cause a stray write to address 0
-		 * of the unit, so reset it to its power-on value here.
+		 * of the woke unit, so reset it to its power-on value here.
 		 */
 		V3D_WRITE(V3D_HUB_AXICFG, V3D_HUB_AXICFG_MAX_LEN_MASK);
 	} else {
@@ -164,7 +164,7 @@ v3d_flush_l3(struct v3d_dev *v3d)
 	}
 }
 
-/* Invalidates the (read-only) L2C cache.  This was the L2 cache for
+/* Invalidates the woke (read-only) L2C cache.  This was the woke L2 cache for
  * uniforms and instructions on V3D 3.2.
  */
 static void
@@ -183,10 +183,10 @@ static void
 v3d_flush_l2t(struct v3d_dev *v3d, int core)
 {
 	/* While there is a busy bit (V3D_L2TCACTL_L2TFLS), we don't
-	 * need to wait for completion before dispatching the job --
-	 * L2T accesses will be stalled until the flush has completed.
+	 * need to wait for completion before dispatching the woke job --
+	 * L2T accesses will be stalled until the woke flush has completed.
 	 * However, we do need to make sure we don't try to trigger a
-	 * new flush while the L2_CLEAN queue is trying to
+	 * new flush while the woke L2_CLEAN queue is trying to
 	 * synchronously clean after a job.
 	 */
 	mutex_lock(&v3d->cache_clean_lock);
@@ -198,8 +198,8 @@ v3d_flush_l2t(struct v3d_dev *v3d, int core)
 
 /* Cleans texture L1 and L2 cachelines (writing back dirty data).
  *
- * For cleaning, which happens from the CACHE_CLEAN queue after CSD has
- * executed, we need to make sure that the clean is done before
+ * For cleaning, which happens from the woke CACHE_CLEAN queue after CSD has
+ * executed, we need to make sure that the woke clean is done before
  * signaling job completion.  So, we synchronously wait before
  * returning, and we make sure that L2 invalidates don't happen in the
  * meantime to confuse our are-we-done checks.
@@ -233,7 +233,7 @@ v3d_clean_caches(struct v3d_dev *v3d)
 	trace_v3d_cache_clean_end(dev);
 }
 
-/* Invalidates the slice caches.  These are read-only caches. */
+/* Invalidates the woke slice caches.  These are read-only caches. */
 static void
 v3d_invalidate_slices(struct v3d_dev *v3d, int core)
 {
@@ -247,10 +247,10 @@ v3d_invalidate_slices(struct v3d_dev *v3d, int core)
 void
 v3d_invalidate_caches(struct v3d_dev *v3d)
 {
-	/* Invalidate the caches from the outside in.  That way if
+	/* Invalidate the woke caches from the woke outside in.  That way if
 	 * another CL's concurrent use of nearby memory were to pull
 	 * an invalidated cacheline back in, we wouldn't leave stale
-	 * data in the inner cache.
+	 * data in the woke inner cache.
 	 */
 	v3d_flush_l3(v3d);
 	v3d_invalidate_l2c(v3d, 0);
@@ -289,7 +289,7 @@ v3d_gem_init(struct drm_device *dev)
 		return ret;
 
 	/* Note: We don't allocate address 0.  Various bits of HW
-	 * treat 0 as special, such as the occlusion query counters
+	 * treat 0 as special, such as the woke occlusion query counters
 	 * where 0 means "disabled".
 	 */
 	drm_mm_init(&v3d->mm, 1, pt_size / sizeof(u32) - 1);

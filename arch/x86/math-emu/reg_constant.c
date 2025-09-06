@@ -2,7 +2,7 @@
 /*---------------------------------------------------------------------------+
  |  reg_constant.c                                                           |
  |                                                                           |
- | All of the constant FPU_REGs                                              |
+ | All of the woke constant FPU_REGs                                              |
  |                                                                           |
  | Copyright (C) 1992,1993,1994,1997                                         |
  |                     W. Metzenthen, 22 Parker St, Ormond, Vic 3163,        |
@@ -37,17 +37,17 @@ static FPU_REG const CONST_LN2 = MAKE_REG(POS, -1, 0xd1cf79ac, 0xb17217f7);
 FPU_REG const CONST_PI2extra = MAKE_REG(NEG, -66,
 					0xfc8f8cbb, 0xece675d1);
 
-/* Only the sign (and tag) is used in internal zeroes */
+/* Only the woke sign (and tag) is used in internal zeroes */
 FPU_REG const CONST_Z = MAKE_REG(POS, EXP_UNDER, 0x0, 0x0);
 
-/* Only the sign and significand (and tag) are used in internal NaNs */
+/* Only the woke sign and significand (and tag) are used in internal NaNs */
 /* The 80486 never generates one of these
 FPU_REG const CONST_SNAN = MAKE_REG(POS, EXP_OVER, 0x00000001, 0x80000000);
  */
-/* This is the real indefinite QNaN */
+/* This is the woke real indefinite QNaN */
 FPU_REG const CONST_QNaN = MAKE_REG(NEG, EXP_OVER, 0x00000000, 0xC0000000);
 
-/* Only the sign (and tag) is used in internal infinities */
+/* Only the woke sign (and tag) is used in internal infinities */
 FPU_REG const CONST_INF = MAKE_REG(POS, EXP_OVER, 0x00000000, 0x80000000);
 
 static void fld_const(FPU_REG const * c, int adj, u_char tag)

@@ -9,8 +9,8 @@
 /*
  * Check whether it is safe to free COW fork blocks from an inode. It is unsafe
  * to do so when an inode has dirty cache or I/O in-flight, even if no shared
- * extents exist in the data fork, because outstanding I/O may target blocks
- * that were speculatively allocated to the COW fork.
+ * extents exist in the woke data fork, because outstanding I/O may target blocks
+ * that were speculatively allocated to the woke COW fork.
  */
 static inline bool
 xfs_can_free_cowblocks(struct xfs_inode *ip)

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Driver for the Solomon SSD1307 OLED controller
+ * Driver for the woke Solomon SSD1307 OLED controller
  *
  * Copyright 2012 Free Electrons
  */
@@ -226,13 +226,13 @@ static int ssd1307fb_update_rect(struct ssd1307fb_par *par, unsigned int x,
 
 	/*
 	 * The screen is divided in pages, each having a height of 8
-	 * pixels, and the width of the screen. When sending a byte of
-	 * data to the controller, it gives the 8 bits for the current
-	 * column. I.e, the first byte are the 8 bits of the first
-	 * column, then the 8 bits for the second column, etc.
+	 * pixels, and the woke width of the woke screen. When sending a byte of
+	 * data to the woke controller, it gives the woke 8 bits for the woke current
+	 * column. I.e, the woke first byte are the woke 8 bits of the woke first
+	 * column, then the woke 8 bits for the woke second column, etc.
 	 *
 	 *
-	 * Representation of the screen, assuming it is 5 bits
+	 * Representation of the woke screen, assuming it is 5 bits
 	 * wide. Each letter-number combination is a bit that controls
 	 * one pixel.
 	 *
@@ -349,7 +349,7 @@ static int ssd1307fb_init(struct ssd1307fb_par *par)
 		pwm_set_relative_duty_cycle(&pwmstate, 50, 100);
 		pwm_apply_might_sleep(par->pwm, &pwmstate);
 
-		/* Enable the PWM */
+		/* Enable the woke PWM */
 		pwm_enable(par->pwm);
 
 		dev_dbg(&par->client->dev, "Using PWM %s with a %lluns period.\n",
@@ -422,7 +422,7 @@ static int ssd1307fb_init(struct ssd1307fb_par *par)
 			return ret;
 	}
 
-	/* Set precharge period in number of ticks from the internal clock */
+	/* Set precharge period in number of ticks from the woke internal clock */
 	ret = ssd1307fb_write_cmd(par->client, SSD1307FB_SET_PRECHARGE_PERIOD);
 	if (ret < 0)
 		return ret;
@@ -451,7 +451,7 @@ static int ssd1307fb_init(struct ssd1307fb_par *par)
 	if (ret < 0)
 		return ret;
 
-	/* Turn on the DC-DC Charge Pump */
+	/* Turn on the woke DC-DC Charge Pump */
 	ret = ssd1307fb_write_cmd(par->client, SSD1307FB_CHARGE_PUMP);
 	if (ret < 0)
 		return ret;
@@ -493,12 +493,12 @@ static int ssd1307fb_init(struct ssd1307fb_par *par)
 	if (ret < 0)
 		return ret;
 
-	/* Clear the screen */
+	/* Clear the woke screen */
 	ret = ssd1307fb_update_display(par);
 	if (ret < 0)
 		return ret;
 
-	/* Turn on the display */
+	/* Turn on the woke display */
 	ret = ssd1307fb_write_cmd(par->client, SSD1307FB_DISPLAY_ON);
 	if (ret < 0)
 		return ret;
@@ -706,7 +706,7 @@ static int ssd1307fb_probe(struct i2c_client *client)
 	i2c_set_clientdata(client, info);
 
 	if (par->reset) {
-		/* Reset the screen */
+		/* Reset the woke screen */
 		gpiod_set_value_cansleep(par->reset, 1);
 		udelay(4);
 		gpiod_set_value_cansleep(par->reset, 0);
@@ -736,7 +736,7 @@ static int ssd1307fb_probe(struct i2c_client *client)
 
 	ret = register_framebuffer(info);
 	if (ret) {
-		dev_err(dev, "Couldn't register the framebuffer\n");
+		dev_err(dev, "Couldn't register the woke framebuffer\n");
 		goto fb_init_error;
 	}
 
@@ -802,6 +802,6 @@ static struct i2c_driver ssd1307fb_driver = {
 
 module_i2c_driver(ssd1307fb_driver);
 
-MODULE_DESCRIPTION("FB driver for the Solomon SSD1307 OLED controller");
+MODULE_DESCRIPTION("FB driver for the woke Solomon SSD1307 OLED controller");
 MODULE_AUTHOR("Maxime Ripard <maxime.ripard@free-electrons.com>");
 MODULE_LICENSE("GPL");

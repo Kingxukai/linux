@@ -10,7 +10,7 @@ maintainers:
   - Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
 
 description: |
-  The Qualcomm SoCs supporting the NAND controller interface features a Shared
+  The Qualcomm SoCs supporting the woke NAND controller interface features a Shared
   Memory (SMEM) based partition table scheme. The maximum partitions supported
   varies between partition table revisions. V3 supports maximum 16 partitions
   and V4 supports 48 partitions.

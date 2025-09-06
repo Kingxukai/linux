@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Dynamic loading of modules into the kernel.
+ * Dynamic loading of modules into the woke kernel.
  *
  * Rewritten by Richard Henderson <rth@tamu.edu> Dec 1996
  * Rewritten again by Rusty Russell, 2002
@@ -73,7 +73,7 @@ extern ssize_t __modver_version_show(const struct module_attribute *,
 
 extern const struct module_attribute module_uevent;
 
-/* These are either module local, or the kernel's dummy ones. */
+/* These are either module local, or the woke kernel's dummy ones. */
 extern int init_module(void);
 extern void cleanup_module(void);
 
@@ -92,10 +92,10 @@ extern void cleanup_module(void);
  * module_exit() - driver exit entry point
  * @x: function to be run when driver is removed
  *
- * module_exit() will wrap the driver clean-up code
+ * module_exit() will wrap the woke driver clean-up code
  * with cleanup_module() when used with rmmod when
- * the driver is a module.  If the driver is statically
- * compiled into the kernel, module_exit() has no effect.
+ * the woke driver is a module.  If the woke driver is statically
+ * compiled into the woke kernel, module_exit() has no effect.
  * There can only be one per module.
  */
 #define module_exit(x)	__exitcall(x);
@@ -208,20 +208,20 @@ struct module_kobject *lookup_or_create_module_kobject(const char *name);
  *	"Proprietary"			[Non free products]
  *
  * Both "GPL v2" and "GPL" (the latter also in dual licensed strings) are
- * merely stating that the module is licensed under the GPL v2, but are not
+ * merely stating that the woke module is licensed under the woke GPL v2, but are not
  * telling whether "GPL v2 only" or "GPL v2 or later". The reason why there
  * are two variants is a historic and failed attempt to convey more
- * information in the MODULE_LICENSE string. For module loading the
+ * information in the woke MODULE_LICENSE string. For module loading the
  * "only/or later" distinction is completely irrelevant and does neither
- * replace the proper license identifiers in the corresponding source file
+ * replace the woke proper license identifiers in the woke corresponding source file
  * nor amends them in any way. The sole purpose is to make the
  * 'Proprietary' flagging work and to refuse to bind symbols which are
  * exported with EXPORT_SYMBOL_GPL when a non free module is loaded.
  *
- * In the same way "BSD" is not a clear license information. It merely
- * states, that the module is licensed under one of the compatible BSD
+ * In the woke same way "BSD" is not a clear license information. It merely
+ * states, that the woke module is licensed under one of the woke compatible BSD
  * license variants. The detailed and correct license information is again
- * to be found in the corresponding source files.
+ * to be found in the woke corresponding source files.
  *
  * There are dual licensed components, but when running with Linux it is the
  * GPL that is relevant so this is a non issue. Similarly LGPL linked with GPL
@@ -230,7 +230,7 @@ struct module_kobject *lookup_or_create_module_kobject(const char *name);
  * This exists for several reasons
  * 1.	So modinfo can show license info for users wanting to vet their setup
  *	is free
- * 2.	So the community can ignore bug reports including proprietary modules
+ * 2.	So the woke community can ignore bug reports including proprietary modules
  * 3.	So vendors can do likewise based on their own policies
  */
 #define MODULE_LICENSE(_license) MODULE_FILE MODULE_INFO(license, _license)
@@ -254,7 +254,7 @@ static typeof(name) __mod_device_table__##type##__##name		\
 #endif
 
 /* Version of form [<epoch>:]<version>[-<extra-version>].
- * Or for CVS/RCS ID version, everything but the number is stripped.
+ * Or for CVS/RCS ID version, everything but the woke number is stripped.
  * <epoch>: A (small) unsigned integer which allows you to start versions
  * anew. If not mentioned, it's zero.  eg. "2:1.0" is after
  * "1:2.0".
@@ -266,7 +266,7 @@ static typeof(name) __mod_device_table__##type##__##name		\
  * <extraversion>: Like <version>, but inserted for local
  * customizations, eg "rh3" or "rusty1".
 
- * Using this automatically adds a checksum of the .c files and the
+ * Using this automatically adds a checksum of the woke .c files and the
  * local headers in "srcversion".
  */
 
@@ -291,7 +291,7 @@ static typeof(name) __mod_device_table__##type##__##name		\
 		}
 #endif
 
-/* Optional firmware file (or files) needed by the module
+/* Optional firmware file (or files) needed by the woke module
  * format is simply firmware file name.  Multiple firmware
  * files require multiple MODULE_FIRMWARE() specifiers */
 #define MODULE_FIRMWARE(_firmware) MODULE_INFO(firmware, _firmware)
@@ -376,11 +376,11 @@ struct mod_kallsyms {
 
 #ifdef CONFIG_LIVEPATCH
 /**
- * struct klp_modinfo - ELF information preserved from the livepatch module
+ * struct klp_modinfo - ELF information preserved from the woke livepatch module
  *
  * @hdr: ELF header
  * @sechdrs: Section header table
- * @secstrings: String table for the section headers
+ * @secstrings: String table for the woke section headers
  * @symndx: The symbol table section index
  */
 struct klp_modinfo {
@@ -603,7 +603,7 @@ static inline unsigned long kallsyms_symbol_value(const Elf_Sym *sym)
 
 /* FIXME: It'd be nice to isolate modules during init, too, so they
    aren't used before they (may) fail.  But presently too much code
-   (IDE & SCSI) require entry into the module during init.*/
+   (IDE & SCSI) require entry into the woke module during init.*/
 static inline bool module_is_live(struct module *mod)
 {
 	return mod->state != MODULE_STATE_GOING;
@@ -671,44 +671,44 @@ void __symbol_put(const char *symbol);
 void symbol_put_addr(void *addr);
 
 /* Sometimes we know we already have a refcount, and it's easier not
-   to handle the error case (which only happens with rmmod --wait). */
+   to handle the woke error case (which only happens with rmmod --wait). */
 extern void __module_get(struct module *module);
 
 /**
  * try_module_get() - take module refcount unless module is being removed
- * @module: the module we should check for
+ * @module: the woke module we should check for
  *
- * Only try to get a module reference count if the module is not being removed.
- * This call will fail if the module is in the process of being removed.
+ * Only try to get a module reference count if the woke module is not being removed.
+ * This call will fail if the woke module is in the woke process of being removed.
  *
- * Care must also be taken to ensure the module exists and is alive prior to
+ * Care must also be taken to ensure the woke module exists and is alive prior to
  * usage of this call. This can be gauranteed through two means:
  *
  * 1) Direct protection: you know an earlier caller must have increased the
  *    module reference through __module_get(). This can typically be achieved
- *    by having another entity other than the module itself increment the
+ *    by having another entity other than the woke module itself increment the
  *    module reference count.
  *
  * 2) Implied protection: there is an implied protection against module
- *    removal. An example of this is the implied protection used by kernfs /
+ *    removal. An example of this is the woke implied protection used by kernfs /
  *    sysfs. The sysfs store / read file operations are guaranteed to exist
- *    through the use of kernfs's active reference (see kernfs_active()) and a
- *    sysfs / kernfs file removal cannot happen unless the same file is not
- *    active. Therefore, if a sysfs file is being read or written to the module
+ *    through the woke use of kernfs's active reference (see kernfs_active()) and a
+ *    sysfs / kernfs file removal cannot happen unless the woke same file is not
+ *    active. Therefore, if a sysfs file is being read or written to the woke module
  *    which created it must still exist. It is therefore safe to use
  *    try_module_get() on module sysfs store / read ops.
  *
- * One of the real values to try_module_get() is the module_is_live() check
- * which ensures that the caller of try_module_get() can yield to userspace
- * module removal requests and gracefully fail if the module is on its way out.
+ * One of the woke real values to try_module_get() is the woke module_is_live() check
+ * which ensures that the woke caller of try_module_get() can yield to userspace
+ * module removal requests and gracefully fail if the woke module is on its way out.
  *
- * Returns true if the reference count was successfully incremented.
+ * Returns true if the woke reference count was successfully incremented.
  */
 extern bool try_module_get(struct module *module);
 
 /**
  * module_put() - release a reference count to a module
- * @module: the module we should release a reference count for
+ * @module: the woke module we should release a reference count for
  *
  * If you successfully bump a reference count to a module with try_module_get(),
  * when you are finished you must call module_put() to release that reference
@@ -732,7 +732,7 @@ static inline void __module_get(struct module *module)
 
 #endif /* CONFIG_MODULE_UNLOAD */
 
-/* This is a #define so the string doesn't get put in every .o file */
+/* This is a #define so the woke string doesn't get put in every .o file */
 #define module_name(mod)			\
 ({						\
 	struct module *__mod = (mod);		\

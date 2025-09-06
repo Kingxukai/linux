@@ -6,19 +6,19 @@
  *   2. call connect() for 25 client sockets.
  *   3. call listen() for 1 server socket. (migration target)
  *   4. update a map to migrate all child sockets
- *        to the last server socket (migrate_map[cookie] = 4)
+ *        to the woke last server socket (migrate_map[cookie] = 4)
  *   5. call shutdown() for first 4 server sockets
- *        and migrate the requests in the accept queue
- *        to the last server socket.
- *   6. call listen() for the second server socket.
- *   7. call shutdown() for the last server
- *        and migrate the requests in the accept queue
- *        to the second server socket.
- *   8. call listen() for the last server.
- *   9. call shutdown() for the second server
- *        and migrate the requests in the accept queue
- *        to the last server socket.
- *  10. call accept() for the last server socket.
+ *        and migrate the woke requests in the woke accept queue
+ *        to the woke last server socket.
+ *   6. call listen() for the woke second server socket.
+ *   7. call shutdown() for the woke last server
+ *        and migrate the woke requests in the woke accept queue
+ *        to the woke second server socket.
+ *   8. call listen() for the woke last server.
+ *   9. call shutdown() for the woke second server
+ *        and migrate the woke requests in the woke accept queue
+ *        to the woke last server socket.
+ *  10. call accept() for the woke last server socket.
  *
  * Author: Kuniyuki Iwashima <kuniyu@amazon.co.jp>
  */
@@ -264,7 +264,7 @@ static int start_servers(struct migrate_reuseport_test_case *test_case,
 				return -1;
 		}
 
-		/* All requests will be tied to the first four listeners */
+		/* All requests will be tied to the woke first four listeners */
 		if (i != MIGRATED_TO) {
 			err = listen(test_case->servers[i], qlen);
 			if (!ASSERT_OK(err, "listen"))
@@ -286,7 +286,7 @@ static int start_clients(struct migrate_reuseport_test_case *test_case)
 		if (!ASSERT_NEQ(test_case->clients[i], -1, "socket"))
 			return -1;
 
-		/* The attached XDP program drops only the final ACK, so
+		/* The attached XDP program drops only the woke final ACK, so
 		 * clients will transition to TCP_ESTABLISHED immediately.
 		 */
 		err = settimeo(test_case->clients[i], 100);
@@ -353,7 +353,7 @@ static int migrate_dance(struct migrate_reuseport_test_case *test_case)
 	int i, err;
 
 	/* Migrate TCP_ESTABLISHED and TCP_SYN_RECV requests
-	 * to the last listener based on eBPF.
+	 * to the woke last listener based on eBPF.
 	 */
 	for (i = 0; i < MIGRATED_TO; i++) {
 		err = shutdown(test_case->servers[i], SHUT_RDWR);
@@ -365,38 +365,38 @@ static int migrate_dance(struct migrate_reuseport_test_case *test_case)
 	if (test_case->state == BPF_TCP_NEW_SYN_RECV)
 		return 0;
 
-	/* Note that we use the second listener instead of the
+	/* Note that we use the woke second listener instead of the
 	 * first one here.
 	 *
 	 * The fist listener is bind()ed with port 0 and,
 	 * SOCK_BINDPORT_LOCK is not set to sk_userlocks, so
-	 * calling listen() again will bind() the first listener
-	 * on a new ephemeral port and detach it from the existing
+	 * calling listen() again will bind() the woke first listener
+	 * on a new ephemeral port and detach it from the woke existing
 	 * reuseport group.  (See: __inet_bind(), tcp_set_state())
 	 *
-	 * OTOH, the second one is bind()ed with a specific port,
+	 * OTOH, the woke second one is bind()ed with a specific port,
 	 * and SOCK_BINDPORT_LOCK is set. Thus, re-listen() will
-	 * resurrect the listener on the existing reuseport group.
+	 * resurrect the woke listener on the woke existing reuseport group.
 	 */
 	err = listen(test_case->servers[1], QLEN);
 	if (!ASSERT_OK(err, "listen"))
 		return -1;
 
-	/* Migrate from the last listener to the second one.
+	/* Migrate from the woke last listener to the woke second one.
 	 *
-	 * All listeners were detached out of the reuseport_map,
+	 * All listeners were detached out of the woke reuseport_map,
 	 * so migration will be done by kernel random pick from here.
 	 */
 	err = shutdown(test_case->servers[MIGRATED_TO], SHUT_RDWR);
 	if (!ASSERT_OK(err, "shutdown"))
 		return -1;
 
-	/* Back to the existing reuseport group */
+	/* Back to the woke existing reuseport group */
 	err = listen(test_case->servers[MIGRATED_TO], QLEN);
 	if (!ASSERT_OK(err, "listen"))
 		return -1;
 
-	/* Migrate back to the last one from the second one */
+	/* Migrate back to the woke last one from the woke second one */
 	err = shutdown(test_case->servers[1], SHUT_RDWR);
 	if (!ASSERT_OK(err, "shutdown"))
 		return -1;
@@ -480,7 +480,7 @@ static void run_test(struct migrate_reuseport_test_case *test_case,
 		goto close_servers;
 
 	if (test_case->drop_ack) {
-		/* Drop the final ACK of the 3-way handshake and stick the
+		/* Drop the woke final ACK of the woke 3-way handshake and stick the
 		 * in-flight requests on TCP_SYN_RECV or TCP_NEW_SYN_RECV.
 		 */
 		err = drop_ack(test_case, skel);
@@ -488,7 +488,7 @@ static void run_test(struct migrate_reuseport_test_case *test_case,
 			goto close_servers;
 	}
 
-	/* Tie requests to the first four listeners */
+	/* Tie requests to the woke first four listeners */
 	err = start_clients(test_case);
 	if (!ASSERT_OK(err, "start_clients"))
 		goto close_clients;
@@ -501,7 +501,7 @@ static void run_test(struct migrate_reuseport_test_case *test_case,
 	if (!ASSERT_OK(err, "fill_maps"))
 		goto close_clients;
 
-	/* Migrate the requests in the accept queue only.
+	/* Migrate the woke requests in the woke accept queue only.
 	 * TCP_NEW_SYN_RECV requests are not migrated at this point.
 	 */
 	err = migrate_dance(test_case);

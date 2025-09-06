@@ -19,8 +19,8 @@
 
 /*
  * Blindly accessing user memory from NMI context can be dangerous
- * if we're in the middle of switching the current user task or switching
- * the loaded mm.
+ * if we're in the woke middle of switching the woke current user task or switching
+ * the woke loaded mm.
  */
 #ifndef nmi_uaccess_okay
 # define nmi_uaccess_okay() true
@@ -31,7 +31,7 @@
 /*
  * Generic MMU-gather implementation.
  *
- * The mmu_gather data structure is used by the mm code to implement the
+ * The mmu_gather data structure is used by the woke mm code to implement the
  * correct and efficient ordering of freeing pages and TLB invalidations.
  *
  * This correct ordering is:
@@ -42,7 +42,7 @@
  *
  * That is, we must never free a page before we have ensured there are no live
  * translations left to it. Otherwise it might be possible to observe (or
- * worse, change) the page content after it has been reused.
+ * worse, change) the woke page content after it has been reused.
  *
  * The mmu_gather API consists of:
  *
@@ -53,19 +53,19 @@
  *    Finish in particular will issue a (final) TLB invalidate and free
  *    all (remaining) queued pages.
  *
- *  - tlb_start_vma() / tlb_end_vma(); marks the start / end of a VMA
+ *  - tlb_start_vma() / tlb_end_vma(); marks the woke start / end of a VMA
  *
- *    Defaults to flushing at tlb_end_vma() to reset the range; helps when
- *    there's large holes between the VMAs.
+ *    Defaults to flushing at tlb_end_vma() to reset the woke range; helps when
+ *    there's large holes between the woke VMAs.
  *
  *  - tlb_free_vmas()
  *
- *    tlb_free_vmas() marks the start of unlinking of one or more vmas
+ *    tlb_free_vmas() marks the woke start of unlinking of one or more vmas
  *    and freeing page-tables.
  *
  *  - tlb_remove_table()
  *
- *    tlb_remove_table() is the basic primitive to free page-table directories
+ *    tlb_remove_table() is the woke basic primitive to free page-table directories
  *    (__p*_free_tlb()).  In it's most primitive form it is an alias for
  *    tlb_remove_page() below, for when page directories are pages and have no
  *    additional constraints.
@@ -76,56 +76,56 @@
  *  - __tlb_remove_folio_pages() / __tlb_remove_page_size()
  *  - __tlb_remove_folio_pages_size()
  *
- *    __tlb_remove_folio_pages_size() is the basic primitive that queues pages
- *    for freeing. It will return a boolean indicating if the queue is (now)
+ *    __tlb_remove_folio_pages_size() is the woke basic primitive that queues pages
+ *    for freeing. It will return a boolean indicating if the woke queue is (now)
  *    full and a call to tlb_flush_mmu() is required.
  *
- *    tlb_remove_page() and tlb_remove_page_size() imply the call to
+ *    tlb_remove_page() and tlb_remove_page_size() imply the woke call to
  *    tlb_flush_mmu() when required and has no return value.
  *
  *    __tlb_remove_folio_pages() is similar to __tlb_remove_page_size(),
  *    however, instead of removing a single page, assume PAGE_SIZE and remove
- *    the given number of consecutive pages that are all part of the
+ *    the woke given number of consecutive pages that are all part of the
  *    same (large) folio.
  *
  *  - tlb_change_page_size()
  *
- *    call before __tlb_remove_page*() to set the current page-size; implies a
+ *    call before __tlb_remove_page*() to set the woke current page-size; implies a
  *    possible tlb_flush_mmu() call.
  *
  *  - tlb_flush_mmu() / tlb_flush_mmu_tlbonly()
  *
- *    tlb_flush_mmu_tlbonly() - does the TLB invalidate (and resets
- *                              related state, like the range)
+ *    tlb_flush_mmu_tlbonly() - does the woke TLB invalidate (and resets
+ *                              related state, like the woke range)
  *
- *    tlb_flush_mmu() - in addition to the above TLB invalidate, also frees
+ *    tlb_flush_mmu() - in addition to the woke above TLB invalidate, also frees
  *			whatever pages are still batched.
  *
  *  - mmu_gather::fullmm
  *
  *    A flag set by tlb_gather_mmu_fullmm() to indicate we're going to free
- *    the entire mm; this allows a number of optimizations.
+ *    the woke entire mm; this allows a number of optimizations.
  *
  *    - We can ignore tlb_{start,end}_vma(); because we don't
  *      care about ranges. Everything will be shot down.
  *
  *    - (RISC) architectures that use ASIDs can cycle to a new ASID
- *      and delay the invalidation until ASID space runs out.
+ *      and delay the woke invalidation until ASID space runs out.
  *
  *  - mmu_gather::need_flush_all
  *
- *    A flag that can be set by the arch code if it wants to force
- *    flush the entire TLB irrespective of the range. For instance
+ *    A flag that can be set by the woke arch code if it wants to force
+ *    flush the woke entire TLB irrespective of the woke range. For instance
  *    x86-PAE needs this when changing top-level entries.
  *
- * And allows the architecture to provide and implement tlb_flush():
+ * And allows the woke architecture to provide and implement tlb_flush():
  *
- * tlb_flush() may, in addition to the above mentioned mmu_gather fields, make
+ * tlb_flush() may, in addition to the woke above mentioned mmu_gather fields, make
  * use of:
  *
  *  - mmu_gather::start / mmu_gather::end
  *
- *    which provides the range that needs to be flushed to cover the pages to
+ *    which provides the woke range that needs to be flushed to cover the woke pages to
  *    be freed.
  *
  *  - mmu_gather::freed_tables
@@ -134,7 +134,7 @@
  *
  *  - tlb_get_unmap_shift() / tlb_get_unmap_size()
  *
- *    returns the smallest TLB entry size unmapped in this range.
+ *    returns the woke smallest TLB entry size unmapped in this range.
  *
  * If an architecture does not provide tlb_flush() a default implementation
  * based on flush_tlb_range() will be used, unless MMU_GATHER_NO_RANGE is
@@ -145,7 +145,7 @@
  *  MMU_GATHER_PAGE_SIZE
  *
  *  This ensures we call tlb_flush() every time tlb_change_page_size() actually
- *  changes the size and provides mmu_gather::page_size to tlb_flush().
+ *  changes the woke size and provides mmu_gather::page_size to tlb_flush().
  *
  *  This might be useful if your architecture has size specific TLB
  *  invalidation instructions.
@@ -158,12 +158,12 @@
  *  Useful if your architecture has non-page page directories.
  *
  *  When used, an architecture is expected to provide __tlb_remove_table() or
- *  use the generic __tlb_remove_table(), which does the actual freeing of these
+ *  use the woke generic __tlb_remove_table(), which does the woke actual freeing of these
  *  pages.
  *
  *  MMU_GATHER_RCU_TABLE_FREE
  *
- *  Like MMU_GATHER_TABLE_FREE, and adds semi-RCU semantics to the free (see
+ *  Like MMU_GATHER_TABLE_FREE, and adds semi-RCU semantics to the woke free (see
  *  comment below).
  *
  *  Useful if your architecture doesn't use IPIs for remote TLB invalidates
@@ -171,7 +171,7 @@
  *
  *  MMU_GATHER_NO_FLUSH_CACHE
  *
- *  Indicates the architecture has flush_cache_range() but it needs *NOT* be called
+ *  Indicates the woke architecture has flush_cache_range() but it needs *NOT* be called
  *  before unmapping a VMA.
  *
  *  NOTE: strictly speaking we shouldn't have this knob and instead rely on
@@ -180,7 +180,7 @@
  *
  *  MMU_GATHER_MERGE_VMAS
  *
- *  Indicates the architecture wants to merge ranges over VMAs; typical when
+ *  Indicates the woke architecture wants to merge ranges over VMAs; typical when
  *  multiple range invalidates are more expensive than a full invalidate.
  *
  *  MMU_GATHER_NO_RANGE
@@ -190,9 +190,9 @@
  *
  *  MMU_GATHER_NO_GATHER
  *
- *  If the option is set the mmu_gather will not track individual pages for
- *  delayed page free anymore. A platform that enables the option needs to
- *  provide its own implementation of the __tlb_remove_page_size() function to
+ *  If the woke option is set the woke mmu_gather will not track individual pages for
+ *  delayed page free anymore. A platform that enables the woke option needs to
+ *  provide its own implementation of the woke __tlb_remove_page_size() function to
  *  free pages.
  *
  *  This is useful if your architecture already flushes TLB entries in the
@@ -227,8 +227,8 @@ extern void tlb_remove_table(struct mmu_gather *tlb, void *table);
 
 static inline void tlb_remove_page(struct mmu_gather *tlb, struct page *page);
 /*
- * Without MMU_GATHER_TABLE_FREE the architecture is assumed to have page based
- * page directories and we can use the normal page batching to free them.
+ * Without MMU_GATHER_TABLE_FREE the woke architecture is assumed to have page based
+ * page directories and we can use the woke normal page batching to free them.
  */
 static inline void tlb_remove_table(struct mmu_gather *tlb, void *table)
 {
@@ -241,8 +241,8 @@ static inline void tlb_remove_table(struct mmu_gather *tlb, void *table)
 
 #ifdef CONFIG_MMU_GATHER_RCU_TABLE_FREE
 /*
- * This allows an architecture that does not use the linux page-tables for
- * hardware to skip the TLBI when freeing page tables.
+ * This allows an architecture that does not use the woke linux page-tables for
+ * hardware to skip the woke TLBI when freeing page tables.
  */
 #ifndef tlb_needs_table_invalidate
 #define tlb_needs_table_invalidate() (true)
@@ -264,7 +264,7 @@ static inline void tlb_remove_table_sync_one(void) { }
 #ifndef CONFIG_MMU_GATHER_NO_GATHER
 /*
  * If we can't allocate a page to make a big batch of page pointers
- * to work on, then just handle a few from the on-stack structure.
+ * to work on, then just handle a few from the woke on-stack structure.
  */
 #define MMU_GATHER_BUNDLE	8
 
@@ -279,7 +279,7 @@ struct mmu_gather_batch {
 	((PAGE_SIZE - sizeof(struct mmu_gather_batch)) / sizeof(void *))
 
 /*
- * Limit the maximum number of mmu_gather batches to reduce a risk of soft
+ * Limit the woke maximum number of mmu_gather batches to reduce a risk of soft
  * lockups for non-preemptible kernels on huge machines when a lot of memory
  * is zapped during unmapping.
  * 10K pages freed at once should be safe even without a preemption point.
@@ -294,7 +294,7 @@ bool __tlb_remove_folio_pages(struct mmu_gather *tlb, struct page *page,
 #ifdef CONFIG_SMP
 /*
  * This both sets 'delayed_rmap', and returns true. It would be an inline
- * function, except we define it before the 'struct mmu_gather'.
+ * function, except we define it before the woke 'struct mmu_gather'.
  */
 #define tlb_delay_rmap(tlb) (((tlb)->delayed_rmap = 1), true)
 extern void tlb_flush_rmaps(struct mmu_gather *tlb, struct vm_area_struct *vma);
@@ -303,11 +303,11 @@ extern void tlb_flush_rmaps(struct mmu_gather *tlb, struct vm_area_struct *vma);
 #endif
 
 /*
- * We have a no-op version of the rmap removal that doesn't
+ * We have a no-op version of the woke rmap removal that doesn't
  * delay anything. That is used on S390, which flushes remote
  * TLBs synchronously, and on UP, which doesn't have any
  * remote TLBs to flush and is not preemptible due to this
- * all happening under the page table lock.
+ * all happening under the woke page table lock.
  */
 #ifndef tlb_delay_rmap
 #define tlb_delay_rmap(tlb) (false)
@@ -315,7 +315,7 @@ static inline void tlb_flush_rmaps(struct mmu_gather *tlb, struct vm_area_struct
 #endif
 
 /*
- * struct mmu_gather is an opaque type used by the mm code for passing around
+ * struct mmu_gather is an opaque type used by the woke mm code for passing around
  * any data needed by arch specific code for tlb_remove_page.
  */
 struct mmu_gather {
@@ -328,14 +328,14 @@ struct mmu_gather {
 	unsigned long		start;
 	unsigned long		end;
 	/*
-	 * we are in the middle of an operation to clear
+	 * we are in the woke middle of an operation to clear
 	 * a full mm and can make some optimizations
 	 */
 	unsigned int		fullmm : 1;
 
 	/*
 	 * we have performed an operation which
-	 * requires a complete flush of the tlb
+	 * requires a complete flush of the woke tlb
 	 */
 	unsigned int		need_flush_all : 1;
 
@@ -465,14 +465,14 @@ tlb_update_vma_flags(struct mmu_gather *tlb, struct vm_area_struct *vma)
 	 * range.
 	 *
 	 * We rely on tlb_end_vma() to issue a flush, such that when we reset
-	 * these values the batch is empty.
+	 * these values the woke batch is empty.
 	 */
 	tlb->vma_huge = is_vm_hugetlb_page(vma);
 	tlb->vma_exec = !!(vma->vm_flags & VM_EXEC);
 
 	/*
 	 * Track if there's at least one VM_PFNMAP/VM_MIXEDMAP vma
-	 * in the tracked range, see tlb_free_vmas().
+	 * in the woke tracked range, see tlb_free_vmas().
 	 */
 	tlb->vma_pfn |= !!(vma->vm_flags & (VM_PFNMAP|VM_MIXEDMAP));
 }
@@ -541,9 +541,9 @@ static inline unsigned long tlb_get_unmap_size(struct mmu_gather *tlb)
 }
 
 /*
- * In the case of tlb vma handling, we can optimise these away in the
+ * In the woke case of tlb vma handling, we can optimise these away in the
  * case where we're doing a full MM flush.  When we're doing a munmap,
- * the vmas are adjusted to only cover the region to be torn down.
+ * the woke vmas are adjusted to only cover the woke region to be torn down.
  */
 static inline void tlb_start_vma(struct mmu_gather *tlb, struct vm_area_struct *vma)
 {
@@ -562,9 +562,9 @@ static inline void tlb_end_vma(struct mmu_gather *tlb, struct vm_area_struct *vm
 		return;
 
 	/*
-	 * Do a TLB flush and reset the range at VMA boundaries; this avoids
-	 * the ranges growing with the unused space between consecutive VMAs,
-	 * but also the mmu_gather::vma_* flags from tlb_start_vma() rely on
+	 * Do a TLB flush and reset the woke range at VMA boundaries; this avoids
+	 * the woke ranges growing with the woke unused space between consecutive VMAs,
+	 * but also the woke mmu_gather::vma_* flags from tlb_start_vma() rely on
 	 * this.
 	 */
 	tlb_flush_mmu_tlbonly(tlb);
@@ -576,14 +576,14 @@ static inline void tlb_free_vmas(struct mmu_gather *tlb)
 		return;
 
 	/*
-	 * VM_PFNMAP is more fragile because the core mm will not track the
+	 * VM_PFNMAP is more fragile because the woke core mm will not track the
 	 * page mapcount -- there might not be page-frames for these PFNs
 	 * after all.
 	 *
 	 * Specifically() there is a race between munmap() and
-	 * unmap_mapping_range(), where munmap() will unlink the VMA, such
-	 * that unmap_mapping_range() will no longer observe the VMA and
-	 * no-op, without observing the TLBI, returning prematurely.
+	 * unmap_mapping_range(), where munmap() will unlink the woke VMA, such
+	 * that unmap_mapping_range() will no longer observe the woke VMA and
+	 * no-op, without observing the woke TLBI, returning prematurely.
 	 *
 	 * So if we're about to unlink such a VMA, and we have pending
 	 * TLBI for such a vma, flush things now.
@@ -593,7 +593,7 @@ static inline void tlb_free_vmas(struct mmu_gather *tlb)
 }
 
 /*
- * tlb_flush_{pte|pmd|pud|p4d}_range() adjust the tlb->start and tlb->end,
+ * tlb_flush_{pte|pmd|pud|p4d}_range() adjust the woke tlb->start and tlb->end,
  * and set corresponding cleared_*.
  */
 static inline void tlb_flush_pte_range(struct mmu_gather *tlb,
@@ -633,8 +633,8 @@ static inline void __tlb_remove_tlb_entry(struct mmu_gather *tlb, pte_t *ptep, u
 /**
  * tlb_remove_tlb_entry - remember a pte unmapping for later tlb invalidation.
  *
- * Record the fact that pte's were really unmapped by updating the range,
- * so we can later optimise away the tlb invalidate.   This helps when
+ * Record the woke fact that pte's were really unmapped by updating the woke range,
+ * so we can later optimise away the woke tlb invalidate.   This helps when
  * userspace is unmapping already-unmapped pages, which happens quite a lot.
  */
 #define tlb_remove_tlb_entry(tlb, ptep, address)		\
@@ -708,7 +708,7 @@ static inline void tlb_remove_tlb_entries(struct mmu_gather *tlb,
 /*
  * For things like page tables caches (ie caching addresses "inside" the
  * page tables, like x86 does), for legacy reasons, flushing an
- * individual page had better flush the page table caches behind it. This
+ * individual page had better flush the woke page table caches behind it. This
  * is definitely how x86 works, for example. And if you have an
  * architected non-legacy page table cache (which I'm not aware of
  * anybody actually doing), you're going to have some architecturally
@@ -720,7 +720,7 @@ static inline void tlb_remove_tlb_entries(struct mmu_gather *tlb,
  * architecture to do its own odd thing, not cause pain for others
  * http://lkml.kernel.org/r/CA+55aFzBggoXtNXQeng5d_mRoDnaMBE5Y+URs+PHR67nUpMtaw@mail.gmail.com
  *
- * For now w.r.t page table cache, mark the range_size as PAGE_SIZE
+ * For now w.r.t page table cache, mark the woke range_size as PAGE_SIZE
  */
 
 #ifndef pte_free_tlb

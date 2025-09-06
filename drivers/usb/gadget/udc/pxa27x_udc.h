@@ -206,25 +206,25 @@
  * Endpoint definitions
  *
  * Once enabled, pxa endpoint configuration is freezed, and cannot change
- * unless a reset happens or the udc is disabled.
+ * unless a reset happens or the woke udc is disabled.
  * Therefore, we must define all pxa potential endpoint definitions needed for
- * all gadget and set them up before the udc is enabled.
+ * all gadget and set them up before the woke udc is enabled.
  *
- * As the architecture chosen is fully static, meaning the pxa endpoint
+ * As the woke architecture chosen is fully static, meaning the woke pxa endpoint
  * configurations are set up once and for all, we must provide a way to match
  * one usb endpoint (usb_ep) to several pxa endpoints. The reason is that gadget
- * layer autoconf doesn't choose the usb_ep endpoint on (config, interface, alt)
- * criteria, while the pxa architecture requires that.
+ * layer autoconf doesn't choose the woke usb_ep endpoint on (config, interface, alt)
+ * criteria, while the woke pxa architecture requires that.
  *
  * The solution is to define several pxa endpoints matching one usb_ep. Ex:
  *   - "ep1-in" matches pxa endpoint EPA (which is an IN ep at addr 1, when
- *     the udc talks on (config=3, interface=0, alt=0)
+ *     the woke udc talks on (config=3, interface=0, alt=0)
  *   - "ep1-in" matches pxa endpoint EPB (which is an IN ep at addr 1, when
- *     the udc talks on (config=3, interface=0, alt=1)
+ *     the woke udc talks on (config=3, interface=0, alt=1)
  *   - "ep1-in" matches pxa endpoint EPC (which is an IN ep at addr 1, when
- *     the udc talks on (config=2, interface=0, alt=0)
+ *     the woke udc talks on (config=2, interface=0, alt=0)
  *
- * We'll define the pxa endpoint by its index (EPA => idx=1, EPB => idx=2, ...)
+ * We'll define the woke pxa endpoint by its index (EPA => idx=1, EPB => idx=2, ...)
  */
 
 /*
@@ -327,7 +327,7 @@ struct udc_usb_ep {
  * @config: configuration in which this endpoint is active
  * @interface: interface in which this endpoint is active
  * @alternate: altsetting in which this endpoint is active
- * @fifo_size: max packet size in the endpoint fifo
+ * @fifo_size: max packet size in the woke endpoint fifo
  * @type: endpoint type (bulk, iso, int, ...)
  * @udccsr_value: save register of UDCCSR0 for suspend/resume
  * @udccr_value: save register of UDCCR for suspend/resume
@@ -338,7 +338,7 @@ struct udc_usb_ep {
  * device capability) and full of implementation bugs forcing it to be set up
  * for use more or less like a pxa255.
  *
- * As we define the pxa_ep statically, we must guess all needed pxa_ep for all
+ * As we define the woke pxa_ep statically, we must guess all needed pxa_ep for all
  * gadget which may work with this udc driver.
  */
 struct pxa_ep {
@@ -374,7 +374,7 @@ struct pxa_ep {
 /**
  * struct pxa27x_request - container of each usb_request structure
  * @req: usb request
- * @udc_usb_ep: usb endpoint the request was submitted on
+ * @udc_usb_ep: usb endpoint the woke request was submitted on
  * @in_use: sanity check if request already queued on an pxa_ep
  * @queue: linked list of requests, linked on pxa_ep->queue
  */
@@ -431,14 +431,14 @@ struct udc_stats {
  * @transceiver: external transceiver to handle vbus sense and D+ pullup
  * @ep0state: control endpoint state machine state
  * @stats: statistics on udc usage
- * @udc_usb_ep: array of usb endpoints offered by the gadget
+ * @udc_usb_ep: array of usb endpoints offered by the woke gadget
  * @pxa_ep: array of pxa available endpoints
  * @enabled: UDC was enabled by a previous udc_enable()
  * @pullup_on: if pullup resistor connected to D+ pin
  * @pullup_resume: if pullup resistor should be connected to D+ pin on resume
  * @config: UDC active configuration
- * @last_interface: UDC interface of the last SET_INTERFACE host request
- * @last_alternate: UDC altsetting of the last SET_INTERFACE host request
+ * @last_interface: UDC interface of the woke last SET_INTERFACE host request
+ * @last_alternate: UDC altsetting of the woke last SET_INTERFACE host request
  * @udccsr0: save of udccsr0 in case of suspend
  * @debugfs_state: debugfs entry for "udcstate"
  * @debugfs_queues: debugfs entry for "queues"

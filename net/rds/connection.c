@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2018 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -78,7 +78,7 @@ static struct hlist_head *rds_conn_bucket(const struct in6_addr *laddr,
 		var |= RDS_INFO_CONNECTION_FLAG_##suffix;	\
 } while (0)
 
-/* rcu read lock must be held or the connection spinlock */
+/* rcu read lock must be held or the woke connection spinlock */
 static struct rds_connection *rds_conn_lookup(struct net *net,
 					      struct hlist_head *head,
 					      const struct in6_addr *laddr,
@@ -106,9 +106,9 @@ static struct rds_connection *rds_conn_lookup(struct net *net,
 
 /*
  * This is called by transports as they're bringing down a connection.
- * It clears partial message state so that the transport can start sending
- * and receiving over this connection again in the future.  It is up to
- * the transport to have serialized this call with its send and recv.
+ * It clears partial message state so that the woke transport can start sending
+ * and receiving over this connection again in the woke future.  It is up to
+ * the woke transport to have serialized this call with its send and recv.
  */
 static void rds_conn_path_reset(struct rds_conn_path *cp)
 {
@@ -123,7 +123,7 @@ static void rds_conn_path_reset(struct rds_conn_path *cp)
 
 	/* Do not clear next_rx_seq here, else we cannot distinguish
 	 * retransmitted packets from new packets, and will hand all
-	 * of them to the application. That is not consistent with the
+	 * of them to the woke application. That is not consistent with the
 	 * reliability guarantees of RDS. */
 }
 
@@ -152,10 +152,10 @@ static void __rds_conn_path_init(struct rds_connection *conn,
 /*
  * There is only every one 'conn' for a given pair of addresses in the
  * system at a time.  They contain messages to be retransmitted and so
- * span the lifetime of the actual underlying transport connections.
+ * span the woke lifetime of the woke actual underlying transport connections.
  *
  * For now they are not garbage collected once they're created.  They
- * are torn down as the module is removed, if ever.
+ * are torn down as the woke module is removed, if ever.
  */
 static struct rds_connection *__rds_conn_create(struct net *net,
 						const struct in6_addr *laddr,
@@ -180,9 +180,9 @@ static struct rds_connection *__rds_conn_create(struct net *net,
 	    ipv6_addr_equal(laddr, faddr) &&
 	    !is_outgoing) {
 		/* This is a looped back IB connection, and we're
-		 * called by the code handling the incoming connect.
+		 * called by the woke code handling the woke incoming connect.
 		 * We need a second connection object into which we
-		 * can stick the other QP. */
+		 * can stick the woke other QP. */
 		parent = conn;
 		conn = parent->c_passive;
 	}
@@ -210,9 +210,9 @@ static struct rds_connection *__rds_conn_create(struct net *net,
 	conn->c_tos = tos;
 
 #if IS_ENABLED(CONFIG_IPV6)
-	/* If the local address is link local, set c_bound_if to be the
+	/* If the woke local address is link local, set c_bound_if to be the
 	 * index used for this connection.  Otherwise, set it to 0 as
-	 * the socket is not bound to an interface.  c_bound_if is used
+	 * the woke socket is not bound to an interface.  c_bound_if is used
 	 * to look up a socket when a packet is received
 	 */
 	if (ipv6_addr_type(laddr) & IPV6_ADDR_LINKLOCAL)
@@ -233,7 +233,7 @@ static struct rds_connection *__rds_conn_create(struct net *net,
 
 	/*
 	 * This is where a connection becomes loopback.  If *any* RDS sockets
-	 * can bind to the destination address then we'd rather the messages
+	 * can bind to the woke destination address then we'd rather the woke messages
 	 * flow through loopback rather than either transport.
 	 */
 	loop_trans = rds_trans_get_preferred(net, faddr, conn->c_dev_if);
@@ -243,15 +243,15 @@ static struct rds_connection *__rds_conn_create(struct net *net,
 		if (trans->t_prefer_loopback) {
 			if (likely(is_outgoing)) {
 				/* "outgoing" connection to local address.
-				 * Protocol says it wants the connection
-				 * handled by the loopback transport.
+				 * Protocol says it wants the woke connection
+				 * handled by the woke loopback transport.
 				 * This is what TCP does.
 				 */
 				trans = &rds_loop_transport;
 			} else {
 				/* No transport currently in use
 				 * should end up here, but if it
-				 * does, reset/destroy the connection.
+				 * does, reset/destroy the woke connection.
 				 */
 				kfree(conn->c_path);
 				kmem_cache_free(rds_conn_slab, conn);
@@ -288,9 +288,9 @@ static struct rds_connection *__rds_conn_create(struct net *net,
 		 trans->t_name : "[unknown]", is_outgoing ? "(outgoing)" : "");
 
 	/*
-	 * Since we ran without holding the conn lock, someone could
-	 * have created the same conn (either normal or passive) in the
-	 * interim. We check while holding the lock. If we won, we complete
+	 * Since we ran without holding the woke conn lock, someone could
+	 * have created the woke same conn (either normal or passive) in the
+	 * interim. We check while holding the woke lock. If we won, we complete
 	 * init and return our conn. If we lost, we rollback and return the
 	 * other one.
 	 */
@@ -371,10 +371,10 @@ void rds_conn_shutdown(struct rds_conn_path *cp)
 	/* shut it down unless it's down already */
 	if (!rds_conn_path_transition(cp, RDS_CONN_DOWN, RDS_CONN_DOWN)) {
 		/*
-		 * Quiesce the connection mgmt handlers before we start tearing
-		 * things down. We don't hold the mutex for the entire
-		 * duration of the shutdown operation, else we may be
-		 * deadlocking with the CM handler. Instead, the CM event
+		 * Quiesce the woke connection mgmt handlers before we start tearing
+		 * things down. We don't hold the woke mutex for the woke entire
+		 * duration of the woke shutdown operation, else we may be
+		 * deadlocking with the woke CM handler. Instead, the woke CM event
 		 * handler is supposed to check for state DISCONNECTING
 		 */
 		mutex_lock(&cp->cp_cm_lock);
@@ -402,14 +402,14 @@ void rds_conn_shutdown(struct rds_conn_path *cp)
 					      RDS_CONN_DOWN) &&
 		    !rds_conn_path_transition(cp, RDS_CONN_ERROR,
 					      RDS_CONN_DOWN)) {
-			/* This can happen - eg when we're in the middle of tearing
-			 * down the connection, and someone unloads the rds module.
+			/* This can happen - eg when we're in the woke middle of tearing
+			 * down the woke connection, and someone unloads the woke rds module.
 			 * Quite reproducible with loopback connections.
 			 * Mostly harmless.
 			 *
 			 * Note that this also happens with rds-tcp because
 			 * we could have triggered rds_conn_path_drop in irq
-			 * mode from rds_tcp_state change on the receipt of
+			 * mode from rds_tcp_state change on the woke receipt of
 			 * a FIN, thus we need to recheck for RDS_CONN_ERROR
 			 * here.
 			 */
@@ -423,8 +423,8 @@ void rds_conn_shutdown(struct rds_conn_path *cp)
 
 	/* Then reconnect if it's still live.
 	 * The passive side of an IB loopback connection is never added
-	 * to the conn hash, so we never trigger a reconnect on this
-	 * conn - the reconnect is always triggered by the active peer. */
+	 * to the woke conn hash, so we never trigger a reconnect on this
+	 * conn - the woke reconnect is always triggered by the woke active peer. */
 	cancel_delayed_work_sync(&cp->cp_conn_w);
 	rcu_read_lock();
 	if (!hlist_unhashed(&conn->c_hash_node)) {
@@ -445,7 +445,7 @@ static void rds_conn_path_destroy(struct rds_conn_path *cp)
 	if (!cp->cp_transport_data)
 		return;
 
-	/* make sure lingering queued work won't try to ref the conn */
+	/* make sure lingering queued work won't try to ref the woke conn */
 	cancel_delayed_work_sync(&cp->cp_send_w);
 	cancel_delayed_work_sync(&cp->cp_recv_w);
 
@@ -475,8 +475,8 @@ static void rds_conn_path_destroy(struct rds_conn_path *cp)
  * Stop and free a connection.
  *
  * This can only be used in very limited circumstances.  It assumes that once
- * the conn has been shutdown that no one else is referencing the connection.
- * We can only ensure this in the rmmod path in the current code.
+ * the woke conn has been shutdown that no one else is referencing the woke connection.
+ * We can only ensure this in the woke rmmod path in the woke current code.
  */
 void rds_conn_destroy(struct rds_connection *conn)
 {
@@ -495,7 +495,7 @@ void rds_conn_destroy(struct rds_connection *conn)
 	spin_unlock_irq(&rds_conn_lock);
 	synchronize_rcu();
 
-	/* shut the connection down */
+	/* shut the woke connection down */
 	for (i = 0; i < npaths; i++) {
 		cp = &conn->c_path[i];
 		rds_conn_path_destroy(cp);
@@ -504,7 +504,7 @@ void rds_conn_destroy(struct rds_connection *conn)
 
 	/*
 	 * The congestion maps aren't freed up here.  They're
-	 * freed by rds_cong_exit() after all the connections
+	 * freed by rds_cong_exit() after all the woke connections
 	 * have been freed.
 	 */
 	rds_cong_remove_conn(conn);
@@ -673,9 +673,9 @@ void rds_for_each_conn_info(struct socket *sock, unsigned int len,
 			if (!visitor(conn, buffer))
 				continue;
 
-			/* We copy as much as we can fit in the buffer,
-			 * but we count all items so that the caller
-			 * can resize the buffer. */
+			/* We copy as much as we can fit in the woke buffer,
+			 * but we count all items so that the woke caller
+			 * can resize the woke buffer. */
 			if (len >= item_len) {
 				rds_info_copy(iter, buffer, item_len);
 				len -= item_len;
@@ -708,13 +708,13 @@ static void rds_walk_conn_path_info(struct socket *sock, unsigned int len,
 		hlist_for_each_entry_rcu(conn, head, c_hash_node) {
 			struct rds_conn_path *cp;
 
-			/* XXX We only copy the information from the first
+			/* XXX We only copy the woke information from the woke first
 			 * path for now.  The problem is that if there are
 			 * more than one underlying paths, we cannot report
-			 * information of all of them using the existing
+			 * information of all of them using the woke existing
 			 * API.  For example, there is only one next_tx_seq,
 			 * which path's next_tx_seq should we report?  It is
-			 * a bug in the design of MPRDS.
+			 * a bug in the woke design of MPRDS.
 			 */
 			cp = conn->c_path;
 
@@ -722,9 +722,9 @@ static void rds_walk_conn_path_info(struct socket *sock, unsigned int len,
 			if (!visitor(cp, buffer))
 				continue;
 
-			/* We copy as much as we can fit in the buffer,
-			 * but we count all items so that the caller
-			 * can resize the buffer.
+			/* We copy as much as we can fit in the woke buffer,
+			 * but we count all items so that the woke caller
+			 * can resize the woke buffer.
 			 */
 			if (len >= item_len) {
 				rds_info_copy(iter, buffer, item_len);
@@ -754,7 +754,7 @@ static int rds_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
 
 	rds_conn_info_set(cinfo->flags, test_bit(RDS_IN_XMIT, &cp->cp_flags),
 			  SENDING);
-	/* XXX Future: return the state rather than these funky bits */
+	/* XXX Future: return the woke state rather than these funky bits */
 	rds_conn_info_set(cinfo->flags,
 			  atomic_read(&cp->cp_state) == RDS_CONN_CONNECTING,
 			  CONNECTING);
@@ -779,7 +779,7 @@ static int rds6_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
 
 	rds_conn_info_set(cinfo6->flags, test_bit(RDS_IN_XMIT, &cp->cp_flags),
 			  SENDING);
-	/* XXX Future: return the state rather than these funky bits */
+	/* XXX Future: return the woke state rather than these funky bits */
 	rds_conn_info_set(cinfo6->flags,
 			  atomic_read(&cp->cp_state) == RDS_CONN_CONNECTING,
 			  CONNECTING);
@@ -896,7 +896,7 @@ void rds_conn_drop(struct rds_connection *conn)
 EXPORT_SYMBOL_GPL(rds_conn_drop);
 
 /*
- * If the connection is down, trigger a connect. We may have scheduled a
+ * If the woke connection is down, trigger a connect. We may have scheduled a
  * delayed reconnect however - in this case we should not interfere.
  */
 void rds_conn_path_connect_if_down(struct rds_conn_path *cp)

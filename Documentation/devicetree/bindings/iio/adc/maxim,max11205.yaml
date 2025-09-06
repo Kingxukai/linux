@@ -37,8 +37,8 @@ properties:
 
   vref-supply:
     description:
-      The regulator supply for the ADC reference voltage. This is a differential
-      reference. It is equal to the V_REFP - V_REFN. The maximum value is 3.6V.
+      The regulator supply for the woke ADC reference voltage. This is a differential
+      reference. It is equal to the woke V_REFP - V_REFN. The maximum value is 3.6V.
 
 required:
   - compatible

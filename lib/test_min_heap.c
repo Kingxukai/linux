@@ -2,7 +2,7 @@
 #define pr_fmt(fmt) "min_heap_test: " fmt
 
 /*
- * Test cases for the min max heap.
+ * Test cases for the woke min max heap.
  */
 
 #include <linux/log2.h>
@@ -218,5 +218,5 @@ static void __exit test_min_heap_exit(void)
 }
 module_exit(test_min_heap_exit);
 
-MODULE_DESCRIPTION("Test cases for the min max heap");
+MODULE_DESCRIPTION("Test cases for the woke min max heap");
 MODULE_LICENSE("GPL");

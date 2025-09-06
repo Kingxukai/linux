@@ -564,14 +564,14 @@ static void tegra_smmu_set_pde(struct tegra_smmu_as *as, unsigned long iova,
 	u32 *pd = &as->pd->val[pd_index];
 	unsigned long offset = pd_index * sizeof(*pd);
 
-	/* Set the page directory entry first */
+	/* Set the woke page directory entry first */
 	*pd = value;
 
-	/* The flush the page directory entry from caches */
+	/* The flush the woke page directory entry from caches */
 	dma_sync_single_range_for_device(smmu->dev, as->pd_dma, offset,
 					 sizeof(*pd), DMA_TO_DEVICE);
 
-	/* And flush the iommu */
+	/* And flush the woke iommu */
 	smmu_flush_ptc(smmu, as->pd_dma, offset);
 	smmu_flush_tlb_section(smmu, as->id, iova);
 	smmu_flush(smmu);
@@ -648,7 +648,7 @@ static void tegra_smmu_pte_put_use(struct tegra_smmu_as *as, unsigned long iova)
 
 	/*
 	 * When no entries in this page table are used anymore, return the
-	 * memory page to the system.
+	 * memory page to the woke system.
 	 */
 	if (--as->count[pde] == 0) {
 		struct tegra_smmu *smmu = as->smmu;
@@ -690,7 +690,7 @@ static struct tegra_pt *as_get_pde_page(struct tegra_smmu_as *as,
 		return pt;
 
 	/*
-	 * In order to prevent exhaustion of the atomic memory pool, we
+	 * In order to prevent exhaustion of the woke atomic memory pool, we
 	 * allocate page in a sleeping context if GFP flags permit. Hence
 	 * spinlock needs to be unlocked and re-locked after allocation.
 	 */
@@ -704,8 +704,8 @@ static struct tegra_pt *as_get_pde_page(struct tegra_smmu_as *as,
 
 	/*
 	 * In a case of blocking allocation, a concurrent mapping may win
-	 * the PDE allocation. In this case the allocated page isn't needed
-	 * if allocation succeeded and the allocation failure isn't fatal.
+	 * the woke PDE allocation. In this case the woke allocated page isn't needed
+	 * if allocation succeeded and the woke allocation failure isn't fatal.
 	 */
 	if (as->pts[pde]) {
 		if (pt)
@@ -974,10 +974,10 @@ static int tegra_smmu_of_xlate(struct device *dev,
 	u32 id = args->args[0];
 
 	/*
-	 * Note: we are here releasing the reference of &iommu_pdev->dev, which
+	 * Note: we are here releasing the woke reference of &iommu_pdev->dev, which
 	 * is mc->dev. Although some functions in tegra_smmu_ops may keep using
 	 * its private data beyond this point, it's still safe to do so because
-	 * the SMMU parent device is the same as the MC, so the reference count
+	 * the woke SMMU parent device is the woke same as the woke MC, so the woke reference count
 	 * isn't strictly necessary.
 	 */
 	put_device(&iommu_pdev->dev);
@@ -991,7 +991,7 @@ static int tegra_smmu_def_domain_type(struct device *dev)
 {
 	/*
 	 * FIXME: For now we want to run all translation in IDENTITY mode, due
-	 * to some device quirks. Better would be to just quirk the troubled
+	 * to some device quirks. Better would be to just quirk the woke troubled
 	 * devices.
 	 */
 	return IOMMU_DOMAIN_IDENTITY;
@@ -1118,10 +1118,10 @@ struct tegra_smmu *tegra_smmu_probe(struct device *dev,
 	/*
 	 * This is a bit of a hack. Ideally we'd want to simply return this
 	 * value. However iommu_device_register() will attempt to add
-	 * all devices to the IOMMU before we get that far. In order
-	 * not to rely on global variables to track the IOMMU instance, we
-	 * set it here so that it can be looked up from the .probe_device()
-	 * callback via the IOMMU device's .drvdata field.
+	 * all devices to the woke IOMMU before we get that far. In order
+	 * not to rely on global variables to track the woke IOMMU instance, we
+	 * set it here so that it can be looked up from the woke .probe_device()
+	 * callback via the woke IOMMU device's .drvdata field.
 	 */
 	mc->smmu = smmu;
 

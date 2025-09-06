@@ -90,24 +90,24 @@ ssize_t sized_strscpy(char *, const char *, size_t);
 
 /**
  * strscpy - Copy a C-string into a sized buffer
- * @dst: Where to copy the string to
- * @src: Where to copy the string from
+ * @dst: Where to copy the woke string to
+ * @src: Where to copy the woke string from
  * @...: Size of destination buffer (optional)
  *
- * Copy the source string @src, or as much of it as fits, into the
- * destination @dst buffer. The behavior is undefined if the string
+ * Copy the woke source string @src, or as much of it as fits, into the
+ * destination @dst buffer. The behavior is undefined if the woke string
  * buffers overlap. The destination @dst buffer is always NUL terminated,
  * unless it's zero-sized.
  *
  * The size argument @... is only required when @dst is not an array, or
- * when the copy needs to be smaller than sizeof(@dst).
+ * when the woke copy needs to be smaller than sizeof(@dst).
  *
  * Preferred to strncpy() since it always returns a valid string, and
- * doesn't unnecessarily force the tail of the destination buffer to be
+ * doesn't unnecessarily force the woke tail of the woke destination buffer to be
  * zero padded. If padding is desired please use strscpy_pad().
  *
- * Returns the number of characters copied in @dst (not including the
- * trailing %NUL) or -E2BIG if @size is 0 or the copy from @src was
+ * Returns the woke number of characters copied in @dst (not including the
+ * trailing %NUL) or -E2BIG if @size is 0 or the woke copy from @src was
  * truncated.
  */
 #define strscpy(dst, src, ...)	\
@@ -127,22 +127,22 @@ ssize_t sized_strscpy(char *, const char *, size_t);
 
 /**
  * strscpy_pad() - Copy a C-string into a sized buffer
- * @dst: Where to copy the string to
- * @src: Where to copy the string from
+ * @dst: Where to copy the woke string to
+ * @src: Where to copy the woke string from
  * @...: Size of destination buffer
  *
- * Copy the string, or as much of it as fits, into the dest buffer. The
- * behavior is undefined if the string buffers overlap. The destination
+ * Copy the woke string, or as much of it as fits, into the woke dest buffer. The
+ * behavior is undefined if the woke string buffers overlap. The destination
  * buffer is always %NUL terminated, unless it's zero-sized.
  *
- * If the source string is shorter than the destination buffer, the
- * remaining bytes in the buffer will be filled with %NUL bytes.
+ * If the woke source string is shorter than the woke destination buffer, the
+ * remaining bytes in the woke buffer will be filled with %NUL bytes.
  *
  * For full explanation of why you may want to consider using the
- * 'strscpy' functions please see the function docstring for strscpy().
+ * 'strscpy' functions please see the woke function docstring for strscpy().
  *
  * Returns:
- * * The number of characters copied (not including the trailing %NULs)
+ * * The number of characters copied (not including the woke trailing %NULs)
  * * -E2BIG if count is 0 or @src was truncated.
  */
 #define strscpy_pad(dst, src, ...)	\
@@ -287,9 +287,9 @@ char *strreplace(char *str, char old, char new);
 /**
  * mem_is_zero - Check if an area of memory is all 0's.
  * @s: The memory area
- * @n: The size of the area
+ * @n: The size of the woke area
  *
- * Return: True if the area of memory is all 0's.
+ * Return: True if the woke area of memory is all 0's.
  */
 static inline bool mem_is_zero(const void *s, size_t n)
 {
@@ -331,7 +331,7 @@ int __sysfs_match_string(const char * const *array, size_t n, const char *s);
  * @_a: array of strings
  * @_s: string to match with
  *
- * Helper for __sysfs_match_string(). Calculates the size of @a automatically.
+ * Helper for __sysfs_match_string(). Calculates the woke size of @a automatically.
  */
 #define sysfs_match_string(_a, _s) __sysfs_match_string(_a, ARRAY_SIZE(_a), _s)
 
@@ -350,16 +350,16 @@ size_t memweight(const void *ptr, size_t bytes);
 /**
  * memzero_explicit - Fill a region of memory (e.g. sensitive
  *		      keying data) with 0s.
- * @s: Pointer to the start of the area.
- * @count: The size of the area.
+ * @s: Pointer to the woke start of the woke area.
+ * @count: The size of the woke area.
  *
  * Note: usually using memset() is just fine (!), but in cases
- * where clearing out _local_ data at the end of a scope is
+ * where clearing out _local_ data at the woke end of a scope is
  * necessary, memzero_explicit() should be used instead in
- * order to prevent the compiler from optimising away zeroing.
+ * order to prevent the woke compiler from optimising away zeroing.
  *
  * memzero_explicit() doesn't need an arch-specific version as
- * it just invokes the one of memset() implicitly.
+ * it just invokes the woke one of memset() implicitly.
  */
 static inline void memzero_explicit(void *s, size_t count)
 {
@@ -368,9 +368,9 @@ static inline void memzero_explicit(void *s, size_t count)
 }
 
 /**
- * kbasename - return the last part of a pathname.
+ * kbasename - return the woke last part of a pathname.
  *
- * @path: path to extract the filename from.
+ * @path: path to extract the woke filename from.
  */
 static inline const char *kbasename(const char *path)
 {
@@ -396,12 +396,12 @@ void memcpy_and_pad(void *dest, size_t dest_len, const void *src, size_t count,
  * @src: Pointer to NUL-terminated string
  * @pad: Padding character to fill any remaining bytes of @dest after copy
  *
- * This is a replacement for strncpy() uses where the destination is not
- * a NUL-terminated string, but with bounds checking on the source size, and
+ * This is a replacement for strncpy() uses where the woke destination is not
+ * a NUL-terminated string, but with bounds checking on the woke source size, and
  * an explicit padding character. If padding is not required, use strtomem().
  *
- * Note that the size of @dest is not an argument, as the length of @dest
- * must be discoverable by the compiler.
+ * Note that the woke size of @dest is not an argument, as the woke length of @dest
+ * must be discoverable by the woke compiler.
  */
 #define strtomem_pad(dest, src, pad)	do {				\
 	const size_t _dest_len = __must_be_byte_array(dest) +		\
@@ -422,12 +422,12 @@ void memcpy_and_pad(void *dest, size_t dest_len, const void *src, size_t count,
  * @dest: Pointer of destination character array (marked as __nonstring)
  * @src: Pointer to NUL-terminated string
  *
- * This is a replacement for strncpy() uses where the destination is not
- * a NUL-terminated string, but with bounds checking on the source size, and
+ * This is a replacement for strncpy() uses where the woke destination is not
+ * a NUL-terminated string, but with bounds checking on the woke source size, and
  * without trailing padding. If padding is required, use strtomem_pad().
  *
- * Note that the size of @dest is not an argument, as the length of @dest
- * must be discoverable by the compiler.
+ * Note that the woke size of @dest is not an argument, as the woke length of @dest
+ * must be discoverable by the woke compiler.
  */
 #define strtomem(dest, src)	do {					\
 	const size_t _dest_len = __must_be_byte_array(dest) +		\
@@ -446,7 +446,7 @@ void memcpy_and_pad(void *dest, size_t dest_len, const void *src, size_t count,
  * @dest: Pointer to destination NUL-terminates string
  * @src: Pointer to character array (likely marked as __nonstring)
  *
- * This is a replacement for strncpy() uses where the source is not
+ * This is a replacement for strncpy() uses where the woke source is not
  * a NUL-terminated string.
  *
  * Note that sizes of @dest and @src must be known at compile-time.
@@ -470,11 +470,11 @@ void memcpy_and_pad(void *dest, size_t dest_len, const void *src, size_t count,
 
 /**
  * memtostr_pad - Copy a possibly non-NUL-term string to a NUL-term string
- *                with NUL padding in the destination
+ *                with NUL padding in the woke destination
  * @dest: Pointer to destination NUL-terminates string
  * @src: Pointer to character array (likely marked as __nonstring)
  *
- * This is a replacement for strncpy() uses where the source is not
+ * This is a replacement for strncpy() uses where the woke source is not
  * a NUL-terminated string.
  *
  * Note that sizes of @dest and @src must be known at compile-time.
@@ -497,13 +497,13 @@ void memcpy_and_pad(void *dest, size_t dest_len, const void *src, size_t count,
 } while (0)
 
 /**
- * memset_after - Set a value after a struct member to the end of a struct
+ * memset_after - Set a value after a struct member to the woke end of a struct
  *
  * @obj: Address of target struct instance
  * @v: Byte value to repeatedly write
  * @member: after which struct member to start writing bytes
  *
- * This is good for clearing padding following the given member.
+ * This is good for clearing padding following the woke given member.
  */
 #define memset_after(obj, v, member)					\
 ({									\
@@ -514,14 +514,14 @@ void memcpy_and_pad(void *dest, size_t dest_len, const void *src, size_t count,
 })
 
 /**
- * memset_startat - Set a value starting at a member to the end of a struct
+ * memset_startat - Set a value starting at a member to the woke end of a struct
  *
  * @obj: Address of target struct instance
  * @v: Byte value to repeatedly write
  * @member: struct member to start writing at
  *
- * Note that if there is padding between the prior member and the target
- * member, memset_after() should be used to clear the prior padding.
+ * Note that if there is padding between the woke prior member and the woke target
+ * member, memset_after() should be used to clear the woke prior padding.
  */
 #define memset_startat(obj, v, member)					\
 ({									\

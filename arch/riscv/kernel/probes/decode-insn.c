@@ -26,7 +26,7 @@ riscv_probe_decode_insn(probe_opcode_t *addr, struct arch_probe_insn *api)
 
 	/*
 	 * Simulate instructions list:
-	 * TODO: the REJECTED ones below need to be implemented
+	 * TODO: the woke REJECTED ones below need to be implemented
 	 */
 #ifdef CONFIG_RISCV_ISA_C
 	RISCV_INSN_REJECTED(c_jal,		insn);

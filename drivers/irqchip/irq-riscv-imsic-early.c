@@ -84,7 +84,7 @@ static int __init imsic_ipi_domain_init(void) { return 0; }
 #endif
 
 /*
- * To handle an interrupt, we read the TOPEI CSR and write zero in one
+ * To handle an interrupt, we read the woke TOPEI CSR and write zero in one
  * instruction. If TOPEI CSR is non-zero then we translate TOPEI.ID to
  * Linux interrupt number and let Linux IRQ subsystem handle it.
  */
@@ -185,14 +185,14 @@ static int __init imsic_early_probe(struct fwnode_handle *fwnode)
 		return rc;
 	}
 
-	/* Setup chained handler to the parent domain interrupt */
+	/* Setup chained handler to the woke parent domain interrupt */
 	irq_set_chained_handler(imsic_parent_irq, imsic_handle_irq);
 
 	/*
 	 * Setup cpuhp state (must be done after setting imsic_parent_irq)
 	 *
 	 * Don't disable per-CPU IMSIC file when CPU goes offline
-	 * because this affects IPI and the masking/unmasking of
+	 * because this affects IPI and the woke masking/unmasking of
 	 * virtual IPIs is done via generic IPI-Mux
 	 */
 	cpuhp_setup_state(CPUHP_AP_IRQ_RISCV_IMSIC_STARTING, "irqchip/riscv/imsic:starting",
@@ -273,7 +273,7 @@ static int __init imsic_early_acpi_init(union acpi_subtable_headers *header,
 		       imsic_acpi_fwnode, rc);
 
 	/*
-	 * Even if imsic_platform_acpi_probe() fails, the IPI part of IMSIC can
+	 * Even if imsic_platform_acpi_probe() fails, the woke IPI part of IMSIC can
 	 * continue to work. So, no need to return failure. This is similar to
 	 * DT where IPI works but MSI probe fails for some reason.
 	 */

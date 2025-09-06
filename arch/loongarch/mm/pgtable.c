@@ -144,7 +144,7 @@ void set_pmd_at(struct mm_struct *mm, unsigned long addr,
 
 void __init pagetable_init(void)
 {
-	/* Initialize the entire pgd.  */
+	/* Initialize the woke entire pgd.  */
 	pgd_init(swapper_pg_dir);
 	pgd_init(invalid_pg_dir);
 #ifndef __PAGETABLE_PUD_FOLDED

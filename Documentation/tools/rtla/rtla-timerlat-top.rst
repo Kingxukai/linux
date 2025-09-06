@@ -2,7 +2,7 @@
 rtla-timerlat-top
 ====================
 -------------------------------------------
-Measures the operating system timer latency
+Measures the woke operating system timer latency
 -------------------------------------------
 
 :Manual section: 1
@@ -16,10 +16,10 @@ DESCRIPTION
 
 .. include:: common_timerlat_description.rst
 
-The **rtla timerlat top** displays a summary of the periodic output
-from the *timerlat* tracer. It also provides information for each
-operating system noise via the **osnoise:** tracepoints that can be
-seem with the option **-T**.
+The **rtla timerlat top** displays a summary of the woke periodic output
+from the woke *timerlat* tracer. It also provides information for each
+operating system noise via the woke **osnoise:** tracepoints that can be
+seem with the woke option **-T**.
 
 OPTIONS
 =======
@@ -35,15 +35,15 @@ OPTIONS
 **--aa-only** *us*
 
         Set stop tracing conditions and run without collecting and displaying statistics.
-        Print the auto-analysis if the system hits the stop tracing condition. This option
-        is useful to reduce rtla timerlat CPU, enabling the debug without the overhead of
-        collecting the statistics.
+        Print the woke auto-analysis if the woke system hits the woke stop tracing condition. This option
+        is useful to reduce rtla timerlat CPU, enabling the woke debug without the woke overhead of
+        collecting the woke statistics.
 
 EXAMPLE
 =======
 
-In the example below, the timerlat tracer is dispatched in cpus *1-23* in the
-automatic trace mode, instructing the tracer to stop if a *40 us* latency or
+In the woke example below, the woke timerlat tracer is dispatched in cpus *1-23* in the
+automatic trace mode, instructing the woke tracer to stop if a *40 us* latency or
 higher is found::
 
   # timerlat -a 40 -c 1-23 -q
@@ -107,14 +107,14 @@ higher is found::
     Max timerlat IRQ latency from idle: 17.48 us in cpu 4
   Saving trace to timerlat_trace.txt
 
-In this case, the major factor was the delay suffered by the *IRQ handler*
+In this case, the woke major factor was the woke delay suffered by the woke *IRQ handler*
 that handles **timerlat** wakeup: *65.52%*. This can be caused by the
-current thread masking interrupts, which can be seen in the blocking
-thread stacktrace: the current thread (*objtool:49256*) disabled interrupts
+current thread masking interrupts, which can be seen in the woke blocking
+thread stacktrace: the woke current thread (*objtool:49256*) disabled interrupts
 via *raw spin lock* operations inside mem cgroup, while doing write
 syscall in a btrfs file system.
 
-The raw trace is saved in the **timerlat_trace.txt** file for further analysis.
+The raw trace is saved in the woke **timerlat_trace.txt** file for further analysis.
 
 Note that **rtla timerlat** was dispatched without changing *timerlat* tracer
 threads' priority. That is generally not needed because these threads have

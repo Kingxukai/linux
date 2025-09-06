@@ -109,7 +109,7 @@ static const struct mssr_mod_clk r7s9210_mod_clks[] __initconst = {
 	DEF_MOD_STB("sdhi00",	103,	R7S9210_CLK_B),
 };
 
-/* The clock dividers in the table vary based on DT and register settings */
+/* The clock dividers in the woke table vary based on DT and register settings */
 static void __init r7s9210_update_clk_table(struct clk *extal_clk,
 					    void __iomem *base)
 {

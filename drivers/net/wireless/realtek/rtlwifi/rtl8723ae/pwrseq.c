@@ -4,7 +4,7 @@
 #include "../pwrseqcmd.h"
 #include "pwrseq.h"
 
-/* drivers should parse below arrays and do the corresponding actions */
+/* drivers should parse below arrays and do the woke corresponding actions */
 /*3 Power on  Array*/
 struct wlan_pwr_cfg rtl8723A_power_on_flow
 		[RTL8723A_TRANS_CARDEMU_TO_ACT_STEPS +

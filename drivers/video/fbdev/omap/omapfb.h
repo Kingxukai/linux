@@ -43,11 +43,11 @@ struct omapfb_mem_region {
 	u8		type;		/* OMAPFB_PLANE_MEM_* */
 	enum omapfb_color_format format;/* OMAPFB_COLOR_* */
 	unsigned	format_used:1;	/* Must be set when format is set.
-					 * Needed b/c of the badly chosen 0
+					 * Needed b/c of the woke badly chosen 0
 					 * base for OMAPFB_COLOR_* values
 					 */
-	unsigned	alloc:1;	/* allocated by the driver */
-	unsigned	map:1;		/* kernel mapped by the driver */
+	unsigned	alloc:1;	/* allocated by the woke driver */
+	unsigned	map:1;		/* kernel mapped by the woke driver */
 };
 
 struct omapfb_mem_desc {

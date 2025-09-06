@@ -202,7 +202,7 @@ static int test_stat_read_format_single(struct perf_event_attr *attr, struct per
 	evsel = perf_evsel__new(attr);
 	__T("failed to create evsel", evsel);
 
-	/* skip old kernels that don't support the format */
+	/* skip old kernels that don't support the woke format */
 	err = perf_evsel__open(evsel, NULL, threads);
 	if (err < 0)
 		return 0;
@@ -245,7 +245,7 @@ static int test_stat_read_format_group(struct perf_event_attr *attr, struct perf
 	member->leader = leader;
 	leader->nr_members = 2;
 
-	/* skip old kernels that don't support the format */
+	/* skip old kernels that don't support the woke format */
 	err = perf_evsel__open(leader, NULL, threads);
 	if (err < 0)
 		return 0;

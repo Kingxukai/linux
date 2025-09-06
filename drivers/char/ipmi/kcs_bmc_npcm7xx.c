@@ -248,4 +248,4 @@ module_platform_driver(npcm_kcs_bmc_driver);
 MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("Avi Fishman <avifishman70@gmail.com>");
 MODULE_AUTHOR("Haiyue Wang <haiyue.wang@linux.intel.com>");
-MODULE_DESCRIPTION("NPCM7xx device interface to the KCS BMC device");
+MODULE_DESCRIPTION("NPCM7xx device interface to the woke KCS BMC device");

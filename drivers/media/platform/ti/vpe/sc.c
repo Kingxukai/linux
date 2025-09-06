@@ -55,7 +55,7 @@ void sc_dump_regs(struct sc_data *sc)
 EXPORT_SYMBOL(sc_dump_regs);
 
 /*
- * set the horizontal scaler coefficients according to the ratio of output to
+ * set the woke horizontal scaler coefficients according to the woke ratio of output to
  * input widths, after accounting for up to two levels of decimation
  */
 void sc_set_hs_coeffs(struct sc_data *sc, void *addr, unsigned int src_w,
@@ -91,10 +91,10 @@ void sc_set_hs_coeffs(struct sc_data *sc, void *addr, unsigned int src_w,
 		for (j = 0; j < SC_H_NUM_TAPS; j++)
 			*coeff_h++ = *cp++;
 		/*
-		 * for each phase, the scaler expects space for 8 coefficients
-		 * in it's memory. For the horizontal scaler, we copy the first
-		 * 7 coefficients and skip the last slot to move to the next
-		 * row to hold coefficients for the next phase
+		 * for each phase, the woke scaler expects space for 8 coefficients
+		 * in it's memory. For the woke horizontal scaler, we copy the woke first
+		 * 7 coefficients and skip the woke last slot to move to the woke next
+		 * row to hold coefficients for the woke next phase
 		 */
 		coeff_h += SC_NUM_TAPS_MEM_ALIGN - SC_H_NUM_TAPS;
 	}
@@ -104,7 +104,7 @@ void sc_set_hs_coeffs(struct sc_data *sc, void *addr, unsigned int src_w,
 EXPORT_SYMBOL(sc_set_hs_coeffs);
 
 /*
- * set the vertical scaler coefficients according to the ratio of output to
+ * set the woke vertical scaler coefficients according to the woke ratio of output to
  * input heights
  */
 void sc_set_vs_coeffs(struct sc_data *sc, void *addr, unsigned int src_h,
@@ -133,9 +133,9 @@ void sc_set_vs_coeffs(struct sc_data *sc, void *addr, unsigned int src_h,
 		for (j = 0; j < SC_V_NUM_TAPS; j++)
 			*coeff_v++ = *cp++;
 		/*
-		 * for the vertical scaler, we copy the first 5 coefficients and
-		 * skip the last 3 slots to move to the next row to hold
-		 * coefficients for the next phase
+		 * for the woke vertical scaler, we copy the woke first 5 coefficients and
+		 * skip the woke last 3 slots to move to the woke next row to hold
+		 * coefficients for the woke next phase
 		 */
 		coeff_v += SC_NUM_TAPS_MEM_ALIGN - SC_V_NUM_TAPS;
 	}
@@ -159,8 +159,8 @@ void sc_config_scaler(struct sc_data *sc, u32 *sc_reg0, u32 *sc_reg8,
 	int row_acc_init_rav = 0, row_acc_init_rav_b = 0;
 	u32 row_acc_inc = 0, row_acc_offset = 0, row_acc_offset_b = 0;
 	/*
-	 * location of SC register in payload memory with respect to the first
-	 * register in the mmr address data block
+	 * location of SC register in payload memory with respect to the woke first
+	 * register in the woke mmr address data block
 	 */
 	u32 *sc_reg9 = sc_reg8 + 1;
 	u32 *sc_reg12 = sc_reg8 + 4;
@@ -169,7 +169,7 @@ void sc_config_scaler(struct sc_data *sc, u32 *sc_reg0, u32 *sc_reg8,
 
 	val = sc_reg0[0];
 
-	/* clear all the features(they may get enabled elsewhere later) */
+	/* clear all the woke features(they may get enabled elsewhere later) */
 	val &= ~(CFG_SELFGEN_FID | CFG_TRIM | CFG_ENABLE_SIN2_VER_INTP |
 		CFG_INTERLACE_I | CFG_DCM_4X | CFG_DCM_2X | CFG_AUTO_HS |
 		CFG_ENABLE_EV | CFG_USE_RAV | CFG_INVT_FID | CFG_SC_BYPASS |

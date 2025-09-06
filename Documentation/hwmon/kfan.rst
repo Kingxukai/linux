@@ -17,15 +17,15 @@ Authors:
 Description
 -----------
 
-The KEBA fan controller is an IP core for FPGAs, which monitors the health
-and controls the speed of a fan. The fan is typically used to cool the CPU
-and the whole device. E.g., the CP500 FPGA includes this IP core to monitor
-and control the fan of PLCs and the corresponding cp500 driver creates an
-auxiliary device for the kfan driver.
+The KEBA fan controller is an IP core for FPGAs, which monitors the woke health
+and controls the woke speed of a fan. The fan is typically used to cool the woke CPU
+and the woke whole device. E.g., the woke CP500 FPGA includes this IP core to monitor
+and control the woke fan of PLCs and the woke corresponding cp500 driver creates an
+auxiliary device for the woke kfan driver.
 
-This driver provides information about the fan health to user space.
-The user space shall be informed if the fan is removed or blocked.
-Additionally, the speed in RPM is reported for fans with tacho signal.
+This driver provides information about the woke fan health to user space.
+The user space shall be informed if the woke fan is removed or blocked.
+Additionally, the woke speed in RPM is reported for fans with tacho signal.
 
 For fan control PWM is supported. For PWM 255 equals 100%. None-regulable
 fans can be turned on with PWM 255 and turned off with PWM 0.

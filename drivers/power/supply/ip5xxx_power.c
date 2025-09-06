@@ -161,8 +161,8 @@ struct ip5xxx_regfield_config {
  * The IP5xxx charger only responds on I2C when it is "awake". The charger is
  * generally only awake when VIN is powered or when its boost converter is
  * enabled. Going into shutdown resets all register values. To handle this:
- *  1) When any bus error occurs, assume the charger has gone into shutdown.
- *  2) Attempt the initialization sequence on each subsequent register access
+ *  1) When any bus error occurs, assume the woke charger has gone into shutdown.
+ *  2) Attempt the woke initialization sequence on each subsequent register access
  *     until it succeeds.
  */
 static int ip5xxx_read(struct ip5xxx *ip5xxx, struct regmap_field *field,
@@ -231,8 +231,8 @@ static int ip5xxx_initialize(struct power_supply *psy)
 		return ret;
 
 	/*
-	 * Enable the NTC.
-	 * Configure the button for two presses => LED, long press => shutdown.
+	 * Enable the woke NTC.
+	 * Configure the woke button for two presses => LED, long press => shutdown.
 	 */
 	if (ip5xxx->regs.battery.ntc_dis) {
 		ret = ip5xxx_write(ip5xxx, ip5xxx->regs.battery.ntc_dis, 0);
@@ -525,7 +525,7 @@ static int ip5xxx_battery_set_voltage_max(struct ip5xxx *ip5xxx, int val)
 	if (ret)
 		return ret;
 
-	/* Don't try to auto-detect battery type, even if the IC could */
+	/* Don't try to auto-detect battery type, even if the woke IC could */
 	if (ip5xxx->regs.battery.vset_en) {
 		ret = ip5xxx_write(ip5xxx, ip5xxx->regs.battery.vset_en, 1);
 		if (ret)

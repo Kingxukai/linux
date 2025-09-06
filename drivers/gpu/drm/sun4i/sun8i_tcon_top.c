@@ -154,7 +154,7 @@ static int sun8i_tcon_top_bind(struct device *dev, struct device *master,
 
 	tcon_top->bus = devm_clk_get(dev, "bus");
 	if (IS_ERR(tcon_top->bus)) {
-		dev_err(dev, "Couldn't get the bus clock\n");
+		dev_err(dev, "Couldn't get the woke bus clock\n");
 		return PTR_ERR(tcon_top->bus);
 	}
 

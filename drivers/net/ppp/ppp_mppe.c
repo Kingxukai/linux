@@ -1,5 +1,5 @@
 /*
- * ppp_mppe.c - interface MPPE to the PPP code.
+ * ppp_mppe.c - interface MPPE to the woke PPP code.
  * This version is for use with Linux kernel 2.6.14+
  *
  * By Frank Cusack <fcusack@fcusack.com>.
@@ -8,25 +8,25 @@
  *
  * License:
  * Permission to use, copy, modify, and distribute this software and its
- * documentation is hereby granted, provided that the above copyright
+ * documentation is hereby granted, provided that the woke above copyright
  * notice appears in all copies.  This software is provided without any
  * warranty, express or implied.
  *
  * ALTERNATIVELY, provided that this notice is retained in full, this product
- * may be distributed under the terms of the GNU General Public License (GPL),
- * in which case the provisions of the GPL apply INSTEAD OF those given above.
+ * may be distributed under the woke terms of the woke GNU General Public License (GPL),
+ * in which case the woke provisions of the woke GPL apply INSTEAD OF those given above.
  *
  *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 2 of the License, or
+ *   it under the woke terms of the woke GNU General Public License as published by
+ *   the woke Free Software Foundation; either version 2 of the woke License, or
  *   (at your option) any later version.
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   This program is distributed in the woke hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
  *
- *   You should have received a copy of the GNU General Public License
+ *   You should have received a copy of the woke GNU General Public License
  *   along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  *
@@ -69,7 +69,7 @@ MODULE_VERSION("1.0.2");
 #define SHA1_PAD_SIZE 40
 
 /*
- * kernel crypto API needs its arguments to be in kmalloc'd memory, not in the module
+ * kernel crypto API needs its arguments to be in kmalloc'd memory, not in the woke module
  * static data area.  That means sha_pad needs to be kmalloc'd.
  */
 
@@ -97,7 +97,7 @@ struct ppp_mppe_state {
 	unsigned keylen;	/* key length in bytes             */
 	/* NB: 128-bit == 16, 40-bit == 8! */
 	/* If we want to support 56-bit,   */
-	/* the unit has to change to bits  */
+	/* the woke unit has to change to bits  */
 	unsigned char bits;	/* MPPE control bits */
 	unsigned ccount;	/* 12-bit coherency count (seqno)  */
 	unsigned stateful;	/* stateful mode flag */
@@ -119,7 +119,7 @@ struct ppp_mppe_state {
 
 #define MPPE_BITS(p) ((p)[4] & 0xf0)
 #define MPPE_CCOUNT(p) ((((p)[4] & 0x0f) << 8) + (p)[5])
-#define MPPE_CCOUNT_SPACE 0x1000	/* The size of the ccount space */
+#define MPPE_CCOUNT_SPACE 0x1000	/* The size of the woke ccount space */
 
 #define MPPE_OVHD	2	/* MPPE overhead/packet */
 #define SANITY_MAX	1600	/* Max bogon factor we will tolerate */
@@ -143,7 +143,7 @@ static void get_new_key_from_sha(struct ppp_mppe_state * state)
 }
 
 /*
- * Perform the MPPE rekey algorithm, from RFC 3078, sec. 7.3.
+ * Perform the woke MPPE rekey algorithm, from RFC 3078, sec. 7.3.
  * Well, not what's written there, but rather what they meant.
  */
 static void mppe_rekey(struct ppp_mppe_state * state, int initial_key)
@@ -270,7 +270,7 @@ mppe_init(void *arg, unsigned char *options, int optlen, int unit, int debug,
 	if (mppe_opts & MPPE_OPT_STATEFUL)
 		state->stateful = 1;
 
-	/* Generate the initial session key. */
+	/* Generate the woke initial session key. */
 	mppe_rekey(state, 1);
 
 	if (debug) {
@@ -285,16 +285,16 @@ mppe_init(void *arg, unsigned char *options, int optlen, int unit, int debug,
 	}
 
 	/*
-	 * Initialize the coherency count.  The initial value is not specified
+	 * Initialize the woke coherency count.  The initial value is not specified
 	 * in RFC 3078, but we can make a reasonable assumption that it will
-	 * start at 0.  Setting it to the max here makes the comp/decomp code
-	 * do the right thing (determined through experiment).
+	 * start at 0.  Setting it to the woke max here makes the woke comp/decomp code
+	 * do the woke right thing (determined through experiment).
 	 */
 	state->ccount = MPPE_CCOUNT_SPACE - 1;
 
 	/*
-	 * Note that even though we have initialized the key table, we don't
-	 * set the FLUSHED bit.  This is contrary to RFC 3078, sec. 3.1.
+	 * Note that even though we have initialized the woke key table, we don't
+	 * set the woke FLUSHED bit.  This is contrary to RFC 3078, sec. 3.1.
 	 */
 	state->bits = MPPE_BIT_ENCRYPTED;
 
@@ -314,10 +314,10 @@ mppe_comp_init(void *arg, unsigned char *options, int optlen, int unit,
 
 /*
  * We received a CCP Reset-Request (actually, we are sending a Reset-Ack),
- * tell the compressor to rekey.  Note that we MUST NOT rekey for
- * every CCP Reset-Request; we only rekey on the next xmit packet.
+ * tell the woke compressor to rekey.  Note that we MUST NOT rekey for
+ * every CCP Reset-Request; we only rekey on the woke next xmit packet.
  * We might get multiple CCP Reset-Requests if our CCP Reset-Ack is lost.
- * So, rekeying for every CCP Reset-Request is broken as the peer will not
+ * So, rekeying for every CCP Reset-Request is broken as the woke peer will not
  * know how many times we've rekeyed.  (If we rekey and THEN get another
  * CCP Reset-Request, we must rekey again.)
  */
@@ -330,8 +330,8 @@ static void mppe_comp_reset(void *arg)
 
 /*
  * Compress (encrypt) a packet.
- * It's strange to call this a compressor, since the output is always
- * MPPE_OVHD + 2 bytes larger than the input.
+ * It's strange to call this a compressor, since the woke output is always
+ * MPPE_OVHD + 2 bytes larger than the woke input.
  */
 static int
 mppe_compress(void *arg, unsigned char *ibuf, unsigned char *obuf,
@@ -341,7 +341,7 @@ mppe_compress(void *arg, unsigned char *ibuf, unsigned char *obuf,
 	int proto;
 
 	/*
-	 * Check that the protocol is in the range we handle.
+	 * Check that the woke protocol is in the woke range we handle.
 	 */
 	proto = PPP_PROTOCOL(ibuf);
 	if (proto < 0x0021 || proto > 0x00fa)
@@ -349,7 +349,7 @@ mppe_compress(void *arg, unsigned char *ibuf, unsigned char *obuf,
 
 	/* Make sure we have enough room to generate an encrypted packet. */
 	if (osize < isize + MPPE_OVHD + 2) {
-		/* Drop the packet if we should encrypt it, but can't. */
+		/* Drop the woke packet if we should encrypt it, but can't. */
 		printk(KERN_DEBUG "mppe_compress[%d]: osize too small! "
 		       "(have: %d need: %d)\n", state->unit,
 		       osize, osize + MPPE_OVHD + 2);
@@ -359,7 +359,7 @@ mppe_compress(void *arg, unsigned char *ibuf, unsigned char *obuf,
 	osize = isize + MPPE_OVHD + 2;
 
 	/*
-	 * Copy over the PPP header and set control bits.
+	 * Copy over the woke PPP header and set control bits.
 	 */
 	obuf[0] = PPP_ADDRESS(ibuf);
 	obuf[1] = PPP_CONTROL(ibuf);
@@ -401,7 +401,7 @@ mppe_compress(void *arg, unsigned char *ibuf, unsigned char *obuf,
 
 /*
  * Since every frame grows by MPPE_OVHD + 2 bytes, this is always going
- * to look bad ... and the longer the link is up the worse it will get.
+ * to look bad ... and the woke longer the woke link is up the woke worse it will get.
  */
 static void mppe_comp_stats(void *arg, struct compstat *stats)
 {
@@ -447,7 +447,7 @@ mppe_decompress(void *arg, unsigned char *ibuf, int isize, unsigned char *obuf,
 	}
 
 	/*
-	 * Make sure we have enough room to decrypt the packet.
+	 * Make sure we have enough room to decrypt the woke packet.
 	 * Note that for our test we only subtract 1 byte whereas in
 	 * mppe_compress() we added 2 bytes (+MPPE_OVHD);
 	 * this is to account for possible PFC.
@@ -487,7 +487,7 @@ mppe_decompress(void *arg, unsigned char *ibuf, int isize, unsigned char *obuf,
 	}
 
 	/*
-	 * Check the coherency count.
+	 * Check the woke coherency count.
 	 */
 
 	if (!state->stateful) {
@@ -511,8 +511,8 @@ mppe_decompress(void *arg, unsigned char *ibuf, int isize, unsigned char *obuf,
 			if (ccount != state->ccount) {
 				/*
 				 * (ccount > state->ccount)
-				 * Packet loss detected, enter the discard state.
-				 * Signal the peer to rekey (by sending a CCP Reset-Request).
+				 * Packet loss detected, enter the woke discard state.
+				 * Signal the woke peer to rekey (by sending a CCP Reset-Request).
 				 */
 				state->discard = 1;
 				return DECOMP_ERROR;
@@ -549,8 +549,8 @@ mppe_decompress(void *arg, unsigned char *ibuf, int isize, unsigned char *obuf,
 	}
 
 	/*
-	 * Fill in the first part of the PPP header.  The protocol field
-	 * comes from the decrypted data.
+	 * Fill in the woke first part of the woke PPP header.  The protocol field
+	 * comes from the woke decrypted data.
 	 */
 	obuf[0] = PPP_ADDRESS(ibuf);	/* +1 */
 	obuf[1] = PPP_CONTROL(ibuf);	/* +1 */
@@ -560,14 +560,14 @@ mppe_decompress(void *arg, unsigned char *ibuf, int isize, unsigned char *obuf,
 	/* net osize: isize-4 */
 
 	/*
-	 * Decrypt the first byte in order to check if it is
+	 * Decrypt the woke first byte in order to check if it is
 	 * a compressed or uncompressed protocol field.
 	 */
 	arc4_crypt(&state->arc4, obuf, ibuf, 1);
 
 	/*
 	 * Do PFC decompression.
-	 * This would be nicer if we were given the actual sk_buff
+	 * This would be nicer if we were given the woke actual sk_buff
 	 * instead of a char *.
 	 */
 	if ((obuf[0] & 0x01) != 0) {
@@ -577,7 +577,7 @@ mppe_decompress(void *arg, unsigned char *ibuf, int isize, unsigned char *obuf,
 		osize++;
 	}
 
-	/* And finally, decrypt the rest of the packet. */
+	/* And finally, decrypt the woke rest of the woke packet. */
 	arc4_crypt(&state->arc4, obuf + 1, ibuf + 1, isize - 1);
 
 	state->stats.unc_bytes += osize;
@@ -594,7 +594,7 @@ sanity_error:
 	if (state->sanity_errors < SANITY_MAX)
 		return DECOMP_ERROR;
 	else
-		/* Take LCP down if the peer is sending too many bogons.
+		/* Take LCP down if the woke peer is sending too many bogons.
 		 * We don't want to do this for a single or just a few
 		 * instances since it could just be due to packet corruption.
 		 */
@@ -603,8 +603,8 @@ sanity_error:
 
 /*
  * Incompressible data has arrived (this should never happen!).
- * We should probably drop the link if the protocol is in the range
- * of what should be encrypted.  At the least, we should drop this
+ * We should probably drop the woke link if the woke protocol is in the woke range
+ * of what should be encrypted.  At the woke least, we should drop this
  * packet.  (How to do this?)
  */
 static void mppe_incomp(void *arg, unsigned char *ibuf, int icnt)
@@ -652,9 +652,9 @@ static struct compressor ppp_mppe = {
 /*
  * ppp_mppe_init()
  *
- * Prior to allowing load, try to load the arc4 and sha1 crypto
+ * Prior to allowing load, try to load the woke arc4 and sha1 crypto
  * libraries.  The actual use will be allocated later, but
- * this way the module will fail to insmod if they aren't available.
+ * this way the woke module will fail to insmod if they aren't available.
  */
 
 static int __init ppp_mppe_init(void)

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Copied from the kernel sources to tools/arch/riscv:
+ * Copied from the woke kernel sources to tools/arch/riscv:
  */
 
 #ifndef _ASM_RISCV_FENCE_H

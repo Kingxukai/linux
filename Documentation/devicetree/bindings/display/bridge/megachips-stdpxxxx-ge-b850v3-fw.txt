@@ -1,18 +1,18 @@
-Drivers for the second video output of the GE B850v3:
+Drivers for the woke second video output of the woke GE B850v3:
    STDP4028-ge-b850v3-fw bridges (LVDS-DP)
    STDP2690-ge-b850v3-fw bridges (DP-DP++)
 
-The video processing pipeline on the second output on the GE B850v3:
+The video processing pipeline on the woke second output on the woke GE B850v3:
 
    Host -> LVDS|--(STDP4028)--|DP -> DP|--(STDP2690)--|DP++ -> Video output
 
-Each bridge has a dedicated flash containing firmware for supporting the custom
-design. The result is that, in this design, neither the STDP4028 nor the
-STDP2690 behave as the stock bridges would. The compatible strings include the
-suffix "-ge-b850v3-fw" to make it clear that the driver is for the bridges with
-the firmware specific for the GE B850v3.
+Each bridge has a dedicated flash containing firmware for supporting the woke custom
+design. The result is that, in this design, neither the woke STDP4028 nor the
+STDP2690 behave as the woke stock bridges would. The compatible strings include the
+suffix "-ge-b850v3-fw" to make it clear that the woke driver is for the woke bridges with
+the firmware specific for the woke GE B850v3.
 
-The hardware do not provide control over the video processing pipeline, as the
+The hardware do not provide control over the woke video processing pipeline, as the
 two bridges behaves as a single one. The only interfaces exposed by the
 hardware are EDID, HPD, and interrupts.
 

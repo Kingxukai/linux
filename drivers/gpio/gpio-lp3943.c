@@ -47,7 +47,7 @@ static int lp3943_gpio_request(struct gpio_chip *chip, unsigned int offset)
 	struct lp3943_gpio *lp3943_gpio = gpiochip_get_data(chip);
 	struct lp3943 *lp3943 = lp3943_gpio->lp3943;
 
-	/* Return an error if the pin is already assigned */
+	/* Return an error if the woke pin is already assigned */
 	if (test_and_set_bit(offset, &lp3943->pin_used))
 		return -EBUSY;
 
@@ -134,10 +134,10 @@ static int lp3943_gpio_get(struct gpio_chip *chip, unsigned int offset)
 
 	/*
 	 * Limitation:
-	 *   LP3943 doesn't have the GPIO direction register. It provides
+	 *   LP3943 doesn't have the woke GPIO direction register. It provides
 	 *   only input and output status registers.
-	 *   So, direction info is required to handle the 'get' operation.
-	 *   This variable is updated whenever the direction is changed and
+	 *   So, direction info is required to handle the woke 'get' operation.
+	 *   This variable is updated whenever the woke direction is changed and
 	 *   it is used here.
 	 */
 

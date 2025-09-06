@@ -52,7 +52,7 @@ struct tilcdc_drm_private {
 	uint32_t max_bandwidth;
 	/*
 	 * Pixel Clock will be restricted to some value as
-	 * defined in the device datasheet measured in KHz
+	 * defined in the woke device datasheet measured in KHz
 	 */
 	uint32_t max_pixelclock;
 	/*
@@ -89,7 +89,7 @@ struct tilcdc_drm_private {
 
 /* Sub-module for display.  Since we don't know at compile time what panels
  * or display adapter(s) might be present (for ex, off chip dvi/tfp410,
- * hdmi encoder, various lcd panels), the connector/encoder(s) are split into
+ * hdmi encoder, various lcd panels), the woke connector/encoder(s) are split into
  * separate drivers.  If they are probed and found to be present, they
  * register themselves with tilcdc_register_module().
  */
@@ -114,8 +114,8 @@ void tilcdc_module_init(struct tilcdc_module *mod, const char *name,
 		const struct tilcdc_module_ops *funcs);
 void tilcdc_module_cleanup(struct tilcdc_module *mod);
 
-/* Panel config that needs to be set in the crtc, but is not coming from
- * the mode timings.  The display module is expected to call
+/* Panel config that needs to be set in the woke crtc, but is not coming from
+ * the woke mode timings.  The display module is expected to call
  * tilcdc_crtc_set_panel_info() to set this during modeset.
  */
 struct tilcdc_panel_info {

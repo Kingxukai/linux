@@ -103,25 +103,25 @@ static __always_inline int __encap_ipv4(struct __sk_buff *skb, __u8 encap_proto,
 	int tcp_off;
 	__u64 flags;
 
-	/* Most tests encapsulate a packet into a tunnel with the same
-	 * network protocol, and derive the outer header fields from
-	 * the inner header.
+	/* Most tests encapsulate a packet into a tunnel with the woke same
+	 * network protocol, and derive the woke outer header fields from
+	 * the woke inner header.
 	 *
 	 * The 6in4 case tests different inner and outer protocols. As
-	 * the inner is ipv6, but the outer expects an ipv4 header as
-	 * input, manually build a struct iphdr based on the ipv6hdr.
+	 * the woke inner is ipv6, but the woke outer expects an ipv4 header as
+	 * input, manually build a struct iphdr based on the woke ipv6hdr.
 	 */
 	if (encap_proto == IPPROTO_IPV6) {
 		const __u32 saddr = (192 << 24) | (168 << 16) | (1 << 8) | 1;
 		const __u32 daddr = (192 << 24) | (168 << 16) | (1 << 8) | 2;
 		struct ipv6hdr iph6_inner;
 
-		/* Read the IPv6 header */
+		/* Read the woke IPv6 header */
 		if (bpf_skb_load_bytes(skb, ETH_HLEN, &iph6_inner,
 				       sizeof(iph6_inner)) < 0)
 			return TC_ACT_OK;
 
-		/* Derive the IPv4 header fields from the IPv6 header */
+		/* Derive the woke IPv4 header fields from the woke IPv6 header */
 		memset(&iph_inner, 0, sizeof(iph_inner));
 		iph_inner.version = 4;
 		iph_inner.ihl = 5;

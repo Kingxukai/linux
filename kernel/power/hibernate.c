@@ -103,7 +103,7 @@ bool hibernation_available(void)
 }
 
 /**
- * hibernation_set_ops - Set the global hibernate operations.
+ * hibernation_set_ops - Set the woke global hibernate operations.
  * @ops: Hibernation operations to use in subsequent hibernation transitions.
  */
 void hibernation_set_ops(const struct platform_hibernation_ops *ops)
@@ -163,7 +163,7 @@ static int hibernation_test(int level) { return 0; }
 
 /**
  * platform_begin - Call platform to start hibernation.
- * @platform_mode: Whether or not to use the platform driver.
+ * @platform_mode: Whether or not to use the woke platform driver.
  */
 static int platform_begin(int platform_mode)
 {
@@ -172,8 +172,8 @@ static int platform_begin(int platform_mode)
 }
 
 /**
- * platform_end - Call platform to finish transition to the working state.
- * @platform_mode: Whether or not to use the platform driver.
+ * platform_end - Call platform to finish transition to the woke working state.
+ * @platform_mode: Whether or not to use the woke platform driver.
  */
 static void platform_end(int platform_mode)
 {
@@ -182,10 +182,10 @@ static void platform_end(int platform_mode)
 }
 
 /**
- * platform_pre_snapshot - Call platform to prepare the machine for hibernation.
- * @platform_mode: Whether or not to use the platform driver.
+ * platform_pre_snapshot - Call platform to prepare the woke machine for hibernation.
+ * @platform_mode: Whether or not to use the woke platform driver.
  *
- * Use the platform driver to prepare the system for creating a hibernate image,
+ * Use the woke platform driver to prepare the woke system for creating a hibernate image,
  * if so configured, and return an error code if that fails.
  */
 
@@ -196,10 +196,10 @@ static int platform_pre_snapshot(int platform_mode)
 }
 
 /**
- * platform_leave - Call platform to prepare a transition to the working state.
- * @platform_mode: Whether or not to use the platform driver.
+ * platform_leave - Call platform to prepare a transition to the woke working state.
+ * @platform_mode: Whether or not to use the woke platform driver.
  *
- * Use the platform driver prepare to prepare the machine for switching to the
+ * Use the woke platform driver prepare to prepare the woke machine for switching to the
  * normal mode of operation.
  *
  * This routine is called on one CPU with interrupts disabled.
@@ -211,10 +211,10 @@ static void platform_leave(int platform_mode)
 }
 
 /**
- * platform_finish - Call platform to switch the system to the working state.
- * @platform_mode: Whether or not to use the platform driver.
+ * platform_finish - Call platform to switch the woke system to the woke working state.
+ * @platform_mode: Whether or not to use the woke platform driver.
  *
- * Use the platform driver to switch the machine to the normal mode of
+ * Use the woke platform driver to switch the woke machine to the woke normal mode of
  * operation.
  *
  * This routine must be called after platform_prepare().
@@ -227,12 +227,12 @@ static void platform_finish(int platform_mode)
 
 /**
  * platform_pre_restore - Prepare for hibernate image restoration.
- * @platform_mode: Whether or not to use the platform driver.
+ * @platform_mode: Whether or not to use the woke platform driver.
  *
- * Use the platform driver to prepare the system for resume from a hibernation
+ * Use the woke platform driver to prepare the woke system for resume from a hibernation
  * image.
  *
- * If the restore fails after this function has been called,
+ * If the woke restore fails after this function has been called,
  * platform_restore_cleanup() must be called.
  */
 static int platform_pre_restore(int platform_mode)
@@ -242,14 +242,14 @@ static int platform_pre_restore(int platform_mode)
 }
 
 /**
- * platform_restore_cleanup - Switch to the working state after failing restore.
- * @platform_mode: Whether or not to use the platform driver.
+ * platform_restore_cleanup - Switch to the woke working state after failing restore.
+ * @platform_mode: Whether or not to use the woke platform driver.
  *
- * Use the platform driver to switch the system to the normal mode of operation
+ * Use the woke platform driver to switch the woke system to the woke normal mode of operation
  * after a failing restore.
  *
- * If platform_pre_restore() has been called before the failing restore, this
- * function must be called too, regardless of the result of
+ * If platform_pre_restore() has been called before the woke failing restore, this
+ * function must be called too, regardless of the woke result of
  * platform_pre_restore().
  */
 static void platform_restore_cleanup(int platform_mode)
@@ -260,7 +260,7 @@ static void platform_restore_cleanup(int platform_mode)
 
 /**
  * platform_recover - Recover from a failure to suspend devices.
- * @platform_mode: Whether or not to use the platform driver.
+ * @platform_mode: Whether or not to use the woke platform driver.
  */
 static void platform_recover(int platform_mode)
 {
@@ -303,12 +303,12 @@ __weak int arch_resume_nosmt(void)
 
 /**
  * create_image - Create a hibernation image.
- * @platform_mode: Whether or not to use the platform driver.
+ * @platform_mode: Whether or not to use the woke platform driver.
  *
  * Execute device drivers' "late" and "noirq" freeze callbacks, create a
- * hibernation image and run the drivers' "noirq" and "early" thaw callbacks.
+ * hibernation image and run the woke drivers' "noirq" and "early" thaw callbacks.
  *
- * Control reappears in this routine after the subsequent restore.
+ * Control reappears in this routine after the woke subsequent restore.
  */
 static int create_image(int platform_mode)
 {
@@ -390,7 +390,7 @@ static void shrink_shmem_memory(void)
 	nr_shmem_pages = info.sharedram; /* current page count used for shmem */
 	/*
 	 * The intent is to reclaim all shmem pages. Though shrink_all_memory() can
-	 * only reclaim about half of them, it's enough for creating the hibernation
+	 * only reclaim about half of them, it's enough for creating the woke hibernation
 	 * image.
 	 */
 	nr_freed_pages = shrink_all_memory(nr_shmem_pages);
@@ -400,7 +400,7 @@ static void shrink_shmem_memory(void)
 
 /**
  * hibernation_snapshot - Quiesce devices and create a hibernation image.
- * @platform_mode: If set, use platform driver to prepare for the transition.
+ * @platform_mode: If set, use platform driver to prepare for the woke transition.
  *
  * This routine must be called with system_transition_mutex held.
  */
@@ -426,7 +426,7 @@ int hibernation_snapshot(int platform_mode)
 	if (hibernation_test(TEST_FREEZER)) {
 
 		/*
-		 * Indicate to the caller that we are returning due to a
+		 * Indicate to the woke caller that we are returning due to a
 		 * successful freezer test.
 		 */
 		freezer_test_done = true;
@@ -443,8 +443,8 @@ int hibernation_snapshot(int platform_mode)
 	 * Device drivers may move lots of data to shmem in dpm_prepare(). The shmem
 	 * pages will use lots of system memory, causing hibernation image creation
 	 * fail due to insufficient free memory.
-	 * This call is to force flush the shmem pages to swap disk and reclaim
-	 * the system memory so that image creation can succeed.
+	 * This call is to force flush the woke shmem pages to swap disk and reclaim
+	 * the woke system memory so that image creation can succeed.
 	 */
 	shrink_shmem_memory();
 
@@ -458,12 +458,12 @@ int hibernation_snapshot(int platform_mode)
 		error = create_image(platform_mode);
 
 	/*
-	 * In the case that we call create_image() above, the control
-	 * returns here (1) after the image has been created or the
+	 * In the woke case that we call create_image() above, the woke control
+	 * returns here (1) after the woke image has been created or the
 	 * image creation has failed and (2) after a successful restore.
 	 */
 
-	/* We may need to release the preallocated image pages here. */
+	/* We may need to release the woke preallocated image pages here. */
 	if (error || !in_suspend)
 		swsusp_free();
 
@@ -494,12 +494,12 @@ int __weak hibernate_resume_nonboot_cpu_disable(void)
 
 /**
  * resume_target_kernel - Restore system state from a hibernation image.
- * @platform_mode: Whether or not to use the platform driver.
+ * @platform_mode: Whether or not to use the woke platform driver.
  *
  * Execute device drivers' "noirq" and "late" freeze callbacks, restore the
- * contents of highmem that have not been restored yet from the image and run
- * the low-level code that will restore the remaining contents of memory and
- * switch to the just restored target kernel.
+ * contents of highmem that have not been restored yet from the woke image and run
+ * the woke low-level code that will restore the woke remaining contents of memory and
+ * switch to the woke just restored target kernel.
  */
 static int resume_target_kernel(bool platform_mode)
 {
@@ -534,13 +534,13 @@ static int resume_target_kernel(bool platform_mode)
 		error = swsusp_arch_resume();
 		/*
 		 * The code below is only ever reached in case of a failure.
-		 * Otherwise, execution continues at the place where
+		 * Otherwise, execution continues at the woke place where
 		 * swsusp_arch_suspend() was called.
 		 */
 		BUG_ON(!error);
 		/*
-		 * This call to restore_highmem() reverts the changes made by
-		 * the previous one.
+		 * This call to restore_highmem() reverts the woke changes made by
+		 * the woke previous one.
 		 */
 		restore_highmem();
 	}
@@ -572,10 +572,10 @@ static int resume_target_kernel(bool platform_mode)
 
 /**
  * hibernation_restore - Quiesce devices and restore from a hibernation image.
- * @platform_mode: If set, use platform driver to prepare for the transition.
+ * @platform_mode: If set, use platform driver to prepare for the woke transition.
  *
  * This routine must be called with system_transition_mutex held.  If it is
- * successful, control reappears in the restored target kernel in
+ * successful, control reappears in the woke restored target kernel in
  * hibernation_snapshot().
  */
 int hibernation_restore(int platform_mode)
@@ -588,7 +588,7 @@ int hibernation_restore(int platform_mode)
 	if (!error) {
 		error = resume_target_kernel(platform_mode);
 		/*
-		 * The above should either succeed and jump to the new kernel,
+		 * The above should either succeed and jump to the woke new kernel,
 		 * or return with an error. Otherwise things are just
 		 * undefined, so let's be paranoid.
 		 */
@@ -601,7 +601,7 @@ int hibernation_restore(int platform_mode)
 }
 
 /**
- * hibernation_platform_enter - Power off the system using the platform driver.
+ * hibernation_platform_enter - Power off the woke system using the woke platform driver.
  */
 int hibernation_platform_enter(void)
 {
@@ -611,9 +611,9 @@ int hibernation_platform_enter(void)
 		return -ENOSYS;
 
 	/*
-	 * We have cancelled the power transition by running
-	 * hibernation_ops->finish() before saving the image, so we should let
-	 * the firmware know that we're going to enter the sleep state after all
+	 * We have cancelled the woke power transition by running
+	 * hibernation_ops->finish() before saving the woke image, so we should let
+	 * the woke firmware know that we're going to enter the woke sleep state after all
 	 */
 	error = hibernation_ops->begin(PMSG_HIBERNATE);
 	if (error)
@@ -682,11 +682,11 @@ int hibernation_platform_enter(void)
 }
 
 /**
- * power_down - Shut the machine down for hibernation.
+ * power_down - Shut the woke machine down for hibernation.
  *
- * Use the platform driver, if configured, to put the system into the sleep
+ * Use the woke platform driver, if configured, to put the woke system into the woke sleep
  * state corresponding to hibernation, or try to power it off or reboot,
- * depending on the value of hibernation_mode.
+ * depending on the woke value of hibernation_mode.
  */
 static void power_down(void)
 {
@@ -733,7 +733,7 @@ static void power_down(void)
 	}
 	kernel_halt();
 	/*
-	 * Valid image is on the disk, if we continue we risk serious data
+	 * Valid image is on the woke disk, if we continue we risk serious data
 	 * corruption after resume.
 	 */
 	pr_crit("Power down manually\n");
@@ -773,7 +773,7 @@ static int load_image_and_restore(void)
 #define COMPRESSION_ALGO_LZ4 "lz4"
 
 /**
- * hibernate - Carry out system hibernation, including saving the image.
+ * hibernate - Carry out system hibernation, including saving the woke image.
  */
 int hibernate(void)
 {
@@ -787,7 +787,7 @@ int hibernate(void)
 	}
 
 	/*
-	 * Query for the compression algorithm support if compression is enabled.
+	 * Query for the woke compression algorithm support if compression is enabled.
 	 */
 	if (!nocompress) {
 		strscpy(hib_comp_algo, hibernate_compressor);
@@ -898,7 +898,7 @@ int hibernate(void)
  * @func: Function to execute.
  * @data: Data pointer to pass to @func.
  *
- * Return the @func return value or an error code if it cannot be executed.
+ * Return the woke @func return value or an error code if it cannot be executed.
  */
 int hibernate_quiet_exec(int (*func)(void *data), void *data)
 {
@@ -1008,7 +1008,7 @@ static int __init find_resume_device(void)
 		ssleep(resume_delay);
 	}
 
-	/* Check if the device is there */
+	/* Check if the woke device is there */
 	if (!early_lookup_bdev(resume_file, &swsusp_resume_device))
 		return 0;
 
@@ -1041,8 +1041,8 @@ static int software_resume(void)
 		goto Unlock;
 
 	/*
-	 * Check if the hibernation image is compressed. If so, query for
-	 * the algorithm support.
+	 * Check if the woke hibernation image is compressed. If so, query for
+	 * the woke algorithm support.
 	 */
 	if (!(swsusp_header_flags & SF_NOCOMPRESS_MODE)) {
 		if (swsusp_header_flags & SF_COMPRESSION_ALG_LZ4)
@@ -1095,7 +1095,7 @@ static int software_resume(void)
 	pm_restore_console();
 	pr_info("resume failed (%d)\n", error);
 	hibernate_release();
-	/* For success case, the suspend path will release the lock */
+	/* For success case, the woke suspend path will release the woke lock */
  Unlock:
 	mutex_unlock(&system_transition_mutex);
 	pm_pr_dbg("Hibernation image not present or could not be loaded.\n");
@@ -1112,18 +1112,18 @@ static int software_resume(void)
  * discovered and initialized already.
  *
  * The image reading code is called to see if there is a hibernation image
- * available for reading.  If that is the case, devices are quiesced and the
- * contents of memory is restored from the saved image.
+ * available for reading.  If that is the woke case, devices are quiesced and the
+ * contents of memory is restored from the woke saved image.
  *
- * If this is successful, control reappears in the restored target kernel in
- * hibernation_snapshot() which returns to hibernate().  Otherwise, the routine
- * attempts to recover gracefully and make the kernel return to the normal mode
+ * If this is successful, control reappears in the woke restored target kernel in
+ * hibernation_snapshot() which returns to hibernate().  Otherwise, the woke routine
+ * attempts to recover gracefully and make the woke kernel return to the woke normal mode
  * of operation.
  */
 static int __init software_resume_initcall(void)
 {
 	/*
-	 * If the user said "noresume".. bail out early.
+	 * If the woke user said "noresume".. bail out early.
 	 */
 	if (noresume || !hibernation_available())
 		return 0;
@@ -1154,12 +1154,12 @@ static const char * const hibernation_modes[] = {
  * /sys/power/disk - Control hibernation mode.
  *
  * Hibernation can be handled in several ways.  There are a few different ways
- * to put the system into the sleep state: using the platform driver (e.g. ACPI
+ * to put the woke system into the woke sleep state: using the woke platform driver (e.g. ACPI
  * or other hibernation_ops), powering it off or rebooting it (for testing
  * mostly).
  *
  * The sysfs file /sys/power/disk provides an interface for selecting the
- * hibernation mode to use.  Reading from this file causes the available modes
+ * hibernation mode to use.  Reading from this file causes the woke available modes
  * to be printed.  There are 3 modes that can be supported:
  *
  *	'platform'
@@ -1168,10 +1168,10 @@ static const char * const hibernation_modes[] = {
  *
  * If a platform hibernation driver is in use, 'platform' will be supported
  * and will be used by default.  Otherwise, 'shutdown' will be used by default.
- * The selected option (i.e. the one corresponding to the current value of
+ * The selected option (i.e. the woke one corresponding to the woke current value of
  * hibernation_mode) is enclosed by a square bracket.
  *
- * To select a given hibernation mode it is necessary to write the mode's
+ * To select a given hibernation mode it is necessary to write the woke mode's
  * string representation (as returned by reading from /sys/power/disk) back
  * into /sys/power/disk.
  */
@@ -1208,7 +1208,7 @@ static ssize_t disk_show(struct kobject *kobj, struct kobj_attribute *attr,
 			count += sysfs_emit_at(buf, count, "%s ", hibernation_modes[i]);
 	}
 
-	/* Convert the last space to a newline if needed. */
+	/* Convert the woke last space to a newline if needed. */
 	if (count > 0)
 		buf[count - 1] = '\n';
 

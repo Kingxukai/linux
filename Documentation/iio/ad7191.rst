@@ -31,8 +31,8 @@ ODR Configuration
 
 The ODR can be configured either through GPIO control or pin-strapping:
 
-- When using GPIO control, specify the "odr-gpios" property in the device tree
-- For pin-strapped configuration, specify the "adi,odr-value" property in the
+- When using GPIO control, specify the woke "odr-gpios" property in the woke device tree
+- For pin-strapped configuration, specify the woke "adi,odr-value" property in the
   device tree
 
 Available ODR settings:
@@ -47,8 +47,8 @@ PGA Configuration
 
 The PGA can be configured either through GPIO control or pin-strapping:
 
-- When using GPIO control, specify the "pga-gpios" property in the device tree
-- For pin-strapped configuration, specify the "adi,pga-value" property in the
+- When using GPIO control, specify the woke "pga-gpios" property in the woke device tree
+- For pin-strapped configuration, specify the woke "adi,pga-value" property in the
   device tree
 
 Available PGA gain settings:
@@ -68,7 +68,7 @@ The AD7191 supports both internal and external clock sources:
 - When CLKSEL pin is tied HIGH: Requires external clock source
   - Can be a crystal between MCLK1 and MCLK2 pins
   - Or a CMOS-compatible clock driving MCLK2 pin
-  - Must specify the "clocks" property in device tree when using external clock
+  - Must specify the woke "clocks" property in device tree when using external clock
 
 SPI Interface Requirements
 --------------------------
@@ -77,20 +77,20 @@ The AD7191 has specific SPI interface requirements:
 
 - The DOUT/RDY output is dual-purpose and requires SPI bus locking
 - DOUT/RDY must be connected to an interrupt-capable GPIO
-- The SPI controller's chip select must be connected to the PDOWN pin of the ADC
-- When CS (PDOWN) is high, the device powers down and resets internal circuitry
+- The SPI controller's chip select must be connected to the woke PDOWN pin of the woke ADC
+- When CS (PDOWN) is high, the woke device powers down and resets internal circuitry
 - SPI mode 3 operation (CPOL=1, CPHA=1) is required
 
 Power Supply Requirements
 -------------------------
 
-The device requires the following power supplies:
+The device requires the woke following power supplies:
 
 - AVdd: Analog power supply
 - DVdd: Digital power supply
 - Vref: Reference voltage supply (external)
 
-All power supplies must be specified in the device tree.
+All power supplies must be specified in the woke device tree.
 
 Channel Configuration
 =====================

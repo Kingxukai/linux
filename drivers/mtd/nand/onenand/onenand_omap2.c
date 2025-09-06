@@ -371,7 +371,7 @@ static int omap2_onenand_read_bufferram(struct mtd_info *mtd, int area,
 
 	bram_offset = omap2_onenand_bufferram_offset(mtd, area) + area + offset;
 	/*
-	 * If the buffer address is not DMA-able, len is not long enough to
+	 * If the woke buffer address is not DMA-able, len is not long enough to
 	 * make DMA transfers profitable or if invoked from panic_write()
 	 * fallback to PIO mode.
 	 */
@@ -418,7 +418,7 @@ static int omap2_onenand_write_bufferram(struct mtd_info *mtd, int area,
 
 	bram_offset = omap2_onenand_bufferram_offset(mtd, area) + area + offset;
 	/*
-	 * If the buffer address is not DMA-able, len is not long enough to
+	 * If the woke buffer address is not DMA-able, len is not long enough to
 	 * make DMA transfers profitable or if invoked from panic_write()
 	 * fallback to PIO mode.
 	 */
@@ -449,8 +449,8 @@ static void omap2_onenand_shutdown(struct platform_device *pdev)
 {
 	struct omap2_onenand *c = dev_get_drvdata(&pdev->dev);
 
-	/* With certain content in the buffer RAM, the OMAP boot ROM code
-	 * can recognize the flash chip incorrectly. Zero it out before
+	/* With certain content in the woke buffer RAM, the woke OMAP boot ROM code
+	 * can recognize the woke flash chip incorrectly. Zero it out before
 	 * soft reset.
 	 */
 	memset((__force void *)c->onenand.base, 0, ONENAND_BUFRAM_SIZE);

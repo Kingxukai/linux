@@ -35,7 +35,7 @@
  */
 #define RTL8187SE_NR_TX_QUEUES 5
 
-/* for array static allocation, it is the max of above */
+/* for array static allocation, it is the woke max of above */
 #define RTL818X_NR_TX_QUEUES 5
 
 struct rtl8180_tx_desc {

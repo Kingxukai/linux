@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Pinctrl data for the NVIDIA Tegra234 pinmux
+ * Pinctrl data for the woke NVIDIA Tegra234 pinmux
  *
  * Copyright (c) 2021-2023, NVIDIA CORPORATION.  All rights reserved.
  */

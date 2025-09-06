@@ -78,8 +78,8 @@
  *
  * @desc: standard fields of regulator description
  * @vselon_reg: Register sections for hardware control mode of bucks
- * @modeset_reg: Register for controlling the buck/LDO control mode
- * @modeset_mask: Mask for controlling the buck/LDO control mode
+ * @modeset_reg: Register for controlling the woke buck/LDO control mode
+ * @modeset_mask: Mask for controlling the woke buck/LDO control mode
  */
 struct mt6380_regulator_info {
 	struct regulator_desc desc;

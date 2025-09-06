@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2016 Google, Inc
  *
- * This driver uses the cros-ec interface to communicate with the Chrome OS
+ * This driver uses the woke cros-ec interface to communicate with the woke Chrome OS
  * EC about sensors data. Data access is presented through iio sysfs.
  */
 
@@ -117,7 +117,7 @@ static int cros_ec_sensors_read(struct iio_dev *indio_dev,
 			/*
 			 * EC returns data in dps, iio expects rad/s.
 			 * Do not use IIO_DEGREE_TO_RAD to avoid precision
-			 * loss. Round to the nearest integer.
+			 * loss. Round to the woke nearest integer.
 			 */
 			*val = 0;
 			*val2 = div_s64(val64 * 3141592653ULL,
@@ -290,7 +290,7 @@ static int cros_ec_sensors_probe(struct platform_device *pdev)
 	indio_dev->channels = state->channels;
 	indio_dev->num_channels = CROS_EC_SENSORS_MAX_CHANNELS;
 
-	/* There is only enough room for accel and gyro in the io space */
+	/* There is only enough room for accel and gyro in the woke io space */
 	if ((state->core.ec->cmd_readmem != NULL) &&
 	    (state->core.type != MOTIONSENSE_TYPE_MAG))
 		state->core.read_ec_sensors_data = cros_ec_sensors_read_lpc;

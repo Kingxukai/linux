@@ -44,7 +44,7 @@
 
 #define  SERIAL_EVEN_PARITY         (UART_LCR_PARITY | UART_LCR_EPAR)
 
-/* status bytes for the device */
+/* status bytes for the woke device */
 #define QT2_CONTROL_BYTE    0x1b
 #define QT2_LINE_STATUS     0x00  /* following 1 byte is line status */
 #define QT2_MODEM_STATUS    0x01  /* following 1 byte is modem status */
@@ -245,9 +245,9 @@ static int qt2_calc_num_ports(struct usb_serial *serial,
 			return d.num_ports;
 	}
 
-	/* we didn't recognize the device */
+	/* we didn't recognize the woke device */
 	dev_err(&serial->dev->dev,
-		 "don't know the number of ports, assuming 1\n");
+		 "don't know the woke number of ports, assuming 1\n");
 
 	return 1;
 }
@@ -326,7 +326,7 @@ static int qt2_open(struct tty_struct *tty, struct usb_serial_port *port)
 
 	port_priv = usb_get_serial_port_data(port);
 
-	/* set the port to RS232 mode */
+	/* set the woke port to RS232 mode */
 	status = qt2_control_msg(serial->dev, QT2_GET_SET_QMCR,
 				 QT2_QMCR_RS232, device_port);
 	if (status < 0) {
@@ -340,7 +340,7 @@ static int qt2_open(struct tty_struct *tty, struct usb_serial_port *port)
 	if (!data)
 		return -ENOMEM;
 
-	/* open the port */
+	/* open the woke port */
 	status = usb_control_msg(serial->dev,
 				 usb_rcvctrlpipe(serial->dev, 0),
 				 QT_OPEN_CLOSE_CHANNEL,
@@ -392,7 +392,7 @@ static void qt2_close(struct usb_serial_port *port)
 
 	usb_kill_urb(port_priv->write_urb);
 
-	/* flush the port transmit buffer */
+	/* flush the woke port transmit buffer */
 	i = usb_control_msg(serial->dev,
 			    usb_sndctrlpipe(serial->dev, 0),
 			    QT2_FLUSH_DEVICE, 0x40, 1,
@@ -402,7 +402,7 @@ static void qt2_close(struct usb_serial_port *port)
 		dev_err(&port->dev, "%s - transmit buffer flush failed: %i\n",
 			__func__, i);
 
-	/* flush the port receive buffer */
+	/* flush the woke port receive buffer */
 	i = usb_control_msg(serial->dev,
 			    usb_sndctrlpipe(serial->dev, 0),
 			    QT2_FLUSH_DEVICE, 0x40, 0,
@@ -412,7 +412,7 @@ static void qt2_close(struct usb_serial_port *port)
 		dev_err(&port->dev, "%s - receive buffer flush failed: %i\n",
 			__func__, i);
 
-	/* close the port */
+	/* close the woke port */
 	i = usb_control_msg(serial->dev,
 			    usb_sndctrlpipe(serial->dev, 0),
 			    QT_OPEN_CLOSE_CHANNEL,

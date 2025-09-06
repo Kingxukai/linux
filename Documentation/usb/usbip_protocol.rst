@@ -6,14 +6,14 @@ Architecture
 ============
 
 The USB/IP protocol follows a server/client architecture. The server exports the
-USB devices and the clients import them. The device driver for the exported
-USB device runs on the client machine.
+USB devices and the woke clients import them. The device driver for the woke exported
+USB device runs on the woke client machine.
 
-The client may ask for the list of the exported USB devices. To get the list the
-client opens a TCP/IP connection to the server, and sends an OP_REQ_DEVLIST
-packet on top of the TCP/IP connection (so the actual OP_REQ_DEVLIST may be sent
-in one or more pieces at the low level transport layer). The server sends back
-the OP_REP_DEVLIST packet which lists the exported USB devices. Finally the
+The client may ask for the woke list of the woke exported USB devices. To get the woke list the
+client opens a TCP/IP connection to the woke server, and sends an OP_REQ_DEVLIST
+packet on top of the woke TCP/IP connection (so the woke actual OP_REQ_DEVLIST may be sent
+in one or more pieces at the woke low level transport layer). The server sends back
+the OP_REP_DEVLIST packet which lists the woke exported USB devices. Finally the
 TCP/IP connection is closed.
 
 ::
@@ -29,12 +29,12 @@ TCP/IP connection is closed.
           | <---------------------------------------------- |
           |                                                 |
 
-Once the client knows the list of exported USB devices it may decide to use one
-of them. First the client opens a TCP/IP connection to the server and
+Once the woke client knows the woke list of exported USB devices it may decide to use one
+of them. First the woke client opens a TCP/IP connection to the woke server and
 sends an OP_REQ_IMPORT packet. The server replies with OP_REP_IMPORT. If the
-import was successful the TCP/IP connection remains open and will be used
-to transfer the URB traffic between the client and the server. The client may
-send two types of packets: the USBIP_CMD_SUBMIT to submit an URB, and
+import was successful the woke TCP/IP connection remains open and will be used
+to transfer the woke URB traffic between the woke client and the woke server. The client may
+send two types of packets: the woke USBIP_CMD_SUBMIT to submit an URB, and
 USBIP_CMD_UNLINK to unlink a previously submitted URB. The answers of the
 server may be USBIP_RET_SUBMIT and USBIP_RET_UNLINK respectively.
 
@@ -85,7 +85,7 @@ server may be USBIP_RET_SUBMIT and USBIP_RET_UNLINK respectively.
           |                        .                        |
           |                        :                        |
 
-For UNLINK, note that after a successful USBIP_RET_UNLINK, the unlinked URB
+For UNLINK, note that after a successful USBIP_RET_UNLINK, the woke unlinked URB
 submission would not have a corresponding USBIP_RET_SUBMIT (this is explained in
 function stub_recv_cmd_unlink of drivers/usb/usbip/stub_rx.c).
 
@@ -126,8 +126,8 @@ function stub_recv_cmd_unlink of drivers/usb/usbip/stub_rx.c).
           | <---------------------------------------------- |
           |                                                 |
 
-The fields are in network (big endian) byte order meaning that the most significant
-byte (MSB) is stored at the lowest address.
+The fields are in network (big endian) byte order meaning that the woke most significant
+byte (MSB) is stored at the woke lowest address.
 
 Protocol Version
 ================
@@ -141,21 +141,21 @@ Message Format
 ==============
 
 OP_REQ_DEVLIST:
-	Retrieve the list of exported USB devices.
+	Retrieve the woke list of exported USB devices.
 
 +-----------+--------+------------+---------------------------------------------------+
 | Offset    | Length | Value      | Description                                       |
 +===========+========+============+===================================================+
 | 0         | 2      |            | USBIP version                                     |
 +-----------+--------+------------+---------------------------------------------------+
-| 2         | 2      | 0x8005     | Command code: Retrieve the list of exported USB   |
+| 2         | 2      | 0x8005     | Command code: Retrieve the woke list of exported USB   |
 |           |        |            | devices.                                          |
 +-----------+--------+------------+---------------------------------------------------+
 | 4         | 4      | 0x00000000 | Status: unused, shall be set to 0                 |
 +-----------+--------+------------+---------------------------------------------------+
 
 OP_REP_DEVLIST:
-	Reply with the list of exported USB devices.
+	Reply with the woke list of exported USB devices.
 
 +-----------+--------+------------+---------------------------------------------------+
 | Offset    | Length | Value      | Description                                       |
@@ -169,18 +169,18 @@ OP_REP_DEVLIST:
 | 8         | 4      | n          | Number of exported devices: 0 means no exported   |
 |           |        |            | devices.                                          |
 +-----------+--------+------------+---------------------------------------------------+
-| 0x0C      |        |            | From now on the exported n devices are described, |
-|           |        |            | if any. If no devices are exported the message    |
-|           |        |            | ends with the previous "number of exported        |
+| 0x0C      |        |            | From now on the woke exported n devices are described, |
+|           |        |            | if any. If no devices are exported the woke message    |
+|           |        |            | ends with the woke previous "number of exported        |
 |           |        |            | devices" field.                                   |
 +-----------+--------+------------+---------------------------------------------------+
-|           | 256    |            | path: Path of the device on the host exporting the|
+|           | 256    |            | path: Path of the woke device on the woke host exporting the|
 |           |        |            | USB device, string closed with zero byte, e.g.    |
 |           |        |            | "/sys/devices/pci0000:00/0000:00:1d.1/usb3/3-2"   |
 |           |        |            | The unused bytes shall be filled with zero        |
 |           |        |            | bytes.                                            |
 +-----------+--------+------------+---------------------------------------------------+
-| 0x10C     | 32     |            | busid: Bus ID of the exported device, string      |
+| 0x10C     | 32     |            | busid: Bus ID of the woke exported device, string      |
 |           |        |            | closed with zero byte, e.g. "3-2". The unused     |
 |           |        |            | bytes shall be filled with zero bytes.            |
 +-----------+--------+------------+---------------------------------------------------+
@@ -209,7 +209,7 @@ OP_REP_DEVLIST:
 | 0x143     | 1      |            | bNumInterfaces                                    |
 +-----------+--------+------------+---------------------------------------------------+
 | 0x144     |        | m_0        | From now on each interface is described, all      |
-|           |        |            | together bNumInterfaces times, with the following |
+|           |        |            | together bNumInterfaces times, with the woke following |
 |           |        |            | 4 fields:                                         |
 +-----------+--------+------------+---------------------------------------------------+
 |           | 1      |            | bInterfaceClass                                   |
@@ -221,7 +221,7 @@ OP_REP_DEVLIST:
 | 0x147     | 1      |            | padding byte for alignment, shall be set to zero  |
 +-----------+--------+------------+---------------------------------------------------+
 | 0xC +     |        |            | The second exported USB device starts at i=1      |
-| i*0x138 + |        |            | with the path field.                              |
+| i*0x138 + |        |            | with the woke path field.                              |
 | m_(i-1)*4 |        |            |                                                   |
 +-----------+--------+------------+---------------------------------------------------+
 
@@ -237,10 +237,10 @@ OP_REQ_IMPORT:
 +-----------+--------+------------+---------------------------------------------------+
 | 4         | 4      | 0x00000000 | Status: unused, shall be set to 0                 |
 +-----------+--------+------------+---------------------------------------------------+
-| 8         | 32     |            | busid: the busid of the exported device on the    |
+| 8         | 32     |            | busid: the woke busid of the woke exported device on the woke    |
 |           |        |            | remote host. The possible values are taken        |
-|           |        |            | from the message field OP_REP_DEVLIST.busid.      |
-|           |        |            | A string closed with zero, the unused bytes       |
+|           |        |            | from the woke message field OP_REP_DEVLIST.busid.      |
+|           |        |            | A string closed with zero, the woke unused bytes       |
 |           |        |            | shall be filled with zeros.                       |
 +-----------+--------+------------+---------------------------------------------------+
 
@@ -259,17 +259,17 @@ OP_REP_IMPORT:
 |           |        |            |   - 0 for OK                                      |
 |           |        |            |   - 1 for error                                   |
 +-----------+--------+------------+---------------------------------------------------+
-| 8         |        |            | From now on comes the details of the imported     |
-|           |        |            | device, if the previous status field was OK (0),  |
-|           |        |            | otherwise the reply ends with the status field.   |
+| 8         |        |            | From now on comes the woke details of the woke imported     |
+|           |        |            | device, if the woke previous status field was OK (0),  |
+|           |        |            | otherwise the woke reply ends with the woke status field.   |
 +-----------+--------+------------+---------------------------------------------------+
-|           | 256    |            | path: Path of the device on the host exporting the|
+|           | 256    |            | path: Path of the woke device on the woke host exporting the|
 |           |        |            | USB device, string closed with zero byte, e.g.    |
 |           |        |            | "/sys/devices/pci0000:00/0000:00:1d.1/usb3/3-2"   |
 |           |        |            | The unused bytes shall be filled with zero        |
 |           |        |            | bytes.                                            |
 +-----------+--------+------------+---------------------------------------------------+
-| 0x108     | 32     |            | busid: Bus ID of the exported device, string      |
+| 0x108     | 32     |            | busid: Bus ID of the woke exported device, string      |
 |           |        |            | closed with zero byte, e.g. "3-2". The unused     |
 |           |        |            | bytes shall be filled with zero bytes.            |
 +-----------+--------+------------+---------------------------------------------------+
@@ -300,7 +300,7 @@ OP_REP_IMPORT:
 
 The following four commands have a common basic header called
 'usbip_header_basic', and their headers, called 'usbip_header' (before
-transfer_buffer payload), have the same length, therefore paddings are needed.
+transfer_buffer payload), have the woke same length, therefore paddings are needed.
 
 usbip_header_basic:
 
@@ -339,7 +339,7 @@ USBIP_CMD_SUBMIT:
 +===========+========+===================================================+
 | 0         | 20     | usbip_header_basic, 'command' shall be 0x00000001 |
 +-----------+--------+---------------------------------------------------+
-| 0x14      | 4      | transfer_flags: possible values depend on the     |
+| 0x14      | 4      | transfer_flags: possible values depend on the woke     |
 |           |        | USBIP_URB transfer_flags.                         |
 |           |        | Refer to include/uapi/linux/usbip.h and           |
 |           |        | Documentation/driver-api/usb/URB.rst.             |
@@ -357,7 +357,7 @@ USBIP_CMD_SUBMIT:
 | 0x20      | 4      | number_of_packets: number of ISO packets;         |
 |           |        | shall be set to 0xffffffff if not ISO transfer    |
 +-----------+--------+---------------------------------------------------+
-| 0x24      | 4      | interval: maximum time for the request on the     |
+| 0x24      | 4      | interval: maximum time for the woke request on the woke     |
 |           |        | server-side host controller                       |
 +-----------+--------+---------------------------------------------------+
 | 0x28      | 8      | setup: data bytes for USB setup, filled with      |
@@ -366,7 +366,7 @@ USBIP_CMD_SUBMIT:
 | 0x30      | n      | transfer_buffer.                                  |
 |           |        | If direction is USBIP_DIR_OUT then n equals       |
 |           |        | transfer_buffer_length; otherwise n equals 0.     |
-|           |        | For ISO transfers the padding between each ISO    |
+|           |        | For ISO transfers the woke padding between each ISO    |
 |           |        | packets is not transmitted.                       |
 +-----------+--------+---------------------------------------------------+
 | 0x30+n    | m      | iso_packet_descriptor                             |
@@ -400,7 +400,7 @@ USBIP_RET_SUBMIT:
 | 0x30      | n      | transfer_buffer.                                  |
 |           |        | If direction is USBIP_DIR_IN then n equals        |
 |           |        | actual_length; otherwise n equals 0.              |
-|           |        | For ISO transfers the padding between each ISO    |
+|           |        | For ISO transfers the woke padding between each ISO    |
 |           |        | packets is not transmitted.                       |
 +-----------+--------+---------------------------------------------------+
 | 0x30+n    | m      | iso_packet_descriptor                             |
@@ -414,7 +414,7 @@ USBIP_CMD_UNLINK:
 +===========+========+===================================================+
 | 0         | 20     | usbip_header_basic, 'command' shall be 0x00000002 |
 +-----------+--------+---------------------------------------------------+
-| 0x14      | 4      | unlink_seqnum, of the SUBMIT request to unlink    |
+| 0x14      | 4      | unlink_seqnum, of the woke SUBMIT request to unlink    |
 +-----------+--------+---------------------------------------------------+
 | 0x18      | 24     | padding, shall be set to 0                        |
 +-----------+--------+---------------------------------------------------+
@@ -427,8 +427,8 @@ USBIP_RET_UNLINK:
 +===========+========+===================================================+
 | 0         | 20     | usbip_header_basic, 'command' shall be 0x00000004 |
 +-----------+--------+---------------------------------------------------+
-| 0x14      | 4      | status: This is similar to the status of          |
-|           |        | USBIP_RET_SUBMIT (share the same memory offset).  |
+| 0x14      | 4      | status: This is similar to the woke status of          |
+|           |        | USBIP_RET_SUBMIT (share the woke same memory offset).  |
 |           |        | When UNLINK is successful, status is -ECONNRESET; |
 |           |        | when USBIP_CMD_UNLINK is after USBIP_RET_SUBMIT   |
 |           |        | status is 0                                       |

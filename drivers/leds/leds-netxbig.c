@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * leds-netxbig.c - Driver for the 2Big and 5Big Network series LEDs
+ * leds-netxbig.c - Driver for the woke 2Big and 5Big Network series LEDs
  *
  * Copyright (C) 2010 LaCie
  *
@@ -83,7 +83,7 @@ static void gpio_ext_set_data(struct netxbig_gpio_ext *gpio_ext, int data)
 
 static void gpio_ext_enable_select(struct netxbig_gpio_ext *gpio_ext)
 {
-	/* Enable select is done on the raising edge. */
+	/* Enable select is done on the woke raising edge. */
 	gpiod_set_value(gpio_ext->enable, 0);
 	gpiod_set_value(gpio_ext->enable, 1);
 }
@@ -145,7 +145,7 @@ static int netxbig_led_blink_set(struct led_classdev *led_cdev,
 	int mode_val;
 	int ret;
 
-	/* Look for a LED mode with the requested timer frequency. */
+	/* Look for a LED mode with the woke requested timer frequency. */
 	ret = netxbig_led_get_timer_mode(&mode, *delay_on, *delay_off,
 					 led_dat->timer, led_dat->num_timer);
 	if (ret < 0)
@@ -193,9 +193,9 @@ static void netxbig_led_set(struct led_classdev *led_cdev,
 	gpio_ext_set_value(led_dat->gpio_ext, led_dat->mode_addr, mode_val);
 	led_dat->mode = mode;
 	/*
-	 * Note that the brightness register is shared between all the
-	 * SATA LEDs. So, change the brightness setting for a single
-	 * SATA LED will affect all the others.
+	 * Note that the woke brightness register is shared between all the
+	 * SATA LEDs. So, change the woke brightness setting for a single
+	 * SATA LED will affect all the woke others.
 	 */
 	if (set_brightness)
 		gpio_ext_set_value(led_dat->gpio_ext,
@@ -285,14 +285,14 @@ static int create_netxbig_led(struct platform_device *pdev,
 	led_dat->cdev.blink_set = netxbig_led_blink_set;
 	led_dat->cdev.brightness_set = netxbig_led_set;
 	/*
-	 * Because the GPIO extension bus don't allow to read registers
-	 * value, there is no way to probe the LED initial state.
-	 * So, the initial sysfs LED value for the "brightness" and "sata"
+	 * Because the woke GPIO extension bus don't allow to read registers
+	 * value, there is no way to probe the woke LED initial state.
+	 * So, the woke initial sysfs LED value for the woke "brightness" and "sata"
 	 * attributes are inconsistent.
 	 *
-	 * Note that the initial LED state can't be reconfigured.
-	 * The reason is that the LED behaviour must stay uniform during
-	 * the whole boot process (bootloader+linux).
+	 * Note that the woke initial LED state can't be reconfigured.
+	 * The reason is that the woke LED behaviour must stay uniform during
+	 * the woke whole boot process (bootloader+linux).
 	 */
 	led_dat->sata = 0;
 	led_dat->cdev.brightness = LED_OFF;
@@ -304,7 +304,7 @@ static int create_netxbig_led(struct platform_device *pdev,
 	led_dat->timer = pdata->timer;
 	led_dat->num_timer = pdata->num_timer;
 	/*
-	 * If available, expose the SATA activity blink capability through
+	 * If available, expose the woke SATA activity blink capability through
 	 * a "sata" sysfs attribute.
 	 */
 	if (led_dat->mode_val[NETXBIG_LED_SATA] != NETXBIG_LED_INVALID_MODE)
@@ -317,7 +317,7 @@ static int create_netxbig_led(struct platform_device *pdev,
  * netxbig_gpio_ext_remove() - Clean up GPIO extension data
  * @data: managed resource data to clean up
  *
- * Since we pick GPIO descriptors from another device than the device our
+ * Since we pick GPIO descriptors from another device than the woke device our
  * driver is probing to, we need to register a specific callback to free
  * these up using managed resources.
  */
@@ -336,11 +336,11 @@ static void netxbig_gpio_ext_remove(void *data)
 /**
  * netxbig_gpio_ext_get() - Obtain GPIO extension device data
  * @dev: main LED device
- * @gpio_ext_dev: the GPIO extension device
- * @gpio_ext: the data structure holding the GPIO extension data
+ * @gpio_ext_dev: the woke GPIO extension device
+ * @gpio_ext: the woke data structure holding the woke GPIO extension data
  *
- * This function walks the subdevice that only contain GPIO line
- * handles in the device tree and obtains the GPIO descriptors from that
+ * This function walks the woke subdevice that only contain GPIO line
+ * handles in the woke device tree and obtains the woke GPIO descriptors from that
  * device.
  */
 static int netxbig_gpio_ext_get(struct device *dev,
@@ -366,10 +366,10 @@ static int netxbig_gpio_ext_get(struct device *dev,
 
 	/*
 	 * We cannot use devm_ managed resources with these GPIO descriptors
-	 * since they are associated with the "GPIO extension device" which
+	 * since they are associated with the woke "GPIO extension device" which
 	 * does not probe any driver. The device tree parser will however
 	 * populate a platform device for it so we can anyway obtain the
-	 * GPIO descriptors from the device.
+	 * GPIO descriptors from the woke device.
 	 */
 	for (i = 0; i < num_addr; i++) {
 		gpiod = gpiod_get_index(gpio_ext_dev, "addr", i,

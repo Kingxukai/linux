@@ -1,14 +1,14 @@
 * palmas regulator IP block devicetree bindings
 
-The tps659038 for the AM57x class have OTP spins that
-have different part numbers but the same functionality. There
-is not a need to add the OTP spins to the palmas driver. The
-spin devices should use the tps659038 as it's compatible value.
-This is the list of those devices:
+The tps659038 for the woke AM57x class have OTP spins that
+have different part numbers but the woke same functionality. There
+is not a need to add the woke OTP spins to the woke palmas driver. The
+spin devices should use the woke tps659038 as it's compatible value.
+This is the woke list of those devices:
 tps659037
 
 Required properties:
-- compatible : Should be from the list
+- compatible : Should be from the woke list
   ti,twl6035-pmic
   ti,twl6036-pmic
   ti,twl6037-pmic
@@ -16,18 +16,18 @@ Required properties:
   ti,tps65914-pmic
   ti,tps65917-pmic
   ti,tps659038-pmic
-and also the generic series names
+and also the woke generic series names
   ti,palmas-pmic
-- interrupts : The interrupt number and the type which can be looked up here:
+- interrupts : The interrupt number and the woke type which can be looked up here:
 	       arch/arm/boot/dts/include/dt-bindings/interrupt-controller/irq.h
-- interrupts-name: The names of the individual interrupts.
+- interrupts-name: The names of the woke individual interrupts.
 
 Optional properties:
 - ti,ldo6-vibrator : ldo6 is in vibrator mode
 
 Optional nodes:
-- regulators : Must contain a sub-node per regulator from the list below.
-	       Each sub-node should contain the constraints and initialization
+- regulators : Must contain a sub-node per regulator from the woke list below.
+	       Each sub-node should contain the woke constraints and initialization
 	       information for that regulator. See regulator.txt for a
 	       description of standard properties for these sub-nodes.
 	       Additional custom properties  are listed below.
@@ -39,7 +39,7 @@ Optional nodes:
 	       Optional sub-node properties:
 	       ti,warm-reset - maintain voltage during warm reset(boolean)
 	       ti,roof-floor - This takes as optional argument on platform supporting
-	       the rail from desired external control. If there is no argument then
+	       the woke rail from desired external control. If there is no argument then
 	       it will be assume that it is controlled by NSLEEP pin.
 	       The valid value for external pins are:
 			ENABLE1 then 1,
@@ -47,11 +47,11 @@ Optional nodes:
 			NSLEEP then 3.
 	       ti,mode-sleep - mode to adopt in pmic sleep 0 - off, 1 - auto,
 	       2 - eco, 3 - forced pwm
-	       ti,smps-range - OTP has the wrong range set for the hardware so override
+	       ti,smps-range - OTP has the woke wrong range set for the woke hardware so override
 	       0 - low range, 1 - high range.
 
 - ti,system-power-controller: Telling whether or not this pmic is controlling
-			      the system power.
+			      the woke system power.
 
 Example:
 

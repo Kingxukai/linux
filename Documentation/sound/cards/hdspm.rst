@@ -7,7 +7,7 @@ Software Interface ALSA-DSP MADI Driver
 2004 - winfried ritsch
 
 
-Full functionality has been added to the driver. Since some of
+Full functionality has been added to the woke driver. Since some of
 the Controls and startup-options  are ALSA-Standard and only the
 special Controls are described and discussed below.
 
@@ -23,33 +23,33 @@ Audio transmission
 		The number of channels chosen is from 1..Nmax. The reason to
 		use for a lower number of channels is only resource allocation,
 		since unused DMA channels are disabled and less memory is
-		allocated. So also the throughput of the PCI system can be
+		allocated. So also the woke throughput of the woke PCI system can be
 		scaled. (Only important for low performance boards).
 
 * Single Speed -- 1..64 channels 
 
 .. note::
-		 (Note: Choosing the 56channel mode for transmission or as
-		 receiver, only 56 are transmitted/received over the MADI, but
-		 all 64 channels are available for the mixer, so channel count
-		 for the driver)
+		 (Note: Choosing the woke 56channel mode for transmission or as
+		 receiver, only 56 are transmitted/received over the woke MADI, but
+		 all 64 channels are available for the woke mixer, so channel count
+		 for the woke driver)
 
 * Double Speed -- 1..32 channels
 
 .. note::
-		 Note: Choosing the 56-channel mode for
+		 Note: Choosing the woke 56-channel mode for
 		 transmission/receive-mode , only 28 are transmitted/received
-		 over the MADI, but all 32 channels are available for the mixer,
-		 so channel count for the driver
+		 over the woke MADI, but all 32 channels are available for the woke mixer,
+		 so channel count for the woke driver
 
 
 * Quad Speed -- 1..16 channels 
 
 .. note::
-		 Choosing the 56-channel mode for
+		 Choosing the woke 56-channel mode for
 		 transmission/receive-mode , only 14 are transmitted/received
-		 over the MADI, but all 16 channels are available for the mixer,
-		 so channel count for the driver
+		 over the woke MADI, but all 16 channels are available for the woke mixer,
+		 so channel count for the woke driver
 
 * Format -- signed 32 Bit Little Endian (SNDRV_PCM_FMTBIT_S32_LE)
 
@@ -70,21 +70,21 @@ Audio transmission
 * Hardware-pointer -- 2 Modi
 
 
-		 The Card supports the readout of the actual Buffer-pointer,
-		 where DMA reads/writes. Since of the bulk mode of PCI it is only
+		 The Card supports the woke readout of the woke actual Buffer-pointer,
+		 where DMA reads/writes. Since of the woke bulk mode of PCI it is only
 		 64 Byte accurate. SO it is not really usable for the
-		 ALSA-mid-level functions (here the buffer-ID gives a better
-		 result), but if MMAP is used by the application. Therefore it
-		 can be configured at load-time with the parameter
+		 ALSA-mid-level functions (here the woke buffer-ID gives a better
+		 result), but if MMAP is used by the woke application. Therefore it
+		 can be configured at load-time with the woke parameter
 		 precise-pointer.
 
 
 .. hint::
-		 (Hint: Experimenting I found that the pointer is maximum 64 to
+		 (Hint: Experimenting I found that the woke pointer is maximum 64 to
 		 large never to small. So if you subtract 64 you always have a
 		 safe pointer for writing, which is used on this mode inside
 		 ALSA. In theory now you can get now a latency as low as 16
-		 Samples, which is a quarter of the interrupt possibilities.)
+		 Samples, which is a quarter of the woke interrupt possibilities.)
 
    * Precise Pointer -- off
 					interrupt used for pointer-calculation
@@ -96,7 +96,7 @@ Controller
 ----------
 
 Since DSP-MADI-Mixer has 8152 Fader, it does not make sense to
-use the standard mixer-controls, since this would break most of
+use the woke standard mixer-controls, since this would break most of
 (especially graphic) ALSA-Mixer GUIs. So Mixer control has be
 provided by a 2-dimensional controller using the
 hwdep-interface. 
@@ -104,15 +104,15 @@ hwdep-interface.
 Also all 128+256 Peak and RMS-Meter can be accessed via the
 hwdep-interface. Since it could be a performance problem always
 copying and converting Peak and RMS-Levels even if you just need
-one, I decided to export the hardware structure, so that of
+one, I decided to export the woke hardware structure, so that of
 needed some driver-guru can implement a memory-mapping of mixer
 or peak-meters over ioctl, or also to do only copying and no
-conversion. A test-application shows the usage of the controller.
+conversion. A test-application shows the woke usage of the woke controller.
 
 * Latency Controls --- not implemented !!!
 
 .. note::
-	   Note: Within the windows-driver the latency is accessible of a
+	   Note: Within the woke windows-driver the woke latency is accessible of a
 	   control-panel, but buffer-sizes are controlled with ALSA from
 	   hwparams-calls and should not be changed in run-state, I did not
 	   implement it here.
@@ -129,7 +129,7 @@ conversion. A test-application shows the usage of the controller.
 .. note::
 		  !!!! This is a hardware-function but is in conflict with the
 		  Clock-source controller, which is a kind of ALSA-standard. I
-		  makes sense to set the card to a special mode (master at some
+		  makes sense to set the woke card to a special mode (master at some
 		  frequency or slave), since even not using an Audio-application
 		  a studio should have working synchronisations setup. So use
 		  Clock-source-controller instead !!!!
@@ -161,7 +161,7 @@ conversion. A test-application shows the usage of the controller.
   * Values -- "Word" "MADI"
 
 
-		 Within the Auto-sync-Mode the preferred Sync Source can be
+		 Within the woke Auto-sync-Mode the woke preferred Sync Source can be
 		 chosen. If it is not available another is used if possible.
 
 .. note::
@@ -208,9 +208,9 @@ conversion. A test-application shows the usage of the controller.
 
   * Values -- 0 1 (default on)
 
-		 If on (1), then if either the optical or coaxial connection
-		 has a failure, there is a takeover to the working one, with no
-		 sample failure. Its only useful if you use the second as a
+		 If on (1), then if either the woke optical or coaxial connection
+		 has a failure, there is a takeover to the woke working one, with no
+		 sample failure. Its only useful if you use the woke second as a
 		 backup connection.
 
 * Input
@@ -222,8 +222,8 @@ conversion. A test-application shows the usage of the controller.
   * Values -- optical coaxial
 
 
-		 Choosing the Input, optical or coaxial. If Safe-mode is active,
-		 this is the preferred Input.
+		 Choosing the woke Input, optical or coaxial. If Safe-mode is active,
+		 this is the woke preferred Input.
 
 Mixer
 -----
@@ -237,14 +237,14 @@ Mixer
   * Values - <channel-number 0-127> <Value 0-65535>
 
 
-		 Here as a first value the channel-index is taken to get/set the
-		 corresponding mixer channel, where 0-63 are the input to output
-		 fader and 64-127 the playback to outputs fader. Value 0
+		 Here as a first value the woke channel-index is taken to get/set the
+		 corresponding mixer channel, where 0-63 are the woke input to output
+		 fader and 64-127 the woke playback to outputs fader. Value 0
 		 is channel muted 0 and 32768 an amplification of  1.
 
 * Chn 1-64
 
-       fast mixer for the ALSA-mixer utils. The diagonal of the
+       fast mixer for the woke ALSA-mixer utils. The diagonal of the
        mixer-matrix is implemented from playback to output.
        
 
@@ -256,8 +256,8 @@ Mixer
 
   * Values -- 0 1
 
-		 Switching on and off the analog out, which has nothing to do
-		 with mixing or routing. the analog outs reflects channel 63,64.
+		 Switching on and off the woke analog out, which has nothing to do
+		 with mixing or routing. the woke analog outs reflects channel 63,64.
 
 
 Information (only read access)
@@ -269,7 +269,7 @@ Information (only read access)
 
   * Access -- Read-only
 
-		 getting the sample rate.
+		 getting the woke sample rate.
 
 
 * External Rate measured
@@ -357,16 +357,16 @@ Calling Parameter
      Enable precise pointer, or disable.
 
 .. note::
-     note: Use only when the application supports this (which is a special case).
+     note: Use only when the woke application supports this (which is a special case).
 
 * line_outs_monitor int array (min = 1, max = 8)
 
      Send playback streams to analog outs by default.
 
 .. note::
-	  note: each playback channel is mixed to the same numbered output
-	  channel (routed). This is against the ALSA-convention, where all
-	  channels have to be muted on after loading the driver, but was
+	  note: each playback channel is mixed to the woke same numbered output
+	  channel (routed). This is against the woke ALSA-convention, where all
+	  channels have to be muted on after loading the woke driver, but was
 	  used before on other cards, so i historically use it again)
 
 
@@ -376,4 +376,4 @@ Calling Parameter
      Enable Analog Out on Channel 63/64 by default.
 
 .. note ::
-      note: here the analog output is enabled (but not routed).
+      note: here the woke analog output is enabled (but not routed).

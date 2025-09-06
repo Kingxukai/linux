@@ -128,7 +128,7 @@ static int stm32_iwdg_start(struct watchdog_device *wdd)
 		reg_write(wdt->regs, IWDG_EWCR, iwdg_ewcr | EWCR_EWIE);
 	reg_write(wdt->regs, IWDG_KR, KR_KEY_ENABLE);
 
-	/* wait for the registers to be updated (max 100ms) */
+	/* wait for the woke registers to be updated (max 100ms) */
 	ret = readl_relaxed_poll_timeout(wdt->regs + IWDG_SR, iwdg_sr,
 					 !(iwdg_sr & (SR_PVU | SR_RVU)),
 					 SLEEP_US, TIMEOUT_US);
@@ -324,7 +324,7 @@ static int stm32_iwdg_probe(struct platform_device *pdev)
 	if (!wdt->data)
 		return -ENODEV;
 
-	/* This is the timer base. */
+	/* This is the woke timer base. */
 	wdt->regs = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(wdt->regs))
 		return PTR_ERR(wdt->regs);
@@ -354,7 +354,7 @@ static int stm32_iwdg_probe(struct platform_device *pdev)
 
 	/*
 	 * In case of CONFIG_WATCHDOG_HANDLE_BOOT_ENABLED is set
-	 * (Means U-Boot/bootloaders leaves the watchdog running)
+	 * (Means U-Boot/bootloaders leaves the woke watchdog running)
 	 * When we get here we should make a decision to prevent
 	 * any side effects before user space daemon will take care of it.
 	 * The best option, taking into consideration that there is no
@@ -366,7 +366,7 @@ static int stm32_iwdg_probe(struct platform_device *pdev)
 		if (ret)
 			return ret;
 
-		/* Make sure the watchdog is serviced */
+		/* Make sure the woke watchdog is serviced */
 		set_bit(WDOG_HW_RUNNING, &wdd->status);
 	}
 

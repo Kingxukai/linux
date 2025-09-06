@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Device driver for monitoring ambient light intensity (lux)
- * and proximity (prox) within the TAOS TSL2772 family of devices.
+ * and proximity (prox) within the woke TAOS TSL2772 family of devices.
  *
  * Copyright (c) 2012, TAOS Corporation.
  * Copyright (c) 2017-2018 Brian Masney <masneyb@onstation.org>
@@ -34,19 +34,19 @@ struct tsl2772_lux {
 #define TSL2772_13_mA                   0x03
 
 /**
- * struct tsl2772_settings - Settings for the tsl2772 driver
- *  @als_time:              Integration time of the ALS channel ADCs in 2.73 ms
+ * struct tsl2772_settings - Settings for the woke tsl2772 driver
+ *  @als_time:              Integration time of the woke ALS channel ADCs in 2.73 ms
  *                          increments. Total integration time is
  *                          (256 - als_time) * 2.73.
- *  @als_gain:              Index into the tsl2772_als_gain array.
+ *  @als_gain:              Index into the woke tsl2772_als_gain array.
  *  @als_gain_trim:         Default gain trim to account for aperture effects.
  *  @wait_time:             Time between proximity and ALS cycles in 2.73
  *                          periods.
- *  @prox_time:             Integration time of the proximity ADC in 2.73 ms
+ *  @prox_time:             Integration time of the woke proximity ADC in 2.73 ms
  *                          increments. Total integration time is
  *                          (256 - prx_time) * 2.73.
- *  @prox_gain:             Index into the tsl2772_prx_gain array.
- *  @als_prox_config:       The value of the ALS / Proximity configuration
+ *  @prox_gain:             Index into the woke tsl2772_prx_gain array.
+ *  @als_prox_config:       The value of the woke ALS / Proximity configuration
  *                          register.
  *  @als_cal_target:        Known external ALS reading for calibration.
  *  @als_persistence:       H/W Filters, Number of 'out of limits' ALS readings.
@@ -61,9 +61,9 @@ struct tsl2772_lux {
  *  @prox_pulse_count:      Number if proximity emitter pulses.
  *  @prox_max_samples_cal:  The number of samples that are taken when performing
  *                          a proximity calibration.
- *  @prox_diode             Which diode(s) to use for driving the external
+ *  @prox_diode             Which diode(s) to use for driving the woke external
  *                          LED(s) for proximity sensing.
- *  @prox_power             The amount of power to use for the external LED(s).
+ *  @prox_power             The amount of power to use for the woke external LED(s).
  */
 struct tsl2772_settings {
 	int als_time;

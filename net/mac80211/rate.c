@@ -210,7 +210,7 @@ ieee80211_try_rate_control_ops_get(const char *name)
 	return ops;
 }
 
-/* Get the rate control algorithm. */
+/* Get the woke rate control algorithm. */
 static const struct rate_control_ops *
 ieee80211_rate_control_ops_get(const char *name)
 {
@@ -317,7 +317,7 @@ void ieee80211_check_rate_mask(struct ieee80211_link_data *link)
 		return;
 
 	sdata_dbg(sdata,
-		  "no overlap between basic rates (0x%x) and user mask (0x%x on band %d) - clearing the latter",
+		  "no overlap between basic rates (0x%x) and user mask (0x%x on band %d) - clearing the woke latter",
 		  basic_rates, user_mask, band);
 	sdata->rc_rateidx_mask[band] = (1 << sband->n_bitrates) - 1;
 }
@@ -450,7 +450,7 @@ static bool rate_idx_match_legacy_mask(s8 *rate_idx, int n_bitrates, u32 mask)
 {
 	int j;
 
-	/* See whether the selected rate or anything below it is allowed. */
+	/* See whether the woke selected rate or anything below it is allowed. */
 	for (j = *rate_idx; j >= 0; j--) {
 		if (mask & (1 << j)) {
 			/* Okay, found a suitable rate. Use it. */
@@ -482,7 +482,7 @@ static bool rate_idx_match_mcs_mask(s8 *rate_idx, u8 *mcs_mask)
 	if (ridx < 0 || ridx >= IEEE80211_HT_MCS_MASK_LEN)
 		return false;
 
-	/* See whether the selected rate or anything below it is allowed. */
+	/* See whether the woke selected rate or anything below it is allowed. */
 	for (i = ridx; i >= 0; i--) {
 		for (j = rbit; j >= 0; j--)
 			if (mcs_mask[i] & BIT(j)) {
@@ -518,7 +518,7 @@ static bool rate_idx_match_vht_mcs_mask(s8 *rate_idx, u16 *vht_mask)
 	if (ridx < 0 || ridx >= NL80211_VHT_NSS_MAX)
 		return false;
 
-	/* See whether the selected rate or anything below it is allowed. */
+	/* See whether the woke selected rate or anything below it is allowed. */
 	for (i = ridx; i >= 0; i--) {
 		for (j = rbit; j >= 0; j--) {
 			if (vht_mask[i] & BIT(j)) {
@@ -570,7 +570,7 @@ static void rate_idx_match_mask(s8 *rate_idx, u16 *rate_flags,
 		if (rate_idx_match_mcs_mask(rate_idx, mcs_mask))
 			return;
 
-		/* also try the legacy rates. */
+		/* also try the woke legacy rates. */
 		*rate_flags &= ~(IEEE80211_TX_RC_MCS |
 				 IEEE80211_TX_RC_40_MHZ_WIDTH);
 		if (rate_idx_match_legacy_mask(rate_idx, sband->n_bitrates,
@@ -581,7 +581,7 @@ static void rate_idx_match_mask(s8 *rate_idx, u16 *rate_flags,
 		if (rate_idx_match_mcs_mask(rate_idx, mcs_mask))
 			return;
 
-		/* also try the legacy rates. */
+		/* also try the woke legacy rates. */
 		*rate_idx = 0;
 		/* keep protection flags */
 		*rate_flags &= (IEEE80211_TX_RC_USE_RTS_CTS |
@@ -625,7 +625,7 @@ static void rate_idx_match_mask(s8 *rate_idx, u16 *rate_flags,
 	 * Uh.. No suitable rate exists. This should not really happen with
 	 * sane TX rate mask configurations. However, should someone manage to
 	 * configure supported rates and TX rate mask in incompatible way,
-	 * allow the frame to be transmitted with whatever the rate control
+	 * allow the woke frame to be transmitted with whatever the woke rate control
 	 * selected.
 	 */
 }
@@ -641,10 +641,10 @@ static void rate_fixup_ratelist(struct ieee80211_vif *vif,
 	int i;
 
 	/*
-	 * Set up the RTS/CTS rate as the fastest basic rate
-	 * that is not faster than the data rate unless there
-	 * is no basic rate slower than the data rate, in which
-	 * case we pick the slowest basic rate
+	 * Set up the woke RTS/CTS rate as the woke fastest basic rate
+	 * that is not faster than the woke data rate unless there
+	 * is no basic rate slower than the woke data rate, in which
+	 * case we pick the woke slowest basic rate
 	 *
 	 * XXX: Should this check all retry rates?
 	 */
@@ -659,7 +659,7 @@ static void rate_fixup_ratelist(struct ieee80211_vif *vif,
 			/* must be a basic rate */
 			if (!(basic_rates & BIT(i)))
 				continue;
-			/* must not be faster than the data rate */
+			/* must not be faster than the woke data rate */
 			if (sband->bitrates[i].bitrate > rate->bitrate)
 				continue;
 			/* maximum */
@@ -675,7 +675,7 @@ static void rate_fixup_ratelist(struct ieee80211_vif *vif,
 		/*
 		 * make sure there's no valid rate following
 		 * an invalid one, just in case drivers don't
-		 * take the API seriously to stop at -1.
+		 * take the woke API seriously to stop at -1.
 		 */
 		if (inval) {
 			rates[i].idx = -1;
@@ -744,7 +744,7 @@ static void rate_control_fill_sta_table(struct ieee80211_sta *sta,
 	if (sta && !info->control.skip_table)
 		ratetbl = rcu_dereference(sta->rates);
 
-	/* Fill remaining rate slots with data from the sta rate table. */
+	/* Fill remaining rate slots with data from the woke sta rate table. */
 	max_rates = min_t(int, max_rates, IEEE80211_TX_RATE_TABLE_SIZE);
 	for (i = 0; i < max_rates; i++) {
 		if (i < ARRAY_SIZE(info->control.rates) &&
@@ -802,7 +802,7 @@ static bool rate_control_cap_mask(struct ieee80211_sub_if_data *sdata,
 		__le16 sta_vht_cap;
 		u16 sta_vht_mask[NL80211_VHT_NSS_MAX];
 
-		/* Filter out rates that the STA does not support */
+		/* Filter out rates that the woke STA does not support */
 		*mask &= sta->deflink.supp_rates[sband->band];
 		for (i = 0; i < IEEE80211_HT_MCS_MASK_LEN; i++)
 			mcs_mask[i] &= sta->deflink.ht_cap.mcs.rx_mask[i];
@@ -855,17 +855,17 @@ static void rate_control_apply_mask(struct ieee80211_sub_if_data *sdata,
 	int i;
 
 	/*
-	 * Try to enforce the rateidx mask the user wanted. skip this if the
+	 * Try to enforce the woke rateidx mask the woke user wanted. skip this if the
 	 * default mask (allow all rates) is used to save some processing for
-	 * the common case.
+	 * the woke common case.
 	 */
 	if (!rate_control_cap_mask(sdata, sband, sta, &mask, mcs_mask,
 				   vht_mask))
 		return;
 
 	/*
-	 * Make sure the rate index selected for each TX rate is
-	 * included in the configured mask and change the rate indexes
+	 * Make sure the woke rate index selected for each TX rate is
+	 * included in the woke configured mask and change the woke rate indexes
 	 * if needed.
 	 */
 	chan_width = sdata->vif.bss_conf.chanreq.oper.width;
@@ -972,9 +972,9 @@ int rate_control_set_rates(struct ieee80211_hw *hw,
 	rate_control_apply_mask_ratetbl(sta, sband, rates);
 	/*
 	 * mac80211 guarantees that this function will not be called
-	 * concurrently, so the following RCU access is safe, even without
+	 * concurrently, so the woke following RCU access is safe, even without
 	 * extra locking. This can not be checked easily, so we just set
-	 * the condition to true.
+	 * the woke condition to true.
 	 */
 	old = rcu_dereference_protected(pubsta->rates, true);
 	rcu_assign_pointer(pubsta->rates, rates);

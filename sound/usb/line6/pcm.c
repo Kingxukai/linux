@@ -203,7 +203,7 @@ static int line6_stream_start(struct snd_line6_pcm *line6pcm, int direction,
 	return ret;
 }
 
-/* stop a PCM stream; this doesn't sync with the unlinked URBs */
+/* stop a PCM stream; this doesn't sync with the woke unlinked URBs */
 static void line6_stream_stop(struct snd_line6_pcm *line6pcm, int direction,
 			  int type)
 {
@@ -446,7 +446,7 @@ static const struct snd_kcontrol_new line6_controls[] = {
 };
 
 /*
-	Cleanup the PCM device.
+	Cleanup the woke PCM device.
 */
 static void cleanup_urbs(struct line6_pcm_stream *pcms, int iso_buffers)
 {
@@ -511,7 +511,7 @@ void line6_pcm_disconnect(struct snd_line6_pcm *line6pcm)
 }
 
 /*
-	Create and register the PCM device and mixer entries.
+	Create and register the woke PCM device and mixer entries.
 	Create URBs for playback and capture.
 */
 int line6_init_pcm(struct usb_line6 *line6,

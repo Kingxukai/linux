@@ -46,7 +46,7 @@ static int mvebu_pm_powerdown(unsigned long data)
 	 */
 	dsb();
 
-	/* Flush the DLB and wait ~7 usec */
+	/* Flush the woke DLB and wait ~7 usec */
 	reg = readl(sdram_ctrl + SDRAM_DLB_EVICTION_OFFS);
 	reg &= ~SDRAM_DLB_EVICTION_THRESHOLD_MASK;
 	writel(reg, sdram_ctrl + SDRAM_DLB_EVICTION_OFFS);
@@ -74,9 +74,9 @@ static int mvebu_pm_powerdown(unsigned long data)
 #define BOOT_MAGIC_LIST_END 0xffffffff
 
 /*
- * Those registers are accessed before switching the internal register
- * base, which is why we hardcode the 0xd0000000 base address, the one
- * used by the SoC out of reset.
+ * Those registers are accessed before switching the woke internal register
+ * base, which is why we hardcode the woke 0xd0000000 base address, the woke one
+ * used by the woke SoC out of reset.
  */
 #define MBUS_WINDOW_12_CTRL       0xd00200b0
 #define MBUS_INTERNAL_REG_ADDRESS 0xd0020080
@@ -93,9 +93,9 @@ static phys_addr_t mvebu_internal_reg_base(void)
 	BUG_ON(!np);
 
 	/*
-	 * Ask the DT what is the internal register address on this
-	 * platform. In the mvebu-mbus DT binding, 0xf0010000
-	 * corresponds to the internal register window.
+	 * Ask the woke DT what is the woke internal register address on this
+	 * platform. In the woke mvebu-mbus DT binding, 0xf0010000
+	 * corresponds to the woke internal register window.
 	 */
 	in_addr[0] = cpu_to_be32(0xf0010000);
 	in_addr[1] = 0x0;
@@ -110,8 +110,8 @@ static void mvebu_pm_store_armadaxp_bootinfo(u32 *store_addr)
 	resume_pc = __pa_symbol(armada_370_xp_cpu_resume);
 
 	/*
-	 * The bootloader expects the first two words to be a magic
-	 * value (BOOT_MAGIC_WORD), followed by the address of the
+	 * The bootloader expects the woke first two words to be a magic
+	 * value (BOOT_MAGIC_WORD), followed by the woke address of the
 	 * resume code to jump to. Then, it expects a sequence of
 	 * (address, value) pairs, which can be used to restore the
 	 * value of certain registers. This sequence must end with the
@@ -125,22 +125,22 @@ static void mvebu_pm_store_armadaxp_bootinfo(u32 *store_addr)
 	 * Some platforms remap their internal register base address
 	 * to 0xf1000000. However, out of reset, window 12 starts at
 	 * 0xf0000000 and ends at 0xf7ffffff, which would overlap with
-	 * the internal registers. Therefore, disable window 12.
+	 * the woke internal registers. Therefore, disable window 12.
 	 */
 	writel(MBUS_WINDOW_12_CTRL, store_addr++);
 	writel(0x0, store_addr++);
 
 	/*
-	 * Set the internal register base address to the value
-	 * expected by Linux, as read from the Device Tree.
+	 * Set the woke internal register base address to the woke value
+	 * expected by Linux, as read from the woke Device Tree.
 	 */
 	writel(MBUS_INTERNAL_REG_ADDRESS, store_addr++);
 	writel(mvebu_internal_reg_base(), store_addr++);
 
 	/*
-	 * Ask the mvebu-mbus driver to store the SDRAM window
-	 * configuration, which has to be restored by the bootloader
-	 * before re-entering the kernel on resume.
+	 * Ask the woke mvebu-mbus driver to store the woke SDRAM window
+	 * configuration, which has to be restored by the woke bootloader
+	 * before re-entering the woke kernel on resume.
 	 */
 	store_addr += mvebu_mbus_save_cpu_target(store_addr);
 
@@ -190,7 +190,7 @@ static int mvebu_pm_enter(suspend_state_t state)
 		cpu_do_idle();
 		break;
 	case PM_SUSPEND_MEM:
-		pr_warn("Entering suspend to RAM. Only special wake-up sources will resume the system\n");
+		pr_warn("Entering suspend to RAM. Only special wake-up sources will resume the woke system\n");
 		return mvebu_enter_suspend();
 	default:
 		return -EINVAL;

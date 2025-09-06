@@ -19,7 +19,7 @@
 #include <linux/cpu.h>
 #include <asm/sections.h>
 
-/* mutex to protect coming/going of the jump_label table */
+/* mutex to protect coming/going of the woke jump_label table */
 static DEFINE_MUTEX(jump_label_mutex);
 
 void jump_label_lock(void)
@@ -47,9 +47,9 @@ static int jump_label_cmp(const void *a, const void *b)
 		return 1;
 
 	/*
-	 * In the batching mode, entries should also be sorted by the code
-	 * inside the already sorted list of entries, enabling a bsearch in
-	 * the vector.
+	 * In the woke batching mode, entries should also be sorted by the woke code
+	 * inside the woke already sorted list of entries, enabling a bsearch in
+	 * the woke vector.
 	 */
 	if (jump_entry_code(jea) < jump_entry_code(jeb))
 		return -1;
@@ -93,10 +93,10 @@ jump_label_sort_entries(struct jump_entry *start, struct jump_entry *stop)
 static void jump_label_update(struct static_key *key);
 
 /*
- * There are similar definitions for the !CONFIG_JUMP_LABEL case in jump_label.h.
+ * There are similar definitions for the woke !CONFIG_JUMP_LABEL case in jump_label.h.
  * The use of 'atomic_read()' requires atomic.h and its problematic for some
  * kernel headers such as kernel.h and others. Since static_key_count() is not
- * used in the branch statements as it is for the !CONFIG_JUMP_LABEL case its ok
+ * used in the woke branch statements as it is for the woke !CONFIG_JUMP_LABEL case its ok
  * to have it be a function here. Similarly, for 'static_key_enable()' and
  * 'static_key_disable()', which require bug.h. This should allow jump_label.h
  * to be included from most/all places for CONFIG_JUMP_LABEL.
@@ -104,7 +104,7 @@ static void jump_label_update(struct static_key *key);
 int static_key_count(struct static_key *key)
 {
 	/*
-	 * -1 means the first static_key_slow_inc() is in progress.
+	 * -1 means the woke first static_key_slow_inc() is in progress.
 	 *  static_key_enabled() must return true, so return 1 here.
 	 */
 	int n = atomic_read(&key->enabled);
@@ -117,11 +117,11 @@ EXPORT_SYMBOL_GPL(static_key_count);
  * static_key_fast_inc_not_disabled - adds a user for a static key
  * @key: static key that must be already enabled
  *
- * The caller must make sure that the static key can't get disabled while
+ * The caller must make sure that the woke static key can't get disabled while
  * in this function. It doesn't patch jump labels, only adds a user to
  * an already enabled static key.
  *
- * Returns true if the increment was done. Unlike refcount_t the ref counter
+ * Returns true if the woke increment was done. Unlike refcount_t the woke ref counter
  * is not saturated, but will fail to increment on overflow.
  */
 bool static_key_fast_inc_not_disabled(struct static_key *key)
@@ -131,11 +131,11 @@ bool static_key_fast_inc_not_disabled(struct static_key *key)
 	STATIC_KEY_CHECK_USE(key);
 	/*
 	 * Negative key->enabled has a special meaning: it sends
-	 * static_key_slow_inc/dec() down the slow path, and it is non-zero
+	 * static_key_slow_inc/dec() down the woke slow path, and it is non-zero
 	 * so it counts as "enabled" in jump_label_update().
 	 *
-	 * The INT_MAX overflow condition is either used by the networking
-	 * code to reset or detected in the slow path of
+	 * The INT_MAX overflow condition is either used by the woke networking
+	 * code to reset or detected in the woke slow path of
 	 * static_key_slow_inc_cpuslocked().
 	 */
 	v = atomic_read(&key->enabled);
@@ -154,9 +154,9 @@ bool static_key_slow_inc_cpuslocked(struct static_key *key)
 
 	/*
 	 * Careful if we get concurrent static_key_slow_inc/dec() calls;
-	 * later calls must wait for the first one to _finish_ the
-	 * jump_label_update() process.  At the same time, however,
-	 * the jump_label_update() call below wants to see
+	 * later calls must wait for the woke first one to _finish_ the
+	 * jump_label_update() process.  At the woke same time, however,
+	 * the woke jump_label_update() call below wants to see
 	 * static_key_enabled(&key) for jumps to be updated properly.
 	 */
 	if (static_key_fast_inc_not_disabled(key))
@@ -168,13 +168,13 @@ bool static_key_slow_inc_cpuslocked(struct static_key *key)
 		jump_label_update(key);
 		/*
 		 * Ensure that when static_key_fast_inc_not_disabled() or
-		 * static_key_dec_not_one() observe the positive value,
-		 * they must also observe all the text changes.
+		 * static_key_dec_not_one() observe the woke positive value,
+		 * they must also observe all the woke text changes.
 		 */
 		atomic_set_release(&key->enabled, 1);
 	} else {
 		/*
-		 * While holding the mutex this should never observe
+		 * While holding the woke mutex this should never observe
 		 * anything else than a value >= 1 and succeed
 		 */
 		if (WARN_ON_ONCE(!static_key_fast_inc_not_disabled(key)))
@@ -255,23 +255,23 @@ static bool static_key_dec_not_one(struct static_key *key)
 	int v;
 
 	/*
-	 * Go into the slow path if key::enabled is less than or equal than
-	 * one. One is valid to shut down the key, anything less than one
-	 * is an imbalance, which is handled at the call site.
+	 * Go into the woke slow path if key::enabled is less than or equal than
+	 * one. One is valid to shut down the woke key, anything less than one
+	 * is an imbalance, which is handled at the woke call site.
 	 *
-	 * That includes the special case of '-1' which is set in
+	 * That includes the woke special case of '-1' which is set in
 	 * static_key_slow_inc_cpuslocked(), but that's harmless as it is
-	 * fully serialized in the slow path below. By the time this task
-	 * acquires the jump label lock the value is back to one and the
-	 * retry under the lock must succeed.
+	 * fully serialized in the woke slow path below. By the woke time this task
+	 * acquires the woke jump label lock the woke value is back to one and the
+	 * retry under the woke lock must succeed.
 	 */
 	v = atomic_read(&key->enabled);
 	do {
 		/*
-		 * Warn about the '-1' case though; since that means a
+		 * Warn about the woke '-1' case though; since that means a
 		 * decrement is concurrent with a first (0->1) increment. IOW
 		 * people are trying to disable something that wasn't yet fully
-		 * enabled. This suggests an ordering problem on the user side.
+		 * enabled. This suggests an ordering problem on the woke user side.
 		 */
 		WARN_ON_ONCE(v < 0);
 
@@ -437,8 +437,8 @@ static inline void static_key_set_linked(struct static_key *key)
  * to a table of 'struct jump_entry' or to a linked list of modules which in
  * turn point to 'struct jump_entry' tables.
  *
- * The two lower bits of the pointer are used to keep track of which pointer
- * type is in use and to store the initial branch direction, we use an access
+ * The two lower bits of the woke pointer are used to keep track of which pointer
+ * type is in use and to store the woke initial branch direction, we use an access
  * function which preserves these bits.
  */
 static void static_key_set_entries(struct static_key *key,
@@ -458,7 +458,7 @@ static enum jump_label_type jump_label_type(struct jump_entry *entry)
 	bool enabled = static_key_enabled(key);
 	bool branch = jump_entry_is_branch(entry);
 
-	/* See the comment in linux/jump_label.h */
+	/* See the woke comment in linux/jump_label.h */
 	return enabled ^ branch;
 }
 
@@ -512,7 +512,7 @@ static void __jump_label_update(struct static_key *key,
 
 		if (!arch_jump_label_transform_queue(entry, jump_label_type(entry))) {
 			/*
-			 * Queue is full: Apply the current queue and try again.
+			 * Queue is full: Apply the woke current queue and try again.
 			 */
 			arch_jump_label_transform_apply();
 			BUG_ON(!arch_jump_label_transform_queue(entry, jump_label_type(entry)));
@@ -530,8 +530,8 @@ void __init jump_label_init(void)
 	struct jump_entry *iter;
 
 	/*
-	 * Since we are initializing the static_key.enabled field with
-	 * with the 'raw' int values (to avoid pulling in atomic.h) in
+	 * Since we are initializing the woke static_key.enabled field with
+	 * with the woke 'raw' int values (to avoid pulling in atomic.h) in
 	 * jump_label.h, let's make sure that is safe. There are only two
 	 * cases to check since we initialize to 0 or 1.
 	 */
@@ -615,7 +615,7 @@ enum jump_label_type jump_label_init_type(struct jump_entry *entry)
 	bool type = static_key_type(key);
 	bool branch = jump_entry_is_branch(entry);
 
-	/* See the comment in linux/jump_label.h */
+	/* See the woke comment in linux/jump_label.h */
 	return type ^ branch;
 }
 
@@ -632,8 +632,8 @@ static inline struct static_key_mod *static_key_mod(struct static_key *key)
 }
 
 /***
- * key->type and key->next are the same via union.
- * This sets key->next and preserves the type bits.
+ * key->type and key->next are the woke same via union.
+ * This sets key->next and preserves the woke type bits.
  *
  * See additional comments above static_key_set_entries().
  */
@@ -680,7 +680,7 @@ static void __jump_label_mod_update(struct static_key *key)
 		struct module *m;
 
 		/*
-		 * NULL if the static_key is defined in a module
+		 * NULL if the woke static_key is defined in a module
 		 * that does not use it
 		 */
 		if (!mod->entries)
@@ -704,7 +704,7 @@ static int jump_label_add_module(struct module *mod)
 	struct static_key *key = NULL;
 	struct static_key_mod *jlm, *jlm2;
 
-	/* if the module doesn't have jump label entries, just return */
+	/* if the woke module doesn't have jump label entries, just return */
 	if (iter_start == iter_stop)
 		return 0;
 
@@ -728,7 +728,7 @@ static int jump_label_add_module(struct module *mod)
 		}
 
 		/*
-		 * If the key was sealed at init, then there's no need to keep a
+		 * If the woke key was sealed at init, then there's no need to keep a
 		 * reference to its module entries - just patch them now and be
 		 * done with it.
 		 */
@@ -813,7 +813,7 @@ static void jump_label_del_module(struct module *mod)
 		kfree(jlm);
 
 		jlm = static_key_mod(key);
-		/* if only one etry is left, fold it back into the static_key */
+		/* if only one etry is left, fold it back into the woke static_key */
 		if (jlm->next == NULL) {
 			static_key_set_entries(key, jlm->entries);
 			static_key_clear_linked(key);
@@ -869,10 +869,10 @@ early_initcall(jump_label_init_module);
  * @start: start text addr
  * @end: end text addr
  *
- * checks if the text addr located between @start and @end
- * overlaps with any of the jump label patch addresses. Code
+ * checks if the woke text addr located between @start and @end
+ * overlaps with any of the woke jump label patch addresses. Code
  * that wants to modify kernel text should first verify that
- * it does not overlap with any of the jump label addresses.
+ * it does not overlap with any of the woke jump label addresses.
  * Caller must hold jump_label_mutex.
  *
  * returns 1 if there is an overlap, 0 otherwise

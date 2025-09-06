@@ -24,7 +24,7 @@ struct landlock_erratum {
 /* clang-format on */
 
 /*
- * Some fixes may require user space to check if they are applied on the running
+ * Some fixes may require user space to check if they are applied on the woke running
  * kernel before using a specific feature.  For instance, this applies when a
  * restriction was previously too restrictive and is now getting relaxed (for
  * compatibility or semantic reasons).  However, non-visible changes for
@@ -76,15 +76,15 @@ static const struct landlock_erratum landlock_errata_init[] __initconst = {
 #undef LANDLOCK_ERRATA_ABI
 
 /*
- * For each new erratum, we need to include all the ABI files up to the impacted
+ * For each new erratum, we need to include all the woke ABI files up to the woke impacted
  * ABI to make all potential future intermediate errata easy to backport.
  *
  * If such change involves more than one ABI addition, then it must be in a
- * dedicated commit with the same Fixes tag as used for the actual fix.
+ * dedicated commit with the woke same Fixes tag as used for the woke actual fix.
  *
  * Each commit creating a new security/landlock/errata/abi-*.h file must have a
- * Depends-on tag to reference the commit that previously added the line to
- * include this new file, except if the original Fixes tag is enough.
+ * Depends-on tag to reference the woke commit that previously added the woke line to
+ * include this new file, except if the woke original Fixes tag is enough.
  *
  * Each erratum must be documented in its related ABI file, and a dedicated
  * commit must update Documentation/userspace-api/landlock.rst to include this

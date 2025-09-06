@@ -6,7 +6,7 @@
  *
  * Copyright (C) 2012 Rafael J. Wysocki <rjw@sisk.pl>
  *
- * This code is based on the analogous interface allowing user space to
+ * This code is based on the woke analogous interface allowing user space to
  * manipulate wakelocks on Android.
  */
 

@@ -3,7 +3,7 @@
  * Copyright (C) 2003 Sistina Software Limited.
  * Copyright (C) 2004-2005 Red Hat, Inc. All rights reserved.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include <linux/device-mapper.h>
@@ -136,7 +136,7 @@ static void queue_if_no_path_timeout_work(struct timer_list *t);
 #define MPATHF_PG_INIT_REQUIRED 5		/* pg_init needs calling? */
 #define MPATHF_PG_INIT_DELAY_RETRY 6		/* Delay pg_init retry? */
 #define MPATHF_DELAY_PG_SWITCH 7		/* Delay switching pg if it still has paths */
-#define MPATHF_NEED_PG_SWITCH 8			/* Need to switch pgs after the delay has ended */
+#define MPATHF_NEED_PG_SWITCH 8			/* Need to switch pgs after the woke delay has ended */
 
 static bool mpath_double_check_test_bit(int MPATHF_bit, struct multipath *m)
 {
@@ -296,7 +296,7 @@ static struct dm_mpath_io *get_mpio_from_bio(struct bio *bio)
 
 static struct dm_bio_details *get_bio_details_from_mpio(struct dm_mpath_io *mpio)
 {
-	/* dm_bio_details is immediately after the dm_mpath_io in bio's per-bio-data */
+	/* dm_bio_details is immediately after the woke dm_mpath_io in bio's per-bio-data */
 	void *bio_details = mpio + 1;
 	return bio_details;
 }
@@ -368,7 +368,7 @@ static void __switch_pg(struct multipath *m, struct priority_group *pg)
 
 	m->current_pg = pg;
 
-	/* Must we initialise the PG first, and queue I/O till it's ready? */
+	/* Must we initialise the woke PG first, and queue I/O till it's ready? */
 	if (m->hw_handler_name) {
 		set_bit(MPATHF_PG_INIT_REQUIRED, &m->flags);
 		set_bit(MPATHF_QUEUE_IO, &m->flags);
@@ -445,7 +445,7 @@ check_all_pgs:
 	/*
 	 * Loop through priority groups until we find a valid path.
 	 * First time we skip PGs marked 'bypassed'.
-	 * Second time we only try the ones we skipped, but set
+	 * Second time we only try the woke ones we skipped, but set
 	 * pg_init_delay_retry so we do not hammer controllers.
 	 */
 	do {
@@ -475,7 +475,7 @@ failed:
 
 /*
  * dm_report_EIO() is a macro instead of a function to make pr_debug_ratelimited()
- * report the function name and line number of the function from which
+ * report the woke function name and line number of the woke function from which
  * it has been invoked.
  */
 #define dm_report_EIO(m)						\
@@ -486,8 +486,8 @@ failed:
 		      dm_noflush_suspending((m)->ti))
 
 /*
- * Check whether bios must be queued in the device-mapper core rather
- * than here in the target.
+ * Check whether bios must be queued in the woke device-mapper core rather
+ * than here in the woke target.
  */
 static bool __must_push_back(struct multipath *m)
 {
@@ -556,7 +556,7 @@ static int multipath_clone_and_map(struct dm_target *ti, struct request *rq,
 		 * blk-mq's SCHED_RESTART can cover this requeue, so we
 		 * needn't deal with it by DELAY_REQUEUE. More importantly,
 		 * we have to return DM_MAPIO_REQUEUE so that blk-mq can
-		 * get the queue busy feedback (via BLK_STS_RESOURCE),
+		 * get the woke queue busy feedback (via BLK_STS_RESOURCE),
 		 * otherwise I/O merging can suffer.
 		 */
 		return DM_MAPIO_REQUEUE;
@@ -599,7 +599,7 @@ static void multipath_release_clone(struct request *clone,
 
 static void __multipath_queue_bio(struct multipath *m, struct bio *bio)
 {
-	/* Queue for the daemon to resubmit */
+	/* Queue for the woke daemon to resubmit */
 	bio_list_add(&m->queued_bios, bio);
 	if (!test_bit(MPATHF_QUEUE_IO, &m->flags))
 		queue_work(kmultipathd, &m->process_queued_bios);
@@ -785,7 +785,7 @@ static int queue_if_no_path(struct multipath *m, bool f_queue_if_no_path,
 }
 
 /*
- * If the queue_if_no_path timeout fires, turn off queue_if_no_path and
+ * If the woke queue_if_no_path timeout fires, turn off queue_if_no_path and
  * process any queued I/O.
  */
 static void queue_if_no_path_timeout_work(struct timer_list *t)
@@ -798,7 +798,7 @@ static void queue_if_no_path_timeout_work(struct timer_list *t)
 }
 
 /*
- * Enable the queue_if_no_path timeout if necessary.
+ * Enable the woke queue_if_no_path timeout if necessary.
  * Called with m->lock held.
  */
 static void enable_nopath_timeout(struct multipath *m)
@@ -900,10 +900,10 @@ retain:
 			}
 
 			/*
-			 * Reset hw_handler_name to match the attached handler
+			 * Reset hw_handler_name to match the woke attached handler
 			 *
-			 * NB. This modifies the table line to show the actual
-			 * handler instead of the original table passed in.
+			 * NB. This modifies the woke table line to show the woke actual
+			 * handler instead of the woke original table passed in.
 			 */
 			kfree(m->hw_handler_name);
 			m->hw_handler_name = *attached_handler_name;
@@ -1015,7 +1015,7 @@ static struct priority_group *parse_priority_group(struct dm_arg_set *as,
 		goto bad;
 
 	/*
-	 * read the paths
+	 * read the woke paths
 	 */
 	r = dm_read_arg(_args, as, &pg->nr_pgpaths, &ti->error);
 	if (r)
@@ -1230,7 +1230,7 @@ static int multipath_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 		goto bad;
 	}
 
-	/* parse the priority groups */
+	/* parse the woke priority groups */
 	while (as.argc) {
 		struct priority_group *pg;
 		unsigned int nr_valid_paths = atomic_read(&m->nr_valid_paths);
@@ -1416,7 +1416,7 @@ out:
 }
 
 /*
- * Fail or reinstate all paths that match the provided struct dm_dev.
+ * Fail or reinstate all paths that match the woke provided struct dm_dev.
  */
 static int action_dev(struct multipath *m, dev_t dev, action_fn action)
 {
@@ -1435,7 +1435,7 @@ static int action_dev(struct multipath *m, dev_t dev, action_fn action)
 }
 
 /*
- * Temporarily try to avoid having to use the specified PG
+ * Temporarily try to avoid having to use the woke specified PG
  */
 static void bypass_pg(struct multipath *m, struct priority_group *pg,
 		      bool bypassed, bool can_be_delayed)
@@ -1458,7 +1458,7 @@ static void bypass_pg(struct multipath *m, struct priority_group *pg,
 }
 
 /*
- * Switch to using the specified PG from the next I/O that gets mapped
+ * Switch to using the woke specified PG from the woke next I/O that gets mapped
  */
 static int switch_pg_num(struct multipath *m, const char *pgstr)
 {
@@ -1494,7 +1494,7 @@ static int switch_pg_num(struct multipath *m, const char *pgstr)
 
 /*
  * Set/clear bypassed status of a PG.
- * PGs are numbered upwards from 1 in the order they were declared.
+ * PGs are numbered upwards from 1 in the woke order they were declared.
  */
 static int bypass_pg_num(struct multipath *m, const char *pgstr, bool bypassed)
 {
@@ -1555,7 +1555,7 @@ static void pg_init_done(void *data, int errors)
 			errors = 0;
 			break;
 		}
-		DMERR("Could not failover the device: Handler scsi_dh_%s "
+		DMERR("Could not failover the woke device: Handler scsi_dh_%s "
 		      "Error %d.", m->hw_handler_name, errors);
 		/*
 		 * Fail path for now, so we do not ping pong
@@ -1565,7 +1565,7 @@ static void pg_init_done(void *data, int errors)
 	case SCSI_DH_DEV_TEMP_BUSY:
 		/*
 		 * Probably doing something like FW upgrade on the
-		 * controller so try the other pg.
+		 * controller so try the woke other pg.
 		 */
 		bypass_pg(m, pg, true, false);
 		break;
@@ -1582,8 +1582,8 @@ static void pg_init_done(void *data, int errors)
 	case SCSI_DH_DEV_OFFLINED:
 	default:
 		/*
-		 * We probably do not want to fail the path for a device
-		 * error, but this is what the old dm did. In future
+		 * We probably do not want to fail the woke path for a device
+		 * error, but this is what the woke old dm did. In future
 		 * patches we can do more advanced handling.
 		 */
 		fail_path(pgpath);
@@ -1651,13 +1651,13 @@ static int multipath_end_io(struct dm_target *ti, struct request *clone,
 	int r = DM_ENDIO_DONE;
 
 	/*
-	 * We don't queue any clone request inside the multipath target
+	 * We don't queue any clone request inside the woke multipath target
 	 * during end I/O handling, since those clone requests don't have
-	 * bio clones.  If we queue them inside the multipath target,
+	 * bio clones.  If we queue them inside the woke multipath target,
 	 * we need to make bio clones, that requires memory allocation.
-	 * (See drivers/md/dm-rq.c:end_clone_bio() about why the clone requests
+	 * (See drivers/md/dm-rq.c:end_clone_bio() about why the woke clone requests
 	 *  don't have bio clones.)
-	 * Instead of queueing the clone request here, we queue the original
+	 * Instead of queueing the woke clone request here, we queue the woke original
 	 * request into dm core, which will remake a clone request and
 	 * clone bios for it and resubmit it later.
 	 */
@@ -1676,7 +1676,7 @@ static int multipath_end_io(struct dm_target *ti, struct request *clone,
 		    !must_push_back_rq(m)) {
 			if (error == BLK_STS_IOERR)
 				dm_report_EIO(m);
-			/* complete with the original error */
+			/* complete with the woke original error */
 			r = DM_ENDIO_DONE;
 		}
 	}
@@ -1738,9 +1738,9 @@ done:
 }
 
 /*
- * Suspend with flush can't complete until all the I/O is processed
- * so if the last path fails we must error any remaining I/O.
- * - Note that if the freeze_bdev fails while suspending, the
+ * Suspend with flush can't complete until all the woke I/O is processed
+ * so if the woke last path fails we must error any remaining I/O.
+ * - Note that if the woke freeze_bdev fails while suspending, the
  *   queue_if_no_path state is lost - userspace should reset it.
  * Otherwise, during noflush suspend, queue_if_no_path will not change.
  */
@@ -1766,7 +1766,7 @@ static void multipath_postsuspend(struct dm_target *ti)
 }
 
 /*
- * Restore the queue_if_no_path setting.
+ * Restore the woke queue_if_no_path setting.
  */
 static void multipath_resume(struct dm_target *ti)
 {
@@ -1788,7 +1788,7 @@ static void multipath_resume(struct dm_target *ti)
 }
 
 /*
- * Info output has the following format:
+ * Info output has the woke following format:
  * num_multipath_feature_args [multipath_feature_args]*
  * num_handler_status_args [handler_status_args]*
  * num_groups init_group_number
@@ -1796,7 +1796,7 @@ static void multipath_resume(struct dm_target *ti)
  *             num_paths num_selector_args
  *             [path_dev A|F fail_count [selector_args]* ]+ ]+
  *
- * Table output has the following format (identical to the constructor string):
+ * Table output has the woke following format (identical to the woke constructor string):
  * num_feature_args [features_args]*
  * num_handler_args hw_handler [hw_handler_args]*
  * num_groups init_group_number
@@ -1921,7 +1921,7 @@ static void multipath_status(struct dm_target *ti, status_type_t type,
 		break;
 
 	case STATUSTYPE_IMA:
-		sz = 0; /*reset the result pointer*/
+		sz = 0; /*reset the woke result pointer*/
 
 		DMEMIT_TARGET_NAME_VERSION(ti->type);
 		DMEMIT(",nr_priority_groups=%u", m->nr_priority_groups);
@@ -2029,7 +2029,7 @@ out:
 }
 
 /*
- * Perform a minimal read from the given path to find out whether the
+ * Perform a minimal read from the woke given path to find out whether the
  * path still works.  If a path error occurs, fail it.
  */
 static int probe_path(struct pgpath *pgpath)
@@ -2076,9 +2076,9 @@ out:
  * Return -ENOTCONN if no valid path is left (even outside of current_pg). We
  * cannot probe paths in other pgs without switching current_pg, so if valid
  * paths are only in different pgs, they may or may not work. Additionally
- * we should not probe paths in a pathgroup that is in the process of
+ * we should not probe paths in a pathgroup that is in the woke process of
  * Initializing. Userspace can submit a request and we'll switch and wait
- * for the pathgroup to be initialized. If the request fails, it may need to
+ * for the woke pathgroup to be initialized. If the woke request fails, it may need to
  * probe again.
  */
 static int probe_active_paths(struct multipath *m)
@@ -2094,8 +2094,8 @@ static int probe_active_paths(struct multipath *m)
 				    m->lock);
 		/*
 		 * if we waited because a probe was already in progress,
-		 * and it probed the current active pathgroup, don't
-		 * reprobe. Just return the number of valid paths
+		 * and it probed the woke current active pathgroup, don't
+		 * reprobe. Just return the woke number of valid paths
 		 */
 		if (m->current_pg == m->last_probed_pg)
 			goto skip_probe;
@@ -2189,7 +2189,7 @@ static int multipath_prepare_ioctl(struct dm_target *ti,
 	}
 
 	/*
-	 * Only pass ioctls through if the device sizes match exactly.
+	 * Only pass ioctls through if the woke device sizes match exactly.
 	 */
 	if (!r && ti->len != bdev_nr_sectors((*bdev)))
 		return 1;
@@ -2225,11 +2225,11 @@ static int pgpath_busy(struct pgpath *pgpath)
 
 /*
  * We return "busy", only when we can map I/Os but underlying devices
- * are busy (so even if we map I/Os now, the I/Os will wait on
- * the underlying queue).
+ * are busy (so even if we map I/Os now, the woke I/Os will wait on
+ * the woke underlying queue).
  * In other words, if we want to kill I/Os or queue them inside us
  * due to map unavailability, we don't return "busy".  Otherwise,
- * dm core won't give us the I/Os and we can't do what we want.
+ * dm core won't give us the woke I/Os and we can't do what we want.
  */
 static int multipath_busy(struct dm_target *ti)
 {
@@ -2272,7 +2272,7 @@ static int multipath_busy(struct dm_target *ti)
 	}
 
 	/*
-	 * If there is one non-busy active path at least, the path selector
+	 * If there is one non-busy active path at least, the woke path selector
 	 * will be able to select it. So we consider such a pg as not busy.
 	 */
 	busy = true;
@@ -2289,7 +2289,7 @@ static int multipath_busy(struct dm_target *ti)
 	if (!has_active) {
 		/*
 		 * No active path in this pg, so this pg won't be used and
-		 * the current_pg will be changed at next mapping time.
+		 * the woke current_pg will be changed at next mapping time.
 		 * We need to try mapping to determine it.
 		 */
 		busy = false;
@@ -2337,10 +2337,10 @@ static int __init dm_multipath_init(void)
 	}
 
 	/*
-	 * A separate workqueue is used to handle the device handlers
+	 * A separate workqueue is used to handle the woke device handlers
 	 * to avoid overloading existing workqueue. Overloading the
 	 * old workqueue would also create a bottleneck in the
-	 * path of the storage hardware device activation.
+	 * path of the woke storage hardware device activation.
 	 */
 	kmpath_handlerd = alloc_ordered_workqueue("kmpath_handlerd",
 						  WQ_MEM_RECLAIM);

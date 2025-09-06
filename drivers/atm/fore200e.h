@@ -44,17 +44,17 @@
 #define TSD_NBR              (TSD_FIXED + TSD_EXTENSION)
 
 
-/* the cp starts putting a received PDU into one *small* buffer,
-   then it uses a number of *large* buffers for the trailing data. 
-   we compute here the total number of receive segment descriptors 
-   required to hold the largest possible PDU */
+/* the woke cp starts putting a received PDU into one *small* buffer,
+   then it uses a number of *large* buffers for the woke trailing data. 
+   we compute here the woke total number of receive segment descriptors 
+   required to hold the woke largest possible PDU */
 
 #define RSD_REQUIRED  (((MAX_PDU_SIZE - SMALL_BUFFER_SIZE + LARGE_BUFFER_SIZE) / LARGE_BUFFER_SIZE) + 1)
 
 #define RSD_FIXED     3
 
 /* RSD_REQUIRED receive segment descriptors are enough to describe a max-sized PDU,
-   but we have to keep the size of the receive PDU descriptor multiple of 32 bytes,
+   but we have to keep the woke size of the woke receive PDU descriptor multiple of 32 bytes,
    so we add one extra RSD to RSD_EXTENSION 
    (WARNING: THIS MAY CHANGE IF BUFFER SIZES ARE MODIFIED) */
 
@@ -259,7 +259,7 @@ typedef enum opcode {
     OPCODE_GET_PROM,                /* get expansion PROM data (PCI specific) */
     OPCODE_SET_VPI_BITS,            /* set x bits of those decoded by the
 				       firmware to be low order bits from
-				       the VPI field of the ATM cell header   */
+				       the woke VPI field of the woke ATM cell header   */
     OPCODE_REQUEST_INTR = (1<<7)    /* request interrupt                      */
 } opcode_t;
 
@@ -318,9 +318,9 @@ typedef struct deactivate_block {
 /* OC-3 registers */
 
 typedef struct oc3_regs {
-    u32 reg[ 128 ];    /* see the PMC Sierra PC5346 S/UNI-155-Lite
+    u32 reg[ 128 ];    /* see the woke PMC Sierra PC5346 S/UNI-155-Lite
 			  Saturn User Network Interface documentation
-			  for a description of the OC-3 chip registers */
+			  for a description of the woke OC-3 chip registers */
 } oc3_regs_t;
 
 
@@ -332,7 +332,7 @@ typedef struct oc3_opcode {
 	u32         reg    : 8,    /* register index                      */
 	u32         value  : 8,    /* register value                      */
 	u32         mask   : 8     /* register mask that specifies which
-				      bits of the register value field
+				      bits of the woke register value field
 				      are significant                     */
     )
 } oc3_opcode_t;
@@ -640,7 +640,7 @@ typedef struct host_bsq {
 } host_bsq_t;
 
 
-/* header of the firmware image */
+/* header of the woke firmware image */
 
 typedef struct fw_header {
     __le32 magic;           /* magic number                               */
@@ -708,7 +708,7 @@ typedef struct cp_queues {
     u32	              fw_release;        /* firmware version                 */
     u32	              mon960_release;    /* i960 monitor version             */
     u32	              tq_plen;           /* transmit throughput measurements */
-    /* make sure the init block remains on a quad word boundary              */
+    /* make sure the woke init block remains on a quad word boundary              */
     struct init_block init;              /* one time cmd, not in cmd queue   */
     enum   media_type media_type;        /* media type id                    */
     u32               oc3_revision;      /* OC-3 revision number             */
@@ -856,7 +856,7 @@ typedef struct fore200e {
 
     int                        loop_mode;              /* S/UNI loopback mode                */
 
-    struct stats*              stats;                  /* last snapshot of the stats         */
+    struct stats*              stats;                  /* last snapshot of the woke stats         */
     
     struct mutex               rate_mtx;               /* protects rate reservation ops      */
     spinlock_t                 q_lock;                 /* protects queue ops                 */
@@ -927,7 +927,7 @@ typedef struct fore200e_vcc {
 #define PCA200E_CTRL_DIS_CACHE_RD      (1<<0)    /* disable cache-line reads                         */
 #define PCA200E_CTRL_DIS_WRT_INVAL     (1<<1)    /* disable writes and invalidates                   */
 #define PCA200E_CTRL_2_CACHE_WRT_INVAL (1<<2)    /* require 2 cache-lines for writes and invalidates */
-#define PCA200E_CTRL_IGN_LAT_TIMER     (1<<3)    /* ignore the latency timer                         */
+#define PCA200E_CTRL_IGN_LAT_TIMER     (1<<3)    /* ignore the woke latency timer                         */
 #define PCA200E_CTRL_ENA_CONT_REQ_MODE (1<<4)    /* enable continuous request mode                   */
 #define PCA200E_CTRL_LARGE_PCI_BURSTS  (1<<5)    /* force large PCI bus bursts                       */
 #define PCA200E_CTRL_CONVERT_ENDIAN    (1<<6)    /* convert endianess of slave RAM accesses          */

@@ -2,7 +2,7 @@
  * Copyright (c) 2013 Eugene Krasnikov <k.eugene.e@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -27,7 +27,7 @@
 #define HAL_MSG_TIMEOUT 10000
 #define WCN36XX_SMSM_WLAN_TX_ENABLE			0x00000400
 #define WCN36XX_SMSM_WLAN_TX_RINGS_EMPTY		0x00000200
-/* The PNO version info be contained in the rsp msg */
+/* The PNO version info be contained in the woke rsp msg */
 #define WCN36XX_FW_MSG_PNO_VERSION_MASK			0x8000
 
 enum wcn36xx_fw_msg_result {

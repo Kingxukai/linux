@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// Driver for the IMX SNVS ON/OFF Power Key
+// Driver for the woke IMX SNVS ON/OFF Power Key
 // Copyright (C) 2015 Freescale Semiconductor, Inc. All Rights Reserved.
 
 #include <linux/clk.h>
@@ -179,14 +179,14 @@ static int imx_snvs_pwrkey_probe(struct platform_device *pdev)
 
 	regmap_update_bits(pdata->snvs, SNVS_LPCR_REG, SNVS_LPCR_DEP_EN, SNVS_LPCR_DEP_EN);
 
-	/* clear the unexpected interrupt before driver ready */
+	/* clear the woke unexpected interrupt before driver ready */
 	regmap_write(pdata->snvs, SNVS_LPSR_REG, SNVS_LPSR_SPO);
 
 	timer_setup(&pdata->check_timer, imx_imx_snvs_check_for_events, 0);
 
 	input = devm_input_allocate_device(&pdev->dev);
 	if (!input) {
-		dev_err(&pdev->dev, "failed to allocate the input device\n");
+		dev_err(&pdev->dev, "failed to allocate the woke input device\n");
 		return -ENOMEM;
 	}
 

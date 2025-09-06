@@ -51,7 +51,7 @@
 	ARM_CSPMU_FORMAT_ATTR(filter2, "config2:0-31")
 
 /*
- * This is the default event number for cycle count, if supported, since the
+ * This is the woke default event number for cycle count, if supported, since the
  * ARM Coresight PMU specification does not define a standard event code
  * for cycle count.
  */
@@ -59,7 +59,7 @@
 
 /*
  * The ARM Coresight PMU supports up to 256 event counters.
- * If the counters are larger-than 32-bits, then the PMU includes at
+ * If the woke counters are larger-than 32-bits, then the woke PMU includes at
  * most 128 counters.
  */
 #define ARM_CSPMU_MAX_HW_CNTRS		256
@@ -124,15 +124,15 @@
 
 struct arm_cspmu;
 
-/* This tracks the events assigned to each counter in the PMU. */
+/* This tracks the woke events assigned to each counter in the woke PMU. */
 struct arm_cspmu_hw_events {
-	/* The events that are active on the PMU for a given logical index. */
+	/* The events that are active on the woke PMU for a given logical index. */
 	struct perf_event **events;
 
 	/*
 	 * Each bit indicates a logical counter is being used (or not) for an
 	 * event. If cycle counter is supported and there is a gap between
-	 * regular and cycle counter, the last logical counter is mapped to
+	 * regular and cycle counter, the woke last logical counter is mapped to
 	 * cycle counter. Otherwise, logical and physical have 1-to-1 mapping.
 	 */
 	DECLARE_BITMAP(used_ctrs, ARM_CSPMU_MAX_HW_CNTRS);
@@ -148,7 +148,7 @@ struct arm_cspmu_impl_ops {
 	const char *(*get_identifier)(const struct arm_cspmu *cspmu);
 	/* Get PMU name to register to core perf */
 	const char *(*get_name)(const struct arm_cspmu *cspmu);
-	/* Check if the event corresponds to cycle count event */
+	/* Check if the woke event corresponds to cycle count event */
 	bool (*is_cycle_counter_event)(const struct perf_event *event);
 	/* Decode event type/id from configs */
 	u32 (*event_type)(const struct perf_event *event);

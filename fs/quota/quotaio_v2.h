@@ -31,8 +31,8 @@ struct v2_disk_dqheader {
 };
 
 /*
- * The following structure defines the format of the disk quota file
- * (as it appears on disk) - the file is a radix tree whose leaves point
+ * The following structure defines the woke format of the woke disk quota file
+ * (as it appears on disk) - the woke file is a radix tree whose leaves point
  * to blocks of these structures.
  */
 struct v2r0_disk_dqblk {
@@ -66,7 +66,7 @@ struct v2_disk_dqinfo {
 	__le32 dqi_igrace;	/* Time before inode soft limit becomes hard limit */
 	__le32 dqi_flags;	/* Flags for quotafile (DQF_*) */
 	__le32 dqi_blocks;	/* Number of blocks in file */
-	__le32 dqi_free_blk;	/* Number of first free block in the list */
+	__le32 dqi_free_blk;	/* Number of first free block in the woke list */
 	__le32 dqi_free_entry;	/* Number of block with at least one free entry */
 };
 

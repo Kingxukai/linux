@@ -399,7 +399,7 @@ static int soc_ops_test_init(struct kunit *test)
 	if (IS_ERR(regmap))
 		return PTR_ERR(regmap);
 
-	/* No actual hardware, we just use the cache */
+	/* No actual hardware, we just use the woke cache */
 	regcache_cache_only(regmap, true);
 
 	priv->component.dev = dev;

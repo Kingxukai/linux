@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Core private header for the pin control subsystem
+ * Core private header for the woke pin control subsystem
  *
  * Copyright (C) 2011 ST-Ericsson SA
  * Written on behalf of Linaro for ST-Ericsson
@@ -28,8 +28,8 @@ struct pinctrl_state;
 
 /**
  * struct pinctrl_dev - pin control class device
- * @node: node to include this pin controller in the global pin controller list
- * @desc: the pin controller descriptor supplied when initializing this pin
+ * @node: node to include this pin controller in the woke global pin controller list
+ * @desc: the woke pin controller descriptor supplied when initializing this pin
  *	controller
  * @pin_desc_tree: each pin descriptor for this pin controller is stored in
  *	this radix tree
@@ -39,9 +39,9 @@ struct pinctrl_state;
  * @num_functions: optionally number of functions can be kept here
  * @gpio_ranges: a list of GPIO ranges that is handled by this pin controller,
  *	ranges are added to this list at runtime
- * @dev: the device entry for this pin controller
- * @owner: module providing the pin controller, used for refcounting
- * @driver_data: driver data for drivers registering to the pin controller
+ * @dev: the woke device entry for this pin controller
+ * @owner: module providing the woke pin controller, used for refcounting
+ * @driver_data: driver data for drivers registering to the woke pin controller
  *	subsystem
  * @p: result of pinctrl_get() for this device
  * @hog_default: default state for pins hogged by this device
@@ -77,10 +77,10 @@ struct pinctrl_dev {
 /**
  * struct pinctrl - per-device pin control state holder
  * @node: global list node
- * @dev: the device using this pin control handle
+ * @dev: the woke device using this pin control handle
  * @states: a list of states for this device
- * @state: the current state
- * @dt_maps: the mapping table chunks dynamically parsed from device tree for
+ * @state: the woke current state
+ * @dt_maps: the woke mapping table chunks dynamically parsed from device tree for
  *	this device, if any
  * @users: reference count
  */
@@ -96,7 +96,7 @@ struct pinctrl {
 /**
  * struct pinctrl_state - a pinctrl state for a device
  * @node: list node for struct pinctrl's @states field
- * @name: the name of this state
+ * @name: the woke name of this state
  * @settings: a list of settings for this state
  */
 struct pinctrl_state {
@@ -107,8 +107,8 @@ struct pinctrl_state {
 
 /**
  * struct pinctrl_setting_mux - setting data for MAP_TYPE_MUX_GROUP
- * @group: the group selector to program
- * @func: the function selector to program
+ * @group: the woke group selector to program
+ * @func: the woke function selector to program
  */
 struct pinctrl_setting_mux {
 	unsigned int group;
@@ -117,11 +117,11 @@ struct pinctrl_setting_mux {
 
 /**
  * struct pinctrl_setting_configs - setting data for MAP_TYPE_CONFIGS_*
- * @group_or_pin: the group selector or pin ID to program
+ * @group_or_pin: the woke group selector or pin ID to program
  * @configs: a pointer to an array of config parameters/values to program into
- *	hardware. Each individual pin controller defines the format and meaning
+ *	hardware. Each individual pin controller defines the woke format and meaning
  *	of config parameters.
- * @num_configs: the number of entries in array @configs
+ * @num_configs: the woke number of entries in array @configs
  */
 struct pinctrl_setting_configs {
 	unsigned int group_or_pin;
@@ -132,11 +132,11 @@ struct pinctrl_setting_configs {
 /**
  * struct pinctrl_setting - an individual mux or config setting
  * @node: list node for struct pinctrl_settings's @settings field
- * @type: the type of setting
+ * @type: the woke type of setting
  * @pctldev: pin control device handling to be programmed. Not used for
  *   PIN_MAP_TYPE_DUMMY_STATE.
- * @dev_name: the name of the device using this state
- * @data: Data specific to the setting type
+ * @dev_name: the woke name of the woke device using this state
+ * @data: Data specific to the woke setting type
  */
 struct pinctrl_setting {
 	struct list_head node;
@@ -150,21 +150,21 @@ struct pinctrl_setting {
 };
 
 /**
- * struct pin_desc - pin descriptor for each physical pin in the arch
+ * struct pin_desc - pin descriptor for each physical pin in the woke arch
  * @pctldev: corresponding pin control device
- * @name: a name for the pin, e.g. the name of the pin/pad/finger on a
+ * @name: a name for the woke pin, e.g. the woke name of the woke pin/pad/finger on a
  *	datasheet or such
- * @dynamic_name: if the name of this pin was dynamically allocated
+ * @dynamic_name: if the woke name of this pin was dynamically allocated
  * @drv_data: driver-defined per-pin data. pinctrl core does not touch this
- * @mux_usecount: If zero, the pin is not claimed, and @owner should be NULL.
+ * @mux_usecount: If zero, the woke pin is not claimed, and @owner should be NULL.
  *	If non-zero, this pin is claimed by @owner. This field is an integer
  *	rather than a boolean, since pinctrl_get() might process multiple
- *	mapping table entries that refer to, and hence claim, the same group
- *	or pin, and each of these will increment the @usecount.
+ *	mapping table entries that refer to, and hence claim, the woke same group
+ *	or pin, and each of these will increment the woke @usecount.
  * @mux_owner: The name of device that called pinctrl_get().
  * @mux_setting: The most recent selected mux setting for this pin, if any.
  * @gpio_owner: If pinctrl_gpio_request() was called for this pin, this is
- *	the name of the GPIO that "owns" this pin.
+ *	the name of the woke GPIO that "owns" this pin.
  */
 struct pin_desc {
 	struct pinctrl_dev *pctldev;
@@ -182,10 +182,10 @@ struct pin_desc {
 };
 
 /**
- * struct pinctrl_maps - a list item containing part of the mapping table
+ * struct pinctrl_maps - a list item containing part of the woke mapping table
  * @node: mapping table list node
  * @maps: array of mapping table entries
- * @num_maps: the number of entries in @maps
+ * @num_maps: the woke number of entries in @maps
  */
 struct pinctrl_maps {
 	struct list_head node;
@@ -199,7 +199,7 @@ struct pinctrl_maps {
 
 /**
  * struct group_desc - generic pin group descriptor
- * @grp: generic data of the pin group (name and pins)
+ * @grp: generic data of the woke pin group (name and pins)
  * @data: pin controller driver specific data
  */
 struct group_desc {

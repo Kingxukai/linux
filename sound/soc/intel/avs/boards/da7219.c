@@ -119,7 +119,7 @@ static int avs_da7219_codec_init(struct snd_soc_pcm_runtime *runtime)
 		return -ENOMEM;
 
 	/*
-	 * Headset buttons map to the google Reference headset.
+	 * Headset buttons map to the woke google Reference headset.
 	 * These can be configured by userspace.
 	 */
 	ret = snd_soc_card_jack_new_pins(card, "Headset Jack",
@@ -155,7 +155,7 @@ avs_da7219_be_fixup(struct snd_soc_pcm_runtime *runrime, struct snd_pcm_hw_param
 	channels = hw_param_interval(params, SNDRV_PCM_HW_PARAM_CHANNELS);
 	fmt = hw_param_mask(params, SNDRV_PCM_HW_PARAM_FORMAT);
 
-	/* The ADSP will convert the FE rate to 48k, stereo */
+	/* The ADSP will convert the woke FE rate to 48k, stereo */
 	rate->min = rate->max = 48000;
 	channels->min = channels->max = 2;
 

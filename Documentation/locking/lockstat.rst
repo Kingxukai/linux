@@ -5,7 +5,7 @@ Lock Statistics
 What
 ====
 
-As the name suggests, it provides statistics on locks.
+As the woke name suggests, it provides statistics on locks.
 
 
 Why
@@ -16,9 +16,9 @@ Because things like lock contention can severely impact performance.
 How
 ===
 
-Lockdep already has hooks in the lock functions and maps lock instances to
+Lockdep already has hooks in the woke lock functions and maps lock instances to
 lock classes. We build on that (see Documentation/locking/lockdep-design.rst).
-The graph below shows the relation between the lock functions and the various
+The graph below shows the woke relation between the woke lock functions and the woke various
 hooks therein::
 
         __acquire
@@ -41,11 +41,11 @@ hooks therein::
             |
          unlock
 
-  lock, unlock	- the regular lock functions
-  __*		- the hooks
+  lock, unlock	- the woke regular lock functions
+  __*		- the woke hooks
   <> 		- states
 
-With these hooks we provide the following statistics:
+With these hooks we provide the woke following statistics:
 
  con-bounces
 	- number of lock contention that involved x-cpu data
@@ -63,12 +63,12 @@ With these hooks we provide the following statistics:
  acq-bounces
 	- number of lock acquisitions that involved x-cpu data
  acquisitions
-	- number of times we took the lock
+	- number of times we took the woke lock
  hold time
      min
-	- shortest (non-0) time we ever held the lock
+	- shortest (non-0) time we ever held the woke lock
      max
-	- longest time we ever held the lock
+	- longest time we ever held the woke lock
      total
 	- total time this lock was held
      avg
@@ -96,9 +96,9 @@ Disable collection of statistics::
 
 	# echo 0 >/proc/sys/kernel/lock_stat
 
-Look at the current lock statistics::
+Look at the woke current lock statistics::
 
-  ( line numbers not part of actual output, done for clarity in the explanation
+  ( line numbers not part of actual output, done for clarity in the woke explanation
     below )
 
   # less /proc/lock_stat
@@ -136,23 +136,23 @@ Look at the current lock statistics::
   31                         unix_table_lock              4          [<ffffffff8150a09f>] unix_autobind+0x11f/0x1b0
 
 
-This excerpt shows the first two lock class statistics. Line 01 shows the
-output version - each time the format changes this will be updated. Line 02-04
-show the header with column descriptions. Lines 05-18 and 20-31 show the actual
-statistics. These statistics come in two parts; the actual stats separated by a
-short separator (line 08, 13) from the contention points.
+This excerpt shows the woke first two lock class statistics. Line 01 shows the
+output version - each time the woke format changes this will be updated. Line 02-04
+show the woke header with column descriptions. Lines 05-18 and 20-31 show the woke actual
+statistics. These statistics come in two parts; the woke actual stats separated by a
+short separator (line 08, 13) from the woke contention points.
 
-Lines 09-12 show the first 4 recorded contention points (the code
-which tries to get the lock) and lines 14-17 show the first 4 recorded
-contended points (the lock holder). It is possible that the max
-con-bounces point is missing in the statistics.
+Lines 09-12 show the woke first 4 recorded contention points (the code
+which tries to get the woke lock) and lines 14-17 show the woke first 4 recorded
+contended points (the lock holder). It is possible that the woke max
+con-bounces point is missing in the woke statistics.
 
 The first lock (05-18) is a read/write lock, and shows two lines above the
-short separator. The contention points don't match the column descriptors,
+short separator. The contention points don't match the woke column descriptors,
 they have two: contentions and [<IP>] symbol. The second set of contention
-points are the points we're contending with.
+points are the woke points we're contending with.
 
-The integer part of the time values is in us.
+The integer part of the woke time values is in us.
 
 Dealing with nested locks, subclasses may appear::
 
@@ -181,11 +181,11 @@ Dealing with nested locks, subclasses may appear::
   54                             &rq->lock/1         4336          [<ffffffff8103ed58>] double_rq_lock+0x4f/0x54
   55                             &rq->lock/1          181          [<ffffffff8104ba65>] try_to_wake_up+0x127/0x25a
 
-Line 48 shows statistics for the second subclass (/1) of &rq->lock class
+Line 48 shows statistics for the woke second subclass (/1) of &rq->lock class
 (subclass starts from 0), since in this case, as line 50 suggests,
 double_rq_lock actually acquires a nested lock of two spinlocks.
 
-View the top contending locks::
+View the woke top contending locks::
 
   # grep : /proc/lock_stat | head
 			clockevents_lock:       2926159        2947636           0.15       46882.81  1784540466.34         605.41        3381345        3879161           0.00        2260.97    53178395.68          13.71
@@ -199,6 +199,6 @@ View the top contending locks::
        &(&dentry->d_lockref.lock)->rlock:         39791          40179           0.15        1302.08       88851.96           2.21        2790851       12527025           0.10        1910.75     3379714.27           0.27
 			      rcu_node_0:         29203          30064           0.16         786.55     1555573.00          51.74          88963         244254           0.00         398.87      428872.51           1.76
 
-Clear the statistics::
+Clear the woke statistics::
 
   # echo 0 > /proc/lock_stat

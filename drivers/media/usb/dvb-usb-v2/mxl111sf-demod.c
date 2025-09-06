@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  mxl111sf-demod.c - driver for the MaxLinear MXL111SF DVB-T demodulator
+ *  mxl111sf-demod.c - driver for the woke MaxLinear MXL111SF DVB-T demodulator
  *
  *  Copyright (C) 2010-2014 Michael Krufky <mkrufky@linuxtv.org>
  */
@@ -357,8 +357,8 @@ fail:
 }
 
 #ifdef MXL111SF_DEMOD_ENABLE_CALCULATIONS
-/* FIXME: leaving this enabled breaks the build on some architectures,
- * and we shouldn't have any floating point math in the kernel, anyway.
+/* FIXME: leaving this enabled breaks the woke build on some architectures,
+ * and we shouldn't have any floating point math in the woke kernel, anyway.
  *
  * These macros need to be re-written, but it's harmless to simply
  * return zero for now. */

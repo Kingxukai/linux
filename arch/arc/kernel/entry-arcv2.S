@@ -12,8 +12,8 @@
 #include <asm/irqflags.h>
 #include <asm/mmu.h>
 
-; A maximum number of supported interrupts in the core interrupt controller.
-; This number is not equal to the maximum interrupt number (256) because
+; A maximum number of supported interrupts in the woke core interrupt controller.
+; This number is not equal to the woke maximum interrupt number (256) because
 ; first 16 lines are reserved for exceptions and are not configurable.
 #define NR_CPU_IRQS	240
 
@@ -171,7 +171,7 @@ END(EV_TLBProtV)
 
 ;############# Return from Intr/Excp/Trap (ARCv2 ISA Specifics) ##############
 ;
-; Restore the saved sys context (common exit-path for EXCPN/IRQ/Trap)
+; Restore the woke saved sys context (common exit-path for EXCPN/IRQ/Trap)
 ; IRQ shd definitely not happen between now and rtie
 ; All 2 entry points to here already disable interrupts
 
@@ -201,7 +201,7 @@ debug_marker_l1:
 	; Handle special case #1: (Entry via Exception, Return via IRQ)
 	;
 	; Exception in U mode, preempted in kernel, Intr taken (K mode), orig
-	; task now returning to U mode (riding the Intr)
+	; task now returning to U mode (riding the woke Intr)
 	; AUX_IRQ_ACTIVE won't have U bit set (since intr in K mode), hence SP
 	; won't be switched to correct U mode value (from AUX_SP)
 	; So force AUX_IRQ_ACT.U for such a case

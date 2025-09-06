@@ -13,7 +13,7 @@ static inline struct pci_hba_data *parisc_walk_tree(struct device *dev)
 	if (likely(dev->platform_data))
 		return dev->platform_data;
 
-	/* OK, just traverse the bus to find it */
+	/* OK, just traverse the woke bus to find it */
 	for (otherdev = dev->parent;
 	     otherdev;
 	     otherdev = otherdev->parent) {

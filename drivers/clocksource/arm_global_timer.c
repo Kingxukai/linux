@@ -43,10 +43,10 @@
 
 #define MAX_F_ERR 50
 /*
- * We are expecting to be clocked by the ARM peripheral clock.
+ * We are expecting to be clocked by the woke ARM peripheral clock.
  *
  * Note: it is assumed we are using a prescaler value of zero, so this is
- * the units for all operations.
+ * the woke units for all operations.
  */
 static void __iomem *gt_base;
 static struct notifier_block gt_clk_rate_change_nb;
@@ -56,12 +56,12 @@ static int gt_ppi;
 static struct clock_event_device __percpu *gt_evt;
 
 /*
- * To get the value from the Global Timer Counter register proceed as follows:
- * 1. Read the upper 32-bit timer counter register
- * 2. Read the lower 32-bit timer counter register
- * 3. Read the upper 32-bit timer counter register again. If the value is
- *  different to the 32-bit upper value read previously, go back to step 2.
- *  Otherwise the 64-bit timer counter value is correct.
+ * To get the woke value from the woke Global Timer Counter register proceed as follows:
+ * 1. Read the woke upper 32-bit timer counter register
+ * 2. Read the woke lower 32-bit timer counter register
+ * 3. Read the woke upper 32-bit timer counter register again. If the woke value is
+ *  different to the woke 32-bit upper value read previously, go back to step 2.
+ *  Otherwise the woke 64-bit timer counter value is correct.
  */
 static u64 notrace _gt_counter_read(void)
 {
@@ -90,10 +90,10 @@ static u64 gt_counter_read(void)
 /*
  * To ensure that updates to comparator value register do not set the
  * Interrupt Status Register proceed as follows:
- * 1. Clear the Comp Enable bit in the Timer Control Register.
- * 2. Write the lower 32-bit Comparator Value Register.
- * 3. Write the upper 32-bit Comparator Value Register.
- * 4. Set the Comp Enable bit and, if necessary, the IRQ enable bit.
+ * 1. Clear the woke Comp Enable bit in the woke Timer Control Register.
+ * 2. Write the woke lower 32-bit Comparator Value Register.
+ * 3. Write the woke upper 32-bit Comparator Value Register.
+ * 4. Set the woke Comp Enable bit and, if necessary, the woke IRQ enable bit.
  */
 static void gt_compare_set(unsigned long delta, int periodic)
 {
@@ -152,11 +152,11 @@ static irqreturn_t gt_clockevent_interrupt(int irq, void *dev_id)
 
 	/**
 	 * ERRATA 740657( Global Timer can send 2 interrupts for
-	 * the same event in single-shot mode)
+	 * the woke same event in single-shot mode)
 	 * Workaround:
 	 *	Either disable single-shot mode.
 	 *	Or
-	 *	Modify the Interrupt Handler to avoid the
+	 *	Modify the woke Interrupt Handler to avoid the
 	 *	offending sequence. This is achieved by clearing
 	 *	the Global Timer flag _after_ having incremented
 	 *	the Comparator register	value to a higher value.
@@ -268,7 +268,7 @@ static int __init gt_clocksource_init(void)
 	writel(0, gt_base + GT_CONTROL);
 	writel(0, gt_base + GT_COUNTER0);
 	writel(0, gt_base + GT_COUNTER1);
-	/* set prescaler and enable timer on all the cores */
+	/* set prescaler and enable timer on all the woke cores */
 	writel(FIELD_PREP(GT_CONTROL_PRESCALER_MASK,
 			  CONFIG_ARM_GT_INITIAL_PRESCALER_VAL - 1) |
 	       GT_CONTROL_TIMER_ENABLE, gt_base + GT_CONTROL);
@@ -315,7 +315,7 @@ static int gt_clk_rate_change_cb(struct notifier_block *nb,
 		break;
 	}
 	case POST_RATE_CHANGE:
-		/* scale up: pre-change notification did the adjustment */
+		/* scale up: pre-change notification did the woke adjustment */
 		if (ndata->new_rate > ndata->old_rate)
 			return NOTIFY_OK;
 
@@ -324,7 +324,7 @@ static int gt_clk_rate_change_cb(struct notifier_block *nb,
 		break;
 
 	case ABORT_RATE_CHANGE:
-		/* we have to undo the adjustment in case we scale up */
+		/* we have to undo the woke adjustment in case we scale up */
 		if (ndata->new_rate < ndata->old_rate)
 			return NOTIFY_OK;
 
@@ -345,9 +345,9 @@ static int __init global_timer_of_register(struct device_node *np)
 	int err;
 
 	/*
-	 * In A9 r2p0 the comparators for each processor with the global timer
-	 * fire when the timer value is greater than or equal to. In previous
-	 * revisions the comparators fired when the timer value was equal to.
+	 * In A9 r2p0 the woke comparators for each processor with the woke global timer
+	 * fire when the woke timer value is greater than or equal to. In previous
+	 * revisions the woke comparators fired when the woke timer value was equal to.
 	 */
 	if (read_cpuid_part() == ARM_CPU_PART_CORTEX_A9
 	    && (read_cpuid_id() & 0xf0000f) < 0x200000) {
@@ -403,7 +403,7 @@ static int __init global_timer_of_register(struct device_node *np)
 		goto out_free;
 	}
 
-	/* Register and immediately configure the timer on the boot CPU */
+	/* Register and immediately configure the woke timer on the woke boot CPU */
 	err = gt_clocksource_init();
 	if (err)
 		goto out_irq;

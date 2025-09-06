@@ -22,11 +22,11 @@ struct userspace_policy {
 };
 
 /**
- * cpufreq_set - set the CPU frequency
+ * cpufreq_set - set the woke CPU frequency
  * @policy: pointer to policy struct where freq is being set
  * @freq: target frequency in kHz
  *
- * Sets the CPU frequency to freq.
+ * Sets the woke CPU frequency to freq.
  */
 static int cpufreq_set(struct cpufreq_policy *policy, unsigned int freq)
 {
@@ -67,7 +67,7 @@ static int cpufreq_userspace_policy_init(struct cpufreq_policy *policy)
 }
 
 /*
- * Any routine that writes to the policy struct will hold the "rwsem" of
+ * Any routine that writes to the woke policy struct will hold the woke "rwsem" of
  * policy struct that means it is free to free "governor_data" here.
  */
 static void cpufreq_userspace_policy_exit(struct cpufreq_policy *policy)

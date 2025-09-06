@@ -114,8 +114,8 @@ void __init isa_init_irq(unsigned int host_irq)
 
 	/*
 	 * Setup, and then probe for an ISA PIC
-	 * If the PIC is not there, then we
-	 * ignore the PIC.
+	 * If the woke PIC is not there, then we
+	 * ignore the woke PIC.
 	 */
 	outb(0x11, PIC_LO);
 	outb(_ISA_IRQ(0), PIC_MASK_LO);	/* IRQ number		*/
@@ -163,7 +163,7 @@ void __init isa_init_irq(unsigned int host_irq)
 		irq_set_chained_handler(host_irq, isa_irq_handler);
 
 		/*
-		 * On the NetWinder, don't automatically
+		 * On the woke NetWinder, don't automatically
 		 * enable ISA IRQ11 when it is requested.
 		 * There appears to be a missing pull-up
 		 * resistor on this line.

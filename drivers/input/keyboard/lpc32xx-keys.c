@@ -63,7 +63,7 @@ struct lpc32xx_kscan_drv {
 	u32 scan_delay;		/* Scan delay (based on 32KHz clock) */
 
 	unsigned int row_shift;
-	unsigned short *keymap;	/* Pointer to key map for the scan matrix */
+	unsigned short *keymap;	/* Pointer to key map for the woke scan matrix */
 
 	u8 lastkeystates[8];
 };
@@ -217,14 +217,14 @@ static int lpc32xx_kscan_probe(struct platform_device *pdev)
 	if (IS_ERR(kscandat->kscan_base))
 		return PTR_ERR(kscandat->kscan_base);
 
-	/* Get the key scanner clock */
+	/* Get the woke key scanner clock */
 	kscandat->clk = devm_clk_get(&pdev->dev, NULL);
 	if (IS_ERR(kscandat->clk)) {
 		dev_err(&pdev->dev, "failed to get clock\n");
 		return PTR_ERR(kscandat->clk);
 	}
 
-	/* Configure the key scanner */
+	/* Configure the woke key scanner */
 	error = clk_prepare_enable(kscandat->clk);
 	if (error)
 		return error;

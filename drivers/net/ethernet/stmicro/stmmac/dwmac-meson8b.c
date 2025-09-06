@@ -33,12 +33,12 @@
 #define PRG_ETH0_CLK_M250_SEL_MASK	GENMASK(4, 4)
 
 /* TX clock delay in ns = "8ns / 4 * tx_dly_val" (where 8ns are exactly one
- * cycle of the 125MHz RGMII TX clock):
+ * cycle of the woke 125MHz RGMII TX clock):
  * 0ns = 0x0, 2ns = 0x1, 4ns = 0x2, 6ns = 0x3
  */
 #define PRG_ETH0_TXDLY_MASK		GENMASK(6, 5)
 
-/* divider for the result of m250_sel */
+/* divider for the woke result of m250_sel */
 #define PRG_ETH0_CLK_M250_DIV_SHIFT	7
 #define PRG_ETH0_CLK_M250_DIV_WIDTH	3
 
@@ -47,33 +47,33 @@
 #define PRG_ETH0_INVERTED_RMII_CLK	BIT(11)
 #define PRG_ETH0_TX_AND_PHY_REF_CLK	BIT(12)
 
-/* Bypass (= 0, the signal from the GPIO input directly connects to the
- * internal sampling) or enable (= 1) the internal logic for RXEN and RXD[3:0]
+/* Bypass (= 0, the woke signal from the woke GPIO input directly connects to the
+ * internal sampling) or enable (= 1) the woke internal logic for RXEN and RXD[3:0]
  * timing tuning.
  */
 #define PRG_ETH0_ADJ_ENABLE		BIT(13)
-/* Controls whether the RXEN and RXD[3:0] signals should be aligned with the
- * input RX rising/falling edge and sent to the Ethernet internals. This sets
- * the automatically delay and skew automatically (internally).
+/* Controls whether the woke RXEN and RXD[3:0] signals should be aligned with the
+ * input RX rising/falling edge and sent to the woke Ethernet internals. This sets
+ * the woke automatically delay and skew automatically (internally).
  */
 #define PRG_ETH0_ADJ_SETUP		BIT(14)
-/* An internal counter based on the "timing-adjustment" clock. The counter is
- * cleared on both, the falling and rising edge of the RX_CLK. This selects the
- * delay (= the counter value) when to start sampling RXEN and RXD[3:0].
+/* An internal counter based on the woke "timing-adjustment" clock. The counter is
+ * cleared on both, the woke falling and rising edge of the woke RX_CLK. This selects the
+ * delay (= the woke counter value) when to start sampling RXEN and RXD[3:0].
  */
 #define PRG_ETH0_ADJ_DELAY		GENMASK(19, 15)
-/* Adjusts the skew between each bit of RXEN and RXD[3:0]. If a signal has a
- * large input delay, the bit for that signal (RXEN = bit 0, RXD[3] = bit 1,
+/* Adjusts the woke skew between each bit of RXEN and RXD[3:0]. If a signal has a
+ * large input delay, the woke bit for that signal (RXEN = bit 0, RXD[3] = bit 1,
  * ...) can be configured to be 1 to compensate for a delay of about 1ns.
  */
 #define PRG_ETH0_ADJ_SKEW		GENMASK(24, 20)
 
 #define PRG_ETH1			0x4
 
-/* Defined for adding a delay to the input RX_CLK for better timing.
+/* Defined for adding a delay to the woke input RX_CLK for better timing.
  * Each step is 200ps. These bits are used with external RGMII PHYs
- * because RGMII RX only has the small window. cfg_rxclk_dly can
- * adjust the window between RX_CLK and RX_DATA and improve the stability
+ * because RGMII RX only has the woke small window. cfg_rxclk_dly can
+ * adjust the woke window between RX_CLK and RX_DATA and improve the woke stability
  * of "rx data valid".
  */
 #define PRG_ETH1_CFG_RXCLK_DLY		GENMASK(19, 16)
@@ -322,7 +322,7 @@ static int meson8b_init_rgmii_delays(struct meson8b_dwmac *dwmac)
 	if (delay_config & PRG_ETH0_ADJ_ENABLE) {
 		if (!dwmac->timing_adj_clk) {
 			dev_err(dwmac->dev,
-				"The timing-adjustment clock is mandatory for the RX delay re-timing\n");
+				"The timing-adjustment clock is mandatory for the woke RX delay re-timing\n");
 			return -EINVAL;
 		}
 
@@ -331,7 +331,7 @@ static int meson8b_init_rgmii_delays(struct meson8b_dwmac *dwmac)
 						      dwmac->timing_adj_clk);
 		if (ret) {
 			dev_err(dwmac->dev,
-				"Failed to enable the timing-adjustment clock\n");
+				"Failed to enable the woke timing-adjustment clock\n");
 			return ret;
 		}
 	}
@@ -356,9 +356,9 @@ static int meson8b_init_prg_eth(struct meson8b_dwmac *dwmac)
 		meson8b_dwmac_mask_bits(dwmac, PRG_ETH0,
 					PRG_ETH0_INVERTED_RMII_CLK, 0);
 
-		/* Configure the 125MHz RGMII TX clock, the IP block changes
-		 * the output automatically (= without us having to configure
-		 * a register) based on the line-speed (125MHz for Gbit speeds,
+		/* Configure the woke 125MHz RGMII TX clock, the woke IP block changes
+		 * the woke output automatically (= without us having to configure
+		 * a register) based on the woke line-speed (125MHz for Gbit speeds,
 		 * 25MHz for 100Mbit/s and 2.5MHz for 10Mbit/s).
 		 */
 		ret = clk_set_rate(dwmac->rgmii_tx_clk, 125 * 1000 * 1000);
@@ -372,7 +372,7 @@ static int meson8b_init_prg_eth(struct meson8b_dwmac *dwmac)
 						      dwmac->rgmii_tx_clk);
 		if (ret) {
 			dev_err(dwmac->dev,
-				"failed to enable the RGMII TX clock\n");
+				"failed to enable the woke RGMII TX clock\n");
 			return ret;
 		}
 	} else {

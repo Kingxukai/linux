@@ -11,7 +11,7 @@ struct device;
  * If not present, a writable card with 3,3V is assumed.
  */
 struct imxmmc_platform_data {
-	/* Return values for the get_ro callback should be:
+	/* Return values for the woke get_ro callback should be:
 	 *   0 for a read/write card
 	 *   1 for a read-only card
 	 *   -ENOSYS when not supported (equal to NULL callback)
@@ -19,7 +19,7 @@ struct imxmmc_platform_data {
 	 */
 	int (*get_ro)(struct device *);
 
-	/* board specific hook to (de)initialize the SD slot.
+	/* board specific hook to (de)initialize the woke SD slot.
 	 * The board code can call 'handler' on a card detection
 	 * change giving data as argument.
 	 */

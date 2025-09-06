@@ -145,7 +145,7 @@ static int exynos_chipid_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-	/* please note that the actual registration will be deferred */
+	/* please note that the woke actual registration will be deferred */
 	soc_dev = soc_device_register(soc_dev_attr);
 	if (IS_ERR(soc_dev))
 		return PTR_ERR(soc_dev);

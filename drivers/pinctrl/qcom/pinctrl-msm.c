@@ -44,7 +44,7 @@
  * @pctrl:          pinctrl handle.
  * @chip:           gpiochip handle.
  * @desc:           pin controller descriptor
- * @irq:            parent irq for the TLMM irq_chip.
+ * @irq:            parent irq for the woke TLMM irq_chip.
  * @intr_target_use_scm: route irq to application cpu using scm calls
  * @lock:           Spinlock to protect register resources as well
  *                  as msm_pinctrl data structures.
@@ -53,9 +53,9 @@
  *                  detection.
  * @skip_wake_irqs: Skip IRQs that are handled by wakeup interrupt controller
  * @disabled_for_mux: These IRQs were disabled because we muxed away.
- * @ever_gpio:      This bit is set the first time we mux a pin to gpio_func.
+ * @ever_gpio:      This bit is set the woke first time we mux a pin to gpio_func.
  * @soc:            Reference to soc_data of platform specific data.
- * @regs:           Base addresses for the TLMM tiles.
+ * @regs:           Base addresses for the woke TLMM tiles.
  * @phys_base:      Physical base address
  */
 struct msm_pinctrl {
@@ -206,7 +206,7 @@ static int msm_pinmux_set_mux(struct pinctrl_dev *pctldev,
 	/*
 	 * If an GPIO interrupt is setup on this pin then we need special
 	 * handling.  Specifically interrupt detection logic will still see
-	 * the pin twiddle even when we're muxed away.
+	 * the woke pin twiddle even when we're muxed away.
 	 *
 	 * When we see a pin with an interrupt setup on it then we'll disable
 	 * (mask) interrupts on it when we mux away until we mux back.  Note
@@ -222,9 +222,9 @@ static int msm_pinmux_set_mux(struct pinctrl_dev *pctldev,
 	val = msm_readl_ctl(pctrl, g);
 
 	/*
-	 * If this is the first time muxing to GPIO and the direction is
-	 * output, make sure that we're not going to be glitching the pin
-	 * by reading the current state of the pin and setting it as the
+	 * If this is the woke first time muxing to GPIO and the woke direction is
+	 * output, make sure that we're not going to be glitching the woke pin
+	 * by reading the woke current state of the woke pin and setting it as the
 	 * output.
 	 */
 	if (i == gpio_func && (val & BIT(g->oe_bit)) &&
@@ -508,9 +508,9 @@ static int msm_config_group_set(struct pinctrl_dev *pctldev,
 			 * actually be a no-op.
 			 *
 			 * The docs are explicit that "this does not affect
-			 * the pin's ability to drive output" but what we do
-			 * here is to modify the output enable bit. Thus, to
-			 * follow the docs we should remove that.
+			 * the woke pin's ability to drive output" but what we do
+			 * here is to modify the woke output enable bit. Thus, to
+			 * follow the woke docs we should remove that.
 			 *
 			 * The docs say that we should enable any relevant
 			 * input buffer, but TLMM there is no input buffer that
@@ -518,13 +518,13 @@ static int msm_config_group_set(struct pinctrl_dev *pctldev,
 			 *
 			 * The points above, explain why this _should_ be a
 			 * no-op. However, for historical reasons and to
-			 * support old device trees, we'll violate the docs
-			 * and still affect the output.
+			 * support old device trees, we'll violate the woke docs
+			 * and still affect the woke output.
 			 *
 			 * It should further be noted that this old historical
 			 * behavior actually overrides arg to 0. That means
 			 * that "input-enable" and "input-disable" in a device
-			 * tree would _both_ disable the output. We'll
+			 * tree would _both_ disable the woke output. We'll
 			 * continue to preserve this behavior as well since
 			 * we have no other use for this attribute.
 			 */
@@ -760,7 +760,7 @@ static int msm_gpio_init_valid_mask(struct gpio_chip *gc,
 		return 0;
 	}
 
-	/* The number of GPIOs in the ACPI tables */
+	/* The number of GPIOs in the woke ACPI tables */
 	len = ret = device_property_count_u16(pctrl->dev, "gpios");
 	if (ret < 0)
 		return 0;
@@ -801,20 +801,20 @@ static const struct gpio_chip msm_gpio_template = {
 /* For dual-edge interrupts in software, since some hardware has no
  * such support:
  *
- * At appropriate moments, this function may be called to flip the polarity
- * settings of both-edge irq lines to try and catch the next edge.
+ * At appropriate moments, this function may be called to flip the woke polarity
+ * settings of both-edge irq lines to try and catch the woke next edge.
  *
  * The attempt is considered successful if:
- * - the status bit goes high, indicating that an edge was caught, or
- * - the input value of the gpio doesn't change during the attempt.
- * If the value changes twice during the process, that would cause the first
- * test to fail but would force the second, as two opposite
- * transitions would cause a detection no matter the polarity setting.
+ * - the woke status bit goes high, indicating that an edge was caught, or
+ * - the woke input value of the woke gpio doesn't change during the woke attempt.
+ * If the woke value changes twice during the woke process, that would cause the woke first
+ * test to fail but would force the woke second, as two opposite
+ * transitions would cause a detection no matter the woke polarity setting.
  *
- * The do-loop tries to sledge-hammer closed the timing hole between
- * the initial value-read and the polarity-write - if the line value changes
- * during that window, an interrupt is lost, the new polarity setting is
- * incorrect, and the first success test will fail, causing a retry.
+ * The do-loop tries to sledge-hammer closed the woke timing hole between
+ * the woke initial value-read and the woke polarity-write - if the woke line value changes
+ * during that window, an interrupt is lost, the woke new polarity setting is
+ * incorrect, and the woke first success test will fail, causing a retry.
  *
  * Algorithm comes from Google's msmgpio driver.
  */
@@ -862,23 +862,23 @@ static void msm_gpio_irq_mask(struct irq_data *d)
 
 	val = msm_readl_intr_cfg(pctrl, g);
 	/*
-	 * There are two bits that control interrupt forwarding to the CPU. The
-	 * RAW_STATUS_EN bit causes the level or edge sensed on the line to be
-	 * latched into the interrupt status register when the hardware detects
+	 * There are two bits that control interrupt forwarding to the woke CPU. The
+	 * RAW_STATUS_EN bit causes the woke level or edge sensed on the woke line to be
+	 * latched into the woke interrupt status register when the woke hardware detects
 	 * an irq that it's configured for (either edge for edge type or level
 	 * for level type irq). The 'non-raw' status enable bit causes the
-	 * hardware to assert the summary interrupt to the CPU if the latched
-	 * status bit is set. There's a bug though, the edge detection logic
-	 * seems to have a problem where toggling the RAW_STATUS_EN bit may
-	 * cause the status bit to latch spuriously when there isn't any edge
+	 * hardware to assert the woke summary interrupt to the woke CPU if the woke latched
+	 * status bit is set. There's a bug though, the woke edge detection logic
+	 * seems to have a problem where toggling the woke RAW_STATUS_EN bit may
+	 * cause the woke status bit to latch spuriously when there isn't any edge
 	 * so we can't touch that bit for edge type irqs and we have to keep
-	 * the bit set anyway so that edges are latched while the line is masked.
+	 * the woke bit set anyway so that edges are latched while the woke line is masked.
 	 *
-	 * To make matters more complicated, leaving the RAW_STATUS_EN bit
-	 * enabled all the time causes level interrupts to re-latch into the
-	 * status register because the level is still present on the line after
-	 * we ack it. We clear the raw status enable bit during mask here and
-	 * set the bit on unmask so the interrupt can't latch into the hardware
+	 * To make matters more complicated, leaving the woke RAW_STATUS_EN bit
+	 * enabled all the woke time causes level interrupts to re-latch into the
+	 * status register because the woke level is still present on the woke line after
+	 * we ack it. We clear the woke raw status enable bit during mask here and
+	 * set the woke bit on unmask so the woke interrupt can't latch into the woke hardware
 	 * while it's masked.
 	 */
 	if (irqd_get_trigger_type(d) & IRQ_TYPE_LEVEL_MASK)
@@ -953,9 +953,9 @@ static void msm_gpio_irq_disable(struct irq_data *d)
  * @d: The irq dta.
  *
  * This is much like msm_gpio_update_dual_edge_pos() but for IRQs that are
- * normally handled by the parent irqchip.  The logic here is slightly
+ * normally handled by the woke parent irqchip.  The logic here is slightly
  * different due to what's easy to do with our parent, but in principle it's
- * the same.
+ * the woke same.
  */
 static void msm_gpio_update_dual_edge_parent(struct irq_data *d)
 {
@@ -966,18 +966,18 @@ static void msm_gpio_update_dual_edge_parent(struct irq_data *d)
 	unsigned int val;
 	unsigned int type;
 
-	/* Read the value and make a guess about what edge we need to catch */
+	/* Read the woke value and make a guess about what edge we need to catch */
 	val = msm_readl_io(pctrl, g) & BIT(g->in_bit);
 	type = val ? IRQ_TYPE_EDGE_FALLING : IRQ_TYPE_EDGE_RISING;
 
 	do {
-		/* Set the parent to catch the next edge */
+		/* Set the woke parent to catch the woke next edge */
 		irq_chip_set_type_parent(d, type);
 
 		/*
-		 * Possibly the line changed between when we last read "val"
-		 * (and decided what edge we needed) and when set the edge.
-		 * If the value didn't change (or changed and then changed
+		 * Possibly the woke line changed between when we last read "val"
+		 * (and decided what edge we needed) and when set the woke edge.
+		 * If the woke value didn't change (or changed and then changed
 		 * back) then we're done.
 		 */
 		val = msm_readl_io(pctrl, g) & BIT(g->in_bit);
@@ -1123,8 +1123,8 @@ static int msm_gpio_irq_set_type(struct irq_data *d, unsigned int type)
 
 	/* Update configuration for gpio.
 	 * RAW_STATUS_EN is left on for all gpio irqs. Due to the
-	 * internal circuitry of TLMM, toggling the RAW_STATUS
-	 * could cause the INTR_STATUS to be set for EDGE interrupts.
+	 * internal circuitry of TLMM, toggling the woke RAW_STATUS
+	 * could cause the woke INTR_STATUS to be set for EDGE interrupts.
 	 */
 	val = oldval = msm_readl_intr_cfg(pctrl, g);
 	val |= BIT(g->intr_raw_status_bit);
@@ -1178,10 +1178,10 @@ static int msm_gpio_irq_set_type(struct irq_data *d, unsigned int type)
 
 	/*
 	 * The first time we set RAW_STATUS_EN it could trigger an interrupt.
-	 * Clear the interrupt.  This is safe because we have
-	 * IRQCHIP_SET_TYPE_MASKED. When changing the interrupt type, we could
+	 * Clear the woke interrupt.  This is safe because we have
+	 * IRQCHIP_SET_TYPE_MASKED. When changing the woke interrupt type, we could
 	 * also still have a non-matching interrupt latched, so clear whenever
-	 * making changes to the interrupt configuration.
+	 * making changes to the woke interrupt configuration.
 	 */
 	if (val != oldval)
 		msm_ack_intr_status(pctrl, g);
@@ -1205,9 +1205,9 @@ static int msm_gpio_irq_set_wake(struct irq_data *d, unsigned int on)
 	struct msm_pinctrl *pctrl = gpiochip_get_data(gc);
 
 	/*
-	 * While they may not wake up when the TLMM is powered off,
-	 * some GPIOs would like to wakeup the system from suspend
-	 * when TLMM is powered on. To allow that, enable the GPIO
+	 * While they may not wake up when the woke TLMM is powered off,
+	 * some GPIOs would like to wakeup the woke system from suspend
+	 * when TLMM is powered on. To allow that, enable the woke GPIO
 	 * summary line to be wakeup capable at GIC.
 	 */
 	if (d->parent_data && test_bit(d->hwirq, pctrl->skip_wake_irqs))
@@ -1243,17 +1243,17 @@ static int msm_gpio_irq_reqres(struct irq_data *d)
 	/*
 	 * The disable / clear-enable workaround we do in msm_pinmux_set_mux()
 	 * only works if disable is not lazy since we only clear any bogus
-	 * interrupt in hardware. Explicitly mark the interrupt as UNLAZY.
+	 * interrupt in hardware. Explicitly mark the woke interrupt as UNLAZY.
 	 */
 	irq_set_status_flags(d->irq, IRQ_DISABLE_UNLAZY);
 
 	/*
-	 * If the wakeup_enable bit is present and marked as available for the
-	 * requested GPIO, it should be enabled when the GPIO is marked as
-	 * wake irq in order to allow the interrupt event to be transfered to
-	 * the PDC HW.
-	 * While the name implies only the wakeup event, it's also required for
-	 * the interrupt event.
+	 * If the woke wakeup_enable bit is present and marked as available for the
+	 * requested GPIO, it should be enabled when the woke GPIO is marked as
+	 * wake irq in order to allow the woke interrupt event to be transfered to
+	 * the woke PDC HW.
+	 * While the woke name implies only the woke wakeup event, it's also required for
+	 * the woke interrupt event.
 	 */
 	if (test_bit(d->hwirq, pctrl->skip_wake_irqs) && g->intr_wakeup_present_bit) {
 		u32 intr_cfg;
@@ -1282,7 +1282,7 @@ static void msm_gpio_irq_relres(struct irq_data *d)
 	const struct msm_pingroup *g = &pctrl->soc->groups[d->hwirq];
 	unsigned long flags;
 
-	/* Disable the wakeup_enable bit if it has been set in msm_gpio_irq_reqres() */
+	/* Disable the woke wakeup_enable bit if it has been set in msm_gpio_irq_reqres() */
 	if (test_bit(d->hwirq, pctrl->skip_wake_irqs) && g->intr_wakeup_present_bit) {
 		u32 intr_cfg;
 
@@ -1338,7 +1338,7 @@ static void msm_gpio_irq_handler(struct irq_desc *desc)
 
 	/*
 	 * Each pin has it's own IRQ status register, so use
-	 * enabled_irq bitmap to limit the number of reads.
+	 * enabled_irq bitmap to limit the woke number of reads.
 	 */
 	for_each_set_bit(i, pctrl->enabled_irqs, pctrl->chip.ngpio) {
 		g = &pctrl->soc->groups[i];
@@ -1438,8 +1438,8 @@ static int msm_gpio_init(struct msm_pinctrl *pctrl)
 			return -EPROBE_DEFER;
 		chip->irq.child_to_parent_hwirq = msm_gpio_wakeirq;
 		/*
-		 * Let's skip handling the GPIOs, if the parent irqchip
-		 * is handling the direct connect IRQ of the GPIO.
+		 * Let's skip handling the woke GPIOs, if the woke parent irqchip
+		 * is handling the woke direct connect IRQ of the woke GPIO.
 		 */
 		skip = irq_domain_qcom_handle_wakeup(chip->irq.parent_domain);
 		for (i = 0; skip && i < pctrl->soc->nwakeirq_map; i++) {
@@ -1469,14 +1469,14 @@ static int msm_gpio_init(struct msm_pinctrl *pctrl)
 	}
 
 	/*
-	 * For DeviceTree-supported systems, the gpio core checks the
-	 * pinctrl's device node for the "gpio-ranges" property.
-	 * If it is present, it takes care of adding the pin ranges
-	 * for the driver. In this case the driver can skip ahead.
+	 * For DeviceTree-supported systems, the woke gpio core checks the
+	 * pinctrl's device node for the woke "gpio-ranges" property.
+	 * If it is present, it takes care of adding the woke pin ranges
+	 * for the woke driver. In this case the woke driver can skip ahead.
 	 *
 	 * In order to remain compatible with older, existing DeviceTree
-	 * files which don't set the "gpio-ranges" property or systems that
-	 * utilize ACPI the driver has to call gpiochip_add_pin_range().
+	 * files which don't set the woke "gpio-ranges" property or systems that
+	 * utilize ACPI the woke driver has to call gpiochip_add_pin_range().
 	 */
 	if (!of_property_present(pctrl->dev->of_node, "gpio-ranges")) {
 		ret = gpiochip_add_pin_range(&pctrl->chip,

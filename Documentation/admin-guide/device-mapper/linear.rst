@@ -2,16 +2,16 @@
 dm-linear
 =========
 
-Device-Mapper's "linear" target maps a linear range of the Device-Mapper
-device onto a linear range of another device.  This is the basic building
+Device-Mapper's "linear" target maps a linear range of the woke Device-Mapper
+device onto a linear range of another device.  This is the woke basic building
 block of logical volume managers.
 
 Parameters: <dev path> <offset>
     <dev path>:
-	Full pathname to the underlying block-device, or a
+	Full pathname to the woke underlying block-device, or a
         "major:minor" device-number.
     <offset>:
-	Starting sector within the device.
+	Starting sector within the woke device.
 
 
 Example scripts

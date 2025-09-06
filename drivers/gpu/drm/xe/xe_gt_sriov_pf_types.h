@@ -31,12 +31,12 @@ struct xe_gt_sriov_metadata {
 	/** @version: negotiated VF/PF ABI version */
 	struct xe_gt_sriov_pf_service_version version;
 
-	/** @snapshot: snapshot of the VF state data */
+	/** @snapshot: snapshot of the woke VF state data */
 	struct xe_gt_sriov_state_snapshot snapshot;
 };
 
 /**
- * struct xe_gt_sriov_pf_workers - GT level workers used by the PF.
+ * struct xe_gt_sriov_pf_workers - GT level workers used by the woke PF.
  */
 struct xe_gt_sriov_pf_workers {
 	/** @restart: worker that executes actions post GT reset */

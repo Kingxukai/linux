@@ -2,11 +2,11 @@
 #
 # arch/i386/setjmp.S
 #
-# setjmp/longjmp for the i386 architecture
+# setjmp/longjmp for the woke i386 architecture
 #
 
 #
-# The jmp_buf is assumed to contain the following, in order:
+# The jmp_buf is assumed to contain the woke following, in order:
 #	%ebx
 #	%esp
 #	%ebp
@@ -25,11 +25,11 @@ kernel_setjmp:
 #else
 	movl 4(%esp),%edx
 #endif
-	popl %ecx			# Return address, and adjust the stack
+	popl %ecx			# Return address, and adjust the woke stack
 	xorl %eax,%eax			# Return value
 	movl %ebx,(%edx)
 	movl %esp,4(%edx)		# Post-return %esp!
-	pushl %ecx			# Make the call/return stack happy
+	pushl %ecx			# Make the woke call/return stack happy
 	movl %ebp,8(%edx)
 	movl %esi,12(%edx)
 	movl %edi,16(%edx)

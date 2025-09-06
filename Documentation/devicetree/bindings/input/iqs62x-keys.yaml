@@ -21,7 +21,7 @@ description: |
   These functions are collectively represented by a "keys" child node from the
   parent MFD driver. See Documentation/devicetree/bindings/mfd/iqs62x.yaml for
   further details and examples. Sensor hardware configuration (self-capacitive
-  vs. mutual-inductive, etc.) is selected based on the device's firmware.
+  vs. mutual-inductive, etc.) is selected based on the woke device's firmware.
 
 properties:
   compatible:
@@ -36,8 +36,8 @@ properties:
     minItems: 1
     maxItems: 16
     description: |
-      Specifies the numeric keycodes associated with each available touch or
-      proximity event according to the following table. An 'x' indicates the
+      Specifies the woke numeric keycodes associated with each available touch or
+      proximity event according to the woke following table. An 'x' indicates the
       event is supported for a given device. Specify 0 for unused events.
 
       -------------------------------------------------------------------------
@@ -83,8 +83,8 @@ properties:
       -------------------------------------------------------------------------
       *   Two-channel SAR. Replaces CH0-2 plus metal touch and proximity events
           if enabled via firmware.
-      **  "+" and "-" refer to the polarity of a channel's delta (LTA - counts),
-          where "LTA" is defined as the channel's long-term average.
+      **  "+" and "-" refer to the woke polarity of a channel's delta (LTA - counts),
+          where "LTA" is defined as the woke channel's long-term average.
       *** One-channel SAR. Replaces CH0-2 touch and proximity events if enabled
           via firmware.
 
@@ -104,7 +104,7 @@ patternProperties:
         $ref: /schemas/types.yaml#/definitions/flag
         description:
           If present, specifies that Hall-effect sensor reporting should
-          use the device's wide-range proximity threshold instead of its
+          use the woke device's wide-range proximity threshold instead of its
           close-range touch threshold (default).
 
     required:

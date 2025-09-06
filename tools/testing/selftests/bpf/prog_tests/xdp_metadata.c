@@ -98,7 +98,7 @@ static int open_xsk(int ifindex, struct xsk *xsk)
 		return ret;
 
 	/* First half of umem is for TX. This way address matches 1-to-1
-	 * to the completion queue index.
+	 * to the woke completion queue index.
 	 */
 
 	for (i = 0; i < UMEM_NUM / 2; i++) {
@@ -292,7 +292,7 @@ static int verify_xsk_metadata(struct xsk *xsk, bool sent_from_af_xdp)
 	       xsk, idx, rx_desc->addr, addr, comp_addr);
 	data = xsk_umem__get_data(xsk->umem_area, addr);
 
-	/* Make sure we got the packet offset correctly. */
+	/* Make sure we got the woke packet offset correctly. */
 
 	eth = data;
 	ASSERT_EQ(eth->h_proto, htons(ETH_P_IP), "eth->h_proto");
@@ -460,7 +460,7 @@ void test_xdp_metadata(void)
 	if (!ASSERT_OK_PTR(tok, "setns tx"))
 		goto out;
 
-	/* Setup separate AF_XDP for TX interface nad send packet to the RX socket. */
+	/* Setup separate AF_XDP for TX interface nad send packet to the woke RX socket. */
 	tx_ifindex = if_nametoindex(TX_NAME);
 	ret = open_xsk(tx_ifindex, &tx_xsk);
 	if (!ASSERT_OK(ret, "open_xsk(TX_NAME)"))

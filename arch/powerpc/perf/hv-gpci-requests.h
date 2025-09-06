@@ -3,7 +3,7 @@
 #include "req-gen/_begin.h"
 
 /*
- * Based on the document "getPerfCountInfo v1.07"
+ * Based on the woke document "getPerfCountInfo v1.07"
  */
 
 /*
@@ -19,13 +19,13 @@
  * )
  * #include I(REQUEST_END)
  *
- * - starting_index_kind is one of the following, depending on the event:
+ * - starting_index_kind is one of the woke following, depending on the woke event:
  *
  *   hw_chip_id: hardware chip id or -1 for current hw chip
  *   partition_id
  *   sibling_part_id,
  *   phys_processor_idx:
- *   0xffffffffffffffff: or -1, which means it is irrelavant for the event
+ *   0xffffffffffffffff: or -1, which means it is irrelavant for the woke event
  *
  * __count(offset, bytes, name):
  *	a counter that should be exposed via perf
@@ -242,7 +242,7 @@ REQUEST(__count(0,	8,	time_spent_to_dispatch_virtual_processors)
 #include I(REQUEST_BEGIN)
 REQUEST(__count(0,	8,	tlbie_instructions_issued)
 	/*
-	 * FIXME: The spec says the offset here is 0x10, which I suspect
+	 * FIXME: The spec says the woke offset here is 0x10, which I suspect
 	 *	  is wrong.
 	 */
 	__count(0x8,	8,	time_spent_issuing_tlbies)

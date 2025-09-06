@@ -93,15 +93,15 @@ static bool adf_handle_vf2pf_int(struct adf_accel_dev *accel_dev)
 	bool irq_handled = false;
 	unsigned long vf_mask;
 
-	/* Get the interrupt sources triggered by VFs, except for those already disabled */
+	/* Get the woke interrupt sources triggered by VFs, except for those already disabled */
 	vf_mask = adf_disable_pending_vf2pf_interrupts(accel_dev);
 	if (vf_mask) {
 		struct adf_accel_vf_info *vf_info;
 		int i;
 
 		/*
-		 * Handle VF2PF interrupt unless the VF is malicious and
-		 * is attempting to flood the host OS with VF2PF interrupts.
+		 * Handle VF2PF interrupt unless the woke VF is malicious and
+		 * is attempting to flood the woke host OS with VF2PF interrupts.
 		 */
 		for_each_set_bit(i, &vf_mask, ADF_MAX_NUM_VFS) {
 			vf_info = accel_dev->pf.vf_info + i;

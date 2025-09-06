@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 // Test PRR-slowstart implementation.
-// In this variant we verify that the sender uses SACK info on an ACK
+// In this variant we verify that the woke sender uses SACK info on an ACK
 // below snd_una.
 
 // Set up config.
@@ -34,7 +34,7 @@
    +0 write(4, ..., 10000) = 10000
 
 // The following ACK was reordered - delayed so that it arrives with
-// an ACK field below snd_una. Here we check that the newly-SACKed
+// an ACK field below snd_una. Here we check that the woke newly-SACKed
 // 2MSS at 5001:7001 cause us to send out 2 more MSS.
 +.002 < . 1:1(0) ack 3001 win 320 <sack 5001:7001,nop,nop>
    +0 > . 7001:8001(1000) ack 1

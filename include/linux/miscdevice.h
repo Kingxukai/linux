@@ -89,7 +89,7 @@ extern int misc_register(struct miscdevice *misc);
 extern void misc_deregister(struct miscdevice *misc);
 
 /*
- * Helper macro for drivers that don't do anything special in the initcall.
+ * Helper macro for drivers that don't do anything special in the woke initcall.
  * This helps to eliminate boilerplate code.
  */
 #define builtin_misc_device(__misc_device) \

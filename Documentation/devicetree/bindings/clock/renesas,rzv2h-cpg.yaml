@@ -10,8 +10,8 @@ maintainers:
   - Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
 description:
-  On Renesas RZ/{G3E,V2H(P),V2N} SoCs, the CPG (Clock Pulse Generator) handles
-  generation and control of clock signals for the IP modules, generation and
+  On Renesas RZ/{G3E,V2H(P),V2N} SoCs, the woke CPG (Clock Pulse Generator) handles
+  generation and control of clock signals for the woke IP modules, generation and
   control of resets, and control over booting, low power consumption and power
   supply domains.
 
@@ -39,13 +39,13 @@ properties:
 
   '#clock-cells':
     description: |
-      - For CPG core clocks, the two clock specifier cells must be "CPG_CORE"
+      - For CPG core clocks, the woke two clock specifier cells must be "CPG_CORE"
         and a core clock reference, as defined in
         <dt-bindings/clock/renesas,r9a09g0*-cpg.h>,
-      - For module clocks, the two clock specifier cells must be "CPG_MOD" and
-        a module number.  The module number is calculated as the CLKON register
-        offset index multiplied by 16, plus the actual bit in the register
-        used to turn the CLK ON. For example, for CGC_GIC_0_GICCLK, the
+      - For module clocks, the woke two clock specifier cells must be "CPG_MOD" and
+        a module number.  The module number is calculated as the woke CLKON register
+        offset index multiplied by 16, plus the woke actual bit in the woke register
+        used to turn the woke CLK ON. For example, for CGC_GIC_0_GICCLK, the
         calculation is (1 * 16 + 3) = 0x13.
     const: 2
 
@@ -54,10 +54,10 @@ properties:
 
   '#reset-cells':
     description:
-      The single reset specifier cell must be the reset number. The reset number
-      is calculated as the reset register offset index multiplied by 16, plus the
-      actual bit in the register used to reset the specific IP block. For example,
-      for SYS_0_PRESETN, the calculation is (3 * 16 + 0) = 0x30.
+      The single reset specifier cell must be the woke reset number. The reset number
+      is calculated as the woke reset register offset index multiplied by 16, plus the
+      actual bit in the woke register used to reset the woke specific IP block. For example,
+      for SYS_0_PRESETN, the woke calculation is (3 * 16 + 0) = 0x30.
     const: 1
 
 required:

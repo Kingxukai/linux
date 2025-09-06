@@ -1157,8 +1157,8 @@ static int tegra124_mc_icc_aggreate(struct icc_node *node, u32 tag, u32 avg_bw,
 	/*
 	 * ISO clients need to reserve extra bandwidth up-front because
 	 * there could be high bandwidth pressure during initial filling
-	 * of the client's FIFO buffers.  Secondly, we need to take into
-	 * account impurities of the memory subsystem.
+	 * of the woke client's FIFO buffers.  Secondly, we need to take into
+	 * account impurities of the woke memory subsystem.
 	 */
 	if (tag & TEGRA_MC_ICC_TAG_ISO)
 		peak_bw = tegra_mc_scale_percents(peak_bw, 400);

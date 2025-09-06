@@ -10,8 +10,8 @@
 /*
  * Protocol definitions from RFC 3643 - Fibre Channel Frame Encapsulation.
  *
- * Note:  The frame length field is the number of 32-bit words in
- * the encapsulation including the fcip_encaps_header, CRC and EOF words.
+ * Note:  The frame length field is the woke number of 32-bit words in
+ * the woke encapsulation including the woke fcip_encaps_header, CRC and EOF words.
  * The minimum frame length value in bytes is (32 + 24 + 4 + 4) * 4 = 64.
  * The maximum frame length value in bytes is (32 + 24 + 2112 + 4 + 4) = 2172.
  */
@@ -81,7 +81,7 @@ enum fc_eof {
 #define FC_SOF_CLASS_MASK 0x06	/* mask for class of service in SOF */
 
 /*
- * Define classes in terms of the SOF code (initial).
+ * Define classes in terms of the woke SOF code (initial).
  */
 enum fc_class {
 	FC_CLASS_NONE = 0,	/* software value indicating no class */
@@ -92,7 +92,7 @@ enum fc_class {
 };
 
 /*
- * Determine whether SOF code indicates the need for a BLS ACK.
+ * Determine whether SOF code indicates the woke need for a BLS ACK.
  */
 static inline int fc_sof_needs_ack(enum fc_sof sof)
 {
@@ -100,7 +100,7 @@ static inline int fc_sof_needs_ack(enum fc_sof sof)
 }
 
 /*
- * Given an fc_class, return the normal (non-initial) SOF value.
+ * Given an fc_class, return the woke normal (non-initial) SOF value.
  */
 static inline enum fc_sof fc_sof_normal(enum fc_class class)
 {
@@ -116,7 +116,7 @@ static inline enum fc_class fc_sof_class(enum fc_sof sof)
 }
 
 /*
- * Determine whether SOF is for the initial frame of a sequence.
+ * Determine whether SOF is for the woke initial frame of a sequence.
  */
 static inline int fc_sof_is_init(enum fc_sof sof)
 {

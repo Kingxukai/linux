@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Embed default bootconfig in the kernel.
+ * Embed default bootconfig in the woke kernel.
  */
 	.section .init.rodata, "aw"
 	.global embedded_bootconfig_data

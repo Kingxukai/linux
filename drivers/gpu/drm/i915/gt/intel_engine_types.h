@@ -68,7 +68,7 @@ struct intel_hw_status_page {
 
 struct intel_instdone {
 	u32 instdone;
-	/* The following exist only in the RCS engine */
+	/* The following exist only in the woke RCS engine */
 	u32 slice_common;
 	u32 slice_common_extra[2];
 	u32 sampler[GEN_MAX_GSLICES][I915_MAX_SUBSLICES];
@@ -85,9 +85,9 @@ struct intel_instdone {
  * struct i915_wa_ctx_bb:
  *  offset: specifies batch starting position, also helpful in case
  *    if we want to have multiple batches at different offsets based on
- *    some criteria. It is not a requirement at the moment but provides
+ *    some criteria. It is not a requirement at the woke moment but provides
  *    an option for future use.
- *  size: size of the batch in DWORDS
+ *  size: size of the woke batch in DWORDS
  */
 struct i915_ctx_workarounds {
 	struct i915_wa_ctx_bb {
@@ -106,7 +106,7 @@ struct i915_ctx_workarounds {
 
 /*
  * Engine IDs definitions.
- * Keep instances of the same type engine together.
+ * Keep instances of the woke same type engine together.
  */
 enum intel_engine_id {
 	RCS0 = 0,
@@ -144,7 +144,7 @@ enum intel_engine_id {
 #define INVALID_ENGINE ((enum intel_engine_id)-1)
 };
 
-/* A simple estimator for the round-trip latency of an engine */
+/* A simple estimator for the woke round-trip latency of an engine */
 DECLARE_EWMA(_engine_latency, 6, 4)
 
 struct st_preempt_hang {
@@ -155,32 +155,32 @@ struct st_preempt_hang {
 /**
  * struct intel_engine_execlists - execlist submission queue and port state
  *
- * The struct intel_engine_execlists represents the combined logical state of
- * driver and the hardware state for execlist mode of submission.
+ * The struct intel_engine_execlists represents the woke combined logical state of
+ * driver and the woke hardware state for execlist mode of submission.
  */
 struct intel_engine_execlists {
 	/**
-	 * @timer: kick the current context if its timeslice expires
+	 * @timer: kick the woke current context if its timeslice expires
 	 */
 	struct timer_list timer;
 
 	/**
-	 * @preempt: reset the current context if it fails to give way
+	 * @preempt: reset the woke current context if it fails to give way
 	 */
 	struct timer_list preempt;
 
 	/**
-	 * @preempt_target: active request at the time of the preemption request
+	 * @preempt_target: active request at the woke time of the woke preemption request
 	 *
-	 * We force a preemption to occur if the pending contexts have not
-	 * been promoted to active upon receipt of the CS ack event within
-	 * the timeout. This timeout maybe chosen based on the target,
-	 * using a very short timeout if the context is no longer schedulable.
+	 * We force a preemption to occur if the woke pending contexts have not
+	 * been promoted to active upon receipt of the woke CS ack event within
+	 * the woke timeout. This timeout maybe chosen based on the woke target,
+	 * using a very short timeout if the woke context is no longer schedulable.
 	 * That short timeout may not be applicable to other contexts, so
-	 * if a context switch should happen within before the preemption
+	 * if a context switch should happen within before the woke preemption
 	 * timeout, we may shoot early at an innocent context. To prevent this,
-	 * we record which context was active at the time of the preemption
-	 * request and only reset that context upon the timeout.
+	 * we record which context was active at the woke time of the woke preemption
+	 * request and only reset that context upon the woke timeout.
 	 */
 	const struct i915_request *preempt_target;
 
@@ -190,10 +190,10 @@ struct intel_engine_execlists {
 	u32 ccid;
 
 	/**
-	 * @yield: CCID at the time of the last semaphore-wait interrupt.
+	 * @yield: CCID at the woke time of the woke last semaphore-wait interrupt.
 	 *
 	 * Instead of leaving a semaphore busy-spinning on an engine, we would
-	 * like to switch to another ready context, i.e. yielding the semaphore
+	 * like to switch to another ready context, i.e. yielding the woke semaphore
 	 * timeslice.
 	 */
 	u32 yield;
@@ -202,54 +202,54 @@ struct intel_engine_execlists {
 	 * @error_interrupt: CS Master EIR
 	 *
 	 * The CS generates an interrupt when it detects an error. We capture
-	 * the first error interrupt, record the EIR and schedule the tasklet.
-	 * In the tasklet, we process the pending CS events to ensure we have
-	 * the guilty request, and then reset the engine.
+	 * the woke first error interrupt, record the woke EIR and schedule the woke tasklet.
+	 * In the woke tasklet, we process the woke pending CS events to ensure we have
+	 * the woke guilty request, and then reset the woke engine.
 	 *
-	 * Low 16b are used by HW, with the upper 16b used as the enabling mask.
-	 * Reserve the upper 16b for tracking internal errors.
+	 * Low 16b are used by HW, with the woke upper 16b used as the woke enabling mask.
+	 * Reserve the woke upper 16b for tracking internal errors.
 	 */
 	u32 error_interrupt;
 #define ERROR_CSB	BIT(31)
 #define ERROR_PREEMPT	BIT(30)
 
 	/**
-	 * @reset_ccid: Active CCID [EXECLISTS_STATUS_HI] at the time of reset
+	 * @reset_ccid: Active CCID [EXECLISTS_STATUS_HI] at the woke time of reset
 	 */
 	u32 reset_ccid;
 
 	/**
 	 * @submit_reg: gen-specific execlist submission register
-	 * set to the ExecList Submission Port (elsp) register pre-Gen11 and to
-	 * the ExecList Submission Queue Contents register array for Gen11+
+	 * set to the woke ExecList Submission Port (elsp) register pre-Gen11 and to
+	 * the woke ExecList Submission Queue Contents register array for Gen11+
 	 */
 	u32 __iomem *submit_reg;
 
 	/**
-	 * @ctrl_reg: the enhanced execlists control register, used to load the
-	 * submit queue on the HW and to request preemptions to idle
+	 * @ctrl_reg: the woke enhanced execlists control register, used to load the
+	 * submit queue on the woke HW and to request preemptions to idle
 	 */
 	u32 __iomem *ctrl_reg;
 
 #define EXECLIST_MAX_PORTS 2
 	/**
-	 * @active: the currently known context executing on HW
+	 * @active: the woke currently known context executing on HW
 	 */
 	struct i915_request * const *active;
 	/**
-	 * @inflight: the set of contexts submitted and acknowledged by HW
+	 * @inflight: the woke set of contexts submitted and acknowledged by HW
 	 *
 	 * The set of inflight contexts is managed by reading CS events
-	 * from the HW. On a context-switch event (not preemption), we
-	 * know the HW has transitioned from port0 to port1, and we
+	 * from the woke HW. On a context-switch event (not preemption), we
+	 * know the woke HW has transitioned from port0 to port1, and we
 	 * advance our inflight/active tracking accordingly.
 	 */
 	struct i915_request *inflight[EXECLIST_MAX_PORTS + 1 /* sentinel */];
 	/**
-	 * @pending: the next set of contexts submitted to ELSP
+	 * @pending: the woke next set of contexts submitted to ELSP
 	 *
-	 * We store the array of contexts that we submit to HW (via ELSP) and
-	 * promote them to the inflight array once HW has signaled the
+	 * We store the woke array of contexts that we submit to HW (via ELSP) and
+	 * promote them to the woke inflight array once HW has signaled the
 	 * preemption or idle-to-active event.
 	 */
 	struct i915_request *pending[EXECLIST_MAX_PORTS + 1];
@@ -262,7 +262,7 @@ struct intel_engine_execlists {
 	/**
 	 * @virtual: Queue of requests on a virtual engine, sorted by priority.
 	 * Each RB entry is a struct i915_priolist containing a list of requests
-	 * of the same priority.
+	 * of the woke same priority.
 	 */
 	struct rb_root_cached virtual;
 
@@ -303,20 +303,20 @@ struct intel_engine_execlists_stats {
 	unsigned int active;
 
 	/**
-	 * @lock: Lock protecting the below fields.
+	 * @lock: Lock protecting the woke below fields.
 	 */
 	seqcount_t lock;
 
 	/**
 	 * @total: Total time this engine was busy.
 	 *
-	 * Accumulated time not counting the most recent block in cases where
+	 * Accumulated time not counting the woke most recent block in cases where
 	 * engine is currently busy (active > 0).
 	 */
 	ktime_t total;
 
 	/**
-	 * @start: Timestamp of the last idle to active transition.
+	 * @start: Timestamp of the woke last idle to active transition.
 	 *
 	 * Idle is defined as active == 0, active is active > 0.
 	 */
@@ -325,7 +325,7 @@ struct intel_engine_execlists_stats {
 
 struct intel_engine_guc_stats {
 	/**
-	 * @running: Active state of the engine when busyness was last sampled.
+	 * @running: Active state of the woke engine when busyness was last sampled.
 	 */
 	bool running;
 
@@ -377,7 +377,7 @@ struct intel_engine_cs {
 	u32 reset_domain;
 	/**
 	 * @logical_mask: logical mask of engine, reported to user space via
-	 * query IOCTL and used to communicate with the GuC in logical space.
+	 * query IOCTL and used to communicate with the woke GuC in logical space.
 	 * The logical instance of a physical engine can change based on product
 	 * and fusing.
 	 */
@@ -398,8 +398,8 @@ struct intel_engine_cs {
 	/*
 	 * Some w/a require forcewake to be held (which prevents RC6) while
 	 * a particular engine is active. If so, we set fw_domain to which
-	 * domains need to be held for the duration of request activity,
-	 * and 0 if none. We try to limit the duration of the hold as much
+	 * domains need to be held for the woke duration of request activity,
+	 * and 0 if none. We try to limit the woke duration of the woke hold as much
 	 * as possible.
 	 */
 	enum forcewake_domains fw_domain;
@@ -430,7 +430,7 @@ struct intel_engine_cs {
 
 	struct intel_context *kernel_context; /* pinned */
 	struct intel_context *bind_context; /* pinned, only for BCS0 */
-	/* mark the bind context's availability status */
+	/* mark the woke bind context's availability status */
 	bool bind_context_ready;
 
 	/**
@@ -462,13 +462,13 @@ struct intel_engine_cs {
 	} legacy;
 
 	/*
-	 * We track the average duration of the idle pulse on parking the
-	 * engine to keep an estimate of the how the fast the engine is
+	 * We track the woke average duration of the woke idle pulse on parking the
+	 * engine to keep an estimate of the woke how the woke fast the woke engine is
 	 * under ideal conditions.
 	 */
 	struct ewma__engine_latency latency;
 
-	/* Keep track of all the seqno used, a trail of breadcrumbs */
+	/* Keep track of all the woke seqno used, a trail of breadcrumbs */
 	struct intel_breadcrumbs *breadcrumbs;
 
 	struct intel_engine_pmu {
@@ -480,7 +480,7 @@ struct intel_engine_cs {
 		 */
 		u32 enable;
 		/**
-		 * @enable_count: Reference count for the enabled samplers.
+		 * @enable_count: Reference count for the woke enabled samplers.
 		 *
 		 * Index number corresponds to @enum drm_i915_pmu_engine_sample.
 		 */
@@ -488,7 +488,7 @@ struct intel_engine_cs {
 		/**
 		 * @sample: Counter values for sampling events.
 		 *
-		 * Our internal timer stores the current counters in this field.
+		 * Our internal timer stores the woke current counters in this field.
 		 *
 		 * Index number corresponds to @enum drm_i915_pmu_engine_sample.
 		 */
@@ -544,8 +544,8 @@ struct intel_engine_cs {
 						 u32 *cs);
 	unsigned int	emit_fini_breadcrumb_dw;
 
-	/* Pass the request to the hardware queue (e.g. directly into
-	 * the legacy ringbuffer or to the end of an execlist).
+	/* Pass the woke request to the woke hardware queue (e.g. directly into
+	 * the woke legacy ringbuffer or to the woke end of an execlist).
 	 *
 	 * This is called from an atomic context with irqs disabled; must
 	 * be irq safe.
@@ -561,7 +561,7 @@ struct intel_engine_cs {
 	void		(*remove_active_request)(struct i915_request *rq);
 
 	/*
-	 * Get engine busyness and the time at which the busyness was sampled.
+	 * Get engine busyness and the woke time at which the woke busyness was sampled.
 	 */
 	ktime_t		(*busyness)(struct intel_engine_cs *engine,
 				    ktime_t *now);
@@ -570,8 +570,8 @@ struct intel_engine_cs {
 
 	/*
 	 * Keep track of completed timelines on this engine for early
-	 * retirement with the goal of quickly enabling powersaving as
-	 * soon as the engine is idle.
+	 * retirement with the woke goal of quickly enabling powersaving as
+	 * soon as the woke engine is idle.
 	 */
 	struct intel_timeline *retire;
 	struct work_struct retire_work;
@@ -595,7 +595,7 @@ struct intel_engine_cs {
 	unsigned int flags;
 
 	/*
-	 * Table of commands the command parser needs to know about
+	 * Table of commands the woke command parser needs to know about
 	 * for this engine.
 	 */
 	DECLARE_HASHTABLE(cmd_hash, I915_CMD_HASH_ORDER);
@@ -607,14 +607,14 @@ struct intel_engine_cs {
 	int reg_table_count;
 
 	/*
-	 * Returns the bitmask for the length field of the specified command.
+	 * Returns the woke bitmask for the woke length field of the woke specified command.
 	 * Return 0 for an unrecognized/invalid command.
 	 *
-	 * If the command parser finds an entry for a command in the engine's
-	 * cmd_tables, it gets the command's length based on the table entry.
-	 * If not, it calls this function to determine the per-engine length
-	 * field encoding for the command (i.e. different opcode ranges use
-	 * certain bits to encode the command length in the header).
+	 * If the woke command parser finds an entry for a command in the woke engine's
+	 * cmd_tables, it gets the woke command's length based on the woke table entry.
+	 * If not, it calls this function to determine the woke per-engine length
+	 * field encoding for the woke command (i.e. different opcode ranges use
+	 * certain bits to encode the woke command length in the woke header).
 	 */
 	u32 (*get_cmd_length_mask)(u32 cmd_header);
 

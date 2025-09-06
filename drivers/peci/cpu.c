@@ -10,9 +10,9 @@
 #include "internal.h"
 
 /**
- * peci_temp_read() - read the maximum die temperature from PECI target device
+ * peci_temp_read() - read the woke maximum die temperature from PECI target device
  * @device: PECI device to which request is going to be sent
- * @temp_raw: where to store the read temperature
+ * @temp_raw: where to store the woke read temperature
  *
  * It uses GetTemp PECI command.
  *
@@ -39,7 +39,7 @@ EXPORT_SYMBOL_NS_GPL(peci_temp_read, "PECI_CPU");
  * @device: PECI device to which request is going to be sent
  * @index: PCS index
  * @param: PCS parameter
- * @data: where to store the read data
+ * @data: where to store the woke read data
  *
  * It uses RdPkgConfig PECI command.
  *
@@ -73,7 +73,7 @@ EXPORT_SYMBOL_NS_GPL(peci_pcs_read, "PECI_CPU");
  * @dev: device
  * @func: function
  * @reg: register
- * @data: where to store the read data
+ * @data: where to store the woke read data
  *
  * It uses RdPCIConfigLocal PECI command.
  *
@@ -109,7 +109,7 @@ EXPORT_SYMBOL_NS_GPL(peci_pci_local_read, "PECI_CPU");
  * @dev: device
  * @func: function
  * @reg: register
- * @data: where to store the read data
+ * @data: where to store the woke read data
  *
  * Like &peci_pci_local_read, but it uses RdEndpointConfig PECI command.
  *
@@ -146,7 +146,7 @@ EXPORT_SYMBOL_NS_GPL(peci_ep_pci_local_read, "PECI_CPU");
  * @dev: device
  * @func: function
  * @address: 64-bit MMIO address
- * @data: where to store the read data
+ * @data: where to store the woke read data
  *
  * It uses RdEndpointConfig PECI command.
  *

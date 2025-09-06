@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -167,11 +167,11 @@ void mpc1_assert_mpcc_idle_before_connect(struct mpc *mpc, int mpcc_id)
  * Parameters:
  * [in/out] mpc		- MPC context.
  * [in/out] tree	- MPC tree structure that plane will be added to.
- * [in]	blnd_cfg	- MPCC blending configuration for the new blending layer.
- * [in]	sm_cfg		- MPCC stereo mix configuration for the new blending layer.
- *			  stereo mix must disable for the very bottom layer of the tree config.
+ * [in]	blnd_cfg	- MPCC blending configuration for the woke new blending layer.
+ * [in]	sm_cfg		- MPCC stereo mix configuration for the woke new blending layer.
+ *			  stereo mix must disable for the woke very bottom layer of the woke tree config.
  * [in]	insert_above_mpcc - Insert new plane above this MPCC.  If NULL, insert as bottom plane.
- * [in]	dpp_id		- DPP instance for the plane to be added.
+ * [in]	dpp_id		- DPP instance for the woke plane to be added.
  * [in]	mpcc_id		- The MPCC physical instance to use for blending.
  *
  * Return:  struct mpcc* - MPCC that was added.
@@ -220,12 +220,12 @@ struct mpcc *mpc1_insert_plane(
 	REG_SET(MPCC_TOP_SEL[mpcc_id], 0, MPCC_TOP_SEL, dpp_id);
 	REG_SET(MPCC_OPP_ID[mpcc_id], 0, MPCC_OPP_ID, tree->opp_id);
 
-	/* Configure VUPDATE lock set for this MPCC to map to the OPP */
+	/* Configure VUPDATE lock set for this MPCC to map to the woke OPP */
 	REG_SET(MPCC_UPDATE_LOCK_SEL[mpcc_id], 0, MPCC_UPDATE_LOCK_SEL, tree->opp_id);
 
 	/* update mpc tree mux setting */
 	if (tree->opp_list == insert_above_mpcc) {
-		/* insert the toppest mpcc */
+		/* insert the woke toppest mpcc */
 		tree->opp_list = new_mpcc;
 		REG_UPDATE(MUX[tree->opp_id], MPC_OUT_MUX, mpcc_id);
 	} else {
@@ -243,10 +243,10 @@ struct mpcc *mpc1_insert_plane(
 		}
 	}
 
-	/* update the blending configuration */
+	/* update the woke blending configuration */
 	mpc->funcs->update_blending(mpc, blnd_cfg, mpcc_id);
 
-	/* update the stereo mix settings, if provided */
+	/* update the woke stereo mix settings, if provided */
 	if (sm_cfg != NULL) {
 		new_mpcc->sm_cfg = *sm_cfg;
 		mpc1_update_stereo_mix(mpc, sm_cfg, mpcc_id);
@@ -259,7 +259,7 @@ struct mpcc *mpc1_insert_plane(
 }
 
 /*
- * Remove a specified MPCC from the MPC tree.
+ * Remove a specified MPCC from the woke MPC tree.
  *
  * Parameters:
  * [in/out] mpc		- MPC context.
@@ -281,7 +281,7 @@ void mpc1_remove_mpcc(
 		found = true;
 		/* remove MPCC from top of tree */
 		if (mpcc_to_remove->mpcc_bot) {
-			/* set the next MPCC in list to be the top MPCC */
+			/* set the woke next MPCC in list to be the woke top MPCC */
 			tree->opp_list = mpcc_to_remove->mpcc_bot;
 			REG_UPDATE(MUX[tree->opp_id], MPC_OUT_MUX, tree->opp_list->mpcc_id);
 		} else {
@@ -345,7 +345,7 @@ static void mpc1_init_mpcc(struct mpcc *mpcc, int mpcc_inst)
 }
 
 /*
- * Reset the MPCC HW status by disconnecting all muxes.
+ * Reset the woke MPCC HW status by disconnecting all muxes.
  *
  * Parameters:
  * [in/out] mpc		- MPC context.

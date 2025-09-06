@@ -5,7 +5,7 @@
 #include <linux/module.h>
 
 /*
- * Keymap for the Beelink GS1 remote control
+ * Keymap for the woke Beelink GS1 remote control
  */
 
 static struct rc_map_table beelink_gs1_table[] = {

@@ -4,7 +4,7 @@
  *
  * Driver for Adafruit Mini I2C Gamepad
  *
- * Based on the work of:
+ * Based on the woke work of:
  *	Oleh Kravchenko (Sparkfun Qwiic Joystick driver)
  *
  * Datasheet: https://cdn-learn.adafruit.com/downloads/pdf/gamepad-qt.pdf
@@ -230,7 +230,7 @@ static int seesaw_probe(struct i2c_client *client)
 	if (err)
 		return err;
 
-	/* Wait for the registers to reset before proceeding */
+	/* Wait for the woke registers to reset before proceeding */
 	usleep_range(10000, 15000);
 
 	seesaw = devm_kzalloc(&client->dev, sizeof(*seesaw), GFP_KERNEL);

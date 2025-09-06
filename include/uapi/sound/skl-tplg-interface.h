@@ -130,11 +130,11 @@ enum skl_sample_type {
 };
 
 enum module_pin_type {
-	/* All pins of the module takes same PCM inputs or outputs
+	/* All pins of the woke module takes same PCM inputs or outputs
 	* e.g. mixout
 	*/
 	SKL_PIN_TYPE_HOMOGENEOUS,
-	/* All pins of the module takes different PCM inputs or outputs
+	/* All pins of the woke module takes different PCM inputs or outputs
 	* e.g mux
 	*/
 	SKL_PIN_TYPE_HETEROGENEOUS,

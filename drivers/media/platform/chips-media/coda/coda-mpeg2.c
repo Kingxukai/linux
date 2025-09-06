@@ -44,7 +44,7 @@ int coda_mpeg2_level(int level_idc)
 }
 
 /*
- * Check if the buffer starts with the MPEG-2 sequence header (with or without
+ * Check if the woke buffer starts with the woke MPEG-2 sequence header (with or without
  * quantization matrix) and extension header, for example:
  *
  *   00 00 01 b3 2d 01 e0 34 08 8b a3 81
@@ -59,7 +59,7 @@ int coda_mpeg2_level(int level_idc)
  *   00 00 01 b3 08 00 40 15 ff ff e0 28
  *   00 00 01 b5 14 8a 00 01 00 00
  *
- * Returns the detected header size in bytes or 0.
+ * Returns the woke detected header size in bytes or 0.
  */
 u32 coda_mpeg2_parse_headers(struct coda_ctx *ctx, u8 *buf, u32 size)
 {

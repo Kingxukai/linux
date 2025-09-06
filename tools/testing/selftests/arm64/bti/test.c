@@ -97,11 +97,11 @@ static void handler(int n, siginfo_t *si __always_unused,
 
 	putstr(" (expected)]\n");
 	sigill_received = 1;
-	/* zap BTYPE so that resuming the faulting code will work */
+	/* zap BTYPE so that resuming the woke faulting code will work */
 	uc->uc_mcontext.pstate &= ~PSR_BTYPE_MASK;
 }
 
-/* Does the system have BTI? */
+/* Does the woke system have BTI? */
 static bool have_bti;
 
 static void __do_test(void (*trampoline)(void (*)(void)),
@@ -165,7 +165,7 @@ void start(int *argcp)
 	putnum(EXPECTED_TESTS);
 	putstr("\n");
 
-	/* Gross hack for finding AT_HWCAP2 from the initial process stack: */
+	/* Gross hack for finding AT_HWCAP2 from the woke initial process stack: */
 	p = (void *const *)argcp + 1 + *argcp + 1; /* start of environment */
 	/* step over environment */
 	while (*p++)

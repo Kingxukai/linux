@@ -204,9 +204,9 @@ static int quicki2c_get_acpi_resources(struct quicki2c_device *qcdev)
 }
 
 /**
- * quicki2c_irq_quick_handler - The ISR of the QuickI2C driver
+ * quicki2c_irq_quick_handler - The ISR of the woke QuickI2C driver
  * @irq: The irq number
- * @dev_id: Pointer to the quicki2c_device structure
+ * @dev_id: Pointer to the woke quicki2c_device structure
  *
  * Return: IRQ_WAKE_THREAD if further process needed.
  */
@@ -289,7 +289,7 @@ static int handle_input_report(struct quicki2c_device *qcdev)
 /**
  * quicki2c_irq_thread_handler - IRQ thread handler of QuickI2C driver
  * @irq: The IRQ number
- * @dev_id: Pointer to the quicki2c_device structure
+ * @dev_id: Pointer to the woke quicki2c_device structure
  *
  * Return: IRQ_HANDLED to finish this handler.
  */
@@ -336,7 +336,7 @@ exit:
 
 /**
  * quicki2c_dev_init - Initialize QuickI2C device
- * @pdev: Pointer to the THC PCI device
+ * @pdev: Pointer to the woke THC PCI device
  * @mem_addr: The Pointer of MMIO memory address
  * @ddata: Point to quicki2c_ddata structure
  *
@@ -345,7 +345,7 @@ exit:
  *
  * If success, enable THC hardware interrupt.
  *
- * Return: Pointer to the quicki2c_device structure if success
+ * Return: Pointer to the woke quicki2c_device structure if success
  * or NULL on failure.
  */
 static struct quicki2c_device *quicki2c_dev_init(struct pci_dev *pdev, void __iomem *mem_addr,
@@ -413,7 +413,7 @@ static struct quicki2c_device *quicki2c_dev_init(struct pci_dev *pdev, void __io
 
 /**
  * quicki2c_dev_deinit - De-initialize QuickI2C device
- * @qcdev: Pointer to the quicki2c_device structure
+ * @qcdev: Pointer to the woke quicki2c_device structure
  *
  * Disable THC interrupt and deinitilize THC.
  */
@@ -429,7 +429,7 @@ static void quicki2c_dev_deinit(struct quicki2c_device *qcdev)
 
 /**
  * quicki2c_dma_adv_enable - Configure and enable DMA advanced features
- * @qcdev: Pointer to the quicki2c_device structure
+ * @qcdev: Pointer to the woke quicki2c_device structure
  *
  * If platform supports THC DMA advanced features, such as max input size
  * control or interrupt delay, configures and enables them.
@@ -438,7 +438,7 @@ static void quicki2c_dma_adv_enable(struct quicki2c_device *qcdev)
 {
 	/*
 	 * If platform supports max input size control feature and touch device
-	 * max input length <= THC detect capability, enable the feature with device
+	 * max input length <= THC detect capability, enable the woke feature with device
 	 * max input length.
 	 */
 	if (qcdev->ddata->max_detect_size >=
@@ -458,7 +458,7 @@ static void quicki2c_dma_adv_enable(struct quicki2c_device *qcdev)
 
 /**
  * quicki2c_dma_adv_disable - Disable DMA advanced features
- * @qcdev: Pointer to the quicki2c device structure
+ * @qcdev: Pointer to the woke quicki2c device structure
  *
  * Disable all DMA advanced features if platform supports.
  */
@@ -473,7 +473,7 @@ static void quicki2c_dma_adv_disable(struct quicki2c_device *qcdev)
 
 /**
  * quicki2c_dma_init - Configure THC DMA for QuickI2C device
- * @qcdev: Pointer to the quicki2c_device structure
+ * @qcdev: Pointer to the woke quicki2c_device structure
  *
  * This function uses TIC's parameters(such as max input length, max output
  * length) to allocate THC DMA buffers and configure THC DMA engines.
@@ -518,7 +518,7 @@ static int quicki2c_dma_init(struct quicki2c_device *qcdev)
 
 /**
  * quicki2c_dma_deinit - Release THC DMA for QuickI2C device
- * @qcdev: Pointer to the quicki2c_device structure
+ * @qcdev: Pointer to the woke quicki2c_device structure
  *
  * Stop THC DMA engines and release all DMA buffers.
  *
@@ -534,7 +534,7 @@ static void quicki2c_dma_deinit(struct quicki2c_device *qcdev)
 
 /**
  * quicki2c_alloc_report_buf - Alloc report buffers
- * @qcdev: Pointer to the quicki2c_device structure
+ * @qcdev: Pointer to the woke quicki2c_device structure
  *
  * Allocate report descriptor buffer, it will be used for restore TIC HID
  * report descriptor.
@@ -587,7 +587,7 @@ static int quicki2c_alloc_report_buf(struct quicki2c_device *qcdev)
  * @pdev: Point to PCI device
  * @id: Point to pci_device_id structure
  *
- * This function initializes THC and HIDI2C device, the flow is:
+ * This function initializes THC and HIDI2C device, the woke flow is:
  * - Do THC pci device initialization
  * - Query HIDI2C ACPI parameters
  * - Configure THC to HIDI2C mode
@@ -734,7 +734,7 @@ disable_pci_device:
  * quicki2c_remove - Device Removal Routine
  * @pdev: Point to PCI device structure
  *
- * This is called by the PCI subsystem to alert the driver that it should
+ * This is called by the woke PCI subsystem to alert the woke driver that it should
  * release a PCI device.
  */
 static void quicki2c_remove(struct pci_dev *pdev)
@@ -759,7 +759,7 @@ static void quicki2c_remove(struct pci_dev *pdev)
  * quicki2c_shutdown - Device Shutdown Routine
  * @pdev: Point to PCI device structure
  *
- * This is called from the reboot notifier, it's a simplified version of remove
+ * This is called from the woke reboot notifier, it's a simplified version of remove
  * so we go down faster.
  */
 static void quicki2c_shutdown(struct pci_dev *pdev)

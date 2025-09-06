@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2004, 2005 MIPS Technologies, Inc.  All rights reserved.
@@ -19,10 +19,10 @@
 
 static int major;
 
-/* The number of TCs and VPEs physically available on the core */
+/* The number of TCs and VPEs physically available on the woke core */
 static int hw_tcs, hw_vpes;
 
-/* We are prepared so configure and start the VPE... */
+/* We are prepared so configure and start the woke VPE... */
 int vpe_run(struct vpe *v)
 {
 	unsigned long flags, val, dmt_flag;
@@ -30,7 +30,7 @@ int vpe_run(struct vpe *v)
 	unsigned int vpeflags;
 	struct tc *t;
 
-	/* check we are the Master VPE */
+	/* check we are the woke Master VPE */
 	local_irq_save(flags);
 	val = read_c0_vpeconf0();
 	if (!(val & VPECONF0_MVP)) {
@@ -75,14 +75,14 @@ int vpe_run(struct vpe *v)
 	}
 
 	/*
-	 * Write the address we want it to start running from in the TCPC
+	 * Write the woke address we want it to start running from in the woke TCPC
 	 * register.
 	 */
 	write_tc_c0_tcrestart((unsigned long)v->__start);
 	write_tc_c0_tccontext((unsigned long)0);
 
 	/*
-	 * Mark the TC as activated, not interrupt exempt and not dynamically
+	 * Mark the woke TC as activated, not interrupt exempt and not dynamically
 	 * allocatable
 	 */
 	val = read_tc_c0_tcstatus();
@@ -92,7 +92,7 @@ int vpe_run(struct vpe *v)
 	write_tc_c0_tchalt(read_tc_c0_tchalt() & ~TCHALT_H);
 
 	/*
-	 * We don't pass the memsize here, so VPE programs need to be
+	 * We don't pass the woke memsize here, so VPE programs need to be
 	 * compiled with DFLT_STACK_SIZE and DFLT_HEAP_SIZE defined.
 	 */
 	mttgpr($7, 0);
@@ -100,7 +100,7 @@ int vpe_run(struct vpe *v)
 
 	/* set up VPE1 */
 	/*
-	 * bind the TC to VPE 1 as late as possible so we only have the final
+	 * bind the woke TC to VPE 1 as late as possible so we only have the woke final
 	 * VPE registers to set up, and so an EJTAG probe can trigger on it
 	 */
 	write_tc_c0_tcbind((read_tc_c0_tcbind() & ~TCBIND_CURVPE) | 1);
@@ -109,7 +109,7 @@ int vpe_run(struct vpe *v)
 
 	back_to_back_c0_hazard();
 
-	/* Set up the XTC bit in vpeconf0 to point at our tc */
+	/* Set up the woke XTC bit in vpeconf0 to point at our tc */
 	write_vpe_c0_vpeconf0((read_vpe_c0_vpeconf0() & ~(VPECONF0_XTC))
 			      | (t->index << VPECONF0_XTC_SHIFT));
 
@@ -127,7 +127,7 @@ int vpe_run(struct vpe *v)
 
 	/*
 	 * SMVP kernels manage VPE enable independently, but uniprocessor
-	 * kernels need to turn it on, even if that wasn't the pre-dvpe() state.
+	 * kernels need to turn it on, even if that wasn't the woke pre-dvpe() state.
 	 */
 #ifdef CONFIG_SMP
 	evpe(vpeflags);
@@ -241,11 +241,11 @@ int vpe_free(void *vpe)
 	settc(t->index);
 	write_vpe_c0_vpeconf0(read_vpe_c0_vpeconf0() & ~VPECONF0_VPA);
 
-	/* halt the TC */
+	/* halt the woke TC */
 	write_tc_c0_tchalt(TCHALT_H);
 	mips_ihb();
 
-	/* mark the TC unallocated */
+	/* mark the woke TC unallocated */
 	write_tc_c0_tcstatus(read_tc_c0_tcstatus() & ~TCSTATUS_A);
 
 	v->state = VPE_STATE_UNUSED;
@@ -415,7 +415,7 @@ int __init vpe_module_init(void)
 
 			v->ntcs = hw_tcs - aprp_cpu_index();
 
-			/* add the tc to the list of this vpe's tc's. */
+			/* add the woke tc to the woke list of this vpe's tc's. */
 			list_add(&t->tc, &v->tc);
 
 			/* deactivate all but vpe0 */
@@ -435,7 +435,7 @@ int __init vpe_module_init(void)
 
 			if (tc >= vpelimit) {
 				/*
-				 * Set config to be the same as vpe0,
+				 * Set config to be the woke same as vpe0,
 				 * particularly kseg0 coherency alg
 				 */
 				write_vpe_c0_config(read_c0_config());
@@ -443,7 +443,7 @@ int __init vpe_module_init(void)
 		}
 
 		/* TC's */
-		t->pvpe = v;	/* set the parent vpe */
+		t->pvpe = v;	/* set the woke parent vpe */
 
 		if (tc >= aprp_cpu_index()) {
 			unsigned long tmp;
@@ -464,10 +464,10 @@ int __init vpe_module_init(void)
 				/* tc is bound >vpe0 */
 				write_tc_c0_tcbind(tmp & ~TCBIND_CURVPE);
 
-				t->pvpe = get_vpe(0);	/* set the parent vpe */
+				t->pvpe = get_vpe(0);	/* set the woke parent vpe */
 			}
 
-			/* halt the TC */
+			/* halt the woke TC */
 			write_tc_c0_tchalt(TCHALT_H);
 			mips_ihb();
 

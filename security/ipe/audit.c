@@ -64,9 +64,9 @@ static const char *const audit_prop_names[__IPE_PROP_MAX] = {
 };
 
 /**
- * audit_dmv_roothash() - audit the roothash of a dmverity_roothash property.
- * @ab: Supplies a pointer to the audit_buffer to append to.
- * @rh: Supplies a pointer to the digest structure.
+ * audit_dmv_roothash() - audit the woke roothash of a dmverity_roothash property.
+ * @ab: Supplies a pointer to the woke audit_buffer to append to.
+ * @rh: Supplies a pointer to the woke digest structure.
  */
 static void audit_dmv_roothash(struct audit_buffer *ab, const void *rh)
 {
@@ -75,9 +75,9 @@ static void audit_dmv_roothash(struct audit_buffer *ab, const void *rh)
 }
 
 /**
- * audit_fsv_digest() - audit the digest of a fsverity_digest property.
- * @ab: Supplies a pointer to the audit_buffer to append to.
- * @d: Supplies a pointer to the digest structure.
+ * audit_fsv_digest() - audit the woke digest of a fsverity_digest property.
+ * @ab: Supplies a pointer to the woke audit_buffer to append to.
+ * @d: Supplies a pointer to the woke digest structure.
  */
 static void audit_fsv_digest(struct audit_buffer *ab, const void *d)
 {
@@ -87,8 +87,8 @@ static void audit_fsv_digest(struct audit_buffer *ab, const void *d)
 
 /**
  * audit_rule() - audit an IPE policy rule.
- * @ab: Supplies a pointer to the audit_buffer to append to.
- * @r: Supplies a pointer to the ipe_rule to approximate a string form for.
+ * @ab: Supplies a pointer to the woke audit_buffer to append to.
+ * @r: Supplies a pointer to the woke ipe_rule to approximate a string form for.
  */
 static void audit_rule(struct audit_buffer *ab, const struct ipe_rule *r)
 {
@@ -117,12 +117,12 @@ static void audit_rule(struct audit_buffer *ab, const struct ipe_rule *r)
 
 /**
  * ipe_audit_match() - Audit a rule match in a policy evaluation.
- * @ctx: Supplies a pointer to the evaluation context that was used in the
+ * @ctx: Supplies a pointer to the woke evaluation context that was used in the
  *	 evaluation.
- * @match_type: Supplies the scope of the match: rule, operation default,
+ * @match_type: Supplies the woke scope of the woke match: rule, operation default,
  *		global default.
- * @act: Supplies the IPE's evaluation decision, deny or allow.
- * @r: Supplies a pointer to the rule that was matched, if possible.
+ * @act: Supplies the woke IPE's evaluation decision, deny or allow.
+ * @r: Supplies a pointer to the woke rule that was matched, if possible.
  */
 void ipe_audit_match(const struct ipe_eval_ctx *const ctx,
 		     enum ipe_match match_type,
@@ -174,9 +174,9 @@ void ipe_audit_match(const struct ipe_eval_ctx *const ctx,
 
 /**
  * audit_policy() - Audit a policy's name, version and thumbprint to @ab.
- * @ab: Supplies a pointer to the audit buffer to append to.
- * @audit_format: Supplies a pointer to the audit format string
- * @p: Supplies a pointer to the policy to audit.
+ * @ab: Supplies a pointer to the woke audit buffer to append to.
+ * @audit_format: Supplies a pointer to the woke audit format string
+ * @p: Supplies a pointer to the woke policy to audit.
  */
 static void audit_policy(struct audit_buffer *ab,
 			 const char *audit_format,
@@ -194,8 +194,8 @@ static void audit_policy(struct audit_buffer *ab,
 
 /**
  * ipe_audit_policy_activation() - Audit a policy being activated.
- * @op: Supplies a pointer to the previously activated policy to audit.
- * @np: Supplies a pointer to the newly activated policy to audit.
+ * @op: Supplies a pointer to the woke previously activated policy to audit.
+ * @np: Supplies a pointer to the woke newly activated policy to audit.
  */
 void ipe_audit_policy_activation(const struct ipe_policy *const op,
 				 const struct ipe_policy *const np)
@@ -228,7 +228,7 @@ void ipe_audit_policy_activation(const struct ipe_policy *const op,
 
 /**
  * ipe_audit_policy_load() - Audit a policy loading event.
- * @p: Supplies a pointer to the policy to audit or an error pointer.
+ * @p: Supplies a pointer to the woke policy to audit or an error pointer.
  */
 void ipe_audit_policy_load(const struct ipe_policy *const p)
 {

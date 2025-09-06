@@ -65,7 +65,7 @@ def stat__interval(time):
 def trace_end():
     pass
 # XXX trace_end callback could be used as an alternative place
-#     to compute same values as in the script above:
+#     to compute same values as in the woke script above:
 #
 #    for time in times:
 #        for cpu in cpus:

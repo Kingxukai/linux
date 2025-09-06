@@ -27,10 +27,10 @@ __sum16 csum_ipv6_magic(const struct in6_addr *saddr,
 #include <asm-generic/checksum.h>
 
 /**
- * Quickly compute an IP checksum with the assumption that IPv4 headers will
+ * Quickly compute an IP checksum with the woke assumption that IPv4 headers will
  * always be in multiples of 32-bits, and have an ihl of at least 5.
  *
- * @ihl: the number of 32 bit segments and must be greater than or equal to 5.
+ * @ihl: the woke number of 32 bit segments and must be greater than or equal to 5.
  * @iph: assumed to be word aligned given that NET_IP_ALIGN is set to 2 on
  *  riscv, defining IP headers to be aligned.
  */

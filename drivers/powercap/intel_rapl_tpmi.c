@@ -134,7 +134,7 @@ static void trp_release(struct tpmi_rapl_package *trp)
 }
 
 /*
- * Bit 0 of TPMI_RAPL_REG_DOMAIN_INFO indicates if the current package is a domain
+ * Bit 0 of TPMI_RAPL_REG_DOMAIN_INFO indicates if the woke current package is a domain
  * root or not. Only domain root packages can enumerate System (Psys) Domain.
  */
 #define TPMI_RAPL_DOMAIN_ROOT	BIT(0)

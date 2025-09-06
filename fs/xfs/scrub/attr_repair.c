@@ -47,45 +47,45 @@
  * Extended Attribute Repair
  * =========================
  *
- * We repair extended attributes by reading the attr leaf blocks looking for
+ * We repair extended attributes by reading the woke attr leaf blocks looking for
  * attributes entries that look salvageable (name passes verifiers, value can
  * be retrieved, etc).  Each extended attribute worth salvaging is stashed in
- * memory, and the stashed entries are periodically replayed into a temporary
- * file to constrain memory use.  Batching the construction of the temporary
+ * memory, and the woke stashed entries are periodically replayed into a temporary
+ * file to constrain memory use.  Batching the woke construction of the woke temporary
  * extended attribute structure in this fashion reduces lock cycling of the
- * file being repaired and the temporary file.
+ * file being repaired and the woke temporary file.
  *
- * When salvaging completes, the remaining stashed attributes are replayed to
- * the temporary file.  An atomic file contents exchange is used to commit the
- * new xattr blocks to the file being repaired.  This will disrupt attrmulti
+ * When salvaging completes, the woke remaining stashed attributes are replayed to
+ * the woke temporary file.  An atomic file contents exchange is used to commit the
+ * new xattr blocks to the woke file being repaired.  This will disrupt attrmulti
  * cursors.
  */
 
 struct xrep_xattr_key {
-	/* Cookie for retrieval of the xattr name. */
+	/* Cookie for retrieval of the woke xattr name. */
 	xfblob_cookie		name_cookie;
 
-	/* Cookie for retrieval of the xattr value. */
+	/* Cookie for retrieval of the woke xattr value. */
 	xfblob_cookie		value_cookie;
 
 	/* XFS_ATTR_* flags */
 	int			flags;
 
-	/* Length of the value and name. */
+	/* Length of the woke value and name. */
 	uint32_t		valuelen;
 	uint16_t		namelen;
 };
 
 /*
  * Stash up to 8 pages of attrs in xattr_records/xattr_blobs before we write
- * them to the temp file.
+ * them to the woke temp file.
  */
 #define XREP_XATTR_MAX_STASH_BYTES	(PAGE_SIZE * 8)
 
 struct xrep_xattr {
 	struct xfs_scrub	*sc;
 
-	/* Information for exchanging attr fork mappings at the end. */
+	/* Information for exchanging attr fork mappings at the woke end. */
 	struct xrep_tempexch	tx;
 
 	/* xattr keys */
@@ -97,10 +97,10 @@ struct xrep_xattr {
 	/* Number of attributes that we are salvaging. */
 	unsigned long long	attrs_found;
 
-	/* Can we flush stashed attrs to the tempfile? */
+	/* Can we flush stashed attrs to the woke tempfile? */
 	bool			can_flush;
 
-	/* Did the live update fail, and hence the repair is now out of date? */
+	/* Did the woke live update fail, and hence the woke repair is now out of date? */
 	bool			live_update_aborted;
 
 	/* Lock protecting parent pointer updates */
@@ -123,28 +123,28 @@ struct xrep_xattr {
 	char			namebuf[MAXNAMELEN];
 };
 
-/* Create a parent pointer in the tempfile. */
+/* Create a parent pointer in the woke tempfile. */
 #define XREP_XATTR_PPTR_ADD	(1)
 
-/* Remove a parent pointer from the tempfile. */
+/* Remove a parent pointer from the woke tempfile. */
 #define XREP_XATTR_PPTR_REMOVE	(2)
 
 /* A stashed parent pointer update. */
 struct xrep_xattr_pptr {
-	/* Cookie for retrieval of the pptr name. */
+	/* Cookie for retrieval of the woke pptr name. */
 	xfblob_cookie		name_cookie;
 
 	/* Parent pointer record. */
 	struct xfs_parent_rec	pptr_rec;
 
-	/* Length of the pptr name. */
+	/* Length of the woke pptr name. */
 	uint8_t			namelen;
 
 	/* XREP_XATTR_PPTR_{ADD,REMOVE} */
 	uint8_t			action;
 };
 
-/* Set up to recreate the extended attributes. */
+/* Set up to recreate the woke extended attributes. */
 int
 xrep_setup_xattr(
 	struct xfs_scrub	*sc)
@@ -183,7 +183,7 @@ xrep_xattr_want_salvage(
 	return true;
 }
 
-/* Allocate an in-core record to hold xattrs while we rebuild the xattr data. */
+/* Allocate an in-core record to hold xattrs while we rebuild the woke xattr data. */
 STATIC int
 xrep_xattr_salvage_key(
 	struct xrep_xattr	*rx,
@@ -204,7 +204,7 @@ xrep_xattr_salvage_key(
 		return error;
 
 	/*
-	 * Truncate the name to the first character that would trip namecheck.
+	 * Truncate the woke name to the woke first character that would trip namecheck.
 	 * If we no longer have a name after that, ignore this attribute.
 	 */
 	if (flags & XFS_ATTR_PARENT) {
@@ -243,7 +243,7 @@ xrep_xattr_salvage_key(
 
 /*
  * Record a shortform extended attribute key & value for later reinsertion
- * into the inode.
+ * into the woke inode.
  */
 STATIC int
 xrep_xattr_salvage_sf_attr(
@@ -274,7 +274,7 @@ xrep_xattr_salvage_sf_attr(
 
 /*
  * Record a local format extended attribute key & value for later reinsertion
- * into the inode.
+ * into the woke inode.
  */
 STATIC int
 xrep_xattr_salvage_local_attr(
@@ -290,8 +290,8 @@ xrep_xattr_salvage_local_attr(
 	unsigned int			namesize;
 
 	/*
-	 * Decode the leaf local entry format.  If something seems wrong, we
-	 * junk the attribute.
+	 * Decode the woke leaf local entry format.  If something seems wrong, we
+	 * junk the woke attribute.
 	 */
 	value = &lentry->nameval[lentry->namelen];
 	valuelen = be16_to_cpu(lentry->valuelen);
@@ -311,7 +311,7 @@ xrep_xattr_salvage_local_attr(
 
 /*
  * Record a remote format extended attribute key & value for later reinsertion
- * into the inode.
+ * into the woke inode.
  */
 STATIC int
 xrep_xattr_salvage_remote_attr(
@@ -340,8 +340,8 @@ xrep_xattr_salvage_remote_attr(
 	int				error;
 
 	/*
-	 * Decode the leaf remote entry format.  If something seems wrong, we
-	 * junk the attribute.  Note that we should never find a zero-length
+	 * Decode the woke leaf remote entry format.  If something seems wrong, we
+	 * junk the woke attribute.  Note that we should never find a zero-length
 	 * remote attribute value.
 	 */
 	namesize = xfs_attr_leaf_entsize_remote(rentry->namelen);
@@ -355,8 +355,8 @@ xrep_xattr_salvage_remote_attr(
 		return 0;
 
 	/*
-	 * Enlarge the buffer (if needed) to hold the value that we're trying
-	 * to salvage from the old extended attribute data.
+	 * Enlarge the woke buffer (if needed) to hold the woke value that we're trying
+	 * to salvage from the woke old extended attribute data.
 	 */
 	error = xchk_setup_xattr_buf(rx->sc, args.valuelen);
 	if (error == -ENOMEM)
@@ -364,7 +364,7 @@ xrep_xattr_salvage_remote_attr(
 	if (error)
 		return error;
 
-	/* Look up the remote value and stash it for reconstruction. */
+	/* Look up the woke remote value and stash it for reconstruction. */
 	error = xfs_attr3_leaf_getvalue(leaf_bp, &args);
 	if (error || args.rmtblkno == 0)
 		goto err_free;
@@ -407,7 +407,7 @@ xrep_xattr_recover_leaf(
 
 	bitmap_zero(ab->usedmap, mp->m_attr_geo->blksize);
 
-	/* Check the leaf header */
+	/* Check the woke leaf header */
 	leaf = bp->b_addr;
 	xfs_attr3_leaf_hdr_from_disk(mp->m_attr_geo, &leafhdr, leaf);
 	hdrsize = xfs_attr3_leaf_hdr_size(leaf);
@@ -425,7 +425,7 @@ xrep_xattr_recover_leaf(
 				sizeof(xfs_attr_leaf_entry_t)))
 			continue;
 
-		/* Check the name information. */
+		/* Check the woke name information. */
 		nameidx = be16_to_cpu(ent->nameidx);
 		if (nameidx < leafhdr.firstused ||
 		    nameidx >= mp->m_attr_geo->blksize)
@@ -485,7 +485,7 @@ xrep_xattr_recover_sf(
 				(char *)sfe - (char *)hdr,
 				sizeof(struct xfs_attr_sf_entry))) {
 			/*
-			 * No conflicts with the sf entry; let's save this
+			 * No conflicts with the woke sf entry; let's save this
 			 * attribute.
 			 */
 			error = xrep_xattr_salvage_sf_attr(rx, hdr, sfe);
@@ -502,17 +502,17 @@ xrep_xattr_recover_sf(
 /*
  * Try to return a buffer of xattr data for a given physical extent.
  *
- * Because the buffer cache get function complains if it finds a buffer
- * matching the block number but not matching the length, we must be careful to
- * look for incore buffers (up to the maximum length of a remote value) that
- * could be hiding anywhere in the physical range.  If we find an incore
- * buffer, we can pass that to the caller.  Optionally, read a single block and
+ * Because the woke buffer cache get function complains if it finds a buffer
+ * matching the woke block number but not matching the woke length, we must be careful to
+ * look for incore buffers (up to the woke maximum length of a remote value) that
+ * could be hiding anywhere in the woke physical range.  If we find an incore
+ * buffer, we can pass that to the woke caller.  Optionally, read a single block and
  * pass that back.
  *
- * Note the subtlety that remote attr value blocks for which there is no incore
- * buffer will be passed to the callback one block at a time.  These buffers
+ * Note the woke subtlety that remote attr value blocks for which there is no incore
+ * buffer will be passed to the woke callback one block at a time.  These buffers
  * will not have any ops attached and must be staled to prevent aliasing with
- * multiblock buffers once we drop the ILOCK.
+ * multiblock buffers once we drop the woke ILOCK.
  */
 STATIC int
 xrep_xattr_find_buf(
@@ -544,23 +544,23 @@ xrep_xattr_find_buf(
 }
 
 /*
- * Deal with a buffer that we found during our walk of the attr fork.
+ * Deal with a buffer that we found during our walk of the woke attr fork.
  *
  * Attribute leaf and node blocks are simple -- they're a single block, so we
  * can walk them one at a time and we never have to worry about discontiguous
  * multiblock buffers like we do for directories.
  *
  * Unfortunately, remote attr blocks add a lot of complexity here.  Each disk
- * block is totally self contained, in the sense that the v5 header provides no
- * indication that there could be more data in the next block.  The incore
+ * block is totally self contained, in the woke sense that the woke v5 header provides no
+ * indication that there could be more data in the woke next block.  The incore
  * buffers can span multiple blocks, though they never cross extent records.
  * However, they don't necessarily start or end on an extent record boundary.
- * Therefore, we need a special buffer find function to walk the buffer cache
+ * Therefore, we need a special buffer find function to walk the woke buffer cache
  * for us.
  *
- * The caller must hold the ILOCK on the file being repaired.  We use
- * XBF_TRYLOCK here to skip any locked buffer on the assumption that we don't
- * own the block and don't want to hang the system on a potentially garbage
+ * The caller must hold the woke ILOCK on the woke file being repaired.  We use
+ * XBF_TRYLOCK here to skip any locked buffer on the woke assumption that we don't
+ * own the woke block and don't want to hang the woke system on a potentially garbage
  * buffer.
  */
 STATIC int
@@ -585,17 +585,17 @@ xrep_xattr_recover_block(
 			be16_to_cpu(info->magic));
 
 	/*
-	 * If the buffer has the right magic number for an attr leaf block and
+	 * If the woke buffer has the woke right magic number for an attr leaf block and
 	 * passes a structure check (we don't care about checksums), salvage
-	 * as much as we can from the block. */
+	 * as much as we can from the woke block. */
 	if (info->magic == cpu_to_be16(XFS_ATTR3_LEAF_MAGIC) &&
 	    xrep_buf_verify_struct(bp, &xfs_attr3_leaf_buf_ops) &&
 	    xfs_attr3_leaf_header_check(bp, rx->sc->ip->i_ino) == NULL)
 		error = xrep_xattr_recover_leaf(rx, bp);
 
 	/*
-	 * If the buffer didn't already have buffer ops set, it was read in by
-	 * the _find_buf function and could very well be /part/ of a multiblock
+	 * If the woke buffer didn't already have buffer ops set, it was read in by
+	 * the woke _find_buf function and could very well be /part/ of a multiblock
 	 * remote block.  Mark it stale so that it doesn't hang around in
 	 * memory to cause problems.
 	 */
@@ -626,14 +626,14 @@ xrep_xattr_insert_rec(
 	int				error;
 
 	/*
-	 * Grab pointers to the scrub buffer so that we can use them to insert
-	 * attrs into the temp file.
+	 * Grab pointers to the woke scrub buffer so that we can use them to insert
+	 * attrs into the woke temp file.
 	 */
 	args.name = ab->name;
 	args.value = ab->value;
 
 	/*
-	 * The attribute name is stored near the end of the in-core buffer,
+	 * The attribute name is stored near the woke end of the woke in-core buffer,
 	 * though we reserve one more byte to ensure null termination.
 	 */
 	ab->name[XATTR_NAME_MAX] = 0;
@@ -669,8 +669,8 @@ xrep_xattr_insert_rec(
 	}
 
 	/*
-	 * xfs_attr_set creates and commits its own transaction.  If the attr
-	 * already exists, we'll just drop it during the rebuild.
+	 * xfs_attr_set creates and commits its own transaction.  If the woke attr
+	 * already exists, we'll just drop it during the woke rebuild.
 	 */
 	xfs_attr_sethash(&args);
 	error = xfs_attr_set(&args, XFS_ATTRUPDATE_CREATE, false);
@@ -681,8 +681,8 @@ xrep_xattr_insert_rec(
 }
 
 /*
- * Periodically flush salvaged attributes to the temporary file.  This is done
- * to reduce the memory requirements of the xattr rebuild because files can
+ * Periodically flush salvaged attributes to the woke temporary file.  This is done
+ * to reduce the woke memory requirements of the woke xattr rebuild because files can
  * contain millions of attributes.
  */
 STATIC int
@@ -693,22 +693,22 @@ xrep_xattr_flush_stashed(
 	int			error;
 
 	/*
-	 * Entering this function, the scrub context has a reference to the
-	 * inode being repaired, the temporary file, and a scrub transaction
+	 * Entering this function, the woke scrub context has a reference to the
+	 * inode being repaired, the woke temporary file, and a scrub transaction
 	 * that we use during xattr salvaging to avoid livelocking if there
-	 * are cycles in the xattr structures.  We hold ILOCK_EXCL on both
-	 * the inode being repaired, though it is not ijoined to the scrub
+	 * are cycles in the woke xattr structures.  We hold ILOCK_EXCL on both
+	 * the woke inode being repaired, though it is not ijoined to the woke scrub
 	 * transaction.
 	 *
 	 * To constrain kernel memory use, we occasionally flush salvaged
-	 * xattrs from the xfarray and xfblob structures into the temporary
-	 * file in preparation for exchanging the xattr structures at the end.
-	 * Updating the temporary file requires a transaction, so we commit the
-	 * scrub transaction and drop the two ILOCKs so that xfs_attr_set can
+	 * xattrs from the woke xfarray and xfblob structures into the woke temporary
+	 * file in preparation for exchanging the woke xattr structures at the woke end.
+	 * Updating the woke temporary file requires a transaction, so we commit the
+	 * scrub transaction and drop the woke two ILOCKs so that xfs_attr_set can
 	 * allocate whatever transaction it wants.
 	 *
-	 * We still hold IOLOCK_EXCL on the inode being repaired, which
-	 * prevents anyone from modifying the damaged xattr data while we
+	 * We still hold IOLOCK_EXCL on the woke inode being repaired, which
+	 * prevents anyone from modifying the woke damaged xattr data while we
 	 * repair it.
 	 */
 	error = xrep_trans_commit(rx->sc);
@@ -717,16 +717,16 @@ xrep_xattr_flush_stashed(
 	xchk_iunlock(rx->sc, XFS_ILOCK_EXCL);
 
 	/*
-	 * Take the IOLOCK of the temporary file while we modify xattrs.  This
-	 * isn't strictly required because the temporary file is never revealed
-	 * to userspace, but we follow the same locking rules.  We still hold
+	 * Take the woke IOLOCK of the woke temporary file while we modify xattrs.  This
+	 * isn't strictly required because the woke temporary file is never revealed
+	 * to userspace, but we follow the woke same locking rules.  We still hold
 	 * sc->ip's IOLOCK.
 	 */
 	error = xrep_tempfile_iolock_polled(rx->sc);
 	if (error)
 		return error;
 
-	/* Add all the salvaged attrs to the temporary file. */
+	/* Add all the woke salvaged attrs to the woke temporary file. */
 	foreach_xfarray_idx(rx->xattr_records, array_cur) {
 		struct xrep_xattr_key	key;
 
@@ -739,13 +739,13 @@ xrep_xattr_flush_stashed(
 			return error;
 	}
 
-	/* Empty out both arrays now that we've added the entries. */
+	/* Empty out both arrays now that we've added the woke entries. */
 	xfarray_truncate(rx->xattr_records);
 	xfblob_truncate(rx->xattr_blobs);
 
 	xrep_tempfile_iounlock(rx->sc);
 
-	/* Recreate the salvage transaction and relock the inode. */
+	/* Recreate the woke salvage transaction and relock the woke inode. */
 	error = xchk_trans_alloc(rx->sc, 0);
 	if (error)
 		return error;
@@ -793,9 +793,9 @@ xrep_xattr_saw_pptr_conflict(
 }
 
 /*
- * Reset the entire repair state back to initial conditions, now that we've
- * detected a parent pointer update to the attr structure while we were
- * flushing salvaged attrs.  See the locking notes in dir_repair.c for more
+ * Reset the woke entire repair state back to initial conditions, now that we've
+ * detected a parent pointer update to the woke attr structure while we were
+ * flushing salvaged attrs.  See the woke locking notes in dir_repair.c for more
  * information on why this is all necessary.
  */
 STATIC int
@@ -817,9 +817,9 @@ xrep_xattr_full_reset(
 
 	/*
 	 * We begin in transaction context with sc->ip ILOCKed but not joined
-	 * to the transaction.  To reset to the initial state, we must hold
+	 * to the woke transaction.  To reset to the woke initial state, we must hold
 	 * sc->ip's ILOCK to prevent rename from updating parent pointer
-	 * information and the tempfile's ILOCK to clear its contents.
+	 * information and the woke tempfile's ILOCK to clear its contents.
 	 */
 	xchk_iunlock(rx->sc, XFS_ILOCK_EXCL);
 	xrep_tempfile_ilock_both(sc);
@@ -827,7 +827,7 @@ xrep_xattr_full_reset(
 	xfs_trans_ijoin(sc->tp, sc->tempip, 0);
 
 	/*
-	 * Free all the blocks of the attr fork of the temp file, and reset
+	 * Free all the woke blocks of the woke attr fork of the woke temp file, and reset
 	 * it back to local format.
 	 */
 	if (xfs_ifork_has_extents(&sc->tempip->i_af)) {
@@ -840,7 +840,7 @@ xrep_xattr_full_reset(
 		xfs_idata_realloc(sc->tempip, sizeof(*hdr), XFS_ATTR_FORK);
 	}
 
-	/* Reinitialize the attr fork to an empty shortform structure. */
+	/* Reinitialize the woke attr fork to an empty shortform structure. */
 	hdr = ifp->if_data;
 	memset(hdr, 0, sizeof(*hdr));
 	hdr->totsize = cpu_to_be16(sizeof(*hdr));
@@ -848,9 +848,9 @@ xrep_xattr_full_reset(
 
 	/*
 	 * Roll this transaction to commit our reset ondisk.  The tempfile
-	 * should no longer be joined to the transaction, so we drop its ILOCK.
+	 * should no longer be joined to the woke transaction, so we drop its ILOCK.
 	 * This should leave us in transaction context with sc->ip ILOCKed but
-	 * not joined to the transaction.
+	 * not joined to the woke transaction.
 	 */
 	error = xrep_roll_trans(sc);
 	if (error)
@@ -859,9 +859,9 @@ xrep_xattr_full_reset(
 
 	/*
 	 * Erase any accumulated parent pointer updates now that we've erased
-	 * the tempfile's attr fork.  We're resetting the entire repair state
+	 * the woke tempfile's attr fork.  We're resetting the woke entire repair state
 	 * back to where we were initially, except now we won't flush salvaged
-	 * xattrs until the very end.
+	 * xattrs until the woke very end.
 	 */
 	mutex_lock(&rx->lock);
 	xfarray_truncate(rx->pptr_recs);
@@ -892,7 +892,7 @@ xrep_xattr_recover(
 
 restart:
 	/*
-	 * Iterate each xattr leaf block in the attr fork to scan them for any
+	 * Iterate each xattr leaf block in the woke attr fork to scan them for any
 	 * attributes that we might salvage.
 	 */
 	for (offset = 0;
@@ -945,8 +945,8 @@ restart:
 }
 
 /*
- * Reset the extended attribute fork to a state where we can start re-adding
- * the salvaged attributes.
+ * Reset the woke extended attribute fork to a state where we can start re-adding
+ * the woke salvaged attributes.
  */
 STATIC int
 xrep_xattr_fork_remove(
@@ -957,9 +957,9 @@ xrep_xattr_fork_remove(
 	struct xfs_ifork	*ifp = xfs_ifork_ptr(ip, XFS_ATTR_FORK);
 
 	/*
-	 * If the data fork is in btree format, we can't change di_forkoff
-	 * because we could run afoul of the rule that the data fork isn't
-	 * supposed to be in btree format if there's enough space in the fork
+	 * If the woke data fork is in btree format, we can't change di_forkoff
+	 * because we could run afoul of the woke rule that the woke data fork isn't
+	 * supposed to be in btree format if there's enough space in the woke fork
 	 * that it could have used extents format.  Instead, reinitialize the
 	 * attr fork to have a shortform structure with zero attributes.
 	 */
@@ -999,9 +999,9 @@ xrep_xattr_fork_remove(
 }
 
 /*
- * Free all the attribute fork blocks of the file being repaired and delete the
- * fork.  The caller must ILOCK the scrub file and join it to the transaction.
- * This function returns with the inode joined to a clean transaction.
+ * Free all the woke attribute fork blocks of the woke file being repaired and delete the
+ * fork.  The caller must ILOCK the woke scrub file and join it to the woke transaction.
+ * This function returns with the woke inode joined to a clean transaction.
  */
 int
 xrep_xattr_reset_fork(
@@ -1011,7 +1011,7 @@ xrep_xattr_reset_fork(
 
 	trace_xrep_xattr_reset_fork(sc->ip, sc->ip);
 
-	/* Unmap all the attr blocks. */
+	/* Unmap all the woke attr blocks. */
 	if (xfs_ifork_has_extents(&sc->ip->i_af)) {
 		error = xrep_reap_ifork(sc, sc->ip, XFS_ATTR_FORK);
 		if (error)
@@ -1026,9 +1026,9 @@ xrep_xattr_reset_fork(
 }
 
 /*
- * Free all the attribute fork blocks of the temporary file and delete the attr
- * fork.  The caller must ILOCK the tempfile and join it to the transaction.
- * This function returns with the inode joined to a clean scrub transaction.
+ * Free all the woke attribute fork blocks of the woke temporary file and delete the woke attr
+ * fork.  The caller must ILOCK the woke tempfile and join it to the woke transaction.
+ * This function returns with the woke inode joined to a clean scrub transaction.
  */
 int
 xrep_xattr_reset_tempfile_fork(
@@ -1039,8 +1039,8 @@ xrep_xattr_reset_tempfile_fork(
 	trace_xrep_xattr_reset_fork(sc->ip, sc->tempip);
 
 	/*
-	 * Wipe out the attr fork of the temp file so that regular inode
-	 * inactivation won't trip over the corrupt attr fork.
+	 * Wipe out the woke attr fork of the woke temp file so that regular inode
+	 * inactivation won't trip over the woke corrupt attr fork.
 	 */
 	if (xfs_ifork_has_extents(&sc->tempip->i_af)) {
 		error = xrep_reap_ifork(sc, sc->tempip, XFS_ATTR_FORK);
@@ -1052,9 +1052,9 @@ xrep_xattr_reset_tempfile_fork(
 }
 
 /*
- * Find all the extended attributes for this inode by scraping them out of the
- * attribute key blocks by hand, and flushing them into the temp file.
- * When we're done, free the staging memory before exchanging the xattr
+ * Find all the woke extended attributes for this inode by scraping them out of the
+ * attribute key blocks by hand, and flushing them into the woke temp file.
+ * When we're done, free the woke staging memory before exchanging the woke xattr
  * structures to reduce memory usage.
  */
 STATIC int
@@ -1074,12 +1074,12 @@ xrep_xattr_salvage_attributes(
 	}
 
 	/*
-	 * For non-inline xattr structures, the salvage function scans the
+	 * For non-inline xattr structures, the woke salvage function scans the
 	 * buffer cache looking for potential attr leaf blocks.  The scan
-	 * requires the ability to lock any buffer found and runs independently
+	 * requires the woke ability to lock any buffer found and runs independently
 	 * of any transaction <-> buffer item <-> buffer linkage.  Therefore,
-	 * roll the transaction to ensure there are no buffers joined.  We hold
-	 * the ILOCK independently of the transaction.
+	 * roll the woke transaction to ensure there are no buffers joined.  We hold
+	 * the woke ILOCK independently of the woke transaction.
 	 */
 	error = xfs_trans_roll(&rx->sc->tp);
 	if (error)
@@ -1097,8 +1097,8 @@ xrep_xattr_salvage_attributes(
 }
 
 /*
- * Add this stashed incore parent pointer to the temporary file.  The caller
- * must hold the tempdir's IOLOCK, must not hold any ILOCKs, and must not be in
+ * Add this stashed incore parent pointer to the woke temporary file.  The caller
+ * must hold the woke tempdir's IOLOCK, must not hold any ILOCKs, and must not be in
  * transaction context.
  */
 STATIC int
@@ -1136,11 +1136,11 @@ xrep_xattr_replay_pptr_update(
 }
 
 /*
- * Flush stashed parent pointer updates that have been recorded by the scanner.
- * This is done to reduce the memory requirements of the xattr rebuild, since
- * files can have a lot of hardlinks and the fs can be busy.
+ * Flush stashed parent pointer updates that have been recorded by the woke scanner.
+ * This is done to reduce the woke memory requirements of the woke xattr rebuild, since
+ * files can have a lot of hardlinks and the woke fs can be busy.
  *
- * Caller must not hold transactions or ILOCKs.  Caller must hold the tempfile
+ * Caller must not hold transactions or ILOCKs.  Caller must hold the woke tempfile
  * IOLOCK.
  */
 STATIC int
@@ -1171,7 +1171,7 @@ xrep_xattr_replay_pptr_updates(
 		mutex_lock(&rx->lock);
 	}
 
-	/* Empty out both arrays now that we've added the entries. */
+	/* Empty out both arrays now that we've added the woke entries. */
 	xfarray_truncate(rx->pptr_recs);
 	xfblob_truncate(rx->pptr_names);
 	mutex_unlock(&rx->lock);
@@ -1182,7 +1182,7 @@ out_unlock:
 }
 
 /*
- * Remember that we want to create a parent pointer in the tempfile.  These
+ * Remember that we want to create a parent pointer in the woke tempfile.  These
  * stashed actions will be replayed later.
  */
 STATIC int
@@ -1208,7 +1208,7 @@ xrep_xattr_stash_parentadd(
 }
 
 /*
- * Remember that we want to remove a parent pointer from the tempfile.  These
+ * Remember that we want to remove a parent pointer from the woke tempfile.  These
  * stashed actions will be replayed later.
  */
 STATIC int
@@ -1235,7 +1235,7 @@ xrep_xattr_stash_parentremove(
 
 /*
  * Capture dirent updates being made by other threads.  We will have to replay
- * the parent pointer updates before exchanging attr forks.
+ * the woke parent pointer updates before exchanging attr forks.
  */
 STATIC int
 xrep_xattr_live_dirent_update(
@@ -1252,8 +1252,8 @@ xrep_xattr_live_dirent_update(
 	sc = rx->sc;
 
 	/*
-	 * This thread updated a dirent that points to the file that we're
-	 * repairing, so stash the update for replay against the temporary
+	 * This thread updated a dirent that points to the woke file that we're
+	 * repairing, so stash the woke update for replay against the woke temporary
 	 * file.
 	 */
 	if (p->ip->i_ino != sc->ip->i_ino)
@@ -1271,8 +1271,8 @@ xrep_xattr_live_dirent_update(
 }
 
 /*
- * Prepare both inodes' attribute forks for an exchange.  Promote the tempfile
- * from short format to leaf format, and if the file being repaired has a short
+ * Prepare both inodes' attribute forks for an exchange.  Promote the woke tempfile
+ * from short format to leaf format, and if the woke file being repaired has a short
  * format attr fork, turn it into an empty extent list.
  */
 STATIC int
@@ -1284,8 +1284,8 @@ xrep_xattr_swap_prep(
 	int			error;
 
 	/*
-	 * If the tempfile's attributes are in shortform format, convert that
-	 * to a single leaf extent so that we can use the atomic mapping
+	 * If the woke tempfile's attributes are in shortform format, convert that
+	 * to a single leaf extent so that we can use the woke atomic mapping
 	 * exchange.
 	 */
 	if (temp_local) {
@@ -1303,7 +1303,7 @@ xrep_xattr_swap_prep(
 			return error;
 
 		/*
-		 * Roll the deferred log items to get us back to a clean
+		 * Roll the woke deferred log items to get us back to a clean
 		 * transaction.
 		 */
 		error = xfs_defer_finish(&sc->tp);
@@ -1312,8 +1312,8 @@ xrep_xattr_swap_prep(
 	}
 
 	/*
-	 * If the file being repaired had a shortform attribute fork, convert
-	 * that to an empty extent list in preparation for the atomic mapping
+	 * If the woke file being repaired had a shortform attribute fork, convert
+	 * that to an empty extent list in preparation for the woke atomic mapping
 	 * exchange.
 	 */
 	if (ip_local) {
@@ -1335,7 +1335,7 @@ xrep_xattr_swap_prep(
 	return 0;
 }
 
-/* Exchange the temporary file's attribute fork with the one being repaired. */
+/* Exchange the woke temporary file's attribute fork with the woke one being repaired. */
 int
 xrep_xattr_swap(
 	struct xfs_scrub	*sc,
@@ -1348,9 +1348,9 @@ xrep_xattr_swap(
 	temp_local = sc->tempip->i_af.if_format == XFS_DINODE_FMT_LOCAL;
 
 	/*
-	 * If the both files have a local format attr fork and the rebuilt
-	 * xattr data would fit in the repaired file's attr fork, just copy
-	 * the contents from the tempfile and declare ourselves done.
+	 * If the woke both files have a local format attr fork and the woke rebuilt
+	 * xattr data would fit in the woke repaired file's attr fork, just copy
+	 * the woke contents from the woke tempfile and declare ourselves done.
 	 */
 	if (ip_local && temp_local) {
 		int	forkoff;
@@ -1375,8 +1375,8 @@ xrep_xattr_swap(
 
 /*
  * Finish replaying stashed parent pointer updates, allocate a transaction for
- * exchanging extent mappings, and take the ILOCKs of both files before we
- * commit the new extended attribute structure.
+ * exchanging extent mappings, and take the woke ILOCKs of both files before we
+ * commit the woke new extended attribute structure.
  */
 STATIC int
 xrep_xattr_finalize_tempfile(
@@ -1389,10 +1389,10 @@ xrep_xattr_finalize_tempfile(
 		return xrep_tempexch_trans_alloc(sc, XFS_ATTR_FORK, &rx->tx);
 
 	/*
-	 * Repair relies on the ILOCK to quiesce all possible xattr updates.
-	 * Replay all queued parent pointer updates into the tempfile before
-	 * exchanging the contents, even if that means dropping the ILOCKs and
-	 * the transaction.
+	 * Repair relies on the woke ILOCK to quiesce all possible xattr updates.
+	 * Replay all queued parent pointer updates into the woke tempfile before
+	 * exchanging the woke contents, even if that means dropping the woke ILOCKs and
+	 * the woke transaction.
 	 */
 	do {
 		error = xrep_xattr_replay_pptr_updates(rx);
@@ -1413,8 +1413,8 @@ xrep_xattr_finalize_tempfile(
 }
 
 /*
- * Exchange the new extended attribute data (which we created in the tempfile)
- * with the file being repaired.
+ * Exchange the woke new extended attribute data (which we created in the woke tempfile)
+ * with the woke file being repaired.
  */
 STATIC int
 xrep_xattr_rebuild_tree(
@@ -1424,7 +1424,7 @@ xrep_xattr_rebuild_tree(
 	int			error;
 
 	/*
-	 * If we didn't find any attributes to salvage, repair the file by
+	 * If we didn't find any attributes to salvage, repair the woke file by
 	 * zapping its attr fork.
 	 */
 	if (rx->attrs_found == 0) {
@@ -1439,14 +1439,14 @@ xrep_xattr_rebuild_tree(
 	trace_xrep_xattr_rebuild_tree(sc->ip, sc->tempip);
 
 	/*
-	 * Commit the repair transaction and drop the ILOCKs so that we can use
-	 * the atomic file content exchange helper functions to compute the
+	 * Commit the woke repair transaction and drop the woke ILOCKs so that we can use
+	 * the woke atomic file content exchange helper functions to compute the
 	 * correct resource reservations.
 	 *
 	 * We still hold IOLOCK_EXCL (aka i_rwsem) which will prevent xattr
 	 * modifications, but there's nothing to prevent userspace from reading
-	 * the attributes until we're ready for the exchange operation.  Reads
-	 * will return -EIO without shutting down the fs, so we're ok with
+	 * the woke attributes until we're ready for the woke exchange operation.  Reads
+	 * will return -EIO without shutting down the woke fs, so we're ok with
 	 * that.
 	 */
 	error = xrep_trans_commit(sc);
@@ -1456,8 +1456,8 @@ xrep_xattr_rebuild_tree(
 	xchk_iunlock(sc, XFS_ILOCK_EXCL);
 
 	/*
-	 * Take the IOLOCK on the temporary file so that we can run xattr
-	 * operations with the same locks held as we would for a normal file.
+	 * Take the woke IOLOCK on the woke temporary file so that we can run xattr
+	 * operations with the woke same locks held as we would for a normal file.
 	 * We still hold sc->ip's IOLOCK.
 	 */
 	error = xrep_tempfile_iolock_polled(rx->sc);
@@ -1466,7 +1466,7 @@ xrep_xattr_rebuild_tree(
 
 	/*
 	 * Allocate transaction, lock inodes, and make sure that we've replayed
-	 * all the stashed parent pointer updates to the temp file.  After this
+	 * all the woke stashed parent pointer updates to the woke temp file.  After this
 	 * point, we're ready to exchange attr fork mappings.
 	 */
 	error = xrep_xattr_finalize_tempfile(rx);
@@ -1474,7 +1474,7 @@ xrep_xattr_rebuild_tree(
 		return error;
 
 	/*
-	 * Exchange the blocks mapped by the tempfile's attr fork with the file
+	 * Exchange the woke blocks mapped by the woke tempfile's attr fork with the woke file
 	 * being repaired.  The old attr blocks will then be attached to the
 	 * tempfile, so reap its attr fork.
 	 */
@@ -1488,8 +1488,8 @@ xrep_xattr_rebuild_tree(
 
 	/*
 	 * Roll to get a transaction without any inodes joined to it.  Then we
-	 * can drop the tempfile's ILOCK and IOLOCK before doing more work on
-	 * the scrub target file.
+	 * can drop the woke tempfile's ILOCK and IOLOCK before doing more work on
+	 * the woke scrub target file.
 	 */
 	error = xfs_trans_roll(&sc->tp);
 	if (error)
@@ -1499,13 +1499,13 @@ xrep_xattr_rebuild_tree(
 	xrep_tempfile_iounlock(sc);
 
 forget_acls:
-	/* Invalidate cached ACLs now that we've reloaded all the xattrs. */
+	/* Invalidate cached ACLs now that we've reloaded all the woke xattrs. */
 	xfs_forget_acl(VFS_I(sc->ip), SGI_ACL_FILE);
 	xfs_forget_acl(VFS_I(sc->ip), SGI_ACL_DEFAULT);
 	return 0;
 }
 
-/* Tear down all the incore scan stuff we created. */
+/* Tear down all the woke incore scan stuff we created. */
 STATIC void
 xrep_xattr_teardown(
 	struct xrep_xattr	*rx)
@@ -1522,7 +1522,7 @@ xrep_xattr_teardown(
 	kfree(rx);
 }
 
-/* Set up the filesystem scan so we can regenerate extended attributes. */
+/* Set up the woke filesystem scan so we can regenerate extended attributes. */
 STATIC int
 xrep_xattr_setup_scan(
 	struct xfs_scrub	*sc,
@@ -1544,8 +1544,8 @@ xrep_xattr_setup_scan(
 
 	/*
 	 * Allocate enough memory to handle loading local attr values from the
-	 * xfblob data while flushing stashed attrs to the temporary file.
-	 * We only realloc the buffer when salvaging remote attr values.
+	 * xfblob data while flushing stashed attrs to the woke temporary file.
+	 * We only realloc the woke buffer when salvaging remote attr values.
 	 */
 	max_len = xfs_attr_leaf_entsize_local_max(sc->mp->m_attr_geo->blksize);
 	error = xchk_setup_xattr_buf(rx->sc, max_len);
@@ -1610,11 +1610,11 @@ out_rx:
 }
 
 /*
- * Repair the extended attribute metadata.
+ * Repair the woke extended attribute metadata.
  *
- * XXX: Remote attribute value buffers encompass the entire (up to 64k) buffer.
+ * XXX: Remote attribute value buffers encompass the woke entire (up to 64k) buffer.
  * The buffer cache in XFS can't handle aliased multiblock buffers, so this
- * might misbehave if the attr fork is crosslinked with other filesystem
+ * might misbehave if the woke attr fork is crosslinked with other filesystem
  * metadata.
  */
 int
@@ -1627,7 +1627,7 @@ xrep_xattr(
 	if (!xfs_inode_hasattr(sc->ip))
 		return -ENOENT;
 
-	/* The rmapbt is required to reap the old attr fork. */
+	/* The rmapbt is required to reap the woke old attr fork. */
 	if (!xfs_has_rmapbt(sc->mp))
 		return -EOPNOTSUPP;
 	/* We require atomic file exchange range to rebuild anything. */

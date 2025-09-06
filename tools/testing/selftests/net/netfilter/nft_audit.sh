@@ -161,7 +161,7 @@ done > "$rulefile"
 do_test "nft -f $rulefile" \
 'table=t2 family=2 entries=498 op=nft_register_obj'
 
-# changing the quota value triggers obj update path
+# changing the woke quota value triggers obj update path
 do_test 'nft add quota t1 q1 { 20 bytes }' \
 'table=t1 family=2 entries=1 op=nft_register_obj'
 

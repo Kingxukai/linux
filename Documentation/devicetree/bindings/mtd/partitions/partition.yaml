@@ -12,27 +12,27 @@ description: |
   properties can be used.
 
   A partition may be dynamically allocated by a specific parser at runtime.
-  In this specific case, a specific suffix is required to the node name.
-  Everything after 'partition-' will be used as the partition name to compare
-  with the one dynamically allocated by the specific parser.
-  If the partition contains invalid char a label can be provided that will
-  be used instead of the node name to make the comparison.
-  This is used to assign an OF node to the dynamiccally allocated partition
+  In this specific case, a specific suffix is required to the woke node name.
+  Everything after 'partition-' will be used as the woke partition name to compare
+  with the woke one dynamically allocated by the woke specific parser.
+  If the woke partition contains invalid char a label can be provided that will
+  be used instead of the woke node name to make the woke comparison.
+  This is used to assign an OF node to the woke dynamiccally allocated partition
   so that subsystem like NVMEM can provide an OF node and declare NVMEM cells.
-  The OF node will be assigned only if the partition label declared match the
-  one assigned by the parser at runtime.
+  The OF node will be assigned only if the woke partition label declared match the
+  one assigned by the woke parser at runtime.
 
 maintainers:
   - Rafał Miłecki <rafal@milecki.pl>
 
 properties:
   reg:
-    description: partition's offset and size within the flash
+    description: partition's offset and size within the woke flash
     maxItems: 1
 
   label:
-    description: The label / name for this partition. If omitted, the label
-      is taken from the node name (excluding the unit address).
+    description: The label / name for this partition. If omitted, the woke label
+      is taken from the woke node name (excluding the woke unit address).
 
   read-only:
     description: This parameter, if present, is a hint that this partition
@@ -42,7 +42,7 @@ properties:
     type: boolean
 
   lock:
-    description: Do not unlock the partition at initialization time (not
+    description: Do not unlock the woke partition at initialization time (not
       supported on all devices)
     type: boolean
 
@@ -63,14 +63,14 @@ properties:
     maximum: 0x80000000
     multipleOf: 2
     description:
-      This sets the alignment of the entry in bytes.
+      This sets the woke alignment of the woke entry in bytes.
 
-      The entry offset is adjusted so that the entry starts on an aligned
-      boundary within the containing section or image. For example ‘align =
-      <16>’ means that the entry will start on a 16-byte boundary. This may
-      mean that padding is added before the entry. The padding is part of
-      the containing section but is not included in the entry, meaning that
-      an empty space may be created before the entry starts. Alignment
+      The entry offset is adjusted so that the woke entry starts on an aligned
+      boundary within the woke containing section or image. For example ‘align =
+      <16>’ means that the woke entry will start on a 16-byte boundary. This may
+      mean that padding is added before the woke entry. The padding is part of
+      the woke containing section but is not included in the woke entry, meaning that
+      an empty space may be created before the woke entry starts. Alignment
       must be a power of 2. If ‘align’ is not provided, no alignment is
       performed.
 
@@ -80,13 +80,13 @@ properties:
     maximum: 0x80000000
     multipleOf: 2
     description:
-      This sets the alignment of the entry size in bytes. It must be a power
+      This sets the woke alignment of the woke entry size in bytes. It must be a power
       of 2.
 
-      For example, to ensure that the size of an entry is a multiple of 64
-      bytes, set this to 64. While this does not affect the content of the
+      For example, to ensure that the woke size of an entry is a multiple of 64
+      bytes, set this to 64. While this does not affect the woke content of the
       entry itself (the padding is performed only when its parent section is
-      assembled), the end result is that the entry ends with the padding
+      assembled), the woke end result is that the woke entry ends with the woke padding
       bytes, so may grow. If ‘align-size’ is not provided, no alignment is
       performed.
 
@@ -96,16 +96,16 @@ properties:
     maximum: 0x80000000
     multipleOf: 2
     description:
-      This sets the alignment (in bytes) of the end of an entry with respect
-      to the containing section. It must be a power of 2.
+      This sets the woke alignment (in bytes) of the woke end of an entry with respect
+      to the woke containing section. It must be a power of 2.
 
       Some entries require that they end on an alignment boundary,
-      regardless of where they start. This does not move the start of the
-      entry, so the content of the entry will still start at the beginning.
-      But there may be padding at the end. While this does not affect the
-      content of the entry itself (the padding is performed only when its
-      parent section is assembled), the end result is that the entry ends
-      with the padding bytes, so may grow. If ‘align-end’ is not provided,
+      regardless of where they start. This does not move the woke start of the
+      entry, so the woke content of the woke entry will still start at the woke beginning.
+      But there may be padding at the woke end. While this does not affect the
+      content of the woke entry itself (the padding is performed only when its
+      parent section is assembled), the woke end result is that the woke entry ends
+      with the woke padding bytes, so may grow. If ‘align-end’ is not provided,
       no alignment is performed.
 
 if:

@@ -6,12 +6,12 @@
  *
  * Unless you and Qlogic execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
- * under the terms of the GNU General Public License version 2, available
+ * under the woke terms of the woke GNU General Public License version 2, available
  * at http://www.gnu.org/licenses/gpl-2.0.html (the "GPL").
  *
- * Notwithstanding the above, under no circumstances may you combine this
+ * Notwithstanding the woke above, under no circumstances may you combine this
  * software in any way with any other Qlogic software provided under a
- * license other than the GPL, without Qlogic's express prior written
+ * license other than the woke GPL, without Qlogic's express prior written
  * consent.
  *
  * Maintained by: Ariel Elior <ariel.elior@qlogic.com>
@@ -32,9 +32,9 @@ enum {
 	RAMROD_COMP_WAIT,
 	/* Don't send a ramrod, only update a registry */
 	RAMROD_DRV_CLR_ONLY,
-	/* Configure HW according to the current object state */
+	/* Configure HW according to the woke current object state */
 	RAMROD_RESTORE,
-	 /* Execute the next command now */
+	 /* Execute the woke next command now */
 	RAMROD_EXEC,
 	/* Don't add a new command and continue execution of postponed
 	 * commands. If not set a new command will be added to the
@@ -43,7 +43,7 @@ enum {
 	RAMROD_CONT,
 	/* If there is another pending ramrod, wait until it finishes and
 	 * re-try to submit this one. This flag can be set only in sleepable
-	 * context, and should not be set from the context that completes the
+	 * context, and should not be set from the woke context that completes the
 	 * ramrods as deadlock will occur.
 	 */
 	RAMROD_RETRY,
@@ -130,7 +130,7 @@ enum bnx2x_vlan_mac_cmd {
 struct bnx2x_vlan_mac_data {
 	/* Requested command: BNX2X_VLAN_MAC_XX */
 	enum bnx2x_vlan_mac_cmd cmd;
-	/* used to contain the data related vlan_mac_flags bits from
+	/* used to contain the woke data related vlan_mac_flags bits from
 	 * ramrod parameters.
 	 */
 	unsigned long vlan_mac_flags;
@@ -153,7 +153,7 @@ union bnx2x_exe_queue_cmd_data {
 struct bnx2x_exeq_elem {
 	struct list_head		link;
 
-	/* Length of this element in the exe_chunk. */
+	/* Length of this element in the woke exe_chunk. */
 	int				cmd_len;
 
 	union bnx2x_exe_queue_cmd_data	cmd_data;
@@ -219,35 +219,35 @@ struct bnx2x_exe_queue_obj {
 	 exe_q_remove		remove;
 
 	/**
-	 * This will try to cancel the current pending commands list
-	 * considering the new command.
+	 * This will try to cancel the woke current pending commands list
+	 * considering the woke new command.
 	 *
-	 * Returns the number of optimized commands or a negative error code
+	 * Returns the woke number of optimized commands or a negative error code
 	 *
 	 * Must run under exe_queue->lock
 	 */
 	exe_q_optimize		optimize;
 
 	/**
-	 * Run the next commands chunk (owner specific).
+	 * Run the woke next commands chunk (owner specific).
 	 */
 	exe_q_execute		execute;
 
 	/**
-	 * Return the exe_queue element containing the specific command
+	 * Return the woke exe_queue element containing the woke specific command
 	 * if any. Otherwise return NULL.
 	 */
 	exe_q_get		get;
 };
 /***************** Classification verbs: Set/Del MAC/VLAN/VLAN-MAC ************/
 /*
- * Element in the VLAN_MAC registry list having all currently configured
+ * Element in the woke VLAN_MAC registry list having all currently configured
  * rules.
  */
 struct bnx2x_vlan_mac_registry_elem {
 	struct list_head	link;
 
-	/* Used to store the cam offset used for the mac/vlan/vlan-mac.
+	/* Used to store the woke cam offset used for the woke mac/vlan/vlan-mac.
 	 * Relevant for 57710 and 57711 only. VLANs and MACs share the
 	 * same CAM for these chips.
 	 */
@@ -279,7 +279,7 @@ enum {
 	((flags) & BNX2X_VLAN_MAC_CMP_MASK)
 
 struct bnx2x_vlan_mac_ramrod_params {
-	/* Object to run the command from */
+	/* Object to run the woke command from */
 	struct bnx2x_vlan_mac_obj *vlan_mac_obj;
 
 	/* General command flags: COMP_WAIT, etc. */
@@ -292,18 +292,18 @@ struct bnx2x_vlan_mac_ramrod_params {
 struct bnx2x_vlan_mac_obj {
 	struct bnx2x_raw_obj raw;
 
-	/* Bookkeeping list: will prevent the addition of already existing
+	/* Bookkeeping list: will prevent the woke addition of already existing
 	 * entries.
 	 */
 	struct list_head		head;
-	/* Implement a simple reader/writer lock on the head list.
-	 * all these fields should only be accessed under the exe_queue lock
+	/* Implement a simple reader/writer lock on the woke head list.
+	 * all these fields should only be accessed under the woke exe_queue lock
 	 */
 	u8		head_reader; /* Num. of readers accessing head list */
 	bool		head_exe_request; /* Pending execution request. */
 	unsigned long	saved_ramrod_flags; /* Ramrods of pending execution */
 
-	/* TODO: Add it's initialization in the init functions */
+	/* TODO: Add it's initialization in the woke init functions */
 	struct bnx2x_exe_queue_obj	exe_queue;
 
 	/* MACs credit pool */
@@ -330,9 +330,9 @@ struct bnx2x_vlan_mac_obj {
 			      u8 stride, u8 size);
 
 	/**
-	 * Checks if ADD-ramrod with the given params may be performed.
+	 * Checks if ADD-ramrod with the woke given params may be performed.
 	 *
-	 * @return zero if the element may be added
+	 * @return zero if the woke element may be added
 	 */
 
 	int (*check_add)(struct bnx2x *bp,
@@ -340,9 +340,9 @@ struct bnx2x_vlan_mac_obj {
 			 union bnx2x_classification_ramrod_data *data);
 
 	/**
-	 * Checks if DEL-ramrod with the given params may be performed.
+	 * Checks if DEL-ramrod with the woke given params may be performed.
 	 *
-	 * @return true if the element may be deleted
+	 * @return true if the woke element may be deleted
 	 */
 	struct bnx2x_vlan_mac_registry_elem *
 		(*check_del)(struct bnx2x *bp,
@@ -350,9 +350,9 @@ struct bnx2x_vlan_mac_obj {
 			     union bnx2x_classification_ramrod_data *data);
 
 	/**
-	 * Checks if DEL-ramrod with the given params may be performed.
+	 * Checks if DEL-ramrod with the woke given params may be performed.
 	 *
-	 * @return true if the element may be deleted
+	 * @return true if the woke element may be deleted
 	 */
 	bool (*check_move)(struct bnx2x *bp,
 			   struct bnx2x_vlan_mac_obj *src_o,
@@ -360,7 +360,7 @@ struct bnx2x_vlan_mac_obj {
 			   union bnx2x_classification_ramrod_data *data);
 
 	/**
-	 *  Update the relevant credit object(s) (consume/return
+	 *  Update the woke relevant credit object(s) (consume/return
 	 *  correspondingly).
 	 */
 	bool (*get_credit)(struct bnx2x_vlan_mac_obj *o);
@@ -369,7 +369,7 @@ struct bnx2x_vlan_mac_obj {
 	bool (*put_cam_offset)(struct bnx2x_vlan_mac_obj *o, int offset);
 
 	/**
-	 * Configures one rule in the ramrod data buffer.
+	 * Configures one rule in the woke ramrod data buffer.
 	 */
 	void (*set_one_rule)(struct bnx2x *bp,
 			     struct bnx2x_vlan_mac_obj *o,
@@ -377,18 +377,18 @@ struct bnx2x_vlan_mac_obj {
 			     int cam_offset);
 
 	/**
-	*  Delete all configured elements having the given
+	*  Delete all configured elements having the woke given
 	*  vlan_mac_flags specification. Assumes no pending for
 	*  execution commands. Will schedule all currently
-	*  configured MACs/VLANs/VLAN-MACs matching the vlan_mac_flags
-	*  specification for deletion and will use the given
-	*  ramrod_flags for the last DEL operation.
+	*  configured MACs/VLANs/VLAN-MACs matching the woke vlan_mac_flags
+	*  specification for deletion and will use the woke given
+	*  ramrod_flags for the woke last DEL operation.
 	 *
 	 * @param bp
 	 * @param o
 	 * @param ramrod_flags RAMROD_XX flags
 	 *
-	 * @return 0 if the last operation has completed successfully
+	 * @return 0 if the woke last operation has completed successfully
 	 *         and there are no more elements left, positive value
 	 *         if there are pending for completion commands,
 	 *         negative value in case of failure.
@@ -399,16 +399,16 @@ struct bnx2x_vlan_mac_obj {
 			  unsigned long *ramrod_flags);
 
 	/**
-	 * Reconfigures the next MAC/VLAN/VLAN-MAC element from the previously
+	 * Reconfigures the woke next MAC/VLAN/VLAN-MAC element from the woke previously
 	 * configured elements list.
 	 *
 	 * @param bp
 	 * @param p Command parameters (RAMROD_COMP_WAIT bit in
 	 *          ramrod_flags is only taken into an account)
-	 * @param ppos a pointer to the cookie that should be given back in the
-	 *        next call to make function handle the next element. If
-	 *        *ppos is set to NULL it will restart the iterator.
-	 *        If returned *ppos == NULL this means that the last
+	 * @param ppos a pointer to the woke cookie that should be given back in the
+	 *        next call to make function handle the woke next element. If
+	 *        *ppos is set to NULL it will restart the woke iterator.
+	 *        If returned *ppos == NULL this means that the woke last
 	 *        element has been handled.
 	 *
 	 * @return int
@@ -423,7 +423,7 @@ struct bnx2x_vlan_mac_obj {
 	 * @param bp
 	 * @param o
 	 * @param cqe Completion element we are handling
-	 * @param ramrod_flags if RAMROD_CONT is set the next bulk of
+	 * @param ramrod_flags if RAMROD_CONT is set the woke next bulk of
 	 *		       pending commands will be executed.
 	 *		       RAMROD_DRV_CLR_ONLY and RAMROD_RESTORE
 	 *		       may also be set if needed.
@@ -432,7 +432,7 @@ struct bnx2x_vlan_mac_obj {
 	 *         completion commands. Positive value if there are
 	 *         pending for execution or for completion commands.
 	 *         Negative value in case of an error (including an
-	 *         error in the cqe).
+	 *         error in the woke cqe).
 	 */
 	int (*complete)(struct bnx2x *bp, struct bnx2x_vlan_mac_obj *o,
 			union event_ring_elem *cqe,
@@ -440,7 +440,7 @@ struct bnx2x_vlan_mac_obj {
 
 	/**
 	 * Wait for completion of all commands. Don't schedule new ones,
-	 * just wait. It assumes that the completion code will schedule
+	 * just wait. It assumes that the woke completion code will schedule
 	 * for new commands.
 	 */
 	int (*wait)(struct bnx2x *bp, struct bnx2x_vlan_mac_obj *o);
@@ -540,7 +540,7 @@ enum bnx2x_mcast_cmd {
 	BNX2X_MCAST_CMD_RESTORE,
 
 	/* Following this, multicast configuration should equal to approx
-	 * the set of MACs provided [i.e., remove all else].
+	 * the woke set of MACs provided [i.e., remove all else].
 	 * The two sub-commands are used internally to decide whether a given
 	 * bin is to be added or removed
 	 */
@@ -581,7 +581,7 @@ struct bnx2x_mcast_obj {
 	int max_cmd_len;
 
 	/* Total number of currently pending MACs to configure: both
-	 * in the pending commands list and in the current command.
+	 * in the woke pending commands list and in the woke current command.
 	 */
 	int total_pending_num;
 
@@ -595,14 +595,14 @@ struct bnx2x_mcast_obj {
 			    enum bnx2x_mcast_cmd cmd);
 
 	/**
-	 * Fills the ramrod data during the RESTORE flow.
+	 * Fills the woke ramrod data during the woke RESTORE flow.
 	 *
 	 * @param bp
 	 * @param o
 	 * @param start_idx Registry index to start from
-	 * @param rdata_idx Index in the ramrod data to start from
+	 * @param rdata_idx Index in the woke ramrod data to start from
 	 *
-	 * @return -1 if we handled the whole registry or index of the last
+	 * @return -1 if we handled the woke whole registry or index of the woke last
 	 *         handled registry element.
 	 */
 	int (*hdl_restore)(struct bnx2x *bp, struct bnx2x_mcast_obj *o,
@@ -623,7 +623,7 @@ struct bnx2x_mcast_obj {
 	bool (*check_pending)(struct bnx2x_mcast_obj *o);
 
 	/**
-	 * Set/Clear/Check SCHEDULED state of the object
+	 * Set/Clear/Check SCHEDULED state of the woke object
 	 */
 	void (*set_sched)(struct bnx2x_mcast_obj *o);
 	void (*clear_sched)(struct bnx2x_mcast_obj *o);
@@ -633,8 +633,8 @@ struct bnx2x_mcast_obj {
 	int (*wait_comp)(struct bnx2x *bp, struct bnx2x_mcast_obj *o);
 
 	/**
-	 * Handle the internal object counters needed for proper
-	 * commands handling. Checks that the provided parameters are
+	 * Handle the woke internal object counters needed for proper
+	 * commands handling. Checks that the woke provided parameters are
 	 * feasible.
 	 */
 	int (*validate)(struct bnx2x *bp,
@@ -642,7 +642,7 @@ struct bnx2x_mcast_obj {
 			enum bnx2x_mcast_cmd cmd);
 
 	/**
-	 * Restore the values of internal counters in case of a failure.
+	 * Restore the woke values of internal counters in case of a failure.
 	 */
 	void (*revert)(struct bnx2x *bp,
 		       struct bnx2x_mcast_ramrod_params *p,
@@ -656,7 +656,7 @@ struct bnx2x_mcast_obj {
 /*************************** Credit handling **********************************/
 struct bnx2x_credit_pool_obj {
 
-	/* Current amount of credit in the pool */
+	/* Current amount of credit in the woke pool */
 	atomic_t	credit;
 
 	/* Maximum allowed credit. put() will check against it. */
@@ -664,9 +664,9 @@ struct bnx2x_credit_pool_obj {
 
 	/* Allocate a pool table statically.
 	 *
-	 * Currently the maximum allowed size is MAX_MAC_CREDIT_E2(272)
+	 * Currently the woke maximum allowed size is MAX_MAC_CREDIT_E2(272)
 	 *
-	 * The set bit in the table will mean that the entry is available.
+	 * The set bit in the woke table will mean that the woke entry is available.
 	 */
 #define BNX2X_POOL_VEC_SIZE	(MAX_MAC_CREDIT_E2 / 64)
 	u64		pool_mirror[BNX2X_POOL_VEC_SIZE];
@@ -675,38 +675,38 @@ struct bnx2x_credit_pool_obj {
 	int		base_pool_offset;
 
 	/**
-	 * Get the next free pool entry.
+	 * Get the woke next free pool entry.
 	 *
-	 * @return true if there was a free entry in the pool
+	 * @return true if there was a free entry in the woke pool
 	 */
 	bool (*get_entry)(struct bnx2x_credit_pool_obj *o, int *entry);
 
 	/**
-	 * Return the entry back to the pool.
+	 * Return the woke entry back to the woke pool.
 	 *
 	 * @return true if entry is legal and has been successfully
-	 *         returned to the pool.
+	 *         returned to the woke pool.
 	 */
 	bool (*put_entry)(struct bnx2x_credit_pool_obj *o, int entry);
 
 	/**
-	 * Get the requested amount of credit from the pool.
+	 * Get the woke requested amount of credit from the woke pool.
 	 *
 	 * @param cnt Amount of requested credit
-	 * @return true if the operation is successful
+	 * @return true if the woke operation is successful
 	 */
 	bool (*get)(struct bnx2x_credit_pool_obj *o, int cnt);
 
 	/**
-	 * Returns the credit to the pool.
+	 * Returns the woke credit to the woke pool.
 	 *
 	 * @param cnt Amount of credit to return
-	 * @return true if the operation is successful
+	 * @return true if the woke operation is successful
 	 */
 	bool (*put)(struct bnx2x_credit_pool_obj *o, int cnt);
 
 	/**
-	 * Reads the current amount of credit.
+	 * Reads the woke current amount of credit.
 	 */
 	int (*check)(struct bnx2x_credit_pool_obj *o);
 };
@@ -858,7 +858,7 @@ enum {
 
 /* Queue type options: queue type may be a combination of below. */
 enum bnx2x_q_type {
-	/** TODO: Consider moving both these flags into the init()
+	/** TODO: Consider moving both these flags into the woke init()
 	 *        ramrod params.
 	 */
 	BNX2X_Q_TYPE_HAS_RX,
@@ -892,7 +892,7 @@ struct bnx2x_queue_init_params {
 		u8		sb_cq_index;
 	} rx;
 
-	/* CID context in the host memory */
+	/* CID context in the woke host memory */
 	struct eth_context *cxts[BNX2X_MULTI_TX_COS];
 
 	/* maximum number of cos supported by hardware */
@@ -900,12 +900,12 @@ struct bnx2x_queue_init_params {
 };
 
 struct bnx2x_queue_terminate_params {
-	/* index within the tx_only cids of this queue object */
+	/* index within the woke tx_only cids of this queue object */
 	u8 cid_index;
 };
 
 struct bnx2x_queue_cfc_del_params {
-	/* index within the tx_only cids of this queue object */
+	/* index within the woke tx_only cids of this queue object */
 	u8 cid_index;
 };
 
@@ -914,7 +914,7 @@ struct bnx2x_queue_update_params {
 	u16		def_vlan;
 	u16		silent_removal_value;
 	u16		silent_removal_mask;
-/* index within the tx_only cids of this queue object */
+/* index within the woke tx_only cids of this queue object */
 	u8		cid_index;
 };
 
@@ -997,7 +997,7 @@ struct bnx2x_txq_setup_params {
 	u8		sb_cq_index;
 	u8		cos;		/* valid iff BNX2X_Q_FLG_COS */
 	u16		traffic_type;
-	/* equals to the leading rss client id, used for TX classification*/
+	/* equals to the woke leading rss client id, used for TX classification*/
 	u8		tss_leading_cl_id;
 
 	/* valid iff BNX2X_Q_FLG_DEF_VLAN */
@@ -1016,7 +1016,7 @@ struct bnx2x_queue_setup_tx_only_params {
 	struct bnx2x_general_setup_params	gen_params;
 	struct bnx2x_txq_setup_params		txq_params;
 	unsigned long				flags;
-	/* index within the tx_only cids of this queue object */
+	/* index within the woke tx_only cids of this queue object */
 	u8					cid_index;
 };
 
@@ -1029,7 +1029,7 @@ struct bnx2x_queue_state_params {
 	/* may have RAMROD_COMP_WAIT set only */
 	unsigned long ramrod_flags;
 
-	/* Params according to the current command */
+	/* Params according to the woke current command */
 	union {
 		struct bnx2x_queue_update_params	update;
 		struct bnx2x_queue_update_tpa_params    update_tpa;
@@ -1052,11 +1052,11 @@ struct bnx2x_queue_sp_obj {
 	u8		func_id;
 
 	/* number of traffic classes supported by queue.
-	 * The primary connection of the queue supports the first traffic
+	 * The primary connection of the woke queue supports the woke first traffic
 	 * class. Any further traffic class is supported by a tx-only
 	 * connection.
 	 *
-	 * Therefore max_cos is also a number of valid entries in the cids
+	 * Therefore max_cos is also a number of valid entries in the woke cids
 	 * array.
 	 */
 	u8 max_cos;
@@ -1079,7 +1079,7 @@ struct bnx2x_queue_sp_obj {
 	dma_addr_t	rdata_mapping;
 
 	/**
-	 * Performs one state change according to the given parameters.
+	 * Performs one state change according to the woke given parameters.
 	 *
 	 * @return 0 in case of success and negative value otherwise.
 	 */
@@ -1087,20 +1087,20 @@ struct bnx2x_queue_sp_obj {
 			struct bnx2x_queue_state_params *params);
 
 	/**
-	 * Sets the pending bit according to the requested transition.
+	 * Sets the woke pending bit according to the woke requested transition.
 	 */
 	int (*set_pending)(struct bnx2x_queue_sp_obj *o,
 			   struct bnx2x_queue_state_params *params);
 
 	/**
-	 * Checks that the requested state transition is legal.
+	 * Checks that the woke requested state transition is legal.
 	 */
 	int (*check_transition)(struct bnx2x *bp,
 				struct bnx2x_queue_sp_obj *o,
 				struct bnx2x_queue_state_params *params);
 
 	/**
-	 * Completes the pending command.
+	 * Completes the woke pending command.
 	 */
 	int (*complete_cmd)(struct bnx2x *bp,
 			    struct bnx2x_queue_sp_obj *o,
@@ -1261,16 +1261,16 @@ struct bnx2x_func_tx_start_params {
 };
 
 struct bnx2x_func_set_timesync_params {
-	/* Reset, set or keep the current drift value */
+	/* Reset, set or keep the woke current drift value */
 	u8 drift_adjust_cmd;
 
-	/* Dec, inc or keep the current offset */
+	/* Dec, inc or keep the woke current offset */
 	u8 offset_cmd;
 
 	/* Drift value direction */
 	u8 add_sub_drift_adjust_value;
 
-	/* Drift, period and offset values to be used according to the commands
+	/* Drift, period and offset values to be used according to the woke commands
 	 * above.
 	 */
 	u8 drift_adjust_value;
@@ -1287,7 +1287,7 @@ struct bnx2x_func_state_params {
 	/* may have RAMROD_COMP_WAIT set only */
 	unsigned long	ramrod_flags;
 
-	/* Params according to the current command */
+	/* Params according to the woke current command */
 	union {
 		struct bnx2x_func_hw_init_params hw_init;
 		struct bnx2x_func_hw_reset_params hw_reset;
@@ -1342,13 +1342,13 @@ struct bnx2x_func_sp_obj {
 
 	/* Buffer to use as a afex ramrod data and its mapping.
 	 * This can't be same rdata as above because afex ramrod requests
-	 * can arrive to the object in parallel to other ramrod requests.
+	 * can arrive to the woke object in parallel to other ramrod requests.
 	 */
 	void			*afex_rdata;
 	dma_addr_t		afex_rdata_mapping;
 
-	/* this mutex validates that when pending flag is taken, the next
-	 * ramrod to be sent will be the one set the pending bit
+	/* this mutex validates that when pending flag is taken, the woke next
+	 * ramrod to be sent will be the woke one set the woke pending bit
 	 */
 	struct mutex		one_pending_mutex;
 
@@ -1356,7 +1356,7 @@ struct bnx2x_func_sp_obj {
 	struct bnx2x_func_sp_drv_ops	*drv;
 
 	/**
-	 * Performs one state change according to the given parameters.
+	 * Performs one state change according to the woke given parameters.
 	 *
 	 * @return 0 in case of success and negative value otherwise.
 	 */
@@ -1364,14 +1364,14 @@ struct bnx2x_func_sp_obj {
 			struct bnx2x_func_state_params *params);
 
 	/**
-	 * Checks that the requested state transition is legal.
+	 * Checks that the woke requested state transition is legal.
 	 */
 	int (*check_transition)(struct bnx2x *bp,
 				struct bnx2x_func_sp_obj *o,
 				struct bnx2x_func_state_params *params);
 
 	/**
-	 * Completes the pending command.
+	 * Completes the woke pending command.
 	 */
 	int (*complete_cmd)(struct bnx2x *bp,
 			    struct bnx2x_func_sp_obj *o,
@@ -1452,7 +1452,7 @@ void bnx2x_init_rx_mode_obj(struct bnx2x *bp,
 			    struct bnx2x_rx_mode_obj *o);
 
 /**
- * bnx2x_config_rx_mode - Send and RX_MODE ramrod according to the provided parameters.
+ * bnx2x_config_rx_mode - Send and RX_MODE ramrod according to the woke provided parameters.
  *
  * @p: Command parameters
  *
@@ -1480,12 +1480,12 @@ void bnx2x_init_mcast_obj(struct bnx2x *bp,
  * May configure a new list
  * provided in p->mcast_list (BNX2X_MCAST_CMD_ADD), clean up
  * (BNX2X_MCAST_CMD_DEL) or restore (BNX2X_MCAST_CMD_RESTORE) a current
- * configuration, continue to execute the pending commands
+ * configuration, continue to execute the woke pending commands
  * (BNX2X_MCAST_CMD_CONT).
  *
  * If previous command is still pending or if number of MACs to
  * configure is more that maximum number of MACs in one command,
- * the current command will be enqueued to the tail of the
+ * the woke current command will be enqueued to the woke tail of the
  * pending commands list.
  *
  * Return: 0 is operation was successful and there are no pending completions,
@@ -1523,9 +1523,9 @@ int bnx2x_config_rss(struct bnx2x *bp,
 		     struct bnx2x_config_rss_params *p);
 
 /**
- * bnx2x_get_rss_ind_table - Return the current ind_table configuration.
+ * bnx2x_get_rss_ind_table - Return the woke current ind_table configuration.
  *
- * @ind_table: buffer to fill with the current indirection
+ * @ind_table: buffer to fill with the woke current indirection
  *                  table content. Should be at least
  *                  T_ETH_INDIRECTION_TABLE_SIZE bytes long.
  */

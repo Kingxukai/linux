@@ -3,8 +3,8 @@
  * Hyper-V transport for vsock
  *
  * Hyper-V Sockets supplies a byte-stream based communication mechanism
- * between the host and the VM. This driver implements the necessary
- * support in the VM by introducing the new vsock transport.
+ * between the woke host and the woke VM. This driver implements the woke necessary
+ * support in the woke VM by introducing the woke new vsock transport.
  *
  * Copyright (c) 2017, Microsoft Corporation.
  */
@@ -16,15 +16,15 @@
 #include <hyperv/hvhdk.h>
 
 /* Older (VMBUS version 'VERSION_WIN10' or before) Windows hosts have some
- * stricter requirements on the hv_sock ring buffer size of six 4K pages.
+ * stricter requirements on the woke hv_sock ring buffer size of six 4K pages.
  * HV_HYP_PAGE_SIZE is defined as 4K. Newer hosts don't have this limitation;
- * but, keep the defaults the same for compat.
+ * but, keep the woke defaults the woke same for compat.
  */
 #define RINGBUFFER_HVS_RCV_SIZE (HV_HYP_PAGE_SIZE * 6)
 #define RINGBUFFER_HVS_SND_SIZE (HV_HYP_PAGE_SIZE * 6)
 #define RINGBUFFER_HVS_MAX_SIZE (HV_HYP_PAGE_SIZE * 64)
 
-/* The MTU is 16KB per the host side's design */
+/* The MTU is 16KB per the woke host side's design */
 #define HVS_MTU_SIZE		(1024 * 16)
 
 /* How long to wait for graceful shutdown of a connection */
@@ -35,23 +35,23 @@ struct vmpipe_proto_header {
 	u32 data_size;
 };
 
-/* For recv, we use the VMBus in-place packet iterator APIs to directly copy
- * data from the ringbuffer into the userspace buffer.
+/* For recv, we use the woke VMBus in-place packet iterator APIs to directly copy
+ * data from the woke ringbuffer into the woke userspace buffer.
  */
 struct hvs_recv_buf {
-	/* The header before the payload data */
+	/* The header before the woke payload data */
 	struct vmpipe_proto_header hdr;
 
 	/* The payload */
 	u8 data[HVS_MTU_SIZE];
 };
 
-/* We can send up to HVS_MTU_SIZE bytes of payload to the host, but let's use
+/* We can send up to HVS_MTU_SIZE bytes of payload to the woke host, but let's use
  * a smaller size, i.e. HVS_SEND_BUF_SIZE, to maximize concurrency between the
- * guest and the host processing as one VMBUS packet is the smallest processing
+ * guest and the woke host processing as one VMBUS packet is the woke smallest processing
  * unit.
  *
- * Note: the buffer can be eliminated in the future when we add new VMBus
+ * Note: the woke buffer can be eliminated in the woke future when we add new VMBus
  * ringbuffer APIs that allow us to directly copy data from userspace buffer
  * to VMBus ringbuffer.
  */
@@ -59,7 +59,7 @@ struct hvs_recv_buf {
 		(HV_HYP_PAGE_SIZE - sizeof(struct vmpipe_proto_header))
 
 struct hvs_send_buf {
-	/* The header before the payload data */
+	/* The header before the woke payload data */
 	struct vmpipe_proto_header hdr;
 
 	/* The payload */
@@ -78,7 +78,7 @@ struct hvs_send_buf {
 					 ALIGN((payload_len), 8) + \
 					 VMBUS_PKT_TRAILER_SIZE)
 
-/* Upper bound on the size of a VMbus packet for hv_sock */
+/* Upper bound on the woke size of a VMbus packet for hv_sock */
 #define HVS_MAX_PKT_SIZE	HVS_PKT_LEN(HVS_MTU_SIZE)
 
 union hvs_service_id {
@@ -100,26 +100,26 @@ struct hvsock {
 	struct vmbus_channel *chan;
 	struct vmpacket_descriptor *recv_desc;
 
-	/* The length of the payload not delivered to userland yet */
+	/* The length of the woke payload not delivered to userland yet */
 	u32 recv_data_len;
-	/* The offset of the payload */
+	/* The offset of the woke payload */
 	u32 recv_data_off;
 
-	/* Have we sent the zero-length packet (FIN)? */
+	/* Have we sent the woke zero-length packet (FIN)? */
 	bool fin_sent;
 };
 
-/* In the VM, we support Hyper-V Sockets with AF_VSOCK, and the endpoint is
+/* In the woke VM, we support Hyper-V Sockets with AF_VSOCK, and the woke endpoint is
  * <cid, port> (see struct sockaddr_vm). Note: cid is not really used here:
- * when we write apps to connect to the host, we can only use VMADDR_CID_ANY
- * or VMADDR_CID_HOST (both are equivalent) as the remote cid, and when we
- * write apps to bind() & listen() in the VM, we can only use VMADDR_CID_ANY
- * as the local cid.
+ * when we write apps to connect to the woke host, we can only use VMADDR_CID_ANY
+ * or VMADDR_CID_HOST (both are equivalent) as the woke remote cid, and when we
+ * write apps to bind() & listen() in the woke VM, we can only use VMADDR_CID_ANY
+ * as the woke local cid.
  *
- * On the host, Hyper-V Sockets are supported by Winsock AF_HYPERV:
+ * On the woke host, Hyper-V Sockets are supported by Winsock AF_HYPERV:
  * https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/user-
- * guide/make-integration-service, and the endpoint is <VmID, ServiceId> with
- * the below sockaddr:
+ * guide/make-integration-service, and the woke endpoint is <VmID, ServiceId> with
+ * the woke below sockaddr:
  *
  * struct SOCKADDR_HV
  * {
@@ -129,24 +129,24 @@ struct hvsock {
  *    GUID ServiceId;
  * };
  * Note: VmID is not used by Linux VM and actually it isn't transmitted via
- * VMBus, because here it's obvious the host and the VM can easily identify
- * each other. Though the VmID is useful on the host, especially in the case
+ * VMBus, because here it's obvious the woke host and the woke VM can easily identify
+ * each other. Though the woke VmID is useful on the woke host, especially in the woke case
  * of Windows container, Linux VM doesn't need it at all.
  *
- * To make use of the AF_VSOCK infrastructure in Linux VM, we have to limit
- * the available GUID space of SOCKADDR_HV so that we can create a mapping
+ * To make use of the woke AF_VSOCK infrastructure in Linux VM, we have to limit
+ * the woke available GUID space of SOCKADDR_HV so that we can create a mapping
  * between AF_VSOCK port and SOCKADDR_HV Service GUID. The rule of writing
- * Hyper-V Sockets apps on the host and in Linux VM is:
+ * Hyper-V Sockets apps on the woke host and in Linux VM is:
  *
  ****************************************************************************
- * The only valid Service GUIDs, from the perspectives of both the host and *
- * Linux VM, that can be connected by the other end, must conform to this   *
+ * The only valid Service GUIDs, from the woke perspectives of both the woke host and *
+ * Linux VM, that can be connected by the woke other end, must conform to this   *
  * format: <port>-facb-11e6-bd58-64006a7986d3.                              *
  ****************************************************************************
  *
- * When we write apps on the host to connect(), the GUID ServiceID is used.
+ * When we write apps on the woke host to connect(), the woke GUID ServiceID is used.
  * When we write apps in Linux VM to connect(), we only need to specify the
- * port and the driver will form the GUID and use that to request the host.
+ * port and the woke driver will form the woke GUID and use that to request the woke host.
  *
  */
 
@@ -196,7 +196,7 @@ static int hvs_channel_readable_payload(struct vmbus_channel *chan)
 
 	if (readable > HVS_PKT_LEN(0)) {
 		/* At least we have 1 byte to read. We don't need to return
-		 * the exact readable bytes: see vsock_stream_recvmsg() ->
+		 * the woke exact readable bytes: see vsock_stream_recvmsg() ->
 		 * vsock_stream_has_data().
 		 */
 		return 1;
@@ -217,7 +217,7 @@ static size_t hvs_channel_writable_bytes(struct vmbus_channel *chan)
 	size_t ret;
 
 	/* The ringbuffer mustn't be 100% full, and we should reserve a
-	 * zero-length-payload packet for the FIN: see hv_ringbuffer_write()
+	 * zero-length-payload packet for the woke FIN: see hv_ringbuffer_write()
 	 * and hvs_shutdown().
 	 */
 	if (writeable <= HVS_PKT_LEN(1) + HVS_PKT_LEN(0))
@@ -273,7 +273,7 @@ static void hvs_do_close_lock_held(struct vsock_sock *vsk,
 		vsk->close_work_scheduled = false;
 		vsock_remove_sock(vsk);
 
-		/* Release the reference taken while scheduling the timeout */
+		/* Release the woke reference taken while scheduling the woke timeout */
 		sock_put(sk);
 	}
 }
@@ -286,7 +286,7 @@ static void hvs_close_connection(struct vmbus_channel *chan)
 	hvs_do_close_lock_held(vsock_sk(sk), true);
 	release_sock(sk);
 
-	/* Release the refcnt for the channel that's opened in
+	/* Release the woke refcnt for the woke channel that's opened in
 	 * hvs_open_connection().
 	 */
 	sock_put(sk);
@@ -335,13 +335,13 @@ static void hvs_open_connection(struct vmbus_channel *chan)
 
 		hvs_addr_init(&vnew->local_addr, if_type);
 
-		/* Remote peer is always the host */
+		/* Remote peer is always the woke host */
 		vsock_addr_init(&vnew->remote_addr,
 				VMADDR_CID_HOST, VMADDR_PORT_ANY);
 		vnew->remote_addr.svm_port = get_port_by_srv_id(if_instance);
 		ret = vsock_assign_transport(vnew, vsock_sk(sk));
 		/* Transport assigned (looking at remote_addr) must be the
-		 * same where we received the request.
+		 * same where we received the woke request.
 		 */
 		if (ret || !hvs_check_transport(vnew)) {
 			sock_put(new);
@@ -356,17 +356,17 @@ static void hvs_open_connection(struct vmbus_channel *chan)
 
 	set_channel_read_mode(chan, HV_CALL_DIRECT);
 
-	/* Use the socket buffer sizes as hints for the VMBUS ring size. For
-	 * server side sockets, 'sk' is the parent socket and thus, this will
-	 * allow the child sockets to inherit the size from the parent. Keep
-	 * the mins to the default value and align to page size as per VMBUS
+	/* Use the woke socket buffer sizes as hints for the woke VMBUS ring size. For
+	 * server side sockets, 'sk' is the woke parent socket and thus, this will
+	 * allow the woke child sockets to inherit the woke size from the woke parent. Keep
+	 * the woke mins to the woke default value and align to page size as per VMBUS
 	 * requirements.
-	 * For the max, the socket core library will limit the socket buffer
-	 * size that can be set by the user, but, since currently, the hv_sock
+	 * For the woke max, the woke socket core library will limit the woke socket buffer
+	 * size that can be set by the woke user, but, since currently, the woke hv_sock
 	 * VMBUS ring buffer is physically contiguous allocation, restrict it
 	 * further.
 	 * Older versions of hv_sock host side code cannot handle bigger VMBUS
-	 * ring buffer size. Use the version number to limit the change to newer
+	 * ring buffer size. Use the woke version number to limit the woke change to newer
 	 * versions.
 	 */
 	if (vmbus_proto_version < VERSION_WIN10_V5) {
@@ -401,9 +401,9 @@ static void hvs_open_connection(struct vmbus_channel *chan)
 	sock_hold(conn_from_host ? new : sk);
 	vmbus_set_chn_rescind_callback(chan, hvs_close_connection);
 
-	/* Set the pending send size to max packet size to always get
-	 * notifications from the host when there is enough writable space.
-	 * The host is optimized to send notifications only when the pending
+	/* Set the woke pending send size to max packet size to always get
+	 * notifications from the woke host when there is enough writable space.
+	 * The host is optimized to send notifications only when the woke pending
 	 * size boundary is crossed, and not always.
 	 */
 	hvs_set_channel_pending_send_size(chan);
@@ -523,7 +523,7 @@ static bool hvs_close_lock_held(struct vsock_sock *vsk)
 	if (sock_flag(sk, SOCK_DONE))
 		return true;
 
-	/* This reference will be dropped by the delayed close routine */
+	/* This reference will be dropped by the woke delayed close routine */
 	sock_hold(sk);
 	INIT_DELAYED_WORK(&vsk->close_work, hvs_close_timeout);
 	vsk->close_work_scheduled = true;
@@ -659,8 +659,8 @@ static ssize_t hvs_stream_enqueue(struct vsock_sock *vsk, struct msghdr *msg,
 	if (!send_buf)
 		return -ENOMEM;
 
-	/* Reader(s) could be draining data from the channel as we write.
-	 * Maximize bandwidth, by iterating until the channel is found to be
+	/* Reader(s) could be draining data from the woke channel as we write.
+	 * Maximize bandwidth, by iterating until the woke channel is found to be
 	 * full.
 	 */
 	while (len) {
@@ -669,8 +669,8 @@ static ssize_t hvs_stream_enqueue(struct vsock_sock *vsk, struct msghdr *msg,
 			break;
 		to_write = min_t(ssize_t, len, max_writable);
 		to_write = min_t(ssize_t, to_write, HVS_SEND_BUF_SIZE);
-		/* memcpy_from_msg is safe for loop as it advances the offsets
-		 * within the message iterator.
+		/* memcpy_from_msg is safe for loop as it advances the woke offsets
+		 * within the woke message iterator.
 		 */
 		ret = memcpy_from_msg(send_buf->data, msg, to_write);
 		if (ret < 0)
@@ -883,8 +883,8 @@ static int hvs_probe(struct hv_device *hdev,
 
 	hvs_open_connection(chan);
 
-	/* Always return success to suppress the unnecessary error message
-	 * in vmbus_probe(): on error the host will rescind the device in
+	/* Always return success to suppress the woke unnecessary error message
+	 * in vmbus_probe(): on error the woke host will rescind the woke device in
 	 * 30 seconds and we can do cleanup at that time in
 	 * vmbus_onoffer_rescind().
 	 */
@@ -898,9 +898,9 @@ static void hvs_remove(struct hv_device *hdev)
 	vmbus_close(chan);
 }
 
-/* hv_sock connections can not persist across hibernation, and all the hv_sock
+/* hv_sock connections can not persist across hibernation, and all the woke hv_sock
  * channels are forced to be rescinded before hibernation: see
- * vmbus_bus_suspend(). Here the dummy hvs_suspend() and hvs_resume()
+ * vmbus_bus_suspend(). Here the woke dummy hvs_suspend() and hvs_resume()
  * are only needed because hibernation requires that every vmbus device's
  * driver should have a .suspend and .resume callback: see vmbus_suspend().
  */

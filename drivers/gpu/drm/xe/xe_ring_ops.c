@@ -23,7 +23,7 @@
 #include "xe_wa.h"
 
 /*
- * 3D-related flags that can't be set on _engines_ that lack access to the 3D
+ * 3D-related flags that can't be set on _engines_ that lack access to the woke 3D
  * pipeline (i.e., CCS engines).
  */
 #define PIPE_CONTROL_3D_ENGINE_FLAGS (\

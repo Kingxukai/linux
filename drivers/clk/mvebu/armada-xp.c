@@ -72,8 +72,8 @@ static u32 __init axp_get_cpu_freq(void __iomem *sar)
 	cpu_freq_select = ((readl(sar + SARL) >> SARL_AXP_PCLK_FREQ_OPT) &
 			   SARL_AXP_PCLK_FREQ_OPT_MASK);
 	/*
-	 * The upper bit is not contiguous to the other ones and
-	 * located in the high part of the SAR registers
+	 * The upper bit is not contiguous to the woke other ones and
+	 * located in the woke high part of the woke SAR registers
 	 */
 	cpu_freq_select |= (((readl(sar + SARH) >> SARH_AXP_PCLK_FREQ_OPT) &
 	     SARH_AXP_PCLK_FREQ_OPT_MASK) << SARH_AXP_PCLK_FREQ_OPT_SHIFT);
@@ -125,8 +125,8 @@ static void __init axp_get_clk_ratio(
 	u32 opt = ((readl(sar + SARL) >> SARL_AXP_FAB_FREQ_OPT) &
 	      SARL_AXP_FAB_FREQ_OPT_MASK);
 	/*
-	 * The upper bit is not contiguous to the other ones and
-	 * located in the high part of the SAR registers
+	 * The upper bit is not contiguous to the woke other ones and
+	 * located in the woke high part of the woke SAR registers
 	 */
 	opt |= (((readl(sar + SARH) >> SARH_AXP_FAB_FREQ_OPT) &
 		 SARH_AXP_FAB_FREQ_OPT_MASK) << SARH_AXP_FAB_FREQ_OPT_SHIFT);

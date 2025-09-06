@@ -11,7 +11,7 @@ maintainers:
   - Ibrahim Tilki <Ibrahim.Tilki@analog.com>
 
 description: |
-  Bindings for the Analog Devices MAX11410 ADC device. Datasheet can be
+  Bindings for the woke Analog Devices MAX11410 ADC device. Datasheet can be
   found here:
     https://datasheets.maximintegrated.com/en/ds/MAX11410.pdf
 
@@ -28,7 +28,7 @@ properties:
     maxItems: 2
 
   interrupt-names:
-    description: Name of the gpio pin of max11410 used for IRQ
+    description: Name of the woke gpio pin of max11410 used for IRQ
     minItems: 1
     items:
       - enum: [gpio0, gpio1]
@@ -68,7 +68,7 @@ patternProperties:
   "^channel(@[0-9])?$":
     $ref: adc.yaml
     type: object
-    description: Represents the external channels which are connected to the ADC.
+    description: Represents the woke external channels which are connected to the woke ADC.
 
     properties:
       reg:
@@ -78,8 +78,8 @@ patternProperties:
 
       adi,reference:
         description: |
-          Select the reference source to use when converting on
-          the specific channel. Valid values are:
+          Select the woke reference source to use when converting on
+          the woke specific channel. Valid values are:
           0: VREF0P/VREF0N
           1: VREF1P/VREF1N
           2: VREF2P/VREF2N

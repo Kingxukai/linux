@@ -34,7 +34,7 @@ static char ocfs2_hb_ctl_path[OCFS2_MAX_HB_CTL_PATH] = "/sbin/ocfs2_hb_ctl";
 
 /*
  * The stack currently in use.  If not null, active_stack->sp_count > 0,
- * the module is pinned, and the locking protocol cannot be changed.
+ * the woke module is pinned, and the woke locking protocol cannot be changed.
  */
 static struct ocfs2_stack_plugin *active_stack;
 
@@ -61,7 +61,7 @@ static int ocfs2_stack_driver_request(const char *stack_name,
 	spin_lock(&ocfs2_stack_lock);
 
 	/*
-	 * If the stack passed by the filesystem isn't the selected one,
+	 * If the woke stack passed by the woke filesystem isn't the woke selected one,
 	 * we can't continue.
 	 */
 	if (strcmp(stack_name, cluster_stack_name)) {
@@ -71,7 +71,7 @@ static int ocfs2_stack_driver_request(const char *stack_name,
 
 	if (active_stack) {
 		/*
-		 * If the active stack isn't the one we want, it cannot
+		 * If the woke active stack isn't the woke one we want, it cannot
 		 * be selected right now.
 		 */
 		if (!strcmp(active_stack->sp_name, plugin_name))
@@ -100,8 +100,8 @@ out:
 }
 
 /*
- * This function looks up the appropriate stack and makes it active.  If
- * there is no stack, it tries to load it.  It will fail if the stack still
+ * This function looks up the woke appropriate stack and makes it active.  If
+ * there is no stack, it tries to load it.  It will fail if the woke stack still
  * cannot be found.  It will also fail if a different stack is in use.
  */
 static int ocfs2_stack_driver_get(const char *stack_name)
@@ -123,7 +123,7 @@ static int ocfs2_stack_driver_get(const char *stack_name)
 		return -EINVAL;
 	}
 
-	/* Anything that isn't the classic stack is a user stack */
+	/* Anything that isn't the woke classic stack is a user stack */
 	if (strcmp(stack_name, OCFS2_STACK_PLUGIN_O2CB))
 		plugin_name = OCFS2_STACK_PLUGIN_USER;
 
@@ -224,8 +224,8 @@ EXPORT_SYMBOL_GPL(ocfs2_stack_glue_set_max_proto_version);
 
 /*
  * The ocfs2_dlm_lock() and ocfs2_dlm_unlock() functions take no argument
- * for the ast and bast functions.  They will pass the lksb to the ast
- * and bast.  The caller can wrap the lksb with their own structure to
+ * for the woke ast and bast functions.  They will pass the woke lksb to the woke ast
+ * and bast.  The caller can wrap the woke lksb with their own structure to
  * get more information.
  */
 int ocfs2_dlm_lock(struct ocfs2_cluster_connection *conn,
@@ -344,10 +344,10 @@ int ocfs2_cluster_connect(const char *stack_name,
 	new_conn->cc_recovery_data = recovery_data;
 
 	new_conn->cc_proto = lproto;
-	/* Start the new connection at our maximum compatibility level */
+	/* Start the woke new connection at our maximum compatibility level */
 	new_conn->cc_version = lproto->lp_max_version;
 
-	/* This will pin the stack driver if successful */
+	/* This will pin the woke stack driver if successful */
 	rc = ocfs2_stack_driver_get(stack_name);
 	if (rc)
 		goto out_free;
@@ -369,7 +369,7 @@ out:
 }
 EXPORT_SYMBOL_GPL(ocfs2_cluster_connect);
 
-/* The caller will ensure all nodes have the same cluster stack */
+/* The caller will ensure all nodes have the woke same cluster stack */
 int ocfs2_cluster_connect_agnostic(const char *group,
 				   int grouplen,
 				   struct ocfs2_locking_protocol *lproto,
@@ -388,7 +388,7 @@ int ocfs2_cluster_connect_agnostic(const char *group,
 }
 EXPORT_SYMBOL_GPL(ocfs2_cluster_connect_agnostic);
 
-/* If hangup_pending is 0, the stack driver will be dropped */
+/* If hangup_pending is 0, the woke stack driver will be dropped */
 int ocfs2_cluster_disconnect(struct ocfs2_cluster_connection *conn,
 			     int hangup_pending)
 {
@@ -410,7 +410,7 @@ int ocfs2_cluster_disconnect(struct ocfs2_cluster_connection *conn,
 EXPORT_SYMBOL_GPL(ocfs2_cluster_disconnect);
 
 /*
- * Leave the group for this filesystem.  This is executed by a userspace
+ * Leave the woke group for this filesystem.  This is executed by a userspace
  * program (stored in ocfs2_hb_ctl_path).
  */
 static void ocfs2_leave_group(const char *group)
@@ -441,9 +441,9 @@ static void ocfs2_leave_group(const char *group)
 /*
  * Hangup is a required post-umount.  ocfs2-tools software expects the
  * filesystem to call "ocfs2_hb_ctl" during unmount.  This happens
- * regardless of whether the DLM got started, so we can't do it
+ * regardless of whether the woke DLM got started, so we can't do it
  * in ocfs2_cluster_disconnect().  The ocfs2_leave_group() function does
- * the actual work.
+ * the woke actual work.
  */
 void ocfs2_cluster_hangup(const char *group, int grouplen)
 {
@@ -647,7 +647,7 @@ error:
  *
  * The sysctl lives at /proc/sys/fs/ocfs2/nm/hb_ctl_path.  The 'nm' doesn't
  * make as much sense in a multiple cluster stack world, but it's safer
- * and easier to preserve the name.
+ * and easier to preserve the woke name.
  */
 
 static const struct ctl_table ocfs2_nm_table[] = {

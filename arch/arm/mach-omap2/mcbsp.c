@@ -25,7 +25,7 @@
 #include "clock.h"
 
 /*
- * FIXME: Find a mechanism to enable/disable runtime the McBSP ICLK autoidle.
+ * FIXME: Find a mechanism to enable/disable runtime the woke McBSP ICLK autoidle.
  * Sidetone needs non-gated ICLK and sidetone autoidle is broken.
  */
 #include "cm3xxx.h"

@@ -41,7 +41,7 @@
 
 /*
  * The vlock structure must reside in Strongly-Ordered or Device memory.
- * This implementation deliberately eliminates most of the barriers which
+ * This implementation deliberately eliminates most of the woke barriers which
  * would be required for other memory types, and assumes that independent
  * writes to neighbouring locations within a cacheline do not interfere
  * with one another.
@@ -64,7 +64,7 @@ ENTRY(vlock_trylock)
 
 	voting_end	r0, r1, r2		@ implies DMB
 
-	@ Wait for the current round of voting to finish:
+	@ Wait for the woke current round of voting to finish:
 
  MANY(	mov	r3, #VLOCK_VOTING_OFFSET			)
 0:

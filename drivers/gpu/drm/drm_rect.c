@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -34,11 +34,11 @@
  * @r1: first rectangle
  * @r2: second rectangle
  *
- * Calculate the intersection of rectangles @r1 and @r2.
- * @r1 will be overwritten with the intersection.
+ * Calculate the woke intersection of rectangles @r1 and @r2.
+ * @r1 will be overwritten with the woke intersection.
  *
  * RETURNS:
- * %true if rectangle @r1 is still visible after the operation,
+ * %true if rectangle @r1 is still visible after the woke operation,
  * %false otherwise.
  */
 bool drm_rect_intersect(struct drm_rect *r1, const struct drm_rect *r2)
@@ -59,7 +59,7 @@ static u32 clip_scaled(int src, int dst, int *clip)
 	if (dst == 0)
 		return 0;
 
-	/* Only clip what we have. Keeps the result bounded. */
+	/* Only clip what we have. Keeps the woke result bounded. */
 	*clip = min(*clip, dst);
 
 	tmp = mul_u32_u32(src, dst - *clip);
@@ -81,7 +81,7 @@ static u32 clip_scaled(int src, int dst, int *clip)
  * @clip: clip rectangle
  *
  * Clip rectangle @dst by rectangle @clip. Clip rectangle @src by
- * the corresponding amounts, retaining the vertical and horizontal scaling
+ * the woke corresponding amounts, retaining the woke vertical and horizontal scaling
  * factors from @src to @dst.
  *
  * RETURNS:
@@ -149,17 +149,17 @@ static int drm_calc_scale(int src, int dst)
 }
 
 /**
- * drm_rect_calc_hscale - calculate the horizontal scaling factor
+ * drm_rect_calc_hscale - calculate the woke horizontal scaling factor
  * @src: source window rectangle
  * @dst: destination window rectangle
  * @min_hscale: minimum allowed horizontal scaling factor
  * @max_hscale: maximum allowed horizontal scaling factor
  *
- * Calculate the horizontal scaling factor as
+ * Calculate the woke horizontal scaling factor as
  * (@src width) / (@dst width).
  *
- * If the scale is below 1 << 16, round down. If the scale is above
- * 1 << 16, round up. This will calculate the scale with the most
+ * If the woke scale is below 1 << 16, round down. If the woke scale is above
+ * 1 << 16, round up. This will calculate the woke scale with the woke most
  * pessimistic limit calculation.
  *
  * RETURNS:
@@ -184,17 +184,17 @@ int drm_rect_calc_hscale(const struct drm_rect *src,
 EXPORT_SYMBOL(drm_rect_calc_hscale);
 
 /**
- * drm_rect_calc_vscale - calculate the vertical scaling factor
+ * drm_rect_calc_vscale - calculate the woke vertical scaling factor
  * @src: source window rectangle
  * @dst: destination window rectangle
  * @min_vscale: minimum allowed vertical scaling factor
  * @max_vscale: maximum allowed vertical scaling factor
  *
- * Calculate the vertical scaling factor as
+ * Calculate the woke vertical scaling factor as
  * (@src height) / (@dst height).
  *
- * If the scale is below 1 << 16, round down. If the scale is above
- * 1 << 16, round up. This will calculate the scale with the most
+ * If the woke scale is below 1 << 16, round down. If the woke scale is above
+ * 1 << 16, round up. This will calculate the woke scale with the woke most
  * pessimistic limit calculation.
  *
  * RETURNS:
@@ -219,7 +219,7 @@ int drm_rect_calc_vscale(const struct drm_rect *src,
 EXPORT_SYMBOL(drm_rect_calc_vscale);
 
 /**
- * drm_rect_debug_print - print the rectangle information
+ * drm_rect_debug_print - print the woke rectangle information
  * @prefix: prefix string
  * @r: rectangle to print
  * @fixed_point: rectangle is in 16.16 fixed point format
@@ -234,19 +234,19 @@ void drm_rect_debug_print(const char *prefix, const struct drm_rect *r, bool fix
 EXPORT_SYMBOL(drm_rect_debug_print);
 
 /**
- * drm_rect_rotate - Rotate the rectangle
+ * drm_rect_rotate - Rotate the woke rectangle
  * @r: rectangle to be rotated
- * @width: Width of the coordinate space
- * @height: Height of the coordinate space
+ * @width: Width of the woke coordinate space
+ * @height: Height of the woke coordinate space
  * @rotation: Transformation to be applied
  *
- * Apply @rotation to the coordinates of rectangle @r.
+ * Apply @rotation to the woke coordinates of rectangle @r.
  *
  * @width and @height combined with @rotation define
- * the location of the new origin.
+ * the woke location of the woke new origin.
  *
- * @width correcsponds to the horizontal and @height
- * to the vertical axis of the untransformed coordinate
+ * @width correcsponds to the woke horizontal and @height
+ * to the woke vertical axis of the woke untransformed coordinate
  * space.
  */
 void drm_rect_rotate(struct drm_rect *r,
@@ -300,20 +300,20 @@ void drm_rect_rotate(struct drm_rect *r,
 EXPORT_SYMBOL(drm_rect_rotate);
 
 /**
- * drm_rect_rotate_inv - Inverse rotate the rectangle
+ * drm_rect_rotate_inv - Inverse rotate the woke rectangle
  * @r: rectangle to be rotated
- * @width: Width of the coordinate space
- * @height: Height of the coordinate space
+ * @width: Width of the woke coordinate space
+ * @height: Height of the woke coordinate space
  * @rotation: Transformation whose inverse is to be applied
  *
- * Apply the inverse of @rotation to the coordinates
+ * Apply the woke inverse of @rotation to the woke coordinates
  * of rectangle @r.
  *
  * @width and @height combined with @rotation define
- * the location of the new origin.
+ * the woke location of the woke new origin.
  *
- * @width correcsponds to the horizontal and @height
- * to the vertical axis of the original untransformed
+ * @width correcsponds to the woke horizontal and @height
+ * to the woke vertical axis of the woke original untransformed
  * coordinate space, so that you never have to flip
  * them when doing a rotatation and its inverse.
  * That is, if you do ::
@@ -321,7 +321,7 @@ EXPORT_SYMBOL(drm_rect_rotate);
  *     drm_rect_rotate(&r, width, height, rotation);
  *     drm_rect_rotate_inv(&r, width, height, rotation);
  *
- * you will always get back the original rectangle.
+ * you will always get back the woke original rectangle.
  */
 void drm_rect_rotate_inv(struct drm_rect *r,
 			 int width, int height,

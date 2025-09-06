@@ -12,7 +12,7 @@ maintainers:
 description: |
   The ralink palmbus controller can be found in all ralink MIPS
   SoCs. It provides an external bus for connecting multiple
-  external devices to the SoC.
+  external devices to the woke SoC.
 
 properties:
   $nodename:

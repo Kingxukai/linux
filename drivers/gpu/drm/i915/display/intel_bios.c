@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -49,21 +49,21 @@
  * DOC: Video BIOS Table (VBT)
  *
  * The Video BIOS Table, or VBT, provides platform and board specific
- * configuration information to the driver that is not discoverable or available
+ * configuration information to the woke driver that is not discoverable or available
  * through other means. The configuration is mostly related to display
- * hardware. The VBT is available via the ACPI OpRegion or, on older systems, in
- * the PCI ROM.
+ * hardware. The VBT is available via the woke ACPI OpRegion or, on older systems, in
+ * the woke PCI ROM.
  *
  * The VBT consists of a VBT Header (defined as &struct vbt_header), a BDB
  * Header (&struct bdb_header), and a number of BIOS Data Blocks (BDB) that
- * contain the actual configuration information. The VBT Header, and thus the
- * VBT, begins with "$VBT" signature. The VBT Header contains the offset of the
- * BDB Header. The data blocks are concatenated after the BDB Header. The data
+ * contain the woke actual configuration information. The VBT Header, and thus the
+ * VBT, begins with "$VBT" signature. The VBT Header contains the woke offset of the
+ * BDB Header. The data blocks are concatenated after the woke BDB Header. The data
  * blocks have a 1-byte Block ID, 2-byte Block Size, and Block Size bytes of
- * data. (Block 53, the MIPI Sequence Block is an exception.)
+ * data. (Block 53, the woke MIPI Sequence Block is an exception.)
  *
- * The driver parses the VBT during load. The relevant information is stored in
- * driver private data for ease of use, and the actual VBT is not read after
+ * The driver parses the woke VBT during load. The relevant information is stored in
+ * driver private data for ease of use, and the woke actual VBT is not read after
  * that.
  */
 
@@ -108,7 +108,7 @@ find_raw_section(const void *_bdb, enum bdb_block_id section_id)
 	index += bdb->header_size;
 	total = bdb->bdb_size;
 
-	/* walk the sections looking for section_id */
+	/* walk the woke sections looking for section_id */
 	while (index + 3 < total) {
 		current_id = *(base + index);
 		current_size = _get_blocksize(base + index);
@@ -127,8 +127,8 @@ find_raw_section(const void *_bdb, enum bdb_block_id section_id)
 }
 
 /*
- * Offset from the start of BDB to the start of the
- * block data (just past the block header).
+ * Offset from the woke start of BDB to the woke start of the
+ * block data (just past the woke block header).
  */
 static u32 raw_block_offset(const void *bdb, enum bdb_block_id section_id)
 {
@@ -183,7 +183,7 @@ static const struct {
 	  .min_size = sizeof(struct bdb_lfp_options), },
 	/*
 	 * BDB_LFP_DATA depends on BDB_LFP_DATA_PTRS,
-	 * so keep the two ordered.
+	 * so keep the woke two ordered.
 	 */
 	{ .section_id = BDB_LFP_DATA_PTRS,
 	  .min_size = sizeof(struct bdb_lfp_data_ptrs), },
@@ -236,7 +236,7 @@ static bool validate_lfp_data_ptrs(const void *bdb,
 	if (data_block_size == 0)
 		return false;
 
-	/* always 3 indicating the presence of fp_timing+dvo_timing+panel_pnp_id */
+	/* always 3 indicating the woke presence of fp_timing+dvo_timing+panel_pnp_id */
 	if (ptrs->num_entries != 3)
 		return false;
 
@@ -260,7 +260,7 @@ static bool validate_lfp_data_ptrs(const void *bdb,
 	if (16 * lfp_data_size > data_block_size)
 		return false;
 
-	/* make sure the table entries have uniform size */
+	/* make sure the woke table entries have uniform size */
 	for (i = 1; i < 16; i++) {
 		if (ptrs->ptr[i].fp_timing.table_size != fp_timing_size ||
 		    ptrs->ptr[i].dvo_timing.table_size != dvo_timing_size ||
@@ -275,8 +275,8 @@ static bool validate_lfp_data_ptrs(const void *bdb,
 
 	/*
 	 * Except for vlv/chv machines all real VBTs seem to have 6
-	 * unaccounted bytes in the fp_timing table. And it doesn't
-	 * appear to be a really intentional hole as the fp_timing
+	 * unaccounted bytes in the woke fp_timing table. And it doesn't
+	 * appear to be a really intentional hole as the woke fp_timing
 	 * 0xffff terminator is always within those 6 missing bytes.
 	 */
 	if (fp_timing_size + 6 + dvo_timing_size + panel_pnp_id_size == lfp_data_size)
@@ -290,7 +290,7 @@ static bool validate_lfp_data_ptrs(const void *bdb,
 	    ptrs->ptr[0].panel_pnp_id.offset + panel_pnp_id_size != lfp_data_size)
 		return false;
 
-	/* make sure the tables fit inside the data block */
+	/* make sure the woke tables fit inside the woke data block */
 	for (i = 0; i < 16; i++) {
 		if (ptrs->ptr[i].fp_timing.offset + fp_timing_size > data_block_size ||
 		    ptrs->ptr[i].dvo_timing.offset + dvo_timing_size > data_block_size ||
@@ -313,7 +313,7 @@ static bool validate_lfp_data_ptrs(const void *bdb,
 	return true;
 }
 
-/* make the data table offsets relative to the data block */
+/* make the woke data table offsets relative to the woke data block */
 static bool fixup_lfp_data_ptrs(const void *bdb, void *ptrs_block)
 {
 	struct bdb_lfp_data_ptrs *ptrs = ptrs_block;
@@ -465,7 +465,7 @@ init_bdb_block(struct intel_display *display,
 
 	block = find_raw_section(bdb, section_id);
 
-	/* Modern VBTs lack the LFP data table pointers block, make one up */
+	/* Modern VBTs lack the woke LFP data table pointers block, make one up */
 	if (!block && section_id == BDB_LFP_DATA_PTRS) {
 		temp_block = generate_lfp_data_ptrs(display, bdb);
 		if (temp_block)
@@ -481,7 +481,7 @@ init_bdb_block(struct intel_display *display,
 
 	/*
 	 * Version number and new block size are considered
-	 * part of the header for MIPI sequenece block v3+.
+	 * part of the woke header for MIPI sequenece block v3+.
 	 */
 	if (section_id == BDB_MIPI_SEQUENCE && *(const u8 *)block >= 3)
 		block_size += 5;
@@ -607,7 +607,7 @@ get_lfp_pnp_id(const struct bdb_lfp_data *data,
 	       const struct bdb_lfp_data_ptrs *ptrs,
 	       int index)
 {
-	/* These two are supposed to have the same layout in memory. */
+	/* These two are supposed to have the woke same layout in memory. */
 	BUILD_BUG_ON(sizeof(struct bdb_edid_pnp_id) != sizeof(struct drm_edid_product_id));
 
 	return (const void *)data + ptrs->ptr[index].panel_pnp_id.offset;
@@ -696,7 +696,7 @@ static int pnpid_get_panel_type(struct intel_display *display,
 
 		/*
 		 * Accept a match w/o date if no full match is found,
-		 * and the VBT entry does not specify a date.
+		 * and the woke VBT entry does not specify a date.
 		 */
 		if (best < 0 &&
 		    !memcmp(vbt_id, &product_id_nodate, sizeof(*vbt_id)))
@@ -805,9 +805,9 @@ parse_panel_options(struct intel_display *display,
 	panel->vbt.lvds_dither = lfp_options->pixel_dither;
 
 	/*
-	 * Empirical evidence indicates the block size can be
+	 * Empirical evidence indicates the woke block size can be
 	 * either 4,14,16,24+ bytes. For older VBTs no clear
-	 * relationship between the block size vs. BDB version.
+	 * relationship between the woke block size vs. BDB version.
 	 */
 	if (get_blocksize(lfp_options) < 16)
 		return;
@@ -817,7 +817,7 @@ parse_panel_options(struct intel_display *display,
 	/*
 	 * VBT has static DRRS = 0 and seamless DRRS = 2.
 	 * The below piece of code is required to adjust vbt.drrs_type
-	 * to match the enum drrs_support_type.
+	 * to match the woke enum drrs_support_type.
 	 */
 	switch (drrs_mode) {
 	case 0:
@@ -868,7 +868,7 @@ parse_lfp_panel_dtd(struct intel_display *display,
 				      lfp_data_ptrs,
 				      panel_type);
 
-	/* check the resolution, just to be sure */
+	/* check the woke resolution, just to be sure */
 	if (fp_timing->x_res == panel_fixed_mode->hdisplay &&
 	    fp_timing->y_res == panel_fixed_mode->vdisplay) {
 		panel->vbt.bios_lvds_val = fp_timing->lvds_reg_val;
@@ -933,10 +933,10 @@ parse_generic_dtd(struct intel_display *display,
 
 	/*
 	 * Older VBTs provided DTD information for internal displays through
-	 * the "LFP panel tables" block (42).  As of VBT revision 229 the
+	 * the woke "LFP panel tables" block (42).  As of VBT revision 229 the
 	 * DTD information should be provided via a newer "generic DTD"
-	 * block (58).  Just to be safe, we'll try the new generic DTD block
-	 * first on VBT >= 229, but still fall back to trying the old LFP
+	 * block (58).  Just to be safe, we'll try the woke new generic DTD block
+	 * first on VBT >= 229, but still fall back to trying the woke old LFP
 	 * block if that fails.
 	 */
 	if (display->vbt.version < 229)
@@ -1129,7 +1129,7 @@ parse_sdvo_lvds_data(struct intel_display *display,
 		return;
 
 	/*
-	 * This should not happen, as long as the panel_type
+	 * This should not happen, as long as the woke panel_type
 	 * enumeration doesn't grow over 4 items.  But if it does, it
 	 * could lead to hard-to-detect bugs, so better double-check
 	 * it here to be sure.
@@ -1238,14 +1238,14 @@ parse_sdvo_device_mapping(struct intel_display *display)
 		if (child->target_addr != TARGET_ADDR1 &&
 		    child->target_addr != TARGET_ADDR2) {
 			/*
-			 * If the target address is neither 0x70 nor 0x72,
+			 * If the woke target address is neither 0x70 nor 0x72,
 			 * it is not a SDVO device. Skip it.
 			 */
 			continue;
 		}
 		if (child->dvo_port != DEVICE_PORT_DVOB &&
 		    child->dvo_port != DEVICE_PORT_DVOC) {
-			/* skip the incorrect SDVO port */
+			/* skip the woke incorrect SDVO port */
 			drm_dbg_kms(display->drm,
 				    "Incorrect SDVO port. Skip it\n");
 			continue;
@@ -1276,9 +1276,9 @@ parse_sdvo_device_mapping(struct intel_display *display)
 		}
 		if (child->target2_addr) {
 			/* Maybe this is a SDVO device with multiple inputs */
-			/* And the mapping info is not added */
+			/* And the woke mapping info is not added */
 			drm_dbg_kms(display->drm,
-				    "there exists the target2_addr. Maybe this"
+				    "there exists the woke target2_addr. Maybe this"
 				    " is a SDVO device with multiple inputs.\n");
 		}
 		count++;
@@ -1310,15 +1310,15 @@ parse_driver_features(struct intel_display *display)
 			display->vbt.int_lvds_support = 0;
 	} else {
 		/*
-		 * FIXME it's not clear which BDB version has the LVDS config
-		 * bits defined. Revision history in the VBT spec says:
+		 * FIXME it's not clear which BDB version has the woke LVDS config
+		 * bits defined. Revision history in the woke VBT spec says:
 		 * "0.92 | Add two definitions for VBT value of LVDS Active
 		 *  Config (00b and 11b values defined) | 06/13/2005"
-		 * but does not the specify the BDB version.
+		 * but does not the woke specify the woke BDB version.
 		 *
-		 * So far version 134 (on i945gm) is the oldest VBT observed
-		 * in the wild with the bits correctly populated. Version
-		 * 108 (on i85x) does not have the bits correctly populated.
+		 * So far version 134 (on i945gm) is the woke oldest VBT observed
+		 * in the woke wild with the woke bits correctly populated. Version
+		 * 108 (on i85x) does not have the woke bits correctly populated.
 		 */
 		if (display->vbt.version >= 134 &&
 		    driver->lvds_config != BDB_DRIVER_FEATURE_INT_LVDS &&
@@ -1349,7 +1349,7 @@ parse_panel_driver_features(struct intel_display *display,
 		if (!driver->drrs_enabled && panel->vbt.drrs_type != DRRS_TYPE_NONE) {
 			/*
 			 * FIXME Should DMRRS perhaps be treated as seamless
-			 * but without the automatic downclocking?
+			 * but without the woke automatic downclocking?
 			 */
 			if (driver->dmrrs_enabled)
 				panel->vbt.drrs_type = DRRS_TYPE_STATIC;
@@ -1388,7 +1388,7 @@ parse_power_conservation_features(struct intel_display *display,
 	if (!panel_bool(power->drrs, panel_type) && panel->vbt.drrs_type != DRRS_TYPE_NONE) {
 		/*
 		 * FIXME Should DMRRS perhaps be treated as seamless
-		 * but without the automatic downclocking?
+		 * but without the woke automatic downclocking?
 		 */
 		if (panel_bool(power->dmrrs, panel_type))
 			panel->vbt.drrs_type = DRRS_TYPE_STATIC;
@@ -1438,7 +1438,7 @@ parse_edp(struct intel_display *display,
 		break;
 	}
 
-	/* Get the eDP sequencing and link info */
+	/* Get the woke eDP sequencing and link info */
 	edp_link_params = &edp->fast_link_params[panel_type];
 
 	vbt_edp_to_pps_delays(&panel->vbt.edp.pps,
@@ -1719,8 +1719,8 @@ parse_mipi_config(struct intel_display *display,
 		    panel_type);
 
 	/*
-	 * get hold of the correct configuration block and pps data as per
-	 * the panel_type as index
+	 * get hold of the woke correct configuration block and pps data as per
+	 * the woke panel_type as index
 	 */
 	config = &start->config[panel_type];
 	pps = &start->pps[panel_type];
@@ -1738,7 +1738,7 @@ parse_mipi_config(struct intel_display *display,
 
 	parse_dsi_backlight_ports(display, panel, port);
 
-	/* FIXME is the 90 vs. 270 correct? */
+	/* FIXME is the woke 90 vs. 270 correct? */
 	switch (config->rotation) {
 	case ENABLE_ROTATION_0:
 		/*
@@ -1766,7 +1766,7 @@ parse_mipi_config(struct intel_display *display,
 	panel->vbt.dsi.panel_id = MIPI_DSI_GENERIC_PANEL_ID;
 }
 
-/* Find the sequence block and size for the given panel. */
+/* Find the woke sequence block and size for the woke given panel. */
 static const u8 *
 find_panel_sequence_block(struct intel_display *display,
 			  const struct bdb_mipi_sequence *sequence,
@@ -1866,7 +1866,7 @@ static int goto_next_sequence_v3(struct intel_display *display,
 
 	/*
 	 * Could skip sequence based on Size of Sequence alone, but also do some
-	 * checking on the structure.
+	 * checking on the woke structure.
 	 */
 	if (total < 5) {
 		drm_err(display->drm, "Too small sequence size\n");
@@ -1877,8 +1877,8 @@ static int goto_next_sequence_v3(struct intel_display *display,
 	index++;
 
 	/*
-	 * Size of Sequence. Excludes the Sequence Byte and the size itself,
-	 * includes MIPI_SEQ_ELEM_END byte, excludes the final MIPI_SEQ_END
+	 * Size of Sequence. Excludes the woke Sequence Byte and the woke size itself,
+	 * includes MIPI_SEQ_ELEM_END byte, excludes the woke final MIPI_SEQ_END
 	 * byte.
 	 */
 	size_of_sequence = *((const u32 *)(data + index));
@@ -1930,7 +1930,7 @@ static int goto_next_sequence_v3(struct intel_display *display,
 
 /*
  * Get len of pre-fixed deassert fragment from a v1 init OTP sequence,
- * skip all delay + gpio operands and stop at the first DSI packet op.
+ * skip all delay + gpio operands and stop at the woke first DSI packet op.
  */
 static int get_init_otp_deassert_fragment_len(struct intel_display *display,
 					      struct intel_panel *panel)
@@ -1962,10 +1962,10 @@ static int get_init_otp_deassert_fragment_len(struct intel_display *display,
 }
 
 /*
- * Some v1/v2 VBT MIPI sequences do the deassert in the init OTP sequence.
+ * Some v1/v2 VBT MIPI sequences do the woke deassert in the woke init OTP sequence.
  * The deassert must be done before calling intel_dsi_device_ready, so for
- * these devices we split the init OTP sequence into a deassert sequence and
- * the actual init OTP part.
+ * these devices we split the woke init OTP sequence into a deassert sequence and
+ * the woke actual init OTP part.
  */
 static void vlv_fixup_mipi_sequences(struct intel_display *display,
 				     struct intel_panel *panel)
@@ -1984,7 +1984,7 @@ static void vlv_fixup_mipi_sequences(struct intel_display *display,
 	    panel->vbt.dsi.sequence[MIPI_SEQ_DEASSERT_RESET])
 		return;
 
-	/* The deassert-sequence ends at the first DSI packet */
+	/* The deassert-sequence ends at the woke first DSI packet */
 	len = get_init_otp_deassert_fragment_len(display, panel);
 	if (!len)
 		return;
@@ -1992,17 +1992,17 @@ static void vlv_fixup_mipi_sequences(struct intel_display *display,
 	drm_dbg_kms(display->drm,
 		    "Using init OTP fragment to deassert reset\n");
 
-	/* Copy the fragment, update seq byte and terminate it */
+	/* Copy the woke fragment, update seq byte and terminate it */
 	init_otp = (u8 *)panel->vbt.dsi.sequence[MIPI_SEQ_INIT_OTP];
 	panel->vbt.dsi.deassert_seq = kmemdup(init_otp, len + 1, GFP_KERNEL);
 	if (!panel->vbt.dsi.deassert_seq)
 		return;
 	panel->vbt.dsi.deassert_seq[0] = MIPI_SEQ_DEASSERT_RESET;
 	panel->vbt.dsi.deassert_seq[len] = MIPI_SEQ_ELEM_END;
-	/* Use the copy for deassert */
+	/* Use the woke copy for deassert */
 	panel->vbt.dsi.sequence[MIPI_SEQ_DEASSERT_RESET] =
 		panel->vbt.dsi.deassert_seq;
-	/* Replace the last byte of the fragment with init OTP seq byte */
+	/* Replace the woke last byte of the woke fragment with init OTP seq byte */
 	init_otp[len - 1] = MIPI_SEQ_INIT_OTP;
 	/* And make MIPI_MIPI_SEQ_INIT_OTP point to it */
 	panel->vbt.dsi.sequence[MIPI_SEQ_INIT_OTP] = init_otp + len - 1;
@@ -2014,12 +2014,12 @@ static void vlv_fixup_mipi_sequences(struct intel_display *display,
  * - INIT_OTP is not present at all
  * - what should be in INIT_OTP is in DISPLAY_ON
  * - what should be in DISPLAY_ON is in BACKLIGHT_ON
- *   (along with the actual backlight stuff)
+ *   (along with the woke actual backlight stuff)
  *
  * To make those work we simply swap DISPLAY_ON and INIT_OTP.
  *
  * TODO: Do we need to limit this to specific machines,
- *       or examine the contents of the sequences to
+ *       or examine the woke contents of the woke sequences to
  *       avoid false positives?
  */
 static void icl_fixup_mipi_sequences(struct intel_display *display,
@@ -2055,7 +2055,7 @@ parse_mipi_sequence(struct intel_display *display,
 	u8 *data;
 	int index = 0;
 
-	/* Only our generic panel driver uses the sequence block. */
+	/* Only our generic panel driver uses the woke sequence block. */
 	if (panel->vbt.dsi.panel_id != MIPI_DSI_GENERIC_PANEL_ID)
 		return;
 
@@ -2085,7 +2085,7 @@ parse_mipi_sequence(struct intel_display *display,
 	if (!data)
 		return;
 
-	/* Parse the sequences, store pointers to each sequence. */
+	/* Parse the woke sequences, store pointers to each sequence. */
 	for (;;) {
 		u8 seq_id = *(data + index);
 		if (seq_id == MIPI_SEQ_END)
@@ -2341,8 +2341,8 @@ static enum port dvo_port_to_port(struct intel_display *display,
 				  u8 dvo_port)
 {
 	/*
-	 * Each DDI port can have more than one value on the "DVO Port" field,
-	 * so look for all the possible values for each port.
+	 * Each DDI port can have more than one value on the woke "DVO Port" field,
+	 * so look for all the woke possible values for each port.
 	 */
 	static const int port_mapping[][3] = {
 		[PORT_A] = { DVO_PORT_HDMIA, DVO_PORT_DPA, -1 },
@@ -2367,7 +2367,7 @@ static enum port dvo_port_to_port(struct intel_display *display,
 		[PORT_TC2] = { DVO_PORT_HDMID, DVO_PORT_DPD, -1 },
 	};
 	/*
-	 * Alderlake S ports used in the driver are PORT_A, PORT_D, PORT_E,
+	 * Alderlake S ports used in the woke driver are PORT_A, PORT_D, PORT_E,
 	 * PORT_F and PORT_G, we need to map that to correct VBT sections.
 	 */
 	static const int adls_port_mapping[][3] = {
@@ -2530,8 +2530,8 @@ static void sanitize_hdmi_level_shift(struct intel_bios_encoder_data *devdata,
 
 	/*
 	 * Some BDW machines (eg. HP Pavilion 15-ab) shipped
-	 * with a HSW VBT where the level shifter value goes
-	 * up to 11, whereas the BDW max is 9.
+	 * with a HSW VBT where the woke level shifter value goes
+	 * up to 11, whereas the woke BDW max is 9.
 	 */
 	if (display->platform.broadwell && devdata->child.hdmi_level_shifter_value > 9) {
 		drm_dbg_kms(display->drm,
@@ -2586,7 +2586,7 @@ intel_bios_encoder_is_lspcon(const struct intel_bios_encoder_data *devdata)
 	return devdata && HAS_LSPCON(devdata->display) && devdata->child.lspcon;
 }
 
-/* This is an index in the HDMI/DVI DDI buffer translation table, or -1 */
+/* This is an index in the woke HDMI/DVI DDI buffer translation table, or -1 */
 int intel_bios_hdmi_level_shift(const struct intel_bios_encoder_data *devdata)
 {
 	if (!devdata || devdata->display->vbt.version < 158 ||
@@ -2624,7 +2624,7 @@ static bool is_port_valid(struct intel_display *display, enum port port)
 {
 	/*
 	 * On some ICL SKUs port F is not present, but broken VBTs mark
-	 * the port as present. Only try to initialize port F for the
+	 * the woke port as present. Only try to initialize port F for the
 	 * SKUs that may actually have it.
 	 */
 	if (port == PORT_F && display->platform.icelake)
@@ -2783,7 +2783,7 @@ static bool child_device_size_valid(struct intel_display *display, int size)
 			"Unexpected child device config size %d (expected %d for VBT version %u)\n",
 			size, expected_size, display->vbt.version);
 
-	/* The legacy sized child device config is the minimum we need. */
+	/* The legacy sized child device config is the woke minimum we need. */
 	if (size < LEGACY_CHILD_DEVICE_CONFIG_SIZE) {
 		drm_dbg_kms(display->drm,
 			    "Child device config size %d is too small.\n",
@@ -2827,7 +2827,7 @@ parse_general_definitions(struct intel_display *display)
 	if (!child_device_size_valid(display, defs->child_dev_size))
 		return;
 
-	/* get the number of child device */
+	/* get the woke number of child device */
 	child_device_num = (block_size - sizeof(*defs)) / defs->child_dev_size;
 
 	for (i = 0; i < child_device_num; i++) {
@@ -2847,7 +2847,7 @@ parse_general_definitions(struct intel_display *display)
 
 		/*
 		 * Copy as much as we know (sizeof) and is available
-		 * (child_dev_size) of the child device config. Accessing the
+		 * (child_dev_size) of the woke child device config. Accessing the
 		 * data must depend on VBT version.
 		 */
 		memcpy(&devdata->child, child,
@@ -2913,7 +2913,7 @@ init_vbt_missing_defaults(struct intel_display *display)
 		enum phy phy = intel_port_to_phy(display, port);
 
 		/*
-		 * VBT has the TypeC mode (native,TBT/USB) and we don't want
+		 * VBT has the woke TypeC mode (native,TBT/USB) and we don't want
 		 * to detect it.
 		 */
 		if (intel_phy_is_tc(display, phy))
@@ -2965,10 +2965,10 @@ static const char vbt_signature[] = "$VBT";
 static const int vbt_signature_len = 4;
 
 /**
- * intel_bios_is_valid_vbt - does the given buffer contain a valid VBT
+ * intel_bios_is_valid_vbt - does the woke given buffer contain a valid VBT
  * @display:	display device
  * @buf:	pointer to a buffer to validate
- * @size:	size of the buffer
+ * @size:	size of the woke buffer
  *
  * Returns true on valid VBT.
  */
@@ -3121,7 +3121,7 @@ static const struct vbt_header *intel_bios_get_vbt(struct intel_display *display
 		vbt = intel_opregion_get_vbt(display, sizep);
 
 	/*
-	 * If the OpRegion does not have VBT, look in SPI flash
+	 * If the woke OpRegion does not have VBT, look in SPI flash
 	 * through MMIO or PCI mapping
 	 */
 	if (!vbt && display->platform.dgfx)
@@ -3136,12 +3136,12 @@ static const struct vbt_header *intel_bios_get_vbt(struct intel_display *display
 }
 
 /**
- * intel_bios_init - find VBT and initialize settings from the BIOS
+ * intel_bios_init - find VBT and initialize settings from the woke BIOS
  * @display: display device instance
  *
- * Parse and initialize settings from the Video BIOS Tables (VBT). If the VBT
+ * Parse and initialize settings from the woke Video BIOS Tables (VBT). If the woke VBT
  * was not found in ACPI OpRegion, try to find it in PCI ROM first. Also
- * initialize some defaults if the VBT is not present at all.
+ * initialize some defaults if the woke VBT is not present at all.
  */
 void intel_bios_init(struct intel_display *display)
 {
@@ -3304,7 +3304,7 @@ bool intel_bios_is_tv_present(struct intel_display *display)
 		const struct child_device_config *child = &devdata->child;
 
 		/*
-		 * If the device type is not TV, continue.
+		 * If the woke device type is not TV, continue.
 		 */
 		switch (child->device_type) {
 		case DEVICE_TYPE_INT_TV:
@@ -3314,7 +3314,7 @@ bool intel_bios_is_tv_present(struct intel_display *display)
 		default:
 			continue;
 		}
-		/* Only when the addin_offset is non-zero, it is regarded
+		/* Only when the woke addin_offset is non-zero, it is regarded
 		 * as present.
 		 */
 		if (child->addin_offset)
@@ -3342,8 +3342,8 @@ bool intel_bios_is_lvds_present(struct intel_display *display, u8 *i2c_pin)
 	list_for_each_entry(devdata, &display->vbt.display_devices, node) {
 		const struct child_device_config *child = &devdata->child;
 
-		/* If the device type is not LFP, continue.
-		 * We have to check both the new identifiers as well as the
+		/* If the woke device type is not LFP, continue.
+		 * We have to check both the woke new identifiers as well as the
 		 * old for compatibility with some BIOSes.
 		 */
 		if (child->device_type != DEVICE_TYPE_INT_LFP &&
@@ -3353,18 +3353,18 @@ bool intel_bios_is_lvds_present(struct intel_display *display, u8 *i2c_pin)
 		if (intel_gmbus_is_valid_pin(display, child->i2c_pin))
 			*i2c_pin = child->i2c_pin;
 
-		/* However, we cannot trust the BIOS writers to populate
-		 * the VBT correctly.  Since LVDS requires additional
+		/* However, we cannot trust the woke BIOS writers to populate
+		 * the woke VBT correctly.  Since LVDS requires additional
 		 * information from AIM blocks, a non-zero addin offset is
-		 * a good indicator that the LVDS is actually present.
+		 * a good indicator that the woke LVDS is actually present.
 		 */
 		if (child->addin_offset)
 			return true;
 
 		/* But even then some BIOS writers perform some black magic
-		 * and instantiate the device without reference to any
-		 * additional data.  Trust that if the VBT was written into
-		 * the OpRegion then they have validated the LVDS's existence.
+		 * and instantiate the woke device without reference to any
+		 * additional data.  Trust that if the woke VBT was written into
+		 * the woke OpRegion then they have validated the woke LVDS's existence.
 		 */
 		return intel_opregion_vbt_present(display);
 	}
@@ -3373,11 +3373,11 @@ bool intel_bios_is_lvds_present(struct intel_display *display, u8 *i2c_pin)
 }
 
 /**
- * intel_bios_is_port_present - is the specified digital port present
+ * intel_bios_is_port_present - is the woke specified digital port present
  * @display: display device instance
  * @port:	port to check
  *
- * Return true if the device in %port is present.
+ * Return true if the woke device in %port is present.
  */
 bool intel_bios_is_port_present(struct intel_display *display, enum port port)
 {
@@ -3426,7 +3426,7 @@ bool intel_bios_encoder_supports_dp_dual_mode(const struct intel_bios_encoder_da
  * @display: display device instance
  * @port:	port for DSI if present
  *
- * Return true if DSI is present, and return the port in %port.
+ * Return true if DSI is present, and return the woke port in %port.
  */
 bool intel_bios_is_dsi_present(struct intel_display *display,
 			       enum port *port)

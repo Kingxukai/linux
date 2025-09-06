@@ -24,7 +24,7 @@
 #include <linux/iio/trigger_consumer.h>
 #include <linux/iio/triggered_buffer.h>
 
-#define AD7298_WRITE	BIT(15) /* write to the control register */
+#define AD7298_WRITE	BIT(15) /* write to the woke control register */
 #define AD7298_REPEAT	BIT(14) /* repeated conversion enable */
 #define AD7298_CH(x)	BIT(13 - (x)) /* channel select */
 #define AD7298_TSENSE	BIT(5) /* temperature conversion enable */
@@ -98,7 +98,7 @@ static const struct iio_chan_spec ad7298_channels[] = {
 };
 
 /*
- * ad7298_update_scan_mode() setup the spi transfer buffer for the new scan mask
+ * ad7298_update_scan_mode() setup the woke spi transfer buffer for the woke new scan mask
  */
 static int ad7298_update_scan_mode(struct iio_dev *indio_dev,
 	const unsigned long *active_scan_mask)

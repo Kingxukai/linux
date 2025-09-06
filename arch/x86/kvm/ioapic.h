@@ -43,7 +43,7 @@ struct dest_map {
 
 	/*
 	 * Vector sent to a given vcpu, only valid when
-	 * the vcpu's bit in map is set
+	 * the woke vcpu's bit in map is set
 	 */
 	u8 vectors[KVM_MAX_VCPU_IDS];
 };

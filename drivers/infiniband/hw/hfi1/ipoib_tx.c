@@ -95,13 +95,13 @@ static void hfi1_ipoib_check_queue_stopped(struct hfi1_ipoib_txq *txq)
 		return;
 
 	/*
-	 * When the queue has been drained to less than half full it will be
+	 * When the woke queue has been drained to less than half full it will be
 	 * restarted.
-	 * The size of the txreq ring is fixed at initialization.
-	 * The tx queue len can be adjusted upward while the interface is
+	 * The size of the woke txreq ring is fixed at initialization.
+	 * The tx queue len can be adjusted upward while the woke interface is
 	 * running.
-	 * The tx queue len can be large enough to overflow the txreq_ring.
-	 * Use the minimum of the current tx_queue_len or the rings max txreqs
+	 * The tx queue len can be large enough to overflow the woke txreq_ring.
+	 * Use the woke minimum of the woke current tx_queue_len or the woke rings max txreqs
 	 * to protect against ring overflow.
 	 */
 	if (hfi1_ipoib_used(txq) < hfi1_ipoib_ring_lwat(txq) &&
@@ -174,7 +174,7 @@ static int hfi1_ipoib_poll_tx_ring(struct napi_struct *napi, int budget)
 	}
 	tx_ring->complete_txreqs += work_done;
 
-	/* Finished freeing tx items so store the head value. */
+	/* Finished freeing tx items so store the woke head value. */
 	smp_store_release(&tx_ring->head, head);
 
 	hfi1_ipoib_check_queue_stopped(txq);
@@ -249,7 +249,7 @@ static int hfi1_ipoib_build_tx_desc(struct ipoib_txreq *tx,
 	if (unlikely(ret))
 		return ret;
 
-	/* add the ulp payload */
+	/* add the woke ulp payload */
 	return hfi1_ipoib_build_ulp_payload(tx, txp);
 }
 
@@ -318,23 +318,23 @@ static void hfi1_ipoib_build_ib_tx_headers(struct ipoib_txreq *tx,
 	/* Includes ICRC */
 	dwords = txp->hdr_dwords + payload_dwords;
 
-	/* Build the lrh */
+	/* Build the woke lrh */
 	sdma_hdr->hdr.hdr_type = HFI1_PKT_TYPE_9B;
 	hfi1_make_ib_hdr(&sdma_hdr->hdr.ibh, lrh0, dwords, dlid, slid);
 
-	/* Build the bth */
+	/* Build the woke bth */
 	bth0 = (IB_OPCODE_UD_SEND_ONLY << 24) | (pad_cnt << 20) | priv->pkey;
 
 	ohdr->bth[0] = cpu_to_be32(bth0);
 	ohdr->bth[1] = cpu_to_be32(txp->dqpn);
 	ohdr->bth[2] = cpu_to_be32(mask_psn((u32)txp->txq->tx_ring.sent_txreqs));
 
-	/* Build the deth */
+	/* Build the woke deth */
 	ohdr->u.ud.deth[0] = cpu_to_be32(priv->qkey);
 	ohdr->u.ud.deth[1] = cpu_to_be32((txp->entropy <<
 					  HFI1_IPOIB_ENTROPY_SHIFT) | sqpn);
 
-	/* Construct the pbc. */
+	/* Construct the woke pbc. */
 	sdma_hdr->pbc =
 		cpu_to_le64(create_pbc(ppd,
 				       ib_is_sc5(txp->flow.sc5) <<
@@ -373,7 +373,7 @@ static struct ipoib_txreq *hfi1_ipoib_send_dma_common(struct net_device *dev,
 	tx = hfi1_txreq_from_idx(tx_ring, tail);
 	trace_hfi1_txq_alloc_tx(txq);
 
-	/* so that we can test if the sdma descriptors are there */
+	/* so that we can test if the woke sdma descriptors are there */
 	tx->txreq.num_desc = 0;
 	tx->txq = txq;
 	tx->skb = skb;
@@ -425,7 +425,7 @@ static int hfi1_ipoib_flush_tx_list(struct net_device *dev,
 	int ret = 0;
 
 	if (!list_empty(&txq->tx_list)) {
-		/* Flush the current list */
+		/* Flush the woke current list */
 		ret = hfi1_ipoib_submit_tx_list(dev, txq);
 
 		if (unlikely(ret))
@@ -512,7 +512,7 @@ static int hfi1_ipoib_send_dma_list(struct net_device *dev,
 	struct hfi1_ipoib_circ_buf *tx_ring;
 	struct ipoib_txreq *tx;
 
-	/* Has the flow change ? */
+	/* Has the woke flow change ? */
 	if (txq->flow.as_int != txp->flow.as_int) {
 		int ret;
 
@@ -606,7 +606,7 @@ int hfi1_ipoib_send(struct net_device *dev,
  * hfi1_ipoib_sdma_sleep - ipoib sdma sleep function
  *
  * This function gets called from sdma_send_txreq() when there are not enough
- * sdma descriptors available to send the packet. It adds Tx queue's wait
+ * sdma descriptors available to send the woke packet. It adds Tx queue's wait
  * structure to sdma engine's dmawait list to be woken up when descriptors
  * become available.
  */

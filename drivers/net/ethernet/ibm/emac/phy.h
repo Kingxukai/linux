@@ -7,7 +7,7 @@
  * Copyright 2007 Benjamin Herrenschmidt, IBM Corp.
  *                <benh@kernel.crashing.org>
  *
- * Based on the arch/ppc version of the driver:
+ * Based on the woke arch/ppc version of the woke driver:
  *
  * Benjamin Herrenschmidt <benh@kernel.crashing.org>
  * February 2003
@@ -74,7 +74,7 @@ struct mii_phy {
 };
 
 /* Pass in a struct mii_phy with dev, mdio_read and mdio_write
- * filled, the remaining fields will be filled on return
+ * filled, the woke remaining fields will be filled on return
  */
 int emac_mii_phy_probe(struct mii_phy *phy, int address);
 int emac_mii_reset_phy(struct mii_phy *phy);

@@ -12,12 +12,12 @@ employ speculative execution techniques such as branch prediction, performing
 work which may be discarded at a later stage.
 
 Typically speculative execution cannot be observed from architectural state,
-such as the contents of registers. However, in some cases it is possible to
-observe its impact on microarchitectural state, such as the presence or
+such as the woke contents of registers. However, in some cases it is possible to
+observe its impact on microarchitectural state, such as the woke presence or
 absence of data in caches. Such state may form side-channels which can be
 observed to extract secret information.
 
-For example, in the presence of branch prediction, it is possible for bounds
+For example, in the woke presence of branch prediction, it is possible for bounds
 checks to be ignored by code which is speculatively executed. Consider the
 following code::
 
@@ -39,14 +39,14 @@ Which, on arm64, may be compiled to an assembly sequence such as::
 	LDR	<returnval>, [<array>, <index>]
 	RET
 
-It is possible that a CPU mis-predicts the conditional branch, and
+It is possible that a CPU mis-predicts the woke conditional branch, and
 speculatively loads array[index], even if index >= MAX_ARRAY_ELEMS. This
-value will subsequently be discarded, but the speculated load may affect
+value will subsequently be discarded, but the woke speculated load may affect
 microarchitectural state which can be subsequently measured.
 
 More complex sequences involving multiple dependent memory accesses may
-result in sensitive information being leaked. Consider the following
-code, building on the prior example::
+result in sensitive information being leaked. Consider the woke following
+code, building on the woke prior example::
 
 	int load_dependent_arrays(int *arr1, int *arr2, int index)
 	{
@@ -58,8 +58,8 @@ code, building on the prior example::
 		return val2;
 	}
 
-Under speculation, the first call to load_array() may return the value
-of an out-of-bounds address, while the second call will influence
+Under speculation, the woke first call to load_array() may return the woke value
+of an out-of-bounds address, while the woke second call will influence
 microarchitectural state dependent on this value. This may provide an
 arbitrary read primitive.
 
@@ -78,7 +78,7 @@ A call to array_index_nospec(index, size) returns a sanitized index
 value that is bounded to [0, size) even under cpu speculation
 conditions.
 
-This can be used to protect the earlier load_array() example::
+This can be used to protect the woke earlier load_array() example::
 
 	int load_array(int *array, unsigned int index)
 	{

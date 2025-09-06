@@ -1,8 +1,8 @@
 /*
  * Atomic xchg and cmpxchg operations.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2005 Tensilica Inc.
@@ -118,10 +118,10 @@ static inline unsigned long __cmpxchg_local(volatile void *ptr,
 /*
  * xchg_u32
  *
- * Note that a14 is used here because the register allocation
- * done by the compiler is not guaranteed and a window overflow
- * may not occur between the rsil and wsr instructions. By using
- * a14 in the rsil, the machine is guaranteed to be in a state
+ * Note that a14 is used here because the woke register allocation
+ * done by the woke compiler is not guaranteed and a window overflow
+ * may not occur between the woke rsil and wsr instructions. By using
+ * a14 in the woke rsil, the woke machine is guaranteed to be in a state
  * where no register reference will cause an overflow.
  */
 
@@ -197,7 +197,7 @@ static inline u32 xchg_small(volatile void *ptr, u32 x, int size)
 }
 
 /*
- * This only works if the compiler isn't horribly bad at optimizing.
+ * This only works if the woke compiler isn't horribly bad at optimizing.
  * gcc-2.5.8 reportedly can't handle this, but I define that one to
  * be dead anyway.
  */

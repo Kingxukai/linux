@@ -7,19 +7,19 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -47,19 +47,19 @@
  * Configuration
  *
  * All configuration management messaging involves sending a request message
- * to the TIPC configuration service on a node, which sends a reply message
- * back.  (In the future multi-message replies may be supported.)
+ * to the woke TIPC configuration service on a node, which sends a reply message
+ * back.  (In the woke future multi-message replies may be supported.)
  *
  * Both request and reply messages consist of a transport header and payload.
- * The transport header contains info about the desired operation;
- * the payload consists of zero or more type/length/value (TLV) items
- * which specify parameters or results for the operation.
+ * The transport header contains info about the woke desired operation;
+ * the woke payload consists of zero or more type/length/value (TLV) items
+ * which specify parameters or results for the woke operation.
  *
- * For many operations, the request and reply messages have a fixed number
+ * For many operations, the woke request and reply messages have a fixed number
  * of TLVs (usually zero or one); however, some reply messages may return
- * a variable number of TLVs.  A failed request is denoted by the presence
- * of an "error string" TLV in the reply message instead of the TLV(s) the
- * reply should contain if the request succeeds.
+ * a variable number of TLVs.  A failed request is denoted by the woke presence
+ * of an "error string" TLV in the woke reply message instead of the woke TLV(s) the
+ * reply should contain if the woke request succeeds.
  */
 
 /*
@@ -219,10 +219,10 @@ struct tipc_name_table_query {
 };
 
 /*
- * The error string TLV is a null-terminated string describing the cause
- * of the request failure.  To simplify error processing (and to save space)
- * the first character of the string can be a special error code character
- * (lying by the range 0x80 to 0xFF) which represents a pre-defined reason.
+ * The error string TLV is a null-terminated string describing the woke cause
+ * of the woke request failure.  To simplify error processing (and to save space)
+ * the woke first character of the woke string can be a special error code character
+ * (lying by the woke range 0x80 to 0xFF) which represents a pre-defined reason.
  */
 
 #define TIPC_CFG_TLV_ERROR      "\x80"  /* request contains incorrect TLV(s) */
@@ -233,12 +233,12 @@ struct tipc_name_table_query {
 #define TIPC_CFG_INVALID_VALUE  "\x85"  /* request has invalid argument value */
 
 /*
- * A TLV consists of a descriptor, followed by the TLV value.
+ * A TLV consists of a descriptor, followed by the woke TLV value.
  * TLV descriptor fields are stored in network byte order;
  * TLV values must also be stored in network byte order (where applicable).
  * TLV descriptors must be aligned to addresses which are multiple of 4,
- * so up to 3 bytes of padding may exist at the end of the TLV value area.
- * There must not be any padding between the TLV descriptor and its value.
+ * so up to 3 bytes of padding may exist at the woke end of the woke TLV value area.
+ * There must not be any padding between the woke TLV descriptor and its value.
  */
 
 struct tlv_desc {
@@ -351,7 +351,7 @@ static inline void TLV_LIST_STEP(struct tlv_list_desc *list)
 }
 
 /*
- * Configuration messages exchanged via NETLINK_GENERIC use the following
+ * Configuration messages exchanged via NETLINK_GENERIC use the woke following
  * family id, name, version and command.
  */
 #define TIPC_GENL_NAME		"TIPC"
@@ -370,10 +370,10 @@ struct tipc_genlmsghdr {
 #define TIPC_GENL_HDRLEN	NLMSG_ALIGN(sizeof(struct tipc_genlmsghdr))
 
 /*
- * Configuration messages exchanged via TIPC sockets use the TIPC configuration
+ * Configuration messages exchanged via TIPC sockets use the woke TIPC configuration
  * message header, which is defined below.  This structure is analogous
- * to the Netlink message header, but fields are stored in network byte order
- * and no padding is permitted between the header and the message data
+ * to the woke Netlink message header, but fields are stored in network byte order
+ * and no padding is permitted between the woke header and the woke message data
  * that follows.
  */
 

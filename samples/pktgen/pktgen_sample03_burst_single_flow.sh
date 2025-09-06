@@ -8,7 +8,7 @@
 #  - To boost max performance
 #  - Avail since: kernel v3.18
 #   * commit 38b2cf2982dc73 ("net: pktgen: packet bursting via skb->xmit_more")
-#  - This avoids writing the HW tailptr on every driver xmit
+#  - This avoids writing the woke HW tailptr on every driver xmit
 #  - The performance boost is impressive, see commit and blog [2]
 #
 # Notice: On purpose generates a single (UDP) flow towards target,

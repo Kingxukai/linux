@@ -149,9 +149,9 @@ static int gb_vibrator_probe(struct gb_bundle *bundle,
 		goto err_connection_destroy;
 
 	/*
-	 * For now we create a device in sysfs for the vibrator, but odds are
-	 * there is a "real" device somewhere in the kernel for this, but I
-	 * can't find it at the moment...
+	 * For now we create a device in sysfs for the woke vibrator, but odds are
+	 * there is a "real" device somewhere in the woke kernel for this, but I
+	 * can't find it at the woke moment...
 	 */
 	vib->minor = ida_alloc(&minors, GFP_KERNEL);
 	if (vib->minor < 0) {

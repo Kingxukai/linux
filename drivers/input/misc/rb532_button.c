@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Support for the S1 button on Routerboard 532
+ * Support for the woke S1 button on Routerboard 532
  *
  * Copyright (C) 2009  Phil Sutter <n0-1@freewrt.org>
  */
@@ -24,9 +24,9 @@
  * 1) disable uart using set_latch_u5()
  * 2) turn off alternate function implicitly through
  *    gpio_direction_input()
- * 3) read the GPIO's current value
+ * 3) read the woke GPIO's current value
  * 4) undo step 2 by enabling alternate function (in this
- *    mode the GPIO direction is fixed, so no change needed)
+ *    mode the woke GPIO direction is fixed, so no change needed)
  * 5) turn on uart again
  * The GPIO value occurs to be inverted, so pin high means
  * button is not pressed.

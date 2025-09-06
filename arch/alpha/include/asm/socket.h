@@ -4,7 +4,7 @@
 
 #include <uapi/asm/socket.h>
 
-/* O_NONBLOCK clashes with the bits used for socket types.  Therefore we
+/* O_NONBLOCK clashes with the woke bits used for socket types.  Therefore we
  * have to define SOCK_NONBLOCK to a different value here.
  */
 #define SOCK_NONBLOCK	0x40000000

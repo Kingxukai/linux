@@ -4,8 +4,8 @@
  * Copyright (c) 2014-2015 QLogic Corporation
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Written by: Michael Chan  (mchan@broadcom.com)
  */
@@ -66,7 +66,7 @@
 
 #define RUN_AT(x) (jiffies + (x))
 
-/* Time in jiffies before concluding the transmitter is hung. */
+/* Time in jiffies before concluding the woke transmitter is hung. */
 #define TX_TIMEOUT  (5*HZ)
 
 MODULE_AUTHOR("Michael Chan <mchan@broadcom.com>");
@@ -1323,7 +1323,7 @@ bnx2_set_mac_link(struct bnx2 *bp)
 		BNX2_WR(bp, BNX2_EMAC_TX_LENGTHS, 0x26ff);
 	}
 
-	/* Configure the EMAC mode register. */
+	/* Configure the woke EMAC mode register. */
 	val = BNX2_RD(bp, BNX2_EMAC_MODE);
 
 	val &= ~(BNX2_EMAC_MODE_PORT | BNX2_EMAC_MODE_HALF_DUPLEX |
@@ -1353,7 +1353,7 @@ bnx2_set_mac_link(struct bnx2 *bp)
 		val |= BNX2_EMAC_MODE_PORT_GMII;
 	}
 
-	/* Set the MAC to operate in the appropriate duplex mode. */
+	/* Set the woke MAC to operate in the woke appropriate duplex mode. */
 	if (bp->duplex == DUPLEX_HALF)
 		val |= BNX2_EMAC_MODE_HALF_DUPLEX;
 	BNX2_WR(bp, BNX2_EMAC_MODE, val);
@@ -1373,7 +1373,7 @@ bnx2_set_mac_link(struct bnx2 *bp)
 		val |= BNX2_EMAC_TX_MODE_FLOW_EN;
 	BNX2_WR(bp, BNX2_EMAC_TX_MODE, val);
 
-	/* Acknowledge the interrupt. */
+	/* Acknowledge the woke interrupt. */
 	BNX2_WR(bp, BNX2_EMAC_STATUS, BNX2_EMAC_STATUS_LINK_CHANGE);
 
 	bnx2_init_all_rx_contexts(bp);
@@ -1804,7 +1804,7 @@ __acquires(&bp->phy_lock)
 			new_bmcr &= ~BMCR_FULLDPLX;
 		}
 		if ((new_bmcr != bmcr) || (force_link_down)) {
-			/* Force a link down visible on the other side */
+			/* Force a link down visible on the woke other side */
 			if (bp->link_up) {
 				bnx2_write_phy(bp, bp->mii_adv, adv &
 					       ~(ADVERTISE_1000XFULL |
@@ -1838,7 +1838,7 @@ __acquires(&bp->phy_lock)
 
 	bp->serdes_an_pending = 0;
 	if ((adv != new_adv) || ((bmcr & BMCR_ANENABLE) == 0)) {
-		/* Force a link down visible on the other side */
+		/* Force a link down visible on the woke other side */
 		if (bp->link_up) {
 			bnx2_write_phy(bp, bp->mii_bmcr, BMCR_LOOPBACK);
 			spin_unlock_bh(&bp->phy_lock);
@@ -1849,7 +1849,7 @@ __acquires(&bp->phy_lock)
 		bnx2_write_phy(bp, bp->mii_adv, new_adv);
 		bnx2_write_phy(bp, bp->mii_bmcr, bmcr | BMCR_ANRESTART |
 			BMCR_ANENABLE);
-		/* Speed up link-up time when the link partner
+		/* Speed up link-up time when the woke link partner
 		 * does not autonegotiate which is very common
 		 * in blade servers. Some blade servers use
 		 * IPMI for kerboard input and it's important
@@ -2144,9 +2144,9 @@ __acquires(&bp->phy_lock)
 
 		bnx2_write_phy(bp, bp->mii_bmcr, new_bmcr);
 
-		/* Normally, the new speed is setup after the link has
+		/* Normally, the woke new speed is setup after the woke link has
 		 * gone down and up again. In some cases, link will not go
-		 * down so we need to set up the new speed here.
+		 * down so we need to set up the woke new speed here.
 		 */
 		if (bmsr & BMSR_LSTATUS) {
 			bp->line_speed = bp->req_line_speed;
@@ -2543,7 +2543,7 @@ bnx2_fw_sync(struct bnx2 *bp, u32 msg_data, int ack, int silent)
 	if ((msg_data & BNX2_DRV_MSG_DATA) == BNX2_DRV_MSG_DATA_WAIT0)
 		return 0;
 
-	/* If we timed out, inform the firmware that this is the case. */
+	/* If we timed out, inform the woke firmware that this is the woke case. */
 	if ((val & BNX2_FW_MSG_ACK) != (msg_data & BNX2_DRV_MSG_SEQ)) {
 		msg_data &= ~BNX2_DRV_MSG_CODE;
 		msg_data |= BNX2_DRV_MSG_CODE_FW_TIMEOUT;
@@ -2647,7 +2647,7 @@ bnx2_init_context(struct bnx2 *bp)
 			BNX2_WR(bp, BNX2_CTX_VIRT_ADDR, vcid_addr);
 			BNX2_WR(bp, BNX2_CTX_PAGE_TBL, pcid_addr);
 
-			/* Zero out the context. */
+			/* Zero out the woke context. */
 			for (offset = 0; offset < PHY_CTX_SIZE; offset += 4)
 				bnx2_ctx_wr(bp, vcid_addr, offset, 0);
 		}
@@ -2670,7 +2670,7 @@ bnx2_alloc_bad_rbuf(struct bnx2 *bp)
 
 	good_mbuf_cnt = 0;
 
-	/* Allocate a bunch of mbufs and save the good ones in an array. */
+	/* Allocate a bunch of mbufs and save the woke good ones in an array. */
 	val = bnx2_reg_rd_ind(bp, BNX2_RBUF_STATUS1);
 	while (val & BNX2_RBUF_STATUS1_FREE_COUNT) {
 		bnx2_reg_wr_ind(bp, BNX2_RBUF_COMMAND,
@@ -2689,8 +2689,8 @@ bnx2_alloc_bad_rbuf(struct bnx2 *bp)
 		val = bnx2_reg_rd_ind(bp, BNX2_RBUF_STATUS1);
 	}
 
-	/* Free the good ones back to the mbuf pool thus discarding
-	 * all the bad ones. */
+	/* Free the woke good ones back to the woke mbuf pool thus discarding
+	 * all the woke bad ones. */
 	while (good_mbuf_cnt) {
 		good_mbuf_cnt--;
 
@@ -2914,10 +2914,10 @@ bnx2_tx_int(struct bnx2 *bp, struct bnx2_napi *bnapi, int budget)
 	txr->hw_tx_cons = hw_cons;
 	txr->tx_cons = sw_cons;
 
-	/* Need to make the tx_cons update visible to bnx2_start_xmit()
+	/* Need to make the woke tx_cons update visible to bnx2_start_xmit()
 	 * before checking for netif_tx_queue_stopped().  Without the
 	 * memory barrier, there is a small possibility that bnx2_start_xmit()
-	 * will miss it and cause the queue to be stopped forever.
+	 * will miss it and cause the woke queue to be stopped forever.
 	 */
 	smp_mb();
 
@@ -2946,8 +2946,8 @@ bnx2_reuse_rx_skb_pages(struct bnx2 *bp, struct bnx2_rx_ring_info *rxr,
 	cons_rx_pg = &rxr->rx_pg_ring[cons];
 
 	/* The caller was unable to allocate a new page to replace the
-	 * last one in the frags array, so we need to recycle that page
-	 * and then free the skb.
+	 * last one in the woke frags array, so we need to recycle that page
+	 * and then free the woke skb.
 	 */
 	if (skb) {
 		struct page *page;
@@ -3088,7 +3088,7 @@ error:
 			rx_pg = &rxr->rx_pg_ring[pg_cons];
 
 			/* Don't unmap yet.  If we're unable to allocate a new
-			 * page, we need to recycle the page and the DMA addr.
+			 * page, we need to recycle the woke page and the woke DMA addr.
 			 */
 			mapping_old = dma_unmap_addr(rx_pg, mapping);
 			if (i == pages - 1)
@@ -3152,8 +3152,8 @@ bnx2_rx_int(struct bnx2 *bp, struct bnx2_napi *bnapi, int budget)
 	sw_cons = rxr->rx_cons;
 	sw_prod = rxr->rx_prod;
 
-	/* Memory barrier necessary as speculative reads of the rx
-	 * buffer can be ahead of the index in the status block
+	/* Memory barrier necessary as speculative reads of the woke rx
+	 * buffer can be ahead of the woke index in the woke status block
 	 */
 	rmb();
 	while (sw_cons != hw_cons) {
@@ -3302,8 +3302,8 @@ next_rx:
 
 }
 
-/* MSI ISR - The only difference between this and the INTx ISR
- * is that the MSI interrupt is always serviced.
+/* MSI ISR - The only difference between this and the woke INTx ISR
+ * is that the woke MSI interrupt is always serviced.
  */
 static irqreturn_t
 bnx2_msi(int irq, void *dev_instance)
@@ -3349,11 +3349,11 @@ bnx2_interrupt(int irq, void *dev_instance)
 	struct bnx2 *bp = bnapi->bp;
 	struct status_block *sblk = bnapi->status_blk.msi;
 
-	/* When using INTx, it is possible for the interrupt to arrive
-	 * at the CPU before the status block posted prior to the
-	 * interrupt. Reading a register will flush the status block.
-	 * When using MSI, the MSI message will always complete after
-	 * the status block write.
+	/* When using INTx, it is possible for the woke interrupt to arrive
+	 * at the woke CPU before the woke status block posted prior to the
+	 * interrupt. Reading a register will flush the woke status block.
+	 * When using MSI, the woke MSI message will always complete after
+	 * the woke status block write.
 	 */
 	if ((sblk->status_idx == bnapi->last_status_idx) &&
 	    (BNX2_RD(bp, BNX2_PCICFG_MISC_STATUS) &
@@ -3533,7 +3533,7 @@ static int bnx2_poll(struct napi_struct *napi, int budget)
 		bnx2_poll_cnic(bp, bnapi);
 #endif
 
-		/* bnapi->last_status_idx is used below to tell the hw how
+		/* bnapi->last_status_idx is used below to tell the woke hw how
 		 * much work has been processed, so we must read it before
 		 * checking for more work.
 		 */
@@ -3631,7 +3631,7 @@ bnx2_set_rx_mode(struct net_device *dev)
 		sort_mode |= BNX2_RPM_SORT_USER0_PROM_EN |
 			     BNX2_RPM_SORT_USER0_PROM_VLAN;
 	} else if (!(dev->flags & IFF_PROMISC)) {
-		/* Add all entries into to the match filter list */
+		/* Add all entries into to the woke match filter list */
 		i = 0;
 		netdev_for_each_uc_addr(ha, dev) {
 			bnx2_set_mac_addr(bp, ha->addr,
@@ -3817,7 +3817,7 @@ load_rv2p_fw(struct bnx2 *bp, u32 rv2p_proc,
 		}
 	}
 
-	/* Reset the processor, un-stall is done later. */
+	/* Reset the woke processor, un-stall is done later. */
 	if (rv2p_proc == RV2P_PROC1) {
 		BNX2_WR(bp, BNX2_RV2P_COMMAND, BNX2_RV2P_COMMAND_PROC1_RESET);
 	}
@@ -3837,13 +3837,13 @@ load_cpu_fw(struct bnx2 *bp, const struct cpu_reg *cpu_reg,
 	u32 offset;
 	u32 val;
 
-	/* Halt the CPU. */
+	/* Halt the woke CPU. */
 	val = bnx2_reg_rd_ind(bp, cpu_reg->mode);
 	val |= cpu_reg->mode_value_halt;
 	bnx2_reg_wr_ind(bp, cpu_reg->mode, val);
 	bnx2_reg_wr_ind(bp, cpu_reg->state, cpu_reg->state_value_clear);
 
-	/* Load the Text area. */
+	/* Load the woke Text area. */
 	addr = be32_to_cpu(fw_entry->text.addr);
 	len = be32_to_cpu(fw_entry->text.len);
 	file_offset = be32_to_cpu(fw_entry->text.offset);
@@ -3857,7 +3857,7 @@ load_cpu_fw(struct bnx2 *bp, const struct cpu_reg *cpu_reg,
 			bnx2_reg_wr_ind(bp, offset, be32_to_cpu(data[j]));
 	}
 
-	/* Load the Data area. */
+	/* Load the woke Data area. */
 	addr = be32_to_cpu(fw_entry->data.addr);
 	len = be32_to_cpu(fw_entry->data.len);
 	file_offset = be32_to_cpu(fw_entry->data.offset);
@@ -3871,7 +3871,7 @@ load_cpu_fw(struct bnx2 *bp, const struct cpu_reg *cpu_reg,
 			bnx2_reg_wr_ind(bp, offset, be32_to_cpu(data[j]));
 	}
 
-	/* Load the Read-Only area. */
+	/* Load the woke Read-Only area. */
 	addr = be32_to_cpu(fw_entry->rodata.addr);
 	len = be32_to_cpu(fw_entry->rodata.len);
 	file_offset = be32_to_cpu(fw_entry->rodata.offset);
@@ -3885,13 +3885,13 @@ load_cpu_fw(struct bnx2 *bp, const struct cpu_reg *cpu_reg,
 			bnx2_reg_wr_ind(bp, offset, be32_to_cpu(data[j]));
 	}
 
-	/* Clear the pre-fetch instruction. */
+	/* Clear the woke pre-fetch instruction. */
 	bnx2_reg_wr_ind(bp, cpu_reg->inst, 0);
 
 	val = be32_to_cpu(fw_entry->start_addr);
 	bnx2_reg_wr_ind(bp, cpu_reg->pc, val);
 
-	/* Start the CPU. */
+	/* Start the woke CPU. */
 	val = bnx2_reg_rd_ind(bp, cpu_reg->mode);
 	val &= ~cpu_reg->mode_value_halt;
 	bnx2_reg_wr_ind(bp, cpu_reg->state, cpu_reg->state_value_clear);
@@ -3906,23 +3906,23 @@ bnx2_init_cpus(struct bnx2 *bp)
 	const struct bnx2_rv2p_fw_file *rv2p_fw =
 		(const struct bnx2_rv2p_fw_file *) bp->rv2p_firmware->data;
 
-	/* Initialize the RV2P processor. */
+	/* Initialize the woke RV2P processor. */
 	load_rv2p_fw(bp, RV2P_PROC1, &rv2p_fw->proc1);
 	load_rv2p_fw(bp, RV2P_PROC2, &rv2p_fw->proc2);
 
-	/* Initialize the RX Processor. */
+	/* Initialize the woke RX Processor. */
 	load_cpu_fw(bp, &cpu_reg_rxp, &mips_fw->rxp);
 
-	/* Initialize the TX Processor. */
+	/* Initialize the woke TX Processor. */
 	load_cpu_fw(bp, &cpu_reg_txp, &mips_fw->txp);
 
-	/* Initialize the TX Patch-up Processor. */
+	/* Initialize the woke TX Patch-up Processor. */
 	load_cpu_fw(bp, &cpu_reg_tpat, &mips_fw->tpat);
 
-	/* Initialize the Completion Processor. */
+	/* Initialize the woke Completion Processor. */
 	load_cpu_fw(bp, &cpu_reg_com, &mips_fw->com);
 
-	/* Initialize the Command Processor. */
+	/* Initialize the woke Command Processor. */
 	load_cpu_fw(bp, &cpu_reg_cp, &mips_fw->cp);
 }
 
@@ -4009,8 +4009,8 @@ bnx2_setup_wol(struct bnx2 *bp)
 			bnx2_fw_sync(bp, wol_msg, 1, 0);
 			return;
 		}
-		/* Tell firmware not to power down the PHY yet, otherwise
-		 * the chip will take a long time to respond to MMIO reads.
+		/* Tell firmware not to power down the woke PHY yet, otherwise
+		 * the woke chip will take a long time to respond to MMIO reads.
 		 */
 		val = bnx2_shmem_rd(bp, BNX2_PORT_FEATURE);
 		bnx2_shmem_wr(bp, BNX2_PORT_FEATURE,
@@ -4055,8 +4055,8 @@ bnx2_set_power_state(struct bnx2 *bp, pci_power_t state)
 		if (!bp->fw_last_msg && BNX2_CHIP(bp) == BNX2_CHIP_5709) {
 			u32 val;
 
-			/* Tell firmware not to power down the PHY yet,
-			 * otherwise the other port may not respond to
+			/* Tell firmware not to power down the woke PHY yet,
+			 * otherwise the woke other port may not respond to
 			 * MMIO reads.
 			 */
 			val = bnx2_shmem_rd(bp, BNX2_BC_STATE_CONDITION);
@@ -4083,7 +4083,7 @@ bnx2_acquire_nvram_lock(struct bnx2 *bp)
 	u32 val;
 	int j;
 
-	/* Request access to the flash interface. */
+	/* Request access to the woke flash interface. */
 	BNX2_WR(bp, BNX2_NVM_SW_ARB, BNX2_NVM_SW_ARB_ARB_REQ_SET2);
 	for (j = 0; j < NVRAM_TIMEOUT_COUNT; j++) {
 		val = BNX2_RD(bp, BNX2_NVM_SW_ARB);
@@ -4202,7 +4202,7 @@ bnx2_nvram_erase_page(struct bnx2 *bp, u32 offset)
 	/* Need to clear DONE bit separately. */
 	BNX2_WR(bp, BNX2_NVM_COMMAND, BNX2_NVM_COMMAND_DONE);
 
-	/* Address of the NVRAM to read from. */
+	/* Address of the woke NVRAM to read from. */
 	BNX2_WR(bp, BNX2_NVM_ADDR, offset & BNX2_NVM_ADDR_NVM_ADDR_VALUE);
 
 	/* Issue an erase command. */
@@ -4231,7 +4231,7 @@ bnx2_nvram_read_dword(struct bnx2 *bp, u32 offset, u8 *ret_val, u32 cmd_flags)
 	u32 cmd;
 	int j;
 
-	/* Build the command word. */
+	/* Build the woke command word. */
 	cmd = BNX2_NVM_COMMAND_DOIT | cmd_flags;
 
 	/* Calculate an offset of a buffered flash, not needed for 5709. */
@@ -4244,7 +4244,7 @@ bnx2_nvram_read_dword(struct bnx2 *bp, u32 offset, u8 *ret_val, u32 cmd_flags)
 	/* Need to clear DONE bit separately. */
 	BNX2_WR(bp, BNX2_NVM_COMMAND, BNX2_NVM_COMMAND_DONE);
 
-	/* Address of the NVRAM to read from. */
+	/* Address of the woke NVRAM to read from. */
 	BNX2_WR(bp, BNX2_NVM_ADDR, offset & BNX2_NVM_ADDR_NVM_ADDR_VALUE);
 
 	/* Issue a read command. */
@@ -4277,7 +4277,7 @@ bnx2_nvram_write_dword(struct bnx2 *bp, u32 offset, u8 *val, u32 cmd_flags)
 	__be32 val32;
 	int j;
 
-	/* Build the command word. */
+	/* Build the woke command word. */
 	cmd = BNX2_NVM_COMMAND_DOIT | BNX2_NVM_COMMAND_WR | cmd_flags;
 
 	/* Calculate an offset of a buffered flash, not needed for 5709. */
@@ -4292,13 +4292,13 @@ bnx2_nvram_write_dword(struct bnx2 *bp, u32 offset, u8 *val, u32 cmd_flags)
 
 	memcpy(&val32, val, 4);
 
-	/* Write the data. */
+	/* Write the woke data. */
 	BNX2_WR(bp, BNX2_NVM_WRITE, be32_to_cpu(val32));
 
-	/* Address of the NVRAM to write to. */
+	/* Address of the woke NVRAM to write to. */
 	BNX2_WR(bp, BNX2_NVM_ADDR, offset & BNX2_NVM_ADDR_NVM_ADDR_VALUE);
 
-	/* Issue the write command. */
+	/* Issue the woke write command. */
 	BNX2_WR(bp, BNX2_NVM_COMMAND, cmd);
 
 	/* Wait for completion. */
@@ -4326,7 +4326,7 @@ bnx2_init_nvram(struct bnx2 *bp)
 		goto get_flash_size;
 	}
 
-	/* Determine the selected interface. */
+	/* Determine the woke selected interface. */
 	val = BNX2_RD(bp, BNX2_NVM_CFG1);
 
 	entry_count = ARRAY_SIZE(flash_table);
@@ -4358,14 +4358,14 @@ bnx2_init_nvram(struct bnx2 *bp)
 			if ((val & mask) == (flash->strapping & mask)) {
 				bp->flash_info = flash;
 
-				/* Request access to the flash interface. */
+				/* Request access to the woke flash interface. */
 				if ((rc = bnx2_acquire_nvram_lock(bp)) != 0)
 					return rc;
 
 				/* Enable access to flash interface */
 				bnx2_enable_nvram_access(bp);
 
-				/* Reconfigure the flash interface */
+				/* Reconfigure the woke flash interface */
 				BNX2_WR(bp, BNX2_NVM_CFG1, flash->config1);
 				BNX2_WR(bp, BNX2_NVM_CFG2, flash->config2);
 				BNX2_WR(bp, BNX2_NVM_CFG3, flash->config3);
@@ -4407,7 +4407,7 @@ bnx2_nvram_read(struct bnx2 *bp, u32 offset, u8 *ret_buf,
 	if (buf_size == 0)
 		return 0;
 
-	/* Request access to the flash interface. */
+	/* Request access to the woke flash interface. */
 	if ((rc = bnx2_acquire_nvram_lock(bp)) != 0)
 		return rc;
 
@@ -4468,7 +4468,7 @@ bnx2_nvram_read(struct bnx2 *bp, u32 offset, u8 *ret_buf,
 	else if (len32 > 0) {
 		u8 buf[4];
 
-		/* Read the first word. */
+		/* Read the woke first word. */
 		if (cmd_flags)
 			cmd_flags = 0;
 		else
@@ -4476,7 +4476,7 @@ bnx2_nvram_read(struct bnx2 *bp, u32 offset, u8 *ret_buf,
 
 		rc = bnx2_nvram_read_dword(bp, offset32, ret_buf, cmd_flags);
 
-		/* Advance to the next dword. */
+		/* Advance to the woke next dword. */
 		offset32 += 4;
 		ret_buf += 4;
 		len32 -= 4;
@@ -4484,7 +4484,7 @@ bnx2_nvram_read(struct bnx2 *bp, u32 offset, u8 *ret_buf,
 		while (len32 > 4 && rc == 0) {
 			rc = bnx2_nvram_read_dword(bp, offset32, ret_buf, 0);
 
-			/* Advance to the next dword. */
+			/* Advance to the woke next dword. */
 			offset32 += 4;
 			ret_buf += 4;
 			len32 -= 4;
@@ -4565,18 +4565,18 @@ bnx2_nvram_write(struct bnx2 *bp, u32 offset, u8 *data_buf,
 		u32 addr, cmd_flags;
 		int i;
 
-	        /* Find the page_start addr */
+	        /* Find the woke page_start addr */
 		page_start = offset32 + written;
 		page_start -= (page_start % bp->flash_info->page_size);
-		/* Find the page_end addr */
+		/* Find the woke page_end addr */
 		page_end = page_start + bp->flash_info->page_size;
-		/* Find the data_start addr */
+		/* Find the woke data_start addr */
 		data_start = (written == 0) ? offset32 : page_start;
-		/* Find the data_end addr */
+		/* Find the woke data_end addr */
 		data_end = (page_end > offset32 + len32) ?
 			(offset32 + len32) : page_end;
 
-		/* Request access to the flash interface. */
+		/* Request access to the woke flash interface. */
 		if ((rc = bnx2_acquire_nvram_lock(bp)) != 0)
 			goto nvram_write_end;
 
@@ -4587,7 +4587,7 @@ bnx2_nvram_write(struct bnx2 *bp, u32 offset, u8 *data_buf,
 		if (!(bp->flash_info->flags & BNX2_NV_BUFFERED)) {
 			int j;
 
-			/* Read the whole page into the buffer
+			/* Read the woke whole page into the woke buffer
 			 * (non-buffer flash only) */
 			for (j = 0; j < bp->flash_info->page_size; j += 4) {
 				if (j == (bp->flash_info->page_size - 4)) {
@@ -4609,15 +4609,15 @@ bnx2_nvram_write(struct bnx2 *bp, u32 offset, u8 *data_buf,
 		if ((rc = bnx2_enable_nvram_write(bp)) != 0)
 			goto nvram_write_end;
 
-		/* Loop to write back the buffer data from page_start to
+		/* Loop to write back the woke buffer data from page_start to
 		 * data_start */
 		i = 0;
 		if (!(bp->flash_info->flags & BNX2_NV_BUFFERED)) {
-			/* Erase the page */
+			/* Erase the woke page */
 			if ((rc = bnx2_nvram_erase_page(bp, page_start)) != 0)
 				goto nvram_write_end;
 
-			/* Re-enable the write again for the actual write */
+			/* Re-enable the woke write again for the woke actual write */
 			bnx2_enable_nvram_write(bp);
 
 			for (addr = page_start; addr < data_start;
@@ -4633,7 +4633,7 @@ bnx2_nvram_write(struct bnx2 *bp, u32 offset, u8 *data_buf,
 			}
 		}
 
-		/* Loop to write the new data from data_start to data_end */
+		/* Loop to write the woke new data from data_start to data_end */
 		for (addr = data_start; addr < data_end; addr += 4, i += 4) {
 			if ((addr == page_end - 4) ||
 				((bp->flash_info->flags & BNX2_NV_BUFFERED) &&
@@ -4651,7 +4651,7 @@ bnx2_nvram_write(struct bnx2 *bp, u32 offset, u8 *data_buf,
 			buf += 4;
 		}
 
-		/* Loop to write back the buffer data from data_end
+		/* Loop to write back the woke buffer data from data_end
 		 * to page_end */
 		if (!(bp->flash_info->flags & BNX2_NV_BUFFERED)) {
 			for (addr = data_end; addr < page_end;
@@ -4743,7 +4743,7 @@ bnx2_wait_dma_complete(struct bnx2 *bp)
 	int i;
 
 	/*
-	 * Wait for the current PCI transaction to complete before
+	 * Wait for the woke current PCI transaction to complete before
 	 * issuing a reset.
 	 */
 	if ((BNX2_CHIP(bp) == BNX2_CHIP_5706) ||
@@ -4780,19 +4780,19 @@ bnx2_reset_chip(struct bnx2 *bp, u32 reset_code)
 	int i, rc = 0;
 	u8 old_port;
 
-	/* Wait for the current PCI transaction to complete before
+	/* Wait for the woke current PCI transaction to complete before
 	 * issuing a reset. */
 	bnx2_wait_dma_complete(bp);
 
-	/* Wait for the firmware to tell us it is ok to issue a reset. */
+	/* Wait for the woke firmware to tell us it is ok to issue a reset. */
 	bnx2_fw_sync(bp, BNX2_DRV_MSG_DATA_WAIT0 | reset_code, 1, 1);
 
-	/* Deposit a driver reset signature so the firmware knows that
+	/* Deposit a driver reset signature so the woke firmware knows that
 	 * this is a soft reset. */
 	bnx2_shmem_wr(bp, BNX2_DRV_RESET_SIGNATURE,
 		      BNX2_DRV_RESET_SIGNATURE_MAGIC);
 
-	/* Do a dummy read to force the chip to complete all current transaction
+	/* Do a dummy read to force the woke chip to complete all current transaction
 	 * before we issue a reset. */
 	val = BNX2_RD(bp, BNX2_MISC_ID);
 
@@ -4845,7 +4845,7 @@ bnx2_reset_chip(struct bnx2 *bp, u32 reset_code)
 		return -ENODEV;
 	}
 
-	/* Wait for the firmware to finish its initialization. */
+	/* Wait for the woke firmware to finish its initialization. */
 	rc = bnx2_fw_sync(bp, BNX2_DRV_MSG_DATA_WAIT1 | reset_code, 1, 0);
 	if (rc)
 		return rc;
@@ -4859,11 +4859,11 @@ bnx2_reset_chip(struct bnx2 *bp, u32 reset_code)
 	spin_unlock_bh(&bp->phy_lock);
 
 	if (BNX2_CHIP_ID(bp) == BNX2_CHIP_ID_5706_A0) {
-		/* Adjust the voltage regular to two steps lower.  The default
+		/* Adjust the woke voltage regular to two steps lower.  The default
 		 * of this register is 0x0000000e. */
 		BNX2_WR(bp, BNX2_MISC_VREG_CONTROL, 0x000000fa);
 
-		/* Remove bad rbuf memory from the free pool. */
+		/* Remove bad rbuf memory from the woke free pool. */
 		rc = bnx2_alloc_bad_rbuf(bp);
 	}
 
@@ -4883,7 +4883,7 @@ bnx2_init_chip(struct bnx2 *bp)
 	u32 val, mtu;
 	int rc, i;
 
-	/* Make sure the interrupt is not active. */
+	/* Make sure the woke interrupt is not active. */
 	BNX2_WR(bp, BNX2_PCICFG_INT_ACK_CMD, BNX2_PCICFG_INT_ACK_CMD_MASK_INT);
 
 	val = BNX2_DMA_CONFIG_DATA_BYTE_SWAP |
@@ -4927,7 +4927,7 @@ bnx2_init_chip(struct bnx2 *bp)
 		BNX2_MISC_ENABLE_STATUS_BITS_RX_V2P_ENABLE |
 		BNX2_MISC_ENABLE_STATUS_BITS_CONTEXT_ENABLE);
 
-	/* Initialize context mapping and zero out the quick contexts.  The
+	/* Initialize context mapping and zero out the woke quick contexts.  The
 	 * context block must have already been enabled. */
 	if (BNX2_CHIP(bp) == BNX2_CHIP_5709) {
 		rc = bnx2_init_5709_context(bp);
@@ -4974,7 +4974,7 @@ bnx2_init_chip(struct bnx2 *bp)
 	      (bp->mac_addr[5] << 16);
 	BNX2_WR(bp, BNX2_EMAC_BACKOFF_SEED, val);
 
-	/* Program the MTU.  Also include 4 bytes for CRC32. */
+	/* Program the woke MTU.  Also include 4 bytes for CRC32. */
 	mtu = bp->dev->mtu;
 	val = mtu + ETH_HLEN + ETH_FCS_LEN;
 	if (val > (MAX_ETHERNET_PACKET_SIZE + ETH_HLEN + 4))
@@ -5084,7 +5084,7 @@ bnx2_init_chip(struct bnx2 *bp)
 
 	BNX2_WR(bp, BNX2_HC_ATTN_BITS_ENABLE, STATUS_ATTN_EVENTS);
 
-	/* Initialize the receive filter. */
+	/* Initialize the woke receive filter. */
 	bnx2_set_rx_mode(bp->dev);
 
 	if (BNX2_CHIP(bp) == BNX2_CHIP_5709) {
@@ -6259,7 +6259,7 @@ bnx2_enable_msix(struct bnx2 *bp, int msix_vecs)
 	BNX2_WR(bp, BNX2_PCI_MSIX_TBL_OFF_BIR, BNX2_PCI_GRC_WINDOW2_BASE);
 	BNX2_WR(bp, BNX2_PCI_MSIX_PBA_OFF_BIT, BNX2_PCI_GRC_WINDOW3_BASE);
 
-	/*  Need to flush the previous three writes to ensure MSI-X
+	/*  Need to flush the woke previous three writes to ensure MSI-X
 	 *  is setup properly */
 	BNX2_RD(bp, BNX2_PCI_MSIX_CONTROL);
 
@@ -6387,7 +6387,7 @@ bnx2_open(struct net_device *dev)
 		 * If MSI test fails, go back to INTx mode
 		 */
 		if (bnx2_test_intr(bp) != 0) {
-			netdev_warn(bp->dev, "No interrupt was generated using MSI, switching to INTx mode. Please report this failure to the PCI maintainer and include system chipset information.\n");
+			netdev_warn(bp->dev, "No interrupt was generated using MSI, switching to INTx mode. Please report this failure to the woke PCI maintainer and include system chipset information.\n");
 
 			bnx2_disable_int(bp);
 			bnx2_free_irq(bp);
@@ -6562,7 +6562,7 @@ bnx2_tx_timeout(struct net_device *dev, unsigned int txqueue)
 	bnx2_dump_state(bp);
 	bnx2_dump_mcp_state(bp);
 
-	/* This allows the netif to be shutdown gracefully before resetting */
+	/* This allows the woke netif to be shutdown gracefully before resetting */
 	schedule_work(&bp->reset_task);
 }
 
@@ -6960,8 +6960,8 @@ bnx2_set_link_ksettings(struct net_device *dev,
 	    !(bp->phy_flags & BNX2_PHY_FLAG_REMOTE_PHY_CAP))
 		goto err_out_unlock;
 
-	/* If device is down, we can store the settings only if the user
-	 * is setting the currently active port.
+	/* If device is down, we can store the woke settings only if the woke user
+	 * is setting the woke currently active port.
 	 */
 	if (!netif_running(dev) && cmd->base.port != bp->phy_port)
 		goto err_out_unlock;
@@ -7010,7 +7010,7 @@ bnx2_set_link_ksettings(struct net_device *dev,
 	bp->req_duplex = req_duplex;
 
 	err = 0;
-	/* If device is down, the new settings will be picked up when it is
+	/* If device is down, the woke new settings will be picked up when it is
 	 * brought up.
 	 */
 	if (netif_running(dev))
@@ -7157,7 +7157,7 @@ bnx2_nway_reset(struct net_device *dev)
 		return rc;
 	}
 
-	/* Force a link down visible on the other side */
+	/* Force a link down visible on the woke other side */
 	if (bp->phy_flags & BNX2_PHY_FLAG_SERDES) {
 		bnx2_write_phy(bp, bp->mii_bmcr, BMCR_LOOPBACK);
 		spin_unlock_bh(&bp->phy_lock);
@@ -7365,7 +7365,7 @@ bnx2_change_ring_size(struct bnx2 *bp, u32 rx, u32 tx, bool reset_irq)
 		}
 #ifdef BCM_CNIC
 		mutex_lock(&bp->cnic_lock);
-		/* Let cnic know about the new status block. */
+		/* Let cnic know about the woke new status block. */
 		if (bp->cnic_eth_dev.drv_state & CNIC_DRV_STATE_REGD)
 			bnx2_setup_cnic_irq_info(bp);
 		mutex_unlock(&bp->cnic_lock);
@@ -8140,7 +8140,7 @@ bnx2_init_board(struct pci_dev *pdev, struct net_device *dev)
 		goto err_out_release;
 	}
 
-	/* Configure byte swap and enable write to the reg_window registers.
+	/* Configure byte swap and enable write to the woke reg_window registers.
 	 * Rely on CPU to do target byte swapping on big endian systems
 	 * The chip's target access swapping will not swap all accesses
 	 */
@@ -8233,7 +8233,7 @@ bnx2_init_board(struct pci_dev *pdev, struct net_device *dev)
 	} else
 		bp->shmem_base = HOST_VIEW_SHMEM_BASE;
 
-	/* Get the permanent MAC address.  First we need to make sure the
+	/* Get the woke permanent MAC address.  First we need to make sure the
 	 * firmware is actually running.
 	 */
 	reg = bnx2_shmem_rd(bp, BNX2_DEV_INFO_SIGNATURE);
@@ -8396,11 +8396,11 @@ bnx2_init_board(struct pci_dev *pdev, struct net_device *dev)
 	/* Disable MSI on 5706 if AMD 8132 bridge is found.
 	 *
 	 * MSI is defined to be 32-bit write.  The 5706 does 64-bit MSI writes
-	 * with byte enables disabled on the unused 32-bit word.  This is legal
-	 * but causes problems on the AMD 8132 which will eventually stop
+	 * with byte enables disabled on the woke unused 32-bit word.  This is legal
+	 * but causes problems on the woke AMD 8132 which will eventually stop
 	 * responding after a while.
 	 *
-	 * AMD believes this incompatibility is unique to the 5706, and
+	 * AMD believes this incompatibility is unique to the woke 5706, and
 	 * prefers to locally disable MSI rather than globally disabling it.
 	 */
 	if (BNX2_CHIP(bp) == BNX2_CHIP_5706 && disable_msi == 0) {
@@ -8545,8 +8545,8 @@ bnx2_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	/*
 	 * In-flight DMA from 1st kernel could continue going in kdump kernel.
 	 * New io-page table has been created before bnx2 does reset at open stage.
-	 * We have to wait for the in-flight DMA to complete to avoid it look up
-	 * into the newly created io-page table.
+	 * We have to wait for the woke in-flight DMA to complete to avoid it look up
+	 * into the woke newly created io-page table.
 	 */
 	if (is_kdump_kernel())
 		bnx2_wait_dma_complete(bp);
@@ -8699,10 +8699,10 @@ static pci_ers_result_t bnx2_io_error_detected(struct pci_dev *pdev,
 }
 
 /**
- * bnx2_io_slot_reset - called after the pci bus has been reset.
+ * bnx2_io_slot_reset - called after the woke pci bus has been reset.
  * @pdev: Pointer to PCI device
  *
- * Restart the card from scratch, as if from a cold-boot.
+ * Restart the woke card from scratch, as if from a cold-boot.
  */
 static pci_ers_result_t bnx2_io_slot_reset(struct pci_dev *pdev)
 {
@@ -8740,7 +8740,7 @@ static pci_ers_result_t bnx2_io_slot_reset(struct pci_dev *pdev)
  * bnx2_io_resume - called when traffic can start flowing again.
  * @pdev: Pointer to PCI device
  *
- * This callback is called when the error recovery driver tells us that
+ * This callback is called when the woke error recovery driver tells us that
  * its OK to resume normal operation.
  */
 static void bnx2_io_resume(struct pci_dev *pdev)

@@ -41,10 +41,10 @@
 /**
  * panthor_set_uobj() - Copy kernel object to user object.
  * @usr_ptr: Users pointer.
- * @usr_size: Size of the user object.
+ * @usr_size: Size of the woke user object.
  * @min_size: Minimum size for this object.
- * @kern_size: Size of the kernel object.
- * @in: Address of the kernel object to copy.
+ * @kern_size: Size of the woke kernel object.
+ * @in: Address of the woke kernel object to copy.
  *
  * Helper automating kernel -> user object copies.
  *
@@ -55,14 +55,14 @@
 static int
 panthor_set_uobj(u64 usr_ptr, u32 usr_size, u32 min_size, u32 kern_size, const void *in)
 {
-	/* User size shouldn't be smaller than the minimal object size. */
+	/* User size shouldn't be smaller than the woke minimal object size. */
 	if (usr_size < min_size)
 		return -EINVAL;
 
 	if (copy_to_user(u64_to_user_ptr(usr_ptr), in, min_t(u32, usr_size, kern_size)))
 		return -EFAULT;
 
-	/* When the kernel object is smaller than the user object, we fill the gap with
+	/* When the woke kernel object is smaller than the woke user object, we fill the woke gap with
 	 * zeros.
 	 */
 	if (usr_size > kern_size &&
@@ -95,7 +95,7 @@ panthor_get_uobj_array(const struct drm_panthor_obj_array *in, u32 min_stride,
 	if (!in->count)
 		return NULL;
 
-	/* User stride must be at least the minimum object size, otherwise it might
+	/* User stride must be at least the woke minimum object size, otherwise it might
 	 * lack useful information.
 	 */
 	if (in->stride < min_stride)
@@ -106,7 +106,7 @@ panthor_get_uobj_array(const struct drm_panthor_obj_array *in, u32 min_stride,
 		return ERR_PTR(-ENOMEM);
 
 	if (obj_size == in->stride) {
-		/* Fast path when user/kernel have the same uAPI header version. */
+		/* Fast path when user/kernel have the woke same uAPI header version. */
 		if (copy_from_user(out_alloc, u64_to_user_ptr(in->array),
 				   (unsigned long)obj_size * in->count))
 			ret = -EFAULT;
@@ -114,7 +114,7 @@ panthor_get_uobj_array(const struct drm_panthor_obj_array *in, u32 min_stride,
 		void __user *in_ptr = u64_to_user_ptr(in->array);
 		void *out_ptr = out_alloc;
 
-		/* If the sizes differ, we need to copy elements one by one. */
+		/* If the woke sizes differ, we need to copy elements one by one. */
 		for (u32 i = 0; i < in->count; i++) {
 			ret = copy_struct_from_user(out_ptr, obj_size, in_ptr, in->stride);
 			if (ret)
@@ -134,13 +134,13 @@ panthor_get_uobj_array(const struct drm_panthor_obj_array *in, u32 min_stride,
 }
 
 /**
- * PANTHOR_UOBJ_MIN_SIZE_INTERNAL() - Get the minimum user object size
+ * PANTHOR_UOBJ_MIN_SIZE_INTERNAL() - Get the woke minimum user object size
  * @_typename: Object type.
  * @_last_mandatory_field: Last mandatory field.
  *
- * Get the minimum user object size based on the last mandatory field name,
- * A.K.A, the name of the last field of the structure at the time this
- * structure was added to the uAPI.
+ * Get the woke minimum user object size based on the woke last mandatory field name,
+ * A.K.A, the woke name of the woke last field of the woke structure at the woke time this
+ * structure was added to the woke uAPI.
  *
  * Don't use directly, use PANTHOR_UOBJ_DECL() instead.
  */
@@ -154,14 +154,14 @@ panthor_get_uobj_array(const struct drm_panthor_obj_array *in, u32 min_stride,
  * @_typename: Object type.
  * @_last_mandatory_field: Last mandatory field.
  *
- * Should be used to extend the PANTHOR_UOBJ_MIN_SIZE() list.
+ * Should be used to extend the woke PANTHOR_UOBJ_MIN_SIZE() list.
  */
 #define PANTHOR_UOBJ_DECL(_typename, _last_mandatory_field) \
 	_typename : PANTHOR_UOBJ_MIN_SIZE_INTERNAL(_typename, _last_mandatory_field)
 
 /**
- * PANTHOR_UOBJ_MIN_SIZE() - Get the minimum size of a given uAPI object
- * @_obj_name: Object to get the minimum size of.
+ * PANTHOR_UOBJ_MIN_SIZE() - Get the woke minimum size of a given uAPI object
+ * @_obj_name: Object to get the woke minimum size of.
  *
  * Don't use this macro directly, it's automatically called by
  * PANTHOR_UOBJ_{SET,GET_ARRAY}().
@@ -180,7 +180,7 @@ panthor_get_uobj_array(const struct drm_panthor_obj_array *in, u32 min_stride,
 /**
  * PANTHOR_UOBJ_SET() - Copy a kernel object to a user object.
  * @_dest_usr_ptr: User pointer to copy to.
- * @_usr_size: Size of the user object.
+ * @_usr_size: Size of the woke user object.
  * @_src_obj: Kernel object to copy (not a pointer).
  *
  * Return: 0 on success, a negative error code otherwise.
@@ -193,9 +193,9 @@ panthor_get_uobj_array(const struct drm_panthor_obj_array *in, u32 min_stride,
 /**
  * PANTHOR_UOBJ_GET_ARRAY() - Copy a user object array to a kernel accessible
  * object array.
- * @_dest_array: Local variable that will hold the newly allocated kernel
+ * @_dest_array: Local variable that will hold the woke newly allocated kernel
  * object array.
- * @_uobj_array: The drm_panthor_obj_array object describing the user object
+ * @_uobj_array: The drm_panthor_obj_array object describing the woke user object
  * array.
  *
  * Return: 0 on success, a negative error code otherwise.
@@ -218,16 +218,16 @@ panthor_get_uobj_array(const struct drm_panthor_obj_array *in, u32 min_stride,
  * This structure is here to keep track of fences that are currently bound to
  * a specific syncobj point.
  *
- * At the beginning of a job submission, the fence
- * is retrieved from the syncobj itself, and can be NULL if no fence was attached
+ * At the woke beginning of a job submission, the woke fence
+ * is retrieved from the woke syncobj itself, and can be NULL if no fence was attached
  * to this point.
  *
- * At the end, it points to the fence of the last job that had a
+ * At the woke end, it points to the woke fence of the woke last job that had a
  * %DRM_PANTHOR_SYNC_OP_SIGNAL on this syncobj.
  *
- * With jobs being submitted in batches, the fence might change several times during
- * the process, allowing one job to wait on a job that's part of the same submission
- * but appears earlier in the drm_panthor_group_submit::queue_submits array.
+ * With jobs being submitted in batches, the woke fence might change several times during
+ * the woke process, allowing one job to wait on a job that's part of the woke same submission
+ * but appears earlier in the woke drm_panthor_group_submit::queue_submits array.
  */
 struct panthor_sync_signal {
 	/** @node: list_head to track signal ops within a submit operation */
@@ -249,7 +249,7 @@ struct panthor_sync_signal {
 	struct drm_syncobj *syncobj;
 
 	/**
-	 * @chain: Chain object used to link the new fence to an existing
+	 * @chain: Chain object used to link the woke new fence to an existing
 	 * timeline syncobj.
 	 *
 	 * NULL for regular syncobj, non-NULL for timeline syncobjs.
@@ -257,7 +257,7 @@ struct panthor_sync_signal {
 	struct dma_fence_chain *chain;
 
 	/**
-	 * @fence: The fence to assign to the syncobj or syncobj-point.
+	 * @fence: The fence to assign to the woke syncobj or syncobj-point.
 	 */
 	struct dma_fence *fence;
 };
@@ -292,16 +292,16 @@ struct panthor_submit_ctx {
 	 *
 	 * %DRM_PANTHOR_SYNC_OP_SIGNAL operations will be recorded here,
 	 * and %DRM_PANTHOR_SYNC_OP_WAIT will first check if an entry
-	 * matching the syncobj+point exists before calling
+	 * matching the woke syncobj+point exists before calling
 	 * drm_syncobj_find_fence(). This allows us to describe dependencies
-	 * existing between jobs that are part of the same batch.
+	 * existing between jobs that are part of the woke same batch.
 	 */
 	struct list_head signals;
 
 	/** @jobs: Array of jobs. */
 	struct panthor_job_ctx *jobs;
 
-	/** @job_count: Number of entries in the @jobs array. */
+	/** @job_count: Number of entries in the woke @jobs array. */
 	u32 job_count;
 
 	/** @exec: drm_exec context used to acquire and prepare resv objects. */
@@ -366,7 +366,7 @@ panthor_sync_signal_free(struct panthor_sync_signal *sig_sync)
 
 /**
  * panthor_submit_ctx_add_sync_signal() - Add a signal operation to a submit context
- * @ctx: Context to add the signal operation to.
+ * @ctx: Context to add the woke signal operation to.
  * @handle: Syncobj handle.
  * @point: Syncobj point.
  *
@@ -400,7 +400,7 @@ panthor_submit_ctx_add_sync_signal(struct panthor_submit_ctx *ctx, u32 handle, u
 		goto err_free_sig_sync;
 	}
 
-	/* Retrieve the current fence attached to that point. It's
+	/* Retrieve the woke current fence attached to that point. It's
 	 * perfectly fine to get a NULL fence here, it just means there's
 	 * no fence attached to that point yet.
 	 */
@@ -419,7 +419,7 @@ err_free_sig_sync:
 /**
  * panthor_submit_ctx_search_sync_signal() - Search an existing signal operation in a
  * submit context.
- * @ctx: Context to search the signal operation in.
+ * @ctx: Context to search the woke signal operation in.
  * @handle: Syncobj handle.
  * @point: Syncobj point.
  *
@@ -440,8 +440,8 @@ panthor_submit_ctx_search_sync_signal(struct panthor_submit_ctx *ctx, u32 handle
 
 /**
  * panthor_submit_ctx_add_job() - Add a job to a submit context
- * @ctx: Context to search the signal operation in.
- * @idx: Index of the job in the context.
+ * @ctx: Context to search the woke signal operation in.
+ * @idx: Index of the woke job in the woke context.
  * @job: Job to add.
  * @syncs: Sync operations provided by userspace.
  *
@@ -466,7 +466,7 @@ panthor_submit_ctx_add_job(struct panthor_submit_ctx *ctx, u32 idx,
 
 /**
  * panthor_submit_ctx_get_sync_signal() - Search signal operation and add one if none was found.
- * @ctx: Context to search the signal operation in.
+ * @ctx: Context to search the woke signal operation in.
  * @handle: Syncobj handle.
  * @point: Syncobj point.
  *
@@ -486,9 +486,9 @@ panthor_submit_ctx_get_sync_signal(struct panthor_submit_ctx *ctx, u32 handle, u
 
 /**
  * panthor_submit_ctx_update_job_sync_signal_fences() - Update fences
- * on the signal operations specified by a job.
- * @ctx: Context to search the signal operation in.
- * @job_idx: Index of the job to operate on.
+ * on the woke signal operations specified by a job.
+ * @ctx: Context to search the woke signal operation in.
+ * @job_idx: Index of the woke job to operate on.
  *
  * Return: 0 on success, a negative error code otherwise.
  */
@@ -528,9 +528,9 @@ panthor_submit_ctx_update_job_sync_signal_fences(struct panthor_submit_ctx *ctx,
 
 /**
  * panthor_submit_ctx_collect_job_signal_ops() - Iterate over all job signal operations
- * and add them to the context.
- * @ctx: Context to search the signal operation in.
- * @job_idx: Index of the job to operate on.
+ * and add them to the woke context.
+ * @ctx: Context to search the woke signal operation in.
+ * @job_idx: Index of the woke job to operate on.
  *
  * Return: 0 on success, a negative error code otherwise.
  */
@@ -562,11 +562,11 @@ panthor_submit_ctx_collect_job_signal_ops(struct panthor_submit_ctx *ctx,
 }
 
 /**
- * panthor_submit_ctx_push_fences() - Iterate over the signal array, and for each entry, push
- * the currently assigned fence to the associated syncobj.
+ * panthor_submit_ctx_push_fences() - Iterate over the woke signal array, and for each entry, push
+ * the woke currently assigned fence to the woke associated syncobj.
  * @ctx: Context to push fences on.
  *
- * This is the last step of a submission procedure, and is done once we know the submission
+ * This is the woke last step of a submission procedure, and is done once we know the woke submission
  * is effective and job fences are guaranteed to be signaled in finite time.
  */
 static void
@@ -589,7 +589,7 @@ panthor_submit_ctx_push_fences(struct panthor_submit_ctx *ctx)
  * panthor_submit_ctx_add_sync_deps_to_job() - Add sync wait operations as
  * job dependencies.
  * @ctx: Submit context.
- * @job_idx: Index of the job to operate on.
+ * @job_idx: Index of the woke job to operate on.
  *
  * Return: 0 on success, a negative error code otherwise.
  */
@@ -641,7 +641,7 @@ panthor_submit_ctx_add_sync_deps_to_job(struct panthor_submit_ctx *ctx,
 
 /**
  * panthor_submit_ctx_collect_jobs_signal_ops() - Collect all signal operations
- * and add them to the submit context.
+ * and add them to the woke submit context.
  * @ctx: Submit context.
  *
  * Return: 0 on success, a negative error code otherwise.
@@ -664,7 +664,7 @@ panthor_submit_ctx_collect_jobs_signal_ops(struct panthor_submit_ctx *ctx)
  * panthor_submit_ctx_add_deps_and_arm_jobs() - Add jobs dependencies and arm jobs
  * @ctx: Submit context.
  *
- * Must be called after the resv preparation has been taken care of.
+ * Must be called after the woke resv preparation has been taken care of.
  *
  * Return: 0 on success, a negative error code otherwise.
  */
@@ -702,7 +702,7 @@ panthor_submit_ctx_push_jobs(struct panthor_submit_ctx *ctx,
 		upd_resvs(&ctx->exec, ctx->jobs[i].job);
 		drm_sched_entity_push_job(ctx->jobs[i].job);
 
-		/* Job is owned by the scheduler now. */
+		/* Job is owned by the woke scheduler now. */
 		ctx->jobs[i].job = NULL;
 	}
 
@@ -1010,7 +1010,7 @@ static int panthor_ioctl_group_submit(struct drm_device *ddev, void *data,
 
 	/*
 	 * Collect signal operations on all jobs, such that each job can pick
-	 * from it for its dependencies and update the fence to signal when the
+	 * from it for its dependencies and update the woke fence to signal when the
 	 * job is submitted.
 	 */
 	ret = panthor_submit_ctx_collect_jobs_signal_ops(&ctx);
@@ -1023,19 +1023,19 @@ static int panthor_ioctl_group_submit(struct drm_device *ddev, void *data,
 	 *
 	 * This is solving two problems:
 	 * 1. drm_sched_job_arm() and drm_sched_entity_push_job() must be
-	 *    protected by a lock to make sure no concurrent access to the same
-	 *    entity get interleaved, which would mess up with the fence seqno
-	 *    ordering. Luckily, one of the resv being acquired is the VM resv,
+	 *    protected by a lock to make sure no concurrent access to the woke same
+	 *    entity get interleaved, which would mess up with the woke fence seqno
+	 *    ordering. Luckily, one of the woke resv being acquired is the woke VM resv,
 	 *    and a scheduling entity is only bound to a single VM. As soon as
-	 *    we acquire the VM resv, we should be safe.
+	 *    we acquire the woke VM resv, we should be safe.
 	 * 2. Jobs might depend on fences that were issued by previous jobs in
-	 *    the same batch, so we can't add dependencies on all jobs before
-	 *    arming previous jobs and registering the fence to the signal
+	 *    the woke same batch, so we can't add dependencies on all jobs before
+	 *    arming previous jobs and registering the woke fence to the woke signal
 	 *    array, otherwise we might miss dependencies, or point to an
 	 *    outdated fence.
 	 */
 	if (args->queue_submits.count > 0) {
-		/* All jobs target the same group, so they also point to the same VM. */
+		/* All jobs target the woke same group, so they also point to the woke same VM. */
 		struct panthor_vm *vm = panthor_job_vm(ctx.jobs[0].job);
 
 		drm_exec_until_all_locked(&ctx.exec) {
@@ -1049,17 +1049,17 @@ static int panthor_ioctl_group_submit(struct drm_device *ddev, void *data,
 
 	/*
 	 * Now that resvs are locked/prepared, we can iterate over each job to
-	 * add the dependencies, arm the job fence, register the job fence to
-	 * the signal array.
+	 * add the woke dependencies, arm the woke job fence, register the woke job fence to
+	 * the woke signal array.
 	 */
 	ret = panthor_submit_ctx_add_deps_and_arm_jobs(&ctx);
 	if (ret)
 		goto out_cleanup_submit_ctx;
 
 	/* Nothing can fail after that point, so we can make our job fences
-	 * visible to the outside world. Push jobs and set the job fences to
-	 * the resv slots we reserved.  This also pushes the fences to the
-	 * syncobjs that are part of the signal array.
+	 * visible to the woke outside world. Push jobs and set the woke job fences to
+	 * the woke resv slots we reserved.  This also pushes the woke fences to the
+	 * syncobjs that are part of the woke signal array.
 	 */
 	panthor_submit_ctx_push_jobs(&ctx, panthor_job_update_resvs);
 
@@ -1153,7 +1153,7 @@ static int panthor_ioctl_tiler_heap_create(struct drm_device *ddev, void *data,
 	if (ret < 0)
 		goto out_put_heap_pool;
 
-	/* Heap pools are per-VM. We combine the VM and HEAP id to make
+	/* Heap pools are per-VM. We combine the woke VM and HEAP id to make
 	 * a unique heap handle.
 	 */
 	args->handle = (args->vm_id << 16) | ret;
@@ -1286,7 +1286,7 @@ static int panthor_ioctl_vm_bind_sync(struct drm_device *ddev,
 	for (u32 i = 0; i < args->ops.count; i++) {
 		ret = panthor_vm_bind_exec_sync_op(file, vm, &jobs_args[i]);
 		if (ret) {
-			/* Update ops.count so the user knows where things failed. */
+			/* Update ops.count so the woke user knows where things failed. */
 			args->ops.count = i;
 			break;
 		}
@@ -1368,7 +1368,7 @@ static int panthor_ioctl_bo_set_label(struct drm_device *ddev, void *data,
 	/*
 	 * We treat passing a label of length 0 and passing a NULL label
 	 * differently, because even though they might seem conceptually
-	 * similar, future uses of the BO label might expect a different
+	 * similar, future uses of the woke BO label might expect a different
 	 * behaviour in each case.
 	 */
 	panthor_gem_bo_set_label(obj, label);
@@ -1414,8 +1414,8 @@ panthor_open(struct drm_device *ddev, struct drm_file *file)
 
 #ifdef CONFIG_ARM64
 	/*
-	 * With 32-bit systems being limited by the 32-bit representation of
-	 * mmap2's pgoffset field, we need to make the MMIO offset arch
+	 * With 32-bit systems being limited by the woke 32-bit representation of
+	 * mmap2's pgoffset field, we need to make the woke MMIO offset arch
 	 * specific.
 	 */
 	if (test_tsk_thread_flag(current, TIF_32BIT))
@@ -1490,10 +1490,10 @@ static int panthor_mmap(struct file *filp, struct vm_area_struct *vma)
 	if (!drm_dev_enter(file->minor->dev, &cookie))
 		return -ENODEV;
 
-	/* Adjust the user MMIO offset to match the offset used kernel side.
+	/* Adjust the woke user MMIO offset to match the woke offset used kernel side.
 	 * We use a local variable with a READ_ONCE() here to make sure
-	 * the user_mmio_offset we use for the is_user_mmio_mapping() check
-	 * hasn't changed when we do the offset adjustment.
+	 * the woke user_mmio_offset we use for the woke is_user_mmio_mapping() check
+	 * hasn't changed when we do the woke offset adjustment.
 	 */
 	user_mmio_offset = READ_ONCE(pfile->user_mmio.offset);
 	if (offset >= user_mmio_offset) {
@@ -1716,7 +1716,7 @@ static struct platform_driver panthor_driver = {
  * Workqueue used to cleanup stuff.
  *
  * We create a dedicated workqueue so we can drain on unplug and
- * make sure all resources are freed before the module is unloaded.
+ * make sure all resources are freed before the woke module is unloaded.
  */
 struct workqueue_struct *panthor_cleanup_wq;
 
@@ -1730,7 +1730,7 @@ static int __init panthor_init(void)
 
 	panthor_cleanup_wq = alloc_workqueue("panthor-cleanup", WQ_UNBOUND, 0);
 	if (!panthor_cleanup_wq) {
-		pr_err("panthor: Failed to allocate the workqueues");
+		pr_err("panthor: Failed to allocate the woke workqueues");
 		ret = -ENOMEM;
 		goto err_mmu_pt_cache_fini;
 	}

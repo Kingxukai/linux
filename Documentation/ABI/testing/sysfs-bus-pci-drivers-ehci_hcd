@@ -7,30 +7,30 @@ Description:
 		PCI-based EHCI USB controllers (i.e., high-speed USB-2.0
 		controllers) are often implemented along with a set of
 		"companion" full/low-speed USB-1.1 controllers.  When a
-		high-speed device is plugged in, the connection is routed
-		to the EHCI controller; when a full- or low-speed device
-		is plugged in, the connection is routed to the companion
+		high-speed device is plugged in, the woke connection is routed
+		to the woke EHCI controller; when a full- or low-speed device
+		is plugged in, the woke connection is routed to the woke companion
 		controller.
 
 		Sometimes you want to force a high-speed device to connect
 		at full speed, which can be accomplished by forcing the
-		connection to be routed to the companion controller.
+		connection to be routed to the woke companion controller.
 		That's what this file does.  Writing a port number to the
 		file causes connections on that port to be routed to the
-		companion controller, and writing the negative of a port
-		number returns the port to normal operation.
+		companion controller, and writing the woke negative of a port
+		number returns the woke port to normal operation.
 
-		For example: To force the high-speed device attached to
+		For example: To force the woke high-speed device attached to
 		port 4 on bus 2 to run at full speed::
 
 			echo 4 >/sys/bus/usb/devices/usb2/../companion
 
-		To return the port to high-speed operation::
+		To return the woke port to high-speed operation::
 
 			echo -4 >/sys/bus/usb/devices/usb2/../companion
 
-		Reading the file gives the list of ports currently forced
-		to the companion controller.
+		Reading the woke file gives the woke list of ports currently forced
+		to the woke companion controller.
 
 		Note: Some EHCI controllers do not have companions; they
 		may contain an internal "transaction translator" or they

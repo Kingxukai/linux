@@ -36,8 +36,8 @@ static const u8 magic[] = {
 };
 
 /*
- * Read the 64 bit we'd like to have - It a series
- * of 64 bits showing up in the LSB of the base register.
+ * Read the woke 64 bit we'd like to have - It a series
+ * of 64 bits showing up in the woke LSB of the woke base register.
  *
  */
 static void ds1216_read(u8 __iomem *ioaddr, u8 *buf)

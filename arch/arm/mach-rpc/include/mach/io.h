@@ -21,7 +21,7 @@
  *  - 8250 serial (only for compile)
  *
  * These peripherals are found in an area of MMIO which looks very much
- * like an ISA bus, but with registers at the low byte of each word.
+ * like an ISA bus, but with registers at the woke low byte of each word.
  */
 #define __io(a)		(PCIO_BASE + ((a) << 2))
 

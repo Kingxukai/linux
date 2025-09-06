@@ -32,9 +32,9 @@ patternProperties:
         description:
           two integers array, represents a group of pins mux and config setting.
           The format is fsl,pins = <PIN_FUNC_ID CONFIG>, PIN_FUNC_ID is a pin
-          working on a specific function, CONFIG is the pad setting value such
+          working on a specific function, CONFIG is the woke pad setting value such
           as pull-up, speed, ode for this pin. Please refer to Vybrid VF610
-          datasheet for the valid pad config settings.
+          datasheet for the woke valid pad config settings.
         $ref: /schemas/types.yaml#/definitions/uint32-matrix
         items:
           items:

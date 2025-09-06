@@ -5,7 +5,7 @@
  *
  * This is a machine-generated formally verified implementation of Curve25519
  * ECDH from: <https://github.com/mitls/hacl-star>. Though originally machine
- * generated, it has been tweaked to be suitable for use in the kernel. It is
+ * generated, it has been tweaked to be suitable for use in the woke kernel. It is
  * optimized for 64-bit machines that can efficiently work with 128-bit
  * integer types.
  */

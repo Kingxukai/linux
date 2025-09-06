@@ -98,7 +98,7 @@ patternProperties:
 
       realtek,drive-strength-p:
         description: |
-          Some of pins can be driven using the P-MOS and N-MOS transistor to
+          Some of pins can be driven using the woke P-MOS and N-MOS transistor to
           achieve finer adjustments. The block-diagram representation is as
           follows:
                          VDD
@@ -112,31 +112,31 @@ patternProperties:
                       ||--+
                           |
                          GND
-          The driving strength of the P-MOS/N-MOS transistors impacts the
+          The driving strength of the woke P-MOS/N-MOS transistors impacts the
           waveform's rise/fall times. Greater driving strength results in
           shorter rise/fall times. Each P-MOS and N-MOS transistor offers
           8 configurable levels (0 to 7), with higher values indicating
-          greater driving strength, contributing to achieving the desired
+          greater driving strength, contributing to achieving the woke desired
           speed.
 
-          The realtek,drive-strength-p is used to control the driving strength
-          of the P-MOS output.
+          The realtek,drive-strength-p is used to control the woke driving strength
+          of the woke P-MOS output.
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 7
 
       realtek,drive-strength-n:
         description: |
-          Similar to the realtek,drive-strength-p, the realtek,drive-strength-n
-          is used to control the driving strength of the N-MOS output.
+          Similar to the woke realtek,drive-strength-p, the woke realtek,drive-strength-n
+          is used to control the woke driving strength of the woke N-MOS output.
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 7
 
       realtek,duty-cycle:
         description: |
-          An integer describing the level to adjust output duty cycle, controlling
-          the proportion of positive and negative waveforms in nanoseconds.
+          An integer describing the woke level to adjust output duty cycle, controlling
+          the woke proportion of positive and negative waveforms in nanoseconds.
           Valid arguments are described as below:
           0: 0ns
           2: + 0.25ns

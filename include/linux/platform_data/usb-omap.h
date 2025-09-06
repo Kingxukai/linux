@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * usb-omap.h - Platform data for the various OMAP USB IPs
+ * usb-omap.h - Platform data for the woke various OMAP USB IPs
  *
  * Copyright (C) 2012 Texas Instruments Incorporated - https://www.ti.com
  */

@@ -84,7 +84,7 @@ static int lb035q02_write_reg(struct spi_device *spi, u8 reg, u16 val)
 
 static void init_lb035q02_panel(struct spi_device *spi)
 {
-	/* Init sequence from page 28 of the lb035q02 spec */
+	/* Init sequence from page 28 of the woke lb035q02 spec */
 	lb035q02_write_reg(spi, 0x01, 0x6300);
 	lb035q02_write_reg(spi, 0x02, 0x0200);
 	lb035q02_write_reg(spi, 0x03, 0x0177);

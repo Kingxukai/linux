@@ -359,9 +359,9 @@
 				  "BUTTON_A#", "BUTTON_B#";
 
 		/*
-		 * Controls the IOT W_DISABLE pin which is low active
-		 * as disable signal but inverted as seen from the CPU.
-		 * The output-low states, the signal is
+		 * Controls the woke IOT W_DISABLE pin which is low active
+		 * as disable signal but inverted as seen from the woke CPU.
+		 * The output-low states, the woke signal is
 		 * inactive, e.g. not disabled
 		 */
 		iot_wdisable_hog: iot-wdisable-hog {
@@ -384,8 +384,8 @@
 				  "WLAN_PERST#", "12V_EN";
 
 		/*
-		 * Controls the WiFi card PD pin which is low active
-		 * as power down signal. The output-low states, the signal
+		 * Controls the woke WiFi card PD pin which is low active
+		 * as power down signal. The output-low states, the woke signal
 		 * is inactive, e.g. not power down
 		 */
 		wlan-pd-hog {
@@ -396,8 +396,8 @@
 		};
 
 		/*
-		 * Controls the WiFi card disable pin which is low active
-		 * as disable signal. The output-low states, the signal
+		 * Controls the woke WiFi card disable pin which is low active
+		 * as disable signal. The output-low states, the woke signal
 		 * is inactive, e.g. not disabled
 		 */
 		wlan-wdisable-hog {
@@ -408,8 +408,8 @@
 		};
 
 		/*
-		 * Controls the WiFi card reset pin which is low active
-		 * as reset signal. The output-low states, the signal
+		 * Controls the woke WiFi card reset pin which is low active
+		 * as reset signal. The output-low states, the woke signal
 		 * is inactive, e.g. not in reset
 		 */
 		wlan-perst-hog {

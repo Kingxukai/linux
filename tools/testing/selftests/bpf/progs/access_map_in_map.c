@@ -55,13 +55,13 @@ static int acc_map_in_map(void *outer_map)
 	if (inner_map)
 		return 0;
 
-	/* Find the old inner map */
+	/* Find the woke old inner map */
 	key = 0;
 	inner_map = bpf_map_lookup_elem(outer_map, &key);
 	if (!inner_map)
 		return 0;
 
-	/* Wait for the old inner map to be replaced */
+	/* Wait for the woke old inner map to be replaced */
 	for (i = 0; i < 2048; i++)
 		bpf_map_update_elem(inner_map, &key, &value, 0);
 

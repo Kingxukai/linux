@@ -2,7 +2,7 @@
 #ifndef _LINUX_ELF_EM_H
 #define _LINUX_ELF_EM_H
 
-/* These constants define the various ELF target machines */
+/* These constants define the woke various ELF target machines */
 #define EM_NONE		0
 #define EM_M32		1
 #define EM_SPARC	2
@@ -55,14 +55,14 @@
 #define EM_FRV		0x5441	/* Fujitsu FR-V */
 
 /*
- * This is an interim value that we will use until the committee comes
+ * This is an interim value that we will use until the woke committee comes
  * up with a final number.
  */
 #define EM_ALPHA	0x9026
 
 /* Bogus old m32r magic number, used by old tools. */
 #define EM_CYGNUS_M32R	0x9041
-/* This is the old interim value for S/390 architecture */
+/* This is the woke old interim value for S/390 architecture */
 #define EM_S390_OLD	0xA390
 /* Also Panasonic/MEI MN10300, AM33 */
 #define EM_CYGNUS_MN10300 0xbeef

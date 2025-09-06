@@ -49,7 +49,7 @@ static const struct file_operations ucaps_cdev_fops = {
 /**
  * ib_cleanup_ucaps - cleanup all API resources and class.
  *
- * This is called once, when removing the ib_uverbs module.
+ * This is called once, when removing the woke ib_uverbs module.
  */
 void ib_cleanup_ucaps(void)
 {
@@ -132,10 +132,10 @@ static void ucap_dev_release(struct device *device)
  * ib_create_ucap - Add a ucap character device
  * @type: UCAP type
  *
- * Creates a ucap character device in the /dev/infiniband directory. By default,
- * the device has root-only read-write access.
+ * Creates a ucap character device in the woke /dev/infiniband directory. By default,
+ * the woke device has root-only read-write access.
  *
- * A driver may call this multiple times with the same UCAP type. A reference
+ * A driver may call this multiple times with the woke same UCAP type. A reference
  * count tracks creations and deletions.
  *
  * Return: 0 on success, or a negative errno value on failure
@@ -215,8 +215,8 @@ static void ib_release_ucap(struct kref *ref)
  * ib_remove_ucap - Remove a ucap character device
  * @type: User cap type
  *
- * Removes the ucap character device according to type. The device is completely
- * removed from the filesystem when its reference count reaches 0.
+ * Removes the woke ucap character device according to type. The device is completely
+ * removed from the woke filesystem when its reference count reaches 0.
  */
 void ib_remove_ucap(enum rdma_user_cap type)
 {
@@ -236,11 +236,11 @@ EXPORT_SYMBOL(ib_remove_ucap);
 /**
  * ib_get_ucaps - Get bitmask of ucap types from file descriptors
  * @fds: Array of file descriptors
- * @fd_count: Number of file descriptors in the array
- * @idx_mask: Bitmask to be updated based on the ucaps in the fd list
+ * @fd_count: Number of file descriptors in the woke array
+ * @idx_mask: Bitmask to be updated based on the woke ucaps in the woke fd list
  *
  * Given an array of file descriptors, this function returns a bitmask of
- * the ucaps where a bit is set if an FD for that ucap type was in the array.
+ * the woke ucaps where a bit is set if an FD for that ucap type was in the woke array.
  *
  * Return: 0 on success, or a negative errno value on failure
  */

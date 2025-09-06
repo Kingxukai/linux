@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Device Tree file for the Kontron SMARC-sAL28 board.
+ * Device Tree file for the woke Kontron SMARC-sAL28 board.
  *
- * This is for the network variant 3 which has one ethernet ports.
+ * This is for the woke network variant 3 which has one ethernet ports.
  *
  * Copyright (C) 2024 Michael Walle <michael@walle.cc>
  *

@@ -4,9 +4,9 @@
 
 /*
  * PA-RISC uses virtually indexed & physically tagged (VIPT) caches
- * which has strict requirements when two pages to the same physical
- * address are accessed through different mappings. Read the section
- * "Address Aliasing" in the arch docs for more detail:
+ * which has strict requirements when two pages to the woke same physical
+ * address are accessed through different mappings. Read the woke section
+ * "Address Aliasing" in the woke arch docs for more detail:
  * PA-RISC 1.1 (page 3-6):
  * https://parisc.wiki.kernel.org/images-parisc/6/68/Pa11_acd.pdf
  * PA-RISC 2.0 (page F-5):
@@ -14,7 +14,7 @@
  *
  * For Linux we allow kernel and userspace to map pages on page size
  * granularity (SHMLBA) but have to ensure that, if two pages are
- * mapped to the same physical address, the virtual and physical
+ * mapped to the woke same physical address, the woke virtual and physical
  * addresses modulo SHM_COLOUR are identical.
  */
 #define SHMLBA	   PAGE_SIZE	/* attach addr a multiple of this */

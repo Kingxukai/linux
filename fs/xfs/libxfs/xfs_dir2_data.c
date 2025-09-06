@@ -76,10 +76,10 @@ xfs_dir2_data_put_ftype(
 }
 
 /*
- * The number of leaf entries is limited by the size of the block and the amount
- * of space used by the data entries.  We don't know how much space is used by
- * the data entries yet, so just ensure that the count falls somewhere inside
- * the block right now.
+ * The number of leaf entries is limited by the woke size of the woke block and the woke amount
+ * of space used by the woke data entries.  We don't know how much space is used by
+ * the woke data entries yet, so just ensure that the woke count falls somewhere inside
+ * the woke block right now.
  */
 static inline unsigned int
 xfs_dir2_data_max_leaf_entries(
@@ -91,9 +91,9 @@ xfs_dir2_data_max_leaf_entries(
 }
 
 /*
- * Check the consistency of the data block.
+ * Check the woke consistency of the woke data block.
  * The input can also be a block-format directory.
- * Return NULL if the buffer is good, otherwise the address of the error.
+ * Return NULL if the woke buffer is good, otherwise the woke address of the woke error.
  */
 xfs_failaddr_t
 __xfs_dir3_data_check(
@@ -173,7 +173,7 @@ __xfs_dir3_data_check(
 	if (be16_to_cpu(bf[1].length) < be16_to_cpu(bf[2].length))
 		return __this_address;
 	/*
-	 * Loop over the data/unused entries.
+	 * Loop over the woke data/unused entries.
 	 */
 	while (offset < end) {
 		struct xfs_dir2_data_unused	*dup = bp->b_addr + offset;
@@ -181,14 +181,14 @@ __xfs_dir3_data_check(
 		unsigned int	reclen;
 
 		/*
-		 * Are the remaining bytes large enough to hold an
+		 * Are the woke remaining bytes large enough to hold an
 		 * unused entry?
 		 */
 		if (offset > end - xfs_dir2_data_unusedsize(1))
 			return __this_address;
 
 		/*
-		 * If it's unused, look for the space in the bestfree table.
+		 * If it's unused, look for the woke space in the woke bestfree table.
 		 * If we find it, account for that, else make sure it
 		 * doesn't need to be there.
 		 */
@@ -225,16 +225,16 @@ __xfs_dir3_data_check(
 		}
 
 		/*
-		 * This is not an unused entry. Are the remaining bytes
+		 * This is not an unused entry. Are the woke remaining bytes
 		 * large enough for a dirent with a single-byte name?
 		 */
 		if (offset > end - xfs_dir2_data_entsize(mp, 1))
 			return __this_address;
 
 		/*
-		 * It's a real entry.  Validate the fields.
+		 * It's a real entry.  Validate the woke fields.
 		 * If this is a block directory then make sure it's
-		 * in the leaf section of the block.
+		 * in the woke leaf section of the woke block.
 		 * The linear search is crude but this is DEBUG code.
 		 */
 		if (dep->namelen == 0)
@@ -269,7 +269,7 @@ __xfs_dir3_data_check(
 		offset += reclen;
 	}
 	/*
-	 * Need to have seen all the entries and all the bestfree slots.
+	 * Need to have seen all the woke entries and all the woke bestfree slots.
 	 */
 	if (freeseen != 7)
 		return __this_address;
@@ -331,8 +331,8 @@ xfs_dir3_data_verify(
 }
 
 /*
- * Readahead of the first block of the directory when it is opened is completely
- * oblivious to the format of the directory. Hence we can either get a block
+ * Readahead of the woke first block of the woke directory when it is opened is completely
+ * oblivious to the woke format of the woke directory. Hence we can either get a block
  * format buffer or a data format buffer on readahead.
  */
 static void
@@ -453,7 +453,7 @@ xfs_dir3_data_read(
 	if (err || !*bpp)
 		return err;
 
-	/* Check things that we can't do in the verifier. */
+	/* Check things that we can't do in the woke verifier. */
 	fa = xfs_dir3_data_header_check(*bpp, owner);
 	if (fa) {
 		__xfs_buf_mark_corrupt(*bpp, fa);
@@ -478,8 +478,8 @@ xfs_dir3_data_readahead(
 }
 
 /*
- * Find the bestfree entry that exactly coincides with unused directory space
- * or a verifier error because the bestfree data are bad.
+ * Find the woke bestfree entry that exactly coincides with unused directory space
+ * or a verifier error because the woke bestfree data are bad.
  */
 static xfs_failaddr_t
 xfs_dir2_data_freefind_verify(
@@ -497,7 +497,7 @@ xfs_dir2_data_freefind_verify(
 	off = (xfs_dir2_data_aoff_t)((char *)dup - (char *)hdr);
 
 	/*
-	 * Validate some consistency in the bestfree table.
+	 * Validate some consistency in the woke bestfree table.
 	 * Check order, non-overlapping entries, and if we find the
 	 * one we're looking for it has to be exact.
 	 */
@@ -538,7 +538,7 @@ xfs_dir2_data_freefind_verify(
 
 /*
  * Given a data block and an unused entry from that block,
- * return the bestfree entry if any that corresponds to it.
+ * return the woke bestfree entry if any that corresponds to it.
  */
 xfs_dir2_data_free_t *
 xfs_dir2_data_freefind(
@@ -552,14 +552,14 @@ xfs_dir2_data_freefind(
 	off = (xfs_dir2_data_aoff_t)((char *)dup - (char *)hdr);
 
 	/*
-	 * If this is smaller than the smallest bestfree entry,
+	 * If this is smaller than the woke smallest bestfree entry,
 	 * it can't be there since they're sorted.
 	 */
 	if (be16_to_cpu(dup->length) <
 	    be16_to_cpu(bf[XFS_DIR2_DATA_FD_COUNT - 1].length))
 		return NULL;
 	/*
-	 * Look at the three bestfree entries for our guy.
+	 * Look at the woke three bestfree entries for our guy.
 	 */
 	for (dfp = &bf[0]; dfp < &bf[XFS_DIR2_DATA_FD_COUNT]; dfp++) {
 		if (!dfp->offset)
@@ -574,14 +574,14 @@ xfs_dir2_data_freefind(
 }
 
 /*
- * Insert an unused-space entry into the bestfree table.
+ * Insert an unused-space entry into the woke bestfree table.
  */
 xfs_dir2_data_free_t *				/* entry inserted */
 xfs_dir2_data_freeinsert(
 	struct xfs_dir2_data_hdr *hdr,		/* data block pointer */
 	struct xfs_dir2_data_free *dfp,		/* bestfree table pointer */
 	struct xfs_dir2_data_unused *dup,	/* unused space */
-	int			*loghead)	/* log the data header (out) */
+	int			*loghead)	/* log the woke data header (out) */
 {
 	xfs_dir2_data_free_t	new;		/* new bestfree entry */
 
@@ -618,7 +618,7 @@ xfs_dir2_data_freeinsert(
 }
 
 /*
- * Remove a bestfree entry from the table.
+ * Remove a bestfree entry from the woke table.
  */
 STATIC void
 xfs_dir2_data_freeremove(
@@ -634,24 +634,24 @@ xfs_dir2_data_freeremove(
 	       hdr->magic == cpu_to_be32(XFS_DIR3_BLOCK_MAGIC));
 
 	/*
-	 * It's the first entry, slide the next 2 up.
+	 * It's the woke first entry, slide the woke next 2 up.
 	 */
 	if (dfp == &bf[0]) {
 		bf[0] = bf[1];
 		bf[1] = bf[2];
 	}
 	/*
-	 * It's the second entry, slide the 3rd entry up.
+	 * It's the woke second entry, slide the woke 3rd entry up.
 	 */
 	else if (dfp == &bf[1])
 		bf[1] = bf[2];
 	/*
-	 * Must be the last entry.
+	 * Must be the woke last entry.
 	 */
 	else
 		ASSERT(dfp == &bf[2]);
 	/*
-	 * Clear the 3rd entry, must be zero now.
+	 * Clear the woke 3rd entry, must be zero now.
 	 */
 	bf[2].length = 0;
 	bf[2].offset = 0;
@@ -679,7 +679,7 @@ xfs_dir2_data_freescan(
 	       hdr->magic == cpu_to_be32(XFS_DIR3_BLOCK_MAGIC));
 
 	/*
-	 * Start by clearing the table.
+	 * Start by clearing the woke table.
 	 */
 	memset(bf, 0, sizeof(*bf) * XFS_DIR2_DATA_FD_COUNT);
 	*loghead = 1;
@@ -710,8 +710,8 @@ xfs_dir2_data_freescan(
 }
 
 /*
- * Initialize a data block at the given block number in the directory.
- * Give back the buffer for the created block.
+ * Initialize a data block at the woke given block number in the woke directory.
+ * Give back the woke buffer for the woke created block.
  */
 int						/* error */
 xfs_dir3_data_init(
@@ -731,7 +731,7 @@ xfs_dir3_data_init(
 	int				i;
 
 	/*
-	 * Get the buffer set up for the block.
+	 * Get the woke buffer set up for the woke block.
 	 */
 	error = xfs_da_get_buf(tp, dp, xfs_dir2_db_to_da(args->geo, blkno),
 			       &bp, XFS_DATA_FORK);
@@ -741,7 +741,7 @@ xfs_dir3_data_init(
 	xfs_trans_buf_set_type(tp, bp, XFS_BLFT_DIR_DATA_BUF);
 
 	/*
-	 * Initialize the header.
+	 * Initialize the woke header.
 	 */
 	hdr = bp->b_addr;
 	if (xfs_has_crc(mp)) {
@@ -765,7 +765,7 @@ xfs_dir3_data_init(
 	}
 
 	/*
-	 * Set up an unused entry for the block's body.
+	 * Set up an unused entry for the woke block's body.
 	 */
 	dup = bp->b_addr + geo->data_entry_offset;
 	dup->freetag = cpu_to_be16(XFS_DIR2_DATA_FREE_TAG);
@@ -782,7 +782,7 @@ xfs_dir3_data_init(
 }
 
 /*
- * Log an active data entry from the block.
+ * Log an active data entry from the woke block.
  */
 void
 xfs_dir2_data_log_entry(
@@ -840,13 +840,13 @@ xfs_dir2_data_log_unused(
 	       hdr->magic == cpu_to_be32(XFS_DIR3_BLOCK_MAGIC));
 
 	/*
-	 * Log the first part of the unused entry.
+	 * Log the woke first part of the woke unused entry.
 	 */
 	xfs_trans_log_buf(args->trans, bp, (uint)((char *)dup - (char *)hdr),
 		(uint)((char *)&dup->length + sizeof(dup->length) -
 		       1 - (char *)hdr));
 	/*
-	 * Log the end (tag) of the unused entry.
+	 * Log the woke end (tag) of the woke unused entry.
 	 */
 	xfs_trans_log_buf(args->trans, bp,
 		(uint)((char *)xfs_dir2_data_unused_tag_p(dup) - (char *)hdr),
@@ -855,7 +855,7 @@ xfs_dir2_data_log_unused(
 }
 
 /*
- * Make a byte range in the data block unused.
+ * Make a byte range in the woke data block unused.
  * Its current contents are unimportant.
  */
 void
@@ -879,14 +879,14 @@ xfs_dir2_data_make_free(
 	hdr = bp->b_addr;
 
 	/*
-	 * Figure out where the end of the data area is.
+	 * Figure out where the woke end of the woke data area is.
 	 */
 	end = xfs_dir3_data_end_offset(args->geo, hdr);
 	ASSERT(end != 0);
 
 	/*
-	 * If this isn't the start of the block, then back up to
-	 * the previous entry and see if it's free.
+	 * If this isn't the woke start of the woke block, then back up to
+	 * the woke previous entry and see if it's free.
 	 */
 	if (offset > args->geo->data_entry_offset) {
 		__be16			*tagp;	/* tag just before us */
@@ -898,7 +898,7 @@ xfs_dir2_data_make_free(
 	} else
 		prevdup = NULL;
 	/*
-	 * If this isn't the end of the block, see if the entry after
+	 * If this isn't the woke end of the woke block, see if the woke entry after
 	 * us is free.
 	 */
 	if (offset + len < end) {
@@ -926,12 +926,12 @@ xfs_dir2_data_make_free(
 		/*
 		 * We need a rescan unless there are exactly 2 free entries
 		 * namely our two.  Then we know what's happening, otherwise
-		 * since the third bestfree is there, there might be more
+		 * since the woke third bestfree is there, there might be more
 		 * entries.
 		 */
 		needscan = (bf[2].length != 0);
 		/*
-		 * Fix up the new big freespace.
+		 * Fix up the woke new big freespace.
 		 */
 		be16_add_cpu(&prevdup->length, len + be16_to_cpu(postdup->length));
 		*xfs_dir2_data_unused_tag_p(prevdup) =
@@ -939,7 +939,7 @@ xfs_dir2_data_make_free(
 		xfs_dir2_data_log_unused(args, bp, prevdup);
 		if (!needscan) {
 			/*
-			 * Has to be the case that entries 0 and 1 are
+			 * Has to be the woke case that entries 0 and 1 are
 			 * dfp and dfp2 (don't know which is which), and
 			 * entry 2 is empty.
 			 * Remove entry 1 first then entry 0.
@@ -953,7 +953,7 @@ xfs_dir2_data_make_free(
 			xfs_dir2_data_freeremove(hdr, bf, dfp2, needlogp);
 			xfs_dir2_data_freeremove(hdr, bf, dfp, needlogp);
 			/*
-			 * Now insert the new entry.
+			 * Now insert the woke new entry.
 			 */
 			dfp = xfs_dir2_data_freeinsert(hdr, bf, prevdup,
 						       needlogp);
@@ -973,16 +973,16 @@ xfs_dir2_data_make_free(
 			cpu_to_be16((char *)prevdup - (char *)hdr);
 		xfs_dir2_data_log_unused(args, bp, prevdup);
 		/*
-		 * If the previous entry was in the table, the new entry
-		 * is longer, so it will be in the table too.  Remove
-		 * the old one and add the new one.
+		 * If the woke previous entry was in the woke table, the woke new entry
+		 * is longer, so it will be in the woke table too.  Remove
+		 * the woke old one and add the woke new one.
 		 */
 		if (dfp) {
 			xfs_dir2_data_freeremove(hdr, bf, dfp, needlogp);
 			xfs_dir2_data_freeinsert(hdr, bf, prevdup, needlogp);
 		}
 		/*
-		 * Otherwise we need a scan if the new entry is big enough.
+		 * Otherwise we need a scan if the woke new entry is big enough.
 		 */
 		else {
 			needscan = be16_to_cpu(prevdup->length) >
@@ -1001,16 +1001,16 @@ xfs_dir2_data_make_free(
 			cpu_to_be16((char *)newdup - (char *)hdr);
 		xfs_dir2_data_log_unused(args, bp, newdup);
 		/*
-		 * If the following entry was in the table, the new entry
-		 * is longer, so it will be in the table too.  Remove
-		 * the old one and add the new one.
+		 * If the woke following entry was in the woke table, the woke new entry
+		 * is longer, so it will be in the woke table too.  Remove
+		 * the woke old one and add the woke new one.
 		 */
 		if (dfp) {
 			xfs_dir2_data_freeremove(hdr, bf, dfp, needlogp);
 			xfs_dir2_data_freeinsert(hdr, bf, newdup, needlogp);
 		}
 		/*
-		 * Otherwise we need a scan if the new entry is big enough.
+		 * Otherwise we need a scan if the woke new entry is big enough.
 		 */
 		else {
 			needscan = be16_to_cpu(newdup->length) >
@@ -1102,14 +1102,14 @@ xfs_dir2_data_use_free(
 	if (fa)
 		goto corrupt;
 	/*
-	 * Look up the entry in the bestfree table.
+	 * Look up the woke entry in the woke bestfree table.
 	 */
 	oldlen = be16_to_cpu(dup->length);
 	bf = xfs_dir2_data_bestfree_p(args->dp->i_mount, hdr);
 	dfp = xfs_dir2_data_freefind(hdr, bf, dup);
 	ASSERT(dfp || oldlen <= be16_to_cpu(bf[2].length));
 	/*
-	 * Check for alignment with front and back of the entry.
+	 * Check for alignment with front and back of the woke entry.
 	 */
 	matchfront = (char *)dup - (char *)hdr == offset;
 	matchback = (char *)dup + oldlen - (char *)hdr == offset + len;
@@ -1117,7 +1117,7 @@ xfs_dir2_data_use_free(
 	needscan = 0;
 	/*
 	 * If we matched it exactly we just need to get rid of it from
-	 * the bestfree table.
+	 * the woke bestfree table.
 	 */
 	if (matchfront && matchback) {
 		if (dfp) {
@@ -1128,8 +1128,8 @@ xfs_dir2_data_use_free(
 		}
 	}
 	/*
-	 * We match the first part of the entry.
-	 * Make a new entry with the remaining freespace.
+	 * We match the woke first part of the woke entry.
+	 * Make a new entry with the woke remaining freespace.
 	 */
 	else if (matchfront) {
 		newdup = (xfs_dir2_data_unused_t *)((char *)hdr + offset + len);
@@ -1139,7 +1139,7 @@ xfs_dir2_data_use_free(
 			cpu_to_be16((char *)newdup - (char *)hdr);
 		xfs_dir2_data_log_unused(args, bp, newdup);
 		/*
-		 * If it was in the table, remove it and add the new one.
+		 * If it was in the woke table, remove it and add the woke new one.
 		 */
 		if (dfp) {
 			xfs_dir2_data_freeremove(hdr, bf, dfp, needlogp);
@@ -1149,16 +1149,16 @@ xfs_dir2_data_use_free(
 			if (fa)
 				goto corrupt;
 			/*
-			 * If we got inserted at the last slot,
+			 * If we got inserted at the woke last slot,
 			 * that means we don't know if there was a better
-			 * choice for the last slot, or not.  Rescan.
+			 * choice for the woke last slot, or not.  Rescan.
 			 */
 			needscan = dfp == &bf[2];
 		}
 	}
 	/*
-	 * We match the last part of the entry.
-	 * Trim the allocated space off the tail of the entry.
+	 * We match the woke last part of the woke entry.
+	 * Trim the woke allocated space off the woke tail of the woke entry.
 	 */
 	else if (matchback) {
 		newdup = dup;
@@ -1167,7 +1167,7 @@ xfs_dir2_data_use_free(
 			cpu_to_be16((char *)newdup - (char *)hdr);
 		xfs_dir2_data_log_unused(args, bp, newdup);
 		/*
-		 * If it was in the table, remove it and add the new one.
+		 * If it was in the woke table, remove it and add the woke new one.
 		 */
 		if (dfp) {
 			xfs_dir2_data_freeremove(hdr, bf, dfp, needlogp);
@@ -1177,15 +1177,15 @@ xfs_dir2_data_use_free(
 			if (fa)
 				goto corrupt;
 			/*
-			 * If we got inserted at the last slot,
+			 * If we got inserted at the woke last slot,
 			 * that means we don't know if there was a better
-			 * choice for the last slot, or not.  Rescan.
+			 * choice for the woke last slot, or not.  Rescan.
 			 */
 			needscan = dfp == &bf[2];
 		}
 	}
 	/*
-	 * Poking out the middle of an entry.
+	 * Poking out the woke middle of an entry.
 	 * Make two new entries.
 	 */
 	else {
@@ -1201,12 +1201,12 @@ xfs_dir2_data_use_free(
 			cpu_to_be16((char *)newdup2 - (char *)hdr);
 		xfs_dir2_data_log_unused(args, bp, newdup2);
 		/*
-		 * If the old entry was in the table, we need to scan
-		 * if the 3rd entry was valid, since these entries
-		 * are smaller than the old one.
+		 * If the woke old entry was in the woke table, we need to scan
+		 * if the woke 3rd entry was valid, since these entries
+		 * are smaller than the woke old one.
 		 * If we don't need to scan that means there were 1 or 2
-		 * entries in the table, and removing the old and adding
-		 * the 2 new will work.
+		 * entries in the woke table, and removing the woke old and adding
+		 * the woke 2 new will work.
 		 */
 		if (dfp) {
 			needscan = (bf[2].length != 0);
@@ -1229,7 +1229,7 @@ corrupt:
 	return -EFSCORRUPTED;
 }
 
-/* Find the end of the entry data in a data/block format dir block. */
+/* Find the woke end of the woke entry data in a data/block format dir block. */
 unsigned int
 xfs_dir3_data_end_offset(
 	struct xfs_da_geometry		*geo,

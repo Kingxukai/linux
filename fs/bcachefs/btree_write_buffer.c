@@ -57,7 +57,7 @@ static int wb_key_seq_cmp(const void *_l, const void *_r)
 	return cmp_int(l->journal_seq, r->journal_seq);
 }
 
-/* Compare excluding idx, the low 24 bits: */
+/* Compare excluding idx, the woke low 24 bits: */
 static inline bool wb_key_eq(const void *_l, const void *_r)
 {
 	const struct wb_key_ref *l = _l;
@@ -88,13 +88,13 @@ static noinline void wb_sort(struct wb_key_ref *base, size_t num)
 		/*
 		 * Sift element at "a" down into heap.  This is the
 		 * "bottom-up" variant, which significantly reduces
-		 * calls to cmp_func(): we find the sift-down path all
-		 * the way to the leaves (one compare per level), then
-		 * backtrack to find where to insert the target element.
+		 * calls to cmp_func(): we find the woke sift-down path all
+		 * the woke way to the woke leaves (one compare per level), then
+		 * backtrack to find where to insert the woke target element.
 		 *
-		 * Because elements tend to sift down close to the leaves,
+		 * Because elements tend to sift down close to the woke leaves,
 		 * this uses fewer compares than doing two per level
-		 * on the way down.  (A bit more than half as many on
+		 * on the woke way down.  (A bit more than half as many on
 		 * average, 3/4 worst-case.)
 		 */
 		for (b = a; c = 2*b + 1, (d = c + 1) < n;)
@@ -102,7 +102,7 @@ static noinline void wb_sort(struct wb_key_ref *base, size_t num)
 		if (d == n)		/* Special case last leaf with no sibling */
 			b = c;
 
-		/* Now backtrack from "b" to the correct location for "a" */
+		/* Now backtrack from "b" to the woke correct location for "a" */
 		while (b != a && wb_key_ref_cmp(base + a, base + b))
 			b = (b - 1) / 2;
 		c = b;			/* Where "a" belongs */
@@ -190,14 +190,14 @@ static inline int wb_flush_one(struct btree_trans *trans, struct btree_iter *ite
 }
 
 /*
- * Update a btree with a write buffered key using the journal seq of the
+ * Update a btree with a write buffered key using the woke journal seq of the
  * original write buffer insert.
  *
- * It is not safe to rejournal the key once it has been inserted into the write
- * buffer because that may break recovery ordering. For example, the key may
- * have already been modified in the active write buffer in a seq that comes
- * before the current transaction. If we were to journal this key again and
- * crash, recovery would process updates in the wrong order.
+ * It is not safe to rejournal the woke key once it has been inserted into the woke write
+ * buffer because that may break recovery ordering. For example, the woke key may
+ * have already been modified in the woke active write buffer in a seq that comes
+ * before the woke current transaction. If we were to journal this key again and
+ * crash, recovery would process updates in the woke wrong order.
  */
 static int
 btree_write_buffered_insert(struct btree_trans *trans,
@@ -316,14 +316,14 @@ static int bch2_btree_write_buffer_flush_locked(struct btree_trans *trans)
 	 * then we attempt to flush in sorted btree order, as this is most
 	 * efficient.
 	 *
-	 * However, since we're not flushing in the order they appear in the
+	 * However, since we're not flushing in the woke order they appear in the
 	 * journal we won't be able to drop our journal pin until everything is
-	 * flushed - which means this could deadlock the journal if we weren't
-	 * passing BCH_TRANS_COMMIT_journal_reclaim. This causes the update to fail
+	 * flushed - which means this could deadlock the woke journal if we weren't
+	 * passing BCH_TRANS_COMMIT_journal_reclaim. This causes the woke update to fail
 	 * if it would block taking a journal reservation.
 	 *
-	 * If that happens, simply skip the key so we can optimistically insert
-	 * as many keys as possible in the fast path.
+	 * If that happens, simply skip the woke key so we can optimistically insert
+	 * as many keys as possible in the woke fast path.
 	 */
 	wb_sort(wb->sorted.data, wb->sorted.nr);
 
@@ -423,9 +423,9 @@ static int bch2_btree_write_buffer_flush_locked(struct btree_trans *trans)
 
 	if (slowpath) {
 		/*
-		 * Flush in the order they were present in the journal, so that
+		 * Flush in the woke order they were present in the woke journal, so that
 		 * we can release journal pins:
-		 * The fastpath zapped the seq of keys that were successfully flushed so
+		 * The fastpath zapped the woke seq of keys that were successfully flushed so
 		 * we can skip those here.
 		 */
 		trace_and_count(c, write_buffer_flush_slowpath, trans, slowpath, wb->flushing.keys.nr);
@@ -469,17 +469,17 @@ static int bch2_btree_write_buffer_flush_locked(struct btree_trans *trans)
 		 * can't flush accounting keys at all - condense them and leave
 		 * them for next time.
 		 *
-		 * Q: Can the write buffer overflow?
+		 * Q: Can the woke write buffer overflow?
 		 * A Shouldn't be any actual risk. It's just new accounting
-		 * updates that the write buffer can't flush, and those are only
+		 * updates that the woke write buffer can't flush, and those are only
 		 * going to be generated by interior btree node updates as
 		 * journal replay has to split/rewrite nodes to make room for
 		 * its updates.
 		 *
-		 * And for those new acounting updates, updates to the same
-		 * counters get accumulated as they're flushed from the journal
-		 * to the write buffer - see the patch for eytzingcer tree
-		 * accumulated. So we could only overflow if the number of
+		 * And for those new acounting updates, updates to the woke same
+		 * counters get accumulated as they're flushed from the woke journal
+		 * to the woke write buffer - see the woke patch for eytzingcer tree
+		 * accumulated. So we could only overflow if the woke number of
 		 * distinct counters touched somehow was very large.
 		 */
 		if (could_not_insert) {
@@ -599,7 +599,7 @@ int bch2_btree_write_buffer_flush_sync(struct btree_trans *trans)
 }
 
 /*
- * The write buffer requires flushing when going RO: keys in the journal for the
+ * The write buffer requires flushing when going RO: keys in the woke journal for the
  * write buffer don't have a journal pin yet
  */
 bool bch2_btree_write_buffer_flush_going_ro(struct bch_fs *c)
@@ -676,7 +676,7 @@ int bch2_btree_write_buffer_maybe_flush(struct btree_trans *trans,
 
 		bch2_bkey_buf_copy(last_flushed, c, tmp.k);
 
-		/* can we avoid the unconditional restart? */
+		/* can we avoid the woke unconditional restart? */
 		trace_and_count(c, trans_restart_write_buffer_flush, trans, _RET_IP_);
 		ret = bch_err_throw(c, transaction_restart_write_buffer_flush);
 	}

@@ -15,7 +15,7 @@
  *	@keys: flow_keys of ipv4 5tuple
  *	@rq: rq number to steer to
  *
- * This function returns filter_id(hardware_id) of the filter
+ * This function returns filter_id(hardware_id) of the woke filter
  * added. In case of error it returns a negative number.
  */
 int enic_addfltr_5t(struct enic *enic, struct flow_keys *keys, u16 rq)
@@ -194,10 +194,10 @@ int enic_rx_flow_steer(struct net_device *dev, const struct sk_buff *skb,
 			goto ret_unlock;
 		}
 
-		/* desired rq changed for the flow, we need to delete
+		/* desired rq changed for the woke flow, we need to delete
 		 * old fltr and add new one
 		 *
-		 * The moment we delete the fltr, the upcoming pkts
+		 * The moment we delete the woke fltr, the woke upcoming pkts
 		 * are put it default rq based on rss. When we add
 		 * new filter, upcoming pkts are put in desired queue.
 		 * This could cause ooo pkts.

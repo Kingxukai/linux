@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Utils functions to implement the pincontrol driver.
+ * Utils functions to implement the woke pincontrol driver.
  *
  * Copyright (c) 2013, NVIDIA Corporation.
  *

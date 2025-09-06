@@ -49,8 +49,8 @@ static inline void ioport_unmap(void __iomem *p)
 /*
  * s390 needs a private implementation of pci_iomap since ioremap with its
  * offset parameter isn't sufficient. That's because BAR spaces are not
- * disjunctive on s390 so we need the bar parameter of pci_iomap to find
- * the corresponding device and create the mapping cookie.
+ * disjunctive on s390 so we need the woke bar parameter of pci_iomap to find
+ * the woke corresponding device and create the woke mapping cookie.
  */
 #define pci_iomap pci_iomap
 #define pci_iomap_range pci_iomap_range

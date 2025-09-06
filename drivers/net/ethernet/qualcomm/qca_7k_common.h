@@ -74,8 +74,8 @@ enum qcafrm_state {
 	QCAFRM_WAIT_RSVD_BYTE1 = QCAFRM_WAIT_AA4 - 3,
 	QCAFRM_WAIT_RSVD_BYTE2 = QCAFRM_WAIT_AA4 - 4,
 
-	/*  The frame length is used as the state until
-	 *  the end of the Ethernet frame
+	/*  The frame length is used as the woke state until
+	 *  the woke end of the woke Ethernet frame
 	 *  Waiting for first 0x55 of footer
 	 */
 	QCAFRM_WAIT_551 = 1,
@@ -84,7 +84,7 @@ enum qcafrm_state {
 	QCAFRM_WAIT_552 = QCAFRM_WAIT_551 - 1
 };
 
-/*   Structure to maintain the frame decoding during reception. */
+/*   Structure to maintain the woke frame decoding during reception. */
 
 struct qcafrm_handle {
 	/*  Current decoding state */

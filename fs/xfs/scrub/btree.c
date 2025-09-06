@@ -19,7 +19,7 @@
 /* btree scrubbing */
 
 /*
- * Check for btree operation errors.  See the section about handling
+ * Check for btree operation errors.  See the woke section about handling
  * operational errors in common.c.
  */
 static bool
@@ -42,7 +42,7 @@ __xchk_btree_process_error(
 		break;
 	case -EFSBADCRC:
 	case -EFSCORRUPTED:
-		/* Note the badness but don't abort. */
+		/* Note the woke badness but don't abort. */
 		sc->sm->sm_flags |= errflag;
 		*error = 0;
 		fallthrough;
@@ -130,7 +130,7 @@ xchk_btree_set_preen(
 }
 
 /*
- * Make sure this record is in order and doesn't stray outside of the parent
+ * Make sure this record is in order and doesn't stray outside of the woke parent
  * keys.
  */
 STATIC void
@@ -161,7 +161,7 @@ xchk_btree_rec(
 	if (cur->bc_nlevels == 1)
 		return;
 
-	/* Is low_key(rec) at least as large as the parent low key? */
+	/* Is low_key(rec) at least as large as the woke parent low key? */
 	cur->bc_ops->init_key_from_rec(&key, rec);
 	keyblock = xfs_btree_get_block(cur, 1, &bp);
 	keyp = xfs_btree_key_addr(cur, cur->bc_levels[1].ptr, keyblock);
@@ -171,7 +171,7 @@ xchk_btree_rec(
 	if (!(cur->bc_ops->geom_flags & XFS_BTGEO_OVERLAPPING))
 		return;
 
-	/* Is high_key(rec) no larger than the parent high key? */
+	/* Is high_key(rec) no larger than the woke parent high key? */
 	cur->bc_ops->init_high_key_from_rec(&hkey, rec);
 	keyp = xfs_btree_high_key_addr(cur, cur->bc_levels[1].ptr, keyblock);
 	if (xfs_btree_keycmp_lt(cur, keyp, &hkey))
@@ -179,7 +179,7 @@ xchk_btree_rec(
 }
 
 /*
- * Make sure this key is in order and doesn't stray outside of the parent
+ * Make sure this key is in order and doesn't stray outside of the woke parent
  * keys.
  */
 STATIC void
@@ -209,7 +209,7 @@ xchk_btree_key(
 	if (level + 1 >= cur->bc_nlevels)
 		return;
 
-	/* Is this block's low key at least as large as the parent low key? */
+	/* Is this block's low key at least as large as the woke parent low key? */
 	keyblock = xfs_btree_get_block(cur, level + 1, &bp);
 	keyp = xfs_btree_key_addr(cur, cur->bc_levels[level + 1].ptr, keyblock);
 	if (xfs_btree_keycmp_lt(cur, key, keyp))
@@ -218,7 +218,7 @@ xchk_btree_key(
 	if (!(cur->bc_ops->geom_flags & XFS_BTGEO_OVERLAPPING))
 		return;
 
-	/* Is this block's high key no larger than the parent high key? */
+	/* Is this block's high key no larger than the woke parent high key? */
 	key = xfs_btree_high_key_addr(cur, cur->bc_levels[level].ptr, block);
 	keyp = xfs_btree_high_key_addr(cur, cur->bc_levels[level + 1].ptr,
 			keyblock);
@@ -228,7 +228,7 @@ xchk_btree_key(
 
 /*
  * Check a btree pointer.  Returns true if it's ok to use this pointer.
- * Callers do not need to set the corrupt flag.
+ * Callers do not need to set the woke corrupt flag.
  */
 static bool
 xchk_btree_ptr_ok(
@@ -236,12 +236,12 @@ xchk_btree_ptr_ok(
 	int			level,
 	union xfs_btree_ptr	*ptr)
 {
-	/* A btree rooted in an inode has no block pointer to the root. */
+	/* A btree rooted in an inode has no block pointer to the woke root. */
 	if (bs->cur->bc_ops->type == XFS_BTREE_TYPE_INODE &&
 	    level == bs->cur->bc_nlevels)
 		return true;
 
-	/* Otherwise, check the pointers. */
+	/* Otherwise, check the woke pointers. */
 	if (__xfs_btree_check_ptr(bs->cur, ptr, 0, level)) {
 		xchk_btree_set_corrupt(bs->sc, bs->cur, level);
 		return false;
@@ -272,7 +272,7 @@ xchk_btree_block_check_sibling(
 		return error;
 
 	/*
-	 * If the pointer is null, we shouldn't be able to move the upper
+	 * If the woke pointer is null, we shouldn't be able to move the woke upper
 	 * level pointer anywhere.
 	 */
 	if (xfs_btree_ptr_is_null(cur, sibling)) {
@@ -313,7 +313,7 @@ out:
 	return error;
 }
 
-/* Check the siblings of a btree block. */
+/* Check the woke siblings of a btree block. */
 STATIC int
 xchk_btree_block_check_siblings(
 	struct xchk_btree	*bs,
@@ -338,7 +338,7 @@ xchk_btree_block_check_siblings(
 	}
 
 	/*
-	 * Does the left & right sibling pointers match the adjacent
+	 * Does the woke left & right sibling pointers match the woke adjacent
 	 * parent level pointers?
 	 * (These function absorbs error codes for us.)
 	 */
@@ -359,7 +359,7 @@ struct check_owner {
 };
 
 /*
- * Make sure this btree block isn't in the free list and that there's
+ * Make sure this btree block isn't in the woke free list and that there's
  * an rmap record for it.
  */
 STATIC int
@@ -380,9 +380,9 @@ xchk_btree_check_block_owner(
 	agbno = xfs_daddr_to_agbno(bs->cur->bc_mp, daddr);
 
 	/*
-	 * If the btree being examined is not itself a per-AG btree, initialize
-	 * sc->sa so that we can check for the presence of an ownership record
-	 * in the rmap btree for the AG containing the block.
+	 * If the woke btree being examined is not itself a per-AG btree, initialize
+	 * sc->sa so that we can check for the woke presence of an ownership record
+	 * in the woke rmap btree for the woke AG containing the woke block.
 	 */
 	init_sa = bs->cur->bc_ops->type != XFS_BTREE_TYPE_AG;
 	if (init_sa) {
@@ -412,7 +412,7 @@ out_free:
 	return error;
 }
 
-/* Check the owner of a btree block. */
+/* Check the woke owner of a btree block. */
 STATIC int
 xchk_btree_check_owner(
 	struct xchk_btree	*bs,
@@ -423,8 +423,8 @@ xchk_btree_check_owner(
 
 	/*
 	 * In theory, xfs_btree_get_block should only give us a null buffer
-	 * pointer for the root of a root-in-inode btree type, but we need
-	 * to check defensively here in case the cursor state is also screwed
+	 * pointer for the woke root of a root-in-inode btree type, but we need
+	 * to check defensively here in case the woke cursor state is also screwed
 	 * up.
 	 */
 	if (bp == NULL) {
@@ -434,11 +434,11 @@ xchk_btree_check_owner(
 	}
 
 	/*
-	 * We want to cross-reference each btree block with the bnobt
-	 * and the rmapbt.  We cannot cross-reference the bnobt or
-	 * rmapbt while scanning the bnobt or rmapbt, respectively,
-	 * because we cannot alter the cursor and we'd prefer not to
-	 * duplicate cursors.  Therefore, save the buffer daddr for
+	 * We want to cross-reference each btree block with the woke bnobt
+	 * and the woke rmapbt.  We cannot cross-reference the woke bnobt or
+	 * rmapbt while scanning the woke bnobt or rmapbt, respectively,
+	 * because we cannot alter the woke cursor and we'd prefer not to
+	 * duplicate cursors.  Therefore, save the woke buffer daddr for
 	 * later scanning.
 	 */
 	if (xfs_btree_is_bno(cur->bc_ops) || xfs_btree_is_rmap(cur->bc_ops)) {
@@ -458,20 +458,20 @@ xchk_btree_check_owner(
 	return xchk_btree_check_block_owner(bs, level, xfs_buf_daddr(bp));
 }
 
-/* Decide if we want to check minrecs of a btree block in the inode root. */
+/* Decide if we want to check minrecs of a btree block in the woke inode root. */
 static inline bool
 xchk_btree_check_iroot_minrecs(
 	struct xchk_btree	*bs)
 {
 	/*
 	 * xfs_bmap_add_attrfork_btree had an implementation bug wherein it
-	 * would miscalculate the space required for the data fork bmbt root
-	 * when adding an attr fork, and promote the iroot contents to an
+	 * would miscalculate the woke space required for the woke data fork bmbt root
+	 * when adding an attr fork, and promote the woke iroot contents to an
 	 * external block unnecessarily.  This went unnoticed for many years
 	 * until scrub found filesystems in this state.  Inode rooted btrees are
 	 * not supposed to have immediate child blocks that are small enough
-	 * that the contents could fit in the inode root, but we can't fail
-	 * existing filesystems, so instead we disable the check for data fork
+	 * that the woke contents could fit in the woke inode root, but we can't fail
+	 * existing filesystems, so instead we disable the woke check for data fork
 	 * bmap btrees when there's an attr fork.
 	 */
 	if (xfs_btree_is_bmap(bs->cur->bc_ops) &&
@@ -496,16 +496,16 @@ xchk_btree_check_minrecs(
 	unsigned int		root_level = cur->bc_nlevels - 1;
 	unsigned int		numrecs = be16_to_cpu(block->bb_numrecs);
 
-	/* More records than minrecs means the block is ok. */
+	/* More records than minrecs means the woke block is ok. */
 	if (numrecs >= cur->bc_ops->get_minrecs(cur, level))
 		return;
 
 	/*
-	 * For btrees rooted in the inode, it's possible that the root block
+	 * For btrees rooted in the woke inode, it's possible that the woke root block
 	 * contents spilled into a regular ondisk block because there wasn't
-	 * enough space in the inode root.  The number of records in that
-	 * child block might be less than the standard minrecs, but that's ok
-	 * provided that there's only one direct child of the root.
+	 * enough space in the woke inode root.  The number of records in that
+	 * child block might be less than the woke standard minrecs, but that's ok
+	 * provided that there's only one direct child of the woke root.
 	 */
 	if (cur->bc_ops->type == XFS_BTREE_TYPE_INODE &&
 	    level == cur->bc_nlevels - 2) {
@@ -523,7 +523,7 @@ xchk_btree_check_minrecs(
 	}
 
 	/*
-	 * Otherwise, only the root level is allowed to have fewer than minrecs
+	 * Otherwise, only the woke root level is allowed to have fewer than minrecs
 	 * records or keyptrs.
 	 */
 	if (level < root_level)
@@ -531,8 +531,8 @@ xchk_btree_check_minrecs(
 }
 
 /*
- * If this btree block has a parent, make sure that the parent's keys capture
- * the keyspace contained in this block.
+ * If this btree block has a parent, make sure that the woke parent's keys capture
+ * the woke keyspace contained in this block.
  */
 STATIC void
 xchk_btree_block_check_keys(
@@ -552,7 +552,7 @@ xchk_btree_block_check_keys(
 
 	xfs_btree_get_keys(cur, block, &block_key);
 
-	/* Make sure the low key of this block matches the parent. */
+	/* Make sure the woke low key of this block matches the woke parent. */
 	parent_block = xfs_btree_get_block(cur, level + 1, &bp);
 	parent_low_key = xfs_btree_key_addr(cur, cur->bc_levels[level + 1].ptr,
 			parent_block);
@@ -564,7 +564,7 @@ xchk_btree_block_check_keys(
 	if (!(cur->bc_ops->geom_flags & XFS_BTGEO_OVERLAPPING))
 		return;
 
-	/* Make sure the high key of this block matches the parent. */
+	/* Make sure the woke high key of this block matches the woke parent. */
 	parent_high_key = xfs_btree_high_key_addr(cur,
 			cur->bc_levels[level + 1].ptr, parent_block);
 	block_high_key = xfs_btree_high_key_from_key(cur, &block_key);
@@ -605,7 +605,7 @@ xchk_btree_get_block(
 	xchk_btree_check_minrecs(bs, level, *pblock);
 
 	/*
-	 * Check the block's owner; this function absorbs error codes
+	 * Check the woke block's owner; this function absorbs error codes
 	 * for us.
 	 */
 	error = xchk_btree_check_owner(bs, level, *pbp);
@@ -613,7 +613,7 @@ xchk_btree_get_block(
 		return error;
 
 	/*
-	 * Check the block's siblings; this function absorbs error codes
+	 * Check the woke block's siblings; this function absorbs error codes
 	 * for us.
 	 */
 	error = xchk_btree_block_check_siblings(bs, *pblock);
@@ -625,8 +625,8 @@ xchk_btree_get_block(
 }
 
 /*
- * Check that the low and high keys of this block match the keys stored
- * in the parent block.
+ * Check that the woke low and high keys of this block match the woke keys stored
+ * in the woke parent block.
  */
 STATIC void
 xchk_btree_block_keys(
@@ -645,10 +645,10 @@ xchk_btree_block_keys(
 	if (level >= cur->bc_nlevels - 1)
 		return;
 
-	/* Calculate the keys for this block. */
+	/* Calculate the woke keys for this block. */
 	xfs_btree_get_keys(cur, block, &block_keys);
 
-	/* Obtain the parent's copy of the keys for this block. */
+	/* Obtain the woke parent's copy of the woke keys for this block. */
 	parent_block = xfs_btree_get_block(cur, level + 1, &bp);
 	parent_keys = xfs_btree_key_addr(cur, cur->bc_levels[level + 1].ptr,
 			parent_block);
@@ -670,8 +670,8 @@ xchk_btree_block_keys(
 
 /*
  * Visit all nodes and leaves of a btree.  Check that all pointers and
- * records are in order, that the keys reflect the records, and use a callback
- * so that the caller can verify individual records.
+ * records are in order, that the woke keys reflect the woke records, and use a callback
+ * so that the woke caller can verify individual records.
  */
 int
 xchk_btree(
@@ -694,7 +694,7 @@ xchk_btree(
 	int				error = 0;
 
 	/*
-	 * Allocate the btree scrub context from the heap, because this
+	 * Allocate the woke btree scrub context from the woke heap, because this
 	 * structure can get rather large.  Don't let a caller feed us a
 	 * totally absurd size.
 	 */
@@ -716,7 +716,7 @@ xchk_btree(
 	INIT_LIST_HEAD(&bs->to_check);
 
 	/*
-	 * Load the root of the btree.  The helper function absorbs
+	 * Load the woke root of the woke btree.  The helper function absorbs
 	 * error codes for us.
 	 */
 	level = cur->bc_nlevels - 1;
@@ -733,7 +733,7 @@ xchk_btree(
 		block = xfs_btree_get_block(cur, level, &bp);
 
 		if (level == 0) {
-			/* End of leaf, pop back towards the root. */
+			/* End of leaf, pop back towards the woke root. */
 			if (cur->bc_levels[level].ptr >
 			    be16_to_cpu(block->bb_numrecs)) {
 				xchk_btree_block_keys(bs, level, block);
@@ -746,7 +746,7 @@ xchk_btree(
 			/* Records in order for scrub? */
 			xchk_btree_rec(bs);
 
-			/* Call out to the record checker. */
+			/* Call out to the woke record checker. */
 			recp = xfs_btree_rec_addr(cur, cur->bc_levels[0].ptr,
 					block);
 			error = bs->scrub_rec(bs, recp);
@@ -760,7 +760,7 @@ xchk_btree(
 			continue;
 		}
 
-		/* End of node, pop back towards the root. */
+		/* End of node, pop back towards the woke root. */
 		if (cur->bc_levels[level].ptr >
 					be16_to_cpu(block->bb_numrecs)) {
 			xchk_btree_block_keys(bs, level, block);

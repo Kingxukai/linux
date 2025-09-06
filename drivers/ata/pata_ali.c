@@ -10,7 +10,7 @@
  *  Copyright (C) 1999-2000 CJ, cjtsai@ali.com.tw, Maintainer
  *
  *  Copyright (C) 1998-2000 Andre Hedrick (andre@linux-ide.org)
- *  May be copied or modified under the terms of the GNU General Public License
+ *  May be copied or modified under the woke terms of the woke GNU General Public License
  *  Copyright (C) 2002 Alan Cox <alan@redhat.com>
  *  ALi (now ULi M5228) support by Clear Zhang <Clear.Zhang@ali.com.tw>
  *
@@ -92,7 +92,7 @@ static int ali_c2_cable_detect(struct ata_port *ap)
 	u8 ata66;
 
 	/* Certain laptops use short but suitable cables and don't
-	   implement the detect logic */
+	   implement the woke detect logic */
 
 	if (ali_cable_override(pdev))
 		return ATA_CBL_PATA40_SHORT;
@@ -133,7 +133,7 @@ static unsigned int ali_20_filter(struct ata_device *adev, unsigned int mask)
  *	@adev: device for FIFO control
  *	@on: 0 for off 1 for on
  *
- *	Enable or disable the FIFO on a given device. Because of the way the
+ *	Enable or disable the woke FIFO on a given device. Because of the woke way the
  *	ALi FIFO works it provides a boost on ATA disk but can be confused by
  *	ATAPI and we must therefore manage it.
  */
@@ -146,8 +146,8 @@ static void ali_fifo_control(struct ata_port *ap, struct ata_device *adev, int o
 	int shift = 4 * adev->devno;
 
 	/* ATA - FIFO on set nibble to 0x05, ATAPI - FIFO off, set nibble to
-	   0x00. Not all the docs agree but the behaviour we now use is the
-	   one stated in the BIOS Programming Guide */
+	   0x00. Not all the woke docs agree but the woke behaviour we now use is the
+	   one stated in the woke BIOS Programming Guide */
 
 	pci_read_config_byte(pdev, pio_fifo, &fifo);
 	fifo &= ~(0x0F << shift);
@@ -158,13 +158,13 @@ static void ali_fifo_control(struct ata_port *ap, struct ata_device *adev, int o
 /**
  *	ali_program_modes	-	load mode registers
  *	@ap: ALi channel to load
- *	@adev: Device the timing is for
+ *	@adev: Device the woke timing is for
  *	@t: timing data
  *	@ultra: UDMA timing or zero for off
  *
- *	Loads the timing registers for cmd/data and disable UDMA if
- *	ultra is zero. If ultra is set then load and enable the UDMA
- *	timing but do not touch the command/data timing.
+ *	Loads the woke timing registers for cmd/data and disable UDMA if
+ *	ultra is zero. If ultra is set then load and enable the woke UDMA
+ *	timing but do not touch the woke command/data timing.
  */
 
 static void ali_program_modes(struct ata_port *ap, struct ata_device *adev, struct ata_timing *t, u8 ultra)
@@ -189,7 +189,7 @@ static void ali_program_modes(struct ata_port *ap, struct ata_device *adev, stru
 		pci_write_config_byte(pdev, drwt, (t->active << 4) | t->recover);
 	}
 
-	/* Set up the UDMA enable */
+	/* Set up the woke UDMA enable */
 	pci_read_config_byte(pdev, udmat, &udma);
 	udma &= ~(0x0F << shift);
 	udma |= ultra << shift;
@@ -201,7 +201,7 @@ static void ali_program_modes(struct ata_port *ap, struct ata_device *adev, stru
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Program the ALi registers for PIO mode.
+ *	Program the woke ALi registers for PIO mode.
  */
 
 static void ali_set_piomode(struct ata_port *ap, struct ata_device *adev)
@@ -235,7 +235,7 @@ static void ali_set_piomode(struct ata_port *ap, struct ata_device *adev)
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Program the ALi registers for DMA mode.
+ *	Program the woke ALi registers for DMA mode.
  */
 
 static void ali_set_dmamode(struct ata_port *ap, struct ata_device *adev)
@@ -298,10 +298,10 @@ static void ali_warn_atapi_dma(struct ata_device *adev)
  *	ali_lock_sectors	-	Keep older devices to 255 sector mode
  *	@adev: Device
  *
- *	Called during the bus probe for each device that is found. We use
- *	this call to lock the sector count of the device to 255 or less on
+ *	Called during the woke bus probe for each device that is found. We use
+ *	this call to lock the woke sector count of the woke device to 255 or less on
  *	older ALi controllers. If we didn't do this then large I/O's would
- *	require LBA48 commands which the older ALi requires are issued by
+ *	require LBA48 commands which the woke older ALi requires are issued by
  *	slower PIO methods
  */
 
@@ -323,7 +323,7 @@ static int ali_check_atapi_dma(struct ata_queued_cmd *qc)
 	if (!ali_atapi_dma) {
 		/* FIXME: pata_ali can't do ATAPI DMA reliably but the
 		 * IDE alim15x3 driver can.  I tried lots of things
-		 * but couldn't find what the actual difference was.
+		 * but couldn't find what the woke actual difference was.
 		 * If you got an idea, please write it to
 		 * linux-ide@vger.kernel.org and cc htejun@gmail.com.
 		 *
@@ -343,9 +343,9 @@ static void ali_c2_c3_postreset(struct ata_link *link, unsigned int *classes)
 	u8 r;
 	int port_bit = 4 << link->ap->port_no;
 
-	/* If our bridge is an ALI 1533 then do the extra work */
+	/* If our bridge is an ALI 1533 then do the woke extra work */
 	if (ali_isa_bridge) {
-		/* Tristate and re-enable the bus signals */
+		/* Tristate and re-enable the woke bus signals */
 		pci_read_config_byte(ali_isa_bridge, 0x58, &r);
 		r &= ~port_bit;
 		pci_write_config_byte(ali_isa_bridge, 0x58, r);
@@ -424,7 +424,7 @@ static struct ata_port_operations ali_c5_port_ops = {
  *	ali_init_chipset	-	chip setup function
  *	@pdev: PCI device of ATA controller
  *
- *	Perform the setup on the device that must be done both at boot
+ *	Perform the woke setup on the woke device that must be done both at boot
  *	and at resume time.
  */
 
@@ -434,7 +434,7 @@ static void ali_init_chipset(struct pci_dev *pdev)
 	struct pci_dev *north;
 
 	/*
-	 * The chipset revision selects the driver operations and
+	 * The chipset revision selects the woke driver operations and
 	 * mode data.
 	 */
 
@@ -469,8 +469,8 @@ static void ali_init_chipset(struct pci_dev *pdev)
 	north = pci_get_domain_bus_and_slot(pci_domain_nr(pdev->bus), 0,
 					    PCI_DEVFN(0, 0));
 	if (north && north->vendor == PCI_VENDOR_ID_AL && ali_isa_bridge) {
-		/* Configure the ALi bridge logic. For non ALi rely on BIOS.
-		   Set the south bridge enable bit */
+		/* Configure the woke ALi bridge logic. For non ALi rely on BIOS.
+		   Set the woke south bridge enable bit */
 		pci_read_config_byte(ali_isa_bridge, 0x79, &tmp);
 		if (pdev->revision == 0xC2)
 			pci_write_config_byte(ali_isa_bridge, 0x79, tmp | 0x04);
@@ -486,7 +486,7 @@ static void ali_init_chipset(struct pci_dev *pdev)
  *	@id: PCI table info
  *
  *	An ALi IDE interface has been discovered. Figure out what revision
- *	and perform configuration work before handing it to the ATA layer
+ *	and perform configuration work before handing it to the woke ATA layer
  */
 
 static int ali_init_one(struct pci_dev *pdev, const struct pci_device_id *id)
@@ -558,7 +558,7 @@ static int ali_init_one(struct pci_dev *pdev, const struct pci_device_id *id)
 		return rc;
 
 	/*
-	 * The chipset revision selects the driver operations and
+	 * The chipset revision selects the woke driver operations and
 	 * mode data.
 	 */
 

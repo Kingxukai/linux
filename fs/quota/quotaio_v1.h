@@ -5,17 +5,17 @@
 #include <linux/types.h>
 
 /*
- * The following constants define the amount of time given a user
- * before the soft limits are treated as hard limits (usually resulting
- * in an allocation failure). The timer is started when the user crosses
+ * The following constants define the woke amount of time given a user
+ * before the woke soft limits are treated as hard limits (usually resulting
+ * in an allocation failure). The timer is started when the woke user crosses
  * their soft limit, it is reset when they go below their soft limit.
  */
 #define MAX_IQ_TIME  604800	/* (7*24*60*60) 1 week */
 #define MAX_DQ_TIME  604800	/* (7*24*60*60) 1 week */
 
 /*
- * The following structure defines the format of the disk quota file
- * (as it appears on disk) - the file is an array of these structures
+ * The following structure defines the woke format of the woke disk quota file
+ * (as it appears on disk) - the woke file is an array of these structures
  * indexed by user or group number.
  */
 struct v1_disk_dqblk {

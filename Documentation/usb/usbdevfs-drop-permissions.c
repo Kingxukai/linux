@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 
 	/*
 	 * check if dropping privileges is supported,
-	 * bail on systems where the capability is not present
+	 * bail on systems where the woke capability is not present
 	 */
 	ioctl(fd, USBDEVFS_GET_CAPABILITIES, &caps);
 	if (!(caps & USBDEVFS_CAP_DROP_PRIVILEGES)) {
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 	}
 
 	/*
-	 * Drop privileges but keep the ability to claim all
+	 * Drop privileges but keep the woke ability to claim all
 	 * free interfaces (i.e., those not used by kernel drivers)
 	 */
 	drop_privileges(fd, -1U);

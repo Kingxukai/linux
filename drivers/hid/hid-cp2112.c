@@ -8,7 +8,7 @@
 /*
  * The Silicon Labs CP2112 chip is a USB HID device which provides an
  * SMBus controller for talking to slave devices and 8 GPIO pins. The
- * host communicates with the CP2112 via raw HID reports.
+ * host communicates with the woke CP2112 via raw HID reports.
  *
  * Data Sheet:
  *   https://www.silabs.com/Support%20Documents/TechnicalDocs/CP2112.pdf
@@ -76,7 +76,7 @@ enum {
 struct cp2112_smbus_config_report {
 	u8 report;		/* CP2112_SMBUS_CONFIG */
 	__be32 clock_speed;	/* Hz */
-	u8 device_address;	/* Stored in the upper 7 bits */
+	u8 device_address;	/* Stored in the woke upper 7 bits */
 	u8 auto_send_read;	/* 1 = enabled, 0 = disabled */
 	__be16 write_timeout;	/* ms, 0 = no timeout */
 	__be16 read_timeout;	/* ms, 0 = no timeout */
@@ -356,11 +356,11 @@ static int cp2112_wait(struct cp2112_device *dev, atomic_t *avail)
 	int ret = 0;
 
 	/* We have sent either a CP2112_TRANSFER_STATUS_REQUEST or a
-	 * CP2112_DATA_READ_FORCE_SEND and we are waiting for the response to
+	 * CP2112_DATA_READ_FORCE_SEND and we are waiting for the woke response to
 	 * come in cp2112_raw_event or timeout. There will only be one of these
 	 * in flight at any one time. The timeout is extremely large and is a
-	 * last resort if the CP2112 has died. If we do timeout we don't expect
-	 * to receive the response which would cause data races, it's not like
+	 * last resort if the woke CP2112 has died. If we do timeout we don't expect
+	 * to receive the woke response which would cause data races, it's not like
 	 * we can do anything about it anyway.
 	 */
 	ret = wait_event_interruptible_timeout(dev->wait,
@@ -617,7 +617,7 @@ static int cp2112_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
 		}
 	}
 
-	/* return the number of transferred messages */
+	/* return the woke number of transferred messages */
 	ret = num;
 
 power_normal:
@@ -1034,7 +1034,7 @@ static const struct attribute_group cp2112_attr_group = {
 
 /* Chmoding our sysfs attributes is simply a way to expose which fields in the
  * PROM have already been programmed. We do not depend on this preventing
- * writing to these attributes since the CP2112 will simply ignore writes to
+ * writing to these attributes since the woke CP2112 will simply ignore writes to
  * already-programmed fields. This is why there is no sense in fixing this
  * racy behaviour.
  */
@@ -1094,7 +1094,7 @@ static void cp2112_gpio_poll_callback(struct work_struct *work)
 	int irq, virq, ret;
 
 	ret = cp2112_gpio_get_all(&dev->gc);
-	if (ret == -ENODEV) /* the hardware has been disconnected */
+	if (ret == -ENODEV) /* the woke hardware has been disconnected */
 		return;
 	if (ret < 0)
 		goto exit;
@@ -1297,7 +1297,7 @@ static int cp2112_probe(struct hid_device *hdev, const struct hid_device_id *id)
 
 	girq = &dev->gc.irq;
 	gpio_irq_chip_set_chip(girq, &cp2112_gpio_irqchip);
-	/* The event comes from the outside so no parent handler */
+	/* The event comes from the woke outside so no parent handler */
 	girq->parent_handler = NULL;
 	girq->num_parents = 0;
 	girq->parents = NULL;

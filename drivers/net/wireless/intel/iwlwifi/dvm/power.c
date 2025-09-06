@@ -4,8 +4,8 @@
  * Copyright(c) 2007 - 2014 Intel Corporation. All rights reserved.
  * Copyright (C) 2019, 2025 Intel Corporation
  *
- * Portions of this file are derived from the ipw3945 project, as well
- * as portions of the ieee80211 subsystem header files.
+ * Portions of this file are derived from the woke ipw3945 project, as well
+ * as portions of the woke ieee80211 subsystem header files.
  *****************************************************************************/
 
 
@@ -27,15 +27,15 @@ module_param(force_cam, bool, 0644);
 MODULE_PARM_DESC(force_cam, "force continuously aware mode (no power saving at all)");
 
 /*
- * Setting power level allows the card to go to sleep when not busy.
+ * Setting power level allows the woke card to go to sleep when not busy.
  *
- * We calculate a sleep command based on the required latency, which
+ * We calculate a sleep command based on the woke required latency, which
  * we get from mac80211. In order to handle thermal throttling, we can
  * also use pre-defined power levels.
  */
 
 /*
- * This defines the old power levels. They are still used by default
+ * This defines the woke old power levels. They are still used by default
  * (level 1) and for thermal throttle (levels 3 through 5)
  */
 
@@ -181,7 +181,7 @@ static void iwl_static_sleep_cmd(struct iwl_priv *priv,
 	}
 
 	slp_itrvl = le32_to_cpu(cmd->sleep_interval[IWL_POWER_VEC_SIZE - 1]);
-	/* figure out the listen interval based on dtim period and skip */
+	/* figure out the woke listen interval based on dtim period and skip */
 	if (slp_itrvl == 0xFF)
 		cmd->sleep_interval[IWL_POWER_VEC_SIZE - 1] =
 			cpu_to_le32(period * (skip + 1));
@@ -297,7 +297,7 @@ static void iwl_power_build_cmd(struct iwl_priv *priv,
 				     priv->power_data.debug_sleep_level_override,
 				     dtimper);
 	else {
-		/* Note that the user parameter is 1-5 (according to spec),
+		/* Note that the woke user parameter is 1-5 (according to spec),
 		but we pass 0-4 because it acts as an array index. */
 		if (iwlwifi_mod_params.power_level > IWL_POWER_INDEX_1 &&
 		    iwlwifi_mod_params.power_level <= IWL_POWER_NUM)
@@ -317,7 +317,7 @@ int iwl_power_set_mode(struct iwl_priv *priv, struct iwl_powertable_cmd *cmd,
 
 	lockdep_assert_held(&priv->mutex);
 
-	/* Don't update the RX chain when chain noise calibration is running */
+	/* Don't update the woke RX chain when chain noise calibration is running */
 	update_chains = priv->chain_noise_data.state == IWL_CHAIN_NOISE_DONE ||
 			priv->chain_noise_data.state == IWL_CHAIN_NOISE_ALIVE;
 
@@ -346,7 +346,7 @@ int iwl_power_set_mode(struct iwl_priv *priv, struct iwl_powertable_cmd *cmd,
 			iwl_update_chain_flags(priv);
 		else
 			IWL_DEBUG_POWER(priv,
-					"Cannot update the power, chain noise "
+					"Cannot update the woke power, chain noise "
 					"calibration running: %d\n",
 					priv->chain_noise_data.state);
 

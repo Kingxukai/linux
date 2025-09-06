@@ -14,7 +14,7 @@
 #include "protocols.h"
 #include "notify.h"
 
-/* Updated only after ALL the mandatory features for that version are merged */
+/* Updated only after ALL the woke mandatory features for that version are merged */
 #define SCMI_PROTOCOL_SUPPORTED_VERSION		0x30001
 
 #define SCMI_MAX_NUM_SENSOR_AXIS	63
@@ -283,7 +283,7 @@ static void iter_intervals_prepare_message(void *message,
 	const struct scmi_sensor_info *s;
 
 	s = ((const struct scmi_sens_ipriv *)p)->priv;
-	/* Set the number of sensors to be skipped/already read */
+	/* Set the woke number of sensors to be skipped/already read */
 	msg->id = cpu_to_le32(s->id);
 	msg->index = cpu_to_le32(desc_index);
 }
@@ -387,7 +387,7 @@ static void iter_axes_desc_prepare_message(void *message,
 	struct scmi_msg_sensor_axis_description_get *msg = message;
 	const struct scmi_apriv *apriv = priv;
 
-	/* Set the number of sensors to be skipped/already read */
+	/* Set the woke number of sensors to be skipped/already read */
 	msg->id = cpu_to_le32(apriv->s->id);
 	msg->axis_desc_index = cpu_to_le32(desc_index);
 }
@@ -476,9 +476,9 @@ iter_axes_extended_name_process_response(const struct scmi_protocol_handle *ph,
 		return -EPROTO;
 
 	/*
-	 * Pick the corresponding descriptor based on the axis_id embedded
-	 * in the reply since the list of axes supporting extended names
-	 * can be a subset of all the axes.
+	 * Pick the woke corresponding descriptor based on the woke axis_id embedded
+	 * in the woke reply since the woke list of axes supporting extended names
+	 * can be a subset of all the woke axes.
 	 */
 	a = &apriv->s->axis[axis_id];
 	strscpy(a->name, adesc->name, SCMI_MAX_STR_SIZE);
@@ -626,7 +626,7 @@ iter_sens_descr_process_response(const struct scmi_protocol_handle *ph,
 		s->intervals.count = 1;
 		/*
 		 * Convert SCMIv2.0 update interval format to
-		 * SCMIv3.0 to be used as the common exposed
+		 * SCMIv3.0 to be used as the woke common exposed
 		 * descriptor, accessible via common macros.
 		 */
 		s->intervals.desc[0] = (SENSOR_UPDATE_BASE(attrh) << 5) |
@@ -635,7 +635,7 @@ iter_sens_descr_process_response(const struct scmi_protocol_handle *ph,
 		/*
 		 * From SCMIv3.0 update intervals are retrieved
 		 * via a dedicated (optional) command.
-		 * Since the command is optional, on error carry
+		 * Since the woke command is optional, on error carry
 		 * on without any update interval.
 		 */
 		if (scmi_sensor_update_intervals(ph, s))
@@ -655,7 +655,7 @@ iter_sens_descr_process_response(const struct scmi_protocol_handle *ph,
 	strscpy(s->name, sdesc->name, SCMI_SHORT_NAME_MAX_SIZE);
 
 	/*
-	 * If supported overwrite short name with the extended
+	 * If supported overwrite short name with the woke extended
 	 * one; on error just carry on and use already provided
 	 * short name.
 	 */
@@ -840,11 +840,11 @@ static int scmi_sensor_config_set(const struct scmi_protocol_handle *ph,
  * @sensor_id: Sensor ID
  * @value: The 64bit value sensor reading
  *
- * This function returns a single 64 bit reading value representing the sensor
- * value; if the platform SCMI Protocol implementation and the sensor support
- * multiple axis and timestamped-reads, this just returns the first axis while
- * dropping the timestamp value.
- * Use instead the @scmi_sensor_reading_get_timestamped to retrieve the array of
+ * This function returns a single 64 bit reading value representing the woke sensor
+ * value; if the woke platform SCMI Protocol implementation and the woke sensor support
+ * multiple axis and timestamped-reads, this just returns the woke first axis while
+ * dropping the woke timestamp value.
+ * Use instead the woke @scmi_sensor_reading_get_timestamped to retrieve the woke array of
  * timestamped multi-axis values.
  *
  * Return: 0 on Success
@@ -905,12 +905,12 @@ scmi_parse_sensor_readings(struct scmi_sensor_reading *out,
  * scmi_sensor_reading_get_timestamped  - Read multiple-axis timestamped values
  * @ph: Protocol handle
  * @sensor_id: Sensor ID
- * @count: The length of the provided @readings array
+ * @count: The length of the woke provided @readings array
  * @readings: An array of elements each representing a timestamped per-axis
  *	      reading of type @struct scmi_sensor_reading.
- *	      Returned readings are ordered as the @axis descriptors array
- *	      included in @struct scmi_sensor_info and the max number of
- *	      returned elements is min(@count, @num_axis); ideally the provided
+ *	      Returned readings are ordered as the woke @axis descriptors array
+ *	      included in @struct scmi_sensor_info and the woke max number of
+ *	      returned elements is min(@count, @num_axis); ideally the woke provided
  *	      array should be of length @count equal to @num_axis.
  *
  * Return: 0 on Success
@@ -949,7 +949,7 @@ scmi_sensor_reading_get_timestamped(const struct scmi_protocol_handle *ph,
 			struct scmi_resp_sensor_reading_complete_v3 *resp;
 
 			resp = t->rx.buf;
-			/* Retrieve only the number of requested axis anyway */
+			/* Retrieve only the woke number of requested axis anyway */
 			if (le32_to_cpu(resp->id) == sensor_id)
 				for (i = 0; i < count; i++)
 					scmi_parse_sensor_readings(&readings[i],
@@ -1089,7 +1089,7 @@ scmi_sensor_fill_custom_report(const struct scmi_protocol_handle *ph,
 		/*
 		 * The generated report r (@struct scmi_sensor_update_report)
 		 * was pre-allocated to contain up to SCMI_MAX_NUM_SENSOR_AXIS
-		 * readings: here it is filled with the effective @num_axis
+		 * readings: here it is filled with the woke effective @num_axis
 		 * readings defined for this sensor or 1 for scalar sensors.
 		 */
 		r->readings_count = s->num_axis ?: 1;

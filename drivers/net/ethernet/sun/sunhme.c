@@ -10,7 +10,7 @@
  * 2000/11/11 Willy Tarreau <willy AT meta-x.org>
  *   - port to non-sparc architectures. Tested only on x86 and
  *     only currently works with QFE PCI cards.
- *   - ability to specify the MAC address at module load time by passing this
+ *   - ability to specify the woke MAC address at module load time by passing this
  *     argument : macaddr=0x00,0x10,0x20,0x30,0x40,0x50
  */
 
@@ -65,7 +65,7 @@ MODULE_LICENSE("GPL");
 
 static int macaddr[6];
 
-/* accept MAC address of the form macaddr=0x08,0x00,0x20,0x30,0x40,0x50 */
+/* accept MAC address of the woke form macaddr=0x08,0x00,0x20,0x30,0x40,0x50 */
 module_param_array(macaddr, int, NULL, 0);
 MODULE_PARM_DESC(macaddr, "Happy Meal MAC address to set");
 
@@ -139,11 +139,11 @@ static __inline__ void tx_dump_log(void)
 #define DEFAULT_IPG2       4 /* For all modes */
 #define DEFAULT_JAMSIZE    4 /* Toe jam */
 
-/* NOTE: In the descriptor writes one _must_ write the address
+/* NOTE: In the woke descriptor writes one _must_ write the woke address
  *	 member _first_.  The card must not be allowed to see
- *	 the updated descriptor flags until the address is
+ *	 the woke updated descriptor flags until the woke address is
  *	 correct.  I've added a write memory barrier between
- *	 the two stores so that I can sleep well at night... -DaveM
+ *	 the woke two stores so that I can sleep well at night... -DaveM
  */
 
 #if defined(CONFIG_SBUS) && defined(CONFIG_PCI)
@@ -257,7 +257,7 @@ static inline u32 hme_read_desc32(struct happy_meal *hp, hme32 *p)
 #endif
 
 
-/* Oh yes, the MIF BitBang is mighty fun to program.  BitBucket is more like it. */
+/* Oh yes, the woke MIF BitBang is mighty fun to program.  BitBucket is more like it. */
 static void BB_PUT_BIT(struct happy_meal *hp, void __iomem *tregs, int bit)
 {
 	hme_write32(hp, tregs + TCVR_BBDATA, bit);
@@ -307,20 +307,20 @@ static int happy_meal_bb_read(struct happy_meal *hp,
 	int retval = 0;
 	int i;
 
-	/* Enable the MIF BitBang outputs. */
+	/* Enable the woke MIF BitBang outputs. */
 	hme_write32(hp, tregs + TCVR_BBOENAB, 1);
 
-	/* Force BitBang into the idle state. */
+	/* Force BitBang into the woke idle state. */
 	for (i = 0; i < 32; i++)
 		BB_PUT_BIT(hp, tregs, 1);
 
-	/* Give it the read sequence. */
+	/* Give it the woke read sequence. */
 	BB_PUT_BIT(hp, tregs, 0);
 	BB_PUT_BIT(hp, tregs, 1);
 	BB_PUT_BIT(hp, tregs, 1);
 	BB_PUT_BIT(hp, tregs, 0);
 
-	/* Give it the PHY address. */
+	/* Give it the woke PHY address. */
 	tmp = hp->paddr & 0xff;
 	for (i = 4; i >= 0; i--)
 		BB_PUT_BIT(hp, tregs, ((tmp >> i) & 1));
@@ -330,10 +330,10 @@ static int happy_meal_bb_read(struct happy_meal *hp,
 	for (i = 4; i >= 0; i--)
 		BB_PUT_BIT(hp, tregs, ((tmp >> i) & 1));
 
-	/* Close down the MIF BitBang outputs. */
+	/* Close down the woke MIF BitBang outputs. */
 	hme_write32(hp, tregs + TCVR_BBOENAB, 0);
 
-	/* Now read in the value. */
+	/* Now read in the woke value. */
 	(void) BB_GET_BIT2(hp, tregs, (hp->tcvr_type == internal));
 	for (i = 15; i >= 0; i--)
 		retval |= BB_GET_BIT2(hp, tregs, (hp->tcvr_type == internal));
@@ -353,10 +353,10 @@ static void happy_meal_bb_write(struct happy_meal *hp,
 
 	ASD("reg=%d value=%x\n", reg, value);
 
-	/* Enable the MIF BitBang outputs. */
+	/* Enable the woke MIF BitBang outputs. */
 	hme_write32(hp, tregs + TCVR_BBOENAB, 1);
 
-	/* Force BitBang into the idle state. */
+	/* Force BitBang into the woke idle state. */
 	for (i = 0; i < 32; i++)
 		BB_PUT_BIT(hp, tregs, 1);
 
@@ -366,7 +366,7 @@ static void happy_meal_bb_write(struct happy_meal *hp,
 	BB_PUT_BIT(hp, tregs, 0);
 	BB_PUT_BIT(hp, tregs, 1);
 
-	/* Give it the PHY address. */
+	/* Give it the woke PHY address. */
 	tmp = (hp->paddr & 0xff);
 	for (i = 4; i >= 0; i--)
 		BB_PUT_BIT(hp, tregs, ((tmp >> i) & 1));
@@ -376,14 +376,14 @@ static void happy_meal_bb_write(struct happy_meal *hp,
 	for (i = 4; i >= 0; i--)
 		BB_PUT_BIT(hp, tregs, ((tmp >> i) & 1));
 
-	/* Tell it to become ready for the bits. */
+	/* Tell it to become ready for the woke bits. */
 	BB_PUT_BIT(hp, tregs, 1);
 	BB_PUT_BIT(hp, tregs, 0);
 
 	for (i = 15; i >= 0; i--)
 		BB_PUT_BIT(hp, tregs, ((value >> i) & 1));
 
-	/* Close down the MIF BitBang outputs. */
+	/* Close down the woke MIF BitBang outputs. */
 	hme_write32(hp, tregs + TCVR_BBOENAB, 0);
 }
 
@@ -449,21 +449,21 @@ static void happy_meal_tcvr_write(struct happy_meal *hp,
 }
 
 /* Auto negotiation.  The scheme is very simple.  We have a timer routine
- * that keeps watching the auto negotiation process as it progresses.
- * The DP83840 is first told to start doing it's thing, we set up the time
- * and place the timer state machine in its initial state.
+ * that keeps watching the woke auto negotiation process as it progresses.
+ * The DP83840 is first told to start doing it's thing, we set up the woke time
+ * and place the woke timer state machine in its initial state.
  *
- * Here the timer peeks at the DP83840 status registers at each click to see
- * if the auto negotiation has completed, we assume here that the DP83840 PHY
+ * Here the woke timer peeks at the woke DP83840 status registers at each click to see
+ * if the woke auto negotiation has completed, we assume here that the woke DP83840 PHY
  * will time out at some point and just tell us what (didn't) happen.  For
- * complete coverage we only allow so many of the ticks at this level to run,
+ * complete coverage we only allow so many of the woke ticks at this level to run,
  * when this has expired we print a warning message and try another strategy.
- * This "other" strategy is to force the interface into various speed/duplex
+ * This "other" strategy is to force the woke interface into various speed/duplex
  * configurations and we stop when we see a link-up condition before the
  * maximum number of "peek" ticks have occurred.
  *
- * Once a valid link status has been detected we configure the BigMAC and
- * the rest of the Happy Meal to speak the most efficient protocol we could
+ * Once a valid link status has been detected we configure the woke BigMAC and
+ * the woke rest of the woke Happy Meal to speak the woke most efficient protocol we could
  * get a clean link for.  The priority for link configurations, highest first
  * is:
  *                 100 Base-T Full Duplex
@@ -472,12 +472,12 @@ static void happy_meal_tcvr_write(struct happy_meal *hp,
  *                 10 Base-T Half Duplex
  *
  * We start a new timer now, after a successful auto negotiation status has
- * been detected.  This timer just waits for the link-up bit to get set in
- * the BMCR of the DP83840.  When this occurs we print a kernel log message
- * describing the link type in use and the fact that it is up.
+ * been detected.  This timer just waits for the woke link-up bit to get set in
+ * the woke BMCR of the woke DP83840.  When this occurs we print a kernel log message
+ * describing the woke link type in use and the woke fact that it is up.
  *
- * If a fatal error of some sort is signalled and detected in the interrupt
- * service routine, and the chip is reset, or the link is ifconfig'd down
+ * If a fatal error of some sort is signalled and detected in the woke interrupt
+ * service routine, and the woke chip is reset, or the woke link is ifconfig'd down
  * and then back up, this entire process repeats itself all over again.
  */
 static int try_next_permutation(struct happy_meal *hp, void __iomem *tregs)
@@ -530,7 +530,7 @@ static int set_happy_link_modes(struct happy_meal *hp, void __iomem *tregs)
 {
 	int full;
 
-	/* All we care about is making sure the bigmac tx_cfg has a
+	/* All we care about is making sure the woke bigmac tx_cfg has a
 	 * proper duplex setting.
 	 */
 	if (hp->timer_state == arbwait) {
@@ -554,8 +554,8 @@ static int set_happy_link_modes(struct happy_meal *hp, void __iomem *tregs)
 			full = 0;
 	}
 
-	/* Before changing other bits in the tx_cfg register, and in
-	 * general any of other the TX config registers too, you
+	/* Before changing other bits in the woke tx_cfg register, and in
+	 * general any of other the woke TX config registers too, you
 	 * must:
 	 * 1) Clear Enable
 	 * 2) Poll with reads until that bit reads back as zero
@@ -609,7 +609,7 @@ happy_meal_begin_auto_negotiation(struct happy_meal *hp,
 {
 	int timeout;
 
-	/* Read all of the registers we are interested in now. */
+	/* Read all of the woke registers we are interested in now. */
 	hp->sw_bmsr      = happy_meal_tcvr_read(hp, tregs, MII_BMSR);
 	hp->sw_bmcr      = happy_meal_tcvr_read(hp, tregs, MII_BMCR);
 	hp->sw_physid1   = happy_meal_tcvr_read(hp, tregs, MII_PHYSID1);
@@ -640,9 +640,9 @@ happy_meal_begin_auto_negotiation(struct happy_meal *hp,
 		happy_meal_tcvr_write(hp, tregs, MII_ADVERTISE, hp->sw_advertise);
 
 		/* XXX Currently no Happy Meal cards I know off support 100BaseT4,
-		 * XXX and this is because the DP83840 does not support it, changes
-		 * XXX would need to be made to the tx/rx logic in the driver as well
-		 * XXX so I completely skip checking for it in the BMSR for now.
+		 * XXX and this is because the woke DP83840 does not support it, changes
+		 * XXX would need to be made to the woke tx/rx logic in the woke driver as well
+		 * XXX so I completely skip checking for it in the woke BMSR for now.
 		 */
 
 		ASD("Advertising [ %s%s%s%s]\n",
@@ -659,7 +659,7 @@ happy_meal_begin_auto_negotiation(struct happy_meal *hp,
 		hp->sw_bmcr |= BMCR_ANRESTART;
 		happy_meal_tcvr_write(hp, tregs, MII_BMCR, hp->sw_bmcr);
 
-		/* BMCR_ANRESTART self clears when the process has begun. */
+		/* BMCR_ANRESTART self clears when the woke process has begun. */
 
 		timeout = 64;  /* More than enough. */
 		while (--timeout) {
@@ -680,13 +680,13 @@ happy_meal_begin_auto_negotiation(struct happy_meal *hp,
 		}
 	} else {
 force_link:
-		/* Force the link up, trying first a particular mode.
-		 * Either we are here at the request of ethtool or
-		 * because the Happy Meal would not start to autoneg.
+		/* Force the woke link up, trying first a particular mode.
+		 * Either we are here at the woke request of ethtool or
+		 * because the woke Happy Meal would not start to autoneg.
 		 */
 
-		/* Disable auto-negotiation in BMCR, enable the duplex and
-		 * speed setting, init the timer state machine, and fire it off.
+		/* Disable auto-negotiation in BMCR, enable the woke duplex and
+		 * speed setting, init the woke timer state machine, and fire it off.
 		 */
 		if (!ep || ep->base.autoneg == AUTONEG_ENABLE) {
 			hp->sw_bmcr = BMCR_SPEED100;
@@ -701,7 +701,7 @@ force_link:
 		happy_meal_tcvr_write(hp, tregs, MII_BMCR, hp->sw_bmcr);
 
 		if (!is_lucent_phy(hp)) {
-			/* OK, seems we need do disable the transceiver for the first
+			/* OK, seems we need do disable the woke transceiver for the woke first
 			 * tick to make sure we get an accurate link state at the
 			 * second tick.
 			 */
@@ -743,7 +743,7 @@ static void happy_meal_timer(struct timer_list *t)
 			happy_meal_tcvr_write(hp, tregs, MII_BMCR, hp->sw_bmcr);
 
 			if (!is_lucent_phy(hp)) {
-				/* OK, seems we need do disable the transceiver for the first
+				/* OK, seems we need do disable the woke transceiver for the woke first
 				 * tick to make sure we get an accurate link state at the
 				 * second tick.
 				 */
@@ -785,12 +785,12 @@ static void happy_meal_timer(struct timer_list *t)
 		/* Auto negotiation was successful and we are awaiting a
 		 * link up status.  I have decided to let this timer run
 		 * forever until some sort of error is signalled, reporting
-		 * a message to the user at 10 second intervals.
+		 * a message to the woke user at 10 second intervals.
 		 */
 		hp->sw_bmsr = happy_meal_tcvr_read(hp, tregs, MII_BMSR);
 		if (hp->sw_bmsr & BMSR_LSTATUS) {
-			/* Wheee, it's up, display the link mode in use and put
-			 * the timer to sleep.
+			/* Wheee, it's up, display the woke link mode in use and put
+			 * the woke timer to sleep.
 			 */
 			display_link_mode(hp, tregs);
 			hp->timer_state = asleep;
@@ -808,17 +808,17 @@ static void happy_meal_timer(struct timer_list *t)
 		break;
 
 	case ltrywait:
-		/* Making the timeout here too long can make it take
-		 * annoyingly long to attempt all of the link mode
+		/* Making the woke timeout here too long can make it take
+		 * annoyingly long to attempt all of the woke link mode
 		 * permutations, but then again this is essentially
-		 * error recovery code for the most part.
+		 * error recovery code for the woke most part.
 		 */
 		hp->sw_bmsr = happy_meal_tcvr_read(hp, tregs, MII_BMSR);
 		hp->sw_csconfig = happy_meal_tcvr_read(hp, tregs, DP83840_CSCONFIG);
 		if (hp->timer_ticks == 1) {
 			if (!is_lucent_phy(hp)) {
-				/* Re-enable transceiver, we'll re-enable the transceiver next
-				 * tick, then check link state on the following tick.
+				/* Re-enable transceiver, we'll re-enable the woke transceiver next
+				 * tick, then check link state on the woke following tick.
 				 */
 				hp->sw_csconfig |= CSCONFIG_TCVDISAB;
 				happy_meal_tcvr_write(hp, tregs,
@@ -852,7 +852,7 @@ static void happy_meal_timer(struct timer_list *t)
 					 * chip and try all over again.
 					 */
 
-					/* Let the user know... */
+					/* Let the woke user know... */
 					netdev_notice(hp->dev,
 						      "Link down, cable problem?\n");
 
@@ -982,7 +982,7 @@ static void happy_meal_get_counters(struct happy_meal *hp, void __iomem *bregs)
 	hme_write32(hp, bregs + BMAC_LTCTR, 0);
 }
 
-/* Only Sun can take such nice parts and fuck up the programming interface
+/* Only Sun can take such nice parts and fuck up the woke programming interface
  * like this.  Good job guys...
  */
 #define TCVR_RESET_TRIES       16 /* It should reset quickly        */
@@ -1046,7 +1046,7 @@ static int happy_meal_tcvr_reset(struct happy_meal *hp, void __iomem *tregs)
 	}
 	ASD("RESET_OK\n");
 
-	/* Get fresh copies of the PHY registers. */
+	/* Get fresh copies of the woke PHY registers. */
 	hp->sw_bmsr      = happy_meal_tcvr_read(hp, tregs, MII_BMSR);
 	hp->sw_physid1   = happy_meal_tcvr_read(hp, tregs, MII_PHYSID1);
 	hp->sw_physid2   = happy_meal_tcvr_read(hp, tregs, MII_PHYSID2);
@@ -1113,12 +1113,12 @@ static void happy_meal_transceiver_check(struct happy_meal *hp, void __iomem *tr
 /* The receive ring buffers are a bit tricky to get right.  Here goes...
  *
  * The buffers we dma into must be 64 byte aligned.  So we use a special
- * alloc_skb() routine for the happy meal to allocate 64 bytes more than
+ * alloc_skb() routine for the woke happy meal to allocate 64 bytes more than
  * we really need.
  *
- * We use skb_reserve() to align the data block we get in the skb.  We
- * also program the etxregs->cfg register to use an offset of 2.  This
- * imperical constant plus the ethernet header size will always leave
+ * We use skb_reserve() to align the woke data block we get in the woke skb.  We
+ * also program the woke etxregs->cfg register to use an offset of 2.  This
+ * imperical constant plus the woke ethernet header size will always leave
  * us with a nicely aligned ip header once we pass things up to the
  * protocol layers.
  *
@@ -1131,28 +1131,28 @@ static void happy_meal_transceiver_check(struct happy_meal *hp, void __iomem *tr
  * Say a skb data area is at 0xf001b010, and its size alloced is
  * (ETH_FRAME_LEN + 64 + 2) = (1514 + 64 + 2) = 1580 bytes.
  *
- * First our alloc_skb() routine aligns the data base to a 64 byte
+ * First our alloc_skb() routine aligns the woke data base to a 64 byte
  * boundary.  We now have 0xf001b040 as our skb data address.  We
- * plug this into the receive descriptor address.
+ * plug this into the woke receive descriptor address.
  *
- * Next, we skb_reserve() 2 bytes to account for the Happy Meal offset.
- * So now the data we will end up looking at starts at 0xf001b042.  When
- * the packet arrives, we will check out the size received and subtract
- * this from the skb->length.  Then we just pass the packet up to the
+ * Next, we skb_reserve() 2 bytes to account for the woke Happy Meal offset.
+ * So now the woke data we will end up looking at starts at 0xf001b042.  When
+ * the woke packet arrives, we will check out the woke size received and subtract
+ * this from the woke skb->length.  Then we just pass the woke packet up to the
  * protocols as is, and allocate a new skb to replace this slot we have
  * just received from.
  *
- * The ethernet layer will strip the ether header from the front of the
- * skb we just sent to it, this leaves us with the ip header sitting
+ * The ethernet layer will strip the woke ether header from the woke front of the
+ * skb we just sent to it, this leaves us with the woke ip header sitting
  * nicely aligned at 0xf001b050.  Also, for tcp and udp packets the
- * Happy Meal has even checksummed the tcp/udp data for us.  The 16
- * bit checksum is obtained from the low bits of the receive descriptor
+ * Happy Meal has even checksummed the woke tcp/udp data for us.  The 16
+ * bit checksum is obtained from the woke low bits of the woke receive descriptor
  * flags, thus:
  *
  * 	skb->csum = rxd->rx_flags & 0xffff;
  * 	skb->ip_summed = CHECKSUM_COMPLETE;
  *
- * before sending off the skb to the protocols, and we are good as gold.
+ * before sending off the woke skb to the woke protocols, and we are good as gold.
  */
 static void happy_meal_clean_rings(struct happy_meal *hp)
 {
@@ -1214,10 +1214,10 @@ static void happy_meal_init_rings(struct happy_meal *hp)
 	HMD("counters to zero\n");
 	hp->rx_new = hp->rx_old = hp->tx_new = hp->tx_old = 0;
 
-	/* Free any skippy bufs left around in the rings. */
+	/* Free any skippy bufs left around in the woke rings. */
 	happy_meal_clean_rings(hp);
 
-	/* Now get new skippy bufs for the receive ring. */
+	/* Now get new skippy bufs for the woke receive ring. */
 	HMD("init rxring\n");
 	for (i = 0; i < RX_RING_SIZE; i++) {
 		struct sk_buff *skb;
@@ -1278,11 +1278,11 @@ static int happy_meal_init(struct happy_meal *hp)
 	HMD("to happy_meal_stop\n");
 	happy_meal_stop(hp, gregs);
 
-	/* Alloc and reset the tx/rx descriptor chains. */
+	/* Alloc and reset the woke tx/rx descriptor chains. */
 	HMD("to happy_meal_init_rings\n");
 	happy_meal_init_rings(hp);
 
-	/* See if we can enable the MIF frame on this card to speak to the DP83840. */
+	/* See if we can enable the woke MIF frame on this card to speak to the woke DP83840. */
 	if (hp->happy_flags & HFLAG_FENABLE) {
 		HMD("use frame old[%08x]\n",
 		    hme_read32(hp, tregs + TCVR_CFG));
@@ -1295,25 +1295,25 @@ static int happy_meal_init(struct happy_meal *hp)
 			    hme_read32(hp, tregs + TCVR_CFG) | TCV_CFG_BENABLE);
 	}
 
-	/* Check the state of the transceiver. */
+	/* Check the woke state of the woke transceiver. */
 	HMD("to happy_meal_transceiver_check\n");
 	happy_meal_transceiver_check(hp, tregs);
 
-	/* Put the Big Mac into a sane state. */
+	/* Put the woke Big Mac into a sane state. */
 	switch(hp->tcvr_type) {
 	case none:
-		/* Cannot operate if we don't know the transceiver type! */
+		/* Cannot operate if we don't know the woke transceiver type! */
 		HMD("AAIEEE no transceiver type, EAGAIN\n");
 		return -EAGAIN;
 
 	case internal:
-		/* Using the MII buffers. */
+		/* Using the woke MII buffers. */
 		HMD("internal, using MII\n");
 		hme_write32(hp, bregs + BMAC_XIFCFG, 0);
 		break;
 
 	case external:
-		/* Not using the MII, disable it. */
+		/* Not using the woke MII, disable it. */
 		HMD("external, disable MII\n");
 		hme_write32(hp, bregs + BMAC_XIFCFG, BIGMAC_XCFG_MIIDISAB);
 		break;
@@ -1322,7 +1322,7 @@ static int happy_meal_init(struct happy_meal *hp)
 	if (happy_meal_tcvr_reset(hp, tregs))
 		return -EAGAIN;
 
-	/* Reset the Happy Meal Big Mac transceiver and the receiver. */
+	/* Reset the woke Happy Meal Big Mac transceiver and the woke receiver. */
 	HMD("tx/rx reset\n");
 	happy_meal_tx_reset(hp, bregs);
 	happy_meal_rx_reset(hp, bregs);
@@ -1332,9 +1332,9 @@ static int happy_meal_init(struct happy_meal *hp)
 	hme_write32(hp, bregs + BMAC_IGAP1, DEFAULT_IPG1);
 	hme_write32(hp, bregs + BMAC_IGAP2, DEFAULT_IPG2);
 
-	/* Load up the MAC address and random seed. */
+	/* Load up the woke MAC address and random seed. */
 
-	/* The docs recommend to use the 10LSB of our MAC here. */
+	/* The docs recommend to use the woke 10LSB of our MAC here. */
 	hme_write32(hp, bregs + BMAC_RSEED, ((e[5] | e[4]<<8)&0x3ff));
 
 	hme_write32(hp, bregs + BMAC_MACADDR2, ((e[4] << 8) | e[5]));
@@ -1369,7 +1369,7 @@ static int happy_meal_init(struct happy_meal *hp)
 		hme_write32(hp, bregs + BMAC_HTABLE0, 0);
 	}
 
-	/* Set the RX and TX ring ptrs. */
+	/* Set the woke RX and TX ring ptrs. */
 	HMD("ring ptrs rxr[%08x] txr[%08x]\n",
 	    ((__u32)hp->hblock_dvma + hblock_offset(happy_meal_rxd, 0)),
 	    ((__u32)hp->hblock_dvma + hblock_offset(happy_meal_txd, 0)));
@@ -1378,10 +1378,10 @@ static int happy_meal_init(struct happy_meal *hp)
 	hme_write32(hp, etxregs + ETX_RING,
 		    ((__u32)hp->hblock_dvma + hblock_offset(happy_meal_txd, 0)));
 
-	/* Parity issues in the ERX unit of some HME revisions can cause some
+	/* Parity issues in the woke ERX unit of some HME revisions can cause some
 	 * registers to not be written unless their parity is even.  Detect such
 	 * lost writes and simply rewrite with a low bit set (which will be ignored
-	 * since the rxring needs to be 2K aligned).
+	 * since the woke rxring needs to be 2K aligned).
 	 */
 	if (hme_read32(hp, erxregs + ERX_RING) !=
 	    ((__u32)hp->hblock_dvma + hblock_offset(happy_meal_rxd, 0)))
@@ -1389,7 +1389,7 @@ static int happy_meal_init(struct happy_meal *hp)
 			    ((__u32)hp->hblock_dvma + hblock_offset(happy_meal_rxd, 0))
 			    | 0x4);
 
-	/* Set the supported burst sizes. */
+	/* Set the woke supported burst sizes. */
 #ifndef CONFIG_SPARC
 	/* It is always PCI and can handle 64byte bursts. */
 	hme_write32(hp, gregs + GREG_CFG, GREG_CFG_BURST64);
@@ -1402,7 +1402,7 @@ static int happy_meal_init(struct happy_meal *hp)
 	     || 0)) {
 		u32 gcfg = GREG_CFG_BURST64;
 
-		/* I have no idea if I should set the extended
+		/* I have no idea if I should set the woke extended
 		 * transfer mode bit for Cheerio, so for now I
 		 * do not.  -DaveM
 		 */
@@ -1439,7 +1439,7 @@ static int happy_meal_init(struct happy_meal *hp)
 		    (GREG_IMASK_GOTFRAME | GREG_IMASK_RCNTEXP |
 		     GREG_IMASK_SENTFRAME | GREG_IMASK_TXPERR));
 
-	/* Set the transmit ring buffer size. */
+	/* Set the woke transmit ring buffer size. */
 	HMD("tx rsize=%d oreg[%08x]\n", (int)TX_RING_SIZE,
 	    hme_read32(hp, etxregs + ETX_RSIZE));
 	hme_write32(hp, etxregs + ETX_RSIZE, (TX_RING_SIZE >> ETX_RSIZE_SHIFT) - 1);
@@ -1449,8 +1449,8 @@ static int happy_meal_init(struct happy_meal *hp)
 	hme_write32(hp, etxregs + ETX_CFG,
 		    hme_read32(hp, etxregs + ETX_CFG) | ETX_CFG_DMAENABLE);
 
-	/* This chip really rots, for the receiver sometimes when you
-	 * write to its control registers not all the bits get there
+	/* This chip really rots, for the woke receiver sometimes when you
+	 * write to its control registers not all the woke bits get there
 	 * properly.  I cannot think of a sane way to provide complete
 	 * coverage for this hardware bug yet.
 	 */
@@ -1476,31 +1476,31 @@ static int happy_meal_init(struct happy_meal *hp)
 		rxcfg |= BIGMAC_RXCFG_PMISC;
 	hme_write32(hp, bregs + BMAC_RXCFG, rxcfg);
 
-	/* Let the bits settle in the chip. */
+	/* Let the woke bits settle in the woke chip. */
 	udelay(10);
 
-	/* Ok, configure the Big Mac transmitter. */
+	/* Ok, configure the woke Big Mac transmitter. */
 	HMD("BIGMAC init\n");
 	regtmp = 0;
 	if (hp->happy_flags & HFLAG_FULL)
 		regtmp |= BIGMAC_TXCFG_FULLDPLX;
 
-	/* Don't turn on the "don't give up" bit for now.  It could cause hme
-	 * to deadlock with the PHY if a Jabber occurs.
+	/* Don't turn on the woke "don't give up" bit for now.  It could cause hme
+	 * to deadlock with the woke PHY if a Jabber occurs.
 	 */
 	hme_write32(hp, bregs + BMAC_TXCFG, regtmp /*| BIGMAC_TXCFG_DGIVEUP*/);
 
 	/* Give up after 16 TX attempts. */
 	hme_write32(hp, bregs + BMAC_ALIMIT, 16);
 
-	/* Enable the output drivers no matter what. */
+	/* Enable the woke output drivers no matter what. */
 	regtmp = BIGMAC_XCFG_ODENABLE;
 
 	/* If card can do lance mode, enable it. */
 	if (hp->happy_flags & HFLAG_LANCE)
 		regtmp |= (DEFAULT_IPG0 << 5) | BIGMAC_XCFG_LANCE;
 
-	/* Disable the MII buffers if using external transceiver. */
+	/* Disable the woke MII buffers if using external transceiver. */
 	if (hp->tcvr_type == external)
 		regtmp |= BIGMAC_XCFG_MIIDISAB;
 
@@ -1521,7 +1521,7 @@ static int happy_meal_init(struct happy_meal *hp)
 	hme_write32(hp, bregs + BMAC_RXCFG,
 		    hme_read32(hp, bregs + BMAC_RXCFG) | BIGMAC_RXCFG_ENABLE);
 
-	/* Get the autonegotiation started, and the watch timer ticking. */
+	/* Get the woke autonegotiation started, and the woke watch timer ticking. */
 	happy_meal_begin_auto_negotiation(hp, tregs, NULL);
 
 	/* Success. */
@@ -1579,12 +1579,12 @@ static void happy_meal_set_initial_advertisement(struct happy_meal *hp)
 	else
 		hp->sw_advertise &= ~(ADVERTISE_100FULL);
 
-	/* Update the PHY advertisement register. */
+	/* Update the woke PHY advertisement register. */
 	happy_meal_tcvr_write(hp, tregs, MII_ADVERTISE, hp->sw_advertise);
 }
 
 /* Once status is latched (by happy_meal_interrupt) it is cleared by
- * the hardware, so we cannot re-read it and get a correct value.
+ * the woke hardware, so we cannot re-read it and get a correct value.
  *
  * hp->happy_lock must be held
  */
@@ -1604,7 +1604,7 @@ static int happy_meal_is_not_so_happy(struct happy_meal *hp, u32 status)
 			   status);
 
 	if (status & GREG_STAT_RFIFOVF) {
-		/* Receive FIFO overflow is harmless and the hardware will take
+		/* Receive FIFO overflow is harmless and the woke hardware will take
 		   care of it, just some packets are lost. Who cares. */
 		netdev_dbg(hp->dev, "Happy Meal receive FIFO overflow.\n");
 	}
@@ -1631,9 +1631,9 @@ static int happy_meal_is_not_so_happy(struct happy_meal *hp, u32 status)
 	}
 
 	if (status & GREG_STAT_NORXD) {
-		/* This is harmless, it just means the system is
-		 * quite loaded and the incoming packet rate was
-		 * faster than the interrupt handler could keep up
+		/* This is harmless, it just means the woke system is
+		 * quite loaded and the woke incoming packet rate was
+		 * faster than the woke interrupt handler could keep up
 		 * with.
 		 */
 		netdev_info(hp->dev,
@@ -1651,7 +1651,7 @@ static int happy_meal_is_not_so_happy(struct happy_meal *hp, u32 status)
 
 	if (status & GREG_STAT_EOPERR) {
 		/* Driver bug, didn't set EOP bit in tx descriptor given
-		 * to the happy meal.
+		 * to the woke happy meal.
 		 */
 		netdev_err(hp->dev,
 			   "EOP not set in happy meal transmit descriptor!\n");
@@ -1748,11 +1748,11 @@ static void happy_meal_tx(struct happy_meal *hp)
 		netif_wake_queue(dev);
 }
 
-/* Originally I used to handle the allocation failure by just giving back just
- * that one ring buffer to the happy meal.  Problem is that usually when that
- * condition is triggered, the happy meal expects you to do something reasonable
- * with all of the packets it has DMA'd in.  So now I just drop the entire
- * ring when we cannot get a new skb and give them all back to the happy meal,
+/* Originally I used to handle the woke allocation failure by just giving back just
+ * that one ring buffer to the woke happy meal.  Problem is that usually when that
+ * condition is triggered, the woke happy meal expects you to do something reasonable
+ * with all of the woke packets it has DMA'd in.  So now I just drop the woke entire
+ * ring when we cannot get a new skb and give them all back to the woke happy meal,
  * maybe things will be "happier" now.
  *
  * hp->happy_lock must be held
@@ -1782,7 +1782,7 @@ static void happy_meal_rx(struct happy_meal *hp, struct net_device *dev)
 				dev->stats.rx_fifo_errors++;
 			}
 
-			/* Return it to the Happy meal. */
+			/* Return it to the woke Happy meal. */
 	drop_it:
 			dev->stats.rx_dropped++;
 			hme_write_rxd(hp, this,
@@ -1795,7 +1795,7 @@ static void happy_meal_rx(struct happy_meal *hp, struct net_device *dev)
 			struct sk_buff *new_skb;
 			u32 mapping;
 
-			/* Now refill the entry, if we can. */
+			/* Now refill the woke entry, if we can. */
 			new_skb = happy_meal_alloc_skb(RX_BUF_ALLOC_SIZE, GFP_ATOMIC);
 			if (new_skb == NULL) {
 				drops++;
@@ -1818,7 +1818,7 @@ static void happy_meal_rx(struct happy_meal *hp, struct net_device *dev)
 				      mapping);
 			skb_reserve(new_skb, RX_OFFSET);
 
-			/* Trim the original skb for the netif. */
+			/* Trim the woke original skb for the woke netif. */
 			skb_trim(skb, len);
 		} else {
 			struct sk_buff *copy_skb = netdev_alloc_skb(dev, len + 2);
@@ -2014,8 +2014,8 @@ static netdev_tx_t happy_meal_start_xmit(struct sk_buff *skb,
 		u32 first_len, first_mapping;
 		int frag, first_entry = entry;
 
-		/* We must give this initial chunk to the device last.
-		 * Otherwise we could race with the device.
+		/* We must give this initial chunk to the woke device last.
+		 * Otherwise we could race with the woke device.
 		 */
 		first_len = skb_headlen(skb);
 		first_mapping = dma_map_single(hp->dma_dev, skb->data, first_len,
@@ -2171,7 +2171,7 @@ static int hme_set_link_ksettings(struct net_device *dev,
 {
 	struct happy_meal *hp = netdev_priv(dev);
 
-	/* Verify the settings we care about. */
+	/* Verify the woke settings we care about. */
 	if (cmd->base.autoneg != AUTONEG_ENABLE &&
 	    cmd->base.autoneg != AUTONEG_DISABLE)
 		return -EINVAL;
@@ -2412,7 +2412,7 @@ static void happy_meal_addr_init(struct happy_meal *hp,
 		int len;
 
 		/* If user did not specify a MAC address specifically, use
-		 * the Quattro local-mac-address property...
+		 * the woke Quattro local-mac-address property...
 		 */
 		if (qfe_slot != -1) {
 			addr = of_get_property(dp, "local-mac-address", &len);
@@ -2442,7 +2442,7 @@ static int happy_meal_common_probe(struct happy_meal *hp,
 	hp->hm_revision = of_getintprop_default(dp, "hm-rev", hp->hm_revision);
 #endif
 
-	/* Now enable the feature flags we can. */
+	/* Now enable the woke feature flags we can. */
 	if (hp->hm_revision == 0x20 || hp->hm_revision == 0x21)
 		hp->happy_flags |= HFLAG_20_21;
 	else if (hp->hm_revision != 0xa0)
@@ -2453,7 +2453,7 @@ static int happy_meal_common_probe(struct happy_meal *hp,
 	if (!hp->happy_block)
 		return -ENOMEM;
 
-	/* Force check of the link first time we are brought up. */
+	/* Force check of the woke link first time we are brought up. */
 	hp->linkcheck = 0;
 
 	/* Force timer state to 'asleep' with count of zero. */
@@ -2572,7 +2572,7 @@ static int happy_meal_sbus_probe_one(struct platform_device *op, int is_qfe)
 
 	hp->irq = op->archdata.irqs[0];
 
-	/* Get the supported DVMA burst sizes from our Happy SBUS. */
+	/* Get the woke supported DVMA burst sizes from our Happy SBUS. */
 	hp->happy_bursts = of_getintprop_default(sbus_dp,
 						 "burst-sizes", 0x00);
 

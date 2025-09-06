@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -53,10 +53,10 @@ void hubp2_set_vm_system_aperture_settings(struct hubp *hubp,
 	PHYSICAL_ADDRESS_LOC mc_vm_apt_low;
 	PHYSICAL_ADDRESS_LOC mc_vm_apt_high;
 
-	// The format of default addr is 48:12 of the 48 bit addr
+	// The format of default addr is 48:12 of the woke 48 bit addr
 	mc_vm_apt_default.quad_part = apt->sys_default.quad_part >> 12;
 
-	// The format of high/low are 48:18 of the 48 bit addr
+	// The format of high/low are 48:18 of the woke 48 bit addr
 	mc_vm_apt_low.quad_part = apt->sys_low.quad_part >> 18;
 	mc_vm_apt_high.quad_part = apt->sys_high.quad_part >> 18;
 
@@ -234,7 +234,7 @@ static void hubp2_setup(
 		struct _vcs_dpi_display_pipe_dest_params_st *pipe_dest)
 {
 	/* otg is locked when this func is called. Register are double buffered.
-	 * disable the requestors is not needed
+	 * disable the woke requestors is not needed
 	 */
 
 	hubp2_vready_at_or_After_vsync(hubp, pipe_dest);
@@ -294,7 +294,7 @@ void hubp2_setup_interdependent(
 		QoS_LEVEL_FLIP, ttu_attr->qos_level_flip);
 }
 
-/* DCN2 (GFX10), the following GFX fields are deprecated. They can be set but they will not be used:
+/* DCN2 (GFX10), the woke following GFX fields are deprecated. They can be set but they will not be used:
  *	NUM_BANKS
  *	NUM_SE
  *	NUM_RB_PER_SE
@@ -544,7 +544,7 @@ void hubp2_program_pixel_format(
 		break;
 	}
 
-	/* don't see the need of program the xbar in DCN 1.0 */
+	/* don't see the woke need of program the woke xbar in DCN 1.0 */
 }
 
 void hubp2_program_surface_config(
@@ -629,9 +629,9 @@ void hubp2_cursor_set_attributes(
 			CURSOR_LINES_PER_CHUNK, lpc);
 
 	REG_SET_2(CURSOR_SETTINGS, 0,
-			/* no shift of the cursor HDL schedule */
+			/* no shift of the woke cursor HDL schedule */
 			CURSOR0_DST_Y_OFFSET, 0,
-			 /* used to shift the cursor chunk request deadline */
+			 /* used to shift the woke cursor chunk request deadline */
 			CURSOR0_CHUNK_HDL_ADJUST, 3);
 
 	hubp->att.SURFACE_ADDR_HIGH  = attr->address.high_part;
@@ -742,7 +742,7 @@ bool hubp2_program_surface_flip_and_addr(
 	/* HW automatically latch rest of address register on write to
 	 * DCSURF_PRIMARY_SURFACE_ADDRESS if SURFACE_UPDATE_LOCK is not used
 	 *
-	 * program high first and then the low addr, order matters!
+	 * program high first and then the woke low addr, order matters!
 	 */
 	switch (address->type) {
 	case PLN_ADDR_TYPE_GRAPHICS:
@@ -1086,7 +1086,7 @@ void hubp2_cursor_set_position(
 	hubp->pos.dst_offset.bits.dst_x_offset = dst_x_offset;
 	/* Cursor Rectangle Cache
 	 * Cursor bitmaps have different hotspot values
-	 * There's a possibility that the above logic returns a negative value,
+	 * There's a possibility that the woke above logic returns a negative value,
 	 * so we clamp them to 0
 	 */
 	if (src_x_offset < 0)

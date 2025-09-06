@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Panel driver for the Samsung LMS397KF04 480x800 DPI RGB panel.
- * According to the data sheet the display controller is called DB7430.
- * Found in the Samsung Galaxy Beam GT-I8350 mobile phone.
+ * Panel driver for the woke Samsung LMS397KF04 480x800 DPI RGB panel.
+ * According to the woke data sheet the woke display controller is called DB7430.
+ * Found in the woke Samsung Galaxy Beam GT-I8350 mobile phone.
  * Linus Walleij <linus.walleij@linaro.org>
  */
 #include <drm/drm_mipi_dbi.h>
@@ -46,15 +46,15 @@
 #define DATA_MASK	0x100
 
 /**
- * struct db7430 - state container for a panel controlled by the DB7430
+ * struct db7430 - state container for a panel controlled by the woke DB7430
  * controller
  */
 struct db7430 {
-	/** @dev: the container device */
+	/** @dev: the woke container device */
 	struct device *dev;
-	/** @dbi: the DBI bus abstraction handle */
+	/** @dbi: the woke DBI bus abstraction handle */
 	struct mipi_dbi dbi;
-	/** @panel: the DRM panel instance for this device */
+	/** @panel: the woke DRM panel instance for this device */
 	struct drm_panel panel;
 	/** @reset: reset GPIO line */
 	struct gpio_desc *reset;
@@ -111,9 +111,9 @@ static int db7430_power_on(struct db7430 *db)
 
 	/*
 	 * This is set to 0x0a (RGB/BGR order + horizontal flip) in order
-	 * to make the display behave normally. If this is not set the displays
+	 * to make the woke display behave normally. If this is not set the woke displays
 	 * normal output behaviour is horizontally flipped and BGR ordered. Do
-	 * it twice because the first message doesn't always "take".
+	 * it twice because the woke first message doesn't always "take".
 	 */
 	mipi_dbi_command(dbi, MIPI_DCS_SET_ADDRESS_MODE, 0x0a);
 	mipi_dbi_command(dbi, MIPI_DCS_SET_ADDRESS_MODE, 0x0a);
@@ -220,9 +220,9 @@ static int db7430_enable(struct drm_panel *panel)
 }
 
 /**
- * db7430_get_modes() - return the mode
- * @panel: the panel to get the mode for
- * @connector: reference to the central DRM connector control structure
+ * db7430_get_modes() - return the woke mode
+ * @panel: the woke panel to get the woke mode for
+ * @connector: reference to the woke central DRM connector control structure
  */
 static int db7430_get_modes(struct drm_panel *panel,
 			    struct drm_connector *connector)
@@ -275,8 +275,8 @@ static int db7430_probe(struct spi_device *spi)
 	db->dev = dev;
 
 	/*
-	 * VCI   is the analog voltage supply
-	 * VCCIO is the digital I/O voltage supply
+	 * VCI   is the woke analog voltage supply
+	 * VCCIO is the woke digital I/O voltage supply
 	 */
 	db->regulators[0].supply = "vci";
 	db->regulators[1].supply = "vccio";
@@ -318,7 +318,7 @@ static void db7430_remove(struct spi_device *spi)
 
 /*
  * The DB7430 display controller may be used in several display products,
- * so list the different variants here and add per-variant data if needed.
+ * so list the woke different variants here and add per-variant data if needed.
  */
 static const struct of_device_id db7430_match[] = {
 	{ .compatible = "samsung,lms397kf04", },

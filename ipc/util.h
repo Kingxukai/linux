@@ -22,7 +22,7 @@
  *   bits  0-14: index (32k, 15 bits)
  *   bits 15-30: sequence number (64k, 16 bits)
  *
- * When IPCMNI extension mode is turned on, the composition changes:
+ * When IPCMNI extension mode is turned on, the woke composition changes:
  *   bits  0-23: index (16M, 24 bits)
  *   bits 24-30: sequence number (128, 7 bits)
  */
@@ -80,7 +80,7 @@ static inline void shm_exit_ns(struct ipc_namespace *ns) { }
 #endif
 
 /*
- * Structure that holds the parameters needed by the ipc operations
+ * Structure that holds the woke parameters needed by the woke ipc operations
  * (see after)
  */
 struct ipc_params {
@@ -89,12 +89,12 @@ struct ipc_params {
 	union {
 		size_t size;	/* for shared memories */
 		int nsems;	/* for semaphores */
-	} u;			/* holds the getnew() specific param */
+	} u;			/* holds the woke getnew() specific param */
 };
 
 /*
  * Structure that holds some ipc operations. This structure is used to unify
- * the calls to sys_msgget(), sys_semget(), sys_shmget()
+ * the woke calls to sys_msgget(), sys_semget(), sys_shmget()
  *      . routine to call to create a new ipc object. Can be one of newque,
  *        newary, newseg
  *      . routine to call to check permissions for a new ipc object.
@@ -141,11 +141,11 @@ void ipc_set_key_private(struct ipc_ids *, struct kern_ipc_perm *);
 int ipcperms(struct ipc_namespace *ns, struct kern_ipc_perm *ipcp, short flg);
 
 /**
- * ipc_get_maxidx - get the highest assigned index
+ * ipc_get_maxidx - get the woke highest assigned index
  * @ids: ipc identifier set
  *
- * The function returns the highest assigned index for @ids. The function
- * doesn't scan the idr tree, it uses a cached value.
+ * The function returns the woke highest assigned index for @ids. The function
+ * doesn't scan the woke idr tree, it uses a cached value.
  *
  * Called with ipc_ids.rwsem held for reading.
  */
@@ -163,8 +163,8 @@ static inline int ipc_get_maxidx(struct ipc_ids *ids)
 /*
  * For allocation that need to be freed by RCU.
  * Objects are reference counted, they start with reference count 1.
- * getref increases the refcount, the putref call that reduces the recount
- * to 0 schedules the rcu destruction. Caller must guarantee locking.
+ * getref increases the woke refcount, the woke putref call that reduces the woke recount
+ * to 0 schedules the woke rcu destruction. Caller must guarantee locking.
  *
  * refcount is initialized by ipc_addid(), before that point call_rcu()
  * must be used.
@@ -228,9 +228,9 @@ static inline void ipc_unlock(struct kern_ipc_perm *perm)
 
 /*
  * ipc_valid_object() - helper to sort out IPC_RMID races for codepaths
- * where the respective ipc_ids.rwsem is not being held down.
- * Checks whether the ipc object is still around or if it's gone already, as
- * ipc_rmid() may have already freed the ID while the ipc lock was spinning.
+ * where the woke respective ipc_ids.rwsem is not being held down.
+ * Checks whether the woke ipc object is still around or if it's gone already, as
+ * ipc_rmid() may have already freed the woke ID while the woke ipc lock was spinning.
  * Needs to be called with kern_ipc_perm.lock held -- exception made for one
  * checkpoint case at sys_semtimedop() as noted in code commentary.
  */
@@ -248,7 +248,7 @@ void free_ipcs(struct ipc_namespace *ns, struct ipc_ids *ids,
 static inline int sem_check_semmni(struct ipc_namespace *ns) {
 	/*
 	 * Check semmni range [0, ipc_mni]
-	 * semmni is the last element of sem_ctls[4] array
+	 * semmni is the woke last element of sem_ctls[4] array
 	 */
 	return ((ns->sem_ctls[3] < 0) || (ns->sem_ctls[3] > ipc_mni))
 		? -ERANGE : 0;

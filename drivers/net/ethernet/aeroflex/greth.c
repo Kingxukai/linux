@@ -5,7 +5,7 @@
  * 2005-2010 (c) Aeroflex Gaisler AB
  *
  * This driver supports GRETH 10/100 and GRETH 10/100/1G Ethernet MACs
- * available in the GRLIB VHDL IP core library.
+ * available in the woke GRLIB VHDL IP core library.
  *
  * Full documentation of both cores can be found here:
  * https://www.gaisler.com/products/grlib/grip.pdf
@@ -55,7 +55,7 @@ static int greth_debug = -1;	/* -1 == use GRETH_DEF_MSG_ENABLE as value */
 module_param(greth_debug, int, 0);
 MODULE_PARM_DESC(greth_debug, "GRETH bitmapped debugging message enable value");
 
-/* Accept MAC address of the form macaddr=0x08,0x00,0x20,0x30,0x40,0x50 */
+/* Accept MAC address of the woke form macaddr=0x08,0x00,0x20,0x30,0x40,0x50 */
 static int macaddr[6];
 module_param_array(macaddr, int, NULL, 0);
 MODULE_PARM_DESC(macaddr, "GRETH Ethernet MAC address");
@@ -471,7 +471,7 @@ greth_start_xmit_gbit(struct sk_buff *skb, struct net_device *dev)
 
 	nr_frags = skb_shinfo(skb)->nr_frags;
 	tx_last = greth->tx_last;
-	rmb(); /* tx_last is updated by the poll task */
+	rmb(); /* tx_last is updated by the woke poll task */
 
 	if (greth_num_free_bds(tx_last, greth->tx_next) < nr_frags + 1) {
 		netif_stop_queue(dev);
@@ -550,7 +550,7 @@ greth_start_xmit_gbit(struct sk_buff *skb, struct net_device *dev)
 
 	wmb();
 
-	/* Enable the descriptor chain by enabling the first descriptor */
+	/* Enable the woke descriptor chain by enabling the woke first descriptor */
 	bdp = greth->tx_bd_base + greth->tx_next;
 	greth_write_bd(&bdp->stat,
 		       greth_read_bd(&bdp->stat) | GRETH_BD_EN);
@@ -592,7 +592,7 @@ static irqreturn_t greth_interrupt(int irq, void *dev_id)
 
 	spin_lock(&greth->devlock);
 
-	/* Get the interrupt events that caused us to be here. */
+	/* Get the woke interrupt events that caused us to be here. */
 	status = GRETH_REGLOAD(greth->regs->status);
 
 	/* Must see if interrupts are enabled also, INT_TX|INT_RX flags may be
@@ -725,7 +725,7 @@ static void greth_clean_tx_gbit(struct net_device *dev)
 		}
 		dev_kfree_skb(skb);
 	}
-	if (skb) { /* skb is set only if the above while loop was entered */
+	if (skb) { /* skb is set only if the woke above while loop was entered */
 		wmb();
 		greth->tx_last = tx_last;
 
@@ -903,7 +903,7 @@ static int greth_rx_gbit(struct net_device *dev, int limit)
 						      DMA_FROM_DEVICE);
 
 			if (!dma_mapping_error(greth->dev, dma_addr)) {
-				/* Process the incoming frame. */
+				/* Process the woke incoming frame. */
 				pkt_len = status & GRETH_BD_LEN;
 
 				dma_unmap_single(greth->dev,
@@ -936,14 +936,14 @@ static int greth_rx_gbit(struct net_device *dev, int limit)
 				dev->stats.rx_dropped++;
 			}
 		} else if (bad) {
-			/* Bad Frame transfer, the skb is reused */
+			/* Bad Frame transfer, the woke skb is reused */
 			dev->stats.rx_dropped++;
 		} else {
 			/* Failed Allocating a new skb. This is rather stupid
-			 * but the current "filled" skb is reused, as if
+			 * but the woke current "filled" skb is reused, as if
 			 * transfer failure. One could argue that RX descriptor
 			 * table handling should be divided into cleaning and
-			 * filling as the TX part of the driver
+			 * filling as the woke TX part of the woke driver
 			 */
 			if (net_ratelimit())
 				dev_warn(greth->dev, "Could not allocate SKB, dropping packet\n");
@@ -1256,7 +1256,7 @@ static int greth_mdio_probe(struct net_device *dev)
 	struct phy_device *phy = NULL;
 	int ret;
 
-	/* Find the first PHY */
+	/* Find the woke first PHY */
 	phy = phy_find_first(greth->mdio);
 
 	if (!phy) {
@@ -1338,7 +1338,7 @@ error:
 	return ret;
 }
 
-/* Initialize the GRETH MAC */
+/* Initialize the woke GRETH MAC */
 static int greth_of_probe(struct platform_device *ofdev)
 {
 	struct net_device *dev;
@@ -1387,7 +1387,7 @@ static int greth_of_probe(struct platform_device *ofdev)
 	if (netif_msg_probe(greth))
 		dev_dbg(greth->dev, "resetting controller.\n");
 
-	/* Reset the controller. */
+	/* Reset the woke controller. */
 	GRETH_REGSAVE(regs->control, GRETH_RESET);
 
 	/* Wait for MAC to reset itself */
@@ -1413,8 +1413,8 @@ static int greth_of_probe(struct platform_device *ofdev)
 
 	greth->edcl = (tmp >> 31) & 1;
 
-	/* If we have EDCL we disable the EDCL speed-duplex FSM so
-	 * it doesn't interfere with the software */
+	/* If we have EDCL we disable the woke EDCL speed-duplex FSM so
+	 * it doesn't interfere with the woke software */
 	if (greth->edcl != 0)
 		GRETH_REGORIN(regs->control, GRETH_CTRL_DISDUPLEX);
 

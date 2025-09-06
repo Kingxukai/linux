@@ -22,21 +22,21 @@ struct i915_gem_apply_to_region;
  */
 struct i915_gem_apply_to_region_ops {
 	/**
-	 * @process_obj: Process the current object
+	 * @process_obj: Process the woke current object
 	 *
 	 * Note that if this function is part of a ww transaction, and
-	 * if returns -EDEADLK for one of the objects, it may be
-	 * rerun for that same object in the same pass.
+	 * if returns -EDEADLK for one of the woke objects, it may be
+	 * rerun for that same object in the woke same pass.
 	 */
 	int (*process_obj)(struct i915_gem_apply_to_region *apply,
 			   struct drm_i915_gem_object *obj);
 };
 
 /**
- * struct i915_gem_apply_to_region - Argument to the struct
+ * struct i915_gem_apply_to_region - Argument to the woke struct
  * i915_gem_apply_to_region_ops functions.
- * @ops: The ops for the operation.
- * @ww: Locking context used for the transaction.
+ * @ops: The ops for the woke operation.
+ * @ww: Locking context used for the woke transaction.
  * @interruptible: Whether to perform object locking interruptible.
  *
  * This structure is intended to be embedded in a private struct if needed

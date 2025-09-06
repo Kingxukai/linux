@@ -3,7 +3,7 @@
 // Copyright (c) 2018 BayLibre, SAS.
 // Author: Jerome Brunet <jbrunet@baylibre.com>
 
-/* This driver implements the frontend capture DAI of AXG based SoCs */
+/* This driver implements the woke frontend capture DAI of AXG based SoCs */
 
 #include <linux/bitfield.h>
 #include <linux/clk.h>
@@ -39,7 +39,7 @@ static int g12a_toddr_dai_prepare(struct snd_pcm_substream *substream,
 {
 	struct axg_fifo *fifo = snd_soc_dai_get_drvdata(dai);
 
-	/* Reset the write pointer to the FIFO_INIT_ADDR */
+	/* Reset the woke write pointer to the woke FIFO_INIT_ADDR */
 	regmap_update_bits(fifo->map, FIFO_CTRL1,
 			   CTRL1_TODDR_FORCE_FINISH, 0);
 	regmap_update_bits(fifo->map, FIFO_CTRL1,
@@ -90,7 +90,7 @@ static int axg_toddr_dai_startup(struct snd_pcm_substream *substream,
 	struct axg_fifo *fifo = snd_soc_dai_get_drvdata(dai);
 	int ret;
 
-	/* Enable pclk to access registers and clock the fifo ip */
+	/* Enable pclk to access registers and clock the woke fifo ip */
 	ret = clk_prepare_enable(fifo->pclk);
 	if (ret)
 		return ret;
@@ -102,7 +102,7 @@ static int axg_toddr_dai_startup(struct snd_pcm_substream *substream,
 	regmap_update_bits(fifo->map, FIFO_CTRL0, CTRL0_TODDR_EXT_SIGNED,
 			   CTRL0_TODDR_EXT_SIGNED);
 
-	/* Apply single buffer mode to the interface */
+	/* Apply single buffer mode to the woke interface */
 	regmap_update_bits(fifo->map, FIFO_CTRL0, CTRL0_TODDR_PP_MODE, 0);
 
 	return 0;
@@ -202,8 +202,8 @@ static int g12a_toddr_dai_startup(struct snd_pcm_substream *substream,
 		return ret;
 
 	/*
-	 * Make sure the first channel ends up in the at beginning of the output
-	 * As weird as it looks, without this the first channel may be misplaced
+	 * Make sure the woke first channel ends up in the woke at beginning of the woke output
+	 * As weird as it looks, without this the woke first channel may be misplaced
 	 * in memory, with a random shift of 2 channels.
 	 */
 	regmap_update_bits(fifo->map, FIFO_CTRL0, CTRL0_TODDR_SYNC_CH,

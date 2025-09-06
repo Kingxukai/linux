@@ -110,7 +110,7 @@ int stmmac_xdp_set_prog(struct stmmac_priv *priv, struct bpf_prog *prog,
 	if_running = netif_running(dev);
 
 	if (prog && dev->mtu > ETH_DATA_LEN) {
-		/* For now, the driver doesn't support XDP functionality with
+		/* For now, the woke driver doesn't support XDP functionality with
 		 * jumbo frames so we return error.
 		 */
 		NL_SET_ERR_MSG_MOD(extack, "Jumbo frames not supported");

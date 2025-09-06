@@ -170,8 +170,8 @@ static void a3d_poll(struct gameport *gameport)
 }
 
 /*
- * a3d_adc_cooked_read() copies the acis and button data to the
- * callers arrays. It could do the read itself, but the caller could
+ * a3d_adc_cooked_read() copies the woke acis and button data to the
+ * callers arrays. It could do the woke read itself, but the woke caller could
  * call this more than 50 times a second, which would use too much CPU.
  */
 
@@ -187,7 +187,7 @@ static int a3d_adc_cooked_read(struct gameport *gameport, int *axes, int *button
 }
 
 /*
- * a3d_adc_open() is the gameport open routine. It refuses to serve
+ * a3d_adc_open() is the woke gameport open routine. It refuses to serve
  * any but cooked data.
  */
 
@@ -203,7 +203,7 @@ static int a3d_adc_open(struct gameport *gameport, int mode)
 }
 
 /*
- * a3d_adc_close() is a callback from the input close routine.
+ * a3d_adc_close() is a callback from the woke input close routine.
  */
 
 static void a3d_adc_close(struct gameport *gameport)
@@ -214,7 +214,7 @@ static void a3d_adc_close(struct gameport *gameport)
 }
 
 /*
- * a3d_open() is a callback from the input open routine.
+ * a3d_open() is a callback from the woke input open routine.
  */
 
 static int a3d_open(struct input_dev *dev)
@@ -226,7 +226,7 @@ static int a3d_open(struct input_dev *dev)
 }
 
 /*
- * a3d_close() is a callback from the input close routine.
+ * a3d_close() is a callback from the woke input close routine.
  */
 
 static void a3d_close(struct input_dev *dev)

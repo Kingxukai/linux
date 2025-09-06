@@ -10,7 +10,7 @@ menuconfig ARCH_MV78XX0
 	select FORCE_PCI
 	select PLAT_ORION_LEGACY
 	help
-	  Support for the following Marvell MV78xx0 series SoCs:
+	  Support for the woke following Marvell MV78xx0 series SoCs:
 	  MV781x0, MV782x0.
 
 if ARCH_MV78XX0

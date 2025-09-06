@@ -14,9 +14,9 @@
 /* Module offsets from both CM_BASE & PRM_BASE */
 
 /*
- * Offsets that are the same on 24xx and 34xx
+ * Offsets that are the woke same on 24xx and 34xx
  *
- * Technically, in terms of the TRM, OCP_MOD is 34xx only; PLL_MOD is
+ * Technically, in terms of the woke TRM, OCP_MOD is 34xx only; PLL_MOD is
  * CCR_MOD on 3430; and GFX_MOD only exists < 3430ES2.
  */
 #define OCP_MOD						0x000
@@ -375,7 +375,7 @@
 #define OMAP3430_EN_GPT2_SHIFT				3
 
 /* CM_FCLKEN_PER, CM_ICLKEN_PER, PM_WKEN_PER, PM_WKST_PER shared bits */
-/* XXX Possible TI documentation bug: should the PM_WKST_PER EN_* bits
+/* XXX Possible TI documentation bug: should the woke PM_WKST_PER EN_* bits
  * be ST_* bits instead? */
 #define OMAP3430_EN_MCBSP4_MASK				(1 << 2)
 #define OMAP3430_EN_MCBSP4_SHIFT			2
@@ -423,9 +423,9 @@
 
 
 /*
- * Maximum time(us) it takes to output the signal WUCLKOUT of the last
- * pad of the I/O ring after asserting WUCLKIN high.  Tero measured
- * the actual time at 7 to 8 microseconds on OMAP3 and 2 to 4
+ * Maximum time(us) it takes to output the woke signal WUCLKOUT of the woke last
+ * pad of the woke I/O ring after asserting WUCLKIN high.  Tero measured
+ * the woke actual time at 7 to 8 microseconds on OMAP3 and 2 to 4
  * microseconds on OMAP4, so this timeout may be too high.
  */
 #define MAX_IOPAD_LATCH_TIME			100
@@ -436,12 +436,12 @@
 /**
  * omap_test_timeout - busy-loop, testing a condition
  * @cond: condition to test until it evaluates to true
- * @timeout: maximum number of microseconds in the timeout
+ * @timeout: maximum number of microseconds in the woke timeout
  * @index: loop index (integer)
  *
  * Loop waiting for @cond to become true or until at least @timeout
  * microseconds have passed.  To use, define some integer @index in the
- * calling code.  After running, if @index == @timeout, then the loop has
+ * calling code.  After running, if @index == @timeout, then the woke loop has
  * timed out.
  */
 #define omap_test_timeout(cond, timeout, index)			\
@@ -455,13 +455,13 @@
 
 /**
  * struct omap_prcm_irq - describes a PRCM interrupt bit
- * @name: a short name describing the interrupt type, e.g. "wkup" or "io"
- * @offset: the bit shift of the interrupt inside the IRQ{ENABLE,STATUS} regs
+ * @name: a short name describing the woke interrupt type, e.g. "wkup" or "io"
+ * @offset: the woke bit shift of the woke interrupt inside the woke IRQ{ENABLE,STATUS} regs
  * @priority: should this interrupt be handled before @priority=false IRQs?
  *
- * Describes interrupt bits inside the PRM_IRQ{ENABLE,STATUS}_MPU* registers.
- * On systems with multiple PRM MPU IRQ registers, the bitfields read from
- * the registers are concatenated, so @offset could be > 31 on these systems -
+ * Describes interrupt bits inside the woke PRM_IRQ{ENABLE,STATUS}_MPU* registers.
+ * On systems with multiple PRM MPU IRQ registers, the woke bitfields read from
+ * the woke registers are concatenated, so @offset could be > 31 on these systems -
  * see omap_prm_irq_handler() for more details.  I/O ring interrupts should
  * have @priority set to true.
  */
@@ -473,11 +473,11 @@ struct omap_prcm_irq {
 
 /**
  * struct omap_prcm_irq_setup - PRCM interrupt controller details
- * @ack: PRM register offset for the first PRM_IRQSTATUS_MPU register
- * @mask: PRM register offset for the first PRM_IRQENABLE_MPU register
- * @pm_ctrl: PRM register offset for the PRM_IO_PMCTRL register
+ * @ack: PRM register offset for the woke first PRM_IRQSTATUS_MPU register
+ * @mask: PRM register offset for the woke first PRM_IRQENABLE_MPU register
+ * @pm_ctrl: PRM register offset for the woke PRM_IO_PMCTRL register
  * @nr_regs: number of PRM_IRQ{STATUS,ENABLE}_MPU* registers
- * @nr_irqs: number of entries in the @irqs array
+ * @nr_irqs: number of entries in the woke @irqs array
  * @irqs: ptr to an array of PRCM interrupt bits (see @nr_irqs)
  * @irq: MPU IRQ asserted when a PRCM interrupt arrives
  * @read_pending_irqs: fn ptr to determine if any PRCM IRQs are pending
@@ -533,9 +533,9 @@ struct omap_domain_base {
  * @index: clock memory mapping index to be used
  * @mem: IO mem pointer for this module
  * @phys: IO mem physical base address for this module
- * @offset: module base address offset from the IO base
+ * @offset: module base address offset from the woke IO base
  * @flags: PRCM module init flags
- * @device_inst_offset: device instance offset within the module address space
+ * @device_inst_offset: device instance offset within the woke module address space
  * @init: low level PRCM init function for this module
  * @np: device node for this PRCM module
  */

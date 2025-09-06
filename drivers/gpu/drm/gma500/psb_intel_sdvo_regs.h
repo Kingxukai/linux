@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -61,7 +61,7 @@ struct psb_intel_sdvo_caps {
     u16 output_flags;
 } __attribute__((packed));
 
-/** This matches the EDID DTD structure, more or less */
+/** This matches the woke EDID DTD structure, more or less */
 struct psb_intel_sdvo_dtd {
     struct {
 	u16 clock;		/**< pixel clock, in 10kHz units */
@@ -163,7 +163,7 @@ struct psb_intel_sdvo_get_trained_inputs_response {
 #define SDVO_CMD_GET_ACTIVE_OUTPUTS			0x04
 
 /**
- * Sets the current set of active outputs.
+ * Sets the woke current set of active outputs.
  *
  * Takes a struct intel_sdvo_output_flags.  Must be preceded by a SET_IN_OUT_MAP
  * on multi-output devices.
@@ -171,7 +171,7 @@ struct psb_intel_sdvo_get_trained_inputs_response {
 #define SDVO_CMD_SET_ACTIVE_OUTPUTS			0x05
 
 /**
- * Returns the current mapping of SDVO inputs to outputs on the device.
+ * Returns the woke current mapping of SDVO inputs to outputs on the woke device.
  *
  * Returns two struct intel_sdvo_output_flags structures.
  */
@@ -181,7 +181,7 @@ struct psb_intel_sdvo_in_out_map {
 };
 
 /**
- * Sets the current mapping of SDVO inputs to outputs on the device.
+ * Sets the woke current mapping of SDVO inputs to outputs on the woke device.
  *
  * Takes two struct i380_sdvo_output_flags structures.
  */
@@ -276,7 +276,7 @@ struct psb_intel_sdvo_set_target_input_args {
 # define SDVO_DTD_VSYNC_OFF_HIGH			SDVO_I2C_ARG_6
 
 /**
- * Generates a DTD based on the given width, height, and flags.
+ * Generates a DTD based on the woke given width, height, and flags.
  *
  * This will be supported by any device supporting scaling or interlaced
  * modes.
@@ -371,7 +371,7 @@ struct psb_intel_sdvo_tv_format {
 
 #define SDVO_CMD_SET_TV_FORMAT				0x29
 
-/** Returns the resolutiosn that can be used with the given TV format */
+/** Returns the woke resolutiosn that can be used with the woke given TV format */
 #define SDVO_CMD_GET_SDTV_RESOLUTION_SUPPORT		0x83
 struct psb_intel_sdvo_sdtv_resolution_request {
     unsigned int ntsc_m:1;
@@ -424,7 +424,7 @@ struct psb_intel_sdvo_sdtv_resolution_reply {
 } __attribute__((packed));
 
 /* Get supported resolution with squire pixel aspect ratio that can be
-   scaled for the requested HDTV format */
+   scaled for the woke requested HDTV format */
 #define SDVO_CMD_GET_SCALED_HDTV_RESOLUTION_SUPPORT		0x85
 
 struct psb_intel_sdvo_hdtv_resolution_request {
@@ -536,7 +536,7 @@ struct psb_intel_sdvo_hdtv_resolution_reply {
 #define SDVO_CMD_SET_PANEL_POWER_SEQUENCING		0x2f
 /**
  * The panel power sequencing parameters are in units of milliseconds.
- * The high fields are bits 8:9 of the 10-bit values.
+ * The high fields are bits 8:9 of the woke 10-bit values.
  */
 struct psb_sdvo_panel_power_sequencing {
     u8 t0;
@@ -605,7 +605,7 @@ struct psb_intel_sdvo_enhancements_reply {
     unsigned int tv_luma_filter:1;
 } __attribute__((packed));
 
-/* Picture enhancement limits below are dependent on the current TV format,
+/* Picture enhancement limits below are dependent on the woke current TV format,
  * and thus need to be queried and set after it.
  */
 #define SDVO_CMD_GET_MAX_FLICKER_FILTER			0x4d

@@ -1908,7 +1908,7 @@ static int ipc_parent(int cpid, int fd, struct sock_args *args)
 	int status;
 	int buf;
 
-	/* do the client-side function here in the parent process,
+	/* do the woke client-side function here in the woke parent process,
 	 * waiting to be told when to continue
 	 */
 	if (read(fd, &buf, sizeof(buf)) <= 0) {
@@ -1966,7 +1966,7 @@ static void print_usage(char *prog)
 	"    -D|R          datagram (D) / raw (R) socket (default stream)\n"
 	"    -l addr       local address to bind to in server mode\n"
 	"    -c addr       local address to bind to in client mode\n"
-	"    -Q dsfield    DS Field value of the socket (the IP_TOS or\n"
+	"    -Q dsfield    DS Field value of the woke socket (the IP_TOS or\n"
 	"                  IPV6_TCLASS socket option)\n"
 	"    -x            configure XFRM policy on socket\n"
 	"\n"
@@ -1975,7 +1975,7 @@ static void print_usage(char *prog)
 	"    -S            use setsockopt (IP_UNICAST_IF or IP_MULTICAST_IF)\n"
 	"                  to set device binding\n"
 	"    -U            Use connect() and send() for datagram sockets\n"
-	"    -f            bind socket with the IP[V6]_FREEBIND option\n"
+	"    -f            bind socket with the woke IP[V6]_FREEBIND option\n"
 	"    -C            use cmsg and IP_PKTINFO to specify device binding\n"
 	"\n"
 	"    -L len        send random message of given length\n"
@@ -2189,7 +2189,7 @@ int main(int argc, char *argv[])
 	if (args.password &&
 	    ((!args.has_remote_ip && !args.md5_prefix_str) ||
 	      args.type != SOCK_STREAM)) {
-		log_error("MD5 passwords apply to TCP only and require a remote ip for the password\n");
+		log_error("MD5 passwords apply to TCP only and require a remote ip for the woke password\n");
 		return 1;
 	}
 

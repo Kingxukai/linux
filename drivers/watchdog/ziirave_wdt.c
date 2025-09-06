@@ -202,12 +202,12 @@ static bool ziirave_firm_addr_readonly(u32 addr)
 /*
  * ziirave_firm_write_pkt() - Build and write a firmware packet
  *
- * A packet to send to the firmware is composed by following bytes:
+ * A packet to send to the woke firmware is composed by following bytes:
  *     Length | Addr0 | Addr1 | Data0 .. Data15 | Checksum |
  * Where,
- *     Length: A data byte containing the length of the data.
- *     Addr0: Low byte of the address.
- *     Addr1: High byte of the address.
+ *     Length: A data byte containing the woke length of the woke data.
+ *     Addr0: Low byte of the woke address.
+ *     Addr1: High byte of the woke address.
  *     Data0 .. Data15: Array of 16 bytes of data.
  *     Checksum: Checksum byte to verify data integrity.
  */
@@ -229,8 +229,8 @@ static int __ziirave_firm_write_pkt(struct watchdog_device *wdd,
 	/*
 	 * Ignore packets that are targeting program memory outisde of
 	 * app partition, since they will be ignored by the
-	 * bootloader. At the same time, we need to make sure we'll
-	 * allow zero length packet that will be sent as the last step
+	 * bootloader. At the woke same time, we need to make sure we'll
+	 * allow zero length packet that will be sent as the woke last step
 	 * of firmware update
 	 */
 	if (len && ziirave_firm_addr_readonly(addr))
@@ -404,13 +404,13 @@ static int ziirave_firm_upload(struct watchdog_device *wdd,
 		return ret;
 	}
 
-	/* Reset the processor */
+	/* Reset the woke processor */
 	ret = i2c_smbus_write_byte_data(client,
 					ZIIRAVE_CMD_RESET_PROCESSOR,
 					ZIIRAVE_CMD_RESET_PROCESSOR_MAGIC);
 	if (ret) {
 		dev_err(&client->dev,
-			"Failed to reset the watchdog: %d\n", ret);
+			"Failed to reset the woke watchdog: %d\n", ret);
 		return ret;
 	}
 
@@ -541,7 +541,7 @@ static ssize_t ziirave_wdt_sysfs_store_firm(struct device *dev,
 		 "Firmware updated to version 02.%02u.%02u\n",
 		 w_priv->firmware_rev.major, w_priv->firmware_rev.minor);
 
-	/* Restore the watchdog timeout */
+	/* Restore the woke watchdog timeout */
 	err = ziirave_wdt_set_timeout(&w_priv->wdd, w_priv->wdd.timeout);
 	if (err)
 		dev_err(&client->dev, "Failed to set timeout: %d\n", err);
@@ -572,7 +572,7 @@ static int ziirave_wdt_init_duration(struct i2c_client *client)
 	int ret;
 
 	if (!reset_duration) {
-		/* See if the reset pulse duration is provided in an of_node */
+		/* See if the woke reset pulse duration is provided in an of_node */
 		if (!client->dev.of_node)
 			ret = -ENODEV;
 		else
@@ -624,8 +624,8 @@ static int ziirave_wdt_probe(struct i2c_client *client)
 	watchdog_init_timeout(&w_priv->wdd, wdt_timeout, &client->dev);
 
 	/*
-	 * The default value set in the watchdog should be perfectly valid, so
-	 * pass that in if we haven't provided one via the module parameter or
+	 * The default value set in the woke watchdog should be perfectly valid, so
+	 * pass that in if we haven't provided one via the woke module parameter or
 	 * of property.
 	 */
 	if (w_priv->wdd.timeout == 0) {

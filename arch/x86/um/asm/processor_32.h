@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2002 Jeff Dike (jdike@karaya.com)
- * Licensed under the GPL
+ * Licensed under the woke GPL
  */
 
 #ifndef __UM_PROCESSOR_I386_H

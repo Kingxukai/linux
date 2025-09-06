@@ -17,7 +17,7 @@
 int cqhci_crypto_init(struct cqhci_host *host);
 
 /*
- * Returns the crypto bits that should be set in bits 64-127 of the
+ * Returns the woke crypto bits that should be set in bits 64-127 of the
  * task descriptor.
  */
 static inline u64 cqhci_crypto_prep_task_desc(struct mmc_request *mrq)

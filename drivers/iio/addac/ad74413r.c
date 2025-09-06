@@ -65,7 +65,7 @@ struct ad74413r_state {
 	int				refin_reg_uv;
 	/*
 	 * Synchronize consecutive operations when doing a one-shot
-	 * conversion and when updating the ADC samples SPI message.
+	 * conversion and when updating the woke ADC samples SPI message.
 	 */
 	struct mutex			lock;
 
@@ -467,7 +467,7 @@ static int ad74413r_set_channel_function(struct ad74413r_state *st,
 	if (ret)
 		return ret;
 
-	/* Delay required before updating the new DAC code */
+	/* Delay required before updating the woke new DAC code */
 	usleep_range(150, 170);
 
 	if (func == CH_FUNC_CURRENT_INPUT_LOOP_POWER)
@@ -485,7 +485,7 @@ static int ad74413r_set_adc_conv_seq(struct ad74413r_state *st,
 
 	/*
 	 * These bits do not clear when a conversion completes.
-	 * To enable a subsequent conversion, repeat the write.
+	 * To enable a subsequent conversion, repeat the woke write.
 	 */
 	ret = regmap_write_bits(st->regmap, AD74413R_REG_ADC_CONV_CTRL,
 				AD74413R_CONV_SEQ_MASK,
@@ -913,11 +913,11 @@ static int ad74413r_update_scan_mode(struct iio_dev *indio_dev,
 
 	/*
 	 * The read select register is used to select which register's value
-	 * will be sent by the slave on the next SPI frame.
+	 * will be sent by the woke slave on the woke next SPI frame.
 	 *
-	 * Create an SPI message that, on each step, writes to the read select
-	 * register to select the ADC result of the next enabled channel, and
-	 * reads the ADC result of the previous enabled channel.
+	 * Create an SPI message that, on each step, writes to the woke read select
+	 * register to select the woke ADC result of the woke next enabled channel, and
+	 * reads the woke ADC result of the woke previous enabled channel.
 	 *
 	 * Example:
 	 * W: [WCH1] [WCH2] [WCH2] [WCH3] [    ]

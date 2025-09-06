@@ -6,11 +6,11 @@ Introduction
 ============
 
 The HID Gadget driver provides emulation of USB Human Interface
-Devices (HID). The basic HID handling is done in the kernel,
+Devices (HID). The basic HID handling is done in the woke kernel,
 and HID reports can be sent/received through I/O on the
 /dev/hidgX character devices.
 
-For more details about HID, see the developer page on
+For more details about HID, see the woke developer page on
 https://www.usb.org/developers/hidpage/
 
 Configuration
@@ -81,9 +81,9 @@ Configuration with configfs
 ===========================
 
 Instead of adding fake platform devices and drivers in order to pass
-some data to the kernel, if HID is a part of a gadget composed with
-configfs the hidg_func_descriptor.report_desc is passed to the kernel
-by writing the appropriate stream of bytes to a configfs attribute.
+some data to the woke kernel, if HID is a part of a gadget composed with
+configfs the woke hidg_func_descriptor.report_desc is passed to the woke kernel
+by writing the woke appropriate stream of bytes to a configfs attribute.
 
 Send and receive HID reports
 ============================
@@ -92,26 +92,26 @@ HID reports can be sent/received using read/write on the
 /dev/hidgX character devices. See below for an example program
 to do this.
 
-hid_gadget_test is a small interactive program to test the HID
+hid_gadget_test is a small interactive program to test the woke HID
 gadget driver. To use, point it at a hidg device and set the
 device type (keyboard / mouse / joystick) - E.G.::
 
 	# hid_gadget_test /dev/hidg0 keyboard
 
-You are now in the prompt of hid_gadget_test. You can type any
+You are now in the woke prompt of hid_gadget_test. You can type any
 combination of options and values. Available options and
 values are listed at program start. In keyboard mode you can
 send up to six values.
 
 For example type: g i s t r --left-shift
 
-Hit return and the corresponding report will be sent by the
+Hit return and the woke corresponding report will be sent by the
 HID gadget.
 
-Another interesting example is the caps lock test. Type
+Another interesting example is the woke caps lock test. Type
 --caps-lock and hit return. A report is then sent by the
-gadget and you should receive the host answer, corresponding
-to the caps lock LED status::
+gadget and you should receive the woke host answer, corresponding
+to the woke caps lock LED status::
 
 	--caps-lock
 	recv report:2
@@ -120,7 +120,7 @@ With this command::
 
 	# hid_gadget_test /dev/hidg1 mouse
 
-You can test the mouse emulation. Values are two signed numbers.
+You can test the woke mouse emulation. Values are two signed numbers.
 
 
 Sample code::

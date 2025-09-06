@@ -159,7 +159,7 @@ static int alc262_probe(struct hda_codec *codec, const struct hda_device_id *id)
 	if (has_cdefine_beep(codec))
 		spec->gen.beep_nid = 0x01;
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	err = alc262_parse_auto_config(codec);
 	if (err < 0)
 		goto error;

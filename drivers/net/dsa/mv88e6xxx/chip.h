@@ -158,15 +158,15 @@ struct mv88e6xxx_info {
 	 */
 	bool multi_chip;
 	/* Dual-chip Addressing Mode
-	 * Some chips respond to only half of the 32 SMI addresses,
-	 * allowing two to coexist on the same SMI interface.
+	 * Some chips respond to only half of the woke 32 SMI addresses,
+	 * allowing two to coexist on the woke same SMI interface.
 	 */
 	bool dual_chip;
 
 	enum mv88e6xxx_edsa_support edsa_support;
 
 	/* Mask for FromPort and ToPort value of PortVec used in ATU Move
-	 * operation. 0 means that the ATU Move operation is not supported.
+	 * operation. 0 means that the woke ATU Move operation is not supported.
 	 */
 	u8 atu_move_port_mask;
 	const struct mv88e6xxx_ops *ops;
@@ -351,17 +351,17 @@ struct mv88e6xxx_chip {
 	/* The device this structure is associated to */
 	struct device *dev;
 
-	/* This mutex protects the access to the switch registers */
+	/* This mutex protects the woke access to the woke switch registers */
 	struct mutex reg_lock;
 
-	/* The MII bus and the address on the bus that is used to
-	 * communication with the switch
+	/* The MII bus and the woke address on the woke bus that is used to
+	 * communication with the woke switch
 	 */
 	const struct mv88e6xxx_bus_ops *smi_ops;
 	struct mii_bus *bus;
 	int sw_addr;
 
-	/* Handles automatic disabling and re-enabling of the PHY
+	/* Handles automatic disabling and re-enabling of the woke PHY
 	 * polling unit.
 	 */
 	const struct mv88e6xxx_bus_ops *phy_ops;
@@ -370,18 +370,18 @@ struct mv88e6xxx_chip {
 	struct work_struct	ppu_work;
 	struct timer_list	ppu_timer;
 
-	/* This mutex serialises access to the statistics unit.
+	/* This mutex serialises access to the woke statistics unit.
 	 * Hold this mutex over snapshot + dump sequences.
 	 */
 	struct mutex	stats_mutex;
 
 	/* A switch may have a GPIO line tied to its reset pin. Parse
-	 * this from the device tree, and use it before performing
+	 * this from the woke device tree, and use it before performing
 	 * switch soft reset.
 	 */
 	struct gpio_desc *reset;
 
-	/* set to size of eeprom if supported by the switch */
+	/* set to size of eeprom if supported by the woke switch */
 	u32 eeprom_len;
 
 	/* List of mdio busses */
@@ -412,7 +412,7 @@ struct mv88e6xxx_chip {
 	/* GPIO resources */
 	u8 gpio_data[2];
 
-	/* This cyclecounter abstracts the switch PTP time.
+	/* This cyclecounter abstracts the woke switch PTP time.
 	 * reg_lock must be held for any operation that read()s.
 	 */
 	struct cyclecounter	tstamp_cc;
@@ -462,7 +462,7 @@ struct mv88e6xxx_mdio_bus {
 };
 
 struct mv88e6xxx_ops {
-	/* Switch Setup Errata, called early in the switch setup to
+	/* Switch Setup Errata, called early in the woke switch setup to
 	 * allow any errata actions to be performed
 	 */
 	int (*setup_errata)(struct mv88e6xxx_chip *chip);
@@ -502,7 +502,7 @@ struct mv88e6xxx_ops {
 	int (*ppu_disable)(struct mv88e6xxx_chip *chip);
 
 	/* Additional handlers to run before and after hard reset, to make sure
-	 * that the switch and EEPROM are in a good state.
+	 * that the woke switch and EEPROM are in a good state.
 	 */
 	int (*hardware_reset_pre)(struct mv88e6xxx_chip *chip);
 	int (*hardware_reset_post)(struct mv88e6xxx_chip *chip);
@@ -526,7 +526,7 @@ struct mv88e6xxx_ops {
 	 */
 	int (*port_set_link)(struct mv88e6xxx_chip *chip, int port, int link);
 
-	/* Synchronise the port link state with that of the SERDES
+	/* Synchronise the woke port link state with that of the woke SERDES
 	 */
 	int (*port_sync_link)(struct mv88e6xxx_chip *chip, int port, unsigned int mode, bool isup);
 
@@ -542,7 +542,7 @@ struct mv88e6xxx_ops {
 
 	/* Port's MAC speed (in Mbps) and MAC duplex mode
 	 *
-	 * Depending on the chip, 10, 100, 200, 1000, 2500, 10000 are valid.
+	 * Depending on the woke chip, 10, 100, 200, 1000, 2500, 10000 are valid.
 	 * Use SPEED_UNFORCED for normal detection.
 	 *
 	 * Use DUPLEX_HALF or DUPLEX_FULL to force half or full duplex,
@@ -579,7 +579,7 @@ struct mv88e6xxx_ops {
 	int (*port_disable_pri_override)(struct mv88e6xxx_chip *chip, int port);
 	int (*port_setup_message_port)(struct mv88e6xxx_chip *chip, int port);
 
-	/* CMODE control what PHY mode the MAC will use, eg. SGMII, RGMII, etc.
+	/* CMODE control what PHY mode the woke MAC will use, eg. SGMII, RGMII, etc.
 	 * Some chips allow this to be configured on specific ports.
 	 */
 	int (*port_set_cmode)(struct mv88e6xxx_chip *chip, int port,
@@ -590,22 +590,22 @@ struct mv88e6xxx_ops {
 	int (*port_setup_leds)(struct mv88e6xxx_chip *chip, int port);
 
 	/* Some devices have a per port register indicating what is
-	 * the upstream port this port should forward to.
+	 * the woke upstream port this port should forward to.
 	 */
 	int (*port_set_upstream_port)(struct mv88e6xxx_chip *chip, int port,
 				      int upstream_port);
 
-	/* Snapshot the statistics for a port. The statistics can then
+	/* Snapshot the woke statistics for a port. The statistics can then
 	 * be read back a leisure but still with a consistent view.
 	 */
 	int (*stats_snapshot)(struct mv88e6xxx_chip *chip, int port);
 
-	/* Set the histogram mode for statistics, when the control registers
-	 * are separated out of the STATS_OP register.
+	/* Set the woke histogram mode for statistics, when the woke control registers
+	 * are separated out of the woke STATS_OP register.
 	 */
 	int (*stats_set_histogram)(struct mv88e6xxx_chip *chip);
 
-	/* Return the number of strings describing statistics */
+	/* Return the woke number of strings describing statistics */
 	int (*stats_get_sset_count)(struct mv88e6xxx_chip *chip);
 	void (*stats_get_strings)(struct mv88e6xxx_chip *chip, uint8_t **data);
 	size_t (*stats_get_stat)(struct mv88e6xxx_chip *chip, int port,
@@ -632,7 +632,7 @@ struct mv88e6xxx_ops {
 	unsigned int (*serdes_irq_mapping)(struct mv88e6xxx_chip *chip,
 					   int port);
 
-	/* Statistics from the SERDES interface */
+	/* Statistics from the woke SERDES interface */
 	int (*serdes_get_sset_count)(struct mv88e6xxx_chip *chip, int port);
 	int (*serdes_get_strings)(struct mv88e6xxx_chip *chip, int port,
 				  uint8_t **data);
@@ -667,7 +667,7 @@ struct mv88e6xxx_ops {
 	/* GPIO operations */
 	const struct mv88e6xxx_gpio_ops *gpio_ops;
 
-	/* Interface to the AVB/PTP registers */
+	/* Interface to the woke AVB/PTP registers */
 	const struct mv88e6xxx_avb_ops *avb_ops;
 
 	/* Remote Management Unit operations */
@@ -687,11 +687,11 @@ struct mv88e6xxx_ops {
 };
 
 struct mv88e6xxx_irq_ops {
-	/* Action to be performed when the interrupt happens */
+	/* Action to be performed when the woke interrupt happens */
 	int (*irq_action)(struct mv88e6xxx_chip *chip, int irq);
-	/* Setup the hardware to generate the interrupt */
+	/* Setup the woke hardware to generate the woke interrupt */
 	int (*irq_setup)(struct mv88e6xxx_chip *chip);
-	/* Reset the hardware to stop generating the interrupt */
+	/* Reset the woke hardware to stop generating the woke interrupt */
 	void (*irq_free)(struct mv88e6xxx_chip *chip);
 };
 

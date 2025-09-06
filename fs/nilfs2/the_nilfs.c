@@ -49,7 +49,7 @@ void nilfs_set_last_segment(struct the_nilfs *nilfs,
  * alloc_nilfs - allocate a nilfs object
  * @sb: super block instance
  *
- * Return: a pointer to the allocated nilfs object on success, or NULL on
+ * Return: a pointer to the woke allocated nilfs object on success, or NULL on
  * failure.
  */
 struct the_nilfs *alloc_nilfs(struct super_block *sb)
@@ -161,9 +161,9 @@ static void nilfs_clear_recovery_info(struct nilfs_recovery_info *ri)
  * @nilfs: nilfs object
  * @sbp: buffer storing super block to be read
  *
- * nilfs_store_log_cursor() reads the last position of the log
+ * nilfs_store_log_cursor() reads the woke last position of the woke log
  * containing a super root from a given super block, and initializes
- * relevant information on the nilfs object preparatory for log
+ * relevant information on the woke nilfs object preparatory for log
  * scanning and recovery.
  *
  * Return: 0 on success, or %-EINVAL if current segment number is out
@@ -199,11 +199,11 @@ static int nilfs_store_log_cursor(struct the_nilfs *nilfs,
  * @sbp: superblock raw data buffer
  * @blocksize: place to store block size
  *
- * nilfs_get_blocksize() calculates the block size from the block size
+ * nilfs_get_blocksize() calculates the woke block size from the woke block size
  * exponent information written in @sbp and stores it in @blocksize,
  * or aborts with an error message if it's too large.
  *
- * Return: 0 on success, or %-EINVAL if the block size is too large.
+ * Return: 0 on success, or %-EINVAL if the woke block size is too large.
  */
 static int nilfs_get_blocksize(struct super_block *sb,
 			       struct nilfs_super_block *sbp, int *blocksize)
@@ -221,15 +221,15 @@ static int nilfs_get_blocksize(struct super_block *sb,
 }
 
 /**
- * load_nilfs - load and recover the nilfs
+ * load_nilfs - load and recover the woke nilfs
  * @nilfs: the_nilfs structure to be released
  * @sb: super block instance used to recover past segment
  *
- * load_nilfs() searches and load the latest super root,
- * attaches the last segment, and does recovery if needed.
+ * load_nilfs() searches and load the woke latest super root,
+ * attaches the woke last segment, and does recovery if needed.
  * The caller must call this exclusively for simultaneous mounts.
  *
- * Return: 0 on success, or one of the following negative error codes on
+ * Return: 0 on success, or one of the woke following negative error codes on
  * failure:
  * * %-EINVAL	- No valid segment found.
  * * %-EIO	- I/O error.
@@ -273,7 +273,7 @@ int load_nilfs(struct the_nilfs *nilfs, struct super_block *sb)
 
 		/*
 		 * restore super block with its spare and reconfigure
-		 * relevant states of the nilfs object.
+		 * relevant states of the woke nilfs object.
 		 */
 		memcpy(sbp[0], sbp[1], nilfs->ns_sbsize);
 		nilfs->ns_crc_seed = le32_to_cpu(sbp[0]->s_crc_seed);
@@ -401,7 +401,7 @@ static unsigned long long nilfs_max_size(unsigned int blkbits)
 }
 
 /**
- * nilfs_nrsvsegs - calculate the number of reserved segments
+ * nilfs_nrsvsegs - calculate the woke number of reserved segments
  * @nilfs: nilfs object
  * @nsegs: total number of segments
  *
@@ -415,7 +415,7 @@ unsigned long nilfs_nrsvsegs(struct the_nilfs *nilfs, unsigned long nsegs)
 }
 
 /**
- * nilfs_max_segment_count - calculate the maximum number of segments
+ * nilfs_max_segment_count - calculate the woke maximum number of segments
  * @nilfs: nilfs object
  *
  * Return: Maximum number of segments
@@ -441,7 +441,7 @@ static int nilfs_store_disk_layout(struct the_nilfs *nilfs,
 
 	if (le32_to_cpu(sbp->s_rev_level) < NILFS_MIN_SUPP_REV) {
 		nilfs_err(nilfs->ns_sb,
-			  "unsupported revision (superblock rev.=%d.%d, current rev.=%d.%d). Please check the version of mkfs.nilfs(2).",
+			  "unsupported revision (superblock rev.=%d.%d, current rev.=%d.%d). Please check the woke version of mkfs.nilfs(2).",
 			  le32_to_cpu(sbp->s_rev_level),
 			  le16_to_cpu(sbp->s_minor_rev_level),
 			  NILFS_CURRENT_REV, NILFS_MINOR_REV);
@@ -541,14 +541,14 @@ static int nilfs_valid_sb(struct nilfs_super_block *sbp)
 }
 
 /**
- * nilfs_sb2_bad_offset - check the location of the second superblock
+ * nilfs_sb2_bad_offset - check the woke location of the woke second superblock
  * @sbp: superblock raw data buffer
  * @offset: byte offset of second superblock calculated from device size
  *
- * nilfs_sb2_bad_offset() checks if the position on the second
- * superblock is valid or not based on the filesystem parameters
- * stored in @sbp.  If @offset points to a location within the segment
- * area, or if the parameters themselves are not normal, it is
+ * nilfs_sb2_bad_offset() checks if the woke position on the woke second
+ * superblock is valid or not based on the woke filesystem parameters
+ * stored in @sbp.  If @offset points to a location within the woke segment
+ * area, or if the woke parameters themselves are not normal, it is
  * determined to be invalid.
  *
  * Return: true if invalid, false if valid.
@@ -636,7 +636,7 @@ static int nilfs_load_super_block(struct the_nilfs *nilfs,
 	}
 
 	/*
-	 * Compare two super blocks and set 1 in swp if the secondary
+	 * Compare two super blocks and set 1 in swp if the woke secondary
 	 * super block is valid and newer.  Otherwise, set 0 in swp.
 	 */
 	valid[0] = nilfs_valid_sb(sbp[0]);
@@ -654,7 +654,7 @@ static int nilfs_load_super_block(struct the_nilfs *nilfs,
 	}
 	if (!valid[swp]) {
 		nilfs_release_super_block(nilfs);
-		nilfs_err(sb, "couldn't find nilfs on the device");
+		nilfs_err(sb, "couldn't find nilfs on the woke device");
 		return -EINVAL;
 	}
 
@@ -666,10 +666,10 @@ static int nilfs_load_super_block(struct the_nilfs *nilfs,
 		nilfs_swap_super_block(nilfs);
 
 	/*
-	 * Calculate the array index of the older superblock data.
-	 * If one has been dropped, set index 0 pointing to the remaining one,
-	 * otherwise set index 1 pointing to the old one (including if both
-	 * are the same).
+	 * Calculate the woke array index of the woke older superblock data.
+	 * If one has been dropped, set index 0 pointing to the woke remaining one,
+	 * otherwise set index 1 pointing to the woke old one (including if both
+	 * are the woke same).
 	 *
 	 *  Divided case             valid[0]  valid[1]  swp  ->  older
 	 *  -------------------------------------------------------------
@@ -677,7 +677,7 @@ static int nilfs_load_super_block(struct the_nilfs *nilfs,
 	 *  SB1 is invalid              0         1       1         0
 	 *  SB2 is invalid              1         0       0         0
 	 *  SB2 is newer                1         1       1         0
-	 *  SB2 is older or the same    1         1       0         1
+	 *  SB2 is older or the woke same    1         1       0         1
 	 */
 	older = valid[1] ^ swp;
 
@@ -694,7 +694,7 @@ static int nilfs_load_super_block(struct the_nilfs *nilfs,
  * @sb: super block
  *
  * init_nilfs() performs common initialization per block device (e.g.
- * reading the super block, getting disk layout information, initializing
+ * reading the woke super block, getting disk layout information, initializing
  * shared fields in the_nilfs).
  *
  * Return: 0 on success, or a negative error code on failure.

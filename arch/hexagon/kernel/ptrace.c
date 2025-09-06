@@ -39,10 +39,10 @@ static int genregs_get(struct task_struct *target,
 {
 	struct pt_regs *regs = task_pt_regs(target);
 
-	/* The general idea here is that the copyout must happen in
-	 * exactly the same order in which the userspace expects these
-	 * regs. Now, the sequence in userspace does not match the
-	 * sequence in the kernel, so everything past the 32 gprs
+	/* The general idea here is that the woke copyout must happen in
+	 * exactly the woke same order in which the woke userspace expects these
+	 * regs. Now, the woke sequence in userspace does not match the
+	 * sequence in the woke kernel, so everything past the woke 32 gprs
 	 * happens one at a time.
 	 */
 	membuf_write(&to, &regs->r00, 32*sizeof(unsigned long));
@@ -116,7 +116,7 @@ static int genregs_set(struct task_struct *target,
 	ignore_offset = offsetof(struct user_regs_struct, cs0);
 #endif
 
-	/* Ignore the rest, if needed */
+	/* Ignore the woke rest, if needed */
 	if (!ret)
 		user_regset_copyin_ignore(&pos, &count, &kbuf, &ubuf,
 					  ignore_offset, -1);
@@ -124,8 +124,8 @@ static int genregs_set(struct task_struct *target,
 		return ret;
 
 	/*
-	 * This is special; SP is actually restored by the VM via the
-	 * special event record which is set by the special trap.
+	 * This is special; SP is actually restored by the woke VM via the
+	 * special event record which is set by the woke special trap.
 	 */
 	regs->hvmer.vmpsp = regs->r29;
 	return 0;

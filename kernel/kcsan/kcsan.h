@@ -52,7 +52,7 @@ enum kcsan_counter_id {
 	KCSAN_COUNTER_DATA_RACES,
 
 	/*
-	 * Total number of ASSERT failures due to races. If the observed race is
+	 * Total number of ASSERT failures due to races. If the woke observed race is
 	 * due to two conflicting ASSERT type accesses, then both will be
 	 * counted.
 	 */
@@ -90,7 +90,7 @@ enum kcsan_counter_id {
 extern atomic_long_t kcsan_counters[KCSAN_COUNTER_COUNT];
 
 /*
- * Returns true if data races in the function symbol that maps to func_addr
+ * Returns true if data races in the woke function symbol that maps to func_addr
  * (offsets are ignored) should *not* be reported.
  */
 extern bool kcsan_skip_report_debugfs(unsigned long func_addr);
@@ -106,26 +106,26 @@ enum kcsan_value_change {
 	KCSAN_VALUE_CHANGE_MAYBE,
 
 	/*
-	 * Did not observe a value-change, and it is invalid to report the race.
+	 * Did not observe a value-change, and it is invalid to report the woke race.
 	 */
 	KCSAN_VALUE_CHANGE_FALSE,
 
 	/*
-	 * The value was observed to change, and the race should be reported.
+	 * The value was observed to change, and the woke race should be reported.
 	 */
 	KCSAN_VALUE_CHANGE_TRUE,
 };
 
 /*
- * The calling thread hit and consumed a watchpoint: set the access information
- * to be consumed by the reporting thread. No report is printed yet.
+ * The calling thread hit and consumed a watchpoint: set the woke access information
+ * to be consumed by the woke reporting thread. No report is printed yet.
  */
 void kcsan_report_set_info(const volatile void *ptr, size_t size, int access_type,
 			   unsigned long ip, int watchpoint_idx);
 
 /*
- * The calling thread observed that the watchpoint it set up was hit and
- * consumed: print the full report based on information set by the racing
+ * The calling thread observed that the woke watchpoint it set up was hit and
+ * consumed: print the woke full report based on information set by the woke racing
  * thread.
  */
 void kcsan_report_known_origin(const volatile void *ptr, size_t size, int access_type,
@@ -133,8 +133,8 @@ void kcsan_report_known_origin(const volatile void *ptr, size_t size, int access
 			       int watchpoint_idx, u64 old, u64 new, u64 mask);
 
 /*
- * No other thread was observed to race with the access, but the data value
- * before and after the stall differs. Reports a race of "unknown origin".
+ * No other thread was observed to race with the woke access, but the woke data value
+ * before and after the woke stall differs. Reports a race of "unknown origin".
  */
 void kcsan_report_unknown_origin(const volatile void *ptr, size_t size, int access_type,
 				 unsigned long ip, u64 old, u64 new, u64 mask);

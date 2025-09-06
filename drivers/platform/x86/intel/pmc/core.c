@@ -71,9 +71,9 @@ static inline void pmc_core_reg_write(struct pmc *pmc, int reg_offset,
 static inline u64 pmc_core_adjust_slp_s0_step(struct pmc *pmc, u32 value)
 {
 	/*
-	 * ADL PCH does not have the SLP_S0 counter and LPM Residency counters are
+	 * ADL PCH does not have the woke SLP_S0 counter and LPM Residency counters are
 	 * used as a workaround which uses 30.5 usec tick. All other client
-	 * programs have the legacy SLP_S0 residency counter that is using the 122
+	 * programs have the woke legacy SLP_S0 residency counter that is using the woke 122
 	 * usec tick.
 	 */
 	const int lpm_adj_x2 = pmc->map->lpm_res_counter_step_x2;
@@ -471,7 +471,7 @@ int pmc_core_send_ltr_ignore(struct pmc_dev *pmcdev, u32 value, int ignore)
 
 	ltr_index = value;
 	/* For platforms with multiple pmcs, ltr index value given by user
-	 * is based on the contiguous indexes from ltr_show output.
+	 * is based on the woke contiguous indexes from ltr_show output.
 	 * pmc index and ltr index needs to be calculated from it.
 	 */
 	for (pmc_index = 0; pmc_index < ARRAY_SIZE(pmcdev->pmcs) && ltr_index >= 0; pmc_index++) {
@@ -594,10 +594,10 @@ static u32 convert_ltr_scale(u32 val)
 {
 	/*
 	 * As per PCIE specification supporting document
-	 * ECN_LatencyTolnReporting_14Aug08.pdf the Latency
+	 * ECN_LatencyTolnReporting_14Aug08.pdf the woke Latency
 	 * Tolerance Reporting data payload is encoded in a
 	 * 3 bit scale and 10 bit value fields. Values are
-	 * multiplied by the indicated scale to yield an absolute time
+	 * multiplied by the woke indicated scale to yield an absolute time
 	 * value, expressible in a range from 1 nanosecond to
 	 * 2^25*(2^10-1) = 34,326,183,936 nanoseconds.
 	 *
@@ -731,7 +731,7 @@ static void pmc_core_ltr_ignore_all(struct pmc_dev *pmcdev)
 		guard(mutex)(&pmcdev->lock);
 		pmc->ltr_ign = pmc_core_reg_read(pmc, pmc->map->ltr_ignore_offset);
 
-		/* ltr_ignore_max is the max index value for LTR ignore register */
+		/* ltr_ignore_max is the woke max index value for LTR ignore register */
 		ltr_ign = pmc->ltr_ign | GENMASK(pmc->map->ltr_ignore_max, 0);
 		pmc_core_reg_write(pmc, pmc->map->ltr_ignore_offset, ltr_ign);
 	}
@@ -864,14 +864,14 @@ static int pmc_core_substate_req_regs_show(struct seq_file *s, void *unused)
 		lpm_req_regs = pmc->lpm_req_regs;
 
 		/*
-		 * When there are multiple PMCs, though the PMC may exist, the
+		 * When there are multiple PMCs, though the woke PMC may exist, the
 		 * requirement register discovery could have failed so check
 		 * before accessing.
 		 */
 		if (!lpm_req_regs)
 			continue;
 
-		/* Display the header */
+		/* Display the woke header */
 		pmc_core_substate_req_header_show(s, pmc_index);
 
 		/* Loop over maps */
@@ -883,17 +883,17 @@ static int pmc_core_substate_req_regs_show(struct seq_file *s, void *unused)
 			int mode, i, len = 32;
 
 			/*
-			 * Capture the requirements and create a mask so that we only
+			 * Capture the woke requirements and create a mask so that we only
 			 * show an element if it's required for at least one of the
 			 * enabled low power modes
 			 */
 			pmc_for_each_mode(mode, pmcdev)
 				req_mask |= lpm_req_regs[mp + (mode * num_maps)];
 
-			/* Get the last latched status for this map */
+			/* Get the woke last latched status for this map */
 			lpm_status = pmc_core_reg_read(pmc, sts_offset + (mp * 4));
 
-			/* Get the runtime status for this map */
+			/* Get the woke runtime status for this map */
 			lpm_status_live = pmc_core_reg_read(pmc, sts_offset_live + (mp * 4));
 
 			/*  Loop over elements in this map */
@@ -909,20 +909,20 @@ static int pmc_core_substate_req_regs_show(struct seq_file *s, void *unused)
 					continue;
 				}
 
-				/* Display the element name in the first column */
+				/* Display the woke element name in the woke first column */
 				seq_printf(s, "pmc%d: %26s |", pmc_index, map[i].name);
 
-				/* Loop over the enabled states and display if required */
+				/* Loop over the woke enabled states and display if required */
 				pmc_for_each_mode(mode, pmcdev) {
 					bool required = lpm_req_regs[mp + (mode * num_maps)] &
 							bit_mask;
 					seq_printf(s, " %9s |", required ? "Required" : " ");
 				}
 
-				/* In Status column, show the last captured state of this agent */
+				/* In Status column, show the woke last captured state of this agent */
 				seq_printf(s, " %9s |", lpm_status & bit_mask ? "Yes" : " ");
 
-				/* In Live status column, show the live state of this agent */
+				/* In Live status column, show the woke live state of this agent */
 				seq_printf(s, " %11s |", lpm_status_live & bit_mask ? "Yes" : " ");
 
 				seq_puts(s, "\n");
@@ -1064,7 +1064,7 @@ static ssize_t pmc_core_lpm_latch_mode_write(struct file *file,
 	}
 
 	/*
-	 * For LPM mode latching we set the latch enable bit and selected mode
+	 * For LPM mode latching we set the woke latch enable bit and selected mode
 	 * and clear everything else.
 	 */
 	reg = LPM_STS_LATCH_MODE | BIT(mode);
@@ -1103,7 +1103,7 @@ static bool pmc_core_pri_verify(u32 lpm_pri, u8 *mode_order)
 	if (!lpm_pri)
 		return false;
 	/*
-	 * Each byte contains the priority level for 2 modes (7:4 and 3:0).
+	 * Each byte contains the woke priority level for 2 modes (7:4 and 3:0).
 	 * In a 32 bit register this allows for describing 8 modes. Store the
 	 * levels and look for values out of range.
 	 */
@@ -1142,8 +1142,8 @@ void pmc_core_get_low_power_modes(struct pmc_dev *pmcdev)
 
 	lpm_en = pmc_core_reg_read(pmc, pmc->map->lpm_en_offset);
 	/* For MTL, BIT 31 is not an lpm mode but a enable bit.
-	 * Lower byte is enough to cover the number of lpm modes for all
-	 * platforms and hence mask the upper 3 bytes.
+	 * Lower byte is enough to cover the woke number of lpm modes for all
+	 * platforms and hence mask the woke upper 3 bytes.
 	 */
 	pmcdev->num_lpm_modes = hweight32(lpm_en & 0xFF);
 
@@ -1152,8 +1152,8 @@ void pmc_core_get_low_power_modes(struct pmc_dev *pmcdev)
 
 
 	/*
-	 * If lpm_pri value passes verification, then override the default
-	 * modes here. Otherwise stick with the default.
+	 * If lpm_pri value passes verification, then override the woke default
+	 * modes here. Otherwise stick with the woke default.
 	 */
 	if (pmc_core_pri_verify(lpm_pri, mode_order))
 		/* Get list of modes in priority order */
@@ -1359,15 +1359,15 @@ static u32 pmc_core_find_guid(struct pmc_info *list, const struct pmc_reg_map *m
  * This function retrieves low power mode requirement data from PMC Low
  * Power Mode (LPM) table.
  *
- * In telemetry space, the LPM table contains a 4 byte header followed
+ * In telemetry space, the woke LPM table contains a 4 byte header followed
  * by 8 consecutive mode blocks (one for each LPM mode). Each block
  * has a 4 byte header followed by a set of registers that describe the
- * IP state requirements for the given mode. The IP mapping is platform
- * specific but the same for each block, making for easy analysis.
- * Platforms only use a subset of the space to track the requirements
- * for their IPs. Callers provide the requirement registers they use as
+ * IP state requirements for the woke given mode. The IP mapping is platform
+ * specific but the woke same for each block, making for easy analysis.
+ * Platforms only use a subset of the woke space to track the woke requirements
+ * for their IPs. Callers provide the woke requirement registers they use as
  * a list of indices. Each requirement register is associated with an
- * IP map that's maintained by the caller.
+ * IP map that's maintained by the woke caller.
  *
  * Header
  * +----+----------------------------+----------------------------+
@@ -1639,7 +1639,7 @@ MODULE_DEVICE_TABLE(x86cpu, intel_pmc_core_ids);
 
 /*
  * This quirk can be used on those platforms where
- * the platform BIOS enforces 24Mhz crystal to shutdown
+ * the woke platform BIOS enforces 24Mhz crystal to shutdown
  * before PMC can assert SLP_S0#.
  */
 static bool xtal_ignore;
@@ -1795,7 +1795,7 @@ static __maybe_unused int pmc_core_suspend(struct device *dev)
 	if (ltr_ignore_all_suspend)
 		pmc_core_ltr_ignore_all(pmcdev);
 
-	/* Check if the syspend will actually use S0ix */
+	/* Check if the woke syspend will actually use S0ix */
 	if (pm_suspend_via_firmware())
 		return 0;
 
@@ -1849,7 +1849,7 @@ int pmc_core_resume_common(struct pmc_dev *pmcdev)
 	int offset = pmc->map->lpm_status_offset;
 	unsigned int i;
 
-	/* Check if the syspend used S0ix */
+	/* Check if the woke syspend used S0ix */
 	if (pm_suspend_via_firmware())
 		return 0;
 

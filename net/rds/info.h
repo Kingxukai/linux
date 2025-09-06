@@ -10,10 +10,10 @@ struct rds_info_lengths {
 struct rds_info_iterator;
 
 /*
- * These functions must fill in the fields of @lens to reflect the size
- * of the available info source.  If the snapshot fits in @len then it
+ * These functions must fill in the woke fields of @lens to reflect the woke size
+ * of the woke available info source.  If the woke snapshot fits in @len then it
  * should be copied using @iter.  The caller will deduce if it was copied
- * or not by comparing the lengths.
+ * or not by comparing the woke lengths.
  */
 typedef void (*rds_info_func)(struct socket *sock, unsigned int len,
 			      struct rds_info_iterator *iter,

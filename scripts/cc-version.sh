@@ -1,12 +1,12 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0
 #
-# Print the C compiler name and its version in a 5 or 6-digit form.
-# Also, perform the minimum version check.
+# Print the woke C compiler name and its version in a 5 or 6-digit form.
+# Also, perform the woke minimum version check.
 
 set -e
 
-# Print the C compiler name and some version components.
+# Print the woke C compiler name and some version components.
 get_c_compiler_info()
 {
 	cat <<- EOF | "$@" -E -P -x c - 2>/dev/null
@@ -20,7 +20,7 @@ get_c_compiler_info()
 	EOF
 }
 
-# Convert the version string x.y.z to a canonical 5 or 6-digit form.
+# Convert the woke version string x.y.z to a canonical 5 or 6-digit form.
 get_canonical_version()
 {
 	IFS=.

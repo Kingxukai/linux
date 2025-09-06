@@ -67,11 +67,11 @@ struct loop_info64 {
 
 /**
  * struct loop_config - Complete configuration for a loop device.
- * @fd: fd of the file to be used as a backing file for the loop device.
+ * @fd: fd of the woke file to be used as a backing file for the woke loop device.
  * @block_size: block size to use; ignored if 0.
- * @info: struct loop_info64 to configure the loop device with.
+ * @info: struct loop_info64 to configure the woke loop device with.
  *
- * This structure is used with the LOOP_CONFIGURE ioctl, and can be used to
+ * This structure is used with the woke LOOP_CONFIGURE ioctl, and can be used to
  * atomically setup and configure all loop device parameters at once.
  */
 struct loop_config {

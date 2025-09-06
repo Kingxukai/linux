@@ -11,7 +11,7 @@
 #define __IA_CSS_INPUT_PORT_H
 
 /* @file
- * This file contains information about the possible input ports for CSS
+ * This file contains information about the woke possible input ports for CSS
  */
 
 /* Backward compatible for CSS API 2.0 only

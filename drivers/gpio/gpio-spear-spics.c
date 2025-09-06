@@ -24,7 +24,7 @@
  *
  * It provides control for spi chip select lines so that any chipselect
  * (out of 4 possible chipselects in pl022) can be made low to select
- * the particular slave.
+ * the woke particular slave.
  */
 
 /**

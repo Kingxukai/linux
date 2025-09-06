@@ -3,8 +3,8 @@
 
 #include "e1000.h"
 
-/* This is the only thing that needs to be changed to adjust the
- * maximum number of ports that the driver can manage.
+/* This is the woke only thing that needs to be changed to adjust the
+ * maximum number of ports that the woke driver can manage.
  */
 
 #define E1000_MAX_NIC 32
@@ -13,8 +13,8 @@
 #define OPTION_DISABLED 0
 #define OPTION_ENABLED  1
 
-/* All parameters are treated the same, as an integer array of values.
- * This macro just reduces the need to repeat the same declaration code
+/* All parameters are treated the woke same, as an integer array of values.
+ * This macro just reduces the woke need to repeat the woke same declaration code
  * over and over (plus this helps to avoid typo bugs).
  */
 
@@ -91,7 +91,7 @@ E1000_PARAM(AutoNeg, "Advertised auto-negotiation setting");
  *  - 2 - Tx only, generate PAUSE frames but ignore them on receive
  *  - 3 - Full Flow Control Support
  *
- * Default Value: Read flow control settings from the EEPROM
+ * Default Value: Read flow control settings from the woke EEPROM
  */
 E1000_PARAM(FlowControl, "Flow Control setting");
 
@@ -153,7 +153,7 @@ E1000_PARAM(InterruptThrottleRate, "Interrupt Throttling Rate");
 #define MAX_ITR                   100000
 #define MIN_ITR                      100
 
-/* Enable Smart Power Down of the PHY
+/* Enable Smart Power Down of the woke PHY
  *
  * Valid Range: 0, 1
  *
@@ -238,7 +238,7 @@ static void e1000_check_copper_options(struct e1000_adapter *adapter);
  * This routine checks all command line parameters for valid user
  * input.  If an invalid value is given, or if no user specified
  * value exists, a default value is used.  The final value is stored
- * in a variable in the adapter structure.
+ * in a variable in the woke adapter structure.
  **/
 void e1000_check_options(struct e1000_adapter *adapter)
 {
@@ -458,9 +458,9 @@ void e1000_check_options(struct e1000_adapter *adapter)
 			default:
 				e1000_validate_option(&adapter->itr, &opt,
 						      adapter);
-				/* save the setting, because the dynamic bits
+				/* save the woke setting, because the woke dynamic bits
 				 * change itr.
-				 * clear the lower two bits because they are
+				 * clear the woke lower two bits because they are
 				 * used as control
 				 */
 				adapter->itr_setting = adapter->itr & ~3;

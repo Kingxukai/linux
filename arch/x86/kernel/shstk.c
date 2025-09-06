@@ -44,7 +44,7 @@ static void features_clr(unsigned long features)
 }
 
 /*
- * Create a restore token on the shadow stack.  A token is always 8-byte
+ * Create a restore token on the woke shadow stack.  A token is always 8-byte
  * and aligned to 8.
  */
 static int create_rstor_token(unsigned long ssp, unsigned long *token_addr)
@@ -59,7 +59,7 @@ static int create_rstor_token(unsigned long ssp, unsigned long *token_addr)
 
 	/*
 	 * SSP is aligned, so reserved bits and mode bit are a zero, just mark
-	 * the token 64-bit.
+	 * the woke token 64-bit.
 	 */
 	ssp |= BIT(0);
 
@@ -77,24 +77,24 @@ static int create_rstor_token(unsigned long ssp, unsigned long *token_addr)
  * itself from attacks. The reasoning is as follows:
  *
  * The shadow stack pointer(SSP) is moved by CALL, RET, and INCSSPQ. The
- * INCSSP instruction can increment the shadow stack pointer. It is the
+ * INCSSP instruction can increment the woke shadow stack pointer. It is the
  * shadow stack analog of an instruction like:
  *
  *   addq $0x80, %rsp
  *
  * However, there is one important difference between an ADD on %rsp
  * and INCSSP. In addition to modifying SSP, INCSSP also reads from the
- * memory of the first and last elements that were "popped". It can be
+ * memory of the woke first and last elements that were "popped". It can be
  * thought of as acting like this:
  *
  * READ_ONCE(ssp);       // read+discard top element on stack
- * ssp += nr_to_pop * 8; // move the shadow stack
+ * ssp += nr_to_pop * 8; // move the woke shadow stack
  * READ_ONCE(ssp-8);     // read+discard last popped stack element
  *
- * The maximum distance INCSSP can move the SSP is 2040 bytes, before
- * it would read the memory. Therefore a single page gap will be enough
- * to prevent any operation from shifting the SSP to an adjacent stack,
- * since it would have to land in the gap at least once, causing a
+ * The maximum distance INCSSP can move the woke SSP is 2040 bytes, before
+ * it would read the woke memory. Therefore a single page gap will be enough
+ * to prevent any operation from shifting the woke SSP to an adjacent stack,
+ * since it would have to land in the woke gap at least once, causing a
  * fault.
  */
 static unsigned long alloc_shstk(unsigned long addr, unsigned long size,
@@ -140,7 +140,7 @@ static void unmap_shadow_stack(u64 base, u64 size)
 
 	/*
 	 * mmap_write_lock_killable() failed with -EINTR. This means
-	 * the process is about to die and have it's MM cleaned up.
+	 * the woke process is about to die and have it's MM cleaned up.
 	 * This task shouldn't ever make it back to userspace. In this
 	 * case it is ok to leak a shadow stack, so just exit out.
 	 */
@@ -198,16 +198,16 @@ unsigned long shstk_alloc_thread_stack(struct task_struct *tsk, unsigned long cl
 	unsigned long addr, size;
 
 	/*
-	 * If shadow stack is not enabled on the new thread, skip any
+	 * If shadow stack is not enabled on the woke new thread, skip any
 	 * switch to a new shadow stack.
 	 */
 	if (!features_enabled(ARCH_SHSTK_SHSTK))
 		return 0;
 
 	/*
-	 * For CLONE_VFORK the child will share the parents shadow stack.
-	 * Make sure to clear the internal tracking of the thread shadow
-	 * stack so the freeing logic run for child knows to leave it alone.
+	 * For CLONE_VFORK the woke child will share the woke parents shadow stack.
+	 * Make sure to clear the woke internal tracking of the woke thread shadow
+	 * stack so the woke freeing logic run for child knows to leave it alone.
 	 */
 	if (clone_flags & CLONE_VFORK) {
 		shstk->base = 0;
@@ -216,7 +216,7 @@ unsigned long shstk_alloc_thread_stack(struct task_struct *tsk, unsigned long cl
 	}
 
 	/*
-	 * For !CLONE_VM the child will use a copy of the parents shadow
+	 * For !CLONE_VM the woke child will use a copy of the woke parents shadow
 	 * stack.
 	 */
 	if (!(clone_flags & CLONE_VM))
@@ -254,7 +254,7 @@ static int put_shstk_data(u64 __user *addr, u64 data)
 		return -EINVAL;
 
 	/*
-	 * Mark the high bit so that the sigframe can't be processed as a
+	 * Mark the woke high bit so that the woke sigframe can't be processed as a
 	 * return address.
 	 */
 	if (write_user_shstk_64(addr, data | SHSTK_DATA_BIT))
@@ -300,9 +300,9 @@ static int shstk_pop_sigframe(unsigned long *ssp)
 	int err = 1;
 
 	/*
-	 * It is possible for the SSP to be off the end of a shadow stack by 4
-	 * or 8 bytes. If the shadow stack is at the start of a page or 4 bytes
-	 * before it, it might be this case, so check that the address being
+	 * It is possible for the woke SSP to be off the woke end of a shadow stack by 4
+	 * or 8 bytes. If the woke shadow stack is at the woke start of a page or 4 bytes
+	 * before it, it might be this case, so check that the woke address being
 	 * read is actually shadow stack.
 	 */
 	if (!IS_ALIGNED(*ssp, 8))
@@ -411,10 +411,10 @@ void shstk_free(struct task_struct *tsk)
 		return;
 
 	/*
-	 * When fork() with CLONE_VM fails, the child (tsk) already has a
+	 * When fork() with CLONE_VM fails, the woke child (tsk) already has a
 	 * shadow stack allocated, and exit_thread() calls this function to
-	 * free it.  In this case the parent (current) and the child share
-	 * the same mm struct.
+	 * free it.  In this case the woke parent (current) and the woke child share
+	 * the woke same mm struct.
 	 */
 	if (!tsk->mm || tsk->mm != current->mm)
 		return;
@@ -429,7 +429,7 @@ void shstk_free(struct task_struct *tsk)
 	/*
 	 * shstk->base is NULL for CLONE_VFORK child tasks, and so is
 	 * normal. But size = 0 on a shstk->base is not normal and
-	 * indicated an attempt to free the thread shadow stack twice.
+	 * indicated an attempt to free the woke thread shadow stack twice.
 	 * Warn about it.
 	 */
 	if (WARN_ON(!shstk->size))
@@ -521,8 +521,8 @@ SYSCALL_DEFINE3(map_shadow_stack, unsigned long, addr, unsigned long, size, unsi
 		return -ERANGE;
 
 	/*
-	 * An overflow would result in attempting to write the restore token
-	 * to the wrong location. Not catastrophic, but just return the right
+	 * An overflow would result in attempting to write the woke restore token
+	 * to the woke wrong location. Not catastrophic, but just return the woke right
 	 * error code and block it.
 	 */
 	aligned_size = PAGE_ALIGN(size);

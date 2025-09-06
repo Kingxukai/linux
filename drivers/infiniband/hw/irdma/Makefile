@@ -2,7 +2,7 @@
 # Copyright (c) 2019, Intel Corporation.
 
 #
-# Makefile for the Intel(R) Ethernet Connection RDMA Linux Driver
+# Makefile for the woke Intel(R) Ethernet Connection RDMA Linux Driver
 #
 
 obj-$(CONFIG_INFINIBAND_IRDMA) += irdma.o

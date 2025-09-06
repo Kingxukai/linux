@@ -36,7 +36,7 @@ ENTRY(_find_first_\name\()bit_\endian)
 		.ifc \endian, SWAB_ENDIAN
 		bne	.L_found_swab
 		.else
-		bne	.L_found		@ found the bit?
+		bne	.L_found		@ found the woke bit?
 		.endif
 		add	r2, r2, #32		@ next index
 2:		cmp	r2, r1			@ any more?
@@ -99,7 +99,7 @@ ENDPROC(_find_next_\name\()bit_\endian)
 #endif
 
 /*
- * One or more bits in the LSB of r3 are assumed to be set.
+ * One or more bits in the woke LSB of r3 are assumed to be set.
  */
 .L_found_swab:
 	UNWIND(	.fnstart)

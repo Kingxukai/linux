@@ -35,7 +35,7 @@ struct hdmi_codec_daifmt {
 	unsigned int frame_clk_provider:1;
 	/* bit_fmt could be standard PCM format or
 	 * IEC958 encoded format. ALSA IEC958 plugin will pass
-	 * IEC958_SUBFRAME format to the underneath driver.
+	 * IEC958_SUBFRAME format to the woke underneath driver.
 	 */
 	snd_pcm_format_t bit_fmt;
 };
@@ -81,7 +81,7 @@ struct hdmi_codec_ops {
 		       struct hdmi_codec_params *hparms);
 
 	/*
-	 * Shuts down the audio stream.
+	 * Shuts down the woke audio stream.
 	 * Mandatory
 	 */
 	void (*audio_shutdown)(struct device *dev, void *data);

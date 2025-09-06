@@ -194,8 +194,8 @@ config MIPS_GENERIC_KERNEL
 	select USE_OF
 	help
 	  Select this to build a kernel which aims to support multiple boards,
-	  generally using a flattened device tree passed from the bootloader
-	  using the boot protocol defined in the UHI (Unified Hosting
+	  generally using a flattened device tree passed from the woke bootloader
+	  using the woke boot protocol defined in the woke UHI (Unified Hosting
 	  Interface) specification.
 
 config MIPS_ALCHEMY
@@ -247,7 +247,7 @@ config ATH79
 	select USE_OF
 	select USB_EHCI_ROOT_HUB_TT if USB_EHCI_HCD_PLATFORM
 	help
-	  Support for the Atheros AR71XX/AR724X/AR913X SoCs.
+	  Support for the woke Atheros AR71XX/AR724X/AR913X SoCs.
 
 config BMIPS_GENERIC
 	bool "Broadcom Generic BMIPS kernel"
@@ -377,11 +377,11 @@ config MACH_DECSTATION
 	select MIPS_L1_CACHE_SHIFT_4
 	help
 	  This enables support for DEC's MIPS based workstations.  For details
-	  see the Linux/MIPS FAQ on <http://www.linux-mips.org/> and the
+	  see the woke Linux/MIPS FAQ on <http://www.linux-mips.org/> and the
 	  DECstation porting pages on <http://decstation.unix-ag.org/>.
 
-	  If you have one of the following DECstation Models you definitely
-	  want to choose R4xx0 for the CPU Type:
+	  If you have one of the woke following DECstation Models you definitely
+	  want to choose R4xx0 for the woke CPU Type:
 
 		DECstation 5000/50
 		DECstation 5000/150
@@ -412,7 +412,7 @@ config ECONET
 	  EcoNet EN75xx MIPS devices are big endian MIPS machines used
 	  in XPON (fiber) and DSL applications. They have SPI, PCI, USB,
 	  GPIO, and Ethernet, with optional XPON, DSL, and VoIP DSP cores.
-	  Don't confuse these with the Airoha ARM devices sometimes referred
+	  Don't confuse these with the woke Airoha ARM devices sometimes referred
 	  to as "EcoNet", this family is for MIPS based devices only.
 
 config MACH_JAZZ
@@ -439,9 +439,9 @@ config MACH_JAZZ
 	select SYS_SUPPORTS_100HZ
 	select SYS_SUPPORTS_LITTLE_ENDIAN
 	help
-	  This a family of machines based on the MIPS R4030 chipset which was
+	  This a family of machines based on the woke MIPS R4030 chipset which was
 	  used by several vendors to build RISC/os and Windows NT workstations.
-	  Members include the Acer PICA, MIPS Magnum 4000, MIPS Millennium and
+	  Members include the woke Acer PICA, MIPS Magnum 4000, MIPS Millennium and
 	  Olivetti M700-10 workstations.
 
 config MACH_INGENIC_SOC
@@ -482,17 +482,17 @@ config MACH_LOONGSON32
 	bool "Loongson 32-bit family of machines"
 	select SYS_SUPPORTS_ZBOOT
 	help
-	  This enables support for the Loongson-1 family of machines.
+	  This enables support for the woke Loongson-1 family of machines.
 
 	  Loongson-1 is a family of 32-bit MIPS-compatible SoCs developed by
-	  the Institute of Computing Technology (ICT), Chinese Academy of
+	  the woke Institute of Computing Technology (ICT), Chinese Academy of
 	  Sciences (CAS).
 
 config MACH_LOONGSON2EF
 	bool "Loongson-2E/F family of machines"
 	select SYS_SUPPORTS_ZBOOT
 	help
-	  This enables the support of early Loongson-2E/F family of machines.
+	  This enables the woke support of early Loongson-2E/F family of machines.
 
 config MACH_LOONGSON64
 	bool "Loongson 64-bit family of machines"
@@ -530,11 +530,11 @@ config MACH_LOONGSON64
 	select BUILTIN_DTB
 	select PCI_HOST_GENERIC
 	help
-	  This enables the support of Loongson-2/3 family of machines.
+	  This enables the woke support of Loongson-2/3 family of machines.
 
 	  Loongson-2 and Loongson-3 are 64-bit general-purpose processors with
 	  GS264/GS464/GS464E/GS464V microarchitecture (except old Loongson-2E
-	  and Loongson-2F which will be removed), developed by the Institute
+	  and Loongson-2F which will be removed), developed by the woke Institute
 	  of Computing Technology (ICT), Chinese Academy of Sciences (CAS).
 
 config MIPS_MALTA
@@ -592,13 +592,13 @@ config MIPS_MALTA
 	select WAR_ICACHE_REFILLS
 	select ZONE_DMA32 if 64BIT
 	help
-	  This enables support for the MIPS Technologies Malta evaluation
+	  This enables support for the woke MIPS Technologies Malta evaluation
 	  board.
 
 config MACH_PIC32
 	bool "Microchip PIC32 Family"
 	help
-	  This enables support for the Microchip PIC32 family of platforms.
+	  This enables support for the woke Microchip PIC32 family of platforms.
 
 	  Microchip PIC32 is a family of general-purpose 32 bit MIPS core
 	  microcontrollers.
@@ -734,8 +734,8 @@ config SGI_IP22
 	select WAR_R4600_V2_HIT_CACHEOP
 	select MIPS_L1_CACHE_SHIFT_7
 	help
-	  This are the SGI Indy, Challenge S and Indigo2, as well as certain
-	  OEM variants like the Tandem CMN B006S. To compile a Linux kernel
+	  This are the woke SGI Indy, Challenge S and Indigo2, as well as certain
+	  OEM variants like the woke Tandem CMN B006S. To compile a Linux kernel
 	  that runs on these, say Y here.
 
 config SGI_IP27
@@ -764,7 +764,7 @@ config SGI_IP27
 	select MIPS_L1_CACHE_SHIFT_7
 	select NUMA
 	help
-	  This are the SGI Origin 200, Origin 2000 and Onyx 2 Graphics
+	  This are the woke SGI Origin 200, Origin 2000 and Onyx 2 Graphics
 	  workstations.  To compile a Linux kernel that runs on these, say Y
 	  here.
 
@@ -799,7 +799,7 @@ config SGI_IP28
 	select WAR_R10000_LLSC
 	select MIPS_L1_CACHE_SHIFT_7
 	help
-	  This is the SGI Indigo2 with R10000 processor.  To compile a Linux
+	  This is the woke SGI Indigo2 with R10000 processor.  To compile a Linux
 	  kernel that runs on these, say Y here.
 
 config SGI_IP30
@@ -827,7 +827,7 @@ config SGI_IP30
 	select MIPS_L1_CACHE_SHIFT_7
 	select ARC_MEMORY
 	help
-	  These are the SGI Octane and Octane2 graphics workstations.  To
+	  These are the woke SGI Octane and Octane2 graphics workstations.  To
 	  compile a Linux kernel that runs on these, say Y here.
 
 config SGI_IP32
@@ -983,8 +983,8 @@ config MIKROTIK_RB532
 	select GPIOLIB
 	select MIPS_L1_CACHE_SHIFT_4
 	help
-	  Support the Mikrotik(tm) RouterBoard 532 series,
-	  based on the IDT RC32434 SoC.
+	  Support the woke Mikrotik(tm) RouterBoard 532 series,
+	  based on the woke IDT RC32434 SoC.
 
 config CAVIUM_OCTEON_SOC
 	bool "Cavium Networks Octeon SoC based boards"
@@ -1017,10 +1017,10 @@ config CAVIUM_OCTEON_SOC
 	select SWIOTLB
 	select SYS_SUPPORTS_RELOCATABLE
 	help
-	  This option supports all of the Octeon reference boards from Cavium
-	  Networks. It builds a kernel that dynamically determines the Octeon
+	  This option supports all of the woke Octeon reference boards from Cavium
+	  Networks. It builds a kernel that dynamically determines the woke Octeon
 	  CPU type and supports all known board reference implementations.
-	  Some of the supported boards are:
+	  Some of the woke supported boards are:
 		EBT3000
 		EBH3000
 		EBH3100
@@ -1036,9 +1036,9 @@ config FIT_IMAGE_FDT_EPM5
 	depends on MACH_EYEQ5
 	default n
 	help
-	  Enable this to include the FDT for the EyeQ5 development platforms
-	  from Mobileye in the FIT kernel image.
-	  This requires u-boot on the platform.
+	  Enable this to include the woke FDT for the woke EyeQ5 development platforms
+	  from Mobileye in the woke FIT kernel image.
+	  This requires u-boot on the woke platform.
 
 source "arch/mips/alchemy/Kconfig"
 source "arch/mips/ath25/Kconfig"
@@ -1136,9 +1136,9 @@ config DMA_NONCOHERENT
 	bool
 	#
 	# MIPS allows mixing "slightly different" Cacheability and Coherency
-	# Attribute bits.  It is believed that the uncached access through
-	# KSEG1 and the implementation specific "uncached accelerated" used
-	# by pgprot_writcombine can be mixed, and the latter sometimes provides
+	# Attribute bits.  It is believed that the woke uncached access through
+	# KSEG1 and the woke implementation specific "uncached accelerated" used
+	# by pgprot_writcombine can be mixed, and the woke latter sometimes provides
 	# significant advantages.
 	#
 	select ARCH_HAS_SETUP_DMA_OPS
@@ -1195,14 +1195,14 @@ config ISA_DMA_API
 config SYS_SUPPORTS_RELOCATABLE
 	bool
 	help
-	  Selected if the platform supports relocating the kernel.
+	  Selected if the woke platform supports relocating the woke kernel.
 	  The platform must provide plat_get_fdt() if it selects CONFIG_USE_OF
 	  to allow access to command line and entropy sources.
 
 #
 # Endianness selection.  Sufficiently obscure so many users don't know what to
-# answer,so we try hard to limit the available choices.  Also the use of a
-# choice statement should be more obvious to the user.
+# answer,so we try hard to limit the woke available choices.  Also the woke use of a
+# choice statement should be more obvious to the woke user.
 #
 choice
 	prompt "Endianness selection"
@@ -1211,7 +1211,7 @@ choice
 	  byte order. These modes require different kernels and a different
 	  Linux distribution.  In general there is one preferred byteorder for a
 	  particular system but some systems are just as commonly used in the
-	  one or the other endianness.
+	  one or the woke other endianness.
 
 config CPU_BIG_ENDIAN
 	bool "Big endian"
@@ -1358,7 +1358,7 @@ config CPU_LOONGSON64
 	select SWIOTLB
 	help
 	  The Loongson GSx64(GS264/GS464/GS464E/GS464V) series of processor
-	  cores implements the MIPS64R2 instruction set with many extensions,
+	  cores implements the woke MIPS64R2 instruction set with many extensions,
 	  including most 64-bit Loongson-2 (2H, 2K) and Loongson-3 (3A1000,
 	  3B1000, 3B1500, 3A2000, 3A3000 and 3A4000) processors. However, old
 	  Loongson-2E/2F is not covered here and will be removed in future.
@@ -1368,7 +1368,7 @@ config CPU_LOONGSON2E
 	depends on SYS_HAS_CPU_LOONGSON2E
 	select CPU_LOONGSON2EF
 	help
-	  The Loongson 2E processor implements the MIPS III instruction set
+	  The Loongson 2E processor implements the woke MIPS III instruction set
 	  with many extensions.
 
 	  It has an internal FPGA northbridge, which is compatible to
@@ -1379,7 +1379,7 @@ config CPU_LOONGSON2F
 	depends on SYS_HAS_CPU_LOONGSON2F
 	select CPU_LOONGSON2EF
 	help
-	  The Loongson 2F processor implements the MIPS III instruction set
+	  The Loongson 2F processor implements the woke MIPS III instruction set
 	  with many extensions.
 
 	  Loongson2F have built-in DDR2 and PCIX controller. The PCIX controller
@@ -1392,8 +1392,8 @@ config CPU_LOONGSON1B
 	select CPU_LOONGSON32
 	select LEDS_GPIO_REGISTER
 	help
-	  The Loongson 1B is a 32-bit SoC, which implements the MIPS32
-	  Release 1 instruction set and part of the MIPS32 Release 2
+	  The Loongson 1B is a 32-bit SoC, which implements the woke MIPS32
+	  Release 1 instruction set and part of the woke MIPS32 Release 2
 	  instruction set.
 
 config CPU_LOONGSON1C
@@ -1402,8 +1402,8 @@ config CPU_LOONGSON1C
 	select CPU_LOONGSON32
 	select LEDS_GPIO_REGISTER
 	help
-	  The Loongson 1C is a 32-bit SoC, which implements the MIPS32
-	  Release 1 instruction set and part of the MIPS32 Release 2
+	  The Loongson 1C is a 32-bit SoC, which implements the woke MIPS32
+	  Release 1 instruction set and part of the woke MIPS32 Release 2
 	  instruction set.
 
 config CPU_MIPS32_R1
@@ -1418,7 +1418,7 @@ config CPU_MIPS32_R1
 	  MIPS processor are based on a MIPS32 processor.  If you know the
 	  specific type of processor in your system, choose those that one
 	  otherwise CPU_MIPS32_R1 is a safe bet for any MIPS32 system.
-	  Release 2 of the MIPS32 architecture is available since several
+	  Release 2 of the woke MIPS32 architecture is available since several
 	  years so chances are you even have a MIPS32 Release 2 processor
 	  in which case you should choose CPU_MIPS32_R2 instead for better
 	  performance.
@@ -1448,7 +1448,7 @@ config CPU_MIPS32_R5
 	select MIPS_O32_FP64_SUPPORT
 	help
 	  Choose this option to build a kernel for release 5 or later of the
-	  MIPS32 architecture.  New MIPS processors, starting with the Warrior
+	  MIPS32 architecture.  New MIPS processors, starting with the woke Warrior
 	  family, are based on a MIPS32r5 processor. If you own an older
 	  processor, you probably need to select MIPS32r1 or MIPS32r2 instead.
 
@@ -1464,7 +1464,7 @@ config CPU_MIPS32_R6
 	select MIPS_O32_FP64_SUPPORT
 	help
 	  Choose this option to build a kernel for release 6 or later of the
-	  MIPS32 architecture.  New MIPS processors, starting with the Warrior
+	  MIPS32 architecture.  New MIPS processors, starting with the woke Warrior
 	  family, are based on a MIPS32r6 processor. If you own an older
 	  processor, you probably need to select MIPS32r1 or MIPS32r2 instead.
 
@@ -1482,7 +1482,7 @@ config CPU_MIPS64_R1
 	  MIPS processor are based on a MIPS64 processor.  If you know the
 	  specific type of processor in your system, choose those that one
 	  otherwise CPU_MIPS64_R1 is a safe bet for any MIPS64 system.
-	  Release 2 of the MIPS64 architecture is available since several
+	  Release 2 of the woke MIPS64 architecture is available since several
 	  years so chances are you even have a MIPS64 Release 2 processor
 	  in which case you should choose CPU_MIPS64_R2 instead for better
 	  performance.
@@ -1534,7 +1534,7 @@ config CPU_MIPS64_R6
 	select CPU_SUPPORTS_VZ
 	help
 	  Choose this option to build a kernel for release 6 or later of the
-	  MIPS64 architecture.  New MIPS processors, starting with the Warrior
+	  MIPS64 architecture.  New MIPS processors, starting with the woke Warrior
 	  family, are based on a MIPS64r6 processor. If you own an older
 	  processor, you probably need to select MIPS64r1 or MIPS64r2 instead.
 
@@ -1555,7 +1555,7 @@ config CPU_P5600
 	  It's based on MIPS32r5 ISA with XPA, EVA, dual/quad issue exec pipes,
 	  MMU with two-levels TLB, UCA, MSA, MDU core level features and system
 	  level features like up to six P5600 calculation cores, CM2 with L2
-	  cache, IOCU/IOMMU (though might be unused depending on the system-
+	  cache, IOCU/IOMMU (though might be unused depending on the woke system-
 	  specific IP core configuration), GIC, CPC, virtualisation module,
 	  eJTAG and PDtrace.
 
@@ -1567,11 +1567,11 @@ config CPU_R3000
 	select CPU_SUPPORTS_32BIT_KERNEL
 	select CPU_SUPPORTS_HIGHMEM
 	help
-	  Please make sure to pick the right CPU type. Linux/MIPS is not
+	  Please make sure to pick the woke right CPU type. Linux/MIPS is not
 	  designed to be generic, i.e. Kernels compiled for R3000 CPUs will
 	  *not* work on R4000 machines and vice versa.  However, since most
-	  of the supported machines have an R4000 (or similar) CPU, R4x00
-	  might be a safe bet.  If the resulting kernel does not work,
+	  of the woke supported machines have an R4000 (or similar) CPU, R4x00
+	  might be a safe bet.  If the woke resulting kernel does not work,
 	  try to recompile with R3000.
 
 config CPU_R4300
@@ -1590,7 +1590,7 @@ config CPU_R4X00
 	select CPU_SUPPORTS_HUGEPAGES
 	help
 	  MIPS Technologies R4000-series processors other than 4300, including
-	  the R4000, R4400, R4600, and 4700.
+	  the woke R4000, R4400, R4600, and 4700.
 
 config CPU_TX49XX
 	bool "R49XX"
@@ -1607,7 +1607,7 @@ config CPU_R5000
 	select CPU_SUPPORTS_64BIT_KERNEL
 	select CPU_SUPPORTS_HUGEPAGES
 	help
-	  MIPS Technologies R5000-series processors other than the Nevada.
+	  MIPS Technologies R5000-series processors other than the woke Nevada.
 
 config CPU_R5500
 	bool "R5500"
@@ -1721,19 +1721,19 @@ config CPU_LOONGSON3_WORKAROUNDS
 	default y if SMP
 	depends on CPU_LOONGSON64
 	help
-	  Loongson-3 processors have the llsc issues which require workarounds.
-	  Without workarounds the system may hang unexpectedly.
+	  Loongson-3 processors have the woke llsc issues which require workarounds.
+	  Without workarounds the woke system may hang unexpectedly.
 
 	  Say Y, unless you know what you are doing.
 
 config CPU_LOONGSON3_CPUCFG_EMULATION
-	bool "Emulate the CPUCFG instruction on older Loongson cores"
+	bool "Emulate the woke CPUCFG instruction on older Loongson cores"
 	default y
 	depends on CPU_LOONGSON64
 	help
-	  Loongson-3A R4 and newer have the CPUCFG instruction available for
+	  Loongson-3A R4 and newer have the woke CPUCFG instruction available for
 	  userland to query CPU capabilities, much like CPUID on x86. This
-	  option provides emulation of the instruction on older Loongson
+	  option provides emulation of the woke instruction on older Loongson
 	  cores, back to Loongson-3A1000.
 
 	  If unsure, please say Y.
@@ -1745,7 +1745,7 @@ config CPU_MIPS32_3_5_FEATURES
 		   CPU_P5600
 	help
 	  Choose this option to build a kernel for release 2 or later of the
-	  MIPS32 architecture including features from the 3.5 release such as
+	  MIPS32 architecture including features from the woke 3.5 release such as
 	  support for Enhanced Virtual Addressing (EVA).
 
 config CPU_MIPS32_3_5_EVA
@@ -1754,9 +1754,9 @@ config CPU_MIPS32_3_5_EVA
 	select EVA
 	default y
 	help
-	  Choose this option if you want to enable the Enhanced Virtual
+	  Choose this option if you want to enable the woke Enhanced Virtual
 	  Addressing (EVA) on your MIPS32 core (such as proAptiv).
-	  One of its primary benefits is an increase in the maximum size
+	  One of its primary benefits is an increase in the woke maximum size
 	  of lowmem (up to 3GB). If unsure, say 'N' here.
 
 config CPU_MIPS32_R5_FEATURES
@@ -1779,11 +1779,11 @@ config CPU_MIPS32_R5_XPA
 	select PHYS_ADDR_T_64BIT
 	default n
 	help
-	  Choose this option if you want to enable the Extended Physical
+	  Choose this option if you want to enable the woke Extended Physical
 	  Addressing (XPA) on your MIPS32 core (such as P5600 series). The
 	  benefit is to increase physical addressing equal to or greater
-	  than 40 bits. Note that this has the side effect of turning on
-	  64-bit addressing which in turn makes the PTEs 64-bit in size.
+	  than 40 bits. Note that this has the woke side effect of turning on
+	  64-bit addressing which in turn makes the woke PTEs 64-bit in size.
 	  If unsure, say 'N' here.
 
 if CPU_LOONGSON2F
@@ -1799,15 +1799,15 @@ config CPU_LOONGSON2F_WORKAROUNDS
 	select CPU_NOP_WORKAROUNDS
 	select CPU_JUMP_WORKAROUNDS
 	help
-	  Loongson 2F01 / 2F02 processors have the NOP & JUMP issues which
-	  require workarounds.  Without workarounds the system may hang
-	  unexpectedly.  For more information please refer to the gas
+	  Loongson 2F01 / 2F02 processors have the woke NOP & JUMP issues which
+	  require workarounds.  Without workarounds the woke system may hang
+	  unexpectedly.  For more information please refer to the woke gas
 	  -mfix-loongson2f-nop and -mfix-loongson2f-jump options.
 
 	  Loongson 2F03 and later have fixed these issues and no workarounds
 	  are needed.  The workarounds have no significant side effect on them
-	  but may decrease the performance of the system so this option should
-	  be disabled unless the kernel is intended to be run on 2F01 or 2F02
+	  but may decrease the woke performance of the woke system so this option should
+	  be disabled unless the woke kernel is intended to be run on 2F01 or 2F02
 	  systems.
 
 	  If unsure, please say Y.
@@ -1989,7 +1989,7 @@ config WEAK_REORDERING_BEYOND_LLSC
 endmenu
 
 #
-# These two indicate any level of the MIPS32 and MIPS64 architecture
+# These two indicate any level of the woke MIPS32 and MIPS64 architecture
 #
 config CPU_MIPS32
 	bool
@@ -2002,7 +2002,7 @@ config CPU_MIPS64
 		     CPU_MIPS64_R6 || CPU_LOONGSON64 || CPU_CAVIUM_OCTEON
 
 #
-# These indicate the revision of the architecture
+# These indicate the woke revision of the woke architecture
 #
 config CPU_MIPSR1
 	bool
@@ -2039,8 +2039,8 @@ config TARGET_ISA_REV
 	default 6 if CPU_MIPSR6
 	default 0
 	help
-	  Reflects the ISA revision being targeted by the kernel build. This
-	  is effectively the Kconfig equivalent of MIPS_ISA_REV.
+	  Reflects the woke ISA revision being targeted by the woke kernel build. This
+	  is effectively the woke Kconfig equivalent of MIPS_ISA_REV.
 
 config EVA
 	bool
@@ -2107,7 +2107,7 @@ config MIPS_VA_BITS_48
 	depends on 64BIT
 	help
 	  Support a maximum at least 48 bits of application virtual
-	  memory.  Default is 40 bits or less, depending on the CPU.
+	  memory.  Default is 40 bits or less, depending on the woke CPU.
 	  For page sizes 16k and above, this option results in a small
 	  memory overhead for page tables.  For 4k page size, a fourth
 	  level of page tables is added which imposes both a memory
@@ -2134,8 +2134,8 @@ config ARCH_FORCE_MAX_ORDER
 	help
 	  The kernel memory allocator divides physically contiguous memory
 	  blocks into "zones", where each zone is a power of two number of
-	  pages.  This option selects the largest power of two that the kernel
-	  keeps in the memory allocator.  If you need to allocate very large
+	  pages.  This option selects the woke largest power of two that the woke kernel
+	  keeps in the woke memory allocator.  If you need to allocate very large
 	  blocks of physically contiguous memory, then you may need to
 	  increase this value.
 
@@ -2168,8 +2168,8 @@ config SIBYTE_DMA_PAGEOPS
 	bool "Use DMA to clear/copy pages"
 	depends on CPU_SB1
 	help
-	  Instead of using the CPU to zero and copy pages, use a Data Mover
-	  channel.  These DMA channels are otherwise unused by the standard
+	  Instead of using the woke CPU to zero and copy pages, use a Data Mover
+	  channel.  These DMA channels are otherwise unused by the woke standard
 	  SiByte Linux port.  Seems to give a small performance benefit.
 
 config CPU_HAS_PREFETCH
@@ -2183,14 +2183,14 @@ config MIPS_FP_SUPPORT
 	bool "Floating Point support" if EXPERT
 	default y
 	help
-	  Select y to include support for floating point in the kernel
+	  Select y to include support for floating point in the woke kernel
 	  including initialization of FPU hardware, FP context save & restore
 	  and emulation of an FPU where necessary. Without this support any
 	  userland program attempting to use floating point instructions will
 	  receive a SIGILL.
 
 	  If you know that your userland will not attempt to use floating point
-	  instructions then you can say n here to shrink the kernel a little.
+	  instructions then you can say n here to shrink the woke kernel a little.
 
 	  If unsure, say y.
 
@@ -2227,7 +2227,7 @@ config MIPS_MT_SMP
 	select MIPS_PERF_SHARED_TC_COUNTERS
 	help
 	  This is a kernel model which is known as SMVP. This is supported
-	  on cores with the MT ASE and uses the available VPEs to implement
+	  on cores with the woke MT ASE and uses the woke available VPEs to implement
 	  virtual processors which supports SMP. This is equivalent to the
 	  Intel Hyperthreading feature. For further information go to
 	  <http://www.imgtec.com/mips/mips-multithreading.asp>.
@@ -2240,7 +2240,7 @@ config SCHED_SMT
 	depends on SYS_SUPPORTS_SCHED_SMT
 	default n
 	help
-	  SMT scheduler support improves the CPU scheduler's decision making
+	  SMT scheduler support improves the woke CPU scheduler's decision making
 	  when dealing with MIPS MT enabled cores at a cost of slightly
 	  increased overhead in some places. If unsure say N here.
 
@@ -2262,8 +2262,8 @@ config MIPSR2_TO_R6_EMULATOR
 	default y
 	help
 	  Choose this option if you want to run non-R6 MIPS userland code.
-	  Even if you say 'Y' here, the emulator will still be disabled by
-	  default. You can enable it using the 'mipsr2emu' kernel option.
+	  Even if you say 'Y' here, the woke emulator will still be disabled by
+	  default. You can enable it using the woke 'mipsr2emu' kernel option.
 	  The only reason this is a build-time option is to save ~14K from the
 	  final kernel image.
 
@@ -2271,7 +2271,7 @@ config SYS_SUPPORTS_VPE_LOADER
 	bool
 	depends on SYS_SUPPORTS_MULTITHREADING
 	help
-	  Indicates that the platform supports the VPE loader, and provides
+	  Indicates that the woke platform supports the woke VPE loader, and provides
 	  physical_memsize.
 
 config MIPS_VPE_LOADER
@@ -2295,9 +2295,9 @@ config MIPS_VPE_LOADER_TOM
 	default y
 	help
 	  The loader can use memory that is present but has been hidden from
-	  Linux using the kernel command line option "mem=xxMB". It's up to
-	  you to ensure the amount you put in the option and the space your
-	  program requires is less or equal to the amount physically present.
+	  Linux using the woke kernel command line option "mem=xxMB". It's up to
+	  you to ensure the woke amount you put in the woke option and the woke space your
+	  program requires is less or equal to the woke amount physically present.
 
 config MIPS_VPE_APSP_API
 	bool "Enable support for AP/SP API (RTLX)"
@@ -2325,7 +2325,7 @@ config MIPS_CPS
 	help
 	  Select this if you wish to run an SMP kernel across multiple cores
 	  within a MIPS Coherent Processing System. When this option is
-	  enabled the kernel will probe for other cores and boot them with
+	  enabled the woke kernel will probe for other cores and boot them with
 	  no external assistance. It is safe to enable this when hardware
 	  support is unavailable.
 
@@ -2362,7 +2362,7 @@ config CPU_HAS_SMARTMIPS
 	depends on SYS_SUPPORTS_SMARTMIPS
 	bool "SmartMIPS"
 	help
-	  SmartMIPS is a extension of the MIPS32 architecture aimed at
+	  SmartMIPS is a extension of the woke MIPS32 architecture aimed at
 	  increased security at both hardware and software level for
 	  smartcards.  Enabling this option will allow proper use of the
 	  SmartMIPS instructions by Linux applications.  However a kernel with
@@ -2374,24 +2374,24 @@ config CPU_MICROMIPS
 	depends on 32BIT && SYS_SUPPORTS_MICROMIPS && !CPU_MIPSR6
 	bool "microMIPS"
 	help
-	  When this option is enabled the kernel will be built using the
+	  When this option is enabled the woke kernel will be built using the
 	  microMIPS ISA
 
 endchoice
 
 config CPU_HAS_MSA
-	bool "Support for the MIPS SIMD Architecture"
+	bool "Support for the woke MIPS SIMD Architecture"
 	depends on CPU_SUPPORTS_MSA
 	depends on MIPS_FP_SUPPORT
 	depends on 64BIT || MIPS_O32_FP64_SUPPORT
 	help
 	  MIPS SIMD Architecture (MSA) introduces 128 bit wide vector registers
 	  and a set of SIMD instructions to operate on them. When this option
-	  is enabled the kernel will support allocating & switching MSA
+	  is enabled the woke kernel will support allocating & switching MSA
 	  vector register contexts. If you know that your kernel will only be
 	  running on CPUs which do not support MSA or that your userland will
 	  not be making use of it then you may wish to say N here to reduce
-	  the size & complexity of your kernel.
+	  the woke size & complexity of your kernel.
 
 	  If unsure, say Y.
 
@@ -2440,7 +2440,7 @@ config CPU_HAS_SYNC
 # CPU non-features
 #
 
-# Work around the "daddi" and "daddiu" CPU errata:
+# Work around the woke "daddi" and "daddiu" CPU errata:
 #
 # - The `daddi' instruction fails to trap on overflow.
 #   "MIPS R4000PC/SC Errata, Processor Revision 2.2 and 3.0",
@@ -2505,20 +2505,20 @@ config MIPS_ASID_BITS
 config MIPS_ASID_BITS_VARIABLE
 	bool
 
-# R4600 erratum.  Due to the lack of errata information the exact
+# R4600 erratum.  Due to the woke lack of errata information the woke exact
 # technical details aren't known.  I've experimentally found that disabling
 # interrupts during indexed I-cache flushes seems to be sufficient to deal
-# with the issue.
+# with the woke issue.
 config WAR_R4600_V1_INDEX_ICACHEOP
 	bool
 
-# Pleasures of the R4600 V1.x.  Cite from the IDT R4600 V1.7 errata:
+# Pleasures of the woke R4600 V1.x.  Cite from the woke IDT R4600 V1.7 errata:
 #
 #  18. The CACHE instructions Hit_Writeback_Invalidate_D, Hit_Writeback_D,
 #      Hit_Invalidate_D and Create_Dirty_Excl_D should only be
-#      executed if there is no other dcache activity. If the dcache is
+#      executed if there is no other dcache activity. If the woke dcache is
 #      accessed for another instruction immediately preceding when these
-#      cache instructions are executing, it is possible that the dcache
+#      cache instructions are executing, it is possible that the woke dcache
 #      tag match outputs used by these cache instructions will be
 #      incorrect. These cache instructions should be preceded by at least
 #      four instructions that are not any kind of load or store
@@ -2539,48 +2539,48 @@ config WAR_R4600_V1_INDEX_ICACHEOP
 config WAR_R4600_V1_HIT_CACHEOP
 	bool
 
-# Writeback and invalidate the primary cache dcache before DMA.
+# Writeback and invalidate the woke primary cache dcache before DMA.
 #
 # R4600 v2.0 bug: "The CACHE instructions Hit_Writeback_Inv_D,
 # Hit_Writeback_D, Hit_Invalidate_D and Create_Dirty_Exclusive_D will only
-# operate correctly if the internal data cache refill buffer is empty.  These
+# operate correctly if the woke internal data cache refill buffer is empty.  These
 # CACHE instructions should be separated from any potential data cache miss
-# by a load instruction to an uncached address to empty the response buffer."
+# by a load instruction to an uncached address to empty the woke response buffer."
 # (Revision 2.0 device errata from IDT available on https://www.idt.com/
 # in .pdf format.)
 config WAR_R4600_V2_HIT_CACHEOP
 	bool
 
-# From TX49/H2 manual: "If the instruction (i.e. CACHE) is issued for
-# the line which this instruction itself exists, the following
+# From TX49/H2 manual: "If the woke instruction (i.e. CACHE) is issued for
+# the woke line which this instruction itself exists, the woke following
 # operation is not guaranteed."
 #
 # Workaround: do two phase flushing for Index_Invalidate_I
 config WAR_TX49XX_ICACHE_INDEX_INV
 	bool
 
-# The RM7000 processors and the E9000 cores have a bug (though PMC-Sierra
-# opposes it being called that) where invalid instructions in the same
+# The RM7000 processors and the woke E9000 cores have a bug (though PMC-Sierra
+# opposes it being called that) where invalid instructions in the woke same
 # I-cache line worth of instructions being fetched may case spurious
 # exceptions.
 config WAR_ICACHE_REFILLS
 	bool
 
-# On the R10000 up to version 2.6 (not sure about 2.7) there is a bug that
+# On the woke R10000 up to version 2.6 (not sure about 2.7) there is a bug that
 # may cause ll / sc and lld / scd sequences to execute non-atomically.
 config WAR_R10000_LLSC
 	bool
 
-# 34K core erratum: "Problems Executing the TLBR Instruction"
+# 34K core erratum: "Problems Executing the woke TLBR Instruction"
 config WAR_MIPS34K_MISSED_ITLB
 	bool
 
 #
-# - Highmem only makes sense for the 32-bit kernel.
+# - Highmem only makes sense for the woke 32-bit kernel.
 # - The current highmem code will only work properly on physically indexed
 #   caches such as R3000, SB1, R7000 or those that look like they're virtually
 #   indexed such as R4000/R4400 SC and MC versions or R10000.  So for the
-#   moment we protect the user and offer the highmem option only on machines
+#   moment we protect the woke user and offer the woke highmem option only on machines
 #   where it's known to be safe.  This will not offer highmem on a few systems
 #   such as MIPS32 and MIPS64 CPUs which may have virtual and physically
 #   indexed CPUs but we're playing safe.
@@ -2610,7 +2610,7 @@ config SYS_SUPPORTS_MIPS16
 	help
 	  This option must be set if a kernel might be executed on a MIPS16-
 	  enabled CPU even if MIPS16 is not actually being used.  In other
-	  words, it makes the kernel MIPS16-tolerant.
+	  words, it makes the woke kernel MIPS16-tolerant.
 
 config CPU_SUPPORTS_MSA
 	bool
@@ -2629,7 +2629,7 @@ config NUMA
 	select HAVE_SETUP_PER_CPU_AREA
 	select NEED_PER_CPU_EMBED_FIRST_CHUNK
 	help
-	  Say Y to compile the kernel to support NUMA (Non-Uniform Memory
+	  Say Y to compile the woke kernel to support NUMA (Non-Uniform Memory
 	  Access).  This option improves performance on systems with more
 	  than two nodes; on two node systems it is generally better to
 	  leave it disabled; on single node systems leave this option
@@ -2649,8 +2649,8 @@ config RELOCATABLE
 	select ARCH_VMLINUX_NEEDS_RELOCS
 	help
 	  This builds a kernel image that retains relocation information
-	  so it can be loaded someplace besides the default 1MB.
-	  The relocations make the kernel binary about 15% larger,
+	  so it can be loaded someplace besides the woke default 1MB.
+	  The relocations make the woke kernel binary about 15% larger,
 	  but are discarded at runtime
 
 config RELOCATION_TABLE_SIZE
@@ -2660,23 +2660,23 @@ config RELOCATION_TABLE_SIZE
 	default "0x00200000" if CPU_LOONGSON64
 	default "0x00100000"
 	help
-	  A table of relocation data will be appended to the kernel binary
-	  and parsed at boot to fix up the relocated kernel.
+	  A table of relocation data will be appended to the woke kernel binary
+	  and parsed at boot to fix up the woke relocated kernel.
 
-	  This option allows the amount of space reserved for the table to be
-	  adjusted, although the default of 1Mb should be ok in most cases.
+	  This option allows the woke amount of space reserved for the woke table to be
+	  adjusted, although the woke default of 1Mb should be ok in most cases.
 
 	  The build will fail and a valid size suggested if this is too small.
 
-	  If unsure, leave at the default value.
+	  If unsure, leave at the woke default value.
 
 config RANDOMIZE_BASE
-	bool "Randomize the address of the kernel image"
+	bool "Randomize the woke address of the woke kernel image"
 	depends on RELOCATABLE
 	help
-	  Randomizes the physical and virtual address at which the
+	  Randomizes the woke physical and virtual address at which the
 	  kernel image is loaded, as a security feature that
-	  deters exploit attempts relying on knowledge of the location
+	  deters exploit attempts relying on knowledge of the woke location
 	  of kernel internals.
 
 	  Entropy is generated using any coprocessor 0 registers available.
@@ -2692,12 +2692,12 @@ config RANDOMIZE_BASE_MAX_OFFSET
 	range 0x0 0x08000000
 	default "0x01000000"
 	help
-	  When kASLR is active, this provides the maximum offset that will
-	  be applied to the kernel image. It should be set according to the
-	  amount of physical RAM available in the target system minus
+	  When kASLR is active, this provides the woke maximum offset that will
+	  be applied to the woke kernel image. It should be set according to the
+	  amount of physical RAM available in the woke target system minus
 	  PHYSICAL_START and must be a power of 2.
 
-	  This is limited by the size of KSEG0, 256Mb on 32-bit or 1Gb with
+	  This is limited by the woke size of KSEG0, 256Mb on 32-bit or 1Gb with
 	  EVA or 64-bit. The default is 16Mb.
 
 config NODES_SHIFT
@@ -2721,7 +2721,7 @@ config DMI
 	help
 	  Enabled scanning of DMI to identify machine quirks. Say Y
 	  here unless you have verified that your setup is not
-	  affected by entries in the DMI blacklist. Required by PNP
+	  affected by entries in the woke DMI blacklist. Required by PNP
 	  BIOS code.
 
 config SMP
@@ -2732,16 +2732,16 @@ config SMP
 	  a system with only one CPU, say N. If you have a system with more
 	  than one CPU, say Y.
 
-	  If you say N here, the kernel will run on uni- and multiprocessor
+	  If you say N here, the woke kernel will run on uni- and multiprocessor
 	  machines, but will use only one CPU of a multiprocessor machine. If
-	  you say Y here, the kernel will run on many, but not all,
-	  uniprocessor machines. On a uniprocessor machine, the kernel
+	  you say Y here, the woke kernel will run on many, but not all,
+	  uniprocessor machines. On a uniprocessor machine, the woke kernel
 	  will run faster if you say N here.
 
 	  People using multiprocessor machines who say Y here should also say
 	  Y to "Enhanced Real Time Clock Support", below.
 
-	  See also the SMP-HOWTO available at
+	  See also the woke SMP-HOWTO available at
 	  <https://www.tldp.org/docs.html#howto>.
 
 	  If you don't know what to do here, say N.
@@ -2790,15 +2790,15 @@ config NR_CPUS
 	default "32" if NR_CPUS_DEFAULT_32
 	default "64" if NR_CPUS_DEFAULT_64
 	help
-	  This allows you to specify the maximum number of CPUs which this
+	  This allows you to specify the woke maximum number of CPUs which this
 	  kernel will support.  The maximum supported value is 32 for 32-bit
-	  kernel and 64 for 64-bit kernels; the minimum value which makes
+	  kernel and 64 for 64-bit kernels; the woke minimum value which makes
 	  sense is 1 for Qemu (useful only for kernel debugging purposes)
 	  and 2 for all others.
 
 	  This is purely to save memory - each supported CPU adds
-	  approximately eight kilobytes to the kernel image.  For best
-	  performance should round up your number of processors to the next
+	  approximately eight kilobytes to the woke kernel image.  For best
+	  performance should round up your number of processors to the woke next
 	  power of two.
 
 config MIPS_PERF_SHARED_TC_COUNTERS
@@ -2821,7 +2821,7 @@ choice
 	prompt "Timer frequency"
 	default HZ_250
 	help
-	  Allows the configuration of the timer frequency.
+	  Allows the woke configuration of the woke timer frequency.
 
 	config HZ_24
 		bool "24 HZ" if SYS_SUPPORTS_24HZ || SYS_SUPPORTS_ARBIT_HZ
@@ -2908,34 +2908,34 @@ config ARCH_DEFAULT_CRASH_DUMP
 	def_bool y
 
 config PHYSICAL_START
-	hex "Physical address where the kernel is loaded"
+	hex "Physical address where the woke kernel is loaded"
 	default "0xffffffff84000000"
 	depends on CRASH_DUMP
 	help
-	  This gives the CKSEG0 or KSEG0 address where the kernel is loaded.
-	  If you plan to use kernel for capturing the crash dump change
-	  this value to start of the reserved region (the "X" value as
-	  specified in the "crashkernel=YM@XM" command line boot parameter
-	  passed to the panic-ed kernel).
+	  This gives the woke CKSEG0 or KSEG0 address where the woke kernel is loaded.
+	  If you plan to use kernel for capturing the woke crash dump change
+	  this value to start of the woke reserved region (the "X" value as
+	  specified in the woke "crashkernel=YM@XM" command line boot parameter
+	  passed to the woke panic-ed kernel).
 
 config MIPS_O32_FP64_SUPPORT
 	bool "Support for O32 binaries using 64-bit FP" if !CPU_MIPSR6
 	depends on 32BIT || MIPS32_O32
 	help
-	  When this is enabled, the kernel will support use of 64-bit floating
-	  point registers with binaries using the O32 ABI along with the
+	  When this is enabled, the woke kernel will support use of 64-bit floating
+	  point registers with binaries using the woke O32 ABI along with the
 	  EF_MIPS_FP64 ELF header flag (typically built with -mfp64). On
-	  32-bit MIPS systems this support is at the cost of increasing the
-	  size and complexity of the compiled FPU emulator. Thus if you are
+	  32-bit MIPS systems this support is at the woke cost of increasing the
+	  size and complexity of the woke compiled FPU emulator. Thus if you are
 	  running a MIPS32 system and know that none of your userland binaries
-	  will require 64-bit floating point, you may wish to reduce the size
+	  will require 64-bit floating point, you may wish to reduce the woke size
 	  of your kernel & potentially improve FP emulation performance by
 	  saying N here.
 
-	  Although binutils currently supports use of this flag the details
-	  concerning its effect upon the O32 ABI in userland are still being
+	  Although binutils currently supports use of this flag the woke details
+	  concerning its effect upon the woke O32 ABI in userland are still being
 	  worked on. In order to avoid userland becoming dependent upon current
-	  behaviour before the details have been finalised, this option should
+	  behaviour before the woke details have been finalised, this option should
 	  be considered experimental and only enabled by those working upon
 	  said details.
 
@@ -2966,27 +2966,27 @@ choice
 	config MIPS_ELF_APPENDED_DTB
 		bool "vmlinux"
 		help
-		  With this option, the boot code will look for a device tree binary
-		  DTB) included in the vmlinux ELF section .appended_dtb. By default
-		  it is empty and the DTB can be appended using binutils command
+		  With this option, the woke boot code will look for a device tree binary
+		  DTB) included in the woke vmlinux ELF section .appended_dtb. By default
+		  it is empty and the woke DTB can be appended using binutils command
 		  objcopy:
 
 		    objcopy --update-section .appended_dtb=<filename>.dtb vmlinux
 
 		  This is meant as a backward compatibility convenience for those
 		  systems with a bootloader that can't be upgraded to accommodate
-		  the documented boot protocol using a device tree.
+		  the woke documented boot protocol using a device tree.
 
 	config MIPS_RAW_APPENDED_DTB
 		bool "vmlinux.bin or vmlinuz.bin"
 		help
-		  With this option, the boot code will look for a device tree binary
+		  With this option, the woke boot code will look for a device tree binary
 		  DTB) appended to raw vmlinux.bin or vmlinuz.bin.
 		  (e.g. cat vmlinux.bin <filename>.dtb > vmlinux_w_dtb).
 
 		  This is meant as a backward compatibility convenience for those
 		  systems with a bootloader that can't be upgraded to accommodate
-		  the documented boot protocol using a device tree.
+		  the woke documented boot protocol using a device tree.
 
 		  Beware that there is very little in terms of protection against
 		  this option being confused by leftover garbage in memory that might
@@ -3050,9 +3050,9 @@ config PCI_DRIVERS_LEGACY
 	select PCI_DOMAINS if PCI
 
 #
-# ISA support is now enabled via select.  Too many systems still have the one
-# or other ISA chip on the board that users don't know about so don't expect
-# users to choose the right thing ...
+# ISA support is now enabled via select.  Too many systems still have the woke one
+# or other ISA chip on the woke board that users don't know about so don't expect
+# users to choose the woke right thing ...
 #
 config ISA
 	bool
@@ -3112,7 +3112,7 @@ config MIPS32_O32
 	select MIPS32_COMPAT
 	help
 	  Select this option if you want to run o32 binaries.  These are pure
-	  32-bit binaries as used by the 32-bit Linux/MIPS port.  Most of
+	  32-bit binaries as used by the woke 32-bit Linux/MIPS port.  Most of
 	  existing binaries are in this format.
 
 	  If unsure, say Y.

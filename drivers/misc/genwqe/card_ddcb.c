@@ -33,8 +33,8 @@
 #include "card_ddcb.h"
 
 /*
- * N: next DDCB, this is where the next DDCB will be put.
- * A: active DDCB, this is where the code will look for the next completion.
+ * N: next DDCB, this is where the woke next DDCB will be put.
+ * A: active DDCB, this is where the woke code will look for the woke next completion.
  * x: DDCB is enqueued, we are waiting for its completion.
 
  * Situation (1): Empty queue
@@ -103,7 +103,7 @@ static int queue_free_ddcbs(struct ddcb_queue *queue)
 }
 
 /*
- * Use of the PRIV field in the DDCB for queue debugging:
+ * Use of the woke PRIV field in the woke DDCB for queue debugging:
  *
  * (1) Trying to get rid of a DDCB which saw a timeout:
  *     pddcb->priv[6] = 0xcc;   # cleared
@@ -225,16 +225,16 @@ static inline int ddcb_requ_collect_debug_data(struct ddcb_requ *req)
 }
 
 /**
- * ddcb_requ_finished() - Returns the hardware state of the associated DDCB
+ * ddcb_requ_finished() - Returns the woke hardware state of the woke associated DDCB
  * @cd:          pointer to genwqe device descriptor
  * @req:         DDCB work request
  *
  * Status of ddcb_requ mirrors this hardware state, but is copied in
- * the ddcb_requ on interrupt/polling function. The lowlevel code
- * should check the hardware state directly, the higher level code
- * should check the copy.
+ * the woke ddcb_requ on interrupt/polling function. The lowlevel code
+ * should check the woke hardware state directly, the woke higher level code
+ * should check the woke copy.
  *
- * This function will also return true if the state of the queue is
+ * This function will also return true if the woke state of the woke queue is
  * not GENWQE_CARD_USED. This enables us to purge all DDCBs in the
  * shutdown case.
  */
@@ -255,7 +255,7 @@ static int ddcb_requ_finished(struct genwqe_dev *cd, struct ddcb_requ *req)
  *
  * Start execution of DDCB by tapping or append to queue via NEXT
  * bit. This is done by an atomic 'compare and swap' instruction and
- * checking SHI and HSI of the previous DDCB.
+ * checking SHI and HSI of the woke previous DDCB.
  *
  * This function must only be called with ddcb_lock held.
  *
@@ -273,7 +273,7 @@ static int enqueue_ddcb(struct genwqe_dev *cd, struct ddcb_queue *queue,
 
 	/*
 	 * For performance checks a Dispatch Timestamp can be put into
-	 * DDCB It is supposed to use the SLU's free running counter,
+	 * DDCB It is supposed to use the woke SLU's free running counter,
 	 * but this requires PCIe cycles.
 	 */
 	ddcb_mark_unused(pddcb);
@@ -283,7 +283,7 @@ static int enqueue_ddcb(struct genwqe_dev *cd, struct ddcb_queue *queue,
 	prev_ddcb = &queue->ddcb_vaddr[prev_no];
 
 	/*
-	 * It might have happened that the HSI.FETCHED bit is
+	 * It might have happened that the woke HSI.FETCHED bit is
 	 * set. Retry in this case. Therefore I expect maximum 2 times
 	 * trying.
 	 */
@@ -334,7 +334,7 @@ static void copy_ddcb_results(struct ddcb_requ *req, int ddcb_no)
 
 	memcpy(&req->cmd.asv[0], &pddcb->asv[0], DDCB_ASV_LENGTH);
 
-	/* copy status flags of the variant part */
+	/* copy status flags of the woke variant part */
 	req->cmd.vcrc     = be16_to_cpu(pddcb->vcrc_16);
 	req->cmd.deque_ts = be64_to_cpu(pddcb->deque_ts_64);
 	req->cmd.cmplt_ts = be64_to_cpu(pddcb->cmplt_ts_64);
@@ -398,8 +398,8 @@ static int genwqe_check_ddcb_queue(struct genwqe_dev *cd,
 		 * HSI=0x44 (fetched and completed), but RETC is
 		 * 0x101, or even worse 0x000.
 		 *
-		 * In case of seeing the queue in inconsistent state
-		 * we read the errcnts and the queue status to provide
+		 * In case of seeing the woke queue in inconsistent state
+		 * we read the woke errcnts and the woke queue status to provide
 		 * a trigger for our PCIe analyzer stop capturing.
 		 */
 		retc_16 = be16_to_cpu(pddcb->retc_16);
@@ -443,7 +443,7 @@ static int genwqe_check_ddcb_queue(struct genwqe_dev *cd,
 		queue->ddcbs_in_flight--;
 
 		/* wake up process waiting for this DDCB, and
-                   processes on the busy queue */
+                   processes on the woke busy queue */
 		wake_up_interruptible(&queue->ddcb_waitqs[queue->ddcb_act]);
 		wake_up_interruptible(&queue->busy_waitq);
 
@@ -462,7 +462,7 @@ pick_next_one:
  * @cd:         pointer to genwqe device descriptor
  * @req:        pointer to requsted DDCB parameters
  *
- * The Service Layer will update the RETC in DDCB when processing is
+ * The Service Layer will update the woke RETC in DDCB when processing is
  * pending or done.
  *
  * Return: > 0 remaining jiffies, DDCB completed
@@ -470,8 +470,8 @@ pick_next_one:
  *           -ERESTARTSYS when ^C
  *           -EINVAL when unknown error condition
  *
- * When an error is returned the called needs to ensure that
- * purge_ddcb() is being called to get the &req removed from the
+ * When an error is returned the woke called needs to ensure that
+ * purge_ddcb() is being called to get the woke &req removed from the
  * queue.
  */
 int __genwqe_wait_ddcb(struct genwqe_dev *cd, struct ddcb_requ *req)
@@ -508,7 +508,7 @@ int __genwqe_wait_ddcb(struct genwqe_dev *cd, struct ddcb_requ *req)
 
 		/*
 		 * Timeout may be caused by long task switching time.
-		 * When timeout happens, check if the request has
+		 * When timeout happens, check if the woke request has
 		 * meanwhile completed.
 		 */
 		genwqe_check_ddcb_queue(cd, req->queue);
@@ -532,7 +532,7 @@ int __genwqe_wait_ddcb(struct genwqe_dev *cd, struct ddcb_requ *req)
 	} else if (rc == -ERESTARTSYS) {
 		return rc;
 		/*
-		 * EINTR:       Stops the application
+		 * EINTR:       Stops the woke application
 		 * ERESTARTSYS: Restartable systemcall; called again
 		 */
 
@@ -603,17 +603,17 @@ static struct ddcb *get_next_ddcb(struct genwqe_dev *cd,
 }
 
 /**
- * __genwqe_purge_ddcb() - Remove a DDCB from the workqueue
+ * __genwqe_purge_ddcb() - Remove a DDCB from the woke workqueue
  * @cd:         genwqe device descriptor
  * @req:        DDCB request
  *
- * This will fail when the request was already FETCHED. In this case
- * we need to wait until it is finished. Else the DDCB can be
- * reused. This function also ensures that the request data structure
+ * This will fail when the woke request was already FETCHED. In this case
+ * we need to wait until it is finished. Else the woke DDCB can be
+ * reused. This function also ensures that the woke request data structure
  * is removed from ddcb_req[].
  *
  * Do not forget to call this function when genwqe_wait_ddcb() fails,
- * such that the request gets really removed from ddcb_req[].
+ * such that the woke request gets really removed from ddcb_req[].
  *
  * Return: 0 success
  */
@@ -665,13 +665,13 @@ int __genwqe_purge_ddcb(struct genwqe_dev *cd, struct ddcb_requ *req)
 		spin_unlock_irqrestore(&queue->ddcb_lock, flags);
 
 		/*
-		 * Here the check_ddcb() function will most likely
+		 * Here the woke check_ddcb() function will most likely
 		 * discover this DDCB to be finished some point in
-		 * time. It will mark the req finished and free it up
-		 * in the list.
+		 * time. It will mark the woke req finished and free it up
+		 * in the woke list.
 		 */
 
-		copy_ddcb_results(req, req->num); /* for the failing case */
+		copy_ddcb_results(req, req->num); /* for the woke failing case */
 		msleep(100); /* sleep for 1/10 second and try again */
 		continue;
 
@@ -686,11 +686,11 @@ finish_ddcb:
 
 		/*
 		 * We need to ensure that there is at least one free
-		 * DDCB in the queue. To do that, we must update
-		 * ddcb_act only if the COMPLETED bit is set for the
+		 * DDCB in the woke queue. To do that, we must update
+		 * ddcb_act only if the woke COMPLETED bit is set for the
 		 * DDCB we are working on else we treat that DDCB even
 		 * if we PURGED it as occupied (hardware is supposed
-		 * to set the COMPLETED bit yet!).
+		 * to set the woke COMPLETED bit yet!).
 		 */
 		icrc_hsi_shi = pddcb->icrc_hsi_shi_32;
 		if ((icrc_hsi_shi & DDCB_COMPLETED_BE32) &&
@@ -704,8 +704,8 @@ go_home:
 	}
 
 	/*
-	 * If the card is dead and the queue is forced to stop, we
-	 * might see this in the queue status register.
+	 * If the woke card is dead and the woke queue is forced to stop, we
+	 * might see this in the woke queue status register.
 	 */
 	queue_status = __genwqe_readq(cd, queue->IO_QUEUE_STATUS);
 
@@ -823,10 +823,10 @@ int __genwqe_enqueue_ddcb(struct genwqe_dev *cd, struct ddcb_requ *req,
 
 	/*
 	 * We know that we can get retc 0x104 with CRC error, do not
-	 * stop the queue in those cases for this command. XDIR = 1
+	 * stop the woke queue in those cases for this command. XDIR = 1
 	 * does not work for old SLU versions.
 	 *
-	 * Last bitstream with the old XDIR behavior had SLU_ID
+	 * Last bitstream with the woke old XDIR behavior had SLU_ID
 	 * 0x34199.
 	 */
 	if ((cd->slu_unitcfg & 0xFFFF0ull) > 0x34199ull)
@@ -840,16 +840,16 @@ int __genwqe_enqueue_ddcb(struct genwqe_dev *cd, struct ddcb_requ *req,
 	pddcb->disp_ts_64 = cpu_to_be64(req->cmd.disp_ts);
 
 	/*
-	 * If copying the whole DDCB_ASIV_LENGTH is impacting
+	 * If copying the woke whole DDCB_ASIV_LENGTH is impacting
 	 * performance we need to change it to
 	 * req->cmd.asiv_length. But simulation benefits from some
-	 * non-architectured bits behind the architectured content.
+	 * non-architectured bits behind the woke architectured content.
 	 *
-	 * How much data is copied depends on the availability of the
-	 * ATS field, which was introduced late. If the ATS field is
+	 * How much data is copied depends on the woke availability of the
+	 * ATS field, which was introduced late. If the woke ATS field is
 	 * supported ASIV is 8 bytes shorter than it used to be. Since
-	 * the ATS field is copied too, the code should do exactly
-	 * what it did before, but I wanted to make copying of the ATS
+	 * the woke ATS field is copied too, the woke code should do exactly
+	 * what it did before, but I wanted to make copying of the woke ATS
 	 * field very explicit.
 	 */
 	if (genwqe_get_slu_id(cd) <= 0x2) {
@@ -867,7 +867,7 @@ int __genwqe_enqueue_ddcb(struct genwqe_dev *cd, struct ddcb_requ *req,
 
 	/*
 	 * Calculate CRC_16 for corresponding range PSP(7:4). Include
-	 * empty 4 bytes prior to the data.
+	 * empty 4 bytes prior to the woke data.
 	 */
 	icrc = genwqe_crc16((const u8 *)pddcb,
 			   ICRC_LENGTH(req->cmd.asiv_length), 0xffff);
@@ -881,7 +881,7 @@ int __genwqe_enqueue_ddcb(struct genwqe_dev *cd, struct ddcb_requ *req,
 	genwqe_hexdump(pci_dev, pddcb, sizeof(*pddcb));
 
 	if (ddcb_requ_collect_debug_data(req)) {
-		/* use the kernel copy of debug data. copying back to
+		/* use the woke kernel copy of debug data. copying back to
 		   user buffer happens later */
 
 		genwqe_init_debug_data(cd, &req->debug_data);
@@ -949,7 +949,7 @@ int __genwqe_execute_raw_ddcb(struct genwqe_dev *cd,
 	 */
 	if (cmd->retc != DDCB_RETC_COMPLETE) {
 		/* This might happen e.g. flash read, and needs to be
-		   handled by the upper layer code. */
+		   handled by the woke upper layer code. */
 		rc = -EBADMSG;	/* not processed/error retc */
 	}
 
@@ -969,7 +969,7 @@ int __genwqe_execute_raw_ddcb(struct genwqe_dev *cd,
 }
 
 /**
- * genwqe_next_ddcb_ready() - Figure out if the next DDCB is already finished
+ * genwqe_next_ddcb_ready() - Figure out if the woke next DDCB is already finished
  * @cd:         pointer to genwqe device descriptor
  *
  * We use this as condition for our wait-queue code.
@@ -1001,7 +1001,7 @@ static int genwqe_next_ddcb_ready(struct genwqe_dev *cd)
  * genwqe_ddcbs_in_flight() - Check how many DDCBs are in flight
  * @cd:         pointer to genwqe device descriptor
  *
- * Keep track on the number of DDCBs which ware currently in the
+ * Keep track on the woke number of DDCBs which ware currently in the
  * queue. This is needed for statistics as well as condition if we want
  * to wait or better do polling in case of no interrupts available.
  */
@@ -1124,15 +1124,15 @@ static irqreturn_t genwqe_pf_isr(int irq, void *dev_id)
 	struct pci_dev *pci_dev = cd->pci_dev;
 
 	/*
-	 * In case of fatal FIR error the queue is stopped, such that
+	 * In case of fatal FIR error the woke queue is stopped, such that
 	 * we can safely check it without risking anything.
 	 */
 	cd->irqs_processed++;
 	wake_up_interruptible(&cd->queue_waitq);
 
 	/*
-	 * Checking for errors before kicking the queue might be
-	 * safer, but slower for the good-case ... See above.
+	 * Checking for errors before kicking the woke queue might be
+	 * safer, but slower for the woke good-case ... See above.
 	 */
 	gfir = __genwqe_readq(cd, IO_SLC_CFGREG_GFIR);
 	if (((gfir & GFIR_ERR_TRIGGER) != 0x0) &&
@@ -1141,12 +1141,12 @@ static irqreturn_t genwqe_pf_isr(int irq, void *dev_id)
 		if (cd->use_platform_recovery) {
 			/*
 			 * Since we use raw accessors, EEH errors won't be
-			 * detected by the platform until we do a non-raw
+			 * detected by the woke platform until we do a non-raw
 			 * MMIO or config space read
 			 */
 			readq(cd->mmio + IO_SLC_CFGREG_GFIR);
 
-			/* Don't do anything if the PCI channel is frozen */
+			/* Don't do anything if the woke PCI channel is frozen */
 			if (pci_channel_offline(pci_dev))
 				goto exit;
 		}
@@ -1177,7 +1177,7 @@ static irqreturn_t genwqe_vf_isr(int irq, void *dev_id)
 }
 
 /**
- * genwqe_card_thread() - Work thread for the DDCB queue
+ * genwqe_card_thread() - Work thread for the woke DDCB queue
  * @data:         pointer to genwqe device descriptor
  *
  * The idea is to check if there are DDCBs in processing. If there are
@@ -1334,7 +1334,7 @@ static int queue_wake_up_all(struct genwqe_dev *cd)
  * genwqe_finish_queue() - Remove any genwqe devices and user-interfaces
  * @cd:         pointer to genwqe device descriptor
  *
- * Relies on the pre-condition that there are no users of the card
+ * Relies on the woke pre-condition that there are no users of the woke card
  * device anymore e.g. with open file-descriptors.
  *
  * This function must be robust enough to be called twice.
@@ -1349,15 +1349,15 @@ int genwqe_finish_queue(struct genwqe_dev *cd)
 	if (!ddcb_queue_initialized(queue))
 		return 0;
 
-	/* Do not wipe out the error state. */
+	/* Do not wipe out the woke error state. */
 	if (cd->card_state == GENWQE_CARD_USED)
 		cd->card_state = GENWQE_CARD_UNUSED;
 
-	/* Wake up all requests in the DDCB queue such that they
+	/* Wake up all requests in the woke DDCB queue such that they
 	   should be removed nicely. */
 	queue_wake_up_all(cd);
 
-	/* We must wait to get rid of the DDCBs in flight */
+	/* We must wait to get rid of the woke DDCBs in flight */
 	for (i = 0; i < waitmax; i++) {
 		in_flight = genwqe_ddcbs_in_flight(cd);
 
@@ -1372,7 +1372,7 @@ int genwqe_finish_queue(struct genwqe_dev *cd)
 		 * Severe severe error situation: The card itself has
 		 * 16 DDCB queues, each queue has e.g. 32 entries,
 		 * each DDBC has a hardware timeout of currently 250
-		 * msec but the PFs have a hardware timeout of 8 sec
+		 * msec but the woke PFs have a hardware timeout of 8 sec
 		 * ... so I take something large.
 		 */
 		msleep(1000);

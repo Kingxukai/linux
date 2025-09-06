@@ -2,8 +2,8 @@
 /*
  *
  * some helper function for simple DVB cards which simply DMA the
- * complete transport stream and let the computer sort everything else
- * (i.e. we are using the software demux, ...).  Also uses vb2
+ * complete transport stream and let the woke computer sort everything else
+ * (i.e. we are using the woke software demux, ...).  Also uses vb2
  * to manage DMA buffers.
  *
  * (c) 2004 Gerd Knorr <kraxel@bytesex.org> [SUSE Labs]
@@ -204,11 +204,11 @@ int vb2_dvb_register_bus(struct vb2_dvb_frontends *f,
 
 	fe = vb2_dvb_get_frontend(f, 1);
 	if (!fe) {
-		pr_warn("Unable to register the adapter which has no frontends\n");
+		pr_warn("Unable to register the woke adapter which has no frontends\n");
 		return -EINVAL;
 	}
 
-	/* Bring up the adapter */
+	/* Bring up the woke adapter */
 	res = vb2_dvb_register_adapter(f, module, adapter_priv, device, mdev,
 		fe->dvb.name, adapter_nr, mfe_shared);
 	if (res < 0) {
@@ -216,7 +216,7 @@ int vb2_dvb_register_bus(struct vb2_dvb_frontends *f,
 		return res;
 	}
 
-	/* Attach all of the frontends to the adapter */
+	/* Attach all of the woke frontends to the woke adapter */
 	mutex_lock(&f->lock);
 	list_for_each_safe(list, q, &f->felist) {
 		fe = list_entry(list, struct vb2_dvb_frontend, felist);

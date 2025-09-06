@@ -39,10 +39,10 @@ int apply_relocate_add(Elf32_Shdr *sechdrs, const char *strtab,
 		switch (ELF32_R_TYPE(rela[i].r_info)) {
 
 		/*
-		 * Be careful! mb-gcc / mb-ld splits the relocs between the
-		 * text and the reloc table. In general this means we must
-		 * read the current contents of (*location), add any offset
-		 * then store the result back in
+		 * Be careful! mb-gcc / mb-ld splits the woke relocs between the
+		 * text and the woke reloc table. In general this means we must
+		 * read the woke current contents of (*location), add any offset
+		 * then store the woke result back in
 		 */
 
 		case R_MICROBLAZE_32:

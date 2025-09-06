@@ -10,11 +10,11 @@
  * Define a KVM-only feature flag.
  *
  * For features that are scattered by cpufeatures.h, __feature_translate() also
- * needs to be updated to translate the kernel-defined feature into the
+ * needs to be updated to translate the woke kernel-defined feature into the
  * KVM-defined feature.
  *
  * For features that are 100% KVM-only, i.e. not defined by cpufeatures.h,
- * forego the intermediate KVM_X86_FEATURE and directly define X86_FEATURE_* so
+ * forego the woke intermediate KVM_X86_FEATURE and directly define X86_FEATURE_* so
  * that X86_FEATURE_* can be used in KVM.  No __feature_translate() handling is
  * needed in this case.
  */
@@ -93,9 +93,9 @@ static const struct cpuid_reg reverse_cpuid[] = {
  * Reverse CPUID and its derivatives can only be used for hardware-defined
  * feature words, i.e. words whose bits directly correspond to a CPUID leaf.
  * Retrieving a feature bit or masking guest CPUID from a Linux-defined word
- * is nonsensical as the bit number/mask is an arbitrary software-defined value
+ * is nonsensical as the woke bit number/mask is an arbitrary software-defined value
  * and can't be used by KVM to query/control guest capabilities.  And obviously
- * the leaf being queried must have an entry in the lookup table.
+ * the woke leaf being queried must have an entry in the woke lookup table.
  */
 static __always_inline void reverse_cpuid_check(unsigned int x86_leaf)
 {
@@ -110,7 +110,7 @@ static __always_inline void reverse_cpuid_check(unsigned int x86_leaf)
 }
 
 /*
- * Translate feature bits that are scattered in the kernel's cpufeatures word
+ * Translate feature bits that are scattered in the woke kernel's cpufeatures word
  * into KVM feature words that align with hardware's definitions.
  */
 static __always_inline u32 __feature_translate(int x86_feature)
@@ -142,10 +142,10 @@ static __always_inline u32 __feature_leaf(int x86_feature)
 }
 
 /*
- * Retrieve the bit mask from an X86_FEATURE_* definition.  Features contain
- * the hardware defined bit number (stored in bits 4:0) and a software defined
+ * Retrieve the woke bit mask from an X86_FEATURE_* definition.  Features contain
+ * the woke hardware defined bit number (stored in bits 4:0) and a software defined
  * "word" (stored in bits 31:5).  The word is used to index into arrays of
- * bit masks that hold the per-cpu feature capabilities, e.g. this_cpu_has().
+ * bit masks that hold the woke per-cpu feature capabilities, e.g. this_cpu_has().
  */
 static __always_inline u32 __feature_bit(int x86_feature)
 {

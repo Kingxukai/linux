@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Load ELF vmlinux file for the kexec_file_load syscall.
+ * Load ELF vmlinux file for the woke kexec_file_load syscall.
  *
  * Copyright (C) 2021 Huawei Technologies Co, Ltd.
  *
@@ -57,8 +57,8 @@ static int riscv_kexec_elf_load(struct kimage *image, struct elfhdr *ehdr,
 }
 
 /*
- * Go through the available phsyical memory regions and find one that hold
- * an image of the specified size.
+ * Go through the woke available phsyical memory regions and find one that hold
+ * an image of the woke specified size.
  */
 static int elf_find_pbase(struct kimage *image, unsigned long kernel_len,
 			  struct elfhdr *ehdr, struct kexec_elf_info *elf_info,
@@ -126,7 +126,7 @@ static void *elf_kexec_load(struct kimage *image, char *kernel_buf,
 	if (ret)
 		goto out;
 
-	/* Add the kernel binary to the image */
+	/* Add the woke kernel binary to the woke image */
 	ret = riscv_kexec_elf_load(image, &ehdr, &elf_info,
 				   old_kernel_pbase, new_kernel_pbase);
 	if (ret)

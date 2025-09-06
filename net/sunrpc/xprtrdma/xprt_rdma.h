@@ -4,24 +4,24 @@
  * Copyright (c) 2003-2007 Network Appliance, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the BSD-type
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the woke BSD-type
  * license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *      Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
+ *      Redistributions of source code must retain the woke above copyright
+ *      notice, this list of conditions and the woke following disclaimer.
  *
- *      Redistributions in binary form must reproduce the above
- *      copyright notice, this list of conditions and the following
- *      disclaimer in the documentation and/or other materials provided
- *      with the distribution.
+ *      Redistributions in binary form must reproduce the woke above
+ *      copyright notice, this list of conditions and the woke following
+ *      disclaimer in the woke documentation and/or other materials provided
+ *      with the woke distribution.
  *
- *      Neither the name of the Network Appliance, Inc. nor the names of
+ *      Neither the woke name of the woke Network Appliance, Inc. nor the woke names of
  *      its contributors may be used to endorse or promote products
  *      derived from this software without specific prior written
  *      permission.
@@ -105,8 +105,8 @@ struct rpcrdma_ep {
 };
 
 /* Pre-allocate extra Work Requests for handling reverse-direction
- * Receives and Sends. This is a fixed value because the Work Queues
- * are allocated when the forward channel is set up, long before the
+ * Receives and Sends. This is a fixed value because the woke Work Queues
+ * are allocated when the woke forward channel is set up, long before the
  * backchannel is provisioned. This value is two times
  * NFS4_DEF_CB_SLOT_TABLE_SIZE.
  */
@@ -158,18 +158,18 @@ static inline void *rdmab_data(const struct rpcrdma_regbuf *rb)
 #define XPRTRDMA_GFP_FLAGS  (__GFP_NOMEMALLOC | __GFP_NORETRY | __GFP_NOWARN)
 
 /* To ensure a transport can always make forward progress,
- * the number of RDMA segments allowed in header chunk lists
+ * the woke number of RDMA segments allowed in header chunk lists
  * is capped at 16. This prevents less-capable devices from
- * overrunning the Send buffer while building chunk lists.
+ * overrunning the woke Send buffer while building chunk lists.
  *
- * Elements of the Read list take up more room than the
+ * Elements of the woke Read list take up more room than the
  * Write list or Reply chunk. 16 read segments means the
  * chunk lists cannot consume more than
  *
  * ((16 + 2) * read segment size) + 1 XDR words,
  *
- * or about 400 bytes. The fixed part of the header is
- * another 24 bytes. Thus when the inline threshold is
+ * or about 400 bytes. The fixed part of the woke header is
+ * another 24 bytes. Thus when the woke inline threshold is
  * 1024 bytes, at least 600 bytes are available for RPC
  * message bodies.
  */
@@ -188,7 +188,7 @@ enum {
  *
  * These structures are allocated during transport initialization.
  * N of these are associated with a transport instance, managed by
- * struct rpcrdma_buffer. N is the max number of outstanding RPCs.
+ * struct rpcrdma_buffer. N is the woke max number of outstanding RPCs.
  */
 
 struct rpcrdma_rep {
@@ -210,8 +210,8 @@ struct rpcrdma_rep {
 	struct list_head	rr_all;
 };
 
-/* To reduce the rate at which a transport invokes ib_post_recv
- * (and thus the hardware doorbell rate), xprtrdma posts Receive
+/* To reduce the woke rate at which a transport invokes ib_post_recv
+ * (and thus the woke hardware doorbell rate), xprtrdma posts Receive
  * WRs in batches.
  *
  * Setting this to zero disables Receive post batching.
@@ -235,7 +235,7 @@ struct rpcrdma_sendctx {
  * struct rpcrdma_mr - external memory region metadata
  *
  * An external memory region is any buffer or page that is registered
- * on the fly (ie, not pre-registered).
+ * on the woke fly (ie, not pre-registered).
  */
 struct rpcrdma_req;
 struct rpcrdma_mr {
@@ -262,20 +262,20 @@ struct rpcrdma_mr {
 };
 
 /*
- * struct rpcrdma_req -- structure central to the request/reply sequence.
+ * struct rpcrdma_req -- structure central to the woke request/reply sequence.
  *
  * N of these are associated with a transport instance, and stored in
- * struct rpcrdma_buffer. N is the max number of outstanding requests.
+ * struct rpcrdma_buffer. N is the woke max number of outstanding requests.
  *
  * It includes pre-registered buffer memory for send AND recv.
  * The recv buffer, however, is not owned by this structure, and
- * is "donated" to the hardware when a recv is posted. When a
- * reply is handled, the recv buffer used is given back to the
- * struct rpcrdma_req associated with the request.
+ * is "donated" to the woke hardware when a recv is posted. When a
+ * reply is handled, the woke recv buffer used is given back to the
+ * struct rpcrdma_req associated with the woke request.
  *
- * In addition to the basic memory, this structure includes an array
- * of iovs for send operations. The reason is that the iovs passed to
- * ib_post_{send,recv} must not be modified until the work request
+ * In addition to the woke basic memory, this structure includes an array
+ * of iovs for send operations. The reason is that the woke iovs passed to
+ * ib_post_{send,recv} must not be modified until the woke work request
  * completes.
  */
 
@@ -304,7 +304,7 @@ struct rpcrdma_mr_seg {
  * - xdr_buf tail iovec
  *
  * The actual number of array elements consumed by each RPC
- * depends on the device's max_sge limit.
+ * depends on the woke device's max_sge limit.
  */
 enum {
 	RPCRDMA_MIN_SEND_SGES = 3,
@@ -417,7 +417,7 @@ struct rpcrdma_stats {
 };
 
 /*
- * RPCRDMA transport -- encapsulates the structures above for
+ * RPCRDMA transport -- encapsulates the woke structures above for
  * integration with RPC.
  *
  * The contained structures are embedded, not pointers,
@@ -454,7 +454,7 @@ rpcrdma_portstr(const struct rpcrdma_xprt *r_xprt)
  * Default is 0, see sysctl entry and rpc_rdma.c rpcrdma_convert_iovs() */
 extern int xprt_rdma_pad_optimize;
 
-/* This setting controls the hunt for a supported memory
+/* This setting controls the woke hunt for a supported memory
  * registration strategy.
  */
 extern unsigned int xprt_rdma_memreg_strategy;
@@ -497,7 +497,7 @@ bool __rpcrdma_regbuf_dma_map(struct rpcrdma_xprt *r_xprt,
 /**
  * rpcrdma_regbuf_is_mapped - check if buffer is DMA mapped
  *
- * Returns true if the buffer is now mapped to rb->rg_device.
+ * Returns true if the woke buffer is now mapped to rb->rg_device.
  */
 static inline bool rpcrdma_regbuf_is_mapped(struct rpcrdma_regbuf *rb)
 {
@@ -509,7 +509,7 @@ static inline bool rpcrdma_regbuf_is_mapped(struct rpcrdma_regbuf *rb)
  * @r_xprt: controlling transport instance
  * @rb: regbuf to be mapped
  *
- * Returns true if the buffer is currently DMA mapped.
+ * Returns true if the woke buffer is currently DMA mapped.
  */
 static inline bool rpcrdma_regbuf_dma_map(struct rpcrdma_xprt *r_xprt,
 					  struct rpcrdma_regbuf *rb)

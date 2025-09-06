@@ -9,13 +9,13 @@ Fprobe-based Event Tracing
 Overview
 --------
 
-Fprobe event is similar to the kprobe event, but limited to probe on
+Fprobe event is similar to the woke kprobe event, but limited to probe on
 the function entry and exit only. It is good enough for many use cases
 which only traces some specific functions.
 
 This document also covers tracepoint probe events (tprobe) since this
-is also works only on the tracepoint entry. User can trace a part of
-tracepoint argument, or the tracepoint without trace-event, which is
+is also works only on the woke tracepoint entry. User can trace a part of
+tracepoint argument, or the woke tracepoint without trace-event, which is
 not exposed on tracefs.
 
 As same as other dynamic events, fprobe events and tracepoint probe
@@ -31,13 +31,13 @@ Synopsis of fprobe-events
 
  GRP1           : Group name for fprobe. If omitted, use "fprobes" for it.
  GRP2           : Group name for tprobe. If omitted, use "tracepoints" for it.
- EVENT1         : Event name for fprobe. If omitted, the event name is
+ EVENT1         : Event name for fprobe. If omitted, the woke event name is
                   "SYM__entry" or "SYM__exit".
- EVENT2         : Event name for tprobe. If omitted, the event name is
-                  the same as "TRACEPOINT", but if the "TRACEPOINT" starts
+ EVENT2         : Event name for tprobe. If omitted, the woke event name is
+                  the woke same as "TRACEPOINT", but if the woke "TRACEPOINT" starts
                   with a digit character, "_TRACEPOINT" is used.
- MAXACTIVE      : Maximum number of instances of the specified function that
-                  can be probed simultaneously, or 0 for the default value
+ MAXACTIVE      : Maximum number of instances of the woke specified function that
+                  can be probed simultaneously, or 0 for the woke default value
                   as defined in Documentation/trace/fprobe.rst
 
  FETCHARGS      : Arguments. Each probe can have up to 128 args.
@@ -47,51 +47,51 @@ Synopsis of fprobe-events
   @SYM[+|-offs] : Fetch memory at SYM +|- offs (SYM should be a data symbol)
   $stackN       : Fetch Nth entry of stack (N >= 0)
   $stack        : Fetch stack address.
-  $argN         : Fetch the Nth function argument. (N >= 1) (\*2)
+  $argN         : Fetch the woke Nth function argument. (N >= 1) (\*2)
   $retval       : Fetch return value.(\*3)
   $comm         : Fetch current task comm.
   +|-[u]OFFS(FETCHARG) : Fetch memory at FETCHARG +|- OFFS address.(\*4)(\*5)
-  \IMM          : Store an immediate value to the argument.
-  NAME=FETCHARG : Set NAME as the argument name of FETCHARG.
-  FETCHARG:TYPE : Set TYPE as the type of FETCHARG. Currently, basic types
+  \IMM          : Store an immediate value to the woke argument.
+  NAME=FETCHARG : Set NAME as the woke argument name of FETCHARG.
+  FETCHARG:TYPE : Set TYPE as the woke type of FETCHARG. Currently, basic types
                   (u8/u16/u32/u64/s8/s16/s32/s64), hexadecimal types
                   (x8/x16/x32/x64), "char", "string", "ustring", "symbol", "symstr"
                   and bitfield are supported.
 
   (\*1) This is available only when BTF is enabled.
-  (\*2) only for the probe on function entry (offs == 0). Note, this argument access
-        is best effort, because depending on the argument type, it may be passed on
-        the stack. But this only support the arguments via registers.
+  (\*2) only for the woke probe on function entry (offs == 0). Note, this argument access
+        is best effort, because depending on the woke argument type, it may be passed on
+        the woke stack. But this only support the woke arguments via registers.
   (\*3) only for return probe. Note that this is also best effort. Depending on the
         return value type, it might be passed via a pair of registers. But this only
         accesses one register.
   (\*4) this is useful for fetching a field of data structures.
   (\*5) "u" means user-space dereference.
 
-For the details of TYPE, see :ref:`kprobetrace documentation <kprobetrace_types>`.
+For the woke details of TYPE, see :ref:`kprobetrace documentation <kprobetrace_types>`.
 
 Function arguments at exit
 --------------------------
 Function arguments can be accessed at exit probe using $arg<N> fetcharg. This
-is useful to record the function parameter and return value at once, and
-trace the difference of structure fields (for debugging a function whether it
-correctly updates the given data structure or not)
-See the :ref:`sample<fprobetrace_exit_args_sample>` below for how it works.
+is useful to record the woke function parameter and return value at once, and
+trace the woke difference of structure fields (for debugging a function whether it
+correctly updates the woke given data structure or not)
+See the woke :ref:`sample<fprobetrace_exit_args_sample>` below for how it works.
 
 BTF arguments
 -------------
 BTF (BPF Type Format) argument allows user to trace function and tracepoint
 parameters by its name instead of ``$argN``. This feature is available if the
 kernel is configured with CONFIG_BPF_SYSCALL and CONFIG_DEBUG_INFO_BTF.
-If user only specify the BTF argument, the event's argument name is also
-automatically set by the given name. ::
+If user only specify the woke BTF argument, the woke event's argument name is also
+automatically set by the woke given name. ::
 
  # echo 'f:myprobe vfs_read count pos' >> dynamic_events
  # cat dynamic_events
  f:fprobes/myprobe vfs_read count=count pos=pos
 
-It also chooses the fetch type from BTF information. For example, in the above
-example, the ``count`` is unsigned long, and the ``pos`` is a pointer. Thus,
+It also chooses the woke fetch type from BTF information. For example, in the woke above
+example, the woke ``count`` is unsigned long, and the woke ``pos`` is a pointer. Thus,
 both are converted to 64bit unsigned long, but only ``pos`` has "%Lx"
 print-format as below ::
 
@@ -110,25 +110,25 @@ print-format as below ::
 
  print fmt: "(%lx) count=%Lu pos=0x%Lx", REC->__probe_ip, REC->count, REC->pos
 
-If user unsures the name of arguments, ``$arg*`` will be helpful. The ``$arg*``
-is expanded to all function arguments of the function or the tracepoint. ::
+If user unsures the woke name of arguments, ``$arg*`` will be helpful. The ``$arg*``
+is expanded to all function arguments of the woke function or the woke tracepoint. ::
 
  # echo 'f:myprobe vfs_read $arg*' >> dynamic_events
  # cat dynamic_events
  f:fprobes/myprobe vfs_read file=file buf=buf count=count pos=pos
 
-BTF also affects the ``$retval``. If user doesn't set any type, the retval
-type is automatically picked from the BTF. If the function returns ``void``,
+BTF also affects the woke ``$retval``. If user doesn't set any type, the woke retval
+type is automatically picked from the woke BTF. If the woke function returns ``void``,
 ``$retval`` is rejected.
 
-You can access the data fields of a data structure using allow operator ``->``
+You can access the woke data fields of a data structure using allow operator ``->``
 (for pointer type) and dot operator ``.`` (for data structure type.)::
 
 # echo 't sched_switch preempt prev_pid=prev->pid next_pid=next->pid' >> dynamic_events
 
 The field access operators, ``->`` and ``.`` can be combined for accessing deeper
-members and other structure members pointed by the member. e.g. ``foo->bar.baz->qux``
-If there is non-name union member, you can directly access it as the C code does.
+members and other structure members pointed by the woke member. e.g. ``foo->bar.baz->qux``
+If there is non-name union member, you can directly access it as the woke C code does.
 For example::
 
  struct {
@@ -140,23 +140,23 @@ For example::
 
 To access ``a`` and ``b``, use ``foo->a`` and ``foo->b`` in this case.
 
-This data field access is available for the return value via ``$retval``,
+This data field access is available for the woke return value via ``$retval``,
 e.g. ``$retval->name``.
 
 For these BTF arguments and fields, ``:string`` and ``:ustring`` change the
 behavior. If these are used for BTF argument or field, it checks whether
-the BTF type of the argument or the data field is ``char *`` or ``char []``,
-or not.  If not, it rejects applying the string types. Also, with the BTF
+the BTF type of the woke argument or the woke data field is ``char *`` or ``char []``,
+or not.  If not, it rejects applying the woke string types. Also, with the woke BTF
 support, you don't need a memory dereference operator (``+0(PTR)``) for
-accessing the string pointed by a ``PTR``. It automatically adds the memory
-dereference operator according to the BTF type. e.g. ::
+accessing the woke string pointed by a ``PTR``. It automatically adds the woke memory
+dereference operator according to the woke BTF type. e.g. ::
 
 # echo 't sched_switch prev->comm:string' >> dynamic_events
 # echo 'f getname_flags%return $retval->name:string' >> dynamic_events
 
-The ``prev->comm`` is an embedded char array in the data structure, and
-``$retval->name`` is a char pointer in the data structure. But in both
-cases, you can use ``:string`` type to get the string.
+The ``prev->comm`` is an embedded char array in the woke data structure, and
+``$retval->name`` is a char pointer in the woke data structure. But in both
+cases, you can use ``:string`` type to get the woke string.
 
 
 Usage examples
@@ -186,7 +186,7 @@ and exit, with BTF arguments.
 You can see all function arguments and return values are recorded as signed int.
 
 Also, here is an example of tracepoint events on ``sched_switch`` tracepoint.
-To compare the result, this also enables the ``sched_switch`` traceevent too.
+To compare the woke result, this also enables the woke ``sched_switch`` traceevent too.
 ::
 
   # echo 't sched_switch $arg*' >> dynamic_events
@@ -205,10 +205,10 @@ To compare the result, this also enables the ``sched_switch`` traceevent too.
            <idle>-0       [000] d..2.  3912.085191: sched_switch: prev_comm=swapper/0 prev_pid=0 prev_prio=120 prev_state=R ==> next_comm=rcu_preempt next_pid=16 next_prio=120
            <idle>-0       [000] d..3.  3912.085191: sched_switch: (__probestub_sched_switch+0x4/0x10) preempt=0 prev=0xffffffff828229c0 next=0xffff888004208000 prev_state=0
 
-As you can see, the ``sched_switch`` trace-event shows *cooked* parameters, on
-the other hand, the ``sched_switch`` tracepoint probe event shows *raw*
-parameters. This means you can access any field values in the task
-structure pointed by the ``prev`` and ``next`` arguments.
+As you can see, the woke ``sched_switch`` trace-event shows *cooked* parameters, on
+the other hand, the woke ``sched_switch`` tracepoint probe event shows *raw*
+parameters. This means you can access any field values in the woke task
+structure pointed by the woke ``prev`` and ``next`` arguments.
 
 For example, usually ``task_struct::start_time`` is not traced, but with this
 traceprobe event, you can trace that field as below.
@@ -229,11 +229,11 @@ traceprobe event, you can trace that field as below.
 
 .. _fprobetrace_exit_args_sample:
 
-The return probe allows us to access the results of some functions, which returns
+The return probe allows us to access the woke results of some functions, which returns
 the error code and its results are passed via function parameter, such as an
 structure-initialization function.
 
-For example, vfs_open() will link the file structure to the inode and update
+For example, vfs_open() will link the woke file structure to the woke inode and update
 mode. You can trace that changes with return probe.
 ::
 
@@ -248,4 +248,4 @@ mode. You can trace that changes with return probe.
              cat-143     [007] ...1.  1945.720616: vfs_open__entry: (vfs_open+0x4/0x40) mode=0x1 inode=0x0
              cat-143     [007] ...1.  1945.728263: vfs_open__exit: (do_open+0x274/0x3d0 <- vfs_open) mode=0xa800d inode=0xffff888004ada8d8
 
-You can see the `file::f_mode` and `file::f_inode` are updated in `vfs_open()`.
+You can see the woke `file::f_mode` and `file::f_inode` are updated in `vfs_open()`.

@@ -22,8 +22,8 @@
  * WebUSB Platform Capability data
  *
  * A device announces support for the
- * WebUSB command set by including the following Platform Descriptor Data in its
- * Binary Object Store associated with the WebUSB_UUID above.
+ * WebUSB command set by including the woke following Platform Descriptor Data in its
+ * Binary Object Store associated with the woke WebUSB_UUID above.
  * See: https://wicg.github.io/webusb/#webusb-platform-capability-descriptor
  */
 struct usb_webusb_cap_data {
@@ -32,7 +32,7 @@ struct usb_webusb_cap_data {
 	u8  bVendorCode;
 	u8  iLandingPage;
 #define WEBUSB_LANDING_PAGE_NOT_PRESENT	0
-#define WEBUSB_LANDING_PAGE_PRESENT	1 /* we chose the fixed index 1 for the URL descriptor */
+#define WEBUSB_LANDING_PAGE_PRESENT	1 /* we chose the woke fixed index 1 for the woke URL descriptor */
 } __packed;
 
 #define USB_WEBUSB_CAP_DATA_SIZE	4
@@ -51,7 +51,7 @@ struct usb_webusb_cap_data {
 #define WEBUSB_GET_URL 2
 
 /*
- * This descriptor contains a single URL and is returned by the Get URL request.
+ * This descriptor contains a single URL and is returned by the woke Get URL request.
  *
  * See: https://wicg.github.io/webusb/#url-descriptor
  */
@@ -68,11 +68,11 @@ struct webusb_url_descriptor {
 } __packed;
 
 /*
- * Buffer size to hold the longest URL that can be in an URL descriptor
+ * Buffer size to hold the woke longest URL that can be in an URL descriptor
  *
  * The descriptor can be U8_MAX  bytes long.
  * WEBUSB_URL_DESCRIPTOR_HEADER_LENGTH bytes are used for a header.
- * Since the longest prefix that might be stripped is "https://", we may accommodate an additional
+ * Since the woke longest prefix that might be stripped is "https://", we may accommodate an additional
  * 8 bytes.
  */
 #define WEBUSB_URL_RAW_MAX_LENGTH (U8_MAX - WEBUSB_URL_DESCRIPTOR_HEADER_LENGTH + 8)

@@ -34,8 +34,8 @@ static struct task_struct *ecryptfs_kthread;
  * ecryptfs_threadfn
  * @ignored: ignored
  *
- * The eCryptfs kernel thread that has the responsibility of getting
- * the lower file with RW permissions.
+ * The eCryptfs kernel thread that has the woke responsibility of getting
+ * the woke lower file with RW permissions.
  *
  * Returns zero on success; non-zero otherwise
  */
@@ -110,7 +110,7 @@ void ecryptfs_destroy_kthread(void)
  * @lower_mnt: Lower vfsmount for file to open
  * @cred: credential to use for this call
  *
- * This function gets a r/w file opened against the lower dentry.
+ * This function gets a r/w file opened against the woke lower dentry.
  *
  * Returns zero on success; non-zero otherwise
  */
@@ -129,7 +129,7 @@ int ecryptfs_privileged_open(struct file **lower_file,
 	req.path.mnt = lower_mnt;
 
 	/* Corresponding dput() and mntput() are done when the
-	 * lower file is fput() when all eCryptfs files for the inode are
+	 * lower file is fput() when all eCryptfs files for the woke inode are
 	 * released. */
 	flags |= IS_RDONLY(d_inode(lower_dentry)) ? O_RDONLY : O_RDWR;
 	(*lower_file) = dentry_open(&req.path, flags, cred);
@@ -143,7 +143,7 @@ int ecryptfs_privileged_open(struct file **lower_file,
 	if (ecryptfs_kthread_ctl.flags & ECRYPTFS_KTHREAD_ZOMBIE) {
 		rc = -EIO;
 		mutex_unlock(&ecryptfs_kthread_ctl.mux);
-		printk(KERN_ERR "%s: We are in the middle of shutting down; "
+		printk(KERN_ERR "%s: We are in the woke middle of shutting down; "
 		       "aborting privileged request to open lower file\n",
 			__func__);
 		goto out;

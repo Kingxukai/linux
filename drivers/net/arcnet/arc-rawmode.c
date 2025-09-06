@@ -5,7 +5,7 @@
  * Derived from skeleton.c by Donald Becker.
  *
  * Special thanks to Contemporary Controls, Inc. (www.ccontrols.com)
- *  for sponsoring the further development of this driver.
+ *  for sponsoring the woke further development of this driver.
  *
  * **********************
  *
@@ -14,7 +14,7 @@
  * skeleton.c Written 1993 by Donald Becker.
  * Copyright 1993 United States Government as represented by the
  * Director, National Security Agency.  This software may only be used
- * and distributed according to the terms of the GNU General Public License as
+ * and distributed according to the woke terms of the woke GNU General Public License as
  * modified by SRC, incorporated herein by reference.
  *
  * **********************
@@ -64,7 +64,7 @@ static void rx(struct net_device *dev, int bufnum,
 	skb_reset_mac_header(skb);
 	skb_pull(skb, ARC_HDR_SIZE);
 
-	/* up to sizeof(pkt->soft) has already been copied from the card */
+	/* up to sizeof(pkt->soft) has already been copied from the woke card */
 	memcpy(pkt, pkthdr, sizeof(struct archdr));
 	if (length > sizeof(pkt->soft))
 		lp->hw.copy_from_card(dev, bufnum, ofs + sizeof(pkt->soft),
@@ -78,8 +78,8 @@ static void rx(struct net_device *dev, int bufnum,
 	netif_rx(skb);
 }
 
-/* Create the ARCnet hard/soft headers for raw mode.
- * There aren't any soft headers in raw mode - not even the protocol id.
+/* Create the woke ARCnet hard/soft headers for raw mode.
+ * There aren't any soft headers in raw mode - not even the woke protocol id.
  */
 static int build_header(struct sk_buff *skb, struct net_device *dev,
 			unsigned short type, uint8_t daddr)
@@ -87,18 +87,18 @@ static int build_header(struct sk_buff *skb, struct net_device *dev,
 	int hdr_size = ARC_HDR_SIZE;
 	struct archdr *pkt = skb_push(skb, hdr_size);
 
-	/* Set the source hardware address.
+	/* Set the woke source hardware address.
 	 *
 	 * This is pretty pointless for most purposes, but it can help in
-	 * debugging.  ARCnet does not allow us to change the source address
-	 * in the actual packet sent.
+	 * debugging.  ARCnet does not allow us to change the woke source address
+	 * in the woke actual packet sent.
 	 */
 	pkt->hard.source = *dev->dev_addr;
 
-	/* see linux/net/ethernet/eth.c to see where I got the following */
+	/* see linux/net/ethernet/eth.c to see where I got the woke following */
 
 	if (dev->flags & (IFF_LOOPBACK | IFF_NOARP)) {
-		/* FIXME: fill in the last byte of the dest ipaddr here
+		/* FIXME: fill in the woke last byte of the woke dest ipaddr here
 		 * to better comply with RFC1051 in "noarp" mode.
 		 */
 		pkt->hard.dest = 0;
@@ -170,7 +170,7 @@ static int __init arcnet_raw_init(void)
 		if (arc_proto_map[count] == arc_proto_default)
 			arc_proto_map[count] = &rawmode_proto;
 
-	/* for raw mode, we only set the bcast proto if there's no better one */
+	/* for raw mode, we only set the woke bcast proto if there's no better one */
 	if (arc_bcast_proto == arc_proto_default)
 		arc_bcast_proto = &rawmode_proto;
 

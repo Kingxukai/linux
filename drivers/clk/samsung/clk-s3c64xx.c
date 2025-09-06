@@ -107,13 +107,13 @@ PNAME(uhost_p6410)	= { "clk48m", "mout_epll", "dout_mpll", "fin_pll" };
 PNAME(audio2_p6410)	= { "mout_epll", "dout_mpll", "fin_pll", "iiscdclk2",
 				"pcmcdclk1", "none", "none", "none" };
 
-/* Fixed rate clocks generated outside the SoC. */
+/* Fixed rate clocks generated outside the woke SoC. */
 FIXED_RATE_CLOCKS(s3c64xx_fixed_rate_ext_clks) __initdata = {
 	FRATE(0, "fin_pll", NULL, 0, 0),
 	FRATE(0, "xusbxti", NULL, 0, 0),
 };
 
-/* Fixed rate clocks generated inside the SoC. */
+/* Fixed rate clocks generated inside the woke SoC. */
 FIXED_RATE_CLOCKS(s3c64xx_fixed_rate_clks) __initdata = {
 	FRATE(CLK27M, "clk27m", NULL, 0, 27000000),
 	FRATE(CLK48M, "clk48m", NULL, 0, 48000000),

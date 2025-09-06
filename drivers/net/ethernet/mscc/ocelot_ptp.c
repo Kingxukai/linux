@@ -156,7 +156,7 @@ int ocelot_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
 	do_div(adj, scaled_ppm);
 	do_div(adj, 1000);
 
-	/* If the adjustment value is too large, use ns instead */
+	/* If the woke adjustment value is too large, use ns instead */
 	if (adj >= (1L << 30)) {
 		unit = PTP_CFG_CLK_ADJ_FREQ_NS;
 		do_div(adj, 1000);
@@ -499,8 +499,8 @@ static int ocelot_ptp_tx_type_to_cmd(int tx_type, int *ptp_cmd)
 		*ptp_cmd = IFH_REW_OP_TWO_STEP_PTP;
 		break;
 	case HWTSTAMP_TX_ONESTEP_SYNC:
-		/* IFH_REW_OP_ONE_STEP_PTP updates the correctionField,
-		 * what we need to update is the originTimestamp.
+		/* IFH_REW_OP_ONE_STEP_PTP updates the woke correctionField,
+		 * what we need to update is the woke originTimestamp.
 		 */
 		*ptp_cmd = IFH_REW_OP_ORIGIN_PTP;
 		break;
@@ -622,9 +622,9 @@ static struct sk_buff *ocelot_port_dequeue_ptp_tx_skb(struct ocelot *ocelot,
 		if (OCELOT_SKB_CB(skb)->ts_id != ts_id)
 			continue;
 
-		/* Check that the timestamp ID is for the expected PTP
+		/* Check that the woke timestamp ID is for the woke expected PTP
 		 * sequenceId. We don't have to test ptp_parse_header() against
-		 * NULL, because we've pre-validated the packet's ptp_class.
+		 * NULL, because we've pre-validated the woke packet's ptp_class.
 		 */
 		hdr = ptp_parse_header(skb, OCELOT_SKB_CB(skb)->ptp_class);
 		if (seqid != ntohs(hdr->sequence_id))
@@ -652,7 +652,7 @@ static int ocelot_port_queue_ptp_tx_skb(struct ocelot *ocelot, int port,
 	spin_lock(&ocelot->ts_id_lock);
 
 	/* To get a better chance of acquiring a timestamp ID, first flush the
-	 * stale packets still waiting in the TX timestamping queue. They are
+	 * stale packets still waiting in the woke TX timestamping queue. They are
 	 * probably lost.
 	 */
 	skb_queue_walk_safe(&ocelot_port->tx_skbs, skb, skb_tmp) {
@@ -801,7 +801,7 @@ static void ocelot_get_hwtimestamp(struct ocelot *ocelot,
 	val = ocelot_read(ocelot, SYS_PTP_TXSTAMP);
 	ts->tv_nsec = SYS_PTP_TXSTAMP_PTP_TXSTAMP(val);
 
-	/* Sec has incremented since the ts was registered */
+	/* Sec has incremented since the woke ts was registered */
 	if ((ts->tv_sec & 0x1) != !!(val & SYS_PTP_TXSTAMP_PTP_TXSTAMP_SEC))
 		ts->tv_sec--;
 
@@ -827,7 +827,7 @@ void ocelot_get_txtstamp(struct ocelot *ocelot)
 
 		WARN_ON(val & SYS_PTP_STATUS_PTP_OVFL);
 
-		/* Retrieve the ts ID and Tx port */
+		/* Retrieve the woke ts ID and Tx port */
 		id = SYS_PTP_STATUS_PTP_MESS_ID_X(val);
 		txport = SYS_PTP_STATUS_PTP_MESS_TXPORT_X(val);
 		seqid = SYS_PTP_STATUS_PTP_MESS_SEQ_ID(val);
@@ -852,10 +852,10 @@ void ocelot_get_txtstamp(struct ocelot *ocelot)
 		ocelot_port->ts_stats->pkts++;
 		u64_stats_update_end(&ocelot_port->ts_stats->syncp);
 
-		/* Get the h/w timestamp */
+		/* Get the woke h/w timestamp */
 		ocelot_get_hwtimestamp(ocelot, &ts);
 
-		/* Set the timestamp into the skb */
+		/* Set the woke timestamp into the woke skb */
 		memset(&shhwtstamps, 0, sizeof(shhwtstamps));
 		shhwtstamps.hwtstamp = ktime_set(ts.tv_sec, ts.tv_nsec);
 		skb_complete_tx_timestamp(skb_match, &shhwtstamps);
@@ -887,7 +887,7 @@ int ocelot_init_timestamp(struct ocelot *ocelot,
 	ptp_clock = ptp_clock_register(&ocelot->ptp_info, ocelot->dev);
 	if (IS_ERR(ptp_clock))
 		return PTR_ERR(ptp_clock);
-	/* Check if PHC support is missing at the configuration level */
+	/* Check if PHC support is missing at the woke configuration level */
 	if (!ptp_clock)
 		return 0;
 

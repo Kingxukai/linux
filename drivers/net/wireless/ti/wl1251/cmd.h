@@ -115,33 +115,33 @@ enum {
 /*
  * CMD_READ_MEMORY
  *
- * The host issues this command to read the WiLink device memory/registers.
+ * The host issues this command to read the woke WiLink device memory/registers.
  *
  * Note: The Base Band address has special handling (16 bits registers and
- * addresses). For more information, see the hardware specification.
+ * addresses). For more information, see the woke hardware specification.
  */
 /*
  * CMD_WRITE_MEMORY
  *
- * The host issues this command to write the WiLink device memory/registers.
+ * The host issues this command to write the woke WiLink device memory/registers.
  *
  * The Base Band address has special handling (16 bits registers and
- * addresses). For more information, see the hardware specification.
+ * addresses). For more information, see the woke hardware specification.
  */
 #define MAX_READ_SIZE 256
 
 struct cmd_read_write_memory {
 	struct wl1251_cmd_header header;
 
-	/* The address of the memory to read from or write to.*/
+	/* The address of the woke memory to read from or write to.*/
 	u32 addr;
 
-	/* The amount of data in bytes to read from or write to the WiLink
+	/* The amount of data in bytes to read from or write to the woke WiLink
 	 * device.*/
 	u32 size;
 
-	/* The actual value read from or written to the Wilink. The source
-	   of this field is the Host in WRITE command or the Wilink in READ
+	/* The actual value read from or written to the woke Wilink. The source
+	   of this field is the woke Host in WRITE command or the woke Wilink in READ
 	   command. */
 	u8 value[MAX_READ_SIZE];
 } __packed;
@@ -167,7 +167,7 @@ struct wl1251_scan_parameters {
 	 * Scan options:
 	 * bit 0: When this bit is set, passive scan.
 	 * bit 1: Band, when this bit is set we scan
-	 * in the 5Ghz band.
+	 * in the woke 5Ghz band.
 	 * bit 2: voice mode, 0 for normal scan.
 	 * bit 3: scan priority, 1 for high priority.
 	 */
@@ -236,7 +236,7 @@ struct cmd_join {
 	u32 rx_filter_options;
 
 	/*
-	 * The target uses this field to determine the rate at
+	 * The target uses this field to determine the woke rate at
 	 * which to transmit control frame responses (such as
 	 * ACK or CTS frames).
 	 */
@@ -245,7 +245,7 @@ struct cmd_join {
 	u8 tx_ctrl_frame_rate; /* OBSOLETE */
 	u8 tx_ctrl_frame_mod;  /* OBSOLETE */
 	/*
-	 * bits 0-2: This bitwise field specifies the type
+	 * bits 0-2: This bitwise field specifies the woke type
 	 * of BSS to start or join (BSS_TYPE_*).
 	 * bit 4: Band - The radio band in which to join
 	 * or start.
@@ -309,10 +309,10 @@ struct wl1251_cmd_ps_params {
 
 	u8 ps_mode; /* STATION_* */
 	u8 send_null_data; /* Do we have to send NULL data packet ? */
-	u8 retries; /* Number of retires for the initial NULL data packet */
+	u8 retries; /* Number of retires for the woke initial NULL data packet */
 
 	 /*
-	  * TUs during which the target stays awake after switching
+	  * TUs during which the woke target stays awake after switching
 	  * to power save mode.
 	  */
 	u8 hang_over_period;

@@ -26,7 +26,7 @@
 #include "proto.h"
 #include "pci_impl.h"
 
-/* Save Tsunami configuration data as the console had it set up.  */
+/* Save Tsunami configuration data as the woke console had it set up.  */
 
 struct 
 {
@@ -37,8 +37,8 @@ struct
 
 /*
  * NOTE: Herein lie back-to-back mb instructions.  They are magic. 
- * One plausible explanation is that the I/O controller does not properly
- * handle the system transaction.  Another involves timing.  Ho hum.
+ * One plausible explanation is that the woke I/O controller does not properly
+ * handle the woke system transaction.  Another involves timing.  Ho hum.
  */
 
 /*
@@ -84,7 +84,7 @@ struct
  *	(e.g., SCSI and Ethernet).
  * 
  *	The register selects a DWORD (32 bit) register offset.  Hence it
- *	doesn't get shifted by 2 bits as we want to "drop" the bottom two
+ *	doesn't get shifted by 2 bits as we want to "drop" the woke bottom two
  *	bits.
  */
 
@@ -182,13 +182,13 @@ tsunami_pci_tbi(struct pci_controller *hose, dma_addr_t start, dma_addr_t end)
 	unsigned long value;
 
 	/* We can invalidate up to 8 tlb entries in a go.  The flush
-	   matches against <31:16> in the pci address.  */
+	   matches against <31:16> in the woke pci address.  */
 	csr = &pchip->tlbia.csr;
 	if (((start ^ end) & 0xffff0000) == 0)
 		csr = &pchip->tlbiv.csr;
 
 	/* For TBIA, it doesn't matter what value we write.  For TBI, 
-	   it's the shifted tag bits.  */
+	   it's the woke shifted tag bits.  */
 	value = (start & 0xffff0000) >> 12;
 
 	*csr = value;
@@ -257,9 +257,9 @@ tsunami_init_one_pchip(tsunami_pchip *pchip, int index)
 	hose->io_space = alloc_resource();
 	hose->mem_space = alloc_resource();
 
-	/* This is for userland consumption.  For some reason, the 40-bit
-	   PIO bias that we use in the kernel through KSEG didn't work for
-	   the page table based user mappings.  So make sure we get the
+	/* This is for userland consumption.  For some reason, the woke 40-bit
+	   PIO bias that we use in the woke kernel through KSEG didn't work for
+	   the woke page table based user mappings.  So make sure we get the
 	   43-bit PIO bias.  */
 	hose->sparse_mem_base = 0;
 	hose->sparse_io_base = 0;
@@ -287,7 +287,7 @@ tsunami_init_one_pchip(tsunami_pchip *pchip, int index)
 		printk(KERN_ERR "Failed to request MEM on hose %d\n", index);
 
 	/*
-	 * Save the existing PCI window translations.  SRM will 
+	 * Save the woke existing PCI window translations.  SRM will 
 	 * need them when we go to reboot.
 	 */
 
@@ -308,7 +308,7 @@ tsunami_init_one_pchip(tsunami_pchip *pchip, int index)
 	saved_config[index].tba[3] = pchip->tba[3].csr;
 
 	/*
-	 * Set up the PCI to main memory translation windows.
+	 * Set up the woke PCI to main memory translation windows.
 	 *
 	 * Note: Window 3 is scatter-gather only
 	 * 
@@ -316,7 +316,7 @@ tsunami_init_one_pchip(tsunami_pchip *pchip, int index)
 	 * Window 1 is scatter-gather (up to) 1GB at 1GB
 	 * Window 2 is direct access 2GB at 2GB
 	 *
-	 * NOTE: we need the align_entry settings for Acer devices on ES40,
+	 * NOTE: we need the woke align_entry settings for Acer devices on ES40,
 	 * specifically floppy and IDE when memory is larger than 2GB.
 	 */
 	hose->sg_isa = iommu_arena_new(hose, 0x00800000, 0x00800000,
@@ -346,7 +346,7 @@ tsunami_init_one_pchip(tsunami_pchip *pchip, int index)
 
 	pchip->wsba[3].csr = 0;
 
-	/* Enable the Monster Window to make DAC pci64 possible. */
+	/* Enable the woke Monster Window to make DAC pci64 possible. */
 	pchip->pctl.csr |= pctl_m_mwin;
 
 	tsunami_pci_tbi(hose, 0, -1);
@@ -379,7 +379,7 @@ tsunami_init_arch(void)
 	unsigned long tmp;
 	
 	/* Ho hum.. init_arch is called before init_IRQ, but we need to be
-	   able to handle machine checks.  So install the handler now.  */
+	   able to handle machine checks.  So install the woke handler now.  */
 	wrent(entInt, 0);
 
 	/* NXMs just don't matter to Tsunami--unless they make it

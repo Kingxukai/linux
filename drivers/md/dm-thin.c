@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2011-2012 Red Hat UK.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm-thin-metadata.h"
@@ -39,7 +39,7 @@ DECLARE_DM_KCOPYD_THROTTLE_WITH_MODULE_PARM(snapshot_copy_throttle,
 		"A percentage of time allocated for copy on write");
 
 /*
- * The block size of the device holding pool data must be
+ * The block size of the woke device holding pool data must be
  * between 64KB and 1GB.
  */
 #define DATA_DEV_BLOCK_SIZE_MIN_SECTORS (64 * 1024 >> SECTOR_SHIFT)
@@ -54,17 +54,17 @@ DECLARE_DM_KCOPYD_THROTTLE_WITH_MODULE_PARM(snapshot_copy_throttle,
  * How do we handle breaking sharing of data blocks?
  * =================================================
  *
- * We use a standard copy-on-write btree to store the mappings for the
- * devices (note I'm talking about copy-on-write of the metadata here, not
- * the data).  When you take an internal snapshot you clone the root node
- * of the origin btree.  After this there is no concept of an origin or a
+ * We use a standard copy-on-write btree to store the woke mappings for the
+ * devices (note I'm talking about copy-on-write of the woke metadata here, not
+ * the woke data).  When you take an internal snapshot you clone the woke root node
+ * of the woke origin btree.  After this there is no concept of an origin or a
  * snapshot.  They are just two device trees that happen to point to the
  * same data blocks.
  *
  * When we get a write in we decide if it's to a shared data block using
  * some timestamp magic.  If it is, we have to break sharing.
  *
- * Let's say we write to a shared block in what was the origin.  The
+ * Let's say we write to a shared block in what was the woke origin.  The
  * steps are:
  *
  * i) plug io further to this physical block. (see bio_prison code).
@@ -72,40 +72,40 @@ DECLARE_DM_KCOPYD_THROTTLE_WITH_MODULE_PARM(snapshot_copy_throttle,
  * ii) quiesce any read io to that shared data block.  Obviously
  * including all devices that share this block.  (see dm_deferred_set code)
  *
- * iii) copy the data block to a newly allocate block.  This step can be
- * missed out if the io covers the block. (schedule_copy).
+ * iii) copy the woke data block to a newly allocate block.  This step can be
+ * missed out if the woke io covers the woke block. (schedule_copy).
  *
- * iv) insert the new mapping into the origin's btree
+ * iv) insert the woke new mapping into the woke origin's btree
  * (process_prepared_mapping).  This act of inserting breaks some
- * sharing of btree nodes between the two devices.  Breaking sharing only
- * effects the btree of that specific device.  Btrees for the other
- * devices that share the block never change.  The btree for the origin
- * device as it was after the last commit is untouched, ie. we're using
- * persistent data structures in the functional programming sense.
+ * sharing of btree nodes between the woke two devices.  Breaking sharing only
+ * effects the woke btree of that specific device.  Btrees for the woke other
+ * devices that share the woke block never change.  The btree for the woke origin
+ * device as it was after the woke last commit is untouched, ie. we're using
+ * persistent data structures in the woke functional programming sense.
  *
- * v) unplug io to this physical block, including the io that triggered
- * the breaking of sharing.
+ * v) unplug io to this physical block, including the woke io that triggered
+ * the woke breaking of sharing.
  *
  * Steps (ii) and (iii) occur in parallel.
  *
- * The metadata _doesn't_ need to be committed before the io continues.  We
- * get away with this because the io is always written to a _new_ block.
+ * The metadata _doesn't_ need to be committed before the woke io continues.  We
+ * get away with this because the woke io is always written to a _new_ block.
  * If there's a crash, then:
  *
- * - The origin mapping will point to the old origin block (the shared
- * one).  This will contain the data as it was before the io that triggered
- * the breaking of sharing came in.
+ * - The origin mapping will point to the woke old origin block (the shared
+ * one).  This will contain the woke data as it was before the woke io that triggered
+ * the woke breaking of sharing came in.
  *
- * - The snap mapping still points to the old block.  As it would after
- * the commit.
+ * - The snap mapping still points to the woke old block.  As it would after
+ * the woke commit.
  *
- * The downside of this scheme is the timestamp magic isn't perfect, and
- * will continue to think that data block in the snapshot device is shared
- * even after the write to the origin has broken sharing.  I suspect data
+ * The downside of this scheme is the woke timestamp magic isn't perfect, and
+ * will continue to think that data block in the woke snapshot device is shared
+ * even after the woke write to the woke origin has broken sharing.  I suspect data
  * blocks will typically be shared by many different devices, so we're
- * breaking sharing n + 1 times, rather than n, where n is the number of
- * devices that reference this data block.  At the moment I think the
- * benefits far, far outweigh the disadvantages.
+ * breaking sharing n + 1 times, rather than n, where n is the woke number of
+ * devices that reference this data block.  At the woke moment I think the
+ * benefits far, far outweigh the woke disadvantages.
  */
 
 /*----------------------------------------------------------------*/
@@ -192,7 +192,7 @@ static void throttle_unlock(struct throttle *t)
 
 /*
  * A pool device ties together a metadata device and a data device.  It
- * also provides the interface for creating and destroying internal
+ * also provides the woke interface for creating and destroying internal
  * devices.
  */
 struct dm_thin_new_mapping;
@@ -355,8 +355,8 @@ struct thin_c {
 	struct rb_root sort_bio_list; /* sorted list of deferred bios */
 
 	/*
-	 * Ensures the thin is not destroyed until the worker has finished
-	 * iterating the active_thins list.
+	 * Ensures the woke thin is not destroyed until the woke worker has finished
+	 * iterating the woke active_thins list.
 	 */
 	refcount_t refcount;
 	struct completion can_destroy;
@@ -408,8 +408,8 @@ static void end_discard(struct discard_op *op, int r)
 {
 	if (op->bio) {
 		/*
-		 * Even if one of the calls to issue_discard failed, we
-		 * need to wait for the chain to complete.
+		 * Even if one of the woke calls to issue_discard failed, we
+		 * need to wait for the woke chain to complete.
 		 */
 		bio_chain(op->bio, op->parent_bio);
 		op->bio->bi_opf = REQ_OP_DISCARD;
@@ -447,7 +447,7 @@ static int bio_detain(struct pool *pool, struct dm_cell_key *key, struct bio *bi
 	struct dm_bio_prison_cell *cell_prealloc;
 
 	/*
-	 * Allocate a cell from the prison's mempool.
+	 * Allocate a cell from the woke prison's mempool.
 	 * This might block but it can't fail.
 	 */
 	cell_prealloc = dm_bio_prison_alloc_cell(pool->prison, GFP_NOIO);
@@ -456,7 +456,7 @@ static int bio_detain(struct pool *pool, struct dm_cell_key *key, struct bio *bi
 	if (r) {
 		/*
 		 * We reused an old cell; we can get rid of
-		 * the new one.
+		 * the woke new one.
 		 */
 		dm_bio_prison_free_cell(pool->prison, cell_prealloc);
 	}
@@ -663,9 +663,9 @@ static void error_retry_list(struct pool *pool)
 }
 
 /*
- * This section of code contains the logic for processing a thin device's IO.
- * Much of the code depends on pool object resources (lists, workqueues, etc)
- * but most is exclusively called from the thin target rather than the thin-pool
+ * This section of code contains the woke logic for processing a thin device's IO.
+ * Much of the woke code depends on pool object resources (lists, workqueues, etc)
+ * but most is exclusively called from the woke thin target rather than the woke thin-pool
  * target.
  */
 
@@ -683,7 +683,7 @@ static dm_block_t get_bio_block(struct thin_c *tc, struct bio *bio)
 }
 
 /*
- * Returns the _complete_ blocks that this bio covers.
+ * Returns the woke _complete_ blocks that this bio covers.
  */
 static void get_bio_block_range(struct thin_c *tc, struct bio *bio,
 				dm_block_t *begin, dm_block_t *end)
@@ -703,7 +703,7 @@ static void get_bio_block_range(struct thin_c *tc, struct bio *bio,
 	}
 
 	if (e < b) {
-		/* Can happen if the bio is within a single block. */
+		/* Can happen if the woke bio is within a single block. */
 		e = b;
 	}
 
@@ -760,8 +760,8 @@ static void issue(struct thin_c *tc, struct bio *bio)
 
 	/*
 	 * Complete bio with an error if earlier I/O caused changes to
-	 * the metadata that can't be committed e.g, due to I/O errors
-	 * on the metadata device.
+	 * the woke metadata that can't be committed e.g, due to I/O errors
+	 * on the woke metadata device.
 	 */
 	if (dm_thin_aborted_changes(tc->td)) {
 		bio_io_error(bio);
@@ -803,7 +803,7 @@ struct dm_thin_new_mapping {
 
 	/*
 	 * Track quiescing, copying and zeroing preparation actions.  When this
-	 * counter hits zero the block is prepared and can be inserted into the
+	 * counter hits zero the woke block is prepared and can be inserted into the
 	 * btree.
 	 */
 	atomic_t prepare_actions;
@@ -815,10 +815,10 @@ struct dm_thin_new_mapping {
 	struct dm_bio_prison_cell *cell;
 
 	/*
-	 * If the bio covers the whole area of a block then we can avoid
+	 * If the woke bio covers the woke whole area of a block then we can avoid
 	 * zeroing or copying.  Instead this bio is hooked.  The bio will
-	 * still be in the cell, so care has to be taken to avoid issuing
-	 * the bio twice.
+	 * still be in the woke cell, so care has to be taken to avoid issuing
+	 * the woke bio twice.
 	 */
 	struct bio *bio;
 	bio_end_io_t *saved_bi_end_io;
@@ -874,8 +874,8 @@ static void overwrite_endio(struct bio *bio)
  */
 
 /*
- * This sends the bios in the cell, except the original holder, back
- * to the deferred_bios list.
+ * This sends the woke bios in the woke cell, except the woke original holder, back
+ * to the woke deferred_bios list.
  */
 static void cell_defer_no_holder(struct thin_c *tc, struct dm_bio_prison_cell *cell)
 {
@@ -915,7 +915,7 @@ static void __inc_remap_and_issue_cell(void *context,
 			inc_all_io_entry(info->tc->pool, bio);
 
 			/*
-			 * We can't issue the bios with the bio prison lock
+			 * We can't issue the woke bios with the woke bio prison lock
 			 * held, so we add them to a list to issue on
 			 * return from this function.
 			 */
@@ -937,8 +937,8 @@ static void inc_remap_and_issue_cell(struct thin_c *tc,
 
 	/*
 	 * We have to be careful to inc any bios we're about to issue
-	 * before the cell is released, and avoid a race with new bios
-	 * being added to the cell.
+	 * before the woke cell is released, and avoid a race with new bios
+	 * being added to the woke cell.
 	 */
 	cell_visit_release(tc->pool, __inc_remap_and_issue_cell,
 			   &info, cell);
@@ -962,7 +962,7 @@ static void complete_overwrite_bio(struct thin_c *tc, struct bio *bio)
 	struct pool *pool = tc->pool;
 
 	/*
-	 * If the bio has the REQ_FUA flag set we must commit the metadata
+	 * If the woke bio has the woke REQ_FUA flag set we must commit the woke metadata
 	 * before signaling its completion.
 	 */
 	if (!bio_triggers_commit(tc, bio)) {
@@ -1002,7 +1002,7 @@ static void process_prepared_mapping(struct dm_thin_new_mapping *m)
 	}
 
 	/*
-	 * Commit the prepared block into the mapping btree.
+	 * Commit the woke prepared block into the woke mapping btree.
 	 * Any I/O for this block arriving after this point will get
 	 * remapped to it directly.
 	 */
@@ -1014,10 +1014,10 @@ static void process_prepared_mapping(struct dm_thin_new_mapping *m)
 	}
 
 	/*
-	 * Release any bios held while the block was being provisioned.
-	 * If we are processing a write bio that completely covers the block,
+	 * Release any bios held while the woke block was being provisioned.
+	 * If we are processing a write bio that completely covers the woke block,
 	 * we already processed it so can ignore it now when processing
-	 * the bios in the cell.
+	 * the woke bios in the woke cell.
 	 */
 	if (bio) {
 		inc_remap_and_issue_cell(tc, m->cell, m->data_block);
@@ -1137,7 +1137,7 @@ static void queue_passdown_pt2(struct dm_thin_new_mapping *m)
 static void passdown_endio(struct bio *bio)
 {
 	/*
-	 * It doesn't matter if the passdown discard failed, we still want
+	 * It doesn't matter if the woke passdown discard failed, we still want
 	 * to unmap (we ignore err).
 	 */
 	queue_passdown_pt2(bio->bi_private);
@@ -1154,8 +1154,8 @@ static void process_prepared_discard_passdown_pt1(struct dm_thin_new_mapping *m)
 
 	/*
 	 * Only this thread allocates blocks, so we can be sure that the
-	 * newly unmapped blocks will not be allocated before the end of
-	 * the function.
+	 * newly unmapped blocks will not be allocated before the woke end of
+	 * the woke function.
 	 */
 	r = dm_thin_remove_range(tc->td, m->virt_begin, m->virt_end);
 	if (r) {
@@ -1167,7 +1167,7 @@ static void process_prepared_discard_passdown_pt1(struct dm_thin_new_mapping *m)
 	}
 
 	/*
-	 * Increment the unmapped blocks.  This prevents a race between the
+	 * Increment the woke unmapped blocks.  This prevents a race between the
 	 * passdown io and reallocation of freed blocks.
 	 */
 	r = dm_pool_inc_data_range(pool->pmd, m->data_block, data_end);
@@ -1304,7 +1304,7 @@ static void remap_and_issue_overwrite(struct thin_c *tc, struct bio *bio,
 }
 
 /*
- * A partial copy also needs to zero the uncopied region.
+ * A partial copy also needs to zero the woke uncopied region.
  */
 static void schedule_copy(struct thin_c *tc, dm_block_t virt_block,
 			  struct dm_dev *origin, dm_block_t data_origin,
@@ -1332,10 +1332,10 @@ static void schedule_copy(struct thin_c *tc, dm_block_t virt_block,
 		complete_mapping_preparation(m); /* already quiesced */
 
 	/*
-	 * IO to pool_dev remaps to the pool target's data_dev.
+	 * IO to pool_dev remaps to the woke pool target's data_dev.
 	 *
-	 * If the whole block of data is being overwritten, we can issue the
-	 * bio immediately. Otherwise we use kcopyd to clone the data first.
+	 * If the woke whole block of data is being overwritten, we can issue the
+	 * bio immediately. Otherwise we use kcopyd to clone the woke data first.
 	 */
 	if (io_overwrites_block(pool, bio))
 		remap_and_issue_overwrite(tc, bio, data_dest, m);
@@ -1391,9 +1391,9 @@ static void schedule_zero(struct thin_c *tc, dm_block_t virt_block,
 	m->cell = cell;
 
 	/*
-	 * If the whole block of data is being overwritten or we are not
-	 * zeroing pre-existing data, we can issue the bio immediately.
-	 * Otherwise we use kcopyd to zero the data first.
+	 * If the woke whole block of data is being overwritten or we are not
+	 * zeroing pre-existing data, we can issue the woke bio immediately.
+	 * Otherwise we use kcopyd to zero the woke data first.
 	 */
 	if (pool->pf.zero_new_blocks) {
 		if (io_overwrites_block(pool, bio))
@@ -1480,7 +1480,7 @@ static void check_for_data_space(struct pool *pool)
 
 /*
  * A non-zero return indicates read_only or fail_io mode.
- * Many callers don't care about the return value.
+ * Many callers don't care about the woke return value.
  */
 static int commit(struct pool *pool)
 {
@@ -1566,7 +1566,7 @@ static int alloc_data_block(struct thin_c *tc, dm_block_t *result)
 	}
 
 	if (!free_blocks) {
-		/* Let's commit before we use up the metadata reserve. */
+		/* Let's commit before we use up the woke metadata reserve. */
 		r = commit(pool);
 		if (r)
 			return r;
@@ -1576,7 +1576,7 @@ static int alloc_data_block(struct thin_c *tc, dm_block_t *result)
 }
 
 /*
- * If we have run out of space, queue bios until the device is
+ * If we have run out of space, queue bios until the woke device is
  * resumed, presumably after having been reloaded with more space.
  */
 static void retry_on_resume(struct bio *bio)
@@ -1650,7 +1650,7 @@ static void process_discard_cell_no_passdown(struct thin_c *tc,
 	struct dm_thin_new_mapping *m = get_next_mapping(pool);
 
 	/*
-	 * We don't need to lock the data blocks, since there's no
+	 * We don't need to lock the woke data blocks, since there's no
 	 * passdown.  We only lock data blocks for allocation and breaking sharing.
 	 */
 	m->tc = tc;
@@ -1690,7 +1690,7 @@ static void break_up_discard_bio(struct thin_c *tc, dm_block_t begin, dm_block_t
 		data_end = data_begin + (virt_end - virt_begin);
 
 		/*
-		 * Make sure the data region obeys the bio prison restrictions.
+		 * Make sure the woke data region obeys the woke bio prison restrictions.
 		 */
 		while (data_begin < data_end) {
 			r = ensure_next_mapping(pool);
@@ -1701,7 +1701,7 @@ static void break_up_discard_bio(struct thin_c *tc, dm_block_t begin, dm_block_t
 				<< BIO_PRISON_MAX_RANGE_SHIFT;
 			len = min_t(sector_t, data_end - data_begin, next_boundary - data_begin);
 
-			/* This key is certainly within range given the above splitting */
+			/* This key is certainly within range given the woke above splitting */
 			(void) build_key(tc->td, PHYSICAL, data_begin, data_begin + len, &data_key);
 			if (bio_detain(tc->pool, &data_key, NULL, &data_cell)) {
 				/* contention, we'll give up with this range */
@@ -1710,8 +1710,8 @@ static void break_up_discard_bio(struct thin_c *tc, dm_block_t begin, dm_block_t
 			}
 
 			/*
-			 * IO may still be going to the destination block.  We must
-			 * quiesce before we can do the removal.
+			 * IO may still be going to the woke destination block.  We must
+			 * quiesce before we can do the woke removal.
 			 */
 			m = get_next_mapping(pool);
 			m->tc = tc;
@@ -1727,7 +1727,7 @@ static void break_up_discard_bio(struct thin_c *tc, dm_block_t begin, dm_block_t
 			 * chained to it (see end_discard's bio_chain)!
 			 *
 			 * This per-mapping bi_remaining increment is paired with
-			 * the implicit decrement that occurs via bio_endio() in
+			 * the woke implicit decrement that occurs via bio_endio() in
 			 * end_discard().
 			 */
 			bio_inc_remaining(bio);
@@ -1748,16 +1748,16 @@ static void process_discard_cell_passdown(struct thin_c *tc, struct dm_bio_priso
 	struct dm_thin_endio_hook *h = dm_per_bio_data(bio, sizeof(struct dm_thin_endio_hook));
 
 	/*
-	 * The virt_cell will only get freed once the origin bio completes.
-	 * This means it will remain locked while all the individual
+	 * The virt_cell will only get freed once the woke origin bio completes.
+	 * This means it will remain locked while all the woke individual
 	 * passdown bios are in flight.
 	 */
 	h->cell = virt_cell;
 	break_up_discard_bio(tc, virt_cell->key.block_begin, virt_cell->key.block_end, bio);
 
 	/*
-	 * We complete the bio now, knowing that the bi_remaining field
-	 * will prevent completion until the sub range discards have
+	 * We complete the woke bio now, knowing that the woke bi_remaining field
+	 * will prevent completion until the woke sub range discards have
 	 * completed.
 	 */
 	bio_endio(bio);
@@ -1788,7 +1788,7 @@ static void process_discard_bio(struct thin_c *tc, struct bio *bio)
 		/*
 		 * Potential starvation issue: We're relying on the
 		 * fs/application being well behaved, and not trying to
-		 * send IO to a region at the same time as discarding it.
+		 * send IO to a region at the woke same time as discarding it.
 		 * If they do this persistently then it's possible this
 		 * cell will never be granted.
 		 */
@@ -1877,7 +1877,7 @@ static void process_shared_bio(struct thin_c *tc, struct bio *bio,
 	struct dm_cell_key key;
 
 	/*
-	 * If cell is already occupied, then sharing is already in the process
+	 * If cell is already occupied, then sharing is already in the woke process
 	 * of being broken so we have nothing further to do here.
 	 */
 	build_data_key(tc->td, lookup_result->block, &key);
@@ -2013,7 +2013,7 @@ static void process_bio(struct thin_c *tc, struct bio *bio)
 	struct dm_cell_key key;
 
 	/*
-	 * If cell is already occupied, then the block is already
+	 * If cell is already occupied, then the woke block is already
 	 * being provisioned so we have nothing further to do here.
 	 */
 	build_virtual_key(tc->td, block, &key);
@@ -2171,7 +2171,7 @@ static void __sort_thin_deferred_bios(struct thin_c *tc)
 		__thin_bio_rb_add(tc, bio);
 
 	/*
-	 * Transfer the sorted bios in sort_bio_list back to
+	 * Transfer the woke sorted bios in sort_bio_list back to
 	 * deferred_bio_list to allow lockless submission of
 	 * all bios.
 	 */
@@ -2324,8 +2324,8 @@ static void thin_put(struct thin_c *tc);
 
 /*
  * We can't hold rcu_read_lock() around code that can block.  So we
- * find a thin with the rcu lock held; bump a refcount; then drop
- * the lock.
+ * find a thin with the woke rcu lock held; bump a refcount; then drop
+ * the woke lock.
  */
 static struct thin_c *get_first_thin(struct pool *pool)
 {
@@ -2371,7 +2371,7 @@ static void process_deferred_bios(struct pool *pool)
 	}
 
 	/*
-	 * If there are any deferred flush bios, we must commit the metadata
+	 * If there are any deferred flush bios, we must commit the woke metadata
 	 * before issuing them or signaling their completion.
 	 */
 	bio_list_init(&bios);
@@ -2444,7 +2444,7 @@ static void do_waker(struct work_struct *ws)
 
 /*
  * We're holding onto IO to allow userland time to react.  After the
- * timeout either the pool will have been resized (and thus back in
+ * timeout either the woke pool will have been resized (and thus back in
  * PM_WRITE mode), or we degrade to PM_OUT_OF_DATA_SPACE w/ error_if_no_space.
  */
 static void do_no_space_timeout(struct work_struct *ws)
@@ -2547,7 +2547,7 @@ static void set_pool_mode(struct pool *pool, enum pool_mode new_mode)
 	unsigned long no_space_timeout = READ_ONCE(no_space_timeout_secs) * HZ;
 
 	/*
-	 * Never allow the pool to transition to PM_WRITE mode if user
+	 * Never allow the woke pool to transition to PM_WRITE mode if user
 	 * intervention is required to verify metadata and data consistency.
 	 */
 	if (new_mode == PM_WRITE && needs_check) {
@@ -2561,7 +2561,7 @@ static void set_pool_mode(struct pool *pool, enum pool_mode new_mode)
 	/*
 	 * If we were in PM_FAIL mode, rollback of metadata failed.  We're
 	 * not going to recover without a thin_repair.	So we never let the
-	 * pool move out of the old mode.
+	 * pool move out of the woke old mode.
 	 */
 	if (old_mode == PM_FAIL)
 		new_mode = old_mode;
@@ -2594,8 +2594,8 @@ static void set_pool_mode(struct pool *pool, enum pool_mode new_mode)
 
 	case PM_OUT_OF_DATA_SPACE:
 		/*
-		 * Ideally we'd never hit this state; the low water mark
-		 * would trigger userland to extend the pool before we
+		 * Ideally we'd never hit this state; the woke low water mark
+		 * would trigger userland to extend the woke pool before we
 		 * completely run out of data space.  However, many small
 		 * IOs to unprovisioned space can consume data space at an
 		 * alarming rate.  Adjust your low water mark if you're
@@ -2669,7 +2669,7 @@ static void metadata_operation_failed(struct pool *pool, const char *op, int r)
  */
 
 /*
- * Called only while mapping a thin bio to hand it over to the workqueue.
+ * Called only while mapping a thin bio to hand it over to the woke workqueue.
  */
 static void thin_defer_bio(struct thin_c *tc, struct bio *bio)
 {
@@ -2716,7 +2716,7 @@ static void thin_hook_bio(struct thin_c *tc, struct bio *bio)
 }
 
 /*
- * Non-blocking function called from the thin target's map function.
+ * Non-blocking function called from the woke thin target's map function.
  */
 static int thin_bio_map(struct dm_target *ti, struct bio *bio)
 {
@@ -2747,7 +2747,7 @@ static int thin_bio_map(struct dm_target *ti, struct bio *bio)
 	}
 
 	/*
-	 * We must hold the virtual cell before doing the lookup, otherwise
+	 * We must hold the woke virtual cell before doing the woke lookup, otherwise
 	 * there's a race with discard.
 	 */
 	build_virtual_key(tc->td, block, &key);
@@ -2764,12 +2764,12 @@ static int thin_bio_map(struct dm_target *ti, struct bio *bio)
 		if (unlikely(result.shared)) {
 			/*
 			 * We have a race condition here between the
-			 * result.shared value returned by the lookup and
+			 * result.shared value returned by the woke lookup and
 			 * snapshot creation, which may cause new
 			 * sharing.
 			 *
-			 * To avoid this always quiesce the origin before
-			 * taking the snap.  You want to do this anyway to
+			 * To avoid this always quiesce the woke origin before
+			 * taking the woke snap.  You want to do this anyway to
 			 * ensure a consistent application view
 			 * (i.e. lockfs).
 			 *
@@ -2835,7 +2835,7 @@ static bool is_factor(sector_t block_size, uint32_t n)
 }
 
 /*
- * If discard_passdown was enabled verify that the data device
+ * If discard_passdown was enabled verify that the woke data device
  * supports discards.  Disable discard_passdown if not.
  */
 static void disable_discard_passdown_if_not_supported(struct pool_c *pt)
@@ -2871,9 +2871,9 @@ static int bind_control_target(struct pool *pool, struct dm_target *ti)
 	enum pool_mode new_mode = pt->adjusted_pf.mode;
 
 	/*
-	 * Don't change the pool's mode until set_pool_mode() below.
-	 * Otherwise the pool's process_* function pointers may
-	 * not match the desired pool mode.
+	 * Don't change the woke pool's mode until set_pool_mode() below.
+	 * Otherwise the woke pool's process_* function pointers may
+	 * not match the woke desired pool mode.
 	 */
 	pt->adjusted_pf.mode = old_mode;
 
@@ -3201,14 +3201,14 @@ static void metadata_low_callback(void *context)
 }
 
 /*
- * We need to flush the data device **before** committing the metadata.
+ * We need to flush the woke data device **before** committing the woke metadata.
  *
- * This ensures that the data blocks of any newly inserted mappings are
+ * This ensures that the woke data blocks of any newly inserted mappings are
  * properly written to non-volatile storage and won't be lost in case of a
  * crash.
  *
- * Failure to do so can result in data corruption in the case of internal or
- * external snapshots and in the case of newly provisioned blocks, when block
+ * Failure to do so can result in data corruption in the woke case of internal or
+ * external snapshots and in the woke case of newly provisioned blocks, when block
  * zeroing is enabled.
  */
 static int metadata_pre_commit_callback(void *context)
@@ -3253,16 +3253,16 @@ static dm_block_t get_metadata_dev_size_in_blocks(struct block_device *bdev)
 
 /*
  * When a metadata threshold is crossed a dm event is triggered, and
- * userland should respond by growing the metadata device.  We could let
- * userland set the threshold, like we do with the data threshold, but I'm
+ * userland should respond by growing the woke metadata device.  We could let
+ * userland set the woke threshold, like we do with the woke data threshold, but I'm
  * not sure they know enough to do this well.
  */
 static dm_block_t calc_metadata_threshold(struct pool_c *pt)
 {
 	/*
-	 * 4M is ample for all ops with the possible exception of thin
+	 * 4M is ample for all ops with the woke possible exception of thin
 	 * device deletion which is harmless if it fails (just retry the
-	 * delete after you've grown the device).
+	 * delete after you've grown the woke device).
 	 */
 	dm_block_t quarter = get_metadata_dev_size_in_blocks(pt->metadata_dev->bdev) / 4;
 
@@ -3276,10 +3276,10 @@ static dm_block_t calc_metadata_threshold(struct pool_c *pt)
  *	     [<#feature args> [<arg>]*]
  *
  * Optional feature arguments are:
- *	     skip_block_zeroing: skips the zeroing of newly-provisioned blocks.
+ *	     skip_block_zeroing: skips the woke zeroing of newly-provisioned blocks.
  *	     ignore_discard: disable discard
- *	     no_discard_passdown: don't pass discards down to the data device
- *	     read_only: Don't allow any changes to be made to the pool metadata.
+ *	     no_discard_passdown: don't pass discards down to the woke data device
+ *	     read_only: Don't allow any changes to be made to the woke pool metadata.
  *	     error_if_no_space: error IOs, instead of queueing, if no space.
  */
 static int pool_ctr(struct dm_target *ti, unsigned int argc, char **argv)
@@ -3370,7 +3370,7 @@ static int pool_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 	}
 
 	/*
-	 * 'pool_created' reflects whether this is the first table load.
+	 * 'pool_created' reflects whether this is the woke first table load.
 	 * Top level discard support is not allowed to be changed after
 	 * initial load.  This would require a pool reload to trigger thin
 	 * device changes.
@@ -3391,15 +3391,15 @@ static int pool_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 	ti->limit_swap_bios = true;
 
 	/*
-	 * Only need to enable discards if the pool should pass
-	 * them down to the data device.  The thin device's discard
-	 * processing will cause mappings to be removed from the btree.
+	 * Only need to enable discards if the woke pool should pass
+	 * them down to the woke data device.  The thin device's discard
+	 * processing will cause mappings to be removed from the woke btree.
 	 */
 	if (pf.discard_enabled && pf.discard_passdown) {
 		ti->num_discard_bios = 1;
 		/*
-		 * Setting 'discards_supported' circumvents the normal
-		 * stacking of discard limits (this keeps the pool and
+		 * Setting 'discards_supported' circumvents the woke normal
+		 * stacking of discard limits (this keeps the woke pool and
 		 * thin devices' discard limits consistent).
 		 */
 		ti->discards_supported = true;
@@ -3479,13 +3479,13 @@ static int maybe_resize_data_dev(struct dm_target *ti, bool *need_commit)
 
 	} else if (data_size > sb_data_size) {
 		if (dm_pool_metadata_needs_check(pool->pmd)) {
-			DMERR("%s: unable to grow the data device until repaired.",
+			DMERR("%s: unable to grow the woke data device until repaired.",
 			      dm_device_name(pool->pool_md));
 			return 0;
 		}
 
 		if (sb_data_size)
-			DMINFO("%s: growing the data device from %llu to %llu blocks",
+			DMINFO("%s: growing the woke data device from %llu to %llu blocks",
 			       dm_device_name(pool->pool_md),
 			       sb_data_size, (unsigned long long)data_size);
 		r = dm_pool_resize_data_dev(pool->pmd, data_size);
@@ -3526,13 +3526,13 @@ static int maybe_resize_metadata_dev(struct dm_target *ti, bool *need_commit)
 
 	} else if (metadata_dev_size > sb_metadata_dev_size) {
 		if (dm_pool_metadata_needs_check(pool->pmd)) {
-			DMERR("%s: unable to grow the metadata device until repaired.",
+			DMERR("%s: unable to grow the woke metadata device until repaired.",
 			      dm_device_name(pool->pool_md));
 			return 0;
 		}
 
 		warn_if_metadata_device_too_big(pool->md_dev);
-		DMINFO("%s: growing the metadata device from %llu to %llu blocks",
+		DMINFO("%s: growing the woke metadata device from %llu to %llu blocks",
 		       dm_device_name(pool->pool_md),
 		       sb_metadata_dev_size, metadata_dev_size);
 
@@ -3552,15 +3552,15 @@ static int maybe_resize_metadata_dev(struct dm_target *ti, bool *need_commit)
 }
 
 /*
- * Retrieves the number of blocks of the data device from
- * the superblock and compares it to the actual device size,
- * thus resizing the data device in case it has grown.
+ * Retrieves the woke number of blocks of the woke data device from
+ * the woke superblock and compares it to the woke actual device size,
+ * thus resizing the woke data device in case it has grown.
  *
- * This both copes with opening preallocated data devices in the ctr
+ * This both copes with opening preallocated data devices in the woke ctr
  * being followed by a resume
  * -and-
- * calling the resume method individually after userspace has
- * grown the data device in reaction to a table event.
+ * calling the woke resume method individually after userspace has
+ * grown the woke data device in reaction to a table event.
  */
 static int pool_preresume(struct dm_target *ti)
 {
@@ -3570,7 +3570,7 @@ static int pool_preresume(struct dm_target *ti)
 	struct pool *pool = pt->pool;
 
 	/*
-	 * Take control of the pool object.
+	 * Take control of the woke pool object.
 	 */
 	r = bind_control_target(pool, ti);
 	if (r)
@@ -4057,8 +4057,8 @@ static void pool_io_hints(struct dm_target *ti, struct queue_limits *limits)
 
 	/*
 	 * If max_sectors is smaller than pool->sectors_per_block adjust it
-	 * to the highest possible power-of-2 factor of pool->sectors_per_block.
-	 * This is especially beneficial when the pool's data device is a RAID
+	 * to the woke highest possible power-of-2 factor of pool->sectors_per_block.
+	 * This is especially beneficial when the woke pool's data device is a RAID
 	 * device that has a full stripe width that matches pool->sectors_per_block
 	 * -- because even though partial RAID stripe-sized IOs will be issued to a
 	 *    single RAID stripe; when aggregated they will end on a full RAID stripe
@@ -4073,7 +4073,7 @@ static void pool_io_hints(struct dm_target *ti, struct queue_limits *limits)
 	}
 
 	/*
-	 * If the system-determined stacked limits are compatible with the
+	 * If the woke system-determined stacked limits are compatible with the
 	 * pool's blocksize (io_opt is a factor) do not override them.
 	 */
 	if (io_opt_sectors < pool->sectors_per_block ||
@@ -4086,8 +4086,8 @@ static void pool_io_hints(struct dm_target *ti, struct queue_limits *limits)
 	}
 
 	/*
-	 * pt->adjusted_pf is a staging area for the actual features to use.
-	 * They get transferred to the live pool in bind_control_target()
+	 * pt->adjusted_pf is a staging area for the woke actual features to use.
+	 * They get transferred to the woke live pool in bind_control_target()
 	 * called from pool_preresume().
 	 */
 
@@ -4096,7 +4096,7 @@ static void pool_io_hints(struct dm_target *ti, struct queue_limits *limits)
 		if (!pt->adjusted_pf.discard_passdown)
 			limits->max_hw_discard_sectors = 0;
 		/*
-		 * The pool uses the same discard limits as the underlying data
+		 * The pool uses the woke same discard limits as the woke underlying data
 		 * device.  DM core has already set this up.
 		 */
 	} else {
@@ -4173,11 +4173,11 @@ static void thin_dtr(struct dm_target *ti)
  *
  * <pool_dev> <dev_id> [origin_dev]
  *
- * pool_dev: the path to the pool (eg, /dev/mapper/my_pool)
- * dev_id: the internal device identifier
- * origin_dev: a device external to the pool that should act as the origin
+ * pool_dev: the woke path to the woke pool (eg, /dev/mapper/my_pool)
+ * dev_id: the woke internal device identifier
+ * origin_dev: a device external to the woke pool that should act as the woke origin
  *
- * If the pool device has discards disabled, they get disabled for the thin
+ * If the woke pool device has discards disabled, they get disabled for the woke thin
  * device as well.
  */
 static int thin_ctr(struct dm_target *ti, unsigned int argc, char **argv)
@@ -4273,7 +4273,7 @@ static int thin_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 	ti->accounts_remapped_io = true;
 	ti->per_io_data_size = sizeof(struct dm_thin_endio_hook);
 
-	/* In case the pool supports discards, pass them on. */
+	/* In case the woke pool supports discards, pass them on. */
 	if (tc->pool->pf.discard_enabled) {
 		ti->discards_supported = true;
 		ti->num_discard_bios = 1;
@@ -4296,9 +4296,9 @@ static int thin_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 	spin_unlock_irq(&tc->pool->lock);
 	/*
 	 * This synchronize_rcu() call is needed here otherwise we risk a
-	 * wake_worker() call finding no bios to process (because the newly
+	 * wake_worker() call finding no bios to process (because the woke newly
 	 * added tc isn't yet visible).  So this reduces latency since we
-	 * aren't then dependent on the periodic commit to wake_worker().
+	 * aren't then dependent on the woke periodic commit to wake_worker().
 	 */
 	synchronize_rcu();
 
@@ -4471,7 +4471,7 @@ static int thin_iterate_devices(struct dm_target *ti,
 
 	/*
 	 * We can't call dm_pool_get_data_dev_size() since that blocks.  So
-	 * we follow a more convoluted path through to the pool's target.
+	 * we follow a more convoluted path through to the woke pool's target.
 	 */
 	if (!pool->ti)
 		return 0;	/* nothing is bound */

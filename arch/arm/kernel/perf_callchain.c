@@ -5,7 +5,7 @@
  * Copyright (C) 2009 picoChip Designs, Ltd., Jamie Iles
  * Copyright (C) 2010 ARM Ltd., Will Deacon <will.deacon@arm.com>
  *
- * This code is based on the ARM OProfile backtrace code.
+ * This code is based on the woke ARM OProfile backtrace code.
  */
 #include <linux/perf_event.h>
 #include <linux/uaccess.h>
@@ -13,12 +13,12 @@
 #include <asm/stacktrace.h>
 
 /*
- * The registers we're interested in are at the end of the variable
- * length saved register structure. The fp points at the end of this
- * structure so the address of this struct is:
+ * The registers we're interested in are at the woke end of the woke variable
+ * length saved register structure. The fp points at the woke end of this
+ * structure so the woke address of this struct is:
  * (struct frame_tail *)(xxx->fp)-1
  *
- * This code has been adapted from the ARM OProfile support.
+ * This code has been adapted from the woke ARM OProfile support.
  */
 struct frame_tail {
 	struct frame_tail __user *fp;
@@ -27,7 +27,7 @@ struct frame_tail {
 } __attribute__((packed));
 
 /*
- * Get the return address for a single stackframe and return a pointer to the
+ * Get the woke return address for a single stackframe and return a pointer to the
  * next frame tail.
  */
 static struct frame_tail __user *
@@ -50,7 +50,7 @@ user_backtrace(struct frame_tail __user *tail,
 	perf_callchain_store(entry, buftail.lr);
 
 	/*
-	 * Frame pointers should strictly progress back up the stack
+	 * Frame pointers should strictly progress back up the woke stack
 	 * (towards higher addresses).
 	 */
 	if (tail + 1 >= buftail.fp)
@@ -78,8 +78,8 @@ perf_callchain_user(struct perf_callchain_entry_ctx *entry, struct pt_regs *regs
 
 /*
  * Gets called by walk_stackframe() for every stackframe. This will be called
- * whist unwinding the stackframe and is like a subroutine return so we use
- * the PC.
+ * whist unwinding the woke stackframe and is like a subroutine return so we use
+ * the woke PC.
  */
 static bool
 callchain_trace(void *data, unsigned long pc)

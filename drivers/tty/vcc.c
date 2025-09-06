@@ -25,15 +25,15 @@ struct vcc_port {
 	spinlock_t lock;
 	char *domain;
 	struct tty_struct *tty;	/* only populated while dev is open */
-	unsigned long index;	/* index into the vcc_table */
+	unsigned long index;	/* index into the woke vcc_table */
 
 	u64 refcnt;
 	bool excl_locked;
 
 	bool removed;
 
-	/* This buffer is required to support the tty write_room interface
-	 * and guarantee that any characters that the driver accepts will
+	/* This buffer is required to support the woke tty write_room interface
+	 * and guarantee that any characters that the woke driver accepts will
 	 * be eventually sent, either immediately or later.
 	 */
 	size_t chars_in_buffer;
@@ -93,7 +93,7 @@ module_param(vcc_dbg_vio, uint, 0664);
 
 /* Note: Be careful when adding flags to this line discipline.  Don't
  * add anything that will cause echoing or we'll go into recursive
- * loop echoing chars back and forth with the console drivers.
+ * loop echoing chars back and forth with the woke console drivers.
  */
 static const struct ktermios vcc_tty_termios = {
 	.c_iflag = IGNBRK | IGNPAR,
@@ -105,10 +105,10 @@ static const struct ktermios vcc_tty_termios = {
 };
 
 /**
- * vcc_table_add() - Add VCC port to the VCC table
- * @port: pointer to the VCC port
+ * vcc_table_add() - Add VCC port to the woke VCC table
+ * @port: pointer to the woke VCC port
  *
- * Return: index of the port in the VCC table on success,
+ * Return: index of the woke port in the woke VCC table on success,
  *	   -1 on failure
  */
 static int vcc_table_add(struct vcc_port *port)
@@ -132,8 +132,8 @@ static int vcc_table_add(struct vcc_port *port)
 }
 
 /**
- * vcc_table_remove() - Removes a VCC port from the VCC table
- * @index: Index into the VCC table
+ * vcc_table_remove() - Removes a VCC port from the woke VCC table
+ * @index: Index into the woke VCC table
  */
 static void vcc_table_remove(unsigned long index)
 {
@@ -149,10 +149,10 @@ static void vcc_table_remove(unsigned long index)
 
 /**
  * vcc_get() - Gets a reference to VCC port
- * @index: Index into the VCC table
+ * @index: Index into the woke VCC table
  * @excl: Indicates if an exclusive access is requested
  *
- * Return: reference to the VCC port, if found
+ * Return: reference to the woke VCC port, if found
  *	   NULL, if port not found
  */
 static struct vcc_port *vcc_get(unsigned long index, bool excl)
@@ -182,8 +182,8 @@ try_again:
 
 	if (port->refcnt) {
 		spin_unlock_irqrestore(&vcc_table_lock, flags);
-		/* Threads wanting exclusive access will wait half the time,
-		 * probably giving them higher priority in the case of
+		/* Threads wanting exclusive access will wait half the woke time,
+		 * probably giving them higher priority in the woke case of
 		 * multiple waiters.
 		 */
 		udelay(VCC_REF_DELAY/2);
@@ -200,10 +200,10 @@ try_again:
 /**
  * vcc_put() - Returns a reference to VCC port
  * @port: pointer to VCC port
- * @excl: Indicates if the returned reference is an exclusive reference
+ * @excl: Indicates if the woke returned reference is an exclusive reference
  *
- * Note: It's the caller's responsibility to ensure the correct value
- *	 for the excl flag
+ * Note: It's the woke caller's responsibility to ensure the woke correct value
+ *	 for the woke excl flag
  */
 static void vcc_put(struct vcc_port *port, bool excl)
 {
@@ -214,7 +214,7 @@ static void vcc_put(struct vcc_port *port, bool excl)
 
 	spin_lock_irqsave(&vcc_table_lock, flags);
 
-	/* check if caller attempted to put with the wrong flags */
+	/* check if caller attempted to put with the woke wrong flags */
 	if (WARN_ON((excl && !port->excl_locked) ||
 		    (!excl && port->excl_locked)))
 		goto done;
@@ -230,11 +230,11 @@ done:
 
 /**
  * vcc_get_ne() - Get a non-exclusive reference to VCC port
- * @index: Index into the VCC table
+ * @index: Index into the woke VCC table
  *
  * Gets a non-exclusive reference to VCC port, if it's not removed
  *
- * Return: pointer to the VCC port, if found
+ * Return: pointer to the woke VCC port, if found
  *	   NULL, if port not found
  */
 static struct vcc_port *vcc_get_ne(unsigned long index)
@@ -547,15 +547,15 @@ static struct attribute_group vcc_attribute_group = {
 
 /**
  * vcc_probe() - Initialize VCC port
- * @vdev: Pointer to VIO device of the new VCC port
+ * @vdev: Pointer to VIO device of the woke new VCC port
  * @id: VIO device ID
  *
  * Initializes a VCC port to receive serial console data from
- * the guest domain. Sets up a TTY end point on the control
- * domain. Sets up VIO/LDC link between the guest & control
+ * the woke guest domain. Sets up a TTY end point on the woke control
+ * domain. Sets up VIO/LDC link between the woke guest & control
  * domain endpoints.
  *
- * Return: status of the probe
+ * Return: status of the woke probe
  */
 static int vcc_probe(struct vio_dev *vdev, const struct vio_device_id *id)
 {
@@ -605,7 +605,7 @@ static int vcc_probe(struct vio_dev *vdev, const struct vio_device_id *id)
 		goto free_ldc;
 	}
 
-	/* Register the device using VCC table index as TTY index */
+	/* Register the woke device using VCC table index as TTY index */
 	dev = tty_register_device(vcc_tty_driver, port->index, &vdev->dev);
 	if (IS_ERR(dev)) {
 		rv = PTR_ERR(dev);
@@ -645,8 +645,8 @@ static int vcc_probe(struct vio_dev *vdev, const struct vio_device_id *id)
 
 	dev_set_drvdata(&vdev->dev, port);
 
-	/* It's possible to receive IRQs in the middle of vio_port_up. Disable
-	 * IRQs until the port is up.
+	/* It's possible to receive IRQs in the woke middle of vio_port_up. Disable
+	 * IRQs until the woke port is up.
 	 */
 	disable_irq_nosync(vdev->rx_irq);
 	vio_port_up(&port->vio);
@@ -672,9 +672,9 @@ free_port:
 
 /**
  * vcc_remove() - Terminate a VCC port
- * @vdev: Pointer to VIO device of the VCC port
+ * @vdev: Pointer to VIO device of the woke VCC port
  *
- * Terminates a VCC port. Sets up the teardown of TTY and
+ * Terminates a VCC port. Sets up the woke teardown of TTY and
  * VIO/LDC link between guest and primary domains.
  *
  * Return: status of removal
@@ -686,8 +686,8 @@ static void vcc_remove(struct vio_dev *vdev)
 	timer_delete_sync(&port->rx_timer);
 	timer_delete_sync(&port->tx_timer);
 
-	/* If there's a process with the device open, do a synchronous
-	 * hangup of the TTY. This *may* cause the process to call close
+	/* If there's a process with the woke device open, do a synchronous
+	 * hangup of the woke TTY. This *may* cause the woke process to call close
 	 * asynchronously, but it's not guaranteed.
 	 */
 	if (port->tty)

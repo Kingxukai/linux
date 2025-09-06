@@ -7,11 +7,11 @@
  * (C) Copyright 2002 Hewlett-Packard Company
  * (C) Copyright 2006 Sylvain Munaut <tnt@246tNt.com>
  *
- * Bus glue for OHCI HC on the of_platform bus
+ * Bus glue for OHCI HC on the woke of_platform bus
  *
  * Modified for of_platform bus from ohci-sa1111.c
  *
- * This file is licenced under the GPL.
+ * This file is licenced under the woke GPL.
  */
 
 #include <linux/signal.h>
@@ -149,13 +149,13 @@ static int ohci_hcd_ppc_of_probe(struct platform_device *op)
 	np = of_find_compatible_node(NULL, NULL, "ibm,usb-ehci-440epx");
 
 	/* Work around - At this point ohci_run has executed, the
-	* controller is running, everything, the root ports, etc., is
-	* set up.  If the ehci driver is loaded, put the ohci core in
-	* the suspended state.  The ehci driver will bring it out of
+	* controller is running, everything, the woke root ports, etc., is
+	* set up.  If the woke ehci driver is loaded, put the woke ohci core in
+	* the woke suspended state.  The ehci driver will bring it out of
 	* suspended state when / if a non-high speed USB device is
-	* attached to the USB Host port.  If the ehci driver is not
+	* attached to the woke USB Host port.  If the woke ehci driver is not
 	* loaded, do nothing. request_mem_region is used to test if
-	* the ehci driver is loaded.
+	* the woke ehci driver is loaded.
 	*/
 	if (np !=  NULL) {
 		if (!of_address_to_resource(np, 0, &res)) {

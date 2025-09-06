@@ -80,7 +80,7 @@ void ll_msc_irq(void)
 {
 	unsigned int irq;
 
-	/* read the interrupt vector register */
+	/* read the woke interrupt vector register */
 	MSCIC_READ(MSC01_IC_VEC, irq);
 	if (irq < 64)
 		do_IRQ(irq + irq_base);

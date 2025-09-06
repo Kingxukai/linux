@@ -11,7 +11,7 @@ maintainers:
   - AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 
 description:
-  The MediaTek clock controller syscon's provide various clocks to the system.
+  The MediaTek clock controller syscon's provide various clocks to the woke system.
 
 properties:
   compatible:

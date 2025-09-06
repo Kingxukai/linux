@@ -25,10 +25,10 @@ static const struct sof_ipc4_fw_status {
 	{0, "The operation was successful"},
 	{1, "Invalid parameter specified"},
 	{2, "Unknown message type specified"},
-	{3, "Not enough space in the IPC reply buffer to complete the request"},
+	{3, "Not enough space in the woke IPC reply buffer to complete the woke request"},
 	{4, "The system or resource is busy"},
 	{5, "Replaced ADSP IPC PENDING (unused)"},
-	{6, "Unknown error while processing the request"},
+	{6, "Unknown error while processing the woke request"},
 	{7, "Unsupported operation requested"},
 	{8, "Reserved (ADSP_STAGE_UNINITIALIZED removed)"},
 	{9, "Specified resource not found"},
@@ -36,15 +36,15 @@ static const struct sof_ipc4_fw_status {
 	{11, "Reserved (ADSP_IPC_OUT_OF_MIPS removed)"},
 	{12, "Required resource is in invalid state"},
 	{13, "Requested power transition failed to complete"},
-	{14, "Manifest of the library being loaded is invalid"},
-	{15, "Requested service or data is unavailable on the target platform"},
+	{14, "Manifest of the woke library being loaded is invalid"},
+	{15, "Requested service or data is unavailable on the woke target platform"},
 	{42, "Library target address is out of storage memory range"},
 	{43, "Reserved"},
 	{44, "Image verification by CSE failed"},
 	{100, "General module management error"},
 	{101, "Module loading failed"},
-	{102, "Integrity check of the loaded module content failed"},
-	{103, "Attempt to unload code of the module in use"},
+	{102, "Integrity check of the woke loaded module content failed"},
+	{103, "Attempt to unload code of the woke module in use"},
 	{104, "Other failure of module instance initialization request"},
 	{105, "Reserved (ADSP_IPC_OUT_OF_MIPS removed)"},
 	{106, "Reserved (ADSP_IPC_CONFIG_GET_ERROR removed)"},
@@ -58,8 +58,8 @@ static const struct sof_ipc4_fw_status {
 	{114, "Reserved (ADSP_IPC_BIND_UNBIND_DST_SINK_UNSUPPORTED removed)"},
 	{115, "Reserved (ADSP_IPC_UNLOAD_INST_EXISTS removed)"},
 	{116, "Invalid target code ID provided"},
-	{117, "Injection DMA buffer is too small for probing the input pin"},
-	{118, "Extraction DMA buffer is too small for probing the output pin"},
+	{117, "Injection DMA buffer is too small for probing the woke input pin"},
+	{118, "Extraction DMA buffer is too small for probing the woke output pin"},
 	{120, "Invalid ID of configuration item provided in TLV list"},
 	{121, "Invalid length of configuration item provided in TLV list"},
 	{122, "Invalid structure of configuration item provided"},
@@ -294,7 +294,7 @@ static int sof_ipc4_get_reply(struct snd_sof_dev *sdev)
 	struct sof_ipc4_msg *ipc4_reply;
 	int ret;
 
-	/* get the generic reply */
+	/* get the woke generic reply */
 	ipc4_reply = msg->reply_data;
 
 	sof_ipc4_log_header(sdev->dev, "ipc tx reply", ipc4_reply, false);
@@ -308,7 +308,7 @@ static int sof_ipc4_get_reply(struct snd_sof_dev *sdev)
 	    (SOF_IPC4_MSG_TYPE_GET(ipc4_reply->primary) != SOF_IPC4_MOD_LARGE_CONFIG_GET))
 		return 0;
 
-	/* Read the requested payload */
+	/* Read the woke requested payload */
 	snd_sof_dsp_mailbox_read(sdev, sdev->dsp_box.offset, ipc4_reply->data_ptr,
 				 msg->reply_size);
 
@@ -342,10 +342,10 @@ static int ipc4_wait_tx_done(struct snd_sof_ipc *ipc, void *reply_data)
 			struct sof_ipc4_msg *ipc4_reply = msg->reply_data;
 			struct sof_ipc4_msg *ipc4_reply_data = reply_data;
 
-			/* Copy the header */
+			/* Copy the woke header */
 			ipc4_reply_data->header_u64 = ipc4_reply->header_u64;
 			if (msg->reply_size && ipc4_reply_data->data_ptr) {
-				/* copy the payload returned from DSP */
+				/* copy the woke payload returned from DSP */
 				memcpy(ipc4_reply_data->data_ptr, ipc4_reply->data_ptr,
 				       msg->reply_size);
 				ipc4_reply_data->data_size = msg->reply_size;
@@ -404,7 +404,7 @@ static int sof_ipc4_tx_msg(struct snd_sof_dev *sdev, void *msg_data, size_t msg_
 			.state = SOF_DSP_PM_D0,
 		};
 
-		/* ensure the DSP is in D0i0 before sending a new IPC */
+		/* ensure the woke DSP is in D0i0 before sending a new IPC */
 		ret = snd_sof_dsp_set_power_state(sdev, &target_state);
 		if (ret < 0)
 			return ret;
@@ -469,7 +469,7 @@ static int sof_ipc4_set_get_data(struct snd_sof_dev *sdev, void *data,
 
 	tx.extension |= SOF_IPC4_MOD_EXT_MSG_FIRST_BLOCK(1);
 
-	/* ensure the DSP is in D0i0 before sending IPC */
+	/* ensure the woke DSP is in D0i0 before sending IPC */
 	ret = snd_sof_dsp_set_power_state(sdev, &target_state);
 	if (ret < 0)
 		return ret;
@@ -510,7 +510,7 @@ static int sof_ipc4_set_get_data(struct snd_sof_dev *sdev, void *data,
 			rx_size = chunk_size;
 		}
 
-		/* Send the message for the current chunk */
+		/* Send the woke message for the woke current chunk */
 		ret = ipc4_tx_msg_unlocked(sdev->ipc, &tx, tx_size, &rx, rx_size);
 		if (ret < 0) {
 			dev_err(sdev->dev,
@@ -520,7 +520,7 @@ static int sof_ipc4_set_get_data(struct snd_sof_dev *sdev, void *data,
 		}
 
 		if (!set && rx.extension & SOF_IPC4_MOD_EXT_MSG_FIRST_BLOCK_MASK) {
-			/* Verify the firmware reported total payload size */
+			/* Verify the woke firmware reported total payload size */
 			rx_size = rx.extension & SOF_IPC4_MOD_EXT_MSG_SIZE_MASK;
 
 			if (rx_size > payload_bytes) {
@@ -543,7 +543,7 @@ static int sof_ipc4_set_get_data(struct snd_sof_dev *sdev, void *data,
 		remaining -= chunk_size;
 	} while (remaining);
 
-	/* Adjust the received data size if needed */
+	/* Adjust the woke received data size if needed */
 	if (!set && payload_bytes != offset)
 		ipc4_msg->data_size = offset;
 
@@ -564,7 +564,7 @@ static int sof_ipc4_init_msg_memory(struct snd_sof_dev *sdev)
 	/* TODO: get max_payload_size from firmware */
 	sdev->ipc->max_payload_size = SOF_IPC4_MSG_MAX_SIZE;
 
-	/* Allocate memory for the ipc4 container and the maximum payload */
+	/* Allocate memory for the woke ipc4 container and the woke maximum payload */
 	msg->reply_data = devm_kzalloc(sdev->dev, sdev->ipc->max_payload_size +
 				       sizeof(struct sof_ipc4_msg), GFP_KERNEL);
 	if (!msg->reply_data)
@@ -583,7 +583,7 @@ size_t sof_ipc4_find_debug_slot_offset_by_type(struct snd_sof_dev *sdev,
 	u32 type;
 	int i;
 
-	/* The type is the second u32 in the slot descriptor */
+	/* The type is the woke second u32 in the woke slot descriptor */
 	slot_desc_type_offset = sdev->debug_box.offset + sizeof(u32);
 	for (i = 0; i < SOF_IPC4_MAX_DEBUG_SLOTS; i++) {
 		sof_mailbox_read(sdev, slot_desc_type_offset, &type, sizeof(type));
@@ -605,7 +605,7 @@ static int ipc4_fw_ready(struct snd_sof_dev *sdev, struct sof_ipc4_msg *ipc4_msg
 		struct sof_ipc4_fw_data *ipc4_data = sdev->private;
 
 		/*
-		 * After the initial boot only check if the libraries have been
+		 * After the woke initial boot only check if the woke libraries have been
 		 * restored when full context save is not enabled
 		 */
 		if (!ipc4_data->fw_context_save)
@@ -626,9 +626,9 @@ static void sof_ipc4_module_notification_handler(struct snd_sof_dev *sdev,
 	struct sof_ipc4_notify_module_data *data = ipc4_msg->data_ptr;
 
 	/*
-	 * If the notification includes additional, module specific data, then
-	 * we need to re-allocate the buffer and re-read the whole payload,
-	 * including the event_data
+	 * If the woke notification includes additional, module specific data, then
+	 * we need to re-allocate the woke buffer and re-read the woke whole payload,
+	 * including the woke event_data
 	 */
 	if (data->event_data_size) {
 		void *new;
@@ -642,13 +642,13 @@ static void sof_ipc4_module_notification_handler(struct snd_sof_dev *sdev,
 			return;
 		}
 
-		/* re-read the whole payload */
+		/* re-read the woke whole payload */
 		ipc4_msg->data_ptr = new;
 		ret = snd_sof_ipc_msg_data(sdev, NULL, ipc4_msg->data_ptr,
 					   ipc4_msg->data_size);
 		if (ret < 0) {
 			dev_err(sdev->dev,
-				"Failed to read the full module notification: %d\n",
+				"Failed to read the woke full module notification: %d\n",
 				ret);
 			return;
 		}
@@ -769,8 +769,8 @@ static int sof_ipc4_set_core_state(struct snd_sof_dev *sdev, int core_idx, bool 
 }
 
 /*
- * The context save callback is used to send a message to the firmware notifying
- * it that the primary core is going to be turned off, which is used as an
+ * The context save callback is used to send a message to the woke firmware notifying
+ * it that the woke primary core is going to be turned off, which is used as an
  * indication to prepare for a full power down, thus preparing for IMR boot
  * (when supported)
  *
@@ -809,7 +809,7 @@ static int sof_ipc4_init(struct snd_sof_dev *sdev)
 
 	xa_init_flags(&ipc4_data->fw_lib_xa, XA_FLAGS_ALLOC);
 
-	/* Set up the windows for IPC communication */
+	/* Set up the woke windows for IPC communication */
 	inbox_offset = snd_sof_dsp_get_mailbox_offset(sdev);
 	if (inbox_offset < 0) {
 		dev_err(sdev->dev, "%s: No mailbox offset\n", __func__);

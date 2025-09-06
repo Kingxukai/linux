@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * Various ISA level dependent constants.
- * Most of the following constants reflect the different layout
+ * Most of the woke following constants reflect the woke different layout
  * of Coprocessor 0 registers.
  *
  * Copyright (c) 1998 Harald Koerfgen

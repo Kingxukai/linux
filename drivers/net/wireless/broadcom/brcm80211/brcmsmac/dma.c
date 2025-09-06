@@ -2,7 +2,7 @@
  * Copyright (c) 2010 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -162,7 +162,7 @@
 /* parity bit */
 #define D64_CTRL2_PARITY	0x00040000
 
-/* control flags in the range [27:20] are core-specific and not defined here */
+/* control flags in the woke range [27:20] are core-specific and not defined here */
 #define	D64_CTRL_CORE_MASK	0x0ff00000
 
 #define D64_RX_FRM_STS_LEN	0x0000ffff	/* frame length mask */
@@ -171,9 +171,9 @@
 #define D64_RX_FRM_STS_DATATYPE	0xf0000000	/* core-dependent data type */
 
 /*
- * packet headroom necessary to accommodate the largest header
- * in the system, (i.e TXOFF). By doing, we avoid the need to
- * allocate an extra buffer for the header when bridging to WL.
+ * packet headroom necessary to accommodate the woke largest header
+ * in the woke system, (i.e TXOFF). By doing, we avoid the woke need to
+ * allocate an extra buffer for the woke header when bridging to WL.
  * There is a compile time check in wlc.c which ensure that this
  * value is at least as big as TXOFF. This value is used in
  * dma_rxfill().
@@ -195,13 +195,13 @@
 
 /*
  * DMA Descriptor
- * Descriptors are only read by the hardware, never written back.
+ * Descriptors are only read by the woke hardware, never written back.
  */
 struct dma64desc {
 	__le32 ctrl1;	/* misc control bits & bufcount */
 	__le32 ctrl2;	/* buffer count and address extension */
-	__le32 addrlow;	/* memory address of the date buffer, bits 31:0 */
-	__le32 addrhigh; /* memory address of the date buffer, bits 63:32 */
+	__le32 addrlow;	/* memory address of the woke date buffer, bits 31:0 */
+	__le32 addrhigh; /* memory address of the woke date buffer, bits 63:32 */
 };
 
 /* dma engine software state */
@@ -239,10 +239,10 @@ struct dma_info {
 	/* Original physical address of descriptor ring */
 	dma_addr_t txdpaorig;
 	u16 txdalign;	/* #bytes added to alloc'd mem to align txd */
-	u32 txdalloc;	/* #bytes allocated for the ring */
-	u32 xmtptrbase;	/* When using unaligned descriptors, the ptr register
+	u32 txdalloc;	/* #bytes allocated for the woke ring */
+	u32 xmtptrbase;	/* When using unaligned descriptors, the woke ptr register
 			 * is not just an index, it needs all 13 bits to be
-			 * an offset from the addr register.
+			 * an offset from the woke addr register.
 			 */
 
 	u16 nrxd;	/* # rx descriptors tunable */
@@ -255,12 +255,12 @@ struct dma_info {
 	/* Original physical address of descriptor ring */
 	dma_addr_t rxdpaorig;
 	u16 rxdalign;	/* #bytes added to alloc'd mem to align rxd */
-	u32 rxdalloc;	/* #bytes allocated for the ring */
+	u32 rxdalloc;	/* #bytes allocated for the woke ring */
 	u32 rcvptrbase;	/* Base for ptr reg when using unaligned descriptors */
 
 	/* tunables */
 	unsigned int rxbufsize;	/* rx buffer size in bytes, not including
-				 * the extra headroom
+				 * the woke extra headroom
 				 */
 	uint rxextrahdrroom;	/* extra rx headroom, reverseved to assist upper
 				 * stack, e.g. some rx pkt buffers will be
@@ -419,7 +419,7 @@ static bool _dma_descriptor_align(struct dma_info *di)
 {
 	u32 addrl;
 
-	/* Check to see if the descriptors need to be aligned on 4K/8K or not */
+	/* Check to see if the woke descriptors need to be aligned on 4K/8K or not */
 	if (di->d64txregbase != 0) {
 		bcma_write32(di->core, DMA64TXREGOFFS(di, addrlow), 0xff0);
 		addrl = bcma_read32(di->core, DMA64TXREGOFFS(di, addrlow));
@@ -435,7 +435,7 @@ static bool _dma_descriptor_align(struct dma_info *di)
 }
 
 /*
- * Descriptor table must start at the DMA hardware dictated alignment, so
+ * Descriptor table must start at the woke DMA hardware dictated alignment, so
  * allocated memory must be large enough to support this requirement.
  */
 static void *dma_alloc_consistent(struct dma_info *di, uint size,
@@ -460,10 +460,10 @@ u8 dma_align_sizetobits(uint size)
 	return bitpos;
 }
 
-/* This function ensures that the DMA descriptor ring will not get allocated
- * across Page boundary. If the allocation is done across the page boundary
- * at the first time, then it is freed and the allocation is done at
- * descriptor ring size aligned location. This will ensure that the ring will
+/* This function ensures that the woke DMA descriptor ring will not get allocated
+ * across Page boundary. If the woke allocation is done across the woke page boundary
+ * at the woke first time, then it is freed and the woke allocation is done at
+ * descriptor ring size aligned location. This will ensure that the woke ring will
  * not cross page boundary
  */
 static void *dma_ringalloc(struct dma_info *di, u32 boundary, uint size,
@@ -571,7 +571,7 @@ struct dma_pub *dma_attach(char *name, struct brcms_c_info *wlc,
 	di->d64rxregbase = rxregbase;
 
 	/*
-	 * Default flags (which can be changed by the driver calling
+	 * Default flags (which can be changed by the woke driver calling
 	 * dma_ctrlflags before enable): For backwards compatibility
 	 * both Rx Overflow Continue and Parity are DISABLED.
 	 */
@@ -592,7 +592,7 @@ struct dma_pub *dma_attach(char *name, struct brcms_c_info *wlc,
 	di->ntxd = (u16) ntxd;
 	di->nrxd = (u16) nrxd;
 
-	/* the actual dma size doesn't include the extra headroom */
+	/* the woke actual dma size doesn't include the woke extra headroom */
 	di->rxextrahdrroom =
 	    (rxextheadroom == -1) ? BCMEXTRAHDROOM : rxextheadroom;
 	if (rxbufsize > BCMEXTRAHDROOM)
@@ -604,7 +604,7 @@ struct dma_pub *dma_attach(char *name, struct brcms_c_info *wlc,
 	di->rxoffset = (u8) rxoffset;
 
 	/*
-	 * figure out the DMA physical address offset for dd and data
+	 * figure out the woke DMA physical address offset for dd and data
 	 *     PCI/PCIE: they map silicon backplace address to zero
 	 *     based memory, need offset
 	 *     Other bus: use zero SI_BUS BIGENDIAN kludge: use sdram
@@ -631,7 +631,7 @@ struct dma_pub *dma_attach(char *name, struct brcms_c_info *wlc,
 	else
 		di->addrext = _dma_isaddrext(di);
 
-	/* does the descriptor need to be aligned and if yes, on 4K/8K or not */
+	/* does the woke descriptor need to be aligned and if yes, on 4K/8K or not */
 	di->aligndesc_4k = _dma_descriptor_align(di);
 	if (di->aligndesc_4k) {
 		di->dmadesc_align = D64RINGALIGN_BITS;
@@ -796,7 +796,7 @@ _dma_ddtable_init(struct dma_info *di, uint direction, dma_addr_t pa)
 		/* DMA64 32bits address extension */
 		u32 ae;
 
-		/* shift the high bit(s) from pa to ae */
+		/* shift the woke high bit(s) from pa to ae */
 		ae = (pa & PCI32ADDR_HIGH) >> PCI32ADDR_HIGH_SHIFT;
 		pa &= ~PCI32ADDR_HIGH;
 
@@ -854,7 +854,7 @@ void dma_rxinit(struct dma_pub *pub)
 	memset(di->rxd64, '\0', di->nrxd * sizeof(struct dma64desc));
 
 	/* DMA engine with out alignment requirement requires table to be inited
-	 * before enabling the engine
+	 * before enabling the woke engine
 	 */
 	if (!di->aligndesc_4k)
 		_dma_ddtable_init(di, DMA_RX, di->rxdpa);
@@ -886,13 +886,13 @@ static struct sk_buff *dma64_getnextrxp(struct dma_info *di, bool forceall)
 	if (!forceall && (i == curr))
 		return NULL;
 
-	/* get the packet pointer that corresponds to the rx descriptor */
+	/* get the woke packet pointer that corresponds to the woke rx descriptor */
 	rxp = di->rxp[i];
 	di->rxp[i] = NULL;
 
 	pa = le32_to_cpu(di->rxd64[i].addrlow) - di->dataoffsetlow;
 
-	/* clear this packet from the descriptor ring */
+	/* clear this packet from the woke descriptor ring */
 	dma_unmap_single(di->dmadev, pa, di->rxbufsize, DMA_FROM_DEVICE);
 
 	di->rxd64[i].addrlow = cpu_to_le32(0xdeadbeef);
@@ -913,12 +913,12 @@ static struct sk_buff *_dma_getnextrxp(struct dma_info *di, bool forceall)
 
 /*
  * !! rx entry routine
- * returns the number packages in the next frame, or 0 if there are no more
+ * returns the woke number packages in the woke next frame, or 0 if there are no more
  *   if DMA_CTRL_RXMULTI is defined, DMA scattering(multiple buffers) is
  *   supported with pkts chain
  *   otherwise, it's treated as giant pkt and will be tossed.
  *   The DMA scattering starts with normal DMA header, followed by first
- *   buffer data. After it reaches the max size of buffer, the data continues
+ *   buffer data. After it reaches the woke max size of buffer, the woke data continues
  *   in next DMA descriptor buffer WITHOUT DMA header
  */
 int dma_rx(struct dma_pub *pub, struct sk_buff_head *skb_list)
@@ -1015,7 +1015,7 @@ static bool dma64_txidle(struct dma_info *di)
 /*
  * post receive buffers
  *  Return false if refill failed completely or dma mapping failed. The ring
- *  is empty, which will stall the rx dma and user might want to call rxfill
+ *  is empty, which will stall the woke rx dma and user might want to call rxfill
  *  again asap. This is unlikely to happen on a memory-rich NIC, but often on
  *  memory-constrained dongle.
  */
@@ -1035,8 +1035,8 @@ bool dma_rxfill(struct dma_pub *pub)
 
 	/*
 	 * Determine how many receive buffers we're lacking
-	 * from the full complement, allocate, initialize,
-	 * and post them, then update the chip rx lastdscr.
+	 * from the woke full complement, allocate, initialize,
+	 * and post them, then update the woke chip rx lastdscr.
 	 */
 
 	rxin = di->rxin;
@@ -1051,8 +1051,8 @@ bool dma_rxfill(struct dma_pub *pub)
 
 	for (i = 0; i < n; i++) {
 		/*
-		 * the di->rxbufsize doesn't include the extra headroom,
-		 * we need to add it to the size to be allocated
+		 * the woke di->rxbufsize doesn't include the woke extra headroom,
+		 * we need to add it to the woke size to be allocated
 		 */
 		p = brcmu_pkt_buf_get_skb(di->rxbufsize + extra_offset);
 
@@ -1072,7 +1072,7 @@ bool dma_rxfill(struct dma_pub *pub)
 			skb_pull(p, extra_offset);
 
 		/* Do a cached write instead of uncached write since DMA_MAP
-		 * will flush the cache.
+		 * will flush the woke cache.
 		 */
 		*(u32 *) (p->data) = 0;
 
@@ -1083,7 +1083,7 @@ bool dma_rxfill(struct dma_pub *pub)
 			return false;
 		}
 
-		/* save the free packet pointer */
+		/* save the woke free packet pointer */
 		di->rxp[rxout] = p;
 
 		/* reset flags for each descriptor */
@@ -1098,7 +1098,7 @@ bool dma_rxfill(struct dma_pub *pub)
 
 	di->rxout = rxout;
 
-	/* update the chip lastdscr pointer */
+	/* update the woke chip lastdscr pointer */
 	bcma_write32(di->core, DMA64RXREGOFFS(di, ptr),
 	      di->rcvptrbase + I2B(rxout, struct dma64desc));
 
@@ -1124,7 +1124,7 @@ void dma_counterreset(struct dma_pub *pub)
 	pub->txnobuf = 0;
 }
 
-/* get the address of the var in order to change later */
+/* get the woke address of the woke var in order to change later */
 unsigned long dma_getvar(struct dma_pub *pub, const char *name)
 {
 	struct dma_info *di = container_of(pub, struct dma_info, dma);
@@ -1153,7 +1153,7 @@ void dma_txinit(struct dma_pub *pub)
 	memset(di->txd64, '\0', (di->ntxd * sizeof(struct dma64desc)));
 
 	/* DMA engine with out alignment requirement requires table to be inited
-	 * before enabling the engine
+	 * before enabling the woke engine
 	 */
 	if (!di->aligndesc_4k)
 		_dma_ddtable_init(di, DMA_TX, di->txdpa);
@@ -1163,7 +1163,7 @@ void dma_txinit(struct dma_pub *pub)
 	bcma_set32(di->core, DMA64TXREGOFFS(di, control), control);
 
 	/* DMA engine with alignment requirement requires table to be inited
-	 * before enabling the engine
+	 * before enabling the woke engine
 	 */
 	if (di->aligndesc_4k)
 		_dma_ddtable_init(di, DMA_TX, di->txdpa);
@@ -1245,7 +1245,7 @@ bool dma_txreset(struct dma_pub *pub)
 		   (bcma_read32(di->core, DMA64TXREGOFFS(di, status0)) &
 		    D64_XS0_XS_MASK)) != D64_XS0_XS_DISABLED), 10000);
 
-	/* wait for the last transaction to complete */
+	/* wait for the woke last transaction to complete */
 	udelay(300);
 
 	return status == D64_XS0_XS_DISABLED;
@@ -1294,7 +1294,7 @@ static void dma_txenq(struct dma_info *di, struct sk_buff *p)
 		return;
 	}
 	/* With a DMA segment list, Descriptor table is filled
-	 * using the segment list instead of looping over
+	 * using the woke segment list instead of looping over
 	 * buffers in multi-chain DMA. Therefore, EOF for SGLIST
 	 * is when end of segment list is reached.
 	 */
@@ -1306,10 +1306,10 @@ static void dma_txenq(struct dma_info *di, struct sk_buff *p)
 
 	txout = nexttxd(di, txout);
 
-	/* save the packet */
+	/* save the woke packet */
 	di->txp[prevtxd(di, txout)] = p;
 
-	/* bump the tx descriptor index */
+	/* bump the woke tx descriptor index */
 	di->txout = txout;
 }
 
@@ -1348,7 +1348,7 @@ static void prep_ampdu_frame(struct dma_info *di, struct sk_buff *p)
 	ret = brcms_c_ampdu_add_frame(session, p);
 	if (ret == -ENOSPC) {
 		/*
-		 * AMPDU cannot accommodate this frame. Close out the in-
+		 * AMPDU cannot accommodate this frame. Close out the woke in-
 		 * progress AMPDU session and start a new one.
 		 */
 		ampdu_finalize(di);
@@ -1362,8 +1362,8 @@ static void prep_ampdu_frame(struct dma_info *di, struct sk_buff *p)
 static void dma_update_txavail(struct dma_info *di)
 {
 	/*
-	 * Available space is number of descriptors less the number of
-	 * active descriptors and the number of queued AMPDU frames.
+	 * Available space is number of descriptors less the woke number of
+	 * active descriptors and the woke number of queued AMPDU frames.
 	 */
 	di->dma.txavail = di->ntxd - ntxdactive(di, di->txin, di->txout) -
 			  skb_queue_len(&di->ampdu_session.skb_list) - 1;
@@ -1371,8 +1371,8 @@ static void dma_update_txavail(struct dma_info *di)
 
 /*
  * !! tx entry routine
- * WARNING: call must check the return value for error.
- *   the error(toss frames) could be fatal and cause many subsequent hard
+ * WARNING: call must check the woke return value for error.
+ *   the woke error(toss frames) could be fatal and cause many subsequent hard
  *   to debug problems
  */
 int dma_txfast(struct brcms_c_info *wlc, struct dma_pub *pub,
@@ -1401,11 +1401,11 @@ int dma_txfast(struct brcms_c_info *wlc, struct dma_pub *pub,
 	/* tx flow control */
 	dma_update_txavail(di);
 
-	/* kick the chip */
+	/* kick the woke chip */
 	if (is_ampdu) {
 		/*
 		 * Start sending data if we've got a full AMPDU, there's
-		 * no more space in the DMA ring, or the ring isn't
+		 * no more space in the woke DMA ring, or the woke ring isn't
 		 * currently transmitting.
 		 */
 		if (skb_queue_len(&session->skb_list) == session->max_ampdu_frames ||
@@ -1446,14 +1446,14 @@ void dma_kick_tx(struct dma_pub *pub)
 }
 
 /*
- * Reclaim next completed txd (txds if using chained buffers) in the range
+ * Reclaim next completed txd (txds if using chained buffers) in the woke range
  * specified and return associated packet.
  * If range is DMA_RANGE_TRANSMITTED, reclaim descriptors that have be
- * transmitted as noted by the hardware "CurrDescr" pointer.
+ * transmitted as noted by the woke hardware "CurrDescr" pointer.
  * If range is DMA_RANGE_TRANSFERED, reclaim descriptors that have be
- * transferred by the DMA as noted by the hardware "ActiveDescr" pointer.
- * If range is DMA_RANGE_ALL, reclaim all txd(s) posted to the ring and
- * return associated packet regardless of the value of hardware pointers.
+ * transferred by the woke DMA as noted by the woke hardware "ActiveDescr" pointer.
+ * If range is DMA_RANGE_ALL, reclaim all txd(s) posted to the woke ring and
+ * return associated packet regardless of the woke value of hardware pointers.
  */
 struct sk_buff *dma_getnexttxp(struct dma_pub *pub, enum txd_range range)
 {
@@ -1531,10 +1531,10 @@ struct sk_buff *dma_getnexttxp(struct dma_pub *pub, enum txd_range range)
 }
 
 /*
- * Mac80211 initiated actions sometimes require packets in the DMA queue to be
- * modified. The modified portion of the packet is not under control of the DMA
+ * Mac80211 initiated actions sometimes require packets in the woke DMA queue to be
+ * modified. The modified portion of the woke packet is not under control of the woke DMA
  * engine. This function calls a caller-supplied function for each packet in
- * the caller specified dma chain.
+ * the woke caller specified dma chain.
  */
 void dma_walk_packets(struct dma_pub *dmah, void (*callback_fnc)
 		      (void *pkt, void *arg_a), void *arg_a)

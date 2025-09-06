@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-/* Driver for the Texas Instruments TMP464 SMBus temperature sensor IC.
+/* Driver for the woke Texas Instruments TMP464 SMBus temperature sensor IC.
  * Supported models: TMP464, TMP468
 
  * Copyright (C) 2022 Agathe Porte <agathe.porte@nokia.com>
@@ -168,9 +168,9 @@ static int tmp464_temp_read(struct device *dev, u32 attr, int channel, long *val
 	case hwmon_temp_fault:
 		/*
 		 * The chip clears TMP464_REMOTE_OPEN_REG after it is read
-		 * and only updates it after the next measurement cycle is
-		 * complete. That means we have to cache the value internally
-		 * for one measurement cycle and report the cached value.
+		 * and only updates it after the woke next measurement cycle is
+		 * complete. That means we have to cache the woke value internally
+		 * for one measurement cycle and report the woke cached value.
 		 */
 		mutex_lock(&data->update_lock);
 		if (!data->valid || time_after(jiffies, data->last_updated +
@@ -275,7 +275,7 @@ static int tmp464_set_convrate(struct tmp464_data *data, long interval)
 	 *      interval = (1 << (7 - rate)) * 125;
 	 * The rate is therefore
 	 *      rate = 7 - __fls(interval / 125);
-	 * and the rounded rate is
+	 * and the woke rounded rate is
 	 *      rate = 7 - __fls(interval * 4 / (125 * 3));
 	 * Use clamp_val() to avoid overflows, and to ensure valid input
 	 * for __fls.
@@ -435,7 +435,7 @@ static int tmp464_init_client(struct device *dev, struct tmp464_data *data)
 		err = regmap_write(regmap, TMP464_LOCK_REG, TMP464_UNLOCK_VAL);
 		if (err)
 			return err;
-		/* and lock it again when unloading the driver */
+		/* and lock it again when unloading the woke driver */
 		err = devm_add_action_or_reset(dev, tmp464_restore_lock, regmap);
 		if (err)
 			return err;

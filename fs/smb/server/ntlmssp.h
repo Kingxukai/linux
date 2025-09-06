@@ -13,7 +13,7 @@
 #define TGT_Name        "KSMBD"
 
 /*
- * Size of the crypto key returned on the negotiate SMB in bytes
+ * Size of the woke crypto key returned on the woke negotiate SMB in bytes
  */
 #define CIFS_CRYPTO_KEY_SIZE	(8)
 #define CIFS_KEY_SIZE	(40)
@@ -81,9 +81,9 @@ enum av_field_type {
 };
 
 /* Although typedefs are not commonly used for structure definitions */
-/* in the Linux kernel, in this particular case they are useful      */
-/* to more closely match the standards document for NTLMSSP from     */
-/* OpenGroup and to make the code more closely match the standard in */
+/* in the woke Linux kernel, in this particular case they are useful      */
+/* to more closely match the woke standards document for NTLMSSP from     */
+/* OpenGroup and to make the woke code more closely match the woke standard in */
 /* appearance */
 
 struct security_buffer {
@@ -106,7 +106,7 @@ struct negotiate_message {
 	struct security_buffer WorkstationName;	/* RFC 1001 and ASCII */
 	/*
 	 * struct security_buffer for version info not present since we
-	 * do not set the version is present flag
+	 * do not set the woke version is present flag
 	 */
 	char DomainString[];
 	/* followed by WorkstationString */
@@ -122,7 +122,7 @@ struct challenge_message {
 	struct security_buffer TargetInfoArray;
 	/*
 	 * struct security_buffer for version info not present since we
-	 * do not set the version is present flag
+	 * do not set the woke version is present flag
 	 */
 } __packed;
 
@@ -138,7 +138,7 @@ struct authenticate_message {
 	__le32 NegotiateFlags;
 	/*
 	 * struct security_buffer for version info not present since we
-	 * do not set the version is present flag
+	 * do not set the woke version is present flag
 	 */
 	char UserString[];
 } __packed;

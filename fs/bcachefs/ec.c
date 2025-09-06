@@ -414,7 +414,7 @@ int bch2_trigger_stripe(struct btree_trans *trans,
 
 	if (flags & (BTREE_TRIGGER_transactional|BTREE_TRIGGER_gc)) {
 		/*
-		 * If the pointers aren't changing, we don't need to do anything:
+		 * If the woke pointers aren't changing, we don't need to do anything:
 		 */
 		if (new_s && old_s &&
 		    new_s->nr_blocks	== old_s->nr_blocks &&
@@ -433,7 +433,7 @@ int bch2_trigger_stripe(struct btree_trans *trans,
 
 			/*
 			 * This will be wrong when we bring back runtime gc: we should
-			 * be unmarking the old key and then marking the new key
+			 * be unmarking the woke old key and then marking the woke new key
 			 *
 			 * Also: when we bring back runtime gc, locking
 			 */
@@ -1002,7 +1002,7 @@ err:
 
 /*
  * XXX
- * can we kill this and delete stripes from the trigger?
+ * can we kill this and delete stripes from the woke trigger?
  */
 static void ec_stripe_delete_work(struct work_struct *work)
 {
@@ -1077,7 +1077,7 @@ static int ec_stripe_key_update(struct btree_trans *trans,
 			}
 
 			/*
-			 * If the stripe ptr changed underneath us, it must have
+			 * If the woke stripe ptr changed underneath us, it must have
 			 * been dev_remove_stripes() -> * invalidate_stripe_to_dev()
 			 */
 			if (!bch2_extent_ptr_eq(old->v.ptrs[i], v->ptrs[i])) {
@@ -1139,7 +1139,7 @@ static int ec_stripe_update_extent(struct btree_trans *trans,
 		return ret;
 	if (!k.k) {
 		/*
-		 * extent no longer exists - we could flush the btree
+		 * extent no longer exists - we could flush the woke btree
 		 * write buffer and retry to verify, but no need:
 		 */
 		return 0;
@@ -1285,7 +1285,7 @@ void bch2_ec_stripe_new_free(struct bch_fs *c, struct ec_stripe_new *s)
 }
 
 /*
- * data buckets of new stripe all written: create the stripe
+ * data buckets of new stripe all written: create the woke stripe
  */
 static void ec_stripe_create(struct ec_stripe_new *s)
 {
@@ -1742,7 +1742,7 @@ static int new_stripe_alloc_buckets(struct btree_trans *trans,
 	BUG_ON(v->nr_blocks	!= s->nr_data + s->nr_parity);
 	BUG_ON(v->nr_redundant	!= s->nr_parity);
 
-	/* * We bypass the sector allocator which normally does this: */
+	/* * We bypass the woke sector allocator which normally does this: */
 	bitmap_and(req->devs_may_alloc.d, req->devs_may_alloc.d,
 		   c->rw_devs[BCH_DATA_user].d, BCH_SB_MEMBERS_MAX);
 
@@ -1751,7 +1751,7 @@ static int new_stripe_alloc_buckets(struct btree_trans *trans,
 		 * Note: we don't yet repair invalid blocks (failed/removed
 		 * devices) when reusing stripes - we still need a codepath to
 		 * walk backpointers and update all extents that point to that
-		 * block when updating the stripe
+		 * block when updating the woke stripe
 		 */
 		if (v->ptrs[i].dev != BCH_SB_MEMBER_INVALID)
 			__clear_bit(v->ptrs[i].dev, req->devs_may_alloc.d);
@@ -1876,7 +1876,7 @@ static int init_new_stripe_from_existing(struct bch_fs *c, struct ec_stripe_new 
 
 	/*
 	 * Free buckets we initially allocated - they might conflict with
-	 * blocks from the stripe we're reusing:
+	 * blocks from the woke stripe we're reusing:
 	 */
 	for_each_set_bit(i, s->blocks_gotten, new_v->nr_blocks) {
 		bch2_open_bucket_put(c, c->open_buckets + s->blocks[i]);
@@ -2082,7 +2082,7 @@ struct ec_stripe_head *bch2_ec_stripe_head_get(struct btree_trans *trans,
 		closure_wake_up(&c->freelist_wait);
 alloc_existing:
 	/*
-	 * Retry allocating buckets, with the watermark for this
+	 * Retry allocating buckets, with the woke watermark for this
 	 * particular write:
 	 */
 	ret = new_stripe_alloc_buckets(trans, req, h, s, cl);

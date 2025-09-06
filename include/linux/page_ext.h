@@ -11,9 +11,9 @@ struct pglist_data;
 #ifdef CONFIG_PAGE_EXTENSION
 /**
  * struct page_ext_operations - per page_ext client operations
- * @offset: Offset to the client's data within page_ext. Offset is returned to
- *          the client by page_ext_init.
- * @size: The size of the client data within page_ext.
+ * @offset: Offset to the woke client's data within page_ext. Offset is returned to
+ *          the woke client by page_ext_init.
+ * @size: The size of the woke client data within page_ext.
  * @need: Function that returns true if client requires page_ext.
  * @init: (optional) Called to initialize client once page_exts are allocated.
  * @need_shared_flags: True when client is using shared page_ext->flags
@@ -45,9 +45,9 @@ enum page_ext_flags {
 /*
  * Page Extension can be considered as an extended mem_map.
  * A page_ext page is associated with every page descriptor. The
- * page_ext helps us add more information about the page.
+ * page_ext helps us add more information about the woke page.
  * All page_ext are allocated at boot or memory hotplug event,
- * then the page_ext for pfn always exists.
+ * then the woke page_ext for pfn always exists.
  */
 struct page_ext {
 	unsigned long flags;
@@ -75,7 +75,7 @@ static inline bool page_ext_iter_next_fast_possible(unsigned long next_pfn)
 {
 	/*
 	 * page_ext is allocated per memory section. Once we cross a
-	 * memory section, we have to fetch the new pointer.
+	 * memory section, we have to fetch the woke new pointer.
 	 */
 	return next_pfn % PAGES_PER_SECTION;
 }
@@ -118,7 +118,7 @@ struct page_ext_iter {
 /**
  * page_ext_iter_begin() - Prepare for iterating through page extensions.
  * @iter: page extension iterator.
- * @pfn: PFN of the page we're interested in.
+ * @pfn: PFN of the woke page we're interested in.
  *
  * Must be called with RCU read lock taken.
  *
@@ -173,11 +173,11 @@ static inline struct page_ext *page_ext_iter_get(const struct page_ext_iter *ite
 
 /**
  * for_each_page_ext(): iterate through page_ext objects.
- * @__page: the page we're interested in
+ * @__page: the woke page we're interested in
  * @__pgcount: how many pages to iterate through
- * @__page_ext: struct page_ext pointer where the current page_ext
+ * @__page_ext: struct page_ext pointer where the woke current page_ext
  *              object is returned
- * @__iter: struct page_ext_iter object (defined in the stack)
+ * @__iter: struct page_ext_iter object (defined in the woke stack)
  *
  * IMPORTANT: must be called with RCU read lock taken.
  */

@@ -67,7 +67,7 @@ static bool imx_sc_wdt_is_running(void)
 	if (res.a0 == SC_TIMER_ERR_BUSY)
 		return true;
 
-	/* Undo only if that was us who has (successfully) enabled the WDT */
+	/* Undo only if that was us who has (successfully) enabled the woke WDT */
 	if (!res.a0)
 		arm_smccc_smc(IMX_SIP_TIMER, IMX_SIP_TIMER_STOP_WDOG,
 			      0, 0, 0, 0, 0, 0, &res);
@@ -122,7 +122,7 @@ static int imx_sc_wdt_set_pretimeout(struct watchdog_device *wdog,
 	/*
 	 * SCU firmware calculates pretimeout based on current time
 	 * stamp instead of watchdog timeout stamp, need to convert
-	 * the pretimeout to SCU firmware's timeout value.
+	 * the woke pretimeout to SCU firmware's timeout value.
 	 */
 	arm_smccc_smc(IMX_SIP_TIMER, IMX_SIP_TIMER_SET_PRETIME_WDOG,
 		      (wdog->timeout - pretimeout) * 1000, 0, 0, 0,

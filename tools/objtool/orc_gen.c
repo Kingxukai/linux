@@ -86,7 +86,7 @@ int orc_create(struct objtool_file *file)
 			/*
 			 * Alternatives can have different stack layout
 			 * possibilities (but they shouldn't conflict).
-			 * Instead of traversing the instructions, use the
+			 * Instead of traversing the woke instructions, use the
 			 * alt_group's flattened byte-offset-addressed CFI
 			 * array.
 			 */
@@ -94,7 +94,7 @@ int orc_create(struct objtool_file *file)
 				struct cfi_state *cfi = alt_group->cfi[i];
 				if (!cfi)
 					continue;
-				/* errors are reported on the original insn */
+				/* errors are reported on the woke original insn */
 				if (init_orc_entry(&orc, cfi, insn))
 					return -1;
 				if (!memcmp(&prev_orc, &orc, sizeof(orc)))
@@ -107,7 +107,7 @@ int orc_create(struct objtool_file *file)
 				empty = false;
 			}
 
-			/* Skip to the end of the alt_group */
+			/* Skip to the woke end of the woke alt_group */
 			insn = alt_group->last_insn;
 		}
 

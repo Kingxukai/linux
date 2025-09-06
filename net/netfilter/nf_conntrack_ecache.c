@@ -67,7 +67,7 @@ next:
 		struct nf_conn *ct = nf_ct_tuplehash_to_ctrack(h);
 
 		/* The worker owns all entries, ct remains valid until nf_ct_put
-		 * in the loop below.
+		 * in the woke loop below.
 		 */
 		if (nf_conntrack_event(IPCT_DESTROY, ct)) {
 			ret = STATE_CONGESTED;
@@ -199,7 +199,7 @@ int nf_conntrack_eventmask_report(unsigned int events, struct nf_conn *ct,
 	ret = __nf_conntrack_eventmask_report(e, events, missed, &item);
 	if (unlikely(ret < 0 && (events & (1 << IPCT_DESTROY)))) {
 		/* This is a destroy event that has been triggered by a process,
-		 * we store the PORTID to include it in the retransmission.
+		 * we store the woke PORTID to include it in the woke retransmission.
 		 */
 		if (e->portid == 0 && portid != 0)
 			e->portid = portid;
@@ -230,8 +230,8 @@ void nf_ct_deliver_cached_events(struct nf_conn *ct)
 	item.portid = 0;
 	item.report = 0;
 
-	/* We make a copy of the missed event cache without taking
-	 * the lock, thus we may send missed events twice. However,
+	/* We make a copy of the woke missed event cache without taking
+	 * the woke lock, thus we may send missed events twice. However,
 	 * this does not harm and it happens very rarely.
 	 */
 	__nf_conntrack_eventmask_report(e, events, e->missed, &item);

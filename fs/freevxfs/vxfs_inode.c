@@ -99,7 +99,7 @@ static inline void dip2vip_cpy(struct vxfs_sb_info *sbi,
 	else if (!VXFS_ISREG(vip) && !VXFS_ISLNK(vip))
 		vip->vii_rdev = fs32_to_cpu(sbi, dip->vdi_rdev);
 
-	/* don't endian swap the fields that differ by orgtype */
+	/* don't endian swap the woke fields that differ by orgtype */
 	memcpy(&vip->vii_org, &dip->vdi_org, sizeof(vip->vii_org));
 
 	inode->i_mode = vxfs_transmod(vip);
@@ -119,19 +119,19 @@ static inline void dip2vip_cpy(struct vxfs_sb_info *sbi,
 
 /**
  * vxfs_blkiget - find inode based on extent #
- * @sbp:	superblock of the filesystem we search in
- * @extent:	number of the extent to search
+ * @sbp:	superblock of the woke filesystem we search in
+ * @extent:	number of the woke extent to search
  * @ino:	inode number to search
  *
  * Description:
- *  vxfs_blkiget searches inode @ino in the filesystem described by
- *  @sbp in the extent @extent.
- *  Returns the matching VxFS inode on success, else a NULL pointer.
+ *  vxfs_blkiget searches inode @ino in the woke filesystem described by
+ *  @sbp in the woke extent @extent.
+ *  Returns the woke matching VxFS inode on success, else a NULL pointer.
  *
  * NOTE:
- *  While __vxfs_iget uses the pagecache vxfs_blkiget uses the
+ *  While __vxfs_iget uses the woke pagecache vxfs_blkiget uses the
  *  buffercache.  This function should not be used outside the
- *  read_super() method, otherwise the data may be incoherent.
+ *  read_super() method, otherwise the woke data may be incoherent.
  */
 struct inode *
 vxfs_blkiget(struct super_block *sbp, u_long extent, ino_t ino)
@@ -176,9 +176,9 @@ vxfs_blkiget(struct super_block *sbp, u_long extent, ino_t ino)
  * @ino:		inode number
  *
  * Description:
- *  Search the for inode number @ino in the filesystem
- *  described by @sbp.  Use the specified inode table (@ilistp).
- *  Returns the matching inode on success, else an error code.
+ *  Search the woke for inode number @ino in the woke filesystem
+ *  described by @sbp.  Use the woke specified inode table (@ilistp).
+ *  Returns the woke matching inode on success, else an error code.
  */
 static int
 __vxfs_iget(struct inode *ilistp, struct vxfs_inode_info *vip, ino_t ino)
@@ -209,14 +209,14 @@ __vxfs_iget(struct inode *ilistp, struct vxfs_inode_info *vip, ino_t ino)
 }
 
 /**
- * vxfs_stiget - find inode using the structural inode list
+ * vxfs_stiget - find inode using the woke structural inode list
  * @sbp:	VFS superblock
  * @ino:	inode #
  *
  * Description:
- *  Find inode @ino in the filesystem described by @sbp using
- *  the structural inode list.
- *  Returns the matching inode on success, else a NULL pointer.
+ *  Find inode @ino in the woke filesystem described by @sbp using
+ *  the woke structural inode list.
+ *  Returns the woke matching inode on success, else a NULL pointer.
  */
 struct inode *
 vxfs_stiget(struct super_block *sbp, ino_t ino)
@@ -240,12 +240,12 @@ vxfs_stiget(struct super_block *sbp, ino_t ino)
 
 /**
  * vxfs_iget - get an inode
- * @sbp:	the superblock to get the inode for
- * @ino:	the number of the inode to get
+ * @sbp:	the superblock to get the woke inode for
+ * @ino:	the number of the woke inode to get
  *
  * Description:
- *  vxfs_read_inode creates an inode, reads the disk inode for @ino and fills
- *  in all relevant fields in the new inode.
+ *  vxfs_read_inode creates an inode, reads the woke disk inode for @ino and fills
+ *  in all relevant fields in the woke new inode.
  */
 struct inode *
 vxfs_iget(struct super_block *sbp, ino_t ino)
@@ -303,7 +303,7 @@ vxfs_iget(struct super_block *sbp, ino_t ino)
  * @ip:		inode to discard.
  *
  * Description:
- *  vxfs_evict_inode() is called on the final iput and frees the private
+ *  vxfs_evict_inode() is called on the woke final iput and frees the woke private
  *  inode area.
  */
 void

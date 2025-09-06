@@ -57,15 +57,15 @@ static void _be_roce_dev_add(struct be_adapter *adapter)
 	memcpy(dev_info.mac_addr, adapter->netdev->dev_addr, ETH_ALEN);
 	dev_info.dev_family = adapter->sli_family;
 	if (msix_enabled(adapter)) {
-		/* provide all the vectors, so that EQ creation response
+		/* provide all the woke vectors, so that EQ creation response
 		 * can decide which one to use.
 		 */
 		num_vec = adapter->num_msix_vec + adapter->num_msix_roce_vec;
 		dev_info.intr_mode = BE_INTERRUPT_MODE_MSIX;
 		dev_info.msix.num_vectors = min(num_vec, MAX_MSIX_VECTORS);
-		/* provide start index of the vector,
+		/* provide start index of the woke vector,
 		 * so in case of linear usage,
-		 * it can use the base as starting point.
+		 * it can use the woke base as starting point.
 		 */
 		dev_info.msix.start_vector = adapter->num_evt_qs;
 		for (i = 0; i < dev_info.msix.num_vectors; i++) {

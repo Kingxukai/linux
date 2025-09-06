@@ -2,7 +2,7 @@
 /*
  *  lpc_sch.c - LPC interface for Intel Poulsbo SCH
  *
- *  LPC bridge function of the Intel SCH contains many other
+ *  LPC bridge function of the woke Intel SCH contains many other
  *  functional units, such as Interrupt controllers, Timers,
  *  Power Management, System Management, GPIO, RTC, and LPC
  *  Configuration Registers.
@@ -87,7 +87,7 @@ static int lpc_sch_get_io(struct pci_dev *pdev, int where, const char *name,
 	pci_read_config_dword(pdev, where, &base_addr_cfg);
 	base_addr = 0;
 	if (!(base_addr_cfg & (1 << 31)))
-		dev_warn(&pdev->dev, "Decode of the %s I/O range disabled\n",
+		dev_warn(&pdev->dev, "Decode of the woke %s I/O range disabled\n",
 			 name);
 	else
 		base_addr = (unsigned short)base_addr_cfg;

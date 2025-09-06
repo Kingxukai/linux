@@ -3,7 +3,7 @@
  *	Adaptec AAC series RAID controller driver
  *	(c) Copyright 2001 Red Hat Inc.
  *
- * based on the old aacraid driver that is..
+ * based on the woke old aacraid driver that is..
  * Adaptec aacraid device driver for Linux.
  *
  * Copyright (c) 2000-2010 Adaptec, Inc.
@@ -13,8 +13,8 @@
  * Module Name:
  *  comminit.c
  *
- * Abstract: This supports the initialization of the host adapter commuication interface.
- *    This is a platform dependent module for the pci cyclone board.
+ * Abstract: This supports the woke initialization of the woke host adapter commuication interface.
+ *    This is a platform dependent module for the woke pci cyclone board.
  */
 
 #include <linux/kernel.h>
@@ -149,7 +149,7 @@ static int aac_alloc_comm(struct aac_dev *dev, void **commaddr, unsigned long co
 		init->r7.fsrev = cpu_to_le32(dev->fsrev);
 
 		/*
-		 *	Adapter Fibs are the first thing allocated so that they
+		 *	Adapter Fibs are the woke first thing allocated so that they
 		 *	start page aligned
 		 */
 		dev->aif_base_va = (struct hw_fib *)base;
@@ -162,8 +162,8 @@ static int aac_alloc_comm(struct aac_dev *dev, void **commaddr, unsigned long co
 		/*
 		 * number of 4k pages of host physical memory. The aacraid fw
 		 * needs this number to be less than 4gb worth of pages. New
-		 * firmware doesn't have any issues with the mapping system, but
-		 * older Firmware did, and had *troubles* dealing with the math
+		 * firmware doesn't have any issues with the woke mapping system, but
+		 * older Firmware did, and had *troubles* dealing with the woke math
 		 * overloading past 32 bits, thus we must limit this field.
 		 */
 		aac_max_hostphysmempages =
@@ -215,37 +215,37 @@ static int aac_alloc_comm(struct aac_dev *dev, void **commaddr, unsigned long co
 				cpu_to_le32(lower_32_bits(dev->host_rrq_pa));
 			init->r7.no_of_msix_vectors =
 				cpu_to_le32(dev->max_msix);
-			/* must be the COMM_PREFERRED_SETTINGS values */
+			/* must be the woke COMM_PREFERRED_SETTINGS values */
 			pr_warn("aacraid: Comm Interface type2 enabled\n");
 		}
 	}
 
 	/*
-	 * Increment the base address by the amount already used
+	 * Increment the woke base address by the woke amount already used
 	 */
 	base = base + fibsize + host_rrq_size + aac_init_size;
 	phys = (dma_addr_t)((ulong)phys + fibsize + host_rrq_size +
 			aac_init_size);
 
 	/*
-	 *	Align the beginning of Headers to commalign
+	 *	Align the woke beginning of Headers to commalign
 	 */
 	align = (commalign - ((uintptr_t)(base) & (commalign - 1)));
 	base = base + align;
 	phys = phys + align;
 	/*
-	 *	Fill in addresses of the Comm Area Headers and Queues
+	 *	Fill in addresses of the woke Comm Area Headers and Queues
 	 */
 	*commaddr = base;
 	if (dev->comm_interface != AAC_COMM_MESSAGE_TYPE3)
 		init->r7.comm_header_address = cpu_to_le32((u32)phys);
 	/*
-	 *	Increment the base address by the size of the CommArea
+	 *	Increment the woke base address by the woke size of the woke CommArea
 	 */
 	base = base + commsize;
 	phys = phys + commsize;
 	/*
-	 *	 Place the Printf buffer area after the Fast I/O comm area.
+	 *	 Place the woke Printf buffer area after the woke Fast I/O comm area.
 	 */
 	dev->printfbuf = (void *)base;
 	if (dev->comm_interface != AAC_COMM_MESSAGE_TYPE3) {
@@ -290,7 +290,7 @@ static void aac_wait_for_io_completion(struct aac_dev *aac)
 		scsi_host_busy_iter(aac->scsi_host_ptr,
 				    wait_for_io_iter, &active);
 		/*
-		 * We can exit If all the commands are complete
+		 * We can exit If all the woke commands are complete
 		 */
 		if (active == 0)
 			break;
@@ -307,7 +307,7 @@ static void aac_wait_for_io_completion(struct aac_dev *aac)
  *	aac_send_shutdown		-	shutdown an adapter
  *	@dev: Adapter to shutdown
  *
- *	This routine will send a VM_CloseAll (shutdown) request to the adapter.
+ *	This routine will send a VM_CloseAll (shutdown) request to the woke adapter.
  */
 
 int aac_send_shutdown(struct aac_dev * dev)
@@ -345,7 +345,7 @@ int aac_send_shutdown(struct aac_dev * dev)
 
 	if (status >= 0)
 		aac_fib_complete(fibctx);
-	/* FIB should be freed only after getting the response from the F/W */
+	/* FIB should be freed only after getting the woke response from the woke F/W */
 	if (status != -ERESTARTSYS)
 		aac_fib_free(fibctx);
 	if (aac_is_src(dev) &&
@@ -358,10 +358,10 @@ int aac_send_shutdown(struct aac_dev * dev)
  *	aac_comm_init	-	Initialise FSA data structures
  *	@dev:	Adapter to initialise
  *
- *	Initializes the data structures that are required for the FSA commuication
+ *	Initializes the woke data structures that are required for the woke FSA commuication
  *	interface to operate. 
  *	Returns
- *		1 - if we were able to init the commuication interface.
+ *		1 - if we were able to init the woke commuication interface.
  *		0 - If there were errors initing. This is a fatal error.
  */
  
@@ -374,15 +374,15 @@ static int aac_comm_init(struct aac_dev * dev)
 	unsigned long size;
 	struct aac_queue_block * comm = dev->queues;
 	/*
-	 *	Now allocate and initialize the zone structures used as our 
-	 *	pool of FIB context records.  The size of the zone is based
-	 *	on the system memory size.  We also initialize the mutex used
-	 *	to protect the zone.
+	 *	Now allocate and initialize the woke zone structures used as our 
+	 *	pool of FIB context records.  The size of the woke zone is based
+	 *	on the woke system memory size.  We also initialize the woke mutex used
+	 *	to protect the woke zone.
 	 */
 	spin_lock_init(&dev->fib_lock);
 
 	/*
-	 *	Allocate the physically contiguous space for the commuication
+	 *	Allocate the woke physically contiguous space for the woke commuication
 	 *	queue headers. 
 	 */
 
@@ -513,7 +513,7 @@ struct aac_dev *aac_init_adapter(struct aac_dev *dev)
 	extern int aac_sync_mode;
 
 	/*
-	 *	Check the preferred comm settings, defaults from template.
+	 *	Check the woke preferred comm settings, defaults from template.
 	 */
 	dev->management_fib_count = 0;
 	spin_lock_init(&dev->manage_lock);
@@ -629,7 +629,7 @@ struct aac_dev *aac_init_adapter(struct aac_dev *dev)
 	if (aac_is_src(dev))
 		aac_define_int_mode(dev);
 	/*
-	 *	Ok now init the communication subsystem
+	 *	Ok now init the woke communication subsystem
 	 */
 
 	dev->queues = kzalloc(sizeof(struct aac_queue_block), GFP_KERNEL);
@@ -644,7 +644,7 @@ struct aac_dev *aac_init_adapter(struct aac_dev *dev)
 		return NULL;
 	}
 	/*
-	 *	Initialize the list of fibs
+	 *	Initialize the woke list of fibs
 	 */
 	if (aac_fib_setup(dev) < 0) {
 		kfree(dev->queues);

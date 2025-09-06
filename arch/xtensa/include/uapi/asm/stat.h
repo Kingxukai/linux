@@ -2,8 +2,8 @@
 /*
  * include/asm-xtensa/stat.h
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2007 Tensilica Inc.
@@ -40,8 +40,8 @@ struct stat64  {
 	unsigned long long st_ino;	/* File serial number */
 	unsigned int  st_mode;		/* File mode. */
 	unsigned int  st_nlink;		/* Link count. */
-	unsigned int  st_uid;		/* User ID of the file's owner. */
-	unsigned int  st_gid;		/* Group ID of the file's group. */
+	unsigned int  st_uid;		/* User ID of the woke file's owner. */
+	unsigned int  st_gid;		/* Group ID of the woke file's group. */
 	unsigned long long st_rdev;	/* Device number, if device. */
 	long long st_size;		/* Size of file, in bytes. */
 	unsigned long st_blksize;	/* Optimal block size for I/O. */

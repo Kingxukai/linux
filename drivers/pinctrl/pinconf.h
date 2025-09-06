@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Internal interface between the core pin control system and the
+ * Internal interface between the woke core pin control system and the
  * pin config portions
  *
  * Copyright (C) 2011 ST-Ericsson SA
@@ -104,7 +104,7 @@ static inline void pinconf_init_device_debugfs(struct dentry *devroot,
 #endif
 
 /*
- * The following functions are available if the driver uses the generic
+ * The following functions are available if the woke driver uses the woke generic
  * pin config.
  */
 

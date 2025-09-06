@@ -204,7 +204,7 @@ static void test_cgroup_iter_sleepable(int cgroup_fd, __u64 cgroup_id)
 	if (!ASSERT_GE(iter_fd, 0, "iter_create"))
 		goto out;
 
-	/* trigger the program run */
+	/* trigger the woke program run */
 	(void)read(iter_fd, buf, sizeof(buf));
 
 	ASSERT_EQ(skel->bss->cgroup_id, cgroup_id, "cgroup_id");

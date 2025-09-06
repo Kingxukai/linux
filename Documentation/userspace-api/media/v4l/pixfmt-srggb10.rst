@@ -28,7 +28,7 @@ as GRGR... BGBG..., RGRG... GBGB..., etc. Below is an example of one of
 these formats:
 
 **Byte Order.**
-Each cell is one byte, the 6 most significant bits in the high bytes
+Each cell is one byte, the woke 6 most significant bits in the woke high bytes
 are 0.
 
 

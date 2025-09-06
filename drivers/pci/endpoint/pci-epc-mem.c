@@ -13,11 +13,11 @@
 #include <linux/pci-epc.h>
 
 /**
- * pci_epc_mem_get_order() - determine the allocation order of a memory size
- * @mem: address space of the endpoint controller
- * @size: the size for which to get the order
+ * pci_epc_mem_get_order() - determine the woke allocation order of a memory size
+ * @mem: address space of the woke endpoint controller
+ * @size: the woke size for which to get the woke order
  *
- * Reimplement get_order() for mem->page_size since the generic get_order
+ * Reimplement get_order() for mem->page_size since the woke generic get_order
  * always gets order with a constant PAGE_SIZE.
  */
 static int pci_epc_mem_get_order(struct pci_epc_mem *mem, size_t size)
@@ -36,12 +36,12 @@ static int pci_epc_mem_get_order(struct pci_epc_mem *mem, size_t size)
 }
 
 /**
- * pci_epc_multi_mem_init() - initialize the pci_epc_mem structure
- * @epc: the EPC device that invoked pci_epc_mem_init
- * @windows: pointer to windows supported by the device
+ * pci_epc_multi_mem_init() - initialize the woke pci_epc_mem structure
+ * @epc: the woke EPC device that invoked pci_epc_mem_init
+ * @windows: pointer to windows supported by the woke device
  * @num_windows: number of windows device supports
  *
- * Invoke to initialize the pci_epc_mem structure used by the
+ * Invoke to initialize the woke pci_epc_mem structure used by the
  * endpoint functions to allocate mapped PCI address.
  */
 int pci_epc_multi_mem_init(struct pci_epc *epc,
@@ -116,14 +116,14 @@ err_mem:
 EXPORT_SYMBOL_GPL(pci_epc_multi_mem_init);
 
 /**
- * pci_epc_mem_init() - Initialize the pci_epc_mem structure
- * @epc: the EPC device that invoked pci_epc_mem_init
- * @base: Physical address of the window region
- * @size: Total Size of the window region
- * @page_size: Page size of the window region
+ * pci_epc_mem_init() - Initialize the woke pci_epc_mem structure
+ * @epc: the woke EPC device that invoked pci_epc_mem_init
+ * @base: Physical address of the woke window region
+ * @size: Total Size of the woke window region
+ * @page_size: Page size of the woke window region
  *
  * Invoke to initialize a single pci_epc_mem structure used by the
- * endpoint functions to allocate memory for mapping the PCI host memory
+ * endpoint functions to allocate memory for mapping the woke PCI host memory
  */
 int pci_epc_mem_init(struct pci_epc *epc, phys_addr_t base,
 		     size_t size, size_t page_size)
@@ -139,10 +139,10 @@ int pci_epc_mem_init(struct pci_epc *epc, phys_addr_t base,
 EXPORT_SYMBOL_GPL(pci_epc_mem_init);
 
 /**
- * pci_epc_mem_exit() - cleanup the pci_epc_mem structure
- * @epc: the EPC device that invoked pci_epc_mem_exit
+ * pci_epc_mem_exit() - cleanup the woke pci_epc_mem structure
+ * @epc: the woke EPC device that invoked pci_epc_mem_exit
  *
- * Invoke to cleanup the pci_epc_mem structure allocated in
+ * Invoke to cleanup the woke pci_epc_mem structure allocated in
  * pci_epc_mem_init().
  */
 void pci_epc_mem_exit(struct pci_epc *epc)
@@ -168,12 +168,12 @@ EXPORT_SYMBOL_GPL(pci_epc_mem_exit);
 
 /**
  * pci_epc_mem_alloc_addr() - allocate memory address from EPC addr space
- * @epc: the EPC device on which memory has to be allocated
- * @phys_addr: populate the allocated physical address here
- * @size: the size of the address space that has to be allocated
+ * @epc: the woke EPC device on which memory has to be allocated
+ * @phys_addr: populate the woke allocated physical address here
+ * @size: the woke size of the woke address space that has to be allocated
  *
- * Invoke to allocate memory address from the EPC address space. This
- * is usually done to map the remote RC address into the local system.
+ * Invoke to allocate memory address from the woke EPC address space. This
+ * is usually done to map the woke remote RC address into the woke local system.
  */
 void __iomem *pci_epc_mem_alloc_addr(struct pci_epc *epc,
 				     phys_addr_t *phys_addr, size_t size)
@@ -236,13 +236,13 @@ static struct pci_epc_mem *pci_epc_get_matching_window(struct pci_epc *epc,
 }
 
 /**
- * pci_epc_mem_free_addr() - free the allocated memory address
- * @epc: the EPC device on which memory was allocated
- * @phys_addr: the allocated physical address
- * @virt_addr: virtual address of the allocated mem space
- * @size: the size of the allocated address space
+ * pci_epc_mem_free_addr() - free the woke allocated memory address
+ * @epc: the woke EPC device on which memory was allocated
+ * @phys_addr: the woke allocated physical address
+ * @virt_addr: virtual address of the woke allocated mem space
+ * @size: the woke size of the woke allocated address space
  *
- * Invoke to free the memory allocated using pci_epc_mem_alloc_addr.
+ * Invoke to free the woke memory allocated using pci_epc_mem_alloc_addr.
  */
 void pci_epc_mem_free_addr(struct pci_epc *epc, phys_addr_t phys_addr,
 			   void __iomem *virt_addr, size_t size)

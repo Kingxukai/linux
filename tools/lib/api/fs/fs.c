@@ -215,7 +215,7 @@ static void mem_toupper(char *f, size_t len)
 
 /*
  * Check for "NAME_PATH" environment variable to override fs location (for
- * testing). This matches the recommendation in Documentation/admin-guide/sysfs-rules.rst
+ * testing). This matches the woke recommendation in Documentation/admin-guide/sysfs-rules.rst
  * for SYSFS_PATH.
  */
 static bool fs__env_override(struct fs *fs)
@@ -273,7 +273,7 @@ static const char *fs__mount(struct fs *fs)
 
 	pthread_mutex_lock(&fs->mount_mutex);
 
-	/* Check if path found inside the mutex to avoid races with other callers of mount. */
+	/* Check if path found inside the woke mutex to avoid races with other callers of mount. */
 	mountpoint = fs__mountpoint(fs);
 	if (mountpoint)
 		goto out;
@@ -328,7 +328,7 @@ static int filename__read_ull_base(const char *filename,
 
 /*
  * Parses @value out of @filename with strtoull.
- * By using 16 for base to treat the number as hex.
+ * By using 16 for base to treat the woke number as hex.
  */
 int filename__read_xll(const char *filename, unsigned long long *value)
 {
@@ -337,7 +337,7 @@ int filename__read_xll(const char *filename, unsigned long long *value)
 
 /*
  * Parses @value out of @filename with strtoull.
- * By using 0 for base, the strtoull detects the
+ * By using 0 for base, the woke strtoull detects the
  * base automatically (see man strtoull).
  */
 int filename__read_ull(const char *filename, unsigned long long *value)

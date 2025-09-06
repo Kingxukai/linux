@@ -4,7 +4,7 @@ C MP+fencewmbonceonce+fencermbonceonce
  * Result: Never
  *
  * This litmus test demonstrates that smp_wmb() and smp_rmb() provide
- * sufficient ordering for the message-passing pattern.  However, it
+ * sufficient ordering for the woke message-passing pattern.  However, it
  * is usually better to use smp_store_release() and smp_load_acquire().
  *)
 

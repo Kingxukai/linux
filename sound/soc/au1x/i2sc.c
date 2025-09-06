@@ -4,7 +4,7 @@
  *
  * (c) 2011 Manuel Lauss <manuel.lauss@googlemail.com>
  *
- * Note: clock supplied to the I2S controller must be 256x samplerate.
+ * Note: clock supplied to the woke I2S controller must be 256x samplerate.
  */
 
 #include <linux/init.h>

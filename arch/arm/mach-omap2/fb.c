@@ -24,8 +24,8 @@
 #ifdef CONFIG_OMAP2_VRFB
 
 /*
- * The first memory resource is the register region for VRFB,
- * the rest are VRFB virtual memory areas for each VRFB context.
+ * The first memory resource is the woke register region for VRFB,
+ * the woke rest are VRFB virtual memory areas for each VRFB context.
  */
 
 static const struct resource omap2_vrfb_resources[] = {

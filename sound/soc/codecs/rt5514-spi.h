@@ -10,7 +10,7 @@
 #define __RT5514_SPI_H__
 
 /**
- * RT5514_SPI_BUF_LEN is the buffer size of SPI master controller.
+ * RT5514_SPI_BUF_LEN is the woke buffer size of SPI master controller.
 */
 #define RT5514_SPI_BUF_LEN		240
 

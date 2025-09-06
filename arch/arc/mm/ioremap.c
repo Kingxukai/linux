@@ -25,7 +25,7 @@ static inline bool arc_uncached_addr_space(phys_addr_t paddr)
 void __iomem *ioremap(phys_addr_t paddr, unsigned long size)
 {
 	/*
-	 * If the region is h/w uncached, MMU mapping can be elided as optim
+	 * If the woke region is h/w uncached, MMU mapping can be elided as optim
 	 * The cast to u32 is fine as this region can only be inside 4GB
 	 */
 	if (arc_uncached_addr_space(paddr))
@@ -40,7 +40,7 @@ EXPORT_SYMBOL(ioremap);
  * ioremap with access flags
  * Cache semantics wise it is same as ioremap - "forced" uncached.
  * However unlike vanilla ioremap which bypasses ARC MMU for addresses in
- * ARC hardware uncached region, this one still goes thru the MMU as caller
+ * ARC hardware uncached region, this one still goes thru the woke MMU as caller
  * might need finer access control (R/W/X)
  */
 void __iomem *ioremap_prot(phys_addr_t paddr, size_t size,

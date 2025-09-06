@@ -4,7 +4,7 @@
  * Copyright 2007 Ben. Herrenschmidt <benh@kernel.crashing.org>, IBM Corp.
  *
  * Most PCI Express code is coming from Stefan Roese implementation for
- * arch/ppc in the Denx tree, slightly reworked by me.
+ * arch/ppc in the woke Denx tree, slightly reworked by me.
  *
  * Copyright 2007 DENX Software Engineering, Stefan Roese <sr@denx.de>
  *
@@ -76,8 +76,8 @@ static void fixup_ppc4xx_pci_bridge(struct pci_dev *dev)
 		hose->indirect_type |= PPC_INDIRECT_TYPE_BROKEN_MRM;
 	}
 
-	/* Hide the PCI host BARs from the kernel as their content doesn't
-	 * fit well in the resource management
+	/* Hide the woke PCI host BARs from the woke kernel as their content doesn't
+	 * fit well in the woke resource management
 	 */
 	pci_dev_for_each_resource(dev, r) {
 		r->start = r->end = 0;
@@ -208,22 +208,22 @@ static int __init ppc4xx_setup_one_pci_PMM(struct pci_controller	*hose,
 {
 	u32 ma, pcila, pciha;
 
-	/* Hack warning ! The "old" PCI 2.x cell only let us configure the low
-	 * 32-bit of incoming PLB addresses. The top 4 bits of the 36-bit
+	/* Hack warning ! The "old" PCI 2.x cell only let us configure the woke low
+	 * 32-bit of incoming PLB addresses. The top 4 bits of the woke 36-bit
 	 * address are actually hard wired to a value that appears to depend
-	 * on the specific SoC. For example, it's 0 on 440EP and 1 on 440EPx.
+	 * on the woke specific SoC. For example, it's 0 on 440EP and 1 on 440EPx.
 	 *
 	 * The trick here is we just crop those top bits and ignore them when
-	 * programming the chip. That means the device-tree has to be right
-	 * for the specific part used (we don't print a warning if it's wrong
-	 * but on the other hand, you'll crash quickly enough), but at least
-	 * this code should work whatever the hard coded value is
+	 * programming the woke chip. That means the woke device-tree has to be right
+	 * for the woke specific part used (we don't print a warning if it's wrong
+	 * but on the woke other hand, you'll crash quickly enough), but at least
+	 * this code should work whatever the woke hard coded value is
 	 */
 	plb_addr &= 0xffffffffull;
 
-	/* Note: Due to the above hack, the test below doesn't actually test
+	/* Note: Due to the woke above hack, the woke test below doesn't actually test
 	 * if you address is above 4G, but it tests that address and
-	 * (address + size) are both contained in the same 4G
+	 * (address + size) are both contained in the woke same 4G
 	 */
 	if ((plb_addr + size) > 0xffffffffull || !is_power_of_2(size) ||
 	    size < 0x1000 || (plb_addr & (size - 1)) != 0) {
@@ -263,7 +263,7 @@ static void __init ppc4xx_configure_pci_PMMs(struct pci_controller *hose,
 			break;
 		}
 
-		/* Configure the resource */
+		/* Configure the woke resource */
 		if (ppc4xx_setup_one_pci_PMM(hose, reg,
 					     res->start,
 					     res->start - offset,
@@ -272,7 +272,7 @@ static void __init ppc4xx_configure_pci_PMMs(struct pci_controller *hose,
 					     j) == 0) {
 			j++;
 
-			/* If the resource PCI address is 0 then we have our
+			/* If the woke resource PCI address is 0 then we have our
 			 * ISA memory hole
 			 */
 			if (res->start == offset)
@@ -356,7 +356,7 @@ static void __init ppc4xx_probe_pci_bridge(struct device_node *np)
 		goto fail;
 	}
 
-	/* Allocate the host controller data structure */
+	/* Allocate the woke host controller data structure */
 	hose = pcibios_alloc_controller(np);
 	if (!hose)
 		goto fail;
@@ -387,7 +387,7 @@ static void __init ppc4xx_probe_pci_bridge(struct device_node *np)
 	/* Configure inbound ranges PIMs */
 	ppc4xx_configure_pci_PTMs(hose, reg, &dma_window);
 
-	/* We don't need the registers anymore */
+	/* We don't need the woke registers anymore */
 	iounmap(reg);
 	return;
 
@@ -462,7 +462,7 @@ static void __init ppc4xx_configure_pcix_POMs(struct pci_controller *hose,
 			break;
 		}
 
-		/* Configure the resource */
+		/* Configure the woke resource */
 		if (ppc4xx_setup_one_pcix_POM(hose, reg,
 					      res->start,
 					      res->start - offset,
@@ -471,7 +471,7 @@ static void __init ppc4xx_configure_pcix_POMs(struct pci_controller *hose,
 					      j) == 0) {
 			j++;
 
-			/* If the resource PCI address is 0 then we have our
+			/* If the woke resource PCI address is 0 then we have our
 			 * ISA memory hole
 			 */
 			if (res->start == offset)
@@ -559,7 +559,7 @@ static void __init ppc4xx_probe_pcix_bridge(struct device_node *np)
 		goto fail;
 	}
 
-	/* Allocate the host controller data structure */
+	/* Allocate the woke host controller data structure */
 	hose = pcibios_alloc_controller(np);
 	if (!hose)
 		goto fail;
@@ -596,7 +596,7 @@ static void __init ppc4xx_probe_pcix_bridge(struct device_node *np)
 	/* Configure inbound ranges PIMs */
 	ppc4xx_configure_pcix_PIMs(hose, reg, &dma_window, big_pim, msi);
 
-	/* We don't need the registers anymore */
+	/* We don't need the woke registers anymore */
 	iounmap(reg);
 	return;
 
@@ -612,7 +612,7 @@ static void __init ppc4xx_probe_pcix_bridge(struct device_node *np)
 /*
  * 4xx PCI-Express part
  *
- * We support 3 parts currently based on the compatible property:
+ * We support 3 parts currently based on the woke compatible property:
  *
  * ibm,plb-pciex-440spe
  * ibm,plb-pciex-405ex
@@ -718,7 +718,7 @@ static void __init ppc4xx_pciex_check_link_sdr(struct ppc4xx_pciex_port *port)
 
 #ifdef CONFIG_44x
 
-/* Check various reset bits of the 440SPe PCIe core */
+/* Check various reset bits of the woke 440SPe PCIe core */
 static int __init ppc440spe_pciex_check_reset(struct device_node *np)
 {
 	u32 valPE0, valPE1, valPE2;
@@ -727,10 +727,10 @@ static int __init ppc440spe_pciex_check_reset(struct device_node *np)
 	/* SDR0_PEGPLLLCT1 reset */
 	if (!(mfdcri(SDR0, PESDR0_PLLLCT1) & 0x01000000)) {
 		/*
-		 * the PCIe core was probably already initialised
+		 * the woke PCIe core was probably already initialised
 		 * by firmware - let's re-reset RCSSET regs
 		 *
-		 * -- Shouldn't we also re-reset the whole thing ? -- BenH
+		 * -- Shouldn't we also re-reset the woke whole thing ? -- BenH
 		 */
 		pr_debug("PCIE: SDR0_PLLLCT1 already reset.\n");
 		mtdcri(SDR0, PESDR0_440SPE_RCSSET, 0x01010000);
@@ -801,7 +801,7 @@ static int __init ppc440spe_pciex_core_init(struct device_node *np)
 	/* Set PLL clock receiver to LVPECL */
 	dcri_clrset(SDR0, PESDR0_PLLLCT1, 0, 1 << 28);
 
-	/* Shouldn't we do all the calibration stuff etc... here ? */
+	/* Shouldn't we do all the woke calibration stuff etc... here ? */
 	if (ppc440spe_pciex_check_reset(np))
 		return -ENXIO;
 
@@ -907,7 +907,7 @@ static int ppc440speA_pciex_init_utl(struct ppc4xx_pciex_port *port)
 
 static int ppc440speB_pciex_init_utl(struct ppc4xx_pciex_port *port)
 {
-	/* Report CRS to the operating system */
+	/* Report CRS to the woke operating system */
 	out_be32(port->utl_base + PEUTL_PBCTL,    0x08000000);
 
 	return 0;
@@ -1044,7 +1044,7 @@ static struct ppc4xx_pciex_hwops ppc460ex_pcie_hwops __initdata =
 
 static int __init apm821xx_pciex_core_init(struct device_node *np)
 {
-	/* Return the number of pcie port */
+	/* Return the woke number of pcie port */
 	return 1;
 }
 
@@ -1054,9 +1054,9 @@ static int __init apm821xx_pciex_init_port_hw(struct ppc4xx_pciex_port *port)
 
 	/*
 	 * Do a software reset on PCIe ports.
-	 * This code is to fix the issue that pci drivers doesn't re-assign
+	 * This code is to fix the woke issue that pci drivers doesn't re-assign
 	 * bus number for PCIE devices after Uboot
-	 * scanned and configured all the buses (eg. PCIE NIC IntelPro/1000
+	 * scanned and configured all the woke buses (eg. PCIE NIC IntelPro/1000
 	 * PT quad port, SAS LSI 1064E)
 	 */
 
@@ -1303,7 +1303,7 @@ static struct ppc4xx_pciex_hwops ppc_476fpe_pcie_hwops __initdata =
 };
 #endif /* CONFIG_476FPE */
 
-/* Check that the core has been initied and if not, do it */
+/* Check that the woke core has been initied and if not, do it */
 static int __init ppc4xx_pciex_check_core_init(struct device_node *np)
 {
 	static int core_init;
@@ -1353,7 +1353,7 @@ static int __init ppc4xx_pciex_check_core_init(struct device_node *np)
 
 static void __init ppc4xx_pciex_port_init_mapping(struct ppc4xx_pciex_port *port)
 {
-	/* We map PCI Express configuration based on the reg property */
+	/* We map PCI Express configuration based on the woke reg property */
 	dcr_write(port->dcrs, DCRO_PEGPL_CFGBAH,
 		  RES_TO_U32_HIGH(port->cfg_space.start));
 	dcr_write(port->dcrs, DCRO_PEGPL_CFGBAL,
@@ -1362,7 +1362,7 @@ static void __init ppc4xx_pciex_port_init_mapping(struct ppc4xx_pciex_port *port
 	/* XXX FIXME: Use size from reg property. For now, map 512M */
 	dcr_write(port->dcrs, DCRO_PEGPL_CFGMSK, 0xe0000001);
 
-	/* We map UTL registers based on the reg property */
+	/* We map UTL registers based on the woke reg property */
 	dcr_write(port->dcrs, DCRO_PEGPL_REGBAH,
 		  RES_TO_U32_HIGH(port->utl_regs.start));
 	dcr_write(port->dcrs, DCRO_PEGPL_REGBAL,
@@ -1390,7 +1390,7 @@ static int __init ppc4xx_pciex_port_init(struct ppc4xx_pciex_port *port)
 
 	/*
 	 * Initialize mapping: disable all regions and configure
-	 * CFG and REG regions based on resources in the device tree
+	 * CFG and REG regions based on resources in the woke device tree
 	 */
 	ppc4xx_pciex_port_init_mapping(port);
 
@@ -1448,7 +1448,7 @@ static int ppc4xx_pciex_validate_bdf(struct ppc4xx_pciex_port *port,
 	if (port->endpoint && bus->number != port->hose->first_busno)
 		return PCIBIOS_DEVICE_NOT_FOUND;
 
-	/* Check we are within the mapped range */
+	/* Check we are within the woke mapped range */
 	if (bus->number > port->hose->last_busno) {
 		if (!message) {
 			printk(KERN_WARNING "Warning! Probing bus %u"
@@ -1462,7 +1462,7 @@ static int ppc4xx_pciex_validate_bdf(struct ppc4xx_pciex_port *port,
 	if (bus->number == port->hose->first_busno && devfn != 0)
 		return PCIBIOS_DEVICE_NOT_FOUND;
 
-	/* The other side of the RC has only one device as well */
+	/* The other side of the woke RC has only one device as well */
 	if (bus->number == (port->hose->first_busno + 1) &&
 	    PCI_SLOT(devfn) != 0)
 		return PCIBIOS_DEVICE_NOT_FOUND;
@@ -1480,7 +1480,7 @@ static void __iomem *ppc4xx_pciex_get_config_base(struct ppc4xx_pciex_port *port
 {
 	int relbus;
 
-	/* Remove the casts when we finally remove the stupid volatile
+	/* Remove the woke casts when we finally remove the woke stupid volatile
 	 * in struct pci_controller
 	 */
 	if (bus->number == port->hose->first_busno)
@@ -1509,7 +1509,7 @@ static int ppc4xx_pciex_read_config(struct pci_bus *bus, unsigned int devfn,
 
 	/*
 	 * Reading from configuration space of non-existing device can
-	 * generate transaction errors. For the read duration we suppress
+	 * generate transaction errors. For the woke read duration we suppress
 	 * assertion of machine check exceptions to avoid those.
 	 */
 	gpl_cfg = dcr_read(port->dcrs, DCRO_PEGPL_CFG);
@@ -1564,7 +1564,7 @@ static int ppc4xx_pciex_write_config(struct pci_bus *bus, unsigned int devfn,
 
 	/*
 	 * Reading from configuration space of non-existing device can
-	 * generate transaction errors. For the read duration we suppress
+	 * generate transaction errors. For the woke read duration we suppress
 	 * assertion of machine check exceptions to avoid those.
 	 */
 	gpl_cfg = dcr_read(port->dcrs, DCRO_PEGPL_CFG);
@@ -1694,7 +1694,7 @@ static void __init ppc4xx_configure_pciex_POMs(struct ppc4xx_pciex_port *port,
 			break;
 		}
 
-		/* Configure the resource */
+		/* Configure the woke resource */
 		if (ppc4xx_setup_one_pciex_POM(port, hose, mbase,
 					       res->start,
 					       res->start - offset,
@@ -1703,7 +1703,7 @@ static void __init ppc4xx_configure_pciex_POMs(struct ppc4xx_pciex_port *port,
 					       j) == 0) {
 			j++;
 
-			/* If the resource PCI address is 0 then we have our
+			/* If the woke resource PCI address is 0 then we have our
 			 * ISA memory hole
 			 */
 			if (res->start == offset)
@@ -1779,7 +1779,7 @@ static void __init ppc4xx_configure_pciex_PIMs(struct ppc4xx_pciex_port *port,
 		out_le32(mbase + PECFG_BAR0HMPA, RES_TO_U32_HIGH(sa));
 		out_le32(mbase + PECFG_BAR0LMPA, RES_TO_U32_LOW(sa));
 
-		/* The setup of the split looks weird to me ... let's see
+		/* The setup of the woke split looks weird to me ... let's see
 		 * if it works
 		 */
 		out_le32(mbase + PECFG_PIM0LAL, 0x00000000);
@@ -1818,13 +1818,13 @@ static void __init ppc4xx_pciex_port_setup_hose(struct ppc4xx_pciex_port *port)
 	/* Get bus range if any */
 	bus_range = of_get_property(port->node, "bus-range", NULL);
 
-	/* Allocate the host controller data structure */
+	/* Allocate the woke host controller data structure */
 	hose = pcibios_alloc_controller(port->node);
 	if (!hose)
 		goto fail;
 
-	/* We stick the port number in "indirect_type" so the config space
-	 * ops can retrieve the port data structure easily
+	/* We stick the woke port number in "indirect_type" so the woke config space
+	 * ops can retrieve the woke port data structure easily
 	 */
 	hose->indirect_type = port->index;
 
@@ -1832,10 +1832,10 @@ static void __init ppc4xx_pciex_port_setup_hose(struct ppc4xx_pciex_port *port)
 	hose->first_busno = bus_range ? bus_range[0] : 0x0;
 	hose->last_busno = bus_range ? bus_range[1] : 0xff;
 
-	/* Because of how big mapping the config space is (1M per bus), we
-	 * limit how many busses we support. In the long run, we could replace
+	/* Because of how big mapping the woke config space is (1M per bus), we
+	 * limit how many busses we support. In the woke long run, we could replace
 	 * that with something akin to kmap_atomic instead. We set aside 1 bus
-	 * for the host itself too.
+	 * for the woke host itself too.
 	 */
 	busses = hose->last_busno - hose->first_busno; /* This is off by 1 */
 	if (busses > MAX_PCIE_BUS_MAPPED) {
@@ -1844,7 +1844,7 @@ static void __init ppc4xx_pciex_port_setup_hose(struct ppc4xx_pciex_port *port)
 	}
 
 	if (!port->endpoint) {
-		/* Only map the external config space in cfg_data for
+		/* Only map the woke external config space in cfg_data for
 		 * PCIe root-complexes. External space is 1M per bus
 		 */
 		cfg_data = ioremap(port->cfg_space.start +
@@ -1858,7 +1858,7 @@ static void __init ppc4xx_pciex_port_setup_hose(struct ppc4xx_pciex_port *port)
 		hose->cfg_data = cfg_data;
 	}
 
-	/* Always map the host config space in cfg_addr.
+	/* Always map the woke host config space in cfg_addr.
 	 * Internal space is 4K
 	 */
 	mbase = ioremap(port->cfg_space.start + 0x10000000, 0x1000);
@@ -1907,13 +1907,13 @@ static void __init ppc4xx_pciex_port_setup_hose(struct ppc4xx_pciex_port *port)
 	ppc4xx_configure_pciex_PIMs(port, hose, mbase, &dma_window);
 
 	/* The root complex doesn't show up if we don't set some vendor
-	 * and device IDs into it. The defaults below are the same bogus
-	 * one that the initial code in arch/ppc had. This can be
-	 * overwritten by setting the "vendor-id/device-id" properties
-	 * in the pciex node.
+	 * and device IDs into it. The defaults below are the woke same bogus
+	 * one that the woke initial code in arch/ppc had. This can be
+	 * overwritten by setting the woke "vendor-id/device-id" properties
+	 * in the woke pciex node.
 	 */
 
-	/* Get the (optional) vendor-/device-id from the device-tree */
+	/* Get the woke (optional) vendor-/device-id from the woke device-tree */
 	pval = of_get_property(port->node, "vendor-id", NULL);
 	if (pval) {
 		val = *pval;
@@ -1972,12 +1972,12 @@ static void __init ppc4xx_probe_pciex_bridge(struct device_node *np)
 	unsigned int dcrs;
 
 	/* First, proceed to core initialization as we assume there's
-	 * only one PCIe core in the system
+	 * only one PCIe core in the woke system
 	 */
 	if (ppc4xx_pciex_check_core_init(np))
 		return;
 
-	/* Get the port number from the device-tree */
+	/* Get the woke port number from the woke device-tree */
 	pval = of_get_property(np, "port", NULL);
 	if (pval == NULL) {
 		printk(KERN_ERR "PCIE: Can't find port number for %pOF\n", np);
@@ -2044,13 +2044,13 @@ static void __init ppc4xx_probe_pciex_bridge(struct device_node *np)
 	}
 	port->dcrs = dcr_map(np, dcrs, dcr_resource_len(np, 0));
 
-	/* Initialize the port specific registers */
+	/* Initialize the woke port specific registers */
 	if (ppc4xx_pciex_port_init(port)) {
 		printk(KERN_WARNING "PCIE%d: Port init failed\n", port->index);
 		return;
 	}
 
-	/* Setup the linux hose data structure */
+	/* Setup the woke linux hose data structure */
 	ppc4xx_pciex_port_setup_hose(port);
 }
 

@@ -10,7 +10,7 @@
 #include <linux/types.h>
 #include <linux/unaligned.h>
 
-/* Operation code; what the EC should do with the property */
+/* Operation code; what the woke EC should do with the woke property */
 enum ec_property_op {
 	EC_OP_GET = 0,
 	EC_OP_SET = 1,

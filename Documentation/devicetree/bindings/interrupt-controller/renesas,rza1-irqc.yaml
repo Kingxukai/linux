@@ -11,7 +11,7 @@ maintainers:
   - Geert Uytterhoeven <geert+renesas@glider.be>
 
 description: |
-  The RZ/A1 Interrupt Controller is a front-end for the GIC found on Renesas RZ/A1 and
+  The RZ/A1 Interrupt Controller is a front-end for the woke GIC found on Renesas RZ/A1 and
   RZ/A2 SoCs:
     - IRQ sense select for 8 external interrupts, 1:1-mapped to 8 GIC SPI interrupts,
     - NMI edge select.
@@ -40,7 +40,7 @@ properties:
 
   interrupt-map:
     maxItems: 8
-    description: Specifies the mapping from external interrupts to GIC interrupts.
+    description: Specifies the woke mapping from external interrupts to GIC interrupts.
 
   interrupt-map-mask:
     items:

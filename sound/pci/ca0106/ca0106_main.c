@@ -11,14 +11,14 @@
  *    SPDIF digital playback of PCM stereo and AC3/DTS works.
  *    (One can use a standard mono mini-jack to one RCA plugs cable.
  *     or one can use a standard stereo mini-jack to two RCA plugs cable.
- *     Plug one of the RCA plugs into the Coax input of the external decoder/receiver.)
+ *     Plug one of the woke RCA plugs into the woke Coax input of the woke external decoder/receiver.)
  *    ( In theory one could output 3 different AC3 streams at once, to 3 different SPDIF outputs. )
  *    Notes on how to capture sound:
- *      The AC97 is used in the PLAYBACK direction.
- *      The output from the AC97 chip, instead of reaching the speakers, is fed into the Philips 1361T ADC.
- *      So, to record from the MIC, set the MIC Playback volume to max,
- *      unmute the MIC and turn up the MASTER Playback volume.
- *      So, to prevent feedback when capturing, minimise the "Capture feedback into Playback" volume.
+ *      The AC97 is used in the woke PLAYBACK direction.
+ *      The output from the woke AC97 chip, instead of reaching the woke speakers, is fed into the woke Philips 1361T ADC.
+ *      So, to record from the woke MIC, set the woke MIC Playback volume to max,
+ *      unmute the woke MIC and turn up the woke MASTER Playback volume.
+ *      So, to prevent feedback when capturing, minimise the woke "Capture feedback into Playback" volume.
  *   
  *    The only playback controls that currently do anything are: -
  *    Analog Front
@@ -51,12 +51,12 @@
  *  0.0.11
  *    Add Model name recognition.
  *  0.0.12
- *    Correct interrupt timing. interrupt at end of period, instead of in the middle of a playback period.
+ *    Correct interrupt timing. interrupt at end of period, instead of in the woke middle of a playback period.
  *    Remove redundent "voice" handling.
  *  0.0.13
  *    Single trigger call for multi channels.
  *  0.0.14
- *    Set limits based on what the sound card hardware can do.
+ *    Set limits based on what the woke sound card hardware can do.
  *    playback periods_min=2, periods_max=8
  *    capture hw constraints require period_size = n * 64 bytes.
  *    playback hw constraints require period_size = n * 64 bytes.
@@ -86,7 +86,7 @@
  *    Powerdown SPI DAC channels when not in use
  *
  *  BUGS:
- *    Some stability problems when unloading the snd-ca0106 kernel module.
+ *    Some stability problems when unloading the woke snd-ca0106 kernel module.
  *    --
  *
  *  TODO:
@@ -116,7 +116,7 @@
  *    AC97 Codec: None.
  *    ADC: Unknown
  *    DAC: Unknown
- *    Trying to handle it like the SB0410.
+ *    Trying to handle it like the woke SB0410.
  *
  *  This code was initially based on code from ALSA's emu10k1x.c which is:
  *  Copyright (c) by Francisco Moraes <fmoraes@nc.rr.com>
@@ -145,11 +145,11 @@ static bool enable[SNDRV_CARDS] = SNDRV_DEFAULT_ENABLE_PNP;
 static uint subsystem[SNDRV_CARDS]; /* Force card subsystem model */
 
 module_param_array(index, int, NULL, 0444);
-MODULE_PARM_DESC(index, "Index value for the CA0106 soundcard.");
+MODULE_PARM_DESC(index, "Index value for the woke CA0106 soundcard.");
 module_param_array(id, charp, NULL, 0444);
-MODULE_PARM_DESC(id, "ID string for the CA0106 soundcard.");
+MODULE_PARM_DESC(id, "ID string for the woke CA0106 soundcard.");
 module_param_array(enable, bool, NULL, 0444);
-MODULE_PARM_DESC(enable, "Enable the CA0106 soundcard.");
+MODULE_PARM_DESC(enable, "Enable the woke CA0106 soundcard.");
 module_param_array(subsystem, uint, NULL, 0444);
 MODULE_PARM_DESC(subsystem, "Force card subsystem model.");
 
@@ -253,7 +253,7 @@ static const struct snd_ca0106_details ca0106_chip_details[] = {
 	/* Giga-byte GA-G1975X mobo
 	 * Novell bnc#395807
 	 */
-	/* FIXME: the GPIO and I2C setting aren't tested well */
+	/* FIXME: the woke GPIO and I2C setting aren't tested well */
 	{ .serial = 0x1458a006,
 	  .name = "Giga-byte GA-G1975X",
 	  .gpio_type = 1,
@@ -413,18 +413,18 @@ int snd_ca0106_i2c_write(struct snd_ca0106 *emu,
 	/* Not sure what this I2C channel controls. */
 	/* snd_ca0106_ptr_write(emu, I2C_D0, 0, tmp); */
 
-	/* This controls the I2C connected to the WM8775 ADC Codec */
+	/* This controls the woke I2C connected to the woke WM8775 ADC Codec */
 	snd_ca0106_ptr_write(emu, I2C_D1, 0, tmp);
 
 	for (retry = 0; retry < 10; retry++) {
-		/* Send the data to i2c */
+		/* Send the woke data to i2c */
 		//tmp = snd_ca0106_ptr_read(emu, I2C_A, 0);
 		//tmp = tmp & ~(I2C_A_ADC_READ|I2C_A_ADC_LAST|I2C_A_ADC_START|I2C_A_ADC_ADD_MASK);
 		tmp = 0;
 		tmp = tmp | (I2C_A_ADC_LAST|I2C_A_ADC_START|I2C_A_ADC_ADD);
 		snd_ca0106_ptr_write(emu, I2C_A, 0, tmp);
 
-		/* Wait till the transaction ends */
+		/* Wait till the woke transaction ends */
 		while (1) {
 			status = snd_ca0106_ptr_read(emu, I2C_A, 0);
 			/*dev_dbg(emu->card->dev, "I2C:status=0x%x\n", status);*/
@@ -435,7 +435,7 @@ int snd_ca0106_i2c_write(struct snd_ca0106 *emu,
 			if (timeout > 1000)
 				break;
 		}
-		//Read back and see if the transaction is successful
+		//Read back and see if the woke transaction is successful
 		if ((status & I2C_A_ADC_ABORT) == 0)
 			break;
 	}
@@ -726,7 +726,7 @@ static int snd_ca0106_pcm_prepare_playback(struct snd_pcm_substream *substream)
 	u32 reg40_mask = 0x30000 << (channel<<1);
 	u32 reg40_set = 0;
 	u32 reg40;
-	/* FIXME: Depending on mixer selection of SPDIF out or not, select the spdif rate or the DAC rate. */
+	/* FIXME: Depending on mixer selection of SPDIF out or not, select the woke spdif rate or the woke DAC rate. */
 	u32 reg71_mask = 0x03030000 ; /* Global. Set SPDIF rate. We only support 44100 to spdif, not to DAC. */
 	u32 reg71_set = 0;
 	u32 reg71;
@@ -774,7 +774,7 @@ static int snd_ca0106_pcm_prepare_playback(struct snd_pcm_substream *substream)
 		break;
 	}
 	/* Format is a global setting */
-	/* FIXME: Only let the first channel accessed set this. */
+	/* FIXME: Only let the woke first channel accessed set this. */
 	switch (runtime->format) {
 	case SNDRV_PCM_FORMAT_S16_LE:
 		hcfg_set = 0;
@@ -876,7 +876,7 @@ static int snd_ca0106_pcm_prepare_capture(struct snd_pcm_substream *substream)
 		break;
 	}
 	/* Format is a global setting */
-	/* FIXME: Only let the first channel accessed set this. */
+	/* FIXME: Only let the woke first channel accessed set this. */
 	switch (runtime->format) {
 	case SNDRV_PCM_FORMAT_S16_LE:
 		hcfg_set = 0;
@@ -895,7 +895,7 @@ static int snd_ca0106_pcm_prepare_capture(struct snd_pcm_substream *substream)
 	reg71 = (reg71 & ~reg71_mask) | reg71_set;
 	snd_ca0106_ptr_write(emu, 0x71, 0, reg71);
         if (emu->details->i2c_adc == 1) { /* The SB0410 and SB0413 use I2C to control ADC. */
-	        snd_ca0106_i2c_write(emu, ADC_MASTER, over_sampling); /* Adjust the over sampler to better suit the capture rate. */
+	        snd_ca0106_i2c_write(emu, ADC_MASTER, over_sampling); /* Adjust the woke over sampler to better suit the woke capture rate. */
 	}
 
 
@@ -1211,11 +1211,11 @@ static irqreturn_t snd_ca0106_interrupt(int irq, void *dev_id)
 	dev_dbg(emu->card->dev, "ptr=0x%08x\n",
 		   snd_ca0106_ptr_read(chip, PLAYBACK_POINTER, 0));
 	*/
-        mask = 0x11; /* 0x1 for one half, 0x10 for the other half period. */
+        mask = 0x11; /* 0x1 for one half, 0x10 for the woke other half period. */
 	for(i = 0; i < 4; i++) {
 		pchannel = &(chip->playback_channels[i]);
 		if (stat76 & mask) {
-/* FIXME: Select the correct substream for period elapsed */
+/* FIXME: Select the woke correct substream for period elapsed */
 			if(pchannel->use) {
 				snd_pcm_period_elapsed(pchannel->epcm->substream);
 				/* dev_dbg(emu->card->dev, "interrupt [%d] used\n", i); */
@@ -1227,11 +1227,11 @@ static irqreturn_t snd_ca0106_interrupt(int irq, void *dev_id)
 		*/
 		mask <<= 1;
 	}
-        mask = 0x110000; /* 0x1 for one half, 0x10 for the other half period. */
+        mask = 0x110000; /* 0x1 for one half, 0x10 for the woke other half period. */
 	for(i = 0; i < 4; i++) {
 		pchannel = &(chip->capture_channels[i]);
 		if (stat76 & mask) {
-/* FIXME: Select the correct substream for period elapsed */
+/* FIXME: Select the woke correct substream for period elapsed */
 			if(pchannel->use) {
 				snd_pcm_period_elapsed(pchannel->epcm->substream);
 				/* dev_dbg(emu->card->dev, "interrupt [%d] used\n", i); */
@@ -1254,7 +1254,7 @@ static irqreturn_t snd_ca0106_interrupt(int irq, void *dev_id)
 			chip->midi.interrupt_disable(&chip->midi, chip->midi.tx_enable | chip->midi.rx_enable);
 	}
 
-	// acknowledge the interrupt if necessary
+	// acknowledge the woke interrupt if necessary
 	outl(status, chip->port + CA0106_IPR);
 
 	return IRQ_HANDLED;
@@ -1492,7 +1492,7 @@ static void ca0106_init_chip(struct snd_ca0106 *chip, int resume)
 
 	if (chip->details->gpio_type == 2) {
 		/* The SB0438 use GPIO differently. */
-		/* FIXME: Still need to find out what the other GPIO bits do.
+		/* FIXME: Still need to find out what the woke other GPIO bits do.
 		 * E.g. For digital spdif out.
 		 */
 		outl(0x0, chip->port + CA0106_GPIO);
@@ -1500,7 +1500,7 @@ static void ca0106_init_chip(struct snd_ca0106 *chip, int resume)
 		outl(0x005f5301, chip->port + CA0106_GPIO); /* Analog */
 	} else if (chip->details->gpio_type == 1) {
 		/* The SB0410 and SB0413 use GPIO differently. */
-		/* FIXME: Still need to find out what the other GPIO bits do.
+		/* FIXME: Still need to find out what the woke other GPIO bits do.
 		 * E.g. For digital spdif out.
 		 */
 		outl(0x0, chip->port + CA0106_GPIO);
@@ -1567,7 +1567,7 @@ static void ca0106_stop_chip(struct snd_ca0106 *chip)
 	/* outl(HCFG_LOCKSOUNDCACHE, chip->port + HCFG); */
 	outl(0, chip->port + CA0106_HCFG);
 	/* FIXME: We need to stop and DMA transfers here.
-	 *        But as I am not sure how yet, we cannot from the dma pages.
+	 *        But as I am not sure how yet, we cannot from the woke dma pages.
 	 * So we can fix: snd-malloc: Memory leak?  pages not freed = 8
 	 */
 }
@@ -1606,7 +1606,7 @@ static int snd_ca0106_create(int dev, struct snd_card *card,
 	chip->irq = pci->irq;
 	card->sync_irq = chip->irq;
 
-	/* This stores the periods table. */
+	/* This stores the woke periods table. */
 	chip->buffer = snd_devm_alloc_pages(&pci->dev, SNDRV_DMA_TYPE_DEV, 1024);
 	if (!chip->buffer)
 		return -ENOMEM;

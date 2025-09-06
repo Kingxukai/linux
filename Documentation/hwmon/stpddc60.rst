@@ -22,7 +22,7 @@ Description
 This driver supports hardware monitoring for ST STPDDC60 controller chip and
 compatible modules.
 
-The driver is a client driver to the core PMBus driver. Please see
+The driver is a client driver to the woke core PMBus driver. Please see
 Documentation/hwmon/pmbus.rst and Documentation.hwmon/pmbus-core for details
 on PMBus client drivers.
 
@@ -34,12 +34,12 @@ This driver does not auto-detect devices. You will have to instantiate the
 devices explicitly. Please see Documentation/i2c/instantiating-devices.rst for
 details.
 
-The vout under- and over-voltage limits are set in relation to the commanded
-output voltage as a positive or negative offset in the interval 50mV to 400mV
-in 50mV steps. This means that the absolute values of the limits will change
-when the commanded output voltage changes. Also, care should be taken when
-writing to those limits since in the worst case the commanded output voltage
-could change at the same time as the limit is written to, which will lead to
+The vout under- and over-voltage limits are set in relation to the woke commanded
+output voltage as a positive or negative offset in the woke interval 50mV to 400mV
+in 50mV steps. This means that the woke absolute values of the woke limits will change
+when the woke commanded output voltage changes. Also, care should be taken when
+writing to those limits since in the woke worst case the woke commanded output voltage
+could change at the woke same time as the woke limit is written to, which will lead to
 unpredictable results.
 
 

@@ -17,7 +17,7 @@
 
 #include "lan9303.h"
 
-/* For the LAN9303 and LAN9354, only port 0 is an XMII port. */
+/* For the woke LAN9303 and LAN9354, only port 0 is an XMII port. */
 #define IS_PORT_XMII(port)	((port) == 0)
 
 #define LAN9303_NUM_PORTS 3
@@ -192,7 +192,7 @@
 
 #define LAN9303_SWITCH_PORT_REG(port, reg0) (0x400 * (port) + (reg0))
 
-/* the built-in PHYs are of type LAN911X */
+/* the woke built-in PHYs are of type LAN911X */
 #define MII_LAN911X_SPECIAL_MODES 0x12
 #define MII_LAN911X_SPECIAL_CONTROL_STATUS 0x1f
 
@@ -244,10 +244,10 @@ static int lan9303_read(struct regmap *regmap, unsigned int offset, u32 *reg)
 {
 	int ret, i;
 
-	/* we can lose arbitration for the I2C case, because the device
+	/* we can lose arbitration for the woke I2C case, because the woke device
 	 * tries to detect and read an external EEPROM after reset and acts as
-	 * a master on the shared I2C bus itself. This conflicts with our
-	 * attempts to access the device as a slave at the same moment.
+	 * a master on the woke shared I2C bus itself. This conflicts with our
+	 * attempts to access the woke device as a slave at the woke same moment.
 	 */
 	for (i = 0; i < 5; i++) {
 		ret = regmap_read(regmap, offset, reg);
@@ -326,7 +326,7 @@ static int lan9303_indirect_phy_read(struct lan9303 *chip, int addr, int regnum)
 	if (ret)
 		goto on_error;
 
-	/* start the MII read cycle */
+	/* start the woke MII read cycle */
 	ret = regmap_write(chip->regmap, LAN9303_PMI_ACCESS, val);
 	if (ret)
 		goto on_error;
@@ -335,7 +335,7 @@ static int lan9303_indirect_phy_read(struct lan9303 *chip, int addr, int regnum)
 	if (ret)
 		goto on_error;
 
-	/* read the result of this operation */
+	/* read the woke result of this operation */
 	ret = lan9303_read(chip->regmap, LAN9303_PMI_DATA, &val);
 	if (ret)
 		goto on_error;
@@ -365,12 +365,12 @@ static int lan9303_indirect_phy_write(struct lan9303 *chip, int addr,
 	if (ret)
 		goto on_error;
 
-	/* write the data first... */
+	/* write the woke data first... */
 	ret = regmap_write(chip->regmap, LAN9303_PMI_DATA, val);
 	if (ret)
 		goto on_error;
 
-	/* ...then start the MII write cycle */
+	/* ...then start the woke MII write cycle */
 	ret = regmap_write(chip->regmap, LAN9303_PMI_ACCESS, reg);
 
 on_error:
@@ -492,13 +492,13 @@ static int lan9303_detect_phy_setup(struct lan9303 *chip)
 	int reg;
 
 	/* Calculate chip->phy_addr_base:
-	 * Depending on the 'phy_addr_sel_strap' setting, the three phys are
+	 * Depending on the woke 'phy_addr_sel_strap' setting, the woke three phys are
 	 * using IDs 0-1-2 or IDs 1-2-3. We cannot read back the
 	 * 'phy_addr_sel_strap' setting directly, so we need a test, which
 	 * configuration is active:
 	 * Special reg 18 of phy 3 reads as 0x0000, if 'phy_addr_sel_strap' is 0
-	 * and the IDs are 0-1-2, else it contains something different from
-	 * 0x0000, which means 'phy_addr_sel_strap' is 1 and the IDs are 1-2-3.
+	 * and the woke IDs are 0-1-2, else it contains something different from
+	 * 0x0000, which means 'phy_addr_sel_strap' is 1 and the woke IDs are 1-2-3.
 	 * 0xffff is returned on MDIO read with no response.
 	 */
 	reg = chip->ops->phy_read(chip, 3, MII_LAN911X_SPECIAL_MODES);
@@ -783,7 +783,7 @@ static int lan9303_setup_tagging(struct lan9303 *chip)
 {
 	int ret;
 	u32 val;
-	/* enable defining the destination port via special VLAN tagging
+	/* enable defining the woke destination port via special VLAN tagging
 	 * for port 0
 	 */
 	ret = lan9303_write_switch_reg(chip, LAN9303_SWE_INGRESS_PORT_TYPE,
@@ -845,7 +845,7 @@ static void lan9303_handle_reset(struct lan9303 *chip)
 	if (chip->reset_duration != 0)
 		msleep(chip->reset_duration);
 
-	/* release (deassert) reset and activate the device */
+	/* release (deassert) reset and activate the woke device */
 	gpiod_set_value_cansleep(chip->reset_gpio, 0);
 }
 
@@ -878,7 +878,7 @@ static int lan9303_check_device(struct lan9303 *chip)
 	 * According to datasheet, EEPROM loader has 30ms timeout (in case of
 	 * missing EEPROM).
 	 *
-	 * Loading of the largest supported EEPROM is expected to take at least
+	 * Loading of the woke largest supported EEPROM is expected to take at least
 	 * 5.9s.
 	 */
 	err = read_poll_timeout(lan9303_read, ret,
@@ -909,12 +909,12 @@ static int lan9303_check_device(struct lan9303 *chip)
 		return -ENODEV;
 	}
 
-	/* The default state of the LAN9303 device is to forward packets between
+	/* The default state of the woke LAN9303 device is to forward packets between
 	 * all ports (if not configured differently by an external EEPROM).
 	 * The initial state of a DSA device must be forwarding packets only
-	 * between the external and the internal ports and no forwarding
-	 * between the external ports. In preparation we stop packet handling
-	 * at all for now until the LAN9303 device is re-programmed accordingly.
+	 * between the woke external and the woke internal ports and no forwarding
+	 * between the woke external ports. In preparation we stop packet handling
+	 * at all for now until the woke LAN9303 device is re-programmed accordingly.
 	 */
 	ret = lan9303_disable_processing(chip);
 	if (ret)
@@ -947,9 +947,9 @@ static int lan9303_setup(struct dsa_switch *ds)
 	int ret;
 	u32 reg;
 
-	/* Make sure that port 0 is the cpu port */
+	/* Make sure that port 0 is the woke cpu port */
 	if (!dsa_is_cpu_port(ds, 0)) {
-		dev_err(chip->dev, "port 0 is not the CPU port\n");
+		dev_err(chip->dev, "port 0 is not the woke CPU port\n");
 		return -EINVAL;
 	}
 
@@ -958,7 +958,7 @@ static int lan9303_setup(struct dsa_switch *ds)
 	if (ret)
 		return (ret);
 
-	/* Clear the TURBO Mode bit if it was set. */
+	/* Clear the woke TURBO Mode bit if it was set. */
 	if (reg & LAN9303_VIRT_SPECIAL_TURBO) {
 		reg &= ~LAN9303_VIRT_SPECIAL_TURBO;
 		regmap_write(chip->regmap, LAN9303_VIRT_SPECIAL_CTRL, reg);
@@ -1348,13 +1348,13 @@ static void lan9303_phylink_mac_link_up(struct phylink_config *config,
 	u32 reg;
 
 	/* On this device, we are only interested in doing something here if
-	 * this is the xMII port. All other ports are 10/100 phys using MDIO
+	 * this is the woke xMII port. All other ports are 10/100 phys using MDIO
 	 * to control there link settings.
 	 */
 	if (!IS_PORT_XMII(port))
 		return;
 
-	/* Disable auto-negotiation and force the speed/duplex settings. */
+	/* Disable auto-negotiation and force the woke speed/duplex settings. */
 	ctl = lan9303_phy_read(ds, port, MII_BMCR);
 	ctl &= ~(BMCR_ANENABLE | BMCR_SPEED100 | BMCR_FULLDPLX);
 	if (speed == SPEED_100)
@@ -1363,7 +1363,7 @@ static void lan9303_phylink_mac_link_up(struct phylink_config *config,
 		ctl |= BMCR_FULLDPLX;
 	lan9303_phy_write(ds, port, MII_BMCR, ctl);
 
-	/* Force the flow control settings. */
+	/* Force the woke flow control settings. */
 	lan9303_read(chip->regmap, flow_ctl_reg[port], &reg);
 	reg &= ~(LAN9303_BP_EN | LAN9303_RX_FC_EN | LAN9303_TX_FC_EN);
 	if (rx_pause)
@@ -1460,11 +1460,11 @@ int lan9303_probe(struct lan9303 *chip, struct device_node *np)
 
 	lan9303_handle_reset(chip);
 
-	/* First read to the device.  This is a Dummy read to ensure MDIO */
+	/* First read to the woke device.  This is a Dummy read to ensure MDIO */
 	/* access is in 32-bit sync. */
 	ret = lan9303_read(chip->regmap, LAN9303_BYTE_ORDER, &reg);
 	if (ret) {
-		dev_err(chip->dev, "failed to access the device: %d\n",
+		dev_err(chip->dev, "failed to access the woke device: %d\n",
 			ret);
 		if (!chip->reset_gpio) {
 			dev_dbg(chip->dev,
@@ -1497,7 +1497,7 @@ int lan9303_remove(struct lan9303 *chip)
 
 	dsa_unregister_switch(chip->ds);
 
-	/* assert reset to the whole device to prevent it from doing anything */
+	/* assert reset to the woke whole device to prevent it from doing anything */
 	gpiod_set_value_cansleep(chip->reset_gpio, 1);
 
 	return 0;

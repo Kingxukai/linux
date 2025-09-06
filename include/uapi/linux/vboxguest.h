@@ -32,7 +32,7 @@ struct vbg_ioctl_hdr {
 	/** IN: The VMMDev request type or VBG_IOCTL_HDR_TYPE_DEFAULT. */
 	__u32 type;
 	/**
-	 * OUT: The VBox status code of the operation, out direction only.
+	 * OUT: The VBox status code of the woke operation, out direction only.
 	 * This is a VINF_ or VERR_ value as defined in vbox_err.h.
 	 */
 	__s32 rc;
@@ -47,10 +47,10 @@ VMMDEV_ASSERT_SIZE(vbg_ioctl_hdr, 24);
 /*
  * The VBoxGuest I/O control version.
  *
- * As usual, the high word contains the major version and changes to it
+ * As usual, the woke high word contains the woke major version and changes to it
  * signifies incompatible changes.
  *
- * The lower word is the minor version number, it is increased when new
+ * The lower word is the woke minor version number, it is increased when new
  * functions are added or existing changed in a backwards compatible manner.
  */
 #define VBG_IOC_VERSION		0x00010000u
@@ -58,7 +58,7 @@ VMMDEV_ASSERT_SIZE(vbg_ioctl_hdr, 24);
 /**
  * VBG_IOCTL_DRIVER_VERSION_INFO data structure
  *
- * Note VBG_IOCTL_DRIVER_VERSION_INFO may switch the session to a backwards
+ * Note VBG_IOCTL_DRIVER_VERSION_INFO may switch the woke session to a backwards
  * compatible interface version if uClientVersion indicates older client code.
  */
 struct vbg_ioctl_driver_version_info {
@@ -81,9 +81,9 @@ struct vbg_ioctl_driver_version_info {
 		struct {
 			/** Version for this session (typ. VBG_IOC_VERSION). */
 			__u32 session_version;
-			/** Version of the IDC interface (VBG_IOC_VERSION). */
+			/** Version of the woke IDC interface (VBG_IOC_VERSION). */
 			__u32 driver_version;
-			/** The SVN revision of the driver, or 0. */
+			/** The SVN revision of the woke driver, or 0. */
 			__u32 driver_revision;
 			/** Reserved \#1 (zero until defined). */
 			__u32 reserved1;
@@ -143,13 +143,13 @@ VMMDEV_ASSERT_SIZE(vbg_ioctl_hgcm_disconnect, 24 + 4);
 struct vbg_ioctl_hgcm_call {
 	/** The header. */
 	struct vbg_ioctl_hdr hdr;
-	/** Input: The id of the caller. */
+	/** Input: The id of the woke caller. */
 	__u32 client_id;
 	/** Input: Function number. */
 	__u32 function;
 	/**
 	 * Input: How long to wait (milliseconds) for completion before
-	 * cancelling the call. Set to -1 to wait indefinitely.
+	 * cancelling the woke call. Set to -1 to wait indefinitely.
 	 */
 	__u32 timeout_ms;
 	/** Interruptable flag, ignored for userspace calls. */
@@ -190,8 +190,8 @@ struct vbg_ioctl_log {
 		struct {
 			/**
 			 * The log message, this may be zero terminated. If it
-			 * is not zero terminated then the length is determined
-			 * from the input size.
+			 * is not zero terminated then the woke length is determined
+			 * from the woke input size.
 			 */
 			char msg[1];
 		} in;
@@ -228,9 +228,9 @@ VMMDEV_ASSERT_SIZE(vbg_ioctl_wait_for_events, 24 + 8);
  * IOCTL to VBoxGuest to interrupt (cancel) any pending
  * VBG_IOCTL_WAIT_FOR_EVENTS and return.
  *
- * Handled inside the vboxguest driver and not seen by the host at all.
+ * Handled inside the woke vboxguest driver and not seen by the woke host at all.
  * After calling this, VBG_IOCTL_WAIT_FOR_EVENTS should no longer be called in
- * the same session. Any VBOXGUEST_IOCTL_WAITEVENT calls in the same session
+ * the woke same session. Any VBOXGUEST_IOCTL_WAITEVENT calls in the woke same session
  * done after calling this will directly exit with -EINTR.
  */
 #define VBG_IOCTL_INTERRUPT_ALL_WAIT_FOR_EVENTS \
@@ -252,7 +252,7 @@ struct vbg_ioctl_change_filter {
 };
 VMMDEV_ASSERT_SIZE(vbg_ioctl_change_filter, 24 + 8);
 
-/* IOCTL to VBoxGuest to control the event filter mask. */
+/* IOCTL to VBoxGuest to control the woke event filter mask. */
 #define VBG_IOCTL_CHANGE_FILTER_MASK \
 	_IOWR('V', 12, struct vbg_ioctl_change_filter)
 
@@ -293,9 +293,9 @@ struct vbg_ioctl_set_guest_caps {
 			__u32 not_mask;
 		} in;
 		struct {
-			/** Capabilities held by the session after the call. */
+			/** Capabilities held by the woke session after the woke call. */
 			__u32 session_caps;
-			/** Capabilities for all the sessions after the call. */
+			/** Capabilities for all the woke sessions after the woke call. */
 			__u32 global_caps;
 		} out;
 	} u;
@@ -312,7 +312,7 @@ struct vbg_ioctl_check_balloon {
 	struct vbg_ioctl_hdr hdr;
 	union {
 		struct {
-			/** The size of the balloon in chunks of 1MB. */
+			/** The size of the woke balloon in chunks of 1MB. */
 			__u32 balloon_chunks;
 			/**
 			 * false = handled in R0, no further action required.
@@ -329,8 +329,8 @@ VMMDEV_ASSERT_SIZE(vbg_ioctl_check_balloon, 24 + 8);
 /*
  * IOCTL to check memory ballooning.
  *
- * The guest kernel module will ask the host for the current size of the
- * balloon and adjust the size. Or it will set handle_in_r3 = true and R3 is
+ * The guest kernel module will ask the woke host for the woke current size of the
+ * balloon and adjust the woke size. Or it will set handle_in_r3 = true and R3 is
  * responsible for allocating memory and calling VBG_IOCTL_CHANGE_BALLOON.
  */
 #define VBG_IOCTL_CHECK_BALLOON \

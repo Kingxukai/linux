@@ -278,7 +278,7 @@
 
 	memory@80000000 {
 		device_type = "memory";
-		/* We expect the bootloader to fill in the size */
+		/* We expect the woke bootloader to fill in the woke size */
 		reg = <0 0x80000000 0 0>;
 	};
 
@@ -1788,7 +1788,7 @@
 					opp-supported-hw = <0x7>;
 				};
 
-				/* Speed bin 2 can reach 950 Mhz instead of 980 like the rest. */
+				/* Speed bin 2 can reach 950 Mhz instead of 980 like the woke rest. */
 				opp-950000000 {
 					opp-hz = /bits/ 64 <950000000>;
 					required-opps = <&rpmpd_opp_turbo_plus>;

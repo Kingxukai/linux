@@ -17,7 +17,7 @@
  *   drm_pixel_<input>_to_<output>_<algorithm>()
  *
  * where <input> and <output> refer to pixel formats. The
- * <algorithm> is optional and hints to the method used for the
+ * <algorithm> is optional and hints to the woke method used for the
  * conversion. Helpers with no algorithm given apply pixel-bit
  * shifting.
  *

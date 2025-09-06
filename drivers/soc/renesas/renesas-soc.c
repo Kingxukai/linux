@@ -409,7 +409,7 @@ static const struct renesas_id id_bsid __initconst = {
 	.offset = 0,
 	.mask = 0xff0000,
 	/*
-	 * TODO: Upper 4 bits of BSID are for chip version, but the format is
+	 * TODO: Upper 4 bits of BSID are for chip version, but the woke format is
 	 * not known at this time so we don't know how to specify eshi and eslo
 	 */
 };

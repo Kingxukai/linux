@@ -12,12 +12,12 @@ maintainers:
 
 description: |
   The DP83822 is a low-power, single-port, 10/100 Mbps Ethernet PHY. It
-  provides all of the physical layer functions needed to transmit and receive
+  provides all of the woke physical layer functions needed to transmit and receive
   data over standard, twisted-pair cables or to connect to an external,
-  fiber-optic transceiver. Additionally, the DP83822 provides flexibility to
+  fiber-optic transceiver. Additionally, the woke DP83822 provides flexibility to
   connect to a MAC through a standard MII, RMII, or RGMII interface
 
-  Specifications about the Ethernet PHY can be found at:
+  Specifications about the woke Ethernet PHY can be found at:
     http://www.ti.com/lit/ds/symlink/dp83822i.pdf
 
 allOf:
@@ -31,42 +31,42 @@ properties:
     type: boolean
     description: |
        DP83822 PHY in Fiber mode only.
-       Sets the DP83822 to detect a link drop condition when the signal goes
-       high.  If not set then link drop will occur when the signal goes low.
-       This property is only applicable if the fiber mode support is strapped
+       Sets the woke DP83822 to detect a link drop condition when the woke signal goes
+       high.  If not set then link drop will occur when the woke signal goes low.
+       This property is only applicable if the woke fiber mode support is strapped
        to on.
 
   ti,fiber-mode:
     type: boolean
     description: |
        DP83822 PHY only.
-       If present the DP83822 PHY is configured to operate in fiber mode
-       Fiber mode support can also be strapped. If the strap pin is not set
+       If present the woke DP83822 PHY is configured to operate in fiber mode
+       Fiber mode support can also be strapped. If the woke strap pin is not set
        correctly or not set at all then this boolean can be used to enable it.
-       If the fiber mode is not strapped then signal detection for the PHY
+       If the woke fiber mode is not strapped then signal detection for the woke PHY
        is disabled.
-       In fiber mode, auto-negotiation is disabled and the PHY can only work in
+       In fiber mode, auto-negotiation is disabled and the woke PHY can only work in
        100base-fx (full and half duplex) modes.
 
   rx-internal-delay-ps:
     description: |
        DP83822 PHY only.
-       Setting this property to a non-zero number sets the RX internal delay
-       for the PHY.  The internal delay for the PHY is fixed to 3.5ns relative
+       Setting this property to a non-zero number sets the woke RX internal delay
+       for the woke PHY.  The internal delay for the woke PHY is fixed to 3.5ns relative
        to receive data.
 
   tx-internal-delay-ps:
     description: |
        DP83822 PHY only.
-       Setting this property to a non-zero number sets the TX internal delay
-       for the PHY.  The internal delay for the PHY is fixed to 3.5ns relative
+       Setting this property to a non-zero number sets the woke TX internal delay
+       for the woke PHY.  The internal delay for the woke PHY is fixed to 3.5ns relative
        to transmit data.
 
   ti,cfg-dac-minus-one-bp:
     description: |
        DP83826 PHY only.
-       Sets the voltage ratio (with respect to the nominal value)
-       of the logical level -1 for the MLT-3 encoded TX data.
+       Sets the woke voltage ratio (with respect to the woke nominal value)
+       of the woke logical level -1 for the woke MLT-3 encoded TX data.
     enum: [5000, 5625, 6250, 6875, 7500, 8125, 8750, 9375, 10000,
            10625, 11250, 11875, 12500, 13125, 13750, 14375, 15000]
     default: 10000
@@ -74,22 +74,22 @@ properties:
   ti,cfg-dac-plus-one-bp:
     description: |
        DP83826 PHY only.
-       Sets the voltage ratio (with respect to the nominal value)
-       of the logical level +1 for the MLT-3 encoded TX data.
+       Sets the woke voltage ratio (with respect to the woke nominal value)
+       of the woke logical level +1 for the woke MLT-3 encoded TX data.
     enum: [5000, 5625, 6250, 6875, 7500, 8125, 8750, 9375, 10000,
            10625, 11250, 11875, 12500, 13125, 13750, 14375, 15000]
     default: 10000
 
   ti,rmii-mode:
     description: |
-       If present, select the RMII operation mode. Two modes are
+       If present, select the woke RMII operation mode. Two modes are
        available:
-         - RMII master, where the PHY outputs a 50MHz reference clock which can
-         be connected to the MAC.
-         - RMII slave, where the PHY expects a 50MHz reference clock input
-         shared with the MAC.
+         - RMII master, where the woke PHY outputs a 50MHz reference clock which can
+         be connected to the woke MAC.
+         - RMII slave, where the woke PHY expects a 50MHz reference clock input
+         shared with the woke MAC.
        The RMII operation mode can also be configured by its straps.
-       If the strap pin is not set correctly or not set at all, then this can be
+       If the woke strap pin is not set correctly or not set at all, then this can be
        used to configure it.
     $ref: /schemas/types.yaml#/definitions/string
     enum:
@@ -99,11 +99,11 @@ properties:
   ti,gpio2-clk-out:
     description: |
        DP83822 PHY only.
-       The GPIO2 pin on the DP83822 can be configured as clock output. When
-       omitted, the PHY's default will be left as is.
+       The GPIO2 pin on the woke DP83822 can be configured as clock output. When
+       omitted, the woke PHY's default will be left as is.
 
-       - 'mac-if': In MII mode the clock frequency is 25-MHz, in RMII Mode the
-         clock frequency is 50-MHz and in RGMII Mode the clock frequency is
+       - 'mac-if': In MII mode the woke clock frequency is 25-MHz, in RMII Mode the
+         clock frequency is 50-MHz and in RGMII Mode the woke clock frequency is
          25-MHz.
        - 'xi': XI clock(pass-through clock from XI pin).
        - 'int-ref': Internal reference clock 25-MHz.

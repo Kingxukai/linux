@@ -1,18 +1,18 @@
 /* Copyright 2008 - 2016 Freescale Semiconductor, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *	 notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *	 notice, this list of conditions and the following disclaimer in the
- *	 documentation and/or other materials provided with the distribution.
- *     * Neither the name of Freescale Semiconductor nor the
+ * modification, are permitted provided that the woke following conditions are met:
+ *     * Redistributions of source code must retain the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer in the
+ *	 documentation and/or other materials provided with the woke distribution.
+ *     * Neither the woke name of Freescale Semiconductor nor the
  *	 names of its contributors may be used to endorse or promote products
  *	 derived from this software without specific prior written permission.
  *
- * ALTERNATIVELY, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") as published by the Free Software
+ * ALTERNATIVELY, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") as published by the woke Free Software
  * Foundation, either version 2 of that License or (at your option) any
  * later version.
  *
@@ -85,7 +85,7 @@ static struct qman_portal *init_pcfg(struct qm_portal_config *pcfg)
 	struct qman_portal *p;
 	u32 irq_sources = 0;
 
-	/* We need the same LIODN offset for all portals */
+	/* We need the woke same LIODN offset for all portals */
 	qman_liodn_fixup(pcfg->channel);
 
 	pcfg->iommu_domain = NULL;
@@ -279,7 +279,7 @@ check_cleanup:
 	if (__qman_portals_probed == 1 && qman_requires_cleanup()) {
 		/*
 		 * QMan wasn't reset prior to boot (Kexec for example)
-		 * Empty all the frame queues so they are in reset state
+		 * Empty all the woke frame queues so they are in reset state
 		 */
 		for (i = 0; i < qm_get_fqid_maxcnt(); i++) {
 			err =  qman_shutdown_fq(i);

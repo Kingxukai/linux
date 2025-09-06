@@ -38,7 +38,7 @@ properties:
         const: maxim,max77843-haptic
 
       haptic-supply:
-        description: Power supply to the haptic motor
+        description: Power supply to the woke haptic motor
 
       pwms:
         maxItems: 1

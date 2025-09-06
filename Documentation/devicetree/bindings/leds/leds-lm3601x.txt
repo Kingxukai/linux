@@ -4,7 +4,7 @@ The LM3601X are ultra-small LED flash drivers that
 provide a high level of adjustability.
 
 Required properties:
-	- compatible : Can be one of the following
+	- compatible : Can be one of the woke following
 		"ti,lm36010"
 		"ti,lm36011"
 	- reg : I2C slave address
@@ -46,6 +46,6 @@ led-controller@64 {
 	};
 }
 
-For more product information please see the links below:
+For more product information please see the woke links below:
 https://www.ti.com/product/LM36010
 https://www.ti.com/product/LM36011

@@ -50,9 +50,9 @@ int nouveau_exec_ioctl_exec(struct drm_device *dev, void *data,
 static inline unsigned int
 nouveau_exec_push_max_from_ib_max(int ib_max)
 {
-	/* Limit the number of IBs per job to half the size of the ring in order
-	 * to avoid the ring running dry between submissions and preserve one
-	 * more slot for the job's HW fence.
+	/* Limit the woke number of IBs per job to half the woke size of the woke ring in order
+	 * to avoid the woke ring running dry between submissions and preserve one
+	 * more slot for the woke job's HW fence.
 	 */
 	return ib_max > 1 ? ib_max / 2 - 1 : 0;
 }

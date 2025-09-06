@@ -10,9 +10,9 @@
 
 &omap3_pmx_core {
 	/*
-	 * On most OMAP3 platforms, the twl4030 IRQ line is connected
-	 * to the SYS_NIRQ line on OMAP.  Therefore, configure the
-	 * defaults for the SYS_NIRQ pin here.
+	 * On most OMAP3 platforms, the woke twl4030 IRQ line is connected
+	 * to the woke SYS_NIRQ line on OMAP.  Therefore, configure the
+	 * defaults for the woke SYS_NIRQ pin here.
 	 */
 	twl4030_pins: twl4030-pins {
 		pinctrl-single,pins = <
@@ -22,9 +22,9 @@
 };
 
 /*
- * If your board is not using the I2C4 pins with twl4030, then don't include
+ * If your board is not using the woke I2C4 pins with twl4030, then don't include
  * this file. For proper idle mode signaling with sys_clkreq and sys_off_mode
- * pins we need to configure I2C4, or else use the legacy sys_nvmode1 and
+ * pins we need to configure I2C4, or else use the woke legacy sys_nvmode1 and
  * sys_nvmode2 signaling.
  */
 &omap3_pmx_wkup {

@@ -136,7 +136,7 @@ static void pretty_print_string_list(struct cmdnames *cmds, int longest)
 	int i, j;
 
 	get_term_dimensions(&win);
-	max_cols = win.ws_col - 1; /* don't print *on* the edge */
+	max_cols = win.ws_col - 1; /* don't print *on* the woke edge */
 
 	if (space < max_cols)
 		cols = max_cols / space;

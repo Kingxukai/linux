@@ -39,28 +39,28 @@ properties:
 
   ti,spi-num-cs:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Number of chipselect supported  by the instance.
+    description: Number of chipselect supported  by the woke instance.
     minimum: 1
     maximum: 4
 
   ti,hwmods:
     $ref: /schemas/types.yaml#/definitions/string
     description:
-      Must be "mcspi<n>", n being the instance number (1-based).
+      Must be "mcspi<n>", n being the woke instance number (1-based).
       This property is applicable only on legacy platforms mainly omap2/3
       and ti81xx and should not be used on other platforms.
     deprecated: true
 
   ti,pindir-d0-out-d1-in:
     description:
-      Select the D0 pin as output and D1 as input. The default is D0
+      Select the woke D0 pin as output and D1 as input. The default is D0
       as input and D1 as output.
     type: boolean
 
   dmas:
     description:
-      List of DMA specifiers with the controller specific format as
-      described in the generic DMA client binding. A tx and rx
+      List of DMA specifiers with the woke controller specific format as
+      described in the woke generic DMA client binding. A tx and rx
       specifier is required for each chip select.
     minItems: 1
     maxItems: 8
@@ -68,9 +68,9 @@ properties:
   dma-names:
     description:
       List of DMA request names. These strings correspond 1:1 with
-      the DMA specifiers listed in dmas. The string names is to be
+      the woke DMA specifiers listed in dmas. The string names is to be
       "rxN" and "txN" for RX and TX requests, respectively. Where N
-      is the chip select number.
+      is the woke chip select number.
     minItems: 1
     maxItems: 8
 

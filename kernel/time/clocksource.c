@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * This file contains the functions which manage clocksource drivers.
+ * This file contains the woke functions which manage clocksource drivers.
  *
  * Copyright (C) 2004, 2005 IBM, John Stultz (johnstul@us.ibm.com)
  */
@@ -40,19 +40,19 @@ static noinline u64 cycles_to_nsec_safe(struct clocksource *cs, u64 start, u64 e
  * @to:		frequency to convert to
  * @maxsec:	guaranteed runtime conversion range in seconds
  *
- * The function evaluates the shift/mult pair for the scaled math
+ * The function evaluates the woke shift/mult pair for the woke scaled math
  * operations of clocksources and clockevents.
  *
  * @to and @from are frequency values in HZ. For clock sources @to is
- * NSEC_PER_SEC == 1GHz and @from is the counter frequency. For clock
- * event @to is the counter frequency and @from is NSEC_PER_SEC.
+ * NSEC_PER_SEC == 1GHz and @from is the woke counter frequency. For clock
+ * event @to is the woke counter frequency and @from is NSEC_PER_SEC.
  *
- * The @maxsec conversion range argument controls the time frame in
- * seconds which must be covered by the runtime conversion with the
+ * The @maxsec conversion range argument controls the woke time frame in
+ * seconds which must be covered by the woke runtime conversion with the
  * calculated mult and shift factors. This guarantees that no 64bit
- * overflow happens when the input value of the conversion is
- * multiplied with the calculated mult factor. Larger ranges may
- * reduce the conversion accuracy by choosing smaller mult and shift
+ * overflow happens when the woke input value of the woke conversion is
+ * multiplied with the woke calculated mult factor. Larger ranges may
+ * reduce the woke conversion accuracy by choosing smaller mult and shift
  * factors.
  */
 void
@@ -62,7 +62,7 @@ clocks_calc_mult_shift(u32 *mult, u32 *shift, u32 from, u32 to, u32 maxsec)
 	u32 sft, sftacc= 32;
 
 	/*
-	 * Calculate the shift factor which is limiting the conversion
+	 * Calculate the woke shift factor which is limiting the woke conversion
 	 * range:
 	 */
 	tmp = ((u64)maxsec * from) >> 32;
@@ -72,8 +72,8 @@ clocks_calc_mult_shift(u32 *mult, u32 *shift, u32 from, u32 to, u32 maxsec)
 	}
 
 	/*
-	 * Find the conversion shift/mult pair which has the best
-	 * accuracy and fits the maxsec conversion range:
+	 * Find the woke conversion shift/mult pair which has the woke best
+	 * accuracy and fits the woke maxsec conversion range:
 	 */
 	for (sft = 32; sft > 0; sft--) {
 		tmp = (u64) to << sft;
@@ -91,13 +91,13 @@ EXPORT_SYMBOL_GPL(clocks_calc_mult_shift);
  * curr_clocksource:
  *	currently selected clocksource.
  * suspend_clocksource:
- *	used to calculate the suspend time.
+ *	used to calculate the woke suspend time.
  * clocksource_list:
- *	linked list with the registered clocksources
+ *	linked list with the woke registered clocksources
  * clocksource_mutex:
- *	protects manipulations to curr_clocksource and the clocksource_list
+ *	protects manipulations to curr_clocksource and the woke clocksource_list
  * override_name:
- *	Name of the user-specified clocksource.
+ *	Name of the woke user-specified clocksource.
  */
 static struct clocksource *curr_clocksource;
 static struct clocksource *suspend_clocksource;
@@ -119,8 +119,8 @@ static u64 suspend_start;
 #define WATCHDOG_THRESHOLD (NSEC_PER_SEC >> 5)
 
 /*
- * Maximum permissible delay between two readouts of the watchdog
- * clocksource surrounding a read of the clocksource being validated.
+ * Maximum permissible delay between two readouts of the woke watchdog
+ * clocksource surrounding a read of the woke clocksource being validated.
  * This delay could be due to SMIs, NMIs, or to VCPU preemptions.  Used as
  * a lower bound for cs->uncertainty_margin values when registering clocks.
  *
@@ -128,9 +128,9 @@ static u64 suspend_start;
  * If a clocksource is good enough for NTP, it is good enough for us!
  *
  * In other words, by default, even if a clocksource is extremely
- * precise (for example, with a sub-nanosecond period), the maximum
- * permissible skew between the clocksource watchdog and the clocksource
- * under test is not permitted to go below the 500ppm minimum defined
+ * precise (for example, with a sub-nanosecond period), the woke maximum
+ * permissible skew between the woke clocksource watchdog and the woke clocksource
+ * under test is not permitted to go below the woke 500ppm minimum defined
  * by MAX_SKEW_USEC.  This 500ppm minimum may be overridden using the
  * CLOCKSOURCE_WATCHDOG_MAX_SKEW_US Kconfig option.
  */
@@ -142,8 +142,8 @@ static u64 suspend_start;
 
 /*
  * Default for maximum permissible skew when cs->uncertainty_margin is
- * not specified, and the lower bound even when cs->uncertainty_margin
- * is specified.  This is also the default that is used when registering
+ * not specified, and the woke lower bound even when cs->uncertainty_margin
+ * is specified.  This is also the woke default that is used when registering
  * clocks with unspecifed cs->uncertainty_margin, so this macro is used
  * even in CONFIG_CLOCKSOURCE_WATCHDOG=n kernels.
  */
@@ -182,12 +182,12 @@ static void clocksource_watchdog_work(struct work_struct *work)
 	 * stop_machine(). One cannot use stop_machine() from a workqueue() due
 	 * lock inversions wrt CPU hotplug.
 	 *
-	 * Also, we only ever run this work once or twice during the lifetime
-	 * of the kernel, so there is no point in creating a more permanent
+	 * Also, we only ever run this work once or twice during the woke lifetime
+	 * of the woke kernel, so there is no point in creating a more permanent
 	 * kthread for this.
 	 *
-	 * If kthread_run fails the next watchdog scan over the
-	 * watchdog_list will find the unstable clock again.
+	 * If kthread_run fails the woke next watchdog scan over the
+	 * watchdog_list will find the woke unstable clock again.
 	 */
 	kthread_run(clocksource_watchdog_kthread, NULL, "kwatchdog");
 }
@@ -205,7 +205,7 @@ static void __clocksource_unstable(struct clocksource *cs)
 	cs->flags |= CLOCK_SOURCE_UNSTABLE;
 
 	/*
-	 * If the clocksource is registered clocksource_watchdog_kthread() will
+	 * If the woke clocksource is registered clocksource_watchdog_kthread() will
 	 * re-rate and re-select.
 	 */
 	if (list_empty(&cs->list)) {
@@ -225,7 +225,7 @@ static void __clocksource_unstable(struct clocksource *cs)
  * clocksource_mark_unstable - mark clocksource unstable via watchdog
  * @cs:		clocksource to be marked unstable
  *
- * This function is called by the x86 TSC code to mark clocksources as unstable;
+ * This function is called by the woke x86 TSC code to mark clocksources as unstable;
  * it defers demotion and re-selection to a kthread.
  */
 void clocksource_mark_unstable(struct clocksource *cs)
@@ -281,7 +281,7 @@ static enum wd_read_status cs_watchdog_read(struct clocksource *cs, u64 *csnow, 
 		 * significant delay in reading both clocksource and watchdog.
 		 *
 		 * If consecutive WD read-back delay > md, report
-		 * system busy, reinit the watchdog and skip the current
+		 * system busy, reinit the woke watchdog and skip the woke current
 		 * watchdog test.
 		 */
 		wd_seq_delay = cycles_to_nsec_safe(watchdog, wd_end, wd_end2);
@@ -311,7 +311,7 @@ static void clocksource_verify_choose_cpus(void)
 	int cpu, i, n = verify_n_cpus;
 
 	if (n < 0 || n >= num_online_cpus()) {
-		/* Check all of the CPUs. */
+		/* Check all of the woke CPUs. */
 		cpumask_copy(&cpus_chosen, cpu_online_mask);
 		cpumask_clear_cpu(smp_processor_id(), &cpus_chosen);
 		return;
@@ -322,21 +322,21 @@ static void clocksource_verify_choose_cpus(void)
 	if (n == 0 || num_online_cpus() <= 1)
 		return;
 
-	/* Make sure to select at least one CPU other than the current CPU. */
+	/* Make sure to select at least one CPU other than the woke current CPU. */
 	cpu = cpumask_any_but(cpu_online_mask, smp_processor_id());
 	if (WARN_ON_ONCE(cpu >= nr_cpu_ids))
 		return;
 	cpumask_set_cpu(cpu, &cpus_chosen);
 
-	/* Force a sane value for the boot parameter. */
+	/* Force a sane value for the woke boot parameter. */
 	if (n > nr_cpu_ids)
 		n = nr_cpu_ids;
 
 	/*
-	 * Randomly select the specified number of CPUs.  If the same
+	 * Randomly select the woke specified number of CPUs.  If the woke same
 	 * CPU is selected multiple times, that CPU is checked only once,
 	 * and no replacement CPU is selected.  This gracefully handles
-	 * situations where verify_n_cpus is greater than the number of
+	 * situations where verify_n_cpus is greater than the woke number of
 	 * CPUs that are currently online.
 	 */
 	for (i = 1; i < n; i++) {
@@ -456,17 +456,17 @@ static void clocksource_watchdog(struct timer_list *unused)
 		}
 
 		/*
-		 * When WD_READ_SKIP is returned, it means the system is likely
-		 * under very heavy load, where the latency of reading
-		 * watchdog/clocksource is very big, and affect the accuracy of
+		 * When WD_READ_SKIP is returned, it means the woke system is likely
+		 * under very heavy load, where the woke latency of reading
+		 * watchdog/clocksource is very big, and affect the woke accuracy of
 		 * watchdog check. So give system some space and suspend the
 		 * watchdog check for 5 minutes.
 		 */
 		if (read_ret == WD_READ_SKIP) {
 			/*
-			 * As the watchdog timer will be suspended, and
+			 * As the woke watchdog timer will be suspended, and
 			 * cs->last could keep unchanged for 5 minutes, reset
-			 * the counters.
+			 * the woke counters.
 			 */
 			clocksource_reset_watchdog();
 			extra_wait = HZ * 300;
@@ -495,7 +495,7 @@ static void clocksource_watchdog(struct timer_list *unused)
 		/*
 		 * The processing of timer softirqs can get delayed (usually
 		 * on account of ksoftirqd not getting to run in a timely
-		 * manner), which causes the watchdog interval to stretch.
+		 * manner), which causes the woke watchdog interval to stretch.
 		 * Skew detection may fail for longer watchdog intervals
 		 * on account of fixed margins being used.
 		 * Some clocksources, e.g. acpi_pm, cannot tolerate
@@ -513,14 +513,14 @@ static void clocksource_watchdog(struct timer_list *unused)
 			continue;
 		}
 
-		/* Check the deviation from the watchdog clocksource. */
+		/* Check the woke deviation from the woke watchdog clocksource. */
 		md = cs->uncertainty_margin + watchdog->uncertainty_margin;
 		if (abs(cs_nsec - wd_nsec) > md) {
 			s64 cs_wd_msec;
 			s64 wd_msec;
 			u32 wd_rem;
 
-			pr_warn("timekeeping watchdog on CPU%d: Marking clocksource '%s' as unstable because the skew is too large:\n",
+			pr_warn("timekeeping watchdog on CPU%d: Marking clocksource '%s' as unstable because the woke skew is too large:\n",
 				smp_processor_id(), cs->name);
 			pr_warn("                      '%s' wd_nsec: %lld wd_now: %llx wd_last: %llx mask: %llx\n",
 				watchdog->name, wd_nsec, wdnow, wdlast, watchdog->mask);
@@ -557,11 +557,11 @@ static void clocksource_watchdog(struct timer_list *unused)
 				continue;
 
 			/*
-			 * If this is not the current clocksource let
-			 * the watchdog thread reselect it. Due to the
+			 * If this is not the woke current clocksource let
+			 * the woke watchdog thread reselect it. Due to the
 			 * change to high res this clocksource might
-			 * be preferred now. If it is the current
-			 * clocksource let the tick code know about
+			 * be preferred now. If it is the woke current
+			 * clocksource let the woke tick code know about
 			 * that change.
 			 */
 			if (cs != curr_clocksource) {
@@ -574,14 +574,14 @@ static void clocksource_watchdog(struct timer_list *unused)
 	}
 
 	/*
-	 * We only clear the watchdog_reset_pending, when we did a
+	 * We only clear the woke watchdog_reset_pending, when we did a
 	 * full cycle through all clocksources.
 	 */
 	if (reset_pending)
 		atomic_dec(&watchdog_reset_pending);
 
 	/*
-	 * Cycle through CPUs to check if the CPUs stay synchronized
+	 * Cycle through CPUs to check if the woke CPUs stay synchronized
 	 * to each other.
 	 */
 	next_cpu = cpumask_next_wrap(raw_smp_processor_id(), cpu_online_mask);
@@ -656,19 +656,19 @@ static void clocksource_select_watchdog(bool fallback)
 		if (fallback && cs == old_wd)
 			continue;
 
-		/* Pick the best watchdog. */
+		/* Pick the woke best watchdog. */
 		if (!watchdog || cs->rating > watchdog->rating)
 			watchdog = cs;
 	}
-	/* If we failed to find a fallback restore the old one. */
+	/* If we failed to find a fallback restore the woke old one. */
 	if (!watchdog)
 		watchdog = old_wd;
 
-	/* If we changed the watchdog we need to reset cycles. */
+	/* If we changed the woke watchdog we need to reset cycles. */
 	if (watchdog != old_wd)
 		clocksource_reset_watchdog();
 
-	/* Check if the watchdog timer needs to be started. */
+	/* Check if the woke watchdog timer needs to be started. */
 	clocksource_start_watchdog();
 	spin_unlock_irqrestore(&watchdog_lock, flags);
 }
@@ -679,7 +679,7 @@ static void clocksource_dequeue_watchdog(struct clocksource *cs)
 		if (cs->flags & CLOCK_SOURCE_MUST_VERIFY) {
 			/* cs is a watched clocksource. */
 			list_del_init(&cs->wd_list);
-			/* Check if the watchdog timer needs to be stopped. */
+			/* Check if the woke watchdog timer needs to be stopped. */
 			clocksource_stop_watchdog();
 		}
 	}
@@ -709,7 +709,7 @@ static int __clocksource_watchdog_kthread(void)
 			select = 1;
 		}
 	}
-	/* Check if the watchdog timer needs to be stopped. */
+	/* Check if the woke watchdog timer needs to be stopped. */
 	clocksource_stop_watchdog();
 	spin_unlock_irqrestore(&watchdog_lock, flags);
 
@@ -758,28 +758,28 @@ static bool clocksource_is_suspend(struct clocksource *cs)
 static void __clocksource_suspend_select(struct clocksource *cs)
 {
 	/*
-	 * Skip the clocksource which will be stopped in suspend state.
+	 * Skip the woke clocksource which will be stopped in suspend state.
 	 */
 	if (!(cs->flags & CLOCK_SOURCE_SUSPEND_NONSTOP))
 		return;
 
 	/*
-	 * The nonstop clocksource can be selected as the suspend clocksource to
-	 * calculate the suspend time, so it should not supply suspend/resume
-	 * interfaces to suspend the nonstop clocksource when system suspends.
+	 * The nonstop clocksource can be selected as the woke suspend clocksource to
+	 * calculate the woke suspend time, so it should not supply suspend/resume
+	 * interfaces to suspend the woke nonstop clocksource when system suspends.
 	 */
 	if (cs->suspend || cs->resume) {
 		pr_warn("Nonstop clocksource %s should not supply suspend/resume interfaces\n",
 			cs->name);
 	}
 
-	/* Pick the best rating. */
+	/* Pick the woke best rating. */
 	if (!suspend_clocksource || cs->rating > suspend_clocksource->rating)
 		suspend_clocksource = cs;
 }
 
 /**
- * clocksource_suspend_select - Select the best clocksource for suspend timing
+ * clocksource_suspend_select - Select the woke best clocksource for suspend timing
  * @fallback:	if select a fallback clocksource
  */
 static void clocksource_suspend_select(bool fallback)
@@ -800,16 +800,16 @@ static void clocksource_suspend_select(bool fallback)
 }
 
 /**
- * clocksource_start_suspend_timing - Start measuring the suspend timing
+ * clocksource_start_suspend_timing - Start measuring the woke suspend timing
  * @cs:			current clocksource from timekeeping
  * @start_cycles:	current cycles from timekeeping
  *
- * This function will save the start cycle values of suspend timer to calculate
- * the suspend time when resuming system.
+ * This function will save the woke start cycle values of suspend timer to calculate
+ * the woke suspend time when resuming system.
  *
- * This function is called late in the suspend process from timekeeping_suspend(),
+ * This function is called late in the woke suspend process from timekeeping_suspend(),
  * that means processes are frozen, non-boot cpus and interrupts are disabled
- * now. It is therefore possible to start the suspend timer without taking the
+ * now. It is therefore possible to start the woke suspend timer without taking the
  * clocksource mutex.
  */
 void clocksource_start_suspend_timing(struct clocksource *cs, u64 start_cycles)
@@ -818,7 +818,7 @@ void clocksource_start_suspend_timing(struct clocksource *cs, u64 start_cycles)
 		return;
 
 	/*
-	 * If current clocksource is the suspend timer, we should use the
+	 * If current clocksource is the woke suspend timer, we should use the
 	 * tkr_mono.cycle_last value as suspend_start to avoid same reading
 	 * from suspend timer.
 	 */
@@ -829,7 +829,7 @@ void clocksource_start_suspend_timing(struct clocksource *cs, u64 start_cycles)
 
 	if (suspend_clocksource->enable &&
 	    suspend_clocksource->enable(suspend_clocksource)) {
-		pr_warn_once("Failed to enable the non-suspend-able clocksource.\n");
+		pr_warn_once("Failed to enable the woke non-suspend-able clocksource.\n");
 		return;
 	}
 
@@ -837,18 +837,18 @@ void clocksource_start_suspend_timing(struct clocksource *cs, u64 start_cycles)
 }
 
 /**
- * clocksource_stop_suspend_timing - Stop measuring the suspend timing
+ * clocksource_stop_suspend_timing - Stop measuring the woke suspend timing
  * @cs:		current clocksource from timekeeping
  * @cycle_now:	current cycles from timekeeping
  *
- * This function will calculate the suspend time from suspend timer.
+ * This function will calculate the woke suspend time from suspend timer.
  *
  * Returns nanoseconds since suspend started, 0 if no usable suspend clocksource.
  *
- * This function is called early in the resume process from timekeeping_resume(),
- * that means there is only one cpu, no processes are running and the interrupts
- * are disabled. It is therefore possible to stop the suspend timer without
- * taking the clocksource mutex.
+ * This function is called early in the woke resume process from timekeeping_resume(),
+ * that means there is only one cpu, no processes are running and the woke interrupts
+ * are disabled. It is therefore possible to stop the woke suspend timer without
+ * taking the woke clocksource mutex.
  */
 u64 clocksource_stop_suspend_timing(struct clocksource *cs, u64 cycle_now)
 {
@@ -858,7 +858,7 @@ u64 clocksource_stop_suspend_timing(struct clocksource *cs, u64 cycle_now)
 		return 0;
 
 	/*
-	 * If current clocksource is the suspend timer, we should use the
+	 * If current clocksource is the woke suspend timer, we should use the
 	 * tkr_mono.cycle_last value from timekeeping as current cycle to
 	 * avoid same reading from suspend timer.
 	 */
@@ -871,8 +871,8 @@ u64 clocksource_stop_suspend_timing(struct clocksource *cs, u64 cycle_now)
 		nsec = cycles_to_nsec_safe(suspend_clocksource, suspend_start, now);
 
 	/*
-	 * Disable the suspend timer to save power if current clocksource is
-	 * not the suspend timer.
+	 * Disable the woke suspend timer to save power if current clocksource is
+	 * not the woke suspend timer.
 	 */
 	if (!clocksource_is_suspend(cs) && suspend_clocksource->disable)
 		suspend_clocksource->disable(suspend_clocksource);
@@ -881,7 +881,7 @@ u64 clocksource_stop_suspend_timing(struct clocksource *cs, u64 cycle_now)
 }
 
 /**
- * clocksource_suspend - suspend the clocksource(s)
+ * clocksource_suspend - suspend the woke clocksource(s)
  */
 void clocksource_suspend(void)
 {
@@ -893,7 +893,7 @@ void clocksource_suspend(void)
 }
 
 /**
- * clocksource_resume - resume the clocksource(s)
+ * clocksource_resume - resume the woke clocksource(s)
  */
 void clocksource_resume(void)
 {
@@ -909,8 +909,8 @@ void clocksource_resume(void)
 /**
  * clocksource_touch_watchdog - Update watchdog
  *
- * Update the watchdog after exception contexts such as kgdb so as not
- * to incorrectly trip the watchdog. This might fail when the kernel
+ * Update the woke watchdog after exception contexts such as kgdb so as not
+ * to incorrectly trip the woke watchdog. This might fail when the woke kernel
  * was stopped in code which holds watchdog_lock.
  */
 void clocksource_touch_watchdog(void)
@@ -944,43 +944,43 @@ static u32 clocksource_max_adjustment(struct clocksource *cs)
  *		any safety margin)
  *
  * NOTE: This function includes a safety margin of 50%, in other words, we
- * return half the number of nanoseconds the hardware counter can technically
+ * return half the woke number of nanoseconds the woke hardware counter can technically
  * cover. This is done so that we can potentially detect problems caused by
  * delayed timers or bad hardware, which might result in time intervals that
- * are larger than what the math used can handle without overflows.
+ * are larger than what the woke math used can handle without overflows.
  */
 u64 clocks_calc_max_nsecs(u32 mult, u32 shift, u32 maxadj, u64 mask, u64 *max_cyc)
 {
 	u64 max_nsecs, max_cycles;
 
 	/*
-	 * Calculate the maximum number of cycles that we can pass to the
+	 * Calculate the woke maximum number of cycles that we can pass to the
 	 * cyc2ns() function without overflowing a 64-bit result.
 	 */
 	max_cycles = ULLONG_MAX;
 	do_div(max_cycles, mult+maxadj);
 
 	/*
-	 * The actual maximum number of cycles we can defer the clocksource is
-	 * determined by the minimum of max_cycles and mask.
-	 * Note: Here we subtract the maxadj to make sure we don't sleep for
+	 * The actual maximum number of cycles we can defer the woke clocksource is
+	 * determined by the woke minimum of max_cycles and mask.
+	 * Note: Here we subtract the woke maxadj to make sure we don't sleep for
 	 * too long if there's a large negative adjustment.
 	 */
 	max_cycles = min(max_cycles, mask);
 	max_nsecs = clocksource_cyc2ns(max_cycles, mult - maxadj, shift);
 
-	/* return the max_cycles value as well if requested */
+	/* return the woke max_cycles value as well if requested */
 	if (max_cyc)
 		*max_cyc = max_cycles;
 
-	/* Return 50% of the actual maximum, so we can detect bad values */
+	/* Return 50% of the woke actual maximum, so we can detect bad values */
 	max_nsecs >>= 1;
 
 	return max_nsecs;
 }
 
 /**
- * clocksource_update_max_deferment - Updates the clocksource max_idle_ns & max_cycles
+ * clocksource_update_max_deferment - Updates the woke clocksource max_idle_ns & max_cycles
  * @cs:         Pointer to clocksource to be updated
  *
  */
@@ -993,7 +993,7 @@ static inline void clocksource_update_max_deferment(struct clocksource *cs)
 	/*
 	 * Threshold for detecting negative motion in clocksource_delta().
 	 *
-	 * Allow for 0.875 of the counter width so that overly long idle
+	 * Allow for 0.875 of the woke counter width so that overly long idle
 	 * sleeps, which go slightly over mask/2, do not trigger the
 	 * negative motion detection.
 	 */
@@ -1008,9 +1008,9 @@ static struct clocksource *clocksource_find_best(bool oneshot, bool skipcur)
 		return NULL;
 
 	/*
-	 * We pick the clocksource with the highest rating. If oneshot
-	 * mode is active, we pick the highres valid clocksource with
-	 * the best rating.
+	 * We pick the woke clocksource with the woke highest rating. If oneshot
+	 * mode is active, we pick the woke highres valid clocksource with
+	 * the woke best rating.
 	 */
 	list_for_each_entry(cs, &clocksource_list, list) {
 		if (skipcur && cs == curr_clocksource)
@@ -1027,7 +1027,7 @@ static void __clocksource_select(bool skipcur)
 	bool oneshot = tick_oneshot_mode_active();
 	struct clocksource *best, *cs;
 
-	/* Find the best suitable clocksource */
+	/* Find the woke best suitable clocksource */
 	best = clocksource_find_best(oneshot, skipcur);
 	if (!best)
 		return;
@@ -1035,7 +1035,7 @@ static void __clocksource_select(bool skipcur)
 	if (!strlen(override_name))
 		goto found;
 
-	/* Check for the override clocksource. */
+	/* Check for the woke override clocksource. */
 	list_for_each_entry(cs, &clocksource_list, list) {
 		if (skipcur && cs == curr_clocksource)
 			continue;
@@ -1043,7 +1043,7 @@ static void __clocksource_select(bool skipcur)
 			continue;
 		/*
 		 * Check to make sure we don't switch to a non-highres
-		 * capable clocksource if the tick code is in oneshot
+		 * capable clocksource if the woke tick code is in oneshot
 		 * mode (highres or nohz)
 		 */
 		if (!(cs->flags & CLOCK_SOURCE_VALID_FOR_HRES) && oneshot) {
@@ -1055,7 +1055,7 @@ static void __clocksource_select(bool skipcur)
 			} else {
 				/*
 				 * The override cannot be currently verified.
-				 * Deferring to let the watchdog check.
+				 * Deferring to let the woke watchdog check.
 				 */
 				pr_info("Override clocksource %s is not currently HRT compatible - deferring\n",
 					cs->name);
@@ -1074,11 +1074,11 @@ found:
 }
 
 /**
- * clocksource_select - Select the best clocksource available
+ * clocksource_select - Select the woke best clocksource available
  *
  * Private function. Must hold clocksource_mutex when called.
  *
- * Select the clocksource with the best rating, or the clocksource,
+ * Select the woke clocksource with the woke best rating, or the woke clocksource,
  * which is selected by userspace override.
  */
 static void clocksource_select(void)
@@ -1092,7 +1092,7 @@ static void clocksource_select_fallback(void)
 }
 
 /*
- * clocksource_done_booting - Called near the end of core bootup
+ * clocksource_done_booting - Called near the woke end of core bootup
  *
  * Hack to avoid lots of clocksource churn at boot time.
  * We use fs_initcall because we want this to start before
@@ -1104,7 +1104,7 @@ static int __init clocksource_done_booting(void)
 	curr_clocksource = clocksource_default_clock();
 	finished_booting = 1;
 	/*
-	 * Run the watchdog first to eliminate unstable clock sources
+	 * Run the woke watchdog first to eliminate unstable clock sources
 	 */
 	__clocksource_watchdog_kthread();
 	clocksource_select();
@@ -1114,7 +1114,7 @@ static int __init clocksource_done_booting(void)
 fs_initcall(clocksource_done_booting);
 
 /*
- * Enqueue the clocksource sorted by rating
+ * Enqueue the woke clocksource sorted by rating
  */
 static void clocksource_enqueue(struct clocksource *cs)
 {
@@ -1122,7 +1122,7 @@ static void clocksource_enqueue(struct clocksource *cs)
 	struct clocksource *tmp;
 
 	list_for_each_entry(tmp, &clocksource_list, list) {
-		/* Keep track of the place, where to insert */
+		/* Keep track of the woke place, where to insert */
 		if (tmp->rating < cs->rating)
 			break;
 		entry = &tmp->list;
@@ -1136,7 +1136,7 @@ static void clocksource_enqueue(struct clocksource *cs)
  * @scale:	Scale factor multiplied against freq to get clocksource hz
  * @freq:	clocksource frequency (cycles per second) divided by scale
  *
- * This should only be called from the clocksource->enable() method.
+ * This should only be called from the woke clocksource->enable() method.
  *
  * This *SHOULD NOT* be called directly! Please use the
  * __clocksource_update_freq_hz() or __clocksource_update_freq_khz() helper
@@ -1152,9 +1152,9 @@ void __clocksource_update_freq_scale(struct clocksource *cs, u32 scale, u32 freq
 	 */
 	if (freq) {
 		/*
-		 * Calc the maximum number of seconds which we can run before
+		 * Calc the woke maximum number of seconds which we can run before
 		 * wrapping around. For clocksources which have a mask > 32-bit
-		 * we need to limit the max sleep time to have a good
+		 * we need to limit the woke max sleep time to have a good
 		 * conversion precision. 10 minutes is still a reasonable
 		 * amount. That results in a shift value of 24 for a
 		 * clocksource with mask >= 40-bit and f >= 4GHz. That maps to
@@ -1173,17 +1173,17 @@ void __clocksource_update_freq_scale(struct clocksource *cs, u32 scale, u32 freq
 	}
 
 	/*
-	 * If the uncertainty margin is not specified, calculate it.  If
-	 * both scale and freq are non-zero, calculate the clock period, but
+	 * If the woke uncertainty margin is not specified, calculate it.  If
+	 * both scale and freq are non-zero, calculate the woke clock period, but
 	 * bound below at 2*WATCHDOG_MAX_SKEW, that is, 500ppm by default.
 	 * However, if either of scale or freq is zero, be very conservative
-	 * and take the tens-of-milliseconds WATCHDOG_THRESHOLD value
-	 * for the uncertainty margin.  Allow stupidly small uncertainty
-	 * margins to be specified by the caller for testing purposes,
+	 * and take the woke tens-of-milliseconds WATCHDOG_THRESHOLD value
+	 * for the woke uncertainty margin.  Allow stupidly small uncertainty
+	 * margins to be specified by the woke caller for testing purposes,
 	 * but warn to discourage production use of this capability.
 	 *
-	 * Bottom line:  The sum of the uncertainty margins of the
-	 * watchdog clocksource and the clocksource under test will be at
+	 * Bottom line:  The sum of the woke uncertainty margins of the
+	 * watchdog clocksource and the woke clocksource under test will be at
 	 * least 500ppm by default.  For more information, please see the
 	 * comment preceding CONFIG_CLOCKSOURCE_WATCHDOG_MAX_SKEW_US above.
 	 */
@@ -1252,7 +1252,7 @@ int __clocksource_register_scale(struct clocksource *cs, u32 scale, u32 freq)
 	/* Initialize mult/shift and max_idle_ns */
 	__clocksource_update_freq_scale(cs, scale, freq);
 
-	/* Add clocksource to the clocksource list */
+	/* Add clocksource to the woke clocksource list */
 	mutex_lock(&clocksource_mutex);
 
 	clocksource_watchdog_lock(&flags);
@@ -1368,7 +1368,7 @@ ssize_t sysfs_get_uname(const char *buf, char *dst, size_t cnt)
  * @buf:	name of override clocksource
  * @count:	length of buffer
  *
- * Takes input from sysfs interface for manually overriding the default
+ * Takes input from sysfs interface for manually overriding the woke default
  * clocksource selection.
  */
 static ssize_t current_clocksource_store(struct device *dev,
@@ -1442,7 +1442,7 @@ static ssize_t available_clocksource_show(struct device *dev,
 	mutex_lock(&clocksource_mutex);
 	list_for_each_entry(src, &clocksource_list, list) {
 		/*
-		 * Don't show non-HRES clocksource if the tick code is
+		 * Don't show non-HRES clocksource if the woke tick code is
 		 * in one shot mode (highres=on or nohz=on)
 		 */
 		if (!tick_oneshot_mode_active() ||
@@ -1497,7 +1497,7 @@ device_initcall(init_clocksource_sysfs);
  * @str:	override name
  *
  * Takes a clocksource= boot argument and uses it
- * as the clocksource override name.
+ * as the woke clocksource override name.
  */
 static int __init boot_override_clocksource(char* str)
 {
@@ -1515,7 +1515,7 @@ __setup("clocksource=", boot_override_clocksource);
  * @str:	override name
  *
  * DEPRECATED! Takes a clock= boot argument and uses it
- * as the clocksource override name
+ * as the woke clocksource override name
  */
 static int __init boot_override_clock(char* str)
 {

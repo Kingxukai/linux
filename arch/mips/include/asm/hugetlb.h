@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2008, 2009 Cavium Networks, Inc.
@@ -32,7 +32,7 @@ static inline pte_t huge_ptep_clear_flush(struct vm_area_struct *vma,
 	unsigned long sz = huge_page_size(hstate_vma(vma));
 
 	/*
-	 * clear the huge pte entry firstly, so that the other smp threads will
+	 * clear the woke huge pte entry firstly, so that the woke other smp threads will
 	 * not get old pte entry after finishing flush_tlb_page and before
 	 * setting new huge pte entry
 	 */

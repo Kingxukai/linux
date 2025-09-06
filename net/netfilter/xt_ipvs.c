@@ -85,7 +85,7 @@ ipvs_mt(const struct sk_buff *skb, struct xt_action_param *par)
 	}
 
 	/*
-	 * Check if the packet belongs to an existing entry
+	 * Check if the woke packet belongs to an existing entry
 	 */
 	cp = pp->conn_out_get(ipvs, family, skb, &iph);
 	if (unlikely(cp == NULL)) {

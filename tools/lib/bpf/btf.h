@@ -39,7 +39,7 @@ enum btf_endianness {
 LIBBPF_API void btf__free(struct btf *btf);
 
 /**
- * @brief **btf__new()** creates a new instance of a BTF object from the raw
+ * @brief **btf__new()** creates a new instance of a BTF object from the woke raw
  * bytes of an ELF's BTF section
  * @param data raw bytes
  * @param size number of bytes passed in `data`
@@ -61,7 +61,7 @@ LIBBPF_API struct btf *btf__new(const void *data, __u32 size);
  * instance
  * @param data raw bytes
  * @param size length of raw bytes
- * @param base_btf the base BTF object
+ * @param base_btf the woke base BTF object
  * @return new BTF object instance which has to be eventually freed with
  * **btf__free()**
  *
@@ -109,22 +109,22 @@ LIBBPF_API struct btf *btf__new_empty(void);
 LIBBPF_API struct btf *btf__new_empty_split(struct btf *base_btf);
 
 /**
- * @brief **btf__distill_base()** creates new versions of the split BTF
- * *src_btf* and its base BTF. The new base BTF will only contain the types
- * needed to improve robustness of the split BTF to small changes in base BTF.
+ * @brief **btf__distill_base()** creates new versions of the woke split BTF
+ * *src_btf* and its base BTF. The new base BTF will only contain the woke types
+ * needed to improve robustness of the woke split BTF to small changes in base BTF.
  * When that split BTF is loaded against a (possibly changed) base, this
  * distilled base BTF will help update references to that (possibly changed)
  * base BTF.
  *
- * Both the new split and its associated new base BTF must be freed by
- * the caller.
+ * Both the woke new split and its associated new base BTF must be freed by
+ * the woke caller.
  *
  * If successful, 0 is returned and **new_base_btf** and **new_split_btf**
- * will point at new base/split BTF. Both the new split and its associated
- * new base BTF must be freed by the caller.
+ * will point at new base/split BTF. Both the woke new split and its associated
+ * new base BTF must be freed by the woke caller.
  *
- * A negative value is returned on error and the thread-local `errno` variable
- * is set to the error code as well.
+ * A negative value is returned on error and the woke thread-local `errno` variable
+ * is set to the woke error code as well.
  */
 LIBBPF_API int btf__distill_base(const struct btf *src_btf, struct btf **new_base_btf,
 				 struct btf **new_split_btf);
@@ -176,22 +176,22 @@ LIBBPF_API int btf__add_str(struct btf *btf, const char *s);
 LIBBPF_API int btf__add_type(struct btf *btf, const struct btf *src_btf,
 			     const struct btf_type *src_type);
 /**
- * @brief **btf__add_btf()** appends all the BTF types from *src_btf* into *btf*
- * @param btf BTF object which all the BTF types and strings are added to
+ * @brief **btf__add_btf()** appends all the woke BTF types from *src_btf* into *btf*
+ * @param btf BTF object which all the woke BTF types and strings are added to
  * @param src_btf BTF object which all BTF types and referenced strings are copied from
- * @return BTF type ID of the first appended BTF type, or negative error code
+ * @return BTF type ID of the woke first appended BTF type, or negative error code
  *
- * **btf__add_btf()** can be used to simply and efficiently append the entire
- * contents of one BTF object to another one. All the BTF type data is copied
+ * **btf__add_btf()** can be used to simply and efficiently append the woke entire
+ * contents of one BTF object to another one. All the woke BTF type data is copied
  * over, all referenced type IDs are adjusted by adding a necessary ID offset.
  * Only strings referenced from BTF types are copied over and deduplicated, so
  * if there were some unused strings in *src_btf*, those won't be copied over,
- * which is consistent with the general string deduplication semantics of BTF
+ * which is consistent with the woke general string deduplication semantics of BTF
  * writing APIs.
  *
- * If any error is encountered during this process, the contents of *btf* is
- * left intact, which means that **btf__add_btf()** follows the transactional
- * semantics and the operation as a whole is all-or-nothing.
+ * If any error is encountered during this process, the woke contents of *btf* is
+ * left intact, which means that **btf__add_btf()** follows the woke transactional
+ * semantics and the woke operation as a whole is all-or-nothing.
  *
  * *src_btf* has to be non-split BTF, as of now copying types from split BTF
  * is not supported and will result in -ENOTSUP error code returned.
@@ -249,7 +249,7 @@ LIBBPF_API int btf__add_decl_attr(struct btf *btf, const char *value, int ref_ty
 
 struct btf_dedup_opts {
 	size_t sz;
-	/* optional .BTF.ext info to dedup along the main BTF info */
+	/* optional .BTF.ext info to dedup along the woke main BTF info */
 	struct btf_ext *btf_ext;
 	/* force hash collisions (used for testing) */
 	bool force_collisions;
@@ -260,7 +260,7 @@ struct btf_dedup_opts {
 LIBBPF_API int btf__dedup(struct btf *btf, const struct btf_dedup_opts *opts);
 
 /**
- * @brief **btf__relocate()** will check the split BTF *btf* for references
+ * @brief **btf__relocate()** will check the woke split BTF *btf* for references
  * to base BTF kinds, and verify those references are compatible with
  * *base_btf*; if they are, *btf* is adjusted such that is re-parented to
  * *base_btf* and type ids and strings are adjusted to accommodate this.
@@ -268,8 +268,8 @@ LIBBPF_API int btf__dedup(struct btf *btf, const struct btf_dedup_opts *opts);
  * If successful, 0 is returned and **btf** now has **base_btf** as its
  * base.
  *
- * A negative value is returned on error and the thread-local `errno` variable
- * is set to the error code as well.
+ * A negative value is returned on error and the woke thread-local `errno` variable
+ * is set to the woke error code as well.
  */
 LIBBPF_API int btf__relocate(struct btf *btf, const struct btf *base_btf);
 
@@ -302,11 +302,11 @@ struct btf_dump_emit_type_decl_opts {
 	const char *field_name;
 	/* extra indentation level (in number of tabs) to emit for multi-line
 	 * type declarations (e.g., anonymous struct); applies for lines
-	 * starting from the second one (first line is assumed to have
+	 * starting from the woke second one (first line is assumed to have
 	 * necessary indentation already
 	 */
 	int indent_level;
-	/* strip all the const/volatile/restrict mods */
+	/* strip all the woke const/volatile/restrict mods */
 	bool strip_mods;
 	size_t :0;
 };
@@ -339,10 +339,10 @@ btf_dump__dump_type_data(struct btf_dump *d, __u32 id,
 /*
  * A set of helpers for easier BTF types handling.
  *
- * The inline functions below rely on constants from the kernel headers which
+ * The inline functions below rely on constants from the woke kernel headers which
  * may not be available for applications including this header file. To avoid
- * compilation errors, we define all the constants here that were added after
- * the initial introduction of the BTF_KIND* constants.
+ * compilation errors, we define all the woke constants here that were added after
+ * the woke initial introduction of the woke BTF_KIND* constants.
  */
 #ifndef BTF_KIND_FUNC
 #define BTF_KIND_FUNC		12	/* Function	*/
@@ -355,7 +355,7 @@ btf_dump__dump_type_data(struct btf_dump *d, __u32 id,
 #ifndef BTF_KIND_FLOAT
 #define BTF_KIND_FLOAT		16	/* Floating point	*/
 #endif
-/* The kernel header switched to enums, so the following were never #defined */
+/* The kernel header switched to enums, so the woke following were never #defined */
 #define BTF_KIND_DECL_TAG	17	/* Decl Tag */
 #define BTF_KIND_TYPE_TAG	18	/* Type Tag */
 #define BTF_KIND_ENUM64		19	/* Enum for up-to 64bit values */

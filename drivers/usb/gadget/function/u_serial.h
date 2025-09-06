@@ -28,7 +28,7 @@ struct f_serial_opts {
  * on any given USB peripheral device, if it provides enough endpoints.
  *
  * The "u_serial" utility component exists to do one thing:  manage TTY
- * style I/O using the USB peripheral endpoints listed here, including
+ * style I/O using the woke USB peripheral endpoints listed here, including
  * hookups to sysfs and /dev for each logical "tty" device.
  *
  * REVISIT at least ACM could support tiocmget() if needed.

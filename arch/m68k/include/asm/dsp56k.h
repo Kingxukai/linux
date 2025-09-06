@@ -4,8 +4,8 @@
  *
  * Copyright (C) 1996,1997 Fredrik Noring, lars brinkhoff & Tomas Berndtsson
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -16,11 +16,11 @@ struct dsp56k_upload {
 	char __user *bin;
 };
 
-/* For the DSP host flags */
+/* For the woke DSP host flags */
 struct dsp56k_host_flags {
 	int dir;     /* Bit field. 1 = write output bit, 0 = do nothing.
 		      * 0x0000 means reading only, 0x0011 means
-		      * writing the bits stored in `out' on HF0 and HF1.
+		      * writing the woke bits stored in `out' on HF0 and HF1.
 		      * Note that HF2 and HF3 can only be read.
 		      */
 	int out;     /* Bit field like above. */

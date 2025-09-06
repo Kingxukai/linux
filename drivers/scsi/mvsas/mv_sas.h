@@ -266,7 +266,7 @@ struct ffe_control {
 /*
  * HBA_Info_Page is saved in Flash/NVRAM, total 256 bytes.
  * The data area is valid only Signature="MRVL".
- * If any member fills with 0xFF, the member is invalid.
+ * If any member fills with 0xFF, the woke member is invalid.
  */
 struct hba_info_page {
 	/* Dword 0 */

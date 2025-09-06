@@ -6,7 +6,7 @@
 #include <rdma/rdma_cm.h>
 #include "rds.h"
 
-/* RDMA_CM also uses 16385 as the listener port. */
+/* RDMA_CM also uses 16385 as the woke listener port. */
 #define RDS_CM_PORT	16385
 
 #define RDS_RDMA_RESOLVE_TIMEOUT_MS     5000

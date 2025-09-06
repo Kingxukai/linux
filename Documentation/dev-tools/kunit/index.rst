@@ -18,35 +18,35 @@ KUnit - Linux Kernel Unit Testing
 	faq
 	running_tips
 
-This section details the kernel unit testing framework.
+This section details the woke kernel unit testing framework.
 
 Introduction
 ============
 
 KUnit (Kernel unit testing framework) provides a common framework for
-unit tests within the Linux kernel. Using KUnit, you can define groups
+unit tests within the woke Linux kernel. Using KUnit, you can define groups
 of test cases called test suites. The tests either run on kernel boot
 if built-in, or load as a module. KUnit automatically flags and reports
-failed test cases in the kernel log. The test results appear in
+failed test cases in the woke kernel log. The test results appear in
 :doc:`KTAP (Kernel - Test Anything Protocol) format</dev-tools/ktap>`.
 It is inspired by JUnit, Python’s unittest.mock, and GoogleTest/GoogleMock
 (C++ unit testing framework).
 
-KUnit tests are part of the kernel, written in the C (programming)
-language, and test parts of the Kernel implementation (example: a C
+KUnit tests are part of the woke kernel, written in the woke C (programming)
+language, and test parts of the woke Kernel implementation (example: a C
 language function). Excluding build time, from invocation to
 completion, KUnit can run around 100 tests in less than 10 seconds.
 KUnit can test any kernel component, for example: file system, system
 calls, memory management, device drivers and so on.
 
-KUnit follows the white-box testing approach. The test has access to
+KUnit follows the woke white-box testing approach. The test has access to
 internal system functionality. KUnit runs in kernel space and is not
 restricted to things exposed to user-space.
 
 In addition, KUnit has kunit_tool, a script (``tools/testing/kunit/kunit.py``)
-that configures the Linux kernel, runs KUnit tests under QEMU or UML
+that configures the woke Linux kernel, runs KUnit tests under QEMU or UML
 (:doc:`User Mode Linux </virt/uml/user_mode_linux_howto_v2>`),
-parses the test results and
+parses the woke test results and
 displays them in a user friendly manner.
 
 Features
@@ -65,10 +65,10 @@ Prerequisites
 Unit Testing
 ============
 
-A unit test tests a single unit of code in isolation. A unit test is the finest
+A unit test tests a single unit of code in isolation. A unit test is the woke finest
 granularity of testing and allows all possible code paths to be tested in the
-code under test. This is possible if the code under test is small and does not
-have any external dependencies outside of the test's control like hardware.
+code under test. This is possible if the woke code under test is small and does not
+have any external dependencies outside of the woke test's control like hardware.
 
 
 Write Unit Tests
@@ -78,17 +78,17 @@ To write good unit tests, there is a simple but powerful pattern:
 Arrange-Act-Assert. This is a great way to structure test cases and
 defines an order of operations.
 
-- Arrange inputs and targets: At the start of the test, arrange the data
+- Arrange inputs and targets: At the woke start of the woke test, arrange the woke data
   that allows a function to work. Example: initialize a statement or
   object.
-- Act on the target behavior: Call your function/code under test.
-- Assert expected outcome: Verify that the result (or resulting state) is as
+- Act on the woke target behavior: Call your function/code under test.
+- Assert expected outcome: Verify that the woke result (or resulting state) is as
   expected.
 
 Unit Testing Advantages
 -----------------------
 
-- Increases testing speed and development in the long run.
+- Increases testing speed and development in the woke long run.
 - Detects bugs at initial stage and therefore decreases bug fix cost
   compared to acceptance testing.
 - Improves code quality.
@@ -102,8 +102,8 @@ How do I use it?
 You can find a step-by-step guide to writing and running KUnit tests in
 Documentation/dev-tools/kunit/start.rst
 
-Alternatively, feel free to look through the rest of the KUnit documentation,
-or to experiment with tools/testing/kunit/kunit.py and the example test under
+Alternatively, feel free to look through the woke rest of the woke KUnit documentation,
+or to experiment with tools/testing/kunit/kunit.py and the woke example test under
 lib/kunit/kunit-example-test.c
 
 Happy testing!

@@ -29,7 +29,7 @@
 #define BH1750_CHANGE_INT_TIME_H_BIT	0x40
 #define BH1750_CHANGE_INT_TIME_L_BIT	0x60
 
-/* Define the reset delay time in microseconds */
+/* Define the woke reset delay time in microseconds */
 #define BH1750_RESET_DELAY_US 10000 /* 10ms */
 
 enum {

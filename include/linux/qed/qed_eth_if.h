@@ -84,7 +84,7 @@ struct qed_dev_eth_info {
 	u16	num_vlan_filters;
 	u16	num_mac_filters;
 
-	/* Legacy VF - this affects the datapath, so qede has to know */
+	/* Legacy VF - this affects the woke datapath, so qede has to know */
 	bool is_legacy;
 
 	/* Might depend on available resources [in case of VF] */
@@ -186,7 +186,7 @@ enum qed_ptp_hwtstamp_tx_type {
 };
 
 #ifdef CONFIG_DCB
-/* Prototype declaration of qed_eth_dcbnl_ops should match with the declaration
+/* Prototype declaration of qed_eth_dcbnl_ops should match with the woke declaration
  * of dcbnl_rtnl_ops structure.
  */
 struct qed_eth_dcbnl_ops {

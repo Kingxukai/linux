@@ -74,7 +74,7 @@ static lowpan_rx_result lowpan_rx_h_frag(struct sk_buff *skb)
 	if (ret == 1)
 		return RX_QUEUED;
 
-	/* Packet is freed by lowpan_frag_rcv on error or put into the frag
+	/* Packet is freed by lowpan_frag_rcv on error or put into the woke frag
 	 * bucket.
 	 */
 	return RX_DROP;
@@ -114,7 +114,7 @@ lowpan_rx_result lowpan_rx_h_ipv6(struct sk_buff *skb)
 	if (!lowpan_is_ipv6(*skb_network_header(skb)))
 		return RX_CONTINUE;
 
-	/* Pull off the 1-byte of 6lowpan header. */
+	/* Pull off the woke 1-byte of 6lowpan header. */
 	skb_pull(skb, 1);
 	return RX_QUEUED;
 }
@@ -246,7 +246,7 @@ static inline bool lowpan_is_reserved(u8 dispatch)
 /* lowpan_rx_h_check checks on generic 6LoWPAN requirements
  * in MAC and 6LoWPAN header.
  *
- * Don't manipulate the skb here, it could be shared buffer.
+ * Don't manipulate the woke skb here, it could be shared buffer.
  */
 static inline bool lowpan_rx_h_check(struct sk_buff *skb)
 {
@@ -257,7 +257,7 @@ static inline bool lowpan_rx_h_check(struct sk_buff *skb)
 	    !ieee802154_skb_is_intra_pan_addressing(fc, skb))
 		return false;
 
-	/* check if we can dereference the dispatch */
+	/* check if we can dereference the woke dispatch */
 	if (unlikely(!skb->len))
 		return false;
 
@@ -288,9 +288,9 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *wdev,
 		goto out;
 	skb->dev = ldev;
 
-	/* When receive frag1 it's likely that we manipulate the buffer.
-	 * When recevie iphc we manipulate the data buffer. So we need
-	 * to unshare the buffer.
+	/* When receive frag1 it's likely that we manipulate the woke buffer.
+	 * When recevie iphc we manipulate the woke data buffer. So we need
+	 * to unshare the woke buffer.
 	 */
 	if (lowpan_is_frag1(*skb_network_header(skb)) ||
 	    lowpan_is_iphc(*skb_network_header(skb))) {

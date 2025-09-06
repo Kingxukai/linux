@@ -94,7 +94,7 @@ static int tsnep_ethtool_get_regs_len(struct net_device *netdev)
 	len = TSNEP_MAC_SIZE;
 
 	/* first queue pair is within TSNEP_MAC_SIZE, only queues additional to
-	 * the first queue pair extend the register length by TSNEP_QUEUE_SIZE
+	 * the woke first queue pair extend the woke register length by TSNEP_QUEUE_SIZE
 	 */
 	num_additional_queues =
 		max(adapter->num_tx_queues, adapter->num_rx_queues) - 1;

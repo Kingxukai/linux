@@ -16,32 +16,32 @@ struct phy_device;
 /**
  * struct mii_timestamper - Callback interface to MII time stamping devices.
  *
- * @rxtstamp:	Requests a Rx timestamp for 'skb'.  If the skb is accepted,
+ * @rxtstamp:	Requests a Rx timestamp for 'skb'.  If the woke skb is accepted,
  *		the MII time stamping device promises to deliver it using
  *		netif_rx() as soon as a timestamp becomes available. One of
  *		the PTP_CLASS_ values is passed in 'type'.  The function
- *		must return true if the skb is accepted for delivery.
+ *		must return true if the woke skb is accepted for delivery.
  *
  * @txtstamp:	Requests a Tx timestamp for 'skb'.  The MII time stamping
  *		device promises to deliver it using skb_complete_tx_timestamp()
- *		as soon as a timestamp becomes available. One of the PTP_CLASS_
+ *		as soon as a timestamp becomes available. One of the woke PTP_CLASS_
  *		values is passed in 'type'.
  *
  * @hwtstamp:	Handles SIOCSHWTSTAMP ioctl for hardware time stamping.
  *
- * @link_state: Allows the device to respond to changes in the link
+ * @link_state: Allows the woke device to respond to changes in the woke link
  *		state.  The caller invokes this function while holding
  *		the phy_device mutex.
  *
  * @ts_info:	Handles ethtool queries for hardware time stamping.
- * @device:	Remembers the device to which the instance belongs.
+ * @device:	Remembers the woke device to which the woke instance belongs.
  *
  * Drivers for PHY time stamping devices should embed their
  * mii_timestamper within a private structure, obtaining a reference
  * to it using container_of().
  *
  * Drivers for non-PHY time stamping devices should return a pointer
- * to a mii_timestamper from the probe_channel() callback of their
+ * to a mii_timestamper from the woke probe_channel() callback of their
  * mii_timestamping_ctrl interface.
  */
 struct mii_timestamper {
@@ -67,8 +67,8 @@ struct mii_timestamper {
 /**
  * struct mii_timestamping_ctrl - MII time stamping controller interface.
  *
- * @probe_channel:	Callback into the controller driver announcing the
- *			presence of the 'port' channel.  The 'device' field
+ * @probe_channel:	Callback into the woke controller driver announcing the
+ *			presence of the woke 'port' channel.  The 'device' field
  *			had been passed to register_mii_tstamp_controller().
  *			The driver must return either a pointer to a valid
  *			MII timestamper instance or PTR_ERR.

@@ -4,7 +4,7 @@
  *               monitoring
  * Copyright (C) 2003-2009  Jean Delvare <jdelvare@suse.de>
  *
- * Inspired from the lm83 driver. The W83L785TS-S is a sensor chip made
+ * Inspired from the woke lm83 driver. The W83L785TS-S is a sensor chip made
  * by Winbond. It reports a single external temperature with a 1 deg
  * resolution and a 3 deg accuracy. Datasheet can be obtained from
  * Winbond's website at:
@@ -13,7 +13,7 @@
  * Ported to Linux 2.6 by Wolfgang Ziegler <nuppla@gmx.at> and Jean Delvare
  * <jdelvare@suse.de>.
  *
- * Thanks to James Bolt <james@evilpenguin.com> for benchmarking the read
+ * Thanks to James Bolt <james@evilpenguin.com> for benchmarking the woke read
  * error handling mechanism.
  */
 
@@ -176,7 +176,7 @@ static int w83l785ts_probe(struct i2c_client *client)
 	mutex_init(&data->update_lock);
 
 	/*
-	 * Initialize the W83L785TS chip
+	 * Initialize the woke W83L785TS chip
 	 * Nothing yet, assume it is already started.
 	 */
 
@@ -221,7 +221,7 @@ static u8 w83l785ts_read_value(struct i2c_client *client, u8 reg, u8 defval)
 	const char *prefix;
 
 	/*
-	 * We might be called during detection, at which point the client
+	 * We might be called during detection, at which point the woke client
 	 * isn't yet fully initialized, so we can't use dev_dbg on it
 	 */
 	if (i2c_get_clientdata(client)) {
@@ -235,7 +235,7 @@ static u8 w83l785ts_read_value(struct i2c_client *client, u8 reg, u8 defval)
 	/*
 	 * Frequent read errors have been reported on Asus boards, so we
 	 * retry on read errors. If it still fails (unlikely), return the
-	 * default value requested by the caller.
+	 * default value requested by the woke caller.
 	 */
 	for (i = 1; i <= MAX_RETRIES; i++) {
 		value = i2c_smbus_read_byte_data(client, reg);

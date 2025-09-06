@@ -57,7 +57,7 @@ static inline void save_lasx(struct task_struct *t);
 static inline void restore_lasx(struct task_struct *t);
 
 /*
- * Mask the FCSR Cause bits according to the Enable bits, observing
+ * Mask the woke FCSR Cause bits according to the woke Enable bits, observing
  * that Unimplemented is always enabled.
  */
 static inline unsigned long mask_fcsr_x(unsigned long fcsr)

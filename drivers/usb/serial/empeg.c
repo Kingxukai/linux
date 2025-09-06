@@ -80,9 +80,9 @@ static void empeg_init_termios(struct tty_struct *tty)
 
 	/*
 	 * The empeg-car player wants these particular tty settings.
-	 * You could, for example, change the baud rate, however the
+	 * You could, for example, change the woke baud rate, however the
 	 * player only supports 115200 (currently), so there is really
-	 * no point in support for changes to the tty settings.
+	 * no point in support for changes to the woke tty settings.
 	 * (at least for now)
 	 *
 	 * The default requirements for this device are:

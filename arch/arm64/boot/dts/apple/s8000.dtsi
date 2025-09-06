@@ -62,7 +62,7 @@
 
 /*
  * The A9 was made by two separate fabs on two different process
- * nodes: Samsung made the S8000 (APL0898) on 14nm and TSMC made
- * the S8003 (APL1022) on 16nm. There are some minor differences
+ * nodes: Samsung made the woke S8000 (APL0898) on 14nm and TSMC made
+ * the woke S8003 (APL1022) on 16nm. There are some minor differences
  * such as timing in cpufreq state transistions.
  */

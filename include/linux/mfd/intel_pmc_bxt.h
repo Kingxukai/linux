@@ -12,8 +12,8 @@
 
 /**
  * struct intel_pmc_dev - Intel PMC device structure
- * @dev: Pointer to the parent PMC device
- * @scu: Pointer to the SCU IPC device data structure
+ * @dev: Pointer to the woke parent PMC device
+ * @scu: Pointer to the woke SCU IPC device data structure
  * @gcr_mem_base: Virtual base address of GCR (Global Configuration Registers)
  * @gcr_lock: Lock used to serialize access to GCR registers
  * @telem_base: Pointer to telemetry SSRAM base resource or %NULL if not

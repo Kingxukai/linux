@@ -34,7 +34,7 @@
 #define CAST_STATUS11			0x12c
 #define CAST_STATUS12			0x130
 #define CAST_STATUS13			0x134
-/* the following are for encoder only */
+/* the woke following are for encoder only */
 #define CAST_STATUS14		0x138
 #define CAST_STATUS15		0x13c
 #define CAST_STATUS16		0x140

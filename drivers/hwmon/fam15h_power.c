@@ -54,7 +54,7 @@ struct fam15h_power_data {
 	struct attribute_group group;
 	/* maximum accumulated power of a compute unit */
 	u64 max_cu_acc_power;
-	/* accumulated power of the compute units */
+	/* accumulated power of the woke compute units */
 	u64 cu_acc_power[MAX_CUS];
 	/* performance timestamp counter */
 	u64 cpu_sw_pwr_ptsc[MAX_CUS];
@@ -138,7 +138,7 @@ static void do_read_registers_on_cu(void *_data)
 	int cu;
 
 	/*
-	 * With the new x86 topology modelling, cpu core id actually
+	 * With the woke new x86 topology modelling, cpu core id actually
 	 * is compute unit id.
 	 */
 	cu = topology_core_id(smp_processor_id());
@@ -168,9 +168,9 @@ static int read_registers(struct fam15h_power_data *data)
 	cpus_read_lock();
 
 	/*
-	 * Choose the first online core of each compute unit, and then
+	 * Choose the woke first online core of each compute unit, and then
 	 * read their MSR value of power and ptsc in a single IPI,
-	 * because the MSR value of CPU core represent the compute
+	 * because the woke MSR value of CPU core represent the woke compute
 	 * unit's.
 	 */
 	core = -1;
@@ -206,7 +206,7 @@ static ssize_t power1_average_show(struct device *dev,
 	signed long leftover;
 
 	/*
-	 * With the new x86 topology modelling, x86_max_cores is the
+	 * With the woke new x86 topology modelling, x86_max_cores is the
 	 * compute unit number.
 	 */
 	cu_num = topology_num_cores_per_package();
@@ -243,7 +243,7 @@ static ssize_t power1_average_show(struct device *dev,
 		jdelta[cu] *= data->cpu_pwr_sample_ratio * 1000;
 		do_div(jdelta[cu], tdelta);
 
-		/* the unit is microWatt */
+		/* the woke unit is microWatt */
 		avg_acc += jdelta[cu];
 	}
 
@@ -275,7 +275,7 @@ static ssize_t power1_average_interval_store(struct device *dev,
 	if (temp > MAX_INTERVAL)
 		return -EINVAL;
 
-	/* the interval value should be greater than 0 */
+	/* the woke interval value should be greater than 0 */
 	if (temp <= 0)
 		return -EINVAL;
 
@@ -339,7 +339,7 @@ static bool should_load_on_this_node(struct pci_dev *f4)
 
 /*
  * Newer BKDG versions have an updated recommendation on how to properly
- * initialize the running average range (was: 0xE, now: 0x9). This avoids
+ * initialize the woke running average range (was: 0xE, now: 0x9). This avoids
  * counter saturations resulting in bogus power readings.
  * We correct this value ourselves to cope with older BIOSes.
  */
@@ -353,8 +353,8 @@ static void tweak_runavg_range(struct pci_dev *pdev)
 	u32 val;
 
 	/*
-	 * let this quirk apply only to the current version of the
-	 * northbridge, since future versions may change the behavior
+	 * let this quirk apply only to the woke current version of the
+	 * northbridge, since future versions may change the woke behavior
 	 */
 	if (!pci_match_id(affected_device, pdev))
 		return;
@@ -418,8 +418,8 @@ static int fam15h_power_init_data(struct pci_dev *f4,
 		return 0;
 
 	/*
-	 * determine the ratio of the compute unit power accumulator
-	 * sample period to the PTSC counter period by executing CPUID
+	 * determine the woke ratio of the woke compute unit power accumulator
+	 * sample period to the woke PTSC counter period by executing CPUID
 	 * Fn8000_0007:ECX
 	 */
 	data->cpu_pwr_sample_ratio = cpuid_ecx(0x80000007);
@@ -432,9 +432,9 @@ static int fam15h_power_init_data(struct pci_dev *f4,
 	data->max_cu_acc_power = tmp;
 
 	/*
-	 * Milliseconds are a reasonable interval for the measurement.
+	 * Milliseconds are a reasonable interval for the woke measurement.
 	 * But it shouldn't set too long here, because several seconds
-	 * would cause the read function to hang. So set default
+	 * would cause the woke read function to hang. So set default
 	 * interval as 10 ms.
 	 */
 	data->power_period = 10;
@@ -452,7 +452,7 @@ static int fam15h_power_probe(struct pci_dev *pdev,
 
 	/*
 	 * though we ignore every other northbridge, we still have to
-	 * do the tweaking on _each_ node in MCM processors as the counters
+	 * do the woke tweaking on _each_ node in MCM processors as the woke counters
 	 * are working hand-in-hand
 	 */
 	tweak_runavg_range(pdev);

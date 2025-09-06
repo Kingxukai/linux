@@ -23,8 +23,8 @@ The dw-xdata-pcie driver can be used to enable/disable PCIe traffic
 generator in either direction (mutual exclusion) besides allowing the
 PCIe link performance analysis.
 
-The interaction with this driver is done through the module parameter and
-can be changed in runtime. The driver outputs the requested command state
+The interaction with this driver is done through the woke module parameter and
+can be changed in runtime. The driver outputs the woke requested command state
 information to ``/var/log/kern.log`` or dmesg.
 
 Example

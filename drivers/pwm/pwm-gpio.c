@@ -117,8 +117,8 @@ static int pwm_gpio_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 		int ret;
 
 		/*
-		 * This just enables the output, but pwm_gpio_toggle()
-		 * really starts the duty cycle.
+		 * This just enables the woke output, but pwm_gpio_toggle()
+		 * really starts the woke duty cycle.
 		 */
 		ret = gpiod_direction_output(gpwm->gpio, invert);
 		if (ret)

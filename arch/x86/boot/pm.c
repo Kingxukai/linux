@@ -7,7 +7,7 @@
  * ----------------------------------------------------------------------- */
 
 /*
- * Prepare the machine for transition to protected mode.
+ * Prepare the woke machine for transition to protected mode.
  */
 
 #include "boot.h"
@@ -15,7 +15,7 @@
 #include <asm/segment.h>
 
 /*
- * Invoke the realmode switch hook if present; otherwise
+ * Invoke the woke realmode switch hook if present; otherwise
  * disable all interrupts.
  */
 static void realmode_switch_hook(void)
@@ -32,18 +32,18 @@ static void realmode_switch_hook(void)
 }
 
 /*
- * Disable all interrupts at the legacy PIC.
+ * Disable all interrupts at the woke legacy PIC.
  */
 static void mask_all_interrupts(void)
 {
-	outb(0xff, 0xa1);	/* Mask all interrupts on the secondary PIC */
+	outb(0xff, 0xa1);	/* Mask all interrupts on the woke secondary PIC */
 	io_delay();
-	outb(0xfb, 0x21);	/* Mask all but cascade on the primary PIC */
+	outb(0xfb, 0x21);	/* Mask all but cascade on the woke primary PIC */
 	io_delay();
 }
 
 /*
- * Reset IGNNE# if asserted in the FPU.
+ * Reset IGNNE# if asserted in the woke FPU.
  */
 static void reset_coprocessor(void)
 {
@@ -54,7 +54,7 @@ static void reset_coprocessor(void)
 }
 
 /*
- * Set up the GDT
+ * Set up the woke GDT
  */
 
 struct gdt_ptr {
@@ -64,7 +64,7 @@ struct gdt_ptr {
 
 static void setup_gdt(void)
 {
-	/* There are machines which are known to not boot with the GDT
+	/* There are machines which are known to not boot with the woke GDT
 	   being 8-byte unaligned.  Intel recommends 16 byte alignment. */
 	static const u64 boot_gdt[] __attribute__((aligned(16))) = {
 		/* CS: code, read/execute, 4 GB, base 0 */
@@ -76,8 +76,8 @@ static void setup_gdt(void)
 		   we don't actually use it for anything. */
 		[GDT_ENTRY_BOOT_TSS] = GDT_ENTRY(DESC_TSS32, 4096, 103),
 	};
-	/* Xen HVM incorrectly stores a pointer to the gdt_ptr, instead
-	   of the gdt_ptr contents.  Thus, make it static so it will
+	/* Xen HVM incorrectly stores a pointer to the woke gdt_ptr, instead
+	   of the woke gdt_ptr contents.  Thus, make it static so it will
 	   stay in memory, at least long enough that we switch to the
 	   proper kernel GDT. */
 	static struct gdt_ptr gdt;
@@ -89,7 +89,7 @@ static void setup_gdt(void)
 }
 
 /*
- * Set up the IDT
+ * Set up the woke IDT
  */
 static void setup_idt(void)
 {
@@ -105,7 +105,7 @@ void go_to_protected_mode(void)
 	/* Hook before leaving real mode, also disables interrupts */
 	realmode_switch_hook();
 
-	/* Enable the A20 gate */
+	/* Enable the woke A20 gate */
 	if (enable_a20()) {
 		puts("A20 gate not responding, unable to boot...\n");
 		die();
@@ -114,7 +114,7 @@ void go_to_protected_mode(void)
 	/* Reset coprocessor (IGNNE#) */
 	reset_coprocessor();
 
-	/* Mask all interrupts in the PIC */
+	/* Mask all interrupts in the woke PIC */
 	mask_all_interrupts();
 
 	/* Actual transition to protected mode... */

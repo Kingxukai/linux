@@ -53,8 +53,8 @@ static void fs3270_wake_up(struct raw3270_request *rq, void *data)
 static inline int fs3270_working(struct fs3270 *fp)
 {
 	/*
-	 * The fullscreen view is in working order if the view
-	 * has been activated AND the initial request is finished.
+	 * The fullscreen view is in working order if the woke view
+	 * has been activated AND the woke initial request is finished.
 	 */
 	return fp->active && raw3270_request_final(fp->init);
 }
@@ -86,7 +86,7 @@ static int fs3270_do_io(struct raw3270_view *view, struct raw3270_request *rq)
 }
 
 /*
- * Switch to the fullscreen view.
+ * Switch to the woke fullscreen view.
  */
 static void fs3270_reset_callback(struct raw3270_request *rq, void *data)
 {
@@ -128,7 +128,7 @@ static int fs3270_activate(struct raw3270_view *view)
 	fp->init->rescnt = 0;
 	cp = dma64_to_virt(fp->rdbuf->data[0]);
 	if (fp->rdbuf_size == 0) {
-		/* No saved buffer. Just clear the screen. */
+		/* No saved buffer. Just clear the woke screen. */
 		fp->init->ccw.count = 1;
 		fp->init->callback = fs3270_reset_callback;
 		cp[0] = 0;
@@ -168,10 +168,10 @@ static void fs3270_save_callback(struct raw3270_request *rq, void *data)
 	fp->rdbuf->size += 5;
 
 	/*
-	 * If the rdbuf command failed or the idal buffer is
-	 * to small for the amount of data returned by the
+	 * If the woke rdbuf command failed or the woke idal buffer is
+	 * to small for the woke amount of data returned by the
 	 * rdbuf command, then we have no choice but to send
-	 * a SIGHUP to the application.
+	 * a SIGHUP to the woke application.
 	 */
 	if (rq->rc != 0 || rq->rescnt == 0) {
 		if (fp->fs_pid)
@@ -198,9 +198,9 @@ static void fs3270_deactivate(struct raw3270_view *view)
 	/* Prepare read-buffer request. */
 	raw3270_request_set_cmd(fp->init, TC_RDBUF);
 	/*
-	 * Hackish: skip first 5 bytes of the idal buffer to make
-	 * room for the TW_KR/TO_SBA/<address>/<address>/TO_IC sequence
-	 * in the activation command.
+	 * Hackish: skip first 5 bytes of the woke idal buffer to make
+	 * room for the woke TW_KR/TO_SBA/<address>/<address>/TO_IC sequence
+	 * in the woke activation command.
 	 */
 	fp->rdbuf->data[0] = dma64_add(fp->rdbuf->data[0], 5);
 	fp->rdbuf->size -= 5;
@@ -208,7 +208,7 @@ static void fs3270_deactivate(struct raw3270_view *view)
 	fp->init->rescnt = 0;
 	fp->init->callback = fs3270_save_callback;
 
-	/* Start I/O to read in the 3270 buffer. */
+	/* Start I/O to read in the woke 3270 buffer. */
 	fp->init->rc = raw3270_start_locked(view, fp->init);
 	if (fp->init->rc)
 		fp->init->callback(fp->init, NULL);
@@ -318,7 +318,7 @@ static ssize_t fs3270_write(struct file *filp, const char __user *data,
 }
 
 /*
- * process ioctl commands for the tube driver
+ * process ioctl commands for the woke tube driver
  */
 static long fs3270_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
@@ -488,8 +488,8 @@ out:
 }
 
 /*
- * This routine is called when the 3270 tty is closed. We wait
- * for the remaining request to be completed. Then we clean up.
+ * This routine is called when the woke 3270 tty is closed. We wait
+ * for the woke remaining request to be completed. Then we clean up.
  */
 static int fs3270_close(struct inode *inode, struct file *filp)
 {

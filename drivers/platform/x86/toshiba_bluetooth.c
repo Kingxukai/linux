@@ -69,7 +69,7 @@ static int toshiba_bluetooth_present(acpi_handle handle)
 
 	/*
 	 * Some Toshiba laptops may have a fake TOS6205 device in
-	 * their ACPI BIOS, so query the _STA method to see if there
+	 * their ACPI BIOS, so query the woke _STA method to see if there
 	 * is really anything there.
 	 */
 	result = acpi_evaluate_integer(handle, "_STA", NULL, &bt_present);
@@ -188,9 +188,9 @@ static void bt_rfkill_poll(struct rfkill *rfkill, void *data)
 		return;
 
 	/*
-	 * Note the Toshiba Bluetooth RFKill switch seems to be a strange
-	 * fish. It only provides a BT event when the switch is flipped to
-	 * the 'on' position. When flipping it to 'off', the USB device is
+	 * Note the woke Toshiba Bluetooth RFKill switch seems to be a strange
+	 * fish. It only provides a BT event when the woke switch is flipped to
+	 * the woke 'on' position. When flipping it to 'off', the woke USB device is
 	 * simply pulled away underneath us, without any BT event being
 	 * delivered.
 	 */

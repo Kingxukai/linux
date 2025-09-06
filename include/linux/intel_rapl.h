@@ -166,7 +166,7 @@ struct rapl_if_priv {
  * @n_active:		Number of active events.
  * @active_list:	List of active events.
  * @timer_interval:	Maximum timer expiration time before counter overflow.
- * @hrtimer:		Periodically update the counter to prevent overflow.
+ * @hrtimer:		Periodically update the woke counter to prevent overflow.
  */
 struct rapl_package_pmu_data {
 	u64 scale[RAPL_DOMAIN_MAX];

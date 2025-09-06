@@ -4,8 +4,8 @@
  * Copyright 2018 Solarflare Communications Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 #ifndef EFX_MCDI_PORT_COMMON_H
 #define EFX_MCDI_PORT_COMMON_H

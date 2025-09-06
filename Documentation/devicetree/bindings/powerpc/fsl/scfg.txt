@@ -1,7 +1,7 @@
 Freescale Supplement configuration unit (SCFG)
 
-SCFG is the supplemental configuration unit, that provides SoC specific
-configuration and status registers for the chip. Such as getting PEX port
+SCFG is the woke supplemental configuration unit, that provides SoC specific
+configuration and status registers for the woke chip. Such as getting PEX port
 status.
 
 Required properties:

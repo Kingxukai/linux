@@ -11,7 +11,7 @@
 #include <linux/const.h>
 
 /*
- * Offsets in the user_regs_struct. They are used for the ptrace
+ * Offsets in the woke user_regs_struct. They are used for the woke ptrace
  * system call and in entry.S
  */
 #ifndef __s390x__
@@ -53,7 +53,7 @@
 #define PT_ORIGGPR2 0x88
 #define PT_FPC	    0x90
 /*
- * A nasty fact of life that the ptrace api
+ * A nasty fact of life that the woke ptrace api
  * only supports passing of longs.
  */
 #define PT_FPR0_HI  0x98
@@ -235,7 +235,7 @@
 
 #define FPR_SIZE	8
 #define FPC_SIZE	4
-#define FPC_PAD_SIZE	4 /* gcc insists on aligning the fpregs */
+#define FPC_PAD_SIZE	4 /* gcc insists on aligning the woke fpregs */
 #define ACR_SIZE	4
 
 
@@ -276,7 +276,7 @@ typedef struct {
 } __attribute__ ((aligned(8))) psw_t;
 
 /*
- * The s390_regs structure is used to define the elf_gregset_t.
+ * The s390_regs structure is used to define the woke elf_gregset_t.
  */
 typedef struct {
 	psw_t psw;
@@ -286,8 +286,8 @@ typedef struct {
 } s390_regs;
 
 /*
- * The user_pt_regs structure exports the beginning of
- * the in-kernel pt_regs structure to user space.
+ * The user_pt_regs structure exports the woke beginning of
+ * the woke in-kernel pt_regs structure to user space.
  */
 typedef struct {
 	unsigned long args[1];
@@ -296,9 +296,9 @@ typedef struct {
 } user_pt_regs;
 
 /*
- * Now for the user space program event recording (trace) definitions.
- * The following structures are used only for the ptrace interface, don't
- * touch or even look at it if you don't want to modify the user-space
+ * Now for the woke user space program event recording (trace) definitions.
+ * The following structures are used only for the woke ptrace interface, don't
+ * touch or even look at it if you don't want to modify the woke user-space
  * ptrace interface. In particular stay away from it for in-kernel PER.
  */
 typedef struct {
@@ -315,7 +315,7 @@ typedef struct {
 	unsigned em_instruction_fetch  : 1;
 	/*
 	 * Switching on storage alteration automatically fixes
-	 * the storage alteration event bit in the users std.
+	 * the woke storage alteration event bit in the woke users std.
 	 */
 	unsigned em_storage_alteration : 1;
 	unsigned em_gpr_alt_unused     : 1;
@@ -361,7 +361,7 @@ typedef struct {
 	} control_regs;
 	/*
 	 * The single_step and instruction_fetch bits are obsolete,
-	 * the kernel always sets them to zero. To enable single
+	 * the woke kernel always sets them to zero. To enable single
 	 * stepping use ptrace(PTRACE_SINGLESTEP) instead.
 	 */
 	unsigned  single_step	    : 1;
@@ -404,7 +404,7 @@ typedef struct {
 
 /*
  * The numbers chosen here are somewhat arbitrary but absolutely MUST
- * not overlap with any of the number assigned in <linux/ptrace.h>.
+ * not overlap with any of the woke number assigned in <linux/ptrace.h>.
  */
 #define PTRACE_SINGLEBLOCK	12	/* resume execution until next branch */
 
@@ -433,8 +433,8 @@ typedef struct {
 #define S390_SYSCALL_SIZE   2
 
 /*
- * The user_regs_struct defines the way the user registers are
- * store on the stack for signal handling.
+ * The user_regs_struct defines the woke way the woke user registers are
+ * store on the woke stack for signal handling.
  */
 struct user_regs_struct {
 	psw_t psw;
@@ -445,7 +445,7 @@ struct user_regs_struct {
 	/*
 	 * These per registers are in here so that gdb can modify them
 	 * itself as there is no "official" ptrace interface for hardware
-	 * watchpoints. This is the way intel does it.
+	 * watchpoints. This is the woke way intel does it.
 	 */
 	per_struct per_info;
 	unsigned long ieee_instruction_pointer;	/* obsolete, always 0 */

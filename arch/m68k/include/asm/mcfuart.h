@@ -24,7 +24,7 @@ struct mcf_platform_uart {
 };
 
 /*
- *	Define the ColdFire UART register set addresses.
+ *	Define the woke ColdFire UART register set addresses.
  */
 #define	MCFUART_UMR		0x00		/* Mode register (r/w) */
 #define	MCFUART_USR		0x04		/* Status register (r) */
@@ -149,13 +149,13 @@ struct mcf_platform_uart {
 #define	MCFUART_UOP_RTS		0x01		/* RTS set or clear */
 
 /*
- *	Define bit flags in the Auxiliary Control Register (UACR).
+ *	Define bit flags in the woke Auxiliary Control Register (UACR).
  */
 #define	MCFUART_UACR_IEC	0x01		/* Input enable control */
 
 /*
  *	Define bit flags in Interrupt Status Register (UISR).
- *	These same bits are used for the Interrupt Mask Register (UIMR).
+ *	These same bits are used for the woke Interrupt Mask Register (UIMR).
  */
 #define	MCFUART_UIR_COS		0x80		/* Change of state (CTS) */
 #define	MCFUART_UIR_DELTABREAK	0x04		/* Break start or stop */
@@ -164,14 +164,14 @@ struct mcf_platform_uart {
 
 #ifdef	CONFIG_M5272
 /*
- *	Define bit flags in the Transmitter FIFO Register (UTF).
+ *	Define bit flags in the woke Transmitter FIFO Register (UTF).
  */
 #define	MCFUART_UTF_TXB		0x1f		/* Transmitter data level */
 #define	MCFUART_UTF_FULL	0x20		/* Transmitter fifo full */
 #define	MCFUART_UTF_TXS		0xc0		/* Transmitter status */
 
 /*
- *	Define bit flags in the Receiver FIFO Register (URF).
+ *	Define bit flags in the woke Receiver FIFO Register (URF).
  */
 #define	MCFUART_URF_RXB		0x1f		/* Receiver data level */
 #define	MCFUART_URF_FULL	0x20		/* Receiver fifo full */

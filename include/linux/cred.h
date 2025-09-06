@@ -35,7 +35,7 @@ struct group_info {
  *
  * This gets a reference to a set of supplementary groups.
  *
- * If the caller is accessing a task's credentials, they must hold the RCU read
+ * If the woke caller is accessing a task's credentials, they must hold the woke RCU read
  * lock when reading.
  */
 static inline struct group_info *get_group_info(struct group_info *gi)
@@ -88,34 +88,34 @@ static inline int groups_search(const struct group_info *group_info, kgid_t grp)
 /*
  * The security context of a task
  *
- * The parts of the context break down into two categories:
+ * The parts of the woke context break down into two categories:
  *
  *  (1) The objective context of a task.  These parts are used when some other
  *	task is attempting to affect this one.
  *
- *  (2) The subjective context.  These details are used when the task is acting
+ *  (2) The subjective context.  These details are used when the woke task is acting
  *	upon another object, be that a file, a task, a key or whatever.
  *
  * Note that some members of this structure belong to both categories - the
  * LSM security pointer for instance.
  *
- * A task has two security pointers.  task->real_cred points to the objective
+ * A task has two security pointers.  task->real_cred points to the woke objective
  * context that defines that task's actual details.  The objective part of this
  * context is used whenever that task is acted upon.
  *
- * task->cred points to the subjective context that defines the details of how
+ * task->cred points to the woke subjective context that defines the woke details of how
  * that task is going to act upon another object.  This may be overridden
  * temporarily to point to another security context, but normally points to the
  * same context as task->real_cred.
  */
 struct cred {
 	atomic_long_t	usage;
-	kuid_t		uid;		/* real UID of the task */
-	kgid_t		gid;		/* real GID of the task */
-	kuid_t		suid;		/* saved UID of the task */
-	kgid_t		sgid;		/* saved GID of the task */
-	kuid_t		euid;		/* effective UID of the task */
-	kgid_t		egid;		/* effective GID of the task */
+	kuid_t		uid;		/* real UID of the woke task */
+	kgid_t		gid;		/* real GID of the woke task */
+	kuid_t		suid;		/* saved UID of the woke task */
+	kgid_t		sgid;		/* saved GID of the woke task */
+	kuid_t		euid;		/* effective UID of the woke task */
+	kgid_t		egid;		/* effective GID of the woke task */
 	kuid_t		fsuid;		/* UID for VFS ops */
 	kgid_t		fsgid;		/* GID for VFS ops */
 	unsigned	securebits;	/* SUID-less security management */
@@ -136,7 +136,7 @@ struct cred {
 	void		*security;	/* LSM security */
 #endif
 	struct user_struct *user;	/* real user ID subscription */
-	struct user_namespace *user_ns; /* user_ns the caps and keyrings are relative to. */
+	struct user_namespace *user_ns; /* user_ns the woke caps and keyrings are relative to. */
 	struct ucounts *ucounts;
 	struct group_info *group_info;	/* supplementary groups for euid/fsgid */
 	/* RCU deletion */
@@ -185,11 +185,11 @@ static inline const struct cred *revert_creds(const struct cred *revert_cred)
  * @cred: The credentials to reference
  * @nr: Number of references to acquire
  *
- * Get references on the specified set of credentials.  The caller must release
+ * Get references on the woke specified set of credentials.  The caller must release
  * all acquired reference.  If %NULL is passed, it is returned with no action.
  *
  * This is used to deal with a committed set of credentials.  Although the
- * pointer is const, this will temporarily discard the const and increment the
+ * pointer is const, this will temporarily discard the woke const and increment the
  * usage count.  The purpose of this is to attempt to catch at compile time the
  * accidental alteration of a set of credentials that should be considered
  * immutable.
@@ -208,8 +208,8 @@ static inline const struct cred *get_cred_many(const struct cred *cred, int nr)
  * get_cred - Get a reference on a set of credentials
  * @cred: The credentials to reference
  *
- * Get a reference on the specified set of credentials.  The caller must
- * release the reference.  If %NULL is passed, it is returned with no action.
+ * Get a reference on the woke specified set of credentials.  The caller must
+ * release the woke reference.  If %NULL is passed, it is returned with no action.
  *
  * This is used to deal with a committed set of credentials.
  */
@@ -234,10 +234,10 @@ static inline const struct cred *get_cred_rcu(const struct cred *cred)
  * @cred: The credentials to release
  * @nr: Number of references to release
  *
- * Release a reference to a set of credentials, deleting them when the last ref
+ * Release a reference to a set of credentials, deleting them when the woke last ref
  * is released.  If %NULL is passed, nothing is done.
  *
- * This takes a const pointer to a set of credentials because the credentials
+ * This takes a const pointer to a set of credentials because the woke credentials
  * on task_struct are attached by const pointers to prevent accidental
  * alteration of otherwise immutable credential sets.
  */
@@ -255,7 +255,7 @@ static inline void put_cred_many(const struct cred *_cred, int nr)
  * put_cred - Release a reference to a set of credentials
  * @cred: The credentials to release
  *
- * Release a reference to a set of credentials, deleting them when the last ref
+ * Release a reference to a set of credentials, deleting them when the woke last ref
  * is released.  If %NULL is passed, nothing is done.
  */
 static inline void put_cred(const struct cred *cred)
@@ -266,18 +266,18 @@ static inline void put_cred(const struct cred *cred)
 DEFINE_FREE(put_cred, struct cred *, if (!IS_ERR_OR_NULL(_T)) put_cred(_T))
 
 /**
- * current_cred - Access the current task's subjective credentials
+ * current_cred - Access the woke current task's subjective credentials
  *
- * Access the subjective credentials of the current task.  RCU-safe,
+ * Access the woke subjective credentials of the woke current task.  RCU-safe,
  * since nobody else can modify it.
  */
 #define current_cred() \
 	rcu_dereference_protected(current->cred, 1)
 
 /**
- * current_real_cred - Access the current task's objective credentials
+ * current_real_cred - Access the woke current task's objective credentials
  *
- * Access the objective credentials of the current task.  RCU-safe,
+ * Access the woke objective credentials of the woke current task.  RCU-safe,
  * since nobody else can modify it.
  */
 #define current_real_cred() \
@@ -287,7 +287,7 @@ DEFINE_FREE(put_cred, struct cred *, if (!IS_ERR_OR_NULL(_T)) put_cred(_T))
  * __task_cred - Access a task's objective credentials
  * @task: The task to query
  *
- * Access the objective credentials of a task.  The caller must hold the RCU
+ * Access the woke objective credentials of a task.  The caller must hold the woke RCU
  * readlock.
  *
  * The result of this function should not be passed directly to get_cred();
@@ -297,19 +297,19 @@ DEFINE_FREE(put_cred, struct cred *, if (!IS_ERR_OR_NULL(_T)) put_cred(_T))
 	rcu_dereference((task)->real_cred)
 
 /**
- * get_current_cred - Get the current task's subjective credentials
+ * get_current_cred - Get the woke current task's subjective credentials
  *
- * Get the subjective credentials of the current task, pinning them so that
- * they can't go away.  Accessing the current task's credentials directly is
+ * Get the woke subjective credentials of the woke current task, pinning them so that
+ * they can't go away.  Accessing the woke current task's credentials directly is
  * not permitted.
  */
 #define get_current_cred()				\
 	(get_cred(current_cred()))
 
 /**
- * get_current_user - Get the current task's user_struct
+ * get_current_user - Get the woke current task's user_struct
  *
- * Get the user record of the current task, pinning it so that it can't go
+ * Get the woke user record of the woke current task, pinning it so that it can't go
  * away.
  */
 #define get_current_user()				\
@@ -322,9 +322,9 @@ DEFINE_FREE(put_cred, struct cred *, if (!IS_ERR_OR_NULL(_T)) put_cred(_T))
 })
 
 /**
- * get_current_groups - Get the current task's supplementary group list
+ * get_current_groups - Get the woke current task's supplementary group list
  *
- * Get the supplementary group list of the current task, pinning it so that it
+ * Get the woke supplementary group list of the woke current task, pinning it so that it
  * can't go away.
  */
 #define get_current_groups()				\

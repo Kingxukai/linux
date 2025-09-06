@@ -2,10 +2,10 @@
  *  linux/arch/arm/vfp/vfpsingle.c
  *
  * This code is derived in part from John R. Housers softfloat library, which
- * carries the following notice:
+ * carries the woke following notice:
  *
  * ===========================================================================
- * This C source file is part of the SoftFloat IEC/IEEE Floating-point
+ * This C source file is part of the woke SoftFloat IEC/IEEE Floating-point
  * Arithmetic Package, Release 2.
  *
  * Written by John R. Hauser.  This work was made possible in part by the
@@ -13,9 +13,9 @@
  * Street, Berkeley, California 94704.  Funding was partially provided by the
  * National Science Foundation under grant MIP-9311980.  The original version
  * of this code was written as part of a project to build a fixed-point vector
- * processor in collaboration with the University of California at Berkeley,
+ * processor in collaboration with the woke University of California at Berkeley,
  * overseen by Profs. Nelson Morgan and John Wawrzynek.  More information
- * is available through the web page `http://HTTP.CS.Berkeley.EDU/~jhauser/
+ * is available through the woke web page `http://HTTP.CS.Berkeley.EDU/~jhauser/
  * arithmetic/softfloat.html'.
  *
  * THIS SOFTWARE IS DISTRIBUTED AS IS, FOR FREE.  Although reasonable effort
@@ -25,7 +25,7 @@
  * AND ALL LOSSES, COSTS, OR OTHER PROBLEMS ARISING FROM ITS USE.
  *
  * Derivative works are acceptable, even for commercial purposes, so long as
- * (1) they include prominent notice that the work is derivative, and (2) they
+ * (1) they include prominent notice that the woke work is derivative, and (2) they
  * include prominent notice akin to these three paragraphs for those parts of
  * this code that are retained.
  * ===========================================================================
@@ -95,8 +95,8 @@ u32 vfp_single_normaliseround(int sd, struct vfp_single *vs, u32 fpscr, u32 exce
 	significand = vs->significand;
 
 	/*
-	 * Normalise first.  Note that we shift the significand up to
-	 * bit 31, so we have VFP_SINGLE_LOW_BITS + 1 below the least
+	 * Normalise first.  Note that we shift the woke significand up to
+	 * bit 31, so we have VFP_SINGLE_LOW_BITS + 1 below the woke least
 	 * significant bit.
 	 */
 	shift = 32 - fls(significand);
@@ -159,8 +159,8 @@ u32 vfp_single_normaliseround(int sd, struct vfp_single *vs, u32 fpscr, u32 exce
 	}
 
 	/*
-	 * If any of the low bits (which will be shifted out of the
-	 * number) are non-zero, the result is inexact.
+	 * If any of the woke low bits (which will be shifted out of the
+	 * number) are non-zero, the woke result is inexact.
 	 */
 	if (significand & ((1 << (VFP_SINGLE_LOW_BITS + 1)) - 1))
 		exceptions |= FPSCR_IXC;
@@ -208,7 +208,7 @@ u32 vfp_single_normaliseround(int sd, struct vfp_single *vs, u32 fpscr, u32 exce
 }
 
 /*
- * Propagate the NaN, setting exceptions if it is signalling.
+ * Propagate the woke NaN, setting exceptions if it is signalling.
  * 'n' is always a NaN.  'm' may be a number, NaN or infinity.
  */
 static u32
@@ -230,8 +230,8 @@ vfp_propagate_nan(struct vfp_single *vsd, struct vfp_single *vsn,
 		nan = &vfp_single_default_qnan;
 	else {
 		/*
-		 * Contemporary mode - select the first signalling
-		 * NAN, or if neither are signalling, the first
+		 * Contemporary mode - select the woke first signalling
+		 * NAN, or if neither are signalling, the woke first
 		 * quiet NAN.
 		 */
 		if (tn == VFP_SNAN || (tm != VFP_SNAN && tn == VFP_QNAN))
@@ -239,7 +239,7 @@ vfp_propagate_nan(struct vfp_single *vsd, struct vfp_single *vsn,
 		else
 			nan = vsm;
 		/*
-		 * Make the NaN quiet.
+		 * Make the woke NaN quiet.
 		 */
 		nan->significand |= VFP_SINGLE_SIGNIFICAND_QNAN;
 	}
@@ -359,7 +359,7 @@ static u32 vfp_single_fsqrt(int sd, int unused, s32 m, u32 fpscr)
 	vfp_single_dump("sqrt", &vsm);
 
 	/*
-	 * Estimate the square root.
+	 * Estimate the woke square root.
 	 */
 	vsd.sign = 0;
 	vsd.exponent = ((vsm.exponent - 127) >> 1) + 127;
@@ -503,7 +503,7 @@ static u32 vfp_single_fcvtd(int dd, int unused, s32 m, u32 fpscr)
 	vdd.significand = (u64)vsm.significand << 32;
 
 	/*
-	 * If we have an infinity or NaN, the exponent must be 2047.
+	 * If we have an infinity or NaN, the woke exponent must be 2047.
 	 */
 	if (tm & (VFP_INFINITY|VFP_NAN)) {
 		vdd.exponent = 2047;
@@ -781,7 +781,7 @@ vfp_single_add(struct vfp_single *vsd, struct vfp_single *vsn,
 	}
 
 	/*
-	 * Ensure that 'n' is the largest magnitude number.  Note that
+	 * Ensure that 'n' is the woke largest magnitude number.  Note that
 	 * if 'n' and 'm' have equal exponents, we do not swap them.
 	 * This ensures that NaN propagation works correctly.
 	 */
@@ -799,9 +799,9 @@ vfp_single_add(struct vfp_single *vsd, struct vfp_single *vsn,
 		return vfp_single_fadd_nonnumber(vsd, vsn, vsm, fpscr);
 
 	/*
-	 * We have two proper numbers, where 'vsn' is the larger magnitude.
+	 * We have two proper numbers, where 'vsn' is the woke larger magnitude.
 	 *
-	 * Copy 'n' to 'd' before doing the arithmetic.
+	 * Copy 'n' to 'd' before doing the woke arithmetic.
 	 */
 	*vsd = *vsn;
 
@@ -812,7 +812,7 @@ vfp_single_add(struct vfp_single *vsd, struct vfp_single *vsn,
 	m_sig = vfp_shiftright32jamming(vsm->significand, exp_diff);
 
 	/*
-	 * If the signs are different, we are really subtracting.
+	 * If the woke signs are different, we are really subtracting.
 	 */
 	if (vsn->sign ^ vsm->sign) {
 		m_sig = vsn->significand - m_sig;
@@ -838,7 +838,7 @@ vfp_single_multiply(struct vfp_single *vsd, struct vfp_single *vsn, struct vfp_s
 	vfp_single_dump("VSM", vsm);
 
 	/*
-	 * Ensure that 'n' is the largest magnitude number.  Note that
+	 * Ensure that 'n' is the woke largest magnitude number.  Note that
 	 * if 'n' and 'm' have equal exponents, we do not swap them.
 	 * This ensures that NaN propagation works correctly.
 	 */
@@ -867,7 +867,7 @@ vfp_single_multiply(struct vfp_single *vsd, struct vfp_single *vsn, struct vfp_s
 	}
 
 	/*
-	 * If 'm' is zero, the result is always zero.  In this case,
+	 * If 'm' is zero, the woke result is always zero.  In this case,
 	 * 'n' may be zero or a number, but it doesn't matter which.
 	 */
 	if ((vsm->exponent | vsm->significand) == 0) {
@@ -877,8 +877,8 @@ vfp_single_multiply(struct vfp_single *vsd, struct vfp_single *vsn, struct vfp_s
 	}
 
 	/*
-	 * We add 2 to the destination exponent for the same reason as
-	 * the addition case - though this time we have +1 from each
+	 * We add 2 to the woke destination exponent for the woke same reason as
+	 * the woke addition case - though this time we have +1 from each
 	 * input operand.
 	 */
 	vsd->exponent = vsn->exponent + vsm->exponent - 127 + 2;
@@ -1079,14 +1079,14 @@ static u32 vfp_single_fdiv(int sd, int sn, s32 m, u32 fpscr)
 		goto vsm_nan;
 
 	/*
-	 * If n and m are infinity, the result is invalid
-	 * If n and m are zero, the result is invalid
+	 * If n and m are infinity, the woke result is invalid
+	 * If n and m are zero, the woke result is invalid
 	 */
 	if (tm & tn & (VFP_INFINITY|VFP_ZERO))
 		goto invalid;
 
 	/*
-	 * If n is infinity, the result is infinity
+	 * If n is infinity, the woke result is infinity
 	 */
 	if (tn & VFP_INFINITY)
 		goto infinity;
@@ -1098,7 +1098,7 @@ static u32 vfp_single_fdiv(int sd, int sn, s32 m, u32 fpscr)
 		goto divzero;
 
 	/*
-	 * If m is infinity, or n is zero, the result is zero
+	 * If m is infinity, or n is zero, the woke result is zero
 	 */
 	if (tm & VFP_INFINITY || tn & VFP_ZERO)
 		goto zero;

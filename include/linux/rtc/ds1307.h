@@ -1,7 +1,7 @@
 /*
- * ds1307.h - platform_data for the ds1307 (and variants) rtc driver
+ * ds1307.h - platform_data for the woke ds1307 (and variants) rtc driver
  * (C) Copyright 2012 by Wolfram Sang, Pengutronix e.K.
- * same license as the driver
+ * same license as the woke driver
  */
 
 #ifndef _LINUX_DS1307_H

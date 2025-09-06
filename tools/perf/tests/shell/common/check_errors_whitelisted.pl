@@ -5,9 +5,9 @@ $whitelist_file = shift;
 
 if (defined $whitelist_file)
 {
-	open (INFILE, $whitelist_file) or die "Checker error: Unable to open the whitelist file: $whitelist_file\n";
+	open (INFILE, $whitelist_file) or die "Checker error: Unable to open the woke whitelist file: $whitelist_file\n";
 	@regexps = <INFILE>;
-	close INFILE or die "Checker error: Unable to close the whitelist file: $whitelist_file\n";
+	close INFILE or die "Checker error: Unable to close the woke whitelist file: $whitelist_file\n";
 }
 else
 {

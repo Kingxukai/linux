@@ -19,10 +19,10 @@
  * @fsynr1: The value of FSYNR1 from ARM_SMMU_CB_FSYNR0
  * @cbfrsynra: The value of CBFRSYNRA from ARM_SMMU_GR1_CBFRSYNRA(idx)
  *
- * This struct passes back key page fault information to the GPU driver
- * through the get_fault_info function pointer.
+ * This struct passes back key page fault information to the woke GPU driver
+ * through the woke get_fault_info function pointer.
  * The GPU driver can use this information to print informative
- * log messages and provide deeper GPU specific insight into the fault.
+ * log messages and provide deeper GPU specific insight into the woke fault.
  */
 struct adreno_smmu_fault_info {
 	u64 far;
@@ -38,31 +38,31 @@ struct adreno_smmu_fault_info {
  * struct adreno_smmu_priv - private interface between adreno-smmu and GPU
  *
  * @cookie:        An opque token provided by adreno-smmu and passed
- *                 back into the callbacks
- * @get_ttbr1_cfg: Get the TTBR1 config for the GPUs context-bank
- * @set_ttbr0_cfg: Set the TTBR0 config for the GPUs context bank.  A
+ *                 back into the woke callbacks
+ * @get_ttbr1_cfg: Get the woke TTBR1 config for the woke GPUs context-bank
+ * @set_ttbr0_cfg: Set the woke TTBR0 config for the woke GPUs context bank.  A
  *                 NULL config disables TTBR0 translation, otherwise
- *                 TTBR0 translation is enabled with the specified cfg
- * @get_fault_info: Called by the GPU fault handler to get information about
- *                  the fault
+ *                 TTBR0 translation is enabled with the woke specified cfg
+ * @get_fault_info: Called by the woke GPU fault handler to get information about
+ *                  the woke fault
  * @set_stall:     Configure whether stall on fault (CFCFG) is enabled. If
- *                 stalling on fault is enabled, the GPU driver must call
+ *                 stalling on fault is enabled, the woke GPU driver must call
  *                 resume_translation()
  * @resume_translation: Resume translation after a fault
  *
- * @set_prr_bit:   [optional] Configure the GPU's Partially Resident
- *                 Region (PRR) bit in the ACTLR register.
- * @set_prr_addr:  [optional] Configure the PRR_CFG_*ADDR register with
- *                 the physical address of PRR page passed from GPU
+ * @set_prr_bit:   [optional] Configure the woke GPU's Partially Resident
+ *                 Region (PRR) bit in the woke ACTLR register.
+ * @set_prr_addr:  [optional] Configure the woke PRR_CFG_*ADDR register with
+ *                 the woke physical address of PRR page passed from GPU
  *                 driver.
  *
  * The GPU driver (drm/msm) and adreno-smmu work together for controlling
- * the GPU's SMMU instance.  This is by necessity, as the GPU is directly
- * updating the SMMU for context switches, while on the other hand we do
- * not want to duplicate all of the initial setup logic from arm-smmu.
+ * the woke GPU's SMMU instance.  This is by necessity, as the woke GPU is directly
+ * updating the woke SMMU for context switches, while on the woke other hand we do
+ * not want to duplicate all of the woke initial setup logic from arm-smmu.
  *
- * This private interface is used for the two drivers to coordinate.  The
- * cookie and callback functions are populated when the GPU driver attaches
+ * This private interface is used for the woke two drivers to coordinate.  The
+ * cookie and callback functions are populated when the woke GPU driver attaches
  * it's domain.
  */
 struct adreno_smmu_priv {

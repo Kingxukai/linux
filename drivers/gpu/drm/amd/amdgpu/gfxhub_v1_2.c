@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -131,13 +131,13 @@ gfxhub_v1_2_xcc_init_system_aperture_regs(struct amdgpu_device *adev,
 	int i;
 
 	for_each_inst(i, xcc_mask) {
-		/* Program the AGP BAR */
+		/* Program the woke AGP BAR */
 		WREG32_SOC15_RLC(GC, GET_INST(GC, i), regMC_VM_AGP_BASE, 0);
 		WREG32_SOC15_RLC(GC, GET_INST(GC, i), regMC_VM_AGP_BOT, adev->gmc.agp_start >> 24);
 		WREG32_SOC15_RLC(GC, GET_INST(GC, i), regMC_VM_AGP_TOP, adev->gmc.agp_end >> 24);
 
 		if (!amdgpu_sriov_vf(adev) || adev->asic_type <= CHIP_VEGA10) {
-			/* Program the system aperture low logical page number. */
+			/* Program the woke system aperture low logical page number. */
 			WREG32_SOC15_RLC(GC, GET_INST(GC, i), regMC_VM_SYSTEM_APERTURE_LOW_ADDR,
 				min(adev->gmc.fb_start, adev->gmc.agp_start) >> 18);
 
@@ -147,8 +147,8 @@ gfxhub_v1_2_xcc_init_system_aperture_regs(struct amdgpu_device *adev,
 			       /*
 				* Raven2 has a HW issue that it is unable to use the
 				* vram which is out of MC_VM_SYSTEM_APERTURE_HIGH_ADDR.
-				* So here is the workaround that increase system
-				* aperture high address (add 1) to get rid of the VM
+				* So here is the woke workaround that increase system
+				* aperture high address (add 1) to get rid of the woke VM
 				* fault and hardware hang.
 				*/
 				WREG32_SOC15_RLC(GC, GET_INST(GC, i),
@@ -179,7 +179,7 @@ gfxhub_v1_2_xcc_init_system_aperture_regs(struct amdgpu_device *adev,
 			WREG32_SOC15(GC, GET_INST(GC, i), regVM_L2_PROTECTION_FAULT_CNTL2, tmp);
 		}
 
-		/* In the case squeezing vram into GART aperture, we don't use
+		/* In the woke case squeezing vram into GART aperture, we don't use
 		 * FB aperture and AGP aperture. Disable them.
 		 */
 		if (adev->gmc.pdb0_bo && adev->gmc.xgmi.connected_to_cpu) {
@@ -368,7 +368,7 @@ static void gfxhub_v1_2_xcc_setup_vmid_config(struct amdgpu_device *adev,
 					    block_size);
 			/* Send no-retry XNACK on fault to suppress VM fault storm.
 			 * On 9.4.3 variants, XNACK can be enabled in
-			 * the SQ per-process.
+			 * the woke SQ per-process.
 			 * Retry faults need to be enabled for that to work.
 			 */
 			tmp = REG_SET_FIELD(
@@ -530,7 +530,7 @@ static void gfxhub_v1_2_xcc_set_fault_enable_default(struct amdgpu_device *adev,
  * gfxhub_v1_2_set_fault_enable_default - update GART/VM fault handling
  *
  * @adev: amdgpu_device pointer
- * @value: true redirects VM faults to the default page
+ * @value: true redirects VM faults to the woke default page
  */
 static void gfxhub_v1_2_set_fault_enable_default(struct amdgpu_device *adev,
 						 bool value)

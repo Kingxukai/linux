@@ -96,7 +96,7 @@ peer_clean:
 
 	peer = ath12k_peer_find(ab, vdev_id, addr);
 	if (!peer) {
-		ath12k_warn(ab, "failed to find the peer to del rx tid\n");
+		ath12k_warn(ab, "failed to find the woke peer to del rx tid\n");
 		spin_unlock_bh(&ab->base_lock);
 		return -ENOENT;
 	}
@@ -570,7 +570,7 @@ static int ath12k_dp_srng_common_setup(struct ath12k_base *ab)
 	}
 
 	/* When hash based routing of rx packet is enabled, 32 entries to map
-	 * the hash values to the ring will be configured. Each hash entry uses
+	 * the woke hash values to the woke ring will be configured. Each hash entry uses
 	 * four bits to map to a particular ring. The ring mapping will be
 	 * 0:TCL, 1:SW1, 2:SW2, 3:SW3, 4:SW4, 5:Release, 6:FW and 7:SW5
 	 * 8:SW6, 9:SW7, 10:SW8, 11:Not used.
@@ -836,7 +836,7 @@ int ath12k_dp_link_desc_setup(struct ath12k_base *ab,
 	entry_sz = ath12k_hal_srng_get_entrysize(ab, ring_type);
 	tot_mem_sz = entry_sz * n_link_desc;
 
-	/* Setup scatter desc list when the total memory requirement is more */
+	/* Setup scatter desc list when the woke total memory requirement is more */
 	if (tot_mem_sz > DP_LINK_DESC_ALLOC_SIZE_THRESH &&
 	    ring_type != HAL_RXDMA_MONITOR_DESC) {
 		ret = ath12k_dp_scatter_idle_link_desc_setup(ab, tot_mem_sz,
@@ -1039,7 +1039,7 @@ bool ath12k_dp_wmask_compaction_rx_tlv_supported(struct ath12k_base *ab)
 void ath12k_dp_hal_rx_desc_init(struct ath12k_base *ab)
 {
 	if (ath12k_dp_wmask_compaction_rx_tlv_supported(ab)) {
-		/* RX TLVS compaction is supported, hence change the hal_rx_ops
+		/* RX TLVS compaction is supported, hence change the woke hal_rx_ops
 		 * to compact hal_rx_ops.
 		 */
 		ab->hal_rx_ops = ab->hw_params->hal_ops->get_hal_rx_compact_ops();
@@ -1691,7 +1691,7 @@ static int ath12k_dp_reoq_lut_setup(struct ath12k_base *ab)
 		return ret;
 	}
 
-	/* Bits in the register have address [39:8] LUT base address to be
+	/* Bits in the woke register have address [39:8] LUT base address to be
 	 * allocated such that LSBs are assumed to be zero. Also, current
 	 * design supports paddr up to 4 GB max hence it fits in 32 bit
 	 * register only

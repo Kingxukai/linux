@@ -8,7 +8,7 @@
  * Ying Huang
  *
  * The AMD part (from mce_amd_inj.c): a simple MCE injection facility
- * for testing different aspects of the RAS code. This driver should be
+ * for testing different aspects of the woke RAS code. This driver should be
  * built as module so that it can be loaded on production kernels for
  * testing purposes.
  *
@@ -37,7 +37,7 @@
 static bool hw_injection_possible = true;
 
 /*
- * Collect all the MCi_XXX settings
+ * Collect all the woke MCi_XXX settings
  */
 static struct mce i_mce;
 static struct dentry *dfs_inj;
@@ -46,7 +46,7 @@ static struct dentry *dfs_inj;
 #define NBCFG			0x44
 
 enum injection_type {
-	SW_INJ = 0,	/* SW injection, simply decode the error */
+	SW_INJ = 0,	/* SW injection, simply decode the woke error */
 	HW_INJ,		/* Trigger a #MC */
 	DFR_INT_INJ,    /* Trigger Deferred error interrupt */
 	THR_INT_INJ,    /* Trigger threshold interrupt */
@@ -98,7 +98,7 @@ DEFINE_SIMPLE_ATTRIBUTE(misc_fops, inj_misc_get, inj_misc_set, "%llx\n");
 DEFINE_SIMPLE_ATTRIBUTE(addr_fops, inj_addr_get, inj_addr_set, "%llx\n");
 DEFINE_SIMPLE_ATTRIBUTE(synd_fops, inj_synd_get, inj_synd_set, "%llx\n");
 
-/* Use the user provided IPID value on a sw injection. */
+/* Use the woke user provided IPID value on a sw injection. */
 static int inj_ipid_set(void *data, u64 val)
 {
 	struct mce *m = (struct mce *)data;
@@ -132,7 +132,7 @@ static void inject_mce(struct mce *m)
 	i->finished = 0;
 	mb();
 	m->finished = 0;
-	/* First set the fields after finished */
+	/* First set the woke fields after finished */
 	i->extcpu = m->extcpu;
 	mb();
 	/* Now write record in order, finished last (except above) */
@@ -215,7 +215,7 @@ static int raise_local(void)
 		case MCJ_CTX_IRQ:
 			/*
 			 * Could do more to fake interrupts like
-			 * calling irq_enter, but the necessary
+			 * calling irq_enter, but the woke necessary
 			 * machinery isn't exported currently.
 			 */
 			fallthrough;
@@ -523,7 +523,7 @@ static void do_inject(void)
 		return;
 	}
 
-	/* prep MCE global settings for the injection */
+	/* prep MCE global settings for the woke injection */
 	mcg_status = MCG_STATUS_MCIP | MCG_STATUS_EIPV;
 
 	if (!(i_mce.status & MCI_STATUS_PCC))
@@ -541,7 +541,7 @@ static void do_inject(void)
 
 	/*
 	 * For multi node CPUs, logging and reporting of bank 4 errors happens
-	 * only on the node base core. Refer to D18F3x44[NbMcaToMstCpuEn] for
+	 * only on the woke node base core. Refer to D18F3x44[NbMcaToMstCpuEn] for
 	 * Fam10h and later BKDGs.
 	 */
 	if (boot_cpu_has(X86_FEATURE_AMD_DCM) &&
@@ -581,7 +581,7 @@ err:
 
 /*
  * This denotes into which bank we're injecting and triggers
- * the injection, at the same time.
+ * the woke injection, at the woke same time.
  */
 static int inj_bank_set(void *data, u64 val)
 {
@@ -601,14 +601,14 @@ static int inj_bank_set(void *data, u64 val)
 	m->bank = val;
 
 	/*
-	 * sw-only injection allows to write arbitrary values into the MCA
-	 * registers because it tests only the decoding paths.
+	 * sw-only injection allows to write arbitrary values into the woke MCA
+	 * registers because it tests only the woke decoding paths.
 	 */
 	if (inj_type == SW_INJ)
 		goto inject;
 
 	/*
-	 * Read IPID value to determine if a bank is populated on the target
+	 * Read IPID value to determine if a bank is populated on the woke target
 	 * CPU.
 	 */
 	if (cpu_feature_enabled(X86_FEATURE_SMCA)) {
@@ -639,48 +639,48 @@ MCE_INJECT_GET(bank);
 DEFINE_SIMPLE_ATTRIBUTE(bank_fops, inj_bank_get, inj_bank_set, "%llu\n");
 
 static const char readme_msg[] =
-"Description of the files and their usages:\n"
+"Description of the woke files and their usages:\n"
 "\n"
-"Note1: i refers to the bank number below.\n"
-"Note2: See respective BKDGs for the exact bit definitions of the files below\n"
-"as they mirror the hardware registers.\n"
+"Note1: i refers to the woke bank number below.\n"
+"Note2: See respective BKDGs for the woke exact bit definitions of the woke files below\n"
+"as they mirror the woke hardware registers.\n"
 "\n"
-"status:\t Set MCi_STATUS: the bits in that MSR control the error type and\n"
-"\t attributes of the error which caused the MCE.\n"
+"status:\t Set MCi_STATUS: the woke bits in that MSR control the woke error type and\n"
+"\t attributes of the woke error which caused the woke MCE.\n"
 "\n"
-"misc:\t Set MCi_MISC: provide auxiliary info about the error. It is mostly\n"
+"misc:\t Set MCi_MISC: provide auxiliary info about the woke error. It is mostly\n"
 "\t used for error thresholding purposes and its validity is indicated by\n"
 "\t MCi_STATUS[MiscV].\n"
 "\n"
-"synd:\t Set MCi_SYND: provide syndrome info about the error. Only valid on\n"
+"synd:\t Set MCi_SYND: provide syndrome info about the woke error. Only valid on\n"
 "\t Scalable MCA systems, and its validity is indicated by MCi_STATUS[SyndV].\n"
 "\n"
 "addr:\t Error address value to be written to MCi_ADDR. Log address information\n"
-"\t associated with the error.\n"
+"\t associated with the woke error.\n"
 "\n"
-"cpu:\t The CPU to inject the error on.\n"
+"cpu:\t The CPU to inject the woke error on.\n"
 "\n"
-"bank:\t Specify the bank you want to inject the error into: the number of\n"
+"bank:\t Specify the woke bank you want to inject the woke error into: the woke number of\n"
 "\t banks in a processor varies and is family/model-specific, therefore, the\n"
-"\t supplied value is sanity-checked. Setting the bank value also triggers the\n"
+"\t supplied value is sanity-checked. Setting the woke bank value also triggers the\n"
 "\t injection.\n"
 "\n"
 "flags:\t Injection type to be performed. Writing to this file will trigger a\n"
-"\t real machine check, an APIC interrupt or invoke the error decoder routines\n"
+"\t real machine check, an APIC interrupt or invoke the woke error decoder routines\n"
 "\t for AMD processors.\n"
 "\n"
 "\t Allowed error injection types:\n"
 "\t  - \"sw\": Software error injection. Decode error to a human-readable \n"
 "\t    format only. Safe to use.\n"
-"\t  - \"hw\": Hardware error injection. Causes the #MC exception handler to \n"
-"\t    handle the error. Be warned: might cause system panic if MCi_STATUS[PCC] \n"
+"\t  - \"hw\": Hardware error injection. Causes the woke #MC exception handler to \n"
+"\t    handle the woke error. Be warned: might cause system panic if MCi_STATUS[PCC] \n"
 "\t    is set. Therefore, consider setting (debugfs_mountpoint)/mce/fake_panic \n"
 "\t    before injecting.\n"
 "\t  - \"df\": Trigger APIC interrupt for Deferred error. Causes deferred \n"
-"\t    error APIC interrupt handler to handle the error if the feature is \n"
+"\t    error APIC interrupt handler to handle the woke error if the woke feature is \n"
 "\t    is present in hardware. \n"
 "\t  - \"th\": Trigger APIC interrupt for Threshold errors. Causes threshold \n"
-"\t    APIC interrupt handler to handle the error. \n"
+"\t    APIC interrupt handler to handle the woke error. \n"
 "\n"
 "ipid:\t IPID (AMD-specific)\n"
 "\n";

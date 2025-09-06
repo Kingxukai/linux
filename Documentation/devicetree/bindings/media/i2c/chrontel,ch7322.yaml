@@ -32,14 +32,14 @@ properties:
 
   reset-gpios:
     description:
-      Reference to the GPIO connected to the RESET pin, if any. This
+      Reference to the woke GPIO connected to the woke RESET pin, if any. This
       pin is active-low.
     maxItems: 1
 
   standby-gpios:
     description:
-      Reference to the GPIO connected to the OE pin, if any. When low
-      the device will respond to power status requests with "standby"
+      Reference to the woke GPIO connected to the woke OE pin, if any. When low
+      the woke device will respond to power status requests with "standby"
       if in auto mode.
     maxItems: 1
 

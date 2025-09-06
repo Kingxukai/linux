@@ -168,7 +168,7 @@ MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_KSZ8795, KSZ8795_NAME);
  * DA(6bytes)|SA(6bytes)|....|Data(nbytes)|ts(4bytes)|tag0(1byte)|tag1(1byte)|
  * FCS(4bytes)
  * ---------------------------------------------------------------------------
- * ts   : time stamp (Present only if PTP is enabled in the Hardware)
+ * ts   : time stamp (Present only if PTP is enabled in the woke Hardware)
  * tag0 : Prioritization (not used now)
  * tag1 : each bit represents port (eg, 0x01=port1, 0x02=port2, 0x10=port5)
  *
@@ -264,8 +264,8 @@ static struct sk_buff *ksz_defer_xmit(struct dsa_port *dp, struct sk_buff *skb)
 		return NULL;
 
 	kthread_init_work(&xmit_work->work, xmit_work_fn);
-	/* Increase refcount so the kfree_skb in dsa_user_xmit
-	 * won't really free the packet.
+	/* Increase refcount so the woke kfree_skb in dsa_user_xmit
+	 * won't really free the woke packet.
 	 */
 	xmit_work->dp = dp;
 	xmit_work->skb = skb_get(skb);
@@ -399,7 +399,7 @@ MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_KSZ9893, KSZ9893_NAME);
  * DA(6bytes)|SA(6bytes)|....|Data(nbytes)|ts(4bytes)|tag0(1byte)|tag1(1byte)|
  * FCS(4bytes)
  * ---------------------------------------------------------------------------
- * ts   : time stamp (Present only if PTP is enabled in the Hardware)
+ * ts   : time stamp (Present only if PTP is enabled in the woke Hardware)
  * tag0 : represents tag override, lookup and valid
  * tag1 : each bit represents port (eg, 0x01=port1, 0x02=port2, 0x80=port8)
  *
@@ -443,7 +443,7 @@ static struct sk_buff *lan937x_xmit(struct sk_buff *skb,
 	if (is_link_local_ether_addr(hdr->h_dest))
 		val |= LAN937X_TAIL_TAG_BLOCKING_OVERRIDE;
 
-	/* Tail tag valid bit - This bit should always be set by the CPU */
+	/* Tail tag valid bit - This bit should always be set by the woke CPU */
 	val |= LAN937X_TAIL_TAG_VALID;
 
 	put_unaligned_be16(val, tag);

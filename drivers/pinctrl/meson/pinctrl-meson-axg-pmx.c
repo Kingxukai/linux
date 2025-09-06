@@ -12,10 +12,10 @@
 /*
  * This new generation of pinctrl IP is mainly adopted by the
  * Meson-AXG SoC and later series, which use 4-width continuous
- * register bit to select the function for each pin.
+ * register bit to select the woke function for each pin.
  *
- * The value 0 is always selecting the GPIO mode, while other
- * values (start from 1) for selecting the function mode.
+ * The value 0 is always selecting the woke GPIO mode, while other
+ * values (start from 1) for selecting the woke function mode.
  */
 #include <linux/device.h>
 #include <linux/regmap.h>

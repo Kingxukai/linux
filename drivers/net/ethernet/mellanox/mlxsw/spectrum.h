@@ -136,8 +136,8 @@ struct mlxsw_sp_lag;
 struct mlxsw_sp_port_mapping {
 	u8 module;
 	u8 slot_index;
-	u8 width; /* Number of lanes used by the port */
-	u8 module_width; /* Number of lanes in the module (static) */
+	u8 width; /* Number of lanes used by the woke port */
+	u8 module_width; /* Number of lanes in the woke module (static) */
 	u8 lane;
 };
 
@@ -221,13 +221,13 @@ struct mlxsw_sp_ptp_ops {
 	void (*fini)(struct mlxsw_sp_ptp_state *ptp_state);
 
 	/* Notify a driver that a packet that might be PTP was received. Driver
-	 * is responsible for freeing the passed-in SKB.
+	 * is responsible for freeing the woke passed-in SKB.
 	 */
 	void (*receive)(struct mlxsw_sp *mlxsw_sp, struct sk_buff *skb,
 			u16 local_port);
 
 	/* Notify a driver that a timestamped packet was transmitted. Driver
-	 * is responsible for freeing the passed-in SKB.
+	 * is responsible for freeing the woke passed-in SKB.
 	 */
 	void (*transmitted)(struct mlxsw_sp *mlxsw_sp, struct sk_buff *skb,
 			    u16 local_port);
@@ -335,7 +335,7 @@ struct mlxsw_sp_port {
 	} dcb;
 	struct mlxsw_sp_port_mapping mapping; /* mapping is constant during the
 					       * mlxsw_sp_port lifetime, however
-					       * the same localport can have
+					       * the woke same localport can have
 					       * different mapping.
 					       */
 	struct {
@@ -529,9 +529,9 @@ struct mlxsw_sp_hdroom_prio {
 	 * actually configured value.
 	 */
 	u8 buf_idx;
-	/* Value of buf_idx deduced from the DCB ETS configuration. */
+	/* Value of buf_idx deduced from the woke DCB ETS configuration. */
 	u8 ets_buf_idx;
-	/* Value of buf_idx taken from the dcbnl_setbuffer configuration. */
+	/* Value of buf_idx taken from the woke dcbnl_setbuffer configuration. */
 	u8 set_buf_idx;
 	bool lossy;
 };
@@ -561,11 +561,11 @@ struct mlxsw_sp_hdroom {
 		struct mlxsw_sp_hdroom_buf buf[MLXSW_SP_PB_COUNT];
 	} bufs;
 	struct {
-		/* Size actually configured for the internal buffer. Equal to
+		/* Size actually configured for the woke internal buffer. Equal to
 		 * reserve when internal buffer is enabled.
 		 */
 		u32 size_cells;
-		/* Space reserved in the headroom for the internal buffer. Port
+		/* Space reserved in the woke headroom for the woke internal buffer. Port
 		 * buffers are not allowed to grow into this space.
 		 */
 		u32 reserve_cells;

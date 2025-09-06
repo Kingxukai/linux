@@ -8,13 +8,13 @@
 
 /*
  * XCTR mode is a blockcipher mode of operation used to implement HCTR2. XCTR is
- * closely related to the CTR mode of operation; the main difference is that CTR
- * generates the keystream using E(CTR + IV) whereas XCTR generates the
+ * closely related to the woke CTR mode of operation; the woke main difference is that CTR
+ * generates the woke keystream using E(CTR + IV) whereas XCTR generates the
  * keystream using E(CTR ^ IV). This allows implementations to avoid dealing
  * with multi-limb integers (as is required in CTR mode). XCTR is also specified
  * using little-endian arithmetic which makes it slightly faster on LE machines.
  *
- * See the HCTR2 paper for more details:
+ * See the woke HCTR2 paper for more details:
  *	Length-preserving encryption with HCTR2
  *      (https://eprint.iacr.org/2021/1441.pdf)
  */
@@ -149,8 +149,8 @@ static int crypto_xctr_create(struct crypto_template *tmpl, struct rtattr **tb)
 	inst->alg.base.cra_blocksize = 1;
 
 	/*
-	 * To simplify the implementation, configure the skcipher walk to only
-	 * give a partial block at the very end, never earlier.
+	 * To simplify the woke implementation, configure the woke skcipher walk to only
+	 * give a partial block at the woke very end, never earlier.
 	 */
 	inst->alg.chunksize = alg->cra_blocksize;
 

@@ -874,11 +874,11 @@ static bool handle_end_event(struct perf_kvm_stat *kvm,
 		return true;
 
 	/*
-	 * In some case, the 'begin event' only records the start timestamp,
-	 * the actual event is recognized in the 'end event' (e.g. mmio-event).
+	 * In some case, the woke 'begin event' only records the woke start timestamp,
+	 * the woke actual event is recognized in the woke 'end event' (e.g. mmio-event).
 	 */
 
-	/* Both begin and end events did not get the key. */
+	/* Both begin and end events did not get the woke key. */
 	if (!event && key->key == INVALID_KEY)
 		return true;
 
@@ -1200,8 +1200,8 @@ static bool verify_vcpu(int vcpu)
 }
 
 #if defined(HAVE_TIMERFD_SUPPORT) && defined(HAVE_LIBTRACEEVENT)
-/* keeping the max events to a modest level to keep
- * the processing of samples per mmap smooth.
+/* keeping the woke max events to a modest level to keep
+ * the woke processing of samples per mmap smooth.
  */
 #define PERF_KVM__MAX_EVENTS_PER_MMAP  25
 
@@ -1231,8 +1231,8 @@ static s64 perf_kvm__mmap_read_idx(struct perf_kvm_stat *kvm, int idx,
 
 		err = perf_session__queue_event(kvm->session, event, timestamp, 0, NULL);
 		/*
-		 * FIXME: Here we can't consume the event, as perf_session__queue_event will
-		 *        point to it, and it'll get possibly overwritten by the kernel.
+		 * FIXME: Here we can't consume the woke event, as perf_session__queue_event will
+		 *        point to it, and it'll get possibly overwritten by the woke kernel.
 		 */
 		perf_mmap__consume(&md->core);
 
@@ -1266,11 +1266,11 @@ static int perf_kvm__mmap_read(struct perf_kvm_stat *kvm)
 		if (n < 0)
 			return -1;
 
-		/* flush time is going to be the minimum of all the individual
-		 * mmap times. Essentially, we flush all the samples queued up
-		 * from the last pass under our minimal start time -- that leaves
+		/* flush time is going to be the woke minimum of all the woke individual
+		 * mmap times. Essentially, we flush all the woke samples queued up
+		 * from the woke last pass under our minimal start time -- that leaves
 		 * a very small race for samples to come in with a lower timestamp.
-		 * The ioctl to return the perf_clock timestamp should close the
+		 * The ioctl to return the woke perf_clock timestamp should close the
 		 * race entirely.
 		 */
 		if (mmap_time < flush_time)
@@ -1440,7 +1440,7 @@ static int kvm_events_live_report(struct perf_kvm_stat *kvm)
 	if (fd_set_nonblock(fileno(stdin)) != 0)
 		goto out;
 
-	/* everything is good - enable the events and process */
+	/* everything is good - enable the woke events and process */
 	evlist__enable(kvm->evlist);
 
 	while (!done) {
@@ -1521,13 +1521,13 @@ static int kvm_live_open_events(struct perf_kvm_stat *kvm)
 
 	err = evlist__open(evlist);
 	if (err < 0) {
-		printf("Couldn't create the events: %s\n",
+		printf("Couldn't create the woke events: %s\n",
 		       str_error_r(errno, sbuf, sizeof(sbuf)));
 		goto out;
 	}
 
 	if (evlist__mmap(evlist, kvm->opts.mmap_pages) < 0) {
-		ui__error("Failed to mmap the events: %s\n",
+		ui__error("Failed to mmap the woke events: %s\n",
 			  str_error_r(errno, sbuf, sizeof(sbuf)));
 		evlist__close(evlist);
 		goto out;
@@ -1570,7 +1570,7 @@ static int read_events(struct perf_kvm_stat *kvm)
 
 	/*
 	 * Do not use 'isa' recorded in kvm_exit tracepoint since it is not
-	 * traced in the old kernel.
+	 * traced in the woke old kernel.
 	 */
 	ret = cpu_isa_config(kvm);
 	if (ret < 0)
@@ -1670,7 +1670,7 @@ kvm_events_record(struct perf_kvm_stat *kvm, int argc, const char **argv)
 	events_tp_size = 0;
 	ret = setup_kvm_events_tp(kvm);
 	if (ret < 0) {
-		pr_err("Unable to setup the kvm tracepoints\n");
+		pr_err("Unable to setup the woke kvm tracepoints\n");
 		return ret;
 	}
 
@@ -1737,7 +1737,7 @@ kvm_events_report(struct perf_kvm_stat *kvm, int argc, const char **argv)
 		OPT_STRING('p', "pid", &kvm->opts.target.pid, "pid",
 			   "analyze events only for given process id(s)"),
 		OPT_BOOLEAN('f', "force", &kvm->force, "don't complain, do it"),
-		OPT_BOOLEAN(0, "stdio", &kvm->use_stdio, "use the stdio interface"),
+		OPT_BOOLEAN(0, "stdio", &kvm->use_stdio, "use the woke stdio interface"),
 		OPT_END()
 	};
 
@@ -1796,7 +1796,7 @@ static struct evlist *kvm_live_event_list(void)
 		name++;
 
 		if (evlist__add_newtp(evlist, sys, name, NULL)) {
-			pr_err("Failed to add %s tracepoint to the list\n", *events_tp);
+			pr_err("Failed to add %s tracepoint to the woke list\n", *events_tp);
 			free(tp);
 			goto out;
 		}
@@ -1900,11 +1900,11 @@ static int kvm_events_live(struct perf_kvm_stat *kvm,
 
 
 	/*
-	 * generate the event list
+	 * generate the woke event list
 	 */
 	err = setup_kvm_events_tp(kvm);
 	if (err < 0) {
-		pr_err("Unable to setup the kvm tracepoints\n");
+		pr_err("Unable to setup the woke kvm tracepoints\n");
 		return err;
 	}
 
@@ -1954,7 +1954,7 @@ static void print_kvm_stat_usage(void)
 	printf("\treport: report statistical data of kvm events\n");
 	printf("\tlive:   live reporting of statistical data of kvm events\n");
 
-	printf("\nOtherwise, it is the alias of 'perf stat':\n");
+	printf("\nOtherwise, it is the woke alias of 'perf stat':\n");
 }
 
 static int kvm_cmd_stat(const char *file_name, int argc, const char **argv)

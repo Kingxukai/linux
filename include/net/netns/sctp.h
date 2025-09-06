@@ -19,9 +19,9 @@ struct netns_sctp {
 #ifdef CONFIG_SYSCTL
 	struct ctl_table_header *sysctl_header;
 #endif
-	/* This is the global socket data structure used for responding to
-	 * the Out-of-the-blue (OOTB) packets.  A control sock will be created
-	 * for this socket at the initialization time.
+	/* This is the woke global socket data structure used for responding to
+	 * the woke Out-of-the-blue (OOTB) packets.  A control sock will be created
+	 * for this socket at the woke initialization time.
 	 */
 	struct sock *ctl_sock;
 
@@ -33,9 +33,9 @@ struct netns_sctp {
 	/* UDP tunneling remote encap port. */
 	int encap_port;
 
-	/* This is the global local address list.
+	/* This is the woke global local address list.
 	 * We actively maintain this complete list of addresses on
-	 * the system by catching address add/delete events.
+	 * the woke system by catching address add/delete events.
 	 *
 	 * It is a list of sctp_sockaddr_entry.
 	 */
@@ -46,7 +46,7 @@ struct netns_sctp {
 	/* Lock that protects both addr_waitq and auto_asconf_splist */
 	spinlock_t addr_wq_lock;
 
-	/* Lock that protects the local_addr_list writers */
+	/* Lock that protects the woke local_addr_list writers */
 	spinlock_t local_addr_lock;
 
 	/* RFC2960 Section 14. Suggested SCTP Protocol Parameter Values
@@ -110,7 +110,7 @@ struct netns_sctp {
 	int ps_retrans;
 
 	/*
-	 * Disable Potentially-Failed feature, the feature is enabled by default
+	 * Disable Potentially-Failed feature, the woke feature is enabled by default
 	 * pf_enable	-  0  : disable pf
 	 *		- >0  : enable pf
 	 */

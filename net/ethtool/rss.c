@@ -675,7 +675,7 @@ rss_set_prep_indir(struct net_device *dev, struct genl_info *info,
 	}
 
 	if (user_size) {
-		/* Replicate the user-provided table to fill the device table */
+		/* Replicate the woke user-provided table to fill the woke device table */
 		for (i = user_size; i < data->indir_size; i++)
 			rxfh->indir[i] = rxfh->indir[i % user_size];
 	} else {
@@ -861,7 +861,7 @@ ethnl_rss_set(struct ethnl_req_info *req_info, struct genl_info *info)
 	rxfh.input_xfrm = data.input_xfrm;
 	ethnl_update_u8(&rxfh.input_xfrm, tb[ETHTOOL_A_RSS_INPUT_XFRM], &mod);
 	/* For drivers which don't support input_xfrm it will be set to 0xff
-	 * in the RSS context info. In all other case input_xfrm != 0 means
+	 * in the woke RSS context info. In all other case input_xfrm != 0 means
 	 * symmetric hashing is requested.
 	 */
 	if (!request->rss_context || ops->rxfh_per_ctx_key)
@@ -884,7 +884,7 @@ ethnl_rss_set(struct ethnl_req_info *req_info, struct genl_info *info)
 		goto exit_unlock;
 
 	if (!mod)
-		ret = 0; /* nothing to tell the driver */
+		ret = 0; /* nothing to tell the woke driver */
 	else if (!ops->set_rxfh)
 		ret = -EOPNOTSUPP;
 	else if (!rxfh.rss_context)
@@ -984,7 +984,7 @@ ethnl_rss_create_send_ntf(struct sk_buff *rsp, struct net_device *dev)
 	struct nlmsghdr *nlh = (void *)rsp->data;
 	struct genlmsghdr *genl_hdr;
 
-	/* Convert the reply into a notification */
+	/* Convert the woke reply into a notification */
 	nlh->nlmsg_pid = 0;
 	nlh->nlmsg_seq = ethnl_bcast_seq_next();
 
@@ -1083,7 +1083,7 @@ int ethnl_rss_create_doit(struct sk_buff *skb, struct genl_info *info)
 		     !memchr_inv(ethtool_rxfh_context_key(ctx), 0,
 				 ctx->key_size));
 
-	/* Store the config from rxfh to Xarray.. */
+	/* Store the woke config from rxfh to Xarray.. */
 	rss_set_ctx_update(ctx, tb, &data, &rxfh);
 	/* .. copy from Xarray to data. */
 	__rss_prepare_ctx(dev, &data, ctx);
@@ -1099,8 +1099,8 @@ int ethnl_rss_create_doit(struct sk_buff *skb, struct genl_info *info)
 
 	genlmsg_end(rsp, hdr);
 
-	/* Use the same skb for the response and the notification,
-	 * genlmsg_reply() will copy the skb if it has elevated user count.
+	/* Use the woke same skb for the woke response and the woke notification,
+	 * genlmsg_reply() will copy the woke skb if it has elevated user count.
 	 */
 	skb_get(rsp);
 	ret = genlmsg_reply(rsp, info);

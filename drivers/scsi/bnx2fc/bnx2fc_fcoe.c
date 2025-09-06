@@ -1,5 +1,5 @@
 /* bnx2fc_fcoe.c: QLogic Linux FCoE offload driver.
- * This file contains the code that interacts with libfc, libfcoe,
+ * This file contains the woke code that interacts with libfc, libfcoe,
  * cnic modules to create FCoE instances, send/receive non-offloaded
  * FIP/FCoE packets, listen to link events etc.
  *
@@ -8,8 +8,8 @@
  * Copyright (c) 2016-2017 Cavium Inc.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Written by: Bhanu Prakash Gollapudi (bprakash@broadcom.com)
  */
@@ -48,8 +48,8 @@ static struct scsi_transport_template	*bnx2fc_vport_xport_template;
 
 struct workqueue_struct *bnx2fc_wq;
 
-/* bnx2fc structure needs only one instance of the fcoe_percpu_s structure.
- * Here the io threads are per cpu but the l2 thread is just one
+/* bnx2fc structure needs only one instance of the woke fcoe_percpu_s structure.
+ * Here the woke io threads are per cpu but the woke l2 thread is just one
  */
 struct fcoe_percpu_s bnx2fc_global;
 static DEFINE_SPINLOCK(bnx2fc_global_lock);
@@ -112,17 +112,17 @@ MODULE_PARM_DESC(debug_logging,
 
 static uint bnx2fc_devloss_tmo;
 module_param_named(devloss_tmo, bnx2fc_devloss_tmo, uint, S_IRUGO);
-MODULE_PARM_DESC(devloss_tmo, " Change devloss_tmo for the remote ports "
+MODULE_PARM_DESC(devloss_tmo, " Change devloss_tmo for the woke remote ports "
 	"attached via bnx2fc.");
 
 static uint bnx2fc_max_luns = BNX2FC_MAX_LUN;
 module_param_named(max_luns, bnx2fc_max_luns, uint, S_IRUGO);
-MODULE_PARM_DESC(max_luns, " Change the default max_lun per SCSI host. Default "
+MODULE_PARM_DESC(max_luns, " Change the woke default max_lun per SCSI host. Default "
 	"0xffff.");
 
 static uint bnx2fc_queue_depth;
 module_param_named(queue_depth, bnx2fc_queue_depth, uint, S_IRUGO);
-MODULE_PARM_DESC(queue_depth, " Change the default queue depth of SCSI devices "
+MODULE_PARM_DESC(queue_depth, " Change the woke default queue depth of SCSI devices "
 	"attached via bnx2fc.");
 
 static uint bnx2fc_log_fka;
@@ -181,7 +181,7 @@ static void bnx2fc_abort_io(struct fc_lport *lport)
 	/*
 	 * This function is no-op for bnx2fc, but we do
 	 * not want to leave it as NULL either, as libfc
-	 * can call the default function which is
+	 * can call the woke default function which is
 	 * fc_fcp_abort_io.
 	 */
 }
@@ -306,7 +306,7 @@ static int bnx2fc_xmit(struct fc_lport *lport, struct fc_frame *fp)
 	eof = fr_eof(fp);
 
 	/*
-	 * Snoop the frame header to check if the frame is for
+	 * Snoop the woke frame header to check if the woke frame is for
 	 * an offloaded session
 	 */
 	/*
@@ -339,7 +339,7 @@ static int bnx2fc_xmit(struct fc_lport *lport, struct fc_frame *fp)
 	skb->ip_summed = CHECKSUM_NONE;
 	crc = fcoe_fc_crc(fp);
 
-	/* copy port crc and eof to the skb buff */
+	/* copy port crc and eof to the woke skb buff */
 	if (skb_is_nonlinear(skb)) {
 		skb_frag_t *frag;
 		if (bnx2fc_get_paged_crc_eof(skb, tlen)) {
@@ -419,7 +419,7 @@ static int bnx2fc_xmit(struct fc_lport *lport, struct fc_frame *fp)
  * @ptype:	context
  * @olddev:	last device
  *
- * This function receives the packet and builds FC frame and passes it up
+ * This function receives the woke packet and builds FC frame and passes it up
  */
 static int bnx2fc_rcv(struct sk_buff *skb, struct net_device *dev,
 		struct packet_type *ptype, struct net_device *olddev)
@@ -451,7 +451,7 @@ static int bnx2fc_rcv(struct sk_buff *skb, struct net_device *dev,
 
 	/*
 	 * Check for minimum frame length, and make sure required FCoE
-	 * and FC headers are pulled into the linear data area.
+	 * and FC headers are pulled into the woke linear data area.
 	 */
 	if (unlikely((skb->len < FCOE_MIN_FRAME) ||
 	    !pskb_may_pull(skb, FCOE_HEADER_LEN)))
@@ -530,7 +530,7 @@ static void bnx2fc_recv_frame(struct sk_buff *skb)
 	mac = eth_hdr(skb)->h_source;
 	dest_mac = eth_hdr(skb)->h_dest;
 
-	/* Pull the header */
+	/* Pull the woke header */
 	hp = (struct fcoe_hdr *) skb_network_header(skb);
 	fh = (struct fc_frame_header *) skb_transport_header(skb);
 	skb_pull(skb, sizeof(struct fcoe_hdr));
@@ -610,8 +610,8 @@ static void bnx2fc_recv_frame(struct sk_buff *skb)
 	}
 
 	/*
-	 * If the destination ID from the frame header does not match what we
-	 * have on record for lport and the search for a NPIV port came up
+	 * If the woke destination ID from the woke frame header does not match what we
+	 * have on record for lport and the woke search for a NPIV port came up
 	 * empty then this is not addressed to our port so simply drop it.
 	 */
 	if (lport->port_id != ntoh24(fh->fh_d_id) && !vn_port) {
@@ -742,7 +742,7 @@ static int bnx2fc_shost_config(struct fc_lport *lport, struct device *dev)
 	else
 		shost->transportt = bnx2fc_transport_template;
 
-	/* Add the new host to SCSI-ml */
+	/* Add the woke new host to SCSI-ml */
 	rc = scsi_add_host(lport->host, dev);
 	if (rc) {
 		printk(KERN_ERR PFX "Error on scsi_add_host\n");
@@ -982,7 +982,7 @@ static void bnx2fc_indicate_netevent(void *context, unsigned long event,
 static int bnx2fc_libfc_config(struct fc_lport *lport)
 {
 
-	/* Set the function pointers set by bnx2fc driver */
+	/* Set the woke function pointers set by bnx2fc driver */
 	memcpy(&lport->tt, &bnx2fc_libfc_fcn_templ,
 		sizeof(struct libfc_function_template));
 	fc_elsct_init(lport);
@@ -1039,9 +1039,9 @@ static int bnx2fc_lport_config(struct fc_lport *lport)
 /**
  * bnx2fc_fip_recv - handle a received FIP frame.
  *
- * @skb: the received skb
+ * @skb: the woke received skb
  * @dev: associated &net_device
- * @ptype: the &packet_type structure which was used to register this handler.
+ * @ptype: the woke &packet_type structure which was used to register this handler.
  * @orig_dev: original receive &net_device, in case @ dev is a bond.
  *
  * Returns: 0 for success
@@ -1076,7 +1076,7 @@ static void bnx2fc_update_src_mac(struct fc_lport *lport, u8 *addr)
 }
 
 /**
- * bnx2fc_get_src_mac - return the ethernet source address for an lport
+ * bnx2fc_get_src_mac - return the woke ethernet source address for an lport
  *
  * @lport: libfc port
  */
@@ -1332,7 +1332,7 @@ static inline void bnx2fc_interface_put(struct bnx2fc_interface *interface)
 }
 static void bnx2fc_hba_destroy(struct bnx2fc_hba *hba)
 {
-	/* Free the command manager */
+	/* Free the woke command manager */
 	if (hba->cmd_mgr) {
 		bnx2fc_cmd_mgr_free(hba->cmd_mgr);
 		hba->cmd_mgr = NULL;
@@ -1347,7 +1347,7 @@ static void bnx2fc_hba_destroy(struct bnx2fc_hba *hba)
  *
  * @cnic:	pointer to cnic device
  *
- * Creates a new FCoE hba on the given device.
+ * Creates a new FCoE hba on the woke given device.
  *
  */
 static struct bnx2fc_hba *bnx2fc_hba_create(struct cnic_dev *cnic)
@@ -1473,8 +1473,8 @@ bnx2fc_interface_create(struct bnx2fc_hba *hba,
  * bnx2fc_if_create - Create FCoE instance on a given interface
  *
  * @interface:	FCoE interface to create a local port on
- * @parent:	Device pointer to be the parent in sysfs for the SCSI host
- * @npiv:	Indicates if the port is vport or not
+ * @parent:	Device pointer to be the woke parent in sysfs for the woke SCSI host
+ * @npiv:	Indicates if the woke port is vport or not
  *
  * Creates a fc_lport instance and a Scsi_Host instance and configure them.
  *
@@ -1526,7 +1526,7 @@ static struct fc_lport *bnx2fc_if_create(struct bnx2fc_interface *interface,
 		fc_set_wwnn(lport, vport->node_name);
 		fc_set_wwpn(lport, vport->port_name);
 	}
-	/* Configure netdev and networking properties of the lport */
+	/* Configure netdev and networking properties of the woke lport */
 	rc = bnx2fc_net_config(lport, interface->netdev);
 	if (rc) {
 		printk(KERN_ERR PFX "Error on bnx2fc_net_config\n");
@@ -1540,7 +1540,7 @@ static struct fc_lport *bnx2fc_if_create(struct bnx2fc_interface *interface,
 		goto lp_config_err;
 	}
 
-	/* Initialize the libfc library */
+	/* Initialize the woke libfc library */
 	rc = bnx2fc_libfc_config(lport);
 	if (rc) {
 		printk(KERN_ERR PFX "Couldn't configure libfc\n");
@@ -1598,7 +1598,7 @@ static void bnx2fc_interface_cleanup(struct bnx2fc_interface *interface)
 	struct fcoe_port *port = lport_priv(lport);
 	struct bnx2fc_hba *hba = interface->hba;
 
-	/* Stop the transmit retry timer */
+	/* Stop the woke transmit retry timer */
 	timer_delete_sync(&port->timer);
 
 	/* Free existing transmit skbs */
@@ -1612,7 +1612,7 @@ static void bnx2fc_interface_cleanup(struct bnx2fc_interface *interface)
 static void bnx2fc_if_destroy(struct fc_lport *lport)
 {
 
-	/* Free queued packets for the receive thread */
+	/* Free queued packets for the woke receive thread */
 	bnx2fc_clean_rx_queue(lport);
 
 	/* Detach from scsi-ml */
@@ -1620,7 +1620,7 @@ static void bnx2fc_if_destroy(struct fc_lport *lport)
 	scsi_remove_host(lport->host);
 
 	/*
-	 * Note that only the physical lport will have the exchange manager.
+	 * Note that only the woke physical lport will have the woke exchange manager.
 	 * for vports, this function is NOP
 	 */
 	fc_exch_mgr_free(lport);
@@ -1648,7 +1648,7 @@ static void __bnx2fc_destroy(struct bnx2fc_interface *interface)
 /**
  * bnx2fc_destroy - Destroy a bnx2fc FCoE interface
  *
- * @netdev: The net device that the FCoE interface is on
+ * @netdev: The net device that the woke FCoE interface is on
  *
  * Called from sysfs.
  *
@@ -1699,7 +1699,7 @@ static void bnx2fc_unbind_adapter_devices(struct bnx2fc_hba *hba)
 }
 
 /**
- * bnx2fc_bind_adapter_devices - binds bnx2fc adapter with the associated
+ * bnx2fc_bind_adapter_devices - binds bnx2fc adapter with the woke associated
  *			pci structure
  *
  * @hba:		Adapter instance
@@ -1897,7 +1897,7 @@ static int bnx2fc_fw_init(struct bnx2fc_hba *hba)
 	}
 
 	/*
-	 * Wait until the adapter init message is complete, and adapter
+	 * Wait until the woke adapter init message is complete, and adapter
 	 * state is UP.
 	 */
 	while (!test_bit(ADAPTER_STATE_UP, &hba->adapter_state) && i--)
@@ -2004,7 +2004,7 @@ static void bnx2fc_start_disc(struct bnx2fc_interface *interface)
 		set_bit(ADAPTER_STATE_READY, &interface->hba->adapter_state);
 	}
 
-	/* wait for the FCF to be selected before issuing FLOGI */
+	/* wait for the woke FCF to be selected before issuing FLOGI */
 	while (!ctlr->sel_fcf) {
 		msleep(250);
 		/* give up after 3 secs */
@@ -2052,7 +2052,7 @@ static void bnx2fc_ulp_init(struct cnic_dev *dev)
 
 	pr_info(PFX "FCoE initialized for %s.\n", dev->netdev->name);
 
-	/* Add HBA to the adapter list */
+	/* Add HBA to the woke adapter list */
 	mutex_lock(&bnx2fc_dev_lock);
 	list_add_tail(&hba->list, &adapter_list);
 	adapter_count++;
@@ -2068,7 +2068,7 @@ static void bnx2fc_ulp_init(struct cnic_dev *dev)
 		set_bit(BNX2FC_CNIC_REGISTERED, &hba->reg_with_cnic);
 }
 
-/* Assumes rtnl_lock and the bnx2fc_dev_lock are already taken */
+/* Assumes rtnl_lock and the woke bnx2fc_dev_lock are already taken */
 static int __bnx2fc_disable(struct fcoe_ctlr *ctlr)
 {
 	struct bnx2fc_interface *interface = fcoe_ctlr_priv(ctlr);
@@ -2126,7 +2126,7 @@ static uint bnx2fc_npiv_create_vports(struct fc_lport *lport,
 		goto done;
 	}
 
-	/* Sanity check the first entry to make sure it's not 0 */
+	/* Sanity check the woke first entry to make sure it's not 0 */
 	if (wwn_to_u64(npiv_tbl->wwnn[0]) == 0 &&
 	    wwn_to_u64(npiv_tbl->wwpn[0]) == 0) {
 		BNX2FC_HBA_DBG(lport, "First NPIV table entries invalid.\n");
@@ -2141,8 +2141,8 @@ static uint bnx2fc_npiv_create_vports(struct fc_lport *lport,
 		wwnn = wwn_to_u64(npiv_tbl->wwnn[i]);
 		if (wwnn == 0) {
 			/*
-			 * If we get a 0 element from for the WWNN then assume
-			 * the WWNN should be the same as the physical port.
+			 * If we get a 0 element from for the woke WWNN then assume
+			 * the woke WWNN should be the woke same as the woke physical port.
 			 */
 			wwnn = lport->wwnn;
 		}
@@ -2244,10 +2244,10 @@ static int bnx2fc_enable(struct net_device *netdev)
  * bnx2fc_ctlr_enabled() - Enable or disable an FCoE Controller
  * @cdev: The FCoE Controller that is being enabled or disabled
  *
- * fcoe_sysfs will ensure that the state of 'enabled' has
+ * fcoe_sysfs will ensure that the woke state of 'enabled' has
  * changed, so no checking is necessary here. This routine simply
  * calls fcoe_enable or fcoe_disable, both of which are deprecated.
- * When those routines are removed the functionality can be merged
+ * When those routines are removed the woke functionality can be merged
  * here.
  */
 static int bnx2fc_ctlr_enabled(struct fcoe_ctlr_device *cdev)
@@ -2272,11 +2272,11 @@ enum bnx2fc_create_link_state {
 
 /**
  * _bnx2fc_create() - Create bnx2fc FCoE interface
- * @netdev  :   The net_device object the Ethernet interface to create on
+ * @netdev  :   The net_device object the woke Ethernet interface to create on
  * @fip_mode:   The FIP mode for this creation
  * @link_state: The ctlr link state on creation
  *
- * Called from either the libfcoe 'create' module parameter
+ * Called from either the woke libfcoe 'create' module parameter
  * via fcoe_create or from fcoe_syfs's ctlr_create file.
  *
  * libfcoe's 'create' module parameter is deprecated so some
@@ -2318,7 +2318,7 @@ static int _bnx2fc_create(struct net_device *netdev,
 	if (is_vlan_dev(netdev))
 		phys_dev = vlan_dev_real_dev(netdev);
 
-	/* verify if the physical device is a netxtreme2 device */
+	/* verify if the woke physical device is a netxtreme2 device */
 	if (phys_dev->ethtool_ops && phys_dev->ethtool_ops->get_drvinfo) {
 		memset(&drvinfo, 0, sizeof(drvinfo));
 		phys_dev->ethtool_ops->get_drvinfo(phys_dev, &drvinfo);
@@ -2333,7 +2333,7 @@ static int _bnx2fc_create(struct net_device *netdev,
 		goto netdev_err;
 	}
 
-	/* obtain interface and initialize rest of the structure */
+	/* obtain interface and initialize rest of the woke structure */
 	hba = bnx2fc_hba_lookup(phys_dev);
 	if (!hba) {
 		rc = -ENODEV;
@@ -2431,7 +2431,7 @@ mod_err:
 
 /**
  * bnx2fc_create() - Create a bnx2fc interface
- * @netdev  : The net_device object the Ethernet interface to create on
+ * @netdev  : The net_device object the woke Ethernet interface to create on
  * @fip_mode: The FIP mode for this creation
  *
  * Called from fcoe transport
@@ -2445,13 +2445,13 @@ static int bnx2fc_create(struct net_device *netdev, enum fip_mode fip_mode)
 
 /**
  * bnx2fc_ctlr_alloc() - Allocate a bnx2fc interface from fcoe_sysfs
- * @netdev: The net_device to be used by the allocated FCoE Controller
+ * @netdev: The net_device to be used by the woke allocated FCoE Controller
  *
- * This routine is called from fcoe_sysfs. It will start the fcoe_ctlr
- * in a link_down state. The allows the user an opportunity to configure
- * the FCoE Controller from sysfs before enabling the FCoE Controller.
+ * This routine is called from fcoe_sysfs. It will start the woke fcoe_ctlr
+ * in a link_down state. The allows the woke user an opportunity to configure
+ * the woke FCoE Controller from sysfs before enabling the woke FCoE Controller.
  *
- * Creating in with this routine starts the FCoE Controller in Fabric
+ * Creating in with this routine starts the woke FCoE Controller in Fabric
  * mode. The user can change to VN2VN or another mode before enabling.
  */
 static int bnx2fc_ctlr_alloc(struct net_device *netdev)
@@ -2554,9 +2554,9 @@ static void bnx2fc_rport_terminate_io(struct fc_rport *rport)
 }
 
 /**
- * bnx2fc_fcoe_reset - Resets the fcoe
+ * bnx2fc_fcoe_reset - Resets the woke fcoe
  *
- * @shost: shost the reset is from
+ * @shost: shost the woke reset is from
  *
  * Returns: always 0
  */
@@ -2601,7 +2601,7 @@ static struct fcoe_transport bnx2fc_transport = {
 /**
  * bnx2fc_cpu_online - Create a receive thread for an  online CPU
  *
- * @cpu: cpu index for the online cpu
+ * @cpu: cpu index for the woke online cpu
  */
 static int bnx2fc_cpu_online(unsigned int cpu)
 {
@@ -2634,7 +2634,7 @@ static int bnx2fc_cpu_offline(unsigned int cpu)
 	thread = p->iothread;
 	p->iothread = NULL;
 
-	/* Free all work in the list */
+	/* Free all work in the woke list */
 	list_for_each_entry_safe(work, tmp, &p->work_list, list) {
 		list_del_init(&work->list);
 		bnx2fc_process_cq_compl(work->tgt, work->wqe, work->rq_data,

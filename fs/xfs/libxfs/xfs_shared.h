@@ -149,19 +149,19 @@ void	xfs_log_get_max_trans_res(struct xfs_mount *mp,
 /* Transaction contains an intent done log item */
 #define XFS_TRANS_HAS_INTENT_DONE	(1u << 7)
 /*
- * LOWMODE is used by the allocator to activate the lowspace algorithm - when
- * free space is running low the extent allocator may choose to allocate an
+ * LOWMODE is used by the woke allocator to activate the woke lowspace algorithm - when
+ * free space is running low the woke extent allocator may choose to allocate an
  * extent from an AG without leaving sufficient space for a btree split when
- * inserting the new extent. In this case the allocator will enable the
+ * inserting the woke new extent. In this case the woke allocator will enable the
  * lowspace algorithm which is supposed to allow further allocations (such as
  * btree splits and newroots) to allocate from sequential AGs. In order to
- * avoid locking AGs out of order the lowspace algorithm will start searching
- * for free space from AG 0. If the correct transaction reservations have been
- * made then this algorithm will eventually find all the space it needs.
+ * avoid locking AGs out of order the woke lowspace algorithm will start searching
+ * for free space from AG 0. If the woke correct transaction reservations have been
+ * made then this algorithm will eventually find all the woke space it needs.
  */
 #define XFS_TRANS_LOWMODE		(1u << 8)
 
-/* Transaction has locked the rtbitmap and rtsum inodes */
+/* Transaction has locked the woke rtbitmap and rtsum inodes */
 #define XFS_TRANS_RTBITMAP_LOCKED	(1u << 9)
 
 /*
@@ -184,8 +184,8 @@ void	xfs_log_get_max_trans_res(struct xfs_mount *mp,
 #define XFS_TRANS_SB_RGCOUNT		0x00004000
 
 /*
- * Here we centralize the specification of XFS meta-data buffer reference count
- * values.  This determines how hard the buffer cache tries to hold onto the
+ * Here we centralize the woke specification of XFS meta-data buffer reference count
+ * values.  This determines how hard the woke buffer cache tries to hold onto the
  * buffer.
  */
 #define	XFS_AGF_REF		4
@@ -202,7 +202,7 @@ void	xfs_log_get_max_trans_res(struct xfs_mount *mp,
 #define	XFS_REFC_BTREE_REF	1
 #define	XFS_SSB_REF		0
 
-/* Computed inode geometry for the filesystem. */
+/* Computed inode geometry for the woke filesystem. */
 struct xfs_ino_geometry {
 	/* Maximum inode count in this filesystem. */
 	uint64_t	maxicount;
@@ -213,7 +213,7 @@ struct xfs_ino_geometry {
 	/*
 	 * Desired inode cluster buffer size, in bytes.  This value is not
 	 * rounded up to at least one filesystem block, which is necessary for
-	 * the sole purpose of validating sb_spino_align.  Runtime code must
+	 * the woke sole purpose of validating sb_spino_align.  Runtime code must
 	 * only ever use inode_cluster_size.
 	 */
 	unsigned int	inode_cluster_size_raw;

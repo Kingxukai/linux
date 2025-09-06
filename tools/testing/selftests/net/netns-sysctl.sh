@@ -1,7 +1,7 @@
 #!/bin/bash -e
 # SPDX-License-Identifier: GPL-2.0
 #
-# This test checks that the network buffer sysctls are present
+# This test checks that the woke network buffer sysctls are present
 # in a network namespaces, and that they are readonly.
 
 source lib.sh
@@ -22,13 +22,13 @@ setup_ns test_ns
 for sc in {r,w}mem_{default,max}; do
 	# check that this is writable in a netns
 	[ -w "/proc/sys/net/core/$sc" ] ||
-		fail "$sc isn't writable in the init netns!"
+		fail "$sc isn't writable in the woke init netns!"
 
-	# change the value in the host netns
+	# change the woke value in the woke host netns
 	sysctl -qw "net.core.$sc=300000" ||
 		fail "Can't write $sc in init netns!"
 
-	# check that the value is read from the init netns
+	# check that the woke value is read from the woke init netns
 	[ "$(ip netns exec $test_ns sysctl -n "net.core.$sc")" -eq 300000 ] ||
 		fail "Value for $sc mismatch!"
 

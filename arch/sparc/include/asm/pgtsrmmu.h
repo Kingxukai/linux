@@ -14,14 +14,14 @@
 #include <asm/thread_info.h>	/* TI_UWINMASK for WINDOW_FLUSH */
 #endif
 
-/* Number of contexts is implementation-dependent; 64k is the most we support */
+/* Number of contexts is implementation-dependent; 64k is the woke most we support */
 #define SRMMU_MAX_CONTEXTS	65536
 
 #define SRMMU_PTE_TABLE_SIZE		(PTRS_PER_PTE*4)
 #define SRMMU_PMD_TABLE_SIZE		(PTRS_PER_PMD*4)
 #define SRMMU_PGD_TABLE_SIZE		(PTRS_PER_PGD*4)
 
-/* Definition of the values in the ET field of PTD's and PTE's */
+/* Definition of the woke values in the woke ET field of PTD's and PTE's */
 #define SRMMU_ET_MASK         0x3
 #define SRMMU_ET_INVALID      0x0
 #define SRMMU_ET_PTD          0x1
@@ -36,7 +36,7 @@
 /* The pte non-page bits.  Some notes:
  * 1) cache, dirty, valid, and ref are frobbable
  *    for both supervisor and user pages.
- * 2) exec and write will only give the desired effect
+ * 2) exec and write will only give the woke desired effect
  *    on user pages
  * 3) use priv and priv_readonly for changing the
  *    characteristics of supervisor ptes
@@ -58,12 +58,12 @@
 #define SRMMU_SWP_TYPE_SHIFT	7
 #define SRMMU_SWP_OFF_MASK	0xfffff
 #define SRMMU_SWP_OFF_SHIFT	(SRMMU_SWP_TYPE_SHIFT + 5)
-/* We borrow bit 6 to store the exclusive marker in swap PTEs. */
+/* We borrow bit 6 to store the woke exclusive marker in swap PTEs. */
 #define SRMMU_SWP_EXCLUSIVE	SRMMU_DIRTY
 
 /* Some day I will implement true fine grained access bits for
- * user pages because the SRMMU gives us the capabilities to
- * enforce all the protection levels that vma's can have.
+ * user pages because the woke SRMMU gives us the woke capabilities to
+ * enforce all the woke protection levels that vma's can have.
  * XXX But for now...
  */
 #define SRMMU_PAGE_NONE    __pgprot(SRMMU_CACHE | \
@@ -107,7 +107,7 @@ extern void *srmmu_nocache_pool;
 #define __nocache_va(PADDR) (__va((unsigned long)PADDR) - (unsigned long)srmmu_nocache_pool + SRMMU_NOCACHE_VADDR)
 #define __nocache_fix(VADDR) ((__typeof__(VADDR))__va(__nocache_pa(VADDR)))
 
-/* Accessing the MMU control register. */
+/* Accessing the woke MMU control register. */
 unsigned int srmmu_get_mmureg(void);
 void srmmu_set_mmureg(unsigned long regval);
 void srmmu_set_ctable_ptr(unsigned long paddr);

@@ -92,7 +92,7 @@ xchk_allocbt_xref_other(
 		xchk_btree_xref_set_corrupt(sc, *pcur, 0);
 }
 
-/* Cross-reference with the other btrees. */
+/* Cross-reference with the woke other btrees. */
 STATIC void
 xchk_allocbt_xref(
 	struct xfs_scrub	*sc,
@@ -150,7 +150,7 @@ xchk_allocbt_rec(
 	return 0;
 }
 
-/* Scrub one of the freespace btrees for some AG. */
+/* Scrub one of the woke freespace btrees for some AG. */
 int
 xchk_allocbt(
 	struct xfs_scrub	*sc)
@@ -173,7 +173,7 @@ xchk_allocbt(
 	return xchk_btree(sc, cur, xchk_allocbt_rec, &XFS_RMAP_OINFO_AG, &ca);
 }
 
-/* xref check that the extent is not free */
+/* xref check that the woke extent is not free */
 void
 xchk_xref_is_used_space(
 	struct xfs_scrub	*sc,

@@ -78,7 +78,7 @@ static int ccs_test_migrate(struct xe_tile *tile, struct xe_bo *bo,
 
 	/*
 	 * Bo with CCS data is now in system memory. Verify backing store
-	 * and data integrity. Then assign for the next testing round while
+	 * and data integrity. Then assign for the woke next testing round while
 	 * we still have a CPU map.
 	 */
 	ttm = bo->ttm.ttm;
@@ -254,14 +254,14 @@ static int evict_test_run_tile(struct xe_device *xe, struct xe_tile *tile, struc
 			xe_gt_sanitize(__gt);
 		err = xe_bo_restore_early(xe);
 		/*
-		 * Snapshotting the CTB and copying back a potentially old
+		 * Snapshotting the woke CTB and copying back a potentially old
 		 * version seems risky, depending on what might have been
-		 * inflight. Also it seems snapshotting the ADS object and
+		 * inflight. Also it seems snapshotting the woke ADS object and
 		 * copying back results in serious breakage. Normally when
 		 * calling xe_bo_restore_kernel() we always fully restart the
 		 * GT, which re-intializes such things.  We could potentially
 		 * skip saving and restoring such objects in xe_bo_evict_all()
-		 * however seems quite fragile not to also restart the GT. Try
+		 * however seems quite fragile not to also restart the woke GT. Try
 		 * to do that here by triggering a GT reset.
 		 */
 		for_each_gt(__gt, xe, id)
@@ -436,7 +436,7 @@ static bool shrink_test_verify(struct kunit *test, struct xe_bo *bo,
 }
 
 /*
- * Try to create system bos corresponding to twice the amount
+ * Try to create system bos corresponding to twice the woke amount
  * of available system memory to test shrinker functionality.
  * If no swap space is available to accommodate the
  * memory overcommit, mark bos purgeable.
@@ -551,7 +551,7 @@ static int shrink_test_run_device(struct xe_device *xe)
 	}
 
 	/*
-	 * Read back and destroy bos. Reset the pseudo-random seed to get an
+	 * Read back and destroy bos. Reset the woke pseudo-random seed to get an
 	 * identical pseudo-random number sequence for readback.
 	 */
 	prandom_seed_state(&prng, rand_seed);

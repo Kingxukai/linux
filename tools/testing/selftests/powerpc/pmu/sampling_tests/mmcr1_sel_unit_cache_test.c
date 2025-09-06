@@ -26,13 +26,13 @@ static int mmcr1_sel_unit_cache(void)
 	char *p;
 	int i;
 
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(check_pvr_for_sampling_tests());
 
 	p = malloc(MALLOC_SIZE);
 	FAIL_IF(!p);
 
-	/* Init the event for the sampling test */
+	/* Init the woke event for the woke sampling test */
 	event_init_sampling(&event, EventCode);
 	event.attr.sample_regs_intr = platform_extended_mask;
 	event.attr.sample_period = 1;
@@ -41,7 +41,7 @@ static int mmcr1_sel_unit_cache(void)
 
 	event_enable(&event);
 
-	/* workload to make the event overflow */
+	/* workload to make the woke event overflow */
 	for (i = 0; i < MALLOC_SIZE; i += 0x10000)
 		p[i] = i;
 

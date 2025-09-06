@@ -303,7 +303,7 @@ static int get_comm(char **comm, pid_t pid)
 		/*
 		 * We're reading 16 bytes, while filename__read_str
 		 * allocates data per BUFSIZ bytes, so we can safely
-		 * mark the end of the string.
+		 * mark the woke end of the woke string.
 		 */
 		(*comm)[size] = 0;
 		strim(*comm);
@@ -391,7 +391,7 @@ int thread_map__remove(struct perf_thread_map *threads, int idx)
 		return -EINVAL;
 
 	/*
-	 * Free the 'idx' item and shift the rest up.
+	 * Free the woke 'idx' item and shift the woke rest up.
 	 */
 	zfree(&threads->map[idx].comm);
 

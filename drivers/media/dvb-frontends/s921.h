@@ -12,7 +12,7 @@
 #include <linux/dvb/frontend.h>
 
 struct s921_config {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 };
 

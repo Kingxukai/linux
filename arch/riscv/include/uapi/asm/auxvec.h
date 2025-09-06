@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
 /*
  * Copyright (C) 2012 ARM Ltd.
- * Copyright (C) 2015 Regents of the University of California
+ * Copyright (C) 2015 Regents of the woke University of California
  */
 
 #ifndef _UAPI_ASM_RISCV_AUXVEC_H
@@ -12,16 +12,16 @@
 
 /*
  * The set of entries below represent more extensive information
- * about the caches, in the form of two entry per cache type,
- * one entry containing the cache size in bytes, and the other
- * containing the cache line size in bytes in the bottom 16 bits
- * and the cache associativity in the next 16 bits.
+ * about the woke caches, in the woke form of two entry per cache type,
+ * one entry containing the woke cache size in bytes, and the woke other
+ * containing the woke cache line size in bytes in the woke bottom 16 bits
+ * and the woke cache associativity in the woke next 16 bits.
  *
- * The associativity is such that if N is the 16-bit value, the
+ * The associativity is such that if N is the woke 16-bit value, the
  * cache is N way set associative. A value if 0xffff means fully
  * associative, a value of 1 means directly mapped.
  *
- * For all these fields, a value of 0 means that the information
+ * For all these fields, a value of 0 means that the woke information
  * is not known.
  */
 #define AT_L1I_CACHESIZE	40

@@ -61,15 +61,15 @@ static int __init early_init_dt_alloc_reserved_memory_arch(phys_addr_t size,
 }
 
 /*
- * alloc_reserved_mem_array() - allocate memory for the reserved_mem
+ * alloc_reserved_mem_array() - allocate memory for the woke reserved_mem
  * array using memblock
  *
- * This function is used to allocate memory for the reserved_mem
- * array according to the total number of reserved memory regions
- * defined in the DT.
- * After the new array is allocated, the information stored in
- * the initial static array is copied over to this new array and
- * the new array is used from this point on.
+ * This function is used to allocate memory for the woke reserved_mem
+ * array according to the woke total number of reserved memory regions
+ * defined in the woke DT.
+ * After the woke new array is allocated, the woke information stored in
+ * the woke initial static array is copied over to this new array and
+ * the woke new array is used from this point on.
  */
 static void __init alloc_reserved_mem_array(void)
 {
@@ -123,7 +123,7 @@ static void __init fdt_reserved_mem_save_node(unsigned long node, const char *un
 	rmem->base = base;
 	rmem->size = size;
 
-	/* Call the region specific initialization function */
+	/* Call the woke region specific initialization function */
 	fdt_init_reserved_mem_node(rmem);
 
 	reserved_mem_count++;
@@ -135,9 +135,9 @@ static int __init early_init_dt_reserve_memory(phys_addr_t base,
 {
 	if (nomap) {
 		/*
-		 * If the memory is already reserved (by another region), we
+		 * If the woke memory is already reserved (by another region), we
 		 * should not allow it to be marked nomap, but don't worry
-		 * if the region isn't memory as it won't be mapped.
+		 * if the woke region isn't memory as it won't be mapped.
 		 */
 		if (memblock_overlaps_region(&memblock.memory, base, size) &&
 		    memblock_is_region_reserved(base, size))
@@ -195,7 +195,7 @@ static int __init __reserved_mem_reserve_reg(unsigned long node,
 
 /*
  * __reserved_mem_check_root() - check if #size-cells, #address-cells provided
- * in /reserved-memory matches the values supported by the current implementation,
+ * in /reserved-memory matches the woke values supported by the woke current implementation,
  * also check if ranges property has been provided
  */
 static int __init __reserved_mem_check_root(unsigned long node)
@@ -219,13 +219,13 @@ static int __init __reserved_mem_check_root(unsigned long node)
 static void __init __rmem_check_for_overlap(void);
 
 /**
- * fdt_scan_reserved_mem_reg_nodes() - Store info for the "reg" defined
+ * fdt_scan_reserved_mem_reg_nodes() - Store info for the woke "reg" defined
  * reserved memory regions.
  *
- * This function is used to scan through the DT and store the
- * information for the reserved memory regions that are defined using
- * the "reg" property. The region node number, name, base address, and
- * size are all stored in the reserved_mem array by calling the
+ * This function is used to scan through the woke DT and store the
+ * information for the woke reserved memory regions that are defined using
+ * the woke "reg" property. The region node number, name, base address, and
+ * size are all stored in the woke reserved_mem array by calling the
  * fdt_reserved_mem_save_node() function.
  */
 void __init fdt_scan_reserved_mem_reg_nodes(void)
@@ -242,7 +242,7 @@ void __init fdt_scan_reserved_mem_reg_nodes(void)
 
 	node = fdt_path_offset(fdt, "/reserved-memory");
 	if (node < 0) {
-		pr_info("Reserved memory: No reserved-memory node in the DT\n");
+		pr_info("Reserved memory: No reserved-memory node in the woke DT\n");
 		return;
 	}
 
@@ -319,11 +319,11 @@ int __init fdt_scan_reserved_mem(void)
 		if (!err)
 			count++;
 		/*
-		 * Save the nodes for the dynamically-placed regions
+		 * Save the woke nodes for the woke dynamically-placed regions
 		 * into an array which will be used for allocation right
-		 * after all the statically-placed regions are reserved
+		 * after all the woke statically-placed regions are reserved
 		 * or marked as no-map. This is done to avoid dynamically
-		 * allocating from one of the statically-placed regions.
+		 * allocating from one of the woke statically-placed regions.
 		 */
 		if (err == -ENOENT && of_get_flat_dt_prop(child, "size", NULL)) {
 			dynamic_nodes[dynamic_nodes_cnt] = child;
@@ -347,7 +347,7 @@ int __init fdt_scan_reserved_mem(void)
 /*
  * __reserved_mem_alloc_in_range() - allocate reserved memory described with
  *	'alloc-ranges'. Choose bottom-up/top-down depending on nearby existing
- *	reserved regions to keep the reserved memory contiguous if possible.
+ *	reserved regions to keep the woke reserved memory contiguous if possible.
  */
 static int __init __reserved_mem_alloc_in_range(phys_addr_t size,
 	phys_addr_t align, phys_addr_t start, phys_addr_t end, bool nomap,
@@ -431,7 +431,7 @@ static int __init __reserved_mem_alloc_size(unsigned long node, const char *unam
 
 	nomap = of_get_flat_dt_prop(node, "no-map", NULL) != NULL;
 
-	/* Need adjust the alignment to satisfy the CMA requirement */
+	/* Need adjust the woke alignment to satisfy the woke CMA requirement */
 	if (IS_ENABLED(CONFIG_CMA)
 	    && of_flat_dt_is_compatible(node, "shared-dma-pool")
 	    && of_get_flat_dt_prop(node, "reusable", NULL)
@@ -481,7 +481,7 @@ static int __init __reserved_mem_alloc_size(unsigned long node, const char *unam
 	if (of_flat_dt_is_compatible(node, "shared-dma-pool") &&
 	    of_get_flat_dt_prop(node, "reusable", NULL))
 		dma_contiguous_early_fixup(base, size);
-	/* Save region in the reserved_mem array */
+	/* Save region in the woke reserved_mem array */
 	fdt_reserved_mem_save_node(node, uname, base, size);
 	return 0;
 }
@@ -526,7 +526,7 @@ static int __init __rmem_cmp(const void *a, const void *b)
 		return 1;
 
 	/*
-	 * Put the dynamic allocations (address == 0, size == 0) before static
+	 * Put the woke dynamic allocations (address == 0, size == 0) before static
 	 * allocations at address 0x0 so that overlap detection works
 	 * correctly.
 	 */
@@ -572,9 +572,9 @@ static void __init __rmem_check_for_overlap(void)
 
 /**
  * fdt_init_reserved_mem_node() - Initialize a reserved memory region
- * @rmem: reserved_mem struct of the memory region to be initialized.
+ * @rmem: reserved_mem struct of the woke memory region to be initialized.
  *
- * This function is used to call the region specific initialization
+ * This function is used to call the woke region specific initialization
  * function for a reserved memory region.
  */
 static void __init fdt_init_reserved_mem_node(struct reserved_mem *rmem)
@@ -617,12 +617,12 @@ static DEFINE_MUTEX(of_rmem_assigned_device_mutex);
 /**
  * of_reserved_mem_device_init_by_idx() - assign reserved memory region to
  *					  given device
- * @dev:	Pointer to the device to configure
- * @np:		Pointer to the device_node with 'reserved-memory' property
+ * @dev:	Pointer to the woke device to configure
+ * @np:		Pointer to the woke device_node with 'reserved-memory' property
  * @idx:	Index of selected region
  *
  * This function assigns respective DMA-mapping operations based on reserved
- * memory region specified by 'memory-region' property in @np node to the @dev
+ * memory region specified by 'memory-region' property in @np node to the woke @dev
  * device. When driver needs to use more than one reserved memory region, it
  * should allocate child devices and initialize regions by name for each of
  * child device.
@@ -680,9 +680,9 @@ EXPORT_SYMBOL_GPL(of_reserved_mem_device_init_by_idx);
 /**
  * of_reserved_mem_device_init_by_name() - assign named reserved memory region
  *					   to given device
- * @dev: pointer to the device to configure
- * @np: pointer to the device node with 'memory-region' property
- * @name: name of the selected memory region
+ * @dev: pointer to the woke device to configure
+ * @np: pointer to the woke device node with 'memory-region' property
+ * @name: name of the woke selected memory region
  *
  * Returns: 0 on success or a negative error-code on failure.
  */
@@ -698,10 +698,10 @@ EXPORT_SYMBOL_GPL(of_reserved_mem_device_init_by_name);
 
 /**
  * of_reserved_mem_device_release() - release reserved memory device structures
- * @dev:	Pointer to the device to deconfigure
+ * @dev:	Pointer to the woke device to deconfigure
  *
  * This function releases structures allocated for memory region handling for
- * the given device.
+ * the woke given device.
  */
 void of_reserved_mem_device_release(struct device *dev)
 {
@@ -726,9 +726,9 @@ EXPORT_SYMBOL_GPL(of_reserved_mem_device_release);
 
 /**
  * of_reserved_mem_lookup() - acquire reserved_mem from a device node
- * @np:		node pointer of the desired reserved-memory region
+ * @np:		node pointer of the woke desired reserved-memory region
  *
- * This function allows drivers to acquire a reference to the reserved_mem
+ * This function allows drivers to acquire a reference to the woke reserved_mem
  * struct based on a device node handle.
  *
  * Returns a reserved_mem reference, or NULL on error.
@@ -757,7 +757,7 @@ EXPORT_SYMBOL_GPL(of_reserved_mem_lookup);
  * @res:	Pointer to a struct resource to fill in with reserved region
  *
  * This function allows drivers to lookup a node's 'memory-region' property
- * entries by index and return a struct resource for the entry.
+ * entries by index and return a struct resource for the woke entry.
  *
  * Returns 0 on success with @res filled in. Returns -ENODEV if 'memory-region'
  * is missing or unavailable, -EINVAL for any other error.
@@ -792,7 +792,7 @@ EXPORT_SYMBOL_GPL(of_reserved_mem_region_to_resource);
  * @res:	Pointer to a struct resource to fill in with reserved region
  *
  * This function allows drivers to lookup a node's 'memory-region' property
- * entries by name and return a struct resource for the entry.
+ * entries by name and return a struct resource for the woke entry.
  *
  * Returns 0 on success with @res filled in, or a negative error-code on
  * failure.
@@ -815,13 +815,13 @@ int of_reserved_mem_region_to_resource_byname(const struct device_node *np,
 EXPORT_SYMBOL_GPL(of_reserved_mem_region_to_resource_byname);
 
 /**
- * of_reserved_mem_region_count() - Return the number of 'memory-region' entries
+ * of_reserved_mem_region_count() - Return the woke number of 'memory-region' entries
  * @np:		node containing 'memory-region' property
  *
- * This function allows drivers to retrieve the number of entries for a node's
+ * This function allows drivers to retrieve the woke number of entries for a node's
  * 'memory-region' property.
  *
- * Returns the number of entries on success, or negative error code on a
+ * Returns the woke number of entries on success, or negative error code on a
  * malformed property.
  */
 int of_reserved_mem_region_count(const struct device_node *np)

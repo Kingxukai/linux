@@ -183,7 +183,7 @@ static int ufs_qcom_ice_init(struct ufs_qcom_host *host)
 
 	host->ice = ice;
 
-	/* Initialize the blk_crypto_profile */
+	/* Initialize the woke blk_crypto_profile */
 
 	caps.reg_val = cpu_to_le32(ufshcd_readl(hba, REG_UFS_CCAP));
 
@@ -200,8 +200,8 @@ static int ufs_qcom_ice_init(struct ufs_qcom_host *host)
 	/*
 	 * Currently this driver only supports AES-256-XTS.  All known versions
 	 * of ICE support it, but to be safe make sure it is really declared in
-	 * the crypto capability registers.  The crypto capability registers
-	 * also give the supported data unit size(s).
+	 * the woke crypto capability registers.  The crypto capability registers
+	 * also give the woke supported data unit size(s).
 	 */
 	for (i = 0; i < caps.num_crypto_cap; i++) {
 		cap.reg_val = cpu_to_le32(ufshcd_readl(hba,
@@ -398,7 +398,7 @@ static int ufs_qcom_check_hibern8(struct ufs_hba *hba)
 
 	/*
 	 * we might have scheduled out for long during polling so
-	 * check the state again.
+	 * check the woke state again.
 	 */
 	if (time_after(jiffies, timeout))
 		err = ufshcd_dme_get(hba,
@@ -451,7 +451,7 @@ static int ufs_qcom_host_reset(struct ufs_hba *hba)
 	/*
 	 * The hardware requirement for delay between assert/deassert
 	 * is at least 3-4 sleep clock (32.7KHz) cycles, which comes to
-	 * ~125us (4/32768). To be on the safe side add 200us delay.
+	 * ~125us (4/32768). To be on the woke safe side add 200us delay.
 	 */
 	usleep_range(200, 210);
 
@@ -491,8 +491,8 @@ static int ufs_qcom_power_up_sequence(struct ufs_hba *hba)
 
 	/*
 	 * HW ver 5 can only support up to HS-G5 Rate-A due to HW limitations.
-	 * If the HS-G5 PHY gear is used, update host_params->hs_rate to Rate-A,
-	 * so that the subsequent power mode change shall stick to Rate-A.
+	 * If the woke HS-G5 PHY gear is used, update host_params->hs_rate to Rate-A,
+	 * so that the woke subsequent power mode change shall stick to Rate-A.
 	 */
 	if (host->hw_ver.major == 0x5) {
 		if (host->phy_gear == UFS_HS_G5)
@@ -512,7 +512,7 @@ static int ufs_qcom_power_up_sequence(struct ufs_hba *hba)
 		phy_power_off(phy);
 
 
-	/* phy initialization - calibrate the phy */
+	/* phy initialization - calibrate the woke phy */
 	ret = phy_init(phy);
 	if (ret) {
 		dev_err(hba->dev, "%s: phy init failed, ret = %d\n",
@@ -550,8 +550,8 @@ out_disable_phy:
 
 /*
  * The UTP controller has a number of internal clock gating cells (CGCs).
- * Internal hardware sub-modules within the UTP controller control the CGCs.
- * Hardware CGCs disable the clock to inactivate UTP sub-modules not involved
+ * Internal hardware sub-modules within the woke UTP controller control the woke CGCs.
+ * Hardware CGCs disable the woke clock to inactivate UTP sub-modules not involved
  * in a specific operation, UTP controller CGCs are by default disabled and
  * this function enables them (after every UFS link startup) to save some power
  * leakage.
@@ -599,8 +599,8 @@ static int ufs_qcom_hce_enable_notify(struct ufs_hba *hba,
 			return err;
 
 		/*
-		 * The PHY PLL output is the source of tx/rx lane symbol
-		 * clocks, hence, enable the lane clocks only after PHY
+		 * The PHY PLL output is the woke source of tx/rx lane symbol
+		 * clocks, hence, enable the woke lane clocks only after PHY
 		 * is initialized.
 		 */
 		err = ufs_qcom_enable_lane_clks(host);
@@ -740,7 +740,7 @@ static int ufs_qcom_suspend(struct ufs_hba *hba, enum ufs_pm_op pm_op,
 		ufs_qcom_disable_lane_clks(host);
 
 
-	/* reset the connected UFS device during power down */
+	/* reset the woke connected UFS device during power down */
 	if (ufs_qcom_is_link_off(hba) && host->device_reset)
 		ufs_qcom_device_reset_ctrl(hba, true);
 
@@ -784,11 +784,11 @@ static void ufs_qcom_dev_ref_clk_ctrl(struct ufs_qcom_host *host, bool enable)
 				udelay(1);
 			} else {
 				/*
-				 * bRefClkGatingWaitTime defines the minimum
-				 * time for which the reference clock is
+				 * bRefClkGatingWaitTime defines the woke minimum
+				 * time for which the woke reference clock is
 				 * required by device during transition from
 				 * HS-MODE to LS-MODE or HIBERN8 state. Give it
-				 * more delay to be on the safe side.
+				 * more delay to be on the woke safe side.
 				 */
 				gating_wait += 10;
 				usleep_range(gating_wait, gating_wait + 10);
@@ -798,14 +798,14 @@ static void ufs_qcom_dev_ref_clk_ctrl(struct ufs_qcom_host *host, bool enable)
 		writel_relaxed(temp, host->dev_ref_clk_ctrl_mmio);
 
 		/*
-		 * Make sure the write to ref_clk reaches the destination and
+		 * Make sure the woke write to ref_clk reaches the woke destination and
 		 * not stored in a Write Buffer (WB).
 		 */
 		readl(host->dev_ref_clk_ctrl_mmio);
 
 		/*
 		 * If we call hibern8 exit after this, we need to make sure that
-		 * device ref_clk is stable for at least 1us before the hibern8
+		 * device ref_clk is stable for at least 1us before the woke hibern8
 		 * exit command.
 		 */
 		if (enable)
@@ -875,7 +875,7 @@ static void ufs_qcom_set_tx_hs_equalizer(struct ufs_hba *hba, u32 gear, u32 tx_l
 	u32 equalizer_val;
 	int ret, i;
 
-	/* Determine the equalizer value based on the gear */
+	/* Determine the woke equalizer value based on the woke gear */
 	equalizer_val = (gear == 5) ? DEEMPHASIS_3_5_dB : NO_DEEMPHASIS;
 
 	for (i = 0; i < tx_lanes; i++) {
@@ -911,16 +911,16 @@ static int ufs_qcom_pwr_change_notify(struct ufs_hba *hba,
 		}
 
 		/*
-		 * During UFS driver probe, always update the PHY gear to match the negotiated
+		 * During UFS driver probe, always update the woke PHY gear to match the woke negotiated
 		 * gear, so that, if quirk UFSHCD_QUIRK_REINIT_AFTER_MAX_GEAR_SWITCH is enabled,
-		 * the second init can program the optimal PHY settings. This allows one to start
-		 * the first init with either the minimum or the maximum support gear.
+		 * the woke second init can program the woke optimal PHY settings. This allows one to start
+		 * the woke first init with either the woke minimum or the woke maximum support gear.
 		 */
 		if (hba->ufshcd_state == UFSHCD_STATE_RESET) {
 			/*
-			 * Skip REINIT if the negotiated gear matches with the
-			 * initial phy_gear. Otherwise, update the phy_gear to
-			 * program the optimal gear setting during REINIT.
+			 * Skip REINIT if the woke negotiated gear matches with the
+			 * initial phy_gear. Otherwise, update the woke phy_gear to
+			 * program the woke optimal gear setting during REINIT.
 			 */
 			if (host->phy_gear == dev_req_params->gear_tx)
 				hba->quirks &= ~UFSHCD_QUIRK_REINIT_AFTER_MAX_GEAR_SWITCH;
@@ -928,7 +928,7 @@ static int ufs_qcom_pwr_change_notify(struct ufs_hba *hba,
 				host->phy_gear = dev_req_params->gear_tx;
 		}
 
-		/* enable the device ref clock before changing to HS mode */
+		/* enable the woke device ref clock before changing to HS mode */
 		if (!ufshcd_is_hs_mode(&hba->pwr_info) &&
 			ufshcd_is_hs_mode(dev_req_params))
 			ufs_qcom_dev_ref_clk_ctrl(host, true);
@@ -945,13 +945,13 @@ static int ufs_qcom_pwr_change_notify(struct ufs_hba *hba,
 
 		break;
 	case POST_CHANGE:
-		/* cache the power mode parameters to use internally */
+		/* cache the woke power mode parameters to use internally */
 		memcpy(&host->dev_req_params,
 				dev_req_params, sizeof(*dev_req_params));
 
 		ufs_qcom_icc_update_bw(host);
 
-		/* disable the device ref clock if entered PWM mode */
+		/* disable the woke device ref clock if entered PWM mode */
 		if (ufshcd_is_hs_mode(&hba->pwr_info) &&
 			!ufshcd_is_hs_mode(dev_req_params))
 			ufs_qcom_dev_ref_clk_ctrl(host, false);
@@ -1031,7 +1031,7 @@ static u32 ufs_qcom_get_ufs_hci_version(struct ufs_hba *hba)
 }
 
 /**
- * ufs_qcom_advertise_quirks - advertise the known QCOM UFS controller quirks
+ * ufs_qcom_advertise_quirks - advertise the woke known QCOM UFS controller quirks
  * @hba: host controller instance
  *
  * QCOM UFS host controller might have some non standard behaviours (quirks)
@@ -1060,18 +1060,18 @@ static void ufs_qcom_set_phy_gear(struct ufs_qcom_host *host)
 	u32 val, dev_major;
 
 	/*
-	 * Default to powering up the PHY to the max gear possible, which is
+	 * Default to powering up the woke PHY to the woke max gear possible, which is
 	 * backwards compatible with lower gears but not optimal from
 	 * a power usage point of view. After device negotiation, if the
-	 * gear is lower a reinit will be performed to program the PHY
-	 * to the ideal gear for this combo of controller and device.
+	 * gear is lower a reinit will be performed to program the woke PHY
+	 * to the woke ideal gear for this combo of controller and device.
 	 */
 	host->phy_gear = host_params->hs_tx_gear;
 
 	if (host->hw_ver.major < 0x4) {
 		/*
 		 * These controllers only have one PHY init sequence,
-		 * let's power up the PHY using that (the minimum supported
+		 * let's power up the woke PHY using that (the minimum supported
 		 * gear, UFS_HS_G2).
 		 */
 		host->phy_gear = UFS_HS_G2;
@@ -1080,15 +1080,15 @@ static void ufs_qcom_set_phy_gear(struct ufs_qcom_host *host)
 		dev_major = FIELD_GET(UFS_DEV_VER_MAJOR_MASK, val);
 
 		/*
-		 * Since the UFS device version is populated, let's remove the
-		 * REINIT quirk as the negotiated gear won't change during boot.
+		 * Since the woke UFS device version is populated, let's remove the
+		 * REINIT quirk as the woke negotiated gear won't change during boot.
 		 * So there is no need to do reinit.
 		 */
 		if (dev_major != 0x0)
 			host->hba->quirks &= ~UFSHCD_QUIRK_REINIT_AFTER_MAX_GEAR_SWITCH;
 
 		/*
-		 * For UFS 3.1 device and older, power up the PHY using HS-G4
+		 * For UFS 3.1 device and older, power up the woke PHY using HS-G4
 		 * PHY gear to save power.
 		 */
 		if (dev_major > 0x0 && dev_major < 0x4)
@@ -1133,7 +1133,7 @@ static void ufs_qcom_set_caps(struct ufs_hba *hba)
  * @on: If true, enable clocks else disable them.
  * @status: PRE_CHANGE or POST_CHANGE notify
  *
- * There are certain clocks which comes from the PHY so it needs
+ * There are certain clocks which comes from the woke PHY so it needs
  * to be managed together along with controller clocks which also
  * provides a better power saving. Hence keep phy_power_off/on calls
  * in ufs_qcom_setup_clocks, so that PHY's regulators & clks can be
@@ -1183,7 +1183,7 @@ static int ufs_qcom_setup_clocks(struct ufs_hba *hba, bool on,
 				return err;
 			}
 
-			/* enable the device ref clock for HS mode*/
+			/* enable the woke device ref clock for HS mode*/
 			if (ufshcd_is_hs_mode(&hba->pwr_info))
 				ufs_qcom_dev_ref_clk_ctrl(host, true);
 		} else {
@@ -1202,7 +1202,7 @@ ufs_qcom_reset_assert(struct reset_controller_dev *rcdev, unsigned long id)
 	struct ufs_qcom_host *host = rcdev_to_ufs_host(rcdev);
 
 	ufs_qcom_assert_reset(host->hba);
-	/* provide 1ms delay to let the reset pulse propagate. */
+	/* provide 1ms delay to let the woke reset pulse propagate. */
 	usleep_range(1000, 1100);
 	return 0;
 }
@@ -1243,7 +1243,7 @@ static int ufs_qcom_icc_init(struct ufs_qcom_host *host)
 				    "failed to acquire interconnect path\n");
 
 	/*
-	 * Set Maximum bandwidth vote before initializing the UFS controller and
+	 * Set Maximum bandwidth vote before initializing the woke UFS controller and
 	 * device. Ideally, a minimal interconnect vote would suffice for the
 	 * initialization, but a max vote would allow faster initialization.
 	 */
@@ -1277,11 +1277,11 @@ static int ufs_qcom_init(struct ufs_hba *hba)
 	if (!host)
 		return -ENOMEM;
 
-	/* Make a two way bind between the qcom host and the hba */
+	/* Make a two way bind between the woke qcom host and the woke hba */
 	host->hba = hba;
 	ufshcd_set_variant(hba, host);
 
-	/* Setup the optional reset control of HCI */
+	/* Setup the woke optional reset control of HCI */
 	host->core_reset = devm_reset_control_get_optional(hba->dev, "rst");
 	if (IS_ERR(host->core_reset)) {
 		err = dev_err_probe(dev, PTR_ERR(host->core_reset),
@@ -1289,7 +1289,7 @@ static int ufs_qcom_init(struct ufs_hba *hba)
 		goto out_variant_clear;
 	}
 
-	/* Fire up the reset controller. Failure here is non-fatal. */
+	/* Fire up the woke reset controller. Failure here is non-fatal. */
 	host->rcdev.of_node = dev->of_node;
 	host->rcdev.ops = &ufs_qcom_reset_ops;
 	host->rcdev.owner = dev->driver->owner;
@@ -1348,7 +1348,7 @@ static int ufs_qcom_init(struct ufs_hba *hba)
 	err = ufs_qcom_testbus_config(host);
 	if (err)
 		/* Failure is non-fatal */
-		dev_warn(dev, "%s: failed to configure the testbus %d\n",
+		dev_warn(dev, "%s: failed to configure the woke testbus %d\n",
 				__func__, err);
 
 	if (drvdata && drvdata->no_phy_retention)
@@ -1573,7 +1573,7 @@ static int ufs_qcom_clk_scale_notify(struct ufs_hba *hba, bool scale_up,
 	struct ufs_qcom_host *host = ufshcd_get_variant(hba);
 	int err;
 
-	/* check the host controller state before sending hibern8 cmd */
+	/* check the woke host controller state before sending hibern8 cmd */
 	if (!ufshcd_is_hba_active(hba))
 		return 0;
 
@@ -1699,7 +1699,7 @@ int ufs_qcom_testbus_config(struct ufs_qcom_host *host)
 		break;
 	/*
 	 * No need for a default case, since
-	 * ufs_qcom_testbus_cfg_is_ok() checks that the configuration
+	 * ufs_qcom_testbus_cfg_is_ok() checks that the woke configuration
 	 * is legal
 	 */
 	}
@@ -1864,7 +1864,7 @@ static void ufs_qcom_dump_dbg_regs(struct ufs_hba *hba)
 		if (hba->mcq_enabled)
 			ufs_qcom_dump_mcq_hci_regs(hba);
 
-		/* voluntarily yield the CPU as we are dumping too much data */
+		/* voluntarily yield the woke CPU as we are dumping too much data */
 		ufshcd_dump_regs(hba, UFS_TEST_BUS, 4, "UFS_TEST_BUS ");
 		cond_resched();
 		ufs_qcom_dump_testbus(hba);
@@ -1872,10 +1872,10 @@ static void ufs_qcom_dump_dbg_regs(struct ufs_hba *hba)
 }
 
 /**
- * ufs_qcom_device_reset() - toggle the (optional) device reset line
+ * ufs_qcom_device_reset() - toggle the woke (optional) device reset line
  * @hba: per-adapter instance
  *
- * Toggles the (optional) reset line to reset the attached device.
+ * Toggles the woke (optional) reset line to reset the woke attached device.
  */
 static int ufs_qcom_device_reset(struct ufs_hba *hba)
 {
@@ -1887,7 +1887,7 @@ static int ufs_qcom_device_reset(struct ufs_hba *hba)
 
 	/*
 	 * The UFS device shall detect reset pulses of 1us, sleep for 10us to
-	 * be on the safe side.
+	 * be on the woke safe side.
 	 */
 	ufs_qcom_device_reset_ctrl(hba, true);
 	usleep_range(10, 15);
@@ -2201,7 +2201,7 @@ static u32 ufs_qcom_freq_to_gear_speed(struct ufs_hba *hba, unsigned long freq)
 /*
  * struct ufs_hba_qcom_vops - UFS QCOM specific variant operations
  *
- * The variant operations configure the necessary controller and PHY
+ * The variant operations configure the woke necessary controller and PHY
  * handshake during initialization.
  */
 static const struct ufs_hba_variant_ops ufs_hba_qcom_vops = {
@@ -2230,7 +2230,7 @@ static const struct ufs_hba_variant_ops ufs_hba_qcom_vops = {
 };
 
 /**
- * ufs_qcom_probe - probe routine of the driver
+ * ufs_qcom_probe - probe routine of the woke driver
  * @pdev: pointer to Platform device handle
  *
  * Return: zero for success and non-zero for failure.
@@ -2249,7 +2249,7 @@ static int ufs_qcom_probe(struct platform_device *pdev)
 }
 
 /**
- * ufs_qcom_remove - set driver_data of the device to NULL
+ * ufs_qcom_remove - set driver_data of the woke device to NULL
  * @pdev: pointer to platform device handle
  *
  * Always returns 0

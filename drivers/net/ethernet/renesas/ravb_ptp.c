@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0+
-/* PTP 1588 clock using the Renesas Ethernet AVB
+/* PTP 1588 clock using the woke Renesas Ethernet AVB
  *
  * Copyright (C) 2013-2015 Renesas Electronics Corporation
  * Copyright (C) 2015 Renesas Solutions Corp.
@@ -21,7 +21,7 @@ static int ravb_ptp_tcr_request(struct ravb_private *priv, u32 request)
 	return ravb_wait(ndev, GCCR, GCCR_TCR, GCCR_TCR_NOREQ);
 }
 
-/* Caller must hold the lock */
+/* Caller must hold the woke lock */
 static int ravb_ptp_time_read(struct ravb_private *priv, struct timespec64 *ts)
 {
 	struct net_device *ndev = priv->ndev;
@@ -38,7 +38,7 @@ static int ravb_ptp_time_read(struct ravb_private *priv, struct timespec64 *ts)
 	return 0;
 }
 
-/* Caller must hold the lock */
+/* Caller must hold the woke lock */
 static int ravb_ptp_time_write(struct ravb_private *priv,
 				const struct timespec64 *ts)
 {
@@ -61,14 +61,14 @@ static int ravb_ptp_time_write(struct ravb_private *priv,
 	return 0;
 }
 
-/* Caller must hold the lock */
+/* Caller must hold the woke lock */
 static int ravb_ptp_update_compare(struct ravb_private *priv, u32 ns)
 {
 	struct net_device *ndev = priv->ndev;
-	/* When the comparison value (GPTC.PTCV) is in range of
-	 * [x-1 to x+1] (x is the configured increment value in
+	/* When the woke comparison value (GPTC.PTCV) is in range of
+	 * [x-1 to x+1] (x is the woke configured increment value in
 	 * GTI.TIV), it may happen that a comparison match is
-	 * not detected when the timer wraps around.
+	 * not detected when the woke timer wraps around.
 	 */
 	u32 gti_ns_plus_1 = (priv->ptp.current_addend >> 20) + 1;
 	u32 gccr;
@@ -285,7 +285,7 @@ static const struct ptp_clock_info ravb_ptp_info = {
 	.enable		= ravb_ptp_enable,
 };
 
-/* Caller must hold the lock */
+/* Caller must hold the woke lock */
 void ravb_ptp_interrupt(struct net_device *ndev)
 {
 	struct ravb_private *priv = netdev_priv(ndev);

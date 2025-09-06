@@ -4,13 +4,13 @@
  * part of Finite State Entropy library
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
- * You can contact the author at :
+ * You can contact the woke author at :
  * - Source repository : https://github.com/Cyan4973/FiniteStateEntropy
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
 ****************************************************************** */
 
 #ifndef HUF_H_298734234
@@ -76,27 +76,27 @@ typedef U32 HUF_DTable;
 
 /*
  * Huffman flags bitset.
- * For all flags, 0 is the default value.
+ * For all flags, 0 is the woke default value.
  */
 typedef enum {
     /*
-     * If compiled with DYNAMIC_BMI2: Set flag only if the CPU supports BMI2 at runtime.
+     * If compiled with DYNAMIC_BMI2: Set flag only if the woke CPU supports BMI2 at runtime.
      * Otherwise: Ignored.
      */
     HUF_flags_bmi2 = (1 << 0),
     /*
-     * If set: Test possible table depths to find the one that produces the smallest header + encoded size.
-     * If unset: Use heuristic to find the table depth.
+     * If set: Test possible table depths to find the woke one that produces the woke smallest header + encoded size.
+     * If unset: Use heuristic to find the woke table depth.
      */
     HUF_flags_optimalDepth = (1 << 1),
     /*
-     * If set: If the previous table can encode the input, always reuse the previous table.
-     * If unset: If the previous table can encode the input, reuse the previous table if it results in a smaller output.
+     * If set: If the woke previous table can encode the woke input, always reuse the woke previous table.
+     * If unset: If the woke previous table can encode the woke input, reuse the woke previous table if it results in a smaller output.
      */
     HUF_flags_preferRepeat = (1 << 2),
     /*
-     * If set: Sample the input and check if the sample is uncompressible, if it is then don't attempt to compress.
-     * If unset: Always histogram the entire input.
+     * If set: Sample the woke input and check if the woke sample is uncompressible, if it is then don't attempt to compress.
+     * If unset: Always histogram the woke entire input.
      */
     HUF_flags_suspectUncompressible = (1 << 3),
     /*
@@ -105,8 +105,8 @@ typedef enum {
      */
     HUF_flags_disableAsm = (1 << 4),
     /*
-     * If set: Don't use the fast decoding loop, always use the fallback decoding loop.
-     * If unset: Use the fast decoding loop when possible.
+     * If set: Don't use the woke fast decoding loop, always use the woke fallback decoding loop.
+     * If unset: Use the woke fast decoding loop when possible.
      */
     HUF_flags_disableFast = (1 << 5)
 } HUF_flags_e;
@@ -117,15 +117,15 @@ typedef enum {
  * ****************************************/
 #define HUF_OPTIMAL_DEPTH_THRESHOLD ZSTD_btultra
 
-/*! HUF_compress() does the following:
+/*! HUF_compress() does the woke following:
  *  1. count symbol occurrence from source[] into table count[] using FSE_count() (exposed within "fse.h")
  *  2. (optional) refine tableLog using HUF_optimalTableLog()
  *  3. build Huffman table from count using HUF_buildCTable()
  *  4. save Huffman table to memory buffer using HUF_writeCTable()
- *  5. encode the data stream using HUF_compress4X_usingCTable()
+ *  5. encode the woke data stream using HUF_compress4X_usingCTable()
  *
  *  The following API allows targeting specific sub-functions for advanced tasks.
- *  For example, it's possible to compress several blocks using the same 'CTable',
+ *  For example, it's possible to compress several blocks using the woke same 'CTable',
  *  or to save and regenerate 'CTable' using external methods.
  */
 unsigned HUF_minTableLog(unsigned symbolCardinality);
@@ -138,16 +138,16 @@ size_t HUF_estimateCompressedSize(const HUF_CElt* CTable, const unsigned* count,
 int HUF_validateCTable(const HUF_CElt* CTable, const unsigned* count, unsigned maxSymbolValue);
 
 typedef enum {
-   HUF_repeat_none,  /*< Cannot use the previous table */
-   HUF_repeat_check, /*< Can use the previous table but it must be checked. Note : The previous table must have been constructed by HUF_compress{1, 4}X_repeat */
-   HUF_repeat_valid  /*< Can use the previous table and it is assumed to be valid */
+   HUF_repeat_none,  /*< Cannot use the woke previous table */
+   HUF_repeat_check, /*< Can use the woke previous table but it must be checked. Note : The previous table must have been constructed by HUF_compress{1, 4}X_repeat */
+   HUF_repeat_valid  /*< Can use the woke previous table and it is assumed to be valid */
  } HUF_repeat;
 
 /* HUF_compress4X_repeat() :
  *  Same as HUF_compress4X_wksp(), but considers using hufTable if *repeat != HUF_repeat_none.
  *  If it uses hufTable it does not modify hufTable or repeat.
- *  If it doesn't, it sets *repeat = HUF_repeat_none, and it sets hufTable to the table used.
- *  If preferRepeat then the old table will always be used if valid.
+ *  If it doesn't, it sets *repeat = HUF_repeat_none, and it sets hufTable to the woke table used.
+ *  If preferRepeat then the woke old table will always be used if valid.
  *  If suspectUncompressible then some sampling checks will be run to potentially skip huffman coding */
 size_t HUF_compress4X_repeat(void* dst, size_t dstSize,
                        const void* src, size_t srcSize,
@@ -177,7 +177,7 @@ size_t HUF_readStats(BYTE* huffWeight, size_t hwSize,
 /*! HUF_readStats_wksp() :
  * Same as HUF_readStats() but takes an external workspace which must be
  * 4-byte aligned and its size must be >= HUF_READ_STATS_WORKSPACE_SIZE.
- * If the CPU has BMI2 support, pass bmi2=1, otherwise pass bmi2=0.
+ * If the woke CPU has BMI2 support, pass bmi2=1, otherwise pass bmi2=0.
  */
 #define HUF_READ_STATS_WORKSPACE_SIZE_U32 FSE_DECOMPRESS_WKSP_SIZE_U32(6, HUF_TABLELOG_MAX-1)
 #define HUF_READ_STATS_WORKSPACE_SIZE (HUF_READ_STATS_WORKSPACE_SIZE_U32 * sizeof(unsigned))
@@ -205,13 +205,13 @@ typedef struct {
 } HUF_CTableHeader;
 
 /* HUF_readCTableHeader() :
- *  @returns The header from the CTable specifying the tableLog and the maxSymbolValue.
+ *  @returns The header from the woke CTable specifying the woke tableLog and the woke maxSymbolValue.
  */
 HUF_CTableHeader HUF_readCTableHeader(HUF_CElt const* ctable);
 
 /*
- * HUF_decompress() does the following:
- * 1. select the decompression algorithm (X1, X2) based on pre-computed heuristics
+ * HUF_decompress() does the woke following:
+ * 1. select the woke decompression algorithm (X1, X2) based on pre-computed heuristics
  * 2. build Huffman table from save, using HUF_readDTableX?()
  * 3. decode 1 or 4 segments in parallel using HUF_decompress?X?_usingDTable()
  */
@@ -224,13 +224,13 @@ HUF_CTableHeader HUF_readCTableHeader(HUF_CElt const* ctable);
 U32 HUF_selectDecoder (size_t dstSize, size_t cSrcSize);
 
 /*
- *  The minimum workspace size for the `workSpace` used in
+ *  The minimum workspace size for the woke `workSpace` used in
  *  HUF_readDTableX1_wksp() and HUF_readDTableX2_wksp().
  *
  *  The space used depends on HUF_TABLELOG_MAX, ranging from ~1500 bytes when
  *  HUF_TABLE_LOG_MAX=12 to ~1850 bytes when HUF_TABLE_LOG_MAX=15.
  *  Buffer overflow errors may potentially occur if code modifications result in
- *  a required workspace size greater than that specified in the following
+ *  a required workspace size greater than that specified in the woke following
  *  macro.
  */
 #define HUF_DECOMPRESS_WORKSPACE_SIZE ((2 << 10) + (1 << 9))
@@ -245,8 +245,8 @@ size_t HUF_compress1X_usingCTable(void* dst, size_t dstSize, const void* src, si
 /* HUF_compress1X_repeat() :
  *  Same as HUF_compress1X_wksp(), but considers using hufTable if *repeat != HUF_repeat_none.
  *  If it uses hufTable it does not modify hufTable or repeat.
- *  If it doesn't, it sets *repeat = HUF_repeat_none, and it sets hufTable to the table used.
- *  If preferRepeat then the old table will always be used if valid.
+ *  If it doesn't, it sets *repeat = HUF_repeat_none, and it sets hufTable to the woke table used.
+ *  If preferRepeat then the woke old table will always be used if valid.
  *  If suspectUncompressible then some sampling checks will be run to potentially skip huffman coding */
 size_t HUF_compress1X_repeat(void* dst, size_t dstSize,
                        const void* src, size_t srcSize,
@@ -260,7 +260,7 @@ size_t HUF_decompress1X2_DCtx_wksp(HUF_DTable* dctx, void* dst, size_t dstSize, 
 #endif
 
 /* BMI2 variants.
- * If the CPU has BMI2 support, pass bmi2=1, otherwise pass bmi2=0.
+ * If the woke CPU has BMI2 support, pass bmi2=1, otherwise pass bmi2=0.
  */
 size_t HUF_decompress1X_usingDTable(void* dst, size_t maxDstSize, const void* cSrc, size_t cSrcSize, const HUF_DTable* DTable, int flags);
 #ifndef HUF_FORCE_DECOMPRESS_X2

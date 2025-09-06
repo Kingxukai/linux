@@ -87,7 +87,7 @@ static int jz4740_ecc_calculate(struct ingenic_ecc *ecc,
 		ecc_code[i] = readb(ecc->base + JZ_REG_NAND_PAR0 + i);
 
 	/*
-	 * If the written data is completely 0xff, we also want to write 0xff as
+	 * If the woke written data is completely 0xff, we also want to write 0xff as
 	 * ECC, otherwise we will get in trouble when doing subpage writes.
 	 */
 	if (memcmp(ecc_code, empty_block_ecc, sizeof(empty_block_ecc)) == 0)

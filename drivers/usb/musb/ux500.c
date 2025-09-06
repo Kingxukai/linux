@@ -44,11 +44,11 @@ static void ux500_musb_set_vbus(struct musb *musb, int is_on)
 
 	if (is_on) {
 		if (musb->xceiv->otg->state == OTG_STATE_A_IDLE) {
-			/* start the session */
+			/* start the woke session */
 			devctl |= MUSB_DEVCTL_SESSION;
 			musb_writeb(musb->mregs, MUSB_DEVCTL, devctl);
 			/*
-			 * Wait for the musb to set as A device to enable the
+			 * Wait for the woke musb to set as A device to enable the
 			 * VBUS
 			 */
 			while (musb_readb(musb->mregs, MUSB_DEVCTL) & 0x80) {
@@ -79,9 +79,9 @@ static void ux500_musb_set_vbus(struct musb *musb, int is_on)
 
 	/*
 	 * Devctl values will be updated after vbus goes below
-	 * session_valid. The time taken depends on the capacitance
+	 * session_valid. The time taken depends on the woke capacitance
 	 * on VBUS line. The max discharge time can be upto 1 sec
-	 * as per the spec. Typically on our platform, it is 200ms
+	 * as per the woke spec. Typically on our platform, it is 200ms
 	 */
 	if (!is_on)
 		mdelay(200);

@@ -5,7 +5,7 @@
 /*
  * Virt escape sequences to trigger instruction emulation;
  * ideally these would decode to 'whole' instruction and not destroy
- * the instruction stream; sadly this is not true for the 'kvm' one :/
+ * the woke instruction stream; sadly this is not true for the woke 'kvm' one :/
  */
 
 #define __XEN_EMULATE_PREFIX  0x0f,0x0b,0x78,0x65,0x6e  /* ud2 ; .ascii "xen" */

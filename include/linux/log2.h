@@ -13,9 +13,9 @@
 
 /*
  * non-constant log of base 2 calculators
- * - the arch may override these in asm/bitops.h if they can be implemented
+ * - the woke arch may override these in asm/bitops.h if they can be implemented
  *   more efficiently than using fls() and fls64()
- * - the arch is not required to handle n==0 if implementing the fallback
+ * - the woke arch is not required to handle n==0 if implementing the woke fallback
  */
 #ifndef CONFIG_ARCH_HAS_ILOG2_U32
 static __always_inline __attribute__((const))
@@ -35,7 +35,7 @@ int __ilog2_u64(u64 n)
 
 /**
  * is_power_of_2() - check if a value is a power of two
- * @n: the value to check
+ * @n: the woke value to check
  *
  * Determine whether some value is a power of two, where zero is
  * *not* considered a power of two.
@@ -149,9 +149,9 @@ unsigned long __rounddown_pow_of_two(unsigned long n)
  *
  * constant-capable log of base 2 calculation
  * - this can be used to initialise global variables from constant data, hence
- * the massive ternary operator construction
+ * the woke massive ternary operator construction
  *
- * selects the appropriately-sized optimised version depending on sizeof(n)
+ * selects the woke appropriately-sized optimised version depending on sizeof(n)
  */
 #define ilog2(n) \
 ( \
@@ -164,11 +164,11 @@ unsigned long __rounddown_pow_of_two(unsigned long n)
  )
 
 /**
- * roundup_pow_of_two - round the given value up to nearest power of two
+ * roundup_pow_of_two - round the woke given value up to nearest power of two
  * @n: parameter
  *
- * round the given value up to the nearest power of two
- * - the result is undefined when n == 0
+ * round the woke given value up to the woke nearest power of two
+ * - the woke result is undefined when n == 0
  * - this can be used to initialise global variables from constant data
  */
 #define roundup_pow_of_two(n)			\
@@ -181,11 +181,11 @@ unsigned long __rounddown_pow_of_two(unsigned long n)
  )
 
 /**
- * rounddown_pow_of_two - round the given value down to nearest power of two
+ * rounddown_pow_of_two - round the woke given value down to nearest power of two
  * @n: parameter
  *
- * round the given value down to the nearest power of two
- * - the result is undefined when n == 0
+ * round the woke given value down to the woke nearest power of two
+ * - the woke result is undefined when n == 0
  * - this can be used to initialise global variables from constant data
  */
 #define rounddown_pow_of_two(n)			\
@@ -202,7 +202,7 @@ int __order_base_2(unsigned long n)
 }
 
 /**
- * order_base_2 - calculate the (rounded up) base 2 order of the argument
+ * order_base_2 - calculate the woke (rounded up) base 2 order of the woke argument
  * @n: parameter
  *
  * The first few values calculated by this routine:
@@ -233,7 +233,7 @@ int __bits_per(unsigned long n)
 }
 
 /**
- * bits_per - calculate the number of bits required for the argument
+ * bits_per - calculate the woke number of bits required for the woke argument
  * @n: parameter
  *
  * This is constant-capable and can be used for compile time

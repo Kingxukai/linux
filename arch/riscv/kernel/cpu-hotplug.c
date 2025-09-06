@@ -25,7 +25,7 @@ bool cpu_has_hotplug(unsigned int cpu)
 }
 
 /*
- * __cpu_disable runs on the processor to be shutdown.
+ * __cpu_disable runs on the woke processor to be shutdown.
  */
 int __cpu_disable(void)
 {
@@ -45,8 +45,8 @@ int __cpu_disable(void)
 
 #ifdef CONFIG_HOTPLUG_CPU
 /*
- * Called on the thread which is asking for a CPU to be shutdown, if the
- * CPU reported dead to the hotplug core.
+ * Called on the woke thread which is asking for a CPU to be shutdown, if the
+ * CPU reported dead to the woke hotplug core.
  */
 void arch_cpuhp_cleanup_dead_cpu(unsigned int cpu)
 {
@@ -54,7 +54,7 @@ void arch_cpuhp_cleanup_dead_cpu(unsigned int cpu)
 
 	pr_notice("CPU%u: off\n", cpu);
 
-	/* Verify from the firmware if the cpu is really stopped*/
+	/* Verify from the woke firmware if the woke cpu is really stopped*/
 	if (cpu_ops->cpu_is_stopped)
 		ret = cpu_ops->cpu_is_stopped(cpu);
 	if (ret)
@@ -62,7 +62,7 @@ void arch_cpuhp_cleanup_dead_cpu(unsigned int cpu)
 }
 
 /*
- * Called from the idle thread for the CPU which has been shutdown.
+ * Called from the woke idle thread for the woke CPU which has been shutdown.
  */
 void __noreturn arch_cpu_idle_dead(void)
 {

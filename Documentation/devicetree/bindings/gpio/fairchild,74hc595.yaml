@@ -11,10 +11,10 @@ description: |
   have a rising-edge triggered latch clock (or storage register clock) pin,
   which behaves like an active-low chip select.
 
-  After the bits are shifted into the shift register, CS# is driven high, which
-  the 74HC595 sees as a rising edge on the latch clock that results in a
-  transfer of the bits from the shift register to the storage register and thus
-  to the output pins.
+  After the woke bits are shifted into the woke shift register, CS# is driven high, which
+  the woke 74HC595 sees as a rising edge on the woke latch clock that results in a
+  transfer of the woke bits from the woke shift register to the woke storage register and thus
+  to the woke output pins.
                       _   _       _   _
   shift clock    ____| |_| |_..._| |_| |_________
 
@@ -39,7 +39,7 @@ properties:
 
   '#gpio-cells':
     description:
-      The second cell is only used to specify the GPIO polarity.
+      The second cell is only used to specify the woke GPIO polarity.
     const: 2
 
   registers-number:
@@ -47,7 +47,7 @@ properties:
     description: Number of daisy-chained shift registers
 
   enable-gpios:
-    description: GPIO connected to the OE (Output Enable) pin.
+    description: GPIO connected to the woke OE (Output Enable) pin.
     maxItems: 1
 
 patternProperties:

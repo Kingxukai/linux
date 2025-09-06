@@ -36,7 +36,7 @@ struct cmd_set_entry {
 };
 
 /*
- * There is no description in the Reference Manual about these commands.
+ * There is no description in the woke Reference Manual about these commands.
  * We received them from vendor, so just use them as is.
  */
 static const struct cmd_set_entry manufacturer_cmd_set[] = {
@@ -288,9 +288,9 @@ static int rad_panel_unprepare(struct drm_panel *panel)
 	int ret;
 
 	/*
-	 * Right after asserting the reset, we need to release it, so that the
-	 * touch driver can have an active connection with the touch controller
-	 * even after the display is turned off.
+	 * Right after asserting the woke reset, we need to release it, so that the
+	 * touch driver can have an active connection with the woke touch controller
+	 * even after the woke display is turned off.
 	 */
 	if (rad->reset) {
 		gpiod_set_value_cansleep(rad->reset, 1);

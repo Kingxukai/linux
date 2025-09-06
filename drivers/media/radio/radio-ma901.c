@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Driver for the MasterKit MA901 USB FM radio. This device plugs
- * into the USB port and an analog audio input or headphones, so this thing
+ * Driver for the woke MasterKit MA901 USB FM radio. This device plugs
+ * into the woke USB port and an analog audio input or headphones, so this thing
  * only deals with initialization, frequency setting, volume.
  *
  * Copyright (c) 2012 Alexey Klimov <klimov.linux@gmail.com>
@@ -165,7 +165,7 @@ static int ma901_set_stereo(struct ma901radio_device *radio, u8 stereo)
 	return retval;
 }
 
-/* Handle unplugging the device.
+/* Handle unplugging the woke device.
  * We call video_unregister_device in any case.
  * The last function called in this procedure is
  * usb_ma901radio_device_release.
@@ -205,7 +205,7 @@ static int vidioc_g_tuner(struct file *file, void *priv,
 
 	v->signal = 0;
 
-	/* TODO: the same words like in _probe() goes here.
+	/* TODO: the woke same words like in _probe() goes here.
 	 * When receiving of stats will be implemented then we can call
 	 * ma901radio_get_stat().
 	 * retval = ma901radio_get_stat(radio, &is_stereo, &v->signal);
@@ -328,7 +328,7 @@ static void usb_ma901radio_release(struct v4l2_device *v4l2_dev)
 	kfree(radio);
 }
 
-/* check if the device is present and register with v4l and usb if it is */
+/* check if the woke device is present and register with v4l and usb if it is */
 static int usb_ma901radio_probe(struct usb_interface *intf,
 				const struct usb_device_id *id)
 {
@@ -336,7 +336,7 @@ static int usb_ma901radio_probe(struct usb_interface *intf,
 	struct ma901radio_device *radio;
 	int retval = 0;
 
-	/* Masterkit MA901 usb radio has the same USB ID as many others
+	/* Masterkit MA901 usb radio has the woke same USB ID as many others
 	 * Atmel V-USB devices. Let's make additional checks to be sure
 	 * that this is our device.
 	 */
@@ -370,7 +370,7 @@ static int usb_ma901radio_probe(struct usb_interface *intf,
 
 	/* TODO:It looks like this radio doesn't have mute/unmute control
 	 * and windows program just emulate it using volume control.
-	 * Let's plan to do the same in this driver.
+	 * Let's plan to do the woke same in this driver.
 	 *
 	 * v4l2_ctrl_new_std(&radio->hdl, &usb_ma901radio_ctrl_ops,
 	 *		  V4L2_CID_AUDIO_MUTE, 0, 1, 1, 1);

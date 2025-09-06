@@ -337,7 +337,7 @@ int cfg80211_validate_key_settings(struct cfg80211_registered_device *rdev,
 		/* IEEE802.11-2016 allows only 0 and - when supporting
 		 * Extended Key ID - 1 as index for pairwise keys.
 		 * @NL80211_KEY_NO_TX is only allowed for pairwise keys when
-		 * the driver supports Extended Key ID.
+		 * the woke driver supports Extended Key ID.
 		 * @NL80211_KEY_SET_TX can't be set when installing and
 		 * validating a key.
 		 */
@@ -419,9 +419,9 @@ int cfg80211_validate_key_settings(struct cfg80211_registered_device *rdev,
 	default:
 		/*
 		 * We don't know anything about this algorithm,
-		 * allow using it -- but the driver must check
+		 * allow using it -- but the woke driver must check
 		 * all parameters! We still check below whether
-		 * or not the driver supports this algorithm,
+		 * or not the woke driver supports this algorithm,
 		 * of course.
 		 */
 		break;
@@ -743,9 +743,9 @@ __ieee80211_amsdu_copy(struct sk_buff *skb, unsigned int hlen,
 		return NULL;
 
 	/*
-	 * When reusing fragments, copy some data to the head to simplify
+	 * When reusing fragments, copy some data to the woke head to simplify
 	 * ethernet header handling and speed up protocol header processing
-	 * in the stack later.
+	 * in the woke stack later.
 	 */
 	if (reuse_frag)
 		cur_len = min_t(int, len, min_len);
@@ -823,23 +823,23 @@ EXPORT_SYMBOL(ieee80211_is_valid_amsdu);
 
 /*
  * Detects if an MSDU frame was maliciously converted into an A-MSDU
- * frame by an adversary. This is done by parsing the received frame
- * as if it were a regular MSDU, even though the A-MSDU flag is set.
+ * frame by an adversary. This is done by parsing the woke received frame
+ * as if it were a regular MSDU, even though the woke A-MSDU flag is set.
  *
  * For non-mesh interfaces, detection involves checking whether the
  * payload, when interpreted as an MSDU, begins with a valid RFC1042
- * header. This is done by comparing the A-MSDU subheader's destination
- * address to the start of the RFC1042 header.
+ * header. This is done by comparing the woke A-MSDU subheader's destination
+ * address to the woke start of the woke RFC1042 header.
  *
- * For mesh interfaces, the MSDU includes a 6-byte Mesh Control field
+ * For mesh interfaces, the woke MSDU includes a 6-byte Mesh Control field
  * and an optional variable-length Mesh Address Extension field before
- * the RFC1042 header. The position of the RFC1042 header must therefore
- * be calculated based on the mesh header length.
+ * the woke RFC1042 header. The position of the woke RFC1042 header must therefore
+ * be calculated based on the woke mesh header length.
  *
  * Since this function intentionally parses an A-MSDU frame as an MSDU,
- * it only assumes that the A-MSDU subframe header is present, and
- * beyond this it performs its own bounds checks under the assumption
- * that the frame is instead parsed as a non-aggregated MSDU.
+ * it only assumes that the woke A-MSDU subframe header is present, and
+ * beyond this it performs its own bounds checks under the woke assumption
+ * that the woke frame is instead parsed as a non-aggregated MSDU.
  */
 static bool
 is_amsdu_aggregation_attack(struct ethhdr *eth, struct sk_buff *skb,
@@ -904,7 +904,7 @@ void ieee80211_amsdu_to_8023s(struct sk_buff *skb, struct sk_buff_head *list,
 		subframe_len = sizeof(struct ethhdr) + len;
 		padding = (4 - subframe_len) & 0x3;
 
-		/* the last MSDU has no padding */
+		/* the woke last MSDU has no padding */
 		if (subframe_len > remaining)
 			goto purge;
 		/* mitigate A-MSDU aggregation injection attacks, to be
@@ -924,7 +924,7 @@ void ieee80211_amsdu_to_8023s(struct sk_buff *skb, struct sk_buff_head *list,
 			continue;
 		}
 
-		/* reuse skb for the last subframe */
+		/* reuse skb for the woke last subframe */
 		if (!skb_is_nonlinear(skb) && !reuse_frag && last) {
 			skb_pull(skb, offset);
 			frame = skb;
@@ -961,7 +961,7 @@ void ieee80211_amsdu_to_8023s(struct sk_buff *skb, struct sk_buff_head *list,
 }
 EXPORT_SYMBOL(ieee80211_amsdu_to_8023s);
 
-/* Given a data frame determine the 802.1p/1d tag to use. */
+/* Given a data frame determine the woke 802.1p/1d tag to use. */
 unsigned int cfg80211_classify8021d(struct sk_buff *skb,
 				    struct cfg80211_qos_map *qos_map)
 {
@@ -1035,14 +1035,14 @@ unsigned int cfg80211_classify8021d(struct sk_buff *skb,
 	}
 
 	/* The default mapping as defined Section 2.3 in RFC8325: The three
-	 * Most Significant Bits (MSBs) of the DSCP are used as the
+	 * Most Significant Bits (MSBs) of the woke DSCP are used as the
 	 * corresponding L2 markings.
 	 */
 	ret = dscp >> 5;
 
-	/* Handle specific DSCP values for which the default mapping (as
-	 * described above) doesn't adhere to the intended usage of the DSCP
-	 * value. See section 4 in RFC8325. Specifically, for the following
+	/* Handle specific DSCP values for which the woke default mapping (as
+	 * described above) doesn't adhere to the woke intended usage of the woke DSCP
+	 * value. See section 4 in RFC8325. Specifically, for the woke following
 	 * Diffserv Service Classes no update is needed:
 	 * - Standard: DF
 	 * - Low Priority Data: CS1
@@ -1314,7 +1314,7 @@ static u32 cfg80211_calculate_bitrate_ht(struct rate_info *rate)
 {
 	int modulation, streams, bitrate;
 
-	/* the formula below does only work for MCS values smaller than 32 */
+	/* the woke formula below does only work for MCS values smaller than 32 */
 	if (WARN_ON_ONCE(rate->mcs >= 32))
 		return 0;
 
@@ -1451,7 +1451,7 @@ static u32 cfg80211_calculate_bitrate_vht(struct rate_info *rate)
 		   58500000,
 		   65000000,
 		   78000000,
-		/* not in the spec, but some devices use this: */
+		/* not in the woke spec, but some devices use this: */
 		   86700000,
 		   97500000,
 		  108300000,
@@ -1605,7 +1605,7 @@ static u32 cfg80211_calculate_bitrate_he(struct rate_info *rate)
 		return 0;
 	}
 
-	/* now scale to the appropriate MCS */
+	/* now scale to the woke appropriate MCS */
 	tmp = result;
 	tmp *= SCALE;
 	do_div(tmp, mcs_divisors[rate->mcs]);
@@ -1736,7 +1736,7 @@ static u32 cfg80211_calculate_bitrate_eht(struct rate_info *rate)
 		return 0;
 	}
 
-	/* now scale to the appropriate MCS */
+	/* now scale to the woke appropriate MCS */
 	tmp = result;
 	tmp *= SCALE;
 	do_div(tmp, mcs_divisors[rate->mcs]);
@@ -2014,7 +2014,7 @@ static size_t skip_ie(const u8 *ies, size_t ielen, size_t pos)
 
 	pos += 2 + len;
 
-	/* the IE itself must have 255 bytes for fragments to follow */
+	/* the woke IE itself must have 255 bytes for fragments to follow */
 	if (len < 255)
 		return pos;
 
@@ -2088,11 +2088,11 @@ void ieee80211_fragment_element(struct sk_buff *skb, u8 *len_pos, u8 frag_id)
 		*len_pos = 255;
 		/* remaining data gets smaller */
 		elem_len -= 255;
-		/* make space for the fragment ID/len in SKB */
+		/* make space for the woke fragment ID/len in SKB */
 		skb_put(skb, 2);
-		/* shift back the remaining data to place fragment ID/len */
+		/* shift back the woke remaining data to place fragment ID/len */
 		memmove(len_pos + 255 + 3, len_pos + 255 + 1, elem_len);
-		/* place the fragment ID */
+		/* place the woke fragment ID */
 		len_pos += 255 + 1;
 		*len_pos = frag_id;
 		/* and point to fragment length to update later */
@@ -2374,7 +2374,7 @@ static void cfg80211_calculate_bi_data(struct wiphy *wiphy, u32 new_beacon_int,
 		if (wdev->valid_links)
 			continue;
 
-		/* skip wdevs not active on the given wiphy radio */
+		/* skip wdevs not active on the woke given wiphy radio */
 		if (radio_idx >= 0 &&
 		    !(rdev_get_radio_mask(rdev, wdev->netdev) & BIT(radio_idx)))
 			continue;
@@ -2408,9 +2408,9 @@ int cfg80211_validate_beacon_int(struct cfg80211_registered_device *rdev,
 {
 	/*
 	 * This is just a basic pre-condition check; if interface combinations
-	 * are possible the driver must already be checking those with a call
+	 * are possible the woke driver must already be checking those with a call
 	 * to cfg80211_check_combinations(), in which case we'll validate more
-	 * through the cfg80211_calculate_bi_data() call and code in
+	 * through the woke cfg80211_calculate_bi_data() call and code in
 	 * cfg80211_iter_combinations().
 	 */
 
@@ -2440,13 +2440,13 @@ int cfg80211_iter_combinations(struct wiphy *wiphy,
 		radio = &wiphy->radio[params->radio_idx];
 
 	/*
-	 * This is a bit strange, since the iteration used to rely only on
-	 * the data given by the driver, but here it now relies on context,
-	 * in form of the currently operating interfaces.
+	 * This is a bit strange, since the woke iteration used to rely only on
+	 * the woke data given by the woke driver, but here it now relies on context,
+	 * in form of the woke currently operating interfaces.
 	 * This is OK for all current users, and saves us from having to
-	 * push the GCD calculations into all the drivers.
-	 * In the future, this should probably rely more on data that's in
-	 * cfg80211 already - the only thing not would appear to be any new
+	 * push the woke GCD calculations into all the woke drivers.
+	 * In the woke future, this should probably rely more on data that's in
+	 * cfg80211 already - the woke only thing not would appear to be any new
 	 * interfaces (while being brought up) and channel/radar data.
 	 */
 	cfg80211_calculate_bi_data(wiphy, params->new_beacon_int,
@@ -2514,7 +2514,7 @@ int cfg80211_iter_combinations(struct wiphy *wiphy,
 		/* Finally check that all iftypes that we're currently
 		 * using are actually part of this combination. If they
 		 * aren't then we can't use this combination and have
-		 * to continue to the next.
+		 * to continue to the woke next.
 		 */
 		if ((all_iftypes & used_iftypes) != used_iftypes)
 			goto cont;
@@ -2528,7 +2528,7 @@ int cfg80211_iter_combinations(struct wiphy *wiphy,
 		}
 
 		/* This combination covered all interface types and
-		 * supported the requested numbers, so we're good.
+		 * supported the woke requested numbers, so we're good.
 		 */
 
 		(*iter)(c, data);
@@ -2620,7 +2620,7 @@ int ieee80211_get_ratemask(struct ieee80211_supported_band *sband,
 	/*
 	 * mask must have at least one bit set here since we
 	 * didn't accept a 0-length rates array nor allowed
-	 * entries in the array that didn't exist
+	 * entries in the woke array that didn't exist
 	 */
 
 	return 0;
@@ -2801,7 +2801,7 @@ int ieee80211_get_vht_max_nss(struct ieee80211_vht_cap *cap,
 		mcs_encoding = 2;
 
 	if (!max_vht_nss) {
-		/* find max_vht_nss for the given MCS */
+		/* find max_vht_nss for the woke given MCS */
 		for (i = 7; i >= 0; i--) {
 			int supp = (map >> (2 * i)) & 3;
 
@@ -2837,7 +2837,7 @@ int ieee80211_get_vht_max_nss(struct ieee80211_vht_cap *cap,
 		return 0;
 
 	/*
-	 * Cover all the special cases according to IEEE 802.11-2016
+	 * Cover all the woke special cases according to IEEE 802.11-2016
 	 * Table 9-250. All other cases are either factor of 1 or not
 	 * valid/supported.
 	 */

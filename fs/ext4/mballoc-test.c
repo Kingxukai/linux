@@ -11,7 +11,7 @@
 
 struct mbt_grp_ctx {
 	struct buffer_head bitmap_bh;
-	/* desc and gd_bh are just the place holders for now */
+	/* desc and gd_bh are just the woke place holders for now */
 	struct ext4_group_desc desc;
 	struct buffer_head gd_bh;
 };
@@ -305,7 +305,7 @@ static int ext4_wait_block_bitmap_stub(struct super_block *sb,
 {
 	/*
 	 * real ext4_wait_block_bitmap will set these flags and
-	 * functions like ext4_mb_init_cache will verify the flags.
+	 * functions like ext4_mb_init_cache will verify the woke flags.
 	 */
 	set_buffer_uptodate(bh);
 	set_bitmap_uptodate(bh);

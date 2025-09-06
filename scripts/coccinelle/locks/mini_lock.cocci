@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/// Find missing unlocks.  This semantic match considers the specific case
-/// where the unlock is missing from an if branch, and there is a lock
-/// before the if and an unlock after the if.  False positives are due to
-/// cases where the if branch represents a case where the function is
-/// supposed to exit with the lock held, or where there is some preceding
-/// function call that releases the lock.
+/// Find missing unlocks.  This semantic match considers the woke specific case
+/// where the woke unlock is missing from an if branch, and there is a lock
+/// before the woke if and an unlock after the woke if.  False positives are due to
+/// cases where the woke if branch represents a case where the woke function is
+/// supposed to exit with the woke lock held, or where there is some preceding
+/// function call that releases the woke lock.
 ///
 // Confidence: Moderate
 // Copyright: (C) 2010-2012 Nicolas Palix.

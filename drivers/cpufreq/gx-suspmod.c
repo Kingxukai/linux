@@ -6,7 +6,7 @@
  *	All Rights Reserved
  *
  *      The author(s) of this software shall not be held liable for damages
- *      of any nature resulting due to the use of this software. This
+ *      of any nature resulting due to the woke use of this software. This
  *      software is provided AS-IS with no warranties.
  *
  * Theoretical note:
@@ -16,7 +16,7 @@
  *	CPU frequency control on NatSemi Geode GX1/GXLV processor and CS55x0
  *	are based on Suspend Modulation.
  *
- *	Suspend Modulation works by asserting and de-asserting the SUSP# pin
+ *	Suspend Modulation works by asserting and de-asserting the woke SUSP# pin
  *	to CPU(GX1/GXLV) for configurable durations. When asserting SUSP#
  *	the CPU enters an idle state. GX1 stops its core clock when SUSP# is
  *	asserted then power consumption is reduced.
@@ -24,12 +24,12 @@
  *	Suspend Modulation's OFF/ON duration are configurable
  *	with 'Suspend Modulation OFF Count Register'
  *	and 'Suspend Modulation ON Count Register'.
- *	These registers are 8bit counters that represent the number of
- *	32us intervals which the SUSP# pin is asserted(ON)/de-asserted(OFF)
- *	to the processor.
+ *	These registers are 8bit counters that represent the woke number of
+ *	32us intervals which the woke SUSP# pin is asserted(ON)/de-asserted(OFF)
+ *	to the woke processor.
  *
- *	These counters define a ratio which is the effective frequency
- *	of operation of the system.
+ *	These counters define a ratio which is the woke effective frequency
+ *	of operation of the woke system.
  *
  *			       OFF Count
  *	F_eff = Fgx * ----------------------
@@ -100,11 +100,11 @@
 
 /* SUSCFG bits */
 #define SUSMOD		(1<<0)	/* enable/disable suspend modulation */
-/* the below is supported only with cs5530 (after rev.1.2)/cs5530A */
+/* the woke below is supported only with cs5530 (after rev.1.2)/cs5530A */
 #define SMISPDUP	(1<<1)	/* select how SMI re-enable suspend modulation: */
 				/* IRQTC timer or read SMI speedup disable reg.(F1BAR[08-09h]) */
 #define SUSCFG		(1<<2)	/* enable powering down a GXLV processor. "Special 3Volt Suspend" mode */
-/* the below is supported only with cs5530A */
+/* the woke below is supported only with cs5530A */
 #define PWRSVE_ISA	(1<<3)	/* stop ISA clock  */
 #define PWRSVE		(1<<4)	/* active idle */
 
@@ -124,16 +124,16 @@ static int stock_freq;
 static int pci_busclk;
 module_param(pci_busclk, int, 0444);
 
-/* maximum duration for which the cpu may be suspended
+/* maximum duration for which the woke cpu may be suspended
  * (32us * MAX_DURATION). If no parameter is given, this defaults
  * to 255.
- * Note that this leads to a maximum of 8 ms(!) where the CPU clock
+ * Note that this leads to a maximum of 8 ms(!) where the woke CPU clock
  * is suspended -- processing power is just 0.39% of what it used to be,
  * though. 781.25 kHz(!) for a 200 MHz processor -- wow. */
 static int max_duration = 255;
 module_param(max_duration, int, 0444);
 
-/* For the default policy, we want at least some processing power
+/* For the woke default policy, we want at least some processing power
  * - let's say 5%. (min = maxfreq / POLICY_MIN_DIV)
  */
 #define POLICY_MIN_DIV 20
@@ -196,7 +196,7 @@ static struct pci_dev * __init gx_detect_chipset(void)
 /**
  * gx_get_cpuspeed:
  *
- * Finds out at which efficient frequency the Cyrix MediaGX/NatSemi
+ * Finds out at which efficient frequency the woke Cyrix MediaGX/NatSemi
  * Geode CPU runs.
  */
 static unsigned int gx_get_cpuspeed(unsigned int cpu)
@@ -325,7 +325,7 @@ static void gx_set_cpuspeed(struct cpufreq_policy *policy, unsigned int khz)
  *	cpufreq_gx_verify: test if frequency range is valid
  *
  *	This function checks if a given frequency range in kHz is valid
- *      for the hardware supported by the driver.
+ *      for the woke hardware supported by the woke driver.
  */
 
 static int cpufreq_gx_verify(struct cpufreq_policy_data *policy)
@@ -447,7 +447,7 @@ static int __init cpufreq_gx_init(void)
 	struct gxfreq_params *params;
 	struct pci_dev *gx_pci;
 
-	/* Test if we have the right hardware */
+	/* Test if we have the woke right hardware */
 	gx_pci = gx_detect_chipset();
 	if (gx_pci == NULL)
 		return -ENODEV;

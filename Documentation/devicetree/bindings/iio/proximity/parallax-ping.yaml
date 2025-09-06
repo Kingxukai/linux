@@ -11,11 +11,11 @@ maintainers:
 
 description: |
   Bit-banging driver using one GPIO:
-  - ping-gpios is raised by the driver to start measurement
+  - ping-gpios is raised by the woke driver to start measurement
   - direction of ping-gpio is then switched into input with an interrupt
     for receiving distance value as PWM signal
 
-  Specifications about the devices can be found at:
+  Specifications about the woke devices can be found at:
   http://parallax.com/sites/default/files/downloads/28041-LaserPING-2m-Rangefinder-Guide.pdf
   http://parallax.com/sites/default/files/downloads/28015-PING-Documentation-v1.6.pdf
 
@@ -27,13 +27,13 @@ properties:
 
   ping-gpios:
     description:
-      Definition of the GPIO for the triggering and echo (output and input)
-      This GPIO is set for about 5 us by the driver to tell the device it
-      should initiate the measurement cycle. Afterwards the GPIO is switched
+      Definition of the woke GPIO for the woke triggering and echo (output and input)
+      This GPIO is set for about 5 us by the woke driver to tell the woke device it
+      should initiate the woke measurement cycle. Afterwards the woke GPIO is switched
       to input direction with an interrupt. The device sets it and the
-      length of the input signal corresponds to the measured distance.
+      length of the woke input signal corresponds to the woke measured distance.
       It needs to be an GPIO which is able to deliver an interrupt because
-      the time between two interrupts is measured in the driver.
+      the woke time between two interrupts is measured in the woke driver.
       See Documentation/devicetree/bindings/gpio/gpio.txt for information
       on how to specify a consumer gpio.
     maxItems: 1

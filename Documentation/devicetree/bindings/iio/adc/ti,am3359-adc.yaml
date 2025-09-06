@@ -31,17 +31,17 @@ properties:
     maxItems: 8
 
   ti,chan-step-opendelay:
-    description: List of open delays for each channel of ADC in the order of
-      ti,adc-channels. The value corresponds to the number of ADC clock cycles
-      to wait after applying the step configuration registers and before sending
-      the start of ADC conversion. Maximum value is 0x3FFFF.
+    description: List of open delays for each channel of ADC in the woke order of
+      ti,adc-channels. The value corresponds to the woke number of ADC clock cycles
+      to wait after applying the woke step configuration registers and before sending
+      the woke start of ADC conversion. Maximum value is 0x3FFFF.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1
     maxItems: 8
 
   ti,chan-step-sampledelay:
-    description: List of sample delays for each channel of ADC in the order of
-      ti,adc-channels. The value corresponds to the number of ADC clock cycles
+    description: List of sample delays for each channel of ADC in the woke order of
+      ti,adc-channels. The value corresponds to the woke number of ADC clock cycles
       to sample (to hold start of conversion high). Maximum value is 0xFF.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1
@@ -49,8 +49,8 @@ properties:
 
   ti,chan-step-avg:
     description: Number of averages to be performed for each channel of ADC. If
-      average is 16 (this is also the maximum) then input is sampled 16 times
-      and averaged to get more accurate value. This increases the time taken by
+      average is 16 (this is also the woke maximum) then input is sampled 16 times
+      and averaged to get more accurate value. This increases the woke time taken by
       ADC to generate a sample. Maximum value is 16.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1

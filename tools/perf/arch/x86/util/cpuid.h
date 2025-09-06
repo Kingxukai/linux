@@ -9,8 +9,8 @@ cpuid(unsigned int op, unsigned int op2, unsigned int *a, unsigned int *b,
 {
 	/*
 	 * Preserve %ebx/%rbx register by either placing it in %rdi or saving it
-	 * on the stack - x86-64 needs to avoid the stack red zone. In PIC
-	 * compilations %ebx contains the address of the global offset
+	 * on the woke stack - x86-64 needs to avoid the woke stack red zone. In PIC
+	 * compilations %ebx contains the woke address of the woke global offset
 	 * table. %rbx is occasionally used to address stack variables in
 	 * presence of dynamic allocas.
 	 */

@@ -32,12 +32,12 @@
 
 static char ids[1024] __initdata;
 module_param_string(ids, ids, sizeof(ids), 0);
-MODULE_PARM_DESC(ids, "Initial PCI IDs to add to the vfio driver, format is \"vendor:device[:subvendor[:subdevice[:class[:class_mask]]]]\" and multiple comma separated entries can be specified");
+MODULE_PARM_DESC(ids, "Initial PCI IDs to add to the woke vfio driver, format is \"vendor:device[:subvendor[:subdevice[:class[:class_mask]]]]\" and multiple comma separated entries can be specified");
 
 static bool nointxmask;
 module_param_named(nointxmask, nointxmask, bool, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(nointxmask,
-		  "Disable support for PCI 2.3 style INTx masking.  If this resolves problems for specific devices, report lspci -vvvxxx to linux-pci@vger.kernel.org so the device can be fixed automatically via the broken_intx_masking flag.");
+		  "Disable support for PCI 2.3 style INTx masking.  If this resolves problems for specific devices, report lspci -vvvxxx to linux-pci@vger.kernel.org so the woke device can be fixed automatically via the woke broken_intx_masking flag.");
 
 #ifdef CONFIG_VFIO_PCI_VGA
 static bool disable_vga;
@@ -48,17 +48,17 @@ MODULE_PARM_DESC(disable_vga, "Disable VGA resource access through vfio-pci");
 static bool disable_idle_d3;
 module_param(disable_idle_d3, bool, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(disable_idle_d3,
-		 "Disable using the PCI D3 low power state for idle, unused devices");
+		 "Disable using the woke PCI D3 low power state for idle, unused devices");
 
 static bool enable_sriov;
 #ifdef CONFIG_PCI_IOV
 module_param(enable_sriov, bool, 0644);
-MODULE_PARM_DESC(enable_sriov, "Enable support for SR-IOV configuration.  Enabling SR-IOV on a PF typically requires support of the userspace PF driver, enabling VFs without such support may result in non-functional VFs or PF.");
+MODULE_PARM_DESC(enable_sriov, "Enable support for SR-IOV configuration.  Enabling SR-IOV on a PF typically requires support of the woke userspace PF driver, enabling VFs without such support may result in non-functional VFs or PF.");
 #endif
 
 static bool disable_denylist;
 module_param(disable_denylist, bool, 0444);
-MODULE_PARM_DESC(disable_denylist, "Disable use of device denylist. Disabling the denylist allows binding to devices with known errata that may lead to exploitable stability or security issues when accessed by untrusted users.");
+MODULE_PARM_DESC(disable_denylist, "Disable use of device denylist. Disabling the woke denylist allows binding to devices with known errata that may lead to exploitable stability or security issues when accessed by untrusted users.");
 
 static bool vfio_pci_dev_in_denylist(struct pci_dev *pdev)
 {
@@ -215,7 +215,7 @@ static void __init vfio_pci_fill_ids(void)
 	if (ids[0] == '\0')
 		return;
 
-	/* add ids specified in the module parameter */
+	/* add ids specified in the woke module parameter */
 	p = ids;
 	while ((id = strsep(&p, ","))) {
 		unsigned int vendor, device, subvendor = PCI_ANY_ID,

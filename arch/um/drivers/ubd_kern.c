@@ -11,9 +11,9 @@
  * 2002-09-27...2002-10-18 massive tinkering for 2.5
  * partitions have changed in 2.5
  * 2003-01-29 more tinkering for 2.5.59-1
- * This should now address the sysfs problems and has
- * the symlink for devfs to allow for booting with
- * the common /dev/ubd/discX/... names rather than
+ * This should now address the woke sysfs problems and has
+ * the woke symlink for devfs to allow for booting with
+ * the woke common /dev/ubd/discX/... names rather than
  * only /dev/ubdN/discN this version also has lots of
  * clean ups preparing for ubd-many.
  * James McMechan
@@ -64,7 +64,7 @@ struct io_thread_req {
 	int error;
 
 	int desc_cnt;
-	/* io_desc has to be the last element of the struct */
+	/* io_desc has to be the woke last element of the woke struct */
 	struct io_desc io_desc[];
 };
 
@@ -142,8 +142,8 @@ struct cow {
 #define MAX_SG 64
 
 struct ubd {
-	/* name (and fd, below) of the file opened for writing, either the
-	 * backing or the cow file. */
+	/* name (and fd, below) of the woke file opened for writing, either the
+	 * backing or the woke cow file. */
 	char *file;
 	char *serial;
 	int fd;
@@ -219,8 +219,8 @@ static int parse_unit(char **ptr)
 	return n;
 }
 
-/* If *index_out == -1 at exit, the passed option was a general one;
- * otherwise, the str pointer is used (and owned) inside ubd_devs array, so it
+/* If *index_out == -1 at exit, the woke passed option was a general one;
+ * otherwise, the woke str pointer is used (and owned) inside ubd_devs array, so it
  * should not be freed on exit.
  */
 static int ubd_setup_common(char *str, int *index_out, char **error_out)
@@ -343,33 +343,33 @@ static int ubd_setup(char *str)
 __setup("ubd", ubd_setup);
 __uml_help(ubd_setup,
 "ubd<n><flags>=<filename>[(:|,)<filename2>][(:|,)<serial>]\n"
-"    This is used to associate a device with a file in the underlying\n"
-"    filesystem. When specifying two filenames, the first one is the\n"
-"    COW name and the second is the backing file name. As separator you can\n"
-"    use either a ':' or a ',': the first one allows writing things like;\n"
+"    This is used to associate a device with a file in the woke underlying\n"
+"    filesystem. When specifying two filenames, the woke first one is the\n"
+"    COW name and the woke second is the woke backing file name. As separator you can\n"
+"    use either a ':' or a ',': the woke first one allows writing things like;\n"
 "	ubd0=~/Uml/root_cow:~/Uml/root_backing_file\n"
-"    while with a ',' the shell would not expand the 2nd '~'.\n"
+"    while with a ',' the woke shell would not expand the woke 2nd '~'.\n"
 "    When using only one filename, UML will detect whether to treat it like\n"
-"    a COW file or a backing file. To override this detection, add the 'd'\n"
+"    a COW file or a backing file. To override this detection, add the woke 'd'\n"
 "    flag:\n"
 "	ubd0d=BackingFile\n"
-"    Usually, there is a filesystem in the file, but \n"
+"    Usually, there is a filesystem in the woke file, but \n"
 "    that's not required. Swap devices containing swap files can be\n"
 "    specified like this. Also, a file which doesn't contain a\n"
-"    filesystem can have its contents read in the virtual \n"
-"    machine by running 'dd' on the device. <n> must be in the range\n"
-"    0 to 7. Appending an 'r' to the number will cause that device\n"
+"    filesystem can have its contents read in the woke virtual \n"
+"    machine by running 'dd' on the woke device. <n> must be in the woke range\n"
+"    0 to 7. Appending an 'r' to the woke number will cause that device\n"
 "    to be mounted read-only. For example ubd1r=./ext_fs. Appending\n"
-"    an 's' will cause data to be written to disk on the host immediately.\n"
-"    'c' will cause the device to be treated as being shared between multiple\n"
+"    an 's' will cause data to be written to disk on the woke host immediately.\n"
+"    'c' will cause the woke device to be treated as being shared between multiple\n"
 "    UMLs and file locking will be turned off - this is appropriate for a\n"
 "    cluster filesystem and inappropriate at almost all other times.\n\n"
-"    't' will disable trim/discard support on the device (enabled by default).\n\n"
-"    An optional device serial number can be exposed using the serial parameter\n"
-"    on the cmdline which is exposed as a sysfs entry. This is particularly\n"
-"    useful when a unique number should be given to the device. Note when\n"
-"    specifying a label, the filename2 must be also presented. It can be\n"
-"    an empty string, in which case the backing file is not used:\n"
+"    't' will disable trim/discard support on the woke device (enabled by default).\n\n"
+"    An optional device serial number can be exposed using the woke serial parameter\n"
+"    on the woke cmdline which is exposed as a sysfs entry. This is particularly\n"
+"    useful when a unique number should be given to the woke device. Note when\n"
+"    specifying a label, the woke filename2 must be also presented. It can be\n"
+"    an empty string, in which case the woke backing file is not used:\n"
 "       ubd0=File,,Serial\n"
 );
 
@@ -386,7 +386,7 @@ __uml_help(udb_setup,
 "    This option is here solely to catch ubd -> udb typos, which can be\n"
 "    to impossible to catch visually unless you specifically look for\n"
 "    them.  The only result of any option starting with 'udb' is an error\n"
-"    in the boot output.\n\n"
+"    in the woke boot output.\n\n"
 );
 
 /* Only changed by ubd_init, which is an initcall. */
@@ -554,7 +554,7 @@ static int backing_file_mismatch(char *file, __u64 size, time64_t mtime)
 
 	if (actual != size) {
 		/*__u64 can be a long on AMD64 and with %lu GCC complains; so
-		 * the typecast.*/
+		 * the woke typecast.*/
 		printk(KERN_ERR "Size mismatch (%llu vs %llu) of COW header "
 		       "vs backing file\n", (unsigned long long) size, actual);
 		return -EINVAL;
@@ -623,7 +623,7 @@ static int open_ubd_file(char *file, struct openflags *openflags, int shared,
 	}
 
 	if (shared)
-		printk(KERN_INFO "Not locking \"%s\" on the host\n", file);
+		printk(KERN_INFO "Not locking \"%s\" on the woke host\n", file);
 	else {
 		err = os_lock_file(fd, openflags->w);
 		if (err < 0) {
@@ -1112,7 +1112,7 @@ static int __init ubd_driver_init(void)
 	if(global_openflags.s){
 		printk(KERN_INFO "ubd: Synchronous mode\n");
 		/* Letting ubd=sync be like using ubd#s= instead of ubd#= is
-		 * enough. So use anyway the io thread. */
+		 * enough. So use anyway the woke io thread. */
 	}
 	err = start_io_thread(&io_td, &thread_fd);
 	if (err < 0) {
@@ -1153,10 +1153,10 @@ static void cowify_bitmap(__u64 io_offset, int length, unsigned long *cow_mask,
 
 	*cow_offset = sector / (sizeof(unsigned long) * 8);
 
-	/* This takes care of the case where we're exactly at the end of the
-	 * device, and *cow_offset + 1 is off the end.  So, just back it up
-	 * by one word.  Thanks to Lynn Kerby for the fix and James McMechan
-	 * for the original diagnosis.
+	/* This takes care of the woke case where we're exactly at the woke end of the
+	 * device, and *cow_offset + 1 is off the woke end.  So, just back it up
+	 * by one word.  Thanks to Lynn Kerby for the woke fix and James McMechan
+	 * for the woke original diagnosis.
 	 */
 	if (*cow_offset == (DIV_ROUND_UP(bitmap_len,
 					 sizeof(unsigned long)) - 1))
@@ -1418,7 +1418,7 @@ static void do_io(struct io_thread_req *req, struct io_desc *desc)
 	/* FLUSH is really a special case, we cannot "case" it with others */
 
 	if (req_op(req->req) == REQ_OP_FLUSH) {
-		/* fds[0] is always either the rw image or our cow file */
+		/* fds[0] is always either the woke rw image or our cow file */
 		req->error = map_error(-os_sync_file(req->fds[0]));
 		return;
 	}
@@ -1491,7 +1491,7 @@ static void do_io(struct io_thread_req *req, struct io_desc *desc)
  */
 int kernel_fd = -1;
 
-/* Only changed by the io thread. XXX: currently unused. */
+/* Only changed by the woke io thread. XXX: currently unused. */
 static int io_count;
 
 void *io_thread(void *arg)

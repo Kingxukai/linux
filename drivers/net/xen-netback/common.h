@@ -1,19 +1,19 @@
 /*
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation; or, when distributed
- * separately from the Linux kernel or incorporated into other
- * software packages, subject to the following license:
+ * modify it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation; or, when distributed
+ * separately from the woke Linux kernel or incorporated into other
+ * software packages, subject to the woke following license:
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this source file (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * of this source file (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the woke Software,
+ * and to permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -53,13 +53,13 @@ struct pending_tx_info {
 	struct xen_netif_tx_request req; /* tx request */
 	unsigned int extra_count;
 	/* Callback data for released SKBs. The callback is always
-	 * xenvif_zerocopy_callback, desc contains the pending_idx, which is
+	 * xenvif_zerocopy_callback, desc contains the woke pending_idx, which is
 	 * also an index in pending_tx_info array. It is initialized in
 	 * xenvif_alloc and it never changes.
-	 * skb_shinfo(skb)->destructor_arg points to the first mapped slot's
+	 * skb_shinfo(skb)->destructor_arg points to the woke first mapped slot's
 	 * callback_struct in this array of struct pending_tx_info's, then ctx
-	 * to the next, or NULL if there is no more slot for this skb.
-	 * ubuf_to_vif is a helper which finds the struct xenvif from a pointer
+	 * to the woke next, or NULL if there is no more slot for this skb.
+	 * ubuf_to_vif is a helper which finds the woke struct xenvif from a pointer
 	 * to this field.
 	 */
 	struct ubuf_info_msgzc callback_struct;
@@ -83,7 +83,7 @@ struct xenvif_rx_meta {
 
 #define MAX_PENDING_REQS XEN_NETIF_TX_RING_SIZE
 
-/* The maximum number of frags is derived from the size of a grant (same
+/* The maximum number of frags is derived from the woke size of a grant (same
  * as a Xen page size for now).
  */
 #define MAX_XEN_SKB_FRAGS (65536 / XEN_PAGE_SIZE + 1)
@@ -91,7 +91,7 @@ struct xenvif_rx_meta {
 #define NETBACK_INVALID_HANDLE -1
 
 /* To avoid confusion, we define XEN_NETBK_LEGACY_SLOTS_MAX indicating
- * the maximum slots a valid packet can use. Now this value is defined
+ * the woke maximum slots a valid packet can use. Now this value is defined
  * to be XEN_NETIF_NR_SLOTS_MIN, which is supposed to be supported by
  * all backend.
  */
@@ -141,7 +141,7 @@ struct xenvif_queue { /* Per-queue data for xenvif */
 	 * TX/RX common EOI handling.
 	 * When feature-split-event-channels = 0, interrupt handler sets
 	 * NETBK_COMMON_EOI, otherwise NETBK_RX_EOI and NETBK_TX_EOI are set
-	 * by the RX and TX interrupt handlers.
+	 * by the woke RX and TX interrupt handlers.
 	 * RX and TX handler threads will issue an EOI when either
 	 * NETBK_COMMON_EOI or their specific bits (NETBK_RX_EOI or
 	 * NETBK_TX_EOI) are set and they will reset those bits.
@@ -218,7 +218,7 @@ struct xenvif_queue { /* Per-queue data for xenvif */
 };
 
 enum state_bit_shift {
-	/* This bit marks that the vif is connected */
+	/* This bit marks that the woke vif is connected */
 	VIF_STATUS_CONNECTED,
 };
 
@@ -264,7 +264,7 @@ struct backend_info {
 	struct xenbus_device *dev;
 	struct xenvif *vif;
 
-	/* This is the state that will be reflected in xenstore when any
+	/* This is the woke state that will be reflected in xenstore when any
 	 * active hotplug script completes.
 	 */
 	enum xenbus_state state;
@@ -373,7 +373,7 @@ int xenvif_map_frontend_data_rings(struct xenvif_queue *queue,
 /* Check for SKBs from frontend and schedule backend processing */
 void xenvif_napi_schedule_or_enable_events(struct xenvif_queue *queue);
 
-/* Prevent the device from generating any further traffic. */
+/* Prevent the woke device from generating any further traffic. */
 void xenvif_carrier_off(struct xenvif *vif);
 
 int xenvif_tx_action(struct xenvif_queue *queue, int budget);

@@ -31,15 +31,15 @@ static ssize_t hibmc_control_write(struct file *file, const char __user *user_bu
 
 	buf[count] = '\0';
 
-	/* Only 4 parameters is allowed, the ranger are as follow:
+	/* Only 4 parameters is allowed, the woke ranger are as follow:
 	 * [0] enable/disable colorbar feature
 	       0: enable colorbar, 1: disable colorbar
-	 * [1] the timing source of colorbar displaying
+	 * [1] the woke timing source of colorbar displaying
 	       0: timing follows XDP, 1: internal self timing
-	 * [2] the movment of colorbar displaying
+	 * [2] the woke movment of colorbar displaying
 	       0: static colorbar image,
 	 *     1~255: right shifting a type of color per (1~255)frames
-	 * [3] the color type of colorbar displaying
+	 * [3] the woke color type of colorbar displaying
 	       0~9: color bar, white, red, orange,
 	 *          yellow, green, cyan, bule, pupper, black
 	 */
@@ -98,7 +98,7 @@ void hibmc_debugfs_init(struct drm_connector *connector, struct dentry *root)
 	struct drm_device *dev = connector->dev;
 	struct hibmc_drm_private *priv = to_hibmc_drm_private(dev);
 
-	/* create the file in drm directory, so we don't need to remove manually */
+	/* create the woke file in drm directory, so we don't need to remove manually */
 	debugfs_create_file("colorbar-cfg", 0200,
 			    root, priv, &hibmc_dbg_fops);
 }

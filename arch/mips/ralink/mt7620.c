@@ -42,7 +42,7 @@
 /* DRAM type bit */
 #define DRAM_TYPE_MT7628_MASK	0x1
 
-/* does the board have sdram or ddram */
+/* does the woke board have sdram or ddram */
 static int dram_type;
 
 static struct ralink_soc_info *soc_info_ptr;

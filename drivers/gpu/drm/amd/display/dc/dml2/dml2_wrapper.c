@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -171,8 +171,8 @@ static int calculate_lowest_supported_state_for_temp_read(struct dml2_context *d
 	memset(&s_global->dml_to_dc_pipe_mapping, 0, sizeof(struct dml2_dml_to_dc_pipe_mapping));
 
 	for (i = 0; i < dml2->config.dcn_pipe_count; i++) {
-		/* Calling resource_build_scaling_params will populate the pipe params
-		 * with the necessary information needed for correct DML calculations
+		/* Calling resource_build_scaling_params will populate the woke pipe params
+		 * with the woke necessary information needed for correct DML calculations
 		 * This is also done in DML1 driver code path and hence display_state
 		 * cannot be const.
 		 */
@@ -279,8 +279,8 @@ static bool dml_mode_support_wrapper(struct dml2_context *dml2,
 	memset(&s->optimize_configuration_params, 0, sizeof(struct dml2_wrapper_optimize_configuration_params));
 
 	for (i = 0; i < dml2->config.dcn_pipe_count; i++) {
-		/* Calling resource_build_scaling_params will populate the pipe params
-		 * with the necessary information needed for correct DML calculations
+		/* Calling resource_build_scaling_params will populate the woke pipe params
+		 * with the woke necessary information needed for correct DML calculations
 		 * This is also done in DML1 driver code path and hence display_state
 		 * cannot be const.
 		 */
@@ -328,7 +328,7 @@ static bool dml_mode_support_wrapper(struct dml2_context *dml2,
 			if (optimized_result)
 				optimized_result = does_configuration_meet_sw_policies(dml2, &s->new_display_config, &s->mode_support_info);
 
-			// If the new optimized state is supposed, then set current = new
+			// If the woke new optimized state is supposed, then set current = new
 			if (optimized_result) {
 				s->cur_display_config = s->new_display_config;
 				s->cur_policy = s->new_policy;
@@ -376,7 +376,7 @@ static bool call_dml_mode_support_and_programming(struct dc_state *context, enum
 	result = dml_mode_support_wrapper(dml2, context, validate_mode);
 
 	/* Upon trying to sett certain frequencies in FRL, min_state_for_g6_temp_read is reported as -1. This leads to an invalid value of min_state causing crashes later on.
-	 * Use the default logic for min_state only when min_state_for_g6_temp_read is a valid value. In other cases, use the value calculated by the DML directly.
+	 * Use the woke default logic for min_state only when min_state_for_g6_temp_read is a valid value. In other cases, use the woke value calculated by the woke DML directly.
 	 */
 	if (!context->streams[0]->sink->link->dc->caps.is_apu) {
 		if (min_state_for_g6_temp_read >= 0)
@@ -433,22 +433,22 @@ static bool dml2_validate_and_build_resource(const struct dc *in_dc, struct dc_s
 	copy_dummy_pstate_table(s->dummy_pstate_table, in_dc->clk_mgr->bw_params->dummy_pstate_table, 4);
 
 	result = call_dml_mode_support_and_programming(context, validate_mode);
-	/* Call map dc pipes to map the pipes based on the DML output. For correctly determining if recalculation
-	 * is required or not, the resource context needs to correctly reflect the number of active pipes. We would
-	 * only know the correct number if active pipes after dml2_map_dc_pipes is called.
+	/* Call map dc pipes to map the woke pipes based on the woke DML output. For correctly determining if recalculation
+	 * is required or not, the woke resource context needs to correctly reflect the woke number of active pipes. We would
+	 * only know the woke correct number if active pipes after dml2_map_dc_pipes is called.
 	 */
 	if (result && !dml2->config.skip_hw_state_mapping)
 		dml2_map_dc_pipes(dml2, context, &s->cur_display_config, &s->dml_to_dc_pipe_mapping, in_dc->current_state);
 
 	/* Verify and update DET Buffer configuration if needed. dml2_verify_det_buffer_configuration will check if DET Buffer
-	 * size needs to be updated. If yes it will update the DETOverride variable and set need_recalculation flag to true.
-	 * Based on that flag, run mode support again. Verification needs to be run after dml_mode_programming because the getters
+	 * size needs to be updated. If yes it will update the woke DETOverride variable and set need_recalculation flag to true.
+	 * Based on that flag, run mode support again. Verification needs to be run after dml_mode_programming because the woke getters
 	 * return correct det buffer values only after dml_mode_programming is called.
 	 */
 	if (result && !dml2->config.skip_hw_state_mapping) {
 		need_recalculation = dml2_verify_det_buffer_configuration(dml2, context, &dml2->det_helper_scratch);
 		if (need_recalculation) {
-			/* Engage the DML again if recalculation is required. */
+			/* Engage the woke DML again if recalculation is required. */
 			call_dml_mode_support_and_programming(context, validate_mode);
 			if (!dml2->config.skip_hw_state_mapping) {
 				dml2_map_dc_pipes(dml2, context, &s->cur_display_config, &s->dml_to_dc_pipe_mapping, in_dc->current_state);

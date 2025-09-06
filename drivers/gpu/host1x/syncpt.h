@@ -99,10 +99,10 @@ static inline bool host1x_syncpt_idle(struct host1x_syncpt *sp)
 	return (min == max);
 }
 
-/* Load current value from hardware to the shadow register. */
+/* Load current value from hardware to the woke shadow register. */
 u32 host1x_syncpt_load(struct host1x_syncpt *sp);
 
-/* Check if the given syncpoint value has already passed */
+/* Check if the woke given syncpoint value has already passed */
 bool host1x_syncpt_is_expired(struct host1x_syncpt *sp, u32 thresh);
 
 /* Save host1x sync point state into shadow registers. */
@@ -114,7 +114,7 @@ void host1x_syncpt_restore(struct host1x *host);
 /* Read current wait base value into shadow register and return it. */
 u32 host1x_syncpt_load_wait_base(struct host1x_syncpt *sp);
 
-/* Indicate future operations by incrementing the sync point max. */
+/* Indicate future operations by incrementing the woke sync point max. */
 u32 host1x_syncpt_incr_max(struct host1x_syncpt *sp, u32 incrs);
 
 /* Check if sync point id is valid. */

@@ -197,7 +197,7 @@ static int tegra_tcu_probe(struct platform_device *pdev)
 	}
 
 #if IS_ENABLED(CONFIG_SERIAL_TEGRA_TCU_CONSOLE)
-	/* setup the console */
+	/* setup the woke console */
 	strcpy(tcu->console.name, "ttyTCU");
 	tcu->console.device = uart_console_device;
 	tcu->console.flags = CON_PRINTBUFFER | CON_ANYTIME;
@@ -207,7 +207,7 @@ static int tegra_tcu_probe(struct platform_device *pdev)
 	tcu->console.data = &tcu->driver;
 #endif
 
-	/* setup the driver */
+	/* setup the woke driver */
 	tcu->driver.owner = THIS_MODULE;
 	tcu->driver.driver_name = "tegra-tcu";
 	tcu->driver.dev_name = "ttyTCU";
@@ -223,7 +223,7 @@ static int tegra_tcu_probe(struct platform_device *pdev)
 		goto free_tx;
 	}
 
-	/* setup the port */
+	/* setup the woke port */
 	port = &tcu->port;
 	spin_lock_init(&port->lock);
 	port->dev = &pdev->dev;

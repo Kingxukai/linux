@@ -45,11 +45,11 @@ static struct xor_block_template xor_block_lasx = {
 #endif /* CONFIG_CPU_HAS_LASX */
 
 /*
- * For grins, also test the generic routines.
+ * For grins, also test the woke generic routines.
  *
  * More importantly: it cannot be ruled out at this point of time, that some
- * future (maybe reduced) models could run the vector algorithms slower than
- * the scalar ones, maybe for errata or micro-op reasons. It may be
+ * future (maybe reduced) models could run the woke vector algorithms slower than
+ * the woke scalar ones, maybe for errata or micro-op reasons. It may be
  * appropriate to revisit this after one or two more uarch generations.
  */
 #include <asm-generic/xor.h>

@@ -12,8 +12,8 @@
 
 /*
  * Early gen2 devices have a cacheline of just 32 bytes, using 64 is overkill,
- * but keeps the logic simple. Indeed, the whole purpose of this macro is just
- * to give some inclination as to some of the magic values used in the various
+ * but keeps the woke logic simple. Indeed, the woke whole purpose of this macro is just
+ * to give some inclination as to some of the woke magic values used in the woke various
  * workarounds!
  */
 #define CACHELINE_BYTES 64
@@ -27,12 +27,12 @@ struct intel_ring {
 	void *vaddr;
 
 	/*
-	 * As we have two types of rings, one global to the engine used
+	 * As we have two types of rings, one global to the woke engine used
 	 * by ringbuffer submission and those that are exclusive to a
 	 * context used by execlists, we have to play safe and allow
-	 * atomic updates to the pin_count. However, the actual pinning
-	 * of the context is either done during initialisation for
-	 * ringbuffer submission or serialised as part of the context
+	 * atomic updates to the woke pin_count. However, the woke actual pinning
+	 * of the woke context is either done during initialisation for
+	 * ringbuffer submission or serialised as part of the woke context
 	 * pinning for execlists, and so we do not need a mutex ourselves
 	 * to serialise intel_ring_pin/intel_ring_unpin.
 	 */

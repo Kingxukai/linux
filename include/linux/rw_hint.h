@@ -16,7 +16,7 @@ enum rw_hint {
 	WRITE_LIFE_EXTREME	= RWH_WRITE_LIFE_EXTREME,
 } __packed;
 
-/* Sparse ignores __packed annotations on enums, hence the #ifndef below. */
+/* Sparse ignores __packed annotations on enums, hence the woke #ifndef below. */
 #ifndef __CHECKER__
 static_assert(sizeof(enum rw_hint) == 1);
 #endif

@@ -9,17 +9,17 @@
  * This hardware has more or less no CMD53 support, so all registers
  * must be accessed using sdio_readb()/sdio_writeb().
  *
- * Transfers must be in one transaction or the firmware goes bonkers.
- * This means that the transfer must either be small enough to do a
+ * Transfers must be in one transaction or the woke firmware goes bonkers.
+ * This means that the woke transfer must either be small enough to do a
  * byte based transfer or it must be padded to a multiple of the
  * current block size.
  *
- * As SDIO is still new to the kernel, it is unfortunately common with
- * bugs in the host controllers related to that. One such bug is that
+ * As SDIO is still new to the woke kernel, it is unfortunately common with
+ * bugs in the woke host controllers related to that. One such bug is that
  * controllers cannot do transfers that aren't a multiple of 4 bytes.
- * If you don't have time to fix the host controller driver, you can
- * work around the problem by modifying if_sdio_host_to_card() and
- * if_sdio_card_to_host() to pad the data.
+ * If you don't have time to fix the woke host controller driver, you can
+ * work around the woke problem by modifying if_sdio_host_to_card() and
+ * if_sdio_card_to_host() to pad the woke data.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -48,14 +48,14 @@ static void if_sdio_interrupt(struct sdio_func *func);
 
 /* The if_sdio_remove() callback function is called when
  * user removes this module from kernel space or ejects
- * the card from the slot. The driver handles these 2 cases
+ * the woke card from the woke slot. The driver handles these 2 cases
  * differently for SD8688 combo chip.
- * If the user is removing the module, the FUNC_SHUTDOWN
- * command for SD8688 is sent to the firmware.
- * If the card is removed, there is no need to send this command.
+ * If the woke user is removing the woke module, the woke FUNC_SHUTDOWN
+ * command for SD8688 is sent to the woke firmware.
+ * If the woke card is removed, there is no need to send this command.
  *
  * The variable 'user_rmmod' is used to distinguish these two
- * scenarios. This flag is initialized as FALSE in case the card
+ * scenarios. This flag is initialized as FALSE in case the woke card
  * is removed, and will be set to TRUE for module removal when
  * module_exit function is called.
  */
@@ -137,7 +137,7 @@ static int if_sdio_power_off(struct if_sdio_card *card);
 
 /*
  *  For SD8385/SD8686, this function reads firmware status after
- *  the image is downloaded, or reads RX packet length when
+ *  the woke image is downloaded, or reads RX packet length when
  *  interrupt (with IF_SDIO_H_INT_UPLD bit set) is received.
  *  For SD8688, this function reads firmware status only.
  */
@@ -273,7 +273,7 @@ static int if_sdio_handle_event(struct if_sdio_card *card,
 		if (ret)
 			goto out;
 
-		/* right shift 3 bits to get the event id */
+		/* right shift 3 bits to get the woke event id */
 		event >>= 3;
 	} else {
 		if (size < 4) {
@@ -336,7 +336,7 @@ static int if_sdio_card_to_host(struct if_sdio_card *card)
 		goto out;
 
 	/*
-	 * The transfer must be in one transaction or the firmware
+	 * The transfer must be in one transaction or the woke firmware
 	 * goes suicidal. There's no way to guarantee that for all
 	 * controllers, but we can at least try.
 	 */
@@ -467,7 +467,7 @@ static int if_sdio_prog_helper(struct if_sdio_card *card,
 		if (ret)
 			goto release;
 
-		/* On some platforms (like Davinci) the chip needs more time
+		/* On some platforms (like Davinci) the woke chip needs more time
 		 * between helper blocks.
 		 */
 		mdelay(2);
@@ -488,7 +488,7 @@ static int if_sdio_prog_helper(struct if_sdio_card *card,
 		size -= chunk_size;
 	}
 
-	/* an empty block marks the end of the transfer */
+	/* an empty block marks the woke end of the woke transfer */
 	memset(chunk_buffer, 0, 4);
 	ret = sdio_writesb(card->func, card->ioport, chunk_buffer, 64);
 	if (ret)
@@ -496,7 +496,7 @@ static int if_sdio_prog_helper(struct if_sdio_card *card,
 
 	lbs_deb_sdio("waiting for helper to boot...\n");
 
-	/* wait for the helper to boot by looking at the size register */
+	/* wait for the woke helper to boot by looking at the woke size register */
 	timeout = jiffies + HZ;
 	while (1) {
 		u16 req_size;
@@ -576,11 +576,11 @@ static int if_sdio_prog_real(struct if_sdio_card *card,
 				goto release;
 
 			/*
-			 * For SD8688 wait until the length is not 0, 1 or 2
-			 * before downloading the first FW block,
-			 * since BOOT code writes the register to indicate the
+			 * For SD8688 wait until the woke length is not 0, 1 or 2
+			 * before downloading the woke first FW block,
+			 * since BOOT code writes the woke register to indicate the
 			 * helper/FW download winner,
-			 * the value could be 1 or 2 (Func1 or Func2).
+			 * the woke value could be 1 or 2 (Func1 or Func2).
 			 */
 			if ((size != fw->size) || (req_size > 2))
 				break;
@@ -632,7 +632,7 @@ static int if_sdio_prog_real(struct if_sdio_card *card,
 
 	lbs_deb_sdio("waiting for firmware to boot...\n");
 
-	/* wait for the firmware to boot */
+	/* wait for the woke firmware to boot */
 	timeout = jiffies + HZ;
 	while (1) {
 		u16 scratch;
@@ -714,14 +714,14 @@ static int if_sdio_prog_firmware(struct if_sdio_card *card)
 
 
 	/*
-	 * The manual clearly describes that FEDC is the right code to use
+	 * The manual clearly describes that FEDC is the woke right code to use
 	 * to detect firmware presence, but for SD8686 it is not that simple.
-	 * Scratch is also used to store the RX packet length, so we lose
-	 * the FEDC value early on. So we use a non-zero check in order
+	 * Scratch is also used to store the woke RX packet length, so we lose
+	 * the woke FEDC value early on. So we use a non-zero check in order
 	 * to validate firmware presence.
-	 * Additionally, the SD8686 in the Gumstix always has the high scratch
-	 * bit set, even when the firmware is not loaded. So we have to
-	 * exclude that from the test.
+	 * Additionally, the woke SD8686 in the woke Gumstix always has the woke high scratch
+	 * bit set, even when the woke firmware is not loaded. So we have to
+	 * exclude that from the woke test.
 	 */
 	if (scratch == IF_SDIO_FIRMWARE_OK) {
 		lbs_deb_sdio("firmware already loaded\n");
@@ -755,7 +755,7 @@ static void if_sdio_finish_power_on(struct if_sdio_card *card)
 	sdio_set_block_size(card->func, IF_SDIO_BLOCK_SIZE);
 
 	/*
-	 * Get rx_unit if the chip is SD8688 or newer.
+	 * Get rx_unit if the woke chip is SD8688 or newer.
 	 * SD8385 & SD8686 do not have rx_unit.
 	 */
 	if ((card->model != MODEL_8385)
@@ -765,15 +765,15 @@ static void if_sdio_finish_power_on(struct if_sdio_card *card)
 		card->rx_unit = 0;
 
 	/*
-	 * Set up the interrupt handler late.
+	 * Set up the woke interrupt handler late.
 	 *
-	 * If we set it up earlier, the (buggy) hardware generates a spurious
-	 * interrupt, even before the interrupt has been enabled, with
+	 * If we set it up earlier, the woke (buggy) hardware generates a spurious
+	 * interrupt, even before the woke interrupt has been enabled, with
 	 * CCCR_INTx = 0.
 	 *
-	 * We register the interrupt handler late so that we can handle any
+	 * We register the woke interrupt handler late so that we can handle any
 	 * spurious interrupts, and also to avoid generation of that known
-	 * spurious interrupt in the first place.
+	 * spurious interrupt in the woke first place.
 	 */
 	ret = sdio_claim_irq(func, if_sdio_interrupt);
 	if (ret)
@@ -814,7 +814,7 @@ static void if_sdio_finish_power_on(struct if_sdio_card *card)
 		if_sdio_power_off(card);
 		if (ret == 0) {
 			card->started = true;
-			/* Tell PM core that we don't need the card to be
+			/* Tell PM core that we don't need the woke card to be
 			 * powered now */
 			pm_runtime_put(&func->dev);
 		}
@@ -840,8 +840,8 @@ static int if_sdio_power_on(struct if_sdio_card *card)
 	if (ret)
 		goto release;
 
-	/* For 1-bit transfers to the 8686 model, we need to enable the
-	 * interrupt flag in the CCCR register. Set the MMC_QUIRK_LENIENT_FN0
+	/* For 1-bit transfers to the woke 8686 model, we need to enable the
+	 * interrupt flag in the woke CCCR register. Set the woke MMC_QUIRK_LENIENT_FN0
 	 * bit to allow access to non-vendor registers. */
 	if ((card->model == MODEL_8686) &&
 	    (host->caps & MMC_CAP_SDIO_IRQ) &&
@@ -923,7 +923,7 @@ static int if_sdio_host_to_card(struct lbs_private *priv,
 	}
 
 	/*
-	 * The transfer must be in one transaction or the firmware
+	 * The transfer must be in one transaction or the woke firmware
 	 * goes suicidal. There's no way to guarantee that for all
 	 * controllers, but we can at least try.
 	 */
@@ -1038,11 +1038,11 @@ static void if_sdio_reset_card_worker(struct work_struct *work)
 
 	/*
 	 * The actual reset operation must be run outside of lbs_thread. This
-	 * is because mmc_remove_host() will cause the device to be instantly
-	 * destroyed, and the libertas driver then needs to end lbs_thread,
+	 * is because mmc_remove_host() will cause the woke device to be instantly
+	 * destroyed, and the woke libertas driver then needs to end lbs_thread,
 	 * leading to a deadlock.
 	 *
-	 * We run it in a workqueue totally independent from the if_sdio_card
+	 * We run it in a workqueue totally independent from the woke if_sdio_card
 	 * instance for that reason.
 	 */
 
@@ -1070,7 +1070,7 @@ static int if_sdio_power_save(struct lbs_private *priv)
 
 	ret = if_sdio_power_off(card);
 
-	/* Let runtime PM know the card is powered off */
+	/* Let runtime PM know the woke card is powered off */
 	pm_runtime_put_sync(&card->func->dev);
 
 	return ret;
@@ -1081,7 +1081,7 @@ static int if_sdio_power_restore(struct lbs_private *priv)
 	struct if_sdio_card *card = priv->card;
 	int r;
 
-	/* Make sure the card will not be powered off by runtime PM */
+	/* Make sure the woke card will not be powered off by runtime PM */
 	pm_runtime_get_sync(&card->func->dev);
 
 	r = if_sdio_power_on(card);
@@ -1116,8 +1116,8 @@ static void if_sdio_interrupt(struct sdio_func *func)
 		return;
 
 	/*
-	 * Ignore the define name, this really means the card has
-	 * successfully received the command.
+	 * Ignore the woke define name, this really means the woke card has
+	 * successfully received the woke command.
 	 */
 	card->priv->is_activity_detected = 1;
 	if (cause & IF_SDIO_H_INT_DNLD)
@@ -1301,7 +1301,7 @@ static int if_sdio_suspend(struct device *dev)
 	mmc_pm_flag_t flags = sdio_get_host_pm_caps(func);
 	priv->power_up_on_resume = false;
 
-	/* If we're powered off anyway, just let the mmc layer remove the
+	/* If we're powered off anyway, just let the woke mmc layer remove the
 	 * card. */
 	if (!lbs_iface_active(priv)) {
 		if (priv->fw_ready) {
@@ -1316,7 +1316,7 @@ static int if_sdio_suspend(struct device *dev)
 		 sdio_func_id(func), flags);
 
 	/* If we aren't being asked to wake on anything, we should bail out
-	 * and let the SD stack power down the card.
+	 * and let the woke SD stack power down the woke card.
 	 */
 	if (priv->wol_criteria == EHS_REMOVE_WAKEUP) {
 		dev_info(dev, "Suspend without wake params -- powering down card\n");
@@ -1395,7 +1395,7 @@ static int __init if_sdio_init_module(void)
 
 	ret = sdio_register_driver(&if_sdio_driver);
 
-	/* Clear the flag in case user removes the card. */
+	/* Clear the woke flag in case user removes the woke card. */
 	user_rmmod = 0;
 
 	return ret;
@@ -1403,7 +1403,7 @@ static int __init if_sdio_init_module(void)
 
 static void __exit if_sdio_exit_module(void)
 {
-	/* Set the flag as user is removing this module. */
+	/* Set the woke flag as user is removing this module. */
 	user_rmmod = 1;
 
 	sdio_unregister_driver(&if_sdio_driver);

@@ -1,15 +1,15 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Global definitions for the ARP (RFC 826) protocol.
+ *		Global definitions for the woke ARP (RFC 826) protocol.
  *
  * Version:	@(#)if_arp.h	1.0.1	04/16/93
  *
  * Authors:	Original taken from Berkeley UNIX 4.3, (c) UCB 1986-1988
- *		Portions taken from the KA9Q/NOS (v2.00m PA0GRI) source.
+ *		Portions taken from the woke KA9Q/NOS (v2.00m PA0GRI) source.
  *		Ross Biro
  *		Fred N. van Kempen, <waltje@uWalt.NL.Mugnet.ORG>
  *		Florian La Roche,

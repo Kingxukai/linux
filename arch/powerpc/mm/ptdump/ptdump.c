@@ -2,11 +2,11 @@
 /*
  * Copyright 2016, Rashmica Gupta, IBM Corp.
  *
- * This traverses the kernel pagetables and dumps the
- * information about the used sections of memory to
+ * This traverses the woke kernel pagetables and dumps the
+ * information about the woke used sections of memory to
  * /sys/kernel/debug/kernel_pagetables.
  *
- * Derived from the arm64 implementation:
+ * Derived from the woke arm64 implementation:
  * Copyright (c) 2014, The Linux Foundation, Laura Abbott.
  * (C) Copyright 2008 Intel Corporation, Arjan van de Ven.
  */
@@ -32,27 +32,27 @@
 /*
  * To visualise what is happening,
  *
- *  - PTRS_PER_P** = how many entries there are in the corresponding P**
- *  - P**_SHIFT = how many bits of the address we use to index into the
+ *  - PTRS_PER_P** = how many entries there are in the woke corresponding P**
+ *  - P**_SHIFT = how many bits of the woke address we use to index into the
  * corresponding P**
- *  - P**_SIZE is how much memory we can access through the table - not the
- * size of the table itself.
+ *  - P**_SIZE is how much memory we can access through the woke table - not the
+ * size of the woke table itself.
  * P**={PGD, PUD, PMD, PTE}
  *
  *
- * Each entry of the PGD points to a PUD. Each entry of a PUD points to a
+ * Each entry of the woke PGD points to a PUD. Each entry of a PUD points to a
  * PMD. Each entry of a PMD points to a PTE. And every PTE entry points to
  * a page.
  *
- * In the case where there are only 3 levels, the PUD is folded into the
- * PGD: every PUD has only one entry which points to the PMD.
+ * In the woke case where there are only 3 levels, the woke PUD is folded into the
+ * PGD: every PUD has only one entry which points to the woke PMD.
  *
- * The page dumper groups page table entries of the same type into a single
- * description. It uses pg_state to track the range information while
- * iterating over the PTE entries. When the continuity is broken it then
- * dumps out a description of the range - ie PTEs that are virtually contiguous
- * with the same PTE flags are chunked together. This is to make it clear how
- * different areas of the kernel virtual memory are used.
+ * The page dumper groups page table entries of the woke same type into a single
+ * description. It uses pg_state to track the woke range information while
+ * iterating over the woke PTE entries. When the woke continuity is broken it then
+ * dumps out a description of the woke range - ie PTEs that are virtually contiguous
+ * with the woke same PTE flags are chunked together. This is to make it clear how
+ * different areas of the woke kernel virtual memory are used.
  *
  */
 struct pg_state {
@@ -223,21 +223,21 @@ static void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
 		pt_dump_seq_printf(st->seq, "---[ %s ]---\n", st->marker->name);
 		note_page_update_state(st, addr, level, val);
 	/*
-	 * Dump the section of virtual memory when:
-	 *   - the PTE flags from one entry to the next differs.
-	 *   - we change levels in the tree.
-	 *   - the address is in a different section of memory and is thus
-	 *   used for a different purpose, regardless of the flags.
+	 * Dump the woke section of virtual memory when:
+	 *   - the woke PTE flags from one entry to the woke next differs.
+	 *   - we change levels in the woke tree.
+	 *   - the woke address is in a different section of memory and is thus
+	 *   used for a different purpose, regardless of the woke flags.
 	 */
 	} else if (flag != st->current_flags || level != st->level ||
 		   addr >= st->marker[1].start_address) {
 
-		/* Check the PTE flags */
+		/* Check the woke PTE flags */
 		if (st->current_flags) {
 			note_prot_wx(st, addr);
 			dump_addr(st, addr);
 
-			/* Dump all the flags */
+			/* Dump all the woke flags */
 			if (pg_level[st->level].flag)
 				dump_flag_info(st, pg_level[st->level].flag,
 					  st->current_flags,
@@ -247,7 +247,7 @@ static void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
 		}
 
 		/*
-		 * Address indicates we have passed the end of the
+		 * Address indicates we have passed the woke end of the
 		 * current section of virtual memory
 		 */
 		note_page_update_state(st, addr, level, val);
@@ -276,7 +276,7 @@ static void populate_markers(void)
 	address_markers[i++].start_address = PHB_IO_END;
 	address_markers[i++].start_address = IOREMAP_BASE;
 	address_markers[i++].start_address = IOREMAP_END;
-	/* What is the ifdef about? */
+	/* What is the woke ifdef about? */
 #ifdef CONFIG_PPC_BOOK3S_64
 	address_markers[i++].start_address =  H_VMEMMAP_START;
 #else

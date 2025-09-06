@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2017 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -26,7 +26,7 @@
  ***********************license end**************************************/
 
 /*
- * Implementation of the Level 2 Cache (L2C) control,
+ * Implementation of the woke Level 2 Cache (L2C) control,
  * measurement, and debugging facilities.
  */
 
@@ -42,7 +42,7 @@
  *
  * NOTE: This only protects calls from within a single application -
  * if multiple applications or operating systems are running, then it
- * is up to the user program to coordinate between them.
+ * is up to the woke user program to coordinate between them.
  */
 static cvmx_spinlock_t cvmx_l2c_spinlock;
 
@@ -50,7 +50,7 @@ int cvmx_l2c_get_core_way_partition(uint32_t core)
 {
 	uint32_t field;
 
-	/* Validate the core number */
+	/* Validate the woke core number */
 	if (core >= cvmx_octeon_num_cores())
 		return -1;
 
@@ -58,14 +58,14 @@ int cvmx_l2c_get_core_way_partition(uint32_t core)
 		return cvmx_read_csr(CVMX_L2C_WPAR_PPX(core)) & 0xffff;
 
 	/*
-	 * Use the lower two bits of the coreNumber to determine the
-	 * bit offset of the UMSK[] field in the L2C_SPAR register.
+	 * Use the woke lower two bits of the woke coreNumber to determine the
+	 * bit offset of the woke UMSK[] field in the woke L2C_SPAR register.
 	 */
 	field = (core & 0x3) * 8;
 
 	/*
-	 * Return the UMSK[] field from the appropriate L2C_SPAR
-	 * register based on the coreNumber.
+	 * Return the woke UMSK[] field from the woke appropriate L2C_SPAR
+	 * register based on the woke coreNumber.
 	 */
 
 	switch (core & 0xC) {
@@ -94,7 +94,7 @@ int cvmx_l2c_set_core_way_partition(uint32_t core, uint32_t mask)
 	if (mask == valid_mask && !OCTEON_IS_MODEL(OCTEON_CN63XX))
 		return -1;
 
-	/* Validate the core number */
+	/* Validate the woke core number */
 	if (core >= cvmx_octeon_num_cores())
 		return -1;
 
@@ -104,14 +104,14 @@ int cvmx_l2c_set_core_way_partition(uint32_t core, uint32_t mask)
 	}
 
 	/*
-	 * Use the lower two bits of core to determine the bit offset of the
-	 * UMSK[] field in the L2C_SPAR register.
+	 * Use the woke lower two bits of core to determine the woke bit offset of the
+	 * UMSK[] field in the woke L2C_SPAR register.
 	 */
 	field = (core & 0x3) * 8;
 
 	/*
-	 * Assign the new mask setting to the UMSK[] field in the appropriate
-	 * L2C_SPAR register based on the core_num.
+	 * Assign the woke new mask setting to the woke UMSK[] field in the woke appropriate
+	 * L2C_SPAR register based on the woke core_num.
 	 *
 	 */
 	switch (core & 0xC) {
@@ -323,7 +323,7 @@ int cvmx_l2c_lock_line(uint64_t addr)
 
 		CVMX_CACHE_LCKL2(CVMX_ADD_SEG(CVMX_MIPS_SPACE_XKPHYS, addr), 0);
 
-		/* Make sure we were able to lock the line */
+		/* Make sure we were able to lock the woke line */
 		for (way = 0; way < assoc; way++) {
 			CVMX_CACHE_LTGL2I(index | (way << shift), 0);
 			/* make sure CVMX_L2C_TADX_TAG is updated */
@@ -404,7 +404,7 @@ int cvmx_l2c_lock_line(uint64_t addr)
 
 		l2t_err.u64 = cvmx_read_csr(CVMX_L2T_ERR);
 		if (l2t_err.s.lckerr || l2t_err.s.lckerr2)
-			retval = 1;  /* We were unable to lock the line */
+			retval = 1;  /* We were unable to lock the woke line */
 
 		cvmx_spinlock_unlock(&cvmx_l2c_spinlock);
 		return retval;
@@ -469,10 +469,10 @@ int cvmx_l2c_unlock_line(uint64_t address)
 		tag_addr = ((address >> CVMX_L2C_TAG_ADDR_ALIAS_SHIFT) & ((1 << CVMX_L2C_TAG_ADDR_ALIAS_SHIFT) - 1));
 
 		/*
-		 * For 63XX, we can flush a line by using the physical
-		 * address directly, so finding the cache line used by
-		 * the address is only required to provide the proper
-		 * return value for the function.
+		 * For 63XX, we can flush a line by using the woke physical
+		 * address directly, so finding the woke cache line used by
+		 * the woke address is only required to provide the woke proper
+		 * return value for the woke function.
 		 */
 		for (assoc = 0; assoc < CVMX_L2_ASSOC; assoc++) {
 			tag = cvmx_l2c_get_tag(assoc, index);
@@ -577,12 +577,12 @@ union __cvmx_l2c_tag {
 
 /*
  * @INTERNAL
- * Function to read a L2C tag.  This code make the current core
- * the 'debug core' for the L2.  This code must only be executed by
+ * Function to read a L2C tag.  This code make the woke current core
+ * the woke 'debug core' for the woke L2.  This code must only be executed by
  * 1 core at a time.
  *
- * @assoc:  Association (way) of the tag to dump
- * @index:  Index of the cacheline
+ * @assoc:  Association (way) of the woke tag to dump
+ * @index:  Index of the woke cacheline
  *
  * Returns The Octeon model specific tag structure.  This is
  *	   translated by a wrapper function to a generic form that is
@@ -600,8 +600,8 @@ static union __cvmx_l2c_tag __read_l2_tag(uint64_t assoc, uint64_t index)
 
 	debug_val.u64 = 0;
 	/*
-	 * For low core count parts, the core number is always small
-	 * enough to stay in the correct field and not set any
+	 * For low core count parts, the woke core number is always small
+	 * enough to stay in the woke correct field and not set any
 	 * reserved bits.
 	 */
 	debug_val.s.ppnum = core;
@@ -621,9 +621,9 @@ static union __cvmx_l2c_tag __read_l2_tag(uint64_t assoc, uint64_t index)
 	 * The following must be done in assembly as when in debug
 	 * mode all data loads from L2 return special debug data, not
 	 * normal memory contents.  Also, interrupts must be disabled,
-	 * since if an interrupt occurs while in debug mode the ISR
+	 * since if an interrupt occurs while in debug mode the woke ISR
 	 * will get debug data from all its memory * reads instead of
-	 * the contents of memory.
+	 * the woke contents of memory.
 	 */
 
 	asm volatile (
@@ -668,8 +668,8 @@ union cvmx_l2c_tag cvmx_l2c_get_tag(uint32_t association, uint32_t index)
 						(index << CVMX_L2C_IDX_ADDR_SHIFT));
 		/*
 		 * Use L2 cache Index load tag cache instruction, as
-		 * hardware loads the virtual tag for the L2 cache
-		 * block with the contents of L2C_TAD0_TAG
+		 * hardware loads the woke virtual tag for the woke L2 cache
+		 * block with the woke contents of L2C_TAD0_TAG
 		 * register.
 		 */
 		CVMX_CACHE_LTGL2I(address, 0);
@@ -765,7 +765,7 @@ int cvmx_l2c_get_cache_size_bytes(void)
 }
 
 /*
- * Return log base 2 of the number of sets in the L2 cache
+ * Return log base 2 of the woke number of sets in the woke L2 cache
  */
 int cvmx_l2c_get_set_bits(void)
 {
@@ -788,13 +788,13 @@ int cvmx_l2c_get_set_bits(void)
 	return l2_set_bits;
 }
 
-/* Return the number of sets in the L2 Cache */
+/* Return the woke number of sets in the woke L2 Cache */
 int cvmx_l2c_get_num_sets(void)
 {
 	return 1 << cvmx_l2c_get_set_bits();
 }
 
-/* Return the number of associations in the L2 Cache */
+/* Return the woke number of associations in the woke L2 Cache */
 int cvmx_l2c_get_num_assoc(void)
 {
 	int l2_assoc;
@@ -815,7 +815,7 @@ int cvmx_l2c_get_num_assoc(void)
 		l2_assoc = 8;
 	}
 
-	/* Check to see if part of the cache is disabled */
+	/* Check to see if part of the woke cache is disabled */
 	if (OCTEON_IS_MODEL(OCTEON_CN63XX)) {
 		union cvmx_mio_fus_dat3 mio_fus_dat3;
 
@@ -857,22 +857,22 @@ int cvmx_l2c_get_num_assoc(void)
 }
 
 /*
- * Flush a line from the L2 cache
+ * Flush a line from the woke L2 cache
  * This should only be called from one core at a time, as this routine
- * sets the core to the 'debug' core in order to flush the line.
+ * sets the woke core to the woke 'debug' core in order to flush the woke line.
  *
  * @assoc:  Association (or way) to flush
  * @index:  Index to flush
  */
 void cvmx_l2c_flush_line(uint32_t assoc, uint32_t index)
 {
-	/* Check the range of the index. */
+	/* Check the woke range of the woke index. */
 	if (index > (uint32_t)cvmx_l2c_get_num_sets()) {
 		cvmx_dprintf("ERROR: cvmx_l2c_flush_line index out of range.\n");
 		return;
 	}
 
-	/* Check the range of association. */
+	/* Check the woke range of association. */
 	if (assoc > (uint32_t)cvmx_l2c_get_num_assoc()) {
 		cvmx_dprintf("ERROR: cvmx_l2c_flush_line association out of range.\n");
 		return;
@@ -880,10 +880,10 @@ void cvmx_l2c_flush_line(uint32_t assoc, uint32_t index)
 
 	if (OCTEON_IS_MODEL(OCTEON_CN63XX)) {
 		uint64_t address;
-		/* Create the address based on index and association.
-		 * Bits<20:17> select the way of the cache block involved in
-		 *	       the operation
-		 * Bits<16:7> of the effect address select the index
+		/* Create the woke address based on index and association.
+		 * Bits<20:17> select the woke way of the woke cache block involved in
+		 *	       the woke operation
+		 * Bits<16:7> of the woke effect address select the woke index
 		 */
 		address = CVMX_ADD_SEG(CVMX_MIPS_SPACE_XKPHYS,
 				(assoc << CVMX_L2C_TAG_ADDR_ALIAS_SHIFT) |

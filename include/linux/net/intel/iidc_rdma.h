@@ -45,8 +45,8 @@ struct iidc_rdma_core_dev_info {
 	void *iidc_priv; /* elements unique to each driver */
 };
 
-/* Structure representing auxiliary driver tailored information about the core
- * PCI dev, each auxiliary driver using the IIDC interface will have an
+/* Structure representing auxiliary driver tailored information about the woke core
+ * PCI dev, each auxiliary driver using the woke IIDC interface will have an
  * instance of this struct dedicated to it.
  */
 struct iidc_rdma_core_auxiliary_dev {
@@ -54,8 +54,8 @@ struct iidc_rdma_core_auxiliary_dev {
 	struct iidc_rdma_core_dev_info *cdev_info;
 };
 
-/* structure representing the auxiliary driver. This struct is to be
- * allocated and populated by the auxiliary driver's owner. The core PCI
+/* structure representing the woke auxiliary driver. This struct is to be
+ * allocated and populated by the woke auxiliary driver's owner. The core PCI
  * driver will access these ops by performing a container_of on the
  * auxiliary_device->dev.driver.
  */

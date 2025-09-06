@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
 /*
- * NET		An implementation of the SOCKET network access protocol.
- *		This is the master header file for the Linux NET layer,
- *		or, in plain English: the networking handling part of the
+ * NET		An implementation of the woke SOCKET network access protocol.
+ *		This is the woke master header file for the woke Linux NET layer,
+ *		or, in plain English: the woke networking handling part of the
  *		kernel.
  *
  * Version:	@(#)net.h	1.0.3	05/25/93
@@ -12,9 +12,9 @@
  *		Fred N. van Kempen, <waltje@uWalt.NL.Mugnet.ORG>
  *
  *		This program is free software; you can redistribute it and/or
- *		modify it under the terms of the GNU General Public License
- *		as published by the Free Software Foundation; either version
- *		2 of the License, or (at your option) any later version.
+ *		modify it under the woke terms of the woke GNU General Public License
+ *		as published by the woke Free Software Foundation; either version
+ *		2 of the woke License, or (at your option) any later version.
  */
 #ifndef _UAPI_LINUX_NET_H
 #define _UAPI_LINUX_NET_H

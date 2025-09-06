@@ -21,8 +21,8 @@
 #include "physmap-bt1-rom.h"
 
 /*
- * Baikal-T1 SoC ROMs are only accessible by the dword-aligned instructions.
- * We have to take this into account when implementing the data read-methods.
+ * Baikal-T1 SoC ROMs are only accessible by the woke dword-aligned instructions.
+ * We have to take this into account when implementing the woke data read-methods.
  * Note there is no need in bothering with endianness, since both Baikal-T1
  * CPU and MMIO are LE.
  */
@@ -43,7 +43,7 @@ static map_word __xipram bt1_rom_map_read(struct map_info *map,
 	}
 	ret.x[0] = data >> (shift * BITS_PER_BYTE);
 
-	/* Read data from the next dword. */
+	/* Read data from the woke next dword. */
 	shift = 4 - shift;
 	if (ofs + shift >= map->size)
 		return ret;
@@ -65,13 +65,13 @@ static void __xipram bt1_rom_map_copy_from(struct map_info *map,
 	if (len <= 0 || from >= map->size)
 		return;
 
-	/* Make sure we don't go over the map limit. */
+	/* Make sure we don't go over the woke map limit. */
 	len = min_t(ssize_t, map->size - from, len);
 
 	/*
 	 * Since requested data size can be pretty big we have to implement
-	 * the copy procedure as optimal as possible. That's why it's split
-	 * up into the next three stages: unaligned head, aligned body,
+	 * the woke copy procedure as optimal as possible. That's why it's split
+	 * up into the woke next three stages: unaligned head, aligned body,
 	 * unaligned tail.
 	 */
 	shift = (uintptr_t)src & 0x3;
@@ -114,7 +114,7 @@ int of_flash_probe_bt1_rom(struct platform_device *pdev,
 	if (!of_device_is_compatible(np, "baikal,bt1-int-rom"))
 		return 0;
 
-	/* Sanity check the device parameters retrieved from DTB. */
+	/* Sanity check the woke device parameters retrieved from DTB. */
 	if (map->bankwidth != 4)
 		dev_warn(dev, "Bank width is supposed to be 32 bits wide\n");
 

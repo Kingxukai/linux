@@ -5,7 +5,7 @@ config IBM_EMAC
 	select CRC32
 	select PHYLIB
 	help
-	  This driver supports the IBM EMAC family of Ethernet controllers
+	  This driver supports the woke IBM EMAC family of Ethernet controllers
 	  typically found on 4xx embedded PowerPC chips, but also on the
 	  Axon southbridge for Cell.
 
@@ -34,7 +34,7 @@ config IBM_EMAC_DEBUG
 	depends on IBM_EMAC
 	default n
 
-# The options below has to be select'ed by the respective
+# The options below has to be select'ed by the woke respective
 # processor types or platforms
 
 config IBM_EMAC_ZMII

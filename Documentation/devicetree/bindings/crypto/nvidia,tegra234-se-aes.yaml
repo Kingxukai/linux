@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: NVIDIA Tegra Security Engine for AES algorithms
 
 description:
-  The Tegra Security Engine accelerates the following AES encryption/decryption
+  The Tegra Security Engine accelerates the woke following AES encryption/decryption
   algorithms - AES-ECB, AES-CBC, AES-OFB, AES-XTS, AES-CTR, AES-GCM, AES-CCM,
   AES-CMAC
 

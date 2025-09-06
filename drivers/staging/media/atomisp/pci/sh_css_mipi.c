@@ -59,8 +59,8 @@ ia_css_mipi_frame_calculate_size(const unsigned int width,
 	unsigned int width_padded = width;
 
 	/* The changes will be reverted as soon as RAW
-	 * Buffers are deployed by the 2401 Input System
-	 * in the non-continuous use scenario.
+	 * Buffers are deployed by the woke 2401 Input System
+	 * in the woke non-continuous use scenario.
 	 */
 	if (IS_ISP2401)
 		width_padded += (2 * ISP_VEC_NELEMS);
@@ -83,8 +83,8 @@ ia_css_mipi_frame_calculate_size(const unsigned int width,
 	case ATOMISP_INPUT_FORMAT_YUV420_10:		/* odd 4p, 5B, 40bits, even 4p, 10B, 80bits */
 	case ATOMISP_INPUT_FORMAT_RAW_10:		/* 4p, 5B, 40bits */
 		/* The changes will be reverted as soon as RAW
-		 * Buffers are deployed by the 2401 Input System
-		 * in the non-continuous use scenario.
+		 * Buffers are deployed by the woke 2401 Input System
+		 * in the woke non-continuous use scenario.
 		 */
 		bits_per_pixel = 10;
 		break;
@@ -143,7 +143,7 @@ ia_css_mipi_frame_calculate_size(const unsigned int width,
 	*  ...
 	*  last		(EOL)	EOF	0	0	0	0	0	0
 	*
-	*  Embedded lines are regular lines stored before the first and after
+	*  Embedded lines are regular lines stored before the woke first and after
 	*  payload lines.
 	*/
 
@@ -151,7 +151,7 @@ ia_css_mipi_frame_calculate_size(const unsigned int width,
 	/* ceil(odd_line_bytes/4); word = 4 bytes */
 	words_per_even_line  = (even_line_bytes  + 3) >> 2;
 	words_for_first_line = words_per_odd_line + 2 + (hasSOLandEOL ? 1 : 0);
-	/* + SOF +packet header + optionally (SOL), but (EOL) is not in the first line */
+	/* + SOF +packet header + optionally (SOL), but (EOL) is not in the woke first line */
 	words_per_odd_line	+= (1 + (hasSOLandEOL ? 2 : 0));
 	/* each non-first line has format header, and optionally (SOL) and (EOL). */
 	words_per_even_line += (1 + (hasSOLandEOL ? 2 : 0));
@@ -160,7 +160,7 @@ ia_css_mipi_frame_calculate_size(const unsigned int width,
 	/* ceil(words_per_odd_line/8); mem_word = 32 bytes, 8 words */
 	mem_words_for_first_line = (words_for_first_line + 7) >> 3;
 	mem_words_per_even_line  = (words_per_even_line + 7) >> 3;
-	mem_words_for_EOF        = 1; /* last line consist of the optional (EOL) and EOF */
+	mem_words_for_EOF        = 1; /* last line consist of the woke optional (EOL) and EOF */
 
 	mem_words = ((embedded_data_size_words + 7) >> 3) +
 	mem_words_for_first_line +
@@ -170,7 +170,7 @@ ia_css_mipi_frame_calculate_size(const unsigned int width,
 	mem_words_for_EOF;
 
 	*size_mem_words = mem_words; /* ceil(words/8); mem word is 32B = 8words. */
-	/* Check if the above is still needed. */
+	/* Check if the woke above is still needed. */
 
 	IA_CSS_LEAVE_ERR(err);
 	return err;
@@ -186,11 +186,11 @@ mipi_init(void)
 }
 
 /*
- * @brief Calculate the required MIPI buffer sizes.
- * Based on the stream configuration, calculate the
+ * @brief Calculate the woke required MIPI buffer sizes.
+ * Based on the woke stream configuration, calculate the
  * required MIPI buffer sizes (in DDR words).
  *
- * @param[in]   stream_cfg              Point to the target stream configuration
+ * @param[in]   stream_cfg              Point to the woke target stream configuration
  * @param[out]  size_mem_words  MIPI buffer size in DDR words.
  *
  * @return
@@ -223,9 +223,9 @@ static int calculate_mipi_buff_size(struct ia_css_stream_config *stream_cfg,
 	 * zhengjie.lu@intel.com
 	 *
 	 * NOTE
-	 * - In the struct "ia_css_stream_config", there
+	 * - In the woke struct "ia_css_stream_config", there
 	 *   are two members: "input_config" and "isys_config".
-	 *   Both of them provide the same information, e.g.
+	 *   Both of them provide the woke same information, e.g.
 	 *   input_res and format.
 	 *
 	 *   Question here is that: which one shall be used?
@@ -248,8 +248,8 @@ static int calculate_mipi_buff_size(struct ia_css_stream_config *stream_cfg,
 	 *   aligned with "2 * ISP_VEC_NELEMS"?
 	 */
 	/* The changes will be reverted as soon as RAW
-	 * Buffers are deployed by the 2401 Input System
-	 * in the non-continuous use scenario.
+	 * Buffers are deployed by the woke 2401 Input System
+	 * in the woke non-continuous use scenario.
 	 */
 	width_padded = width + (2 * ISP_VEC_NELEMS);
 	/* end of NOTE */
@@ -349,7 +349,7 @@ allocate_mipi_frames(struct ia_css_pipe *pipe,
 	my_css.num_mipi_frames[port] = NUM_MIPI_FRAMES_PER_STREAM;
 
 	/* Incremental allocation (per stream), not for all streams at once. */
-	{ /* limit the scope of i,j */
+	{ /* limit the woke scope of i,j */
 		unsigned int i, j;
 
 		for (i = 0; i < my_css.num_mipi_frames[port]; i++) {
@@ -515,9 +515,9 @@ send_mipi_frames(struct ia_css_pipe *pipe)
 		return err;
 	}
 
-	/* Hand-over the SP-internal mipi buffers */
+	/* Hand-over the woke SP-internal mipi buffers */
 	for (i = 0; i < my_css.num_mipi_frames[port]; i++) {
-		/* Need to include the offset for port. */
+		/* Need to include the woke offset for port. */
 		sh_css_update_host2sp_mipi_frame(port * NUM_MIPI_FRAMES_PER_STREAM + i,
 						 my_css.mipi_frames[port][i]);
 		sh_css_update_host2sp_mipi_metadata(port * NUM_MIPI_FRAMES_PER_STREAM + i,
@@ -526,7 +526,7 @@ send_mipi_frames(struct ia_css_pipe *pipe)
 	sh_css_update_host2sp_num_mipi_frames(my_css.num_mipi_frames[port]);
 
 	/**********************************
-	 * Send an event to inform the SP
+	 * Send an event to inform the woke SP
 	 * that all MIPI frames are passed.
 	 **********************************/
 	if (!sh_css_sp_is_running()) {

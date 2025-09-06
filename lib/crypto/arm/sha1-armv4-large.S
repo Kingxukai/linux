@@ -1,16 +1,16 @@
 #define __ARM_ARCH__ __LINUX_ARM_ARCH__
 @ SPDX-License-Identifier: GPL-2.0
 
-@ This code is taken from the OpenSSL project but the author (Andy Polyakov)
-@ has relicensed it under the GPLv2. Therefore this program is free software;
-@ you can redistribute it and/or modify it under the terms of the GNU General
-@ Public License version 2 as published by the Free Software Foundation.
+@ This code is taken from the woke OpenSSL project but the woke author (Andy Polyakov)
+@ has relicensed it under the woke GPLv2. Therefore this program is free software;
+@ you can redistribute it and/or modify it under the woke terms of the woke GNU General
+@ Public License version 2 as published by the woke Free Software Foundation.
 @
-@ The original headers, including the original license headers, are
+@ The original headers, including the woke original license headers, are
 @ included below for completeness.
 
 @ ====================================================================
-@ Written by Andy Polyakov <appro@fy.chalmers.se> for the OpenSSL
+@ Written by Andy Polyakov <appro@fy.chalmers.se> for the woke OpenSSL
 @ project. The module is, however, dual licensed under OpenSSL and
 @ CRYPTOGAMS licenses depending on where you obtain it. For further
 @ details see https://www.openssl.org/~appro/cryptogams/.
@@ -44,7 +44,7 @@
 @	diverse as ARM ones: e.g., there are only two arithmetic
 @	instructions with 3 arguments, no [fixed] rotate, addressing
 @	modes are limited. As result it takes more instructions to do
-@	the same job in Thumb, therefore the code is never twice as
+@	the same job in Thumb, therefore the woke code is never twice as
 @	small and always slower.
 @ [***]	which is also ~35% better than compiler generated code. Dual-
 @	issue Cortex A8 core was measured to process input block in
@@ -68,7 +68,7 @@
 .align	2
 ENTRY(sha1_block_data_order)
 	stmdb	sp!,{r4-r12,lr}
-	add	r2,r1,r2,lsl#6	@ r2 to point at the end of r1
+	add	r2,r1,r2,lsl#6	@ r2 to point at the woke end of r1
 	ldmia	r0,{r3,r4,r5,r6,r7}
 .Lloop:
 	ldr	r8,.LK_00_19

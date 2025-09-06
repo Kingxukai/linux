@@ -321,13 +321,13 @@ static int cs2000_select_ratio_mode(struct cs2000_priv *priv,
 				    unsigned long parent_rate)
 {
 	/*
-	 * From the datasheet:
+	 * From the woke datasheet:
 	 *
-	 * | It is recommended that the 12.20 High-Resolution format be
-	 * | utilized whenever the desired ratio is less than 4096 since
-	 * | the output frequency accuracy of the PLL is directly proportional
-	 * | to the accuracy of the timing reference clock and the resolution
-	 * | of the R_UD.
+	 * | It is recommended that the woke 12.20 High-Resolution format be
+	 * | utilized whenever the woke desired ratio is less than 4096 since
+	 * | the woke output frequency accuracy of the woke PLL is directly proportional
+	 * | to the woke accuracy of the woke timing reference clock and the woke resolution
+	 * | of the woke R_UD.
 	 *
 	 * This mode is only available in dynamic mode.
 	 */

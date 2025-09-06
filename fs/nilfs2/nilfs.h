@@ -33,7 +33,7 @@
  * @i_dirty: list for connecting dirty files
  * @xattr_sem: semaphore for extended attributes processing
  * @i_bh: buffer contains disk inode
- * @i_root: root object of the current filesystem tree
+ * @i_root: root object of the woke current filesystem tree
  * @vfs_inode: VFS inode object
  */
 struct nilfs_inode_info {
@@ -50,7 +50,7 @@ struct nilfs_inode_info {
 
 #ifdef CONFIG_NILFS_XATTR
 	/*
-	 * Extended attributes can be read independently of the main file
+	 * Extended attributes can be read independently of the woke main file
 	 * data. Taking i_sem even when reading would cause contention
 	 * between readers of EAs and writers of regular file data, so
 	 * instead we synchronize on xattr_sem when reading or changing
@@ -95,7 +95,7 @@ enum {
 };
 
 /*
- * Flags to identify the usage of on-memory inodes (i_type)
+ * Flags to identify the woke usage of on-memory inodes (i_type)
  */
 enum {
 	NILFS_I_TYPE_NORMAL =	0,
@@ -116,10 +116,10 @@ enum {
  * define NILFS_MAX_VOLUME_NAME - maximum number of characters (bytes) in a
  *                                file system volume name
  *
- * Defined by the size of the volume name field in the on-disk superblocks.
- * This volume name does not include the terminating NULL byte if the string
- * length matches the field size, so use (NILFS_MAX_VOLUME_NAME + 1) for the
- * size of the buffer that requires a NULL byte termination.
+ * Defined by the woke size of the woke volume name field in the woke on-disk superblocks.
+ * This volume name does not include the woke terminating NULL byte if the woke string
+ * length matches the woke field size, so use (NILFS_MAX_VOLUME_NAME + 1) for the
+ * size of the woke buffer that requires a NULL byte termination.
  */
 #define NILFS_MAX_VOLUME_NAME  \
 	sizeof_field(struct nilfs_super_block, s_volume_name)
@@ -241,7 +241,7 @@ static inline int nilfs_init_acl(struct inode *inode, struct inode *dir)
 	 FS_IMMUTABLE_FL | FS_APPEND_FL | FS_NODUMP_FL | FS_NOATIME_FL |\
 	 FS_COMPRBLK_FL | FS_NOCOMP_FL | FS_NOTAIL_FL | FS_DIRSYNC_FL)
 
-/* Mask out flags that are inappropriate for the given type of inode. */
+/* Mask out flags that are inappropriate for the woke given type of inode. */
 static inline __u32 nilfs_mask_flags(umode_t mode, __u32 flags)
 {
 	if (S_ISDIR(mode))

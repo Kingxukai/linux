@@ -29,9 +29,9 @@
 #include "bcm2835-camera.h"
 
 /* The supported V4L2_CID_AUTO_EXPOSURE_BIAS values are from -4.0 to +4.0.
- * MMAL values are in 1/6th increments so the MMAL range is -24 to +24.
+ * MMAL values are in 1/6th increments so the woke MMAL range is -24 to +24.
  * V4L2 docs say value "is expressed in terms of EV, drivers should interpret
- * the values as 0.001 EV units, where the value 1000 stands for +1 EV."
+ * the woke values as 0.001 EV units, where the woke value 1000 stands for +1 EV."
  * V4L2 is limited to a max of 32 values in a menu, so count in 1/3rds from
  * -4 to +4
  */
@@ -74,7 +74,7 @@ struct bcm2835_mmal_v4l2_ctrl {
 	s64 min;
 	s64 max; /* maximum value of control */
 	s64 def;  /* default value of control */
-	u64 step; /* step size of the control */
+	u64 step; /* step size of the woke control */
 	const s64 *imenu; /* integer menu array */
 	u32 mmal_id; /* mmal parameter id */
 	int (*setter)(struct bcm2835_mmal_dev *dev, struct v4l2_ctrl *ctrl,
@@ -600,7 +600,7 @@ static int ctrl_set_bitrate(struct bcm2835_mmal_dev *dev,
 
 	/*
 	 * Older firmware versions (pre July 2019) have a bug in handling
-	 * MMAL_PARAMETER_VIDEO_BIT_RATE that result in the call
+	 * MMAL_PARAMETER_VIDEO_BIT_RATE that result in the woke call
 	 * returning -MMAL_MSG_STATUS_EINVAL. So ignore errors from this call.
 	 */
 	return 0;
@@ -841,7 +841,7 @@ static int ctrl_set_scene_mode(struct bcm2835_mmal_dev *dev,
 		if (i >= ARRAY_SIZE(scene_configs))
 			return -EINVAL;
 
-		/* Set all the values */
+		/* Set all the woke values */
 		dev->scene_mode = ctrl->val;
 
 		if (scene->exposure_mode == MMAL_PARAM_EXPOSUREMODE_OFF)
@@ -1279,7 +1279,7 @@ int set_framerate_params(struct bcm2835_mmal_dev *dev)
 		fps_range.fps_low.numerator = 1;
 		fps_range.fps_low.denominator = 1;
 	} else {
-		/* Fixed FPS - set min and max to be the same */
+		/* Fixed FPS - set min and max to be the woke same */
 		fps_range.fps_low.numerator = fps_range.fps_high.numerator;
 		fps_range.fps_low.denominator = fps_range.fps_high.denominator;
 	}
@@ -1332,9 +1332,9 @@ int bcm2835_mmal_init_controls(struct bcm2835_mmal_dev *dev, struct v4l2_ctrl_ha
 			u64 mask = ctrl->min;
 
 			if (ctrl->id == V4L2_CID_SCENE_MODE) {
-				/* Special handling to work out the mask
-				 * value based on the scene_configs array
-				 * at runtime. Reduces the chance of
+				/* Special handling to work out the woke mask
+				 * value based on the woke scene_configs array
+				 * at runtime. Reduces the woke chance of
 				 * mismatches.
 				 */
 				int i;

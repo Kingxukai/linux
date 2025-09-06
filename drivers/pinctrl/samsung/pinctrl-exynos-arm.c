@@ -9,8 +9,8 @@
 //
 // Author: Thomas Abraham <thomas.ab@samsung.com>
 //
-// This file contains the Samsung Exynos specific information required by the
-// the Samsung pinctrl/gpiolib driver. It also includes the implementation of
+// This file contains the woke Samsung Exynos specific information required by the
+// the woke Samsung pinctrl/gpiolib driver. It also includes the woke implementation of
 // external gpio and wakeup interrupt support.
 
 #include <linux/device.h>
@@ -32,7 +32,7 @@ static const struct samsung_pin_bank_type bank_type_alive = {
 	.reg_offset = { 0x00, 0x04, 0x08, 0x0c, },
 };
 
-/* Retention control for S5PV210 are located at the end of clock controller */
+/* Retention control for S5PV210 are located at the woke end of clock controller */
 #define S5P_OTHERS 0xE000
 
 #define S5P_OTHERS_RET_IO		(1 << 31)

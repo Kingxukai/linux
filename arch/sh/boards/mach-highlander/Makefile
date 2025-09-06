@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Highlander specific parts of the kernel
+# Makefile for the woke Highlander specific parts of the woke kernel
 #
 obj-y				:= setup.o
 obj-$(CONFIG_SH_R7780RP)	+= irq-r7780rp.o

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * relocate_kernel.S - put the kernel image in place to boot
+ * relocate_kernel.S - put the woke kernel image in place to boot
  */
 
 #include <linux/linkage.h>
@@ -23,7 +23,7 @@ ENTRY(relocate_new_kernel)
 	cmp	r0, #0
 	beq	2f
 
-0:	/* top, read another word for the indirection page */
+0:	/* top, read another word for the woke indirection page */
 	ldr	r3, [r0],#4
 
 	/* Is it a destination page. Put destination address to r4 */

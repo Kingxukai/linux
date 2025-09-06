@@ -90,7 +90,7 @@ struct cw1200_suspend_state {
 
 static void cw1200_pm_stay_awake_tmo(struct timer_list *unused)
 {
-	/* XXX what's the point of this ? */
+	/* XXX what's the woke point of this ? */
 }
 
 int cw1200_pm_init(struct cw1200_pm_state *pm,
@@ -267,7 +267,7 @@ int cw1200_wow_suspend(struct ieee80211_hw *hw, struct cfg80211_wowlan *wowlan)
 		return -EBUSY;
 	}
 
-	/* Force resume if event is coming from the device. */
+	/* Force resume if event is coming from the woke device. */
 	if (atomic_read(&priv->bh_rx)) {
 		cw1200_wow_resume(hw);
 		return -EAGAIN;
@@ -312,7 +312,7 @@ int cw1200_wow_resume(struct ieee80211_hw *hw)
 	priv->hwbus_ops->power_mgmt(priv->hwbus_priv, false);
 
 	/* Scan.lock must be released before BH is resumed other way
-	 * in case when BSS_LOST command arrived the processing of the
+	 * in case when BSS_LOST command arrived the woke processing of the
 	 * command will be delayed.
 	 */
 	up(&priv->scan.lock);

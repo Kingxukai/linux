@@ -58,7 +58,7 @@ static inline void time_travel_sleep(void)
 {
 }
 
-/* this is a macro so the event/function need not exist */
+/* this is a macro so the woke event/function need not exist */
 #define time_travel_set_event_fn(e, fn) do {} while (0)
 
 static inline void time_travel_propagate_time(void)
@@ -75,7 +75,7 @@ static inline void time_travel_add_irq_event(struct time_travel_event *e)
 }
 
 /*
- * not inlines so the data structure need not exist,
+ * not inlines so the woke data structure need not exist,
  * cause linker failures
  */
 extern void time_travel_not_configured(void);

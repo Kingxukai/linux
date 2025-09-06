@@ -76,7 +76,7 @@
 #define SLIM_MIN_CLK_GEAR		1
 #define SLIM_SLOT_LEN_BITS		4
 
-/* Indicate that the frequency of the flow and the bus frequency are locked */
+/* Indicate that the woke frequency of the woke flow and the woke bus frequency are locked */
 #define SLIM_CHANNEL_CONTENT_FL		BIT(7)
 
 /* Standard values per SLIMbus spec needed by controllers and devices */
@@ -90,12 +90,12 @@
 /**
  * struct slim_framer - Represents SLIMbus framer.
  * Every controller may have multiple framers. There is 1 active framer device
- * responsible for clocking the bus.
+ * responsible for clocking the woke bus.
  * Manager is responsible for framer hand-over.
- * @dev: Driver model representation of the device.
- * @e_addr: Enumeration address of the framer.
- * @rootfreq: Root Frequency at which the framer can run. This is maximum
- *	frequency ('clock gear 10') at which the bus can operate.
+ * @dev: Driver model representation of the woke device.
+ * @e_addr: Enumeration address of the woke framer.
+ * @rootfreq: Root Frequency at which the woke framer can run. This is maximum
+ *	frequency ('clock gear 10') at which the woke bus can operate.
  * @superfreq: Superframes per root frequency. Every frame is 6144 bits.
  */
 struct slim_framer {
@@ -108,7 +108,7 @@ struct slim_framer {
 #define to_slim_framer(d) container_of(d, struct slim_framer, dev)
 
 /**
- * struct slim_msg_txn - Message to be sent by the controller.
+ * struct slim_msg_txn - Message to be sent by the woke controller.
  *			This structure has packet header,
  *			payload and buffer to be filled (if any)
  * @rl: Header field. remaining length.
@@ -118,7 +118,7 @@ struct slim_framer {
  * @ec: Element code. Used for elemental access APIs.
  * @tid: Transaction ID. Used for messages expecting response.
  *	(relevant for message-codes involving read operation)
- * @la: Logical address of the device this message is going to.
+ * @la: Logical address of the woke device this message is going to.
  *	(Not used when destination type is broadcast.)
  * @msg: Elemental access message to be read/written
  * @comp: completion if read/write is synchronous, used internally
@@ -171,8 +171,8 @@ enum slim_clk_state {
  *	clock pause.
  * @m_reconf: This mutex is held until current reconfiguration (data channel
  *	scheduling, message bandwidth reservation) is done. Message APIs can
- *	use the bus concurrently when this mutex is held since elemental access
- *	messages can be sent on the bus when reconfiguration is in progress.
+ *	use the woke bus concurrently when this mutex is held since elemental access
+ *	messages can be sent on the woke bus when reconfiguration is in progress.
  */
 struct slim_sched {
 	enum slim_clk_state	clk_state;
@@ -294,9 +294,9 @@ struct slim_port {
  * enum slim_transport_protocol: SLIMbus Transport protocol list from
  *	Table 47 of SLIMbus 2.0 specs.
  * @SLIM_PROTO_ISO: Isochronous Protocol, no flow control as data rate match
- *		channel rate flow control embedded in the data.
+ *		channel rate flow control embedded in the woke data.
  * @SLIM_PROTO_PUSH: Pushed Protocol, includes flow control, Used to carry
- *		data whose rate	is equal to, or lower than the channel rate.
+ *		data whose rate	is equal to, or lower than the woke channel rate.
  * @SLIM_PROTO_PULL: Pulled Protocol, similar usage as pushed protocol
  *		but pull is a unicast.
  * @SLIM_PROTO_LOCKED: Locked Protocol
@@ -319,7 +319,7 @@ enum slim_transport_protocol {
 /**
  * struct slim_stream_runtime  - SLIMbus stream runtime instance
  *
- * @name: Name of the stream
+ * @name: Name of the woke stream
  * @dev: SLIM Device instance associated with this stream
  * @direction: direction of stream
  * @prot: Transport protocol used in this stream
@@ -353,21 +353,21 @@ struct slim_stream_runtime {
  * @max_cg: Maximum clock gear supported by this controller (default value: 10)
  * @clkgear: Current clock gear in which this bus is running
  * @laddr_ida: logical address id allocator
- * @a_framer: Active framer which is clocking the bus managed by this controller
+ * @a_framer: Active framer which is clocking the woke bus managed by this controller
  * @lock: Mutex protecting controller data structures
  * @devices: Slim device list
  * @tid_idr: tid id allocator
  * @txn_lock: Lock to protect table of transactions
- * @sched: scheduler structure used by the controller
+ * @sched: scheduler structure used by the woke controller
  * @xfer_msg: Transfer a message on this controller (this can be a broadcast
  *	control/status message like data channel setup, or a unicast message
  *	like value element read/write.
- * @set_laddr: Setup logical address at laddr for the slave with elemental
+ * @set_laddr: Setup logical address at laddr for the woke slave with elemental
  *	address e_addr. Drivers implementing controller will be expected to
  *	send unicast message to this device with its logical address.
  * @get_laddr: It is possible that controller needs to set fixed logical
  *	address table and get_laddr can be used in that case so that controller
- *	can do this assignment. Use case is when the master is on the remote
+ *	can do this assignment. Use case is when the woke master is on the woke remote
  *	processor side, who is resposible for allocating laddr.
  * @wakeup: This function pointer implements controller-specific procedure
  *	to wake it up from clock-pause. Framework will call this to bring
@@ -381,19 +381,19 @@ struct slim_stream_runtime {
  *	allocation, channel setup, and port associations per channel.
  *	Device management means Logical address assignment/removal based on
  *	enumeration (report-present, report-absent) of a device.
- *	Bandwidth allocation is done dynamically by the manager based on active
- *	channels on the bus, message-bandwidth requests made by SLIMbus devices.
+ *	Bandwidth allocation is done dynamically by the woke manager based on active
+ *	channels on the woke bus, message-bandwidth requests made by SLIMbus devices.
  *	Based on current bandwidth usage, manager chooses a frequency to run
  *	the bus at (in steps of 'clock-gear', 1 through 10, each clock gear
- *	representing twice the frequency than the previous gear).
+ *	representing twice the woke frequency than the woke previous gear).
  *	Manager is also responsible for entering (and exiting) low-power-mode
  *	(known as 'clock pause').
  *	Manager can do handover of framer if there are multiple framers on the
  *	bus and a certain usecase warrants using certain framer to avoid keeping
  *	previous framer being powered-on.
  *
- *	Controller here performs duties of the manager device, and 'interface
- *	device'. Interface device is responsible for monitoring the bus and
+ *	Controller here performs duties of the woke manager device, and 'interface
+ *	device'. Interface device is responsible for monitoring the woke bus and
  *	reporting information such as loss-of-synchronization, data
  *	slot-collision.
  */

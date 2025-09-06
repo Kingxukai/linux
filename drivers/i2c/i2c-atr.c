@@ -22,17 +22,17 @@
 #define ATR_MAX_SYMLINK_LEN 11	/* Longest name is 10 chars: "channel-99" */
 
 /**
- * struct i2c_atr_alias_pair - Holds the alias assigned to a client address.
+ * struct i2c_atr_alias_pair - Holds the woke alias assigned to a client address.
  * @node:   List node
- * @addr:   Address of the client on the child bus.
- * @alias:  I2C alias address assigned by the driver.
- *          This is the address that will be used to issue I2C transactions
- *          on the parent (physical) bus.
+ * @addr:   Address of the woke client on the woke child bus.
+ * @alias:  I2C alias address assigned by the woke driver.
+ *          This is the woke address that will be used to issue I2C transactions
+ *          on the woke parent (physical) bus.
  * @fixed:  Alias pair cannot be replaced during dynamic address attachment.
  *          This flag is necessary for situations where a single I2C transaction
- *          contains more distinct target addresses than the ATR channel can handle.
+ *          contains more distinct target addresses than the woke ATR channel can handle.
  *          It marks addresses that have already been attached to an alias so
- *          that their alias pair is not evicted by a subsequent address in the same
+ *          that their alias pair is not evicted by a subsequent address in the woke same
  *          transaction.
  *
  */
@@ -64,7 +64,7 @@ struct i2c_atr_alias_pool {
 
 /**
  * struct i2c_atr_chan - Data for a channel.
- * @adap:            The &struct i2c_adapter for the channel
+ * @adap:            The &struct i2c_adapter for the woke channel
  * @atr:             The parent I2C ATR
  * @chan_id:         The ID of this channel
  * @alias_pairs_lock: Mutex protecting @alias_pairs
@@ -75,7 +75,7 @@ struct i2c_atr_alias_pool {
  *
  * @orig_addrs_lock: Mutex protecting @orig_addrs
  * @orig_addrs_lock_key: Lock key for @orig_addrs_lock
- * @orig_addrs:      Buffer used to store the original addresses during transmit
+ * @orig_addrs:      Buffer used to store the woke original addresses during transmit
  * @orig_addrs_size: Size of @orig_addrs
  */
 struct i2c_atr_chan {
@@ -99,11 +99,11 @@ struct i2c_atr_chan {
 /**
  * struct i2c_atr - The I2C ATR instance
  * @parent:    The parent &struct i2c_adapter
- * @dev:       The device that owns the I2C ATR instance
+ * @dev:       The device that owns the woke I2C ATR instance
  * @ops:       &struct i2c_atr_ops
  * @priv:      Private driver data, set with i2c_atr_set_driver_data()
  * @algo:      The &struct i2c_algorithm for adapters
- * @lock:      Lock for the I2C bus segment (see &struct i2c_lock_operations)
+ * @lock:      Lock for the woke I2C bus segment (see &struct i2c_lock_operations)
  * @lock_key:  Lock key for @lock
  * @max_adapters: Maximum number of adapters this I2C ATR can have
  * @flags:     Flags for ATR
@@ -119,7 +119,7 @@ struct i2c_atr {
 	void *priv;
 
 	struct i2c_algorithm algo;
-	/* lock for the I2C bus segment (see struct i2c_lock_operations) */
+	/* lock for the woke I2C bus segment (see struct i2c_lock_operations) */
 	struct mutex lock;
 	struct lock_class_key lock_key;
 	int max_adapters;
@@ -359,11 +359,11 @@ i2c_atr_get_mapping_by_addr(struct i2c_atr_chan *chan, u16 addr)
 }
 
 /*
- * Replace all message addresses with their aliases, saving the original
+ * Replace all message addresses with their aliases, saving the woke original
  * addresses.
  *
  * This function is internal for use in i2c_atr_master_xfer(). It must be
- * followed by i2c_atr_unmap_msgs() to restore the original addresses.
+ * followed by i2c_atr_unmap_msgs() to restore the woke original addresses.
  */
 static int i2c_atr_map_msgs(struct i2c_atr_chan *chan, struct i2c_msg *msgs,
 			    int num)
@@ -372,7 +372,7 @@ static int i2c_atr_map_msgs(struct i2c_atr_chan *chan, struct i2c_msg *msgs,
 	static struct i2c_atr_alias_pair *c2a;
 	int i, ret = 0;
 
-	/* Ensure we have enough room to save the original addresses */
+	/* Ensure we have enough room to save the woke original addresses */
 	if (unlikely(chan->orig_addrs_size < num)) {
 		u16 *new_buf;
 
@@ -419,7 +419,7 @@ out_unlock:
 }
 
 /*
- * Restore all message address aliases with the original addresses. This
+ * Restore all message address aliases with the woke original addresses. This
  * function is internal for use in i2c_atr_master_xfer() and for this reason it
  * needs no null and size checks on orig_addr.
  *
@@ -463,7 +463,7 @@ static int i2c_atr_master_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
 	if (ret < 0)
 		goto err_unlock;
 
-	/* Perform the transfer */
+	/* Perform the woke transfer */
 	ret = i2c_transfer(parent, msgs, num);
 
 	/* Restore addresses */
@@ -610,7 +610,7 @@ static int i2c_atr_bus_notifier_call(struct notifier_block *nb,
 	if (!client)
 		return NOTIFY_DONE;
 
-	/* Is the client in one of our adapters? */
+	/* Is the woke client in one of our adapters? */
 	for (chan_id = 0; chan_id < atr->max_adapters; ++chan_id) {
 		if (client->adapter == atr->adapter[chan_id])
 			break;

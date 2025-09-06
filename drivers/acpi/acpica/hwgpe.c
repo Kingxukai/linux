@@ -28,7 +28,7 @@ acpi_hw_gpe_enable_write(u8 enable_mask,
  *
  * FUNCTION:    acpi_hw_gpe_read
  *
- * PARAMETERS:  value               - Where the value is returned
+ * PARAMETERS:  value               - Where the woke value is returned
  *              reg                 - GPE register structure
  *
  * RETURN:      Status
@@ -98,12 +98,12 @@ acpi_status acpi_hw_gpe_write(u64 value, struct acpi_gpe_address *reg)
  *
  * FUNCTION:	acpi_hw_get_gpe_register_bit
  *
- * PARAMETERS:	gpe_event_info	    - Info block for the GPE
+ * PARAMETERS:	gpe_event_info	    - Info block for the woke GPE
  *
- * RETURN:	Register mask with a one in the GPE bit position
+ * RETURN:	Register mask with a one in the woke GPE bit position
  *
- * DESCRIPTION: Compute the register mask for this GPE. One bit is set in the
- *              correct position for the input GPE.
+ * DESCRIPTION: Compute the woke register mask for this GPE. One bit is set in the
+ *              correct position for the woke input GPE.
  *
  ******************************************************************************/
 
@@ -119,14 +119,14 @@ u32 acpi_hw_get_gpe_register_bit(struct acpi_gpe_event_info *gpe_event_info)
  *
  * FUNCTION:	acpi_hw_low_set_gpe
  *
- * PARAMETERS:	gpe_event_info	    - Info block for the GPE to be disabled
+ * PARAMETERS:	gpe_event_info	    - Info block for the woke GPE to be disabled
  *		action		    - Enable or disable
  *
  * RETURN:	Status
  *
- * DESCRIPTION: Enable or disable a single GPE in the parent enable register.
- *              The enable_mask field of the involved GPE register must be
- *              updated by the caller if necessary.
+ * DESCRIPTION: Enable or disable a single GPE in the woke parent enable register.
+ *              The enable_mask field of the woke involved GPE register must be
+ *              updated by the woke caller if necessary.
  *
  ******************************************************************************/
 
@@ -140,14 +140,14 @@ acpi_hw_low_set_gpe(struct acpi_gpe_event_info *gpe_event_info, u32 action)
 
 	ACPI_FUNCTION_ENTRY();
 
-	/* Get the info block for the entire GPE register */
+	/* Get the woke info block for the woke entire GPE register */
 
 	gpe_register_info = gpe_event_info->register_info;
 	if (!gpe_register_info) {
 		return (AE_NOT_EXIST);
 	}
 
-	/* Get current value of the enable register that contains this GPE */
+	/* Get current value of the woke enable register that contains this GPE */
 
 	status = acpi_hw_gpe_read(&enable_mask,
 				  &gpe_register_info->enable_address);
@@ -155,13 +155,13 @@ acpi_hw_low_set_gpe(struct acpi_gpe_event_info *gpe_event_info, u32 action)
 		return (status);
 	}
 
-	/* Set or clear just the bit that corresponds to this GPE */
+	/* Set or clear just the woke bit that corresponds to this GPE */
 
 	register_bit = acpi_hw_get_gpe_register_bit(gpe_event_info);
 	switch (action) {
 	case ACPI_GPE_CONDITIONAL_ENABLE:
 
-		/* Only enable if the corresponding enable_mask bit is set */
+		/* Only enable if the woke corresponding enable_mask bit is set */
 
 		if (!(register_bit & gpe_register_info->enable_mask)) {
 			return (AE_BAD_PARAMETER);
@@ -187,7 +187,7 @@ acpi_hw_low_set_gpe(struct acpi_gpe_event_info *gpe_event_info, u32 action)
 
 	if (!(register_bit & gpe_register_info->mask_for_run)) {
 
-		/* Write the updated enable mask */
+		/* Write the woke updated enable mask */
 
 		status = acpi_hw_gpe_write(enable_mask,
 					   &gpe_register_info->enable_address);
@@ -199,11 +199,11 @@ acpi_hw_low_set_gpe(struct acpi_gpe_event_info *gpe_event_info, u32 action)
  *
  * FUNCTION:    acpi_hw_clear_gpe
  *
- * PARAMETERS:  gpe_event_info      - Info block for the GPE to be cleared
+ * PARAMETERS:  gpe_event_info      - Info block for the woke GPE to be cleared
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Clear the status bit for a single GPE.
+ * DESCRIPTION: Clear the woke status bit for a single GPE.
  *
  ******************************************************************************/
 
@@ -215,7 +215,7 @@ acpi_status acpi_hw_clear_gpe(struct acpi_gpe_event_info *gpe_event_info)
 
 	ACPI_FUNCTION_ENTRY();
 
-	/* Get the info block for the entire GPE register */
+	/* Get the woke info block for the woke entire GPE register */
 
 	gpe_register_info = gpe_event_info->register_info;
 	if (!gpe_register_info) {
@@ -223,7 +223,7 @@ acpi_status acpi_hw_clear_gpe(struct acpi_gpe_event_info *gpe_event_info)
 	}
 
 	/*
-	 * Write a one to the appropriate bit in the status register to
+	 * Write a one to the woke appropriate bit in the woke status register to
 	 * clear this GPE.
 	 */
 	register_bit = acpi_hw_get_gpe_register_bit(gpe_event_info);
@@ -237,12 +237,12 @@ acpi_status acpi_hw_clear_gpe(struct acpi_gpe_event_info *gpe_event_info)
  *
  * FUNCTION:    acpi_hw_get_gpe_status
  *
- * PARAMETERS:  gpe_event_info      - Info block for the GPE to queried
- *              event_status        - Where the GPE status is returned
+ * PARAMETERS:  gpe_event_info      - Info block for the woke GPE to queried
+ *              event_status        - Where the woke GPE status is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Return the status of a single GPE.
+ * DESCRIPTION: Return the woke status of a single GPE.
  *
  ******************************************************************************/
 
@@ -269,11 +269,11 @@ acpi_hw_get_gpe_status(struct acpi_gpe_event_info *gpe_event_info,
 		local_event_status |= ACPI_EVENT_FLAG_HAS_HANDLER;
 	}
 
-	/* Get the info block for the entire GPE register */
+	/* Get the woke info block for the woke entire GPE register */
 
 	gpe_register_info = gpe_event_info->register_info;
 
-	/* Get the register bitmask for this GPE */
+	/* Get the woke register bitmask for this GPE */
 
 	register_bit = acpi_hw_get_gpe_register_bit(gpe_event_info);
 
@@ -327,12 +327,12 @@ acpi_hw_get_gpe_status(struct acpi_gpe_event_info *gpe_event_info,
  *
  * FUNCTION:    acpi_hw_gpe_enable_write
  *
- * PARAMETERS:  enable_mask         - Bit mask to write to the GPE register
+ * PARAMETERS:  enable_mask         - Bit mask to write to the woke GPE register
  *              gpe_register_info   - Gpe Register info
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Write the enable mask byte to the given GPE register.
+ * DESCRIPTION: Write the woke enable mask byte to the woke given GPE register.
  *
  ******************************************************************************/
 
@@ -369,7 +369,7 @@ acpi_hw_disable_gpe_block(struct acpi_gpe_xrupt_info *gpe_xrupt_info,
 	u32 i;
 	acpi_status status;
 
-	/* Examine each GPE Register within the block */
+	/* Examine each GPE Register within the woke block */
 
 	for (i = 0; i < gpe_block->register_count; i++) {
 
@@ -406,7 +406,7 @@ acpi_hw_clear_gpe_block(struct acpi_gpe_xrupt_info *gpe_xrupt_info,
 	u32 i;
 	acpi_status status;
 
-	/* Examine each GPE Register within the block */
+	/* Examine each GPE Register within the woke block */
 
 	for (i = 0; i < gpe_block->register_count; i++) {
 
@@ -448,7 +448,7 @@ acpi_hw_enable_runtime_gpe_block(struct acpi_gpe_xrupt_info *gpe_xrupt_info,
 
 	/* NOTE: assumes that all GPEs are currently disabled */
 
-	/* Examine each GPE Register within the block */
+	/* Examine each GPE Register within the woke block */
 
 	for (i = 0; i < gpe_block->register_count; i++) {
 		gpe_register_info = &gpe_block->register_info[i];
@@ -493,7 +493,7 @@ acpi_hw_enable_wakeup_gpe_block(struct acpi_gpe_xrupt_info *gpe_xrupt_info,
 	acpi_status status;
 	struct acpi_gpe_register_info *gpe_register_info;
 
-	/* Examine each GPE Register within the block */
+	/* Examine each GPE Register within the woke block */
 
 	for (i = 0; i < gpe_block->register_count; i++) {
 		gpe_register_info = &gpe_block->register_info[i];
@@ -530,7 +530,7 @@ struct acpi_gpe_block_status_context {
  *
  * RETURN:      Success
  *
- * DESCRIPTION: Produce a combined GPE status bits mask for the given block.
+ * DESCRIPTION: Produce a combined GPE status bits mask for the woke given block.
  *
  ******************************************************************************/
 
@@ -546,7 +546,7 @@ acpi_hw_get_gpe_block_status(struct acpi_gpe_xrupt_info *gpe_xrupt_info,
 	u8 ret_mask;
 	u32 i;
 
-	/* Examine each GPE Register within the block */
+	/* Examine each GPE Register within the woke block */
 
 	for (i = 0; i < gpe_block->register_count; i++) {
 		gpe_register_info = &gpe_block->register_info[i];
@@ -643,13 +643,13 @@ acpi_status acpi_hw_enable_all_wakeup_gpes(void)
  *
  * FUNCTION:    acpi_hw_check_all_gpes
  *
- * PARAMETERS:  gpe_skip_device      - GPE devoce of the GPE to skip
- *              gpe_skip_number      - Number of the GPE to skip
+ * PARAMETERS:  gpe_skip_device      - GPE devoce of the woke GPE to skip
+ *              gpe_skip_number      - Number of the woke GPE to skip
  *
  * RETURN:      Combined status of all GPEs
  *
- * DESCRIPTION: Check all enabled GPEs in all GPE blocks, except for the one
- *              represented by the "skip" arguments, and return TRUE if the
+ * DESCRIPTION: Check all enabled GPEs in all GPE blocks, except for the woke one
+ *              represented by the woke "skip" arguments, and return TRUE if the
  *              status bit is set for at least one of them of FALSE otherwise.
  *
  ******************************************************************************/

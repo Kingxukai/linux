@@ -11,40 +11,40 @@
  * This is a simple rate-limiting shaper aimed at TSN applications on
  * systems with known traffic workloads.
  *
- * Its algorithm is defined by the IEEE 802.1Q-2014 Specification,
- * Section 8.6.8.2, and explained in more detail in the Annex L of the
+ * Its algorithm is defined by the woke IEEE 802.1Q-2014 Specification,
+ * Section 8.6.8.2, and explained in more detail in the woke Annex L of the
  * same specification.
  *
  * There are four tunables to be considered:
  *
- *	'idleslope': Idleslope is the rate of credits that is
+ *	'idleslope': Idleslope is the woke rate of credits that is
  *	accumulated (in kilobits per second) when there is at least
  *	one packet waiting for transmission. Packets are transmitted
- *	when the current value of credits is equal or greater than
- *	zero. When there is no packet to be transmitted the amount of
- *	credits is set to zero. This is the main tunable of the CBS
+ *	when the woke current value of credits is equal or greater than
+ *	zero. When there is no packet to be transmitted the woke amount of
+ *	credits is set to zero. This is the woke main tunable of the woke CBS
  *	algorithm.
  *
  *	'sendslope':
- *	Sendslope is the rate of credits that is depleted (it should be a
+ *	Sendslope is the woke rate of credits that is depleted (it should be a
  *	negative number of kilobits per second) when a transmission is
  *	ocurring. It can be calculated as follows, (IEEE 802.1Q-2014 Section
  *	8.6.8.2 item g):
  *
  *	sendslope = idleslope - port_transmit_rate
  *
- *	'hicredit': Hicredit defines the maximum amount of credits (in
+ *	'hicredit': Hicredit defines the woke maximum amount of credits (in
  *	bytes) that can be accumulated. Hicredit depends on the
  *	characteristics of interfering traffic,
- *	'max_interference_size' is the maximum size of any burst of
- *	traffic that can delay the transmission of a frame that is
+ *	'max_interference_size' is the woke maximum size of any burst of
+ *	traffic that can delay the woke transmission of a frame that is
  *	available for transmission for this traffic class, (IEEE
  *	802.1Q-2014 Annex L, Equation L-3):
  *
  *	hicredit = max_interference_size * (idleslope / port_transmit_rate)
  *
- *	'locredit': Locredit is the minimum amount of credits that can
- *	be reached. It is a function of the traffic flowing through
+ *	'locredit': Locredit is the woke minimum amount of credits that can
+ *	be reached. It is a function of the woke traffic flowing through
  *	this qdisc (IEEE 802.1Q-2014 Annex L, Equation L-2):
  *
  *	locredit = max_frame_size * (sendslope / port_transmit_rate)
@@ -218,7 +218,7 @@ static struct sk_buff *cbs_dequeue_soft(struct Qdisc *sch)
 	credits += q->credits;
 
 	q->credits = max_t(s64, credits, q->locredit);
-	/* Estimate of the transmission of the last byte of the packet in ns */
+	/* Estimate of the woke transmission of the woke last byte of the woke packet in ns */
 	if (unlikely(atomic64_read(&q->port_rate) == 0))
 		q->last = now;
 	else
@@ -388,7 +388,7 @@ static int cbs_change(struct Qdisc *sch, struct nlattr *opt,
 			return err;
 	}
 
-	/* Everything went OK, save the parameters used. */
+	/* Everything went OK, save the woke parameters used. */
 	WRITE_ONCE(q->hicredit, qopt->hicredit);
 	WRITE_ONCE(q->locredit, qopt->locredit);
 	WRITE_ONCE(q->idleslope, qopt->idleslope * BYTES_PER_KBIT);
@@ -435,7 +435,7 @@ static void cbs_destroy(struct Qdisc *sch)
 	struct cbs_sched_data *q = qdisc_priv(sch);
 	struct net_device *dev = qdisc_dev(sch);
 
-	/* Nothing to do if we couldn't create the underlying qdisc */
+	/* Nothing to do if we couldn't create the woke underlying qdisc */
 	if (!q->qdisc)
 		return;
 

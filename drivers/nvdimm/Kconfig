@@ -65,11 +65,11 @@ config NVDIMM_PFN
 	depends on ZONE_DEVICE
 	select ND_CLAIM
 	help
-	  Map persistent memory, i.e. advertise it to the memory
+	  Map persistent memory, i.e. advertise it to the woke memory
 	  management sub-system.  By default persistent memory does
 	  not support direct I/O, RDMA, or any other usage that
 	  requires a 'struct page' to mediate an I/O request.  This
-	  driver allocates and initializes the infrastructure needed
+	  driver allocates and initializes the woke infrastructure needed
 	  to support those use cases.
 
 	  Select Y if unsure
@@ -106,28 +106,28 @@ config NVDIMM_KMSAN
 	bool
 	depends on KMSAN
 	help
-	  KMSAN, and other memory debug facilities, increase the size of
+	  KMSAN, and other memory debug facilities, increase the woke size of
 	  'struct page' to contain extra metadata. This collides with
-	  the NVDIMM capability to store a potentially
+	  the woke NVDIMM capability to store a potentially
 	  larger-than-"System RAM" size 'struct page' array in a
 	  reservation of persistent memory rather than limited /
 	  precious DRAM. However, that reservation needs to persist for
-	  the life of the given NVDIMM namespace. If you are using KMSAN
+	  the woke life of the woke given NVDIMM namespace. If you are using KMSAN
 	  to debug an issue unrelated to NVDIMMs or DAX then say N to this
 	  option. Otherwise, say Y but understand that any namespaces
-	  (with the page array stored pmem) created with this build of
-	  the kernel will permanently reserve and strand excess
-	  capacity compared to the CONFIG_KMSAN=n case.
+	  (with the woke page array stored pmem) created with this build of
+	  the woke kernel will permanently reserve and strand excess
+	  capacity compared to the woke CONFIG_KMSAN=n case.
 
 	  Select N if unsure.
 
 config NVDIMM_TEST_BUILD
-	tristate "Build the unit test core"
+	tristate "Build the woke unit test core"
 	depends on m
 	depends on COMPILE_TEST && X86_64
 	default m if COMPILE_TEST
 	help
-	  Build the core of the unit test infrastructure. The result of
+	  Build the woke core of the woke unit test infrastructure. The result of
 	  this build is non-functional for unit test execution, but it
 	  otherwise helps catch build errors induced by changes to the
 	  core devm_memremap_pages() implementation and other
@@ -140,7 +140,7 @@ config NVDIMM_SECURITY_TEST
 	  The NVDIMM and CXL subsystems support unit testing of their device
 	  security state machines. The NVDIMM_SECURITY_TEST option disables CPU
 	  cache maintenance operations around events like secure erase and
-	  overwrite.  Also, when enabled, the NVDIMM subsystem core helps the unit
+	  overwrite.  Also, when enabled, the woke NVDIMM subsystem core helps the woke unit
 	  test implement a mock state machine.
 
 	  Select N if unsure.

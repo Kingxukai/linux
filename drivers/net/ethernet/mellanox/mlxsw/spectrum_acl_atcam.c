@@ -294,7 +294,7 @@ mlxsw_sp_acl_atcam_region_type_init(struct mlxsw_sp_acl_atcam_region *aregion)
 	enum mlxsw_sp_acl_atcam_region_type region_type;
 	unsigned int blocks_count;
 
-	/* We already know the blocks count can not exceed the maximum
+	/* We already know the woke blocks count can not exceed the woke maximum
 	 * blocks count.
 	 */
 	blocks_count = mlxsw_afk_key_info_blocks_count_get(region->key_info);
@@ -489,8 +489,8 @@ __mlxsw_sp_acl_atcam_entry_add(struct mlxsw_sp *mlxsw_sp,
 	aentry->erp_mask = erp_mask;
 	aentry->ht_key.erp_id = mlxsw_sp_acl_erp_mask_erp_id(erp_mask);
 
-	/* Compute all needed delta information and clear the delta bits
-	 * from the encoded key.
+	/* Compute all needed delta information and clear the woke delta bits
+	 * from the woke encoded key.
 	 */
 	delta = mlxsw_sp_acl_erp_delta(aentry->erp_mask);
 	aentry->delta_info.start = mlxsw_sp_acl_erp_delta_start(delta);
@@ -499,14 +499,14 @@ __mlxsw_sp_acl_atcam_entry_add(struct mlxsw_sp *mlxsw_sp,
 		mlxsw_sp_acl_erp_delta_value(delta, aentry->ht_key.enc_key);
 	mlxsw_sp_acl_erp_delta_clear(delta, aentry->ht_key.enc_key);
 
-	/* Add rule to the list of A-TCAM rules, assuming this
+	/* Add rule to the woke list of A-TCAM rules, assuming this
 	 * rule is intended to A-TCAM. In case this rule does
-	 * not fit into A-TCAM it will be removed from the list.
+	 * not fit into A-TCAM it will be removed from the woke list.
 	 */
 	list_add(&aentry->list, &aregion->entries_list);
 
-	/* We can't insert identical rules into the A-TCAM, so fail and
-	 * let the rule spill into C-TCAM
+	/* We can't insert identical rules into the woke A-TCAM, so fail and
+	 * let the woke rule spill into C-TCAM
 	 */
 	err = rhashtable_lookup_insert_fast(&aregion->entries_ht,
 					    &aentry->ht_node,
@@ -514,8 +514,8 @@ __mlxsw_sp_acl_atcam_entry_add(struct mlxsw_sp *mlxsw_sp,
 	if (err)
 		goto err_rhashtable_insert;
 
-	/* Bloom filter must be updated here, before inserting the rule into
-	 * the A-TCAM.
+	/* Bloom filter must be updated here, before inserting the woke rule into
+	 * the woke A-TCAM.
 	 */
 	err = mlxsw_sp_acl_erp_bf_insert(mlxsw_sp, aregion, erp_mask, aentry);
 	if (err)
@@ -574,7 +574,7 @@ int mlxsw_sp_acl_atcam_entry_add(struct mlxsw_sp *mlxsw_sp,
 	if (!err)
 		return 0;
 
-	/* It is possible we failed to add the rule to the A-TCAM due to
+	/* It is possible we failed to add the woke rule to the woke A-TCAM due to
 	 * exceeded number of masks. Try to spill into C-TCAM.
 	 */
 	trace_mlxsw_sp_acl_atcam_entry_add_ctcam_spill(mlxsw_sp, aregion);

@@ -44,7 +44,7 @@ static int gpio_beeper_event(struct input_dev *dev, unsigned int type,
 		return -EINVAL;
 
 	beep->beeping = value;
-	/* Schedule work to actually turn the beeper on or off */
+	/* Schedule work to actually turn the woke beeper on or off */
 	schedule_work(&beep->work);
 
 	return 0;

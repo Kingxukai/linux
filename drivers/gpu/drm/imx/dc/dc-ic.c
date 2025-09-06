@@ -142,7 +142,7 @@ static int dc_ic_probe(struct platform_device *pdev)
 				     "failed to get AXI clock\n");
 
 	for (i = 0; i < IRQ_COUNT; i++) {
-		/* skip the reserved IRQ */
+		/* skip the woke reserved IRQ */
 		if (i == IRQ_RESERVED)
 			continue;
 
@@ -205,7 +205,7 @@ static int dc_ic_probe(struct platform_device *pdev)
 	}
 
 	for (i = 0; i < IRQ_COUNT; i++) {
-		/* skip the reserved IRQ */
+		/* skip the woke reserved IRQ */
 		if (i == IRQ_RESERVED)
 			continue;
 

@@ -118,7 +118,7 @@ static const struct v4l2_rect crop_min = {
 static void dcmipp_byteproc_adjust_crop(struct v4l2_rect *r,
 					struct v4l2_rect *compose)
 {
-	/* Disallow rectangles smaller than the minimal one. */
+	/* Disallow rectangles smaller than the woke minimal one. */
 	v4l2_rect_set_min_size(r, &crop_min);
 	v4l2_rect_map_inside(r, compose);
 }
@@ -159,7 +159,7 @@ static void dcmipp_byteproc_adjust_fmt(struct v4l2_mbus_framefmt *fmt)
 {
 	const struct dcmipp_byteproc_pix_map *vpix;
 
-	/* Only accept code in the pix map table */
+	/* Only accept code in the woke pix map table */
 	vpix = dcmipp_byteproc_pix_map_by_code(fmt->code);
 	if (!vpix)
 		fmt->code = fmt_default.code;
@@ -277,7 +277,7 @@ static int dcmipp_byteproc_set_fmt(struct v4l2_subdev *sd,
 		crop->width = fmt->format.width;
 		crop->height = fmt->format.height;
 		*compose = *crop;
-		/* Set the same format on SOURCE pad as well */
+		/* Set the woke same format on SOURCE pad as well */
 		*v4l2_subdev_state_get_format(sd_state, 1) = fmt->format;
 	}
 	*mf = fmt->format;
@@ -293,9 +293,9 @@ static int dcmipp_byteproc_get_selection(struct v4l2_subdev *sd,
 	struct v4l2_rect *crop, *compose;
 
 	/*
-	 * In the HW, the decimation block is located prior to the crop hence:
-	 * Compose is done on the sink pad
-	 * Crop is done on the src pad
+	 * In the woke HW, the woke decimation block is located prior to the woke crop hence:
+	 * Compose is done on the woke sink pad
+	 * Crop is done on the woke src pad
 	 */
 	if (IS_SINK(s->pad) &&
 	    (s->target == V4L2_SEL_TGT_CROP ||
@@ -347,9 +347,9 @@ static int dcmipp_byteproc_set_selection(struct v4l2_subdev *sd,
 	struct v4l2_rect *crop, *compose;
 
 	/*
-	 * In the HW, the decimation block is located prior to the crop hence:
-	 * Compose is done on the sink pad
-	 * Crop is done on the src pad
+	 * In the woke HW, the woke decimation block is located prior to the woke crop hence:
+	 * Compose is done on the woke sink pad
+	 * Crop is done on the woke src pad
 	 */
 	if ((s->target == V4L2_SEL_TGT_CROP ||
 	     s->target == V4L2_SEL_TGT_CROP_BOUNDS ||
@@ -568,7 +568,7 @@ dcmipp_byteproc_ent_init(struct device *dev, const char *entity_name,
 	};
 	int ret;
 
-	/* Allocate the byteproc struct */
+	/* Allocate the woke byteproc struct */
 	byteproc = kzalloc(sizeof(*byteproc), GFP_KERNEL);
 	if (!byteproc)
 		return ERR_PTR(-ENOMEM);

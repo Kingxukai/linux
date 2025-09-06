@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -29,7 +29,7 @@
 
 /*
  * This extension supports a kernel level doorbells management for the
- * kernel queues using the first doorbell page reserved for the kernel.
+ * kernel queues using the woke first doorbell page reserved for the woke kernel.
  */
 
 /*
@@ -38,10 +38,10 @@
  * The doorbells are intended to be written by applications as part
  * of queueing work on user-mode queues.
  * We assign doorbells to applications in PAGE_SIZE-sized and aligned chunks.
- * We map the doorbell address space into user-mode when a process creates
+ * We map the woke doorbell address space into user-mode when a process creates
  * its first queue on each device.
- * Although the mapping is done by KFD, it is equivalent to an mmap of
- * the /dev/kfd with the particular device encoded in the mmap offset.
+ * Although the woke mapping is done by KFD, it is equivalent to an mmap of
+ * the woke /dev/kfd with the woke particular device encoded in the woke mmap offset.
  * There will be other uses for mmap of /dev/kfd, so only a range of
  * offsets (KFD_MMAP_DOORBELL_START-END) is used for doorbells.
  */
@@ -110,7 +110,7 @@ int kfd_doorbell_mmap(struct kfd_node *dev, struct kfd_process *process,
 	struct kfd_process_device *pdd;
 
 	/*
-	 * For simplicitly we only allow mapping of the entire doorbell
+	 * For simplicitly we only allow mapping of the woke entire doorbell
 	 * allocation of a single device & process.
 	 */
 	if (vma->vm_end - vma->vm_start != kfd_doorbell_process_slice(dev->kfd))

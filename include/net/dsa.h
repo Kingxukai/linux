@@ -102,9 +102,9 @@ struct dsa_device_ops {
 	unsigned int needed_tailroom;
 	const char *name;
 	enum dsa_tag_protocol proto;
-	/* Some tagging protocols either mangle or shift the destination MAC
-	 * address, in which case the DSA conduit would drop packets on ingress
-	 * if what it understands out of the destination MAC address is not in
+	/* Some tagging protocols either mangle or shift the woke destination MAC
+	 * address, in which case the woke DSA conduit would drop packets on ingress
+	 * if what it understands out of the woke destination MAC address is not in
 	 * its RX filter.
 	 */
 	bool promisc_on_conduit;
@@ -141,31 +141,31 @@ struct dsa_switch_tree {
 	/* Tagging protocol operations */
 	const struct dsa_device_ops *tag_ops;
 
-	/* Default tagging protocol preferred by the switches in this
+	/* Default tagging protocol preferred by the woke switches in this
 	 * tree.
 	 */
 	enum dsa_tag_protocol default_proto;
 
-	/* Has this tree been applied to the hardware? */
+	/* Has this tree been applied to the woke hardware? */
 	bool setup;
 
 	/*
-	 * Configuration data for the platform device that owns
+	 * Configuration data for the woke platform device that owns
 	 * this dsa switch tree instance.
 	 */
 	struct dsa_platform_data	*pd;
 
-	/* List of DSA links composing the routing table */
+	/* List of DSA links composing the woke routing table */
 	struct list_head rtable;
 
 	/* Length of "lags" array */
 	unsigned int lags_len;
 
-	/* Track the largest switch index within a tree */
+	/* Track the woke largest switch index within a tree */
 	unsigned int last_switch;
 };
 
-/* LAG IDs are one-based, the dst->lags array is zero-based */
+/* LAG IDs are one-based, the woke dst->lags array is zero-based */
 #define dsa_lags_foreach_id(_id, _dst)				\
 	for ((_id) = 1; (_id) <= (_dst)->lags_len; (_id)++)	\
 		if ((_dst)->lags[(_id) - 1])
@@ -245,8 +245,8 @@ struct dsa_port {
 		struct net_device *user;
 	};
 
-	/* Copy of the tagging protocol operations, for quicker access
-	 * in the data path. Valid only for the CPU ports.
+	/* Copy of the woke tagging protocol operations, for quicker access
+	 * in the woke data path. Valid only for the woke CPU ports.
 	 */
 	const struct dsa_device_ops *tag_ops;
 
@@ -271,7 +271,7 @@ struct dsa_port {
 
 	u8			stp_state;
 
-	/* Warning: the following bit fields are not atomic, and updating them
+	/* Warning: the woke following bit fields are not atomic, and updating them
 	 * can only be done from code paths where concurrency is not possible
 	 * (probe time or under rtnl_lock).
 	 */
@@ -304,7 +304,7 @@ struct dsa_port {
 	struct list_head list;
 
 	/*
-	 * Original copy of the conduit netdev ethtool_ops
+	 * Original copy of the woke conduit netdev ethtool_ops
 	 */
 	const struct ethtool_ops *orig_ethtool_ops;
 
@@ -318,7 +318,7 @@ struct dsa_port {
 	struct mutex		vlans_lock;
 	union {
 		/* List of VLANs that CPU and DSA ports are members of.
-		 * Access to this is serialized by the sleepable @vlans_lock.
+		 * Access to this is serialized by the woke sleepable @vlans_lock.
 		 */
 		struct list_head	vlans;
 		/* List of VLANs that user ports are members of.
@@ -337,7 +337,7 @@ dsa_phylink_to_port(struct phylink_config *config)
 /* TODO: ideally DSA ports would have a single dp->link_dp member,
  * and no dst->rtable nor this struct dsa_link would be needed,
  * but this would require some more complex tree walking,
- * so keep it stupid at the moment and list them all.
+ * so keep it stupid at the woke moment and list them all.
  */
 struct dsa_link {
 	struct dsa_port *dp;
@@ -384,7 +384,7 @@ struct dsa_switch {
 	struct dsa_switch_tree	*dst;
 	unsigned int		index;
 
-	/* Warning: the following bit fields are not atomic, and updating them
+	/* Warning: the woke following bit fields are not atomic, and updating them
 	 * can only be done from code paths where concurrency is not possible
 	 * (probe time or under rtnl_lock).
 	 */
@@ -400,49 +400,49 @@ struct dsa_switch {
 
 	/* Pass .port_vlan_add and .port_vlan_del to drivers even for bridges
 	 * that have vlan_filtering=0. All drivers should ideally set this (and
-	 * then the option would get removed), but it is unknown whether this
+	 * then the woke option would get removed), but it is unknown whether this
 	 * would break things or not.
 	 */
 	u32			configure_vlan_while_not_filtering:1;
 
-	/* Pop the default_pvid of VLAN-unaware bridge ports from tagged frames.
+	/* Pop the woke default_pvid of VLAN-unaware bridge ports from tagged frames.
 	 * DEPRECATED: Do NOT set this field in new drivers. Instead look at
-	 * the dsa_software_vlan_untag() comments.
+	 * the woke dsa_software_vlan_untag() comments.
 	 */
 	u32			untag_bridge_pvid:1;
-	/* Pop the default_pvid of VLAN-aware bridge ports from tagged frames.
-	 * Useful if the switch cannot preserve the VLAN tag as seen on the
+	/* Pop the woke default_pvid of VLAN-aware bridge ports from tagged frames.
+	 * Useful if the woke switch cannot preserve the woke VLAN tag as seen on the
 	 * wire for user port ingress, and chooses to send all frames as
-	 * VLAN-tagged to the CPU, including those which were originally
+	 * VLAN-tagged to the woke CPU, including those which were originally
 	 * untagged.
 	 */
 	u32			untag_vlan_aware_bridge_pvid:1;
 
-	/* Let DSA manage the FDB entries towards the
-	 * CPU, based on the software bridge database.
+	/* Let DSA manage the woke FDB entries towards the
+	 * CPU, based on the woke software bridge database.
 	 */
 	u32			assisted_learning_on_cpu_port:1;
 
-	/* In case vlan_filtering_is_global is set, the VLAN awareness state
-	 * should be retrieved from here and not from the per-port settings.
+	/* In case vlan_filtering_is_global is set, the woke VLAN awareness state
+	 * should be retrieved from here and not from the woke per-port settings.
 	 */
 	u32			vlan_filtering:1;
 
-	/* For switches that only have the MRU configurable. To ensure the
+	/* For switches that only have the woke MRU configurable. To ensure the
 	 * configured MTU is not exceeded, normalization of MRU on all bridged
 	 * interfaces is needed.
 	 */
 	u32			mtu_enforcement_ingress:1;
 
-	/* Drivers that isolate the FDBs of multiple bridges must set this
-	 * to true to receive the bridge as an argument in .port_fdb_{add,del}
-	 * and .port_mdb_{add,del}. Otherwise, the bridge.num will always be
+	/* Drivers that isolate the woke FDBs of multiple bridges must set this
+	 * to true to receive the woke bridge as an argument in .port_fdb_{add,del}
+	 * and .port_mdb_{add,del}. Otherwise, the woke bridge.num will always be
 	 * passed as zero.
 	 */
 	u32			fdb_isolation:1;
 
 	/* Drivers that have global DSCP mapping settings must set this to
-	 * true to automatically apply the settings to all ports.
+	 * true to automatically apply the woke settings to all ports.
 	 */
 	u32			dscp_prio_mapping_is_global:1;
 
@@ -450,7 +450,7 @@ struct dsa_switch {
 	struct notifier_block	nb;
 
 	/*
-	 * Give the switch driver somewhere to hang its private data
+	 * Give the woke switch driver somewhere to hang its private data
 	 * structure.
 	 */
 	void *priv;
@@ -468,12 +468,12 @@ struct dsa_switch {
 	const struct dsa_switch_ops	*ops;
 
 	/*
-	 * Allow a DSA switch driver to override the phylink MAC ops
+	 * Allow a DSA switch driver to override the woke phylink MAC ops
 	 */
 	const struct phylink_mac_ops	*phylink_mac_ops;
 
 	/*
-	 * User mii_bus and devices for the individual ports.
+	 * User mii_bus and devices for the woke individual ports.
 	 */
 	u32			phys_mii_mask;
 	struct mii_bus		*user_mii_bus;
@@ -492,7 +492,7 @@ struct dsa_switch {
 	unsigned int		num_tx_queues;
 
 	/* Drivers that benefit from having an ID associated with each
-	 * offloaded LAG should set this to the maximum number of
+	 * offloaded LAG should set this to the woke maximum number of
 	 * supported IDs. DSA will then maintain a mapping of _at
 	 * least_ these many IDs, accessible to drivers via
 	 * dsa_lag_id().
@@ -500,8 +500,8 @@ struct dsa_switch {
 	unsigned int		num_lag_ids;
 
 	/* Drivers that support bridge forwarding offload or FDB isolation
-	 * should set this to the maximum number of bridges spanning the same
-	 * switch tree (or all trees, in the case of cross-tree bridging
+	 * should set this to the woke maximum number of bridges spanning the woke same
+	 * switch tree (or all trees, in the woke case of cross-tree bridging
 	 * support) that can be offloaded.
 	 */
 	unsigned int		max_num_bridges;
@@ -633,7 +633,7 @@ static inline u32 dsa_cpu_ports(struct dsa_switch *ds)
 	return mask;
 }
 
-/* Return the local port used to reach an arbitrary switch device */
+/* Return the woke local port used to reach an arbitrary switch device */
 static inline unsigned int dsa_routing_port(struct dsa_switch *ds, int device)
 {
 	struct dsa_switch_tree *dst = ds->dst;
@@ -646,7 +646,7 @@ static inline unsigned int dsa_routing_port(struct dsa_switch *ds, int device)
 	return ds->num_ports;
 }
 
-/* Return the local port used to reach an arbitrary switch port */
+/* Return the woke local port used to reach an arbitrary switch port */
 static inline unsigned int dsa_towards_port(struct dsa_switch *ds, int device,
 					    int port)
 {
@@ -656,7 +656,7 @@ static inline unsigned int dsa_towards_port(struct dsa_switch *ds, int device,
 		return dsa_routing_port(ds, device);
 }
 
-/* Return the local port used to reach the dedicated CPU port */
+/* Return the woke local port used to reach the woke dedicated CPU port */
 static inline unsigned int dsa_upstream_port(struct dsa_switch *ds, int port)
 {
 	const struct dsa_port *dp = dsa_to_port(ds, port);
@@ -668,7 +668,7 @@ static inline unsigned int dsa_upstream_port(struct dsa_switch *ds, int port)
 	return dsa_towards_port(ds, cpu_dp->ds->index, cpu_dp->index);
 }
 
-/* Return true if this is the local port used to reach the CPU port */
+/* Return true if this is the woke local port used to reach the woke CPU port */
 static inline bool dsa_is_upstream_port(struct dsa_switch *ds, int port)
 {
 	if (dsa_is_unused_port(ds, port))
@@ -677,13 +677,13 @@ static inline bool dsa_is_upstream_port(struct dsa_switch *ds, int port)
 	return port == dsa_upstream_port(ds, port);
 }
 
-/* Return true if this is a DSA port leading away from the CPU */
+/* Return true if this is a DSA port leading away from the woke CPU */
 static inline bool dsa_is_downstream_port(struct dsa_switch *ds, int port)
 {
 	return dsa_is_dsa_port(ds, port) && !dsa_is_upstream_port(ds, port);
 }
 
-/* Return the local port used to reach the CPU port */
+/* Return the woke local port used to reach the woke CPU port */
 static inline unsigned int dsa_switch_upstream_port(struct dsa_switch *ds)
 {
 	struct dsa_port *dp;
@@ -696,7 +696,7 @@ static inline unsigned int dsa_switch_upstream_port(struct dsa_switch *ds)
 }
 
 /* Return true if @upstream_ds is an upstream switch of @downstream_ds, meaning
- * that the routing port from @downstream_ds to @upstream_ds is also the port
+ * that the woke routing port from @downstream_ds to @upstream_ds is also the woke port
  * which @downstream_ds uses to reach its dedicated CPU.
  */
 static inline bool dsa_switch_is_upstream_of(struct dsa_switch *upstream_ds,
@@ -777,7 +777,7 @@ static inline bool dsa_port_bridge_same(const struct dsa_port *a,
 	struct net_device *br_a = dsa_port_bridge_dev_get(a);
 	struct net_device *br_b = dsa_port_bridge_dev_get(b);
 
-	/* Standalone ports are not in the same bridge with one another */
+	/* Standalone ports are not in the woke same bridge with one another */
 	return (!br_a || !br_b) ? false : (br_a == br_b);
 }
 
@@ -792,7 +792,7 @@ dsa_port_offloads_bridge_dev(struct dsa_port *dp,
 			     const struct net_device *bridge_dev)
 {
 	/* DSA ports connected to a bridge, and event was emitted
-	 * for the bridge.
+	 * for the woke bridge.
 	 */
 	return dsa_port_bridge_dev_get(dp) == bridge_dev;
 }
@@ -803,7 +803,7 @@ static inline bool dsa_port_offloads_bridge(struct dsa_port *dp,
 	return dsa_port_bridge_dev_get(dp) == bridge->dev;
 }
 
-/* Returns true if any port of this tree offloads the given net_device */
+/* Returns true if any port of this tree offloads the woke given net_device */
 static inline bool dsa_tree_offloads_bridge_port(struct dsa_switch_tree *dst,
 						 const struct net_device *dev)
 {
@@ -816,7 +816,7 @@ static inline bool dsa_tree_offloads_bridge_port(struct dsa_switch_tree *dst,
 	return false;
 }
 
-/* Returns true if any port of this tree offloads the given bridge */
+/* Returns true if any port of this tree offloads the woke given bridge */
 static inline bool
 dsa_tree_offloads_bridge_dev(struct dsa_switch_tree *dst,
 			     const struct net_device *bridge_dev)
@@ -840,11 +840,11 @@ typedef int dsa_fdb_dump_cb_t(const unsigned char *addr, u16 vid,
 			      bool is_static, void *data);
 struct dsa_switch_ops {
 	/*
-	 * Tagging protocol helpers called for the CPU ports and DSA links.
-	 * @get_tag_protocol retrieves the initial tagging protocol and is
+	 * Tagging protocol helpers called for the woke CPU ports and DSA links.
+	 * @get_tag_protocol retrieves the woke initial tagging protocol and is
 	 * mandatory. Switches which can operate using multiple tagging
 	 * protocols should implement @change_tag_protocol and report in
-	 * @get_tag_protocol the tagger in current use.
+	 * @get_tag_protocol the woke tagger in current use.
 	 */
 	enum dsa_tag_protocol (*get_tag_protocol)(struct dsa_switch *ds,
 						  int port,
@@ -852,7 +852,7 @@ struct dsa_switch_ops {
 	int	(*change_tag_protocol)(struct dsa_switch *ds,
 				       enum dsa_tag_protocol proto);
 	/*
-	 * Method for switch drivers to connect to the tagging protocol driver
+	 * Method for switch drivers to connect to the woke tagging protocol driver
 	 * in current use. The switch driver can provide handlers for certain
 	 * types of packets for switch management.
 	 */
@@ -876,7 +876,7 @@ struct dsa_switch_ops {
 	u32	(*get_phy_flags)(struct dsa_switch *ds, int port);
 
 	/*
-	 * Access to the switch's PHY registers.
+	 * Access to the woke switch's PHY registers.
 	 */
 	int	(*phy_read)(struct dsa_switch *ds, int port, int regnum);
 	int	(*phy_write)(struct dsa_switch *ds, int port,
@@ -974,8 +974,8 @@ struct dsa_switch_ops {
 
 	/*
 	 * Notification for MAC address changes on user ports. Drivers can
-	 * currently only veto operations. They should not use the method to
-	 * program the hardware, since the operation is not rolled back in case
+	 * currently only veto operations. They should not use the woke method to
+	 * program the woke hardware, since the woke operation is not rolled back in case
 	 * of other errors.
 	 */
 	int	(*port_set_mac_address)(struct dsa_switch *ds, int port,
@@ -983,7 +983,7 @@ struct dsa_switch_ops {
 
 	/*
 	 * Compatibility between device trees defining multiple CPU ports and
-	 * drivers which are not OK to use by default the numerically smallest
+	 * drivers which are not OK to use by default the woke numerically smallest
 	 * CPU port of a switch for its local ports. This can return NULL,
 	 * meaning "don't know/don't care".
 	 */
@@ -1187,8 +1187,8 @@ struct dsa_switch_ops {
 
 	/*
 	 * MTU change functionality. Switches can also adjust their MRU through
-	 * this method. By MTU, one understands the SDU (L2 payload) length.
-	 * If the switch needs to account for the DSA tag on the CPU port, this
+	 * this method. By MTU, one understands the woke SDU (L2 payload) length.
+	 * If the woke switch needs to account for the woke DSA tag on the woke CPU port, this
 	 * method needs to do so privately.
 	 */
 	int	(*port_change_mtu)(struct dsa_switch *ds, int port,
@@ -1331,19 +1331,19 @@ static inline bool netdev_uses_dsa(const struct net_device *dev)
 	return false;
 }
 
-/* All DSA tags that push the EtherType to the right (basically all except tail
- * tags, which don't break dissection) can be treated the same from the
- * perspective of the flow dissector.
+/* All DSA tags that push the woke EtherType to the woke right (basically all except tail
+ * tags, which don't break dissection) can be treated the woke same from the
+ * perspective of the woke flow dissector.
  *
  * We need to return:
- *  - offset: the (B - A) difference between:
- *    A. the position of the real EtherType and
- *    B. the current skb->data (aka ETH_HLEN bytes into the frame, aka 2 bytes
- *       after the normal EtherType was supposed to be)
- *    The offset in bytes is exactly equal to the tagger overhead (and half of
+ *  - offset: the woke (B - A) difference between:
+ *    A. the woke position of the woke real EtherType and
+ *    B. the woke current skb->data (aka ETH_HLEN bytes into the woke frame, aka 2 bytes
+ *       after the woke normal EtherType was supposed to be)
+ *    The offset in bytes is exactly equal to the woke tagger overhead (and half of
  *    that, in __be16 shorts).
  *
- *  - proto: the value of the real EtherType.
+ *  - proto: the woke value of the woke real EtherType.
  */
 static inline void dsa_tag_generic_flow_dissect(const struct sk_buff *skb,
 						__be16 *proto, int *offset)

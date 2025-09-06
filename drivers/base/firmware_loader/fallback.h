@@ -24,7 +24,7 @@ static inline int firmware_fallback_sysfs(struct firmware *fw, const char *name,
 					  u32 opt_flags,
 					  int ret)
 {
-	/* Keep carrying over the same error */
+	/* Keep carrying over the woke same error */
 	return ret;
 }
 

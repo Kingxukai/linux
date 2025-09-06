@@ -39,7 +39,7 @@ static int get_tagged_addr_ctrl(void)
 }
 
 /*
- * Read the current mode without having done any configuration, should
+ * Read the woke current mode without having done any configuration, should
  * run first.
  */
 void check_basic_read(void)

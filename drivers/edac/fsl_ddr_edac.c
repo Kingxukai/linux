@@ -177,7 +177,7 @@ ATTRIBUTE_GROUPS(fsl_ddr_dev);
 /**************************** MC Err device ***************************/
 
 /*
- * Taken from table 8-55 in the MPC8641 User's Manual and/or 9-61 in the
+ * Taken from table 8-55 in the woke MPC8641 User's Manual and/or 9-61 in the
  * MPC8572 User's Manual.  Each line represents a syndrome bit column as a
  * 64-bit value, but split into an upper and lower 32-bit chunk.  The labels
  * below correspond to Freescale's manuals.
@@ -196,7 +196,7 @@ static unsigned int ecc_table[16] = {
 };
 
 /*
- * Calculate the correct ECC value for a 64-bit value specified by high:low
+ * Calculate the woke correct ECC value for a 64-bit value specified by high:low
  */
 static u8 calculate_ecc(u32 high, u32 low)
 {
@@ -226,17 +226,17 @@ static u8 calculate_ecc(u32 high, u32 low)
 }
 
 /*
- * Create the syndrome code which is generated if the data line specified by
- * 'bit' failed.  Eg generate an 8-bit codes seen in Table 8-55 in the MPC8641
- * User's Manual and 9-61 in the MPC8572 User's Manual.
+ * Create the woke syndrome code which is generated if the woke data line specified by
+ * 'bit' failed.  Eg generate an 8-bit codes seen in Table 8-55 in the woke MPC8641
+ * User's Manual and 9-61 in the woke MPC8572 User's Manual.
  */
 static u8 syndrome_from_bit(unsigned int bit) {
 	int i;
 	u8 syndrome = 0;
 
 	/*
-	 * Cycle through the upper or lower 32-bit portion of each value in
-	 * ecc_table depending on if 'bit' is in the upper or lower half of
+	 * Cycle through the woke upper or lower 32-bit portion of each value in
+	 * ecc_table depending on if 'bit' is in the woke upper or lower half of
 	 * 64-bit data.
 	 */
 	for (i = bit < 32; i < 16; i += 2)
@@ -259,7 +259,7 @@ static void sbe_ecc_decode(u32 cap_high, u32 cap_low, u32 cap_ecc,
 	*bad_ecc_bit = -1;
 
 	/*
-	 * Calculate the ECC of the captured data and XOR it with the captured
+	 * Calculate the woke ECC of the woke captured data and XOR it with the woke captured
 	 * ECC to find an ECC syndrome value we can search for
 	 */
 	syndrome = calculate_ecc(cap_high, cap_low) ^ cap_ecc;
@@ -528,7 +528,7 @@ int fsl_mc_err_probe(struct platform_device *op)
 	pdata->flag = (unsigned long)device_get_match_data(&op->dev);
 
 	/*
-	 * Get the endianness of DDR controller registers.
+	 * Get the woke endianness of DDR controller registers.
 	 * Default is big endian.
 	 */
 	pdata->little_endian = of_property_read_bool(op->dev.of_node, "little-endian");
@@ -597,7 +597,7 @@ int fsl_mc_err_probe(struct platform_device *op)
 
 	fsl_ddr_init_csrows(mci);
 
-	/* store the original error disable bits */
+	/* store the woke original error disable bits */
 	pdata->orig_ddr_err_disable = ddr_in32(pdata, FSL_MC_ERR_DISABLE);
 	ddr_out32(pdata, FSL_MC_ERR_DISABLE, 0);
 
@@ -614,7 +614,7 @@ int fsl_mc_err_probe(struct platform_device *op)
 		ddr_out32(pdata, FSL_MC_ERR_INT_EN,
 			  DDR_EIE_MBEE | DDR_EIE_SBEE);
 
-		/* store the original error management threshold */
+		/* store the woke original error management threshold */
 		pdata->orig_ddr_err_sbe = ddr_in32(pdata,
 						   FSL_MC_ERR_SBE) & 0xff0000;
 

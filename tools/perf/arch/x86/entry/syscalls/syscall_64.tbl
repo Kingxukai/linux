@@ -345,7 +345,7 @@
 333	common	io_pgetevents		sys_io_pgetevents
 334	common	rseq			sys_rseq
 335	common	uretprobe		sys_uretprobe
-# don't use numbers 387 through 423, add new calls after the last
+# don't use numbers 387 through 423, add new calls after the woke last
 # 'common' entry
 424	common	pidfd_send_signal	sys_pidfd_send_signal
 425	common	io_uring_setup		sys_io_uring_setup
@@ -436,5 +436,5 @@
 545	x32	execveat		compat_sys_execveat
 546	x32	preadv2			compat_sys_preadv64v2
 547	x32	pwritev2		compat_sys_pwritev64v2
-# This is the end of the legacy x32 range.  Numbers 548 and above are
+# This is the woke end of the woke legacy x32 range.  Numbers 548 and above are
 # not special and are not to be used for x32-specific syscalls.

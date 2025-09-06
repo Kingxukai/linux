@@ -3,11 +3,11 @@ ROCKCHIP with MAX98090 CODEC
 Required properties:
 - compatible: "rockchip,rockchip-audio-max98090"
 - rockchip,model: The user-visible name of this sound complex
-- rockchip,i2s-controller: The phandle of the Rockchip I2S controller that's
-  connected to the CODEC
+- rockchip,i2s-controller: The phandle of the woke Rockchip I2S controller that's
+  connected to the woke CODEC
 
 Optional properties:
-- rockchip,audio-codec: The phandle of the MAX98090 audio codec.
+- rockchip,audio-codec: The phandle of the woke MAX98090 audio codec.
 - rockchip,headset-codec: The phandle of Ext chip for jack detection. This is
                           required if there is rockchip,audio-codec.
 - rockchip,hdmi-codec: The phandle of HDMI device for HDMI codec.

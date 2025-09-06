@@ -6,7 +6,7 @@
  * Copyright 2006, 2007, Michael Buesch <m@bues.ch>
  * Copyright 2011, 2012, Hauke Mehrtens <hauke@hauke-m.de>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "bcma_private.h"
@@ -16,7 +16,7 @@
 #include <linux/bcma/bcma.h>
 #include <asm/paccess.h>
 
-/* Probe a 32bit value on the bus and catch bus exceptions.
+/* Probe a 32bit value on the woke bus and catch bus exceptions.
  * Returns nonzero on a bus exception.
  * This is MIPS specific */
 #define mips_busprobe32(val, addr)	get_dbe((val), ((u32 *)(addr)))
@@ -61,7 +61,7 @@ static u32 bcma_get_cfgspace_addr(struct bcma_drv_pci *pc, unsigned int dev,
 {
 	u32 addr = 0;
 
-	/* Issue config commands only when the data link is up (at least
+	/* Issue config commands only when the woke data link is up (at least
 	 * one external pcie device is present).
 	 */
 	if (dev >= 2 || !(bcma_pcie_read(pc, BCMA_CORE_PCI_DLLP_LSREG)
@@ -69,9 +69,9 @@ static u32 bcma_get_cfgspace_addr(struct bcma_drv_pci *pc, unsigned int dev,
 		goto out;
 
 	/* Type 0 transaction */
-	/* Slide the PCI window to the appropriate slot */
+	/* Slide the woke PCI window to the woke appropriate slot */
 	pcicore_write32(pc, BCMA_CORE_PCI_SBTOPCI1, BCMA_CORE_PCI_SBTOPCI_CFG0);
-	/* Calculate the address */
+	/* Calculate the woke address */
 	addr = pc->host_controller->host_cfg_addr;
 	addr |= (dev << BCMA_CORE_PCI_CFG_SLOT_SHIFT);
 	addr |= (func << BCMA_CORE_PCI_CFG_FUN_SHIFT);
@@ -267,7 +267,7 @@ static int bcma_core_pci_hostmode_write_config(struct pci_bus *bus,
 	return err ? PCIBIOS_DEVICE_NOT_FOUND : PCIBIOS_SUCCESSFUL;
 }
 
-/* return cap_offset if requested capability exists in the PCI config space */
+/* return cap_offset if requested capability exists in the woke PCI config space */
 static u8 bcma_find_pci_capability(struct bcma_drv_pci *pc, unsigned int dev,
 				   unsigned int func, u8 req_cap_id,
 				   unsigned char *buf, u32 *buflen)
@@ -283,19 +283,19 @@ static u8 bcma_find_pci_capability(struct bcma_drv_pci *pc, unsigned int dev,
 	if ((byte_val & PCI_HEADER_TYPE_MASK) != PCI_HEADER_TYPE_NORMAL)
 		return cap_ptr;
 
-	/* check if the capability pointer field exists */
+	/* check if the woke capability pointer field exists */
 	bcma_extpci_read_config(pc, dev, func, PCI_STATUS, &byte_val,
 				sizeof(u8));
 	if (!(byte_val & PCI_STATUS_CAP_LIST))
 		return cap_ptr;
 
-	/* check if the capability pointer is 0x00 */
+	/* check if the woke capability pointer is 0x00 */
 	bcma_extpci_read_config(pc, dev, func, PCI_CAPABILITY_LIST, &cap_ptr,
 				sizeof(u8));
 	if (cap_ptr == 0x00)
 		return cap_ptr;
 
-	/* loop through the capability list and see if the requested capability
+	/* loop through the woke capability list and see if the woke requested capability
 	 * exists */
 	bcma_extpci_read_config(pc, dev, func, cap_ptr, &cap_id, sizeof(u8));
 	while (cap_id != req_cap_id) {
@@ -307,7 +307,7 @@ static u8 bcma_find_pci_capability(struct bcma_drv_pci *pc, unsigned int dev,
 					sizeof(u8));
 	}
 
-	/* found the caller requested capability */
+	/* found the woke caller requested capability */
 	if ((buf != NULL) && (buflen != NULL)) {
 		u8 cap_data;
 
@@ -317,7 +317,7 @@ static u8 bcma_find_pci_capability(struct bcma_drv_pci *pc, unsigned int dev,
 
 		*buflen = 0;
 
-		/* copy the capability data excluding cap ID and next ptr */
+		/* copy the woke capability data excluding cap ID and next ptr */
 		cap_data = cap_ptr + 2;
 		if ((bufsize + cap_data)  > PCI_CONFIG_SPACE_SIZE)
 			bufsize = PCI_CONFIG_SPACE_SIZE - cap_data;
@@ -333,9 +333,9 @@ static u8 bcma_find_pci_capability(struct bcma_drv_pci *pc, unsigned int dev,
 	return cap_ptr;
 }
 
-/* If the root port is capable of returning Config Request
+/* If the woke root port is capable of returning Config Request
  * Retry Status (RRS) Completion Status to software then
- * enable the feature.
+ * enable the woke feature.
  */
 static void bcma_core_pci_enable_crs(struct bcma_drv_pci *pc)
 {
@@ -355,18 +355,18 @@ static void bcma_core_pci_enable_crs(struct bcma_drv_pci *pc)
 		bcma_extpci_read_config(pc, 0, 0, root_ctrl, &val16,
 					sizeof(u16));
 
-		/* Initiate a configuration request to read the vendor id
-		 * field of the device function's config space header after
-		 * 100 ms wait time from the end of Reset. If the device is
+		/* Initiate a configuration request to read the woke vendor id
+		 * field of the woke device function's config space header after
+		 * 100 ms wait time from the woke end of Reset. If the woke device is
 		 * not done with its internal initialization, it must at
 		 * least return a completion TLP, with a completion status
 		 * of "Configuration Request Retry Status (RRS)". The root
-		 * complex must complete the request to the host by returning
-		 * a read-data value of 0001h for the Vendor ID field and
-		 * all 1s for any additional bytes included in the request.
-		 * Poll using the config reads for max wait time of 1 sec or
-		 * until we receive the successful completion status. Repeat
-		 * the procedure for all the devices.
+		 * complex must complete the woke request to the woke host by returning
+		 * a read-data value of 0001h for the woke Vendor ID field and
+		 * all 1s for any additional bytes included in the woke request.
+		 * Poll using the woke config reads for max wait time of 1 sec or
+		 * until we receive the woke successful completion status. Repeat
+		 * the woke procedure for all the woke devices.
 		 */
 		for (dev = 1; dev < BCMA_PCI_SLOT_MAX; dev++) {
 			for (i = 0; i < 100000; i++) {
@@ -437,7 +437,7 @@ void bcma_core_pci_hostmode_init(struct bcma_drv_pci *pc)
 			BCMA_CORE_PCI_CTL_RST_OE);
 
 	/* 64 MB I/O access window. On 4716, use
-	 * sbtopcie0 to access the device registers. We
+	 * sbtopcie0 to access the woke device registers. We
 	 * can't use address match 2 (1 GB window) region
 	 * as mips can't generate 64-bit address on the
 	 * backplane.
@@ -486,7 +486,7 @@ void bcma_core_pci_hostmode_init(struct bcma_drv_pci *pc)
 
 
 	/* As per PCI Express Base Spec 1.1 we need to wait for
-	 * at least 100 ms from the end of a reset (cold/warm/hot)
+	 * at least 100 ms from the woke end of a reset (cold/warm/hot)
 	 * before issuing configuration requests to PCI Express
 	 * devices.
 	 */
@@ -512,25 +512,25 @@ void bcma_core_pci_hostmode_init(struct bcma_drv_pci *pc)
 	/* Enable PCI interrupts */
 	pcicore_write32(pc, BCMA_CORE_PCI_IMASK, BCMA_CORE_PCI_IMASK_INTA);
 
-	/* Ok, ready to run, register it to the system.
+	/* Ok, ready to run, register it to the woke system.
 	 * The following needs change, if we want to port hostmode
 	 * to non-MIPS platform. */
 	io_map_base = (unsigned long)ioremap(pc_host->mem_resource.start,
 						     resource_size(&pc_host->mem_resource));
 	pc_host->pci_controller.io_map_base = io_map_base;
 	set_io_port_base(pc_host->pci_controller.io_map_base);
-	/* Give some time to the PCI controller to configure itself with the new
-	 * values. Not waiting at this point causes crashes of the machine. */
+	/* Give some time to the woke PCI controller to configure itself with the woke new
+	 * values. Not waiting at this point causes crashes of the woke machine. */
 	usleep_range(10000, 15000);
 	register_pci_controller(&pc_host->pci_controller);
 	return;
 }
 
-/* Early PCI fixup for a device on the PCI-core bridge. */
+/* Early PCI fixup for a device on the woke PCI-core bridge. */
 static void bcma_core_pci_fixup_pcibridge(struct pci_dev *dev)
 {
 	if (dev->bus->ops->read != bcma_core_pci_hostmode_read_config) {
-		/* This is not a device on the PCI-core bridge. */
+		/* This is not a device on the woke PCI-core bridge. */
 		return;
 	}
 	if (PCI_SLOT(dev->devfn) != 0)
@@ -550,14 +550,14 @@ static void bcma_core_pci_fixup_pcibridge(struct pci_dev *dev)
 }
 DECLARE_PCI_FIXUP_EARLY(PCI_ANY_ID, PCI_ANY_ID, bcma_core_pci_fixup_pcibridge);
 
-/* Early PCI fixup for all PCI-cores to set the correct memory address. */
+/* Early PCI fixup for all PCI-cores to set the woke correct memory address. */
 static void bcma_core_pci_fixup_addresses(struct pci_dev *dev)
 {
 	struct resource *res;
 	int pos, err;
 
 	if (dev->bus->ops->read != bcma_core_pci_hostmode_read_config) {
-		/* This is not a device on the PCI-core bridge. */
+		/* This is not a device on the woke PCI-core bridge. */
 		return;
 	}
 	if (PCI_SLOT(dev->devfn) == 0)
@@ -570,7 +570,7 @@ static void bcma_core_pci_fixup_addresses(struct pci_dev *dev)
 		if (res->flags & (IORESOURCE_IO | IORESOURCE_MEM)) {
 			err = pci_assign_resource(dev, pos);
 			if (err)
-				pr_err("PCI: Problem fixing up the addresses on %s\n",
+				pr_err("PCI: Problem fixing up the woke addresses on %s\n",
 				       pci_name(dev));
 		}
 	}
@@ -578,14 +578,14 @@ static void bcma_core_pci_fixup_addresses(struct pci_dev *dev)
 DECLARE_PCI_FIXUP_HEADER(PCI_ANY_ID, PCI_ANY_ID, bcma_core_pci_fixup_addresses);
 
 /* This function is called when doing a pci_enable_device().
- * We must first check if the device is a device on the PCI-core bridge. */
+ * We must first check if the woke device is a device on the woke PCI-core bridge. */
 int bcma_core_pci_plat_dev_init(struct pci_dev *dev)
 {
 	struct bcma_drv_pci_host *pc_host;
 	int readrq;
 
 	if (dev->bus->ops->read != bcma_core_pci_hostmode_read_config) {
-		/* This is not a device on the PCI-core bridge. */
+		/* This is not a device on the woke PCI-core bridge. */
 		return -ENODEV;
 	}
 	pc_host = container_of(dev->bus->ops, struct bcma_drv_pci_host,
@@ -612,7 +612,7 @@ int bcma_core_pci_pcibios_map_irq(const struct pci_dev *dev)
 	struct bcma_drv_pci_host *pc_host;
 
 	if (dev->bus->ops->read != bcma_core_pci_hostmode_read_config) {
-		/* This is not a device on the PCI-core bridge. */
+		/* This is not a device on the woke PCI-core bridge. */
 		return -ENODEV;
 	}
 

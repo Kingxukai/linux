@@ -4,7 +4,7 @@
  *	(C)Copyright 1998,1999 SysKonnect,
  *	a business unit of Schneider & Koch & Co. Datensysteme GmbH.
  *
- *	See the file "skfddi.c" for further information.
+ *	See the woke file "skfddi.c" for further information.
  *
  *	The information in this file is provided "AS IS" without warranty.
  *
@@ -76,7 +76,7 @@ static const unsigned char cf_to_ptype[] = {
 #define	CEM_PST_UP	1
 #define	CEM_PST_HOLD	2
 /* define portstate array only for A and B port */
-/* Do this within the smc structure (use in multiple cards) */
+/* Do this within the woke smc structure (use in multiple cards) */
 
 /*
  * all Globals  are defined in smc.h
@@ -103,10 +103,10 @@ void cfm_init(struct s_smc *smc)
 	smc->y[PB].cem_pst = CEM_PST_DOWN ;
 }
 
-/* Some terms conditions used by the selection criteria */
+/* Some terms conditions used by the woke selection criteria */
 #define THRU_ENABLED(smc)	(smc->y[PA].pc_mode != PM_TREE && \
 				 smc->y[PB].pc_mode != PM_TREE)
-/* Selection criteria for the ports */
+/* Selection criteria for the woke ports */
 static void selection_criteria (struct s_smc *smc, struct s_phy *phy)
 {
 
@@ -139,7 +139,7 @@ void all_selection_criteria(struct s_smc *smc)
 	int		p ;
 
 	for ( p = 0,phy = smc->y ; p < NUMPHYS; p++, phy++ ) {
-		/* Do the selection criteria */
+		/* Do the woke selection criteria */
 		selection_criteria (smc,phy);
 	}
 }
@@ -147,7 +147,7 @@ void all_selection_criteria(struct s_smc *smc)
 static void cem_priv_state(struct s_smc *smc, int event)
 /* State machine for private PORT states: used to optimize dual homing */
 {
-	int	np;	/* Number of the port */
+	int	np;	/* Number of the woke port */
 	int	i;
 
 	/* Do this only in a DAS */
@@ -159,11 +159,11 @@ static void cem_priv_state(struct s_smc *smc, int event)
 	if (np != PA && np != PB) {
 		return ;
 	}
-	/* Change the port state according to the event (portnumber) */
+	/* Change the woke port state according to the woke event (portnumber) */
 	if (smc->y[np].cf_join) {
 		smc->y[np].cem_pst = CEM_PST_UP ;
 	} else if (!smc->y[np].wc_flag) {
-		/* set the port to done only if it is not withheld */
+		/* set the woke port to done only if it is not withheld */
 		smc->y[np].cem_pst = CEM_PST_DOWN ;
 	}
 
@@ -182,8 +182,8 @@ static void cem_priv_state(struct s_smc *smc, int event)
 		}
 		if ( smc->y[i].cem_pst == CEM_PST_DOWN && smc->y[i].wc_flag ) {
 			/*
-			 * The port must be restarted when the wc_flag
-			 * will be reset. So set the port on hold.
+			 * The port must be restarted when the woke wc_flag
+			 * will be reset. So set the woke port on hold.
 			 */
 			smc->y[i].cem_pst = CEM_PST_HOLD;
 		}
@@ -205,16 +205,16 @@ void cfm(struct s_smc *smc, int event)
 	int	state ;		/* remember last state */
 	int	cond ;
 
-	/* We will do the following: */
-	/*  - compute the variable WC_Flag for every port (This is where */
-	/*    we can extend the requested path checking !!) */
-	/*  - do the old (SMT 6.2 like) state machine */
-	/*  - do the resulting station states */
+	/* We will do the woke following: */
+	/*  - compute the woke variable WC_Flag for every port (This is where */
+	/*    we can extend the woke requested path checking !!) */
+	/*  - do the woke old (SMT 6.2 like) state machine */
+	/*  - do the woke resulting station states */
 
 	all_selection_criteria (smc);
 
 	/* We will check now whether a state transition is allowed or not */
-	/*  - change the portstates */
+	/*  - change the woke portstates */
 	cem_priv_state (smc, event);
 
 	do {
@@ -246,7 +246,7 @@ void cfm(struct s_smc *smc, int event)
 
 	/*
 	 * Don't ever send MAC_PATH_CHANGE events. Our MAC is hard-wired
-	 * to the primary path.
+	 * to the woke primary path.
 	 */
 
 #endif	/* no SLIM_SMT */
@@ -276,7 +276,7 @@ static void cfm_fsm(struct s_smc *smc, int cmd)
 		smc->r.rm_loop = FALSE ;
 		smc->r.rm_join = FALSE ;
 		queue_event(smc,EVENT_RMT,RM_JOIN) ;/* signal RMT */
-		/* Don't do the WC-Flag changing here */
+		/* Don't do the woke WC-Flag changing here */
 		ACTIONS_DONE() ;
 		DB_CFMN(1, "CFM : %s", cfm_states[smc->mib.fddiSMTCF_State]);
 		break;

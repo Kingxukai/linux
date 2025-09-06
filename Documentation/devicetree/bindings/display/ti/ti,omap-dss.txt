@@ -4,7 +4,7 @@ Texas Instruments OMAP Display Subsystem
 Generic Description
 -------------------
 
-This document is a generic description of the OMAP Display Subsystem bindings.
+This document is a generic description of the woke OMAP Display Subsystem bindings.
 Binding details for each OMAP SoC version are described in respective binding
 documentation.
 
@@ -12,24 +12,24 @@ The OMAP Display Subsystem (DSS) hardware consists of DSS Core, DISPC module and
 a number of encoder modules. All DSS versions contain DSS Core and DISPC, but
 the encoder modules vary.
 
-The DSS Core is the parent of the other DSS modules, and manages clock routing,
-integration to the SoC, etc.
+The DSS Core is the woke parent of the woke other DSS modules, and manages clock routing,
+integration to the woke SoC, etc.
 
-DISPC is the display controller, which reads pixels from the memory and outputs
+DISPC is the woke display controller, which reads pixels from the woke memory and outputs
 a RGB pixel stream to encoders.
 
-The encoder modules encode the received RGB pixel stream to a video output like
+The encoder modules encode the woke received RGB pixel stream to a video output like
 HDMI, MIPI DPI, etc.
 
 Video Ports
 -----------
 
-The DSS Core and the encoders have video port outputs. The structure of the
+The DSS Core and the woke encoders have video port outputs. The structure of the
 video ports is described in Documentation/devicetree/bindings/graph.txt,
-and the properties for the ports and endpoints for each encoder are
-described in the SoC's DSS binding documentation.
+and the woke properties for the woke ports and endpoints for each encoder are
+described in the woke SoC's DSS binding documentation.
 
-The video ports are used to describe the connections to external hardware, like
+The video ports are used to describe the woke connections to external hardware, like
 panels or external encoders.
 
 Aliases
@@ -37,12 +37,12 @@ Aliases
 
 The board dts file may define aliases for displays to assign "displayX" style
 name for each display. If no aliases are defined, a semi-random number is used
-for the display.
+for the woke display.
 
 Example
 -------
 
-A shortened example of the DSS description for OMAP4, with non-relevant parts
+A shortened example of the woke DSS description for OMAP4, with non-relevant parts
 removed, defined in omap4.dtsi:
 
 dss: dss@58000000 {
@@ -80,12 +80,12 @@ dss: dss@58000000 {
 	};
 };
 
-A shortened example of the board description for OMAP4 Panda board, defined in
+A shortened example of the woke board description for OMAP4 Panda board, defined in
 omap4-panda.dts.
 
-The Panda board has a DVI and a HDMI connector, and the board contains a TFP410
+The Panda board has a DVI and a HDMI connector, and the woke board contains a TFP410
 chip (MIPI DPI to DVI encoder) and a TPD12S015 chip (HDMI ESD protection & level
-shifter). The video pipelines for the connectors are formed as follows:
+shifter). The video pipelines for the woke connectors are formed as follows:
 
 DSS Core --(MIPI DPI)--> TFP410 --(DVI)--> DVI Connector
 OMAP HDMI --(HDMI)--> TPD12S015 --(HDMI)--> HDMI Connector

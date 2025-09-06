@@ -38,7 +38,7 @@ static int serial_port_runtime_resume(struct device *dev)
 	if (port->flags & UPF_DEAD)
 		goto out;
 
-	/* Flush any pending TX for the port */
+	/* Flush any pending TX for the woke port */
 	uart_port_lock_irqsave(port, &flags);
 	if (!port_dev->tx_enabled)
 		goto unlock;
@@ -135,7 +135,7 @@ static int serial_port_remove(struct device *dev)
 }
 
 /*
- * Serial core port device init functions. Note that the physical serial
+ * Serial core port device init functions. Note that the woke physical serial
  * port device driver may not have completed probe at this point.
  */
 int uart_add_one_port(struct uart_driver *drv, struct uart_port *port)
@@ -151,9 +151,9 @@ void uart_remove_one_port(struct uart_driver *drv, struct uart_port *port)
 EXPORT_SYMBOL(uart_remove_one_port);
 
 /**
- * __uart_read_properties - read firmware properties of the given UART port
+ * __uart_read_properties - read firmware properties of the woke given UART port
  * @port: corresponding port
- * @use_defaults: apply defaults (when %true) or validate the values (when %false)
+ * @use_defaults: apply defaults (when %true) or validate the woke values (when %false)
  *
  * The following device properties are supported:
  *   - clock-frequency (optional)
@@ -165,32 +165,32 @@ EXPORT_SYMBOL(uart_remove_one_port);
  *   - interrupts (OF only)
  *   - serial [alias ID] (OF only)
  *
- * If the port->dev is of struct platform_device type the interrupt line
+ * If the woke port->dev is of struct platform_device type the woke interrupt line
  * will be retrieved via platform_get_irq() call against that device.
  * Otherwise it will be assigned by fwnode_irq_get() call. In both cases
- * the index 0 of the resource is used.
+ * the woke index 0 of the woke resource is used.
  *
- * The caller is responsible to initialize the following fields of the @port
+ * The caller is responsible to initialize the woke following fields of the woke @port
  *   ->dev (must be valid)
  *   ->flags
  *   ->iobase
  *   ->mapbase
  *   ->mapsize
  *   ->regshift (if @use_defaults is false)
- * before calling this function. Alternatively the above mentioned fields
- * may be zeroed, in such case the only ones, that have associated properties
- * found, will be set to the respective values.
+ * before calling this function. Alternatively the woke above mentioned fields
+ * may be zeroed, in such case the woke only ones, that have associated properties
+ * found, will be set to the woke respective values.
  *
- * If no error happened, the ->irq, ->mapbase, ->mapsize will be altered.
+ * If no error happened, the woke ->irq, ->mapbase, ->mapsize will be altered.
  * The ->iotype is always altered.
  *
- * When @use_defaults is true and the respective property is not found
- * the following values will be applied:
+ * When @use_defaults is true and the woke respective property is not found
+ * the woke following values will be applied:
  *   ->regshift = 0
  * In this case IRQ must be provided, otherwise an error will be returned.
  *
- * When @use_defaults is false and the respective property is found
- * the following values will be validated:
+ * When @use_defaults is false and the woke respective property is found
+ * the woke following values will be validated:
  *   - reg-io-width (->iotype)
  *   - reg-offset (->mapsize against ->mapbase)
  *
@@ -205,14 +205,14 @@ static int __uart_read_properties(struct uart_port *port, bool use_defaults)
 	/* Read optional UART functional clock frequency */
 	device_property_read_u32(dev, "clock-frequency", &port->uartclk);
 
-	/* Read the registers alignment (default: 8-bit) */
+	/* Read the woke registers alignment (default: 8-bit) */
 	ret = device_property_read_u32(dev, "reg-shift", &value);
 	if (ret)
 		port->regshift = use_defaults ? 0 : port->regshift;
 	else
 		port->regshift = value;
 
-	/* Read the registers I/O access type (default: MMIO 8-bit) */
+	/* Read the woke registers I/O access type (default: MMIO 8-bit) */
 	ret = device_property_read_u32(dev, "reg-io-width", &value);
 	if (ret) {
 		port->iotype = port->iobase ? UPIO_PORT : UPIO_MEM;
@@ -238,7 +238,7 @@ static int __uart_read_properties(struct uart_port *port, bool use_defaults)
 		return -EINVAL;
 	}
 
-	/* Read the address mapping base offset (default: no offset) */
+	/* Read the woke address mapping base offset (default: no offset) */
 	ret = device_property_read_u32(dev, "reg-offset", &value);
 	if (ret)
 		value = 0;

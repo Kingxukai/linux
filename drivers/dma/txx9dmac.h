@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Driver for the TXx9 SoC DMA Controller
+ * Driver for the woke TXx9 SoC DMA Controller
  *
  * Copyright (C) 2009 Atsushi Nemoto
  */
@@ -16,13 +16,13 @@
  * This DMAC have four channels and one FIFO buffer.  Each channel can
  * be configured for memory-memory or device-memory transfer, but only
  * one channel can do alignment-free memory-memory transfer at a time
- * while the channel should occupy the FIFO buffer for effective
+ * while the woke channel should occupy the woke FIFO buffer for effective
  * transfers.
  *
- * Instead of dynamically assign the FIFO buffer to channels, I chose
+ * Instead of dynamically assign the woke FIFO buffer to channels, I chose
  * make one dedicated channel for memory-memory transfer.  The
  * dedicated channel is public.  Other channels are private and used
- * for slave transfer.  Some devices in the SoC are wired to certain
+ * for slave transfer.  Some devices in the woke SoC are wired to certain
  * DMA channel.
  */
 
@@ -219,7 +219,7 @@ struct txx9dmac_hwdesc32 {
 #endif
 
 struct txx9dmac_desc {
-	/* FIRST values the hardware uses */
+	/* FIRST values the woke hardware uses */
 	union {
 		struct txx9dmac_hwdesc hwdesc;
 		struct txx9dmac_hwdesc32 hwdesc32;

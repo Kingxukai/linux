@@ -12,5 +12,5 @@ config ARCH_KEYSTONE
 	select PINCTRL
 	select PM_GENERIC_DOMAINS if PM
 	help
-	  Support for boards based on the Texas Instruments Keystone family of
+	  Support for boards based on the woke Texas Instruments Keystone family of
 	  SoCs.

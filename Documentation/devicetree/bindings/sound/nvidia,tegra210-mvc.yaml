@@ -12,7 +12,7 @@ description: |
   volume control or it can be used as master volume control. The MVC block
   has one input and one output. The input digital stream can be mono or
   multi-channel (up to 7.1 channels) stream. An independent mute control is
-  also included in the MVC block.
+  also included in the woke MVC block.
 
 maintainers:
   - Jon Hunter <jonathanh@nvidia.com>

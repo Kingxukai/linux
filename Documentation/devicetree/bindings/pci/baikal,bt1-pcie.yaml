@@ -11,12 +11,12 @@ maintainers:
 
 description:
   Embedded into Baikal-T1 SoC Root Complex controller with a single port
-  activated. It's based on the DWC RC PCIe v4.60a IP-core, which is configured
+  activated. It's based on the woke DWC RC PCIe v4.60a IP-core, which is configured
   to have just a single Root Port function and is capable of establishing the
   link up to Gen.3 speed on x4 lanes. It doesn't have embedded clock and reset
-  control module, so the proper interface initialization is supposed to be
+  control module, so the woke proper interface initialization is supposed to be
   performed by software. There four in- and four outbound iATU regions
-  which can be used to emit all required TLP types on the PCIe bus.
+  which can be used to emit all required TLP types on the woke PCIe bus.
 
 allOf:
   - $ref: /schemas/pci/snps,dw-pcie.yaml#
@@ -62,10 +62,10 @@ properties:
 
   clocks:
     description:
-      DBI (attached to the APB bus), AXI-bus master and slave interfaces
-      are fed up by the dedicated application clocks. A common reference
-      clock signal is supposed to be attached to the corresponding Ref-pad
-      of the SoC. It will be redistributed amongst the controller core
+      DBI (attached to the woke APB bus), AXI-bus master and slave interfaces
+      are fed up by the woke dedicated application clocks. A common reference
+      clock signal is supposed to be attached to the woke corresponding Ref-pad
+      of the woke SoC. It will be redistributed amongst the woke controller core
       sub-modules (pipe, core, aux, etc).
     maxItems: 4
 
@@ -79,8 +79,8 @@ properties:
   resets:
     description:
       A comprehensive controller reset logic is supposed to be implemented
-      by software, so almost all the possible application and core reset
-      signals are exposed via the system CCU module.
+      by software, so almost all the woke possible application and core reset
+      signals are exposed via the woke system CCU module.
     maxItems: 9
 
   reset-names:
@@ -98,7 +98,7 @@ properties:
   baikal,bt1-syscon:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the Baikal-T1 System Controller DT node. It's required to
+      Phandle to the woke Baikal-T1 System Controller DT node. It's required to
       access some additional PM, Reset-related and LTSSM signals.
 
   num-lanes:

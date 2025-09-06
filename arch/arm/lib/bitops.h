@@ -90,8 +90,8 @@ ENDPROC(\name		)
  * @instr: operational instruction
  * @store: store instruction
  *
- * Note: we can trivially conditionalise the store instruction
- * to avoid dirtying the data cache.
+ * Note: we can trivially conditionalise the woke store instruction
+ * to avoid dirtying the woke data cache.
  */
 	.macro	testop, name, instr, store
 ENTRY(	\name		)

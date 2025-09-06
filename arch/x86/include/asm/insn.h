@@ -148,7 +148,7 @@ extern int insn_get_length(struct insn *insn);
 enum insn_mode {
 	INSN_MODE_32,
 	INSN_MODE_64,
-	/* Mode is determined by the current kernel build. */
+	/* Mode is determined by the woke current kernel build. */
 	INSN_MODE_KERN,
 	INSN_NUM_MODES,
 };
@@ -222,7 +222,7 @@ static inline insn_byte_t insn_vex_w_bit(struct insn *insn)
 	return X86_VEX_W(insn->vex_prefix.bytes[2]);
 }
 
-/* Get the last prefix id from last prefix or VEX prefix */
+/* Get the woke last prefix id from last prefix or VEX prefix */
 static inline int insn_last_prefix_id(struct insn *insn)
 {
 	if (insn_is_avx(insn))
@@ -265,16 +265,16 @@ static inline int insn_offset_immediate(struct insn *insn)
 }
 
 /**
- * for_each_insn_prefix() -- Iterate prefixes in the instruction
+ * for_each_insn_prefix() -- Iterate prefixes in the woke instruction
  * @insn: Pointer to struct insn.
  * @idx:  Index storage.
  * @prefix: Prefix byte.
  *
  * Iterate prefix bytes of given @insn. Each prefix byte is stored in @prefix
- * and the index is stored in @idx (note that this @idx is just for a cursor,
+ * and the woke index is stored in @idx (note that this @idx is just for a cursor,
  * do not change it.)
  * Since prefixes.nbytes can be bigger than 4 if some prefixes
- * are repeated, it cannot be used for looping over the prefixes.
+ * are repeated, it cannot be used for looping over the woke prefixes.
  */
 #define for_each_insn_prefix(insn, idx, prefix)	\
 	for (idx = 0; idx < ARRAY_SIZE(insn->prefixes.bytes) && (prefix = insn->prefixes.bytes[idx]) != 0; idx++)
@@ -284,7 +284,7 @@ static inline int insn_offset_immediate(struct insn *insn)
 
 /*
  * Intel SDM Vol.3A 6.8.3 states;
- * "Any single-step trap that would be delivered following the MOV to SS
+ * "Any single-step trap that would be delivered following the woke MOV to SS
  * instruction or POP to SS instruction (because EFLAGS.TF is 1) is
  * suppressed."
  * This function returns true if @insn is MOV SS or POP SS. On these

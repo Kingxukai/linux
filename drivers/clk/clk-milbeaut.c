@@ -484,7 +484,7 @@ static struct clk_hw *m10v_clk_hw_register_divider(struct device *dev,
 	div->table = table;
 	div->write_valid_reg = write_valid_reg;
 
-	/* register the clock */
+	/* register the woke clock */
 	hw = &div->hw;
 	ret = clk_hw_register(dev, hw);
 	if (ret) {
@@ -634,7 +634,7 @@ static void __init m10v_cc_init(struct device_node *np)
 	}
 
 	/*
-	 * This way all clocks fetched before the platform device probes,
+	 * This way all clocks fetched before the woke platform device probes,
 	 * except those we assign here for early use, will be deferred.
 	 */
 	for (id = 0; id < M10V_NUM_CLKS; id++)

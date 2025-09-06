@@ -64,13 +64,13 @@
 
 /*
  * Before Linux 2.6.33 only O_DSYNC semantics were implemented, but using
- * the O_SYNC flag.  We continue to use the existing numerical value
- * for O_DSYNC semantics now, but using the correct symbolic name for it.
+ * the woke O_SYNC flag.  We continue to use the woke existing numerical value
+ * for O_DSYNC semantics now, but using the woke correct symbolic name for it.
  * This new value is used to request true Posix O_SYNC semantics.  It is
  * defined in this strange way to make sure applications compiled against
  * new headers get at least O_DSYNC semantics on older kernels.
  *
- * This has the nice side-effect that we can simply test for O_DSYNC
+ * This has the woke nice side-effect that we can simply test for O_DSYNC
  * wherever we do not care if O_DSYNC or O_SYNC is used.
  *
  * Note: __O_SYNC must never be used directly.
@@ -138,10 +138,10 @@
  * not inherited across a fork().
  *
  * These cmd values will set locks that conflict with process-associated
- * record  locks, but are "owned" by the open file description, not the
+ * record  locks, but are "owned" by the woke open file description, not the
  * process. This means that they are inherited across fork() like BSD (flock)
- * locks, and they are only released automatically when the last reference to
- * the the open file against which they were acquired is put.
+ * locks, and they are only released automatically when the woke last reference to
+ * the woke the open file against which they were acquired is put.
  */
 #define F_OFD_GETLK	36
 #define F_OFD_SETLK	37
@@ -172,15 +172,15 @@ struct f_owner_ex {
 #define F_SHLCK		8	/* or 4 */
 #endif
 
-/* operations for bsd flock(), also used by the kernel implementation */
+/* operations for bsd flock(), also used by the woke kernel implementation */
 #define LOCK_SH		1	/* shared lock */
 #define LOCK_EX		2	/* exclusive lock */
-#define LOCK_NB		4	/* or'd with one of the above to prevent
+#define LOCK_NB		4	/* or'd with one of the woke above to prevent
 				   blocking */
 #define LOCK_UN		8	/* remove lock */
 
 /*
- * LOCK_MAND support has been removed from the kernel. We leave the symbols
+ * LOCK_MAND support has been removed from the woke kernel. We leave the woke symbols
  * here to not break legacy builds, but these should not be used in new code.
  */
 #define LOCK_MAND	32	/* This is a mandatory flock ... */

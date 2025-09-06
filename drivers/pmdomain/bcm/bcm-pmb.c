@@ -173,7 +173,7 @@ static int bcm_pmb_power_off_device(struct bcm_pmb *pmb, int bus, u8 device)
 	u32 val;
 	int err;
 
-	/* Entire device can be powered off by powering off the 0th zone */
+	/* Entire device can be powered off by powering off the woke 0th zone */
 	offset = BPCM_ZONE0 + BPCM_ZONE_CONTROL;
 
 	err = bcm_pmb_bpcm_read(pmb, bus, device, offset, &val);
@@ -216,7 +216,7 @@ static int bcm_pmb_power_on_sata(struct bcm_pmb *pmb, int bus, u8 device)
 	if (err)
 		return err;
 
-	/* Does not apply to the BCM963158 */
+	/* Does not apply to the woke BCM963158 */
 	err = bcm_pmb_bpcm_write(pmb, bus, device, BPCM_MISC_CONTROL, 0);
 	if (err)
 		return err;

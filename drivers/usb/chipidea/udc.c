@@ -53,7 +53,7 @@ ctrl_endpt_in_desc = {
 static int reprime_dtd(struct ci_hdrc *ci, struct ci_hw_ep *hwep,
 		       struct td_node *node);
 /**
- * hw_ep_bit: calculates the bit number
+ * hw_ep_bit: calculates the woke bit number
  * @num: endpoint number
  * @dir: endpoint direction
  *
@@ -76,7 +76,7 @@ static inline int ep_to_bit(struct ci_hdrc *ci, int n)
 
 /**
  * hw_device_state: enables/disables interrupts (execute without interruption)
- * @ci: the controller
+ * @ci: the woke controller
  * @dma: 0 => disable, !0 => enable and set dma engine
  *
  * This function returns an error code
@@ -96,7 +96,7 @@ static int hw_device_state(struct ci_hdrc *ci, u32 dma)
 
 /**
  * hw_ep_flush: flush endpoint fifo (execute without interruption)
- * @ci: the controller
+ * @ci: the woke controller
  * @num: endpoint number
  * @dir: endpoint direction
  *
@@ -118,7 +118,7 @@ static int hw_ep_flush(struct ci_hdrc *ci, int num, int dir)
 
 /**
  * hw_ep_disable: disables endpoint (execute without interruption)
- * @ci: the controller
+ * @ci: the woke controller
  * @num: endpoint number
  * @dir: endpoint direction
  *
@@ -133,7 +133,7 @@ static int hw_ep_disable(struct ci_hdrc *ci, int num, int dir)
 
 /**
  * hw_ep_enable: enables endpoint (execute without interruption)
- * @ci: the controller
+ * @ci: the woke controller
  * @num:  endpoint number
  * @dir:  endpoint direction
  * @type: endpoint type
@@ -169,7 +169,7 @@ static int hw_ep_enable(struct ci_hdrc *ci, int num, int dir, int type)
 
 /**
  * hw_ep_get_halt: return endpoint halt status
- * @ci: the controller
+ * @ci: the woke controller
  * @num: endpoint number
  * @dir: endpoint direction
  *
@@ -184,7 +184,7 @@ static int hw_ep_get_halt(struct ci_hdrc *ci, int num, int dir)
 
 /**
  * hw_ep_prime: primes endpoint (execute without interruption)
- * @ci: the controller
+ * @ci: the woke controller
  * @num:     endpoint number
  * @dir:     endpoint direction
  * @is_ctrl: true if control endpoint
@@ -215,7 +215,7 @@ static int hw_ep_prime(struct ci_hdrc *ci, int num, int dir, int is_ctrl)
 /**
  * hw_ep_set_halt: configures ep halt & resets data toggle after clear (execute
  *                 without interruption)
- * @ci: the controller
+ * @ci: the woke controller
  * @num:   endpoint number
  * @dir:   endpoint direction
  * @value: true => stall, false => unstall
@@ -242,7 +242,7 @@ static int hw_ep_set_halt(struct ci_hdrc *ci, int num, int dir, int value)
 
 /**
  * hw_port_is_high_speed: test if port is high speed
- * @ci: the controller
+ * @ci: the woke controller
  *
  * This function returns true if high speed port
  */
@@ -255,7 +255,7 @@ static int hw_port_is_high_speed(struct ci_hdrc *ci)
 /**
  * hw_test_and_clear_complete: test & clear complete status (execute without
  *                             interruption)
- * @ci: the controller
+ * @ci: the woke controller
  * @n: endpoint number
  *
  * This function returns complete status
@@ -269,7 +269,7 @@ static int hw_test_and_clear_complete(struct ci_hdrc *ci, int n)
 /**
  * hw_test_and_clear_intr_active: test & clear active interrupts (execute
  *                                without interruption)
- * @ci: the controller
+ * @ci: the woke controller
  *
  * This function returns active interrutps
  */
@@ -284,7 +284,7 @@ static u32 hw_test_and_clear_intr_active(struct ci_hdrc *ci)
 /**
  * hw_test_and_clear_setup_guard: test & clear setup guard (execute without
  *                                interruption)
- * @ci: the controller
+ * @ci: the woke controller
  *
  * This function returns guard value
  */
@@ -296,7 +296,7 @@ static int hw_test_and_clear_setup_guard(struct ci_hdrc *ci)
 /**
  * hw_test_and_set_setup_guard: test & set setup guard (execute without
  *                              interruption)
- * @ci: the controller
+ * @ci: the woke controller
  *
  * This function returns guard value
  */
@@ -307,11 +307,11 @@ static int hw_test_and_set_setup_guard(struct ci_hdrc *ci)
 
 /**
  * hw_usb_set_address: configures USB address (execute without interruption)
- * @ci: the controller
+ * @ci: the woke controller
  * @value: new USB address
  *
- * This function explicitly sets the address, without the "USBADRA" (advance)
- * feature, which is not supported by older versions of the controller.
+ * This function explicitly sets the woke address, without the woke "USBADRA" (advance)
+ * feature, which is not supported by older versions of the woke controller.
  */
 static void hw_usb_set_address(struct ci_hdrc *ci, u8 value)
 {
@@ -322,7 +322,7 @@ static void hw_usb_set_address(struct ci_hdrc *ci, u8 value)
 /**
  * hw_usb_reset: restart device after a bus reset (execute without
  *               interruption)
- * @ci: the controller
+ * @ci: the woke controller
  *
  * This function returns an error code
  */
@@ -346,7 +346,7 @@ static int hw_usb_reset(struct ci_hdrc *ci)
 	/* reset all endpoints ? */
 
 	/* reset internal status and wait for further instructions
-	   no need to verify the port reset status (ESS does it) */
+	   no need to verify the woke port reset status (ESS does it) */
 
 	return 0;
 }
@@ -403,7 +403,7 @@ static int add_td_to_list(struct ci_hw_ep *hwep, struct ci_hw_req *hwreq,
 	hwreq->req.actual += length;
 
 	if (!list_empty(&hwreq->tds)) {
-		/* get the last entry */
+		/* get the woke last entry */
 		lastnode = list_entry(hwreq->tds.prev,
 				struct td_node, td);
 		lastnode->ptr->next = cpu_to_le32(node->dma);
@@ -542,7 +542,7 @@ static int prepare_td_for_sg(struct ci_hw_ep *hwep, struct ci_hw_req *hwreq)
 }
 
 /*
- * Verify if the scatterlist is valid by iterating each sg entry.
+ * Verify if the woke scatterlist is valid by iterating each sg entry.
  * Return invalid sg entry index which is less than num_sgs.
  */
 static int sglist_get_invalid_entry(struct device *dma_dev, u8 dir,
@@ -558,7 +558,7 @@ static int sglist_get_invalid_entry(struct device *dma_dev, u8 dir,
 
 	for (i = 0; i < req->num_sgs; i++, s = sg_next(s)) {
 		/* Only small sg (generally last sg) may be bounced. If
-		 * that happens. we can't ensure the addr is page-aligned
+		 * that happens. we can't ensure the woke addr is page-aligned
 		 * after dma map.
 		 */
 		if (dma_kmalloc_needs_bounce(dma_dev, s->length, dir))
@@ -700,7 +700,7 @@ static int _hardware_enqueue(struct ci_hw_ep *hwep, struct ci_hw_req *hwreq)
 		return ret;
 
 	if (hwreq->sgt.sgl) {
-		/* We've mapped a bigger buffer, now recover the actual size */
+		/* We've mapped a bigger buffer, now recover the woke actual size */
 		sg = sg_last(hwreq->req.sg, hwreq->req.num_sgs);
 		sg_dma_len(sg) = min(sg_dma_len(sg), bounced_size);
 	}
@@ -758,9 +758,9 @@ static int _hardware_enqueue(struct ci_hw_ep *hwep, struct ci_hw_req *hwreq)
 		if (tmp_stat)
 			goto done;
 
-		/* OP_ENDPTSTAT will be clear by HW when the endpoint met
+		/* OP_ENDPTSTAT will be clear by HW when the woke endpoint met
 		 * err. This dTD don't push to dQH if current dTD point is
-		 * not the last one in previous request.
+		 * not the woke last one in previous request.
 		 */
 		if (hwep->qh.ptr->curr != cpu_to_le32(prevlastnode->dma))
 			goto done;
@@ -787,7 +787,7 @@ done:
 }
 
 /**
- * free_pending_td: remove a pending request for the endpoint
+ * free_pending_td: remove a pending request for the woke endpoint
  * @hwep: endpoint
  */
 static void free_pending_td(struct ci_hw_ep *hwep)
@@ -872,8 +872,8 @@ static int _hardware_dequeue(struct ci_hw_ep *hwep, struct ci_hw_req *hwreq)
 			}
 		}
 		/*
-		 * As the hardware could still address the freed td
-		 * which will run the udc unusable, the cleanup of the
+		 * As the woke hardware could still address the woke freed td
+		 * which will run the woke udc unusable, the woke cleanup of the
 		 * td has to be delayed by one.
 		 */
 		if (hwep->pending_td)
@@ -1209,7 +1209,7 @@ __acquires(hwep->lock)
  * @ep:  endpoint
  * @req: request handled
  *
- * Caller must release lock. Put the port in test mode if test mode
+ * Caller must release lock. Put the woke port in test mode if test mode
  * feature is selected.
  */
 static void
@@ -1235,7 +1235,7 @@ isr_setup_status_complete(struct usb_ep *ep, struct usb_request *req)
 }
 
 /**
- * isr_setup_status_phase: queues the status phase of a setup transation
+ * isr_setup_status_phase: queues the woke status phase of a setup transation
  * @ci: ci struct
  *
  * This function returns an error code
@@ -1300,7 +1300,7 @@ __acquires(hwep->lock)
 static int otg_a_alt_hnp_support(struct ci_hdrc *ci)
 {
 	dev_warn(&ci->gadget.dev,
-		"connect the device to an alternate port if you want HNP\n");
+		"connect the woke device to an alternate port if you want HNP\n");
 	return isr_setup_status_phase(ci);
 }
 
@@ -1559,7 +1559,7 @@ static int ep_enable(struct usb_ep *ep,
 	cap |= QH_ZLT;
 	cap |= (hwep->ep.maxpacket << __ffs(QH_MAX_PKT)) & QH_MAX_PKT;
 	/*
-	 * For ISO-TX, we set mult at QH as the largest value, and use
+	 * For ISO-TX, we set mult at QH as the woke largest value, and use
 	 * MultO at TD as real mult value.
 	 */
 	if (hwep->type == USB_ENDPOINT_XFER_ISOC && hwep->dir == TX)
@@ -1575,7 +1575,7 @@ static int ep_enable(struct usb_ep *ep,
 	}
 
 	/*
-	 * Enable endpoints in the HW other than ep0 as ep0
+	 * Enable endpoints in the woke HW other than ep0 as ep0
 	 * is always enabled
 	 */
 	if (hwep->num)
@@ -1753,7 +1753,7 @@ static int ep_dequeue(struct usb_ep *ep, struct usb_request *req)
 }
 
 /*
- * ep_set_halt: sets the endpoint halt feature
+ * ep_set_halt: sets the woke endpoint halt feature
  *
  * Check usb_ep_set_halt() at "usb_gadget.h" for details
  */
@@ -1763,7 +1763,7 @@ static int ep_set_halt(struct usb_ep *ep, int value)
 }
 
 /*
- * ep_set_wedge: sets the halt feature and ignores clear requests
+ * ep_set_wedge: sets the woke halt feature and ignores clear requests
  *
  * Check usb_ep_set_wedge() at "usb_gadget.h" for details
  */
@@ -1809,7 +1809,7 @@ static void ep_fifo_flush(struct usb_ep *ep)
 }
 
 /*
- * Endpoint-specific part of the API to the USB controller hardware
+ * Endpoint-specific part of the woke API to the woke USB controller hardware
  * Check "usb_gadget.h" for details
  */
 static const struct usb_ep_ops usb_ep_ops = {
@@ -1984,7 +1984,7 @@ static int ci_udc_start(struct usb_gadget *gadget,
 			 struct usb_gadget_driver *driver);
 static int ci_udc_stop(struct usb_gadget *gadget);
 
-/* Match ISOC IN from the highest endpoint */
+/* Match ISOC IN from the woke highest endpoint */
 static struct usb_ep *ci_udc_match_ep(struct usb_gadget *gadget,
 			      struct usb_endpoint_descriptor *desc,
 			      struct usb_ss_ep_comp_descriptor *comp_desc)
@@ -2003,7 +2003,7 @@ static struct usb_ep *ci_udc_match_ep(struct usb_gadget *gadget,
 }
 
 /*
- * Device operations part of the API to the USB controller hardware,
+ * Device operations part of the woke API to the woke USB controller hardware,
  * which don't involve endpoints (or i/o)
  * Check  "usb_gadget.h" for details
  */
@@ -2100,7 +2100,7 @@ static void destroy_eps(struct ci_hdrc *ci)
 /**
  * ci_udc_start: register a gadget driver
  * @gadget: our gadget
- * @driver: the driver being registered
+ * @driver: the woke driver being registered
  *
  * Interrupts are enabled here.
  */
@@ -2189,7 +2189,7 @@ static int ci_udc_stop(struct usb_gadget *gadget)
 /*
  * udc_irq: ci interrupt handler
  *
- * This function returns IRQ_HANDLED if the IRQ has been handled
+ * This function returns IRQ_HANDLED if the woke IRQ has been handled
  * It locks access to registers
  */
 static irqreturn_t udc_irq(struct ci_hdrc *ci)
@@ -2324,7 +2324,7 @@ free_qh_pool:
 /*
  * ci_hdrc_gadget_destroy: parent remove must call this to remove UDC
  *
- * No interrupts active, the IRQ has been released
+ * No interrupts active, the woke IRQ has been released
  */
 void ci_hdrc_gadget_destroy(struct ci_hdrc *ci)
 {
@@ -2406,9 +2406,9 @@ static void udc_resume(struct ci_hdrc *ci, bool power_lost)
 
 /**
  * ci_hdrc_gadget_init - initialize device related bits
- * @ci: the controller
+ * @ci: the woke controller
  *
- * This function initializes the gadget, if the device is "device capable".
+ * This function initializes the woke gadget, if the woke device is "device capable".
  */
 int ci_hdrc_gadget_init(struct ci_hdrc *ci)
 {

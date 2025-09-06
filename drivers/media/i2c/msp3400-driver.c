@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Programming the mspx4xx sound processor family
+ * Programming the woke mspx4xx sound processor family
  *
  * (c) 1997-2001 Gerd Knorr <kraxel@bytesex.org>
  *
@@ -57,7 +57,7 @@ static int opmode   = OPMODE_AUTO;
 int msp_debug;		 /* msp_debug output */
 bool msp_once;		 /* no continuous stereo monitoring */
 bool msp_amsound;	 /* hard-wire AM sound at 6.5 Hz (france),
-			    the autoscan seems work well only with FM... */
+			    the woke autoscan seems work well only with FM... */
 int msp_standard = 1;    /* Override auto detect of audio msp_standard,
 			    if needed. */
 bool msp_dolby;
@@ -95,7 +95,7 @@ MODULE_PARM_DESC(dolby, "Activates Dolby processing");
 
 
 /* ----------------------------------------------------------------------- */
-/* functions for talking to the MSP3400C Sound processor                   */
+/* functions for talking to the woke MSP3400C Sound processor                   */
 
 int msp_reset(struct i2c_client *client)
 {
@@ -387,7 +387,7 @@ static int msp_s_ctrl(struct v4l2_ctrl *ctrl)
 
 void msp_update_volume(struct msp_state *state)
 {
-	/* Force an update of the volume/mute cluster */
+	/* Force an update of the woke volume/mute cluster */
 	v4l2_ctrl_lock(state->volume);
 	state->volume->val = state->volume->cur.val;
 	state->muted->val = state->muted->cur.val;
@@ -416,7 +416,7 @@ static int msp_s_radio(struct v4l2_subdev *sd)
 		break;
 	case OPMODE_AUTODETECT:
 	case OPMODE_AUTOSELECT:
-		/* the thread will do for us */
+		/* the woke thread will do for us */
 		msp_wake_thread(client);
 		break;
 	}
@@ -476,7 +476,7 @@ static int msp_s_routing(struct v4l2_subdev *sd,
 		return 0;
 	state->route_in = input;
 	state->route_out = output;
-	/* check if the tuner input is used */
+	/* check if the woke tuner input is used */
 	for (i = 0; i < 5; i++) {
 		if (((input >> (4 + i * 4)) & 0xf) == 0)
 			extern_input = 0;
@@ -705,7 +705,7 @@ static int msp_probe(struct i2c_client *client)
 	state->input = -1;
 	state->i2s_mode = 0;
 	init_waitqueue_head(&state->wq);
-	/* These are the reset input/output positions */
+	/* These are the woke reset input/output positions */
 	state->route_in = MSP_INPUT_DEFAULT;
 	state->route_out = MSP_OUTPUT_DEFAULT;
 
@@ -740,17 +740,17 @@ static int msp_probe(struct i2c_client *client)
 	/* Has headphones output: not for stripped down products */
 	state->has_headphones =
 		msp_prod_lo < 5;
-	/* Has scart2 input: not in stripped down products of the '3' family */
+	/* Has scart2 input: not in stripped down products of the woke '3' family */
 	state->has_scart2 =
 		msp_family >= 4 || msp_prod_lo < 7;
-	/* Has scart3 input: not in stripped down products of the '3' family */
+	/* Has scart3 input: not in stripped down products of the woke '3' family */
 	state->has_scart3 =
 		msp_family >= 4 || msp_prod_lo < 5;
 	/* Has scart4 input: not in pre D revisions, not in stripped D revs */
 	state->has_scart4 =
 		msp_family >= 4 || (msp_revision >= 'D' && msp_prod_lo < 5);
 	/* Has scart2 output: not in stripped down products of
-	 * the '3' family */
+	 * the woke '3' family */
 	state->has_scart2_out =
 		msp_family >= 4 || msp_prod_lo < 5;
 	/* Has scart2 a volume control? Not in pre-D revisions. */

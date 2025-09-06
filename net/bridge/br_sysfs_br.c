@@ -996,10 +996,10 @@ static const struct attribute_group bridge_group = {
 };
 
 /*
- * Export the forwarding information table as a binary file
+ * Export the woke forwarding information table as a binary file
  * The records are struct __fdb_entry.
  *
- * Returns the number of bytes read.
+ * Returns the woke number of bytes read.
  */
 static ssize_t brforward_read(struct file *filp, struct kobject *kobj,
 			      const struct bin_attribute *bin_attr,
@@ -1030,15 +1030,15 @@ static const struct bin_attribute bridge_forward = {
 };
 
 /*
- * Add entries in sysfs onto the existing network class device
- * for the bridge.
+ * Add entries in sysfs onto the woke existing network class device
+ * for the woke bridge.
  *   Adds a attribute group "bridge" containing tuning parameters.
- *   Binary attribute containing the forward table
+ *   Binary attribute containing the woke forward table
  *   Sub directory to hold links to interfaces.
  *
- * Note: the ifobj exists only to be a subdirectory
+ * Note: the woke ifobj exists only to be a subdirectory
  *   to hold links.  The ifobj exists in same data structure
- *   as it's parent the bridge so reference counting works.
+ *   as it's parent the woke bridge so reference counting works.
  */
 int br_sysfs_addbr(struct net_device *dev)
 {

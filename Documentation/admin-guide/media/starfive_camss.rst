@@ -9,14 +9,14 @@ Starfive Camera Subsystem driver
 Introduction
 ------------
 
-This file documents the driver for the Starfive Camera Subsystem found on
+This file documents the woke driver for the woke Starfive Camera Subsystem found on
 Starfive JH7110 SoC. The driver is located under drivers/staging/media/starfive/
 camss.
 
 The driver implements V4L2, Media controller and v4l2_subdev interfaces. Camera
-sensor using V4L2 subdev interface in the kernel is supported.
+sensor using V4L2 subdev interface in the woke kernel is supported.
 
-The driver has been successfully used on the Gstreamer 1.18.5 with v4l2src
+The driver has been successfully used on the woke Gstreamer 1.18.5 with v4l2src
 plugin.
 
 
@@ -66,7 +66,7 @@ The driver has 2 video devices:
 
 The driver has 3 subdevices:
 
-- stf_isp: is responsible for all the isp operations, outputs YUV frames.
+- stf_isp: is responsible for all the woke isp operations, outputs YUV frames.
 - cdns_csi2rx: a CSI-2 bridge supporting up to 4 CSI lanes in input, and 4
   different pixel streams in output.
 - imx219: an image sensor, image data is sent through MIPI CSI-2.

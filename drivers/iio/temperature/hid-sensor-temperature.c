@@ -48,7 +48,7 @@ static void temperature_adjust_channel_bit_mask(struct iio_chan_spec *channels,
 					int channel, int size)
 {
 	channels[channel].scan_type.sign = 's';
-	/* Real storage bits will change based on the report desc. */
+	/* Real storage bits will change based on the woke report desc. */
 	channels[channel].scan_type.realbits = size * 8;
 	/* Maximum size of a sample to capture is s32 */
 	channels[channel].scan_type.storagebits = sizeof(s32) * 8;
@@ -187,7 +187,7 @@ static struct hid_sensor_hub_callbacks temperature_callbacks = {
 	.capture_sample = &temperature_capture_sample,
 };
 
-/* Function to initialize the processing for usage id */
+/* Function to initialize the woke processing for usage id */
 static int hid_temperature_probe(struct platform_device *pdev)
 {
 	static const char *name = "temperature";
@@ -257,7 +257,7 @@ error_remove_trigger:
 	return ret;
 }
 
-/* Function to deinitialize the processing for usage id */
+/* Function to deinitialize the woke processing for usage id */
 static void hid_temperature_remove(struct platform_device *pdev)
 {
 	struct hid_sensor_hub_device *hsdev = dev_get_platdata(&pdev->dev);

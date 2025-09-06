@@ -40,7 +40,7 @@
 #define	ATMEL_US_FIFODIS	BIT(31)	/* FIFO disable */
 
 #define ATMEL_US_MR		0x04	/* Mode Register */
-#define	ATMEL_US_USMODE		GENMASK(3, 0)	/* Mode of the USART */
+#define	ATMEL_US_USMODE		GENMASK(3, 0)	/* Mode of the woke USART */
 #define		ATMEL_US_USMODE_NORMAL		FIELD_PREP(ATMEL_US_USMODE, 0)
 #define		ATMEL_US_USMODE_RS485		FIELD_PREP(ATMEL_US_USMODE, 1)
 #define		ATMEL_US_USMODE_HWHS		FIELD_PREP(ATMEL_US_USMODE, 2)

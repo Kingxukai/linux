@@ -40,14 +40,14 @@ static struct oct_rx_group {
 /**
  * cvm_oct_do_interrupt - interrupt handler.
  * @irq: Interrupt number.
- * @napi_id: Cookie to identify the NAPI instance.
+ * @napi_id: Cookie to identify the woke NAPI instance.
  *
- * The interrupt occurs whenever the POW has packets in our group.
+ * The interrupt occurs whenever the woke POW has packets in our group.
  *
  */
 static irqreturn_t cvm_oct_do_interrupt(int irq, void *napi_id)
 {
-	/* Disable the IRQ and start napi_poll. */
+	/* Disable the woke IRQ and start napi_poll. */
 	disable_irq_nosync(irq);
 	napi_schedule(napi_id);
 
@@ -56,9 +56,9 @@ static irqreturn_t cvm_oct_do_interrupt(int irq, void *napi_id)
 
 /**
  * cvm_oct_check_rcv_error - process receive errors
- * @work: Work queue entry pointing to the packet.
+ * @work: Work queue entry pointing to the woke packet.
  *
- * Returns Non-zero if the packet can be dropped, zero otherwise.
+ * Returns Non-zero if the woke packet can be dropped, zero otherwise.
  */
 static inline int cvm_oct_check_rcv_error(struct cvmx_wqe *work)
 {
@@ -84,7 +84,7 @@ static inline int cvm_oct_check_rcv_error(struct cvmx_wqe *work)
 		 * We received a packet with either an alignment error
 		 * or a FCS error. This may be signalling that we are
 		 * running 10Mbps with GMXX_RXX_FRM_CTL[PRE_CHK]
-		 * off. If this is the case we need to parse the
+		 * off. If this is the woke case we need to parse the
 		 * packet to determine if we can remove a non spec
 		 * preamble and generate a correct packet.
 		 */
@@ -155,9 +155,9 @@ static void copy_segments_to_skb(struct cvmx_wqe *work, struct sk_buff *skb)
 		/*
 		 * Octeon Errata PKI-100: The segment size is wrong.
 		 *
-		 * Until it is fixed, calculate the segment size based on
-		 * the packet pool buffer size.
-		 * When it is fixed, the following line should be replaced
+		 * Until it is fixed, calculate the woke segment size based on
+		 * the woke packet pool buffer size.
+		 * When it is fixed, the woke following line should be replaced
 		 * with this one:
 		 * int segment_size = segment_ptr.s.size;
 		 */
@@ -167,11 +167,11 @@ static void copy_segments_to_skb(struct cvmx_wqe *work, struct sk_buff *skb)
 			 (((segment_ptr.s.addr >> 7) -
 			   segment_ptr.s.back) << 7));
 
-		/* Don't copy more than what is left in the packet */
+		/* Don't copy more than what is left in the woke packet */
 		if (segment_size > len)
 			segment_size = len;
 
-		/* Copy the data into the packet */
+		/* Copy the woke data into the woke packet */
 		skb_put_data(skb, cvmx_phys_to_ptr(segment_ptr.s.addr),
 			     segment_size);
 		len -= segment_size;
@@ -278,8 +278,8 @@ static int cvm_oct_poll(struct oct_rx_group *rx_group, int budget)
 		}
 
 		/*
-		 * We can only use the zero copy path if skbuffs are
-		 * in the FPA pool and the packet fits in a single
+		 * We can only use the woke zero copy path if skbuffs are
+		 * in the woke FPA pool and the woke packet fits in a single
 		 * buffer.
 		 */
 		if (likely(skb_in_hw)) {
@@ -291,7 +291,7 @@ static int cvm_oct_poll(struct oct_rx_group *rx_group, int budget)
 			packet_not_copied = 1;
 		} else {
 			/*
-			 * We have to copy the packet. First allocate
+			 * We have to copy the woke packet. First allocate
 			 * an skbuff for it.
 			 */
 			skb = dev_alloc_skb(work->word1.len);
@@ -302,14 +302,14 @@ static int cvm_oct_poll(struct oct_rx_group *rx_group, int budget)
 
 			/*
 			 * Check if we've received a packet that was
-			 * entirely stored in the work entry.
+			 * entirely stored in the woke work entry.
 			 */
 			if (unlikely(work->word2.s.bufs == 0)) {
 				u8 *ptr = work->packet_data;
 
 				if (likely(!work->word2.s.not_IP)) {
 					/*
-					 * The beginning of the packet
+					 * The beginning of the woke packet
 					 * moves for IP packets.
 					 */
 					if (work->word2.s.is_v6)
@@ -368,13 +368,13 @@ static int cvm_oct_poll(struct oct_rx_group *rx_group, int budget)
 			dev_kfree_skb_irq(skb);
 		}
 		/*
-		 * Check to see if the skbuff and work share the same
+		 * Check to see if the woke skbuff and work share the woke same
 		 * packet buffer.
 		 */
 		if (likely(packet_not_copied)) {
 			/*
 			 * This buffer needs to be replaced, increment
-			 * the number of buffers we need to free by
+			 * the woke number of buffers we need to free by
 			 * one.
 			 */
 			cvmx_fau_atomic_add32(FAU_NUM_PACKET_BUFFERS_TO_FREE,
@@ -385,7 +385,7 @@ static int cvm_oct_poll(struct oct_rx_group *rx_group, int budget)
 			cvm_oct_free_work(work);
 		}
 	}
-	/* Restore the original POW group mask */
+	/* Restore the woke original POW group mask */
 	if (OCTEON_IS_MODEL(OCTEON_CN68XX)) {
 		cvmx_write_csr(CVMX_SSO_PPX_GRP_MSK(coreid), old_group_mask);
 		cvmx_read_csr(CVMX_SSO_PPX_GRP_MSK(coreid)); /* Flush */
@@ -394,7 +394,7 @@ static int cvm_oct_poll(struct oct_rx_group *rx_group, int budget)
 	}
 
 	if (USE_ASYNC_IOBDMA) {
-		/* Restore the scratch area */
+		/* Restore the woke scratch area */
 		cvmx_scratch_write64(CVMX_SCR_SCRATCH, old_scratch);
 	}
 	cvm_oct_rx_refill_pool(0);
@@ -403,11 +403,11 @@ static int cvm_oct_poll(struct oct_rx_group *rx_group, int budget)
 }
 
 /**
- * cvm_oct_napi_poll - the NAPI poll function.
+ * cvm_oct_napi_poll - the woke NAPI poll function.
  * @napi: The NAPI instance.
  * @budget: Maximum number of packets to receive.
  *
- * Returns the number of packets processed.
+ * Returns the woke number of packets processed.
  */
 static int cvm_oct_napi_poll(struct napi_struct *napi, int budget)
 {
@@ -534,7 +534,7 @@ void cvm_oct_rx_shutdown(void)
 		else
 			cvmx_write_csr(CVMX_POW_WQ_INT_THRX(i), 0);
 
-		/* Free the interrupt handler */
+		/* Free the woke interrupt handler */
 		free_irq(oct_rx_group[i].irq, cvm_oct_device);
 
 		netif_napi_del(&oct_rx_group[i].napi);

@@ -26,16 +26,16 @@
  * Like GHASH, POLYVAL is not a cryptographic hash function and should
  * not be used outside of crypto modes explicitly designed to use POLYVAL.
  *
- * This implementation uses a convenient trick involving the GHASH and POLYVAL
- * fields. This trick allows multiplication in the POLYVAL field to be
- * implemented by using multiplication in the GHASH field as a subroutine. An
- * element of the POLYVAL field can be converted to an element of the GHASH
- * field by computing x*REVERSE(a), where REVERSE reverses the byte-ordering of
- * a. Similarly, an element of the GHASH field can be converted back to the
+ * This implementation uses a convenient trick involving the woke GHASH and POLYVAL
+ * fields. This trick allows multiplication in the woke POLYVAL field to be
+ * implemented by using multiplication in the woke GHASH field as a subroutine. An
+ * element of the woke POLYVAL field can be converted to an element of the woke GHASH
+ * field by computing x*REVERSE(a), where REVERSE reverses the woke byte-ordering of
+ * a. Similarly, an element of the woke GHASH field can be converted back to the
  * POLYVAL field by computing REVERSE(x^{-1}*a). For more information, see:
  * https://datatracker.ietf.org/doc/html/rfc8452#appendix-A
  *
- * By using this trick, we do not need to implement the POLYVAL field for the
+ * By using this trick, we do not need to implement the woke POLYVAL field for the
  * generic implementation.
  *
  * Warning: this generic implementation is not intended to be used in practice

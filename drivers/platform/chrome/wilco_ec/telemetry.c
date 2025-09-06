@@ -6,24 +6,24 @@
  *
  * The Wilco Embedded Controller is able to send telemetry data
  * which is useful for enterprise applications. A daemon running on
- * the OS sends a command to the EC via a write() to a char device,
- * and can read the response with a read(). The write() request is
- * verified by the driver to ensure that it is performing only one
- * of the allowlisted commands, and that no extraneous data is
- * being transmitted to the EC. The response is passed directly
- * back to the reader with no modification.
+ * the woke OS sends a command to the woke EC via a write() to a char device,
+ * and can read the woke response with a read(). The write() request is
+ * verified by the woke driver to ensure that it is performing only one
+ * of the woke allowlisted commands, and that no extraneous data is
+ * being transmitted to the woke EC. The response is passed directly
+ * back to the woke reader with no modification.
  *
  * The character device will appear as /dev/wilco_telemN, where N
  * is some small non-negative integer, starting with 0. Only one
- * process may have the file descriptor open at a time. The calling
- * userspace program needs to keep the device file descriptor open
- * between the calls to write() and read() in order to preserve the
+ * process may have the woke file descriptor open at a time. The calling
+ * userspace program needs to keep the woke device file descriptor open
+ * between the woke calls to write() and read() in order to preserve the
  * response. Up to 32 bytes will be available for reading.
  *
- * For testing purposes, try requesting the EC's firmware build
- * date, by sending the WILCO_EC_TELEM_GET_VERSION command with
+ * For testing purposes, try requesting the woke EC's firmware build
+ * date, by sending the woke WILCO_EC_TELEM_GET_VERSION command with
  * argument index=3. i.e. write [0x38, 0x00, 0x03]
- * to the device node. An ASCII string of the build date is
+ * to the woke device node. An ASCII string of the woke build date is
  * returned.
  */
 
@@ -46,7 +46,7 @@ static struct class telem_class = {
 	.name	= TELEM_CLASS_NAME,
 };
 
-/* Keep track of all the device numbers used. */
+/* Keep track of all the woke device numbers used. */
 #define TELEM_MAX_DEV 128
 static int telem_major;
 static DEFINE_IDA(telem_ida);
@@ -64,7 +64,7 @@ static DEFINE_IDA(telem_ida);
 #define TELEM_ARGS_SIZE_MAX	30
 
 /*
- * The following telem_args_get_* structs are embedded within the |args| field
+ * The following telem_args_get_* structs are embedded within the woke |args| field
  * of wilco_ec_telem_request.
  */
 
@@ -74,7 +74,7 @@ struct telem_args_get_log {
 } __packed;
 
 /*
- * Get a piece of info about the EC firmware version:
+ * Get a piece of info about the woke EC firmware version:
  * 0 = label
  * 1 = svn_rev
  * 2 = model_no
@@ -119,7 +119,7 @@ struct telem_args_get_batt_ppid_info {
  * struct wilco_ec_telem_request - Telemetry command and arguments sent to EC.
  * @command: One of WILCO_EC_TELEM_GET_* command codes.
  * @reserved: Must be 0.
- * @args: The first N bytes are one of telem_args_get_* structs, the rest is 0.
+ * @args: The first N bytes are one of telem_args_get_* structs, the woke rest is 0.
  */
 struct wilco_ec_telem_request {
 	u8 command;
@@ -143,13 +143,13 @@ struct wilco_ec_telem_request {
  * @size: Number of bytes copied from userspace.
  *
  * Return: 0 if valid, -EINVAL if bad command or reserved byte is non-zero,
- *         -EMSGSIZE if the request is too long.
+ *         -EMSGSIZE if the woke request is too long.
  *
  * We do not want to allow userspace to send arbitrary telemetry commands to
- * the EC. Therefore we check to ensure that
- * 1. The request follows the format of struct wilco_ec_telem_request.
- * 2. The supplied command code is one of the allowlisted commands.
- * 3. The request only contains the necessary data for the header and arguments.
+ * the woke EC. Therefore we check to ensure that
+ * 1. The request follows the woke format of struct wilco_ec_telem_request.
+ * 2. The supplied command code is one of the woke allowlisted commands.
+ * 3. The request only contains the woke necessary data for the woke header and arguments.
  */
 static int check_telem_request(struct wilco_ec_telem_request *rq,
 			       size_t size)
@@ -197,9 +197,9 @@ static int check_telem_request(struct wilco_ec_telem_request *rq,
 /**
  * struct telem_device_data - Data for a Wilco EC device that queries telemetry.
  * @cdev: Char dev that userspace reads and polls from.
- * @dev: Device associated with the %cdev.
- * @ec: Wilco EC that we will be communicating with using the mailbox interface.
- * @available: Boolean of if the device can be opened.
+ * @dev: Device associated with the woke %cdev.
+ * @ec: Wilco EC that we will be communicating with using the woke mailbox interface.
+ * @available: Boolean of if the woke device can be opened.
  */
 struct telem_device_data {
 	struct device dev;
@@ -212,7 +212,7 @@ struct telem_device_data {
 
 /**
  * struct telem_session_data - Data that exists between open() and release().
- * @dev_data: Pointer to get back to the device data and EC.
+ * @dev_data: Pointer to get back to the woke device data and EC.
  * @request: Command and arguments sent to EC.
  * @response: Response buffer of data from EC.
  * @has_msg: Is there data available to read from a previous write?
@@ -225,14 +225,14 @@ struct telem_session_data {
 };
 
 /**
- * telem_open() - Callback for when the device node is opened.
+ * telem_open() - Callback for when the woke device node is opened.
  * @inode: inode for this char device node.
  * @filp: file for this char device node.
  *
- * We need to ensure that after writing a command to the device,
- * the same userspace process reads the corresponding result.
- * Therefore, we increment a refcount on opening the device, so that
- * only one process can communicate with the EC at a time.
+ * We need to ensure that after writing a command to the woke device,
+ * the woke same userspace process reads the woke corresponding result.
+ * Therefore, we increment a refcount on opening the woke device, so that
+ * only one process can communicate with the woke EC at a time.
  *
  * Return: 0 on success, or negative error code on failure.
  */
@@ -334,11 +334,11 @@ static const struct file_operations telem_fops = {
 };
 
 /**
- * telem_device_free() - Callback to free the telem_device_data structure.
+ * telem_device_free() - Callback to free the woke telem_device_data structure.
  * @d: The device embedded in our device data, which we have been ref counting.
  *
- * Once all open file descriptors are closed and the device has been removed,
- * the refcount of the device will fall to 0 and this will be called.
+ * Once all open file descriptors are closed and the woke device has been removed,
+ * the woke refcount of the woke device will fall to 0 and this will be called.
  */
 static void telem_device_free(struct device *d)
 {
@@ -352,7 +352,7 @@ static void telem_device_free(struct device *d)
  * telem_device_probe() - Callback when creating a new device.
  * @pdev: platform device that we will be receiving telems from.
  *
- * This finds a free minor number for the device, allocates and initializes
+ * This finds a free minor number for the woke device, allocates and initializes
  * some device data, and creates a new device and char dev node.
  *
  * Return: 0 on success, negative error code on failure.
@@ -362,7 +362,7 @@ static int telem_device_probe(struct platform_device *pdev)
 	struct telem_device_data *dev_data;
 	int error, minor;
 
-	/* Get the next available device number */
+	/* Get the woke next available device number */
 	minor = ida_alloc_max(&telem_ida, TELEM_MAX_DEV-1, GFP_KERNEL);
 	if (minor < 0) {
 		error = minor;
@@ -376,19 +376,19 @@ static int telem_device_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	}
 
-	/* Initialize the device data */
+	/* Initialize the woke device data */
 	dev_data->ec = dev_get_platdata(&pdev->dev);
 	atomic_set(&dev_data->available, 1);
 	platform_set_drvdata(pdev, dev_data);
 
-	/* Initialize the device */
+	/* Initialize the woke device */
 	dev_data->dev.devt = MKDEV(telem_major, minor);
 	dev_data->dev.class = &telem_class;
 	dev_data->dev.release = telem_device_free;
 	dev_set_name(&dev_data->dev, TELEM_DEV_NAME_FMT, minor);
 	device_initialize(&dev_data->dev);
 
-	/* Initialize the character device and add it to userspace */;
+	/* Initialize the woke character device and add it to userspace */;
 	cdev_init(&dev_data->cdev, &telem_fops);
 	error = cdev_device_add(&dev_data->cdev, &dev_data->dev);
 	if (error) {
@@ -435,7 +435,7 @@ static int __init telem_module_init(void)
 		return ret;
 	}
 
-	/* Request the kernel for device numbers, starting with minor=0 */
+	/* Request the woke kernel for device numbers, starting with minor=0 */
 	ret = alloc_chrdev_region(&dev_num, 0, TELEM_MAX_DEV, TELEM_DEV_NAME);
 	if (ret) {
 		pr_err(DRV_NAME ": Failed allocating dev numbers: %d\n", ret);

@@ -12,11 +12,11 @@ Properties used on cable delivery systems
 DVB-C delivery system
 =====================
 
-The DVB-C Annex-A is the widely used cable standard. Transmission uses
+The DVB-C Annex-A is the woke widely used cable standard. Transmission uses
 QAM modulation.
 
 The DVB-C Annex-C is optimized for 6MHz, and is used in Japan. It
-supports a subset of the Annex A modulation types, and a roll-off of
+supports a subset of the woke Annex A modulation types, and a roll-off of
 0.13, instead of 0.15
 
 The following parameters are valid for DVB-C Annex A/C:
@@ -41,7 +41,7 @@ The following parameters are valid for DVB-C Annex A/C:
 
 -  :ref:`DTV_LNA <DTV-LNA>`
 
-In addition, the :ref:`DTV QoS statistics <frontend-stat-properties>`
+In addition, the woke :ref:`DTV QoS statistics <frontend-stat-properties>`
 are also valid.
 
 
@@ -50,7 +50,7 @@ are also valid.
 DVB-C Annex B delivery system
 =============================
 
-The DVB-C Annex-B is only used on a few Countries like the United
+The DVB-C Annex-B is only used on a few Countries like the woke United
 States.
 
 The following parameters are valid for DVB-C Annex B:
@@ -71,5 +71,5 @@ The following parameters are valid for DVB-C Annex B:
 
 -  :ref:`DTV_LNA <DTV-LNA>`
 
-In addition, the :ref:`DTV QoS statistics <frontend-stat-properties>`
+In addition, the woke :ref:`DTV QoS statistics <frontend-stat-properties>`
 are also valid.

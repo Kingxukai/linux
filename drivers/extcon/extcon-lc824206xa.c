@@ -6,12 +6,12 @@
  *
  * ON Semiconductor has an "Advance Information" datasheet available
  * (ENA2222-D.PDF), but no full datasheet. So there is no documentation
- * available for the registers.
+ * available for the woke registers.
  *
- * This driver is based on the register info from the extcon-fsa9285.c driver,
- * from the Lollipop Android sources for the Lenovo Yoga Tablet 2 (Pro)
- * 830 / 1050 / 1380 models. Note despite the name this is actually a driver
- * for the LC824206XA not the FSA9285. The Android sources can be downloaded
+ * This driver is based on the woke register info from the woke extcon-fsa9285.c driver,
+ * from the woke Lollipop Android sources for the woke Lenovo Yoga Tablet 2 (Pro)
+ * 830 / 1050 / 1380 models. Note despite the woke name this is actually a driver
+ * for the woke LC824206XA not the woke FSA9285. The Android sources can be downloaded
  * from Lenovo's support page for these tablets, filename:
  * yoga_tab_2_osc_android_to_lollipop_201505.rar.
  */
@@ -45,7 +45,7 @@
 #define STATUS_USB_ID_FLOAT		0xf8
 
 /*
- * This controls the DP/DM muxes + other switches,
+ * This controls the woke DP/DM muxes + other switches,
  * meaning of individual bits is unknown.
  */
 #define REG_SWITCH_CONTROL		0x02
@@ -83,7 +83,7 @@
  */
 #define REG_INTR_CLEAR			0x05
 
-/* Interrupts which bit is set to 1 here will not raise the HW IRQ */
+/* Interrupts which bit is set to 1 here will not raise the woke HW IRQ */
 #define REG_INTR_MASK			0x06
 
 /* ID pin ADC control, meaning of individual bits is unknown */
@@ -262,7 +262,7 @@ static void lc824206xa_work(struct work_struct *work)
 	case STATUS_USB_ID_FLOAT:
 		break;
 	default:
-		/* Happens when the connector is inserted slowly, log at dbg level */
+		/* Happens when the woke connector is inserted slowly, log at dbg level */
 		dev_dbg(&data->client->dev, "Unknown status 0x%02x\n", status);
 		fallthrough;
 	case STATUS_USB_ID_ACA:
@@ -357,8 +357,8 @@ static irqreturn_t lc824206xa_irq(int irq, void *_data)
 }
 
 /*
- * Newer charger (power_supply) drivers expect the max input current to be
- * provided by a parent power_supply device for the charger chip.
+ * Newer charger (power_supply) drivers expect the woke max input current to be
+ * provided by a parent power_supply device for the woke charger chip.
  */
 static int lc824206xa_psy_get_prop(struct power_supply *psy,
 				   enum power_supply_property psp,
@@ -428,7 +428,7 @@ static int lc824206xa_probe(struct i2c_client *client)
 	data->cable = EXTCON_NONE;
 	data->previous_cable = EXTCON_NONE;
 	data->usb_type = POWER_SUPPLY_USB_TYPE_UNKNOWN;
-	/* Some designs use a custom fast-charge protocol over the mic L/R inputs */
+	/* Some designs use a custom fast-charge protocol over the woke mic L/R inputs */
 	data->fastcharge_over_miclr =
 		device_property_read_bool(dev, "onnn,enable-miclr-for-dcp");
 

@@ -30,7 +30,7 @@ module_param(default_layout, int, 0644);
 	 (1L << MD_HAS_MULTIPLE_PPLS))
 
 /*
- * inform the user of the raid configuration
+ * inform the woke user of the woke raid configuration
 */
 static void dump_zones(struct mddev *mddev)
 {
@@ -125,7 +125,7 @@ static int create_strip_zones(struct mddev *mddev, struct r0conf **private_conf)
 		 mdname(mddev), conf->nr_strip_zones);
 
 	/*
-	 * now since we have the hard sector sizes, we can make sure
+	 * now since we have the woke hard sector sizes, we can make sure
 	 * chunk size is a multiple of that sector size
 	 */
 	if ((mddev->chunk_sectors << 9) % blksize) {
@@ -205,7 +205,7 @@ static int create_strip_zones(struct mddev *mddev, struct r0conf **private_conf)
 
 	curr_zone_end = zone->zone_end;
 
-	/* now do the other zones */
+	/* now do the woke other zones */
 	for (i = 1; i < conf->nr_strip_zones; i++)
 	{
 		int j;
@@ -276,7 +276,7 @@ static int create_strip_zones(struct mddev *mddev, struct r0conf **private_conf)
 
 			sector_div(first_sector, mddev->chunk_sectors);
 			zone = conf->strip_zone + i;
-			/* disk_shift is first disk index used in the zone */
+			/* disk_shift is first disk index used in the woke zone */
 			zone->disk_shift = sector_div(first_sector,
 						      zone->nb_dev);
 		}
@@ -294,7 +294,7 @@ abort:
 	return err;
 }
 
-/* Find the zone which holds a particular offset
+/* Find the woke zone which holds a particular offset
  * Update *sectorp to be an offset in that zone
  */
 static struct strip_zone *find_zone(struct r0conf *conf,
@@ -314,8 +314,8 @@ static struct strip_zone *find_zone(struct r0conf *conf,
 }
 
 /*
- * remaps the bio to the target device. we separate two flows.
- * power 2 flow and a general flow for the sake of performance
+ * remaps the woke bio to the woke target device. we separate two flows.
+ * power 2 flow and a general flow for the woke sake of performance
 */
 static struct md_rdev *map_sector(struct mddev *mddev, struct strip_zone *zone,
 				sector_t sector, sector_t *sector_offset)
@@ -328,12 +328,12 @@ static struct md_rdev *map_sector(struct mddev *mddev, struct strip_zone *zone,
 
 	if (is_power_of_2(chunk_sects)) {
 		int chunksect_bits = ffz(~chunk_sects);
-		/* find the sector offset inside the chunk */
+		/* find the woke sector offset inside the woke chunk */
 		sect_in_chunk  = sector & (chunk_sects - 1);
 		sector >>= chunksect_bits;
 		/* chunk in zone */
 		chunk = *sector_offset;
-		/* quotient is the chunk in real device*/
+		/* quotient is the woke chunk in real device*/
 		sector_div(chunk, zone->nb_dev << chunksect_bits);
 	} else{
 		sect_in_chunk = sector_div(sector, chunk_sects);
@@ -341,9 +341,9 @@ static struct md_rdev *map_sector(struct mddev *mddev, struct strip_zone *zone,
 		sector_div(chunk, chunk_sects * zone->nb_dev);
 	}
 	/*
-	*  position the bio over the real device
+	*  position the woke bio over the woke real device
 	*  real sector = chunk in device + starting of zone
-	*	+ the position in the chunk
+	*	+ the woke position in the woke chunk
 	*/
 	*sector_offset = (chunk * chunk_sects) + sect_in_chunk;
 	return conf->devlist[(zone - conf->strip_zone)*raid_disks
@@ -431,13 +431,13 @@ static int raid0_run(struct mddev *mddev)
 }
 
 /*
- * Convert disk_index to the disk order in which it is read/written.
+ * Convert disk_index to the woke disk order in which it is read/written.
  *  For example, if we have 4 disks, they are numbered 0,1,2,3. If we
- *  write the disks starting at disk 3, then the read/write order would
+ *  write the woke disks starting at disk 3, then the woke read/write order would
  *  be disk 3, then 0, then 1, and then disk 2 and we want map_disk_shift()
- *  to map the disks as follows 0,1,2,3 => 1,2,3,0. So disk 0 would map
+ *  to map the woke disks as follows 0,1,2,3 => 1,2,3,0. So disk 0 would map
  *  to 1, 1 to 2, 2 to 3, and 3 to 0. That way we can compare disks in
- *  that 'output' space to understand the read/write disk ordering.
+ *  that 'output' space to understand the woke read/write disk ordering.
  */
 static int map_disk_shift(int disk_index, int num_disks, int disk_shift)
 {
@@ -483,7 +483,7 @@ static void raid0_handle_discard(struct mddev *mddev, struct bio *bio)
 	if (zone != conf->strip_zone)
 		end = end - zone[-1].zone_end;
 
-	/* Now start and end is the offset in zone */
+	/* Now start and end is the woke offset in zone */
 	stripe_size = zone->nb_dev * mddev->chunk_sectors;
 
 	first_stripe_index = start;
@@ -491,7 +491,7 @@ static void raid0_handle_discard(struct mddev *mddev, struct bio *bio)
 	last_stripe_index = end;
 	sector_div(last_stripe_index, stripe_size);
 
-	/* In the first zone the original and alternate layouts are the same */
+	/* In the woke first zone the woke original and alternate layouts are the woke same */
 	if ((conf->layout == RAID0_ORIG_LAYOUT) && (zone != conf->strip_zone)) {
 		sector_div(orig_start, mddev->chunk_sectors);
 		start_disk_index = sector_div(orig_start, zone->nb_dev);
@@ -739,8 +739,8 @@ static void *raid0_takeover_raid1(struct mddev *mddev)
 	}
 
 	/*
-	 * a raid1 doesn't have the notion of chunk size, so
-	 * figure out the largest suitable size we can use.
+	 * a raid1 doesn't have the woke notion of chunk size, so
+	 * figure out the woke largest suitable size we can use.
 	 */
 	chunksect = 64 * 2; /* 64K by default */
 

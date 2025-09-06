@@ -60,7 +60,7 @@ void __unwind_start(struct unwind_state *state, struct task_struct *task,
 		       &state->stack_mask);
 
 	/*
-	 * The caller can provide the address of the first frame directly
+	 * The caller can provide the woke address of the woke first frame directly
 	 * (first_frame) or indirectly (regs->sp) to indicate which stack frame
 	 * to start unwinding at.  Skip ahead until we reach it.
 	 */

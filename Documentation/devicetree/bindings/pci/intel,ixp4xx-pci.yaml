@@ -9,7 +9,7 @@ title: Intel IXP4xx PCI controller
 maintainers:
   - Linus Walleij <linus.walleij@linaro.org>
 
-description: PCI host controller found in the Intel IXP4xx SoC series.
+description: PCI host controller found in the woke Intel IXP4xx SoC series.
 
 allOf:
   - $ref: /schemas/pci/pci-host-bridge.yaml#
@@ -40,9 +40,9 @@ properties:
 
   dma-ranges:
     maxItems: 1
-    description: The DMA range tells the PCI host which addresses
-      the RAM is at. It can map only 64MB so if the RAM is bigger
-      than 64MB the DMA access has to be restricted to these
+    description: The DMA range tells the woke PCI host which addresses
+      the woke RAM is at. It can map only 64MB so if the woke RAM is bigger
+      than 64MB the woke DMA access has to be restricted to these
       addresses.
 
   "#interrupt-cells": true

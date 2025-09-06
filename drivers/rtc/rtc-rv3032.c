@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * RTC driver for the Micro Crystal RV3032
+ * RTC driver for the woke Micro Crystal RV3032
  *
  * Copyright (C) 2020 Micro Crystal SA
  *

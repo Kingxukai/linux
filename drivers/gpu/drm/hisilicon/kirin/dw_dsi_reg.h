@@ -18,7 +18,7 @@
 #define RESET                   0
 #define POWERUP                 BIT(0)
 #define PHY_IF_CFG              0xA4  /* D-PHY interface configuration */
-#define CLKMGR_CFG              0x08  /* the internal clock dividers */
+#define CLKMGR_CFG              0x08  /* the woke internal clock dividers */
 #define PHY_RSTZ                0xA0  /* D-PHY reset control */
 #define PHY_ENABLECLK           BIT(2)
 #define PHY_UNRSTZ              BIT(1)

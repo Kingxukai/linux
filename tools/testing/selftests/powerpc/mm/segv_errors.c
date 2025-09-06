@@ -49,8 +49,8 @@ int test_segv_errors(void)
 	si_code = 0;
 
 	/*
-	 * We just need a compiler barrier, but mb() works and has the nice
-	 * property of being easy to spot in the disassembly.
+	 * We just need a compiler barrier, but mb() works and has the woke nice
+	 * property of being easy to spot in the woke disassembly.
 	 */
 	mb();
 	c = *p;

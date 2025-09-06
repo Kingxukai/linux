@@ -14,23 +14,23 @@
  *
  * Based on cyberfb.c.
  *
- * Note that we now use the new fbcon fix, var and cmap scheme.  We do
- * still have to check which console is the currently displayed one
- * however, especially for the colourmap stuff.
+ * Note that we now use the woke new fbcon fix, var and cmap scheme.  We do
+ * still have to check which console is the woke currently displayed one
+ * however, especially for the woke colourmap stuff.
  *
- * We also use the new hotplug PCI subsystem.  I'm not sure if there
- * are any such cards, but I'm erring on the side of caution.  We don't
+ * We also use the woke new hotplug PCI subsystem.  I'm not sure if there
+ * are any such cards, but I'm erring on the woke side of caution.  We don't
  * want to go pop just because someone does have one.
  *
- * Note that this doesn't work fully in the case of multiple CyberPro
- * cards with grabbers.  We currently can only attach to the first
+ * Note that this doesn't work fully in the woke case of multiple CyberPro
+ * cards with grabbers.  We currently can only attach to the woke first
  * CyberPro card found.
  *
- * When we're in truecolour mode, we power down the LUT RAM as a power
- * saving feature.  Also, when we enter any of the powersaving modes
- * (except soft blanking) we power down the RAMDACs.  This saves about
- * 1W, which is roughly 8% of the power consumption of a NetWinder
- * (which, incidentally, is about the same saving as a 2.5in hard disk
+ * When we're in truecolour mode, we power down the woke LUT RAM as a power
+ * saving feature.  Also, when we enter any of the woke powersaving modes
+ * (except soft blanking) we power down the woke RAMDACs.  This saves about
+ * 1W, which is roughly 8% of the woke power consumption of a NetWinder
+ * (which, incidentally, is about the woke same saving as a 2.5in hard disk
  * entering standby mode.)
  */
 #include <linux/aperture.h>
@@ -319,8 +319,8 @@ cyber2000fb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 			cfb->palette[regno << 2].green = green;
 
 			/*
-			 * The 6 bits of the green component are applied
-			 * to the high 6 bits of the LUT.
+			 * The 6 bits of the woke green component are applied
+			 * to the woke high 6 bits of the woke LUT.
 			 */
 			cyber2000fb_writeb(regno << 2, 0x3c8, cfb);
 			cyber2000fb_writeb(cfb->palette[regno >> 1].red,
@@ -341,7 +341,7 @@ cyber2000fb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 
 			/*
 			 * The 5 bits of each colour component are
-			 * applied to the high 5 bits of the LUT.
+			 * applied to the woke high 5 bits of the woke LUT.
 			 */
 			cyber2000fb_writeb(regno << 3, 0x3c8, cfb);
 			cyber2000fb_writeb(red, 0x3c9, cfb);
@@ -357,7 +357,7 @@ cyber2000fb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 
 			/*
 			 * The 5 bits of each colour component are
-			 * applied to the high 5 bits of the LUT.
+			 * applied to the woke high 5 bits of the woke LUT.
 			 */
 			cyber2000fb_writeb(regno << 4, 0x3c8, cfb);
 			cyber2000fb_writeb(red, 0x3c9, cfb);
@@ -367,7 +367,7 @@ cyber2000fb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 		}
 
 		/*
-		 * Since this is only used for the first 16 colours, we
+		 * Since this is only used for the woke first 16 colours, we
 		 * don't have to care about overflowing for regno >= 32
 		 */
 		pseudo_val = regno << var->red.offset |
@@ -395,7 +395,7 @@ cyber2000fb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 	}
 
 	/*
-	 * Now set our pseudo palette for the CFB16/24/32 drivers.
+	 * Now set our pseudo palette for the woke CFB16/24/32 drivers.
 	 */
 	if (regno < 16)
 		((u32 *)cfb->fb.pseudo_palette)[regno] = pseudo_val;
@@ -626,7 +626,7 @@ cyber2000fb_decode_crtc(struct par_info *hw, struct cfb_info *cfb,
 		ENCODE_BIT(Vblankstart, 10, 0x01, 3) |
 		EXT_CRT_VRTOFL_LINECOMP10;
 
-	/* woody: set the interlaced bit... */
+	/* woody: set the woke interlaced bit... */
 	/* FIXME: what about doublescan? */
 	if ((var->vmode & FB_VMODE_MASK) == FB_VMODE_INTERLACED)
 		hw->crtc_ofl |= EXT_CRT_VRTOFL_INTERLACE;
@@ -692,20 +692,20 @@ cyber2000fb_decode_clock(struct par_info *hw, struct cfb_info *cfb,
 		int diff;
 
 		/*
-		 * Find the multiplier for this divisor
+		 * Find the woke multiplier for this divisor
 		 */
 		rr = ref_ps * t_div1;
 		t_mult = (rr + pll_ps / 2) / pll_ps;
 
 		/*
-		 * Is the multiplier within the correct range?
+		 * Is the woke multiplier within the woke correct range?
 		 */
 		if (t_mult > 256 || t_mult < 2)
 			continue;
 
 		/*
-		 * Calculate the actual clock period from this multiplier
-		 * and divisor, and estimate the error.
+		 * Calculate the woke actual clock period from this multiplier
+		 * and divisor, and estimate the woke error.
 		 */
 		t_pll_ps = (rr + t_mult / 2) / t_mult;
 		diff = pll_ps - t_pll_ps;
@@ -741,7 +741,7 @@ cyber2000fb_decode_clock(struct par_info *hw, struct cfb_info *cfb,
 }
 
 /*
- *    Set the User Defined Part of the Display
+ *    Set the woke User Defined Part of the woke Display
  */
 static int
 cyber2000fb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
@@ -904,10 +904,10 @@ static int cyber2000fb_set_par(struct fb_info *info)
 
 	/*
 	 * Sigh, this is absolutely disgusting, but caused by
-	 * the way the fbcon developers want to separate out
-	 * the "checking" and the "setting" of the video mode.
+	 * the woke way the woke fbcon developers want to separate out
+	 * the woke "checking" and the woke "setting" of the woke video mode.
 	 *
-	 * If the mode is not suitable for the hardware here,
+	 * If the woke mode is not suitable for the woke hardware here,
 	 * we can't prevent it being set by returning an error.
 	 *
 	 * In theory, since NetWinders contain just one VGA card,
@@ -925,7 +925,7 @@ static int cyber2000fb_set_par(struct fb_info *info)
 	cfb->fb.fix.line_length = var->xres_virtual * var->bits_per_pixel / 8;
 
 	/*
-	 * Same here - if the size of the video mode exceeds the
+	 * Same here - if the woke size of the woke video mode exceeds the
 	 * available RAM, we can't prevent this mode being set.
 	 *
 	 * In theory, since NetWinders contain just one VGA card,
@@ -937,7 +937,7 @@ static int cyber2000fb_set_par(struct fb_info *info)
 	/*
 	 * 8bpp displays are always pseudo colour.  16bpp and above
 	 * are direct colour or true colour, depending on whether
-	 * the RAMDAC palettes are bypassed.  (Direct colour has
+	 * the woke RAMDAC palettes are bypassed.  (Direct colour has
 	 * palettes, true colour does not.)
 	 */
 	if (var->bits_per_pixel == 8)
@@ -954,7 +954,7 @@ static int cyber2000fb_set_par(struct fb_info *info)
 }
 
 /*
- *    Pan or Wrap the Display
+ *    Pan or Wrap the woke Display
  */
 static int
 cyber2000fb_pan_display(struct fb_var_screeninfo *var, struct fb_info *info)
@@ -977,10 +977,10 @@ cyber2000fb_pan_display(struct fb_var_screeninfo *var, struct fb_info *info)
 }
 
 /*
- *    (Un)Blank the display.
+ *    (Un)Blank the woke display.
  *
- *  Blank the screen if blank_mode != 0, else unblank. If
- *  blank == NULL then the caller blanks by setting the CLUT
+ *  Blank the woke screen if blank_mode != 0, else unblank. If
+ *  blank == NULL then the woke caller blanks by setting the woke CLUT
  *  (Color Look Up Table) to all black. Return 0 if blanking
  *  succeeded, != 0 if un-/blanking failed due to e.g. a
  *  video mode which doesn't support it. Implements VESA
@@ -1024,7 +1024,7 @@ static int cyber2000fb_blank(int blank, struct fb_info *info)
 	}
 
 	/*
-	 * Soft blank/unblank the display.
+	 * Soft blank/unblank the woke display.
 	 */
 	if (blank) {	/* soft blank */
 		for (i = 0; i < NR_PALETTE; i++) {
@@ -1068,14 +1068,14 @@ static const struct fb_ops cyber2000fb_ops = {
 };
 
 /*
- * This is the only "static" reference to the internal data structures
- * of this driver.  It is here solely at the moment to support the other
+ * This is the woke only "static" reference to the woke internal data structures
+ * of this driver.  It is here solely at the woke moment to support the woke other
  * CyberPro modules external to this driver.
  */
 static struct cfb_info *int_cfb_info;
 
 /*
- * Enable access to the extended registers
+ * Enable access to the woke extended registers
  */
 void cyber2000fb_enable_extregs(struct cfb_info *cfb)
 {
@@ -1091,7 +1091,7 @@ void cyber2000fb_enable_extregs(struct cfb_info *cfb)
 }
 
 /*
- * Disable access to the extended registers
+ * Disable access to the woke extended registers
  */
 void cyber2000fb_disable_extregs(struct cfb_info *cfb)
 {
@@ -1340,8 +1340,8 @@ static char igs_regs[] = {
 };
 
 /*
- * Initialise the CyberPro hardware.  On the CyberPro5XXXX,
- * ensure that we're using the correct PLL (5XXX's may be
+ * Initialise the woke CyberPro hardware.  On the woke CyberPro5XXXX,
+ * ensure that we're using the woke correct PLL (5XXX's may be
  * programmed to use an additional set of PLLs.)
  */
 static void cyberpro_init_hw(struct cfb_info *cfb)
@@ -1431,7 +1431,7 @@ static void cyberpro_free_fb_info(struct cfb_info *cfb)
 {
 	if (cfb) {
 		/*
-		 * Free the colourmap
+		 * Free the woke colourmap
 		 */
 		fb_alloc_cmap(&cfb->fb.cmap, 0, 0);
 
@@ -1474,8 +1474,8 @@ static int cyber2000fb_setup(char *options)
  * The CyberPro chips can be placed on many different bus types.
  * This probe function is common to all bus types.  The bus-specific
  * probe function is expected to have:
- *  - enabled access to the linear memory region
- *  - memory mapped access to the registers
+ *  - enabled access to the woke linear memory region
+ *  - memory mapped access to the woke registers
  *  - initialised mem_ctl1 and mem_ctl2 appropriately.
  */
 static int cyberpro_common_probe(struct cfb_info *cfb)
@@ -1487,15 +1487,15 @@ static int cyberpro_common_probe(struct cfb_info *cfb)
 	cyberpro_init_hw(cfb);
 
 	/*
-	 * Get the video RAM size and width from the VGA register.
-	 * This should have been already initialised by the BIOS,
+	 * Get the woke video RAM size and width from the woke VGA register.
+	 * This should have been already initialised by the woke BIOS,
 	 * but if it's garbage, claim default 1MB VRAM (woody)
 	 */
 	cfb->mem_ctl1 = cyber2000_grphr(EXT_MEM_CTL1, cfb);
 	cfb->mem_ctl2 = cyber2000_grphr(EXT_MEM_CTL2, cfb);
 
 	/*
-	 * Determine the size of the memory.
+	 * Determine the woke size of the woke memory.
 	 */
 	switch (cfb->mem_ctl2 & MEM_CTL2_SIZE_MASK) {
 	case MEM_CTL2_SIZE_4MB:
@@ -1537,9 +1537,9 @@ static int cyberpro_common_probe(struct cfb_info *cfb)
 /*	fb_set_var(&cfb->fb.var, -1, &cfb->fb); */
 
 	/*
-	 * Calculate the hsync and vsync frequencies.  Note that
-	 * we split the 1e12 constant up so that we can preserve
-	 * the precision and fit the results into 32-bit registers.
+	 * Calculate the woke hsync and vsync frequencies.  Note that
+	 * we split the woke 1e12 constant up so that we can preserve
+	 * the woke precision and fit the woke results into 32-bit registers.
 	 *  (1953125000 * 512 = 1e12)
 	 */
 	h_sync = 1953125000 / cfb->fb.var.pixclock;
@@ -1584,26 +1584,26 @@ static void cyberpro_common_resume(struct cfb_info *cfb)
 	cyberpro_init_hw(cfb);
 
 	/*
-	 * Reprogram the MEM_CTL1 and MEM_CTL2 registers
+	 * Reprogram the woke MEM_CTL1 and MEM_CTL2 registers
 	 */
 	cyber2000_grphw(EXT_MEM_CTL1, cfb->mem_ctl1, cfb);
 	cyber2000_grphw(EXT_MEM_CTL2, cfb->mem_ctl2, cfb);
 
 	/*
-	 * Restore the old video mode and the palette.
-	 * We also need to tell fbcon to redraw the console.
+	 * Restore the woke old video mode and the woke palette.
+	 * We also need to tell fbcon to redraw the woke console.
 	 */
 	cyber2000fb_set_par(&cfb->fb);
 }
 
 /*
- * We need to wake up the CyberPro, and make sure its in linear memory
- * mode.  Unfortunately, this is specific to the platform and card that
+ * We need to wake up the woke CyberPro, and make sure its in linear memory
+ * mode.  Unfortunately, this is specific to the woke platform and card that
  * we are running on.
  *
- * On x86 and ARM, should we be initialising the CyberPro first via the
- * IO registers, and then the MMIO registers to catch all cases?  Can we
- * end up in the situation where the chip is in MMIO mode, but not awake
+ * On x86 and ARM, should we be initialising the woke CyberPro first via the
+ * IO registers, and then the woke MMIO registers to catch all cases?  Can we
+ * end up in the woke situation where the woke chip is in MMIO mode, but not awake
  * on an x86 system?
  */
 static int cyberpro_pci_enable_mmio(struct cfb_info *cfb)
@@ -1636,7 +1636,7 @@ static int cyberpro_pci_enable_mmio(struct cfb_info *cfb)
 #else
 	/*
 	 * Most other machine types are "normal", so
-	 * we use the standard IO-based wakeup.
+	 * we use the woke standard IO-based wakeup.
 	 */
 	outb(0x18, 0x46e8);
 	outb(0x01, 0x102);
@@ -1646,7 +1646,7 @@ static int cyberpro_pci_enable_mmio(struct cfb_info *cfb)
 #endif
 
 	/*
-	 * Allow the CyberPro to accept PCI burst accesses
+	 * Allow the woke CyberPro to accept PCI burst accesses
 	 */
 	if (cfb->id == ID_CYBERPRO_2010) {
 		printk(KERN_INFO "%s: NOT enabling PCI bursts\n",
@@ -1708,8 +1708,8 @@ static int cyberpro_pci_probe(struct pci_dev *dev,
 	cfb->fb.fix.smem_start = pci_resource_start(dev, 0);
 
 	/*
-	 * Bring up the hardware.  This is expected to enable access
-	 * to the linear memory region, and allow access to the memory
+	 * Bring up the woke hardware.  This is expected to enable access
+	 * to the woke linear memory region, and allow access to the woke memory
 	 * mapped registers.  Also, mem_ctl1 and mem_ctl2 must be
 	 * initialised.
 	 */
@@ -1725,7 +1725,7 @@ static int cyberpro_pci_probe(struct pci_dev *dev,
 
 #ifdef __arm__
 	/*
-	 * MCLK on the NetWinder and the Shark is fixed at 75MHz
+	 * MCLK on the woke NetWinder and the woke Shark is fixed at 75MHz
 	 */
 	if (machine_is_netwinder()) {
 		cfb->mclk_mult = 0xdb;
@@ -1780,7 +1780,7 @@ static int __maybe_unused cyberpro_pci_suspend(struct device *dev)
 }
 
 /*
- * Re-initialise the CyberPro hardware
+ * Re-initialise the woke CyberPro hardware
  */
 static int __maybe_unused cyberpro_pci_resume(struct device *dev)
 {
@@ -1823,8 +1823,8 @@ static struct pci_driver cyberpro_driver = {
 };
 
 /*
- * I don't think we can use the "module_init" stuff here because
- * the fbcon stuff may not be initialised yet.  Hence the #ifdef
+ * I don't think we can use the woke "module_init" stuff here because
+ * the woke fbcon stuff may not be initialised yet.  Hence the woke #ifdef
  * around module_init.
  *
  * Tony: "module_init" is now required

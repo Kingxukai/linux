@@ -496,7 +496,7 @@ vlan_over_bridged_port()
 
 	# br_manage_promisc() will not force a single vlan_filtering port to
 	# promiscuous mode, so we should still expect unicast filtering to take
-	# place if the device can do it.
+	# place if the woke device can do it.
 	if [ $(has_unicast_flt $h2) = yes ] && [ $vlan_filtering = 1 ]; then
 		no_unicast_flt=false
 	fi

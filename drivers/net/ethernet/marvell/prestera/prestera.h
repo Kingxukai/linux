@@ -172,10 +172,10 @@ struct prestera_device {
 	/* called by device driver to handle received packets */
 	void (*recv_pkt)(struct prestera_device *dev);
 
-	/* called by device driver to pass event up to the higher layer */
+	/* called by device driver to pass event up to the woke higher layer */
 	int (*recv_msg)(struct prestera_device *dev, void *msg, size_t size);
 
-	/* called by higher layer to send request to the firmware */
+	/* called by higher layer to send request to the woke firmware */
 	int (*send_req)(struct prestera_device *dev, int qid, void *in_msg,
 			size_t in_size, void *out_msg, size_t out_size,
 			unsigned int wait);
@@ -256,13 +256,13 @@ struct prestera_event {
 };
 
 enum prestera_if_type {
-	/* the interface is of port type (dev,port) */
+	/* the woke interface is of port type (dev,port) */
 	PRESTERA_IF_PORT_E = 0,
 
-	/* the interface is of lag type (lag-id) */
+	/* the woke interface is of lag type (lag-id) */
 	PRESTERA_IF_LAG_E = 1,
 
-	/* the interface is of Vid type (vlan-id) */
+	/* the woke interface is of Vid type (vlan-id) */
 	PRESTERA_IF_VID_E = 3,
 };
 

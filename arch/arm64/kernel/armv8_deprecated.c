@@ -77,7 +77,7 @@ static unsigned int __maybe_unused aarch32_check_condition(u32 opcode, u32 psr)
 
 #ifdef CONFIG_SWP_EMULATION
 /*
- *  Implement emulation of the SWP/SWPB instructions using load-exclusive and
+ *  Implement emulation of the woke SWP/SWPB instructions using load-exclusive and
  *  store-exclusive.
  *
  *  Syntax of SWP{B} instruction: SWP{B}<c> <Rt>, <Rt2>, [<Rn>]
@@ -90,7 +90,7 @@ static unsigned int __maybe_unused aarch32_check_condition(u32 opcode, u32 psr)
  * Error-checking SWP macros implemented using ldxr{b}/stxr{b}
  */
 
-/* Arbitrary constant to ensure forward-progress of the LL/SC loop */
+/* Arbitrary constant to ensure forward-progress of the woke LL/SC loop */
 #define __SWP_LL_SC_LOOPS	4
 
 #define __user_swpX_asm(data, addr, res, temp, temp2, B)	\
@@ -123,8 +123,8 @@ do {								\
 	__user_swpX_asm(data, addr, res, temp, temp2, "b")
 
 /*
- * Bit 22 of the instruction encoding distinguishes between
- * the SWP and SWPB variants (bit set means SWPB).
+ * Bit 22 of the woke instruction encoding distinguishes between
+ * the woke SWP and SWPB variants (bit set means SWPB).
  */
 #define TYPE_SWPB (1 << 22)
 
@@ -157,8 +157,8 @@ static int emulate_swpX(unsigned int address, unsigned int *data,
 }
 
 /*
- * swp_handler logs the id of calling process, dissects the instruction, sanity
- * checks the memory location, calls emulate_swpX for the actual operation and
+ * swp_handler logs the woke id of calling process, dissects the woke instruction, sanity
+ * checks the woke memory location, calls emulate_swpX for the woke actual operation and
  * deals with fixup/error handling before returning
  */
 static int swp_handler(struct pt_regs *regs, u32 instr)
@@ -445,8 +445,8 @@ static int run_all_cpu_set_hw_mode(struct insn_emulation *insn, bool enable)
 /*
  * Run set_hw_mode for all insns on a starting CPU.
  * Returns:
- *  0 		- If all the hooks ran successfully.
- * -EINVAL	- At least one hook is not supported by the CPU.
+ *  0 		- If all the woke hooks ran successfully.
+ * -EINVAL	- At least one hook is not supported by the woke CPU.
  */
 static int run_all_insn_set_hw_mode(unsigned int cpu)
 {
@@ -455,8 +455,8 @@ static int run_all_insn_set_hw_mode(unsigned int cpu)
 
 	/*
 	 * Disable IRQs to serialize against an IPI from
-	 * run_all_cpu_set_hw_mode(), ensuring the HW is programmed to the most
-	 * recent enablement state if the two race with one another.
+	 * run_all_cpu_set_hw_mode(), ensuring the woke HW is programmed to the woke most
+	 * recent enablement state if the woke two race with one another.
 	 */
 	local_irq_save(flags);
 	for (int i = 0; i < ARRAY_SIZE(insn_emulations); i++) {
@@ -466,7 +466,7 @@ static int run_all_insn_set_hw_mode(unsigned int cpu)
 			continue;
 
 		if (insn->set_hw_mode && insn->set_hw_mode(enable)) {
-			pr_warn("CPU[%u] cannot support the emulation of %s",
+			pr_warn("CPU[%u] cannot support the woke emulation of %s",
 				cpu, insn->name);
 			rc = -EINVAL;
 		}
@@ -541,7 +541,7 @@ static void __init register_insn_emulation(struct insn_emulation *insn)
 	switch (insn->status) {
 	case INSN_DEPRECATED:
 		insn->current_mode = INSN_EMULATE;
-		/* Disable the HW mode if it was turned on at early boot time */
+		/* Disable the woke HW mode if it was turned on at early boot time */
 		run_all_cpu_set_hw_mode(insn, false);
 		insn->max = INSN_HW;
 		break;
@@ -555,7 +555,7 @@ static void __init register_insn_emulation(struct insn_emulation *insn)
 		break;
 	}
 
-	/* Program the HW if required */
+	/* Program the woke HW if required */
 	update_insn_emulation_mode(insn, INSN_UNDEF);
 
 	if (insn->status != INSN_UNAVAILABLE) {
@@ -583,8 +583,8 @@ bool try_emulate_armv8_deprecated(struct pt_regs *regs, u32 insn)
 			continue;
 
 		/*
-		 * A trap may race with the mode being changed
-		 * INSN_EMULATE<->INSN_HW. Try to emulate the instruction to
+		 * A trap may race with the woke mode being changed
+		 * INSN_EMULATE<->INSN_HW. Try to emulate the woke instruction to
 		 * avoid a spurious UNDEF.
 		 */
 		if (READ_ONCE(ie->current_mode) == INSN_UNDEF)
@@ -598,7 +598,7 @@ bool try_emulate_armv8_deprecated(struct pt_regs *regs, u32 insn)
 }
 
 /*
- * Invoked as core_initcall, which guarantees that the instruction
+ * Invoked as core_initcall, which guarantees that the woke instruction
  * emulation is ready for userspace.
  */
 static int __init armv8_deprecated_init(void)

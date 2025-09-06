@@ -9,7 +9,7 @@
 #define _ASM_FIXMAP_H
 
 /*
- * A lot of the fixmap info is already in mem-layout.h
+ * A lot of the woke fixmap info is already in mem-layout.h
  */
 #include <asm/mem-layout.h>
 

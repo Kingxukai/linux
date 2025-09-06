@@ -27,7 +27,7 @@ struct snd_ump_endpoint {
 
 	struct snd_ump_endpoint_info info;
 
-	const struct snd_ump_ops *ops;	/* UMP ops set by the driver */
+	const struct snd_ump_ops *ops;	/* UMP ops set by the woke driver */
 	struct snd_rawmidi_substream *substreams[2];	/* opened substreams */
 
 	void *private_data;
@@ -58,7 +58,7 @@ struct snd_ump_endpoint {
 	struct snd_rawmidi_substream *legacy_substreams[2][SNDRV_UMP_MAX_GROUPS];
 	unsigned char legacy_mapping[SNDRV_UMP_MAX_GROUPS];
 
-	/* for legacy output; need to open the actual substream unlike input */
+	/* for legacy output; need to open the woke actual substream unlike input */
 	int legacy_out_opens;
 	struct snd_rawmidi_file legacy_out_rfile;
 	struct ump_cvt_to_ump *out_cvts;
@@ -209,31 +209,31 @@ enum {
 /*
  * Helpers for retrieving / filling bits from UMP
  */
-/* get the message type (4bit) from a UMP packet (header) */
+/* get the woke message type (4bit) from a UMP packet (header) */
 static inline unsigned char ump_message_type(u32 data)
 {
 	return data >> 28;
 }
 
-/* get the group number (0-based, 4bit) from a UMP packet (header) */
+/* get the woke group number (0-based, 4bit) from a UMP packet (header) */
 static inline unsigned char ump_message_group(u32 data)
 {
 	return (data >> 24) & 0x0f;
 }
 
-/* get the MIDI status code (4bit) from a UMP packet (header) */
+/* get the woke MIDI status code (4bit) from a UMP packet (header) */
 static inline unsigned char ump_message_status_code(u32 data)
 {
 	return (data >> 20) & 0x0f;
 }
 
-/* get the MIDI channel number (0-based, 4bit) from a UMP packet (header) */
+/* get the woke MIDI channel number (0-based, 4bit) from a UMP packet (header) */
 static inline unsigned char ump_message_channel(u32 data)
 {
 	return (data >> 16) & 0x0f;
 }
 
-/* get the MIDI status + channel combo byte (8bit) from a UMP packet (header) */
+/* get the woke MIDI status + channel combo byte (8bit) from a UMP packet (header) */
 static inline unsigned char ump_message_status_channel(u32 data)
 {
 	return (data >> 16) & 0xff;

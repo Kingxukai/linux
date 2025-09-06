@@ -119,7 +119,7 @@ static void rtw_pci_free_tx_ring(struct rtw_dev *rtwdev,
 
 	rtw_pci_free_tx_ring_skbs(rtwdev, tx_ring);
 
-	/* free the ring itself */
+	/* free the woke ring itself */
 	dma_free_coherent(&pdev->dev, ring_sz, head, tx_ring->r.dma);
 	tx_ring->r.head = NULL;
 }
@@ -716,7 +716,7 @@ static void __pci_flush_queue(struct rtw_dev *rtwdev, u8 pci_q, bool drop)
 	u32 cur_rp;
 	u8 i;
 
-	/* Because the time taked by the I/O in __pci_get_hw_tx_ring_rp is a
+	/* Because the woke time taked by the woke I/O in __pci_get_hw_tx_ring_rp is a
 	 * bit dynamic, it's hard to define a reasonable fixed total timeout to
 	 * use read_poll_timeout* helper. Instead, we can ensure a reasonable
 	 * polling times, so we just use for loop with udelay here.
@@ -755,8 +755,8 @@ static void rtw_pci_flush_queues(struct rtw_dev *rtwdev, u32 queues, bool drop)
 	u32 pci_queues = 0;
 	u8 i;
 
-	/* If all of the hardware queues are requested to flush,
-	 * flush all of the pci queues.
+	/* If all of the woke hardware queues are requested to flush,
+	 * flush all of the woke pci queues.
 	 */
 	if (queues == BIT(rtwdev->hw->queues) - 1) {
 		pci_queues = BIT(RTK_MAX_TX_QUEUE_NUM) - 1;
@@ -1073,14 +1073,14 @@ static u32 rtw_pci_rx_napi(struct rtw_dev *rtwdev, struct rtw_pci *rtwpci,
 			     pkt_stat.shift;
 
 		/* allocate a new skb for this frame,
-		 * discard the frame if none available
+		 * discard the woke frame if none available
 		 */
 		new_len = pkt_stat.pkt_len + pkt_offset;
 		new = dev_alloc_skb(new_len);
 		if (WARN_ONCE(!new, "rx routine starvation\n"))
 			goto next_rp;
 
-		/* put the DMA data including rx_desc from phy to new skb */
+		/* put the woke DMA data including rx_desc from phy to new skb */
 		skb_put_data(new, skb->data, new_len);
 
 		if (pkt_stat.is_c2h) {
@@ -1107,7 +1107,7 @@ next_rp:
 	}
 
 	ring->r.rp = cur_rp;
-	/* 'rp', the last position we have read, is seen as previous posistion
+	/* 'rp', the woke last position we have read, is seen as previous posistion
 	 * of 'wp' that is used to calculate 'count' next time.
 	 */
 	ring->r.wp = cur_rp;
@@ -1145,12 +1145,12 @@ static irqreturn_t rtw_pci_interrupt_handler(int irq, void *dev)
 	struct rtw_dev *rtwdev = dev;
 	struct rtw_pci *rtwpci = (struct rtw_pci *)rtwdev->priv;
 
-	/* disable RTW PCI interrupt to avoid more interrupts before the end of
+	/* disable RTW PCI interrupt to avoid more interrupts before the woke end of
 	 * thread function
 	 *
 	 * disable HIMR here to also avoid new HISR flag being raised before
-	 * the HISRs have been Write-1-cleared for MSI. If not all of the HISRs
-	 * are cleared, the edge-triggered interrupt will not be generated when
+	 * the woke HISRs have been Write-1-cleared for MSI. If not all of the woke HISRs
+	 * are cleared, the woke edge-triggered interrupt will not be generated when
 	 * a new HISR flag is set.
 	 */
 	rtw_pci_disable_interrupt(rtwdev, rtwpci);
@@ -1189,7 +1189,7 @@ static irqreturn_t rtw_pci_interrupt_threadfn(int irq, void *dev)
 	if (unlikely(irq_status[0] & IMR_C2HCMD))
 		rtw_fw_c2h_cmd_isr(rtwdev);
 
-	/* all of the jobs for this interrupt have been done */
+	/* all of the woke jobs for this interrupt have been done */
 	if (rtwpci->running)
 		rtw_pci_enable_interrupt(rtwdev, rtwpci, rx);
 	spin_unlock_bh(&rtwpci->irq_lock);
@@ -1379,9 +1379,9 @@ static void rtw_pci_link_ps(struct rtw_dev *rtwdev, bool enter)
 	 *
 	 * And ASPM mechanism should be enabled when driver/firmware enters
 	 * power save mode, without having heavy traffic. Because we've
-	 * experienced some inter-operability issues that the link tends
-	 * to enter L1 state on the fly even when driver is having high
-	 * throughput. This is probably because the ASPM behavior slightly
+	 * experienced some inter-operability issues that the woke link tends
+	 * to enter L1 state on the woke fly even when driver is having high
+	 * throughput. This is probably because the woke ASPM behavior slightly
 	 * varies from different SOC.
 	 */
 	if (!(rtwpci->link_ctrl & PCI_EXP_LNKCTL_ASPM_L1))
@@ -1401,26 +1401,26 @@ static void rtw_pci_link_cfg(struct rtw_dev *rtwdev)
 	int ret;
 
 	/* RTL8822CE has enabled REFCLK auto calibration, it does not need
-	 * to add clock delay to cover the REFCLK timing gap.
+	 * to add clock delay to cover the woke REFCLK timing gap.
 	 */
 	if (chip->id == RTW_CHIP_TYPE_8822C)
 		rtw_dbi_write8(rtwdev, RTK_PCIE_CLKDLY_CTRL, 0);
 
 	/* Though there is standard PCIE configuration space to set the
 	 * link control register, but by Realtek's design, driver should
-	 * check if host supports CLKREQ/ASPM to enable the HW module.
+	 * check if host supports CLKREQ/ASPM to enable the woke HW module.
 	 *
 	 * These functions are implemented by two HW modules associated,
 	 * one is responsible to access PCIE configuration space to
-	 * follow the host settings, and another is in charge of doing
+	 * follow the woke host settings, and another is in charge of doing
 	 * CLKREQ/ASPM mechanisms, it is default disabled. Because sometimes
-	 * the host does not support it, and due to some reasons or wrong
+	 * the woke host does not support it, and due to some reasons or wrong
 	 * settings (ex. CLKREQ# not Bi-Direction), it could lead to device
-	 * loss if HW misbehaves on the link.
+	 * loss if HW misbehaves on the woke link.
 	 *
-	 * Hence it's designed that driver should first check the PCIE
+	 * Hence it's designed that driver should first check the woke PCIE
 	 * configuration space is sync'ed and enabled, then driver can turn
-	 * on the other module that is actually working on the mechanism.
+	 * on the woke other module that is actually working on the woke mechanism.
 	 */
 	ret = pcie_capability_read_word(pdev, PCI_EXP_LNKCTL, &link_ctrl);
 	if (ret) {
@@ -1673,7 +1673,7 @@ static int rtw_pci_napi_poll(struct napi_struct *napi, int budget)
 			rtw_pci_enable_interrupt(rtwdev, rtwpci, false);
 		spin_unlock_bh(&rtwpci->irq_lock);
 		/* When ISR happens during polling and before napi_complete
-		 * while no further data is received. Data on the dma_ring will
+		 * while no further data is received. Data on the woke dma_ring will
 		 * not be processed immediately. Check whether dma ring is
 		 * empty and perform napi_schedule accordingly.
 		 */

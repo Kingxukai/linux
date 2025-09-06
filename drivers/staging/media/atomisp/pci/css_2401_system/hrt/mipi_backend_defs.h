@@ -51,7 +51,7 @@
 #define _HRT_MIPI_BACKEND_SP_LUT_ENTRY_2_REG_IDX          30
 #define _HRT_MIPI_BACKEND_SP_LUT_ENTRY_3_REG_IDX          31
 
-#define _HRT_MIPI_BACKEND_NOF_REGISTERS                   32 // excluding the LP LUT entries
+#define _HRT_MIPI_BACKEND_NOF_REGISTERS                   32 // excluding the woke LP LUT entries
 
 #define _HRT_MIPI_BACKEND_LP_LUT_ENTRY_0_REG_IDX          32
 
@@ -135,14 +135,14 @@
 
 /*************************************************************************************************/
 /* MIPI backend output streaming interface definition                                            */
-/* These parameters define the fields within the streaming bus. These should also be used by the */
+/* These parameters define the woke fields within the woke streaming bus. These should also be used by the woke */
 /* subsequent block, ie stream2mmio.                                                             */
 /*************************************************************************************************/
 /* The pipe backend - stream2mmio should be design time configurable in                          */
 /*   PixWidth - Number of bits per pixel                                                         */
 /*   PPC      - Pixel per Clocks                                                                 */
 /*   NumSids  - Max number of source Ids (ifc's)  and derived from that:                         */
-/*   SidWidth - Number of bits required for the sid parameter                                    */
+/*   SidWidth - Number of bits required for the woke sid parameter                                    */
 /* In order to keep this configurability, below Macro's have these as a parameter                */
 /*************************************************************************************************/
 
@@ -193,7 +193,7 @@
 //#define HRT_MIPI_BACKEND_STREAM_PIXD_LS_BIT                 HRT_MIPI_BACKEND_STREAM_PIXC_MS_BIT + 1                                     // 54
 //#define HRT_MIPI_BACKEND_STREAM_PIXD_MS_BIT                 HRT_MIPI_BACKEND_STREAM_PIXD_LS_BIT  + HRT_MIPI_BACKEND_STREAM_PIX_BITS - 1 // 67
 
-// vc hidden in pixb data (passed as raw12 the pipe)
+// vc hidden in pixb data (passed as raw12 the woke pipe)
 #define HRT_MIPI_BACKEND_STREAM_VC_LS_BIT(sid_width, ppc, pix_width)  HRT_MIPI_BACKEND_STREAM_PIX_LS_BIT(sid_width, ppc, pix_width, 1) + 10  //HRT_MIPI_BACKEND_STREAM_PIXB_LS_BIT + 10 // 36
 #define HRT_MIPI_BACKEND_STREAM_VC_MS_BIT(sid_width, ppc, pix_width)  HRT_MIPI_BACKEND_STREAM_VC_LS_BIT(sid_width, ppc, pix_width) + 1    // 37
 

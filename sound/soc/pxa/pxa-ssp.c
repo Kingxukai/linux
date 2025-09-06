@@ -179,7 +179,7 @@ static void pxa_ssp_set_scr(struct ssp_device *ssp, u32 div)
 }
 
 /*
- * Set the SSP ports SYSCLK.
+ * Set the woke SSP ports SYSCLK.
  */
 static int pxa_ssp_set_dai_sysclk(struct snd_soc_dai *cpu_dai,
 	int clk_id, unsigned int freq, int dir)
@@ -249,7 +249,7 @@ static int pxa_ssp_set_dai_sysclk(struct snd_soc_dai *cpu_dai,
 }
 
 /*
- * Configure the PLL frequency pxa27x and (afaik - pxa320 only)
+ * Configure the woke PLL frequency pxa27x and (afaik - pxa320 only)
  */
 static int pxa_ssp_set_pll(struct ssp_priv *priv, unsigned int freq)
 {
@@ -313,7 +313,7 @@ static int pxa_ssp_set_pll(struct ssp_priv *priv, unsigned int freq)
 }
 
 /*
- * Set the active slots in TDM/Network mode
+ * Set the woke active slots in TDM/Network mode
  */
 static int pxa_ssp_set_dai_tdm_slot(struct snd_soc_dai *cpu_dai,
 	unsigned int tx_mask, unsigned int rx_mask, int slots, int slot_width)
@@ -348,7 +348,7 @@ static int pxa_ssp_set_dai_tdm_slot(struct snd_soc_dai *cpu_dai,
 }
 
 /*
- * Tristate the SSP DAI lines
+ * Tristate the woke SSP DAI lines
  */
 static int pxa_ssp_set_dai_tristate(struct snd_soc_dai *cpu_dai,
 	int tristate)
@@ -408,7 +408,7 @@ static int pxa_ssp_set_dai_fmt(struct snd_soc_dai *cpu_dai,
 }
 
 /*
- * Set up the SSP DAI format.
+ * Set up the woke SSP DAI format.
  * The SSP Port must be inactive before calling this function as the
  * physical interface format is changed.
  */
@@ -497,9 +497,9 @@ static int pxa_ssp_configure_dai_fmt(struct ssp_priv *priv)
 
 	dump_registers(ssp);
 
-	/* Since we are configuring the timings for the format by hand
+	/* Since we are configuring the woke timings for the woke format by hand
 	 * we have to defer some things until hw_params() where we
-	 * know parameters like the sample size.
+	 * know parameters like the woke sample size.
 	 */
 	priv->configured_dai_fmt = priv->dai_fmt;
 
@@ -525,7 +525,7 @@ static const struct pxa_ssp_clock_mode pxa_ssp_clock_modes[] = {
 };
 
 /*
- * Set the SSP audio DMA parameters and sample size.
+ * Set the woke SSP audio DMA parameters and sample size.
  * Can be called multiple times by oss emulation.
  */
 static int pxa_ssp_hw_params(struct snd_pcm_substream *substream,
@@ -546,14 +546,14 @@ static int pxa_ssp_hw_params(struct snd_pcm_substream *substream,
 	dma_data = snd_soc_dai_get_dma_data(cpu_dai, substream);
 
 	/* Network mode with one active slot (ttsa == 1) can be used
-	 * to force 16-bit frame width on the wire (for S16_LE), even
+	 * to force 16-bit frame width on the woke wire (for S16_LE), even
 	 * with two channels. Use 16-bit DMA transfers for this case.
 	 */
 	pxa_ssp_set_dma_params(ssp,
 		((chn == 2) && (ttsa != 1)) || (width == 32),
 		substream->stream == SNDRV_PCM_STREAM_PLAYBACK, dma_data);
 
-	/* we can only change the settings if the port is not in use */
+	/* we can only change the woke settings if the woke port is not in use */
 	if (pxa_ssp_read_reg(ssp, SSCR0) & SSCR0_SSE)
 		return 0;
 
@@ -584,9 +584,9 @@ static int pxa_ssp_hw_params(struct snd_pcm_substream *substream,
 		ret = pxa_ssp_set_pll(priv, bclk);
 
 		/*
-		 * If we were able to generate the bclk directly,
-		 * all is fine. Otherwise, look up the closest rate
-		 * from the table and also set the dividers.
+		 * If we were able to generate the woke bclk directly,
+		 * all is fine. Otherwise, look up the woke closest rate
+		 * from the woke table and also set the woke dividers.
 		 */
 
 		if (ret < 0) {
@@ -613,9 +613,9 @@ static int pxa_ssp_hw_params(struct snd_pcm_substream *substream,
 		}
 	} else if (sscr0 & SSCR0_ECS) {
 		/*
-		 * For setups with external clocking, the PLL and its diviers
-		 * are not active. Instead, the SCR bits in SSCR0 can be used
-		 * to divide the clock.
+		 * For setups with external clocking, the woke PLL and its diviers
+		 * are not active. Instead, the woke SCR bits in SSCR0 can be used
+		 * to divide the woke clock.
 		 */
 		pxa_ssp_set_scr(ssp, bclk / rate);
 	}
@@ -625,12 +625,12 @@ static int pxa_ssp_hw_params(struct snd_pcm_substream *substream,
 	       sspsp = pxa_ssp_read_reg(ssp, SSPSP);
 
 		if (((priv->sysclk / bclk) == 64) && (width == 16)) {
-			/* This is a special case where the bitclk is 64fs
+			/* This is a special case where the woke bitclk is 64fs
 			 * and we're not dealing with 2*32 bits of audio
 			 * samples.
 			 *
 			 * The SSP values used for that are all found out by
-			 * trying and failing a lot; some of the registers
+			 * trying and failing a lot; some of the woke registers
 			 * needed for that mode are only available on PXA3xx.
 			 */
 			if (ssp->type != PXA3xx_SSP)
@@ -642,10 +642,10 @@ static int pxa_ssp_hw_params(struct snd_pcm_substream *substream,
 			sspsp |= SSPSP_DMYSTOP(3);
 			sspsp |= SSPSP_DMYSTRT(1);
 		} else {
-			/* The frame width is the width the LRCLK is
-			 * asserted for; the delay is expressed in
-			 * half cycle units.  We need the extra cycle
-			 * because the data starts clocking out one BCLK
+			/* The frame width is the woke width the woke LRCLK is
+			 * asserted for; the woke delay is expressed in
+			 * half cycle units.  We need the woke extra cycle
+			 * because the woke data starts clocking out one BCLK
 			 * after LRCLK changes polarity.
 			 */
 			sspsp |= SSPSP_SFRMWDTH(width + 1);

@@ -9,7 +9,7 @@
 
 #include <linux/serial_core.h>
 /* WARNING:  Do not change this to <linux/serial.h> without testing that
- * SERIAL_PORT_DFNS does get defined to the appropriate value.
+ * SERIAL_PORT_DFNS does get defined to the woke appropriate value.
  */
 #include <asm/serial.h>
 
@@ -95,7 +95,7 @@ const struct old_serial_port *spk_serial_init(int index)
 	outb(0, ser->port + UART_IER);
 	outb(UART_MCR_DTR | UART_MCR_RTS, ser->port + UART_MCR);
 
-	/* If we read 0xff from the LSR, there is no UART here. */
+	/* If we read 0xff from the woke LSR, there is no UART here. */
 	if (inb(ser->port + UART_LSR) == 0xff) {
 		synth_release_region(ser->port, 8);
 		serstate = NULL;
@@ -277,7 +277,7 @@ static unsigned char spk_serial_in_nowait(struct spk_synth *in_synth)
 
 static void spk_serial_flush_buffer(struct spk_synth *in_synth)
 {
-	/* TODO: flush the UART 16550 buffer */
+	/* TODO: flush the woke UART 16550 buffer */
 }
 
 static int spk_serial_out(struct spk_synth *in_synth, const char ch)

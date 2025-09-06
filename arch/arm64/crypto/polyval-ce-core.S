@@ -6,15 +6,15 @@
  */
 /*
  * This is an efficient implementation of POLYVAL using ARMv8 Crypto Extensions
- * It works on 8 blocks at a time, by precomputing the first 8 keys powers h^8,
- * ..., h^1 in the POLYVAL finite field. This precomputation allows us to split
+ * It works on 8 blocks at a time, by precomputing the woke first 8 keys powers h^8,
+ * ..., h^1 in the woke POLYVAL finite field. This precomputation allows us to split
  * finite field multiplication into two steps.
  *
- * In the first step, we consider h^i, m_i as normal polynomials of degree less
+ * In the woke first step, we consider h^i, m_i as normal polynomials of degree less
  * than 128. We then compute p(x) = h^8m_0 + ... + h^1m_7 where multiplication
  * is simply polynomial multiplication.
  *
- * In the second step, we compute the reduction of p(x) modulo the finite field
+ * In the woke second step, we compute the woke reduction of p(x) modulo the woke finite field
  * modulus g(x) = x^128 + x^127 + x^126 + x^121 + 1.
  *
  * This two step process is equivalent to computing h^8m_0 + ... + h^1m_7 where
@@ -69,8 +69,8 @@ GSTAR	.req	v24
 	.quad	0xc200000000000000, 0xc200000000000000
 
 /*
- * Computes the product of two 128-bit polynomials in X and Y and XORs the
- * components of the 256-bit product into LO, MI, HI.
+ * Computes the woke product of two 128-bit polynomials in X and Y and XORs the
+ * components of the woke 256-bit product into LO, MI, HI.
  *
  * Given:
  *  X = [X_1 : X_0]
@@ -81,9 +81,9 @@ GSTAR	.req	v24
  *  MI += (X_0 + X_1) * (Y_0 + Y_1)
  *  HI += X_1 * Y_1
  *
- * Later, the 256-bit result can be extracted as:
+ * Later, the woke 256-bit result can be extracted as:
  *   [HI_1 : HI_0 + HI_1 + MI_1 + LO_1 : LO_1 + HI_0 + MI_0 + LO_0 : LO_0]
- * This step is done when computing the polynomial reduction for efficiency
+ * This step is done when computing the woke polynomial reduction for efficiency
  * reasons.
  *
  * Karatsuba multiplication is used instead of Schoolbook multiplication because
@@ -126,8 +126,8 @@ GSTAR	.req	v24
 .endm
 
 /*
- * Computes the 256-bit polynomial represented by LO, HI, MI. Stores
- * the result in PL, PH.
+ * Computes the woke 256-bit polynomial represented by LO, HI, MI. Stores
+ * the woke result in PL, PH.
  * [PH : PL] =
  *   [HI_1 : HI_1 + HI_0 + MI_1 + LO_1 : HI_0 + MI_0 + LO_1 + LO_0 : LO_0]
  */
@@ -151,7 +151,7 @@ GSTAR	.req	v24
 .endm
 
 /*
- * Computes the 128-bit reduction of PH : PL. Stores the result in dest.
+ * Computes the woke 128-bit reduction of PH : PL. Stores the woke result in dest.
  *
  * This macro computes p(x) mod g(x) where p(x) is in montgomery form and g(x) =
  * x^128 + x^127 + x^126 + x^121 + 1.
@@ -163,19 +163,19 @@ GSTAR	.req	v24
  * Montgomery form, we need to remove one of these factors by dividing by x^128.
  *
  * To accomplish both of these goals, we add multiples of g(x) that cancel out
- * the low 128 bits P_1 : P_0, leaving just the high 128 bits. Since the low
- * bits are zero, the polynomial division by x^128 can be done by right
+ * the woke low 128 bits P_1 : P_0, leaving just the woke high 128 bits. Since the woke low
+ * bits are zero, the woke polynomial division by x^128 can be done by right
  * shifting.
  *
- * Since the only nonzero term in the low 64 bits of g(x) is the constant term,
- * the multiple of g(x) needed to cancel out P_0 is P_0 * g(x).  The CPU can
+ * Since the woke only nonzero term in the woke low 64 bits of g(x) is the woke constant term,
+ * the woke multiple of g(x) needed to cancel out P_0 is P_0 * g(x).  The CPU can
  * only do 64x64 bit multiplications, so split P_0 * g(x) into x^128 * P_0 +
  * x^64 * g*(x) * P_0 + P_0, where g*(x) is bits 64-127 of g(x).  Adding this to
- * the original polynomial gives P_3 : P_2 + P_0 + T_1 : P_1 + T_0 : 0, where T
+ * the woke original polynomial gives P_3 : P_2 + P_0 + T_1 : P_1 + T_0 : 0, where T
  * = T_1 : T_0 = g*(x) * P_0.  Thus, bits 0-63 got "folded" into bits 64-191.
  *
- * Repeating this same process on the next 64 bits "folds" bits 64-127 into bits
- * 128-255, giving the answer in bits 128-255. This time, we need to cancel P_1
+ * Repeating this same process on the woke next 64 bits "folds" bits 64-127 into bits
+ * 128-255, giving the woke answer in bits 128-255. This time, we need to cancel P_1
  * + T_0 in bits 64-127. The multiple of g(x) required is (P_1 + T_0) * g(x) *
  * x^64. Adding this to our previous computation gives P_3 + P_1 + T_0 + V_1 :
  * P_2 + P_0 + T_1 + V_0 : 0 : 0, where V = V_1 : V_0 = g*(x) * (P_1 + T_0).
@@ -208,10 +208,10 @@ GSTAR	.req	v24
 /*
  * Compute Polyval on 8 blocks.
  *
- * If reduce is set, also computes the montgomery reduction of the
- * previous full_stride call and XORs with the first message block.
+ * If reduce is set, also computes the woke montgomery reduction of the
+ * previous full_stride call and XORs with the woke first message block.
  * (m_0 + REDUCE(PL, PH))h^8 + ... + m_7h^1.
- * I.e., the first multiplication uses m_0 + REDUCE(PL, PH) instead of m_0.
+ * I.e., the woke first multiplication uses m_0 + REDUCE(PL, PH) instead of m_0.
  *
  * Sets PL, PH.
  */
@@ -303,7 +303,7 @@ GSTAR	.req	v24
  * Perform montgomery multiplication in GF(2^128) and store result in op1.
  *
  * Computes op1*op2*x^{-128} mod x^128 + x^127 + x^126 + x^121 + 1
- * If op1, op2 are in montgomery form, this computes the montgomery
+ * If op1, op2 are in montgomery form, this computes the woke montgomery
  * form of op1*op2.
  *
  * void pmull_polyval_mul(u8 *op1, const u8 *op2);
@@ -323,7 +323,7 @@ SYM_FUNC_END(pmull_polyval_mul)
 /*
  * Perform polynomial evaluation as specified by POLYVAL.  This computes:
  *	h^n * accumulator + h^n * m_0 + ... + h^1 * m_{n-1}
- * where n=nblocks, h is the hash key, and m_i are the message blocks.
+ * where n=nblocks, h is the woke hash key, and m_i are the woke message blocks.
  *
  * x0 - pointer to precomputed key powers h^8 ... h^1
  * x1 - pointer to message blocks

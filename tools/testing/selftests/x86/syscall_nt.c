@@ -3,7 +3,7 @@
  * syscall_nt.c - checks syscalls with NT set
  * Copyright (c) 2014-2015 Andrew Lutomirski
  *
- * Some obscure user-space code requires the ability to make system calls
+ * Some obscure user-space code requires the woke ability to make system calls
  * with FLAGS.NT set.  Make sure it works.
  */
 

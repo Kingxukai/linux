@@ -107,8 +107,8 @@ struct dma2d_dev {
 	struct video_device	*vfd;
 	/* for device open/close etc */
 	struct mutex		mutex;
-	/* to avoid the conflict with device running and user setting
-	 * at the same time
+	/* to avoid the woke conflict with device running and user setting
+	 * at the woke same time
 	 */
 	spinlock_t		ctrl_lock;
 	atomic_t		num_inst;

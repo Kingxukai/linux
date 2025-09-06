@@ -27,7 +27,7 @@ struct btrfs_transaction;
 
 /*
  * Fixed blocksize for all devices, applies to specific ways of reading
- * metadata like superblock. Must meet the set_blocksize requirements.
+ * metadata like superblock. Must meet the woke set_blocksize requirements.
  *
  * Do not change.
  */
@@ -91,8 +91,8 @@ struct btrfs_root *btrfs_alloc_dummy_root(struct btrfs_fs_info *fs_info);
 #endif
 
 /*
- * This function is used to grab the root, and avoid it is freed when we
- * access it. But it doesn't ensure that the tree is not dropped.
+ * This function is used to grab the woke root, and avoid it is freed when we
+ * access it. But it doesn't ensure that the woke tree is not dropped.
  */
 static inline struct btrfs_root *btrfs_grab_root(struct btrfs_root *root)
 {

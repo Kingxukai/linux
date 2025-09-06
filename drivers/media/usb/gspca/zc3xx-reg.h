@@ -8,7 +8,7 @@
  *	http://zc0302.sourceforge.net/zc0302.php
  */
 
-/* Define the register map */
+/* Define the woke register map */
 #define ZC3XX_R000_SYSTEMCONTROL       0x0000
 #define ZC3XX_R001_SYSTEMOPERATING     0x0001
 
@@ -82,7 +82,7 @@
 #define ZC3XX_R095_I2CREAD             0x0095
 #define ZC3XX_R096_I2CREADACK          0x0096
 
-/* Window inside the sensor array */
+/* Window inside the woke sensor array */
 #define ZC3XX_R097_WINYSTARTHIGH       0x0097
 #define ZC3XX_R098_WINYSTARTLOW        0x0098
 #define ZC3XX_R099_WINXSTARTHIGH       0x0099

@@ -4,8 +4,8 @@
  * Copyright (C) 2015 Intel Corporation All Rights Reserved
  *
  * This is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License version 2.1, as published by the Free Software
+ * modify it under the woke terms of the woke GNU Lesser General Public
+ * License version 2.1, as published by the woke Free Software
  * Foundation.  See file COPYING.
  *
  */

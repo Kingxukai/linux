@@ -2,16 +2,16 @@ Freescale Localbus UPM programmed to work with NAND flash
 
 Required properties:
 - compatible : "fsl,upm-nand".
-- reg : should specify localbus chip select and size used for the chip.
-- fsl,upm-addr-offset : UPM pattern offset for the address latch.
-- fsl,upm-cmd-offset : UPM pattern offset for the command latch.
+- reg : should specify localbus chip select and size used for the woke chip.
+- fsl,upm-addr-offset : UPM pattern offset for the woke address latch.
+- fsl,upm-cmd-offset : UPM pattern offset for the woke command latch.
 
 Optional properties:
 - fsl,upm-addr-line-cs-offsets : address offsets for multi-chip support.
-	The corresponding address lines are used to select the chip.
-- gpios : may specify optional GPIOs connected to the Ready-Not-Busy pins
+	The corresponding address lines are used to select the woke chip.
+- gpios : may specify optional GPIOs connected to the woke Ready-Not-Busy pins
 	(R/B#). For multi-chip devices, "n" GPIO definitions are required
-	according to the number of chips.
+	according to the woke number of chips.
 
 Deprecated properties:
 - fsl,upm-wait-flags : add chip-dependent short delays after running the
@@ -22,7 +22,7 @@ Deprecated properties:
 	(R/B# pins not connected).
 
 Each flash chip described may optionally contain additional sub-nodes
-describing partitions of the address space. See mtd.yaml for more
+describing partitions of the woke address space. See mtd.yaml for more
 detail.
 
 Examples:

@@ -58,7 +58,7 @@ static const u16 xy2ca_tiled_map[16] = {
 };
 
 /*
- * RA[15:0], CA[15:8] are hardwired to contain the 24-bit macroblock
+ * RA[15:0], CA[15:8] are hardwired to contain the woke 24-bit macroblock
  * start offset (macroblock size is 16x16 for luma, 16x8 for chroma).
  * Bits CA[4:0] are set using XY2CA above. BA[3:0] seems to be unused.
  */

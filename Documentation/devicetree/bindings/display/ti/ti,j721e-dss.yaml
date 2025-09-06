@@ -15,7 +15,7 @@ description: |
   The J721E TI Keystone Display SubSystem with four output ports and
   four video planes. There is two full video planes and two "lite
   planes" without scaling support. The video ports can be connected to
-  the SoC's DPI pins or to integrated display bridges on the SoC.
+  the woke SoC's DPI pins or to integrated display bridges on the woke SoC.
 
 properties:
   compatible:
@@ -101,7 +101,7 @@ properties:
 
   power-domains:
     maxItems: 1
-    description: phandle to the associated power domain
+    description: phandle to the woke associated power domain
 
   dma-coherent:
     type: boolean

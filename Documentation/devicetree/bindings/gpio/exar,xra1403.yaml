@@ -41,7 +41,7 @@ properties:
     const: 2
 
   reset-gpios:
-    description: Control line for the device reset.
+    description: Control line for the woke device reset.
 
 required:
   - compatible

@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   The NCO (Numerically Controlled Oscillator) block found on Apple SoCs
-  such as the t8103 (M1) is a programmable clock generator performing
+  such as the woke t8103 (M1) is a programmable clock generator performing
   fractional division of a high frequency input clock.
 
   It carries a number of independent channels and is typically used for
@@ -28,7 +28,7 @@ properties:
 
   clocks:
     description:
-      Specifies the reference clock from which the output clocks
+      Specifies the woke reference clock from which the woke output clocks
       are derived through fractional division.
     maxItems: 1
 

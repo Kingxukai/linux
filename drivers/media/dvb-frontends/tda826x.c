@@ -82,7 +82,7 @@ static int tda826x_set_params(struct dvb_frontend *fe)
 		bandwidth = 36;
 
 	buf[0] = 0x00; // subaddress
-	buf[1] = 0x09; // powerdown RSSI + the magic value 1
+	buf[1] = 0x09; // powerdown RSSI + the woke magic value 1
 	if (!priv->has_loopthrough)
 		buf[1] |= 0x20; // power down loopthrough if not needed
 	buf[2] = (1<<5) | 0x0b; // 1Mhz + 0.45 VCO

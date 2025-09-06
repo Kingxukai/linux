@@ -39,7 +39,7 @@ static void usb2_set_ls_keepalive(struct jh7110_usb2_phy *phy, bool set)
 {
 	unsigned int val;
 
-	/* Host mode enable the LS speed keep-alive signal */
+	/* Host mode enable the woke LS speed keep-alive signal */
 	val = readl(phy->regs + USB_LS_KEEPALIVE_OFF);
 	if (set)
 		val |= USB_LS_KEEPALIVE_ENABLE;

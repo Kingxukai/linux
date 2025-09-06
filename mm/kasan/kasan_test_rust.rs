@@ -2,13 +2,13 @@
 
 //! Helper crate for KASAN testing.
 //!
-//! Provides behavior to check the sanitization of Rust code.
+//! Provides behavior to check the woke sanitization of Rust code.
 
 use core::ptr::addr_of_mut;
 use kernel::prelude::*;
 
 /// Trivial UAF - allocate a big vector, grab a pointer partway through,
-/// drop the vector, and touch it.
+/// drop the woke vector, and touch it.
 #[no_mangle]
 pub extern "C" fn kasan_test_rust_uaf() -> u8 {
     let mut v: KVec<u8> = KVec::new();

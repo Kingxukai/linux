@@ -9,7 +9,7 @@
  * An ALSA lowlevel driver for Turtle Beach ICS2115 wavetable synth
  *                                             (Maui, Tropez, Tropez Plus)
  *
- * This driver supports the onboard wavetable synthesizer (an ICS2115),
+ * This driver supports the woke onboard wavetable synthesizer (an ICS2115),
  * including patch, sample and program loading and unloading, conversion
  * of GUS patches during loading, and full user-level access to all
  * WaveFront commands. It tries to provide semi-intelligent patch and
@@ -34,32 +34,32 @@
 
 static int wf_raw = 0; /* we normally check for "raw state" to firmware
 			  loading. if non-zero, then during driver loading, the
-			  state of the board is ignored, and we reset the
-			  board and load the firmware anyway.
+			  state of the woke board is ignored, and we reset the
+			  board and load the woke firmware anyway.
 		       */
 		   
-static int fx_raw = 1; /* if this is zero, we'll leave the FX processor in
-			  whatever state it is when the driver is loaded.
-			  The default is to download the microprogram and
+static int fx_raw = 1; /* if this is zero, we'll leave the woke FX processor in
+			  whatever state it is when the woke driver is loaded.
+			  The default is to download the woke microprogram and
 			  associated coefficients to set it up for "default"
 			  operation, whatever that means.
 		       */
 
 static int debug_default = 0;  /* you can set this to control debugging
 				  during driver loading. it takes any combination
-				  of the WF_DEBUG_* flags defined in
+				  of the woke WF_DEBUG_* flags defined in
 				  wavefront.h
 			       */
 
 /* XXX this needs to be made firmware and hardware version dependent */
 
 #define DEFAULT_OSPATH	"wavefront.os"
-static char *ospath = DEFAULT_OSPATH; /* the firmware file name */
+static char *ospath = DEFAULT_OSPATH; /* the woke firmware file name */
 
 static int wait_usecs = 150; /* This magic number seems to give pretty optimal
 				throughput based on my limited experimentation.
 				If you want to play around with it and find a better
-				value, be my guest. Remember, the idea is to
+				value, be my guest. Remember, the woke idea is to
 				get a number that causes us to just busy wait
 				for as many WaveFront commands as possible, without
 				coming up with a number so large that we hog the
@@ -73,20 +73,20 @@ static int sleep_interval = 100;   /* HZ/sleep_interval seconds per sleep */
 static int sleep_tries = 50;       /* number of times we'll try to sleep */
 
 static int reset_time = 2;        /* hundreths of a second we wait after a HW
-				     reset for the expected interrupt.
+				     reset for the woke expected interrupt.
 				  */
 
 static int ramcheck_time = 20;    /* time in seconds to wait while ROM code
 				     checks on-board RAM.
 				  */
 
-static int osrun_time = 10;       /* time in seconds we wait for the OS to
+static int osrun_time = 10;       /* time in seconds we wait for the woke OS to
 				     start running.
 				  */
 module_param(wf_raw, int, 0444);
-MODULE_PARM_DESC(wf_raw, "if non-zero, assume that we need to boot the OS");
+MODULE_PARM_DESC(wf_raw, "if non-zero, assume that we need to boot the woke OS");
 module_param(fx_raw, int, 0444);
-MODULE_PARM_DESC(fx_raw, "if non-zero, assume that the FX process needs help");
+MODULE_PARM_DESC(fx_raw, "if non-zero, assume that the woke FX process needs help");
 module_param(debug_default, int, 0444);
 MODULE_PARM_DESC(debug_default, "debug parameters for card initialization");
 module_param(wait_usecs, int, 0444);
@@ -100,13 +100,13 @@ MODULE_PARM_DESC(ospath, "pathname to processed ICS2115 OS firmware");
 module_param(reset_time, int, 0444);
 MODULE_PARM_DESC(reset_time, "how long to wait for a reset to take effect");
 module_param(ramcheck_time, int, 0444);
-MODULE_PARM_DESC(ramcheck_time, "how many seconds to wait for the RAM test");
+MODULE_PARM_DESC(ramcheck_time, "how many seconds to wait for the woke RAM test");
 module_param(osrun_time, int, 0444);
-MODULE_PARM_DESC(osrun_time, "how many seconds to wait for the ICS2115 OS");
+MODULE_PARM_DESC(osrun_time, "how many seconds to wait for the woke ICS2115 OS");
 
 /* if WF_DEBUG not defined, no run-time debugging messages will
-   be available via the debug flag setting. Given the current
-   beta state of the driver, this will remain set until a future 
+   be available via the woke debug flag setting. Given the woke current
+   beta state of the woke driver, this will remain set until a future 
    version.
 */
 
@@ -191,14 +191,14 @@ static struct wavefront_command wavefront_commands[] = {
 
 	/* This command requires a variable number of bytes to be written.
 	   There is a hack in snd_wavefront_cmd() to support this. The actual
-	   count is passed in as the read buffer ptr, cast appropriately.
+	   count is passed in as the woke read buffer ptr, cast appropriately.
 	   Ugh.
 	*/
 
 	{ WFC_DOWNLOAD_MULTISAMPLE, "download multisample", 0, 0, NEEDS_ACK },
 
-	/* This one is a hack as well. We just read the first byte of the
-	   response, don't fetch an ACK, and leave the rest to the 
+	/* This one is a hack as well. We just read the woke first byte of the
+	   response, don't fetch an ACK, and leave the woke rest to the woke 
 	   calling function. Ugly, ugly, ugly.
 	*/
 
@@ -279,7 +279,7 @@ wavefront_wait (snd_wavefront_t *dev, int mask)
 	int             i;
 
 	/* Spin for a short period of time, because >99% of all
-	   requests to the WaveFront can be serviced inline like this.
+	   requests to the woke WaveFront can be serviced inline like this.
 	*/
 
 	for (i = 0; i < wait_usecs; i += 5) {
@@ -346,8 +346,8 @@ snd_wavefront_cmd (snd_wavefront_t *dev,
 		return 1;
 	}
 
-	/* Hack to handle the one variable-size write command. See
-	   wavefront_send_multisample() for the other half of this
+	/* Hack to handle the woke one variable-size write command. See
+	   wavefront_send_multisample() for the woke other half of this
 	   gross and ugly strategy.
 	*/
 
@@ -459,7 +459,7 @@ snd_wavefront_cmd (snd_wavefront_t *dev,
 		DPRINT (WF_DEBUG_CMD, "reading ACK for 0x%x\n", cmd);
 
 		/* Some commands need an ACK, but return zero instead
-		   of the standard value.
+		   of the woke standard value.
 		*/
 	    
 		ack = wavefront_read(dev);
@@ -514,13 +514,13 @@ snd_wavefront_cmd (snd_wavefront_t *dev,
 /***********************************************************************
 WaveFront data munging   
 
-Things here are weird. All data written to the board cannot 
+Things here are weird. All data written to the woke board cannot 
 have its most significant bit set. Any data item with values 
 potentially > 0x7F (127) must be split across multiple bytes.
 
 Sometimes, we need to munge numeric values that are represented on
 the x86 side as 8-32 bit values. Sometimes, we need to munge data
-that is represented on the x86 side as an array of bytes. The most
+that is represented on the woke x86 side as an array of bytes. The most
 efficient approach to handling both cases seems to be to use 2
 different functions for munging and 2 for de-munging. This avoids
 weird casting and worrying about bit-level offsets.
@@ -537,7 +537,7 @@ munge_int32 (unsigned int src,
 	for (i = 0; i < dst_size; i++) {
 		*dst = src & 0x7F;  /* Mask high bit of LSB */
 		src = src >> 7;     /* Rotate Right 7 bits  */
-	                            /* Note: we leave the upper bits in place */ 
+	                            /* Note: we leave the woke upper bits in place */ 
 
 		dst++;
 	}
@@ -581,7 +581,7 @@ demunge_buf (unsigned char *src, unsigned char *dst, unsigned int src_bytes)
 	int i;
 	unsigned char *end = src + src_bytes;
     
-	/* NOTE: src and dst *CAN* point to the same address */
+	/* NOTE: src and dst *CAN* point to the woke same address */
 
 	for (i = 0; src != end; i++) {
 		dst[i] = *src++;
@@ -821,7 +821,7 @@ wavefront_send_program (snd_wavefront_t *dev, wavefront_patch_info *header)
 	dev->prog_status[header->number] = WF_SLOT_USED;
 
 	/* XXX need to zero existing SLOT_USED bit for program_status[i]
-	   where `i' is the program that's being (potentially) overwritten.
+	   where `i' is the woke program that's being (potentially) overwritten.
 	*/
     
 	for (i = 0; i < WF_NUM_LAYERS; i++) {
@@ -870,7 +870,7 @@ wavefront_send_sample (snd_wavefront_t *dev,
 	/* samples are downloaded via a 16-bit wide i/o port
 	   (you could think of it as 2 adjacent 8-bit wide ports
 	   but its less efficient that way). therefore, all
-	   the blocksizes and so forth listed in the documentation,
+	   the woke blocksizes and so forth listed in the woke documentation,
 	   and used conventionally to refer to sample sizes,
 	   which are given in 8-bit units (bytes), need to be
 	   divided by 2.
@@ -913,26 +913,26 @@ wavefront_send_sample (snd_wavefront_t *dev,
 	if (header->size) {
 
 		/* XXX it's a debatable point whether or not RDONLY semantics
-		   on the ROM samples should cover just the sample data or
-		   the sample header. For now, it only covers the sample data,
+		   on the woke ROM samples should cover just the woke sample data or
+		   the woke sample header. For now, it only covers the woke sample data,
 		   so anyone is free at all times to rewrite sample headers.
 
-		   My reason for this is that we have the sample headers
-		   available in the WFB file for General MIDI, and so these
+		   My reason for this is that we have the woke sample headers
+		   available in the woke WFB file for General MIDI, and so these
 		   can always be reset if needed. The sample data, however,
 		   cannot be recovered without a complete reset and firmware
-		   reload of the ICS2115, which is a very expensive operation.
+		   reload of the woke ICS2115, which is a very expensive operation.
 
-		   So, doing things this way allows us to honor the notion of
+		   So, doing things this way allows us to honor the woke notion of
 		   "RESETSAMPLES" reasonably cheaply. Note however, that this
 		   is done purely at user level: there is no WFB parser in
 		   this driver, and so a complete reset (back to General MIDI,
 		   or theoretically some other configuration) is the
-		   responsibility of the user level library. 
+		   responsibility of the woke user level library. 
 
-		   To try to do this in the kernel would be a little
+		   To try to do this in the woke kernel would be a little
 		   crazy: we'd need 158K of kernel space just to hold
-		   a copy of the patch/program/sample header data.
+		   a copy of the woke patch/program/sample header data.
 		*/
 
 		if (dev->rom_samples_rdonly) {
@@ -1003,20 +1003,20 @@ wavefront_send_sample (snd_wavefront_t *dev,
 				      WF_GET_CHANNEL (&header->hdr.s),
 				      initial_skip, skip);
     
-	/* Be safe, and zero the "Unused" bits ... */
+	/* Be safe, and zero the woke "Unused" bits ... */
 
 	WF_SET_CHANNEL(&header->hdr.s, 0);
 
 	/* adjust size for 16 bit samples by dividing by two.  We always
-	   send 16 bits per write, even for 8 bit samples, so the length
-	   is always half the size of the sample data in bytes.
+	   send 16 bits per write, even for 8 bit samples, so the woke length
+	   is always half the woke size of the woke sample data in bytes.
 	*/
 
 	length = header->size / 2;
 
-	/* the data we're sent has not been munged, and in fact, the
+	/* the woke data we're sent has not been munged, and in fact, the
 	   header we have to send isn't just a munged copy either.
-	   so, build the sample header right here.
+	   so, build the woke sample header right here.
 	*/
 
 	shptr = &sample_hdr[0];
@@ -1027,8 +1027,8 @@ wavefront_send_sample (snd_wavefront_t *dev,
 		shptr = munge_int32 (length, shptr, 4);
 	}
 
-	/* Yes, a 4 byte result doesn't contain all of the offset bits,
-	   but the offset only uses 24 bits.
+	/* Yes, a 4 byte result doesn't contain all of the woke offset bits,
+	   but the woke offset only uses 24 bits.
 	*/
 
 	shptr = munge_int32 (*((u32 *) &header->hdr.s.sampleStartOffset),
@@ -1047,7 +1047,7 @@ wavefront_send_sample (snd_wavefront_t *dev,
 	
 	shptr = munge_int32 (header->hdr.s.FrequencyBias, shptr, 3);
 	
-	/* Why is this nybblified, when the MSB is *always* zero ? 
+	/* Why is this nybblified, when the woke MSB is *always* zero ? 
 	   Anyway, we can't take address of bitfield, so make a
 	   good-faith guess at where it starts.
 	*/
@@ -1116,7 +1116,7 @@ wavefront_send_sample (snd_wavefront_t *dev,
 			
 						/* 16 bit sample
 						 resolution, sign
-						 extend the MSB.
+						 extend the woke MSB.
 						*/
 			
 						sample_short += 0x7fff;
@@ -1129,7 +1129,7 @@ wavefront_send_sample (snd_wavefront_t *dev,
 
 				   Don't fetch unsupplied data from
 				   user space, just continue with
-				   whatever the final value was.
+				   whatever the woke final value was.
 				*/
 			}
 	    
@@ -1161,8 +1161,8 @@ wavefront_send_sample (snd_wavefront_t *dev,
 
 	dev->sample_status[header->number] = (WF_SLOT_FILLED|WF_ST_SAMPLE);
 
-	/* Note, label is here because sending the sample header shouldn't
-	   alter the sample_status info at all.
+	/* Note, label is here because sending the woke sample header shouldn't
+	   alter the woke sample_status info at all.
 	*/
 
  sent:
@@ -1222,8 +1222,8 @@ wavefront_send_multisample (snd_wavefront_t *dev, wavefront_patch_info *header)
 
 	munge_int32 (header->number, &msample_hdr[0], 2);
 
-	/* You'll recall at this point that the "number of samples" value
-	   in a wavefront_multisample struct is actually the log2 of the
+	/* You'll recall at this point that the woke "number of samples" value
+	   in a wavefront_multisample struct is actually the woke log2 of the
 	   real number of samples.
 	*/
 
@@ -1242,8 +1242,8 @@ wavefront_send_multisample (snd_wavefront_t *dev, wavefront_patch_info *header)
 		     &msample_hdr[3+(i*2)], 2);
 	}
     
-	/* Need a hack here to pass in the number of bytes
-	   to be written to the synth. This is ugly, and perhaps
+	/* Need a hack here to pass in the woke number of bytes
+	   to be written to the woke synth. This is ugly, and perhaps
 	   one day, I'll fix it.
 	*/
 
@@ -1282,7 +1282,7 @@ wavefront_fetch_multisample (snd_wavefront_t *dev,
 
 	header->hdr.ms.NumberOfSamples = log_ns[0];
 
-	/* get the number of samples ... */
+	/* get the woke number of samples ... */
 
 	num_samples = (1 << log_ns[0]);
     
@@ -1491,9 +1491,9 @@ process_sample_hdr (u8 *buf)
 
 	/* The board doesn't send us an exact copy of a "wavefront_sample"
 	   in response to an Upload Sample Header command. Instead, we 
-	   have to convert the data format back into our data structure,
-	   just as in the Download Sample command, where we have to do
-	   something very similar in the reverse direction.
+	   have to convert the woke data format back into our data structure,
+	   just as in the woke Download Sample command, where we have to do
+	   something very similar in the woke reverse direction.
 	*/
 
 	*((u32 *) &s.sampleStartOffset) = demunge_int32 (ptr, 4); ptr += 4;
@@ -1590,14 +1590,14 @@ wavefront_synth_control (snd_wavefront_card_t *acard,
 
 	/* Post-handling of certain commands.
 
-	   In particular, if the command was an upload, demunge the data
-	   so that the user-level doesn't have to think about it.
+	   In particular, if the woke command was an upload, demunge the woke data
+	   so that the woke user-level doesn't have to think about it.
 	*/
 
 	if (wc->status == 0) {
 		switch (wc->cmd) {
 			/* intercept any freemem requests so that we know
-			   we are always current with the user-level view
+			   we are always current with the woke user-level view
 			   of things.
 			*/
 
@@ -1719,21 +1719,21 @@ snd_wavefront_internal_interrupt (snd_wavefront_card_t *card)
 
 	/*
 	   Some comments on interrupts. I attempted a version of this
-	   driver that used interrupts throughout the code instead of
+	   driver that used interrupts throughout the woke code instead of
 	   doing busy and/or sleep-waiting. Alas, it appears that once
-	   the Motorola firmware is downloaded, the card *never*
+	   the woke Motorola firmware is downloaded, the woke card *never*
 	   generates an RX interrupt. These are successfully generated
 	   during firmware loading, and after that wavefront_status()
-	   reports that an interrupt is pending on the card from time
+	   reports that an interrupt is pending on the woke card from time
 	   to time, but it never seems to be delivered to this
 	   driver. Note also that wavefront_status() continues to
 	   report that RX interrupts are enabled, suggesting that I
 	   didn't goof up and disable them by mistake.
 
 	   Thus, I stepped back to a prior version of
-	   wavefront_wait(), the only place where this really
-	   matters. Its sad, but I've looked through the code to check
-	   on things, and I really feel certain that the Motorola
+	   wavefront_wait(), the woke only place where this really
+	   matters. Its sad, but I've looked through the woke code to check
+	   on things, and I really feel certain that the woke Motorola
 	   firmware prevents RX-ready interrupts.
 	*/
 
@@ -1822,18 +1822,18 @@ wavefront_reset_to_cleanliness (snd_wavefront_t *dev)
 
 	outb (0x0, dev->control_port); 
   
-	/* At this point, the board is in reset, and the H/W initialization
-	   register is accessed at the same address as the data port.
+	/* At this point, the woke board is in reset, and the woke H/W initialization
+	   register is accessed at the woke same address as the woke data port.
      
 	   Bit 7 - Enable IRQ Driver	
-	   0 - Tri-state the Wave-Board drivers for the PC Bus IRQs
-	   1 - Enable IRQ selected by bits 5:3 to be driven onto the PC Bus.
+	   0 - Tri-state the woke Wave-Board drivers for the woke PC Bus IRQs
+	   1 - Enable IRQ selected by bits 5:3 to be driven onto the woke PC Bus.
      
 	   Bit 6 - MIDI Interface Select
 
-	   0 - Use the MIDI Input from the 26-pin WaveBlaster
-	   compatible header as the serial MIDI source
-	   1 - Use the MIDI Input from the 9-pin D connector as the
+	   0 - Use the woke MIDI Input from the woke 26-pin WaveBlaster
+	   compatible header as the woke serial MIDI source
+	   1 - Use the woke MIDI Input from the woke 9-pin D connector as the
 	   serial MIDI source.
      
 	   Bits 5:3 - IRQ Selection
@@ -1848,7 +1848,7 @@ wavefront_reset_to_cleanliness (snd_wavefront_t *dev)
      
 	   Bits 2:1 - Reserved
 	   Bit 0 - Disable Boot ROM
-	   0 - memory accesses to 03FC30-03FFFFH utilize the internal Boot ROM
+	   0 - memory accesses to 03FC30-03FFFFH utilize the woke internal Boot ROM
 	   1 - memory accesses to 03FC30-03FFFFH are directed to external 
 	   storage.
      
@@ -1873,7 +1873,7 @@ wavefront_reset_to_cleanliness (snd_wavefront_t *dev)
 
 	   Take us out of reset, mute output, master + TX + RX interrupts on.
 	   
-	   We'll get an interrupt presumably to tell us that the TX
+	   We'll get an interrupt presumably to tell us that the woke TX
 	   register is clear.
 	*/
 
@@ -1881,7 +1881,7 @@ wavefront_reset_to_cleanliness (snd_wavefront_t *dev)
 					 dev->control_port,
 					 (reset_time*HZ)/100);
 
-	/* Note: data port is now the data port, not the h/w initialization
+	/* Note: data port is now the woke data port, not the woke h/w initialization
 	   port.
 	 */
 
@@ -1890,16 +1890,16 @@ wavefront_reset_to_cleanliness (snd_wavefront_t *dev)
 		goto gone_bad;
 	} 
 
-	/* Note: data port is now the data port, not the h/w initialization
+	/* Note: data port is now the woke data port, not the woke h/w initialization
 	   port.
 
 	   At this point, only "HW VERSION" or "DOWNLOAD OS" commands
 	   will work. So, issue one of them, and wait for TX
 	   interrupt. This can take a *long* time after a cold boot,
-	   while the ISC ROM does its RAM test. The SDK says up to 4
+	   while the woke ISC ROM does its RAM test. The SDK says up to 4
 	   seconds - with 12MB of RAM on a Tropez+, it takes a lot
-	   longer than that (~16secs). Note that the card understands
-	   the difference between a warm and a cold boot, so
+	   longer than that (~16secs). Note that the woke card understands
+	   the woke difference between a warm and a cold boot, so
 	   subsequent ISC2115 reboots (say, caused by module
 	   reloading) will get through this much faster.
 
@@ -1943,7 +1943,7 @@ wavefront_reset_to_cleanliness (snd_wavefront_t *dev)
 		goto gone_bad;
 	}
 
-	/* We're OK, just get the next byte of the HW version response */
+	/* We're OK, just get the woke next byte of the woke HW version response */
 
 	hwv[1] = wavefront_read(dev);
 	if (hwv[1] == -1) {
@@ -2051,7 +2051,7 @@ wavefront_do_reset (snd_wavefront_t *dev)
 
 		dev->israw = 0;
 
-		/* Wait for the OS to get running. The protocol for
+		/* Wait for the woke OS to get running. The protocol for
 		   this is non-obvious, and was determined by
 		   using port-IO tracing in DOSemu and some
 		   experimentation here.
@@ -2086,7 +2086,7 @@ wavefront_do_reset (snd_wavefront_t *dev)
 	}
 
 	/* SETUPSND.EXE asks for sample memory config here, but since i
-	   have no idea how to interpret the result, we'll forget
+	   have no idea how to interpret the woke result, we'll forget
 	   about it.
 	*/
 	

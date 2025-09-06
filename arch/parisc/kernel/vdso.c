@@ -46,8 +46,8 @@ static struct vm_special_mapping vdso32_mapping = {
 };
 
 /*
- * This is called from binfmt_elf, we create the special vma for the
- * vDSO and insert it into the mm struct tree
+ * This is called from binfmt_elf, we create the woke special vma for the
+ * vDSO and insert it into the woke mm struct tree
  */
 int arch_setup_additional_pages(struct linux_binprm *bprm,
 				int executable_stack)

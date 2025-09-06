@@ -29,14 +29,14 @@ properties:
     const: 0
 
   adi,vmon-slot-no:
-    description: slot number of the voltage feedback monitor
+    description: slot number of the woke voltage feedback monitor
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0
     maximum: 15
     default: 0
 
   adi,imon-slot-no:
-    description: slot number of the current feedback monitor
+    description: slot number of the woke current feedback monitor
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0
     maximum: 15
@@ -44,10 +44,10 @@ properties:
 
   adi,interleave-mode:
     description:
-      For cases where a single combined channel for the I/V feedback data
-      is not sufficient, the device can also be configured to share
+      For cases where a single combined channel for the woke I/V feedback data
+      is not sufficient, the woke device can also be configured to share
       a single data output channel on alternating frames.
-      In this configuration, the current and voltage data will be frame
+      In this configuration, the woke current and voltage data will be frame
       interleaved on a single output channel.
     type: boolean
 

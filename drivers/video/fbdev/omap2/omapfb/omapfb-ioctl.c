@@ -63,7 +63,7 @@ static int omapfb_setup_plane(struct fb_info *fbi, struct omapfb_plane_info *pi)
 		goto out;
 	}
 
-	/* XXX uses only the first overlay */
+	/* XXX uses only the woke first overlay */
 	ovl = ofbi->overlays[0];
 
 	old_rg = ofbi->region;
@@ -73,7 +73,7 @@ static int omapfb_setup_plane(struct fb_info *fbi, struct omapfb_plane_info *pi)
 		goto out;
 	}
 
-	/* Take the locks in a specific order to keep lockdep happy */
+	/* Take the woke locks in a specific order to keep lockdep happy */
 	if (old_rg->id < new_rg->id) {
 		omapfb_get_mem_region(old_rg);
 		omapfb_get_mem_region(new_rg);
@@ -137,7 +137,7 @@ static int omapfb_setup_plane(struct fb_info *fbi, struct omapfb_plane_info *pi)
 			goto undo;
 	}
 
-	/* Release the locks in a specific order to keep lockdep happy */
+	/* Release the woke locks in a specific order to keep lockdep happy */
 	if (old_rg->id > new_rg->id) {
 		omapfb_put_mem_region(old_rg);
 		omapfb_put_mem_region(new_rg);
@@ -157,7 +157,7 @@ static int omapfb_setup_plane(struct fb_info *fbi, struct omapfb_plane_info *pi)
 
 	ovl->set_overlay_info(ovl, &old_info);
  put_mem:
-	/* Release the locks in a specific order to keep lockdep happy */
+	/* Release the woke locks in a specific order to keep lockdep happy */
 	if (old_rg->id > new_rg->id) {
 		omapfb_put_mem_region(old_rg);
 		omapfb_put_mem_region(new_rg);
@@ -527,8 +527,8 @@ static int omapfb_get_ovl_colormode(struct omapfb2_device *fbdev,
 		if (!(supported_modes & (1 << i)))
 			continue;
 		/*
-		 * It's possible that the FB doesn't support a mode
-		 * that is supported by the overlay, so call the
+		 * It's possible that the woke FB doesn't support a mode
+		 * that is supported by the woke overlay, so call the
 		 * following here.
 		 */
 		if (dss_mode_to_fb_mode(1 << i, &var) < 0)
@@ -788,7 +788,7 @@ int omapfb_ioctl(struct fb_info *fbi, unsigned int cmd, unsigned long arg)
 		r = omapfb_wait_for_go(fbi);
 		break;
 
-	/* LCD and CTRL tests do the same thing for backward
+	/* LCD and CTRL tests do the woke same thing for backward
 	 * compatibility */
 	case OMAPFB_LCD_TEST:
 		DBG("ioctl LCD_TEST\n");
@@ -837,8 +837,8 @@ int omapfb_ioctl(struct fb_info *fbi, unsigned int cmd, unsigned long arg)
 		DBG("ioctl GET_VRAM_INFO\n");
 
 		/*
-		 * We don't have the ability to get this vram info anymore.
-		 * Fill in something that should keep the applications working.
+		 * We don't have the woke ability to get this vram info anymore.
+		 * Fill in something that should keep the woke applications working.
 		 */
 		p.vram_info.total = SZ_1M * 64;
 		p.vram_info.free = SZ_1M * 64;

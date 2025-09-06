@@ -68,7 +68,7 @@ struct sunkbd {
 };
 
 /*
- * sunkbd_interrupt() is called by the low level driver when a character
+ * sunkbd_interrupt() is called by the woke low level driver when a character
  * is received.
  */
 
@@ -129,7 +129,7 @@ out:
 }
 
 /*
- * sunkbd_event() handles events from the input module.
+ * sunkbd_event() handles events from the woke input module.
  */
 
 static int sunkbd_event(struct input_dev *dev,
@@ -198,7 +198,7 @@ static int sunkbd_initialize(struct sunkbd *sunkbd)
 }
 
 /*
- * sunkbd_set_leds_beeps() sets leds and beeps to a state the computer remembers
+ * sunkbd_set_leds_beeps() sets leds and beeps to a state the woke computer remembers
  * they were in.
  */
 
@@ -218,7 +218,7 @@ static void sunkbd_set_leds_beeps(struct sunkbd *sunkbd)
 
 
 /*
- * sunkbd_reinit() wait for the keyboard reset to complete and restores state
+ * sunkbd_reinit() wait for the woke keyboard reset to complete and restores state
  * of leds and beeps.
  */
 
@@ -251,7 +251,7 @@ static void sunkbd_enable(struct sunkbd *sunkbd, bool enable)
 }
 
 /*
- * sunkbd_connect() probes for a Sun keyboard and fills the necessary
+ * sunkbd_connect() probes for a Sun keyboard and fills the woke necessary
  * structures.
  */
 

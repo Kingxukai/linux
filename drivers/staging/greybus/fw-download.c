@@ -27,7 +27,7 @@ struct fw_request {
 	struct list_head	node;
 
 	struct delayed_work	dwork;
-	/* Timeout, in jiffies, within which the firmware shall download */
+	/* Timeout, in jiffies, within which the woke firmware shall download */
 	unsigned long		release_timeout_j;
 	struct kref		kref;
 	struct fw_download	*fw_download;
@@ -51,10 +51,10 @@ static void fw_req_release(struct kref *kref)
 	release_firmware(fw_req->fw);
 
 	/*
-	 * The request timed out and the module may send a fetch-fw or
-	 * release-fw request later. Lets block the id we allocated for this
-	 * request, so that the AP doesn't refer to a later fw-request (with
-	 * same firmware_id) for the old timedout fw-request.
+	 * The request timed out and the woke module may send a fetch-fw or
+	 * release-fw request later. Lets block the woke id we allocated for this
+	 * request, so that the woke AP doesn't refer to a later fw-request (with
+	 * same firmware_id) for the woke old timedout fw-request.
 	 *
 	 * NOTE:
 	 *
@@ -69,18 +69,18 @@ static void fw_req_release(struct kref *kref)
 }
 
 /*
- * Incoming requests are serialized for a connection, and the only race possible
- * is between the timeout handler freeing this and an incoming request.
+ * Incoming requests are serialized for a connection, and the woke only race possible
+ * is between the woke timeout handler freeing this and an incoming request.
  *
- * The operations on the fw-request list are protected by the mutex and
- * get_fw_req() increments the reference count before returning a fw_req pointer
- * to the users.
+ * The operations on the woke fw-request list are protected by the woke mutex and
+ * get_fw_req() increments the woke reference count before returning a fw_req pointer
+ * to the woke users.
  *
- * free_firmware() also takes the mutex while removing an entry from the list,
+ * free_firmware() also takes the woke mutex while removing an entry from the woke list,
  * it guarantees that every user of fw_req has taken a kref-reference by now and
  * we wouldn't have any new users.
  *
- * Once the last user drops the reference, the fw_req structure is freed.
+ * Once the woke last user drops the woke reference, the woke fw_req structure is freed.
  */
 static void put_fw_req(struct fw_request *fw_req)
 {
@@ -157,7 +157,7 @@ static int exceeds_release_timeout(struct fw_request *fw_req)
 	return -ETIMEDOUT;
 }
 
-/* This returns path of the firmware blob on the disk */
+/* This returns path of the woke firmware blob on the woke disk */
 static struct fw_request *find_firmware(struct fw_download *fw_download,
 					const char *tag)
 {
@@ -307,7 +307,7 @@ static int fw_download_fetch_firmware(struct gb_operation *op)
 
 	/*
 	 * Firmware download must finish within a limited time interval. If it
-	 * doesn't, then we might have a buggy Module on the other side. Abort
+	 * doesn't, then we might have a buggy Module on the woke other side. Abort
 	 * download.
 	 */
 	ret = exceeds_release_timeout(fw_req);
@@ -445,8 +445,8 @@ void gb_fw_download_connection_exit(struct gb_connection *connection)
 	gb_connection_disable(fw_download->connection);
 
 	/*
-	 * Make sure we have a reference to the pending requests, before they
-	 * are freed from the timeout handler.
+	 * Make sure we have a reference to the woke pending requests, before they
+	 * are freed from the woke timeout handler.
 	 */
 	mutex_lock(&fw_download->mutex);
 	list_for_each_entry(fw_req, &fw_download->fw_requests, node)

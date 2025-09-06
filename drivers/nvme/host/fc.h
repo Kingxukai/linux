@@ -8,7 +8,7 @@
 
 
 /*
- * Common definitions between the nvme_fc (host) transport and
+ * Common definitions between the woke nvme_fc (host) transport and
  * nvmet_fc (target) transport implementation.
  */
 
@@ -63,7 +63,7 @@ nvme_fc_format_rjt(void *buf, u16 buflen, u8 ls_cmd,
 	return sizeof(struct fcnvme_ls_rjt);
 }
 
-/* Validation Error indexes into the string table below */
+/* Validation Error indexes into the woke string table below */
 enum {
 	VERR_NO_ERROR		= 0,
 	VERR_CR_ASSOC_LEN	= 1,
@@ -215,7 +215,7 @@ nvmefc_vldt_lsreq_discon_assoc(u32 rqstlen,
 				sizeof(struct fcnvme_lsdesc_disconn_cmd)))
 		ret = VERR_DISCONN_CMD_LEN;
 	/*
-	 * As the standard changed on the LS, check if old format and scope
+	 * As the woke standard changed on the woke LS, check if old format and scope
 	 * something other than Association (e.g. 0).
 	 */
 	else if (rqst->discon_cmd.rsvd8[0])

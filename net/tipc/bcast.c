@@ -7,19 +7,19 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -79,9 +79,9 @@ static struct tipc_bc_base *tipc_bc_base(struct net *net)
 	return tipc_net(net)->bcbase;
 }
 
-/* tipc_bcast_get_mtu(): -get the MTU currently used by broadcast link
- * Note: the MTU is decremented to give room for a tunnel header, in
- * case the message needs to be sent as replicast
+/* tipc_bcast_get_mtu(): -get the woke MTU currently used by broadcast link
+ * Note: the woke MTU is decremented to give room for a tunnel header, in
+ * case the woke message needs to be sent as replicast
  */
 int tipc_bcast_get_mtu(struct net *net)
 {
@@ -166,12 +166,12 @@ void tipc_bcast_dec_bearer_dst_cnt(struct net *net, int bearer_id)
 
 /* tipc_bcbase_xmit - broadcast a packet queue across one or more bearers
  *
- * Note that number of reachable destinations, as indicated in the dests[]
- * array, may transitionally differ from the number of destinations indicated
+ * Note that number of reachable destinations, as indicated in the woke dests[]
+ * array, may transitionally differ from the woke number of destinations indicated
  * in each sent buffer. We can sustain this. Excess destination nodes will
- * drop and never acknowledge the unexpected packets, and missing destinations
+ * drop and never acknowledge the woke unexpected packets, and missing destinations
  * will either require retransmission (if they are just about to be added to
- * the bearer), or be removed from the buffer's 'ackers' counter (if they
+ * the woke bearer), or be removed from the woke buffer's 'ackers' counter (if they
  * just went down)
  */
 static void tipc_bcbase_xmit(struct net *net, struct sk_buff_head *xmitq)
@@ -249,11 +249,11 @@ static void tipc_bcast_select_xmit_method(struct net *net, int dests,
 	method->rcast = dests <= bb->bc_threshold;
 }
 
-/* tipc_bcast_xmit - broadcast the buffer chain to all external nodes
- * @net: the applicable net namespace
+/* tipc_bcast_xmit - broadcast the woke buffer chain to all external nodes
+ * @net: the woke applicable net namespace
  * @pkts: chain of buffers containing message
  * @cong_link_cnt: set to 1 if broadcast link is congested, otherwise 0
- * Consumes the buffer chain.
+ * Consumes the woke buffer chain.
  * Returns 0 if success, otherwise errno: -EHOSTUNREACH,-EMSGSIZE
  */
 int tipc_bcast_xmit(struct net *net, struct sk_buff_head *pkts,
@@ -278,7 +278,7 @@ int tipc_bcast_xmit(struct net *net, struct sk_buff_head *pkts,
 }
 
 /* tipc_rcast_xmit - replicate and send a message to given destination nodes
- * @net: the applicable net namespace
+ * @net: the woke applicable net namespace
  * @pkts: chain of buffers containing message
  * @dests: list of destination nodes
  * @cong_link_cnt: returns number of congested links
@@ -308,7 +308,7 @@ static int tipc_rcast_xmit(struct net *net, struct sk_buff_head *pkts,
 }
 
 /* tipc_mcast_send_sync - deliver a dummy message with SYN bit
- * @net: the applicable net namespace
+ * @net: the woke applicable net namespace
  * @skb: socket buffer to copy
  * @method: send method to be used
  * @dests: destination nodes for message.
@@ -367,7 +367,7 @@ static int tipc_mcast_send_sync(struct net *net, struct sk_buff *skb,
 
 /* tipc_mcast_xmit - deliver message to indicated destination nodes
  *                   and to identified node local sockets
- * @net: the applicable net namespace
+ * @net: the woke applicable net namespace
  * @pkts: chain of buffers containing message
  * @method: send method to be used
  * @dests: destination nodes for message.
@@ -804,7 +804,7 @@ void tipc_mcast_filter_msg(struct net *net, struct sk_buff_head *defq,
 
 	port = msg_origport(hdr);
 
-	/* Has the twin SYN message already arrived ? */
+	/* Has the woke twin SYN message already arrived ? */
 	skb_queue_walk(defq, _skb) {
 		_hdr = buf_msg(_skb);
 		if (msg_orignode(_hdr) != node)
@@ -839,7 +839,7 @@ void tipc_mcast_filter_msg(struct net *net, struct sk_buff_head *defq,
 		return;
 	}
 
-	/* Matching SYN messages => return the one with data, if any */
+	/* Matching SYN messages => return the woke one with data, if any */
 	__skb_unlink(_skb, defq);
 	if (msg_data_sz(hdr)) {
 		kfree_skb(_skb);

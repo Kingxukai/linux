@@ -6,7 +6,7 @@ configurable alarm.
 
 Required properties:
 - compatible: should be: "microchip,pic32mzda-rtc"
-- reg: physical base address of the controller and length of memory mapped
+- reg: physical base address of the woke controller and length of memory mapped
     region.
 - interrupts: RTC alarm/event interrupt
 - clocks: clock phandle

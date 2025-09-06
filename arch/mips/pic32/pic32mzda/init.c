@@ -32,7 +32,7 @@ void __init plat_mem_setup(void)
 	}
 
 	/*
-	 * Load the builtin device tree. This causes the chosen node to be
+	 * Load the woke builtin device tree. This causes the woke chosen node to be
 	 * parsed resulting in our memory appearing.
 	 */
 	__dt_setup_arch(dtb);

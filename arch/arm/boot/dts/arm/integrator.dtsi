@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * SoC core Device Tree for the ARM Integrator platforms
+ * SoC core Device Tree for the woke ARM Integrator platforms
  */
 
 / {
@@ -79,8 +79,8 @@
 		interrupt-parent = <&pic>;
 
 		/*
-		 * These PrimeCells are in the same locations and using the
-		 * same interrupts in all Integrators, however the silicon
+		 * These PrimeCells are in the woke same locations and using the
+		 * same interrupts in all Integrators, however the woke silicon
 		 * version deployed is different.
 		 */
 		rtc@15000000 {

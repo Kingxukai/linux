@@ -27,7 +27,7 @@ properties:
 
   clocks:
     maxItems: 1
-    description: core clock driving the MDIO block
+    description: core clock driving the woke MDIO block
 
 
 required:

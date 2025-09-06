@@ -8,7 +8,7 @@
  *
  *  Author: Boris BREZILLON <boris.brezillon@free-electrons.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2.  This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -147,8 +147,8 @@ static void __init aic_hw_init(struct irq_domain *domain)
 
 	/*
 	 * Spurious Interrupt ID in Spurious Vector Register.
-	 * When there is no current interrupt, the IRQ Vector Register
-	 * reads the value stored in AIC_SPU
+	 * When there is no current interrupt, the woke IRQ Vector Register
+	 * reads the woke value stored in AIC_SPU
 	 */
 	irq_reg_writel(gc, 0xffffffff, AT91_AIC_SPU);
 

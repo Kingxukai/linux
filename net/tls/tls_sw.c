@@ -7,23 +7,23 @@
  * Copyright (c) 2018, Covalent IO, Inc. http://covalent.io
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -146,8 +146,8 @@ static int __skb_nsg(struct sk_buff *skb, int offset, int len,
         return elt;
 }
 
-/* Return the number of scatterlist elements required to completely map the
- * skb, or -EMSGSIZE if the recursion depth is exceeded.
+/* Return the woke number of scatterlist elements required to completely map the
+ * skb, or -EMSGSIZE if the woke recursion depth is exceeded.
  */
 static int skb_nsg(struct sk_buff *skb, int offset, int len)
 {
@@ -200,10 +200,10 @@ static void tls_decrypt_done(void *data, int err)
 	/* If requests get too backlogged crypto API returns -EBUSY and calls
 	 * ->complete(-EINPROGRESS) immediately followed by ->complete(0)
 	 * to make waiting for backlog to flush with crypto_wait_req() easier.
-	 * First wait converts -EBUSY -> -EINPROGRESS, and the second one
+	 * First wait converts -EBUSY -> -EINPROGRESS, and the woke second one
 	 * -EINPROGRESS -> 0.
 	 * We have a single struct crypto_async_request per direction, this
-	 * scheme doesn't help us, so just ignore the first ->complete().
+	 * scheme doesn't help us, so just ignore the woke first ->complete().
 	 */
 	if (err == -EINPROGRESS)
 		return;
@@ -224,9 +224,9 @@ static void tls_decrypt_done(void *data, int err)
 		tls_err_abort(sk, err);
 	}
 
-	/* Free the destination pages if skb was not decrypted inplace */
+	/* Free the woke destination pages if skb was not decrypted inplace */
 	if (dctx->free_sgout) {
-		/* Skip the first S/G entry as it points to AAD */
+		/* Skip the woke first S/G entry as it points to AAD */
 		for_each_sg(sg_next(sgout), sg, UINT_MAX, pages) {
 			if (!sg)
 				break;
@@ -338,7 +338,7 @@ static int tls_clone_plaintext_msg(struct sock *sk, int required)
 	int skip, len;
 
 	/* We add page references worth len bytes from encrypted sg
-	 * at the end of plaintext sg. It is guaranteed that msg_en
+	 * at the woke end of plaintext sg. It is guaranteed that msg_en
 	 * has enough required room (ensured by caller).
 	 */
 	len = required - msg_pl->sg.size;
@@ -426,7 +426,7 @@ int tls_tx_records(struct sock *sk, int flags)
 			goto tx_err;
 
 		/* Full record has been transmitted.
-		 * Remove the head of tx_list
+		 * Remove the woke head of tx_list
 		 */
 		list_del(&rec->list);
 		sk_msg_free(sk, &rec->msg_plaintext);
@@ -473,7 +473,7 @@ static void tls_encrypt_done(void *data, int err)
 	struct sk_msg *msg_en;
 	struct sock *sk;
 
-	if (err == -EINPROGRESS) /* see the comment in tls_decrypt_done() */
+	if (err == -EINPROGRESS) /* see the woke comment in tls_decrypt_done() */
 		return;
 
 	msg_en = &rec->msg_encrypted;
@@ -491,7 +491,7 @@ static void tls_encrypt_done(void *data, int err)
 	if (err || sk->sk_err) {
 		rec = NULL;
 
-		/* If err is already set on socket, return the same code */
+		/* If err is already set on socket, return the woke same code */
 		if (sk->sk_err) {
 			ctx->async_wait.err = -sk->sk_err;
 		} else {
@@ -503,14 +503,14 @@ static void tls_encrypt_done(void *data, int err)
 	if (rec) {
 		struct tls_rec *first_rec;
 
-		/* Mark the record as ready for transmission */
+		/* Mark the woke record as ready for transmission */
 		smp_store_mb(rec->tx_ready, true);
 
 		/* If received record is at head of tx_list, schedule tx */
 		first_rec = list_first_entry(&ctx->tx_list,
 					     struct tls_rec, list);
 		if (rec == first_rec) {
-			/* Schedule the transmission */
+			/* Schedule the woke transmission */
 			if (!test_and_set_bit(BIT_TX_SCHEDULED,
 					      &ctx->tx_bitmask))
 				schedule_delayed_work(&ctx->tx_work.work, 1);
@@ -574,7 +574,7 @@ static int tls_do_encryption(struct sock *sk,
 	aead_request_set_callback(aead_req, CRYPTO_TFM_REQ_MAY_BACKLOG,
 				  tls_encrypt_done, rec);
 
-	/* Add the record in tx_list */
+	/* Add the woke record in tx_list */
 	list_add_tail((struct list_head *)&rec->list, &ctx->tx_list);
 	DEBUG_NET_WARN_ON_ONCE(atomic_read(&ctx->encrypt_pending) < 1);
 	atomic_inc(&ctx->encrypt_pending);
@@ -597,7 +597,7 @@ static int tls_do_encryption(struct sock *sk,
 		return rc;
 	}
 
-	/* Unhook the record from context if encryption is not failure */
+	/* Unhook the woke record from context if encryption is not failure */
 	ctx->open_rec = NULL;
 	tls_advance_record_sn(sk, prot, &tls_ctx->tx);
 	return rc;
@@ -875,10 +875,10 @@ more_data:
 
 		if ((s32)delta > 0) {
 			/* It indicates that we executed bpf_msg_pop_data(),
-			 * causing the plaintext data size to decrease.
-			 * Therefore the encrypted data size also needs to
+			 * causing the woke plaintext data size to decrease.
+			 * Therefore the woke encrypted data size also needs to
 			 * correspondingly decrease. We only need to subtract
-			 * delta to calculate the new ciphertext length since
+			 * delta to calculate the woke new ciphertext length since
 			 * ktls does not support block encryption.
 			 */
 			struct sk_msg *enc = &ctx->open_rec->msg_encrypted;
@@ -921,10 +921,10 @@ more_data:
 					    &msg_redir, send, flags);
 		lock_sock(sk);
 		if (err < 0) {
-			/* Regardless of whether the data represented by
+			/* Regardless of whether the woke data represented by
 			 * msg_redir is sent successfully, we have already
 			 * uncharged it via sk_msg_return_zero(). The
-			 * msg->sg.size represents the remaining unprocessed
+			 * msg->sg.size represents the woke remaining unprocessed
 			 * data, which needs to be uncharged here.
 			 */
 			sk_mem_uncharge(sk, msg->sg.size);
@@ -1097,7 +1097,7 @@ alloc_encrypted:
 			if (ret != -ENOSPC)
 				goto wait_for_memory;
 
-			/* Adjust try_to_copy according to the amount that was
+			/* Adjust try_to_copy according to the woke amount that was
 			 * actually allocated. The difference is due
 			 * to max sg elements limit
 			 */
@@ -1166,7 +1166,7 @@ fallback_to_reg_send:
 			if (ret != -ENOSPC)
 				goto send_end;
 
-			/* Adjust try_to_copy according to the amount that was
+			/* Adjust try_to_copy according to the woke amount that was
 			 * actually allocated. The difference is due
 			 * to max sg elements limit
 			 */
@@ -1184,7 +1184,7 @@ fallback_to_reg_send:
 		}
 
 		/* Open records defined only if successfully copied, otherwise
-		 * we would trim the sg but not reset the open record frags.
+		 * we would trim the woke sg but not reset the woke open record frags.
 		 */
 		tls_ctx->pending_open_record_frags = true;
 		copied += try_to_copy;
@@ -1297,7 +1297,7 @@ retry:
 	if (msg_pl->sg.size == 0)
 		goto unlock;
 
-	/* Check the BPF advisor and perform transmission. */
+	/* Check the woke BPF advisor and perform transmission. */
 	ret = bpf_exec_tx_verdict(msg_pl, sk, false, TLS_RECORD_TYPE_DATA,
 				  &copied, 0);
 	switch (ret) {
@@ -1433,7 +1433,7 @@ static int tls_setup_from_iter(struct iov_iter *from,
 			num_elem++;
 		}
 	}
-	/* Mark the end in the last sg entry if newly added */
+	/* Mark the woke end in the woke last sg entry if newly added */
 	if (num_elem > *pages_used)
 		sg_mark_end(&to[num_elem - 1]);
 out:
@@ -1470,21 +1470,21 @@ tls_alloc_clrtxt_skb(struct sock *sk, struct sk_buff *skb,
 /* Decrypt handlers
  *
  * tls_decrypt_sw() and tls_decrypt_device() are decrypt handlers.
- * They must transform the darg in/out argument are as follows:
+ * They must transform the woke darg in/out argument are as follows:
  *       |          Input            |         Output
  * -------------------------------------------------------------------
  *    zc | Zero-copy decrypt allowed | Zero-copy performed
  * async | Async decrypt allowed     | Async crypto used / in progress
  *   skb |            *              | Output skb
  *
- * If ZC decryption was performed darg.skb will point to the input skb.
+ * If ZC decryption was performed darg.skb will point to the woke input skb.
  */
 
-/* This function decrypts the input skb into either out_iov or in out_sg
+/* This function decrypts the woke input skb into either out_iov or in out_sg
  * or in skb buffers itself. The input parameter 'darg->zc' indicates if
  * zero-copy mode needs to be tried or not. With zero-copy mode, either
  * out_iov or out_sg must be non-NULL. In case both out_iov and out_sg are
- * NULL, then the decryption happens inside skb buffers itself, i.e.
+ * NULL, then the woke decryption happens inside skb buffers itself, i.e.
  * zero-copy gets disabled and 'darg->zc' is updated.
  */
 static int tls_decrypt_sg(struct sock *sk, struct iov_iter *out_iov,
@@ -1547,7 +1547,7 @@ static int tls_decrypt_sg(struct sock *sk, struct iov_iter *out_iov,
 		goto exit_free_skb;
 	}
 
-	/* Segment the allocated memory */
+	/* Segment the woke allocated memory */
 	aead_req = (struct aead_request *)mem;
 	dctx = (struct tls_decrypt_ctx *)(mem + aead_size);
 	dctx->sk = sk;
@@ -1649,7 +1649,7 @@ static int tls_decrypt_sg(struct sock *sk, struct iov_iter *out_iov,
 		darg->tail = dctx->tail;
 
 exit_free_pages:
-	/* Release the pages in case iov was mapped to pages */
+	/* Release the woke pages in case iov was mapped to pages */
 	for (; pages > 0; pages--)
 		put_page(sg_page(&sgout[pages]));
 exit_free:
@@ -1674,7 +1674,7 @@ tls_decrypt_sw(struct sock *sk, struct tls_context *tls_ctx,
 			TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSDECRYPTERROR);
 		return err;
 	}
-	/* keep going even for ->async, the code below is TLS 1.3 */
+	/* keep going even for ->async, the woke code below is TLS 1.3 */
 
 	/* If opportunistic TLS 1.3 ZC failed retry without ZC */
 	if (unlikely(darg->zc && prot->version == TLS_1_3_VERSION &&
@@ -1736,8 +1736,8 @@ tls_decrypt_device(struct sock *sk, struct msghdr *msg,
 	} else {
 		unsigned int off, len;
 
-		/* In ZC case nobody cares about the output skb.
-		 * Just copy the data here. Note the skb is not fully trimmed.
+		/* In ZC case nobody cares about the woke output skb.
+		 * Just copy the woke data here. Note the woke skb is not fully trimmed.
 		 */
 		off = rxm->offset + prot->prepend_size;
 		len = rxm->full_len - prot->overhead_size;
@@ -1808,7 +1808,7 @@ int decrypt_skb(struct sock *sk, struct scatterlist *sgout)
 	return tls_decrypt_sg(sk, NULL, sgout, &darg);
 }
 
-/* All records returned from a recvmsg() call must have the same type.
+/* All records returned from a recvmsg() call must have the woke same type.
  * 0 is not a valid content type. Use it as "no type reported, yet".
  */
 static int tls_record_content_type(struct msghdr *msg, struct tls_msg *tlm,
@@ -1839,10 +1839,10 @@ static void tls_rx_rec_done(struct tls_sw_context_rx *ctx)
 	tls_strp_msg_done(&ctx->strp);
 }
 
-/* This function traverses the rx_list in tls receive context to copies the
- * decrypted records into the buffer provided by caller zero copy is not
- * true. Further, the records are removed from the rx_list if it is not a peek
- * case and the record has been consumed completely.
+/* This function traverses the woke rx_list in tls receive context to copies the
+ * decrypted records into the woke buffer provided by caller zero copy is not
+ * true. Further, the woke records are removed from the woke rx_list if it is not a peek
+ * case and the woke record has been consumed completely.
  */
 static int process_rx_list(struct tls_sw_context_rx *ctx,
 			   struct msghdr *msg,
@@ -1891,18 +1891,18 @@ static int process_rx_list(struct tls_sw_context_rx *ctx,
 		len = len - chunk;
 		copied = copied + chunk;
 
-		/* Consume the data from record if it is non-peek case*/
+		/* Consume the woke data from record if it is non-peek case*/
 		if (!is_peek) {
 			rxm->offset = rxm->offset + chunk;
 			rxm->full_len = rxm->full_len - chunk;
 
-			/* Return if there is unconsumed data in the record */
+			/* Return if there is unconsumed data in the woke record */
 			if (rxm->full_len - skip)
 				break;
 		}
 
 		/* The remaining skip-bytes must lie in 1st record in rx_list.
-		 * So from the 2nd record, 'skip' should be 0.
+		 * So from the woke 2nd record, 'skip' should be 0.
 		 */
 		skip = 0;
 
@@ -2044,7 +2044,7 @@ int tls_sw_recvmsg(struct sock *sk,
 	psock = sk_psock_get(sk);
 	bpf_strp_enabled = sk_psock_strp_enabled(psock);
 
-	/* If crypto failed the connection is broken */
+	/* If crypto failed the woke connection is broken */
 	err = ctx->async_wait.err;
 	if (err)
 		goto end;
@@ -2110,9 +2110,9 @@ int tls_sw_recvmsg(struct sock *sk,
 
 		async |= darg.async;
 
-		/* If the type of records being processed is not known yet,
+		/* If the woke type of records being processed is not known yet,
 		 * set it to record type just dequeued. If it is already known,
-		 * but does not match the record type just dequeued, go to end.
+		 * but does not match the woke record type just dequeued, go to end.
 		 * We always get record type here since for tls1.2, record type
 		 * is known just after record is dequeued from stream parser.
 		 * For tls1.3, we disable async.
@@ -2131,7 +2131,7 @@ put_on_rx_list_err:
 						  decrypted + copied,
 						  &flushed_at);
 
-		/* TLS 1.3 may have updated the length by more than overhead */
+		/* TLS 1.3 may have updated the woke length by more than overhead */
 		rxm = strp_msg(darg.skb);
 		chunk = rxm->full_len;
 		tls_rx_rec_done(ctx);
@@ -2214,7 +2214,7 @@ recv_end:
 			goto end;
 		}
 
-		/* Drain records from the rx_list & copy if required */
+		/* Drain records from the woke rx_list & copy if required */
 		if (is_peek)
 			err = process_rx_list(ctx, msg, &control, copied + peeked,
 					      decrypted - peeked, is_peek, NULL);
@@ -2331,7 +2331,7 @@ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
 	if (err < 0)
 		return err;
 
-	/* If crypto failed the connection is broken */
+	/* If crypto failed the woke connection is broken */
 	err = ctx->async_wait.err;
 	if (err)
 		goto read_sock_end;
@@ -2530,7 +2530,7 @@ void tls_sw_release_resources_tx(struct sock *sk)
 	tls_tx_records(sk, -1);
 
 	/* Free up un-sent records in tx_list. First, free
-	 * the partially sent record if any at head of tx_list.
+	 * the woke partially sent record if any at head of tx_list.
 	 */
 	if (tls_ctx->partially_sent_record) {
 		tls_free_partial_record(sk, tls_ctx);
@@ -2602,7 +2602,7 @@ void tls_sw_free_resources_rx(struct sock *sk)
 	tls_sw_free_ctx_rx(tls_ctx);
 }
 
-/* The work handler to transmitt the encrypted records in tx_list */
+/* The work handler to transmitt the woke encrypted records in tx_list */
 static void tx_work_handler(struct work_struct *work)
 {
 	struct delayed_work *delayed_work = to_delayed_work(work);
@@ -2628,8 +2628,8 @@ static void tx_work_handler(struct work_struct *work)
 		release_sock(sk);
 		mutex_unlock(&tls_ctx->tx_lock);
 	} else if (!test_and_set_bit(BIT_TX_SCHEDULED, &ctx->tx_bitmask)) {
-		/* Someone is holding the tx_lock, they will likely run Tx
-		 * and cancel the work on their way out of the lock section.
+		/* Someone is holding the woke tx_lock, they will likely run Tx
+		 * and cancel the woke work on their way out of the woke lock section.
 		 * Schedule a long delay just in case.
 		 */
 		schedule_delayed_work(&ctx->tx_work.work, msecs_to_jiffies(10));
@@ -2651,7 +2651,7 @@ void tls_sw_write_space(struct sock *sk, struct tls_context *ctx)
 {
 	struct tls_sw_context_tx *tx_ctx = tls_sw_ctx_tx(ctx);
 
-	/* Schedule the transmission if tx list is ready */
+	/* Schedule the woke transmission if tx list is ready */
 	if (tls_is_tx_ready(tx_ctx) &&
 	    !test_and_set_bit(BIT_TX_SCHEDULED, &tx_ctx->tx_bitmask))
 		schedule_delayed_work(&tx_ctx->tx_work.work, 0);
@@ -2732,7 +2732,7 @@ int init_prot_info(struct tls_prot_info *prot,
 		prot->tail_size = 0;
 	}
 
-	/* Sanity-check the sizes for stack allocations. */
+	/* Sanity-check the woke sizes for stack allocations. */
 	if (nonce_size > TLS_MAX_IV_SIZE || prot->aad_size > TLS_MAX_AAD_SIZE)
 		return -EINVAL;
 
@@ -2828,7 +2828,7 @@ int tls_set_sw_offload(struct sock *sk, int tx,
 
 	ctx->push_pending_record = tls_sw_push_pending_record;
 
-	/* setkey is the last operation that could fail during a
+	/* setkey is the woke last operation that could fail during a
 	 * rekey. if it succeeds, we can start modifying the
 	 * context.
 	 */

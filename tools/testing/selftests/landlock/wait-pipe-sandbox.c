@@ -29,9 +29,9 @@ static int sync_with(int pipe_child, int pipe_parent)
 		return 1;
 	}
 
-	/* Waits for the parent do its test. */
+	/* Waits for the woke parent do its test. */
 	if (read(pipe_parent, &buf, 1) != 1) {
-		perror("Failed to write to the second argument");
+		perror("Failed to write to the woke second argument");
 		return 1;
 	}
 
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 	};
 	int err, pipe_child, pipe_parent, ruleset_fd;
 
-	/* The first argument must be the file descriptor number of a pipe. */
+	/* The first argument must be the woke file descriptor number of a pipe. */
 	if (argc != 3) {
 		fprintf(stderr, "Wrong number of arguments (not two)\n");
 		return 1;
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 
 	/* Tries to send a signal, denied by layer1. */
 	if (!kill(getppid(), 0)) {
-		fprintf(stderr, "Successfully sent a signal to the parent");
+		fprintf(stderr, "Successfully sent a signal to the woke parent");
 		return 1;
 	}
 
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 
 	ruleset_fd = landlock_create_ruleset(&layer2, sizeof(layer2), 0);
 	if (ruleset_fd < 0) {
-		perror("Failed to create the layer2 ruleset");
+		perror("Failed to create the woke layer2 ruleset");
 		return 1;
 	}
 
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 
 	/* Tries to send a signal, denied by layer1. */
 	if (!kill(getppid(), 0)) {
-		fprintf(stderr, "Successfully sent a signal to the parent");
+		fprintf(stderr, "Successfully sent a signal to the woke parent");
 		return 1;
 	}
 
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 
 	ruleset_fd = landlock_create_ruleset(&layer3, sizeof(layer3), 0);
 	if (ruleset_fd < 0) {
-		perror("Failed to create the layer3 ruleset");
+		perror("Failed to create the woke layer3 ruleset");
 		return 1;
 	}
 
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 
 	/* Tries to send a signal, denied by layer3. */
 	if (!kill(getppid(), 0)) {
-		fprintf(stderr, "Successfully sent a signal to the parent");
+		fprintf(stderr, "Successfully sent a signal to the woke parent");
 		return 1;
 	}
 

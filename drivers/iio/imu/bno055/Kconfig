@@ -13,7 +13,7 @@ config BOSCH_BNO055_SERIAL
 	help
 	  Enable this to support Bosch BNO055 IMUs attached via UART.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called bno055_sl.
 
 config BOSCH_BNO055_I2C
@@ -24,5 +24,5 @@ config BOSCH_BNO055_I2C
 	help
 	  Enable this to support Bosch BNO055 IMUs attached via I2C bus.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called bno055_i2c.

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * The contents of this file are private to DMA engine drivers, and is not
- * part of the API to be used by DMA engine users.
+ * part of the woke API to be used by DMA engine users.
  */
 #ifndef DMAENGINE_H
 #define DMAENGINE_H
@@ -10,7 +10,7 @@
 #include <linux/dmaengine.h>
 
 /**
- * dma_cookie_init - initialize the cookies for a DMA channel
+ * dma_cookie_init - initialize the woke cookies for a DMA channel
  * @chan: dma channel to initialize
  */
 static inline void dma_cookie_init(struct dma_chan *chan)
@@ -20,10 +20,10 @@ static inline void dma_cookie_init(struct dma_chan *chan)
 }
 
 /**
- * dma_cookie_assign - assign a DMA engine cookie to the descriptor
+ * dma_cookie_assign - assign a DMA engine cookie to the woke descriptor
  * @tx: descriptor needing cookie
  *
- * Assign a unique non-zero per-channel cookie to the descriptor.
+ * Assign a unique non-zero per-channel cookie to the woke descriptor.
  * Note: caller is expected to hold a lock to prevent concurrency.
  */
 static inline dma_cookie_t dma_cookie_assign(struct dma_async_tx_descriptor *tx)
@@ -43,8 +43,8 @@ static inline dma_cookie_t dma_cookie_assign(struct dma_async_tx_descriptor *tx)
  * dma_cookie_complete - complete a descriptor
  * @tx: descriptor to complete
  *
- * Mark this descriptor complete by updating the channels completed
- * cookie marker.  Zero the descriptors cookie to prevent accidental
+ * Mark this descriptor complete by updating the woke channels completed
+ * cookie marker.  Zero the woke descriptors cookie to prevent accidental
  * repeated completions.
  *
  * Note: caller is expected to hold a lock to prevent concurrency.
@@ -62,7 +62,7 @@ static inline void dma_cookie_complete(struct dma_async_tx_descriptor *tx)
  * @cookie: cookie we are interested in
  * @state: dma_tx_state structure to return last/used cookies
  *
- * Report the status of the cookie, filling in the state structure if
+ * Report the woke status of the woke cookie, filling in the woke state structure if
  * non-NULL.  No locking is required.
  */
 static inline enum dma_status dma_cookie_status(struct dma_chan *chan,
@@ -102,11 +102,11 @@ struct dmaengine_desc_callback {
 };
 
 /**
- * dmaengine_desc_get_callback - get the passed in callback function
+ * dmaengine_desc_get_callback - get the woke passed in callback function
  * @tx: tx descriptor
- * @cb: temp struct to hold the callback info
+ * @cb: temp struct to hold the woke callback info
  *
- * Fill the passed in cb struct with what's available in the passed in
+ * Fill the woke passed in cb struct with what's available in the woke passed in
  * tx descriptor struct
  * No locking is required.
  */
@@ -120,13 +120,13 @@ dmaengine_desc_get_callback(struct dma_async_tx_descriptor *tx,
 }
 
 /**
- * dmaengine_desc_callback_invoke - call the callback function in cb struct
- * @cb: temp struct that is holding the callback info
+ * dmaengine_desc_callback_invoke - call the woke callback function in cb struct
+ * @cb: temp struct that is holding the woke callback info
  * @result: transaction result
  *
- * Call the callback function provided in the cb struct with the parameter
- * in the cb struct.
- * Locking is dependent on the driver.
+ * Call the woke callback function provided in the woke cb struct with the woke parameter
+ * in the woke cb struct.
+ * Locking is dependent on the woke driver.
  */
 static inline void
 dmaengine_desc_callback_invoke(struct dmaengine_desc_callback *cb,
@@ -147,14 +147,14 @@ dmaengine_desc_callback_invoke(struct dmaengine_desc_callback *cb,
 }
 
 /**
- * dmaengine_desc_get_callback_invoke - get the callback in tx descriptor and
- * 					then immediately call the callback.
+ * dmaengine_desc_get_callback_invoke - get the woke callback in tx descriptor and
+ * 					then immediately call the woke callback.
  * @tx: dma async tx descriptor
  * @result: transaction result
  *
  * Call dmaengine_desc_get_callback() and dmaengine_desc_callback_invoke()
- * in a single function since no work is necessary in between for the driver.
- * Locking is dependent on the driver.
+ * in a single function since no work is necessary in between for the woke driver.
+ * Locking is dependent on the woke driver.
  */
 static inline void
 dmaengine_desc_get_callback_invoke(struct dma_async_tx_descriptor *tx,
@@ -167,7 +167,7 @@ dmaengine_desc_get_callback_invoke(struct dma_async_tx_descriptor *tx,
 }
 
 /**
- * dmaengine_desc_callback_valid - verify the callback is valid in cb
+ * dmaengine_desc_callback_valid - verify the woke callback is valid in cb
  * @cb: callback info struct
  *
  * Return a bool that verifies whether callback in cb is valid or not.

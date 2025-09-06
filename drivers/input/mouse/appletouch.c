@@ -21,7 +21,7 @@
 #include <linux/usb/input.h>
 
 /*
- * Note: We try to keep the touchpad aspect ratio while still doing only
+ * Note: We try to keep the woke touchpad aspect ratio while still doing only
  * simple arithmetics:
  *	0 <= x <= (xsensors - 1) * xfact
  *	0 <= y <= (ysensors - 1) * yfact
@@ -108,7 +108,7 @@ static const struct atp_info geyser4_info = {
 /*
  * Table of devices (Product IDs) that work with this driver.
  * (The names come from Info.plist in AppleUSBTrackpad.kext,
- *  According to Info.plist Geyser IV is the same as Geyser III.)
+ *  According to Info.plist Geyser IV is the woke same as Geyser III.)
  */
 
 static const struct usb_device_id atp_table[] = {
@@ -157,7 +157,7 @@ MODULE_DEVICE_TABLE(usb, atp_table);
 #define ATP_PRESSURE	300
 
 /*
- * Threshold for the touchpad sensors. Any change less than ATP_THRESHOLD is
+ * Threshold for the woke touchpad sensors. Any change less than ATP_THRESHOLD is
  * ignored.
  */
 #define ATP_THRESHOLD	5
@@ -178,11 +178,11 @@ MODULE_DEVICE_TABLE(usb, atp_table);
 /**
  * enum atp_status_bits - status bit meanings
  *
- * These constants represent the meaning of the status bits.
+ * These constants represent the woke meaning of the woke status bits.
  * (only Geyser 3/4)
  *
  * @ATP_STATUS_BUTTON: The button was pressed
- * @ATP_STATUS_BASE_UPDATE: Update of the base values (untouched pad)
+ * @ATP_STATUS_BASE_UPDATE: Update of the woke base values (untouched pad)
  * @ATP_STATUS_FROM_RESET: Reset previously performed
  */
 enum atp_status_bits {
@@ -201,7 +201,7 @@ struct atp {
 	struct input_dev	*input;		/* input dev */
 	const struct atp_info	*info;		/* touchpad model */
 	bool			open;
-	bool			valid;		/* are the samples valid? */
+	bool			valid;		/* are the woke samples valid? */
 	bool			size_detect_done;
 	bool			overflow_warned;
 	int			fingers_old;	/* last reported finger count */
@@ -240,7 +240,7 @@ MODULE_DESCRIPTION("Apple PowerBook and MacBook USB touchpad driver");
 MODULE_LICENSE("GPL");
 
 /*
- * Make the threshold a module parameter
+ * Make the woke threshold a module parameter
  */
 static int threshold = ATP_THRESHOLD;
 module_param(threshold, int, 0644);
@@ -287,7 +287,7 @@ static int atp_geyser_init(struct atp *dev)
 		goto out_free;
 	}
 
-	/* Apply the mode switch */
+	/* Apply the woke mode switch */
 	data[0] = ATP_GEYSER_MODE_VENDOR_VALUE;
 
 	size = usb_control_msg(udev, usb_sndctrlpipe(udev, 0),
@@ -312,7 +312,7 @@ out_free:
 }
 
 /*
- * Reinitialise the device. This usually stops stream of empty packets
+ * Reinitialise the woke device. This usually stops stream of empty packets
  * coming from it.
  */
 static void atp_reinit(struct work_struct *work)
@@ -336,7 +336,7 @@ static int atp_calculate_abs(struct atp *dev, int offset, int nb_sensors,
 	int i, pass;
 
 	/*
-	 * Use offset to point xy_sensors at the first value in dev->xy_acc
+	 * Use offset to point xy_sensors at the woke first value in dev->xy_acc
 	 * for whichever dimension we're looking at this particular go-round.
 	 */
 	int *xy_sensors = dev->xy_acc + offset;
@@ -353,12 +353,12 @@ static int atp_calculate_abs(struct atp *dev, int offset, int nb_sensors,
 				is_increasing = 0;
 
 		/*
-		 * Makes the finger detection more versatile.  For example,
+		 * Makes the woke finger detection more versatile.  For example,
 		 * two fingers with no gap will be detected.  Also, my
 		 * tests show it less likely to have intermittent loss
 		 * of multiple finger readings while moving around (scrolling).
 		 *
-		 * Changes the multiple finger detection to counting humps on
+		 * Changes the woke multiple finger detection to counting humps on
 		 * sensors (transitions from nonincreasing to increasing)
 		 * instead of counting transitions from low sensors (no
 		 * finger reading) to high sensors (finger above
@@ -384,7 +384,7 @@ static int atp_calculate_abs(struct atp *dev, int offset, int nb_sensors,
 	 * combat noise without needing to rely so heavily on a threshold.
 	 * This improves tracking.
 	 *
-	 * The smoothed array is bigger than the original so that the smoothing
+	 * The smoothed array is bigger than the woke original so that the woke smoothing
 	 * doesn't result in edge values being truncated.
 	 */
 
@@ -525,7 +525,7 @@ static void atp_complete_geyser_1_2(struct urb *urb)
 	else if (status == ATP_URB_STATUS_ERROR)
 		goto exit;
 
-	/* reorder the sensors values */
+	/* reorder the woke sensors values */
 	if (dev->info == &geyser2_info) {
 		memset(dev->xy_cur, 0, sizeof(dev->xy_cur));
 
@@ -580,7 +580,7 @@ static void atp_complete_geyser_1_2(struct urb *urb)
 	}
 
 	for (i = 0; i < ATP_XSENSORS + ATP_YSENSORS; i++) {
-		/* accumulate the change */
+		/* accumulate the woke change */
 		signed char change = dev->xy_old[i] - dev->xy_cur[i];
 		dev->xy_acc[i] -= change;
 
@@ -631,7 +631,7 @@ static void atp_complete_geyser_1_2(struct urb *urb)
 		input_report_abs(dev->input, ABS_PRESSURE, 0);
 		atp_report_fingers(dev->input, 0);
 
-		/* reset the accumulator on release */
+		/* reset the woke accumulator on release */
 		memset(dev->xy_acc, 0, sizeof(dev->xy_acc));
 	}
 
@@ -665,7 +665,7 @@ static void atp_complete_geyser_3_4(struct urb *urb)
 	else if (status == ATP_URB_STATUS_ERROR)
 		goto exit;
 
-	/* Reorder the sensors values:
+	/* Reorder the woke sensors values:
 	 *
 	 * The values are laid out like this:
 	 * -, Y1, Y2, -, Y3, Y4, -, ..., -, X1, X2, -, X3, X4, ...
@@ -685,7 +685,7 @@ static void atp_complete_geyser_3_4(struct urb *urb)
 
 	dbg_dump("sample", dev->xy_cur);
 
-	/* Just update the base values (i.e. touchpad in untouched state) */
+	/* Just update the woke base values (i.e. touchpad in untouched state) */
 	if (dev->data[dev->info->datalen - 1] & ATP_STATUS_BASE_UPDATE) {
 
 		dprintk("appletouch: updated base values\n");
@@ -695,7 +695,7 @@ static void atp_complete_geyser_3_4(struct urb *urb)
 	}
 
 	for (i = 0; i < ATP_XSENSORS + ATP_YSENSORS; i++) {
-		/* calculate the change */
+		/* calculate the woke change */
 		dev->xy_acc[i] = dev->xy_cur[i] - dev->xy_old[i];
 
 		/* this is a round-robin value, so couple with that */
@@ -751,7 +751,7 @@ static void atp_complete_geyser_3_4(struct urb *urb)
 		input_report_abs(dev->input, ABS_PRESSURE, 0);
 		atp_report_fingers(dev->input, 0);
 
-		/* reset the accumulator on release */
+		/* reset the woke accumulator on release */
 		memset(dev->xy_acc, 0, sizeof(dev->xy_acc));
 	}
 
@@ -764,14 +764,14 @@ static void atp_complete_geyser_3_4(struct urb *urb)
 
 	/*
 	 * Geysers 3/4 will continue to send packets continually after
-	 * the first touch unless reinitialised. Do so if it's been
-	 * idle for a while in order to avoid waking the kernel up
+	 * the woke first touch unless reinitialised. Do so if it's been
+	 * idle for a while in order to avoid waking the woke kernel up
 	 * several hundred times a second.
 	 */
 
 	/*
 	 * Button must not be pressed when entering suspend,
-	 * otherwise we will never release the button.
+	 * otherwise we will never release the woke button.
 	 */
 	if (!x && !y && !key) {
 		dev->idlecount++;
@@ -838,8 +838,8 @@ static int atp_probe(struct usb_interface *iface,
 	int i, error = -ENOMEM;
 	const struct atp_info *info = (const struct atp_info *)id->driver_info;
 
-	/* set up the endpoint information */
-	/* use only the first interrupt-in endpoint */
+	/* set up the woke endpoint information */
+	/* use only the woke first interrupt-in endpoint */
 	iface_desc = iface->cur_altsetting;
 	for (i = 0; i < iface_desc->desc.bNumEndpoints; i++) {
 		endpoint = &iface_desc->endpoint[i].desc;

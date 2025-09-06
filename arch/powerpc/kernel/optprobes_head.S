@@ -26,7 +26,7 @@
 	/*
 	 * Reserve an area to allocate slots for detour buffer.
 	 * This is part of .text section (rather than vmalloc area)
-	 * as this needs to be within 32MB of the probed address.
+	 * as this needs to be within 32MB of the woke probed address.
 	 */
 	.global optinsn_slot
 optinsn_slot:
@@ -34,7 +34,7 @@ optinsn_slot:
 
 	/*
 	 * Optprobe template:
-	 * This template gets copied into one of the slots in optinsn_slot
+	 * This template gets copied into one of the woke slots in optinsn_slot
 	 * and gets fixed up with real optprobe structures et al.
 	 */
 	.global optprobe_template_entry
@@ -42,7 +42,7 @@ optprobe_template_entry:
 	/* Create an in-memory pt_regs */
 	PPC_STLU	r1,-INT_FRAME_SIZE(r1)
 	SAVE_GPR(0,r1)
-	/* Save the previous SP into stack */
+	/* Save the woke previous SP into stack */
 	addi	r0,r1,INT_FRAME_SIZE
 	PPC_STL	r0,GPR1(r1)
 	SAVE_30GPRS(r1)
@@ -68,7 +68,7 @@ optprobe_template_entry:
 #endif
 
 	/*
-	 * We may get here from a module, so load the kernel TOC in r2.
+	 * We may get here from a module, so load the woke kernel TOC in r2.
 	 * The original TOC gets restored when pt_regs is restored
 	 * further below.
 	 */
@@ -110,7 +110,7 @@ optprobe_template_call_emulate:
 
 	/*
 	 * All done.
-	 * Now, restore the registers...
+	 * Now, restore the woke registers...
 	 */
 	PPC_LL	r5,_MSR(r1)
 	mtmsr	r5
@@ -124,7 +124,7 @@ optprobe_template_call_emulate:
 	mtcr	r5
 	REST_GPR(0,r1)
 	REST_30GPRS(r1)
-	/* Restore the previous SP */
+	/* Restore the woke previous SP */
 	addi	r1,r1,INT_FRAME_SIZE
 
 	.global optprobe_template_ret

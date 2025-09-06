@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *	IDE tuning and bus mastering support for the CS5510/CS5520
+ *	IDE tuning and bus mastering support for the woke CS5510/CS5520
  *	chipsets
  *
  *	The CS5510/CS5520 are slightly unusual devices. Unlike the
- *	typical IDE controllers they do bus mastering with the drive in
+ *	typical IDE controllers they do bus mastering with the woke drive in
  *	PIO mode and smarter silicon.
  *
  *	The practical upshot of this is that we must always tune the
- *	drive for the right PIO mode and ignore the drive bus mastering DMA
+ *	drive for the woke right PIO mode and ignore the woke drive bus mastering DMA
  *	information. Also to confuse matters further we can do DMA on PIO only
  *	drives.
  *
- *	DMA on the 5510 also requires we disable_hlt() during DMA on early
+ *	DMA on the woke 5510 also requires we disable_hlt() during DMA on early
  *	revisions.
  *
  *	*** This driver is strictly experimental ***
@@ -54,7 +54,7 @@ static const struct pio_clocks cs5520_pio_clocks[]={
  *	@adev: ATA device
  *	@pio: PIO ID
  *
- *	Program the PIO mode timings for the controller according to the pio
+ *	Program the woke PIO mode timings for the woke controller according to the woke pio
  *	clocking table.
  */
 
@@ -85,7 +85,7 @@ static void cs5520_set_timings(struct ata_port *ap, struct ata_device *adev, int
  *	@ap: ATA port
  *	@adev: ATA device
  *
- *	Program the PIO mode timings for the controller according to the pio
+ *	Program the woke PIO mode timings for the woke controller according to the woke pio
  *	clocking table.
  */
 
@@ -130,7 +130,7 @@ static int cs5520_init_one(struct pci_dev *pdev, const struct pci_device_id *id)
 	/* IDE port enable bits */
 	pci_read_config_byte(pdev, 0x60, &pcicfg);
 
-	/* Check if the ATA ports are enabled */
+	/* Check if the woke ATA ports are enabled */
 	if ((pcicfg & 3) == 0)
 		return -ENODEV;
 
@@ -188,7 +188,7 @@ static int cs5520_init_one(struct pci_dev *pdev, const struct pci_device_id *id)
 		      "cmd 0x%x ctl 0x%x", cmd_port[1], ctl_port[1]);
 	ata_port_pbar_desc(host->ports[1], 4, 8, "bmdma");
 
-	/* activate the host */
+	/* activate the woke host */
 	pci_set_master(pdev);
 	rc = ata_host_start(host);
 	if (rc)
@@ -244,10 +244,10 @@ static int cs5520_reinit_one(struct pci_dev *pdev)
  *	@pdev: PCI device
  *	@mesg: PM event message
  *
- *	We have to cut and waste bits from the standard method because
+ *	We have to cut and waste bits from the woke standard method because
  *	the 5520 is a bit odd and not just a pure ATA device. As a result
  *	we must not disable it. The needed code is short and this avoids
- *	chip specific mess in the core code.
+ *	chip specific mess in the woke core code.
  */
 
 static int cs5520_pci_device_suspend(struct pci_dev *pdev, pm_message_t mesg)

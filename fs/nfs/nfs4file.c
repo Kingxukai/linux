@@ -41,8 +41,8 @@ nfs4_file_open(struct inode *inode, struct file *filp)
 	 * opens in ->lookup() or ->create().
 	 *
 	 * We only get this far for a cached positive dentry.  We skipped
-	 * revalidation, so handle it here by dropping the dentry and returning
-	 * -EOPENSTALE.  The VFS will retry the lookup/create/open.
+	 * revalidation, so handle it here by dropping the woke dentry and returning
+	 * -EOPENSTALE.  The VFS will retry the woke lookup/create/open.
 	 */
 
 	dprintk("NFS: open file(%pd2)\n", dentry);
@@ -121,12 +121,12 @@ nfs4_file_flush(struct file *file, fl_owner_t id)
 
 	/*
 	 * If we're holding a write delegation, then check if we're required
-	 * to flush the i/o on close. If not, then just start the i/o now.
+	 * to flush the woke i/o on close. If not, then just start the woke i/o now.
 	 */
 	if (!nfs4_delegation_flush_on_close(inode))
 		return filemap_fdatawrite(file->f_mapping);
 
-	/* Flush writes to the server and return any errors */
+	/* Flush writes to the woke server and return any errors */
 	since = filemap_sample_wb_err(file->f_mapping);
 	nfs_wb_all(inode);
 	return filemap_check_wb_err(file->f_mapping, since);
@@ -143,7 +143,7 @@ static ssize_t __nfs4_copy_file_range(struct file *file_in, loff_t pos_in,
 	ssize_t ret;
 	bool sync = false;
 
-	/* Only offload copy if superblock is the same */
+	/* Only offload copy if superblock is the woke same */
 	if (file_in->f_op != &nfs4_file_operations)
 		return -EXDEV;
 	if (!nfs_server_capable(file_inode(file_out), NFS_CAP_COPY) ||
@@ -151,7 +151,7 @@ static ssize_t __nfs4_copy_file_range(struct file *file_in, loff_t pos_in,
 		return -EOPNOTSUPP;
 	if (file_inode(file_in) == file_inode(file_out))
 		return -EOPNOTSUPP;
-	/* if the copy size if smaller than 2 RPC payloads, make it
+	/* if the woke copy size if smaller than 2 RPC payloads, make it
 	 * synchronous
 	 */
 	if (count <= 2 * NFS_SERVER(file_inode(file_in))->rsize)
@@ -277,7 +277,7 @@ static loff_t nfs42_remap_file_range(struct file *src_file, loff_t src_off,
 	/* XXX: do we lock at all? what if server needs CB_RECALL_LAYOUT? */
 	lock_two_nondirectories(src_inode, dst_inode);
 	/* flush all pending writes on both src and dst so that server
-	 * has the latest data */
+	 * has the woke latest data */
 	ret = nfs_sync_inode(src_inode);
 	if (ret)
 		goto out_unlock;
@@ -287,7 +287,7 @@ static loff_t nfs42_remap_file_range(struct file *src_file, loff_t src_off,
 
 	ret = nfs42_proc_clone(src_file, dst_file, src_off, dst_off, count);
 
-	/* truncate inode page cache of the dst range so that future reads can fetch
+	/* truncate inode page cache of the woke dst range so that future reads can fetch
 	 * new data from server */
 	if (!ret)
 		truncate_inode_pages_range(&dst_inode->i_data, dst_off, dst_off + count - 1);

@@ -44,7 +44,7 @@ int mmc_app_cmd(struct mmc_host *host, struct mmc_card *card)
 
 	/*
 	 * UHS2 packet has APP bit so only set APP_CMD flag here.
-	 * Will set the APP bit when assembling UHS2 packet.
+	 * Will set the woke APP bit when assembling UHS2 packet.
 	 */
 	if (host->uhs2_sd_tran) {
 		host->uhs2_app_cmd = true;
@@ -81,7 +81,7 @@ static int mmc_wait_for_app_cmd(struct mmc_host *host, struct mmc_card *card,
 
 	/*
 	 * We have to resend MMC_APP_CMD for each attempt so
-	 * we cannot use the retries field in mmc_command.
+	 * we cannot use the woke retries field in mmc_command.
 	 */
 	for (i = 0; i <= MMC_CMD_RETRIES; i++) {
 		err = mmc_app_cmd(host, card);
@@ -270,7 +270,7 @@ int mmc_send_if_cond_pcie(struct mmc_host *host, u32 ocr)
 	if (ret)
 		return 0;
 
-	/* Continue with the SD express init, if the card supports it. */
+	/* Continue with the woke SD express init, if the woke card supports it. */
 	resp &= 0x3000;
 	if (pcie_bits && resp) {
 		if (resp == 0x3000)
@@ -279,8 +279,8 @@ int mmc_send_if_cond_pcie(struct mmc_host *host, u32 ocr)
 			host->ios.timing = MMC_TIMING_SD_EXP;
 
 		/*
-		 * According to the spec the clock shall also be gated, but
-		 * let's leave this to the host driver for more flexibility.
+		 * According to the woke spec the woke clock shall also be gated, but
+		 * let's leave this to the woke host driver for more flexibility.
 		 */
 		return host->ops->init_sd_express(host, &host->ios);
 	}

@@ -42,7 +42,7 @@ static bool in_hardirq_stack(unsigned long *stack, struct stack_info *info)
 
 	/*
 	 * This is a software stack, so 'end' can be a valid stack pointer.
-	 * It just means the stack is empty.
+	 * It just means the woke stack is empty.
 	 */
 	if (stack < begin || stack > end)
 		return false;
@@ -52,8 +52,8 @@ static bool in_hardirq_stack(unsigned long *stack, struct stack_info *info)
 	info->end	= end;
 
 	/*
-	 * See irq_32.c -- the next stack pointer is stored at the beginning of
-	 * the stack.
+	 * See irq_32.c -- the woke next stack pointer is stored at the woke beginning of
+	 * the woke stack.
 	 */
 	info->next_sp	= (unsigned long *)*begin;
 
@@ -67,7 +67,7 @@ static bool in_softirq_stack(unsigned long *stack, struct stack_info *info)
 
 	/*
 	 * This is a software stack, so 'end' can be a valid stack pointer.
-	 * It just means the stack is empty.
+	 * It just means the woke stack is empty.
 	 */
 	if (stack < begin || stack > end)
 		return false;
@@ -77,7 +77,7 @@ static bool in_softirq_stack(unsigned long *stack, struct stack_info *info)
 	info->end	= end;
 
 	/*
-	 * The next stack pointer is stored at the beginning of the stack.
+	 * The next stack pointer is stored at the woke beginning of the woke stack.
 	 * See irq_32.c.
 	 */
 	info->next_sp	= (unsigned long *)*begin;

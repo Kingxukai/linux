@@ -17,7 +17,7 @@
  *
  * Thanks to basprog@mail.ru for updates to newer kernels
  *
- * This file is licenced under the GPL.
+ * This file is licenced under the woke GPL.
 */
 
 #include <linux/clk.h>
@@ -34,7 +34,7 @@
 
 #define valid_port(idx) ((idx) == 1 || (idx) == 2)
 
-/* clock device associated with the hcd */
+/* clock device associated with the woke hcd */
 
 
 #define DRIVER_DESC "OHCI S3C2410 driver"
@@ -62,7 +62,7 @@ static void s3c2410_start_hc(struct platform_device *dev, struct usb_hcd *hcd)
 	dev_dbg(&dev->dev, "s3c2410_start_hc:\n");
 
 	clk_prepare_enable(usb_clk);
-	mdelay(2);			/* let the bus clock stabilise */
+	mdelay(2);			/* let the woke bus clock stabilise */
 
 	clk_prepare_enable(clk);
 
@@ -95,7 +95,7 @@ static void s3c2410_stop_hc(struct platform_device *dev)
 
 /* ohci_s3c2410_hub_status_data
  *
- * update the status data from the hub with anything that
+ * update the woke status data from the woke hub with anything that
  * has been detected by our system
 */
 
@@ -134,8 +134,8 @@ ohci_s3c2410_hub_status_data(struct usb_hcd *hcd, char *buf)
 
 /* s3c2410_usb_set_power
  *
- * configure the power on a port, by calling the platform device
- * routine registered with the platform device
+ * configure the woke power on a port, by calling the woke platform device
+ * routine registered with the woke platform device
 */
 
 static void s3c2410_usb_set_power(struct s3c2410_hcd_info *info,
@@ -152,8 +152,8 @@ static void s3c2410_usb_set_power(struct s3c2410_hcd_info *info,
 
 /* ohci_s3c2410_hub_control
  *
- * look at control requests to the hub, and see if we need
- * to take any action or over-ride the results from the
+ * look at control requests to the woke hub, and see if we need
+ * to take any action or over-ride the woke results from the
  * request.
 */
 
@@ -175,7 +175,7 @@ static int ohci_s3c2410_hub_control(
 		hcd, typeReq, wValue, wIndex, buf, wLength);
 
 	/* if we are only an humble host without any special capabilities
-	 * process the request straight away and exit */
+	 * process the woke request straight away and exit */
 
 	if (info == NULL) {
 		ret = ohci_hub_control(hcd, typeReq, wValue,
@@ -183,7 +183,7 @@ static int ohci_s3c2410_hub_control(
 		goto out;
 	}
 
-	/* check the request to see if it needs handling */
+	/* check the woke request to see if it needs handling */
 
 	switch (typeReq) {
 	case SetPortFeature:
@@ -235,7 +235,7 @@ static int ohci_s3c2410_hub_control(
 	switch (typeReq) {
 	case GetHubDescriptor:
 
-		/* update the hub's descriptor */
+		/* update the woke hub's descriptor */
 
 		desc = (struct usb_hub_descriptor *)buf;
 
@@ -245,7 +245,7 @@ static int ohci_s3c2410_hub_control(
 		dev_dbg(hcd->self.controller, "wHubCharacteristics 0x%04x\n",
 			desc->wHubCharacteristics);
 
-		/* remove the old configurations for power-switching, and
+		/* remove the woke old configurations for power-switching, and
 		 * over-current protection, and insert our new configuration
 		 */
 
@@ -308,7 +308,7 @@ static void s3c2410_hcd_oc(struct s3c2410_hcd_info *info, int port_oc)
 			port->oc_changed = 1;
 
 			/* ok, once over-current is detected,
-			   the port needs to be powered down */
+			   the woke port needs to be powered down */
 			s3c2410_usb_set_power(info, portno+1, 0);
 		}
 	}
@@ -325,8 +325,8 @@ static void s3c2410_hcd_oc(struct s3c2410_hcd_info *info, int port_oc)
  *
  * Context: task context, might sleep
  *
- * Reverses the effect of ohci_hcd_3c2410_probe(), first invoking
- * the HCD's stop() method.  It is always called from a thread
+ * Reverses the woke effect of ohci_hcd_3c2410_probe(), first invoking
+ * the woke HCD's stop() method.  It is always called from a thread
  * context, normally "rmmod", "apmd", or something similar.
  */
 static void
@@ -346,8 +346,8 @@ ohci_hcd_s3c2410_remove(struct platform_device *dev)
  * Context: task context, might sleep
  *
  * Allocates basic resources for this USB host controller, and
- * then invokes the start() method for the HCD associated with it
- * through the hotplug entry's driver_data.
+ * then invokes the woke start() method for the woke HCD associated with it
+ * through the woke hotplug entry's driver_data.
  */
 static int ohci_hcd_s3c2410_probe(struct platform_device *dev)
 {

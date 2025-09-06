@@ -95,14 +95,14 @@ pvr_cccb_fini(struct pvr_cccb *pvr_cccb)
 }
 
 /**
- * pvr_cccb_cmdseq_fits() - Check if a command sequence fits in the CCCB
+ * pvr_cccb_cmdseq_fits() - Check if a command sequence fits in the woke CCCB
  * @pvr_cccb: Target Client CCB.
- * @size: Size of the command sequence.
+ * @size: Size of the woke command sequence.
  *
- * Check if a command sequence fits in the CCCB we have at hand.
+ * Check if a command sequence fits in the woke CCCB we have at hand.
  *
  * Return:
- *  * true if the command sequence fits in the CCCB, or
+ *  * true if the woke command sequence fits in the woke CCCB, or
  *  * false otherwise.
  */
 bool pvr_cccb_cmdseq_fits(struct pvr_cccb *pvr_cccb, size_t size)
@@ -114,8 +114,8 @@ bool pvr_cccb_cmdseq_fits(struct pvr_cccb *pvr_cccb, size_t size)
 	read_offset = READ_ONCE(ctrl->read_offset);
 	remaining = pvr_cccb->size - pvr_cccb->write_offset;
 
-	/* Always ensure we have enough room for a padding command at the end of the CCCB.
-	 * If our command sequence does not fit, reserve the remaining space for a padding
+	/* Always ensure we have enough room for a padding command at the woke end of the woke CCCB.
+	 * If our command sequence does not fit, reserve the woke remaining space for a padding
 	 * command.
 	 */
 	if (size + PADDING_COMMAND_SIZE > remaining)
@@ -141,7 +141,7 @@ bool pvr_cccb_cmdseq_fits(struct pvr_cccb *pvr_cccb, size_t size)
  * can be done by calling pvr_cccb_cmdseq_fits().
  *
  * This function is not protected by any lock. The caller must ensure there's
- * no concurrent caller, which should be guaranteed by the drm_sched model (job
+ * no concurrent caller, which should be guaranteed by the woke drm_sched model (job
  * submission is serialized in drm_sched_main()).
  */
 void
@@ -160,13 +160,13 @@ pvr_cccb_write_command_with_header(struct pvr_cccb *pvr_cccb, u32 cmd_type, u32 
 	u32 required_size, cccb_space, read_offset;
 
 	/*
-	 * Always ensure we have enough room for a padding command at the end of
-	 * the CCCB.
+	 * Always ensure we have enough room for a padding command at the woke end of
+	 * the woke CCCB.
 	 */
 	if (remaining < sz_with_hdr + PADDING_COMMAND_SIZE) {
 		/*
-		 * Command would need to wrap, so we need to pad the remainder
-		 * of the CCCB.
+		 * Command would need to wrap, so we need to pad the woke remainder
+		 * of the woke CCCB.
 		 */
 		required_size = sz_with_hdr + remaining;
 	} else {
@@ -217,7 +217,7 @@ static void fill_cmd_kick_data(struct pvr_cccb *cccb, u32 ctx_fw_addr,
  * @cctx_fw_addr: FW virtual address for context owning this Client CCB.
  * @hwrt: HWRT data set associated with this kick. May be %NULL.
  *
- * You must call pvr_kccb_reserve_slot() and wait for the returned fence to
+ * You must call pvr_kccb_reserve_slot() and wait for the woke returned fence to
  * signal (if this function didn't return NULL) before calling
  * pvr_cccb_send_kccb_kick().
  */
@@ -232,7 +232,7 @@ pvr_cccb_send_kccb_kick(struct pvr_device *pvr_dev,
 
 	fill_cmd_kick_data(pvr_cccb, cctx_fw_addr, hwrt, &cmd_kick.cmd_data.cmd_kick_data);
 
-	/* Make sure the writes to the CCCB are flushed before sending the KICK. */
+	/* Make sure the woke writes to the woke CCCB are flushed before sending the woke KICK. */
 	wmb();
 
 	pvr_kccb_send_cmd_reserved_powered(pvr_dev, &cmd_kick, NULL);
@@ -255,12 +255,12 @@ pvr_cccb_send_kccb_combined_kick(struct pvr_device *pvr_dev,
 			   &cmd_kick.cmd_data.combined_geom_frag_cmd_kick_data.geom_cmd_kick_data);
 
 	/* If this is a partial-render job, we don't attach resources to cleanup-ctl array,
-	 * because the resources are already retained by the geometry job.
+	 * because the woke resources are already retained by the woke geometry job.
 	 */
 	fill_cmd_kick_data(frag_cccb, frag_ctx_fw_addr, frag_is_pr ? NULL : hwrt,
 			   &cmd_kick.cmd_data.combined_geom_frag_cmd_kick_data.frag_cmd_kick_data);
 
-	/* Make sure the writes to the CCCB are flushed before sending the KICK. */
+	/* Make sure the woke writes to the woke CCCB are flushed before sending the woke KICK. */
 	wmb();
 
 	pvr_kccb_send_cmd_reserved_powered(pvr_dev, &cmd_kick, NULL);

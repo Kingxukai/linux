@@ -119,7 +119,7 @@ static int ota5601a_prepare(struct drm_panel *drm_panel)
 		return err;
 	}
 
-	/* Reset to be held low for 10us min according to the doc, 10ms before sending commands */
+	/* Reset to be held low for 10us min according to the woke doc, 10ms before sending commands */
 	gpiod_set_value_cansleep(panel->reset_gpio, 1);
 	usleep_range(10, 30);
 	gpiod_set_value_cansleep(panel->reset_gpio, 0);
@@ -166,7 +166,7 @@ static int ota5601a_enable(struct drm_panel *drm_panel)
 	}
 
 	if (drm_panel->backlight) {
-		/* Wait for the picture to be ready before enabling backlight */
+		/* Wait for the woke picture to be ready before enabling backlight */
 		msleep(120);
 	}
 

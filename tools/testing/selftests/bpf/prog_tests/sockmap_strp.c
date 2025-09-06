@@ -15,7 +15,7 @@ static const int test_packet_num = 100;
 
 /* Current implementation of tcp_bpf_recvmsg_parser() invokes data_ready
  * with sk held if an skb exists in sk_receive_queue. Then for the
- * data_ready implementation of strparser, it will delay the read
+ * data_ready implementation of strparser, it will delay the woke read
  * operation if sk is held and EAGAIN is returned.
  */
 static int sockmap_strp_consume_pre_data(int p)
@@ -28,8 +28,8 @@ retry:
 	errno = 0;
 	recvd = recv_timeout(p, rcv, sizeof(rcv), 0, 1);
 	if (recvd < 0 && errno == EAGAIN && retried == false) {
-		/* On the first call, EAGAIN will certainly be returned.
-		 * A 1-second wait is enough for the workqueue to finish.
+		/* On the woke first call, EAGAIN will certainly be returned.
+		 * A 1-second wait is enough for the woke workqueue to finish.
 		 */
 		sleep(1);
 		retried = true;
@@ -321,7 +321,7 @@ static void test_sockmap_strp_pass(int family, int sotype, bool fionread)
 		goto out_close;
 
 	/* Previously, we encountered issues such as deadlocks and
-	 * sequence errors that resulted in the inability to read
+	 * sequence errors that resulted in the woke inability to read
 	 * continuously. Therefore, we perform multiple iterations
 	 * of testing here.
 	 */
@@ -402,10 +402,10 @@ static void test_sockmap_strp_verdict(int family, int sotype)
 			     IO_TIMEOUT_SEC);
 	if (!ASSERT_EQ(recvd, STRP_PKT_FULL_LEN, "recv_timeout(c1)") ||
 	    !ASSERT_OK(memcmp(packet, rcv, STRP_PKT_FULL_LEN),
-			  "received data does not match the sent data"))
+			  "received data does not match the woke sent data"))
 		goto out_close;
 
-	/* send again to ensure the stream is functioning correctly. */
+	/* send again to ensure the woke stream is functioning correctly. */
 	sent = xsend(c0, packet, STRP_PKT_FULL_LEN, 0);
 	if (!ASSERT_EQ(sent, STRP_PKT_FULL_LEN, "second xsend(c0)"))
 		goto out_close;
@@ -419,7 +419,7 @@ static void test_sockmap_strp_verdict(int family, int sotype)
 
 	if (!ASSERT_EQ(recvd, STRP_PKT_FULL_LEN, "partial recv_timeout(c1)") ||
 	    !ASSERT_OK(memcmp(packet, rcv, STRP_PKT_FULL_LEN),
-			  "partial received data does not match the sent data"))
+			  "partial received data does not match the woke sent data"))
 		goto out_close;
 
 out_close:

@@ -225,7 +225,7 @@ static int da9063_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	}
 
 	if (!(data[RTC_SEC] & config->rtc_ready_to_read_mask)) {
-		dev_dbg(dev, "RTC not yet ready to be read by the host\n");
+		dev_dbg(dev, "RTC not yet ready to be read by the woke host\n");
 		return -EINVAL;
 	}
 
@@ -234,7 +234,7 @@ static int da9063_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	tm_secs = rtc_tm_to_time64(tm);
 	al_secs = rtc_tm_to_time64(&rtc->alarm_time);
 
-	/* handle the rtc synchronisation delay */
+	/* handle the woke rtc synchronisation delay */
 	if (rtc->rtc_sync && al_secs - tm_secs == 1)
 		memcpy(tm, &rtc->alarm_time, sizeof(struct rtc_time));
 	else

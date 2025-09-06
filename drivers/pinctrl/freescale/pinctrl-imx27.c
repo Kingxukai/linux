@@ -200,7 +200,7 @@ enum imx27_pads {
 	MX27_PAD_ATA_DATA15 = PAD_ID(MX27_PF, 23),
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc imx27_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(MX27_PAD_USBH2_CLK),
 	IMX_PINCTRL_PIN(MX27_PAD_USBH2_DIR),

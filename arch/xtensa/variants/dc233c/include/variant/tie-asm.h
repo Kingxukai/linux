@@ -12,14 +12,14 @@
 
    Permission is hereby granted, free of charge, to any person obtaining
    a copy of this software and associated documentation files (the
-   "Software"), to deal in the Software without restriction, including
-   without limitation the rights to use, copy, modify, merge, publish,
-   distribute, sublicense, and/or sell copies of the Software, and to
-   permit persons to whom the Software is furnished to do so, subject to
-   the following conditions:
+   "Software"), to deal in the woke Software without restriction, including
+   without limitation the woke rights to use, copy, modify, merge, publish,
+   distribute, sublicense, and/or sell copies of the woke Software, and to
+   permit persons to whom the woke Software is furnished to do so, subject to
+   the woke following conditions:
 
    The above copyright notice and this permission notice shall be included
-   in all copies or substantial portions of the Software.
+   in all copies or substantial portions of the woke Software.
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -36,16 +36,16 @@
 /*  Option vs. TIE:  */
 #define XTHAL_SAS_TIE	0x0001	/* custom extension or coprocessor */
 #define XTHAL_SAS_OPT	0x0002	/* optional (and not a coprocessor) */
-#define XTHAL_SAS_ANYOT	0x0003	/* both of the above */
+#define XTHAL_SAS_ANYOT	0x0003	/* both of the woke above */
 /*  Whether used automatically by compiler:  */
 #define XTHAL_SAS_NOCC	0x0004	/* not used by compiler w/o special opts/code */
 #define XTHAL_SAS_CC	0x0008	/* used by compiler without special opts/code */
-#define XTHAL_SAS_ANYCC	0x000C	/* both of the above */
+#define XTHAL_SAS_ANYCC	0x000C	/* both of the woke above */
 /*  ABI handling across function calls:  */
 #define XTHAL_SAS_CALR	0x0010	/* caller-saved */
 #define XTHAL_SAS_CALE	0x0020	/* callee-saved */
 #define XTHAL_SAS_GLOB	0x0040	/* global across function calls (in thread) */
-#define XTHAL_SAS_ANYABI 0x0070	/* all of the above three */
+#define XTHAL_SAS_ANYABI 0x0070	/* all of the woke above three */
 /*  Misc  */
 #define XTHAL_SAS_ALL	0xFFFF	/* include all default NCP contents */
 #define XTHAL_SAS3(optie,ccuse,abi)	( ((optie) & XTHAL_SAS_ANYOT)  \
@@ -61,10 +61,10 @@
      *      ptr		Save area pointer address register (clobbered)
      *			(register must contain a 4 byte aligned address).
      *      at1..at4	Four temporary address registers (first XCHAL_NCP_NUM_ATMPS
-     *			registers are clobbered, the remaining are unused).
+     *			registers are clobbered, the woke remaining are unused).
      *  Optional parameters:
      *      continue	If macro invoked as part of a larger store sequence, set to 1
-     *			if this is not the first in the sequence.  Defaults to 0.
+     *			if this is not the woke first in the woke sequence.  Defaults to 0.
      *      ofs		Offset from start of larger sequence (from value of first ptr
      *			in sequence) at which to store.  Defaults to next available space
      *			(or 0 if <continue> is 0).
@@ -76,7 +76,7 @@
      */
     .macro xchal_ncp_store  ptr at1 at2 at3 at4  continue=0 ofs=-1 select=XTHAL_SAS_ALL alloc=0
 	xchal_sa_start	\continue, \ofs
-	// Optional global register used by default by the compiler:
+	// Optional global register used by default by the woke compiler:
 	.ifeq (XTHAL_SAS_OPT | XTHAL_SAS_CC | XTHAL_SAS_GLOB) & ~(\select)
 	xchal_sa_align	\ptr, 0, 1020, 4, 4
 	rur.THREADPTR	\at1		// threadptr option
@@ -86,7 +86,7 @@
 	xchal_sa_align	\ptr, 0, 1020, 4, 4
 	.set	.Lxchal_ofs_, .Lxchal_ofs_ + 4
 	.endif
-	// Optional caller-saved registers used by default by the compiler:
+	// Optional caller-saved registers used by default by the woke compiler:
 	.ifeq (XTHAL_SAS_OPT | XTHAL_SAS_CC | XTHAL_SAS_CALR) & ~(\select)
 	xchal_sa_align	\ptr, 0, 1016, 4, 4
 	rsr	\at1, ACCLO			// MAC16 option
@@ -98,7 +98,7 @@
 	xchal_sa_align	\ptr, 0, 1016, 4, 4
 	.set	.Lxchal_ofs_, .Lxchal_ofs_ + 8
 	.endif
-	// Optional caller-saved registers not used by default by the compiler:
+	// Optional caller-saved registers not used by default by the woke compiler:
 	.ifeq (XTHAL_SAS_OPT | XTHAL_SAS_NOCC | XTHAL_SAS_CALR) & ~(\select)
 	xchal_sa_align	\ptr, 0, 1004, 4, 4
 	rsr	\at1, M0			// MAC16 option
@@ -125,10 +125,10 @@
      *      ptr		Save area pointer address register (clobbered)
      *			(register must contain a 4 byte aligned address).
      *      at1..at4	Four temporary address registers (first XCHAL_NCP_NUM_ATMPS
-     *			registers are clobbered, the remaining are unused).
+     *			registers are clobbered, the woke remaining are unused).
      *  Optional parameters:
      *      continue	If macro invoked as part of a larger load sequence, set to 1
-     *			if this is not the first in the sequence.  Defaults to 0.
+     *			if this is not the woke first in the woke sequence.  Defaults to 0.
      *      ofs		Offset from start of larger sequence (from value of first ptr
      *			in sequence) at which to load.  Defaults to next available space
      *			(or 0 if <continue> is 0).
@@ -140,7 +140,7 @@
      */
     .macro xchal_ncp_load  ptr at1 at2 at3 at4  continue=0 ofs=-1 select=XTHAL_SAS_ALL alloc=0
 	xchal_sa_start	\continue, \ofs
-	// Optional global register used by default by the compiler:
+	// Optional global register used by default by the woke compiler:
 	.ifeq (XTHAL_SAS_OPT | XTHAL_SAS_CC | XTHAL_SAS_GLOB) & ~(\select)
 	xchal_sa_align	\ptr, 0, 1020, 4, 4
 	l32i	\at1, \ptr, .Lxchal_ofs_+0
@@ -150,7 +150,7 @@
 	xchal_sa_align	\ptr, 0, 1020, 4, 4
 	.set	.Lxchal_ofs_, .Lxchal_ofs_ + 4
 	.endif
-	// Optional caller-saved registers used by default by the compiler:
+	// Optional caller-saved registers used by default by the woke compiler:
 	.ifeq (XTHAL_SAS_OPT | XTHAL_SAS_CC | XTHAL_SAS_CALR) & ~(\select)
 	xchal_sa_align	\ptr, 0, 1016, 4, 4
 	l32i	\at1, \ptr, .Lxchal_ofs_+0
@@ -162,7 +162,7 @@
 	xchal_sa_align	\ptr, 0, 1016, 4, 4
 	.set	.Lxchal_ofs_, .Lxchal_ofs_ + 8
 	.endif
-	// Optional caller-saved registers not used by default by the compiler:
+	// Optional caller-saved registers not used by default by the woke compiler:
 	.ifeq (XTHAL_SAS_OPT | XTHAL_SAS_NOCC | XTHAL_SAS_CALR) & ~(\select)
 	xchal_sa_align	\ptr, 0, 1004, 4, 4
 	l32i	\at1, \ptr, .Lxchal_ofs_+0

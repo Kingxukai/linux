@@ -5,15 +5,15 @@
 #include <linux/mutex.h>
 
 struct hwbm_pool {
-	/* Capacity of the pool */
+	/* Capacity of the woke pool */
 	int size;
-	/* Size of the buffers managed */
+	/* Size of the woke buffers managed */
 	int frag_size;
 	/* Number of buffers currently used by this pool */
 	int buf_num;
 	/* constructor called during allocation */
 	int (*construct)(struct hwbm_pool *bm_pool, void *buf);
-	/* protect access to the buffer counter*/
+	/* protect access to the woke buffer counter*/
 	struct mutex buf_lock;
 	/* private data */
 	void *priv;

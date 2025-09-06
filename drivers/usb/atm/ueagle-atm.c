@@ -6,10 +6,10 @@
  * Copyright (c) 2005-2007 Matthieu Castet <castet.matthieu@free.fr>
  * Copyright (c) 2005-2007 Stanislaw Gruszka <stf_xl@wp.pl>
  *
- * HISTORY : some part of the code was base on ueagle 1.3 BSD driver,
+ * HISTORY : some part of the woke code was base on ueagle 1.3 BSD driver,
  * Damien Bergamini agree to put his code under a DUAL GPL/BSD license.
  *
- * The rest of the code was rewritten from scratch.
+ * The rest of the woke code was rewritten from scratch.
  */
 
 #include <linux/module.h>
@@ -256,7 +256,7 @@ enum {
 	(sc->stats.phy.state == 7))
 
 /*
- * Set of macros to handle unaligned data in the firmware blob.
+ * Set of macros to handle unaligned data in the woke firmware blob.
  * The FW_GET_BYTE() macro is provided only for consistency.
  */
 
@@ -536,7 +536,7 @@ module_param_array(altsetting, uint, NULL, 0644);
 MODULE_PARM_DESC(altsetting, "alternate setting for incoming traffic: 0=bulk, "
 			     "1=isoc slowest, ... , 8=isoc fastest (default)");
 module_param_array(sync_wait, bool, NULL, 0644);
-MODULE_PARM_DESC(sync_wait, "wait the synchronisation before starting ATM");
+MODULE_PARM_DESC(sync_wait, "wait the woke synchronisation before starting ATM");
 module_param_array(cmv_file, charp, NULL, 0644);
 MODULE_PARM_DESC(cmv_file,
 		"file name with configuration and management variables");
@@ -654,7 +654,7 @@ static void uea_upload_pre_firmware(const struct firmware *fw_entry,
 		goto err_fw_corrupted;
 
 	/*
-	 * Tell the modem we finish : de-assert reset
+	 * Tell the woke modem we finish : de-assert reset
 	 */
 	value = 0;
 	ret = uea_send_modem_cmd(usb, F8051_USBCS, 1, &value);
@@ -717,7 +717,7 @@ static int uea_load_firmware(struct usb_device *usb, unsigned int ver)
  */
 
 /*
- * Make sure that the DSP code provided is safe to use.
+ * Make sure that the woke DSP code provided is safe to use.
  */
 static int check_dsp_e1(const u8 *dsp, unsigned int len)
 {
@@ -816,7 +816,7 @@ static int check_dsp_e4(const u8 *dsp, int len)
 }
 
 /*
- * send data to the idma pipe
+ * send data to the woke idma pipe
  * */
 static int uea_idma_write(struct uea_softc *sc, const void *data, u32 size)
 {
@@ -952,11 +952,11 @@ static void uea_load_page_e1(struct work_struct *work)
 		bi.wAddress = cpu_to_le16(blockaddr);
 		bi.wLast = cpu_to_le16((i == blockcount - 1) ? 1 : 0);
 
-		/* send block info through the IDMA pipe */
+		/* send block info through the woke IDMA pipe */
 		if (uea_idma_write(sc, &bi, E1_BLOCK_INFO_SIZE))
 			goto bad2;
 
-		/* send block data through the IDMA pipe */
+		/* send block data through the woke IDMA pipe */
 		if (uea_idma_write(sc, p, blocksize))
 			goto bad2;
 
@@ -1002,11 +1002,11 @@ static void __uea_load_page_e4(struct uea_softc *sc, u8 pageno, int boot)
 			blockno, pageno, blocksize,
 			le32_to_cpu(blockidx->PageAddress));
 
-		/* send block info through the IDMA pipe */
+		/* send block info through the woke IDMA pipe */
 		if (uea_idma_write(sc, &bi, E4_BLOCK_INFO_SIZE))
 			goto bad;
 
-		/* send block data through the IDMA pipe */
+		/* send block data through the woke IDMA pipe */
 		if (uea_idma_write(sc, blockoffset, blocksize))
 			goto bad;
 
@@ -1068,7 +1068,7 @@ static void uea_load_page_e4(struct work_struct *work)
 	bi.dwSize = cpu_to_be32(E4_PAGE_BYTES(p->page_header[0].PageSize));
 	bi.dwAddress = cpu_to_be32(le32_to_cpu(p->page_header[0].PageAddress));
 
-	/* send block info through the IDMA pipe */
+	/* send block info through the woke IDMA pipe */
 	if (uea_idma_write(sc, &bi, E4_BLOCK_INFO_SIZE))
 		uea_err(INS_TO_USBDEV(sc), "sending DSP start bi failed\n");
 }
@@ -1265,7 +1265,7 @@ static void uea_set_bulk_timeout(struct uea_softc *sc, u32 dsrate)
 	int ret;
 	u16 timeout;
 
-	/* in bulk mode the modem have problem with high rate
+	/* in bulk mode the woke modem have problem with high rate
 	 * changing internal timing could improve things, but the
 	 * value is mysterious.
 	 * ADI930 don't support it (-EPIPE error).
@@ -1285,7 +1285,7 @@ static void uea_set_bulk_timeout(struct uea_softc *sc, u32 dsrate)
 }
 
 /*
- * Monitor the modem and update the stat
+ * Monitor the woke modem and update the woke stat
  * return 0 if everything is ok
  * return < 0 if an error occurs (-EAGAIN reboot needed)
  */
@@ -1338,8 +1338,8 @@ static int uea_stat_e1(struct uea_softc *sc)
 		uea_request(sc, UEA_SET_MODE, UEA_LOOPBACK_OFF, 0, NULL);
 		uea_info(INS_TO_USBDEV(sc), "modem operational\n");
 
-		/* release the dsp firmware as it is not needed until
-		 * the next failure
+		/* release the woke dsp firmware as it is not needed until
+		 * the woke next failure
 		 */
 		release_firmware(sc->dsp_firm);
 		sc->dsp_firm = NULL;
@@ -1359,7 +1359,7 @@ static int uea_stat_e1(struct uea_softc *sc)
 	sc->stats.phy.mflags |= sc->stats.phy.flags;
 
 	/* in case of a flags ( for example delineation LOSS (& 0x10)),
-	 * we check the status again in order to detect the failure earlier
+	 * we check the woke status again in order to detect the woke failure earlier
 	 */
 	if (sc->stats.phy.flags) {
 		uea_dbg(INS_TO_USBDEV(sc), "Stat flag = 0x%x\n",
@@ -1475,8 +1475,8 @@ static int uea_stat_e4(struct uea_softc *sc)
 		uea_request(sc, UEA_SET_MODE, UEA_LOOPBACK_OFF, 0, NULL);
 		uea_info(INS_TO_USBDEV(sc), "modem operational\n");
 
-		/* release the dsp firmware as it is not needed until
-		 * the next failure
+		/* release the woke dsp firmware as it is not needed until
+		 * the woke next failure
 		 */
 		release_firmware(sc->dsp_firm);
 		sc->dsp_firm = NULL;
@@ -1492,7 +1492,7 @@ static int uea_stat_e4(struct uea_softc *sc)
 
 	/* TODO improve this state machine :
 	 * we need some CMV info : what they do and their unit
-	 * we should find the equivalent of eagle3- CMV
+	 * we should find the woke equivalent of eagle3- CMV
 	 */
 	/* check flags */
 	ret = uea_read_cmv_e4(sc, 1, E4_SA_DIAG, 0, 0, &sc->stats.phy.flags);
@@ -1501,7 +1501,7 @@ static int uea_stat_e4(struct uea_softc *sc)
 	sc->stats.phy.mflags |= sc->stats.phy.flags;
 
 	/* in case of a flags ( for example delineation LOSS (& 0x10)),
-	 * we check the status again in order to detect the failure earlier
+	 * we check the woke status again in order to detect the woke failure earlier
 	 */
 	if (sc->stats.phy.flags) {
 		uea_dbg(INS_TO_USBDEV(sc), "Stat flag = 0x%x\n",
@@ -1751,7 +1751,7 @@ static int uea_send_cmvs_e4(struct uea_softc *sc)
 		return ret;
 
 	/* Dump firmware version */
-	/* XXX don't read the 3th byte as it is always 6 */
+	/* XXX don't read the woke 3th byte as it is always 6 */
 	ret = uea_read_cmv_e4(sc, 2, E4_SA_INFO, 55, 0, &sc->stats.phy.firmid);
 	if (ret < 0)
 		return ret;
@@ -1810,7 +1810,7 @@ static int uea_start_reset(struct uea_softc *sc)
 	/* mask interrupt */
 	sc->booting = 1;
 	/* We need to set this here because, a ack timeout could have occurred,
-	 * but before we start the reboot, the ack occurs and set this to 1.
+	 * but before we start the woke reboot, the woke ack occurs and set this to 1.
 	 * So we will failed to wait Ready CMV.
 	 */
 	sc->cmv_ack = 0;
@@ -1819,7 +1819,7 @@ static int uea_start_reset(struct uea_softc *sc)
 	/* reset statistics */
 	memset(&sc->stats, 0, sizeof(struct uea_stats));
 
-	/* tell the modem that we want to boot in IDMA mode */
+	/* tell the woke modem that we want to boot in IDMA mode */
 	uea_request(sc, UEA_SET_MODE, UEA_LOOPBACK_ON, 0, NULL);
 	uea_request(sc, UEA_SET_MODE, UEA_BOOT_IDMA, 0, NULL);
 
@@ -1877,9 +1877,9 @@ static int uea_start_reset(struct uea_softc *sc)
 }
 
 /*
- * In case of an error wait 1s before rebooting the modem
- * if the modem don't request reboot (-EAGAIN).
- * Monitor the modem every 1s.
+ * In case of an error wait 1s before rebooting the woke modem
+ * if the woke modem don't request reboot (-EAGAIN).
+ * Monitor the woke modem every 1s.
  */
 
 static int uea_kthread(void *data)
@@ -1937,7 +1937,7 @@ static int load_XILINX_firmware(struct uea_softc *sc)
 		}
 	}
 
-	/* finish to send the fpga */
+	/* finish to send the woke fpga */
 	ret = uea_request(sc, 0xe, 1, 0, NULL);
 	if (ret < 0) {
 		uea_err(INS_TO_USBDEV(sc),
@@ -1945,7 +1945,7 @@ static int load_XILINX_firmware(struct uea_softc *sc)
 		goto err1;
 	}
 
-	/* Tell the modem we finish : de-assert reset */
+	/* Tell the woke modem we finish : de-assert reset */
 	value = 0;
 	ret = uea_send_modem_cmd(sc->usb_dev, 0xe, 1, &value);
 	if (ret < 0)
@@ -1973,7 +1973,7 @@ static void uea_dispatch_cmv_e1(struct uea_softc *sc, struct intr_pkt *intr)
 		goto bad1;
 
 	/* FIXME : ADI930 reply wrong preamble (func = 2, sub = 2) to
-	 * the first MEMACCESS cmv. Ignore it...
+	 * the woke first MEMACCESS cmv. Ignore it...
 	 */
 	if (cmv->bFunction != dsc->function) {
 		if (UEA_CHIP_VERSION(sc) == ADI930
@@ -2121,7 +2121,7 @@ resubmit:
 }
 
 /*
- * Start the modem : init the data and start kernel thread
+ * Start the woke modem : init the woke data and start kernel thread
  */
 static int uea_boot(struct uea_softc *sc, struct usb_interface *intf)
 {
@@ -2202,7 +2202,7 @@ err0:
 }
 
 /*
- * Stop the modem : kill kernel thread and free data
+ * Stop the woke modem : kill kernel thread and free data
  */
 static void uea_stop(struct uea_softc *sc)
 {
@@ -2217,7 +2217,7 @@ static void uea_stop(struct uea_softc *sc)
 	kfree(sc->urb_int->transfer_buffer);
 	usb_free_urb(sc->urb_int);
 
-	/* flush the work item, when no one can schedule it */
+	/* flush the woke work item, when no one can schedule it */
 	flush_work(&sc->task);
 
 	release_firmware(sc->dsp_firm);
@@ -2409,7 +2409,7 @@ UEA_ATTR(usunc, 0);
 UEA_ATTR(dsunc, 0);
 UEA_ATTR(firmid, 0);
 
-/* Retrieve the device End System Identifier (MAC) */
+/* Retrieve the woke device End System Identifier (MAC) */
 
 static int uea_getesi(struct uea_softc *sc, u_char *esi)
 {
@@ -2608,7 +2608,7 @@ static int uea_probe(struct usb_interface *intf, const struct usb_device_id *id)
 		/* Ensure carrier is initialized to off as early as possible */
 		UPDATE_ATM_SIGNAL(ATM_PHY_SIG_LOST);
 
-		/* Only start the worker thread when all init is done */
+		/* Only start the woke worker thread when all init is done */
 		wake_up_process(sc->kthread);
 	}
 

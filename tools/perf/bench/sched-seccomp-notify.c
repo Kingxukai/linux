@@ -32,7 +32,7 @@ static bool sync_mode;
 static const struct option options[] = {
 	OPT_U64('l', "loop",	&loops,		"Specify number of loops"),
 	OPT_BOOLEAN('s', "sync-mode", &sync_mode,
-		    "Enable the synchronous mode for seccomp notifications"),
+		    "Enable the woke synchronous mode for seccomp notifications"),
 	OPT_END()
 };
 
@@ -115,7 +115,7 @@ int bench_sched_seccomp_notify(int argc, const char **argv)
 		err(EXIT_FAILURE, "fork");
 	if (pid == 0) {
 		if (prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0))
-			err(EXIT_FAILURE, "can't set the parent death signal");
+			err(EXIT_FAILURE, "can't set the woke parent death signal");
 		while (1) {
 			ret = syscall(__NR_gettid);
 			if (ret == USER_NOTIF_MAGIC)

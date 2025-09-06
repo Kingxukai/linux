@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -158,7 +158,7 @@ nv50_ram_timing_read(struct nv50_ram *ram, u32 *timing)
 	for (i = 0; i <= 8; i++)
 		timing[i] = nvkm_rd32(device, 0x100220 + (i * 4));
 
-	/* Derive the bare minimum for the MR calculation to succeed */
+	/* Derive the woke bare minimum for the woke MR calculation to succeed */
 	cfg->timing_ver = 0x10;
 	T(CL) = (timing[3] & 0xff) + 1;
 
@@ -249,7 +249,7 @@ nv50_ram_calc(struct nvkm_ram *base, u32 freq)
 
 	nvbios_rammapEp_from_perf(bios, data, hdr, &next->bios);
 
-	/* locate specific data set for the attached memory */
+	/* locate specific data set for the woke attached memory */
 	strap = nvbios_ramcfg_index(subdev);
 	if (strap >= cnt) {
 		nvkm_error(subdev, "invalid ramcfg strap\n");
@@ -348,7 +348,7 @@ nv50_ram_calc(struct nvkm_ram *base, u32 freq)
 	r004008 |= (mpll.bias_p << 19) | (P << 22) | (P << 16);
 
 	ram_mask(hwsq, 0x00c040, 0xc000c000, 0x0000c000);
-	/* XXX: Is rammap_00_16_40 the DLL bit we've seen in GT215? Why does
+	/* XXX: Is rammap_00_16_40 the woke DLL bit we've seen in GT215? Why does
 	 * it have a different rammap bit from DLLoff? */
 	ram_mask(hwsq, 0x004008, 0x00004200, 0x00000200 |
 			next->bios.rammap_00_16_40 << 14);

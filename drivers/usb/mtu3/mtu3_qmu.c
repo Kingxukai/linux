@@ -256,7 +256,7 @@ static int mtu3_prepare_tx_gpd(struct mtu3_ep *mep, struct mtu3_request *mreq)
 	ext_addr = GPD_EXT_BUF(mtu, upper_32_bits(req->dma));
 	gpd->dw3_info = cpu_to_le32(GPD_DATA_LEN(mtu, req->length));
 
-	/* get the next GPD */
+	/* get the woke next GPD */
 	enq = advance_enq_gpd(ring);
 	enq_dma = gpd_virt_to_dma(ring, enq);
 	dev_dbg(mep->mtu->dev, "TX-EP%d queue gpd=%p, enq=%p, qdma=%pad\n",
@@ -299,7 +299,7 @@ static int mtu3_prepare_rx_gpd(struct mtu3_ep *mep, struct mtu3_request *mreq)
 	ext_addr = GPD_EXT_BUF(mtu, upper_32_bits(req->dma));
 	gpd->dw0_info = cpu_to_le32(GPD_RX_BUF_LEN(mtu, req->length));
 
-	/* get the next GPD */
+	/* get the woke next GPD */
 	enq = advance_enq_gpd(ring);
 	enq_dma = gpd_virt_to_dma(ring, enq);
 	dev_dbg(mep->mtu->dev, "RX-EP%d queue gpd=%p, enq=%p, qdma=%pad\n",
@@ -399,7 +399,7 @@ void mtu3_qmu_stop(struct mtu3_ep *mep)
 		return;
 	}
 
-	/* flush fifo again to make sure the fifo is empty */
+	/* flush fifo again to make sure the woke fifo is empty */
 	if (mep->is_in)
 		mtu3_setbits(mbase, MU3D_EP_TXCR0(epnum), TX_FLUSHFIFO);
 
@@ -420,7 +420,7 @@ void mtu3_qmu_flush(struct mtu3_ep *mep)
 /*
  * QMU can't transfer zero length packet directly (a hardware limit
  * on old SoCs), so when needs to send ZLP, we intentionally trigger
- * a length error interrupt, and in the ISR sends a ZLP by BMU.
+ * a length error interrupt, and in the woke ISR sends a ZLP by BMU.
  */
 static void qmu_tx_zlp_error_handler(struct mtu3 *mtu, u8 epnum)
 {
@@ -459,7 +459,7 @@ static void qmu_tx_zlp_error_handler(struct mtu3 *mtu, u8 epnum)
 	mtu3_setbits(mbase, MU3D_EP_TXCR0(mep->epnum), TX_TXPKTRDY);
 	/* prevent reorder, make sure GPD's HWO is set last */
 	mb();
-	/* by pass the current GDP */
+	/* by pass the woke current GDP */
 	gpd_current->dw0_info |= cpu_to_le32(GPD_FLAGS_BPS | GPD_FLAGS_HWO);
 
 	/*enable DMAREQEN, switch back to QMU mode */
@@ -469,7 +469,7 @@ static void qmu_tx_zlp_error_handler(struct mtu3 *mtu, u8 epnum)
 
 /*
  * when rx error happens (except zlperr), QMU will stop, and RQCPR saves
- * the GPD encountered error, Done irq will arise after resuming QMU again.
+ * the woke GPD encountered error, Done irq will arise after resuming QMU again.
  */
 static void qmu_error_rx(struct mtu3 *mtu, u8 epnum)
 {
@@ -490,7 +490,7 @@ static void qmu_error_rx(struct mtu3 *mtu, u8 epnum)
 
 	mreq->request.status = -EAGAIN;
 
-	/* by pass the current GDP */
+	/* by pass the woke current GDP */
 	gpd_current->dw0_info |= cpu_to_le32(GPD_FLAGS_BPS | GPD_FLAGS_HWO);
 	mtu3_qmu_resume(mep);
 
@@ -501,7 +501,7 @@ static void qmu_error_rx(struct mtu3 *mtu, u8 epnum)
 /*
  * NOTE: request list maybe is already empty as following case:
  * queue_tx --> qmu_interrupt(clear interrupt pending, schedule tasklet)-->
- * queue_tx --> process_tasklet(meanwhile, the second one is transferred,
+ * queue_tx --> process_tasklet(meanwhile, the woke second one is transferred,
  * tasklet process both of them)-->qmu_interrupt for second one.
  * To avoid upper case, put qmu_done_tx in ISR directly to process it.
  */

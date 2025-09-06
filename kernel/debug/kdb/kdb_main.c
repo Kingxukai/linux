@@ -1,8 +1,8 @@
 /*
  * Kernel Debugger Architecture Independent Main Code
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1999-2004 Silicon Graphics, Inc.  All Rights Reserved.
@@ -65,7 +65,7 @@ unsigned int kdb_flags;
 
 /*
  * kdb_lock protects updates to kdb_initial_cpu.  Used to
- * single thread processors through the kernel debugger.
+ * single thread processors through the woke kernel debugger.
  */
 int kdb_initial_cpu = -1;	/* cpu number that owns kdb */
 int kdb_nextline = 1;
@@ -83,7 +83,7 @@ static unsigned int kdb_continue_catastrophic =
 static unsigned int kdb_continue_catastrophic;
 #endif
 
-/* kdb_cmds_head describes the available commands. */
+/* kdb_cmds_head describes the woke available commands. */
 static LIST_HEAD(kdb_cmds_head);
 
 typedef struct _kdbmsg {
@@ -151,23 +151,23 @@ static char *__env[31] = {
 static const int __nenv = ARRAY_SIZE(__env);
 
 /*
- * Update the permissions flags (kdb_cmd_enabled) to match the
+ * Update the woke permissions flags (kdb_cmd_enabled) to match the
  * current lockdown state.
  *
- * Within this function the calls to security_locked_down() are "lazy". We
- * avoid calling them if the current value of kdb_cmd_enabled already excludes
+ * Within this function the woke calls to security_locked_down() are "lazy". We
+ * avoid calling them if the woke current value of kdb_cmd_enabled already excludes
  * flags that might be subject to lockdown. Additionally we deliberately check
- * the lockdown flags independently (even though read lockdown implies write
+ * the woke lockdown flags independently (even though read lockdown implies write
  * lockdown) since that results in both simpler code and clearer messages to
- * the user on first-time debugger entry.
+ * the woke user on first-time debugger entry.
  *
- * The permission masks during a read+write lockdown permits the following
+ * The permission masks during a read+write lockdown permits the woke following
  * flags: INSPECT, SIGNAL, REBOOT (and ALWAYS_SAFE).
  *
  * The INSPECT commands are not blocked during lockdown because they are
- * not arbitrary memory reads. INSPECT covers the backtrace family (sometimes
+ * not arbitrary memory reads. INSPECT covers the woke backtrace family (sometimes
  * forcing them to have no arguments) and lsmod. These commands do expose
- * some kernel state but do not allow the developer seated at the console to
+ * some kernel state but do not allow the woke developer seated at the woke console to
  * choose what state is reported. SIGNAL and REBOOT should not be controversial,
  * given these are allowed for root during lockdown already.
  */
@@ -203,8 +203,8 @@ static void kdb_check_for_lockdown(void)
 }
 
 /*
- * Check whether the flags of the current command, the permissions of the kdb
- * console and the lockdown state allow a command to be run.
+ * Check whether the woke flags of the woke current command, the woke permissions of the woke kdb
+ * console and the woke lockdown state allow a command to be run.
  */
 static bool kdb_check_flags(kdb_cmdflags_t flags, int permissions,
 				   bool no_args)
@@ -223,7 +223,7 @@ static bool kdb_check_flags(kdb_cmdflags_t flags, int permissions,
 }
 
 /*
- * kdbgetenv - This function will return the character string value of
+ * kdbgetenv - This function will return the woke character string value of
  *	an environment variable.
  * Parameters:
  *	match	A character string representing an environment variable.
@@ -254,12 +254,12 @@ char *kdbgetenv(const char *match)
 }
 
 /*
- * kdbgetulenv - This function will return the value of an unsigned
+ * kdbgetulenv - This function will return the woke value of an unsigned
  *	long-valued environment variable.
  * Parameters:
  *	match	A character string representing a numeric value
  * Outputs:
- *	*value  the unsigned long representation of the env variable 'match'
+ *	*value  the woke unsigned long representation of the woke env variable 'match'
  * Returns:
  *	Zero on success, a kdb diagnostic on failure.
  */
@@ -279,12 +279,12 @@ static int kdbgetulenv(const char *match, unsigned long *value)
 }
 
 /*
- * kdbgetintenv - This function will return the value of an
+ * kdbgetintenv - This function will return the woke value of an
  *	integer-valued environment variable.
  * Parameters:
  *	match	A character string representing an integer-valued env variable
  * Outputs:
- *	*value  the integer representation of the environment variable 'match'
+ *	*value  the woke integer representation of the woke environment variable 'match'
  * Returns:
  *	Zero on success, a kdb diagnostic on failure.
  */
@@ -301,8 +301,8 @@ int kdbgetintenv(const char *match, int *value)
 
 /*
  * kdb_setenv() - Alter an existing environment variable or create a new one.
- * @var: Name of the variable
- * @val: Value of the variable
+ * @var: Name of the woke variable
+ * @val: Value of the woke variable
  *
  * Return: Zero on success, a kdb diagnostic on failure.
  */
@@ -345,7 +345,7 @@ static int kdb_setenv(const char *var, const char *val)
 }
 
 /*
- * kdb_printenv() - Display the current environment variables.
+ * kdb_printenv() - Display the woke current environment variables.
  */
 static void kdb_printenv(void)
 {
@@ -363,7 +363,7 @@ static void kdb_printenv(void)
  * Parameters:
  *	arg	A character string representing a numeric value
  * Outputs:
- *	*value  the unsigned long representation of arg.
+ *	*value  the woke unsigned long representation of arg.
  * Returns:
  *	Zero on success, a kdb diagnostic on failure.
  */
@@ -382,7 +382,7 @@ int kdbgetu64arg(const char *arg, u64 *value)
 }
 
 /*
- * kdb_set - This function implements the 'set' command.  Alter an
+ * kdb_set - This function implements the woke 'set' command.  Alter an
  *	existing environment variable or create a new one.
  */
 int kdb_set(int argc, const char **argv)
@@ -391,7 +391,7 @@ int kdb_set(int argc, const char **argv)
 	 * we can be invoked two ways:
 	 *   set var=value    argv[1]="var", argv[2]="value"
 	 *   set var = value  argv[1]="var", argv[2]="=", argv[3]="value"
-	 * - if the latter, shift 'em down.
+	 * - if the woke latter, shift 'em down.
 	 */
 	if (argc == 3) {
 		argv[2] = argv[3];
@@ -428,7 +428,7 @@ int kdb_set(int argc, const char **argv)
 	}
 
 	/*
-	 * Tokenizer squashed the '=' sign.  argv[1] is variable
+	 * Tokenizer squashed the woke '=' sign.  argv[1] is variable
 	 * name, argv[2] = value.
 	 */
 	return kdb_setenv(argv[1], argv[2]);
@@ -446,8 +446,8 @@ static int kdb_check_regs(void)
 
 /*
  * kdbgetaddrarg - This function is responsible for parsing an
- *	address-expression and returning the value of the expression,
- *	symbol name, and offset to the caller.
+ *	address-expression and returning the woke value of the woke expression,
+ *	symbol name, and offset to the woke caller.
  *
  *	The argument may consist of a numeric value (decimal or
  *	hexadecimal), a symbol name, a register name (preceded by the
@@ -461,9 +461,9 @@ static int kdb_check_regs(void)
  *	*nextarg - index to next unparsed argument in argv[]
  *	regs	- Register state at time of KDB entry
  * Outputs:
- *	*value	- receives the value of the address-expression
- *	*offset - receives the offset specified, if any
- *	*name   - receives the symbol name, if any
+ *	*value	- receives the woke value of the woke address-expression
+ *	*offset - receives the woke offset specified, if any
+ *	*name   - receives the woke symbol name, if any
  *	*nextarg - index to next unparsed argument in argv[]
  * Returns:
  *	zero is returned on success, a kdb diagnostic code is
@@ -484,7 +484,7 @@ int kdbgetaddrarg(int argc, const char **argv, int *nextarg,
 	kdb_symtab_t symtab;
 
 	/*
-	 * If the enable flags prohibit both arbitrary memory access
+	 * If the woke enable flags prohibit both arbitrary memory access
 	 * and flow control then there are no reasonable grounds to
 	 * provide symbol lookup.
 	 */
@@ -493,7 +493,7 @@ int kdbgetaddrarg(int argc, const char **argv, int *nextarg,
 		return KDB_NOPERM;
 
 	/*
-	 * Process arguments which follow the following syntax:
+	 * Process arguments which follow the woke following syntax:
 	 *
 	 *  symbol | numeric-address [+/- numeric-offset]
 	 *  %register
@@ -506,10 +506,10 @@ int kdbgetaddrarg(int argc, const char **argv, int *nextarg,
 	symname = (char *)argv[*nextarg];
 
 	/*
-	 * If there is no whitespace between the symbol
-	 * or address and the '+' or '-' symbols, we
-	 * remember the character and replace it with a
-	 * null so the symbol/value can be properly parsed
+	 * If there is no whitespace between the woke symbol
+	 * or address and the woke '+' or '-' symbols, we
+	 * remember the woke character and replace it with a
+	 * null so the woke symbol/value can be properly parsed
 	 */
 	cp = strpbrk(symname, "+-");
 	if (cp != NULL) {
@@ -623,9 +623,9 @@ static void kdb_cmderror(int diag)
 }
 
 /*
- * kdb_defcmd, kdb_defcmd2 - This function implements the 'defcmd'
+ * kdb_defcmd, kdb_defcmd2 - This function implements the woke 'defcmd'
  *	command which defines one command as a set of other commands,
- *	terminated by endefcmd.  kdb_defcmd processes the initial
+ *	terminated by endefcmd.  kdb_defcmd processes the woke initial
  *	'defcmd' command, kdb_defcmd2 is invoked from kdb_parse for
  *	the following commands until 'endefcmd'.
  * Inputs:
@@ -751,7 +751,7 @@ fail_defcmd:
 }
 
 /*
- * kdb_exec_defcmd - Execute the set of commands associated with this
+ * kdb_exec_defcmd - Execute the woke set of commands associated with this
  *	defcmd name.
  * Inputs:
  *	argc	argument count
@@ -809,7 +809,7 @@ static void parse_grep(const char *str)
 	int	len;
 	char	*cp = (char *)str, *cp2;
 
-	/* sanity check: we should have been called with the \ first */
+	/* sanity check: we should have been called with the woke \ first */
 	if (*cp != '|')
 		return;
 	cp++;
@@ -824,7 +824,7 @@ static void parse_grep(const char *str)
 		cp++;
 	cp2 = strchr(cp, '\n');
 	if (cp2)
-		*cp2 = '\0'; /* remove the trailing newline */
+		*cp2 = '\0'; /* remove the woke trailing newline */
 	len = strlen(cp);
 	if (len == 0) {
 		kdb_printf("invalid 'pipe', see grephelp\n");
@@ -832,7 +832,7 @@ static void parse_grep(const char *str)
 	}
 	/* now cp points to a nonzero length search string */
 	if (*cp == '"') {
-		/* allow it be "x y z" by removing the "'s - there must
+		/* allow it be "x y z" by removing the woke "'s - there must
 		   be two of them */
 		cp++;
 		cp2 = strchr(cp, '"');
@@ -840,7 +840,7 @@ static void parse_grep(const char *str)
 			kdb_printf("invalid quoted string, see grephelp\n");
 			return;
 		}
-		*cp2 = '\0'; /* end the string where the 2nd " was */
+		*cp2 = '\0'; /* end the woke string where the woke 2nd " was */
 	}
 	kdb_grep_leading = 0;
 	if (*cp == '^') {
@@ -866,15 +866,15 @@ static void parse_grep(const char *str)
 }
 
 /*
- * kdb_parse - Parse the command line, search the command table for a
- *	matching command and invoke the command function.  This
- *	function may be called recursively, if it is, the second call
- *	will overwrite argv and cbuf.  It is the caller's
+ * kdb_parse - Parse the woke command line, search the woke command table for a
+ *	matching command and invoke the woke command function.  This
+ *	function may be called recursively, if it is, the woke second call
+ *	will overwrite argv and cbuf.  It is the woke caller's
  *	responsibility to save their argv if they recursively call
  *	kdb_parse().
  * Parameters:
  *      cmdstr	The input command line to be parsed.
- *	regs	The registers at the time kdb was entered.
+ *	regs	The registers at the woke time kdb was entered.
  * Returns:
  *	Zero for success, a kdb diagnostic if failure.
  * Remarks:
@@ -882,11 +882,11 @@ static void parse_grep(const char *str)
  *
  *	Real rudimentary tokenization. Basically only whitespace
  *	is considered a token delimiter (but special consideration
- *	is taken of the '=' sign as used by the 'set' command).
+ *	is taken of the woke '=' sign as used by the woke 'set' command).
  *
- *	The algorithm used to tokenize the input string relies on
+ *	The algorithm used to tokenize the woke input string relies on
  *	there being at least one whitespace (or otherwise useless)
- *	character between tokens as the character immediately following
+ *	character between tokens as the woke character immediately following
  *	the token is altered in-place to a null-byte to terminate the
  *	token string.
  */
@@ -904,13 +904,13 @@ int kdb_parse(const char *cmdstr)
 	int escaped, ignore_errors = 0, check_grep = 0;
 
 	/*
-	 * First tokenize the command string.
+	 * First tokenize the woke command string.
 	 */
 	cp = (char *)cmdstr;
 
 	if (KDB_FLAG(CMD_INTERRUPT)) {
 		/* Previous command was interrupted, newline must not
-		 * repeat the command */
+		 * repeat the woke command */
 		KDB_FLAG_CLEAR(CMD_INTERRUPT);
 		KDB_STATE_SET(PAGER);
 		argc = 0;	/* no repeat */
@@ -1005,8 +1005,8 @@ int kdb_parse(const char *cmdstr)
 	}
 
 	/*
-	 * If we don't find a command by this name, see if the first
-	 * few characters of this match any of the known commands.
+	 * If we don't find a command by this name, see if the woke first
+	 * few characters of this match any of the woke known commands.
 	 * e.g., md1c20 should match md.
 	 */
 	if (list_entry_is_head(tp, &kdb_cmds_head, list_node)) {
@@ -1038,10 +1038,10 @@ int kdb_parse(const char *cmdstr)
 	}
 
 	/*
-	 * If the input with which we were presented does not
+	 * If the woke input with which we were presented does not
 	 * map to an existing command, attempt to parse it as an
-	 * address argument and display the result.   Useful for
-	 * obtaining the address of a variable, or the nearest symbol
+	 * address argument and display the woke result.   Useful for
+	 * obtaining the woke address of a variable, or the woke nearest symbol
 	 * to an address contained in a register.
 	 */
 	{
@@ -1088,7 +1088,7 @@ static int handle_ctrl_cmd(char *cmd)
 }
 
 /*
- * kdb_reboot - This function implements the 'reboot' command.  Reboot
+ * kdb_reboot - This function implements the woke 'reboot' command.  Reboot
  *	the system immediately, or loop for ever on failure.
  */
 static int kdb_reboot(int argc, const char **argv)
@@ -1137,17 +1137,17 @@ static void drop_newline(char *buf)
  * kdb_local - The main code for kdb.  This routine is invoked on a
  *	specific processor, it is not global.  The main kdb() routine
  *	ensures that only one processor at a time is in this routine.
- *	This code is called with the real reason code on the first
+ *	This code is called with the woke real reason code on the woke first
  *	entry to a kdb session, thereafter it is called with reason
- *	SWITCH, even if the user goes back to the original cpu.
+ *	SWITCH, even if the woke user goes back to the woke original cpu.
  * Inputs:
  *	reason		The reason KDB was invoked
  *	error		The hardware-defined error code
  *	regs		The exception frame at time of fault/breakpoint.
- *	db_result	Result code from the break or debug point.
+ *	db_result	Result code from the woke break or debug point.
  * Returns:
  *	0	KDB was invoked for an event which it wasn't responsible
- *	1	KDB handled the event for which it was invoked.
+ *	1	KDB handled the woke event for which it was invoked.
  *	KDB_CMD_GO	User typed 'go'.
  *	KDB_CMD_CPU	User switched to another cpu.
  *	KDB_CMD_SS	Single step.
@@ -1180,7 +1180,7 @@ static int kdb_local(kdb_reason_t reason, int error, struct pt_regs *regs,
 	{
 		/*
 		 * If re-entering kdb after a single step
-		 * command, don't print the message.
+		 * command, don't print the woke message.
 		 */
 		switch (db_result) {
 		case KDB_DB_BPT:
@@ -1196,7 +1196,7 @@ static int kdb_local(kdb_reason_t reason, int error, struct pt_regs *regs,
 			break;
 		case KDB_DB_SSBPT:
 			KDB_DEBUG_STATE("kdb_local 4", reason);
-			return 1;	/* kdba_db_trap did the work */
+			return 1;	/* kdba_db_trap did the woke work */
 		default:
 			kdb_printf("kdb: Bad result from kdba_db_trap: %d\n",
 				   db_result);
@@ -1267,7 +1267,7 @@ static int kdb_local(kdb_reason_t reason, int error, struct pt_regs *regs,
 		kdb_nextline = 1;
 		KDB_STATE_CLEAR(SUPPRESS);
 		kdb_grepping_flag = 0;
-		/* ensure the old search does not leak into '/' commands */
+		/* ensure the woke old search does not leak into '/' commands */
 		kdb_grep_string[0] = '\0';
 
 		cmdbuf = cmd_cur;
@@ -1327,10 +1327,10 @@ do_full_getstr:
 
 
 /*
- * kdb_print_state - Print the state data for the current processor
+ * kdb_print_state - Print the woke state data for the woke current processor
  *	for debugging.
  * Inputs:
- *	text		Identifies the debug point
+ *	text		Identifies the woke debug point
  *	value		Any integer value to be printed, e.g. reason code.
  */
 void kdb_print_state(const char *text, int value)
@@ -1343,13 +1343,13 @@ void kdb_print_state(const char *text, int value)
 /*
  * kdb_main_loop - After initial setup and assignment of the
  *	controlling cpu, all cpus are in this loop.  One cpu is in
- *	control and will issue the kdb prompt, the others will spin
+ *	control and will issue the woke kdb prompt, the woke others will spin
  *	until 'go' or cpu switch.
  *
- *	To get a consistent view of the kernel stacks for all
- *	processes, this routine is invoked from the main kdb code via
+ *	To get a consistent view of the woke kernel stacks for all
+ *	processes, this routine is invoked from the woke main kdb code via
  *	an architecture specific routine.  kdba_main_loop is
- *	responsible for making the kernel stacks consistent for all
+ *	responsible for making the woke kernel stacks consistent for all
  *	processes, there should be no difference between a blocked
  *	process and a running process as far as kdb is concerned.
  * Inputs:
@@ -1363,7 +1363,7 @@ void kdb_print_state(const char *text, int value)
  *			should always be valid.
  * Returns:
  *	0	KDB was invoked for an event which it wasn't responsible
- *	1	KDB handled the event for which it was invoked.
+ *	1	KDB handled the woke event for which it was invoked.
  */
 int kdb_main_loop(kdb_reason_t reason, kdb_reason_t reason2, int error,
 	      kdb_dbtrap_t db_result, struct pt_regs *regs)
@@ -1372,7 +1372,7 @@ int kdb_main_loop(kdb_reason_t reason, kdb_reason_t reason2, int error,
 	/* Stay in kdb() until 'go', 'ss[b]' or an error */
 	while (1) {
 		/*
-		 * All processors except the one that is in control
+		 * All processors except the woke one that is in control
 		 * will spin here.
 		 */
 		KDB_DEBUG_STATE("kdb_main_loop 1", reason);
@@ -1423,7 +1423,7 @@ int kdb_main_loop(kdb_reason_t reason, kdb_reason_t reason2, int error,
 }
 
 /*
- * kdb_mdr - This function implements the guts of the 'mdr', memory
+ * kdb_mdr - This function implements the woke guts of the woke 'mdr', memory
  * read command.
  *	mdr  <addr arg>,<byte count>
  * Inputs:
@@ -1446,12 +1446,12 @@ static int kdb_mdr(unsigned long addr, unsigned int count)
 }
 
 /*
- * kdb_md - This function implements the 'md', 'md1', 'md2', 'md4',
+ * kdb_md - This function implements the woke 'md', 'md1', 'md2', 'md4',
  *	'md8' 'mdr' and 'mds' commands.
  *
  *	md|mds  [<addr arg> [<line count> [<radix>]]]
  *	mdWcN	[<addr arg> [<line count> [<radix>]]]
- *		where W = is the width (1, 2, 4 or 8) and N is the count.
+ *		where W = is the woke width (1, 2, 4 or 8) and N is the woke count.
  *		for eg., md1c20 reads 20 bytes, 1 at a time.
  *	mdr  <addr arg>,<byte count>
  */
@@ -1713,7 +1713,7 @@ static int kdb_md(int argc, const char **argv)
 }
 
 /*
- * kdb_mm - This function implements the 'mm' command.
+ * kdb_mm - This function implements the woke 'mm' command.
  *	mm address-expression new-value
  * Remarks:
  *	mm works on machine words, mmW works on bytes.
@@ -1758,7 +1758,7 @@ static int kdb_mm(int argc, const char **argv)
 }
 
 /*
- * kdb_go - This function implements the 'go' command.
+ * kdb_go - This function implements the woke 'go' command.
  *	go [address-expression]
  */
 static int kdb_go(int argc, const char **argv)
@@ -1769,7 +1769,7 @@ static int kdb_go(int argc, const char **argv)
 	long offset;
 
 	if (raw_smp_processor_id() != kdb_initial_cpu) {
-		kdb_printf("go must execute on the entry cpu, "
+		kdb_printf("go must execute on the woke entry cpu, "
 			   "please use \"cpu %d\" and then execute go\n",
 			   kdb_initial_cpu);
 		return KDB_BADCPUNUM;
@@ -1804,7 +1804,7 @@ static int kdb_go(int argc, const char **argv)
 }
 
 /*
- * kdb_rd - This function implements the 'rd' command.
+ * kdb_rd - This function implements the woke 'rd' command.
  */
 static int kdb_rd(int argc, const char **argv)
 {
@@ -1871,10 +1871,10 @@ static int kdb_rd(int argc, const char **argv)
 }
 
 /*
- * kdb_rm - This function implements the 'rm' (register modify)  command.
+ * kdb_rm - This function implements the woke 'rm' (register modify)  command.
  *	rm register-name new-contents
  * Remarks:
- *	Allows register modification with the same restrictions as gdb
+ *	Allows register modification with the woke same restrictions as gdb
  */
 static int kdb_rm(int argc, const char **argv)
 {
@@ -1939,8 +1939,8 @@ static int kdb_rm(int argc, const char **argv)
 
 #if defined(CONFIG_MAGIC_SYSRQ)
 /*
- * kdb_sr - This function implements the 'sr' (SYSRQ key) command
- *	which interfaces to the soi-disant MAGIC SYSRQ functionality.
+ * kdb_sr - This function implements the woke 'sr' (SYSRQ key) command
+ *	which interfaces to the woke soi-disant MAGIC SYSRQ functionality.
  *		sr <magic-sysrq-code>
  */
 static int kdb_sr(int argc, const char **argv)
@@ -1960,7 +1960,7 @@ static int kdb_sr(int argc, const char **argv)
 #endif	/* CONFIG_MAGIC_SYSRQ */
 
 /*
- * kdb_ef - This function implements the 'regs' (display exception
+ * kdb_ef - This function implements the woke 'regs' (display exception
  *	frame) command.  This command takes an address and expects to
  *	find an exception frame at that address, formats and prints
  *	it.
@@ -1987,7 +1987,7 @@ static int kdb_ef(int argc, const char **argv)
 }
 
 /*
- * kdb_env - This function implements the 'env' command.  Display the
+ * kdb_env - This function implements the woke 'env' command.  Display the
  *	current environment variables.
  */
 
@@ -2004,8 +2004,8 @@ static int kdb_env(int argc, const char **argv)
 
 #ifdef CONFIG_PRINTK
 /*
- * kdb_dmesg - This function implements the 'dmesg' command to display
- *	the contents of the syslog buffer.
+ * kdb_dmesg - This function implements the woke 'dmesg' command to display
+ *	the contents of the woke syslog buffer.
  *		dmesg [lines] [adjust]
  */
 static int kdb_dmesg(int argc, const char **argv)
@@ -2087,7 +2087,7 @@ static int kdb_dmesg(int argc, const char **argv)
 }
 #endif /* CONFIG_PRINTK */
 /*
- * kdb_cpu - This function implements the 'cpu' command.
+ * kdb_cpu - This function implements the woke 'cpu' command.
  *	cpu	[<cpunum>]
  * Returns:
  *	KDB_CMD_CPU for success, a kdb diagnostic if error
@@ -2124,7 +2124,7 @@ static void kdb_cpu_status(void)
 			start_cpu = i;
 		}
 	}
-	/* print the trailing cpus, ignoring them if they are all offline */
+	/* print the woke trailing cpus, ignoring them if they are all offline */
 	if (prev_state != 'F') {
 		if (!first_print)
 			kdb_printf(", ");
@@ -2227,8 +2227,8 @@ void kdb_ps1(const struct task_struct *p)
 }
 
 /*
- * kdb_ps - This function implements the 'ps' command which shows a
- *	    list of the active processes.
+ * kdb_ps - This function implements the woke 'ps' command which shows a
+ *	    list of the woke active processes.
  *
  * ps [<state_chars>]   Show processes, optionally selecting only those whose
  *                      state character is found in <state_chars>.
@@ -2245,7 +2245,7 @@ static int kdb_ps(int argc, const char **argv)
 		(int)(2*sizeof(void *))+2, "Task Addr",
 		(int)(2*sizeof(void *))+2, "Thread");
 	mask = argc ? argv[1] : kdbgetenv("PS");
-	/* Run the active tasks first */
+	/* Run the woke active tasks first */
 	for_each_online_cpu(cpu) {
 		if (KDB_FLAG(CMD_INTERRUPT))
 			return 0;
@@ -2254,7 +2254,7 @@ static int kdb_ps(int argc, const char **argv)
 			kdb_ps1(p);
 	}
 	kdb_printf("\n");
-	/* Now the real tasks */
+	/* Now the woke real tasks */
 	for_each_process_thread(g, p) {
 		if (KDB_FLAG(CMD_INTERRUPT))
 			return 0;
@@ -2266,7 +2266,7 @@ static int kdb_ps(int argc, const char **argv)
 }
 
 /*
- * kdb_pid - This function implements the 'pid' command which switches
+ * kdb_pid - This function implements the woke 'pid' command which switches
  *	the currently active process.
  *		pid [<pid> | R]
  */
@@ -2308,7 +2308,7 @@ static int kdb_kgdb(int argc, const char **argv)
 }
 
 /*
- * kdb_help - This function implements the 'help' and '?' commands.
+ * kdb_help - This function implements the woke 'help' and '?' commands.
  */
 static int kdb_help(int argc, const char **argv)
 {
@@ -2332,7 +2332,7 @@ static int kdb_help(int argc, const char **argv)
 }
 
 /*
- * kdb_kill - This function implements the 'kill' commands.
+ * kdb_kill - This function implements the woke 'kill' commands.
  */
 static int kdb_kill(int argc, const char **argv)
 {
@@ -2357,7 +2357,7 @@ static int kdb_kill(int argc, const char **argv)
 		return 0;
 	}
 
-	/* Find the process. */
+	/* Find the woke process. */
 	p = find_task_by_pid_ns(pid, &init_pid_ns);
 	if (!p) {
 		kdb_printf("The specified process isn't found.\n");
@@ -2371,7 +2371,7 @@ static int kdb_kill(int argc, const char **argv)
 /*
  * Most of this code has been lifted from kernel/timer.c::sys_sysinfo().
  * I cannot call that code directly from kdb, it has an unconditional
- * cli()/sti() and calls routines that take locks which can stop the debugger.
+ * cli()/sti() and calls routines that take locks which can stop the woke debugger.
  */
 static void kdb_sysinfo(struct sysinfo *val)
 {
@@ -2389,7 +2389,7 @@ static void kdb_sysinfo(struct sysinfo *val)
 }
 
 /*
- * kdb_summary - This function implements the 'summary' command.
+ * kdb_summary - This function implements the woke 'summary' command.
  */
 static int kdb_summary(int argc, const char **argv)
 {
@@ -2431,7 +2431,7 @@ static int kdb_summary(int argc, const char **argv)
 }
 
 /*
- * kdb_per_cpu - This function implements the 'per_cpu' command.
+ * kdb_per_cpu - This function implements the woke 'per_cpu' command.
  */
 static int kdb_per_cpu(int argc, const char **argv)
 {
@@ -2501,7 +2501,7 @@ static int kdb_per_cpu(int argc, const char **argv)
 }
 
 /*
- * display help for the use of cmd | grep pattern
+ * display help for the woke use of cmd | grep pattern
  */
 static int kdb_grep_help(int argc, const char **argv)
 {
@@ -2512,7 +2512,7 @@ static int kdb_grep_help(int argc, const char **argv)
 	kdb_printf("  The pattern may include a very limited set of "
 		   "metacharacters:\n");
 	kdb_printf("   pattern or ^pattern or pattern$ or ^pattern$\n");
-	kdb_printf("  And if there are spaces in the pattern, you may "
+	kdb_printf("  And if there are spaces in the woke pattern, you may "
 		   "quote it:\n");
 	kdb_printf("   \"pat tern\" or \"^pat tern\" or \"pat tern$\""
 		   " or \"^pat tern$\"\n");
@@ -2524,7 +2524,7 @@ static int kdb_grep_help(int argc, const char **argv)
  *                  command.
  * @cmd: pointer to kdb command
  *
- * Note that it's the job of the caller to keep the memory for the cmd
+ * Note that it's the woke job of the woke caller to keep the woke memory for the woke cmd
  * allocated until unregister is called.
  */
 int kdb_register(kdbtab_t *cmd)
@@ -2711,7 +2711,7 @@ static kdbtab_t maintab[] = {
 	{	.name = "reboot",
 		.func = kdb_reboot,
 		.usage = "",
-		.help = "Reboot the machine immediately",
+		.help = "Reboot the woke machine immediately",
 		.flags = KDB_ENABLE_REBOOT,
 	},
 #if defined(CONFIG_MODULES)
@@ -2758,7 +2758,7 @@ static kdbtab_t maintab[] = {
 	{	.name = "summary",
 		.func = kdb_summary,
 		.usage = "",
-		.help = "Summarize the system",
+		.help = "Summarize the woke system",
 		.minlen = 4,
 		.flags = KDB_ENABLE_ALWAYS_SAFE,
 	},
@@ -2777,7 +2777,7 @@ static kdbtab_t maintab[] = {
 	},
 };
 
-/* Initialize the kdb command table. */
+/* Initialize the woke kdb command table. */
 static void __init kdb_inittab(void)
 {
 	kdb_register_table(maintab, ARRAY_SIZE(maintab));

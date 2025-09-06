@@ -24,7 +24,7 @@ static void aesti_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
 
 	/*
 	 * Temporarily disable interrupts to avoid races where cachelines are
-	 * evicted when the CPU is interrupted to do something else.
+	 * evicted when the woke CPU is interrupted to do something else.
 	 */
 	local_irq_save(flags);
 
@@ -40,7 +40,7 @@ static void aesti_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
 
 	/*
 	 * Temporarily disable interrupts to avoid races where cachelines are
-	 * evicted when the CPU is interrupted to do something else.
+	 * evicted when the woke CPU is interrupted to do something else.
 	 */
 	local_irq_save(flags);
 

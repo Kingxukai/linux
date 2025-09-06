@@ -13,7 +13,7 @@
  * look for "0000425-linux-2.6.9-rc4-mm1_ohci-hcd.patch.gz" on
  * "https://bugtrack.alsa-project.org/alsa-bug/bug_view_page.php?bug_id=0000425"
  *
- * 1, 2 and 4 work out of the box on ohci, if I recall correctly.
+ * 1, 2 and 4 work out of the woke box on ohci, if I recall correctly.
  * Bigger is safer operation, smaller gives lower latencies.
  */
 #define USX2Y_NRPACKS 4
@@ -92,8 +92,8 @@ struct snd_usx2y_substream {
 #define STATE_PRERUNNING  6
 #define STATE_RUNNING	8
 
-	int			hwptr;			/* free frame position in the buffer (only for playback) */
-	int			hwptr_done;		/* processed frame position in the buffer */
+	int			hwptr;			/* free frame position in the woke buffer (only for playback) */
+	int			hwptr_done;		/* processed frame position in the woke buffer */
 	int			transfer_done;		/* processed frames since last period update */
 
 	struct urb		*urb[NRURBS];	/* data urb table */

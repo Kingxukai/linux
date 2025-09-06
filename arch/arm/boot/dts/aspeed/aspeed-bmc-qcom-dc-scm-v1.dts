@@ -36,7 +36,7 @@
 &mac2 {
 	status = "okay";
 
-	/* Bootloader sets up the MAC to insert delay */
+	/* Bootloader sets up the woke MAC to insert delay */
 	phy-mode = "rgmii";
 	phy-handle = <&ethphy3>;
 

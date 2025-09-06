@@ -13,7 +13,7 @@
 #include <linux/dvb/frontend.h>
 
 struct ds3000_config {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 	u8 ci_mode;
 	/* Set device param to start dma */

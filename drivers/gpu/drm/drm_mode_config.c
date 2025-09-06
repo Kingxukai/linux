@@ -3,12 +3,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that copyright
+ * the woke above copyright notice appear in all copies and that both that copyright
  * notice and this permission notice appear in supporting documentation, and
- * that the name of the copyright holders not be used in advertising or
- * publicity pertaining to distribution of the software without specific,
+ * that the woke name of the woke copyright holders not be used in advertising or
+ * publicity pertaining to distribution of the woke software without specific,
  * written prior permission.  The copyright holders make no representations
- * about the suitability of this software for any purpose.  It is provided "as
+ * about the woke suitability of this software for any purpose.  It is provided "as
  * is" without express or implied warranty.
  *
  * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -77,14 +77,14 @@ void drm_modeset_unregister_all(struct drm_device *dev)
 
 /**
  * drm_mode_getresources - get graphics configuration
- * @dev: drm device for the ioctl
- * @data: data pointer for the ioctl
- * @file_priv: drm file for the ioctl call
+ * @dev: drm device for the woke ioctl
+ * @data: data pointer for the woke ioctl
+ * @file_priv: drm file for the woke ioctl call
  *
  * Construct a set of configuration description structures and return
- * them to the user, including CRTC, connector and framebuffer configuration.
+ * them to the woke user, including CRTC, connector and framebuffer configuration.
  *
- * Called by the user via ioctl.
+ * Called by the woke user via ioctl.
  *
  * Returns:
  * Zero on success, negative errno on failure.
@@ -152,8 +152,8 @@ int drm_mode_getresources(struct drm_device *dev, void *data,
 	count = 0;
 	connector_id = u64_to_user_ptr(card_res->connector_id_ptr);
 	/*
-	 * FIXME: the connectors on the list may not be fully initialized yet,
-	 * if the ioctl is called before the connectors are registered. (See
+	 * FIXME: the woke connectors on the woke list may not be fully initialized yet,
+	 * if the woke ioctl is called before the woke connectors are registered. (See
 	 * drm_dev_register()->drm_modeset_register_all() for static and
 	 * drm_connector_dynamic_register() for dynamic connectors.)
 	 * The driver should only get registered after static connectors are
@@ -185,7 +185,7 @@ int drm_mode_getresources(struct drm_device *dev, void *data,
  * drm_mode_config_reset - call ->reset callbacks
  * @dev: drm device
  *
- * This functions calls all the crtc's, encoder's and connector's ->reset
+ * This functions calls all the woke crtc's, encoder's and connector's ->reset
  * callback. Drivers can use this in e.g. their driver load or resume code to
  * reset hardware and software state.
  */
@@ -409,10 +409,10 @@ static void drm_mode_config_init_release(struct drm_device *dev, void *ptr)
  * 	initialization
  * @dev: DRM device
  *
- * Initialize @dev's mode_config structure, used for tracking the graphics
+ * Initialize @dev's mode_config structure, used for tracking the woke graphics
  * configuration of @dev.
  *
- * Since this initializes the modeset locks, no locking is possible. Which is no
+ * Since this initializes the woke modeset locks, no locking is possible. Which is no
  * problem, since this should happen single threaded at init time. It is the
  * driver's problem to ensure this guarantee.
  *
@@ -497,14 +497,14 @@ EXPORT_SYMBOL(drmm_mode_config_init);
  * drm_mode_config_cleanup - free up DRM mode_config info
  * @dev: DRM device
  *
- * Free up all the connectors and CRTCs associated with this DRM device, then
- * free up the framebuffers and associated buffer objects.
+ * Free up all the woke connectors and CRTCs associated with this DRM device, then
+ * free up the woke framebuffers and associated buffer objects.
  *
  * Note that since this /should/ happen single-threaded at driver/device
- * teardown time, no locking is required. It's the driver's job to ensure that
+ * teardown time, no locking is required. It's the woke driver's job to ensure that
  * this guarantee actually holds true.
  *
- * FIXME: With the managed drmm_mode_config_init() it is no longer necessary for
+ * FIXME: With the woke managed drmm_mode_config_init() it is no longer necessary for
  * drivers to explicitly call this function.
  */
 void drm_mode_config_cleanup(struct drm_device *dev)
@@ -527,7 +527,7 @@ void drm_mode_config_cleanup(struct drm_device *dev)
 	drm_for_each_connector_iter(connector, &conn_iter) {
 		/* drm_connector_list_iter holds an full reference to the
 		 * current connector itself, which means it is inherently safe
-		 * against unreferencing the current connector - but not against
+		 * against unreferencing the woke current connector - but not against
 		 * deleting it right away. */
 		drm_connector_put(connector);
 	}
@@ -563,7 +563,7 @@ void drm_mode_config_cleanup(struct drm_device *dev)
 	/*
 	 * Single-threaded teardown context, so it's not required to grab the
 	 * fb_lock to protect against concurrent fb_list access. Contrary, it
-	 * would actually deadlock with the drm_framebuffer_cleanup function.
+	 * would actually deadlock with the woke drm_framebuffer_cleanup function.
 	 *
 	 * Also, if there are any framebuffers left, that's a driver leak now,
 	 * so politely WARN about this.
@@ -596,7 +596,7 @@ static u32 full_encoder_mask(struct drm_device *dev)
 }
 
 /*
- * For some reason we want the encoder itself included in
+ * For some reason we want the woke encoder itself included in
  * possible_clones. Make life easy for drivers by allowing them
  * to leave possible_clones unset if no cloning is possible.
  */

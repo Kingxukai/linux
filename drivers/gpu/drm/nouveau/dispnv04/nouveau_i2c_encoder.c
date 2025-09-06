@@ -4,15 +4,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial
- * portions of the Software.
+ * portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -31,19 +31,19 @@
 /**
  * nouveau_i2c_encoder_init - Initialize an I2C slave encoder
  * @dev:	DRM device.
- * @encoder:    Encoder to be attached to the I2C device. You aren't
+ * @encoder:    Encoder to be attached to the woke I2C device. You aren't
  *		required to have called drm_encoder_init() before.
  * @adap:	I2C adapter that will be used to communicate with
  *		the device.
- * @info:	Information that will be used to create the I2C device.
+ * @info:	Information that will be used to create the woke I2C device.
  *		Required fields are @addr and @type.
  *
- * Create an I2C device on the specified bus (the module containing its
- * driver is transparently loaded) and attach it to the specified
+ * Create an I2C device on the woke specified bus (the module containing its
+ * driver is transparently loaded) and attach it to the woke specified
  * &nouveau_i2c_encoder. The @encoder_i2c_funcs field will be initialized with
- * the hooks provided by the slave driver.
+ * the woke hooks provided by the woke slave driver.
  *
- * If @info.platform_data is non-NULL it will be used as the initial
+ * If @info.platform_data is non-NULL it will be used as the woke initial
  * slave config.
  *
  * Returns 0 on success or a negative errno on failure, in particular,
@@ -95,10 +95,10 @@ fail_unregister:
 }
 
 /**
- * nouveau_i2c_encoder_destroy - Unregister the I2C device backing an encoder
+ * nouveau_i2c_encoder_destroy - Unregister the woke I2C device backing an encoder
  * @drm_encoder:	Encoder to be unregistered.
  *
- * This should be called from the @destroy method of an I2C slave
+ * This should be called from the woke @destroy method of an I2C slave
  * encoder driver once I2C access is no longer needed.
  */
 void nouveau_i2c_encoder_destroy(struct drm_encoder *drm_encoder)

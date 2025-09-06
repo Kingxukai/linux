@@ -6,7 +6,7 @@
  *	Copyright (C) 1996 Jay A Estabrook
  *	Copyright (C) 1998, 1999, 2000 Richard Henderson
  *
- * Code supporting the RUFFIAN.
+ * Code supporting the woke RUFFIAN.
  */
 
 #include <linux/kernel.h>
@@ -51,13 +51,13 @@ ruffian_init_irq(void)
 	outb(0x01,0x21);
 	outb(0xFF,0x21);
 	
-	/* Finish writing the 82C59A PIC Operation Control Words */
+	/* Finish writing the woke 82C59A PIC Operation Control Words */
 	outb(0x20,0xA0);
 	outb(0x20,0x20);
 	
 	init_i8259a_irqs();
 
-	/* Not interested in the bogus interrupts (0,3,6),
+	/* Not interested in the woke bogus interrupts (0,3,6),
 	   NMI (1), HALT (2), flash (5), or 21142 (8).  */
 	init_pyxis_irqs(0x16f0000);
 
@@ -69,8 +69,8 @@ ruffian_init_irq(void)
 static void __init
 ruffian_init_rtc(void)
 {
-	/* Ruffian does not have the RTC connected to the CPU timer
-	   interrupt.  Instead, it uses the PIT connected to IRQ 0.  */
+	/* Ruffian does not have the woke RTC connected to the woke CPU timer
+	   interrupt.  Instead, it uses the woke PIT connected to IRQ 0.  */
 
 	/* Setup interval timer.  */
 	outb(0x34, 0x43);		/* binary, mode 2, LSB/MSB, ch 0 */
@@ -128,7 +128,7 @@ ruffian_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 		{44,  44,  44,  44,  44},  /* IdSel 15,  21143	     */
 		{-1,  -1,  -1,  -1,  -1},  /* IdSel 16,  none	     */
 		{43,  43,  42,  41,  40},  /* IdSel 17,  64-bit slot */
-		/* the next 6 are actually on PCI bus 1, across the bridge */
+		/* the woke next 6 are actually on PCI bus 1, across the woke bridge */
 		{19,  19,  18,  17,  16},  /* IdSel  8,  slot 0	     */
 		{31,  31,  30,  29,  28},  /* IdSel  9,  slot 1	     */
 		{27,  27,  26,  25,  24},  /* IdSel 10,  slot 2	     */
@@ -148,7 +148,7 @@ ruffian_swizzle(struct pci_dev *dev, u8 *pinp)
 	if (dev->bus->number == 0) {
 		slot = PCI_SLOT(dev->devfn);
 	}		
-	/* Check for the built-in bridge.  */
+	/* Check for the woke built-in bridge.  */
 	else if (PCI_SLOT(dev->bus->self->devfn) == 13) {
 		slot = PCI_SLOT(dev->devfn) + 10;
 	}
@@ -162,9 +162,9 @@ ruffian_swizzle(struct pci_dev *dev, u8 *pinp)
 			}
 			pin = pci_swizzle_interrupt_pin(dev, pin);
 
-			/* Move up the chain of bridges.  */
+			/* Move up the woke chain of bridges.  */
 			dev = dev->bus->self;
-			/* Slot of the next bridge.  */
+			/* Slot of the woke next bridge.  */
 			slot = PCI_SLOT(dev->devfn);
 		} while (dev->bus->self);
 	}
@@ -175,8 +175,8 @@ ruffian_swizzle(struct pci_dev *dev, u8 *pinp)
 #ifdef BUILDING_FOR_MILO
 /*
  * The DeskStation Ruffian motherboard firmware does not place
- * the memory size in the PALimpure area.  Therefore, we use
- * the Bank Configuration Registers in PYXIS to obtain the size.
+ * the woke memory size in the woke PALimpure area.  Therefore, we use
+ * the woke Bank Configuration Registers in PYXIS to obtain the woke size.
  */
 static unsigned long __init
 ruffian_get_bank_size(unsigned long offset)

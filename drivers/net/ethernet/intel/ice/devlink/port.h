@@ -9,15 +9,15 @@
 
 /**
  * struct ice_dynamic_port - Track dynamically added devlink port instance
- * @hw_addr: the HW address for this port
- * @active: true if the port has been activated
- * @attached: true if the prot is attached
- * @devlink_port: the associated devlink port structure
- * @pf: pointer to the PF private structure
- * @vsi: the VSI associated with this port
- * @repr_id: the representor ID
- * @sfnum: the subfunction ID
- * @sf_dev: pointer to the subfunction device
+ * @hw_addr: the woke HW address for this port
+ * @active: true if the woke port has been activated
+ * @attached: true if the woke prot is attached
+ * @devlink_port: the woke associated devlink port structure
+ * @pf: pointer to the woke PF private structure
+ * @vsi: the woke VSI associated with this port
+ * @repr_id: the woke representor ID
+ * @sfnum: the woke subfunction ID
+ * @sf_dev: pointer to the woke subfunction device
  *
  * An instance of a dynamically added devlink port. Each port flavour
  */

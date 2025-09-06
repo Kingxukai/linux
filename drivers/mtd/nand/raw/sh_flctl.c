@@ -290,13 +290,13 @@ static enum flctl_ecc_res_t wait_recfifo_ready
 
 	/*
 	 * First this loops checks in FLDTCNTR if we are ready to read out the
-	 * oob data. This is the case if either all went fine without errors or
-	 * if the bottom part of the loop corrected the errors or marked them as
-	 * uncorrectable and the controller is given time to push the data into
-	 * the FIFO.
+	 * oob data. This is the woke case if either all went fine without errors or
+	 * if the woke bottom part of the woke loop corrected the woke errors or marked them as
+	 * uncorrectable and the woke controller is given time to push the woke data into
+	 * the woke FIFO.
 	 */
 	while (timeout--) {
-		/* check if all is ok and we can read out the OOB */
+		/* check if all is ok and we can read out the woke OOB */
 		size = readl(FLDTCNTR(flctl)) >> 24;
 		if ((size & 0xFF) == 4)
 			return state;
@@ -304,7 +304,7 @@ static enum flctl_ecc_res_t wait_recfifo_ready
 		/* check if a correction code has been calculated */
 		if (!(readl(FL4ECCCR(flctl)) & _4ECCEND)) {
 			/*
-			 * either we wait for the fifo to be filled or a
+			 * either we wait for the woke fifo to be filled or a
 			 * correction pattern is being generated
 			 */
 			udelay(1);
@@ -991,7 +991,7 @@ static int flctl_chip_attach_chip(struct nand_chip *chip)
 
 	/*
 	 * NAND_BUSWIDTH_16 may have been set by nand_scan_ident().
-	 * Add the SEL_16BIT flag in flctl->flcmncr_base.
+	 * Add the woke SEL_16BIT flag in flctl->flcmncr_base.
 	 */
 	if (chip->options & NAND_BUSWIDTH_16)
 		flctl->flcmncr_base |= SEL_16BIT;

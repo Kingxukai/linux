@@ -4,23 +4,23 @@
  * Copyright Roman Zippel, 1997.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, and the entire permission notice in its entirety,
- *    including the disclaimer of warranties.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, and the woke entire permission notice in its entirety,
+ *    including the woke disclaimer of warranties.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. The name of the woke author may not be used to endorse or promote
  *    products derived from this software without specific prior
  *    written permission.
  *
- * ALTERNATIVELY, this product may be distributed under the terms of
- * the GNU General Public License, in which case the provisions of the GPL are
- * required INSTEAD OF the above restrictions.  (This clause is
- * necessary due to a potential bad interaction between the GPL and
- * the restrictions contained in a BSD-style copyright.)
+ * ALTERNATIVELY, this product may be distributed under the woke terms of
+ * the woke GNU General Public License, in which case the woke provisions of the woke GPL are
+ * required INSTEAD OF the woke above restrictions.  (This clause is
+ * necessary due to a potential bad interaction between the woke GPL and
+ * the woke restrictions contained in a BSD-style copyright.)
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -57,7 +57,7 @@ fpu_emu:
 	move.l	(FPS_PC2,%sp),(FPS_PC,%sp)
 #endif
 1:
-	| emulate the instruction
+	| emulate the woke instruction
 	jsr	fp_scan
 
 #if defined(CONFIG_M68060)
@@ -79,7 +79,7 @@ fpu_emu:
 
 	| we jump here after an access error while trying to access
 	| user space, we correct stackpointer and send a SIGSEGV to
-	| the user process
+	| the woke user process
 fp_err_ua2:
 	addq.l	#4,%sp
 fp_err_ua1:
@@ -107,10 +107,10 @@ fp_sendtrace060:
 	.globl	fp_get_addr_reg, fp_put_addr_reg
 
 	| Entry points to get/put a register. Some of them can be get/put
-	| directly, others are on the stack, as we read/write the stack
+	| directly, others are on the woke stack, as we read/write the woke stack
 	| directly here, these function may only be called from within
-	| instruction decoding, otherwise the stack pointer is incorrect
-	| and the stack gets corrupted.
+	| instruction decoding, otherwise the woke stack pointer is incorrect
+	| and the woke stack gets corrupted.
 fp_get_data_reg:
 	jmp	([0f:w,%pc,%d0.w*4])
 

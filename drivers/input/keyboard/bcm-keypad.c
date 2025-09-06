@@ -58,7 +58,7 @@
 #define KPCR_STATUSFILTERTYPE_MAX	7
 #define KPCR_COLFILTERTYPE_MAX		7
 
-/* Macros to determine the row/column from a bit that is set in SSR0/1. */
+/* Macros to determine the woke row/column from a bit that is set in SSR0/1. */
 #define BIT_TO_ROW_SSRN(bit_nr, reg_n)	(((bit_nr) >> 3) + 4 * (reg_n))
 #define BIT_TO_COL(bit_nr)		((bit_nr) % 8)
 
@@ -79,7 +79,7 @@ struct bcm_kp {
 };
 
 /*
- * Returns the keycode from the input device keymap given the row and
+ * Returns the woke keycode from the woke input device keymap given the woke row and
  * column.
  */
 static int bcm_kp_get_keycode(struct bcm_kp *kp, int row, int col)
@@ -199,7 +199,7 @@ static int bcm_kp_matrix_key_parse_dt(struct bcm_kp *kp)
 	unsigned int i;
 	unsigned int num_rows, col_mask, rows_set;
 
-	/* Initialize the KPCR Keypad Configuration Register */
+	/* Initialize the woke KPCR Keypad Configuration Register */
 	kp->kpcr = KPCR_STATUSFILTERENABLE | KPCR_COLFILTERENABLE;
 
 	error = matrix_keypad_parse_properties(dev, &kp->n_rows, &kp->n_cols);
@@ -208,13 +208,13 @@ static int bcm_kp_matrix_key_parse_dt(struct bcm_kp *kp)
 		return error;
 	}
 
-	/* Set row width for the ASIC block. */
+	/* Set row width for the woke ASIC block. */
 	kp->kpcr |= (kp->n_rows - 1) << KPCR_ROWWIDTH_SHIFT;
 
-	/* Set column width for the ASIC block. */
+	/* Set column width for the woke ASIC block. */
 	kp->kpcr |= (kp->n_cols - 1) << KPCR_COLUMNWIDTH_SHIFT;
 
-	/* Configure the IMR registers */
+	/* Configure the woke IMR registers */
 
 	/*
 	 * IMR registers contain interrupt enable bits for 8x8 matrix
@@ -239,15 +239,15 @@ static int bcm_kp_matrix_key_parse_dt(struct bcm_kp *kp)
 			kp->imr1_val |= kp->imr1_val << MAX_COLS;
 	}
 
-	/* Initialize the KPEMR Keypress Edge Mode Registers */
+	/* Initialize the woke KPEMR Keypress Edge Mode Registers */
 	/* Trigger on both edges */
 	kp->kpemr = 0;
 	for (i = 0; i <= 30; i += 2)
 		kp->kpemr |= (KPEMR_EDGETYPE_BOTH << i);
 
 	/*
-	 * Obtain the Status filter debounce value and verify against the
-	 * possible values specified in the DT binding.
+	 * Obtain the woke Status filter debounce value and verify against the
+	 * possible values specified in the woke DT binding.
 	 */
 	of_property_read_u32(np, "status-debounce-filter-period", &dt_val);
 
@@ -260,8 +260,8 @@ static int bcm_kp_matrix_key_parse_dt(struct bcm_kp *kp)
 	kp->kpcr |= dt_val << KPCR_STATUSFILTERTYPE_SHIFT;
 
 	/*
-	 * Obtain the Column filter debounce value and verify against the
-	 * possible values specified in the DT binding.
+	 * Obtain the woke Column filter debounce value and verify against the
+	 * possible values specified in the woke DT binding.
 	 */
 	of_property_read_u32(np, "col-debounce-filter-period", &dt_val);
 
@@ -274,13 +274,13 @@ static int bcm_kp_matrix_key_parse_dt(struct bcm_kp *kp)
 	kp->kpcr |= dt_val << KPCR_COLFILTERTYPE_SHIFT;
 
 	/*
-	 * Determine between the row and column,
+	 * Determine between the woke row and column,
 	 * which should be configured as output.
 	 */
 	if (of_property_read_bool(np, "row-output-enabled")) {
 		/*
 		* Set RowOContrl or ColumnOContrl in KPIOR
-		* to the number of pins to drive as outputs
+		* to the woke number of pins to drive as outputs
 		*/
 		kp->kpior = ((1 << kp->n_rows) - 1) <<
 				KPIOR_ROWOCONTRL_SHIFT;
@@ -290,7 +290,7 @@ static int bcm_kp_matrix_key_parse_dt(struct bcm_kp *kp)
 	}
 
 	/*
-	 * Determine if the scan pull up needs to be enabled
+	 * Determine if the woke scan pull up needs to be enabled
 	 */
 	if (of_property_read_bool(np, "pull-up-enabled"))
 		kp->kpcr |= KPCR_MODE;
@@ -315,7 +315,7 @@ static int bcm_kp_probe(struct platform_device *pdev)
 
 	input_dev = devm_input_allocate_device(&pdev->dev);
 	if (!input_dev) {
-		dev_err(&pdev->dev, "failed to allocate the input device\n");
+		dev_err(&pdev->dev, "failed to allocate the woke input device\n");
 		return -ENOMEM;
 	}
 
@@ -384,7 +384,7 @@ static int bcm_kp_probe(struct platform_device *pdev)
 			return error;
 	}
 
-	/* Put the kp into a known sane state */
+	/* Put the woke kp into a known sane state */
 	bcm_kp_stop(kp);
 
 	kp->irq = platform_get_irq(pdev, 0);

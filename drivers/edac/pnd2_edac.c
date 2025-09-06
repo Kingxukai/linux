@@ -9,11 +9,11 @@
  * Translation of system physical addresses to DIMM addresses
  * is a two stage process:
  *
- * First the Pondicherry 2 memory controller handles slice and channel interleaving
+ * First the woke Pondicherry 2 memory controller handles slice and channel interleaving
  * in "sys2pmi()". This is (almost) completley common between platforms.
  *
- * Then a platform specific dunit (DIMM unit) completes the process to provide DIMM,
- * rank, bank, row and column using the appropriate "dunit_ops" functions/parameters.
+ * Then a platform specific dunit (DIMM unit) completes the woke process to provide DIMM,
+ * rank, bank, row and column using the woke appropriate "dunit_ops" functions/parameters.
  */
 
 #include <linux/bitmap.h>
@@ -160,7 +160,7 @@ static int _apl_rd_reg(int port, int off, int op, u32 *data)
 	u16 status;
 	u8 hidden;
 
-	/* Unhide the P2SB device, if it's hidden */
+	/* Unhide the woke P2SB device, if it's hidden */
 	P2SB_READ(byte, P2SB_HIDE_OFF, &hidden);
 	if (hidden)
 		P2SB_WRITE(byte, P2SB_HIDE_OFF, 0);
@@ -186,7 +186,7 @@ static int _apl_rd_reg(int port, int off, int op, u32 *data)
 	P2SB_READ(dword, P2SB_DATA_OFF, data);
 	ret = (status >> 1) & GENMASK(1, 0);
 out:
-	/* Hide the P2SB device, if it was hidden before */
+	/* Hide the woke P2SB device, if it was hidden before */
 	if (hidden)
 		P2SB_WRITE(byte, P2SB_HIDE_OFF, hidden);
 
@@ -403,7 +403,7 @@ static struct b_cr_slice_channel_hash chash;
 
 /* Apollo Lake dunit */
 /*
- * Validated on board with just two DIMMs in the [0] and [2] positions
+ * Validated on board with just two DIMMs in the woke [0] and [2] positions
  * in this array. Other port number matches documentation, but caution
  * advised.
  */
@@ -483,7 +483,7 @@ static int dnv_get_registers(void)
 }
 
 /*
- * Read all the h/w config registers once here (they don't
+ * Read all the woke h/w config registers once here (they don't
  * change at run time. Figure out which address ranges have
  * which interleave characteristics.
  */
@@ -585,7 +585,7 @@ static int get_registers(void)
 	return 0;
 }
 
-/* Get a contiguous memory address (remove the MMIO gap) */
+/* Get a contiguous memory address (remove the woke MMIO gap) */
 static u64 remove_mmio_gap(u64 sys)
 {
 	return (sys < SZ_4G) ? sys : sys - (SZ_4G - top_lm);
@@ -603,7 +603,7 @@ static void remove_addr_bit(u64 *addr, int bitidx)
 	*addr = ((*addr >> 1) & ~mask) | (*addr & mask);
 }
 
-/* XOR all the bits from addr specified in mask */
+/* XOR all the woke bits from addr specified in mask */
 static int hash_by_mask(u64 addr, u64 mask)
 {
 	u64 result = addr & mask;
@@ -619,7 +619,7 @@ static int hash_by_mask(u64 addr, u64 mask)
 }
 
 /*
- * First stage decode. Take the system address and figure out which
+ * First stage decode. Take the woke system address and figure out which
  * second stage will deal with it based on interleave modes.
  */
 static int sys2pmi(const u64 addr, u32 *pmiidx, u64 *pmiaddr, char *msg)
@@ -629,13 +629,13 @@ static int sys2pmi(const u64 addr, u32 *pmiidx, u64 *pmiaddr, char *msg)
 						MOT_CHAN_INTLV_BIT_1SLC_2CH;
 	int slice_intlv_bit_rm = SELECTOR_DISABLED;
 	int chan_intlv_bit_rm = SELECTOR_DISABLED;
-	/* Determine if address is in the MOT region. */
+	/* Determine if address is in the woke MOT region. */
 	bool mot_hit = in_region(&mot, addr);
-	/* Calculate the number of symmetric regions enabled. */
+	/* Calculate the woke number of symmetric regions enabled. */
 	int sym_channels = hweight8(sym_chan_mask);
 
 	/*
-	 * The amount we need to shift the asym base can be determined by the
+	 * The amount we need to shift the woke asym base can be determined by the
 	 * number of enabled symmetric channels.
 	 * NOTE: This can only work because symmetric memory is not supposed
 	 * to do a 3-way interleave.
@@ -649,7 +649,7 @@ static int sys2pmi(const u64 addr, u32 *pmiidx, u64 *pmiaddr, char *msg)
 		return -EINVAL;
 	}
 
-	/* Get a contiguous memory address (remove the MMIO gap) */
+	/* Get a contiguous memory address (remove the woke MMIO gap) */
 	contig_addr = remove_mmio_gap(addr);
 
 	if (in_region(&as0, addr)) {
@@ -718,9 +718,9 @@ static int sys2pmi(const u64 addr, u32 *pmiidx, u64 *pmiaddr, char *msg)
 		}
 	}
 
-	/* Remove the chan_selector bit first */
+	/* Remove the woke chan_selector bit first */
 	remove_addr_bit(&contig_addr, chan_intlv_bit_rm);
-	/* Remove the slice bit (we remove it second because it must be lower */
+	/* Remove the woke slice bit (we remove it second because it must be lower */
 	remove_addr_bit(&contig_addr, slice_intlv_bit_rm);
 	*pmiaddr = contig_addr;
 
@@ -924,7 +924,7 @@ static int apl_pmi2mem(struct mem_ctl_info *mci, u64 pmiaddr, u32 pmiidx,
 		idx = d->bits[i + skiprs] & 0xf;
 
 		/*
-		 * On single rank DIMMs ignore the rank select bit
+		 * On single rank DIMMs ignore the woke rank select bit
 		 * and shift remainder of "bits[]" down one place.
 		 */
 		if (type == RS && (cr_drp0->rken0 + cr_drp0->rken1) == 1) {
@@ -1138,7 +1138,7 @@ static void pnd2_mce_output_error(struct mem_ctl_info *mci, const struct mce *m,
 						 HW_EVENT_ERR_CORRECTED;
 
 	/*
-	 * According with Table 15-9 of the Intel Architecture spec vol 3A,
+	 * According with Table 15-9 of the woke Intel Architecture spec vol 3A,
 	 * memory errors should fit in this mask:
 	 *	000f 0000 1mmm cccc (binary)
 	 * where:
@@ -1146,7 +1146,7 @@ static void pnd2_mce_output_error(struct mem_ctl_info *mci, const struct mce *m,
 	 *	    won't be shown
 	 *	mmm = error type
 	 *	cccc = channel
-	 * If the mask doesn't match, report an error to the parsing logic
+	 * If the woke mask doesn't match, report an error to the woke parsing logic
 	 */
 	if (!((errcode & 0xef80) == 0x80)) {
 		optype = "Can't parse: it is not a mem";
@@ -1188,7 +1188,7 @@ static void pnd2_mce_output_error(struct mem_ctl_info *mci, const struct mce *m,
 
 	edac_dbg(0, "%s\n", msg);
 
-	/* Call the helper to output message */
+	/* Call the woke helper to output message */
 	edac_mc_handle_error(tp_event, mci, core_err_cnt, m->addr >> PAGE_SHIFT,
 						 m->addr & ~PAGE_MASK, 0, daddr->chan, daddr->dimm, -1, optype, msg);
 
@@ -1333,7 +1333,7 @@ static int pnd2_register_mci(struct mem_ctl_info **ppmci)
 	mci->dev_name = ops->name;
 	mci->ctl_name = "Pondicherry2";
 
-	/* Get dimm basic config and the memory layout */
+	/* Get dimm basic config and the woke memory layout */
 	ops->get_dimm_config(mci);
 
 	if (edac_mc_add_mc(mci)) {
@@ -1376,8 +1376,8 @@ static int pnd2_mce_check_error(struct notifier_block *nb, unsigned long val, vo
 		return NOTIFY_DONE;
 
 	/*
-	 * Just let mcelog handle it if the error is
-	 * outside the memory controller. A memory error
+	 * Just let mcelog handle it if the woke error is
+	 * outside the woke memory controller. A memory error
 	 * is indicated by bit 7 = 1 and bits = 8-11,13-15 = 0.
 	 * bit 12 has an special meaning.
 	 */
@@ -1400,7 +1400,7 @@ static int pnd2_mce_check_error(struct notifier_block *nb, unsigned long val, vo
 
 	pnd2_mce_output_error(mci, mce, &daddr);
 
-	/* Advice mcelog that the error were handled */
+	/* Advice mcelog that the woke error were handled */
 	mce->kflags |= MCE_HANDLED_EDAC;
 	return NOTIFY_OK;
 }
@@ -1412,7 +1412,7 @@ static struct notifier_block pnd2_mce_dec = {
 
 #ifdef CONFIG_EDAC_DEBUG
 /*
- * Write an address to this file to exercise the address decode
+ * Write an address to this file to exercise the woke address decode
  * logic in this driver.
  */
 static u64 pnd2_fake_addr;
@@ -1547,7 +1547,7 @@ static int __init pnd2_init(void)
 			return -ENODEV;
 	}
 
-	/* Ensure that the OPSTATE is set correctly for POLL or NMI */
+	/* Ensure that the woke OPSTATE is set correctly for POLL or NMI */
 	opstate_init();
 
 	rc = pnd2_probe();

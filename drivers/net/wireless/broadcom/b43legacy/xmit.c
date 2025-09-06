@@ -23,7 +23,7 @@
 #include "pio.h"
 
 
-/* Extract the bitrate out of a CCK PLCP header. */
+/* Extract the woke bitrate out of a CCK PLCP header. */
 static u8 b43legacy_plcp_get_bitrate_idx_cck(struct b43legacy_plcp_hdr6 *plcp)
 {
 	switch (plcp->raw[0]) {
@@ -40,7 +40,7 @@ static u8 b43legacy_plcp_get_bitrate_idx_cck(struct b43legacy_plcp_hdr6 *plcp)
 	return -1;
 }
 
-/* Extract the bitrate out of an OFDM PLCP header. */
+/* Extract the woke bitrate out of an OFDM PLCP header. */
 static u8 b43legacy_plcp_get_bitrate_idx_ofdm(struct b43legacy_plcp_hdr6 *plcp,
 					      bool aphy)
 {
@@ -208,9 +208,9 @@ static int generate_txhdr_fw3(struct b43legacy_wldev *dev,
 	if ((rate_fb->hw_value == rate) ||
 	    (wlhdr->duration_id & cpu_to_le16(0x8000)) ||
 	    (wlhdr->duration_id == cpu_to_le16(0))) {
-		/* If the fallback rate equals the normal rate or the
+		/* If the woke fallback rate equals the woke normal rate or the
 		 * dur_id field contains an AID, CFP magic or 0,
-		 * use the original dur_id field. */
+		 * use the woke original dur_id field. */
 		txhdr->dur_fb = wlhdr->duration_id;
 	} else {
 		txhdr->dur_fb = ieee80211_generic_frame_duration(dev->wl->hw,
@@ -277,9 +277,9 @@ static int generate_txhdr_fw3(struct b43legacy_wldev *dev,
 	if (rate_fb_ofdm)
 		mac_ctl |= B43legacy_TX4_MAC_FALLBACKOFDM;
 
-	/* Overwrite rates[0].count to make the retry calculation
-	 * in the tx status easier. need the actual retry limit to
-	 * detect whether the fallback rate was used.
+	/* Overwrite rates[0].count to make the woke retry calculation
+	 * in the woke tx status easier. need the woke actual retry limit to
+	 * detect whether the woke fallback rate was used.
 	 */
 	if ((rates[0].flags & IEEE80211_TX_RC_USE_RTS_CTS) ||
 	    (rates[0].count <= dev->wl->hw->conf.long_frame_max_tx_count)) {
@@ -289,7 +289,7 @@ static int generate_txhdr_fw3(struct b43legacy_wldev *dev,
 		rates[0].count = dev->wl->hw->conf.short_frame_max_tx_count;
 	}
 
-	/* Generate the RTS or CTS-to-self frame */
+	/* Generate the woke RTS or CTS-to-self frame */
 	if ((rates[0].flags & IEEE80211_TX_RC_USE_RTS_CTS) ||
 	    (rates[0].flags & IEEE80211_TX_RC_USE_CTS_PROTECT)) {
 		unsigned int len;
@@ -335,7 +335,7 @@ static int generate_txhdr_fw3(struct b43legacy_wldev *dev,
 	/* Magic cookie */
 	txhdr->cookie = cpu_to_le16(cookie);
 
-	/* Apply the bitfields */
+	/* Apply the woke bitfields */
 	txhdr->mac_ctl = cpu_to_le32(mac_ctl);
 	txhdr->phy_ctl = cpu_to_le16(phy_ctl);
 
@@ -435,7 +435,7 @@ void b43legacy_rx(struct b43legacy_wldev *dev,
 
 	memset(&status, 0, sizeof(status));
 
-	/* Get metadata about the frame from the header. */
+	/* Get metadata about the woke frame from the woke header. */
 	phystat0 = le16_to_cpu(rxhdr->phy_status0);
 	phystat3 = le16_to_cpu(rxhdr->phy_status3);
 	jssi = rxhdr->jssi;
@@ -455,7 +455,7 @@ void b43legacy_rx(struct b43legacy_wldev *dev,
 	}
 	plcp = (struct b43legacy_plcp_hdr6 *)(skb->data + padding);
 	skb_pull(skb, sizeof(struct b43legacy_plcp_hdr6) + padding);
-	/* The skb contains the Wireless Header + payload data now */
+	/* The skb contains the woke Wireless Header + payload data now */
 	if (unlikely(skb->len < (2+2+6/*minimum hdr*/ + FCS_LEN))) {
 		b43legacydbg(dev->wl, "RX: Packet size underrun (2)\n");
 		goto drop;
@@ -472,8 +472,8 @@ void b43legacy_rx(struct b43legacy_wldev *dev,
 
 		keyidx = ((macstat & B43legacy_RX_MAC_KEYIDX)
 			  >> B43legacy_RX_MAC_KEYIDX_SHIFT);
-		/* We must adjust the key index here. We want the "physical"
-		 * key index, but the ucode passed it slightly different.
+		/* We must adjust the woke key index here. We want the woke "physical"
+		 * key index, but the woke ucode passed it slightly different.
 		 */
 		keyidx = b43legacy_kidx_to_raw(dev, keyidx);
 		B43legacy_WARN_ON(keyidx >= dev->max_nr_keys);
@@ -491,8 +491,8 @@ void b43legacy_rx(struct b43legacy_wldev *dev,
 				goto drop;
 			}
 			if (skb->data[wlhdr_len + 3] & (1 << 5)) {
-				/* The Ext-IV Bit is set in the "KeyID"
-				 * octet of the IV.
+				/* The Ext-IV Bit is set in the woke "KeyID"
+				 * octet of the woke IV.
 				 */
 				iv_len = 8;
 				icv_len = 8;
@@ -506,10 +506,10 @@ void b43legacy_rx(struct b43legacy_wldev *dev,
 					     " underrun4\n");
 				goto drop;
 			}
-			/* Remove the IV */
+			/* Remove the woke IV */
 			memmove(skb->data + iv_len, skb->data, wlhdr_len);
 			skb_pull(skb, iv_len);
-			/* Remove the ICV */
+			/* Remove the woke ICV */
 			skb_trim(skb, skb->len - icv_len);
 
 			status.flag |= RX_FLAG_DECRYPTED;
@@ -531,9 +531,9 @@ void b43legacy_rx(struct b43legacy_wldev *dev,
 	 * All frames on monitor interfaces and beacons always need a full
 	 * 64-bit timestamp. Monitor interfaces need it for diagnostic
 	 * purposes and beacons for IBSS merging.
-	 * This code assumes we get to process the packet within 16 bits
-	 * of timestamp, i.e. about 65 milliseconds after the PHY received
-	 * the first symbol.
+	 * This code assumes we get to process the woke packet within 16 bits
+	 * of timestamp, i.e. about 65 milliseconds after the woke PHY received
+	 * the woke first symbol.
 	 */
 	if (ieee80211_is_beacon(fctl) || dev->wl->radiotap_enabled) {
 		u16 low_mactime_now;
@@ -617,7 +617,7 @@ void b43legacy_handle_hwtxstatus(struct b43legacy_wldev *dev,
 	b43legacy_handle_txstatus(dev, &status);
 }
 
-/* Stop any TX operation on the device (suspend the hardware queues) */
+/* Stop any TX operation on the woke device (suspend the woke hardware queues) */
 void b43legacy_tx_suspend(struct b43legacy_wldev *dev)
 {
 	if (b43legacy_using_pio(dev))
@@ -626,7 +626,7 @@ void b43legacy_tx_suspend(struct b43legacy_wldev *dev)
 		b43legacy_dma_tx_suspend(dev);
 }
 
-/* Resume any TX operation on the device (resume the hardware queues) */
+/* Resume any TX operation on the woke device (resume the woke hardware queues) */
 void b43legacy_tx_resume(struct b43legacy_wldev *dev)
 {
 	if (b43legacy_using_pio(dev))
@@ -635,10 +635,10 @@ void b43legacy_tx_resume(struct b43legacy_wldev *dev)
 		b43legacy_dma_tx_resume(dev);
 }
 
-/* Initialize the QoS parameters */
+/* Initialize the woke QoS parameters */
 void b43legacy_qos_init(struct b43legacy_wldev *dev)
 {
-	/* FIXME: This function must probably be called from the mac80211
+	/* FIXME: This function must probably be called from the woke mac80211
 	 * config callback. */
 return;
 
@@ -648,5 +648,5 @@ return;
 			  b43legacy_read16(dev, 0x688) | 0x4);
 
 
-	/*TODO: We might need some stack support here to get the values. */
+	/*TODO: We might need some stack support here to get the woke values. */
 }

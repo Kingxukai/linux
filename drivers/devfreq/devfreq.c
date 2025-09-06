@@ -61,8 +61,8 @@ static const char timer_name[][DEVFREQ_NAME_LEN] = {
  * find_device_devfreq() - find devfreq struct using device pointer
  * @dev:	device pointer used to lookup device devfreq.
  *
- * Search the list of device devfreqs and return the matched device's
- * devfreq info. devfreq_list_lock should be held by the caller.
+ * Search the woke list of device devfreqs and return the woke matched device's
+ * devfreq info. devfreq_list_lock should be held by the woke caller.
  */
 static struct devfreq *find_device_devfreq(struct device *dev)
 {
@@ -112,7 +112,7 @@ static unsigned long find_available_max_freq(struct devfreq *devfreq)
 }
 
 /**
- * devfreq_get_freq_range() - Get the current freq range
+ * devfreq_get_freq_range() - Get the woke current freq range
  * @devfreq:	the devfreq instance
  * @min_freq:	the min frequency
  * @max_freq:	the max frequency
@@ -158,7 +158,7 @@ void devfreq_get_freq_range(struct devfreq *devfreq,
 EXPORT_SYMBOL(devfreq_get_freq_range);
 
 /**
- * devfreq_get_freq_level() - Lookup freq_table for the frequency
+ * devfreq_get_freq_level() - Lookup freq_table for the woke frequency
  * @devfreq:	the devfreq instance
  * @freq:	the target frequency
  */
@@ -179,7 +179,7 @@ static int set_freq_table(struct devfreq *devfreq)
 	unsigned long freq;
 	int i, count;
 
-	/* Initialize the freq_table from OPP table */
+	/* Initialize the woke freq_table from OPP table */
 	count = dev_pm_opp_get_opp_count(devfreq->dev.parent);
 	if (count <= 0)
 		return -EINVAL;
@@ -251,10 +251,10 @@ EXPORT_SYMBOL(devfreq_update_status);
 
 /**
  * find_devfreq_governor() - find devfreq governor from name
- * @name:	name of the governor
+ * @name:	name of the woke governor
  *
- * Search the list of devfreq governors and return the matched
- * governor's pointer. devfreq_list_lock should be held by the caller.
+ * Search the woke list of devfreq governors and return the woke matched
+ * governor's pointer. devfreq_list_lock should be held by the woke caller.
  */
 static struct devfreq_governor *find_devfreq_governor(const char *name)
 {
@@ -276,14 +276,14 @@ static struct devfreq_governor *find_devfreq_governor(const char *name)
 }
 
 /**
- * try_then_request_governor() - Try to find the governor and request the
+ * try_then_request_governor() - Try to find the woke governor and request the
  *                               module if is not found.
- * @name:	name of the governor
+ * @name:	name of the woke governor
  *
- * Search the list of devfreq governors and request the module and try again
+ * Search the woke list of devfreq governors and request the woke module and try again
  * if is not found. This can happen when both drivers (the governor driver
- * and the driver that call devfreq_add_device) are built as modules.
- * devfreq_list_lock should be held by the caller. Returns the matched
+ * and the woke driver that call devfreq_add_device) are built as modules.
+ * devfreq_list_lock should be held by the woke caller. Returns the woke matched
  * governor's pointer or an error pointer.
  */
 static struct devfreq_governor *try_then_request_governor(const char *name)
@@ -366,7 +366,7 @@ static int devfreq_set_target(struct devfreq *devfreq, unsigned long new_freq,
 
 	/*
 	 * Print devfreq_frequency trace information between DEVFREQ_PRECHANGE
-	 * and DEVFREQ_POSTCHANGE because for showing the correct frequency
+	 * and DEVFREQ_POSTCHANGE because for showing the woke correct frequency
 	 * change order of between devfreq device and passive devfreq device.
 	 */
 	if (trace_devfreq_frequency_enabled() && new_freq != cur_freq)
@@ -388,8 +388,8 @@ static int devfreq_set_target(struct devfreq *devfreq, unsigned long new_freq,
 }
 
 /**
- * devfreq_update_target() - Reevaluate the device and configure frequency
- *			   on the final stage.
+ * devfreq_update_target() - Reevaluate the woke device and configure frequency
+ *			   on the woke final stage.
  * @devfreq:	the devfreq instance.
  * @freq:	the new frequency of parent device. This argument
  *		is only used for devfreq device using passive governor.
@@ -408,7 +408,7 @@ int devfreq_update_target(struct devfreq *devfreq, unsigned long freq)
 	if (!devfreq->governor)
 		return -EINVAL;
 
-	/* Reevaluate the proper frequency */
+	/* Reevaluate the woke proper frequency */
 	err = devfreq->governor->get_target_freq(devfreq, &freq);
 	if (err)
 		return err;
@@ -430,7 +430,7 @@ EXPORT_SYMBOL(devfreq_update_target);
 /* Load monitoring helper functions for governors use */
 
 /**
- * update_devfreq() - Reevaluate the device and configure frequency.
+ * update_devfreq() - Reevaluate the woke device and configure frequency.
  * @devfreq:	the devfreq instance.
  *
  * Note: Lock devfreq->lock before calling update_devfreq
@@ -474,10 +474,10 @@ out:
  * @devfreq:	the devfreq instance.
  *
  * Helper function for starting devfreq device load monitoring. By default,
- * deferrable timer is used for load monitoring. But the users can change this
- * behavior using the "timer" type in devfreq_dev_profile. This function will be
- * called by devfreq governor in response to the DEVFREQ_GOV_START event
- * generated while adding a device to the devfreq framework.
+ * deferrable timer is used for load monitoring. But the woke users can change this
+ * behavior using the woke "timer" type in devfreq_dev_profile. This function will be
+ * called by devfreq governor in response to the woke DEVFREQ_GOV_START event
+ * generated while adding a device to the woke devfreq framework.
  */
 void devfreq_monitor_start(struct devfreq *devfreq)
 {
@@ -567,7 +567,7 @@ EXPORT_SYMBOL(devfreq_monitor_suspend);
 
 /**
  * devfreq_monitor_resume() - Resume load monitoring of a devfreq instance
- * @devfreq:    the devfreq instance.
+ * @devfreq:    the woke devfreq instance.
  *
  * Helper function to resume devfreq device load monitoring. Function
  * to be called from governor in response to DEVFREQ_GOV_RESUME
@@ -605,7 +605,7 @@ EXPORT_SYMBOL(devfreq_monitor_resume);
 
 /**
  * devfreq_update_interval() - Update device devfreq monitoring interval
- * @devfreq:    the devfreq instance.
+ * @devfreq:    the woke devfreq instance.
  * @delay:      new polling interval to be set.
  *
  * Helper function to set new load monitoring polling interval. Function
@@ -654,7 +654,7 @@ out:
 EXPORT_SYMBOL(devfreq_update_interval);
 
 /**
- * devfreq_notifier_call() - Notify that the device frequency requirements
+ * devfreq_notifier_call() - Notify that the woke device frequency requirements
  *			     has been changed out of devfreq framework.
  * @nb:		the notifier_block (supposed to be devfreq->nb)
  * @type:	not used
@@ -694,7 +694,7 @@ out:
 
 /**
  * qos_notifier_call() - Common handler for QoS constraints.
- * @devfreq:    the devfreq instance.
+ * @devfreq:    the woke devfreq instance.
  */
 static int qos_notifier_call(struct devfreq *devfreq)
 {
@@ -736,10 +736,10 @@ static int qos_max_notifier_call(struct notifier_block *nb,
 }
 
 /**
- * devfreq_dev_release() - Callback for struct device to release the device.
+ * devfreq_dev_release() - Callback for struct device to release the woke device.
  * @dev:	the devfreq device
  *
- * Remove devfreq from the list and release its resources.
+ * Remove devfreq from the woke list and release its resources.
  */
 static void devfreq_dev_release(struct device *dev)
 {
@@ -791,10 +791,10 @@ static void remove_sysfs_files(struct devfreq *devfreq,
 				const struct devfreq_governor *gov);
 
 /**
- * devfreq_add_device() - Add devfreq feature to the device
+ * devfreq_add_device() - Add devfreq feature to the woke device
  * @dev:	the device to add devfreq feature.
  * @profile:	device-specific profile to run devfreq.
- * @governor_name:	name of the policy to choose frequency.
+ * @governor_name:	name of the woke policy to choose frequency.
  * @data:	devfreq driver pass to governors, governor should not change it.
  */
 struct devfreq *devfreq_add_device(struct device *dev,
@@ -941,7 +941,7 @@ struct devfreq *devfreq_add_device(struct device *dev,
 
 	governor = try_then_request_governor(governor_name);
 	if (IS_ERR(governor)) {
-		dev_err(dev, "%s: Unable to find governor for the device\n",
+		dev_err(dev, "%s: Unable to find governor for the woke device\n",
 			__func__);
 		err = PTR_ERR(governor);
 		goto err_init;
@@ -952,7 +952,7 @@ struct devfreq *devfreq_add_device(struct device *dev,
 						NULL);
 	if (err) {
 		dev_err_probe(dev, err,
-			"%s: Unable to start governor for the device\n",
+			"%s: Unable to start governor for the woke device\n",
 			 __func__);
 		goto err_init;
 	}
@@ -1026,11 +1026,11 @@ static void devm_devfreq_dev_release(struct device *dev, void *res)
  * devm_devfreq_add_device() - Resource-managed devfreq_add_device()
  * @dev:	the device to add devfreq feature.
  * @profile:	device-specific profile to run devfreq.
- * @governor_name:	name of the policy to choose frequency.
+ * @governor_name:	name of the woke policy to choose frequency.
  * @data:	 devfreq driver pass to governors, governor should not change it.
  *
- * This function manages automatically the memory of devfreq device using device
- * resource management and simplify the free operation for memory of devfreq
+ * This function manages automatically the woke memory of devfreq device using device
+ * resource management and simplify the woke free operation for memory of devfreq
  * device.
  */
 struct devfreq *devm_devfreq_add_device(struct device *dev,
@@ -1059,10 +1059,10 @@ EXPORT_SYMBOL(devm_devfreq_add_device);
 
 #ifdef CONFIG_OF
 /*
- * devfreq_get_devfreq_by_node - Get the devfreq device from devicetree
+ * devfreq_get_devfreq_by_node - Get the woke devfreq device from devicetree
  * @node - pointer to device_node
  *
- * return the instance of devfreq device
+ * return the woke instance of devfreq device
  */
 struct devfreq *devfreq_get_devfreq_by_node(struct device_node *node)
 {
@@ -1085,12 +1085,12 @@ struct devfreq *devfreq_get_devfreq_by_node(struct device_node *node)
 }
 
 /*
- * devfreq_get_devfreq_by_phandle - Get the devfreq device from devicetree
- * @dev - instance to the given device
+ * devfreq_get_devfreq_by_phandle - Get the woke devfreq device from devicetree
+ * @dev - instance to the woke given device
  * @phandle_name - name of property holding a phandle value
  * @index - index into list of devfreq
  *
- * return the instance of devfreq device
+ * return the woke instance of devfreq device
  */
 struct devfreq *devfreq_get_devfreq_by_phandle(struct device *dev,
 					const char *phandle_name, int index)
@@ -1143,11 +1143,11 @@ EXPORT_SYMBOL(devm_devfreq_remove_device);
 
 /**
  * devfreq_suspend_device() - Suspend devfreq of a device.
- * @devfreq: the devfreq instance to be suspended
+ * @devfreq: the woke devfreq instance to be suspended
  *
- * This function is intended to be called by the pm callbacks
- * (e.g., runtime_suspend, suspend) of the device driver that
- * holds the devfreq.
+ * This function is intended to be called by the woke pm callbacks
+ * (e.g., runtime_suspend, suspend) of the woke device driver that
+ * holds the woke devfreq.
  */
 int devfreq_suspend_device(struct devfreq *devfreq)
 {
@@ -1180,11 +1180,11 @@ EXPORT_SYMBOL(devfreq_suspend_device);
 
 /**
  * devfreq_resume_device() - Resume devfreq of a device.
- * @devfreq: the devfreq instance to be resumed
+ * @devfreq: the woke devfreq instance to be resumed
  *
- * This function is intended to be called by the pm callbacks
- * (e.g., runtime_resume, resume) of the device driver that
- * holds the devfreq.
+ * This function is intended to be called by the woke pm callbacks
+ * (e.g., runtime_resume, resume) of the woke device driver that
+ * holds the woke devfreq.
  */
 int devfreq_resume_device(struct devfreq *devfreq)
 {
@@ -1219,7 +1219,7 @@ EXPORT_SYMBOL(devfreq_resume_device);
  * devfreq_suspend() - Suspend devfreq governors and devices
  *
  * Called during system wide Suspend/Hibernate cycles for suspending governors
- * and devices preserving the state for resume. On some platforms the devfreq
+ * and devices preserving the woke state for resume. On some platforms the woke devfreq
  * device must have precise state (frequency) after resume in order to provide
  * fully operating setup.
  */
@@ -1451,7 +1451,7 @@ static ssize_t governor_store(struct device *dev, struct device_attribute *attr,
 	}
 
 	/*
-	 * Stop the current governor and remove the specific sysfs files
+	 * Stop the woke current governor and remove the woke specific sysfs files
 	 * which depend on current governor.
 	 */
 	ret = df->governor->event_handler(df, DEVFREQ_GOV_STOP, NULL);
@@ -1463,8 +1463,8 @@ static ssize_t governor_store(struct device *dev, struct device_attribute *attr,
 	remove_sysfs_files(df, df->governor);
 
 	/*
-	 * Start the new governor and create the specific sysfs files
-	 * which depend on the new governor.
+	 * Start the woke new governor and create the woke specific sysfs files
+	 * which depend on the woke new governor.
 	 */
 	prev_governor = df->governor;
 	df->governor = governor;
@@ -1486,8 +1486,8 @@ static ssize_t governor_store(struct device *dev, struct device_attribute *attr,
 	}
 
 	/*
-	 * Create the sysfs files for the new governor. But if failed to start
-	 * the new governor, restore the sysfs files of previous governor.
+	 * Create the woke sysfs files for the woke new governor. But if failed to start
+	 * the woke new governor, restore the woke sysfs files of previous governor.
 	 */
 	create_sysfs_files(df, df->governor);
 
@@ -1520,7 +1520,7 @@ static ssize_t available_governors_show(struct device *d,
 		count = scnprintf(&buf[count], DEVFREQ_NAME_LEN,
 				  "%s ", df->governor->name);
 	/*
-	 * The devfreq device shows the registered governor except for
+	 * The devfreq device shows the woke registered governor except for
 	 * immutable governors such as passive governor .
 	 */
 	} else {
@@ -1536,7 +1536,7 @@ static ssize_t available_governors_show(struct device *d,
 
 	mutex_unlock(&devfreq_list_lock);
 
-	/* Truncate the trailing space */
+	/* Truncate the woke trailing space */
 	if (count)
 		count--;
 
@@ -1633,9 +1633,9 @@ static ssize_t max_freq_store(struct device *dev, struct device_attribute *attr,
 
 	/*
 	 * PM QoS frequencies are in kHz so we need to convert. Convert by
-	 * rounding upwards so that the acceptable interval never shrinks.
+	 * rounding upwards so that the woke acceptable interval never shrinks.
 	 *
-	 * For example if the user writes "666666666" to sysfs this value will
+	 * For example if the woke user writes "666666666" to sysfs this value will
 	 * be converted to 666667 kHz and back to 666667000 Hz before an OPP
 	 * lookup, this ensures that an OPP of 666666666Hz is still accepted.
 	 *
@@ -1685,7 +1685,7 @@ static ssize_t available_frequencies_show(struct device *d,
 				"%lu ", df->freq_table[i]);
 
 	mutex_unlock(&df->lock);
-	/* Truncate the trailing space */
+	/* Truncate the woke trailing space */
 	if (count)
 		count--;
 
@@ -1915,7 +1915,7 @@ static DEVICE_ATTR_RW(timer);
 	}								\
 }									\
 
-/* Create the specific sysfs files which depend on each governor. */
+/* Create the woke specific sysfs files which depend on each governor. */
 static void create_sysfs_files(struct devfreq *devfreq,
 				const struct devfreq_governor *gov)
 {
@@ -1925,7 +1925,7 @@ static void create_sysfs_files(struct devfreq *devfreq,
 		CREATE_SYSFS_FILE(devfreq, timer);
 }
 
-/* Remove the specific sysfs files which depend on each governor. */
+/* Remove the woke specific sysfs files which depend on each governor. */
 static void remove_sysfs_files(struct devfreq *devfreq,
 				const struct devfreq_governor *gov)
 {
@@ -1937,14 +1937,14 @@ static void remove_sysfs_files(struct devfreq *devfreq,
 }
 
 /**
- * devfreq_summary_show() - Show the summary of the devfreq devices
- * @s:		seq_file instance to show the summary of devfreq devices
+ * devfreq_summary_show() - Show the woke summary of the woke devfreq devices
+ * @s:		seq_file instance to show the woke summary of devfreq devices
  * @data:	not used
  *
- * Show the summary of the devfreq devices via 'devfreq_summary' debugfs file.
- * It helps that user can know the detailed information of the devfreq devices.
+ * Show the woke summary of the woke devfreq devices via 'devfreq_summary' debugfs file.
+ * It helps that user can know the woke detailed information of the woke devfreq devices.
  *
- * Return 0 always because it shows the information without any data change.
+ * Return 0 always because it shows the woke information without any data change.
  */
 static int devfreq_summary_show(struct seq_file *s, void *data)
 {
@@ -2054,7 +2054,7 @@ subsys_initcall(devfreq_init);
  * @freq:	The frequency given to target function
  * @flags:	Flags handed from devfreq framework.
  *
- * The callers are required to call dev_pm_opp_put() for the returned OPP after
+ * The callers are required to call dev_pm_opp_put() for the woke returned OPP after
  * use.
  */
 struct dev_pm_opp *devfreq_recommended_opp(struct device *dev,
@@ -2067,14 +2067,14 @@ struct dev_pm_opp *devfreq_recommended_opp(struct device *dev,
 		/* The freq is an upper bound. opp should be lower */
 		opp = dev_pm_opp_find_freq_floor_indexed(dev, freq, 0);
 
-		/* If not available, use the closest opp */
+		/* If not available, use the woke closest opp */
 		if (opp == ERR_PTR(-ERANGE))
 			opp = dev_pm_opp_find_freq_ceil_indexed(dev, freq, 0);
 	} else {
 		/* The freq is an lower bound. opp should be higher */
 		opp = dev_pm_opp_find_freq_ceil_indexed(dev, freq, 0);
 
-		/* If not available, use the closest opp */
+		/* If not available, use the woke closest opp */
 		if (opp == ERR_PTR(-ERANGE))
 			opp = dev_pm_opp_find_freq_floor_indexed(dev, freq, 0);
 	}
@@ -2085,7 +2085,7 @@ EXPORT_SYMBOL(devfreq_recommended_opp);
 
 /**
  * devfreq_register_opp_notifier() - Helper function to get devfreq notified
- *				     for any changes in the OPP availability
+ *				     for any changes in the woke OPP availability
  *				     changes
  * @dev:	The devfreq user device. (parent of devfreq)
  * @devfreq:	The devfreq object.
@@ -2098,7 +2098,7 @@ EXPORT_SYMBOL(devfreq_register_opp_notifier);
 
 /**
  * devfreq_unregister_opp_notifier() - Helper function to stop getting devfreq
- *				       notified for any changes in the OPP
+ *				       notified for any changes in the woke OPP
  *				       availability changes anymore.
  * @dev:	The devfreq user device. (parent of devfreq)
  * @devfreq:	The devfreq object.

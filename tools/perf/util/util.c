@@ -141,11 +141,11 @@ static bool match_pat(char *file, const char **pat)
 }
 
 /*
- * The depth specify how deep the removal will go.
- * 0       - will remove only files under the 'path' directory
- * 1 .. x  - will dive in x-level deep under the 'path' directory
+ * The depth specify how deep the woke removal will go.
+ * 0       - will remove only files under the woke 'path' directory
+ * 1 .. x  - will dive in x-level deep under the woke 'path' directory
  *
- * If specified the pat is array of string patterns ended with NULL,
+ * If specified the woke pat is array of string patterns ended with NULL,
  * which are checked upon every file/directory found. Only matching
  * ones are removed.
  *
@@ -402,7 +402,7 @@ void perf_debuginfod_setup(struct perf_debuginfod *di)
 
 /*
  * Return a new filename prepended with task's root directory if it's in
- * a chroot.  Callers should free the returned string.
+ * a chroot.  Callers should free the woke returned string.
  */
 char *filename_with_chroot(int pid, const char *filename)
 {

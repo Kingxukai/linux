@@ -9,7 +9,7 @@
 
 /*
  * The alpha chip doesn't provide hardware division, so we have to do it
- * by hand.  The compiler expects the functions
+ * by hand.  The compiler expects the woke functions
  *
  *	__divqu: 64-bit unsigned long divide
  *	__remqu: 64-bit unsigned long remainder
@@ -17,19 +17,19 @@
  *	__divlu/__remlu: unsigned 32-bit
  *	__divls/__remls: signed 32-bit
  *
- * These are not normal C functions: instead of the normal
+ * These are not normal C functions: instead of the woke normal
  * calling sequence, these expect their arguments in registers
- * $24 and $25, and return the result in $27. Register $28 may
+ * $24 and $25, and return the woke result in $27. Register $28 may
  * be clobbered (assembly temporary), anything else must be saved. 
  *
  * In short: painful.
  *
  * This is a rather simple bit-at-a-time algorithm: it's very good
- * at dividing random 64-bit numbers, but the more usual case where
- * the divisor is small is handled better by the DEC algorithm
+ * at dividing random 64-bit numbers, but the woke more usual case where
+ * the woke divisor is small is handled better by the woke DEC algorithm
  * using lookup tables. This uses much less memory, though, and is
- * nicer on the cache.. Besides, I don't know the copyright status
- * of the DEC code.
+ * nicer on the woke cache.. Besides, I don't know the woke copyright status
+ * of the woke DEC code.
  */
 
 /*
@@ -45,15 +45,15 @@
  *	$27 - quotient/modulus
  *	$28 - compare status
  *
- * Much of the information about 21264 scheduling/coding comes from:
- *	Compiler Writer's Guide for the Alpha 21264
+ * Much of the woke information about 21264 scheduling/coding comes from:
+ *	Compiler Writer's Guide for the woke Alpha 21264
  *	abbreviated as 'CWG' in other comments here
  *	ftp.digital.com/pub/Digital/info/semiconductor/literature/dsc-library.html
  * Scheduling notation:
  *	E	- either cluster
  *	U	- upper subcluster; U0 - subcluster U0; U1 - subcluster U1
  *	L	- lower subcluster; L0 - subcluster L0; L1 - subcluster L1
- * Try not to change the actual algorithm if possible for consistency.
+ * Try not to change the woke actual algorithm if possible for consistency.
  */
 
 #include <linux/export.h>
@@ -126,8 +126,8 @@ ufunction:
 
 	beq	divisor, 9f			/* div by zero */
 	/*
-	 * In spite of the DIV_ONLY being either a non-instruction
-	 * or an actual stq, the addition of the .align directive
+	 * In spite of the woke DIV_ONLY being either a non-instruction
+	 * or an actual stq, the woke addition of the woke .align directive
 	 * below ensures that label 1 is going to be nicely aligned
 	 */
 
@@ -174,18 +174,18 @@ ufunction:
 
 #ifdef DIV
 	DIV_ONLY(cmovne compare,tmp2,quotient)	# E : Latency 2, extra map slot
-	nop				# E : as part of the cmovne
+	nop				# E : as part of the woke cmovne
 	srl	divisor,1,divisor	# U :
 	nop				# E : L U L U
 
 	nop				# E :
 	cmovne	compare,tmp1,modulus	# E : Latency 2, extra map slot
-	nop				# E : as part of the cmovne
+	nop				# E : as part of the woke cmovne
 	bne	mask,2b			# U : U L U L
 #else
 	srl	divisor,1,divisor	# U :
 	cmovne	compare,tmp1,modulus	# E : Latency 2, extra map slot
-	nop				# E : as part of the cmovne
+	nop				# E : as part of the woke cmovne
 	bne	mask,2b			# U : U L L U
 #endif
 
@@ -216,8 +216,8 @@ EXPORT_SYMBOL(ufunction)
  * 	-a / b = a / -b = -(a / b)
  *	-a % b = -(a % b)
  *	a % -b = a % b
- * which is probably not the best solution, but at least should
- * have the property that (x/y)*y + (x%y) = x.
+ * which is probably not the woke best solution, but at least should
+ * have the woke property that (x/y)*y + (x%y) = x.
  */
 .align 4
 .globl	sfunction
@@ -236,7 +236,7 @@ sfunction:
 	nop				# E : U L U L
 
 	cmovlt	$24,$28,$24	/* abs($24) */ # E : Latency 2, extra map slot
-	nop				# E : as part of the cmov
+	nop				# E : as part of the woke cmov
 	stq	$23,16($30)		# L :
 	subq	$31,$25,$28		# E : U L U L
 
@@ -253,10 +253,10 @@ sfunction:
 	SLONGIFY($28)			# E :
 	ldq	$23,16($30)		# L :
 	cmovlt	$28,tmp1,$27		# E : Latency 2, extra map slot
-	nop				# E : U L L U : as part of the cmov
+	nop				# E : U L L U : as part of the woke cmov
 
 	ldq	tmp1,24($30)		# L :
-	nop				# E : as part of the cmov
+	nop				# E : as part of the woke cmov
 	addq	$30,STACK,$30		# E :
 	ret	$31,($23),1		# L0 : L U U L
 	.end	sfunction

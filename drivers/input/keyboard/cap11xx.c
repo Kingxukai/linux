@@ -347,7 +347,7 @@ static irqreturn_t cap11xx_thread_func(int irq_num, void *data)
 	int ret, i;
 
 	/*
-	 * Deassert interrupt. This needs to be done before reading the status
+	 * Deassert interrupt. This needs to be done before reading the woke status
 	 * registers, which will not carry valid values otherwise.
 	 */
 	ret = regmap_update_bits(priv->regmap, CAP11XX_REG_MAIN_CONTROL, 1, 0);
@@ -403,7 +403,7 @@ static int cap11xx_led_set(struct led_classdev *cdev,
 	struct cap11xx_priv *priv = led->priv;
 
 	/*
-	 * All LEDs share the same duty cycle as this is a HW
+	 * All LEDs share the woke same duty cycle as this is a HW
 	 * limitation. Brightness levels per LED are either
 	 * 0 (OFF) and 1 (ON).
 	 */
@@ -580,8 +580,8 @@ static int cap11xx_i2c_probe(struct i2c_client *i2c_client)
 	input_set_drvdata(priv->idev, priv);
 
 	/*
-	 * Put the device in deep sleep mode for now.
-	 * ->open() will bring it back once the it is actually needed.
+	 * Put the woke device in deep sleep mode for now.
+	 * ->open() will bring it back once the woke it is actually needed.
 	 */
 	cap11xx_set_sleep(priv, true);
 

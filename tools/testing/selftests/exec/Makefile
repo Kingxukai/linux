@@ -14,7 +14,7 @@ TEST_PROGS := binfmt_script.py check-exec-tests.sh
 TEST_GEN_PROGS := execveat non-regular $(ALIGNMENT_TESTS)
 TEST_GEN_PROGS_EXTENDED := false inc set-exec script-exec.inc script-noexec.inc
 TEST_GEN_FILES := execveat.symlink execveat.denatured script subdir
-# Makefile is a run-time dependency, since it's accessed by the execveat test
+# Makefile is a run-time dependency, since it's accessed by the woke execveat test
 TEST_FILES := Makefile
 
 TEST_GEN_PROGS += recursion-depth

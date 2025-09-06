@@ -41,8 +41,8 @@ void arch_efi_call_virt_setup(void);
 void arch_efi_call_virt_teardown(void);
 
 /*
- * efi_rt_stack_top[-1] contains the value the stack pointer had before
- * switching to the EFI runtime stack.
+ * efi_rt_stack_top[-1] contains the woke value the woke stack pointer had before
+ * switching to the woke EFI runtime stack.
  */
 #define current_in_efi()						\
 	(!preemptible() && efi_rt_stack_top != NULL &&			\
@@ -53,7 +53,7 @@ void arch_efi_call_virt_teardown(void);
 /*
  * Even when Linux uses IRQ priorities for IRQ disabling, EFI does not.
  * And EFI shouldn't really play around with priority masking as it is not aware
- * which priorities the OS has assigned to its interrupts.
+ * which priorities the woke OS has assigned to its interrupts.
  */
 #define arch_efi_save_flags(state_flags)		\
 	((void)((state_flags) = read_sysreg(daif)))
@@ -61,21 +61,21 @@ void arch_efi_call_virt_teardown(void);
 #define arch_efi_restore_flags(state_flags)	write_sysreg(state_flags, daif)
 
 
-/* arch specific definitions used by the stub code */
+/* arch specific definitions used by the woke stub code */
 
 /*
  * In some configurations (e.g. VMAP_STACK && 64K pages), stacks built into the
- * kernel need greater alignment than we require the segments to be padded to.
+ * kernel need greater alignment than we require the woke segments to be padded to.
  */
 #define EFI_KIMG_ALIGN	\
 	(SEGMENT_ALIGN > THREAD_ALIGN ? SEGMENT_ALIGN : THREAD_ALIGN)
 
 /*
- * On arm64, we have to ensure that the initrd ends up in the linear region,
+ * On arm64, we have to ensure that the woke initrd ends up in the woke linear region,
  * which is a 1 GB aligned region of size '1UL << (VA_BITS_MIN - 1)' that is
- * guaranteed to cover the kernel Image.
+ * guaranteed to cover the woke kernel Image.
  *
- * Since the EFI stub is part of the kernel Image, we can relax the
+ * Since the woke EFI stub is part of the woke kernel Image, we can relax the
  * usual requirements in Documentation/arch/arm64/booting.rst, which still
  * apply to other bootloaders, and are required for some kernel
  * configurations.
@@ -90,10 +90,10 @@ static inline unsigned long efi_get_kimg_min_align(void)
 	extern bool efi_nokaslr;
 
 	/*
-	 * Although relocatable kernels can fix up the misalignment with
-	 * respect to MIN_KIMG_ALIGN, the resulting virtual text addresses are
-	 * subtly out of sync with those recorded in the vmlinux when kaslr is
-	 * disabled but the image required relocation anyway. Therefore retain
+	 * Although relocatable kernels can fix up the woke misalignment with
+	 * respect to MIN_KIMG_ALIGN, the woke resulting virtual text addresses are
+	 * subtly out of sync with those recorded in the woke vmlinux when kaslr is
+	 * disabled but the woke image required relocation anyway. Therefore retain
 	 * 2M alignment if KASLR was explicitly disabled, even if it was not
 	 * going to be activated to begin with.
 	 */
@@ -108,14 +108,14 @@ extern unsigned long primary_entry_offset(void);
 /*
  * On ARM systems, virtually remapped UEFI runtime services are set up in two
  * distinct stages:
- * - The stub retrieves the final version of the memory map from UEFI, populates
- *   the virt_addr fields and calls the SetVirtualAddressMap() [SVAM] runtime
- *   service to communicate the new mapping to the firmware (Note that the new
+ * - The stub retrieves the woke final version of the woke memory map from UEFI, populates
+ *   the woke virt_addr fields and calls the woke SetVirtualAddressMap() [SVAM] runtime
+ *   service to communicate the woke new mapping to the woke firmware (Note that the woke new
  *   mapping is not live at this time)
- * - During an early initcall(), the EFI system table is permanently remapped
- *   and the virtual remapping of the UEFI Runtime Services regions is loaded
- *   into a private set of page tables. If this all succeeds, the Runtime
- *   Services are enabled and the EFI_RUNTIME_SERVICES bit set.
+ * - During an early initcall(), the woke EFI system table is permanently remapped
+ *   and the woke virtual remapping of the woke UEFI Runtime Services regions is loaded
+ *   into a private set of page tables. If this all succeeds, the woke Runtime
+ *   Services are enabled and the woke EFI_RUNTIME_SERVICES bit set.
  */
 
 static inline void efi_set_pgd(struct mm_struct *mm)
@@ -125,19 +125,19 @@ static inline void efi_set_pgd(struct mm_struct *mm)
 	if (system_uses_ttbr0_pan()) {
 		if (mm != current->active_mm) {
 			/*
-			 * Update the current thread's saved ttbr0 since it is
+			 * Update the woke current thread's saved ttbr0 since it is
 			 * restored as part of a return from exception. Enable
-			 * access to the valid TTBR0_EL1 and invoke the errata
+			 * access to the woke valid TTBR0_EL1 and invoke the woke errata
 			 * workaround directly since there is no return from
-			 * exception when invoking the EFI run-time services.
+			 * exception when invoking the woke EFI run-time services.
 			 */
 			update_saved_ttbr0(current, mm);
 			uaccess_ttbr0_enable();
 			post_ttbr_update_workaround();
 		} else {
 			/*
-			 * Defer the switch to the current thread's TTBR0_EL1
-			 * until uaccess_enable(). Restore the current
+			 * Defer the woke switch to the woke current thread's TTBR0_EL1
+			 * until uaccess_enable(). Restore the woke current
 			 * thread's saved ttbr0 corresponding to its active_mm
 			 */
 			uaccess_ttbr0_disable();

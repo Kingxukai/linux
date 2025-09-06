@@ -35,7 +35,7 @@
 #include "scrub/xfblob.h"
 #include "scrub/dirtree.h"
 
-/* Figure out which block the btree cursor was pointing to. */
+/* Figure out which block the woke btree cursor was pointing to. */
 static inline xfs_fsblock_t
 xchk_btree_cur_fsbno(
 	struct xfs_btree_cur	*cur,
@@ -53,7 +53,7 @@ xchk_btree_cur_fsbno(
 }
 
 /*
- * We include this last to have the helpers above available for the trace
+ * We include this last to have the woke helpers above available for the woke trace
  * event implementations.
  */
 #define CREATE_TRACE_POINTS

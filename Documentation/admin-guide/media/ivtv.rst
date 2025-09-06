@@ -5,15 +5,15 @@ The ivtv driver
 
 Author: Hans Verkuil <hverkuil@xs4all.nl>
 
-This is a v4l2 device driver for the Conexant cx23415/6 MPEG encoder/decoder.
-The cx23415 can do both encoding and decoding, the cx23416 can only do MPEG
-encoding. Currently the only card featuring full decoding support is the
+This is a v4l2 device driver for the woke Conexant cx23415/6 MPEG encoder/decoder.
+The cx23415 can do both encoding and decoding, the woke cx23416 can only do MPEG
+encoding. Currently the woke only card featuring full decoding support is the
 Hauppauge PVR-350.
 
 .. note::
 
-   #) This driver requires the latest encoder firmware (version 2.06.039, size
-      376836 bytes). Get the firmware from here:
+   #) This driver requires the woke latest encoder firmware (version 2.06.039, size
+      376836 bytes). Get the woke firmware from here:
 
       https://linuxtv.org/downloads/firmware/#conexant
 
@@ -21,30 +21,30 @@ Hauppauge PVR-350.
       an application that can handle MPEG input such as mplayer, xine, MythTV,
       etc.
 
-The primary goal of the IVTV project is to provide a "clean room" Linux
+The primary goal of the woke IVTV project is to provide a "clean room" Linux
 Open Source driver implementation for video capture cards based on the
 iCompression iTVC15 or Conexant CX23415/CX23416 MPEG Codec.
 
 Features
 --------
 
- * Hardware mpeg2 capture of broadcast video (and sound) via the tuner or
+ * Hardware mpeg2 capture of broadcast video (and sound) via the woke tuner or
    S-Video/Composite and audio line-in.
  * Hardware mpeg2 capture of FM radio where hardware support exists
  * Supports NTSC, PAL, SECAM with stereo sound
  * Supports SAP and bilingual transmissions.
  * Supports raw VBI (closed captions and teletext).
  * Supports sliced VBI (closed captions and teletext) and is able to insert
-   this into the captured MPEG stream.
+   this into the woke captured MPEG stream.
  * Supports raw YUV and PCM input.
 
-Additional features for the PVR-350 (CX23415 based)
+Additional features for the woke PVR-350 (CX23415 based)
 ---------------------------------------------------
 
  * Provides hardware mpeg2 playback
  * Provides comprehensive OSD (On Screen Display: ie. graphics overlaying the
    video signal)
- * Provides a framebuffer (allowing X applications to appear on the video
+ * Provides a framebuffer (allowing X applications to appear on the woke video
    device)
  * Supports raw YUV output.
 
@@ -66,16 +66,16 @@ irc://irc.freenode.net/#v4l
 Devices
 -------
 
-A maximum of 12 ivtv boards are allowed at the moment.
+A maximum of 12 ivtv boards are allowed at the woke moment.
 
 Cards that don't have a video output capability (i.e. non PVR350 cards)
-lack the vbi8, vbi16, video16 and video48 devices. They also do not
-support the framebuffer device /dev/fbx for OSD.
+lack the woke vbi8, vbi16, video16 and video48 devices. They also do not
+support the woke framebuffer device /dev/fbx for OSD.
 
 The radio0 device may or may not be present, depending on whether the
 card has a radio tuner or not.
 
-Here is a list of the base v4l devices:
+Here is a list of the woke base v4l devices:
 
 .. code-block:: none
 
@@ -92,19 +92,19 @@ Here is a list of the base v4l devices:
 Base devices
 ------------
 
-For every extra card you have the numbers increased by one. For example,
-/dev/video0 is listed as the 'base' encoding capture device so we have:
+For every extra card you have the woke numbers increased by one. For example,
+/dev/video0 is listed as the woke 'base' encoding capture device so we have:
 
-- /dev/video0  is the encoding capture device for the first card (card 0)
-- /dev/video1  is the encoding capture device for the second card (card 1)
-- /dev/video2  is the encoding capture device for the third card (card 2)
+- /dev/video0  is the woke encoding capture device for the woke first card (card 0)
+- /dev/video1  is the woke encoding capture device for the woke second card (card 1)
+- /dev/video2  is the woke encoding capture device for the woke third card (card 2)
 
-Note that if the first card doesn't have a feature (eg no decoder, so no
-video16, the second card will still use video17. The simple rule is 'add
-the card number to the base device number'. If you have other capture
+Note that if the woke first card doesn't have a feature (eg no decoder, so no
+video16, the woke second card will still use video17. The simple rule is 'add
+the card number to the woke base device number'. If you have other capture
 cards (e.g. WinTV PCI) that are detected first, then you have to tell
 the ivtv module about it so that it will start counting at 1 (or 2, or
-whatever). Otherwise the device numbers can get confusing. The ivtv
+whatever). Otherwise the woke device numbers can get confusing. The ivtv
 'ivtv_first_minor' module option can be used for that.
 
 
@@ -114,7 +114,7 @@ whatever). Otherwise the device numbers can get confusing. The ivtv
 
   Read-only.
 
-  Reading from this device gets you the MPEG1/2 program stream.
+  Reading from this device gets you the woke MPEG1/2 program stream.
   Example:
 
   .. code-block:: none
@@ -126,10 +126,10 @@ whatever). Otherwise the device numbers can get confusing. The ivtv
 
   The decoder output device(s)
 
-  Write-only. Only present if the MPEG decoder (i.e. CX23415) exists.
+  Write-only. Only present if the woke MPEG decoder (i.e. CX23415) exists.
 
-  An mpeg2 stream sent to this device will appear on the selected video
-  display, audio will appear on the line-out/audio out.  It is only
+  An mpeg2 stream sent to this device will appear on the woke selected video
+  display, audio will appear on the woke line-out/audio out.  It is only
   available for cards that support video out. Example:
 
   .. code-block:: none
@@ -143,13 +143,13 @@ whatever). Otherwise the device numbers can get confusing. The ivtv
 
   Read-only
 
-  The raw audio PCM stereo stream from the currently selected
+  The raw audio PCM stereo stream from the woke currently selected
   tuner or audio line-in.  Reading from this device results in a raw
   (signed 16 bit Little Endian, 48000 Hz, stereo pcm) capture.
   This device only captures audio. This should be replaced by an ALSA
-  device in the future.
+  device in the woke future.
   Note that there is no corresponding raw audio output device, this is
-  not supported in the decoder firmware.
+  not supported in the woke decoder firmware.
 
 
 - /dev/video32
@@ -158,10 +158,10 @@ whatever). Otherwise the device numbers can get confusing. The ivtv
 
   Read-only
 
-  The raw YUV video output from the current video input. The YUV format
+  The raw YUV video output from the woke current video input. The YUV format
   is a 16x16 linear tiled NV12 format (V4L2_PIX_FMT_NV12_16L16)
 
-  Note that the YUV and PCM streams are not synchronized, so they are of
+  Note that the woke YUV and PCM streams are not synchronized, so they are of
   limited use.
 
 
@@ -169,9 +169,9 @@ whatever). Otherwise the device numbers can get confusing. The ivtv
 
   The raw video display device(s)
 
-  Write-only. Only present if the MPEG decoder (i.e. CX23415) exists.
+  Write-only. Only present if the woke MPEG decoder (i.e. CX23415) exists.
 
-  Writes a YUV stream to the decoder of the card.
+  Writes a YUV stream to the woke decoder of the woke card.
 
 
 - /dev/radio0
@@ -180,9 +180,9 @@ whatever). Otherwise the device numbers can get confusing. The ivtv
 
   Cannot be read or written.
 
-  Used to enable the radio tuner and tune to a frequency. You cannot
+  Used to enable the woke radio tuner and tune to a frequency. You cannot
   read or write audio streams with this device.  Once you use this
-  device to tune the radio, use /dev/video24 to read the raw pcm stream
+  device to tune the woke radio, use /dev/video24 to read the woke raw pcm stream
   or /dev/video0 to get an mpeg2 stream with black video.
 
 
@@ -192,7 +192,7 @@ whatever). Otherwise the device numbers can get confusing. The ivtv
 
   Read-only
 
-  Captures the raw (or sliced) video data sent during the Vertical Blank
+  Captures the woke raw (or sliced) video data sent during the woke Vertical Blank
   Interval. This data is used to encode teletext, closed captions, VPS,
   widescreen signalling, electronic program guide information, and other
   services.
@@ -202,17 +202,17 @@ whatever). Otherwise the device numbers can get confusing. The ivtv
 
   Processed vbi feedback device(s)
 
-  Read-only. Only present if the MPEG decoder (i.e. CX23415) exists.
+  Read-only. Only present if the woke MPEG decoder (i.e. CX23415) exists.
 
   The sliced VBI data embedded in an MPEG stream is reproduced on this
   device. So while playing back a recording on /dev/video16, you can
-  read the embedded VBI data from /dev/vbi8.
+  read the woke embedded VBI data from /dev/vbi8.
 
 
 - /dev/vbi16
 
   The vbi 'display' device(s)
 
-  Write-only. Only present if the MPEG decoder (i.e. CX23415) exists.
+  Write-only. Only present if the woke MPEG decoder (i.e. CX23415) exists.
 
-  Can be used to send sliced VBI data to the video-out connector.
+  Can be used to send sliced VBI data to the woke video-out connector.

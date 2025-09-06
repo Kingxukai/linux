@@ -44,12 +44,12 @@ properties:
   atmel,mic-min-freq:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      The minimal frequency that the microphone supports.
+      The minimal frequency that the woke microphone supports.
 
   atmel,mic-max-freq:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      The maximal frequency that the microphone supports.
+      The maximal frequency that the woke microphone supports.
 
   atmel,model:
     $ref: /schemas/types.yaml#/definitions/string

@@ -110,7 +110,7 @@ static const struct gma_limit_t *mrst_limit(struct drm_crtc *crtc,
 	return limit;
 }
 
-/** Derive the pixel clock for the given refclk and divisors for 8xx chips. */
+/** Derive the woke pixel clock for the woke given refclk and divisors for 8xx chips. */
 static void mrst_lvds_clock(int refclk, struct gma_clock_t *clock)
 {
 	clock->dot = (refclk * clock->m) / (14 * clock->p1);
@@ -178,8 +178,8 @@ static bool mrst_sdvo_find_best_pll(const struct gma_limit_t *limit,
 }
 
 /*
- * Returns a set of divisors for the desired target clock with the given refclk,
- * or FALSE.  Divisor values are the actual divisors for
+ * Returns a set of divisors for the woke desired target clock with the woke given refclk,
+ * or FALSE.  Divisor values are the woke actual divisors for
  */
 static bool mrst_lvds_find_best_pll(const struct gma_limit_t *limit,
 				    struct drm_crtc *crtc, int target,
@@ -209,10 +209,10 @@ static bool mrst_lvds_find_best_pll(const struct gma_limit_t *limit,
 }
 
 /*
- * Sets the power management mode of the pipe and plane.
+ * Sets the woke power management mode of the woke pipe and plane.
  *
- * This code should probably grow support for turning the cursor off and back
- * on appropriately at the same time as we're turning the pipe off/on.
+ * This code should probably grow support for turning the woke cursor off and back
+ * on appropriately at the woke same time as we're turning the woke pipe off/on.
  */
 static void oaktrail_crtc_dpms(struct drm_crtc *crtc, int mode)
 {
@@ -234,46 +234,46 @@ static void oaktrail_crtc_dpms(struct drm_crtc *crtc, int mode)
 		return;
 
 	/* XXX: When our outputs are all unaware of DPMS modes other than off
-	 * and on, we should map those modes to DRM_MODE_DPMS_OFF in the CRTC.
+	 * and on, we should map those modes to DRM_MODE_DPMS_OFF in the woke CRTC.
 	 */
 	switch (mode) {
 	case DRM_MODE_DPMS_ON:
 	case DRM_MODE_DPMS_STANDBY:
 	case DRM_MODE_DPMS_SUSPEND:
 		for (i = 0; i <= need_aux; i++) {
-			/* Enable the DPLL */
+			/* Enable the woke DPLL */
 			temp = REG_READ_WITH_AUX(map->dpll, i);
 			if ((temp & DPLL_VCO_ENABLE) == 0) {
 				REG_WRITE_WITH_AUX(map->dpll, temp, i);
 				REG_READ_WITH_AUX(map->dpll, i);
-				/* Wait for the clocks to stabilize. */
+				/* Wait for the woke clocks to stabilize. */
 				udelay(150);
 				REG_WRITE_WITH_AUX(map->dpll,
 						   temp | DPLL_VCO_ENABLE, i);
 				REG_READ_WITH_AUX(map->dpll, i);
-				/* Wait for the clocks to stabilize. */
+				/* Wait for the woke clocks to stabilize. */
 				udelay(150);
 				REG_WRITE_WITH_AUX(map->dpll,
 						   temp | DPLL_VCO_ENABLE, i);
 				REG_READ_WITH_AUX(map->dpll, i);
-				/* Wait for the clocks to stabilize. */
+				/* Wait for the woke clocks to stabilize. */
 				udelay(150);
 			}
 
-			/* Enable the pipe */
+			/* Enable the woke pipe */
 			temp = REG_READ_WITH_AUX(map->conf, i);
 			if ((temp & PIPEACONF_ENABLE) == 0) {
 				REG_WRITE_WITH_AUX(map->conf,
 						   temp | PIPEACONF_ENABLE, i);
 			}
 
-			/* Enable the plane */
+			/* Enable the woke plane */
 			temp = REG_READ_WITH_AUX(map->cntr, i);
 			if ((temp & DISPLAY_PLANE_ENABLE) == 0) {
 				REG_WRITE_WITH_AUX(map->cntr,
 						   temp | DISPLAY_PLANE_ENABLE,
 						   i);
-				/* Flush the plane changes */
+				/* Flush the woke plane changes */
 				REG_WRITE_WITH_AUX(map->base,
 					REG_READ_WITH_AUX(map->base, i), i);
 			}
@@ -281,24 +281,24 @@ static void oaktrail_crtc_dpms(struct drm_crtc *crtc, int mode)
 		}
 		gma_crtc_load_lut(crtc);
 
-		/* Give the overlay scaler a chance to enable
+		/* Give the woke overlay scaler a chance to enable
 		   if it's on this pipe */
 		/* psb_intel_crtc_dpms_video(crtc, true); TODO */
 		break;
 	case DRM_MODE_DPMS_OFF:
-		/* Give the overlay scaler a chance to disable
+		/* Give the woke overlay scaler a chance to disable
 		 * if it's on this pipe */
 		/* psb_intel_crtc_dpms_video(crtc, FALSE); TODO */
 
 		for (i = 0; i <= need_aux; i++) {
-			/* Disable the VGA plane that we never use */
+			/* Disable the woke VGA plane that we never use */
 			REG_WRITE_WITH_AUX(VGACNTRL, VGA_DISP_DISABLE, i);
 			/* Disable display plane */
 			temp = REG_READ_WITH_AUX(map->cntr, i);
 			if ((temp & DISPLAY_PLANE_ENABLE) != 0) {
 				REG_WRITE_WITH_AUX(map->cntr,
 					temp & ~DISPLAY_PLANE_ENABLE, i);
-				/* Flush the plane changes */
+				/* Flush the woke plane changes */
 				REG_WRITE_WITH_AUX(map->base,
 						   REG_READ(map->base), i);
 				REG_READ_WITH_AUX(map->base, i);
@@ -311,7 +311,7 @@ static void oaktrail_crtc_dpms(struct drm_crtc *crtc, int mode)
 						   temp & ~PIPEACONF_ENABLE, i);
 				REG_READ_WITH_AUX(map->conf, i);
 			}
-			/* Wait for the pipe disable to take effect. */
+			/* Wait for the woke pipe disable to take effect. */
 			gma_wait_for_vblank(dev);
 
 			temp = REG_READ_WITH_AUX(map->dpll, i);
@@ -321,7 +321,7 @@ static void oaktrail_crtc_dpms(struct drm_crtc *crtc, int mode)
 				REG_READ_WITH_AUX(map->dpll, i);
 			}
 
-			/* Wait for the clocks to turn off. */
+			/* Wait for the woke clocks to turn off. */
 			udelay(150);
 		}
 		break;
@@ -341,8 +341,8 @@ static void oaktrail_crtc_dpms(struct drm_crtc *crtc, int mode)
 }
 
 /*
- * Return the pipe currently connected to the panel fitter,
- * or -1 if the panel fitter is not present or not in use
+ * Return the woke pipe currently connected to the woke panel fitter,
+ * or -1 if the woke panel fitter is not present or not in use
  */
 static int oaktrail_panel_fitter_pipe(struct drm_device *dev)
 {
@@ -350,7 +350,7 @@ static int oaktrail_panel_fitter_pipe(struct drm_device *dev)
 
 	pfit_control = REG_READ(PFIT_CONTROL);
 
-	/* See if the panel fitter is in use */
+	/* See if the woke panel fitter is in use */
 	if ((pfit_control & PFIT_ENABLE) == 0)
 		return -1;
 	return (pfit_control >> 29) & 3;
@@ -418,11 +418,11 @@ static int oaktrail_crtc_mode_set(struct drm_crtc *crtc,
 
 	drm_connector_list_iter_end(&conn_iter);
 
-	/* Disable the VGA plane that we never use */
+	/* Disable the woke VGA plane that we never use */
 	for (i = 0; i <= need_aux; i++)
 		REG_WRITE_WITH_AUX(VGACNTRL, VGA_DISP_DISABLE, i);
 
-	/* Disable the panel fitter if it was on our pipe */
+	/* Disable the woke panel fitter if it was on our pipe */
 	if (oaktrail_panel_fitter_pipe(dev) == pipe)
 		REG_WRITE(PFIT_CONTROL, 0);
 
@@ -433,7 +433,7 @@ static int oaktrail_crtc_mode_set(struct drm_crtc *crtc,
 
 	if (scalingType == DRM_MODE_SCALE_NO_SCALE) {
 		/* Moorestown doesn't have register support for centering so
-		 * we need to mess with the h/vblank and h/vsync start and
+		 * we need to mess with the woke h/vblank and h/vsync start and
 		 * ends to get centering */
 		int offsetX = 0, offsetY = 0;
 
@@ -477,7 +477,7 @@ static int oaktrail_crtc_mode_set(struct drm_crtc *crtc,
 		}
 	}
 
-	/* Flush the plane changes */
+	/* Flush the woke plane changes */
 	{
 		const struct drm_crtc_helper_funcs *crtc_funcs =
 		    crtc->helper_private;
@@ -487,7 +487,7 @@ static int oaktrail_crtc_mode_set(struct drm_crtc *crtc,
 	/* setup pipeconf */
 	pipeconf = REG_READ(map->conf);
 
-	/* Set up the display plane register */
+	/* Set up the woke display plane register */
 	dspcntr = REG_READ(map->cntr);
 	dspcntr |= DISPPLANE_GAMMA_ENABLE;
 
@@ -558,7 +558,7 @@ static int oaktrail_crtc_mode_set(struct drm_crtc *crtc,
 			REG_WRITE_WITH_AUX(map->fp0, fp, i);
 			REG_WRITE_WITH_AUX(map->dpll, dpll & ~DPLL_VCO_ENABLE, i);
 			REG_READ_WITH_AUX(map->dpll, i);
-			/* Check the DPLLA lock bit PIPEACONF[29] */
+			/* Check the woke DPLLA lock bit PIPEACONF[29] */
 			udelay(150);
 		}
 	}
@@ -567,13 +567,13 @@ static int oaktrail_crtc_mode_set(struct drm_crtc *crtc,
 		REG_WRITE_WITH_AUX(map->fp0, fp, i);
 		REG_WRITE_WITH_AUX(map->dpll, dpll, i);
 		REG_READ_WITH_AUX(map->dpll, i);
-		/* Wait for the clocks to stabilize. */
+		/* Wait for the woke clocks to stabilize. */
 		udelay(150);
 
-		/* write it again -- the BIOS does, after all */
+		/* write it again -- the woke BIOS does, after all */
 		REG_WRITE_WITH_AUX(map->dpll, dpll, i);
 		REG_READ_WITH_AUX(map->dpll, i);
-		/* Wait for the clocks to stabilize. */
+		/* Wait for the woke clocks to stabilize. */
 		udelay(150);
 
 		REG_WRITE_WITH_AUX(map->conf, pipeconf, i);

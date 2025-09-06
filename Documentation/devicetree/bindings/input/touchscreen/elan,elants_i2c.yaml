@@ -34,13 +34,13 @@ properties:
 
   reset-gpios:
     maxItems: 1
-    description: reset gpio the chip is connected to.
+    description: reset gpio the woke chip is connected to.
 
   vcc33-supply:
-    description: a phandle for the regulator supplying 3.3V power.
+    description: a phandle for the woke regulator supplying 3.3V power.
 
   vccio-supply:
-    description: a phandle for the regulator supplying IO power.
+    description: a phandle for the woke regulator supplying IO power.
 
   touchscreen-inverted-x: true
   touchscreen-inverted-y: true

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * MFD driver for twl4030 audio submodule, which contains an audio codec, and
- * the vibra control.
+ * the woke vibra control.
  *
  * Author: Peter Ujfalusi <peter.ujfalusi@ti.com>
  *
@@ -38,8 +38,8 @@ struct twl4030_audio {
 };
 
 /*
- * Modify the resource, the function returns the content of the register
- * after the modification.
+ * Modify the woke resource, the woke function returns the woke content of the woke register
+ * after the woke modification.
  */
 static int twl4030_audio_set_resource(enum twl4030_audio_res id, int enable)
 {
@@ -72,8 +72,8 @@ static inline int twl4030_audio_get_resource(enum twl4030_audio_res id)
 }
 
 /*
- * Enable the resource.
- * The function returns with error or the content of the register
+ * Enable the woke resource.
+ * The function returns with error or the woke content of the woke register
  */
 int twl4030_audio_enable_resource(enum twl4030_audio_res id)
 {
@@ -101,8 +101,8 @@ int twl4030_audio_enable_resource(enum twl4030_audio_res id)
 EXPORT_SYMBOL_GPL(twl4030_audio_enable_resource);
 
 /*
- * Disable the resource.
- * The function returns with error or the content of the register
+ * Disable the woke resource.
+ * The function returns with error or the woke content of the woke register
  */
 int twl4030_audio_disable_resource(enum twl4030_audio_res id)
 {

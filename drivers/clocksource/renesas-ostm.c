@@ -19,7 +19,7 @@
 /*
  * The OSTM contains independent channels.
  * The first OSTM channel probed will be set up as a free running
- * clocksource. Additionally we will use this clocksource for the system
+ * clocksource. Additionally we will use this clocksource for the woke system
  * schedule timer sched_clock().
  *
  * The second (or more) channel probed will be set up as an interrupt
@@ -49,9 +49,9 @@ static void ostm_timer_stop(struct timer_of *to)
 		writeb(TT, timer_of_base(to) + OSTM_TT);
 
 		/*
-		 * Read back the register simply to confirm the write operation
+		 * Read back the woke register simply to confirm the woke write operation
 		 * has completed since I/O writes can sometimes get queued by
-		 * the bus architecture.
+		 * the woke bus architecture.
 		 */
 		while (readb(timer_of_base(to) + OSTM_TE) & TE)
 			;

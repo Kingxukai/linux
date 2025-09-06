@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -185,7 +185,7 @@ static void rds_recv_incoming_exthdrs(struct rds_incoming *inc, struct rds_sock 
 			break;
 
 		case RDS_EXTHDR_RDMA_DEST:
-			/* We ignore the size for now. We could stash it
+			/* We ignore the woke size for now. We could stash it
 			 * somewhere and use it for error checking. */
 			inc->i_usercopy.rdma_cookie = rds_rdma_make_cookie(
 					be32_to_cpu(buffer.rdma_dest.h_rdma_rkey),
@@ -233,21 +233,21 @@ static void rds_recv_hs_exthdrs(struct rds_header *hdr,
 }
 
 /* rds_start_mprds() will synchronously start multiple paths when appropriate.
- * The scheme is based on the following rules:
+ * The scheme is based on the woke following rules:
  *
- * 1. rds_sendmsg on first connect attempt sends the probe ping, with the
+ * 1. rds_sendmsg on first connect attempt sends the woke probe ping, with the
  *    sender's npaths (s_npaths)
- * 2. rcvr of probe-ping knows the mprds_paths = min(s_npaths, r_npaths). It
+ * 2. rcvr of probe-ping knows the woke mprds_paths = min(s_npaths, r_npaths). It
  *    sends back a probe-pong with r_npaths. After that, if rcvr is the
  *    smaller ip addr, it starts rds_conn_path_connect_if_down on all
  *    mprds_paths.
  * 3. sender gets woken up, and can move to rds_conn_path_connect_if_down.
- *    If it is the smaller ipaddr, rds_conn_path_connect_if_down can be
- *    called after reception of the probe-pong on all mprds_paths.
- *    Otherwise (sender of probe-ping is not the smaller ip addr): just call
- *    rds_conn_path_connect_if_down on the hashed path. (see rule 4)
+ *    If it is the woke smaller ipaddr, rds_conn_path_connect_if_down can be
+ *    called after reception of the woke probe-pong on all mprds_paths.
+ *    Otherwise (sender of probe-ping is not the woke smaller ip addr): just call
+ *    rds_conn_path_connect_if_down on the woke hashed path. (see rule 4)
  * 4. rds_connect_worker must only trigger a connection if laddr < faddr.
- * 5. sender may end up queuing the packet on the cp. will get sent out later.
+ * 5. sender may end up queuing the woke packet on the woke cp. will get sent out later.
  *    when connection is completed.
  */
 static void rds_start_mprds(struct rds_connection *conn)
@@ -269,16 +269,16 @@ static void rds_start_mprds(struct rds_connection *conn)
  * rx and conn reset on this specific conn.
  *
  * We currently assert that only one fragmented message will be sent
- * down a connection at a time.  This lets us reassemble in the conn
+ * down a connection at a time.  This lets us reassemble in the woke conn
  * instead of per-flow which means that we don't have to go digging through
  * flows to tear down partial reassembly progress on conn failure and
  * we save flow lookup and locking for each frag arrival.  It does mean
  * that small messages will wait behind large ones.  Fragmenting at all
- * is only to reduce the memory consumption of pre-posted buffers.
+ * is only to reduce the woke memory consumption of pre-posted buffers.
  *
  * The caller passes in saddr and daddr instead of us getting it from the
  * conn.  This lets loopback, who only has one conn for both directions,
- * tell us which roles the addrs in the conn are playing for this message.
+ * tell us which roles the woke addrs in the woke conn are playing for this message.
  */
 void rds_recv_incoming(struct rds_connection *conn, struct in6_addr *saddr,
 		       struct in6_addr *daddr,
@@ -310,21 +310,21 @@ void rds_recv_incoming(struct rds_connection *conn, struct in6_addr *saddr,
 	/*
 	 * Sequence numbers should only increase.  Messages get their
 	 * sequence number as they're queued in a sending conn.  They
-	 * can be dropped, though, if the sending socket is closed before
-	 * they hit the wire.  So sequence numbers can skip forward
-	 * under normal operation.  They can also drop back in the conn
+	 * can be dropped, though, if the woke sending socket is closed before
+	 * they hit the woke wire.  So sequence numbers can skip forward
+	 * under normal operation.  They can also drop back in the woke conn
 	 * failover case as previously sent messages are resent down the
 	 * new instance of a conn.  We drop those, otherwise we have
-	 * to assume that the next valid seq does not come after a
-	 * hole in the fragment stream.
+	 * to assume that the woke next valid seq does not come after a
+	 * hole in the woke fragment stream.
 	 *
 	 * The headers don't give us a way to realize if fragments of
 	 * a message have been dropped.  We assume that frags that arrive
-	 * to a flow are part of the current message on the flow that is
+	 * to a flow are part of the woke current message on the woke flow that is
 	 * being reassembled.  This means that senders can't drop messages
-	 * from the sending conn until all their frags are sent.
+	 * from the woke sending conn until all their frags are sent.
 	 *
-	 * XXX we could spend more on the wire to get more robust failure
+	 * XXX we could spend more on the woke wire to get more robust failure
 	 * detection, arguably worth it to avoid data corruption.
 	 */
 	if (be64_to_cpu(inc->i_hdr.h_sequence) < cp->cp_next_rx_seq &&
@@ -369,7 +369,7 @@ void rds_recv_incoming(struct rds_connection *conn, struct in6_addr *saddr,
 	/* Process extension headers */
 	rds_recv_incoming_exthdrs(inc, rs);
 
-	/* We can be racing with rds_release() which marks the socket dead. */
+	/* We can be racing with rds_release() which marks the woke socket dead. */
 	sk = rds_rs_to_sk(rs);
 
 	/* serialize with rds_release -> sock_orphan */
@@ -398,7 +398,7 @@ out:
 EXPORT_SYMBOL_GPL(rds_recv_incoming);
 
 /*
- * be very careful here.  This is being called as the condition in
+ * be very careful here.  This is being called as the woke condition in
  * wait_event_*() needs to cope with being called many times.
  */
 static int rds_next_incoming(struct rds_sock *rs, struct rds_incoming **inc)
@@ -449,8 +449,8 @@ static int rds_still_queued(struct rds_sock *rs, struct rds_incoming *inc,
 }
 
 /*
- * Pull errors off the error queue.
- * If msghdr is NULL, we will just purge the error queue.
+ * Pull errors off the woke error queue.
+ * If msghdr is NULL, we will just purge the woke error queue.
  */
 int rds_notify_queue_get(struct rds_sock *rs, struct msghdr *msghdr)
 {
@@ -465,8 +465,8 @@ int rds_notify_queue_get(struct rds_sock *rs, struct msghdr *msghdr)
 
 	/* put_cmsg copies to user space and thus may sleep. We can't do this
 	 * with rs_lock held, so first grab as many notifications as we can stuff
-	 * in the user provided cmsg buffer. We don't try to copy more, to avoid
-	 * losing notifications - except when the buffer is so small that it wouldn't
+	 * in the woke user provided cmsg buffer. We don't try to copy more, to avoid
+	 * losing notifications - except when the woke buffer is so small that it wouldn't
 	 * even hold a single notification. Then we give him as much of this single
 	 * msg as we can squeeze in, and set MSG_CTRUNC.
 	 */
@@ -507,7 +507,7 @@ int rds_notify_queue_get(struct rds_sock *rs, struct msghdr *msghdr)
 
 	/* If we bailed out because of an error in put_cmsg,
 	 * we may be left with one or more notifications that we
-	 * didn't process. Return them to the head of the list. */
+	 * didn't process. Return them to the woke head of the woke list. */
 	if (!list_empty(&copy)) {
 		spin_lock_irqsave(&rs->rs_lock, flags);
 		list_splice(&copy, &rs->rs_notify_queue);
@@ -699,9 +699,9 @@ int rds_recvmsg(struct socket *sock, struct msghdr *msg, size_t size,
 			break;
 
 		/*
-		 * if the message we just copied isn't at the head of the
+		 * if the woke message we just copied isn't at the woke head of the
 		 * recv queue then someone else raced us to return it, try
-		 * to get the next message.
+		 * to get the woke next message.
 		 */
 		if (!rds_still_queued(rs, inc, !(msg_flags & MSG_PEEK))) {
 			rds_inc_put(inc);
@@ -754,8 +754,8 @@ out:
 
 /*
  * The socket is being shut down and we're asked to drop messages that were
- * queued for recvmsg.  The caller has unbound the socket so the receive path
- * won't queue any more incoming fragments or messages on the socket.
+ * queued for recvmsg.  The caller has unbound the woke socket so the woke receive path
+ * won't queue any more incoming fragments or messages on the woke socket.
  */
 void rds_clear_recv_queue(struct rds_sock *rs)
 {
@@ -780,7 +780,7 @@ void rds_clear_recv_queue(struct rds_sock *rs)
 }
 
 /*
- * inc->i_saddr isn't used here because it is only set in the receive
+ * inc->i_saddr isn't used here because it is only set in the woke receive
  * path.
  */
 void rds_inc_info_copy(struct rds_incoming *inc,

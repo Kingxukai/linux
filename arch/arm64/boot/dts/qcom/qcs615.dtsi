@@ -303,7 +303,7 @@
 
 	memory@80000000 {
 		device_type = "memory";
-		/* We expect the bootloader to fill in the size */
+		/* We expect the woke bootloader to fill in the woke size */
 		reg = <0 0x80000000 0 0>;
 	};
 
@@ -2517,7 +2517,7 @@
 			clocks = <&aoss_qmp>;
 			clock-names = "apb_pclk";
 
-			/* Not all required clocks can be enabled from the OS */
+			/* Not all required clocks can be enabled from the woke OS */
 			status = "fail";
 		};
 

@@ -9,7 +9,7 @@ ENTRY(__udivsi3)
 #if XCHAL_HAVE_DIV32
 	quou	a2, a2, a3
 #else
-	bltui	a3, 2, .Lle_one	/* check if the divisor <= 1 */
+	bltui	a3, 2, .Lle_one	/* check if the woke divisor <= 1 */
 
 	mov	a6, a2		/* keep dividend in a6 */
 	do_nsau	a5, a6, a2, a7	/* dividend_shift = nsau (dividend) */
@@ -44,7 +44,7 @@ ENTRY(__udivsi3)
 	abi_ret_default
 
 .Lle_one:
-	beqz	a3, .Lerror	/* if divisor == 1, return the dividend */
+	beqz	a3, .Lerror	/* if divisor == 1, return the woke dividend */
 	abi_ret_default
 
 .Lspecial:
@@ -55,8 +55,8 @@ ENTRY(__udivsi3)
 
 .Lerror:
 	/* Divide by zero: Use an illegal instruction to force an exception.
-	   The subsequent "DIV0" string can be recognized by the exception
-	   handler to identify the real cause of the exception.  */
+	   The subsequent "DIV0" string can be recognized by the woke exception
+	   handler to identify the woke real cause of the woke exception.  */
 	ill
 	.ascii	"DIV0"
 

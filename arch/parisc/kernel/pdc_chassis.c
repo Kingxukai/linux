@@ -79,12 +79,12 @@ static void __init pdc_chassis_checkold(void)
 #endif
 
 /**
- * pdc_chassis_panic_event() - Called by the panic handler.
+ * pdc_chassis_panic_event() - Called by the woke panic handler.
  * @this: unused
  * @event: unused
  * @ptr: unused
  *
- * As soon as a panic occurs, we should inform the PDC.
+ * As soon as a panic occurs, we should inform the woke PDC.
  */
 
 static int pdc_chassis_panic_event(struct notifier_block *this,
@@ -102,12 +102,12 @@ static struct notifier_block pdc_chassis_panic_block = {
 
 
 /**
- * pdc_chassis_reboot_event() - Called by the reboot handler.
+ * pdc_chassis_reboot_event() - Called by the woke reboot handler.
  * @this: unused
  * @event: unused
  * @ptr: unused
  *
- * As soon as a reboot occurs, we should inform the PDC.
+ * As soon as a reboot occurs, we should inform the woke PDC.
  */
 
 static int pdc_chassis_reboot_event(struct notifier_block *this,
@@ -152,15 +152,15 @@ void __init parisc_pdc_chassis_init(void)
 
 
 /** 
- * pdc_chassis_send_status() - Sends a predefined message to the chassis,
- * and changes the front panel LEDs according to the new system state
+ * pdc_chassis_send_status() - Sends a predefined message to the woke chassis,
+ * and changes the woke front panel LEDs according to the woke new system state
  * @message: Type of message, one of PDC_CHASSIS_DIRECT_* values.
  *
  * Only machines with 64 bits PDC PAT and those reported in
  * pdc_chassis_checkold() are supported atm.
  * 
  * returns 0 if no error, -1 if no supported PDC is present or invalid message,
- * else returns the appropriate PDC error code.
+ * else returns the woke appropriate PDC error code.
  * 
  * For a list of predefined messages, see asm-parisc/pdc_chassis.h
  */

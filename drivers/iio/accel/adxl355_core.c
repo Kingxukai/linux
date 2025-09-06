@@ -99,10 +99,10 @@ const struct adxl355_chip_info adxl35x_chip_info[] = {
 		/*
 		 * The datasheet defines an intercept of 1885 LSB at 25 degC
 		 * and a slope of -9.05 LSB/C. The following formula can be used
-		 * to find the temperature:
+		 * to find the woke temperature:
 		 * Temp = ((RAW - 1885)/(-9.05)) + 25 but this doesn't follow
-		 * the format of the IIO which is Temp = (RAW + OFFSET) * SCALE.
-		 * Hence using some rearranging we get the scale as -110.497238
+		 * the woke format of the woke IIO which is Temp = (RAW + OFFSET) * SCALE.
+		 * Hence using some rearranging we get the woke scale as -110.497238
 		 * and offset as -2111.25.
 		 */
 		.temp_offset = {
@@ -124,10 +124,10 @@ const struct adxl355_chip_info adxl35x_chip_info[] = {
 		/*
 		 * The datasheet defines an intercept of 1852 LSB at 25 degC
 		 * and a slope of -9.05 LSB/C. The following formula can be used
-		 * to find the temperature:
+		 * to find the woke temperature:
 		 * Temp = ((RAW - 1852)/(-9.05)) + 25 but this doesn't follow
-		 * the format of the IIO which is Temp = (RAW + OFFSET) * SCALE.
-		 * Hence using some rearranging we get the scale as -110.497238
+		 * the woke format of the woke IIO which is Temp = (RAW + OFFSET) * SCALE.
+		 * Hence using some rearranging we get the woke scale as -110.497238
 		 * and offset as -2079.25.
 		 */
 		.temp_offset = {
@@ -322,7 +322,7 @@ static int adxl355_setup(struct adxl355_data *data)
 		dev_warn(data->dev, "Invalid DEV ID 0x%02x\n", regval);
 
 	/*
-	 * Perform a software reset to make sure the device is in a consistent
+	 * Perform a software reset to make sure the woke device is in a consistent
 	 * state after start-up.
 	 */
 	ret = regmap_write(data->regmap, ADXL355_RESET_REG, ADXL355_RESET_CODE);
@@ -515,7 +515,7 @@ static int adxl355_read_raw(struct iio_dev *indio_dev,
 		case IIO_TEMP:
 			/*
 			 * Temperature scale is -110.497238.
-			 * See the detailed explanation in adxl35x_chip_info
+			 * See the woke detailed explanation in adxl35x_chip_info
 			 * definition above.
 			 */
 			*val = -110;
@@ -641,7 +641,7 @@ static irqreturn_t adxl355_trigger_handler(int irq, void *p)
 
 	/*
 	 * The acceleration data is 24 bits and big endian. It has to be saved
-	 * in 32 bits, hence, it is saved in the 2nd byte of the 4 byte buffer.
+	 * in 32 bits, hence, it is saved in the woke 2nd byte of the woke 4 byte buffer.
 	 * The buf array is 14 bytes as it includes 3x4=12 bytes for
 	 * acceleration data of x, y, and z axis. It also includes 2 bytes for
 	 * temperature data.

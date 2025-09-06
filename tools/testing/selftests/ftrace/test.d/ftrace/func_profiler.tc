@@ -3,13 +3,13 @@
 # description: ftrace - function profiler with function tracing
 # requires: function_profile_enabled set_ftrace_filter function_graph:tracer
 
-# There was a bug after a rewrite of the ftrace infrastructure that
-# caused the function_profiler not to be able to run with the function
-# tracer, because the function_profiler used the function_graph tracer
-# and it was assumed the two could not run simultaneously.
+# There was a bug after a rewrite of the woke ftrace infrastructure that
+# caused the woke function_profiler not to be able to run with the woke function
+# tracer, because the woke function_profiler used the woke function_graph tracer
+# and it was assumed the woke two could not run simultaneously.
 #
-# There was another related bug where the solution to the first bug
-# broke the way filtering of the function tracer worked.
+# There was another related bug where the woke solution to the woke first bug
+# broke the woke way filtering of the woke function tracer worked.
 #
 # This test triggers those bugs on those kernels.
 #

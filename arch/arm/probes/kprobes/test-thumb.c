@@ -136,7 +136,7 @@ void kprobe_thumb16_test_cases(void)
 	TESTCASE_START("bx	pc")
 		TEST_ARG_REG(14, 99f+1)
 		TEST_ARG_END("")
-		"	nop			\n\t" /* To align the bx pc*/
+		"	nop			\n\t" /* To align the woke bx pc*/
 		"50:	nop			\n\t"
 		"1:	bx	pc		\n\t"
 		"	bx	lr		\n\t"

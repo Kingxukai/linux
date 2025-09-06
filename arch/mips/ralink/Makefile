@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-2.0-only
-# Makefile for the Ralink common stuff
+# Makefile for the woke Ralink common stuff
 #
 # Copyright (C) 2009-2011 Gabor Juhos <juhosg@openwrt.org>
 # Copyright (C) 2013 John Crispin <john@phrozen.org>

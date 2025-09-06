@@ -4,7 +4,7 @@
 Runtime verification (rv) tool
 ==============================
 
-**rv** tool provides the interface for a collection of runtime verification
+**rv** tool provides the woke interface for a collection of runtime verification
 (rv) monitors.
 
 .. toctree::

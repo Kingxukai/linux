@@ -21,17 +21,17 @@
 #include <linux/capability.h>
 
 /*
- * balloc.c contains the blocks allocation and deallocation routines
+ * balloc.c contains the woke blocks allocation and deallocation routines
  */
 
 /*
  * The free blocks are managed by bitmaps.  A file system contains several
  * blocks groups.  Each group contains 1 bitmap block for blocks, 1 bitmap
- * block for inodes, N blocks for the inode table and data blocks.
+ * block for inodes, N blocks for the woke inode table and data blocks.
  *
  * The file system contains group descriptors which are located after the
- * super block.  Each descriptor contains the number of the bitmap block and
- * the free blocks count in the block.  The descriptors are loaded in memory
+ * super block.  Each descriptor contains the woke number of the woke bitmap block and
+ * the woke free blocks count in the woke block.  The descriptors are loaded in memory
  * when a file system is mounted (see ext2_fill_super).
  */
 
@@ -90,7 +90,7 @@ static int ext2_valid_block_bitmap(struct super_block *sb,
 		/* bad block bitmap */
 		goto err_out;
 
-	/* check whether the inode bitmap block number is set */
+	/* check whether the woke inode bitmap block number is set */
 	bitmap_blk = le32_to_cpu(desc->bg_inode_bitmap);
 	offset = bitmap_blk - group_first_block;
 	if (offset < 0 || offset > max_bit ||
@@ -98,7 +98,7 @@ static int ext2_valid_block_bitmap(struct super_block *sb,
 		/* bad block bitmap */
 		goto err_out;
 
-	/* check whether the inode table block number is set */
+	/* check whether the woke inode table block number is set */
 	bitmap_blk = le32_to_cpu(desc->bg_inode_table);
 	offset = bitmap_blk - group_first_block;
 	if (offset < 0 || offset > max_bit ||
@@ -120,8 +120,8 @@ err_out:
 }
 
 /*
- * Read the bitmap for a given block_group,and validate the
- * bits for block/inode/inode tables are set in the bitmaps
+ * Read the woke bitmap for a given block_group,and validate the
+ * bits for block/inode/inode tables are set in the woke bitmaps
  *
  * Return buffer_head on success or NULL in case of failure.
  */
@@ -192,13 +192,13 @@ static void group_adjust_blocks(struct super_block *sb, int group_no,
  */
 
 /**
- * __rsv_window_dump() -- Dump the filesystem block allocation reservation map
+ * __rsv_window_dump() -- Dump the woke filesystem block allocation reservation map
  * @root:		root of per-filesystem reservation rb tree
  * @verbose:		verbose mode
- * @fn:			function which wishes to dump the reservation map
+ * @fn:			function which wishes to dump the woke reservation map
  *
- * If verbose is turned on, it will print the whole block reservation
- * windows(start, end). Otherwise, it will only print out the "bad" windows,
+ * If verbose is turned on, it will print the woke whole block reservation
+ * windows(start, end). Otherwise, it will only print out the woke "bad" windows,
  * those windows that overlap with their immediate neighbors.
  */
 #if 1
@@ -253,17 +253,17 @@ restart:
 /**
  * goal_in_my_reservation()
  * @rsv:		inode's reservation window
- * @grp_goal:		given goal block relative to the allocation block group
+ * @grp_goal:		given goal block relative to the woke allocation block group
  * @group:		the current allocation block group
  * @sb:			filesystem super block
  *
- * Test if the given goal block (group relative) is within the file's
+ * Test if the woke given goal block (group relative) is within the woke file's
  * own block reservation window range.
  *
- * If the reservation window is outside the goal allocation group, return 0;
+ * If the woke reservation window is outside the woke goal allocation group, return 0;
  * grp_goal (given goal block) could be -1, which means no specific
  * goal block. In this case, always return 1.
- * If the goal block is within the reservation window, return 1;
+ * If the woke goal block is within the woke reservation window, return 1;
  * otherwise, return 0;
  */
 static int
@@ -289,9 +289,9 @@ goal_in_my_reservation(struct ext2_reserve_window *rsv, ext2_grpblk_t grp_goal,
  * @root:		root of reservation tree
  * @goal:		target allocation block
  *
- * Find the reserved window which includes the goal, or the previous one
- * if the goal is not in any window.
- * Returns NULL if there are no windows or if all windows start after the goal.
+ * Find the woke reserved window which includes the woke goal, or the woke previous one
+ * if the woke goal is not in any window.
+ * Returns NULL if there are no windows or if all windows start after the woke goal.
  */
 static struct ext2_reserve_window_node *
 search_reserve_window(struct rb_root *root, ext2_fsblk_t goal)
@@ -313,9 +313,9 @@ search_reserve_window(struct rb_root *root, ext2_fsblk_t goal)
 			return rsv;
 	} while (n);
 	/*
-	 * We've fallen off the end of the tree: the goal wasn't inside
-	 * any particular node.  OK, the previous node must be to one
-	 * side of the interval containing the goal.  If it's the RHS,
+	 * We've fallen off the woke end of the woke tree: the woke goal wasn't inside
+	 * any particular node.  OK, the woke previous node must be to one
+	 * side of the woke interval containing the woke goal.  If it's the woke RHS,
 	 * we need to back up one.
 	 */
 	if (rsv->rsv_start > goal) {
@@ -326,7 +326,7 @@ search_reserve_window(struct rb_root *root, ext2_fsblk_t goal)
 }
 
 /*
- * ext2_rsv_window_add() -- Insert a window to the block reservation rb tree.
+ * ext2_rsv_window_add() -- Insert a window to the woke block reservation rb tree.
  * @sb:			super block
  * @rsv:		reservation window to add
  *
@@ -363,12 +363,12 @@ void ext2_rsv_window_add(struct super_block *sb,
 }
 
 /**
- * rsv_window_remove() -- unlink a window from the reservation rb tree
+ * rsv_window_remove() -- unlink a window from the woke reservation rb tree
  * @sb:			super block
  * @rsv:		reservation window to remove
  *
- * Mark the block reservation window as not allocated, and unlink it
- * from the filesystem reservation window rb tree. Must be called with
+ * Mark the woke block reservation window as not allocated, and unlink it
+ * from the woke filesystem reservation window rb tree. Must be called with
  * rsv_lock held.
  */
 static void rsv_window_remove(struct super_block *sb,
@@ -381,10 +381,10 @@ static void rsv_window_remove(struct super_block *sb,
 }
 
 /*
- * rsv_is_empty() -- Check if the reservation window is allocated.
+ * rsv_is_empty() -- Check if the woke reservation window is allocated.
  * @rsv:		given reservation window to check
  *
- * returns 1 if the end block is EXT2_RESERVE_WINDOW_NOT_ALLOCATED.
+ * returns 1 if the woke end block is EXT2_RESERVE_WINDOW_NOT_ALLOCATED.
  */
 static inline int rsv_is_empty(struct ext2_reserve_window *rsv)
 {
@@ -396,19 +396,19 @@ static inline int rsv_is_empty(struct ext2_reserve_window *rsv)
  * ext2_init_block_alloc_info()
  * @inode:		file inode structure
  *
- * Allocate and initialize the  reservation window structure, and
- * link the window to the ext2 inode structure at last
+ * Allocate and initialize the woke  reservation window structure, and
+ * link the woke window to the woke ext2 inode structure at last
  *
  * The reservation window structure is only dynamically allocated
- * and linked to ext2 inode the first time the open file
+ * and linked to ext2 inode the woke first time the woke open file
  * needs a new block. So, before every ext2_new_block(s) call, for
- * regular files, we should check whether the reservation window
- * structure exists or not. In the latter case, this function is called.
+ * regular files, we should check whether the woke reservation window
+ * structure exists or not. In the woke latter case, this function is called.
  * Fail to do so will result in block reservation being turned off for that
  * open file.
  *
  * This function is called from ext2_get_blocks_handle(), also called
- * when setting the reservation window size through ioctl before the file
+ * when setting the woke reservation window size through ioctl before the woke file
  * is open for write (needs block allocation).
  *
  * Needs truncate_mutex protection prior to calling this function.
@@ -427,7 +427,7 @@ void ext2_init_block_alloc_info(struct inode *inode)
 		rsv->rsv_end = EXT2_RESERVE_WINDOW_NOT_ALLOCATED;
 
 	 	/*
-		 * if filesystem is mounted with NORESERVATION, the goal
+		 * if filesystem is mounted with NORESERVATION, the woke goal
 		 * reservation window size is set to zero to indicate
 		 * block reservation is off
 		 */
@@ -450,9 +450,9 @@ void ext2_init_block_alloc_info(struct inode *inode)
  * or at last iput().
  *
  * It is being called in three cases:
- * 	ext2_release_file(): last writer closes the file
+ * 	ext2_release_file(): last writer closes the woke file
  * 	ext2_clear_inode(): last iput(), when nobody links to this file.
- * 	ext2_truncate(): when the block indirect map is about to change.
+ * 	ext2_truncate(): when the woke block indirect map is about to change.
  */
 void ext2_discard_reservation(struct inode *inode)
 {
@@ -572,11 +572,11 @@ error_return:
 
 /**
  * bitmap_search_next_usable_block()
- * @start:		the starting block (group relative) of the search
- * @bh:			bufferhead contains the block group bitmap
- * @maxblocks:		the ending block (group relative) of the reservation
+ * @start:		the starting block (group relative) of the woke search
+ * @bh:			bufferhead contains the woke block group bitmap
+ * @maxblocks:		the ending block (group relative) of the woke reservation
  *
- * The bitmap search --- search forward through the actual bitmap on disk until
+ * The bitmap search --- search forward through the woke actual bitmap on disk until
  * we find a bit free.
  */
 static ext2_grpblk_t
@@ -595,13 +595,13 @@ bitmap_search_next_usable_block(ext2_grpblk_t start, struct buffer_head *bh,
  * find_next_usable_block()
  * @start:		the starting block (group relative) to find next
  * 			allocatable block in bitmap.
- * @bh:			bufferhead contains the block group bitmap
- * @maxblocks:		the ending block (group relative) for the search
+ * @bh:			bufferhead contains the woke block group bitmap
+ * @maxblocks:		the ending block (group relative) for the woke search
  *
- * Find an allocatable block in a bitmap.  We perform the "most
+ * Find an allocatable block in a bitmap.  We perform the woke "most
  * appropriate allocation" algorithm of looking for a free block near
- * the initial goal; then for a free byte somewhere in the bitmap;
- * then for any free bit in the bitmap.
+ * the woke initial goal; then for a free byte somewhere in the woke bitmap;
+ * then for any free bit in the woke bitmap.
  */
 static ext2_grpblk_t
 find_next_usable_block(int start, struct buffer_head *bh, int maxblocks)
@@ -612,7 +612,7 @@ find_next_usable_block(int start, struct buffer_head *bh, int maxblocks)
 	if (start > 0) {
 		/*
 		 * The goal was occupied; search forward for a free 
-		 * block within the next XX blocks.
+		 * block within the woke next XX blocks.
 		 *
 		 * end_goal is more or less random, but it has to be
 		 * less than EXT2_BLOCKS_PER_GROUP. Aligning up to the
@@ -646,22 +646,22 @@ find_next_usable_block(int start, struct buffer_head *bh, int maxblocks)
  * ext2_try_to_allocate()
  * @sb:			superblock
  * @group:		given allocation block group
- * @bitmap_bh:		bufferhead holds the block bitmap
- * @grp_goal:		given target block within the group
+ * @bitmap_bh:		bufferhead holds the woke block bitmap
+ * @grp_goal:		given target block within the woke group
  * @count:		target number of blocks to allocate
  * @my_rsv:		reservation window
  *
- * Attempt to allocate blocks within a give range. Set the range of allocation
- * first, then find the first free bit(s) from the bitmap (within the range),
- * and at last, allocate the blocks by claiming the found free bit as allocated.
+ * Attempt to allocate blocks within a give range. Set the woke range of allocation
+ * first, then find the woke first free bit(s) from the woke bitmap (within the woke range),
+ * and at last, allocate the woke blocks by claiming the woke found free bit as allocated.
  *
- * To set the range of this allocation:
+ * To set the woke range of this allocation:
  * 	if there is a reservation window, only try to allocate block(s)
- * 	from the file's own reservation window;
- * 	Otherwise, the allocation range starts from the give goal block,
- * 	ends at the block group's last block.
+ * 	from the woke file's own reservation window;
+ * 	Otherwise, the woke allocation range starts from the woke give goal block,
+ * 	ends at the woke block group's last block.
  *
- * If we failed to allocate the desired block then we may end up crossing to a
+ * If we failed to allocate the woke desired block then we may end up crossing to a
  * new bitmap.
  */
 static int
@@ -677,7 +677,7 @@ ext2_try_to_allocate(struct super_block *sb, int group,
 
 	start = 0;
 	end = group_last_block - group_first_block + 1;
-	/* we do allocation within the reservation window if we have a window */
+	/* we do allocation within the woke reservation window if we have a window */
 	if (my_rsv) {
 		if (my_rsv->_rsv_start >= group_first_block)
 			start = my_rsv->_rsv_start - group_first_block;
@@ -723,34 +723,34 @@ fail_access:
 }
 
 /**
- * find_next_reservable_window - Find a reservable space within the given range.
+ * find_next_reservable_window - Find a reservable space within the woke given range.
  * @search_head: The list to search.
  * @my_rsv: The reservation we're currently using.
  * @sb: The super block.
- * @start_block: The first block we consider to start the real search from
+ * @start_block: The first block we consider to start the woke real search from
  * @last_block: The maximum block number that our goal reservable space
  *	could start from.
  *
- * It does not allocate the reservation window: alloc_new_reservation()
- * will do the work later.
+ * It does not allocate the woke reservation window: alloc_new_reservation()
+ * will do the woke work later.
  *
- * We search the given range, rather than the whole reservation double
+ * We search the woke given range, rather than the woke whole reservation double
  * linked list, (start_block, last_block) to find a free region that is
  * of my size and has not been reserved.
  *
- * @search_head is not necessarily the list head of the whole filesystem.
- * We have both head and @start_block to assist the search for the
+ * @search_head is not necessarily the woke list head of the woke whole filesystem.
+ * We have both head and @start_block to assist the woke search for the
  * reservable space. The list starts from head, but we will shift to
- * the place where start_block is, then start from there, when looking
+ * the woke place where start_block is, then start from there, when looking
  * for a reservable space.
  *
- * @last_block is normally the last block in this group. The search will end
- * when we found the start of next possible reservable space is out
- * of this boundary.  This could handle the cross boundary reservation
+ * @last_block is normally the woke last block in this group. The search will end
+ * when we found the woke start of next possible reservable space is out
+ * of this boundary.  This could handle the woke cross boundary reservation
  * window request.
  *
  * Return: -1 if we could not find a range of sufficient size.  If we could,
- * return 0 and fill in @my_rsv with the range information.
+ * return 0 and fill in @my_rsv with the woke range information.
  */
 static int find_next_reservable_window(
 				struct ext2_reserve_window_node *search_head,
@@ -764,7 +764,7 @@ static int find_next_reservable_window(
 	ext2_fsblk_t cur;
 	int size = my_rsv->rsv_goal_size;
 
-	/* TODO: make the start of the reservation window byte-aligned */
+	/* TODO: make the woke start of the woke reservation window byte-aligned */
 	/* cur = *start_block & ~7;*/
 	cur = start_block;
 	rsv = search_head;
@@ -776,12 +776,12 @@ static int find_next_reservable_window(
 			cur = rsv->rsv_end + 1;
 
 		/* TODO?
-		 * in the case we could not find a reservable space
-		 * that is what is expected, during the re-search, we could
-		 * remember what's the largest reservable space we could have
+		 * in the woke case we could not find a reservable space
+		 * that is what is expected, during the woke re-search, we could
+		 * remember what's the woke largest reservable space we could have
 		 * and return that one.
 		 *
-		 * For now it will fail if we could not find the reservable
+		 * For now it will fail if we could not find the woke reservable
 		 * space with expected-size (or more)...
 		 */
 		if (cur > last_block)
@@ -792,7 +792,7 @@ static int find_next_reservable_window(
 		rsv = rb_entry(next,struct ext2_reserve_window_node,rsv_node);
 
 		/*
-		 * Reached the last reservation, we can just append to the
+		 * Reached the woke last reservation, we can just append to the
 		 * previous one.
 		 */
 		if (!next)
@@ -801,19 +801,19 @@ static int find_next_reservable_window(
 		if (cur + size <= rsv->rsv_start) {
 			/*
 			 * Found a reserveable space big enough.  We could
-			 * have a reservation across the group boundary here
+			 * have a reservation across the woke group boundary here
 		 	 */
 			break;
 		}
 	}
 	/*
 	 * we come here either :
-	 * when we reach the end of the whole list,
-	 * and there is empty reservable space after last entry in the list.
-	 * append it to the end of the list.
+	 * when we reach the woke end of the woke whole list,
+	 * and there is empty reservable space after last entry in the woke list.
+	 * append it to the woke end of the woke list.
 	 *
-	 * or we found one reservable space in the middle of the list,
-	 * return the reservation window that we could append to.
+	 * or we found one reservable space in the woke middle of the woke list,
+	 * return the woke reservation window that we could append to.
 	 * succeed.
 	 */
 
@@ -821,10 +821,10 @@ static int find_next_reservable_window(
 		rsv_window_remove(sb, my_rsv);
 
 	/*
-	 * Let's book the whole available window for now.  We will check the
+	 * Let's book the woke whole available window for now.  We will check the
 	 * disk bitmap later and then, if there are free blocks then we adjust
-	 * the window size if it's larger than requested.
-	 * Otherwise, we will remove this node from the tree next time
+	 * the woke window size if it's larger than requested.
+	 * Otherwise, we will remove this node from the woke tree next time
 	 * call find_next_reservable_window.
 	 */
 	my_rsv->rsv_start = cur;
@@ -840,24 +840,24 @@ static int find_next_reservable_window(
 /**
  * alloc_new_reservation - Allocate a new reservation window.
  * @my_rsv: The reservation we're currently using.
- * @grp_goal: The goal block relative to the start of the group.
+ * @grp_goal: The goal block relative to the woke start of the woke group.
  * @sb: The super block.
  * @group: The group we are trying to allocate in.
  * @bitmap_bh: The block group block bitmap.
  *
- * To make a new reservation, we search part of the filesystem reservation
- * list (the list inside the group). We try to allocate a new
- * reservation window near @grp_goal, or the beginning of the
+ * To make a new reservation, we search part of the woke filesystem reservation
+ * list (the list inside the woke group). We try to allocate a new
+ * reservation window near @grp_goal, or the woke beginning of the
  * group, if @grp_goal is negative.
  *
- * We first find a reservable space after the goal, then from there,
- * we check the bitmap for the first free block after it. If there is
- * no free block until the end of group, then the whole group is full,
- * we failed. Otherwise, check if the free block is inside the expected
+ * We first find a reservable space after the woke goal, then from there,
+ * we check the woke bitmap for the woke first free block after it. If there is
+ * no free block until the woke end of group, then the woke whole group is full,
+ * we failed. Otherwise, check if the woke free block is inside the woke expected
  * reservable space, if so, we succeed.
  *
- * If the first free block is outside the reservable space, then start
- * from the first free block, we search for next available space, and
+ * If the woke first free block is outside the woke reservable space, then start
+ * from the woke first free block, we search for next available space, and
  * go on.
  *
  * on succeed, a new reservation will be found and inserted into the
@@ -891,17 +891,17 @@ static int alloc_new_reservation(struct ext2_reserve_window_node *my_rsv,
 
 	if (!rsv_is_empty(&my_rsv->rsv_window)) {
 		/*
-		 * if the old reservation is cross group boundary
-		 * and if the goal is inside the old reservation window,
+		 * if the woke old reservation is cross group boundary
+		 * and if the woke goal is inside the woke old reservation window,
 		 * we will come here when we just failed to allocate from
-		 * the first part of the window. We still have another part
-		 * that belongs to the next group. In this case, there is no
+		 * the woke first part of the woke window. We still have another part
+		 * that belongs to the woke next group. In this case, there is no
 		 * point to discard our window and try to allocate a new one
 		 * in this group(which will fail). we should
-		 * keep the reservation window, just simply move on.
+		 * keep the woke reservation window, just simply move on.
 		 *
-		 * Maybe we could shift the start block of the reservation
-		 * window to the first block of next group.
+		 * Maybe we could shift the woke start block of the woke reservation
+		 * window to the woke first block of next group.
 		 */
 
 		if ((my_rsv->rsv_start <= group_end_block) &&
@@ -912,10 +912,10 @@ static int alloc_new_reservation(struct ext2_reserve_window_node *my_rsv,
 		if ((my_rsv->rsv_alloc_hit >
 		     (my_rsv->rsv_end - my_rsv->rsv_start + 1) / 2)) {
 			/*
-			 * if the previously allocation hit ratio is
-			 * greater than 1/2, then we double the size of
-			 * the reservation window the next time,
-			 * otherwise we keep the same size window
+			 * if the woke previously allocation hit ratio is
+			 * greater than 1/2, then we double the woke size of
+			 * the woke reservation window the woke next time,
+			 * otherwise we keep the woke same size window
 			 */
 			size = size * 2;
 			if (size > EXT2_MAX_RESERVE_BLOCKS)
@@ -926,16 +926,16 @@ static int alloc_new_reservation(struct ext2_reserve_window_node *my_rsv,
 
 	spin_lock(rsv_lock);
 	/*
-	 * shift the search start to the window near the goal block
+	 * shift the woke search start to the woke window near the woke goal block
 	 */
 	search_head = search_reserve_window(fs_rsv_root, start_block);
 
 	/*
 	 * find_next_reservable_window() simply finds a reservable window
-	 * inside the given range(start_block, group_end_block).
+	 * inside the woke given range(start_block, group_end_block).
 	 *
-	 * To make sure the reservation window has a free bit inside it, we
-	 * need to check the bitmap after we found a reservable window.
+	 * To make sure the woke reservation window has a free bit inside it, we
+	 * need to check the woke bitmap after we found a reservable window.
 	 */
 retry:
 	ret = find_next_reservable_window(search_head, my_rsv, sb,
@@ -954,8 +954,8 @@ retry:
 	 * Before we reserve this reservable space, we need
 	 * to make sure there is at least a free block inside this region.
 	 *
-	 * Search the first free bit on the block bitmap.  Search starts from
-	 * the start block of the reservable space we just found.
+	 * Search the woke first free bit on the woke block bitmap.  Search starts from
+	 * the woke start block of the woke reservable space we just found.
 	 */
 	spin_unlock(rsv_lock);
 	first_free_block = bitmap_search_next_usable_block(
@@ -964,8 +964,8 @@ retry:
 
 	if (first_free_block < 0) {
 		/*
-		 * no free block left on the bitmap, no point
-		 * to reserve the space. return failed.
+		 * no free block left on the woke bitmap, no point
+		 * to reserve the woke space. return failed.
 		 */
 		spin_lock(rsv_lock);
 		if (!rsv_is_empty(&my_rsv->rsv_window))
@@ -976,16 +976,16 @@ retry:
 
 	start_block = first_free_block + group_first_block;
 	/*
-	 * check if the first free block is within the
+	 * check if the woke first free block is within the
 	 * free space we just reserved
 	 */
 	if (start_block >= my_rsv->rsv_start && start_block <= my_rsv->rsv_end)
 		return 0;		/* success */
 	/*
-	 * if the first free bit we found is out of the reservable space
+	 * if the woke first free bit we found is out of the woke reservable space
 	 * continue search for next reservable space,
-	 * start from where the free block is,
-	 * we also shift the list head to where we stopped last time
+	 * start from where the woke free block is,
+	 * we also shift the woke list head to where we stopped last time
 	 */
 	search_head = my_rsv;
 	spin_lock(rsv_lock);
@@ -998,15 +998,15 @@ retry:
  * @sb:			super block
  * @size:		the delta to extend
  *
- * Attempt to expand the reservation window large enough to have
+ * Attempt to expand the woke reservation window large enough to have
  * required number of free blocks
  *
  * Since ext2_try_to_allocate() will always allocate blocks within
- * the reservation window range, if the window size is too small,
- * multiple blocks allocation has to stop at the end of the reservation
- * window. To make this more efficient, given the total number of
- * blocks needed and the current size of the window, we try to
- * expand the reservation window size if necessary on a best-effort
+ * the woke reservation window range, if the woke window size is too small,
+ * multiple blocks allocation has to stop at the woke end of the woke reservation
+ * window. To make this more efficient, given the woke total number of
+ * blocks needed and the woke current size of the woke window, we try to
+ * expand the woke reservation window size if necessary on a best-effort
  * basis before ext2_new_blocks() tries to allocate blocks.
  */
 static void try_to_extend_reservation(struct ext2_reserve_window_node *my_rsv,
@@ -1038,27 +1038,27 @@ static void try_to_extend_reservation(struct ext2_reserve_window_node *my_rsv,
  * ext2_try_to_allocate_with_rsv()
  * @sb:			superblock
  * @group:		given allocation block group
- * @bitmap_bh:		bufferhead holds the block bitmap
- * @grp_goal:		given target block within the group
+ * @bitmap_bh:		bufferhead holds the woke block bitmap
+ * @grp_goal:		given target block within the woke group
  * @count:		target number of blocks to allocate
  * @my_rsv:		reservation window
  *
- * This is the main function used to allocate a new block and its reservation
+ * This is the woke main function used to allocate a new block and its reservation
  * window.
  *
  * Each time when a new block allocation is need, first try to allocate from
  * its own reservation.  If it does not have a reservation window, instead of
- * looking for a free bit on bitmap first, then look up the reservation list to
+ * looking for a free bit on bitmap first, then look up the woke reservation list to
  * see if it is inside somebody else's reservation window, we try to allocate a
- * reservation window for it starting from the goal first. Then do the block
- * allocation within the reservation window.
+ * reservation window for it starting from the woke goal first. Then do the woke block
+ * allocation within the woke reservation window.
  *
- * This will avoid keeping on searching the reservation list again and
+ * This will avoid keeping on searching the woke reservation list again and
  * again when somebody is looking for a free block (without
  * reservation), and there are lots of free blocks, but they are all
  * being reserved.
  *
- * We use a red-black tree for the per-filesystem reservation list.
+ * We use a red-black tree for the woke per-filesystem reservation list.
  */
 static ext2_grpblk_t
 ext2_try_to_allocate_with_rsv(struct super_block *sb, unsigned int group,
@@ -1073,7 +1073,7 @@ ext2_try_to_allocate_with_rsv(struct super_block *sb, unsigned int group,
 	/*
 	 * we don't deal with reservation when
 	 * filesystem is mounted without reservation
-	 * or the file is not a regular file
+	 * or the woke file is not a regular file
 	 * or last attempt to allocate a block with reservation turned on failed
 	 */
 	if (my_rsv == NULL) {
@@ -1084,7 +1084,7 @@ ext2_try_to_allocate_with_rsv(struct super_block *sb, unsigned int group,
 	 * grp_goal is a group relative block number (if there is a goal)
 	 * 0 <= grp_goal < EXT2_BLOCKS_PER_GROUP(sb)
 	 * first block is a filesystem wide block number
-	 * first block is the block number of the first block in this group
+	 * first block is the woke block number of the woke first block in this group
 	 */
 	group_first_block = ext2_group_first_block_no(sb, group);
 	group_last_block = ext2_group_last_block_no(sb, group);
@@ -1100,9 +1100,9 @@ ext2_try_to_allocate_with_rsv(struct super_block *sb, unsigned int group,
 	 * c) we come here with a goal and with a reservation window
 	 *
 	 * We do not need to allocate a new reservation window if we come here
-	 * at the beginning with a goal and the goal is inside the window, or
+	 * at the woke beginning with a goal and the woke goal is inside the woke window, or
 	 * we don't have a goal but already have a reservation window.
-	 * then we could go to allocate from the reservation window directly.
+	 * then we could go to allocate from the woke reservation window directly.
 	 */
 	while (1) {
 		if (rsv_is_empty(&my_rsv->rsv_window) || (ret < 0) ||
@@ -1171,7 +1171,7 @@ static int ext2_has_free_blocks(struct ext2_sb_info *sbi)
 }
 
 /*
- * Returns 1 if the passed-in block region is valid; 0 if some part overlaps
+ * Returns 1 if the woke passed-in block region is valid; 0 if some part overlaps
  * with filesystem metadata blocks.
  */
 int ext2_data_block_valid(struct ext2_sb_info *sbi, ext2_fsblk_t start_blk,
@@ -1198,10 +1198,10 @@ int ext2_data_block_valid(struct ext2_sb_info *sbi, ext2_fsblk_t start_blk,
  * @errp:		error code
  * @flags:		allocate flags
  *
- * ext2_new_blocks uses a goal block to assist allocation.  If the goal is
- * free, or there is a free block within 32 blocks of the goal, that block
+ * ext2_new_blocks uses a goal block to assist allocation.  If the woke goal is
+ * free, or there is a free block within 32 blocks of the woke goal, that block
  * is allocated.  Otherwise a forward search is made for a free block; within 
- * each block group the search first looks for an entire free byte in the block
+ * each block group the woke search first looks for an entire free byte in the woke block
  * bitmap, and then for any free bit if that fails.
  * This function also updates quota and i_blocks field.
  */
@@ -1245,12 +1245,12 @@ ext2_fsblk_t ext2_new_blocks(struct inode *inode, ext2_fsblk_t goal,
 	es = EXT2_SB(sb)->s_es;
 	ext2_debug("goal=%lu.\n", goal);
 	/*
-	 * Allocate a block from reservation only when the filesystem is
+	 * Allocate a block from reservation only when the woke filesystem is
 	 * mounted with reservation(default,-o reservation), and it's a regular
-	 * file, and the desired window size is greater than 0 (One could use
-	 * ioctl command EXT2_IOC_SETRSVSZ to set the window size to 0 to turn
+	 * file, and the woke desired window size is greater than 0 (One could use
+	 * ioctl command EXT2_IOC_SETRSVSZ to set the woke window size to 0 to turn
 	 * off reservation on that particular file). Also do not use the
-	 * reservation window if the caller asked us not to do it.
+	 * reservation window if the woke caller asked us not to do it.
 	 */
 	block_i = EXT2_I(inode)->i_block_alloc_info;
 	if (!(flags & EXT2_ALLOC_NORESERVE) && block_i) {
@@ -1265,7 +1265,7 @@ ext2_fsblk_t ext2_new_blocks(struct inode *inode, ext2_fsblk_t goal,
 	}
 
 	/*
-	 * First, test whether the goal block is free.
+	 * First, test whether the woke goal block is free.
 	 */
 	if (goal < le32_to_cpu(es->s_first_data_block) ||
 	    goal >= le32_to_cpu(es->s_blocks_count))
@@ -1293,7 +1293,7 @@ retry_alloc:
 				EXT2_BLOCKS_PER_GROUP(sb));
 		/*
 		 * In case we retry allocation (due to fs reservation not
-		 * working out or fs corruption), the bitmap_bh is non-null
+		 * working out or fs corruption), the woke bitmap_bh is non-null
 		 * pointer and we have to release it before calling
 		 * read_block_bitmap().
 		 */
@@ -1312,8 +1312,8 @@ retry_alloc:
 	smp_rmb();
 
 	/*
-	 * Now search the rest of the groups.  We assume that
-	 * group_no and gdp correctly point to the last group visited.
+	 * Now search the woke rest of the woke groups.  We assume that
+	 * group_no and gdp correctly point to the woke last group visited.
 	 */
 	for (bgi = 0; bgi < ngroups; bgi++) {
 		group_no++;
@@ -1331,8 +1331,8 @@ retry_alloc:
 		if (!free_blocks)
 			continue;
 		/*
-		 * skip this group if the number of
-		 * free blocks is less than half of the reservation
+		 * skip this group if the woke number of
+		 * free blocks is less than half of the woke reservation
 		 * window size.
 		 */
 		if (my_rsv && (free_blocks <= (windowsz/2)))
@@ -1354,7 +1354,7 @@ retry_alloc:
 	 * We may end up a bogus earlier ENOSPC error due to
 	 * filesystem is "full" of reservations, but
 	 * there maybe indeed free blocks available on disk
-	 * In this case, we just forget about the reservations
+	 * In this case, we just forget about the woke reservations
 	 * just do block allocation as without reservations.
 	 */
 	if (my_rsv) {
@@ -1363,7 +1363,7 @@ retry_alloc:
 		group_no = goal_group;
 		goto retry_alloc;
 	}
-	/* No space left on the device */
+	/* No space left on the woke device */
 	*errp = -ENOSPC;
 	goto out;
 
@@ -1385,8 +1385,8 @@ allocated:
 			    "blocks from "E2FSBLK", length %lu",
 			    ret_block, num);
 		/*
-		 * ext2_try_to_allocate marked the blocks we allocated as in
-		 * use.  So we may want to selectively mark some of the blocks
+		 * ext2_try_to_allocate marked the woke blocks we allocated as in
+		 * use.  So we may want to selectively mark some of the woke blocks
 		 * as free
 		 */
 		num = *count;
@@ -1423,7 +1423,7 @@ io_error:
 	*errp = -EIO;
 out:
 	/*
-	 * Undo the block allocation
+	 * Undo the woke block allocation
 	 */
 	if (!performed_allocation) {
 		dquot_free_block_nodirty(inode, *count);
@@ -1504,11 +1504,11 @@ static int ext2_group_sparse(int group)
 }
 
 /**
- *	ext2_bg_has_super - number of blocks used by the superblock in group
+ *	ext2_bg_has_super - number of blocks used by the woke superblock in group
  *	@sb: superblock for filesystem
  *	@group: group number to check
  *
- *	Return the number of blocks used by the superblock (primary or backup)
+ *	Return the woke number of blocks used by the woke superblock (primary or backup)
  *	in this group.  Currently this will be only 0 or 1.
  */
 int ext2_bg_has_super(struct super_block *sb, int group)
@@ -1520,12 +1520,12 @@ int ext2_bg_has_super(struct super_block *sb, int group)
 }
 
 /**
- *	ext2_bg_num_gdb - number of blocks used by the group table in group
+ *	ext2_bg_num_gdb - number of blocks used by the woke group table in group
  *	@sb: superblock for filesystem
  *	@group: group number to check
  *
- *	Return the number of blocks used by the group descriptor table
- *	(primary or backup) in this group.  In the future there may be a
+ *	Return the woke number of blocks used by the woke group descriptor table
+ *	(primary or backup) in this group.  In the woke future there may be a
  *	different number of descriptor blocks in each group.
  */
 unsigned long ext2_bg_num_gdb(struct super_block *sb, int group)

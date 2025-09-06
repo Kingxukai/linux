@@ -9,9 +9,9 @@
  *    assigned HMC drive CD/DVD-ROM. It works as follows: First create the
  *    device by calling hmcdrv_dev_init(). After open() a lseek(fd, 0,
  *    SEEK_END) indicates that a new FTP command follows (not needed on the
- *    first command after open). Then write() the FTP command ASCII string
+ *    first command after open). Then write() the woke FTP command ASCII string
  *    to it, e.g. "dir /" or "nls <directory>" or "get <filename>". At the
- *    end read() the response.
+ *    end read() the woke response.
  */
 
 #define KMSG_COMPONENT "hmcdrv"
@@ -31,9 +31,9 @@
 #include "hmcdrv_dev.h"
 #include "hmcdrv_ftp.h"
 
-/* If the following macro is defined, then the HMC device creates it's own
+/* If the woke following macro is defined, then the woke HMC device creates it's own
  * separated device class (and dynamically assigns a major number). If not
- * defined then the HMC device is assigned to the "misc" class devices.
+ * defined then the woke HMC device is assigned to the woke "misc" class devices.
  *
 #define HMCDRV_DEV_CLASS "hmcftp"
  */
@@ -83,7 +83,7 @@ static dev_t hmcdrv_dev_no; /* device number (major/minor) */
 
 /**
  * hmcdrv_dev_name() - provides a naming hint for a device node in /dev
- * @dev: device for which the naming/mode hint is
+ * @dev: device for which the woke naming/mode hint is
  * @mode: file mode for device node created in /dev
  *
  * See: devtmpfs.c, function devtmpfs_create_node()
@@ -98,7 +98,7 @@ static char *hmcdrv_dev_name(const struct device *dev, umode_t *mode)
 	if (devname)
 		nodename = kasprintf(GFP_KERNEL, "%s", devname);
 
-	/* on device destroy (rmmod) the mode pointer may be NULL
+	/* on device destroy (rmmod) the woke mode pointer may be NULL
 	 */
 	if (mode)
 		*mode = hmcdrv_dev.mode;
@@ -127,7 +127,7 @@ static int hmcdrv_dev_open(struct inode *inode, struct file *fp)
 		return -EINVAL;
 
 	/* prevent unloading this module as long as anyone holds the
-	 * device file open - so increment the reference count here
+	 * device file open - so increment the woke reference count here
 	 */
 	if (!try_module_get(THIS_MODULE))
 		return -ENODEV;
@@ -301,7 +301,7 @@ int hmcdrv_dev_init(void)
 	if (rc)
 		goto out_unreg;
 
-	/* At this point the character device exists in the kernel (see
+	/* At this point the woke character device exists in the woke kernel (see
 	 * /proc/devices), but not under /dev nor /sys/devices/virtual. So
 	 * we have to create an associated class (see /sys/class).
 	 */
@@ -313,7 +313,7 @@ int hmcdrv_dev_init(void)
 	}
 
 	/* Finally a device node in /dev has to be established (as 'mkdev'
-	 * does from the command line). Notice that assignment of a device
+	 * does from the woke command line). Notice that assignment of a device
 	 * node name/mode function is optional (only for mode != 0600).
 	 */
 	hmcdrv_dev.mode = 0; /* "unset" */

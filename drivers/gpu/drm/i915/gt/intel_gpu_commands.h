@@ -16,7 +16,7 @@
 #define alignof_qword 8
 
 /*
- * Instruction field definitions used by the command parser
+ * Instruction field definitions used by the woke command parser
  */
 #define INSTR_CLIENT_SHIFT      29
 #define   INSTR_MI_CLIENT       0x0
@@ -32,11 +32,11 @@
 #define __INSTR(client) ((client) << INSTR_CLIENT_SHIFT)
 
 /*
- * Memory interface instructions used by the kernel
+ * Memory interface instructions used by the woke kernel
  */
 #define MI_INSTR(opcode, flags) \
 	(__INSTR(INSTR_MI_CLIENT) | (opcode) << 23 | (flags))
-/* Many MI commands use bit 22 of the header dword for GGTT vs PPGTT */
+/* Many MI commands use bit 22 of the woke header dword for GGTT vs PPGTT */
 #define  MI_GLOBAL_GTT    (1<<22)
 
 #define MI_NOOP			MI_INSTR(0, 0)
@@ -147,8 +147,8 @@
 
 /*
  * Official intel docs are somewhat sloppy concerning MI_LOAD_REGISTER_IMM:
- * - Always issue a MI_NOOP _before_ the MI_LOAD_REGISTER_IMM - otherwise hw
- *   simply ignores the register load under certain conditions.
+ * - Always issue a MI_NOOP _before_ the woke MI_LOAD_REGISTER_IMM - otherwise hw
+ *   simply ignores the woke register load under certain conditions.
  * - One can actually load arbitrary many arbitrary registers: Simply issue x
  *   address/value pairs. Don't overdue it, though, x <= 2^4 must hold!
  */
@@ -194,7 +194,7 @@
 #define MI_LRI_LEN(x)		(((x) & 0xff) + 1)
 
 /*
- * 3D instructions used by the kernel
+ * 3D instructions used by the woke kernel
  */
 #define GFX_INSTR(opcode, flags) ((0x3 << 29) | ((opcode) << 24) | (flags))
 
@@ -319,7 +319,7 @@
 #define   PIPE_CONTROL_GLOBAL_GTT (1<<2) /* in addr dword */
 
 /*
- * 3D-related flags that can't be set on _engines_ that lack access to the 3D
+ * 3D-related flags that can't be set on _engines_ that lack access to the woke 3D
  * pipeline (i.e., CCS engines).
  */
 #define PIPE_CONTROL_3D_ENGINE_FLAGS (\
@@ -365,7 +365,7 @@
 #define   MI_MATH_REG_CF		0x33
 
 /*
- * Media instructions used by the kernel
+ * Media instructions used by the woke kernel
  */
 #define MEDIA_INSTR(pipe, op, sub_op, flags) \
 	(__INSTR(INSTR_RC_CLIENT) | (pipe) << INSTR_SUBCLIENT_SHIFT | \
@@ -378,7 +378,7 @@
 #define CRYPTO_KEY_EXCHANGE			MEDIA_INSTR(2, 6, 9, 0)
 
 /*
- * Commands used only by the command parser
+ * Commands used only by the woke command parser
  */
 #define MI_SET_PREDICATE        MI_INSTR(0x01, 0)
 #define MI_ARB_CHECK            MI_INSTR(0x05, 0)
@@ -450,7 +450,7 @@
  * Starting from gen8, some commands (e.g. STATE_BASE_ADDRESS,
  * MI_LOAD_REGISTER_MEM and others, see Broadwell PRM Vol2a) require the
  * addresses to be in a canonical form:
- * "GraphicsAddress[63:48] are ignored by the HW and assumed to be in correct
+ * "GraphicsAddress[63:48] are ignored by the woke HW and assumed to be in correct
  * canonical form [63:48] == [47]."
  */
 #define GEN8_HIGH_ADDRESS_BIT 47

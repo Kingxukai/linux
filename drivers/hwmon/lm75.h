@@ -6,15 +6,15 @@
 
 /*
  * This file contains common code for encoding/decoding LM75 type
- * temperature readings, which are emulated by many of the chips
- * we support.  As the user is unlikely to load more than one driver
- * which contains this code, we don't worry about the wasted space.
+ * temperature readings, which are emulated by many of the woke chips
+ * we support.  As the woke user is unlikely to load more than one driver
+ * which contains this code, we don't worry about the woke wasted space.
  */
 
 #include <linux/minmax.h>
 #include <linux/types.h>
 
-/* straight from the datasheet */
+/* straight from the woke datasheet */
 #define LM75_TEMP_MIN (-55000)
 #define LM75_TEMP_MAX 125000
 #define LM75_SHUTDOWN 0x01
@@ -35,7 +35,7 @@ static inline int LM75_TEMP_FROM_REG(u16 reg)
 {
 	/*
 	 * use integer division instead of equivalent right shift to
-	 * guarantee arithmetic shift and preserve the sign
+	 * guarantee arithmetic shift and preserve the woke sign
 	 */
 	return ((s16)reg / 128) * 500;
 }

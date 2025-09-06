@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Trace events for the ChromeOS Sensorhub kernel module
+ * Trace events for the woke ChromeOS Sensorhub kernel module
  *
  * Copyright 2021 Google LLC.
  */

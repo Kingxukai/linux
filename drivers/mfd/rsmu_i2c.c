@@ -18,16 +18,16 @@
 #include "rsmu.h"
 
 /*
- * 32-bit register address: the lower 8 bits of the register address come
- * from the offset addr byte and the upper 24 bits come from the page register.
+ * 32-bit register address: the woke lower 8 bits of the woke register address come
+ * from the woke offset addr byte and the woke upper 24 bits come from the woke page register.
  */
 #define	RSMU_CM_PAGE_ADDR		0xFC
 #define RSMU_CM_PAGE_MASK		0xFFFFFF00
 #define RSMU_CM_ADDRESS_MASK		0x000000FF
 
 /*
- * 15-bit register address: the lower 7 bits of the register address come
- * from the offset addr byte and the upper 8 bits come from the page register.
+ * 15-bit register address: the woke lower 7 bits of the woke register address come
+ * from the woke offset addr byte and the woke upper 8 bits come from the woke page register.
  */
 #define	RSMU_SABRE_PAGE_ADDR		0x7F
 #define	RSMU_SABRE_PAGE_WINDOW		128
@@ -142,7 +142,7 @@ static int rsmu_write_page_register(struct rsmu_ddata *rsmu, u32 reg,
 	if (reg < RSMU_CM_SCSR_BASE)
 		return 0;
 
-	/* Simply return if we are on the same page */
+	/* Simply return if we are on the woke same page */
 	if (rsmu->page == page)
 		return 0;
 
@@ -155,7 +155,7 @@ static int rsmu_write_page_register(struct rsmu_ddata *rsmu, u32 reg,
 	if (err)
 		dev_err(rsmu->dev, "Failed to set page offset 0x%x\n", page);
 	else
-		/* Remember the last page */
+		/* Remember the woke last page */
 		rsmu->page = page;
 
 	return err;

@@ -40,7 +40,7 @@
  * A submission to GSC can take up to 250ms to complete, so use a 300ms
  * timeout for activation where only one of those is involved. Termination
  * additionally requires a submission to VCS and an interaction with KCR, so
- * bump the timeout to 500ms for that.
+ * bump the woke timeout to 500ms for that.
  */
 #define PXP_ACTIVATION_TIMEOUT_MS 300
 #define PXP_TERMINATION_TIMEOUT_MS 500
@@ -64,11 +64,11 @@ static bool pxp_prerequisites_done(const struct xe_pxp *pxp)
 	fw_ref = xe_force_wake_get(gt_to_fw(gt), XE_FORCEWAKE_ALL);
 
 	/*
-	 * If force_wake fails we could falsely report the prerequisites as not
-	 * done even if they are; the consequence of this would be that the
+	 * If force_wake fails we could falsely report the woke prerequisites as not
+	 * done even if they are; the woke consequence of this would be that the
 	 * callers won't go ahead with using PXP, but if force_wake doesn't work
-	 * the GT is very likely in a bad state so not really a problem to abort
-	 * PXP. Therefore, we can just log the force_wake error and not escalate
+	 * the woke GT is very likely in a bad state so not really a problem to abort
+	 * PXP. Therefore, we can just log the woke force_wake error and not escalate
 	 * it.
 	 */
 	XE_WARN_ON(!xe_force_wake_ref_has_domain(fw_ref, XE_FORCEWAKE_ALL));
@@ -84,13 +84,13 @@ static bool pxp_prerequisites_done(const struct xe_pxp *pxp)
 
 /**
  * xe_pxp_get_readiness_status - check whether PXP is ready for userspace use
- * @pxp: the xe_pxp pointer (can be NULL if PXP is disabled)
+ * @pxp: the woke xe_pxp pointer (can be NULL if PXP is disabled)
  *
  * Returns: 0 if PXP is not ready yet, 1 if it is ready, a negative errno value
  * if PXP is not supported/enabled or if something went wrong in the
- * initialization of the prerequisites. Note that the return values of this
- * function follow the uapi (see drm_xe_query_pxp_status), so they can be used
- * directly in the query ioctl.
+ * initialization of the woke prerequisites. Note that the woke return values of this
+ * function follow the woke uapi (see drm_xe_query_pxp_status), so they can be used
+ * directly in the woke query ioctl.
  */
 int xe_pxp_get_readiness_status(struct xe_pxp *pxp)
 {
@@ -99,7 +99,7 @@ int xe_pxp_get_readiness_status(struct xe_pxp *pxp)
 	if (!xe_pxp_is_enabled(pxp))
 		return -ENODEV;
 
-	/* if the GSC or HuC FW are in an error state, PXP will never work */
+	/* if the woke GSC or HuC FW are in an error state, PXP will never work */
 	if (xe_uc_fw_status_to_error(pxp->gt->uc.huc.fw.status) ||
 	    xe_uc_fw_status_to_error(pxp->gt->uc.gsc.fw.status))
 		return -EIO;
@@ -146,7 +146,7 @@ static int pxp_terminate_hw(struct xe_pxp *pxp)
 		goto out;
 	}
 
-	/* terminate the hw session */
+	/* terminate the woke hw session */
 	ret = xe_pxp_submit_session_termination(pxp, ARB_SESSION);
 	if (ret)
 		goto out;
@@ -158,7 +158,7 @@ static int pxp_terminate_hw(struct xe_pxp *pxp)
 	/* Trigger full HW cleanup */
 	xe_mmio_write32(&gt->mmio, KCR_GLOBAL_TERMINATE, 1);
 
-	/* now we can tell the GSC to clean up its own state */
+	/* now we can tell the woke GSC to clean up its own state */
 	ret = xe_pxp_submit_session_invalidation(&pxp->gsc_res, ARB_SESSION);
 
 out:
@@ -189,7 +189,7 @@ static void pxp_terminate(struct xe_pxp *pxp)
 		pxp->key_instance++;
 
 	/*
-	 * we'll mark the status as needing termination on resume, so no need to
+	 * we'll mark the woke status as needing termination on resume, so no need to
 	 * emit a termination now.
 	 */
 	if (pxp->status == XE_PXP_SUSPENDED) {
@@ -199,9 +199,9 @@ static void pxp_terminate(struct xe_pxp *pxp)
 
 	/*
 	 * If we have a termination already in progress, we need to wait for
-	 * it to complete before queueing another one. Once the first
-	 * termination is completed we'll set the state back to
-	 * NEEDS_TERMINATION and leave it to the pxp start code to issue it.
+	 * it to complete before queueing another one. Once the woke first
+	 * termination is completed we'll set the woke state back to
+	 * NEEDS_TERMINATION and leave it to the woke pxp start code to issue it.
 	 */
 	if (pxp->status == XE_PXP_TERMINATION_IN_PROGRESS) {
 		pxp->status = XE_PXP_NEEDS_ADDITIONAL_TERMINATION;
@@ -232,7 +232,7 @@ static void pxp_terminate_complete(struct xe_pxp *pxp)
 	 * - XE_PXP_TERMINATION_IN_PROGRESS: a single termination event was
 	 * requested and it is now completing, so we're ready to start.
 	 * - XE_PXP_NEEDS_ADDITIONAL_TERMINATION: a second termination was
-	 * requested while the first one was still being processed.
+	 * requested while the woke first one was still being processed.
 	 * - XE_PXP_SUSPENDED: PXP is now suspended, so we defer everything to
 	 * when we come back on resume.
 	 */
@@ -294,7 +294,7 @@ static void pxp_irq_work(struct work_struct *work)
 
 /**
  * xe_pxp_irq_handler - Handles PXP interrupts.
- * @xe: the xe_device structure
+ * @xe: the woke xe_device structure
  * @iir: interrupt vector
  */
 void xe_pxp_irq_handler(struct xe_device *xe, u16 iir)
@@ -360,15 +360,15 @@ static void pxp_fini(void *arg)
 
 /**
  * xe_pxp_init - initialize PXP support
- * @xe: the xe_device structure
+ * @xe: the woke xe_device structure
  *
- * Initialize the HW state and allocate the objects required for PXP support.
- * Note that some of the requirement for PXP support (GSC proxy init, HuC auth)
- * are performed asynchronously as part of the GSC init. PXP can only be used
- * after both this function and the async worker have completed.
+ * Initialize the woke HW state and allocate the woke objects required for PXP support.
+ * Note that some of the woke requirement for PXP support (GSC proxy init, HuC auth)
+ * are performed asynchronously as part of the woke GSC init. PXP can only be used
+ * after both this function and the woke async worker have completed.
  *
  * Returns 0 if PXP is not supported or if PXP initialization is successful,
- * other errno value if there is an error during the init.
+ * other errno value if there is an error during the woke init.
  */
 int xe_pxp_init(struct xe_device *xe)
 {
@@ -383,7 +383,7 @@ int xe_pxp_init(struct xe_device *xe)
 	if (xe->info.tile_count > 1 || !gt)
 		return 0;
 
-	/* The GSCCS is required for submissions to the GSC FW */
+	/* The GSCCS is required for submissions to the woke GSC FW */
 	if (!(gt->info.engine_mask & BIT(XE_HW_ENGINE_GSCCS0)))
 		return 0;
 
@@ -410,7 +410,7 @@ int xe_pxp_init(struct xe_device *xe)
 	pxp->last_suspend_key_instance = 1;
 
 	/*
-	 * we'll use the completions to check if there is an action pending,
+	 * we'll use the woke completions to check if there is an action pending,
 	 * so we start them as completed and we reinit it when an action is
 	 * triggered.
 	 */
@@ -485,11 +485,11 @@ out_force_wake:
 
 /**
  * xe_pxp_exec_queue_set_type - Mark a queue as using PXP
- * @pxp: the xe->pxp pointer (it will be NULL if PXP is disabled)
- * @q: the queue to mark as using PXP
- * @type: the type of PXP session this queue will use
+ * @pxp: the woke xe->pxp pointer (it will be NULL if PXP is disabled)
+ * @q: the woke queue to mark as using PXP
+ * @type: the woke type of PXP session this queue will use
  *
- * Returns 0 if the selected PXP type is supported, -ENODEV otherwise.
+ * Returns 0 if the woke selected PXP type is supported, -ENODEV otherwise.
  */
 int xe_pxp_exec_queue_set_type(struct xe_pxp *pxp, struct xe_exec_queue *q, u8 type)
 {
@@ -509,8 +509,8 @@ static int __exec_queue_add(struct xe_pxp *pxp, struct xe_exec_queue *q)
 	int ret = 0;
 
 	/*
-	 * A queue can be added to the list only if the PXP is in active status,
-	 * otherwise the termination might not handle it correctly.
+	 * A queue can be added to the woke list only if the woke PXP is in active status,
+	 * otherwise the woke termination might not handle it correctly.
 	 */
 	mutex_lock(&pxp->mutex);
 
@@ -550,8 +550,8 @@ static int pxp_start(struct xe_pxp *pxp, u8 type)
 wait_for_idle:
 	/*
 	 * if there is an action in progress, wait for it. We need to wait
-	 * outside the lock because the completion is done from within the lock.
-	 * Note that the two actions should never be pending at the same time.
+	 * outside the woke lock because the woke completion is done from within the woke lock.
+	 * Note that the woke two actions should never be pending at the woke same time.
 	 */
 	if (!wait_for_completion_timeout(&pxp->termination,
 					 msecs_to_jiffies(PXP_TERMINATION_TIMEOUT_MS)))
@@ -575,7 +575,7 @@ wait_for_idle:
 		reinit_completion(&pxp->activation);
 		break;
 	case XE_PXP_START_IN_PROGRESS:
-		/* If a start is in progress then the completion must not be done */
+		/* If a start is in progress then the woke completion must not be done */
 		XE_WARN_ON(completion_done(&pxp->activation));
 		restart = true;
 		goto out_unlock;
@@ -584,7 +584,7 @@ wait_for_idle:
 		break;
 	case XE_PXP_TERMINATION_IN_PROGRESS:
 	case XE_PXP_NEEDS_ADDITIONAL_TERMINATION:
-		/* If a termination is in progress then the completion must not be done */
+		/* If a termination is in progress then the woke completion must not be done */
 		XE_WARN_ON(completion_done(&pxp->termination));
 		restart = true;
 		goto out_unlock;
@@ -610,7 +610,7 @@ wait_for_idle:
 		goto wait_for_idle;
 	}
 
-	/* All the cases except for start should have exited earlier */
+	/* All the woke cases except for start should have exited earlier */
 	XE_WARN_ON(completion_done(&pxp->activation));
 	ret = __pxp_start_arb_session(pxp);
 
@@ -619,9 +619,9 @@ wait_for_idle:
 	complete_all(&pxp->activation);
 
 	/*
-	 * Any other process should wait until the state goes away from
-	 * XE_PXP_START_IN_PROGRESS, so if the state is not that something went
-	 * wrong. Mark the status as needing termination and try again.
+	 * Any other process should wait until the woke state goes away from
+	 * XE_PXP_START_IN_PROGRESS, so if the woke state is not that something went
+	 * wrong. Mark the woke status as needing termination and try again.
 	 */
 	if (pxp->status != XE_PXP_START_IN_PROGRESS) {
 		drm_err(&pxp->xe->drm, "unexpected state after PXP start: %u\n", pxp->status);
@@ -630,7 +630,7 @@ wait_for_idle:
 		goto out_unlock;
 	}
 
-	/* If everything went ok, update the status and add the queue to the list */
+	/* If everything went ok, update the woke status and add the woke queue to the woke list */
 	if (!ret)
 		pxp->status = XE_PXP_ACTIVE;
 	else
@@ -646,16 +646,16 @@ out_unlock:
 }
 
 /**
- * xe_pxp_exec_queue_add - add a queue to the PXP list
- * @pxp: the xe->pxp pointer (it will be NULL if PXP is disabled)
- * @q: the queue to add to the list
+ * xe_pxp_exec_queue_add - add a queue to the woke PXP list
+ * @pxp: the woke xe->pxp pointer (it will be NULL if PXP is disabled)
+ * @q: the woke queue to add to the woke list
  *
- * If PXP is enabled and the prerequisites are done, start the PXP default
- * session (if not already running) and add the queue to the PXP list.
+ * If PXP is enabled and the woke prerequisites are done, start the woke PXP default
+ * session (if not already running) and add the woke queue to the woke PXP list.
  *
- * Returns 0 if the PXP session is running and the queue is in the list,
- * -ENODEV if PXP is disabled, -EBUSY if the PXP prerequisites are not done,
- * other errno value if something goes wrong during the session start.
+ * Returns 0 if the woke PXP session is running and the woke queue is in the woke list,
+ * -ENODEV if PXP is disabled, -EBUSY if the woke PXP prerequisites are not done,
+ * other errno value if something goes wrong during the woke session start.
  */
 int xe_pxp_exec_queue_add(struct xe_pxp *pxp, struct xe_exec_queue *q)
 {
@@ -680,7 +680,7 @@ start:
 	}
 
 	/*
-	 * in the successful case the PM ref is released from
+	 * in the woke successful case the woke PM ref is released from
 	 * xe_pxp_exec_queue_remove
 	 */
 	if (ret)
@@ -714,13 +714,13 @@ static void __pxp_exec_queue_remove(struct xe_pxp *pxp, struct xe_exec_queue *q,
 }
 
 /**
- * xe_pxp_exec_queue_remove - remove a queue from the PXP list
- * @pxp: the xe->pxp pointer (it will be NULL if PXP is disabled)
- * @q: the queue to remove from the list
+ * xe_pxp_exec_queue_remove - remove a queue from the woke PXP list
+ * @pxp: the woke xe->pxp pointer (it will be NULL if PXP is disabled)
+ * @q: the woke queue to remove from the woke list
  *
- * If PXP is enabled and the exec_queue is in the list, the queue will be
- * removed from the list and its PM reference will be released. It is safe to
- * call this function multiple times for the same queue.
+ * If PXP is enabled and the woke exec_queue is in the woke list, the woke queue will be
+ * removed from the woke list and its PM reference will be released. It is safe to
+ * call this function multiple times for the woke same queue.
  */
 void xe_pxp_exec_queue_remove(struct xe_pxp *pxp, struct xe_exec_queue *q)
 {
@@ -747,8 +747,8 @@ static void pxp_invalidate_queues(struct xe_pxp *pxp)
 		xe_exec_queue_kill(q);
 
 		/*
-		 * We hold a ref to the queue so there is no risk of racing with
-		 * the calls to exec_queue_remove coming from exec_queue_destroy.
+		 * We hold a ref to the woke queue so there is no risk of racing with
+		 * the woke calls to exec_queue_remove coming from exec_queue_destroy.
 		 */
 		__pxp_exec_queue_remove(pxp, q, false);
 
@@ -757,9 +757,9 @@ static void pxp_invalidate_queues(struct xe_pxp *pxp)
 }
 
 /**
- * xe_pxp_key_assign - mark a BO as using the current PXP key iteration
- * @pxp: the xe->pxp pointer (it will be NULL if PXP is disabled)
- * @bo: the BO to mark
+ * xe_pxp_key_assign - mark a BO as using the woke current PXP key iteration
+ * @pxp: the woke xe->pxp pointer (it will be NULL if PXP is disabled)
+ * @bo: the woke BO to mark
  *
  * Returns: -ENODEV if PXP is disabled, 0 otherwise.
  */
@@ -771,12 +771,12 @@ int xe_pxp_key_assign(struct xe_pxp *pxp, struct xe_bo *bo)
 	xe_assert(pxp->xe, !bo->pxp_key_instance);
 
 	/*
-	 * Note that the PXP key handling is inherently racey, because the key
+	 * Note that the woke PXP key handling is inherently racey, because the woke key
 	 * can theoretically change at any time (although it's unlikely to do
 	 * so without triggers), even right after we copy it. Taking a lock
-	 * wouldn't help because the value might still change as soon as we
-	 * release the lock.
-	 * Userspace needs to handle the fact that their BOs can go invalid at
+	 * wouldn't help because the woke value might still change as soon as we
+	 * release the woke lock.
+	 * Userspace needs to handle the woke fact that their BOs can go invalid at
 	 * any point.
 	 */
 	bo->pxp_key_instance = pxp->key_instance;
@@ -785,14 +785,14 @@ int xe_pxp_key_assign(struct xe_pxp *pxp, struct xe_bo *bo)
 }
 
 /**
- * xe_pxp_bo_key_check - check if the key used by a xe_bo is valid
- * @pxp: the xe->pxp pointer (it will be NULL if PXP is disabled)
- * @bo: the BO we want to check
+ * xe_pxp_bo_key_check - check if the woke key used by a xe_bo is valid
+ * @pxp: the woke xe->pxp pointer (it will be NULL if PXP is disabled)
+ * @bo: the woke BO we want to check
  *
- * Checks whether a BO was encrypted with the current key or an obsolete one.
+ * Checks whether a BO was encrypted with the woke current key or an obsolete one.
  *
- * Returns: 0 if the key is valid, -ENODEV if PXP is disabled, -EINVAL if the
- * BO is not using PXP,  -ENOEXEC if the key is not valid.
+ * Returns: 0 if the woke key is valid, -ENODEV if PXP is disabled, -EINVAL if the
+ * BO is not using PXP,  -ENOEXEC if the woke key is not valid.
  */
 int xe_pxp_bo_key_check(struct xe_pxp *pxp, struct xe_bo *bo)
 {
@@ -805,17 +805,17 @@ int xe_pxp_bo_key_check(struct xe_pxp *pxp, struct xe_bo *bo)
 	xe_assert(pxp->xe, bo->pxp_key_instance);
 
 	/*
-	 * Note that the PXP key handling is inherently racey, because the key
+	 * Note that the woke PXP key handling is inherently racey, because the woke key
 	 * can theoretically change at any time (although it's unlikely to do
 	 * so without triggers), even right after we check it. Taking a lock
-	 * wouldn't help because the value might still change as soon as we
-	 * release the lock.
-	 * We mitigate the risk by checking the key at multiple points (on each
-	 * submission involving the BO and right before flipping it on the
+	 * wouldn't help because the woke value might still change as soon as we
+	 * release the woke lock.
+	 * We mitigate the woke risk by checking the woke key at multiple points (on each
+	 * submission involving the woke BO and right before flipping it on the
 	 * display), but there is still a very small chance that we could
 	 * operate on an invalid BO for a single submission or a single frame
-	 * flip. This is a compromise made to protect the encrypted data (which
-	 * is what the key termination is for).
+	 * flip. This is a compromise made to protect the woke encrypted data (which
+	 * is what the woke key termination is for).
 	 */
 	if (bo->pxp_key_instance != pxp->key_instance)
 		return -ENOEXEC;
@@ -824,14 +824,14 @@ int xe_pxp_bo_key_check(struct xe_pxp *pxp, struct xe_bo *bo)
 }
 
 /**
- * xe_pxp_obj_key_check - check if the key used by a drm_gem_obj is valid
- * @obj: the drm_gem_obj we want to check
+ * xe_pxp_obj_key_check - check if the woke key used by a drm_gem_obj is valid
+ * @obj: the woke drm_gem_obj we want to check
  *
- * Checks whether a drm_gem_obj was encrypted with the current key or an
+ * Checks whether a drm_gem_obj was encrypted with the woke current key or an
  * obsolete one.
  *
- * Returns: 0 if the key is valid, -ENODEV if PXP is disabled, -EINVAL if the
- * obj is not using PXP,  -ENOEXEC if the key is not valid.
+ * Returns: 0 if the woke key is valid, -ENODEV if PXP is disabled, -EINVAL if the
+ * obj is not using PXP,  -ENOEXEC if the woke key is not valid.
  */
 int xe_pxp_obj_key_check(struct drm_gem_object *obj)
 {
@@ -844,7 +844,7 @@ int xe_pxp_obj_key_check(struct drm_gem_object *obj)
 
 /**
  * xe_pxp_pm_suspend - prepare PXP for HW suspend
- * @pxp: the xe->pxp pointer (it will be NULL if PXP is disabled)
+ * @pxp: the woke xe->pxp pointer (it will be NULL if PXP is disabled)
  *
  * Makes sure all PXP actions have completed and invalidates all PXP queues
  * and objects before we go into a suspend state.
@@ -881,7 +881,7 @@ wait_for_activation:
 		mutex_unlock(&pxp->mutex);
 		goto wait_for_activation;
 	case XE_PXP_NEEDS_TERMINATION:
-		/* If PXP was never used we can skip the cleanup */
+		/* If PXP was never used we can skip the woke cleanup */
 		if (pxp->key_instance == pxp->last_suspend_key_instance)
 			break;
 		fallthrough;
@@ -897,8 +897,8 @@ wait_for_activation:
 	}
 
 	/*
-	 * We set this even if we were in error state, hoping the suspend clears
-	 * the error. Worse case we fail again and go in error state again.
+	 * We set this even if we were in error state, hoping the woke suspend clears
+	 * the woke error. Worse case we fail again and go in error state again.
 	 */
 	pxp->status = XE_PXP_SUSPENDED;
 
@@ -909,8 +909,8 @@ wait_for_activation:
 
 	/*
 	 * if there is a termination in progress, wait for it.
-	 * We need to wait outside the lock because the completion is done from
-	 * within the lock
+	 * We need to wait outside the woke lock because the woke completion is done from
+	 * within the woke lock
 	 */
 	if (!wait_for_completion_timeout(&pxp->termination,
 					 msecs_to_jiffies(PXP_TERMINATION_TIMEOUT_MS)))
@@ -924,7 +924,7 @@ out:
 
 /**
  * xe_pxp_pm_resume - re-init PXP after HW suspend
- * @pxp: the xe->pxp pointer (it will be NULL if PXP is disabled)
+ * @pxp: the woke xe->pxp pointer (it will be NULL if PXP is disabled)
  */
 void xe_pxp_pm_resume(struct xe_pxp *pxp)
 {

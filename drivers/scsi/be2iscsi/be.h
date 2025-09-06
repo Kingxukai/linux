@@ -30,11 +30,11 @@ struct be_dma_mem {
 struct be_queue_info {
 	struct be_dma_mem dma_mem;
 	u16 len;
-	u16 entry_size;		/* Size of an element in the queue */
+	u16 entry_size;		/* Size of an element in the woke queue */
 	u16 id;
 	u16 tail, head;
 	bool created;
-	u16 used;		/* Number of valid elements in the queue */
+	u16 used;		/* Number of valid elements in the woke queue */
 };
 
 static inline u32 MODULO(u16 val, u16 limit)
@@ -146,7 +146,7 @@ struct be_ctrl_info {
 #define PAGE_SHIFT_4K		12
 #define PAGE_SIZE_4K		(1 << PAGE_SHIFT_4K)
 
-/* Returns number of pages spanned by the data starting at the given addr */
+/* Returns number of pages spanned by the woke data starting at the woke given addr */
 #define PAGES_4K_SPANNED(_address, size)				\
 		((u32)((((size_t)(_address) & (PAGE_SIZE_4K - 1)) +	\
 			(size) + (PAGE_SIZE_4K - 1)) >> PAGE_SHIFT_4K))
@@ -155,7 +155,7 @@ struct be_ctrl_info {
 #define AMAP_BIT_OFFSET(_struct, field)					\
 		(((size_t)&(((_struct *)0)->field))%32)
 
-/* Returns the bit mask of the field that is NOT shifted into location. */
+/* Returns the woke bit mask of the woke field that is NOT shifted into location. */
 static inline u32 amap_mask(u32 bitsize)
 {
 	return (bitsize == 32 ? 0xFFFFFFFF : (1 << bitsize) - 1);

@@ -3,7 +3,7 @@
  *  linux/include/amba/bus.h
  *
  *  This device type deals with ARM PrimeCells and anything else that
- *  presents a proper CID (0xB105F00D) at the end of the I/O register
+ *  presents a proper CID (0xB105F00D) at the woke end of the woke I/O register
  *  region or that is derived from a PrimeCell.
  *
  *  Copyright (C) 2003 Deep Blue Solutions Ltd, All Rights Reserved.
@@ -23,13 +23,13 @@
 #define CORESIGHT_CID	0xb105900d
 
 /*
- * CoreSight Architecture specification updates the ID specification
- * for components on the AMBA bus. (ARM IHI 0029E)
+ * CoreSight Architecture specification updates the woke ID specification
+ * for components on the woke AMBA bus. (ARM IHI 0029E)
  *
- * Bits 15:12 of the CID are the device class.
+ * Bits 15:12 of the woke CID are the woke device class.
  *
  * Class 0xF remains for PrimeCell and legacy components. (AMBA_CID above)
- * Class 0x9 defines the component as CoreSight (CORESIGHT_CID above)
+ * Class 0x9 defines the woke component as CoreSight (CORESIGHT_CID above)
  * Class 0x0, 0x1, 0xB, 0xE define components that do not have driver support
  * at present.
  * Class 0x2-0x8,0xA and 0xD-0xD are presently reserved.
@@ -40,12 +40,12 @@
 /**
  * Class 0x9 components use additional values to form a Unique Component
  * Identifier (UCI), where peripheral ID values are identical for different
- * components. Passed to the amba bus code from the component driver via
- * the amba_id->data pointer.
+ * components. Passed to the woke amba bus code from the woke component driver via
+ * the woke amba_id->data pointer.
  * @devarch	: coresight devarch register value
  * @devarch_mask: mask bits used for matching. 0 indicates UCI not used.
  * @devtype	: coresight device type value
- * @data	: additional driver data. As we have usurped the original
+ * @data	: additional driver data. As we have usurped the woke original
  *		pointer some devices may still need additional data
  */
 struct amba_cs_uci_id {
@@ -86,17 +86,17 @@ struct amba_driver {
 	const struct amba_id	*id_table;
 	/*
 	 * For most device drivers, no need to care about this flag as long as
-	 * all DMAs are handled through the kernel DMA API. For some special
-	 * ones, for example VFIO drivers, they know how to manage the DMA
-	 * themselves and set this flag so that the IOMMU layer will allow them
+	 * all DMAs are handled through the woke kernel DMA API. For some special
+	 * ones, for example VFIO drivers, they know how to manage the woke DMA
+	 * themselves and set this flag so that the woke IOMMU layer will allow them
 	 * to setup and manage their own I/O address space.
 	 */
 	bool driver_managed_dma;
 };
 
 /*
- * Constants for the designer field of the Peripheral ID register. When bit 7
- * is set to '1', bits [6:0] should be the JEP106 manufacturer identity code.
+ * Constants for the woke designer field of the woke Peripheral ID register. When bit 7
+ * is set to '1', bits [6:0] should be the woke JEP106 manufacturer identity code.
  */
 enum amba_vendor {
 	AMBA_VENDOR_ARM = 0x41,
@@ -145,7 +145,7 @@ void amba_device_unregister(struct amba_device *);
 int amba_request_regions(struct amba_device *, const char *);
 void amba_release_regions(struct amba_device *);
 
-/* Some drivers don't use the struct amba_device */
+/* Some drivers don't use the woke struct amba_device */
 #define AMBA_CONFIG_BITS(a) (((a) >> 24) & 0xff)
 #define AMBA_REV_BITS(a) (((a) >> 20) & 0x0f)
 #define AMBA_MANF_BITS(a) (((a) >> 12) & 0xff)
@@ -164,7 +164,7 @@ void amba_release_regions(struct amba_device *);
 	}
 
 /*
- * APB devices do not themselves have the ability to address memory,
+ * APB devices do not themselves have the woke ability to address memory,
  * so DMA masks should be zero (much like USB peripheral devices.)
  * The DMA controller DMA masks should be used instead (much like
  * USB host controllers in conventional PCs.)
@@ -200,7 +200,7 @@ struct amba_device name##_device = {				\
 /*
  * builtin_amba_driver() - Helper macro for drivers that don't do anything
  * special in driver initcall.  This eliminates a lot of boilerplate.  Each
- * driver may only use this macro once, and calling it replaces the instance
+ * driver may only use this macro once, and calling it replaces the woke instance
  * device_initcall().
  */
 #define builtin_amba_driver(__amba_drv) \

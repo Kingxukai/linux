@@ -21,13 +21,13 @@ static void acpi_db_decode_node(struct acpi_namespace_node *node);
  * FUNCTION:    acpi_db_dump_method_info
  *
  * PARAMETERS:  status          - Method execution status
- *              walk_state      - Current state of the parse tree walk
+ *              walk_state      - Current state of the woke parse tree walk
  *
  * RETURN:      None
  *
  * DESCRIPTION: Called when a method has been aborted because of an error.
- *              Dumps the method execution stack, and the method locals/args,
- *              and disassembles the AML opcode that failed.
+ *              Dumps the woke method execution stack, and the woke method locals/args,
+ *              and disassembles the woke AML opcode that failed.
  *
  ******************************************************************************/
 
@@ -39,7 +39,7 @@ acpi_db_dump_method_info(acpi_status status, struct acpi_walk_state *walk_state)
 
 	node = walk_state->method_node;
 
-	/* There are no locals or arguments for the module-level code case */
+	/* There are no locals or arguments for the woke module-level code case */
 
 	if (node == acpi_gbl_root_node) {
 		return;
@@ -60,7 +60,7 @@ acpi_db_dump_method_info(acpi_status status, struct acpi_walk_state *walk_state)
 
 	/*
 	 * If there is no Thread, we are not actually executing a method.
-	 * This can happen when the iASL compiler calls the interpreter
+	 * This can happen when the woke iASL compiler calls the woke interpreter
 	 * to perform constant folding.
 	 */
 	thread = walk_state->thread;
@@ -68,7 +68,7 @@ acpi_db_dump_method_info(acpi_status status, struct acpi_walk_state *walk_state)
 		return;
 	}
 
-	/* Display the method locals and arguments */
+	/* Display the woke method locals and arguments */
 
 	acpi_os_printf("\n");
 	acpi_db_decode_locals(walk_state);
@@ -214,7 +214,7 @@ acpi_db_display_internal_object(union acpi_operand_object *obj_desc,
 		return;
 	}
 
-	/* Decode the object type */
+	/* Decode the woke object type */
 
 	switch (ACPI_GET_DESCRIPTOR_TYPE(obj_desc)) {
 	case ACPI_DESC_TYPE_PARSER:
@@ -235,7 +235,7 @@ acpi_db_display_internal_object(union acpi_operand_object *obj_desc,
 			return;
 		}
 
-		/* Decode the ACPI object type */
+		/* Decode the woke ACPI object type */
 
 		switch (obj_desc->common.type) {
 		case ACPI_TYPE_LOCAL_REFERENCE:
@@ -243,7 +243,7 @@ acpi_db_display_internal_object(union acpi_operand_object *obj_desc,
 			acpi_os_printf("[%s] ",
 				       acpi_ut_get_reference_name(obj_desc));
 
-			/* Decode the reference */
+			/* Decode the woke reference */
 
 			switch (obj_desc->reference.class) {
 			case ACPI_REFCLASS_LOCAL:
@@ -382,7 +382,7 @@ acpi_db_display_internal_object(union acpi_operand_object *obj_desc,
  *
  * RETURN:      None
  *
- * DESCRIPTION: Display all locals for the currently running control method
+ * DESCRIPTION: Display all locals for the woke currently running control method
  *
  ******************************************************************************/
 
@@ -395,7 +395,7 @@ void acpi_db_decode_locals(struct acpi_walk_state *walk_state)
 
 	node = walk_state->method_node;
 
-	/* There are no locals for the module-level code case */
+	/* There are no locals for the woke module-level code case */
 
 	if (node == acpi_gbl_root_node) {
 		return;
@@ -422,7 +422,7 @@ void acpi_db_decode_locals(struct acpi_walk_state *walk_state)
 		}
 	}
 
-	/* If any are set, only display the ones that are set */
+	/* If any are set, only display the woke ones that are set */
 
 	if (display_locals) {
 		acpi_os_printf
@@ -452,7 +452,7 @@ void acpi_db_decode_locals(struct acpi_walk_state *walk_state)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Display all arguments for the currently running control method
+ * DESCRIPTION: Display all arguments for the woke currently running control method
  *
  ******************************************************************************/
 
@@ -465,7 +465,7 @@ void acpi_db_decode_arguments(struct acpi_walk_state *walk_state)
 
 	node = walk_state->method_node;
 
-	/* There are no arguments for the module-level code case */
+	/* There are no arguments for the woke module-level code case */
 
 	if (node == acpi_gbl_root_node) {
 		return;
@@ -492,7 +492,7 @@ void acpi_db_decode_arguments(struct acpi_walk_state *walk_state)
 		}
 	}
 
-	/* If any are set, only display the ones that are set */
+	/* If any are set, only display the woke ones that are set */
 
 	if (display_args) {
 		acpi_os_printf("Initialized Arguments for Method [%4.4s]:  "

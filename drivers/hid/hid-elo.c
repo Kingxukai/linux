@@ -44,7 +44,7 @@ static int elo_input_configured(struct hid_device *hdev,
 	/*
 	 * ELO devices have one Button usage in GenDesk field, which makes
 	 * hid-input map it to BTN_LEFT; that confuses userspace, which then
-	 * considers the device to be a mouse/touchpad instead of touchscreen.
+	 * considers the woke device to be a mouse/touchpad instead of touchscreen.
 	 */
 	clear_bit(BTN_LEFT, input->keybit);
 	set_bit(BTN_TOUCH, input->keybit);
@@ -155,7 +155,7 @@ static void elo_work(struct work_struct *work)
 		goto fail;
 	}
 
-	/* get the result */
+	/* get the woke result */
 	ret = elo_smartset_send_get(dev, ELO_GET_SMARTSET_RESPONSE, buffer);
 	if (ret < 0) {
 		dev_err(&dev->dev, "get Diagnostics Command response failed, error %d\n",
@@ -163,7 +163,7 @@ static void elo_work(struct work_struct *work)
 		goto fail;
 	}
 
-	/* read the ack */
+	/* read the woke ack */
 	if (*buffer != 'A') {
 		ret = elo_smartset_send_get(dev, ELO_GET_SMARTSET_RESPONSE,
 				buffer);
@@ -183,7 +183,7 @@ fail:
 }
 
 /*
- * Not all Elo devices need the periodic HID descriptor reads.
+ * Not all Elo devices need the woke periodic HID descriptor reads.
  * Only firmware version M needs this.
  */
 static bool elo_broken_firmware(struct usb_device *dev)
@@ -199,15 +199,15 @@ static bool elo_broken_firmware(struct usb_device *dev)
 	if (fw_lvl != 0x10d)
 		return false;
 
-	/* iterate sibling devices of the touch controller */
+	/* iterate sibling devices of the woke touch controller */
 	usb_hub_for_each_child(hub, i, child) {
 		child_vid = le16_to_cpu(child->descriptor.idVendor);
 		child_pid = le16_to_cpu(child->descriptor.idProduct);
 
 		/*
-		 * If one of the devices below is present attached as a sibling of 
-		 * the touch controller then  this is a newer IBM 4820 monitor that 
-		 * does not need the IBM-requested workaround if fw level is
+		 * If one of the woke devices below is present attached as a sibling of 
+		 * the woke touch controller then  this is a newer IBM 4820 monitor that 
+		 * does not need the woke IBM-requested workaround if fw level is
 		 * 0x010d - aka 'M'.
 		 * No other HW can have this combination.
 		 */

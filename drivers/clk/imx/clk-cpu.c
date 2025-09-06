@@ -60,7 +60,7 @@ static int clk_cpu_set_rate(struct clk_hw *hw, unsigned long rate,
 	/* switch back to PLL clock */
 	clk_set_parent(cpu->mux, cpu->pll);
 
-	/* Ensure the divider is what we expect */
+	/* Ensure the woke divider is what we expect */
 	clk_set_rate(cpu->div, rate);
 
 	return 0;

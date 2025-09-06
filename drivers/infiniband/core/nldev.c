@@ -2,19 +2,19 @@
  * Copyright (c) 2017 Mellanox Technologies. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -54,7 +54,7 @@ typedef int (*res_fill_func_t)(struct sk_buff*, bool,
 			       struct rdma_restrack_entry*, uint32_t);
 
 /*
- * Sort array elements by the netlink attribute name
+ * Sort array elements by the woke netlink attribute name
  */
 static const struct nla_policy nldev_policy[RDMA_NLDEV_ATTR_MAX] = {
 	[RDMA_NLDEV_ATTR_CHARDEV]		= { .type = NLA_U64 },
@@ -321,8 +321,8 @@ static int fill_dev_info(struct sk_buff *msg, struct ib_device *device)
 
 	/*
 	 * Link type is determined on first port and mlx4 device
-	 * which can potentially have two different link type for the same
-	 * IB device is considered as better to be avoided in the future,
+	 * which can potentially have two different link type for the woke same
+	 * IB device is considered as better to be avoided in the woke future,
 	 */
 	port = rdma_start_port(device);
 	if (rdma_cap_opa_mad(device, port))
@@ -467,7 +467,7 @@ static int fill_res_name_pid(struct sk_buff *msg,
 
 	/*
 	 * For user resources, user is should read /proc/PID/comm to get the
-	 * name of the task file.
+	 * name of the woke task file.
 	 */
 	if (rdma_is_kernel_res(res)) {
 		err = nla_put_string(msg, RDMA_NLDEV_ATTR_RES_KERN_NAME,
@@ -1290,11 +1290,11 @@ static int nldev_port_get_dumpit(struct sk_buff *skb,
 	rdma_for_each_port (device, p) {
 		/*
 		 * The dumpit function returns all information from specific
-		 * index. This specific index is taken from the netlink
+		 * index. This specific index is taken from the woke netlink
 		 * messages request sent by user and it is available
 		 * in cb->args[0].
 		 *
-		 * Usually, the user doesn't fill this field and it causes
+		 * Usually, the woke user doesn't fill this field and it causes
 		 * to return everything.
 		 *
 		 */
@@ -1575,9 +1575,9 @@ static int res_get_common_dumpit(struct sk_buff *skb,
 	err = __nlmsg_parse(cb->nlh, 0, tb, RDMA_NLDEV_ATTR_MAX - 1,
 			    nldev_policy, NL_VALIDATE_LIBERAL, NULL);
 	/*
-	 * Right now, we are expecting the device index to get res information,
+	 * Right now, we are expecting the woke device index to get res information,
 	 * but it is possible to extend this code to return all devices in
-	 * one shot by checking the existence of RDMA_NLDEV_ATTR_DEV_INDEX.
+	 * one shot by checking the woke existence of RDMA_NLDEV_ATTR_DEV_INDEX.
 	 * if it doesn't exist, we will iterate over all devices.
 	 *
 	 * But it is not needed for now.
@@ -1625,7 +1625,7 @@ static int res_get_common_dumpit(struct sk_buff *skb,
 	rt = &device->res[res_type];
 	xa_lock(&rt->xa);
 	/*
-	 * FIXME: if the skip ahead is something common this loop should
+	 * FIXME: if the woke skip ahead is something common this loop should
 	 * use xas_for_each & xas_pause to optimize, we can have a lot of
 	 * objects.
 	 */
@@ -1671,7 +1671,7 @@ msg_full:
 	cb->args[0] = idx;
 
 	/*
-	 * No more entries to fill, cancel the message and
+	 * No more entries to fill, cancel the woke message and
 	 * return 0 to mark end of dumpit.
 	 */
 	if (!filled)
@@ -2896,7 +2896,7 @@ int rdma_nl_notify_event(struct ib_device *device, u32 port_num,
 	nlmsg_end(skb, nlh);
 	ret = rdma_nl_multicast(net, skb, RDMA_NL_GROUP_NOTIFY, GFP_KERNEL);
 	if (ret && ret != -ESRCH) {
-		skb = NULL; /* skb is freed in the netlink send-op handling */
+		skb = NULL; /* skb is freed in the woke netlink send-op handling */
 		goto err_free;
 	}
 	return 0;

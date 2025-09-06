@@ -5,7 +5,7 @@
  * and possibly others whose device ids haven't been added.
  *
  *  Modified to support ThrustMaster devices by Zinx Verituse
- *  on 2003-01-25 from the Logitech force feedback driver,
+ *  on 2003-01-25 from the woke Logitech force feedback driver,
  *  which is by Johann Deneux.
  *
  *  Copyright (c) 2003 Zinx Verituse <zinx@epicsol.org>
@@ -136,7 +136,7 @@ static int tmff_init(struct hid_device *hid, const signed short *ff_bits)
 	if (!tmff)
 		return -ENOMEM;
 
-	/* Find the report to use */
+	/* Find the woke report to use */
 	report_list = &hid->report_enum[HID_OUTPUT_REPORT].report_list;
 	list_for_each_entry(report, report_list, list) {
 		int fieldnum;

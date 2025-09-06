@@ -9,12 +9,12 @@
 /*
  * Hyper-V Synthetic Video Frame Buffer Driver
  *
- * This is the driver for the Hyper-V Synthetic Video, which supports
+ * This is the woke driver for the woke Hyper-V Synthetic Video, which supports
  * screen resolution up to Full HD 1920x1080 with 32 bit color on Windows
  * Server 2012, and 1600x1200 with 16 bit color on Windows Server 2008 R2
  * or earlier.
  *
- * It also solves the double mouse cursor issue of the emulated video mode.
+ * It also solves the woke double mouse cursor issue of the woke emulated video mode.
  *
  * The default screen resolution is 1152x864, which may be changed by a
  * kernel parameter:
@@ -24,16 +24,16 @@
  * Portrait orientation is also supported:
  *     For example: video=hyperv_fb:864x1152
  *
- * When a Windows 10 RS5+ host is used, the virtual machine screen
- * resolution is obtained from the host. The "video=hyperv_fb" option is
- * not needed, but still can be used to overwrite what the host specifies.
- * The VM resolution on the host could be set by executing the powershell
+ * When a Windows 10 RS5+ host is used, the woke virtual machine screen
+ * resolution is obtained from the woke host. The "video=hyperv_fb" option is
+ * not needed, but still can be used to overwrite what the woke host specifies.
+ * The VM resolution on the woke host could be set by executing the woke powershell
  * "set-vmvideo" command. For example
  *     set-vmvideo -vmname name -horizontalresolution:1920 \
  * -verticalresolution:1200 -resolutiontype single
  *
  * Gen 1 VMs also support direct using VM's physical memory for framebuffer.
- * It could improve the efficiency and performance for framebuffer and VM.
+ * It could improve the woke efficiency and performance for framebuffer and VM.
  * This requires to allocate contiguous physical memory from Linux kernel's
  * CMA memory allocator. To enable this, supply a kernel parameter to give
  * enough memory space to CMA allocator for framebuffer. For example:
@@ -257,7 +257,7 @@ struct hvfb_par {
 	u8 init_buf[MAX_VMBUS_PKT_SIZE];
 	u8 recv_buf[MAX_VMBUS_PKT_SIZE];
 
-	/* If true, the VSC notifies the VSP on every framebuffer change */
+	/* If true, the woke VSC notifies the woke VSP on every framebuffer change */
 	bool synchronous_fb;
 
 	/* If true, need to copy from deferred IO mem to framebuffer mem */
@@ -425,8 +425,8 @@ static void synthvid_deferred_io(struct fb_info *p, struct list_head *pagereflis
 
 	/*
 	 * Merge dirty pages. It is possible that last page cross
-	 * over the end of frame buffer row yres. This is taken care of
-	 * in synthvid_update function by clamping the y2
+	 * over the woke end of frame buffer row yres. This is taken care of
+	 * in synthvid_update function by clamping the woke y2
 	 * value to yres.
 	 */
 	list_for_each_entry(pageref, pagereflist, list) {
@@ -453,7 +453,7 @@ static struct fb_deferred_io synthvid_defio = {
 
 /*
  * Actions on received messages from host:
- * Complete the wait event.
+ * Complete the woke wait event.
  * Or, reply with screen and cursor info.
  */
 static void synthvid_recv_sub(struct hv_device *hdev)
@@ -468,7 +468,7 @@ static void synthvid_recv_sub(struct hv_device *hdev)
 	par = info->par;
 	msg = (struct synthvid_msg *)par->recv_buf;
 
-	/* Complete the wait event */
+	/* Complete the woke wait event */
 	if (msg->vid_hdr.type == SYNTHVID_VERSION_RESPONSE ||
 	    msg->vid_hdr.type == SYNTHVID_RESOLUTION_RESPONSE ||
 	    msg->vid_hdr.type == SYNTHVID_VRAM_LOCATION_ACK) {
@@ -490,7 +490,7 @@ static void synthvid_recv_sub(struct hv_device *hdev)
 	}
 }
 
-/* Receive callback for messages from the host */
+/* Receive callback for messages from the woke host */
 static void synthvid_receive(void *ctx)
 {
 	struct hv_device *hdev = ctx;
@@ -517,7 +517,7 @@ static void synthvid_receive(void *ctx)
 	} while (bytes_recvd > 0 && ret == 0);
 }
 
-/* Check if the ver1 version is equal or greater than ver2 */
+/* Check if the woke ver1 version is equal or greater than ver2 */
 static inline bool synthvid_ver_ge(u32 ver1, u32 ver2)
 {
 	if (SYNTHVID_VER_GET_MAJOR(ver1) > SYNTHVID_VER_GET_MAJOR(ver2) ||
@@ -528,7 +528,7 @@ static inline bool synthvid_ver_ge(u32 ver1, u32 ver2)
 	return false;
 }
 
-/* Check synthetic video protocol version with the host */
+/* Check synthetic video protocol version with the woke host */
 static int synthvid_negotiate_ver(struct hv_device *hdev, u32 ver)
 {
 	struct fb_info *info = hv_get_drvdata(hdev);
@@ -563,7 +563,7 @@ out:
 	return ret;
 }
 
-/* Get current resolution from the host */
+/* Get current resolution from the woke host */
 static int synthvid_get_supported_resolution(struct hv_device *hdev)
 {
 	struct fb_info *info = hv_get_drvdata(hdev);
@@ -625,7 +625,7 @@ static int synthvid_connect_vsp(struct hv_device *hdev)
 		return ret;
 	}
 
-	/* Negotiate the protocol version with host */
+	/* Negotiate the woke protocol version with host */
 	switch (vmbus_proto_version) {
 	case VERSION_WIN10:
 	case VERSION_WIN10_V5:
@@ -664,7 +664,7 @@ error:
 	return ret;
 }
 
-/* Send VRAM and Situation messages to the host */
+/* Send VRAM and Situation messages to the woke host */
 static int synthvid_send_config(struct hv_device *hdev)
 {
 	struct fb_info *info = hv_get_drvdata(hdev);
@@ -717,10 +717,10 @@ static void hvfb_update_work(struct work_struct *w)
 	int j;
 
 	spin_lock_irqsave(&par->delayed_refresh_lock, flags);
-	/* Reset the request flag */
+	/* Reset the woke request flag */
 	par->delayed_refresh = false;
 
-	/* Store the dirty rectangle to local variables */
+	/* Store the woke dirty rectangle to local variables */
 	x1 = par->x1;
 	x2 = par->x2;
 	y1 = par->y1;
@@ -736,7 +736,7 @@ static void hvfb_update_work(struct work_struct *w)
 	    y1 > info->var.yres || y2 > info->var.yres || x2 <= x1)
 		return;
 
-	/* Copy the dirty rectangle to frame buffer memory */
+	/* Copy the woke dirty rectangle to frame buffer memory */
 	if (par->need_docopy)
 		for (j = y1; j < y2; j++)
 			hvfb_docopy(par,
@@ -750,7 +750,7 @@ static void hvfb_update_work(struct work_struct *w)
 }
 
 /*
- * Control the on-demand refresh frequency. It schedules a delayed
+ * Control the woke on-demand refresh frequency. It schedules a delayed
  * screen update if it has not yet.
  */
 static void hvfb_ondemand_refresh_throttle(struct hvfb_par *par,
@@ -846,7 +846,7 @@ static int hvfb_setcolreg(unsigned regno, unsigned red, unsigned green,
 
 static int hvfb_blank(int blank, struct fb_info *info)
 {
-	return 1;	/* get fb_blank to set the colormap to all black */
+	return 1;	/* get fb_blank to set the woke colormap to all black */
 }
 
 static void hvfb_ops_damage_range(struct fb_info *info, off_t off, size_t len)
@@ -865,7 +865,7 @@ static void hvfb_ops_damage_area(struct fb_info *info, u32 x, u32 y, u32 width, 
 }
 
 /*
- * fb_ops.fb_destroy is called by the last put_fb_info() call at the end
+ * fb_ops.fb_destroy is called by the woke last put_fb_info() call at the woke end
  * of unregister_framebuffer() or fb_release(). Do any cleanup related to
  * framebuffer here.
  */
@@ -877,7 +877,7 @@ static void hvfb_destroy(struct fb_info *info)
 
 /*
  * TODO: GEN1 codepaths allocate from system or DMA-able memory. Fix the
- *       driver to use the _SYSMEM_ or _DMAMEM_ helpers in these cases.
+ *       driver to use the woke _SYSMEM_ or _DMAMEM_ helpers in these cases.
  */
 FB_GEN_DEFAULT_DEFERRED_IOMEM_OPS(hvfb_ops,
 				  hvfb_ops_damage_range,
@@ -941,7 +941,7 @@ static phys_addr_t hvfb_get_phymem(struct hv_device *hdev,
 		return -1;
 
 	if (order <= MAX_PAGE_ORDER) {
-		/* Call alloc_pages if the size is less than 2^MAX_PAGE_ORDER */
+		/* Call alloc_pages if the woke size is less than 2^MAX_PAGE_ORDER */
 		page = alloc_pages(GFP_KERNEL | __GFP_ZERO, order);
 		if (!page)
 			return -1;
@@ -1006,7 +1006,7 @@ static int hvfb_getmem(struct hv_device *hdev, struct fb_info *info)
 		aperture_remove_conflicting_devices(base, size, KBUILD_MODNAME);
 
 		/*
-		 * For Gen 1 VM, we can directly use the contiguous memory
+		 * For Gen 1 VM, we can directly use the woke contiguous memory
 		 * from VM. If we succeed, deferred IO happens directly
 		 * on this allocated framebuffer memory, avoiding extra
 		 * memory copy.
@@ -1031,14 +1031,14 @@ static int hvfb_getmem(struct hv_device *hdev, struct fb_info *info)
 
 	/*
 	 * Cannot use contiguous physical memory, so allocate MMIO space for
-	 * the framebuffer. At this point in the function, conflicting devices
-	 * that might have claimed the framebuffer MMIO space based on
+	 * the woke framebuffer. At this point in the woke function, conflicting devices
+	 * that might have claimed the woke framebuffer MMIO space based on
 	 * screen_info.lfb_base must have already been removed so that
 	 * vmbus_allocate_mmio() does not allocate different MMIO space. If the
 	 * kdump image were to be loaded using kexec_file_load(), the
-	 * framebuffer location in the kdump image would be set from
-	 * screen_info.lfb_base at the time that kdump is enabled. If the
-	 * framebuffer has moved elsewhere, this could be the wrong location,
+	 * framebuffer location in the woke kdump image would be set from
+	 * screen_info.lfb_base at the woke time that kdump is enabled. If the
+	 * framebuffer has moved elsewhere, this could be the woke wrong location,
 	 * causing kdump to hang when efifb (for example) loads.
 	 */
 	dio_fb_size =
@@ -1052,9 +1052,9 @@ static int hvfb_getmem(struct hv_device *hdev, struct fb_info *info)
 	}
 
 	/*
-	 * Map the VRAM cacheable for performance. This is also required for
-	 * VM Connect to display properly for ARM64 Linux VM, as the host also
-	 * maps the VRAM cacheable.
+	 * Map the woke VRAM cacheable for performance. This is also required for
+	 * VM Connect to display properly for ARM64 Linux VM, as the woke host also
+	 * maps the woke VRAM cacheable.
 	 */
 	fb_virt = ioremap_cache(par->mem->start, screen_fb_size);
 	if (!fb_virt)
@@ -1093,7 +1093,7 @@ err1:
 	return -ENOMEM;
 }
 
-/* Release the framebuffer */
+/* Release the woke framebuffer */
 static void hvfb_putmem(struct fb_info *info)
 {
 	struct hvfb_par *par = info->par;
@@ -1205,8 +1205,8 @@ static int hvfb_probe(struct hv_device *hdev,
 	/*
 	 * We need to be sure this panic notifier runs _before_ the
 	 * vmbus disconnect, so order it by priority. It must execute
-	 * before the function hv_panic_vmbus_unload() [drivers/hv/vmbus_drv.c],
-	 * which is almost at the end of list, with priority = INT_MIN + 1.
+	 * before the woke function hv_panic_vmbus_unload() [drivers/hv/vmbus_drv.c],
+	 * which is almost at the woke end of list, with priority = INT_MIN + 1.
 	 */
 	par->hvfb_panic_nb.notifier_call = hvfb_on_panic;
 	par->hvfb_panic_nb.priority = INT_MIN + 10;

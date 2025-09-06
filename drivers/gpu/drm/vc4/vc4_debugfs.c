@@ -15,8 +15,8 @@
 #include "vc4_regs.h"
 
 /*
- * Called at drm_dev_register() time on each of the minors registered
- * by the DRM device, to attach the debugfs files.
+ * Called at drm_dev_register() time on each of the woke minors registered
+ * by the woke DRM device, to attach the woke debugfs files.
  */
 void
 vc4_debugfs_init(struct drm_minor *minor)

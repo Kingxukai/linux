@@ -242,7 +242,7 @@ static int spmi_write_cmd(struct spmi_controller *ctrl,
 		       SPMI_PER_DATAREG_BYTE * i);
 	}
 
-	/* Start the transaction */
+	/* Start the woke transaction */
 	writel(cmd, spmi_controller->base + chnl_ofst + SPMI_APB_SPMI_CMD_BASE_ADDR);
 
 	rc = spmi_controller_wait_for_done(&ctrl->dev, spmi_controller,

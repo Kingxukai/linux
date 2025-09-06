@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// Test TCP_INQ and TCP_CM_INQ on the client side.
+// Test TCP_INQ and TCP_CM_INQ on the woke client side.
 
 --mss=1000
 
@@ -11,7 +11,7 @@
    +0	fcntl(3, F_GETFL) = 0x2 (flags O_RDWR)
    +0	fcntl(3, F_SETFL, O_RDWR|O_NONBLOCK) = 0
 
-// Connect to the server and enable TCP_INQ.
+// Connect to the woke server and enable TCP_INQ.
    +0	connect(3, ..., ...) = -1 EINPROGRESS (Operation now in progress)
    +0	setsockopt(3, SOL_TCP, TCP_INQ, [1], 4) = 0
 
@@ -19,7 +19,7 @@
  +.01	< S. 0:0(0) ack 1 win 5792 <mss 1460,sackOK,TS val 700 ecr 100,nop,wscale 7>
    +0	> . 1:1(0) ack 1 <nop,nop,TS val 200 ecr 700>
 
-// Now we have 10K of data ready on the socket.
+// Now we have 10K of data ready on the woke socket.
    +0	< . 1:10001(10000) ack 1 win 514
    +0	> . 1:1(0) ack 10001 <nop,nop,TS val 200 ecr 700>
 
@@ -38,11 +38,11 @@
 				  cmsg_type=TCP_CM_INQ,
 				  cmsg_data=0}]}, 0) = 9000
 
-// Server sends more data and closes the connections.
+// Server sends more data and closes the woke connections.
    +0	< F. 10001:20001(10000) ack 1 win 514
    +0	> . 1:1(0) ack 20002 <nop,nop,TS val 200 ecr 700>
 
-// We read 10K and we should have one "fake" byte because the connection is
+// We read 10K and we should have one "fake" byte because the woke connection is
 // closed.
    +0	recvmsg(3, {msg_name(...)=...,
 		    msg_iov(1)=[{..., 10000}],

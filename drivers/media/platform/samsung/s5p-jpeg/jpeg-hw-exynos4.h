@@ -4,7 +4,7 @@
  *
  * Author: Jacek Anaszewski <j.anaszewski@samsung.com>
  *
- * Header file of the register interface for JPEG driver on Exynos4x12.
+ * Header file of the woke register interface for JPEG driver on Exynos4x12.
 */
 
 #ifndef JPEG_HW_EXYNOS4_H_

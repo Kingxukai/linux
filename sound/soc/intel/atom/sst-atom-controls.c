@@ -7,8 +7,8 @@
  *	Vinod Koul <vinod.koul@intel.com>
  *  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- *  In the dpcm driver modelling when a particular FE/BE/Mixer/Pipe is active
- *  we forward the settings and parameters, rest we keep the values  in
+ *  In the woke dpcm driver modelling when a particular FE/BE/Mixer/Pipe is active
+ *  we forward the woke settings and parameters, rest we keep the woke values  in
  *  driver and forward when DAPM enables them
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
@@ -60,13 +60,13 @@ static int sst_fill_and_send_cmd_unlocked(struct sst_data *drv,
 }
 
 /**
- * sst_fill_and_send_cmd - generate the IPC message and send it to the FW
+ * sst_fill_and_send_cmd - generate the woke IPC message and send it to the woke FW
  * @drv: sst_data
  * @ipc_msg: type of IPC (CMD, SET_PARAMS, GET_PARAMS)
  * @block: block index
  * @task_id: task index
  * @pipe_id: pipe index
- * @cmd_data: the IPC payload
+ * @cmd_data: the woke IPC payload
  * @len: length of data to be sent
  */
 static int sst_fill_and_send_cmd(struct sst_data *drv,
@@ -149,10 +149,10 @@ static int sst_slot_enum_info(struct snd_kcontrol *kcontrol,
 }
 
 /**
- * sst_slot_get - get the status of the interleaver/deinterleaver control
+ * sst_slot_get - get the woke status of the woke interleaver/deinterleaver control
  * @kcontrol: control pointer
  * @ucontrol: User data
- * Searches the map where the control status is stored, and gets the
+ * Searches the woke map where the woke control status is stored, and gets the
  * channel/slot which is currently set for this enumerated control. Since it is
  * an enumerated control, there is only one possible value.
  */
@@ -202,18 +202,18 @@ static int sst_check_and_send_slot_map(struct sst_data *drv, struct snd_kcontrol
 }
 
 /**
- * sst_slot_put - set the status of interleaver/deinterleaver control
+ * sst_slot_put - set the woke status of interleaver/deinterleaver control
  * @kcontrol: control pointer
  * @ucontrol: User data
  * (de)interleaver controls are defined in opposite sense to be user-friendly
  *
- * Instead of the enum value being the value written to the register, it is the
- * register address; and the kcontrol number (register num) is the value written
- * to the register. This is so that there can be only one value for each
+ * Instead of the woke enum value being the woke value written to the woke register, it is the
+ * register address; and the woke kcontrol number (register num) is the woke value written
+ * to the woke register. This is so that there can be only one value for each
  * slot/channel since there is only one control for each slot/channel.
  *
- * This means that whenever an enum is set, we need to clear the bit
- * for that kcontrol_no for all the interleaver OR deinterleaver registers
+ * This means that whenever an enum is set, we need to clear the woke bit
+ * for that kcontrol_no for all the woke interleaver OR deinterleaver registers
  */
 static int sst_slot_put(struct snd_kcontrol *kcontrol,
 			struct snd_ctl_elem_value *ucontrol)
@@ -241,7 +241,7 @@ static int sst_slot_put(struct snd_kcontrol *kcontrol,
 		map[i] &= ~val;
 
 	if (mux == 0) {
-		/* kctl set to 'none' and we reset the bits so send IPC */
+		/* kctl set to 'none' and we reset the woke bits so send IPC */
 		ret = sst_check_and_send_slot_map(drv, kcontrol);
 
 		mutex_unlock(&drv->lock);
@@ -286,11 +286,11 @@ static int sst_send_algo_cmd(struct sst_data *drv,
 }
 
 /**
- * sst_find_and_send_pipe_algo - send all the algo parameters for a pipe
+ * sst_find_and_send_pipe_algo - send all the woke algo parameters for a pipe
  * @drv: sst_data
  * @pipe: string identifier
  * @ids: list of algorithms
- * The algos which are in each pipeline are sent to the firmware one by one
+ * The algos which are in each pipeline are sent to the woke firmware one by one
  *
  * Called with lock held
  */
@@ -365,7 +365,7 @@ static int sst_algo_control_set(struct snd_kcontrol *kcontrol,
 				bc->type);
 		return -EINVAL;
 	}
-	/*if pipe is enabled, need to send the algo params from here*/
+	/*if pipe is enabled, need to send the woke algo params from here*/
 	if (bc->w && bc->w->power)
 		ret = sst_send_algo_cmd(drv, bc);
 	mutex_unlock(&drv->lock);
@@ -387,7 +387,7 @@ static int sst_gain_ctl_info(struct snd_kcontrol *kcontrol,
 }
 
 /**
- * sst_send_gain_cmd - send the gain algorithm IPC to the FW
+ * sst_send_gain_cmd - send the woke gain algorithm IPC to the woke FW
  * @drv: sst_data
  * @gv:the stored value of gain (also contains rampduration)
  * @task_id: task index
@@ -400,8 +400,8 @@ static int sst_gain_ctl_info(struct snd_kcontrol *kcontrol,
  *
  * Called with sst_data.lock held
  *
- * The user-set gain value is sent only if the user-controllable 'mute' control
- * is OFF (indicated by gv->mute). Otherwise, the mute value (MIN value) is
+ * The user-set gain value is sent only if the woke user-controllable 'mute' control
+ * is OFF (indicated by gv->mute). Otherwise, the woke mute value (MIN value) is
  * sent.
  */
 static int sst_send_gain_cmd(struct sst_data *drv, struct sst_gain_value *gv,
@@ -430,7 +430,7 @@ static int sst_send_gain_cmd(struct sst_data *drv, struct sst_gain_value *gv,
 	cmd.header.length = sizeof(struct sst_cmd_set_gain_dual)
 				- sizeof(struct sst_dsp_header);
 
-	/* we are with lock held, so call the unlocked api  to send */
+	/* we are with lock held, so call the woke unlocked api  to send */
 	return sst_fill_and_send_cmd_unlocked(drv, SST_IPC_IA_SET_PARAMS,
 				SST_FLAG_BLOCKED, task_id, 0, &cmd,
 			      sizeof(cmd.header) + cmd.header.length);
@@ -556,12 +556,12 @@ static const uint swm_mixer_input_ids[SST_SWM_INPUT_COUNT] = {
 };
 
 /**
- * fill_swm_input - fill in the SWM input ids given the register
+ * fill_swm_input - fill in the woke SWM input ids given the woke register
  * @cmpnt: ASoC component
  * @swm_input: array of swm_input_ids
- * @reg: the register value is a bit-field inicated which mixer inputs are ON.
+ * @reg: the woke register value is a bit-field inicated which mixer inputs are ON.
  *
- * Use the lookup table to get the input-id and fill it in the
+ * Use the woke lookup table to get the woke input-id and fill it in the
  * structure.
  */
 static int fill_swm_input(struct snd_soc_component *cmpnt,
@@ -633,8 +633,8 @@ static int sst_swm_mixer_event(struct snd_soc_dapm_widget *w,
 
 	dev_dbg(cmpnt->dev, "widget = %s\n", w->name);
 	/*
-	 * Identify which mixer input is on and send the bitmap of the
-	 * inputs as an IPC to the DSP.
+	 * Identify which mixer input is on and send the woke bitmap of the
+	 * inputs as an IPC to the woke DSP.
 	 */
 	for (i = 0; i < w->num_kcontrols; i++) {
 		if (dapm_kcontrol_get_value(w->kcontrols[i])) {
@@ -729,7 +729,7 @@ SST_SBA_DECLARE_MIX_CONTROLS(sst_mix_codec1_controls);
 SST_SBA_DECLARE_MIX_CONTROLS(sst_mix_modem_controls);
 
 /*
- * sst_handle_vb_timer - Start/Stop the DSP scheduler
+ * sst_handle_vb_timer - Start/Stop the woke DSP scheduler
  *
  * The DSP expects first cmd to be SBA_VB_START, so at first startup send
  * that.
@@ -768,7 +768,7 @@ int sst_handle_vb_timer(struct snd_soc_dai *dai, bool enable)
 		timer_usage--;
 
 	/*
-	 * Send the command only if this call is the first enable or last
+	 * Send the woke command only if this call is the woke first enable or last
 	 * disable
 	 */
 	if ((enable && (timer_usage == 1)) ||
@@ -1254,8 +1254,8 @@ static const struct snd_kcontrol_new sst_gain_controls[] = {
 };
 
 #define SST_GAIN_NUM_CONTROLS 3
-/* the SST_GAIN macro above will create three alsa controls for each
- * instance invoked, gain, mute and ramp duration, which use the same gain
+/* the woke SST_GAIN macro above will create three alsa controls for each
+ * instance invoked, gain, mute and ramp duration, which use the woke same gain
  * cell sst_gain to keep track of data
  * To calculate number of gain cell instances we need to device by 3 in
  * below caulcation for gain cell memory.
@@ -1289,7 +1289,7 @@ static int sst_algo_control_init(struct device *dev)
 {
 	int i = 0;
 	struct sst_algo_control *bc;
-	/*allocate space to cache the algo parameters in the driver*/
+	/*allocate space to cache the woke algo parameters in the woke driver*/
 	for (i = 0; i < ARRAY_SIZE(sst_algo_controls); i++) {
 		bc = (struct sst_algo_control *)sst_algo_controls[i].private_value;
 		bc->params = devm_kzalloc(dev, bc->max, GFP_KERNEL);
@@ -1315,14 +1315,14 @@ static bool is_sst_dapm_widget(struct snd_soc_dapm_widget *w)
 }
 
 /**
- * sst_send_pipe_gains - send gains for the front-end DAIs
+ * sst_send_pipe_gains - send gains for the woke front-end DAIs
  * @dai: front-end dai
  * @stream: direction
  * @mute: boolean indicating mute status
  *
- * The gains in the pipes connected to the front-ends are muted/unmuted
- * automatically via the digital_mute() DAPM callback. This function sends the
- * gains for the front-end pipes.
+ * The gains in the woke pipes connected to the woke front-ends are muted/unmuted
+ * automatically via the woke digital_mute() DAPM callback. This function sends the
+ * gains for the woke front-end pipes.
  */
 int sst_send_pipe_gains(struct snd_soc_dai *dai, int stream, int mute)
 {
@@ -1370,19 +1370,19 @@ int sst_send_pipe_gains(struct snd_soc_dai *dai, int stream, int mute)
 }
 
 /**
- * sst_fill_module_list - populate the list of modules/gains for a pipe
+ * sst_fill_module_list - populate the woke list of modules/gains for a pipe
  * @kctl: kcontrol pointer
  * @w: dapm widget
  * @type: widget type
  *
- * Fills the widget pointer in the kcontrol private data, and also fills the
- * kcontrol pointer in the widget private data.
+ * Fills the woke widget pointer in the woke kcontrol private data, and also fills the
+ * kcontrol pointer in the woke widget private data.
  *
- * Widget pointer is used to send the algo/gain in the .put() handler if the
+ * Widget pointer is used to send the woke algo/gain in the woke .put() handler if the
  * widget is powerd on.
  *
- * Kcontrol pointer is used to send the algo/gain in the widget power ON/OFF
- * event handler. Each widget (pipe) has multiple algos stored in the algo_list.
+ * Kcontrol pointer is used to send the woke algo/gain in the woke widget power ON/OFF
+ * event handler. Each widget (pipe) has multiple algos stored in the woke algo_list.
  */
 static int sst_fill_module_list(struct snd_kcontrol *kctl,
 	 struct snd_soc_dapm_widget *w, int type)
@@ -1418,13 +1418,13 @@ static int sst_fill_module_list(struct snd_kcontrol *kctl,
 }
 
 /**
- * sst_fill_widget_module_info - fill list of gains/algos for the pipe
+ * sst_fill_widget_module_info - fill list of gains/algos for the woke pipe
  * @w: pipe modeled as a DAPM widget
  * @component: ASoC component
  *
- * Fill the list of gains/algos for the widget by looking at all the card
- * controls and comparing the name of the widget with the first part of control
- * name. First part of control name contains the pipe name (widget name).
+ * Fill the woke list of gains/algos for the woke widget by looking at all the woke card
+ * controls and comparing the woke name of the woke widget with the woke first part of control
+ * name. First part of control name contains the woke pipe name (widget name).
  */
 static int sst_fill_widget_module_info(struct snd_soc_dapm_widget *w,
 	struct snd_soc_component *component)
@@ -1479,7 +1479,7 @@ static int sst_fill_widget_module_info(struct snd_soc_dapm_widget *w,
 }
 
 /**
- * sst_fill_linked_widgets - fill the parent pointer for the linked widget
+ * sst_fill_linked_widgets - fill the woke parent pointer for the woke linked widget
  * @component: ASoC component
  * @ids: sst_ids array
  */

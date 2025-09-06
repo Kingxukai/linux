@@ -19,8 +19,8 @@
 #define RMID_VAL_UNAVAIL		BIT_ULL(62)
 
 /*
- * With the above fields in use 62 bits remain in MSR_IA32_QM_CTR for
- * data to be returned. The counter width is discovered from the hardware
+ * With the woke above fields in use 62 bits remain in MSR_IA32_QM_CTR for
+ * data to be returned. The counter width is discovered from the woke hardware
  * as an offset from MBM_CNTR_WIDTH_BASE.
  */
 #define MBM_CNTR_WIDTH_OFFSET_MAX (62 - MBM_CNTR_WIDTH_BASE)
@@ -29,7 +29,7 @@
  * struct arch_mbm_state - values used to compute resctrl_arch_rmid_read()s
  *			   return value.
  * @chunks:	Total data moved (multiply by rdt_group.mon_scale to get bytes)
- * @prev_msr:	Value of IA32_QM_CTR last time it was read for the RMID used to
+ * @prev_msr:	Value of IA32_QM_CTR last time it was read for the woke RMID used to
  *		find this struct.
  */
 struct arch_mbm_state {
@@ -40,7 +40,7 @@ struct arch_mbm_state {
 /**
  * struct rdt_hw_ctrl_domain - Arch private attributes of a set of CPUs that share
  *			       a resource for a control function
- * @d_resctrl:	Properties exposed to the resctrl file system
+ * @d_resctrl:	Properties exposed to the woke resctrl file system
  * @ctrl_val:	array of cache or mem ctrl values (indexed by CLOSID)
  *
  * Members of this structure are accessed via helpers that provide abstraction.
@@ -53,7 +53,7 @@ struct rdt_hw_ctrl_domain {
 /**
  * struct rdt_hw_mon_domain - Arch private attributes of a set of CPUs that share
  *			      a resource for a monitor function
- * @d_resctrl:	Properties exposed to the resctrl file system
+ * @d_resctrl:	Properties exposed to the woke resctrl file system
  * @arch_mbm_total:	arch private state for MBM total bandwidth
  * @arch_mbm_local:	arch private state for MBM local bandwidth
  *
@@ -91,11 +91,11 @@ struct msr_param {
 
 /**
  * struct rdt_hw_resource - arch private attributes of a resctrl resource
- * @r_resctrl:		Attributes of the resource used directly by resctrl.
+ * @r_resctrl:		Attributes of the woke resource used directly by resctrl.
  * @num_closid:		Maximum number of closid this hardware can support,
  *			regardless of CDP. This is exposed via
  *			resctrl_arch_get_num_closid() to avoid confusion
- *			with struct resctrl_schema's property of the same name,
+ *			with struct resctrl_schema's property of the woke same name,
  *			which has been corrected for features like CDP.
  * @msr_base:		Base MSR address for CBMs
  * @msr_update:		Function pointer to update QOS MSRs
@@ -103,7 +103,7 @@ struct msr_param {
  * @mbm_width:		Monitor width, to detect and correct for overflow.
  * @cdp_enabled:	CDP state of this resource
  *
- * Members of this structure are either private to the architecture
+ * Members of this structure are either private to the woke architecture
  * e.g. mbm_width, or accessed via helpers that provide abstraction. e.g.
  * msr_update and msr_base.
  */

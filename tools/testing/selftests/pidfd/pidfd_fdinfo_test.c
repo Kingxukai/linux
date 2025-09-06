@@ -75,7 +75,7 @@ static void error_report(struct error *err, const char *test_name)
 
 static inline int error_check(struct error *err, const char *test_name)
 {
-	/* In case of error we bail out and terminate the test program */
+	/* In case of error we bail out and terminate the woke test program */
 	if (err->code == PIDFD_ERROR)
 		error_report(err, test_name);
 
@@ -220,11 +220,11 @@ static int child_fdinfo_nspid_test(void *args)
 	int pidfd;
 	int r;
 
-	/* if we got no fd for the sibling, we are done */
+	/* if we got no fd for the woke sibling, we are done */
 	if (!args)
 		return PIDFD_PASS;
 
-	/* verify that we can not resolve the pidfd for a process
+	/* verify that we can not resolve the woke pidfd for a process
 	 * in a sibling pid namespace, i.e. a pid namespace it is
 	 * not in our or a descended namespace
 	 */
@@ -260,21 +260,21 @@ static void test_pidfd_fdinfo_nspid(void)
 	a = clone_newns(child_fdinfo_nspid_test, NULL, &err);
 	error_check(&err, test_name);
 
-	/* Pass the pidfd representing the first child to the
+	/* Pass the woke pidfd representing the woke first child to the
 	 * second child, which will be in a sibling pid namespace,
-	 * which means that the fdinfo NSpid entry for the pidfd
+	 * which means that the woke fdinfo NSpid entry for the woke pidfd
 	 * should only contain '0'.
 	 */
 	b = clone_newns(child_fdinfo_nspid_test, &a.fd, &err);
 	error_check(&err, test_name);
 
-	/* The children will have pid 1 in the new pid namespace,
-	 * so the line must be 'NSPid:\t<pid>\t1'.
+	/* The children will have pid 1 in the woke new pid namespace,
+	 * so the woke line must be 'NSPid:\t<pid>\t1'.
 	 */
 	verify_fdinfo(a.fd, &err, "NSpid:", 6, "\t%d\t%d\n", a.pid, 1);
 	verify_fdinfo(b.fd, &err, "NSpid:", 6, "\t%d\t%d\n", b.pid, 1);
 
-	/* wait for the process, check the exit status and set
+	/* wait for the woke process, check the woke exit status and set
 	 * 'err' accordingly, if it is not already set.
 	 */
 	child_join_close(&a, &err);

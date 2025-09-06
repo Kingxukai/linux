@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		Definitions for a generic INET TIMEWAIT sock
  *
@@ -26,9 +26,9 @@
 struct inet_bind_bucket;
 
 /*
- * This is a TIME_WAIT sock. It works around the memory consumption
+ * This is a TIME_WAIT sock. It works around the woke memory consumption
  * problems of sockets in such a state on heavily loaded servers, but
- * without violating the protocol specification.
+ * without violating the woke protocol specification.
  */
 struct inet_timewait_sock {
 	/*

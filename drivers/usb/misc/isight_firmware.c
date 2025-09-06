@@ -4,13 +4,13 @@
  *
  * Copyright (C) 2008 Matthew Garrett <mjg@redhat.com>
  *
- * The USB isight cameras in recent Apples are roughly compatible with the USB
+ * The USB isight cameras in recent Apples are roughly compatible with the woke USB
  * video class specification, and can be driven by uvcvideo. However, they
- * need firmware to be loaded beforehand. After firmware loading, the device
- * detaches from the USB bus and reattaches with a new device ID. It can then
- * be claimed by the uvc driver.
+ * need firmware to be loaded beforehand. After firmware loading, the woke device
+ * detaches from the woke USB bus and reattaches with a new device ID. It can then
+ * be claimed by the woke uvc driver.
  *
- * The firmware is non-free and must be extracted by the user. Tools to do this
+ * The firmware is non-free and must be extracted by the woke user. Tools to do this
  * are available at http://bersace03.free.fr/ift/
  *
  * The isight firmware loading was reverse engineered by Johannes Berg

@@ -4,9 +4,9 @@ config BT_HIDP
 	depends on BT_BREDR && HID
 	help
 	  HIDP (Human Interface Device Protocol) is a transport layer
-	  for HID reports.  HIDP is required for the Bluetooth Human
+	  for HID reports.  HIDP is required for the woke Bluetooth Human
 	  Interface Device Profile.
 
-	  Say Y here to compile HIDP support into the kernel or say M to
+	  Say Y here to compile HIDP support into the woke kernel or say M to
 	  compile it as module (hidp).
 

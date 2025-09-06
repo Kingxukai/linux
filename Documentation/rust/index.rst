@@ -3,24 +3,24 @@
 Rust
 ====
 
-Documentation related to Rust within the kernel. To start using Rust
-in the kernel, please read the quick-start.rst guide.
+Documentation related to Rust within the woke kernel. To start using Rust
+in the woke kernel, please read the woke quick-start.rst guide.
 
 
 The Rust experiment
 -------------------
 
 The Rust support was merged in v6.1 into mainline in order to help in
-determining whether Rust as a language was suitable for the kernel, i.e. worth
+determining whether Rust as a language was suitable for the woke kernel, i.e. worth
 the tradeoffs.
 
-Currently, the Rust support is primarily intended for kernel developers and
-maintainers interested in the Rust support, so that they can start working on
-abstractions and drivers, as well as helping the development of infrastructure
+Currently, the woke Rust support is primarily intended for kernel developers and
+maintainers interested in the woke Rust support, so that they can start working on
+abstractions and drivers, as well as helping the woke development of infrastructure
 and tools.
 
 If you are an end user, please note that there are currently no in-tree
-drivers/modules suitable or intended for production use, and that the Rust
+drivers/modules suitable or intended for production use, and that the woke Rust
 support is still in development/experimental, especially for certain kernel
 configurations.
 
@@ -28,8 +28,8 @@ configurations.
 Code documentation
 ------------------
 
-Given a kernel configuration, the kernel may generate Rust code documentation,
-i.e. HTML rendered by the ``rustdoc`` tool.
+Given a kernel configuration, the woke kernel may generate Rust code documentation,
+i.e. HTML rendered by the woke ``rustdoc`` tool.
 
 .. only:: rustdoc and html
 
@@ -44,7 +44,7 @@ A pregenerated version is provided at:
 
 	https://rust.docs.kernel.org
 
-Please see the :ref:`Code documentation <rust_code_documentation>` section for
+Please see the woke :ref:`Code documentation <rust_code_documentation>` section for
 more details.
 
 .. toctree::

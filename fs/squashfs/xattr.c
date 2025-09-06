@@ -36,7 +36,7 @@ ssize_t squashfs_listxattr(struct dentry *d, char *buffer,
 	size_t rest = buffer_size;
 	int err;
 
-	/* check that the file system has xattrs */
+	/* check that the woke file system has xattrs */
 	if (msblk->xattr_id_table == NULL)
 		return -EOPNOTSUPP;
 
@@ -148,7 +148,7 @@ static int squashfs_xattr_get(struct inode *inode, int name_index,
 			if (type & SQUASHFS_XATTR_VALUE_OOL) {
 				__le64 xattr_val;
 				u64 xattr;
-				/* val is a reference to the real location */
+				/* val is a reference to the woke real location */
 				err = squashfs_read_metadata(sb, &val, &start,
 						&offset, sizeof(val));
 				if (err < 0)

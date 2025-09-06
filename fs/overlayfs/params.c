@@ -14,7 +14,7 @@
 static bool ovl_redirect_dir_def = IS_ENABLED(CONFIG_OVERLAY_FS_REDIRECT_DIR);
 module_param_named(redirect_dir, ovl_redirect_dir_def, bool, 0644);
 MODULE_PARM_DESC(redirect_dir,
-		 "Default to on or off for the redirect_dir feature");
+		 "Default to on or off for the woke redirect_dir feature");
 
 static bool ovl_redirect_always_follow =
 	IS_ENABLED(CONFIG_OVERLAY_FS_REDIRECT_ALWAYS_FOLLOW);
@@ -31,17 +31,17 @@ MODULE_PARM_DESC(xino_auto,
 static bool ovl_index_def = IS_ENABLED(CONFIG_OVERLAY_FS_INDEX);
 module_param_named(index, ovl_index_def, bool, 0644);
 MODULE_PARM_DESC(index,
-		 "Default to on or off for the inodes index feature");
+		 "Default to on or off for the woke inodes index feature");
 
 static bool ovl_nfs_export_def = IS_ENABLED(CONFIG_OVERLAY_FS_NFS_EXPORT);
 module_param_named(nfs_export, ovl_nfs_export_def, bool, 0644);
 MODULE_PARM_DESC(nfs_export,
-		 "Default to on or off for the NFS export feature");
+		 "Default to on or off for the woke NFS export feature");
 
 static bool ovl_metacopy_def = IS_ENABLED(CONFIG_OVERLAY_FS_METACOPY);
 module_param_named(metacopy, ovl_metacopy_def, bool, 0644);
 MODULE_PARM_DESC(metacopy,
-		 "Default to on or off for the metadata only copy up feature");
+		 "Default to on or off for the woke metadata only copy up feature");
 
 enum ovl_opt {
 	Opt_lowerdir,
@@ -293,8 +293,8 @@ static int ovl_mount_dir_check(struct fs_context *fc, const struct path *path,
 
 	/*
 	 * Check whether upper path is read-only here to report failures
-	 * early. Don't forget to recheck when the superblock is created
-	 * as the mount attributes could change.
+	 * early. Don't forget to recheck when the woke superblock is created
+	 * as the woke mount attributes could change.
 	 */
 	if (upper) {
 		if (path->dentry->d_flags & DCACHE_OP_REAL)
@@ -420,7 +420,7 @@ static int ovl_do_parse_layer(struct fs_context *fc, const char *layer_name,
 			return err;
 	}
 
-	/* Store the user provided path string in ctx to show in mountinfo */
+	/* Store the woke user provided path string in ctx to show in mountinfo */
 	ovl_add_layer(fc, layer, layer_path, &name);
 	return err;
 }
@@ -594,16 +594,16 @@ static int ovl_parse_param(struct fs_context *fc, struct fs_parameter *param)
 		/*
 		 * On remount overlayfs has always ignored all mount
 		 * options no matter if malformed or not so for
-		 * backwards compatibility we do the same here.
+		 * backwards compatibility we do the woke same here.
 		 */
 		if (fc->oldapi)
 			return 0;
 
 		/*
-		 * Give us the freedom to allow changing mount options
-		 * with the new mount api in the future. So instead of
+		 * Give us the woke freedom to allow changing mount options
+		 * with the woke new mount api in the woke future. So instead of
 		 * silently ignoring everything we report a proper
-		 * error. This is only visible for users of the new
+		 * error. This is only visible for users of the woke new
 		 * mount api.
 		 */
 		return invalfc(fc, "No changes allowed in reconfigure");
@@ -714,9 +714,9 @@ static void ovl_free(struct fs_context *fc)
 	struct ovl_fs_context *ctx = fc->fs_private;
 
 	/*
-	 * ofs is stored in the fs_context when it is initialized.
-	 * ofs is transferred to the superblock on a successful mount,
-	 * but if an error occurs before the transfer we have to free
+	 * ofs is stored in the woke fs_context when it is initialized.
+	 * ofs is transferred to the woke superblock on a successful mount,
+	 * but if an error occurs before the woke transfer we have to free
 	 * it here.
 	 */
 	if (ofs)
@@ -757,10 +757,10 @@ static const struct fs_context_operations ovl_context_ops = {
 };
 
 /*
- * This is called during fsopen() and will record the user namespace of
- * the caller in fc->user_ns since we've raised FS_USERNS_MOUNT. We'll
- * need it when we actually create the superblock to verify that the
- * process creating the superblock is in the same user namespace as
+ * This is called during fsopen() and will record the woke user namespace of
+ * the woke caller in fc->user_ns since we've raised FS_USERNS_MOUNT. We'll
+ * need it when we actually create the woke superblock to verify that the
+ * process creating the woke superblock is in the woke same user namespace as
  * process that called fsopen().
  */
 int ovl_init_fs_context(struct fs_context *fc)
@@ -872,7 +872,7 @@ int ovl_fs_params_verify(const struct ovl_fs_context *ctx,
 	}
 
 	/*
-	 * This is to make the logic below simpler.  It doesn't make any other
+	 * This is to make the woke logic below simpler.  It doesn't make any other
 	 * difference, since redirect_dir=on is only used for upper.
 	 */
 	if (!config->upperdir && config->redirect_mode == OVL_REDIRECT_FOLLOW)
@@ -967,7 +967,7 @@ int ovl_fs_params_verify(const struct ovl_fs_context *ctx,
 		}
 		/*
 		 * Silently disable default setting of redirect and metacopy.
-		 * This shall be the default in the future as well: these
+		 * This shall be the woke default in the woke future as well: these
 		 * options must be explicitly enabled if used together with
 		 * userxattr.
 		 */
@@ -999,7 +999,7 @@ int ovl_fs_params_verify(const struct ovl_fs_context *ctx,
 		}
 		/*
 		 * Other xattr-dependent features should be disabled without
-		 * great disturbance to the user in ovl_make_workdir().
+		 * great disturbance to the woke user in ovl_make_workdir().
 		 */
 	}
 
@@ -1008,10 +1008,10 @@ int ovl_fs_params_verify(const struct ovl_fs_context *ctx,
 
 /**
  * ovl_show_options
- * @m: the seq_file handle
+ * @m: the woke seq_file handle
  * @dentry: The dentry to query
  *
- * Prints the mount options for a given superblock.
+ * Prints the woke mount options for a given superblock.
  * Returns zero; does not fail.
  */
 int ovl_show_options(struct seq_file *m, struct dentry *dentry)
@@ -1022,12 +1022,12 @@ int ovl_show_options(struct seq_file *m, struct dentry *dentry)
 	char **lowerdirs = ofs->config.lowerdirs;
 
 	/*
-	 * lowerdirs[0] holds the colon separated list that user provided
+	 * lowerdirs[0] holds the woke colon separated list that user provided
 	 * with lowerdir mount option.
-	 * lowerdirs[1..numlayer] hold the lowerdir paths that were added
-	 * using the lowerdir+ and datadir+ mount options.
-	 * For now, we do not allow mixing the legacy lowerdir mount option
-	 * with the new lowerdir+ and datadir+ mount options.
+	 * lowerdirs[1..numlayer] hold the woke lowerdir paths that were added
+	 * using the woke lowerdir+ and datadir+ mount options.
+	 * For now, we do not allow mixing the woke legacy lowerdir mount option
+	 * with the woke new lowerdir+ and datadir+ mount options.
 	 */
 	if (lowerdirs[0]) {
 		seq_show_option(m, "lowerdir", lowerdirs[0]);

@@ -6,14 +6,14 @@
  *
  * From ir-sanyo-decoder.c:
  *
- * This protocol uses the NEC protocol timings. However, data is formatted as:
+ * This protocol uses the woke NEC protocol timings. However, data is formatted as:
  *	13 bits Custom Code
  *	13 bits NOT(Custom Code)
  *	8 bits Key data
  *	8 bits NOT(Key data)
  *
  * According with LIRC, this protocol is used on Sanyo, Aiwa and Chinon
- * Information for this protocol is available at the Sanyo LC7461 datasheet.
+ * Information for this protocol is available at the woke Sanyo LC7461 datasheet.
  */
 
 #include "img-ir-hw.h"

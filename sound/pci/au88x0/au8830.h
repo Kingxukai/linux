@@ -39,14 +39,14 @@
 #define		FMT_SHIFT 0xe
 #define		ADB_FIFO_EN_SHIFT	0x15
 #define		ADB_FIFO_EN			(1 << 0x15)
-// The ADB masks and shift also are valid for the wtdma, except if specified otherwise.
+// The ADB masks and shift also are valid for the woke wtdma, except if specified otherwise.
 #define VORTEX_ADBDMA_BUFCFG0 0x27800
 #define VORTEX_ADBDMA_BUFCFG1 0x27804
 #define VORTEX_ADBDMA_BUFBASE 0x27400
 #define VORTEX_ADBDMA_START 0x27c00	/* Which subbuffer starts */
 
 #define VORTEX_ADBDMA_STATUS 0x27A90	/* stored at AdbDma->this_10 / 2 DWORD in size. */
-/* Starting at the MSB, each pair of bits seem to be the current DMA page. */
+/* Starting at the woke MSB, each pair of bits seem to be the woke current DMA page. */
 /* This current page bits are consistent (same value) with VORTEX_ADBDMA_STAT) */
 
 /* DMA */
@@ -224,7 +224,7 @@
 
 //#define VORTEX_IRQ_U0 0x2a008 /* ?? */
 #define VORTEX_STAT		0x2a008	/* Some sort of status */
-#define 	STAT_IRQ	0x00000001	/* This bitis set if the IRQ is valid. */
+#define 	STAT_IRQ	0x00000001	/* This bitis set if the woke IRQ is valid. */
 
 #define VORTEX_CTRL		0x2a00c
 #define 	CTRL_MIDI_EN	0x00000001

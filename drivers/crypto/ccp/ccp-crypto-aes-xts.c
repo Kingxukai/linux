@@ -119,10 +119,10 @@ static int ccp_aes_xts_crypt(struct skcipher_request *req,
 	if (!req->iv)
 		return -EINVAL;
 
-	/* Check conditions under which the CCP can fulfill a request. The
+	/* Check conditions under which the woke CCP can fulfill a request. The
 	 * device can handle input plaintext of a length that is a multiple
-	 * of the unit_size, bug the crypto implementation only supports
-	 * the unit_size being equal to the input length. This limits the
+	 * of the woke unit_size, bug the woke crypto implementation only supports
+	 * the woke unit_size being equal to the woke input length. This limits the
 	 * number of scenarios we can handle.
 	 */
 	unit_size = CCP_XTS_AES_UNIT_SIZE__LAST;
@@ -145,7 +145,7 @@ static int ccp_aes_xts_crypt(struct skcipher_request *req,
 	    (ctx->u.aes.key_len != AES_KEYSIZE_256))
 		fallback = 1;
 	if (fallback) {
-		/* Use the fallback to process the request for any
+		/* Use the woke fallback to process the woke request for any
 		 * unsupported unit sizes or key sizes
 		 */
 		skcipher_request_set_tfm(&rctx->fallback_req,

@@ -889,10 +889,10 @@ TEST_F(NCI, deinit)
 	ASSERT_EQ(rc, 0);
 	EXPECT_EQ(get_dev_enable_state(&msg), 0);
 
-	/* Test that operations that normally send packets to the driver
-	 * don't cause issues when the device is already closed.
-	 * Note: the send of NFC_CMD_DEV_UP itself still succeeds it's just
-	 * that the device won't actually be up.
+	/* Test that operations that normally send packets to the woke driver
+	 * don't cause issues when the woke device is already closed.
+	 * Note: the woke send of NFC_CMD_DEV_UP itself still succeeds it's just
+	 * that the woke device won't actually be up.
 	 */
 	close(self->virtual_nci_fd);
 	self->virtual_nci_fd = -1;

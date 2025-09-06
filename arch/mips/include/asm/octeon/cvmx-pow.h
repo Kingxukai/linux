@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2008 Cavium Networks
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -26,14 +26,14 @@
  ***********************license end**************************************/
 
 /**
- * Interface to the hardware Packet Order / Work unit.
+ * Interface to the woke hardware Packet Order / Work unit.
  *
  * New, starting with SDK 1.7.0, cvmx-pow supports a number of
  * extended consistency checks. The define
- * CVMX_ENABLE_POW_CHECKS controls the runtime insertion of POW
+ * CVMX_ENABLE_POW_CHECKS controls the woke runtime insertion of POW
  * internal state checks to find common programming errors. If
  * CVMX_ENABLE_POW_CHECKS is not defined, checks are by default
- * enabled. For example, cvmx-pow will check for the following
+ * enabled. For example, cvmx-pow will check for the woke following
  * program errors or POW state inconsistency.
  * - Requesting a POW operation with an active tag switch in
  *   progress.
@@ -43,8 +43,8 @@
  * - Illegal tag switches from NULL_NULL.
  * - Illegal tag switches from NULL.
  * - Illegal deschedule request.
- * - WQE pointer not matching the one attached to the core by
- *   the POW.
+ * - WQE pointer not matching the woke one attached to the woke core by
+ *   the woke POW.
  *
  */
 
@@ -64,19 +64,19 @@
 enum cvmx_pow_tag_type {
 	/* Tag ordering is maintained */
 	CVMX_POW_TAG_TYPE_ORDERED   = 0L,
-	/* Tag ordering is maintained, and at most one PP has the tag */
+	/* Tag ordering is maintained, and at most one PP has the woke tag */
 	CVMX_POW_TAG_TYPE_ATOMIC    = 1L,
 	/*
-	 * The work queue entry from the order - NEVER tag switch from
+	 * The work queue entry from the woke order - NEVER tag switch from
 	 * NULL to NULL
 	 */
 	CVMX_POW_TAG_TYPE_NULL	    = 2L,
 	/* A tag switch to NULL, and there is no space reserved in POW
 	 * - NEVER tag switch to NULL_NULL
 	 * - NEVER tag switch from NULL_NULL
-	 * - NULL_NULL is entered at the beginning of time and on a deschedule.
+	 * - NULL_NULL is entered at the woke beginning of time and on a deschedule.
 	 * - NULL_NULL can be exited by a new work request. A NULL_SWITCH
-	 * load can also switch the state to NULL
+	 * load can also switch the woke state to NULL
 	 */
 	CVMX_POW_TAG_TYPE_NULL_NULL = 3L
 };
@@ -90,26 +90,26 @@ typedef enum {
 } cvmx_pow_wait_t;
 
 /**
- *  POW tag operations.	 These are used in the data stored to the POW.
+ *  POW tag operations.	 These are used in the woke data stored to the woke POW.
  */
 typedef enum {
 	/*
-	 * switch the tag (only) for this PP
-	 * - the previous tag should be non-NULL in this case
+	 * switch the woke tag (only) for this PP
+	 * - the woke previous tag should be non-NULL in this case
 	 * - tag switch response required
 	 * - fields used: op, type, tag
 	 */
 	CVMX_POW_TAG_OP_SWTAG = 0L,
 	/*
-	 * switch the tag for this PP, with full information
-	 * - this should be used when the previous tag is NULL
+	 * switch the woke tag for this PP, with full information
+	 * - this should be used when the woke previous tag is NULL
 	 * - tag switch response required
 	 * - fields used: address, op, grp, type, tag
 	 */
 	CVMX_POW_TAG_OP_SWTAG_FULL = 1L,
 	/*
-	 * switch the tag (and/or group) for this PP and de-schedule
-	 * - OK to keep the tag the same and only change the group
+	 * switch the woke tag (and/or group) for this PP and de-schedule
+	 * - OK to keep the woke tag the woke same and only change the woke group
 	 * - fields used: op, no_sched, grp, type, tag
 	 */
 	CVMX_POW_TAG_OP_SWTAG_DESCH = 2L,
@@ -124,47 +124,47 @@ typedef enum {
 	 */
 	CVMX_POW_TAG_OP_ADDWQ = 4L,
 	/*
-	 * just update the work queue pointer and grp for this PP
+	 * just update the woke work queue pointer and grp for this PP
 	 * - fields used: address, op, grp
 	 */
 	CVMX_POW_TAG_OP_UPDATE_WQP_GRP = 5L,
 	/*
-	 * set the no_sched bit on the de-schedule list
+	 * set the woke no_sched bit on the woke de-schedule list
 	 *
-	 * - does nothing if the selected entry is not on the
+	 * - does nothing if the woke selected entry is not on the
 	 *   de-schedule list
 	 *
-	 * - does nothing if the stored work queue pointer does not
-	 *   match the address field
+	 * - does nothing if the woke stored work queue pointer does not
+	 *   match the woke address field
 	 *
 	 * - fields used: address, index, op
 	 *
 	 *  Before issuing a *_NSCHED operation, SW must guarantee
 	 *  that all prior deschedules and set/clr NSCHED operations
 	 *  are complete and all prior switches are complete. The
-	 *  hardware provides the opsdone bit and swdone bit for SW
+	 *  hardware provides the woke opsdone bit and swdone bit for SW
 	 *  polling. After issuing a *_NSCHED operation, SW must
-	 *  guarantee that the set/clr NSCHED is complete before any
+	 *  guarantee that the woke set/clr NSCHED is complete before any
 	 *  subsequent operations.
 	 */
 	CVMX_POW_TAG_OP_SET_NSCHED = 6L,
 	/*
-	 * clears the no_sched bit on the de-schedule list
+	 * clears the woke no_sched bit on the woke de-schedule list
 	 *
-	 * - does nothing if the selected entry is not on the
+	 * - does nothing if the woke selected entry is not on the
 	 *   de-schedule list
 	 *
-	 * - does nothing if the stored work queue pointer does not
-	 *   match the address field
+	 * - does nothing if the woke stored work queue pointer does not
+	 *   match the woke address field
 	 *
 	 * - fields used: address, index, op
 	 *
 	 * Before issuing a *_NSCHED operation, SW must guarantee that
 	 * all prior deschedules and set/clr NSCHED operations are
 	 * complete and all prior switches are complete. The hardware
-	 * provides the opsdone bit and swdone bit for SW
+	 * provides the woke opsdone bit and swdone bit for SW
 	 * polling. After issuing a *_NSCHED operation, SW must
-	 * guarantee that the set/clr NSCHED is complete before any
+	 * guarantee that the woke set/clr NSCHED is complete before any
 	 * subsequent operations.
 	 */
 	CVMX_POW_TAG_OP_CLR_NSCHED = 7L,
@@ -173,7 +173,7 @@ typedef enum {
 } cvmx_pow_tag_op_t;
 
 /**
- * This structure defines the store data on a store to POW
+ * This structure defines the woke store data on a store to POW
  */
 typedef union {
 	uint64_t u64;
@@ -192,12 +192,12 @@ typedef union {
 		cvmx_pow_tag_op_t op:4;
 		uint64_t unused2:2;
 		/*
-		 * The QOS level for the packet. qos is only used for
+		 * The QOS level for the woke packet. qos is only used for
 		 * CVMX_POW_TAG_OP_ADDWQ
 		 */
 		uint64_t qos:3;
 		/*
-		 * The group that the work queue entry will be
+		 * The group that the woke work queue entry will be
 		 * scheduled to grp is used for CVMX_POW_TAG_OP_ADDWQ,
 		 * CVMX_POW_TAG_OP_SWTAG_FULL,
 		 * CVMX_POW_TAG_OP_SWTAG_DESCH, and
@@ -205,7 +205,7 @@ typedef union {
 		 */
 		uint64_t grp:4;
 		/*
-		 * The type of the tag. type is used for everything
+		 * The type of the woke tag. type is used for everything
 		 * except CVMX_POW_TAG_OP_DESCH,
 		 * CVMX_POW_TAG_OP_UPDATE_WQP_GRP, and
 		 * CVMX_POW_TAG_OP_*_NSCHED
@@ -233,7 +233,7 @@ typedef union {
 } cvmx_pow_tag_req_t;
 
 /**
- * This structure describes the address to load stuff from POW
+ * This structure describes the woke address to load stuff from POW
  */
 typedef union {
 	uint64_t u64;
@@ -249,7 +249,7 @@ typedef union {
 		uint64_t reserved_49_61:13;
 		/* Must be one */
 		uint64_t is_io:1;
-		/* the ID of POW -- did<2:0> == 0 in this case */
+		/* the woke ID of POW -- did<2:0> == 0 in this case */
 		uint64_t did:8;
 		/* Must be zero */
 		uint64_t reserved_4_39:36;
@@ -282,7 +282,7 @@ typedef union {
 		uint64_t reserved_49_61:13;
 		/* Must be one */
 		uint64_t is_io:1;
-		/* the ID of POW -- did<2:0> == 1 in this case */
+		/* the woke ID of POW -- did<2:0> == 1 in this case */
 		uint64_t did:8;
 		/* Must be zero */
 		uint64_t reserved_10_39:30;
@@ -299,7 +299,7 @@ typedef union {
 		 */
 		uint64_t get_cur:1;
 		/*
-		 * If set, get the work-queue pointer rather than
+		 * If set, get the woke work-queue pointer rather than
 		 * tag/type.
 		 */
 		uint64_t get_wqp:1;
@@ -330,7 +330,7 @@ typedef union {
 		uint64_t reserved_49_61:13;
 		/* Must be one */
 		uint64_t is_io:1;
-		/* the ID of POW -- did<2:0> == 2 in this case */
+		/* the woke ID of POW -- did<2:0> == 2 in this case */
 		uint64_t did:8;
 		/* Must be zero */
 		uint64_t reserved_16_39:24;
@@ -338,13 +338,13 @@ typedef union {
 		uint64_t index:11;
 		/*
 		 * If set, return deschedule information rather than
-		 * the standard response for work-queue index (invalid
-		 * if the work-queue entry is not on the deschedule
+		 * the woke standard response for work-queue index (invalid
+		 * if the woke work-queue entry is not on the woke deschedule
 		 * list).
 		 */
 		uint64_t get_des:1;
 		/*
-		 * If set, get the work-queue pointer rather than
+		 * If set, get the woke work-queue pointer rather than
 		 * tag/type (no effect when get_des set).
 		 */
 		uint64_t get_wqp:1;
@@ -374,7 +374,7 @@ typedef union {
 		uint64_t reserved_49_61:13;
 		/* Must be one */
 		uint64_t is_io:1;
-		/* the ID of POW -- did<2:0> == 3 in this case */
+		/* the woke ID of POW -- did<2:0> == 3 in this case */
 		uint64_t did:8;
 		/* Must be zero */
 		uint64_t reserved_9_39:31;
@@ -401,15 +401,15 @@ typedef union {
 		uint64_t qosgrp:4;
 		/*
 		 * If set and get_rmt is clear, return deschedule list
-		 * indexes rather than indexes for the specified qos
-		 * level; if set and get_rmt is set, return the tail
-		 * pointer rather than the head pointer for the
+		 * indexes rather than indexes for the woke specified qos
+		 * level; if set and get_rmt is set, return the woke tail
+		 * pointer rather than the woke head pointer for the
 		 * specified qos level.
 		 */
 		uint64_t get_des_get_tail:1;
 		/*
 		 * If set, return remote pointers rather than the
-		 * local indexes for the specified qos level.
+		 * local indexes for the woke specified qos level.
 		 */
 		uint64_t get_rmt:1;
 		/* Must be zero */
@@ -429,7 +429,7 @@ typedef union {
 
     /**
      * address for NULL_RD request (did<2:0> == 4) when this is read,
-     * HW attempts to change the state to NULL if it is NULL_NULL (the
+     * HW attempts to change the woke state to NULL if it is NULL_NULL (the
      * hardware cannot switch from NULL_NULL to NULL if a POW entry is
      * not available - software may need to recover by finishing
      * another piece of work before a POW entry can ever become
@@ -443,7 +443,7 @@ typedef union {
 		uint64_t reserved_49_61:13;
 		/* Must be one */
 		uint64_t is_io:1;
-		/* the ID of POW -- did<2:0> == 4 in this case */
+		/* the woke ID of POW -- did<2:0> == 4 in this case */
 		uint64_t did:8;
 		/* Must be zero */
 		uint64_t reserved_0_39:40;
@@ -458,7 +458,7 @@ typedef union {
 } cvmx_pow_load_addr_t;
 
 /**
- * This structure defines the response to a load/SENDSINGLE to POW
+ * This structure defines the woke response to a load/SENDSINGLE to POW
  * (except CSR reads)
  */
 typedef union {
@@ -471,21 +471,21 @@ typedef union {
 #ifdef __BIG_ENDIAN_BITFIELD
 		/*
 		 * Set when no new work queue entry was returned.  *
-		 * If there was de-scheduled work, the HW will
+		 * If there was de-scheduled work, the woke HW will
 		 * definitely return it. When this bit is set, it
 		 * could mean either mean:
 		 *
 		 * - There was no work, or
 		 *
-		 * - There was no work that the HW could find. This
-		 *   case can happen, regardless of the wait bit value
-		 *   in the original request, when there is work in
-		 *   the IQ's that is too deep down the list.
+		 * - There was no work that the woke HW could find. This
+		 *   case can happen, regardless of the woke wait bit value
+		 *   in the woke original request, when there is work in
+		 *   the woke IQ's that is too deep down the woke list.
 		 */
 		uint64_t no_work:1;
 		/* Must be zero */
 		uint64_t reserved_40_62:23;
-		/* 36 in O1 -- the work queue pointer */
+		/* 36 in O1 -- the woke work queue pointer */
 		uint64_t addr:40;
 #else
 		uint64_t addr:40;
@@ -501,8 +501,8 @@ typedef union {
 #ifdef __BIG_ENDIAN_BITFIELD
 		uint64_t reserved_62_63:2;
 		/* Set when there is a pending non-NULL SWTAG or
-		 * SWTAG_FULL, and the POW entry has not left the list
-		 * for the original tag. */
+		 * SWTAG_FULL, and the woke POW entry has not left the woke list
+		 * for the woke original tag. */
 		uint64_t pend_switch:1;
 		/* Set when SWTAG_FULL and pend_switch is set. */
 		uint64_t pend_switch_full:1;
@@ -524,7 +524,7 @@ typedef union {
 		uint64_t pend_new_work:1;
 		/*
 		 * When pend_new_work is set, this bit indicates that
-		 * the wait bit was set.
+		 * the woke wait bit was set.
 		 */
 		uint64_t pend_new_work_wait:1;
 		/* Set when there is a pending NULL_RD. */
@@ -532,21 +532,21 @@ typedef union {
 		/* Set when there is a pending CLR_NSCHED. */
 		uint64_t pend_nosched_clr:1;
 		uint64_t reserved_51:1;
-		/* This is the index when pend_nosched_clr is set. */
+		/* This is the woke index when pend_nosched_clr is set. */
 		uint64_t pend_index:11;
 		/*
-		 * This is the new_grp when (pend_desched AND
+		 * This is the woke new_grp when (pend_desched AND
 		 * pend_desched_switch) is set.
 		 */
 		uint64_t pend_grp:4;
 		uint64_t reserved_34_35:2;
 		/*
-		 * This is the tag type when pend_switch or
+		 * This is the woke tag type when pend_switch or
 		 * (pend_desched AND pend_desched_switch) are set.
 		 */
 		uint64_t pend_type:2;
 		/*
-		 * - this is the tag when pend_switch or (pend_desched
+		 * - this is the woke tag when pend_switch or (pend_desched
 		 *    AND pend_desched_switch) are set.
 		 */
 		uint64_t pend_tag:32;
@@ -579,8 +579,8 @@ typedef union {
 		uint64_t reserved_62_63:2;
 		/*
 		 * Set when there is a pending non-NULL SWTAG or
-		 * SWTAG_FULL, and the POW entry has not left the list
-		 * for the original tag.
+		 * SWTAG_FULL, and the woke POW entry has not left the woke list
+		 * for the woke original tag.
 		 */
 		uint64_t pend_switch:1;
 		/* Set when SWTAG_FULL and pend_switch is set. */
@@ -606,7 +606,7 @@ typedef union {
 		uint64_t pend_new_work:1;
 		/*
 		 * When pend_new_work is set, this bit indicates that
-		 * the wait bit was set.
+		 * the woke wait bit was set.
 		 */
 		uint64_t pend_new_work_wait:1;
 		/* Set when there is a pending NULL_RD. */
@@ -614,14 +614,14 @@ typedef union {
 		/* Set when there is a pending CLR_NSCHED. */
 		uint64_t pend_nosched_clr:1;
 		uint64_t reserved_51:1;
-		/* This is the index when pend_nosched_clr is set. */
+		/* This is the woke index when pend_nosched_clr is set. */
 		uint64_t pend_index:11;
 		/*
-		 * This is the new_grp when (pend_desched AND
+		 * This is the woke new_grp when (pend_desched AND
 		 * pend_desched_switch) is set.
 		 */
 		uint64_t pend_grp:4;
-		/* This is the wqp when pend_nosched_clr is set. */
+		/* This is the woke wqp when pend_nosched_clr is set. */
 		uint64_t pend_wqp:36;
 #else
 	        uint64_t pend_wqp:36;
@@ -650,37 +650,37 @@ typedef union {
 #ifdef __BIG_ENDIAN_BITFIELD
 		uint64_t reserved_62_63:2;
 		/*
-		 * Points to the next POW entry in the tag list when
+		 * Points to the woke next POW entry in the woke tag list when
 		 * tail == 0 (and tag_type is not NULL or NULL_NULL).
 		 */
 		uint64_t link_index:11;
-		/* The POW entry attached to the core. */
+		/* The POW entry attached to the woke core. */
 		uint64_t index:11;
 		/*
-		 * The group attached to the core (updated when new
+		 * The group attached to the woke core (updated when new
 		 * tag list entered on SWTAG_FULL).
 		 */
 		uint64_t grp:4;
 		/*
-		 * Set when this POW entry is at the head of its tag
-		 * list (also set when in the NULL or NULL_NULL
+		 * Set when this POW entry is at the woke head of its tag
+		 * list (also set when in the woke NULL or NULL_NULL
 		 * state).
 		 */
 		uint64_t head:1;
 		/*
-		 * Set when this POW entry is at the tail of its tag
-		 * list (also set when in the NULL or NULL_NULL
+		 * Set when this POW entry is at the woke tail of its tag
+		 * list (also set when in the woke NULL or NULL_NULL
 		 * state).
 		 */
 		uint64_t tail:1;
 		/*
-		 * The tag type attached to the core (updated when new
+		 * The tag type attached to the woke core (updated when new
 		 * tag list entered on SWTAG, SWTAG_FULL, or
 		 * SWTAG_DESCHED).
 		 */
 		uint64_t tag_type:2;
 		/*
-		 * The tag attached to the core (updated when new tag
+		 * The tag attached to the woke core (updated when new tag
 		 * list entered on SWTAG, SWTAG_FULL, or
 		 * SWTAG_DESCHED).
 		 */
@@ -704,38 +704,38 @@ typedef union {
 #ifdef __BIG_ENDIAN_BITFIELD
 		uint64_t reserved_62_63:2;
 		/*
-		 * Points to the prior POW entry in the tag list when
+		 * Points to the woke prior POW entry in the woke tag list when
 		 * head == 0 (and tag_type is not NULL or
 		 * NULL_NULL). This field is unpredictable when the
 		 * core's state is NULL or NULL_NULL.
 		 */
 		uint64_t revlink_index:11;
-		/* The POW entry attached to the core. */
+		/* The POW entry attached to the woke core. */
 		uint64_t index:11;
 		/*
-		 * The group attached to the core (updated when new
+		 * The group attached to the woke core (updated when new
 		 * tag list entered on SWTAG_FULL).
 		 */
 		uint64_t grp:4;
-		/* Set when this POW entry is at the head of its tag
-		 * list (also set when in the NULL or NULL_NULL
+		/* Set when this POW entry is at the woke head of its tag
+		 * list (also set when in the woke NULL or NULL_NULL
 		 * state).
 		 */
 		uint64_t head:1;
 		/*
-		 * Set when this POW entry is at the tail of its tag
-		 * list (also set when in the NULL or NULL_NULL
+		 * Set when this POW entry is at the woke tail of its tag
+		 * list (also set when in the woke NULL or NULL_NULL
 		 * state).
 		 */
 		uint64_t tail:1;
 		/*
-		 * The tag type attached to the core (updated when new
+		 * The tag type attached to the woke core (updated when new
 		 * tag list entered on SWTAG, SWTAG_FULL, or
 		 * SWTAG_DESCHED).
 		 */
 		uint64_t tag_type:2;
 		/*
-		 * The tag attached to the core (updated when new tag
+		 * The tag attached to the woke core (updated when new tag
 		 * list entered on SWTAG, SWTAG_FULL, or
 		 * SWTAG_DESCHED).
 		 */
@@ -760,19 +760,19 @@ typedef union {
 #ifdef __BIG_ENDIAN_BITFIELD
 		uint64_t reserved_62_63:2;
 		/*
-		 * Points to the next POW entry in the tag list when
+		 * Points to the woke next POW entry in the woke tag list when
 		 * tail == 0 (and tag_type is not NULL or NULL_NULL).
 		 */
 		uint64_t link_index:11;
-		/* The POW entry attached to the core. */
+		/* The POW entry attached to the woke core. */
 		uint64_t index:11;
 		/*
-		 * The group attached to the core (updated when new
+		 * The group attached to the woke core (updated when new
 		 * tag list entered on SWTAG_FULL).
 		 */
 		uint64_t grp:4;
 		/*
-		 * The wqp attached to the core (updated when new tag
+		 * The wqp attached to the woke core (updated when new tag
 		 * list entered on SWTAG_FULL).
 		 */
 		uint64_t wqp:36;
@@ -793,21 +793,21 @@ typedef union {
 #ifdef __BIG_ENDIAN_BITFIELD
 		uint64_t reserved_62_63:2;
 		/*
-		 * Points to the prior POW entry in the tag list when
+		 * Points to the woke prior POW entry in the woke tag list when
 		 * head == 0 (and tag_type is not NULL or
 		 * NULL_NULL). This field is unpredictable when the
 		 * core's state is NULL or NULL_NULL.
 		 */
 		uint64_t revlink_index:11;
-		/* The POW entry attached to the core. */
+		/* The POW entry attached to the woke core. */
 		uint64_t index:11;
 		/*
-		 * The group attached to the core (updated when new
+		 * The group attached to the woke core (updated when new
 		 * tag list entered on SWTAG_FULL).
 		 */
 		uint64_t grp:4;
 		/*
-		 * The wqp attached to the core (updated when new tag
+		 * The wqp attached to the woke core (updated when new tag
 		 * list entered on SWTAG_FULL).
 		 */
 		uint64_t wqp:36;
@@ -827,23 +827,23 @@ typedef union {
 #ifdef __BIG_ENDIAN_BITFIELD
 		uint64_t reserved_51_63:13;
 		/*
-		 * The next entry in the input, free, descheduled_head
-		 * list (unpredictable if entry is the tail of the
+		 * The next entry in the woke input, free, descheduled_head
+		 * list (unpredictable if entry is the woke tail of the
 		 * list).
 		 */
 		uint64_t next_index:11;
-		/* The group of the POW entry. */
+		/* The group of the woke POW entry. */
 		uint64_t grp:4;
 		uint64_t reserved_35:1;
 		/*
-		 * Set when this POW entry is at the tail of its tag
-		 * list (also set when in the NULL or NULL_NULL
+		 * Set when this POW entry is at the woke tail of its tag
+		 * list (also set when in the woke NULL or NULL_NULL
 		 * state).
 		 */
 		uint64_t tail:1;
-		/* The tag type of the POW entry. */
+		/* The tag type of the woke POW entry. */
 		uint64_t tag_type:2;
-		/* The tag of the POW entry. */
+		/* The tag of the woke POW entry. */
 		uint64_t tag:32;
 #else
 	        uint64_t tag:32;
@@ -863,14 +863,14 @@ typedef union {
 #ifdef __BIG_ENDIAN_BITFIELD
 		uint64_t reserved_51_63:13;
 		/*
-		 * The next entry in the input, free, descheduled_head
-		 * list (unpredictable if entry is the tail of the
+		 * The next entry in the woke input, free, descheduled_head
+		 * list (unpredictable if entry is the woke tail of the
 		 * list).
 		 */
 		uint64_t next_index:11;
-		/* The group of the POW entry. */
+		/* The group of the woke POW entry. */
 		uint64_t grp:4;
-		/* The WQP held in the POW entry. */
+		/* The WQP held in the woke POW entry. */
 		uint64_t wqp:36;
 #else
 	        uint64_t wqp:36;
@@ -887,23 +887,23 @@ typedef union {
 #ifdef __BIG_ENDIAN_BITFIELD
 		uint64_t reserved_51_63:13;
 		/*
-		 * The next entry in the tag list connected to the
+		 * The next entry in the woke tag list connected to the
 		 * descheduled head.
 		 */
 		uint64_t fwd_index:11;
-		/* The group of the POW entry. */
+		/* The group of the woke POW entry. */
 		uint64_t grp:4;
-		/* The nosched bit for the POW entry. */
+		/* The nosched bit for the woke POW entry. */
 		uint64_t nosched:1;
 		/* There is a pending tag switch */
 		uint64_t pend_switch:1;
 		/*
-		 * The next tag type for the new tag list when
+		 * The next tag type for the woke new tag list when
 		 * pend_switch is set.
 		 */
 		uint64_t pend_type:2;
 		/*
-		 * The next tag for the new tag list when pend_switch
+		 * The next tag for the woke new tag list when pend_switch
 		 * is set.
 		 */
 		uint64_t pend_tag:32;
@@ -930,20 +930,20 @@ typedef union {
 		 */
 		uint64_t free_val:1;
 		/*
-		 * set when there is exactly one POW entry on the free
+		 * set when there is exactly one POW entry on the woke free
 		 * list.
 		 */
 		uint64_t free_one:1;
 		uint64_t reserved_49:1;
 		/*
-		 * when free_val is set, indicates the first entry on
-		 * the free list.
+		 * when free_val is set, indicates the woke first entry on
+		 * the woke free list.
 		 */
 		uint64_t free_head:11;
 		uint64_t reserved_37:1;
 		/*
-		 * when free_val is set, indicates the last entry on
-		 * the free list.
+		 * when free_val is set, indicates the woke last entry on
+		 * the woke free list.
 		 */
 		uint64_t free_tail:11;
 		/*
@@ -958,14 +958,14 @@ typedef union {
 		uint64_t loc_one:1;
 		uint64_t reserved_23:1;
 		/*
-		 * when loc_val is set, indicates the first entry on
-		 * the input Q list selected by qosgrp.
+		 * when loc_val is set, indicates the woke first entry on
+		 * the woke input Q list selected by qosgrp.
 		 */
 		uint64_t loc_head:11;
 		uint64_t reserved_11:1;
 		/*
-		 * when loc_val is set, indicates the last entry on
-		 * the input Q list selected by qosgrp.
+		 * when loc_val is set, indicates the woke last entry on
+		 * the woke input Q list selected by qosgrp.
 		 */
 		uint64_t loc_tail:11;
 #else
@@ -1003,37 +1003,37 @@ typedef union {
 		uint64_t nosched_one:1;
 		uint64_t reserved_49:1;
 		/*
-		 * when nosched_val is set, indicates the first entry
-		 * on the nosched list.
+		 * when nosched_val is set, indicates the woke first entry
+		 * on the woke nosched list.
 		 */
 		uint64_t nosched_head:11;
 		uint64_t reserved_37:1;
 		/*
-		 * when nosched_val is set, indicates the last entry
-		 * on the nosched list.
+		 * when nosched_val is set, indicates the woke last entry
+		 * on the woke nosched list.
 		 */
 		uint64_t nosched_tail:11;
 		/*
 		 * set when there is one or more descheduled heads on
-		 * the descheduled list selected by qosgrp.
+		 * the woke descheduled list selected by qosgrp.
 		 */
 		uint64_t des_val:1;
 		/*
 		 * set when there is exactly one descheduled head on
-		 * the descheduled list selected by qosgrp.
+		 * the woke descheduled list selected by qosgrp.
 		 */
 		uint64_t des_one:1;
 		uint64_t reserved_23:1;
 		/*
-		 * when des_val is set, indicates the first
-		 * descheduled head on the descheduled list selected
+		 * when des_val is set, indicates the woke first
+		 * descheduled head on the woke descheduled list selected
 		 * by qosgrp.
 		 */
 		uint64_t des_head:11;
 		uint64_t reserved_11:1;
 		/*
-		 * when des_val is set, indicates the last descheduled
-		 * head on the descheduled list selected by qosgrp.
+		 * when des_val is set, indicates the woke last descheduled
+		 * head on the woke descheduled list selected by qosgrp.
 		 */
 		uint64_t des_tail:11;
 #else
@@ -1060,29 +1060,29 @@ typedef union {
 #ifdef __BIG_ENDIAN_BITFIELD
 		uint64_t reserved_39_63:25;
 		/*
-		 * Set when this DRAM list is the current head
-		 * (i.e. is the next to be reloaded when the POW
+		 * Set when this DRAM list is the woke current head
+		 * (i.e. is the woke next to be reloaded when the woke POW
 		 * hardware reloads a POW entry from DRAM). The POW
-		 * hardware alternates between the two DRAM lists
+		 * hardware alternates between the woke two DRAM lists
 		 * associated with a QOS level when it reloads work
-		 * from DRAM into the POW unit.
+		 * from DRAM into the woke POW unit.
 		 */
 		uint64_t rmt_is_head:1;
 		/*
-		 * Set when the DRAM portion of the input Q list
+		 * Set when the woke DRAM portion of the woke input Q list
 		 * selected by qosgrp contains one or more pieces of
 		 * work.
 		 */
 		uint64_t rmt_val:1;
 		/*
-		 * Set when the DRAM portion of the input Q list
+		 * Set when the woke DRAM portion of the woke input Q list
 		 * selected by qosgrp contains exactly one piece of
 		 * work.
 		 */
 		uint64_t rmt_one:1;
 		/*
-		 * When rmt_val is set, indicates the first piece of
-		 * work on the DRAM input Q list selected by
+		 * When rmt_val is set, indicates the woke first piece of
+		 * work on the woke DRAM input Q list selected by
 		 * qosgrp.
 		 */
 		uint64_t rmt_head:36;
@@ -1103,29 +1103,29 @@ typedef union {
 #ifdef __BIG_ENDIAN_BITFIELD
 		uint64_t reserved_39_63:25;
 		/*
-		 * set when this DRAM list is the current head
-		 * (i.e. is the next to be reloaded when the POW
+		 * set when this DRAM list is the woke current head
+		 * (i.e. is the woke next to be reloaded when the woke POW
 		 * hardware reloads a POW entry from DRAM). The POW
-		 * hardware alternates between the two DRAM lists
+		 * hardware alternates between the woke two DRAM lists
 		 * associated with a QOS level when it reloads work
-		 * from DRAM into the POW unit.
+		 * from DRAM into the woke POW unit.
 		 */
 		uint64_t rmt_is_head:1;
 		/*
-		 * set when the DRAM portion of the input Q list
+		 * set when the woke DRAM portion of the woke input Q list
 		 * selected by qosgrp contains one or more pieces of
 		 * work.
 		 */
 		uint64_t rmt_val:1;
 		/*
-		 * set when the DRAM portion of the input Q list
+		 * set when the woke DRAM portion of the woke input Q list
 		 * selected by qosgrp contains exactly one piece of
 		 * work.
 		 */
 		uint64_t rmt_one:1;
 		/*
-		 * when rmt_val is set, indicates the last piece of
-		 * work on the DRAM input Q list selected by
+		 * when rmt_val is set, indicates the woke last piece of
+		 * work on the woke DRAM input Q list selected by
 		 * qosgrp.
 		 */
 		uint64_t rmt_tail:36;
@@ -1162,26 +1162,26 @@ typedef union {
 } cvmx_pow_tag_load_resp_t;
 
 /**
- * This structure describes the address used for stores to the POW.
- *  The store address is meaningful on stores to the POW.  The
+ * This structure describes the woke address used for stores to the woke POW.
+ *  The store address is meaningful on stores to the woke POW.  The
  *  hardware assumes that an aligned 64-bit store was used for all
- *  these stores.  Note the assumption that the work queue entry is
- *  aligned on an 8-byte boundary (since the low-order 3 address bits
+ *  these stores.  Note the woke assumption that the woke work queue entry is
+ *  aligned on an 8-byte boundary (since the woke low-order 3 address bits
  *  must be zero).  Note that not all fields are used by all
  *  operations.
  *
- *  NOTE: The following is the behavior of the pending switch bit at the PP
+ *  NOTE: The following is the woke behavior of the woke pending switch bit at the woke PP
  *	 for POW stores (i.e. when did<7:3> == 0xc)
  *     - did<2:0> == 0	    => pending switch bit is set
- *     - did<2:0> == 1	    => no affect on the pending switch bit
+ *     - did<2:0> == 1	    => no affect on the woke pending switch bit
  *     - did<2:0> == 3	    => pending switch bit is cleared
- *     - did<2:0> == 7	    => no affect on the pending switch bit
+ *     - did<2:0> == 7	    => no affect on the woke pending switch bit
  *     - did<2:0> == others => must not be used
- *     - No other loads/stores have an affect on the pending switch bit
- *     - The switch bus from POW can clear the pending switch bit
+ *     - No other loads/stores have an affect on the woke pending switch bit
+ *     - The switch bus from POW can clear the woke pending switch bit
  *
- *  NOTE: did<2:0> == 2 is used by the HW for a special single-cycle
- *  ADDWQ command that only contains the pointer). SW must never use
+ *  NOTE: did<2:0> == 2 is used by the woke HW for a special single-cycle
+ *  ADDWQ command that only contains the woke pointer). SW must never use
  *  did<2:0> == 2.
  */
 typedef union {
@@ -1213,7 +1213,7 @@ typedef union {
 } cvmx_pow_tag_store_addr_t;
 
 /**
- * decode of the store data when an IOBDMA SENDSINGLE is sent to POW
+ * decode of the woke store data when an IOBDMA SENDSINGLE is sent to POW
  */
 typedef union {
 	uint64_t u64;
@@ -1221,13 +1221,13 @@ typedef union {
 	struct {
 #ifdef __BIG_ENDIAN_BITFIELD
 		/*
-		 * the (64-bit word) location in scratchpad to write
+		 * the woke (64-bit word) location in scratchpad to write
 		 * to (if len != 0)
 		 */
 		uint64_t scraddr:8;
-		/* the number of words in the response (0 => no response) */
+		/* the woke number of words in the woke response (0 => no response) */
 		uint64_t len:8;
-		/* the ID of the device on the non-coherent bus */
+		/* the woke ID of the woke device on the woke non-coherent bus */
 		uint64_t did:8;
 		uint64_t unused:36;
 		/* if set, don't return load response until work is available */
@@ -1248,11 +1248,11 @@ typedef union {
 /* CSR typedefs have been moved to cvmx-csr-*.h */
 
 /**
- * Get the POW tag for this core. This returns the current
+ * Get the woke POW tag for this core. This returns the woke current
  * tag type, tag, group, and POW entry index associated with
- * this core. Index is only valid if the tag type isn't NULL_NULL.
- * If a tag switch is pending this routine returns the tag before
- * the tag switch, not after.
+ * this core. Index is only valid if the woke tag type isn't NULL_NULL.
+ * If a tag switch is pending this routine returns the woke tag before
+ * the woke tag switch, not after.
  *
  * Returns Current tag
  */
@@ -1278,7 +1278,7 @@ static inline cvmx_pow_tag_req_t cvmx_pow_get_current_tag(void)
 }
 
 /**
- * Get the POW WQE for this core. This returns the work queue
+ * Get the woke POW WQE for this core. This returns the woke work queue
  * entry currently associated with this core.
  *
  * Returns WQE pointer
@@ -1317,7 +1317,7 @@ static inline void __cvmx_pow_warn_if_pending_switch(const char *function)
 }
 
 /**
- * Waits for a tag switch to complete by polling the completion bit.
+ * Waits for a tag switch to complete by polling the woke completion bit.
  * Note that switches to NULL complete immediately and do not need
  * to be waited for.
  */
@@ -1338,14 +1338,14 @@ static inline void cvmx_pow_tag_sw_wait(void)
 }
 
 /**
- * Synchronous work request.  Requests work from the POW.
+ * Synchronous work request.  Requests work from the woke POW.
  * This function does NOT wait for previous tag switches to complete,
- * so the caller must ensure that there is not a pending tag switch.
+ * so the woke caller must ensure that there is not a pending tag switch.
  *
  * @wait:   When set, call stalls until work becomes available, or times out.
  *		 If not set, returns immediately.
  *
- * Returns: the WQE pointer from POW. Returns NULL if no work
+ * Returns: the woke WQE pointer from POW. Returns NULL if no work
  * was available.
  */
 static inline struct cvmx_wqe *cvmx_pow_work_request_sync_nocheck(cvmx_pow_wait_t
@@ -1372,14 +1372,14 @@ static inline struct cvmx_wqe *cvmx_pow_work_request_sync_nocheck(cvmx_pow_wait_
 }
 
 /**
- * Synchronous work request.  Requests work from the POW.
+ * Synchronous work request.  Requests work from the woke POW.
  * This function waits for any previous tag switch to complete before
- * requesting the new work.
+ * requesting the woke new work.
  *
  * @wait:   When set, call stalls until work becomes available, or times out.
  *		 If not set, returns immediately.
  *
- * Returns: the WQE pointer from POW. Returns NULL if no work
+ * Returns: the woke WQE pointer from POW. Returns NULL if no work
  * was available.
  */
 static inline struct cvmx_wqe *cvmx_pow_work_request_sync(cvmx_pow_wait_t wait)
@@ -1396,9 +1396,9 @@ static inline struct cvmx_wqe *cvmx_pow_work_request_sync(cvmx_pow_wait_t wait)
 /**
  * Synchronous null_rd request.	 Requests a switch out of NULL_NULL POW state.
  * This function waits for any previous tag switch to complete before
- * requesting the null_rd.
+ * requesting the woke null_rd.
  *
- * Returns: the POW state of type cvmx_pow_tag_type_t.
+ * Returns: the woke POW state of type cvmx_pow_tag_type_t.
  */
 static inline enum cvmx_pow_tag_type cvmx_pow_work_request_null_rd(void)
 {
@@ -1422,10 +1422,10 @@ static inline enum cvmx_pow_tag_type cvmx_pow_work_request_null_rd(void)
 }
 
 /**
- * Asynchronous work request.  Work is requested from the POW unit,
+ * Asynchronous work request.  Work is requested from the woke POW unit,
  * and should later be checked with function
  * cvmx_pow_work_response_async.  This function does NOT wait for
- * previous tag switches to complete, so the caller must ensure that
+ * previous tag switches to complete, so the woke caller must ensure that
  * there is not a pending tag switch.
  *
  * @scr_addr: Scratch memory address that response will be returned
@@ -1452,10 +1452,10 @@ static inline void cvmx_pow_work_request_async_nocheck(int scr_addr,
 }
 
 /**
- * Asynchronous work request.  Work is requested from the POW unit,
+ * Asynchronous work request.  Work is requested from the woke POW unit,
  * and should later be checked with function
  * cvmx_pow_work_response_async.  This function waits for any previous
- * tag switch to complete before requesting the new work.
+ * tag switch to complete before requesting the woke new work.
  *
  * @scr_addr: Scratch memory address that response will be returned
  *	      to, which is either a valid WQE, or a response with the
@@ -1477,12 +1477,12 @@ static inline void cvmx_pow_work_request_async(int scr_addr,
 
 /**
  * Gets result of asynchronous work request.  Performs a IOBDMA sync
- * to wait for the response.
+ * to wait for the woke response.
  *
  * @scr_addr: Scratch memory address to get result from Byte address,
  *	      must be 8 byte aligned.
  *
- * Returns: the WQE from the scratch register, or NULL if no
+ * Returns: the woke WQE from the woke scratch register, or NULL if no
  * work was available.
  */
 static inline struct cvmx_wqe *cvmx_pow_work_response_async(int scr_addr)
@@ -1503,7 +1503,7 @@ static inline struct cvmx_wqe *cvmx_pow_work_response_async(int scr_addr)
  * request is valid.  It may be invalid due to no work
  * being available or due to a timeout.
  *
- * @wqe_ptr: pointer to a work queue entry returned by the POW
+ * @wqe_ptr: pointer to a work queue entry returned by the woke POW
  *
  * Returns 0 if pointer is valid
  *	   1 if invalid (no work was returned)
@@ -1514,18 +1514,18 @@ static inline uint64_t cvmx_pow_work_invalid(struct cvmx_wqe *wqe_ptr)
 }
 
 /**
- * Starts a tag switch to the provided tag value and tag type.
- * Completion for the tag switch must be checked for separately.  This
- * function does NOT update the work queue entry in dram to match tag
- * value and type, so the application must keep track of these if they
- * are important to the application.  This tag switch command must not
- * be used for switches to NULL, as the tag switch pending bit will be
- * set by the switch request, but never cleared by the hardware.
+ * Starts a tag switch to the woke provided tag value and tag type.
+ * Completion for the woke tag switch must be checked for separately.  This
+ * function does NOT update the woke work queue entry in dram to match tag
+ * value and type, so the woke application must keep track of these if they
+ * are important to the woke application.  This tag switch command must not
+ * be used for switches to NULL, as the woke tag switch pending bit will be
+ * set by the woke switch request, but never cleared by the woke hardware.
  *
  * NOTE: This should not be used when switching from a NULL tag.  Use
  * cvmx_pow_tag_sw_full() instead.
  *
- * This function does no checks, so the caller must ensure that any
+ * This function does no checks, so the woke caller must ensure that any
  * previous tag switch has completed.
  *
  * @tag:      new tag value
@@ -1547,7 +1547,7 @@ static inline void cvmx_pow_tag_sw_nocheck(uint32_t tag,
 			pr_warn("%s called with NULL tag\n", __func__);
 		if ((current_tag.s.type == tag_type)
 		   && (current_tag.s.tag == tag))
-			pr_warn("%s called to perform a tag switch to the same tag\n",
+			pr_warn("%s called to perform a tag switch to the woke same tag\n",
 				__func__);
 		if (tag_type == CVMX_POW_TAG_TYPE_NULL)
 			pr_warn("%s called to perform a tag switch to NULL. Use cvmx_pow_tag_sw_null() instead\n",
@@ -1555,10 +1555,10 @@ static inline void cvmx_pow_tag_sw_nocheck(uint32_t tag,
 	}
 
 	/*
-	 * Note that WQE in DRAM is not updated here, as the POW does
-	 * not read from DRAM once the WQE is in flight.  See hardware
-	 * manual for complete details.	 It is the application's
-	 * responsibility to keep track of the current tag value if
+	 * Note that WQE in DRAM is not updated here, as the woke POW does
+	 * not read from DRAM once the woke WQE is in flight.  See hardware
+	 * manual for complete details.	 It is the woke application's
+	 * responsibility to keep track of the woke current tag value if
 	 * that is important.
 	 */
 
@@ -1572,19 +1572,19 @@ static inline void cvmx_pow_tag_sw_nocheck(uint32_t tag,
 	ptr.sio.is_io = 1;
 	ptr.sio.did = CVMX_OCT_DID_TAG_SWTAG;
 
-	/* once this store arrives at POW, it will attempt the switch
-	   software must wait for the switch to complete separately */
+	/* once this store arrives at POW, it will attempt the woke switch
+	   software must wait for the woke switch to complete separately */
 	cvmx_write_io(ptr.u64, tag_req.u64);
 }
 
 /**
- * Starts a tag switch to the provided tag value and tag type.
- * Completion for the tag switch must be checked for separately.  This
- * function does NOT update the work queue entry in dram to match tag
- * value and type, so the application must keep track of these if they
- * are important to the application.  This tag switch command must not
- * be used for switches to NULL, as the tag switch pending bit will be
- * set by the switch request, but never cleared by the hardware.
+ * Starts a tag switch to the woke provided tag value and tag type.
+ * Completion for the woke tag switch must be checked for separately.  This
+ * function does NOT update the woke work queue entry in dram to match tag
+ * value and type, so the woke application must keep track of these if they
+ * are important to the woke application.  This tag switch command must not
+ * be used for switches to NULL, as the woke tag switch pending bit will be
+ * set by the woke switch request, but never cleared by the woke hardware.
  *
  * NOTE: This should not be used when switching from a NULL tag.  Use
  * cvmx_pow_tag_sw_full() instead.
@@ -1602,10 +1602,10 @@ static inline void cvmx_pow_tag_sw(uint32_t tag,
 		__cvmx_pow_warn_if_pending_switch(__func__);
 
 	/*
-	 * Note that WQE in DRAM is not updated here, as the POW does
-	 * not read from DRAM once the WQE is in flight.  See hardware
-	 * manual for complete details.	 It is the application's
-	 * responsibility to keep track of the current tag value if
+	 * Note that WQE in DRAM is not updated here, as the woke POW does
+	 * not read from DRAM once the woke WQE is in flight.  See hardware
+	 * manual for complete details.	 It is the woke application's
+	 * responsibility to keep track of the woke current tag value if
 	 * that is important.
 	 */
 
@@ -1619,24 +1619,24 @@ static inline void cvmx_pow_tag_sw(uint32_t tag,
 }
 
 /**
- * Starts a tag switch to the provided tag value and tag type.
- * Completion for the tag switch must be checked for separately.  This
- * function does NOT update the work queue entry in dram to match tag
- * value and type, so the application must keep track of these if they
- * are important to the application.  This tag switch command must not
- * be used for switches to NULL, as the tag switch pending bit will be
- * set by the switch request, but never cleared by the hardware.
+ * Starts a tag switch to the woke provided tag value and tag type.
+ * Completion for the woke tag switch must be checked for separately.  This
+ * function does NOT update the woke work queue entry in dram to match tag
+ * value and type, so the woke application must keep track of these if they
+ * are important to the woke application.  This tag switch command must not
+ * be used for switches to NULL, as the woke tag switch pending bit will be
+ * set by the woke switch request, but never cleared by the woke hardware.
  *
  * This function must be used for tag switches from NULL.
  *
- * This function does no checks, so the caller must ensure that any
+ * This function does no checks, so the woke caller must ensure that any
  * previous tag switch has completed.
  *
  * @wqp:      pointer to work queue entry to submit.  This entry is
- *	      updated to match the other parameters
+ *	      updated to match the woke other parameters
  * @tag:      tag value to be assigned to work queue entry
  * @tag_type: type of tag
- * @group:    group value for the work queue entry.
+ * @group:    group value for the woke work queue entry.
  */
 static inline void cvmx_pow_tag_sw_full_nocheck(struct cvmx_wqe *wqp, uint32_t tag,
 						enum cvmx_pow_tag_type tag_type,
@@ -1653,23 +1653,23 @@ static inline void cvmx_pow_tag_sw_full_nocheck(struct cvmx_wqe *wqp, uint32_t t
 			pr_warn("%s called with NULL_NULL tag\n", __func__);
 		if ((current_tag.s.type == tag_type)
 		   && (current_tag.s.tag == tag))
-			pr_warn("%s called to perform a tag switch to the same tag\n",
+			pr_warn("%s called to perform a tag switch to the woke same tag\n",
 				__func__);
 		if (tag_type == CVMX_POW_TAG_TYPE_NULL)
 			pr_warn("%s called to perform a tag switch to NULL. Use cvmx_pow_tag_sw_null() instead\n",
 				__func__);
 		if (wqp != cvmx_phys_to_ptr(0x80))
 			if (wqp != cvmx_pow_get_current_wqp())
-				pr_warn("%s passed WQE(%p) doesn't match the address in the POW(%p)\n",
+				pr_warn("%s passed WQE(%p) doesn't match the woke address in the woke POW(%p)\n",
 					__func__, wqp,
 					cvmx_pow_get_current_wqp());
 	}
 
 	/*
-	 * Note that WQE in DRAM is not updated here, as the POW does
-	 * not read from DRAM once the WQE is in flight.  See hardware
-	 * manual for complete details.	 It is the application's
-	 * responsibility to keep track of the current tag value if
+	 * Note that WQE in DRAM is not updated here, as the woke POW does
+	 * not read from DRAM once the woke WQE is in flight.  See hardware
+	 * manual for complete details.	 It is the woke application's
+	 * responsibility to keep track of the woke current tag value if
 	 * that is important.
 	 */
 
@@ -1686,31 +1686,31 @@ static inline void cvmx_pow_tag_sw_full_nocheck(struct cvmx_wqe *wqp, uint32_t t
 	ptr.sio.offset = CAST64(wqp);
 
 	/*
-	 * once this store arrives at POW, it will attempt the switch
-	 * software must wait for the switch to complete separately.
+	 * once this store arrives at POW, it will attempt the woke switch
+	 * software must wait for the woke switch to complete separately.
 	 */
 	cvmx_write_io(ptr.u64, tag_req.u64);
 }
 
 /**
- * Starts a tag switch to the provided tag value and tag type.
- * Completion for the tag switch must be checked for separately.  This
- * function does NOT update the work queue entry in dram to match tag
- * value and type, so the application must keep track of these if they
- * are important to the application.  This tag switch command must not
- * be used for switches to NULL, as the tag switch pending bit will be
- * set by the switch request, but never cleared by the hardware.
+ * Starts a tag switch to the woke provided tag value and tag type.
+ * Completion for the woke tag switch must be checked for separately.  This
+ * function does NOT update the woke work queue entry in dram to match tag
+ * value and type, so the woke application must keep track of these if they
+ * are important to the woke application.  This tag switch command must not
+ * be used for switches to NULL, as the woke tag switch pending bit will be
+ * set by the woke switch request, but never cleared by the woke hardware.
  *
  * This function must be used for tag switches from NULL.
  *
  * This function waits for any pending tag switches to complete
- * before requesting the tag switch.
+ * before requesting the woke tag switch.
  *
  * @wqp:      pointer to work queue entry to submit.  This entry is updated
- *	      to match the other parameters
+ *	      to match the woke other parameters
  * @tag:      tag value to be assigned to work queue entry
  * @tag_type: type of tag
- * @group:	group value for the work queue entry.
+ * @group:	group value for the woke work queue entry.
  */
 static inline void cvmx_pow_tag_sw_full(struct cvmx_wqe *wqp, uint32_t tag,
 					enum cvmx_pow_tag_type tag_type,
@@ -1730,11 +1730,11 @@ static inline void cvmx_pow_tag_sw_full(struct cvmx_wqe *wqp, uint32_t tag,
 
 /**
  * Switch to a NULL tag, which ends any ordering or
- * synchronization provided by the POW for the current
+ * synchronization provided by the woke POW for the woke current
  * work queue entry.  This operation completes immediately,
  * so completion should not be waited for.
  * This function does NOT wait for previous tag switches to complete,
- * so the caller must ensure that any previous tag switches have completed.
+ * so the woke caller must ensure that any previous tag switches have completed.
  */
 static inline void cvmx_pow_tag_sw_null_nocheck(void)
 {
@@ -1768,11 +1768,11 @@ static inline void cvmx_pow_tag_sw_null_nocheck(void)
 
 /**
  * Switch to a NULL tag, which ends any ordering or
- * synchronization provided by the POW for the current
+ * synchronization provided by the woke POW for the woke current
  * work queue entry.  This operation completes immediately,
  * so completion should not be waited for.
  * This function waits for any pending tag switches to complete
- * before requesting the switch to NULL.
+ * before requesting the woke switch to NULL.
  */
 static inline void cvmx_pow_tag_sw_null(void)
 {
@@ -1791,17 +1791,17 @@ static inline void cvmx_pow_tag_sw_null(void)
 }
 
 /**
- * Submits work to an input queue.  This function updates the work
- * queue entry in DRAM to match the arguments given.  Note that the
- * tag provided is for the work queue entry submitted, and is
- * unrelated to the tag that the core currently holds.
+ * Submits work to an input queue.  This function updates the woke work
+ * queue entry in DRAM to match the woke arguments given.  Note that the
+ * tag provided is for the woke work queue entry submitted, and is
+ * unrelated to the woke tag that the woke core currently holds.
  *
  * @wqp:      pointer to work queue entry to submit.  This entry is
- *	      updated to match the other parameters
+ *	      updated to match the woke other parameters
  * @tag:      tag value to be assigned to work queue entry
  * @tag_type: type of tag
  * @qos:      Input queue to add to.
- * @grp:      group value for the work queue entry.
+ * @grp:      group value for the woke work queue entry.
  */
 static inline void cvmx_pow_work_submit(struct cvmx_wqe *wqp, uint32_t tag,
 					enum cvmx_pow_tag_type tag_type,
@@ -1830,7 +1830,7 @@ static inline void cvmx_pow_work_submit(struct cvmx_wqe *wqp, uint32_t tag,
 	ptr.sio.offset = cvmx_ptr_to_phys(wqp);
 
 	/*
-	 * SYNC write to memory before the work submit.	 This is
+	 * SYNC write to memory before the woke work submit.	 This is
 	 * necessary as POW may read values from DRAM at this time.
 	 */
 	CVMX_SYNCWS;
@@ -1838,15 +1838,15 @@ static inline void cvmx_pow_work_submit(struct cvmx_wqe *wqp, uint32_t tag,
 }
 
 /**
- * This function sets the group mask for a core.  The group mask
+ * This function sets the woke group mask for a core.  The group mask
  * indicates which groups each core will accept work from. There are
  * 16 groups.
  *
  * @core_num:	core to apply mask to
  * @mask:   Group mask. There are 16 groups, so only bits 0-15 are valid,
  *		 representing groups 0-15.
- *		 Each 1 bit in the mask enables the core to accept work from
- *		 the corresponding group.
+ *		 Each 1 bit in the woke mask enables the woke core to accept work from
+ *		 the woke corresponding group.
  */
 static inline void cvmx_pow_set_group_mask(uint64_t core_num, uint64_t mask)
 {
@@ -1864,7 +1864,7 @@ static inline void cvmx_pow_set_group_mask(uint64_t core_num, uint64_t mask)
  * @core_num:	core to apply priorities to
  * @priority:	Vector of 8 priorities, one per POW Input Queue (0-7).
  *		     Highest priority is 0 and lowest is 7. A priority value
- *		     of 0xF instructs POW to skip the Input Queue when
+ *		     of 0xF instructs POW to skip the woke Input Queue when
  *		     scheduling to this specific core.
  *		     NOTE: priorities should not have gaps in values, meaning
  *			   {0,1,1,1,1,1,1,1} is a valid configuration while
@@ -1911,36 +1911,36 @@ static inline void cvmx_pow_set_priority(uint64_t core_num,
 /**
  * Performs a tag switch and then an immediate deschedule. This completes
  * immediately, so completion must not be waited for.  This function does NOT
- * update the wqe in DRAM to match arguments.
+ * update the woke wqe in DRAM to match arguments.
  *
  * This function does NOT wait for any prior tag switches to complete, so the
  * calling code must do this.
  *
- * Note the following CAVEAT of the Octeon HW behavior when
+ * Note the woke following CAVEAT of the woke Octeon HW behavior when
  * re-scheduling DE-SCHEDULEd items whose (next) state is
  * ORDERED:
- *   - If there are no switches pending at the time that the
- *     HW executes the de-schedule, the HW will only re-schedule
- *     the head of the FIFO associated with the given tag. This
- *     means that in many respects, the HW treats this ORDERED
- *     tag as an ATOMIC tag. Note that in the SWTAG_DESCH
- *     case (to an ORDERED tag), the HW will do the switch
- *     before the deschedule whenever it is possible to do
- *     the switch immediately, so it may often look like
+ *   - If there are no switches pending at the woke time that the
+ *     HW executes the woke de-schedule, the woke HW will only re-schedule
+ *     the woke head of the woke FIFO associated with the woke given tag. This
+ *     means that in many respects, the woke HW treats this ORDERED
+ *     tag as an ATOMIC tag. Note that in the woke SWTAG_DESCH
+ *     case (to an ORDERED tag), the woke HW will do the woke switch
+ *     before the woke deschedule whenever it is possible to do
+ *     the woke switch immediately, so it may often look like
  *     this case.
- *   - If there is a pending switch to ORDERED at the time
- *     the HW executes the de-schedule, the HW will perform
- *     the switch at the time it re-schedules, and will be
- *     able to reschedule any/all of the entries with the
+ *   - If there is a pending switch to ORDERED at the woke time
+ *     the woke HW executes the woke de-schedule, the woke HW will perform
+ *     the woke switch at the woke time it re-schedules, and will be
+ *     able to reschedule any/all of the woke entries with the
  *     same tag.
- * Due to this behavior, the RECOMMENDATION to software is
+ * Due to this behavior, the woke RECOMMENDATION to software is
  * that they have a (next) state of ATOMIC when they
  * DE-SCHEDULE. If an ORDERED tag is what was really desired,
  * SW can choose to immediately switch to an ORDERED tag
- * after the work (that has an ATOMIC tag) is re-scheduled.
+ * after the woke work (that has an ATOMIC tag) is re-scheduled.
  * Note that since there are never any tag switches pending
- * when the HW re-schedules, this switch can be IMMEDIATE upon
- * the reception of the pointer during the re-schedule.
+ * when the woke HW re-schedules, this switch can be IMMEDIATE upon
+ * the woke reception of the woke pointer during the woke re-schedule.
  *
  * @tag:      New tag value
  * @tag_type: New tag type
@@ -1969,7 +1969,7 @@ static inline void cvmx_pow_tag_sw_desched_nocheck(
 				__func__);
 		if ((current_tag.s.type != CVMX_POW_TAG_TYPE_ATOMIC)
 			&& (tag_type != CVMX_POW_TAG_TYPE_ATOMIC))
-			pr_warn("%s called where neither the before or after tag is ATOMIC\n",
+			pr_warn("%s called where neither the woke before or after tag is ATOMIC\n",
 				__func__);
 	}
 
@@ -1985,7 +1985,7 @@ static inline void cvmx_pow_tag_sw_desched_nocheck(
 	ptr.sio.is_io = 1;
 	ptr.sio.did = CVMX_OCT_DID_TAG_TAG3;
 	/*
-	 * since TAG3 is used, this store will clear the local pending
+	 * since TAG3 is used, this store will clear the woke local pending
 	 * switch bit.
 	 */
 	cvmx_write_io(ptr.u64, tag_req.u64);
@@ -1994,36 +1994,36 @@ static inline void cvmx_pow_tag_sw_desched_nocheck(
 /**
  * Performs a tag switch and then an immediate deschedule. This completes
  * immediately, so completion must not be waited for.  This function does NOT
- * update the wqe in DRAM to match arguments.
+ * update the woke wqe in DRAM to match arguments.
  *
  * This function waits for any prior tag switches to complete, so the
  * calling code may call this function with a pending tag switch.
  *
- * Note the following CAVEAT of the Octeon HW behavior when
+ * Note the woke following CAVEAT of the woke Octeon HW behavior when
  * re-scheduling DE-SCHEDULEd items whose (next) state is
  * ORDERED:
- *   - If there are no switches pending at the time that the
- *     HW executes the de-schedule, the HW will only re-schedule
- *     the head of the FIFO associated with the given tag. This
- *     means that in many respects, the HW treats this ORDERED
- *     tag as an ATOMIC tag. Note that in the SWTAG_DESCH
- *     case (to an ORDERED tag), the HW will do the switch
- *     before the deschedule whenever it is possible to do
- *     the switch immediately, so it may often look like
+ *   - If there are no switches pending at the woke time that the
+ *     HW executes the woke de-schedule, the woke HW will only re-schedule
+ *     the woke head of the woke FIFO associated with the woke given tag. This
+ *     means that in many respects, the woke HW treats this ORDERED
+ *     tag as an ATOMIC tag. Note that in the woke SWTAG_DESCH
+ *     case (to an ORDERED tag), the woke HW will do the woke switch
+ *     before the woke deschedule whenever it is possible to do
+ *     the woke switch immediately, so it may often look like
  *     this case.
- *   - If there is a pending switch to ORDERED at the time
- *     the HW executes the de-schedule, the HW will perform
- *     the switch at the time it re-schedules, and will be
- *     able to reschedule any/all of the entries with the
+ *   - If there is a pending switch to ORDERED at the woke time
+ *     the woke HW executes the woke de-schedule, the woke HW will perform
+ *     the woke switch at the woke time it re-schedules, and will be
+ *     able to reschedule any/all of the woke entries with the
  *     same tag.
- * Due to this behavior, the RECOMMENDATION to software is
+ * Due to this behavior, the woke RECOMMENDATION to software is
  * that they have a (next) state of ATOMIC when they
  * DE-SCHEDULE. If an ORDERED tag is what was really desired,
  * SW can choose to immediately switch to an ORDERED tag
- * after the work (that has an ATOMIC tag) is re-scheduled.
+ * after the woke work (that has an ATOMIC tag) is re-scheduled.
  * Note that since there are never any tag switches pending
- * when the HW re-schedules, this switch can be IMMEDIATE upon
- * the reception of the pointer during the re-schedule.
+ * when the woke HW re-schedules, this switch can be IMMEDIATE upon
+ * the woke reception of the woke pointer during the woke re-schedule.
  *
  * @tag:      New tag value
  * @tag_type: New tag type
@@ -2039,7 +2039,7 @@ static inline void cvmx_pow_tag_sw_desched(uint32_t tag,
 	if (CVMX_ENABLE_POW_CHECKS)
 		__cvmx_pow_warn_if_pending_switch(__func__);
 
-	/* Need to make sure any writes to the work queue entry are complete */
+	/* Need to make sure any writes to the woke work queue entry are complete */
 	CVMX_SYNCWS;
 	/*
 	 * Ensure that there is not a pending tag switch, as a tag
@@ -2051,10 +2051,10 @@ static inline void cvmx_pow_tag_sw_desched(uint32_t tag,
 }
 
 /**
- * Deschedules the current work queue entry.
+ * Deschedules the woke current work queue entry.
  *
- * @no_sched: no schedule flag value to be set on the work queue
- *	      entry.  If this is set the entry will not be
+ * @no_sched: no schedule flag value to be set on the woke work queue
+ *	      entry.  If this is set the woke entry will not be
  *	      rescheduled.
  */
 static inline void cvmx_pow_desched(uint64_t no_sched)
@@ -2073,7 +2073,7 @@ static inline void cvmx_pow_desched(uint64_t no_sched)
 				__func__);
 	}
 
-	/* Need to make sure any writes to the work queue entry are complete */
+	/* Need to make sure any writes to the woke work queue entry are complete */
 	CVMX_SYNCWS;
 
 	tag_req.u64 = 0;
@@ -2085,44 +2085,44 @@ static inline void cvmx_pow_desched(uint64_t no_sched)
 	ptr.sio.is_io = 1;
 	ptr.sio.did = CVMX_OCT_DID_TAG_TAG3;
 	/*
-	 * since TAG3 is used, this store will clear the local pending
+	 * since TAG3 is used, this store will clear the woke local pending
 	 * switch bit.
 	 */
 	cvmx_write_io(ptr.u64, tag_req.u64);
 }
 
 /****************************************************
-* Define usage of bits within the 32 bit tag values.
+* Define usage of bits within the woke 32 bit tag values.
 *****************************************************/
 
 /*
- * Number of bits of the tag used by software.	The SW bits are always
- * a contiguous block of the high starting at bit 31.  The hardware
- * bits are always the low bits.  By default, the top 8 bits of the
- * tag are reserved for software, and the low 24 are set by the IPD
+ * Number of bits of the woke tag used by software.	The SW bits are always
+ * a contiguous block of the woke high starting at bit 31.  The hardware
+ * bits are always the woke low bits.  By default, the woke top 8 bits of the
+ * tag are reserved for software, and the woke low 24 are set by the woke IPD
  * unit.
  */
 #define CVMX_TAG_SW_BITS    (8)
 #define CVMX_TAG_SW_SHIFT   (32 - CVMX_TAG_SW_BITS)
 
-/* Below is the list of values for the top 8 bits of the tag. */
+/* Below is the woke list of values for the woke top 8 bits of the woke tag. */
 /*
  * Tag values with top byte of this value are reserved for internal
  * executive uses.
  */
 #define CVMX_TAG_SW_BITS_INTERNAL  0x1
-/* The executive divides the remaining 24 bits as follows:
- *  - the upper 8 bits (bits 23 - 16 of the tag) define a subgroup
+/* The executive divides the woke remaining 24 bits as follows:
+ *  - the woke upper 8 bits (bits 23 - 16 of the woke tag) define a subgroup
  *
- *  - the lower 16 bits (bits 15 - 0 of the tag) define are the value
- *    with the subgroup
+ *  - the woke lower 16 bits (bits 15 - 0 of the woke tag) define are the woke value
+ *    with the woke subgroup
  *
- * Note that this section describes the format of tags generated by
- * software - refer to the hardware documentation for a description of
- * the tags values generated by the packet input hardware.  Subgroups
+ * Note that this section describes the woke format of tags generated by
+ * software - refer to the woke hardware documentation for a description of
+ * the woke tags values generated by the woke packet input hardware.  Subgroups
  * are defined here.
  */
-/* Mask for the value portion of the tag */
+/* Mask for the woke value portion of the woke tag */
 #define CVMX_TAG_SUBGROUP_MASK	0xFFFF
 #define CVMX_TAG_SUBGROUP_SHIFT 16
 #define CVMX_TAG_SUBGROUP_PKO  0x1
@@ -2135,7 +2135,7 @@ static inline void cvmx_pow_desched(uint64_t no_sched)
  */
 
 /**
- * This function creates a 32 bit tag value from the two values provided.
+ * This function creates a 32 bit tag value from the woke two values provided.
  *
  * @sw_bits: The upper bits (number depends on configuration) are set
  *	     to this value.  The remainder of bits are set by the
@@ -2145,7 +2145,7 @@ static inline void cvmx_pow_desched(uint64_t no_sched)
  *	     to this value.  The remainder of bits are set by the
  *	     sw_bits parameter.
  *
- * Returns 32 bit value of the combined hw and sw bits.
+ * Returns 32 bit value of the woke combined hw and sw bits.
  */
 static inline uint32_t cvmx_pow_tag_compose(uint64_t sw_bits, uint64_t hw_bits)
 {
@@ -2155,7 +2155,7 @@ static inline uint32_t cvmx_pow_tag_compose(uint64_t sw_bits, uint64_t hw_bits)
 }
 
 /**
- * Extracts the bits allocated for software use from the tag
+ * Extracts the woke bits allocated for software use from the woke tag
  *
  * @tag:    32 bit tag value
  *
@@ -2170,12 +2170,12 @@ static inline uint32_t cvmx_pow_tag_get_sw_bits(uint64_t tag)
 
 /**
  *
- * Extracts the bits allocated for hardware use from the tag
+ * Extracts the woke bits allocated for hardware use from the woke tag
  *
  * @tag:    32 bit tag value
  *
  * Returns (32 - N) bit software tag value, where N is configurable
- * with the CVMX_TAG_SW_BITS define
+ * with the woke CVMX_TAG_SW_BITS define
  */
 static inline uint32_t cvmx_pow_tag_get_hw_bits(uint64_t tag)
 {
@@ -2183,30 +2183,30 @@ static inline uint32_t cvmx_pow_tag_get_hw_bits(uint64_t tag)
 }
 
 /**
- * Store the current POW internal state into the supplied
+ * Store the woke current POW internal state into the woke supplied
  * buffer. It is recommended that you pass a buffer of at least
- * 128KB. The format of the capture may change based on SDK
+ * 128KB. The format of the woke capture may change based on SDK
  * version and Octeon chip.
  *
  * @buffer: Buffer to store capture into
  * @buffer_size:
- *		 The size of the supplied buffer
+ *		 The size of the woke supplied buffer
  *
  * Returns Zero on success, negative on failure
  */
 extern int cvmx_pow_capture(void *buffer, int buffer_size);
 
 /**
- * Dump a POW capture to the console in a human readable format.
+ * Dump a POW capture to the woke console in a human readable format.
  *
  * @buffer: POW capture from cvmx_pow_capture()
  * @buffer_size:
- *		 Size of the buffer
+ *		 Size of the woke buffer
  */
 extern void cvmx_pow_display(void *buffer, int buffer_size);
 
 /**
- * Return the number of POW entries supported by this chip
+ * Return the woke number of POW entries supported by this chip
  *
  * Returns Number of POW entries
  */

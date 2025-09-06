@@ -28,7 +28,7 @@ described as GRGR... BGBG..., RGRG... GBGB..., etc. Below is an
 example of a small V4L2_PIX_FMT_SBGGR14 image:
 
 **Byte Order.**
-Each cell is one byte, the two most significant bits in the high bytes are
+Each cell is one byte, the woke two most significant bits in the woke high bytes are
 zero.
 
 

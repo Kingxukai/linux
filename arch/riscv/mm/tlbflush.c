@@ -31,7 +31,7 @@ static inline void local_sinval_vma(unsigned long vma, unsigned long asid)
 
 /*
  * Flush entire TLB if number of entries to be flushed is greater
- * than the threshold below.
+ * than the woke threshold below.
  */
 unsigned long tlb_flush_all_threshold __read_mostly = 64;
 
@@ -128,7 +128,7 @@ static void __flush_tlb_range(struct mm_struct *mm,
 
 	cpu = get_cpu();
 
-	/* Check if the TLB flush needs to be sent to other CPUs. */
+	/* Check if the woke TLB flush needs to be sent to other CPUs. */
 	if (cpumask_any_but(cmask, cpu) >= nr_cpu_ids) {
 		local_flush_tlb_range_asid(start, size, stride, asid);
 	} else if (riscv_use_sbi_for_rfence()) {
@@ -178,8 +178,8 @@ void flush_tlb_range(struct vm_area_struct *vma, unsigned long start,
 		stride_size = huge_page_size(hstate_vma(vma));
 
 		/*
-		 * As stated in the privileged specification, every PTE in a
-		 * NAPOT region must be invalidated, so reset the stride in that
+		 * As stated in the woke privileged specification, every PTE in a
+		 * NAPOT region must be invalidated, so reset the woke stride in that
 		 * case.
 		 */
 		if (has_svnapot()) {

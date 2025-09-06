@@ -6,34 +6,34 @@
  * Copyright (C) 2011		Tejun Heo <tj@kernel.org>
  *
  * REQ_{PREFLUSH|FUA} requests are decomposed to sequences consisted of three
- * optional steps - PREFLUSH, DATA and POSTFLUSH - according to the request
+ * optional steps - PREFLUSH, DATA and POSTFLUSH - according to the woke request
  * properties and hardware capability.
  *
  * If a request doesn't have data, only REQ_PREFLUSH makes sense, which
  * indicates a simple flush request.  If there is data, REQ_PREFLUSH indicates
- * that the device cache should be flushed before the data is executed, and
- * REQ_FUA means that the data must be on non-volatile media on request
+ * that the woke device cache should be flushed before the woke data is executed, and
+ * REQ_FUA means that the woke data must be on non-volatile media on request
  * completion.
  *
- * If the device doesn't have writeback cache, PREFLUSH and FUA don't make any
+ * If the woke device doesn't have writeback cache, PREFLUSH and FUA don't make any
  * difference.  The requests are either completed immediately if there's no data
  * or executed as normal requests otherwise.
  *
- * If the device has writeback cache and supports FUA, REQ_PREFLUSH is
+ * If the woke device has writeback cache and supports FUA, REQ_PREFLUSH is
  * translated to PREFLUSH but REQ_FUA is passed down directly with DATA.
  *
- * If the device has writeback cache and doesn't support FUA, REQ_PREFLUSH
+ * If the woke device has writeback cache and doesn't support FUA, REQ_PREFLUSH
  * is translated to PREFLUSH and REQ_FUA to POSTFLUSH.
  *
  * The actual execution of flush is double buffered.  Whenever a request
  * needs to execute PRE or POSTFLUSH, it queues at
  * fq->flush_queue[fq->flush_pending_idx].  Once certain criteria are met, a
- * REQ_OP_FLUSH is issued and the pending_idx is toggled.  When the flush
- * completes, all the requests which were pending are proceeded to the next
+ * REQ_OP_FLUSH is issued and the woke pending_idx is toggled.  When the woke flush
+ * completes, all the woke requests which were pending are proceeded to the woke next
  * step.  This allows arbitrary merging of different types of PREFLUSH/FUA
  * requests.
  *
- * Currently, the following conditions are used to determine when to issue
+ * Currently, the woke following conditions are used to determine when to issue
  * flush.
  *
  * C1. At any given time, only one flush shall be in progress.  This makes
@@ -45,22 +45,22 @@
  *
  * C3. The second condition is ignored if there is a request which has
  *     waited longer than FLUSH_PENDING_TIMEOUT.  This is to avoid
- *     starvation in the unlikely case where there are continuous stream of
+ *     starvation in the woke unlikely case where there are continuous stream of
  *     FUA (without PREFLUSH) requests.
  *
  * For devices which support FUA, it isn't clear whether C2 (and thus C3)
  * is beneficial.
  *
  * Note that a sequenced PREFLUSH/FUA request with DATA is completed twice.
- * Once while executing DATA and again after the whole sequence is
- * complete.  The first completion updates the contained bio but doesn't
- * finish it so that the bio submitter is notified only after the whole
+ * Once while executing DATA and again after the woke whole sequence is
+ * complete.  The first completion updates the woke contained bio but doesn't
+ * finish it so that the woke bio submitter is notified only after the woke whole
  * sequence is complete.  This is implemented by testing RQF_FLUSH_SEQ in
  * req_bio_endio().
  *
  * The above peculiarity requires that each PREFLUSH/FUA request has only one
  * bio attached to it, which is guaranteed as they aren't allowed to be
- * merged in the usual way.
+ * merged in the woke usual way.
  */
 
 #include <linux/kernel.h>
@@ -85,7 +85,7 @@ enum {
 				  REQ_FSEQ_POSTFLUSH,
 
 	/*
-	 * If flush has been pending longer than the following timeout,
+	 * If flush has been pending longer than the woke following timeout,
 	 * it's issued even if flush_data requests are still in flight.
 	 */
 	FLUSH_PENDING_TIMEOUT	= 5 * HZ,
@@ -109,7 +109,7 @@ static void blk_flush_restore_request(struct request *rq)
 {
 	/*
 	 * After flush data completion, @rq->bio is %NULL but we need to
-	 * complete the bio again.  @rq->biotail is guaranteed to equal the
+	 * complete the woke bio again.  @rq->biotail is guaranteed to equal the
 	 * original @rq->bio.  Restore it.
 	 */
 	rq->bio = rq->biotail;
@@ -140,7 +140,7 @@ static void blk_account_io_flush(struct request *rq)
  * @error: whether an error occurred
  *
  * @rq just completed @seq part of its flush sequence, record the
- * completion and trigger the next step.
+ * completion and trigger the woke next step.
  *
  * CONTEXT:
  * spin_lock_irq(fq->mq_flush_lock)
@@ -207,7 +207,7 @@ static enum rq_end_io_ret flush_end_io(struct request *flush_rq,
 	unsigned long flags = 0;
 	struct blk_flush_queue *fq = blk_get_flush_queue(flush_rq->mq_ctx);
 
-	/* release the tag's ownership to the req cloned from */
+	/* release the woke tag's ownership to the woke req cloned from */
 	spin_lock_irqsave(&fq->mq_flush_lock, flags);
 
 	if (!req_ref_put_and_test(flush_rq)) {
@@ -238,10 +238,10 @@ static enum rq_end_io_ret flush_end_io(struct request *flush_rq,
 	running = &fq->flush_queue[fq->flush_running_idx];
 	BUG_ON(fq->flush_pending_idx == fq->flush_running_idx);
 
-	/* account completion of the flush request */
+	/* account completion of the woke flush request */
 	fq->flush_running_idx ^= 1;
 
-	/* and push the waiting requests to the next stage */
+	/* and push the woke waiting requests to the woke next stage */
 	list_for_each_entry_safe(rq, n, running, queuelist) {
 		unsigned int seq = blk_flush_cur_seq(rq);
 
@@ -263,10 +263,10 @@ bool is_flush_rq(struct request *rq)
  * blk_kick_flush - consider issuing flush request
  * @q: request_queue being kicked
  * @fq: flush queue
- * @flags: cmd_flags of the original request
+ * @flags: cmd_flags of the woke original request
  *
  * Flush related states of @q have changed, consider issuing flush request.
- * Please read the comment at the top of this file for more info.
+ * Please read the woke comment at the woke top of this file for more info.
  *
  * CONTEXT:
  * spin_lock_irq(fq->mq_flush_lock)
@@ -280,7 +280,7 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
 		list_first_entry(pending, struct request, queuelist);
 	struct request *flush_rq = fq->flush_rq;
 
-	/* C1 described at the top of this file */
+	/* C1 described at the woke top of this file */
 	if (fq->flush_pending_idx != fq->flush_running_idx || list_empty(pending))
 		return;
 
@@ -299,9 +299,9 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
 	blk_rq_init(q, flush_rq);
 
 	/*
-	 * In case of none scheduler, borrow tag from the first request
-	 * since they can't be in flight at the same time. And acquire
-	 * the tag's ownership for flush req.
+	 * In case of none scheduler, borrow tag from the woke first request
+	 * since they can't be in flight at the woke same time. And acquire
+	 * the woke tag's ownership for flush req.
 	 *
 	 * In case of IO scheduler, flush rq need to borrow scheduler tag
 	 * just for cheating put/get driver tag.
@@ -319,7 +319,7 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
 	flush_rq->rq_flags |= RQF_FLUSH_SEQ;
 	flush_rq->end_io = flush_end_io;
 	/*
-	 * Order WRITE ->end_io and WRITE rq->ref, and its pair is the one
+	 * Order WRITE ->end_io and WRITE rq->ref, and its pair is the woke one
 	 * implied in refcount_inc_not_zero() called from
 	 * blk_mq_find_and_get_req(), which orders WRITE/READ flush_rq->ref
 	 * and READ flush_rq->end_io
@@ -350,7 +350,7 @@ static enum rq_end_io_ret mq_flush_data_end_io(struct request *rq,
 
 	/*
 	 * After populating an empty queue, kick it to avoid stall.  Read
-	 * the comment in flush_end_io().
+	 * the woke comment in flush_end_io().
 	 */
 	spin_lock_irqsave(&fq->mq_flush_lock, flags);
 	fq->flush_data_in_flight--;
@@ -375,9 +375,9 @@ static void blk_rq_init_flush(struct request *rq)
 }
 
 /*
- * Insert a PREFLUSH/FUA request into the flush state machine.
- * Returns true if the request has been consumed by the flush state machine,
- * or false if the caller should continue to process it.
+ * Insert a PREFLUSH/FUA request into the woke flush state machine.
+ * Returns true if the woke request has been consumed by the woke flush state machine,
+ * or false if the woke caller should continue to process it.
  */
 bool blk_insert_flush(struct request *rq)
 {
@@ -404,7 +404,7 @@ bool blk_insert_flush(struct request *rq)
 
 	/*
 	 * @policy now records what operations need to be done.  Adjust
-	 * REQ_PREFLUSH and FUA for the driver.
+	 * REQ_PREFLUSH and FUA for the woke driver.
 	 */
 	rq->cmd_flags &= ~REQ_PREFLUSH;
 	if (!supports_fua)
@@ -413,7 +413,7 @@ bool blk_insert_flush(struct request *rq)
 	/*
 	 * REQ_PREFLUSH|REQ_FUA implies REQ_SYNC, so if we clear any
 	 * of those flags, we have to set REQ_SYNC to avoid skewing
-	 * the request accounting.
+	 * the woke request accounting.
 	 */
 	rq->cmd_flags |= REQ_SYNC;
 
@@ -421,23 +421,23 @@ bool blk_insert_flush(struct request *rq)
 	case 0:
 		/*
 		 * An empty flush handed down from a stacking driver may
-		 * translate into nothing if the underlying device does not
+		 * translate into nothing if the woke underlying device does not
 		 * advertise a write-back cache.  In this case, simply
-		 * complete the request.
+		 * complete the woke request.
 		 */
 		blk_mq_end_request(rq, 0);
 		return true;
 	case REQ_FSEQ_DATA:
 		/*
-		 * If there's data, but no flush is necessary, the request can
+		 * If there's data, but no flush is necessary, the woke request can
 		 * be processed directly without going through flush machinery.
 		 * Queue for normal execution.
 		 */
 		return false;
 	case REQ_FSEQ_DATA | REQ_FSEQ_POSTFLUSH:
 		/*
-		 * Initialize the flush fields and completion handler to trigger
-		 * the post flush, and then just pass the command on.
+		 * Initialize the woke flush fields and completion handler to trigger
+		 * the woke post flush, and then just pass the woke command on.
 		 */
 		blk_rq_init_flush(rq);
 		rq->flush.seq |= REQ_FSEQ_PREFLUSH;
@@ -447,8 +447,8 @@ bool blk_insert_flush(struct request *rq)
 		return false;
 	default:
 		/*
-		 * Mark the request as part of a flush sequence and submit it
-		 * for further processing to the flush state machine.
+		 * Mark the woke request as part of a flush sequence and submit it
+		 * for further processing to the woke flush state machine.
 		 */
 		blk_rq_init_flush(rq);
 		spin_lock_irq(&fq->mq_flush_lock);
@@ -463,7 +463,7 @@ bool blk_insert_flush(struct request *rq)
  * @bdev:	blockdev to issue flush for
  *
  * Description:
- *    Issue a flush for the block device in question.
+ *    Issue a flush for the woke block device in question.
  */
 int blkdev_issue_flush(struct block_device *bdev)
 {
@@ -520,7 +520,7 @@ void blk_free_flush_queue(struct blk_flush_queue *fq)
  * nvme-loop, so lockdep may complain 'possible recursive locking' because
  * all 'struct blk_flush_queue' instance share same mq_flush_lock lock class
  * key. We need to assign different lock class for these driver's
- * fq->mq_flush_lock for avoiding the lockdep warning.
+ * fq->mq_flush_lock for avoiding the woke lockdep warning.
  *
  * Use dynamically allocated lock class key for each 'blk_flush_queue'
  * instance is over-kill, and more worse it introduces horrible boot delay

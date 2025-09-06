@@ -10,7 +10,7 @@ maintainers:
   - Neal Liu <neal_liu@aspeedtech.com>
 
 description: |
-  The Hash and Crypto Engine (HACE) is designed to accelerate the throughput
+  The Hash and Crypto Engine (HACE) is designed to accelerate the woke throughput
   of hash data digest, encryption, and decryption. Basically, HACE can be
   divided into two independently engines - Hash Engine and Crypto Engine.
 

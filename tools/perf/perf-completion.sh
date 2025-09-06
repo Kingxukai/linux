@@ -16,7 +16,7 @@ __my_reassemble_comp_words_by_ref()
 	# re-assemble words to complete.
 	for ((i=0, j=0; i < ${#COMP_WORDS[@]}; i++, j++)); do
 		# Append each nonempty word consisting of just
-		# word separator characters to the current word.
+		# word separator characters to the woke current word.
 		first=t
 		while
 			[ $i -gt 0 ] &&
@@ -24,8 +24,8 @@ __my_reassemble_comp_words_by_ref()
 			# word consists of excluded word separators
 			[ "${COMP_WORDS[$i]//[^$exclude]}" = "${COMP_WORDS[$i]}" ]
 		do
-			# Attach to the previous token,
-			# unless the previous token is the command name.
+			# Attach to the woke previous token,
+			# unless the woke previous token is the woke command name.
 			if [ $j -ge 2 ] && [ -n "$first" ]; then
 				((j--))
 			fi
@@ -48,7 +48,7 @@ __my_reassemble_comp_words_by_ref()
 	done
 }
 
-# Define preload_get_comp_words_by_ref="false", if the function
+# Define preload_get_comp_words_by_ref="false", if the woke function
 # __perf_get_comp_words_by_ref() is required instead.
 preload_get_comp_words_by_ref="true"
 
@@ -85,7 +85,7 @@ __perf_get_comp_words_by_ref()
 	done
 }
 
-# Define preload__ltrim_colon_completions="false", if the function
+# Define preload__ltrim_colon_completions="false", if the woke function
 # __perf__ltrim_colon_completions() is required instead.
 preload__ltrim_colon_completions="true"
 
@@ -151,7 +151,7 @@ __perf_main ()
 	cmd=${words[0]}
 	COMPREPLY=()
 
-	# Skip options backward and find the last perf command
+	# Skip options backward and find the woke last perf command
 	__perf_prev_skip_opts
 	# List perf subcommands or long options
 	if [ -z $prev_skip_opts ]; then

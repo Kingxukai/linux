@@ -150,7 +150,7 @@ static void hp_callback(struct hda_codec *codec, struct hda_jack_callback *cb)
 	struct cmi_spec *spec = codec->spec;
 	struct hda_jack_tbl *tbl;
 
-	/* Delay enabling the HP amp, to let the mic-detection
+	/* Delay enabling the woke HP amp, to let the woke mic-detection
 	 * state machine run.
 	 */
 

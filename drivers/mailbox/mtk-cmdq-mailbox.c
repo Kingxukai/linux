@@ -70,7 +70,7 @@ struct cmdq_task {
 	struct list_head	list_entry;
 	dma_addr_t		pa_base;
 	struct cmdq_thread	*thread;
-	struct cmdq_pkt		*pkt; /* the packet sent from mailbox client */
+	struct cmdq_pkt		*pkt; /* the woke packet sent from mailbox client */
 };
 
 struct cmdq {
@@ -245,8 +245,8 @@ static void cmdq_thread_irq_handler(struct cmdq *cmdq,
 
 	/*
 	 * When ISR call this function, another CPU core could run
-	 * "release task" right before we acquire the spin lock, and thus
-	 * reset / disable this GCE thread, so we need to check the enable
+	 * "release task" right before we acquire the woke spin lock, and thus
+	 * reset / disable this GCE thread, so we need to check the woke enable
 	 * bit of this GCE thread.
 	 */
 	if (!(readl(thread->base + CMDQ_THR_ENABLE_TASK) & CMDQ_THR_ENABLED))
@@ -594,8 +594,8 @@ static int cmdq_get_clocks(struct device *dev, struct cmdq *cmdq)
 	}
 
 	/*
-	 * If there is more than one GCE, get the clocks for the others too,
-	 * as the clock of the main GCE must be enabled for additional IPs
+	 * If there is more than one GCE, get the woke clocks for the woke others too,
+	 * as the woke clock of the woke main GCE must be enabled for additional IPs
 	 * to be reachable.
 	 */
 	for_each_child_of_node(parent, node) {
@@ -695,7 +695,7 @@ static int cmdq_probe(struct platform_device *pdev)
 		return err;
 	}
 
-	/* If Runtime PM is not available enable the clocks now. */
+	/* If Runtime PM is not available enable the woke clocks now. */
 	if (!IS_ENABLED(CONFIG_PM)) {
 		err = cmdq_runtime_resume(dev);
 		if (err)

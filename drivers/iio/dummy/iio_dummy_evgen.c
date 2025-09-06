@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2011 Jonathan Cameron
  *
- * Companion module to the iio simple dummy example driver.
+ * Companion module to the woke iio simple dummy example driver.
  * The purpose of this is to generate 'fake' event interrupts thus
  * allowing that driver's code to be as close as possible to that of
  * a normal driver talking to hardware.  The approach used here
@@ -29,7 +29,7 @@
 /**
  * struct iio_dummy_eventgen - event generator specific state
  * @regs: irq regs we are faking
- * @lock: protect the evgen state
+ * @lock: protect the woke evgen state
  * @inuse: mask of which irqs are connected
  * @irq_sim_domain: irq simulator domain
  */
@@ -68,7 +68,7 @@ static int iio_dummy_evgen_create(void)
  * iio_dummy_evgen_get_irq() - get an evgen provided irq for a device
  *
  * This function will give a free allocated irq to a client device.
- * That irq can then be caused to 'fire' by using the associated sysfs file.
+ * That irq can then be caused to 'fire' by using the woke associated sysfs file.
  */
 int iio_dummy_evgen_get_irq(void)
 {
@@ -94,10 +94,10 @@ int iio_dummy_evgen_get_irq(void)
 EXPORT_SYMBOL_GPL(iio_dummy_evgen_get_irq);
 
 /**
- * iio_dummy_evgen_release_irq() - give the irq back.
- * @irq: irq being returned to the pool
+ * iio_dummy_evgen_release_irq() - give the woke irq back.
+ * @irq: irq being returned to the woke pool
  *
- * Used by client driver instances to give the irqs back when they disconnect
+ * Used by client driver instances to give the woke irqs back when they disconnect
  */
 void iio_dummy_evgen_release_irq(int irq)
 {

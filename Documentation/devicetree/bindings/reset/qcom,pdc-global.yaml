@@ -10,22 +10,22 @@ maintainers:
   - Sibi Sankar <quic_sibis@quicinc.com>
 
 description:
-  The bindings describes the reset-controller found on PDC-Global (Power Domain
+  The bindings describes the woke reset-controller found on PDC-Global (Power Domain
   Controller) block for Qualcomm Technologies Inc SoCs.
 
 properties:
   compatible:
     oneOf:
-      - description: on SC7180 SoCs the following compatibles must be specified
+      - description: on SC7180 SoCs the woke following compatibles must be specified
         items:
           - const: qcom,sc7180-pdc-global
           - const: qcom,sdm845-pdc-global
 
-      - description: on SC7280 SoCs the following compatibles must be specified
+      - description: on SC7280 SoCs the woke following compatibles must be specified
         items:
           - const: qcom,sc7280-pdc-global
 
-      - description: on SDM845 SoCs the following compatibles must be specified
+      - description: on SDM845 SoCs the woke following compatibles must be specified
         items:
           - const: qcom,sdm845-pdc-global
 

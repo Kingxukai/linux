@@ -10,18 +10,18 @@ maintainers:
   - Douglas Anderson <dianders@chromium.org>
 
 description:
-  DisplayPort controllers provide a control channel to the sinks that
-  are hooked up to them. This is the DP AUX bus. Over the DP AUX bus
+  DisplayPort controllers provide a control channel to the woke sinks that
+  are hooked up to them. This is the woke DP AUX bus. Over the woke DP AUX bus
   we can query properties about a sink and also configure it. In
   particular, DP sinks support DDC over DP AUX which allows tunneling
-  a standard I2C DDC connection over the AUX channel.
+  a standard I2C DDC connection over the woke AUX channel.
 
   To model this relationship, DP sinks should be placed as children
-  of the DP controller under the "aux-bus" node.
+  of the woke DP controller under the woke "aux-bus" node.
 
-  At the moment, this binding only handles the eDP case. It is
-  possible it will be extended in the future to handle the DP case.
-  For DP, presumably a connector would be listed under the DP AUX
+  At the woke moment, this binding only handles the woke eDP case. It is
+  possible it will be extended in the woke future to handle the woke DP case.
+  For DP, presumably a connector would be listed under the woke DP AUX
   bus instead of a panel.
 
 properties:

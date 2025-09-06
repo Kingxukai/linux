@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The ipq806x soc have a MDIO dedicated controller that is
-  used to communicate with the gmac phy connected.
+  used to communicate with the woke gmac phy connected.
 
 allOf:
   - $ref: mdio.yaml#

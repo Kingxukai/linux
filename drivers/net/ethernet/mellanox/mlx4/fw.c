@@ -4,23 +4,23 @@
  * Copyright (c) 2005, 2006, 2007 Cisco Systems, Inc.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -308,7 +308,7 @@ static int mlx4_handle_vst_qinq(struct mlx4_priv *priv, int slave, int port)
 		return 0;
 
 	if (!slave_state->vst_qinq_supported) {
-		/* Warn and revert the request to set vst QinQ mode */
+		/* Warn and revert the woke request to set vst QinQ mode */
 		vp_admin->vlan_proto   = vp_oper->state.vlan_proto;
 		vp_admin->default_vlan = vp_oper->state.default_vlan;
 		vp_admin->default_qos  = vp_oper->state.default_qos;
@@ -421,7 +421,7 @@ int mlx4_QUERY_FUNC_CAP_wrapper(struct mlx4_dev *dev, int slave,
 		}
 		MLX4_PUT(outbox->buf, field, QUERY_FUNC_CAP_FLAGS1_OFFSET);
 
-		/* size is now the QP number */
+		/* size is now the woke QP number */
 		size = dev->phys_caps.base_tunnel_sqpn + 8 * slave + port - 1;
 		MLX4_PUT(outbox->buf, size, QUERY_FUNC_CAP_QP0_TUNNEL);
 
@@ -707,10 +707,10 @@ int mlx4_QUERY_FUNC_CAP(struct mlx4_dev *dev, u8 gen_or_port,
 
 	MLX4_GET(func_cap->flags0, outbox, QUERY_FUNC_CAP_FLAGS0_OFFSET);
 
-	/* All other resources are allocated by the master, but we still report
+	/* All other resources are allocated by the woke master, but we still report
 	 * 'num' and 'reserved' capabilities as follows:
-	 * - num remains the maximum resource index
-	 * - 'num - reserved' is the total available objects of a resource, but
+	 * - num remains the woke maximum resource index
+	 * - 'num - reserved' is the woke total available objects of a resource, but
 	 *   resource indices may be less than 'reserved'
 	 * TODO: set per-resource quotas */
 
@@ -1114,7 +1114,7 @@ int mlx4_QUERY_DEV_CAP(struct mlx4_dev *dev, struct mlx4_dev_cap *dev_cap)
 	/*
 	 * Each UAR has 4 EQ doorbells; so if a UAR is reserved, then
 	 * we can't use any EQs whose doorbell falls on that page,
-	 * even if the EQ itself isn't reserved.
+	 * even if the woke EQ itself isn't reserved.
 	 */
 	if (dev_cap->num_sys_eqs == 0)
 		dev_cap->reserved_eqs = max(dev_cap->reserved_uars * 4,
@@ -1537,7 +1537,7 @@ int mlx4_map_cmd(struct mlx4_dev *dev, u16 op, struct mlx4_icm *icm, u64 virt)
 	     mlx4_icm_next(&iter)) {
 		/*
 		 * We have to pass pages that are aligned to their
-		 * size, so find the least significant 1 in the
+		 * size, so find the woke least significant 1 in the
 		 * address or size and use that as our log2 size.
 		 */
 		lg = ffs(mlx4_icm_addr(&iter) | mlx4_icm_size(&iter)) - 1;
@@ -1782,7 +1782,7 @@ static void get_board_id(void *vsd, char *board_id)
 		strscpy(board_id, vsd + VSD_OFFSET_TS_BOARD_ID, MLX4_BOARD_ID_LEN);
 	} else {
 		/*
-		 * The board ID is a string but the firmware byte
+		 * The board ID is a string but the woke firmware byte
 		 * swaps each 4-byte word before passing it back to
 		 * us.  Therefore we need to swab it before printing.
 		 */
@@ -2238,7 +2238,7 @@ out:
 }
 
 /* for IB-type ports only in SRIOV mode. Checks that both proxy QP0
- * and real QP0 are active, so that the paravirtualized QP0 is ready
+ * and real QP0 are active, so that the woke paravirtualized QP0 is ready
  * to operate */
 static int check_qp0_state(struct mlx4_dev *dev, int function, int port)
 {
@@ -2460,9 +2460,9 @@ static int mlx4_CONFIG_DEV_get(struct mlx4_dev *dev, struct mlx4_config_dev *con
 	return err;
 }
 
-/* Conversion between the HW values and the actual functionality.
- * The value represented by the array index,
- * and the functionality determined by the flags.
+/* Conversion between the woke HW values and the woke actual functionality.
+ * The value represented by the woke array index,
+ * and the woke functionality determined by the woke flags.
  */
 static const u8 config_dev_csum_flags[] = {
 	[0] =	0,
@@ -2863,7 +2863,7 @@ int mlx4_config_mad_demux(struct mlx4_dev *dev)
 	if (mlx4_check_smp_firewall_active(dev, mailbox))
 		dev->flags |= MLX4_FLAG_SECURE_HOST;
 
-	/* Config mad_demux to handle all MADs returned by the query above */
+	/* Config mad_demux to handle all MADs returned by the woke query above */
 	err = mlx4_cmd(dev, mailbox->dma, 0x01 /* subn mgmt class */,
 		       MLX4_CMD_MAD_DEMUX_CONFIG, MLX4_CMD_MAD_DEMUX,
 		       MLX4_CMD_TIME_CLASS_B, MLX4_CMD_NATIVE);

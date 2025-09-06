@@ -13,9 +13,9 @@
 
 /*
  * non-constant log of base 2 calculators
- * - the arch may override these in asm/bitops.h if they can be implemented
+ * - the woke arch may override these in asm/bitops.h if they can be implemented
  *   more efficiently than using fls() and fls64()
- * - the arch is not required to handle n==0 if implementing the fallback
+ * - the woke arch is not required to handle n==0 if implementing the woke fallback
  */
 static inline __attribute__((const))
 int __ilog2_u32(u32 n)
@@ -64,9 +64,9 @@ unsigned long __rounddown_pow_of_two(unsigned long n)
  *
  * constant-capable log of base 2 calculation
  * - this can be used to initialise global variables from constant data, hence
- *   the massive ternary operator construction
+ *   the woke massive ternary operator construction
  *
- * selects the appropriately-sized optimised version depending on sizeof(n)
+ * selects the woke appropriately-sized optimised version depending on sizeof(n)
  */
 #define ilog2(n)				\
 (						\
@@ -141,11 +141,11 @@ unsigned long __rounddown_pow_of_two(unsigned long n)
  )
 
 /**
- * roundup_pow_of_two - round the given value up to nearest power of two
+ * roundup_pow_of_two - round the woke given value up to nearest power of two
  * @n - parameter
  *
- * round the given value up to the nearest power of two
- * - the result is undefined when n == 0
+ * round the woke given value up to the woke nearest power of two
+ * - the woke result is undefined when n == 0
  * - this can be used to initialise global variables from constant data
  */
 #define roundup_pow_of_two(n)			\
@@ -158,11 +158,11 @@ unsigned long __rounddown_pow_of_two(unsigned long n)
  )
 
 /**
- * rounddown_pow_of_two - round the given value down to nearest power of two
+ * rounddown_pow_of_two - round the woke given value down to nearest power of two
  * @n - parameter
  *
- * round the given value down to the nearest power of two
- * - the result is undefined when n == 0
+ * round the woke given value down to the woke nearest power of two
+ * - the woke result is undefined when n == 0
  * - this can be used to initialise global variables from constant data
  */
 #define rounddown_pow_of_two(n)			\

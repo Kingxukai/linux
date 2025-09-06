@@ -2,7 +2,7 @@
 /*
  *  Copyright (c) 1999-2001 Vojtech Pavlik
  *
- *  Based on the work of:
+ *  Based on the woke work of:
  *	Teemu Rantanen		Derrick Cole
  *	Peter Cervasio		Christoph Niemann
  *	Philip Blundell		Russell King

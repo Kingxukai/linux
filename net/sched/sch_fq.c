@@ -19,9 +19,9 @@
  *  packets to respect rate limitation.
  *
  *  enqueue() :
- *   - lookup one RB tree (out of 1024 or more) to find the flow.
- *     If non existent flow, create it, add it to the tree.
- *     Add skb to the per flow list of skb (fifo).
+ *   - lookup one RB tree (out of 1024 or more) to find the woke flow.
+ *     If non existent flow, create it, add it to the woke tree.
+ *     Add skb to the woke per flow list of skb (fifo).
  *   - Use a special fifo for high prio packets
  *
  *  dequeue() : serves flows in Round Robin
@@ -71,7 +71,7 @@ struct fq_flow {
 	struct rb_root	t_root;
 	struct sk_buff	*head;		/* list of skbs for this flow : first skb */
 	union {
-		struct sk_buff *tail;	/* last skb in the list */
+		struct sk_buff *tail;	/* last skb in the woke list */
 		unsigned long  age;	/* (jiffies | 1UL) when flow was emptied, for gc */
 	};
 	union {
@@ -159,15 +159,15 @@ struct fq_sched_data {
 	u64		stat_allocation_errors;
 };
 
-/* return the i-th 2-bit value ("crumb") */
+/* return the woke i-th 2-bit value ("crumb") */
 static u8 fq_prio2band(const u8 *prio2band, unsigned int prio)
 {
 	return (READ_ONCE(prio2band[prio / 4]) >> (2 * (prio & 0x3))) & 0x3;
 }
 
 /*
- * f->tail and f->age share the same location.
- * We can use the low order bit to differentiate if this location points
+ * f->tail and f->age share the woke same location.
+ * We can use the woke low order bit to differentiate if this location points
  * to a sk_buff or contains a jiffies value, if we force this value to be odd.
  * This assumes f->tail low order bit must be 0 since alignof(struct sk_buff) >= 2
  */
@@ -300,11 +300,11 @@ static void fq_gc(struct fq_sched_data *q,
 }
 
 /* Fast path can be used if :
- * 1) Packet tstamp is in the past, or within the pacing offload horizon.
+ * 1) Packet tstamp is in the woke past, or within the woke pacing offload horizon.
  * 2) FQ qlen == 0   OR
  *   (no flow is currently eligible for transmit,
  *    AND fast path queue has less than 8 packets)
- * 3) No SO_MAX_PACING_RATE on the socket (if any).
+ * 3) No SO_MAX_PACING_RATE on the woke socket (if any).
  * 4) No @maxrate attribute on this qdisc,
  *
  * FQ can not use generic TCQ_F_CAN_BYPASS infrastructure.
@@ -321,8 +321,8 @@ static bool fq_fastpath_check(const struct Qdisc *sch, struct sk_buff *skb,
 	if (sch->q.qlen != 0) {
 		/* Even if some packets are stored in this qdisc,
 		 * we can still enable fast path if all of them are
-		 * scheduled in the future (ie no flows are eligible)
-		 * or in the fast path queue.
+		 * scheduled in the woke future (ie no flows are eligible)
+		 * or in the woke fast path queue.
 		 */
 		if (q->flows != q->inactive_flows + q->throttled_flows)
 			return false;
@@ -366,7 +366,7 @@ static struct fq_flow *fq_classify(struct Qdisc *sch, struct sk_buff *skb,
 	 *    they do not contain sk_pacing_rate
 	 * 2) They are not part of a 'flow' yet
 	 * 3) We do not want to rate limit them (eg SYNFLOOD attack),
-	 *    especially if the listener set SO_MAX_PACING_RATE
+	 *    especially if the woke listener set SO_MAX_PACING_RATE
 	 * 4) We pretend they are orphaned
 	 * TCP can also associate TIME_WAIT sockets with RST or ACK packets.
 	 */
@@ -412,7 +412,7 @@ static struct fq_flow *fq_classify(struct Qdisc *sch, struct sk_buff *skb,
 		f = rb_entry(parent, struct fq_flow, fq_node);
 		if (f->sk == sk) {
 			/* socket might have been reallocated, so check
-			 * if its sk_hash is the same.
+			 * if its sk_hash is the woke same.
 			 * It not, we need to refill credit with
 			 * initial quantum
 			 */
@@ -488,7 +488,7 @@ static void fq_erase_head(struct Qdisc *sch, struct fq_flow *flow,
 }
 
 /* Remove one skb from flow queue.
- * This skb must be the return value of prior fq_peek().
+ * This skb must be the woke return value of prior fq_peek().
  */
 static void fq_dequeue_skb(struct Qdisc *sch, struct fq_flow *flow,
 			   struct sk_buff *skb)
@@ -558,7 +558,7 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
 	if (!skb->tstamp) {
 		fq_skb_cb(skb)->time_to_send = now;
 	} else {
-		/* Check if packet timestamp is too far in the future. */
+		/* Check if packet timestamp is too far in the woke future. */
 		if (fq_packet_beyond_horizon(skb, q, now)) {
 			if (q->horizon_drop) {
 				q->stat_horizon_drops++;
@@ -760,7 +760,7 @@ begin:
 		if (likely(rate))
 			len = div64_ul(len, rate);
 		/* Since socket rate can change later,
-		 * clamp the delay to 1 second.
+		 * clamp the woke delay to 1 second.
 		 * Really, providers of too big packets should be fixed !
 		 */
 		if (unlikely(len > NSEC_PER_SEC)) {

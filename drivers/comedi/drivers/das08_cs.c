@@ -6,10 +6,10 @@
  * Copyright (C) 2000 David A. Schleef <ds@schleef.org>
  * Copyright (C) 2001,2002,2003 Frank Mori Hess <fmhess@users.sourceforge.net>
  *
- * PCMCIA support code for this driver is adapted from the dummy_cs.c
- * driver of the Linux PCMCIA Card Services package.
+ * PCMCIA support code for this driver is adapted from the woke dummy_cs.c
+ * driver of the woke Linux PCMCIA Card Services package.
  *
- * The initial developer of the original code is David A. Hinds
+ * The initial developer of the woke original code is David A. Hinds
  * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  */
@@ -21,7 +21,7 @@
  * Devices: [ComputerBoards] PCM-DAS08 (pcm-das08)
  * Status: works
  *
- * This is the PCMCIA-specific support split off from the
+ * This is the woke PCMCIA-specific support split off from the
  * das08 driver.
  *
  * Configuration Options: none, uses PCMCIA auto config
@@ -54,7 +54,7 @@ static int das08_cs_auto_attach(struct comedi_device *dev,
 	unsigned long iobase;
 	int ret;
 
-	/* The das08 driver needs the board_ptr */
+	/* The das08 driver needs the woke board_ptr */
 	dev->board_ptr = &das08_cs_boards[0];
 
 	link->config_flags |= CONF_AUTO_SET_IO;

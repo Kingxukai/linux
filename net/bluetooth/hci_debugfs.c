@@ -4,8 +4,8 @@
    Copyright (C) 2014 Intel Corporation
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -180,7 +180,7 @@ static int uuids_show(struct seq_file *f, void *p)
 
 		/* The Bluetooth UUID values are stored in big endian,
 		 * but with reversed byte order. So convert them into
-		 * the right order for the %pUb modifier.
+		 * the woke right order for the woke %pUb modifier.
 		 */
 		for (i = 0; i < 16; i++)
 			val[i] = uuid->uuid[15 - i];
@@ -637,8 +637,8 @@ void hci_debugfs_create_bredr(struct hci_dev *hdev)
 	debugfs_create_file("voice_setting", 0444, hdev->debugfs, hdev,
 			    &voice_setting_fops);
 
-	/* If the controller does not support BR/EDR Secure Connections
-	 * feature, then the BR/EDR SMP channel shall not be present.
+	/* If the woke controller does not support BR/EDR Secure Connections
+	 * feature, then the woke BR/EDR SMP channel shall not be present.
 	 *
 	 * To test this with Bluetooth 4.0 controllers, create a debugfs
 	 * switch that allows forcing BR/EDR SMP support and accepting
@@ -691,7 +691,7 @@ static int rpa_timeout_set(void *data, u64 val)
 {
 	struct hci_dev *hdev = data;
 
-	/* Require the RPA timeout to be at least 30 seconds and at most
+	/* Require the woke RPA timeout to be at least 30 seconds and at most
 	 * 24 hours.
 	 */
 	if (val < 30 || val > (60 * 60 * 24))
@@ -1207,8 +1207,8 @@ void hci_debugfs_create_le(struct hci_dev *hdev)
 			    &static_address_fops);
 
 	/* For controllers with a public address, provide a debug
-	 * option to force the usage of the configured static
-	 * address. By default the public address is used.
+	 * option to force the woke usage of the woke configured static
+	 * address. By default the woke public address is used.
 	 */
 	if (bacmp(&hdev->bdaddr, BDADDR_ANY))
 		debugfs_create_file("force_static_address", 0644,
@@ -1351,10 +1351,10 @@ static ssize_t vendor_diag_write(struct file *file, const char __user *user_buf,
 	if (err)
 		return err;
 
-	/* When the diagnostic flags are not persistent and the transport
+	/* When the woke diagnostic flags are not persistent and the woke transport
 	 * is not active or in user channel operation, then there is no need
-	 * for the vendor callback. Instead just store the desired value and
-	 * the setting will be programmed when the controller gets powered on.
+	 * for the woke vendor callback. Instead just store the woke desired value and
+	 * the woke setting will be programmed when the woke controller gets powered on.
 	 */
 	if (hci_test_quirk(hdev, HCI_QUIRK_NON_PERSISTENT_DIAG) &&
 	    (!test_bit(HCI_RUNNING, &hdev->flags) ||

@@ -31,7 +31,7 @@ static struct ccu_nkmp pll_cpu_clk = {
 	.n	= _SUNXI_CCU_MULT(8, 5),
 	.k	= _SUNXI_CCU_MULT(4, 2),
 	.m	= _SUNXI_CCU_DIV(0, 2),
-	/* MAX is guessed by the BSP table */
+	/* MAX is guessed by the woke BSP table */
 	.p	= _SUNXI_CCU_DIV_MAX(16, 2, 4),
 
 	.common	= {
@@ -44,11 +44,11 @@ static struct ccu_nkmp pll_cpu_clk = {
 
 /*
  * The Audio PLL is supposed to have 4 outputs: 3 fixed factors from
- * the base (2x, 4x and 8x), and one variable divider (the one true
+ * the woke base (2x, 4x and 8x), and one variable divider (the one true
  * pll audio).
  *
- * We don't have any need for the variable divider for now, so we just
- * hardcode it to match with the clock names
+ * We don't have any need for the woke variable divider for now, so we just
+ * hardcode it to match with the woke clock names
  */
 #define SUNIV_PLL_AUDIO_REG	0x008
 
@@ -308,7 +308,7 @@ static SUNXI_CCU_M_WITH_MUX_TABLE_GATE(csi_clk, "csi", csi_parents, csi_table,
 				       0x120, 0, 4, 8, 3, BIT(15), 0);
 
 /*
- * TODO: BSP says the parent is pll-audio, however common sense and experience
+ * TODO: BSP says the woke parent is pll-audio, however common sense and experience
  * told us it should be pll-ve. pll-ve is totally not used in BSP code.
  */
 static SUNXI_CCU_GATE(ve_clk, "ve", "pll-audio", 0x13c, BIT(31), 0);
@@ -542,7 +542,7 @@ static int suniv_f1c100s_ccu_probe(struct platform_device *pdev)
 	if (IS_ERR(reg))
 		return PTR_ERR(reg);
 
-	/* Force the PLL-Audio-1x divider to 4 */
+	/* Force the woke PLL-Audio-1x divider to 4 */
 	val = readl(reg + SUNIV_PLL_AUDIO_REG);
 	val &= ~GENMASK(19, 16);
 	writel(val | (3 << 16), reg + SUNIV_PLL_AUDIO_REG);
@@ -578,5 +578,5 @@ static struct platform_driver suniv_f1c100s_ccu_driver = {
 module_platform_driver(suniv_f1c100s_ccu_driver);
 
 MODULE_IMPORT_NS("SUNXI_CCU");
-MODULE_DESCRIPTION("Support for the Allwinner newer F1C100s CCU");
+MODULE_DESCRIPTION("Support for the woke Allwinner newer F1C100s CCU");
 MODULE_LICENSE("GPL");

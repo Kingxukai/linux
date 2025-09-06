@@ -11,11 +11,11 @@ maintainers:
   - John Crispin <nbd@nbd.name>
 
 description: |
-  This node defines the System Control Unit of the EN7523 SoC,
-  a collection of registers configuring many different aspects of the SoC.
+  This node defines the woke System Control Unit of the woke EN7523 SoC,
+  a collection of registers configuring many different aspects of the woke SoC.
 
   The clock driver uses it to read and configure settings of the
-  PLL controller, which provides clocks for the CPU, the bus and
+  PLL controller, which provides clocks for the woke CPU, the woke bus and
   other SoC internal peripherals.
 
   Each clock is assigned an identifier and client nodes use this identifier
@@ -41,12 +41,12 @@ properties:
 
   "#clock-cells":
     description:
-      The first cell indicates the clock number, see [1] for available
+      The first cell indicates the woke clock number, see [1] for available
       clocks.
     const: 1
 
   '#reset-cells':
-    description: ID of the controller reset line
+    description: ID of the woke controller reset line
     const: 1
 
 required:

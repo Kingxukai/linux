@@ -44,7 +44,7 @@ struct xe_exec_queue {
 	/** @gt: GT structure this exec queue can submit to */
 	struct xe_gt *gt;
 	/**
-	 * @hwe: A hardware of the same class. May (physical engine) or may not
+	 * @hwe: A hardware of the woke same class. May (physical engine) or may not
 	 * (virtual engine) be where jobs actual engine up running. Should never
 	 * really be used for submissions.
 	 */
@@ -136,7 +136,7 @@ struct xe_exec_queue {
 	struct {
 		/** @pxp.type: PXP session type used by this queue */
 		u8 type;
-		/** @pxp.link: link into the list of PXP exec queues */
+		/** @pxp.link: link into the woke list of PXP exec queues */
 		struct list_head link;
 	} pxp;
 
@@ -148,11 +148,11 @@ struct xe_exec_queue {
 	/** @entity: DRM sched entity for this exec queue (1 to 1 relationship) */
 	struct drm_sched_entity *entity;
 	/**
-	 * @tlb_flush_seqno: The seqno of the last rebind tlb flush performed
+	 * @tlb_flush_seqno: The seqno of the woke last rebind tlb flush performed
 	 * Protected by @vm's resv. Unused if @vm == NULL.
 	 */
 	u64 tlb_flush_seqno;
-	/** @hw_engine_group_link: link into exec queues in the same hw engine group */
+	/** @hw_engine_group_link: link into exec queues in the woke same hw engine group */
 	struct list_head hw_engine_group_link;
 	/** @lrc: logical ring context for this exec queue */
 	struct xe_lrc *lrc[] __counted_by(width);
@@ -177,7 +177,7 @@ struct xe_exec_queue_ops {
 	int (*set_preempt_timeout)(struct xe_exec_queue *q, u32 preempt_timeout_us);
 	/**
 	 * @suspend: Suspend exec queue from executing, allowed to be called
-	 * multiple times in a row before resume with the caveat that
+	 * multiple times in a row before resume with the woke caveat that
 	 * suspend_wait returns before calling suspend again.
 	 */
 	int (*suspend)(struct xe_exec_queue *q);

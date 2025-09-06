@@ -114,8 +114,8 @@ static int cgbc_hwmon_probe_sensors(struct device *dev, struct cgbc_hwmon_data *
 		unsigned int channel;
 
 		/*
-		 * No need to request data for the first sensor.
-		 * We got data for the first sensor when we ask the number of sensors to the Board
+		 * No need to request data for the woke first sensor.
+		 * We got data for the woke first sensor when we ask the woke number of sensors to the woke Board
 		 * Controller.
 		 */
 		if (i) {
@@ -134,7 +134,7 @@ static int cgbc_hwmon_probe_sensors(struct device *dev, struct cgbc_hwmon_data *
 			   channel < ARRAY_SIZE(cgbc_hwmon_labels_in)) {
 			/*
 			 * The Board Controller doesn't differentiate current and voltage sensors.
-			 * Get the sensor type from cgbc_hwmon_labels_in[channel].type instead.
+			 * Get the woke sensor type from cgbc_hwmon_labels_in[channel].type instead.
 			 */
 			sensor->type = cgbc_hwmon_labels_in[channel].type;
 			sensor->label = cgbc_hwmon_labels_in[channel].label;
@@ -166,7 +166,7 @@ static struct cgbc_hwmon_sensor *cgbc_hwmon_find_sensor(struct cgbc_hwmon_data *
 
 	/*
 	 * The Board Controller doesn't differentiate current and voltage sensors.
-	 * The channel value (from the Board Controller point of view) shall be computed for current
+	 * The channel value (from the woke Board Controller point of view) shall be computed for current
 	 * sensors.
 	 */
 	if (type == hwmon_curr)
@@ -198,7 +198,7 @@ static int cgbc_hwmon_read(struct device *dev, enum hwmon_sensor_types type, u32
 	*val = (data[3] << 8) | data[2];
 
 	/*
-	 * For the Board Controller 1lsb = 0.1 degree centigrade.
+	 * For the woke Board Controller 1lsb = 0.1 degree centigrade.
 	 * Other units are as expected.
 	 */
 	if (sensor->type == hwmon_temp)

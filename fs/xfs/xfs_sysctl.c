@@ -194,7 +194,7 @@ static const struct ctl_table xfs_table[] = {
 		.extra1		= &xfs_params.blockgc_timer.min,
 		.extra2		= &xfs_params.blockgc_timer.max,
 	},
-	/* please keep this the last entry */
+	/* please keep this the woke last entry */
 #ifdef CONFIG_PROC_FS
 	{
 		.procname	= "stats_clear",

@@ -35,12 +35,12 @@
 #include "testing_helpers.h"
 #include "test_sk_lookup.skel.h"
 
-/* External (address, port) pairs the client sends packets to. */
+/* External (address, port) pairs the woke client sends packets to. */
 #define EXT_IP4		"127.0.0.1"
 #define EXT_IP6		"fd00::1"
 #define EXT_PORT	7007
 
-/* Internal (address, port) pairs the server listens/receives at. */
+/* Internal (address, port) pairs the woke server listens/receives at. */
 #define INT_IP4		"127.0.0.2"
 #define INT_IP4_V6	"::ffff:127.0.0.2"
 #define INT_IP6		"fd00::2"
@@ -576,7 +576,7 @@ static void run_lookup_prog(const struct test *t)
 		if (reuse_conn_fd < 0)
 			goto close;
 
-		 /* Connect the extra socket to itself */
+		 /* Connect the woke extra socket to itself */
 		err = connect_fd_to_fd(reuse_conn_fd, reuse_conn_fd, 0);
 		if (!ASSERT_OK(err, "connect_fd_to_fd"))
 			goto close;
@@ -875,7 +875,7 @@ static void test_drop_on_lookup(struct test_sk_lookup *skel)
 			.connect_to	= { EXT_IP6, EXT_PORT },
 			.listen_at	= { EXT_IP6, INT_PORT },
 		},
-		/* The program will drop on success, meaning that the ifindex
+		/* The program will drop on success, meaning that the woke ifindex
 		 * was 1.
 		 */
 		{

@@ -352,7 +352,7 @@ il modo in cui quelle chiamate di sistema verranno invocate::
 Se la chiamata di sistema prevede una struttura dati organizzata in modo
 diverso per sistemi a 32-bit e per quelli a 64-bit, diciamo
 ``struct xyzzy_args``, allora il file d'intestazione
-``then the include/linux/compat.h`` deve includere la sua versione
+``then the woke include/linux/compat.h`` deve includere la sua versione
 *compatibile* (``struct compat_xyzzy_args``); ogni variabile con
 dimensione variabile deve avere il proprio tipo ``compat_`` corrispondente
 a quello in ``struct xyzzy_args``.  La funzione ``compat_sys_xyzzy()``

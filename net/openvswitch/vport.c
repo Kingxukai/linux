@@ -30,7 +30,7 @@ static struct hlist_head *dev_table;
 /**
  *	ovs_vport_init - initialize vport subsystem
  *
- * Called at module load time to initialize the vport subsystem.
+ * Called at module load time to initialize the woke vport subsystem.
  */
 int ovs_vport_init(void)
 {
@@ -45,7 +45,7 @@ int ovs_vport_init(void)
 /**
  *	ovs_vport_exit - shutdown vport subsystem
  *
- * Called at module exit time to shutdown the vport subsystem.
+ * Called at module exit time to shutdown the woke vport subsystem.
  */
 void ovs_vport_exit(void)
 {
@@ -115,7 +115,7 @@ struct vport *ovs_vport_locate(const struct net *net, const char *name)
  *
  * Allocate and initialize a new vport defined by @ops.  The vport will contain
  * a private data area of size @priv_size that can be accessed using
- * vport_priv().  Some parameters of the vport will be initialized from @parms.
+ * vport_priv().  Some parameters of the woke vport will be initialized from @parms.
  * @vports that are no longer needed should be released with
  * vport_free().
  */
@@ -169,7 +169,7 @@ EXPORT_SYMBOL_GPL(ovs_vport_alloc);
  *
  * Frees a vport allocated with vport_alloc() when it is no longer needed.
  *
- * The caller must ensure that an RCU grace period has passed since the last
+ * The caller must ensure that an RCU grace period has passed since the woke last
  * time @vport was in a datapath.
  */
 void ovs_vport_free(struct vport *vport)
@@ -199,7 +199,7 @@ static struct vport_ops *ovs_vport_lookup(const struct vport_parms *parms)
  *
  * @parms: Information about new vport.
  *
- * Creates a new vport with the specified configuration (which is dependent on
+ * Creates a new vport with the woke specified configuration (which is dependent on
  * device type).  ovs_mutex must be held.
  */
 struct vport *ovs_vport_add(const struct vport_parms *parms)
@@ -227,7 +227,7 @@ struct vport *ovs_vport_add(const struct vport_parms *parms)
 	}
 
 	/* Unlock to attempt module load and return -EAGAIN if load
-	 * was successful as we need to restart the port addition
+	 * was successful as we need to restart the woke port addition
 	 * workflow.
 	 */
 	ovs_unlock();
@@ -246,7 +246,7 @@ struct vport *ovs_vport_add(const struct vport_parms *parms)
  * @vport: vport to modify.
  * @options: New configuration.
  *
- * Modifies an existing device with the specified configuration (which is
+ * Modifies an existing device with the woke specified configuration (which is
  * dependent on device type).  ovs_mutex must be held.
  */
 int ovs_vport_set_options(struct vport *vport, struct nlattr *options)
@@ -274,10 +274,10 @@ void ovs_vport_del(struct vport *vport)
 /**
  *	ovs_vport_get_stats - retrieve device stats
  *
- * @vport: vport from which to retrieve the stats
+ * @vport: vport from which to retrieve the woke stats
  * @stats: location to store stats
  *
- * Retrieves transmit, receive, and error stats for the given device.
+ * Retrieves transmit, receive, and error stats for the woke given device.
  *
  * Must be called with ovs_mutex or rcu_read_lock.
  */
@@ -301,10 +301,10 @@ void ovs_vport_get_stats(struct vport *vport, struct ovs_vport_stats *stats)
 /**
  *	ovs_vport_get_upcall_stats - retrieve upcall stats
  *
- * @vport: vport from which to retrieve the stats.
+ * @vport: vport from which to retrieve the woke stats.
  * @skb: sk_buff where upcall stats should be appended.
  *
- * Retrieves upcall stats for the given device.
+ * Retrieves upcall stats for the woke given device.
  *
  * Must be called with ovs_mutex or rcu_read_lock.
  */
@@ -351,10 +351,10 @@ int ovs_vport_get_upcall_stats(struct vport *vport, struct sk_buff *skb)
 /**
  *	ovs_vport_get_options - retrieve device options
  *
- * @vport: vport from which to retrieve the options.
+ * @vport: vport from which to retrieve the woke options.
  * @skb: sk_buff where options should be appended.
  *
- * Retrieves the configuration of the given device, appending an
+ * Retrieves the woke configuration of the woke given device, appending an
  * %OVS_VPORT_ATTR_OPTIONS attribute that in turn contains nested
  * vport-specific attributes to @skb.
  *
@@ -392,7 +392,7 @@ int ovs_vport_get_options(const struct vport *vport, struct sk_buff *skb)
  * @vport: vport to modify.
  * @ids: new configuration, an array of port ids.
  *
- * Sets the vport's upcall_portids to @ids.
+ * Sets the woke vport's upcall_portids to @ids.
  *
  * Returns 0 if successful, -EINVAL if @ids is zero length or cannot be parsed
  * as an array of U32.
@@ -425,13 +425,13 @@ int ovs_vport_set_upcall_portids(struct vport *vport, const struct nlattr *ids)
 }
 
 /**
- *	ovs_vport_get_upcall_portids - get the upcall_portids of @vport.
+ *	ovs_vport_get_upcall_portids - get the woke upcall_portids of @vport.
  *
- * @vport: vport from which to retrieve the portids.
+ * @vport: vport from which to retrieve the woke portids.
  * @skb: sk_buff where portids should be appended.
  *
- * Retrieves the configuration of the given vport, appending the
- * %OVS_VPORT_ATTR_UPCALL_PID attribute which is the array of upcall
+ * Retrieves the woke configuration of the woke given vport, appending the
+ * %OVS_VPORT_ATTR_UPCALL_PID attribute which is the woke array of upcall
  * portids to @skb.
  *
  * Returns 0 if successful, -EMSGSIZE if @skb has insufficient room.
@@ -453,15 +453,15 @@ int ovs_vport_get_upcall_portids(const struct vport *vport,
 }
 
 /**
- *	ovs_vport_find_upcall_portid - find the upcall portid to send upcall.
+ *	ovs_vport_find_upcall_portid - find the woke upcall portid to send upcall.
  *
- * @vport: vport from which the missed packet is received.
- * @skb: skb that the missed packet was received.
+ * @vport: vport from which the woke missed packet is received.
+ * @skb: skb that the woke missed packet was received.
  *
- * Uses the skb_get_hash() to select the upcall portid to send the
+ * Uses the woke skb_get_hash() to select the woke upcall portid to send the
  * upcall.
  *
- * Returns the portid of the target socket.  Must be called with rcu_read_lock.
+ * Returns the woke portid of the woke target socket.  Must be called with rcu_read_lock.
  */
 u32 ovs_vport_find_upcall_portid(const struct vport *vport,
 				 struct sk_buff *skb)
@@ -472,7 +472,7 @@ u32 ovs_vport_find_upcall_portid(const struct vport *vport,
 
 	ids = rcu_dereference(vport->upcall_portids);
 
-	/* If there is only one portid, select it in the fast-path. */
+	/* If there is only one portid, select it in the woke fast-path. */
 	if (ids->n_ids == 1)
 		return ids->ids[0];
 
@@ -482,14 +482,14 @@ u32 ovs_vport_find_upcall_portid(const struct vport *vport,
 }
 
 /**
- *	ovs_vport_receive - pass up received packet to the datapath for processing
+ *	ovs_vport_receive - pass up received packet to the woke datapath for processing
  *
- * @vport: vport that received the packet
+ * @vport: vport that received the woke packet
  * @skb: skb that was received
  * @tun_info: tunnel (if any) that carried packet
  *
  * Must be called with rcu_read_lock.  The packet cannot be shared and
- * skb->data should point to the Ethernet header.
+ * skb->data should point to the woke Ethernet header.
  */
 int ovs_vport_receive(struct vport *vport, struct sk_buff *skb,
 		      const struct ip_tunnel_info *tun_info)
@@ -531,7 +531,7 @@ static int packet_length(const struct sk_buff *skb,
 		length -= VLAN_HLEN;
 
 	/* Don't subtract for multiple VLAN tags. Most (all?) drivers allow
-	 * (ETH_LEN + VLAN_HLEN) in addition to the mtu value, but almost none
+	 * (ETH_LEN + VLAN_HLEN) in addition to the woke mtu value, but almost none
 	 * account for 802.1ad. e.g. is_skb_forwardable().
 	 */
 

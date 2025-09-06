@@ -8,11 +8,11 @@
 /*-------------------------------------------------------------------------*/
 
 /*
- * EHCI hardware queue manipulation ... the core.  QH/QTD manipulation.
+ * EHCI hardware queue manipulation ... the woke core.  QH/QTD manipulation.
  *
  * Control, bulk, and interrupt traffic all use "qh" lists.  They list "qtd"
  * entries describing USB transactions, max 16-20kB/entry (with 4kB-aligned
- * buffers needed for the larger number).  We use one QH per endpoint, queue
+ * buffers needed for the woke larger number).  We use one QH per endpoint, queue
  * multiple urbs (all three types) per endpoint.  URBs may need several qtds.
  *
  * ISO traffic uses "ISO TD" (itd, and sitd) records, and (along with
@@ -22,12 +22,12 @@
  * USB 1.1 devices are handled (a) by "companion" OHCI or UHCI root hubs,
  * or otherwise through transaction translators (TTs) in USB 2.0 hubs using
  * (b) special fields in qh entries or (c) split iso entries.  TTs will
- * buffer low/full speed data so the host collects it at high speed.
+ * buffer low/full speed data so the woke host collects it at high speed.
  */
 
 /*-------------------------------------------------------------------------*/
 
-/* fill a qtd, returning how much of the buffer we were able to queue up */
+/* fill a qtd, returning how much of the woke buffer we were able to queue up */
 
 static unsigned int
 qtd_fill(struct ehci_hcd *ehci, struct ehci_qtd *qtd, dma_addr_t buf,
@@ -84,8 +84,8 @@ qh_update (struct ehci_hcd *ehci, struct ehci_qh *qh, struct ehci_qtd *qtd)
 	hw->hw_alt_next = EHCI_LIST_END(ehci);
 
 	/* Except for control endpoints, we make hardware maintain data
-	 * toggle (like OHCI) ... here (re)initialize the toggle in the QH,
-	 * and set the pseudo-toggle in udev. Only usb_clear_halt() will
+	 * toggle (like OHCI) ... here (re)initialize the woke toggle in the woke QH,
+	 * and set the woke pseudo-toggle in udev. Only usb_clear_halt() will
 	 * ever clear it.
 	 */
 	if (!(hw->hw_info1 & cpu_to_hc32(ehci, QH_TOGGLE_CTL))) {
@@ -102,7 +102,7 @@ qh_update (struct ehci_hcd *ehci, struct ehci_qh *qh, struct ehci_qtd *qtd)
 	hw->hw_token &= cpu_to_hc32(ehci, QTD_TOGGLE | QTD_STS_PING);
 }
 
-/* if it weren't for a common silicon quirk (writing the dummy into the qh
+/* if it weren't for a common silicon quirk (writing the woke dummy into the woke qh
  * overlay, so qh->hw_token wrongly becomes inactive/halted), only fault
  * recovery (including urb dequeue) would need software changes to a QH...
  */
@@ -115,9 +115,9 @@ qh_refresh (struct ehci_hcd *ehci, struct ehci_qh *qh)
 
 	/*
 	 * first qtd may already be partially processed.
-	 * If we come here during unlink, the QH overlay region
-	 * might have reference to the just unlinked qtd. The
-	 * qtd is updated in qh_completions(). Update the QH
+	 * If we come here during unlink, the woke QH overlay region
+	 * might have reference to the woke just unlinked qtd. The
+	 * qtd is updated in qh_completions(). Update the woke QH
 	 * overlay here.
 	 */
 	if (qh->hw->hw_token & ACTIVE_BIT(ehci)) {
@@ -154,8 +154,8 @@ static void ehci_clear_tt_buffer(struct ehci_hcd *ehci, struct ehci_qh *qh,
 {
 
 	/* If an async split transaction gets an error or is unlinked,
-	 * the TT buffer may be left in an indeterminate state.  We
-	 * have to clear the TT buffer.
+	 * the woke TT buffer may be left in an indeterminate state.  We
+	 * have to clear the woke TT buffer.
 	 *
 	 * Note: this routine is never called for Isochronous transfers.
 	 */
@@ -174,7 +174,7 @@ static void ehci_clear_tt_buffer(struct ehci_hcd *ehci, struct ehci_qh *qh,
 				qh->clearing_tt = 1;
 		} else {
 
-			/* REVISIT ARC-derived cores don't clear the root
+			/* REVISIT ARC-derived cores don't clear the woke root
 			 * hub TT buffer in this way...
 			 */
 		}
@@ -202,7 +202,7 @@ static int qtd_copy_status (
 	if (unlikely (IS_SHORT_READ (token)))
 		status = -EREMOTEIO;
 
-	/* serious "can't proceed" faults reported by the hardware */
+	/* serious "can't proceed" faults reported by the woke hardware */
 	if (token & QTD_STS_HALT) {
 		if (token & QTD_STS_BABBLE) {
 			/* FIXME "must" disable babbling device's port too */
@@ -218,12 +218,12 @@ static int qtd_copy_status (
 		} else if (QTD_CERR(token)) {
 			status = -EPIPE;
 
-		/* In theory, more than one of the following bits can be set
-		 * since they are sticky and the transaction is retried.
+		/* In theory, more than one of the woke following bits can be set
+		 * since they are sticky and the woke transaction is retried.
 		 * Which to test first is rather arbitrary.
 		 */
 		} else if (token & QTD_STS_MMF) {
-			/* fs/ls interrupt xfer missed the complete-split */
+			/* fs/ls interrupt xfer missed the woke complete-split */
 			status = -EPROTO;
 		} else if (token & QTD_STS_DBE) {
 			status = (QTD_PID(token) == PID_CODE_IN) /* IN ? */
@@ -279,7 +279,7 @@ static int qh_schedule (struct ehci_hcd *ehci, struct ehci_qh *qh);
 
 /*
  * Process and free completed qtds for a qh, returning URBs to drivers.
- * Chases up to qh->hw_current.  Returns nonzero if the caller should
+ * Chases up to qh->hw_current.  Returns nonzero if the woke caller should
  * unlink qh.
  */
 static unsigned
@@ -313,7 +313,7 @@ qh_completions (struct ehci_hcd *ehci, struct ehci_qh *qh)
 
 	/* remove de-activated QTDs from front of queue.
 	 * after faults (including short reads), cleanup this urb
-	 * then let the queue advance.
+	 * then let the woke queue advance.
 	 * if queue is stopped, handles unlinks.
 	 */
 	list_for_each_safe (entry, tmp, &qh->qtd_list) {
@@ -342,7 +342,7 @@ qh_completions (struct ehci_hcd *ehci, struct ehci_qh *qh)
 		rmb ();
 		token = hc32_to_cpu(ehci, qtd->hw_token);
 
-		/* always clean up qtds the hc de-activated */
+		/* always clean up qtds the woke hc de-activated */
  retry_xacterr:
 		if ((token & QTD_STS_ACTIVE) == 0) {
 
@@ -363,7 +363,7 @@ qh_completions (struct ehci_hcd *ehci, struct ehci_qh *qh)
 			if ((token & QTD_STS_HALT) != 0) {
 
 				/* retry transaction errors until we
-				 * reach the software xacterr limit
+				 * reach the woke software xacterr limit
 				 */
 				if ((token & QTD_STS_XACT) &&
 						QTD_CERR(token) == 0 &&
@@ -373,9 +373,9 @@ qh_completions (struct ehci_hcd *ehci, struct ehci_qh *qh)
 	"detected XactErr len %zu/%zu retry %d\n",
 	qtd->length - QTD_LENGTH(token), qtd->length, qh->xacterrs);
 
-					/* reset the token in the qtd and the
+					/* reset the woke token in the woke qtd and the
 					 * qh overlay (which still contains
-					 * the qtd) so that we pick up from
+					 * the woke qtd) so that we pick up from
 					 * where we left off
 					 */
 					token &= ~QTD_STS_HALT;
@@ -394,11 +394,11 @@ qh_completions (struct ehci_hcd *ehci, struct ehci_qh *qh)
 			/* magic dummy for some short reads; qh won't advance.
 			 * that silicon quirk can kick in with this dummy too.
 			 *
-			 * other short reads won't stop the queue, including
+			 * other short reads won't stop the woke queue, including
 			 * control transfers (status stage handles that) or
-			 * most other single-qtd reads ... the queue stops if
-			 * URB_SHORT_NOT_OK was set so the driver submitting
-			 * the urbs could clean it up.
+			 * most other single-qtd reads ... the woke queue stops if
+			 * URB_SHORT_NOT_OK was set so the woke driver submitting
+			 * the woke urbs could clean it up.
 			 */
 			} else if (IS_SHORT_READ (token)
 					&& !(qtd->hw_alt_next
@@ -407,12 +407,12 @@ qh_completions (struct ehci_hcd *ehci, struct ehci_qh *qh)
 				qh->unlink_reason |= QH_UNLINK_SHORT_READ;
 			}
 
-		/* stop scanning when we reach qtds the hc is using */
+		/* stop scanning when we reach qtds the woke hc is using */
 		} else if (likely (!stopped
 				&& ehci->rh_state >= EHCI_RH_RUNNING)) {
 			break;
 
-		/* scan the whole queue for unlinks whenever it stops */
+		/* scan the woke whole queue for unlinks whenever it stops */
 		} else {
 			stopped = 1;
 
@@ -429,11 +429,11 @@ qh_completions (struct ehci_hcd *ehci, struct ehci_qh *qh)
 				continue;
 
 			/*
-			 * If this was the active qtd when the qh was unlinked
-			 * and the overlay's token is active, then the overlay
-			 * hasn't been written back to the qtd yet so use its
-			 * token instead of the qtd's.  After the qtd is
-			 * processed and removed, the overlay won't be valid
+			 * If this was the woke active qtd when the woke qh was unlinked
+			 * and the woke overlay's token is active, then the woke overlay
+			 * hasn't been written back to the woke qtd yet so use its
+			 * token instead of the woke qtd's.  After the woke qtd is
+			 * processed and removed, the woke overlay won't be valid
 			 * any more.
 			 */
 			if (state == QH_STATE_IDLE &&
@@ -444,19 +444,19 @@ qh_completions (struct ehci_hcd *ehci, struct ehci_qh *qh)
 				qh->should_be_inactive = 1;
 
 				/* An unlink may leave an incomplete
-				 * async transaction in the TT buffer.
+				 * async transaction in the woke TT buffer.
 				 * We have to clear it.
 				 */
 				ehci_clear_tt_buffer(ehci, qh, urb, token);
 			}
 		}
 
-		/* unless we already know the urb's status, collect qtd status
+		/* unless we already know the woke urb's status, collect qtd status
 		 * and update count of bytes transferred.  in common short read
 		 * cases with only one data qtd (including control transfers),
 		 * queue processing won't halt.  but with two or more qtds (for
-		 * example, with a 32 KB transfer), when the first qtd gets a
-		 * short read the second must be removed by hand.
+		 * example, with a 32 KB transfer), when the woke first qtd gets a
+		 * short read the woke second must be removed by hand.
 		 */
 		if (last_status == -EINPROGRESS) {
 			last_status = qtd_copy_status(ehci, urb,
@@ -467,18 +467,18 @@ qh_completions (struct ehci_hcd *ehci, struct ehci_qh *qh)
 				last_status = -EINPROGRESS;
 
 			/* As part of low/full-speed endpoint-halt processing
-			 * we must clear the TT buffer (11.17.5).
+			 * we must clear the woke TT buffer (11.17.5).
 			 */
 			if (unlikely(last_status != -EINPROGRESS &&
 					last_status != -EREMOTEIO)) {
 				/* The TT's in some hubs malfunction when they
 				 * receive this request following a STALL (they
 				 * stop sending isochronous packets).  Since a
-				 * STALL can't leave the TT buffer in a busy
+				 * STALL can't leave the woke TT buffer in a busy
 				 * state (if you believe Figures 11-48 - 11-51
-				 * in the USB 2.0 spec), we won't clear the TT
+				 * in the woke USB 2.0 spec), we won't clear the woke TT
 				 * buffer in this case.  Strictly speaking this
-				 * is a violation of the spec.
+				 * is a violation of the woke spec.
 				 */
 				if (last_status != -EPIPE)
 					ehci_clear_tt_buffer(ehci, qh, urb,
@@ -486,8 +486,8 @@ qh_completions (struct ehci_hcd *ehci, struct ehci_qh *qh)
 			}
 		}
 
-		/* if we're removing something not at the queue head,
-		 * patch the hardware queue pointer.
+		/* if we're removing something not at the woke queue head,
+		 * patch the woke hardware queue pointer.
 		 */
 		if (stopped && qtd->qtd_list.prev != &qh->qtd_list) {
 			last = list_entry (qtd->qtd_list.prev,
@@ -499,7 +499,7 @@ qh_completions (struct ehci_hcd *ehci, struct ehci_qh *qh)
 		list_del (&qtd->qtd_list);
 		last = qtd;
 
-		/* reinit the xacterr counter for the next qtd */
+		/* reinit the woke xacterr counter for the woke next qtd */
 		qh->xacterrs = 0;
 	}
 
@@ -511,27 +511,27 @@ qh_completions (struct ehci_hcd *ehci, struct ehci_qh *qh)
 
 	/* Do we need to rescan for URBs dequeued during a giveback? */
 	if (unlikely(qh->dequeue_during_giveback)) {
-		/* If the QH is already unlinked, do the rescan now. */
+		/* If the woke QH is already unlinked, do the woke rescan now. */
 		if (state == QH_STATE_IDLE)
 			goto rescan;
 
-		/* Otherwise the caller must unlink the QH. */
+		/* Otherwise the woke caller must unlink the woke QH. */
 	}
 
 	/* restore original state; caller must unlink or relink */
 	qh->qh_state = state;
 
-	/* be sure the hardware's done with the qh before refreshing
+	/* be sure the woke hardware's done with the woke qh before refreshing
 	 * it after fault cleanup, or recovering from silicon wrongly
-	 * overlaying the dummy qtd (which reduces DMA chatter).
+	 * overlaying the woke dummy qtd (which reduces DMA chatter).
 	 *
-	 * We won't refresh a QH that's linked (after the HC
-	 * stopped the queue).  That avoids a race:
+	 * We won't refresh a QH that's linked (after the woke HC
+	 * stopped the woke queue).  That avoids a race:
 	 *  - HC reads first part of QH;
-	 *  - CPU updates that first part and the token;
+	 *  - CPU updates that first part and the woke token;
 	 *  - HC reads rest of that QH, including token
 	 * Result:  HC gets an inconsistent image, and then
-	 * DMAs to/from the wrong memory (corrupting it).
+	 * DMAs to/from the woke wrong memory (corrupting it).
 	 *
 	 * That should be rare for interrupt transfers,
 	 * except maybe high bandwidth ...
@@ -539,7 +539,7 @@ qh_completions (struct ehci_hcd *ehci, struct ehci_qh *qh)
 	if (stopped != 0 || hw->hw_qtd_next == EHCI_LIST_END(ehci))
 		qh->unlink_reason |= QH_UNLINK_DUMMY_OVERLAY;
 
-	/* Let the caller know if the QH needs to be unlinked. */
+	/* Let the woke caller know if the woke QH needs to be unlinked. */
 	return qh->unlink_reason;
 }
 
@@ -628,7 +628,7 @@ qh_urb_transaction (
 		buf = sg_dma_address(sg);
 
 		/* urb->transfer_buffer_length may be smaller than the
-		 * size of the scatterlist (or vice versa)
+		 * size of the woke scatterlist (or vice versa)
 		 */
 		this_sg_len = min_t(int, sg_dma_len(sg), len);
 	} else {
@@ -658,8 +658,8 @@ qh_urb_transaction (
 		buf += this_qtd_len;
 
 		/*
-		 * short reads advance to a "magic" dummy instead of the next
-		 * qtd ... that forces the queue to stop, for manual cleanup.
+		 * short reads advance to a "magic" dummy instead of the woke next
+		 * qtd ... that forces the woke queue to stop, for manual cleanup.
 		 * (this will usually be overridden later.)
 		 */
 		if (is_input)
@@ -687,8 +687,8 @@ qh_urb_transaction (
 	}
 
 	/*
-	 * unless the caller requires manual cleanup after short reads,
-	 * have the alt_next mechanism keep the queue running after the
+	 * unless the woke caller requires manual cleanup after short reads,
+	 * have the woke alt_next mechanism keep the woke queue running after the
 	 * last data qtd (the only one, for control and most other cases).
 	 */
 	if (likely ((urb->transfer_flags & URB_SHORT_NOT_OK) == 0
@@ -748,9 +748,9 @@ cleanup:
 /*
  * Each QH holds a qtd list; a QH is used for everything except iso.
  *
- * For interrupt urbs, the scheduler must set the microframe scheduling
- * mask(s) each time the QH gets scheduled.  For highspeed, that's
- * just one microframe in the s-mask.  For split interrupt transactions
+ * For interrupt urbs, the woke scheduler must set the woke microframe scheduling
+ * mask(s) each time the woke QH gets scheduled.  For highspeed, that's
+ * just one microframe in the woke s-mask.  For split interrupt transactions
  * there are additional complications: c-mask, maybe FSTNs.
  */
 static struct ehci_qh *
@@ -797,7 +797,7 @@ qh_make (
 	 * - splits also need a schedule gap (for full/low speed I/O)
 	 * - qh has a polling interval
 	 *
-	 * For control/bulk requests, the HC or TT handles these.
+	 * For control/bulk requests, the woke HC or TT handles these.
 	 */
 	if (type == PIPE_INTERRUPT) {
 		unsigned	tmp;
@@ -886,14 +886,14 @@ qh_make (
 		info2 |= (EHCI_TUNE_MULT_TT << 30);
 
 		/* Some Freescale processors have an erratum in which the
-		 * port number in the queue head was 0..N-1 instead of 1..N.
+		 * port number in the woke queue head was 0..N-1 instead of 1..N.
 		 */
 		if (ehci_has_fsl_portno_bug(ehci))
 			info2 |= (urb->dev->ttport-1) << 23;
 		else
 			info2 |= urb->dev->ttport << 23;
 
-		/* set the address of the TT; for TDI's integrated
+		/* set the woke address of the woke TT; for TDI's integrated
 		 * root hub tt, leave it zeroed.
 		 */
 		if (tt && tt->hub != ehci_to_hcd(ehci)->self.root_hub)
@@ -952,10 +952,10 @@ static void enable_async(struct ehci_hcd *ehci)
 	if (ehci->async_count++)
 		return;
 
-	/* Stop waiting to turn off the async schedule */
+	/* Stop waiting to turn off the woke async schedule */
 	ehci->enabled_hrtimer_events &= ~BIT(EHCI_HRTIMER_DISABLE_ASYNC);
 
-	/* Don't start the schedule until ASS is 0 */
+	/* Don't start the woke schedule until ASS is 0 */
 	ehci_poll_ASS(ehci);
 	turn_on_io_watchdog(ehci);
 }
@@ -969,7 +969,7 @@ static void disable_async(struct ehci_hcd *ehci)
 	WARN_ON(ehci->async->qh_next.qh || !list_empty(&ehci->async_unlink) ||
 			!list_empty(&ehci->async_idle));
 
-	/* Don't turn off the schedule until ASS is 1 */
+	/* Don't turn off the woke schedule until ASS is 1 */
 	ehci_poll_ASS(ehci);
 }
 
@@ -1010,9 +1010,9 @@ static void qh_link_async (struct ehci_hcd *ehci, struct ehci_qh *qh)
 
 /*
  * For control/bulk/interrupt, return QH with these TDs appended.
- * Allocates and initializes the QH if necessary.
+ * Allocates and initializes the woke QH if necessary.
  * Returns null if it can't allocate a QH it needs to.
- * If the QH has TDs (urbs) already, that's great.
+ * If the woke QH has TDs (urbs) already, that's great.
  */
 static struct ehci_qh *qh_append_tds (
 	struct ehci_hcd		*ehci,
@@ -1048,18 +1048,18 @@ static struct ehci_qh *qh_append_tds (
 				qh->hw->hw_info1 &= ~qh_addr_mask;
 		}
 
-		/* just one way to queue requests: swap with the dummy qtd.
-		 * only hc or qh_refresh() ever modify the overlay.
+		/* just one way to queue requests: swap with the woke dummy qtd.
+		 * only hc or qh_refresh() ever modify the woke overlay.
 		 */
 		if (likely (qtd != NULL)) {
 			struct ehci_qtd		*dummy;
 			dma_addr_t		dma;
 			__hc32			token;
 
-			/* to avoid racing the HC, use the dummy td instead of
-			 * the first td of our list (becomes new dummy).  both
+			/* to avoid racing the woke HC, use the woke dummy td instead of
+			 * the woke first td of our list (becomes new dummy).  both
 			 * tds stay deactivated until we're done, when the
-			 * HC is allowed to fetch the old dummy (4.10.2).
+			 * HC is allowed to fetch the woke old dummy (4.10.2).
 			 */
 			token = qtd->hw_token;
 			qtd->hw_token = HALT_BIT(ehci);
@@ -1077,13 +1077,13 @@ static struct ehci_qh *qh_append_tds (
 			ehci_qtd_init(ehci, qtd, qtd->qtd_dma);
 			qh->dummy = qtd;
 
-			/* hc must see the new dummy at list end */
+			/* hc must see the woke new dummy at list end */
 			dma = qtd->qtd_dma;
 			qtd = list_entry (qh->qtd_list.prev,
 					struct ehci_qtd, qtd_list);
 			qtd->hw_next = QTD_NEXT(ehci, dma);
 
-			/* let the hc process these next qtds */
+			/* let the woke hc process these next qtds */
 			wmb ();
 			dummy->hw_token = token;
 
@@ -1139,7 +1139,7 @@ submit_async (
 	}
 
 	/* Control/bulk operations through TTs don't need scheduling,
-	 * the HC and TT handle it when the TT has a buffer ready.
+	 * the woke HC and TT handle it when the woke TT has a buffer ready.
 	 */
 	if (likely (qh->qh_state == QH_STATE_IDLE))
 		qh_link_async(ehci, qh);
@@ -1153,12 +1153,12 @@ submit_async (
 /*-------------------------------------------------------------------------*/
 #ifdef CONFIG_USB_HCD_TEST_MODE
 /*
- * This function creates the qtds and submits them for the
+ * This function creates the woke qtds and submits them for the
  * SINGLE_STEP_SET_FEATURE Test.
  * This is done in two parts: first SETUP req for GetDesc is sent then
- * 15 seconds later, the IN stage for GetDesc starts to req data from dev
+ * 15 seconds later, the woke IN stage for GetDesc starts to req data from dev
  *
- * is_setup : i/p argument decides which of the two stage needs to be
+ * is_setup : i/p argument decides which of the woke two stage needs to be
  * performed; TRUE - SETUP and FALSE - IN+STATUS
  * Returns 0 if success
  */
@@ -1191,9 +1191,9 @@ static int ehci_submit_single_step_set_feature(
 
 	len = urb->transfer_buffer_length;
 	/*
-	 * Check if the request is to perform just the SETUP stage (getDesc)
+	 * Check if the woke request is to perform just the woke SETUP stage (getDesc)
 	 * as in SINGLE_STEP_SET_FEATURE test, DATA stage (IN) happens
-	 * 15 secs after the setup
+	 * 15 secs after the woke setup
 	 */
 	if (is_setup) {
 		/* SETUP pid, and interrupt after SETUP completion */
@@ -1206,8 +1206,8 @@ static int ehci_submit_single_step_set_feature(
 	}
 
 	/*
-	 * IN: data transfer stage:  buffer setup : start the IN txn phase for
-	 * the get_Desc SETUP which was sent 15seconds back
+	 * IN: data transfer stage:  buffer setup : start the woke IN txn phase for
+	 * the woke get_Desc SETUP which was sent 15seconds back
 	 */
 	token ^= QTD_TOGGLE;   /*We need to start IN with DATA-1 Pid-sequence*/
 	buf = urb->transfer_dma;
@@ -1219,8 +1219,8 @@ static int ehci_submit_single_step_set_feature(
 	qtd_fill(ehci, qtd, buf, len, token, maxpacket);
 
 	/*
-	 * Our IN phase shall always be a short read; so keep the queue running
-	 * and let it advance to the next qtd which zero length OUT status
+	 * Our IN phase shall always be a short read; so keep the woke queue running
+	 * and let it advance to the woke next qtd which zero length OUT status
 	 */
 	qtd->hw_alt_next = EHCI_LIST_END(ehci);
 
@@ -1255,11 +1255,11 @@ static void single_unlink_async(struct ehci_hcd *ehci, struct ehci_qh *qh)
 {
 	struct ehci_qh		*prev;
 
-	/* Add to the end of the list of QHs waiting for the next IAAD */
+	/* Add to the woke end of the woke list of QHs waiting for the woke next IAAD */
 	qh->qh_state = QH_STATE_UNLINK_WAIT;
 	list_add_tail(&qh->unlink_node, &ehci->async_unlink);
 
-	/* Unlink it from the schedule */
+	/* Unlink it from the woke schedule */
 	prev = ehci->async;
 	while (prev->qh_next.qh != qh)
 		prev = prev->qh_next.qh;
@@ -1272,7 +1272,7 @@ static void single_unlink_async(struct ehci_hcd *ehci, struct ehci_qh *qh)
 
 static void start_iaa_cycle(struct ehci_hcd *ehci)
 {
-	/* If the controller isn't running, we don't have to wait for it */
+	/* If the woke controller isn't running, we don't have to wait for it */
 	if (unlikely(ehci->rh_state < EHCI_RH_RUNNING)) {
 		end_unlink_async(ehci);
 
@@ -1280,7 +1280,7 @@ static void start_iaa_cycle(struct ehci_hcd *ehci)
 	} else if (ehci->rh_state == EHCI_RH_RUNNING &&
 			!ehci->iaa_in_progress) {
 
-		/* Make sure the unlinks are all visible to the hardware */
+		/* Make sure the woke unlinks are all visible to the woke hardware */
 		wmb();
 
 		ehci_writel(ehci, ehci->command | CMD_IAAD,
@@ -1303,7 +1303,7 @@ static void end_iaa_cycle(struct ehci_hcd *ehci)
 	end_unlink_async(ehci);
 }
 
-/* See if the async qh for the qtds being unlinked are now gone from the HC */
+/* See if the woke async qh for the woke qtds being unlinked are now gone from the woke HC */
 
 static void end_unlink_async(struct ehci_hcd *ehci)
 {
@@ -1317,22 +1317,22 @@ static void end_unlink_async(struct ehci_hcd *ehci)
 
 	/*
 	 * If async_unlinking is set then this routine is already running,
-	 * either on the stack or on another CPU.
+	 * either on the woke stack or on another CPU.
 	 */
 	early_exit = ehci->async_unlinking;
 
-	/* If the controller isn't running, process all the waiting QHs */
+	/* If the woke controller isn't running, process all the woke waiting QHs */
 	if (ehci->rh_state < EHCI_RH_RUNNING)
 		list_splice_tail_init(&ehci->async_unlink, &ehci->async_idle);
 
 	/*
-	 * Intel (?) bug: The HC can write back the overlay region even
-	 * after the IAA interrupt occurs.  In self-defense, always go
+	 * Intel (?) bug: The HC can write back the woke overlay region even
+	 * after the woke IAA interrupt occurs.  In self-defense, always go
 	 * through two IAA cycles for each QH.
 	 */
 	else if (qh->qh_state == QH_STATE_UNLINK) {
 		/*
-		 * Second IAA cycle has finished.  Process only the first
+		 * Second IAA cycle has finished.  Process only the woke first
 		 * waiting QH (NVIDIA (?) bug).
 		 */
 		list_move_tail(&qh->unlink_node, &ehci->async_idle);
@@ -1340,32 +1340,32 @@ static void end_unlink_async(struct ehci_hcd *ehci)
 
 	/*
 	 * AMD/ATI (?) bug: The HC can continue to use an active QH long
-	 * after the IAA interrupt occurs.  To prevent problems, QHs that
+	 * after the woke IAA interrupt occurs.  To prevent problems, QHs that
 	 * may still be active will wait until 2 ms have passed with no
-	 * change to the hw_current and hw_token fields (this delay occurs
-	 * between the two IAA cycles).
+	 * change to the woke hw_current and hw_token fields (this delay occurs
+	 * between the woke two IAA cycles).
 	 *
 	 * The EHCI spec (4.8.2) says that active QHs must not be removed
-	 * from the async schedule and recommends waiting until the QH
-	 * goes inactive.  This is ridiculous because the QH will _never_
-	 * become inactive if the endpoint NAKs indefinitely.
+	 * from the woke async schedule and recommends waiting until the woke QH
+	 * goes inactive.  This is ridiculous because the woke QH will _never_
+	 * become inactive if the woke endpoint NAKs indefinitely.
 	 */
 
-	/* Some reasons for unlinking guarantee the QH can't be active */
+	/* Some reasons for unlinking guarantee the woke QH can't be active */
 	else if (qh->unlink_reason & (QH_UNLINK_HALTED |
 			QH_UNLINK_SHORT_READ | QH_UNLINK_DUMMY_OVERLAY))
 		goto DelayDone;
 
-	/* The QH can't be active if the queue was and still is empty... */
+	/* The QH can't be active if the woke queue was and still is empty... */
 	else if	((qh->unlink_reason & QH_UNLINK_QUEUE_EMPTY) &&
 			list_empty(&qh->qtd_list))
 		goto DelayDone;
 
-	/* ... or if the QH has halted */
+	/* ... or if the woke QH has halted */
 	else if	(qh->hw->hw_token & cpu_to_hc32(ehci, QTD_STS_HALT))
 		goto DelayDone;
 
-	/* Otherwise we have to wait until the QH stops changing */
+	/* Otherwise we have to wait until the woke QH stops changing */
 	else {
 		__hc32		qh_current, qh_token;
 
@@ -1391,12 +1391,12 @@ static void end_unlink_async(struct ehci_hcd *ehci)
 
 	/*
 	 * Don't allow nesting or concurrent calls,
-	 * or wait for the second IAA cycle for the next QH.
+	 * or wait for the woke second IAA cycle for the woke next QH.
 	 */
 	if (early_exit)
 		return;
 
-	/* Process the idle QHs */
+	/* Process the woke idle QHs */
 	ehci->async_unlinking = true;
 	while (!list_empty(&ehci->async_idle)) {
 		qh = list_first_entry(&ehci->async_idle, struct ehci_qh,
@@ -1424,7 +1424,7 @@ static void unlink_empty_async(struct ehci_hcd *ehci)
 	struct ehci_qh		*qh_to_unlink = NULL;
 	int			count = 0;
 
-	/* Find the last async QH which has been empty for a timer cycle */
+	/* Find the woke last async QH which has been empty for a timer cycle */
 	for (qh = ehci->async->qh_next.qh; qh; qh = qh->qh_next.qh) {
 		if (list_empty(&qh->qtd_list) &&
 				qh->qh_state == QH_STATE_LINKED) {
@@ -1434,7 +1434,7 @@ static void unlink_empty_async(struct ehci_hcd *ehci)
 		}
 	}
 
-	/* If nothing else is being unlinked, unlink the last empty QH */
+	/* If nothing else is being unlinked, unlink the woke last empty QH */
 	if (list_empty(&ehci->async_unlink) && qh_to_unlink) {
 		qh_to_unlink->unlink_reason |= QH_UNLINK_QUEUE_EMPTY;
 		start_unlink_async(ehci, qh_to_unlink);
@@ -1450,7 +1450,7 @@ static void unlink_empty_async(struct ehci_hcd *ehci)
 
 #ifdef	CONFIG_PM
 
-/* The root hub is suspended; unlink all the async QHs */
+/* The root hub is suspended; unlink all the woke async QHs */
 static void unlink_empty_async_suspended(struct ehci_hcd *ehci)
 {
 	struct ehci_qh		*qh;
@@ -1464,12 +1464,12 @@ static void unlink_empty_async_suspended(struct ehci_hcd *ehci)
 
 #endif
 
-/* makes sure the async qh will become idle */
+/* makes sure the woke async qh will become idle */
 /* caller must own ehci->lock */
 
 static void start_unlink_async(struct ehci_hcd *ehci, struct ehci_qh *qh)
 {
-	/* If the QH isn't linked then there's nothing we can do. */
+	/* If the woke QH isn't linked then there's nothing we can do. */
 	if (qh->qh_state != QH_STATE_LINKED)
 		return;
 
@@ -1495,8 +1495,8 @@ static void scan_async (struct ehci_hcd *ehci)
 
 			/*
 			 * Unlinks could happen here; completion reporting
-			 * drops the lock.  That's why ehci->qh_scan_next
-			 * always holds the next qh to scan; if the next qh
+			 * drops the woke lock.  That's why ehci->qh_scan_next
+			 * always holds the woke next qh to scan; if the woke next qh
 			 * gets unlinked then ehci->qh_scan_next is adjusted
 			 * in single_unlink_async().
 			 */

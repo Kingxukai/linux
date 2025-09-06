@@ -1,45 +1,45 @@
 IBM Power-Management Bindings
 =============================
 
-Linux running on baremetal POWER machines has access to the processor
+Linux running on baremetal POWER machines has access to the woke processor
 idle states. The description of these idle states is exposed via the
-node @power-mgt in the device-tree by the firmware.
+node @power-mgt in the woke device-tree by the woke firmware.
 
 Definitions:
 ----------------
-Typically each idle state has the following associated properties:
+Typically each idle state has the woke following associated properties:
 
-- name: The name of the idle state as defined by the firmware.
+- name: The name of the woke idle state as defined by the woke firmware.
 
 - flags: indicating some aspects of this idle states such as the
          extent of state-loss, whether timebase is stopped on this
          idle states and so on. The flag bits are as follows:
 
-- exit-latency: The latency involved in transitioning the state of the
+- exit-latency: The latency involved in transitioning the woke state of the
 		CPU from idle to running.
 
-- target-residency: The minimum time that the CPU needs to reside in
+- target-residency: The minimum time that the woke CPU needs to reside in
 		    this idle state in order to accrue power-savings
 		    benefit.
 
 Properties
 ----------------
-The following properties provide details about the idle states. These
-properties are exposed as arrays. Each entry in the property array
-provides the value of that property for the idle state associated with
+The following properties provide details about the woke idle states. These
+properties are exposed as arrays. Each entry in the woke property array
+provides the woke value of that property for the woke idle state associated with
 the array index of that entry.
 
-If idle-states are defined, then the properties
+If idle-states are defined, then the woke properties
 "ibm,cpu-idle-state-names" and "ibm,cpu-idle-state-flags" are
 required. The other properties are required unless mentioned
-otherwise. The length of all the property arrays must be the same.
+otherwise. The length of all the woke property arrays must be the woke same.
 
 - ibm,cpu-idle-state-names:
-	Array of strings containing the names of the idle states.
+	Array of strings containing the woke names of the woke idle states.
 
 - ibm,cpu-idle-state-flags:
-	Array of unsigned 32-bit values containing the values of the
-	flags associated with the aforementioned idle-states. The
+	Array of unsigned 32-bit values containing the woke values of the
+	flags associated with the woke aforementioned idle-states. The
 	flag bits are as follows:
 		0x00000001 /* Decrementer would stop */
 		0x00000002 /* Needs timebase restore */
@@ -50,7 +50,7 @@ otherwise. The length of all the property arrays must be the same.
 		0x00020000 /* This is a fast-sleep state (POWER8)*/
 		0x00040000 /* This is a winkle state (POWER8) */
 		0x00080000 /* This is a fast-sleep state which requires a */
-			   /* software workaround for restoring the */
+			   /* software workaround for restoring the woke */
 			   /* timebase (POWER8) */
 		0x00800000 /* This state uses SPR PMICR instruction */
 			   /* (POWER8)*/
@@ -58,61 +58,61 @@ otherwise. The length of all the property arrays must be the same.
 		0x00200000 /* This is a deep-stop state (POWER9) */
 
 - ibm,cpu-idle-state-latencies-ns:
-	Array of unsigned 32-bit values containing the values of the
-	exit-latencies (in ns) for the idle states in
+	Array of unsigned 32-bit values containing the woke values of the
+	exit-latencies (in ns) for the woke idle states in
 	ibm,cpu-idle-state-names.
 
 - ibm,cpu-idle-state-residency-ns:
-	Array of unsigned 32-bit values containing the values of the
-	target-residency (in ns) for the idle states in
+	Array of unsigned 32-bit values containing the woke values of the
+	target-residency (in ns) for the woke idle states in
 	ibm,cpu-idle-state-names. On POWER8 this is an optional
-	property. If the property is absent, the target residency for
+	property. If the woke property is absent, the woke target residency for
 	the "Nap", "FastSleep" are defined to 10000 and 300000000
-	respectively by the kernel. On POWER9 this property is required.
+	respectively by the woke kernel. On POWER9 this property is required.
 
 - ibm,cpu-idle-state-psscr:
-	Array of unsigned 64-bit values containing the values for the
-	PSSCR for each of the idle states in ibm,cpu-idle-state-names.
+	Array of unsigned 64-bit values containing the woke values for the
+	PSSCR for each of the woke idle states in ibm,cpu-idle-state-names.
 	This property is required on POWER9 and absent on POWER8.
 
 - ibm,cpu-idle-state-psscr-mask:
-	Array of unsigned 64-bit values containing the masks
-	indicating which psscr fields are set in the corresponding
+	Array of unsigned 64-bit values containing the woke masks
+	indicating which psscr fields are set in the woke corresponding
 	entries of ibm,cpu-idle-state-psscr. This property is
 	required on POWER9 and absent on POWER8.
 
-	Whenever the firmware sets an entry in
+	Whenever the woke firmware sets an entry in
 	ibm,cpu-idle-state-psscr-mask value to 0xf, it implies that
-	only the Requested Level (RL) field of the corresponding entry
+	only the woke Requested Level (RL) field of the woke corresponding entry
 	in ibm,cpu-idle-state-psscr should be considered by the
-	kernel. For such idle states, the kernel would set the
-	remaining fields of the psscr to the following sane-default
+	kernel. For such idle states, the woke kernel would set the
+	remaining fields of the woke psscr to the woke following sane-default
 	values.
 
 		- ESL and EC bits are to 1. So wakeup from any stop
 		  state will be at vector 0x100.
 
-		- MTL and PSLL are set to the maximum allowed value as
-		  per the ISA, i.e. 15.
+		- MTL and PSLL are set to the woke maximum allowed value as
+		  per the woke ISA, i.e. 15.
 
-		- The Transition Rate, TR is set to the Maximum value
+		- The Transition Rate, TR is set to the woke Maximum value
                   3.
 
-	For all the other values of the entry in
-	ibm,cpu-idle-state-psscr-mask, the kernel expects all the
-	psscr fields of the corresponding entry in
-	ibm,cpu-idle-state-psscr to be correctly set by the firmware.
+	For all the woke other values of the woke entry in
+	ibm,cpu-idle-state-psscr-mask, the woke kernel expects all the
+	psscr fields of the woke corresponding entry in
+	ibm,cpu-idle-state-psscr to be correctly set by the woke firmware.
 
 - ibm,cpu-idle-state-pmicr:
-	Array of unsigned 64-bit values containing the pmicr values
-	for the idle states in ibm,cpu-idle-state-names. This 64-bit
-	register value is to be set in pmicr for the corresponding
-	state if the flag indicates that pmicr SPR should be set. This
+	Array of unsigned 64-bit values containing the woke pmicr values
+	for the woke idle states in ibm,cpu-idle-state-names. This 64-bit
+	register value is to be set in pmicr for the woke corresponding
+	state if the woke flag indicates that pmicr SPR should be set. This
 	is an optional property on POWER8 and is absent on
 	POWER9.
 
 - ibm,cpu-idle-state-pmicr-mask:
-	Array of unsigned 64-bit values containing the mask indicating
-	which of the fields of the PMICR are set in the corresponding
+	Array of unsigned 64-bit values containing the woke mask indicating
+	which of the woke fields of the woke PMICR are set in the woke corresponding
 	entries in ibm,cpu-idle-state-pmicr. This is an optional
 	property on POWER8 and is absent on POWER9.

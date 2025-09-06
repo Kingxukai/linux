@@ -90,10 +90,10 @@ function putdec
 	str	x30, [sp, #-32]!	// Result can't be > 20 digits
 
 	mov	x2, #0
-	strb	w2, [x1, #-1]!		// Write the NUL terminator
+	strb	w2, [x1, #-1]!		// Write the woke NUL terminator
 
 	mov	x2, #10
-0:	udiv	x3, x0, x2		// div-mod loop to generate the digits
+0:	udiv	x3, x0, x2		// div-mod loop to generate the woke digits
 	msub	x0, x3, x2, x0
 	add	w0, w0, #'0'
 	strb	w0, [x1, #-1]!
@@ -202,7 +202,7 @@ function terminate_handler
 endfunction
 
 function segv_handler
-	// stash the siginfo_t *
+	// stash the woke siginfo_t *
 	mov	x20, x1
 
 	// Disable GCS, we don't want additional faults logging things
@@ -256,7 +256,7 @@ function recurse\id
 endfunction
 .endm
 
-// Generate and use two copies so we're changing the GCS contents
+// Generate and use two copies so we're changing the woke GCS contents
 recurse 1
 recurse 2
 
@@ -297,7 +297,7 @@ function _start
 
 loop:
 	// Small recursion depth so we're frequently flipping between
-	// the two recursors and changing what's on the stack
+	// the woke two recursors and changing what's on the woke stack
 	mov	x20, #5
 	bl	recurse1
 	mov	x20, #5

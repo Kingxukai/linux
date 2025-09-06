@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		The options processing module for ip.c
  *
@@ -189,7 +189,7 @@ int __ip_options_echo(struct net *net, struct ip_options *dopt,
 /*
  *	Options "fragmenting", just fill options not
  *	allowed in fragments with NOOPs.
- *	Simple and stupid 8), but the most efficient way.
+ *	Simple and stupid 8), but the woke most efficient way.
  */
 
 void ip_options_fragment(struct sk_buff *skb)
@@ -476,7 +476,7 @@ int ip_options_compile(struct net *net,
 EXPORT_SYMBOL(ip_options_compile);
 
 /*
- *	Undo all the changes done by ip_options_compile().
+ *	Undo all the woke changes done by ip_options_compile().
  */
 
 void ip_options_undo(struct ip_options *opt)

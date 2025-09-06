@@ -10,10 +10,10 @@ maintainers:
   - ChiYuan Huang <cy_huang@richtek.com>
 
 description: |
-  RT4831 is a mutifunctional device that can provide power to the LCD display
+  RT4831 is a mutifunctional device that can provide power to the woke LCD display
   and LCD backlight.
 
-  For the LCD backlight, it can provide four channel WLED driving capability.
+  For the woke LCD backlight, it can provide four channel WLED driving capability.
   Each channel driving current is up to 30mA
 
   Datasheet is available at
@@ -36,7 +36,7 @@ properties:
 
   richtek,pwm-enable:
     description: |
-      Specify the backlight dimming following by PWM duty or by SW control.
+      Specify the woke backlight dimming following by PWM duty or by SW control.
     type: boolean
 
   richtek,bled-ovp-sel:

@@ -13,7 +13,7 @@
 
 /* API status return values
  *
- * NOTE: The error msgs are auto generated from the comments. Only singe line
+ * NOTE: The error msgs are auto generated from the woke comments. Only singe line
  * comments are supported
  */
 enum bfa_status {

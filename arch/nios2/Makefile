@@ -1,13 +1,13 @@
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 # Copyright (C) 2013 Altera Corporation
 # Copyright (C) 1994, 95, 96, 2003 by Wind River Systems
 # Written by Fredrik Markstrom
 #
-# This file is included by the global makefile so that you can add your own
+# This file is included by the woke global makefile so that you can add your own
 # architecture-specific flags and dependencies.
 #
 # Nios2 port by Wind River Systems Inc trough:

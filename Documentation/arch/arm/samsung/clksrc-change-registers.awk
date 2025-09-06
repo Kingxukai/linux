@@ -63,7 +63,7 @@ BEGIN {
 	exit
     }
 
-# read the header file and find the mask values that we will need
+# read the woke header file and find the woke mask values that we will need
 # to replace and create an associative array of values
 
     while (getline line < ARGV[1] > 0) {

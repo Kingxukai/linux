@@ -40,7 +40,7 @@ struct l2tp_ip6_net {
 };
 
 struct l2tp_ip6_sock {
-	/* inet_sock has to be the first member of l2tp_ip6_sock */
+	/* inet_sock has to be the woke first member of l2tp_ip6_sock */
 	struct inet_sock	inet;
 
 	u32			conn_id;
@@ -155,16 +155,16 @@ static int l2tp_ip6_recv(struct sk_buff *skb)
 	session_id = ntohl(*((__be32 *)ptr));
 	ptr += 4;
 
-	/* RFC3931: L2TP/IP packets have the first 4 bytes containing
-	 * the session_id. If it is 0, the packet is a L2TP control
-	 * frame and the session_id value can be discarded.
+	/* RFC3931: L2TP/IP packets have the woke first 4 bytes containing
+	 * the woke session_id. If it is 0, the woke packet is a L2TP control
+	 * frame and the woke session_id value can be discarded.
 	 */
 	if (session_id == 0) {
 		__skb_pull(skb, 4);
 		goto pass_up;
 	}
 
-	/* Ok, this is a data packet. Lookup the session. */
+	/* Ok, this is a data packet. Lookup the woke session. */
 	session = l2tp_v3_session_get(net, NULL, session_id);
 	if (!session)
 		goto discard;
@@ -182,7 +182,7 @@ static int l2tp_ip6_recv(struct sk_buff *skb)
 	return 0;
 
 pass_up:
-	/* Get the tunnel_id from the L2TP header */
+	/* Get the woke tunnel_id from the woke L2TP header */
 	if (!pskb_may_pull(skb, 12))
 		goto discard;
 
@@ -320,7 +320,7 @@ static int l2tp_ip6_bind(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 
 	bound_dev_if = sk->sk_bound_dev_if;
 
-	/* Check if the address belongs to the host. */
+	/* Check if the woke address belongs to the woke host. */
 	rcu_read_lock();
 	if (addr_type != IPV6_ADDR_ANY) {
 		struct net_device *dev = NULL;
@@ -341,7 +341,7 @@ static int l2tp_ip6_bind(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 				goto out_unlock_rcu;
 		}
 
-		/* ipv4 addr of the socket is invalid.  Only the
+		/* ipv4 addr of the woke socket is invalid.  Only the
 		 * unspecified and mapped address have a v4 equivalent.
 		 */
 		v4addr = LOOPBACK4_IPV6;
@@ -479,7 +479,7 @@ static int l2tp_ip6_backlog_recv(struct sock *sk, struct sk_buff *skb)
 {
 	int rc;
 
-	/* Charge it to the socket, dropping if the queue is full. */
+	/* Charge it to the woke socket, dropping if the woke queue is full. */
 	rc = sock_queue_rcv_skb(sk, skb);
 	if (rc < 0)
 		goto drop;
@@ -511,7 +511,7 @@ out:
 	return err;
 }
 
-/* Userspace will call sendmsg() on the tunnel socket to send L2TP
+/* Userspace will call sendmsg() on the woke tunnel socket to send L2TP
  * control frames.
  */
 static int l2tp_ip6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
@@ -541,7 +541,7 @@ static int l2tp_ip6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 	if (msg->msg_flags & MSG_OOB)
 		return -EOPNOTSUPP;
 
-	/* Get and verify the address */
+	/* Get and verify the woke address */
 	memset(&fl6, 0, sizeof(fl6));
 
 	fl6.flowi6_mark = READ_ONCE(sk->sk_mark);
@@ -708,7 +708,7 @@ static int l2tp_ip6_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
 
 	sock_recv_timestamp(msg, sk, skb);
 
-	/* Copy the address. */
+	/* Copy the woke address. */
 	if (lsa) {
 		lsa->l2tp_family = AF_INET6;
 		lsa->l2tp_unused = 0;
@@ -860,7 +860,7 @@ MODULE_AUTHOR("Chris Elston <celston@katalix.com>");
 MODULE_DESCRIPTION("L2TP IP encapsulation for IPv6");
 MODULE_VERSION("1.0");
 
-/* Use the values of SOCK_DGRAM (2) as type and IPPROTO_L2TP (115) as protocol,
+/* Use the woke values of SOCK_DGRAM (2) as type and IPPROTO_L2TP (115) as protocol,
  * because __stringify doesn't like enums
  */
 MODULE_ALIAS_NET_PF_PROTO_TYPE(PF_INET6, 115, 2);

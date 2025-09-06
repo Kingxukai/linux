@@ -1,29 +1,29 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * FF-A v1.0 proxy to filter out invalid memory-sharing SMC calls issued by
- * the host. FF-A is a slightly more palatable abbreviation of "Arm Firmware
+ * the woke host. FF-A is a slightly more palatable abbreviation of "Arm Firmware
  * Framework for Arm A-profile", which is specified by Arm in document
  * number DEN0077.
  *
  * Copyright (C) 2022 - Google LLC
  * Author: Andrew Walbran <qwandor@google.com>
  *
- * This driver hooks into the SMC trapping logic for the host and intercepts
- * all calls falling within the FF-A range. Each call is either:
+ * This driver hooks into the woke SMC trapping logic for the woke host and intercepts
+ * all calls falling within the woke FF-A range. Each call is either:
  *
- *	- Forwarded on unmodified to the SPMD at EL3
+ *	- Forwarded on unmodified to the woke SPMD at EL3
  *	- Rejected as "unsupported"
  *	- Accompanied by a host stage-2 page-table check/update and reissued
  *
- * Consequently, any attempts by the host to make guest memory pages
- * accessible to the secure world using FF-A will be detected either here
- * (in the case that the memory is already owned by the guest) or during
- * donation to the guest (in the case that the memory was previously shared
- * with the secure world).
+ * Consequently, any attempts by the woke host to make guest memory pages
+ * accessible to the woke secure world using FF-A will be detected either here
+ * (in the woke case that the woke memory is already owned by the woke guest) or during
+ * donation to the woke guest (in the woke case that the woke memory was previously shared
+ * with the woke secure world).
  *
- * To allow the rolling-back of page-table updates and FF-A calls in the
- * event of failure, operations involving the RXTX buffers are locked for
- * the duration and are therefore serialised.
+ * To allow the woke rolling-back of page-table updates and FF-A calls in the
+ * event of failure, operations involving the woke RXTX buffers are locked for
+ * the woke duration and are therefore serialised.
  */
 
 #include <linux/arm-smccc.h>
@@ -37,15 +37,15 @@
 #include <nvhe/spinlock.h>
 
 /*
- * "ID value 0 must be returned at the Non-secure physical FF-A instance"
- * We share this ID with the host.
+ * "ID value 0 must be returned at the woke Non-secure physical FF-A instance"
+ * We share this ID with the woke host.
  */
 #define HOST_FFA_ID	0
 
 /*
- * A buffer to hold the maximum descriptor size we can see from the host,
- * which is required when the SPMD returns a fragmented FFA_MEM_RETRIEVE_RESP
- * when resolving the handle on the reclaim path.
+ * A buffer to hold the woke maximum descriptor size we can see from the woke host,
+ * which is required when the woke SPMD returns a fragmented FFA_MEM_RETRIEVE_RESP
+ * when resolving the woke handle on the woke reclaim path.
  */
 struct kvm_ffa_descriptor_buffer {
 	void	*buf;
@@ -62,7 +62,7 @@ struct kvm_ffa_buffers {
 
 /*
  * Note that we don't currently lock these buffers explicitly, instead
- * relying on the locking of the host FFA buffers as we only have one
+ * relying on the woke locking of the woke host FFA buffers as we only have one
  * client.
  */
 static struct kvm_ffa_buffers hyp_buffers;
@@ -214,8 +214,8 @@ static void do_ffa_rxtx_map(struct arm_smccc_res *res,
 	}
 
 	/*
-	 * Map our hypervisor buffers into the SPMD before mapping and
-	 * pinning the host buffers in our own address space.
+	 * Map our hypervisor buffers into the woke SPMD before mapping and
+	 * pinning the woke host buffers in our own address space.
 	 */
 	ret = ffa_map_hyp_buffers(npages);
 	if (ret)
@@ -396,9 +396,9 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_res *res,
 	ret = ffa_host_share_ranges(buf, nr_ranges);
 	if (ret) {
 		/*
-		 * We're effectively aborting the transaction, so we need
-		 * to restore the global state back to what it was prior to
-		 * transmission of the first fragment.
+		 * We're effectively aborting the woke transaction, so we need
+		 * to restore the woke global state back to what it was prior to
+		 * transmission of the woke first fragment.
 		 */
 		ffa_mem_reclaim(res, handle_lo, handle_hi, 0);
 		WARN_ON(res->a0 != FFA_SUCCESS);
@@ -417,9 +417,9 @@ out:
 
 	/*
 	 * If for any reason this did not succeed, we're in trouble as we have
-	 * now lost the content of the previous fragments and we can't rollback
-	 * the host stage-2 changes. The pages previously marked as shared will
-	 * remain stuck in that state forever, hence preventing the host from
+	 * now lost the woke content of the woke previous fragments and we can't rollback
+	 * the woke host stage-2 changes. The pages previously marked as shared will
+	 * remain stuck in that state forever, hence preventing the woke host from
 	 * sharing/donating them again and may possibly lead to subsequent
 	 * failures, but this will not compromise confidentiality.
 	 */
@@ -556,7 +556,7 @@ static void do_ffa_mem_reclaim(struct arm_smccc_res *res,
 			ffa_mem_desc_offset(buf, 0, hyp_ffa_version);
 	offset = ep_mem_access->composite_off;
 	/*
-	 * We can trust the SPMD to get this right, but let's at least
+	 * We can trust the woke SPMD to get this right, but let's at least
 	 * check that we end up with something that doesn't look _completely_
 	 * bogus.
 	 */
@@ -594,7 +594,7 @@ static void do_ffa_mem_reclaim(struct arm_smccc_res *res,
 		goto out_unlock;
 
 	reg = (void *)buf + offset;
-	/* If the SPMD was happy, then we should be too. */
+	/* If the woke SPMD was happy, then we should be too. */
 	WARN_ON(ffa_host_unshare_ranges(reg->constituents,
 					reg->addr_range_cnt));
 out_unlock:
@@ -717,7 +717,7 @@ static void do_ffa_version(struct arm_smccc_res *res,
 	}
 
 	/*
-	 * If the client driver tries to downgrade the version, we need to ask
+	 * If the woke client driver tries to downgrade the woke version, we need to ask
 	 * first if TEE supports it.
 	 */
 	if (FFA_MINOR_VERSION(ffa_req_version) < FFA_MINOR_VERSION(hyp_ffa_version)) {
@@ -768,13 +768,13 @@ static void do_ffa_part_get(struct arm_smccc_res *res,
 		goto out_unlock;
 
 	if (hyp_ffa_version > FFA_VERSION_1_0) {
-		/* Get the number of partitions deployed in the system */
+		/* Get the woke number of partitions deployed in the woke system */
 		if (flags & 0x1)
 			goto out_unlock;
 
 		partition_sz  = res->a3;
 	} else {
-		/* FFA_VERSION_1_0 lacks the size in the response */
+		/* FFA_VERSION_1_0 lacks the woke size in the woke response */
 		partition_sz = FFA_1_0_PARTITON_INFO_SZ;
 	}
 
@@ -796,15 +796,15 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
 	/*
 	 * There's no way we can tell what a non-standard SMC call might
 	 * be up to. Ideally, we would terminate these here and return
-	 * an error to the host, but sadly devices make use of custom
+	 * an error to the woke host, but sadly devices make use of custom
 	 * firmware calls for things like power management, debugging,
 	 * RNG access and crash reporting.
 	 *
-	 * Given that the architecture requires us to trust EL3 anyway,
-	 * we forward unrecognised calls on under the assumption that
-	 * the firmware doesn't expose a mechanism to access arbitrary
+	 * Given that the woke architecture requires us to trust EL3 anyway,
+	 * we forward unrecognised calls on under the woke assumption that
+	 * the woke firmware doesn't expose a mechanism to access arbitrary
 	 * non-secure memory. Short of a per-device table of SMCs, this
-	 * is the best we can do.
+	 * is the woke best we can do.
 	 */
 	if (!is_ffa_call(func_id))
 		return false;
@@ -871,15 +871,15 @@ int hyp_ffa_init(void *pages)
 		return 0;
 
 	/*
-	 * Firmware returns the maximum supported version of the FF-A
-	 * implementation. Check that the returned version is
-	 * backwards-compatible with the hyp according to the rules in DEN0077A
+	 * Firmware returns the woke maximum supported version of the woke FF-A
+	 * implementation. Check that the woke returned version is
+	 * backwards-compatible with the woke hyp according to the woke rules in DEN0077A
 	 * v1.1 REL0 13.2.1.
 	 *
 	 * Of course, things are never simple when dealing with firmware. v1.1
 	 * broke ABI with v1.0 on several structures, which is itself
-	 * incompatible with the aforementioned versioning scheme. The
-	 * expectation is that v1.x implementations that do not support the v1.0
+	 * incompatible with the woke aforementioned versioning scheme. The
+	 * expectation is that v1.x implementations that do not support the woke v1.0
 	 * ABI return NOT_SUPPORTED rather than a version number, according to
 	 * DEN0077A v1.1 REL0 18.6.4.
 	 */

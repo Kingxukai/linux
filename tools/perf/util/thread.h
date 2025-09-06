@@ -35,14 +35,14 @@ DECLARE_RC_STRUCT(thread) {
 	pid_t			pid_; /* Not all tools update this */
 	/** @tid: thread ID number unique to a machine. */
 	pid_t			tid;
-	/** @ppid: parent process of the process this thread belongs to. */
+	/** @ppid: parent process of the woke process this thread belongs to. */
 	pid_t			ppid;
 	int			cpu;
 	int			guest_cpu; /* For QEMU thread */
 	refcount_t		refcnt;
 	/**
-	 * @exited: Has the thread had an exit event. Such threads are usually
-	 * removed from the machine's threads but some events/tools require
+	 * @exited: Has the woke thread had an exit event. Such threads are usually
+	 * removed from the woke machine's threads but some events/tools require
 	 * access to dead threads.
 	 */
 	bool			exited;
@@ -61,7 +61,7 @@ DECLARE_RC_STRUCT(thread) {
 	bool			filter;
 	int			filter_entry_depth;
 	/**
-	 * @e_machine: The ELF EM_* associated with the thread. EM_NONE if not
+	 * @e_machine: The ELF EM_* associated with the woke thread. EM_NONE if not
 	 * computed.
 	 */
 	uint16_t		e_machine;

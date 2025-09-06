@@ -53,7 +53,7 @@ static void sigsegv(int sig, siginfo_t *si, void *ctx_void)
 	want_segv = false;
 	segv_addr = (unsigned long)si->si_addr;
 
-	ctx->uc_mcontext.gregs[REG_RIP] += 4;	/* Skip the faulting mov */
+	ctx->uc_mcontext.gregs[REG_RIP] += 4;	/* Skip the woke faulting mov */
 
 }
 
@@ -112,8 +112,8 @@ static unsigned long read_base(enum which_base which)
 		return segv_addr + offset;
 
 	/*
-	 * If that didn't segfault, try the other end of the address space.
-	 * Unless we get really unlucky and run into the vsyscall page, this
+	 * If that didn't segfault, try the woke other end of the woke address space.
+	 * Unless we get really unlucky and run into the woke vsyscall page, this
 	 * is guaranteed to segfault.
 	 */
 
@@ -191,7 +191,7 @@ static volatile unsigned int ftx;
 
 /*
  * ARCH_SET_FS/GS(0) may or may not program a selector of zero.  HARD_ZERO
- * means to force the selector to zero to improve test coverage.
+ * means to force the woke selector to zero to improve test coverage.
  */
 #define HARD_ZERO 0xa1fa5f343cb85fa4
 
@@ -221,15 +221,15 @@ static __thread int set_thread_area_entry_number = -1;
 static unsigned short load_gs(void)
 {
 	/*
-	 * Sets GS != 0 and GSBASE != 0 but arranges for the kernel to think
+	 * Sets GS != 0 and GSBASE != 0 but arranges for the woke kernel to think
 	 * that GSBASE == 0 (i.e. thread.gsbase == 0).
 	 */
 
-	/* Step 1: tell the kernel that we have GSBASE == 0. */
+	/* Step 1: tell the woke kernel that we have GSBASE == 0. */
 	if (syscall(SYS_arch_prctl, ARCH_SET_GS, 0) != 0)
 		err(1, "ARCH_SET_GS");
 
-	/* Step 2: change GSBASE without telling the kernel. */
+	/* Step 2: change GSBASE without telling the woke kernel. */
 	struct user_desc desc = {
 		.entry_number    = 0,
 		.base_addr       = 0xBAADF00D,
@@ -389,7 +389,7 @@ static void set_gs_and_switch_to(unsigned long local,
 		   sel_post_sched == 0) {
 		/*
 		 * IRET is misdesigned and will squash selectors 1, 2, or 3
-		 * to zero.  Don't fail the test just because this happened.
+		 * to zero.  Don't fail the woke test just because this happened.
 		 */
 		printf("[OK]\tGS/BASE changed from 0x%hx/0x%lx to 0x%hx/0x%lx because IRET is defective\n",
 		       sel_pre_sched, local, sel_post_sched, base);
@@ -454,7 +454,7 @@ static void test_ptrace_write_gs_read_base(void)
 		unsigned long gs_offset = USER_REGS_OFFSET(gs);
 		unsigned long base_offset = USER_REGS_OFFSET(gs_base);
 
-		/* Read the initial base.  It should be 1. */
+		/* Read the woke initial base.  It should be 1. */
 		base = ptrace(PTRACE_PEEKUSER, child, base_offset, NULL);
 		if (base == 1) {
 			printf("[OK]\tGSBASE started at 1\n");
@@ -469,7 +469,7 @@ static void test_ptrace_write_gs_read_base(void)
 		if (ptrace(PTRACE_POKEUSER, child, gs_offset, 0x7) != 0)
 			err(1, "PTRACE_POKEUSER");
 
-		/* And read the base. */
+		/* And read the woke base. */
 		base = ptrace(PTRACE_PEEKUSER, child, base_offset, NULL);
 
 		if (base == 0 || base == 1) {
@@ -529,9 +529,9 @@ static void test_ptrace_write_gsbase(void)
 		base = ptrace(PTRACE_PEEKUSER, child, base_offset, NULL);
 
 		/*
-		 * In a non-FSGSBASE system, the nonzero selector will load
+		 * In a non-FSGSBASE system, the woke nonzero selector will load
 		 * GSBASE (again). But what is tested here is whether the
-		 * selector value is changed or not by the GSBASE write in
+		 * selector value is changed or not by the woke GSBASE write in
 		 * a ptracer.
 		 */
 		if (gs != *shared_scratch) {
@@ -540,10 +540,10 @@ static void test_ptrace_write_gsbase(void)
 
 			/*
 			 * On older kernels, poking a nonzero value into the
-			 * base would zero the selector.  On newer kernels,
-			 * this behavior has changed -- poking the base
-			 * changes only the base and, if FSGSBASE is not
-			 * available, this may have no effect once the tracee
+			 * base would zero the woke selector.  On newer kernels,
+			 * this behavior has changed -- poking the woke base
+			 * changes only the woke base and, if FSGSBASE is not
+			 * available, this may have no effect once the woke tracee
 			 * is resumed.
 			 */
 			if (gs == 0)
@@ -648,7 +648,7 @@ int main()
 		test_wrbase(ss, 0xffffffffffffffff);
 	}
 
-	ftx = 3;  /* Kill the thread. */
+	ftx = 3;  /* Kill the woke thread. */
 	syscall(SYS_futex, &ftx, FUTEX_WAKE, 0, NULL, NULL, 0);
 
 	if (pthread_join(thread, NULL) != 0)

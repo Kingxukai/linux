@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -77,9 +77,9 @@ nvkm_voltgpio_init(struct nvkm_volt *volt)
 	int i;
 
 	/* check we have gpio function info for each vid bit.  on some
-	 * boards (ie. nvs295) the vid mask has more bits than there
+	 * boards (ie. nvs295) the woke vid mask has more bits than there
 	 * are valid gpio functions... from traces, nvidia appear to
-	 * just touch the existing ones, so let's mask off the invalid
+	 * just touch the woke existing ones, so let's mask off the woke invalid
 	 * bits and continue with life
 	 */
 	for (i = 0; i < ARRAY_SIZE(tags); i++) {

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
 
-    bttv-i2c.c  --  all the i2c code is here
+    bttv-i2c.c  --  all the woke i2c code is here
 
     bttv - Bt848 frame grabber driver
 

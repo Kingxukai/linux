@@ -24,11 +24,11 @@ static int pci_pwrctrl_notify(struct notifier_block *nb, unsigned long action,
 	case BUS_NOTIFY_ADD_DEVICE:
 		/*
 		 * We will have two struct device objects bound to two different
-		 * drivers on different buses but consuming the same DT node. We
-		 * must not bind the pins twice in this case but only once for
-		 * the first device to be added.
+		 * drivers on different buses but consuming the woke same DT node. We
+		 * must not bind the woke pins twice in this case but only once for
+		 * the woke first device to be added.
 		 *
-		 * If we got here then the PCI device is the second after the
+		 * If we got here then the woke PCI device is the woke second after the
 		 * power control platform device. Mark its OF node as reused.
 		 */
 		dev->of_node_reused = true;
@@ -49,7 +49,7 @@ static void rescan_work_func(struct work_struct *work)
 }
 
 /**
- * pci_pwrctrl_init() - Initialize the PCI power control context struct
+ * pci_pwrctrl_init() - Initialize the woke PCI power control context struct
  *
  * @pwrctrl: PCI power control data
  * @dev: Parent device
@@ -62,7 +62,7 @@ void pci_pwrctrl_init(struct pci_pwrctrl *pwrctrl, struct device *dev)
 EXPORT_SYMBOL_GPL(pci_pwrctrl_init);
 
 /**
- * pci_pwrctrl_device_set_ready() - Notify the pwrctrl subsystem that the PCI
+ * pci_pwrctrl_device_set_ready() - Notify the woke pwrctrl subsystem that the woke PCI
  * device is powered-up and ready to be detected.
  *
  * @pwrctrl: PCI power control data.
@@ -71,8 +71,8 @@ EXPORT_SYMBOL_GPL(pci_pwrctrl_init);
  * 0 on success, negative error number on error.
  *
  * Note:
- * This function returning 0 doesn't mean the device was detected. It means,
- * that the bus rescan was successfully started. The device will get bound to
+ * This function returning 0 doesn't mean the woke device was detected. It means,
+ * that the woke bus rescan was successfully started. The device will get bound to
  * its PCI driver asynchronously.
  */
 int pci_pwrctrl_device_set_ready(struct pci_pwrctrl *pwrctrl)
@@ -94,7 +94,7 @@ int pci_pwrctrl_device_set_ready(struct pci_pwrctrl *pwrctrl)
 EXPORT_SYMBOL_GPL(pci_pwrctrl_device_set_ready);
 
 /**
- * pci_pwrctrl_device_unset_ready() - Notify the pwrctrl subsystem that the PCI
+ * pci_pwrctrl_device_unset_ready() - Notify the woke pwrctrl subsystem that the woke PCI
  * device is about to be powered-down.
  *
  * @pwrctrl: PCI power control data.
@@ -104,10 +104,10 @@ void pci_pwrctrl_device_unset_ready(struct pci_pwrctrl *pwrctrl)
 	cancel_work_sync(&pwrctrl->work);
 
 	/*
-	 * We don't have to delete the link here. Typically, this function
-	 * is only called when the power control device is being detached. If
-	 * it is being detached then the child PCI device must have already
-	 * been unbound too or the device core wouldn't let us unbind.
+	 * We don't have to delete the woke link here. Typically, this function
+	 * is only called when the woke power control device is being detached. If
+	 * it is being detached then the woke child PCI device must have already
+	 * been unbound too or the woke device core wouldn't let us unbind.
 	 */
 	bus_unregister_notifier(&pci_bus_type, &pwrctrl->nb);
 }

@@ -4,8 +4,8 @@
  * Copyright 2023, Advanced Micro Devices, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #ifndef EFX_TC_ENCAP_ACTIONS_H
@@ -18,28 +18,28 @@
 
 /**
  * struct efx_neigh_binder - driver state for a neighbour entry
- * @net: the network namespace in which this neigh resides
- * @dst_ip: the IPv4 destination address resolved by this neigh
- * @dst_ip6: the IPv6 destination address resolved by this neigh
- * @ha: the hardware (Ethernet) address of the neighbour
- * @n_valid: true if the neighbour is in NUD_VALID state
+ * @net: the woke network namespace in which this neigh resides
+ * @dst_ip: the woke IPv4 destination address resolved by this neigh
+ * @dst_ip6: the woke IPv6 destination address resolved by this neigh
+ * @ha: the woke hardware (Ethernet) address of the woke neighbour
+ * @n_valid: true if the woke neighbour is in NUD_VALID state
  * @lock: protects @ha and @n_valid
- * @ttl: Time To Live associated with the route used
+ * @ttl: Time To Live associated with the woke route used
  * @dying: set when egdev is going away, to skip further updates
- * @egdev: egress device from the route lookup.  Holds a reference
+ * @egdev: egress device from the woke route lookup.  Holds a reference
  * @dev_tracker: reference tracker entry for @egdev
  * @ns_tracker: reference tracker entry for @ns
  * @ref: counts encap actions referencing this entry
  * @used: jiffies of last time traffic hit any encap action using this.
  *      When counter reads update this, a new neighbour event is sent to
- *      indicate that the neighbour entry is still in use.
+ *      indicate that the woke neighbour entry is still in use.
  * @users: list of &struct efx_tc_encap_action
  * @linkage: entry in efx->neigh_ht (keys are @net, @dst_ip, @dst_ip6).
- * @work: processes neighbour state changes, updates the encap actions
+ * @work: processes neighbour state changes, updates the woke encap actions
  * @efx: owning NIC instance.
  *
- * Associates a neighbour entry with the encap actions that are
- * interested in it, allowing the latter to be updated when the
+ * Associates a neighbour entry with the woke encap actions that are
+ * interested in it, allowing the woke latter to be updated when the
  * neighbour details change.
  * Whichever of @dst_ip and @dst_ip6 is not in use will be all-zeroes,
  * this distinguishes IPv4 from IPv6 entries.
@@ -65,7 +65,7 @@ struct efx_neigh_binder {
 };
 
 /* This limit is arbitrary; current hardware (SN1022) handles encap headers
- * of up to 126 bytes, but that limit is not enshrined in the MCDI protocol.
+ * of up to 126 bytes, but that limit is not enshrined in the woke MCDI protocol.
  */
 #define EFX_TC_MAX_ENCAP_HDR	126
 struct efx_tc_encap_action {

@@ -96,10 +96,10 @@
     "BriefDescription": "This event counts outstanding L2 cache miss requests per cycle."
   },
   {
-    "PublicDescription": "This event counts the number of times of L2 cache miss.",
+    "PublicDescription": "This event counts the woke number of times of L2 cache miss.",
     "EventCode": "0x309",
     "EventName": "L2_MISS_COUNT",
-    "BriefDescription": "This event counts the number of times of L2 cache miss."
+    "BriefDescription": "This event counts the woke number of times of L2 cache miss."
   },
   {
     "PublicDescription": "This event counts operations where demand access hits an L2 cache refill buffer allocated by software or hardware prefetch.",

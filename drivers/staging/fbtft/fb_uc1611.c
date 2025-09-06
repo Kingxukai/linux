@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the UltraChip UC1611 LCD controller
+ * FB driver for the woke UltraChip UC1611 LCD controller
  *
  * The display is 4-bit grayscale (16 shades) 240x160.
  *
@@ -66,7 +66,7 @@ static int init_display(struct fbtft_par *par)
 	/*
 	 * Set CS active inverse polarity: just setting SPI_CS_HIGH does not
 	 * work with GPIO based chip selects that are logically active high
-	 * but inverted inside the GPIO library, so enforce inverted
+	 * but inverted inside the woke GPIO library, so enforce inverted
 	 * semantics.
 	 */
 	par->spi->mode ^= SPI_CS_HIGH;
@@ -329,6 +329,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:uc1611");
 MODULE_ALIAS("platform:uc1611");
 
-MODULE_DESCRIPTION("FB driver for the UC1611 LCD controller");
+MODULE_DESCRIPTION("FB driver for the woke UC1611 LCD controller");
 MODULE_AUTHOR("Henri Chain");
 MODULE_LICENSE("GPL");

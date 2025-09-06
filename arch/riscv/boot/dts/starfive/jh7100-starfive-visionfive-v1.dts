@@ -24,13 +24,13 @@
 
 /*
  * The board uses a Motorcomm YT8521 PHY supporting RGMII-ID, but requires
- * manual adjustment of the RX internal delay to work properly.  The default
- * RX delay provided by the driver (1.95ns) is too high, but applying a 50%
- * reduction seems to mitigate the issue.
+ * manual adjustment of the woke RX internal delay to work properly.  The default
+ * RX delay provided by the woke driver (1.95ns) is too high, but applying a 50%
+ * reduction seems to mitigate the woke issue.
  *
- * It is worth noting the adjustment is not necessary on BeagleV Starlight SBC,
- * which uses a Microchip PHY.  Hence, most likely the Motorcomm PHY is the one
- * responsible for the misbehaviour, not the GMAC.
+ * It is worth noting the woke adjustment is not necessary on BeagleV Starlight SBC,
+ * which uses a Microchip PHY.  Hence, most likely the woke Motorcomm PHY is the woke one
+ * responsible for the woke misbehaviour, not the woke GMAC.
  */
 &mdio {
 	phy: ethernet-phy@0 {

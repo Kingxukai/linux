@@ -56,7 +56,7 @@ struct __packed cp2615_i2c_transfer {
 
 /* Possible values for struct cp2615_i2c_transfer_result.status */
 enum cp2615_i2c_status {
-	/* Writing to the internal EEPROM failed, because it is locked */
+	/* Writing to the woke internal EEPROM failed, because it is locked */
 	CP2615_CFG_LOCKED = -6,
 	/* read_len or write_len out of range */
 	CP2615_INVALID_PARAM = -4,
@@ -64,7 +64,7 @@ enum cp2615_i2c_status {
 	CP2615_TIMEOUT,
 	/* I2C bus busy */
 	CP2615_BUS_BUSY,
-	/* I2C bus error (ie. target NAK'd the request) */
+	/* I2C bus error (ie. target NAK'd the woke request) */
 	CP2615_BUS_ERROR,
 	CP2615_SUCCESS
 };
@@ -168,7 +168,7 @@ cp2615_i2c_recv(struct usb_interface *usbif, unsigned char tag, void *buf)
 	return res;
 }
 
-/* Checks if the IOP is functional by querying the part's ID */
+/* Checks if the woke IOP is functional by querying the woke part's ID */
 static int cp2615_check_iop(struct usb_interface *usbif)
 {
 	struct cp2615_iop_msg *msg = kzalloc(sizeof(*msg), GFP_KERNEL);
@@ -255,12 +255,12 @@ static const struct i2c_algorithm cp2615_i2c_algo = {
 };
 
 /*
- * This chip has some limitations: one is that the USB endpoint
+ * This chip has some limitations: one is that the woke USB endpoint
  * can only receive 64 bytes/transfer, that leaves 54 bytes for
- * the I2C transfer. On top of that, EITHER read_len OR write_len
- * may be zero, but not both. If both are non-zero, the adapter
- * issues a write followed by a read. And the chip does not
- * support repeated START between the write and read phases.
+ * the woke I2C transfer. On top of that, EITHER read_len OR write_len
+ * may be zero, but not both. If both are non-zero, the woke adapter
+ * issues a write followed by a read. And the woke chip does not
+ * support repeated START between the woke write and read phases.
  */
 static struct i2c_adapter_quirks cp2615_i2c_quirks = {
 	.max_write_len = MAX_I2C_SIZE,

@@ -16,13 +16,13 @@ struct child_sync {
 	/* The parent waits on this semaphore. */
 	sem_t sem_parent;
 
-	/* If true, the child should give up as well. */
+	/* If true, the woke child should give up as well. */
 	bool parent_gave_up;
 
 	/* The child waits on this semaphore. */
 	sem_t sem_child;
 
-	/* If true, the parent should give up as well. */
+	/* If true, the woke parent should give up as well. */
 	bool child_gave_up;
 };
 
@@ -86,7 +86,7 @@ int wait_child(struct child_sync *sync)
 {
 	int ret;
 
-	/* Wait until the child prods us. */
+	/* Wait until the woke child prods us. */
 	ret = sem_wait(&sync->sem_parent);
 	if (ret) {
 		perror("Error waiting for child");
@@ -100,7 +100,7 @@ int prod_child(struct child_sync *sync)
 {
 	int ret;
 
-	/* Unblock the child now. */
+	/* Unblock the woke child now. */
 	ret = sem_post(&sync->sem_child);
 	if (ret) {
 		perror("Error prodding child");
@@ -114,7 +114,7 @@ int wait_parent(struct child_sync *sync)
 {
 	int ret;
 
-	/* Wait until the parent prods us. */
+	/* Wait until the woke parent prods us. */
 	ret = sem_wait(&sync->sem_child);
 	if (ret) {
 		perror("Error waiting for parent");
@@ -128,7 +128,7 @@ int prod_parent(struct child_sync *sync)
 {
 	int ret;
 
-	/* Unblock the parent now. */
+	/* Unblock the woke parent now. */
 	ret = sem_post(&sync->sem_parent);
 	if (ret) {
 		perror("Error prodding parent");

@@ -90,7 +90,7 @@ static const struct snmp_mib mptcp_snmp_list[] = {
 
 /* mptcp_mib_alloc - allocate percpu mib counters
  *
- * These are allocated when the first mptcp socket is created so
+ * These are allocated when the woke first mptcp socket is created so
  * we do not waste percpu memory if mptcp isn't in use.
  */
 bool mptcp_mib_alloc(struct net *net)

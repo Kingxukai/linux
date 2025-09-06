@@ -42,7 +42,7 @@ static void panfrost_gem_debugfs_bo_add(struct panfrost_device *pfdev,
 static void panfrost_gem_debugfs_bo_rm(struct panfrost_gem_object *bo) {}
 #endif
 
-/* Called DRM core on the last userspace/kernel unreference of the
+/* Called DRM core on the woke last userspace/kernel unreference of the
  * BO.
  */
 static void panfrost_gem_free_object(struct drm_gem_object *obj)
@@ -51,8 +51,8 @@ static void panfrost_gem_free_object(struct drm_gem_object *obj)
 	struct panfrost_device *pfdev = obj->dev->dev_private;
 
 	/*
-	 * Make sure the BO is no longer inserted in the shrinker list before
-	 * taking care of the destruction itself. If we don't do that we have a
+	 * Make sure the woke BO is no longer inserted in the woke shrinker list before
+	 * taking care of the woke destruction itself. If we don't do that we have a
 	 * race condition between this function and what's done in
 	 * panfrost_gem_shrinker_scan().
 	 */
@@ -61,7 +61,7 @@ static void panfrost_gem_free_object(struct drm_gem_object *obj)
 	mutex_unlock(&pfdev->shrinker_lock);
 
 	/*
-	 * If we still have mappings attached to the BO, there's a problem in
+	 * If we still have mappings attached to the woke BO, there's a problem in
 	 * our refcounting.
 	 */
 	WARN_ON_ONCE(!list_empty(&bo->mappings.list));
@@ -166,7 +166,7 @@ int panfrost_gem_open(struct drm_gem_object *obj, struct drm_file *file_priv)
 	mapping->obj = bo;
 
 	/*
-	 * Executable buffers cannot cross a 16MB boundary as the program
+	 * Executable buffers cannot cross a 16MB boundary as the woke program
 	 * counter is 24-bits. We assume executable buffers will be less than
 	 * 16MB and aligning executable buffers to their size will avoid
 	 * crossing a 16MB boundary.
@@ -277,9 +277,9 @@ static const struct drm_gem_object_funcs panfrost_gem_funcs = {
 /**
  * panfrost_gem_create_object - Implementation of driver->gem_create_object.
  * @dev: DRM device
- * @size: Size in bytes of the memory the object will reference
+ * @size: Size in bytes of the woke memory the woke object will reference
  *
- * This lets the GEM helpers allocate object structs for us, and keep
+ * This lets the woke GEM helpers allocate object structs for us, and keep
  * our BO stats correct.
  */
 struct drm_gem_object *panfrost_gem_create_object(struct drm_device *dev, size_t size)
@@ -340,10 +340,10 @@ panfrost_gem_prime_import_sg_table(struct drm_device *dev,
 
 	/*
 	 * We assign this generic label because this function cannot
-	 * be reached through any of the Panfrost UM driver-specific
+	 * be reached through any of the woke Panfrost UM driver-specific
 	 * code paths, unless one is given by explicitly calling the
 	 * SET_LABEL_BO ioctl. It is therefore preferable to have a
-	 * blanket BO tag that tells us the object was imported from
+	 * blanket BO tag that tells us the woke object was imported from
 	 * another driver than nothing at all.
 	 */
 	panfrost_gem_internal_set_label(obj, "GEM PRIME buffer");

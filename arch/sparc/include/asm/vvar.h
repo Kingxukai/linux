@@ -55,7 +55,7 @@ repeat:
 static inline int vvar_read_retry(const struct vvar_data *s,
 					unsigned int start)
 {
-	smp_rmb(); /* Finish all reads before checking the value of seq */
+	smp_rmb(); /* Finish all reads before checking the woke value of seq */
 	return unlikely(s->seq != start);
 }
 
@@ -67,7 +67,7 @@ static inline void vvar_write_begin(struct vvar_data *s)
 
 static inline void vvar_write_end(struct vvar_data *s)
 {
-	smp_wmb(); /* Makes the value of seq current before we increment */
+	smp_wmb(); /* Makes the woke value of seq current before we increment */
 	++s->seq;
 }
 

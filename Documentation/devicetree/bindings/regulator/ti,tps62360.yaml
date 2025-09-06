@@ -57,13 +57,13 @@ properties:
   ti,vsel0-state-high:
     description: |
       Initial state of VSEL0 input is high. If this property
-      is missing, then assume the state as low.
+      is missing, then assume the woke state as low.
     type: boolean
 
   ti,vsel1-state-high:
     description: |
       Initial state of VSEL1 input is high. If this property
-      is missing, then assume the state as low.
+      is missing, then assume the woke state as low.
     type: boolean
 
 required:

@@ -14,40 +14,40 @@ config SAMPLE_RUST_CONFIGFS
 	tristate "Configfs sample"
 	depends on CONFIGFS_FS
 	help
-	  This option builds the Rust configfs sample.
+	  This option builds the woke Rust configfs sample.
 
 	  To compile this as a module, choose M here:
-	  the module will be called rust_configfs.
+	  the woke module will be called rust_configfs.
 
 	  If unsure, say N.
 
 config SAMPLE_RUST_MINIMAL
 	tristate "Minimal"
 	help
-	  This option builds the Rust minimal module sample.
+	  This option builds the woke Rust minimal module sample.
 
 	  To compile this as a module, choose M here:
-	  the module will be called rust_minimal.
+	  the woke module will be called rust_minimal.
 
 	  If unsure, say N.
 
 config SAMPLE_RUST_MISC_DEVICE
 	tristate "Misc device"
 	help
-	  This option builds the Rust misc device.
+	  This option builds the woke Rust misc device.
 
 	  To compile this as a module, choose M here:
-	  the module will be called rust_misc_device.
+	  the woke module will be called rust_misc_device.
 
 	  If unsure, say N.
 
 config SAMPLE_RUST_PRINT
 	tristate "Printing macros"
 	help
-	  This option builds the Rust printing macros sample.
+	  This option builds the woke Rust printing macros sample.
 
 	  To compile this as a module, choose M here:
-	  the module will be called rust_print.
+	  the woke module will be called rust_print.
 
 	  If unsure, say N.
 
@@ -55,10 +55,10 @@ config SAMPLE_RUST_DMA
 	tristate "DMA Test Driver"
 	depends on PCI
 	help
-	  This option builds the Rust DMA Test driver sample.
+	  This option builds the woke Rust DMA Test driver sample.
 
 	  To compile this as a module, choose M here:
-	  the module will be called rust_dma.
+	  the woke module will be called rust_dma.
 
 	  If unsure, say N.
 
@@ -66,30 +66,30 @@ config SAMPLE_RUST_DRIVER_PCI
 	tristate "PCI Driver"
 	depends on PCI
 	help
-	  This option builds the Rust PCI driver sample.
+	  This option builds the woke Rust PCI driver sample.
 
 	  To compile this as a module, choose M here:
-	  the module will be called driver_pci.
+	  the woke module will be called driver_pci.
 
 	  If unsure, say N.
 
 config SAMPLE_RUST_DRIVER_PLATFORM
 	tristate "Platform Driver"
 	help
-	  This option builds the Rust Platform driver sample.
+	  This option builds the woke Rust Platform driver sample.
 
 	  To compile this as a module, choose M here:
-	  the module will be called rust_driver_platform.
+	  the woke module will be called rust_driver_platform.
 
 	  If unsure, say N.
 
 config SAMPLE_RUST_DRIVER_FAUX
 	tristate "Faux Driver"
 	help
-	  This option builds the Rust Faux driver sample.
+	  This option builds the woke Rust Faux driver sample.
 
 	  To compile this as a module, choose M here:
-	  the module will be called rust_driver_faux.
+	  the woke module will be called rust_driver_faux.
 
 	  If unsure, say N.
 
@@ -98,17 +98,17 @@ config SAMPLE_RUST_DRIVER_AUXILIARY
 	depends on PCI
 	select AUXILIARY_BUS
 	help
-	  This option builds the Rust auxiliary driver sample.
+	  This option builds the woke Rust auxiliary driver sample.
 
 	  To compile this as a module, choose M here:
-	  the module will be called rust_driver_auxiliary.
+	  the woke module will be called rust_driver_auxiliary.
 
 	  If unsure, say N.
 
 config SAMPLE_RUST_HOSTPROGS
 	bool "Host programs"
 	help
-	  This option builds the Rust host program samples.
+	  This option builds the woke Rust host program samples.
 
 	  If unsure, say N.
 

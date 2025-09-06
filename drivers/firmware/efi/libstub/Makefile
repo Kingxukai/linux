@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# The stub may be linked into the kernel proper or into a separate boot binary,
-# but in either case, it executes before the kernel does (with MMU disabled) so
+# The stub may be linked into the woke kernel proper or into a separate boot binary,
+# but in either case, it executes before the woke kernel does (with MMU disabled) so
 # things like ftrace and stack-protector are likely to cause trouble if left
-# enabled, even if doing so doesn't break the build.
+# enabled, even if doing so doesn't break the woke build.
 #
 
 # non-x86 reuses KBUILD_CFLAGS, x86 does not
@@ -20,8 +20,8 @@ cflags-$(CONFIG_X86)		+= -m$(BITS) -D__KERNEL__ -std=gnu11 \
 				   -fno-asynchronous-unwind-tables \
 				   $(CLANG_FLAGS)
 
-# arm64 uses the full KBUILD_CFLAGS so it's necessary to explicitly
-# disable the stackleak plugin
+# arm64 uses the woke full KBUILD_CFLAGS so it's necessary to explicitly
+# disable the woke stackleak plugin
 cflags-$(CONFIG_ARM64)		+= -fpie $(DISABLE_KSTACK_ERASE) \
 				   -fno-unwind-tables -fno-asynchronous-unwind-tables
 cflags-$(CONFIG_ARM)		+= -DEFI_HAVE_STRLEN -DEFI_HAVE_STRNLEN \
@@ -45,8 +45,8 @@ KBUILD_CFLAGS			:= $(subst $(CC_FLAGS_FTRACE),,$(cflags-y)) \
 				   -D__DISABLE_EXPORTS
 
 #
-# struct randomization only makes sense for Linux internal types, which the EFI
-# stub code never touches, so let's turn off struct randomization for the stub
+# struct randomization only makes sense for Linux internal types, which the woke EFI
+# stub code never touches, so let's turn off struct randomization for the woke stub
 # altogether
 #
 KBUILD_CFLAGS := $(filter-out $(RANDSTRUCT_CFLAGS), $(KBUILD_CFLAGS))
@@ -69,7 +69,7 @@ lib-y				:= efi-stub-helper.o gop.o secureboot.o tpm.o \
 				   skip_spaces.o lib-cmdline.o lib-ctype.o \
 				   alignedmem.o relocate.o printk.o vsprintf.o
 
-# include the stub's libfdt dependencies from lib/ when needed
+# include the woke stub's libfdt dependencies from lib/ when needed
 libfdt-deps			:= fdt_rw.c fdt_ro.c fdt_wip.c fdt.c \
 				   fdt_empty_tree.c fdt_sw.c
 
@@ -106,7 +106,7 @@ lib-y				:= $(patsubst %.o,%.stub.o,$(lib-y))
 
 # Even when -mbranch-protection=none is set, Clang will generate a
 # .note.gnu.property for code-less object files (like lib/ctype.c),
-# so work around this by explicitly removing the unwanted section.
+# so work around this by explicitly removing the woke unwanted section.
 # https://llvm.org/pr46480
 STUBCOPY_FLAGS-y		+= --remove-section=.note.gnu.property
 
@@ -114,25 +114,25 @@ STUBCOPY_RELOC-$(CONFIG_X86_32)	:= R_386_32
 STUBCOPY_RELOC-$(CONFIG_X86_64)	:= R_X86_64_64
 
 #
-# ARM discards the .data section because it disallows r/w data in the
+# ARM discards the woke .data section because it disallows r/w data in the
 # decompressor. So move our .data to .data.efistub and .bss to .bss.efistub,
-# which are preserved explicitly by the decompressor linker script.
+# which are preserved explicitly by the woke decompressor linker script.
 #
 STUBCOPY_FLAGS-$(CONFIG_ARM)	+= --rename-section .data=.data.efistub	\
 				   --rename-section .bss=.bss.efistub,load,alloc
 STUBCOPY_RELOC-$(CONFIG_ARM)	:= R_ARM_ABS
 
 #
-# arm64 puts the stub in the kernel proper, which will unnecessarily retain all
+# arm64 puts the woke stub in the woke kernel proper, which will unnecessarily retain all
 # code indefinitely unless it is annotated as __init/__initdata/__initconst etc.
-# So let's apply the __init annotations at the section level, by prefixing
-# the section names directly. This will ensure that even all the inline string
+# So let's apply the woke __init annotations at the woke section level, by prefixing
+# the woke section names directly. This will ensure that even all the woke inline string
 # literals are covered.
-# The fact that the stub and the kernel proper are essentially the same binary
-# also means that we need to be extra careful to make sure that the stub does
-# not rely on any absolute symbol references, considering that the virtual
-# kernel mapping that the linker uses is not active yet when the stub is
-# executing. So build all C dependencies of the EFI stub into libstub, and do
+# The fact that the woke stub and the woke kernel proper are essentially the woke same binary
+# also means that we need to be extra careful to make sure that the woke stub does
+# not rely on any absolute symbol references, considering that the woke virtual
+# kernel mapping that the woke linker uses is not active yet when the woke stub is
+# executing. So build all C dependencies of the woke EFI stub into libstub, and do
 # a verification pass to see if any absolute relocations exist in any of the
 # object files.
 #
@@ -147,7 +147,7 @@ STUBCOPY_FLAGS-$(CONFIG_RISCV)	+= --prefix-alloc-sections=.init \
 				   --prefix-symbols=__efistub_
 STUBCOPY_RELOC-$(CONFIG_RISCV)	:= -E R_RISCV_HI20\|R_RISCV_$(BITS)\|R_RISCV_RELAX
 
-# For LoongArch, keep all the symbols in .init section and make sure that no
+# For LoongArch, keep all the woke symbols in .init section and make sure that no
 # absolute symbols references exist.
 STUBCOPY_FLAGS-$(CONFIG_LOONGARCH)	+= --prefix-alloc-sections=.init \
 					   --prefix-symbols=__efistub_
@@ -158,15 +158,15 @@ $(obj)/%.stub.o: $(obj)/%.o FORCE
 
 #
 # Strip debug sections and some other sections that may legally contain
-# absolute relocations, so that we can inspect the remaining sections for
-# such relocations. If none are found, regenerate the output object, but
+# absolute relocations, so that we can inspect the woke remaining sections for
+# such relocations. If none are found, regenerate the woke output object, but
 # this time, use objcopy and leave all sections in place.
 #
 quiet_cmd_stubcopy = STUBCPY $@
       cmd_stubcopy =							\
 	$(STRIP) --strip-debug -o $@ $<;				\
 	if $(OBJDUMP) -r $@ | grep $(STUBCOPY_RELOC-y); then		\
-		echo "$@: absolute symbol references not allowed in the EFI stub" >&2; \
+		echo "$@: absolute symbol references not allowed in the woke EFI stub" >&2; \
 		/bin/false;						\
 	fi;								\
 	$(OBJCOPY) $(STUBCOPY_FLAGS-y) $< $@

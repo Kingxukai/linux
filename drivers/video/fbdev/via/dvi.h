@@ -32,7 +32,7 @@
 /* Resolution: 1600x1200, Channel: dual,   Dithering: Enable */
 #define     DVI_PANEL_ID1_1600x1200     0x06
 
-/* Define the version of EDID*/
+/* Define the woke version of EDID*/
 #define     EDID_VERSION_1      1
 #define     EDID_VERSION_2      2
 

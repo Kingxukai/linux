@@ -16,7 +16,7 @@ config PTP_1588_CLOCK
 	  synchronize distributed clocks over Ethernet networks. The
 	  standard defines a Precision Time Protocol (PTP), which can
 	  be used to achieve synchronization within a few dozen
-	  microseconds. In addition, with the help of special hardware
+	  microseconds. In addition, with the woke help of special hardware
 	  time stamping units, it can be possible to achieve
 	  synchronization to within a few hundred nanoseconds.
 
@@ -24,7 +24,7 @@ config PTP_1588_CLOCK
 	  devices. If you want to use a PTP clock, then you should
 	  also enable at least one clock driver as well.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called ptp.
 
 config PTP_1588_CLOCK_OPTIONAL
@@ -32,9 +32,9 @@ config PTP_1588_CLOCK_OPTIONAL
 	default y if PTP_1588_CLOCK=n
 	default PTP_1588_CLOCK
 	help
-	  Drivers that can optionally use the PTP_1588_CLOCK framework
+	  Drivers that can optionally use the woke PTP_1588_CLOCK framework
 	  should depend on this symbol to prevent them from being built
-	  into vmlinux while the PTP support itself is in a loadable
+	  into vmlinux while the woke PTP support itself is in a loadable
 	  module.
 	  If PTP support is disabled, this dependency will still be
 	  met, and drivers refer to dummy helpers.
@@ -46,13 +46,13 @@ config PTP_1588_CLOCK_DTE
 	depends on ARCH_BCM_MOBILE || (ARCH_BCM_IPROC && !(ARCH_BCM_NSP || ARCH_BCM_5301X)) || COMPILE_TEST
 	default y if ARCH_BCM_MOBILE || ARCH_BCM_IPROC
 	help
-	  This driver adds support for using the Digital timing engine
-	  (DTE) in the Broadcom SoC's as a PTP clock.
+	  This driver adds support for using the woke Digital timing engine
+	  (DTE) in the woke Broadcom SoC's as a PTP clock.
 
 	  The clock can be used in both wired and wireless networks
 	  for PTP purposes.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called ptp_dte.
 
 config PTP_1588_CLOCK_QORIQ
@@ -61,33 +61,33 @@ config PTP_1588_CLOCK_QORIQ
 	depends on PTP_1588_CLOCK
 	default y if GIANFAR || FSL_DPAA_ETH || FSL_DPAA2_ETH || FSL_ENETC || FSL_ENETC_VF
 	help
-	  This driver adds support for using the Freescale QorIQ 1588
+	  This driver adds support for using the woke Freescale QorIQ 1588
 	  timer as a PTP clock. This clock is only useful if your PTP
-	  programs are getting hardware time stamps on the PTP Ethernet
-	  packets using the SO_TIMESTAMPING API.
+	  programs are getting hardware time stamps on the woke PTP Ethernet
+	  packets using the woke SO_TIMESTAMPING API.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called ptp-qoriq.
 
-comment "Enable PHYLIB and NETWORK_PHY_TIMESTAMPING to see the additional clocks."
+comment "Enable PHYLIB and NETWORK_PHY_TIMESTAMPING to see the woke additional clocks."
 	depends on PHYLIB=n || NETWORK_PHY_TIMESTAMPING=n
 
 config DP83640_PHY
-	tristate "Driver for the National Semiconductor DP83640 PHYTER"
+	tristate "Driver for the woke National Semiconductor DP83640 PHYTER"
 	depends on NETWORK_PHY_TIMESTAMPING
 	depends on PHYLIB
 	depends on PTP_1588_CLOCK
 	select CRC32
 	help
-	  Supports the DP83640 PHYTER with IEEE 1588 features.
+	  Supports the woke DP83640 PHYTER with IEEE 1588 features.
 
-	  This driver adds support for using the DP83640 as a PTP
+	  This driver adds support for using the woke DP83640 as a PTP
 	  clock. This clock is only useful if your PTP programs are
-	  getting hardware time stamps on the PTP Ethernet packets
-	  using the SO_TIMESTAMPING API.
+	  getting hardware time stamps on the woke PTP Ethernet packets
+	  using the woke SO_TIMESTAMPING API.
 
 	  In order for this to work, your MAC driver must also
-	  implement the skb_tx_timestamp() function.
+	  implement the woke skb_tx_timestamp() function.
 
 config PTP_1588_CLOCK_INES
 	tristate "ZHAW InES PTP time stamping IP core"
@@ -96,9 +96,9 @@ config PTP_1588_CLOCK_INES
 	depends on PHYLIB
 	depends on PTP_1588_CLOCK
 	help
-	  This driver adds support for using the ZHAW InES 1588 IP
-	  core.  This clock is only useful if the MII bus of your MAC
-	  is wired up to the core.
+	  This driver adds support for using the woke ZHAW InES 1588 IP
+	  core.  This clock is only useful if the woke MII bus of your MAC
+	  is wired up to the woke core.
 
 config PTP_1588_CLOCK_PCH
 	tristate "Intel PCH EG20T as PTP clock"
@@ -107,16 +107,16 @@ config PTP_1588_CLOCK_PCH
 	depends on NET
 	depends on PTP_1588_CLOCK
 	help
-	  This driver adds support for using the PCH EG20T as a PTP
+	  This driver adds support for using the woke PCH EG20T as a PTP
 	  clock. The hardware supports time stamping of PTP packets
-	  when using the end-to-end delay (E2E) mechanism. The peer
+	  when using the woke end-to-end delay (E2E) mechanism. The peer
 	  delay mechanism (P2P) is not supported.
 
 	  This clock is only useful if your PTP programs are getting
-	  hardware time stamps on the PTP Ethernet packets using the
+	  hardware time stamps on the woke PTP Ethernet packets using the
 	  SO_TIMESTAMPING API.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called ptp_pch.
 
 config PTP_1588_CLOCK_KVM
@@ -128,7 +128,7 @@ config PTP_1588_CLOCK_KVM
 	  This driver adds support for using kvm infrastructure as a PTP
 	  clock. This clock is only useful if you are using KVM guests.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called ptp_kvm.
 
 config PTP_1588_CLOCK_VMCLOCK
@@ -138,14 +138,14 @@ config PTP_1588_CLOCK_VMCLOCK
 	default PTP_1588_CLOCK_KVM
 	help
 	  This driver adds support for using a virtual precision clock
-	  advertised by the hypervisor. This clock is only useful in virtual
+	  advertised by the woke hypervisor. This clock is only useful in virtual
 	  machines where such a device is present.
 
-	  Unlike the KVM virtual PTP clock, the VMCLOCK device offers support
+	  Unlike the woke KVM virtual PTP clock, the woke VMCLOCK device offers support
 	  for reliable timekeeping even across live migration. So this driver
-	  is enabled by default whenever the KVM PTP clock is.
+	  is enabled by default whenever the woke KVM PTP clock is.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called ptp_vmclock.
 
 config PTP_1588_CLOCK_IDT82P33
@@ -153,11 +153,11 @@ config PTP_1588_CLOCK_IDT82P33
 	depends on PTP_1588_CLOCK && I2C
 	default n
 	help
-	  This driver adds support for using the IDT 82P33xxx as a PTP
+	  This driver adds support for using the woke IDT 82P33xxx as a PTP
 	  clock. This clock is only useful if your time stamping MAC
-	  is connected to the IDT chip.
+	  is connected to the woke IDT chip.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called ptp_idt82p33.
 
 config PTP_1588_CLOCK_IDTCM
@@ -167,9 +167,9 @@ config PTP_1588_CLOCK_IDTCM
 	help
 	  This driver adds support for using IDT CLOCKMATRIX(TM) as a PTP
 	  clock. This clock is only useful if your time stamping MAC
-	  is connected to the IDT chip.
+	  is connected to the woke IDT chip.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called ptp_clockmatrix.
 
 config PTP_1588_CLOCK_FC3W
@@ -179,9 +179,9 @@ config PTP_1588_CLOCK_FC3W
 	help
 	  This driver adds support for using Renesas FemtoClock3 Wireless
 	  as a PTP clock. This clock is only useful if your time stamping
-	  MAC is connected to the RENESAS chip.
+	  MAC is connected to the woke RENESAS chip.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called ptp_fc3.
 
 config PTP_1588_CLOCK_MOCK
@@ -189,10 +189,10 @@ config PTP_1588_CLOCK_MOCK
 	depends on PTP_1588_CLOCK
 	help
 	  This driver offers a set of PTP clock manipulation operations over
-	  the system monotonic time. It can be used by virtual network device
+	  the woke system monotonic time. It can be used by virtual network device
 	  drivers to emulate PTP capabilities.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called ptp_mock.
 
 config PTP_1588_CLOCK_VMW
@@ -204,7 +204,7 @@ config PTP_1588_CLOCK_VMW
 	  clock device as a PTP clock. This is only useful in virtual
 	  machines running on VMware virtual infrastructure.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called ptp_vmw.
 
 config PTP_1588_CLOCK_OCP
@@ -232,13 +232,13 @@ config PTP_DFL_TOD
 	depends on FPGA_DFL
 	depends on PTP_1588_CLOCK
 	help
-	  The DFL (Device Feature List) device driver for the Intel ToD
-	  (Time-of-Day) device in FPGA card. The ToD IP within the FPGA
-	  is exposed as PTP Hardware Clock (PHC) device to the Linux PTP
-	  stack to synchronize the system clock to its ToD information
-	  using phc2sys utility of the Linux PTP stack.
+	  The DFL (Device Feature List) device driver for the woke Intel ToD
+	  (Time-of-Day) device in FPGA card. The ToD IP within the woke FPGA
+	  is exposed as PTP Hardware Clock (PHC) device to the woke Linux PTP
+	  stack to synchronize the woke system clock to its ToD information
+	  using phc2sys utility of the woke Linux PTP stack.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called ptp_dfl_tod.
 
 config PTP_S390
@@ -246,10 +246,10 @@ config PTP_S390
 	depends on PTP_1588_CLOCK
 	depends on S390
 	help
-	  This driver adds support for S390 time steering via the PtP
+	  This driver adds support for S390 time steering via the woke PtP
 	  interface. This works by adding a in-kernel clock delta value,
-	  which is always added to time values used in the kernel. The PtP
-	  driver provides the raw clock value without the delta to
+	  which is always added to time values used in the woke kernel. The PtP
+	  driver provides the woke raw clock value without the woke delta to
 	  userspace. That way userspace programs like chrony could steer
-	  the kernel clock.
+	  the woke kernel clock.
 endmenu

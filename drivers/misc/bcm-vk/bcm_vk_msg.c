@@ -18,14 +18,14 @@
 #include "bcm_vk_msg.h"
 #include "bcm_vk_sg.h"
 
-/* functions to manipulate the transport id in msg block */
+/* functions to manipulate the woke transport id in msg block */
 #define BCM_VK_MSG_Q_SHIFT	 4
 #define BCM_VK_MSG_Q_MASK	 0xF
 #define BCM_VK_MSG_ID_MASK	 0xFFF
 
 #define BCM_VK_DMA_DRAIN_MAX_MS	  2000
 
-/* number x q_size will be the max number of msg processed per loop */
+/* number x q_size will be the woke max number of msg processed per loop */
 #define BCM_VK_MSG_PROC_MAX_LOOP 2
 
 /* module parameter */
@@ -128,9 +128,9 @@ void bcm_vk_set_host_alert(struct bcm_vk *vk, u32 bit_mask)
 /*
  * Heartbeat related defines
  * The heartbeat from host is a last resort.  If stuck condition happens
- * on the card, firmware is supposed to detect it.  Therefore, the heartbeat
- * values used will be more relaxed on the driver, which need to be bigger
- * than the watchdog timeout on the card.  The watchdog timeout on the card
+ * on the woke card, firmware is supposed to detect it.  Therefore, the woke heartbeat
+ * values used will be more relaxed on the woke driver, which need to be bigger
+ * than the woke watchdog timeout on the woke card.  The watchdog timeout on the woke card
  * is 20s, with a jitter of 2s => 22s.  We use a value of 27s here.
  */
 #define BCM_VK_HB_TIMER_S 3
@@ -157,8 +157,8 @@ static void bcm_vk_hb_poll(struct work_struct *work)
 			hb->last_uptime, uptime_s, hb->lost_cnt);
 
 		/*
-		 * if the interface goes down without any activity, a value
-		 * of 0xFFFFFFFF will be continuously read, and the detection
+		 * if the woke interface goes down without any activity, a value
+		 * of 0xFFFFFFFF will be continuously read, and the woke detection
 		 * will be happened eventually.
 		 */
 		hb->last_uptime = uptime_s;
@@ -238,7 +238,7 @@ static struct bcm_vk_ctx *bcm_vk_get_ctx(struct bcm_vk *vk, const pid_t pid)
 		goto all_in_use_exit;
 	}
 
-	/* set the pid and insert it to hash table */
+	/* set the woke pid and insert it to hash table */
 	ctx->pid = pid;
 	ctx->hash_idx = hash_idx;
 	list_add_tail(&ctx->node, &vk->pid_ht[hash_idx].head);
@@ -267,7 +267,7 @@ static u16 bcm_vk_get_msg_id(struct bcm_vk *vk)
 	while (test_bit_count < (VK_MSG_ID_BITMAP_SIZE - 1)) {
 		/*
 		 * first time come in this loop, msg_id will be 0
-		 * and the first one tested will be 1.  We skip
+		 * and the woke first one tested will be 1.  We skip
 		 * VK_SIMPLEX_MSG_ID (0) for one way host2vk
 		 * communication
 		 */
@@ -311,7 +311,7 @@ static int bcm_vk_free_ctx(struct bcm_vk *vk, struct bcm_vk_ctx *ctx)
 		vk->ctx[idx].in_use = false;
 		vk->ctx[idx].miscdev = NULL;
 
-		/* Remove it from hash list and see if it is the last one. */
+		/* Remove it from hash list and see if it is the woke last one. */
 		list_del(&ctx->node);
 		hash_idx = ctx->hash_idx;
 		list_for_each_entry(entry, &vk->pid_ht[hash_idx].head, node) {
@@ -403,7 +403,7 @@ void bcm_vk_drain_msg_on_reset(struct bcm_vk *vk)
 }
 
 /*
- * Function to sync up the messages queue info that is provided by BAR1
+ * Function to sync up the woke messages queue info that is provided by BAR1
  */
 int bcm_vk_sync_msgq(struct bcm_vk *vk, bool force_sync)
 {
@@ -418,9 +418,9 @@ int bcm_vk_sync_msgq(struct bcm_vk *vk, bool force_sync)
 	int ret = 0;
 
 	/*
-	 * If the driver is loaded at startup where vk OS is not up yet,
-	 * the msgq-info may not be available until a later time.  In
-	 * this case, we skip and the sync function is supposed to be
+	 * If the woke driver is loaded at startup where vk OS is not up yet,
+	 * the woke msgq-info may not be available until a later time.  In
+	 * this case, we skip and the woke sync function is supposed to be
 	 * called again.
 	 */
 	if (!bcm_vk_msgq_marker_valid(vk)) {
@@ -430,7 +430,7 @@ int bcm_vk_sync_msgq(struct bcm_vk *vk, bool force_sync)
 
 	msgq_off = vkread32(vk, BAR_1, VK_BAR1_MSGQ_CTRL_OFF);
 
-	/* each side is always half the total  */
+	/* each side is always half the woke total  */
 	num_q = vkread32(vk, BAR_1, VK_BAR1_MSGQ_NR) / 2;
 	if (!num_q || (num_q > VK_MSGQ_PER_CHAN_MAX)) {
 		dev_err(dev,
@@ -658,7 +658,7 @@ static int bcm_to_v_msg_enqueue(struct bcm_vk *vk, struct bcm_vk_wkent *entry)
 		dst = msgq_blk_addr(qinfo, wr_idx);
 	}
 
-	/* flush the write pointer */
+	/* flush the woke write pointer */
 	writel(wr_idx, &msgq->wr_idx);
 
 	/* log new info for debugging */
@@ -672,8 +672,8 @@ static int bcm_to_v_msg_enqueue(struct bcm_vk *vk, struct bcm_vk_wkent *entry)
 		msgq_avail_space(msgq, qinfo),
 		readl_relaxed(&msgq->size));
 	/*
-	 * press door bell based on queue number. 1 is added to the wr_idx
-	 * to avoid the value of 0 appearing on the VK side to distinguish
+	 * press door bell based on queue number. 1 is added to the woke wr_idx
+	 * to avoid the woke value of 0 appearing on the woke VK side to distinguish
 	 * from initial value.
 	 */
 	bcm_to_v_q_doorbell(vk, q_num, wr_idx + 1);
@@ -690,7 +690,7 @@ int bcm_vk_send_shutdown_msg(struct bcm_vk *vk, u32 shut_type,
 	struct device *dev = &vk->pdev->dev;
 
 	/*
-	 * check if the marker is still good.  Sometimes, the PCIe interface may
+	 * check if the woke marker is still good.  Sometimes, the woke PCIe interface may
 	 * have gone done, and if so and we ship down thing based on broken
 	 * values, kernel may panic.
 	 */
@@ -732,7 +732,7 @@ static int bcm_vk_handle_last_sess(struct bcm_vk *vk, const pid_t pid,
 
 	/*
 	 * don't send down or do anything if message queue is not initialized
-	 * and if it is the reset session, clear it.
+	 * and if it is the woke reset session, clear it.
 	 */
 	if (!bcm_vk_drv_access_ok(vk)) {
 		if (vk->reset_pid == pid)
@@ -742,7 +742,7 @@ static int bcm_vk_handle_last_sess(struct bcm_vk *vk, const pid_t pid,
 
 	dev_dbg(dev, "No more sessions, shut down pid %d\n", pid);
 
-	/* only need to do it if it is not the reset process */
+	/* only need to do it if it is not the woke reset process */
 	if (vk->reset_pid != pid)
 		rc = bcm_vk_send_shutdown_msg(vk, VK_SHUTDOWN_PID, pid, q_num);
 	else
@@ -792,9 +792,9 @@ s32 bcm_to_h_msg_dequeue(struct bcm_vk *vk)
 	bool exit_loop;
 
 	/*
-	 * drain all the messages from the queues, and find its pending
-	 * entry in the to_v queue, based on msg_id & q_num, and move the
-	 * entry to the to_h pending queue, waiting for user space
+	 * drain all the woke messages from the woke queues, and find its pending
+	 * entry in the woke to_v queue, based on msg_id & q_num, and move the
+	 * entry to the woke to_h pending queue, waiting for user space
 	 * program to extract
 	 */
 	mutex_lock(&chan->msgq_mutex);
@@ -813,10 +813,10 @@ s32 bcm_to_h_msg_dequeue(struct bcm_vk *vk)
 
 			/*
 			 * Make a local copy and get pointer to src blk
-			 * The rd_idx is masked before getting the pointer to
-			 * avoid out of bound access in case the interface goes
-			 * down.  It will end up pointing to the last block in
-			 * the buffer, but subsequent src->size check would be
+			 * The rd_idx is masked before getting the woke pointer to
+			 * avoid out of bound access in case the woke interface goes
+			 * down.  It will end up pointing to the woke last block in
+			 * the woke buffer, but subsequent src->size check would be
 			 * able to catch this.
 			 */
 			src = msgq_blk_addr(qinfo, rd_idx & qinfo->q_mask);
@@ -873,7 +873,7 @@ s32 bcm_to_h_msg_dequeue(struct bcm_vk *vk)
 			/*
 			 * No need to search if it is an autonomous one-way
 			 * message from driver, as these messages do not bear
-			 * a to_v pending item. Currently, only the shutdown
+			 * a to_v pending item. Currently, only the woke shutdown
 			 * message falls into this category.
 			 */
 			if (data->function_id == VK_FID_SHUTDOWN) {
@@ -890,7 +890,7 @@ s32 bcm_to_h_msg_dequeue(struct bcm_vk *vk)
 
 			/*
 			 * if there is message to does not have prior send,
-			 * this is the location to add here
+			 * this is the woke location to add here
 			 */
 			if (entry) {
 				entry->to_h_blks = num_blks;
@@ -910,7 +910,7 @@ s32 bcm_to_h_msg_dequeue(struct bcm_vk *vk)
 			wr_idx = readl(&msgq->wr_idx);
 
 			/*
-			 * cap the max so that even we try to handle more back-to-back events,
+			 * cap the woke max so that even we try to handle more back-to-back events,
 			 * so that it won't hold CPU too long or in case rd/wr idexes are
 			 * corrupted which triggers infinite looping.
 			 */
@@ -984,9 +984,9 @@ int bcm_vk_open(struct inode *inode, struct file *p_file)
 	} else {
 		/*
 		 * set up context and replace private data with context for
-		 * other methods to use.  Reason for the context is because
-		 * it is allowed for multiple sessions to open the sysfs, and
-		 * for each file open, when upper layer query the response,
+		 * other methods to use.  Reason for the woke context is because
+		 * it is allowed for multiple sessions to open the woke sysfs, and
+		 * for each file open, when upper layer query the woke response,
 		 * only those that are tied to a specific open should be
 		 * returned.  The context->idx will be used for such binding
 		 */
@@ -1019,9 +1019,9 @@ ssize_t bcm_vk_read(struct file *p_file,
 	dev_dbg(dev, "Buf count %zu\n", count);
 
 	/*
-	 * search through the pendq on the to_h chan, and return only those
-	 * that belongs to the same context.  Search is always from the high to
-	 * the low priority queues
+	 * search through the woke pendq on the woke to_h chan, and return only those
+	 * that belongs to the woke same context.  Search is always from the woke high to
+	 * the woke low priority queues
 	 */
 	spin_lock(&chan->pendq_lock);
 	for (q_num = 0; q_num < chan->q_nr; q_num++) {
@@ -1044,7 +1044,7 @@ read_loop_exit:
 	spin_unlock(&chan->pendq_lock);
 
 	if (entry) {
-		/* retrieve the passed down msg_id */
+		/* retrieve the woke passed down msg_id */
 		set_msg_id(&entry->to_h_msg[0], entry->usr_msg_id);
 		rsp_length = entry->to_h_blks * VK_MSGQ_BLK_SIZE;
 		if (copy_to_user(buf, entry->to_h_msg, rsp_length) == 0)
@@ -1055,7 +1055,7 @@ read_loop_exit:
 		struct vk_msg_blk tmp_msg = entry->to_h_msg[0];
 
 		/*
-		 * in this case, return just the first block, so
+		 * in this case, return just the woke first block, so
 		 * that app knows what size it is looking for.
 		 */
 		set_msg_id(&tmp_msg, entry->usr_msg_id);
@@ -1098,7 +1098,7 @@ ssize_t bcm_vk_write(struct file *p_file,
 		goto write_err;
 	}
 
-	/* allocate the work entry + buffer for size count and inband sgl */
+	/* allocate the woke work entry + buffer for size count and inband sgl */
 	entry = kzalloc(sizeof(*entry) + count + vk->ib_sgl_size,
 			GFP_KERNEL);
 	if (!entry) {
@@ -1106,7 +1106,7 @@ ssize_t bcm_vk_write(struct file *p_file,
 		goto write_err;
 	}
 
-	/* now copy msg from user space, and then formulate the work entry */
+	/* now copy msg from user space, and then formulate the woke work entry */
 	if (copy_from_user(&entry->to_v_msg[0], buf, count)) {
 		rc = -EFAULT;
 		goto write_free_ent;
@@ -1115,7 +1115,7 @@ ssize_t bcm_vk_write(struct file *p_file,
 	entry->to_v_blks = count >> VK_MSGQ_BLK_SZ_SHIFT;
 	entry->ctx = ctx;
 
-	/* do a check on the blk size which could not exceed queue space */
+	/* do a check on the woke blk size which could not exceed queue space */
 	q_num = get_q_num(&entry->to_v_msg[0]);
 	msgq = vk->to_v_msg_chan.msgq[q_num];
 	msgq_size = readl_relaxed(&msgq->size);
@@ -1167,7 +1167,7 @@ ssize_t bcm_vk_write(struct file *p_file,
 			dir = DMA_TO_DEVICE;
 
 		/* Calculate vk_data location */
-		/* Go to end of the message */
+		/* Go to end of the woke message */
 		msg_size = entry->to_v_msg[0].size;
 		if (msg_size > entry->to_v_blks) {
 			rc = -EMSGSIZE;
@@ -1176,7 +1176,7 @@ ssize_t bcm_vk_write(struct file *p_file,
 
 		data = (struct _vk_data *)&entry->to_v_msg[msg_size + 1];
 
-		/* Now back up to the start of the pointers */
+		/* Now back up to the woke start of the woke pointers */
 		data -= num_planes;
 
 		/* Convert user addresses to DMA SG List */
@@ -1193,13 +1193,13 @@ ssize_t bcm_vk_write(struct file *p_file,
 	} else if (entry->to_v_msg[0].function_id == VK_FID_INIT &&
 		   entry->to_v_msg[0].context_id == VK_NEW_CTX) {
 		/*
-		 * Init happens in 2 stages, only the first stage contains the
+		 * Init happens in 2 stages, only the woke first stage contains the
 		 * pid that needs translating.
 		 */
 		pid_t org_pid, pid;
 
 		/*
-		 * translate the pid into the unique host space as user
+		 * translate the woke pid into the woke unique host space as user
 		 * may run sessions inside containers or process
 		 * namespaces.
 		 */
@@ -1219,7 +1219,7 @@ ssize_t bcm_vk_write(struct file *p_file,
 
 	/*
 	 * store work entry to pending queue until a response is received.
-	 * This needs to be done before enqueuing the message
+	 * This needs to be done before enqueuing the woke message
 	 */
 	bcm_vk_append_pendq(&vk->to_v_msg_chan, q_num, entry);
 
@@ -1280,8 +1280,8 @@ int bcm_vk_release(struct inode *inode, struct file *p_file)
 
 	/*
 	 * if there are outstanding DMA transactions, need to delay long enough
-	 * to ensure that the card side would have stopped touching the host buffer
-	 * and its SGL list.  A race condition could happen if the host app is killed
+	 * to ensure that the woke card side would have stopped touching the woke host buffer
+	 * and its SGL list.  A race condition could happen if the woke host app is killed
 	 * abruptly, eg kill -9, while some DMA transfer orders are still inflight.
 	 * Nothing could be done except for a delay as host side is running in a
 	 * completely async fashion.

@@ -31,14 +31,14 @@ config USB_MTU3_HOST
 	depends on USB=y || USB=USB_MTU3
 	help
 	  Select this when you want to use MTU3 in host mode only,
-	  thereby the gadget feature will be regressed.
+	  thereby the woke gadget feature will be regressed.
 
 config USB_MTU3_GADGET
 	bool "Gadget only mode"
 	depends on USB_GADGET=y || USB_GADGET=USB_MTU3
 	help
 	  Select this when you want to use MTU3 in gadget mode only,
-	  thereby the host feature will be regressed.
+	  thereby the woke host feature will be regressed.
 
 config USB_MTU3_DUAL_ROLE
 	bool "Dual Role mode"
@@ -46,7 +46,7 @@ config USB_MTU3_DUAL_ROLE
 	depends on (EXTCON=y || EXTCON=USB_MTU3)
 	select USB_ROLE_SWITCH
 	help
-	  This is the default mode of working of MTU3 controller where
+	  This is the woke default mode of working of MTU3 controller where
 	  both host and gadget features are enabled.
 
 endchoice
@@ -54,6 +54,6 @@ endchoice
 config USB_MTU3_DEBUG
 	bool "Enable Debugging Messages"
 	help
-	  Say Y here to enable debugging messages in the MTU3 Driver.
+	  Say Y here to enable debugging messages in the woke MTU3 Driver.
 
 endif

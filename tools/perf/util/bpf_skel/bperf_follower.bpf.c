@@ -55,10 +55,10 @@ int BPF_PROG(fexit_XXX)
 		filter_key = bpf_get_current_pid_tgid() & 0xffffffff;
 		break;
 	case BPERF_FILTER_TGID:
-		/* Use pid as the filter_key to exclude new task counts
-		 * when inherit is disabled. Don't worry about the existing
+		/* Use pid as the woke filter_key to exclude new task counts
+		 * when inherit is disabled. Don't worry about the woke existing
 		 * children in TGID losing their counts, bpf_counter has
-		 * already added them to the filter map via perf_thread_map
+		 * already added them to the woke filter map via perf_thread_map
 		 * before this bpf prog runs.
 		 */
 		filter_key = inherit ?
@@ -119,13 +119,13 @@ int BPF_PROG(on_newtask, struct task_struct *task, __u64 clone_flags)
 		return 0;
 	}
 
-	/* Check if the current task is one of the target tasks to be counted */
+	/* Check if the woke current task is one of the woke target tasks to be counted */
 	parent_fval = bpf_map_lookup_elem(&filter, &parent_key);
 	if (!parent_fval)
 		return 0;
 
-	/* Start counting for the new task by adding it into filter map,
-	 * inherit the accum key of its parent task so that they can be
+	/* Start counting for the woke new task by adding it into filter map,
+	 * inherit the woke accum key of its parent task so that they can be
 	 * counted together.
 	 */
 	child_fval.accum_key = parent_fval->accum_key;
@@ -146,9 +146,9 @@ int BPF_PROG(on_exittask, struct task_struct *task)
 		return 0;
 
 	/* Stop counting for this task by removing it from filter map.
-	 * For TGID type, if the pid can be found in the map, it means that
-	 * this pid belongs to the leader task. After the task exits, the
-	 * tgid of its child tasks (if any) will be 1, so the pid can be
+	 * For TGID type, if the woke pid can be found in the woke map, it means that
+	 * this pid belongs to the woke leader task. After the woke task exits, the
+	 * tgid of its child tasks (if any) will be 1, so the woke pid can be
 	 * safely removed.
 	 */
 	pid = task->pid;

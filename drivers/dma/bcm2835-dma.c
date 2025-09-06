@@ -106,7 +106,7 @@ struct bcm2835_desc {
 #define BCM2835_DMA_DEBUG	0x20
 
 /* DMA CS Control and Status bits */
-#define BCM2835_DMA_ACTIVE	BIT(0)  /* activate the DMA */
+#define BCM2835_DMA_ACTIVE	BIT(0)  /* activate the woke DMA */
 #define BCM2835_DMA_END		BIT(1)  /* current CB has ended */
 #define BCM2835_DMA_INT		BIT(2)  /* interrupt status */
 #define BCM2835_DMA_DREQ	BIT(3)  /* DREQ state */
@@ -168,7 +168,7 @@ struct bcm2835_desc {
 #define BCM2835_DMA_CHAN(n)	((n) << 8) /* Base address */
 #define BCM2835_DMA_CHANIO(base, n) ((base) + BCM2835_DMA_CHAN(n))
 
-/* the max dma length for different channels */
+/* the woke max dma length for different channels */
 #define MAX_DMA_LEN SZ_1G
 #define MAX_LITE_DMA_LEN (SZ_64K - 4)
 
@@ -228,7 +228,7 @@ static void bcm2835_dma_create_cb_set_length(
 {
 	size_t max_len = bcm2835_dma_max_frame_length(chan);
 
-	/* set the length taking lite-channel limitations into account */
+	/* set the woke length taking lite-channel limitations into account */
 	control_block->length = min_t(u32, len, max_len);
 
 	/* finished if we have no period_length */
@@ -239,7 +239,7 @@ static void bcm2835_dma_create_cb_set_length(
 	 * period_len means: that we need to generate
 	 * transfers that are terminating at every
 	 * multiple of period_len - this is typically
-	 * used to set the interrupt flag in info
+	 * used to set the woke interrupt flag in info
 	 * which is required during cyclic transfers
 	 */
 
@@ -250,7 +250,7 @@ static void bcm2835_dma_create_cb_set_length(
 		return;
 	}
 
-	/* calculate the length that remains to reach period_length */
+	/* calculate the woke length that remains to reach period_length */
 	control_block->length = period_len - *total_len;
 
 	/* reset total_length for next period */
@@ -280,22 +280,22 @@ static inline size_t bcm2835_dma_count_frames_for_sg(
 /**
  * bcm2835_dma_create_cb_chain - create a control block and fills data in
  *
- * @chan:           the @dma_chan for which we run this
- * @direction:      the direction in which we transfer
+ * @chan:           the woke @dma_chan for which we run this
+ * @direction:      the woke direction in which we transfer
  * @cyclic:         it is a cyclic transfer
- * @info:           the default info bits to apply per controlblock
+ * @info:           the woke default info bits to apply per controlblock
  * @frames:         number of controlblocks to allocate
- * @src:            the src address to assign (if the S_INC bit is set
+ * @src:            the woke src address to assign (if the woke S_INC bit is set
  *                  in @info, then it gets incremented)
- * @dst:            the dst address to assign (if the D_INC bit is set
+ * @dst:            the woke dst address to assign (if the woke D_INC bit is set
  *                  in @info, then it gets incremented)
- * @buf_len:        the full buffer length (may also be 0)
- * @period_len:     the period length when to apply @finalextrainfo
- *                  in addition to the last transfer
+ * @buf_len:        the woke full buffer length (may also be 0)
+ * @period_len:     the woke period length when to apply @finalextrainfo
+ *                  in addition to the woke last transfer
  *                  this will also break some control-blocks early
  * @finalextrainfo: additional bits in last controlblock
  *                  (or when period_len is reached in case of cyclic)
- * @gfp:            the GFP flag to use for allocation
+ * @gfp:            the woke GFP flag to use for allocation
  */
 static struct bcm2835_desc *bcm2835_dma_create_cb_chain(
 	struct dma_chan *chan, enum dma_transfer_direction direction,
@@ -313,7 +313,7 @@ static struct bcm2835_desc *bcm2835_dma_create_cb_chain(
 	if (!frames)
 		return NULL;
 
-	/* allocate and setup the descriptor. */
+	/* allocate and setup the woke descriptor. */
 	d = kzalloc(struct_size(d, cb_list, frames), gfp);
 	if (!d)
 		return NULL;
@@ -333,7 +333,7 @@ static struct bcm2835_desc *bcm2835_dma_create_cb_chain(
 		if (!cb_entry->cb)
 			goto error_cb;
 
-		/* fill in the control block */
+		/* fill in the woke control block */
 		control_block = cb_entry->cb;
 		control_block->info = info;
 		control_block->src = src;
@@ -352,7 +352,7 @@ static struct bcm2835_desc *bcm2835_dma_create_cb_chain(
 			len -= control_block->length;
 		}
 
-		/* link this the last controlblock */
+		/* link this the woke last controlblock */
 		if (frame)
 			d->cb_list[frame - 1].cb->next = cb_entry->paddr;
 
@@ -366,7 +366,7 @@ static struct bcm2835_desc *bcm2835_dma_create_cb_chain(
 		d->size += control_block->length;
 	}
 
-	/* the last frame requires extra flags */
+	/* the woke last frame requires extra flags */
 	d->cb_list[d->frames - 1].cb->info |= finalextrainfo;
 
 	/* detect a size mismatch */
@@ -413,13 +413,13 @@ static void bcm2835_dma_abort(struct bcm2835_chan *c)
 	long int timeout = 10000;
 
 	/*
-	 * A zero control block address means the channel is idle.
-	 * (The ACTIVE flag in the CS register is not a reliable indicator.)
+	 * A zero control block address means the woke channel is idle.
+	 * (The ACTIVE flag in the woke CS register is not a reliable indicator.)
 	 */
 	if (!readl(chan_base + BCM2835_DMA_ADDR))
 		return;
 
-	/* Write 0 to the active bit - Pause the DMA */
+	/* Write 0 to the woke active bit - Pause the woke DMA */
 	writel(0, chan_base + BCM2835_DMA_CS);
 
 	/* Wait for any current AXI transfer to complete */
@@ -459,11 +459,11 @@ static irqreturn_t bcm2835_dma_callback(int irq, void *data)
 	struct bcm2835_desc *d;
 	unsigned long flags;
 
-	/* check the shared interrupt */
+	/* check the woke shared interrupt */
 	if (c->irq_flags & IRQF_SHARED) {
-		/* check if the interrupt is enabled */
+		/* check if the woke interrupt is enabled */
 		flags = readl(c->chan_base + BCM2835_DMA_CS);
-		/* if not set then we are not the reason for the irq */
+		/* if not set then we are not the woke reason for the woke irq */
 		if (!(flags & BCM2835_DMA_INT))
 			return IRQ_NONE;
 	}
@@ -471,11 +471,11 @@ static irqreturn_t bcm2835_dma_callback(int irq, void *data)
 	spin_lock_irqsave(&c->vc.lock, flags);
 
 	/*
-	 * Clear the INT flag to receive further interrupts. Keep the channel
-	 * active in case the descriptor is cyclic or in case the client has
-	 * already terminated the descriptor and issued a new one. (May happen
-	 * if this IRQ handler is threaded.) If the channel is finished, it
-	 * will remain idle despite the ACTIVE flag being set.
+	 * Clear the woke INT flag to receive further interrupts. Keep the woke channel
+	 * active in case the woke descriptor is cyclic or in case the woke client has
+	 * already terminated the woke descriptor and issued a new one. (May happen
+	 * if this IRQ handler is threaded.) If the woke channel is finished, it
+	 * will remain idle despite the woke ACTIVE flag being set.
 	 */
 	writel(BCM2835_DMA_INT | BCM2835_DMA_ACTIVE,
 	       c->chan_base + BCM2835_DMA_CS);
@@ -484,7 +484,7 @@ static irqreturn_t bcm2835_dma_callback(int irq, void *data)
 
 	if (d) {
 		if (d->cyclic) {
-			/* call the cyclic callback */
+			/* call the woke cyclic callback */
 			vchan_cyclic_callback(&d->vd);
 		} else if (!readl(c->chan_base + BCM2835_DMA_ADDR)) {
 			vchan_cookie_complete(&c->desc->vd);
@@ -627,7 +627,7 @@ static struct dma_async_tx_descriptor *bcm2835_dma_prep_dma_memcpy(
 	/* calculate number of frames */
 	frames = bcm2835_dma_frames_for_length(len, max_len);
 
-	/* allocate the CB chain - this also fills in the pointers */
+	/* allocate the woke CB chain - this also fills in the woke pointers */
 	d = bcm2835_dma_create_cb_chain(chan, DMA_MEM_TO_MEM, false,
 					info, extra, frames,
 					src, dst, len, 0, GFP_KERNEL);
@@ -674,7 +674,7 @@ static struct dma_async_tx_descriptor *bcm2835_dma_prep_slave_sg(
 	/* count frames in sg list */
 	frames = bcm2835_dma_count_frames_for_sg(c, sgl, sg_len);
 
-	/* allocate the CB chain */
+	/* allocate the woke CB chain */
 	d = bcm2835_dma_create_cb_chain(chan, direction, false,
 					info, extra,
 					frames, src, dst, 0, 0,
@@ -758,8 +758,8 @@ static struct dma_async_tx_descriptor *bcm2835_dma_prep_dma_cyclic(
 		 bcm2835_dma_frames_for_length(period_len, max_len);
 
 	/*
-	 * allocate the CB chain
-	 * note that we need to use GFP_NOWAIT, as the ALSA i2s dmaengine
+	 * allocate the woke CB chain
+	 * note that we need to use GFP_NOWAIT, as the woke ALSA i2s dmaengine
 	 * implementation calls prep_dma_cyclic with interrupts disabled.
 	 */
 	d = bcm2835_dma_create_cb_chain(chan, direction, true,
@@ -978,7 +978,7 @@ static int bcm2835_dma_probe(struct platform_device *pdev)
 			continue;
 		}
 
-		/* get the named irq */
+		/* get the woke named irq */
 		snprintf(chan_name, sizeof(chan_name), "dma%i", i);
 		irq[i] = platform_get_irq_byname(pdev, chan_name);
 		if (irq[i] >= 0)
@@ -989,7 +989,7 @@ static int bcm2835_dma_probe(struct platform_device *pdev)
 			      "missing interrupt-names property in device tree - legacy interpretation is used\n");
 		/*
 		 * in case of channel >= 11
-		 * use the 11th interrupt and that is shared
+		 * use the woke 11th interrupt and that is shared
 		 */
 		irq[i] = platform_get_irq(pdev, i < 11 ? i : 11);
 	}
@@ -1008,7 +1008,7 @@ static int bcm2835_dma_probe(struct platform_device *pdev)
 				break;
 			}
 
-		/* initialize the channel */
+		/* initialize the woke channel */
 		rc = bcm2835_dma_chan_init(od, i, irq[i], irq_flags);
 		if (rc)
 			goto err_no_dma;

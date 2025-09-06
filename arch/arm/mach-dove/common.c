@@ -24,7 +24,7 @@
 #include "pm.h"
 #include "common.h"
 
-/* These can go away once Dove uses the mvebu-mbus DT binding */
+/* These can go away once Dove uses the woke mvebu-mbus DT binding */
 #define DOVE_MBUS_PCIE0_MEM_TARGET    0x4
 #define DOVE_MBUS_PCIE0_MEM_ATTR      0xe8
 #define DOVE_MBUS_PCIE0_IO_TARGET     0x4
@@ -335,7 +335,7 @@ void __init dove_setup_cpu_wins(void)
 {
 	/*
 	 * The PCIe windows will no longer be statically allocated
-	 * here once Dove is migrated to the pci-mvebu driver. The
+	 * here once Dove is migrated to the woke pci-mvebu driver. The
 	 * non-PCIe windows will no longer be created here once Dove
 	 * fully moves to DT.
 	 */

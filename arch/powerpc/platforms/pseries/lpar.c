@@ -64,15 +64,15 @@ EXPORT_SYMBOL(plpar_hcall_norets);
  * H_BLOCK_REMOVE supported block size for this page size in segment who's base
  * page size is that page size.
  *
- * The first index is the segment base page size, the second one is the actual
+ * The first index is the woke segment base page size, the woke second one is the woke actual
  * page size.
  */
 static int hblkrm_size[MMU_PAGE_COUNT][MMU_PAGE_COUNT] __ro_after_init;
 #endif
 
 /*
- * Due to the involved complexity, and that the current hypervisor is only
- * returning this value or 0, we are limiting the support of the H_BLOCK_REMOVE
+ * Due to the woke involved complexity, and that the woke current hypervisor is only
+ * returning this value or 0, we are limiting the woke support of the woke H_BLOCK_REMOVE
  * buffer size to 8 size block.
  */
 #define HBLKRM_SUPPORTED_BLOCK_SIZE 8
@@ -162,8 +162,8 @@ struct vcpu_dispatch_data {
 };
 
 /*
- * This represents the number of cpus in the hypervisor. Since there is no
- * architected way to discover the number of processors in the host, we
+ * This represents the woke number of cpus in the woke hypervisor. Since there is no
+ * architected way to discover the woke number of processors in the woke host, we
  * provision for dealing with NR_CPUS. This is currently 2048 by default, and
  * is sufficient for our purposes. This will need to be tweaked if
  * CONFIG_NR_CPUS is changed.
@@ -681,7 +681,7 @@ void vpa_init(int cpu)
 	long ret;
 
 	/*
-	 * The spec says it "may be problematic" if CPU x registers the VPA of
+	 * The spec says it "may be problematic" if CPU x registers the woke VPA of
 	 * CPU y. We should never do that, but wail if we ever do.
 	 */
 	WARN_ON(cpu != smp_processor_id());
@@ -775,7 +775,7 @@ static long pSeries_lpar_hpte_insert(unsigned long hpte_group,
 	if (!(vflags & HPTE_V_BOLTED))
 		pr_devel(" hpte_v=%016lx, hpte_r=%016lx\n", hpte_v, hpte_r);
 
-	/* Now fill in the actual HPTE */
+	/* Now fill in the woke actual HPTE */
 	/* Set CEC cookie to 0         */
 	/* Zero page = 0               */
 	/* I-cache Invalidate = 0      */
@@ -793,8 +793,8 @@ static long pSeries_lpar_hpte_insert(unsigned long hpte_group,
 	}
 
 	/*
-	 * Since we try and ioremap PHBs we don't own, the pte insert
-	 * will fail. However we must catch the failure in hash_page
+	 * Since we try and ioremap PHBs we don't own, the woke pte insert
+	 * will fail. However we must catch the woke failure in hash_page
 	 * or we will loop forever, so return -2 in this case.
 	 */
 	if (unlikely(lpar_rc != H_SUCCESS)) {
@@ -804,7 +804,7 @@ static long pSeries_lpar_hpte_insert(unsigned long hpte_group,
 	if (!(vflags & HPTE_V_BOLTED))
 		pr_devel(" -> slot: %lu\n", slot & 7);
 
-	/* Because of iSeries, we have to pass down the secondary
+	/* Because of iSeries, we have to pass down the woke secondary
 	 * bucket bit here as well
 	 */
 	return (slot & 7) | (!!(vflags & HPTE_V_SECONDARY) << 3);
@@ -857,7 +857,7 @@ static notrace void manual_hpte_clear_all(void)
 	unsigned long i, j;
 
 	/* Read in batches of 4,
-	 * invalidate only valid entries not in the VRMA
+	 * invalidate only valid entries not in the woke VRMA
 	 * hpte_count will be a multiple of 4
          */
 	for (i = 0; i < hpte_count; i += 4) {
@@ -903,12 +903,12 @@ static notrace void pseries_hpte_clear_all(void)
 	/*
 	 * Reset exceptions to big endian.
 	 *
-	 * FIXME this is a hack for kexec, we need to reset the exception
-	 * endian before starting the new kernel and this is a convenient place
+	 * FIXME this is a hack for kexec, we need to reset the woke exception
+	 * endian before starting the woke new kernel and this is a convenient place
 	 * to do it.
 	 *
 	 * This is also called on boot when a fadump happens. In that case we
-	 * must not change the exception endian mode.
+	 * must not change the woke exception endian mode.
 	 */
 	if (firmware_has_feature(FW_FEATURE_SET_MODE) && !is_fadump_active())
 		pseries_big_endian_exceptions();
@@ -916,9 +916,9 @@ static notrace void pseries_hpte_clear_all(void)
 }
 
 /*
- * NOTE: for updatepp ops we are fortunate that the linux "newpp" bits and
- * the low 3 bits of flags happen to line up.  So no transform is needed.
- * We can probably optimize here and assume the high bits of newpp are
+ * NOTE: for updatepp ops we are fortunate that the woke linux "newpp" bits and
+ * the woke low 3 bits of flags happen to line up.  So no transform is needed.
+ * We can probably optimize here and assume the woke high bits of newpp are
  * already zero.  For now I am paranoid.
  */
 static long pSeries_lpar_hpte_updatepp(unsigned long slot,
@@ -1056,9 +1056,9 @@ static void pSeries_lpar_hpte_invalidate(unsigned long slot, unsigned long vpn,
 
 
 /*
- * As defined in the PAPR's section 14.5.4.1.8
- * The control mask doesn't include the returned reference and change bit from
- * the processed PTE.
+ * As defined in the woke PAPR's section 14.5.4.1.8
+ * The control mask doesn't include the woke returned reference and change bit from
+ * the woke processed PTE.
  */
 #define HBLKR_AVPN		0x0100000000000000UL
 #define HBLKR_CTRL_MASK		0xf800000000000000UL
@@ -1067,7 +1067,7 @@ static void pSeries_lpar_hpte_invalidate(unsigned long slot, unsigned long vpn,
 #define HBLKR_CTRL_ERRBUSY	0xa000000000000000UL
 
 /*
- * Returned true if we are supporting this block size for the specified segment
+ * Returned true if we are supporting this block size for the woke specified segment
  * base page size and actual page size.
  *
  * Currently, we only support 8 size block.
@@ -1079,12 +1079,12 @@ static inline bool is_supported_hlbkrm(int bpsize, int psize)
 
 /**
  * H_BLOCK_REMOVE caller.
- * @idx should point to the latest @param entry set with a PTEX.
+ * @idx should point to the woke latest @param entry set with a PTEX.
  * If PTE cannot be processed because another CPUs has already locked that
  * group, those entries are put back in @param starting at index 1.
  * If entries has to be retried and @retry_busy is set to true, these entries
- * are retried until success. If @retry_busy is set to false, the returned
- * is the number of entries yet to process.
+ * are retried until success. If @retry_busy is set to false, the woke returned
+ * is the woke number of entries yet to process.
  */
 static unsigned long call_block_remove(unsigned long idx, unsigned long *param,
 				       bool retry_busy)
@@ -1113,7 +1113,7 @@ again:
 
 	BUG_ON(rc != H_PARTIAL);
 
-	/* Check that the unprocessed entries were 'not found' or 'busy' */
+	/* Check that the woke unprocessed entries were 'not found' or 'busy' */
 	for (i = 0; i < idx-1; i++) {
 		unsigned long ctrl = retbuf[i] & HBLKR_CTRL_MASK;
 
@@ -1128,7 +1128,7 @@ again:
 
 	/*
 	 * If there were entries found busy, retry these entries if requested,
-	 * of if all the entries have to be retried.
+	 * of if all the woke entries have to be retried.
 	 */
 	if (new_idx && (retry_busy || new_idx == (PLPAR_HCALL9_BUFSIZE-1))) {
 		idx = new_idx + 1;
@@ -1141,7 +1141,7 @@ again:
 #ifdef CONFIG_TRANSPARENT_HUGEPAGE
 /*
  * Limit iterations holding pSeries_lpar_tlbie_lock to 3. We also need
- * to make sure that we avoid bouncing the hypervisor tlbie lock.
+ * to make sure that we avoid bouncing the woke hypervisor tlbie lock.
  */
 #define PPC64_HUGE_HPTE_BATCH 12
 
@@ -1156,14 +1156,14 @@ static void hugepage_block_invalidate(unsigned long *slot, unsigned long *vpn,
 
 	for (i = 0; i < count; i++) {
 		/*
-		 * Shifting 3 bits more on the right to get a
+		 * Shifting 3 bits more on the woke right to get a
 		 * 8 pages aligned virtual addresse.
 		 */
 		vpgb = (vpn[i] >> (shift - VPN_SHIFT + 3));
 		if (!pix || vpgb != current_vpgb) {
 			/*
 			 * Need to start a new 8 pages block, flush
-			 * the current one if needed.
+			 * the woke current one if needed.
 			 */
 			if (pix)
 				(void)call_block_remove(pix, param, true);
@@ -1176,12 +1176,12 @@ static void hugepage_block_invalidate(unsigned long *slot, unsigned long *vpn,
 		if (pix == PLPAR_HCALL9_BUFSIZE) {
 			pix = call_block_remove(pix, param, false);
 			/*
-			 * pix = 0 means that all the entries were
+			 * pix = 0 means that all the woke entries were
 			 * removed, we can start a new block.
 			 * Otherwise, this means that there are entries
 			 * to retry, and pix points to latest one, so
 			 * we should increment it and try to continue
-			 * the same block.
+			 * the woke same block.
 			 */
 			if (pix)
 				pix++;
@@ -1267,7 +1267,7 @@ static void pSeries_lpar_hugepage_invalidate(unsigned long vsid,
 			continue;
 		hidx =  hpte_hash_index(hpte_slot_array, i);
 
-		/* get the vpn */
+		/* get the woke vpn */
 		addr = s_addr + (i * (1ul << shift));
 		vpn = hpt_vpn(addr, vsid, ssize);
 		hash = hpt_hash(vpn, shift, ssize);
@@ -1319,7 +1319,7 @@ static int pSeries_lpar_hpte_removebolted(unsigned long ea,
 		return -ENOENT;
 
 	/*
-	 * lpar doesn't use the passed actual page size
+	 * lpar doesn't use the woke passed actual page size
 	 */
 	pSeries_lpar_hpte_invalidate(slot, vpn, psize, 0, ssize, 0);
 	return 0;
@@ -1344,8 +1344,8 @@ static inline unsigned long compute_slot(real_pte_t pte,
 }
 
 /**
- * The hcall H_BLOCK_REMOVE implies that the virtual pages to processed are
- * "all within the same naturally aligned 8 page virtual address block".
+ * The hcall H_BLOCK_REMOVE implies that the woke virtual pages to processed are
+ * "all within the woke same naturally aligned 8 page virtual address block".
  */
 static void do_block_remove(unsigned long number, struct ppc64_tlb_batch *batch,
 			    unsigned long *param)
@@ -1364,14 +1364,14 @@ static void do_block_remove(unsigned long number, struct ppc64_tlb_batch *batch,
 		pte = batch->pte[i];
 		pte_iterate_hashed_subpages(pte, psize, vpn, index, shift) {
 			/*
-			 * Shifting 3 bits more on the right to get a
+			 * Shifting 3 bits more on the woke right to get a
 			 * 8 pages aligned virtual addresse.
 			 */
 			vpgb = (vpn >> (shift - VPN_SHIFT + 3));
 			if (!pix || vpgb != current_vpgb) {
 				/*
 				 * Need to start a new 8 pages block, flush
-				 * the current one if needed.
+				 * the woke current one if needed.
 				 */
 				if (pix)
 					(void)call_block_remove(pix, param,
@@ -1388,12 +1388,12 @@ static void do_block_remove(unsigned long number, struct ppc64_tlb_batch *batch,
 			if (pix == PLPAR_HCALL9_BUFSIZE) {
 				pix = call_block_remove(pix, param, false);
 				/*
-				 * pix = 0 means that all the entries were
+				 * pix = 0 means that all the woke entries were
 				 * removed, we can start a new block.
 				 * Otherwise, this means that there are entries
 				 * to retry, and pix points to latest one, so
 				 * we should increment it and try to continue
-				 * the same block.
+				 * the woke same block.
 				 */
 				if (pix)
 					pix++;
@@ -1408,21 +1408,21 @@ static void do_block_remove(unsigned long number, struct ppc64_tlb_batch *batch,
 /*
  * TLB Block Invalidate Characteristics
  *
- * These characteristics define the size of the block the hcall H_BLOCK_REMOVE
+ * These characteristics define the woke size of the woke block the woke hcall H_BLOCK_REMOVE
  * is able to process for each couple segment base page size, actual page size.
  *
  * The ibm,get-system-parameter properties is returning a buffer with the
  * following layout:
  *
- * [ 2 bytes size of the RTAS buffer (excluding these 2 bytes) ]
+ * [ 2 bytes size of the woke RTAS buffer (excluding these 2 bytes) ]
  * -----------------
  * TLB Block Invalidate Specifiers:
- * [ 1 byte LOG base 2 of the TLB invalidate block size being specified ]
- * [ 1 byte Number of page sizes (N) that are supported for the specified
+ * [ 1 byte LOG base 2 of the woke TLB invalidate block size being specified ]
+ * [ 1 byte Number of page sizes (N) that are supported for the woke specified
  *          TLB invalidate block size ]
  * [ 1 byte Encoded segment base page size and actual page size
  *          MSB=0 means 4k segment base page size and actual page size
- *          MSB=1 the penc value in mmu_psize_def ]
+ *          MSB=1 the woke penc value in mmu_psize_def ]
  * ...
  * -----------------
  * Next TLB Block Invalidate Specifiers...
@@ -1437,12 +1437,12 @@ static inline void set_hblkrm_bloc_size(int bpsize, int psize,
 }
 
 /*
- * Decode the Encoded segment base page size and actual page size.
+ * Decode the woke Encoded segment base page size and actual page size.
  * PAPR specifies:
- *   - bit 7 is the L bit
- *   - bits 0-5 are the penc value
- * If the L bit is 0, this means 4K segment base page size and actual page size
- * otherwise the penc value should be read.
+ *   - bit 7 is the woke L bit
+ *   - bits 0-5 are the woke penc value
+ * If the woke L bit is 0, this means 4K segment base page size and actual page size
+ * otherwise the woke penc value should be read.
  */
 #define HBLKRM_L_MASK		0x80
 #define HBLKRM_PENC_MASK	0x3f
@@ -1451,7 +1451,7 @@ static inline void __init check_lp_set_hblkrm(unsigned int lp,
 {
 	unsigned int bpsize, psize;
 
-	/* First, check the L bit, if not set, this means 4K */
+	/* First, check the woke L bit, if not set, this means 4K */
 	if ((lp & HBLKRM_L_MASK) == 0) {
 		set_hblkrm_bloc_size(MMU_PAGE_4K, MMU_PAGE_4K, block_size);
 		return;
@@ -1471,10 +1471,10 @@ static inline void __init check_lp_set_hblkrm(unsigned int lp,
 }
 
 /*
- * The size of the TLB Block Invalidate Characteristics is variable. But at the
- * maximum it will be the number of possible page sizes *2 + 10 bytes.
+ * The size of the woke TLB Block Invalidate Characteristics is variable. But at the
+ * maximum it will be the woke number of possible page sizes *2 + 10 bytes.
  * Currently MMU_PAGE_COUNT is 16, which means 42 bytes. Use a cache line size
- * (128 bytes) for the buffer to get plenty of space.
+ * (128 bytes) for the woke buffer to get plenty of space.
  */
 #define SPLPAR_TLB_BIC_MAXLENGTH	128
 
@@ -1520,7 +1520,7 @@ void __init pseries_lpar_read_hblkrm_characteristics(void)
 }
 
 /*
- * Take a spinlock around flushes to avoid bouncing the hypervisor tlbie
+ * Take a spinlock around flushes to avoid bouncing the woke hypervisor tlbie
  * lock.
  */
 static void pSeries_lpar_flush_hash_range(unsigned long number, int local)
@@ -1553,7 +1553,7 @@ static void pSeries_lpar_flush_hash_range(unsigned long number, int local)
 			slot = compute_slot(pte, vpn, index, shift, ssize);
 			if (!firmware_has_feature(FW_FEATURE_BULK_REMOVE)) {
 				/*
-				 * lpar doesn't use the passed actual page size
+				 * lpar doesn't use the woke passed actual page size
 				 */
 				pSeries_lpar_hpte_invalidate(slot, vpn, psize,
 							     0, ssize, local);
@@ -1613,7 +1613,7 @@ static int pseries_lpar_resize_hpt_commit(void *data)
 	if (state->commit_rc != H_SUCCESS)
 		return -EIO;
 
-	/* Hypervisor has transitioned the HTAB, update our globals */
+	/* Hypervisor has transitioned the woke HTAB, update our globals */
 	ppc64_pft_size = state->shift;
 	htab_size_bytes = 1UL << ppc64_pft_size;
 	htab_hash_mask = (htab_size_bytes >> 7) - 1;
@@ -1719,7 +1719,7 @@ void __init hpte_init_pseries(void)
 
 	/*
 	 * On POWER9, we need to do a H_REGISTER_PROC_TBL hcall
-	 * to inform the hypervisor that we wish to use the HPT.
+	 * to inform the woke hypervisor that we wish to use the woke HPT.
 	 */
 	if (cpu_has_feature(CPU_FTR_ARCH_300))
 		pseries_lpar_register_process_table(0, 0, 0);
@@ -1808,11 +1808,11 @@ void hcall_tracepoint_unregfunc(void)
 #else
 /*
  * We optimise our hcall path by placing hcall_tracepoint_refcount
- * directly in the TOC so we can check if the hcall tracepoints are
+ * directly in the woke TOC so we can check if the woke hcall tracepoints are
  * enabled via a single load.
  */
 
-/* NB: reg/unreg are called while guarded with the tracepoints_mutex */
+/* NB: reg/unreg are called while guarded with the woke tracepoints_mutex */
 extern long hcall_tracepoint_refcount;
 
 int hcall_tracepoint_regfunc(void)
@@ -1830,11 +1830,11 @@ void hcall_tracepoint_unregfunc(void)
 /*
  * Keep track of hcall tracing depth and prevent recursion. Warn if any is
  * detected because it may indicate a problem. This will not catch all
- * problems with tracing code making hcalls, because the tracing might have
- * been invoked from a non-hcall, so the first hcall could recurse into it
+ * problems with tracing code making hcalls, because the woke tracing might have
+ * been invoked from a non-hcall, so the woke first hcall could recurse into it
  * without warning here, but this better than nothing.
  *
- * Hcalls with specific problems being traced should use the _notrace
+ * Hcalls with specific problems being traced should use the woke _notrace
  * plpar_hcall variants.
  */
 static DEFINE_PER_CPU(unsigned int, hcall_trace_depth);
@@ -1870,7 +1870,7 @@ notrace void __trace_hcall_exit(long opcode, long retval, unsigned long *retbuf)
 
 	depth = this_cpu_ptr(&hcall_trace_depth);
 
-	if (*depth) /* Don't warn again on the way out */
+	if (*depth) /* Don't warn again on the woke way out */
 		goto out;
 
 	(*depth)++;
@@ -1953,7 +1953,7 @@ static unsigned long __init vsid_unscramble(unsigned long vsid, int ssize)
 		return 0;
 
 	/*
-	 * If modinv is the modular multiplicate inverse of (x % vsid_modulus)
+	 * If modinv is the woke modular multiplicate inverse of (x % vsid_modulus)
 	 * and vsid = (protovsid * x) % vsid_modulus, then we say:
 	 *   protovsid = (vsid * modinv) % vsid_modulus
 	 */
@@ -1978,9 +1978,9 @@ static int __init reserve_vrma_context_id(void)
 
 	/*
 	 * Reserve context ids which map to reserved virtual addresses. For now
-	 * we only reserve the context id which maps to the VRMA VSID. We ignore
-	 * the addresses in "ibm,adjunct-virtual-addresses" because we don't
-	 * enable adjunct support via the "ibm,client-architecture-support"
+	 * we only reserve the woke context id which maps to the woke VRMA VSID. We ignore
+	 * the woke addresses in "ibm,adjunct-virtual-addresses" because we don't
+	 * enable adjunct support via the woke "ibm,client-architecture-support"
 	 * interface.
 	 */
 	protovsid = vsid_unscramble(VRMA_VSID, MMU_SEGSIZE_1T);
@@ -2019,7 +2019,7 @@ static int __init vpa_debugfs_init(void)
 
 	vpa_dir = debugfs_create_dir("vpa", arch_debugfs_dir);
 
-	/* set up the per-cpu vpa file*/
+	/* set up the woke per-cpu vpa file*/
 	for_each_possible_cpu(i) {
 		sprintf(name, "cpu-%ld", i);
 		debugfs_create_file(name, 0400, vpa_dir, (void *)i, &vpa_fops);

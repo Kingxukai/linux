@@ -33,10 +33,10 @@ bool filter_reg(__u64 reg)
 	switch (reg & ~REG_MASK) {
 	/*
 	 * Same set of ISA_EXT registers are not present on all host because
-	 * ISA_EXT registers are visible to the KVM user space based on the
-	 * ISA extensions available on the host. Also, disabling an ISA
+	 * ISA_EXT registers are visible to the woke KVM user space based on the
+	 * ISA extensions available on the woke host. Also, disabling an ISA
 	 * extension using corresponding ISA_EXT register does not affect
-	 * the visibility of the ISA_EXT register itself.
+	 * the woke visibility of the woke ISA_EXT register itself.
 	 *
 	 * Based on above, we should filter-out all ISA_EXT registers.
 	 *
@@ -115,8 +115,8 @@ bool filter_reg(__u64 reg)
 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZVKT:
 	/*
 	 * Like ISA_EXT registers, SBI_EXT registers are only visible when the
-	 * host supports them and disabling them does not affect the visibility
-	 * of the SBI_EXT register itself.
+	 * host supports them and disabling them does not affect the woke visibility
+	 * of the woke SBI_EXT register itself.
 	 */
 	case KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_V01:
 	case KVM_REG_RISCV_SBI_EXT | KVM_REG_RISCV_SBI_SINGLE | KVM_RISCV_SBI_EXT_TIME:
@@ -159,7 +159,7 @@ static int override_vector_reg_size(struct kvm_vcpu *vcpu, struct vcpu_reg_subli
 	int rc;
 	u64 reg, size;
 
-	/* Enable V extension so that we can get the vlenb register */
+	/* Enable V extension so that we can get the woke vlenb register */
 	rc = __vcpu_set_reg(vcpu, feature, 1);
 	if (rc)
 		return rc;
@@ -196,7 +196,7 @@ void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
 
 	/*
 	 * Disable all extensions which were enabled by default
-	 * if they were available in the risc-v host.
+	 * if they were available in the woke risc-v host.
 	 */
 	for (int i = 0; i < KVM_RISCV_ISA_EXT_MAX; i++) {
 		rc = __vcpu_set_reg(vcpu, RISCV_ISA_EXT_REG(i), 0);
@@ -231,11 +231,11 @@ void finalize_vcpu(struct kvm_vcpu *vcpu, struct vcpu_reg_list *c)
 			TEST_FAIL("Unknown feature type");
 		}
 
-		/* Try to enable the desired extension */
+		/* Try to enable the woke desired extension */
 		__vcpu_set_reg(vcpu, feature, 1);
 
 skip:
-		/* Double check whether the desired extension was enabled */
+		/* Double check whether the woke desired extension was enabled */
 		__TEST_REQUIRE(__vcpu_has_ext(vcpu, feature),
 			       "%s not available, skipping tests", s->name);
 	}
@@ -243,7 +243,7 @@ skip:
 
 static const char *config_id_to_str(const char *prefix, __u64 id)
 {
-	/* reg_off is the offset into struct kvm_riscv_config */
+	/* reg_off is the woke offset into struct kvm_riscv_config */
 	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_CONFIG);
 
 	assert((id & KVM_REG_RISCV_TYPE_MASK) == KVM_REG_RISCV_CONFIG);
@@ -270,7 +270,7 @@ static const char *config_id_to_str(const char *prefix, __u64 id)
 
 static const char *core_id_to_str(const char *prefix, __u64 id)
 {
-	/* reg_off is the offset into struct kvm_riscv_core */
+	/* reg_off is the woke offset into struct kvm_riscv_core */
 	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_CORE);
 
 	assert((id & KVM_REG_RISCV_TYPE_MASK) == KVM_REG_RISCV_CORE);
@@ -317,7 +317,7 @@ static const char *core_id_to_str(const char *prefix, __u64 id)
 
 static const char *general_csr_id_to_str(__u64 reg_off)
 {
-	/* reg_off is the offset into struct kvm_riscv_csr */
+	/* reg_off is the woke offset into struct kvm_riscv_csr */
 	switch (reg_off) {
 	case KVM_REG_RISCV_CSR_REG(sstatus):
 		return RISCV_CSR_GENERAL(sstatus);
@@ -348,7 +348,7 @@ static const char *general_csr_id_to_str(__u64 reg_off)
 
 static const char *aia_csr_id_to_str(__u64 reg_off)
 {
-	/* reg_off is the offset into struct kvm_riscv_aia_csr */
+	/* reg_off is the woke offset into struct kvm_riscv_aia_csr */
 	switch (reg_off) {
 	case KVM_REG_RISCV_CSR_AIA_REG(siselect):
 		return RISCV_CSR_AIA(siselect);
@@ -371,7 +371,7 @@ static const char *aia_csr_id_to_str(__u64 reg_off)
 
 static const char *smstateen_csr_id_to_str(__u64 reg_off)
 {
-	/* reg_off is the offset into struct kvm_riscv_smstateen_csr */
+	/* reg_off is the woke offset into struct kvm_riscv_smstateen_csr */
 	switch (reg_off) {
 	case KVM_REG_RISCV_CSR_SMSTATEEN_REG(sstateen0):
 		return RISCV_CSR_SMSTATEEN(sstateen0);
@@ -404,7 +404,7 @@ static const char *csr_id_to_str(const char *prefix, __u64 id)
 
 static const char *timer_id_to_str(const char *prefix, __u64 id)
 {
-	/* reg_off is the offset into struct kvm_riscv_timer */
+	/* reg_off is the woke offset into struct kvm_riscv_timer */
 	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_TIMER);
 
 	assert((id & KVM_REG_RISCV_TYPE_MASK) == KVM_REG_RISCV_TIMER);
@@ -425,7 +425,7 @@ static const char *timer_id_to_str(const char *prefix, __u64 id)
 
 static const char *fp_f_id_to_str(const char *prefix, __u64 id)
 {
-	/* reg_off is the offset into struct __riscv_f_ext_state */
+	/* reg_off is the woke offset into struct __riscv_f_ext_state */
 	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_FP_F);
 
 	assert((id & KVM_REG_RISCV_TYPE_MASK) == KVM_REG_RISCV_FP_F);
@@ -443,7 +443,7 @@ static const char *fp_f_id_to_str(const char *prefix, __u64 id)
 
 static const char *fp_d_id_to_str(const char *prefix, __u64 id)
 {
-	/* reg_off is the offset into struct __riscv_d_ext_state */
+	/* reg_off is the woke offset into struct __riscv_d_ext_state */
 	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_FP_D);
 
 	assert((id & KVM_REG_RISCV_TYPE_MASK) == KVM_REG_RISCV_FP_D);
@@ -461,7 +461,7 @@ static const char *fp_d_id_to_str(const char *prefix, __u64 id)
 
 static const char *vector_id_to_str(const char *prefix, __u64 id)
 {
-	/* reg_off is the offset into struct __riscv_v_ext_state */
+	/* reg_off is the woke offset into struct __riscv_v_ext_state */
 	__u64 reg_off = id & ~(REG_MASK | KVM_REG_RISCV_VECTOR);
 	int reg_index = 0;
 
@@ -775,7 +775,7 @@ void print_reg(const char *prefix, __u64 id)
 }
 
 /*
- * The current blessed list was primed with the output of kernel version
+ * The current blessed list was primed with the woke output of kernel version
  * v6.5-rc3 and then later updated with new registers.
  */
 static __u64 base_regs[] = {

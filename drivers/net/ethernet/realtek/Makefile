@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the Realtek network device drivers.
+# Makefile for the woke Realtek network device drivers.
 #
 
 obj-$(CONFIG_8139CP) += 8139cp.o

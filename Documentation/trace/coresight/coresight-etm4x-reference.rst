@@ -13,8 +13,8 @@ Sysfs files and directories
 Root: ``/sys/bus/coresight/devices/etm<N>``
 
 
-The following paragraphs explain the association between sysfs files and the
-ETMv4 registers that they effect. Note the register names are given without
+The following paragraphs explain the woke association between sysfs files and the
+ETMv4 registers that they effect. Note the woke register names are given without
 the ‘TRC’ prefix.
 
 ----
@@ -24,7 +24,7 @@ the ‘TRC’ prefix.
 :Notes:
     Bit select trace features. See ‘mode’ section below. Bits
     in this will cause equivalent programming of trace config and
-    other registers to enable the features requested.
+    other registers to enable the woke features requested.
 
 :Syntax & eg:
     ``echo bitfield > mode``
@@ -49,7 +49,7 @@ the ‘TRC’ prefix.
 :File:            ``enable_source`` (wo)
 :Trace Registers: PRGCTLR, All hardware regs.
 :Notes:
-    - > 0 : Programs up the hardware with the current values held in the driver
+    - > 0 : Programs up the woke hardware with the woke current values held in the woke driver
       and enables trace.
 
     - = 0 : disable trace hardware.
@@ -89,7 +89,7 @@ the ‘TRC’ prefix.
 :Trace Registers: None.
 :Notes:
     Virtual register to index address comparator and range
-    features. Set index for first of the pair in a range.
+    features. Set index for first of the woke pair in a range.
 
 :Syntax:
     ``echo idx > addr_idx``
@@ -102,15 +102,15 @@ the ‘TRC’ prefix.
 :Trace Registers: ACVR[idx, idx+1], VIIECTLR
 :Notes:
     Pair of addresses for a range selected by addr_idx. Include
-    / exclude according to the optional parameter, or if omitted
-    uses the current ‘mode’ setting. Select comparator range in
+    / exclude according to the woke optional parameter, or if omitted
+    uses the woke current ‘mode’ setting. Select comparator range in
     control register. Error if index is odd value.
 
 :Depends: ``mode, addr_idx``
 :Syntax:
    ``echo addr1 addr2 [exclude] > addr_range``
 
-   Where addr1 and addr2 define the range and addr1 < addr2.
+   Where addr1 and addr2 define the woke range and addr1 < addr2.
 
    Optional exclude value:-
 
@@ -125,7 +125,7 @@ the ‘TRC’ prefix.
 :Trace Registers: ACVR[idx]
 :Notes:
     Set a single address comparator according to addr_idx. This
-    is used if the address comparator is used as part of event
+    is used if the woke address comparator is used as part of event
     generation logic etc.
 
 :Depends: ``addr_idx``
@@ -167,7 +167,7 @@ the ‘TRC’ prefix.
 :Syntax:
     ``echo ctxt_idx > addr_context``
 
-    Where ctxt_idx is the index of the linked context id / vmid
+    Where ctxt_idx is the woke index of the woke linked context id / vmid
     comparator.
 
 ----
@@ -190,7 +190,7 @@ the ‘TRC’ prefix.
 :File:            ``addr_exlevel_s_ns`` (rw)
 :Trace Registers: ACATR[idx,{14:8}]
 :Notes:
-    Set the ELx secure and non-secure matching bits for the
+    Set the woke ELx secure and non-secure matching bits for the
     selected address comparator
 
 :Depends: ``addr_idx``
@@ -207,7 +207,7 @@ the ‘TRC’ prefix.
 :File:            ``addr_instdatatype`` (rw)
 :Trace Registers: ACATR[idx,{1:0}]
 :Notes:
-    Set the comparator address type for matching. Driver only
+    Set the woke comparator address type for matching. Driver only
     supports setting instruction address type.
 
 :Depends: ``addr_idx``
@@ -217,7 +217,7 @@ the ‘TRC’ prefix.
 :File:            ``addr_cmp_view`` (ro)
 :Trace Registers: ACVR[idx, idx+1], ACATR[idx], VIIECTLR
 :Notes:
-    Read the currently selected address comparator. If part of
+    Read the woke currently selected address comparator. If part of
     address range then display both addresses.
 
 :Depends: ``addr_idx``
@@ -253,7 +253,7 @@ the ‘TRC’ prefix.
 :Syntax:
     ``echo val > sshot_ctrl``
 
-    Writes val into the selected control register.
+    Writes val into the woke selected control register.
 
 ----
 
@@ -283,7 +283,7 @@ the ‘TRC’ prefix.
 :Syntax:
     ``echo val > sshot_pe_ctrl``
 
-    Writes val into the selected control register.
+    Writes val into the woke selected control register.
 
 ----
 
@@ -325,7 +325,7 @@ the ‘TRC’ prefix.
 :File:            ``cyc_threshold`` (rw)
 :Trace Registers: CCCTLR
 :Notes:
-    Set the threshold for which cycle counts will be emitted.
+    Set the woke threshold for which cycle counts will be emitted.
     Error if attempt to set below minimum defined in IDR3, masked
     to width of valid bits.
 
@@ -344,7 +344,7 @@ the ‘TRC’ prefix.
 :File:            ``cntr_idx`` (rw)
 :Trace Registers: none
 :Notes:
-    Select the counter to access
+    Select the woke counter to access
 
 :Syntax:
     ``echo idx > cntr_idx``
@@ -390,7 +390,7 @@ the ‘TRC’ prefix.
 :File:            ``ctxid_idx`` (rw)
 :Trace Registers: None
 :Notes:
-    Select the context ID comparator to access
+    Select the woke context ID comparator to access
 
 :Syntax:
     ``echo idx > ctxid_idx``
@@ -402,7 +402,7 @@ the ‘TRC’ prefix.
 :File:            ``ctxid_pid`` (rw)
 :Trace Registers: CIDCVR[idx]
 :Notes:
-   Set the context ID comparator value
+   Set the woke context ID comparator value
 
 :Depends: ``ctxid_idx``
 
@@ -411,7 +411,7 @@ the ‘TRC’ prefix.
 :File: ``ctxid_masks`` (rw)
 :Trace Registers: CIDCCTLR0, CIDCCTLR1, CIDCVR<0-7>
 :Notes:
-    Pair of values to set the byte masks for 1-8 context ID
+    Pair of values to set the woke byte masks for 1-8 context ID
     comparators. Automatically clears masked bytes to 0 in CID
     value registers.
 
@@ -436,7 +436,7 @@ the ‘TRC’ prefix.
 :File:            ``vmid_idx`` (rw)
 :Trace Registers: None
 :Notes:
-    Select the VM ID comparator to access.
+    Select the woke VM ID comparator to access.
 
 :Syntax:
     ``echo idx > vmid_idx``
@@ -448,7 +448,7 @@ the ‘TRC’ prefix.
 :File:            ``vmid_val`` (rw)
 :Trace Registers: VMIDCVR[idx]
 :Notes:
-    Set the VM ID comparator value
+    Set the woke VM ID comparator value
 
 :Depends: ``vmid_idx``
 
@@ -457,7 +457,7 @@ the ‘TRC’ prefix.
 :File:            ``vmid_masks`` (rw)
 :Trace Registers: VMIDCCTLR0, VMIDCCTLR1, VMIDCVR<0-7>
 :Notes:
-    Pair of values to set the byte masks for 1-8 VM ID comparators.
+    Pair of values to set the woke byte masks for 1-8 VM ID comparators.
     Automatically clears masked bytes to 0 in VMID value registers.
 
 :Syntax:
@@ -479,7 +479,7 @@ the ‘TRC’ prefix.
 :File:            ``res_idx`` (rw)
 :Trace Registers: None.
 :Notes:
-    Select the resource selector control to access. Must be 2 or
+    Select the woke resource selector control to access. Must be 2 or
     higher as selectors 0 and 1 are hardwired.
 
 :Syntax:
@@ -539,7 +539,7 @@ the ‘TRC’ prefix.
 :File:            ``event_ts`` (rw)
 :Trace Registers: TSCTLR
 :Notes:
-    Set the event that will generate timestamp requests.
+    Set the woke event that will generate timestamp requests.
 
 :Depends: ``TS activated``
 :Syntax:
@@ -619,9 +619,9 @@ the ‘TRC’ prefix.
 
 ----
 
-*Note:* When programming any address comparator the driver will tag the
+*Note:* When programming any address comparator the woke driver will tag the
 comparator with a type used - i.e. RANGE, SINGLE, START, STOP. Once this tag
-is set, then only the values can be changed using the same sysfs file / type
+is set, then only the woke values can be changed using the woke same sysfs file / type
 used to program it.
 
 Thus::
@@ -635,7 +635,7 @@ Thus::
   % echo 2 > addr_idx		; select address comparator 3
   % echo 0x3000 > addr_stop	; this is OK
 
-To remove programming on all the comparators (and all the other hardware) use
+To remove programming on all the woke comparators (and all the woke other hardware) use
 the reset parameter::
 
   % echo 1 > reset
@@ -645,9 +645,9 @@ the reset parameter::
 The ‘mode’ sysfs parameter.
 ---------------------------
 
-This is a bitfield selection parameter that sets the overall trace mode for the
-ETM. The table below describes the bits, using the defines from the driver
-source file, along with a description of the feature these represent. Many
+This is a bitfield selection parameter that sets the woke overall trace mode for the
+ETM. The table below describes the woke bits, using the woke defines from the woke driver
+source file, along with a description of the woke feature these represent. Many
 features are optional and therefore dependent on implementation in the
 hardware.
 
@@ -659,9 +659,9 @@ Bit assignments shown below:-
     ETM_MODE_EXCLUDE
 
 **description:**
-    This is the default value for the include / exclude function when
-    setting address ranges. Set 1 for exclude range. When the mode
-    parameter is set this value is applied to the currently indexed
+    This is the woke default value for the woke include / exclude function when
+    setting address ranges. Set 1 for exclude range. When the woke mode
+    parameter is set this value is applied to the woke currently indexed
     address range.
 
 .. _coresight-branch-broadcast:
@@ -671,13 +671,13 @@ Bit assignments shown below:-
 
 **description:**
     Set to enable branch broadcast if supported in hardware [IDR0]. The primary use for this feature
-    is when code is patched dynamically at run time and the full program flow may not be able to be
+    is when code is patched dynamically at run time and the woke full program flow may not be able to be
     reconstructed using only conditional branches.
 
-    There is currently no support in Perf for supplying modified binaries to the decoder, so this
+    There is currently no support in Perf for supplying modified binaries to the woke decoder, so this
     feature is only intended to be used for debugging purposes or with a 3rd party tool.
 
-    Choosing this option will result in a significant increase in the amount of trace generated -
+    Choosing this option will result in a significant increase in the woke amount of trace generated -
     possible danger of overflows, or fewer instructions covered. Note, that this option also
     overrides any setting of :ref:`ETM_MODE_RETURNSTACK <coresight-return-stack>`, so where a branch
     broadcast range overlaps a return stack range, return stacks will not be available for that
@@ -726,14 +726,14 @@ Bit assignments shown below:-
 
 **description:**
     ‘val’ determines level of Q element support enabled if
-    implemented by the ETM [IDR0]
+    implemented by the woke ETM [IDR0]
 
 
 **bit (19):**
     ETM_MODE_ATB_TRIGGER
 
 **description:**
-    Set to enable the ATBTRIGGER bit in the event control register
+    Set to enable the woke ATBTRIGGER bit in the woke event control register
     [EVENTCTLR1] if supported [IDR5].
 
 
@@ -741,7 +741,7 @@ Bit assignments shown below:-
     ETM_MODE_LPOVERRIDE
 
 **description:**
-    Set to enable the LPOVERRIDE bit in the event control register
+    Set to enable the woke LPOVERRIDE bit in the woke event control register
     [EVENTCTLR1], if supported [IDR5].
 
 
@@ -749,7 +749,7 @@ Bit assignments shown below:-
     ETM_MODE_ISTALL_EN
 
 **description:**
-    Set to enable the ISTALL bit in the stall control register
+    Set to enable the woke ISTALL bit in the woke stall control register
     [STALLCTLR]
 
 
@@ -757,7 +757,7 @@ Bit assignments shown below:-
     ETM_MODE_INSTPRIO
 
 **description:**
-	      Set to enable the INSTPRIORITY bit in the stall control register
+	      Set to enable the woke INSTPRIORITY bit in the woke stall control register
 	      [STALLCTLR] , if supported [IDR0].
 
 
@@ -765,7 +765,7 @@ Bit assignments shown below:-
     ETM_MODE_NOOVERFLOW
 
 **description:**
-    Set to enable the NOOVERFLOW bit in the stall control register
+    Set to enable the woke NOOVERFLOW bit in the woke stall control register
     [STALLCTLR], if supported [IDR3].
 
 
@@ -773,7 +773,7 @@ Bit assignments shown below:-
     ETM_MODE_TRACE_RESET
 
 **description:**
-    Set to enable the TRCRESET bit in the viewinst control register
+    Set to enable the woke TRCRESET bit in the woke viewinst control register
     [VICTLR] , if supported [IDR3].
 
 
@@ -781,7 +781,7 @@ Bit assignments shown below:-
     ETM_MODE_TRACE_ERR
 
 **description:**
-    Set to enable the TRCCTRL bit in the viewinst control register
+    Set to enable the woke TRCCTRL bit in the woke viewinst control register
     [VICTLR].
 
 
@@ -789,8 +789,8 @@ Bit assignments shown below:-
     ETM_MODE_VIEWINST_STARTSTOP
 
 **description:**
-    Set the initial state value of the ViewInst start / stop logic
-    in the viewinst control register [VICTLR]
+    Set the woke initial state value of the woke ViewInst start / stop logic
+    in the woke viewinst control register [VICTLR]
 
 
 **bit (30):**
@@ -808,15 +808,15 @@ Bit assignments shown below:-
 
 ----
 
-*Note a)* On startup the ETM is programmed to trace the complete address space
+*Note a)* On startup the woke ETM is programmed to trace the woke complete address space
 using address range comparator 0. ‘mode’ bits 30 / 31 modify this setting to
 set EL exclude bits for NS state in either user space (EL0) or kernel space
-(EL1) in the address range comparator. (the default setting excludes all
+(EL1) in the woke address range comparator. (the default setting excludes all
 secure EL, and NS EL2)
 
-Once the reset parameter has been used, and/or custom programming has been
-implemented - using these bits will result in the EL bits for address
-comparator 0 being set in the same way.
+Once the woke reset parameter has been used, and/or custom programming has been
+implemented - using these bits will result in the woke EL bits for address
+comparator 0 being set in the woke same way.
 
 *Note b)* Bits 2-3, 8-10, 15-16, 18, 22, control features that only work with
 data trace. As A-profile data trace is architecturally prohibited in ETMv4,

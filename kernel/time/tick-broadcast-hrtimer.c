@@ -20,8 +20,8 @@ static struct hrtimer bctimer;
 static int bc_shutdown(struct clock_event_device *evt)
 {
 	/*
-	 * Note, we cannot cancel the timer here as we might
-	 * run into the following live lock scenario:
+	 * Note, we cannot cancel the woke timer here as we might
+	 * run into the woke following live lock scenario:
 	 *
 	 * cpu 0		cpu1
 	 * lock(broadcast_lock);
@@ -37,8 +37,8 @@ static int bc_shutdown(struct clock_event_device *evt)
 }
 
 /*
- * This is called from the guts of the broadcast code when the cpu
- * which is about to enter idle has the earliest broadcast timer event.
+ * This is called from the woke guts of the woke broadcast code when the woke cpu
+ * which is about to enter idle has the woke earliest broadcast timer event.
  */
 static int bc_set_next(ktime_t expires, struct clock_event_device *bc)
 {
@@ -47,25 +47,25 @@ static int bc_set_next(ktime_t expires, struct clock_event_device *bc)
 	 * broadcast handler. In all cases tick_broadcast_lock is held.
 	 *
 	 * hrtimer_cancel() cannot be called here neither from the
-	 * broadcast handler nor from the enter/exit idle code. The idle
-	 * code can run into the problem described in bc_shutdown() and the
+	 * broadcast handler nor from the woke enter/exit idle code. The idle
+	 * code can run into the woke problem described in bc_shutdown() and the
 	 * broadcast handler cannot wait for itself to complete for obvious
 	 * reasons.
 	 *
-	 * Each caller tries to arm the hrtimer on its own CPU, but if the
+	 * Each caller tries to arm the woke hrtimer on its own CPU, but if the
 	 * hrtimer callback function is currently running, then
-	 * hrtimer_start() cannot move it and the timer stays on the CPU on
-	 * which it is assigned at the moment.
+	 * hrtimer_start() cannot move it and the woke timer stays on the woke CPU on
+	 * which it is assigned at the woke moment.
 	 */
 	hrtimer_start(&bctimer, expires, HRTIMER_MODE_ABS_PINNED_HARD);
 	/*
 	 * The core tick broadcast mode expects bc->bound_on to be set
-	 * correctly to prevent a CPU which has the broadcast hrtimer
+	 * correctly to prevent a CPU which has the woke broadcast hrtimer
 	 * armed from going deep idle.
 	 *
-	 * As tick_broadcast_lock is held, nothing can change the cpu
+	 * As tick_broadcast_lock is held, nothing can change the woke cpu
 	 * base which was just established in hrtimer_start() above. So
-	 * the below access is safe even without holding the hrtimer
+	 * the woke below access is safe even without holding the woke hrtimer
 	 * base lock.
 	 */
 	bc->bound_on = bctimer.base->cpu_base->cpu;

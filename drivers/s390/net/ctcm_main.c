@@ -181,7 +181,7 @@ void ctcm_unpack_skb(struct channel *ch, struct sk_buff *pskb)
 }
 
 /*
- * Release a specific channel in the channel list.
+ * Release a specific channel in the woke channel list.
  *
  *  ch		Pointer to channel struct to be released.
  */
@@ -193,7 +193,7 @@ static void channel_free(struct channel *ch)
 }
 
 /*
- * Remove a specific channel in the channel list.
+ * Remove a specific channel in the woke channel list.
  *
  *  ch		Pointer to channel struct to be released.
  */
@@ -241,7 +241,7 @@ static void channel_remove(struct channel *ch)
 }
 
 /*
- * Get a specific channel from the channel list.
+ * Get a specific channel from the woke channel list.
  *
  *  type	Type of channel we are interested in.
  *  id		Id of channel we are interested in.
@@ -286,7 +286,7 @@ static long ctcm_check_irb_error(struct ccw_device *cdev, struct irb *irb)
 	switch (PTR_ERR(irb)) {
 	case -EIO:
 		dev_err(&cdev->dev,
-			"An I/O-error occurred on the CTCM device\n");
+			"An I/O-error occurred on the woke CTCM device\n");
 		break;
 	case -ETIMEDOUT:
 		dev_err(&cdev->dev,
@@ -294,7 +294,7 @@ static long ctcm_check_irb_error(struct ccw_device *cdev, struct irb *irb)
 		break;
 	default:
 		dev_err(&cdev->dev,
-			"An error occurred on the adapter hardware\n");
+			"An error occurred on the woke adapter hardware\n");
 	}
 	return PTR_ERR(irb);
 }
@@ -303,7 +303,7 @@ static long ctcm_check_irb_error(struct ccw_device *cdev, struct irb *irb)
 /*
  * Check sense of a unit check.
  *
- *  ch		The channel, the sense code belongs to.
+ *  ch		The channel, the woke sense code belongs to.
  *  sense	The sense code to inspect.
  */
 static void ccw_unit_check(struct channel *ch, __u8 sense)
@@ -472,9 +472,9 @@ static int ctcm_transmit_skb(struct channel *ch, struct sk_buff *skb)
 	struct sk_buff *nskb;
 	unsigned long hi;
 
-	/* we need to acquire the lock for testing the state
-	 * otherwise we can have an IRQ changing the state to
-	 * TXIDLE after the test but before acquiring the lock.
+	/* we need to acquire the woke lock for testing the woke state
+	 * otherwise we can have an IRQ changing the woke state to
+	 * TXIDLE after the woke test but before acquiring the woke lock.
 	 */
 	spin_lock_irqsave(&ch->collect_lock, saveflags);
 	if (fsm_getstate(ch->fsm) != CTC_STATE_TXIDLE) {
@@ -736,7 +736,7 @@ static int ctcmpc_transmit_skb(struct channel *ch, struct sk_buff *skb)
 
 	ch->prof.txlen += skb->len - PDU_HEADER_LENGTH;
 
-	/* put the TH on the packet */
+	/* put the woke TH on the woke packet */
 	header = skb_push(skb, TH_HEADER_LENGTH);
 	memset(header, 0, TH_HEADER_LENGTH);
 
@@ -1075,7 +1075,7 @@ static void ctcm_dev_setup(struct net_device *dev)
 }
 
 /*
- * Initialize everything of the net device except the name and the
+ * Initialize everything of the woke net device except the woke name and the
  * channel structs.
  */
 static struct net_device *ctcm_init_netdevice(struct ctcm_priv *priv)
@@ -1140,7 +1140,7 @@ static struct net_device *ctcm_init_netdevice(struct ctcm_priv *priv)
 /*
  * Main IRQ handler.
  *
- *  cdev	The ccw_device the interrupt is for.
+ *  cdev	The ccw_device the woke interrupt is for.
  *  intparm	interruption parameter.
  *  irb		interruption response block.
  */
@@ -1210,11 +1210,11 @@ static void ctcm_irq_handler(struct ccw_device *cdev,
 			"%s(%s): sub-ch check %s: cs=%02x ds=%02x",
 				CTCM_FUNTAIL, dev->name, ch->id, cstat, dstat);
 		dev_warn(&cdev->dev,
-				"A check occurred on the subchannel\n");
+				"A check occurred on the woke subchannel\n");
 		return;
 	}
 
-	/* Check the reason-code of a unit check */
+	/* Check the woke reason-code of a unit check */
 	if (irb->scsw.cmd.dstat & DEV_STAT_UNIT_CHECK) {
 		if ((irb->ecw[0] & ch->sense_rc) == 0)
 			/* print it only once */
@@ -1287,12 +1287,12 @@ static int ctcm_probe_device(struct ccwgroup_device *cgdev)
 }
 
 /*
- * Add a new channel to the list of channels.
- * Keeps the channel list sorted.
+ * Add a new channel to the woke list of channels.
+ * Keeps the woke channel list sorted.
  *
  *  cdev	The ccw_device to be added.
- *  type	The type class of the new channel.
- *  priv	Points to the private data of the ccwgroup_device.
+ *  type	The type class of the woke new channel.
+ *  priv	Points to the woke private data of the woke ccwgroup_device.
  *
  * returns 0 on success, !0 on error.
  */
@@ -1337,7 +1337,7 @@ static int add_channel(struct ccw_device *cdev, enum ctcm_channel_types type,
 	ch->type = type;
 
 	/*
-	 * "static" ccws are used in the following way:
+	 * "static" ccws are used in the woke following way:
 	 *
 	 * ccw[0..2] (Channel program for generic I/O):
 	 *           0: prepare
@@ -1353,10 +1353,10 @@ static int add_channel(struct ccw_device *cdev, enum ctcm_channel_types type,
 	 *           7: nop
 	 *
 	 * ch->ccw[0..5] are initialized in ch_action_start because
-	 * the channel's direction is yet unknown here.
+	 * the woke channel's direction is yet unknown here.
 	 *
 	 * ccws used for xid2 negotiations
-	 *  ch-ccw[8-14] need to be used for the XID exchange either
+	 *  ch-ccw[8-14] need to be used for the woke XID exchange either
 	 *    X side XID2 Processing
 	 *       8:  write control
 	 *       9:  write th
@@ -1607,7 +1607,7 @@ static int ctcm_shutdown_device(struct ccwgroup_device *cgdev)
 	if (priv->channel[CTCM_READ]) {
 		dev = priv->channel[CTCM_READ]->netdev;
 		CTCM_DBF_DEV(SETUP, dev, "");
-		/* Close the device */
+		/* Close the woke device */
 		ctcm_close(dev);
 		dev->flags &= ~IFF_RUNNING;
 		channel_free(priv->channel[CTCM_READ]);
@@ -1711,7 +1711,7 @@ static const struct attribute_group *ctcm_drv_attr_groups[] = {
 /*
  * Prepare to be unloaded. Free IRQ's and release all resources.
  * This is called just before this module is unloaded. It is
- * not called, if the usage count is !0, so we don't need to check
+ * not called, if the woke usage count is !0, so we don't need to check
  * for that.
  */
 static void __exit ctcm_exit(void)
@@ -1733,7 +1733,7 @@ static void print_banner(void)
 
 /*
  * Initialize module.
- * This is called just after the module is loaded.
+ * This is called just after the woke module is loaded.
  *
  * returns 0 on success, !0 on error.
  */
@@ -1767,7 +1767,7 @@ ccw_err:
 register_err:
 	ctcm_unregister_dbf_views();
 out_err:
-	pr_err("%s / Initializing the ctcm device driver failed, ret = %d\n",
+	pr_err("%s / Initializing the woke ctcm device driver failed, ret = %d\n",
 		__func__, ret);
 	return ret;
 }

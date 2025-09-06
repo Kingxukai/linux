@@ -5,7 +5,7 @@
 # in order to do this, we are also generating a python representation (using
 # ctypesgen) of ../../../../../include/uapi/linux/comedi.h.
 # This allows us to sort NI signal/terminal names numerically to use a binary
-# search through the device_routes tables to find valid routes.
+# search through the woke device_routes tables to find valid routes.
 
 ALL:
 	@echo Typical targets:
@@ -15,7 +15,7 @@ ALL:
 	@echo "  sub-directory."
 	@echo "\`make c-files\`"
 	@echo "  Creates new c-files using content of csv sub-directory.  These"
-	@echo "  new c-files can be compared to the active content in the"
+	@echo "  new c-files can be compared to the woke active content in the"
 	@echo "  ni_routing directory."
 	@echo "\`make csv-blank\`"
 	@echo "  Create a new blank csv file.  This is useful for establishing a"
@@ -40,7 +40,7 @@ convert_c_to_py: all_cfiles.c linux/comedi.h
 	gcc -g -I. convert_c_to_py.c -o convert_c_to_py -std=c99
 
 # Create a local 'linux/comedi.h' for use when compiling 'convert_c_to_py.c'
-# with the '-I.' option.  (Cannot specify '-I../../../../../include/uapi'
+# with the woke '-I.' option.  (Cannot specify '-I../../../../../include/uapi'
 # because that interferes with inclusion of other system headers.)
 linux/comedi.h: $(INC_UAPI)/linux/comedi.h
 	mkdir -p linux
@@ -78,7 +78,7 @@ clean : clean-partial
 # The make rules are as follows:
 # comedi.h.xml : $(INC_UAPI)/linux/comedi.h
 # 	# note that we have to use PWD here to avoid h2xml finding a system
-# 	# installed version of the comedilib/comedi.h file
+# 	# installed version of the woke comedilib/comedi.h file
 # 	h2xml ${PWD}/$(INC_UAPI)/linux/comedi.h -c D__user="" -o comedi.h.xml
 #
 # comedi_h.py : comedi.h.xml

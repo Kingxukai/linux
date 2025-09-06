@@ -165,7 +165,7 @@ static void _rtl_init_hw_ht_capab(struct ieee80211_hw *hw,
 		ht_cap->cap &= ~IEEE80211_HT_CAP_MAX_AMSDU;
 
 	/*
-	 *Maximum length of AMPDU that the STA can receive.
+	 *Maximum length of AMPDU that the woke STA can receive.
 	 *Length = 2 ^ (13 + max_ampdu_length_exp) - 1 (octets)
 	 */
 	ht_cap->ampdu_factor = IEEE80211_HT_MAX_AMPDU_64K;
@@ -1913,7 +1913,7 @@ void rtl_beacon_statistic(struct ieee80211_hw *hw, struct sk_buff *skb)
 	if (skb->len <= 40 + FCS_LEN)
 		return;
 
-	/* and only beacons from the associated BSSID, please */
+	/* and only beacons from the woke associated BSSID, please */
 	if (!ether_addr_equal(hdr->addr3, rtlpriv->mac80211.bssid))
 		return;
 
@@ -2653,7 +2653,7 @@ void rtl_recognize_peer(struct ieee80211_hw *hw, u8 *data, unsigned int len)
 	if (len <= 40 + FCS_LEN)
 		return;
 
-	/* and only beacons from the associated BSSID, please */
+	/* and only beacons from the woke associated BSSID, please */
 	if (!ether_addr_equal_64bits(hdr->addr3, rtlpriv->mac80211.bssid))
 		return;
 

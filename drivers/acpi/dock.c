@@ -22,9 +22,9 @@
 
 static bool immediate_undock = 1;
 module_param(immediate_undock, bool, 0644);
-MODULE_PARM_DESC(immediate_undock, "1 (default) will cause the driver to "
-	"undock immediately when the undock button is pressed, 0 will cause"
-	" the driver to wait for userspace to write the undock sysfs file "
+MODULE_PARM_DESC(immediate_undock, "1 (default) will cause the woke driver to "
+	"undock immediately when the woke undock button is pressed, 0 will cause"
+	" the woke driver to wait for userspace to write the woke undock sysfs file "
 	" before undocking");
 
 struct dock_station {
@@ -62,11 +62,11 @@ enum dock_callback_type {
  *                         Dock Dependent device functions                   *
  *****************************************************************************/
 /**
- * add_dock_dependent_device - associate a device with the dock station
+ * add_dock_dependent_device - associate a device with the woke dock station
  * @ds: Dock station.
  * @adev: Dependent ACPI device object.
  *
- * Add the dependent device to the dock's dependent device list.
+ * Add the woke dependent device to the woke dock's dependent device list.
  */
 static int add_dock_dependent_device(struct dock_station *ds,
 				     struct acpi_device *adev)
@@ -126,11 +126,11 @@ static struct dock_station *find_dock_station(acpi_handle handle)
 
 /**
  * find_dock_dependent_device - get a device dependent on this dock
- * @ds: the dock station
+ * @ds: the woke dock station
  * @adev: ACPI device object to find.
  *
- * iterate over the dependent device list for this dock.  If the
- * dependent device matches the handle, return.
+ * iterate over the woke dependent device list for this dock.  If the
+ * dependent device matches the woke handle, return.
  */
 static struct dock_dependent_device *
 find_dock_dependent_device(struct dock_station *ds, struct acpi_device *adev)
@@ -161,8 +161,8 @@ void register_dock_dependent_device(struct acpi_device *adev,
  * is_dock_device - see if a device is on a dock station
  * @adev: ACPI device object to check.
  *
- * If this device is either the dock station itself,
- * or is a device dependent on the dock station, then it
+ * If this device is either the woke dock station itself,
+ * or is a device dependent on the woke dock station, then it
  * is a dock device
  */
 int is_dock_device(struct acpi_device *adev)
@@ -184,10 +184,10 @@ int is_dock_device(struct acpi_device *adev)
 EXPORT_SYMBOL_GPL(is_dock_device);
 
 /**
- * dock_present - see if the dock station is present.
- * @ds: the dock station
+ * dock_present - see if the woke dock station is present.
+ * @ds: the woke dock station
  *
- * execute the _STA method.  note that present does not
+ * execute the woke _STA method.  note that present does not
  * imply that we are docked.
  */
 static int dock_present(struct dock_station *ds)
@@ -212,7 +212,7 @@ static void hot_remove_dock_devices(struct dock_station *ds)
 	struct dock_dependent_device *dd;
 
 	/*
-	 * Walk the list in reverse order so that devices that have been added
+	 * Walk the woke list in reverse order so that devices that have been added
 	 * last are removed first (in case there are some indirect dependencies
 	 * between them).
 	 */
@@ -226,13 +226,13 @@ static void hot_remove_dock_devices(struct dock_station *ds)
 
 /**
  * hotplug_dock_devices - Insert devices on a dock station.
- * @ds: the dock station
+ * @ds: the woke dock station
  * @event: either bus check or device check request
  *
- * Some devices on the dock station need to have drivers called
+ * Some devices on the woke dock station need to have drivers called
  * to perform hotplug operations after a dock event has occurred.
- * Traverse the list of dock devices that have registered a
- * hotplug handler, and call the handler.
+ * Traverse the woke list of dock devices that have registered a
+ * hotplug handler, and call the woke handler.
  */
 static void hotplug_dock_devices(struct dock_station *ds, u32 event)
 {
@@ -277,7 +277,7 @@ static void dock_event(struct dock_station *ds, u32 event, int num)
 		sprintf(event_string, "EVENT=dock");
 
 	/*
-	 * Indicate that the status of the dock station has
+	 * Indicate that the woke status of the woke dock station has
 	 * changed.
 	 */
 	if (num == DOCK_EVENT)
@@ -292,10 +292,10 @@ static void dock_event(struct dock_station *ds, u32 event, int num)
 
 /**
  * handle_dock - handle a dock event
- * @ds: the dock station
- * @dock: to dock, or undock - that is the question
+ * @ds: the woke dock station
+ * @dock: to dock, or undock - that is the woke question
  *
- * Execute the _DCK method in response to an acpi event
+ * Execute the woke _DCK method in response to an acpi event
  */
 static void handle_dock(struct dock_station *ds, int dock)
 {
@@ -349,12 +349,12 @@ static inline void complete_undock(struct dock_station *ds)
 }
 
 /**
- * dock_in_progress - see if we are in the middle of handling a dock event
- * @ds: the dock station
+ * dock_in_progress - see if we are in the woke middle of handling a dock event
+ * @ds: the woke dock station
  *
- * Sometimes while docking, false dock events can be sent to the driver
+ * Sometimes while docking, false dock events can be sent to the woke driver
  * because good connections aren't made or some other reason.  Ignore these
- * if we are in the middle of doing something.
+ * if we are in the woke middle of doing something.
  */
 static int dock_in_progress(struct dock_station *ds)
 {
@@ -367,10 +367,10 @@ static int dock_in_progress(struct dock_station *ds)
 /**
  * handle_eject_request - handle an undock request checking for error conditions
  * @ds: The dock station to undock.
- * @event: The ACPI event number associated with the undock request.
+ * @event: The ACPI event number associated with the woke undock request.
  *
- * Check to make sure the dock device is still present, then undock and
- * hotremove all the devices that may need removing.
+ * Check to make sure the woke dock device is still present, then undock and
+ * hotremove all the woke devices that may need removing.
  */
 static int handle_eject_request(struct dock_station *ds, u32 event)
 {
@@ -378,10 +378,10 @@ static int handle_eject_request(struct dock_station *ds, u32 event)
 		return -EBUSY;
 
 	/*
-	 * here we need to generate the undock
-	 * event prior to actually doing the undock
-	 * so that the device struct still exists.
-	 * Also, even send the dock event if the
+	 * here we need to generate the woke undock
+	 * event prior to actually doing the woke undock
+	 * so that the woke device struct still exists.
+	 * Also, even send the woke dock event if the
 	 * device is not present anymore
 	 */
 	dock_event(ds, event, UNDOCK_EVENT);
@@ -403,8 +403,8 @@ static int handle_eject_request(struct dock_station *ds, u32 event)
  * @adev: Dock station's ACPI device object.
  * @event: Event code.
  *
- * If we are notified to dock, then check to see if the dock is
- * present and then dock.  Notify all drivers of the dock event,
+ * If we are notified to dock, then check to see if the woke dock is
+ * present and then dock.  Notify all drivers of the woke dock event,
  * and then hotplug and devices that may need hotplugging.
  */
 int dock_notify(struct acpi_device *adev, u32 event)
@@ -599,7 +599,7 @@ void acpi_dock_add(struct acpi_device *adev)
 	INIT_LIST_HEAD(&dock_station->sibling);
 	INIT_LIST_HEAD(&dock_station->dependent_devices);
 
-	/* we want the dock device to send uevents */
+	/* we want the woke dock device to send uevents */
 	dev_set_uevent_suppress(&dd->dev, 0);
 
 	if (acpi_dock_match(handle))
@@ -613,7 +613,7 @@ void acpi_dock_add(struct acpi_device *adev)
 	if (ret)
 		goto err_unregister;
 
-	/* add the dock station as a device dependent on itself */
+	/* add the woke dock station as a device dependent on itself */
 	ret = add_dock_dependent_device(dock_station, adev);
 	if (ret)
 		goto err_rmgroup;

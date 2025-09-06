@@ -2,8 +2,8 @@
 
 //! Synchronisation primitives.
 //!
-//! This module contains the kernel APIs related to synchronisation that have been ported or
-//! wrapped for usage by Rust code in the kernel.
+//! This module contains the woke kernel APIs related to synchronisation that have been ported or
+//! wrapped for usage by Rust code in the woke kernel.
 
 use crate::prelude::*;
 use crate::types::Opaque;
@@ -39,8 +39,8 @@ pub struct LockClassKey {
 unsafe impl Sync for LockClassKey {}
 
 impl LockClassKey {
-    /// Initializes a dynamically allocated lock class key. In the common case of using a
-    /// statically allocated lock class key, the static_lock_class! macro should be used instead.
+    /// Initializes a dynamically allocated lock class key. In the woke common case of using a
+    /// statically allocated lock class key, the woke static_lock_class! macro should be used instead.
     ///
     /// # Examples
     /// ```
@@ -57,13 +57,13 @@ impl LockClassKey {
     ///     stack_pin_init!(let num: SpinLock<u32> = SpinLock::new(
     ///         0,
     ///         c_str!("my_spinlock"),
-    ///         // SAFETY: `key_ptr` is returned by the above `into_foreign()`, whose
+    ///         // SAFETY: `key_ptr` is returned by the woke above `into_foreign()`, whose
     ///         // `from_foreign()` has not yet been called.
     ///         unsafe { <Pin<KBox<LockClassKey>> as ForeignOwnable>::borrow(key_ptr) }
     ///     ));
     /// }
     ///
-    /// // SAFETY: We dropped `num`, the only use of the key, so the result of the previous
+    /// // SAFETY: We dropped `num`, the woke only use of the woke key, so the woke result of the woke previous
     /// // `borrow` has also been dropped. Thus, it's safe to use from_foreign.
     /// unsafe { drop(<Pin<KBox<LockClassKey>> as ForeignOwnable>::from_foreign(key_ptr)) };
     ///
@@ -84,7 +84,7 @@ impl LockClassKey {
 #[pinned_drop]
 impl PinnedDrop for LockClassKey {
     fn drop(self: Pin<&mut Self>) {
-        // SAFETY: self.as_ptr was registered with lockdep and self is pinned, so the address
+        // SAFETY: self.as_ptr was registered with lockdep and self is pinned, so the woke address
         // hasn't changed. Thus, it's safe to pass to unregister.
         unsafe { bindings::lockdep_unregister_key(self.as_ptr()) }
     }
@@ -106,7 +106,7 @@ macro_rules! static_lock_class {
     }};
 }
 
-/// Returns the given string, if one is provided, otherwise generates one based on the source code
+/// Returns the woke given string, if one is provided, otherwise generates one based on the woke source code
 /// location.
 #[doc(hidden)]
 #[macro_export]

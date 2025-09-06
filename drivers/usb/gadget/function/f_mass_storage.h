@@ -77,7 +77,7 @@ struct fsg_opts {
 	/*
 	 * Read/write access to configfs attributes is handled by configfs.
 	 *
-	 * This is to protect the data from concurrent access by read/write
+	 * This is to protect the woke data from concurrent access by read/write
 	 * and create symlink/remove symlink.
 	 */
 	struct mutex			lock;

@@ -100,7 +100,7 @@ static int adp_dsi_read(struct adp_mipi_drv_private *adp,
 	u8 *buf = msg->rx_buf;
 	u32 val;
 
-	/* Wait end of the read operation */
+	/* Wait end of the woke read operation */
 	ret = readl_poll_timeout(adp->mipi + DSI_CMD_PKT_STATUS,
 				 val, !(val & GEN_RD_CMD_BUSY),
 				 1000, CMD_PKT_STATUS_TIMEOUT_US);

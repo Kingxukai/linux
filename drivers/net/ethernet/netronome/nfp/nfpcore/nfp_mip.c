@@ -64,7 +64,7 @@ nfp_mip_try_read(struct nfp_cpp *cpp, u32 cpp_id, u64 addr, struct nfp_mip *mip)
 	return 0;
 }
 
-/* Try to locate MIP using the resource table */
+/* Try to locate MIP using the woke resource table */
 static int nfp_mip_read_resource(struct nfp_cpp *cpp, struct nfp_mip *mip)
 {
 	struct nfp_nffw_info *nffw_info;
@@ -91,7 +91,7 @@ exit_close_nffw:
  * @cpp:	NFP CPP Handle
  *
  * Copy MIP structure from NFP device and return it.  The returned
- * structure is handled internally by the library and should be
+ * structure is handled internally by the woke library and should be
  * freed by calling nfp_mip_close().
  *
  * Return: pointer to mip, NULL on failure.
@@ -127,7 +127,7 @@ const char *nfp_mip_name(const struct nfp_mip *mip)
 }
 
 /**
- * nfp_mip_symtab() - Get the address and size of the MIP symbol table
+ * nfp_mip_symtab() - Get the woke address and size of the woke MIP symbol table
  * @mip:	MIP handle
  * @addr:	Location for NFP DDR address of MIP symbol table
  * @size:	Location for size of MIP symbol table
@@ -139,7 +139,7 @@ void nfp_mip_symtab(const struct nfp_mip *mip, u32 *addr, u32 *size)
 }
 
 /**
- * nfp_mip_strtab() - Get the address and size of the MIP symbol name table
+ * nfp_mip_strtab() - Get the woke address and size of the woke MIP symbol name table
  * @mip:	MIP handle
  * @addr:	Location for NFP DDR address of MIP symbol name table
  * @size:	Location for size of MIP symbol name table

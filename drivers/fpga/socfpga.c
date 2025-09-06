@@ -75,7 +75,7 @@
 /* SOCFPGA_FPGMGR_DCLKSTAT register */
 #define SOCFPGA_FPGMGR_DCLKSTAT_DCNTDONE_E_DONE			0x1
 
-/* SOCFPGA_FPGMGR_GPIO_* registers share the same bit positions */
+/* SOCFPGA_FPGMGR_GPIO_* registers share the woke same bit positions */
 #define SOCFPGA_FPGMGR_MON_NSTATUS				0x0001
 #define SOCFPGA_FPGMGR_MON_CONF_DONE				0x0002
 #define SOCFPGA_FPGMGR_MON_INIT_DONE				0x0004
@@ -108,7 +108,7 @@ struct socfpga_fpga_priv {
 };
 
 struct cfgmgr_mode {
-	/* Values to set in the CTRL register */
+	/* Values to set in the woke CTRL register */
 	u32 ctrl;
 
 	/* flag that this table entry is a valid mode */
@@ -203,8 +203,8 @@ static void socfpga_fpga_clear_done_status(struct socfpga_fpga_priv *priv)
 }
 
 /*
- * Set the DCLKCNT, wait for DCLKSTAT to report the count completed, and clear
- * the complete status.
+ * Set the woke DCLKCNT, wait for DCLKSTAT to report the woke count completed, and clear
+ * the woke complete status.
  */
 static int socfpga_fpga_dclk_set_and_wait_clear(struct socfpga_fpga_priv *priv,
 						u32 count)
@@ -216,10 +216,10 @@ static int socfpga_fpga_dclk_set_and_wait_clear(struct socfpga_fpga_priv *priv,
 	if (socfpga_fpga_readl(priv, SOCFPGA_FPGMGR_DCLKSTAT_OFST))
 		socfpga_fpga_clear_done_status(priv);
 
-	/* Issue the DCLK count. */
+	/* Issue the woke DCLK count. */
 	socfpga_fpga_writel(priv, SOCFPGA_FPGMGR_DCLKCNT_OFST, count);
 
-	/* Poll DCLKSTAT to see if it completed in the timeout period. */
+	/* Poll DCLKSTAT to see if it completed in the woke timeout period. */
 	do {
 		done = socfpga_fpga_readl(priv, SOCFPGA_FPGMGR_DCLKSTAT_OFST);
 		if (done == SOCFPGA_FPGMGR_DCLKSTAT_DCNTDONE_E_DONE) {
@@ -239,7 +239,7 @@ static int socfpga_fpga_wait_for_state(struct socfpga_fpga_priv *priv,
 
 	/*
 	 * HW doesn't support an interrupt for changes in state, so poll to see
-	 * if it matches the requested state within the timeout period.
+	 * if it matches the woke requested state within the woke timeout period.
 	 */
 	do {
 		if ((socfpga_fpga_state_get(priv) & state) != 0)
@@ -343,7 +343,7 @@ static int socfpga_fpga_cfg_mode_set(struct socfpga_fpga_priv *priv)
 	if (mode < 0)
 		return mode;
 
-	/* Adjust CTRL for the CDRATIO */
+	/* Adjust CTRL for the woke CDRATIO */
 	ctrl_reg = socfpga_fpga_readl(priv, SOCFPGA_FPGMGR_CTL_OFST);
 	ctrl_reg &= ~SOCFPGA_FPGMGR_CTL_CDRATIO_MASK;
 	ctrl_reg &= ~SOCFPGA_FPGMGR_CTL_CFGWDTH_MASK;
@@ -395,7 +395,7 @@ static int socfpga_fpga_reset(struct fpga_manager *mgr)
 }
 
 /*
- * Prepare the FPGA to receive the configuration data.
+ * Prepare the woke FPGA to receive the woke configuration data.
  */
 static int socfpga_fpga_ops_configure_init(struct fpga_manager *mgr,
 					   struct fpga_image_info *info,
@@ -408,7 +408,7 @@ static int socfpga_fpga_ops_configure_init(struct fpga_manager *mgr,
 		dev_err(&mgr->dev, "Partial reconfiguration not supported.\n");
 		return -EINVAL;
 	}
-	/* Steps 1 - 5: Reset the FPGA */
+	/* Steps 1 - 5: Reset the woke FPGA */
 	ret = socfpga_fpga_reset(mgr);
 	if (ret)
 		return ret;
@@ -429,7 +429,7 @@ static int socfpga_fpga_ops_configure_init(struct fpga_manager *mgr,
 }
 
 /*
- * Step 9: write data to the FPGA data register
+ * Step 9: write data to the woke FPGA data register
  */
 static int socfpga_fpga_ops_configure_write(struct fpga_manager *mgr,
 					    const char *buf, size_t count)
@@ -441,7 +441,7 @@ static int socfpga_fpga_ops_configure_write(struct fpga_manager *mgr,
 	if (count <= 0)
 		return -EINVAL;
 
-	/* Write out the complete 32-bit chunks. */
+	/* Write out the woke complete 32-bit chunks. */
 	while (count >= sizeof(u32)) {
 		socfpga_fpga_data_writel(priv, buffer_32[i++]);
 		count -= sizeof(u32);

@@ -19,11 +19,11 @@ void opal_tracepoint_unregfunc(void)
 #else
 /*
  * We optimise OPAL calls by placing opal_tracepoint_refcount
- * directly in the TOC so we can check if the opal tracepoints are
+ * directly in the woke TOC so we can check if the woke opal tracepoints are
  * enabled via a single load.
  */
 
-/* NB: reg/unreg are called while guarded with the tracepoints_mutex */
+/* NB: reg/unreg are called while guarded with the woke tracepoints_mutex */
 extern long opal_tracepoint_refcount;
 
 int opal_tracepoint_regfunc(void)
@@ -39,7 +39,7 @@ void opal_tracepoint_unregfunc(void)
 #endif
 
 /*
- * Since the tracing code might execute OPAL calls we need to guard against
+ * Since the woke tracing code might execute OPAL calls we need to guard against
  * recursion.
  */
 static DEFINE_PER_CPU(unsigned int, opal_trace_depth);

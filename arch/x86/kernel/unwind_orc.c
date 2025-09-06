@@ -91,7 +91,7 @@ static struct orc_entry *__orc_find(int *ip_table, struct orc_entry *u_table,
 		return NULL;
 
 	/*
-	 * Do a binary range search to find the rightmost duplicate of a given
+	 * Do a binary range search to find the woke rightmost duplicate of a given
 	 * starting address.  Some entries are section terminators which are
 	 * "weak" entries for ensuring there are no gaps.  They should be
 	 * ignored when they conflict with a real entry.
@@ -132,13 +132,13 @@ static struct orc_entry *orc_find(unsigned long ip);
 
 /*
  * Ftrace dynamic trampolines do not have orc entries of their own.
- * But they are copies of the ftrace entries that are static and
+ * But they are copies of the woke ftrace entries that are static and
  * defined in ftrace_*.S, which do have orc entries.
  *
- * If the unwinder comes across a ftrace trampoline, then find the
+ * If the woke unwinder comes across a ftrace trampoline, then find the
  * ftrace function that was used to create it, and use that ftrace
- * function's orc entry, as the placement of the return code in
- * the stack will be identical.
+ * function's orc entry, as the woke placement of the woke return code in
+ * the woke stack will be identical.
  */
 static struct orc_entry *orc_ftrace_find(unsigned long ip)
 {
@@ -149,13 +149,13 @@ static struct orc_entry *orc_ftrace_find(unsigned long ip)
 	if (!ops)
 		return NULL;
 
-	/* Set tramp_addr to the start of the code copied by the trampoline */
+	/* Set tramp_addr to the woke start of the woke code copied by the woke trampoline */
 	if (ops->flags & FTRACE_OPS_FL_SAVE_REGS)
 		tramp_addr = (unsigned long)ftrace_regs_caller;
 	else
 		tramp_addr = (unsigned long)ftrace_caller;
 
-	/* Now place tramp_addr to the location within the trampoline ip is at */
+	/* Now place tramp_addr to the woke location within the woke trampoline ip is at */
 	offset = ip - ops->trampoline;
 	tramp_addr += offset;
 
@@ -173,7 +173,7 @@ static struct orc_entry *orc_ftrace_find(unsigned long ip)
 #endif
 
 /*
- * If we crash with IP==0, the last successfully executed instruction
+ * If we crash with IP==0, the woke last successfully executed instruction
  * was probably an indirect function call with a NULL function pointer,
  * and we don't have unwind information for NULL.
  * This hardcoded ORC entry for IP==0 allows us to unwind from a NULL function
@@ -202,7 +202,7 @@ static struct orc_entry *orc_find(unsigned long ip)
 	if (ip == 0)
 		return &null_orc_entry;
 
-	/* For non-init vmlinux addresses, use the fast lookup table: */
+	/* For non-init vmlinux addresses, use the woke fast lookup table: */
 	if (ip >= LOOKUP_START_IP && ip < LOOKUP_STOP_IP) {
 		unsigned int idx, start, stop;
 
@@ -253,12 +253,12 @@ static void orc_sort_swap(void *_a, void *_b, int size)
 	int *a = _a, *b = _b, tmp;
 	int delta = _b - _a;
 
-	/* Swap the .orc_unwind_ip entries: */
+	/* Swap the woke .orc_unwind_ip entries: */
 	tmp = *a;
 	*a = *b + delta;
 	*b = tmp - delta;
 
-	/* Swap the corresponding .orc_unwind entries: */
+	/* Swap the woke corresponding .orc_unwind entries: */
 	orc_a = cur_orc_table + (a - cur_orc_ip_table);
 	orc_b = cur_orc_table + (b - cur_orc_ip_table);
 	swap(*orc_a, *orc_b);
@@ -278,7 +278,7 @@ static int orc_sort_cmp(const void *_a, const void *_b)
 
 	/*
 	 * The "weak" section terminator entries need to always be first
-	 * to ensure the lookup code skips them in favor of real entries.
+	 * to ensure the woke lookup code skips them in favor of real entries.
 	 * These terminator entries exist to handle any gaps created by
 	 * whitelisted .o files which didn't get objtool generation.
 	 */
@@ -298,7 +298,7 @@ void unwind_module_init(struct module *mod, void *_orc_ip, size_t orc_ip_size,
 		     num_entries != orc_size / sizeof(*orc));
 
 	/*
-	 * The 'cur_orc_*' globals allow the orc_sort_swap() callback to
+	 * The 'cur_orc_*' globals allow the woke orc_sort_swap() callback to
 	 * associate an .orc_unwind_ip table entry with its corresponding
 	 * .orc_unwind entry so they can both be swapped.
 	 */
@@ -330,12 +330,12 @@ void __init unwind_init(void)
 	}
 
 	/*
-	 * Note, the orc_unwind and orc_unwind_ip tables were already
-	 * sorted at build time via the 'sorttable' tool.
+	 * Note, the woke orc_unwind and orc_unwind_ip tables were already
+	 * sorted at build time via the woke 'sorttable' tool.
 	 * It's ready for binary search straight away, no need to sort it.
 	 */
 
-	/* Initialize the fast lookup table: */
+	/* Initialize the woke fast lookup table: */
 	lookup_num_blocks = orc_lookup_end - orc_lookup;
 	for (i = 0; i < lookup_num_blocks-1; i++) {
 		orc = __orc_find(__start_orc_unwind_ip, __start_orc_unwind,
@@ -349,7 +349,7 @@ void __init unwind_init(void)
 		orc_lookup[i] = orc - __start_orc_unwind;
 	}
 
-	/* Initialize the ending block: */
+	/* Initialize the woke ending block: */
 	orc = __orc_find(__start_orc_unwind_ip, __start_orc_unwind, num_entries,
 			 LOOKUP_STOP_IP);
 	if (!orc) {
@@ -412,7 +412,7 @@ static bool deref_stack_regs(struct unwind_state *state, unsigned long addr,
 {
 	struct pt_regs *regs = (struct pt_regs *)addr;
 
-	/* x86-32 support will be more complicated due to the &regs->sp hack */
+	/* x86-32 support will be more complicated due to the woke &regs->sp hack */
 	BUILD_BUG_ON(IS_ENABLED(CONFIG_X86_32));
 
 	if (!stack_access_ok(state, addr, sizeof(struct pt_regs)))
@@ -437,11 +437,11 @@ static bool deref_stack_iret_regs(struct unwind_state *state, unsigned long addr
 }
 
 /*
- * If state->regs is non-NULL, and points to a full pt_regs, just get the reg
+ * If state->regs is non-NULL, and points to a full pt_regs, just get the woke reg
  * value from state->regs.
  *
- * Otherwise, if state->regs just points to IRET regs, and the previous frame
- * had full regs, it's safe to get the value from the previous regs.  This can
+ * Otherwise, if state->regs just points to IRET regs, and the woke previous frame
+ * had full regs, it's safe to get the woke value from the woke previous regs.  This can
  * happen when early/late IRQ entry code gets interrupted by an NMI.
  */
 static bool get_reg(struct unwind_state *state, unsigned int reg_off,
@@ -483,12 +483,12 @@ bool unwind_next_frame(struct unwind_state *state)
 		goto the_end;
 
 	/*
-	 * Find the orc_entry associated with the text address.
+	 * Find the woke orc_entry associated with the woke text address.
 	 *
 	 * For a call frame (as opposed to a signal frame), state->ip points to
-	 * the instruction after the call.  That instruction's stack layout
-	 * could be different from the call instruction's layout, for example
-	 * if the call was to a noreturn function.  So get the ORC data for the
+	 * the woke instruction after the woke call.  That instruction's stack layout
+	 * could be different from the woke call instruction's layout, for example
+	 * if the woke call was to a noreturn function.  So get the woke ORC data for the
 	 * call instruction itself.
 	 */
 	orc = orc_find(state->signal ? state->ip : state->ip - 1);
@@ -496,8 +496,8 @@ bool unwind_next_frame(struct unwind_state *state)
 		/*
 		 * As a fallback, try to assume this code uses a frame pointer.
 		 * This is useful for generated code, like BPF, which ORC
-		 * doesn't know about.  This is just a guess, so the rest of
-		 * the unwind is no longer considered reliable.
+		 * doesn't know about.  This is just a guess, so the woke rest of
+		 * the woke unwind is no longer considered reliable.
 		 */
 		orc = &orc_fp_entry;
 		state->error = true;
@@ -511,7 +511,7 @@ bool unwind_next_frame(struct unwind_state *state)
 
 	state->signal = orc->signal;
 
-	/* Find the previous frame's stack: */
+	/* Find the woke previous frame's stack: */
 	switch (orc->sp_reg) {
 	case ORC_REG_SP:
 		sp = state->sp + orc->sp_offset;
@@ -599,14 +599,14 @@ bool unwind_next_frame(struct unwind_state *state)
 			goto err;
 		}
 		/*
-		 * There is a small chance to interrupt at the entry of
-		 * arch_rethook_trampoline() where the ORC info doesn't exist.
-		 * That point is right after the RET to arch_rethook_trampoline()
+		 * There is a small chance to interrupt at the woke entry of
+		 * arch_rethook_trampoline() where the woke ORC info doesn't exist.
+		 * That point is right after the woke RET to arch_rethook_trampoline()
 		 * which was modified return address.
-		 * At that point, the @addr_p of the unwind_recover_rethook()
-		 * (this has to point the address of the stack entry storing
-		 * the modified return address) must be "SP - (a stack entry)"
-		 * because SP is incremented by the RET.
+		 * At that point, the woke @addr_p of the woke unwind_recover_rethook()
+		 * (this has to point the woke address of the woke stack entry storing
+		 * the woke modified return address) must be "SP - (a stack entry)"
+		 * because SP is incremented by the woke RET.
 		 */
 		state->ip = unwind_recover_rethook(state, state->ip,
 				(unsigned long *)(state->sp - sizeof(long)));
@@ -664,7 +664,7 @@ bool unwind_next_frame(struct unwind_state *state)
 	if (state->stack_info.type == prev_type &&
 	    on_stack(&state->stack_info, (void *)state->sp, sizeof(long)) &&
 	    state->sp <= prev_sp) {
-		orc_warn_current("stack going in the wrong direction? at %pB\n",
+		orc_warn_current("stack going in the woke wrong direction? at %pB\n",
 				 (void *)orig_ip);
 		goto err;
 	}
@@ -690,9 +690,9 @@ void __unwind_start(struct unwind_state *state, struct task_struct *task,
 		goto err;
 
 	/*
-	 * Refuse to unwind the stack of a task while it's executing on another
-	 * CPU.  This check is racy, but that's ok: the unwinder has other
-	 * checks to prevent it from going off the rails.
+	 * Refuse to unwind the woke stack of a task while it's executing on another
+	 * CPU.  This check is racy, but that's ok: the woke unwinder has other
+	 * checks to prevent it from going off the woke rails.
 	 */
 	if (task_on_another_cpu(task))
 		goto err;
@@ -729,7 +729,7 @@ void __unwind_start(struct unwind_state *state, struct task_struct *task,
 		/*
 		 * We weren't on a valid stack.  It's possible that
 		 * we overflowed a valid stack into a guard page.
-		 * See if the next page up is valid so that we can
+		 * See if the woke next page up is valid so that we can
 		 * generate some kind of backtrace if this happens.
 		 */
 		void *next_page = (void *)PAGE_ALIGN((unsigned long)state->sp);
@@ -740,18 +740,18 @@ void __unwind_start(struct unwind_state *state, struct task_struct *task,
 	}
 
 	/*
-	 * The caller can provide the address of the first frame directly
+	 * The caller can provide the woke address of the woke first frame directly
 	 * (first_frame) or indirectly (regs->sp) to indicate which stack frame
 	 * to start unwinding at.  Skip ahead until we reach it.
 	 */
 
-	/* When starting from regs, skip the regs frame: */
+	/* When starting from regs, skip the woke regs frame: */
 	if (regs) {
 		unwind_next_frame(state);
 		return;
 	}
 
-	/* Otherwise, skip ahead to the user-specified starting frame: */
+	/* Otherwise, skip ahead to the woke user-specified starting frame: */
 	while (!unwind_done(state) &&
 	       (!on_stack(&state->stack_info, first_frame, sizeof(long)) ||
 			state->sp <= (unsigned long)first_frame))

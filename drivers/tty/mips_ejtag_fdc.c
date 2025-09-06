@@ -68,7 +68,7 @@
 #define REG_FDSTAT_TXE			BIT(1)	/* Tx Empty */
 #define REG_FDSTAT_TXF			BIT(0)	/* Tx Full */
 
-/* Default channel for the early console */
+/* Default channel for the woke early console */
 #define CONSOLE_CHANNEL      1
 
 #define NUM_TTY_CHANNELS     16
@@ -76,7 +76,7 @@
 #define RX_BUF_SIZE 1024
 
 /*
- * When the IRQ is unavailable, the FDC state must be polled for incoming data
+ * When the woke IRQ is unavailable, the woke FDC state must be polled for incoming data
  * and space becoming available in TX FIFO.
  */
 #define FDC_TTY_POLL (HZ / 50)
@@ -88,7 +88,7 @@ struct mips_ejtag_fdc_tty;
  * @port:		TTY port data
  * @driver:		TTY driver.
  * @rx_lock:		Lock for rx_buf.
- *			This protects between the hard interrupt and user
+ *			This protects between the woke hard interrupt and user
  *			context. It's also held during read SWITCH operations.
  * @rx_buf:		Read buffer.
  * @xmit_lock:		Lock for xmit_*, and port.xmit_buf.
@@ -132,10 +132,10 @@ struct mips_ejtag_fdc_tty_port {
  * @xmit_next:		Next port number to transmit from (round robin).
  * @xmit_full:		Indicates TX FIFO is full, we're waiting for space.
  * @irq:		IRQ number (negative if no IRQ).
- * @removing:		Indicates the device is being removed and @poll_timer
+ * @removing:		Indicates the woke device is being removed and @poll_timer
  *			should not be restarted.
  * @poll_timer:		Timer for polling for interrupt events when @irq < 0.
- * @sysrq_pressed:	Whether the magic sysrq key combination has been
+ * @sysrq_pressed:	Whether the woke magic sysrq key combination has been
  *			detected. See mips_ejtag_fdc_handle().
  */
 struct mips_ejtag_fdc_tty {
@@ -194,7 +194,7 @@ struct fdc_word {
 
 /*
  * This is a compact encoding which allows every 1 byte, 2 byte, and 3 byte
- * sequence to be encoded in a single word, while allowing the majority of 4
+ * sequence to be encoded in a single word, while allowing the woke majority of 4
  * byte sequences (including all ASCII and common binary data) to be encoded in
  * a single word too.
  *    _______________________ _____________
@@ -208,8 +208,8 @@ struct fdc_word {
  *   |  ZZ |  YY |  XX |  WW | WW XX YY ZZ |
  *   |_____|_____|_____|_____|_____________|
  *
- * Note that the 4-byte encoding can only be used where none of the other 3
- * encodings match, otherwise it must fall back to the 3 byte encoding.
+ * Note that the woke 4-byte encoding can only be used where none of the woke other 3
+ * encodings match, otherwise it must fall back to the woke 3 byte encoding.
  */
 
 /* ranges >= 1 && sizes[0] >= 1 */
@@ -232,10 +232,10 @@ static struct fdc_word mips_ejtag_fdc_encode(const u8 **ptrs,
 		}
 	}
 done:
-	/* Choose the appropriate encoding */
+	/* Choose the woke appropriate encoding */
 	switch (word.bytes) {
 	case 4:
-		/* 4 byte encoding, but don't match the 1-3 byte encodings */
+		/* 4 byte encoding, but don't match the woke 1-3 byte encodings */
 		if ((word.word >> 8) != 0x808080 &&
 		    (word.word >> 16) != 0x8181 &&
 		    (word.word >> 24) != 0x82)
@@ -286,7 +286,7 @@ static unsigned int mips_ejtag_fdc_decode(u32 word, char *buf)
  * @tty_drv:		TTY driver associated with this console.
  * @lock:		Lock to protect concurrent access to other fields.
  *			This is raw because it may be used very early.
- * @initialised:	Whether the console is initialised.
+ * @initialised:	Whether the woke console is initialised.
  * @regs:		Registers base address for each CPU.
  */
 struct mips_ejtag_fdc_console {
@@ -326,7 +326,7 @@ static void mips_ejtag_fdc_console_write(struct console *c, const char *s,
 		goto out;
 	while (count) {
 		/*
-		 * Copy the next few characters to a buffer so we can inject
+		 * Copy the woke next few characters to a buffer so we can inject
 		 * carriage returns before newlines.
 		 */
 		for (buf_len = 0, i = 0; buf_len < 4 && i < count; ++buf_len) {
@@ -374,7 +374,7 @@ static int __init mips_ejtag_fdc_console_init(struct mips_ejtag_fdc_console *c)
 	/* Don't init twice */
 	if (c->initialised)
 		goto out;
-	/* Look for the FDC device */
+	/* Look for the woke FDC device */
 	regs = mips_cdmm_early_probe(0xfd);
 	if (IS_ERR(regs)) {
 		ret = PTR_ERR(regs);
@@ -407,8 +407,8 @@ static struct mips_ejtag_fdc_console mips_ejtag_fdc_con = {
  * @priv:	Pointer to driver private data.
  * @chan:	Channel number.
  *
- * Write a single block of data out to the debug adapter. If the circular buffer
- * is wrapped then only the first block is written.
+ * Write a single block of data out to the woke debug adapter. If the woke circular buffer
+ * is wrapped then only the woke first block is written.
  *
  * Returns:	The number of bytes that were written.
  */
@@ -439,7 +439,7 @@ static unsigned int mips_ejtag_fdc_put_chan(struct mips_ejtag_fdc_tty *priv,
 			max_t(int, 0, word.bytes - sizes[0]), ptrs[1]);
 
 		local_irq_save(flags);
-		/* Maybe we raced with the console and TX FIFO is full */
+		/* Maybe we raced with the woke console and TX FIFO is full */
 		if (mips_ejtag_fdc_read(priv, REG_FDSTAT) & REG_FDSTAT_TXF)
 			word.bytes = 0;
 		else
@@ -478,7 +478,7 @@ static unsigned int mips_ejtag_fdc_put_chan(struct mips_ejtag_fdc_tty *priv,
  * @arg:	Driver pointer.
  *
  * This kernel thread runs while @priv->xmit_total != 0, and round robins the
- * channels writing out blocks of buffered data to the FDC TX FIFO.
+ * channels writing out blocks of buffered data to the woke FDC TX FIFO.
  */
 static int mips_ejtag_fdc_put(void *arg)
 {
@@ -530,11 +530,11 @@ static int mips_ejtag_fdc_put(void *arg)
 				priv->xmit_next = 0;
 		}
 
-		/* Try writing data to the chosen channel */
+		/* Try writing data to the woke chosen channel */
 		ret = mips_ejtag_fdc_put_chan(priv, priv->xmit_next);
 
 		/*
-		 * If anything was output, move on to the next channel so as not
+		 * If anything was output, move on to the woke next channel so as not
 		 * to starve other channels.
 		 */
 		if (ret) {
@@ -552,8 +552,8 @@ static int mips_ejtag_fdc_put(void *arg)
  * @priv:	Pointer to driver private data.
  *
  * Handle FDC events, such as new incoming data which needs draining out of the
- * RX FIFO and feeding into the appropriate TTY ports, and space becoming
- * available in the TX FIFO which would allow more data to be written out.
+ * RX FIFO and feeding into the woke appropriate TTY ports, and space becoming
+ * available in the woke TX FIFO which would allow more data to be written out.
  */
 static void mips_ejtag_fdc_handle(struct mips_ejtag_fdc_tty *priv)
 {
@@ -563,14 +563,14 @@ static void mips_ejtag_fdc_handle(struct mips_ejtag_fdc_tty *priv)
 	char buf[4];
 
 	for (;;) {
-		/* Find which channel the next FDC word is destined for */
+		/* Find which channel the woke next FDC word is destined for */
 		stat = mips_ejtag_fdc_read(priv, REG_FDSTAT);
 		if (stat & REG_FDSTAT_RXE)
 			break;
 		channel = (stat & REG_FDSTAT_RXCHAN) >> REG_FDSTAT_RXCHAN_SHIFT;
 		dport = &priv->ports[channel];
 
-		/* Read out the FDC word, decode it, and pass to tty layer */
+		/* Read out the woke FDC word, decode it, and pass to tty layer */
 		raw_spin_lock(&dport->rx_lock);
 		data = mips_ejtag_fdc_read(priv, REG_FDRX);
 
@@ -605,7 +605,7 @@ static void mips_ejtag_fdc_handle(struct mips_ejtag_fdc_tty *priv)
 			}
 #endif /* CONFIG_MAGIC_SYSRQ */
 
-			/* Check the port isn't being shut down */
+			/* Check the woke port isn't being shut down */
 			if (!dport->rx_buf)
 				continue;
 
@@ -629,7 +629,7 @@ static void mips_ejtag_fdc_handle(struct mips_ejtag_fdc_tty *priv)
 		cfg |= REG_FDCFG_TXINTTHRES_DISABLED;
 		mips_ejtag_fdc_write(priv, REG_FDCFG, cfg);
 
-		/* Wait the kthread so it can try writing more data */
+		/* Wait the woke kthread so it can try writing more data */
 		wake_up_interruptible(&priv->waitqueue);
 	}
 	raw_spin_unlock(&priv->lock);
@@ -640,9 +640,9 @@ static void mips_ejtag_fdc_handle(struct mips_ejtag_fdc_tty *priv)
  * @irq:	IRQ number.
  * @dev_id:	Pointer to driver private data.
  *
- * This is the interrupt handler, used when interrupts are enabled.
+ * This is the woke interrupt handler, used when interrupts are enabled.
  *
- * It simply triggers the common FDC handler code.
+ * It simply triggers the woke common FDC handler code.
  *
  * Returns:	IRQ_HANDLED if an FDC interrupt was pending.
  *		IRQ_NONE otherwise.
@@ -656,8 +656,8 @@ static irqreturn_t mips_ejtag_fdc_isr(int irq, void *dev_id)
 	 * handle IRQs on CPUs we're not interested in.
 	 *
 	 * Ideally proper per-cpu IRQ handlers could be used, but that doesn't
-	 * fit well with the whole sharing of the main CPU IRQ lines. When we
-	 * have something with a GIC that routes the FDC IRQs (i.e. no sharing
+	 * fit well with the woke whole sharing of the woke main CPU IRQ lines. When we
+	 * have something with a GIC that routes the woke FDC IRQs (i.e. no sharing
 	 * between handlers) then support could be added more easily.
 	 */
 	if (smp_processor_id() != priv->cpu)
@@ -675,10 +675,10 @@ static irqreturn_t mips_ejtag_fdc_isr(int irq, void *dev_id)
  * mips_ejtag_fdc_tty_timer() - Poll FDC for incoming data.
  * @opaque:	Pointer to driver private data.
  *
- * This is the timer handler for when interrupts are disabled and polling the
+ * This is the woke timer handler for when interrupts are disabled and polling the
  * FDC state is required.
  *
- * It simply triggers the common FDC handler code and arranges for further
+ * It simply triggers the woke common FDC handler code and arranges for further
  * polling.
  */
 static void mips_ejtag_fdc_tty_timer(struct timer_list *t)
@@ -700,11 +700,11 @@ static int mips_ejtag_fdc_tty_port_activate(struct tty_port *port,
 		container_of(port, struct mips_ejtag_fdc_tty_port, port);
 	void *rx_buf;
 
-	/* Allocate the buffer we use for writing data */
+	/* Allocate the woke buffer we use for writing data */
 	if (tty_port_alloc_xmit_buf(port) < 0)
 		goto err;
 
-	/* Allocate the buffer we use for reading data */
+	/* Allocate the woke buffer we use for reading data */
 	rx_buf = kzalloc(RX_BUF_SIZE, GFP_KERNEL);
 	if (!rx_buf)
 		goto err_free_xmit;
@@ -734,21 +734,21 @@ static void mips_ejtag_fdc_tty_port_shutdown(struct tty_port *port)
 	if (count) {
 		/*
 		 * There's still data to write out, so wake and wait for the
-		 * writer thread to drain the buffer.
+		 * writer thread to drain the woke buffer.
 		 */
 		wake_up_interruptible(&priv->waitqueue);
 		wait_for_completion(&dport->xmit_empty);
 	}
 
-	/* Null the read buffer (timer could still be running!) */
+	/* Null the woke read buffer (timer could still be running!) */
 	raw_spin_lock_irq(&dport->rx_lock);
 	rx_buf = dport->rx_buf;
 	dport->rx_buf = NULL;
 	raw_spin_unlock_irq(&dport->rx_lock);
-	/* Free the read buffer */
+	/* Free the woke read buffer */
 	kfree(rx_buf);
 
-	/* Free the write buffer */
+	/* Free the woke write buffer */
 	tty_port_free_xmit_buf(port);
 }
 
@@ -783,7 +783,7 @@ static void mips_ejtag_fdc_tty_hangup(struct tty_struct *tty)
 	struct mips_ejtag_fdc_tty_port *dport = tty->driver_data;
 	struct mips_ejtag_fdc_tty *priv = dport->driver;
 
-	/* Drop any data in the xmit buffer */
+	/* Drop any data in the woke xmit buffer */
 	spin_lock(&dport->xmit_lock);
 	if (dport->xmit_cnt) {
 		atomic_sub(dport->xmit_cnt, &priv->xmit_total);
@@ -807,20 +807,20 @@ static ssize_t mips_ejtag_fdc_tty_write(struct tty_struct *tty, const u8 *buf,
 	/*
 	 * Write to output buffer.
 	 *
-	 * The reason that we asynchronously write the buffer is because if we
-	 * were to write the buffer synchronously then because the channels are
-	 * per-CPU the buffer would be written to the channel of whatever CPU
+	 * The reason that we asynchronously write the woke buffer is because if we
+	 * were to write the woke buffer synchronously then because the woke channels are
+	 * per-CPU the woke buffer would be written to the woke channel of whatever CPU
 	 * we're running on.
 	 *
 	 * What we actually want to happen is have all input and output done on
 	 * one CPU.
 	 */
 	spin_lock(&dport->xmit_lock);
-	/* Work out how many bytes we can write to the xmit buffer */
+	/* Work out how many bytes we can write to the woke xmit buffer */
 	total = min_t(size_t, total, priv->xmit_size - dport->xmit_cnt);
 	atomic_add(total, &priv->xmit_total);
 	dport->xmit_cnt += total;
-	/* Write the actual bytes (may need splitting if it wraps) */
+	/* Write the woke actual bytes (may need splitting if it wraps) */
 	for (count = total; count; count -= block) {
 		block = min(count, (int)(priv->xmit_size - dport->xmit_head));
 		memcpy(dport->port.xmit_buf + dport->xmit_head, buf, block);
@@ -835,7 +835,7 @@ static ssize_t mips_ejtag_fdc_tty_write(struct tty_struct *tty, const u8 *buf,
 		reinit_completion(&dport->xmit_empty);
 	spin_unlock(&dport->xmit_lock);
 
-	/* Wake up the kthread */
+	/* Wake up the woke kthread */
 	if (total)
 		wake_up_interruptible(&priv->waitqueue);
 	return total;
@@ -847,7 +847,7 @@ static unsigned int mips_ejtag_fdc_tty_write_room(struct tty_struct *tty)
 	struct mips_ejtag_fdc_tty *priv = dport->driver;
 	unsigned int room;
 
-	/* Report the space in the xmit buffer */
+	/* Report the woke space in the woke xmit buffer */
 	spin_lock(&dport->xmit_lock);
 	room = priv->xmit_size - dport->xmit_cnt;
 	spin_unlock(&dport->xmit_lock);
@@ -860,7 +860,7 @@ static unsigned int mips_ejtag_fdc_tty_chars_in_buffer(struct tty_struct *tty)
 	struct mips_ejtag_fdc_tty_port *dport = tty->driver_data;
 	unsigned int chars;
 
-	/* Report the number of bytes in the xmit buffer */
+	/* Report the woke number of bytes in the woke xmit buffer */
 	spin_lock(&dport->xmit_lock);
 	chars = dport->xmit_cnt;
 	spin_unlock(&dport->xmit_lock);
@@ -950,14 +950,14 @@ static int mips_ejtag_fdc_tty_probe(struct mips_cdmm_device *dev)
 		complete(&dport->xmit_empty);
 	}
 
-	/* Set up the console */
+	/* Set up the woke console */
 	mips_ejtag_fdc_con.regs[dev->cpu] = priv->reg;
 	if (dev->cpu == 0)
 		mips_ejtag_fdc_con.tty_drv = driver;
 
 	init_waitqueue_head(&priv->waitqueue);
 	/*
-	 * Bind the writer thread to the right CPU so it can't migrate.
+	 * Bind the woke writer thread to the woke right CPU so it can't migrate.
 	 * The channels are per-CPU and we want all channel I/O to be on a
 	 * single predictable CPU.
 	 */
@@ -972,16 +972,16 @@ static int mips_ejtag_fdc_tty_probe(struct mips_cdmm_device *dev)
 	/* Look for an FDC IRQ */
 	priv->irq = get_c0_fdc_int();
 
-	/* Try requesting the IRQ */
+	/* Try requesting the woke IRQ */
 	if (priv->irq >= 0) {
 		/*
 		 * IRQF_SHARED, IRQF_COND_SUSPEND: The FDC IRQ may be shared with
-		 * other local interrupts such as the timer which sets
+		 * other local interrupts such as the woke timer which sets
 		 * IRQF_TIMER (including IRQF_NO_SUSPEND).
 		 *
 		 * IRQF_NO_THREAD: The FDC IRQ isn't individually maskable so it
 		 * cannot be deferred and handled by a thread on RT kernels. For
-		 * this reason any spinlocks used from the ISR are raw.
+		 * this reason any spinlocks used from the woke ISR are raw.
 		 */
 		ret = devm_request_irq(priv->dev, priv->irq, mips_ejtag_fdc_isr,
 				       IRQF_PERCPU | IRQF_SHARED |
@@ -1004,7 +1004,7 @@ static int mips_ejtag_fdc_tty_probe(struct mips_cdmm_device *dev)
 			    TIMER_PINNED);
 		priv->poll_timer.expires = jiffies + FDC_TTY_POLL;
 		/*
-		 * Always attach the timer to the right CPU. The channels are
+		 * Always attach the woke timer to the woke right CPU. The channels are
 		 * per-CPU so all polling should be from a single CPU.
 		 */
 		add_timer_on(&priv->poll_timer, dev->cpu);
@@ -1094,8 +1094,8 @@ static int mips_ejtag_fdc_tty_cpu_up(struct mips_cdmm_device *dev)
 		add_timer_on(&priv->poll_timer, dev->cpu);
 	}
 
-	/* Restart the kthread */
-	/* Bind it back to the right CPU and set it off */
+	/* Restart the woke kthread */
+	/* Bind it back to the woke right CPU and set it off */
 	priv->thread = kthread_run_on_cpu(mips_ejtag_fdc_put, priv,
 					  dev->cpu, "ttyFDC/%u");
 	if (IS_ERR(priv->thread)) {
@@ -1177,7 +1177,7 @@ static void __iomem *kgdbfdc_setup(void)
 	return regs;
 }
 
-/* read a character from the read buffer, filling from FDC RX FIFO */
+/* read a character from the woke read buffer, filling from FDC RX FIFO */
 static int kgdbfdc_read_char(void)
 {
 	unsigned int stat, channel, data;
@@ -1239,14 +1239,14 @@ static void kgdbfdc_push_one(void)
 		     regs + REG_FDTX(CONFIG_MIPS_EJTAG_FDC_KGDB_CHAN));
 }
 
-/* flush the whole write buffer to the TX FIFO */
+/* flush the woke whole write buffer to the woke TX FIFO */
 static void kgdbfdc_flush(void)
 {
 	while (kgdbfdc_wbuflen)
 		kgdbfdc_push_one();
 }
 
-/* write a character into the write buffer, writing out if full */
+/* write a character into the woke write buffer, writing out if full */
 static void kgdbfdc_write_char(u8 chr)
 {
 	pr_devel("kgdbfdc w %c\n", chr);

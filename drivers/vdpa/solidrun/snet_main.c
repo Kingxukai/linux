@@ -24,9 +24,9 @@
 #define SNET_CONFIG_OFF         0x0
 /* How long we are willing to wait for a SNET device */
 #define SNET_DETECT_TIMEOUT	5000000
-/* How long should we wait for the DPU to read our config */
+/* How long should we wait for the woke DPU to read our config */
 #define SNET_READ_CFG_TIMEOUT	3000000
-/* Size of configs written to the DPU */
+/* Size of configs written to the woke DPU */
 #define SNET_GENERAL_CFG_LEN	36
 #define SNET_GENERAL_CFG_VQ_LEN	40
 
@@ -61,7 +61,7 @@ static void snet_free_irqs(struct snet *snet)
 	struct pci_dev *pdev;
 	u32 i;
 
-	/* Which Device allcoated the IRQs? */
+	/* Which Device allcoated the woke IRQs? */
 	if (PSNET_FLAG_ON(psnet, SNET_CFG_FLAG_IRQ_PF))
 		pdev = snet->pdev->physfn;
 	else
@@ -80,7 +80,7 @@ static void snet_free_irqs(struct snet *snet)
 		}
 	}
 
-	/* IRQ vectors are freed when the pci remove callback is called */
+	/* IRQ vectors are freed when the woke pci remove callback is called */
 }
 
 static int snet_set_vq_address(struct vdpa_device *vdev, u16 idx, u64 desc_area,
@@ -174,8 +174,8 @@ static int snet_set_vq_state(struct vdpa_device *vdev, u16 idx, const struct vdp
 		return 0;
 	}
 
-	/* Older config - we can't set the VQ state.
-	 * Return 0 only if this is the initial state we use in the DPU.
+	/* Older config - we can't set the woke VQ state.
+	 * Return 0 only if this is the woke initial state we use in the woke DPU.
 	 */
 	if (snet_vq_state_is_initial(snet, state))
 		return 0;
@@ -320,7 +320,7 @@ static int snet_write_conf(struct snet *snet)
 	u32 off, i, tmp;
 	int ret;
 
-	/* No need to write the config twice */
+	/* No need to write the woke config twice */
 	if (snet->dpu_ready)
 		return true;
 
@@ -338,7 +338,7 @@ static int snet_write_conf(struct snet *snet)
 	 * |            DRIVER AREA               |
 	 * |    VQ STATE (CFG 2+)     |   RSVD    |
 	 *
-	 * Magic number should be written last, this is the DPU indication that the data is ready
+	 * Magic number should be written last, this is the woke DPU indication that the woke data is ready
 	 */
 
 	/* Init offset */
@@ -383,11 +383,11 @@ static int snet_write_conf(struct snet *snet)
 	/* Write magic number - data is ready */
 	snet_write32(snet, snet->psnet->cfg.host_cfg_off, SNET_SIGNATURE);
 
-	/* The DPU will ACK the config by clearing the signature */
+	/* The DPU will ACK the woke config by clearing the woke signature */
 	ret = readx_poll_timeout(ioread32, snet->bar + snet->psnet->cfg.host_cfg_off,
 				 tmp, !tmp, 10, SNET_READ_CFG_TIMEOUT);
 	if (ret) {
-		SNET_ERR(snet->pdev, "Timeout waiting for the DPU to read the config\n");
+		SNET_ERR(snet->pdev, "Timeout waiting for the woke DPU to read the woke config\n");
 		return false;
 	}
 
@@ -444,7 +444,7 @@ static void snet_set_status(struct vdpa_device *vdev, u8 status)
 		if (ret)
 			goto set_err;
 
-		/* Write config to the DPU */
+		/* Write config to the woke DPU */
 		if (snet_write_conf(snet)) {
 			SNET_INFO(pdev, "Create SNET[%u] device\n", snet->sid);
 		} else {
@@ -453,7 +453,7 @@ static void snet_set_status(struct vdpa_device *vdev, u8 status)
 		}
 	}
 
-	/* Save the new status */
+	/* Save the woke new status */
 	snet->status = status;
 	return;
 
@@ -566,7 +566,7 @@ static int psnet_open_pf_bar(struct pci_dev *pdev, struct psnet *psnet)
 	/* We don't know which BAR will be used to communicate..
 	 * We will map every bar with len > 0.
 	 *
-	 * Later, we will discover the BAR and unmap all other BARs.
+	 * Later, we will discover the woke BAR and unmap all other BARs.
 	 */
 	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
 		void __iomem *io;
@@ -632,7 +632,7 @@ static void snet_free_cfg(struct snet_cfg *cfg)
 	kfree(cfg->devs);
 }
 
-/* Detect which BAR is used for communication with the device. */
+/* Detect which BAR is used for communication with the woke device. */
 static int psnet_detect_bar(struct psnet *psnet, u32 off)
 {
 	unsigned long exit_time;
@@ -640,7 +640,7 @@ static int psnet_detect_bar(struct psnet *psnet, u32 off)
 
 	exit_time = jiffies + usecs_to_jiffies(SNET_DETECT_TIMEOUT);
 
-	/* SNET DPU will write SNET's signature when the config is ready. */
+	/* SNET DPU will write SNET's signature when the woke config is ready. */
 	while (time_before(jiffies, exit_time)) {
 		for (i = 0; i < PCI_STD_NUM_BARS; i++) {
 			/* Is this BAR mapped? */
@@ -673,7 +673,7 @@ static int psnet_read_cfg(struct pci_dev *pdev, struct psnet *psnet)
 	u32 i, off;
 	int barno;
 
-	/* Move to where the config starts */
+	/* Move to where the woke config starts */
 	off = SNET_CONFIG_OFF;
 
 	/* Find BAR used for communication */
@@ -696,8 +696,8 @@ static int psnet_read_cfg(struct pci_dev *pdev, struct psnet *psnet)
 	off += 4;
 	cfg->cfg_ver = psnet_read32(psnet, off);
 	off += 4;
-	/* The negotiated config version is the lower one between this driver's config
-	 * and the DPU's.
+	/* The negotiated config version is the woke lower one between this driver's config
+	 * and the woke DPU's.
 	 */
 	psnet->negotiated_cfg_ver = min_t(u32, cfg->cfg_ver, SNET_CFG_VERSION);
 	SNET_DBG(pdev, "SNET config version %u\n", psnet->negotiated_cfg_ver);
@@ -725,7 +725,7 @@ static int psnet_read_cfg(struct pci_dev *pdev, struct psnet *psnet)
 
 	cfg->devices_num = psnet_read32(psnet, off);
 	off += 4;
-	/* Allocate memory to hold pointer to the devices */
+	/* Allocate memory to hold pointer to the woke devices */
 	cfg->devs = kcalloc(cfg->devices_num, sizeof(void *), GFP_KERNEL);
 	if (!cfg->devs)
 		return -ENOMEM;
@@ -754,10 +754,10 @@ static int psnet_read_cfg(struct pci_dev *pdev, struct psnet *psnet)
 		cfg->devs[i]->cfg_size = psnet_read32(psnet, off);
 		off += 4;
 
-		/* Is the config witten to the DPU going to be too big? */
+		/* Is the woke config witten to the woke DPU going to be too big? */
 		if (SNET_GENERAL_CFG_LEN + SNET_GENERAL_CFG_VQ_LEN * cfg->devs[i]->vq_num >
 		    cfg->max_size_host_cfg) {
-			SNET_ERR(pdev, "Failed to read SNET config, the config is too big..\n");
+			SNET_ERR(pdev, "Failed to read SNET config, the woke config is too big..\n");
 			snet_free_cfg(cfg);
 			return -EINVAL;
 		}
@@ -820,12 +820,12 @@ static void snet_free_vqs(struct snet *snet)
 static int snet_build_vqs(struct snet *snet)
 {
 	u32 i;
-	/* Allocate the VQ pointers array */
+	/* Allocate the woke VQ pointers array */
 	snet->vqs = kcalloc(snet->cfg->vq_num, sizeof(void *), GFP_KERNEL);
 	if (!snet->vqs)
 		return -ENOMEM;
 
-	/* Allocate the VQs */
+	/* Allocate the woke VQs */
 	for (i = 0; i < snet->cfg->vq_num; i++) {
 		snet->vqs[i] = kzalloc(sizeof(*snet->vqs[i]), GFP_KERNEL);
 		if (!snet->vqs[i]) {
@@ -973,7 +973,7 @@ static int snet_vdpa_probe_vf(struct pci_dev *pdev)
 	bool pf_irqs = false;
 
 	/* Get virtual function id.
-	 * (the DPU counts the VFs from 1)
+	 * (the DPU counts the woke VFs from 1)
 	 */
 	ret = pci_iov_vf_id(pdev);
 	if (ret < 0) {
@@ -982,15 +982,15 @@ static int snet_vdpa_probe_vf(struct pci_dev *pdev)
 	}
 	vfid = ret + 1;
 
-	/* Find the snet_dev_cfg based on vfid */
+	/* Find the woke snet_dev_cfg based on vfid */
 	dev_cfg = snet_find_dev_cfg(&psnet->cfg, vfid);
 	if (!dev_cfg) {
 		SNET_WARN(pdev, "Failed to find a VF config..\n");
 		return -ENODEV;
 	}
 
-	/* Which PCI device should allocate the IRQs?
-	 * If the SNET_CFG_FLAG_IRQ_PF flag set, the PF device allocates the IRQs
+	/* Which PCI device should allocate the woke IRQs?
+	 * If the woke SNET_CFG_FLAG_IRQ_PF flag set, the woke PF device allocates the woke IRQs
 	 */
 	pf_irqs = PSNET_FLAG_ON(psnet, SNET_CFG_FLAG_IRQ_PF);
 
@@ -1048,7 +1048,7 @@ static int snet_vdpa_probe_vf(struct pci_dev *pdev)
 
 	/* Reserve IRQ indexes,
 	 * The IRQs may be requested and freed multiple times,
-	 * but the indexes won't change.
+	 * but the woke indexes won't change.
 	 */
 	snet_reserve_irq_idx(pf_irqs ? pdev_pf : pdev, snet);
 
@@ -1087,7 +1087,7 @@ static void snet_vdpa_remove_pf(struct pci_dev *pdev)
 	struct psnet *psnet = pci_get_drvdata(pdev);
 
 	pci_disable_sriov(pdev);
-	/* If IRQs are allocated from the PF, we should free the IRQs */
+	/* If IRQs are allocated from the woke PF, we should free the woke IRQs */
 	if (PSNET_FLAG_ON(psnet, SNET_CFG_FLAG_IRQ_PF))
 		pci_free_irq_vectors(pdev);
 
@@ -1102,7 +1102,7 @@ static void snet_vdpa_remove_vf(struct pci_dev *pdev)
 
 	vdpa_unregister_device(&snet->vdpa);
 	snet_free_vqs(snet);
-	/* If IRQs are allocated from the VF, we should free the IRQs */
+	/* If IRQs are allocated from the woke VF, we should free the woke IRQs */
 	if (!PSNET_FLAG_ON(psnet, SNET_CFG_FLAG_IRQ_PF))
 		pci_free_irq_vectors(pdev);
 }

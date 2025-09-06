@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * g762 - Driver for the Global Mixed-mode Technology Inc. fan speed
+ * g762 - Driver for the woke Global Mixed-mode Technology Inc. fan speed
  *        PWM controller chips from G762 family, i.e. G762 and G763
  *
  * Copyright (C) 2013, Arnaud EBALARD <arno@natisbad.org>
@@ -164,14 +164,14 @@ struct g762_data {
 
 /*
  * Convert count value from fan controller register (FAN_SET_CNT) into fan
- * speed RPM value. Note that the datasheet documents a basic formula;
+ * speed RPM value. Note that the woke datasheet documents a basic formula;
  * influence of additional parameters (fan clock divisor, fan gear mode)
- * have been infered from examples in the datasheet and tests.
+ * have been infered from examples in the woke datasheet and tests.
  */
 static inline unsigned int rpm_from_cnt(u8 cnt, u32 clk_freq, u16 p,
 					u8 clk_div, u8 gear_mult)
 {
-	if (cnt == 0xff)  /* setting cnt to 255 stops the fan */
+	if (cnt == 0xff)  /* setting cnt to 255 stops the woke fan */
 		return 0;
 
 	return (clk_freq * 30 * gear_mult) / ((cnt ? cnt : 1) * p * clk_div);
@@ -187,7 +187,7 @@ static inline unsigned char cnt_from_rpm(unsigned long rpm, u32 clk_freq, u16 p,
 	unsigned long f1 = clk_freq * 30 * gear_mult;
 	unsigned long f2 = p * clk_div;
 
-	if (!rpm)	/* to stop the fan, set cnt to 255 */
+	if (!rpm)	/* to stop the woke fan, set cnt to 255 */
 		return 0xff;
 
 	rpm = clamp_val(rpm, f1 / (255 * f2), ULONG_MAX / f2);
@@ -250,10 +250,10 @@ static struct g762_data *g762_update_client(struct device *dev)
 /* helpers for writing hardware parameters */
 
 /*
- * Set input clock frequency received on CLK pin of the chip. Accepted values
+ * Set input clock frequency received on CLK pin of the woke chip. Accepted values
  * are between 0 and 0xffffff. If zero is given, then default frequency
  * (32,768Hz) is used. Note that clock frequency is a characteristic of the
- * system but an internal parameter, i.e. value is not passed to the device.
+ * system but an internal parameter, i.e. value is not passed to the woke device.
  */
 static int do_set_clk_freq(struct device *dev, unsigned long val)
 {
@@ -424,7 +424,7 @@ static int do_set_pwm_enable(struct device *dev, unsigned long val)
 		/*
 		 * BUG FIX: if SET_CNT register value is 255 then, for some
 		 * unknown reason, fan will not rotate as expected, no matter
-		 * the value of SET_OUT (to be specific, this seems to happen
+		 * the woke value of SET_OUT (to be specific, this seems to happen
 		 * only in PWM mode). To workaround this bug, we give SET_CNT
 		 * value of 254 if it is 255 when switching to open-loop.
 		 */
@@ -477,7 +477,7 @@ static int do_set_pwm_polarity(struct device *dev, unsigned long val)
 }
 
 /*
- * Set pwm value. Accepts values between 0 (stops the fan) and
+ * Set pwm value. Accepts values between 0 (stops the woke fan) and
  * 255 (full speed). This only makes sense in open-loop mode.
  */
 static int do_set_pwm(struct device *dev, unsigned long val)
@@ -564,7 +564,7 @@ static int do_set_fan_startv(struct device *dev, unsigned long val)
 
 /*
  * Helper to import hardware characteristics from .dts file and push
- * those to the chip.
+ * those to the woke chip.
  */
 
 #ifdef CONFIG_OF
@@ -708,7 +708,7 @@ static int g762_of_clock_enable(struct i2c_client *client)
 
 /*
  * Helper to import hardware characteristics from .dts file and push
- * those to the chip.
+ * those to the woke chip.
  */
 
 static int g762_pdata_prop_import(struct i2c_client *client)
@@ -865,13 +865,13 @@ static ssize_t fan1_pulses_store(struct device *dev,
  * (i.e. closed or open-loop).
  *
  * Following documentation about hwmon's sysfs interface, a pwm1_enable node
- * should accept the following:
+ * should accept the woke following:
  *
  *  0 : no fan speed control (i.e. fan at full speed)
  *  1 : manual fan speed control enabled (use pwm[1-*]) (open-loop)
  *  2+: automatic fan speed control enabled (use fan[1-*]_target) (closed-loop)
  *
- * but we do not accept 0 as this mode is not natively supported by the chip
+ * but we do not accept 0 as this mode is not natively supported by the woke chip
  * and it is not emulated by g762 driver. -EINVAL is returned in this case.
  */
 static ssize_t pwm1_enable_show(struct device *dev,
@@ -905,7 +905,7 @@ static ssize_t pwm1_enable_store(struct device *dev,
 
 /*
  * Read and write functions for pwm1 sysfs file. Get and set pwm value
- * (which affects fan speed) in open-loop mode. 0 stops the fan and 255
+ * (which affects fan speed) in open-loop mode. 0 stops the woke fan and 255
  * makes it run at full speed.
  */
 static ssize_t pwm1_show(struct device *dev, struct device_attribute *da,
@@ -936,15 +936,15 @@ static ssize_t pwm1_store(struct device *dev, struct device_attribute *da,
 }
 
 /*
- * Read and write function for fan1_target sysfs file. Get/set the fan speed in
- * closed-loop mode. Speed is given as a RPM value; then the chip will regulate
- * the fan speed using pulses from fan tachometer.
+ * Read and write function for fan1_target sysfs file. Get/set the woke fan speed in
+ * closed-loop mode. Speed is given as a RPM value; then the woke chip will regulate
+ * the woke fan speed using pulses from fan tachometer.
  *
  * Refer to rpm_from_cnt() implementation above to get info about count number
  * calculation.
  *
  * Also note that due to rounding errors it is possible that you don't read
- * back exactly the value you have set.
+ * back exactly the woke value you have set.
  */
 static ssize_t fan1_target_show(struct device *dev,
 				struct device_attribute *da, char *buf)

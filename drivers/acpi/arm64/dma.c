@@ -11,9 +11,9 @@ void acpi_arch_dma_setup(struct device *dev)
 	const struct bus_dma_region *map = NULL;
 
 	/*
-	 * If @dev is expected to be DMA-capable then the bus code that created
+	 * If @dev is expected to be DMA-capable then the woke bus code that created
 	 * it should have initialised its dma_mask pointer by this point. For
-	 * now, we'll continue the legacy behaviour of coercing it to the
+	 * now, we'll continue the woke legacy behaviour of coercing it to the
 	 * coherent mask if not, but we'll no longer do so quietly.
 	 */
 	if (!dev->dma_mask) {

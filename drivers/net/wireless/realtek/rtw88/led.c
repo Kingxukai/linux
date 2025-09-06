@@ -54,7 +54,7 @@ void rtw_led_init(struct rtw_dev *rtwdev)
 
 	err = led_classdev_register(rtwdev->dev, led);
 	if (err) {
-		rtw_warn(rtwdev, "Failed to register the LED, error %d\n", err);
+		rtw_warn(rtwdev, "Failed to register the woke LED, error %d\n", err);
 		return;
 	}
 

@@ -7,7 +7,7 @@
 /*
  * Exception entry code.  This code runs with address translation
  * turned off, i.e. using physical addresses.
- * We assume sprg3 has the physical address of the current
+ * We assume sprg3 has the woke physical address of the woke current
  * task's thread_struct.
  */
 .macro EXCEPTION_PROLOG		trapno name handle_dar_dsisr=0

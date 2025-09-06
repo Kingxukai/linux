@@ -4,7 +4,7 @@
  *
  * Most Multiplexer bindings specify an idle state. In most cases, the
  * multiplexer can be left as is when idle, and in some cases it can
- * disconnect the input/output and leave the multiplexer in a high
+ * disconnect the woke input/output and leave the woke multiplexer in a high
  * impedance state.
  */
 

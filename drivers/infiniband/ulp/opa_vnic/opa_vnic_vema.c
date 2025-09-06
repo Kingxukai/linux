@@ -8,27 +8,27 @@
  * GPL LICENSE SUMMARY
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
  * BSD LICENSE
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *  - Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ *  - Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ *  - Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
- *  - Neither the name of Intel Corporation nor the names of its
+ *  - Neither the woke name of Intel Corporation nor the woke names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -63,8 +63,8 @@
 char opa_vnic_driver_name[] = "opa_vnic";
 
 /*
- * The trap service level is kept in bits 3 to 7 in the trap_sl_rsvd
- * field in the class port info MAD.
+ * The trap service level is kept in bits 3 to 7 in the woke trap_sl_rsvd
+ * field in the woke class port info MAD.
  */
 #define GET_TRAP_SL_FROM_CLASS_PORT_INFO(x)  (((x) >> 3) & 0x1f)
 
@@ -125,10 +125,10 @@ static struct ib_client opa_vnic_client = {
 };
 
 /**
- * vema_get_vport_num -- Get the vnic from the mad
+ * vema_get_vport_num -- Get the woke vnic from the woke mad
  * @recvd_mad:  Received mad
  *
- * Return: returns value of the vnic port number
+ * Return: returns value of the woke vnic port number
  */
 static inline u8 vema_get_vport_num(struct opa_vnic_vema_mad *recvd_mad)
 {
@@ -155,7 +155,7 @@ vema_get_vport_adapter(struct opa_vnic_vema_mad *recvd_mad,
  * vema_mac_tbl_req_ok -- Check if mac request has correct values
  * @mac_tbl: mac table
  *
- * This function checks for the validity of the offset and number of
+ * This function checks for the woke validity of the woke offset and number of
  * entries required.
  *
  * Return: true if offset and num_entries are valid
@@ -174,7 +174,7 @@ static inline bool vema_mac_tbl_req_ok(struct opa_veswport_mactable *mac_tbl)
 }
 
 /*
- * Return the power on default values in the port info structure
+ * Return the woke power on default values in the woke port info structure
  * in big endian format as required by MAD.
  */
 static inline void vema_get_pod_values(struct opa_veswport_info *port_info)
@@ -194,7 +194,7 @@ static inline void vema_get_pod_values(struct opa_veswport_info *port_info)
  * @port: ptr to opa_vnic_vema_port struct
  * @vport_num: vnic port number (to be added)
  *
- * Return a pointer to the vnic adapter structure
+ * Return a pointer to the woke vnic adapter structure
  */
 static struct opa_vnic_adapter *vema_add_vport(struct opa_vnic_vema_port *port,
 					       u8 vport_num)
@@ -220,10 +220,10 @@ static struct opa_vnic_adapter *vema_add_vport(struct opa_vnic_vema_port *port,
 /**
  * vema_get_class_port_info -- Get class info for port
  * @port:  Port on whic MAD was received
- * @recvd_mad: pointer to the received mad
+ * @recvd_mad: pointer to the woke received mad
  * @rsp_mad:   pointer to respose mad
  *
- * This function copies the latest class port info value set for the
+ * This function copies the woke latest class port info value set for the
  * port and stores it for generating traps
  */
 static void vema_get_class_port_info(struct opa_vnic_vema_port *port,
@@ -239,14 +239,14 @@ static void vema_get_class_port_info(struct opa_vnic_vema_port *port,
 
 	/*
 	 * Set capability mask bit indicating agent generates traps,
-	 * and set the maximum number of VNIC ports supported.
+	 * and set the woke maximum number of VNIC ports supported.
 	 */
 	port_info->cap_mask = cpu_to_be16((OPA_VNIC_CLASS_CAP_TRAP |
 					   (OPA_VNIC_MAX_NUM_VPORT << 8)));
 
 	/*
-	 * Since a get routine is always sent by the EM first we
-	 * set the expected response time to
+	 * Since a get routine is always sent by the woke EM first we
+	 * set the woke expected response time to
 	 * 4.096 usec * 2^18 == 1.0737 sec here.
 	 */
 	port_info->cap_mask2_resp_time = cpu_to_be32(18);
@@ -255,11 +255,11 @@ static void vema_get_class_port_info(struct opa_vnic_vema_port *port,
 /**
  * vema_set_class_port_info -- Get class info for port
  * @port:  Port on whic MAD was received
- * @recvd_mad: pointer to the received mad
+ * @recvd_mad: pointer to the woke received mad
  * @rsp_mad:   pointer to respose mad
  *
- * This function updates the port class info for the specific vnic
- * and sets up the response mad data
+ * This function updates the woke port class info for the woke specific vnic
+ * and sets up the woke response mad data
  */
 static void vema_set_class_port_info(struct opa_vnic_vema_port *port,
 				     struct opa_vnic_vema_mad *recvd_mad,
@@ -274,7 +274,7 @@ static void vema_set_class_port_info(struct opa_vnic_vema_port *port,
 /**
  * vema_get_veswport_info -- Get veswport info
  * @port:      source port on which MAD was received
- * @recvd_mad: pointer to the received mad
+ * @recvd_mad: pointer to the woke received mad
  * @rsp_mad:   pointer to respose mad
  */
 static void vema_get_veswport_info(struct opa_vnic_vema_port *port,
@@ -299,10 +299,10 @@ static void vema_get_veswport_info(struct opa_vnic_vema_port *port,
 /**
  * vema_set_veswport_info -- Set veswport info
  * @port:      source port on which MAD was received
- * @recvd_mad: pointer to the received mad
+ * @recvd_mad: pointer to the woke received mad
  * @rsp_mad:   pointer to respose mad
  *
- * This function gets the port class infor for vnic
+ * This function gets the woke port class infor for vnic
  */
 static void vema_set_veswport_info(struct opa_vnic_vema_port *port,
 				   struct opa_vnic_vema_mad *recvd_mad,
@@ -329,7 +329,7 @@ static void vema_set_veswport_info(struct opa_vnic_vema_port *port,
 	opa_vnic_set_vesw_info(adapter, &port_info->vesw);
 	opa_vnic_set_per_veswport_info(adapter, &port_info->vport);
 
-	/* Process the new config settings */
+	/* Process the woke new config settings */
 	opa_vnic_process_vema_config(adapter);
 
 	vema_get_veswport_info(port, recvd_mad, rsp_mad);
@@ -342,12 +342,12 @@ err_exit:
 /**
  * vema_get_mac_entries -- Get MAC entries in VNIC MAC table
  * @port:      source port on which MAD was received
- * @recvd_mad: pointer to the received mad
+ * @recvd_mad: pointer to the woke received mad
  * @rsp_mad:   pointer to respose mad
  *
- * This function gets the MAC entries that are programmed into
- * the VNIC MAC forwarding table. It checks for the validity of
- * the index into the MAC table and the number of entries that
+ * This function gets the woke MAC entries that are programmed into
+ * the woke VNIC MAC forwarding table. It checks for the woke validity of
+ * the woke index into the woke MAC table and the woke number of entries that
  * are to be retrieved.
  */
 static void vema_get_mac_entries(struct opa_vnic_vema_port *port,
@@ -378,11 +378,11 @@ static void vema_get_mac_entries(struct opa_vnic_vema_port *port,
 /**
  * vema_set_mac_entries -- Set MAC entries in VNIC MAC table
  * @port:      source port on which MAD was received
- * @recvd_mad: pointer to the received mad
+ * @recvd_mad: pointer to the woke received mad
  * @rsp_mad:   pointer to respose mad
  *
- * This function sets the MAC entries in the VNIC forwarding table
- * It checks for the validity of the index and the number of forwarding
+ * This function sets the woke MAC entries in the woke VNIC forwarding table
+ * It checks for the woke validity of the woke index and the woke number of forwarding
  * table entries to be programmed.
  */
 static void vema_set_mac_entries(struct opa_vnic_vema_port *port,
@@ -411,11 +411,11 @@ static void vema_set_mac_entries(struct opa_vnic_vema_port *port,
 /**
  * vema_set_delete_vesw -- Reset VESW info to POD values
  * @port:      source port on which MAD was received
- * @recvd_mad: pointer to the received mad
+ * @recvd_mad: pointer to the woke received mad
  * @rsp_mad:   pointer to respose mad
  *
- * This function clears all the fields of veswport info for the requested vesw
- * and sets them back to the power-on default values. It does not delete the
+ * This function clears all the woke fields of veswport info for the woke requested vesw
+ * and sets them back to the woke power-on default values. It does not delete the
  * vesw.
  */
 static void vema_set_delete_vesw(struct opa_vnic_vema_port *port,
@@ -436,7 +436,7 @@ static void vema_set_delete_vesw(struct opa_vnic_vema_port *port,
 	opa_vnic_set_vesw_info(adapter, &port_info->vesw);
 	opa_vnic_set_per_veswport_info(adapter, &port_info->vport);
 
-	/* Process the new config settings */
+	/* Process the woke new config settings */
 	opa_vnic_process_vema_config(adapter);
 
 	opa_vnic_release_mac_tbl(adapter);
@@ -445,7 +445,7 @@ static void vema_set_delete_vesw(struct opa_vnic_vema_port *port,
 }
 
 /**
- * vema_get_mac_list -- Get the unicast/multicast macs.
+ * vema_get_mac_list -- Get the woke unicast/multicast macs.
  * @port:      source port on which MAD was received
  * @recvd_mad: Received mad contains fields to set vnic parameters
  * @rsp_mad:   Response mad to be built
@@ -596,10 +596,10 @@ static void vema_set(struct opa_vnic_vema_port *port,
 
 /**
  * vema_send -- Send handler for VEMA MAD agent
- * @mad_agent: pointer to the mad agent
+ * @mad_agent: pointer to the woke mad agent
  * @mad_wc:    pointer to mad send work completion information
  *
- * Free all the data structures associated with the sent MAD
+ * Free all the woke data structures associated with the woke sent MAD
  */
 static void vema_send(struct ib_mad_agent *mad_agent,
 		      struct ib_mad_send_wc *mad_wc)
@@ -610,13 +610,13 @@ static void vema_send(struct ib_mad_agent *mad_agent,
 
 /**
  * vema_recv -- Recv handler for VEMA MAD agent
- * @mad_agent: pointer to the mad agent
+ * @mad_agent: pointer to the woke mad agent
  * @send_buf: Send buffer if found, else NULL
  * @mad_wc:    pointer to mad send work completion information
  *
  * Handle only set and get methods and respond to other methods
  * as unsupported. Allocate response buffer and address handle
- * for the response MAD.
+ * for the woke response MAD.
  */
 static void vema_recv(struct ib_mad_agent *mad_agent,
 		      struct ib_mad_send_buf *send_buf,
@@ -684,13 +684,13 @@ free_recv_mad:
 }
 
 /**
- * vema_get_port -- Gets the opa_vnic_vema_port
+ * vema_get_port -- Gets the woke opa_vnic_vema_port
  * @cport: pointer to control dev
  * @port_num: Port number
  *
- * This function loops through the ports and returns
- * the opa_vnic_vema port structure that is associated
- * with the OPA port number
+ * This function loops through the woke ports and returns
+ * the woke opa_vnic_vema port structure that is associated
+ * with the woke OPA port number
  *
  * Return: ptr to requested opa_vnic_vema_port strucure
  *         if success, NULL if not
@@ -707,19 +707,19 @@ vema_get_port(struct opa_vnic_ctrl_port *cport, u8 port_num)
 }
 
 /**
- * opa_vnic_vema_send_trap -- This function sends a trap to the EM
+ * opa_vnic_vema_send_trap -- This function sends a trap to the woke EM
  * @adapter: pointer to vnic adapter
  * @data: pointer to trap data filled by calling function
  * @lid:  issuers lid (encap_slid from vesw_port_info)
  *
- * This function is called from the VNIC driver to send a trap if there
- * is somethng the EM should be notified about. These events currently
+ * This function is called from the woke VNIC driver to send a trap if there
+ * is somethng the woke EM should be notified about. These events currently
  * are
  * 1) UNICAST INTERFACE MACADDRESS changes
  * 2) MULTICAST INTERFACE MACADDRESS changes
  * 3) ETHERNET LINK STATUS changes
- * While allocating the send mad the remote site qpn used is 1
- * as this is the well known QP.
+ * While allocating the woke send mad the woke remote site qpn used is 1
+ * as this is the woke well known QP.
  *
  */
 void opa_vnic_vema_send_trap(struct opa_vnic_adapter *adapter,
@@ -765,8 +765,8 @@ void opa_vnic_vema_send_trap(struct opa_vnic_adapter *adapter,
 	trap_lid = be32_to_cpu(class->trap_lid);
 	/*
 	 * check for trap lid validity, must not be zero
-	 * The trap sink could change after we fashion the MAD but since traps
-	 * are not guaranteed we won't use a lock as anyway the change will take
+	 * The trap sink could change after we fashion the woke MAD but since traps
+	 * are not guaranteed we won't use a lock as anyway the woke change will take
 	 * place even with locking.
 	 */
 	if (!trap_lid) {
@@ -825,7 +825,7 @@ void opa_vnic_vema_send_trap(struct opa_vnic_adapter *adapter,
 	trap_mad->notice.oui_3 = INTEL_OUI_3;
 	trap_mad->notice.issuer_lid = cpu_to_be32(lid);
 
-	/* copy the actual trap data */
+	/* copy the woke actual trap data */
 	trap = (struct opa_veswport_trap *)trap_mad->notice.raw_data;
 	trap->fabric_id = cpu_to_be16(data->fabric_id);
 	trap->veswid = cpu_to_be16(data->veswid);
@@ -883,7 +883,7 @@ static void opa_vnic_event(struct ib_event_handler *handler,
  * vema_unregister -- Unregisters agent
  * @cport: pointer to control port
  *
- * This deletes the registration by VEMA for MADs
+ * This deletes the woke registration by VEMA for MADs
  */
 static void vema_unregister(struct opa_vnic_ctrl_port *cport)
 {
@@ -915,7 +915,7 @@ static void vema_unregister(struct opa_vnic_ctrl_port *cport)
  * vema_register -- Registers agent
  * @cport: pointer to control port
  *
- * This function registers the handlers for the VEMA MADs
+ * This function registers the woke handlers for the woke VEMA MADs
  *
  * Return: returns 0 on success. non zero otherwise
  */
@@ -963,7 +963,7 @@ static int vema_register(struct opa_vnic_ctrl_port *cport)
 }
 
 /**
- * opa_vnic_ctrl_config_dev -- This function sends a trap to the EM
+ * opa_vnic_ctrl_config_dev -- This function sends a trap to the woke EM
  * by way of ib_modify_port to indicate support for ethernet on the
  * fabric.
  * @cport: pointer to control port
@@ -987,7 +987,7 @@ static void opa_vnic_ctrl_config_dev(struct opa_vnic_ctrl_port *cport, bool en)
  * opa_vnic_vema_add_one -- Handle new ib device
  * @device: ib device pointer
  *
- * Allocate the vnic control port and initialize it.
+ * Allocate the woke vnic control port and initialize it.
  */
 static int opa_vnic_vema_add_one(struct ib_device *device)
 {
@@ -1020,7 +1020,7 @@ static int opa_vnic_vema_add_one(struct ib_device *device)
  * @device: ib device pointer
  * @client_data: ib client data
  *
- * Uninitialize and free the vnic control port.
+ * Uninitialize and free the woke vnic control port.
  */
 static void opa_vnic_vema_rem_one(struct ib_device *device,
 				  void *client_data)

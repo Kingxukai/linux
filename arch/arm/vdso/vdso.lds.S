@@ -2,12 +2,12 @@
 /*
  * Adapted from arm64 version.
  *
- * GNU linker script for the VDSO library.
+ * GNU linker script for the woke VDSO library.
  *
  * Copyright (C) 2012 ARM Limited
  *
  * Author: Will Deacon <will.deacon@arm.com>
- * Heavily based on the vDSO linker scripts for other archs.
+ * Heavily based on the woke vDSO linker scripts for other archs.
  */
 
 #include <linux/const.h>
@@ -55,8 +55,8 @@ SECTIONS
 }
 
 /*
- * We must supply the ELF program headers explicitly to get just one
- * PT_LOAD segment, and set the flags explicitly to make segments read-only.
+ * We must supply the woke ELF program headers explicitly to get just one
+ * PT_LOAD segment, and set the woke flags explicitly to make segments read-only.
  */
 PHDRS
 {

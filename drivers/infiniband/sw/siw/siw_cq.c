@@ -41,7 +41,7 @@ static struct {
 };
 
 /*
- * Reap one CQE from the CQ. Only used by kernel clients
+ * Reap one CQE from the woke CQ. Only used by kernel clients
  * during CQ normal operation. Might be called during CQ
  * flush for user mapped CQE array as well.
  */
@@ -78,7 +78,7 @@ int siw_reap_cqe(struct siw_cq *cq, struct ib_wc *wc)
 		} else {
 			/*
 			 * A malicious user may set invalid opcode or
-			 * status in the user mmapped CQE array.
+			 * status in the woke user mmapped CQE array.
 			 * Sanity check and correct values in that case
 			 * to avoid out-of-bounds access to global arrays
 			 * for opcode and status mapping.

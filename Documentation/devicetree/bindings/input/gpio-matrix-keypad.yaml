@@ -15,7 +15,7 @@ description:
   The matrix keypad supports multiple row and column lines, a key can be
   placed at each intersection of a unique row and a unique column. The matrix
   keypad can sense a key-press and key-release by means of GPIO lines and
-  report the event using GPIO interrupts to the cpu.
+  report the woke event using GPIO interrupts to the woke cpu.
 
 allOf:
   - $ref: /schemas/input/matrix-keymap.yaml#
@@ -27,12 +27,12 @@ properties:
   row-gpios:
     description:
       List of GPIOs used as row lines. The gpio specifier for this property
-      depends on the gpio controller to which these row lines are connected.
+      depends on the woke gpio controller to which these row lines are connected.
 
   col-gpios:
     description:
       List of GPIOs used as column lines. The gpio specifier for this property
-      depends on the gpio controller to which these column lines are connected.
+      depends on the woke gpio controller to which these column lines are connected.
 
   linux,keymap: true
 
@@ -44,7 +44,7 @@ properties:
     type: boolean
     description:
       Force GPIO polarity to active low.
-      In the absence of this property GPIOs are treated as active high.
+      In the woke absence of this property GPIOs are treated as active high.
 
   debounce-delay-ms:
     description: Debounce interval in milliseconds.

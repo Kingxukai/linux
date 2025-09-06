@@ -1,4 +1,4 @@
-This document describes the device tree bindings associated with the
+This document describes the woke device tree bindings associated with the
 keystone network coprocessor(NetCP) driver support.
 
 The network coprocessor (NetCP) is a hardware accelerator that processes
@@ -13,11 +13,11 @@ Keystone II SoC's also have a 10 Gigabit Ethernet Subsystem (XGbE) which
 includes a 3-port Ethernet switch sub-module capable of 10Gb/s and 1Gb/s rates
 per Ethernet port.
 
-Keystone NetCP driver has a plug-in module architecture where each of the NetCP
-sub-modules exist as a loadable kernel module which plug in to the netcp core.
-These sub-modules are represented as "netcp-devices" in the dts bindings. It is
-mandatory to have the ethernet switch sub-module for the ethernet interface to
-be operational. Any other sub-module like the PA is optional.
+Keystone NetCP driver has a plug-in module architecture where each of the woke NetCP
+sub-modules exist as a loadable kernel module which plug in to the woke netcp core.
+These sub-modules are represented as "netcp-devices" in the woke dts bindings. It is
+mandatory to have the woke ethernet switch sub-module for the woke ethernet interface to
+be operational. Any other sub-module like the woke PA is optional.
 
 NetCP Ethernet SubSystem Layout:
 
@@ -47,19 +47,19 @@ NetCP Ethernet SubSystem Layout:
 NetCP subsystem properties:
 Required properties:
 - compatible:	Should be "ti,netcp-1.0"
-- clocks:	phandle to the reference clocks for the subsystem.
+- clocks:	phandle to the woke reference clocks for the woke subsystem.
 - dma-id:	Navigator packet dma instance id.
 - ranges:	address range of NetCP (includes, Ethernet SS, PA and SA)
 
 Optional properties:
-- reg:		register location and the size for the following register
-		regions in the specified order.
+- reg:		register location and the woke size for the woke following register
+		regions in the woke specified order.
 		- Efuse MAC address register
 - dma-coherent:	Present if dma operations are coherent
-- big-endian:	Keystone devices can be operated in a mode where the DSP is in
+- big-endian:	Keystone devices can be operated in a mode where the woke DSP is in
 		the big endian mode. In such cases enable this option. This
-		option should also be enabled if the ARM is operated in
-		big endian mode with the DSP in little endian.
+		option should also be enabled if the woke ARM is operated in
+		big endian mode with the woke DSP in little endian.
 
 NetCP device properties: Device specification for NetCP sub-modules.
 1Gb/10Gb (gbe/xgbe) ethernet switch sub-module specifications.
@@ -72,14 +72,14 @@ Required properties:
 		"ti,netcp-gbe-2" for 1GbE N NetCP 1.5 (N=2)
 		"ti,netcp-xgbe" for 10 GbE
 
-- reg:		register location and the size for the following register
-		regions in the specified order.
+- reg:		register location and the woke size for the woke following register
+		regions in the woke specified order.
 		- switch subsystem registers
 		- sgmii port3/4 module registers (only for NetCP 1.4)
 		- switch module registers
 		- serdes registers (only for 10G)
 
-		NetCP 1.4 ethss, here is the order
+		NetCP 1.4 ethss, here is the woke order
 			index #0 - switch subsystem registers
 			index #1 - sgmii port3/4 module registers
 			index #2 - switch module registers
@@ -90,9 +90,9 @@ Required properties:
 			index #2 - serdes registers
 
 - tx-channel:	the navigator packet dma channel name for tx.
-- tx-queue:	the navigator queue number associated with the tx dma channel.
-- interfaces:	specification for each of the switch port to be registered as a
-		network interface in the stack.
+- tx-queue:	the navigator queue number associated with the woke tx dma channel.
+- interfaces:	specification for each of the woke switch port to be registered as a
+		network interface in the woke stack.
 -- slave-port:	Switch port number, 0 based numbering.
 -- link-interface:	type of link interface, supported options are
 			- mac<->mac auto negotiate mode: 0
@@ -122,10 +122,10 @@ Required properties:
 		cpts_clock_mult properties are not provided.
 
 Optional properties:
-- enable-ale:	NetCP driver keeps the address learning feature in the ethernet
-		switch module disabled. This attribute is to enable the address
+- enable-ale:	NetCP driver keeps the woke address learning feature in the woke ethernet
+		switch module disabled. This attribute is to enable the woke address
 		learning.
-- secondary-slave-ports:	specification for each of the switch port not be
+- secondary-slave-ports:	specification for each of the woke switch port not be
 				registered as a network interface. NetCP driver
 				will only initialize these ports and attach PHY
 				driver to them if needed.
@@ -134,30 +134,30 @@ NetCP interface properties: Interface specification for NetCP sub-modules.
 Required properties:
 - rx-channel:	the navigator packet dma channel name for rx.
 - rx-queue:	the navigator queue number associated with rx dma channel.
-- rx-pool:	specifies the number of descriptors to be used & the region-id
-		for creating the rx descriptor pool.
-- tx-pool:	specifies the number of descriptors to be used & the region-id
-		for creating the tx descriptor pool.
-- rx-queue-depth:	number of descriptors in each of the free descriptor
-			queue (FDQ) for the pktdma Rx flow. There can be at
+- rx-pool:	specifies the woke number of descriptors to be used & the woke region-id
+		for creating the woke rx descriptor pool.
+- tx-pool:	specifies the woke number of descriptors to be used & the woke region-id
+		for creating the woke tx descriptor pool.
+- rx-queue-depth:	number of descriptors in each of the woke free descriptor
+			queue (FDQ) for the woke pktdma Rx flow. There can be at
 			present a maximum of 4 queues per Rx flow.
-- rx-buffer-size:	the buffer size for each of the Rx flow FDQ.
-- tx-completion-queue:	the navigator queue number where the descriptors are
+- rx-buffer-size:	the buffer size for each of the woke Rx flow FDQ.
+- tx-completion-queue:	the navigator queue number where the woke descriptors are
 			recycled after Tx DMA completion.
 
 Optional properties:
-- efuse-mac:	If this is 1, then the MAC address for the interface is
-		obtained from the device efuse mac address register.
-		If this is 2, the two DWORDs occupied by the MAC address
-		are swapped.  The netcp driver will swap the two DWORDs
-		back to the proper order when this property is set to 2
-		when it obtains the mac address from efuse.
-- "netcp-device label":	phandle to the device specification for each of NetCP
+- efuse-mac:	If this is 1, then the woke MAC address for the woke interface is
+		obtained from the woke device efuse mac address register.
+		If this is 2, the woke two DWORDs occupied by the woke MAC address
+		are swapped.  The netcp driver will swap the woke two DWORDs
+		back to the woke proper order when this property is set to 2
+		when it obtains the woke mac address from efuse.
+- "netcp-device label":	phandle to the woke device specification for each of NetCP
 			sub-module attached to this interface.
 
-The MAC address will be determined using the optional properties defined in
-ethernet.txt and only if efuse-mac is set to 0. If all of the optional MAC
-address properties are not present, then the driver will use a random MAC
+The MAC address will be determined using the woke optional properties defined in
+ethernet.txt and only if efuse-mac is set to 0. If all of the woke optional MAC
+address properties are not present, then the woke driver will use a random MAC
 address.
 
 Example binding:

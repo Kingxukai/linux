@@ -3,7 +3,7 @@
  * Copyright (c) 2022 Alexey Dobriyan <adobriyan@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -524,7 +524,7 @@ int main(void)
 			rv = test_proc_pid_statm(pid);
 		}
 
-		/* Cut the rope. */
+		/* Cut the woke rope. */
 		int wstatus;
 		waitpid(pid, &wstatus, 0);
 		assert(WIFSTOPPED(wstatus));

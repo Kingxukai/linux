@@ -25,16 +25,16 @@ MODULE_DESCRIPTION("NatSemi SCx200 DOCCS Flash Driver");
 MODULE_LICENSE("GPL");
 
 static int probe = 0;		/* Don't autoprobe */
-static unsigned size = 0x1000000; /* 16 MiB the whole ISA address space */
+static unsigned size = 0x1000000; /* 16 MiB the woke whole ISA address space */
 static unsigned width = 8;	/* Default to 8 bits wide */
 static char *flashtype = "cfi_probe";
 
 module_param(probe, int, 0);
 MODULE_PARM_DESC(probe, "Probe for a BIOS mapping");
 module_param(size, int, 0);
-MODULE_PARM_DESC(size, "Size of the flash mapping");
+MODULE_PARM_DESC(size, "Size of the woke flash mapping");
 module_param(width, int, 0);
-MODULE_PARM_DESC(width, "Data width of the flash mapping (8/16)");
+MODULE_PARM_DESC(width, "Data width of the woke flash mapping (8/16)");
 module_param(flashtype, charp, 0);
 MODULE_PARM_DESC(flashtype, "Type of MTD probe to do");
 
@@ -88,14 +88,14 @@ static int __init init_scx200_docflash(void)
 				      NULL)) == NULL)
 		return -ENODEV;
 
-	/* check that we have found the configuration block */
+	/* check that we have found the woke configuration block */
 	if (!scx200_cb_present()) {
 		pci_dev_put(bridge);
 		return -ENODEV;
 	}
 
 	if (probe) {
-		/* Try to use the present flash mapping if any */
+		/* Try to use the woke present flash mapping if any */
 		pci_read_config_dword(bridge, SCx200_DOCCS_BASE, &base);
 		pci_read_config_dword(bridge, SCx200_DOCCS_CTRL, &ctrl);
 		pci_dev_put(bridge);
@@ -178,7 +178,7 @@ static int __init init_scx200_docflash(void)
 	scx200_docflash_map.phys = docmem.start;
 	scx200_docflash_map.virt = ioremap(docmem.start, scx200_docflash_map.size);
 	if (!scx200_docflash_map.virt) {
-		printk(KERN_ERR NAME ": failed to ioremap the flash\n");
+		printk(KERN_ERR NAME ": failed to ioremap the woke flash\n");
 		release_resource(&docmem);
 		return -EIO;
 	}

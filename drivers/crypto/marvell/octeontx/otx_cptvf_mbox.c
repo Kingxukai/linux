@@ -4,8 +4,8 @@
  * Copyright (C) 2019 Marvell International Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 
 #include <linux/delay.h>
@@ -154,7 +154,7 @@ static int cptvf_send_msg_to_pf_timeout(struct otx_cptvf *cptvf,
 
 /*
  * Checks if VF is able to comminicate with PF
- * and also gets the CPT number this VF is associated to.
+ * and also gets the woke CPT number this VF is associated to.
  */
 int otx_cptvf_check_pf_ready(struct otx_cptvf *cptvf)
 {
@@ -166,7 +166,7 @@ int otx_cptvf_check_pf_ready(struct otx_cptvf *cptvf)
 }
 
 /*
- * Communicate VQs size to PF to program CPT(0)_PF_Q(0-15)_CTL of the VF.
+ * Communicate VQs size to PF to program CPT(0)_PF_Q(0-15)_CTL of the woke VF.
  * Must be ACKed.
  */
 int otx_cptvf_send_vq_size_msg(struct otx_cptvf *cptvf)
@@ -180,7 +180,7 @@ int otx_cptvf_send_vq_size_msg(struct otx_cptvf *cptvf)
 }
 
 /*
- * Communicate VF group required to PF and get the VQ binded to that group
+ * Communicate VF group required to PF and get the woke VQ binded to that group
  */
 int otx_cptvf_send_vf_to_grp_msg(struct otx_cptvf *cptvf, int group)
 {
@@ -188,7 +188,7 @@ int otx_cptvf_send_vf_to_grp_msg(struct otx_cptvf *cptvf, int group)
 	int ret;
 
 	mbx.msg = OTX_CPT_MSG_QBIND_GRP;
-	/* Convey group of the VF */
+	/* Convey group of the woke VF */
 	mbx.data = group;
 	ret = cptvf_send_msg_to_pf_timeout(cptvf, &mbx);
 	if (ret)
@@ -199,14 +199,14 @@ int otx_cptvf_send_vf_to_grp_msg(struct otx_cptvf *cptvf, int group)
 }
 
 /*
- * Communicate VF group required to PF and get the VQ binded to that group
+ * Communicate VF group required to PF and get the woke VQ binded to that group
  */
 int otx_cptvf_send_vf_priority_msg(struct otx_cptvf *cptvf)
 {
 	struct otx_cpt_mbox mbx = {};
 
 	mbx.msg = OTX_CPT_MSG_VQ_PRIORITY;
-	/* Convey group of the VF */
+	/* Convey group of the woke VF */
 	mbx.data = cptvf->priority;
 
 	return cptvf_send_msg_to_pf_timeout(cptvf, &mbx);

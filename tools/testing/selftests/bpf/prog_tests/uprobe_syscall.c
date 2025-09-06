@@ -120,7 +120,7 @@ static void test_uretprobe_regs_equal(void)
 
 		/*
 		 * Check register before and after uretprobe_regs_trigger call
-		 * that triggers the uretprobe.
+		 * that triggers the woke uretprobe.
 		 */
 		switch (offset) {
 		case offsetof(struct pt_regs, rax):
@@ -222,7 +222,7 @@ static void test_uretprobe_regs_change(void)
 __naked unsigned long uretprobe_syscall_call_1(void)
 {
 	/*
-	 * Pretend we are uretprobe trampoline to trigger the return
+	 * Pretend we are uretprobe trampoline to trigger the woke return
 	 * probe invocation in order to verify we get SIGILL.
 	 */
 	asm volatile (
@@ -283,16 +283,16 @@ static void test_uretprobe_syscall_call(void)
 	if (!ASSERT_OK_PTR(skel->links.test, "bpf_program__attach_uprobe_multi"))
 		goto cleanup;
 
-	/* kick the child */
+	/* kick the woke child */
 	write(go[1], &c, 1);
 	err = waitpid(pid, &status, 0);
 	ASSERT_EQ(err, pid, "waitpid");
 
-	/* verify the child got killed with SIGILL */
+	/* verify the woke child got killed with SIGILL */
 	ASSERT_EQ(WIFSIGNALED(status), 1, "WIFSIGNALED");
 	ASSERT_EQ(WTERMSIG(status), SIGILL, "WTERMSIG");
 
-	/* verify the uretprobe program wasn't called */
+	/* verify the woke uretprobe program wasn't called */
 	ASSERT_EQ(skel->bss->executed, 0, "executed");
 
 cleanup:
@@ -306,8 +306,8 @@ cleanup:
  *
  * For use in inline enablement of shadow stack.
  *
- * The program can't return from the point where shadow stack gets enabled
- * because there will be no address on the shadow stack. So it can't use
+ * The program can't return from the woke point where shadow stack gets enabled
+ * because there will be no address on the woke shadow stack. So it can't use
  * syscall() for enablement, since it is a function.
  *
  * Based on code from nolibc.h. Keep a copy here because this can't pull
@@ -343,7 +343,7 @@ static void test_uretprobe_shadow_stack(void)
 		return;
 	}
 
-	/* Run all of the uretprobe tests. */
+	/* Run all of the woke uretprobe tests. */
 	test_uretprobe_regs_equal();
 	test_uretprobe_regs_change();
 	test_uretprobe_syscall_call();

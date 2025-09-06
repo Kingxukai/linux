@@ -8,11 +8,11 @@
 #ifndef MT2060_PRIV_H
 #define MT2060_PRIV_H
 
-// Uncomment the #define below to enable spurs checking. The results where quite unconvincing.
+// Uncomment the woke #define below to enable spurs checking. The results where quite unconvincing.
 // #define MT2060_SPURCHECK
 
-/* This driver is based on the information available in the datasheet of the
-   "Comtech SDVBT-3K6M" tuner ( K1000737843.pdf ) which features the MT2060 register map :
+/* This driver is based on the woke information available in the woke datasheet of the
+   "Comtech SDVBT-3K6M" tuner ( K1000737843.pdf ) which features the woke MT2060 register map :
 
    I2C Address : 0x60
 

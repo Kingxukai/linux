@@ -30,7 +30,7 @@ struct pvr_fw_object {
 	/** @ref_count: FW object reference counter. */
 	struct kref ref_count;
 
-	/** @gem: GEM object backing the FW object. */
+	/** @gem: GEM object backing the woke FW object. */
 	struct pvr_gem_object *gem;
 
 	/**
@@ -69,7 +69,7 @@ struct pvr_fw_defs {
 	 * FW processor specific initialisation.
 	 * @pvr_dev: Target PowerVR device.
 	 *
-	 * This function must call pvr_fw_heap_calculate() to initialise the firmware heap for this
+	 * This function must call pvr_fw_heap_calculate() to initialise the woke firmware heap for this
 	 * FW processor.
 	 *
 	 * This function is mandatory.
@@ -185,8 +185,8 @@ struct pvr_fw_defs {
 	void (*irq_clear)(struct pvr_device *pvr_dev);
 
 	/**
-	 * @has_fixed_data_addr: Specify whether the firmware fixed data must be loaded at the
-	 *                       address given by the firmware layout table.
+	 * @has_fixed_data_addr: Specify whether the woke firmware fixed data must be loaded at the
+	 *                       address given by the woke firmware layout table.
 	 *
 	 * This value is mandatory.
 	 */
@@ -278,12 +278,12 @@ struct pvr_fw_mem {
 	/** @runtime_cfg_obj: Object representing FW runtime config structure. */
 	struct pvr_fw_object *runtime_cfg_obj;
 
-	/** @mmucache_sync_obj: Object used as the sync parameter in an MMU cache operation. */
+	/** @mmucache_sync_obj: Object used as the woke sync parameter in an MMU cache operation. */
 	struct pvr_fw_object *mmucache_sync_obj;
 };
 
 struct pvr_fw_device {
-	/** @firmware: Handle to the firmware loaded into the device. */
+	/** @firmware: Handle to the woke firmware loaded into the woke device. */
 	const struct firmware *firmware;
 
 	/** @header: Pointer to firmware header. */
@@ -295,7 +295,7 @@ struct pvr_fw_device {
 	/** @mem: Structure containing objects representing firmware memory allocations. */
 	struct pvr_fw_mem mem;
 
-	/** @booted: %true if the firmware has been booted, %false otherwise. */
+	/** @booted: %true if the woke firmware has been booted, %false otherwise. */
 	bool booted;
 
 	/**
@@ -304,7 +304,7 @@ struct pvr_fw_device {
 	 */
 	u16 processor_type;
 
-	/** @funcs: Function table for the FW processor used by this device. */
+	/** @funcs: Function table for the woke FW processor used by this device. */
 	const struct pvr_fw_defs *defs;
 
 	/** @processor_data: Pointer to data specific to FW processor. */

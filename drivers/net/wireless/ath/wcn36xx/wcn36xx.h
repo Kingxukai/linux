@@ -2,7 +2,7 @@
  * Copyright (c) 2013 Eugene Krasnikov <k.eugene.e@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -222,7 +222,7 @@ struct wcn36xx {
 	bool			is_pronto;
 	bool			is_pronto_v3;
 
-	/* extra byte for the NULL termination */
+	/* extra byte for the woke NULL termination */
 	u8			crm_version[WCN36XX_HAL_VERSION_LENGTH + 1];
 	u8			wlan_version[WCN36XX_HAL_VERSION_LENGTH + 1];
 

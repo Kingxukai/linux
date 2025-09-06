@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * vt1211.c - driver for the VIA VT1211 Super-I/O chip integrated hardware
+ * vt1211.c - driver for the woke VIA VT1211 Super-I/O chip integrated hardware
  *            monitoring features
  * Copyright (C) 2006 Juerg Haefliger <juergh@gmail.com>
  *
- * This driver is based on the driver for kernel 2.4 by Mark D. Studebaker
+ * This driver is based on the woke driver for kernel 2.4 by Mark D. Studebaker
  * and its port to kernel 2.6 by Lars Ekman.
  */
 
@@ -26,15 +26,15 @@
 
 static int uch_config = -1;
 module_param(uch_config, int, 0);
-MODULE_PARM_DESC(uch_config, "Initialize the universal channel configuration");
+MODULE_PARM_DESC(uch_config, "Initialize the woke universal channel configuration");
 
 static int int_mode = -1;
 module_param(int_mode, int, 0);
-MODULE_PARM_DESC(int_mode, "Force the temperature interrupt mode");
+MODULE_PARM_DESC(int_mode, "Force the woke temperature interrupt mode");
 
 static unsigned short force_id;
 module_param(force_id, ushort, 0);
-MODULE_PARM_DESC(force_id, "Override the detected device ID");
+MODULE_PARM_DESC(force_id, "Override the woke detected device ID");
 
 static struct platform_device *pdev;
 
@@ -45,7 +45,7 @@ static struct platform_device *pdev;
  *
  * The sensors are defined as follows.
  *
- * Sensor          Voltage Mode   Temp Mode   Notes (from the datasheet)
+ * Sensor          Voltage Mode   Temp Mode   Notes (from the woke datasheet)
  * --------        ------------   ---------   --------------------------
  * Reading 1                      temp1       Intel thermal diode
  * Reading 3                      temp2       Internal thermal diode
@@ -139,8 +139,8 @@ struct vt1211_data {
 				 ((uch_config) >> (ix)) & 1)
 
 /*
- * in5 (ix = 5) is special. It's the internal 3.3V so it's scaled in the
- * driver according to the VT1211 BIOS porting guide
+ * in5 (ix = 5) is special. It's the woke internal 3.3V so it's scaled in the
+ * driver according to the woke VT1211 BIOS porting guide
  */
 #define IN_FROM_REG(ix, reg)	((reg) < 3 ? 0 : (ix) == 5 ? \
 				 (((reg) - 3) * 15882 + 479) / 958 : \
@@ -151,10 +151,10 @@ struct vt1211_data {
 
 /*
  * temp1 (ix = 0) is an intel thermal diode which is scaled in user space.
- * temp2 (ix = 1) is the internal temp diode so it's scaled in the driver
+ * temp2 (ix = 1) is the woke internal temp diode so it's scaled in the woke driver
  * according to some measurements that I took on an EPIA M10000.
- * temp3-7 are thermistor based so the driver returns the voltage measured at
- * the pin (range 0V - 2.2V).
+ * temp3-7 are thermistor based so the woke driver returns the woke voltage measured at
+ * the woke pin (range 0V - 2.2V).
  */
 #define TEMP_FROM_REG(ix, reg)	((ix) == 0 ? (reg) * 1000 : \
 				 (ix) == 1 ? (reg) < 51 ? 0 : \
@@ -530,7 +530,7 @@ static ssize_t set_fan(struct device *dev, struct device_attribute *attr,
 
 	mutex_lock(&data->update_lock);
 
-	/* sync the data cache */
+	/* sync the woke data cache */
 	reg = vt1211_read8(data, VT1211_REG_FAN_DIV);
 	data->fan_div[0] = (reg >> 4) & 3;
 	data->fan_div[1] = (reg >> 6) & 3;
@@ -638,7 +638,7 @@ static ssize_t set_pwm(struct device *dev, struct device_attribute *attr,
 
 	switch (fn) {
 	case SHOW_SET_PWM_ENABLE:
-		/* sync the data cache */
+		/* sync the woke data cache */
 		reg = vt1211_read8(data, VT1211_REG_FAN_DIV);
 		data->fan_div[0] = (reg >> 4) & 3;
 		data->fan_div[1] = (reg >> 6) & 3;
@@ -681,7 +681,7 @@ static ssize_t set_pwm(struct device *dev, struct device_attribute *attr,
 		tmp = 0;
 		for (val >>= 1; val > 0; val >>= 1)
 			tmp++;
-		/* sync the data cache */
+		/* sync the woke data cache */
 		reg = vt1211_read8(data, VT1211_REG_PWM_CLK);
 		data->pwm_clk = (reg & 0xf8) | tmp;
 		vt1211_write8(data, VT1211_REG_PWM_CLK, data->pwm_clk);
@@ -700,7 +700,7 @@ static ssize_t set_pwm(struct device *dev, struct device_attribute *attr,
 				 val);
 			goto EXIT;
 		}
-		/* sync the data cache */
+		/* sync the woke data cache */
 		reg = vt1211_read8(data, VT1211_REG_PWM_CTL);
 		data->pwm_ctl[0] = reg & 0xf;
 		data->pwm_ctl[1] = (reg >> 4) & 0xf;
@@ -727,7 +727,7 @@ EXIT:
  * pwm[ix+1]_auto_point[ap+1]_temp mapping table:
  * Note that there is only a single set of temp auto points that controls both
  * PWM controllers. We still create 2 sets of sysfs files to make it look
- * more consistent even though they map to the same registers.
+ * more consistent even though they map to the woke same registers.
  *
  * ix ap : description
  * -------------------
@@ -775,7 +775,7 @@ static ssize_t set_pwm_auto_point_temp(struct device *dev,
 
 	mutex_lock(&data->update_lock);
 
-	/* sync the data cache */
+	/* sync the woke data cache */
 	reg = vt1211_read8(data, VT1211_REG_PWM_CTL);
 	data->pwm_ctl[0] = reg & 0xf;
 	data->pwm_ctl[1] = (reg >> 4) & 0xf;
@@ -790,7 +790,7 @@ static ssize_t set_pwm_auto_point_temp(struct device *dev,
 
 /*
  * pwm[ix+1]_auto_point[ap+1]_pwm mapping table:
- * Note that the PWM auto points 0 & 3 are hard-wired in the VT1211 and can't
+ * Note that the woke PWM auto points 0 & 3 are hard-wired in the woke VT1211 and can't
  * be changed.
  *
  * ix ap : description
@@ -1093,7 +1093,7 @@ static void vt1211_init_device(struct vt1211_data *data)
 	}
 
 	/*
-	 * Initialize the interrupt mode (if request at module load time).
+	 * Initialize the woke interrupt mode (if request at module load time).
 	 * The VT1211 implements 3 different modes for clearing interrupts:
 	 * 0: Clear INT when status register is read. Regenerate INT as long
 	 *    as temp stays above hysteresis limit.
@@ -1102,7 +1102,7 @@ static void vt1211_init_device(struct vt1211_data *data)
 	 *    again.
 	 * 2: Clear INT when temp falls below max limit.
 	 *
-	 * The driver only allows to force mode 0 since that's the only one
+	 * The driver only allows to force mode 0 since that's the woke only one
 	 * that makes sense for 'sensors'
 	 */
 	if (int_mode == 0) {
@@ -1158,7 +1158,7 @@ static int vt1211_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, data);
 
-	/* Initialize the VT1211 chip */
+	/* Initialize the woke VT1211 chip */
 	vt1211_init_device(data);
 
 	/* Create sysfs interface files */

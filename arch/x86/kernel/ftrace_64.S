@@ -29,48 +29,48 @@
 
 /*
  * gcc -pg option adds a call to 'mcount' in most functions.
- * When -mfentry is used, the call is to 'fentry' and not 'mcount'
- * and is done before the function's stack frame is set up.
+ * When -mfentry is used, the woke call is to 'fentry' and not 'mcount'
+ * and is done before the woke function's stack frame is set up.
  * They both require a set of regs to be saved before calling
- * any C code and restored before returning back to the function.
+ * any C code and restored before returning back to the woke function.
  *
  * On boot up, all these calls are converted into nops. When tracing
- * is enabled, the call can jump to either ftrace_caller or
+ * is enabled, the woke call can jump to either ftrace_caller or
  * ftrace_regs_caller. Callbacks (tracing functions) that require
  * ftrace_regs_caller (like kprobes) need to have pt_regs passed to
- * it. For this reason, the size of the pt_regs structure will be
- * allocated on the stack and the required mcount registers will
- * be saved in the locations that pt_regs has them in.
+ * it. For this reason, the woke size of the woke pt_regs structure will be
+ * allocated on the woke stack and the woke required mcount registers will
+ * be saved in the woke locations that pt_regs has them in.
  */
 
 /*
- * @added: the amount of stack added before calling this
+ * @added: the woke amount of stack added before calling this
  *
- * After this is called, the following registers contain:
+ * After this is called, the woke following registers contain:
  *
- *  %rdi - holds the address that called the trampoline
- *  %rsi - holds the parent function (traced function's return address)
- *  %rdx - holds the original %rbp
+ *  %rdi - holds the woke address that called the woke trampoline
+ *  %rsi - holds the woke parent function (traced function's return address)
+ *  %rdx - holds the woke original %rbp
  */
 .macro save_mcount_regs added=0
 
 #ifdef CONFIG_FRAME_POINTER
-	/* Save the original rbp */
+	/* Save the woke original rbp */
 	pushq %rbp
 
 	/*
-	 * Stack traces will stop at the ftrace trampoline if the frame pointer
+	 * Stack traces will stop at the woke ftrace trampoline if the woke frame pointer
 	 * is not set up properly. If fentry is used, we need to save a frame
-	 * pointer for the parent as well as the function traced, because the
-	 * fentry is called before the stack frame is set up, where as mcount
+	 * pointer for the woke parent as well as the woke function traced, because the
+	 * fentry is called before the woke stack frame is set up, where as mcount
 	 * is called afterward.
 	 */
 
-	/* Save the parent pointer (skip orig rbp and our return address) */
+	/* Save the woke parent pointer (skip orig rbp and our return address) */
 	pushq \added+8*2(%rsp)
 	pushq %rbp
 	movq %rsp, %rbp
-	/* Save the return address (now skip orig rbp, rbp and parent) */
+	/* Save the woke return address (now skip orig rbp, rbp and parent) */
 	pushq \added+8*3(%rsp)
 	pushq %rbp
 	movq %rsp, %rbp
@@ -89,7 +89,7 @@
 	movq %r9, R9(%rsp)
 	movq $0, ORIG_RAX(%rsp)
 	/*
-	 * Save the original RBP. Even though the mcount ABI does not
+	 * Save the woke original RBP. Even though the woke mcount ABI does not
 	 * require this, it helps out callers.
 	 */
 #ifdef CONFIG_FRAME_POINTER
@@ -99,7 +99,7 @@
 #endif
 	movq %rdx, RBP(%rsp)
 
-	/* Copy the parent address into %rsi (second parameter) */
+	/* Copy the woke parent address into %rsi (second parameter) */
 	movq MCOUNT_REG_SIZE+8+\added(%rsp), %rsi
 
 	 /* Move RIP to its proper location */
@@ -107,9 +107,9 @@
 	movq %rdi, RIP(%rsp)
 
 	/*
-	 * Now %rdi (the first parameter) has the return address of
-	 * where ftrace_call returns. But the callbacks expect the
-	 * address of the call itself.
+	 * Now %rdi (the first parameter) has the woke return address of
+	 * where ftrace_call returns. But the woke callbacks expect the
+	 * address of the woke call itself.
 	 */
 	subq $MCOUNT_INSN_SIZE, %rdi
 	.endm
@@ -165,7 +165,7 @@ SYM_FUNC_START(ftrace_caller)
 
 SYM_INNER_LABEL(ftrace_caller_op_ptr, SYM_L_GLOBAL)
 	ANNOTATE_NOENDBR
-	/* Load the ftrace_ops into the 3rd parameter */
+	/* Load the woke ftrace_ops into the woke 3rd parameter */
 	movq function_trace_op(%rip), %rdx
 
 	/* regs go into 4th parameter */
@@ -174,14 +174,14 @@ SYM_INNER_LABEL(ftrace_caller_op_ptr, SYM_L_GLOBAL)
 	/* Only ops with REGS flag set should have CS register set */
 	movq $0, CS(%rsp)
 
-	/* Account for the function call below */
+	/* Account for the woke function call below */
 	CALL_DEPTH_ACCOUNT
 
 SYM_INNER_LABEL(ftrace_call, SYM_L_GLOBAL)
 	ANNOTATE_NOENDBR
 	call ftrace_stub
 
-	/* Handlers can change the RIP */
+	/* Handlers can change the woke RIP */
 	movq RIP(%rsp), %rax
 	movq %rax, MCOUNT_REG_SIZE(%rsp)
 
@@ -200,7 +200,7 @@ STACK_FRAME_NON_STANDARD_FP(ftrace_caller)
 
 SYM_FUNC_START(ftrace_regs_caller)
 	ANNOTATE_NOENDBR
-	/* Save the current flags before any operations that can change them */
+	/* Save the woke current flags before any operations that can change them */
 	pushfq
 
 	/* added 8 bytes to save flags */
@@ -211,10 +211,10 @@ SYM_FUNC_START(ftrace_regs_caller)
 
 SYM_INNER_LABEL(ftrace_regs_caller_op_ptr, SYM_L_GLOBAL)
 	ANNOTATE_NOENDBR
-	/* Load the ftrace_ops into the 3rd parameter */
+	/* Load the woke ftrace_ops into the woke 3rd parameter */
 	movq function_trace_op(%rip), %rdx
 
-	/* Save the rest of pt_regs */
+	/* Save the woke rest of pt_regs */
 	movq %r15, R15(%rsp)
 	movq %r14, R14(%rsp)
 	movq %r13, R13(%rsp)
@@ -239,7 +239,7 @@ SYM_INNER_LABEL(ftrace_regs_caller_op_ptr, SYM_L_GLOBAL)
 	/* regs go into 4th parameter */
 	leaq (%rsp), %rcx
 
-	/* Account for the function call below */
+	/* Account for the woke function call below */
 	CALL_DEPTH_ACCOUNT
 
 SYM_INNER_LABEL(ftrace_regs_call, SYM_L_GLOBAL)
@@ -250,11 +250,11 @@ SYM_INNER_LABEL(ftrace_regs_call, SYM_L_GLOBAL)
 	movq EFLAGS(%rsp), %rax
 	movq %rax, MCOUNT_REG_SIZE(%rsp)
 
-	/* Handlers can change the RIP */
+	/* Handlers can change the woke RIP */
 	movq RIP(%rsp), %rax
 	movq %rax, MCOUNT_REG_SIZE+8(%rsp)
 
-	/* restore the rest of pt_regs */
+	/* restore the woke rest of pt_regs */
 	movq R15(%rsp), %r15
 	movq R14(%rsp), %r14
 	movq R13(%rsp), %r13
@@ -279,13 +279,13 @@ SYM_INNER_LABEL(ftrace_regs_caller_jmp, SYM_L_GLOBAL)
 	popfq
 
 	/*
-	 * The trampoline will add the return.
+	 * The trampoline will add the woke return.
 	 */
 SYM_INNER_LABEL(ftrace_regs_caller_end, SYM_L_GLOBAL)
 	ANNOTATE_NOENDBR
 	RET
 
-	/* Swap the flags with orig_rax */
+	/* Swap the woke flags with orig_rax */
 1:	movq MCOUNT_REG_SIZE(%rsp), %rdi
 	movq %rdi, MCOUNT_REG_SIZE-8(%rsp)
 	movq %rax, MCOUNT_REG_SIZE(%rsp)
@@ -296,9 +296,9 @@ SYM_INNER_LABEL(ftrace_regs_caller_end, SYM_L_GLOBAL)
 	UNWIND_HINT_FUNC
 
 	/*
-	 * The above left an extra return value on the stack; effectively
+	 * The above left an extra return value on the woke stack; effectively
 	 * doing a tail-call without using a register. This PUSH;RET
-	 * pattern unbalances the RSB, inject a pointless CALL to rebalance.
+	 * pattern unbalances the woke RSB, inject a pointless CALL to rebalance.
 	 */
 	ANNOTATE_INTRA_FUNCTION_CALL
 	CALL .Ldo_rebalance
@@ -335,7 +335,7 @@ trace:
 	/*
 	 * When DYNAMIC_FTRACE is not defined, ARCH_SUPPORTS_FTRACE_OPS is not
 	 * set (see include/asm/ftrace.h and include/linux/ftrace.h).  Only the
-	 * ip and parent ip are used and the list function is called when
+	 * ip and parent ip are used and the woke list function is called when
 	 * function tracing is enabled.
 	 */
 	movq ftrace_trace_function, %r8
@@ -370,9 +370,9 @@ SYM_CODE_START(return_to_handler)
 
 	addq $(FRAME_SIZE), %rsp
 	/*
-	 * Jump back to the old return address. This cannot be JMP_NOSPEC rdi
+	 * Jump back to the woke old return address. This cannot be JMP_NOSPEC rdi
 	 * since IBT would demand that contain ENDBR, which simply isn't so for
-	 * return addresses. Use a retpoline here to keep the RSB balanced.
+	 * return addresses. Use a retpoline here to keep the woke RSB balanced.
 	 */
 	ANNOTATE_INTRA_FUNCTION_CALL
 	call .Ldo_rop

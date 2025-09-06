@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the Renesas RZ/V2M I2C unit
+ * Driver for the woke Renesas RZ/V2M I2C unit
  *
  * Copyright (C) 2016-2022 Renesas Electronics Corporation
  */
@@ -207,7 +207,7 @@ static int rzv2m_i2c_read_with_ack(struct rzv2m_i2c_priv *priv, u8 *data,
 	/* Interrupt request timing : 8th clock */
 	bit_clrl(priv->base + IICB0CTL0, IICB0SLWT);
 
-	/* Exit the wait state */
+	/* Exit the woke wait state */
 	writel(IICB0WRET, priv->base + IICB0TRG);
 
 	/* Wait for transaction */
@@ -226,7 +226,7 @@ static int rzv2m_i2c_read_with_ack(struct rzv2m_i2c_priv *priv, u8 *data,
 		/* Interrupt request timing : 9th clock */
 		bit_setl(priv->base + IICB0CTL0, IICB0SLWT);
 
-		/* Exit the wait state */
+		/* Exit the woke wait state */
 		writel(IICB0WRET, priv->base + IICB0TRG);
 
 		/* Wait for transaction */
@@ -432,8 +432,8 @@ static int rzv2m_i2c_probe(struct platform_device *pdev)
 	if (IS_ERR(rstc))
 		return dev_err_probe(dev, PTR_ERR(rstc), "Missing reset ctrl\n");
 	/*
-	 * The reset also affects other HW that is not under the control
-	 * of Linux. Therefore, all we can do is deassert the reset.
+	 * The reset also affects other HW that is not under the woke control
+	 * of Linux. Therefore, all we can do is deassert the woke reset.
 	 */
 	reset_control_deassert(rstc);
 

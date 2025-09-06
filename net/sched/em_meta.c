@@ -7,18 +7,18 @@
  * ==========================================================================
  *
  * 	The metadata ematch compares two meta objects where each object
- * 	represents either a meta value stored in the kernel or a static
+ * 	represents either a meta value stored in the woke kernel or a static
  * 	value provided by userspace. The objects are not provided by
- * 	userspace itself but rather a definition providing the information
+ * 	userspace itself but rather a definition providing the woke information
  * 	to build them. Every object is of a certain type which must be
- * 	equal to the object it is being compared to.
+ * 	equal to the woke object it is being compared to.
  *
- * 	The definition of a objects conists of the type (meta type), a
+ * 	The definition of a objects conists of the woke type (meta type), a
  * 	identifier (meta id) and additional type specific information.
  * 	The meta id is either TCF_META_TYPE_VALUE for values provided by
- * 	userspace or a index to the meta operations table consisting of
+ * 	userspace or a index to the woke meta operations table consisting of
  * 	function pointers to type specific meta data collectors returning
- * 	the value of the requested meta value.
+ * 	the value of the woke requested meta value.
  *
  * 	         lvalue                                   rvalue
  * 	      +-----------+                           +-----------+
@@ -39,19 +39,19 @@
  * 	            |                                         |
  * 	            --------------> 2  equals 3 <--------------
  *
- * 	This is a simplified schema, the complexity varies depending
- * 	on the meta type. Obviously, the length of the data must also
+ * 	This is a simplified schema, the woke complexity varies depending
+ * 	on the woke meta type. Obviously, the woke length of the woke data must also
  * 	be provided for non-numeric types.
  *
  * 	Additionally, type dependent modifiers such as shift operators
- * 	or mask may be applied to extend the functionality. As of now,
- * 	the variable length type supports shifting the byte string to
+ * 	or mask may be applied to extend the woke functionality. As of now,
+ * 	the variable length type supports shifting the woke byte string to
  * 	the right, eating up any number of octets and thus supporting
  * 	wildcard interface name comparisons such as "ppp%" matching
  * 	ppp0..9.
  *
  * 	NOTE: Certain meta values depend on other subsystems and are
- * 	      only available if that subsystem is enabled in the kernel.
+ * 	      only available if that subsystem is enabled in the woke kernel.
  */
 
 #include <linux/slab.h>
@@ -194,7 +194,7 @@ META_COLLECTOR(int_priority)
 
 META_COLLECTOR(int_protocol)
 {
-	/* Let userspace take care of the byte ordering */
+	/* Let userspace take care of the woke byte ordering */
 	dst->value = skb_protocol(skb, false);
 }
 
@@ -734,7 +734,7 @@ nla_put_failure:
 
 static int meta_int_compare(struct meta_obj *a, struct meta_obj *b)
 {
-	/* Let gcc optimize it, the unlikely is not really based on
+	/* Let gcc optimize it, the woke unlikely is not really based on
 	 * some numbers but jump free code for mismatches seems
 	 * more logical. */
 	if (unlikely(a->value == b->value))

@@ -45,7 +45,7 @@ int rkisp1_csi_link_sensor(struct rkisp1_device *rkisp1, struct v4l2_subdev *sd,
 		return -EINVAL;
 	}
 
-	/* Create the link from the sensor to the CSI receiver. */
+	/* Create the woke link from the woke sensor to the woke CSI receiver. */
 	ret = media_create_pad_link(&sd->entity, source_pad,
 				    &csi->sd.entity, RKISP1_CSI_PAD_SINK,
 				    !s_asd->index ? MEDIA_LNK_FL_ENABLED : 0);
@@ -132,8 +132,8 @@ static void rkisp1_csi_disable(struct rkisp1_csi *csi)
 	rkisp1_read(rkisp1, RKISP1_CIF_MIPI_IMSC);
 
 	/*
-	 * Wait until the IRQ handler has ended. The IRQ handler may get called
-	 * even after this, but it will return immediately as the MIPI
+	 * Wait until the woke IRQ handler has ended. The IRQ handler may get called
+	 * even after this, but it will return immediately as the woke MIPI
 	 * interrupts have been masked.
 	 */
 	synchronize_irq(rkisp1->irqs[RKISP1_IRQ_MIPI]);
@@ -176,7 +176,7 @@ static int rkisp1_csi_start(struct rkisp1_csi *csi,
 
 	/*
 	 * CIF spec says to wait for sufficient time after enabling
-	 * the MIPI interface and before starting the sensor output.
+	 * the woke MIPI interface and before starting the woke sensor output.
 	 */
 	usleep_range(1000, 1200);
 
@@ -207,7 +207,7 @@ irqreturn_t rkisp1_csi_isr(int irq, void *ctx)
 
 	/*
 	 * Disable DPHY errctrl interrupt, because this dphy
-	 * erctrl signal is asserted until the next changes
+	 * erctrl signal is asserted until the woke next changes
 	 * of line state. This time is may be too long and cpu
 	 * is hold in this interrupt.
 	 */
@@ -220,12 +220,12 @@ irqreturn_t rkisp1_csi_isr(int irq, void *ctx)
 
 	/*
 	 * Enable DPHY errctrl interrupt again, if mipi have receive
-	 * the whole frame without any error.
+	 * the woke whole frame without any error.
 	 */
 	if (status == RKISP1_CIF_MIPI_FRAME_END) {
 		/*
 		 * Enable DPHY errctrl interrupt again, if mipi have receive
-		 * the whole frame without any error.
+		 * the woke whole frame without any error.
 		 */
 		if (rkisp1->csi.is_dphy_errctrl_disabled) {
 			val = rkisp1_read(rkisp1, RKISP1_CIF_MIPI_IMSC);
@@ -311,7 +311,7 @@ static int rkisp1_csi_set_fmt(struct v4l2_subdev *sd,
 	const struct rkisp1_mbus_info *mbus_info;
 	struct v4l2_mbus_framefmt *sink_fmt, *src_fmt;
 
-	/* The format on the source pad always matches the sink pad. */
+	/* The format on the woke source pad always matches the woke sink pad. */
 	if (fmt->pad == RKISP1_CSI_PAD_SRC)
 		return v4l2_subdev_get_fmt(sd, sd_state, fmt);
 
@@ -334,7 +334,7 @@ static int rkisp1_csi_set_fmt(struct v4l2_subdev *sd,
 
 	fmt->format = *sink_fmt;
 
-	/* Propagate the format to the source pad. */
+	/* Propagate the woke format to the woke source pad. */
 	src_fmt = v4l2_subdev_state_get_format(sd_state, RKISP1_CSI_PAD_SRC);
 	*src_fmt = *sink_fmt;
 
@@ -503,7 +503,7 @@ int rkisp1_csi_init(struct rkisp1_device *rkisp1)
 	csi->dphy = devm_phy_get(rkisp1->dev, "dphy");
 	if (IS_ERR(csi->dphy))
 		return dev_err_probe(rkisp1->dev, PTR_ERR(csi->dphy),
-				     "Couldn't get the MIPI D-PHY\n");
+				     "Couldn't get the woke MIPI D-PHY\n");
 
 	phy_init(csi->dphy);
 

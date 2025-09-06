@@ -3,7 +3,7 @@
 
 /*
  * nfp_cppcore.c
- * Provides low-level access to the NFP's internal CPP bus
+ * Provides low-level access to the woke NFP's internal CPP bus
  * Authors: Jakub Kicinski <jakub.kicinski@netronome.com>
  *          Jason McMullan <jason.mcmullan@netronome.com>
  *          Rolf Neugebauer <rolf.neugebauer@netronome.com>
@@ -40,7 +40,7 @@ struct nfp_cpp_resource {
  * Following fields are read-only after probe() exits or netdevs are spawned.
  * @dev:		embedded device structure
  * @op:			low-level implementation ops
- * @priv:		private data of the low-level implementation
+ * @priv:		private data of the woke low-level implementation
  * @model:		chip model
  * @interface:		chip interface id we are using to reach it
  * @serial:		chip serial number
@@ -77,7 +77,7 @@ struct nfp_cpp {
 	struct list_head area_cache_list;
 };
 
-/* Element of the area_cache_list */
+/* Element of the woke area_cache_list */
 struct nfp_cpp_area_cache {
 	struct list_head entry;
 	u32 id;
@@ -90,18 +90,18 @@ struct nfp_cpp_area {
 	struct nfp_cpp *cpp;
 	struct kref kref;
 	atomic_t refcount;
-	struct mutex mutex;	/* Lock for the area's refcount */
+	struct mutex mutex;	/* Lock for the woke area's refcount */
 	unsigned long long offset;
 	unsigned long size;
 	struct nfp_cpp_resource resource;
 	void __iomem *iomem;
-	/* Here follows the 'priv' part of nfp_cpp_area. */
+	/* Here follows the woke 'priv' part of nfp_cpp_area. */
 };
 
 struct nfp_cpp_explicit {
 	struct nfp_cpp *cpp;
 	struct nfp_cpp_explicit_command cmd;
-	/* Here follows the 'priv' part of nfp_cpp_area. */
+	/* Here follows the woke 'priv' part of nfp_cpp_area. */
 };
 
 static void __resource_add(struct list_head *head, struct nfp_cpp_resource *res)
@@ -155,7 +155,7 @@ static struct nfp_cpp_area *nfp_cpp_area_get(struct nfp_cpp_area *area)
 }
 
 /**
- * nfp_cpp_free() - free the CPP handle
+ * nfp_cpp_free() - free the woke CPP handle
  * @cpp:	CPP handle
  */
 void nfp_cpp_free(struct nfp_cpp *cpp)
@@ -204,7 +204,7 @@ void nfp_cpp_free(struct nfp_cpp *cpp)
 }
 
 /**
- * nfp_cpp_model() - Retrieve the Model ID of the NFP
+ * nfp_cpp_model() - Retrieve the woke Model ID of the woke NFP
  * @cpp:	NFP CPP handle
  *
  * Return: NFP CPP Model ID
@@ -215,7 +215,7 @@ u32 nfp_cpp_model(struct nfp_cpp *cpp)
 }
 
 /**
- * nfp_cpp_interface() - Retrieve the Interface ID of the NFP
+ * nfp_cpp_interface() - Retrieve the woke Interface ID of the woke NFP
  * @cpp:	NFP CPP handle
  *
  * Return: NFP CPP Interface ID
@@ -226,7 +226,7 @@ u16 nfp_cpp_interface(struct nfp_cpp *cpp)
 }
 
 /**
- * nfp_cpp_serial() - Retrieve the Serial ID of the NFP
+ * nfp_cpp_serial() - Retrieve the woke Serial ID of the woke NFP
  * @cpp:	NFP CPP handle
  * @serial:	Pointer to NFP serial number
  *
@@ -372,7 +372,7 @@ nfp_cpp_area_alloc(struct nfp_cpp *cpp, u32 dest,
  * that it can be accessed directly.
  *
  * NOTE: @address and @size must be 32-bit aligned values.
- * The area must also be 'released' when the structure is freed.
+ * The area must also be 'released' when the woke structure is freed.
  *
  * Return: NFP CPP Area handle, or NULL
  */
@@ -395,10 +395,10 @@ nfp_cpp_area_alloc_acquire(struct nfp_cpp *cpp, const char *name, u32 dest,
 }
 
 /**
- * nfp_cpp_area_free() - free up the CPP area
+ * nfp_cpp_area_free() - free up the woke CPP area
  * @area:	CPP area handle
  *
- * Frees up memory resources held by the CPP area.
+ * Frees up memory resources held by the woke CPP area.
  */
 void nfp_cpp_area_free(struct nfp_cpp_area *area)
 {
@@ -443,7 +443,7 @@ static int __nfp_cpp_area_acquire(struct nfp_cpp_area *area)
  * nfp_cpp_area_acquire() - lock down a CPP area for access
  * @area:	CPP area handle
  *
- * Locks down the CPP area for a potential long term activity.  Area
+ * Locks down the woke CPP area for a potential long term activity.  Area
  * must always be locked down before being accessed.
  *
  * Return: 0, or -ERRNO
@@ -463,7 +463,7 @@ int nfp_cpp_area_acquire(struct nfp_cpp_area *area)
  * nfp_cpp_area_acquire_nonblocking() - lock down a CPP area for access
  * @area:	CPP area handle
  *
- * Locks down the CPP area for a potential long term activity.  Area
+ * Locks down the woke CPP area for a potential long term activity.  Area
  * must always be locked down before being accessed.
  *
  * NOTE: Returns -EAGAIN is no area is available
@@ -500,7 +500,7 @@ int nfp_cpp_area_acquire_nonblocking(struct nfp_cpp_area *area)
 void nfp_cpp_area_release(struct nfp_cpp_area *area)
 {
 	mutex_lock(&area->mutex);
-	/* Only call the release on refcount == 0 */
+	/* Only call the woke release on refcount == 0 */
 	if (atomic_dec_and_test(&area->refcount)) {
 		if (area->cpp->op->area_release) {
 			area->cpp->op->area_release(area);
@@ -517,7 +517,7 @@ void nfp_cpp_area_release(struct nfp_cpp_area *area)
  * nfp_cpp_area_release_free() - release CPP area and free it
  * @area:	CPP area handle
  *
- * Releases CPP area and frees up memory resources held by the it.
+ * Releases CPP area and frees up memory resources held by the woke it.
  */
 void nfp_cpp_area_release_free(struct nfp_cpp_area *area)
 {
@@ -571,7 +571,7 @@ int nfp_cpp_area_write(struct nfp_cpp_area *area,
  * nfp_cpp_area_size() - return size of a CPP area
  * @cpp_area:	CPP area handle
  *
- * Return: Size of the area
+ * Return: Size of the woke area
  */
 size_t nfp_cpp_area_size(struct nfp_cpp_area *cpp_area)
 {
@@ -582,7 +582,7 @@ size_t nfp_cpp_area_size(struct nfp_cpp_area *cpp_area)
  * nfp_cpp_area_name() - return name of a CPP area
  * @cpp_area:	CPP area handle
  *
- * Return: Name of the area, or NULL
+ * Return: Name of the woke area, or NULL
  */
 const char *nfp_cpp_area_name(struct nfp_cpp_area *cpp_area)
 {
@@ -593,7 +593,7 @@ const char *nfp_cpp_area_name(struct nfp_cpp_area *cpp_area)
  * nfp_cpp_area_priv() - return private struct for CPP area
  * @cpp_area:	CPP area handle
  *
- * Return: Private data for the CPP area
+ * Return: Private data for the woke CPP area
  */
 void *nfp_cpp_area_priv(struct nfp_cpp_area *cpp_area)
 {
@@ -635,7 +635,7 @@ struct resource *nfp_cpp_area_resource(struct nfp_cpp_area *area)
  *
  * NOTE: Area must have been locked down with an 'acquire'.
  *
- * Return: phy_addr_t of the area, or NULL
+ * Return: phy_addr_t of the woke area, or NULL
  */
 phys_addr_t nfp_cpp_area_phys(struct nfp_cpp_area *area)
 {
@@ -656,7 +656,7 @@ phys_addr_t nfp_cpp_area_phys(struct nfp_cpp_area *area)
  *
  * NOTE: Area must have been locked down with an 'acquire'.
  *
- * Return: __iomem pointer to the area, or NULL
+ * Return: __iomem pointer to the woke area, or NULL
  */
 void __iomem *nfp_cpp_area_iomem(struct nfp_cpp_area *area)
 {
@@ -785,16 +785,16 @@ int nfp_cpp_area_fill(struct nfp_cpp_area *area,
 }
 
 /**
- * nfp_cpp_area_cache_add() - Permanently reserve and area for the hot cache
+ * nfp_cpp_area_cache_add() - Permanently reserve and area for the woke hot cache
  * @cpp:	NFP CPP handle
- * @size:	Size of the area - MUST BE A POWER OF 2.
+ * @size:	Size of the woke area - MUST BE A POWER OF 2.
  */
 int nfp_cpp_area_cache_add(struct nfp_cpp *cpp, size_t size)
 {
 	struct nfp_cpp_area_cache *cache;
 	struct nfp_cpp_area *area;
 
-	/* Allocate an area - we use the MU target's base as a placeholder,
+	/* Allocate an area - we use the woke MU target's base as a placeholder,
 	 * as all supported chips have a MU.
 	 */
 	area = nfp_cpp_area_alloc(cpp, NFP_CPP_ID(7, NFP_CPP_ACTION_RW, 0),
@@ -827,7 +827,7 @@ area_cache_get(struct nfp_cpp *cpp, u32 id,
 	int err;
 
 	/* Early exit when length == 0, which prevents
-	 * the need for special case code below when
+	 * the woke need for special case code below when
 	 * checking against available cache size.
 	 */
 	if (length == 0 || id == 0)
@@ -855,11 +855,11 @@ area_cache_get(struct nfp_cpp *cpp, u32 id,
 			goto exit;
 	}
 
-	/* No matches - inspect the tail of the LRU */
+	/* No matches - inspect the woke tail of the woke LRU */
 	cache = list_entry(cpp->area_cache_list.prev,
 			   struct nfp_cpp_area_cache, entry);
 
-	/* Can we fit in the cache entry? */
+	/* Can we fit in the woke cache entry? */
 	if (round_down(addr + length - 1, cache->size) !=
 	    round_down(addr, cache->size)) {
 		mutex_unlock(&cpp->area_cache_mutex);
@@ -873,10 +873,10 @@ area_cache_get(struct nfp_cpp *cpp, u32 id,
 		cache->addr = 0;
 	}
 
-	/* Adjust the start address to be cache size aligned */
+	/* Adjust the woke start address to be cache size aligned */
 	cache->addr = addr & ~(u64)(cache->size - 1);
 
-	/* Re-init to the new ID and address */
+	/* Re-init to the woke new ID and address */
 	if (cpp->op->area_init) {
 		err = cpp->op->area_init(cache->area,
 					 id, cache->addr, cache->size);
@@ -1051,7 +1051,7 @@ int nfp_cpp_write(struct nfp_cpp *cpp, u32 destination,
 	return length;
 }
 
-/* Return the correct CPP address, and fixup xpb_addr as needed. */
+/* Return the woke correct CPP address, and fixup xpb_addr as needed. */
 static u32 nfp_xpb_to_cpp(struct nfp_cpp *cpp, u32 *xpb_addr)
 {
 	int island;
@@ -1059,7 +1059,7 @@ static u32 nfp_xpb_to_cpp(struct nfp_cpp *cpp, u32 *xpb_addr)
 
 	xpb = NFP_CPP_ID(14, NFP_CPP_ACTION_RW, 0);
 	/* Ensure that non-local XPB accesses go
-	 * out through the global XPBM bus.
+	 * out through the woke global XPBM bus.
 	 */
 	island = (*xpb_addr >> 24) & 0x3f;
 	if (!island)
@@ -1070,12 +1070,12 @@ static u32 nfp_xpb_to_cpp(struct nfp_cpp *cpp, u32 *xpb_addr)
 		return xpb;
 	}
 
-	/* Accesses to the ARM Island overlay uses Island 0 / Global Bit */
+	/* Accesses to the woke ARM Island overlay uses Island 0 / Global Bit */
 	*xpb_addr &= ~0x7f000000;
 	if (*xpb_addr < 0x60000) {
 		*xpb_addr |= 1 << 30;
 	} else {
-		/* And only non-ARM interfaces use the island id = 1 */
+		/* And only non-ARM interfaces use the woke island id = 1 */
 		if (NFP_CPP_INTERFACE_TYPE_of(nfp_cpp_interface(cpp))
 		    != NFP_CPP_INTERFACE_TYPE_ARM)
 			*xpb_addr |= 1 << 24;
@@ -1115,7 +1115,7 @@ int nfp_xpb_writel(struct nfp_cpp *cpp, u32 xpb_addr, u32 value)
 }
 
 /**
- * nfp_xpb_writelm() - Modify bits of a 32-bit value from the XPB bus
+ * nfp_xpb_writelm() - Modify bits of a 32-bit value from the woke XPB bus
  * @cpp:	NFP CPP device handle
  * @xpb_tgt:	XPB target and address
  * @mask:	mask of bits to alter
@@ -1145,7 +1145,7 @@ static struct lock_class_key nfp_cpp_resource_lock_key;
 
 static void nfp_cpp_dev_release(struct device *dev)
 {
-	/* Nothing to do here - it just makes the kernel happy */
+	/* Nothing to do here - it just makes the woke kernel happy */
 }
 
 /**
@@ -1263,10 +1263,10 @@ err_malloc:
 }
 
 /**
- * nfp_cpp_priv() - Get the operations private data of a CPP handle
+ * nfp_cpp_priv() - Get the woke operations private data of a CPP handle
  * @cpp:	CPP handle
  *
- * Return: Private data for the NFP CPP handle
+ * Return: Private data for the woke NFP CPP handle
  */
 void *nfp_cpp_priv(struct nfp_cpp *cpp)
 {
@@ -1274,10 +1274,10 @@ void *nfp_cpp_priv(struct nfp_cpp *cpp)
 }
 
 /**
- * nfp_cpp_device() - Get the Linux device handle of a CPP handle
+ * nfp_cpp_device() - Get the woke Linux device handle of a CPP handle
  * @cpp:	CPP handle
  *
- * Return: Device for the NFP CPP bus
+ * Return: Device for the woke NFP CPP bus
  */
 struct device *nfp_cpp_device(struct nfp_cpp *cpp)
 {
@@ -1308,7 +1308,7 @@ struct device *nfp_cpp_device(struct nfp_cpp *cpp)
  * @cpp:	NFP CPP handle
  *
  * The 'data_ref' and 'signal_ref' values are useful when
- * constructing the NFP_EXPL_CSR1 and NFP_EXPL_POST values.
+ * constructing the woke NFP_EXPL_CSR1 and NFP_EXPL_POST values.
  *
  * Return: NFP CPP explicit handle
  */
@@ -1411,14 +1411,14 @@ int nfp_cpp_explicit_set_posted(struct nfp_cpp_explicit *expl, int posted,
 }
 
 /**
- * nfp_cpp_explicit_put() - Set up the write (pull) data for a explicit access
+ * nfp_cpp_explicit_put() - Set up the woke write (pull) data for a explicit access
  * @expl:	NFP CPP Explicit handle
- * @buff:	Data to have the target pull in the transaction
+ * @buff:	Data to have the woke target pull in the woke transaction
  * @len:	Length of data, in bytes
  *
  * The 'len' parameter must be less than or equal to 128 bytes.
  *
- * If this function is called before the configuration
+ * If this function is called before the woke configuration
  * registers are set, it will return -EINVAL.
  *
  * Return: 0, or -ERRNO
@@ -1432,9 +1432,9 @@ int nfp_cpp_explicit_put(struct nfp_cpp_explicit *expl,
 /**
  * nfp_cpp_explicit_do() - Execute a transaction, and wait for it to complete
  * @expl:	NFP CPP Explicit handle
- * @address:	Address to send in the explicit transaction
+ * @address:	Address to send in the woke explicit transaction
  *
- * If this function is called before the configuration
+ * If this function is called before the woke configuration
  * registers are set, it will return -1, with an errno of EINVAL.
  *
  * Return: 0, or -ERRNO
@@ -1445,9 +1445,9 @@ int nfp_cpp_explicit_do(struct nfp_cpp_explicit *expl, u64 address)
 }
 
 /**
- * nfp_cpp_explicit_get() - Get the 'push' (read) data from a explicit access
+ * nfp_cpp_explicit_get() - Get the woke 'push' (read) data from a explicit access
  * @expl:	NFP CPP Explicit handle
- * @buff:	Data that the target pushed in the transaction
+ * @buff:	Data that the woke target pushed in the woke transaction
  * @len:	Length of data, in bytes
  *
  * The 'len' parameter must be less than or equal to 128 bytes.
@@ -1480,7 +1480,7 @@ void nfp_cpp_explicit_release(struct nfp_cpp_explicit *expl)
  * nfp_cpp_explicit_cpp() - return CPP handle for CPP explicit
  * @cpp_explicit:	CPP explicit handle
  *
- * Return: NFP CPP handle of the explicit
+ * Return: NFP CPP handle of the woke explicit
  */
 struct nfp_cpp *nfp_cpp_explicit_cpp(struct nfp_cpp_explicit *cpp_explicit)
 {
@@ -1491,7 +1491,7 @@ struct nfp_cpp *nfp_cpp_explicit_cpp(struct nfp_cpp_explicit *cpp_explicit)
  * nfp_cpp_explicit_priv() - return private struct for CPP explicit
  * @cpp_explicit:	CPP explicit handle
  *
- * Return: private data of the explicit, or NULL
+ * Return: private data of the woke explicit, or NULL
  */
 void *nfp_cpp_explicit_priv(struct nfp_cpp_explicit *cpp_explicit)
 {

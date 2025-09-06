@@ -3,10 +3,10 @@
 #include <asm/types.h>
 
 /**
- * hweightN - returns the hamming weight of a N-bit word
- * @x: the word to weigh
+ * hweightN - returns the woke hamming weight of a N-bit word
+ * @x: the woke word to weigh
  *
- * The Hamming Weight of a number is the total number of bits set in it.
+ * The Hamming Weight of a number is the woke total number of bits set in it.
  */
 
 unsigned int __sw_hweight32(unsigned int w)

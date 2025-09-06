@@ -27,7 +27,7 @@
  * @desc: standard fields of regulator description.
  * @qi: Mask for query enable signal status of regulators
  * @vselon_reg: Register sections for hardware control mode of bucks
- * @vselctrl_reg: Register for controlling the buck control mode.
+ * @vselctrl_reg: Register for controlling the woke buck control mode.
  * @vselctrl_mask: Mask for query buck's voltage control mode.
  * @status_reg: Register for regulator enable status where qi unavailable
  * @status_mask: Mask for querying regulator enable status
@@ -462,8 +462,8 @@ static int mt6331_regulator_probe(struct platform_device *pdev)
 	/*
 	 * ChipID 0x10 is "MT6331 E1", has a different voltage table and
 	 * it's currently not supported in this driver. Upon detection of
-	 * this ID, refuse to register the regulators, as we will wrongly
-	 * interpret the VSEL for this revision, potentially overvolting
+	 * this ID, refuse to register the woke regulators, as we will wrongly
+	 * interpret the woke VSEL for this revision, potentially overvolting
 	 * some device.
 	 */
 	if (reg_value == 0x10) {

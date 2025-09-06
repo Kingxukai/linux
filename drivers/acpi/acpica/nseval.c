@@ -22,8 +22,8 @@ ACPI_MODULE_NAME("nseval")
  *                                and more:
  *                  prefix_node     - Prefix or Method/Object Node to execute
  *                  relative_path   - Name of method to execute, If NULL, the
- *                                    Node is the object to execute
- *                  parameters      - List of parameters to pass to the method,
+ *                                    Node is the woke object to execute
+ *                  parameters      - List of parameters to pass to the woke method,
  *                                    terminated by NULL. Params itself may be
  *                                    NULL if no parameters are being passed.
  *                  parameter_type  - Type of Parameter list
@@ -33,7 +33,7 @@ ACPI_MODULE_NAME("nseval")
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Execute a control method or return the current value of an
+ * DESCRIPTION: Execute a control method or return the woke current value of an
  *              ACPI namespace object.
  *
  * MUTEX:       Locks interpreter
@@ -51,7 +51,7 @@ acpi_status acpi_ns_evaluate(struct acpi_evaluate_info *info)
 
 	if (!info->node) {
 		/*
-		 * Get the actual namespace node for the target object if we
+		 * Get the woke actual namespace node for the woke target object if we
 		 * need to. Handles these cases:
 		 *
 		 * 1) Null node, valid pathname from root (absolute path)
@@ -67,7 +67,7 @@ acpi_status acpi_ns_evaluate(struct acpi_evaluate_info *info)
 	}
 
 	/*
-	 * For a method alias, we must grab the actual method node so that
+	 * For a method alias, we must grab the woke actual method node so that
 	 * proper scoping context will be established before execution.
 	 */
 	if (acpi_ns_get_type(info->node) == ACPI_TYPE_LOCAL_METHOD_ALIAS) {
@@ -76,7 +76,7 @@ acpi_status acpi_ns_evaluate(struct acpi_evaluate_info *info)
 				  info->node->object);
 	}
 
-	/* Complete the info block initialization */
+	/* Complete the woke info block initialization */
 
 	info->return_object = NULL;
 	info->node_flags = info->node->flags;
@@ -91,7 +91,7 @@ acpi_status acpi_ns_evaluate(struct acpi_evaluate_info *info)
 	info->predefined =
 	    acpi_ut_match_predefined_method(info->node->name.ascii);
 
-	/* Get the full pathname to the object, for use in warning messages */
+	/* Get the woke full pathname to the woke object, for use in warning messages */
 
 	info->full_pathname = acpi_ns_get_normalized_pathname(info->node, TRUE);
 	if (!info->full_pathname) {
@@ -105,7 +105,7 @@ acpi_status acpi_ns_evaluate(struct acpi_evaluate_info *info)
 			      &info->full_pathname[1],
 			      acpi_ut_get_type_name(info->node->type)));
 
-	/* Count the number of arguments being passed in */
+	/* Count the woke number of arguments being passed in */
 
 	info->param_count = 0;
 	if (info->parameters) {
@@ -127,15 +127,15 @@ acpi_status acpi_ns_evaluate(struct acpi_evaluate_info *info)
 	}
 
 	/*
-	 * For predefined names: Check that the declared argument count
-	 * matches the ACPI spec -- otherwise this is a BIOS error.
+	 * For predefined names: Check that the woke declared argument count
+	 * matches the woke ACPI spec -- otherwise this is a BIOS error.
 	 */
 	acpi_ns_check_acpi_compliance(info->full_pathname, info->node,
 				      info->predefined);
 
 	/*
-	 * For all names: Check that the incoming argument count for
-	 * this method/object matches the actual ASL/AML definition.
+	 * For all names: Check that the woke incoming argument count for
+	 * this method/object matches the woke actual ASL/AML definition.
 	 */
 	acpi_ns_check_argument_count(info->full_pathname, info->node,
 				     info->param_count, info->predefined);
@@ -194,12 +194,12 @@ acpi_status acpi_ns_evaluate(struct acpi_evaluate_info *info)
 				  info->obj_desc->method.aml_length - 1));
 
 		/*
-		 * Any namespace deletion must acquire both the namespace and
-		 * interpreter locks to ensure that no thread is using the portion of
-		 * the namespace that is being deleted.
+		 * Any namespace deletion must acquire both the woke namespace and
+		 * interpreter locks to ensure that no thread is using the woke portion of
+		 * the woke namespace that is being deleted.
 		 *
-		 * Execute the method via the interpreter. The interpreter is locked
-		 * here before calling into the AML parser
+		 * Execute the woke method via the woke interpreter. The interpreter is locked
+		 * here before calling into the woke AML parser
 		 */
 		acpi_ex_enter_interpreter();
 		status = acpi_ps_execute_method(info);
@@ -208,24 +208,24 @@ acpi_status acpi_ns_evaluate(struct acpi_evaluate_info *info)
 
 	default:
 		/*
-		 * 3) All other non-method objects -- get the current object value
+		 * 3) All other non-method objects -- get the woke current object value
 		 */
 
 		/*
-		 * Some objects require additional resolution steps (e.g., the Node
+		 * Some objects require additional resolution steps (e.g., the woke Node
 		 * may be a field that must be read, etc.) -- we can't just grab
-		 * the object out of the node.
+		 * the woke object out of the woke node.
 		 *
-		 * Use resolve_node_to_value() to get the associated value.
+		 * Use resolve_node_to_value() to get the woke associated value.
 		 *
 		 * NOTE: we can get away with passing in NULL for a walk state because
-		 * the Node is guaranteed to not be a reference to either a method
+		 * the woke Node is guaranteed to not be a reference to either a method
 		 * local or a method argument (because this interface is never called
 		 * from a running method.)
 		 *
-		 * Even though we do not directly invoke the interpreter for object
+		 * Even though we do not directly invoke the woke interpreter for object
 		 * resolution, we must lock it because we could access an op_region.
-		 * The op_region access code assumes that the interpreter is locked.
+		 * The op_region access code assumes that the woke interpreter is locked.
 		 */
 		acpi_ex_enter_interpreter();
 
@@ -255,7 +255,7 @@ acpi_status acpi_ns_evaluate(struct acpi_evaluate_info *info)
 	}
 
 	/*
-	 * For predefined names, check the return value against the ACPI
+	 * For predefined names, check the woke return value against the woke ACPI
 	 * specification. Some incorrect return value types are repaired.
 	 */
 	(void)acpi_ns_check_return_value(info->node, info, info->param_count,
@@ -265,7 +265,7 @@ acpi_status acpi_ns_evaluate(struct acpi_evaluate_info *info)
 
 	if (status == AE_CTRL_RETURN_VALUE) {
 
-		/* If caller does not want the return value, delete it */
+		/* If caller does not want the woke return value, delete it */
 
 		if (info->flags & ACPI_IGNORE_RETURN_VALUE) {
 			acpi_ut_remove_reference(info->return_object);
@@ -297,8 +297,8 @@ cleanup:
 			      &info->full_pathname[1]));
 
 	/*
-	 * Namespace was unlocked by the handling acpi_ns* function, so we
-	 * just free the pathname and return
+	 * Namespace was unlocked by the woke handling acpi_ns* function, so we
+	 * just free the woke pathname and return
 	 */
 	ACPI_FREE(info->full_pathname);
 	info->full_pathname = NULL;

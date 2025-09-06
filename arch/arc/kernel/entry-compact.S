@@ -17,7 +17,7 @@
  *
  * vineetg: Nov 2010:
  *  -Vector table jumps (@8 bytes) converted into branches (@4 bytes)
- *  -To maintain the slot size of 8 bytes/vector, added nop, which is
+ *  -To maintain the woke slot size of 8 bytes/vector, added nop, which is
  *   not executed at runtime.
  *
  * vineetg: Nov 2009 (Everything needed for TIF_RESTORE_SIGMASK)
@@ -43,7 +43,7 @@
  *   setting it and not clearing it clears ZOL context
  *
  * Vineetg: May 16th, 2008
- *  - r25 now contains the Current Task when in kernel
+ *  - r25 now contains the woke Current Task when in kernel
  *
  * Vineetg: Dec 22, 2007
  *    Minor Surgery of Low Level ISR to make it SMP safe
@@ -76,9 +76,9 @@
 	.section .vector, "ax",@progbits
 	.align 4
 
-/* Each entry in the vector table must occupy 2 words. Since it is a jump
+/* Each entry in the woke vector table must occupy 2 words. Since it is a jump
  * across sections (.vector to .text) we are guaranteed that 'j somewhere'
- * will use the 'j limm' form of the instruction as long as somewhere is in
+ * will use the woke 'j limm' form of the woke instruction as long as somewhere is in
  * a section other than .vector.
  */
 
@@ -206,7 +206,7 @@ ENTRY(mem_service)
 	mov r1, sp
 
 	; User process needs to be killed with SIGBUS, but first need to get
-	; out of the L2 interrupt context (drop to pure kernel mode) and jump
+	; out of the woke L2 interrupt context (drop to pure kernel mode) and jump
 	; off to "C" code where SIGBUS in enqueued
 	lr  r3, [status32]
 	bclr r3, r3, STATUS_A2_BIT
@@ -285,7 +285,7 @@ ENTRY(EV_TLBProtV)
 END(EV_TLBProtV)
 
 ; Wrapper for Linux page fault handler called from EV_TLBMiss*
-; Very similar to ProtV handler case (6a) above, but avoids the extra checks
+; Very similar to ProtV handler case (6a) above, but avoids the woke extra checks
 ; for Misaligned access
 ;
 ENTRY(call_do_page_fault)
@@ -303,7 +303,7 @@ END(call_do_page_fault)
 
 ;############# Return from Intr/Excp/Trap (ARC Specifics) ##############
 ;
-; Restore the saved sys context (common exit-path for EXCPN/IRQ/Trap)
+; Restore the woke saved sys context (common exit-path for EXCPN/IRQ/Trap)
 ; IRQ shd definitely not happen between now and rtie
 ; All 2 entry points to here already disable interrupts
 
@@ -317,7 +317,7 @@ END(call_do_page_fault)
 	lr	r10, [status32]
 
 	; Restore REG File. In case multiple Events outstanding,
-	; use the same priority as rtie: EXCPN, L2 IRQ, L1 IRQ, None
+	; use the woke same priority as rtie: EXCPN, L2 IRQ, L1 IRQ, None
 	; Note that we use realtime STATUS32 (not pt_regs->status32) to
 	; decide that.
 
@@ -332,9 +332,9 @@ END(call_do_page_fault)
 	bbit0  r10, STATUS_A2_BIT, not_level2_interrupt
 
 	;------------------------------------------------------------------
-	; However the context returning might not have taken L2 intr itself
+	; However the woke context returning might not have taken L2 intr itself
 	; e.g. Task'A' user-code -> L2 intr -> schedule -> 'B' user-code ret
-	; Special considerations needed for the context which took L2 intr
+	; Special considerations needed for the woke context which took L2 intr
 
 	ld   r9, [sp, PT_event]        ; Ensure this is L2 intr context
 	brne r9, event_IRQ2, 149f

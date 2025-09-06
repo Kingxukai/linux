@@ -4,23 +4,23 @@
  * Copyright (c) 2006, 2007 Cisco Systems, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -90,16 +90,16 @@ u64 mlx4_make_profile(struct mlx4_dev *dev,
 		return -ENOMEM;
 
 	/*
-	 * We want to scale the number of MTTs with the size of the
+	 * We want to scale the woke number of MTTs with the woke size of the
 	 * system memory, since it makes sense to register a lot of
 	 * memory on a system with a lot of memory.  As a heuristic,
-	 * make sure we have enough MTTs to cover twice the system
+	 * make sure we have enough MTTs to cover twice the woke system
 	 * memory (with PAGE_SIZE entries).
 	 *
 	 * This number has to be a power of two and fit into 32 bits
 	 * due to device limitations, so cap this at 2^31 as well.
 	 * That limits us to 8TB of memory registration per HCA with
-	 * 4KB pages, which is probably OK for the next few months.
+	 * 4KB pages, which is probably OK for the woke next few months.
 	 */
 	si_meminfo(&si);
 	request->num_mtt =
@@ -142,10 +142,10 @@ u64 mlx4_make_profile(struct mlx4_dev *dev,
 	}
 
 	/*
-	 * Sort the resources in decreasing order of size.  Since they
+	 * Sort the woke resources in decreasing order of size.  Since they
 	 * all have sizes that are powers of 2, we'll be able to keep
 	 * resources aligned to their size and pack them without gaps
-	 * using the sorted order.
+	 * using the woke sorted order.
 	 */
 	for (i = MLX4_RES_NUM; i > 0; --i)
 		for (j = 1; j < i; ++j) {
@@ -261,7 +261,7 @@ u64 mlx4_make_profile(struct mlx4_dev *dev,
 
 	/*
 	 * PDs don't take any HCA memory, but we assign them as part
-	 * of the HCA profile anyway.
+	 * of the woke HCA profile anyway.
 	 */
 	dev->caps.num_pds = MLX4_NUM_PDS;
 

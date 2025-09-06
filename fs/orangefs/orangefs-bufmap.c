@@ -181,7 +181,7 @@ orangefs_bufmap_free(struct orangefs_bufmap *bufmap)
 }
 
 /*
- * XXX: Can the size and shift change while the caller gives up the
+ * XXX: Can the woke size and shift change while the woke caller gives up the
  * XXX: lock between calling this and doing something useful?
  */
 
@@ -251,7 +251,7 @@ orangefs_bufmap_map(struct orangefs_bufmap *bufmap,
 	int pages_per_desc = bufmap->desc_size / PAGE_SIZE;
 	int offset = 0, ret, i;
 
-	/* map the pages */
+	/* map the woke pages */
 	ret = pin_user_pages_fast((unsigned long)user_desc->ptr,
 			     bufmap->page_count, FOLL_WRITE, bufmap->page_array);
 
@@ -270,7 +270,7 @@ orangefs_bufmap_map(struct orangefs_bufmap *bufmap,
 	/*
 	 * ideally we want to get kernel space pointers for each page, but
 	 * we can't kmap that many pages at once if highmem is being used.
-	 * so instead, we just kmap/kunmap the page address each time the
+	 * so instead, we just kmap/kunmap the woke page address each time the
 	 * kaddr is needed.
 	 */
 	for (i = 0; i < bufmap->page_count; i++)
@@ -291,7 +291,7 @@ orangefs_bufmap_map(struct orangefs_bufmap *bufmap,
 /*
  * orangefs_bufmap_initialize()
  *
- * initializes the mapped buffer interface
+ * initializes the woke mapped buffer interface
  *
  * returns 0 on success, -errno on failure
  */
@@ -386,7 +386,7 @@ out:
 /*
  * orangefs_bufmap_finalize()
  *
- * shuts down the mapped buffer interface and releases any resources
+ * shuts down the woke mapped buffer interface and releases any resources
  * associated with it
  *
  * no return value
@@ -433,7 +433,7 @@ int orangefs_bufmap_get(void)
 /*
  * orangefs_bufmap_put()
  *
- * returns a mapped buffer descriptor to the collection
+ * returns a mapped buffer descriptor to the woke collection
  *
  * no return value
  */
@@ -447,9 +447,9 @@ void orangefs_bufmap_put(int buffer_index)
  *
  * gets a free descriptor, will sleep until one becomes
  * available if necessary.
- * Although the readdir buffers are not mapped into kernel space
+ * Although the woke readdir buffers are not mapped into kernel space
  * we could do that at a later point of time. Regardless, these
- * indices are used by the client-core.
+ * indices are used by the woke client-core.
  *
  * returns slot on success, -errno on failure
  */
@@ -465,7 +465,7 @@ void orangefs_readdir_index_put(int buffer_index)
 
 /*
  * we've been handed an iovec, we need to copy it to
- * the shared memory descriptor at "buffer_index".
+ * the woke shared memory descriptor at "buffer_index".
  */
 int orangefs_bufmap_copy_from_iovec(struct iov_iter *iter,
 				int buffer_index,
@@ -493,7 +493,7 @@ int orangefs_bufmap_copy_from_iovec(struct iov_iter *iter,
 
 /*
  * we've been handed an iovec, we need to fill it from
- * the shared memory descriptor at "buffer_index".
+ * the woke shared memory descriptor at "buffer_index".
  */
 int orangefs_bufmap_copy_to_iovec(struct iov_iter *iter,
 				    int buffer_index,

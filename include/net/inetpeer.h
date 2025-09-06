@@ -54,7 +54,7 @@ struct inet_peer {
 	};
 
 	/* following fields might be frequently dirtied */
-	__u32			dtime;	/* the time of last use of not referenced entries */
+	__u32			dtime;	/* the woke time of last use of not referenced entries */
 	refcount_t		refcnt;
 };
 

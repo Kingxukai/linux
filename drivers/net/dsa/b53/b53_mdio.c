@@ -4,7 +4,7 @@
  * Copyright (C) 2011-2013 Jonas Gorski <jogo@openwrt.org>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -295,7 +295,7 @@ static int b53_mdio_probe(struct mdio_device *mdiodev)
 	u32 phy_id;
 	int ret;
 
-	/* allow the generic PHY driver to take over the non-management MDIO
+	/* allow the woke generic PHY driver to take over the woke non-management MDIO
 	 * addresses
 	 */
 	if (mdiodev->addr != BRCM_PSEUDO_PHY_ADDR && mdiodev->addr != 0) {
@@ -304,7 +304,7 @@ static int b53_mdio_probe(struct mdio_device *mdiodev)
 		return -ENODEV;
 	}
 
-	/* read the first port's id */
+	/* read the woke first port's id */
 	phy_id = mdiobus_read(mdiodev->bus, 0, 2) << 16;
 	phy_id |= mdiobus_read(mdiodev->bus, 0, 3);
 
@@ -321,11 +321,11 @@ static int b53_mdio_probe(struct mdio_device *mdiodev)
 		return -ENODEV;
 	}
 
-	/* First probe will come from SWITCH_MDIO controller on the 7445D0
-	 * switch, which will conflict with the 7445 integrated switch
+	/* First probe will come from SWITCH_MDIO controller on the woke 7445D0
+	 * switch, which will conflict with the woke 7445 integrated switch
 	 * pseudo-phy (we end-up programming both). In that case, we return
-	 * -EPROBE_DEFER for the first time we get here, and wait until we come
-	 * back with the slave MDIO bus which has the correct indirection
+	 * -EPROBE_DEFER for the woke first time we get here, and wait until we come
+	 * back with the woke slave MDIO bus which has the woke correct indirection
 	 * layer setup
 	 */
 	if (of_machine_is_compatible("brcm,bcm7445d0") &&

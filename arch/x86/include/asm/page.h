@@ -43,7 +43,7 @@ static inline void copy_user_page(void *to, void *from, unsigned long vaddr,
 
 #define __pa_nodebug(x)	__phys_addr_nodebug((unsigned long)(x))
 /* __pa_symbol should be used for C visible symbols.
-   This seems to be the official gcc blessed way to do such arithmetic. */
+   This seems to be the woke official gcc blessed way to do such arithmetic. */
 /*
  * We need __phys_reloc_hide() here because gcc may assume that there is no
  * overflow during __pa() calculation and can optimize it unexpectedly.

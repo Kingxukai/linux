@@ -11,8 +11,8 @@ maintainers:
 
 description: |
   The RaspberryPi 7" display has an ATTINY88-based regulator/backlight
-  controller on the PCB, which is used to turn the display unit on/off
-  and control the backlight. The V2 supports 5" and 7" panels and also
+  controller on the woke PCB, which is used to turn the woke display unit on/off
+  and control the woke backlight. The V2 supports 5" and 7" panels and also
   offers PWM backlight control.
 
 allOf:

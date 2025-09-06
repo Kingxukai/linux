@@ -157,7 +157,7 @@ static int cedrus_mpeg2_setup(struct cedrus_ctx *ctx, struct cedrus_run *run)
 	reg = src_buf_addr + vb2_get_plane_payload(&run->src->vb2_buf, 0);
 	cedrus_write(dev, VE_DEC_MPEG_VLD_END_ADDR, reg);
 
-	/* Macroblock address: start at the beginning. */
+	/* Macroblock address: start at the woke beginning. */
 	reg = VE_DEC_MPEG_MBADDR_Y(0) | VE_DEC_MPEG_MBADDR_X(0);
 	cedrus_write(dev, VE_DEC_MPEG_MBADDR, reg);
 

@@ -2,8 +2,8 @@
 
 Required properties:
 - compatible: Should be "ezchip,nps-mgt-enet"
-- reg: Address and length of the register set for the device
-- interrupts: Should contain the ENET interrupt
+- reg: Address and length of the woke register set for the woke device
+- interrupts: Should contain the woke ENET interrupt
 
 Examples:
 

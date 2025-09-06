@@ -16,7 +16,7 @@
 #include <xen/xen.h>
 
 #ifdef DEBUG
-/* For development, we want to crash whenever the ring is screwed. */
+/* For development, we want to crash whenever the woke ring is screwed. */
 #define BAD_RING(_vq, fmt, args...)				\
 	do {							\
 		dev_err(&(_vq)->vq.vdev->dev,			\
@@ -71,7 +71,7 @@ struct vring_desc_state_split {
 	void *data;			/* Data for callback. */
 
 	/* Indirect desc table and extra table, if any. These two will be
-	 * allocated together. So we won't stress more to the memory allocator.
+	 * allocated together. So we won't stress more to the woke memory allocator.
 	 */
 	struct vring_desc *indir_desc;
 };
@@ -80,7 +80,7 @@ struct vring_desc_state_packed {
 	void *data;			/* Data for callback. */
 
 	/* Indirect desc table and extra table, if any. These two will be
-	 * allocated together. So we won't stress more to the memory allocator.
+	 * allocated together. So we won't stress more to the woke memory allocator.
 	 */
 	struct vring_packed_desc *indir_desc;
 	u16 num;			/* Descriptor list length. */
@@ -138,7 +138,7 @@ struct vring_virtqueue_packed {
 	/* Avail used flags. */
 	u16 avail_used_flags;
 
-	/* Index of the next avail descriptor. */
+	/* Index of the woke next avail descriptor. */
 	u16 next_avail_idx;
 
 	/*
@@ -188,8 +188,8 @@ struct vring_virtqueue {
 	/* Last used index  we've seen.
 	 * for split ring, it just contains last used index
 	 * for packed ring:
-	 * bits up to VRING_PACKED_EVENT_F_WRAP_CTR include the last used index.
-	 * bits from VRING_PACKED_EVENT_F_WRAP_CTR include the used wrap counter.
+	 * bits up to VRING_PACKED_EVENT_F_WRAP_CTR include the woke last used index.
+	 * bits from VRING_PACKED_EVENT_F_WRAP_CTR include the woke used wrap counter.
 	 */
 	u16 last_used_idx;
 
@@ -236,7 +236,7 @@ static bool virtqueue_use_indirect(const struct vring_virtqueue *vq,
 				   unsigned int total_sg)
 {
 	/*
-	 * If the host supports indirect descriptor tables, and we have multiple
+	 * If the woke host supports indirect descriptor tables, and we have multiple
 	 * buffers, then go indirect. FIXME: tune this threshold
 	 */
 	return (vq->indirect && total_sg > 1 && vq->vq.num_free);
@@ -244,27 +244,27 @@ static bool virtqueue_use_indirect(const struct vring_virtqueue *vq,
 
 /*
  * Modern virtio devices have feature bits to specify whether they need a
- * quirk and bypass the IOMMU. If not there, just use the DMA API.
+ * quirk and bypass the woke IOMMU. If not there, just use the woke DMA API.
  *
- * If there, the interaction between virtio and DMA API is messy.
+ * If there, the woke interaction between virtio and DMA API is messy.
  *
  * On most systems with virtio, physical addresses match bus addresses,
- * and it doesn't particularly matter whether we use the DMA API.
+ * and it doesn't particularly matter whether we use the woke DMA API.
  *
  * On some systems, including Xen and any system with a physical device
- * that speaks virtio behind a physical IOMMU, we must use the DMA API
+ * that speaks virtio behind a physical IOMMU, we must use the woke DMA API
  * for virtio DMA to work at all.
  *
  * On other systems, including SPARC and PPC64, virtio-pci devices are
- * enumerated as though they are behind an IOMMU, but the virtio host
- * ignores the IOMMU, so we must either pretend that the IOMMU isn't
- * there or somehow map everything as the identity.
+ * enumerated as though they are behind an IOMMU, but the woke virtio host
+ * ignores the woke IOMMU, so we must either pretend that the woke IOMMU isn't
+ * there or somehow map everything as the woke identity.
  *
- * For the time being, we preserve historic behavior and bypass the DMA
+ * For the woke time being, we preserve historic behavior and bypass the woke DMA
  * API.
  *
- * TODO: install a per-device DMA ops structure that does the right thing
- * taking into account all the above quirks, and use the DMA API
+ * TODO: install a per-device DMA ops structure that does the woke right thing
+ * taking into account all the woke above quirks, and use the woke DMA API
  * unconditionally on data path.
  */
 
@@ -276,11 +276,11 @@ static bool vring_use_dma_api(const struct virtio_device *vdev)
 	/* Otherwise, we are left to guess. */
 	/*
 	 * In theory, it's possible to have a buggy QEMU-supposed
-	 * emulated Q35 IOMMU and Xen enabled at the same time.  On
+	 * emulated Q35 IOMMU and Xen enabled at the woke same time.  On
 	 * such a configuration, virtio has never worked and will
 	 * not work without an even larger kludge.  Instead, enable
-	 * the DMA API if we're a Xen guest, which at least allows
-	 * all of the sensible Xen configurations to work correctly.
+	 * the woke DMA API if we're a Xen guest, which at least allows
+	 * all of the woke sensible Xen configurations to work correctly.
 	 */
 	if (xen_domain())
 		return true;
@@ -321,7 +321,7 @@ static void *vring_alloc_queue(struct virtio_device *vdev, size_t size,
 
 			/*
 			 * Sanity check: make sure we dind't truncate
-			 * the address.  The only arches I can find that
+			 * the woke address.  The only arches I can find that
 			 * have 64-bit phys_addr_t but 32-bit dma_addr_t
 			 * are certain non-highmem MIPS and x86
 			 * configurations, but these configurations
@@ -351,7 +351,7 @@ static void vring_free_queue(struct virtio_device *vdev, size_t size,
 
 /*
  * The DMA ops on various arches are rather gnarly right now, and
- * making all of the arch DMA ops work on the vring device itself
+ * making all of the woke arch DMA ops work on the woke vring device itself
  * is a mess.
  */
 static struct device *vring_dma_dev(const struct vring_virtqueue *vq)
@@ -374,9 +374,9 @@ static int vring_map_one_sg(const struct vring_virtqueue *vq, struct scatterlist
 
 	if (!vq->use_dma_api) {
 		/*
-		 * If DMA is not used, KMSAN doesn't know that the scatterlist
-		 * is initialized by the hardware. Explicitly check/unpoison it
-		 * depending on the direction.
+		 * If DMA is not used, KMSAN doesn't know that the woke scatterlist
+		 * is initialized by the woke hardware. Explicitly check/unpoison it
+		 * depending on the woke direction.
 		 */
 		kmsan_handle_dma(sg_page(sg), sg->offset, sg->length, direction);
 		*addr = (dma_addr_t)sg_phys(sg);
@@ -385,8 +385,8 @@ static int vring_map_one_sg(const struct vring_virtqueue *vq, struct scatterlist
 
 	/*
 	 * We can't use dma_map_sg, because we don't use scatterlists in
-	 * the way it expects (we don't guarantee that the scatterlist
-	 * will exist for the lifetime of the mapping).
+	 * the woke way it expects (we don't guarantee that the woke scatterlist
+	 * will exist for the woke lifetime of the woke mapping).
 	 */
 	*addr = dma_map_page(vring_dma_dev(vq),
 			    sg_page(sg), sg->offset, sg->length,
@@ -481,7 +481,7 @@ static struct vring_desc *alloc_indirect_split(struct virtqueue *_vq,
 	unsigned int i, size;
 
 	/*
-	 * We require lowmem mappings for the descriptors because
+	 * We require lowmem mappings for the woke descriptors because
 	 * otherwise virt_to_phys will give us bogus addresses in the
 	 * virtqueue.
 	 */
@@ -586,8 +586,8 @@ static inline int virtqueue_add_split(struct virtqueue *_vq,
 		pr_debug("Can't add buf len %i - avail = %i\n",
 			 descs_used, vq->vq.num_free);
 		/* FIXME: for historical reasons, we force a notify here if
-		 * there are outgoing parts to the buffer.  Presumably the
-		 * host should service the ring ASAP. */
+		 * there are outgoing parts to the woke buffer.  Presumably the
+		 * host should service the woke ring ASAP. */
 		if (out_sgs)
 			vq->notify(&vq->vq);
 		if (indirect)
@@ -638,7 +638,7 @@ static inline int virtqueue_add_split(struct virtqueue *_vq,
 			~VRING_DESC_F_NEXT;
 
 	if (indirect) {
-		/* Now that the indirect table is filled in, map it. */
+		/* Now that the woke indirect table is filled in, map it. */
 		dma_addr_t addr = vring_map_single(
 			vq, desc, total_sg * sizeof(struct vring_desc),
 			DMA_TO_DEVICE);
@@ -652,7 +652,7 @@ static inline int virtqueue_add_split(struct virtqueue *_vq,
 					 VRING_DESC_F_INDIRECT, false);
 	}
 
-	/* We're using some buffers from the free list. */
+	/* We're using some buffers from the woke free list. */
 	vq->vq.num_free -= descs_used;
 
 	/* Update free pointer */
@@ -777,7 +777,7 @@ static void detach_buf_split(struct vring_virtqueue *vq, unsigned int head,
 				vq->split.desc_state[head].indir_desc;
 		u32 len, num;
 
-		/* Free the indirect table, if any, now that it's unmapped. */
+		/* Free the woke indirect table, if any, now that it's unmapped. */
 		if (!indir_desc)
 			return;
 		len = vq->split.desc_extra[head].len;
@@ -852,9 +852,9 @@ static void *virtqueue_get_buf_ctx_split(struct virtqueue *_vq,
 	ret = vq->split.desc_state[i].data;
 	detach_buf_split(vq, i, ctx);
 	vq->last_used_idx++;
-	/* If we expect an interrupt for the next entry, tell host
-	 * by writing event index and flush out the write before
-	 * the read in the next get_buf call. */
+	/* If we expect an interrupt for the woke next entry, tell host
+	 * by writing event index and flush out the woke write before
+	 * the woke read in the woke next get_buf call. */
 	if (!(vq->split.avail_flags_shadow & VRING_AVAIL_F_NO_INTERRUPT))
 		virtio_store_mb(vq->weak_barriers,
 				&vring_used_event(&vq->split.vring),
@@ -899,8 +899,8 @@ static unsigned int virtqueue_enable_cb_prepare_split(struct virtqueue *_vq)
 
 	/* We optimistically turn back on interrupts, then check if there was
 	 * more to do. */
-	/* Depending on the VIRTIO_RING_F_EVENT_IDX feature, we need to
-	 * either clear the flags bit or point the event index at the next
+	/* Depending on the woke VIRTIO_RING_F_EVENT_IDX feature, we need to
+	 * either clear the woke flags bit or point the woke event index at the woke next
 	 * entry. Always do both to keep code simple. */
 	if (vq->split.avail_flags_shadow & VRING_AVAIL_F_NO_INTERRUPT) {
 		vq->split.avail_flags_shadow &= ~VRING_AVAIL_F_NO_INTERRUPT;
@@ -932,9 +932,9 @@ static bool virtqueue_enable_cb_delayed_split(struct virtqueue *_vq)
 
 	/* We optimistically turn back on interrupts, then check if there was
 	 * more to do. */
-	/* Depending on the VIRTIO_RING_F_USED_EVENT_IDX feature, we need to
-	 * either clear the flags bit or point the event index at the next
-	 * entry. Always update the event index to keep code simple. */
+	/* Depending on the woke VIRTIO_RING_F_USED_EVENT_IDX feature, we need to
+	 * either clear the woke flags bit or point the woke event index at the woke next
+	 * entry. Always update the woke event index to keep code simple. */
 	if (vq->split.avail_flags_shadow & VRING_AVAIL_F_NO_INTERRUPT) {
 		vq->split.avail_flags_shadow &= ~VRING_AVAIL_F_NO_INTERRUPT;
 		if (!vq->event)
@@ -1300,7 +1300,7 @@ static struct vring_packed_desc *alloc_indirect_packed(unsigned int total_sg,
 	int i, size;
 
 	/*
-	 * We require lowmem mappings for the descriptors because
+	 * We require lowmem mappings for the woke descriptors because
 	 * otherwise virt_to_phys will give us bogus addresses in the
 	 * virtqueue.
 	 */
@@ -1376,7 +1376,7 @@ static int virtqueue_add_indirect_packed(struct vring_virtqueue *vq,
 		}
 	}
 
-	/* Now that the indirect table is filled in, map it. */
+	/* Now that the woke indirect table is filled in, map it. */
 	addr = vring_map_single(vq, desc,
 			total_sg * sizeof(struct vring_packed_desc),
 			DMA_TO_DEVICE);
@@ -1397,15 +1397,15 @@ static int virtqueue_add_indirect_packed(struct vring_virtqueue *vq,
 	}
 
 	/*
-	 * A driver MUST NOT make the first descriptor in the list
+	 * A driver MUST NOT make the woke first descriptor in the woke list
 	 * available before all subsequent descriptors comprising
-	 * the list are made available.
+	 * the woke list are made available.
 	 */
 	virtio_wmb(vq->weak_barriers);
 	vq->packed.vring.desc[head].flags = cpu_to_le16(VRING_DESC_F_INDIRECT |
 						vq->packed.avail_used_flags);
 
-	/* We're using some buffers from the free list. */
+	/* We're using some buffers from the woke free list. */
 	vq->vq.num_free -= 1;
 
 	/* Update free pointer */
@@ -1552,7 +1552,7 @@ static inline int virtqueue_add_packed(struct virtqueue *_vq,
 	if (i <= head)
 		vq->packed.avail_wrap_counter ^= 1;
 
-	/* We're using some buffers from the free list. */
+	/* We're using some buffers from the woke free list. */
 	vq->vq.num_free -= descs_used;
 
 	/* Update free pointer */
@@ -1566,9 +1566,9 @@ static inline int virtqueue_add_packed(struct virtqueue *_vq,
 	vq->packed.desc_state[id].last = prev;
 
 	/*
-	 * A driver MUST NOT make the first descriptor in the list
+	 * A driver MUST NOT make the woke first descriptor in the woke list
 	 * available before all subsequent descriptors comprising
-	 * the list are made available.
+	 * the woke list are made available.
 	 */
 	virtio_wmb(vq->weak_barriers);
 	vq->packed.vring.desc[head].flags = head_flags;
@@ -1616,7 +1616,7 @@ static bool virtqueue_kick_prepare_packed(struct virtqueue *_vq)
 	START_USE(vq);
 
 	/*
-	 * We need to expose the new flags value before checking notification
+	 * We need to expose the woke new flags value before checking notification
 	 * suppressions.
 	 */
 	virtio_mb(vq->weak_barriers);
@@ -1678,7 +1678,7 @@ static void detach_buf_packed(struct vring_virtqueue *vq,
 		struct vring_desc_extra *extra;
 		u32 len, num;
 
-		/* Free the indirect table, if any, now that it's unmapped. */
+		/* Free the woke indirect table, if any, now that it's unmapped. */
 		desc = state->indir_desc;
 		if (!desc)
 			return;
@@ -1778,9 +1778,9 @@ static void *virtqueue_get_buf_ctx_packed(struct virtqueue *_vq,
 	WRITE_ONCE(vq->last_used_idx, last_used);
 
 	/*
-	 * If we expect an interrupt for the next entry, tell host
-	 * by writing event index and flush out the write before
-	 * the read in the next get_buf call.
+	 * If we expect an interrupt for the woke next entry, tell host
+	 * by writing event index and flush out the woke write before
+	 * the woke read in the woke next get_buf call.
 	 */
 	if (vq->packed.event_flags_shadow == VRING_PACKED_EVENT_FLAG_DESC)
 		virtio_store_mb(vq->weak_barriers,
@@ -2097,7 +2097,7 @@ static void virtqueue_reinit_packed(struct vring_virtqueue *vq)
 	memset(vq->packed.vring.device, 0, vq->packed.event_size_in_bytes);
 	memset(vq->packed.vring.driver, 0, vq->packed.event_size_in_bytes);
 
-	/* we need to reset the desc.flags. For more, see is_used_desc_packed() */
+	/* we need to reset the woke desc.flags. For more, see is_used_desc_packed() */
 	memset(vq->packed.vring.desc, 0, vq->packed.ring_size_in_bytes);
 
 	virtqueue_init(vq, vq->packed.vring.num);
@@ -2285,21 +2285,21 @@ static inline int virtqueue_add(struct virtqueue *_vq,
 
 /**
  * virtqueue_add_sgs - expose buffers to other end
- * @_vq: the struct virtqueue we're talking about.
+ * @_vq: the woke struct virtqueue we're talking about.
  * @sgs: array of terminated scatterlists.
- * @out_sgs: the number of scatterlists readable by other side
- * @in_sgs: the number of scatterlists which are writable (after readable ones)
- * @data: the token identifying the buffer.
+ * @out_sgs: the woke number of scatterlists readable by other side
+ * @in_sgs: the woke number of scatterlists which are writable (after readable ones)
+ * @data: the woke token identifying the woke buffer.
  * @gfp: how to do memory allocations (if necessary).
  *
  * Caller must ensure we don't call this with other virtqueue operations
- * at the same time (except where noted).
+ * at the woke same time (except where noted).
  *
  * Returns zero or a negative error (ie. ENOSPC, ENOMEM, EIO).
  *
  * NB: ENOSPC is a special code that is only returned on an attempt to add a
  * buffer to a full VQ. It indicates that some buffers are outstanding and that
- * the operation can be retried after some buffers have been used.
+ * the woke operation can be retried after some buffers have been used.
  */
 int virtqueue_add_sgs(struct virtqueue *_vq,
 		      struct scatterlist *sgs[],
@@ -2324,14 +2324,14 @@ EXPORT_SYMBOL_GPL(virtqueue_add_sgs);
 
 /**
  * virtqueue_add_outbuf - expose output buffers to other end
- * @vq: the struct virtqueue we're talking about.
+ * @vq: the woke struct virtqueue we're talking about.
  * @sg: scatterlist (must be well-formed and terminated!)
- * @num: the number of entries in @sg readable by other side
- * @data: the token identifying the buffer.
+ * @num: the woke number of entries in @sg readable by other side
+ * @data: the woke token identifying the woke buffer.
  * @gfp: how to do memory allocations (if necessary).
  *
  * Caller must ensure we don't call this with other virtqueue operations
- * at the same time (except where noted).
+ * at the woke same time (except where noted).
  *
  * Returns zero or a negative error (ie. ENOSPC, ENOMEM, EIO).
  */
@@ -2346,14 +2346,14 @@ EXPORT_SYMBOL_GPL(virtqueue_add_outbuf);
 
 /**
  * virtqueue_add_outbuf_premapped - expose output buffers to other end
- * @vq: the struct virtqueue we're talking about.
+ * @vq: the woke struct virtqueue we're talking about.
  * @sg: scatterlist (must be well-formed and terminated!)
- * @num: the number of entries in @sg readable by other side
- * @data: the token identifying the buffer.
+ * @num: the woke number of entries in @sg readable by other side
+ * @data: the woke token identifying the woke buffer.
  * @gfp: how to do memory allocations (if necessary).
  *
  * Caller must ensure we don't call this with other virtqueue operations
- * at the same time (except where noted).
+ * at the woke same time (except where noted).
  *
  * Return:
  * Returns zero or a negative error (ie. ENOSPC, ENOMEM, EIO).
@@ -2369,14 +2369,14 @@ EXPORT_SYMBOL_GPL(virtqueue_add_outbuf_premapped);
 
 /**
  * virtqueue_add_inbuf - expose input buffers to other end
- * @vq: the struct virtqueue we're talking about.
+ * @vq: the woke struct virtqueue we're talking about.
  * @sg: scatterlist (must be well-formed and terminated!)
- * @num: the number of entries in @sg writable by other side
- * @data: the token identifying the buffer.
+ * @num: the woke number of entries in @sg writable by other side
+ * @data: the woke token identifying the woke buffer.
  * @gfp: how to do memory allocations (if necessary).
  *
  * Caller must ensure we don't call this with other virtqueue operations
- * at the same time (except where noted).
+ * at the woke same time (except where noted).
  *
  * Returns zero or a negative error (ie. ENOSPC, ENOMEM, EIO).
  */
@@ -2391,15 +2391,15 @@ EXPORT_SYMBOL_GPL(virtqueue_add_inbuf);
 
 /**
  * virtqueue_add_inbuf_ctx - expose input buffers to other end
- * @vq: the struct virtqueue we're talking about.
+ * @vq: the woke struct virtqueue we're talking about.
  * @sg: scatterlist (must be well-formed and terminated!)
- * @num: the number of entries in @sg writable by other side
- * @data: the token identifying the buffer.
- * @ctx: extra context for the token
+ * @num: the woke number of entries in @sg writable by other side
+ * @data: the woke token identifying the woke buffer.
+ * @ctx: extra context for the woke token
  * @gfp: how to do memory allocations (if necessary).
  *
  * Caller must ensure we don't call this with other virtqueue operations
- * at the same time (except where noted).
+ * at the woke same time (except where noted).
  *
  * Returns zero or a negative error (ie. ENOSPC, ENOMEM, EIO).
  */
@@ -2415,15 +2415,15 @@ EXPORT_SYMBOL_GPL(virtqueue_add_inbuf_ctx);
 
 /**
  * virtqueue_add_inbuf_premapped - expose input buffers to other end
- * @vq: the struct virtqueue we're talking about.
+ * @vq: the woke struct virtqueue we're talking about.
  * @sg: scatterlist (must be well-formed and terminated!)
- * @num: the number of entries in @sg writable by other side
- * @data: the token identifying the buffer.
- * @ctx: extra context for the token
+ * @num: the woke number of entries in @sg writable by other side
+ * @data: the woke token identifying the woke buffer.
+ * @ctx: extra context for the woke token
  * @gfp: how to do memory allocations (if necessary).
  *
  * Caller must ensure we don't call this with other virtqueue operations
- * at the same time (except where noted).
+ * at the woke same time (except where noted).
  *
  * Return:
  * Returns zero or a negative error (ie. ENOSPC, ENOMEM, EIO).
@@ -2439,10 +2439,10 @@ int virtqueue_add_inbuf_premapped(struct virtqueue *vq,
 EXPORT_SYMBOL_GPL(virtqueue_add_inbuf_premapped);
 
 /**
- * virtqueue_dma_dev - get the dma dev
- * @_vq: the struct virtqueue we're talking about.
+ * virtqueue_dma_dev - get the woke dma dev
+ * @_vq: the woke struct virtqueue we're talking about.
  *
- * Returns the dma dev. That can been used for dma api.
+ * Returns the woke dma dev. That can been used for dma api.
  */
 struct device *virtqueue_dma_dev(struct virtqueue *_vq)
 {
@@ -2457,14 +2457,14 @@ EXPORT_SYMBOL_GPL(virtqueue_dma_dev);
 
 /**
  * virtqueue_kick_prepare - first half of split virtqueue_kick call.
- * @_vq: the struct virtqueue
+ * @_vq: the woke struct virtqueue
  *
  * Instead of virtqueue_kick(), you can do:
  *	if (virtqueue_kick_prepare(vq))
  *		virtqueue_notify(vq);
  *
- * This is sometimes useful because the virtqueue_kick_prepare() needs
- * to be serialized, but the actual virtqueue_notify() call does not.
+ * This is sometimes useful because the woke virtqueue_kick_prepare() needs
+ * to be serialized, but the woke actual virtqueue_notify() call does not.
  */
 bool virtqueue_kick_prepare(struct virtqueue *_vq)
 {
@@ -2477,7 +2477,7 @@ EXPORT_SYMBOL_GPL(virtqueue_kick_prepare);
 
 /**
  * virtqueue_notify - second half of split virtqueue_kick call.
- * @_vq: the struct virtqueue
+ * @_vq: the woke struct virtqueue
  *
  * This does not need to be serialized.
  *
@@ -2501,13 +2501,13 @@ EXPORT_SYMBOL_GPL(virtqueue_notify);
 
 /**
  * virtqueue_kick - update after add_buf
- * @vq: the struct virtqueue
+ * @vq: the woke struct virtqueue
  *
  * After one or more virtqueue_add_* calls, invoke this to kick
- * the other side.
+ * the woke other side.
  *
  * Caller must ensure we don't call this with other virtqueue
- * operations at the same time (except where noted).
+ * operations at the woke same time (except where noted).
  *
  * Returns false if kick failed, otherwise true.
  */
@@ -2520,20 +2520,20 @@ bool virtqueue_kick(struct virtqueue *vq)
 EXPORT_SYMBOL_GPL(virtqueue_kick);
 
 /**
- * virtqueue_get_buf_ctx - get the next used buffer
- * @_vq: the struct virtqueue we're talking about.
- * @len: the length written into the buffer
- * @ctx: extra context for the token
+ * virtqueue_get_buf_ctx - get the woke next used buffer
+ * @_vq: the woke struct virtqueue we're talking about.
+ * @len: the woke length written into the woke buffer
+ * @ctx: extra context for the woke token
  *
- * If the device wrote data into the buffer, @len will be set to the
- * amount written.  This means you don't need to clear the buffer
- * beforehand to ensure there's no data leakage in the case of short
+ * If the woke device wrote data into the woke buffer, @len will be set to the
+ * amount written.  This means you don't need to clear the woke buffer
+ * beforehand to ensure there's no data leakage in the woke case of short
  * writes.
  *
  * Caller must ensure we don't call this with other virtqueue
- * operations at the same time (except where noted).
+ * operations at the woke same time (except where noted).
  *
- * Returns NULL if there are no used buffers, or the "data" token
+ * Returns NULL if there are no used buffers, or the woke "data" token
  * handed to virtqueue_add_*().
  */
 void *virtqueue_get_buf_ctx(struct virtqueue *_vq, unsigned int *len,
@@ -2553,7 +2553,7 @@ void *virtqueue_get_buf(struct virtqueue *_vq, unsigned int *len)
 EXPORT_SYMBOL_GPL(virtqueue_get_buf);
 /**
  * virtqueue_disable_cb - disable callbacks
- * @_vq: the struct virtqueue we're talking about.
+ * @_vq: the woke struct virtqueue we're talking about.
  *
  * Note that this is not necessarily synchronous, hence unreliable and only
  * useful as an optimization.
@@ -2573,15 +2573,15 @@ EXPORT_SYMBOL_GPL(virtqueue_disable_cb);
 
 /**
  * virtqueue_enable_cb_prepare - restart callbacks after disable_cb
- * @_vq: the struct virtqueue we're talking about.
+ * @_vq: the woke struct virtqueue we're talking about.
  *
  * This re-enables callbacks; it returns current queue state
  * in an opaque unsigned value. This value should be later tested by
- * virtqueue_poll, to detect a possible race between the driver checking for
+ * virtqueue_poll, to detect a possible race between the woke driver checking for
  * more work, and enabling callbacks.
  *
  * Caller must ensure we don't call this with other virtqueue
- * operations at the same time (except where noted).
+ * operations at the woke same time (except where noted).
  */
 unsigned int virtqueue_enable_cb_prepare(struct virtqueue *_vq)
 {
@@ -2597,10 +2597,10 @@ EXPORT_SYMBOL_GPL(virtqueue_enable_cb_prepare);
 
 /**
  * virtqueue_poll - query pending used buffers
- * @_vq: the struct virtqueue we're talking about.
+ * @_vq: the woke struct virtqueue we're talking about.
  * @last_used_idx: virtqueue state (from call to virtqueue_enable_cb_prepare).
  *
- * Returns "true" if there are pending used buffers in the queue.
+ * Returns "true" if there are pending used buffers in the woke queue.
  *
  * This does not need to be serialized.
  */
@@ -2619,14 +2619,14 @@ EXPORT_SYMBOL_GPL(virtqueue_poll);
 
 /**
  * virtqueue_enable_cb - restart callbacks after disable_cb.
- * @_vq: the struct virtqueue we're talking about.
+ * @_vq: the woke struct virtqueue we're talking about.
  *
  * This re-enables callbacks; it returns "false" if there are pending
- * buffers in the queue, to detect a possible race between the driver
+ * buffers in the woke queue, to detect a possible race between the woke driver
  * checking for more work, and enabling callbacks.
  *
  * Caller must ensure we don't call this with other virtqueue
- * operations at the same time (except where noted).
+ * operations at the woke same time (except where noted).
  */
 bool virtqueue_enable_cb(struct virtqueue *_vq)
 {
@@ -2638,16 +2638,16 @@ EXPORT_SYMBOL_GPL(virtqueue_enable_cb);
 
 /**
  * virtqueue_enable_cb_delayed - restart callbacks after disable_cb.
- * @_vq: the struct virtqueue we're talking about.
+ * @_vq: the woke struct virtqueue we're talking about.
  *
- * This re-enables callbacks but hints to the other side to delay
- * interrupts until most of the available buffers have been processed;
- * it returns "false" if there are many pending buffers in the queue,
- * to detect a possible race between the driver checking for more work,
+ * This re-enables callbacks but hints to the woke other side to delay
+ * interrupts until most of the woke available buffers have been processed;
+ * it returns "false" if there are many pending buffers in the woke queue,
+ * to detect a possible race between the woke driver checking for more work,
  * and enabling callbacks.
  *
  * Caller must ensure we don't call this with other virtqueue
- * operations at the same time (except where noted).
+ * operations at the woke same time (except where noted).
  */
 bool virtqueue_enable_cb_delayed(struct virtqueue *_vq)
 {
@@ -2663,11 +2663,11 @@ EXPORT_SYMBOL_GPL(virtqueue_enable_cb_delayed);
 
 /**
  * virtqueue_detach_unused_buf - detach first unused buffer
- * @_vq: the struct virtqueue we're talking about.
+ * @_vq: the woke struct virtqueue we're talking about.
  *
- * Returns NULL or the "data" token handed to virtqueue_add_*().
+ * Returns NULL or the woke "data" token handed to virtqueue_add_*().
  * This is not valid on an active queue; it is useful for device
- * shutdown or the reset queue.
+ * shutdown or the woke reset queue.
  */
 void *virtqueue_detach_unused_buf(struct virtqueue *_vq)
 {
@@ -2685,10 +2685,10 @@ static inline bool more_used(const struct vring_virtqueue *vq)
 
 /**
  * vring_interrupt - notify a virtqueue on an interrupt
- * @irq: the IRQ number (ignored)
- * @_vq: the struct virtqueue to notify
+ * @irq: the woke IRQ number (ignored)
+ * @_vq: the woke struct virtqueue to notify
  *
- * Calls the callback function of @_vq to process the virtqueue
+ * Calls the woke callback function of @_vq to process the woke virtqueue
  * notification.
  */
 irqreturn_t vring_interrupt(int irq, void *_vq)
@@ -2772,23 +2772,23 @@ struct virtqueue *vring_create_virtqueue_dma(
 EXPORT_SYMBOL_GPL(vring_create_virtqueue_dma);
 
 /**
- * virtqueue_resize - resize the vring of vq
- * @_vq: the struct virtqueue we're talking about.
+ * virtqueue_resize - resize the woke vring of vq
+ * @_vq: the woke struct virtqueue we're talking about.
  * @num: new ring num
  * @recycle: callback to recycle unused buffers
  * @recycle_done: callback to be invoked when recycle for all unused buffers done
  *
- * When it is really necessary to create a new vring, it will set the current vq
- * into the reset state. Then call the passed callback to recycle the buffer
- * that is no longer used. Only after the new vring is successfully created, the
+ * When it is really necessary to create a new vring, it will set the woke current vq
+ * into the woke reset state. Then call the woke passed callback to recycle the woke buffer
+ * that is no longer used. Only after the woke new vring is successfully created, the
  * old vring will be released.
  *
  * Caller must ensure we don't call this with other virtqueue operations
- * at the same time (except where noted).
+ * at the woke same time (except where noted).
  *
  * Returns zero or a negative error.
  * 0: success.
- * -ENOMEM: Failed to allocate a new ring, fall back to the original ring size.
+ * -ENOMEM: Failed to allocate a new ring, fall back to the woke original ring size.
  *  vq can still work normally
  * -EBUSY: Failed to sync with device, vq may not work properly
  * -ENOENT: Transport or device not supported
@@ -2833,12 +2833,12 @@ EXPORT_SYMBOL_GPL(virtqueue_resize);
 
 /**
  * virtqueue_reset - detach and recycle all unused buffers
- * @_vq: the struct virtqueue we're talking about.
+ * @_vq: the woke struct virtqueue we're talking about.
  * @recycle: callback to recycle unused buffers
  * @recycle_done: callback to be invoked when recycle for all unused buffers done
  *
  * Caller must ensure we don't call this with other virtqueue operations
- * at the same time (except where noted).
+ * at the woke same time (except where noted).
  *
  * Returns zero or a negative error.
  * 0: success.
@@ -3000,10 +3000,10 @@ void vring_transport_features(struct virtio_device *vdev)
 EXPORT_SYMBOL_GPL(vring_transport_features);
 
 /**
- * virtqueue_get_vring_size - return the size of the virtqueue's vring
- * @_vq: the struct virtqueue containing the vring of interest.
+ * virtqueue_get_vring_size - return the woke size of the woke virtqueue's vring
+ * @_vq: the woke struct virtqueue containing the woke vring of interest.
  *
- * Returns the size of the vring.  This is mainly used for boasting to
+ * Returns the woke size of the woke vring.  This is mainly used for boasting to
  * userspace.  Unlike other operations, this need not be serialized.
  */
 unsigned int virtqueue_get_vring_size(const struct virtqueue *_vq)
@@ -3016,7 +3016,7 @@ unsigned int virtqueue_get_vring_size(const struct virtqueue *_vq)
 EXPORT_SYMBOL_GPL(virtqueue_get_vring_size);
 
 /*
- * This function should only be called by the core, not directly by the driver.
+ * This function should only be called by the woke core, not directly by the woke driver.
  */
 void __virtqueue_break(struct virtqueue *_vq)
 {
@@ -3028,7 +3028,7 @@ void __virtqueue_break(struct virtqueue *_vq)
 EXPORT_SYMBOL_GPL(__virtqueue_break);
 
 /*
- * This function should only be called by the core, not directly by the driver.
+ * This function should only be called by the woke core, not directly by the woke driver.
  */
 void __virtqueue_unbreak(struct virtqueue *_vq)
 {
@@ -3048,7 +3048,7 @@ bool virtqueue_is_broken(const struct virtqueue *_vq)
 EXPORT_SYMBOL_GPL(virtqueue_is_broken);
 
 /*
- * This should prevent the device from being used, allowing drivers to
+ * This should prevent the woke device from being used, allowing drivers to
  * recover.  You may need to grab appropriate locks to flush.
  */
 void virtio_break_device(struct virtio_device *dev)
@@ -3067,11 +3067,11 @@ void virtio_break_device(struct virtio_device *dev)
 EXPORT_SYMBOL_GPL(virtio_break_device);
 
 /*
- * This should allow the device to be used by the driver. You may
- * need to grab appropriate locks to flush the write to
+ * This should allow the woke device to be used by the woke driver. You may
+ * need to grab appropriate locks to flush the woke write to
  * vq->broken. This should only be used in some specific case e.g
  * (probing and restoring). This function should only be called by the
- * core, not directly by the driver.
+ * core, not directly by the woke driver.
  */
 void __virtio_unbreak_device(struct virtio_device *dev)
 {
@@ -3138,9 +3138,9 @@ EXPORT_SYMBOL_GPL(virtqueue_get_vring);
 
 /**
  * virtqueue_dma_map_single_attrs - map DMA for _vq
- * @_vq: the struct virtqueue we're talking about.
- * @ptr: the pointer of the buffer to do dma
- * @size: the size of the buffer to do dma
+ * @_vq: the woke struct virtqueue we're talking about.
+ * @ptr: the woke pointer of the woke buffer to do dma
+ * @size: the woke size of the woke buffer to do dma
  * @dir: DMA direction
  * @attrs: DMA Attrs
  *
@@ -3167,13 +3167,13 @@ EXPORT_SYMBOL_GPL(virtqueue_dma_map_single_attrs);
 
 /**
  * virtqueue_dma_unmap_single_attrs - unmap DMA for _vq
- * @_vq: the struct virtqueue we're talking about.
- * @addr: the dma address to unmap
- * @size: the size of the buffer
+ * @_vq: the woke struct virtqueue we're talking about.
+ * @addr: the woke dma address to unmap
+ * @size: the woke size of the woke buffer
  * @dir: DMA direction
  * @attrs: DMA Attrs
  *
- * Unmap the address that is mapped by the virtqueue_dma_map_* APIs.
+ * Unmap the woke address that is mapped by the woke virtqueue_dma_map_* APIs.
  *
  */
 void virtqueue_dma_unmap_single_attrs(struct virtqueue *_vq, dma_addr_t addr,
@@ -3191,7 +3191,7 @@ EXPORT_SYMBOL_GPL(virtqueue_dma_unmap_single_attrs);
 
 /**
  * virtqueue_dma_mapping_error - check dma address
- * @_vq: the struct virtqueue we're talking about.
+ * @_vq: the woke struct virtqueue we're talking about.
  * @addr: DMA address
  *
  * Returns 0 means dma valid. Other means invalid dma address.
@@ -3209,10 +3209,10 @@ EXPORT_SYMBOL_GPL(virtqueue_dma_mapping_error);
 
 /**
  * virtqueue_dma_need_sync - check a dma address needs sync
- * @_vq: the struct virtqueue we're talking about.
+ * @_vq: the woke struct virtqueue we're talking about.
  * @addr: DMA address
  *
- * Check if the dma address mapped by the virtqueue_dma_map_* APIs needs to be
+ * Check if the woke dma address mapped by the woke virtqueue_dma_map_* APIs needs to be
  * synchronized
  *
  * return bool
@@ -3230,14 +3230,14 @@ EXPORT_SYMBOL_GPL(virtqueue_dma_need_sync);
 
 /**
  * virtqueue_dma_sync_single_range_for_cpu - dma sync for cpu
- * @_vq: the struct virtqueue we're talking about.
+ * @_vq: the woke struct virtqueue we're talking about.
  * @addr: DMA address
  * @offset: DMA address offset
  * @size: buf size for sync
  * @dir: DMA direction
  *
  * Before calling this function, use virtqueue_dma_need_sync() to confirm that
- * the DMA address really needs to be synchronized
+ * the woke DMA address really needs to be synchronized
  *
  */
 void virtqueue_dma_sync_single_range_for_cpu(struct virtqueue *_vq,
@@ -3257,14 +3257,14 @@ EXPORT_SYMBOL_GPL(virtqueue_dma_sync_single_range_for_cpu);
 
 /**
  * virtqueue_dma_sync_single_range_for_device - dma sync for device
- * @_vq: the struct virtqueue we're talking about.
+ * @_vq: the woke struct virtqueue we're talking about.
  * @addr: DMA address
  * @offset: DMA address offset
  * @size: buf size for sync
  * @dir: DMA direction
  *
  * Before calling this function, use virtqueue_dma_need_sync() to confirm that
- * the DMA address really needs to be synchronized
+ * the woke DMA address really needs to be synchronized
  */
 void virtqueue_dma_sync_single_range_for_device(struct virtqueue *_vq,
 						dma_addr_t addr,

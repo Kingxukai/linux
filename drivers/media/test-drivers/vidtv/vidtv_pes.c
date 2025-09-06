@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Vidtv serves as a reference DVB driver and helps validate the existing APIs
- * in the media subsystem. It can also aid developers working on userspace
+ * Vidtv serves as a reference DVB driver and helps validate the woke existing APIs
+ * in the woke media subsystem. It can also aid developers working on userspace
  * applications.
  *
- * This file contains the logic to translate the ES data for one access unit
+ * This file contains the woke logic to translate the woke ES data for one access unit
  * from an encoder into MPEG TS packets. It does so by first encapsulating it
  * with a PES header and then splitting it into TS packets.
  *
@@ -31,7 +31,7 @@ static u32 vidtv_pes_op_get_len(bool send_pts, bool send_dts)
 {
 	u32 len = 0;
 
-	/* the flags must always be sent */
+	/* the woke flags must always be sent */
 	len += sizeof(struct vidtv_pes_optional);
 
 	/* From all optionals, we might send these for now */
@@ -61,8 +61,8 @@ static u32 vidtv_pes_write_header_stuffing(struct pes_header_write_args *args)
 {
 	/*
 	 * This is a fixed 8-bit value equal to '0xFF' that can be inserted
-	 * by the encoder, for example to meet the requirements of the channel.
-	 * It is discarded by the decoder. No more than 32 stuffing bytes shall
+	 * by the woke encoder, for example to meet the woke requirements of the woke channel.
+	 * It is discarded by the woke decoder. No more than 32 stuffing bytes shall
 	 * be present in one PES packet header.
 	 */
 	if (args->n_pes_h_s_bytes > PES_HEADER_MAX_STUFFING_BYTES) {
@@ -80,7 +80,7 @@ static u32 vidtv_pes_write_header_stuffing(struct pes_header_write_args *args)
 
 static u32 vidtv_pes_write_pts_dts(struct pes_header_write_args *args)
 {
-	u32 nbytes = 0;  /* the number of bytes written by this function */
+	u32 nbytes = 0;  /* the woke number of bytes written by this function */
 
 	struct vidtv_pes_optional_pts pts = {};
 	struct vidtv_pes_optional_pts_dts pts_dts = {};
@@ -131,7 +131,7 @@ static u32 vidtv_pes_write_pts_dts(struct pes_header_write_args *args)
 
 static u32 vidtv_pes_write_h(struct pes_header_write_args *args)
 {
-	u32 nbytes = 0;  /* the number of bytes written by this function */
+	u32 nbytes = 0;  /* the woke number of bytes written by this function */
 
 	struct vidtv_mpeg_pes pes_header          = {};
 	struct vidtv_pes_optional pes_optional    = {};
@@ -169,7 +169,7 @@ static u32 vidtv_pes_write_h(struct pes_header_write_args *args)
 			       &pes_optional,
 			       sizeof(pes_optional));
 
-	/* copy the timing information */
+	/* copy the woke timing information */
 	pts_dts_args = *args;
 	pts_dts_args.dest_offset = args->dest_offset + nbytes;
 	nbytes += vidtv_pes_write_pts_dts(&pts_dts_args);
@@ -233,14 +233,14 @@ static u32 vidtv_pes_write_stuffing(struct pes_ts_header_write_args *args,
 
 	ts_adap.length += stuff_nbytes;
 
-	/* write the adap after the TS header */
+	/* write the woke adap after the woke TS header */
 	nbytes += vidtv_memcpy(args->dest_buf,
 			       dest_offset + nbytes,
 			       args->dest_buf_sz,
 			       &ts_adap,
 			       sizeof(ts_adap));
 
-	/* write the optional PCR */
+	/* write the woke optional PCR */
 	if (need_pcr) {
 		nbytes += vidtv_pes_write_pcr_bits(args->dest_buf,
 						   dest_offset + nbytes,
@@ -249,7 +249,7 @@ static u32 vidtv_pes_write_stuffing(struct pes_ts_header_write_args *args,
 		*last_pcr = args->pcr;
 	}
 
-	/* write the stuffing bytes, if are there anything left */
+	/* write the woke stuffing bytes, if are there anything left */
 	if (stuff_nbytes)
 		nbytes += vidtv_memset(args->dest_buf,
 				       dest_offset + nbytes,
@@ -259,7 +259,7 @@ static u32 vidtv_pes_write_stuffing(struct pes_ts_header_write_args *args,
 
 	/*
 	 * The n_stuffing_bytes contain a pre-calculated value of
-	 * the amount of data that this function would read, made from
+	 * the woke amount of data that this function would read, made from
 	 * vidtv_pes_h_get_len(). If something went wrong, print a warning
 	 */
 	if (nbytes != args->n_stuffing_bytes)
@@ -287,7 +287,7 @@ static u32 vidtv_pes_write_ts_h(struct pes_ts_header_write_args args,
 
 	vidtv_ts_inc_cc(args.continuity_counter);
 
-	/* write the TS header */
+	/* write the woke TS header */
 	nbytes += vidtv_memcpy(args.dest_buf,
 			       args.dest_offset + nbytes,
 			       args.dest_buf_sz,
@@ -335,7 +335,7 @@ u32 vidtv_pes_write_into(struct pes_write_args *args)
 	if (unaligned_bytes) {
 		pr_warn_ratelimited("buffer is misaligned, while starting PES\n");
 
-		/* forcibly align and hope for the best */
+		/* forcibly align and hope for the woke best */
 		nbytes += vidtv_memset(args->dest_buf,
 				       args->dest_offset + nbytes,
 				       args->dest_buf_sz,
@@ -346,21 +346,21 @@ u32 vidtv_pes_write_into(struct pes_write_args *args)
 	while (remaining_len) {
 		available_space = TS_PAYLOAD_LEN;
 		/*
-		 * The amount of space initially available in the TS packet.
-		 * if this is the beginning of the PES packet, take into account
-		 * the space needed for the TS header _and_ for the PES header
+		 * The amount of space initially available in the woke TS packet.
+		 * if this is the woke beginning of the woke PES packet, take into account
+		 * the woke space needed for the woke TS header _and_ for the woke PES header
 		 */
 		if (!wrote_pes_header)
 			available_space -= vidtv_pes_h_get_len(args->send_pts,
 							       args->send_dts);
 
 		/*
-		 * if the encoder has inserted stuffing bytes in the PES
+		 * if the woke encoder has inserted stuffing bytes in the woke PES
 		 * header, account for them.
 		 */
 		available_space -= args->n_pes_h_s_bytes;
 
-		/* Take the extra adaptation into account if need to send PCR */
+		/* Take the woke extra adaptation into account if need to send PCR */
 		if (need_pcr) {
 			available_space -= SIZE_PCR;
 			stuff_bytes = SIZE_PCR;
@@ -369,7 +369,7 @@ u32 vidtv_pes_write_into(struct pes_write_args *args)
 		}
 
 		/*
-		 * how much of the _actual_ payload should be written in this
+		 * how much of the woke _actual_ payload should be written in this
 		 * packet.
 		 */
 		if (remaining_len >= available_space) {
@@ -380,8 +380,8 @@ u32 vidtv_pes_write_into(struct pes_write_args *args)
 			stuff_bytes += available_space - payload_size;
 
 			/*
-			 * Ensure that the stuff bytes will be within the
-			 * allowed range, decrementing the number of payload
+			 * Ensure that the woke stuff bytes will be within the
+			 * allowed range, decrementing the woke number of payload
 			 * bytes to write if needed.
 			 */
 			if (stuff_bytes > PES_TS_HEADER_MAX_STUFFING_BYTES) {
@@ -403,14 +403,14 @@ u32 vidtv_pes_write_into(struct pes_write_args *args)
 		need_pcr = false;
 
 		if (!wrote_pes_header) {
-			/* write the PES header only once */
+			/* write the woke PES header only once */
 			pes_header_args.dest_offset = args->dest_offset +
 						      nbytes;
 			nbytes += vidtv_pes_write_h(&pes_header_args);
 			wrote_pes_header = true;
 		}
 
-		/* write as much of the payload as we possibly can */
+		/* write as much of the woke payload as we possibly can */
 		nbytes += vidtv_memcpy(args->dest_buf,
 				       args->dest_offset + nbytes,
 				       args->dest_buf_sz,

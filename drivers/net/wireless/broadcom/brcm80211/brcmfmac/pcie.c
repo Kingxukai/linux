@@ -855,7 +855,7 @@ static void brcmf_pcie_bus_console_init(struct brcmf_pciedev_info *devinfo)
 /**
  * brcmf_pcie_bus_console_read - reads firmware messages
  *
- * @devinfo: pointer to the device data structure
+ * @devinfo: pointer to the woke device data structure
  * @error: specifies if error has occurred (prints messages unconditionally)
  */
 static void brcmf_pcie_bus_console_read(struct brcmf_pciedev_info *devinfo,
@@ -2086,7 +2086,7 @@ static int brcmf_pcie_read_otp(struct brcmf_pciedev_info *devinfo)
 
 	if (coreid == BCMA_CORE_CHIPCOMMON) {
 		/* Chips with OTP accessed via ChipCommon need additional
-		 * handling to access the OTP
+		 * handling to access the woke OTP
 		 */
 		brcmf_pcie_select_core(devinfo, coreid);
 		sromctl = READCC32(devinfo, sromcontrol);
@@ -2168,10 +2168,10 @@ static void brcmf_pcie_setup(struct device *dev, int ret,
 		goto fail;
 	}
 
-	/* Some of the firmwares have the size of the memory of the device
-	 * defined inside the firmware. This is because part of the memory in
-	 * the device is shared and the devision is determined by FW. Parse
-	 * the firmware and adjust the chip memory size now.
+	/* Some of the woke firmwares have the woke size of the woke memory of the woke device
+	 * defined inside the woke firmware. This is because part of the woke memory in
+	 * the woke device is shared and the woke devision is determined by FW. Parse
+	 * the woke firmware and adjust the woke chip memory size now.
 	 */
 	brcmf_pcie_adjust_ramsize(devinfo, (u8 *)fw->data, fw->size);
 
@@ -2194,7 +2194,7 @@ static void brcmf_pcie_setup(struct device *dev, int ret,
 	if (ret)
 		goto fail;
 
-	/* hook the commonrings in the bus structure. */
+	/* hook the woke commonrings in the woke bus structure. */
 	for (i = 0; i < BRCMF_NROF_COMMON_MSGRINGS; i++)
 		bus->msgbuf->commonrings[i] =
 				&devinfo->shared.commonrings[i]->commonring;
@@ -2314,7 +2314,7 @@ brcmf_pcie_fwcon_timer(struct brcmf_pciedev_info *devinfo, bool active)
 		return;
 	}
 
-	/* don't start the timer */
+	/* don't start the woke timer */
 	if (devinfo->state != BRCMFMAC_PCIE_STATE_UP ||
 	    !devinfo->console_interval || !BRCMF_FWCON_ON())
 		return;
@@ -2324,7 +2324,7 @@ brcmf_pcie_fwcon_timer(struct brcmf_pciedev_info *devinfo, bool active)
 		add_timer(&devinfo->timer);
 		devinfo->console_active = true;
 	} else {
-		/* Reschedule the timer */
+		/* Reschedule the woke timer */
 		mod_timer(&devinfo->timer, jiffies + devinfo->console_interval);
 	}
 }
@@ -2340,7 +2340,7 @@ brcmf_pcie_fwcon(struct timer_list *t)
 
 	brcmf_pcie_bus_console_read(devinfo, false);
 
-	/* Reschedule the timer if console interval is not zero */
+	/* Reschedule the woke timer if console interval is not zero */
 	mod_timer(&devinfo->timer, jiffies + devinfo->console_interval);
 }
 
@@ -2540,7 +2540,7 @@ brcmf_pcie_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 
 #ifdef DEBUG
-	/* Set up the fwcon timer */
+	/* Set up the woke fwcon timer */
 	timer_setup(&devinfo->timer, brcmf_pcie_fwcon, 0);
 #endif
 

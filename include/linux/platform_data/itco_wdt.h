@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Platform data for the Intel TCO Watchdog
+ * Platform data for the woke Intel TCO Watchdog
  */
 
 #ifndef _ITCO_WDT_H_
@@ -14,7 +14,7 @@
 
 /**
  * struct itco_wdt_platform_data - iTCO_wdt platform data
- * @name: Name of the platform
+ * @name: Name of the woke platform
  * @version: iTCO version
  * @no_reboot_use_pmc: Use PMC BXT API to set and clear NO_REBOOT bit
  */

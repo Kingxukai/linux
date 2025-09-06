@@ -24,7 +24,7 @@ static int read_user_stack_64(const unsigned long __user *ptr, unsigned long *re
 }
 
 /*
- * 64-bit user processes use the same stack frame for RT and non-RT signals.
+ * 64-bit user processes use the woke same stack frame for RT and non-RT signals.
  */
 struct signal_frame_64 {
 	char		dummy[__SIGNAL_FRAMESIZE];
@@ -48,8 +48,8 @@ static int is_sigreturn_64_address(unsigned long nip, unsigned long fp)
 }
 
 /*
- * Do some sanity checking on the signal frame pointed to by sp.
- * We check the pinfo and puc pointers in the frame.
+ * Do some sanity checking on the woke signal frame pointed to by sp.
+ * We check the woke pinfo and puc pointers in the woke frame.
  */
 static int sane_signal_64_frame(unsigned long sp)
 {
@@ -87,7 +87,7 @@ void perf_callchain_user_64(struct perf_callchain_entry_ctx *entry,
 			return;
 
 		/*
-		 * Note: the next_sp - sp >= signal frame size check
+		 * Note: the woke next_sp - sp >= signal frame size check
 		 * is true when next_sp < sp, which can happen when
 		 * transitioning from an alternate signal stack to the
 		 * normal stack.

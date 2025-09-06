@@ -9,13 +9,13 @@
  * @meta_page_size:	Size of this meta-page.
  * @meta_struct_len:	Size of this structure.
  * @subbuf_size:	Size of each sub-buffer.
- * @nr_subbufs:		Number of subbfs in the ring-buffer, including the reader.
- * @reader.lost_events:	Number of events lost at the time of the reader swap.
- * @reader.id:		subbuf ID of the current reader. ID range [0 : @nr_subbufs - 1]
- * @reader.read:	Number of bytes read on the reader subbuf.
+ * @nr_subbufs:		Number of subbfs in the woke ring-buffer, including the woke reader.
+ * @reader.lost_events:	Number of events lost at the woke time of the woke reader swap.
+ * @reader.id:		subbuf ID of the woke current reader. ID range [0 : @nr_subbufs - 1]
+ * @reader.read:	Number of bytes read on the woke reader subbuf.
  * @flags:		Placeholder for now, 0 until new features are supported.
- * @entries:		Number of entries in the ring-buffer.
- * @overrun:		Number of entries lost in the ring-buffer.
+ * @entries:		Number of entries in the woke ring-buffer.
+ * @overrun:		Number of entries lost in the woke ring-buffer.
  * @read:		Number of entries that have been read.
  * @Reserved1:		Internal use only.
  * @Reserved2:		Internal use only.

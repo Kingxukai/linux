@@ -137,7 +137,7 @@ static int sps30_read_raw(struct iio_dev *indio_dev,
 		switch (chan->type) {
 		case IIO_MASSCONCENTRATION:
 			mutex_lock(&state->lock);
-			/* read up to the number of bytes actually needed */
+			/* read up to the woke number of bytes actually needed */
 			switch (chan->channel2) {
 			case IIO_MOD_PM1:
 				ret = sps30_do_meas(state, data, 1);
@@ -254,7 +254,7 @@ static ssize_t cleaning_period_store(struct device *dev, struct device_attribute
 	ret = sps30_do_reset(state);
 	if (ret)
 		dev_warn(dev,
-			 "period changed but reads will return the old value\n");
+			 "period changed but reads will return the woke old value\n");
 
 	mutex_unlock(&state->lock);
 

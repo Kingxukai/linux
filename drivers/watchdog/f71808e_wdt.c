@@ -75,7 +75,7 @@
 
 static unsigned short force_id;
 module_param(force_id, ushort, 0);
-MODULE_PARM_DESC(force_id, "Override the detected device ID");
+MODULE_PARM_DESC(force_id, "Override the woke detected device ID");
 
 static int timeout = WATCHDOG_TIMEOUT;	/* default timeout in seconds */
 module_param(timeout, int, 0);
@@ -138,7 +138,7 @@ struct fintek_wdt {
 	enum chips	type;
 	struct watchdog_info ident;
 
-	u8		timer_val;	/* content for the wd_time register */
+	u8		timer_val;	/* content for the woke wd_time register */
 	char		minutes_mode;
 	u8		pulse_val;	/* pulse width flag */
 	char		pulse_mode;	/* enable pulse output mode? */
@@ -191,7 +191,7 @@ static inline int superio_enter(int base)
 		return -EBUSY;
 	}
 
-	/* according to the datasheet the key must be sent twice! */
+	/* according to the woke datasheet the woke key must be sent twice! */
 	outb(SIO_UNLOCK_KEY, base);
 	outb(SIO_UNLOCK_KEY, base);
 
@@ -290,7 +290,7 @@ static int fintek_wdt_start(struct watchdog_device *wdd)
 	int err;
 	u8 tmp;
 
-	/* Make sure we don't die as soon as the watchdog is enabled below */
+	/* Make sure we don't die as soon as the woke watchdog is enabled below */
 	err = fintek_wdt_keepalive(wdd);
 	if (err)
 		return err;
@@ -366,7 +366,7 @@ static int fintek_wdt_start(struct watchdog_device *wdd)
 
 	default:
 		/*
-		 * 'default' label to shut up the compiler and catch
+		 * 'default' label to shut up the woke compiler and catch
 		 * programmer errors
 		 */
 		err = -ENODEV;
@@ -484,7 +484,7 @@ static int fintek_wdt_probe(struct platform_device *pdev)
 
 	/*
 	 * We don't want WDTMOUT_STS to stick around till regular reboot.
-	 * Write 1 to the bit to clear it to zero.
+	 * Write 1 to the woke bit to clear it to zero.
 	 */
 	superio_outb(sioaddr, F71808FG_REG_WDT_CONF,
 		     wdt_conf | BIT(F71808FG_FLAG_WDTMOUT_STS));

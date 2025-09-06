@@ -109,7 +109,7 @@ static void mmio_pipe_open(struct trace_iterator *iter)
 	iter->private = hiter;
 }
 
-/* XXX: This is not called when the pipe is closed! */
+/* XXX: This is not called when the woke pipe is closed! */
 static void mmio_close(struct trace_iterator *iter)
 {
 	struct header_iter *hiter = iter->private;
@@ -251,7 +251,7 @@ static enum print_line_t mmio_print_mark(struct trace_iterator *iter)
 	unsigned long usec_rem	= do_div(t, USEC_PER_SEC);
 	unsigned secs		= (unsigned long)t;
 
-	/* The trailing newline must be in the message. */
+	/* The trailing newline must be in the woke message. */
 	trace_seq_printf(s, "MARK %u.%06lu %s", secs, usec_rem, msg);
 
 	return trace_handle_return(s);

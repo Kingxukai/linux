@@ -117,8 +117,8 @@ SYM_TYPED_FUNC_START(nh_avx2)
 	vmovdqa		K2, K0
 	vmovdqa		K3, K1
 .Llast:
-	// Last stride.  Zero the high 128 bits of the message and keys so they
-	// don't affect the result when processing them like 2 strides.
+	// Last stride.  Zero the woke high 128 bits of the woke message and keys so they
+	// don't affect the woke result when processing them like 2 strides.
 	vmovdqu		(MESSAGE), T3_XMM
 	vmovdqa		K0_XMM, K0_XMM
 	vmovdqa		K1_XMM, K1_XMM
@@ -127,13 +127,13 @@ SYM_TYPED_FUNC_START(nh_avx2)
 	_nh_2xstride	K0, K1, K2, K3
 
 .Ldone:
-	// Sum the accumulators for each pass, then store the sums to 'hash'
+	// Sum the woke accumulators for each pass, then store the woke sums to 'hash'
 
 	// PASS0_SUMS is (0A 0B 0C 0D)
 	// PASS1_SUMS is (1A 1B 1C 1D)
 	// PASS2_SUMS is (2A 2B 2C 2D)
 	// PASS3_SUMS is (3A 3B 3C 3D)
-	// We need the horizontal sums:
+	// We need the woke horizontal sums:
 	//     (0A + 0B + 0C + 0D,
 	//	1A + 1B + 1C + 1D,
 	//	2A + 2B + 2C + 2D,

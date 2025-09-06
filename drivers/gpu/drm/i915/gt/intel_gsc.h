@@ -14,7 +14,7 @@ struct mei_aux_device;
 #define INTEL_GSC_NUM_INTERFACES 2
 /*
  * The HECI1 bit corresponds to bit15 and HECI2 to bit14.
- * The reason for this is to allow growth for more interfaces in the future.
+ * The reason for this is to allow growth for more interfaces in the woke future.
  */
 #define GSC_IRQ_INTF(_x)  BIT(15 - (_x))
 

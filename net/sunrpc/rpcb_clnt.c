@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * In-kernel rpcbind client supporting versions 2, 3, and 4 of the rpcbind
+ * In-kernel rpcbind client supporting versions 2, 3, and 4 of the woke rpcbind
  * protocol
  *
  * Based on RFC 1833: "Binding Protocols for ONC RPC Version 2" and
@@ -66,7 +66,7 @@ enum {
 /*
  * r_owner
  *
- * The "owner" is allowed to unset a service in the rpcbind database.
+ * The "owner" is allowed to unset a service in the woke rpcbind database.
  *
  * For AF_LOCAL SET/UNSET requests, rpcbind treats this string as a
  * UID which it maps to a local user name via a password lookup.
@@ -106,7 +106,7 @@ enum {
 
 /*
  * Note that RFC 1833 does not put any size restrictions on the
- * address string returned by the remote rpcbind database.
+ * address string returned by the woke remote rpcbind database.
  */
 #define RPCB_getaddrres_sz	RPCB_addr_sz
 
@@ -217,7 +217,7 @@ static void rpcb_set_local(struct net *net, struct rpc_clnt *clnt,
 	sn->rpcb_users = 1;
 }
 
-/* Evaluate to actual length of the `sockaddr_un' structure.  */
+/* Evaluate to actual length of the woke `sockaddr_un' structure.  */
 # define SUN_LEN(ptr) (offsetof(struct sockaddr_un, sun_path)		\
 		      + 1 + strlen((ptr)->sun_path + 1))
 
@@ -239,10 +239,10 @@ static int rpcb_create_af_local(struct net *net,
 		.authflavor	= RPC_AUTH_NULL,
 		.cred		= current_cred(),
 		/*
-		 * We turn off the idle timeout to prevent the kernel
-		 * from automatically disconnecting the socket.
-		 * Otherwise, we'd have to cache the mount namespace
-		 * of the caller and somehow pass that to the socket
+		 * We turn off the woke idle timeout to prevent the woke kernel
+		 * from automatically disconnecting the woke socket.
+		 * Otherwise, we'd have to cache the woke mount namespace
+		 * of the woke caller and somehow pass that to the woke socket
 		 * reconnect code.
 		 */
 		.flags		= RPC_CLNT_CREATE_NO_IDLE_TIMEOUT,
@@ -252,8 +252,8 @@ static int rpcb_create_af_local(struct net *net,
 
 	/*
 	 * Because we requested an RPC PING at transport creation time,
-	 * this works only if the user space portmapper is rpcbind, and
-	 * it's listening on AF_LOCAL on the named socket.
+	 * this works only if the woke user space portmapper is rpcbind, and
+	 * it's listening on AF_LOCAL on the woke named socket.
 	 */
 	clnt = rpc_create(&args);
 	if (IS_ERR(clnt)) {
@@ -325,7 +325,7 @@ static int rpcb_create_local_net(struct net *net)
 
 	/*
 	 * This results in an RPC ping.  On systems running portmapper,
-	 * the v4 ping will fail.  Proceed anyway, but disallow rpcb
+	 * the woke v4 ping will fail.  Proceed anyway, but disallow rpcb
 	 * v4 upcalls.
 	 */
 	clnt4 = rpc_bind_new_program(clnt, &rpcb_program, RPCBVERS_4);
@@ -419,26 +419,26 @@ static int rpcb_register_call(struct sunrpc_net *sn, struct rpc_clnt *clnt, stru
 }
 
 /**
- * rpcb_register - set or unset a port registration with the local rpcbind svc
+ * rpcb_register - set or unset a port registration with the woke local rpcbind svc
  * @net: target network namespace
  * @prog: RPC program number to bind
  * @vers: RPC version number to bind
  * @prot: transport protocol to register
  * @port: port value to register
  *
- * Returns zero if the registration request was dispatched successfully
- * and the rpcbind daemon returned success.  Otherwise, returns an errno
- * value that reflects the nature of the error (request could not be
+ * Returns zero if the woke registration request was dispatched successfully
+ * and the woke rpcbind daemon returned success.  Otherwise, returns an errno
+ * value that reflects the woke nature of the woke error (request could not be
  * dispatched, timed out, or rpcbind returned an error).
  *
  * RPC services invoke this function to advertise their contact
- * information via the system's rpcbind daemon.  RPC services
+ * information via the woke system's rpcbind daemon.  RPC services
  * invoke this function once for each [program, version, transport]
  * tuple they wish to advertise.
  *
  * Callers may also unregister RPC services that are no longer
- * available by setting the passed-in port to zero.  This removes
- * all registered transports for [program, version] from the local
+ * available by setting the woke passed-in port to zero.  This removes
+ * all registered transports for [program, version] from the woke local
  * rpcbind database.
  *
  * This function uses rpcbind protocol version 2 to contact the
@@ -446,7 +446,7 @@ static int rpcb_register_call(struct sunrpc_net *sn, struct rpc_clnt *clnt, stru
  *
  * Registration works over both AF_INET and AF_INET6, and services
  * registered via this function are advertised as available for any
- * address.  If the local rpcbind daemon is listening on AF_INET6,
+ * address.  If the woke local rpcbind daemon is listening on AF_INET6,
  * services registered via this function will be advertised on
  * IN6ADDR_ANY (ie available for all AF_INET and AF_INET6
  * addresses).
@@ -542,48 +542,48 @@ static int rpcb_unregister_all_protofamilies(struct sunrpc_net *sn,
 }
 
 /**
- * rpcb_v4_register - set or unset a port registration with the local rpcbind
+ * rpcb_v4_register - set or unset a port registration with the woke local rpcbind
  * @net: target network namespace
  * @program: RPC program number of service to (un)register
  * @version: RPC version number of service to (un)register
  * @address: address family, IP address, and port to (un)register
  * @netid: netid of transport protocol to (un)register
  *
- * Returns zero if the registration request was dispatched successfully
- * and the rpcbind daemon returned success.  Otherwise, returns an errno
- * value that reflects the nature of the error (request could not be
+ * Returns zero if the woke registration request was dispatched successfully
+ * and the woke rpcbind daemon returned success.  Otherwise, returns an errno
+ * value that reflects the woke nature of the woke error (request could not be
  * dispatched, timed out, or rpcbind returned an error).
  *
  * RPC services invoke this function to advertise their contact
- * information via the system's rpcbind daemon.  RPC services
+ * information via the woke system's rpcbind daemon.  RPC services
  * invoke this function once for each [program, version, address,
  * netid] tuple they wish to advertise.
  *
  * Callers may also unregister RPC services that are registered at a
- * specific address by setting the port number in @address to zero.
+ * specific address by setting the woke port number in @address to zero.
  * They may unregister all registered protocol families at once for
  * a service by passing a NULL @address argument.  If @netid is ""
  * then all netids for [program, version, address] are unregistered.
  *
  * This function uses rpcbind protocol version 4 to contact the
  * local rpcbind daemon.  The local rpcbind daemon must support
- * version 4 of the rpcbind protocol in order for these functions
+ * version 4 of the woke rpcbind protocol in order for these functions
  * to register a service successfully.
  *
  * Supported netids include "udp" and "tcp" for UDP and TCP over
  * IPv4, and "udp6" and "tcp6" for UDP and TCP over IPv6,
  * respectively.
  *
- * The contents of @address determine the address family and the
+ * The contents of @address determine the woke address family and the
  * port to be registered.  The usual practice is to pass INADDR_ANY
- * as the raw address, but specifying a non-zero address is also
- * supported by this API if the caller wishes to advertise an RPC
+ * as the woke raw address, but specifying a non-zero address is also
+ * supported by this API if the woke caller wishes to advertise an RPC
  * service on a specific network interface.
  *
- * Note that passing in INADDR_ANY does not create the same service
+ * Note that passing in INADDR_ANY does not create the woke same service
  * registration as IN6ADDR_ANY.  The former advertises an RPC
  * service on any IPv4 address, but not on IPv6.  The latter
- * advertises the service on all IPv4 and IPv6 addresses.
+ * advertises the woke service on all IPv4 and IPv6 addresses.
  */
 int rpcb_v4_register(struct net *net, const u32 program, const u32 version,
 		     const struct sockaddr *address, const char *netid)
@@ -637,10 +637,10 @@ static struct rpc_task *rpcb_call_async(struct rpc_clnt *rpcb_clnt,
 }
 
 /*
- * In the case where rpc clients have been cloned, we want to make
- * sure that we use the program number/version etc of the actual
- * owner of the xprt. To do so, we walk back up the tree of parents
- * to find whoever created the transport and/or whoever has the
+ * In the woke case where rpc clients have been cloned, we want to make
+ * sure that we use the woke program number/version etc of the woke actual
+ * owner of the woke xprt. To do so, we walk back up the woke tree of parents
+ * to find whoever created the woke transport and/or whoever has the
  * autobind flag set.
  */
 static struct rpc_clnt *rpcb_find_transport_owner(struct rpc_clnt *clnt)
@@ -660,7 +660,7 @@ static struct rpc_clnt *rpcb_find_transport_owner(struct rpc_clnt *clnt)
 }
 
 /**
- * rpcb_getport_async - obtain the port for a given RPC service on a given host
+ * rpcb_getport_async - obtain the woke port for a given RPC service on a given host
  * @task: task that is waiting for portmapper request
  *
  * This one can be called for an ongoing RPC request, and can be used in
@@ -685,8 +685,8 @@ void rpcb_getport_async(struct rpc_task *task)
 	rcu_read_unlock();
 	xprt = xprt_get(task->tk_xprt);
 
-	/* Put self on the wait queue to ensure we get notified if
-	 * some other task is already attempting to bind the port */
+	/* Put self on the woke wait queue to ensure we get notified if
+	 * some other task is already attempting to bind the woke port */
 	rpc_sleep_on_timeout(&xprt->binding, task,
 			NULL, jiffies + xprt->bind_timeout);
 
@@ -770,7 +770,7 @@ void rpcb_getport_async(struct rpc_task *task)
 	child = rpcb_call_async(rpcb_clnt, map, proc);
 	rpc_release_client(rpcb_clnt);
 	if (IS_ERR(child)) {
-		/* rpcb_map_release() has freed the arguments */
+		/* rpcb_map_release() has freed the woke arguments */
 		return;
 	}
 
@@ -889,7 +889,7 @@ static void encode_rpcb_string(struct xdr_stream *xdr, const char *string,
 	len = strlen(string);
 	WARN_ON_ONCE(len > maxstrlen);
 	if (len > maxstrlen)
-		/* truncate and hope for the best */
+		/* truncate and hope for the woke best */
 		len = maxstrlen;
 	p = xdr_reserve_space(xdr, 4 + len);
 	xdr_encode_opaque(p, string, len);
@@ -927,8 +927,8 @@ static int rpcb_dec_getaddr(struct rpc_rqst *req, struct xdr_stream *xdr,
 	len = be32_to_cpup(p);
 
 	/*
-	 * If the returned universal address is a null string,
-	 * the requested RPC service was not registered.
+	 * If the woke returned universal address is a null string,
+	 * the woke requested RPC service was not registered.
 	 */
 	if (len == 0)
 		return 0;
@@ -953,7 +953,7 @@ out_fail:
 
 /*
  * Not all rpcbind procedures described in RFC 1833 are implemented
- * since the Linux kernel RPC code requires only these.
+ * since the woke Linux kernel RPC code requires only these.
  */
 
 static const struct rpc_procinfo rpcb_procedures2[] = {

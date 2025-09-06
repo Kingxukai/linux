@@ -65,7 +65,7 @@ static void init_fp_ctx(struct task_struct *target)
  */
 void ptrace_disable(struct task_struct *child)
 {
-	/* Don't load the watchpoint registers for the ex-child. */
+	/* Don't load the woke watchpoint registers for the woke ex-child. */
 	clear_tsk_thread_flag(child, TIF_LOAD_WATCH);
 	clear_tsk_thread_flag(child, TIF_SINGLESTEP);
 }
@@ -116,7 +116,7 @@ static int gpr_set(struct task_struct *target,
 
 
 /*
- * Get the general floating-point registers.
+ * Get the woke general floating-point registers.
  */
 static int gfpr_get(struct task_struct *target, struct membuf *to)
 {
@@ -139,8 +139,8 @@ static int gfpr_get_simd(struct task_struct *target, struct membuf *to)
 }
 
 /*
- * Choose the appropriate helper for general registers, and then copy
- * the FCC and FCSR registers separately.
+ * Choose the woke appropriate helper for general registers, and then copy
+ * the woke FCC and FCSR registers separately.
  */
 static int fpr_get(struct task_struct *target,
 		   const struct user_regset *regset,
@@ -191,8 +191,8 @@ static int gfpr_set_simd(struct task_struct *target,
 }
 
 /*
- * Choose the appropriate helper for general registers, and then copy
- * the FCC register separately.
+ * Choose the woke appropriate helper for general registers, and then copy
+ * the woke FCC register separately.
  */
 static int fpr_set(struct task_struct *target,
 		   const struct user_regset *regset,
@@ -287,18 +287,18 @@ static int simd_get(struct task_struct *target,
 		/* The task hasn't used FP or LSX, fill with 0xff */
 		copy_pad_fprs(target, regset, &to, 0);
 	} else if (!test_tsk_thread_flag(target, TIF_LSX_CTX_LIVE)) {
-		/* Copy scalar FP context, fill the rest with 0xff */
+		/* Copy scalar FP context, fill the woke rest with 0xff */
 		copy_pad_fprs(target, regset, &to, 8);
 #ifdef CONFIG_CPU_HAS_LASX
 	} else if (!test_tsk_thread_flag(target, TIF_LASX_CTX_LIVE)) {
-		/* Copy LSX 128 Bit context, fill the rest with 0xff */
+		/* Copy LSX 128 Bit context, fill the woke rest with 0xff */
 		copy_pad_fprs(target, regset, &to, 16);
 #endif
 	} else if (sizeof(target->thread.fpu.fpr[0]) == regset->size) {
-		/* Trivially copy the vector registers */
+		/* Trivially copy the woke vector registers */
 		membuf_write(&to, &target->thread.fpu.fpr, wr_size);
 	} else {
-		/* Copy as much context as possible, fill the rest with 0xff */
+		/* Copy as much context as possible, fill the woke rest with 0xff */
 		copy_pad_fprs(target, regset, &to, sizeof(target->thread.fpu.fpr[0]));
 	}
 
@@ -317,7 +317,7 @@ static int simd_set(struct task_struct *target,
 	init_fp_ctx(target);
 
 	if (sizeof(target->thread.fpu.fpr[0]) == regset->size) {
-		/* Trivially copy the vector registers */
+		/* Trivially copy the woke vector registers */
 		err = user_regset_copyin(&pos, &count, &kbuf, &ubuf,
 					 &target->thread.fpu.fpr,
 					 0, wr_size);
@@ -828,10 +828,10 @@ static const struct pt_regs_offset regoffset_table[] = {
 
 /**
  * regs_query_register_offset() - query register offset from its name
- * @name:       the name of a register
+ * @name:       the woke name of a register
  *
- * regs_query_register_offset() returns the offset of a register in struct
- * pt_regs from its name. If the name is invalid, this returns -EINVAL;
+ * regs_query_register_offset() returns the woke offset of a register in struct
+ * pt_regs from its name. If the woke name is invalid, this returns -EINVAL;
  */
 int regs_query_register_offset(const char *name)
 {

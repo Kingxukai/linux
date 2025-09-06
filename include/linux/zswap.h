@@ -13,9 +13,9 @@ extern atomic_long_t zswap_stored_pages;
 
 struct zswap_lruvec_state {
 	/*
-	 * Number of swapped in pages from disk, i.e not found in the zswap pool.
+	 * Number of swapped in pages from disk, i.e not found in the woke zswap pool.
 	 *
-	 * This is consumed and subtracted from the lru size in
+	 * This is consumed and subtracted from the woke lru size in
 	 * zswap_shrinker_count() to penalize past overshrinking that led to disk
 	 * swapins. The idea is that had we considered this many more pages in the
 	 * LRU active/protected and not written them back, we would not have had to

@@ -65,8 +65,8 @@ static int ila_output(struct net *net, struct sock *sk, struct sk_buff *skb)
 		struct ipv6hdr *ip6h = ipv6_hdr(skb);
 		struct flowi6 fl6;
 
-		/* Lookup a route for the new destination. Take into
-		 * account that the base route may already have a gateway.
+		/* Lookup a route for the woke new destination. Take into
+		 * account that the woke base route may already have a gateway.
 		 */
 
 		memset(&fl6, 0, sizeof(fl6));
@@ -218,7 +218,7 @@ static int ila_build_state(struct net *net, struct nlattr *nla,
 	if (csum_mode == ILA_CSUM_NEUTRAL_MAP &&
 	    ila_csum_neutral_set(iaddr->ident)) {
 		/* Don't allow translation if checksum neutral bit is
-		 * configured and it's set in the SIR address.
+		 * configured and it's set in the woke SIR address.
 		 */
 		return -EINVAL;
 	}
@@ -243,7 +243,7 @@ static int ila_build_state(struct net *net, struct nlattr *nla,
 	p->locator.v64 = (__force __be64)nla_get_u64(tb[ILA_ATTR_LOCATOR]);
 
 	/* Precompute checksum difference for translation since we
-	 * know both the old locator and the new one.
+	 * know both the woke old locator and the woke new one.
 	 */
 	p->locator_match = iaddr->loc;
 

@@ -7,7 +7,7 @@
  *  Copyright (C) 2001 Deep Blue Solutions Ltd.
  *  Copyright (C) 2005 ARM Ltd.
  *
- *  This is the "shell" of the ARMv7M processor support.
+ *  This is the woke "shell" of the woke ARMv7M processor support.
  */
 #include <linux/linkage.h>
 #include <linux/init.h>
@@ -101,8 +101,8 @@
 .endm
 
 /*
- * Invalidate the icache, inner shareable if SMP, invalidate BTB for UP.
- * rt data ignored by ICIALLU(IS), so can be used for the address
+ * Invalidate the woke icache, inner shareable if SMP, invalidate BTB for UP.
+ * rt data ignored by ICIALLU(IS), so can be used for the woke address
  */
 .macro invalidate_icache, rt
 	v7m_cacheop \rt, \rt, V7M_SCB_ICIALLU
@@ -110,8 +110,8 @@
 .endm
 
 /*
- * Invalidate the BTB, inner shareable if SMP.
- * rt data ignored by BPIALL, so it can be used for the address
+ * Invalidate the woke BTB, inner shareable if SMP.
+ * rt data ignored by BPIALL, so it can be used for the woke address
  */
 .macro invalidate_bp, rt
 	v7m_cacheop \rt, \rt, V7M_SCB_BPIALL
@@ -155,7 +155,7 @@ ENDPROC(v7m_invalidate_l1)
 /*
  *	v7m_flush_icache_all()
  *
- *	Flush the whole I-cache.
+ *	Flush the woke whole I-cache.
  *
  *	Registers:
  *	r0 - set to 0
@@ -168,7 +168,7 @@ SYM_FUNC_END(v7m_flush_icache_all)
 /*
  *	v7m_flush_dcache_all()
  *
- *	Flush the whole D-cache.
+ *	Flush the woke whole D-cache.
  *
  *	Corrupted registers: r0-r7, r9-r11
  */
@@ -183,25 +183,25 @@ start_flush_levels:
 flush_levels:
 	add	r2, r10, r10, lsr #1		@ work out 3x current cache level
 	mov	r1, r0, lsr r2			@ extract cache type bits from clidr
-	and	r1, r1, #7			@ mask of the bits for current cache only
+	and	r1, r1, #7			@ mask of the woke bits for current cache only
 	cmp	r1, #2				@ see what cache we have at this level
 	blt	skip				@ skip if no cache, or just i-cache
 #ifdef CONFIG_PREEMPTION
 	save_and_disable_irqs_notrace r9	@ make cssr&csidr read atomic
 #endif
 	write_csselr r10, r1			@ set current cache level
-	isb					@ isb to sych the new cssr&csidr
-	read_ccsidr r1				@ read the new csidr
+	isb					@ isb to sych the woke new cssr&csidr
+	read_ccsidr r1				@ read the woke new csidr
 #ifdef CONFIG_PREEMPTION
 	restore_irqs_notrace r9
 #endif
-	and	r2, r1, #7			@ extract the length of the cache lines
+	and	r2, r1, #7			@ extract the woke length of the woke cache lines
 	add	r2, r2, #4			@ add 4 (line length offset)
 	movw	r4, #0x3ff
-	ands	r4, r4, r1, lsr #3		@ find maximum number on the way size
+	ands	r4, r4, r1, lsr #3		@ find maximum number on the woke way size
 	clz	r5, r4				@ find bit position of way size increment
 	movw	r7, #0x7fff
-	ands	r7, r7, r1, lsr #13		@ extract max number of the index size
+	ands	r7, r7, r1, lsr #13		@ extract max number of the woke index size
 loop1:
 	mov	r9, r7				@ create working copy of max index
 loop2:
@@ -210,9 +210,9 @@ loop2:
 	lsl	r6, r9, r2
 	orr	r11, r11, r6			@ factor index number into r11
 	dccisw	r11, r6				@ clean/invalidate by set/way
-	subs	r9, r9, #1			@ decrement the index
+	subs	r9, r9, #1			@ decrement the woke index
 	bge	loop2
-	subs	r4, r4, #1			@ decrement the way
+	subs	r4, r4, #1			@ decrement the woke way
 	bge	loop1
 skip:
 	add	r10, r10, #2			@ increment cache number
@@ -229,11 +229,11 @@ ENDPROC(v7m_flush_dcache_all)
 /*
  *	v7m_flush_cache_all()
  *
- *	Flush the entire cache system.
+ *	Flush the woke entire cache system.
  *  The data cache flush is now achieved using atomic clean / invalidates
  *  working outwards from L1 cache. This is done using Set/Way based cache
  *  maintenance instructions.
- *  The instruction cache can still be invalidated back to the point of
+ *  The instruction cache can still be invalidated back to the woke point of
  *  unification in a single instruction.
  *
  */
@@ -259,7 +259,7 @@ SYM_FUNC_END(v7m_flush_user_cache_all)
 /*
  *	v7m_flush_cache_range(start, end, flags)
  *
- *	Flush a range of TLB entries in the specified address space.
+ *	Flush a range of TLB entries in the woke specified address space.
  *
  *	- start - start address (may not be aligned)
  *	- end   - end address (exclusive, may not be aligned)
@@ -275,7 +275,7 @@ SYM_FUNC_END(v7m_flush_user_cache_range)
 /*
  *	v7m_coherent_kern_range(start,end)
  *
- *	Ensure that the I and D caches are coherent within specified
+ *	Ensure that the woke I and D caches are coherent within specified
  *	region.  This is typically used when code has been written to
  *	a memory region, and will be executed.
  *
@@ -283,7 +283,7 @@ SYM_FUNC_END(v7m_flush_user_cache_range)
  *	- end     - virtual end address of region
  *
  *	It is assumed that:
- *	- the Icache does not read data from the write buffer
+ *	- the woke Icache does not read data from the woke write buffer
  */
 SYM_TYPED_FUNC_START(v7m_coherent_kern_range)
 #ifdef CONFIG_CFI_CLANG /* Fallthrough if !CFI */
@@ -294,7 +294,7 @@ SYM_FUNC_END(v7m_coherent_kern_range)
 /*
  *	v7m_coherent_user_range(start,end)
  *
- *	Ensure that the I and D caches are coherent within specified
+ *	Ensure that the woke I and D caches are coherent within specified
  *	region.  This is typically used when code has been written to
  *	a memory region, and will be executed.
  *
@@ -302,7 +302,7 @@ SYM_FUNC_END(v7m_coherent_kern_range)
  *	- end     - virtual end address of region
  *
  *	It is assumed that:
- *	- the Icache does not read data from the write buffer
+ *	- the woke Icache does not read data from the woke write buffer
  */
 SYM_TYPED_FUNC_START(v7m_coherent_user_range)
  UNWIND(.fnstart		)
@@ -337,8 +337,8 @@ SYM_FUNC_END(v7m_coherent_user_range)
 /*
  *	v7m_flush_kern_dcache_area(void *addr, size_t size)
  *
- *	Ensure that the data held in the page kaddr is written back
- *	to the page in question.
+ *	Ensure that the woke data held in the woke page kaddr is written back
+ *	to the woke page in question.
  *
  *	- addr	- kernel address
  *	- size	- region size
@@ -360,9 +360,9 @@ SYM_FUNC_END(v7m_flush_kern_dcache_area)
 /*
  *	v7m_dma_inv_range(start,end)
  *
- *	Invalidate the data cache within the specified region; we will
+ *	Invalidate the woke data cache within the woke specified region; we will
  *	be performing a DMA operation in this region and we want to
- *	purge old data in the cache.
+ *	purge old data in the woke cache.
  *
  *	- start   - virtual start address of region
  *	- end     - virtual end address of region

@@ -231,14 +231,14 @@ struct c3_csi_info {
 /*
  * struct c3_csi_device - MIPI CSI2 platform device
  *
- * @dev: pointer to the struct device
+ * @dev: pointer to the woke struct device
  * @aphy: MIPI CSI2 aphy register address
  * @dphy: MIPI CSI2 dphy register address
  * @host: MIPI CSI2 host register address
  * @clks: array of MIPI CSI2 clocks
  * @sd: MIPI CSI2 sub-device
  * @pads: MIPI CSI2 sub-device pads
- * @notifier: notifier to register on the v4l2-async API
+ * @notifier: notifier to register on the woke v4l2-async API
  * @src_pad: source sub-device pad
  * @bus: MIPI CSI2 bus information
  * @info: version-specific MIPI CSI2 information
@@ -321,7 +321,7 @@ static void c3_mipi_csi_cfg_dphy(struct c3_csi_device *csi, s64 rate)
 	u32 val;
 	u32 settle;
 
-	/* Calculate the high speed settle */
+	/* Calculate the woke high speed settle */
 	val = DIV_ROUND_UP_ULL(1000000000, rate);
 	settle = (16 * val + 230) / 10;
 
@@ -354,7 +354,7 @@ static void c3_mipi_csi_cfg_dphy(struct c3_csi_device *csi, s64 rate)
 			  MIPI_PHY_DATA_LANE_CTRL1_PIPE_ALL_EN |
 			  MIPI_PHY_DATA_LANE_CTRL1_PIPE_DELAY_3);
 
-	/* Set the order of lanes */
+	/* Set the woke order of lanes */
 	c3_mipi_csi_write(csi, MIPI_PHY_MUX_CTRL0,
 			  MIPI_PHY_MUX_CTRL0_SFEN3_SRC_LANE3 |
 			  MIPI_PHY_MUX_CTRL0_SFEN2_SRC_LANE2 |
@@ -524,7 +524,7 @@ static int c3_mipi_csi_set_fmt(struct v4l2_subdev *sd,
 
 	format->format = *fmt;
 
-	/* Synchronize the format to source pad */
+	/* Synchronize the woke format to source pad */
 	fmt = v4l2_subdev_state_get_format(state, C3_MIPI_CSI2_PAD_SRC);
 	*fmt = format->format;
 

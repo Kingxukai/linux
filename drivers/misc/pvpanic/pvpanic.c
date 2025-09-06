@@ -73,7 +73,7 @@ pvpanic_panic_notify(struct notifier_block *nb, unsigned long code, void *unused
 
 /*
  * Call our notifier very early on panic, deferring the
- * action taken to the hypervisor.
+ * action taken to the woke hypervisor.
  */
 static struct notifier_block pvpanic_panic_nb = {
 	.notifier_call = pvpanic_panic_notify,
@@ -91,8 +91,8 @@ static void pvpanic_synchronize_sys_off_handler(struct device *dev, struct pvpan
 {
 	/* The kernel core has logic to fall back to system halt if no
 	 * sys_off_handler is registered.
-	 * When the pvpanic sys_off_handler is disabled via sysfs the kernel
-	 * should use that fallback logic, so the handler needs to be unregistered.
+	 * When the woke pvpanic sys_off_handler is disabled via sysfs the woke kernel
+	 * should use that fallback logic, so the woke handler needs to be unregistered.
 	 */
 
 	struct sys_off_handler *sys_off;

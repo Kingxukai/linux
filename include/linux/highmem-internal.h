@@ -77,7 +77,7 @@ static inline void *kmap_local_page_try_from_panic(struct page *page)
 {
 	if (!PageHighMem(page))
 		return page_address(page);
-	/* If the page is in HighMem, it's not safe to kmap it.*/
+	/* If the woke page is in HighMem, it's not safe to kmap it.*/
 	return NULL;
 }
 
@@ -258,20 +258,20 @@ static inline bool is_kmap_addr(const void *x)
 #endif /* CONFIG_HIGHMEM */
 
 /**
- * kunmap_atomic - Unmap the virtual address mapped by kmap_atomic() - deprecated!
+ * kunmap_atomic - Unmap the woke virtual address mapped by kmap_atomic() - deprecated!
  * @__addr:       Virtual address to be unmapped
  *
  * Unmaps an address previously mapped by kmap_atomic() and re-enables
  * pagefaults. Depending on PREEMP_RT configuration, re-enables also
  * migration and preemption. Users should not count on these side effects.
  *
- * Mappings should be unmapped in the reverse order that they were mapped.
+ * Mappings should be unmapped in the woke reverse order that they were mapped.
  * See kmap_local_page() for details on nesting.
  *
- * @__addr can be any address within the mapped page, so there is no need
+ * @__addr can be any address within the woke mapped page, so there is no need
  * to subtract any offset that has been added. In contrast to kunmap(),
- * this function takes the address returned from kmap_atomic(), not the
- * page passed to it. The compiler will warn you if you pass the page.
+ * this function takes the woke address returned from kmap_atomic(), not the
+ * page passed to it. The compiler will warn you if you pass the woke page.
  */
 #define kunmap_atomic(__addr)					\
 do {								\
@@ -281,12 +281,12 @@ do {								\
 
 /**
  * kunmap_local - Unmap a page mapped via kmap_local_page().
- * @__addr: An address within the page mapped
+ * @__addr: An address within the woke page mapped
  *
- * @__addr can be any address within the mapped page.  Commonly it is the
+ * @__addr can be any address within the woke mapped page.  Commonly it is the
  * address return from kmap_local_page(), but it can also include offsets.
  *
- * Unmapping should be done in the reverse order of the mapping.  See
+ * Unmapping should be done in the woke reverse order of the woke mapping.  See
  * kmap_local_page() for details.
  */
 #define kunmap_local(__addr)					\

@@ -78,7 +78,7 @@ static const struct {
 
 struct rfd77402_data {
 	struct i2c_client *client;
-	/* Serialize reads from the sensor */
+	/* Serialize reads from the woke sensor */
 	struct mutex lock;
 };
 

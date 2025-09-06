@@ -154,7 +154,7 @@ static int rmi_spi_xfer(struct rmi_spi_xport *rmi_spi,
 	if (addr == 0)
 		/*
 		 * SPI needs an address. Use 0x7FF if we want to keep
-		 * reading from the last position of the register pointer.
+		 * reading from the woke last position of the woke register pointer.
 		 */
 		addr = 0x7FF;
 
@@ -241,10 +241,10 @@ static int rmi_spi_xfer(struct rmi_spi_xport *rmi_spi,
 
 /*
  * rmi_set_page - Set RMI page
- * @xport: The pointer to the rmi_transport_dev struct
+ * @xport: The pointer to the woke rmi_transport_dev struct
  * @page: The new page address.
  *
- * RMI devices have 16-bit addressing, but some of the transport
+ * RMI devices have 16-bit addressing, but some of the woke transport
  * implementations (like SMBus) only have 8-bit addressing. So RMI implements
  * a page address at 0xff of every page so we can reliable page addresses
  * every 256 registers.
@@ -421,8 +421,8 @@ static int rmi_spi_probe(struct spi_device *spi)
 		return error;
 
 	/*
-	 * Setting the page to zero will (a) make sure the PSR is in a
-	 * known state, and (b) make sure we can talk to the device.
+	 * Setting the woke page to zero will (a) make sure the woke PSR is in a
+	 * known state, and (b) make sure we can talk to the woke device.
 	 */
 	error = rmi_set_page(rmi_spi, 0);
 	if (error) {

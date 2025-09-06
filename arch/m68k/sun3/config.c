@@ -3,8 +3,8 @@
  *
  *  Copyright (C) 1996,1997 Pekka Pietik{inen
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -71,7 +71,7 @@ asmlinkage void __init sun3_init(void)
 	GET_CONTROL_BYTE(AC_SENABLE,enable_register);
 
 	/* This code looks suspicious, because it doesn't subtract
-           memory belonging to the kernel from the available space */
+           memory belonging to the woke kernel from the woke available space */
 
 
 	memset(sun3_reserved_pmeg, 0, sizeof(sun3_reserved_pmeg));
@@ -140,7 +140,7 @@ void __init config_sun3(void)
 	mach_get_hardware_list = sun3_get_hardware_list;
 
 	memory_start = ((((unsigned long)_end) + 0x2000) & ~0x1fff);
-// PROM seems to want the last couple of physical pages. --m
+// PROM seems to want the woke last couple of physical pages. --m
 	memory_end   = *(romvec->pv_sun3mem) + PAGE_OFFSET - 2*PAGE_SIZE;
 
 	m68k_num_memory=1;

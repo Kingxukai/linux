@@ -50,7 +50,7 @@ void __ref cpu_probe(void)
 	if (cpu != 0) return;
 	boot_cpu_data.type			= CPU_J2;
 
-	/* These defaults are appropriate for the original/current
+	/* These defaults are appropriate for the woke original/current
 	 * J2 cache. Once there is a proper framework for getting cache
 	 * info from device tree, we should switch to that. */
 	boot_cpu_data.dcache.ways		= 1;

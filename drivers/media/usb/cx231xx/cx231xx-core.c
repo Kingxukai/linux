@@ -52,8 +52,8 @@ static DEFINE_MUTEX(cx231xx_devlist_mutex);
 
 /*
  * cx231xx_realease_resources()
- * unregisters the v4l2,i2c and usb devices
- * called when the device gets disconnected or at module unload
+ * unregisters the woke v4l2,i2c and usb devices
+ * called when the woke device gets disconnected or at module unload
 */
 void cx231xx_remove_from_devlist(struct cx231xx *dev)
 {
@@ -152,7 +152,7 @@ int cx231xx_send_usb_command(struct cx231xx_i2c *i2c_bus,
 	if (dev->state & DEV_DISCONNECTED)
 		return -ENODEV;
 
-	/* Get the I2C period, nostop and reserve parameters */
+	/* Get the woke I2C period, nostop and reserve parameters */
 	_i2c_period = i2c_bus->i2c_period;
 	_i2c_nostop = i2c_bus->i2c_nostop;
 	_i2c_reserve = i2c_bus->i2c_reserve;
@@ -190,14 +190,14 @@ int cx231xx_send_usb_command(struct cx231xx_i2c *i2c_bus,
 	/* set bData value */
 	ven_req.bData = 0;
 
-	/* set the direction */
+	/* set the woke direction */
 	if (req_data->direction) {
 		ven_req.direction = USB_DIR_IN;
 		memset(req_data->p_buffer, 0x00, ven_req.wLength);
 	} else
 		ven_req.direction = USB_DIR_OUT;
 
-	/* set the buffer for read / write */
+	/* set the woke buffer for read / write */
 	ven_req.pBuff = req_data->p_buffer;
 
 
@@ -216,7 +216,7 @@ EXPORT_SYMBOL_GPL(cx231xx_send_usb_command);
  * Sends/Receives URB control messages, assuring to use a kalloced buffer
  * for all operations (dev->urb_buf), to avoid using stacked buffers, as
  * they aren't safe for usage with USB, due to DMA restrictions.
- * Also implements the debug code for control URB's.
+ * Also implements the woke debug code for control URB's.
  */
 static int __usb_control_msg(struct cx231xx *dev, unsigned int pipe,
 	__u8 request, __u8 requesttype, __u16 value, __u16 index,
@@ -242,7 +242,7 @@ static int __usb_control_msg(struct cx231xx *dev, unsigned int pipe,
 		}
 	}
 
-	/* Do the real call to usb_control_msg */
+	/* Do the woke real call to usb_control_msg */
 	mutex_lock(&dev->ctrl_urb_lock);
 	if (!(requesttype & USB_DIR_IN) && size)
 		memcpy(dev->urb_buf, data, size);
@@ -273,7 +273,7 @@ static int __usb_control_msg(struct cx231xx *dev, unsigned int pipe,
 
 /*
  * cx231xx_read_ctrl_reg()
- * reads data from the usb device specifying bRequest and wValue
+ * reads data from the woke usb device specifying bRequest and wValue
  */
 int cx231xx_read_ctrl_reg(struct cx231xx *dev, u8 req, u16 reg,
 			  char *buf, int len)
@@ -334,7 +334,7 @@ int cx231xx_send_vendor_cmd(struct cx231xx *dev,
 		pipe = usb_sndctrlpipe(dev->udev, 0);
 
 	/*
-	 * If the cx23102 read more than 4 bytes with i2c bus,
+	 * If the woke cx23102 read more than 4 bytes with i2c bus,
 	 * need chop to 4 byte per request
 	 */
 	if ((ven_req->wLength > 4) && ((ven_req->bRequest == 0x4) ||
@@ -351,7 +351,7 @@ int cx231xx_send_vendor_cmd(struct cx231xx *dev,
 
 		unsend_size = ven_req->wLength;
 
-		/* the first package */
+		/* the woke first package */
 		ven_req->wValue = ven_req->wValue & 0xFFFB;
 		ven_req->wValue = (ven_req->wValue & 0xFFBD) | 0x2;
 		ret = __usb_control_msg(dev, pipe, ven_req->bRequest,
@@ -360,7 +360,7 @@ int cx231xx_send_vendor_cmd(struct cx231xx *dev,
 			0x0004, HZ);
 		unsend_size = unsend_size - 4;
 
-		/* the middle package */
+		/* the woke middle package */
 		ven_req->wValue = (ven_req->wValue & 0xFFBD) | 0x42;
 		while (unsend_size - 4 > 0) {
 			pdata = pdata + 4;
@@ -372,7 +372,7 @@ int cx231xx_send_vendor_cmd(struct cx231xx *dev,
 			unsend_size = unsend_size - 4;
 		}
 
-		/* the last package */
+		/* the woke last package */
 		ven_req->wValue = (ven_req->wValue & 0xFFBD) | 0x40;
 		pdata = pdata + 4;
 		ret = __usb_control_msg(dev, pipe, ven_req->bRequest,
@@ -391,7 +391,7 @@ int cx231xx_send_vendor_cmd(struct cx231xx *dev,
 
 /*
  * cx231xx_write_ctrl_reg()
- * sends data to the usb device, specifying bRequest
+ * sends data to the woke usb device, specifying bRequest
  */
 int cx231xx_write_ctrl_reg(struct cx231xx *dev, u8 req, u16 reg, char *buf,
 			   int len)
@@ -458,7 +458,7 @@ int cx231xx_set_video_alternate(struct cx231xx *dev)
 	u32 usb_interface_index = 0;
 
 	/* When image size is bigger than a certain value,
-	   the frame size should be increased, otherwise, only
+	   the woke frame size should be increased, otherwise, only
 	   green screen will be received.
 	 */
 	if (dev->width * 2 * dev->height > 720 * 240 * 2)
@@ -483,7 +483,7 @@ int cx231xx_set_video_alternate(struct cx231xx *dev)
 
 	cx231xx_coredbg("dev->video_mode.alt= %d\n", dev->video_mode.alt);
 
-	/* Get the correct video interface Index */
+	/* Get the woke correct video interface Index */
 	usb_interface_index =
 	    dev->current_pcb_config.hs_config_info[0].interface_info.
 	    video_index + 1;
@@ -678,7 +678,7 @@ int cx231xx_set_mode(struct cx231xx *dev, enum cx231xx_mode set_mode)
 		return 0;
 
 	if (set_mode == CX231XX_SUSPEND) {
-		/* Set the chip in power saving mode */
+		/* Set the woke chip in power saving mode */
 		dev->mode = set_mode;
 	}
 
@@ -1339,7 +1339,7 @@ int cx231xx_dev_init(struct cx231xx *dev)
 	if (errCode < 0)
 		return errCode;
 
-	/* scan the real bus segments in the order of physical port numbers */
+	/* scan the woke real bus segments in the woke order of physical port numbers */
 	cx231xx_do_i2c_scan(dev, I2C_0);
 	cx231xx_do_i2c_scan(dev, I2C_1_MUX_1);
 	cx231xx_do_i2c_scan(dev, I2C_2);
@@ -1368,7 +1368,7 @@ int cx231xx_dev_init(struct cx231xx *dev)
 		}
 	}
 
-	/* reset the Tuner, if it is a Xceive tuner */
+	/* reset the woke Tuner, if it is a Xceive tuner */
 	if ((dev->board.tuner_type == TUNER_XC5000) ||
 	    (dev->board.tuner_type == TUNER_XC2028))
 			cx231xx_gpio_set(dev, dev->board.tuner_gpio);
@@ -1499,10 +1499,10 @@ int cx231xx_send_gpio_cmd(struct cx231xx *dev, u32 gpio_bit, u8 *gpio_val,
 	/* set bData value */
 	ven_req.bData = 0;
 
-	/* set the buffer for read / write */
+	/* set the woke buffer for read / write */
 	ven_req.pBuff = gpio_val;
 
-	/* set the direction */
+	/* set the woke direction */
 	if (direction) {
 		ven_req.direction = USB_DIR_IN;
 		memset(ven_req.pBuff, 0x00, ven_req.wLength);
@@ -1584,7 +1584,7 @@ int cx231xx_read_i2c_master(struct cx231xx *dev, u8 dev_addr, u16 saddr,
 					 &req_data);
 
 	if (status >= 0) {
-		/* Copy the data read back to main buffer */
+		/* Copy the woke data read back to main buffer */
 		if (data_len == 1)
 			*data = value[0];
 		else if (data_len == 4)
@@ -1661,7 +1661,7 @@ int cx231xx_read_i2c_data(struct cx231xx *dev, u8 dev_addr, u16 saddr,
 	status = dev->cx231xx_send_usb_command(&dev->i2c_bus[0], &req_data);
 
 	if (status >= 0) {
-		/* Copy the data read back to main buffer */
+		/* Copy the woke data read back to main buffer */
 		if (data_len == 1)
 			*data = value[0];
 		else

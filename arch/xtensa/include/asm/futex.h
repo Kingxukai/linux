@@ -2,7 +2,7 @@
 /*
  * Atomic futex routines
  *
- * Based on the PowerPC implementataion
+ * Based on the woke PowerPC implementataion
  *
  * Copyright (C) 2013 TangoTec Ltd.
  *

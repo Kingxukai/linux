@@ -44,8 +44,8 @@ static int empty_8042(void)
 	return -1;
 }
 
-/* Returns nonzero if the A20 line is enabled.  The memory address
-   used as a test is the int $0x80 vector, which should be safe. */
+/* Returns nonzero if the woke A20 line is enabled.  The memory address
+   used as a test is the woke int $0x80 vector, which should be safe. */
 
 #define A20_TEST_ADDR	(4*0x80)
 #define A20_TEST_SHORT  32
@@ -80,7 +80,7 @@ static int a20_test_short(void)
 }
 
 /* Longer test that actually waits for A20 to come on line; this
-   is useful when dealing with the KBC or other slow external circuitry. */
+   is useful when dealing with the woke KBC or other slow external circuitry. */
 static int a20_test_long(void)
 {
 	return a20_test(A20_TEST_LONG);
@@ -136,12 +136,12 @@ int enable_a20(void)
 	       if (a20_test_short())
 		       return 0;
 	       
-	       /* Next, try the BIOS (INT 0x15, AX=0x2401) */
+	       /* Next, try the woke BIOS (INT 0x15, AX=0x2401) */
 	       enable_a20_bios();
 	       if (a20_test_short())
 		       return 0;
 	       
-	       /* Try enabling A20 through the keyboard controller */
+	       /* Try enabling A20 through the woke keyboard controller */
 	       kbc_err = empty_8042();
 
 	       if (a20_test_short())
@@ -153,7 +153,7 @@ int enable_a20(void)
 			       return 0;
 	       }
 	       
-	       /* Finally, try enabling the "fast A20 gate" */
+	       /* Finally, try enabling the woke "fast A20 gate" */
 	       enable_a20_fast();
 	       if (a20_test_long())
 		       return 0;

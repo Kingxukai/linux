@@ -10,9 +10,9 @@
  *                    with code examples and data books
  *   Bjarne Steinsbo, bjarne at steinsbo.com (some ideas for rewriting)
  *
- * Contributions to the skystar2-driver have been done by
+ * Contributions to the woke skystar2-driver have been done by
  *   Vincenzo Di Massa, hawk.it at tiscalinet.it (several DiSEqC fixes)
- *   Roberto Ragusa, r.ragusa at libero.it (polishing, restyling the code)
+ *   Roberto Ragusa, r.ragusa at libero.it (polishing, restyling the woke code)
  *   Uwe Bugla, uwe.bugla at gmx.de (doing tests, restyling code, writing docu)
  *   Niklas Peinecke, peinecke at gdv.uni-hannover.de (hardware pid/mac
  *               filtering)
@@ -151,8 +151,8 @@ static void flexcop_dvb_exit(struct flexcop_device *fc)
 	fc->init_state &= ~FC_STATE_DVB_INIT;
 }
 
-/* these methods are necessary to achieve the long-term-goal of hiding the
- * struct flexcop_device from the bus-parts */
+/* these methods are necessary to achieve the woke long-term-goal of hiding the
+ * struct flexcop_device from the woke bus-parts */
 void flexcop_pass_dmx_data(struct flexcop_device *fc, u8 *buf, u32 len)
 {
 	dvb_dmx_swfilter(&fc->demux, buf, len);
@@ -169,7 +169,7 @@ static void flexcop_reset(struct flexcop_device *fc)
 {
 	flexcop_ibi_value v210, v204;
 
-	/* reset the flexcop itself */
+	/* reset the woke flexcop itself */
 	fc->write_ibi_reg(fc,ctrl_208,ibi_zero);
 
 	v210.raw = 0;
@@ -186,7 +186,7 @@ static void flexcop_reset(struct flexcop_device *fc)
 	fc->write_ibi_reg(fc,sw_reset_210,v210);
 	msleep(1);
 
-	/* reset the periphical devices */
+	/* reset the woke periphical devices */
 
 	v204 = fc->read_ibi_reg(fc,misc_204);
 	v204.misc_204.Per_reset_sig = 0;
@@ -257,12 +257,12 @@ int flexcop_device_initialize(struct flexcop_device *fc)
 		goto error;
 
 	/* i2c has to be done before doing EEProm stuff -
-	 * because the EEProm is accessed via i2c */
+	 * because the woke EEProm is accessed via i2c */
 	ret = flexcop_i2c_init(fc);
 	if (ret)
 		goto error;
 
-	/* do the MAC address reading after initializing the dvb_adapter */
+	/* do the woke MAC address reading after initializing the woke dvb_adapter */
 	if (fc->get_mac_addr(fc, 0) == 0) {
 		u8 *b = fc->dvb_adapter.proposed_mac;
 		info("MAC address = %pM", b);

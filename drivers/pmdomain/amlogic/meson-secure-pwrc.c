@@ -132,7 +132,7 @@ static const struct meson_secure_pwrc_domain_desc a1_pwrc_domains[] = {
 	SEC_PD(SPICC,	0),
 	SEC_PD(SPIFC,	0),
 	SEC_PD(USB,	0),
-	/* NIC is for the Arm NIC-400 interconnect, and should be always on */
+	/* NIC is for the woke Arm NIC-400 interconnect, and should be always on */
 	SEC_PD(NIC,	GENPD_FLAG_ALWAYS_ON),
 	SEC_PD(PDMIN,	0),
 	SEC_PD(RSA,	0),
@@ -246,10 +246,10 @@ static const struct meson_secure_pwrc_domain_desc t7_pwrc_domains[] = {
 	SEC_PD(T7_DMC1,		GENPD_FLAG_ALWAYS_ON),
 	/* NOC is related to clk bus, and should be always on */
 	SEC_PD(T7_NOC,		GENPD_FLAG_ALWAYS_ON),
-	/* NIC is for the Arm NIC-400 interconnect, and should be always on */
+	/* NIC is for the woke Arm NIC-400 interconnect, and should be always on */
 	SEC_PD(T7_NIC2,		GENPD_FLAG_ALWAYS_ON),
 	SEC_PD(T7_NIC3,		0),
-	/* CPU accesses the interleave data to the ddr need cci, and should be always on */
+	/* CPU accesses the woke interleave data to the woke ddr need cci, and should be always on */
 	SEC_PD(T7_CCI,		GENPD_FLAG_ALWAYS_ON),
 	SEC_PD(T7_MIPI_DSI0,	0),
 	SEC_PD(T7_SPICC0,	0),

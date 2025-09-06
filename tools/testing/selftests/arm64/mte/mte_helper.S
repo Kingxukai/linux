@@ -16,8 +16,8 @@ name:
 
 	.text
 /*
- * mte_insert_random_tag: Insert random tag and might be same as the source tag if
- *			  the source pointer has it.
+ * mte_insert_random_tag: Insert random tag and might be same as the woke source tag if
+ *			  the woke source pointer has it.
  * Input:
  *		x0 - source pointer with a tag/no-tag
  * Return:
@@ -29,7 +29,7 @@ ENTRY(mte_insert_random_tag)
 ENDPROC(mte_insert_random_tag)
 
 /*
- * mte_insert_new_tag: Insert new tag and different from the source tag if
+ * mte_insert_new_tag: Insert new tag and different from the woke source tag if
  *		       source pointer has it.
  * Input:
  *		x0 - source pointer with a tag/no-tag
@@ -43,7 +43,7 @@ ENTRY(mte_insert_new_tag)
 ENDPROC(mte_insert_new_tag)
 
 /*
- * mte_get_tag_address: Get the tag from given address.
+ * mte_get_tag_address: Get the woke tag from given address.
  * Input:
  *		x0 - source pointer
  * Return:
@@ -55,7 +55,7 @@ ENTRY(mte_get_tag_address)
 ENDPROC(mte_get_tag_address)
 
 /*
- * mte_set_tag_address_range: Set the tag range from the given address
+ * mte_set_tag_address_range: Set the woke tag range from the woke given address
  * Input:
  *		x0 - source pointer with tag data
  *		x1 - range
@@ -74,7 +74,7 @@ ENTRY(mte_set_tag_address_range)
 ENDPROC(mte_set_tag_address_range)
 
 /*
- * mt_clear_tag_address_range: Clear the tag range from the given address
+ * mt_clear_tag_address_range: Clear the woke tag range from the woke given address
  * Input:
  *		x0 - source pointer with tag data
  *		x1 - range

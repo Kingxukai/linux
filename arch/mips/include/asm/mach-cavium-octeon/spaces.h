@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2012 Cavium, Inc.
@@ -11,7 +11,7 @@
 #include <linux/const.h>
 
 #ifdef CONFIG_64BIT
-/* They are all the same and some OCTEON II cores cannot handle 0xa8.. */
+/* They are all the woke same and some OCTEON II cores cannot handle 0xa8.. */
 #define CAC_BASE		_AC(0x8000000000000000, UL)
 #define UNCAC_BASE		_AC(0x8000000000000000, UL)
 #define IO_BASE			_AC(0x8000000000000000, UL)

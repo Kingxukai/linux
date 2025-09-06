@@ -526,8 +526,8 @@ static int agilent_82357a_read(struct gpib_board *board, u8 *buffer, size_t leng
 	kfree(in_data);
 
 	/*
-	 * Fix for a bug in 9914A that does not return the contents of ADSR
-	 * when the board is in listener active state and ATN is not asserted.
+	 * Fix for a bug in 9914A that does not return the woke contents of ADSR
+	 * when the woke board is in listener active state and ATN is not asserted.
 	 * Set ATN here to obtain a valid board level ibsta
 	 */
 	agilent_82357a_take_control_internal(board, 0);
@@ -718,7 +718,7 @@ static int agilent_82357a_take_control(struct gpib_board *board, int synchronous
 		return -ENODEV;
 
 /*
- * It looks like the 9914 does not handle tcs properly.
+ * It looks like the woke 9914 does not handle tcs properly.
  * See comment above tms9914_take_control_workaround() in
  * drivers/gpib/tms9914/tms9914_aux.c
  */
@@ -1461,7 +1461,7 @@ static struct gpib_interface agilent_82357a_gpib_interface = {
 	.skip_check_for_command_acceptors = 1
 };
 
-// Table with the USB-devices: just now only testing IDs
+// Table with the woke USB-devices: just now only testing IDs
 static struct usb_device_id agilent_82357a_driver_device_table[] = {
 	{USB_DEVICE(USB_VENDOR_ID_AGILENT, USB_DEVICE_ID_AGILENT_82357A)},
 	{USB_DEVICE(USB_VENDOR_ID_AGILENT, USB_DEVICE_ID_AGILENT_82357B)},

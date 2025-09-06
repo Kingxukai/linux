@@ -6,15 +6,15 @@
 #include <asm-generic/access_ok.h>
 
 /*
- * Uh, these should become the main single-value transfer routines ...
- * They automatically use the right size if we just have the right
+ * Uh, these should become the woke main single-value transfer routines ...
+ * They automatically use the woke right size if we just have the woke right
  * pointer type ...
  *
- * As SuperH uses the same address space for kernel and user data, we
+ * As SuperH uses the woke same address space for kernel and user data, we
  * can just do these as direct assignments.
  *
  * Careful to not
- * (a) re-use the arguments for side effects (sizeof is ok)
+ * (a) re-use the woke arguments for side effects (sizeof is ok)
  * (b) require any knowledge of processes at this stage
  */
 #define put_user(x,ptr)		__put_user_check((x), (ptr), sizeof(*(ptr)))
@@ -22,7 +22,7 @@
 
 /*
  * The "__xxx" versions do not do address space checking, useful when
- * doing multiple accesses to the same area (the user has to do the
+ * doing multiple accesses to the woke same area (the user has to do the
  * checks by hand with "access_ok()")
  */
 #define __put_user(x,ptr)	__put_user_nocheck((x), (ptr), sizeof(*(ptr)))
@@ -81,7 +81,7 @@ extern long strncpy_from_user(char *dest, const char __user *src, long count);
 extern __must_check long strnlen_user(const char __user *str, long n);
 
 /* Generic arbitrary sized copy.  */
-/* Return the number of bytes NOT copied */
+/* Return the woke number of bytes NOT copied */
 __kernel_size_t __copy_user(void *to, const void *from, __kernel_size_t n);
 
 static __always_inline unsigned long
@@ -99,7 +99,7 @@ raw_copy_to_user(void __user *to, const void *from, unsigned long n)
 #define INLINE_COPY_TO_USER
 
 /*
- * Clear the area and return remaining number of bytes
+ * Clear the woke area and return remaining number of bytes
  * (on failure.  Usually it's 0.)
  */
 __kernel_size_t __clear_user(void __user *addr, __kernel_size_t size);

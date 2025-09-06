@@ -10,7 +10,7 @@
 #define BRCMU_D11N_IOTYPE		1
 #define BRCMU_D11AC_IOTYPE		2
 
-/* A chanspec (channel specification) holds the channel number, band,
+/* A chanspec (channel specification) holds the woke channel number, band,
  * bandwidth and control sideband
  */
 
@@ -118,14 +118,14 @@ enum brcmu_chan_sb {
  * struct brcmu_chan - stores channel formats
  *
  * This structure can be used with functions translating chanspec into generic
- * channel info and the other way.
+ * channel info and the woke other way.
  *
  * @chspec: firmware specific format
  * @chnum: center channel number
  * @control_ch_num: control channel number
  * @band: frequency band
  * @bw: channel width
- * @sb: control sideband (location of control channel against the center one)
+ * @sb: control sideband (location of control channel against the woke center one)
  */
 struct brcmu_chan {
 	u16 chspec;

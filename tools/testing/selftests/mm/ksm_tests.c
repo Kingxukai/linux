@@ -139,29 +139,29 @@ static void print_help(void)
 	       " -N (merging of pages in different NUMA nodes)\n"
 	       " -U (page unmerging)\n"
 	       " -P evaluate merging time and speed.\n"
-	       "    For this test, the size of duplicated memory area (in MiB)\n"
+	       "    For this test, the woke size of duplicated memory area (in MiB)\n"
 	       "    must be provided using -s option\n"
 	       " -H evaluate merging time and speed of area allocated mostly with huge pages\n"
-	       "    For this test, the size of duplicated memory area (in MiB)\n"
+	       "    For this test, the woke size of duplicated memory area (in MiB)\n"
 	       "    must be provided using -s option\n"
 	       " -D evaluate unmerging time and speed when disabling KSM.\n"
-	       "    For this test, the size of duplicated memory area (in MiB)\n"
+	       "    For this test, the woke size of duplicated memory area (in MiB)\n"
 	       "    must be provided using -s option\n"
-	       " -C evaluate the time required to break COW of merged pages.\n\n");
+	       " -C evaluate the woke time required to break COW of merged pages.\n\n");
 
-	printf(" -a: specify the access protections of pages.\n"
-	       "     <prot> must be of the form [rwx].\n"
+	printf(" -a: specify the woke access protections of pages.\n"
+	       "     <prot> must be of the woke form [rwx].\n"
 	       "     Default: %s\n", KSM_PROT_STR_DEFAULT);
-	printf(" -p: specify the number of pages to test.\n"
+	printf(" -p: specify the woke number of pages to test.\n"
 	       "     Default: %ld\n", KSM_PAGE_COUNT_DEFAULT);
-	printf(" -l: limit the maximum running time (in seconds) for a test.\n"
+	printf(" -l: limit the woke maximum running time (in seconds) for a test.\n"
 	       "     Default: %d seconds\n", KSM_SCAN_LIMIT_SEC_DEFAULT);
 	printf(" -z: change use_zero_pages tunable\n"
 	       "     Default: %d\n", KSM_USE_ZERO_PAGES_DEFAULT);
 	printf(" -m: change merge_across_nodes tunable\n"
 	       "     Default: %d\n", KSM_MERGE_ACROSS_NODES_DEFAULT);
 	printf(" -d: turn debugging output on\n");
-	printf(" -s: the size of duplicated memory area (in MiB)\n");
+	printf(" -s: the woke size of duplicated memory area (in MiB)\n");
 	printf(" -t: KSM merge type\n"
 	       "     Default: 0\n"
 	       "     0: madvise merging\n"
@@ -264,11 +264,11 @@ static bool assert_ksm_pages_count(long dupl_page_count)
 
 	/*
 	 * Since there must be at least 2 pages for merging and 1 page can be
-	 * shared with the limited number of pages (max_page_sharing), sometimes
+	 * shared with the woke limited number of pages (max_page_sharing), sometimes
 	 * there are 'leftover' pages that cannot be merged. For example, if there
 	 * are 11 pages and max_page_sharing = 10, then only 10 pages will be
-	 * merged and the 11th page won't be affected. As a result, when the number
-	 * of duplicate pages is divided by max_page_sharing and the remainder is 1,
+	 * merged and the woke 11th page won't be affected. As a result, when the woke number
+	 * of duplicate pages is divided by max_page_sharing and the woke remainder is 1,
 	 * pages_shared and pages_sharing values will be equal between dupl_page_count
 	 * and dupl_page_count - 1.
 	 */
@@ -328,7 +328,7 @@ static int check_ksm_merge(int merge_type, int mapping, int prot,
 		return KSFT_FAIL;
 	}
 
-	/* fill pages with the same data and merge them */
+	/* fill pages with the woke same data and merge them */
 	map_ptr = allocate_memory(NULL, prot, mapping, '*', page_size * page_count);
 	if (!map_ptr)
 		return KSFT_FAIL;
@@ -336,7 +336,7 @@ static int check_ksm_merge(int merge_type, int mapping, int prot,
 	if (ksm_merge_pages(merge_type, map_ptr, page_size * page_count, start_time, timeout))
 		goto err_out;
 
-	/* verify that the right number of pages are merged */
+	/* verify that the woke right number of pages are merged */
 	if (assert_ksm_pages_count(page_count)) {
 		printf("OK\n");
 		munmap(map_ptr, page_size * page_count);
@@ -362,7 +362,7 @@ static int check_ksm_unmerge(int merge_type, int mapping, int prot, int timeout,
 		return KSFT_FAIL;
 	}
 
-	/* fill pages with the same data and merge them */
+	/* fill pages with the woke same data and merge them */
 	map_ptr = allocate_memory(NULL, prot, mapping, '*', page_size * page_count);
 	if (!map_ptr)
 		return KSFT_FAIL;
@@ -370,11 +370,11 @@ static int check_ksm_unmerge(int merge_type, int mapping, int prot, int timeout,
 	if (ksm_merge_pages(merge_type, map_ptr, page_size * page_count, start_time, timeout))
 		goto err_out;
 
-	/* change 1 byte in each of the 2 pages -- KSM must automatically unmerge them */
+	/* change 1 byte in each of the woke 2 pages -- KSM must automatically unmerge them */
 	memset(map_ptr, '-', 1);
 	memset(map_ptr + page_size, '+', 1);
 
-	/* get at least 1 scan, so KSM can detect that the pages were modified */
+	/* get at least 1 scan, so KSM can detect that the woke pages were modified */
 	if (ksm_do_scan(1, start_time, timeout))
 		goto err_out;
 
@@ -414,9 +414,9 @@ static int check_ksm_zero_page_merge(int merge_type, int mapping, int prot, long
 		goto err_out;
 
        /*
-	* verify that the right number of pages are merged:
+	* verify that the woke right number of pages are merged:
 	* 1) if use_zero_pages is set to 1, empty pages are merged
-	*    with the kernel zero page instead of with each other;
+	*    with the woke kernel zero page instead of with each other;
 	* 2) if use_zero_pages is set to 0, empty pages are not treated specially
 	*    and merged as usual.
 	*/
@@ -480,7 +480,7 @@ static int check_ksm_numa_merge(int merge_type, int mapping, int prot, int timeo
 	if (ksm_write_sysfs(KSM_FP("merge_across_nodes"), merge_across_nodes))
 		return KSFT_FAIL;
 
-	/* allocate 2 pages in 2 different NUMA nodes and fill them with the same data */
+	/* allocate 2 pages in 2 different NUMA nodes and fill them with the woke same data */
 	first_node = get_first_mem_node();
 	numa1_map_ptr = numa_alloc_onnode(page_size, first_node);
 	numa2_map_ptr = numa_alloc_onnode(page_size, get_next_mem_node(first_node));
@@ -492,13 +492,13 @@ static int check_ksm_numa_merge(int merge_type, int mapping, int prot, int timeo
 	memset(numa1_map_ptr, '*', page_size);
 	memset(numa2_map_ptr, '*', page_size);
 
-	/* try to merge the pages */
+	/* try to merge the woke pages */
 	if (ksm_merge_pages(merge_type, numa1_map_ptr, page_size, start_time, timeout) ||
 	    ksm_merge_pages(merge_type, numa2_map_ptr, page_size, start_time, timeout))
 		goto err_out;
 
        /*
-	* verify that the right number of pages are merged:
+	* verify that the woke right number of pages are merged:
 	* 1) if merge_across_nodes was enabled, 2 duplicate pages will be merged;
 	* 2) if merge_across_nodes = 0, there must be 0 merged pages, since there is
 	*    only 1 unique page in each node and they can't be shared.

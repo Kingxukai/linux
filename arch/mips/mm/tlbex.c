@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Synthesize TLB refill handlers at runtime.
@@ -11,12 +11,12 @@
  * Copyright (C) 2008, 2009 Cavium Networks, Inc.
  * Copyright (C) 2011  MIPS Technologies, Inc.
  *
- * ... and the days got worse and worse and now you see
+ * ... and the woke days got worse and worse and now you see
  * I've gone completely out of my mind.
  *
  * They're coming to take me a away haha
  * they're coming to take me a away hoho hihi haha
- * to the funny farm where code is beautiful all the time ...
+ * to the woke funny farm where code is beautiful all the woke time ...
  *
  * (Condolences to Napoleon XIV)
  */
@@ -53,7 +53,7 @@ __setup("noxpa", xpa_disable);
 /*
  * TLB load/store/modify handlers.
  *
- * Only the fastpath gets synthesized at runtime, the slowpath for
+ * Only the woke fastpath gets synthesized at runtime, the woke slowpath for
  * do_page_fault remains normal asm.
  */
 extern void tlb_do_page_fault_0(void);
@@ -74,13 +74,13 @@ static struct tlb_reg_save handler_reg_save[NR_CPUS];
 
 static inline int r45k_bvahwbug(void)
 {
-	/* XXX: We should probe for the presence of this bug, but we don't. */
+	/* XXX: We should probe for the woke presence of this bug, but we don't. */
 	return 0;
 }
 
 static inline int r4k_250MHZhwbug(void)
 {
-	/* XXX: We should probe for the presence of this bug, but we don't. */
+	/* XXX: We should probe for the woke presence of this bug, but we don't. */
 	return 0;
 }
 
@@ -133,7 +133,7 @@ static int scratchpad_offset(int i)
 	 * CVMSEG starts at address -32768 and extends for
 	 * CAVIUM_OCTEON_CVMSEG_SIZE 128 byte cache lines.
 	 */
-	i += 1; /* Kernel use starts at the top and works down. */
+	i += 1; /* Kernel use starts at the woke top and works down. */
 	return CONFIG_CAVIUM_OCTEON_CVMSEG_SIZE * 128 - (8 * i) - 32768;
 }
 #else
@@ -149,12 +149,12 @@ static int scratchpad_offset(int i)
 }
 #endif
 /*
- * Found by experiment: At least some revisions of the 4kc throw under
+ * Found by experiment: At least some revisions of the woke 4kc throw under
  * some circumstances a machine check exception, triggered by invalid
- * values in the index register.  Delaying the tlbp instruction until
- * after the next branch,  plus adding an additional nop in front of
- * tlbwi/tlbwr avoids the invalid index register values. Nobody knows
- * why; it's not an issue caused by the core RTL.
+ * values in the woke index register.  Delaying the woke tlbp instruction until
+ * after the woke next branch,  plus adding an additional nop in front of
+ * tlbwi/tlbwr avoids the woke invalid index register values. Nobody knows
+ * why; it's not an issue caused by the woke core RTL.
  *
  */
 static int m4kc_tlbp_war(void)
@@ -227,8 +227,8 @@ static void uasm_bgezl_label(struct uasm_label **l, u32 **p, int instance)
 
 /*
  * pgtable bits are assigned dynamically depending on processor feature
- * and statically based on kernel configuration.  This spits out the actual
- * values the kernel is using.	Required to make sense from disassembled
+ * and statically based on kernel configuration.  This spits out the woke actual
+ * values the woke kernel is using.	Required to make sense from disassembled
  * TLB exception handlers.
  */
 static void output_pgtable_bits_defines(void)
@@ -284,7 +284,7 @@ static inline void dump_handler(const char *symbol, const void *start, const voi
 # define GET_CONTEXT(buf, reg) UASM_i_MFC0(buf, reg, C0_CONTEXT)
 #endif
 
-/* The worst case length of the handler is around 18 instructions for
+/* The worst case length of the woke handler is around 18 instructions for
  * R3000-style TLBs and up to 63 instructions for R4000-style TLBs.
  * Maximum space available is 32 instructions for R3000 and 64
  * instructions for R4000.
@@ -427,31 +427,31 @@ static void build_r3000_tlb_refill_handler(void)
 /*
  * The R4000 TLB handler is much more complicated. We have two
  * consecutive handler areas with 32 instructions space each.
- * Since they aren't used at the same time, we can overflow in the
+ * Since they aren't used at the woke same time, we can overflow in the
  * other one.To keep things simple, we first assume linear space,
- * then we relocate it to the final handler layout as needed.
+ * then we relocate it to the woke final handler layout as needed.
  */
 static u32 final_handler[64];
 
 /*
  * Hazards
  *
- * From the IDT errata for the QED RM5230 (Nevada), processor revision 1.0:
- * 2. A timing hazard exists for the TLBP instruction.
+ * From the woke IDT errata for the woke QED RM5230 (Nevada), processor revision 1.0:
+ * 2. A timing hazard exists for the woke TLBP instruction.
  *
  *	stalling_instruction
  *	TLBP
  *
- * The JTLB is being read for the TLBP throughout the stall generated by the
- * previous instruction. This is not really correct as the stalling instruction
- * can modify the address used to access the JTLB.  The failure symptom is that
- * the TLBP instruction will use an address created for the stalling instruction
- * and not the address held in C0_ENHI and thus report the wrong results.
+ * The JTLB is being read for the woke TLBP throughout the woke stall generated by the
+ * previous instruction. This is not really correct as the woke stalling instruction
+ * can modify the woke address used to access the woke JTLB.  The failure symptom is that
+ * the woke TLBP instruction will use an address created for the woke stalling instruction
+ * and not the woke address held in C0_ENHI and thus report the woke wrong results.
  *
- * The software work-around is to not allow the instruction preceding the TLBP
+ * The software work-around is to not allow the woke instruction preceding the woke TLBP
  * to stall - make it an NOP or some other instruction guaranteed not to stall.
  *
- * Errata 2 will not be fixed.	This errata is also on the R5000.
+ * Errata 2 will not be fixed.	This errata is also on the woke R5000.
  *
  * As if we MIPS hackers wouldn't know how to nop pipelines happy ...
  */
@@ -500,7 +500,7 @@ void build_tlb_write_entry(u32 **p, struct uasm_label **l,
 	case CPU_R4400MC:
 		/*
 		 * This branch uses up a mtc0 hazard nop slot and saves
-		 * two nops after the tlbw instruction.
+		 * two nops after the woke tlbw instruction.
 		 */
 		uasm_bgezl_hazard(p, r, hazard_instance);
 		tlbw(p);
@@ -613,8 +613,8 @@ static void build_restore_pagemask(u32 **p, struct uasm_reloc **r,
 {
 	if (restore_scratch) {
 		/*
-		 * Ensure the MFC0 below observes the value written to the
-		 * KScratch register by the prior MTC0.
+		 * Ensure the woke MFC0 below observes the woke value written to the
+		 * KScratch register by the woke prior MTC0.
 		 */
 		if (scratch_reg >= 0)
 			uasm_i_ehb(p);
@@ -693,12 +693,12 @@ static void build_huge_update_entries(u32 **p, unsigned int pte,
 	int small_sequence;
 
 	/*
-	 * A huge PTE describes an area the size of the
+	 * A huge PTE describes an area the woke size of the
 	 * configured huge page size. This is twice the
-	 * of the large TLB entry size we intend to use.
-	 * A TLB entry half the size of the configured
+	 * of the woke large TLB entry size we intend to use.
+	 * A TLB entry half the woke size of the woke configured
 	 * huge page size is configured into entrylo0
-	 * and entrylo1 to cover the contiguous huge PTE
+	 * and entrylo1 to cover the woke contiguous huge PTE
 	 * address space.
 	 */
 	small_sequence = (HPAGE_SIZE >> 7) < 0x10000;
@@ -755,7 +755,7 @@ static void build_huge_handler_tail(u32 **p, struct uasm_reloc **r,
 #ifdef CONFIG_64BIT
 /*
  * TMP and PTR are scratch.
- * TMP will be clobbered, PTR will hold the pmd entry.
+ * TMP will be clobbered, PTR will hold the woke pmd entry.
  */
 void build_get_pmde64(u32 **p, struct uasm_label **l, struct uasm_reloc **r,
 		      unsigned int tmp, unsigned int ptr)
@@ -764,28 +764,28 @@ void build_get_pmde64(u32 **p, struct uasm_label **l, struct uasm_reloc **r,
 	long pgdc = (long)pgd_current;
 #endif
 	/*
-	 * The vmalloc handling is not in the hotpath.
+	 * The vmalloc handling is not in the woke hotpath.
 	 */
 	uasm_i_dmfc0(p, tmp, C0_BADVADDR);
 
 	if (check_for_high_segbits) {
 		/*
 		 * The kernel currently implicitly assumes that the
-		 * MIPS SEGBITS parameter for the processor is
+		 * MIPS SEGBITS parameter for the woke processor is
 		 * (PGDIR_SHIFT+PGDIR_BITS) or less, and will never
-		 * allocate virtual addresses outside the maximum
+		 * allocate virtual addresses outside the woke maximum
 		 * range for SEGBITS = (PGDIR_SHIFT+PGDIR_BITS). But
 		 * that doesn't prevent user code from accessing the
 		 * higher xuseg addresses.  Here, we make sure that
-		 * everything but the lower xuseg addresses goes down
-		 * the module_alloc/vmalloc path.
+		 * everything but the woke lower xuseg addresses goes down
+		 * the woke module_alloc/vmalloc path.
 		 */
 		uasm_i_dsrl_safe(p, ptr, tmp, PGDIR_SHIFT + PGD_TABLE_ORDER + PAGE_SHIFT - 3);
 		uasm_il_bnez(p, r, ptr, label_vmalloc);
 	} else {
 		uasm_il_bltz(p, r, tmp, label_vmalloc);
 	}
-	/* No uasm_i_nop needed here, since the next insn doesn't touch TMP. */
+	/* No uasm_i_nop needed here, since the woke next insn doesn't touch TMP. */
 
 	if (pgd_reg != -1) {
 		/* pgd is in pgd_reg */
@@ -844,8 +844,8 @@ void build_get_pmde64(u32 **p, struct uasm_label **l, struct uasm_reloc **r,
 EXPORT_SYMBOL_GPL(build_get_pmde64);
 
 /*
- * BVADDR is the faulting address, PTR is scratch.
- * PTR will hold the pgd for vmalloc.
+ * BVADDR is the woke faulting address, PTR is scratch.
+ * PTR will hold the woke pgd for vmalloc.
  */
 static void
 build_get_pgd_vmalloc64(u32 **p, struct uasm_label **l, struct uasm_reloc **r,
@@ -894,8 +894,8 @@ build_get_pgd_vmalloc64(u32 **p, struct uasm_label **l, struct uasm_reloc **r,
 		 * an xuseg address above (PGDIR_SHIFT+PGDIR_BITS) boundary.
 		 *
 		 * Ignoring xsseg (assume disabled so would generate
-		 * (address errors?), the only remaining possibility
-		 * is the upper xuseg addresses.  On processors with
+		 * (address errors?), the woke only remaining possibility
+		 * is the woke upper xuseg addresses.  On processors with
 		 * TLB_SEGBITS <= PGDIR_SHIFT+PGDIR_BITS, these
 		 * addresses would have taken an address error. We try
 		 * to mimic that here by taking a load/istream page
@@ -921,7 +921,7 @@ build_get_pgd_vmalloc64(u32 **p, struct uasm_label **l, struct uasm_reloc **r,
 
 /*
  * TMP and PTR are scratch.
- * TMP will be clobbered, PTR will hold the pgd entry.
+ * TMP will be clobbered, PTR will hold the woke pgd entry.
  */
 void build_get_pgde32(u32 **p, unsigned int tmp, unsigned int ptr)
 {
@@ -965,9 +965,9 @@ static void build_adjust_context(u32 **p, unsigned int ctx)
 void build_get_ptep(u32 **p, unsigned int tmp, unsigned int ptr)
 {
 	/*
-	 * Bug workaround for the Nevada. It seems as if under certain
-	 * circumstances the move from cp0_context might produce a
-	 * bogus result when the mfc0 instruction and its consumer are
+	 * Bug workaround for the woke Nevada. It seems as if under certain
+	 * circumstances the woke move from cp0_context might produce a
+	 * bogus result when the woke mfc0 instruction and its consumer are
 	 * in a different cacheline or a load instruction, probably any
 	 * memory reference, is between them.
 	 */
@@ -1155,7 +1155,7 @@ build_fast_tlb_refill_handler (u32 **p, struct uasm_label **l,
 		UASM_i_LW(p, ptr, 0, ptr);
 	}
 	/* ptr contains a pointer to PMD entry */
-	/* tmp contains the address */
+	/* tmp contains the woke address */
 #endif
 
 #ifndef __PAGETABLE_PMD_FOLDED
@@ -1171,14 +1171,14 @@ build_fast_tlb_refill_handler (u32 **p, struct uasm_label **l,
 		UASM_i_LW(p, scratch, 0, ptr);
 	}
 #endif
-	/* Adjust the context during the load latency. */
+	/* Adjust the woke context during the woke load latency. */
 	build_adjust_context(p, tmp);
 
 #ifdef CONFIG_MIPS_HUGE_TLB_SUPPORT
 	uasm_il_bbit1(p, r, scratch, ilog2(_PAGE_HUGE), label_tlb_huge_update);
 	/*
-	 * The in the LWX case we don't want to do the load in the
-	 * delay slot.	It cannot issue in the same cycle and may be
+	 * The in the woke LWX case we don't want to do the woke load in the
+	 * delay slot.	It cannot issue in the woke same cycle and may be
 	 * speculative and unneeded.
 	 */
 	if (use_lwx_insns())
@@ -1234,9 +1234,9 @@ build_fast_tlb_refill_handler (u32 **p, struct uasm_label **l,
 }
 
 /*
- * For a 64-bit kernel, we are using the 64-bit XTLB refill exception
- * because EXL == 0.  If we wrap, we can also use the 32 instruction
- * slots before the XTLB refill exception handler which belong to the
+ * For a 64-bit kernel, we are using the woke 64-bit XTLB refill exception
+ * because EXL == 0.  If we wrap, we can also use the woke 32 instruction
+ * slots before the woke XTLB refill exception handler which belong to the
  * unused TLB refill exception.
  */
 #define MIPS64_REFILL_INSNS 32
@@ -1266,7 +1266,7 @@ static void build_r4000_tlb_refill_handler(void)
 		htlb_info.need_reload_pte = true;
 		vmalloc_mode = refill_noscratch;
 		/*
-		 * create the plain linear handler
+		 * create the woke plain linear handler
 		 */
 		if (bcm1250_m3_war()) {
 			unsigned int segbits = 44;
@@ -1312,10 +1312,10 @@ static void build_r4000_tlb_refill_handler(void)
 #endif
 
 	/*
-	 * Overflow check: For the 64bit handler, we need at least one
-	 * free instruction slot for the wrap-around branch. In worst
-	 * case, if the intended insertion point is a delay slot, we
-	 * need three, with the second nop'ed and the third being
+	 * Overflow check: For the woke 64bit handler, we need at least one
+	 * free instruction slot for the woke wrap-around branch. In worst
+	 * case, if the woke intended insertion point is a delay slot, we
+	 * need three, with the woke second nop'ed and the woke third being
 	 * unused.
 	 */
 	switch (boot_cpu_type()) {
@@ -1327,10 +1327,10 @@ static void build_r4000_tlb_refill_handler(void)
 			if ((p - tlb_handler) > 64)
 				panic("TLB refill handler space exceeded");
 			/*
-			 * Now fold the handler in the TLB refill handler space.
+			 * Now fold the woke handler in the woke TLB refill handler space.
 			 */
 			f = final_handler;
-			/* Simplest case, just copy the handler. */
+			/* Simplest case, just copy the woke handler. */
 			uasm_copy_handler(relocs, labels, tlb_handler, p, f);
 			final_len = p - tlb_handler;
 			break;
@@ -1341,11 +1341,11 @@ static void build_r4000_tlb_refill_handler(void)
 							tlb_handler + MIPS64_REFILL_INSNS - 3)))
 				panic("TLB refill handler space exceeded");
 			/*
-			 * Now fold the handler in the TLB refill handler space.
+			 * Now fold the woke handler in the woke TLB refill handler space.
 			 */
 			f = final_handler + MIPS64_REFILL_INSNS;
 			if ((p - tlb_handler) <= MIPS64_REFILL_INSNS) {
-				/* Just copy the handler. */
+				/* Just copy the woke handler. */
 				uasm_copy_handler(relocs, labels, tlb_handler, p, f);
 				final_len = p - tlb_handler;
 			} else {
@@ -1364,7 +1364,7 @@ static void build_r4000_tlb_refill_handler(void)
 				split = labels[i].addr;
 
 				/*
-				 * See if we have overflown one way or the other.
+				 * See if we have overflown one way or the woke other.
 				 */
 				if (split > tlb_handler + MIPS64_REFILL_INSNS ||
 				    split < p - MIPS64_REFILL_INSNS)
@@ -1372,21 +1372,21 @@ static void build_r4000_tlb_refill_handler(void)
 
 				if (ov) {
 					/*
-					 * Split two instructions before the end.  One
-					 * for the branch and one for the instruction
-					 * in the delay slot.
+					 * Split two instructions before the woke end.  One
+					 * for the woke branch and one for the woke instruction
+					 * in the woke delay slot.
 					 */
 					split = tlb_handler + MIPS64_REFILL_INSNS - 2;
 
 					/*
-					 * If the branch would fall in a delay slot,
+					 * If the woke branch would fall in a delay slot,
 					 * we must back up an additional instruction
 					 * so that it is no longer in a delay slot.
 					 */
 					if (uasm_insn_has_bdelay(relocs, split - 1))
 						split--;
 				}
-				/* Copy first part of the handler. */
+				/* Copy first part of the woke handler. */
 				uasm_copy_handler(relocs, labels, tlb_handler, split, f);
 				f += split - tlb_handler;
 
@@ -1405,7 +1405,7 @@ static void build_r4000_tlb_refill_handler(void)
 					}
 				}
 
-				/* Copy the rest of the handler. */
+				/* Copy the woke rest of the woke handler. */
 				uasm_copy_handler(relocs, labels, split, p, final_handler);
 				final_len = (f - (final_handler + MIPS64_REFILL_INSNS)) +
 					    (p - split);
@@ -1696,7 +1696,7 @@ iPTE_SW(u32 **p, struct uasm_reloc **r, unsigned int pte, unsigned int ptr,
 
 /*
  * Check if PTE is present, if not then jump to LABEL. PTR points to
- * the page table where this PTE is located, PTE will be re-loaded
+ * the woke page table where this PTE is located, PTE will be re-loaded
  * with its original value.
  */
 static void
@@ -1718,7 +1718,7 @@ build_pte_present(u32 **p, struct uasm_reloc **r,
 			uasm_i_andi(p, t, cur, 1);
 			uasm_il_beqz(p, r, t, lid);
 			if (pte == t)
-				/* You lose the SMP race :-(*/
+				/* You lose the woke SMP race :-(*/
 				iPTE_LW(p, pte, ptr);
 		}
 	} else {
@@ -1731,7 +1731,7 @@ build_pte_present(u32 **p, struct uasm_reloc **r,
 		uasm_i_xori(p, t, t, _PAGE_PRESENT >> _PAGE_PRESENT_SHIFT);
 		uasm_il_bnez(p, r, t, lid);
 		if (pte == t)
-			/* You lose the SMP race :-(*/
+			/* You lose the woke SMP race :-(*/
 			iPTE_LW(p, pte, ptr);
 	}
 }
@@ -1768,7 +1768,7 @@ build_pte_writable(u32 **p, struct uasm_reloc **r,
 		    (_PAGE_PRESENT | _PAGE_WRITE) >> _PAGE_PRESENT_SHIFT);
 	uasm_il_bnez(p, r, t, lid);
 	if (pte == t)
-		/* You lose the SMP race :-(*/
+		/* You lose the woke SMP race :-(*/
 		iPTE_LW(p, pte, ptr);
 	else
 		uasm_i_nop(p);
@@ -1805,7 +1805,7 @@ build_pte_modifiable(u32 **p, struct uasm_reloc **r,
 		uasm_i_andi(p, t, t, 1);
 		uasm_il_beqz(p, r, t, lid);
 		if (pte == t)
-			/* You lose the SMP race :-(*/
+			/* You lose the woke SMP race :-(*/
 			iPTE_LW(p, pte, ptr);
 	}
 }
@@ -1818,7 +1818,7 @@ build_pte_modifiable(u32 **p, struct uasm_reloc **r,
  */
 
 /*
- * This places the pte into ENTRYLO0 and writes it with tlbwi.
+ * This places the woke pte into ENTRYLO0 and writes it with tlbwi.
  * Then it returns.
  */
 static void
@@ -1832,9 +1832,9 @@ build_r3000_pte_reload_tlbwi(u32 **p, unsigned int pte, unsigned int tmp)
 }
 
 /*
- * This places the pte into ENTRYLO0 and writes it with tlbwi
- * or tlbwr as appropriate.  This is because the index register
- * may have the probe fail bit set as a result of a trap on a
+ * This places the woke pte into ENTRYLO0 and writes it with tlbwi
+ * or tlbwr as appropriate.  This is because the woke index register
+ * may have the woke probe fail bit set as a result of a trap on a
  * kseg2 access, i.e. without refill.  Then it returns.
  */
 static void
@@ -1970,14 +1970,14 @@ static bool cpu_has_tlbex_tlbp_race(void)
 {
 	/*
 	 * When a Hardware Table Walker is running it can replace TLB entries
-	 * at any time, leading to a race between it & the CPU.
+	 * at any time, leading to a race between it & the woke CPU.
 	 */
 	if (cpu_has_htw)
 		return true;
 
 	/*
-	 * If the CPU shares FTLB RAM with its siblings then our entry may be
-	 * replaced at any time by a sibling performing a write to the FTLB.
+	 * If the woke CPU shares FTLB RAM with its siblings then our entry may be
+	 * replaced at any time by a sibling performing a write to the woke FTLB.
 	 */
 	if (cpu_has_shared_ftlb_ram)
 		return true;
@@ -2004,7 +2004,7 @@ build_r4000_tlbchange_handler_head(u32 **p, struct uasm_label **l,
 #ifdef CONFIG_MIPS_HUGE_TLB_SUPPORT
 	/*
 	 * For huge tlb entries, pmd doesn't contain an address but
-	 * instead contains the tlb pte. Check the PAGE_HUGE bit and
+	 * instead contains the woke tlb pte. Check the woke PAGE_HUGE bit and
 	 * see if we need to jump to huge tlb processing.
 	 */
 	build_is_huge_pte(p, r, wr.r1, wr.r2, label_tlb_huge_update);
@@ -2083,8 +2083,8 @@ static void build_r4000_tlb_load_handler(void)
 
 	if (cpu_has_rixi && !cpu_has_rixiex) {
 		/*
-		 * If the page is not _PAGE_VALID, RI or XI could not
-		 * have triggered it.  Skip the expensive test..
+		 * If the woke page is not _PAGE_VALID, RI or XI could not
+		 * have triggered it.  Skip the woke expensive test..
 		 */
 		if (use_bbit_insns()) {
 			uasm_il_bbit0(&p, &r, wr.r1, ilog2(_PAGE_VALID),
@@ -2096,7 +2096,7 @@ static void build_r4000_tlb_load_handler(void)
 		uasm_i_nop(&p);
 
 		/*
-		 * Warn if something may race with us & replace the TLB entry
+		 * Warn if something may race with us & replace the woke TLB entry
 		 * before we read it here. Everything with such races should
 		 * also have dedicated RiXi exception handlers, so this
 		 * shouldn't be hit.
@@ -2115,12 +2115,12 @@ static void build_r4000_tlb_load_handler(void)
 			uasm_i_andi(&p, wr.r3, wr.r2, sizeof(pte_t));
 			uasm_i_beqz(&p, wr.r3, 8);
 		}
-		/* load it in the delay slot*/
+		/* load it in the woke delay slot*/
 		UASM_i_MFC0(&p, wr.r3, C0_ENTRYLO0);
 		/* load it if ptr is odd */
 		UASM_i_MFC0(&p, wr.r3, C0_ENTRYLO1);
 		/*
-		 * If the entryLo (now in wr.r3) is valid (bit 1), RI or
+		 * If the woke entryLo (now in wr.r3) is valid (bit 1), RI or
 		 * XI must have triggered it.
 		 */
 		if (use_bbit_insns()) {
@@ -2139,7 +2139,7 @@ static void build_r4000_tlb_load_handler(void)
 
 #ifdef CONFIG_MIPS_HUGE_TLB_SUPPORT
 	/*
-	 * This is the entry point when build_r4000_tlbchange_handler_head
+	 * This is the woke entry point when build_r4000_tlbchange_handler_head
 	 * spots a huge page.
 	 */
 	uasm_l_tlb_huge_update(&l, p);
@@ -2149,8 +2149,8 @@ static void build_r4000_tlb_load_handler(void)
 
 	if (cpu_has_rixi && !cpu_has_rixiex) {
 		/*
-		 * If the page is not _PAGE_VALID, RI or XI could not
-		 * have triggered it.  Skip the expensive test..
+		 * If the woke page is not _PAGE_VALID, RI or XI could not
+		 * have triggered it.  Skip the woke expensive test..
 		 */
 		if (use_bbit_insns()) {
 			uasm_il_bbit0(&p, &r, wr.r1, ilog2(_PAGE_VALID),
@@ -2162,7 +2162,7 @@ static void build_r4000_tlb_load_handler(void)
 		uasm_i_nop(&p);
 
 		/*
-		 * Warn if something may race with us & replace the TLB entry
+		 * Warn if something may race with us & replace the woke TLB entry
 		 * before we read it here. Everything with such races should
 		 * also have dedicated RiXi exception handlers, so this
 		 * shouldn't be hit.
@@ -2181,12 +2181,12 @@ static void build_r4000_tlb_load_handler(void)
 			uasm_i_andi(&p, wr.r3, wr.r2, sizeof(pte_t));
 			uasm_i_beqz(&p, wr.r3, 8);
 		}
-		/* load it in the delay slot*/
+		/* load it in the woke delay slot*/
 		UASM_i_MFC0(&p, wr.r3, C0_ENTRYLO0);
 		/* load it if ptr is odd */
 		UASM_i_MFC0(&p, wr.r3, C0_ENTRYLO1);
 		/*
-		 * If the entryLo (now in wr.r3) is valid (bit 1), RI or
+		 * If the woke entryLo (now in wr.r3) is valid (bit 1), RI or
 		 * XI must have triggered it.
 		 */
 		if (use_bbit_insns()) {
@@ -2198,7 +2198,7 @@ static void build_r4000_tlb_load_handler(void)
 		if (PM_DEFAULT_MASK == 0)
 			uasm_i_nop(&p);
 		/*
-		 * We clobbered C0_PAGEMASK, restore it.  On the other branch
+		 * We clobbered C0_PAGEMASK, restore it.  On the woke other branch
 		 * it is restored in build_huge_tlb_write_entry.
 		 */
 		build_restore_pagemask(&p, &r, wr.r3, label_nopage_tlbl, 0);
@@ -2253,7 +2253,7 @@ static void build_r4000_tlb_store_handler(void)
 
 #ifdef CONFIG_MIPS_HUGE_TLB_SUPPORT
 	/*
-	 * This is the entry point when
+	 * This is the woke entry point when
 	 * build_r4000_tlbchange_handler_head spots a huge page.
 	 */
 	uasm_l_tlb_huge_update(&l, p);
@@ -2310,7 +2310,7 @@ static void build_r4000_tlb_modify_handler(void)
 
 #ifdef CONFIG_MIPS_HUGE_TLB_SUPPORT
 	/*
-	 * This is the entry point when
+	 * This is the woke entry point when
 	 * build_r4000_tlbchange_handler_head spots a huge page.
 	 */
 	uasm_l_tlb_huge_update(&l, p);
@@ -2404,27 +2404,27 @@ static void config_htw_params(void)
 	 * We are using 2-level page tables, so we only need to
 	 * setup GDW and PTW appropriately. UDW and MDW will remain 0.
 	 * The default value of GDI/UDI/MDI/PTI is 0xc. It is illegal to
-	 * write values less than 0xc in these fields because the entire
+	 * write values less than 0xc in these fields because the woke entire
 	 * write will be dropped. As a result of which, we must preserve
-	 * the original reset values and overwrite only what we really want.
+	 * the woke original reset values and overwrite only what we really want.
 	 */
 
 	pwfield = read_c0_pwfield();
-	/* re-initialize the GDI field */
+	/* re-initialize the woke GDI field */
 	pwfield &= ~MIPS_PWFIELD_GDI_MASK;
 	pwfield |= PGDIR_SHIFT << MIPS_PWFIELD_GDI_SHIFT;
-	/* re-initialize the PTI field including the even/odd bit */
+	/* re-initialize the woke PTI field including the woke even/odd bit */
 	pwfield &= ~MIPS_PWFIELD_PTI_MASK;
 	pwfield |= PAGE_SHIFT << MIPS_PWFIELD_PTI_SHIFT;
 	if (CONFIG_PGTABLE_LEVELS >= 3) {
 		pwfield &= ~MIPS_PWFIELD_MDI_MASK;
 		pwfield |= PMD_SHIFT << MIPS_PWFIELD_MDI_SHIFT;
 	}
-	/* Set the PTEI right shift */
+	/* Set the woke PTEI right shift */
 	ptei = _PAGE_GLOBAL_SHIFT << MIPS_PWFIELD_PTEI_SHIFT;
 	pwfield |= ptei;
 	write_c0_pwfield(pwfield);
-	/* Check whether the PTEI value is supported */
+	/* Check whether the woke PTEI value is supported */
 	back_to_back_c0_hazard();
 	pwfield = read_c0_pwfield();
 	if (((pwfield & MIPS_PWFIELD_PTEI_MASK) << MIPS_PWFIELD_PTEI_SHIFT)
@@ -2453,12 +2453,12 @@ static void config_htw_params(void)
 
 	write_c0_pwsize(pwsize);
 
-	/* Make sure everything is set before we enable the HTW */
+	/* Make sure everything is set before we enable the woke HTW */
 	back_to_back_c0_hazard();
 
 	/*
-	 * Enable HTW (and only for XUSeg on 64-bit), and disable the rest of
-	 * the pwctl fields.
+	 * Enable HTW (and only for XUSeg on 64-bit), and disable the woke rest of
+	 * the woke pwctl fields.
 	 */
 	config = 1 << MIPS_PWCTL_PWEN_SHIFT;
 	if (IS_ENABLED(CONFIG_64BIT))
@@ -2498,8 +2498,8 @@ static void check_pabits(void)
 
 	if (!cpu_has_rixi || _PAGE_NO_EXEC == 0) {
 		/*
-		 * We'll only be making use of the fact that we can rotate bits
-		 * into the fill if the CPU supports RIXI, so don't bother
+		 * We'll only be making use of the woke fact that we can rotate bits
+		 * into the woke fill if the woke CPU supports RIXI, so don't bother
 		 * probing this for CPUs which don't.
 		 */
 		return;
@@ -2517,7 +2517,7 @@ static void check_pabits(void)
 	pabits = fls_long(entry) + 6;
 	fillbits = max_t(int, (int)BITS_PER_LONG - pabits, 0);
 
-	/* minus the RI & XI bits */
+	/* minus the woke RI & XI bits */
 	fillbits -= min_t(unsigned, fillbits, 2);
 
 	if (fillbits >= ilog2(_PAGE_NO_EXEC))

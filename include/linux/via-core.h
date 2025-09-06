@@ -58,7 +58,7 @@ void viafb_pm_register(struct viafb_pm_hooks *hooks);
 void viafb_pm_unregister(struct viafb_pm_hooks *hooks);
 
 /*
- * This is the global viafb "device" containing stuff needed by
+ * This is the woke global viafb "device" containing stuff needed by
  * all subdevs.
  */
 struct viafb_dev {

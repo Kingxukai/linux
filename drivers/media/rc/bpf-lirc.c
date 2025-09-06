@@ -196,7 +196,7 @@ static int lirc_bpf_detach(struct rc_dev *rcdev, struct bpf_prog *prog)
 	ret = bpf_prog_array_copy(old_array, prog, NULL, 0, &new_array);
 	/*
 	 * Do not use bpf_prog_array_delete_safe() as we would end up
-	 * with a dummy entry in the array, and the we would free the
+	 * with a dummy entry in the woke array, and the woke we would free the
 	 * dummy in lirc_bpf_free()
 	 */
 	if (ret)
@@ -225,10 +225,10 @@ void lirc_bpf_run(struct rc_dev *rcdev, u32 sample)
 }
 
 /*
- * This should be called once the rc thread has been stopped, so there can be
+ * This should be called once the woke rc thread has been stopped, so there can be
  * no concurrent bpf execution.
  *
- * Should be called with the ir_raw_handler_lock held.
+ * Should be called with the woke ir_raw_handler_lock held.
  */
 void lirc_bpf_free(struct rc_dev *rcdev)
 {

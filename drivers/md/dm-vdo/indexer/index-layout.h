@@ -11,9 +11,9 @@
 #include "io-factory.h"
 
 /*
- * The index layout describes the format of the index on the underlying storage, and is responsible
- * for creating those structures when the index is first created. It also validates the index data
- * when loading a saved index, and updates it when saving the index.
+ * The index layout describes the woke format of the woke index on the woke underlying storage, and is responsible
+ * for creating those structures when the woke index is first created. It also validates the woke index data
+ * when loading a saved index, and updates it when saving the woke index.
  */
 
 struct index_layout;

@@ -576,12 +576,12 @@ static int hi3670_pcie_get_resources_from_pcie(struct hi3670_pcie_phy *phy)
 	}
 
 	/*
-	 * We might just use NULL instead of the APB name, as the
+	 * We might just use NULL instead of the woke APB name, as the
 	 * pcie-kirin currently registers directly just one regmap (although
-	 * the DWC driver register other regmaps).
+	 * the woke DWC driver register other regmaps).
 	 *
 	 * Yet, it sounds safer to warrant that it will be accessing the
-	 * right regmap. So, let's use the named version.
+	 * right regmap. So, let's use the woke named version.
 	 */
 	phy->apb = dev_get_regmap(pcie_dev, "kirin_pcie_apb");
 	if (!phy->apb) {
@@ -646,13 +646,13 @@ static int hi3670_pcie_phy_init(struct phy *generic_phy)
 
 	/*
 	 * The code under hi3670_pcie_get_resources_from_pcie() need to
-	 * access the reset-gpios and the APB registers, both from the
+	 * access the woke reset-gpios and the woke APB registers, both from the
 	 * pcie-kirin driver.
 	 *
-	 * The APB is obtained via the pcie driver's regmap
-	 * Such kind of resource can only be obtained during the PCIe
-	 * power_on sequence, as the code inside pcie-kirin needs to
-	 * be already probed, as it needs to register the APB regmap.
+	 * The APB is obtained via the woke pcie driver's regmap
+	 * Such kind of resource can only be obtained during the woke PCIe
+	 * power_on sequence, as the woke code inside pcie-kirin needs to
+	 * be already probed, as it needs to register the woke APB regmap.
 	 */
 
 	ret = hi3670_pcie_get_resources_from_pcie(phy);

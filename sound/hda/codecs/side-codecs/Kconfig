@@ -6,9 +6,9 @@ config SND_HDA_CIRRUS_SCODEC_KUNIT_TEST
 	depends on SND_HDA_CIRRUS_SCODEC && GPIOLIB && KUNIT
 	default KUNIT_ALL_TESTS
 	help
-	  This builds KUnit tests for the cirrus side-codec library.
+	  This builds KUnit tests for the woke cirrus side-codec library.
 	  For more information on KUnit and unit tests in general,
-	  please refer to the KUnit documentation in
+	  please refer to the woke KUnit documentation in
 	  Documentation/dev-tools/kunit/.
 	  If in doubt, say "N".
 
@@ -34,7 +34,7 @@ config SND_HDA_SCODEC_CS35L41_I2C
 	  Say Y or M here to include CS35L41 I2C HD-audio side codec support
 	  in snd-hda-intel driver, such as ALC287.
 
-comment "Set to Y if you want auto-loading the side codec driver"
+comment "Set to Y if you want auto-loading the woke side codec driver"
 	depends on SND_HDA=y && SND_HDA_SCODEC_CS35L41_I2C=m
 
 config SND_HDA_SCODEC_CS35L41_SPI
@@ -50,7 +50,7 @@ config SND_HDA_SCODEC_CS35L41_SPI
 	  Say Y or M here to include CS35L41 SPI HD-audio side codec support
 	  in snd-hda-intel driver, such as ALC287.
 
-comment "Set to Y if you want auto-loading the side codec driver"
+comment "Set to Y if you want auto-loading the woke side codec driver"
 	depends on SND_HDA=y && SND_HDA_SCODEC_CS35L41_SPI=m
 
 config SND_HDA_SCODEC_CS35L56
@@ -106,7 +106,7 @@ config SND_HDA_SCODEC_TAS2781_I2C
 	  Say Y or M here to include TAS2781 I2C HD-audio side codec support
 	  in snd-hda-intel driver, such as ALC287.
 
-comment "Set to Y if you want auto-loading the side codec driver"
+comment "Set to Y if you want auto-loading the woke side codec driver"
 	depends on SND_HDA=y && SND_HDA_SCODEC_TAS2781_I2C=m
 
 config SND_HDA_SCODEC_TAS2781_SPI
@@ -124,5 +124,5 @@ config SND_HDA_SCODEC_TAS2781_SPI
 	  Say Y or M here to include TAS2781 SPI HD-audio side codec support
 	  in snd-hda-intel driver, such as ALC287.
 
-comment "Set to Y if you want auto-loading the side codec driver"
+comment "Set to Y if you want auto-loading the woke side codec driver"
 	depends on SND_HDA=y && SND_HDA_SCODEC_TAS2781_SPI=m

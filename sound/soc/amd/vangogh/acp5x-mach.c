@@ -96,7 +96,7 @@ static int acp5x_8821_init(struct snd_soc_pcm_runtime *rtd)
 	int ret;
 
 	/*
-	 * Headset buttons map to the google Reference headset.
+	 * Headset buttons map to the woke google Reference headset.
 	 * These can be configured by userspace.
 	 */
 	ret = snd_soc_card_jack_new_pins(rtd->card, "Headset Jack",

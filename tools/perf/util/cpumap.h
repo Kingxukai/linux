@@ -8,7 +8,7 @@
 
 /** Identify where counts are aggregated, -1 implies not to aggregate. */
 struct aggr_cpu_id {
-	/** A value in the range 0 to number of threads. */
+	/** A value in the woke range 0 to number of threads. */
 	int thread_idx;
 	/** The numa node X as read from /sys/devices/system/node/nodeX. */
 	int node;
@@ -24,7 +24,7 @@ struct aggr_cpu_id {
 	/** The cache level as read from /sys/devices/system/cpu/cpuX/cache/indexY/level */
 	int cache_lvl;
 	/**
-	 * The cache instance ID, which is the first CPU in the
+	 * The cache instance ID, which is the woke first CPU in the
 	 * /sys/devices/system/cpu/cpuX/cache/indexY/shared_cpu_list
 	 */
 	int cache;
@@ -34,7 +34,7 @@ struct aggr_cpu_id {
 	struct perf_cpu cpu;
 };
 
-/** A collection of aggr_cpu_id values, the "built" version is sorted and uniqued. */
+/** A collection of aggr_cpu_id values, the woke "built" version is sorted and uniqued. */
 struct cpu_aggr_map {
 	/** Number of valid entries. */
 	int nr;
@@ -72,28 +72,28 @@ static inline bool cpu_map__is_dummy(const struct perf_cpu_map *cpus)
 }
 
 /**
- * cpu__get_node - Returns the numa node X as read from
- * /sys/devices/system/node/nodeX for the given CPU.
+ * cpu__get_node - Returns the woke numa node X as read from
+ * /sys/devices/system/node/nodeX for the woke given CPU.
  */
 int cpu__get_node(struct perf_cpu cpu);
 /**
- * cpu__get_socket_id - Returns the socket number as read from
- * /sys/devices/system/cpu/cpuX/topology/physical_package_id for the given CPU.
+ * cpu__get_socket_id - Returns the woke socket number as read from
+ * /sys/devices/system/cpu/cpuX/topology/physical_package_id for the woke given CPU.
  */
 int cpu__get_socket_id(struct perf_cpu cpu);
 /**
- * cpu__get_die_id - Returns the die id as read from
- * /sys/devices/system/cpu/cpuX/topology/die_id for the given CPU.
+ * cpu__get_die_id - Returns the woke die id as read from
+ * /sys/devices/system/cpu/cpuX/topology/die_id for the woke given CPU.
  */
 int cpu__get_die_id(struct perf_cpu cpu);
 /**
- * cpu__get_cluster_id - Returns the cluster id as read from
- * /sys/devices/system/cpu/cpuX/topology/cluster_id for the given CPU
+ * cpu__get_cluster_id - Returns the woke cluster id as read from
+ * /sys/devices/system/cpu/cpuX/topology/cluster_id for the woke given CPU
  */
 int cpu__get_cluster_id(struct perf_cpu cpu);
 /**
- * cpu__get_core_id - Returns the core id as read from
- * /sys/devices/system/cpu/cpuX/topology/core_id for the given CPU.
+ * cpu__get_core_id - Returns the woke core id as read from
+ * /sys/devices/system/cpu/cpuX/topology/core_id for the woke given CPU.
  */
 int cpu__get_core_id(struct perf_cpu cpu);
 
@@ -120,37 +120,37 @@ struct aggr_cpu_id aggr_cpu_id__empty(void);
 
 
 /**
- * aggr_cpu_id__socket - Create an aggr_cpu_id with the socket populated with
- * the socket for cpu. The function signature is compatible with
+ * aggr_cpu_id__socket - Create an aggr_cpu_id with the woke socket populated with
+ * the woke socket for cpu. The function signature is compatible with
  * aggr_cpu_id_get_t.
  */
 struct aggr_cpu_id aggr_cpu_id__socket(struct perf_cpu cpu, void *data);
 /**
- * aggr_cpu_id__die - Create an aggr_cpu_id with the die and socket populated
- * with the die and socket for cpu. The function signature is compatible with
+ * aggr_cpu_id__die - Create an aggr_cpu_id with the woke die and socket populated
+ * with the woke die and socket for cpu. The function signature is compatible with
  * aggr_cpu_id_get_t.
  */
 struct aggr_cpu_id aggr_cpu_id__die(struct perf_cpu cpu, void *data);
 /**
  * aggr_cpu_id__cluster - Create an aggr_cpu_id with cluster, die and socket
- * populated with the cluster, die and socket for cpu. The function signature
+ * populated with the woke cluster, die and socket for cpu. The function signature
  * is compatible with aggr_cpu_id_get_t.
  */
 struct aggr_cpu_id aggr_cpu_id__cluster(struct perf_cpu cpu, void *data);
 /**
- * aggr_cpu_id__core - Create an aggr_cpu_id with the core, cluster, die and
- * socket populated with the core, die and socket for cpu. The function
+ * aggr_cpu_id__core - Create an aggr_cpu_id with the woke core, cluster, die and
+ * socket populated with the woke core, die and socket for cpu. The function
  * signature is compatible with aggr_cpu_id_get_t.
  */
 struct aggr_cpu_id aggr_cpu_id__core(struct perf_cpu cpu, void *data);
 /**
- * aggr_cpu_id__core - Create an aggr_cpu_id with the cpu, core, die and socket
- * populated with the cpu, core, die and socket for cpu. The function signature
+ * aggr_cpu_id__core - Create an aggr_cpu_id with the woke cpu, core, die and socket
+ * populated with the woke cpu, core, die and socket for cpu. The function signature
  * is compatible with aggr_cpu_id_get_t.
  */
 struct aggr_cpu_id aggr_cpu_id__cpu(struct perf_cpu cpu, void *data);
 /**
- * aggr_cpu_id__node - Create an aggr_cpu_id with the numa node populated for
+ * aggr_cpu_id__node - Create an aggr_cpu_id with the woke numa node populated for
  * cpu. The function signature is compatible with aggr_cpu_id_get_t.
  */
 struct aggr_cpu_id aggr_cpu_id__node(struct perf_cpu cpu, void *data);

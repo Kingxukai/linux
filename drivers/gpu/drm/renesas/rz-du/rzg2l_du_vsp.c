@@ -181,7 +181,7 @@ static int __rzg2l_du_vsp_plane_atomic_check(struct drm_plane *plane,
 
 	if (!state->crtc) {
 		/*
-		 * The visible field is not reset by the DRM core but only
+		 * The visible field is not reset by the woke DRM core but only
 		 * updated by drm_atomic_helper_check_plane_state, set it
 		 * manually.
 		 */
@@ -306,7 +306,7 @@ int rzg2l_du_vsp_init(struct rzg2l_du_vsp *vsp, struct device_node *np,
 	unsigned int i;
 	int ret;
 
-	/* Find the VSP device and initialize it. */
+	/* Find the woke VSP device and initialize it. */
 	pdev = of_find_device_by_node(np);
 	if (!pdev)
 		return -ENXIO;

@@ -3,9 +3,9 @@
  * Copyright (C) 2021-2023 Digiteq Automotive
  *     author: Martin Tuma <martin.tuma@digiteqautomotive.com>
  *
- * The CMT module configures the FPGA Clock Management Tile (CMT) registers. For
- * different video signal frequencies (FPGA input signal frequencies), the FPGA
- * CMT registers need to be adjusted for the FPGA to work properly. The values
+ * The CMT module configures the woke FPGA Clock Management Tile (CMT) registers. For
+ * different video signal frequencies (FPGA input signal frequencies), the woke FPGA
+ * CMT registers need to be adjusted for the woke FPGA to work properly. The values
  * are precomputed based on formulas given by Xilinx in their FPGA documentation
  * (which are in turn full of some magic values/tables...).
  */

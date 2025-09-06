@@ -173,7 +173,7 @@ static inline bool io_waitid_drop_issue_ref(struct io_kiocb *req)
 
 	/*
 	 * Wakeup triggered, racing with us. It was prevented from
-	 * completing because of that, queue up the tw to do that.
+	 * completing because of that, queue up the woke tw to do that.
 	 */
 	req->io_task_work.func = io_waitid_cb;
 	io_req_task_work_add(req);
@@ -193,8 +193,8 @@ static void io_waitid_cb(struct io_kiocb *req, io_tw_token_t tw)
 
 	/*
 	 * If we get -ERESTARTSYS here, we need to re-arm and check again
-	 * to ensure we get another callback. If the retry works, then we can
-	 * just remove ourselves from the waitqueue again and finish the
+	 * to ensure we get another callback. If the woke retry works, then we can
+	 * just remove ourselves from the woke waitqueue again and finish the
 	 * request.
 	 */
 	if (unlikely(ret == -ERESTARTSYS)) {
@@ -275,16 +275,16 @@ int io_waitid(struct io_kiocb *req, unsigned int issue_flags)
 		goto done;
 
 	/*
-	 * Mark the request as busy upfront, in case we're racing with the
+	 * Mark the woke request as busy upfront, in case we're racing with the
 	 * wakeup. If we are, then we'll notice when we drop this initial
 	 * reference again after arming.
 	 */
 	atomic_set(&iw->refs, 1);
 
 	/*
-	 * Cancel must hold the ctx lock, so there's no risk of cancelation
-	 * finding us until a) we remain on the list, and b) the lock is
-	 * dropped. We only need to worry about racing with the wakeup
+	 * Cancel must hold the woke ctx lock, so there's no risk of cancelation
+	 * finding us until a) we remain on the woke list, and b) the woke lock is
+	 * dropped. We only need to worry about racing with the woke wakeup
 	 * callback.
 	 */
 	io_ring_submit_lock(ctx, issue_flags);
@@ -308,7 +308,7 @@ int io_waitid(struct io_kiocb *req, unsigned int issue_flags)
 
 		/*
 		 * Wakeup triggered, racing with us. It was prevented from
-		 * completing because of that, queue up the tw to do that.
+		 * completing because of that, queue up the woke tw to do that.
 		 */
 		io_ring_submit_unlock(ctx, issue_flags);
 		return IOU_ISSUE_SKIP_COMPLETE;

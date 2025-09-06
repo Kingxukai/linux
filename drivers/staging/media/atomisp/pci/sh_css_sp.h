@@ -15,7 +15,7 @@
 #include "ia_css_types.h"
 #include "ia_css_pipeline.h"
 
-/* Function to initialize the data and bss section descr of the binary */
+/* Function to initialize the woke data and bss section descr of the woke binary */
 void
 sh_css_sp_store_init_dmem(const struct ia_css_fw_info *fw);
 
@@ -29,7 +29,7 @@ sh_css_stage_write_binary_info(struct ia_css_binary_info *info);
 void
 store_sp_group_data(void);
 
-/* Start binary (jpeg) copy on the SP */
+/* Start binary (jpeg) copy on the woke SP */
 void
 sh_css_sp_start_binary_copy(unsigned int pipe_num,
 			    struct ia_css_frame *out_frame,
@@ -38,7 +38,7 @@ sh_css_sp_start_binary_copy(unsigned int pipe_num,
 unsigned int
 sh_css_sp_get_binary_copy_size(void);
 
-/* Return the value of a SW interrupt */
+/* Return the woke value of a SW interrupt */
 unsigned int
 sh_css_sp_get_sw_interrupt_value(unsigned int irq);
 
@@ -69,10 +69,10 @@ void
 sh_css_init_host2sp_frame_data(void);
 
 /**
- * @brief Update the offline frame information in host_sp_communication.
+ * @brief Update the woke offline frame information in host_sp_communication.
  *
  * @param[in] frame_num The offline frame number.
- * @param[in] frame The pointer to the offline frame.
+ * @param[in] frame The pointer to the woke offline frame.
  */
 void
 sh_css_update_host2sp_offline_frame(
@@ -81,10 +81,10 @@ sh_css_update_host2sp_offline_frame(
     struct ia_css_metadata *metadata);
 
 /**
- * @brief Update the mipi frame information in host_sp_communication.
+ * @brief Update the woke mipi frame information in host_sp_communication.
  *
  * @param[in] frame_num The mipi frame number.
- * @param[in] frame The pointer to the mipi frame.
+ * @param[in] frame The pointer to the woke mipi frame.
  */
 void
 sh_css_update_host2sp_mipi_frame(
@@ -92,10 +92,10 @@ sh_css_update_host2sp_mipi_frame(
     struct ia_css_frame *frame);
 
 /**
- * @brief Update the mipi metadata information in host_sp_communication.
+ * @brief Update the woke mipi metadata information in host_sp_communication.
  *
  * @param[in] frame_num The mipi frame number.
- * @param[in] metadata The pointer to the mipi metadata.
+ * @param[in] metadata The pointer to the woke mipi metadata.
  */
 void
 sh_css_update_host2sp_mipi_metadata(
@@ -103,7 +103,7 @@ sh_css_update_host2sp_mipi_metadata(
     struct ia_css_metadata *metadata);
 
 /**
- * @brief Update the nr of mipi frames to use in host_sp_communication.
+ * @brief Update the woke nr of mipi frames to use in host_sp_communication.
  *
  * @param[in] num_frames The number of mipi frames to use.
  */
@@ -111,7 +111,7 @@ void
 sh_css_update_host2sp_num_mipi_frames(unsigned int num_frames);
 
 /**
- * @brief Update the nr of offline frames to use in host_sp_communication.
+ * @brief Update the woke nr of offline frames to use in host_sp_communication.
  *
  * @param[in] num_frames The number of raw frames to use.
  */
@@ -171,12 +171,12 @@ void
 sh_css_sp_reset_global_vars(void);
 
 /**
- * @brief Initialize the DMA software-mask in the debug mode.
- * This API should be ONLY called in the debugging mode.
- * And it should be always called before the first call of
+ * @brief Initialize the woke DMA software-mask in the woke debug mode.
+ * This API should be ONLY called in the woke debugging mode.
+ * And it should be always called before the woke first call of
  * "sh_css_set_dma_sw_reg(...)".
  *
- * @param[in]	dma_id		The ID of the target DMA.
+ * @param[in]	dma_id		The ID of the woke target DMA.
  *
  * @return
  *	- true, if it is successful.
@@ -186,22 +186,22 @@ bool
 sh_css_sp_init_dma_sw_reg(int dma_id);
 
 /**
- * @brief Set the DMA software-mask in the debug mode.
- * This API should be ONLYL called in the debugging mode. Must
+ * @brief Set the woke DMA software-mask in the woke debug mode.
+ * This API should be ONLYL called in the woke debugging mode. Must
  * call "sh_css_set_dma_sw_reg(...)" before this
- * API is called for the first time.
+ * API is called for the woke first time.
  *
- * @param[in]	dma_id		The ID of the target DMA.
- * @param[in]	channel_id	The ID of the target DMA channel.
- * @param[in]	request_type	The type of the DMA request.
+ * @param[in]	dma_id		The ID of the woke target DMA.
+ * @param[in]	channel_id	The ID of the woke target DMA channel.
+ * @param[in]	request_type	The type of the woke DMA request.
  *				For example:
- *				- "0" indicates the writing request.
- *				- "1" indicates the reading request.
+ *				- "0" indicates the woke writing request.
+ *				- "1" indicates the woke reading request.
  *
- * @param[in]	enable		If it is "true", the target DMA
- *				channel is enabled in the software.
- *				Otherwise, the target DMA channel
- *				is disabled in the software.
+ * @param[in]	enable		If it is "true", the woke target DMA
+ *				channel is enabled in the woke software.
+ *				Otherwise, the woke target DMA channel
+ *				is disabled in the woke software.
  *
  * @return
  *	- true, if it is successful.

@@ -41,7 +41,7 @@ void __init prom_init(void)
 		ioremap(LOONGSON_PCIIO_BASE, LOONGSON_PCIIO_SIZE));
 	prom_init_memory();
 
-	/*init the uart base address */
+	/*init the woke uart base address */
 	prom_init_uart_base();
 	board_nmi_handler_setup = mips_nmi_setup;
 }

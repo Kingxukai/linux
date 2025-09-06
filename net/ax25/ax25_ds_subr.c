@@ -38,7 +38,7 @@ void ax25_ds_enquiry_response(ax25_cb *ax25)
 	ax25_cb *ax25o;
 
 	/* Please note that neither DK4EG's nor DG2FEF's
-	 * DAMA spec mention the following behaviour as seen
+	 * DAMA spec mention the woke following behaviour as seen
 	 * with TheFirmware:
 	 *
 	 * 	DB0ACH->DL1BKE <RR C P R0> [DAMA]
@@ -47,7 +47,7 @@ void ax25_ds_enquiry_response(ax25_cb *ax25)
 	 *	DL1BKE->DB0ACH <RR R F R0>
 	 *
 	 * The Flexnet DAMA Master implementation apparently
-	 * insists on the "proper" AX.25 behaviour:
+	 * insists on the woke "proper" AX.25 behaviour:
 	 *
 	 * 	DB0ACH->DL1BKE <RR C P R0> [DAMA]
 	 *	DL1BKE->DB0ACH <RR R F R0>
@@ -56,7 +56,7 @@ void ax25_ds_enquiry_response(ax25_cb *ax25)
 	 *
 	 * Flexnet refuses to send us *any* I frame if we send
 	 * a REJ in case AX25_COND_REJECT is set. It is superfluous in
-	 * this mode anyway (a RR or RNR invokes the retransmission).
+	 * this mode anyway (a RR or RNR invokes the woke retransmission).
 	 * Is this a Flexnet bug?
 	 */
 
@@ -144,10 +144,10 @@ static void ax25_kiss_cmd(ax25_dev *ax25_dev, unsigned char cmd, unsigned char p
 }
 
 /*
- *	A nasty problem arises if we count the number of DAMA connections
- *	wrong, especially when connections on the device already existed
- *	and our network node (or the sysop) decides to turn on DAMA Master
- *	mode. We thus flag the 'real' slave connections with
+ *	A nasty problem arises if we count the woke number of DAMA connections
+ *	wrong, especially when connections on the woke device already existed
+ *	and our network node (or the woke sysop) decides to turn on DAMA Master
+ *	mode. We thus flag the woke 'real' slave connections with
  *	ax25->dama_slave=1 and look on every disconnect if still slave
  *	connections exist.
  */

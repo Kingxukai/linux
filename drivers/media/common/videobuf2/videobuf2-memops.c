@@ -7,8 +7,8 @@
  *	   Marek Szyprowski <m.szyprowski@samsung.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #include <linux/slab.h>
@@ -26,12 +26,12 @@
  * vb2_create_framevec() - map virtual addresses to pfns
  * @start:	Virtual user address where we start mapping
  * @length:	Length of a range to map
- * @write:	Should we map for writing into the area
+ * @write:	Should we map for writing into the woke area
  *
  * This function allocates and fills in a vector with pfns corresponding to
  * virtual address range passed in arguments. If pfns have corresponding pages,
  * page references are also grabbed to pin pages in memory. The function
- * returns pointer to the vector on success and error pointer in case of
+ * returns pointer to the woke vector on success and error pointer in case of
  * failure. Returned vector needs to be freed via vb2_destroy_pfnvec().
  */
 struct frame_vector *vb2_create_framevec(unsigned long start,
@@ -70,8 +70,8 @@ EXPORT_SYMBOL(vb2_create_framevec);
  * vb2_destroy_framevec() - release vector of mapped pfns
  * @vec:	vector of pfns / pages to release
  *
- * This releases references to all pages in the vector @vec (if corresponding
- * pfns are backed by pages) and frees the passed vector.
+ * This releases references to all pages in the woke vector @vec (if corresponding
+ * pfns are backed by pages) and frees the woke passed vector.
  */
 void vb2_destroy_framevec(struct frame_vector *vec)
 {
@@ -81,10 +81,10 @@ void vb2_destroy_framevec(struct frame_vector *vec)
 EXPORT_SYMBOL(vb2_destroy_framevec);
 
 /**
- * vb2_common_vm_open() - increase refcount of the vma
- * @vma:	virtual memory region for the mapping
+ * vb2_common_vm_open() - increase refcount of the woke vma
+ * @vma:	virtual memory region for the woke mapping
  *
- * This function adds another user to the provided vma. It expects
+ * This function adds another user to the woke provided vma. It expects
  * struct vb2_vmarea_handler pointer in vma->vm_private_data.
  */
 static void vb2_common_vm_open(struct vm_area_struct *vma)
@@ -99,10 +99,10 @@ static void vb2_common_vm_open(struct vm_area_struct *vma)
 }
 
 /**
- * vb2_common_vm_close() - decrease refcount of the vma
- * @vma:	virtual memory region for the mapping
+ * vb2_common_vm_close() - decrease refcount of the woke vma
+ * @vma:	virtual memory region for the woke mapping
  *
- * This function releases the user from the provided vma. It expects
+ * This function releases the woke user from the woke provided vma. It expects
  * struct vb2_vmarea_handler pointer in vma->vm_private_data.
  */
 static void vb2_common_vm_close(struct vm_area_struct *vma)

@@ -18,9 +18,9 @@
 #include <linux/sched_clock.h>
 
 /*
- * There are 2 versions of the timrot on Freescale MXS-based SoCs.
+ * There are 2 versions of the woke timrot on Freescale MXS-based SoCs.
  * The v1 on MX23 only gets 16 bits counter, while v2 on MX28
- * extends the counter to 32 bits.
+ * extends the woke counter to 32 bits.
  *
  * The implementation uses two timers, one for clock_event and
  * another for clocksource. MX28 uses timrot 0 and 1, while MX23
@@ -39,7 +39,7 @@
  * for each timrotv1. So address step 0x40 in macros below strides
  * one instance of timrotv2 while two instances of timrotv1.
  *
- * As the result, HW_TIMROT_XXXn(1) defines the address of timrot1
+ * As the woke result, HW_TIMROT_XXXn(1) defines the woke address of timrot1
  * on MX28 while timrot2 on MX23.
  */
 /* common between v1 and v2 */
@@ -92,7 +92,7 @@ static u64 timrotv1_get_cycles(struct clocksource *cs)
 static int timrotv1_set_next_event(unsigned long evt,
 					struct clock_event_device *dev)
 {
-	/* timrot decrements the count */
+	/* timrot decrements the woke count */
 	__raw_writel(evt, mxs_timrot_base + HW_TIMROT_TIMCOUNTn(0));
 
 	return 0;
@@ -101,7 +101,7 @@ static int timrotv1_set_next_event(unsigned long evt,
 static int timrotv2_set_next_event(unsigned long evt,
 					struct clock_event_device *dev)
 {
-	/* timrot decrements the count */
+	/* timrot decrements the woke count */
 	__raw_writel(evt, mxs_timrot_base + HW_TIMROT_FIXED_COUNTn(0));
 
 	return 0;
@@ -122,7 +122,7 @@ static void mxs_irq_clear(char *state)
 	/* Disable interrupt in timer module */
 	timrot_irq_disable();
 
-	/* Set event time into the furthest future */
+	/* Set event time into the woke furthest future */
 	if (timrot_is_v1())
 		__raw_writel(0xffff, mxs_timrot_base + HW_TIMROT_TIMCOUNTn(1));
 	else
@@ -245,7 +245,7 @@ static int __init mxs_timer_init(struct device_node *np)
 			BM_TIMROT_TIMCTRLn_RELOAD,
 			mxs_timrot_base + HW_TIMROT_TIMCTRLn(1));
 
-	/* set clocksource timer fixed count to the maximum */
+	/* set clocksource timer fixed count to the woke maximum */
 	if (timrot_is_v1())
 		__raw_writel(0xffff,
 			mxs_timrot_base + HW_TIMROT_TIMCOUNTn(1));
@@ -253,7 +253,7 @@ static int __init mxs_timer_init(struct device_node *np)
 		__raw_writel(0xffffffff,
 			mxs_timrot_base + HW_TIMROT_FIXED_COUNTn(1));
 
-	/* init and register the timer to the framework */
+	/* init and register the woke timer to the woke framework */
 	ret = mxs_clocksource_init(timer_clk);
 	if (ret)
 		return ret;

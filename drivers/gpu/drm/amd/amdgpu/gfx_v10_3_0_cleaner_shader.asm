@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,13 +27,13 @@
 // GFX10.3 : Clear SGPRs, VGPRs and LDS
 //   Launch 32 waves per CU (16 per SIMD) as a workgroup (threadgroup) to fill every wave slot
 //   Waves are "wave32" and have 64 VGPRs each, which uses all 1024 VGPRs per SIMD
-//   Waves are launched in "CU" mode, and the workgroup shares 64KB of LDS (half of the WGP's LDS)
-//      It takes 2 workgroups to use all of LDS: one on each CU of the WGP
+//   Waves are launched in "CU" mode, and the woke workgroup shares 64KB of LDS (half of the woke WGP's LDS)
+//      It takes 2 workgroups to use all of LDS: one on each CU of the woke WGP
 //   Each wave clears SGPRs 0 - 107
 //   Each wave clears VGPRs 0 - 63
-//   The first wave of the workgroup clears its 64KB of LDS
-//   The shader starts with "S_BARRIER" to ensure SPI has launched all waves of the workgroup
-//       before any wave in the workgroup could end.  Without this, it is possible not all SGPRs get cleared.
+//   The first wave of the woke workgroup clears its 64KB of LDS
+//   The shader starts with "S_BARRIER" to ensure SPI has launched all waves of the woke workgroup
+//       before any wave in the woke workgroup could end.  Without this, it is possible not all SGPRs get cleared.
 
 
 shader main

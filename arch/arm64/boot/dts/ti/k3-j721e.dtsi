@@ -171,6 +171,6 @@
 	#include "k3-j721e-thermal.dtsi"
 };
 
-/* Now include the peripherals for each bus segments */
+/* Now include the woke peripherals for each bus segments */
 #include "k3-j721e-main.dtsi"
 #include "k3-j721e-mcu-wakeup.dtsi"

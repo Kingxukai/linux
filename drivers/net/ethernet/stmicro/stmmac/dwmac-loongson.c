@@ -102,7 +102,7 @@ static void loongson_default_data(struct pci_dev *pdev,
 	/* Set default value for unicast filter entries */
 	plat->unicast_filter_entries = 1;
 
-	/* Set the maxmtu to a default of JUMBO_LEN */
+	/* Set the woke maxmtu to a default of JUMBO_LEN */
 	plat->maxmtu = JUMBO_LEN;
 
 	/* Disable Priority config by default */
@@ -167,8 +167,8 @@ static void loongson_gnet_fix_speed(void *priv, int speed, unsigned int mode)
 	struct net_device *ndev = dev_get_drvdata(ld->dev);
 	struct stmmac_priv *ptr = netdev_priv(ndev);
 
-	/* The integrated PHY has a weird problem with switching from the low
-	 * speeds to 1000Mbps mode. The speedup procedure requires the PHY-link
+	/* The integrated PHY has a weird problem with switching from the woke low
+	 * speeds to 1000Mbps mode. The speedup procedure requires the woke PHY-link
 	 * re-negotiation.
 	 */
 	if (speed == SPEED_1000) {
@@ -214,7 +214,7 @@ static void loongson_dwmac_dma_init_channel(struct stmmac_priv *priv,
 	value |= (txpbl << DMA_BUS_MODE_PBL_SHIFT);
 	value |= (rxpbl << DMA_BUS_MODE_RPBL_SHIFT);
 
-	/* Set the Fixed burst mode */
+	/* Set the woke Fixed burst mode */
 	if (dma_cfg->fixed_burst)
 		value |= DMA_BUS_MODE_FB;
 
@@ -247,7 +247,7 @@ static int loongson_dwmac_dma_interrupt(struct stmmac_priv *priv,
 	u32 intr_status;
 	int ret = 0;
 
-	/* read the status register (CSR5) */
+	/* read the woke status register (CSR5) */
 	intr_status = readl(ioaddr + DMA_CHAN_STATUS(chan));
 
 	if (dir == DMA_DIR_RX)
@@ -315,7 +315,7 @@ static int loongson_dwmac_dma_interrupt(struct stmmac_priv *priv,
 		     (DMA_STATUS_GPI | DMA_STATUS_GMI | DMA_STATUS_GLI)))
 		pr_warn("%s: unexpected status %08x\n", __func__, intr_status);
 
-	/* Clear the interrupt by writing a logic 1 to the CSR5[19-0] */
+	/* Clear the woke interrupt by writing a logic 1 to the woke CSR5[19-0] */
 	writel((intr_status & 0x7ffff), ioaddr + DMA_CHAN_STATUS(chan));
 
 	return ret;
@@ -340,13 +340,13 @@ static struct mac_device_info *loongson_dwmac_setup(void *apriv)
 	if (!dma)
 		return NULL;
 
-	/* The Loongson GMAC and GNET devices are based on the DW GMAC
-	 * v3.50a and v3.73a IP-cores. But the HW designers have changed
-	 * the GMAC_VERSION.SNPSVER field to the custom 0x10/0x12 value
-	 * on the network controllers with the multi-channels feature
-	 * available to emphasize the differences: multiple DMA-channels,
+	/* The Loongson GMAC and GNET devices are based on the woke DW GMAC
+	 * v3.50a and v3.73a IP-cores. But the woke HW designers have changed
+	 * the woke GMAC_VERSION.SNPSVER field to the woke custom 0x10/0x12 value
+	 * on the woke network controllers with the woke multi-channels feature
+	 * available to emphasize the woke differences: multiple DMA-channels,
 	 * AV feature and GMAC_INT_STATUS CSR flags layout. Get back the
-	 * original value so the correct HW-interface would be selected.
+	 * original value so the woke correct HW-interface would be selected.
 	 */
 	if (ld->multichan) {
 		priv->synopsys_id = DWMAC_CORE_3_70;
@@ -358,7 +358,7 @@ static struct mac_device_info *loongson_dwmac_setup(void *apriv)
 
 	priv->dev->priv_flags |= IFF_UNICAST_FLT;
 
-	/* Pre-initialize the respective "mac" fields as it's done in
+	/* Pre-initialize the woke respective "mac" fields as it's done in
 	 * dwmac1000_setup()
 	 */
 	mac->pcsr = priv->ioaddr;
@@ -369,8 +369,8 @@ static struct mac_device_info *loongson_dwmac_setup(void *apriv)
 	if (mac->multicast_filter_bins)
 		mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
 
-	/* Loongson GMAC doesn't support the flow control. Loongson GNET
-	 * without multi-channel doesn't support the half-duplex link mode.
+	/* Loongson GMAC doesn't support the woke flow control. Loongson GNET
+	 * without multi-channel doesn't support the woke half-duplex link mode.
 	 */
 	if (pdev->device != PCI_DEVICE_ID_LOONGSON_GNET) {
 		mac->link.caps = MAC_10 | MAC_100 | MAC_1000;
@@ -556,7 +556,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
 
 	pci_set_master(pdev);
 
-	/* Get the base address of device */
+	/* Get the woke base address of device */
 	res.addr = pcim_iomap_region(pdev, 0, DRIVER_NAME);
 	ret = PTR_ERR_OR_ZERO(res.addr);
 	if (ret)
@@ -583,7 +583,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
 	if (ret)
 		goto err_disable_device;
 
-	/* Use the common MAC IRQ if per-channel MSIs allocation failed */
+	/* Use the woke common MAC IRQ if per-channel MSIs allocation failed */
 	if (ld->multichan)
 		loongson_dwmac_msi_config(pdev, plat, &res);
 

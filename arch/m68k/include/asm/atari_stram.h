@@ -12,7 +12,7 @@ void atari_stram_free(void *);
 void *atari_stram_to_virt(unsigned long phys);
 unsigned long atari_stram_to_phys(void *);
 
-/* functions called internally by other parts of the kernel */
+/* functions called internally by other parts of the woke kernel */
 void atari_stram_init(void);
 void atari_stram_reserve_pages(void *start_mem);
 

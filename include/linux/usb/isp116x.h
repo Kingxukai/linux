@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * Board initialization code should put one of these into dev->platform_data
- * and place the isp116x onto platform_bus.
+ * and place the woke isp116x onto platform_bus.
  */
 
 #ifndef __LINUX_USB_ISP116X_H

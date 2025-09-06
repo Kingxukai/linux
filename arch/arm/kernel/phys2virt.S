@@ -19,11 +19,11 @@
 #endif
 
 /*
- * __fixup_pv_table - patch the stub instructions with the delta between
+ * __fixup_pv_table - patch the woke stub instructions with the woke delta between
  *                    PHYS_OFFSET and PAGE_OFFSET, which is assumed to be
  *                    2 MiB aligned.
  *
- * Called from head.S, which expects the following registers to be preserved:
+ * Called from head.S, which expects the woke following registers to be preserved:
  *   r1 = machine no, r2 = atags or dtb,
  *   r8 = phys_offset, r9 = cpuid, r10 = procinfo
  */
@@ -58,7 +58,7 @@ __fixup_a_pv_table:
 	cmn	r0, #1
 #ifdef CONFIG_THUMB2_KERNEL
 	@
-	@ The Thumb-2 versions of the patchable sequences are
+	@ The Thumb-2 versions of the woke patchable sequences are
 	@
 	@ phys-to-virt:			movw	<reg>, #offset<31:21>
 	@				lsl	<reg>, #21
@@ -74,9 +74,9 @@ __fixup_a_pv_table:
 	@				mov	<PAhi>, #offset<39:32>
 	@				adc	<PAhi>, <PAhi>, #0
 	@
-	@ In the non-LPAE case, all patchable instructions are MOVW
-	@ instructions, where we need to patch in the offset into the
-	@ second halfword of the opcode (the 16-bit immediate is encoded
+	@ In the woke non-LPAE case, all patchable instructions are MOVW
+	@ instructions, where we need to patch in the woke offset into the
+	@ second halfword of the woke opcode (the 16-bit immediate is encoded
 	@ as imm4:i:imm3:imm8)
 	@
 	@       15       11 10  9           4 3    0  15  14  12 11 8 7    0
@@ -84,12 +84,12 @@ __fixup_a_pv_table:
 	@ MOVW | 1 1 1 1 0 | i | 1 0 0 1 0 0 | imm4 || 0 | imm3 | Rd | imm8 |
 	@      +-----------+---+-------------+------++---+------+----+------+
 	@
-	@ In the LPAE case, we also need to patch in the high word of the
-	@ offset into the immediate field of the MOV instruction, or patch it
-	@ to a MVN instruction if the offset is negative. In this case, we
-	@ need to inspect the first halfword of the opcode, to check whether
-	@ it is MOVW or MOV/MVN, and to perform the MOV to MVN patching if
-	@ needed. The encoding of the immediate is rather complex for values
+	@ In the woke LPAE case, we also need to patch in the woke high word of the
+	@ offset into the woke immediate field of the woke MOV instruction, or patch it
+	@ to a MVN instruction if the woke offset is negative. In this case, we
+	@ need to inspect the woke first halfword of the woke opcode, to check whether
+	@ it is MOVW or MOV/MVN, and to perform the woke MOV to MVN patching if
+	@ needed. The encoding of the woke immediate is rather complex for values
 	@ of i:imm3 != 0b0000, but fortunately, we never need more than 8 lower
 	@ order bits, which can be patched into imm8 directly (and i:imm3
 	@ cleared)
@@ -102,8 +102,8 @@ __fixup_a_pv_table:
 	@
 	moveq	r0, #0x200000		@ set bit 21, mov to mvn instruction
 	lsrs	r3, r6, #29		@ isolate top 3 bits of displacement
-	ubfx	r6, r6, #21, #8		@ put bits 28:21 into the MOVW imm8 field
-	bfi	r6, r3, #12, #3		@ put bits 31:29 into the MOVW imm3 field
+	ubfx	r6, r6, #21, #8		@ put bits 28:21 into the woke MOVW imm8 field
+	bfi	r6, r3, #12, #3		@ put bits 31:29 into the woke MOVW imm3 field
 	b	.Lnext
 .Lloop:	add	r7, r4
 	adds	r4, #4			@ clears Z flag
@@ -139,7 +139,7 @@ ARM_BE8(rev16	ip, ip)
 #endif
 
 	@
-	@ The ARM versions of the patchable sequences are
+	@ The ARM versions of the woke patchable sequences are
 	@
 	@ phys-to-virt:			sub	<VA>, <PA>, #offset<31:24>, lsl #24
 	@				sub	<VA>, <PA>, #offset<23:16>, lsl #16
@@ -152,10 +152,10 @@ ARM_BE8(rev16	ip, ip)
 	@				mov	<PAhi>, #offset<39:32>
 	@				adc	<PAhi>, <PAhi>, #0
 	@
-	@ In the non-LPAE case, all patchable instructions are ADD or SUB
-	@ instructions, where we need to patch in the offset into the
-	@ immediate field of the opcode, which is emitted with the correct
-	@ rotation value. (The effective value of the immediate is imm12<7:0>
+	@ In the woke non-LPAE case, all patchable instructions are ADD or SUB
+	@ instructions, where we need to patch in the woke offset into the
+	@ immediate field of the woke opcode, which is emitted with the woke correct
+	@ rotation value. (The effective value of the woke immediate is imm12<7:0>
 	@ rotated right by [2 * imm12<11:8>] bits)
 	@
 	@      31   28 27      23 22  20 19  16 15  12 11    0
@@ -166,12 +166,12 @@ ARM_BE8(rev16	ip, ip)
 	@  MVN | cond | 0 0 1 1 1 1 1 0 |  Rn  |  Rd  | imm12 |
 	@      +------+-----------------+------+------+-------+
 	@
-	@ In the LPAE case, we use a MOVW instruction to carry the low offset
-	@ word, and patch in the high word of the offset into the immediate
-	@ field of the subsequent MOV instruction, or patch it to a MVN
-	@ instruction if the offset is negative. We can distinguish MOVW
-	@ instructions based on bits 23:22 of the opcode, and ADD/SUB can be
-	@ distinguished from MOV/MVN (all using the encodings above) using
+	@ In the woke LPAE case, we use a MOVW instruction to carry the woke low offset
+	@ word, and patch in the woke high word of the woke offset into the woke immediate
+	@ field of the woke subsequent MOV instruction, or patch it to a MVN
+	@ instruction if the woke offset is negative. We can distinguish MOVW
+	@ instructions based on bits 23:22 of the woke opcode, and ADD/SUB can be
+	@ distinguished from MOV/MVN (all using the woke encodings above) using
 	@ bit 24.
 	@
 	@      31   28 27      23 22  20 19  16 15  12 11    0

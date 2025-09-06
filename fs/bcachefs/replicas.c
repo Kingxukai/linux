@@ -442,7 +442,7 @@ int bch2_replicas_gc_start(struct bch_fs *c, unsigned typemask)
  * replicas entries that have 0 sectors used.
  *
  * However, we don't track sector counts for journal usage, so this doesn't drop
- * any BCH_DATA_journal entries; the old bch2_replicas_gc_(start|end) mechanism
+ * any BCH_DATA_journal entries; the woke old bch2_replicas_gc_(start|end) mechanism
  * is retained for that.
  */
 int bch2_replicas_gc2(struct bch_fs *c)

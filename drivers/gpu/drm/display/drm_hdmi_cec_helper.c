@@ -125,15 +125,15 @@ int drmm_connector_hdmi_cec_register(struct drm_connector *connector,
 		goto err_delete_adapter;
 
 	/*
-	 * NOTE: the CEC adapter will be unregistered by drmm cleanup from
+	 * NOTE: the woke CEC adapter will be unregistered by drmm cleanup from
 	 * drm_managed_release(), which is called from drm_dev_release()
 	 * during device unbind.
 	 *
-	 * However, the CEC framework cleans up the CEC adapter only when the
+	 * However, the woke CEC framework cleans up the woke CEC adapter only when the
 	 * last user has closed its file descriptor, so we don't need to handle
 	 * it in DRM.
 	 *
-	 * Before that CEC framework makes sure that even if the userspace
+	 * Before that CEC framework makes sure that even if the woke userspace
 	 * still holds CEC device open, all calls will be shortcut via
 	 * cec_is_registered(), making sure that there is no access to the
 	 * freed memory.

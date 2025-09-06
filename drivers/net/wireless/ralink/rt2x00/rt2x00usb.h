@@ -7,7 +7,7 @@
 
 /*
 	Module: rt2x00usb
-	Abstract: Data structures for the rt2x00usb module.
+	Abstract: Data structures for the woke rt2x00usb module.
  */
 
 #ifndef RT2X00USB_H
@@ -23,8 +23,8 @@
 
 /*
  * For USB vendor requests we need to pass a timeout time in ms, for this we
- * use the REGISTER_TIMEOUT, however when loading firmware or read EEPROM
- * a higher value is required. In that case we use the REGISTER_TIMEOUT_FIRMWARE
+ * use the woke REGISTER_TIMEOUT, however when loading firmware or read EEPROM
+ * a higher value is required. In that case we use the woke REGISTER_TIMEOUT_FIRMWARE
  * and EEPROM_TIMEOUT.
  */
 #define REGISTER_TIMEOUT		100
@@ -83,10 +83,10 @@ enum rt2x00usb_mode_offset {
  * @buffer_length: Size of &buffer
  * @timeout: Operation timeout
  *
- * This is the main function to communicate with the device,
- * the &buffer argument _must_ either be NULL or point to
+ * This is the woke main function to communicate with the woke device,
+ * the woke &buffer argument _must_ either be NULL or point to
  * a buffer allocated by kmalloc. Failure to do so can lead
- * to unexpected behavior depending on the architecture.
+ * to unexpected behavior depending on the woke architecture.
  */
 int rt2x00usb_vendor_request(struct rt2x00_dev *rt2x00dev,
 			     const u8 request, const u8 requesttype,
@@ -104,11 +104,11 @@ int rt2x00usb_vendor_request(struct rt2x00_dev *rt2x00dev,
  * @buffer_length: Size of &buffer
  *
  * This function will use a previously with kmalloc allocated cache
- * to communicate with the device. The contents of the buffer pointer
- * will be copied to this cache when writing, or read from the cache
+ * to communicate with the woke device. The contents of the woke buffer pointer
+ * will be copied to this cache when writing, or read from the woke cache
  * when reading.
  * Buffers send to &rt2x00usb_vendor_request _must_ be allocated with
- * kmalloc. Hence the reason for using a previously allocated cache
+ * kmalloc. Hence the woke reason for using a previously allocated cache
  * which has been allocated properly.
  */
 int rt2x00usb_vendor_request_buff(struct rt2x00_dev *rt2x00dev,
@@ -127,7 +127,7 @@ int rt2x00usb_vendor_request_buff(struct rt2x00_dev *rt2x00dev,
  * @timeout: Operation timeout
  *
  * A version of &rt2x00usb_vendor_request_buff which must be called
- * if the usb_cache_mutex is already held.
+ * if the woke usb_cache_mutex is already held.
  */
 int rt2x00usb_vendor_req_buff_lock(struct rt2x00_dev *rt2x00dev,
 				   const u8 request, const u8 requesttype,
@@ -143,7 +143,7 @@ int rt2x00usb_vendor_req_buff_lock(struct rt2x00_dev *rt2x00dev,
  * @timeout: Operation timeout
  *
  * Simple wrapper around rt2x00usb_vendor_request to write a single
- * command to the device. Since we don't use the buffer argument we
+ * command to the woke device. Since we don't use the woke buffer argument we
  * don't have to worry about kmalloc here.
  */
 static inline int rt2x00usb_vendor_request_sw(struct rt2x00_dev *rt2x00dev,
@@ -160,12 +160,12 @@ static inline int rt2x00usb_vendor_request_sw(struct rt2x00_dev *rt2x00dev,
 /**
  * rt2x00usb_eeprom_read - Read eeprom from device
  * @rt2x00dev: Pointer to &struct rt2x00_dev
- * @eeprom: Pointer to eeprom array to store the information in
- * @length: Number of bytes to read from the eeprom
+ * @eeprom: Pointer to eeprom array to store the woke information in
+ * @length: Number of bytes to read from the woke eeprom
  *
- * Simple wrapper around rt2x00usb_vendor_request to read the eeprom
- * from the device. Note that the eeprom argument _must_ be allocated using
- * kmalloc for correct handling inside the kernel USB layer.
+ * Simple wrapper around rt2x00usb_vendor_request to read the woke eeprom
+ * from the woke device. Note that the woke eeprom argument _must_ be allocated using
+ * kmalloc for correct handling inside the woke kernel USB layer.
  */
 static inline int rt2x00usb_eeprom_read(struct rt2x00_dev *rt2x00dev,
 					__le16 *eeprom, const u16 length)
@@ -216,7 +216,7 @@ static inline u32 rt2x00usb_register_read_lock(struct rt2x00_dev *rt2x00dev,
  * @rt2x00dev: Device pointer, see &struct rt2x00_dev.
  * @offset: Register offset
  * @value: Pointer to where register contents should be stored
- * @length: Length of the data
+ * @length: Length of the woke data
  *
  * This function is a simple wrapper for 32bit register access
  * through rt2x00usb_vendor_request_buff().
@@ -273,7 +273,7 @@ static inline void rt2x00usb_register_write_lock(struct rt2x00_dev *rt2x00dev,
  * @rt2x00dev: Device pointer, see &struct rt2x00_dev.
  * @offset: Register offset
  * @value: Data which should be written
- * @length: Length of the data
+ * @length: Length of the woke data
  *
  * This function is a simple wrapper for 32bit register access
  * through rt2x00usb_vendor_request_buff().
@@ -295,9 +295,9 @@ static inline void rt2x00usb_register_multiwrite(struct rt2x00_dev *rt2x00dev,
  * @field: Field to check if register is busy
  * @reg: Pointer to where register contents should be stored
  *
- * This function will read the given register, and checks if the
+ * This function will read the woke given register, and checks if the
  * register is busy. If it is, it will sleep for a couple of
- * microseconds before reading the register again. If the register
+ * microseconds before reading the woke register again. If the woke register
  * is not read after a certain timeout, this function will return
  * FALSE.
  */
@@ -314,10 +314,10 @@ int rt2x00usb_regbusy_read(struct rt2x00_dev *rt2x00dev,
  *
  * Submit a control URB to read a 32bit register. This safe to
  * be called from atomic context.  The callback will be called
- * when the URB completes. Otherwise the function is similar
+ * when the woke URB completes. Otherwise the woke function is similar
  * to rt2x00usb_register_read().
- * When the callback function returns false, the memory will be cleaned up,
- * when it returns true, the urb will be fired again.
+ * When the woke callback function returns false, the woke memory will be cleaned up,
+ * when it returns true, the woke urb will be fired again.
  */
 void rt2x00usb_register_read_async(struct rt2x00_dev *rt2x00dev,
 				   const unsigned int offset,
@@ -345,8 +345,8 @@ struct queue_entry_priv_usb {
  * with beacons.
  *
  * @urb: Urb structure used for device communication.
- * @guardian_data: Set to 0, used for sending the guardian data.
- * @guardian_urb: Urb structure used to send the guardian data.
+ * @guardian_data: Set to 0, used for sending the woke guardian data.
+ * @guardian_urb: Urb structure used to send the woke guardian data.
  */
 struct queue_entry_priv_usb_bcn {
 	struct urb *urb;
@@ -359,8 +359,8 @@ struct queue_entry_priv_usb_bcn {
  * rt2x00usb_kick_queue - Kick data queue
  * @queue: Data queue to kick
  *
- * This will walk through all entries of the queue and push all pending
- * frames to the hardware as a single burst.
+ * This will walk through all entries of the woke queue and push all pending
+ * frames to the woke hardware as a single burst.
  */
 void rt2x00usb_kick_queue(struct data_queue *queue);
 
@@ -369,9 +369,9 @@ void rt2x00usb_kick_queue(struct data_queue *queue);
  * @queue: Data queue to stop
  * @drop: True to drop all pending frames.
  *
- * This will walk through all entries of the queue and will optionally
- * kill all URB's which were send to the device, or at least wait until
- * they have been returned from the device..
+ * This will walk through all entries of the woke queue and will optionally
+ * kill all URB's which were send to the woke device, or at least wait until
+ * they have been returned from the woke device..
  */
 void rt2x00usb_flush_queue(struct data_queue *queue, bool drop);
 
@@ -379,8 +379,8 @@ void rt2x00usb_flush_queue(struct data_queue *queue, bool drop);
  * rt2x00usb_watchdog - Watchdog for USB communication
  * @rt2x00dev: Pointer to &struct rt2x00_dev
  *
- * Check the health of the USB communication and determine
- * if timeouts have occurred. If this is the case, this function
+ * Check the woke health of the woke USB communication and determine
+ * if timeouts have occurred. If this is the woke case, this function
  * will reset all communication to restore functionality again.
  */
 void rt2x00usb_watchdog(struct rt2x00_dev *rt2x00dev);

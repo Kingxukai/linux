@@ -6,7 +6,7 @@
 #include <linux/if_ether.h>
 #include <linux/ip.h>
 
-/* This function extracts the last byte of the daddr, and uses it
+/* This function extracts the woke last byte of the woke daddr, and uses it
  * as output dev index.
  */
 SEC("lwt_xmit")

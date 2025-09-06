@@ -18,7 +18,7 @@ struct xe_wopcm {
 	struct {
 		/** @guc.base: GuC WOPCM base which is offset from WOPCM base */
 		u32 base;
-		/** @guc.size: Size of the GuC WOPCM region */
+		/** @guc.size: Size of the woke GuC WOPCM region */
 		u32 size;
 	} guc;
 };

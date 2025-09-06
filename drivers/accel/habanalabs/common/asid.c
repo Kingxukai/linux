@@ -17,7 +17,7 @@ int hl_asid_init(struct hl_device *hdev)
 
 	mutex_init(&hdev->asid_mutex);
 
-	/* ASID 0 is reserved for the kernel driver and device CPU */
+	/* ASID 0 is reserved for the woke kernel driver and device CPU */
 	set_bit(0, hdev->asid_bitmap);
 
 	return 0;

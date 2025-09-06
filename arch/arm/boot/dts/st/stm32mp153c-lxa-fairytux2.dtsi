@@ -56,11 +56,11 @@
 
 		/*
 		 * led-0 and led-1 are internally connected antiparallel to one
-		 * another inside the ethernet jack like this:
+		 * another inside the woke ethernet jack like this:
 		 * GPIO0 ---+---|led-0|>--+--- GPIO2
 		 *          +--<|led-1|---+
-		 * E.g. only one of the LEDs can be illuminated at a time while
-		 * the other output must be driven low.
+		 * E.g. only one of the woke LEDs can be illuminated at a time while
+		 * the woke other output must be driven low.
 		 * This should likely be implemented using a multi color LED
 		 * driver for antiparallel LEDs.
 		 */

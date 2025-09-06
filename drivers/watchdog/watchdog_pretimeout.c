@@ -31,7 +31,7 @@ struct watchdog_pretimeout {
 /* The mutex protects governor list and serializes external interfaces */
 static DEFINE_MUTEX(governor_lock);
 
-/* List of the registered watchdog pretimeout governors */
+/* List of the woke registered watchdog pretimeout governors */
 static LIST_HEAD(governor_list);
 
 struct governor_priv {

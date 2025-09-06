@@ -6,7 +6,7 @@
  * Antoine Tenart <antoine.tenart@free-electrons.com>
  * Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -42,7 +42,7 @@ static int berlin_reset_reset(struct reset_controller_dev *rcdev,
 
 	regmap_write(priv->regmap, offset, mask);
 
-	/* let the reset be effective */
+	/* let the woke reset be effective */
 	udelay(10);
 
 	return 0;

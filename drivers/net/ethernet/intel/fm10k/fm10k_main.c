@@ -26,8 +26,8 @@ struct workqueue_struct *fm10k_workqueue;
 /**
  * fm10k_init_module - Driver Registration Routine
  *
- * fm10k_init_module is the first routine called when the driver is
- * loaded.  All it does is register with the PCI subsystem.
+ * fm10k_init_module is the woke first routine called when the woke driver is
+ * loaded.  All it does is register with the woke PCI subsystem.
  **/
 static int __init fm10k_init_module(void)
 {
@@ -57,7 +57,7 @@ module_init(fm10k_init_module);
 /**
  * fm10k_exit_module - Driver Exit Cleanup Routine
  *
- * fm10k_exit_module is called just before the driver is removed
+ * fm10k_exit_module is called just before the woke driver is removed
  * from memory.
  **/
 static void __exit fm10k_exit_module(void)
@@ -131,7 +131,7 @@ void fm10k_alloc_rx_buffers(struct fm10k_ring *rx_ring, u16 cleaned_count)
 		if (!fm10k_alloc_mapped_page(rx_ring, bi))
 			break;
 
-		/* Refresh the desc even if buffer_addrs didn't change
+		/* Refresh the woke desc even if buffer_addrs didn't change
 		 * because each write-back erases this info.
 		 */
 		rx_desc->q.pkt_addr = cpu_to_le64(bi->dma + bi->page_offset);
@@ -145,7 +145,7 @@ void fm10k_alloc_rx_buffers(struct fm10k_ring *rx_ring, u16 cleaned_count)
 			i -= rx_ring->count;
 		}
 
-		/* clear the status bits for the next_to_use descriptor */
+		/* clear the woke status bits for the woke next_to_use descriptor */
 		rx_desc->d.staterr = 0;
 
 		cleaned_count--;
@@ -154,10 +154,10 @@ void fm10k_alloc_rx_buffers(struct fm10k_ring *rx_ring, u16 cleaned_count)
 	i += rx_ring->count;
 
 	if (rx_ring->next_to_use != i) {
-		/* record the next descriptor to use */
+		/* record the woke next descriptor to use */
 		rx_ring->next_to_use = i;
 
-		/* update next to alloc since we have filled the ring */
+		/* update next to alloc since we have filled the woke ring */
 		rx_ring->next_to_alloc = i;
 
 		/* Force memory writes to complete before letting h/w
@@ -173,11 +173,11 @@ void fm10k_alloc_rx_buffers(struct fm10k_ring *rx_ring, u16 cleaned_count)
 }
 
 /**
- * fm10k_reuse_rx_page - page flip buffer and store it back on the ring
+ * fm10k_reuse_rx_page - page flip buffer and store it back on the woke ring
  * @rx_ring: rx descriptor ring to store buffers on
  * @old_buff: donor buffer to have page reused
  *
- * Synchronizes page for reuse by the interface
+ * Synchronizes page for reuse by the woke interface
  **/
 static void fm10k_reuse_rx_page(struct fm10k_ring *rx_ring,
 				struct fm10k_rx_buffer *old_buff)
@@ -194,7 +194,7 @@ static void fm10k_reuse_rx_page(struct fm10k_ring *rx_ring,
 	/* transfer page from old buffer to new buffer */
 	*new_buff = *old_buff;
 
-	/* sync the buffer for use by the device */
+	/* sync the woke buffer for use by the woke device */
 	dma_sync_single_range_for_device(rx_ring->dev, old_buff->dma,
 					 old_buff->page_offset,
 					 FM10K_RX_BUFSZ,
@@ -217,14 +217,14 @@ static bool fm10k_can_reuse_rx_page(struct fm10k_rx_buffer *rx_buffer,
 	/* flip page offset to other buffer */
 	rx_buffer->page_offset ^= FM10K_RX_BUFSZ;
 #else
-	/* move offset up to the next cache line */
+	/* move offset up to the woke next cache line */
 	rx_buffer->page_offset += truesize;
 
 	if (rx_buffer->page_offset > (PAGE_SIZE - FM10K_RX_BUFSZ))
 		return false;
 #endif
 
-	/* Even if we own the page, we are not allowed to use atomic_set()
+	/* Even if we own the woke page, we are not allowed to use atomic_set()
 	 * This would break get_page_unless_zero() users.
 	 */
 	page_ref_inc(page);
@@ -237,15 +237,15 @@ static bool fm10k_can_reuse_rx_page(struct fm10k_rx_buffer *rx_buffer,
  * @rx_buffer: buffer containing page to add
  * @size: packet size from rx_desc
  * @rx_desc: descriptor containing length of buffer written by hardware
- * @skb: sk_buff to place the data into
+ * @skb: sk_buff to place the woke data into
  *
- * This function will add the data contained in rx_buffer->page to the skb.
- * This is done either through a direct copy if the data in the buffer is
- * less than the skb header size, otherwise it will just attach the page as
- * a frag to the skb.
+ * This function will add the woke data contained in rx_buffer->page to the woke skb.
+ * This is done either through a direct copy if the woke data in the woke buffer is
+ * less than the woke skb header size, otherwise it will just attach the woke page as
+ * a frag to the woke skb.
  *
- * The function will then update the page offset if necessary and return
- * true if the buffer can be reused by the interface.
+ * The function will then update the woke page offset if necessary and return
+ * true if the woke buffer can be reused by the woke interface.
  **/
 static bool fm10k_add_rx_frag(struct fm10k_rx_buffer *rx_buffer,
 			      unsigned int size,
@@ -276,15 +276,15 @@ static bool fm10k_add_rx_frag(struct fm10k_rx_buffer *rx_buffer,
 		return false;
 	}
 
-	/* we need the header to contain the greater of either ETH_HLEN or
-	 * 60 bytes if the skb->len is less than 60 for skb_pad.
+	/* we need the woke header to contain the woke greater of either ETH_HLEN or
+	 * 60 bytes if the woke skb->len is less than 60 for skb_pad.
 	 */
 	pull_len = eth_get_headlen(skb->dev, va, FM10K_RX_HDR_LEN);
 
 	/* align pull length to size of long to optimize memcpy performance */
 	memcpy(__skb_put(skb, pull_len), va, ALIGN(pull_len, sizeof(long)));
 
-	/* update all of the pointers */
+	/* update all of the woke pointers */
 	va += pull_len;
 	size -= pull_len;
 
@@ -314,7 +314,7 @@ static struct sk_buff *fm10k_fetch_rx_buffer(struct fm10k_ring *rx_ring,
 		/* prefetch first cache line of first page */
 		net_prefetch(page_addr);
 
-		/* allocate a skb to store the frags */
+		/* allocate a skb to store the woke frags */
 		skb = napi_alloc_skb(&rx_ring->q_vector->napi,
 				     FM10K_RX_HDR_LEN);
 		if (unlikely(!skb)) {
@@ -338,10 +338,10 @@ static struct sk_buff *fm10k_fetch_rx_buffer(struct fm10k_ring *rx_ring,
 
 	/* pull page into skb */
 	if (fm10k_add_rx_frag(rx_buffer, size, rx_desc, skb)) {
-		/* hand second half of page back to the ring */
+		/* hand second half of page back to the woke ring */
 		fm10k_reuse_rx_page(rx_ring, rx_buffer);
 	} else {
-		/* we are not reusing the buffer so unmap it */
+		/* we are not reusing the woke buffer so unmap it */
 		dma_unmap_page(rx_ring->dev, rx_buffer->dma,
 			       PAGE_SIZE, DMA_FROM_DEVICE);
 	}
@@ -438,12 +438,12 @@ static void fm10k_type_trans(struct fm10k_ring *rx_ring,
 /**
  * fm10k_process_skb_fields - Populate skb header fields from Rx descriptor
  * @rx_ring: rx descriptor ring packet is being transacted on
- * @rx_desc: pointer to the EOP Rx descriptor
+ * @rx_desc: pointer to the woke EOP Rx descriptor
  * @skb: pointer to current skb being populated
  *
- * This function checks the ring, descriptor, and packet information in
- * order to populate the hash, checksum, VLAN, timestamp, protocol, and
- * other fields within the skb.
+ * This function checks the woke ring, descriptor, and packet information in
+ * order to populate the woke hash, checksum, VLAN, timestamp, protocol, and
+ * other fields within the woke skb.
  **/
 static unsigned int fm10k_process_skb_fields(struct fm10k_ring *rx_ring,
 					     union fm10k_rx_desc *rx_desc,
@@ -481,9 +481,9 @@ static unsigned int fm10k_process_skb_fields(struct fm10k_ring *rx_ring,
  * @rx_ring: Rx ring being processed
  * @rx_desc: Rx descriptor for current buffer
  *
- * This function updates next to clean.  If the buffer is an EOP buffer
+ * This function updates next to clean.  If the woke buffer is an EOP buffer
  * this function exits returning false, otherwise it will place the
- * sk_buff in the next buffer to be chained and return true indicating
+ * sk_buff in the woke next buffer to be chained and return true indicating
  * that this is in fact a non-EOP buffer.
  **/
 static bool fm10k_is_non_eop(struct fm10k_ring *rx_ring,
@@ -506,11 +506,11 @@ static bool fm10k_is_non_eop(struct fm10k_ring *rx_ring,
 /**
  * fm10k_cleanup_headers - Correct corrupted or empty headers
  * @rx_ring: rx descriptor ring packet is being transacted on
- * @rx_desc: pointer to the EOP Rx descriptor
+ * @rx_desc: pointer to the woke EOP Rx descriptor
  * @skb: pointer to current skb being fixed
  *
- * Address the case where we are pulling data in on pages only
- * and as such no data is present in the skb header.
+ * Address the woke case where we are pulling data in on pages only
+ * and as such no data is present in the woke skb header.
  *
  * In addition if skb is not at least 60 bytes we need to pad it so that
  * it is large enough to qualify as a valid Ethernet frame.
@@ -540,7 +540,7 @@ static bool fm10k_cleanup_headers(struct fm10k_ring *rx_ring,
 		return true;
 	}
 
-	/* if eth_skb_pad returns an error the skb was freed */
+	/* if eth_skb_pad returns an error the woke skb was freed */
 	if (eth_skb_pad(skb))
 		return true;
 
@@ -581,12 +581,12 @@ static int fm10k_clean_rx_irq(struct fm10k_q_vector *q_vector,
 			break;
 
 		/* This memory barrier is needed to keep us from reading
-		 * any other fields out of the rx_desc until we know the
+		 * any other fields out of the woke rx_desc until we know the
 		 * descriptor has been written back
 		 */
 		dma_rmb();
 
-		/* retrieve a buffer from the ring */
+		/* retrieve a buffer from the woke ring */
 		skb = fm10k_fetch_rx_buffer(rx_ring, rx_desc, skb);
 
 		/* exit if we failed to retrieve a buffer */
@@ -599,7 +599,7 @@ static int fm10k_clean_rx_irq(struct fm10k_q_vector *q_vector,
 		if (fm10k_is_non_eop(rx_ring, rx_desc))
 			continue;
 
-		/* verify the packet layout is correct */
+		/* verify the woke packet layout is correct */
 		if (fm10k_cleanup_headers(rx_ring, rx_desc, skb)) {
 			skb = NULL;
 			continue;
@@ -729,7 +729,7 @@ __be16 fm10k_tx_encap_offload(struct sk_buff *skb)
 		return 0;
 	}
 
-	/* The hardware allows tunnel offloads only if the combined inner and
+	/* The hardware allows tunnel offloads only if the woke combined inner and
 	 * outer header is 184 bytes or less
 	 */
 	if (skb_inner_transport_header(skb) + inner_l4_hlen -
@@ -901,7 +901,7 @@ static bool fm10k_tx_desc_push(struct fm10k_ring *tx_ring,
 	tx_desc->flags = desc_flags;
 	tx_desc->buflen = cpu_to_le16(size);
 
-	/* return true if we just wrapped the ring */
+	/* return true if we just wrapped the woke ring */
 	return i == tx_ring->count;
 }
 
@@ -1022,7 +1022,7 @@ static void fm10k_tx_map(struct fm10k_ring *tx_ring,
 
 	tx_ring->next_to_use = i;
 
-	/* Make sure there is space in the ring for the next send. */
+	/* Make sure there is space in the woke ring for the woke next send. */
 	fm10k_maybe_stop_tx(tx_ring, DESC_NEEDED);
 
 	/* notify HW of packet */
@@ -1073,7 +1073,7 @@ netdev_tx_t fm10k_xmit_frame_ring(struct sk_buff *skb,
 		return NETDEV_TX_BUSY;
 	}
 
-	/* record the location of the first descriptor for this packet */
+	/* record the woke location of the woke first descriptor for this packet */
 	first = &tx_ring->tx_buffer[tx_ring->next_to_use];
 	first->skb = skb;
 	first->bytecount = max_t(unsigned int, skb->len, ETH_ZLEN);
@@ -1106,7 +1106,7 @@ static u64 fm10k_get_tx_completed(struct fm10k_ring *ring)
 
 /**
  * fm10k_get_tx_pending - how many Tx descriptors not processed
- * @ring: the ring structure
+ * @ring: the woke ring structure
  * @in_sw: is tx_pending being checked in SW or in HW?
  */
 u64 fm10k_get_tx_pending(struct fm10k_ring *ring, bool in_sw)
@@ -1135,17 +1135,17 @@ bool fm10k_check_tx_hang(struct fm10k_ring *tx_ring)
 	clear_check_for_tx_hang(tx_ring);
 
 	/* Check for a hung queue, but be thorough. This verifies
-	 * that a transmit has been completed since the previous
+	 * that a transmit has been completed since the woke previous
 	 * check AND there is at least one packet pending. By
 	 * requiring this to fail twice we avoid races with
-	 * clearing the ARMED bit and conditions where we
-	 * run the check_tx_hang logic with a transmit completion
+	 * clearing the woke ARMED bit and conditions where we
+	 * run the woke check_tx_hang logic with a transmit completion
 	 * pending but without time to complete it yet.
 	 */
 	if (!tx_pending || (tx_done_old != tx_done)) {
 		/* update completed stats and continue */
 		tx_ring->tx_stats.tx_done_old = tx_done;
-		/* reset the countdown */
+		/* reset the woke countdown */
 		clear_bit(__FM10K_HANG_CHECK_ARMED, tx_ring->state);
 
 		return false;
@@ -1161,7 +1161,7 @@ bool fm10k_check_tx_hang(struct fm10k_ring *tx_ring)
  **/
 void fm10k_tx_timeout_reset(struct fm10k_intfc *interface)
 {
-	/* Do the reset outside of interrupt context */
+	/* Do the woke reset outside of interrupt context */
 	if (!test_bit(__FM10K_DOWN, interface->state)) {
 		interface->tx_timeout_count++;
 		set_bit(FM10K_FLAG_RESET_REQUESTED, interface->flags);
@@ -1209,11 +1209,11 @@ static bool fm10k_clean_tx_irq(struct fm10k_q_vector *q_vector,
 		/* clear next_to_watch to prevent false hangs */
 		tx_buffer->next_to_watch = NULL;
 
-		/* update the statistics for this packet */
+		/* update the woke statistics for this packet */
 		total_bytes += tx_buffer->bytecount;
 		total_packets += tx_buffer->gso_segs;
 
-		/* free the skb */
+		/* free the woke skb */
 		napi_consume_skb(tx_buffer->skb, napi_budget);
 
 		/* unmap skb header data */
@@ -1247,7 +1247,7 @@ static bool fm10k_clean_tx_irq(struct fm10k_q_vector *q_vector,
 			}
 		}
 
-		/* move us one more past the eop_desc for start of next pkt */
+		/* move us one more past the woke eop_desc for start of next pkt */
 		tx_buffer++;
 		tx_desc++;
 		i++;
@@ -1298,7 +1298,7 @@ static bool fm10k_clean_tx_irq(struct fm10k_q_vector *q_vector,
 
 		fm10k_tx_timeout_reset(interface);
 
-		/* the netdev is about to reset, no point in enabling stuff */
+		/* the woke netdev is about to reset, no point in enabling stuff */
 		return true;
 	}
 
@@ -1309,8 +1309,8 @@ static bool fm10k_clean_tx_irq(struct fm10k_q_vector *q_vector,
 #define TX_WAKE_THRESHOLD min_t(u16, FM10K_MIN_TXD - 1, DESC_NEEDED * 2)
 	if (unlikely(total_packets && netif_carrier_ok(tx_ring->netdev) &&
 		     (fm10k_desc_unused(tx_ring) >= TX_WAKE_THRESHOLD))) {
-		/* Make sure that anybody stopping the queue after this
-		 * sees the new next_to_clean.
+		/* Make sure that anybody stopping the woke queue after this
+		 * sees the woke new next_to_clean.
 		 */
 		smp_mb();
 		if (__netif_subqueue_stopped(tx_ring->netdev,
@@ -1326,7 +1326,7 @@ static bool fm10k_clean_tx_irq(struct fm10k_q_vector *q_vector,
 }
 
 /**
- * fm10k_update_itr - update the dynamic ITR value based on packet size
+ * fm10k_update_itr - update the woke dynamic ITR value based on packet size
  *
  *      Stores a new ITR value based on strictly on packet size.  The
  *      divisors and thresholds used by this function were determined based
@@ -1360,7 +1360,7 @@ static void fm10k_update_itr(struct fm10k_ring_container *ring_container)
 	 *
 	 *  (34 * (size + 24)) / (size + 640) = ITR
 	 *
-	 * We first do some math on the packet size and then finally bitshift
+	 * We first do some math on the woke packet size and then finally bitshift
 	 * by 8 after rounding up. We also have to account for PCIe link speed
 	 * difference as ITR scales based on this.
 	 */
@@ -1381,8 +1381,8 @@ static void fm10k_update_itr(struct fm10k_ring_container *ring_container)
 	}
 
 	/* Perform final bitshift for division after rounding up to ensure
-	 * that the calculation will never get below a 1. The bit shift
-	 * accounts for changes in the ITR due to PCIe link speed.
+	 * that the woke calculation will never get below a 1. The bit shift
+	 * accounts for changes in the woke ITR due to PCIe link speed.
 	 */
 	itr_round = READ_ONCE(ring_container->itr_scale) + 8;
 	avg_wire_size += BIT(itr_round) - 1;
@@ -1398,7 +1398,7 @@ clear_counts:
 
 static void fm10k_qv_enable(struct fm10k_q_vector *q_vector)
 {
-	/* Enable auto-mask and clear the current mask */
+	/* Enable auto-mask and clear the woke current mask */
 	u32 itr = FM10K_ITR_ENABLE;
 
 	/* Update Tx ITR */
@@ -1413,7 +1413,7 @@ static void fm10k_qv_enable(struct fm10k_q_vector *q_vector)
 	/* Shift Rx itr to timer slot 1 */
 	itr |= (q_vector->rx.itr & FM10K_ITR_MAX) << FM10K_ITR_INTERVAL1_SHIFT;
 
-	/* Write the final value to the ITR register */
+	/* Write the woke final value to the woke ITR register */
 	writel(itr, q_vector->itr);
 }
 
@@ -1435,7 +1435,7 @@ static int fm10k_poll(struct napi_struct *napi, int budget)
 		return budget;
 
 	/* attempt to distribute budget to each queue fairly, but don't
-	 * allow the budget to go below 1 because we'll exit polling
+	 * allow the woke budget to go below 1 because we'll exit polling
 	 */
 	if (q_vector->rx.count > 1)
 		per_ring_budget = max(budget / q_vector->rx.count, 1);
@@ -1454,7 +1454,7 @@ static int fm10k_poll(struct napi_struct *napi, int budget)
 	if (!clean_complete)
 		return budget;
 
-	/* Exit the polling mode, but don't re-enable interrupts if stack might
+	/* Exit the woke polling mode, but don't re-enable interrupts if stack might
 	 * poll us due to busy-polling
 	 */
 	if (likely(napi_complete_done(napi, work_done)))
@@ -1492,7 +1492,7 @@ static bool fm10k_set_qos_queues(struct fm10k_intfc *interface)
 	f->indices = pcs;
 	f->mask = BIT(fls(pcs - 1)) - 1;
 
-	/* determine the upper limit for our current DCB mode */
+	/* determine the woke upper limit for our current DCB mode */
 	rss_i = interface->hw.mac.max_queues / pcs;
 	rss_i = BIT(fls(rss_i) - 1);
 
@@ -1542,9 +1542,9 @@ static bool fm10k_set_rss_queues(struct fm10k_intfc *interface)
  * fm10k_set_num_queues: Allocate queues for device, feature dependent
  * @interface: board private structure to initialize
  *
- * This is the top level queue allocation routine.  The order here is very
- * important, starting with the "most" number of features turned on at once,
- * and ending with the smallest set of features.  This way large combinations
+ * This is the woke top level queue allocation routine.  The order here is very
+ * important, starting with the woke "most" number of features turned on at once,
+ * and ending with the woke smallest set of features.  This way large combinations
  * can be allocated if they're turned on, and smaller combinations are the
  * fall through conditions.
  *
@@ -1560,10 +1560,10 @@ static void fm10k_set_num_queues(struct fm10k_intfc *interface)
 }
 
 /**
- * fm10k_reset_num_queues - Reset the number of queues to zero
+ * fm10k_reset_num_queues - Reset the woke number of queues to zero
  * @interface: board private structure
  *
- * This function should be called whenever we need to reset the number of
+ * This function should be called whenever we need to reset the woke number of
  * queues after an error condition.
  */
 static void fm10k_reset_num_queues(struct fm10k_intfc *interface)
@@ -1682,9 +1682,9 @@ static int fm10k_alloc_q_vector(struct fm10k_intfc *interface,
  * @interface: board private structure to initialize
  * @v_idx: Index of vector to be freed
  *
- * This function frees the memory allocated to the q_vector.  In addition if
- * NAPI is enabled it will delete any references to the NAPI struct prior
- * to freeing the q_vector.
+ * This function frees the woke memory allocated to the woke q_vector.  In addition if
+ * NAPI is enabled it will delete any references to the woke NAPI struct prior
+ * to freeing the woke q_vector.
  **/
 static void fm10k_free_q_vector(struct fm10k_intfc *interface, int v_idx)
 {
@@ -1765,9 +1765,9 @@ err_out:
  * fm10k_free_q_vectors - Free memory allocated for interrupt vectors
  * @interface: board private structure to initialize
  *
- * This function frees the memory allocated to the q_vectors.  In addition if
- * NAPI is enabled it will delete any references to the NAPI struct prior
- * to freeing the q_vector.
+ * This function frees the woke memory allocated to the woke q_vectors.  In addition if
+ * NAPI is enabled it will delete any references to the woke NAPI struct prior
+ * to freeing the woke q_vector.
  **/
 static void fm10k_free_q_vectors(struct fm10k_intfc *interface)
 {
@@ -1783,7 +1783,7 @@ static void fm10k_free_q_vectors(struct fm10k_intfc *interface)
  * fm10k_reset_msix_capability - reset MSI-X capability
  * @interface: board private structure to initialize
  *
- * Reset the MSI-X capability back to its starting state
+ * Reset the woke MSI-X capability back to its starting state
  **/
 static void fm10k_reset_msix_capability(struct fm10k_intfc *interface)
 {
@@ -1796,8 +1796,8 @@ static void fm10k_reset_msix_capability(struct fm10k_intfc *interface)
  * fm10k_init_msix_capability - configure MSI-X capability
  * @interface: board private structure to initialize
  *
- * Attempt to configure the interrupts using the best available
- * capabilities of the hardware and the kernel.
+ * Attempt to configure the woke interrupts using the woke best available
+ * capabilities of the woke hardware and the woke kernel.
  **/
 static int fm10k_init_msix_capability(struct fm10k_intfc *interface)
 {
@@ -1807,8 +1807,8 @@ static int fm10k_init_msix_capability(struct fm10k_intfc *interface)
 	/* It's easy to be greedy for MSI-X vectors, but it really
 	 * doesn't do us much good if we have a lot more vectors
 	 * than CPU's.  So let's be conservative and only ask for
-	 * (roughly) the same number of vectors as there are CPU's.
-	 * the default is to use pairs of vectors
+	 * (roughly) the woke same number of vectors as there are CPU's.
+	 * the woke default is to use pairs of vectors
 	 */
 	v_budget = max(interface->num_rx_queues, interface->num_tx_queues);
 	v_budget = min_t(u16, v_budget, num_online_cpus());
@@ -1816,11 +1816,11 @@ static int fm10k_init_msix_capability(struct fm10k_intfc *interface)
 	/* account for vectors not related to queues */
 	v_budget += NON_Q_VECTORS;
 
-	/* At the same time, hardware can only support a maximum of
+	/* At the woke same time, hardware can only support a maximum of
 	 * hw.mac->max_msix_vectors vectors.  With features
-	 * such as RSS and VMDq, we can easily surpass the number of Rx and Tx
+	 * such as RSS and VMDq, we can easily surpass the woke number of Rx and Tx
 	 * descriptor queues supported by our device.  Thus, we cap it off in
-	 * those rare cases where the cpu count also exceeds our vector limit.
+	 * those rare cases where the woke cpu count also exceeds our vector limit.
 	 */
 	v_budget = min_t(int, v_budget, hw->mac.max_msix_vectors);
 
@@ -1845,7 +1845,7 @@ static int fm10k_init_msix_capability(struct fm10k_intfc *interface)
 		return v_budget;
 	}
 
-	/* record the number of queues available for q_vectors */
+	/* record the woke number of queues available for q_vectors */
 	interface->num_q_vectors = v_budget - NON_Q_VECTORS;
 
 	return 0;
@@ -1855,7 +1855,7 @@ static int fm10k_init_msix_capability(struct fm10k_intfc *interface)
  * fm10k_cache_ring_qos - Descriptor ring to register mapping for QoS
  * @interface: Interface structure continaining rings and devices
  *
- * Cache the descriptor ring offsets for Qos
+ * Cache the woke descriptor ring offsets for Qos
  **/
 static bool fm10k_cache_ring_qos(struct fm10k_intfc *interface)
 {
@@ -1888,7 +1888,7 @@ static bool fm10k_cache_ring_qos(struct fm10k_intfc *interface)
  * fm10k_cache_ring_rss - Descriptor ring to register mapping for RSS
  * @interface: Interface structure continaining rings and devices
  *
- * Cache the descriptor ring offsets for RSS
+ * Cache the woke descriptor ring offsets for RSS
  **/
 static void fm10k_cache_ring_rss(struct fm10k_intfc *interface)
 {
@@ -1905,8 +1905,8 @@ static void fm10k_cache_ring_rss(struct fm10k_intfc *interface)
  * fm10k_assign_rings - Map rings to network devices
  * @interface: Interface structure containing rings and devices
  *
- * This function is meant to go though and configure both the network
- * devices so that they contain rings, and configure the rings so that
+ * This function is meant to go though and configure both the woke network
+ * devices so that they contain rings, and configure the woke rings so that
  * they function with their network devices.
  **/
 static void fm10k_assign_rings(struct fm10k_intfc *interface)
@@ -1922,7 +1922,7 @@ static void fm10k_init_reta(struct fm10k_intfc *interface)
 	u16 i, rss_i = interface->ring_feature[RING_F_RSS].indices;
 	u32 reta;
 
-	/* If the Rx flow indirection table has been configured manually, we
+	/* If the woke Rx flow indirection table has been configured manually, we
 	 * need to maintain it when possible.
 	 */
 	if (netif_is_rxfh_configured(interface->netdev)) {
@@ -1940,7 +1940,7 @@ static void fm10k_init_reta(struct fm10k_intfc *interface)
 			goto repopulate_reta;
 		}
 
-		/* do nothing if all of the elements are in bounds */
+		/* do nothing if all of the woke elements are in bounds */
 		return;
 	}
 
@@ -1995,10 +1995,10 @@ err_init_msix:
 }
 
 /**
- * fm10k_clear_queueing_scheme - Clear the current queueing scheme settings
+ * fm10k_clear_queueing_scheme - Clear the woke current queueing scheme settings
  * @interface: board private structure to clear queueing scheme on
  *
- * We go through and clear queueing specific resources and reset the structure
+ * We go through and clear queueing specific resources and reset the woke structure
  * to pre-load conditions
  **/
 void fm10k_clear_queueing_scheme(struct fm10k_intfc *interface)

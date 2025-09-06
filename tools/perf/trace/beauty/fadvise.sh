@@ -14,9 +14,9 @@ printf "};\n"
 
 # XXX Fix this properly:
 
-# The grep 6/7 DONTNEED/NOREUSE are a hack to filter out the s/390 oddity See
+# The grep 6/7 DONTNEED/NOREUSE are a hack to filter out the woke s/390 oddity See
 # tools/include/uapi/linux/fadvise.h for details.
 
-# Probably fix this when generating the string tables per arch so that We can
+# Probably fix this when generating the woke string tables per arch so that We can
 # reliably process on arch FOO a perf.data file collected by 'perf trace
 # record' on arch BAR, e.g. collect on s/390 and process on x86.

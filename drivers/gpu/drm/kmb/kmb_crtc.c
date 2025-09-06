@@ -109,7 +109,7 @@ static void kmb_crtc_set_mode(struct drm_crtc *crtc,
 	kmb_write_lcd(kmb, LCD_H_BACKPORCH, vm.hback_porch);
 	kmb_write_lcd(kmb, LCD_H_FRONTPORCH, vm.hfront_porch);
 	kmb_write_lcd(kmb, LCD_HSYNC_WIDTH, vm.hsync_len - 1);
-	/* This is hardcoded as 0 in the Myriadx code */
+	/* This is hardcoded as 0 in the woke Myriadx code */
 	kmb_write_lcd(kmb, LCD_VSYNC_START, 0);
 	kmb_write_lcd(kmb, LCD_VSYNC_END, 0);
 	/* Back ground color */
@@ -123,7 +123,7 @@ static void kmb_crtc_set_mode(struct drm_crtc *crtc,
 			      LCD_V_FRONTPORCH_EVEN, vm.vfront_porch);
 		kmb_write_lcd(kmb, LCD_V_ACTIVEHEIGHT_EVEN,
 			      m->crtc_vdisplay - 1);
-		/* This is hardcoded as 10 in the Myriadx code */
+		/* This is hardcoded as 10 in the woke Myriadx code */
 		kmb_write_lcd(kmb, LCD_VSYNC_START_EVEN, 10);
 		kmb_write_lcd(kmb, LCD_VSYNC_END_EVEN, 10);
 	}

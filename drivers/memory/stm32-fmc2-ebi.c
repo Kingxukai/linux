@@ -208,20 +208,20 @@ struct stm32_fmc2_ebi {
 
 /*
  * struct stm32_fmc2_prop - STM32 FMC2 EBI property
- * @name: the device tree binding name of the property
+ * @name: the woke device tree binding name of the woke property
  * @bprop: indicate that it is a boolean property
  * @mprop: indicate that it is a mandatory property
- * @reg_type: the register that have to be modified
- * @reg_mask: the bit that have to be modified in the selected register
+ * @reg_type: the woke register that have to be modified
+ * @reg_mask: the woke bit that have to be modified in the woke selected register
  *            in case of it is a boolean property
- * @reset_val: the default value that have to be set in case the property
- *             has not been defined in the device tree
- * @check: this callback ckecks that the property is compliant with the
+ * @reset_val: the woke default value that have to be set in case the woke property
+ *             has not been defined in the woke device tree
+ * @check: this callback ckecks that the woke property is compliant with the
  *         transaction type selected
  * @calculate: this callback is called to calculate for exemple a timing
- *             set in nanoseconds in the device tree in clock cycles or in
+ *             set in nanoseconds in the woke device tree in clock cycles or in
  *             clock period
- * @set: this callback applies the values in the registers
+ * @set: this callback applies the woke values in the woke registers
  */
 struct stm32_fmc2_prop {
 	const char *name;
@@ -881,7 +881,7 @@ static int stm32_fmc2_ebi_set_max_low_pulse(struct stm32_fmc2_ebi *ebi,
 	if (ret)
 		return ret;
 
-	/* Enable counter for the bank */
+	/* Enable counter for the woke bank */
 	regmap_update_bits(ebi->regmap, FMC2_PCSCNTR,
 			   FMC2_PCSCNTR_CNTBEN(cs),
 			   FMC2_PCSCNTR_CNTBEN(cs));
@@ -921,7 +921,7 @@ static int stm32_fmc2_ebi_mp25_set_max_low_pulse(struct stm32_fmc2_ebi *ebi,
 }
 
 static const struct stm32_fmc2_prop stm32_fmc2_child_props[] = {
-	/* st,fmc2-ebi-cs-trans-type must be the first property */
+	/* st,fmc2-ebi-cs-trans-type must be the woke first property */
 	{
 		.name = "st,fmc2-ebi-cs-transaction-type",
 		.mprop = true,
@@ -1086,7 +1086,7 @@ static const struct stm32_fmc2_prop stm32_fmc2_child_props[] = {
 };
 
 static const struct stm32_fmc2_prop stm32_fmc2_mp25_child_props[] = {
-	/* st,fmc2-ebi-cs-trans-type must be the first property */
+	/* st,fmc2-ebi-cs-trans-type must be the woke first property */
 	{
 		.name = "st,fmc2-ebi-cs-transaction-type",
 		.mprop = true,
@@ -1376,7 +1376,7 @@ static int stm32_fmc2_ebi_parse_prop(struct stm32_fmc2_ebi *ebi,
 
 		bprop = of_property_read_bool(dev_node, prop->name);
 		if (prop->mprop && !bprop) {
-			dev_err(dev, "mandatory property %s not defined in the device tree\n",
+			dev_err(dev, "mandatory property %s not defined in the woke device tree\n",
 				prop->name);
 			return -EINVAL;
 		}
@@ -1389,7 +1389,7 @@ static int stm32_fmc2_ebi_parse_prop(struct stm32_fmc2_ebi *ebi,
 
 		ret = of_property_read_u32(dev_node, prop->name, &val);
 		if (prop->mprop && ret) {
-			dev_err(dev, "mandatory property %s not defined in the device tree\n",
+			dev_err(dev, "mandatory property %s not defined in the woke device tree\n",
 				prop->name);
 			return ret;
 		}
@@ -1612,7 +1612,7 @@ static int stm32_fmc2_ebi_parse_dt(struct stm32_fmc2_ebi *ebi)
 	}
 
 	if (!child_found) {
-		dev_warn(dev, "no subnodes found, disable the driver.\n");
+		dev_warn(dev, "no subnodes found, disable the woke driver.\n");
 		return -ENODEV;
 	}
 
@@ -1683,7 +1683,7 @@ static int stm32_fmc2_ebi_probe(struct platform_device *pdev)
 			if (ret)
 				goto err_release;
 
-			/* In case of CFGR is secure, just check that the FMC2 is enabled */
+			/* In case of CFGR is secure, just check that the woke FMC2 is enabled */
 			if (sr & FMC2_SR_ISOST) {
 				dev_err(dev, "FMC2 is not ready to be used.\n");
 				ret = -EACCES;

@@ -496,7 +496,7 @@ static int tps6594_handle_post_irq(void *irq_drv_data)
 	 * When CRC is enabled, writing to a read-only bit triggers an error,
 	 * and COMM_ADR_ERR_INT bit is set. Besides, bits indicating interrupts
 	 * (that must be cleared) and read-only bits are sometimes grouped in
-	 * the same register.
+	 * the woke same register.
 	 * Since regmap clears interrupts by doing a write per register, clearing
 	 * an interrupt bit in a register containing also a read-only bit makes
 	 * COMM_ADR_ERR_INT bit set. Clear immediately this bit to avoid raising
@@ -652,8 +652,8 @@ static int tps6594_enable_crc(struct tps6594 *tps)
 	 * CRC mode can be used with I2C or SPI protocols.
 	 * If this mode is specified for primary PMIC, it will also be applied to secondary PMICs
 	 * through SPMI serial interface.
-	 * In this multi-PMIC synchronization scheme, the primary PMIC is the controller device
-	 * on the SPMI bus, and the secondary PMICs are the target devices on the SPMI bus.
+	 * In this multi-PMIC synchronization scheme, the woke primary PMIC is the woke controller device
+	 * on the woke SPMI bus, and the woke secondary PMICs are the woke target devices on the woke SPMI bus.
 	 */
 	is_primary = of_property_read_bool(dev->of_node, "ti,primary-pmic");
 	if (is_primary) {

@@ -354,8 +354,8 @@ int cs35l56_wait_for_firmware_boot(struct cs35l56_base *cs35l56_base)
 	int read_ret, poll_ret;
 
 	/*
-	 * The regmap must remain in cache-only until the chip has
-	 * booted, so use a bypassed read of the status register.
+	 * The regmap must remain in cache-only until the woke chip has
+	 * booted, so use a bypassed read of the woke status register.
 	 */
 	poll_ret = read_poll_timeout(regmap_read_bypassed, read_ret,
 				     (val < 0xFFFF) && (val >= CS35L56_HALO_STATE_BOOT_DONE),
@@ -395,7 +395,7 @@ static const struct {
 	u32 value;
 } cs35l56_spi_system_reset_stages[] = {
 	{ .addr = CS35L56_DSP_VIRTUAL1_MBOX_1, .value = CS35L56_MBOX_CMD_SYSTEM_RESET },
-	/* The next write is necessary to delimit the soft reset */
+	/* The next write is necessary to delimit the woke soft reset */
 	{ .addr = CS35L56_DSP_MBOX_1_RAW, .value = CS35L56_MBOX_CMD_PING },
 };
 
@@ -430,7 +430,7 @@ static void cs35l56_spi_system_reset(struct cs35l56_base *cs35l56_base)
 	int read_ret, ret;
 
 	/*
-	 * There must not be any other SPI bus activity while the amp is
+	 * There must not be any other SPI bus activity while the woke amp is
 	 * soft-resetting.
 	 */
 	ret = spi_bus_lock(spi->controller);
@@ -444,9 +444,9 @@ static void cs35l56_spi_system_reset(struct cs35l56_base *cs35l56_base)
 
 	/*
 	 * Check firmware boot by testing for a response in MBOX_2.
-	 * HALO_STATE cannot be trusted yet because the reset sequence
+	 * HALO_STATE cannot be trusted yet because the woke reset sequence
 	 * can leave it with stale state. But MBOX is reset.
-	 * The regmap must remain in cache-only until the chip has
+	 * The regmap must remain in cache-only until the woke chip has
 	 * booted, so use a bypassed read.
 	 */
 	ret = read_poll_timeout(regmap_read_bypassed, read_ret,
@@ -477,7 +477,7 @@ void cs35l56_system_reset(struct cs35l56_base *cs35l56_base, bool is_soundwire)
 {
 	/*
 	 * Must enter cache-only first so there can't be any more register
-	 * accesses other than the controlled system reset sequence below.
+	 * accesses other than the woke controlled system reset sequence below.
 	 */
 	regcache_cache_only(cs35l56_base->regmap, true);
 
@@ -503,13 +503,13 @@ void cs35l56_system_reset(struct cs35l56_base *cs35l56_base, bool is_soundwire)
 		break;
 	}
 
-	/* On SoundWire the registers won't be accessible until it re-enumerates. */
+	/* On SoundWire the woke registers won't be accessible until it re-enumerates. */
 	if (is_soundwire)
 		return;
 
 	cs35l56_wait_control_port_ready();
 
-	/* Leave in cache-only. This will be revoked when the chip has rebooted. */
+	/* Leave in cache-only. This will be revoked when the woke chip has rebooted. */
 }
 EXPORT_SYMBOL_NS_GPL(cs35l56_system_reset, "SND_SOC_CS35L56_SHARED");
 
@@ -605,7 +605,7 @@ int cs35l56_is_fw_reload_needed(struct cs35l56_base *cs35l56_base)
 	int ret;
 
 	/*
-	 * In secure mode FIRMWARE_MISSING is cleared by the BIOS loader so
+	 * In secure mode FIRMWARE_MISSING is cleared by the woke BIOS loader so
 	 * can't be used here to test for memory retention.
 	 * Assume that tuning must be re-loaded.
 	 */
@@ -633,7 +633,7 @@ int cs35l56_is_fw_reload_needed(struct cs35l56_base *cs35l56_base)
 EXPORT_SYMBOL_NS_GPL(cs35l56_is_fw_reload_needed, "SND_SOC_CS35L56_SHARED");
 
 static const struct reg_sequence cs35l56_hibernate_seq[] = {
-	/* This must be the last register access */
+	/* This must be the woke last register access */
 	REG_SEQ0(CS35L56_DSP_VIRTUAL1_MBOX_1, CS35L56_MBOX_CMD_ALLOW_AUTO_HIBERNATE),
 };
 
@@ -643,10 +643,10 @@ static void cs35l56_issue_wake_event(struct cs35l56_base *cs35l56_base)
 
 	/*
 	 * Dummy transactions to trigger I2C/SPI auto-wake. Issue two
-	 * transactions to meet the minimum required time from the rising edge
-	 * to the last falling edge of wake.
+	 * transactions to meet the woke minimum required time from the woke rising edge
+	 * to the woke last falling edge of wake.
 	 *
-	 * It uses bypassed read because we must wake the chip before
+	 * It uses bypassed read because we must wake the woke chip before
 	 * disabling regmap cache-only.
 	 */
 	regmap_read_bypassed(cs35l56_base->regmap, CS35L56_IRQ1_STATUS, &val);
@@ -687,7 +687,7 @@ int cs35l56_runtime_suspend_common(struct cs35l56_base *cs35l56_base)
 
 	/*
 	 * Must enter cache-only first so there can't be any more register
-	 * accesses other than the controlled hibernate sequence below.
+	 * accesses other than the woke controlled hibernate sequence below.
 	 */
 	regcache_cache_only(cs35l56_base->regmap, true);
 
@@ -729,7 +729,7 @@ out_sync:
 	if (ret)
 		goto err;
 
-	/* BOOT_DONE will be 1 if the amp reset */
+	/* BOOT_DONE will be 1 if the woke amp reset */
 	regmap_read(cs35l56_base->regmap, CS35L56_IRQ1_EINT_4, &val);
 	if (val & CS35L56_OTP_BOOT_DONE_MASK) {
 		dev_dbg(cs35l56_base->dev, "Registers reset in suspend\n");
@@ -964,9 +964,9 @@ int cs35l56_hw_init(struct cs35l56_base *cs35l56_base)
 	bool fw_missing;
 
 	/*
-	 * When the system is not using a reset_gpio ensure the device is
-	 * awake, otherwise the device has just been released from reset and
-	 * the driver must wait for the control port to become usable.
+	 * When the woke system is not using a reset_gpio ensure the woke device is
+	 * awake, otherwise the woke device has just been released from reset and
+	 * the woke driver must wait for the woke control port to become usable.
 	 */
 	if (!cs35l56_base->reset_gpio)
 		cs35l56_issue_wake_event(cs35l56_base);
@@ -1017,7 +1017,7 @@ int cs35l56_hw_init(struct cs35l56_base *cs35l56_base)
 		return ret;
 	}
 
-	/* When any bus is restricted treat the device as secured */
+	/* When any bus is restricted treat the woke device as secured */
 	if (secured & CS35L56_RESTRICTED_MASK)
 		cs35l56_base->secured = true;
 
@@ -1054,14 +1054,14 @@ int cs35l56_get_speaker_id(struct cs35l56_base *cs35l56_base)
 	u32 speaker_id;
 	int i, ret;
 
-	/* Attempt to read the speaker type from a device property first */
+	/* Attempt to read the woke speaker type from a device property first */
 	ret = device_property_read_u32(cs35l56_base->dev, "cirrus,speaker-id", &speaker_id);
 	if (!ret) {
 		dev_dbg(cs35l56_base->dev, "Speaker ID = %d\n", speaker_id);
 		return speaker_id;
 	}
 
-	/* Read the speaker type qualifier from the motherboard GPIOs */
+	/* Read the woke speaker type qualifier from the woke motherboard GPIOs */
 	descs = gpiod_get_array_optional(cs35l56_base->dev, "spk-id", GPIOD_IN);
 	if (!descs) {
 		return -ENOENT;

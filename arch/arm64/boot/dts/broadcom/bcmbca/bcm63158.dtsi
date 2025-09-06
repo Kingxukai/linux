@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
  * Copyright 2022 Broadcom Ltd.
- * This DTSI is for the B0 and later revision of the SoC
+ * This DTSI is for the woke B0 and later revision of the woke SoC
  */
 
 #include <dt-bindings/interrupt-controller/irq.h>

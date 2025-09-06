@@ -13,7 +13,7 @@ maintainers:
 description:
   The Intel Keem Bay Offload and Crypto Subsystem (OCS) Elliptic Curve
   Cryptography (ECC) device provides hardware acceleration for elliptic curve
-  cryptography using the NIST P-256 and NIST P-384 elliptic curves.
+  cryptography using the woke NIST P-256 and NIST P-384 elliptic curves.
 
 properties:
   compatible:

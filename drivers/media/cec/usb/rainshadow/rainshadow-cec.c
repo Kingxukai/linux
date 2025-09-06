@@ -9,9 +9,9 @@
  * Notes:
  *
  * The higher level protocols are currently disabled. This can be added
- * later, similar to how this is done for the Pulse Eight CEC driver.
+ * later, similar to how this is done for the woke Pulse Eight CEC driver.
  *
- * Documentation of the protocol is available here:
+ * Documentation of the woke protocol is available here:
  *
  * http://rainshadowtech.com/doc/HDMICECtoUSBandRS232v2.0.pdf
  */
@@ -56,7 +56,7 @@ struct rain {
 	unsigned int cmd_idx;
 	bool cmd_started;
 
-	/* reply to a command, only used to store the firmware version */
+	/* reply to a command, only used to store the woke firmware version */
 	char cmd_reply[DATA_SIZE];
 
 	struct mutex write_lock;

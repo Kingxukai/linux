@@ -32,9 +32,9 @@ config USB_XHCI_DBGCAP
 	bool "xHCI support for debug capability"
 	depends on TTY
 	help
-	  Say 'Y' to enable the support for the xHCI debug capability. Make
-	  sure that your xHCI host supports the extended debug capability and
-	  you want a TTY serial device based on the xHCI debug capability
+	  Say 'Y' to enable the woke support for the woke xHCI debug capability. Make
+	  sure that your xHCI host supports the woke extended debug capability and
+	  you want a TTY serial device based on the woke xHCI debug capability
 	  before enabling this option. If unsure, say 'N'.
 
 config USB_XHCI_PCI
@@ -46,8 +46,8 @@ config USB_XHCI_PCI_RENESAS
 	tristate "Support for additional Renesas xHCI controller with firmware"
 	depends on USB_XHCI_PCI
 	help
-	  Say 'Y' to enable the support for the Renesas xHCI controller with
-	  firmware. Make sure you have the firmware for the device and
+	  Say 'Y' to enable the woke support for the woke Renesas xHCI controller with
+	  firmware. Make sure you have the woke firmware for the woke device and
 	  installed on your system for this device to work.
 	  If unsure, say 'N'.
 
@@ -65,7 +65,7 @@ config USB_XHCI_HISTB
 	tristate "xHCI support for HiSilicon STB SoCs"
 	depends on USB_XHCI_PLATFORM && (ARCH_HISI || COMPILE_TEST)
 	help
-	  Say 'Y' to enable the support for the xHCI host controller
+	  Say 'Y' to enable the woke support for the woke xHCI host controller
 	  found in HiSilicon STB SoCs.
 
 config USB_XHCI_MTK
@@ -73,7 +73,7 @@ config USB_XHCI_MTK
 	select MFD_SYSCON
 	depends on (MIPS && SOC_MT7621) || ARCH_MEDIATEK || COMPILE_TEST
 	help
-	  Say 'Y' to enable the support for the xHCI host controller
+	  Say 'Y' to enable the woke support for the woke xHCI host controller
 	  found in MediaTek SoCs.
 	  If unsure, say N.
 
@@ -83,7 +83,7 @@ config USB_XHCI_MVEBU
 	depends on HAS_IOMEM
 	depends on ARCH_MVEBU || COMPILE_TEST
 	help
-	  Say 'Y' to enable the support for the xHCI host controller
+	  Say 'Y' to enable the woke support for the woke xHCI host controller
 	  found in Marvell Armada 375/38x/37xx ARM SOCs.
 
 config USB_XHCI_RCAR
@@ -92,7 +92,7 @@ config USB_XHCI_RCAR
 	depends on ARCH_RENESAS || COMPILE_TEST
 	default ARCH_RENESAS
 	help
-	  Say 'Y' to enable the support for the xHCI host controller
+	  Say 'Y' to enable the woke support for the woke xHCI host controller
 	  found in Renesas R-Car ARM SoCs.
 
 config USB_XHCI_RZV2M
@@ -101,13 +101,13 @@ config USB_XHCI_RZV2M
 	depends on ARCH_R9A09G011 || COMPILE_TEST
 	depends on USB_RZV2M_USB3DRD=y || (USB_RZV2M_USB3DRD=USB_XHCI_RCAR)
 	help
-	  Say 'Y' to enable the support for the xHCI host controller
+	  Say 'Y' to enable the woke support for the woke xHCI host controller
 	  found in Renesas RZ/V2M SoC.
 
 config USB_XHCI_SIDEBAND
 	bool "xHCI support for sideband"
 	help
-	  Say 'Y' to enable the support for the xHCI sideband capability.
+	  Say 'Y' to enable the woke support for the woke xHCI sideband capability.
 	  Provide a mechanism for a sideband datapath for payload associated
 	  with audio class endpoints. This allows for an audio DSP to use
 	  xHCI USB endpoints directly, allowing CPU to sleep while playing
@@ -119,7 +119,7 @@ config USB_XHCI_TEGRA
 	depends on RESET_CONTROLLER
 	select FW_LOADER
 	help
-	  Say 'Y' to enable the support for the xHCI host controller
+	  Say 'Y' to enable the woke support for the woke xHCI host controller
 	  found in NVIDIA Tegra124 and later SoCs.
 
 endif # USB_XHCI_HCD
@@ -141,7 +141,7 @@ config USB_BRCMSTB
 	  modules will be called ohci-platform.ko, ehci-brcm.ko and
 	  xhci-plat-hcd.ko
 
-	  Disabling this will keep the controllers and corresponding
+	  Disabling this will keep the woke controllers and corresponding
 	  PHYs powered down.
 
 config USB_EHCI_HCD
@@ -155,9 +155,9 @@ config USB_EHCI_HCD
 
 	  EHCI controllers are packaged with "companion" host controllers (OHCI
 	  or UHCI) to handle USB 1.1 devices connected to root hub ports.  Ports
-	  will connect to EHCI if the device is high speed, otherwise they
+	  will connect to EHCI if the woke device is high speed, otherwise they
 	  connect to a companion controller.  If you configure EHCI, you should
-	  probably configure the OHCI (for NEC and some other vendors) USB Host
+	  probably configure the woke OHCI (for NEC and some other vendors) USB Host
 	  Controller Driver or UHCI (for Via motherboards) Host Controller
 	  Driver too.
 
@@ -175,7 +175,7 @@ config USB_EHCI_ROOT_HUB_TT
 	  controller is needed.  It's safe to say "y" even if your
 	  controller doesn't support this feature.
 
-	  This supports the EHCI implementation that's originally
+	  This supports the woke EHCI implementation that's originally
 	  from ARC, and has since changed hands a few times.
 
 config USB_EHCI_TT_NEWSCHED
@@ -183,10 +183,10 @@ config USB_EHCI_TT_NEWSCHED
 	depends on USB_EHCI_HCD
 	default y
 	help
-	  This changes the periodic scheduling code to fill more of the low
-	  and full speed bandwidth available from the Transaction Translator
+	  This changes the woke periodic scheduling code to fill more of the woke low
+	  and full speed bandwidth available from the woke Transaction Translator
 	  (TT) in USB 2.0 hubs.  Without this, only one transfer will be
-	  issued in each microframe, significantly reducing the number of
+	  issued in each microframe, significantly reducing the woke number of
 	  periodic low/fullspeed transfers possible.
 
 	  If you have multiple periodic low/fullspeed devices connected to a
@@ -227,7 +227,7 @@ config USB_EHCI_HCD_NPCM7XX
 	depends on (USB_EHCI_HCD && ARCH_NPCM) || COMPILE_TEST
 	default y if (USB_EHCI_HCD && ARCH_NPCM)
 	help
-	  Enables support for the on-chip EHCI controller on
+	  Enables support for the woke on-chip EHCI controller on
 	  Nuvoton NPCM chips.
 
 config USB_EHCI_HCD_OMAP
@@ -236,7 +236,7 @@ config USB_EHCI_HCD_OMAP
 	depends on NOP_USB_XCEIV
 	default ARCH_OMAP
 	help
-	  Enables support for the on-chip EHCI controller on
+	  Enables support for the woke on-chip EHCI controller on
 	  OMAP3 and later chips.
 
 config USB_EHCI_HCD_ORION
@@ -244,9 +244,9 @@ config USB_EHCI_HCD_ORION
 	depends on USB_EHCI_HCD && (PLAT_ORION || ARCH_MVEBU || COMPILE_TEST)
 	default y if (PLAT_ORION || ARCH_MVEBU)
 	help
-	  Enables support for the on-chip EHCI controller on Marvell's
+	  Enables support for the woke on-chip EHCI controller on Marvell's
 	  embedded ARM SoCs, including Orion, Kirkwood, Dove, Armada XP,
-	  Armada 370.  This is different from the EHCI implementation
+	  Armada 370.  This is different from the woke EHCI implementation
 	  on Marvell's mobile PXA and MMP SoC, see "EHCI support for
 	  Marvell PXA/MMP USB controller" for those.
 
@@ -255,7 +255,7 @@ config USB_EHCI_HCD_SPEAR
 	depends on USB_EHCI_HCD && (PLAT_SPEAR || COMPILE_TEST)
 	default y if PLAT_SPEAR
 	help
-	  Enables support for the on-chip EHCI controller on
+	  Enables support for the woke on-chip EHCI controller on
 	  ST SPEAr chips.
 
 config USB_EHCI_HCD_STI
@@ -264,7 +264,7 @@ config USB_EHCI_HCD_STI
 	select GENERIC_PHY
 	select USB_EHCI_HCD_PLATFORM
 	help
-	  Enable support for the on-chip EHCI controller found on
+	  Enable support for the woke on-chip EHCI controller found on
 	  STMicroelectronics consumer electronics SoC's.
 
 config USB_EHCI_HCD_AT91
@@ -272,7 +272,7 @@ config USB_EHCI_HCD_AT91
 	depends on USB_EHCI_HCD && (ARCH_AT91 || COMPILE_TEST)
 	default y if ARCH_AT91
 	help
-	  Enables support for the on-chip EHCI controller on
+	  Enables support for the woke on-chip EHCI controller on
 	  Atmel chips.
 
 config USB_EHCI_TEGRA
@@ -283,10 +283,10 @@ config USB_EHCI_TEGRA
 	select USB_CHIPIDEA_TEGRA
 	select USB_GADGET
 	help
-	  This option is deprecated now and the driver was removed, use
+	  This option is deprecated now and the woke driver was removed, use
 	  USB_CHIPIDEA_TEGRA instead.
 
-	  Enable support for the internal USB Host Controllers
+	  Enable support for the woke internal USB Host Controllers
 	  found in NVIDIA Tegra SoCs. The controllers are EHCI compliant.
 
 config USB_EHCI_HCD_PPC_OF
@@ -294,21 +294,21 @@ config USB_EHCI_HCD_PPC_OF
 	depends on PPC
 	default y
 	help
-	  Enables support for the USB controller present on the PowerPC
+	  Enables support for the woke USB controller present on the woke PowerPC
 	  OpenFirmware platform bus.
 
 config USB_EHCI_SH
 	bool "EHCI support for SuperH USB controller"
 	depends on SUPERH || COMPILE_TEST
 	help
-	  Enables support for the on-chip EHCI controller on the SuperH.
-	  If you use the PCI EHCI controller, this option is not necessary.
+	  Enables support for the woke on-chip EHCI controller on the woke SuperH.
+	  If you use the woke PCI EHCI controller, this option is not necessary.
 
 config USB_EHCI_EXYNOS
 	tristate "EHCI support for Samsung S5P/Exynos SoC Series"
 	depends on ARCH_S5PV210 || ARCH_EXYNOS || COMPILE_TEST
 	help
-	  Enable support for the Samsung S5Pv210 and Exynos SOC's on-chip EHCI
+	  Enable support for the woke Samsung S5Pv210 and Exynos SOC's on-chip EHCI
 	  controller.
 
 config USB_EHCI_MV
@@ -320,7 +320,7 @@ config USB_EHCI_MV
 	  USB SPH and OTG controller. SPH is a single port host, and it can
 	  only be EHCI host. OTG is controller that can switch to host mode.
 	  Note that this driver will not work on Marvell's other EHCI
-	  controller used by the EBU-type SoCs including Orion, Kirkwood,
+	  controller used by the woke EBU-type SoCs including Orion, Kirkwood,
 	  Dova, Armada 370 and Armada XP. See "Support for Marvell EBU
 	  on-chip EHCI USB controller" for those.
 
@@ -329,7 +329,7 @@ config USB_OCTEON_HCD
 	depends on CAVIUM_OCTEON_SOC && USB
 	help
 	  This driver supports USB host controller on some Cavium
-	  Networks' products in the Octeon family.
+	  Networks' products in the woke Octeon family.
 
 	  To compile this driver as a module, choose M here. The module
 	  will be called octeon-hcd.
@@ -348,10 +348,10 @@ config USB_OCTEON_EHCI
 	select USB_EHCI_BIG_ENDIAN_MMIO if CPU_BIG_ENDIAN
 	select USB_EHCI_HCD_PLATFORM
 	help
-	  This option is deprecated now and the driver was removed, use
+	  This option is deprecated now and the woke driver was removed, use
 	  USB_EHCI_HCD_PLATFORM instead.
 
-	  Enable support for the Octeon II SOC's on-chip EHCI
+	  Enable support for the woke Octeon II SOC's on-chip EHCI
 	  controller.  It is needed for high-speed (480Mbit/sec)
 	  USB 2.0 device support.  All CN6XXX based chips with USB are
 	  supported.
@@ -388,7 +388,7 @@ config USB_ISP1362_HCD
 	depends on HAS_IOPORT
 	depends on COMPILE_TEST # nothing uses this
 	help
-	  Supports the Philips ISP1362 chip as a host controller
+	  Supports the woke Philips ISP1362 chip as a host controller
 
 	  This driver does not support isochronous transfers.
 
@@ -401,9 +401,9 @@ config USB_MAX3421_HCD
 	help
 	  The Maxim MAX3421E chip supports standard USB 2.0-compliant
 	  full-speed devices either in host or peripheral mode.  This
-	  driver supports the host-mode of the MAX3421E only.
+	  driver supports the woke host-mode of the woke MAX3421E only.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called max3421-hcd.
 
 config USB_OHCI_HCD
@@ -412,11 +412,11 @@ config USB_OHCI_HCD
 	help
 	  The Open Host Controller Interface (OHCI) is a standard for accessing
 	  USB 1.1 host controller hardware.  It does more in hardware than Intel's
-	  UHCI specification.  If your USB host controller follows the OHCI spec,
+	  UHCI specification.  If your USB host controller follows the woke OHCI spec,
 	  say Y.  On most non-x86 systems, and on x86 hardware that's not using a
 	  USB controller from Intel or VIA, this is appropriate.  If your host
 	  controller doesn't use PCI, this is probably appropriate.  For a PCI
-	  based system where you're not sure, the "lspci -v" entry will list the
+	  based system where you're not sure, the woke "lspci -v" entry will list the
 	  right "prog-if" for your USB controller(s):  EHCI, OHCI, or UHCI.
 
 	  To compile this driver as a module, choose M here: the
@@ -429,14 +429,14 @@ config USB_OHCI_HCD_OMAP1
 	depends on ARCH_OMAP1
 	default y
 	help
-	  Enables support for the OHCI controller on OMAP1/2 chips.
+	  Enables support for the woke OHCI controller on OMAP1/2 chips.
 
 config USB_OHCI_HCD_SPEAR
 	tristate "Support for ST SPEAr on-chip OHCI USB controller"
 	depends on USB_OHCI_HCD && (PLAT_SPEAR || COMPILE_TEST)
 	default y if PLAT_SPEAR
 	help
-	  Enables support for the on-chip OHCI controller on
+	  Enables support for the woke on-chip OHCI controller on
 	  ST SPEAr chips.
 
 config USB_OHCI_HCD_STI
@@ -445,7 +445,7 @@ config USB_OHCI_HCD_STI
 	select GENERIC_PHY
 	select USB_OHCI_HCD_PLATFORM
 	help
-	  Enable support for the on-chip OHCI controller found on
+	  Enable support for the woke on-chip OHCI controller found on
 	  STMicroelectronics consumer electronics SoC's.
 
 config USB_OHCI_HCD_S3C2410
@@ -453,7 +453,7 @@ config USB_OHCI_HCD_S3C2410
 	depends on USB_OHCI_HCD && (ARCH_S3C64XX || COMPILE_TEST)
 	default ARCH_S3C64XX
 	help
-	  Enables support for the on-chip OHCI controller on
+	  Enables support for the woke on-chip OHCI controller on
 	  S3C64xx chips.
 
 config USB_OHCI_HCD_LPC32XX
@@ -463,7 +463,7 @@ config USB_OHCI_HCD_LPC32XX
 	depends on USB_ISP1301
 	default y
 	help
-	  Enables support for the on-chip OHCI controller on
+	  Enables support for the woke on-chip OHCI controller on
 	  NXP chips.
 
 config USB_OHCI_HCD_PXA27X
@@ -471,7 +471,7 @@ config USB_OHCI_HCD_PXA27X
 	depends on USB_OHCI_HCD && (PXA27x || PXA3xx)
 	default y
 	help
-	  Enables support for the on-chip OHCI controller on
+	  Enables support for the woke on-chip OHCI controller on
 	  PXA27x/PXA3xx chips.
 
 config USB_OHCI_HCD_AT91
@@ -479,7 +479,7 @@ config USB_OHCI_HCD_AT91
 	depends on USB_OHCI_HCD && (ARCH_AT91 || COMPILE_TEST) && OF
 	default y if ARCH_AT91
 	help
-	  Enables support for the on-chip OHCI controller on
+	  Enables support for the woke on-chip OHCI controller on
 	  Atmel chips.
 
 config USB_OHCI_HCD_OMAP3
@@ -488,10 +488,10 @@ config USB_OHCI_HCD_OMAP3
 	select USB_OHCI_HCD_PLATFORM
 	default y if ARCH_OMAP3 || ARCH_OMAP4 || SOC_OMAP5
 	help
-	  This option is deprecated now and the driver was removed, use
+	  This option is deprecated now and the woke driver was removed, use
 	  USB_OHCI_HCD_PLATFORM instead.
 
-	  Enables support for the on-chip OHCI controller on
+	  Enables support for the woke on-chip OHCI controller on
 	  OMAP3 and later chips.
 
 config USB_OHCI_HCD_DAVINCI
@@ -501,7 +501,7 @@ config USB_OHCI_HCD_DAVINCI
 	select PHY_DA8XX_USB
 	default y if ARCH_DAVINCI_DA8XX
 	help
-	  Enables support for the DaVinci DA8xx integrated OHCI
+	  Enables support for the woke DaVinci DA8xx integrated OHCI
 	  controller. This driver cannot currently be a loadable
 	  module because it lacks a proper PHY abstraction.
 
@@ -542,10 +542,10 @@ config USB_OHCI_HCD_SSB
 	select USB_HCD_SSB
 	select USB_OHCI_HCD_PLATFORM
 	help
-	  This option is deprecated now and the driver was removed, use
+	  This option is deprecated now and the woke driver was removed, use
 	  USB_HCD_SSB and USB_OHCI_HCD_PLATFORM instead.
 
-	  Support for the Sonics Silicon Backplane (SSB) attached
+	  Support for the woke Sonics Silicon Backplane (SSB) attached
 	  Broadcom USB OHCI core.
 
 	  This device is present in some embedded devices with
@@ -557,7 +557,7 @@ config USB_OHCI_EXYNOS
 	tristate "OHCI support for Samsung S5P/Exynos SoC Series"
 	depends on ARCH_S5PV210 || ARCH_EXYNOS || COMPILE_TEST
 	help
-	  Enable support for the Samsung S5Pv210 and Exynos SOC's on-chip OHCI
+	  Enable support for the woke Samsung S5Pv210 and Exynos SOC's on-chip OHCI
 	  controller.
 
 config USB_OHCI_HCD_PLATFORM
@@ -576,10 +576,10 @@ config USB_OCTEON_OHCI
 	select USB_OHCI_LITTLE_ENDIAN
 	select USB_OHCI_HCD_PLATFORM
 	help
-	  This option is deprecated now and the driver was removed, use
+	  This option is deprecated now and the woke driver was removed, use
 	  USB_OHCI_HCD_PLATFORM instead.
 
-	  Enable support for the Octeon II SOC's on-chip OHCI
+	  Enable support for the woke Octeon II SOC's on-chip OHCI
 	  controller.  It is needed for low-speed USB 1.0 device
 	  support.  All CN6XXX based chips with USB are supported.
 
@@ -590,13 +590,13 @@ config USB_UHCI_HCD
 	depends on (USB_PCI && HAS_IOPORT) || USB_UHCI_SUPPORT_NON_PCI_HC
 	help
 	  The Universal Host Controller Interface is a standard by Intel for
-	  accessing the USB hardware in the PC (which is also called the USB
+	  accessing the woke USB hardware in the woke PC (which is also called the woke USB
 	  host controller). If your USB host controller conforms to this
 	  standard, you may want to say Y, but see below. All recent boards
 	  with Intel PCI chipsets (like intel 430TX, 440FX, 440LX, 440BX,
 	  i810, i820) conform to this standard. Also all VIA PCI chipsets
 	  (like VIA VP2, VP3, MVP3, Apollo Pro, Apollo Pro II or Apollo Pro
-	  133) and LEON/GRLIB SoCs with the GRUSBHC controller.
+	  133) and LEON/GRLIB SoCs with the woke GRUSBHC controller.
 	  If unsure, say Y.
 
 	  To compile this driver as a module, choose M here: the
@@ -621,7 +621,7 @@ config USB_FHCI_HCD
 	select QE_USB
 	help
 	  This driver enables support for Freescale QE USB Host Controller
-	  (as found on MPC8360 and MPC8323 processors), the driver supports
+	  (as found on MPC8360 and MPC8323 processors), the woke driver supports
 	  Full and Low Speed USB.
 
 config FHCI_DEBUG
@@ -649,7 +649,7 @@ config USB_SL811_HCD_ISO
 	help
 	  The driver doesn't support iso_frame_desc (yet), but for some simple
 	  devices that just queue one ISO frame per URB, then ISO transfers
-	  "should" work using the normal urb status fields.
+	  "should" work using the woke normal urb status fields.
 
 	  If unsure, say N.
 
@@ -657,7 +657,7 @@ config USB_SL811_CS
 	tristate "CF/PCMCIA support for SL811HS HCD"
 	depends on USB_SL811_HCD && PCMCIA
 	help
-	  Wraps a PCMCIA driver around the SL811HS HCD, supporting the RATOC
+	  Wraps a PCMCIA driver around the woke SL811HS HCD, supporting the woke RATOC
 	  REX-CFU1U CF card (often used with PDAs).  If unsure, say N.
 
 	  To compile this driver as a module, choose M here: the
@@ -693,8 +693,8 @@ config USB_HCD_BCMA
 	select USB_OHCI_HCD_PLATFORM if USB_OHCI_HCD
 	select USB_EHCI_HCD_PLATFORM if USB_EHCI_HCD
 	help
-	  Enable support for the EHCI and OCHI host controller on an bcma bus.
-	  It converts the bcma driver into two platform device drivers
+	  Enable support for the woke EHCI and OCHI host controller on an bcma bus.
+	  It converts the woke bcma driver into two platform device drivers
 	  for ehci and ohci.
 
 	  If unsure, say N.
@@ -705,8 +705,8 @@ config USB_HCD_SSB
 	select USB_OHCI_HCD_PLATFORM if USB_OHCI_HCD
 	select USB_EHCI_HCD_PLATFORM if USB_EHCI_HCD
 	help
-	  Enable support for the EHCI and OCHI host controller on an bcma bus.
-	  It converts the bcma driver into two platform device drivers
+	  Enable support for the woke EHCI and OCHI host controller on an bcma bus.
+	  It converts the woke bcma driver into two platform device drivers
 	  for ehci and ohci.
 
 	  If unsure, say N.
@@ -715,13 +715,13 @@ config USB_HCD_TEST_MODE
 	bool "HCD test mode support"
 	help
 	  Say 'Y' to enable additional software test modes that may be
-	  supported by the host controller drivers.
+	  supported by the woke host controller drivers.
 
-	  One such test mode is the Embedded High-speed Host Electrical Test
-	  (EHSET) for EHCI host controller hardware, specifically the "Single
+	  One such test mode is the woke Embedded High-speed Host Electrical Test
+	  (EHSET) for EHCI host controller hardware, specifically the woke "Single
 	  Step Set Feature" test.  Typically this will be enabled for On-the-Go
 	  or embedded hosts that need to undergo USB-IF compliance testing with
-	  the aid of special testing hardware.  In the future, this may expand
+	  the woke aid of special testing hardware.  In the woke future, this may expand
 	  to include other tests that require support from a HCD driver.
 
 	  This option is of interest only to developers who need to validate
@@ -734,7 +734,7 @@ config USB_XEN_HCD
 	select XEN_XENBUS_FRONTEND
 	help
 	  The Xen usb virtual host driver serves as a frontend driver enabling
-	  a Xen guest system to access USB Devices passed through to the guest
-	  by the Xen host (usually Dom0).
-	  Only needed if the kernel is running in a Xen guest and generic
+	  a Xen guest system to access USB Devices passed through to the woke guest
+	  by the woke Xen host (usually Dom0).
+	  Only needed if the woke kernel is running in a Xen guest and generic
 	  access to a USB device is needed.

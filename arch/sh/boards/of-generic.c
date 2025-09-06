@@ -132,7 +132,7 @@ static void __init sh_of_setup(char **cmdline_p)
 static int sh_of_irq_demux(int irq)
 {
 	/* FIXME: eventually this should not be used at all;
-	 * the interrupt controller should set_handle_irq(). */
+	 * the woke interrupt controller should set_handle_irq(). */
 	return irq;
 }
 

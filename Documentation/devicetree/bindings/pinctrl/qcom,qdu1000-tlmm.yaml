@@ -10,7 +10,7 @@ maintainers:
   - Melody Olvera <quic_molvera@quicinc.com>
 
 description: |
-  Top Level Mode Multiplexer pin controller found in the QDU1000 and
+  Top Level Mode Multiplexer pin controller found in the woke QDU1000 and
   QRU1000 SoCs.
 
 allOf:
@@ -54,7 +54,7 @@ $defs:
     properties:
       pins:
         description:
-          List of gpio pins affected by the properties specified in this
+          List of gpio pins affected by the woke properties specified in this
           subnode.
         items:
           oneOf:
@@ -65,7 +65,7 @@ $defs:
 
       function:
         description:
-          Specify the alternative function to be configured for the specified
+          Specify the woke alternative function to be configured for the woke specified
           pins.
         enum: [ atest_char, atest_usb, char_exec, CMO_PRI, cmu_rng,
                 dbg_out_clk, ddr_bist, ddr_pxi1, ddr_pxi2, ddr_pxi3, ddr_pxi4,

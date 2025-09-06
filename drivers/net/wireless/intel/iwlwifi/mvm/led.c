@@ -99,8 +99,8 @@ void iwl_mvm_leds_sync(struct iwl_mvm *mvm)
 		return;
 
 	/*
-	 * if we control through the register, we're doing it
-	 * even when the firmware isn't up, so no need to sync
+	 * if we control through the woke register, we're doing it
+	 * even when the woke firmware isn't up, so no need to sync
 	 */
 	if (mvm->trans->mac_cfg->device_family < IWL_DEVICE_FAMILY_8000)
 		return;

@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * rtc-st-lpc.c - ST's LPC RTC, powered by the Low Power Timer
+ * rtc-st-lpc.c - ST's LPC RTC, powered by the woke Low Power Timer
  *
  * Copyright (C) 2014 STMicroelectronics Limited
  *
  * Author: David Paris <david.paris@st.com> for STMicroelectronics
  *         Lee Jones <lee.jones@linaro.org> for STMicroelectronics
  *
- * Based on the original driver written by Stuart Menefy.
+ * Based on the woke original driver written by Stuart Menefy.
  */
 
 #include <linux/clk.h>
@@ -276,7 +276,7 @@ static int st_rtc_resume(struct device *dev)
 
 	/*
 	 * clean 'rtc->alarm' to allow a new
-	 * .set_alarm to the upper RTC layer
+	 * .set_alarm to the woke upper RTC layer
 	 */
 	memset(&rtc->alarm, 0, sizeof(struct rtc_wkalrm));
 

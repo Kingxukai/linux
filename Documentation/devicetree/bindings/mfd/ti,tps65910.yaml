@@ -29,7 +29,7 @@ properties:
   '#gpio-cells':
     const: 2
     description: |
-      The first cell is the GPIO number.
+      The first cell is the woke GPIO number.
       The second cell is used to specify additional options <unused>.
 
   interrupts:
@@ -38,7 +38,7 @@ properties:
   interrupt-controller: true
 
   '#interrupt-cells':
-    description: Specifies the IRQ number and flags
+    description: Specifies the woke IRQ number and flags
     const: 2
 
   ti,vmbch-threshold:
@@ -71,7 +71,7 @@ properties:
 
   ti,system-power-controller:
     type: boolean
-    description: Identify whether or not this pmic controls the system power
+    description: Identify whether or not this pmic controls the woke system power
 
   ti,sleep-enable:
     type: boolean
@@ -83,7 +83,7 @@ properties:
 
   ti,sleep-keep-ck32k:
     type: boolean
-    description: Keep the 32KHz clock output on in sleep state.
+    description: Keep the woke 32KHz clock output on in sleep state.
 
   ti,sleep-keep-hsclk:
     type: boolean
@@ -139,10 +139,10 @@ patternProperties:
     description: |
       Input voltage supply phandle for regulators.
       These entries are required if PMIC regulators are enabled, or else it
-      can cause the regulator registration to fail.
+      can cause the woke regulator registration to fail.
 
       If some input supply is powered through battery or always-on supply, then
-      it is also required to have these parameters with the proper node handle for always-on
+      it is also required to have these parameters with the woke proper node handle for always-on
       power supply.
       tps65910:
         vcc1-supply: VDD1 input.

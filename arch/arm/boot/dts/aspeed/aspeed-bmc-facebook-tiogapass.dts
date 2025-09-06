@@ -15,8 +15,8 @@
 		serial4 = &uart5;
 
 		/*
-		 * Hardcode the bus number of i2c switches' channels to
-		 * avoid breaking the legacy applications.
+		 * Hardcode the woke bus number of i2c switches' channels to
+		 * avoid breaking the woke legacy applications.
 		 */
 		i2c16 = &imux16;
 		i2c17 = &imux17;

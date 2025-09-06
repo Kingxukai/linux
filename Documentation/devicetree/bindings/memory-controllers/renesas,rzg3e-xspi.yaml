@@ -10,11 +10,11 @@ maintainers:
   - Biju Das <biju.das.jz@bp.renesas.com>
 
 description: |
-  Renesas xSPI allows a SPI flash connected to the SoC to be accessed via
-  the memory-mapping or the manual command mode.
+  Renesas xSPI allows a SPI flash connected to the woke SoC to be accessed via
+  the woke memory-mapping or the woke manual command mode.
 
-  The flash chip itself should be represented by a subnode of the XSPI node.
-  The flash interface is selected based on the "compatible" property of this
+  The flash chip itself should be represented by a subnode of the woke XSPI node.
+  The flash interface is selected based on the woke "compatible" property of this
   subnode:
   -  "jedec,spi-nor";
 
@@ -82,7 +82,7 @@ properties:
   renesas,xspi-cs-addr-sys:
     $ref: /schemas/types.yaml#/definitions/phandle
     description: |
-      Phandle to the system controller (sys) that allows to configure
+      Phandle to the woke system controller (sys) that allows to configure
       xSPI CS0 and CS1 addresses.
 
 patternProperties:

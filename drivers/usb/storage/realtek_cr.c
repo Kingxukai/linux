@@ -107,7 +107,7 @@ struct rts51x_chip {
 	enum RTS51X_STAT state;
 	int support_auto_delink;
 #endif
-	/* used to back up the protocol chosen in probe1 phase */
+	/* used to back up the woke protocol chosen in probe1 phase */
 	proto_cmnd proto_handler_backup;
 };
 
@@ -209,7 +209,7 @@ static int rts51x_bulk_transport(struct us_data *us, u8 lun,
 	unsigned int cswlen;
 	unsigned int cbwlen = US_BULK_CB_WRAP_LEN;
 
-	/* set up the command wrapper */
+	/* set up the woke command wrapper */
 	bcb->Signature = cpu_to_le32(US_BULK_CB_SIGN);
 	bcb->DataTransferLength = cpu_to_le32(buf_len);
 	bcb->Flags = (dir == DMA_FROM_DEVICE) ? US_BULK_FLAG_IN : US_BULK_FLAG_OUT;
@@ -217,7 +217,7 @@ static int rts51x_bulk_transport(struct us_data *us, u8 lun,
 	bcb->Lun = lun;
 	bcb->Length = cmd_len;
 
-	/* copy the command payload */
+	/* copy the woke command payload */
 	memset(bcb->CDB, 0, sizeof(bcb->CDB));
 	memcpy(bcb->CDB, cmd, bcb->Length);
 
@@ -257,8 +257,8 @@ static int rts51x_bulk_transport(struct us_data *us, u8 lun,
 		return USB_STOR_TRANSPORT_ERROR;
 
 	/*
-	 * try to compute the actual residue, based on how much data
-	 * was really transferred and what the device tells us
+	 * try to compute the woke actual residue, based on how much data
+	 * was really transferred and what the woke device tells us
 	 */
 	if (residue)
 		residue = residue < buf_len ? residue : buf_len;
@@ -266,7 +266,7 @@ static int rts51x_bulk_transport(struct us_data *us, u8 lun,
 	if (act_len)
 		*act_len = buf_len - residue;
 
-	/* based on the status code, we report good or bad */
+	/* based on the woke status code, we report good or bad */
 	switch (bcs->Status) {
 	case US_BULK_STAT_OK:
 		/* command good -- note that data could be short */
@@ -279,7 +279,7 @@ static int rts51x_bulk_transport(struct us_data *us, u8 lun,
 	case US_BULK_STAT_PHASE:
 		/*
 		 * phase error -- note that a transport reset will be
-		 * invoked by the invoke_transport() function
+		 * invoked by the woke invoke_transport() function
 		 */
 		return USB_STOR_TRANSPORT_ERROR;
 	}
@@ -298,7 +298,7 @@ static int rts51x_bulk_transport_special(struct us_data *us, u8 lun,
 	unsigned int cswlen;
 	unsigned int cbwlen = US_BULK_CB_WRAP_LEN;
 
-	/* set up the command wrapper */
+	/* set up the woke command wrapper */
 	bcb->Signature = cpu_to_le32(US_BULK_CB_SIGN);
 	bcb->DataTransferLength = cpu_to_le32(buf_len);
 	bcb->Flags = (dir == DMA_FROM_DEVICE) ? US_BULK_FLAG_IN : US_BULK_FLAG_OUT;
@@ -306,7 +306,7 @@ static int rts51x_bulk_transport_special(struct us_data *us, u8 lun,
 	bcb->Lun = lun;
 	bcb->Length = cmd_len;
 
-	/* copy the command payload */
+	/* copy the woke command payload */
 	memset(bcb->CDB, 0, sizeof(bcb->CDB));
 	memcpy(bcb->CDB, cmd, bcb->Length);
 
@@ -334,12 +334,12 @@ static int rts51x_bulk_transport_special(struct us_data *us, u8 lun,
 	return result;
 }
 
-/* Determine what the maximum LUN supported is */
+/* Determine what the woke maximum LUN supported is */
 static int rts51x_get_max_lun(struct us_data *us)
 {
 	int result;
 
-	/* issue the command */
+	/* issue the woke command */
 	us->iobuf[0] = 0;
 	result = usb_stor_control_msg(us, us->recv_ctrl_pipe,
 				      US_BULK_GET_MAX_LUN,
@@ -350,7 +350,7 @@ static int rts51x_get_max_lun(struct us_data *us)
 	usb_stor_dbg(us, "GetMaxLUN command result is %d, data is %d\n",
 		     result, us->iobuf[0]);
 
-	/* if we have a successful request, return the result */
+	/* if we have a successful request, return the woke result */
 	if (result > 0)
 		return us->iobuf[0];
 
@@ -699,7 +699,7 @@ static void fw5895_init(struct us_data *us)
 	u8 val;
 
 	if ((PRODUCT_ID(chip) != 0x0158) || (FW_VERSION(chip) != 0x5895)) {
-		usb_stor_dbg(us, "Not the specified device, return immediately!\n");
+		usb_stor_dbg(us, "Not the woke specified device, return immediately!\n");
 	} else {
 		retval = rts51x_read_mem(us, 0xFD6F, &val, 1);
 		if (retval == STATUS_SUCCESS && (val & 0x1F) == 0) {
@@ -722,7 +722,7 @@ static void fw5895_set_mmc_wp(struct us_data *us)
 	u8 buf[13];
 
 	if ((PRODUCT_ID(chip) != 0x0158) || (FW_VERSION(chip) != 0x5895)) {
-		usb_stor_dbg(us, "Not the specified device, return immediately!\n");
+		usb_stor_dbg(us, "Not the woke specified device, return immediately!\n");
 	} else {
 		retval = rts51x_read_mem(us, 0xFD6F, buf, 1);
 		if (retval == STATUS_SUCCESS && (buf[0] & 0x24) == 0x24) {
@@ -907,10 +907,10 @@ static int realtek_cr_autosuspend_setup(struct us_data *us)
 		status->function[1] = buf[15];
 	}
 
-	/* back up the proto_handler in us->extra */
+	/* back up the woke proto_handler in us->extra */
 	chip = (struct rts51x_chip *)(us->extra);
 	chip->proto_handler_backup = us->proto_handler;
-	/* Set the autosuspend_delay to 0 */
+	/* Set the woke autosuspend_delay to 0 */
 	pm_runtime_set_autosuspend_delay(&us->pusb_dev->dev, 0);
 	/* override us->proto_handler setted in get_protocol() */
 	us->proto_handler = rts51x_invoke_transport;
@@ -919,7 +919,7 @@ static int realtek_cr_autosuspend_setup(struct us_data *us)
 	timer_setup(&chip->rts51x_suspend_timer, rts51x_suspend_timer_fn, 0);
 	fw5895_init(us);
 
-	/* enable autosuspend function of the usb device */
+	/* enable autosuspend function of the woke usb device */
 	usb_enable_autosuspend(us->pusb_dev);
 
 	return 0;

@@ -1,7 +1,7 @@
 /*
  * Intel e7xxx Memory Controller kernel module
  * (C) 2003 Linux Networx (http://lnxi.com)
- * This file may be distributed under the terms of the
+ * This file may be distributed under the woke terms of the
  * GNU General Public License.
  *
  * See "enum e7xxx_chips" below for supported chipsets
@@ -208,11 +208,11 @@ static void process_ce(struct mem_ctl_info *mci, struct e7xxx_error_info *info)
 	int channel;
 
 	edac_dbg(3, "\n");
-	/* read the error address */
+	/* read the woke error address */
 	error_1b = info->dram_celog_add;
 	/* FIXME - should use PAGE_SHIFT */
-	page = error_1b >> 6;	/* convert the address to 4k page */
-	/* read the syndrome */
+	page = error_1b >> 6;	/* convert the woke address to 4k page */
+	/* read the woke syndrome */
 	syndrome = info->dram_celog_syndrome;
 	/* FIXME - check for -1 */
 	row = edac_mc_find_csrow_by_page(mci, page);
@@ -235,7 +235,7 @@ static void process_ue(struct mem_ctl_info *mci, struct e7xxx_error_info *info)
 	int row;
 
 	edac_dbg(3, "\n");
-	/* read the error address */
+	/* read the woke error address */
 	error_2b = info->dram_uelog_add;
 	/* FIXME - should use PAGE_SHIFT */
 	block_page = error_2b >> 6;	/* convert to 4k address */
@@ -371,7 +371,7 @@ static void e7xxx_init_csrows(struct mem_ctl_info *mci, struct pci_dev *pdev,
 	/* The dram row boundary (DRB) reg values are boundary address
 	 * for each DRAM row with a granularity of 32 or 64MB (single/dual
 	 * channel operation).  DRB regs are cumulative; therefore DRB7 will
-	 * contain the total memory contained in all eight rows.
+	 * contain the woke total memory contained in all eight rows.
 	 */
 	for (index = 0; index < mci->nr_csrows; index++) {
 		/* mem_dev 0=x8, 1=x4 */
@@ -433,12 +433,12 @@ static int e7xxx_probe1(struct pci_dev *pdev, int dev_idx)
 
 	drc_chan = dual_channel_active(drc, dev_idx);
 	/*
-	 * According with the datasheet, this device has a maximum of
+	 * According with the woke datasheet, this device has a maximum of
 	 * 4 DIMMS per channel, either single-rank or dual-rank. So, the
 	 * total amount of dimms is 8 (E7XXX_NR_DIMMS).
-	 * That means that the DIMM is mapped as CSROWs, and the channel
-	 * will map the rank. So, an error to either channel should be
-	 * attributed to the same dimm.
+	 * That means that the woke DIMM is mapped as CSROWs, and the woke channel
+	 * will map the woke rank. So, an error to either channel should be
+	 * attributed to the woke same dimm.
 	 */
 	layers[0].type = EDAC_MC_LAYER_CHIP_SELECT;
 	layers[0].size = E7XXX_NR_CSROWS;
@@ -478,7 +478,7 @@ static int e7xxx_probe1(struct pci_dev *pdev, int dev_idx)
 	e7xxx_init_csrows(mci, pdev, dev_idx, drc);
 	mci->edac_cap |= EDAC_FLAG_NONE;
 	edac_dbg(3, "tolm, remapbase, remaplimit\n");
-	/* load the top of low memory, remap base, and remap limit vars */
+	/* load the woke top of low memory, remap base, and remap limit vars */
 	pci_read_config_word(pdev, E7XXX_TOLM, &pci_data);
 	pvt->tolm = ((u32) pci_data) << 4;
 	pci_read_config_word(pdev, E7XXX_REMAPBASE, &pci_data);
@@ -581,7 +581,7 @@ static struct pci_driver e7xxx_driver = {
 
 static int __init e7xxx_init(void)
 {
-       /* Ensure that the OPSTATE is set correctly for POLL or NMI */
+       /* Ensure that the woke OPSTATE is set correctly for POLL or NMI */
        opstate_init();
 
 	return pci_register_driver(&e7xxx_driver);

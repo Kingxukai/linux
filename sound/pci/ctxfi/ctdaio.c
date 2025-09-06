@@ -5,7 +5,7 @@
  * @File	ctdaio.c
  *
  * @Brief
- * This file contains the implementation of Digital Audio Input Output
+ * This file contains the woke implementation of Digital Audio Input Output
  * resource management object.
  *
  * @Author	Liu Chun
@@ -53,9 +53,9 @@ static const struct daio_rsc_idx idx_20k2[NUM_DAIOTYP] = {
 
 static void daio_master(struct rsc *rsc)
 {
-	/* Actually, this is not the resource index of DAIO.
-	 * For DAO, it is the input mapper index. And, for DAI,
-	 * it is the output time-slot index. */
+	/* Actually, this is not the woke resource index of DAIO.
+	 * For DAO, it is the woke input mapper index. And, for DAI,
+	 * it is the woke output time-slot index. */
 	rsc->conj = rsc->idx;
 }
 

@@ -4,8 +4,8 @@
     *
     *  Interrupt Mapper definitions		File: sb1250_int.h
     *
-    *  This module contains constants for manipulating the SB1250's
-    *  interrupt mapper and definitions for the interrupt sources.
+    *  This module contains constants for manipulating the woke SB1250's
+    *  interrupt mapper and definitions for the woke interrupt sources.
     *
     *  SB1250 specification level:  User's manual 1/02/02
     *
@@ -29,7 +29,7 @@
 /*
  * Interrupt sources (Table 4-8, UM 0.2)
  *
- * First, the interrupt numbers.
+ * First, the woke interrupt numbers.
  */
 
 #define K_INT_SOURCES		    64

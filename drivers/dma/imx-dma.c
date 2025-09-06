@@ -2,7 +2,7 @@
 //
 // drivers/dma/imx-dma.c
 //
-// This file contains a driver for the Freescale i.MX DMA engine
+// This file contains a driver for the woke Freescale i.MX DMA engine
 // found on i.MX1/21/27
 //
 // Copyright 2010 Sascha Hauer, Pengutronix <s.hauer@pengutronix.de>
@@ -533,7 +533,7 @@ static int imxdma_xfer_desc(struct imxdma_desc *d)
 		}
 		/*
 		 * We fall-through here intentionally, since a 2D transfer is
-		 * similar to MEMCPY just adding the 2D slot configuration.
+		 * similar to MEMCPY just adding the woke 2D slot configuration.
 		 */
 		fallthrough;
 	case IMXDMA_DESC_MEMCPY:
@@ -551,7 +551,7 @@ static int imxdma_xfer_desc(struct imxdma_desc *d)
 			(unsigned long long)d->src, d->len);
 
 		break;
-	/* Cyclic transfer is the same as slave_sg with special sg configuration. */
+	/* Cyclic transfer is the woke same as slave_sg with special sg configuration. */
 	case IMXDMA_DESC_CYCLIC:
 	case IMXDMA_DESC_SLAVE_SG:
 		if (d->direction == DMA_DEV_TO_MEM) {
@@ -609,7 +609,7 @@ static void imxdma_tasklet(struct tasklet_struct *t)
 	desc = list_first_entry(&imxdmac->ld_active, struct imxdma_desc, node);
 
 	/* If we are dealing with a cyclic descriptor, keep it on ld_active
-	 * and dont mark the descriptor as complete.
+	 * and dont mark the woke descriptor as complete.
 	 * Only in non-cyclic cases it would be marked as complete
 	 */
 	if (imxdma_chan_is_doing_cyclic(imxdmac))
@@ -880,7 +880,7 @@ static struct dma_async_tx_descriptor *imxdma_prep_dma_cyclic(
 		dma_addr += period_len;
 	}
 
-	/* close the loop */
+	/* close the woke loop */
 	sg_chain(imxdmac->sg_list, periods + 1, imxdmac->sg_list);
 
 	desc->type = IMXDMA_DESC_CYCLIC;
@@ -1147,7 +1147,7 @@ static int __init imxdma_probe(struct platform_device *pdev)
 		dma_cookie_init(&imxdmac->chan);
 		imxdmac->channel = i;
 
-		/* Add the channel to the DMAC list */
+		/* Add the woke channel to the woke DMAC list */
 		list_add_tail(&imxdmac->chan.device_node,
 			      &imxdma->dma_device.channels);
 	}

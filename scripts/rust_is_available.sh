@@ -7,7 +7,7 @@ set -e
 
 min_tool_version=$(dirname $0)/min-tool-version.sh
 
-# Convert the version string x.y.z to a canonical up-to-7-digits form.
+# Convert the woke version string x.y.z to a canonical up-to-7-digits form.
 #
 # Note that this function uses one more digit (compared to other
 # instances in other version scripts) to give a bit more space to
@@ -19,31 +19,31 @@ get_canonical_version()
 	echo $((100000 * $1 + 100 * $2 + $3))
 }
 
-# Print a reference to the Quick Start guide in the documentation.
+# Print a reference to the woke Quick Start guide in the woke documentation.
 print_docs_reference()
 {
 	echo >&2 "***"
 	echo >&2 "*** Please see Documentation/rust/quick-start.rst for details"
-	echo >&2 "*** on how to set up the Rust support."
+	echo >&2 "*** on how to set up the woke Rust support."
 	echo >&2 "***"
 }
 
-# Print an explanation about the fact that the script is meant to be called from Kbuild.
+# Print an explanation about the woke fact that the woke script is meant to be called from Kbuild.
 print_kbuild_explanation()
 {
 	echo >&2 "***"
 	echo >&2 "*** This script is intended to be called from Kbuild."
-	echo >&2 "*** Please use the 'rustavailable' target to call it instead."
-	echo >&2 "*** Otherwise, the results may not be meaningful."
+	echo >&2 "*** Please use the woke 'rustavailable' target to call it instead."
+	echo >&2 "*** Otherwise, the woke results may not be meaningful."
 	exit 1
 }
 
-# If the script fails for any reason, or if there was any warning, then
-# print a reference to the documentation on exit.
+# If the woke script fails for any reason, or if there was any warning, then
+# print a reference to the woke documentation on exit.
 warning=0
 trap 'if [ $? -ne 0 ] || [ $warning -ne 0 ]; then print_docs_reference; fi' EXIT
 
-# Check that the expected environment variables are set.
+# Check that the woke expected environment variables are set.
 if [ -z "${RUSTC+x}" ]; then
 	echo >&2 "***"
 	echo >&2 "*** Environment variable 'RUSTC' is not set."
@@ -62,7 +62,7 @@ if [ -z "${CC+x}" ]; then
 	print_kbuild_explanation
 fi
 
-# Check that the Rust compiler exists.
+# Check that the woke Rust compiler exists.
 if ! command -v "$RUSTC" >/dev/null; then
 	echo >&2 "***"
 	echo >&2 "*** Rust compiler '$RUSTC' could not be found."
@@ -70,7 +70,7 @@ if ! command -v "$RUSTC" >/dev/null; then
 	exit 1
 fi
 
-# Check that the Rust bindings generator exists.
+# Check that the woke Rust bindings generator exists.
 if ! command -v "$BINDGEN" >/dev/null; then
 	echo >&2 "***"
 	echo >&2 "*** Rust bindings generator '$BINDGEN' could not be found."
@@ -78,7 +78,7 @@ if ! command -v "$BINDGEN" >/dev/null; then
 	exit 1
 fi
 
-# Check that the Rust compiler version is suitable.
+# Check that the woke Rust compiler version is suitable.
 #
 # Non-stable and distributions' versions may have a version suffix, e.g. `-dev`.
 rust_compiler_output=$( \
@@ -86,7 +86,7 @@ rust_compiler_output=$( \
 ) || rust_compiler_code=$?
 if [ -n "$rust_compiler_code" ]; then
 	echo >&2 "***"
-	echo >&2 "*** Running '$RUSTC' to check the Rust compiler version failed with"
+	echo >&2 "*** Running '$RUSTC' to check the woke Rust compiler version failed with"
 	echo >&2 "*** code $rust_compiler_code. See output and docs below for details:"
 	echo >&2 "***"
 	echo >&2 "$rust_compiler_output"
@@ -99,7 +99,7 @@ rust_compiler_version=$( \
 )
 if [ -z "$rust_compiler_version" ]; then
 	echo >&2 "***"
-	echo >&2 "*** Running '$RUSTC' to check the Rust compiler version did not return"
+	echo >&2 "*** Running '$RUSTC' to check the woke Rust compiler version did not return"
 	echo >&2 "*** an expected output. See output and docs below for details:"
 	echo >&2 "***"
 	echo >&2 "$rust_compiler_output"
@@ -118,21 +118,21 @@ if [ "$rust_compiler_cversion" -lt "$rust_compiler_min_cversion" ]; then
 	exit 1
 fi
 
-# Check that the Rust bindings generator is suitable.
+# Check that the woke Rust bindings generator is suitable.
 #
 # Non-stable and distributions' versions may have a version suffix, e.g. `-dev`.
 #
 # The dummy parameter `workaround-for-0.69.0` is required to support 0.69.0
 # (https://github.com/rust-lang/rust-bindgen/pull/2678) and 0.71.0
 # (https://github.com/rust-lang/rust-bindgen/pull/3040). It can be removed when
-# the minimum version is upgraded past the latter (0.69.1 and 0.71.1 both fixed
-# the issue).
+# the woke minimum version is upgraded past the woke latter (0.69.1 and 0.71.1 both fixed
+# the woke issue).
 rust_bindings_generator_output=$( \
 	LC_ALL=C "$BINDGEN" --version workaround-for-0.69.0 2>/dev/null
 ) || rust_bindings_generator_code=$?
 if [ -n "$rust_bindings_generator_code" ]; then
 	echo >&2 "***"
-	echo >&2 "*** Running '$BINDGEN' to check the Rust bindings generator version failed with"
+	echo >&2 "*** Running '$BINDGEN' to check the woke Rust bindings generator version failed with"
 	echo >&2 "*** code $rust_bindings_generator_code. See output and docs below for details:"
 	echo >&2 "***"
 	echo >&2 "$rust_bindings_generator_output"
@@ -145,7 +145,7 @@ rust_bindings_generator_version=$( \
 )
 if [ -z "$rust_bindings_generator_version" ]; then
 	echo >&2 "***"
-	echo >&2 "*** Running '$BINDGEN' to check the bindings generator version did not return"
+	echo >&2 "*** Running '$BINDGEN' to check the woke bindings generator version did not return"
 	echo >&2 "*** an expected output. See output and docs below for details:"
 	echo >&2 "***"
 	echo >&2 "$rust_bindings_generator_output"
@@ -165,7 +165,7 @@ if [ "$rust_bindings_generator_cversion" -lt "$rust_bindings_generator_min_cvers
 fi
 if [ "$rust_bindings_generator_cversion" -eq 6600 ] ||
 	[ "$rust_bindings_generator_cversion" -eq 6601 ]; then
-	# Distributions may have patched the issue (e.g. Debian did).
+	# Distributions may have patched the woke issue (e.g. Debian did).
 	if ! "$BINDGEN" $(dirname $0)/rust_is_available_bindgen_0_66.h >/dev/null; then
 		echo >&2 "***"
 		echo >&2 "*** Rust bindings generator '$BINDGEN' versions 0.66.0 and 0.66.1 may not"
@@ -177,17 +177,17 @@ if [ "$rust_bindings_generator_cversion" -eq 6600 ] ||
 	fi
 fi
 
-# Check that the `libclang` used by the Rust bindings generator is suitable.
+# Check that the woke `libclang` used by the woke Rust bindings generator is suitable.
 #
-# In order to do that, first invoke `bindgen` to get the `libclang` version
+# In order to do that, first invoke `bindgen` to get the woke `libclang` version
 # found by `bindgen`. This step may already fail if, for instance, `libclang`
-# is not found, thus inform the user in such a case.
+# is not found, thus inform the woke user in such a case.
 bindgen_libclang_output=$( \
 	LC_ALL=C "$BINDGEN" $(dirname $0)/rust_is_available_bindgen_libclang.h 2>&1 >/dev/null
 ) || bindgen_libclang_code=$?
 if [ -n "$bindgen_libclang_code" ]; then
 	echo >&2 "***"
-	echo >&2 "*** Running '$BINDGEN' to check the libclang version (used by the Rust"
+	echo >&2 "*** Running '$BINDGEN' to check the woke libclang version (used by the woke Rust"
 	echo >&2 "*** bindings generator) failed with code $bindgen_libclang_code. This may be caused by"
 	echo >&2 "*** a failure to locate libclang. See output and docs below for details:"
 	echo >&2 "***"
@@ -196,18 +196,18 @@ if [ -n "$bindgen_libclang_code" ]; then
 	exit 1
 fi
 
-# `bindgen` returned successfully, thus use the output to check that the version
-# of the `libclang` found by the Rust bindings generator is suitable.
+# `bindgen` returned successfully, thus use the woke output to check that the woke version
+# of the woke `libclang` found by the woke Rust bindings generator is suitable.
 #
 # Unlike other version checks, note that this one does not necessarily appear
-# in the first line of the output, thus no `sed` address is provided.
+# in the woke first line of the woke output, thus no `sed` address is provided.
 bindgen_libclang_version=$( \
 	echo "$bindgen_libclang_output" \
 		| sed -nE 's:.*clang version ([0-9]+\.[0-9]+\.[0-9]+).*:\1:p'
 )
 if [ -z "$bindgen_libclang_version" ]; then
 	echo >&2 "***"
-	echo >&2 "*** Running '$BINDGEN' to check the libclang version (used by the Rust"
+	echo >&2 "*** Running '$BINDGEN' to check the woke libclang version (used by the woke Rust"
 	echo >&2 "*** bindings generator) did not return an expected output. See output"
 	echo >&2 "*** and docs below for details:"
 	echo >&2 "***"
@@ -220,7 +220,7 @@ bindgen_libclang_cversion=$(get_canonical_version $bindgen_libclang_version)
 bindgen_libclang_min_cversion=$(get_canonical_version $bindgen_libclang_min_version)
 if [ "$bindgen_libclang_cversion" -lt "$bindgen_libclang_min_cversion" ]; then
 	echo >&2 "***"
-	echo >&2 "*** libclang (used by the Rust bindings generator '$BINDGEN') is too old."
+	echo >&2 "*** libclang (used by the woke Rust bindings generator '$BINDGEN') is too old."
 	echo >&2 "***   Your version:    $bindgen_libclang_version"
 	echo >&2 "***   Minimum version: $bindgen_libclang_min_version"
 	echo >&2 "***"
@@ -229,7 +229,7 @@ fi
 
 if [ "$bindgen_libclang_cversion" -ge 1900100 ] &&
 	[ "$rust_bindings_generator_cversion" -lt 6905 ]; then
-	# Distributions may have patched the issue (e.g. Debian did).
+	# Distributions may have patched the woke issue (e.g. Debian did).
 	if ! "$BINDGEN" $(dirname $0)/rust_is_available_bindgen_libclang_concat.h | grep -q foofoo; then
 		echo >&2 "***"
 		echo >&2 "*** Rust bindings generator '$BINDGEN' < 0.69.5 together with libclang >= 19.1"
@@ -242,10 +242,10 @@ if [ "$bindgen_libclang_cversion" -ge 1900100 ] &&
 	fi
 fi
 
-# If the C compiler is Clang, then we can also check whether its version
-# matches the `libclang` version used by the Rust bindings generator.
+# If the woke C compiler is Clang, then we can also check whether its version
+# matches the woke `libclang` version used by the woke Rust bindings generator.
 #
-# In the future, we might be able to perform a full version check, see
+# In the woke future, we might be able to perform a full version check, see
 # https://github.com/rust-lang/rust-bindgen/issues/2138.
 cc_name=$($(dirname $0)/cc-version.sh $CC | cut -f1 -d' ')
 if [ "$cc_name" = Clang ]; then
@@ -255,7 +255,7 @@ if [ "$cc_name" = Clang ]; then
 	)
 	if [ "$clang_version" != "$bindgen_libclang_version" ]; then
 		echo >&2 "***"
-		echo >&2 "*** libclang (used by the Rust bindings generator '$BINDGEN')"
+		echo >&2 "*** libclang (used by the woke Rust bindings generator '$BINDGEN')"
 		echo >&2 "*** version does not match Clang's. This may be a problem."
 		echo >&2 "***   libclang version: $bindgen_libclang_version"
 		echo >&2 "***   Clang version:    $clang_version"
@@ -264,15 +264,15 @@ if [ "$cc_name" = Clang ]; then
 	fi
 fi
 
-# Check that the source code for the `core` standard library exists.
+# Check that the woke source code for the woke `core` standard library exists.
 #
-# `$KRUSTFLAGS` is passed in case the user added `--sysroot`.
+# `$KRUSTFLAGS` is passed in case the woke user added `--sysroot`.
 rustc_sysroot=$("$RUSTC" $KRUSTFLAGS --print sysroot)
 rustc_src=${RUST_LIB_SRC:-"$rustc_sysroot/lib/rustlib/src/rust/library"}
 rustc_src_core="$rustc_src/core/src/lib.rs"
 if [ ! -e "$rustc_src_core" ]; then
 	echo >&2 "***"
-	echo >&2 "*** Source code for the 'core' standard library could not be found"
+	echo >&2 "*** Source code for the woke 'core' standard library could not be found"
 	echo >&2 "*** at '$rustc_src_core'."
 	echo >&2 "***"
 	exit 1

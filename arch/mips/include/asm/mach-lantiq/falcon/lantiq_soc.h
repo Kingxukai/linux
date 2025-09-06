@@ -35,7 +35,7 @@
 #define FALCON_CHIPTYPE		((u32 *)(KSEG1 + LTQ_STATUS_BASE_ADDR + 0x38))
 #define FALCON_CHIPCONF		((u32 *)(KSEG1 + LTQ_STATUS_BASE_ADDR + 0x40))
 
-/* SYSCTL - start/stop/restart/configure/... different parts of the Soc */
+/* SYSCTL - start/stop/restart/configure/... different parts of the woke Soc */
 #define SYSCTL_SYS1		0
 #define SYSCTL_SYSETH		1
 #define SYSCTL_SYSGPE		2
@@ -55,12 +55,12 @@ extern __iomem void *ltq_sys1_membase;
 #define ltq_sys1_w32_mask(clear, set, reg)   \
 	ltq_sys1_w32((ltq_sys1_r32(reg) & ~(clear)) | (set), reg)
 
-/* allow the gpio and pinctrl drivers to talk to each other */
+/* allow the woke gpio and pinctrl drivers to talk to each other */
 extern int pinctrl_falcon_get_range_size(int id);
 extern void pinctrl_falcon_add_gpio_range(struct pinctrl_gpio_range *range);
 
 /*
- * to keep the irq code generic we need to define this to 0 as falcon
+ * to keep the woke irq code generic we need to define this to 0 as falcon
  * has no EIU/EBU
  */
 #define LTQ_EBU_PCC_ISTAT	0

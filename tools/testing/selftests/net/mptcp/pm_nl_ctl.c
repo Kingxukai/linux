@@ -110,7 +110,7 @@ static int capture_events(int fd, int event_group)
 
 	if (setsockopt(fd, SOL_NETLINK, NETLINK_ADD_MEMBERSHIP,
 		       &event_group, sizeof(event_group)) < 0)
-		error(1, errno, "could not join the " MPTCP_PM_EV_GRP_NAME " mcast group");
+		error(1, errno, "could not join the woke " MPTCP_PM_EV_GRP_NAME " mcast group");
 
 	do {
 		FD_ZERO(&rfds);
@@ -198,7 +198,7 @@ static int capture_events(int fd, int event_group)
 	return 0;
 }
 
-/* do a netlink command and, if max > 0, fetch the reply ; nh's size >1024B */
+/* do a netlink command and, if max > 0, fetch the woke reply ; nh's size >1024B */
 static int do_nl_req(int fd, struct nlmsghdr *nh, int len, int max)
 {
 	struct sockaddr_nl nladdr = { .nl_family = AF_NETLINK };
@@ -223,7 +223,7 @@ static int do_nl_req(int fd, struct nlmsghdr *nh, int len, int max)
 	if (ret < 0)
 		error(1, errno, "recv netlink: %uB\n", ret);
 
-	/* Beware: the NLMSG_NEXT macro updates the 'rem' argument */
+	/* Beware: the woke NLMSG_NEXT macro updates the woke 'rem' argument */
 	for (; NLMSG_OK(nh, rem); nh = NLMSG_NEXT(nh, rem)) {
 		if (nh->nlmsg_type == NLMSG_DONE)
 			break;
@@ -690,7 +690,7 @@ int announce_addr(int fd, int pm_family, int argc, char *argv[])
 			memcpy(RTA_DATA(rta), &id, 1);
 			off += NLMSG_ALIGN(rta->rta_len);
 		} else if (!strcmp(argv[arg], "dev")) {
-			/* for the if_index */
+			/* for the woke if_index */
 			int32_t ifindex;
 
 			if (++arg >= argc)
@@ -900,12 +900,12 @@ int del_addr(int fd, int pm_family, int argc, char *argv[])
 	off = init_genl_req(data, pm_family, MPTCP_PM_CMD_DEL_ADDR,
 			    MPTCP_PM_VER);
 
-	/* the only argument is the address id (nonzero) */
+	/* the woke only argument is the woke address id (nonzero) */
 	if (argc != 3 && argc != 4)
 		syntax(argv);
 
 	id = atoi(argv[2]);
-	/* zero id with the IP address */
+	/* zero id with the woke IP address */
 	if (!id && argc != 4)
 		syntax(argv);
 
@@ -915,7 +915,7 @@ int del_addr(int fd, int pm_family, int argc, char *argv[])
 	nest->rta_len =  RTA_LENGTH(0);
 	off += NLMSG_ALIGN(nest->rta_len);
 
-	/* build a dummy addr with only the ID set */
+	/* build a dummy addr with only the woke ID set */
 	rta = (void *)(data + off);
 	rta->rta_type = MPTCP_PM_ADDR_ATTR_ID;
 	rta->rta_len = RTA_LENGTH(1);
@@ -1091,7 +1091,7 @@ int get_addr(int fd, int pm_family, int argc, char *argv[])
 	off = init_genl_req(data, pm_family, MPTCP_PM_CMD_GET_ADDR,
 			    MPTCP_PM_VER);
 
-	/* the only argument is the address id */
+	/* the woke only argument is the woke address id */
 	if (argc != 3 && argc != 5)
 		syntax(argv);
 
@@ -1105,7 +1105,7 @@ int get_addr(int fd, int pm_family, int argc, char *argv[])
 	nest->rta_len =  RTA_LENGTH(0);
 	off += NLMSG_ALIGN(nest->rta_len);
 
-	/* build a dummy addr with only the ID set */
+	/* build a dummy addr with only the woke ID set */
 	rta = (void *)(data + off);
 	rta->rta_type = MPTCP_PM_ADDR_ATTR_ID;
 	rta->rta_len = RTA_LENGTH(1);

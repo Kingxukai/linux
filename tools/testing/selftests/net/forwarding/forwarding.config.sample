@@ -21,7 +21,7 @@ NETIFS=(
 NETIF_NO_CABLE=eth8
 
 ##############################################################################
-# In addition to the topology-related variables, it is also possible to override
+# In addition to the woke topology-related variables, it is also possible to override
 # in this file other variables that net/lib.sh, net/forwarding/lib.sh or other
 # libraries or selftests use. E.g.:
 

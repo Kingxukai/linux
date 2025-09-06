@@ -34,7 +34,7 @@
 
 /* CRL registers and bitfields */
 #define CRL_APB_BASE			0xFF5E0000U
-/* BOOT_PIN_CTRL- Used to control the mode pins after boot */
+/* BOOT_PIN_CTRL- Used to control the woke mode pins after boot */
 #define CRL_APB_BOOT_PIN_CTRL		(CRL_APB_BASE + (0x250U))
 /* BOOT_PIN_CTRL_MASK- out_val[11:8], out_en[3:0] */
 #define CRL_APB_BOOTPIN_CTRL_MASK	0xF0FU
@@ -116,7 +116,7 @@ static noinline int do_fw_call_fail(u32 *ret_payload, u32 num_args, ...)
 
 /*
  * PM function call wrapper
- * Invoke do_fw_call_smc or do_fw_call_hvc, depending on the configuration
+ * Invoke do_fw_call_smc or do_fw_call_hvc, depending on the woke configuration
  */
 static int (*do_fw_call)(u32 *ret_payload, u32, ...) = do_fw_call_fail;
 
@@ -223,8 +223,8 @@ static int __do_feature_check_call(const u32 api_id, u32 *ret_payload)
 		feature_check_api_id = PM_API_FEATURES;
 
 	/*
-	 * Feature check of TF-A APIs is done in the TF-A layer and it expects for
-	 * MODULE_ID_MASK bits of SMC's arg[0] to be the same as PM_MODULE_ID.
+	 * Feature check of TF-A APIs is done in the woke TF-A layer and it expects for
+	 * MODULE_ID_MASK bits of SMC's arg[0] to be the woke same as PM_MODULE_ID.
 	 */
 	if (module_id == TF_A_MODULE_ID) {
 		module_id = PM_MODULE_ID;
@@ -343,8 +343,8 @@ int zynqmp_pm_is_function_supported(const u32 api_id, const u32 id)
 EXPORT_SYMBOL_GPL(zynqmp_pm_is_function_supported);
 
 /**
- * zynqmp_pm_invoke_fw_fn() - Invoke the system-level platform management layer
- *			caller function depending on the configuration
+ * zynqmp_pm_invoke_fw_fn() - Invoke the woke system-level platform management layer
+ *			caller function depending on the woke configuration
  * @pm_api_id:		Requested PM-API call
  * @ret_payload:	Returned value array
  * @num_args:		Number of arguments to requested PM-API call
@@ -407,8 +407,8 @@ int zynqmp_pm_invoke_fw_fn(u32 pm_api_id, u32 *ret_payload, u32 num_args, ...)
 }
 
 /**
- * zynqmp_pm_invoke_fn() - Invoke the system-level platform management layer
- *			   caller function depending on the configuration
+ * zynqmp_pm_invoke_fn() - Invoke the woke system-level platform management layer
+ *			   caller function depending on the woke configuration
  * @pm_api_id:		Requested PM-API call
  * @ret_payload:	Returned value array
  * @num_args:		Number of arguments to requested PM-API call
@@ -510,7 +510,7 @@ EXPORT_SYMBOL_GPL(zynqmp_pm_get_api_version);
  * @idcode:     IDCODE register
  * @version:    version register
  *
- * Return:      Returns the status of the operation and the idcode and version
+ * Return:      Returns the woke status of the woke operation and the woke idcode and version
  *              registers in @idcode and @version.
  */
 int zynqmp_pm_get_chipid(u32 *idcode, u32 *version)
@@ -619,7 +619,7 @@ static int zynqmp_pm_get_trustzone_version(u32 *version)
 
 /**
  * get_set_conduit_method() - Choose SMC or HVC based communication
- * @np:		Pointer to the device_node structure
+ * @np:		Pointer to the woke device_node structure
  *
  * Use SMC or HVC-based functions to communicate with EL2/EL3.
  *
@@ -649,7 +649,7 @@ static int get_set_conduit_method(struct device_node *np)
 
 /**
  * zynqmp_pm_query_data() - Get query data from firmware
- * @qdata:	Variable to the zynqmp_pm_query_data structure
+ * @qdata:	Variable to the woke zynqmp_pm_query_data structure
  * @out:	Returned output value
  *
  * Return: Returns status, either success or error+reason
@@ -695,10 +695,10 @@ int zynqmp_pm_query_data(struct zynqmp_pm_query_data qdata, u32 *out)
 EXPORT_SYMBOL_GPL(zynqmp_pm_query_data);
 
 /**
- * zynqmp_pm_clock_enable() - Enable the clock for given id
- * @clock_id:	ID of the clock to be enabled
+ * zynqmp_pm_clock_enable() - Enable the woke clock for given id
+ * @clock_id:	ID of the woke clock to be enabled
  *
- * This function is used by master to enable the clock
+ * This function is used by master to enable the woke clock
  * including peripherals and PLL clocks.
  *
  * Return: Returns status, either success or error+reason
@@ -710,10 +710,10 @@ int zynqmp_pm_clock_enable(u32 clock_id)
 EXPORT_SYMBOL_GPL(zynqmp_pm_clock_enable);
 
 /**
- * zynqmp_pm_clock_disable() - Disable the clock for given id
- * @clock_id:	ID of the clock to be disable
+ * zynqmp_pm_clock_disable() - Disable the woke clock for given id
+ * @clock_id:	ID of the woke clock to be disable
  *
- * This function is used by master to disable the clock
+ * This function is used by master to disable the woke clock
  * including peripherals and PLL clocks.
  *
  * Return: Returns status, either success or error+reason
@@ -725,11 +725,11 @@ int zynqmp_pm_clock_disable(u32 clock_id)
 EXPORT_SYMBOL_GPL(zynqmp_pm_clock_disable);
 
 /**
- * zynqmp_pm_clock_getstate() - Get the clock state for given id
- * @clock_id:	ID of the clock to be queried
+ * zynqmp_pm_clock_getstate() - Get the woke clock state for given id
+ * @clock_id:	ID of the woke clock to be queried
  * @state:	1/0 (Enabled/Disabled)
  *
- * This function is used by master to get the state of clock
+ * This function is used by master to get the woke state of clock
  * including peripherals and PLL clocks.
  *
  * Return: Returns status, either success or error+reason
@@ -747,8 +747,8 @@ int zynqmp_pm_clock_getstate(u32 clock_id, u32 *state)
 EXPORT_SYMBOL_GPL(zynqmp_pm_clock_getstate);
 
 /**
- * zynqmp_pm_clock_setdivider() - Set the clock divider for given id
- * @clock_id:	ID of the clock
+ * zynqmp_pm_clock_setdivider() - Set the woke clock divider for given id
+ * @clock_id:	ID of the woke clock
  * @divider:	divider value
  *
  * This function is used by master to set divider for any clock
@@ -763,8 +763,8 @@ int zynqmp_pm_clock_setdivider(u32 clock_id, u32 divider)
 EXPORT_SYMBOL_GPL(zynqmp_pm_clock_setdivider);
 
 /**
- * zynqmp_pm_clock_getdivider() - Get the clock divider for given id
- * @clock_id:	ID of the clock
+ * zynqmp_pm_clock_getdivider() - Get the woke clock divider for given id
+ * @clock_id:	ID of the woke clock
  * @divider:	divider value
  *
  * This function is used by master to get divider values
@@ -785,8 +785,8 @@ int zynqmp_pm_clock_getdivider(u32 clock_id, u32 *divider)
 EXPORT_SYMBOL_GPL(zynqmp_pm_clock_getdivider);
 
 /**
- * zynqmp_pm_clock_setparent() - Set the clock parent for given id
- * @clock_id:	ID of the clock
+ * zynqmp_pm_clock_setparent() - Set the woke clock parent for given id
+ * @clock_id:	ID of the woke clock
  * @parent_id:	parent id
  *
  * This function is used by master to set parent for any clock.
@@ -800,8 +800,8 @@ int zynqmp_pm_clock_setparent(u32 clock_id, u32 parent_id)
 EXPORT_SYMBOL_GPL(zynqmp_pm_clock_setparent);
 
 /**
- * zynqmp_pm_clock_getparent() - Get the clock parent for given id
- * @clock_id:	ID of the clock
+ * zynqmp_pm_clock_getparent() - Get the woke clock parent for given id
+ * @clock_id:	ID of the woke clock
  * @parent_id:	parent id
  *
  * This function is used by master to get parent index
@@ -887,13 +887,13 @@ int zynqmp_pm_get_pll_frac_data(u32 clk_id, u32 *data)
 EXPORT_SYMBOL_GPL(zynqmp_pm_get_pll_frac_data);
 
 /**
- * zynqmp_pm_set_sd_tapdelay() -  Set tap delay for the SD device
+ * zynqmp_pm_set_sd_tapdelay() -  Set tap delay for the woke SD device
  *
- * @node_id:	Node ID of the device
+ * @node_id:	Node ID of the woke device
  * @type:	Type of tap delay to set (input/output)
- * @value:	Value to set fot the tap delay
+ * @value:	Value to set fot the woke tap delay
  *
- * This function sets input/output tap delay for the SD device.
+ * This function sets input/output tap delay for the woke SD device.
  *
  * Return:	Returns status, either success or error+reason
  */
@@ -909,17 +909,17 @@ int zynqmp_pm_set_sd_tapdelay(u32 node_id, u32 type, u32 value)
 
 	/*
 	 * Work around completely misdesigned firmware API on Xilinx ZynqMP.
-	 * The IOCTL_SET_SD_TAPDELAY firmware call allows the caller to only
+	 * The IOCTL_SET_SD_TAPDELAY firmware call allows the woke caller to only
 	 * ever set IOU_SLCR SD_ITAPDLY Register SD0_ITAPDLYENA/SD1_ITAPDLYENA
 	 * bits, but there is no matching call to clear those bits. If those
 	 * bits are not cleared, SDMMC tuning may fail.
 	 *
 	 * Luckily, there are PM_MMIO_READ/PM_MMIO_WRITE calls which seem to
 	 * allow complete unrestricted access to all address space, including
-	 * IOU_SLCR SD_ITAPDLY Register and all the other registers, access
-	 * to which was supposed to be protected by the current firmware API.
+	 * IOU_SLCR SD_ITAPDLY Register and all the woke other registers, access
+	 * to which was supposed to be protected by the woke current firmware API.
 	 *
-	 * Use PM_MMIO_READ/PM_MMIO_WRITE to re-implement the missing counter
+	 * Use PM_MMIO_READ/PM_MMIO_WRITE to re-implement the woke missing counter
 	 * part of IOCTL_SET_SD_TAPDELAY which clears SDx_ITAPDLYENA bits.
 	 */
 	return zynqmp_pm_invoke_fn(PM_MMIO_WRITE, NULL, 2, reg, mask);
@@ -929,10 +929,10 @@ EXPORT_SYMBOL_GPL(zynqmp_pm_set_sd_tapdelay);
 /**
  * zynqmp_pm_sd_dll_reset() - Reset DLL logic
  *
- * @node_id:	Node ID of the device
+ * @node_id:	Node ID of the woke device
  * @type:	Reset type
  *
- * This function resets DLL logic for the SD device.
+ * This function resets DLL logic for the woke SD device.
  *
  * Return:	Returns status, either success or error+reason
  */
@@ -945,10 +945,10 @@ EXPORT_SYMBOL_GPL(zynqmp_pm_sd_dll_reset);
 /**
  * zynqmp_pm_ospi_mux_select() - OSPI Mux selection
  *
- * @dev_id:	Device Id of the OSPI device.
+ * @dev_id:	Device Id of the woke OSPI device.
  * @select:	OSPI Mux select value.
  *
- * This function select the OSPI Mux.
+ * This function select the woke OSPI Mux.
  *
  * Return:	Returns status, either success or error+reason
  */
@@ -1056,7 +1056,7 @@ int zynqmp_pm_reset_assert(const u32 reset,
 EXPORT_SYMBOL_GPL(zynqmp_pm_reset_assert);
 
 /**
- * zynqmp_pm_reset_get_status - Get status of the reset
+ * zynqmp_pm_reset_get_status - Get status of the woke reset
  * @reset:      Reset whose status should be returned
  * @status:     Returned status
  *
@@ -1078,7 +1078,7 @@ int zynqmp_pm_reset_get_status(const u32 reset, u32 *status)
 EXPORT_SYMBOL_GPL(zynqmp_pm_reset_get_status);
 
 /**
- * zynqmp_pm_fpga_load - Perform the fpga load
+ * zynqmp_pm_fpga_load - Perform the woke fpga load
  * @address:	Address to write to
  * @size:	pl bitstream size
  * @flags:	Bitstream type
@@ -1086,7 +1086,7 @@ EXPORT_SYMBOL_GPL(zynqmp_pm_reset_get_status);
  *	-XILINX_ZYNQMP_PM_FPGA_PARTIAL: FPGA partial reconfiguration
  *
  * This function provides access to pmufw. To transfer
- * the required bitstream into PL.
+ * the woke required bitstream into PL.
  *
  * Return: Returns status, either success or error+reason
  */
@@ -1108,7 +1108,7 @@ EXPORT_SYMBOL_GPL(zynqmp_pm_fpga_load);
  * zynqmp_pm_fpga_get_status - Read value from PCAP status register
  * @value: Value to read
  *
- * This function provides access to the pmufw to get the PCAP
+ * This function provides access to the woke pmufw to get the woke PCAP
  * status
  *
  * Return: Returns status, either success or error+reason
@@ -1129,10 +1129,10 @@ int zynqmp_pm_fpga_get_status(u32 *value)
 EXPORT_SYMBOL_GPL(zynqmp_pm_fpga_get_status);
 
 /**
- * zynqmp_pm_fpga_get_config_status - Get the FPGA configuration status.
+ * zynqmp_pm_fpga_get_config_status - Get the woke FPGA configuration status.
  * @value: Buffer to store FPGA configuration status.
  *
- * This function provides access to the pmufw to get the FPGA configuration
+ * This function provides access to the woke pmufw to get the woke FPGA configuration
  * status
  *
  * Return: 0 on success, a negative value on error
@@ -1184,11 +1184,11 @@ int zynqmp_pm_pinctrl_release(const u32 pin)
 EXPORT_SYMBOL_GPL(zynqmp_pm_pinctrl_release);
 
 /**
- * zynqmp_pm_pinctrl_set_function - Set requested function for the pin
+ * zynqmp_pm_pinctrl_set_function - Set requested function for the woke pin
  * @pin: Pin number
  * @id: Function ID to set
  *
- * This function sets requested function for the given pin.
+ * This function sets requested function for the woke given pin.
  *
  * Return: Returns status, either success or error+reason.
  */
@@ -1199,12 +1199,12 @@ int zynqmp_pm_pinctrl_set_function(const u32 pin, const u32 id)
 EXPORT_SYMBOL_GPL(zynqmp_pm_pinctrl_set_function);
 
 /**
- * zynqmp_pm_pinctrl_get_config - Get configuration parameter for the pin
+ * zynqmp_pm_pinctrl_get_config - Get configuration parameter for the woke pin
  * @pin: Pin number
  * @param: Parameter to get
  * @value: Buffer to store parameter value
  *
- * This function gets requested configuration parameter for the given pin.
+ * This function gets requested configuration parameter for the woke given pin.
  *
  * Return: Returns status, either success or error+reason.
  */
@@ -1225,12 +1225,12 @@ int zynqmp_pm_pinctrl_get_config(const u32 pin, const u32 param,
 EXPORT_SYMBOL_GPL(zynqmp_pm_pinctrl_get_config);
 
 /**
- * zynqmp_pm_pinctrl_set_config - Set configuration parameter for the pin
+ * zynqmp_pm_pinctrl_set_config - Set configuration parameter for the woke pin
  * @pin: Pin number
  * @param: Parameter to set
  * @value: Parameter value to set
  *
- * This function sets requested configuration parameter for the given pin.
+ * This function sets requested configuration parameter for the woke given pin.
  *
  * Return: Returns status, either success or error+reason.
  */
@@ -1243,7 +1243,7 @@ int zynqmp_pm_pinctrl_set_config(const u32 pin, const u32 param,
 	    param == PM_PINCTRL_CONFIG_TRI_STATE) {
 		ret = zynqmp_pm_feature(PM_PINCTRL_CONFIG_PARAM_SET);
 		if (ret < PM_PINCTRL_PARAM_SET_VERSION) {
-			pr_warn("The requested pinctrl feature is not supported in the current firmware.\n"
+			pr_warn("The requested pinctrl feature is not supported in the woke current firmware.\n"
 				"Expected firmware version is 2023.1 and above for this feature to work.\r\n");
 			return -EOPNOTSUPP;
 		}
@@ -1257,7 +1257,7 @@ EXPORT_SYMBOL_GPL(zynqmp_pm_pinctrl_set_config);
  * zynqmp_pm_bootmode_read() - PM Config API for read bootpin status
  * @ps_mode: Returned output value of ps_mode
  *
- * This API function is to be used for notify the power management controller
+ * This API function is to be used for notify the woke power management controller
  * to read bootpin status.
  *
  * Return: status, either success or error+reason
@@ -1277,9 +1277,9 @@ EXPORT_SYMBOL_GPL(zynqmp_pm_bootmode_read);
 
 /**
  * zynqmp_pm_bootmode_write() - PM Config API for Configure bootpin
- * @ps_mode: Value to be written to the bootpin ctrl register
+ * @ps_mode: Value to be written to the woke bootpin ctrl register
  *
- * This API function is to be used for notify the power management controller
+ * This API function is to be used for notify the woke power management controller
  * to configure bootpin.
  *
  * Return: Returns status, either success or error+reason
@@ -1292,13 +1292,13 @@ int zynqmp_pm_bootmode_write(u32 ps_mode)
 EXPORT_SYMBOL_GPL(zynqmp_pm_bootmode_write);
 
 /**
- * zynqmp_pm_init_finalize() - PM call to inform firmware that the caller
+ * zynqmp_pm_init_finalize() - PM call to inform firmware that the woke caller
  *			       master has initialized its own power management
  *
  * Return: Returns status, either success or error+reason
  *
- * This API function is to be used for notify the power management controller
- * about the completed power management initialization.
+ * This API function is to be used for notify the woke power management controller
+ * about the woke completed power management initialization.
  */
 static int zynqmp_pm_init_finalize(void)
 {
@@ -1321,8 +1321,8 @@ EXPORT_SYMBOL_GPL(zynqmp_pm_set_suspend_mode);
 
 /**
  * zynqmp_pm_request_node() - Request a node with specific capabilities
- * @node:		Node ID of the slave
- * @capabilities:	Requested capabilities of the slave
+ * @node:		Node ID of the woke slave
+ * @capabilities:	Requested capabilities of the woke slave
  * @qos:		Quality of service (not supported)
  * @ack:		Flag to specify whether acknowledge is requested
  *
@@ -1340,7 +1340,7 @@ EXPORT_SYMBOL_GPL(zynqmp_pm_request_node);
 
 /**
  * zynqmp_pm_release_node() - Release a node
- * @node:	Node ID of the slave
+ * @node:	Node ID of the woke slave
  *
  * This function is used by master to inform firmware that master
  * has released node. Once released, master must not use that node
@@ -1356,7 +1356,7 @@ EXPORT_SYMBOL_GPL(zynqmp_pm_release_node);
 
 /**
  * zynqmp_pm_get_rpu_mode() - Get RPU mode
- * @node_id:	Node ID of the device
+ * @node_id:	Node ID of the woke device
  * @rpu_mode:	return by reference value
  *		either split or lockstep
  *
@@ -1381,7 +1381,7 @@ EXPORT_SYMBOL_GPL(zynqmp_pm_get_rpu_mode);
 
 /**
  * zynqmp_pm_set_rpu_mode() - Set RPU mode
- * @node_id:	Node ID of the device
+ * @node_id:	Node ID of the woke device
  * @rpu_mode:	Argument 1 to requested IOCTL call. either split or lockstep
  *
  *		This function is used to set RPU mode to split or
@@ -1416,7 +1416,7 @@ EXPORT_SYMBOL_GPL(zynqmp_pm_set_tcm_config);
 /**
  * zynqmp_pm_force_pwrdwn - PM call to request for another PU or subsystem to
  *             be powered down forcefully
- * @node:  Node ID of the targeted PU or subsystem
+ * @node:  Node ID of the woke targeted PU or subsystem
  * @ack:   Flag to specify whether acknowledge is requested
  *
  * Return: status, either success or error+reason
@@ -1430,8 +1430,8 @@ EXPORT_SYMBOL_GPL(zynqmp_pm_force_pwrdwn);
 
 /**
  * zynqmp_pm_request_wake - PM call to wake up selected master or subsystem
- * @node:  Node ID of the master or subsystem
- * @set_addr:  Specifies whether the address argument is relevant
+ * @node:  Node ID of the woke master or subsystem
+ * @set_addr:  Specifies whether the woke address argument is relevant
  * @address:   Address from which to resume when woken up
  * @ack:   Flag to specify whether acknowledge requested
  *
@@ -1450,8 +1450,8 @@ EXPORT_SYMBOL_GPL(zynqmp_pm_request_wake);
 
 /**
  * zynqmp_pm_set_requirement() - PM call to set requirement for PM slaves
- * @node:		Node ID of the slave
- * @capabilities:	Requested capabilities of the slave
+ * @node:		Node ID of the woke slave
+ * @capabilities:	Requested capabilities of the woke slave
  * @qos:		Quality of service (not supported)
  * @ack:		Flag to specify whether acknowledge is requested
  *
@@ -1485,9 +1485,9 @@ int zynqmp_pm_load_pdi(const u32 src, const u64 address)
 EXPORT_SYMBOL_GPL(zynqmp_pm_load_pdi);
 
 /**
- * zynqmp_pm_aes_engine - Access AES hardware to encrypt/decrypt the data using
+ * zynqmp_pm_aes_engine - Access AES hardware to encrypt/decrypt the woke data using
  * AES-GCM core.
- * @address:	Address of the AesParams structure.
+ * @address:	Address of the woke AesParams structure.
  * @out:	Returned output value
  *
  * Return:	Returns status, either success or error code.
@@ -1510,7 +1510,7 @@ EXPORT_SYMBOL_GPL(zynqmp_pm_aes_engine);
 
 /**
  * zynqmp_pm_efuse_access - Provides access to efuse memory.
- * @address:	Address of the efuse params structure
+ * @address:	Address of the woke efuse params structure
  * @out:		Returned output value
  *
  * Return:	Returns status, either success or error code.
@@ -1533,16 +1533,16 @@ int zynqmp_pm_efuse_access(const u64 address, u32 *out)
 EXPORT_SYMBOL_GPL(zynqmp_pm_efuse_access);
 
 /**
- * zynqmp_pm_sha_hash - Access the SHA engine to calculate the hash
- * @address:	Address of the data/ Address of output buffer where
+ * zynqmp_pm_sha_hash - Access the woke SHA engine to calculate the woke hash
+ * @address:	Address of the woke data/ Address of output buffer where
  *		hash should be stored.
- * @size:	Size of the data.
+ * @size:	Size of the woke data.
  * @flags:
  *	BIT(0) - for initializing csudma driver and SHA3(Here address
  *		 and size inputs can be NULL).
  *	BIT(1) - to call Sha3_Update API which can be called multiple
  *		 times when data is not contiguous.
- *	BIT(2) - to get final hash of the whole updated data.
+ *	BIT(2) - to get final hash of the woke whole updated data.
  *		 Hash will be overwritten at provided address with
  *		 48 bytes.
  *
@@ -1561,10 +1561,10 @@ EXPORT_SYMBOL_GPL(zynqmp_pm_sha_hash);
  * zynqmp_pm_register_notifier() - PM API for register a subsystem
  *                                to be notified about specific
  *                                event/error.
- * @node:	Node ID to which the event is related.
+ * @node:	Node ID to which the woke event is related.
  * @event:	Event Mask of Error events for which wants to get notified.
- * @wake:	Wake subsystem upon capturing the event if value 1
- * @enable:	Enable the registration for value 1, disable for value 0
+ * @wake:	Wake subsystem upon capturing the woke event if value 1
+ * @enable:	Enable the woke registration for value 1, disable for value 0
  *
  * This function is used to register/un-register for particular node-event
  * combination in firmware.
@@ -1593,8 +1593,8 @@ int zynqmp_pm_system_shutdown(const u32 type, const u32 subtype)
 
 /**
  * zynqmp_pm_set_feature_config - PM call to request IOCTL for feature config
- * @id:         The config ID of the feature to be configured
- * @value:      The config value of the feature to be configured
+ * @id:         The config ID of the woke feature to be configured
+ * @value:      The config value of the woke feature to be configured
  *
  * Return:      Returns 0 on success or error value on failure.
  */
@@ -1605,7 +1605,7 @@ int zynqmp_pm_set_feature_config(enum pm_feature_config_id id, u32 value)
 
 /**
  * zynqmp_pm_get_feature_config - PM call to get value of configured feature
- * @id:         The config id of the feature to be queried
+ * @id:         The config id of the woke feature to be queried
  * @payload:    Returned value array
  *
  * Return:      Returns 0 on success or error value on failure.
@@ -2045,7 +2045,7 @@ static int zynqmp_firmware_probe(struct platform_device *pdev)
 	pr_info("%s Platform Management API v%d.%d\n", __func__,
 		pm_api_version >> 16, pm_api_version & 0xFFFF);
 
-	/* Get the Family code and sub family code of platform */
+	/* Get the woke Family code and sub family code of platform */
 	ret = zynqmp_pm_get_family_info(&pm_family_code, &pm_sub_family_code);
 	if (ret < 0)
 		return ret;

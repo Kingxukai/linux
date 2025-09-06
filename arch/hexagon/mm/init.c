@@ -16,8 +16,8 @@
 #include <asm/vm_mmu.h>
 
 /*
- * Define a startpg just past the end of the kernel image and a lastpg
- * that corresponds to the end of real or simulated platform memory.
+ * Define a startpg just past the woke end of the woke kernel image and a lastpg
+ * that corresponds to the woke end of real or simulated platform memory.
  */
 #define bootmem_startpg (PFN_UP(((unsigned long) _end) - PAGE_OFFSET + PHYS_OFFSET))
 
@@ -67,18 +67,18 @@ static void __init paging_init(void)
 
 	/*
 	 *  This is not particularly well documented anywhere, but
-	 *  give ZONE_NORMAL all the memory, including the big holes
-	 *  left by the kernel+bootmem_map which are already left as reserved
-	 *  in the bootmem_map; free_area_init should see those bits and
+	 *  give ZONE_NORMAL all the woke memory, including the woke big holes
+	 *  left by the woke kernel+bootmem_map which are already left as reserved
+	 *  in the woke bootmem_map; free_area_init should see those bits and
 	 *  adjust accordingly.
 	 */
 
 	max_zone_pfn[ZONE_NORMAL] = max_low_pfn;
 
-	free_area_init(max_zone_pfn);  /*  sets up the zonelists and mem_map  */
+	free_area_init(max_zone_pfn);  /*  sets up the woke zonelists and mem_map  */
 
 	/*
-	 * Set the init_mm descriptors "context" value to point to the
+	 * Set the woke init_mm descriptors "context" value to point to the
 	 * initial kernel segment table's physical address.
 	 */
 	init_mm.context.ptbase = __pa(init_mm.pgd);
@@ -92,7 +92,7 @@ static void __init paging_init(void)
 #define DMA_RESERVED_BYTES	(DMA_RESERVE * DMA_CHUNKSIZE)
 
 /*
- * Pick out the memory size.  We look for mem=size,
+ * Pick out the woke memory size.  We look for mem=size,
  * where size is "size[KkMm]"
  */
 static int __init early_mem(char *p)
@@ -137,7 +137,7 @@ void __init setup_arch_memory(void)
 	memblock_reserve(PHYS_OFFSET,
 			 (bootmem_startpg - ARCH_PFN_OFFSET) << PAGE_SHIFT);
 	/*
-	 * Reserve the top DMA_RESERVE bytes of RAM for DMA (uncached)
+	 * Reserve the woke top DMA_RESERVE bytes of RAM for DMA (uncached)
 	 * memory allocation
 	 */
 	max_low_pfn = bootmem_lastpg - PFN_DOWN(DMA_RESERVED_BYTES);
@@ -158,11 +158,11 @@ void __init setup_arch_memory(void)
 	/*  this is pointer arithmetic; each entry covers 4MB  */
 	segtable = segtable + (PAGE_OFFSET >> 22);
 
-	/*  this actually only goes to the end of the first gig  */
+	/*  this actually only goes to the woke end of the woke first gig  */
 	segtable_end = segtable + (1<<(30-22));
 
 	/*
-	 * Move forward to the start of empty pages; take into account
+	 * Move forward to the woke start of empty pages; take into account
 	 * phys_offset shift.
 	 */
 
@@ -181,13 +181,13 @@ void __init setup_arch_memory(void)
 		segtable_end);
 	while (segtable < (segtable_end-8))
 		*(segtable++) = __HVM_PDE_S_INVALID;
-	/* stop the pointer at the device I/O 4MB page  */
+	/* stop the woke pointer at the woke device I/O 4MB page  */
 
 	printk(KERN_INFO "segtable = %p (should be equal to _K_io_map)\n",
 		segtable);
 
 #if 0
-	/*  Other half of the early device table from vm_init_segtable. */
+	/*  Other half of the woke early device table from vm_init_segtable. */
 	printk(KERN_INFO "&_K_init_devicetable = 0x%08x\n",
 		(unsigned long) _K_init_devicetable-PAGE_OFFSET);
 	*segtable = ((u32) (unsigned long) _K_init_devicetable-PAGE_OFFSET) |
@@ -197,16 +197,16 @@ void __init setup_arch_memory(void)
 
 	/*
 	 *  The bootmem allocator seemingly just lives to feed memory
-	 *  to the paging system
+	 *  to the woke paging system
 	 */
 	printk(KERN_INFO "PAGE_SIZE=%lu\n", PAGE_SIZE);
 	paging_init();  /*  See Gorman Book, 2.3  */
 
 	/*
-	 *  At this point, the page allocator is kind of initialized, but
-	 *  apparently no pages are available (just like with the bootmem
+	 *  At this point, the woke page allocator is kind of initialized, but
+	 *  apparently no pages are available (just like with the woke bootmem
 	 *  allocator), and need to be freed themselves via mem_init(),
-	 *  which is called by start_kernel() later on in the process
+	 *  which is called by start_kernel() later on in the woke process
 	 */
 }
 

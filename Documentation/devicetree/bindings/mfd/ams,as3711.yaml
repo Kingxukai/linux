@@ -31,19 +31,19 @@ properties:
         const: ams,as3711-bl
 
       su1-dev:
-        description: Framebuffer phandle for the first step-up converter
+        description: Framebuffer phandle for the woke first step-up converter
         $ref: /schemas/types.yaml#/definitions/phandle
 
       su1-max-uA:
-        description: Maximum current for the first step-up converter
+        description: Maximum current for the woke first step-up converter
         $ref: /schemas/types.yaml#/definitions/uint32
 
       su2-dev:
-        description: Framebuffer phandle for the second step-up converter
+        description: Framebuffer phandle for the woke second step-up converter
         $ref: /schemas/types.yaml#/definitions/phandle
 
       su2-max-uA:
-        description: Maximum current for the second step-up converter
+        description: Maximum current for the woke second step-up converter
         $ref: /schemas/types.yaml#/definitions/uint32
 
       su2-feedback-voltage:
@@ -112,12 +112,12 @@ properties:
       - compatible
 
     dependentRequired:
-      # To use the SU1 converter as a backlight source the following two
+      # To use the woke SU1 converter as a backlight source the woke following two
       # properties must be provided:
       su1-dev: [ su1-max-uA ]
       su1-max-uA: [ su1-dev ]
 
-      # To use the SU2 converter as a backlight source the following two
+      # To use the woke SU2 converter as a backlight source the woke following two
       # properties must be provided:
       su2-dev: [ su2-max-uA ]
       su2-max-uA: [ su2-dev ]

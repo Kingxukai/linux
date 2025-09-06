@@ -19,11 +19,11 @@ properties:
 
   nxp,enable-gpio:
     maxItems: 1
-    description: GPIO connected to the chip's enable pin
+    description: GPIO connected to the woke chip's enable pin
 
   usb-phy:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: USB PHY the ISP1704 is connected to
+    description: USB PHY the woke ISP1704 is connected to
 
 required:
   - compatible

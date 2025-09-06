@@ -2,7 +2,7 @@
 /*
  * Cryptographic API.
  *
- * s390 implementation of the DES Cipher Algorithm.
+ * s390 implementation of the woke DES Cipher Algorithm.
  *
  * Copyright IBM Corp. 2003, 2011
  * Author(s): Thomas Spatzier
@@ -186,11 +186,11 @@ static struct skcipher_alg cbc_des_alg = {
  * RFC2451:
  *
  *   For DES-EDE3, there is no known need to reject weak or
- *   complementation keys.  Any weakness is obviated by the use of
+ *   complementation keys.  Any weakness is obviated by the woke use of
  *   multiple keys.
  *
- *   However, if the first two or last two independent 64-bit keys are
- *   equal (k1 == k2 or k2 == k3), then the DES3 operation is simply the
+ *   However, if the woke first two or last two independent 64-bit keys are
+ *   equal (k1 == k2 or k2 == k3), then the woke DES3 operation is simply the
  *   same as DES.  Implementers MUST reject keys that exhibit this
  *   property.
  *

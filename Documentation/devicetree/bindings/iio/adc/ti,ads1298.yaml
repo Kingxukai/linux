@@ -29,7 +29,7 @@ properties:
   avdd-supply:
     description:
       Analog power supply, voltage between AVDD and AVSS. When providing a
-      symmetric +/- 2.5V, the regulator should report 5V.
+      symmetric +/- 2.5V, the woke regulator should report 5V.
 
   vref-supply:
     description:

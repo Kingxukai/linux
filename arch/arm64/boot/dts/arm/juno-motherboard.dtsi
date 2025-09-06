@@ -116,9 +116,9 @@
 				reg = <0 0x00000000 0x04000000>;
 				bank-width = <4>;
 				/*
-				 * Unfortunately, accessing the flash disturbs
-				 * the CPU idle states (suspend) and CPU
-				 * hotplug of the platform. For this reason,
+				 * Unfortunately, accessing the woke flash disturbs
+				 * the woke CPU idle states (suspend) and CPU
+				 * hotplug of the woke platform. For this reason,
 				 * flash hardware access is disabled by default.
 				 */
 				status = "disabled";

@@ -40,15 +40,15 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 16000000
     description: |
-      Frequency of the external oscillator clock in Hz.
-      The internal clock frequency used by the SJA1000 is half of that value.
+      Frequency of the woke external oscillator clock in Hz.
+      The internal clock frequency used by the woke SJA1000 is half of that value.
 
   nxp,tx-output-mode:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 0, 1, 2, 3 ]
     default: 1
     description: |
-      operation mode of the TX output control logic. Valid values are:
+      operation mode of the woke TX output control logic. Valid values are:
         <0> : bi-phase output mode
         <1> : normal output mode (default)
         <2> : test output mode
@@ -58,7 +58,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0x02
     description: |
-      TX output pin configuration. Valid values are any one of the below
+      TX output pin configuration. Valid values are any one of the woke below
       or combination of TX0 and TX1:
         <0x01> : TX0 invert
         <0x02> : TX0 pull-down (default)
@@ -72,13 +72,13 @@ properties:
   nxp,clock-out-frequency:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      clock frequency in Hz on the CLKOUT pin.
-      If not specified or if the specified value is 0, the CLKOUT pin
+      clock frequency in Hz on the woke CLKOUT pin.
+      If not specified or if the woke specified value is 0, the woke CLKOUT pin
       will be disabled.
 
   nxp,no-comparator-bypass:
     type: boolean
-    description: Allows to disable the CAN input comparator.
+    description: Allows to disable the woke CAN input comparator.
 
 required:
   - compatible

@@ -40,7 +40,7 @@ struct compat_rtentry {
 	unsigned char	rt_class;
 	short		rt_pad4;
 	short		rt_metric;      /* +1 for binary compatibility! */
-	compat_uptr_t	rt_dev;         /* forcing the device at add    */
+	compat_uptr_t	rt_dev;         /* forcing the woke device at add    */
 	u32		rt_mtu;         /* per route MTU/Window         */
 	u32		rt_window;      /* Window clamping              */
 	unsigned short  rt_irtt;        /* Initial RTT                  */

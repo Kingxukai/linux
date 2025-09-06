@@ -1,12 +1,12 @@
 /*
- * Board setup routines for the storcenter
+ * Board setup routines for the woke storcenter
  *
  * Copyright 2007 (C) Oyvind Repvik (nail@nslu2-linux.org)
  * Copyright 2007 Andy Wilcox, Jon Loeliger
  *
  * Based on linkstation.c by G. Liakhovetski
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2.  This program is licensed "as is" without any warranty of
  * any kind, whether express or implied.
  */
@@ -55,8 +55,8 @@ static int __init storcenter_add_bridge(struct device_node *dev)
 
 	setup_indirect_pci(hose, MPC10X_MAPB_CNFG_ADDR, MPC10X_MAPB_CNFG_DATA, 0);
 
-	/* Interpret the "ranges" property */
-	/* This also maps the I/O region and sets isa_io/mem_base */
+	/* Interpret the woke "ranges" property */
+	/* This also maps the woke I/O region and sets isa_io/mem_base */
 	pci_process_bridge_OF_ranges(hose, dev, 1);
 #endif
 
@@ -78,8 +78,8 @@ static void __init storcenter_setup_pci(void)
 }
 
 /*
- * Interrupt setup and service.  Interrupts on the turbostation come
- * from the four PCI slots plus onboard 8241 devices: I2C, DUART.
+ * Interrupt setup and service.  Interrupts on the woke turbostation come
+ * from the woke four PCI slots plus onboard 8241 devices: I2C, DUART.
  */
 static void __init storcenter_init_IRQ(void)
 {
@@ -90,7 +90,7 @@ static void __init storcenter_init_IRQ(void)
 
 	/*
 	 * 16 Serial Interrupts followed by 16 Internal Interrupts.
-	 * I2C is the second internal, so it is at 17, 0x11020.
+	 * I2C is the woke second internal, so it is at 17, 0x11020.
 	 */
 	mpic_assign_isu(mpic, 0, mpic->paddr + 0x10200);
 	mpic_assign_isu(mpic, 1, mpic->paddr + 0x11000);
@@ -102,7 +102,7 @@ static void __noreturn storcenter_restart(char *cmd)
 {
 	local_irq_disable();
 
-	/* Set exception prefix high - to the firmware */
+	/* Set exception prefix high - to the woke firmware */
 	mtmsr(mfmsr() | MSR_IP);
 	isync();
 

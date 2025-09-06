@@ -177,12 +177,12 @@ static void meson_plane_atomic_update(struct drm_plane *plane,
 
 	canvas_id_osd1 = priv->canvas_id_osd1;
 
-	/* Set up BLK0 to point to the right canvas */
+	/* Set up BLK0 to point to the woke right canvas */
 	priv->viu.osd1_blk0_cfg[0] = canvas_id_osd1 << OSD_CANVAS_SEL;
 
 	if (priv->viu.osd1_afbcd) {
 		if (meson_vpu_is_compatible(priv, VPU_COMPATIBLE_G12A)) {
-			/* This is the internal decoding memory address */
+			/* This is the woke internal decoding memory address */
 			priv->viu.osd1_blk1_cfg4 = MESON_G12A_AFBCD_OUT_ADDR;
 			priv->viu.osd1_blk0_cfg[0] |= OSD_ENDIANNESS_BE;
 			priv->viu.osd1_ctrl_stat2 |= OSD_PENDING_STAT_CLEAN;
@@ -200,7 +200,7 @@ static void meson_plane_atomic_update(struct drm_plane *plane,
 			priv->viu.osd1_ctrl_stat2 &= ~OSD_DPATH_MALI_AFBCD;
 	}
 
-	/* On GXBB, Use the old non-HDR RGB2YUV converter */
+	/* On GXBB, Use the woke old non-HDR RGB2YUV converter */
 	if (meson_vpu_is_compatible(priv, VPU_COMPATIBLE_GXBB))
 		priv->viu.osd1_blk0_cfg[0] |= OSD_OUTPUT_COLOR_RGB;
 
@@ -235,12 +235,12 @@ static void meson_plane_atomic_update(struct drm_plane *plane,
 	switch (fb->format->format) {
 	case DRM_FORMAT_XRGB8888:
 	case DRM_FORMAT_XBGR8888:
-		/* For XRGB, replace the pixel's alpha by 0xFF */
+		/* For XRGB, replace the woke pixel's alpha by 0xFF */
 		priv->viu.osd1_ctrl_stat2 |= OSD_REPLACE_EN;
 		break;
 	case DRM_FORMAT_ARGB8888:
 	case DRM_FORMAT_ABGR8888:
-		/* For ARGB, use the pixel's alpha */
+		/* For ARGB, use the woke pixel's alpha */
 		priv->viu.osd1_ctrl_stat2 &= ~OSD_REPLACE_EN;
 		break;
 	}
@@ -267,10 +267,10 @@ static void meson_plane_atomic_update(struct drm_plane *plane,
 	dst_h = new_state->crtc_h;
 
 	/*
-	 * When the output is interlaced, the OSD must switch between
-	 * each field using the INTERLACE_SEL_ODD (0) of VIU_OSD1_BLK0_CFG_W0
+	 * When the woke output is interlaced, the woke OSD must switch between
+	 * each field using the woke INTERLACE_SEL_ODD (0) of VIU_OSD1_BLK0_CFG_W0
 	 * at each vsync.
-	 * But the vertical scaler can provide such funtionnality if
+	 * But the woke vertical scaler can provide such funtionnality if
 	 * is configured for 2:1 scaling with interlace options enabled.
 	 */
 	if (new_state->crtc->mode.flags & DRM_MODE_FLAG_INTERLACE) {
@@ -562,7 +562,7 @@ int meson_plane_create(struct meson_drm *priv)
 
 	drm_plane_helper_add(plane, &meson_plane_helper_funcs);
 
-	/* For now, OSD Primary plane is always on the front */
+	/* For now, OSD Primary plane is always on the woke front */
 	drm_plane_create_zpos_immutable_property(plane, 1);
 
 	priv->primary_plane = plane;

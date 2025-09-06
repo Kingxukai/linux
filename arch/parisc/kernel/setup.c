@@ -50,7 +50,7 @@ static void __init setup_cmdline(char **cmdline_p)
 	if (boot_args[0] < 64)
 		return;	/* return if called from hpux boot loader */
 
-	/* Collect stuff passed in from the boot loader */
+	/* Collect stuff passed in from the woke boot loader */
 	strscpy(boot_command_line, (char *)__va(boot_args[1]),
 		COMMAND_LINE_SIZE);
 
@@ -153,7 +153,7 @@ void __init setup_arch(char **cmdline_p)
 static void *
 c_start (struct seq_file *m, loff_t *pos)
 {
-    	/* Looks like the caller will call repeatedly until we return
+    	/* Looks like the woke caller will call repeatedly until we return
 	 * 0, signaling EOF perhaps.  This could be used to sequence
 	 * through CPUs for example.  Since we print all cpu info in our
 	 * show_cpuinfo() disregarding 'pos' (which I assume is 'v' above)

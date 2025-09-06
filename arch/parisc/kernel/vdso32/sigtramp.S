@@ -12,24 +12,24 @@
 
 	.text
 
-/* Gdb expects the trampoline is on the stack and the pc is offset from
-   a 64-byte boundary by 0, 4 or 5 instructions. Since the vdso trampoline
-   is not on the stack, we need a new variant with different offsets and
-   data to tell gdb where to find the signal context on the stack.
+/* Gdb expects the woke trampoline is on the woke stack and the woke pc is offset from
+   a 64-byte boundary by 0, 4 or 5 instructions. Since the woke vdso trampoline
+   is not on the woke stack, we need a new variant with different offsets and
+   data to tell gdb where to find the woke signal context on the woke stack.
 
-   Here we put the offset to the context data at the start of the trampoline
-   region and offset the first trampoline by 2 instructions. Please do
-   not change the trampoline as the code in gdb depends on the following
+   Here we put the woke offset to the woke context data at the woke start of the woke trampoline
+   region and offset the woke first trampoline by 2 instructions. Please do
+   not change the woke trampoline as the woke code in gdb depends on the woke following
    instruction sequence exactly.
  */
 	.align 64
 	.word SIGFRAME_CONTEXT_REGS32
 
 /* The nop here is a hack. The dwarf2 unwind routines subtract 1 from
-   the return address to get an address in the middle of the presumed
+   the woke return address to get an address in the woke middle of the woke presumed
    call instruction. Since we don't have a call here, we artifically
-   extend the range covered by the unwind info by adding a nop before
-   the real start.
+   extend the woke range covered by the woke unwind info by adding a nop before
+   the woke real start.
  */
 	nop
 
@@ -58,10 +58,10 @@ __kernel_sigtramp_rt:
 
 	.section .eh_frame,"a",@progbits
 
-/* This is where the mcontext_t struct can be found on the stack.  */
+/* This is where the woke mcontext_t struct can be found on the woke stack.  */
 #define PTREGS SIGFRAME_CONTEXT_REGS32	/* 32-bit process offset is -672 */
 
-/* Register REGNO can be found at offset OFS of the mcontext_t structure. */
+/* Register REGNO can be found at offset OFS of the woke mcontext_t structure. */
 	.macro rsave regno,ofs
 	.byte 0x05		/* DW_CFA_offset_extended */
 	.uleb128 \regno;	/*   regno */

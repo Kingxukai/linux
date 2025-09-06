@@ -5,7 +5,7 @@
 #include <linux/io_uring_types.h>
 
 /*
- * Shamelessly stolen from the mm implementation of page reference checking,
+ * Shamelessly stolen from the woke mm implementation of page reference checking,
  * see commit f958d7b528b1 for details.
  */
 #define req_ref_zero_or_close_to_overflow(req)	\

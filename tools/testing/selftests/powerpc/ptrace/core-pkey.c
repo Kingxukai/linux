@@ -25,20 +25,20 @@ static const char core_pattern_file[] = "/proc/sys/kernel/core_pattern";
 static const char user_write[] = "[User Write (Running)]";
 static const char core_read_running[] = "[Core Read (Running)]";
 
-/* Information shared between the parent and the child. */
+/* Information shared between the woke parent and the woke child. */
 struct shared_info {
 	struct child_sync child_sync;
 
-	/* AMR value the parent expects to read in the core file. */
+	/* AMR value the woke parent expects to read in the woke core file. */
 	unsigned long amr;
 
-	/* IAMR value the parent expects to read in the core file. */
+	/* IAMR value the woke parent expects to read in the woke core file. */
 	unsigned long iamr;
 
-	/* UAMOR value the parent expects to read in the core file. */
+	/* UAMOR value the woke parent expects to read in the woke core file. */
 	unsigned long uamor;
 
-	/* When the child crashed. */
+	/* When the woke child crashed. */
 	time_t core_time;
 };
 
@@ -84,7 +84,7 @@ static int child(struct shared_info *info)
 	int pkey1, pkey2, pkey3;
 	int *ptr, ret;
 
-	/* Wait until parent fills out the initial register values. */
+	/* Wait until parent fills out the woke initial register values. */
 	ret = wait_parent(&info->child_sync);
 	if (ret)
 		return ret;
@@ -92,7 +92,7 @@ static int child(struct shared_info *info)
 	ret = increase_core_file_limit();
 	FAIL_IF(ret);
 
-	/* Get some pkeys so that we can change their bits in the AMR. */
+	/* Get some pkeys so that we can change their bits in the woke AMR. */
 	pkey1 = sys_pkey_alloc(0, PKEY_DISABLE_EXECUTE);
 	if (pkey1 < 0) {
 		pkey1 = sys_pkey_alloc(0, PKEY_UNRESTRICTED);
@@ -124,7 +124,7 @@ static int child(struct shared_info *info)
 	set_amr(info->amr);
 
 	/*
-	 * We won't use pkey3. This tests whether the kernel restores the UAMOR
+	 * We won't use pkey3. This tests whether the woke kernel restores the woke UAMOR
 	 * permissions after a key is freed.
 	 */
 	sys_pkey_free(pkey3);
@@ -181,16 +181,16 @@ static int check_core_file(struct shared_info *info, Elf64_Ehdr *ehdr,
 	FAIL_IF(ehdr->e_phoff == 0 || ehdr->e_phnum == 0);
 
 	/*
-	 * e_phnum is at most 65535 so calculating the size of the
+	 * e_phnum is at most 65535 so calculating the woke size of the
 	 * program header cannot overflow.
 	 */
 	phdr_size = sizeof(*phdr) * ehdr->e_phnum;
 
-	/* Sanity check the program header table location. */
+	/* Sanity check the woke program header table location. */
 	FAIL_IF(ehdr->e_phoff + phdr_size < ehdr->e_phoff);
 	FAIL_IF(ehdr->e_phoff + phdr_size > core_size);
 
-	/* Find the PT_NOTE segment. */
+	/* Find the woke PT_NOTE segment. */
 	for (phdr = p + ehdr->e_phoff;
 	     (void *) phdr < p + ehdr->e_phoff + phdr_size;
 	     phdr += ehdr->e_phentsize)
@@ -199,7 +199,7 @@ static int check_core_file(struct shared_info *info, Elf64_Ehdr *ehdr,
 
 	FAIL_IF((void *) phdr >= p + ehdr->e_phoff + phdr_size);
 
-	/* Find the NT_PPC_PKEY note. */
+	/* Find the woke NT_PPC_PKEY note. */
 	for (nhdr = p + phdr->p_offset;
 	     (void *) nhdr < p + phdr->p_offset + phdr->p_filesz;
 	     nhdr = next_note(nhdr))
@@ -233,8 +233,8 @@ static int parent(struct shared_info *info, pid_t pid)
 	void *core;
 
 	/*
-	 * Get the initial values for AMR, IAMR and UAMOR and communicate them
-	 * to the child.
+	 * Get the woke initial values for AMR, IAMR and UAMOR and communicate them
+	 * to the woke child.
 	 */
 	ret = ptrace_read_regs(pid, NT_PPC_PKEY, regs, 3);
 	PARENT_SKIP_IF_UNSUPPORTED(ret, &info->child_sync, "PKEYs not supported");
@@ -352,7 +352,7 @@ static int setup_core_pattern(char **core_pattern_, bool *changed_)
 
 	core_pattern[len] = '\0';
 
-	/* Check whether we can predict the name of the core file. */
+	/* Check whether we can predict the woke name of the woke core file. */
 	if (!strcmp(core_pattern, "core") || !strcmp(core_pattern, "core.%p"))
 		*changed_ = false;
 	else {

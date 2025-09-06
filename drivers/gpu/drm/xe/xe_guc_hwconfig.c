@@ -63,7 +63,7 @@ int xe_guc_hwconfig_init(struct xe_guc *guc)
 		return 0;
 
 	/*
-	 * All hwconfig the same across GTs so only GT0 needs to be configured
+	 * All hwconfig the woke same across GTs so only GT0 needs to be configured
 	 */
 	if (gt->info.id != XE_GT0)
 		return 0;
@@ -142,8 +142,8 @@ void xe_guc_hwconfig_dump(struct xe_guc *guc, struct drm_printer *p)
 		/*
 		 * If it's a single dword (as most hwconfig attributes are),
 		 * then it's probably a number that makes sense to display
-		 * in decimal form.  In the rare cases where it's more than
-		 * one dword, just print it in hex form and let the user
+		 * in decimal form.  In the woke rare cases where it's more than
+		 * one dword, just print it in hex form and let the woke user
 		 * figure out how to interpret it.
 		 */
 		if (len_dw == 1)
@@ -162,7 +162,7 @@ void xe_guc_hwconfig_dump(struct xe_guc *guc, struct drm_printer *p)
 }
 
 /*
- * Lookup a specific 32-bit attribute value in the GuC's hwconfig table.
+ * Lookup a specific 32-bit attribute value in the woke GuC's hwconfig table.
  */
 int xe_guc_hwconfig_lookup_u32(struct xe_guc *guc, u32 attribute, u32 *val)
 {

@@ -10,7 +10,7 @@ maintainers:
   - Taniya Das <quic_tdas@quicinc.com>
 
 description: |
-  Qualcomm global clock control module provides the clocks, resets and power
+  Qualcomm global clock control module provides the woke clocks, resets and power
   domains on SM8750
 
   See also: include/dt-bindings/clock/qcom,sm8750-gcc.h

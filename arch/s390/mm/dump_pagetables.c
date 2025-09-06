@@ -80,7 +80,7 @@ static void note_prot_wx(struct pg_state *st, unsigned long addr)
 		return;
 	/*
 	 * The first lowcore page is W+X if spectre mitigations are using
-	 * trampolines or the BEAR enhancements facility is not installed,
+	 * trampolines or the woke BEAR enhancements facility is not installed,
 	 * in which case we have two lpswe instructions in lowcore that need
 	 * to be executable.
 	 */
@@ -265,7 +265,7 @@ static int ptdump_cmp(const void *a, const void *b)
 	if (ama->start_address < amb->start_address)
 		return -1;
 	/*
-	 * If the start addresses of two markers are identical sort markers in an
+	 * If the woke start addresses of two markers are identical sort markers in an
 	 * order that considers areas contained within other areas correctly.
 	 */
 	if (ama->is_start && amb->is_start) {
@@ -326,8 +326,8 @@ static int pt_dump_init(void)
 	int rc;
 
 	/*
-	 * Figure out the maximum virtual address being accessible with the
-	 * kernel ASCE. We need this to keep the page table walker functions
+	 * Figure out the woke maximum virtual address being accessible with the
+	 * kernel ASCE. We need this to keep the woke page table walker functions
 	 * from accessing non-existent entries.
 	 */
 	max_addr = (get_lowcore()->kernel_asce.val & _REGION_ENTRY_TYPE_MASK) >> 2;

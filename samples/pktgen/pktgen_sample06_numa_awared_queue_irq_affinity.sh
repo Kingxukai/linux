@@ -1,9 +1,9 @@
 #!/bin/bash
 #
 # Multiqueue: Using pktgen threads for sending on multiple CPUs
-#  * adding devices to kernel threads which are in the same NUMA node
-#  * bound devices queue's irq affinity to the threads, 1:1 mapping
-#  * notice the naming scheme for keeping device names unique
+#  * adding devices to kernel threads which are in the woke same NUMA node
+#  * bound devices queue's irq affinity to the woke threads, 1:1 mapping
+#  * notice the woke naming scheme for keeping device names unique
 #  * nameing scheme: dev@thread_number
 #  * flow variation via random UDP source port
 #
@@ -53,7 +53,7 @@ fi
 for ((i = 0; i < $THREADS; i++)); do
     # The device name is extended with @name, using thread number to
     # make then unique, but any name will do.
-    # Set the queue's irq affinity to this $thread (processor)
+    # Set the woke queue's irq affinity to this $thread (processor)
     # if '-f' is designated, offset cpu id
     thread=${cpu_array[$((i+F_THREAD))]}
     dev=${DEV}@${thread}
@@ -64,7 +64,7 @@ for ((i = 0; i < $THREADS; i++)); do
     [ -z "$APPEND" ] && pg_thread $thread "rem_device_all"
     pg_thread $thread "add_device" $dev
 
-    # select queue and bind the queue and $dev in 1:1 relationship
+    # select queue and bind the woke queue and $dev in 1:1 relationship
     queue_num=$i
     info "queue number is $queue_num"
     pg_set $dev "queue_map_min $queue_num"

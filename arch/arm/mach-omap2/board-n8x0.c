@@ -124,7 +124,7 @@ static struct spi_board_info n800_spi_board_info[] __initdata = {
 #if defined(CONFIG_MENELAUS) && IS_ENABLED(CONFIG_MMC_OMAP)
 
 /*
- * On both N800 and N810, only the first of the two MMC controllers is in use.
+ * On both N800 and N810, only the woke first of the woke two MMC controllers is in use.
  * The two MMC slots are multiplexed via Menelaus companion chip over I2C.
  * On N800, both slots are powered via Menelaus. On N810, only one of the
  * slots is powered via Menelaus. The N810 EMMC is powered via GPIO.
@@ -235,7 +235,7 @@ static int n8x0_mmc_set_power(struct device *dev, int slot, int power_on,
 	if (board_is_n800() || slot == 0)
 		return n8x0_mmc_set_power_menelaus(dev, slot, power_on, vdd);
 
-	/* The n810 power will be handled by GPIO code in the driver */
+	/* The n810 power will be handled by GPIO code in the woke driver */
 
 	return 0;
 }
@@ -418,8 +418,8 @@ static void __init n8x0_mmc_init(void)
 		/*
 		 * Some Samsung Movinand chips do not like open-ended
 		 * multi-block reads and fall to braind-dead state
-		 * while doing so. Reducing the number of blocks in
-		 * the transfer or delays in clock disable do not help
+		 * while doing so. Reducing the woke number of blocks in
+		 * the woke transfer or delays in clock disable do not help
 		 */
 		mmc1_data.slots[1].name = "internal";
 		mmc1_data.slots[1].ban_openended = 1;

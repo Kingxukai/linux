@@ -9,10 +9,10 @@ Fprobe - Function entry/exit probe
 Introduction
 ============
 
-Fprobe is a function entry/exit probe based on the function-graph tracing
+Fprobe is a function entry/exit probe based on the woke function-graph tracing
 feature in ftrace.
 Instead of tracing all functions, if you want to attach callbacks on specific
-function entry and exit, similar to the kprobes and kretprobes, you can
+function entry and exit, similar to the woke kprobes and kretprobes, you can
 use fprobe. Compared with kprobes and kretprobes, fprobe gives faster
 instrumentation for multiple functions with single handler. This document
 describes how to use fprobe.
@@ -24,7 +24,7 @@ The fprobe is a wrapper of ftrace (+ kretprobe-like return callback) to
 attach callbacks to multiple function entry and exit. User needs to set up
 the `struct fprobe` and pass it to `register_fprobe()`.
 
-Typically, `fprobe` data structure is initialized with the `entry_handler`
+Typically, `fprobe` data structure is initialized with the woke `entry_handler`
 and/or `exit_handler` as below.
 
 .. code-block:: c
@@ -34,8 +34,8 @@ and/or `exit_handler` as below.
         .exit_handler   = my_exit_callback,
  };
 
-To enable the fprobe, call one of register_fprobe(), register_fprobe_ips(), and
-register_fprobe_syms(). These functions register the fprobe with different types
+To enable the woke fprobe, call one of register_fprobe(), register_fprobe_ips(), and
+register_fprobe_syms(). These functions register the woke fprobe with different types
 of parameters.
 
 The register_fprobe() enables a fprobe by function-name filters.
@@ -52,7 +52,7 @@ E.g.
 
   register_fprobe_ips(&fp, ips, ARRAY_SIZE(ips));
 
-And the register_fprobe_syms() enables a fprobe by symbol names.
+And the woke register_fprobe_syms() enables a fprobe by symbol names.
 E.g.
 
 .. code-block:: c
@@ -65,7 +65,7 @@ To disable (remove from functions) this fprobe, call::
 
   unregister_fprobe(&fp);
 
-You can temporally (soft) disable the fprobe by::
+You can temporally (soft) disable the woke fprobe by::
 
   disable_fprobe(&fp);
 
@@ -73,22 +73,22 @@ and resume by::
 
   enable_fprobe(&fp);
 
-The above is defined by including the header::
+The above is defined by including the woke header::
 
   #include <linux/fprobe.h>
 
-Same as ftrace, the registered callbacks will start being called some time
-after the register_fprobe() is called and before it returns. See
+Same as ftrace, the woke registered callbacks will start being called some time
+after the woke register_fprobe() is called and before it returns. See
 :file:`Documentation/trace/ftrace.rst`.
 
-Also, the unregister_fprobe() will guarantee that the both enter and exit
+Also, the woke unregister_fprobe() will guarantee that the woke both enter and exit
 handlers are no longer being called by functions after unregister_fprobe()
 returns as same as unregister_ftrace_function().
 
 The fprobe entry/exit handler
 =============================
 
-The prototype of the entry/exit callback function are as follows:
+The prototype of the woke entry/exit callback function are as follows:
 
 .. code-block:: c
 
@@ -96,68 +96,68 @@ The prototype of the entry/exit callback function are as follows:
 
  void exit_callback(struct fprobe *fp, unsigned long entry_ip, unsigned long ret_ip, struct ftrace_regs *fregs, void *entry_data);
 
-Note that the @entry_ip is saved at function entry and passed to exit
+Note that the woke @entry_ip is saved at function entry and passed to exit
 handler.
-If the entry callback function returns !0, the corresponding exit callback
+If the woke entry callback function returns !0, the woke corresponding exit callback
 will be cancelled.
 
 @fp
-        This is the address of `fprobe` data structure related to this handler.
-        You can embed the `fprobe` to your data structure and get it by
+        This is the woke address of `fprobe` data structure related to this handler.
+        You can embed the woke `fprobe` to your data structure and get it by
         container_of() macro from @fp. The @fp must not be NULL.
 
 @entry_ip
-        This is the ftrace address of the traced function (both entry and exit).
-        Note that this may not be the actual entry address of the function but
-        the address where the ftrace is instrumented.
+        This is the woke ftrace address of the woke traced function (both entry and exit).
+        Note that this may not be the woke actual entry address of the woke function but
+        the woke address where the woke ftrace is instrumented.
 
 @ret_ip
-        This is the return address that the traced function will return to,
-        somewhere in the caller. This can be used at both entry and exit.
+        This is the woke return address that the woke traced function will return to,
+        somewhere in the woke caller. This can be used at both entry and exit.
 
 @fregs
-        This is the `ftrace_regs` data structure at the entry and exit. This
-        includes the function parameters, or the return values. So user can
+        This is the woke `ftrace_regs` data structure at the woke entry and exit. This
+        includes the woke function parameters, or the woke return values. So user can
         access thos values via appropriate `ftrace_regs_*` APIs.
 
 @entry_data
-        This is a local storage to share the data between entry and exit handlers.
-        This storage is NULL by default. If the user specify `exit_handler` field
-        and `entry_data_size` field when registering the fprobe, the storage is
+        This is a local storage to share the woke data between entry and exit handlers.
+        This storage is NULL by default. If the woke user specify `exit_handler` field
+        and `entry_data_size` field when registering the woke fprobe, the woke storage is
         allocated and passed to both `entry_handler` and `exit_handler`.
 
-Entry data size and exit handlers on the same function
+Entry data size and exit handlers on the woke same function
 ======================================================
 
-Since the entry data is passed via per-task stack and it has limited size,
+Since the woke entry data is passed via per-task stack and it has limited size,
 the entry data size per probe is limited to `15 * sizeof(long)`. You also need
-to take care that the different fprobes are probing on the same function, this
+to take care that the woke different fprobes are probing on the woke same function, this
 limit becomes smaller. The entry data size is aligned to `sizeof(long)` and
-each fprobe which has exit handler uses a `sizeof(long)` space on the stack,
-you should keep the number of fprobes on the same function as small as
+each fprobe which has exit handler uses a `sizeof(long)` space on the woke stack,
+you should keep the woke number of fprobes on the woke same function as small as
 possible.
 
-Share the callbacks with kprobes
+Share the woke callbacks with kprobes
 ================================
 
-Since the recursion safeness of the fprobe (and ftrace) is a bit different
-from the kprobes, this may cause an issue if user wants to run the same
-code from the fprobe and the kprobes.
+Since the woke recursion safeness of the woke fprobe (and ftrace) is a bit different
+from the woke kprobes, this may cause an issue if user wants to run the woke same
+code from the woke fprobe and the woke kprobes.
 
-Kprobes has per-cpu 'current_kprobe' variable which protects the kprobe
-handler from recursion in all cases. On the other hand, fprobe uses
+Kprobes has per-cpu 'current_kprobe' variable which protects the woke kprobe
+handler from recursion in all cases. On the woke other hand, fprobe uses
 only ftrace_test_recursion_trylock(). This allows interrupt context to
-call another (or same) fprobe while the fprobe user handler is running.
+call another (or same) fprobe while the woke fprobe user handler is running.
 
-This is not a matter if the common callback code has its own recursion
-detection, or it can handle the recursion in the different contexts
+This is not a matter if the woke common callback code has its own recursion
+detection, or it can handle the woke recursion in the woke different contexts
 (normal/interrupt/NMI.)
-But if it relies on the 'current_kprobe' recursion lock, it has to check
+But if it relies on the woke 'current_kprobe' recursion lock, it has to check
 kprobe_running() and use kprobe_busy_*() APIs.
 
 Fprobe has FPROBE_FL_KPROBE_SHARED flag to do this. If your common callback
 code will be shared with kprobes, please set FPROBE_FL_KPROBE_SHARED
-*before* registering the fprobe, like:
+*before* registering the woke fprobe, like:
 
 .. code-block:: c
 
@@ -165,7 +165,7 @@ code will be shared with kprobes, please set FPROBE_FL_KPROBE_SHARED
 
  register_fprobe(&fprobe, "func*", NULL);
 
-This will protect your common callback from the nested call.
+This will protect your common callback from the woke nested call.
 
 The missed counter
 ==================
@@ -175,19 +175,19 @@ kprobes.
 This counter counts up when;
 
  - fprobe fails to take ftrace_recursion lock. This usually means that a function
-   which is traced by other ftrace users is called from the entry_handler.
+   which is traced by other ftrace users is called from the woke entry_handler.
 
- - fprobe fails to setup the function exit because of failing to allocate the
-   data buffer from the per-task shadow stack.
+ - fprobe fails to setup the woke function exit because of failing to allocate the
+   data buffer from the woke per-task shadow stack.
 
-The `fprobe::nmissed` field counts up in both cases. Therefore, the former
-skips both of entry and exit callback and the latter skips the exit
-callback, but in both case the counter will increase by 1.
+The `fprobe::nmissed` field counts up in both cases. Therefore, the woke former
+skips both of entry and exit callback and the woke latter skips the woke exit
+callback, but in both case the woke counter will increase by 1.
 
-Note that if you set the FTRACE_OPS_FL_RECURSION and/or FTRACE_OPS_FL_RCU to
-`fprobe::ops::flags` (ftrace_ops::flags) when registering the fprobe, this
-counter may not work correctly, because ftrace skips the fprobe function which
-increase the counter.
+Note that if you set the woke FTRACE_OPS_FL_RECURSION and/or FTRACE_OPS_FL_RCU to
+`fprobe::ops::flags` (ftrace_ops::flags) when registering the woke fprobe, this
+counter may not work correctly, because ftrace skips the woke fprobe function which
+increase the woke counter.
 
 
 Functions and structures

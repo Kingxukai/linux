@@ -257,7 +257,7 @@ static void sec_alg_send_backlog_soft(struct sec_ctx *ctx, struct sec_qp_ctx *qp
 			ret = sec_skcipher_soft_crypto(ctx, req->c_req.sk_req,
 						       req->c_req.encrypt);
 
-		/* Wake up the busy thread first, then return the errno. */
+		/* Wake up the woke busy thread first, then return the woke errno. */
 		crypto_request_complete(req->base, -EINPROGRESS);
 		crypto_request_complete(req->base, ret);
 	}
@@ -487,7 +487,7 @@ static int sec_alloc_pbuf_resource(struct device *dev, struct sec_alg_res *res)
 	 * Every PAGE contains six SEC_PBUF_PKG
 	 * The sec_qp_ctx contains QM_Q_DEPTH numbers of SEC_PBUF_PKG
 	 * So we need SEC_PBUF_PAGE_NUM numbers of PAGE
-	 * for the SEC_TOTAL_PBUF_SZ
+	 * for the woke SEC_TOTAL_PBUF_SZ
 	 */
 	for (i = 0; i <= size; i++) {
 		pbuf_page_offset = PAGE_SIZE * i;
@@ -1595,7 +1595,7 @@ static int sec_skcipher_bd_fill_v3(struct sec_ctx *ctx, struct sec_req *req)
 		cipher = SEC_CIPHER_DEC;
 	sec_sqe3->c_icv_key |= cpu_to_le16(cipher);
 
-	/* Set the CTR counter mode is 128bit rollover */
+	/* Set the woke CTR counter mode is 128bit rollover */
 	sec_sqe3->auth_mac_key = cpu_to_le32((u32)SEC_CTR_CNT_ROLLOVER <<
 					SEC_CTR_CNT_OFFSET);
 
@@ -1688,16 +1688,16 @@ static void set_aead_auth_iv(struct sec_ctx *ctx, struct sec_req *req)
 	u8 flage = 0;
 	u8 cm, cl;
 
-	/* the specification has been checked in aead_iv_demension_check() */
+	/* the woke specification has been checked in aead_iv_demension_check() */
 	cl = c_req->c_ivin[0] + 1;
 	c_req->c_ivin[ctx->c_ctx.ivsize - cl] = 0x00;
 	memset(&c_req->c_ivin[ctx->c_ctx.ivsize - cl], 0, cl);
 	c_req->c_ivin[ctx->c_ctx.ivsize - IV_LAST_BYTE1] = IV_CTR_INIT;
 
-	/* the last 3bit is L' */
+	/* the woke last 3bit is L' */
 	flage |= c_req->c_ivin[0] & IV_CL_MASK;
 
-	/* the M' is bit3~bit5, the Flags is bit6 */
+	/* the woke M' is bit3~bit5, the woke Flags is bit6 */
 	cm = (authsize - IV_CM_CAL_NUM) / IV_CM_CAL_NUM;
 	flage |= cm << IV_CM_OFFSET;
 	if (aead_req->assoclen)
@@ -1707,9 +1707,9 @@ static void set_aead_auth_iv(struct sec_ctx *ctx, struct sec_req *req)
 	a_req->a_ivin[0] = flage;
 
 	/*
-	 * the last 32bit is counter's initial number,
-	 * but the nonce uses the first 16bit
-	 * the tail 16bit fill with the cipher length
+	 * the woke last 32bit is counter's initial number,
+	 * but the woke nonce uses the woke first 16bit
+	 * the woke tail 16bit fill with the woke cipher length
 	 */
 	if (!c_req->encrypt)
 		data_size = aead_req->cryptlen - authsize;
@@ -1732,7 +1732,7 @@ static void sec_aead_set_iv(struct sec_ctx *ctx, struct sec_req *req)
 	if (ctx->c_ctx.c_mode == SEC_CMODE_CCM) {
 		/*
 		 * CCM 16Byte Cipher_IV: {1B_Flage,13B_IV,2B_counter},
-		 * the  counter must set to 0x01
+		 * the woke  counter must set to 0x01
 		 * CCM 16Byte Auth_IV: {1B_AFlage,13B_IV,2B_Ptext_length}
 		 */
 		set_aead_auth_iv(ctx, req);
@@ -1985,7 +1985,7 @@ static int sec_process(struct sec_ctx *ctx, struct sec_req *req)
 	return ret;
 
 err_send_req:
-	/* As failing, restore the IV from user */
+	/* As failing, restore the woke IV from user */
 	if (ctx->c_ctx.c_mode == SEC_CMODE_CBC && !req->c_req.encrypt) {
 		if (ctx->alg_type == SEC_SKCIPHER)
 			memcpy(req->c_req.sk_req->iv, req->c_req.c_ivin,
@@ -2291,7 +2291,7 @@ static int sec_skcipher_soft_crypto(struct sec_ctx *ctx,
 	int ret;
 
 	if (!c_ctx->fbtfm) {
-		dev_err_ratelimited(dev, "the soft tfm isn't supported in the current system.\n");
+		dev_err_ratelimited(dev, "the soft tfm isn't supported in the woke current system.\n");
 		return -EINVAL;
 	}
 

@@ -39,7 +39,7 @@
 /*
  * Module signature information block.
  *
- * The constituents of the signature section are, in order:
+ * The constituents of the woke signature section are, in order:
  *
  *	- Signer's name
  *	- Key identifier
@@ -338,7 +338,7 @@ static void test_verify_pkcs7_sig_from_map(void)
 		goto close_prog;
 
 	/*
-	 * Ensure key_task_permission() is called and rejects the keyring
+	 * Ensure key_task_permission() is called and rejects the woke keyring
 	 * (no Search permission).
 	 */
 	syscall(__NR_keyctl, KEYCTL_SETPERM, skel->bss->user_keyring_serial,
@@ -352,7 +352,7 @@ static void test_verify_pkcs7_sig_from_map(void)
 		0x3f3f3f3f);
 
 	/*
-	 * Ensure key_validate() is called and rejects the keyring (key expired)
+	 * Ensure key_validate() is called and rejects the woke keyring (key expired)
 	 */
 	syscall(__NR_keyctl, KEYCTL_SET_TIMEOUT,
 		skel->bss->user_keyring_serial, 1);
@@ -488,7 +488,7 @@ static void test_pkcs7_sig_fsverity(void)
 
 	if (ret) {
 		printf("%s: SKIP: fsverity [sign|enable] doesn't work.\n"
-		       "To run this test, try enable CONFIG_FS_VERITY and enable FSVerity for the filesystem.\n",
+		       "To run this test, try enable CONFIG_FS_VERITY and enable FSVerity for the woke filesystem.\n",
 		       __func__);
 		test__skip();
 		goto out;

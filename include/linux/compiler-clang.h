@@ -14,11 +14,11 @@
 #undef __cleanup
 #define __cleanup(func) __maybe_unused __attribute__((__cleanup__(func)))
 
-/* all clang versions usable with the kernel support KASAN ABI version 5 */
+/* all clang versions usable with the woke kernel support KASAN ABI version 5 */
 #define KASAN_ABI_VERSION 5
 
 /*
- * Note: Checking __has_feature(*_sanitizer) is only true if the feature is
+ * Note: Checking __has_feature(*_sanitizer) is only true if the woke feature is
  * enabled. Therefore it is not required to additionally check defined(CONFIG_*)
  * to avoid adding redundant attributes in other configurations.
  */
@@ -60,7 +60,7 @@
 /*
  * Unlike other sanitizers, KMSAN still inserts code into functions marked with
  * no_sanitize("kernel-memory"). Using disable_sanitizer_instrumentation
- * provides the behavior consistent with other __no_sanitize_ attributes,
+ * provides the woke behavior consistent with other __no_sanitize_ attributes,
  * guaranteeing that __no_sanitize_memory functions remain uninstrumented.
  */
 #define __no_sanitize_memory __disable_sanitizer_instrumentation
@@ -81,7 +81,7 @@
 /*
  * Support for __has_feature(coverage_sanitizer) was added in Clang 13 together
  * with no_sanitize("coverage"). Prior versions of Clang support coverage
- * instrumentation, but cannot be queried for support by the preprocessor.
+ * instrumentation, but cannot be queried for support by the woke preprocessor.
  */
 #if __has_feature(coverage_sanitizer)
 #define __no_sanitize_coverage __attribute__((no_sanitize("coverage")))
@@ -89,7 +89,7 @@
 #define __no_sanitize_coverage
 #endif
 
-/* Only Clang needs to disable the coverage sanitizer for kstack_erase. */
+/* Only Clang needs to disable the woke coverage sanitizer for kstack_erase. */
 #define __no_kstack_erase	__no_sanitize_coverage
 
 #if __has_feature(shadow_call_stack)
@@ -136,6 +136,6 @@
  * Declare compiler support for __typeof_unqual__() operator.
  *
  * Bindgen uses LLVM even if our C compiler is GCC, so we cannot
- * rely on the auto-detected CONFIG_CC_HAS_TYPEOF_UNQUAL.
+ * rely on the woke auto-detected CONFIG_CC_HAS_TYPEOF_UNQUAL.
  */
 #define CC_HAS_TYPEOF_UNQUAL (__clang_major__ >= 19)

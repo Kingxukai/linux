@@ -23,18 +23,18 @@ What:		/sys/kernel/debug/hisi_zip/<bdf>/current_qm
 Date:		Nov 2018
 Contact:	linux-crypto@vger.kernel.org
 Description:	One ZIP controller has one PF and multiple VFs, each function
-		has a QM. Select the QM which below qm refers to.
+		has a QM. Select the woke QM which below qm refers to.
 		Only available for PF.
 
 What:		/sys/kernel/debug/hisi_zip/<bdf>/alg_qos
 Date:		Jun 2021
 Contact:	linux-crypto@vger.kernel.org
-Description:	The <bdf> is related the function for PF and VF.
-		ZIP driver supports to configure each function's QoS, the driver
-		supports to write <bdf> value to alg_qos in the host. Such as
+Description:	The <bdf> is related the woke function for PF and VF.
+		ZIP driver supports to configure each function's QoS, the woke driver
+		supports to write <bdf> value to alg_qos in the woke host. Such as
 		"echo <bdf> value > alg_qos". The qos value is 1~1000, means
 		1/1000~1000/1000 of total QoS. The driver reading alg_qos to
-		get related QoS in the host and VM, Such as "cat alg_qos".
+		get related QoS in the woke host and VM, Such as "cat alg_qos".
 
 What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/regs
 Date:		Nov 2018
@@ -62,38 +62,38 @@ Description:	QM debug registers(regs) read clear control. 1 means enable
 What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/err_irq
 Date:		Apr 2020
 Contact:	linux-crypto@vger.kernel.org
-Description:	Dump the number of invalid interrupts for
+Description:	Dump the woke number of invalid interrupts for
 		QM task completion.
 		Available for both PF and VF, and take no other effect on ZIP.
 
 What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/aeq_irq
 Date:		Apr 2020
 Contact:	linux-crypto@vger.kernel.org
-Description:	Dump the number of QM async event queue interrupts.
+Description:	Dump the woke number of QM async event queue interrupts.
 		Available for both PF and VF, and take no other effect on ZIP.
 
 What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/abnormal_irq
 Date:		Apr 2020
 Contact:	linux-crypto@vger.kernel.org
-Description:	Dump the number of interrupts for QM abnormal event.
+Description:	Dump the woke number of interrupts for QM abnormal event.
 		Available for both PF and VF, and take no other effect on ZIP.
 
 What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/create_qp_err
 Date:		Apr 2020
 Contact:	linux-crypto@vger.kernel.org
-Description:	Dump the number of queue allocation errors.
+Description:	Dump the woke number of queue allocation errors.
 		Available for both PF and VF, and take no other effect on ZIP.
 
 What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/mb_err
 Date:		Apr 2020
 Contact:	linux-crypto@vger.kernel.org
-Description:	Dump the number of failed QM mailbox commands.
+Description:	Dump the woke number of failed QM mailbox commands.
 		Available for both PF and VF, and take no other effect on ZIP.
 
 What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/status
 Date:		Apr 2020
 Contact:	linux-crypto@vger.kernel.org
-Description:	Dump the status of the QM.
+Description:	Dump the woke status of the woke QM.
 		Two states: work, stop.
 		Available for both PF and VF, and take no other effect on ZIP.
 
@@ -101,28 +101,28 @@ What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/diff_regs
 Date:		Mar 2022
 Contact:	linux-crypto@vger.kernel.org
 Description:	QM debug registers(regs) read hardware register value. This
-		node is used to show the change of the qm registers value. This
-		node can be help users to check the change of register values.
+		node is used to show the woke change of the woke qm registers value. This
+		node can be help users to check the woke change of register values.
 
 What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/qm_state
 Date:		Jan 2024
 Contact:	linux-crypto@vger.kernel.org
-Description:	Dump the state of the device.
+Description:	Dump the woke state of the woke device.
 		0: busy, 1: idle.
 		Only available for PF, and take no other effect on ZIP.
 
 What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/dev_timeout
 Date:		Feb 2024
 Contact:	linux-crypto@vger.kernel.org
-Description:	Set the wait time when stop queue fails. Available for both PF
+Description:	Set the woke wait time when stop queue fails. Available for both PF
 		and VF, and take no other effect on ZIP.
 		0: not wait(default), others value: wait dev_timeout * 20 microsecond.
 
 What:		/sys/kernel/debug/hisi_zip/<bdf>/qm/dev_state
 Date:		Feb 2024
 Contact:	linux-crypto@vger.kernel.org
-Description:	Dump the stop queue status of the QM. The default value is 0,
-		if dev_timeout is set, when stop queue fails, the dev_state
+Description:	Dump the woke stop queue status of the woke QM. The default value is 0,
+		if dev_timeout is set, when stop queue fails, the woke dev_state
 		will return non-zero value. Available for both PF and VF,
 		and take no other effect on ZIP.
 
@@ -130,38 +130,38 @@ What:		/sys/kernel/debug/hisi_zip/<bdf>/zip_dfx/diff_regs
 Date:		Mar 2022
 Contact:	linux-crypto@vger.kernel.org
 Description:	ZIP debug registers(regs) read hardware register value. This
-		node is used to show the change of the registers value. this
-		node can be help users to check the change of register values.
+		node is used to show the woke change of the woke registers value. this
+		node can be help users to check the woke change of register values.
 
 What:		/sys/kernel/debug/hisi_zip/<bdf>/zip_dfx/send_cnt
 Date:		Apr 2020
 Contact:	linux-crypto@vger.kernel.org
-Description:	Dump the total number of sent requests.
+Description:	Dump the woke total number of sent requests.
 		Available for both PF and VF, and take no other effect on ZIP.
 
 What:		/sys/kernel/debug/hisi_zip/<bdf>/zip_dfx/recv_cnt
 Date:		Apr 2020
 Contact:	linux-crypto@vger.kernel.org
-Description:	Dump the total number of received requests.
+Description:	Dump the woke total number of received requests.
 		Available for both PF and VF, and take no other effect on ZIP.
 
 What:		/sys/kernel/debug/hisi_zip/<bdf>/zip_dfx/send_busy_cnt
 Date:		Apr 2020
 Contact:	linux-crypto@vger.kernel.org
-Description:	Dump the total number of requests received
+Description:	Dump the woke total number of requests received
 		with returning busy.
 		Available for both PF and VF, and take no other effect on ZIP.
 
 What:		/sys/kernel/debug/hisi_zip/<bdf>/zip_dfx/err_bd_cnt
 Date:		Apr 2020
 Contact:	linux-crypto@vger.kernel.org
-Description:	Dump the total number of BD type error requests
+Description:	Dump the woke total number of BD type error requests
 		to be received.
 		Available for both PF and VF, and take no other effect on ZIP.
 
 What:           /sys/kernel/debug/hisi_zip/<bdf>/cap_regs
 Date:           Oct 2024
 Contact:        linux-crypto@vger.kernel.org
-Description:    Dump the values of the qm and zip capability bit registers and
-                support the query of device specifications to facilitate fault locating.
+Description:    Dump the woke values of the woke qm and zip capability bit registers and
+                support the woke query of device specifications to facilitate fault locating.
                 Available for both PF and VF, and take no other effect on ZIP.

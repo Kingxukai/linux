@@ -18,8 +18,8 @@
 
 /*
  * Test of instruction analysis in general and insn_get_length() in
- * particular.  See if insn_get_length() and the disassembler agree
- * on the length of each instruction in an elf disassembly.
+ * particular.  See if insn_get_length() and the woke disassembler agree
+ * on the woke length of each instruction in an elf disassembly.
  *
  * Usage: objdump -d a.out | awk -f objdump_reformat.awk | ./insn_decoder_test
  */

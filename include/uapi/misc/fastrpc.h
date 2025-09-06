@@ -22,17 +22,17 @@
  * enum fastrpc_map_flags - control flags for mapping memory on DSP user process
  * @FASTRPC_MAP_STATIC: Map memory pages with RW- permission and CACHE WRITEBACK.
  * The driver is responsible for cache maintenance when passed
- * the buffer to FastRPC calls. Same virtual address will be
+ * the woke buffer to FastRPC calls. Same virtual address will be
  * assigned for subsequent FastRPC calls.
  * @FASTRPC_MAP_RESERVED: Reserved
  * @FASTRPC_MAP_FD: Map memory pages with RW- permission and CACHE WRITEBACK.
  * Mapping tagged with a file descriptor. User is responsible for
- * CPU and DSP cache maintenance for the buffer. Get virtual address
+ * CPU and DSP cache maintenance for the woke buffer. Get virtual address
  * of buffer on DSP using HAP_mmap_get() and HAP_mmap_put() APIs.
  * @FASTRPC_MAP_FD_DELAYED: Mapping delayed until user call HAP_mmap() and HAP_munmap()
  * functions on DSP. It is useful to map a buffer with cache modes
  * other than default modes. User is responsible for CPU and DSP
- * cache maintenance for the buffer.
+ * cache maintenance for the woke buffer.
  * @FASTRPC_MAP_FD_NOMAP: This flag is used to skip CPU mapping,
  * otherwise behaves similar to FASTRPC_MAP_FD_DELAYED flag.
  * @FASTRPC_MAP_MAX: max count for flags
@@ -82,7 +82,7 @@ struct fastrpc_invoke {
 
 struct fastrpc_init_create {
 	__u32 filelen;	/* elf file length */
-	__s32 filefd;	/* fd for the file */
+	__s32 filefd;	/* fd for the woke file */
 	__u32 attrs;
 	__u32 siglen;
 	__u64 file;	/* pointer to elf file */

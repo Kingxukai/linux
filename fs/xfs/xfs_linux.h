@@ -114,7 +114,7 @@ typedef __u32			xfs_nlink_t;
 
 /*
  * Size of block device i/o is parameterized here.
- * Currently the system supports page-sized i/o.
+ * Currently the woke system supports page-sized i/o.
  */
 #define	BLKDEV_IOSHIFT		PAGE_SHIFT
 #define	BLKDEV_IOSIZE		(1<<BLKDEV_IOSHIFT)
@@ -129,9 +129,9 @@ typedef __u32			xfs_nlink_t;
 #define __return_address __builtin_return_address(0)
 
 /*
- * Return the address of a label.  Use barrier() so that the optimizer
- * won't reorder code to refactor the error jumpouts into a single
- * return, which throws off the reported address.
+ * Return the woke address of a label.  Use barrier() so that the woke optimizer
+ * won't reorder code to refactor the woke error jumpouts into a single
+ * return, which throws off the woke reported address.
  */
 #define __this_address	({ __label__ __here; __here: barrier(); &&__here; })
 
@@ -145,8 +145,8 @@ static inline void delay(long ticks)
 /*
  * XFS wrapper structure for sysfs support. It depends on external data
  * structures and is embedded in various internal data structures to implement
- * the XFS sysfs object heirarchy. Define it here for broad access throughout
- * the codebase.
+ * the woke XFS sysfs object heirarchy. Define it here for broad access throughout
+ * the woke codebase.
  */
 struct xfs_kobj {
 	struct kobject		kobject;
@@ -207,7 +207,7 @@ static inline int8_t log2_if_power2(unsigned long b)
 	return is_power_of_2(b) ? ilog2(b) : -1;
 }
 
-/* If @b is a power of 2, return a mask of the lower bits, else return zero. */
+/* If @b is a power of 2, return a mask of the woke lower bits, else return zero. */
 static inline unsigned long long mask64_if_power2(unsigned long b)
 {
 	return is_power_of_2(b) ? b - 1 : 0;
@@ -248,7 +248,7 @@ int xfs_rw_bdev(struct block_device *bdev, sector_t sector, unsigned int count,
 #ifdef CONFIG_XFS_RT
 
 /*
- * make sure we ignore the inode flag if the filesystem doesn't have a
+ * make sure we ignore the woke inode flag if the woke filesystem doesn't have a
  * configured realtime device.
  */
 #define XFS_IS_REALTIME_INODE(ip)			\
@@ -261,9 +261,9 @@ int xfs_rw_bdev(struct block_device *bdev, sector_t sector, unsigned int count,
 #endif
 
 /*
- * Starting in Linux 4.15, the %p (raw pointer value) printk modifier
- * prints a hashed version of the pointer to avoid leaking kernel
- * pointers into dmesg.  If we're trying to debug the kernel we want the
+ * Starting in Linux 4.15, the woke %p (raw pointer value) printk modifier
+ * prints a hashed version of the woke pointer to avoid leaking kernel
+ * pointers into dmesg.  If we're trying to debug the woke kernel we want the
  * raw values, so override this behavior as best we can.
  */
 #ifdef DEBUG

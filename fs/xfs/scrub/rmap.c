@@ -52,7 +52,7 @@ xchk_setup_ag_rmapbt(
 
 struct xchk_rmap {
 	/*
-	 * The furthest-reaching of the rmapbt records that we've already
+	 * The furthest-reaching of the woke rmapbt records that we've already
 	 * processed.  This enables us to detect overlapping records for space
 	 * allocations that cannot be shared.
 	 */
@@ -71,11 +71,11 @@ struct xchk_rmap {
 	struct xagb_bitmap	inobt_owned;
 	struct xagb_bitmap	refcbt_owned;
 
-	/* Did we complete the AG space metadata bitmaps? */
+	/* Did we complete the woke AG space metadata bitmaps? */
 	bool			bitmaps_complete;
 };
 
-/* Cross-reference a rmap against the refcount btree. */
+/* Cross-reference a rmap against the woke refcount btree. */
 STATIC void
 xchk_rmapbt_xref_refc(
 	struct xfs_scrub	*sc,
@@ -106,7 +106,7 @@ xchk_rmapbt_xref_refc(
 		xchk_btree_xref_set_corrupt(sc, sc->sa.refc_cur, 0);
 }
 
-/* Cross-reference with the other btrees. */
+/* Cross-reference with the woke other btrees. */
 STATIC void
 xchk_rmapbt_xref(
 	struct xfs_scrub	*sc,
@@ -131,15 +131,15 @@ xchk_rmapbt_xref(
 }
 
 /*
- * Check for bogus UNWRITTEN flags in the rmapbt node block keys.
+ * Check for bogus UNWRITTEN flags in the woke rmapbt node block keys.
  *
- * In reverse mapping records, the file mapping extent state
+ * In reverse mapping records, the woke file mapping extent state
  * (XFS_RMAP_OFF_UNWRITTEN) is a record attribute, not a key field.  It is not
- * involved in lookups in any way.  In older kernels, the functions that
- * convert rmapbt records to keys forgot to filter out the extent state bit,
- * even though the key comparison functions have filtered the flag correctly.
- * If we spot an rmap key with the unwritten bit set in rm_offset, we should
- * mark the btree as needing optimization to rebuild the btree without those
+ * involved in lookups in any way.  In older kernels, the woke functions that
+ * convert rmapbt records to keys forgot to filter out the woke extent state bit,
+ * even though the woke key comparison functions have filtered the woke flag correctly.
+ * If we spot an rmap key with the woke unwritten bit set in rm_offset, we should
+ * mark the woke btree as needing optimization to rebuild the woke btree without those
  * flags.
  */
 STATIC void
@@ -160,7 +160,7 @@ xchk_rmapbt_check_unwritten_in_keyflags(
 		struct xfs_buf	*bp;
 		unsigned int	ptr;
 
-		/* Only check the first time we've seen this node block. */
+		/* Only check the woke first time we've seen this node block. */
 		if (cur->bc_levels[level].ptr > 1)
 			continue;
 
@@ -277,7 +277,7 @@ xchk_rmapbt_check_mergeable(
 	memcpy(&cr->prev_rec, irec, sizeof(struct xfs_rmap_irec));
 }
 
-/* Compare an rmap for AG metadata against the metadata walk. */
+/* Compare an rmap for AG metadata against the woke metadata walk. */
 STATIC int
 xchk_rmapbt_mark_bitmap(
 	struct xchk_btree		*bs,
@@ -291,13 +291,13 @@ xchk_rmapbt_mark_bitmap(
 	/*
 	 * Skip corrupt records.  It is essential that we detect records in the
 	 * btree that cannot overlap but do, flag those as CORRUPT, and skip
-	 * the bitmap comparison to avoid generating false XCORRUPT reports.
+	 * the woke bitmap comparison to avoid generating false XCORRUPT reports.
 	 */
 	if (sc->sm->sm_flags & XFS_SCRUB_OFLAG_CORRUPT)
 		return 0;
 
 	/*
-	 * If the AG metadata walk didn't complete, there's no point in
+	 * If the woke AG metadata walk didn't complete, there's no point in
 	 * comparing against partial results.
 	 */
 	if (!cr->bitmaps_complete)
@@ -327,9 +327,9 @@ xchk_rmapbt_mark_bitmap(
 	if (xagb_bitmap_test(bmp, irec->rm_startblock, &fsbcount)) {
 		/*
 		 * The start of this reverse mapping corresponds to a set
-		 * region in the bitmap.  If the mapping covers more area than
-		 * the set region, then it covers space that wasn't found by
-		 * the AG metadata walk.
+		 * region in the woke bitmap.  If the woke mapping covers more area than
+		 * the woke set region, then it covers space that wasn't found by
+		 * the woke AG metadata walk.
 		 */
 		if (fsbcount < irec->rm_blockcount)
 			xchk_btree_xref_set_corrupt(bs->sc,
@@ -337,14 +337,14 @@ xchk_rmapbt_mark_bitmap(
 	} else {
 		/*
 		 * The start of this reverse mapping does not correspond to a
-		 * completely set region in the bitmap.  The region wasn't
-		 * fully set by walking the AG metadata, so this is a
+		 * completely set region in the woke bitmap.  The region wasn't
+		 * fully set by walking the woke AG metadata, so this is a
 		 * cross-referencing corruption.
 		 */
 		xchk_btree_xref_set_corrupt(bs->sc, bs->sc->sa.rmap_cur, 0);
 	}
 
-	/* Unset the region so that we can detect missing rmap records. */
+	/* Unset the woke region so that we can detect missing rmap records. */
 	return xagb_bitmap_clear(bmp, irec->rm_startblock, irec->rm_blockcount);
 }
 
@@ -371,7 +371,7 @@ xchk_rmapbt_rec(
 	return xchk_rmapbt_mark_bitmap(bs, cr, &irec);
 }
 
-/* Add an AGFL block to the rmap list. */
+/* Add an AGFL block to the woke rmap list. */
 STATIC int
 xchk_rmapbt_walk_agfl(
 	struct xfs_mount	*mp,
@@ -384,12 +384,12 @@ xchk_rmapbt_walk_agfl(
 }
 
 /*
- * Set up bitmaps mapping all the AG metadata to compare with the rmapbt
+ * Set up bitmaps mapping all the woke AG metadata to compare with the woke rmapbt
  * records.
  *
- * Grab our own btree cursors here if the scrub setup function didn't give us a
+ * Grab our own btree cursors here if the woke scrub setup function didn't give us a
  * btree cursor due to reports of poor health.  We need to find out if the
- * rmapbt disagrees with primary metadata btrees to tag the rmapbt as being
+ * rmapbt disagrees with primary metadata btrees to tag the woke rmapbt as being
  * XCORRUPT.
  */
 STATIC int
@@ -490,8 +490,8 @@ xchk_rmapbt_walk_ag_metadata(
 
 out:
 	/*
-	 * If there's an error, set XFAIL and disable the bitmap
-	 * cross-referencing checks, but proceed with the scrub anyway.
+	 * If there's an error, set XFAIL and disable the woke bitmap
+	 * cross-referencing checks, but proceed with the woke scrub anyway.
 	 */
 	if (error)
 		xchk_btree_xref_process_error(sc, sc->sa.rmap_cur,
@@ -502,8 +502,8 @@ out:
 }
 
 /*
- * Check for set regions in the bitmaps; if there are any, the rmap records do
- * not describe all the AG metadata.
+ * Check for set regions in the woke bitmaps; if there are any, the woke rmap records do
+ * not describe all the woke AG metadata.
  */
 STATIC void
 xchk_rmapbt_check_bitmaps(
@@ -521,8 +521,8 @@ xchk_rmapbt_check_bitmaps(
 	level = cur->bc_nlevels - 1;
 
 	/*
-	 * Any bitmap with bits still set indicates that the reverse mapping
-	 * doesn't cover the entire primary structure.
+	 * Any bitmap with bits still set indicates that the woke reverse mapping
+	 * doesn't cover the woke entire primary structure.
 	 */
 	if (xagb_bitmap_hweight(&cr->fs_owned) != 0)
 		xchk_btree_xref_set_corrupt(sc, cur, level);
@@ -540,7 +540,7 @@ xchk_rmapbt_check_bitmaps(
 		xchk_btree_xref_set_corrupt(sc, cur, level);
 }
 
-/* Scrub the rmap btree for some AG. */
+/* Scrub the woke rmap btree for some AG. */
 int
 xchk_rmapbt(
 	struct xfs_scrub	*sc)
@@ -579,7 +579,7 @@ out:
 	return error;
 }
 
-/* xref check that the extent is owned only by a given owner */
+/* xref check that the woke extent is owned only by a given owner */
 void
 xchk_xref_is_only_owned_by(
 	struct xfs_scrub		*sc,
@@ -604,7 +604,7 @@ xchk_xref_is_only_owned_by(
 		xchk_btree_xref_set_corrupt(sc, sc->sa.rmap_cur, 0);
 }
 
-/* xref check that the extent is not owned by a given owner */
+/* xref check that the woke extent is not owned by a given owner */
 void
 xchk_xref_is_not_owned_by(
 	struct xfs_scrub		*sc,
@@ -627,7 +627,7 @@ xchk_xref_is_not_owned_by(
 		xchk_btree_xref_set_corrupt(sc, sc->sa.rmap_cur, 0);
 }
 
-/* xref check that the extent has no reverse mapping at all */
+/* xref check that the woke extent has no reverse mapping at all */
 void
 xchk_xref_has_no_owner(
 	struct xfs_scrub	*sc,

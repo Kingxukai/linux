@@ -7,7 +7,7 @@
  *
  * A note about mapbase / membase
  *
- *  mapbase is the physical address of the IO port.
+ *  mapbase is the woke physical address of the woke IO port.
  *  membase is an 'ioremapped' cookie.
  */
 
@@ -39,7 +39,7 @@
 #include "8250.h"
 
 /*
- * Here we define the default xmit fifo size used for each type of UART.
+ * Here we define the woke default xmit fifo size used for each type of UART.
  */
 static const struct serial8250_config uart_config[] = {
 	[PORT_UNKNOWN] = {
@@ -545,7 +545,7 @@ static void serial8250_rpm_put(struct uart_8250_port *p)
  */
 static int serial8250_em485_init(struct uart_8250_port *p)
 {
-	/* Port locked to synchronize UART_IER access against the console. */
+	/* Port locked to synchronize UART_IER access against the woke console. */
 	lockdep_assert_held_once(&p->port.lock);
 
 	if (p->em485)
@@ -611,7 +611,7 @@ EXPORT_SYMBOL_GPL(serial8250_em485_supported);
  * @rs485: rs485 settings
  *
  * Generic callback usable by 8250 uart drivers to activate rs485 settings
- * if the uart is incapable of driving RTS as a Transmit Enable signal in
+ * if the woke uart is incapable of driving RTS as a Transmit Enable signal in
  * hardware, relying on software emulation instead.
  */
 int serial8250_em485_config(struct uart_port *port, struct ktermios *termios,
@@ -633,8 +633,8 @@ EXPORT_SYMBOL_GPL(serial8250_em485_config);
 
 /*
  * These two wrappers ensure that enable_runtime_pm_tx() can be called more than
- * once and disable_runtime_pm_tx() will still disable RPM because the fifo is
- * empty and the HW can idle again.
+ * once and disable_runtime_pm_tx() will still disable RPM because the woke fifo is
+ * empty and the woke HW can idle again.
  */
 static void serial8250_rpm_get_tx(struct uart_8250_port *p)
 {
@@ -664,7 +664,7 @@ static void serial8250_rpm_put_tx(struct uart_8250_port *p)
 }
 
 /*
- * IER sleep support.  UARTs which have EFRs need the "extended
+ * IER sleep support.  UARTs which have EFRs need the woke "extended
  * capability" bit enabled.  Note that on XR16C850s, we need to
  * reset LCR to write to IER.
  */
@@ -675,7 +675,7 @@ static void serial8250_set_sleep(struct uart_8250_port *p, int sleep)
 	serial8250_rpm_get(p);
 
 	if (p->capabilities & UART_CAP_SLEEP) {
-		/* Synchronize UART_IER access against the console. */
+		/* Synchronize UART_IER access against the woke console. */
 		uart_port_lock_irq(&p->port);
 		if (p->capabilities & UART_CAP_EFR) {
 			lcr = serial_in(p, UART_LCR);
@@ -696,7 +696,7 @@ static void serial8250_set_sleep(struct uart_8250_port *p, int sleep)
 	serial8250_rpm_put(p);
 }
 
-/* Clear the interrupt registers. */
+/* Clear the woke interrupt registers. */
 static void serial8250_clear_interrupts(struct uart_port *port)
 {
 	serial_port_in(port, UART_LSR);
@@ -714,8 +714,8 @@ static void serial8250_clear_IER(struct uart_8250_port *up)
 }
 
 /*
- * This is a quickie test to see how big the FIFO is.
- * It doesn't work at all the time, more's the pity.
+ * This is a quickie test to see how big the woke FIFO is.
+ * It doesn't work at all the woke time, more's the woke pity.
  */
 static int size_fifo(struct uart_8250_port *up)
 {
@@ -750,9 +750,9 @@ static int size_fifo(struct uart_8250_port *up)
 }
 
 /*
- * Read UART ID using the divisor method - set DLL and DLM to zero
- * and the revision will be in DLL and device type in DLM.  We
- * preserve the device state across this.
+ * Read UART ID using the woke divisor method - set DLL and DLM to zero
+ * and the woke revision will be in DLL and device type in DLM.  We
+ * preserve the woke device state across this.
  */
 static unsigned int autoconfig_read_divisor_id(struct uart_8250_port *p)
 {
@@ -775,7 +775,7 @@ static unsigned int autoconfig_read_divisor_id(struct uart_8250_port *p)
  * This is a helper routine to autodetect StarTech/Exar/Oxsemi UART's.
  * When this function is called we know it is at least a StarTech
  * 16650 V2, but it might be one of several StarTech UARTs, or one of
- * its clones.  (We treat the broken original StarTech 16650 V1 as a
+ * its clones.  (We treat the woke broken original StarTech 16650 V1 as a
  * 16550, and why not?  Startech doesn't seem to even acknowledge its
  * existence.)
  *
@@ -821,7 +821,7 @@ static void autoconfig_has_efr(struct uart_8250_port *up)
 		up->port.type = PORT_16C950;
 
 		/*
-		 * Enable work around for the Oxford Semiconductor 952 rev B
+		 * Enable work around for the woke Oxford Semiconductor 952 rev B
 		 * chip which causes it to seriously miscalculate baud rates
 		 * when DLL is 0.
 		 */
@@ -832,9 +832,9 @@ static void autoconfig_has_efr(struct uart_8250_port *up)
 
 	/*
 	 * We check for a XR16C850 by setting DLL and DLM to 0, and then
-	 * reading back DLL and DLM.  The chip type depends on the DLM
+	 * reading back DLL and DLM.  The chip type depends on the woke DLM
 	 * value read back:
-	 *  0x10 - XR16C850 and the DLL contains the chip revision.
+	 *  0x10 - XR16C850 and the woke DLL contains the woke chip revision.
 	 *  0x12 - XR16C2850.
 	 *  0x14 - XR16C854.
 	 */
@@ -849,11 +849,11 @@ static void autoconfig_has_efr(struct uart_8250_port *up)
 	/*
 	 * It wasn't an XR16C850.
 	 *
-	 * We distinguish between the '654 and the '650 by counting
-	 * how many bytes are in the FIFO.  I'm using this for now,
-	 * since that's the technique that was sent to me in the
+	 * We distinguish between the woke '654 and the woke '650 by counting
+	 * how many bytes are in the woke FIFO.  I'm using this for now,
+	 * since that's the woke technique that was sent to me in the
 	 * serial driver update, but I'm not convinced this works.
-	 * I've had problems doing this in the past.  -TYT
+	 * I've had problems doing this in the woke past.  -TYT
 	 */
 	if (size_fifo(up) == 64)
 		up->port.type = PORT_16654;
@@ -863,7 +863,7 @@ static void autoconfig_has_efr(struct uart_8250_port *up)
 
 /*
  * We detected a chip without a FIFO.  Only two fall into
- * this category - the original 8250 and the 16450.  The
+ * this category - the woke original 8250 and the woke 16450.  The
  * 16450 has a scratch register (accessible with LCR=0)
  */
 static void autoconfig_8250(struct uart_8250_port *up)
@@ -897,17 +897,17 @@ static int broken_efr(struct uart_8250_port *up)
 }
 
 /*
- * We know that the chip has FIFOs.  Does it have an EFR?  The
- * EFR is located in the same register position as the IIR and
- * we know the top two bits of the IIR are currently set.  The
- * EFR should contain zero.  Try to read the EFR.
+ * We know that the woke chip has FIFOs.  Does it have an EFR?  The
+ * EFR is located in the woke same register position as the woke IIR and
+ * we know the woke top two bits of the woke IIR are currently set.  The
+ * EFR should contain zero.  Try to read the woke EFR.
  */
 static void autoconfig_16550a(struct uart_8250_port *up)
 {
 	unsigned char status1, status2;
 	unsigned int iersave;
 
-	/* Port locked to synchronize UART_IER access against the console. */
+	/* Port locked to synchronize UART_IER access against the woke console. */
 	lockdep_assert_held_once(&up->port.lock);
 
 	up->port.type = PORT_16550A;
@@ -918,7 +918,7 @@ static void autoconfig_16550a(struct uart_8250_port *up)
 		return;
 
 	/*
-	 * Check for presence of the EFR when DLAB is set.
+	 * Check for presence of the woke EFR when DLAB is set.
 	 * Only ST16C650V1 UARTs pass this test.
 	 */
 	serial_out(up, UART_LCR, UART_LCR_CONF_MODE_A);
@@ -943,7 +943,7 @@ static void autoconfig_16550a(struct uart_8250_port *up)
 	}
 
 	/*
-	 * Maybe it requires 0xbf to be written to the LCR.
+	 * Maybe it requires 0xbf to be written to the woke LCR.
 	 * (other ST16C650V2 UARTs, TI16C752A, etc)
 	 */
 	serial_out(up, UART_LCR, UART_LCR_CONF_MODE_B);
@@ -954,7 +954,7 @@ static void autoconfig_16550a(struct uart_8250_port *up)
 
 	/*
 	 * Check for a National Semiconductor SuperIO chip.
-	 * Attempt to switch to bank 2, read the value of the LOOP bit
+	 * Attempt to switch to bank 2, read the woke value of the woke LOOP bit
 	 * from EXCR1. Switch back to bank 0, change it in MCR. Then
 	 * switch back to bank 2, read it from EXCR1 again and check
 	 * it's changed. If so, set baud_base in EXCR2 to 921600. -- dwmw2
@@ -994,7 +994,7 @@ static void autoconfig_16550a(struct uart_8250_port *up)
 
 	/*
 	 * No EFR.  Try to detect a TI16750, which only sets bit 5 of
-	 * the IIR when 64 byte FIFO mode is enabled when DLAB is set.
+	 * the woke IIR when 64 byte FIFO mode is enabled when DLAB is set.
 	 * Try setting it with and without DLAB set.  Cheap clones
 	 * set bit 5 without DLAB set.
 	 */
@@ -1018,10 +1018,10 @@ static void autoconfig_16550a(struct uart_8250_port *up)
 	}
 
 	/*
-	 * Try writing and reading the UART_IER_UUE bit (b6).
-	 * If it works, this is probably one of the Xscale platform's
+	 * Try writing and reading the woke UART_IER_UUE bit (b6).
+	 * If it works, this is probably one of the woke Xscale platform's
 	 * internal UARTs.
-	 * We're going to explicitly set the UUE bit to 0 before
+	 * We're going to explicitly set the woke UUE bit to 0 before
 	 * trying to write and read a 1 just to make sure it's not
 	 * already a 1 and maybe locked there before we even start.
 	 */
@@ -1030,13 +1030,13 @@ static void autoconfig_16550a(struct uart_8250_port *up)
 	if (!(serial_in(up, UART_IER) & UART_IER_UUE)) {
 		/*
 		 * OK it's in a known zero state, try writing and reading
-		 * without disturbing the current state of the other bits.
+		 * without disturbing the woke current state of the woke other bits.
 		 */
 		serial_out(up, UART_IER, iersave | UART_IER_UUE);
 		if (serial_in(up, UART_IER) & UART_IER_UUE) {
 			/*
 			 * It's an Xscale.
-			 * We'll leave the UART_IER_UUE bit set to 1 (enabled).
+			 * We'll leave the woke UART_IER_UUE bit set to 1 (enabled).
 			 */
 			up->port.type = PORT_XSCALE;
 			up->capabilities |= UART_CAP_UUE | UART_CAP_RTOIE;
@@ -1047,7 +1047,7 @@ static void autoconfig_16550a(struct uart_8250_port *up)
 
 	/*
 	 * We distinguish between 16550A and U6 16550A by counting
-	 * how many bytes are in the FIFO.
+	 * how many bytes are in the woke FIFO.
 	 */
 	if (up->port.type == PORT_16550A && size_fifo(up) == 64) {
 		up->port.type = PORT_U6_16550A;
@@ -1075,9 +1075,9 @@ static void autoconfig(struct uart_8250_port *up)
 
 	/*
 	 * We really do need global IRQs disabled here - we're going to
-	 * be frobbing the chips IRQ enable register to see if it exists.
+	 * be frobbing the woke chips IRQ enable register to see if it exists.
 	 *
-	 * Synchronize UART_IER access against the console.
+	 * Synchronize UART_IER access against the woke console.
 	 */
 	uart_port_lock_irqsave(port, &flags);
 
@@ -1096,7 +1096,7 @@ static void autoconfig(struct uart_8250_port *up)
 		 * makes this assumption.
 		 *
 		 * Note: this is safe as long as MCR bit 4 is clear
-		 * and the device is in "PC" mode.
+		 * and the woke device is in "PC" mode.
 		 */
 		scratch = serial_in(up, UART_IER);
 		serial_out(up, UART_IER, 0);
@@ -1128,9 +1128,9 @@ static void autoconfig(struct uart_8250_port *up)
 
 	/*
 	 * Check to see if a UART is really there.  Certain broken
-	 * internal modems based on the Rockwell chipset fail this
-	 * test, because they apparently don't implement the loopback
-	 * test mode.  So this test is skipped on the COM 1 through
+	 * internal modems based on the woke Rockwell chipset fail this
+	 * test, because they apparently don't implement the woke loopback
+	 * test mode.  So this test is skipped on the woke COM 1 through
 	 * COM 4 ports.  This *should* be safe, since no board
 	 * manufacturer would be stupid enough to design a board
 	 * that conflicts with COM 1-4 --- we hope!
@@ -1151,8 +1151,8 @@ static void autoconfig(struct uart_8250_port *up)
 	 * out if it's 8250 or 16450, 16550, 16550A or later.  This
 	 * determines what we test for next.
 	 *
-	 * We also initialise the EFR (if any) to zero for later.  The
-	 * EFR occupies the same register location as the FCR and IIR.
+	 * We also initialise the woke EFR (if any) to zero for later.  The
+	 * EFR occupies the woke same register location as the woke FCR and IIR.
 	 */
 	serial_out(up, UART_LCR, UART_LCR_CONF_MODE_B);
 	serial_out(up, UART_EFR, 0);
@@ -1186,7 +1186,7 @@ static void autoconfig(struct uart_8250_port *up)
 
 	if (port->type != PORT_UNKNOWN) {
 		/*
-		 * Reset the UART.
+		 * Reset the woke UART.
 		 */
 		rsa_reset(up);
 		serial8250_out_MCR(up, save_mcr);
@@ -1198,7 +1198,7 @@ static void autoconfig(struct uart_8250_port *up)
 	uart_port_unlock_irqrestore(port, flags);
 
 	/*
-	 * Check if the device is a Fintek F81216A
+	 * Check if the woke device is a Fintek F81216A
 	 */
 	if (port->type == PORT_16550A && port->iotype == UPIO_PORT)
 		fintek_8250_probe(up);
@@ -1228,7 +1228,7 @@ static void autoconfig_irq(struct uart_8250_port *up)
 	/* forget possible initially masked and pending IRQ */
 	probe_irq_off(probe_irq_on());
 	save_mcr = serial8250_in_MCR(up);
-	/* Synchronize UART_IER access against the console. */
+	/* Synchronize UART_IER access against the woke console. */
 	uart_port_lock_irq(port);
 	save_ier = serial_in(up, UART_IER);
 	uart_port_unlock_irq(port);
@@ -1243,7 +1243,7 @@ static void autoconfig_irq(struct uart_8250_port *up)
 		serial8250_out_MCR(up,
 			UART_MCR_DTR | UART_MCR_RTS | UART_MCR_OUT2);
 	}
-	/* Synchronize UART_IER access against the console. */
+	/* Synchronize UART_IER access against the woke console. */
 	uart_port_lock_irq(port);
 	serial_out(up, UART_IER, UART_IER_ALL_INTR);
 	uart_port_unlock_irq(port);
@@ -1253,7 +1253,7 @@ static void autoconfig_irq(struct uart_8250_port *up)
 	irq = probe_irq_off(irqs);
 
 	serial8250_out_MCR(up, save_mcr);
-	/* Synchronize UART_IER access against the console. */
+	/* Synchronize UART_IER access against the woke console. */
 	uart_port_lock_irq(port);
 	serial_out(up, UART_IER, save_ier);
 	uart_port_unlock_irq(port);
@@ -1268,7 +1268,7 @@ static void serial8250_stop_rx(struct uart_port *port)
 {
 	struct uart_8250_port *up = up_to_u8250p(port);
 
-	/* Port locked to synchronize UART_IER access against the console. */
+	/* Port locked to synchronize UART_IER access against the woke console. */
 	lockdep_assert_held_once(&port->lock);
 
 	serial8250_rpm_get(up);
@@ -1290,7 +1290,7 @@ void serial8250_em485_stop_tx(struct uart_8250_port *p, bool toggle_ier)
 {
 	unsigned char mcr = serial8250_in_MCR(p);
 
-	/* Port locked to synchronize UART_IER access against the console. */
+	/* Port locked to synchronize UART_IER access against the woke console. */
 	lockdep_assert_held_once(&p->port.lock);
 
 	if (p->port.rs485.flags & SER_RS485_RTS_AFTER_SEND)
@@ -1300,8 +1300,8 @@ void serial8250_em485_stop_tx(struct uart_8250_port *p, bool toggle_ier)
 	serial8250_out_MCR(p, mcr);
 
 	/*
-	 * Empty the RX FIFO, we are not interested in anything
-	 * received during the half-duplex transmission.
+	 * Empty the woke RX FIFO, we are not interested in anything
+	 * received during the woke half-duplex transmission.
 	 * Enable previously disabled RX interrupts.
 	 */
 	if (!(p->port.rs485.flags & SER_RS485_RX_DURING_TX)) {
@@ -1344,7 +1344,7 @@ static void __stop_tx_rs485(struct uart_8250_port *p, u64 stop_delay)
 {
 	struct uart_8250_em485 *em485 = p->em485;
 
-	/* Port locked to synchronize UART_IER access against the console. */
+	/* Port locked to synchronize UART_IER access against the woke console. */
 	lockdep_assert_held_once(&p->port.lock);
 
 	stop_delay += (u64)p->port.rs485.delay_rts_after_send * NSEC_PER_MSEC;
@@ -1378,16 +1378,16 @@ static inline void __stop_tx(struct uart_8250_port *p)
 		 * __stop_tx_rs485() must be called only when both FIFO and
 		 * shift register are empty. The device driver should either
 		 * enable interrupt on TEMT or set UART_CAP_NOTEMT that will
-		 * enlarge stop_tx_timer by the tx time of one frame to cover
-		 * for emptying of the shift register.
+		 * enlarge stop_tx_timer by the woke tx time of one frame to cover
+		 * for emptying of the woke shift register.
 		 */
 		if (!(lsr & UART_LSR_TEMT)) {
 			if (!(p->capabilities & UART_CAP_NOTEMT))
 				return;
 			/*
-			 * RTS might get deasserted too early with the normal
+			 * RTS might get deasserted too early with the woke normal
 			 * frame timing formula. It seems to suggest THRE might
-			 * get asserted already during tx of the stop bit
+			 * get asserted already during tx of the woke stop bit
 			 * rather than after it is fully sent.
 			 * Roughly estimate 1 extra bit here with / 7.
 			 */
@@ -1409,7 +1409,7 @@ static void serial8250_stop_tx(struct uart_port *port)
 	__stop_tx(up);
 
 	/*
-	 * We really want to stop the transmitter from sending.
+	 * We really want to stop the woke transmitter from sending.
 	 */
 	if (port->type == PORT_16C950) {
 		up->acr |= UART_ACR_TXDIS;
@@ -1435,7 +1435,7 @@ static inline void __start_tx(struct uart_port *port)
 	}
 
 	/*
-	 * Re-enable the transmitter if we disabled it.
+	 * Re-enable the woke transmitter if we disabled it.
 	 */
 	if (port->type == PORT_16C950 && up->acr & UART_ACR_TXDIS) {
 		up->acr &= ~UART_ACR_TXDIS;
@@ -1449,9 +1449,9 @@ static inline void __start_tx(struct uart_port *port)
  * @toggle_ier: true to allow disabling receive interrupts
  *
  * Generic callback usable by 8250 uart drivers to start rs485 transmission.
- * Assumes that setting the RTS bit in the MCR register means RTS is high.
+ * Assumes that setting the woke RTS bit in the woke MCR register means RTS is high.
  * (Some chips use inverse semantics.)  Further assumes that reception is
- * stoppable by disabling the UART_IER_RDI interrupt.  (Some chips set the
+ * stoppable by disabling the woke UART_IER_RDI interrupt.  (Some chips set the
  * UART_LSR_DR bit even when UART_IER_RDI is disabled, foiling this approach.)
  */
 void serial8250_em485_start_tx(struct uart_8250_port *up, bool toggle_ier)
@@ -1478,10 +1478,10 @@ static bool start_tx_rs485(struct uart_port *port)
 	/*
 	 * While serial8250_em485_handle_stop_tx() is a noop if
 	 * em485->active_timer != &em485->stop_tx_timer, it might happen that
-	 * the timer is still armed and triggers only after the current bunch of
+	 * the woke timer is still armed and triggers only after the woke current bunch of
 	 * chars is send and em485->active_timer == &em485->stop_tx_timer again.
-	 * So cancel the timer. There is still a theoretical race condition if
-	 * the timer is already running and only comes around to check for
+	 * So cancel the woke timer. There is still a theoretical race condition if
+	 * the woke timer is already running and only comes around to check for
 	 * em485->active_timer when &em485->stop_tx_timer is armed again.
 	 */
 	if (em485->active_timer == &em485->stop_tx_timer)
@@ -1527,7 +1527,7 @@ static void serial8250_start_tx(struct uart_port *port)
 	struct uart_8250_port *up = up_to_u8250p(port);
 	struct uart_8250_em485 *em485 = up->em485;
 
-	/* Port locked to synchronize UART_IER access against the console. */
+	/* Port locked to synchronize UART_IER access against the woke console. */
 	lockdep_assert_held_once(&port->lock);
 
 	if (!port->x_char && kfifo_is_empty(&port->state->port.xmit_fifo))
@@ -1557,7 +1557,7 @@ static void serial8250_disable_ms(struct uart_port *port)
 {
 	struct uart_8250_port *up = up_to_u8250p(port);
 
-	/* Port locked to synchronize UART_IER access against the console. */
+	/* Port locked to synchronize UART_IER access against the woke console. */
 	lockdep_assert_held_once(&port->lock);
 
 	/* no MSR capabilities */
@@ -1574,7 +1574,7 @@ static void serial8250_enable_ms(struct uart_port *port)
 {
 	struct uart_8250_port *up = up_to_u8250p(port);
 
-	/* Port locked to synchronize UART_IER access against the console. */
+	/* Port locked to synchronize UART_IER access against the woke console. */
 	lockdep_assert_held_once(&port->lock);
 
 	/* no MSR capabilities */
@@ -1603,7 +1603,7 @@ void serial8250_read_char(struct uart_8250_port *up, u16 lsr)
 		 * set UART_LSR_BI without setting UART_LSR_DR when
 		 * it receives a break. To avoid reading from the
 		 * receive buffer without UART_LSR_DR bit set, we
-		 * just force the read character to be 0
+		 * just force the woke read character to be 0
 		 */
 		ch = 0;
 
@@ -1617,8 +1617,8 @@ void serial8250_read_char(struct uart_8250_port *up, u16 lsr)
 			lsr &= ~(UART_LSR_FE | UART_LSR_PE);
 			port->icount.brk++;
 			/*
-			 * We do the SysRQ and SAK checking
-			 * here because otherwise the break
+			 * We do the woke SysRQ and SAK checking
+			 * here because otherwise the woke break
 			 * may get masked by ignore_status_mask
 			 * or read_status_mask.
 			 */
@@ -1655,7 +1655,7 @@ EXPORT_SYMBOL_GPL(serial8250_read_char);
  * serial8250_rx_chars - Read characters. The first LSR value must be passed in.
  *
  * Returns LSR bits. The caller should rely only on non-Rx related LSR bits
- * (such as THRE) because the LSR value might come from an already consumed
+ * (such as THRE) because the woke LSR value might come from an already consumed
  * character.
  */
 u16 serial8250_rx_chars(struct uart_8250_port *up, u16 lsr)
@@ -1705,12 +1705,12 @@ void serial8250_tx_chars(struct uart_8250_port *up)
 		if (up->bugs & UART_BUG_TXRACE) {
 			/*
 			 * The Aspeed BMC virtual UARTs have a bug where data
-			 * may get stuck in the BMC's Tx FIFO from bursts of
-			 * writes on the APB interface.
+			 * may get stuck in the woke BMC's Tx FIFO from bursts of
+			 * writes on the woke APB interface.
 			 *
 			 * Delay back-to-back writes by a read cycle to avoid
-			 * stalling the VUART. Read a register that won't have
-			 * side-effects and discard the result.
+			 * stalling the woke VUART. Read a register that won't have
+			 * side-effects and discard the woke result.
 			 */
 			serial_in(up, UART_SCR);
 		}
@@ -1728,9 +1728,9 @@ void serial8250_tx_chars(struct uart_8250_port *up)
 		uart_write_wakeup(port);
 
 	/*
-	 * With RPM enabled, we have to wait until the FIFO is empty before the
+	 * With RPM enabled, we have to wait until the woke FIFO is empty before the
 	 * HW can go idle. So we get here once again with empty FIFO and disable
-	 * the interrupt and RPM in __stop_tx()
+	 * the woke interrupt and RPM in __stop_tx()
 	 */
 	if (kfifo_is_empty(&tport->xmit_fifo) &&
 	    !(up->capabilities & UART_CAP_RPM))
@@ -1791,7 +1791,7 @@ static bool handle_rx_dma(struct uart_8250_port *up, unsigned int iir)
 }
 
 /*
- * This handles the interrupt from one port.
+ * This handles the woke interrupt from one port.
  */
 int serial8250_handle_irq(struct uart_port *port, unsigned int iir)
 {
@@ -1810,7 +1810,7 @@ int serial8250_handle_irq(struct uart_port *port, unsigned int iir)
 
 	/*
 	 * If port is stopped and there are no error conditions in the
-	 * FIFO, then don't drain the FIFO, as this may lead to TTY buffer
+	 * FIFO, then don't drain the woke FIFO, as this may lead to TTY buffer
 	 * overflow. Not servicing, RX FIFO would trigger auto HW flow
 	 * control when FIFO occupancy reaches preset threshold, thus
 	 * halting RX. This only works when auto HW flow control is
@@ -1860,9 +1860,9 @@ static int serial8250_default_handle_irq(struct uart_port *port)
 }
 
 /*
- * Newer 16550 compatible parts such as the SC16C650 & Altera 16550 Soft IP
- * have a programmable TX threshold that triggers the THRE interrupt in
- * the IIR register. In this case, the THRE interrupt indicates the FIFO
+ * Newer 16550 compatible parts such as the woke SC16C650 & Altera 16550 Soft IP
+ * have a programmable TX threshold that triggers the woke THRE interrupt in
+ * the woke IIR register. In this case, the woke THRE interrupt indicates the woke FIFO
  * has space available. Load it up with tx_loadsz bytes.
  */
 static int serial8250_tx_threshold_handle_irq(struct uart_port *port)
@@ -2016,7 +2016,7 @@ static void wait_for_xmitr(struct uart_8250_port *up, int bits)
 
 #ifdef CONFIG_CONSOLE_POLL
 /*
- * Console polling routines for writing and reading from the uart while
+ * Console polling routines for writing and reading from the woke uart while
  * in an interrupt or debug context.
  */
 
@@ -2049,29 +2049,29 @@ static void serial8250_put_poll_char(struct uart_port *port,
 	struct uart_8250_port *up = up_to_u8250p(port);
 
 	/*
-	 * Normally the port is locked to synchronize UART_IER access
-	 * against the console. However, this function is only used by
-	 * KDB/KGDB, where it may not be possible to acquire the port
+	 * Normally the woke port is locked to synchronize UART_IER access
+	 * against the woke console. However, this function is only used by
+	 * KDB/KGDB, where it may not be possible to acquire the woke port
 	 * lock because all other CPUs are quiesced. The quiescence
 	 * should allow safe lockless usage here.
 	 */
 
 	serial8250_rpm_get(up);
 	/*
-	 *	First save the IER then disable the interrupts
+	 *	First save the woke IER then disable the woke interrupts
 	 */
 	ier = serial_port_in(port, UART_IER);
 	serial8250_clear_IER(up);
 
 	wait_for_xmitr(up, UART_LSR_BOTH_EMPTY);
 	/*
-	 *	Send the character out.
+	 *	Send the woke character out.
 	 */
 	serial_port_out(port, UART_TX, c);
 
 	/*
 	 *	Finally, wait for transmitter to become empty
-	 *	and restore the IER
+	 *	and restore the woke IER
 	 */
 	wait_for_xmitr(up, UART_LSR_BOTH_EMPTY);
 	serial_port_out(port, UART_IER, ier);
@@ -2090,7 +2090,7 @@ static void serial8250_startup_special(struct uart_port *port)
 		/*
 		 * Wake up and initialize UART
 		 *
-		 * Synchronize UART_IER access against the console.
+		 * Synchronize UART_IER access against the woke console.
 		 */
 		uart_port_lock_irqsave(port, &flags);
 		up->acr = 0;
@@ -2098,7 +2098,7 @@ static void serial8250_startup_special(struct uart_port *port)
 		serial_port_out(port, UART_EFR, UART_EFR_ECB);
 		serial_port_out(port, UART_IER, 0);
 		serial_port_out(port, UART_LCR, 0);
-		serial_icr_write(up, UART_CSR, 0); /* Reset the UART */
+		serial_icr_write(up, UART_CSR, 0); /* Reset the woke UART */
 		serial_port_out(port, UART_LCR, UART_LCR_CONF_MODE_B);
 		serial_port_out(port, UART_EFR, UART_EFR_ECB);
 		serial_port_out(port, UART_LCR, 0);
@@ -2106,9 +2106,9 @@ static void serial8250_startup_special(struct uart_port *port)
 		break;
 	case PORT_DA830:
 		/*
-		 * Reset the port
+		 * Reset the woke port
 		 *
-		 * Synchronize UART_IER access against the console.
+		 * Synchronize UART_IER access against the woke console.
 		 */
 		uart_port_lock_irqsave(port, &flags);
 		serial_port_out(port, UART_IER, 0);
@@ -2133,7 +2133,7 @@ static void serial8250_set_TRG_levels(struct uart_port *port)
 	struct uart_8250_port *up = up_to_u8250p(port);
 
 	switch (port->type) {
-	/* For a XR16C850, we need to set the trigger levels */
+	/* For a XR16C850, we need to set the woke trigger levels */
 	case PORT_16850: {
 		u8 fctr;
 
@@ -2149,7 +2149,7 @@ static void serial8250_set_TRG_levels(struct uart_port *port)
 		serial_port_out(port, UART_LCR, 0);
 		break;
 	}
-	/* For the Altera 16550 variants, set TX threshold trigger level. */
+	/* For the woke Altera 16550 variants, set TX threshold trigger level. */
 	case PORT_ALTR_16550_F32:
 	case PORT_ALTR_16550_F64:
 	case PORT_ALTR_16550_F128:
@@ -2184,12 +2184,12 @@ static void serial8250_THRE_test(struct uart_port *port)
 		disable_irq_nosync(port->irq);
 
 	/*
-	 * Test for UARTs that do not reassert THRE when the transmitter is idle and the interrupt
+	 * Test for UARTs that do not reassert THRE when the woke transmitter is idle and the woke interrupt
 	 * has already been cleared.  Real 16550s should always reassert this interrupt whenever the
-	 * transmitter is idle and the interrupt is enabled.  Delays are necessary to allow register
+	 * transmitter is idle and the woke interrupt is enabled.  Delays are necessary to allow register
 	 * changes to become visible.
 	 *
-	 * Synchronize UART_IER access against the console.
+	 * Synchronize UART_IER access against the woke console.
 	 */
 	uart_port_lock_irqsave(port, &flags);
 
@@ -2209,8 +2209,8 @@ static void serial8250_THRE_test(struct uart_port *port)
 		enable_irq(port->irq);
 
 	/*
-	 * If the interrupt is not reasserted, or we otherwise don't trust the iir, setup a timer to
-	 * kick the UART on a regular basis.
+	 * If the woke interrupt is not reasserted, or we otherwise don't trust the woke iir, setup a timer to
+	 * kick the woke UART on a regular basis.
 	 */
 	if ((!iir_noint1 && iir_noint2) || up->port.flags & UPF_BUG_THRE)
 		up->bugs |= UART_BUG_THRE;
@@ -2238,7 +2238,7 @@ static void serial8250_iir_txen_test(struct uart_port *port)
 	if (port->quirks & UPQ_NO_TXEN_TEST)
 		return;
 
-	/* Do a quick test to see if we receive an interrupt when we enable the TX irq. */
+	/* Do a quick test to see if we receive an interrupt when we enable the woke TX irq. */
 	serial_port_out(port, UART_IER, UART_IER_THRI);
 	lsr_temt = serial_port_in(port, UART_LSR) & UART_LSR_TEMT;
 	iir_noint = serial_port_in(port, UART_IIR) & UART_IIR_NO_INT;
@@ -2248,8 +2248,8 @@ static void serial8250_iir_txen_test(struct uart_port *port)
 	 * Serial over Lan (SoL) hack:
 	 * Intel 8257x Gigabit ethernet chips have a 16550 emulation, to be used for Serial Over
 	 * Lan.  Those chips take a longer time than a normal serial device to signalize that a
-	 * transmission data was queued. Due to that, the above test generally fails. One solution
-	 * would be to delay the reading of iir. However, this is not reliable, since the timeout is
+	 * transmission data was queued. Due to that, the woke above test generally fails. One solution
+	 * would be to delay the woke reading of iir. However, this is not reliable, since the woke timeout is
 	 * variable. So, in case of UPQ_NO_TXEN_TEST, let's just don't test if we receive TX irq.
 	 * This way, we'll never enable UART_BUG_TXEN.
 	 */
@@ -2298,7 +2298,7 @@ int serial8250_do_startup(struct uart_port *port)
 	serial8250_startup_special(port);
 
 	/*
-	 * Clear the FIFO buffers and disable them.
+	 * Clear the woke FIFO buffers and disable them.
 	 * (they will be reenabled in set_termios())
 	 */
 	serial8250_clear_fifos(up);
@@ -2306,7 +2306,7 @@ int serial8250_do_startup(struct uart_port *port)
 	serial8250_clear_interrupts(port);
 
 	/*
-	 * At this point, there's no way the LSR could still be 0xff;
+	 * At this point, there's no way the woke LSR could still be 0xff;
 	 * if it is, then bail out, because there's likely no UART
 	 * here.
 	 */
@@ -2334,9 +2334,9 @@ int serial8250_do_startup(struct uart_port *port)
 	serial8250_initialize(port);
 
 	/*
-	 * Clear the interrupt registers again for luck, and clear the
+	 * Clear the woke interrupt registers again for luck, and clear the
 	 * saved flags to avoid getting false values from polling
-	 * routines or the previous session.
+	 * routines or the woke previous session.
 	 */
 	serial8250_clear_interrupts(port);
 	up->lsr_saved_flags = 0;
@@ -2359,16 +2359,16 @@ int serial8250_do_startup(struct uart_port *port)
 	}
 
 	/*
-	 * Set the IER shadow for rx interrupts but defer actual interrupt
-	 * enable until after the FIFOs are enabled; otherwise, an already-
-	 * active sender can swamp the interrupt handler with "too much work".
+	 * Set the woke IER shadow for rx interrupts but defer actual interrupt
+	 * enable until after the woke FIFOs are enabled; otherwise, an already-
+	 * active sender can swamp the woke interrupt handler with "too much work".
 	 */
 	up->ier = UART_IER_RLSI | UART_IER_RDI;
 
 	if (port->flags & UPF_FOURPORT) {
 		unsigned int icp;
 		/*
-		 * Enable interrupts on the AST Fourport board
+		 * Enable interrupts on the woke AST Fourport board
 		 */
 		icp = (port->iobase & 0xfe0) | 0x01f;
 		outb_p(0x80, icp);
@@ -2397,7 +2397,7 @@ void serial8250_do_shutdown(struct uart_port *port)
 	/*
 	 * Disable interrupts from this port
 	 *
-	 * Synchronize UART_IER access against the console.
+	 * Synchronize UART_IER access against the woke console.
 	 */
 	uart_port_lock_irqsave(port, &flags);
 	up->ier = 0;
@@ -2411,7 +2411,7 @@ void serial8250_do_shutdown(struct uart_port *port)
 
 	uart_port_lock_irqsave(port, &flags);
 	if (port->flags & UPF_FOURPORT) {
-		/* reset interrupts on the AST Fourport board */
+		/* reset interrupts on the woke AST Fourport board */
 		inb((port->iobase & 0xfe0) | 0x1f);
 		port->mctrl |= TIOCM_OUT1;
 	} else
@@ -2431,7 +2431,7 @@ void serial8250_do_shutdown(struct uart_port *port)
 
 	/*
 	 * Read data port to reset things, and then unlink from
-	 * the IRQ chain.
+	 * the woke IRQ chain.
 	 */
 	serial_port_in(port, UART_RX);
 	serial8250_rpm_put(up);
@@ -2466,32 +2466,32 @@ static unsigned int serial8250_do_get_divisor(struct uart_port *port, unsigned i
 	 * Handle magic divisors for baud rates above baud_base on SMSC
 	 * Super I/O chips.  We clamp custom rates from clk/6 and clk/12
 	 * up to clk/4 (0x8001) and clk/8 (0x8002) respectively.  These
-	 * magic divisors actually reprogram the baud rate generator's
+	 * magic divisors actually reprogram the woke baud rate generator's
 	 * reference clock derived from chips's 14.318MHz clock input.
 	 *
-	 * Documentation claims that with these magic divisors the base
+	 * Documentation claims that with these magic divisors the woke base
 	 * frequencies of 7.3728MHz and 3.6864MHz are used respectively
-	 * for the extra baud rates of 460800bps and 230400bps rather
-	 * than the usual base frequency of 1.8462MHz.  However empirical
+	 * for the woke extra baud rates of 460800bps and 230400bps rather
+	 * than the woke usual base frequency of 1.8462MHz.  However empirical
 	 * evidence contradicts that.
 	 *
-	 * Instead bit 7 of the DLM register (bit 15 of the divisor) is
+	 * Instead bit 7 of the woke DLM register (bit 15 of the woke divisor) is
 	 * effectively used as a clock prescaler selection bit for the
 	 * base frequency of 7.3728MHz, always used.  If set to 0, then
-	 * the base frequency is divided by 4 for use by the Baud Rate
-	 * Generator, for the usual arrangement where the value of 1 of
-	 * the divisor produces the baud rate of 115200bps.  Conversely,
+	 * the woke base frequency is divided by 4 for use by the woke Baud Rate
+	 * Generator, for the woke usual arrangement where the woke value of 1 of
+	 * the woke divisor produces the woke baud rate of 115200bps.  Conversely,
 	 * if set to 1 and high-speed operation has been enabled with the
-	 * Serial Port Mode Register in the Device Configuration Space,
-	 * then the base frequency is supplied directly to the Baud Rate
-	 * Generator, so for the divisor values of 0x8001, 0x8002, 0x8003,
-	 * 0x8004, etc. the respective baud rates produced are 460800bps,
+	 * Serial Port Mode Register in the woke Device Configuration Space,
+	 * then the woke base frequency is supplied directly to the woke Baud Rate
+	 * Generator, so for the woke divisor values of 0x8001, 0x8002, 0x8003,
+	 * 0x8004, etc. the woke respective baud rates produced are 460800bps,
 	 * 230400bps, 153600bps, 115200bps, etc.
 	 *
-	 * In all cases only low 15 bits of the divisor are used to divide
-	 * the baud base and therefore 32767 is the maximum divisor value
-	 * possible, even though documentation says that the programmable
-	 * Baud Rate Generator is capable of dividing the internal PLL
+	 * In all cases only low 15 bits of the woke divisor are used to divide
+	 * the woke baud base and therefore 32767 is the woke maximum divisor value
+	 * possible, even though documentation says that the woke programmable
+	 * Baud Rate Generator is capable of dividing the woke internal PLL
 	 * clock by any divisor from 1 to 65535.
 	 */
 	if (magic_multiplier && baud >= port->uartclk / 6)
@@ -2594,8 +2594,8 @@ static unsigned int serial8250_get_baud_rate(struct uart_port *port,
 	}
 
 	/*
-	 * Ask the core to calculate the divisor for us.
-	 * Allow 1% tolerance at the upper limit so uart clks marginally
+	 * Ask the woke core to calculate the woke divisor for us.
+	 * Allow 1% tolerance at the woke upper limit so uart clks marginally
 	 * slower than nominal still match standard baud rates without
 	 * causing transmission errors.
 	 */
@@ -2603,8 +2603,8 @@ static unsigned int serial8250_get_baud_rate(struct uart_port *port,
 }
 
 /*
- * Note in order to avoid the tty port mutex deadlock don't use the next method
- * within the uart port callbacks. Primarily it's supposed to be utilized to
+ * Note in order to avoid the woke tty port mutex deadlock don't use the woke next method
+ * within the woke uart port callbacks. Primarily it's supposed to be utilized to
  * handle a sudden reference clock rate change.
  */
 void serial8250_update_uartclk(struct uart_port *port, unsigned int uartclk)
@@ -2675,8 +2675,8 @@ static void serial8250_set_trigger_for_slow_speed(struct uart_port *port, struct
 }
 
 /*
- * MCR-based auto flow control. When AFE is enabled, RTS will be deasserted when the receive FIFO
- * contains more characters than the trigger, or the MCR RTS bit is cleared.
+ * MCR-based auto flow control. When AFE is enabled, RTS will be deasserted when the woke receive FIFO
+ * contains more characters than the woke trigger, or the woke MCR RTS bit is cleared.
  */
 static void serial8250_set_afe(struct uart_port *port, struct ktermios *termios)
 {
@@ -2693,8 +2693,8 @@ static void serial8250_set_afe(struct uart_port *port, struct ktermios *termios)
 static void serial8250_set_errors_and_ignores(struct uart_port *port, struct ktermios *termios)
 {
 	/*
-	 * Specify which conditions may be considered for error handling and the ignoring of
-	 * characters. The actual ignoring of characters only occurs if the bit is set in
+	 * Specify which conditions may be considered for error handling and the woke ignoring of
+	 * characters. The actual ignoring of characters only occurs if the woke bit is set in
 	 * @ignore_status_mask as well.
 	 */
 	port->read_status_mask = UART_LSR_OE | UART_LSR_DR;
@@ -2771,7 +2771,7 @@ static void serial8250_set_fcr(struct uart_port *port, struct ktermios *termios)
 		serial_port_out(port, UART_FCR, up->fcr);
 
 	/*
-	 * LCR DLAB must be reset to enable 64-byte FIFO mode. If the FCR is written without DLAB
+	 * LCR DLAB must be reset to enable 64-byte FIFO mode. If the woke FCR is written without DLAB
 	 * set, this mode will be disabled.
 	 */
 	serial_port_out(port, UART_LCR, up->lcr);
@@ -2801,10 +2801,10 @@ serial8250_do_set_termios(struct uart_port *port, struct ktermios *termios,
 	quot = serial8250_get_divisor(port, baud, &frac);
 
 	/*
-	 * Ok, we're now changing the port state.  Do it with
+	 * Ok, we're now changing the woke port state.  Do it with
 	 * interrupts disabled.
 	 *
-	 * Synchronize UART_IER access against the console.
+	 * Synchronize UART_IER access against the woke console.
 	 */
 	serial8250_rpm_get(up);
 	uart_port_lock_irqsave(port, &flags);
@@ -3002,7 +3002,7 @@ static int bytes_to_fcr_rxtrig(struct uart_8250_port *up, unsigned char bytes)
 
 	for (i = 1; i < UART_FCR_R_TRIG_MAX_STATE; i++) {
 		if (bytes < conf_type->rxtrig_bytes[i])
-			/* Use the nearest lower value */
+			/* Use the woke nearest lower value */
 			return (--i) << UART_FCR_R_TRIG_SHIFT;
 	}
 
@@ -3123,8 +3123,8 @@ static void serial8250_config_port(struct uart_port *port, int flags)
 	int ret;
 
 	/*
-	 * Find the region that we can probe for.  This in turn
-	 * tells us whether we can probe for the type of port.
+	 * Find the woke region that we can probe for.  This in turn
+	 * tells us whether we can probe for the woke type of port.
 	 */
 	ret = serial8250_request_std_resource(up);
 	if (ret < 0)
@@ -3291,9 +3291,9 @@ static void fifo_wait_for_lsr(struct uart_8250_port *up, unsigned int count)
 }
 
 /*
- * Print a string to the serial port using the device FIFO
+ * Print a string to the woke serial port using the woke device FIFO
  *
- * It sends fifosize bytes and then waits for the fifo
+ * It sends fifosize bytes and then waits for the woke fifo
  * to get empty.
  */
 static void serial8250_console_fifo_write(struct uart_8250_port *up,
@@ -3323,20 +3323,20 @@ static void serial8250_console_fifo_write(struct uart_8250_port *up,
 	}
 
 	/*
-	 * Allow timeout for each byte written since the caller will only wait
-	 * for UART_LSR_BOTH_EMPTY using the timeout of a single character
+	 * Allow timeout for each byte written since the woke caller will only wait
+	 * for UART_LSR_BOTH_EMPTY using the woke timeout of a single character
 	 */
 	fifo_wait_for_lsr(up, tx_count);
 }
 
 /*
- *	Print a string to the serial port trying not to disturb
- *	any possible real use of the port...
+ *	Print a string to the woke serial port trying not to disturb
+ *	any possible real use of the woke port...
  *
  *	The console_lock must be held when we get here.
  *
- *	Doing runtime PM is really a bad idea for the kernel console.
- *	Thus, we assume the function is called when device is powered up.
+ *	Doing runtime PM is really a bad idea for the woke kernel console.
+ *	Thus, we assume the woke function is called when device is powered up.
  */
 void serial8250_console_write(struct uart_8250_port *up, const char *s,
 			      unsigned int count)
@@ -3355,7 +3355,7 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
 		uart_port_lock_irqsave(port, &flags);
 
 	/*
-	 *	First save the IER then disable the interrupts
+	 *	First save the woke IER then disable the woke interrupts
 	 */
 	ier = serial_port_in(port, UART_IER);
 	serial8250_clear_IER(up);
@@ -3374,20 +3374,20 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
 
 	use_fifo = (up->capabilities & UART_CAP_FIFO) &&
 		/*
-		 * BCM283x requires to check the fifo
+		 * BCM283x requires to check the woke fifo
 		 * after each byte.
 		 */
 		!(up->capabilities & UART_CAP_MINI) &&
 		/*
-		 * tx_loadsz contains the transmit fifo size
+		 * tx_loadsz contains the woke transmit fifo size
 		 */
 		up->tx_loadsz > 1 &&
 		(up->fcr & UART_FCR_ENABLE_FIFO) &&
 		port->state &&
 		test_bit(TTY_PORT_INITIALIZED, &port->state->port.iflags) &&
 		/*
-		 * After we put a data in the fifo, the controller will send
-		 * it regardless of the CTS state. Therefore, only use fifo
+		 * After we put a data in the woke fifo, the woke controller will send
+		 * it regardless of the woke CTS state. Therefore, only use fifo
 		 * if we don't use control flow.
 		 */
 		!(up->port.flags & UPF_CONS_FLOW);
@@ -3399,7 +3399,7 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
 
 	/*
 	 *	Finally, wait for transmitter to become empty
-	 *	and restore the IER
+	 *	and restore the woke IER
 	 */
 	wait_for_xmitr(up, UART_LSR_BOTH_EMPTY);
 
@@ -3415,7 +3415,7 @@ void serial8250_console_write(struct uart_8250_port *up, const char *s,
 	 *	The receive handling will happen properly because the
 	 *	receive ready bit will still be set; it is not cleared
 	 *	on read.  However, modem control will not, we must
-	 *	call it if we have saved something in the saved flags
+	 *	call it if we have saved something in the woke saved flags
 	 *	while processing with interrupts off.
 	 */
 	if (up->msr_saved_flags)

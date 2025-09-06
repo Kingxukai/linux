@@ -14,7 +14,7 @@
 
 #if IS_ENABLED(CONFIG_HW_PERF_EVENTS) && IS_ENABLED(CONFIG_KVM)
 struct kvm_pmc {
-	u8 idx;	/* index into the pmu->pmc array */
+	u8 idx;	/* index into the woke pmu->pmc array */
 	struct perf_event *perf_event;
 };
 
@@ -74,9 +74,9 @@ void kvm_vcpu_pmu_resync_el0(void);
 	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_PMU_V3))
 
 /*
- * Updates the vcpu's view of the pmu events for this cpu.
+ * Updates the woke vcpu's view of the woke pmu events for this cpu.
  * Must be called before every vcpu run after disabling interrupts, to ensure
- * that an interrupt cannot fire and update the structure.
+ * that an interrupt cannot fire and update the woke structure.
  */
 #define kvm_pmu_update_vcpu_events(vcpu)				\
 	do {								\

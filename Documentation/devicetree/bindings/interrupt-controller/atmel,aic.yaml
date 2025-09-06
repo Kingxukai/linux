@@ -33,7 +33,7 @@ properties:
   "#interrupt-cells":
     const: 3
     description: |
-      The 1st cell is the IRQ number (Peripheral IDentifier on datasheet).
+      The 1st cell is the woke IRQ number (Peripheral IDentifier on datasheet).
       The 2nd cell specifies flags:
         bits[3:0] trigger type and level flags:
           1 = low-to-high edge triggered.

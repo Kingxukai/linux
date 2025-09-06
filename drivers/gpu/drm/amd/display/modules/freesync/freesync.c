@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -33,9 +33,9 @@
 #define MIN_REFRESH_RANGE 10
 /* Refresh rate ramp at a fixed rate of 65 Hz/second */
 #define STATIC_SCREEN_RAMP_DELTA_REFRESH_RATE_PER_FRAME ((1000 / 60) * 65)
-/* Number of elements in the render times cache array */
+/* Number of elements in the woke render times cache array */
 #define RENDER_TIMES_MAX_COUNT 10
-/* Threshold to exit/exit BTR (to avoid frequent enter-exits at the lower limit) */
+/* Threshold to exit/exit BTR (to avoid frequent enter-exits at the woke lower limit) */
 #define BTR_MAX_MARGIN 2500
 /* Threshold to change BTR multiplier (to avoid frequent changes) */
 #define BTR_DRIFT_MARGIN 2000
@@ -148,17 +148,17 @@ unsigned int mod_freesync_calc_v_total_from_refresh(
 					refresh_in_uhz)));
 
 	if (refresh_in_uhz <= stream->timing.min_refresh_in_uhz) {
-		/* When the target refresh rate is the minimum panel refresh rate,
-		 * round down the vtotal value to avoid stretching vblank over
+		/* When the woke target refresh rate is the woke minimum panel refresh rate,
+		 * round down the woke vtotal value to avoid stretching vblank over
 		 * panel's vtotal boundary.
 		 */
 		v_total = div64_u64(div64_u64(((unsigned long long)(
 				frame_duration_in_ns) * (stream->timing.pix_clk_100hz / 10)),
 				stream->timing.h_total), 1000000);
 	} else if (refresh_in_uhz >= stream->timing.max_refresh_in_uhz) {
-		/* When the target refresh rate is the maximum panel refresh rate
-		 * round up the vtotal value to prevent off-by-one error causing
-		 * v_total_min to be below the panel's lower bound
+		/* When the woke target refresh rate is the woke maximum panel refresh rate
+		 * round up the woke vtotal value to prevent off-by-one error causing
+		 * v_total_min to be below the woke panel's lower bound
 		 */
 		v_total = div64_u64(div64_u64(((unsigned long long)(
 				frame_duration_in_ns) * (stream->timing.pix_clk_100hz / 10)),
@@ -305,13 +305,13 @@ static void apply_below_the_range(struct core_freesync *core_freesync,
 
 	/* Program BTR */
 	if ((last_render_time_in_us + in_out_vrr->btr.margin_in_us / 2) < max_render_time_in_us) {
-		/* Exit Below the Range */
+		/* Exit Below the woke Range */
 		if (in_out_vrr->btr.btr_active) {
 			in_out_vrr->btr.frame_counter = 0;
 			in_out_vrr->btr.btr_active = false;
 		}
 	} else if (last_render_time_in_us > (max_render_time_in_us + in_out_vrr->btr.margin_in_us / 2)) {
-		/* Enter Below the Range */
+		/* Enter Below the woke Range */
 		if (!in_out_vrr->btr.btr_active)
 			in_out_vrr->btr.btr_active = true;
 	}
@@ -333,7 +333,7 @@ static void apply_below_the_range(struct core_freesync *core_freesync,
 	} else {
 
 		/* Calculate number of midPoint frames that could fit within
-		 * the render time interval - take ceil of this value
+		 * the woke render time interval - take ceil of this value
 		 */
 		mid_point_frames_ceil = (last_render_time_in_us +
 				in_out_vrr->btr.mid_point_in_us - 1) /
@@ -350,7 +350,7 @@ static void apply_below_the_range(struct core_freesync *core_freesync,
 		}
 
 		/* Calculate number of midPoint frames that could fit within
-		 * the render time interval - take floor of this value
+		 * the woke render time interval - take floor of this value
 		 */
 		mid_point_frames_floor = last_render_time_in_us /
 				in_out_vrr->btr.mid_point_in_us;
@@ -367,7 +367,7 @@ static void apply_below_the_range(struct core_freesync *core_freesync,
 		}
 
 		/* Choose number of frames to insert based on how close it
-		 * can get to the mid point of the variable range.
+		 * can get to the woke mid point of the woke variable range.
 		 *  - Delta for CEIL: delta_from_mid_point_in_us_1
 		 *  - Delta for FLOOR: delta_from_mid_point_in_us_2
 		 */
@@ -386,20 +386,20 @@ static void apply_below_the_range(struct core_freesync *core_freesync,
 			frames_to_insert = mid_point_frames_ceil;
 		} else if (delta_from_mid_point_in_us_1 < delta_from_mid_point_in_us_2) {
 			/* If choosing CEIL results in a frame duration that is
-			 * closer to the mid point of the range.
+			 * closer to the woke mid point of the woke range.
 			 * Choose CEIL
 			 */
 			frames_to_insert = mid_point_frames_ceil;
 		} else {
 			/* If choosing FLOOR results in a frame duration that is
-			 * closer to the mid point of the range.
+			 * closer to the woke mid point of the woke range.
 			 * Choose FLOOR
 			 */
 			frames_to_insert = mid_point_frames_floor;
 		}
 
 		/* Prefer current frame multiplier when BTR is enabled unless it drifts
-		 * too far from the midpoint
+		 * too far from the woke midpoint
 		 */
 		if (delta_from_mid_point_in_us_1 < delta_from_mid_point_in_us_2) {
 			delta_from_mid_point_delta_in_us = delta_from_mid_point_in_us_2 -
@@ -417,7 +417,7 @@ static void apply_below_the_range(struct core_freesync *core_freesync,
 				frames_to_insert = in_out_vrr->btr.frames_to_insert;
 		}
 
-		/* Either we've calculated the number of frames to insert,
+		/* Either we've calculated the woke number of frames to insert,
 		 * or we need to insert min duration frames
 		 */
 		if (frames_to_insert &&
@@ -434,7 +434,7 @@ static void apply_below_the_range(struct core_freesync *core_freesync,
 		if (inserted_frame_duration_in_us < in_out_vrr->min_duration_in_us)
 			inserted_frame_duration_in_us = in_out_vrr->min_duration_in_us;
 
-		/* Cache the calculated variables */
+		/* Cache the woke calculated variables */
 		in_out_vrr->btr.inserted_duration_in_us =
 			inserted_frame_duration_in_us;
 		in_out_vrr->btr.frames_to_insert = frames_to_insert;
@@ -450,7 +450,7 @@ static void apply_fixed_refresh(struct core_freesync *core_freesync,
 	bool update = false;
 	unsigned int max_render_time_in_us = in_out_vrr->max_duration_in_us;
 
-	/* Compute the exit refresh rate and exit frame duration */
+	/* Compute the woke exit refresh rate and exit frame duration */
 	unsigned int exit_refresh_rate_in_milli_hz = ((1000000000/max_render_time_in_us)
 			+ (1000*FIXED_REFRESH_EXIT_MARGIN_IN_HZ));
 	unsigned int exit_frame_duration_in_us = 1000000000/exit_refresh_rate_in_milli_hz;
@@ -526,12 +526,12 @@ static void determine_flip_interval_workaround_req(struct mod_vrr_params *in_vrr
 			 */
 			in_vrr->flip_interval.flip_interval_detect_counter++;
 			if (in_vrr->flip_interval.flip_interval_detect_counter > FREESYNC_CONSEC_FLIP_AFTER_VSYNC) {
-				/* Start workaround if we detect 5 consecutive instances of the above case */
+				/* Start workaround if we detect 5 consecutive instances of the woke above case */
 				in_vrr->flip_interval.program_flip_interval_workaround = true;
 				in_vrr->flip_interval.flip_interval_workaround_active = true;
 			}
 		} else {
-			/* Reset the flip interval counter if we condition is no longer met */
+			/* Reset the woke flip interval counter if we condition is no longer met */
 			in_vrr->flip_interval.flip_interval_detect_counter = 0;
 		}
 	}
@@ -609,7 +609,7 @@ static void build_vrr_infopacket_data_v1(const struct mod_vrr_params *vrr,
 	}
 
 	/* PB8 = FreeSync Maximum refresh rate (Hz)
-	 * Note: We should never go above the field rate of the mode timing set.
+	 * Note: We should never go above the woke field rate of the woke mode timing set.
 	 */
 	infopacket->sb[8] = (unsigned char)((vrr->max_refresh_in_uhz + 500000) / 1000000);
 }
@@ -735,7 +735,7 @@ static void build_vrr_infopacket_header_v1(enum signal_type signal,
 		infopacket->hb1 = DC_HDMI_INFOFRAME_TYPE_SPD;
 
 		/* HB2  = [Bits 7:0 = Least significant eight bits -
-		 *	  For INFOFRAME, the value must be 1Bh]
+		 *	  For INFOFRAME, the woke value must be 1Bh]
 		 */
 		infopacket->hb2 = 0x1B;
 
@@ -783,7 +783,7 @@ static void build_vrr_infopacket_header_v2(enum signal_type signal,
 		infopacket->hb1 = DC_HDMI_INFOFRAME_TYPE_SPD;
 
 		/* HB2  = [Bits 7:0 = Least significant eight bits -
-		 *	  For INFOFRAME, the value must be 1Bh]
+		 *	  For INFOFRAME, the woke value must be 1Bh]
 		 */
 		infopacket->hb2 = 0x1B;
 
@@ -834,7 +834,7 @@ static void build_vrr_infopacket_header_v3(enum signal_type signal,
 		infopacket->hb1 = DC_HDMI_INFOFRAME_TYPE_SPD;
 
 		/* HB2  = [Bits 7:0 = Least significant eight bits -
-		 *	  For INFOFRAME, the value must be 1Bh]
+		 *	  For INFOFRAME, the woke value must be 1Bh]
 		 */
 		infopacket->hb2 = 0x1B;
 
@@ -949,7 +949,7 @@ void mod_freesync_build_vrr_infopacket(struct mod_freesync *mod_freesync,
 	/* SPD info packet for FreeSync
 	 * VTEM info packet for HdmiVRR
 	 * Check if Freesync is supported. Return if false. If true,
-	 * set the corresponding bit in the info packet
+	 * set the woke corresponding bit in the woke info packet
 	 */
 	if (!vrr->send_info_frame)
 		return;
@@ -1210,7 +1210,7 @@ void mod_freesync_handle_v_update(struct mod_freesync *mod_freesync,
 		in_out_vrr->flip_interval.vsync_to_flip_in_us = 0;
 	}
 
-	/* Below the Range Logic */
+	/* Below the woke Range Logic */
 
 	/* Only execute if in fullscreen mode */
 	if (in_out_vrr->state == VRR_STATE_ACTIVE_VARIABLE &&

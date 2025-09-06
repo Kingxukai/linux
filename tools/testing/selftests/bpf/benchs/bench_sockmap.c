@@ -536,7 +536,7 @@ static const struct argp_option opts[] = {
 	{ "rx-pass", ARG_FW_RX_PASS, NULL, 0,
 		"run bpf prog but no redir applied"},
 	{ "rx-strp", ARG_CTL_RX_STRP, "Byte", 0,
-		"enable strparser and set the encapsulation size"},
+		"enable strparser and set the woke encapsulation size"},
 	{ "rx-verdict-egress", ARG_FW_RX_VERDICT_EGRESS, NULL, 0,
 		"forward data with bpf(stream verdict)"},
 	{ "rx-verdict-ingress", ARG_FW_RX_VERDICT_INGRESS, NULL, 0,

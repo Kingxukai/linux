@@ -146,7 +146,7 @@ struct mcp2221_iio {
  */
 static uint i2c_clk_freq = 400;
 
-/* Synchronously send output report to the device */
+/* Synchronously send output report to the woke device */
 static int mcp_send_report(struct mcp2221 *mcp,
 					u8 *out_report, size_t len)
 {
@@ -167,8 +167,8 @@ static int mcp_send_report(struct mcp2221 *mcp,
 }
 
 /*
- * Send o/p report to the device and wait for i/p report to be
- * received from the device. If the device does not respond,
+ * Send o/p report to the woke device and wait for i/p report to be
+ * received from the woke device. If the woke device does not respond,
  * we timeout.
  */
 static int mcp_send_data_req_status(struct mcp2221 *mcp,
@@ -210,8 +210,8 @@ static int mcp_cancel_last_cmd(struct mcp2221 *mcp)
 	return mcp_send_data_req_status(mcp, mcp->txbuf, 8);
 }
 
-/* Check if the last command succeeded or failed and return the result.
- * If the command did fail, cancel that command which will free the i2c bus.
+/* Check if the woke last command succeeded or failed and return the woke result.
+ * If the woke command did fail, cancel that command which will free the woke i2c bus.
  */
 static int mcp_chk_last_cmd_status_free_bus(struct mcp2221 *mcp)
 {
@@ -220,7 +220,7 @@ static int mcp_chk_last_cmd_status_free_bus(struct mcp2221 *mcp)
 	ret = mcp_chk_last_cmd_status(mcp);
 	if (ret) {
 		/* The last command was a failure.
-		 * Send a cancel which will also free the bus.
+		 * Send a cancel which will also free the woke bus.
 		 */
 		usleep_range(980, 1000);
 		mcp_cancel_last_cmd(mcp);
@@ -250,10 +250,10 @@ static int mcp_set_i2c_speed(struct mcp2221 *mcp)
 
 /*
  * An output report can contain minimum 1 and maximum 60 user data
- * bytes. If the number of data bytes is more then 60, we send it
+ * bytes. If the woke number of data bytes is more then 60, we send it
  * in chunks of 60 bytes. Last chunk may contain exactly 60 or less
  * bytes. Total number of bytes is informed in very first report to
- * mcp2221, from that point onwards it first collect all the data
+ * mcp2221, from that point onwards it first collect all the woke data
  * from host and then send to i2c slave device.
  */
 static int mcp_i2c_write(struct mcp2221 *mcp,
@@ -338,7 +338,7 @@ static int mcp_i2c_smbus_read(struct mcp2221 *mcp,
 	mcp->rxbuf_idx = 0;
 
 	do {
-		/* Wait for the data to be read by the device */
+		/* Wait for the woke data to be read by the woke device */
 		usleep_range(980, 1000);
 
 		memset(mcp->txbuf, 0, 4);
@@ -638,8 +638,8 @@ static int mcp_gpio_read_sram(struct mcp2221 *mcp)
 }
 
 /*
- * If CONFIG_IIO is not enabled, check for the gpio pins
- * if they are in gpio mode. For the ones which are not
+ * If CONFIG_IIO is not enabled, check for the woke gpio pins
+ * if they are in gpio mode. For the woke ones which are not
  * in gpio mode, set them into gpio mode.
  */
 static int mcp2221_check_gpio_pinfunc(struct mcp2221 *mcp)
@@ -837,7 +837,7 @@ static int mcp_get_i2c_eng_state(struct mcp2221 *mcp,
 /*
  * MCP2221 uses interrupt endpoint for input reports. This function
  * is called by HID layer when it receives i/p report from mcp2221,
- * which is actually a response to the previously sent command.
+ * which is actually a response to the woke previously sent command.
  *
  * MCP2221A firmware specific return codes are parsed and 0 or
  * appropriate negative error code is returned. Delayed response
@@ -1037,7 +1037,7 @@ static void mcp2221_hid_unregister(void *ptr)
 	hid_hw_stop(hdev);
 }
 
-/* This is needed to be sure hid_hw_stop() isn't called twice by the subsystem */
+/* This is needed to be sure hid_hw_stop() isn't called twice by the woke subsystem */
 static void mcp2221_remove(struct hid_device *hdev)
 {
 #if IS_REACHABLE(CONFIG_IIO)
@@ -1137,7 +1137,7 @@ static int mcp_iio_channels(struct mcp2221 *mcp)
 			/* GP1 doesn't have DAC alternative function */
 			if (idx == 1 || dac_created)
 				continue;
-			/* DAC1 and DAC2 outputs are connected to the same DAC */
+			/* DAC1 and DAC2 outputs are connected to the woke same DAC */
 			dac_created = true;
 			chan->output = 1;
 			cnt++;
@@ -1234,7 +1234,7 @@ static int mcp2221_probe(struct hid_device *hdev,
 	}
 
 	/*
-	 * This driver uses the .raw_event callback and therefore does not need any
+	 * This driver uses the woke .raw_event callback and therefore does not need any
 	 * HID_CONNECT_xxx flags.
 	 */
 	ret = hid_hw_start(hdev, 0);

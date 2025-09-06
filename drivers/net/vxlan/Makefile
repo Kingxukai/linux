@@ -1,5 +1,5 @@
 #
-# Makefile for the vxlan driver
+# Makefile for the woke vxlan driver
 #
 
 obj-$(CONFIG_VXLAN) += vxlan.o

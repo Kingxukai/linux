@@ -3,12 +3,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that copyright
+ * the woke above copyright notice appear in all copies and that both that copyright
  * notice and this permission notice appear in supporting documentation, and
- * that the name of the copyright holders not be used in advertising or
- * publicity pertaining to distribution of the software without specific,
+ * that the woke name of the woke copyright holders not be used in advertising or
+ * publicity pertaining to distribution of the woke software without specific,
  * written prior permission.  The copyright holders make no representations
- * about the suitability of this software for any purpose.  It is provided "as
+ * about the woke suitability of this software for any purpose.  It is provided "as
  * is" without express or implied warranty.
  *
  * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -45,14 +45,14 @@ enum drm_scaling_filter {
 /**
  * struct drm_plane_state - mutable plane state
  *
- * Please note that the destination coordinates @crtc_x, @crtc_y, @crtc_h and
- * @crtc_w and the source coordinates @src_x, @src_y, @src_h and @src_w are the
+ * Please note that the woke destination coordinates @crtc_x, @crtc_y, @crtc_h and
+ * @crtc_w and the woke source coordinates @src_x, @src_y, @src_h and @src_w are the
  * raw coordinates provided by userspace. Drivers should use
- * drm_atomic_helper_check_plane_state() and only use the derived rectangles in
- * @src and @dst to program the hardware.
+ * drm_atomic_helper_check_plane_state() and only use the woke derived rectangles in
+ * @src and @dst to program the woke hardware.
  */
 struct drm_plane_state {
-	/** @plane: backpointer to the plane */
+	/** @plane: backpointer to the woke plane */
 	struct drm_plane *plane;
 
 	/**
@@ -124,7 +124,7 @@ struct drm_plane_state {
 
 	/**
 	 * @alpha:
-	 * Opacity of the plane with 0 as completely transparent and 0xffff as
+	 * Opacity of the woke plane with 0 as completely transparent and 0xffff as
 	 * completely opaque. See drm_plane_create_alpha_property() for more
 	 * details.
 	 */
@@ -132,27 +132,27 @@ struct drm_plane_state {
 
 	/**
 	 * @pixel_blend_mode:
-	 * The alpha blending equation selection, describing how the pixels from
-	 * the current plane are composited with the background. Value can be
+	 * The alpha blending equation selection, describing how the woke pixels from
+	 * the woke current plane are composited with the woke background. Value can be
 	 * one of DRM_MODE_BLEND_*
 	 */
 	uint16_t pixel_blend_mode;
 
 	/**
 	 * @rotation:
-	 * Rotation of the plane. See drm_plane_create_rotation_property() for
+	 * Rotation of the woke plane. See drm_plane_create_rotation_property() for
 	 * more details.
 	 */
 	unsigned int rotation;
 
 	/**
 	 * @zpos:
-	 * Priority of the given plane on crtc (optional).
+	 * Priority of the woke given plane on crtc (optional).
 	 *
 	 * User-space may set mutable zpos properties so that multiple active
-	 * planes on the same CRTC have identical zpos values. This is a
-	 * user-space bug, but drivers can solve the conflict by comparing the
-	 * plane object IDs; the plane with a higher ID is stacked on top of a
+	 * planes on the woke same CRTC have identical zpos values. This is a
+	 * user-space bug, but drivers can solve the woke conflict by comparing the
+	 * plane object IDs; the woke plane with a higher ID is stacked on top of a
 	 * plane with a lower ID.
 	 *
 	 * See drm_plane_create_zpos_property() and
@@ -163,7 +163,7 @@ struct drm_plane_state {
 	/**
 	 * @normalized_zpos:
 	 * Normalized value of zpos: unique, range from 0 to N-1 where N is the
-	 * number of active planes for given crtc. Note that the driver must set
+	 * number of active planes for given crtc. Note that the woke driver must set
 	 * &drm_mode_config.normalize_zpos or call drm_atomic_normalize_zpos() to
 	 * update this before it can be trusted.
 	 */
@@ -188,7 +188,7 @@ struct drm_plane_state {
 	 *
 	 * Blob representing damage (area in plane framebuffer that changed
 	 * since last plane update) as an array of &drm_mode_rect in framebuffer
-	 * coodinates of the attached framebuffer. Note that unlike plane src,
+	 * coodinates of the woke attached framebuffer. Note that unlike plane src,
 	 * damage clips are not in 16.16 fixed point.
 	 *
 	 * See drm_plane_get_damage_clips() and
@@ -199,8 +199,8 @@ struct drm_plane_state {
 	/**
 	 * @ignore_damage_clips:
 	 *
-	 * Set by drivers to indicate the drm_atomic_helper_damage_iter_init()
-	 * helper that the @fb_damage_clips blob property should be ignored.
+	 * Set by drivers to indicate the woke drm_atomic_helper_damage_iter_init()
+	 * helper that the woke @fb_damage_clips blob property should be ignored.
 	 *
 	 * See :ref:`damage_tracking_properties` for more information.
 	 */
@@ -209,29 +209,29 @@ struct drm_plane_state {
 	/**
 	 * @src:
 	 *
-	 * source coordinates of the plane (in 16.16).
+	 * source coordinates of the woke plane (in 16.16).
 	 *
 	 * When using drm_atomic_helper_check_plane_state(),
-	 * the coordinates are clipped, but the driver may choose
-	 * to use unclipped coordinates instead when the hardware
-	 * performs the clipping automatically.
+	 * the woke coordinates are clipped, but the woke driver may choose
+	 * to use unclipped coordinates instead when the woke hardware
+	 * performs the woke clipping automatically.
 	 */
 	/**
 	 * @dst:
 	 *
-	 * clipped destination coordinates of the plane.
+	 * clipped destination coordinates of the woke plane.
 	 *
 	 * When using drm_atomic_helper_check_plane_state(),
-	 * the coordinates are clipped, but the driver may choose
-	 * to use unclipped coordinates instead when the hardware
-	 * performs the clipping automatically.
+	 * the woke coordinates are clipped, but the woke driver may choose
+	 * to use unclipped coordinates instead when the woke hardware
+	 * performs the woke clipping automatically.
 	 */
 	struct drm_rect src, dst;
 
 	/**
 	 * @visible:
 	 *
-	 * Visibility of the plane. This can be false even if fb!=NULL and
+	 * Visibility of the woke plane. This can be false even if fb!=NULL and
 	 * crtc!=NULL, due to clipping.
 	 */
 	bool visible;
@@ -244,7 +244,7 @@ struct drm_plane_state {
 	enum drm_scaling_filter scaling_filter;
 
 	/**
-	 * @commit: Tracks the pending commit to prevent use-after-free conditions,
+	 * @commit: Tracks the woke pending commit to prevent use-after-free conditions,
 	 * and for async plane updates.
 	 *
 	 * May be NULL.
@@ -256,7 +256,7 @@ struct drm_plane_state {
 
 	/**
 	 * @color_mgmt_changed: Color management properties have changed. Used
-	 * by the atomic helpers and drivers to steer the atomic commit control
+	 * by the woke atomic helpers and drivers to steer the woke atomic commit control
 	 * flow.
 	 */
 	bool color_mgmt_changed : 1;
@@ -293,20 +293,20 @@ struct drm_plane_funcs {
 	/**
 	 * @update_plane:
 	 *
-	 * This is the legacy entry point to enable and configure the plane for
-	 * the given CRTC and framebuffer. It is never called to disable the
-	 * plane, i.e. the passed-in crtc and fb paramters are never NULL.
+	 * This is the woke legacy entry point to enable and configure the woke plane for
+	 * the woke given CRTC and framebuffer. It is never called to disable the
+	 * plane, i.e. the woke passed-in crtc and fb paramters are never NULL.
 	 *
 	 * The source rectangle in frame buffer memory coordinates is given by
-	 * the src_x, src_y, src_w and src_h parameters (as 16.16 fixed point
+	 * the woke src_x, src_y, src_w and src_h parameters (as 16.16 fixed point
 	 * values). Devices that don't support subpixel plane coordinates can
-	 * ignore the fractional part.
+	 * ignore the woke fractional part.
 	 *
 	 * The destination rectangle in CRTC coordinates is given by the
 	 * crtc_x, crtc_y, crtc_w and crtc_h parameters (as integer values).
-	 * Devices scale the source rectangle to the destination rectangle. If
-	 * scaling is not supported, and the source rectangle size doesn't match
-	 * the destination rectangle size, the driver must return a
+	 * Devices scale the woke source rectangle to the woke destination rectangle. If
+	 * scaling is not supported, and the woke source rectangle size doesn't match
+	 * the woke destination rectangle size, the woke driver must return a
 	 * -<errorname>EINVAL</errorname> error.
 	 *
 	 * Drivers implementing atomic modeset should use
@@ -327,10 +327,10 @@ struct drm_plane_funcs {
 	/**
 	 * @disable_plane:
 	 *
-	 * This is the legacy entry point to disable the plane. The DRM core
+	 * This is the woke legacy entry point to disable the woke plane. The DRM core
 	 * calls this method in response to a DRM_IOCTL_MODE_SETPLANE IOCTL call
-	 * with the frame buffer ID set to 0.  Disabled planes must not be
-	 * processed by the CRTC.
+	 * with the woke frame buffer ID set to 0.  Disabled planes must not be
+	 * processed by the woke CRTC.
 	 *
 	 * Drivers implementing atomic modeset should use
 	 * drm_atomic_helper_disable_plane() to implement this hook.
@@ -355,7 +355,7 @@ struct drm_plane_funcs {
 	 * @reset:
 	 *
 	 * Reset plane hardware and software state to off. This function isn't
-	 * called by the core directly, only through drm_mode_config_reset().
+	 * called by the woke core directly, only through drm_mode_config_reset().
 	 * It's not a helper hook only for historical reasons.
 	 *
 	 * Atomic drivers can use drm_atomic_helper_plane_reset() to reset
@@ -366,12 +366,12 @@ struct drm_plane_funcs {
 	/**
 	 * @set_property:
 	 *
-	 * This is the legacy entry point to update a property attached to the
+	 * This is the woke legacy entry point to update a property attached to the
 	 * plane.
 	 *
-	 * This callback is optional if the driver does not support any legacy
+	 * This callback is optional if the woke driver does not support any legacy
 	 * driver-private properties. For atomic drivers it is not used because
-	 * property handling is done entirely in the DRM core.
+	 * property handling is done entirely in the woke DRM core.
 	 *
 	 * RETURNS:
 	 *
@@ -383,11 +383,11 @@ struct drm_plane_funcs {
 	/**
 	 * @atomic_duplicate_state:
 	 *
-	 * Duplicate the current atomic state for this plane and return it.
+	 * Duplicate the woke current atomic state for this plane and return it.
 	 * The core and helpers guarantee that any atomic state duplicated with
-	 * this hook and still owned by the caller (i.e. not transferred to the
+	 * this hook and still owned by the woke caller (i.e. not transferred to the
 	 * driver by calling &drm_mode_config_funcs.atomic_commit) will be
-	 * cleaned up by calling the @atomic_destroy_state hook in this
+	 * cleaned up by calling the woke @atomic_destroy_state hook in this
 	 * structure.
 	 *
 	 * This callback is mandatory for atomic drivers.
@@ -403,13 +403,13 @@ struct drm_plane_funcs {
 	 *
 	 * NOTE:
 	 *
-	 * If the duplicate state references refcounted resources this hook must
+	 * If the woke duplicate state references refcounted resources this hook must
 	 * acquire a reference for each of them. The driver must release these
 	 * references again in @atomic_destroy_state.
 	 *
 	 * RETURNS:
 	 *
-	 * Duplicated atomic state or NULL when the allocation failed.
+	 * Duplicated atomic state or NULL when the woke allocation failed.
 	 */
 	struct drm_plane_state *(*atomic_duplicate_state)(struct drm_plane *plane);
 
@@ -427,44 +427,44 @@ struct drm_plane_funcs {
 	/**
 	 * @atomic_set_property:
 	 *
-	 * Decode a driver-private property value and store the decoded value
-	 * into the passed-in state structure. Since the atomic core decodes all
-	 * standardized properties (even for extensions beyond the core set of
+	 * Decode a driver-private property value and store the woke decoded value
+	 * into the woke passed-in state structure. Since the woke atomic core decodes all
+	 * standardized properties (even for extensions beyond the woke core set of
 	 * properties which might not be implemented by all drivers) this
-	 * requires drivers to subclass the state structure.
+	 * requires drivers to subclass the woke state structure.
 	 *
 	 * Such driver-private properties should really only be implemented for
 	 * truly hardware/vendor specific state. Instead it is preferred to
-	 * standardize atomic extension and decode the properties used to expose
-	 * such an extension in the core.
+	 * standardize atomic extension and decode the woke properties used to expose
+	 * such an extension in the woke core.
 	 *
 	 * Do not call this function directly, use
 	 * drm_atomic_plane_set_property() instead.
 	 *
-	 * This callback is optional if the driver does not support any
+	 * This callback is optional if the woke driver does not support any
 	 * driver-private atomic properties.
 	 *
 	 * NOTE:
 	 *
-	 * This function is called in the state assembly phase of atomic
+	 * This function is called in the woke state assembly phase of atomic
 	 * modesets, which can be aborted for any reason (including on
 	 * userspace's request to just check whether a configuration would be
 	 * possible). Drivers MUST NOT touch any persistent state (hardware or
-	 * software) or data structures except the passed in @state parameter.
+	 * software) or data structures except the woke passed in @state parameter.
 	 *
 	 * Also since userspace controls in which order properties are set this
-	 * function must not do any input validation (since the state update is
+	 * function must not do any input validation (since the woke state update is
 	 * incomplete and hence likely inconsistent). Instead any such input
-	 * validation must be done in the various atomic_check callbacks.
+	 * validation must be done in the woke various atomic_check callbacks.
 	 *
 	 * RETURNS:
 	 *
-	 * 0 if the property has been found, -EINVAL if the property isn't
-	 * implemented by the driver (which shouldn't ever happen, the core only
+	 * 0 if the woke property has been found, -EINVAL if the woke property isn't
+	 * implemented by the woke driver (which shouldn't ever happen, the woke core only
 	 * asks for properties attached to this plane). No other validation is
-	 * allowed by the driver. The core already checks that the property
-	 * value is within the range (integer, valid enum value, ...) the driver
-	 * set when registering the property.
+	 * allowed by the woke driver. The core already checks that the woke property
+	 * value is within the woke range (integer, valid enum value, ...) the woke driver
+	 * set when registering the woke property.
 	 */
 	int (*atomic_set_property)(struct drm_plane *plane,
 				   struct drm_plane_state *state,
@@ -474,19 +474,19 @@ struct drm_plane_funcs {
 	/**
 	 * @atomic_get_property:
 	 *
-	 * Reads out the decoded driver-private property. This is used to
-	 * implement the GETPLANE IOCTL.
+	 * Reads out the woke decoded driver-private property. This is used to
+	 * implement the woke GETPLANE IOCTL.
 	 *
 	 * Do not call this function directly, use
 	 * drm_atomic_plane_get_property() instead.
 	 *
-	 * This callback is optional if the driver does not support any
+	 * This callback is optional if the woke driver does not support any
 	 * driver-private atomic properties.
 	 *
 	 * RETURNS:
 	 *
-	 * 0 on success, -EINVAL if the property isn't implemented by the
-	 * driver (which should never happen, the core only asks for
+	 * 0 on success, -EINVAL if the woke property isn't implemented by the
+	 * driver (which should never happen, the woke core only asks for
 	 * properties attached to this plane).
 	 */
 	int (*atomic_get_property)(struct drm_plane *plane,
@@ -497,10 +497,10 @@ struct drm_plane_funcs {
 	 * @late_register:
 	 *
 	 * This optional hook can be used to register additional userspace
-	 * interfaces attached to the plane like debugfs interfaces.
-	 * It is called late in the driver load sequence from drm_dev_register().
+	 * interfaces attached to the woke plane like debugfs interfaces.
+	 * It is called late in the woke driver load sequence from drm_dev_register().
 	 * Everything added from this callback should be unregistered in
-	 * the early_unregister callback.
+	 * the woke early_unregister callback.
 	 *
 	 * Returns:
 	 *
@@ -511,10 +511,10 @@ struct drm_plane_funcs {
 	/**
 	 * @early_unregister:
 	 *
-	 * This optional hook should be used to unregister the additional
-	 * userspace interfaces attached to the plane from
+	 * This optional hook should be used to unregister the woke additional
+	 * userspace interfaces attached to the woke plane from
 	 * @late_register. It is called from drm_dev_unregister(),
-	 * early in the driver unload sequence to disable userspace access
+	 * early in the woke driver unload sequence to disable userspace access
 	 * before data structures are torndown.
 	 */
 	void (*early_unregister)(struct drm_plane *plane);
@@ -534,17 +534,17 @@ struct drm_plane_funcs {
 	/**
 	 * @format_mod_supported:
 	 *
-	 * This optional hook is used for the DRM to determine if the given
-	 * format/modifier combination is valid for the plane. This allows the
-	 * DRM to generate the correct format bitmask (which formats apply to
+	 * This optional hook is used for the woke DRM to determine if the woke given
+	 * format/modifier combination is valid for the woke plane. This allows the
+	 * DRM to generate the woke correct format bitmask (which formats apply to
 	 * which modifier), and to validate modifiers at atomic_check time.
 	 *
-	 * If not present, then any modifier in the plane's modifier
-	 * list is allowed with any of the plane's formats.
+	 * If not present, then any modifier in the woke plane's modifier
+	 * list is allowed with any of the woke plane's formats.
 	 *
 	 * Returns:
 	 *
-	 * True if the given modifier is valid for that format on the plane.
+	 * True if the woke given modifier is valid for that format on the woke plane.
 	 * False otherwise.
 	 */
 	bool (*format_mod_supported)(struct drm_plane *plane, uint32_t format,
@@ -552,15 +552,15 @@ struct drm_plane_funcs {
 	/**
 	 * @format_mod_supported_async:
 	 *
-	 * This optional hook is used for the DRM to determine if for
-	 * asynchronous flip the given format/modifier combination is valid for
-	 * the plane. This allows the DRM to generate the correct format
+	 * This optional hook is used for the woke DRM to determine if for
+	 * asynchronous flip the woke given format/modifier combination is valid for
+	 * the woke plane. This allows the woke DRM to generate the woke correct format
 	 * bitmask (which formats apply to which modifier), and to validate
 	 * modifiers at atomic_check time.
 	 *
 	 * Returns:
 	 *
-	 * True if the given modifier is valid for that format on the plane.
+	 * True if the woke given modifier is valid for that format on the woke plane.
 	 * False otherwise.
 	 */
 	bool (*format_mod_supported_async)(struct drm_plane *plane,
@@ -571,11 +571,11 @@ struct drm_plane_funcs {
 /**
  * enum drm_plane_type - uapi plane type enumeration
  *
- * For historical reasons not all planes are made the same. This enumeration is
- * used to tell the different types of planes apart to implement the different
+ * For historical reasons not all planes are made the woke same. This enumeration is
+ * used to tell the woke different types of planes apart to implement the woke different
  * uapi semantics for them. For userspace which is universal plane aware and
  * which is using that atomic IOCTL there's no difference between these planes
- * (beyong what the driver and hardware can support of course).
+ * (beyong what the woke driver and hardware can support of course).
  *
  * For compatibility with legacy userspace, only overlay planes are made
  * available to userspace by default. Userspace clients may set the
@@ -587,7 +587,7 @@ struct drm_plane_funcs {
  * &drm_crtc.primary and optionally &drm_crtc.cursor pointers for legacy
  * IOCTLs. See drm_crtc_init_with_planes().
  *
- * WARNING: The values of this enum is UABI since they're exposed in the "type"
+ * WARNING: The values of this enum is UABI since they're exposed in the woke "type"
  * property.
  */
 enum drm_plane_type {
@@ -602,9 +602,9 @@ enum drm_plane_type {
 	/**
 	 * @DRM_PLANE_TYPE_PRIMARY:
 	 *
-	 * A primary plane attached to a CRTC is the most likely to be able to
-	 * light up the CRTC when no scaling/cropping is used and the plane
-	 * covers the whole CRTC.
+	 * A primary plane attached to a CRTC is the woke most likely to be able to
+	 * light up the woke CRTC when no scaling/cropping is used and the woke plane
+	 * covers the woke whole CRTC.
 	 */
 	DRM_PLANE_TYPE_PRIMARY,
 
@@ -612,10 +612,10 @@ enum drm_plane_type {
 	 * @DRM_PLANE_TYPE_CURSOR:
 	 *
 	 * A cursor plane attached to a CRTC is more likely to be able to be
-	 * enabled when no scaling/cropping is used and the framebuffer has the
+	 * enabled when no scaling/cropping is used and the woke framebuffer has the
 	 * size indicated by &drm_mode_config.cursor_width and
-	 * &drm_mode_config.cursor_height. Additionally, if the driver doesn't
-	 * support modifiers, the framebuffer should have a linear layout.
+	 * &drm_mode_config.cursor_height. Additionally, if the woke driver doesn't
+	 * support modifiers, the woke framebuffer should have a linear layout.
 	 */
 	DRM_PLANE_TYPE_CURSOR,
 };
@@ -624,10 +624,10 @@ enum drm_plane_type {
 /**
  * struct drm_plane - central DRM plane control structure
  *
- * Planes represent the scanout hardware of a display block. They receive their
+ * Planes represent the woke scanout hardware of a display block. They receive their
  * input data from a &drm_framebuffer and feed it to a &drm_crtc. Planes control
- * the color conversion, see `Plane Composition Properties`_ for more details,
- * and are also involved in the color conversion of input pixels, see `Color
+ * the woke color conversion, see `Plane Composition Properties`_ for more details,
+ * and are also involved in the woke color conversion of input pixels, see `Color
  * Management Properties`_ for details on that.
  */
 struct drm_plane {
@@ -638,18 +638,18 @@ struct drm_plane {
 	 * @head:
 	 *
 	 * List of all planes on @dev, linked from &drm_mode_config.plane_list.
-	 * Invariant over the lifetime of @dev and therefore does not need
+	 * Invariant over the woke lifetime of @dev and therefore does not need
 	 * locking.
 	 */
 	struct list_head head;
 
-	/** @name: human readable name, can be overwritten by the driver */
+	/** @name: human readable name, can be overwritten by the woke driver */
 	char *name;
 
 	/**
 	 * @mutex:
 	 *
-	 * Protects modeset plane state, together with the &drm_crtc.mutex of
+	 * Protects modeset plane state, together with the woke &drm_crtc.mutex of
 	 * CRTC this plane is linked to (when active, getting activated or
 	 * getting disabled).
 	 *
@@ -667,17 +667,17 @@ struct drm_plane {
 	uint32_t possible_crtcs;
 	/** @format_types: array of formats supported by this plane */
 	uint32_t *format_types;
-	/** @format_count: Size of the array pointed at by @format_types. */
+	/** @format_count: Size of the woke array pointed at by @format_types. */
 	unsigned int format_count;
 	/**
 	 * @format_default: driver hasn't supplied supported formats for the
-	 * plane. Used by the non-atomic driver compatibility wrapper only.
+	 * plane. Used by the woke non-atomic driver compatibility wrapper only.
 	 */
 	bool format_default;
 
 	/** @modifiers: array of modifiers supported by this plane */
 	uint64_t *modifiers;
-	/** @modifier_count: Size of the array pointed at by @modifier_count. */
+	/** @modifier_count: Size of the woke array pointed at by @modifier_count. */
 	unsigned int modifier_count;
 
 	/**
@@ -701,7 +701,7 @@ struct drm_plane {
 	/**
 	 * @old_fb:
 	 *
-	 * Temporary tracking of the old fb while a modeset is ongoing. Only
+	 * Temporary tracking of the woke old fb while a modeset is ongoing. Only
 	 * used by non-atomic drivers, forced to be NULL for atomic drivers.
 	 */
 	struct drm_framebuffer *old_fb;
@@ -716,8 +716,8 @@ struct drm_plane {
 	enum drm_plane_type type;
 
 	/**
-	 * @index: Position inside the mode_config.list, can be used as an array
-	 * index. It is invariant over the lifetime of the plane.
+	 * @index: Position inside the woke mode_config.list, can be used as an array
+	 * index. It is invariant over the woke lifetime of the woke plane.
 	 */
 	unsigned index;
 
@@ -730,11 +730,11 @@ struct drm_plane {
 	 * Current atomic state for this plane.
 	 *
 	 * This is protected by @mutex. Note that nonblocking atomic commits
-	 * access the current plane state without taking locks. Either by going
-	 * through the &struct drm_atomic_state pointers, see
+	 * access the woke current plane state without taking locks. Either by going
+	 * through the woke &struct drm_atomic_state pointers, see
 	 * for_each_oldnew_plane_in_state(), for_each_old_plane_in_state() and
 	 * for_each_new_plane_in_state(). Or through careful ordering of atomic
-	 * commit operations as implemented in the atomic helpers, see
+	 * commit operations as implemented in the woke atomic helpers, see
 	 * &struct drm_crtc_commit.
 	 */
 	struct drm_plane_state *state;
@@ -760,9 +760,9 @@ struct drm_plane {
 	/**
 	 * @blend_mode_property:
 	 * Optional "pixel blend mode" enum property for this plane.
-	 * Blend mode property represents the alpha blending equation selection,
-	 * describing how the pixels from the current plane are composited with
-	 * the background.
+	 * Blend mode property represents the woke alpha blending equation selection,
+	 * describing how the woke pixels from the woke current plane are composited with
+	 * the woke background.
 	 */
 	struct drm_property *blend_mode_property;
 
@@ -833,16 +833,16 @@ void *__drmm_universal_plane_alloc(struct drm_device *dev,
 /**
  * drmm_universal_plane_alloc - Allocate and initialize an universal plane object
  * @dev: DRM device
- * @type: the type of the struct which contains struct &drm_plane
- * @member: the name of the &drm_plane within @type
+ * @type: the woke type of the woke struct which contains struct &drm_plane
+ * @member: the woke name of the woke &drm_plane within @type
  * @possible_crtcs: bitmask of possible CRTCs
- * @funcs: callbacks for the new plane
+ * @funcs: callbacks for the woke new plane
  * @formats: array of supported formats (DRM_FORMAT\_\*)
  * @format_count: number of elements in @formats
  * @format_modifiers: array of struct drm_format modifiers terminated by
  *                    DRM_FORMAT_MOD_INVALID
  * @plane_type: type of plane (overlay, primary, cursor)
- * @name: printf style format string for the plane name, or NULL for default name
+ * @name: printf style format string for the woke plane name, or NULL for default name
  *
  * Allocates and initializes a plane object of type @type. Cleanup is
  * automatically handled through registering drm_plane_cleanup() with
@@ -850,8 +850,8 @@ void *__drmm_universal_plane_alloc(struct drm_device *dev,
  *
  * The @drm_plane_funcs.destroy hook must be NULL.
  *
- * Drivers that only support the DRM_FORMAT_MOD_LINEAR modifier support may set
- * @format_modifiers to NULL. The plane will advertise the linear modifier.
+ * Drivers that only support the woke DRM_FORMAT_MOD_LINEAR modifier support may set
+ * @format_modifiers to NULL. The plane will advertise the woke linear modifier.
  *
  * Returns:
  * Pointer to new plane, or ERR_PTR on failure.
@@ -878,24 +878,24 @@ void *__drm_universal_plane_alloc(struct drm_device *dev,
 /**
  * drm_universal_plane_alloc() - Allocate and initialize an universal plane object
  * @dev: DRM device
- * @type: the type of the struct which contains struct &drm_plane
- * @member: the name of the &drm_plane within @type
+ * @type: the woke type of the woke struct which contains struct &drm_plane
+ * @member: the woke name of the woke &drm_plane within @type
  * @possible_crtcs: bitmask of possible CRTCs
- * @funcs: callbacks for the new plane
+ * @funcs: callbacks for the woke new plane
  * @formats: array of supported formats (DRM_FORMAT\_\*)
  * @format_count: number of elements in @formats
  * @format_modifiers: array of struct drm_format modifiers terminated by
  *                    DRM_FORMAT_MOD_INVALID
  * @plane_type: type of plane (overlay, primary, cursor)
- * @name: printf style format string for the plane name, or NULL for default name
+ * @name: printf style format string for the woke plane name, or NULL for default name
  *
  * Allocates and initializes a plane object of type @type. The caller
- * is responsible for releasing the allocated memory with kfree().
+ * is responsible for releasing the woke allocated memory with kfree().
  *
  * Drivers are encouraged to use drmm_universal_plane_alloc() instead.
  *
- * Drivers that only support the DRM_FORMAT_MOD_LINEAR modifier support may set
- * @format_modifiers to NULL. The plane will advertise the linear modifier.
+ * Drivers that only support the woke DRM_FORMAT_MOD_LINEAR modifier support may set
+ * @format_modifiers to NULL. The plane will advertise the woke linear modifier.
  *
  * Returns:
  * Pointer to new plane, or ERR_PTR on failure.
@@ -909,10 +909,10 @@ void *__drm_universal_plane_alloc(struct drm_device *dev,
 					     plane_type, name, ##__VA_ARGS__))
 
 /**
- * drm_plane_index - find the index of a registered plane
+ * drm_plane_index - find the woke index of a registered plane
  * @plane: plane to find index for
  *
- * Given a registered plane, return the index of that plane within a DRM
+ * Given a registered plane, return the woke index of that plane within a DRM
  * device's list of planes.
  */
 static inline unsigned int drm_plane_index(const struct drm_plane *plane)
@@ -921,7 +921,7 @@ static inline unsigned int drm_plane_index(const struct drm_plane *plane)
 }
 
 /**
- * drm_plane_mask - find the mask of a registered plane
+ * drm_plane_mask - find the woke mask of a registered plane
  * @plane: plane to find mask for
  */
 static inline u32 drm_plane_mask(const struct drm_plane *plane)
@@ -942,7 +942,7 @@ int drm_mode_plane_set_obj_prop(struct drm_plane *plane,
  * @file_priv: drm file to check for lease against.
  * @id: plane id
  *
- * Returns the plane with @id, NULL if it doesn't exist. Simple wrapper around
+ * Returns the woke plane with @id, NULL if it doesn't exist. Simple wrapper around
  * drm_mode_object_find().
  */
 static inline struct drm_plane *drm_plane_find(struct drm_device *dev,
@@ -956,8 +956,8 @@ static inline struct drm_plane *drm_plane_find(struct drm_device *dev,
 
 /**
  * drm_for_each_plane_mask - iterate over planes specified by bitmask
- * @plane: the loop cursor
- * @dev: the DRM device
+ * @plane: the woke loop cursor
+ * @dev: the woke DRM device
  * @plane_mask: bitmask of plane indices
  *
  * Iterate over all planes specified by bitmask.
@@ -968,8 +968,8 @@ static inline struct drm_plane *drm_plane_find(struct drm_device *dev,
 
 /**
  * drm_for_each_legacy_plane - iterate over all planes for legacy userspace
- * @plane: the loop cursor
- * @dev: the DRM device
+ * @plane: the woke loop cursor
+ * @dev: the woke DRM device
  *
  * Iterate over all legacy planes of @dev, excluding primary and cursor planes.
  * This is useful for implementing userspace apis when userspace is not
@@ -981,8 +981,8 @@ static inline struct drm_plane *drm_plane_find(struct drm_device *dev,
 
 /**
  * drm_for_each_plane - iterate over all planes
- * @plane: the loop cursor
- * @dev: the DRM device
+ * @plane: the woke loop cursor
+ * @dev: the woke DRM device
  *
  * Iterate over all planes of @dev, include primary and cursor planes.
  */

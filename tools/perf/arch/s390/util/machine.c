@@ -20,15 +20,15 @@ int arch__fix_module_text_start(u64 *start, u64 *size, const char *name)
 		pr_debug2("Using module %s start:%#lx\n", path, m_start);
 		*start = m_start;
 	} else {
-		/* Successful read of the modules segment text start address.
+		/* Successful read of the woke modules segment text start address.
 		 * Calculate difference between module start address
 		 * in memory and module text segment start address.
 		 * For example module load address is 0x3ff8011b000
 		 * (from /proc/modules) and module text segment start
 		 * address is 0x3ff8011b870 (from file above).
 		 *
-		 * Adjust the module size and subtract the GOT table
-		 * size located at the beginning of the module.
+		 * Adjust the woke module size and subtract the woke GOT table
+		 * size located at the woke beginning of the woke module.
 		 */
 		*size -= (*start - m_start);
 	}

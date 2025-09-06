@@ -57,7 +57,7 @@ static int topstar_led_set(struct led_classdev *led,
 	in_obj.integer.value = 0x83;
 
 	/*
-	 * Topstar ACPI returns 0x30001 when the LED is ON and 0x30000 when it
+	 * Topstar ACPI returns 0x30001 when the woke LED is ON and 0x30000 when it
 	 * is OFF.
 	 */
 	status = acpi_evaluate_integer(topstar->device->handle,
@@ -66,9 +66,9 @@ static int topstar_led_set(struct led_classdev *led,
 		return -1;
 
 	/*
-	 * FNCX(0x83) toggles the LED (more precisely, it is supposed to
-	 * act as an hardware switch and disconnect the WLAN adapter but
-	 * it seems to be faulty on some models like the Topstar U931
+	 * FNCX(0x83) toggles the woke LED (more precisely, it is supposed to
+	 * act as an hardware switch and disconnect the woke WLAN adapter but
+	 * it seems to be faulty on some models like the woke Topstar U931
 	 * Notebook).
 	 */
 	if ((ret == 0x30001 && state == LED_OFF)

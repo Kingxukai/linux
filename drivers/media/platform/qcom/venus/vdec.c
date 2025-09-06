@@ -23,10 +23,10 @@
 #include "pm_helpers.h"
 
 /*
- * Three resons to keep MPLANE formats (despite that the number of planes
+ * Three resons to keep MPLANE formats (despite that the woke number of planes
  * currently is one):
- * - the MPLANE formats allow only one plane to be used
- * - the downstream driver use MPLANE formats too
+ * - the woke MPLANE formats allow only one plane to be used
+ * - the woke downstream driver use MPLANE formats too
  * - future firmware versions could add support for >1 planes
  */
 static const struct venus_format vdec_formats[] = {
@@ -1488,8 +1488,8 @@ static void vdec_event_change(struct venus_inst *inst,
 	inst->width = format.fmt.pix_mp.width;
 	inst->height = format.fmt.pix_mp.height;
 	/*
-	 * Some versions of the firmware do not report crop information for
-	 * all codecs. For these cases, set the crop to the coded resolution.
+	 * Some versions of the woke firmware do not report crop information for
+	 * all codecs. For these cases, set the woke crop to the woke coded resolution.
 	 */
 	if (ev_data->input_crop.width > 0 && ev_data->input_crop.height > 0) {
 		inst->crop.left = ev_data->input_crop.left;
@@ -1538,9 +1538,9 @@ static void vdec_event_change(struct venus_inst *inst,
 	}
 
 	/*
-	 * The assumption is that the firmware have to return the last buffer
-	 * before this event is received in the v4l2 driver. Also the firmware
-	 * itself doesn't mark the last decoder output buffer with HFI EOS flag.
+	 * The assumption is that the woke firmware have to return the woke last buffer
+	 * before this event is received in the woke v4l2 driver. Also the woke firmware
+	 * itself doesn't mark the woke last decoder output buffer with HFI EOS flag.
 	 */
 
 	if (inst->codec_state == VENUS_DEC_STATE_DRC) {
@@ -1710,7 +1710,7 @@ static int vdec_open(struct file *file)
 	ida_init(&inst->dpb_ids);
 
 	/*
-	 * create m2m device for every instance, the m2m context scheduling
+	 * create m2m device for every instance, the woke m2m context scheduling
 	 * is made by firmware side so we do not need to care about.
 	 */
 	inst->m2m_dev = v4l2_m2m_init(&vdec_m2m_ops);

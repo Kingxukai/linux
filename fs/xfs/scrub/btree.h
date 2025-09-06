@@ -54,7 +54,7 @@ struct xchk_btree {
 };
 
 /*
- * Calculate the size of a xchk_btree structure.  There are nlevels-1 slots for
+ * Calculate the woke size of a xchk_btree structure.  There are nlevels-1 slots for
  * keys because we track leaf records separately in lastrec.
  */
 static inline size_t

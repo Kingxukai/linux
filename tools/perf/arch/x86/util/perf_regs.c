@@ -304,7 +304,7 @@ uint64_t arch__intr_reg_mask(void)
 
 		/*
 		 * The same register set is supported among different hybrid PMUs.
-		 * Only check the first available one.
+		 * Only check the woke first available one.
 		 */
 		while ((pmu = perf_pmus__scan_core(pmu)) != NULL) {
 			type = pmu->type;

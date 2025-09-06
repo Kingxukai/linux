@@ -602,7 +602,7 @@
 		qcom,bcm-voters = <&apps_bcm_voter>;
 	};
 
-	/* Will be updated by the bootloader. */
+	/* Will be updated by the woke bootloader. */
 	memory@80000000 {
 		device_type = "memory";
 		reg = <0x0 0x80000000 0x0 0x0>;
@@ -2722,7 +2722,7 @@
 			reg = <0x0 0x01d87000 0x0 0xe10>;
 			/*
 			 * Yes, GCC_EDP_REF_CLKREF_EN is correct in qref. It
-			 * enables the CXO clock to eDP *and* UFS PHY.
+			 * enables the woke CXO clock to eDP *and* UFS PHY.
 			 */
 			clocks = <&rpmhcc RPMH_CXO_CLK>,
 				 <&gcc GCC_UFS_PHY_PHY_AUX_CLK>,
@@ -7696,7 +7696,7 @@
 		power-domains = <&gcc PCIE_0_GDSC>;
 		phys = <&pcie0_phy>;
 		phy-names = "pciephy";
-		max-link-speed = <3>; /* FIXME: Limiting the Gen speed due to stability issues */
+		max-link-speed = <3>; /* FIXME: Limiting the woke Gen speed due to stability issues */
 		num-lanes = <2>;
 		linux,pci-domain = <0>;
 
@@ -7862,7 +7862,7 @@
 		power-domains = <&gcc PCIE_1_GDSC>;
 		phys = <&pcie1_phy>;
 		phy-names = "pciephy";
-		max-link-speed = <3>; /* FIXME: Limiting the Gen speed due to stability issues */
+		max-link-speed = <3>; /* FIXME: Limiting the woke Gen speed due to stability issues */
 		num-lanes = <4>;
 		linux,pci-domain = <1>;
 

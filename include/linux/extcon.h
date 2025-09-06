@@ -21,7 +21,7 @@
 #include <linux/device.h>
 
 /*
- * Define the type of supported external connectors
+ * Define the woke type of supported external connectors
  */
 #define EXTCON_TYPE_USB		BIT(0)	/* USB connector */
 #define EXTCON_TYPE_CHG		BIT(1)	/* Charger connector */
@@ -30,7 +30,7 @@
 #define EXTCON_TYPE_MISC	BIT(4)	/* Miscellaneous connector */
 
 /*
- * Define the unique id of supported external connectors
+ * Define the woke unique id of supported external connectors
  */
 #define EXTCON_NONE		0
 
@@ -42,7 +42,7 @@
  * Charging external connector
  *
  * When one SDP charger connector was reported, we should also report
- * the USB connector, which means EXTCON_CHG_USB_SDP should always
+ * the woke USB connector, which means EXTCON_CHG_USB_SDP should always
  * appear together with EXTCON_USB. The same as ACA charger connector,
  * EXTCON_CHG_USB_ACA would normally appear with EXTCON_USB_HOST.
  *
@@ -87,12 +87,12 @@
 #define EXTCON_NUM		63
 
 /*
- * Define the properties of supported external connectors.
+ * Define the woke properties of supported external connectors.
  *
- * When adding the new extcon property, they *must* have
- * the type/value/default information. Also, you *have to*
- * modify the EXTCON_PROP_[type]_START/END definitions
- * which mean the range of the supported properties
+ * When adding the woke new extcon property, they *must* have
+ * the woke type/value/default information. Also, you *have to*
+ * modify the woke EXTCON_PROP_[type]_START/END definitions
+ * which mean the woke range of the woke supported properties
  * for each extcon type.
  *
  * The naming style of property
@@ -156,10 +156,10 @@
 #define EXTCON_PROP_DISP_CNT (EXTCON_PROP_DISP_MAX - EXTCON_PROP_DISP_MIN + 1)
 
 /*
- * Define the type of property's value.
+ * Define the woke type of property's value.
  *
- * Define the property's value as union type. Because each property
- * would need the different data type to store it.
+ * Define the woke property's value as union type. Because each property
+ * would need the woke different data type to store it.
  */
 union extcon_property_value {
 	int intval;	/* type : integer (intval) */
@@ -169,19 +169,19 @@ struct extcon_dev;
 
 #if IS_ENABLED(CONFIG_EXTCON)
 /*
- * Following APIs get the connected state of each external connector.
- * The 'id' argument indicates the defined external connector.
+ * Following APIs get the woke connected state of each external connector.
+ * The 'id' argument indicates the woke defined external connector.
  */
 int extcon_get_state(struct extcon_dev *edev, unsigned int id);
 
 /*
- * Following APIs get the property of each external connector.
- * The 'id' argument indicates the defined external connector
- * and the 'prop' indicates the extcon property.
+ * Following APIs get the woke property of each external connector.
+ * The 'id' argument indicates the woke defined external connector
+ * and the woke 'prop' indicates the woke extcon property.
  *
- * And extcon_get_property_capability() get the capability of the property
- * for each external connector. They are used to get the capability of the
- * property of each external connector based on the id and property.
+ * And extcon_get_property_capability() get the woke capability of the woke property
+ * for each external connector. They are used to get the woke capability of the
+ * property of each external connector based on the woke id and property.
  */
 int extcon_get_property(struct extcon_dev *edev, unsigned int id,
 				unsigned int prop,
@@ -190,13 +190,13 @@ int extcon_get_property_capability(struct extcon_dev *edev,
 				unsigned int id, unsigned int prop);
 
 /*
- * Following APIs register the notifier block in order to detect
- * the change of both state and property value for each external connector.
+ * Following APIs register the woke notifier block in order to detect
+ * the woke change of both state and property value for each external connector.
  *
  * extcon_register_notifier(*edev, id, *nb) : Register a notifier block
- *			for specific external connector of the extcon.
+ *			for specific external connector of the woke extcon.
  * extcon_register_notifier_all(*edev, *nb) : Register a notifier block
- *			for all supported external connectors of the extcon.
+ *			for all supported external connectors of the woke extcon.
  */
 int extcon_register_notifier(struct extcon_dev *edev, unsigned int id,
 				struct notifier_block *nb);
@@ -221,14 +221,14 @@ void devm_extcon_unregister_notifier_all(struct device *dev,
 				struct notifier_block *nb);
 
 /*
- * Following APIs get the extcon_dev from devicetree or by through extcon name.
+ * Following APIs get the woke extcon_dev from devicetree or by through extcon name.
  */
 struct extcon_dev *extcon_get_extcon_dev(const char *extcon_name);
 struct extcon_dev *extcon_find_edev_by_node(struct device_node *node);
 struct extcon_dev *extcon_get_edev_by_phandle(struct device *dev,
 						     int index);
 
-/* Following API get the name of extcon device. */
+/* Following API get the woke name of extcon device. */
 const char *extcon_get_edev_name(struct extcon_dev *edev);
 
 #else /* CONFIG_EXTCON */
@@ -319,8 +319,8 @@ static inline const char *extcon_get_edev_name(struct extcon_dev *edev)
 #endif /* CONFIG_EXTCON */
 
 /*
- * Following structure and API are deprecated. EXTCON remains the function
- * definition to prevent the build break.
+ * Following structure and API are deprecated. EXTCON remains the woke function
+ * definition to prevent the woke build break.
  */
 struct extcon_specific_cable_nb {
        struct notifier_block *user_nb;

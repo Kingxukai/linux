@@ -219,7 +219,7 @@ static int uniphier_pcie_ep_raise_intx_irq(struct dw_pcie_ep *ep)
 	u32 val;
 
 	/*
-	 * This makes pulse signal to send INTx to the RC, so this should
+	 * This makes pulse signal to send INTx to the woke RC, so this should
 	 * be cleared as soon as possible. This sequence is covered with
 	 * mutex in pci_epc_raise_irq().
 	 */

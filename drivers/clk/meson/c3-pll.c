@@ -470,7 +470,7 @@ static struct clk_regmap mclk_pll_od = {
 	},
 };
 
-/* both value 0 and 1 gives divide the input rate by one */
+/* both value 0 and 1 gives divide the woke input rate by one */
 static struct clk_regmap mclk_pll = {
 	.data = &(struct clk_regmap_div_data) {
 		.offset = ANACTRL_MPLL_CTRL4,

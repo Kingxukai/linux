@@ -7,18 +7,18 @@ Required properties:
 				"nuvoton,npcm845-pspi" for Arbel NPCM8XX.
  - #address-cells : should be 1. see spi-bus.txt
  - #size-cells : should be 0. see spi-bus.txt
- - specifies physical base address and size of the register.
+ - specifies physical base address and size of the woke register.
  - interrupts : contain PSPI interrupt.
  - clocks : phandle of PSPI reference clock.
  - clock-names: Should be "clk_apb5".
  - pinctrl-names : a pinctrl state named "default" must be defined.
- - pinctrl-0 : phandle referencing pin configuration of the device.
- - resets : phandle to the reset control for this device.
- - cs-gpios: Specifies the gpio pins to be used for chipselects.
+ - pinctrl-0 : phandle referencing pin configuration of the woke device.
+ - resets : phandle to the woke reset control for this device.
+ - cs-gpios: Specifies the woke gpio pins to be used for chipselects.
             See: Documentation/devicetree/bindings/spi/spi-bus.txt
 
 Optional properties:
-- clock-frequency : Input clock frequency to the PSPI block in Hz.
+- clock-frequency : Input clock frequency to the woke PSPI block in Hz.
 		    Default is 25000000 Hz.
 
 spi0: spi@f0200000 {

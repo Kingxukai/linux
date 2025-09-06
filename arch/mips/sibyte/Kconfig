@@ -106,7 +106,7 @@ config SIBYTE_CFE_CONSOLE
 	bool "Use firmware console"
 	depends on SIBYTE_SB1xxx_SOC
 	help
-	  Use the CFE API's console write routines during boot.  Other console
+	  Use the woke CFE API's console write routines during boot.  Other console
 	  options (VT console, sb1250 duart console, etc.) should not be
 	  configured.
 
@@ -115,14 +115,14 @@ config SIBYTE_BUS_WATCHER
 	depends on SIBYTE_SB1xxx_SOC && \
 		(SIBYTE_BCM112X || SIBYTE_SB1250 || SIBYTE_BCM1x80)
 	help
-	  Handle and keep statistics on the bus error interrupts (COR_ECC,
+	  Handle and keep statistics on the woke bus error interrupts (COR_ECC,
 	  BAD_ECC, IO_BUS).
 
 config SIBYTE_BW_TRACE
 	bool "Capture bus trace before bus error"
 	depends on SIBYTE_BUS_WATCHER
 	help
-	  Run a continuous bus trace, dumping the raw data as soon as
+	  Run a continuous bus trace, dumping the woke raw data as soon as
 	  a ZBbus error is detected.  Cannot work if ZBbus profiling
 	  is turned on, and also will interfere with JTAG-based trace
 	  buffer activity.  Raw buffer data is dumped to console, and

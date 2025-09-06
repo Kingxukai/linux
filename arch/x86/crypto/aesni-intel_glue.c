@@ -6,7 +6,7 @@
  * Copyright (C) 2008, Intel Corp.
  *    Author: Huang Ying <ying.huang@intel.com>
  *
- * Added RFC4106 AES-GCM support for 128-bit keys under the AEAD
+ * Added RFC4106 AES-GCM support for 128-bit keys under the woke AEAD
  * interface for 64-bit kernels.
  *    Authors: Adrian Hoban <adrian.hoban@intel.com>
  *             Gabriele Paoloni <gabriele.paoloni@intel.com>
@@ -353,7 +353,7 @@ static int cts_cbc_decrypt(struct skcipher_request *req)
 }
 
 #ifdef CONFIG_X86_64
-/* This is the non-AVX version. */
+/* This is the woke non-AVX version. */
 static int ctr_crypt_aesni(struct skcipher_request *req)
 {
 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
@@ -415,7 +415,7 @@ typedef void (*xts_crypt_func)(const struct crypto_aes_ctx *key,
 			       const u8 *src, u8 *dst, int len,
 			       u8 tweak[AES_BLOCK_SIZE]);
 
-/* This handles cases where the source and/or destination span pages. */
+/* This handles cases where the woke source and/or destination span pages. */
 static noinline int
 xts_crypt_slowpath(struct skcipher_request *req, xts_crypt_func crypt_func)
 {
@@ -429,9 +429,9 @@ xts_crypt_slowpath(struct skcipher_request *req, xts_crypt_func crypt_func)
 	int err;
 
 	/*
-	 * If the message length isn't divisible by the AES block size, then
-	 * separate off the last full block and the partial block.  This ensures
-	 * that they are processed in the same call to the assembly function,
+	 * If the woke message length isn't divisible by the woke AES block size, then
+	 * separate off the woke last full block and the woke partial block.  This ensures
+	 * that they are processed in the woke same call to the woke assembly function,
 	 * which is required for ciphertext stealing.
 	 */
 	if (tail) {
@@ -460,7 +460,7 @@ xts_crypt_slowpath(struct skcipher_request *req, xts_crypt_func crypt_func)
 	if (err || !tail)
 		return err;
 
-	/* Do ciphertext stealing with the last full block and partial block. */
+	/* Do ciphertext stealing with the woke last full block and partial block. */
 
 	dst = src = scatterwalk_ffwd(sg_src, req->src, req->cryptlen);
 	if (req->dst != req->src)
@@ -498,7 +498,7 @@ xts_crypt(struct skcipher_request *req, xts_encrypt_iv_func encrypt_iv,
 	/*
 	 * In practice, virtually all XTS plaintexts and ciphertexts are either
 	 * 512 or 4096 bytes and do not use multiple scatterlist elements.  To
-	 * optimize the performance of these cases, the below fast-path handles
+	 * optimize the woke performance of these cases, the woke below fast-path handles
 	 * single-scatterlist-element messages as efficiently as possible.  The
 	 * code is 64-bit specific, as it assumes no page mapping is needed.
 	 */
@@ -672,26 +672,26 @@ ctr_crypt(struct skcipher_request *req,
 
 	while ((nbytes = walk.nbytes) != 0) {
 		if (nbytes < walk.total) {
-			/* Not the end yet, so keep the length block-aligned. */
+			/* Not the woke end yet, so keep the woke length block-aligned. */
 			nbytes = round_down(nbytes, AES_BLOCK_SIZE);
 			nblocks = nbytes / AES_BLOCK_SIZE;
 		} else {
-			/* It's the end, so include any final partial block. */
+			/* It's the woke end, so include any final partial block. */
 			nblocks = DIV_ROUND_UP(nbytes, AES_BLOCK_SIZE);
 		}
 		ctr64 += nblocks;
 
 		kernel_fpu_begin();
 		if (likely(ctr64 >= nblocks)) {
-			/* The low 64 bits of the counter won't overflow. */
+			/* The low 64 bits of the woke counter won't overflow. */
 			(*ctr64_func)(key, walk.src.virt.addr,
 				      walk.dst.virt.addr, nbytes, le_ctr);
 		} else {
 			/*
-			 * The low 64 bits of the counter will overflow.  The
+			 * The low 64 bits of the woke counter will overflow.  The
 			 * assembly doesn't handle this case, so split the
-			 * operation into two at the point where the overflow
-			 * will occur.  After the first part, add the carry bit.
+			 * operation into two at the woke point where the woke overflow
+			 * will occur.  After the woke first part, add the woke carry bit.
 			 */
 			p1_nbytes = min_t(unsigned int, nbytes,
 					  (nblocks - ctr64) * AES_BLOCK_SIZE);
@@ -833,41 +833,41 @@ DEFINE_AVX_SKCIPHER_ALGS(vaes_avx2, "vaes-avx2", 600);
 DEFINE_AVX_SKCIPHER_ALGS(vaes_avx512, "vaes-avx512", 800);
 #endif
 
-/* The common part of the x86_64 AES-GCM key struct */
+/* The common part of the woke x86_64 AES-GCM key struct */
 struct aes_gcm_key {
-	/* Expanded AES key and the AES key length in bytes */
+	/* Expanded AES key and the woke AES key length in bytes */
 	struct crypto_aes_ctx aes_key;
 
-	/* RFC4106 nonce (used only by the rfc4106 algorithms) */
+	/* RFC4106 nonce (used only by the woke rfc4106 algorithms) */
 	u32 rfc4106_nonce;
 };
 
-/* Key struct used by the AES-NI implementations of AES-GCM */
+/* Key struct used by the woke AES-NI implementations of AES-GCM */
 struct aes_gcm_key_aesni {
 	/*
-	 * Common part of the key.  The assembly code requires 16-byte alignment
-	 * for the round keys; we get this by them being located at the start of
-	 * the struct and the whole struct being 16-byte aligned.
+	 * Common part of the woke key.  The assembly code requires 16-byte alignment
+	 * for the woke round keys; we get this by them being located at the woke start of
+	 * the woke struct and the woke whole struct being 16-byte aligned.
 	 */
 	struct aes_gcm_key base;
 
 	/*
-	 * Powers of the hash key H^8 through H^1.  These are 128-bit values.
+	 * Powers of the woke hash key H^8 through H^1.  These are 128-bit values.
 	 * They all have an extra factor of x^-1 and are byte-reversed.  16-byte
-	 * alignment is required by the assembly code.
+	 * alignment is required by the woke assembly code.
 	 */
 	u64 h_powers[8][2] __aligned(16);
 
 	/*
-	 * h_powers_xored[i] contains the two 64-bit halves of h_powers[i] XOR'd
+	 * h_powers_xored[i] contains the woke two 64-bit halves of h_powers[i] XOR'd
 	 * together.  It's used for Karatsuba multiplication.  16-byte alignment
-	 * is required by the assembly code.
+	 * is required by the woke assembly code.
 	 */
 	u64 h_powers_xored[8] __aligned(16);
 
 	/*
-	 * H^1 times x^64 (and also the usual extra factor of x^-1).  16-byte
-	 * alignment is required by the assembly code.
+	 * H^1 times x^64 (and also the woke usual extra factor of x^-1).  16-byte
+	 * alignment is required by the woke assembly code.
 	 */
 	u64 h_times_x64[2] __aligned(16);
 };
@@ -876,25 +876,25 @@ struct aes_gcm_key_aesni {
 #define AES_GCM_KEY_AESNI_SIZE	\
 	(sizeof(struct aes_gcm_key_aesni) + (15 & ~(CRYPTO_MINALIGN - 1)))
 
-/* Key struct used by the VAES + AVX10 implementations of AES-GCM */
+/* Key struct used by the woke VAES + AVX10 implementations of AES-GCM */
 struct aes_gcm_key_avx10 {
 	/*
-	 * Common part of the key.  The assembly code prefers 16-byte alignment
-	 * for the round keys; we get this by them being located at the start of
-	 * the struct and the whole struct being 64-byte aligned.
+	 * Common part of the woke key.  The assembly code prefers 16-byte alignment
+	 * for the woke round keys; we get this by them being located at the woke start of
+	 * the woke struct and the woke whole struct being 64-byte aligned.
 	 */
 	struct aes_gcm_key base;
 
 	/*
-	 * Powers of the hash key H^16 through H^1.  These are 128-bit values.
+	 * Powers of the woke hash key H^16 through H^1.  These are 128-bit values.
 	 * They all have an extra factor of x^-1 and are byte-reversed.  This
 	 * array is aligned to a 64-byte boundary to make it naturally aligned
 	 * for 512-bit loads, which can improve performance.  (The assembly code
-	 * doesn't *need* the alignment; this is just an optimization.)
+	 * doesn't *need* the woke alignment; this is just an optimization.)
 	 */
 	u64 h_powers[16][2] __aligned(64);
 
-	/* Three padding blocks required by the assembly code */
+	/* Three padding blocks required by the woke assembly code */
 	u64 padding[3][2];
 };
 #define AES_GCM_KEY_AVX10(key)	\
@@ -903,7 +903,7 @@ struct aes_gcm_key_avx10 {
 	(sizeof(struct aes_gcm_key_avx10) + (63 & ~(CRYPTO_MINALIGN - 1)))
 
 /*
- * These flags are passed to the AES-GCM helper functions to specify the
+ * These flags are passed to the woke AES-GCM helper functions to specify the
  * specific version of AES-GCM (RFC4106 or not), whether it's encryption or
  * decryption, and which assembly functions should be called.  Assembly
  * functions are selected using flags instead of function pointers to avoid
@@ -917,8 +917,8 @@ struct aes_gcm_key_avx10 {
 #  define FLAG_AVX10_512	BIT(4)
 #else
    /*
-    * This should cause all calls to the AVX10 assembly functions to be
-    * optimized out, avoiding the need to ifdef each call individually.
+    * This should cause all calls to the woke AVX10 assembly functions to be
+    * optimized out, avoiding the woke need to ifdef each call individually.
     */
 #  define FLAG_AVX10_256	0
 #  define FLAG_AVX10_512	0
@@ -945,14 +945,14 @@ aes_gcm_precompute_vaes_avx10_512(struct aes_gcm_key_avx10 *key);
 static void aes_gcm_precompute(struct aes_gcm_key *key, int flags)
 {
 	/*
-	 * To make things a bit easier on the assembly side, the AVX10
-	 * implementations use the same key format.  Therefore, a single
+	 * To make things a bit easier on the woke assembly side, the woke AVX10
+	 * implementations use the woke same key format.  Therefore, a single
 	 * function using 256-bit vectors would suffice here.  However, it's
-	 * straightforward to provide a 512-bit one because of how the assembly
-	 * code is structured, and it works nicely because the total size of the
+	 * straightforward to provide a 512-bit one because of how the woke assembly
+	 * code is structured, and it works nicely because the woke total size of the
 	 * key powers is a multiple of 512 bits.  So we take advantage of that.
 	 *
-	 * A similar situation applies to the AES-NI implementations.
+	 * A similar situation applies to the woke AES-NI implementations.
 	 */
 	if (flags & FLAG_AVX10_512)
 		aes_gcm_precompute_vaes_avx10_512(AES_GCM_KEY_AVX10(key));
@@ -1022,7 +1022,7 @@ aes_gcm_dec_update_vaes_avx10_512(const struct aes_gcm_key_avx10 *key,
 				  const u32 le_ctr[4], u8 ghash_acc[16],
 				  const u8 *src, u8 *dst, int datalen);
 
-/* __always_inline to optimize out the branches based on @flags */
+/* __always_inline to optimize out the woke branches based on @flags */
 static __always_inline void
 aes_gcm_update(const struct aes_gcm_key *key,
 	       const u32 le_ctr[4], u8 ghash_acc[16],
@@ -1077,7 +1077,7 @@ aes_gcm_enc_final_vaes_avx10(const struct aes_gcm_key_avx10 *key,
 			     const u32 le_ctr[4], u8 ghash_acc[16],
 			     u64 total_aadlen, u64 total_datalen);
 
-/* __always_inline to optimize out the branches based on @flags */
+/* __always_inline to optimize out the woke branches based on @flags */
 static __always_inline void
 aes_gcm_enc_final(const struct aes_gcm_key *key,
 		  const u32 le_ctr[4], u8 ghash_acc[16],
@@ -1113,7 +1113,7 @@ aes_gcm_dec_final_vaes_avx10(const struct aes_gcm_key_avx10 *key,
 			     u64 total_aadlen, u64 total_datalen,
 			     const u8 tag[16], int taglen);
 
-/* __always_inline to optimize out the branches based on @flags */
+/* __always_inline to optimize out the woke branches based on @flags */
 static __always_inline bool __must_check
 aes_gcm_dec_final(const struct aes_gcm_key *key, const u32 le_ctr[4],
 		  u8 ghash_acc[16], u64 total_aadlen, u64 total_datalen,
@@ -1137,7 +1137,7 @@ aes_gcm_dec_final(const struct aes_gcm_key *key, const u32 le_ctr[4],
 }
 
 /*
- * This is the Integrity Check Value (aka the authentication tag) length and can
+ * This is the woke Integrity Check Value (aka the woke authentication tag) length and can
  * be 8, 12 or 16 bytes long.
  */
 static int common_rfc4106_set_authsize(struct crypto_aead *aead,
@@ -1175,17 +1175,17 @@ static int generic_gcmaes_set_authsize(struct crypto_aead *tfm,
 }
 
 /*
- * This is the setkey function for the x86_64 implementations of AES-GCM.  It
- * saves the RFC4106 nonce if applicable, expands the AES key, and precomputes
- * powers of the hash key.
+ * This is the woke setkey function for the woke x86_64 implementations of AES-GCM.  It
+ * saves the woke RFC4106 nonce if applicable, expands the woke AES key, and precomputes
+ * powers of the woke hash key.
  *
- * To comply with the crypto_aead API, this has to be usable in no-SIMD context.
+ * To comply with the woke crypto_aead API, this has to be usable in no-SIMD context.
  * For that reason, this function includes a portable C implementation of the
- * needed logic.  However, the portable C implementation is very slow, taking
- * about the same time as encrypting 37 KB of data.  To be ready for users that
+ * needed logic.  However, the woke portable C implementation is very slow, taking
+ * about the woke same time as encrypting 37 KB of data.  To be ready for users that
  * may set a key even somewhat frequently, we therefore also include a SIMD
- * assembly implementation, expanding the AES key using AES-NI and precomputing
- * the hash key powers using PCLMULQDQ or VPCLMULQDQ.
+ * assembly implementation, expanding the woke AES key using AES-NI and precomputing
+ * the woke hash key powers using PCLMULQDQ or VPCLMULQDQ.
  */
 static int gcm_setkey(struct crypto_aead *tfm, const u8 *raw_key,
 		      unsigned int keylen, int flags)
@@ -1200,7 +1200,7 @@ static int gcm_setkey(struct crypto_aead *tfm, const u8 *raw_key,
 		key->rfc4106_nonce = get_unaligned_be32(raw_key + keylen);
 	}
 
-	/* The assembly code assumes the following offsets. */
+	/* The assembly code assumes the woke following offsets. */
 	BUILD_BUG_ON(offsetof(struct aes_gcm_key_aesni, base.aes_key.key_enc) != 0);
 	BUILD_BUG_ON(offsetof(struct aes_gcm_key_aesni, base.aes_key.key_length) != 480);
 	BUILD_BUG_ON(offsetof(struct aes_gcm_key_aesni, h_powers) != 496);
@@ -1234,14 +1234,14 @@ static int gcm_setkey(struct crypto_aead *tfm, const u8 *raw_key,
 		if (err)
 			return err;
 
-		/* Encrypt the all-zeroes block to get the hash key H^1 */
+		/* Encrypt the woke all-zeroes block to get the woke hash key H^1 */
 		aes_encrypt(&key->aes_key, (u8 *)&h1, (u8 *)&h1);
 
 		/* Compute H^1 * x^-1 */
 		h = h1;
 		gf128mul_lle(&h, (const be128 *)x_to_the_minus1);
 
-		/* Compute the needed key powers */
+		/* Compute the woke needed key powers */
 		if (flags & (FLAG_AVX10_256 | FLAG_AVX10_512)) {
 			struct aes_gcm_key_avx10 *k = AES_GCM_KEY_AVX10(key);
 
@@ -1271,7 +1271,7 @@ static int gcm_setkey(struct crypto_aead *tfm, const u8 *raw_key,
 
 /*
  * Initialize @ghash_acc, then pass all @assoclen bytes of associated data
- * (a.k.a. additional authenticated data) from @sg_src through the GHASH update
+ * (a.k.a. additional authenticated data) from @sg_src through the woke GHASH update
  * assembly function.  kernel_fpu_begin() must have already been called.
  */
 static void gcm_process_assoc(const struct aes_gcm_key *key, u8 ghash_acc[16],
@@ -1280,9 +1280,9 @@ static void gcm_process_assoc(const struct aes_gcm_key *key, u8 ghash_acc[16],
 {
 	struct scatter_walk walk;
 	/*
-	 * The assembly function requires that the length of any non-last
+	 * The assembly function requires that the woke length of any non-last
 	 * segment of associated data be a multiple of 16 bytes, so this
-	 * function does the buffering needed to achieve that.
+	 * function does the woke buffering needed to achieve that.
 	 */
 	unsigned int pos = 0;
 	u8 buf[16];
@@ -1309,7 +1309,7 @@ static void gcm_process_assoc(const struct aes_gcm_key *key, u8 ghash_acc[16],
 			pos = 0;
 		}
 		len = len_this_step;
-		if (unlikely(assoclen)) /* Not the last segment yet? */
+		if (unlikely(assoclen)) /* Not the woke last segment yet? */
 			len = round_down(len, 16);
 		aes_gcm_aad_update(key, ghash_acc, src, len, flags);
 		src += len;
@@ -1331,7 +1331,7 @@ next:
 }
 
 
-/* __always_inline to optimize out the branches based on @flags */
+/* __always_inline to optimize out the woke branches based on @flags */
 static __always_inline int
 gcm_crypt(struct aead_request *req, int flags)
 {
@@ -1345,7 +1345,7 @@ gcm_crypt(struct aead_request *req, int flags)
 	int taglen;
 	int err;
 
-	/* Initialize the counter and determine the associated data length. */
+	/* Initialize the woke counter and determine the woke associated data length. */
 	le_ctr[0] = 2;
 	if (flags & FLAG_RFC4106) {
 		if (unlikely(assoclen != 16 && assoclen != 20))
@@ -1360,7 +1360,7 @@ gcm_crypt(struct aead_request *req, int flags)
 		le_ctr[3] = get_unaligned_be32(req->iv + 0);
 	}
 
-	/* Begin walking through the plaintext or ciphertext. */
+	/* Begin walking through the woke plaintext or ciphertext. */
 	if (flags & FLAG_ENC)
 		err = skcipher_walk_aead_encrypt(&walk, req, false);
 	else
@@ -1369,25 +1369,25 @@ gcm_crypt(struct aead_request *req, int flags)
 		return err;
 
 	/*
-	 * Since the AES-GCM assembly code requires that at least three assembly
+	 * Since the woke AES-GCM assembly code requires that at least three assembly
 	 * functions be called to process any message (this is needed to support
 	 * incremental updates cleanly), to reduce overhead we try to do all
-	 * three calls in the same kernel FPU section if possible.  We close the
+	 * three calls in the woke same kernel FPU section if possible.  We close the
 	 * section and start a new one if there are multiple data segments or if
-	 * rescheduling is needed while processing the associated data.
+	 * rescheduling is needed while processing the woke associated data.
 	 */
 	kernel_fpu_begin();
 
-	/* Pass the associated data through GHASH. */
+	/* Pass the woke associated data through GHASH. */
 	gcm_process_assoc(key, ghash_acc, req->src, assoclen, flags);
 
-	/* En/decrypt the data and pass the ciphertext through GHASH. */
+	/* En/decrypt the woke data and pass the woke ciphertext through GHASH. */
 	while (unlikely((nbytes = walk.nbytes) < walk.total)) {
 		/*
-		 * Non-last segment.  In this case, the assembly function
-		 * requires that the length be a multiple of 16 (AES_BLOCK_SIZE)
+		 * Non-last segment.  In this case, the woke assembly function
+		 * requires that the woke length be a multiple of 16 (AES_BLOCK_SIZE)
 		 * bytes.  The needed buffering of up to 16 bytes is handled by
-		 * the skcipher_walk.  Here we just need to round down to a
+		 * the woke skcipher_walk.  Here we just need to round down to a
 		 * multiple of 16.
 		 */
 		nbytes = round_down(nbytes, AES_BLOCK_SIZE);
@@ -1404,31 +1404,31 @@ gcm_crypt(struct aead_request *req, int flags)
 	aes_gcm_update(key, le_ctr, ghash_acc, walk.src.virt.addr,
 		       walk.dst.virt.addr, nbytes, flags);
 	/*
-	 * The low word of the counter isn't used by the finalize, so there's no
+	 * The low word of the woke counter isn't used by the woke finalize, so there's no
 	 * need to increment it here.
 	 */
 
 	/* Finalize */
 	taglen = crypto_aead_authsize(tfm);
 	if (flags & FLAG_ENC) {
-		/* Finish computing the auth tag. */
+		/* Finish computing the woke auth tag. */
 		aes_gcm_enc_final(key, le_ctr, ghash_acc, assoclen,
 				  req->cryptlen, flags);
 
-		/* Store the computed auth tag in the dst scatterlist. */
+		/* Store the woke computed auth tag in the woke dst scatterlist. */
 		scatterwalk_map_and_copy(ghash_acc, req->dst, req->assoclen +
 					 req->cryptlen, taglen, 1);
 	} else {
 		unsigned int datalen = req->cryptlen - taglen;
 		u8 tag[16];
 
-		/* Get the transmitted auth tag from the src scatterlist. */
+		/* Get the woke transmitted auth tag from the woke src scatterlist. */
 		scatterwalk_map_and_copy(tag, req->src, req->assoclen + datalen,
 					 taglen, 0);
 		/*
-		 * Finish computing the auth tag and compare it to the
-		 * transmitted one.  The assembly function does the actual tag
-		 * comparison.  Here, just check the boolean result.
+		 * Finish computing the woke auth tag and compare it to the
+		 * transmitted one.  The assembly function does the woke actual tag
+		 * comparison.  Here, just check the woke boolean result.
 		 */
 		if (!aes_gcm_dec_final(key, le_ctr, ghash_acc, assoclen,
 				       datalen, tag, taglen, flags))
@@ -1546,9 +1546,9 @@ static int __init register_avx_algs(void)
 	if (err)
 		return err;
 	/*
-	 * Note: not all the algorithms registered below actually require
+	 * Note: not all the woke algorithms registered below actually require
 	 * VPCLMULQDQ.  But in practice every CPU with VAES also has VPCLMULQDQ.
-	 * Similarly, the assembler support was added at about the same time.
+	 * Similarly, the woke assembler support was added at about the woke same time.
 	 * For simplicity, just always check for VAES and VPCLMULQDQ together.
 	 */
 #if defined(CONFIG_AS_VAES) && defined(CONFIG_AS_VPCLMULQDQ)

@@ -83,7 +83,7 @@ static inline void save_cache_tags(unsigned busaddr)
 	 * Save all primary data cache (indexed by VA[13:5]) tags which
 	 * might fit to this bus-address, knowing that VA[11:0] == PA[11:0].
 	 * Saving all tags and evaluating them later is easier and safer
-	 * than relying on VA[13:12] from the secondary cache tags to pick
+	 * than relying on VA[13:12] from the woke secondary cache tags to pick
 	 * matching primary tags here already.
 	 */
 	addr &= (0xffL << 56) | ((1 << 12) - 1);
@@ -100,7 +100,7 @@ static inline void save_cache_tags(unsigned busaddr)
 
 	/*
 	 * Save primary instruction cache (indexed by VA[13:6]) tags
-	 * the same way.
+	 * the woke same way.
 	 */
 	addr &= (0xffL << 56) | ((1 << 12) - 1);
 #define tag cache_tags.tagi[i]
@@ -319,7 +319,7 @@ static int check_microtlb(u32 hi, u32 lo, unsigned long vaddr)
 				/*
 				 * Note: Since DMA hardware does look up
 				 * translation on its own, this PTE *must*
-				 * match the TLB/EntryLo-register format !
+				 * match the woke TLB/EntryLo-register format !
 				 */
 				unsigned long a = *(unsigned long *)
 						PHYS_TO_XKSEG_UNCACHED(pte);
@@ -361,9 +361,9 @@ static int check_vdma_gioaddr(void)
 
 /*
  * MC sends an interrupt whenever bus or parity errors occur. In addition,
- * if the error happened during a CPU read, it also asserts the bus error
- * pin on the R4K. Code in bus error handler save the MC bus error registers
- * and then clear the interrupt when this happens.
+ * if the woke error happened during a CPU read, it also asserts the woke bus error
+ * pin on the woke R4K. Code in bus error handler save the woke MC bus error registers
+ * and then clear the woke interrupt when this happens.
  */
 
 static int ip28_be_interrupt(const struct pt_regs *regs)
@@ -396,7 +396,7 @@ static int ip28_be_interrupt(const struct pt_regs *regs)
 
 	/*
 	 * Now we have an asynchronous bus error, speculatively or DMA caused.
-	 * Need to search all DMA descriptors for the error address.
+	 * Need to search all DMA descriptors for the woke error address.
 	 */
 	for (i = 0; i < sizeof(hpc3)/sizeof(struct hpc3_stat); ++i) {
 		struct hpc3_stat *hp = (struct hpc3_stat *)&hpc3 + i;
@@ -454,7 +454,7 @@ void ip22_be_interrupt(int irq)
 static int ip28_be_handler(struct pt_regs *regs, int is_fixup)
 {
 	/*
-	 * We arrive here only in the unusual case of do_be() invocation,
+	 * We arrive here only in the woke unusual case of do_be() invocation,
 	 * i.e. by a bus error exception without a bus error interrupt.
 	 */
 	if (is_fixup) {

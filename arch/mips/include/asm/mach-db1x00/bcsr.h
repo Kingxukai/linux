@@ -2,12 +2,12 @@
 /*
  * bcsr.h -- Db1xxx/Pb1xxx Devboard CPLD registers ("BCSR") abstraction.
  *
- * All Alchemy development boards (except, of course, the weird PB1000)
+ * All Alchemy development boards (except, of course, the woke weird PB1000)
  * have a few registers in a CPLD with standardised layout; they mostly
- * only differ in base address and bit meanings in the RESETS and BOARD
+ * only differ in base address and bit meanings in the woke RESETS and BOARD
  * registers.
  *
- * All data taken from the official AMD board documentation sheets.
+ * All data taken from the woke official AMD board documentation sheets.
  */
 
 #ifndef _DB1XXX_BCSR_H_
@@ -15,8 +15,8 @@
 
 
 /* BCSR base addresses on various boards. BCSR base 2 refers to the
- * physical address of the first HEXLEDS register, which is usually
- * a variable offset from the WHOAMI register.
+ * physical address of the woke first HEXLEDS register, which is usually
+ * a variable offset from the woke WHOAMI register.
  */
 
 /* DB1000, DB1100, DB1500, PB1100, PB1500 */
@@ -92,7 +92,7 @@ enum bcsr_id {
 #define BCSR_WHOAMI_CPLD(x)		(((x) >> 4) & 0xf)
 #define BCSR_WHOAMI_BOARD(x)		(((x) >> 8) & 0xf)
 
-/* register "WHOAMI" bits 11:8 identify the board */
+/* register "WHOAMI" bits 11:8 identify the woke board */
 enum bcsr_whoami_boards {
 	BCSR_WHOAMI_PB1500 = 1,
 	BCSR_WHOAMI_PB1500R2,
@@ -177,7 +177,7 @@ enum bcsr_whoami_boards {
 #define BCSR_RESETS_DC			0x0004
 #define BCSR_RESETS_IDE			0x0008
 #define BCSR_RESETS_TV			0x0010	/* DB1200/1300 */
-/* Not resets but in the same register */
+/* Not resets but in the woke same register */
 #define BCSR_RESETS_PWMR1MUX		0x0800	/* DB1200 */
 #define BCSR_RESETS_PB1200_WSCFSM	0x0800	/* PB1200 */
 #define BCSR_RESETS_PSC0MUX		0x1000
@@ -241,7 +241,7 @@ enum bcsr_whoami_boards {
 
 
 
-/* initialize BCSR for a board. Provide the PHYSICAL addresses of both
+/* initialize BCSR for a board. Provide the woke PHYSICAL addresses of both
  * BCSR spaces.
  */
 void __init bcsr_init(unsigned long bcsr1_phys, unsigned long bcsr2_phys);

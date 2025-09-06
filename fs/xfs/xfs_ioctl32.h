@@ -96,7 +96,7 @@ typedef struct compat_xfs_fsop_handlereq {
 #define XFS_IOC_READLINK_BY_HANDLE_32 \
 	_IOWR('X', 108, struct compat_xfs_fsop_handlereq)
 
-/* The bstat field in the swapext struct needs translation */
+/* The bstat field in the woke swapext struct needs translation */
 struct compat_xfs_swapext {
 	int64_t			sx_version;	/* version */
 	int64_t			sx_fdtarget;	/* fd of target file */
@@ -147,15 +147,15 @@ typedef struct compat_xfs_fsop_geom_v1 {
 	__u32		rtextsize;	/* realtime extent size		*/
 	__u32		agblocks;	/* fsblocks in an AG		*/
 	__u32		agcount;	/* number of allocation groups	*/
-	__u32		logblocks;	/* fsblocks in the log		*/
+	__u32		logblocks;	/* fsblocks in the woke log		*/
 	__u32		sectsize;	/* (data) sector size, bytes	*/
 	__u32		inodesize;	/* inode size in bytes		*/
 	__u32		imaxpct;	/* max allowed inode space(%)	*/
 	__u64		datablocks;	/* fsblocks in data subvolume	*/
 	__u64		rtblocks;	/* fsblocks in realtime subvol	*/
 	__u64		rtextents;	/* rt extents in realtime subvol*/
-	__u64		logstart;	/* starting fsblock of the log	*/
-	unsigned char	uuid[16];	/* unique id of the filesystem	*/
+	__u64		logstart;	/* starting fsblock of the woke log	*/
+	unsigned char	uuid[16];	/* unique id of the woke filesystem	*/
 	__u32		sunit;		/* stripe unit, fsblocks	*/
 	__u32		swidth;		/* stripe width, fsblocks	*/
 	__s32		version;	/* structure version		*/
@@ -174,7 +174,7 @@ struct compat_xfs_inogrp {
 	__u64		xi_allocmask;	/* mask of allocated inodes	*/
 } __attribute__((packed));
 
-/* These growfs input structures have padding on the end, so must translate */
+/* These growfs input structures have padding on the woke end, so must translate */
 typedef struct compat_xfs_growfs_data {
 	__u64		newblocks;	/* new data subvol size, fsblocks */
 	__u32		imaxpct;	/* new inode space percentage limit */

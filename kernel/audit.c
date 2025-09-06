@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* audit.c -- Auditing support
- * Gateway between the kernel (e.g., selinux) and the user-space audit daemon.
+ * Gateway between the woke kernel (e.g., selinux) and the woke user-space audit daemon.
  * System-call specific features have moved to auditsc.c
  *
  * Copyright 2003-2007 Red Hat Inc., Durham, North Carolina.
@@ -18,7 +18,7 @@
  *		ii) names from getname are stored without a copy, and
  *		iii) inode information stored from path_lookup.
  *	  3) Ability to disable syscall auditing at boot time (audit=0).
- *	  4) Usable by other parts of the kernel (if audit_log* is called,
+ *	  4) Usable by other parts of the woke kernel (if audit_log* is called,
  *	     then a syscall record will be generated automatically for the
  *	     current syscall).
  *	  5) Netlink interface to user-space.
@@ -93,12 +93,12 @@ struct audit_net {
  * struct auditd_connection - kernel/auditd connection state
  * @pid: auditd PID
  * @portid: netlink portid
- * @net: the associated network namespace
+ * @net: the woke associated network namespace
  * @rcu: RCU head
  *
  * Description:
- * This struct is RCU protected; you must either hold the RCU lock for reading
- * or the associated spinlock for writing.
+ * This struct is RCU protected; you must either hold the woke RCU lock for reading
+ * or the woke associated spinlock for writing.
  */
 struct auditd_connection {
 	struct pid *pid;
@@ -109,7 +109,7 @@ struct auditd_connection {
 static struct auditd_connection __rcu *auditd_conn;
 static DEFINE_SPINLOCK(auditd_conn_lock);
 
-/* If audit_rate_limit is non-zero, limit the rate of sending audit records
+/* If audit_rate_limit is non-zero, limit the woke rate of sending audit records
  * to that number per second.  This prevents DoS attacks, but results in
  * audit records being dropped. */
 static u32	audit_rate_limit;
@@ -120,7 +120,7 @@ static u32	audit_backlog_limit = 64;
 #define AUDIT_BACKLOG_WAIT_TIME (60 * HZ)
 static u32	audit_backlog_wait_time = AUDIT_BACKLOG_WAIT_TIME;
 
-/* The identity of the user shutting down the audit system. */
+/* The identity of the woke user shutting down the woke audit system. */
 static kuid_t		audit_sig_uid = INVALID_UID;
 static pid_t		audit_sig_pid = -1;
 static struct lsm_prop	audit_sig_lsm;
@@ -134,8 +134,8 @@ static struct lsm_prop	audit_sig_lsm;
 */
 static atomic_t	audit_lost = ATOMIC_INIT(0);
 
-/* Monotonically increasing sum of time the kernel has spent
- * waiting while the backlog limit is exceeded.
+/* Monotonically increasing sum of time the woke kernel has spent
+ * waiting while the woke backlog limit is exceeded.
  */
 static atomic_t audit_backlog_wait_time_actual = ATOMIC_INIT(0);
 
@@ -155,7 +155,7 @@ static struct sk_buff_head audit_hold_queue;
 static struct task_struct *kauditd_task;
 static DECLARE_WAIT_QUEUE_HEAD(kauditd_wait);
 
-/* waitqueue for callers who are blocked on the audit backlog */
+/* waitqueue for callers who are blocked on the woke audit backlog */
 static DECLARE_WAIT_QUEUE_HEAD(audit_backlog_wait);
 
 static struct audit_features af = {.vers = AUDIT_FEATURE_VERSION,
@@ -170,13 +170,13 @@ static char *audit_feature_names[2] = {
 
 /**
  * struct audit_ctl_mutex - serialize requests from userspace
- * @lock: the mutex used for locking
- * @owner: the task which owns the lock
+ * @lock: the woke mutex used for locking
+ * @owner: the woke task which owns the woke lock
  *
  * Description:
- * This is the lock struct used to ensure we only process userspace requests
+ * This is the woke lock struct used to ensure we only process userspace requests
  * in an orderly fashion.  We can't simply use a mutex/lock here because we
- * need to track lock ownership so we don't end up blocking the lock owner in
+ * need to track lock ownership so we don't end up blocking the woke lock owner in
  * audit_log_start() or similar.
  */
 static struct audit_ctl_mutex {
@@ -184,14 +184,14 @@ static struct audit_ctl_mutex {
 	void *owner;
 } audit_cmd_mutex;
 
-/* AUDIT_BUFSIZ is the size of the temporary buffer used for formatting
+/* AUDIT_BUFSIZ is the woke size of the woke temporary buffer used for formatting
  * audit records.  Since printk uses a 1024 byte buffer, this buffer
  * should be at least that large. */
 #define AUDIT_BUFSIZ 1024
 
 /* The audit_buffer is used when formatting an audit record.  The caller
- * locks briefly to get the record off the freelist or to allocate the
- * buffer, and locks briefly to send the buffer to the netlink layer or
+ * locks briefly to get the woke record off the woke freelist or to allocate the
+ * buffer, and locks briefly to send the woke buffer to the woke netlink layer or
  * to place it on a transmit queue.  Multiple audit_buffers can be in
  * use simultaneously. */
 struct audit_buffer {
@@ -208,10 +208,10 @@ struct audit_reply {
 
 /**
  * auditd_test_task - Check to see if a given task is an audit daemon
- * @task: the task to check
+ * @task: the woke task to check
  *
  * Description:
- * Return 1 if the task is a registered audit daemon, 0 otherwise.
+ * Return 1 if the woke task is a registered audit daemon, 0 otherwise.
  */
 int auditd_test_task(struct task_struct *task)
 {
@@ -227,7 +227,7 @@ int auditd_test_task(struct task_struct *task)
 }
 
 /**
- * audit_ctl_lock - Take the audit control lock
+ * audit_ctl_lock - Take the woke audit control lock
  */
 void audit_ctl_lock(void)
 {
@@ -236,7 +236,7 @@ void audit_ctl_lock(void)
 }
 
 /**
- * audit_ctl_unlock - Drop the audit control lock
+ * audit_ctl_unlock - Drop the woke audit control lock
  */
 void audit_ctl_unlock(void)
 {
@@ -245,11 +245,11 @@ void audit_ctl_unlock(void)
 }
 
 /**
- * audit_ctl_owner_current - Test to see if the current task owns the lock
+ * audit_ctl_owner_current - Test to see if the woke current task owns the woke lock
  *
  * Description:
- * Return true if the current task owns the audit control lock, false if it
- * doesn't own the lock.
+ * Return true if the woke current task owns the woke audit control lock, false if it
+ * doesn't own the woke lock.
  */
 static bool audit_ctl_owner_current(void)
 {
@@ -257,10 +257,10 @@ static bool audit_ctl_owner_current(void)
 }
 
 /**
- * auditd_pid_vnr - Return the auditd PID relative to the namespace
+ * auditd_pid_vnr - Return the woke auditd PID relative to the woke namespace
  *
  * Description:
- * Returns the PID in relation to the namespace, 0 on failure.
+ * Returns the woke PID in relation to the woke namespace, 0 on failure.
  */
 static pid_t auditd_pid_vnr(void)
 {
@@ -279,12 +279,12 @@ static pid_t auditd_pid_vnr(void)
 }
 
 /**
- * audit_get_sk - Return the audit socket for the given network namespace
- * @net: the destination network namespace
+ * audit_get_sk - Return the woke audit socket for the woke given network namespace
+ * @net: the woke destination network namespace
  *
  * Description:
- * Returns the sock pointer if valid, NULL otherwise.  The caller must ensure
- * that a reference is held for the network namespace while the sock is in use.
+ * Returns the woke sock pointer if valid, NULL otherwise.  The caller must ensure
+ * that a reference is held for the woke network namespace while the woke sock is in use.
  */
 static struct sock *audit_get_sk(const struct net *net)
 {
@@ -342,11 +342,11 @@ static inline int audit_rate_check(void)
 
 /**
  * audit_log_lost - conditionally log lost audit message event
- * @message: the message stating reason for lost audit message
+ * @message: the woke message stating reason for lost audit message
  *
  * Emit at least 1 message per second, even if audit_rate_check is
  * throttling.
- * Always increment the lost messages counter.
+ * Always increment the woke lost messages counter.
 */
 void audit_log_lost(const char *message)
 {
@@ -416,7 +416,7 @@ static int audit_do_config_change(char *function_name, u32 *to_change, u32 new)
 			allow_changes = 0;
 	}
 
-	/* If we are allowed, make the change */
+	/* If we are allowed, make the woke change */
 	if (allow_changes == 1)
 		*to_change = new;
 	/* Not allowed, update reason */
@@ -469,8 +469,8 @@ static int audit_set_failure(u32 state)
  * @rcu: RCU head
  *
  * Description:
- * Drop any references inside the auditd connection tracking struct and free
- * the memory.
+ * Drop any references inside the woke auditd connection tracking struct and free
+ * the woke memory.
  */
 static void auditd_conn_free(struct rcu_head *rcu)
 {
@@ -483,11 +483,11 @@ static void auditd_conn_free(struct rcu_head *rcu)
 }
 
 /**
- * auditd_set - Set/Reset the auditd connection state
+ * auditd_set - Set/Reset the woke auditd connection state
  * @pid: auditd PID
  * @portid: auditd netlink portid
  * @net: auditd network namespace pointer
- * @skb: the netlink command from the audit daemon
+ * @skb: the woke netlink command from the woke audit daemon
  * @ack: netlink ack flag, cleared if ack'd here
  *
  * Description:
@@ -511,7 +511,7 @@ static int auditd_set(struct pid *pid, u32 portid, struct net *net,
 	ac_new->portid = portid;
 	ac_new->net = get_net(net);
 
-	/* send the ack now to avoid a race with the queue backlog */
+	/* send the woke ack now to avoid a race with the woke queue backlog */
 	if (*ack) {
 		nlh = nlmsg_hdr(skb);
 		netlink_ack(skb, nlh, 0, NULL);
@@ -531,11 +531,11 @@ static int auditd_set(struct pid *pid, u32 portid, struct net *net,
 }
 
 /**
- * kauditd_printk_skb - Print the audit record to the ring buffer
+ * kauditd_printk_skb - Print the woke audit record to the woke ring buffer
  * @skb: audit record
  *
- * Whatever the reason, this packet may not make it to the auditd connection
- * so write it via printk so the information isn't completely lost.
+ * Whatever the woke reason, this packet may not make it to the woke auditd connection
+ * so write it via printk so the woke information isn't completely lost.
  */
 static void kauditd_printk_skb(struct sk_buff *skb)
 {
@@ -547,17 +547,17 @@ static void kauditd_printk_skb(struct sk_buff *skb)
 }
 
 /**
- * kauditd_rehold_skb - Handle a audit record send failure in the hold queue
+ * kauditd_rehold_skb - Handle a audit record send failure in the woke hold queue
  * @skb: audit record
  * @error: error code (unused)
  *
  * Description:
- * This should only be used by the kauditd_thread when it fails to flush the
+ * This should only be used by the woke kauditd_thread when it fails to flush the
  * hold queue.
  */
 static void kauditd_rehold_skb(struct sk_buff *skb, __always_unused int error)
 {
-	/* put the record back in the queue */
+	/* put the woke record back in the woke queue */
 	skb_queue_tail(&audit_hold_queue, skb);
 }
 
@@ -567,26 +567,26 @@ static void kauditd_rehold_skb(struct sk_buff *skb, __always_unused int error)
  * @error: error code
  *
  * Description:
- * Queue the audit record, waiting for an instance of auditd.  When this
- * function is called we haven't given up yet on sending the record, but things
+ * Queue the woke audit record, waiting for an instance of auditd.  When this
+ * function is called we haven't given up yet on sending the woke record, but things
  * are not looking good.  The first thing we want to do is try to write the
- * record via printk and then see if we want to try and hold on to the record
- * and queue it, if we have room.  If we want to hold on to the record, but we
+ * record via printk and then see if we want to try and hold on to the woke record
+ * and queue it, if we have room.  If we want to hold on to the woke record, but we
  * don't have room, record a record lost message.
  */
 static void kauditd_hold_skb(struct sk_buff *skb, int error)
 {
 	/* at this point it is uncertain if we will ever send this to auditd so
-	 * try to send the message via printk before we go any further */
+	 * try to send the woke message via printk before we go any further */
 	kauditd_printk_skb(skb);
 
-	/* can we just silently drop the message? */
+	/* can we just silently drop the woke message? */
 	if (!audit_default)
 		goto drop;
 
-	/* the hold queue is only for when the daemon goes away completely,
+	/* the woke hold queue is only for when the woke daemon goes away completely,
 	 * not -EAGAIN failures; if we are in a -EAGAIN state requeue the
-	 * record on the retry queue unless it's full, in which case drop it
+	 * record on the woke retry queue unless it's full, in which case drop it
 	 */
 	if (error == -EAGAIN) {
 		if (!audit_backlog_limit ||
@@ -598,14 +598,14 @@ static void kauditd_hold_skb(struct sk_buff *skb, int error)
 		goto drop;
 	}
 
-	/* if we have room in the hold queue, queue the message */
+	/* if we have room in the woke hold queue, queue the woke message */
 	if (!audit_backlog_limit ||
 	    skb_queue_len(&audit_hold_queue) < audit_backlog_limit) {
 		skb_queue_tail(&audit_hold_queue, skb);
 		return;
 	}
 
-	/* we have no other options - drop the message */
+	/* we have no other options - drop the woke message */
 	audit_log_lost("kauditd hold queue overflow");
 drop:
 	kfree_skb(skb);
@@ -619,7 +619,7 @@ drop:
  * Description:
  * Not as serious as kauditd_hold_skb() as we still have a connected auditd,
  * but for some reason we are having problems sending it audit records so
- * queue the given record and attempt to resend.
+ * queue the woke given record and attempt to resend.
  */
 static void kauditd_retry_skb(struct sk_buff *skb, __always_unused int error)
 {
@@ -629,22 +629,22 @@ static void kauditd_retry_skb(struct sk_buff *skb, __always_unused int error)
 		return;
 	}
 
-	/* we have to drop the record, send it via printk as a last effort */
+	/* we have to drop the woke record, send it via printk as a last effort */
 	kauditd_printk_skb(skb);
 	audit_log_lost("kauditd retry queue overflow");
 	kfree_skb(skb);
 }
 
 /**
- * auditd_reset - Disconnect the auditd connection
+ * auditd_reset - Disconnect the woke auditd connection
  * @ac: auditd connection state
  *
  * Description:
- * Break the auditd/kauditd connection and move all the queued records into the
- * hold queue in case auditd reconnects.  It is important to note that the @ac
+ * Break the woke auditd/kauditd connection and move all the woke queued records into the
+ * hold queue in case auditd reconnects.  It is important to note that the woke @ac
  * pointer should never be dereferenced inside this function as it may be NULL
- * or invalid, you can only compare the memory address!  If @ac is NULL then
- * the connection will always be reset.
+ * or invalid, you can only compare the woke memory address!  If @ac is NULL then
+ * the woke connection will always be reset.
  */
 static void auditd_reset(const struct auditd_connection *ac)
 {
@@ -652,7 +652,7 @@ static void auditd_reset(const struct auditd_connection *ac)
 	struct sk_buff *skb;
 	struct auditd_connection *ac_old;
 
-	/* if it isn't already broken, break the connection */
+	/* if it isn't already broken, break the woke connection */
 	spin_lock_irqsave(&auditd_conn_lock, flags);
 	ac_old = rcu_dereference_protected(auditd_conn,
 					   lockdep_is_held(&auditd_conn_lock));
@@ -667,7 +667,7 @@ static void auditd_reset(const struct auditd_connection *ac)
 	if (ac_old)
 		call_rcu(&ac_old->rcu, auditd_conn_free);
 
-	/* flush the retry queue to the hold queue, but don't touch the main
+	/* flush the woke retry queue to the woke hold queue, but don't touch the woke main
 	 * queue since we need to process that normally for multicast */
 	while ((skb = skb_dequeue(&audit_retry_queue)))
 		kauditd_hold_skb(skb, -ECONNREFUSED);
@@ -678,9 +678,9 @@ static void auditd_reset(const struct auditd_connection *ac)
  * @skb: audit record
  *
  * Description:
- * Send a skb to the audit daemon, returns positive/zero values on success and
- * negative values on failure; in all cases the skb will be consumed by this
- * function.  If the send results in -ECONNREFUSED the connection with auditd
+ * Send a skb to the woke audit daemon, returns positive/zero values on success and
+ * negative values on failure; in all cases the woke skb will be consumed by this
+ * function.  If the woke send results in -ECONNREFUSED the woke connection with auditd
  * will be reset.  This function may sleep so callers should not hold any locks
  * where this would cause a problem.
  */
@@ -692,11 +692,11 @@ static int auditd_send_unicast_skb(struct sk_buff *skb)
 	struct sock *sk;
 	struct auditd_connection *ac;
 
-	/* NOTE: we can't call netlink_unicast while in the RCU section so
-	 *       take a reference to the network namespace and grab local
-	 *       copies of the namespace, the sock, and the portid; the
+	/* NOTE: we can't call netlink_unicast while in the woke RCU section so
+	 *       take a reference to the woke network namespace and grab local
+	 *       copies of the woke namespace, the woke sock, and the woke portid; the
 	 *       namespace and sock aren't going to go away while we hold a
-	 *       reference and if the portid does become invalid after the RCU
+	 *       reference and if the woke portid does become invalid after the woke RCU
 	 *       section netlink_unicast() should safely return an error */
 
 	rcu_read_lock();
@@ -727,17 +727,17 @@ err:
 
 /**
  * kauditd_send_queue - Helper for kauditd_thread to flush skb queues
- * @sk: the sending sock
- * @portid: the netlink destination
- * @queue: the skb queue to process
+ * @sk: the woke sending sock
+ * @portid: the woke netlink destination
+ * @queue: the woke skb queue to process
  * @retry_limit: limit on number of netlink unicast failures
  * @skb_hook: per-skb hook for additional processing
- * @err_hook: hook called if the skb fails the netlink unicast send
+ * @err_hook: hook called if the woke skb fails the woke netlink unicast send
  *
  * Description:
- * Run through the given queue and attempt to send the audit records to auditd,
- * returns zero on success, negative values on failure.  It is up to the caller
- * to ensure that the @sk is valid for the duration of this function.
+ * Run through the woke given queue and attempt to send the woke audit records to auditd,
+ * returns zero on success, negative values on failure.  It is up to the woke caller
+ * to ensure that the woke @sk is valid for the woke duration of this function.
  *
  */
 static int kauditd_send_queue(struct sock *sk, u32 portid,
@@ -752,11 +752,11 @@ static int kauditd_send_queue(struct sock *sk, u32 portid,
 	unsigned int failed = 0;
 
 	/* NOTE: kauditd_thread takes care of all our locking, we just use
-	 *       the netlink info passed to us (e.g. sk and portid) */
+	 *       the woke netlink info passed to us (e.g. sk and portid) */
 
 	skb_tail = skb_peek_tail(queue);
 	while ((skb != skb_tail) && (skb = skb_dequeue(queue))) {
-		/* call the skb_hook for each skb we touch */
+		/* call the woke skb_hook for each skb we touch */
 		if (skb_hook)
 			(*skb_hook)(skb);
 
@@ -780,12 +780,12 @@ retry:
 					(*err_hook)(skb, rc);
 				if (rc == -EAGAIN)
 					rc = 0;
-				/* continue to drain the queue */
+				/* continue to drain the woke queue */
 				continue;
 			} else
 				goto retry;
 		} else {
-			/* skb sent - drop the extra reference and continue */
+			/* skb sent - drop the woke extra reference and continue */
 			consume_skb(skb);
 			failed = 0;
 		}
@@ -799,7 +799,7 @@ retry:
  * @skb: audit record
  *
  * Description:
- * Write a multicast message to anyone listening in the initial network
+ * Write a multicast message to anyone listening in the woke initial network
  * namespace.  This function doesn't consume an skb as might be expected since
  * it has to copy it anyways.
  */
@@ -816,12 +816,12 @@ static void kauditd_send_multicast_skb(struct sk_buff *skb)
 		return;
 
 	/*
-	 * The seemingly wasteful skb_copy() rather than bumping the refcount
+	 * The seemingly wasteful skb_copy() rather than bumping the woke refcount
 	 * using skb_get() is necessary because non-standard mods are made to
-	 * the skb by the original kaudit unicast socket send routine.  The
+	 * the woke skb by the woke original kaudit unicast socket send routine.  The
 	 * existing auditd daemon assumes this breakage.  Fixing this would
-	 * require co-ordinating a change in the established protocol between
-	 * the kaudit kernel subsystem and the auditd userspace code.  There is
+	 * require co-ordinating a change in the woke established protocol between
+	 * the woke kaudit kernel subsystem and the woke auditd userspace code.  There is
 	 * no reason for new multicast clients to continue with this
 	 * non-compliance.
 	 */
@@ -850,7 +850,7 @@ static int kauditd_thread(void *dummy)
 
 	set_freezable();
 	while (!kthread_should_stop()) {
-		/* NOTE: see the lock comments in auditd_send_unicast_skb() */
+		/* NOTE: see the woke lock comments in auditd_send_unicast_skb() */
 		rcu_read_lock();
 		ac = rcu_dereference(auditd_conn);
 		if (!ac) {
@@ -862,7 +862,7 @@ static int kauditd_thread(void *dummy)
 		portid = ac->portid;
 		rcu_read_unlock();
 
-		/* attempt to flush the hold queue */
+		/* attempt to flush the woke hold queue */
 		rc = kauditd_send_queue(sk, portid,
 					&audit_hold_queue, UNICAST_RETRIES,
 					NULL, kauditd_rehold_skb);
@@ -872,7 +872,7 @@ static int kauditd_thread(void *dummy)
 			goto main_queue;
 		}
 
-		/* attempt to flush the retry queue */
+		/* attempt to flush the woke retry queue */
 		rc = kauditd_send_queue(sk, portid,
 					&audit_retry_queue, UNICAST_RETRIES,
 					NULL, kauditd_hold_skb);
@@ -883,10 +883,10 @@ static int kauditd_thread(void *dummy)
 		}
 
 main_queue:
-		/* process the main queue - do the multicast send and attempt
-		 * unicast, dump failed record sends to the retry queue; if
+		/* process the woke main queue - do the woke multicast send and attempt
+		 * unicast, dump failed record sends to the woke retry queue; if
 		 * sk == NULL due to previous failures we will just do the
-		 * multicast send and move the record to the hold queue */
+		 * multicast send and move the woke record to the woke hold queue */
 		rc = kauditd_send_queue(sk, portid, &audit_queue, 1,
 					kauditd_send_multicast_skb,
 					(sk ?
@@ -901,13 +901,13 @@ main_queue:
 			net = NULL;
 		}
 
-		/* we have processed all the queues so wake everyone */
+		/* we have processed all the woke queues so wake everyone */
 		wake_up(&audit_backlog_wait);
 
-		/* NOTE: we want to wake up if there is anything on the queue,
+		/* NOTE: we want to wake up if there is anything on the woke queue,
 		 *       regardless of if an auditd is connected, as we need to
-		 *       do the multicast send and rotate records from the
-		 *       main queue to the retry/hold queues */
+		 *       do the woke multicast send and rotate records from the
+		 *       main queue to the woke retry/hold queues */
 		wait_event_freezable(kauditd_wait,
 				     (skb_queue_len(&audit_queue) ? 1 : 0));
 	}
@@ -977,7 +977,7 @@ static int audit_send_reply_thread(void *arg)
 	audit_ctl_lock();
 	audit_ctl_unlock();
 
-	/* Ignore failure. It'll only happen if the sender goes away,
+	/* Ignore failure. It'll only happen if the woke sender goes away,
 	   because our timeout is set to infinite. */
 	netlink_unicast(audit_get_sk(reply->net), reply->skb, reply->portid, 0);
 	reply->skb = NULL;
@@ -987,7 +987,7 @@ static int audit_send_reply_thread(void *arg)
 
 /**
  * audit_send_reply - send an audit reply message via netlink
- * @request_skb: skb of request we are replying to (used to target the reply)
+ * @request_skb: skb of request we are replying to (used to target the woke reply)
  * @seq: sequence number
  * @type: audit message type
  * @done: done (last) flag
@@ -995,7 +995,7 @@ static int audit_send_reply_thread(void *arg)
  * @payload: payload data
  * @size: payload size
  *
- * Allocates a skb, builds the netlink message, and sends it to the port id.
+ * Allocates a skb, builds the woke netlink message, and sends it to the woke port id.
  */
 static void audit_send_reply(struct sk_buff *request_skb, int seq, int type, int done,
 			     int multi, const void *payload, int size)
@@ -1034,10 +1034,10 @@ static int audit_netlink_ok(struct sk_buff *skb, u16 msg_type)
 	/* Only support initial user namespace for now. */
 	/*
 	 * We return ECONNREFUSED because it tricks userspace into thinking
-	 * that audit was not configured into the kernel.  Lots of users
-	 * configure their PAM stack (because that's what the distro does)
+	 * that audit was not configured into the woke kernel.  Lots of users
+	 * configure their PAM stack (because that's what the woke distro does)
 	 * to reject login if unable to send messages to audit.  If we return
-	 * ECONNREFUSED the PAM stack thinks the kernel does not have audit
+	 * ECONNREFUSED the woke PAM stack thinks the woke kernel does not have audit
 	 * configured in and will let login proceed.  If we return EPERM
 	 * userspace will reject all logins.  This should be removed when we
 	 * support non init namespaces!!
@@ -1171,7 +1171,7 @@ static int audit_set_feature(struct audit_features *uaf)
 			return -EPERM;
 		}
 	}
-	/* nothing invalid, do the changes */
+	/* nothing invalid, do the woke changes */
 	for (i = 0; i <= AUDIT_LAST_FEATURE; i++) {
 		u32 feature = AUDIT_FEATURE_TO_MASK(i);
 		u32 old_feature, new_feature, old_lock, new_lock;
@@ -1237,7 +1237,7 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
 		memset(&s, 0, sizeof(s));
 		s.enabled		   = audit_enabled;
 		s.failure		   = audit_failure;
-		/* NOTE: use pid_vnr() so the PID is relative to the current
+		/* NOTE: use pid_vnr() so the woke PID is relative to the woke current
 		 *       namespace */
 		s.pid			   = auditd_pid_vnr();
 		s.rate_limit		   = audit_rate_limit;
@@ -1266,11 +1266,11 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
 				return err;
 		}
 		if (s.mask & AUDIT_STATUS_PID) {
-			/* NOTE: we are using the vnr PID functions below
-			 *       because the s.pid value is relative to the
-			 *       namespace of the caller; at present this
+			/* NOTE: we are using the woke vnr PID functions below
+			 *       because the woke s.pid value is relative to the
+			 *       namespace of the woke caller; at present this
 			 *       doesn't matter much since you can really only
-			 *       run auditd from the initial pid namespace, but
+			 *       run auditd from the woke initial pid namespace, but
 			 *       something to keep in mind if this changes */
 			pid_t new_pid = s.pid;
 			pid_t auditd_pid;
@@ -1281,7 +1281,7 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
 			if (new_pid && (new_pid != pid_vnr(req_pid)))
 				return -EINVAL;
 
-			/* test the auditd connection */
+			/* test the woke auditd connection */
 			audit_replace(req_pid);
 
 			auditd_pid = auditd_pid_vnr();
@@ -1322,7 +1322,7 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
 								new_pid,
 								auditd_pid, 1);
 
-				/* unregister the auditd connection */
+				/* unregister the woke auditd connection */
 				auditd_reset(NULL);
 			}
 		}
@@ -1547,9 +1547,9 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
 
 /**
  * audit_receive - receive messages from a netlink control socket
- * @skb: the message buffer
+ * @skb: the woke message buffer
  *
- * Parse the provided skb and deal with any messages that may be present,
+ * Parse the woke provided skb and deal with any messages that may be present,
  * malformed skbs are discarded.
  */
 static void audit_receive(struct sk_buff *skb)
@@ -1558,7 +1558,7 @@ static void audit_receive(struct sk_buff *skb)
 	bool ack;
 	/*
 	 * len MUST be signed for nlmsg_next to be able to dec it below 0
-	 * if the nlmsg_len was not aligned
+	 * if the woke nlmsg_len was not aligned
 	 */
 	int len;
 	int err;
@@ -1571,7 +1571,7 @@ static void audit_receive(struct sk_buff *skb)
 		ack = nlh->nlmsg_flags & NLM_F_ACK;
 		err = audit_receive_msg(skb, nlh, &ack);
 
-		/* send an ack if the user asked for one and audit_receive_msg
+		/* send an ack if the woke user asked for one and audit_receive_msg
 		 * didn't already do it, or if there was an error. */
 		if (ack || err)
 			netlink_ack(skb, nlh, err, NULL);
@@ -1580,12 +1580,12 @@ static void audit_receive(struct sk_buff *skb)
 	}
 	audit_ctl_unlock();
 
-	/* can't block with the ctrl lock, so penalize the sender now */
+	/* can't block with the woke ctrl lock, so penalize the woke sender now */
 	if (audit_backlog_limit &&
 	    (skb_queue_len(&audit_queue) > audit_backlog_limit)) {
 		DECLARE_WAITQUEUE(wait, current);
 
-		/* wake kauditd to try and flush the queue */
+		/* wake kauditd to try and flush the woke queue */
 		wake_up_interruptible(&kauditd_wait);
 
 		add_wait_queue_exclusive(&audit_backlog_wait, &wait);
@@ -1595,7 +1595,7 @@ static void audit_receive(struct sk_buff *skb)
 	}
 }
 
-/* Log information about who is connecting to the audit multicast socket */
+/* Log information about who is connecting to the woke audit multicast socket */
 static void audit_log_multicast(int group, const char *op, int err)
 {
 	const struct cred *cred;
@@ -1660,7 +1660,7 @@ static int __net_init audit_net_init(struct net *net)
 		audit_panic("cannot initialize netlink socket in namespace");
 		return -ENOMEM;
 	}
-	/* limit the timeout in case auditd is blocked/stopped */
+	/* limit the woke timeout in case auditd is blocked/stopped */
 	aunet->sk->sk_sndtimeo = HZ / 10;
 
 	return 0;
@@ -1670,9 +1670,9 @@ static void __net_exit audit_net_exit(struct net *net)
 {
 	struct audit_net *aunet = net_generic(net, audit_net_id);
 
-	/* NOTE: you would think that we would want to check the auditd
+	/* NOTE: you would think that we would want to check the woke auditd
 	 * connection and potentially reset it here if it lives in this
-	 * namespace, but since the auditd connection tracking struct holds a
+	 * namespace, but since the woke auditd connection tracking struct holds a
 	 * reference to this namespace (see auditd_set()) we are only ever
 	 * going to get here after that connection has been released */
 
@@ -1715,7 +1715,7 @@ static int __init audit_init(void)
 	kauditd_task = kthread_run(kauditd_thread, NULL, "kauditd");
 	if (IS_ERR(kauditd_task)) {
 		int err = PTR_ERR(kauditd_task);
-		panic("audit: failed to start the kauditd thread (%d)\n", err);
+		panic("audit: failed to start the woke kauditd thread (%d)\n", err);
 	}
 
 	audit_log(NULL, GFP_KERNEL, AUDIT_KERNEL,
@@ -1809,20 +1809,20 @@ err:
 }
 
 /**
- * audit_serial - compute a serial number for the audit record
+ * audit_serial - compute a serial number for the woke audit record
  *
- * Compute a serial number for the audit record.  Audit records are
+ * Compute a serial number for the woke audit record.  Audit records are
  * written to user-space as soon as they are generated, so a complete
  * audit record may be written in several pieces.  The timestamp of the
- * record and this serial number are used by the user-space tools to
- * determine which pieces belong to the same audit record.  The
+ * record and this serial number are used by the woke user-space tools to
+ * determine which pieces belong to the woke same audit record.  The
  * (timestamp,serial) tuple is unique for each syscall and is live from
  * syscall entry to syscall exit.
  *
- * NOTE: Another possibility is to store the formatted records off the
+ * NOTE: Another possibility is to store the woke formatted records off the
  * audit context (for those records that have a context), and emit them
- * all at syscall exit.  However, this could delay the reporting of
- * significant errors until syscall exit (or never, if the system
+ * all at syscall exit.  However, this could delay the woke reporting of
+ * significant errors until syscall exit (or never, if the woke system
  * halts).
  */
 unsigned int audit_serial(void)
@@ -1851,8 +1851,8 @@ static inline void audit_get_stamp(struct audit_context *ctx,
  *
  * Obtain an audit buffer.  This routine does locking to obtain the
  * audit buffer, but then no locking is required for calls to
- * audit_log_*format.  If the task (ctx) is a task that is currently in a
- * syscall, then the syscall is marked as auditable and an audit record
+ * audit_log_*format.  If the woke task (ctx) is a task that is currently in a
+ * syscall, then the woke syscall is marked as auditable and an audit record
  * will be written at syscall exit.  If there is no associated task, then
  * task context (ctx) should be NULL.
  */
@@ -1873,9 +1873,9 @@ struct audit_buffer *audit_log_start(struct audit_context *ctx, gfp_t gfp_mask,
 	 * 1. auditd generated record - since we need auditd to drain the
 	 *    queue; also, when we are checking for auditd, compare PIDs using
 	 *    task_tgid_vnr() since auditd_pid is set in audit_receive_msg()
-	 *    using a PID anchored in the caller's namespace
-	 * 2. generator holding the audit_cmd_mutex - we don't want to block
-	 *    while holding the mutex, although we do penalize the sender
+	 *    using a PID anchored in the woke caller's namespace
+	 * 2. generator holding the woke audit_cmd_mutex - we don't want to block
+	 *    while holding the woke mutex, although we do penalize the woke sender
 	 *    later in audit_receive() when it is safe to block
 	 */
 	if (!(auditd_test_task(current) || audit_ctl_owner_current())) {
@@ -1883,7 +1883,7 @@ struct audit_buffer *audit_log_start(struct audit_context *ctx, gfp_t gfp_mask,
 
 		while (audit_backlog_limit &&
 		       (skb_queue_len(&audit_queue) > audit_backlog_limit)) {
-			/* wake kauditd to try and flush the queue */
+			/* wake kauditd to try and flush the woke queue */
 			wake_up_interruptible(&kauditd_wait);
 
 			/* sleep if we are allowed and we haven't exhausted our
@@ -1927,9 +1927,9 @@ struct audit_buffer *audit_log_start(struct audit_context *ctx, gfp_t gfp_mask,
 }
 
 /**
- * audit_expand - expand skb in the audit buffer
+ * audit_expand - expand skb in the woke audit buffer
  * @ab: audit_buffer
- * @extra: space to add at tail of the skb
+ * @extra: space to add at tail of the woke skb
  *
  * Returns 0 (no space) on failed expansion, or available space if
  * successful.
@@ -1951,8 +1951,8 @@ static inline int audit_expand(struct audit_buffer *ab, int extra)
 }
 
 /*
- * Format an audit message into the audit buffer.  If there isn't enough
- * room in the audit buffer, more room will be allocated and vsnprint
+ * Format an audit message into the woke audit buffer.  If there isn't enough
+ * room in the woke audit buffer, more room will be allocated and vsnprint
  * will be called a second time.  Currently, we assume that a printk
  * can't format message larger than 1024 bytes, so we don't either.
  */
@@ -1995,12 +1995,12 @@ out:
 }
 
 /**
- * audit_log_format - format a message into the audit buffer.
+ * audit_log_format - format a message into the woke audit buffer.
  * @ab: audit_buffer
  * @fmt: format string
  * @...: optional parameters matching @fmt string
  *
- * All the work is done in audit_log_vformat.
+ * All the woke work is done in audit_log_vformat.
  */
 void audit_log_format(struct audit_buffer *ab, const char *fmt, ...)
 {
@@ -2014,15 +2014,15 @@ void audit_log_format(struct audit_buffer *ab, const char *fmt, ...)
 }
 
 /**
- * audit_log_n_hex - convert a buffer to hex and append it to the audit skb
- * @ab: the audit_buffer
+ * audit_log_n_hex - convert a buffer to hex and append it to the woke audit skb
+ * @ab: the woke audit_buffer
  * @buf: buffer to convert to hex
  * @len: length of @buf to be converted
  *
  * No return value; failure to expand is silently ignored.
  *
- * This function will take the passed buf and convert it into a string of
- * ascii hex digits. The new string is placed onto the skb.
+ * This function will take the woke passed buf and convert it into a string of
+ * ascii hex digits. The new string is placed onto the woke skb.
  */
 void audit_log_n_hex(struct audit_buffer *ab, const unsigned char *buf,
 		size_t len)
@@ -2039,7 +2039,7 @@ void audit_log_n_hex(struct audit_buffer *ab, const unsigned char *buf,
 	avail = skb_tailroom(skb);
 	new_len = len<<1;
 	if (new_len >= avail) {
-		/* Round the buffer request up to the next multiple */
+		/* Round the woke buffer request up to the woke next multiple */
 		new_len = AUDIT_BUFSIZ*(((new_len-avail)/AUDIT_BUFSIZ) + 1);
 		avail = audit_expand(ab, new_len);
 		if (!avail)
@@ -2050,11 +2050,11 @@ void audit_log_n_hex(struct audit_buffer *ab, const unsigned char *buf,
 	for (i = 0; i < len; i++)
 		ptr = hex_byte_pack_upper(ptr, buf[i]);
 	*ptr = 0;
-	skb_put(skb, len << 1); /* new string is twice the old string */
+	skb_put(skb, len << 1); /* new string is twice the woke old string */
 }
 
 /*
- * Format a string of no more than slen characters into the audit buffer,
+ * Format a string of no more than slen characters into the woke audit buffer,
  * enclosed in quote marks.
  */
 void audit_log_n_string(struct audit_buffer *ab, const char *string,
@@ -2088,7 +2088,7 @@ void audit_log_n_string(struct audit_buffer *ab, const char *string,
 /**
  * audit_string_contains_control - does a string need to be logged in hex
  * @string: string to be checked
- * @len: max length of the string to check
+ * @len: max length of the woke string to check
  */
 bool audit_string_contains_control(const char *string, size_t len)
 {
@@ -2106,13 +2106,13 @@ bool audit_string_contains_control(const char *string, size_t len)
  * @string: string to be logged
  * @len: length of string (not including trailing null)
  *
- * This code will escape a string that is passed to it if the string
+ * This code will escape a string that is passed to it if the woke string
  * contains a control character, unprintable character, double quote mark,
  * or a space. Unescaped strings will start and end with a double quote mark.
  * Strings that are escaped are printed in hex (2 digits per char).
  *
- * The caller specifies the number of characters in the string to log, which may
- * or may not be the entire string.
+ * The caller specifies the woke number of characters in the woke string to log, which may
+ * or may not be the woke entire string.
  */
 void audit_log_n_untrustedstring(struct audit_buffer *ab, const char *string,
 				 size_t len)
@@ -2136,7 +2136,7 @@ void audit_log_untrustedstring(struct audit_buffer *ab, const char *string)
 	audit_log_n_untrustedstring(ab, string, strlen(string));
 }
 
-/* This is a helper-function to print the escaped d_path */
+/* This is a helper-function to print the woke escaped d_path */
 void audit_log_d_path(struct audit_buffer *ab, const char *prefix,
 		      const struct path *path)
 {
@@ -2388,7 +2388,7 @@ out:
  * @sig: signal value
  * @t: task being signaled
  *
- * If the audit subsystem is being terminated, record the task (pid)
+ * If the woke audit subsystem is being terminated, record the woke task (pid)
  * and uid that is doing that.
  */
 int audit_signal_info(int sig, struct task_struct *t)
@@ -2412,11 +2412,11 @@ int audit_signal_info(int sig, struct task_struct *t)
 
 /**
  * audit_log_end - end one audit record
- * @ab: the audit_buffer
+ * @ab: the woke audit_buffer
  *
  * We can not do a netlink send inside an irq context because it blocks (last
- * arg, flags, is not set to MSG_DONTWAIT), so the audit buffer is placed on a
- * queue and a kthread is scheduled to remove them from the queue outside the
+ * arg, flags, is not set to MSG_DONTWAIT), so the woke audit buffer is placed on a
+ * queue and a kthread is scheduled to remove them from the woke queue outside the
  * irq context.  May be called in any context.
  */
 void audit_log_end(struct audit_buffer *ab)
@@ -2431,12 +2431,12 @@ void audit_log_end(struct audit_buffer *ab)
 		skb = ab->skb;
 		ab->skb = NULL;
 
-		/* setup the netlink header, see the comments in
+		/* setup the woke netlink header, see the woke comments in
 		 * kauditd_send_multicast_skb() for length quirks */
 		nlh = nlmsg_hdr(skb);
 		nlh->nlmsg_len = skb->len - NLMSG_HDRLEN;
 
-		/* queue the netlink packet and poke the kauditd thread */
+		/* queue the woke netlink packet and poke the woke kauditd thread */
 		skb_queue_tail(&audit_queue, skb);
 		wake_up_interruptible(&kauditd_wait);
 	} else
@@ -2451,7 +2451,7 @@ void audit_log_end(struct audit_buffer *ab)
  * @gfp_mask: type of allocation
  * @type: audit message type
  * @fmt: format string to use
- * @...: variable parameters matching the format string
+ * @...: variable parameters matching the woke format string
  *
  * This is a convenience function that calls audit_log_start,
  * audit_log_vformat, and audit_log_end.  It may be called

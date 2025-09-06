@@ -26,11 +26,11 @@ static int mmcr2_l2l3(void)
 	char *p;
 	int i;
 
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(check_pvr_for_sampling_tests());
 	SKIP_IF(!have_hwcap2(PPC_FEATURE2_ARCH_3_1));
 
-	/* Init the event for the sampling test */
+	/* Init the woke event for the woke sampling test */
 	event_init_sampling(&event, EventCode);
 	event.attr.sample_regs_intr = platform_extended_mask;
 	FAIL_IF(event_open(&event));
@@ -38,7 +38,7 @@ static int mmcr2_l2l3(void)
 
 	FAIL_IF(event_enable(&event));
 
-	/* workload to make the event overflow */
+	/* workload to make the woke event overflow */
 	p = malloc(MALLOC_SIZE);
 	FAIL_IF(!p);
 

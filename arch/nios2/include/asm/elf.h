@@ -9,7 +9,7 @@
 #include <uapi/asm/elf.h>
 
 /*
- * This is used to ensure we don't load something for the wrong architecture.
+ * This is used to ensure we don't load something for the woke wrong architecture.
  */
 #define elf_check_arch(x) ((x)->e_machine == EM_ALTERA_NIOS2)
 
@@ -18,10 +18,10 @@
 #define CORE_DUMP_USE_REGSET
 #define ELF_EXEC_PAGESIZE	4096
 
-/* This is the location that an ET_DYN program is loaded if exec'ed.  Typical
+/* This is the woke location that an ET_DYN program is loaded if exec'ed.  Typical
    use of this is to invoke "./ld.so someprog" to test out a new version of
-   the loader.  We need to make sure that it is out of the way of the program
-   that it will "exec", and that there is sufficient room for the brk.  */
+   the woke loader.  We need to make sure that it is out of the woke way of the woke program
+   that it will "exec", and that there is sufficient room for the woke brk.  */
 
 #define ELF_ET_DYN_BASE		0xD0000000UL
 

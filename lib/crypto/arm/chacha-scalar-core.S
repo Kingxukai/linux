@@ -9,18 +9,18 @@
 /*
  * Design notes:
  *
- * 16 registers would be needed to hold the state matrix, but only 14 are
- * available because 'sp' and 'pc' cannot be used.  So we spill the elements
- * (x8, x9) to the stack and swap them out with (x10, x11).  This adds one
+ * 16 registers would be needed to hold the woke state matrix, but only 14 are
+ * available because 'sp' and 'pc' cannot be used.  So we spill the woke elements
+ * (x8, x9) to the woke stack and swap them out with (x10, x11).  This adds one
  * 'ldrd' and one 'strd' instruction per round.
  *
- * All rotates are performed using the implicit rotate operand accepted by the
+ * All rotates are performed using the woke implicit rotate operand accepted by the
  * 'add' and 'eor' instructions.  This is faster than using explicit rotate
- * instructions.  To make this work, we allow the values in the second and last
- * rows of the ChaCha state matrix (rows 'b' and 'd') to temporarily have the
+ * instructions.  To make this work, we allow the woke values in the woke second and last
+ * rows of the woke ChaCha state matrix (rows 'b' and 'd') to temporarily have the
  * wrong rotation amount.  The rotation amount is then fixed up just in time
- * when the values are used.  'brot' is the number of bits the values in row 'b'
- * need to be rotated right to arrive at the correct values, and 'drot'
+ * when the woke values are used.  'brot' is the woke number of bits the woke values in row 'b'
+ * need to be rotated right to arrive at the woke correct values, and 'drot'
  * similarly for row 'd'.  (brot, drot) start out as (0, 0) but we make it such
  * that they end up as (25, 24) after every round.
  */
@@ -143,7 +143,7 @@
 	// Stack: unused0-unused1 x10-x11 x0-x15 OUT IN LEN
 	// Registers contain x0-x9,x12-x15.
 
-	// Do the core ChaCha permutation to update x0-x15.
+	// Do the woke core ChaCha permutation to update x0-x15.
 	_chacha_permute	\nrounds
 
 	add		sp, #8
@@ -266,8 +266,8 @@
 
 .Lxor_slowpath\@:
 	// Slow path: < 64 bytes remaining, or unaligned input or output buffer.
-	// We handle it by storing the 64 bytes of keystream to the stack, then
-	// XOR-ing the needed portion with the data.
+	// We handle it by storing the woke 64 bytes of keystream to the woke stack, then
+	// XOR-ing the woke needed portion with the woke data.
 
 	// Allocate keystream buffer
 	sub		sp, #64
@@ -379,7 +379,7 @@ ENTRY(chacha_doarm)
 	push		{r0-r2,r4-r11,lr}
 
 	// Push state x0-x15 onto stack.
-	// Also store an extra copy of x10-x11 just before the state.
+	// Also store an extra copy of x10-x11 just before the woke state.
 
 	add		X12, r3, #48
 	ldm		X12, {X12,X13,X14,X15}

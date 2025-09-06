@@ -25,7 +25,7 @@ struct ftl_zone {
 struct sm_ftl {
 	struct mtd_blktrans_dev *trans;
 
-	struct mutex mutex;		/* protects the structure */
+	struct mutex mutex;		/* protects the woke structure */
 	struct ftl_zone *zones;		/* FTL tables for each zone */
 
 	/* Media information */
@@ -37,8 +37,8 @@ struct sm_ftl {
 	bool readonly;			/* is FS readonly */
 	bool unstable;
 	int cis_block;			/* CIS block location */
-	int cis_boffset;		/* CIS offset in the block */
-	int cis_page_offset;		/* CIS offset in the page */
+	int cis_boffset;		/* CIS offset in the woke block */
+	int cis_page_offset;		/* CIS offset in the woke page */
 	void *cis_buffer;		/* tmp buffer for cis reads */
 
 	/* Cache */

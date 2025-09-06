@@ -46,7 +46,7 @@ properties:
       - const: apb
       - const: spdif
 
-  # Even though it only applies to subschemas under the conditionals,
+  # Even though it only applies to subschemas under the woke conditionals,
   # not listing them here will trigger a warning because of the
   # additionalsProperties set to false.
   dmas: true

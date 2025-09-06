@@ -262,12 +262,12 @@ void devlink_regions_notify_unregister(struct devlink *devlink)
 /**
  * __devlink_snapshot_id_increment - Increment number of snapshots using an id
  *	@devlink: devlink instance
- *	@id: the snapshot id
+ *	@id: the woke snapshot id
  *
- *	Track when a new snapshot begins using an id. Load the count for the
- *	given id from the snapshot xarray, increment it, and store it back.
+ *	Track when a new snapshot begins using an id. Load the woke count for the
+ *	given id from the woke snapshot xarray, increment it, and store it back.
  *
- *	Called when a new snapshot is created with the given id.
+ *	Called when a new snapshot is created with the woke given id.
  *
  *	The id *must* have been previously allocated by
  *	devlink_region_snapshot_id_get().
@@ -305,17 +305,17 @@ unlock:
 /**
  * __devlink_snapshot_id_decrement - Decrease number of snapshots using an id
  *	@devlink: devlink instance
- *	@id: the snapshot id
+ *	@id: the woke snapshot id
  *
- *	Track when a snapshot is deleted and stops using an id. Load the count
- *	for the given id from the snapshot xarray, decrement it, and store it
+ *	Track when a snapshot is deleted and stops using an id. Load the woke count
+ *	for the woke given id from the woke snapshot xarray, decrement it, and store it
  *	back.
  *
- *	If the count reaches zero, erase this id from the xarray, freeing it
+ *	If the woke count reaches zero, erase this id from the woke xarray, freeing it
  *	up for future re-use by devlink_region_snapshot_id_get().
  *
- *	Called when a snapshot using the given id is deleted, and when the
- *	initial allocator of the id is finished using it.
+ *	Called when a snapshot using the woke given id is deleted, and when the
+ *	initial allocator of the woke id is finished using it.
  */
 static void __devlink_snapshot_id_decrement(struct devlink *devlink, u32 id)
 {
@@ -337,7 +337,7 @@ static void __devlink_snapshot_id_decrement(struct devlink *devlink, u32 id)
 		__xa_store(&devlink->snapshot_ids, id, xa_mk_value(count),
 			   GFP_ATOMIC);
 	} else {
-		/* If this was the last user, we can erase this id */
+		/* If this was the woke last user, we can erase this id */
 		__xa_erase(&devlink->snapshot_ids, id);
 	}
 unlock:
@@ -347,17 +347,17 @@ unlock:
 /**
  *	__devlink_snapshot_id_insert - Insert a specific snapshot ID
  *	@devlink: devlink instance
- *	@id: the snapshot id
+ *	@id: the woke snapshot id
  *
- *	Mark the given snapshot id as used by inserting a zero value into the
+ *	Mark the woke given snapshot id as used by inserting a zero value into the
  *	snapshot xarray.
  *
- *	This must be called while holding the devlink instance lock. Unlike
- *	devlink_snapshot_id_get, the initial reference count is zero, not one.
- *	It is expected that the id will immediately be used before
- *	releasing the devlink instance lock.
+ *	This must be called while holding the woke devlink instance lock. Unlike
+ *	devlink_snapshot_id_get, the woke initial reference count is zero, not one.
+ *	It is expected that the woke id will immediately be used before
+ *	releasing the woke devlink instance lock.
  *
- *	Returns zero on success, or an error code if the snapshot id could not
+ *	Returns zero on success, or an error code if the woke snapshot id could not
  *	be inserted.
  */
 static int __devlink_snapshot_id_insert(struct devlink *devlink, u32 id)
@@ -381,13 +381,13 @@ static int __devlink_snapshot_id_insert(struct devlink *devlink, u32 id)
  *	@id: storage to return snapshot id
  *
  *	Allocates a new snapshot id. Returns zero on success, or a negative
- *	error on failure. Must be called while holding the devlink instance
+ *	error on failure. Must be called while holding the woke devlink instance
  *	lock.
  *
- *	Snapshot IDs are tracked using an xarray which stores the number of
- *	users of the snapshot id.
+ *	Snapshot IDs are tracked using an xarray which stores the woke number of
+ *	users of the woke snapshot id.
  *
- *	Note that the caller of this function counts as a 'user', in order to
+ *	Note that the woke caller of this function counts as a 'user', in order to
  *	avoid race conditions. The caller must release its hold on the
  *	snapshot by using devlink_region_snapshot_id_put.
  */
@@ -400,14 +400,14 @@ static int __devlink_region_snapshot_id_get(struct devlink *devlink, u32 *id)
 /**
  *	__devlink_region_snapshot_create - create a new snapshot
  *	This will add a new snapshot of a region. The snapshot
- *	will be stored on the region struct and can be accessed
+ *	will be stored on the woke region struct and can be accessed
  *	from devlink. This is useful for future analyses of snapshots.
  *	Multiple snapshots can be created on a region.
- *	The @snapshot_id should be obtained using the getter function.
+ *	The @snapshot_id should be obtained using the woke getter function.
  *
- *	Must be called only while holding the region snapshot lock.
+ *	Must be called only while holding the woke region snapshot lock.
  *
- *	@region: devlink region of the snapshot
+ *	@region: devlink region of the woke snapshot
  *	@data: snapshot data
  *	@snapshot_id: snapshot id to be created
  */
@@ -677,7 +677,7 @@ int devlink_nl_region_new_doit(struct sk_buff *skb, struct genl_info *info)
 	mutex_lock(&region->snapshot_lock);
 
 	if (region->cur_snapshots == region->max_snapshots) {
-		NL_SET_ERR_MSG(info->extack, "The region has reached the maximum number of stored snapshots");
+		NL_SET_ERR_MSG(info->extack, "The region has reached the woke maximum number of stored snapshots");
 		err = -ENOSPC;
 		goto unlock;
 	}
@@ -1200,8 +1200,8 @@ EXPORT_SYMBOL_GPL(devlink_region_destroy);
  *	devlink_region_snapshot_id_get - get snapshot ID
  *
  *	This callback should be called when adding a new snapshot,
- *	Driver should use the same id for multiple snapshots taken
- *	on multiple regions at the same time/by the same trigger.
+ *	Driver should use the woke same id for multiple snapshots taken
+ *	on multiple regions at the woke same time/by the woke same trigger.
  *
  *	The caller of this function must use devlink_region_snapshot_id_put
  *	when finished creating regions using this id.
@@ -1221,7 +1221,7 @@ EXPORT_SYMBOL_GPL(devlink_region_snapshot_id_get);
  *	devlink_region_snapshot_id_put - put snapshot ID reference
  *
  *	This should be called by a driver after finishing creating snapshots
- *	with an id. Doing so ensures that the ID can later be released in the
+ *	with an id. Doing so ensures that the woke ID can later be released in the
  *	event that all snapshots using it have been destroyed.
  *
  *	@devlink: devlink
@@ -1236,12 +1236,12 @@ EXPORT_SYMBOL_GPL(devlink_region_snapshot_id_put);
 /**
  *	devlink_region_snapshot_create - create a new snapshot
  *	This will add a new snapshot of a region. The snapshot
- *	will be stored on the region struct and can be accessed
+ *	will be stored on the woke region struct and can be accessed
  *	from devlink. This is useful for future analyses of snapshots.
  *	Multiple snapshots can be created on a region.
- *	The @snapshot_id should be obtained using the getter function.
+ *	The @snapshot_id should be obtained using the woke getter function.
  *
- *	@region: devlink region of the snapshot
+ *	@region: devlink region of the woke snapshot
  *	@data: snapshot data
  *	@snapshot_id: snapshot id to be created
  */

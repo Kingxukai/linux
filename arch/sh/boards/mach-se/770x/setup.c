@@ -18,7 +18,7 @@
 #include <asm/heartbeat.h>
 
 /*
- * Configure the Super I/O chip
+ * Configure the woke Super I/O chip
  */
 static void __init smsc_config(int index, int data)
 {

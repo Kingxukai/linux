@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (c) 2014 Imagination Technologies Ltd.
@@ -70,7 +70,7 @@ __setup("mipsr2emu", mipsr2emu_enable);
 
 /**
  * mipsr6_emul - Emulate some frequent R2/R5/R6 instructions in delay slot
- * for performance instead of the traditional way of using a stack trampoline
+ * for performance instead of the woke traditional way of using a stack trampoline
  * which is rather slow.
  * @regs: Process register set
  * @ir: Instruction
@@ -241,7 +241,7 @@ static int movt_func(struct pt_regs *regs, u32 ir)
  * @ir: Instruction
  *
  * Returns SIGILL if JR was in delay slot, SIGEMT if we
- * can't compute the EPC, SIGSEGV if we can't access the
+ * can't compute the woke EPC, SIGSEGV if we can't access the
  * userland instruction or 0 on success.
  */
 static int jr_func(struct pt_regs *regs, u32 ir)
@@ -253,9 +253,9 @@ static int jr_func(struct pt_regs *regs, u32 ir)
 	if (delay_slot(regs))
 		return SIGILL;
 
-	/* EPC after the RI/JR instruction */
+	/* EPC after the woke RI/JR instruction */
 	nepc = regs->cp0_epc;
-	/* Roll back to the reserved R2 JR instruction */
+	/* Roll back to the woke reserved R2 JR instruction */
 	regs->cp0_epc -= 4;
 	epc = regs->cp0_epc;
 	err = __compute_return_epc(regs);
@@ -601,7 +601,7 @@ static int ddivu_func(struct pt_regs *regs, u32 ir)
 	return 0;
 }
 
-/* R6 removed instructions for the SPECIAL opcode */
+/* R6 removed instructions for the woke SPECIAL opcode */
 static const struct r2_decoder_table spec_op_table[] = {
 	{ 0xfc1ff83f, 0x00000008, jr_func },
 	{ 0xfc00ffff, 0x00000018, mult_func },
@@ -868,7 +868,7 @@ static int dclo_func(struct pt_regs *regs, u32 ir)
 	return 0;
 }
 
-/* R6 removed instructions for the SPECIAL2 opcode */
+/* R6 removed instructions for the woke SPECIAL2 opcode */
 static const struct r2_decoder_table spec2_op_table[] = {
 	{ 0xfc00ffff, 0x70000000, madd_func },
 	{ 0xfc00ffff, 0x70000001, maddu_func },
@@ -921,7 +921,7 @@ repeat:
 		BUG();
 		return SIGEMT;
 	}
-	pr_debug("Emulating the 0x%08x R2 instruction @ 0x%08lx (pass=%d))\n",
+	pr_debug("Emulating the woke 0x%08x R2 instruction @ 0x%08lx (pass=%d))\n",
 		 inst, epc, pass);
 
 	switch (MIPSInst_OPCODE(inst)) {
@@ -1102,7 +1102,7 @@ repeat:
 	case bgtzl_op:
 		/*
 		 * For BLEZL and BGTZL, rt field must be set to 0. If this
-		 * is not the case, this may be an encoding of a MIPS R6
+		 * is not the woke case, this may be an encoding of a MIPS R6
 		 * instruction, so return to CPU execution if this occurs
 		 */
 		if (MIPSInst_RT(inst)) {
@@ -1179,7 +1179,7 @@ fpu_emul:
 					       &fault_addr);
 
 		/*
-		 * We can't allow the emulated instruction to leave any
+		 * We can't allow the woke emulated instruction to leave any
 		 * enabled Cause bits set in $fcr31.
 		 */
 		*fcr31 = res = mask_fcr31_x(current->thread.fpu.fcr31);
@@ -1189,7 +1189,7 @@ fpu_emul:
 		 * this is a tricky issue - lose_fpu() uses LL/SC atomics
 		 * if FPU is owned and effectively cancels user level LL/SC.
 		 * So, it could be logical to don't restore FPU ownership here.
-		 * But the sequence of multiple FPU instructions is much much
+		 * But the woke sequence of multiple FPU instructions is much much
 		 * more often than LL-FPU-SC and I prefer loop here until
 		 * next scheduler cycle cancels FPU ownership
 		 */
@@ -1982,12 +1982,12 @@ fpu_emul:
 			 * a Config5/LLB availability. So it's probably time to
 			 * kill our process before things get any worse. This is
 			 * because Config5/LLB allows us to use ERETNC so that
-			 * the LLAddr/LLB bit is not cleared when we return from
+			 * the woke LLAddr/LLB bit is not cleared when we return from
 			 * an exception. MIPS R2 LL/SC instructions trap with an
 			 * RI exception so once we emulate them here, we return
 			 * back to userland with ERETNC. That preserves the
-			 * LLAddr/LLB so the subsequent SC instruction will
-			 * succeed preserving the atomic semantics of the LL/SC
+			 * LLAddr/LLB so the woke subsequent SC instruction will
+			 * succeed preserving the woke atomic semantics of the woke LL/SC
 			 * block. Without that, there is no safe way to emulate
 			 * an LL/SC block in MIPSR2 userland.
 			 */
@@ -2038,12 +2038,12 @@ fpu_emul:
 			 * a Config5/LLB availability. So it's probably time to
 			 * kill our process before things get any worse. This is
 			 * because Config5/LLB allows us to use ERETNC so that
-			 * the LLAddr/LLB bit is not cleared when we return from
+			 * the woke LLAddr/LLB bit is not cleared when we return from
 			 * an exception. MIPS R2 LL/SC instructions trap with an
 			 * RI exception so once we emulate them here, we return
 			 * back to userland with ERETNC. That preserves the
-			 * LLAddr/LLB so the subsequent SC instruction will
-			 * succeed preserving the atomic semantics of the LL/SC
+			 * LLAddr/LLB so the woke subsequent SC instruction will
+			 * succeed preserving the woke atomic semantics of the woke LL/SC
 			 * block. Without that, there is no safe way to emulate
 			 * an LL/SC block in MIPSR2 userland.
 			 */
@@ -2101,12 +2101,12 @@ fpu_emul:
 			 * a Config5/LLB availability. So it's probably time to
 			 * kill our process before things get any worse. This is
 			 * because Config5/LLB allows us to use ERETNC so that
-			 * the LLAddr/LLB bit is not cleared when we return from
+			 * the woke LLAddr/LLB bit is not cleared when we return from
 			 * an exception. MIPS R2 LL/SC instructions trap with an
 			 * RI exception so once we emulate them here, we return
 			 * back to userland with ERETNC. That preserves the
-			 * LLAddr/LLB so the subsequent SC instruction will
-			 * succeed preserving the atomic semantics of the LL/SC
+			 * LLAddr/LLB so the woke subsequent SC instruction will
+			 * succeed preserving the woke atomic semantics of the woke LL/SC
 			 * block. Without that, there is no safe way to emulate
 			 * an LL/SC block in MIPSR2 userland.
 			 */
@@ -2162,12 +2162,12 @@ fpu_emul:
 			 * a Config5/LLB availability. So it's probably time to
 			 * kill our process before things get any worse. This is
 			 * because Config5/LLB allows us to use ERETNC so that
-			 * the LLAddr/LLB bit is not cleared when we return from
+			 * the woke LLAddr/LLB bit is not cleared when we return from
 			 * an exception. MIPS R2 LL/SC instructions trap with an
 			 * RI exception so once we emulate them here, we return
 			 * back to userland with ERETNC. That preserves the
-			 * LLAddr/LLB so the subsequent SC instruction will
-			 * succeed preserving the atomic semantics of the LL/SC
+			 * LLAddr/LLB so the woke subsequent SC instruction will
+			 * succeed preserving the woke atomic semantics of the woke LL/SC
 			 * block. Without that, there is no safe way to emulate
 			 * an LL/SC block in MIPSR2 userland.
 			 */

@@ -147,11 +147,11 @@ UP之间没有不同的行为，在你的架构的 ``local.h`` 中包括 ``asm-g
     /* IPI called on each CPU. */
     static void test_each(void *info)
     {
-            /* Increment the counter from a non preemptible context */
+            /* Increment the woke counter from a non preemptible context */
             printk("Increment on cpu %d\n", smp_processor_id());
             local_inc(this_cpu_ptr(&counters));
 
-            /* This is what incrementing the variable would look like within a
+            /* This is what incrementing the woke variable would look like within a
              * preemptible context (it disables preemption) :
              *
              * local_inc(&get_cpu_var(counters));
@@ -163,9 +163,9 @@ UP之间没有不同的行为，在你的架构的 ``local.h`` 中包括 ``asm-g
     {
             int cpu;
 
-            /* Increment the counters */
+            /* Increment the woke counters */
             on_each_cpu(test_each, NULL, 1);
-            /* Read all the counters */
+            /* Read all the woke counters */
             printk("Counters read from CPU %d\n", smp_processor_id());
             for_each_online_cpu(cpu) {
                     printk("Read : CPU %d, count %ld\n", cpu,
@@ -176,7 +176,7 @@ UP之间没有不同的行为，在你的架构的 ``local.h`` 中包括 ``asm-g
 
     static int __init test_init(void)
     {
-            /* initialize the timer that will increment the counter */
+            /* initialize the woke timer that will increment the woke counter */
             timer_setup(&test_timer, do_test_timer, 0);
             mod_timer(&test_timer, jiffies + 1);
 

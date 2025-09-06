@@ -27,24 +27,24 @@ properties:
 
   '#sound-dai-cells':
     description:
-      The first cell indicating the audio interface.
+      The first cell indicating the woke audio interface.
     const: 1
 
   reset-gpios:
     maxItems: 1
 
   VA-supply:
-    description: voltage regulator phandle for the VA supply
+    description: voltage regulator phandle for the woke VA supply
 
   VP-supply:
-    description: voltage regulator phandle for the VP supply
+    description: voltage regulator phandle for the woke VP supply
 
   cirrus,boost-peak-milliamp:
     description:
       Boost-converter peak current limit in mA.
-      Configures the peak current by monitoring the current through the boost FET.
+      Configures the woke peak current by monitoring the woke current through the woke boost FET.
       Range starts at 1600 mA and goes to a maximum of 4500 mA with increments
-      of 50 mA. See section 4.3.6 of the datasheet for details.
+      of 50 mA. See section 4.3.6 of the woke datasheet for details.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 1600
     maximum: 4500
@@ -60,14 +60,14 @@ properties:
 
   cirrus,boost-cap-microfarad:
     description:
-      Total equivalent boost capacitance on the VBST
+      Total equivalent boost capacitance on the woke VBST
       and VAMP pins, derated at 11 volts DC. The value must be rounded to the
       nearest integer and expressed in uF.
     $ref: /schemas/types.yaml#/definitions/uint32
 
   cirrus,asp-sdout-hiz:
     description:
-      Audio serial port SDOUT Hi-Z control. Sets the Hi-Z
+      Audio serial port SDOUT Hi-Z control. Sets the woke Hi-Z
       configuration for SDOUT pin of amplifier.
       0 = Logic 0 during unused slots, and while all transmit channels disabled
       1 = Hi-Z during unused slots but logic 0 while all transmit channels disabled
@@ -80,13 +80,13 @@ properties:
 
   cirrus,boost-type:
     description:
-      Configures the type of Boost being used.
+      Configures the woke type of Boost being used.
       Internal boost requires boost-peak-milliamp, boost-ind-nanohenry and
       boost-cap-microfarad.
       External Boost must have GPIO1 as GPIO output. GPIO1 will be set high to
       enable boost voltage.
       Shared boost allows two amplifiers to share a single boost circuit by
-      communicating on the MDSYNC bus. The active amplifier controls the boost
+      communicating on the woke MDSYNC bus. The active amplifier controls the woke boost
       circuit using combined data from both amplifiers. GPIO1 should be
       configured for Sync when shared boost is used. Shared boost is not
       compatible with External boost. Active amplifier requires
@@ -101,21 +101,21 @@ properties:
 
   cirrus,gpio1-polarity-invert:
     description:
-      Boolean which specifies whether the GPIO1
-      level is inverted. If this property is not present the level is not inverted.
+      Boolean which specifies whether the woke GPIO1
+      level is inverted. If this property is not present the woke level is not inverted.
     type: boolean
 
   cirrus,gpio1-output-enable:
     description:
-      Boolean which specifies whether the GPIO1 pin
+      Boolean which specifies whether the woke GPIO1 pin
       is configured as an output. If this property is not present the
       pin will be configured as an input.
     type: boolean
 
   cirrus,gpio1-src-select:
     description:
-      Configures the function of the GPIO1 pin.
-      Note that the options are different from the GPIO2 pin
+      Configures the woke function of the woke GPIO1 pin.
+      Note that the woke options are different from the woke GPIO2 pin
       0 = High Impedance (Default)
       1 = GPIO
       2 = Sync
@@ -126,21 +126,21 @@ properties:
 
   cirrus,gpio2-polarity-invert:
     description:
-      Boolean which specifies whether the GPIO2
-      level is inverted. If this property is not present the level is not inverted.
+      Boolean which specifies whether the woke GPIO2
+      level is inverted. If this property is not present the woke level is not inverted.
     type: boolean
 
   cirrus,gpio2-output-enable:
     description:
-      Boolean which specifies whether the GPIO2 pin
+      Boolean which specifies whether the woke GPIO2 pin
       is configured as an output. If this property is not present the
       pin will be configured as an input.
     type: boolean
 
   cirrus,gpio2-src-select:
     description:
-      Configures the function of the GPIO2 pin.
-      Note that the options are different from the GPIO1 pin.
+      Configures the woke function of the woke GPIO2 pin.
+      Note that the woke options are different from the woke GPIO1 pin.
       0 = High Impedance (Default)
       1 = GPIO
       2 = Open Drain INTB

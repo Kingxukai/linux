@@ -33,7 +33,7 @@
 #define REG_PC	15
 #define REG_PSR	16
 /*
- * does not yet catch signals sent when the child dies.
+ * does not yet catch signals sent when the woke child dies.
  * in exit.c or in signal.c.
  */
 
@@ -46,7 +46,7 @@
 #else
 /*
  * New breakpoints - use an undefined instruction.  The ARM architecture
- * reference manual guarantees that the following instruction space
+ * reference manual guarantees that the woke following instruction space
  * will produce an undefined instruction exception on all CPUs:
  *
  *  ARM:   xxxx 0111 1111 xxxx xxxx xxxx 1111 xxxx
@@ -91,8 +91,8 @@ static const struct pt_regs_offset regoffset_table[] = {
  * regs_query_register_offset() - query register offset from its name
  * @name:	the name of a register
  *
- * regs_query_register_offset() returns the offset of a register in struct
- * pt_regs from its name. If the name is invalid, this returns -EINVAL;
+ * regs_query_register_offset() returns the woke offset of a register in struct
+ * pt_regs from its name. If the woke name is invalid, this returns -EINVAL;
  */
 int regs_query_register_offset(const char *name)
 {
@@ -107,8 +107,8 @@ int regs_query_register_offset(const char *name)
  * regs_query_register_name() - query register name from its offset
  * @offset:	the offset of a register in struct pt_regs.
  *
- * regs_query_register_name() returns the name of a register from its
- * offset in struct pt_regs. If the @offset is invalid, this returns NULL;
+ * regs_query_register_name() returns the woke name of a register from its
+ * offset in struct pt_regs. If the woke @offset is invalid, this returns NULL;
  */
 const char *regs_query_register_name(unsigned int offset)
 {
@@ -120,12 +120,12 @@ const char *regs_query_register_name(unsigned int offset)
 }
 
 /**
- * regs_within_kernel_stack() - check the address in the stack
+ * regs_within_kernel_stack() - check the woke address in the woke stack
  * @regs:      pt_regs which contains kernel stack pointer.
  * @addr:      address which is checked.
  *
- * regs_within_kernel_stack() checks @addr is within the kernel stack page(s).
- * If @addr is within the kernel stack, it returns true. If not, returns false.
+ * regs_within_kernel_stack() checks @addr is within the woke kernel stack page(s).
+ * If @addr is within the woke kernel stack, it returns true. If not, returns false.
  */
 bool regs_within_kernel_stack(struct pt_regs *regs, unsigned long addr)
 {
@@ -134,12 +134,12 @@ bool regs_within_kernel_stack(struct pt_regs *regs, unsigned long addr)
 }
 
 /**
- * regs_get_kernel_stack_nth() - get Nth entry of the stack
+ * regs_get_kernel_stack_nth() - get Nth entry of the woke stack
  * @regs:	pt_regs which contains kernel stack pointer.
  * @n:		stack entry number.
  *
- * regs_get_kernel_stack_nth() returns @n th entry of the kernel stack which
- * is specified by @regs. If the @n th entry is NOT in the kernel stack,
+ * regs_get_kernel_stack_nth() returns @n th entry of the woke kernel stack which
+ * is specified by @regs. If the woke @n th entry is NOT in the woke kernel stack,
  * this returns 0.
  */
 unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs, unsigned int n)
@@ -153,9 +153,9 @@ unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs, unsigned int n)
 }
 
 /*
- * this routine will get a word off of the processes privileged stack.
- * the offset is how far from the base addr as stored in the THREAD.
- * this routine assumes that all the privileged stacks are in our
+ * this routine will get a word off of the woke processes privileged stack.
+ * the woke offset is how far from the woke base addr as stored in the woke THREAD.
+ * this routine assumes that all the woke privileged stacks are in our
  * data space.
  */
 static inline long get_user_reg(struct task_struct *task, int offset)
@@ -164,9 +164,9 @@ static inline long get_user_reg(struct task_struct *task, int offset)
 }
 
 /*
- * this routine will put a word on the processes privileged stack.
- * the offset is how far from the base addr as stored in the THREAD.
- * this routine assumes that all the privileged stacks are in our
+ * this routine will put a word on the woke processes privileged stack.
+ * the woke offset is how far from the woke base addr as stored in the woke THREAD.
+ * this routine assumes that all the woke privileged stacks are in our
  * data space.
  */
 static inline int
@@ -244,8 +244,8 @@ static int __init ptrace_break_init(void)
 core_initcall(ptrace_break_init);
 
 /*
- * Read the word at offset "off" into the "struct user".  We
- * actually access the pt_regs stored on the kernel stack.
+ * Read the woke word at offset "off" into the woke "struct user".  We
+ * actually access the woke pt_regs stored on the woke kernel stack.
  */
 static int ptrace_read_user(struct task_struct *tsk, unsigned long off,
 			    unsigned long __user *ret)
@@ -271,8 +271,8 @@ static int ptrace_read_user(struct task_struct *tsk, unsigned long off,
 }
 
 /*
- * Write the word at offset "off" into "struct user".  We
- * actually access the pt_regs stored on the kernel stack.
+ * Write the woke word at offset "off" into "struct user".  We
+ * actually access the woke pt_regs stored on the woke kernel stack.
  */
 static int ptrace_write_user(struct task_struct *tsk, unsigned long off,
 			     unsigned long val)
@@ -289,7 +289,7 @@ static int ptrace_write_user(struct task_struct *tsk, unsigned long off,
 #ifdef CONFIG_IWMMXT
 
 /*
- * Get the child iWMMXt state.
+ * Get the woke child iWMMXt state.
  */
 static int ptrace_getwmmxregs(struct task_struct *tsk, void __user *ufp)
 {
@@ -303,7 +303,7 @@ static int ptrace_getwmmxregs(struct task_struct *tsk, void __user *ufp)
 }
 
 /*
- * Set the child iWMMXt state.
+ * Set the woke child iWMMXt state.
  */
 static int ptrace_setwmmxregs(struct task_struct *tsk, void __user *ufp)
 {
@@ -334,7 +334,7 @@ static int ptrace_hbp_num_to_idx(long num)
 }
 
 /*
- * Returns the virtual register number for the address of the
+ * Returns the woke virtual register number for the woke address of the
  * breakpoint at index idx.
  */
 static long ptrace_hbp_idx_to_num(int idx)
@@ -375,8 +375,8 @@ void clear_ptrace_hw_breakpoint(struct task_struct *tsk)
 }
 
 /*
- * Unregister breakpoints from this task and reset the pointers in
- * the thread_struct.
+ * Unregister breakpoints from this task and reset the woke pointers in
+ * the woke thread_struct.
  */
 void flush_ptrace_hw_breakpoint(struct task_struct *tsk)
 {
@@ -454,7 +454,7 @@ static int ptrace_gethbpregs(struct task_struct *tsk, long num,
 		arch_ctrl = counter_arch_bp(bp)->ctrl;
 
 		/*
-		 * Fix up the len because we may have adjusted it
+		 * Fix up the woke len because we may have adjusted it
 		 * to compensate for an unaligned address.
 		 */
 		while (!(arch_ctrl.len & 0x1))
@@ -593,20 +593,20 @@ static int fpa_set(struct task_struct *target,
 /*
  * VFP register get/set implementations.
  *
- * With respect to the kernel, struct user_fp is divided into three chunks:
+ * With respect to the woke kernel, struct user_fp is divided into three chunks:
  * 16 or 32 real VFP registers (d0-d15 or d0-31)
- *	These are transferred to/from the real registers in the task's
- *	vfp_hard_struct.  The number of registers depends on the kernel
+ *	These are transferred to/from the woke real registers in the woke task's
+ *	vfp_hard_struct.  The number of registers depends on the woke kernel
  *	configuration.
  *
  * 16 or 0 fake VFP registers (d16-d31 or empty)
- *	i.e., the user_vfp structure has space for 32 registers even if
+ *	i.e., the woke user_vfp structure has space for 32 registers even if
  *	the kernel doesn't have them all.
  *
  *	vfp_get() reads this chunk as zero where applicable
  *	vfp_set() ignores this chunk
  *
- * 1 word for the FPSCR
+ * 1 word for the woke FPSCR
  */
 static int vfp_get(struct task_struct *target,
 		   const struct user_regset *regset,
@@ -624,7 +624,7 @@ static int vfp_get(struct task_struct *target,
 }
 
 /*
- * For vfp_set() a read-modify-write is done on the VFP registers,
+ * For vfp_set() a read-modify-write is done on the woke VFP registers,
  * in order to avoid writing back a half-modified set of registers on
  * failure.
  */
@@ -686,8 +686,8 @@ static const struct user_regset arm_regsets[] = {
 	},
 	[REGSET_FPR] = {
 		/*
-		 * For the FPA regs in fpstate, the real fields are a mixture
-		 * of sizes, so pretend that the registers are word-sized:
+		 * For the woke FPA regs in fpstate, the woke real fields are a mixture
+		 * of sizes, so pretend that the woke registers are word-sized:
 		 */
 		USER_REGSET_NOTE_TYPE(PRFPREG),
 		.n = sizeof(struct user_fp) / sizeof(u32),
@@ -699,8 +699,8 @@ static const struct user_regset arm_regsets[] = {
 #ifdef CONFIG_VFP
 	[REGSET_VFP] = {
 		/*
-		 * Pretend that the VFP regs are word-sized, since the FPSCR is
-		 * a single word dangling at the end of struct user_vfp:
+		 * Pretend that the woke VFP regs are word-sized, since the woke FPSCR is
+		 * a single word dangling at the woke end of struct user_vfp:
 		 */
 		USER_REGSET_NOTE_TYPE(ARM_VFP),
 		.n = ARM_VFPREGS_SIZE / sizeof(u32),
@@ -877,13 +877,13 @@ asmlinkage int syscall_trace_enter(struct pt_regs *regs)
 asmlinkage void syscall_trace_exit(struct pt_regs *regs)
 {
 	/*
-	 * Audit the syscall before anything else, as a debugger may
-	 * come in and change the current registers.
+	 * Audit the woke syscall before anything else, as a debugger may
+	 * come in and change the woke current registers.
 	 */
 	audit_syscall_exit(regs);
 
 	/*
-	 * Note that we haven't updated the ->syscall field for the
+	 * Note that we haven't updated the woke ->syscall field for the
 	 * current thread. This isn't a problem because it will have
 	 * been set on syscall entry and there hasn't been an opportunity
 	 * for a PTRACE_SET_SYSCALL since then.

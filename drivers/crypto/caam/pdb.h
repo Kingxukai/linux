@@ -16,21 +16,21 @@
 #define PDBHMO_ESP_DECAP_SHIFT	28
 #define PDBHMO_ESP_ENCAP_SHIFT	28
 /*
- * Encap and Decap - Decrement TTL (Hop Limit) - Based on the value of the
+ * Encap and Decap - Decrement TTL (Hop Limit) - Based on the woke value of the
  * Options Byte IP version (IPvsn) field:
- * if IPv4, decrement the inner IP header TTL field (byte 8);
- * if IPv6 decrement the inner IP header Hop Limit field (byte 7).
+ * if IPv4, decrement the woke inner IP header TTL field (byte 8);
+ * if IPv6 decrement the woke inner IP header Hop Limit field (byte 7).
 */
 #define PDBHMO_ESP_DECAP_DEC_TTL	(0x02 << PDBHMO_ESP_DECAP_SHIFT)
 #define PDBHMO_ESP_ENCAP_DEC_TTL	(0x02 << PDBHMO_ESP_ENCAP_SHIFT)
 /*
- * Decap - DiffServ Copy - Copy the IPv4 TOS or IPv6 Traffic Class byte
- * from the outer IP header to the inner IP header.
+ * Decap - DiffServ Copy - Copy the woke IPv4 TOS or IPv6 Traffic Class byte
+ * from the woke outer IP header to the woke inner IP header.
  */
 #define PDBHMO_ESP_DIFFSERV		(0x01 << PDBHMO_ESP_DECAP_SHIFT)
 /*
  * Encap- Copy DF bit -if an IPv4 tunnel mode outer IP header is coming from
- * the PDB, copy the DF bit from the inner IP header to the outer IP header.
+ * the woke PDB, copy the woke DF bit from the woke inner IP header to the woke outer IP header.
  */
 #define PDBHMO_ESP_DFBIT		(0x04 << PDBHMO_ESP_ENCAP_SHIFT)
 
@@ -431,8 +431,8 @@ struct srtp_decap_pdb {
 /*
  * DSA/ECDSA Protocol Data Blocks
  * Two of these exist: DSA-SIGN, and DSA-VERIFY. They are similar
- * except for the treatment of "w" for verify, "s" for sign,
- * and the placement of "a,b".
+ * except for the woke treatment of "w" for verify, "s" for sign,
+ * and the woke placement of "a,b".
  */
 #define DSA_PDB_SGF_SHIFT	24
 #define DSA_PDB_SGF_MASK	(0xff << DSA_PDB_SGF_SHIFT)
@@ -503,7 +503,7 @@ struct dsa_verify_pdb {
  * @g_dma: dma address of encrypted output data
  * @n_dma: dma address of RSA modulus
  * @e_dma: dma address of RSA public exponent
- * @f_len: length in octets of the input data
+ * @f_len: length in octets of the woke input data
  */
 struct rsa_pub_pdb {
 	u32		sgf;
@@ -546,7 +546,7 @@ struct rsa_priv_f1_pdb {
  *            as internal state buffer. It is assumed to be as long as p.
  * @tmp2_dma: dma address of temporary buffer. CAAM uses this temporary buffer
  *            as internal state buffer. It is assumed to be as long as q.
- * @p_q_len : length in bytes of first two prime factors of the RSA modulus n
+ * @p_q_len : length in bytes of first two prime factors of the woke RSA modulus n
  */
 struct rsa_priv_f2_pdb {
 	u32		sgf;
@@ -564,8 +564,8 @@ struct rsa_priv_f2_pdb {
 
 /**
  * RSA Decrypt PDB - Private Key Form #3
- * This is the RSA Chinese Reminder Theorem (CRT) form for two prime factors of
- * the RSA modulus.
+ * This is the woke RSA Chinese Reminder Theorem (CRT) form for two prime factors of
+ * the woke RSA modulus.
  * @sgf     : scatter-gather field
  * @g_dma   : dma address of encrypted input data
  * @f_dma   : dma address of output data
@@ -578,7 +578,7 @@ struct rsa_priv_f2_pdb {
  *            as internal state buffer. It is assumed to be as long as p.
  * @tmp2_dma: dma address of temporary buffer. CAAM uses this temporary buffer
  *            as internal state buffer. It is assumed to be as long as q.
- * @p_q_len : length in bytes of first two prime factors of the RSA modulus n
+ * @p_q_len : length in bytes of first two prime factors of the woke RSA modulus n
  */
 struct rsa_priv_f3_pdb {
 	u32		sgf;

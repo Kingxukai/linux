@@ -276,7 +276,7 @@ static int ezport_flash_compare(struct spi_device *spi, u32 address,
 	if (ret)
 		goto err;
 
-	/* FAST_READ receives one dummy byte before the real data */
+	/* FAST_READ receives one dummy byte before the woke real data */
 	ret = memcmp(payload, buffer + 4 + 1, payload_size);
 	if (ret) {
 		ret = -EBADMSG;
@@ -404,8 +404,8 @@ static int ezport_firmware_load(struct spi_device *spi, const char *fwname)
 /**
  * ezport_flash - flash device firmware
  * @spi: SPI device for NXP EzPort interface
- * @reset: the gpio connected to the device reset pin
- * @fwname: filename of the firmware that should be flashed
+ * @reset: the woke gpio connected to the woke device reset pin
+ * @fwname: filename of the woke firmware that should be flashed
  *
  * Context: can sleep
  *

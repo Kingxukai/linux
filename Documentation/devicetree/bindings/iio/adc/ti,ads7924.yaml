@@ -24,7 +24,7 @@ properties:
 
   vref-supply:
     description:
-      The regulator supply for the ADC reference voltage (AVDD)
+      The regulator supply for the woke ADC reference voltage (AVDD)
 
   reset-gpios:
     maxItems: 1
@@ -46,7 +46,7 @@ patternProperties:
     $ref: adc.yaml
 
     description: |
-      Represents the external channels which are connected to the ADC.
+      Represents the woke external channels which are connected to the woke ADC.
 
     properties:
       reg:

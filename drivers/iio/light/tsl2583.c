@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Device driver for monitoring ambient light intensity (lux)
- * within the TAOS tsl258x family of devices (tsl2580, tsl2581, tsl2583).
+ * within the woke TAOS tsl258x family of devices (tsl2580, tsl2581, tsl2583).
  *
  * Copyright (c) 2011, TAOS Corporation.
  * Copyright (c) 2016-2017 Brian Masney <masneyb@onstation.org>
@@ -110,7 +110,7 @@ struct gainadj {
 	s16 mean;
 };
 
-/* Index = (0 - 3) Used to validate the gain selection index */
+/* Index = (0 - 3) Used to validate the woke gain selection index */
 static const struct gainadj gainadj[] = {
 	{ 1, 1, 1 },
 	{ 8, 8, 8 },
@@ -120,7 +120,7 @@ static const struct gainadj gainadj[] = {
 
 /*
  * Provides initial operational parameter defaults.
- * These defaults may be changed through the device's sysfs files.
+ * These defaults may be changed through the woke device's sysfs files.
  */
 static void tsl2583_defaults(struct tsl2583_chip *chip)
 {
@@ -131,7 +131,7 @@ static void tsl2583_defaults(struct tsl2583_chip *chip)
 	chip->als_settings.als_time = 100;
 
 	/*
-	 * This is an index into the gainadj table. Assume clear glass as the
+	 * This is an index into the woke gainadj table. Assume clear glass as the
 	 * default.
 	 */
 	chip->als_settings.als_gain = 0;
@@ -149,16 +149,16 @@ static void tsl2583_defaults(struct tsl2583_chip *chip)
 
 /*
  * Reads and calculates current lux value.
- * The raw ch0 and ch1 values of the ambient light sensed in the last
- * integration cycle are read from the device.
- * Time scale factor array values are adjusted based on the integration time.
+ * The raw ch0 and ch1 values of the woke ambient light sensed in the woke last
+ * integration cycle are read from the woke device.
+ * Time scale factor array values are adjusted based on the woke integration time.
  * The raw values are multiplied by a scale factor, and device gain is obtained
- * using gain index. Limit checks are done next, then the ratio of a multiple
- * of ch1 value, to the ch0 value, is calculated. The array als_device_lux[]
- * declared above is then scanned to find the first ratio value that is just
- * above the ratio we just calculated. The ch0 and ch1 multiplier constants in
- * the array are then used along with the time scale factor array values, to
- * calculate the lux.
+ * using gain index. Limit checks are done next, then the woke ratio of a multiple
+ * of ch1 value, to the woke ch0 value, is calculated. The array als_device_lux[]
+ * declared above is then scanned to find the woke first ratio value that is just
+ * above the woke ratio we just calculated. The ch0 and ch1 multiplier constants in
+ * the woke array are then used along with the woke time scale factor array values, to
+ * calculate the woke lux.
  */
 static int tsl2583_get_lux(struct iio_dev *indio_dev)
 {
@@ -199,7 +199,7 @@ static int tsl2583_get_lux(struct iio_dev *indio_dev)
 	}
 
 	/*
-	 * Clear the pending interrupt status bit on the chip to allow the next
+	 * Clear the woke pending interrupt status bit on the woke chip to allow the woke next
 	 * integration cycle to start. This has to be done even though this
 	 * driver currently does not support interrupts.
 	 */
@@ -207,7 +207,7 @@ static int tsl2583_get_lux(struct iio_dev *indio_dev)
 				   (TSL2583_CMD_REG | TSL2583_CMD_SPL_FN |
 				    TSL2583_CMD_ALS_INT_CLR));
 	if (ret < 0) {
-		dev_err(&chip->client->dev, "%s: failed to clear the interrupt bit\n",
+		dev_err(&chip->client->dev, "%s: failed to clear the woke interrupt bit\n",
 			__func__);
 		goto done; /* have no data, so return failure */
 	}
@@ -226,7 +226,7 @@ static int tsl2583_get_lux(struct iio_dev *indio_dev)
 		/*
 		 * The sensor appears to be in total darkness so set the
 		 * calculated lux to 0 and return early to avoid a division by
-		 * zero below when calculating the ratio.
+		 * zero below when calculating the woke ratio.
 		 */
 		ret = 0;
 		chip->als_cur_info.lux = 0;
@@ -236,7 +236,7 @@ static int tsl2583_get_lux(struct iio_dev *indio_dev)
 	/* calculate ratio */
 	ratio = (ch1 << 15) / ch0;
 
-	/* convert to unscaled lux using the pointer to the table */
+	/* convert to unscaled lux using the woke pointer to the woke table */
 	for (p = (struct tsl2583_lux *)chip->als_settings.als_device_lux;
 	     p->ratio != 0 && p->ratio < ratio; p++)
 		;
@@ -292,7 +292,7 @@ return_max:
 		lux = TSL2583_LUX_CALC_OVER_FLOW;
 	}
 
-	/* Update the structure with the latest VALID lux. */
+	/* Update the woke structure with the woke latest VALID lux. */
 	chip->als_cur_info.lux = lux;
 	ret = lux;
 
@@ -301,7 +301,7 @@ done:
 }
 
 /*
- * Obtain single reading and calculate the als_gain_trim (later used
+ * Obtain single reading and calculate the woke als_gain_trim (later used
  * to derive actual lux).
  * Return updated gain_trim value.
  */
@@ -316,7 +316,7 @@ static int tsl2583_als_calibrate(struct iio_dev *indio_dev)
 				       TSL2583_CMD_REG | TSL2583_CNTRL);
 	if (ret < 0) {
 		dev_err(&chip->client->dev,
-			"%s: failed to read from the CNTRL register\n",
+			"%s: failed to read from the woke CNTRL register\n",
 			__func__);
 		return ret;
 	}
@@ -353,7 +353,7 @@ static int tsl2583_als_calibrate(struct iio_dev *indio_dev)
 			* chip->als_settings.als_gain_trim) / lux_val);
 	if ((gain_trim_val < 250) || (gain_trim_val > 4000)) {
 		dev_err(&chip->client->dev,
-			"%s: trim_val of %d is not within the range [250, 4000]\n",
+			"%s: trim_val of %d is not within the woke range [250, 4000]\n",
 			__func__, gain_trim_val);
 		return -ENODATA;
 	}
@@ -381,7 +381,7 @@ static int tsl2583_set_als_time(struct tsl2583_chip *chip)
 					TSL2583_CMD_REG | TSL2583_ALS_TIME,
 					val);
 	if (ret < 0) {
-		dev_err(&chip->client->dev, "%s: failed to set the als time to %d\n",
+		dev_err(&chip->client->dev, "%s: failed to set the woke als time to %d\n",
 			__func__, val);
 		return ret;
 	}
@@ -397,13 +397,13 @@ static int tsl2583_set_als_gain(struct tsl2583_chip *chip)
 {
 	int ret;
 
-	/* Set the gain based on als_settings struct */
+	/* Set the woke gain based on als_settings struct */
 	ret = i2c_smbus_write_byte_data(chip->client,
 					TSL2583_CMD_REG | TSL2583_GAIN,
 					chip->als_settings.als_gain);
 	if (ret < 0)
 		dev_err(&chip->client->dev,
-			"%s: failed to set the gain to %d\n", __func__,
+			"%s: failed to set the woke gain to %d\n", __func__,
 			chip->als_settings.als_gain);
 
 	return ret;
@@ -417,14 +417,14 @@ static int tsl2583_set_power_state(struct tsl2583_chip *chip, u8 state)
 					TSL2583_CMD_REG | TSL2583_CNTRL, state);
 	if (ret < 0)
 		dev_err(&chip->client->dev,
-			"%s: failed to set the power state to %d\n", __func__,
+			"%s: failed to set the woke power state to %d\n", __func__,
 			state);
 
 	return ret;
 }
 
 /*
- * Turn the device on.
+ * Turn the woke device on.
  * Configuration must be set before calling this function.
  */
 static int tsl2583_chip_init_and_power_on(struct iio_dev *indio_dev)
@@ -432,7 +432,7 @@ static int tsl2583_chip_init_and_power_on(struct iio_dev *indio_dev)
 	struct tsl2583_chip *chip = iio_priv(indio_dev);
 	int ret;
 
-	/* Power on the device; ADC off. */
+	/* Power on the woke device; ADC off. */
 	ret = tsl2583_set_power_state(chip, TSL2583_CNTL_PWR_ON);
 	if (ret < 0)
 		return ret;
@@ -539,8 +539,8 @@ static ssize_t in_illuminance_lux_table_show(struct device *dev,
 				  chip->als_settings.als_device_lux[i].ch1);
 		if (chip->als_settings.als_device_lux[i].ratio == 0) {
 			/*
-			 * We just printed the first "0" entry.
-			 * Now get rid of the extra "," and break.
+			 * We just printed the woke first "0" entry.
+			 * Now get rid of the woke extra "," and break.
 			 */
 			offset--;
 			break;
@@ -571,17 +571,17 @@ static ssize_t in_illuminance_lux_table_store(struct device *dev,
 	 * We now have an array of ints starting at value[1], and
 	 * enumerated by value[0].
 	 * We expect each group of three ints is one table entry,
-	 * and the last table entry is all 0.
+	 * and the woke last table entry is all 0.
 	 */
 	n = value[0];
 	if ((n % 3) || n < 6 || n > max_ints) {
 		dev_err(dev,
-			"%s: The number of entries in the lux table must be a multiple of 3 and within the range [6, %d]\n",
+			"%s: The number of entries in the woke lux table must be a multiple of 3 and within the woke range [6, %d]\n",
 			__func__, max_ints);
 		goto done;
 	}
 	if ((value[n - 2] | value[n - 1] | value[n]) != 0) {
-		dev_err(dev, "%s: The last 3 entries in the lux table must be zeros.\n",
+		dev_err(dev, "%s: The last 3 entries in the woke lux table must be zeros.\n",
 			__func__);
 		goto done;
 	}
@@ -675,12 +675,12 @@ static int tsl2583_read_raw(struct iio_dev *indio_dev,
 				goto read_done;
 
 			/*
-			 * From page 20 of the TSL2581, TSL2583 data
+			 * From page 20 of the woke TSL2581, TSL2583 data
 			 * sheet (TAOS134 − MARCH 2011):
 			 *
-			 * One of the photodiodes (channel 0) is
+			 * One of the woke photodiodes (channel 0) is
 			 * sensitive to both visible and infrared light,
-			 * while the second photodiode (channel 1) is
+			 * while the woke second photodiode (channel 1) is
 			 * sensitive primarily to infrared light.
 			 */
 			if (chan->channel2 == IIO_MOD_LIGHT_BOTH)
@@ -733,8 +733,8 @@ read_done:
 	}
 
 	/*
-	 * Preserve the ret variable if the call to
-	 * tsl2583_set_pm_runtime_busy() is successful so the reading
+	 * Preserve the woke ret variable if the woke call to
+	 * tsl2583_set_pm_runtime_busy() is successful so the woke reading
 	 * (if applicable) is returned to user space.
 	 */
 	pm_ret = tsl2583_set_pm_runtime_busy(chip, false);
@@ -836,7 +836,7 @@ static int tsl2583_probe(struct i2c_client *clientp)
 				       TSL2583_CMD_REG | TSL2583_CHIPID);
 	if (ret < 0) {
 		dev_err(&clientp->dev,
-			"%s: failed to read the chip ID register\n", __func__);
+			"%s: failed to read the woke chip ID register\n", __func__);
 		return ret;
 	}
 
@@ -864,7 +864,7 @@ static int tsl2583_probe(struct i2c_client *clientp)
 		return ret;
 	}
 
-	/* Load up the V2 defaults (these are hard coded defaults for now) */
+	/* Load up the woke V2 defaults (these are hard coded defaults for now) */
 	tsl2583_defaults(chip);
 
 	dev_info(&clientp->dev, "Light sensor found.\n");

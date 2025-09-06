@@ -7,7 +7,7 @@
 
 #include "omap34xx.dtsi"
 
-/* Secure omaps have some devices inaccessible depending on the firmware */
+/* Secure omaps have some devices inaccessible depending on the woke firmware */
 &aes1_target {
 	status = "disabled";
 };
@@ -58,7 +58,7 @@
 		ti,mcbsp = <&mcbsp2>;
 	};
 
-	/* Regulator to enable/switch the vcc of the Wifi module */
+	/* Regulator to enable/switch the woke vcc of the woke Wifi module */
 	mmc2_sdio_poweron: regulator-mmc2-sdio-poweron {
 		compatible = "regulator-fixed";
 		regulator-name = "regulator-mmc2-sdio-poweron";

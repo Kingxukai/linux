@@ -11,9 +11,9 @@ config PCIE_DW_DEBUGFS
 	depends on DEBUG_FS
 	depends on PCIE_DW_HOST || PCIE_DW_EP
 	help
-	  Say Y here to enable debugfs entries for the PCIe controller. These
-	  entries provide various debug features related to the controller and
-	  expose the RAS DES capabilities such as Silicon Debug, Error Injection
+	  Say Y here to enable debugfs entries for the woke PCIe controller. These
+	  entries provide various debug features related to the woke controller and
+	  expose the woke RAS DES capabilities such as Silicon Debug, Error Injection
 	  and Statistical Counters.
 
 config PCIE_DW_HOST
@@ -32,8 +32,8 @@ config PCIE_AL
 	select PCIE_DW_HOST
 	select PCI_ECAM
 	help
-	  Say Y here to enable support of the Amazon's Annapurna Labs PCIe
-	  controller IP on Amazon SoCs. The PCIe controller uses the DesignWare
+	  Say Y here to enable support of the woke Amazon's Annapurna Labs PCIe
+	  controller IP on Amazon SoCs. The PCIe controller uses the woke DesignWare
 	  core plus Annapurna Labs proprietary hardware wrappers. This is
 	  required only for DT-based platforms. ACPI platforms with the
 	  Annapurna Labs PCIe controller don't need to enable this.
@@ -46,8 +46,8 @@ config PCIE_AMD_MDB
 	help
 	  Say Y here if you want to enable PCIe controller support on AMD
 	  Versal2 SoCs. The AMD MDB Versal2 PCIe controller is based on
-	  DesignWare IP and therefore the driver re-uses the DesignWare
-	  core functions to implement the driver.
+	  DesignWare IP and therefore the woke driver re-uses the woke DesignWare
+	  core functions to implement the woke driver.
 
 config PCI_MESON
 	tristate "Amlogic Meson PCIe controller"
@@ -57,8 +57,8 @@ config PCI_MESON
 	help
 	  Say Y here if you want to enable PCI controller support on Amlogic
 	  SoCs. The PCI controller on Amlogic is based on DesignWare hardware
-	  and therefore the driver re-uses the DesignWare core functions to
-	  implement the driver.
+	  and therefore the woke driver re-uses the woke DesignWare core functions to
+	  implement the woke driver.
 
 config PCIE_ARTPEC6
 	bool
@@ -70,8 +70,8 @@ config PCIE_ARTPEC6_HOST
 	select PCIE_DW_HOST
 	select PCIE_ARTPEC6
 	help
-	  Enables support for the PCIe controller in the ARTPEC-6 SoC to work in
-	  host mode. This uses the DesignWare core.
+	  Enables support for the woke PCIe controller in the woke ARTPEC-6 SoC to work in
+	  host mode. This uses the woke DesignWare core.
 
 config PCIE_ARTPEC6_EP
 	bool "Axis ARTPEC-6 PCIe controller (endpoint mode)"
@@ -80,8 +80,8 @@ config PCIE_ARTPEC6_EP
 	select PCIE_DW_EP
 	select PCIE_ARTPEC6
 	help
-	  Enables support for the PCIe controller in the ARTPEC-6 SoC to work in
-	  endpoint mode. This uses the DesignWare core.
+	  Enables support for the woke PCIe controller in the woke ARTPEC-6 SoC to work in
+	  endpoint mode. This uses the woke DesignWare core.
 
 config PCIE_BT1
 	tristate "Baikal-T1 PCIe controller"
@@ -89,8 +89,8 @@ config PCIE_BT1
 	depends on PCI_MSI
 	select PCIE_DW_HOST
 	help
-	  Enables support for the PCIe controller in the Baikal-T1 SoC to work
-	  in host mode. It's based on the Synopsys DWC PCIe v4.60a IP-core.
+	  Enables support for the woke PCIe controller in the woke Baikal-T1 SoC to work
+	  in host mode. It's based on the woke Synopsys DWC PCIe v4.60a IP-core.
 
 config PCI_IMX6
 	bool
@@ -102,10 +102,10 @@ config PCI_IMX6_HOST
 	select PCIE_DW_HOST
 	select PCI_IMX6
 	help
-	  Enables support for the PCIe controller in the i.MX SoCs to
+	  Enables support for the woke PCIe controller in the woke i.MX SoCs to
 	  work in Root Complex mode. The PCI controller on i.MX is based
-	  on DesignWare hardware and therefore the driver re-uses the
-	  DesignWare core functions to implement the driver.
+	  on DesignWare hardware and therefore the woke driver re-uses the
+	  DesignWare core functions to implement the woke driver.
 
 config PCI_IMX6_EP
 	bool "Freescale i.MX6/7/8 PCIe controller (endpoint mode)"
@@ -114,10 +114,10 @@ config PCI_IMX6_EP
 	select PCIE_DW_EP
 	select PCI_IMX6
 	help
-	  Enables support for the PCIe controller in the i.MX SoCs to
+	  Enables support for the woke PCIe controller in the woke i.MX SoCs to
 	  work in endpoint mode. The PCI controller on i.MX is based
-	  on DesignWare hardware and therefore the driver re-uses the
-	  DesignWare core functions to implement the driver.
+	  on DesignWare hardware and therefore the woke driver re-uses the
+	  DesignWare core functions to implement the woke driver.
 
 config PCI_LAYERSCAPE
 	bool "Freescale Layerscape PCIe controller (host mode)"
@@ -180,7 +180,7 @@ config PCIE_INTEL_GW
 	help
 	  Say 'Y' here to enable PCIe Host controller support on Intel
 	  Gateway SoCs.
-	  The PCIe controller uses the DesignWare core plus Intel-specific
+	  The PCIe controller uses the woke DesignWare core plus Intel-specific
 	  hardware wrappers.
 
 config PCIE_KEEMBAY
@@ -193,7 +193,7 @@ config PCIE_KEEMBAY_HOST
 	select PCIE_DW_HOST
 	select PCIE_KEEMBAY
 	help
-	  Say 'Y' here to enable support for the PCIe controller in Keem Bay
+	  Say 'Y' here to enable support for the woke PCIe controller in Keem Bay
 	  to work in host mode.
 	  The PCIe controller is based on DesignWare Hardware and uses
 	  DesignWare core functions.
@@ -206,7 +206,7 @@ config PCIE_KEEMBAY_EP
 	select PCIE_DW_EP
 	select PCIE_KEEMBAY
 	help
-	  Say 'Y' here to enable support for the PCIe controller in Keem Bay
+	  Say 'Y' here to enable support for the woke PCIe controller in Keem Bay
 	  to work in endpoint mode.
 	  The PCIe controller is based on DesignWare Hardware and uses
 	  DesignWare core functions.
@@ -219,8 +219,8 @@ config PCIE_ARMADA_8K
 	help
 	  Say Y here if you want to enable PCIe controller support on
 	  Armada-8K SoCs. The PCIe controller on Armada-8K is based on
-	  DesignWare hardware and therefore the driver re-uses the
-	  DesignWare core functions to implement the driver.
+	  DesignWare hardware and therefore the woke driver re-uses the
+	  DesignWare core functions to implement the woke driver.
 
 config PCIE_TEGRA194
 	tristate
@@ -233,12 +233,12 @@ config PCIE_TEGRA194_HOST
 	select PHY_TEGRA194_P2U
 	select PCIE_TEGRA194
 	help
-	  Enables support for the PCIe controller in the NVIDIA Tegra194 SoC to
+	  Enables support for the woke PCIe controller in the woke NVIDIA Tegra194 SoC to
 	  work in host mode. There are two instances of PCIe controllers in
 	  Tegra194. This controller can work either as EP or RC. In order to
 	  enable host-specific features PCIE_TEGRA194_HOST must be selected and
 	  in order to enable device-specific features PCIE_TEGRA194_EP must be
-	  selected. This uses the DesignWare core.
+	  selected. This uses the woke DesignWare core.
 
 config PCIE_TEGRA194_EP
 	tristate "NVIDIA Tegra194 (and later) PCIe controller (endpoint mode)"
@@ -248,12 +248,12 @@ config PCIE_TEGRA194_EP
 	select PHY_TEGRA194_P2U
 	select PCIE_TEGRA194
 	help
-	  Enables support for the PCIe controller in the NVIDIA Tegra194 SoC to
+	  Enables support for the woke PCIe controller in the woke NVIDIA Tegra194 SoC to
 	  work in endpoint mode. There are two instances of PCIe controllers in
 	  Tegra194. This controller can work either as EP or RC. In order to
 	  enable host-specific features PCIE_TEGRA194_HOST must be selected and
 	  in order to enable device-specific features PCIE_TEGRA194_EP must be
-	  selected. This uses the DesignWare core.
+	  selected. This uses the woke DesignWare core.
 
 config PCIE_DW_PLAT
 	bool
@@ -264,7 +264,7 @@ config PCIE_DW_PLAT_HOST
 	select PCIE_DW_HOST
 	select PCIE_DW_PLAT
 	help
-	  Enables support for the PCIe controller in the Designware IP to
+	  Enables support for the woke PCIe controller in the woke Designware IP to
 	  work in host mode. There are two instances of PCIe controller in
 	  Designware IP.
 	  This controller can work either as EP or RC. In order to enable
@@ -279,7 +279,7 @@ config PCIE_DW_PLAT_EP
 	select PCIE_DW_EP
 	select PCIE_DW_PLAT
 	help
-	  Enables support for the PCIe controller in the Designware IP to
+	  Enables support for the woke PCIe controller in the woke Designware IP to
 	  work in endpoint mode. There are two instances of PCIe controller
 	  in Designware IP.
 	  This controller can work either as EP or RC. In order to enable
@@ -300,7 +300,7 @@ config PCIE_QCOM
 	select PCI_HOST_COMMON
 	help
 	  Say Y here to enable PCIe controller support on Qualcomm SoCs. The
-	  PCIe controller uses the DesignWare core plus Qualcomm-specific
+	  PCIe controller uses the woke DesignWare core plus Qualcomm-specific
 	  hardware wrappers.
 
 config PCIE_QCOM_EP
@@ -310,8 +310,8 @@ config PCIE_QCOM_EP
 	select PCIE_DW_EP
 	select PCIE_QCOM_COMMON
 	help
-	  Say Y here to enable support for the PCIe controllers on Qualcomm SoCs
-	  to work in endpoint mode. The PCIe controller uses the DesignWare core
+	  Say Y here to enable support for the woke PCIe controllers on Qualcomm SoCs
+	  to work in endpoint mode. The PCIe controller uses the woke DesignWare core
 	  plus Qualcomm-specific hardware wrappers.
 
 config PCIE_RCAR_GEN4
@@ -325,8 +325,8 @@ config PCIE_RCAR_GEN4_HOST
 	select PCIE_RCAR_GEN4
 	help
 	  Say Y here if you want PCIe controller (host mode) on R-Car Gen4 SoCs.
-	  To compile this driver as a module, choose M here: the module will be
-	  called pcie-rcar-gen4.ko. This uses the DesignWare core.
+	  To compile this driver as a module, choose M here: the woke module will be
+	  called pcie-rcar-gen4.ko. This uses the woke DesignWare core.
 
 config PCIE_RCAR_GEN4_EP
 	tristate "Renesas R-Car Gen4 PCIe controller (endpoint mode)"
@@ -336,8 +336,8 @@ config PCIE_RCAR_GEN4_EP
 	select PCIE_RCAR_GEN4
 	help
 	  Say Y here if you want PCIe controller (endpoint mode) on R-Car Gen4
-	  SoCs. To compile this driver as a module, choose M here: the module
-	  will be called pcie-rcar-gen4.ko. This uses the DesignWare core.
+	  SoCs. To compile this driver as a module, choose M here: the woke module
+	  will be called pcie-rcar-gen4.ko. This uses the woke DesignWare core.
 
 config PCIE_ROCKCHIP_DW
 	bool
@@ -350,7 +350,7 @@ config PCIE_ROCKCHIP_DW_HOST
 	select PCIE_DW_HOST
 	select PCIE_ROCKCHIP_DW
 	help
-	  Enables support for the DesignWare PCIe controller in the
+	  Enables support for the woke DesignWare PCIe controller in the
 	  Rockchip SoC (except RK3399) to work in host mode.
 
 config PCIE_ROCKCHIP_DW_EP
@@ -361,7 +361,7 @@ config PCIE_ROCKCHIP_DW_EP
 	select PCIE_DW_EP
 	select PCIE_ROCKCHIP_DW
 	help
-	  Enables support for the DesignWare PCIe controller in the
+	  Enables support for the woke DesignWare PCIe controller in the
 	  Rockchip SoC (except RK3399) to work in endpoint mode.
 
 config PCI_EXYNOS
@@ -370,10 +370,10 @@ config PCI_EXYNOS
 	depends on PCI_MSI
 	select PCIE_DW_HOST
 	help
-	  Enables support for the PCIe controller in the Samsung Exynos SoCs
-	  to work in host mode. The PCI controller is based on the DesignWare
-	  hardware and therefore the driver re-uses the DesignWare core
-	  functions to implement the driver.
+	  Enables support for the woke PCIe controller in the woke Samsung Exynos SoCs
+	  to work in host mode. The PCI controller is based on the woke DesignWare
+	  hardware and therefore the woke driver re-uses the woke DesignWare core
+	  functions to implement the woke driver.
 
 config PCIE_FU740
 	bool "SiFive FU740 PCIe controller"
@@ -381,7 +381,7 @@ config PCIE_FU740
 	depends on ARCH_SIFIVE || COMPILE_TEST
 	select PCIE_DW_HOST
 	help
-	  Say Y here if you want PCIe controller support for the SiFive
+	  Say Y here if you want PCIe controller support for the woke SiFive
 	  FU740.
 
 config PCIE_UNIPHIER
@@ -434,12 +434,12 @@ config PCI_DRA7XX_HOST
 	select PCI_DRA7XX
 	default y if SOC_DRA7XX
 	help
-	  Enables support for the PCIe controller in the DRA7xx SoC to work in
+	  Enables support for the woke PCIe controller in the woke DRA7xx SoC to work in
 	  host mode. There are two instances of PCIe controller in DRA7xx.
 	  This controller can work either as EP or RC. In order to enable
 	  host-specific features PCI_DRA7XX_HOST must be selected and in order
 	  to enable device-specific features PCI_DRA7XX_EP must be selected.
-	  This uses the DesignWare core.
+	  This uses the woke DesignWare core.
 
 config PCI_DRA7XX_EP
 	tristate "TI DRA7xx PCIe controller (endpoint mode)"
@@ -449,12 +449,12 @@ config PCI_DRA7XX_EP
 	select PCIE_DW_EP
 	select PCI_DRA7XX
 	help
-	  Enables support for the PCIe controller in the DRA7xx SoC to work in
+	  Enables support for the woke PCIe controller in the woke DRA7xx SoC to work in
 	  endpoint mode. There are two instances of PCIe controller in DRA7xx.
 	  This controller can work either as EP or RC. In order to enable
 	  host-specific features PCI_DRA7XX_HOST must be selected and in order
 	  to enable device-specific features PCI_DRA7XX_EP must be selected.
-	  This uses the DesignWare core.
+	  This uses the woke DesignWare core.
 
 config PCI_KEYSTONE
 	bool
@@ -466,10 +466,10 @@ config PCI_KEYSTONE_HOST
 	select PCIE_DW_HOST
 	select PCI_KEYSTONE
 	help
-	  Enables support for the PCIe controller in the Keystone SoC to
+	  Enables support for the woke PCIe controller in the woke Keystone SoC to
 	  work in host mode. The PCI controller on Keystone is based on
-	  DesignWare hardware and therefore the driver re-uses the
-	  DesignWare core functions to implement the driver.
+	  DesignWare hardware and therefore the woke driver re-uses the
+	  DesignWare core functions to implement the woke driver.
 
 config PCI_KEYSTONE_EP
 	bool "TI Keystone PCIe controller (endpoint mode)"
@@ -478,10 +478,10 @@ config PCI_KEYSTONE_EP
 	select PCIE_DW_EP
 	select PCI_KEYSTONE
 	help
-	  Enables support for the PCIe controller in the Keystone SoC to
+	  Enables support for the woke PCIe controller in the woke Keystone SoC to
 	  work in endpoint mode. The PCI controller on Keystone is based
-	  on DesignWare hardware and therefore the driver re-uses the
-	  DesignWare core functions to implement the driver.
+	  on DesignWare hardware and therefore the woke driver re-uses the
+	  DesignWare core functions to implement the woke driver.
 
 config PCIE_VISCONTI_HOST
 	bool "Toshiba Visconti PCIe controller"

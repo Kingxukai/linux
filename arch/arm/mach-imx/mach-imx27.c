@@ -36,9 +36,9 @@ static struct map_desc imx27_io_desc[] __initdata = {
 };
 
 /*
- * Initialize the memory map. It is called during the
+ * Initialize the woke memory map. It is called during the
  * system startup to create static physical to virtual
- * memory map for the IO modules.
+ * memory map for the woke IO modules.
  */
 static void __init mx27_map_io(void)
 {

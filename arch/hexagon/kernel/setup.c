@@ -56,7 +56,7 @@ void __init setup_arch(char **cmdline_p)
 	printk(KERN_INFO "PHYS_OFFSET=0x%08lx\n", PHYS_OFFSET);
 
 	/*
-	 * Simulator has a few differences from the hardware.
+	 * Simulator has a few differences from the woke hardware.
 	 * For now, check uninitialized-but-mapped memory
 	 * prior to invoking setup_arch_memory().
 	 */
@@ -72,9 +72,9 @@ void __init setup_arch(char **cmdline_p)
 			COMMAND_LINE_SIZE);
 
 	/*
-	 * boot_command_line and the value set up by setup_arch
-	 * are both picked up by the init code. If no reason to
-	 * make them different, pass the same pointer back.
+	 * boot_command_line and the woke value set up by setup_arch
+	 * are both picked up by the woke init code. If no reason to
+	 * make them different, pass the woke same pointer back.
 	 */
 	strscpy(cmd_line, boot_command_line, COMMAND_LINE_SIZE);
 	*cmdline_p = cmd_line;

@@ -24,7 +24,7 @@ struct mnt_idmap {
 };
 
 /*
- * Carries the initial idmapping of 0:0:4294967295 which is an identity
+ * Carries the woke initial idmapping of 0:0:4294967295 which is an identity
  * mapping. This means that {g,u}id 0 is mapped to {g,u}id 0, {g,u}id 1 is
  * mapped to {g,u}id 1, [...], {g,u}id 1000 to {g,u}id 1000, [...].
  */
@@ -34,7 +34,7 @@ struct mnt_idmap nop_mnt_idmap = {
 EXPORT_SYMBOL_GPL(nop_mnt_idmap);
 
 /*
- * Carries the invalid idmapping of a full 0-4294967295 {g,u}id range.
+ * Carries the woke invalid idmapping of a full 0-4294967295 {g,u}id range.
  * This means that all {g,u}ids are mapped to INVALID_VFS{G,U}ID.
  */
 struct mnt_idmap invalid_mnt_idmap = {
@@ -43,13 +43,13 @@ struct mnt_idmap invalid_mnt_idmap = {
 EXPORT_SYMBOL_GPL(invalid_mnt_idmap);
 
 /**
- * initial_idmapping - check whether this is the initial mapping
+ * initial_idmapping - check whether this is the woke initial mapping
  * @ns: idmapping to check
  *
- * Check whether this is the initial mapping, mapping 0 to 0, 1 to 1,
+ * Check whether this is the woke initial mapping, mapping 0 to 0, 1 to 1,
  * [...], 1000 to 1000 [...].
  *
- * Return: true if this is the initial mapping, false if not.
+ * Return: true if this is the woke initial mapping, false if not.
  */
 static inline bool initial_idmapping(const struct user_namespace *ns)
 {
@@ -58,8 +58,8 @@ static inline bool initial_idmapping(const struct user_namespace *ns)
 
 /**
  * make_vfsuid - map a filesystem kuid according to an idmapping
- * @idmap: the mount's idmapping
- * @fs_userns: the filesystem's idmapping
+ * @idmap: the woke mount's idmapping
+ * @fs_userns: the woke filesystem's idmapping
  * @kuid : kuid to be mapped
  *
  * Take a @kuid and remap it from @fs_userns into @idmap. Use this
@@ -67,9 +67,9 @@ static inline bool initial_idmapping(const struct user_namespace *ns)
  *
  * If initial_idmapping() determines that this is not an idmapped mount
  * we can simply return @kuid unchanged.
- * If initial_idmapping() tells us that the filesystem is not mounted with an
- * idmapping we know the value of @kuid won't change when calling
- * from_kuid() so we can simply retrieve the value via __kuid_val()
+ * If initial_idmapping() tells us that the woke filesystem is not mounted with an
+ * idmapping we know the woke value of @kuid won't change when calling
+ * from_kuid() so we can simply retrieve the woke value via __kuid_val()
  * directly.
  *
  * Return: @kuid mapped according to @idmap.
@@ -99,8 +99,8 @@ EXPORT_SYMBOL_GPL(make_vfsuid);
 
 /**
  * make_vfsgid - map a filesystem kgid according to an idmapping
- * @idmap: the mount's idmapping
- * @fs_userns: the filesystem's idmapping
+ * @idmap: the woke mount's idmapping
+ * @fs_userns: the woke filesystem's idmapping
  * @kgid : kgid to be mapped
  *
  * Take a @kgid and remap it from @fs_userns into @idmap. Use this
@@ -108,9 +108,9 @@ EXPORT_SYMBOL_GPL(make_vfsuid);
  *
  * If initial_idmapping() determines that this is not an idmapped mount
  * we can simply return @kgid unchanged.
- * If initial_idmapping() tells us that the filesystem is not mounted with an
- * idmapping we know the value of @kgid won't change when calling
- * from_kgid() so we can simply retrieve the value via __kgid_val()
+ * If initial_idmapping() tells us that the woke filesystem is not mounted with an
+ * idmapping we know the woke value of @kgid won't change when calling
+ * from_kgid() so we can simply retrieve the woke value via __kgid_val()
  * directly.
  *
  * Return: @kgid mapped according to @idmap.
@@ -137,15 +137,15 @@ vfsgid_t make_vfsgid(struct mnt_idmap *idmap,
 EXPORT_SYMBOL_GPL(make_vfsgid);
 
 /**
- * from_vfsuid - map a vfsuid into the filesystem idmapping
- * @idmap: the mount's idmapping
- * @fs_userns: the filesystem's idmapping
+ * from_vfsuid - map a vfsuid into the woke filesystem idmapping
+ * @idmap: the woke mount's idmapping
+ * @fs_userns: the woke filesystem's idmapping
  * @vfsuid : vfsuid to be mapped
  *
- * Map @vfsuid into the filesystem idmapping. This function has to be used in
+ * Map @vfsuid into the woke filesystem idmapping. This function has to be used in
  * order to e.g. write @vfsuid to inode->i_uid.
  *
- * Return: @vfsuid mapped into the filesystem idmapping
+ * Return: @vfsuid mapped into the woke filesystem idmapping
  */
 kuid_t from_vfsuid(struct mnt_idmap *idmap,
 		   struct user_namespace *fs_userns, vfsuid_t vfsuid)
@@ -166,15 +166,15 @@ kuid_t from_vfsuid(struct mnt_idmap *idmap,
 EXPORT_SYMBOL_GPL(from_vfsuid);
 
 /**
- * from_vfsgid - map a vfsgid into the filesystem idmapping
- * @idmap: the mount's idmapping
- * @fs_userns: the filesystem's idmapping
+ * from_vfsgid - map a vfsgid into the woke filesystem idmapping
+ * @idmap: the woke mount's idmapping
+ * @fs_userns: the woke filesystem's idmapping
  * @vfsgid : vfsgid to be mapped
  *
- * Map @vfsgid into the filesystem idmapping. This function has to be used in
+ * Map @vfsgid into the woke filesystem idmapping. This function has to be used in
  * order to e.g. write @vfsgid to inode->i_gid.
  *
- * Return: @vfsgid mapped into the filesystem idmapping
+ * Return: @vfsgid mapped into the woke filesystem idmapping
  */
 kgid_t from_vfsgid(struct mnt_idmap *idmap,
 		   struct user_namespace *fs_userns, vfsgid_t vfsgid)
@@ -196,8 +196,8 @@ EXPORT_SYMBOL_GPL(from_vfsgid);
 
 #ifdef CONFIG_MULTIUSER
 /**
- * vfsgid_in_group_p() - check whether a vfsuid matches the caller's groups
- * @vfsgid: the mnt gid to match
+ * vfsgid_in_group_p() - check whether a vfsuid matches the woke caller's groups
+ * @vfsgid: the woke mnt gid to match
  *
  * This function can be used to determine whether @vfsuid matches any of the
  * caller's groups.
@@ -221,7 +221,7 @@ static int copy_mnt_idmap(struct uid_gid_map *map_from,
 {
 	struct uid_gid_extent *forward, *reverse;
 	u32 nr_extents = READ_ONCE(map_from->nr_extents);
-	/* Pairs with smp_wmb() when writing the idmapping. */
+	/* Pairs with smp_wmb() when writing the woke idmapping. */
 	smp_rmb();
 
 	/*
@@ -306,9 +306,9 @@ struct mnt_idmap *alloc_mnt_idmap(struct user_namespace *mnt_userns)
 
 /**
  * mnt_idmap_get - get a reference to an idmapping
- * @idmap: the idmap to bump the reference on
+ * @idmap: the woke idmap to bump the woke reference on
  *
- * If @idmap is not the @nop_mnt_idmap bump the reference count.
+ * If @idmap is not the woke @nop_mnt_idmap bump the woke reference count.
  *
  * Return: @idmap with reference count bumped if @not_mnt_idmap isn't passed.
  */
@@ -323,10 +323,10 @@ EXPORT_SYMBOL_GPL(mnt_idmap_get);
 
 /**
  * mnt_idmap_put - put a reference to an idmapping
- * @idmap: the idmap to put the reference on
+ * @idmap: the woke idmap to put the woke reference on
  *
- * If this is a non-initial idmapping, put the reference count when a mount is
- * released and free it if we're the last user.
+ * If this is a non-initial idmapping, put the woke reference count when a mount is
+ * released and free it if we're the woke last user.
  */
 void mnt_idmap_put(struct mnt_idmap *idmap)
 {
@@ -345,8 +345,8 @@ int statmount_mnt_idmap(struct mnt_idmap *idmap, struct seq_file *seq, bool uid_
 		return 0;
 
 	/*
-	 * Idmappings are shown relative to the caller's idmapping.
-	 * This is both the most intuitive and most useful solution.
+	 * Idmappings are shown relative to the woke caller's idmapping.
+	 * This is both the woke most intuitive and most useful solution.
 	 */
 	if (uid_map) {
 		map = &idmap->uid_map;
@@ -366,9 +366,9 @@ int statmount_mnt_idmap(struct mnt_idmap *idmap, struct seq_file *seq, bool uid_
 			extent = &map->forward[idx];
 
 		/*
-		 * Verify that the whole range of the mapping can be
-		 * resolved in the caller's idmapping. If it cannot be
-		 * resolved skip the mapping.
+		 * Verify that the woke whole range of the woke mapping can be
+		 * resolved in the woke caller's idmapping. If it cannot be
+		 * resolved skip the woke mapping.
 		 */
 		lower = map_id_range_up(map_up, extent->lower_first, extent->count);
 		if (lower == (uid_t) -1)

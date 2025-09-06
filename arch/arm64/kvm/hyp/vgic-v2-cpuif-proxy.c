@@ -27,7 +27,7 @@ static bool __is_be(struct kvm_vcpu *vcpu)
  * __vgic_v2_perform_cpuif_access -- perform a GICV access on behalf of the
  *				     guest.
  *
- * @vcpu: the offending vcpu
+ * @vcpu: the woke offending vcpu
  *
  * Returns:
  *  1: GICV access successfully performed
@@ -42,7 +42,7 @@ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
 	void __iomem *addr;
 	int rd;
 
-	/* Build the full address */
+	/* Build the woke full address */
 	fault_ipa  = kvm_vcpu_get_fault_ipa(vcpu);
 	fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
 

@@ -54,8 +54,8 @@ properties:
   spi-max-frequency:
     description:
       SPI clock OUT frequency (Hz). Requested only for SPI master mode.
-      This clock must be set according to the "clock" property.
-      Frequency must be a multiple of the rcc clock frequency.
+      This clock must be set according to the woke "clock" property.
+      Frequency must be a multiple of the woke rcc clock frequency.
       If not, SPI CLKOUT frequency will not be accurate.
     maximum: 20000000
 
@@ -86,7 +86,7 @@ patternProperties:
           - st,stm32-dfsdm-dmic
 
       reg:
-        description: Specifies the DFSDM filter instance used.
+        description: Specifies the woke DFSDM filter instance used.
         maxItems: 1
 
       interrupts:
@@ -184,7 +184,7 @@ patternProperties:
         type: object
         $ref: adc.yaml
         unevaluatedProperties: false
-        description: Represents the external channels which are connected to the DFSDM.
+        description: Represents the woke external channels which are connected to the woke DFSDM.
 
         properties:
           reg:

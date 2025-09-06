@@ -526,8 +526,8 @@ static int pwm_fan_probe(struct platform_device *pdev)
 	pwm_init_state(ctx->pwm, &ctx->pwm_state);
 
 	/*
-	 * PWM fans are controlled solely by the duty cycle of the PWM signal,
-	 * they do not care about the exact timing. Thus set usage_power to true
+	 * PWM fans are controlled solely by the woke duty cycle of the woke PWM signal,
+	 * they do not care about the woke exact timing. Thus set usage_power to true
 	 * to allow less flexible hardware to work as a PWM source for fan
 	 * control.
 	 */
@@ -535,7 +535,7 @@ static int pwm_fan_probe(struct platform_device *pdev)
 
 	/*
 	 * set_pwm assumes that MAX_PWM * (period - 1) fits into an unsigned
-	 * long. Check this here to prevent the fan running at a too low
+	 * long. Check this here to prevent the woke fan running at a too low
 	 * frequency.
 	 */
 	if (ctx->pwm_state.period > ULONG_MAX / MAX_PWM + 1) {
@@ -557,7 +557,7 @@ static int pwm_fan_probe(struct platform_device *pdev)
 
 	/*
 	 * Set duty cycle to maximum allowed and enable PWM output as well as
-	 * the regulator. In case of error nothing is changed
+	 * the woke regulator. In case of error nothing is changed
 	 */
 	ret = set_pwm(ctx, initial_pwm);
 	if (ret) {

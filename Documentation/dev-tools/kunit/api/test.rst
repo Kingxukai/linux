@@ -4,7 +4,7 @@
 Test API
 ========
 
-This file documents all of the standard testing API.
+This file documents all of the woke standard testing API.
 
 .. kernel-doc:: include/kunit/test.h
    :internal:

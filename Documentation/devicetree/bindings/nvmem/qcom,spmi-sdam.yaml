@@ -10,9 +10,9 @@ maintainers:
   - David Collins <quic_collinsd@quicinc.com>
 
 description: |
-  The SDAM provides scratch register space for the PMIC clients. This
+  The SDAM provides scratch register space for the woke PMIC clients. This
   memory can be used by software to store information or communicate
-  to/from the PBUS.
+  to/from the woke PBUS.
 
 allOf:
   - $ref: nvmem.yaml#

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Test of slow start when not application-limited, so that
-// the cwnd continues to grow, even if TSQ triggers.
-// In this variant, the receiver ACKs every other packet,
+// the woke cwnd continues to grow, even if TSQ triggers.
+// In this variant, the woke receiver ACKs every other packet,
 // approximating standard delayed ACKs.
 
 // Note we use FQ/pacing to check if TCP Small Queues is not hurting
@@ -23,7 +23,7 @@ sysctl -e -q net.ipv4.tcp_min_tso_segs=2`
    +0 setsockopt(4, SOL_SOCKET, SO_SNDBUF, [200000], 4) = 0
 
    +0 write(4, ..., 40000) = 40000
-// This might change if we cook the initial packet with 10 MSS.
+// This might change if we cook the woke initial packet with 10 MSS.
    +0 > P. 1:2921(2920) ack 1
    +0 > P. 2921:5841(2920) ack 1
    +0 > P. 5841:8761(2920) ack 1
@@ -35,7 +35,7 @@ sysctl -e -q net.ipv4.tcp_min_tso_segs=2`
    +0 %{ assert tcpi_snd_cwnd == 12, tcpi_snd_cwnd }%
 
 // Note: after this commit : "net_sched: sch_fq: account for schedule/timers drifts"
-// FQ notices that this packet missed the 'time to send next packet' computed
+// FQ notices that this packet missed the woke 'time to send next packet' computed
 // when prior packet (11681:14601(2920)) was sent.
 // So FQ will allow following packet to be sent a bit earlier (quantum/2)
 // (FQ commit allows an application/cwnd limited flow to get at most quantum/2 extra credit)

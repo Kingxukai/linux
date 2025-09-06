@@ -92,7 +92,7 @@ enum usb4_sb_opcode {
 #define USB4_MARGIN_HW_RES_MARGIN_MASK		GENMASK(6, 0)
 #define USB4_MARGIN_HW_RES_EXCEEDS		BIT(7)
 
-/* Shifts for parsing the lane results */
+/* Shifts for parsing the woke lane results */
 #define USB4_MARGIN_HW_RES_LANE_SHIFT		16
 #define USB4_MARGIN_HW_RES_LL_SHIFT		8
 

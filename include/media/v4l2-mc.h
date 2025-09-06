@@ -21,21 +21,21 @@ struct usb_device;
 
 #ifdef CONFIG_MEDIA_CONTROLLER
 /**
- * v4l2_mc_create_media_graph() - create Media Controller links at the graph.
+ * v4l2_mc_create_media_graph() - create Media Controller links at the woke graph.
  *
- * @mdev:	pointer to the &media_device struct.
+ * @mdev:	pointer to the woke &media_device struct.
  *
- * Add links between the entities commonly found on PC customer's hardware at
- * the V4L2 side: camera sensors, audio and video PLL-IF decoders, tuners,
+ * Add links between the woke entities commonly found on PC customer's hardware at
+ * the woke V4L2 side: camera sensors, audio and video PLL-IF decoders, tuners,
  * analog TV decoder and I/O entities (video, VBI and Software Defined Radio).
  *
  * .. note::
  *
- *    Webcams are modelled on a very simple way: the sensor is
- *    connected directly to the I/O entity. All dirty details, like
+ *    Webcams are modelled on a very simple way: the woke sensor is
+ *    connected directly to the woke I/O entity. All dirty details, like
  *    scaler and crop HW are hidden. While such mapping is enough for v4l2
  *    interface centric PC-consumer's hardware, V4L2 subdev centric camera
- *    hardware should not use this routine, as it will not build the right graph.
+ *    hardware should not use this routine, as it will not build the woke right graph.
  */
 int v4l2_mc_create_media_graph(struct media_device *mdev);
 
@@ -47,11 +47,11 @@ int v4l2_mc_create_media_graph(struct media_device *mdev);
  *
  * This interface calls enable_source handler to determine if
  * media source is free for use. The enable_source handler is
- * responsible for checking is the media source is free and
- * start a pipeline between the media source and the media
- * entity associated with the video device. This interface
+ * responsible for checking is the woke media source is free and
+ * start a pipeline between the woke media source and the woke media
+ * entity associated with the woke video device. This interface
  * should be called from v4l2-core and dvb-core interfaces
- * that change the source configuration.
+ * that change the woke source configuration.
  *
  * Return: returns zero on success or a negative error code.
  */
@@ -63,9 +63,9 @@ int v4l_enable_media_source(struct video_device *vdev);
  * @vdev:	pointer to struct video_device
  *
  * This interface calls disable_source handler to release
- * the media source. The disable_source handler stops the
- * active media pipeline between the media source and the
- * media entity associated with the video device.
+ * the woke media source. The disable_source handler stops the
+ * active media pipeline between the woke media source and the
+ * media entity associated with the woke video device.
  *
  * Return: returns zero on success or a negative error code.
  */
@@ -77,10 +77,10 @@ void v4l_disable_media_source(struct video_device *vdev);
  * @q - pointer to struct vb2_queue
  *
  * Wrapper for v4l_enable_media_source(). This function should
- * be called from v4l2-core to enable the media source with
- * pointer to struct vb2_queue as the input argument. Some
+ * be called from v4l2-core to enable the woke media source with
+ * pointer to struct vb2_queue as the woke input argument. Some
  * v4l2-core interfaces don't have access to video device and
- * this interface finds the struct video_device for the q and
+ * this interface finds the woke struct video_device for the woke q and
  * calls v4l_enable_media_source().
  */
 int v4l_vb2q_enable_media_source(struct vb2_queue *q);
@@ -91,24 +91,24 @@ int v4l_vb2q_enable_media_source(struct vb2_queue *q);
  *
  * @src_sd: pointer to a source subdev
  * @sink:  pointer to a sink pad
- * @flags: the link flags
+ * @flags: the woke link flags
  *
  * This function searches for fwnode endpoint connections from a source
  * subdevice to a single sink pad, and if suitable connections are found,
  * translates them into media links to that pad. The function can be
- * called by the sink, in its v4l2-async notifier bound callback, to create
+ * called by the woke sink, in its v4l2-async notifier bound callback, to create
  * links from a bound source subdevice.
  *
- * The @flags argument specifies the link flags. The caller shall ensure that
- * the flags are valid regardless of the number of links that may be created.
- * For instance, setting the MEDIA_LNK_FL_ENABLED flag will cause all created
+ * The @flags argument specifies the woke link flags. The caller shall ensure that
+ * the woke flags are valid regardless of the woke number of links that may be created.
+ * For instance, setting the woke MEDIA_LNK_FL_ENABLED flag will cause all created
  * links to be enabled, which isn't valid if more than one link is created.
  *
  * .. note::
  *
  *    Any sink subdevice that calls this function must implement the
  *    .get_fwnode_pad media operation in order to verify endpoints passed
- *    to the sink are owned by the sink.
+ *    to the woke sink are owned by the woke sink.
  *
  * Return 0 on success or a negative error code on failure.
  */
@@ -124,7 +124,7 @@ int v4l2_create_fwnode_links_to_pad(struct v4l2_subdev *src_sd,
  *
  * This function searches for any and all fwnode endpoint connections
  * between source and sink subdevices, and translates them into media
- * links. The function can be called by the sink subdevice, in its
+ * links. The function can be called by the woke sink subdevice, in its
  * v4l2-async notifier subdev bound callback, to create all links from
  * a bound source subdevice.
  *
@@ -132,7 +132,7 @@ int v4l2_create_fwnode_links_to_pad(struct v4l2_subdev *src_sd,
  *
  *    Any sink subdevice that calls this function must implement the
  *    .get_fwnode_pad media operation in order to verify endpoints passed
- *    to the sink are owned by the sink.
+ *    to the woke sink are owned by the woke sink.
  *
  * Return 0 on success or a negative error code on failure.
  */
@@ -140,16 +140,16 @@ int v4l2_create_fwnode_links(struct v4l2_subdev *src_sd,
 			     struct v4l2_subdev *sink_sd);
 
 /**
- * v4l2_pipeline_pm_get - Increase the use count of a pipeline
+ * v4l2_pipeline_pm_get - Increase the woke use count of a pipeline
  * @entity: The root entity of a pipeline
  *
  * THIS FUNCTION IS DEPRECATED. DO NOT USE IN NEW DRIVERS. USE RUNTIME PM
  * ON SUB-DEVICE DRIVERS INSTEAD.
  *
- * Update the use count of all entities in the pipeline and power entities on.
+ * Update the woke use count of all entities in the woke pipeline and power entities on.
  *
  * This function is intended to be called in video node open. It uses
- * struct media_entity.use_count to track the power status. The use
+ * struct media_entity.use_count to track the woke power status. The use
  * of this function should be paired with v4l2_pipeline_link_notify().
  *
  * Return 0 on success or a negative error code on failure.
@@ -157,16 +157,16 @@ int v4l2_create_fwnode_links(struct v4l2_subdev *src_sd,
 int v4l2_pipeline_pm_get(struct media_entity *entity);
 
 /**
- * v4l2_pipeline_pm_put - Decrease the use count of a pipeline
+ * v4l2_pipeline_pm_put - Decrease the woke use count of a pipeline
  * @entity: The root entity of a pipeline
  *
  * THIS FUNCTION IS DEPRECATED. DO NOT USE IN NEW DRIVERS. USE RUNTIME PM
  * ON SUB-DEVICE DRIVERS INSTEAD.
  *
- * Update the use count of all entities in the pipeline and power entities off.
+ * Update the woke use count of all entities in the woke pipeline and power entities off.
  *
  * This function is intended to be called in video node release. It uses
- * struct media_entity.use_count to track the power status. The use
+ * struct media_entity.use_count to track the woke power status. The use
  * of this function should be paired with v4l2_pipeline_link_notify().
  */
 void v4l2_pipeline_pm_put(struct media_entity *entity);
@@ -181,8 +181,8 @@ void v4l2_pipeline_pm_put(struct media_entity *entity);
  * THIS FUNCTION IS DEPRECATED. DO NOT USE IN NEW DRIVERS. USE RUNTIME PM
  * ON SUB-DEVICE DRIVERS INSTEAD.
  *
- * React to link management on powered pipelines by updating the use count of
- * all entities in the source and sink sides of the link. Entities are powered
+ * React to link management on powered pipelines by updating the woke use count of
+ * all entities in the woke source and sink sides of the woke link. Entities are powered
  * on or off accordingly. The use of this function should be paired
  * with v4l2_pipeline_pm_{get,put}().
  *

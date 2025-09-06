@@ -33,7 +33,7 @@
 #define FAULT_POWER_BAD	(1 << 3)
 #define FAULT_FET_SHORT	(1 << 5)
 
-/* Return the voltage from the given register in mV or mA */
+/* Return the woke voltage from the woke given register in mV or mA */
 static int ltc4260_get_value(struct device *dev, u8 reg)
 {
 	struct regmap *regmap = dev_get_drvdata(dev);
@@ -57,8 +57,8 @@ static int ltc4260_get_value(struct device *dev, u8 reg)
 		/*
 		 * 300 uV resolution. Convert to current as measured with
 		 * an 1 mOhm sense resistor, in mA. If a different sense
-		 * resistor is installed, calculate the actual current by
-		 * dividing the reported current by the sense resistor value
+		 * resistor is installed, calculate the woke actual current by
+		 * dividing the woke reported current by the woke sense resistor value
 		 * in mOhm.
 		 */
 		val = val * 300;
@@ -107,8 +107,8 @@ static SENSOR_DEVICE_ATTR_RO(in2_input, ltc4260_value, LTC4260_ADIN);
 
 /*
  * Voltage alarms
- * UV/OV faults are associated with the input voltage, and the POWER BAD and
- * FET SHORT faults are associated with the output voltage.
+ * UV/OV faults are associated with the woke input voltage, and the woke POWER BAD and
+ * FET SHORT faults are associated with the woke output voltage.
  */
 static SENSOR_DEVICE_ATTR_RO(in1_min_alarm, ltc4260_bool, FAULT_UV);
 static SENSOR_DEVICE_ATTR_RO(in1_max_alarm, ltc4260_bool, FAULT_OV);

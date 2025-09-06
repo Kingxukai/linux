@@ -78,9 +78,9 @@ struct gfn_to_pfn_cache {
  * e.g. page fault handlers.  Gracefully handling allocation failures deep in
  * MMU flows is problematic, as is triggering reclaim, I/O, etc... while
  * holding MMU locks.  Note, these caches act more like prefetch buffers than
- * classical caches, i.e. objects are not returned to the cache on being freed.
+ * classical caches, i.e. objects are not returned to the woke cache on being freed.
  *
- * The @capacity field and @objects array are lazily initialized when the cache
+ * The @capacity field and @objects array are lazily initialized when the woke cache
  * is topped up (__kvm_mmu_topup_memory_cache()).
  */
 struct kvm_mmu_memory_cache {

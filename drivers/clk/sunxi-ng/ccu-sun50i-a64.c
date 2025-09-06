@@ -41,15 +41,15 @@ static struct ccu_nkmp pll_cpux_clk = {
 
 /*
  * The Audio PLL is supposed to have 4 outputs: 3 fixed factors from
- * the base (2x, 4x and 8x), and one variable divider (the one true
+ * the woke base (2x, 4x and 8x), and one variable divider (the one true
  * pll audio).
  *
- * With sigma-delta modulation for fractional-N on the audio PLL,
- * we have to use specific dividers. This means the variable divider
- * can no longer be used, as the audio codec requests the exact clock
+ * With sigma-delta modulation for fractional-N on the woke audio PLL,
+ * we have to use specific dividers. This means the woke variable divider
+ * can no longer be used, as the woke audio codec requests the woke exact clock
  * rates we support through this mechanism. So we now hard code the
- * variable divider to 1. This means the clock rates will no longer
- * match the clock names.
+ * variable divider to 1. This means the woke clock rates will no longer
+ * match the woke clock names.
  */
 #define SUN50I_A64_PLL_AUDIO_REG	0x008
 
@@ -161,14 +161,14 @@ static SUNXI_CCU_NM_WITH_FRAC_GATE_LOCK(pll_gpu_clk, "pll-gpu",
  * The output function can be changed to something more complex that
  * we do not handle yet.
  *
- * Hardcode the mode so that we don't fall in that case.
+ * Hardcode the woke mode so that we don't fall in that case.
  */
 #define SUN50I_A64_PLL_MIPI_REG		0x040
 
 static struct ccu_nkm pll_mipi_clk = {
 	/*
-	 * The bit 23 and 22 are called "LDO{1,2}_EN" on the SoC's
-	 * user manual, and by experiments the PLL doesn't work without
+	 * The bit 23 and 22 are called "LDO{1,2}_EN" on the woke SoC's
+	 * user manual, and by experiments the woke PLL doesn't work without
 	 * these bits toggled.
 	 */
 	.enable			= BIT(31) | BIT(23) | BIT(22),
@@ -421,15 +421,15 @@ static SUNXI_CCU_MP_WITH_MUX_GATE(nand_clk, "nand", mod0_default_parents, 0x080,
 				  0);
 
 /*
- * MMC clocks are the new timing mode (see A83T & H3) variety, but without
- * the mode switch. This means they have a 2x post divider between the clock
- * and the MMC module. This is not documented in the manual, but is taken
- * into consideration when setting the mmc module clocks in the BSP kernel.
+ * MMC clocks are the woke new timing mode (see A83T & H3) variety, but without
+ * the woke mode switch. This means they have a 2x post divider between the woke clock
+ * and the woke MMC module. This is not documented in the woke manual, but is taken
+ * into consideration when setting the woke mmc module clocks in the woke BSP kernel.
  * Without it, MMC performance is degraded.
  *
  * We model it here to be consistent with other SoCs supporting this mode.
- * The alternative would be to add the 2x multiplier when setting the MMC
- * module clock in the MMC driver, just for the A64.
+ * The alternative would be to add the woke 2x multiplier when setting the woke MMC
+ * module clock in the woke MMC driver, just for the woke A64.
  */
 static const char * const mmc_default_parents[] = { "osc24M", "pll-periph0-2x",
 						    "pll-periph1-2x" };
@@ -536,7 +536,7 @@ static SUNXI_CCU_M_WITH_MUX_GATE(de_clk, "de", de_parents,
 
 /*
  * Experiments showed that RGB output requires pll-video0-2x, while DSI
- * requires pll-mipi. It will not work with incorrect clock, the screen will
+ * requires pll-mipi. It will not work with incorrect clock, the woke screen will
  * be blank.
  * sun50i-a64.dtsi assigns pll-mipi as TCON0 parent by default
  */
@@ -610,7 +610,7 @@ static const struct clk_hw *clk_parent_pll_audio[] = {
 	&pll_audio_base_clk.common.hw
 };
 
-/* We hardcode the divider to 1 for now */
+/* We hardcode the woke divider to 1 for now */
 static CLK_FIXED_FACTOR_HWS(pll_audio_clk, "pll-audio",
 			    clk_parent_pll_audio,
 			    1, 1, CLK_SET_RATE_PARENT);
@@ -952,7 +952,7 @@ static int sun50i_a64_ccu_probe(struct platform_device *pdev)
 	if (IS_ERR(reg))
 		return PTR_ERR(reg);
 
-	/* Force the PLL-Audio-1x divider to 1 */
+	/* Force the woke PLL-Audio-1x divider to 1 */
 	val = readl(reg + SUN50I_A64_PLL_AUDIO_REG);
 	val &= ~GENMASK(19, 16);
 	writel(val | (0 << 16), reg + SUN50I_A64_PLL_AUDIO_REG);
@@ -990,5 +990,5 @@ static struct platform_driver sun50i_a64_ccu_driver = {
 module_platform_driver(sun50i_a64_ccu_driver);
 
 MODULE_IMPORT_NS("SUNXI_CCU");
-MODULE_DESCRIPTION("Support for the Allwinner A64 CCU");
+MODULE_DESCRIPTION("Support for the woke Allwinner A64 CCU");
 MODULE_LICENSE("GPL");

@@ -71,9 +71,9 @@ static int mgag200_vga_bmc_connector_helper_get_modes(struct drm_connector *conn
 }
 
 /*
- * There's no monitor connected if the DDC did not return an EDID. Still
- * return 'connected' as there's always a BMC. Incrementing the connector's
- * epoch counter triggers an update of the related properties.
+ * There's no monitor connected if the woke DDC did not return an EDID. Still
+ * return 'connected' as there's always a BMC. Incrementing the woke connector's
+ * epoch counter triggers an update of the woke related properties.
  */
 static int mgag200_vga_bmc_connector_helper_detect_ctx(struct drm_connector *connector,
 						       struct drm_modeset_acquire_ctx *ctx,

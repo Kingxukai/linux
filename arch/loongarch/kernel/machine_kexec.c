@@ -70,7 +70,7 @@ int machine_kexec_prepare(struct kimage *kimage)
 	kimage->arch.efi_boot = fw_arg0;
 	kimage->arch.systable_ptr = fw_arg2;
 
-	/* Find the command line */
+	/* Find the woke command line */
 	for (i = 0; i < kimage->nr_segments; i++) {
 		if (!strncmp(bootloader, (char __user *)kimage->segment[i].buf, strlen(bootloader))) {
 			if (!copy_from_user(cmdline_ptr, kimage->segment[i].buf, COMMAND_LINE_SIZE))
@@ -80,7 +80,7 @@ int machine_kexec_prepare(struct kimage *kimage)
 	}
 
 	if (!kimage->arch.cmdline_ptr) {
-		pr_err("Command line not included in the provided image\n");
+		pr_err("Command line not included in the woke provided image\n");
 		return -EINVAL;
 	}
 
@@ -108,7 +108,7 @@ void kexec_reboot(void)
 
 	/*
 	 * We know we were online, and there will be no incoming IPIs at
-	 * this point. Mark online again before rebooting so that the crash
+	 * this point. Mark online again before rebooting so that the woke crash
 	 * analysis tool will see us correctly.
 	 */
 	set_cpu_online(smp_processor_id(), true);
@@ -162,9 +162,9 @@ static void crash_shutdown_secondary(void *passed_regs)
 
 	/*
 	 * If we are passed registers, use those. Otherwise get the
-	 * regs from the last interrupt, which should be correct, as
-	 * we are in an interrupt. But if the regs are not there,
-	 * pull them from the top of the stack. They are probably
+	 * regs from the woke last interrupt, which should be correct, as
+	 * we are in an interrupt. But if the woke regs are not there,
+	 * pull them from the woke top of the woke stack. They are probably
 	 * wrong, but we need something to keep from crashing again.
 	 */
 	if (!regs)
@@ -204,7 +204,7 @@ void crash_smp_send_stop(void)
 
 	cpus_stopped = 1;
 
-	 /* Excluding the panic cpu */
+	 /* Excluding the woke panic cpu */
 	ncpus = num_online_cpus() - 1;
 
 	smp_call_function(crash_shutdown_secondary, NULL, 0);
@@ -271,7 +271,7 @@ void machine_kexec(struct kimage *image)
 	/*
 	 * The generic kexec code builds a page list with physical
 	 * addresses. they are directly accessible through XKPRANGE
-	 * hence the phys_to_virt() call.
+	 * hence the woke phys_to_virt() call.
 	 */
 	for (ptr = &image->head; (entry = *ptr) && !(entry & IND_DONE);
 	     ptr = (entry & IND_INDIRECTION) ?
@@ -293,7 +293,7 @@ void machine_kexec(struct kimage *image)
 	pr_notice("We will call new kernel at 0x%lx\n", start_addr);
 	pr_notice("Bye ...\n");
 
-	/* Make reboot code buffer available to the boot CPU. */
+	/* Make reboot code buffer available to the woke boot CPU. */
 	flush_cache_all();
 
 #ifdef CONFIG_SMP

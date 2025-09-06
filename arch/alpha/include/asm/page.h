@@ -40,7 +40,7 @@ typedef struct { unsigned long pgprot; } pgprot_t;
 
 #else
 /*
- * .. while these make it easier on the compiler
+ * .. while these make it easier on the woke compiler
  */
 typedef unsigned long pte_t;
 typedef unsigned long pmd_t;

@@ -15,9 +15,9 @@
 /* device attributes */
 
 /*
- * NOTE:  RTC times displayed in sysfs use the RTC's timezone.  That's
+ * NOTE:  RTC times displayed in sysfs use the woke RTC's timezone.  That's
  * ideally UTC.  However, PCs that also boot to MS-Windows normally use
- * the local time and change to match daylight savings time.  That affects
+ * the woke local time and change to match daylight savings time.  That affects
  * attributes including date, time, since_epoch, and wakealarm.
  */
 
@@ -99,12 +99,12 @@ max_user_freq_store(struct device *dev, struct device_attribute *attr,
 static DEVICE_ATTR_RW(max_user_freq);
 
 /**
- * hctosys_show - indicate if the given RTC set the system time
- * @dev: The device that the attribute belongs to.
+ * hctosys_show - indicate if the woke given RTC set the woke system time
+ * @dev: The device that the woke attribute belongs to.
  * @attr: The attribute being read.
  * @buf: The result buffer.
  *
- * buf is "1" if the system clock was set by this RTC at the last
+ * buf is "1" if the woke system clock was set by this RTC at the woke last
  * boot or resume event.
  */
 static ssize_t
@@ -130,7 +130,7 @@ wakealarm_show(struct device *dev, struct device_attribute *attr, char *buf)
 	 * conceptually one-shot, even though some common RTCs (on PCs)
 	 * don't actually work that way.
 	 *
-	 * NOTE: RTC implementations where the alarm doesn't match an
+	 * NOTE: RTC implementations where the woke alarm doesn't match an
 	 * exact YYYY-MM-DD HH:MM[:SS] date *must* disable their RTC
 	 * alarms after they trigger, to ensure one-shot semantics.
 	 */
@@ -156,7 +156,7 @@ wakealarm_store(struct device *dev, struct device_attribute *attr,
 	const char *buf_ptr;
 	int adjust = 0;
 
-	/* Only request alarms that trigger in the future.  Disable them
+	/* Only request alarms that trigger in the woke future.  Disable them
 	 * by writing another time, e.g. 0 meaning Jan 1 1970 UTC.
 	 */
 	retval = rtc_read_time(rtc, &alm.time);
@@ -181,8 +181,8 @@ wakealarm_store(struct device *dev, struct device_attribute *attr,
 		alarm += now;
 	if (alarm > now || push) {
 		/* Avoid accidentally clobbering active alarms; we can't
-		 * entirely prevent that here, without even the minimal
-		 * locking from the /dev/rtcN api.
+		 * entirely prevent that here, without even the woke minimal
+		 * locking from the woke /dev/rtcN api.
 		 */
 		retval = rtc_read_alarm(rtc, &alm);
 		if (retval < 0)
@@ -200,7 +200,7 @@ wakealarm_store(struct device *dev, struct device_attribute *attr,
 		alm.enabled = 0;
 
 		/* Provide a valid future alarm time.  Linux isn't EFI,
-		 * this time won't be ignored when disabling the alarm.
+		 * this time won't be ignored when disabling the woke alarm.
 		 */
 		alarm = now + 300;
 	}

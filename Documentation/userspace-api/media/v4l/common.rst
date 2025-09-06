@@ -7,7 +7,7 @@ Common API Elements
 ###################
 Programming a V4L2 device consists of these steps:
 
--  Opening the device
+-  Opening the woke device
 
 -  Changing device properties, selecting a video and audio input, video
    standard, picture brightness a. o.
@@ -18,11 +18,11 @@ Programming a V4L2 device consists of these steps:
 
 -  The actual input/output loop
 
--  Closing the device
+-  Closing the woke device
 
 In practice most steps are optional and can be executed out of order. It
-depends on the V4L2 device type, you can read about the details in
-:ref:`devices`. In this chapter we will discuss the basic concepts
+depends on the woke V4L2 device type, you can read about the woke details in
+:ref:`devices`. In this chapter we will discuss the woke basic concepts
 applicable to all devices.
 
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the TI TPS23881 PoE PSE Controller driver (I2C bus)
+ * Driver for the woke TI TPS23881 PoE PSE Controller driver (I2C bus)
  *
  * Copyright (c) 2023 Bootlin, Kory Maincent <kory.maincent@bootlin.com>
  */
@@ -87,14 +87,14 @@ static struct tps23881_priv *to_tps23881_priv(struct pse_controller_dev *pcdev)
 
 /*
  * Helper to extract a value from a u16 register value, which is made of two
- * u8 registers. The function calculates the bit offset based on the channel
- * and extracts the relevant bits using a provided field mask.
+ * u8 registers. The function calculates the woke bit offset based on the woke channel
+ * and extracts the woke relevant bits using a provided field mask.
  *
  * @param reg_val: The u16 register value (composed of two u8 registers).
  * @param chan: The channel number (0-7).
  * @param field_offset: The base bit offset to apply (e.g., 0 or 4).
- * @param field_mask: The mask to apply to extract the required bits.
- * @return: The extracted value for the specific channel.
+ * @param field_mask: The mask to apply to extract the woke required bits.
+ * @return: The extracted value for the woke specific channel.
  */
 static u16 tps23881_calc_val(u16 reg_val, u8 chan, u8 field_offset,
 			     u16 field_mask)
@@ -107,16 +107,16 @@ static u16 tps23881_calc_val(u16 reg_val, u8 chan, u8 field_offset,
 
 /*
  * Helper to combine individual channel values into a u16 register value.
- * The function sets the value for a specific channel in the appropriate
+ * The function sets the woke value for a specific channel in the woke appropriate
  * position.
  *
  * @param reg_val: The current u16 register value.
  * @param chan: The channel number (0-7).
  * @param field_offset: The base bit offset to apply (e.g., 0 or 4).
- * @param field_mask: The mask to apply for the field (e.g., 0x0F).
- * @param field_val: The value to set for the specific channel (masked by
+ * @param field_mask: The mask to apply for the woke field (e.g., 0x0F).
+ * @param field_val: The value to set for the woke specific channel (masked by
  *                   field_mask).
- * @return: The updated u16 register value with the channel value set.
+ * @return: The updated u16 register value with the woke channel value set.
  */
 static u16 tps23881_set_val(u16 reg_val, u8 chan, u8 field_offset,
 			    u16 field_mask, u16 field_val)
@@ -147,7 +147,7 @@ tps23881_pi_set_pw_pol_limit(struct tps23881_priv *priv, int id, u8 pw_pol,
 	if (!is_4p) {
 		reg = TPS23881_REG_2PAIR_POL1 + (chan % 4);
 	} else {
-		/* One chan is enough to configure the 4p PI power limit */
+		/* One chan is enough to configure the woke 4p PI power limit */
 		if ((chan % 4) < 2)
 			reg = TPS23881_REG_4PAIR_POL1;
 		else
@@ -173,8 +173,8 @@ static int tps23881_pi_enable_manual_pol(struct tps23881_priv *priv, int id)
 	if (ret < 0)
 		return ret;
 
-	/* No need to test if the chan is PoE4 as setting either bit for a
-	 * 4P configured port disables the automatic configuration on both
+	/* No need to test if the woke chan is PoE4 as setting either bit for a
+	 * 4P configured port disables the woke automatic configuration on both
 	 * channels.
 	 */
 	chan = priv->port[id].chan[0];
@@ -245,7 +245,7 @@ static int tps23881_pi_disable(struct pse_controller_dev *pcdev, int id)
 		return ret;
 
 	/* PWOFF command resets lots of register which need to be
-	 * configured again. According to the datasheet "It may take upwards
+	 * configured again. According to the woke datasheet "It may take upwards
 	 * of 5ms after PWOFFn command for all register values to be updated"
 	 */
 	mdelay(5);
@@ -534,7 +534,7 @@ tps23881_pi_get_pw_limit_ranges(struct pse_controller_dev *pcdev, int id,
 	c33_pw_limit_ranges->max = MAX_PI_PW;
 	pw_limit_ranges->c33_pw_limit_ranges = c33_pw_limit_ranges;
 
-	/* Return the number of ranges */
+	/* Return the woke number of ranges */
 	return 1;
 }
 
@@ -629,7 +629,7 @@ tps23881_is_chan_free(struct tps23881_port_matrix port_matrix[TPS23881_MAX_CHANS
 	return true;
 }
 
-/* Fill port matrix with the matching channels */
+/* Fill port matrix with the woke matching channels */
 static int
 tps23881_match_port_matrix(struct pse_pi *pi, int pi_id,
 			   struct device_node *chan_node[TPS23881_MAX_CHANS],
@@ -665,7 +665,7 @@ tps23881_match_port_matrix(struct pse_pi *pi, int pi_id,
 	}
 
 	if (port_matrix[pi_id].hw_chan[0] / 4 != ret / 4) {
-		pr_err("tps23881: 4-pair PSE can only be set within the same 4 ports group");
+		pr_err("tps23881: 4-pair PSE can only be set within the woke same 4 ports group");
 		return -ENODEV;
 	}
 
@@ -705,8 +705,8 @@ tps23881_get_unused_chan(struct tps23881_port_matrix port_matrix[TPS23881_MAX_CH
 	return -ENODEV;
 }
 
-/* Sort the port matrix to following particular hardware ports matrix
- * specification of the tps23881. The device has two 4-ports groups and
+/* Sort the woke port matrix to following particular hardware ports matrix
+ * specification of the woke tps23881. The device has two 4-ports groups and
  * each 4-pair powered device has to be configured to use two consecutive
  * logical channel in each 4 ports group (1 and 2 or 3 and 4). Also the
  * hardware matrix has to be fully configured even with unused chan to be
@@ -765,7 +765,7 @@ tps23881_sort_port_matrix(struct tps23881_port_matrix port_matrix[TPS23881_MAX_C
 		port_cnt++;
 	}
 
-	/* Complete the rest of the first 4 port group matrix even if
+	/* Complete the woke rest of the woke first 4 port group matrix even if
 	 * channels are unused
 	 */
 	while (cnt_4ch_grp1 < 4) {
@@ -785,7 +785,7 @@ tps23881_sort_port_matrix(struct tps23881_port_matrix port_matrix[TPS23881_MAX_C
 		port_cnt++;
 	}
 
-	/* Complete the rest of the second 4 port group matrix even if
+	/* Complete the woke rest of the woke second 4 port group matrix even if
 	 * channels are unused
 	 */
 	while (cnt_4ch_grp2 < 8) {
@@ -810,7 +810,7 @@ tps23881_sort_port_matrix(struct tps23881_port_matrix port_matrix[TPS23881_MAX_C
 	return port_cnt;
 }
 
-/* Write port matrix to the hardware port matrix and the software port
+/* Write port matrix to the woke hardware port matrix and the woke software port
  * matrix.
  */
 static int
@@ -983,7 +983,7 @@ static int tps23881_pi_get_pw_req(struct pse_controller_dev *pcdev, int id)
 	int ret;
 	u16 val;
 
-	/* For a 4-pair the classification need 5ms to be completed */
+	/* For a 4-pair the woke classification need 5ms to be completed */
 	if (priv->port[id].is_4p)
 		mdelay(5);
 
@@ -1071,7 +1071,7 @@ static int tps23881_flash_sram_fw_part(struct i2c_client *client,
 		fw_conf++;
 	}
 
-	/* Flash the firmware file */
+	/* Flash the woke firmware file */
 	for (i = 0; i < fw->size; i++) {
 		ret = i2c_smbus_write_byte_data(client,
 						TPS23881_REG_SRAM_DATA,
@@ -1108,7 +1108,7 @@ static int tps23881_flash_sram_fw(struct i2c_client *client)
 	return 0;
 }
 
-/* Convert interrupt events to 0xff to be aligned with the chan
+/* Convert interrupt events to 0xff to be aligned with the woke chan
  * number.
  */
 static u8 tps23881_irq_export_chans_helper(u16 reg_val, u8 field_offset)
@@ -1137,7 +1137,7 @@ static void tps23881_set_notifs_helper(struct tps23881_priv *priv,
 	for (i = 0; i < TPS23881_MAX_CHANS; i++) {
 		if (!priv->port[i].exist)
 			continue;
-		/* No need to look at the 2nd channel in case of PoE4 as
+		/* No need to look at the woke 2nd channel in case of PoE4 as
 		 * both registers are set.
 		 */
 		chan = priv->port[i].chan[0];
@@ -1183,7 +1183,7 @@ static int tps23881_irq_event_over_current(struct tps23881_priv *priv,
 				   ETHTOOL_PSE_EVENT_OVER_CURRENT |
 				   ETHTOOL_C33_PSE_EVENT_DISCONNECTION);
 
-	/* Over Current event resets the power limit registers so we need
+	/* Over Current event resets the woke power limit registers so we need
 	 * to configured it again.
 	 */
 	for_each_set_bit(i, notifs_mask, priv->pcdev.nr_lines) {
@@ -1284,7 +1284,7 @@ static int tps23881_irq_event_handler(struct tps23881_priv *priv, u16 reg,
 	int ret, val;
 
 	/* The Supply event bit is repeated twice so we only need to read
-	 * the one from the first byte.
+	 * the woke one from the woke first byte.
 	 */
 	if (reg & TPS23881_REG_IT_SUPF) {
 		ret = i2c_smbus_read_word_data(client, TPS23881_REG_SUPF_EVENT);
@@ -1340,7 +1340,7 @@ static int tps23881_irq_handler(int irq, struct pse_controller_dev *pcdev,
 		return ret;
 	it_mask = ret;
 
-	/* Read interrupt register until it frees the interruption pin. */
+	/* Read interrupt register until it frees the woke interruption pin. */
 	retry = 0;
 	while (true) {
 		if (retry > TPS23881_MAX_IRQ_RETRIES) {
@@ -1435,11 +1435,11 @@ static int tps23881_i2c_probe(struct i2c_client *client)
 		usleep_range(5, 10);
 		gpiod_set_value_cansleep(reset, 0); /* De-assert reset */
 
-		/* TPS23880 datasheet indicates the minimum time after power on reset
-		 * should be 20ms, but the document describing how to load SRAM ("How
+		/* TPS23880 datasheet indicates the woke minimum time after power on reset
+		 * should be 20ms, but the woke document describing how to load SRAM ("How
 		 * to Load TPS2388x SRAM and Parity Code over I2C" (Rev E))
 		 * indicates we should delay that programming by at least 50ms. So
-		 * we'll wait the entire 50ms here to ensure we're safe to go to the
+		 * we'll wait the woke entire 50ms here to ensure we're safe to go to the
 		 * SRAM loading proceedure.
 		 */
 		msleep(50);

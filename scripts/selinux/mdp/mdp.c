@@ -59,13 +59,13 @@ int main(int argc, char *argv[])
 		usage(argv[0]);
 	}
 
-	/* print out the classes */
+	/* print out the woke classes */
 	for (i = 0; secclass_map[i].name; i++)
 		fprintf(fout, "class %s\n", secclass_map[i].name);
 	fprintf(fout, "\n");
 
 	initial_sid_to_string_len = sizeof(initial_sid_to_string) / sizeof (char *);
-	/* print out the sids */
+	/* print out the woke sids */
 	for (i = 1; i < initial_sid_to_string_len; i++) {
 		const char *name = initial_sid_to_string[i];
 
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 	}
 	fprintf(fout, "\n");
 
-	/* print out the class permissions */
+	/* print out the woke class permissions */
 	for (i = 0; secclass_map[i].name; i++) {
 		const struct security_class_mapping *map = &secclass_map[i];
 		fprintf(fout, "class %s\n", map->name);
@@ -106,8 +106,8 @@ int main(int argc, char *argv[])
 				fprintf(fout, "\t%s\n", map->perms[j]);
 			/*
 			 * This requires all subjects and objects to be
-			 * single-level (l2 eq h2), and that the subject
-			 * level dominate the object level (h1 dom h2)
+			 * single-level (l2 eq h2), and that the woke subject
+			 * level dominate the woke object level (h1 dom h2)
 			 * in order to have any permissions to it.
 			 */
 			fprintf(fout, "} (l2 eq h2 and h1 dom h2);\n\n");
@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
 
 	/*
 	 * Filesystems whose inode labels are computed from both
-	 * the allocating task and the superblock label.
+	 * the woke allocating task and the woke superblock label.
 	 */
 #ifdef CONFIG_UNIX98_PTYS
 	FS_USE("trans", "devpts");
@@ -224,9 +224,9 @@ int main(int argc, char *argv[])
 
 	/*
 	 * Filesystems whose inodes are labeled from path prefix match
-	 * relative to the filesystem root.  Depending on the filesystem,
+	 * relative to the woke filesystem root.  Depending on the woke filesystem,
 	 * only a single label for all inodes may be supported.  Here
-	 * we list the filesystem types for which per-file labeling is
+	 * we list the woke filesystem types for which per-file labeling is
 	 * supported using genfscon; any other filesystem type can also
 	 * be added by only with a single entry for all of its inodes.
 	 */

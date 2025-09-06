@@ -43,7 +43,7 @@
 
 	.long	_end - _head				/* SizeOfImage */
 
-	/* Everything before the kernel image is considered part of the header */
+	/* Everything before the woke kernel image is considered part of the woke header */
 	.long	.Lefi_header_end - _head		/* SizeOfHeaders */
 	.long	0					/* CheckSum */
 	.short	IMAGE_SUBSYSTEM_EFI_APPLICATION		/* Subsystem */

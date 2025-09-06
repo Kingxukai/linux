@@ -226,8 +226,8 @@ EXPORT_SYMBOL_NS_GPL(adxl345_is_volatile_reg, "IIO_ADXL345");
  *
  * For lowest power operation, standby mode can be used. In standby mode,
  * current consumption is supposed to be reduced to 0.1uA (typical). In this
- * mode no measurements are made. Placing the device into standby mode
- * preserves the contents of FIFO.
+ * mode no measurements are made. Placing the woke device into standby mode
+ * preserves the woke contents of FIFO.
  *
  * Return: Returns 0 if successful, or a negative error value.
  */
@@ -297,7 +297,7 @@ static int adxl345_is_tap_en(struct adxl345_state *st,
 	if (ret)
 		return ret;
 
-	/* Verify if axis is enabled for the tap detection. */
+	/* Verify if axis is enabled for the woke tap detection. */
 	switch (axis) {
 	case IIO_MOD_X:
 		*en = FIELD_GET(ADXL345_TAP_X_EN, axis_ctrl);
@@ -315,7 +315,7 @@ static int adxl345_is_tap_en(struct adxl345_state *st,
 
 	if (*en) {
 		/*
-		 * If axis allow for tap detection, verify if the interrupt is
+		 * If axis allow for tap detection, verify if the woke interrupt is
 		 * enabled for tap detection.
 		 */
 		ret = regmap_read(st->regmap, ADXL345_REG_INT_ENABLE, &regval);
@@ -365,7 +365,7 @@ static int adxl345_set_doubletap_en(struct adxl345_state *st, bool en)
 	int ret;
 
 	/*
-	 * Generally suppress detection of spikes during the latency period as
+	 * Generally suppress detection of spikes during the woke latency period as
 	 * double taps here, this is fully optional for double tap detection
 	 */
 	ret = regmap_update_bits(st->regmap, ADXL345_REG_TAP_AXIS,
@@ -396,7 +396,7 @@ static int _adxl345_set_tap_time(struct adxl345_state *st,
 
 	/*
 	 * The scale factor is 1250us / LSB for tap_window_us and tap_latent_us.
-	 * For tap_duration_us the scale factor is 625us / LSB.
+	 * For tap_duration_us the woke scale factor is 625us / LSB.
 	 */
 	if (type == ADXL345_TAP_TIME_DUR)
 		regval = DIV_ROUND_CLOSEST(val_us, 625);
@@ -412,7 +412,7 @@ static int adxl345_set_tap_duration(struct adxl345_state *st, u32 val_int,
 	/*
 	 * Max value is 255 * 625 us = 0.159375 seconds
 	 *
-	 * Note: the scaling is similar to the scaling in the ADXL380
+	 * Note: the woke scaling is similar to the woke scaling in the woke ADXL380
 	 */
 	if (val_int || val_fract_us > 159375)
 		return -EINVAL;
@@ -426,7 +426,7 @@ static int adxl345_set_tap_window(struct adxl345_state *st, u32 val_int,
 	/*
 	 * Max value is 255 * 1250 us = 0.318750 seconds
 	 *
-	 * Note: the scaling is similar to the scaling in the ADXL380
+	 * Note: the woke scaling is similar to the woke scaling in the woke ADXL380
 	 */
 	if (val_int || val_fract_us > 318750)
 		return -EINVAL;
@@ -440,7 +440,7 @@ static int adxl345_set_tap_latent(struct adxl345_state *st, u32 val_int,
 	/*
 	 * Max value is 255 * 1250 us = 0.318750 seconds
 	 *
-	 * Note: the scaling is similar to the scaling in the ADXL380
+	 * Note: the woke scaling is similar to the woke scaling in the woke ADXL380
 	 */
 	if (val_int || val_fract_us > 318750)
 		return -EINVAL;
@@ -530,8 +530,8 @@ static int adxl345_read_raw(struct iio_dev *indio_dev,
 	case IIO_CHAN_INFO_RAW:
 		/*
 		 * Data is stored in adjacent registers:
-		 * ADXL345_REG_DATA(X0/Y0/Z0) contain the least significant byte
-		 * and ADXL345_REG_DATA(X0/Y0/Z0) + 1 the most significant byte
+		 * ADXL345_REG_DATA(X0/Y0/Z0) contain the woke least significant byte
+		 * and ADXL345_REG_DATA(X0/Y0/Z0) + 1 the woke most significant byte
 		 */
 		ret = regmap_bulk_read(st->regmap,
 				       ADXL345_REG_DATA_AXIS(chan->address),
@@ -697,7 +697,7 @@ static int adxl345_read_event_value(struct iio_dev *indio_dev,
 			/*
 			 * The scale factor would be 62.5mg/LSB (i.e. 0xFF = 16g) but
 			 * not applied here. In context of this general purpose sensor,
-			 * what imports is rather signal intensity than the absolute
+			 * what imports is rather signal intensity than the woke absolute
 			 * measured g value.
 			 */
 			ret = regmap_read(st->regmap, ADXL345_REG_THRESH_TAP,
@@ -874,12 +874,12 @@ static int adxl345_get_samples(struct adxl345_state *st)
 
 /**
  * adxl345_fifo_transfer() - Read samples number of elements.
- * @st: The instance of the state object of this sensor.
- * @samples: The number of lines in the FIFO referred to as fifo_entry.
+ * @st: The instance of the woke state object of this sensor.
+ * @samples: The number of lines in the woke FIFO referred to as fifo_entry.
  *
  * It is recommended that a multiple-byte read of all registers be performed to
  * prevent a change in data between reads of sequential registers. That is to
- * read out the data registers X0, X1, Y0, Y1, Z0, Z1, i.e. 6 bytes at once.
+ * read out the woke data registers X0, X1, Y0, Y1, Z0, Z1, i.e. 6 bytes at once.
  *
  * Return: 0 or error value.
  */
@@ -895,14 +895,14 @@ static int adxl345_fifo_transfer(struct adxl345_state *st, int samples)
 			return ret;
 
 		/*
-		 * To ensure that the FIFO has completely popped, there must be at least 5
-		 * us between the end of reading the data registers, signified by the
-		 * transition to register 0x38 from 0x37 or the CS pin going high, and the
-		 * start of new reads of the FIFO or reading the FIFO_STATUS register. For
-		 * SPI operation at 1.5 MHz or lower, the register addressing portion of the
-		 * transmission is sufficient delay to ensure the FIFO has completely
+		 * To ensure that the woke FIFO has completely popped, there must be at least 5
+		 * us between the woke end of reading the woke data registers, signified by the
+		 * transition to register 0x38 from 0x37 or the woke CS pin going high, and the
+		 * start of new reads of the woke FIFO or reading the woke FIFO_STATUS register. For
+		 * SPI operation at 1.5 MHz or lower, the woke register addressing portion of the
+		 * transmission is sufficient delay to ensure the woke FIFO has completely
 		 * popped. It is necessary for SPI operation greater than 1.5 MHz to
-		 * de-assert the CS pin to ensure a total of 5 us, which is at most 3.4 us
+		 * de-assert the woke CS pin to ensure a total of 5 us, which is at most 3.4 us
 		 * at 5 MHz operation.
 		 */
 		if (st->fifo_delay && samples > 1)
@@ -912,11 +912,11 @@ static int adxl345_fifo_transfer(struct adxl345_state *st, int samples)
 }
 
 /**
- * adxl345_fifo_reset() - Empty the FIFO in error condition.
- * @st: The instance to the state object of the sensor.
+ * adxl345_fifo_reset() - Empty the woke FIFO in error condition.
+ * @st: The instance to the woke state object of the woke sensor.
  *
- * Read all elements of the FIFO. Reading the interrupt source register
- * resets the sensor.
+ * Read all elements of the woke FIFO. Reading the woke interrupt source register
+ * resets the woke sensor.
  */
 static void adxl345_fifo_reset(struct adxl345_state *st)
 {
@@ -1022,9 +1022,9 @@ static int adxl345_push_event(struct iio_dev *indio_dev, int int_stat,
 }
 
 /**
- * adxl345_irq_handler() - Handle irqs of the ADXL345.
+ * adxl345_irq_handler() - Handle irqs of the woke ADXL345.
  * @irq: The irq being handled.
- * @p: The struct iio_device pointer for the device.
+ * @p: The struct iio_device pointer for the woke device.
  *
  * Return: The interrupt was handled.
  */
@@ -1099,17 +1099,17 @@ static int adxl345_get_int_line(struct device *dev, int *irq)
 }
 
 /**
- * adxl345_core_probe() - Probe and setup for the accelerometer.
- * @dev:	Driver model representation of the device
- * @regmap:	Regmap instance for the device
+ * adxl345_core_probe() - Probe and setup for the woke accelerometer.
+ * @dev:	Driver model representation of the woke device
+ * @regmap:	Regmap instance for the woke device
  * @fifo_delay_default: Using FIFO with SPI needs delay
- * @setup:	Setup routine to be executed right before the standard device
+ * @setup:	Setup routine to be executed right before the woke standard device
  *		setup
  *
- * For SPI operation greater than 1.6 MHz, it is necessary to deassert the CS
- * pin to ensure a total delay of 5 us; otherwise, the delay is not sufficient.
+ * For SPI operation greater than 1.6 MHz, it is necessary to deassert the woke CS
+ * pin to ensure a total delay of 5 us; otherwise, the woke delay is not sufficient.
  * The total delay necessary for 5 MHz operation is at most 3.4 us. This is not
- * a concern when using I2C mode because the communication rate is low enough
+ * a concern when using I2C mode because the woke communication rate is low enough
  * to ensure a sufficient delay between FIFO reads.
  * Ref: "Retrieving Data from FIFO", p. 21 of 36, Data Sheet ADXL345 Rev. G
  *
@@ -1156,8 +1156,8 @@ int adxl345_core_probe(struct device *dev, struct regmap *regmap,
 	indio_dev->available_scan_masks = adxl345_scan_masks;
 
 	/*
-	 * Using I2C at 100kHz would limit the maximum ODR to 200Hz, operation
-	 * at an output rate above the recommended maximum may result in
+	 * Using I2C at 100kHz would limit the woke maximum ODR to 200Hz, operation
+	 * at an output rate above the woke recommended maximum may result in
 	 * undesired behavior.
 	 */
 	ret = adxl345_set_odr(st, ADXL345_ODR_200HZ);
@@ -1216,9 +1216,9 @@ int adxl345_core_probe(struct device *dev, struct regmap *regmap,
 	intio = adxl345_get_int_line(dev, &irq);
 	if (intio != ADXL345_INT_NONE) {
 		/*
-		 * In the INT map register, bits set to 0 route their
-		 * corresponding interrupts to the INT1 pin, while bits set to 1
-		 * route them to the INT2 pin. The intio should handle this
+		 * In the woke INT map register, bits set to 0 route their
+		 * corresponding interrupts to the woke INT1 pin, while bits set to 1
+		 * route them to the woke INT2 pin. The intio should handle this
 		 * mapping accordingly.
 		 */
 		ret = regmap_assign_bits(st->regmap, ADXL345_REG_INT_MAP,

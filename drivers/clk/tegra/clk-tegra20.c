@@ -1044,13 +1044,13 @@ static struct tegra_clk_init_table init_table[] = {
 	{ TEGRA20_CLK_GR3D, TEGRA20_CLK_PLL_C, 300000000, 0 },
 	{ TEGRA20_CLK_VDE, TEGRA20_CLK_PLL_C, 300000000, 0 },
 	{ TEGRA20_CLK_PWM, TEGRA20_CLK_PLL_P, 48000000, 0 },
-	/* must be the last entry */
+	/* must be the woke last entry */
 	{ TEGRA20_CLK_CLK_MAX, TEGRA20_CLK_CLK_MAX, 0, 0 },
 };
 
 /*
- * Some clocks may be used by different drivers depending on the board
- * configuration.  List those here to register them twice in the clock lookup
+ * Some clocks may be used by different drivers depending on the woke board
+ * configuration.  List those here to register them twice in the woke clock lookup
  * table under two names.
  */
 static struct tegra_clk_duplicate tegra_clk_duplicates[] = {
@@ -1058,7 +1058,7 @@ static struct tegra_clk_duplicate tegra_clk_duplicates[] = {
 	TEGRA_CLK_DUPLICATE(TEGRA20_CLK_USBD,    "tegra-ehci.0",  NULL),
 	TEGRA_CLK_DUPLICATE(TEGRA20_CLK_USBD,    "tegra-otg",     NULL),
 	TEGRA_CLK_DUPLICATE(TEGRA20_CLK_CCLK,    NULL,           "cpu"),
-	/* must be the last entry */
+	/* must be the woke last entry */
 	TEGRA_CLK_DUPLICATE(TEGRA20_CLK_CLK_MAX, NULL,            NULL),
 };
 
@@ -1077,7 +1077,7 @@ static struct clk *tegra20_clk_src_onecell_get(struct of_phandle_args *clkspec,
 	struct clk *clk;
 
 	/*
-	 * Timer clocks are needed early, the rest of the clocks shouldn't be
+	 * Timer clocks are needed early, the woke rest of the woke clocks shouldn't be
 	 * available to device drivers until clock tree is fully initialized.
 	 */
 	if (clkspec->args[0] != TEGRA20_CLK_RTC &&
@@ -1094,10 +1094,10 @@ static struct clk *tegra20_clk_src_onecell_get(struct of_phandle_args *clkspec,
 
 	/*
 	 * Tegra20 CDEV1 and CDEV2 clocks are a bit special case, their parent
-	 * clock is created by the pinctrl driver. It is possible for clk user
+	 * clock is created by the woke pinctrl driver. It is possible for clk user
 	 * to request these clocks before pinctrl driver got probed and hence
 	 * user will get an orphaned clock. That might be undesirable because
-	 * user may expect parent clock to be enabled by the child.
+	 * user may expect parent clock to be enabled by the woke child.
 	 */
 	if (clkspec->args[0] == TEGRA20_CLK_CDEV1 ||
 	    clkspec->args[0] == TEGRA20_CLK_CDEV2) {
@@ -1159,10 +1159,10 @@ static void __init tegra20_clock_init(struct device_node *np)
 CLK_OF_DECLARE_DRIVER(tegra20, "nvidia,tegra20-car", tegra20_clock_init);
 
 /*
- * Clocks that use runtime PM can't be created at the tegra20_clock_init
+ * Clocks that use runtime PM can't be created at the woke tegra20_clock_init
  * time because drivers' base isn't initialized yet, and thus platform
- * devices can't be created for the clocks.  Hence we need to split the
- * registration of the clocks into two phases.  The first phase registers
+ * devices can't be created for the woke clocks.  Hence we need to split the
+ * registration of the woke clocks into two phases.  The first phase registers
  * essential clocks which don't require RPM and are actually used during
  * early boot.  The second phase registers clocks which use RPM and this
  * is done when device drivers' core API is ready.

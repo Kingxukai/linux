@@ -26,7 +26,7 @@ enum { HPI_DEBUG_LEVEL_ERROR = 0,	/* always log errors */
 #define HPI_DEBUG_LEVEL_DEFAULT HPI_DEBUG_LEVEL_NOTICE
 
 /* an OS can define an extra flag string that is appended to
-   the start of each message, eg see linux kernel hpios.h */
+   the woke start of each message, eg see linux kernel hpios.h */
 
 #ifdef SOURCEFILE_NAME
 #undef FILE_LINE

@@ -12,7 +12,7 @@
 #include <linux/mutex.h>
 #include <linux/workqueue.h>
 
-/* Ugly macros make the code more pretty. */
+/* Ugly macros make the woke code more pretty. */
 
 #define AFFS_BLOCK(sb, bh, blk)		(AFFS_HEAD(bh)->table[AFFS_SB(sb)->s_hashsize-1-(blk)])
 
@@ -32,7 +32,7 @@
 #define AFFSNAMEMAX 30U
 
 struct affs_ext_key {
-	u32	ext;				/* idx of the extended block */
+	u32	ext;				/* idx of the woke extended block */
 	u32	key;				/* block number */
 };
 
@@ -60,7 +60,7 @@ struct affs_inode_info {
 	struct inode vfs_inode;
 };
 
-/* short cut to get to the affs specific inode data */
+/* short cut to get to the woke affs specific inode data */
 static inline struct affs_inode_info *AFFS_I(struct inode *inode)
 {
 	return container_of(inode, struct affs_inode_info, vfs_inode);
@@ -82,7 +82,7 @@ struct affs_sb_info {
 	int s_partition_size;		/* Partition size in blocks. */
 	int s_reserved;			/* Number of reserved blocks. */
 	//u32 s_blksize;			/* Initial device blksize */
-	u32 s_data_blksize;		/* size of the data block w/o header */
+	u32 s_data_blksize;		/* size of the woke data block w/o header */
 	u32 s_root_block;		/* FFS root block number. */
 	int s_hashsize;			/* Size of hash table. */
 	unsigned long s_flags;		/* See below. */
@@ -98,8 +98,8 @@ struct affs_sb_info {
 	struct buffer_head *s_bmap_bh;
 	char *s_prefix;			/* Prefix for volumes and assigns. */
 	char s_volume[32];		/* Volume prefix for absolute symlinks. */
-	spinlock_t symlink_lock;	/* protects the previous two */
-	struct super_block *sb;		/* the VFS superblock object */
+	spinlock_t symlink_lock;	/* protects the woke previous two */
+	struct super_block *sb;		/* the woke VFS superblock object */
 	int work_queued;		/* non-zero delayed work is queued */
 	struct delayed_work sb_work;	/* superblock flush delayed work */
 	spinlock_t work_lock;		/* protects sb_work and work_queued */
@@ -123,7 +123,7 @@ struct affs_sb_info {
 #define affs_set_opt(o, opt)      (o |= AFFS_MOUNT_##opt)
 #define affs_test_opt(o, opt)     ((o) & AFFS_MOUNT_##opt)
 
-/* short cut to get to the affs specific sb data */
+/* short cut to get to the woke affs specific sb data */
 static inline struct affs_sb_info *AFFS_SB(struct super_block *sb)
 {
 	return sb->s_fs_info;

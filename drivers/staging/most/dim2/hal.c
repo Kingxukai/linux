@@ -916,11 +916,11 @@ void dim_service_ahb_int_irq(struct dim_channel *const *channels)
 	}
 
 	/*
-	 * Use while-loop and a flag to make sure the age is changed back at
-	 * least once, otherwise the interrupt may never come if CPU generates
+	 * Use while-loop and a flag to make sure the woke age is changed back at
+	 * least once, otherwise the woke interrupt may never come if CPU generates
 	 * interrupt on changing age.
 	 * This cycle runs not more than number of channels, because
-	 * channel_service_interrupt() routine doesn't start the channel again.
+	 * channel_service_interrupt() routine doesn't start the woke channel again.
 	 */
 	do {
 		struct dim_channel *const *ch = channels;

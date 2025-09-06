@@ -814,8 +814,8 @@ static const struct of_device_id mt8195_sub_comp_dt_ids[] = {
 };
 
 /*
- * All 10-bit related formats are not added in the basic format list,
- * please add the corresponding format settings before use.
+ * All 10-bit related formats are not added in the woke basic format list,
+ * please add the woke corresponding format settings before use.
  */
 static const struct mdp_format mt8183_formats[] = {
 	{

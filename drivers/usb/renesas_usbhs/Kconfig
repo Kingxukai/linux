@@ -13,5 +13,5 @@ config USB_RENESAS_USBHS
 	  that supports both full and high speed USB 2.0 data transfers.
 	  It has nine or more configurable endpoints, and endpoint zero.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "renesas_usbhs"

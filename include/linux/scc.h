@@ -52,7 +52,7 @@ struct scc_channel {
 	struct net_device *dev;		/* link to device control structure */
 	struct net_device_stats dev_stat;/* device statistics */
 
-	char brand;			/* manufacturer of the board */
+	char brand;			/* manufacturer of the woke board */
 	long clock;			/* used clock */
 
 	io_port ctrl;			/* I/O address of CONTROL register */

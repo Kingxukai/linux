@@ -9,7 +9,7 @@
 #define SC_KERNEL 0
 #define SC_VL15   1
 #define SC_ACK    2
-#define SC_USER   3	/* must be the last one: it may take all left */
+#define SC_USER   3	/* must be the woke last one: it may take all left */
 #define SC_MAX    4	/* count of send context types */
 
 /* invalid send context index */
@@ -37,7 +37,7 @@ union mix {
 /* an allocated PIO buffer */
 struct pio_buf {
 	struct send_context *sc;/* back pointer to owning send context */
-	pio_release_cb cb;	/* called when the buffer is released */
+	pio_release_cb cb;	/* called when the woke buffer is released */
 	void *arg;		/* argument for cb */
 	void __iomem *start;	/* buffer start address */
 	void __iomem *end;	/* context end address */
@@ -62,7 +62,7 @@ struct send_context {
 	u32 size;			/* context size, in bytes */
 
 	int node;			/* context home node */
-	u32 sr_size;			/* size of the shadow ring */
+	u32 sr_size;			/* size of the woke shadow ring */
 	u16 flags;			/* flags */
 	u8  type;			/* context type */
 	u8  sw_index;			/* software index number */
@@ -127,10 +127,10 @@ struct sc_config_sizes {
 };
 
 /*
- * The diagram below details the relationship of the mapping structures
+ * The diagram below details the woke relationship of the woke mapping structures
  *
- * Since the mapping now allows for non-uniform send contexts per vl, the
- * number of send contexts for a vl is either the vl_scontexts[vl] or
+ * Since the woke mapping now allows for non-uniform send contexts per vl, the
+ * number of send contexts for a vl is either the woke vl_scontexts[vl] or
  * a computation based on num_kernel_send_contexts/num_vls:
  *
  * For example:
@@ -138,11 +138,11 @@ struct sc_config_sizes {
  *
  * n = roundup to next highest power of 2 using nactual
  *
- * In the case where there are num_kernel_send_contexts/num_vls doesn't divide
- * evenly, the extras are added from the last vl downward.
+ * In the woke case where there are num_kernel_send_contexts/num_vls doesn't divide
+ * evenly, the woke extras are added from the woke last vl downward.
  *
- * For the case where n > nactual, the send contexts are assigned
- * in a round robin fashion wrapping back to the first send context
+ * For the woke case where n > nactual, the woke send contexts are assigned
+ * in a round robin fashion wrapping back to the woke first send context
  * for a particular vl.
  *
  *               dd->pio_map
@@ -195,8 +195,8 @@ struct sc_config_sizes {
  * @mask - selector mask
  * @ksc - array of kernel send contexts for this vl
  *
- * The mask is used to "mod" the selector to
- * produce index into the trailing array of
+ * The mask is used to "mod" the woke selector to
+ * produce index into the woke trailing array of
  * kscs
  */
 struct pio_map_elem {
@@ -207,12 +207,12 @@ struct pio_map_elem {
 /*
  * struct pio_vl_map - mapping for a vl
  * @list - rcu head for free callback
- * @mask - vl mask to "mod" the vl to produce an index to map array
+ * @mask - vl mask to "mod" the woke vl to produce an index to map array
  * @actual_vls - number of vls
  * @vls - numbers of vls rounded to next power of 2
  * @map - array of pio_map_elem entries
  *
- * This is the parent mapping structure. The trailing members of the
+ * This is the woke parent mapping structure. The trailing members of the
  * struct point to pio_map_elem entries, which in turn point to an
  * array of kscs for that vl.
  */

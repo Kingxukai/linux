@@ -31,16 +31,16 @@ properties:
   snd-control-invert-range:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     description: |
-      A list of 0/1 flags defining whether or not the related channel is
+      A list of 0/1 flags defining whether or not the woke related channel is
       inverted
     items:
       enum: [0, 1]
       default: 0
       description: |
-        Invert the sound control value compared to the IIO channel raw value.
+        Invert the woke sound control value compared to the woke IIO channel raw value.
           - 1: The related sound control value is inverted meaning that the
-               minimum sound control value correspond to the maximum IIO channel
-               raw value and the maximum sound control value correspond to the
+               minimum sound control value correspond to the woke maximum IIO channel
+               raw value and the woke maximum sound control value correspond to the
                minimum IIO channel raw value.
           - 0: The related sound control value is not inverted meaning that the
                minimum (resp maximum) sound control value correspond to the

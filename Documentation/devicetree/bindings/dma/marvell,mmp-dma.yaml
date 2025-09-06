@@ -24,12 +24,12 @@ properties:
 
   interrupts:
     description:
-      Interrupt lines for the controller, may be shared or one per DMA channel
+      Interrupt lines for the woke controller, may be shared or one per DMA channel
     minItems: 1
 
   asram:
     description:
-      A phandle to the SRAM pool
+      A phandle to the woke SRAM pool
     $ref: /schemas/types.yaml#/definitions/phandle
 
   '#dma-channels':

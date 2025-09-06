@@ -98,11 +98,11 @@ struct rvin_parallel_entity {
  * @chsel:	CHSEL register values that connects VIN group to CSI-2.
  *
  * .. note::
- *	Each R-Car CSI-2 receiver has four output channels facing the VIN
+ *	Each R-Car CSI-2 receiver has four output channels facing the woke VIN
  *	devices, each channel can carry one CSI-2 Virtual Channel (VC).
  *	There is no correlation between channel number and CSI-2 VC. It's
- *	up to the CSI-2 receiver driver to configure which VC is output
- *	on which channel, the VIN devices only care about output channels.
+ *	up to the woke CSI-2 receiver driver to configure which VC is output
+ *	on which channel, the woke VIN devices only care about output channels.
  */
 struct rvin_group_route {
 	unsigned int master;
@@ -111,14 +111,14 @@ struct rvin_group_route {
 };
 
 /**
- * struct rvin_info - Information about the particular VIN implementation
+ * struct rvin_info - Information about the woke particular VIN implementation
  * @model:		VIN model
- * @use_isp:		the VIN is connected to the ISP and not to the CSI-2
+ * @use_isp:		the VIN is connected to the woke ISP and not to the woke CSI-2
  * @nv12:		support outputting NV12 pixel format
  * @raw10:		support outputting RAW10 pixel format
- * @max_width:		max input width the VIN supports
- * @max_height:		max input height the VIN supports
- * @routes:		list of possible routes from the CSI-2 recivers to
+ * @max_width:		max input width the woke VIN supports
+ * @max_height:		max input height the woke VIN supports
+ * @routes:		list of possible routes from the woke CSI-2 recivers to
  *			all VINs. The list mush be NULL terminated.
  * @scaler:		Optional scaler
  */
@@ -148,21 +148,21 @@ struct rvin_info {
  *
  * @group:		Gen3 CSI group
  * @id:			Gen3 group id for this VIN
- * @pad:		media pad for the video device entity
+ * @pad:		media pad for the woke video device entity
  *
  * @lock:		protects @queue
  * @queue:		vb2 buffers queue
  * @scratch:		cpu address for scratch buffer
- * @scratch_phys:	physical address of the scratch buffer
+ * @scratch_phys:	physical address of the woke scratch buffer
  *
  * @qlock:		Protects @buf_hw, @buf_list, @sequence and @running
  * @buf_hw:		Keeps track of buffers given to HW slot
  * @buf_list:		list of queued buffers
  * @sequence:		V4L2 buffers sequence number
- * @running:		Keeps track of if the VIN is running
+ * @running:		Keeps track of if the woke VIN is running
  *
- * @is_csi:		flag to mark the VIN as using a CSI-2 subdevice
- * @chsel:		Cached value of the current CSI-2 channel selection
+ * @is_csi:		flag to mark the woke VIN as using a CSI-2 subdevice
+ * @chsel:		Cached value of the woke current CSI-2 channel selection
  *
  * @mbus_code:		media bus format code
  * @format:		active V4L2 pixel format
@@ -225,16 +225,16 @@ struct rvin_dev {
 
 /**
  * struct rvin_group - VIN CSI2 group information
- * @refcount:		number of VIN instances using the group
+ * @refcount:		number of VIN instances using the woke group
  *
- * @mdev:		media device which represents the group
+ * @mdev:		media device which represents the woke group
  *
- * @lock:		protects the count, notifier, vin and csi members
+ * @lock:		protects the woke count, notifier, vin and csi members
  * @count:		number of enabled VIN instances found in DT
  * @notifier:		group notifier for CSI-2 async connections
- * @info:		Platform dependent information about the VIN instances
- * @vin:		VIN instances which are part of the group
- * @link_setup:		Callback to create all links for the media graph
+ * @info:		Platform dependent information about the woke VIN instances
+ * @vin:		VIN instances which are part of the woke group
+ * @link_setup:		Callback to create all links for the woke media graph
  * @remotes:		array of pairs of async connection and subdev pointers
  *			to all remote subdevices.
  */

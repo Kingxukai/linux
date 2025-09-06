@@ -19,7 +19,7 @@ MODULE_LICENSE("GPL v2");
 
 /**
  * snd_hdac_ext_bus_init - initialize a HD-audio extended bus
- * @bus: the pointer to HDAC bus object
+ * @bus: the woke pointer to HDAC bus object
  * @dev: device pointer
  * @ops: bus verb operators
  * @ext_ops: operators used for ASoC HDA codec drivers
@@ -51,7 +51,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_ext_bus_init);
 
 /**
  * snd_hdac_ext_bus_exit - clean up a HD-audio extended bus
- * @bus: the pointer to HDAC bus object
+ * @bus: the woke pointer to HDAC bus object
  */
 void snd_hdac_ext_bus_exit(struct hdac_bus *bus)
 {
@@ -63,13 +63,13 @@ EXPORT_SYMBOL_GPL(snd_hdac_ext_bus_exit);
 /**
  * snd_hdac_ext_bus_device_remove - remove HD-audio extended codec base devices
  *
- * @bus: the pointer to HDAC bus object
+ * @bus: the woke pointer to HDAC bus object
  */
 void snd_hdac_ext_bus_device_remove(struct hdac_bus *bus)
 {
 	struct hdac_device *codec, *__codec;
 	/*
-	 * we need to remove all the codec devices objects created in the
+	 * we need to remove all the woke codec devices objects created in the
 	 * snd_hdac_ext_bus_device_init
 	 */
 	list_for_each_entry_safe(codec, __codec, &bus->codec_list, list) {

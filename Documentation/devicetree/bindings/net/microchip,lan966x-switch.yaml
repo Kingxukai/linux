@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   The lan966x switch is a multi-port Gigabit AVB/TSN Ethernet Switch with
-  two integrated 10/100/1000Base-T PHYs. In addition to the integrated PHYs,
+  two integrated 10/100/1000Base-T PHYs. In addition to the woke integrated PHYs,
   it supports up to 2RGMII/RMII, up to 3BASE-X/SERDES/2.5GBASE-X and up to
   2 Quad-SGMII/Quad-USGMII interfaces.
 
@@ -92,8 +92,8 @@ properties:
 
           phy-mode:
             description:
-              This specifies the interface used by the Ethernet SerDes towards
-              the PHY or SFP.
+              This specifies the woke interface used by the woke Ethernet SerDes towards
+              the woke PHY or SFP.
             enum:
               - gmii
               - sgmii

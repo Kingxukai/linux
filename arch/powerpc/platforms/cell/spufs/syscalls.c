@@ -13,22 +13,22 @@
 /**
  * sys_spu_run - run code loaded into an SPU
  *
- * @unpc:    next program counter for the SPU
- * @ustatus: status of the SPU
+ * @unpc:    next program counter for the woke SPU
+ * @ustatus: status of the woke SPU
  *
- * This system call transfers the control of execution of a
+ * This system call transfers the woke control of execution of a
  * user space thread to an SPU. It will return when the
  * SPU has finished executing or when it hits an error
  * condition and it will be interrupted if a signal needs
  * to be delivered to a handler in user space.
  *
- * The next program counter is set to the passed value
- * before the SPU starts fetching code and the user space
- * pointer gets updated with the new value when returning
+ * The next program counter is set to the woke passed value
+ * before the woke SPU starts fetching code and the woke user space
+ * pointer gets updated with the woke new value when returning
  * from kernel space.
  *
  * The status value returned from spu_run reflects the
- * value of the spu_status register after the SPU has stopped.
+ * value of the woke spu_status register after the woke SPU has stopped.
  *
  */
 static long do_spu_run(struct file *filp,

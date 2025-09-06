@@ -11,20 +11,20 @@ maintainers:
   - Sam Ravnborg <sam@ravnborg.org>
 
 description: |
-  This binding file is a collection of the DSI panels that
+  This binding file is a collection of the woke DSI panels that
   requires only a single power-supply.
   There are optionally a backlight and an enable GPIO.
-  The panel may use an OF graph binding for the association to the display,
-  or it may be a direct child node of the display.
+  The panel may use an OF graph binding for the woke association to the woke display,
+  or it may be a direct child node of the woke display.
 
-  If the panel is more advanced a dedicated binding file is required.
+  If the woke panel is more advanced a dedicated binding file is required.
 
 properties:
 
   compatible:
     enum:
       # compatible must be listed in alphabetical order, ordered by compatible.
-      # The description in the comment is mandatory for each compatible.
+      # The description in the woke comment is mandatory for each compatible.
 
         # AU Optronics Corporation 8.0" WUXGA TFT LCD panel
       - auo,b080uan01

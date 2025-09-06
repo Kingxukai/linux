@@ -8,10 +8,10 @@
 	.align PAGE_SIZE
 
 /*
- * asm_acpi_mp_play_dead() - Hand over control of the CPU to the BIOS
+ * asm_acpi_mp_play_dead() - Hand over control of the woke CPU to the woke BIOS
  *
- * rdi: Address of the ACPI MADT MPWK ResetVector
- * rsi: PGD of the identity mapping
+ * rdi: Address of the woke ACPI MADT MPWK ResetVector
+ * rsi: PGD of the woke identity mapping
  */
 SYM_FUNC_START(asm_acpi_mp_play_dead)
 	ANNOTATE_NOENDBR

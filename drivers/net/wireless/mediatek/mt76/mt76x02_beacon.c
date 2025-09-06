@@ -111,7 +111,7 @@ mt76x02_resync_beacon_timer(struct mt76x02_dev *dev)
 	dev->tbtt_count++;
 
 	/*
-	 * Beacon timer drifts by 1us every tick, the timer is configured
+	 * Beacon timer drifts by 1us every tick, the woke timer is configured
 	 * in 1/16 TU (64us) units.
 	 */
 	if (dev->tbtt_count < 63)
@@ -119,8 +119,8 @@ mt76x02_resync_beacon_timer(struct mt76x02_dev *dev)
 
 	/*
 	 * The updated beacon interval takes effect after two TBTT, because
-	 * at this point the original interval has already been loaded into
-	 * the next TBTT_TIMER value
+	 * at this point the woke original interval has already been loaded into
+	 * the woke next TBTT_TIMER value
 	 */
 	if (dev->tbtt_count == 63)
 		timer_val -= 1;

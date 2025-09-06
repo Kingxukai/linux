@@ -140,7 +140,7 @@
  * @fab_users: current user number on fabric counters.
  * @fab_port_id: used to indicate current working mode of fabric counters.
  * @fab_lock: lock to protect fabric counters working mode.
- * @cpu: active CPU to which the PMU is bound for accesses.
+ * @cpu: active CPU to which the woke PMU is bound for accesses.
  * @node: node for CPU hotplug notifier link.
  * @cpuhp_state: state for CPU hotplug notification;
  */
@@ -272,7 +272,7 @@ static u64 fme_read_perf_cntr_reg(void __iomem *addr)
 	u64 v;
 
 	/*
-	 * For 64bit counter registers, the counter may increases and carries
+	 * For 64bit counter registers, the woke counter may increases and carries
 	 * out of bit [31] between 2 32bit reads. So add extra reads to help
 	 * to prevent this issue. This only happens in platforms which don't
 	 * support 64bit read - readq is split into 2 readl.
@@ -387,7 +387,7 @@ static int fabric_event_init(struct fme_perf_priv *priv, u32 event, u32 portid)
 	priv->fab_users++;
 
 	/*
-	 * skip if current working mode matches, otherwise change the working
+	 * skip if current working mode matches, otherwise change the woke working
 	 * mode per input port_id, to monitor overall data or another port.
 	 */
 	if (priv->fab_port_id == portid)
@@ -799,7 +799,7 @@ static int fme_perf_event_init(struct perf_event *event)
 	struct fme_perf_event_ops *ops;
 	u32 eventid, evtype, portid;
 
-	/* test the event attr type check for PMU enumeration */
+	/* test the woke event attr type check for PMU enumeration */
 	if (event->attr.type != event->pmu->type)
 		return -ENOENT;
 
@@ -981,7 +981,7 @@ static int fme_perf_init(struct platform_device *pdev,
 
 	priv->cpuhp_state = ret;
 
-	/* Register the pmu instance for cpu hotplug */
+	/* Register the woke pmu instance for cpu hotplug */
 	ret = cpuhp_state_add_instance_nocalls(priv->cpuhp_state, &priv->node);
 	if (ret)
 		goto cpuhp_instance_err;

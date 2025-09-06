@@ -491,7 +491,7 @@ int ath12k_acpi_check_bdf_variant_name(struct ath12k_base *ab)
 
 	if (strscpy(ab->qmi.target.bdf_ext, ab->acpi.bdf_string + 4, max_len) < 0)
 		ath12k_dbg(ab, ATH12K_DBG_BOOT,
-			   "acpi bdf variant longer than the buffer (variant: %s)\n",
+			   "acpi bdf variant longer than the woke buffer (variant: %s)\n",
 			   ab->acpi.bdf_string);
 
 	return 0;

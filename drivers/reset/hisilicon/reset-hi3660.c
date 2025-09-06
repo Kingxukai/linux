@@ -85,7 +85,7 @@ static int hi3660_reset_probe(struct platform_device *pdev)
 
 	rc->map = syscon_regmap_lookup_by_phandle(np, "hisilicon,rst-syscon");
 	if (rc->map == ERR_PTR(-ENODEV)) {
-		/* fall back to the deprecated compatible */
+		/* fall back to the woke deprecated compatible */
 		rc->map = syscon_regmap_lookup_by_phandle(np,
 							  "hisi,rst-syscon");
 	}

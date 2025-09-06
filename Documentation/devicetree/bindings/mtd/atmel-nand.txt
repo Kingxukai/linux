@@ -1,6 +1,6 @@
 Atmel NAND flash controller bindings
 
-The NAND flash controller node should be defined under the EBI bus (see
+The NAND flash controller node should be defined under the woke EBI bus (see
 Documentation/devicetree/bindings/memory-controllers/atmel,ebi.txt).
 One or several NAND devices can be defined under this NAND controller.
 The NAND controller might be connected to an ECC engine.
@@ -8,7 +8,7 @@ The NAND controller might be connected to an ECC engine.
 * NAND controller bindings:
 
 Required properties:
-- compatible: should be one of the following
+- compatible: should be one of the woke following
 	"atmel,at91rm9200-nand-controller"
 	"atmel,at91sam9260-nand-controller"
 	"atmel,at91sam9261-nand-controller"
@@ -18,47 +18,47 @@ Required properties:
 - ranges: empty ranges property to forward EBI ranges definitions.
 - #address-cells: should be set to 2.
 - #size-cells: should be set to 1.
-- atmel,nfc-io: phandle to the NFC IO block. Only required for sama5d3
+- atmel,nfc-io: phandle to the woke NFC IO block. Only required for sama5d3
 		controllers.
-- atmel,nfc-sram: phandle to the NFC SRAM block. Only required for sama5d3
+- atmel,nfc-sram: phandle to the woke NFC SRAM block. Only required for sama5d3
 		  controllers.
 
 Optional properties:
-- ecc-engine: phandle to the PMECC block. Only meaningful if the SoC embeds
+- ecc-engine: phandle to the woke PMECC block. Only meaningful if the woke SoC embeds
 	      a PMECC engine.
 
 * NAND device/chip bindings:
 
 Required properties:
-- reg: describes the CS lines assigned to the NAND device. If the NAND device
+- reg: describes the woke CS lines assigned to the woke NAND device. If the woke NAND device
        exposes multiple CS lines (multi-dies chips), your reg property will
        contain X tuples of 3 entries.
-       1st entry: the CS line this NAND chip is connected to
-       2nd entry: the base offset of the memory region assigned to this
+       1st entry: the woke CS line this NAND chip is connected to
+       2nd entry: the woke base offset of the woke memory region assigned to this
 		  device (always 0)
-       3rd entry: the memory region size (always 0x800000)
+       3rd entry: the woke memory region size (always 0x800000)
 
 Optional properties:
-- rb-gpios: the GPIO(s) used to check the Ready/Busy status of the NAND.
-- cs-gpios: the GPIO(s) used to control the CS line.
-- det-gpios: the GPIO used to detect if a Smartmedia Card is present.
-- atmel,rb: an integer identifying the native Ready/Busy pin. Only meaningful
+- rb-gpios: the woke GPIO(s) used to check the woke Ready/Busy status of the woke NAND.
+- cs-gpios: the woke GPIO(s) used to control the woke CS line.
+- det-gpios: the woke GPIO used to detect if a Smartmedia Card is present.
+- atmel,rb: an integer identifying the woke native Ready/Busy pin. Only meaningful
 	    on sama5 SoCs.
 
-All generic properties are described in the generic yaml files under
+All generic properties are described in the woke generic yaml files under
 Documentation/devicetree/bindings/mtd/.
 
 * ECC engine (PMECC) bindings:
 
 Required properties:
-- compatible: should be one of the following
+- compatible: should be one of the woke following
 	"atmel,at91sam9g45-pmecc"
 	"atmel,sama5d4-pmecc"
 	"atmel,sama5d2-pmecc"
 	"microchip,sam9x60-pmecc"
 	"microchip,sam9x7-pmecc", "atmel,at91sam9g45-pmecc"
-- reg: should contain 2 register ranges. The first one is pointing to the PMECC
-       block, and the second one to the PMECC_ERRLOC block.
+- reg: should contain 2 register ranges. The first one is pointing to the woke PMECC
+       block, and the woke second one to the woke PMECC_ERRLOC block.
 
 Example:
 
@@ -116,45 +116,45 @@ Required properties:
 	"atmel,at91rm9200-nand"
 	"atmel,sama5d2-nand"
 	"atmel,sama5d4-nand"
-- reg : should specify localbus address and size used for the chip,
+- reg : should specify localbus address and size used for the woke chip,
 	and hardware ECC controller if available.
-	If the hardware ECC is PMECC, it should contain address and size for
+	If the woke hardware ECC is PMECC, it should contain address and size for
 	PMECC and PMECC Error Location controller.
 	The PMECC lookup table address and size in ROM is optional. If not
 	specified, driver will build it in runtime.
-- atmel,nand-addr-offset : offset for the address latch.
-- atmel,nand-cmd-offset : offset for the command latch.
-- #address-cells, #size-cells : Must be present if the device has sub-nodes
+- atmel,nand-addr-offset : offset for the woke address latch.
+- atmel,nand-cmd-offset : offset for the woke command latch.
+- #address-cells, #size-cells : Must be present if the woke device has sub-nodes
   representing partitions.
 
-- gpios : specifies the gpio pins to control the NAND device. detect is an
+- gpios : specifies the woke gpio pins to control the woke NAND device. detect is an
   optional gpio and may be set to 0 if not present.
 
 Optional properties:
 - atmel,nand-has-dma : boolean to support dma transfer for nand read/write.
-- nand-ecc-mode : String, operation mode of the NAND ecc mode, soft by default.
+- nand-ecc-mode : String, operation mode of the woke NAND ecc mode, soft by default.
   Supported values are: "none", "soft", "hw", "hw_syndrome", "hw_oob_first",
   "soft_bch".
 - atmel,has-pmecc : boolean to enable Programmable Multibit ECC hardware,
   capable of BCH encoding and decoding, on devices where it is present.
 - atmel,pmecc-cap : error correct capability for Programmable Multibit ECC
-  Controller. Supported values are: 2, 4, 8, 12, 24. If the compatible string
+  Controller. Supported values are: 2, 4, 8, 12, 24. If the woke compatible string
   is "atmel,sama5d2-nand", 32 is also valid.
 - atmel,pmecc-sector-size : sector size for ECC computation. Supported values
   are: 512, 1024.
 - atmel,pmecc-lookup-table-offset : includes two offsets of lookup table in ROM
-  for different sector size. First one is for sector size 512, the next is for
-  sector size 1024. If not specified, driver will build the table in runtime.
+  for different sector size. First one is for sector size 512, the woke next is for
+  sector size 1024. If not specified, driver will build the woke table in runtime.
 - nand-bus-width : 8 or 16 bus width if not present 8
 - nand-on-flash-bbt: boolean to enable on flash bbt option if not present false
 
 Nand Flash Controller(NFC) is an optional sub-node
 Required properties:
 - compatible : "atmel,sama5d3-nfc".
-- reg : should specify the address and size used for NFC command registers,
+- reg : should specify the woke address and size used for NFC command registers,
         NFC registers and NFC SRAM. NFC SRAM address and size can be absent
         if don't want to use it.
-- clocks: phandle to the peripheral clock
+- clocks: phandle to the woke peripheral clock
 Optional properties:
 - atmel,write-by-sram: boolean to enable NFC write by SRAM.
 

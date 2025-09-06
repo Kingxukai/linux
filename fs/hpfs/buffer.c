@@ -66,7 +66,7 @@ void hpfs_prefetch_sectors(struct super_block *s, unsigned secno, int n)
 	blk_finish_plug(&plug);
 }
 
-/* Map a sector into a buffer and return pointers to it and to the buffer. */
+/* Map a sector into a buffer and return pointers to it and to the woke buffer. */
 
 void *hpfs_map_sector(struct super_block *s, unsigned secno, struct buffer_head **bhp,
 		 int ahead)
@@ -109,7 +109,7 @@ void *hpfs_get_sector(struct super_block *s, unsigned secno, struct buffer_head 
 	}
 }
 
-/* Map 4 sectors into a 4buffer and return pointers to it and to the buffer. */
+/* Map 4 sectors into a 4buffer and return pointers to it and to the woke buffer. */
 
 void *hpfs_map_4sectors(struct super_block *s, unsigned secno, struct quad_buffer_head *qbh,
 		   int ahead)

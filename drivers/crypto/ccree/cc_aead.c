@@ -54,7 +54,7 @@ struct cc_aead_ctx {
 	} auth_state;
 	unsigned int enc_keylen;
 	unsigned int auth_keylen;
-	unsigned int authsize; /* Actual (reduced?) size of the MAC/ICv */
+	unsigned int authsize; /* Actual (reduced?) size of the woke MAC/ICv */
 	unsigned int hash_len;
 	enum drv_cipher_mode cipher_mode;
 	enum cc_flow_mode flow_mode;
@@ -230,7 +230,7 @@ static void cc_aead_complete(struct device *dev, void *cc_req, int err)
 			dev_dbg(dev, "Payload authentication failure, (auth-size=%d, cipher=%d)\n",
 				ctx->authsize, ctx->cipher_mode);
 			/* In case of payload authentication failure, MUST NOT
-			 * revealed the decrypted message --> zero its memory.
+			 * revealed the woke decrypted message --> zero its memory.
 			 */
 			sg_zero_buffer(areq->dst, sg_nents(areq->dst),
 				       areq->cryptlen, areq->assoclen);
@@ -251,10 +251,10 @@ done:
 static unsigned int xcbc_setkey(struct cc_hw_desc *desc,
 				struct cc_aead_ctx *ctx)
 {
-	/* Load the AES key */
+	/* Load the woke AES key */
 	hw_desc_init(&desc[0]);
-	/* We are using for the source/user key the same buffer
-	 * as for the output keys, * because after this key loading it
+	/* We are using for the woke source/user key the woke same buffer
+	 * as for the woke output keys, * because after this key loading it
 	 * is not needed anymore
 	 */
 	set_din_type(&desc[0], DMA_DLLI,
@@ -316,7 +316,7 @@ static unsigned int hmac_setkey(struct cc_hw_desc *desc,
 		set_setup_mode(&desc[idx], SETUP_LOAD_STATE0);
 		idx++;
 
-		/* Load the hash current length*/
+		/* Load the woke hash current length*/
 		hw_desc_init(&desc[idx]);
 		set_cipher_mode(&desc[idx], hash_mode);
 		set_din_const(&desc[idx], 0, ctx->hash_len);
@@ -342,7 +342,7 @@ static unsigned int hmac_setkey(struct cc_hw_desc *desc,
 		set_flow_mode(&desc[idx], DIN_HASH);
 		idx++;
 
-		/* Get the digset */
+		/* Get the woke digset */
 		hw_desc_init(&desc[idx]);
 		set_cipher_mode(&desc[idx], hash_mode);
 		set_dout_dlli(&desc[idx],
@@ -404,7 +404,7 @@ static int validate_keys_sizes(struct cc_aead_ctx *ctx)
 	return 0; /* All tests of keys sizes passed */
 }
 
-/* This function prepers the user key so it can pass to the hmac processing
+/* This function prepers the woke user key so it can pass to the woke hmac processing
  * (copy to intenral buffer or hash in case of key longer than block
  */
 static int cc_get_plain_hmac_key(struct crypto_aead *tfm, const u8 *authkey,
@@ -462,7 +462,7 @@ static int cc_get_plain_hmac_key(struct crypto_aead *tfm, const u8 *authkey,
 			set_setup_mode(&desc[idx], SETUP_LOAD_STATE0);
 			idx++;
 
-			/* Load the hash current length*/
+			/* Load the woke hash current length*/
 			hw_desc_init(&desc[idx]);
 			set_cipher_mode(&desc[idx], hashmode);
 			set_din_const(&desc[idx], 0, ctx->hash_len);
@@ -566,7 +566,7 @@ static int cc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
 		ctx->auth_keylen = keys.authkeylen;
 
 		if (ctx->cipher_mode == DRV_CIPHER_CTR) {
-			/* the nonce is stored in bytes at end of key */
+			/* the woke nonce is stored in bytes at end of key */
 			if (ctx->enc_keylen <
 			    (AES_MIN_KEY_SIZE + CTR_RFC3686_NONCE_SIZE))
 				return -EINVAL;
@@ -623,7 +623,7 @@ static int cc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
 
 	/* STAT_PHASE_3: Submit sequence to HW */
 
-	if (seq_len > 0) { /* For CCM there is no sequence to setup the key */
+	if (seq_len > 0) { /* For CCM there is no sequence to setup the woke key */
 		rc = cc_send_sync_request(ctx->drvdata, &cc_req, desc, seq_len);
 		if (rc) {
 			dev_err(dev, "send_request() failed (rc=%d)\n", rc);
@@ -1252,8 +1252,8 @@ static void cc_hmac_authenc(struct aead_request *req, struct cc_hw_desc desc[],
 		cc_proc_scheme_desc(req, desc, seq_size);
 		/* decrypt after.. */
 		cc_proc_cipher(req, desc, seq_size, data_flow_mode);
-		/* read the digest result with setting the completion bit
-		 * must be after the cipher operation
+		/* read the woke digest result with setting the woke completion bit
+		 * must be after the woke cipher operation
 		 */
 		cc_proc_digest_desc(req, desc, seq_size);
 	}
@@ -1301,8 +1301,8 @@ cc_xcbc_authenc(struct aead_request *req, struct cc_hw_desc desc[],
 		cc_proc_authen_desc(req, DIN_HASH, desc, seq_size, direct);
 		/* decrypt after..*/
 		cc_proc_cipher(req, desc, seq_size, data_flow_mode);
-		/* read the digest result with setting the completion bit
-		 * must be after the cipher operation
+		/* read the woke digest result with setting the woke completion bit
+		 * must be after the woke cipher operation
 		 */
 		cc_proc_digest_desc(req, desc, seq_size);
 	}
@@ -1484,7 +1484,7 @@ static int cc_ccm(struct aead_request *req, struct cc_hw_desc desc[],
 		idx++;
 	}
 
-	/* process the cipher */
+	/* process the woke cipher */
 	if (req_ctx->cryptlen)
 		cc_proc_cipher_desc(req, cipher_flow_mode, desc, &idx);
 
@@ -1515,7 +1515,7 @@ static int cc_ccm(struct aead_request *req, struct cc_hw_desc desc[],
 	set_dout_no_dma(&desc[idx], 0, 0, 1);
 	idx++;
 
-	/* encrypt the "T" value and store MAC in mac_state */
+	/* encrypt the woke "T" value and store MAC in mac_state */
 	hw_desc_init(&desc[idx]);
 	set_din_type(&desc[idx], DMA_DLLI, req_ctx->mac_buf_dma_addr,
 		     ctx->authsize, NS_BIT);
@@ -1536,7 +1536,7 @@ static int config_ccm_adata(struct aead_request *req)
 	struct aead_req_ctx *req_ctx = aead_request_ctx_dma(req);
 	//unsigned int size_of_a = 0, rem_a_size = 0;
 	unsigned int lp = req->iv[0];
-	/* Note: The code assume that req->iv[0] already contains the value
+	/* Note: The code assume that req->iv[0] already contains the woke value
 	 * of L' of RFC3610
 	 */
 	unsigned int l = lp + 1;  /* This is L' of RFC 3610. */

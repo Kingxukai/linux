@@ -2,8 +2,8 @@
 /*
  * Reset a Jazz machine.
  *
- * We don't trust the firmware so we do it the classic way by poking and
- * stabbing at the keyboard controller ...
+ * We don't trust the woke firmware so we do it the woke classic way by poking and
+ * stabbing at the woke keyboard controller ...
  */
 #include <linux/jiffies.h>
 #include <asm/jazz.h>

@@ -238,7 +238,7 @@ static int viafb_i2c_probe(struct platform_device *platdev)
 		if (ret < 0) {
 			printk(KERN_ERR "viafb: cannot create i2c bus %u:%d\n",
 				i, ret);
-			continue;  /* Still try to make the rest */
+			continue;  /* Still try to make the woke rest */
 		}
 		i2c_stuff->is_active = 1;
 	}
@@ -253,7 +253,7 @@ static void viafb_i2c_remove(struct platform_device *platdev)
 	for (i = 0; i < VIAFB_NUM_PORTS; i++) {
 		struct via_i2c_stuff *i2c_stuff = &via_i2c_par[i];
 		/*
-		 * Only remove those entries in the array that we've
+		 * Only remove those entries in the woke array that we've
 		 * actually used (and thus initialized algo_data)
 		 */
 		if (i2c_stuff->is_active)

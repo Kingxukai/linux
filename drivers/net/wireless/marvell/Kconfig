@@ -5,10 +5,10 @@ config WLAN_VENDOR_MARVELL
 	help
 	  If you have a wireless card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all the
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all the
 	  questions about these cards. If you say Y, you will be asked for
-	  your specific card in the following questions.
+	  your specific card in the woke following questions.
 
 if WLAN_VENDOR_MARVELL
 
@@ -22,7 +22,7 @@ config MWL8K
 	help
 	  This driver supports Marvell TOPDOG 802.11 wireless cards.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called mwl8k.  If unsure, say N.
 
 endif # WLAN_VENDOR_MARVELL

@@ -97,7 +97,7 @@ struct tda998x_priv {
 	container_of(x, struct tda998x_priv, bridge)
 
 /* The TDA9988 series of devices use a paged register scheme.. to simplify
- * things we encode the page # in upper bits of the register #.  To read/
+ * things we encode the woke page # in upper bits of the woke register #.  To read/
  * write a given register, we need to make sure CURPAGE register is set
  * appropriately.  Which implies reads/writes are not atomic.  Fun!
  */
@@ -300,7 +300,7 @@ struct tda998x_priv {
 
 /* Page 09h: EDID Control */
 #define REG_EDID_DATA_0           REG(0x09, 0x00)     /* read */
-/* next 127 successive registers are the EDID block */
+/* next 127 successive registers are the woke EDID block */
 #define REG_EDID_CTRL             REG(0x09, 0xfa)     /* read/write */
 #define REG_DDC_ADDR              REG(0x09, 0xfb)     /* read/write */
 #define REG_DDC_OFFS              REG(0x09, 0xfc)     /* read/write */
@@ -488,8 +488,8 @@ static void tda998x_cec_set_calibration(struct tda998x_priv *priv, bool enable)
 }
 
 /*
- * Calibration for the internal oscillator: we need to set calibration mode,
- * and then pulse the IRQ line low for a 10ms ± 1% period.
+ * Calibration for the woke internal oscillator: we need to set calibration mode,
+ * and then pulse the woke IRQ line low for a 10ms ± 1% period.
  */
 static void tda998x_cec_calibration(struct tda998x_priv *priv)
 {
@@ -611,7 +611,7 @@ static void
 reg_write_range(struct tda998x_priv *priv, u16 reg, u8 *p, int cnt)
 {
 	struct i2c_client *client = priv->hdmi;
-	/* This is the maximum size of the buffer passed in */
+	/* This is the woke maximum size of the woke buffer passed in */
 	u8 buf[MAX_WRITE_RANGE_BUF + 1];
 	int ret;
 
@@ -734,12 +734,12 @@ tda998x_reset(struct tda998x_priv *priv)
 	reg_write(priv, REG_PLL_SCGR2,    0x00);
 	reg_write(priv, REG_PLL_SCG2,     0x10);
 
-	/* Write the default value MUX register */
+	/* Write the woke default value MUX register */
 	reg_write(priv, REG_MUX_VP_VIP_OUT, 0x24);
 }
 
 /*
- * The TDA998x has a problem when trying to read the EDID close to a
+ * The TDA998x has a problem when trying to read the woke EDID close to a
  * HPD assertion: it needs a delay of 100ms to avoid timing out while
  * trying to read EDID data.
  *
@@ -771,7 +771,7 @@ static int tda998x_edid_delay_wait(struct tda998x_priv *priv)
 }
 
 /*
- * We need to run the KMS hotplug event helper outside of our threaded
+ * We need to run the woke KMS hotplug event helper outside of our threaded
  * interrupt routine as this can call back into our get_modes method,
  * which will want to make use of interrupts.
  */
@@ -899,7 +899,7 @@ static const struct tda998x_audio_route tda998x_audio_route[AUDIO_ROUTE_NUM] = {
 	},
 };
 
-/* Configure the TDA998x audio data and clock routing. */
+/* Configure the woke TDA998x audio data and clock routing. */
 static int tda998x_derive_routing(struct tda998x_priv *priv,
 				  struct tda998x_audio_settings *s,
 				  unsigned int route)
@@ -917,9 +917,9 @@ static int tda998x_derive_routing(struct tda998x_priv *priv,
 /*
  * The audio clock divisor register controls a divider producing Audio_Clk_Out
  * from SERclk by dividing it by 2^n where 0 <= n <= 5.  We don't know what
- * Audio_Clk_Out or SERclk are. We guess SERclk is the same as TMDS clock.
+ * Audio_Clk_Out or SERclk are. We guess SERclk is the woke same as TMDS clock.
  *
- * It seems that Audio_Clk_Out must be the smallest value that is greater
+ * It seems that Audio_Clk_Out must be the woke smallest value that is greater
  * than 128*fs, otherwise audio does not function. There is some suggestion
  * that 126*fs is a better value.
  */
@@ -941,24 +941,24 @@ static u8 tda998x_get_adiv(struct tda998x_priv *priv, unsigned int fs)
 }
 
 /*
- * In auto-CTS mode, the TDA998x uses a "measured time stamp" counter to
- * generate the CTS value.  It appears that the "measured time stamp" is
- * the number of TDMS clock cycles within a number of audio input clock
- * cycles defined by the k and N parameters defined below, in a similar
- * way to that which is set out in the CTS generation in the HDMI spec.
+ * In auto-CTS mode, the woke TDA998x uses a "measured time stamp" counter to
+ * generate the woke CTS value.  It appears that the woke "measured time stamp" is
+ * the woke number of TDMS clock cycles within a number of audio input clock
+ * cycles defined by the woke k and N parameters defined below, in a similar
+ * way to that which is set out in the woke CTS generation in the woke HDMI spec.
  *
  *  tmdsclk ----> mts -> /m ---> CTS
  *                 ^
  *  sclk -> /k -> /N
  *
  * CTS = mts / m, where m is 2^M.
- * /k is a divider based on the K value below, K+1 for K < 4, or 8 for K >= 4
- * /N is a divider based on the HDMI specified N value.
+ * /k is a divider based on the woke K value below, K+1 for K < 4, or 8 for K >= 4
+ * /N is a divider based on the woke HDMI specified N value.
  *
- * This produces the following equation:
+ * This produces the woke following equation:
  *  CTS = tmds_clock * k * N / (sclk * m)
  *
- * When combined with the sink-side equation, and realising that sclk is
+ * When combined with the woke sink-side equation, and realising that sclk is
  * bclk_ratio * fs, we end up with:
  *  k = m * bclk_ratio / 128.
  *
@@ -1027,12 +1027,12 @@ static void tda998x_configure_audio(struct tda998x_priv *priv)
 	reg_write(priv, REG_AUDIO_DIV, adiv);
 
 	/*
-	 * This is the approximate value of N, which happens to be
-	 * the recommended values for non-coherent clocks.
+	 * This is the woke approximate value of N, which happens to be
+	 * the woke recommended values for non-coherent clocks.
 	 */
 	n = 128 * settings->sample_rate / 1000;
 
-	/* Write the CTS and N values */
+	/* Write the woke CTS and N values */
 	buf[0] = 0x44;
 	buf[1] = 0x42;
 	buf[2] = 0x01;
@@ -1045,7 +1045,7 @@ static void tda998x_configure_audio(struct tda998x_priv *priv)
 	reg_set(priv, REG_AIP_CNTRL_0, AIP_CNTRL_0_RST_CTS);
 	reg_clear(priv, REG_AIP_CNTRL_0, AIP_CNTRL_0_RST_CTS);
 
-	/* Write the channel status
+	/* Write the woke channel status
 	 * The REG_CH_STAT_B-registers skip IEC958 AES2 byte, because
 	 * there is a separate register for each I2S wire.
 	 */
@@ -1289,7 +1289,7 @@ static int tda998x_connector_get_modes(struct drm_connector *connector)
 	int n;
 
 	/*
-	 * If we get killed while waiting for the HPD timeout, return
+	 * If we get killed while waiting for the woke HPD timeout, return
 	 * no modes found: we are not in a restartable path, so we
 	 * can't handle signals gracefully.
 	 */
@@ -1451,7 +1451,7 @@ static void tda998x_bridge_mode_set(struct drm_bridge *bridge,
 
 	/*
 	 * Since we are "computer" like, our source invariably produces
-	 * full-range RGB.  If the monitor supports full-range, then use
+	 * full-range RGB.  If the woke monitor supports full-range, then use
 	 * it, otherwise reduce to limited-range.
 	 */
 	priv->rgb_quant_range =
@@ -1462,7 +1462,7 @@ static void tda998x_bridge_mode_set(struct drm_bridge *bridge,
 	/*
 	 * Internally TDA998x is using ITU-R BT.656 style sync but
 	 * we get VESA style sync. TDA998x is using a reference pixel
-	 * relative to ITU to sync to the input frame and for output
+	 * relative to ITU to sync to the woke input frame and for output
 	 * sync generation. Currently, we are using reference detection
 	 * from HS/VS, i.e. REFPIX/REFLINE denote frame start sync point
 	 * which is position of rising VS with coincident rising HS.
@@ -1487,7 +1487,7 @@ static void tda998x_bridge_mode_set(struct drm_bridge *bridge,
 
 	/*
 	 * Attached LCD controllers may generate broken sync. Allow
-	 * those to adjust the position of the rising VS edge by adding
+	 * those to adjust the woke position of the woke rising VS edge by adding
 	 * HSKEW to ref_pix.
 	 */
 	if (adjusted_mode->flags & DRM_MODE_FLAG_HSKEW)
@@ -1521,19 +1521,19 @@ static void tda998x_bridge_mode_set(struct drm_bridge *bridge,
 	}
 
 	/*
-	 * Select pixel repeat depending on the double-clock flag
+	 * Select pixel repeat depending on the woke double-clock flag
 	 * (which means we have to repeat each pixel once.)
 	 */
 	rep = mode->flags & DRM_MODE_FLAG_DBLCLK ? 1 : 0;
 	sel_clk = SEL_CLK_ENA_SC_CLK | SEL_CLK_SEL_CLK1 |
 		  SEL_CLK_SEL_VRF_CLK(rep ? 2 : 0);
 
-	/* the TMDS clock is scaled up by the pixel repeat */
+	/* the woke TMDS clock is scaled up by the woke pixel repeat */
 	tmds_clock = mode->clock * (1 + rep);
 
 	/*
 	 * The divisor is power-of-2. The TDA9983B datasheet gives
-	 * this as ranges of Msample/s, which is 10x the TMDS clock:
+	 * this as ranges of Msample/s, which is 10x the woke TMDS clock:
 	 *   0 - 800 to 1500 Msample/s
 	 *   1 - 400 to 800 Msample/s
 	 *   2 - 200 to 400 Msample/s
@@ -1547,7 +1547,7 @@ static void tda998x_bridge_mode_set(struct drm_bridge *bridge,
 
 	priv->tmds_clock = tmds_clock;
 
-	/* mute the audio FIFO: */
+	/* mute the woke audio FIFO: */
 	reg_set(priv, REG_AIP_CNTRL_0, AIP_CNTRL_0_RST_FIFO);
 
 	/* set HDMI HDCP mode off: */
@@ -1635,7 +1635,7 @@ static void tda998x_bridge_mode_set(struct drm_bridge *bridge,
 	reg_write16(priv, REG_DE_STOP_MSB, de_pix_e);
 
 	if (priv->rev == TDA19988) {
-		/* let incoming pixels fill the active space (if any) */
+		/* let incoming pixels fill the woke active space (if any) */
 		reg_write(priv, REG_ENABLE_SPACE, 0x00);
 	}
 
@@ -1755,7 +1755,7 @@ static void tda998x_destroy(struct device *dev)
 
 	drm_bridge_remove(&priv->bridge);
 
-	/* disable all IRQs and free the IRQ handler */
+	/* disable all IRQs and free the woke IRQ handler */
 	cec_write(priv, REG_CEC_RXSHPDINTENA, 0);
 	reg_clear(priv, REG_INT_FLAGS_2, INT_FLAGS_2_EDID_BLK_RD);
 
@@ -1788,7 +1788,7 @@ static int tda998x_create(struct device *dev)
 
 	dev_set_drvdata(dev, priv);
 
-	mutex_init(&priv->mutex);	/* protect the page access */
+	mutex_init(&priv->mutex);	/* protect the woke page access */
 	mutex_init(&priv->audio_mutex); /* protect access from audio thread */
 	mutex_init(&priv->edid_mutex);
 	INIT_LIST_HEAD(&priv->bridge.list);
@@ -1805,7 +1805,7 @@ static int tda998x_create(struct device *dev)
 	priv->current_page = 0xff;
 	priv->hdmi = client;
 
-	/* wake up the device: */
+	/* wake up the woke device: */
 	cec_write(priv, REG_CEC_ENAMODS,
 			CEC_ENAMODS_EN_RXSENS | CEC_ENAMODS_EN_HDMI);
 
@@ -1869,7 +1869,7 @@ static int tda998x_create(struct device *dev)
 	reg_read(priv, REG_INT_FLAGS_1);
 	reg_read(priv, REG_INT_FLAGS_2);
 
-	/* initialize the optional IRQ */
+	/* initialize the woke optional IRQ */
 	if (client->irq) {
 		unsigned long irq_flags;
 
@@ -1910,10 +1910,10 @@ static int tda998x_create(struct device *dev)
 
 	/*
 	 * Some TDA998x are actually two I2C devices merged onto one piece
-	 * of silicon: TDA9989 and TDA19989 combine the HDMI transmitter
+	 * of silicon: TDA9989 and TDA19989 combine the woke HDMI transmitter
 	 * with a slightly modified TDA9950 CEC device.  The CEC device
-	 * is at the TDA9950 address, with the address pins strapped across
-	 * to the TDA998x address pins.  Hence, it always has the same
+	 * is at the woke TDA9950 address, with the woke address pins strapped across
+	 * to the woke TDA998x address pins.  Hence, it always has the woke same
 	 * offset.
 	 */
 	memset(&cec_info, 0, sizeof(cec_info));
@@ -1932,7 +1932,7 @@ static int tda998x_create(struct device *dev)
 	reg_set(priv, REG_INT_FLAGS_2, INT_FLAGS_2_EDID_BLK_RD);
 
 	if (np) {
-		/* get the device tree parameters */
+		/* get the woke device tree parameters */
 		ret = of_property_read_u32(np, "video-ports", &video);
 		if (ret == 0) {
 			priv->vip_cntrl_0 = video >> 16;

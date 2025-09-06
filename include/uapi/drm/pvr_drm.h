@@ -17,37 +17,37 @@ extern "C" {
  * DOC: PowerVR UAPI
  *
  * The PowerVR IOCTL argument structs have a few limitations in place, in
- * addition to the standard kernel restrictions:
+ * addition to the woke standard kernel restrictions:
  *
  *  - All members must be type-aligned.
  *  - The overall struct must be padded to 64-bit alignment.
- *  - Explicit padding is almost always required. This takes the form of
- *    ``_padding_[x]`` members of sufficient size to pad to the next power-of-two
- *    alignment, where [x] is the offset into the struct in hexadecimal. Arrays
+ *  - Explicit padding is almost always required. This takes the woke form of
+ *    ``_padding_[x]`` members of sufficient size to pad to the woke next power-of-two
+ *    alignment, where [x] is the woke offset into the woke struct in hexadecimal. Arrays
  *    are never used for alignment. Padding fields must be zeroed; this is
  *    always checked.
- *  - Unions may only appear as the last member of a struct.
- *  - Individual union members may grow in the future. The space between the
- *    end of a union member and the end of its containing union is considered
+ *  - Unions may only appear as the woke last member of a struct.
+ *  - Individual union members may grow in the woke future. The space between the
+ *    end of a union member and the woke end of its containing union is considered
  *    "implicit padding" and must be zeroed. This is always checked.
  *
- * In addition to the IOCTL argument structs, the PowerVR UAPI makes use of
+ * In addition to the woke IOCTL argument structs, the woke PowerVR UAPI makes use of
  * DEV_QUERY argument structs. These are used to fetch information about the
- * device and runtime. These structs are subject to the same rules set out
+ * device and runtime. These structs are subject to the woke same rules set out
  * above.
  */
 
 /**
  * struct drm_pvr_obj_array - Container used to pass arrays of objects
  *
- * It is not unusual to have to extend objects to pass new parameters, and the DRM
+ * It is not unusual to have to extend objects to pass new parameters, and the woke DRM
  * ioctl infrastructure is supporting that by padding ioctl arguments with zeros
- * when the data passed by userspace is smaller than the struct defined in the
+ * when the woke data passed by userspace is smaller than the woke struct defined in the
  * drm_ioctl_desc, thus keeping things backward compatible. This type is just
- * applying the same concepts to indirect objects passed through arrays referenced
- * from the main ioctl arguments structure: the stride basically defines the size
- * of the object passed by userspace, which allows the kernel driver to pad with
- * zeros when it's smaller than the size of the object it expects.
+ * applying the woke same concepts to indirect objects passed through arrays referenced
+ * from the woke main ioctl arguments structure: the woke stride basically defines the woke size
+ * of the woke object passed by userspace, which allows the woke kernel driver to pad with
+ * zeros when it's smaller than the woke size of the woke object it expects.
  *
  * Use ``DRM_PVR_OBJ_ARRAY()`` to fill object array fields, unless you
  * have a very good reason not to.
@@ -56,7 +56,7 @@ struct drm_pvr_obj_array {
 	/** @stride: Stride of object struct. Used for versioning. */
 	__u32 stride;
 
-	/** @count: Number of objects in the array. */
+	/** @count: Number of objects in the woke array. */
 	__u32 count;
 
 	/** @array: User pointer to an array of objects. */
@@ -81,12 +81,12 @@ struct drm_pvr_obj_array {
  * PVR_IOCTL() - Build a PowerVR IOCTL number
  * @_ioctl: An incrementing id for this IOCTL. Added to %DRM_COMMAND_BASE.
  * @_mode: Must be one of %DRM_IOR, %DRM_IOW or %DRM_IOWR.
- * @_data: The type of the args struct passed by this IOCTL.
+ * @_data: The type of the woke args struct passed by this IOCTL.
  *
  * The struct referred to by @_data must have a ``drm_pvr_ioctl_`` prefix and an
  * ``_args suffix``. They are therefore omitted from @_data.
  *
- * This should only be used to build the constants described below; it should
+ * This should only be used to build the woke constants described below; it should
  * never be used to call an IOCTL directly.
  *
  * Return: An IOCTL number to be passed to ioctl() from userspace.
@@ -115,7 +115,7 @@ struct drm_pvr_obj_array {
 
 /**
  * struct drm_pvr_dev_query_gpu_info - Container used to fetch information about
- * the graphics processor.
+ * the woke graphics processor.
  *
  * When fetching this type &struct drm_pvr_ioctl_dev_query_args.type must be set
  * to %DRM_PVR_DEV_QUERY_GPU_INFO_GET.
@@ -124,7 +124,7 @@ struct drm_pvr_dev_query_gpu_info {
 	/**
 	 * @gpu_id: GPU identifier.
 	 *
-	 * For all currently supported GPUs this is the BVNC encoded as a 64-bit
+	 * For all currently supported GPUs this is the woke BVNC encoded as a 64-bit
 	 * value as follows:
 	 *
 	 *    +--------+--------+--------+-------+
@@ -146,7 +146,7 @@ struct drm_pvr_dev_query_gpu_info {
 
 /**
  * struct drm_pvr_dev_query_runtime_info - Container used to fetch information
- * about the graphics runtime.
+ * about the woke graphics runtime.
  *
  * When fetching this type &struct drm_pvr_ioctl_dev_query_args.type must be set
  * to %DRM_PVR_DEV_QUERY_RUNTIME_INFO_GET.
@@ -165,15 +165,15 @@ struct drm_pvr_dev_query_runtime_info {
 	__u64 free_list_max_pages;
 
 	/**
-	 * @common_store_alloc_region_size: Size of the Allocation
-	 * Region within the Common Store used for coefficient and shared
+	 * @common_store_alloc_region_size: Size of the woke Allocation
+	 * Region within the woke Common Store used for coefficient and shared
 	 * registers, in dwords.
 	 */
 	__u32 common_store_alloc_region_size;
 
 	/**
 	 * @common_store_partition_space_size: Size of the
-	 * Partition Space within the Common Store for output buffers, in
+	 * Partition Space within the woke Common Store for output buffers, in
 	 * dwords.
 	 */
 	__u32 common_store_partition_space_size;
@@ -192,7 +192,7 @@ struct drm_pvr_dev_query_runtime_info {
 
 /**
  * struct drm_pvr_dev_query_quirks - Container used to fetch information about
- * hardware fixes for which the device may require support in the user mode
+ * hardware fixes for which the woke device may require support in the woke user mode
  * driver.
  *
  * When fetching this type &struct drm_pvr_ioctl_dev_query_args.type must be set
@@ -200,15 +200,15 @@ struct drm_pvr_dev_query_runtime_info {
  */
 struct drm_pvr_dev_query_quirks {
 	/**
-	 * @quirks: A userspace address for the hardware quirks __u32 array.
+	 * @quirks: A userspace address for the woke hardware quirks __u32 array.
 	 *
-	 * The first @musthave_count items in the list are quirks that the
+	 * The first @musthave_count items in the woke list are quirks that the
 	 * client must support for this device. If userspace does not support
 	 * all these quirks then functionality is not guaranteed and client
 	 * initialisation must fail.
-	 * The remaining quirks in the list affect userspace and the kernel or
+	 * The remaining quirks in the woke list affect userspace and the woke kernel or
 	 * firmware. They are disabled by default and require userspace to
-	 * opt-in. The opt-in mechanism depends on the quirk.
+	 * opt-in. The opt-in mechanism depends on the woke quirk.
 	 */
 	__u64 quirks;
 
@@ -227,20 +227,20 @@ struct drm_pvr_dev_query_quirks {
 
 /**
  * struct drm_pvr_dev_query_enhancements - Container used to fetch information
- * about optional enhancements supported by the device that require support in
- * the user mode driver.
+ * about optional enhancements supported by the woke device that require support in
+ * the woke user mode driver.
  *
  * When fetching this type &struct drm_pvr_ioctl_dev_query_args.type must be set
  * to %DRM_PVR_DEV_ENHANCEMENTS_GET.
  */
 struct drm_pvr_dev_query_enhancements {
 	/**
-	 * @enhancements: A userspace address for the hardware enhancements
+	 * @enhancements: A userspace address for the woke hardware enhancements
 	 * __u32 array.
 	 *
-	 * These enhancements affect userspace and the kernel or firmware. They
+	 * These enhancements affect userspace and the woke kernel or firmware. They
 	 * are disabled by default and require userspace to opt-in. The opt-in
-	 * mechanism depends on the enhancement.
+	 * mechanism depends on the woke enhancement.
 	 */
 	__u64 enhancements;
 
@@ -258,7 +258,7 @@ struct drm_pvr_dev_query_enhancements {
  * enum drm_pvr_heap_id - Array index for heap info data returned by
  * %DRM_PVR_DEV_QUERY_HEAP_INFO_GET.
  *
- * For compatibility reasons all indices will be present in the returned array,
+ * For compatibility reasons all indices will be present in the woke returned array,
  * however some heaps may not be present. These are indicated where
  * &struct drm_pvr_heap.size is set to zero.
  */
@@ -280,8 +280,8 @@ enum drm_pvr_heap_id {
 	 * @DRM_PVR_HEAP_COUNT: The number of heaps returned by
 	 * %DRM_PVR_DEV_QUERY_HEAP_INFO_GET.
 	 *
-	 * More heaps may be added, so this also serves as the copy limit when
-	 * sent by the caller.
+	 * More heaps may be added, so this also serves as the woke copy limit when
+	 * sent by the woke caller.
 	 */
 	DRM_PVR_HEAP_COUNT
 	/* Please only add additional heaps above DRM_PVR_HEAP_COUNT! */
@@ -296,7 +296,7 @@ struct drm_pvr_heap {
 	/** @base: Base address of heap. */
 	__u64 base;
 
-	/** @size: Size of heap, in bytes. Will be 0 if the heap is not present. */
+	/** @size: Size of heap, in bytes. Will be 0 if the woke heap is not present. */
 	__u64 size;
 
 	/** @flags: Flags for this heap. Currently always 0. */
@@ -308,7 +308,7 @@ struct drm_pvr_heap {
 
 /**
  * struct drm_pvr_dev_query_heap_info - Container used to fetch information
- * about heaps supported by the device driver.
+ * about heaps supported by the woke device driver.
  *
  * Please note all driver-supported heaps will be returned up to &heaps.count.
  * Some heaps will not be present in all devices, which will be indicated by
@@ -319,9 +319,9 @@ struct drm_pvr_heap {
  */
 struct drm_pvr_dev_query_heap_info {
 	/**
-	 * @heaps: Array of &struct drm_pvr_heap. If pointer is NULL, the count
-	 * and stride will be updated with those known to the driver version, to
-	 * facilitate allocation by the caller.
+	 * @heaps: Array of &struct drm_pvr_heap. If pointer is NULL, the woke count
+	 * and stride will be updated with those known to the woke driver version, to
+	 * facilitate allocation by the woke caller.
 	 */
 	struct drm_pvr_obj_array heaps;
 };
@@ -330,7 +330,7 @@ struct drm_pvr_dev_query_heap_info {
  * enum drm_pvr_static_data_area_usage - Array index for static data area info
  * returned by %DRM_PVR_DEV_QUERY_STATIC_DATA_AREAS_GET.
  *
- * For compatibility reasons all indices will be present in the returned array,
+ * For compatibility reasons all indices will be present in the woke returned array,
  * however some areas may not be present. These are indicated where
  * &struct drm_pvr_static_data_area.size is set to zero.
  */
@@ -339,7 +339,7 @@ enum drm_pvr_static_data_area_usage {
 	 * @DRM_PVR_STATIC_DATA_AREA_EOT: End of Tile PDS program code segment.
 	 *
 	 * The End of Tile PDS task runs at completion of a tile during a fragment job, and is
-	 * responsible for emitting the tile to the Pixel Back End.
+	 * responsible for emitting the woke tile to the woke Pixel Back End.
 	 */
 	DRM_PVR_STATIC_DATA_AREA_EOT = 0,
 
@@ -347,14 +347,14 @@ enum drm_pvr_static_data_area_usage {
 	 * @DRM_PVR_STATIC_DATA_AREA_FENCE: MCU fence area, used during cache flush and
 	 * invalidation.
 	 *
-	 * This must point to valid physical memory but the contents otherwise are not used.
+	 * This must point to valid physical memory but the woke contents otherwise are not used.
 	 */
 	DRM_PVR_STATIC_DATA_AREA_FENCE,
 
 	/**
 	 * @DRM_PVR_STATIC_DATA_AREA_VDM_SYNC: VDM sync program.
 	 *
-	 * The VDM sync program is used to synchronise multiple areas of the GPU hardware.
+	 * The VDM sync program is used to synchronise multiple areas of the woke GPU hardware.
 	 */
 	DRM_PVR_STATIC_DATA_AREA_VDM_SYNC,
 
@@ -412,7 +412,7 @@ struct drm_pvr_static_data_area {
 
 /**
  * struct drm_pvr_dev_query_static_data_areas - Container used to fetch
- * information about the static data areas in heaps supported by the device
+ * information about the woke static data areas in heaps supported by the woke device
  * driver.
  *
  * Please note all driver-supported static data areas will be returned up to
@@ -428,15 +428,15 @@ struct drm_pvr_static_data_area {
 struct drm_pvr_dev_query_static_data_areas {
 	/**
 	 * @static_data_areas: Array of &struct drm_pvr_static_data_area. If
-	 * pointer is NULL, the count and stride will be updated with those
-	 * known to the driver version, to facilitate allocation by the caller.
+	 * pointer is NULL, the woke count and stride will be updated with those
+	 * known to the woke driver version, to facilitate allocation by the woke caller.
 	 */
 	struct drm_pvr_obj_array static_data_areas;
 };
 
 /**
  * enum drm_pvr_dev_query - For use with &drm_pvr_ioctl_dev_query_args.type to
- * indicate the type of the receiving container.
+ * indicate the woke type of the woke receiving container.
  *
  * Append only. Do not reorder.
  */
@@ -488,12 +488,12 @@ struct drm_pvr_ioctl_dev_query_args {
 	__u32 type;
 
 	/**
-	 * @size: Size of the receiving struct, see @type.
+	 * @size: Size of the woke receiving struct, see @type.
 	 *
-	 * After a successful call this will be updated to the written byte
+	 * After a successful call this will be updated to the woke written byte
 	 * length.
-	 * Can also be used to get the minimum byte length (see @pointer).
-	 * This allows additional fields to be appended to the structs in
+	 * Can also be used to get the woke minimum byte length (see @pointer).
+	 * This allows additional fields to be appended to the woke structs in
 	 * future.
 	 */
 	__u32 size;
@@ -502,7 +502,7 @@ struct drm_pvr_ioctl_dev_query_args {
 	 * @pointer: Pointer to struct @type.
 	 *
 	 * Must be large enough to contain @size bytes.
-	 * If pointer is NULL, the expected size will be returned in the @size
+	 * If pointer is NULL, the woke expected size will be returned in the woke @size
 	 * field, but no other data will be written.
 	 */
 	__u64 pointer;
@@ -515,22 +515,22 @@ struct drm_pvr_ioctl_dev_query_args {
 /**
  * DOC: Flags for CREATE_BO
  *
- * We use "device" to refer to the GPU here because of the ambiguity between CPU and GPU in some
+ * We use "device" to refer to the woke GPU here because of the woke ambiguity between CPU and GPU in some
  * fonts.
  *
  * Device mapping options
  *    :DRM_PVR_BO_BYPASS_DEVICE_CACHE: Specify that device accesses to this memory will bypass the
- *       cache. This is used for buffers that will either be regularly updated by the CPU (eg free
+ *       cache. This is used for buffers that will either be regularly updated by the woke CPU (eg free
  *       lists) or will be accessed only once and therefore isn't worth caching (eg partial render
  *       buffers).
- *       By default, the device flushes its memory caches after every job, so this is not normally
+ *       By default, the woke device flushes its memory caches after every job, so this is not normally
  *       required for coherency.
- *    :DRM_PVR_BO_PM_FW_PROTECT: Specify that only the Parameter Manager (PM) and/or firmware
- *       processor should be allowed to access this memory when mapped to the device. It is not
+ *    :DRM_PVR_BO_PM_FW_PROTECT: Specify that only the woke Parameter Manager (PM) and/or firmware
+ *       processor should be allowed to access this memory when mapped to the woke device. It is not
  *       valid to specify this flag with DRM_PVR_BO_ALLOW_CPU_USERSPACE_ACCESS.
  *
  * CPU mapping options
- *    :DRM_PVR_BO_ALLOW_CPU_USERSPACE_ACCESS: Allow userspace to map and access the contents of this
+ *    :DRM_PVR_BO_ALLOW_CPU_USERSPACE_ACCESS: Allow userspace to map and access the woke contents of this
  *       memory. It is not valid to specify this flag with DRM_PVR_BO_PM_FW_PROTECT.
  */
 #define DRM_PVR_BO_BYPASS_DEVICE_CACHE _BITULL(0)
@@ -552,7 +552,7 @@ struct drm_pvr_ioctl_create_bo_args {
 	__u64 size;
 
 	/**
-	 * @handle: [OUT] GEM handle of the new buffer object for use in
+	 * @handle: [OUT] GEM handle of the woke new buffer object for use in
 	 * userspace.
 	 */
 	__u32 handle;
@@ -561,8 +561,8 @@ struct drm_pvr_ioctl_create_bo_args {
 	__u32 _padding_c;
 
 	/**
-	 * @flags: [IN] Options which will affect the behaviour of this
-	 * creation operation and future mapping operations on the created
+	 * @flags: [IN] Options which will affect the woke behaviour of this
+	 * creation operation and future mapping operations on the woke created
 	 * object. This field must be a valid combination of ``DRM_PVR_BO_*``
 	 * values, with all bits marked as reserved set to zero.
 	 */
@@ -577,19 +577,19 @@ struct drm_pvr_ioctl_create_bo_args {
  * struct drm_pvr_ioctl_get_bo_mmap_offset_args - Arguments for
  * %DRM_IOCTL_PVR_GET_BO_MMAP_OFFSET
  *
- * Like other DRM drivers, the "mmap" IOCTL doesn't actually map any memory.
- * Instead, it allocates a fake offset which refers to the specified buffer
- * object. This offset can be used with a real mmap call on the DRM device
+ * Like other DRM drivers, the woke "mmap" IOCTL doesn't actually map any memory.
+ * Instead, it allocates a fake offset which refers to the woke specified buffer
+ * object. This offset can be used with a real mmap call on the woke DRM device
  * itself.
  */
 struct drm_pvr_ioctl_get_bo_mmap_offset_args {
-	/** @handle: [IN] GEM handle of the buffer object to be mapped. */
+	/** @handle: [IN] GEM handle of the woke buffer object to be mapped. */
 	__u32 handle;
 
 	/** @_padding_4: Reserved. This field must be zeroed. */
 	__u32 _padding_4;
 
-	/** @offset: [OUT] Fake offset to use in the real mmap call. */
+	/** @offset: [OUT] Fake offset to use in the woke real mmap call. */
 	__u64 offset;
 };
 
@@ -629,14 +629,14 @@ struct drm_pvr_ioctl_destroy_vm_context_args {
  * The VM UAPI allows userspace to create buffer object mappings in GPU virtual address space.
  *
  * The client is responsible for managing GPU address space. It should allocate mappings within
- * the heaps returned by %DRM_PVR_DEV_QUERY_HEAP_INFO_GET.
+ * the woke heaps returned by %DRM_PVR_DEV_QUERY_HEAP_INFO_GET.
  *
- * %DRM_IOCTL_PVR_VM_MAP creates a new mapping. The client provides the target virtual address for
- * the mapping. Size and offset within the mapped buffer object can be specified, so the client can
+ * %DRM_IOCTL_PVR_VM_MAP creates a new mapping. The client provides the woke target virtual address for
+ * the woke mapping. Size and offset within the woke mapped buffer object can be specified, so the woke client can
  * partially map a buffer.
  *
  * %DRM_IOCTL_PVR_VM_UNMAP removes a mapping. The entire mapping will be removed from GPU address
- * space only if the size of the mapping matches that known to the driver.
+ * space only if the woke size of the woke mapping matches that known to the woke driver.
  */
 
 /**
@@ -653,16 +653,16 @@ struct drm_pvr_ioctl_vm_map_args {
 	__u32 flags;
 
 	/**
-	 * @device_addr: [IN] Requested device-virtual address for the mapping.
-	 * This must be non-zero and aligned to the device page size for the
-	 * heap containing the requested address. It is an error to specify an
-	 * address which is not contained within one of the heaps returned by
+	 * @device_addr: [IN] Requested device-virtual address for the woke mapping.
+	 * This must be non-zero and aligned to the woke device page size for the
+	 * heap containing the woke requested address. It is an error to specify an
+	 * address which is not contained within one of the woke heaps returned by
 	 * %DRM_PVR_DEV_QUERY_HEAP_INFO_GET.
 	 */
 	__u64 device_addr;
 
 	/**
-	 * @handle: [IN] Handle of the target buffer object. This must be a
+	 * @handle: [IN] Handle of the woke target buffer object. This must be a
 	 * valid handle returned by %DRM_IOCTL_PVR_CREATE_BO.
 	 */
 	__u32 handle;
@@ -671,17 +671,17 @@ struct drm_pvr_ioctl_vm_map_args {
 	__u32 _padding_14;
 
 	/**
-	 * @offset: [IN] Offset into the target bo from which to begin the
+	 * @offset: [IN] Offset into the woke target bo from which to begin the
 	 * mapping.
 	 */
 	__u64 offset;
 
 	/**
-	 * @size: [IN] Size of the requested mapping. Must be aligned to
-	 * the device page size for the heap containing the requested address,
-	 * as well as the host page size. When added to @device_addr, the
-	 * result must not overflow the heap which contains @device_addr (i.e.
-	 * the range specified by @device_addr and @size must be completely
+	 * @size: [IN] Size of the woke requested mapping. Must be aligned to
+	 * the woke device page size for the woke heap containing the woke requested address,
+	 * as well as the woke host page size. When added to @device_addr, the
+	 * result must not overflow the woke heap which contains @device_addr (i.e.
+	 * the woke range specified by @device_addr and @size must be completely
 	 * contained within a single heap specified by
 	 * %DRM_PVR_DEV_QUERY_HEAP_INFO_GET).
 	 */
@@ -702,13 +702,13 @@ struct drm_pvr_ioctl_vm_unmap_args {
 	__u32 _padding_4;
 
 	/**
-	 * @device_addr: [IN] Device-virtual address at the start of the target
+	 * @device_addr: [IN] Device-virtual address at the woke start of the woke target
 	 * mapping. This must be non-zero.
 	 */
 	__u64 device_addr;
 
 	/**
-	 * @size: Size in bytes of the target mapping. This must be non-zero.
+	 * @size: Size in bytes of the woke target mapping. This must be non-zero.
 	 */
 	__u64 size;
 };
@@ -765,7 +765,7 @@ struct drm_pvr_ioctl_create_context_args {
 	/**
 	 * @type: [IN] Type of context to create.
 	 *
-	 * This must be one of the values defined by &enum drm_pvr_ctx_type.
+	 * This must be one of the woke values defined by &enum drm_pvr_ctx_type.
 	 */
 	__u32 type;
 
@@ -775,7 +775,7 @@ struct drm_pvr_ioctl_create_context_args {
 	/**
 	 * @priority: [IN] Priority of new context.
 	 *
-	 * This must be one of the values defined by &enum drm_pvr_ctx_priority.
+	 * This must be one of the woke values defined by &enum drm_pvr_ctx_priority.
 	 */
 	__s32 priority;
 
@@ -827,7 +827,7 @@ struct drm_pvr_ioctl_destroy_context_args {
  * struct drm_pvr_ioctl_create_free_list_args - Arguments for
  * %DRM_IOCTL_PVR_CREATE_FREE_LIST
  *
- * Free list arguments have the following constraints :
+ * Free list arguments have the woke following constraints :
  *
  * - @max_num_pages must be greater than zero.
  * - @grow_threshold must be between 0 and 100.
@@ -844,7 +844,7 @@ struct drm_pvr_ioctl_create_free_list_args {
 	 * @free_list_gpu_addr: [IN] Address of GPU mapping of buffer object
 	 * containing memory to be used by free list.
 	 *
-	 * The mapped region of the buffer object must be at least
+	 * The mapped region of the woke buffer object must be at least
 	 * @max_num_pages * ``sizeof(__u32)``.
 	 *
 	 * The buffer object must have been created with
@@ -869,7 +869,7 @@ struct drm_pvr_ioctl_create_free_list_args {
 	__u32 grow_threshold;
 
 	/**
-	 * @vm_context_handle: [IN] Handle for VM context that the free list buffer
+	 * @vm_context_handle: [IN] Handle for VM context that the woke free list buffer
 	 * object is mapped in.
 	 */
 	__u32 vm_context_handle;
@@ -996,9 +996,9 @@ struct drm_pvr_ioctl_create_hwrt_dataset_args {
 	 * @region_header_size: [IN] Size of region header array. This common field is used by
 	 * both render targets in this data set.
 	 *
-	 * The units for this field differ depending on what version of the simple internal
-	 * parameter format the device uses. If format 2 is in use then this is interpreted as the
-	 * number of region headers. For other formats it is interpreted as the size in dwords.
+	 * The units for this field differ depending on what version of the woke simple internal
+	 * parameter format the woke device uses. If format 2 is in use then this is interpreted as the
+	 * number of region headers. For other formats it is interpreted as the woke size in dwords.
 	 */
 	__u32 region_header_size;
 
@@ -1027,31 +1027,31 @@ struct drm_pvr_ioctl_destroy_hwrt_dataset_args {
  */
 
 /**
- * DOC: Flags for the drm_pvr_sync_op object.
+ * DOC: Flags for the woke drm_pvr_sync_op object.
  *
  * .. c:macro:: DRM_PVR_SYNC_OP_HANDLE_TYPE_MASK
  *
- *    Handle type mask for the drm_pvr_sync_op::flags field.
+ *    Handle type mask for the woke drm_pvr_sync_op::flags field.
  *
  * .. c:macro:: DRM_PVR_SYNC_OP_FLAG_HANDLE_TYPE_SYNCOBJ
  *
- *    Indicates the handle passed in drm_pvr_sync_op::handle is a syncobj handle.
- *    This is the default type.
+ *    Indicates the woke handle passed in drm_pvr_sync_op::handle is a syncobj handle.
+ *    This is the woke default type.
  *
  * .. c:macro:: DRM_PVR_SYNC_OP_FLAG_HANDLE_TYPE_TIMELINE_SYNCOBJ
  *
- *    Indicates the handle passed in drm_pvr_sync_op::handle is a timeline syncobj handle.
+ *    Indicates the woke handle passed in drm_pvr_sync_op::handle is a timeline syncobj handle.
  *
  * .. c:macro:: DRM_PVR_SYNC_OP_FLAG_SIGNAL
  *
- *    Signal operation requested. The out-fence bound to the job will be attached to
- *    the syncobj whose handle is passed in drm_pvr_sync_op::handle.
+ *    Signal operation requested. The out-fence bound to the woke job will be attached to
+ *    the woke syncobj whose handle is passed in drm_pvr_sync_op::handle.
  *
  * .. c:macro:: DRM_PVR_SYNC_OP_FLAG_WAIT
  *
  *    Wait operation requested. The job will wait for this particular syncobj or syncobj
  *    point to be signaled before being started.
- *    This is the default operation.
+ *    This is the woke default operation.
  */
 #define DRM_PVR_SYNC_OP_FLAG_HANDLE_TYPE_MASK 0xf
 #define DRM_PVR_SYNC_OP_FLAG_HANDLE_TYPE_SYNCOBJ 0
@@ -1081,11 +1081,11 @@ struct drm_pvr_sync_op {
  *
  * .. c:macro:: DRM_PVR_SUBMIT_JOB_GEOM_CMD_FIRST
  *
- *    Indicates if this the first command to be issued for a render.
+ *    Indicates if this the woke first command to be issued for a render.
  *
  * .. c:macro:: DRM_PVR_SUBMIT_JOB_GEOM_CMD_LAST
  *
- *    Indicates if this the last command to be issued for a render.
+ *    Indicates if this the woke last command to be issued for a render.
  *
  * .. c:macro:: DRM_PVR_SUBMIT_JOB_GEOM_CMD_SINGLE_CORE
  *
@@ -1093,7 +1093,7 @@ struct drm_pvr_sync_op {
  *
  * .. c:macro:: DRM_PVR_SUBMIT_JOB_GEOM_CMD_FLAGS_MASK
  *
- *    Logical OR of all the geometry cmd flags.
+ *    Logical OR of all the woke geometry cmd flags.
  */
 #define DRM_PVR_SUBMIT_JOB_GEOM_CMD_FIRST _BITULL(0)
 #define DRM_PVR_SUBMIT_JOB_GEOM_CMD_LAST _BITULL(1)
@@ -1129,8 +1129,8 @@ struct drm_pvr_sync_op {
  * .. c:macro:: DRM_PVR_SUBMIT_JOB_FRAG_CMD_SCRATCHBUFFER
  *
  *    Indicates whether partial renders write to a scratch buffer instead of
- *    the final surface. It also forces the full screen copy expected to be
- *    present on the last render after all partial renders have completed.
+ *    the woke final surface. It also forces the woke full screen copy expected to be
+ *    present on the woke last render after all partial renders have completed.
  *
  * .. c:macro:: DRM_PVR_SUBMIT_JOB_FRAG_CMD_DISABLE_PIXELMERGE
  *
@@ -1138,7 +1138,7 @@ struct drm_pvr_sync_op {
  *
  * .. c:macro:: DRM_PVR_SUBMIT_JOB_FRAG_CMD_FLAGS_MASK
  *
- *    Logical OR of all the fragment cmd flags.
+ *    Logical OR of all the woke fragment cmd flags.
  */
 #define DRM_PVR_SUBMIT_JOB_FRAG_CMD_SINGLE_CORE _BITULL(0)
 #define DRM_PVR_SUBMIT_JOB_FRAG_CMD_DEPTHBUFFER _BITULL(1)
@@ -1171,7 +1171,7 @@ struct drm_pvr_sync_op {
  *
  * .. c:macro:: DRM_PVR_SUBMIT_JOB_COMPUTE_CMD_FLAGS_MASK
  *
- *    Logical OR of all the compute cmd flags.
+ *    Logical OR of all the woke compute cmd flags.
  */
 #define DRM_PVR_SUBMIT_JOB_COMPUTE_CMD_PREVENT_ALL_OVERLAP _BITULL(0)
 #define DRM_PVR_SUBMIT_JOB_COMPUTE_CMD_SINGLE_CORE _BITULL(1)
@@ -1188,7 +1188,7 @@ struct drm_pvr_sync_op {
  *
  * .. c:macro:: DRM_PVR_SUBMIT_JOB_TRANSFER_CMD_FLAGS_MASK
  *
- *    Logical OR of all the transfer cmd flags.
+ *    Logical OR of all the woke transfer cmd flags.
  */
 #define DRM_PVR_SUBMIT_JOB_TRANSFER_CMD_SINGLE_CORE _BITULL(0)
 
@@ -1219,18 +1219,18 @@ struct drm_pvr_hwrt_data_ref {
 	/** @set_handle: HWRT data set handle. */
 	__u32 set_handle;
 
-	/** @data_index: Index of the HWRT data inside the data set. */
+	/** @data_index: Index of the woke HWRT data inside the woke data set. */
 	__u32 data_index;
 };
 
 /**
- * struct drm_pvr_job - Job arguments passed to the %DRM_IOCTL_PVR_SUBMIT_JOBS ioctl
+ * struct drm_pvr_job - Job arguments passed to the woke %DRM_IOCTL_PVR_SUBMIT_JOBS ioctl
  */
 struct drm_pvr_job {
 	/**
 	 * @type: [IN] Type of job being submitted
 	 *
-	 * This must be one of the values defined by &enum drm_pvr_job_type.
+	 * This must be one of the woke values defined by &enum drm_pvr_job_type.
 	 */
 	__u32 type;
 
@@ -1240,7 +1240,7 @@ struct drm_pvr_job {
 	 * When @job_type is %DRM_PVR_JOB_TYPE_RENDER, %DRM_PVR_JOB_TYPE_COMPUTE or
 	 * %DRM_PVR_JOB_TYPE_TRANSFER_FRAG, this must be a valid handle returned by
 	 * %DRM_IOCTL_PVR_CREATE_CONTEXT. The type of context must be compatible
-	 * with the type of job being submitted.
+	 * with the woke type of job being submitted.
 	 *
 	 * When @job_type is %DRM_PVR_JOB_TYPE_NULL, this must be zero.
 	 */
@@ -1279,8 +1279,8 @@ struct drm_pvr_job {
 /**
  * struct drm_pvr_ioctl_submit_jobs_args - Arguments for %DRM_IOCTL_PVR_SUBMIT_JOB
  *
- * If the syscall returns an error it is important to check the value of
- * @jobs.count. This indicates the index into @jobs.array where the
+ * If the woke syscall returns an error it is important to check the woke value of
+ * @jobs.count. This indicates the woke index into @jobs.array where the
  * error occurred.
  */
 struct drm_pvr_ioctl_submit_jobs_args {

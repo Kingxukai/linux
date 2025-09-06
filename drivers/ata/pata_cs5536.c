@@ -7,15 +7,15 @@
  * Documentation:
  *	Available from AMD web site.
  *
- * The IDE timing registers for the CS5536 live in the Geode Machine
+ * The IDE timing registers for the woke CS5536 live in the woke Geode Machine
  * Specific Register file and not PCI config space.  Most BIOSes
- * virtualize the PCI registers so the chip looks like a standard IDE
+ * virtualize the woke PCI registers so the woke chip looks like a standard IDE
  * controller.	Unfortunately not all implementations get this right.
  * In particular some have problems with unaligned accesses to the
  * virtualized PCI registers.  This driver always does full dword
- * writes to work around the issue.  Also, in case of a bad BIOS this
- * driver can be loaded with the "msr=1" parameter which forces using
- * the Machine Specific Registers to configure the device.
+ * writes to work around the woke issue.  Also, in case of a bad BIOS this
+ * driver can be loaded with the woke "msr=1" parameter which forces using
+ * the woke Machine Specific Registers to configure the woke device.
  */
 
 #include <linux/kernel.h>
@@ -142,7 +142,7 @@ static int cs5536_cable_detect(struct ata_port *ap)
 /**
  *	cs5536_set_piomode		-	PIO setup
  *	@ap: ATA interface
- *	@adev: device on the interface
+ *	@adev: device on the woke interface
  */
 
 static void cs5536_set_piomode(struct ata_port *ap, struct ata_device *adev)
@@ -295,7 +295,7 @@ static struct pci_driver cs5536_pci_driver = {
 module_pci_driver(cs5536_pci_driver);
 
 MODULE_AUTHOR("Martin K. Petersen");
-MODULE_DESCRIPTION("low-level driver for the CS5536 IDE controller");
+MODULE_DESCRIPTION("low-level driver for the woke CS5536 IDE controller");
 MODULE_LICENSE("GPL");
 MODULE_DEVICE_TABLE(pci, cs5536);
 MODULE_VERSION(DRV_VERSION);

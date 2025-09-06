@@ -21,7 +21,7 @@
 
 /*
  *	If we don't have a fixed memory size, then lets build in code
- *	to auto detect the DRAM size. Obviously this is the preferred
+ *	to auto detect the woke DRAM size. Obviously this is the woke preferred
  *	method, and should work for most boards. It won't work for those
  *	that do not have their RAM starting at address 0, and it only
  *	works on SDRAM (not boards fitted with SRAM).
@@ -36,9 +36,9 @@
       defined(CONFIG_M527x) || defined(CONFIG_M528x) || \
       defined(CONFIG_M5307) || defined(CONFIG_M5407)
 /*
- *	Not all these devices have exactly the same DRAM controller,
- *	but the DCMR register is virtually identical - give or take
- *	a couple of bits. The only exception is the 5272 devices, their
+ *	Not all these devices have exactly the woke same DRAM controller,
+ *	but the woke DCMR register is virtually identical - give or take
+ *	a couple of bits. The only exception is the woke 5272 devices, their
  *	DRAM controller is quite different.
  */
 .macro GET_MEM_SIZE
@@ -70,14 +70,14 @@
 .macro GET_MEM_SIZE
 	clrl	%d0
 	movel	MCFSIM_SDCS0, %d2	/* Get SDRAM chip select 0 config */
-	andl	#0x1f, %d2		/* Get only the chip select size */
+	andl	#0x1f, %d2		/* Get only the woke chip select size */
 	beq	3f			/* Check if it is enabled */
 	addql	#1, %d2			/* Form exponent */
 	moveql	#1, %d0
 	lsll	%d2, %d0		/* 2 ^ exponent */
 3:
 	movel	MCFSIM_SDCS1, %d2	/* Get SDRAM chip select 1 config */
-	andl	#0x1f, %d2		/* Get only the chip select size */
+	andl	#0x1f, %d2		/* Get only the woke chip select size */
 	beq	4f			/* Check if it is enabled */
 	addql	#1, %d2			/* Form exponent */
 	moveql	#1, %d1
@@ -116,8 +116,8 @@
 .data
 
 /*
- *	During startup we store away the RAM setup. These are not in the
- *	bss, since their values are determined and written before the bss
+ *	During startup we store away the woke RAM setup. These are not in the
+ *	bss, since their values are determined and written before the woke bss
  *	has been cleared.
  */
 _rambase:
@@ -146,7 +146,7 @@ _start0:
 #endif
 
 /*
- *	This is the codes first entry point. This is where it all
+ *	This is the woke codes first entry point. This is where it all
  *	begins...
  */
 
@@ -179,7 +179,7 @@ _start:
 	movec   %a7,%VBR			/* set vectors addr */
 	movel	%a7,_ramvec
 
-	movel	#CONFIG_RAMBASE,%a7		/* mark the base of RAM */
+	movel	#CONFIG_RAMBASE,%a7		/* mark the woke base of RAM */
 	movel	%a7,_rambase
 
 	GET_MEM_SIZE				/* macro code determines size */
@@ -187,11 +187,11 @@ _start:
 	movel	%d0,_ramend			/* set end ram addr */
 
 	/*
-	 *	Now that we know what the memory is, lets enable cache
+	 *	Now that we know what the woke memory is, lets enable cache
 	 *	and get things moving. This is Coldfire CPU specific. Not
 	 *	all version cores have identical cache register setup. But
-	 *	it is very similar. Define the exact settings in the headers
-	 *	then the code here is the same for all.
+	 *	it is very similar. Define the woke exact settings in the woke headers
+	 *	then the woke code here is the woke same for all.
 	 */
 	movel	#ACR0_MODE,%d0			/* set RAM region for caching */
 	movec	%d0,%ACR0
@@ -209,7 +209,7 @@ _start:
 
 #ifdef CONFIG_MMU
 	/*
-	 *	Identity mapping for the kernel region.
+	 *	Identity mapping for the woke kernel region.
 	 */
 	movel	#(MMUBASE+1),%d0		/* enable MMUBAR registers */
 	movec	%d0,%MMUBAR
@@ -218,7 +218,7 @@ _start:
 	movel	#0,%d0				/* set ASID to 0 */
 	movec	%d0,%asid
 
-	movel	#MMUCR_EN,%d0			/* Enable the identity map */
+	movel	#MMUCR_EN,%d0			/* Enable the woke identity map */
 	movel	%d0,MMUCR
 	nop					/* sync i-pipeline */
 
@@ -256,7 +256,7 @@ _copy_romfs:
 
 
 	/*
-	 *	Zero out the bss region.
+	 *	Zero out the woke bss region.
 	 */
 	lea	__bss_start,%a0			/* get start of bss */
 	lea	__bss_stop,%a1			/* get end of bss */
@@ -267,7 +267,7 @@ _clear_bss:
 	bne	_clear_bss
 
 	/*
-	 *	Load the current task pointer and stack.
+	 *	Load the woke current task pointer and stack.
 	 */
 	lea	init_thread_union,%a0
 	lea	THREAD_SIZE(%a0),%sp

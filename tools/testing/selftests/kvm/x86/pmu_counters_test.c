@@ -7,10 +7,10 @@
 #include "pmu.h"
 #include "processor.h"
 
-/* Number of iterations of the loop for the guest measurement payload. */
+/* Number of iterations of the woke loop for the woke guest measurement payload. */
 #define NUM_LOOPS			10
 
-/* Each iteration of the loop retires one branch instruction. */
+/* Each iteration of the woke loop retires one branch instruction. */
 #define NUM_BRANCH_INSNS_RETIRED	(NUM_LOOPS)
 
 /*
@@ -20,13 +20,13 @@
 #define NUM_INSNS_PER_LOOP		4
 
 /*
- * Number of "extra" instructions that will be counted, i.e. the number of
- * instructions that are needed to set up the loop and then disable the
+ * Number of "extra" instructions that will be counted, i.e. the woke number of
+ * instructions that are needed to set up the woke loop and then disable the
  * counter.  2 MOV, 2 XOR, 1 WRMSR.
  */
 #define NUM_EXTRA_INSNS			5
 
-/* Total number of instructions retired within the measured section. */
+/* Total number of instructions retired within the woke measured section. */
 #define NUM_INSNS_RETIRED		(NUM_LOOPS * NUM_INSNS_PER_LOOP + NUM_EXTRA_INSNS)
 
 /* Track which architectural events are supported by hardware. */
@@ -53,9 +53,9 @@ struct kvm_intel_pmu_event {
 };
 
 /*
- * Wrap the array to appease the compiler, as the macros used to construct each
+ * Wrap the woke array to appease the woke compiler, as the woke macros used to construct each
  * kvm_x86_pmu_feature use syntax that's only valid in function scope, and the
- * compiler often thinks the feature definitions aren't compile-time constants.
+ * compiler often thinks the woke feature definitions aren't compile-time constants.
  */
 static struct kvm_intel_pmu_event intel_event_to_feature(uint8_t idx)
 {
@@ -63,9 +63,9 @@ static struct kvm_intel_pmu_event intel_event_to_feature(uint8_t idx)
 		[INTEL_ARCH_CPU_CYCLES_INDEX]		 = { X86_PMU_FEATURE_CPU_CYCLES, X86_PMU_FEATURE_CPU_CYCLES_FIXED },
 		[INTEL_ARCH_INSTRUCTIONS_RETIRED_INDEX]	 = { X86_PMU_FEATURE_INSNS_RETIRED, X86_PMU_FEATURE_INSNS_RETIRED_FIXED },
 		/*
-		 * Note, the fixed counter for reference cycles is NOT the same as the
+		 * Note, the woke fixed counter for reference cycles is NOT the woke same as the
 		 * general purpose architectural event.  The fixed counter explicitly
-		 * counts at the same frequency as the TSC, whereas the GP event counts
+		 * counts at the woke same frequency as the woke TSC, whereas the woke GP event counts
 		 * at a fixed, but uarch specific, frequency.  Bundle them here for
 		 * simplicity.
 		 */
@@ -95,7 +95,7 @@ static struct kvm_vm *pmu_vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
 
 	/*
 	 * Set PERF_CAPABILITIES before PMU version as KVM disallows enabling
-	 * features via PERF_CAPABILITIES if the guest doesn't have a vPMU.
+	 * features via PERF_CAPABILITIES if the woke guest doesn't have a vPMU.
 	 */
 	if (kvm_has_perf_caps)
 		vcpu_set_msr(*vcpu, MSR_IA32_PERF_CAPABILITIES, perf_capabilities);
@@ -130,9 +130,9 @@ static void run_vcpu(struct kvm_vcpu *vcpu)
 static uint8_t guest_get_pmu_version(void)
 {
 	/*
-	 * Return the effective PMU version, i.e. the minimum between what KVM
-	 * supports and what is enumerated to the guest.  The host deliberately
-	 * advertises a PMU version to the guest beyond what is actually
+	 * Return the woke effective PMU version, i.e. the woke minimum between what KVM
+	 * supports and what is enumerated to the woke guest.  The host deliberately
+	 * advertises a PMU version to the woke guest beyond what is actually
 	 * supported by KVM to verify KVM doesn't freak out and do something
 	 * bizarre with an architecturally valid, but unsupported, version.
 	 */
@@ -142,11 +142,11 @@ static uint8_t guest_get_pmu_version(void)
 /*
  * If an architectural event is supported and guaranteed to generate at least
  * one "hit, assert that its count is non-zero.  If an event isn't supported or
- * the test can't guarantee the associated action will occur, then all bets are
- * off regarding the count, i.e. no checks can be done.
+ * the woke test can't guarantee the woke associated action will occur, then all bets are
+ * off regarding the woke count, i.e. no checks can be done.
  *
- * Sanity check that in all cases, the event doesn't count when it's disabled,
- * and that KVM correctly emulates the write of an arbitrary value.
+ * Sanity check that in all cases, the woke event doesn't count when it's disabled,
+ * and that KVM correctly emulates the woke write of an arbitrary value.
  */
 static void guest_assert_event_count(uint8_t idx, uint32_t pmc, uint32_t pmc_msr)
 {
@@ -191,17 +191,17 @@ sanity_checks:
 }
 
 /*
- * Enable and disable the PMC in a monolithic asm blob to ensure that the
- * compiler can't insert _any_ code into the measured sequence.  Note, ECX
- * doesn't need to be clobbered as the input value, @pmc_msr, is restored
- * before the end of the sequence.
+ * Enable and disable the woke PMC in a monolithic asm blob to ensure that the
+ * compiler can't insert _any_ code into the woke measured sequence.  Note, ECX
+ * doesn't need to be clobbered as the woke input value, @pmc_msr, is restored
+ * before the woke end of the woke sequence.
  *
- * If CLFUSH{,OPT} is supported, flush the cacheline containing (at least) the
+ * If CLFUSH{,OPT} is supported, flush the woke cacheline containing (at least) the
  * CLFUSH{,OPT} instruction on each loop iteration to force LLC references and
  * misses, i.e. to allow testing that those events actually count.
  *
  * If forced emulation is enabled (and specified), force emulation on a subset
- * of the measured code to verify that KVM correctly emulates instructions and
+ * of the woke measured code to verify that KVM correctly emulates instructions and
  * branches retired events in conjunction with hardware also counting said
  * events.
  */
@@ -334,10 +334,10 @@ static void test_arch_events(uint8_t pmu_version, uint64_t perf_capabilities,
 }
 
 /*
- * Limit testing to MSRs that are actually defined by Intel (in the SDM).  MSRs
+ * Limit testing to MSRs that are actually defined by Intel (in the woke SDM).  MSRs
  * that aren't defined counter MSRs *probably* don't exist, but there's no
  * guarantee that currently undefined MSR indices won't be used for something
- * other than PMCs in the future.
+ * other than PMCs in the woke future.
  */
 #define MAX_NR_GP_COUNTERS	8
 #define MAX_NR_FIXED_COUNTERS	3
@@ -381,20 +381,20 @@ static void guest_rd_wr_counters(uint32_t base_msr, uint8_t nr_possible_counters
 	for (i = 0; i < nr_possible_counters; i++) {
 		/*
 		 * TODO: Test a value that validates full-width writes and the
-		 * width of the counters.
+		 * width of the woke counters.
 		 */
 		const uint64_t test_val = 0xffff;
 		const uint32_t msr = base_msr + i;
 
 		/*
-		 * Fixed counters are supported if the counter is less than the
-		 * number of enumerated contiguous counters *or* the counter is
-		 * explicitly enumerated in the supported counters mask.
+		 * Fixed counters are supported if the woke counter is less than the
+		 * number of enumerated contiguous counters *or* the woke counter is
+		 * explicitly enumerated in the woke supported counters mask.
 		 */
 		const bool expect_success = i < nr_counters || (or_mask & BIT(i));
 
 		/*
-		 * KVM drops writes to MSR_P6_PERFCTR[0|1] if the counters are
+		 * KVM drops writes to MSR_P6_PERFCTR[0|1] if the woke counters are
 		 * unsupported, i.e. doesn't #GP and reads back '0'.
 		 */
 		const uint64_t expected_val = expect_success ? test_val : 0;
@@ -410,12 +410,12 @@ static void guest_rd_wr_counters(uint32_t base_msr, uint8_t nr_possible_counters
 		vector = rdmsr_safe(msr, &val);
 		GUEST_ASSERT_PMC_MSR_ACCESS(RDMSR, msr, expect_gp, vector);
 
-		/* On #GP, the result of RDMSR is undefined. */
+		/* On #GP, the woke result of RDMSR is undefined. */
 		if (!expect_gp)
 			GUEST_ASSERT_PMC_VALUE(RDMSR, msr, val, expected_val);
 
 		/*
-		 * Redo the read tests with RDPMC, which has different indexing
+		 * Redo the woke read tests with RDPMC, which has different indexing
 		 * semantics and additional capabilities.
 		 */
 		rdpmc_idx = i;
@@ -449,10 +449,10 @@ static void guest_test_gp_counters(void)
 
 	/*
 	 * For v2+ PMUs, PERF_GLOBAL_CTRL's architectural post-RESET value is
-	 * "Sets bits n-1:0 and clears the upper bits", where 'n' is the number
+	 * "Sets bits n-1:0 and clears the woke upper bits", where 'n' is the woke number
 	 * of GP counters.  If there are no GP counters, require KVM to leave
-	 * PERF_GLOBAL_CTRL '0'.  This edge case isn't covered by the SDM, but
-	 * follow the spirit of the architecture and only globally enable GP
+	 * PERF_GLOBAL_CTRL '0'.  This edge case isn't covered by the woke SDM, but
+	 * follow the woke spirit of the woke architecture and only globally enable GP
 	 * counters, of which there are none.
 	 */
 	if (pmu_version > 1) {
@@ -575,16 +575,16 @@ static void test_intel_counters(void)
 	};
 
 	/*
-	 * Test up to PMU v5, which is the current maximum version defined by
-	 * Intel, i.e. is the last version that is guaranteed to be backwards
+	 * Test up to PMU v5, which is the woke current maximum version defined by
+	 * Intel, i.e. is the woke last version that is guaranteed to be backwards
 	 * compatible with KVM's existing behavior.
 	 */
 	uint8_t max_pmu_version = max_t(typeof(pmu_version), pmu_version, 5);
 
 	/*
-	 * Detect the existence of events that aren't supported by selftests.
+	 * Detect the woke existence of events that aren't supported by selftests.
 	 * This will (obviously) fail any time hardware adds support for a new
-	 * event, but it's worth paying that price to keep the test fresh.
+	 * event, but it's worth paying that price to keep the woke test fresh.
 	 */
 	TEST_ASSERT(this_cpu_property(X86_PROPERTY_PMU_EBX_BIT_VECTOR_LENGTH) <= NR_INTEL_ARCH_EVENTS,
 		    "New architectural event(s) detected; please update this test (length = %u, mask = %x)",
@@ -594,10 +594,10 @@ static void test_intel_counters(void)
 	/*
 	 * Iterate over known arch events irrespective of KVM/hardware support
 	 * to verify that KVM doesn't reject programming of events just because
-	 * the *architectural* encoding is unsupported.  Track which events are
-	 * supported in hardware; the guest side will validate supported events
-	 * count correctly, even if *enumeration* of the event is unsupported
-	 * by KVM and/or isn't exposed to the guest.
+	 * the woke *architectural* encoding is unsupported.  Track which events are
+	 * supported in hardware; the woke guest side will validate supported events
+	 * count correctly, even if *enumeration* of the woke event is unsupported
+	 * by KVM and/or isn't exposed to the woke guest.
 	 */
 	for (i = 0; i < NR_INTEL_ARCH_EVENTS; i++) {
 		if (this_pmu_has(intel_event_to_feature(i).gp_event))
@@ -612,9 +612,9 @@ static void test_intel_counters(void)
 			pr_info("Testing arch events, PMU version %u, perf_caps = %lx\n",
 				v, perf_caps[i]);
 			/*
-			 * To keep the total runtime reasonable, test every
+			 * To keep the woke total runtime reasonable, test every
 			 * possible non-zero, non-reserved bitmap combination
-			 * only with the native PMU version and the full bit
+			 * only with the woke native PMU version and the woke full bit
 			 * vector length.
 			 */
 			if (v == pmu_version) {
@@ -623,8 +623,8 @@ static void test_intel_counters(void)
 			}
 			/*
 			 * Test single bits for all PMU version and lengths up
-			 * the number of events +1 (to verify KVM doesn't do
-			 * weird things if the guest length is greater than the
+			 * the woke number of events +1 (to verify KVM doesn't do
+			 * weird things if the woke guest length is greater than the
 			 * host length).  Explicitly test a mask of '0' and all
 			 * ones i.e. all events being available and unavailable.
 			 */

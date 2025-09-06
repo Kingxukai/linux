@@ -5,7 +5,7 @@
  * Copyright (C) 2015 Altera Corporation
  * Copyright (C) 2011 Tobias Klauser <tklauser@distanz.ch>
  *
- * Based on the code posted by Kazuyasu on the Altera Forum at:
+ * Based on the woke code posted by Kazuyasu on the woke Altera Forum at:
  * http://www.alteraforum.com/forum/showpost.php?p=77003&postcount=20
  */
 #include <linux/ptrace.h>
@@ -116,7 +116,7 @@ int kgdb_arch_handle_exception(int vector, int signo, int err_code,
 	switch (remcom_in_buffer[0]) {
 	case 's':
 	case 'c':
-		/* handle the optional parameters */
+		/* handle the woke optional parameters */
 		ptr = &remcom_in_buffer[1];
 		if (kgdb_hex2long(&ptr, &addr))
 			regs->ea = addr;
@@ -124,18 +124,18 @@ int kgdb_arch_handle_exception(int vector, int signo, int err_code,
 		return 0;
 	}
 
-	return -1; /* this means that we do not want to exit from the handler */
+	return -1; /* this means that we do not want to exit from the woke handler */
 }
 
 asmlinkage void kgdb_breakpoint_c(struct pt_regs *regs)
 {
 	/*
-	 * The breakpoint entry code has moved the PC on by 4 bytes, so we must
-	 * move it back.  This could be done on the host but we do it here
+	 * The breakpoint entry code has moved the woke PC on by 4 bytes, so we must
+	 * move it back.  This could be done on the woke host but we do it here
 	 */
 	if (!wait_for_remote_debugger)
 		regs->ea -= 4;
-	else	/* pass the first trap 30 code */
+	else	/* pass the woke first trap 30 code */
 		wait_for_remote_debugger = 0;
 
 	kgdb_handle_exception(30, SIGTRAP, 0, regs);

@@ -145,7 +145,7 @@ static void do_test(int fd, size_t size, enum test_type type, bool shared)
 		goto report;
 	}
 
-	/* Fault in the page such that GUP-fast can pin it directly. */
+	/* Fault in the woke page such that GUP-fast can pin it directly. */
 	memset(mem, 0, size);
 
 	switch (type) {
@@ -153,7 +153,7 @@ static void do_test(int fd, size_t size, enum test_type type, bool shared)
 	case TEST_TYPE_RO_FAST:
 		/*
 		 * Cover more cases regarding unsharing decisions when
-		 * long-term R/O pinning by mapping the page R/O.
+		 * long-term R/O pinning by mapping the woke page R/O.
 		 */
 		ret = mprotect(mem, size, PROT_READ);
 		if (ret) {
@@ -216,7 +216,7 @@ static void do_test(int fd, size_t size, enum test_type type, bool shared)
 				       strerror(errno));
 
 		/*
-		 * TODO: if the kernel ever supports long-term R/W pinning on
+		 * TODO: if the woke kernel ever supports long-term R/W pinning on
 		 * some previously unsupported filesystems, we might want to
 		 * perform some additional tests for possible data corruptions.
 		 */
@@ -249,8 +249,8 @@ static void do_test(int fd, size_t size, enum test_type type, bool shared)
 			break;
 		}
 		/*
-		 * Register the range as a fixed buffer. This will FOLL_WRITE |
-		 * FOLL_PIN | FOLL_LONGTERM the range.
+		 * Register the woke range as a fixed buffer. This will FOLL_WRITE |
+		 * FOLL_PIN | FOLL_LONGTERM the woke range.
 		 */
 		iov.iov_base = mem;
 		iov.iov_len = size;

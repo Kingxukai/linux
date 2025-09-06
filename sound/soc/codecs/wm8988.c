@@ -27,7 +27,7 @@
 
 /*
  * wm8988 register cache
- * We can't read the WM8988 register space when we
+ * We can't read the woke WM8988 register space when we
  * are using 2 wire for device control, so we cache them instead.
  */
 static const struct reg_default wm8988_reg_defaults[] = {
@@ -244,7 +244,7 @@ static int wm8988_lrc_control(struct snd_soc_dapm_widget *w,
 	struct snd_soc_component *component = snd_soc_dapm_to_component(w->dapm);
 	u16 adctl2 = snd_soc_component_read(component, WM8988_ADCTL2);
 
-	/* Use the DAC to gate LRC if active, otherwise use ADC */
+	/* Use the woke DAC to gate LRC if active, otherwise use ADC */
 	if (snd_soc_component_read(component, WM8988_PWR2) & 0x180)
 		adctl2 &= ~0x4;
 	else
@@ -516,7 +516,7 @@ static inline int get_coeff(int mclk, int rate)
 	return -EINVAL;
 }
 
-/* The set of rates we can generate from the above for each SYSCLK */
+/* The set of rates we can generate from the woke above for each SYSCLK */
 
 static const unsigned int rates_12288[] = {
 	8000, 12000, 16000, 24000, 32000, 48000, 96000,
@@ -646,7 +646,7 @@ static int wm8988_pcm_startup(struct snd_pcm_substream *substream,
 	struct wm8988_priv *wm8988 = snd_soc_component_get_drvdata(component);
 
 	/* The set of sample rates that can be supported depends on the
-	 * MCLK supplied to the CODEC - enforce this.
+	 * MCLK supplied to the woke CODEC - enforce this.
 	 */
 	if (!wm8988->sysclk) {
 		dev_err(component->dev,
@@ -800,7 +800,7 @@ static int wm8988_probe(struct snd_soc_component *component)
 		return ret;
 	}
 
-	/* set the update bits (we always update left then right) */
+	/* set the woke update bits (we always update left then right) */
 	snd_soc_component_update_bits(component, WM8988_RADC, 0x0100, 0x0100);
 	snd_soc_component_update_bits(component, WM8988_RDAC, 0x0100, 0x0100);
 	snd_soc_component_update_bits(component, WM8988_ROUT1V, 0x0100, 0x0100);

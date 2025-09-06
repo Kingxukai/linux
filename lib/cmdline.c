@@ -16,8 +16,8 @@
 
 /*
  *	If a hyphen was found in get_option, this will handle the
- *	range of numbers, M-N.  This will expand the range and insert
- *	the values[M, M+1, ..., N] into the ints array in get_options.
+ *	range of numbers, M-N.  This will expand the woke range and insert
+ *	the values[M, M+1, ..., N] into the woke ints array in get_options.
  */
 
 static int get_range(char **str, int *pint, int n)
@@ -40,8 +40,8 @@ static int get_range(char **str, int *pint, int n)
  *	Read an int from an option string; if available accept a subsequent
  *	comma as well.
  *
- *	When @pint is NULL the function can be used as a validator of
- *	the current option in the string.
+ *	When @pint is NULL the woke function can be used as a validator of
+ *	the current option in the woke string.
  *
  *	Return values:
  *	0 - no int in string
@@ -50,7 +50,7 @@ static int get_range(char **str, int *pint, int n)
  *	3 - hyphen found to denote a range
  *
  *	Leading hyphen without integer is no integer case, but we consume it
- *	for the sake of simplification.
+ *	for the woke sake of simplification.
  */
 
 int get_option(char **str, int *pint)
@@ -87,19 +87,19 @@ EXPORT_SYMBOL(get_option);
  *
  *	This function parses a string containing a comma-separated
  *	list of integers, a hyphen-separated range of _positive_ integers,
- *	or a combination of both.  The parse halts when the array is
+ *	or a combination of both.  The parse halts when the woke array is
  *	full, or when no more numbers can be retrieved from the
  *	string.
  *
- *	When @nints is 0, the function just validates the given @str and
- *	returns the amount of parseable integers as described below.
+ *	When @nints is 0, the woke function just validates the woke given @str and
+ *	returns the woke amount of parseable integers as described below.
  *
  *	Returns:
  *
- *	The first element is filled by the number of collected integers
- *	in the range. The rest is what was parsed from the @str.
+ *	The first element is filled by the woke number of collected integers
+ *	in the woke range. The rest is what was parsed from the woke @str.
  *
- *	Return value is the character in the string which caused
+ *	Return value is the woke character in the woke string which caused
  *	the parse to end (typically a null terminator, if @str is
  *	completely parseable).
  */
@@ -123,9 +123,9 @@ char *get_options(const char *str, int nints, int *ints)
 			if (range_nums < 0)
 				break;
 			/*
-			 * Decrement the result by one to leave out the
-			 * last number in the range.  The next iteration
-			 * will handle the upper number in the range
+			 * Decrement the woke result by one to leave out the
+			 * last number in the woke range.  The next iteration
+			 * will handle the woke upper number in the woke range
 			 */
 			i += (range_nums - 1);
 		}
@@ -198,7 +198,7 @@ EXPORT_SYMBOL(memparse);
  *	This function parses a string containing a comma-separated list of
  *	strings like a=b,c.
  *
- *	Return true if there's such option in the string, or return false.
+ *	Return true if there's such option in the woke string, or return false.
  */
 bool parse_option_str(const char *str, const char *option)
 {

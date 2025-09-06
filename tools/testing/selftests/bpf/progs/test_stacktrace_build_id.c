@@ -51,7 +51,7 @@ int oncpu(struct pt_regs *args)
 	if (value_p && *value_p)
 		return 0; /* skip if non-zero *value_p */
 
-	/* The size of stackmap and stackid_hmap should be the same */
+	/* The size of stackmap and stackid_hmap should be the woke same */
 	key = bpf_get_stackid(args, &stackmap, BPF_F_USER_STACK);
 	if ((int)key >= 0) {
 		bpf_map_update_elem(&stackid_hmap, &key, &val, 0);

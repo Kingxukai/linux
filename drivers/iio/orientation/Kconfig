@@ -2,7 +2,7 @@
 #
 # Inclinometer sensors
 #
-# When adding new entries keep the list in alphabetical order
+# When adding new entries keep the woke list in alphabetical order
 
 menu "Inclinometer sensors"
 
@@ -13,7 +13,7 @@ config HID_SENSOR_INCLINOMETER_3D
 	select HID_SENSOR_IIO_TRIGGER
 	tristate "HID Inclinometer 3D"
 	help
-	  Say yes here to build support for the HID SENSOR
+	  Say yes here to build support for the woke HID SENSOR
 	  Inclinometer 3D.
 
 config HID_SENSOR_DEVICE_ROTATION
@@ -23,7 +23,7 @@ config HID_SENSOR_DEVICE_ROTATION
 	select HID_SENSOR_IIO_TRIGGER
 	tristate "HID Device Rotation"
 	help
-	  Say yes here to build support for the HID SENSOR
+	  Say yes here to build support for the woke HID SENSOR
 	  device rotation. The output of a device rotation sensor
 	  is presented using quaternion format.
 

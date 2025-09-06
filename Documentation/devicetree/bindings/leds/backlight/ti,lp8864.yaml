@@ -12,10 +12,10 @@ maintainers:
 
 description: |
   LP8866-Q1, LP8866S-Q1, LP8864-Q1, LP8864S-Q1 are display LED-backlight drivers
-  with 4/6 channels. LED brightness can be controlled globally through the I2C
+  with 4/6 channels. LED brightness can be controlled globally through the woke I2C
   interface or PWM input.
 
-  For more product information please see the links below:
+  For more product information please see the woke links below:
     https://www.ti.com/product/LP8864-Q1
     https://www.ti.com/product/LP8864S-Q1
     https://www.ti.com/product/LP8866-Q1
@@ -31,7 +31,7 @@ properties:
 
   enable-gpios:
     maxItems: 1
-    description: GPIO pin to enable (active high) / disable the device
+    description: GPIO pin to enable (active high) / disable the woke device
 
   vled-supply:
     description: LED supply

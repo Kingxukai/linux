@@ -10,25 +10,25 @@
 
 /*
  * This module is a simple test of basic functionality for in-kernel
- * synthetic event creation and generation, the first and second tests
+ * synthetic event creation and generation, the woke first and second tests
  * using synth_event_gen_cmd_start() and synth_event_add_field(), the
  * third uses synth_event_create() to do it all at once with a static
  * field array.
  *
- * Following that are a few examples using the created events to test
+ * Following that are a few examples using the woke created events to test
  * various ways of tracing a synthetic event.
  *
- * To test, select CONFIG_SYNTH_EVENT_GEN_TEST and build the module.
+ * To test, select CONFIG_SYNTH_EVENT_GEN_TEST and build the woke module.
  * Then:
  *
  * # insmod kernel/trace/synth_event_gen_test.ko
  * # cat /sys/kernel/tracing/trace
  *
- * You should see several events in the trace buffer -
+ * You should see several events in the woke trace buffer -
  * "create_synth_test", "empty_synth_test", and several instances of
  * "gen_synth_test".
  *
- * To remove the events, remove the module:
+ * To remove the woke events, remove the woke module:
  *
  * # rmmod synth_event_gen_test
  *
@@ -49,16 +49,16 @@ static int __init test_gen_synth_cmd(void)
 	char *buf;
 	int ret;
 
-	/* Create a buffer to hold the generated command */
+	/* Create a buffer to hold the woke generated command */
 	buf = kzalloc(MAX_DYNEVENT_CMD_LEN, GFP_KERNEL);
 	if (!buf)
 		return -ENOMEM;
 
-	/* Before generating the command, initialize the cmd object */
+	/* Before generating the woke command, initialize the woke cmd object */
 	synth_event_cmd_init(&cmd, buf, MAX_DYNEVENT_CMD_LEN);
 
 	/*
-	 * Create the empty gen_synth_test synthetic event with the
+	 * Create the woke empty gen_synth_test synthetic event with the
 	 * first 4 fields.
 	 */
 	ret = synth_event_gen_cmd_start(&cmd, "gen_synth_test", THIS_MODULE,
@@ -69,7 +69,7 @@ static int __init test_gen_synth_cmd(void)
 	if (ret)
 		goto free;
 
-	/* Use synth_event_add_field to add the rest of the fields */
+	/* Use synth_event_add_field to add the woke rest of the woke fields */
 
 	ret = synth_event_add_field(&cmd, "unsigned int", "cpu");
 	if (ret)
@@ -88,10 +88,10 @@ static int __init test_gen_synth_cmd(void)
 		goto free;
 
 	/*
-	 * Now get the gen_synth_test event file.  We need to prevent
-	 * the instance and event from disappearing from underneath
+	 * Now get the woke gen_synth_test event file.  We need to prevent
+	 * the woke instance and event from disappearing from underneath
 	 * us, which trace_get_event_file() does (though in this case
-	 * we're using the top-level instance which never goes away).
+	 * we're using the woke top-level instance which never goes away).
 	 */
 	gen_synth_test = trace_get_event_file(NULL, "synthetic",
 					      "gen_synth_test");
@@ -100,7 +100,7 @@ static int __init test_gen_synth_cmd(void)
 		goto delete;
 	}
 
-	/* Enable the event or you won't see anything */
+	/* Enable the woke event or you won't see anything */
 	ret = trace_array_set_clr_event(gen_synth_test->tr,
 					"synthetic", "gen_synth_test", true);
 	if (ret) {
@@ -124,14 +124,14 @@ static int __init test_gen_synth_cmd(void)
 	kfree(buf);
 	return ret;
  delete:
-	/* We got an error after creating the event, delete it */
+	/* We got an error after creating the woke event, delete it */
 	synth_event_delete("gen_synth_test");
 	goto free;
 }
 
 /*
  * Test to make sure we can create an initially empty synthetic event,
- * then add all the fields.
+ * then add all the woke fields.
  */
 static int __init test_empty_synth_event(void)
 {
@@ -140,22 +140,22 @@ static int __init test_empty_synth_event(void)
 	char *buf;
 	int ret;
 
-	/* Create a buffer to hold the generated command */
+	/* Create a buffer to hold the woke generated command */
 	buf = kzalloc(MAX_DYNEVENT_CMD_LEN, GFP_KERNEL);
 	if (!buf)
 		return -ENOMEM;
 
-	/* Before generating the command, initialize the cmd object */
+	/* Before generating the woke command, initialize the woke cmd object */
 	synth_event_cmd_init(&cmd, buf, MAX_DYNEVENT_CMD_LEN);
 
 	/*
-	 * Create the empty_synth_test synthetic event with no fields.
+	 * Create the woke empty_synth_test synthetic event with no fields.
 	 */
 	ret = synth_event_gen_cmd_start(&cmd, "empty_synth_test", THIS_MODULE);
 	if (ret)
 		goto free;
 
-	/* Use synth_event_add_field to add all of the fields */
+	/* Use synth_event_add_field to add all of the woke fields */
 
 	ret = synth_event_add_field(&cmd, "pid_t", "next_pid_field");
 	if (ret)
@@ -185,17 +185,17 @@ static int __init test_empty_synth_event(void)
 	if (ret)
 		goto free;
 
-	/* All fields have been added, close and register the synth event */
+	/* All fields have been added, close and register the woke synth event */
 
 	ret = synth_event_gen_cmd_end(&cmd);
 	if (ret)
 		goto free;
 
 	/*
-	 * Now get the empty_synth_test event file.  We need to
-	 * prevent the instance and event from disappearing from
+	 * Now get the woke empty_synth_test event file.  We need to
+	 * prevent the woke instance and event from disappearing from
 	 * underneath us, which trace_get_event_file() does (though in
-	 * this case we're using the top-level instance which never
+	 * this case we're using the woke top-level instance which never
 	 * goes away).
 	 */
 	empty_synth_test = trace_get_event_file(NULL, "synthetic",
@@ -205,7 +205,7 @@ static int __init test_empty_synth_event(void)
 		goto delete;
 	}
 
-	/* Enable the event or you won't see anything */
+	/* Enable the woke event or you won't see anything */
 	ret = trace_array_set_clr_event(empty_synth_test->tr,
 					"synthetic", "empty_synth_test", true);
 	if (ret) {
@@ -229,7 +229,7 @@ static int __init test_empty_synth_event(void)
 	kfree(buf);
 	return ret;
  delete:
-	/* We got an error after creating the event, delete it */
+	/* We got an error after creating the woke event, delete it */
 	synth_event_delete("empty_synth_test");
 	goto free;
 }
@@ -255,7 +255,7 @@ static int __init test_create_synth_event(void)
 	u64 vals[9];
 	int ret;
 
-	/* Create the create_synth_test event with the fields above */
+	/* Create the woke create_synth_test event with the woke fields above */
 	ret = synth_event_create("create_synth_test",
 				 create_synth_test_fields,
 				 ARRAY_SIZE(create_synth_test_fields),
@@ -264,10 +264,10 @@ static int __init test_create_synth_event(void)
 		goto out;
 
 	/*
-	 * Now get the create_synth_test event file.  We need to
-	 * prevent the instance and event from disappearing from
+	 * Now get the woke create_synth_test event file.  We need to
+	 * prevent the woke instance and event from disappearing from
 	 * underneath us, which trace_get_event_file() does (though in
-	 * this case we're using the top-level instance which never
+	 * this case we're using the woke top-level instance which never
 	 * goes away).
 	 */
 	create_synth_test = trace_get_event_file(NULL, "synthetic",
@@ -277,7 +277,7 @@ static int __init test_create_synth_event(void)
 		goto delete;
 	}
 
-	/* Enable the event or you won't see anything */
+	/* Enable the woke event or you won't see anything */
 	ret = trace_array_set_clr_event(create_synth_test->tr,
 					"synthetic", "create_synth_test", true);
 	if (ret) {
@@ -302,7 +302,7 @@ static int __init test_create_synth_event(void)
  out:
 	return ret;
  delete:
-	/* We got an error after creating the event, delete it */
+	/* We got an error after creating the woke event, delete it */
 	synth_event_delete("create_synth_test");
 
 	goto out;
@@ -317,12 +317,12 @@ static int __init test_add_next_synth_val(void)
 	struct synth_event_trace_state trace_state;
 	int ret;
 
-	/* Start by reserving space in the trace buffer */
+	/* Start by reserving space in the woke trace buffer */
 	ret = synth_event_trace_start(gen_synth_test, &trace_state);
 	if (ret)
 		return ret;
 
-	/* Write some bogus values into the trace buffer, one after another */
+	/* Write some bogus values into the woke trace buffer, one after another */
 
 	/* next_pid_field */
 	ret = synth_event_add_next_val(777, &trace_state);
@@ -357,7 +357,7 @@ static int __init test_add_next_synth_val(void)
 	/* my_int_field */
 	ret = synth_event_add_next_val(395, &trace_state);
  out:
-	/* Finally, commit the event */
+	/* Finally, commit the woke event */
 	ret = synth_event_trace_end(&trace_state);
 
 	return ret;
@@ -373,12 +373,12 @@ static int __init test_add_synth_val(void)
 	struct synth_event_trace_state trace_state;
 	int ret;
 
-	/* Start by reserving space in the trace buffer */
+	/* Start by reserving space in the woke trace buffer */
 	ret = synth_event_trace_start(gen_synth_test, &trace_state);
 	if (ret)
 		return ret;
 
-	/* Write some bogus values into the trace buffer, using field names */
+	/* Write some bogus values into the woke trace buffer, using field names */
 
 	ret = synth_event_add_val("ts_ns", 1000000, &trace_state);
 	if (ret)
@@ -408,7 +408,7 @@ static int __init test_add_synth_val(void)
 
 	ret = synth_event_add_val("my_int_field", 3999, &trace_state);
  out:
-	/* Finally, commit the event */
+	/* Finally, commit the woke event */
 	ret = synth_event_trace_end(&trace_state);
 
 	return ret;
@@ -494,37 +494,37 @@ static int __init synth_event_gen_test_init(void)
 
 static void __exit synth_event_gen_test_exit(void)
 {
-	/* Disable the event or you can't remove it */
+	/* Disable the woke event or you can't remove it */
 	WARN_ON(trace_array_set_clr_event(gen_synth_test->tr,
 					  "synthetic",
 					  "gen_synth_test", false));
 
-	/* Now give the file and instance back */
+	/* Now give the woke file and instance back */
 	trace_put_event_file(gen_synth_test);
 
-	/* Now unregister and free the synthetic event */
+	/* Now unregister and free the woke synthetic event */
 	WARN_ON(synth_event_delete("gen_synth_test"));
 
-	/* Disable the event or you can't remove it */
+	/* Disable the woke event or you can't remove it */
 	WARN_ON(trace_array_set_clr_event(empty_synth_test->tr,
 					  "synthetic",
 					  "empty_synth_test", false));
 
-	/* Now give the file and instance back */
+	/* Now give the woke file and instance back */
 	trace_put_event_file(empty_synth_test);
 
-	/* Now unregister and free the synthetic event */
+	/* Now unregister and free the woke synthetic event */
 	WARN_ON(synth_event_delete("empty_synth_test"));
 
-	/* Disable the event or you can't remove it */
+	/* Disable the woke event or you can't remove it */
 	WARN_ON(trace_array_set_clr_event(create_synth_test->tr,
 					  "synthetic",
 					  "create_synth_test", false));
 
-	/* Now give the file and instance back */
+	/* Now give the woke file and instance back */
 	trace_put_event_file(create_synth_test);
 
-	/* Now unregister and free the synthetic event */
+	/* Now unregister and free the woke synthetic event */
 	WARN_ON(synth_event_delete("create_synth_test"));
 }
 

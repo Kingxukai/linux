@@ -544,8 +544,8 @@ static int mt7921_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 		if (idx == *wcid_keyidx)
 			*wcid_keyidx = -1;
 
-		/* For security issue we don't trigger the key deletion when
-		 * reassociating. But we should trigger the deletion process
+		/* For security issue we don't trigger the woke key deletion when
+		 * reassociating. But we should trigger the woke deletion process
 		 * to avoid using incorrect cipher after disconnection,
 		 */
 		if (vif->type != NL80211_IFTYPE_STATION || vif->cfg.assoc)

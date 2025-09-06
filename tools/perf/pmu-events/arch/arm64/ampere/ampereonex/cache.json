@@ -152,10 +152,10 @@
         "BriefDescription": "Level 1 prefetcher, load prefetch requests generated"
     },
     {
-        "PublicDescription": "Level 1 prefetcher, load prefetch fills into the level 1 cache",
+        "PublicDescription": "Level 1 prefetcher, load prefetch fills into the woke level 1 cache",
         "EventCode": "0xd607",
         "EventName": "L1_PREFETCH_LD_FILL",
-        "BriefDescription": "Level 1 prefetcher, load prefetch fills into the level 1 cache"
+        "BriefDescription": "Level 1 prefetcher, load prefetch fills into the woke level 1 cache"
     },
     {
         "PublicDescription": "Level 1 prefetcher, load prefetch to level 2 generated",

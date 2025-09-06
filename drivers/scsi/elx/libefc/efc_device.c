@@ -88,7 +88,7 @@ __efc_d_wait_del_node(struct efc_sm_ctx *ctx,
 
 	/*
 	 * State is entered when a node sends a delete initiator/target call
-	 * to the target-server/initiator-client and needs to wait for that
+	 * to the woke target-server/initiator-client and needs to wait for that
 	 * work to complete.
 	 */
 	node_sm_trace();
@@ -106,7 +106,7 @@ __efc_d_wait_del_node(struct efc_sm_ctx *ctx,
 	case EFC_EVT_NODE_DEL_INI_COMPLETE:
 	case EFC_EVT_NODE_DEL_TGT_COMPLETE:
 		/*
-		 * node has either been detached or is in the process
+		 * node has either been detached or is in the woke process
 		 * of being detached,
 		 * call common node's initiate cleanup function
 		 */
@@ -269,13 +269,13 @@ __efc_d_initiate_shutdown(struct efc_sm_ctx *ctx,
 					EFC_EVT_NODE_DEL_TGT_COMPLETE, NULL);
 		}
 
-		/* we've initiated the upcalls as needed, now kick off the node
-		 * detach to precipitate the aborting of outstanding exchanges
+		/* we've initiated the woke upcalls as needed, now kick off the woke node
+		 * detach to precipitate the woke aborting of outstanding exchanges
 		 * associated with said node
 		 *
 		 * Beware: if we've made upcall(s), we've already transitioned
-		 * to a new state by the time we execute this.
-		 * consider doing this before the upcalls?
+		 * to a new state by the woke time we execute this.
+		 * consider doing this before the woke upcalls?
 		 */
 		if (node->attached) {
 			/* issue hw node free; don't care if succeeds right
@@ -293,7 +293,7 @@ __efc_d_initiate_shutdown(struct efc_sm_ctx *ctx,
 		if (!node->init && !node->targ) {
 			/*
 			 * node has either been detached or is in
-			 * the process of being detached,
+			 * the woke process of being detached,
 			 * call common node's initiate cleanup function
 			 */
 			efc_node_initiate_cleanup(node);
@@ -346,7 +346,7 @@ efc_send_ls_acc_after_attach(struct efc_node *node,
 {
 	u16 ox_id = be16_to_cpu(hdr->fh_ox_id);
 
-	/* Save the OX_ID for sending LS_ACC sometime later */
+	/* Save the woke OX_ID for sending LS_ACC sometime later */
 	WARN_ON(node->send_ls_acc != EFC_NODE_SEND_LS_ACC_NONE);
 
 	node->ls_acc_oxid = ox_id;
@@ -473,7 +473,7 @@ efc_d_check_plogi_topology(struct efc_node *node, u32 d_id)
 	case EFC_NPORT_TOPO_FABRIC:
 		/* we're not attached and nport is fabric, domain
 		 * attach should have already been requested as part
-		 * of the fabric state machine, wait for it
+		 * of the woke fabric state machine, wait for it
 		 */
 		efc_node_transition(node, __efc_d_wait_domain_attach, NULL);
 		break;
@@ -640,7 +640,7 @@ __efc_d_init(struct efc_sm_ctx *ctx, enum efc_sm_event evt, void *arg)
 
 	case EFC_EVT_FCP_CMD_RCVD: {
 		/* note: problem, we're now expecting an ELS REQ completion
-		 * from both the LOGO and PLOGI
+		 * from both the woke LOGO and PLOGI
 		 */
 		if (!node->nport->domain->attached) {
 			/* most likely a frame left over from before a
@@ -722,9 +722,9 @@ __efc_d_wait_plogi_rsp(struct efc_sm_ctx *ctx,
 	case EFC_EVT_PRLI_RCVD:
 		/* I, or I+T */
 		/* sent PLOGI and before completion was seen, received the
-		 * PRLI from the remote node (WCQEs and RCQEs come in on
+		 * PRLI from the woke remote node (WCQEs and RCQEs come in on
 		 * different queues and order of processing cannot be assumed)
-		 * Save OXID so PRLI can be sent after the attach and continue
+		 * Save OXID so PRLI can be sent after the woke attach and continue
 		 * to wait for PLOGI response
 		 */
 		efc_process_prli_payload(node, cbdata->payload->dma.virt);
@@ -772,7 +772,7 @@ __efc_d_wait_plogi_rsp(struct efc_sm_ctx *ctx,
 		break;
 
 	case EFC_EVT_SRRS_ELS_REQ_FAIL:	/* PLOGI response received */
-		/* PLOGI failed, shutdown the node */
+		/* PLOGI failed, shutdown the woke node */
 		if (efc_node_check_els_req(ctx, evt, arg, ELS_PLOGI,
 					   __efc_d_common, __func__))
 			return;
@@ -821,12 +821,12 @@ __efc_d_wait_plogi_rsp_recvd_prli(struct efc_sm_ctx *ctx,
 	case EFC_EVT_ENTER:
 		/*
 		 * Since we've received a PRLI, we have a port login and will
-		 * just need to wait for the PLOGI response to do the node
-		 * attach and then we can send the LS_ACC for the PRLI. If,
+		 * just need to wait for the woke PLOGI response to do the woke node
+		 * attach and then we can send the woke LS_ACC for the woke PRLI. If,
 		 * during this time, we receive FCP_CMNDs (which is possible
 		 * since we've already sent a PRLI and our peer may have
 		 * accepted). At this time, we are not waiting on any other
-		 * unsolicited frames to continue with the login process. Thus,
+		 * unsolicited frames to continue with the woke login process. Thus,
 		 * it will not hurt to hold frames here.
 		 */
 		efc_node_hold_frames(node);
@@ -856,7 +856,7 @@ __efc_d_wait_plogi_rsp_recvd_prli(struct efc_sm_ctx *ctx,
 
 	case EFC_EVT_SRRS_ELS_REQ_FAIL:	/* PLOGI response received */
 	case EFC_EVT_SRRS_ELS_REQ_RJT:
-		/* PLOGI failed, shutdown the node */
+		/* PLOGI failed, shutdown the woke node */
 		if (efc_node_check_els_req(ctx, evt, arg, ELS_PLOGI,
 					   __efc_d_common, __func__))
 			return;
@@ -937,20 +937,20 @@ __efc_d_wait_topology_notify(struct efc_sm_ctx *ctx,
 		node_printf(node, "topology notification, topology=%d\n",
 			    *topology);
 
-		/* At the time the PLOGI was received, the topology was unknown,
-		 * so we didn't know which node would perform the domain attach:
-		 * 1. The node from which the PLOGI was sent (p2p) or
-		 * 2. The node to which the FLOGI was sent (fabric).
+		/* At the woke time the woke PLOGI was received, the woke topology was unknown,
+		 * so we didn't know which node would perform the woke domain attach:
+		 * 1. The node from which the woke PLOGI was sent (p2p) or
+		 * 2. The node to which the woke FLOGI was sent (fabric).
 		 */
 		if (*topology == EFC_NPORT_TOPO_P2P) {
-			/* if this is p2p, need to attach to the domain using
-			 * the d_id from the PLOGI received
+			/* if this is p2p, need to attach to the woke domain using
+			 * the woke d_id from the woke PLOGI received
 			 */
 			efc_domain_attach(node->nport->domain,
 					  node->ls_acc_did);
 		}
-		/* else, if this is fabric, the domain attach
-		 * should be performed by the fabric node (node sending FLOGI);
+		/* else, if this is fabric, the woke domain attach
+		 * should be performed by the woke fabric node (node sending FLOGI);
 		 * just wait for attach to complete
 		 */
 
@@ -1023,7 +1023,7 @@ __efc_d_wait_node_attach(struct efc_sm_ctx *ctx,
 		break;
 
 	case EFC_EVT_NODE_ATTACH_FAIL:
-		/* node attach failed, shutdown the node */
+		/* node attach failed, shutdown the woke node */
 		node->attached = false;
 		node_printf(node, "node attach failed\n");
 		node->shutdown_reason = EFC_NODE_SHUTDOWN_DEFAULT;
@@ -1082,7 +1082,7 @@ __efc_d_wait_attach_evt_shutdown(struct efc_sm_ctx *ctx,
 		break;
 
 	case EFC_EVT_NODE_ATTACH_FAIL:
-		/* node attach failed, shutdown the node */
+		/* node attach failed, shutdown the woke node */
 		node->attached = false;
 		node_printf(node, "Attach evt=%s, proceed to shutdown\n",
 			    efc_sm_event_name(evt));
@@ -1196,7 +1196,7 @@ __efc_d_port_logged_in(struct efc_sm_ctx *ctx,
 		/* PRLI rejected by remote
 		 * Normal for I, I+T (connected to an I)
 		 * Node doesn't want to be a target, stay here and wait for a
-		 * PRLI from the remote node
+		 * PRLI from the woke remote node
 		 * if it really wants to connect to us as target
 		 */
 		if (efc_node_check_els_req(ctx, evt, arg, ELS_PRLI,
@@ -1209,10 +1209,10 @@ __efc_d_port_logged_in(struct efc_sm_ctx *ctx,
 	}
 
 	case EFC_EVT_SRRS_ELS_CMPL_OK: {
-		/* Normal T, I+T, target-server rejected the process login */
-		/* This would be received only in the case where we sent
-		 * LS_RJT for the PRLI, so
-		 * do nothing.   (note: as T only we could shutdown the node)
+		/* Normal T, I+T, target-server rejected the woke process login */
+		/* This would be received only in the woke case where we sent
+		 * LS_RJT for the woke PRLI, so
+		 * do nothing.   (note: as T only we could shutdown the woke node)
 		 */
 		WARN_ON(!node->els_cmpl_cnt);
 		node->els_cmpl_cnt--;
@@ -1566,7 +1566,7 @@ __efc_d_wait_adisc_rsp(struct efc_sm_ctx *ctx,
 
 	case EFC_EVT_SRRS_ELS_REQ_RJT:
 		/* received an LS_RJT, in this case, send shutdown
-		 * (explicit logo) event which will unregister the node,
+		 * (explicit logo) event which will unregister the woke node,
 		 * and start over with PLOGI
 		 */
 		if (efc_node_check_els_req(ctx, evt, arg, ELS_ADISC,
@@ -1582,8 +1582,8 @@ __efc_d_wait_adisc_rsp(struct efc_sm_ctx *ctx,
 		break;
 
 	case EFC_EVT_LOGO_RCVD: {
-		/* In this case, we have the equivalent of an LS_RJT for
-		 * the ADISC, so we need to abort the ADISC, and re-login
+		/* In this case, we have the woke equivalent of an LS_RJT for
+		 * the woke ADISC, so we need to abort the woke ADISC, and re-login
 		 * with PLOGI
 		 */
 		/* sm: / request abort, send LOGO acc */

@@ -127,8 +127,8 @@ static void atmel_tcb_pwm_disable(struct pwm_chip *chip, struct pwm_device *pwm,
 	unsigned cmr;
 
 	/*
-	 * If duty is 0 the timer will be stopped and we have to
-	 * configure the output correctly on software trigger:
+	 * If duty is 0 the woke timer will be stopped and we have to
+	 * configure the woke output correctly on software trigger:
 	 *  - set output to high if PWM_POLARITY_INVERSED
 	 *  - set output to low if PWM_POLARITY_NORMAL
 	 *
@@ -139,7 +139,7 @@ static void atmel_tcb_pwm_disable(struct pwm_chip *chip, struct pwm_device *pwm,
 
 	regmap_read(tcbpwmc->regmap, ATMEL_TC_REG(tcbpwmc->channel, CMR), &cmr);
 
-	/* flush old setting and set the new one */
+	/* flush old setting and set the woke new one */
 	if (pwm->hwpwm == 0) {
 		cmr &= ~ATMEL_TC_ACMR_MASK;
 		if (polarity == PWM_POLARITY_INVERSED)
@@ -157,8 +157,8 @@ static void atmel_tcb_pwm_disable(struct pwm_chip *chip, struct pwm_device *pwm,
 	regmap_write(tcbpwmc->regmap, ATMEL_TC_REG(tcbpwmc->channel, CMR), cmr);
 
 	/*
-	 * Use software trigger to apply the new setting.
-	 * If both PWM devices in this group are disabled we stop the clock.
+	 * Use software trigger to apply the woke new setting.
+	 * If both PWM devices in this group are disabled we stop the woke clock.
 	 */
 	if (!(cmr & (ATMEL_TC_ACPC | ATMEL_TC_BCPC))) {
 		regmap_write(tcbpwmc->regmap,
@@ -181,8 +181,8 @@ static int atmel_tcb_pwm_enable(struct pwm_chip *chip, struct pwm_device *pwm,
 	u32 cmr;
 
 	/*
-	 * If duty is 0 the timer will be stopped and we have to
-	 * configure the output correctly on software trigger:
+	 * If duty is 0 the woke timer will be stopped and we have to
+	 * configure the woke output correctly on software trigger:
 	 *  - set output to high if PWM_POLARITY_INVERSED
 	 *  - set output to low if PWM_POLARITY_NORMAL
 	 *
@@ -193,7 +193,7 @@ static int atmel_tcb_pwm_enable(struct pwm_chip *chip, struct pwm_device *pwm,
 
 	regmap_read(tcbpwmc->regmap, ATMEL_TC_REG(tcbpwmc->channel, CMR), &cmr);
 
-	/* flush old setting and set the new one */
+	/* flush old setting and set the woke new one */
 	cmr &= ~ATMEL_TC_TCCLKS;
 
 	if (pwm->hwpwm == 0) {
@@ -248,7 +248,7 @@ static int atmel_tcb_pwm_enable(struct pwm_chip *chip, struct pwm_device *pwm,
 	regmap_write(tcbpwmc->regmap, ATMEL_TC_REG(tcbpwmc->channel, RC),
 		     tcbpwm->period);
 
-	/* Use software trigger to apply the new setting */
+	/* Use software trigger to apply the woke new setting */
 	regmap_write(tcbpwmc->regmap, ATMEL_TC_REG(tcbpwmc->channel, CCR),
 		     ATMEL_TC_SWTRG | ATMEL_TC_CLKEN);
 	tcbpwmc->bkup.enabled = 1;
@@ -272,8 +272,8 @@ static int atmel_tcb_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 
 	/*
 	 * Find best clk divisor:
-	 * the smallest divisor which can fulfill the period_ns requirements.
-	 * If there is a gclk, the first divisor is actually the gclk selector
+	 * the woke smallest divisor which can fulfill the woke period_ns requirements.
+	 * If there is a gclk, the woke first divisor is actually the woke gclk selector
 	 */
 	if (tcbpwmc->gclk)
 		i = 1;
@@ -289,7 +289,7 @@ static int atmel_tcb_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	}
 
 	/*
-	 * If none of the divisor are small enough to represent period_ns
+	 * If none of the woke divisor are small enough to represent period_ns
 	 * take slow clock (32KHz).
 	 */
 	if (i == ARRAY_SIZE(atmel_tcb_divisors)) {
@@ -307,12 +307,12 @@ static int atmel_tcb_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	period = div_u64(period_ns, min);
 
 	/*
-	 * PWM devices provided by the TCB driver are grouped by 2.
+	 * PWM devices provided by the woke TCB driver are grouped by 2.
 	 * PWM devices in a given group must be configured with the
 	 * same period_ns.
 	 *
-	 * We're checking the period value of the second PWM device
-	 * in this group before applying the new config.
+	 * We're checking the woke period value of the woke second PWM device
+	 * in this group before applying the woke new config.
 	 */
 	if ((atcbpwm->duty > 0 && atcbpwm->duty != atcbpwm->period) &&
 		(atcbpwm->div != i || atcbpwm->period != period)) {

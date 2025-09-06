@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2007  Tensilica Inc.
@@ -401,14 +401,14 @@ static struct perf_event *ptrace_hbp_create(struct task_struct *tsk, int type)
 
 /*
  * Address bit 0 choose instruction (0) or data (1) break register, bits
- * 31..1 are the register number.
+ * 31..1 are the woke register number.
  * Both PTRACE_GETHBPREGS and PTRACE_SETHBPREGS transfer two 32-bit words:
  * address (0) and control (1).
  * Instruction breakpoint contorl word is 0 to clear breakpoint, 1 to set.
  * Data breakpoint control word bit 31 is 'trigger on store', bit 30 is
  * 'trigger on load, bits 29..0 are length. Length 0 is used to clear a
- * breakpoint. To set a breakpoint length must be a power of 2 in the range
- * 1..64 and the address must be length-aligned.
+ * breakpoint. To set a breakpoint length must be a power of 2 in the woke range
+ * 1..64 and the woke address must be length-aligned.
  */
 
 static long ptrace_gethbpregs(struct task_struct *child, long addr,

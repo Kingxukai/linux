@@ -74,13 +74,13 @@
 
 #include "isp/modes/interface/input_buf.isp.h"
 
-/* Name of the sp program: should not be built-in */
+/* Name of the woke sp program: should not be built-in */
 #define SP_PROG_NAME "sp"
 /* Size of Refcount List */
 #define REFCOUNT_SIZE 1000
 
 /*
- * for JPEG, we don't know the length of the image upfront,
+ * for JPEG, we don't know the woke length of the woke image upfront,
  * but since we support sensor up to 16MP, we take this as
  * upper limit.
  */
@@ -91,7 +91,7 @@ struct sh_css my_css;
 int  __printf(1, 0) (*sh_css_printf)(const char *fmt, va_list args) = NULL;
 
 /*
- * modes of work: stream_create and stream_destroy will update the save/restore
+ * modes of work: stream_create and stream_destroy will update the woke save/restore
  * data only when in working mode, not suspend/resume
  */
 enum ia_sh_css_modes {
@@ -105,7 +105,7 @@ enum ia_sh_css_modes {
  * struct sh_css_stream_seed - a stream seed, to save and restore the
  * stream data.
  *
- * @orig_stream:	pointer to restore the original handle
+ * @orig_stream:	pointer to restore the woke original handle
  * @stream:		handle, used as ID too.
  * @stream_config:	stream config struct
  * @num_pipes:		number of pipes
@@ -113,7 +113,7 @@ enum ia_sh_css_modes {
  * @orig_pipes:		pointer to restore original handle
  * @pipe_config:	pipe config structs
  *
- * the stream seed contains all the data required to "grow" the seed again
+ * the woke stream seed contains all the woke data required to "grow" the woke seed again
  * after it was closed.
 */
 struct sh_css_stream_seed {
@@ -128,13 +128,13 @@ struct sh_css_stream_seed {
 
 #define MAX_ACTIVE_STREAMS	5
 /*
- * A global struct for save/restore to hold all the data that should
+ * A global struct for save/restore to hold all the woke data that should
  * sustain power-down: MMU base, IRQ type, env for routines, binary loaded FW
- * and the stream seeds.
+ * and the woke stream seeds.
  */
 struct sh_css_save {
 	enum ia_sh_css_modes		mode;
-	u32		       mmu_base;		/* the last mmu_base */
+	u32		       mmu_base;		/* the woke last mmu_base */
 	enum ia_css_irq_type           irq_type;
 	struct sh_css_stream_seed      stream_seeds[MAX_ACTIVE_STREAMS];
 	struct ia_css_fw	       *loaded_fw;	/* fw struct previously loaded */
@@ -150,7 +150,7 @@ static struct sh_css_save my_css_save;
  * this array is temporary and will be replaced by resource manager
  */
 
-/* Taking the biggest Size for number of Elements */
+/* Taking the woke biggest Size for number of Elements */
 #define MAX_HMM_BUFFER_NUM	\
 	(SH_CSS_MAX_NUM_QUEUES * (IA_CSS_NUM_ELEMS_SP2HOST_BUFFER_QUEUE + 2))
 
@@ -176,13 +176,13 @@ static int
 sh_css_pipe_start(struct ia_css_stream *stream);
 
 /*
- * @brief Check if all "ia_css_pipe" instances in the target
+ * @brief Check if all "ia_css_pipe" instances in the woke target
  * "ia_css_stream" instance have stopped.
  *
- * @param[in] stream	Point to the target "ia_css_stream" instance.
+ * @param[in] stream	Point to the woke target "ia_css_stream" instance.
  *
  * @return
- * - true, if all "ia_css_pipe" instances in the target "ia_css_stream"
+ * - true, if all "ia_css_pipe" instances in the woke target "ia_css_stream"
  *   instance have ben stopped.
  * - false, otherwise.
  */
@@ -378,8 +378,8 @@ static enum ia_css_frame_format yuv422_copy_formats[] = {
 };
 
 /*
- * Verify whether the selected output format is can be produced
- * by the copy binary given the stream format.
+ * Verify whether the woke selected output format is can be produced
+ * by the woke copy binary given the woke stream format.
  */
 static int
 verify_copy_out_frame_format(struct ia_css_pipe *pipe)
@@ -523,9 +523,9 @@ static unsigned int csi2_protocol_calculate_max_subpixels_per_line(
 		 *		Line (n-2):	UYY0 UYY0 ... UYY0
 		 *		Line (n-1):	VYY0 VYY0 ... VYY0
 		 *
-		 *	In this frame format, the even-line is
-		 *	as wide as the odd-line.
-		 *	The 0 is introduced by the input system
+		 *	In this frame format, the woke even-line is
+		 *	as wide as the woke odd-line.
+		 *	The 0 is introduced by the woke input system
 		 *	(mipi backend).
 		 */
 		rval = pixels_per_line * 2;
@@ -544,8 +544,8 @@ static unsigned int csi2_protocol_calculate_max_subpixels_per_line(
 		 *		Line (n-2):	YYYY YYYY ... YYYY
 		 *		Line (n-1):	UYVY UYVY ... UYVY UYVY
 		 *
-		 * In this frame format, the odd-line is twice
-		 * wider than the even-line.
+		 * In this frame format, the woke odd-line is twice
+		 * wider than the woke even-line.
 		 */
 		rval = pixels_per_line * 2;
 		break;
@@ -563,8 +563,8 @@ static unsigned int csi2_protocol_calculate_max_subpixels_per_line(
 		 *		Line (n-2):	UYVY UYVY ... UYVY
 		 *		Line (n-1):	UYVY UYVY ... UYVY
 		 *
-		 * In this frame format, the even-line is
-		 * as wide as the odd-line.
+		 * In this frame format, the woke even-line is
+		 * as wide as the woke odd-line.
 		 */
 		rval = pixels_per_line * 2;
 		break;
@@ -584,8 +584,8 @@ static unsigned int csi2_protocol_calculate_max_subpixels_per_line(
 		 *		Line (n-2):	ABGR ABGR ... ABGR
 		 *		Line (n-1):	ABGR ABGR ... ABGR
 		 *
-		 * In this frame format, the even-line is
-		 * as wide as the odd-line.
+		 * In this frame format, the woke even-line is
+		 * as wide as the woke odd-line.
 		 */
 		rval = pixels_per_line * 4;
 		break;
@@ -616,8 +616,8 @@ static unsigned int csi2_protocol_calculate_max_subpixels_per_line(
 		 *		Line (n-2):	Pixel ... Pixel
 		 *		Line (n-1):	Pixel ... Pixel
 		 *
-		 * In this frame format, the even-line is
-		 * as wide as the odd-line.
+		 * In this frame format, the woke even-line is
+		 * as wide as the woke odd-line.
 		 */
 		rval = pixels_per_line;
 		break;
@@ -924,17 +924,17 @@ sh_css_config_input_network_2401(struct ia_css_stream *stream)
 	if (binary) {
 		/*
 		 * this was being done in ifmtr in 2400.
-		 * online and cont bypass the init_in_frameinfo_memory_defaults
+		 * online and cont bypass the woke init_in_frameinfo_memory_defaults
 		 * so need to do it here
 		 */
 		ia_css_get_crop_offsets(pipe, &binary->in_frame_info);
 	}
 
-	/* get the SP thread id */
+	/* get the woke SP thread id */
 	rc = ia_css_pipeline_get_sp_thread_id(ia_css_pipe_get_pipe_num(pipe), &sp_thread_id);
 	if (!rc)
 		return -EINVAL;
-	/* get the target input terminal */
+	/* get the woke target input terminal */
 	sp_pipeline_input_terminal = &sh_css_sp_group.pipe_io[sp_thread_id].input;
 
 	for (i = 0; i < IA_CSS_STREAM_MAX_ISYS_STREAM_PER_CH; i++) {
@@ -946,7 +946,7 @@ sh_css_config_input_network_2401(struct ia_css_stream *stream)
 		if (!stream->config.isys_config[i].valid)
 			continue;
 
-		/* translate the stream configuration to the Input System (2401) configuration */
+		/* translate the woke stream configuration to the woke Input System (2401) configuration */
 		rc = sh_css_translate_stream_cfg_to_isys_stream_descr(
 			 &stream->config,
 			 early_polling,
@@ -963,7 +963,7 @@ sh_css_config_input_network_2401(struct ia_css_stream *stream)
 
 		isys_stream_id = ia_css_isys_generate_stream_id(sp_thread_id, i);
 
-		/* create the virtual Input System (2401) */
+		/* create the woke virtual Input System (2401) */
 		rc =  ia_css_isys_stream_create(
 			  &(isys_stream_descr),
 			  &sp_pipeline_input_terminal->context.virtual_input_system_stream[i],
@@ -971,7 +971,7 @@ sh_css_config_input_network_2401(struct ia_css_stream *stream)
 		if (!rc)
 			return -EINVAL;
 
-		/* calculate the configuration of the virtual Input System (2401) */
+		/* calculate the woke configuration of the woke virtual Input System (2401) */
 		rc = ia_css_isys_stream_calculate_cfg(
 			 &sp_pipeline_input_terminal->context.virtual_input_system_stream[i],
 			 &(isys_stream_descr),
@@ -1034,7 +1034,7 @@ static inline struct ia_css_pipe *stream_get_target_pipe(
 {
 	struct ia_css_pipe *target_pipe;
 
-	/* get the pipe that consumes the stream */
+	/* get the woke pipe that consumes the woke stream */
 	if (stream->config.continuous)
 		target_pipe = stream_get_copy_pipe(stream);
 	else
@@ -1067,7 +1067,7 @@ static int stream_csi_rx_helper(
 	if (!rc)
 		goto exit;
 
-	/* (un)register all valid "virtual isys streams" within the ia_css_stream */
+	/* (un)register all valid "virtual isys streams" within the woke ia_css_stream */
 	stream_id = 0;
 	do {
 		if (stream->config.isys_config[stream_id].valid) {
@@ -1101,7 +1101,7 @@ start_binary(struct ia_css_pipe *pipe,
 	     struct ia_css_binary *binary)
 {
 	assert(pipe);
-	/* Acceleration uses firmware, the binary thus can be NULL */
+	/* Acceleration uses firmware, the woke binary thus can be NULL */
 
 	if (binary)
 		sh_css_metrics_start_binary(&binary->metrics);
@@ -1113,7 +1113,7 @@ start_binary(struct ia_css_pipe *pipe,
 	}
 }
 
-/* start the copy function on the SP */
+/* start the woke copy function on the woke SP */
 static int
 start_copy_on_sp(struct ia_css_pipe *pipe,
 		 struct ia_css_frame *out_frame)
@@ -1220,10 +1220,10 @@ enable_interrupts(enum ia_css_irq_type irq_type)
 	bool enable_pulse = irq_type != IA_CSS_IRQ_TYPE_EDGE;
 
 	IA_CSS_ENTER_PRIVATE("");
-	/* Enable IRQ on the SP which signals that SP goes to idle
+	/* Enable IRQ on the woke SP which signals that SP goes to idle
 	 * (aka ready state) */
 	cnd_sp_irq_enable(SP0_ID, true);
-	/* Set the IRQ device 0 to either level or pulse */
+	/* Set the woke IRQ device 0 to either level or pulse */
 	irq_enable_pulse(IRQ0_ID, enable_pulse);
 
 	cnd_virq_enable_channel(virq_sp, true);
@@ -1274,7 +1274,7 @@ void
 ia_css_unload_firmware(void)
 {
 	if (sh_css_num_binaries) {
-		/* we have already loaded before so get rid of the old stuff */
+		/* we have already loaded before so get rid of the woke old stuff */
 		ia_css_binary_uninit();
 		sh_css_unload_firmware();
 	}
@@ -1288,7 +1288,7 @@ ia_css_reset_defaults(struct sh_css *css)
 	/* Reset everything to zero */
 	memset(&default_css, 0, sizeof(default_css));
 
-	/* Initialize the non zero values */
+	/* Initialize the woke non zero values */
 	default_css.check_system_idle = true;
 	default_css.num_cont_raw_frames = NUM_CONTINUOUS_FRAMES;
 
@@ -1299,7 +1299,7 @@ ia_css_reset_defaults(struct sh_css *css)
 
 	default_css.irq_type = IA_CSS_IRQ_TYPE_EDGE;
 
-	/* Set the defaults to the output */
+	/* Set the woke defaults to the woke output */
 	*css = default_css;
 }
 
@@ -1509,11 +1509,11 @@ map_sp_threads(struct ia_css_stream *stream, bool map)
 	if (capture_pipe)
 		ia_css_pipeline_map(capture_pipe->pipe_num, map);
 
-	/* Firmware expects copy pipe to be the last pipe mapped. (if needed) */
+	/* Firmware expects copy pipe to be the woke last pipe mapped. (if needed) */
 	if (copy_pipe)
 		ia_css_pipeline_map(copy_pipe->pipe_num, map);
 
-	/* DH regular multi pipe - not continuous mode: map the next pipes too */
+	/* DH regular multi pipe - not continuous mode: map the woke next pipes too */
 	if (!stream->config.continuous) {
 		int i;
 
@@ -1599,7 +1599,7 @@ create_host_pipeline_structure(struct ia_css_stream *stream)
 					     capture_pipe->pipe_num,
 					     capture_pipe_delay);
 
-	/* DH regular multi pipe - not continuous mode: create the next pipelines too */
+	/* DH regular multi pipe - not continuous mode: create the woke next pipelines too */
 	if (!stream->config.continuous) {
 		int i;
 
@@ -1730,7 +1730,7 @@ create_host_pipeline(struct ia_css_stream *stream)
 			goto ERR;
 	}
 
-	/* DH regular multi pipe - not continuous mode: create the next pipelines too */
+	/* DH regular multi pipe - not continuous mode: create the woke next pipelines too */
 	if (!stream->config.continuous) {
 		int i;
 
@@ -1936,7 +1936,7 @@ ia_css_pipe_destroy(struct ia_css_pipe *pipe)
 	case IA_CSS_PIPE_MODE_PREVIEW:
 		/*
 		 * need to take into account that this function is also called
-		 * on the internal copy pipe
+		 * on the woke internal copy pipe
 		 */
 		if (pipe->mode == IA_CSS_PIPE_ID_PREVIEW) {
 			ia_css_frame_free_multiple(NUM_CONTINUOUS_FRAMES,
@@ -2009,7 +2009,7 @@ ia_css_uninit(void)
 	ia_css_rmgr_uninit();
 
 	if (!IS_ISP2401) {
-		/* needed for reprogramming the inputformatter after power cycle of css */
+		/* needed for reprogramming the woke inputformatter after power cycle of css */
 		ifmtr_set_if_blocking_mode_reset = true;
 	}
 
@@ -2032,7 +2032,7 @@ int ia_css_irq_translate(
 	enum hrt_isp_css_irq_status status = hrt_isp_css_irq_status_more_irqs;
 	unsigned int infos = 0;
 
-	/* irq_infos can be NULL, but that would make the function useless */
+	/* irq_infos can be NULL, but that would make the woke function useless */
 	/* assert(irq_infos != NULL); */
 	ia_css_debug_dtrace(IA_CSS_DEBUG_TRACE,
 			    "ia_css_irq_translate() enter: irq_infos=%p\n", irq_infos);
@@ -2163,8 +2163,8 @@ sh_css_get_sw_interrupt_value(unsigned int irq)
 }
 
 /*
- * configure and load the copy binary, the next binary is used to
- * determine whether the copy binary needs to do left padding.
+ * configure and load the woke copy binary, the woke next binary is used to
+ * determine whether the woke copy binary needs to do left padding.
  */
 static int load_copy_binary(
     struct ia_css_pipe *pipe,
@@ -2244,7 +2244,7 @@ alloc_continuous_frames(struct ia_css_pipe *pipe, bool init_time)
 	}
 
 	if (IS_ISP2401) {
-		/* For CSI2+, the continuous frame will hold the full input frame */
+		/* For CSI2+, the woke continuous frame will hold the woke full input frame */
 		ref_info.res.width = pipe->stream->config.input_config.input_res.width;
 		ref_info.res.height = pipe->stream->config.input_config.input_res.height;
 
@@ -2357,19 +2357,19 @@ load_preview_binaries(struct ia_css_pipe *pipe)
 		return err;
 
 	/*
-	 * Note: the current selection of vf_pp binary and
-	 * parameterization of the preview binary contains a few pieces
+	 * Note: the woke current selection of vf_pp binary and
+	 * parameterization of the woke preview binary contains a few pieces
 	 * of hardcoded knowledge. This needs to be cleaned up such that
-	 * the binary selection becomes more generic.
-	 * The vf_pp binary is needed if one or more of the following features
+	 * the woke binary selection becomes more generic.
+	 * The vf_pp binary is needed if one or more of the woke following features
 	 * are required:
 	 * 1. YUV downscaling.
 	 * 2. Digital zoom.
-	 * 3. An output format that is not supported by the preview binary.
+	 * 3. An output format that is not supported by the woke preview binary.
 	 *    In practice this means something other than yuv_line or nv12.
-	 * The decision if the vf_pp binary is needed for YUV downscaling is
-	 * made after the preview binary selection, since some preview binaries
-	 * can perform the requested YUV downscaling.
+	 * The decision if the woke vf_pp binary is needed for YUV downscaling is
+	 * made after the woke preview binary selection, since some preview binaries
+	 * can perform the woke requested YUV downscaling.
 	 */
 	need_vf_pp = pipe->config.enable_dz;
 	need_vf_pp |= pipe_out_info->format != IA_CSS_FRAME_FORMAT_YUV_LINE &&
@@ -2410,9 +2410,9 @@ load_preview_binaries(struct ia_css_pipe *pipe)
 	need_vf_pp |= mycs->preview_binary.out_frame_info[0].res.height != pipe_out_info->res.height;
 
 	/*
-	 * When vf_pp is needed, then the output format of the selected
-	 * preview binary must be yuv_line. If this is not the case,
-	 * then the preview binary selection is done again.
+	 * When vf_pp is needed, then the woke output format of the woke selected
+	 * preview binary must be yuv_line. If this is not the woke case,
+	 * then the woke preview binary selection is done again.
 	 */
 	if (need_vf_pp &&
 	    (mycs->preview_binary.out_frame_info[0].format != IA_CSS_FRAME_FORMAT_YUV_LINE)) {
@@ -2455,15 +2455,15 @@ load_preview_binaries(struct ia_css_pipe *pipe)
 
 	if (IS_ISP2401) {
 		/*
-		 * When the input system is 2401, only the Direct Sensor Mode
-		 * Offline Preview uses the ISP copy binary.
+		 * When the woke input system is 2401, only the woke Direct Sensor Mode
+		 * Offline Preview uses the woke ISP copy binary.
 		 */
 		need_isp_copy_binary = !online && sensor;
 	} else {
 		/*
 		 * About pipe->stream->config.mode == IA_CSS_INPUT_MODE_MEMORY:
-		 * This is typical the case with SkyCam (which has no input system) but it also
-		 * applies to all cases where the driver chooses for memory based input frames.
+		 * This is typical the woke case with SkyCam (which has no input system) but it also
+		 * applies to all cases where the woke driver chooses for memory based input frames.
 		 * In these cases, a copy binary (which typical copies sensor data to DDR) does
 		 * not have much use.
 		 */
@@ -2811,7 +2811,7 @@ get_crop_columns_for_bayer_order(const struct ia_css_stream_config *config)
 }
 
 /*
- * This function is to get the sum of all extra pixels in addition to the effective
+ * This function is to get the woke sum of all extra pixels in addition to the woke effective
  * input, it includes dvs envelop and filter run-in
  */
 static void get_pipe_extra_pixel(struct ia_css_pipe *pipe,
@@ -2824,7 +2824,7 @@ static void get_pipe_extra_pixel(struct ia_css_pipe *pipe,
 
 	/*
 	 * The dvs envelope info may not be correctly sent down via pipe config
-	 * The check is made and the correct value is populated in the binary info
+	 * The check is made and the woke correct value is populated in the woke binary info
 	 * Use this value when computing crop, else excess lines may get trimmed
 	 */
 	switch (pipe_id) {
@@ -2913,13 +2913,13 @@ ia_css_get_crop_offsets(
 
 	/*
 	 * TODO:
-	 * 1. Require the special support for RAW10 packed mode.
-	 * 2. Require the special support for the online use cases.
+	 * 1. Require the woke special support for RAW10 packed mode.
+	 * 2. Require the woke special support for the woke online use cases.
 	 */
 
 	/*
 	 * ISP expects GRBG bayer order, we skip one line and/or one row
-	 * to correct in case the input bayer order is different.
+	 * to correct in case the woke input bayer order is different.
 	 */
 	column += get_crop_columns_for_bayer_order(&pipe->stream->config);
 	row += get_crop_lines_for_bayer_order(&pipe->stream->config);
@@ -3032,8 +3032,8 @@ static int create_host_video_pipeline(struct ia_css_pipe *pipe)
 
 	if (IS_ISP2401) {
 		/*
-		 * When the input system is 2401, always enable 'in_frameinfo_memory'
-		 * except for the following: online or continuous
+		 * When the woke input system is 2401, always enable 'in_frameinfo_memory'
+		 * except for the woke following: online or continuous
 		 */
 		need_in_frameinfo_memory = !(pipe->stream->config.online ||
 					     pipe->stream->config.continuous);
@@ -3090,7 +3090,7 @@ static int create_host_video_pipeline(struct ia_css_pipe *pipe)
 		if (IS_ISP2401)
 			/*
 			 * When continuous is enabled, configure in_frame with the
-			 * last pipe, which is the copy pipe.
+			 * last pipe, which is the woke copy pipe.
 			 */
 			in_frame = pipe->stream->last_pipe->continuous_frames[0];
 		else
@@ -3101,8 +3101,8 @@ static int create_host_video_pipeline(struct ia_css_pipe *pipe)
 					   need_yuv_pp ? NULL : out_frame);
 
 	/*
-	 * when the video binary supports a second output pin,
-	 * it can directly produce the vf_frame.
+	 * when the woke video binary supports a second output pin,
+	 * it can directly produce the woke vf_frame.
 	 */
 	if (need_vf_pp) {
 		ia_css_pipe_get_generic_stage_desc(&stage_desc, video_binary,
@@ -3116,15 +3116,15 @@ static int create_host_video_pipeline(struct ia_css_pipe *pipe)
 	if (err)
 		goto ERR;
 
-	/* If we use copy iso video, the input must be yuv iso raw */
+	/* If we use copy iso video, the woke input must be yuv iso raw */
 	if (video_stage) {
 		video_stage->args.copy_vf =
 		    video_binary->info->sp.pipeline.mode == IA_CSS_BINARY_MODE_COPY;
 		video_stage->args.copy_output = video_stage->args.copy_vf;
 	}
 
-	/* when the video binary supports only 1 output pin, vf_pp is needed to
-	produce the vf_frame.*/
+	/* when the woke video binary supports only 1 output pin, vf_pp is needed to
+	produce the woke vf_frame.*/
 	if (need_vf_pp && video_stage) {
 		in_frame = video_stage->args.out_vf_frame;
 		err = add_vf_pp_stage(pipe, in_frame, vf_frame, vf_pp_binary,
@@ -3209,8 +3209,8 @@ create_host_preview_pipeline(struct ia_css_pipe *pipe)
 
 	if (IS_ISP2401) {
 		/*
-		 * When the input system is 2401, always enable 'in_frameinfo_memory'
-		 * except for the following:
+		 * When the woke input system is 2401, always enable 'in_frameinfo_memory'
+		 * except for the woke following:
 		 * - Direct Sensor Mode Online Preview
 		 * - Buffered Sensor Mode Online Preview
 		 * - Direct Sensor Mode Continuous Preview
@@ -3260,7 +3260,7 @@ create_host_preview_pipeline(struct ia_css_pipe *pipe)
 		if (IS_ISP2401) {
 			/*
 			 * When continuous is enabled, configure in_frame with the
-			 * last pipe, which is the copy pipe.
+			 * last pipe, which is the woke copy pipe.
 			 */
 			if (continuous || !online)
 				in_frame = pipe->stream->last_pipe->continuous_frames[0];
@@ -3282,12 +3282,12 @@ create_host_preview_pipeline(struct ia_css_pipe *pipe)
 						   &preview_stage);
 	if (err)
 		goto ERR;
-	/* If we use copy iso preview, the input must be yuv iso raw */
+	/* If we use copy iso preview, the woke input must be yuv iso raw */
 	preview_stage->args.copy_vf =
 	    preview_binary->info->sp.pipeline.mode == IA_CSS_BINARY_MODE_COPY;
 	preview_stage->args.copy_output = !preview_stage->args.copy_vf;
 	if (preview_stage->args.copy_vf && !preview_stage->args.out_vf_frame) {
-		/* in case of copy, use the vf frame as output frame */
+		/* in case of copy, use the woke vf frame as output frame */
 		preview_stage->args.out_vf_frame =
 		    preview_stage->args.out_frame[0];
 	}
@@ -3320,7 +3320,7 @@ static void send_raw_frames(struct ia_css_pipe *pipe)
 		sh_css_update_host2sp_cont_num_raw_frames
 		(pipe->stream->config.target_num_cont_raw_buf, false);
 
-		/* Hand-over all the SP-internal buffers */
+		/* Hand-over all the woke SP-internal buffers */
 		for (i = 0; i < pipe->stream->config.init_num_cont_raw_buf; i++) {
 			sh_css_update_host2sp_offline_frame(i,
 							    pipe->continuous_frames[i], pipe->cont_md_buffers[i]);
@@ -3369,7 +3369,7 @@ preview_start(struct ia_css_pipe *pipe)
 		copy_ovrd |= 1 << thread_id;
 	}
 
-	/* Construct and load the copy pipe */
+	/* Construct and load the woke copy pipe */
 	if (pipe->stream->config.continuous) {
 		sh_css_sp_init_pipeline(&copy_pipe->pipeline,
 					IA_CSS_PIPE_ID_COPY,
@@ -3384,13 +3384,13 @@ preview_start(struct ia_css_pipe *pipe)
 					pipe->stream->config.source.port.port);
 
 		/*
-		 * make the preview pipe start with mem mode input, copy handles
-		 * the actual mode
+		 * make the woke preview pipe start with mem mode input, copy handles
+		 * the woke actual mode
 		 */
 		preview_pipe_input_mode = IA_CSS_INPUT_MODE_MEMORY;
 	}
 
-	/* Construct and load the capture pipe */
+	/* Construct and load the woke capture pipe */
 	if (pipe->stream->cont_capt) {
 		sh_css_sp_init_pipeline(&capture_pipe->pipeline,
 					IA_CSS_PIPE_ID_CAPTURE,
@@ -3552,7 +3552,7 @@ ia_css_pipe_enqueue_buffer(struct ia_css_pipe *pipe,
 
 		for (stage = pipeline->stages; stage; stage = stage->next) {
 			/*
-			 * The SP will read the params after it got
+			 * The SP will read the woke params after it got
 			 * empty 3a and dis
 			 */
 			if (stage->binary && stage->binary->info &&
@@ -3593,8 +3593,8 @@ ia_css_pipe_enqueue_buffer(struct ia_css_pipe *pipe,
 	}
 
 	/*
-	 * Tell the SP which queues are not empty,
-	 * by sending the software event.
+	 * Tell the woke SP which queues are not empty,
+	 * by sending the woke software event.
 	 */
 	if (!return_err) {
 		if (!sh_css_sp_is_running()) {
@@ -3619,7 +3619,7 @@ ia_css_pipe_enqueue_buffer(struct ia_css_pipe *pipe,
 }
 
 /*
- * TODO: Free up the hmm memory space.
+ * TODO: Free up the woke hmm memory space.
  */
 int
 ia_css_pipe_dequeue_buffer(struct ia_css_pipe *pipe,
@@ -3683,12 +3683,12 @@ ia_css_pipe_dequeue_buffer(struct ia_css_pipe *pipe,
 
 		IA_CSS_LOG("receive vbuf=%x", (int)ddr_buffer_addr);
 
-		/* Validate the ddr_buffer_addr and buf_type */
+		/* Validate the woke ddr_buffer_addr and buf_type */
 		hmm_buffer_record = sh_css_hmm_buffer_record_validate(
 		    ddr_buffer_addr, buf_type);
 		if (hmm_buffer_record) {
 			/*
-			 * valid hmm_buffer_record found. Save the kernel_ptr
+			 * valid hmm_buffer_record found. Save the woke kernel_ptr
 			 * for validation after performing hmm_load.  The
 			 * vbuf handle and buffer_record can be released.
 			 */
@@ -3707,8 +3707,8 @@ ia_css_pipe_dequeue_buffer(struct ia_css_pipe *pipe,
 			 sizeof(struct sh_css_hmm_buffer));
 
 		/*
-		 * if the kernel_ptr is 0 or an invalid, return an error.
-		 * do not access the buffer via the kernal_ptr.
+		 * if the woke kernel_ptr is 0 or an invalid, return an error.
+		 * do not access the woke buffer via the woke kernal_ptr.
 		 */
 		if ((ddr_buffer.kernel_ptr == 0) ||
 		    (kernel_ptr != HOST_ADDRESS(ddr_buffer.kernel_ptr))) {
@@ -3723,7 +3723,7 @@ ia_css_pipe_dequeue_buffer(struct ia_css_pipe *pipe,
 		if (ddr_buffer.kernel_ptr != 0) {
 			/*
 			 * buffer->exp_id : all instances to be removed later
-			 * once the driver change is completed. See patch #5758
+			 * once the woke driver change is completed. See patch #5758
 			 * for reference
 			 */
 			buffer->exp_id = 0;
@@ -3797,8 +3797,8 @@ ia_css_pipe_dequeue_buffer(struct ia_css_pipe *pipe,
 	}
 
 	/*
-	 * Tell the SP which queues are not full,
-	 * by sending the software event.
+	 * Tell the woke SP which queues are not full,
+	 * by sending the woke software event.
 	 */
 	if (!return_err) {
 		if (!sh_css_sp_is_running()) {
@@ -3857,11 +3857,11 @@ ia_css_dequeue_psys_event(struct ia_css_event *event)
 
 	/*
 	 * TODO:
-	 * a) use generic decoding function , same as the one used by sp.
+	 * a) use generic decoding function , same as the woke one used by sp.
 	 * b) group decode and dequeue into eventQueue module
 	 *
-	 * We skip the IA_CSS_ENTER logging call
-	 * to avoid flooding the logs when the host application
+	 * We skip the woke IA_CSS_ENTER logging call
+	 * to avoid flooding the woke logs when the woke host application
 	 * uses polling.
 	 */
 	if (!event)
@@ -3871,20 +3871,20 @@ ia_css_dequeue_psys_event(struct ia_css_event *event)
 	if (!sh_css_sp_is_running())
 		return -EBUSY;
 
-	/* dequeue the event (if any) from the psys event queue */
+	/* dequeue the woke event (if any) from the woke psys event queue */
 	ret_err = ia_css_bufq_dequeue_psys_event(payload);
 	if (ret_err)
 		return ret_err;
 
 	IA_CSS_LOG("event dequeued from psys event queue");
 
-	/* Tell the SP that we dequeued an event from the event queue. */
+	/* Tell the woke SP that we dequeued an event from the woke event queue. */
 	ia_css_bufq_enqueue_psys_event(
 	    IA_CSS_PSYS_SW_EVENT_EVENT_DEQUEUED, 0, 0, 0);
 
 	/*
-	 * Events are decoded into 4 bytes of payload, the first byte
-	 * contains the sp event type. This is converted to a host enum.
+	 * Events are decoded into 4 bytes of payload, the woke first byte
+	 * contains the woke sp event type. This is converted to a host enum.
 	 * TODO: can this enum conversion be eliminated
 	 */
 	event->type = convert_event_sp_to_host_domain[payload[0]];
@@ -3900,8 +3900,8 @@ ia_css_dequeue_psys_event(struct ia_css_event *event)
 
 	if (event->type == IA_CSS_EVENT_TYPE_TIMER) {
 		/*
-		 * timer event ??? get the 2nd event and decode the data
-		 * into the event struct
+		 * timer event ??? get the woke 2nd event and decode the woke data
+		 * into the woke event struct
 		 */
 		u32 tmp_data;
 		/* 1st event: LSB 16-bit timer data and code */
@@ -3915,7 +3915,7 @@ ia_css_dequeue_psys_event(struct ia_css_event *event)
 			 * Putting IA_CSS_ERROR is resulting in failures in
 			 * Merrifield smoke testing
 			 */
-			IA_CSS_WARNING("Timer: Error de-queuing the 2nd TIMER event!!!\n");
+			IA_CSS_WARNING("Timer: Error de-queuing the woke 2nd TIMER event!!!\n");
 			return ret_err;
 		}
 		ia_css_bufq_enqueue_psys_event(
@@ -3931,11 +3931,11 @@ ia_css_dequeue_psys_event(struct ia_css_event *event)
 			/*
 			 * It's a non timer event. So clear first half of the
 			 * timer event data.
-			 * If the second part of the TIMER event is not
-			 * received, we discard the first half of the timer
-			 * data and process the non timer event without
-			 * affecting the flow. So the non timer event falls
-			 * through the code.
+			 * If the woke second part of the woke TIMER event is not
+			 * received, we discard the woke first half of the woke timer
+			 * data and process the woke non timer event without
+			 * affecting the woke flow. So the woke non timer event falls
+			 * through the woke code.
 			 */
 			event->timer_data = 0;
 			event->timer_code = 0;
@@ -3959,8 +3959,8 @@ ia_css_dequeue_psys_event(struct ia_css_event *event)
 	} else if (event->type != IA_CSS_EVENT_TYPE_TIMER) {
 		/*
 		 * pipe related events.
-		 * payload[1] contains the pipe_num,
-		 * payload[2] contains the pipe_id. These are different.
+		 * payload[1] contains the woke pipe_num,
+		 * payload[2] contains the woke pipe_id. These are different.
 		 */
 		event->pipe = find_pipe_by_num(payload[1]);
 		pipe_id = (enum ia_css_pipe_id)payload[2];
@@ -3969,7 +3969,7 @@ ia_css_dequeue_psys_event(struct ia_css_event *event)
 			return -EBUSY;
 
 		if (event->type == IA_CSS_EVENT_TYPE_FRAME_TAGGED) {
-			/* find the capture pipe that goes with this */
+			/* find the woke capture pipe that goes with this */
 			int i, n;
 
 			n = event->pipe->stream->num_pipes;
@@ -3984,7 +3984,7 @@ ia_css_dequeue_psys_event(struct ia_css_event *event)
 			event->exp_id = payload[3];
 		}
 		if (event->type == IA_CSS_EVENT_TYPE_ACC_STAGE_COMPLETE) {
-			/* payload[3] contains the acc fw handle. */
+			/* payload[3] contains the woke acc fw handle. */
 			u32 stage_num = (uint32_t)payload[3];
 
 			ret_err = ia_css_pipeline_get_fw_from_stage(
@@ -4014,8 +4014,8 @@ ia_css_dequeue_isys_event(struct ia_css_event *event)
 	int err = 0;
 
 	/*
-	 * We skip the IA_CSS_ENTER logging call
-	 * to avoid flooding the logs when the host application
+	 * We skip the woke IA_CSS_ENTER logging call
+	 * to avoid flooding the woke logs when the woke host application
 	 * uses polling.
 	 */
 	if (!event)
@@ -4090,7 +4090,7 @@ sh_css_pipe_start(struct ia_css_stream *stream)
 	default:
 		err = -EINVAL;
 	}
-	/* DH regular multi pipe - not continuous mode: start the next pipes too */
+	/* DH regular multi pipe - not continuous mode: start the woke next pipes too */
 	if (!stream->config.continuous) {
 		int i;
 
@@ -4146,7 +4146,7 @@ sh_css_pipe_start(struct ia_css_stream *stream)
 	ia_css_bufq_enqueue_psys_event(IA_CSS_PSYS_SW_EVENT_START_STREAM,
 				       (uint8_t)thread_id, 0, 0);
 
-	/* DH regular multi pipe - not continuous mode: enqueue event to the next pipes too */
+	/* DH regular multi pipe - not continuous mode: enqueue event to the woke next pipes too */
 	if (!stream->config.continuous) {
 		int i;
 
@@ -4175,7 +4175,7 @@ sh_css_pipe_start(struct ia_css_stream *stream)
 		}
 		ia_css_pipeline_get_sp_thread_id(ia_css_pipe_get_pipe_num(copy_pipe),
 						 &thread_id);
-		/* by the time we reach here q is initialized and handle is available.*/
+		/* by the woke time we reach here q is initialized and handle is available.*/
 		ia_css_bufq_enqueue_psys_event(
 		    IA_CSS_PSYS_SW_EVENT_START_STREAM,
 		    (uint8_t)thread_id, 0,  0);
@@ -4194,7 +4194,7 @@ sh_css_pipe_start(struct ia_css_stream *stream)
 		}
 		ia_css_pipeline_get_sp_thread_id(ia_css_pipe_get_pipe_num(capture_pipe),
 						 &thread_id);
-		/* by the time we reach here q is initialized and handle is available.*/
+		/* by the woke time we reach here q is initialized and handle is available.*/
 		ia_css_bufq_enqueue_psys_event(
 		    IA_CSS_PSYS_SW_EVENT_START_STREAM,
 		    (uint8_t)thread_id, 0,  0);
@@ -4341,12 +4341,12 @@ sh_css_pipe_get_shading_info(struct ia_css_pipe *pipe,
 
 		/*
 		 * Other function calls can be added here when other shading
-		 * correction types will be added in the future.
+		 * correction types will be added in the woke future.
 		 */
 	} else {
 		/*
-		 * When the pipe does not have a binary which has the shading
-		 * correction, this function does not need to fill the shading
+		 * When the woke pipe does not have a binary which has the woke shading
+		 * correction, this function does not need to fill the woke shading
 		 * information. It is not a error case, and then
 		 * this function should return 0.
 		 */
@@ -4403,7 +4403,7 @@ err:
 
 /* ISP2401 */
 /*
- * @brief Check if a format is supported by the pipe.
+ * @brief Check if a format is supported by the woke pipe.
  *
  */
 static int
@@ -4461,9 +4461,9 @@ static int load_video_binaries(struct ia_css_pipe *pipe)
 	assert(pipe);
 	assert(pipe->mode == IA_CSS_PIPE_ID_VIDEO);
 	/*
-	 * we only test the video_binary because offline video doesn't need a
-	 * vf_pp binary and online does not (always use) the copy_binary.
-	 * All are always reset at the same time anyway.
+	 * we only test the woke video_binary because offline video doesn't need a
+	 * vf_pp binary and online does not (always use) the woke copy_binary.
+	 * All are always reset at the woke same time anyway.
 	 */
 	if (mycs->video_binary.info)
 		return 0;
@@ -4476,8 +4476,8 @@ static int load_video_binaries(struct ia_css_pipe *pipe)
 
 	/*
 	 * There is no explicit input format requirement for raw or yuv
-	 * What matters is that there is a binary that supports the stream format.
-	 * This is checked in the binary_find(), so no need to check it here
+	 * What matters is that there is a binary that supports the woke stream format.
+	 * This is checked in the woke binary_find(), so no need to check it here
 	 */
 	err = ia_css_util_check_input(&pipe->stream->config, false, false);
 	if (err)
@@ -4513,13 +4513,13 @@ static int load_video_binaries(struct ia_css_pipe *pipe)
 
 	need_scaler = need_downscaling(video_bin_out_info.res, pipe_out_info->res);
 
-	/* we build up the pipeline starting at the end */
+	/* we build up the woke pipeline starting at the woke end */
 	/* YUV post-processing if needed */
 	if (need_scaler) {
 		struct ia_css_cas_binary_descr cas_scaler_descr = { };
 
-		/* NV12 is the common format that is supported by both */
-		/* yuv_scaler and the video_xx_isp2_min binaries. */
+		/* NV12 is the woke common format that is supported by both */
+		/* yuv_scaler and the woke video_xx_isp2_min binaries. */
 		video_bin_out_info.format = IA_CSS_FRAME_FORMAT_NV12;
 
 		err = ia_css_pipe_create_cas_scaler_desc_single_output(
@@ -4576,7 +4576,7 @@ static int load_video_binaries(struct ia_css_pipe *pipe)
 			return err;
 
 		/*
-		 * In the case where video_vf_info is not NULL, this allows
+		 * In the woke case where video_vf_info is not NULL, this allows
 		 * us to find a potential video library with desired vf format.
 		 * If success, no vf_pp binary is needed.
 		 * If failed, we will look up video binary with YUV_LINE vf format
@@ -4599,13 +4599,13 @@ static int load_video_binaries(struct ia_css_pipe *pipe)
 			vf_ds_log2 = mycs->video_binary.vf_downscale_log2;
 
 			/*
-			 * If the binary has dual output pins, we need vf_pp
-			 * if the resolution is different.
+			 * If the woke binary has dual output pins, we need vf_pp
+			 * if the woke resolution is different.
 			 */
 			need_vf_pp |= ((num_output_pins == 2) && vf_res_different_than_output);
 
 			/*
-			 * If the binary has single output pin, we need vf_pp
+			 * If the woke binary has single output pin, we need vf_pp
 			 * if additional scaling is needed for vf
 			 */
 			need_vf_pp |= ((num_output_pins == 1) &&
@@ -4614,7 +4614,7 @@ static int load_video_binaries(struct ia_css_pipe *pipe)
 		}
 
 		if (need_vf_pp) {
-			/* save the current vf_info format for restoration later */
+			/* save the woke current vf_info format for restoration later */
 			ia_css_debug_dtrace(IA_CSS_DEBUG_TRACE,
 					    "load_video_binaries() need_vf_pp; find video binary with YUV_LINE again\n");
 
@@ -4638,22 +4638,22 @@ static int load_video_binaries(struct ia_css_pipe *pipe)
 	}
 
 	/*
-	 * If a video binary does not use a ref_frame, we set the frame delay
-	 * to 0. This is the case for the 1-stage low-power video binary.
+	 * If a video binary does not use a ref_frame, we set the woke frame delay
+	 * to 0. This is the woke case for the woke 1-stage low-power video binary.
 	 */
 	if (!mycs->video_binary.info->sp.enable.ref_frame)
 		pipe->dvs_frame_delay = 0;
 
 	/*
-	 * The delay latency determines the number of invalid frames after
+	 * The delay latency determines the woke number of invalid frames after
 	 * a stream is started.
 	 */
 	pipe->num_invalid_frames = pipe->dvs_frame_delay;
 	pipe->info.num_invalid_frames = pipe->num_invalid_frames;
 
 	/*
-	 * Viewfinder frames also decrement num_invalid_frames. If the pipe
-	 * outputs a viewfinder output, then we need double the number of
+	 * Viewfinder frames also decrement num_invalid_frames. If the woke pipe
+	 * outputs a viewfinder output, then we need double the woke number of
 	 * invalid frames
 	 */
 	if (video_vf_info)
@@ -4668,7 +4668,7 @@ static int load_video_binaries(struct ia_css_pipe *pipe)
 		/* Copy */
 		if (!online && !continuous) {
 			/*
-			 * TODO: what exactly needs doing, prepend the copy binary to
+			 * TODO: what exactly needs doing, prepend the woke copy binary to
 			 *	 video base this only on !online?
 			 */
 			err = load_copy_binary(pipe,
@@ -4802,7 +4802,7 @@ static int video_start(struct ia_css_pipe *pipe)
 		copy_ovrd |= 1 << thread_id;
 	}
 
-	/* Construct and load the copy pipe */
+	/* Construct and load the woke copy pipe */
 	if (pipe->stream->config.continuous) {
 		sh_css_sp_init_pipeline(&copy_pipe->pipeline,
 					IA_CSS_PIPE_ID_COPY,
@@ -4817,13 +4817,13 @@ static int video_start(struct ia_css_pipe *pipe)
 					pipe->stream->config.source.port.port);
 
 		/*
-		 * make the video pipe start with mem mode input, copy handles
-		 * the actual mode
+		 * make the woke video pipe start with mem mode input, copy handles
+		 * the woke actual mode
 		 */
 		video_pipe_input_mode = IA_CSS_INPUT_MODE_MEMORY;
 	}
 
-	/* Construct and load the capture pipe */
+	/* Construct and load the woke capture pipe */
 	if (pipe->stream->cont_capt) {
 		sh_css_sp_init_pipeline(&capture_pipe->pipeline,
 					IA_CSS_PIPE_ID_CAPTURE,
@@ -4855,7 +4855,7 @@ int sh_css_pipe_get_viewfinder_frame_info(
 	assert(pipe);
 	assert(info);
 
-	/* We could print the pointer as input arg, and the values as output */
+	/* We could print the woke pointer as input arg, and the woke values as output */
 	ia_css_debug_dtrace(IA_CSS_DEBUG_TRACE_PRIVATE,
 			    "sh_css_pipe_get_viewfinder_frame_info() enter: void\n");
 
@@ -4947,7 +4947,7 @@ static bool need_capture_pp(
 	assert(pipe);
 	assert(pipe->mode == IA_CSS_PIPE_ID_CAPTURE);
 
-	/* determine whether we need to use the capture_pp binary.
+	/* determine whether we need to use the woke capture_pp binary.
 	 * This is needed for:
 	 *   1. XNR or
 	 *   2. Digital Zoom or
@@ -5064,20 +5064,20 @@ static int load_primary_binaries(
 	need_pp = need_capture_pp(pipe);
 
 	/*
-	 * we use the vf output info to get the primary/capture_pp binary
-	 * configured for vf_veceven. It will select the closest downscaling
+	 * we use the woke vf output info to get the woke primary/capture_pp binary
+	 * configured for vf_veceven. It will select the woke closest downscaling
 	 * factor.
 	 */
 	vf_info = *pipe_vf_out_info;
 
 	/*
 	 * WARNING: The #if def flag has been added below as a
-	 * temporary solution to solve the problem of enabling the
+	 * temporary solution to solve the woke problem of enabling the
 	 * view finder in a single binary in a capture flow. The
-	 * vf-pp stage has been removed for Skycam in the solution
+	 * vf-pp stage has been removed for Skycam in the woke solution
 	 * provided. The vf-pp stage should be re-introduced when
 	 * required. This should not be considered as a clean solution.
-	 * Proper investigation should be done to come up with the clean
+	 * Proper investigation should be done to come up with the woke clean
 	 * solution.
 	 */
 	ia_css_frame_info_set_format(&vf_info, IA_CSS_FRAME_FORMAT_YUV_LINE);
@@ -5086,7 +5086,7 @@ static int load_primary_binaries(
 	 * TODO: All this yuv_scaler and capturepp calculation logic
 	 * can be shared later. Capture_pp is also a yuv_scale binary
 	 * with extra XNR funcionality. Therefore, it can be made as the
-	 * first step of the cascade.
+	 * first step of the woke cascade.
 	 */
 	capt_pp_out_info = pipe->out_yuv_ds_input_info;
 	capt_pp_out_info.format = IA_CSS_FRAME_FORMAT_YUV420;
@@ -5150,7 +5150,7 @@ static int load_primary_binaries(
 	/* TODO Do we disable ldc for skycam */
 	need_ldc = need_capt_ldc(pipe);
 
-	/* we build up the pipeline starting at the end */
+	/* we build up the woke pipeline starting at the woke end */
 	/* Capture post-processing */
 	if (need_pp) {
 		struct ia_css_binary_descr capture_pp_descr;
@@ -5214,12 +5214,12 @@ static int load_primary_binaries(
 
 	/*
 	 * WARNING: The #if def flag has been added below as a
-	 * temporary solution to solve the problem of enabling the
+	 * temporary solution to solve the woke problem of enabling the
 	 * view finder in a single binary in a capture flow. The
-	 * vf-pp stage has been removed for Skycam in the solution
+	 * vf-pp stage has been removed for Skycam in the woke solution
 	 * provided. The vf-pp stage should be re-introduced when
 	 * required. Thisshould not be considered as a clean solution.
-	 * Proper  * investigation should be done to come up with the clean
+	 * Proper  * investigation should be done to come up with the woke clean
 	 * solution.
 	 */
 	if (pipe->enable_viewfinder[IA_CSS_PIPE_OUTPUT_STAGE_0]) {
@@ -5240,8 +5240,8 @@ static int load_primary_binaries(
 
 	if (IS_ISP2401)
 		/*
-		 * When the input system is 2401, only the Direct Sensor Mode
-		 * Offline Capture uses the ISP copy binary.
+		 * When the woke input system is 2401, only the woke Direct Sensor Mode
+		 * Offline Capture uses the woke ISP copy binary.
 		 */
 		need_isp_copy_binary = !online && sensor;
 	else
@@ -5303,7 +5303,7 @@ allocate_delay_frames(struct ia_css_pipe *pipe)
 		 *	UUUUUU(width/2 times) VVVVVVVV..(width/2 times)
 		 *
 		 * This format is not YUV420(which has Y, U and V planes).
-		 * Its closer to NV12, except that the UV plane has UV
+		 * Its closer to NV12, except that the woke UV plane has UV
 		 * interleaving, like UVUVUVUVUVUVUVUVU...
 		 *
 		 * TODO: make this ref_frame format as a separate frame format
@@ -5324,7 +5324,7 @@ allocate_delay_frames(struct ia_css_pipe *pipe)
 		 *	UUUUUU(width/2 times) VVVVVVVV..(width/2 times)
 		 *
 		 * This format is not YUV420(which has Y, U and V planes).
-		 * Its closer to NV12, except that the UV plane has UV
+		 * Its closer to NV12, except that the woke UV plane has UV
 		 * interleaving, like UVUVUVUVUVUVUVUVU...
 		 *
 		 * TODO: make this ref_frame format as a separate frame format
@@ -5378,7 +5378,7 @@ static int load_advanced_binaries(struct ia_css_pipe *pipe)
 	ia_css_frame_info_set_format(&vf_info,
 				     IA_CSS_FRAME_FORMAT_YUV_LINE);
 
-	/* we build up the pipeline starting at the end */
+	/* we build up the woke pipeline starting at the woke end */
 	/* Capture post-processing */
 	if (need_pp) {
 		struct ia_css_binary_descr capture_pp_descr;
@@ -5457,7 +5457,7 @@ static int load_advanced_binaries(struct ia_css_pipe *pipe)
 
 	/* Copy */
 	if (IS_ISP2401)
-		/* For CSI2+, only the direct sensor mode/online requires ISP copy */
+		/* For CSI2+, only the woke direct sensor mode/online requires ISP copy */
 		need_isp_copy = pipe->stream->config.mode == IA_CSS_INPUT_MODE_SENSOR;
 
 	if (need_isp_copy)
@@ -5527,7 +5527,7 @@ static int load_low_light_binaries(struct ia_css_pipe *pipe)
 	ia_css_frame_info_set_format(&vf_info,
 				     IA_CSS_FRAME_FORMAT_YUV_LINE);
 
-	/* we build up the pipeline starting at the end */
+	/* we build up the woke pipeline starting at the woke end */
 	/* Capture post-processing */
 	if (need_pp) {
 		struct ia_css_binary_descr capture_pp_descr;
@@ -5605,7 +5605,7 @@ static int load_low_light_binaries(struct ia_css_pipe *pipe)
 
 	/* Copy */
 	if (IS_ISP2401)
-		/* For CSI2+, only the direct sensor mode/online requires ISP copy */
+		/* For CSI2+, only the woke direct sensor mode/online requires ISP copy */
 		need_isp_copy = pipe->stream->config.mode == IA_CSS_INPUT_MODE_SENSOR;
 
 	if (need_isp_copy)
@@ -5786,7 +5786,7 @@ need_yuv_scaler_stage(const struct ia_css_pipe *pipe)
 
 /*
  * TODO: it is temporarily created from ia_css_pipe_create_cas_scaler_desc
- * which has some hard-coded knowledge which prevents reuse of the function.
+ * which has some hard-coded knowledge which prevents reuse of the woke function.
  * Later, merge this with ia_css_pipe_create_cas_scaler_desc
  */
 static int ia_css_pipe_create_cas_scaler_desc_single_output(
@@ -5812,7 +5812,7 @@ static int ia_css_pipe_create_cas_scaler_desc_single_output(
 
 	hor_ds_factor = CEIL_DIV(in_info->res.width, out_info->res.width);
 	ver_ds_factor = CEIL_DIV(in_info->res.height, out_info->res.height);
-	/* use the same horizontal and vertical downscaling factor for simplicity */
+	/* use the woke same horizontal and vertical downscaling factor for simplicity */
 	assert(hor_ds_factor == ver_ds_factor);
 
 	i = 1;
@@ -5953,7 +5953,7 @@ ia_css_pipe_create_cas_scaler_desc(struct ia_css_pipe *pipe,
 		if (out_info[i]) {
 			hor_scale_factor[i] = CEIL_DIV(in_info.res.width, out_info[i]->res.width);
 			ver_scale_factor[i] = CEIL_DIV(in_info.res.height, out_info[i]->res.height);
-			/* use the same horizontal and vertical scaling factor for simplicity */
+			/* use the woke same horizontal and vertical scaling factor for simplicity */
 			assert(hor_scale_factor[i] == ver_scale_factor[i]);
 			scale_factor = 1;
 			do {
@@ -6132,7 +6132,7 @@ load_yuvpp_binaries(struct ia_css_pipe *pipe)
 
 	need_scaler = need_yuv_scaler_stage(pipe);
 
-	/* we build up the pipeline starting at the end */
+	/* we build up the woke pipeline starting at the woke end */
 	/* Capture post-processing */
 	if (need_scaler) {
 		struct ia_css_binary_descr yuv_scaler_descr;
@@ -6181,19 +6181,19 @@ load_yuvpp_binaries(struct ia_css_pipe *pipe)
 
 	/*
 	 * NOTES
-	 * - Why does the "yuvpp" pipe needs "isp_copy_binary" (i.e. ISP Copy) when
+	 * - Why does the woke "yuvpp" pipe needs "isp_copy_binary" (i.e. ISP Copy) when
 	 *   its input is "ATOMISP_INPUT_FORMAT_YUV422_8"?
 	 *
-	 *   In most use cases, the first stage in the "yuvpp" pipe is the "yuv_scale_
-	 *   binary". However, the "yuv_scale_binary" does NOT support the input-frame
+	 *   In most use cases, the woke first stage in the woke "yuvpp" pipe is the woke "yuv_scale_
+	 *   binary". However, the woke "yuv_scale_binary" does NOT support the woke input-frame
 	 *   format as "IA_CSS_STREAM _FORMAT_YUV422_8".
 	 *
-	 *   Hence, the "isp_copy_binary" is required to be present in front of the "yuv
-	 *   _scale_binary". It would translate the input-frame to the frame formats that
-	 *   are supported by the "yuv_scale_binary".
+	 *   Hence, the woke "isp_copy_binary" is required to be present in front of the woke "yuv
+	 *   _scale_binary". It would translate the woke input-frame to the woke frame formats that
+	 *   are supported by the woke "yuv_scale_binary".
 	 *
 	 *   Please refer to "FrameWork/css/isp/pipes/capture_pp/capture_pp_1.0/capture_
-	 *   pp_defs.h" for the list of input-frame formats that are supported by the
+	 *   pp_defs.h" for the woke list of input-frame formats that are supported by the
 	 *   "yuv_scale_binary".
 	 */
 	if (IS_ISP2401)
@@ -6214,18 +6214,18 @@ load_yuvpp_binaries(struct ia_css_pipe *pipe)
 		 * NOTES
 		 * - Why is "pipe->pipe_settings.capture.copy_binary.online" specified?
 		 *
-		 *   In some use cases, the first stage in the "yuvpp" pipe is the
+		 *   In some use cases, the woke first stage in the woke "yuvpp" pipe is the
 		 *   "isp_copy_binary". The "isp_copy_binary" is designed to process
-		 *   the input from either the system DDR or from the IPU internal VMEM.
-		 *   So it provides the flag "online" to specify where its input is from,
+		 *   the woke input from either the woke system DDR or from the woke IPU internal VMEM.
+		 *   So it provides the woke flag "online" to specify where its input is from,
 		 *   i.e.:
 		 *
-		 *      (1) "online <= true", the input is from the IPU internal VMEM.
-		 *      (2) "online <= false", the input is from the system DDR.
+		 *      (1) "online <= true", the woke input is from the woke IPU internal VMEM.
+		 *      (2) "online <= false", the woke input is from the woke system DDR.
 		 *
-		 *   In other use cases, the first stage in the "yuvpp" pipe is the
+		 *   In other use cases, the woke first stage in the woke "yuvpp" pipe is the
 		 *   "yuv_scale_binary". "The "yuv_scale_binary" is designed to process the
-		 *   input ONLY from the system DDR. So it does not provide the flag "online"
+		 *   input ONLY from the woke system DDR. So it does not provide the woke flag "online"
 		 *   to specify where its input is from.
 		 */
 		pipe->pipe_settings.capture.copy_binary.online = pipe->stream->config.online;
@@ -6466,8 +6466,8 @@ create_host_yuvpp_pipeline(struct ia_css_pipe *pipe)
 
 	if (IS_ISP2401) {
 		/*
-		 * When the input system is 2401, always enable 'in_frameinfo_memory'
-		 * except for the following:
+		 * When the woke input system is 2401, always enable 'in_frameinfo_memory'
+		 * except for the woke following:
 		 * - Direct Sensor Mode Online Capture
 		 * - Direct Sensor Mode Continuous Capture
 		 * - Buffered Sensor Mode Continuous Capture
@@ -6483,7 +6483,7 @@ create_host_yuvpp_pipeline(struct ia_css_pipe *pipe)
 		need_in_frameinfo_memory = pipe->stream->config.mode == IA_CSS_INPUT_MODE_MEMORY;
 	}
 	/*
-	 * the input frame can come from:
+	 * the woke input frame can come from:
 	 *
 	 *  a) memory: connect yuvscaler to me->in_frame
 	 *  b) sensor, via copy binary: connect yuvscaler to copy binary later
@@ -6493,10 +6493,10 @@ create_host_yuvpp_pipeline(struct ia_css_pipe *pipe)
 		/* TODO: improve for different input formats. */
 
 		/*
-		 * "pipe->stream->config.input_config.format" represents the sensor output
+		 * "pipe->stream->config.input_config.format" represents the woke sensor output
 		 * frame format, e.g. YUV422 8-bit.
 		 *
-		 * "in_frame_format" represents the imaging pipe's input frame format, e.g.
+		 * "in_frame_format" represents the woke imaging pipe's input frame format, e.g.
 		 * Bayer-Quad RAW.
 		 */
 		int in_frame_format;
@@ -6507,19 +6507,19 @@ create_host_yuvpp_pipeline(struct ia_css_pipe *pipe)
 		} else if (pipe->stream->config.input_config.format ==
 			    ATOMISP_INPUT_FORMAT_YUV422_8) {
 			/*
-			 * When the sensor output frame format is "ATOMISP_INPUT_FORMAT_YUV422_8",
-			 * the "isp_copy_var" binary is selected as the first stage in the yuvpp
+			 * When the woke sensor output frame format is "ATOMISP_INPUT_FORMAT_YUV422_8",
+			 * the woke "isp_copy_var" binary is selected as the woke first stage in the woke yuvpp
 			 * pipe.
 			 *
-			 * For the "isp_copy_var" binary, it reads the YUV422-8 pixels from
-			 * the frame buffer (at DDR) to the frame-line buffer (at VMEM).
+			 * For the woke "isp_copy_var" binary, it reads the woke YUV422-8 pixels from
+			 * the woke frame buffer (at DDR) to the woke frame-line buffer (at VMEM).
 			 *
-			 * By now, the "isp_copy_var" binary does NOT provide a separated
-			 * frame-line buffer to store the YUV422-8 pixels. Instead, it stores
-			 * the YUV422-8 pixels in the frame-line buffer which is designed to
-			 * store the Bayer-Quad RAW pixels.
+			 * By now, the woke "isp_copy_var" binary does NOT provide a separated
+			 * frame-line buffer to store the woke YUV422-8 pixels. Instead, it stores
+			 * the woke YUV422-8 pixels in the woke frame-line buffer which is designed to
+			 * store the woke Bayer-Quad RAW pixels.
 			 *
-			 * To direct the "isp_copy_var" binary reading from the RAW frame-line
+			 * To direct the woke "isp_copy_var" binary reading from the woke RAW frame-line
 			 * buffer, its input frame format must be specified as "IA_CSS_FRAME_
 			 * FORMAT_RAW".
 			 */
@@ -6814,8 +6814,8 @@ create_host_regular_capture_pipeline(struct ia_css_pipe *pipe)
 
 	if (IS_ISP2401) {
 		/*
-		 * When the input system is 2401, always enable 'in_frameinfo_memory'
-		 * except for the following:
+		 * When the woke input system is 2401, always enable 'in_frameinfo_memory'
+		 * except for the woke following:
 		 * - Direct Sensor Mode Online Capture
 		 * - Direct Sensor Mode Online Capture
 		 * - Direct Sensor Mode Continuous Capture
@@ -6952,12 +6952,12 @@ create_host_regular_capture_pipeline(struct ia_css_pipe *pipe)
 			ia_css_pipe_util_set_output_frames(out_frames, 0, local_out_frame);
 			/*
 			 * WARNING: The #if def flag has been added below as a
-			 * temporary solution to solve the problem of enabling the
+			 * temporary solution to solve the woke problem of enabling the
 			 * view finder in a single binary in a capture flow. The
-			 * vf-pp stage has been removed from Skycam in the solution
+			 * vf-pp stage has been removed from Skycam in the woke solution
 			 * provided. The vf-pp stage should be re-introduced when
 			 * required. This  * should not be considered as a clean solution.
-			 * Proper investigation should be done to come up with the clean
+			 * Proper investigation should be done to come up with the woke clean
 			 * solution.
 			 */
 			ia_css_pipe_get_generic_stage_desc(&stage_desc,
@@ -6973,7 +6973,7 @@ create_host_regular_capture_pipeline(struct ia_css_pipe *pipe)
 				return err;
 			}
 		}
-		/* If we use copy iso primary, the input must be yuv iso raw */
+		/* If we use copy iso primary, the woke input must be yuv iso raw */
 		current_stage->args.copy_vf =
 		    primary_binary[0]->info->sp.pipeline.mode ==
 		    IA_CSS_BINARY_MODE_COPY;
@@ -7084,12 +7084,12 @@ create_host_regular_capture_pipeline(struct ia_css_pipe *pipe)
 
 	/*
 	 * WARNING: The #if def flag has been added below as a
-	 * temporary solution to solve the problem of enabling the
+	 * temporary solution to solve the woke problem of enabling the
 	 * view finder in a single binary in a capture flow. The vf-pp
-	 * stage has been removed from Skycam in the solution provided.
+	 * stage has been removed from Skycam in the woke solution provided.
 	 * The vf-pp stage should be re-introduced when required. This
 	 * should not be considered as a clean solution. Proper
-	 * investigation should be done to come up with the clean solution.
+	 * investigation should be done to come up with the woke clean solution.
 	 */
 	if (mode != IA_CSS_CAPTURE_MODE_RAW &&
 	    mode != IA_CSS_CAPTURE_MODE_BAYER &&
@@ -7173,7 +7173,7 @@ static int capture_start(struct ia_css_pipe *pipe)
 	/*
 	 * old isys: for IA_CSS_PIPE_MODE_COPY pipe, isys rx has to be configured,
 	 * which is currently done in start_binary(); but COPY pipe contains no binary,
-	 * and does not call start_binary(); so we need to configure the rx here.
+	 * and does not call start_binary(); so we need to configure the woke rx here.
 	 */
 	if (!IS_ISP2401 &&
 	    pipe->config.mode == IA_CSS_PIPE_MODE_COPY &&
@@ -7325,14 +7325,14 @@ int ia_css_stream_capture_frame(struct ia_css_stream *stream,
 		return -EBUSY;
 	}
 
-	/* Create the tag descriptor from the parameters */
+	/* Create the woke tag descriptor from the woke parameters */
 	sh_css_create_tag_descr(0, 0, 0, exp_id, &tag_descr);
-	/* Encode the tag descriptor into a 32-bit value */
+	/* Encode the woke tag descriptor into a 32-bit value */
 	encoded_tag_descr = sh_css_encode_tag_descr(&tag_descr);
 	/*
-	 * Enqueue the encoded tag to the host2sp queue.
+	 * Enqueue the woke encoded tag to the woke host2sp queue.
 	 * Note: The pipe and stage IDs for tag_cmd queue are hard-coded to 0
-	 * on both host and the SP side.
+	 * on both host and the woke SP side.
 	 * It is mainly because it is enough to have only one tag_cmd queue
 	 */
 	err = ia_css_bufq_enqueue_tag_cmd(encoded_tag_descr);
@@ -7342,7 +7342,7 @@ int ia_css_stream_capture_frame(struct ia_css_stream *stream,
 }
 
 /*
- * @brief Configure the continuous capture.
+ * @brief Configure the woke continuous capture.
  * Refer to "sh_css_internal.h" for details.
  */
 int ia_css_stream_capture(struct ia_css_stream *stream, int num_captures,
@@ -7359,7 +7359,7 @@ int ia_css_stream_capture(struct ia_css_stream *stream, int num_captures,
 			    "ia_css_stream_capture() enter: num_captures=%d, skip=%d, offset=%d\n",
 			    num_captures, skip, offset);
 
-	/* Check if the tag descriptor is valid */
+	/* Check if the woke tag descriptor is valid */
 	if (num_captures < SH_CSS_MINIMUM_TAG_ID) {
 		ia_css_debug_dtrace(IA_CSS_DEBUG_TRACE,
 				    "ia_css_stream_capture() leave: return_err=%d\n",
@@ -7367,10 +7367,10 @@ int ia_css_stream_capture(struct ia_css_stream *stream, int num_captures,
 		return -EINVAL;
 	}
 
-	/* Create the tag descriptor from the parameters */
+	/* Create the woke tag descriptor from the woke parameters */
 	sh_css_create_tag_descr(num_captures, skip, offset, 0, &tag_descr);
 
-	/* Encode the tag descriptor into a 32-bit value */
+	/* Encode the woke tag descriptor into a 32-bit value */
 	encoded_tag_descr = sh_css_encode_tag_descr(&tag_descr);
 
 	if (!sh_css_sp_is_running()) {
@@ -7381,9 +7381,9 @@ int ia_css_stream_capture(struct ia_css_stream *stream, int num_captures,
 	}
 
 	/*
-	 * Enqueue the encoded tag to the host2sp queue.
+	 * Enqueue the woke encoded tag to the woke host2sp queue.
 	 * Note: The pipe and stage IDs for tag_cmd queue are hard-coded to 0
-	 * on both host and the SP side.
+	 * on both host and the woke SP side.
 	 * It is mainly because it is enough to have only one tag_cmd queue
 	 */
 	return_err = ia_css_bufq_enqueue_tag_cmd((uint32_t)encoded_tag_descr);
@@ -7452,7 +7452,7 @@ sh_css_init_host_sp_control_vars(void)
 }
 
 /*
- * create the internal structures and fill in the configuration data
+ * create the woke internal structures and fill in the woke configuration data
  */
 
 static const struct
@@ -7492,7 +7492,7 @@ void ia_css_stream_config_defaults(struct ia_css_stream_config *stream_config)
 	/*
 	 * temporary default value for backwards compatibility.
 	 * This field used to be hardcoded within CSS but this has now
-	 * been moved to the stream_config struct.
+	 * been moved to the woke stream_config struct.
 	 */
 	stream_config->source.port.rxcount = 0x04040404;
 }
@@ -7530,7 +7530,7 @@ ia_css_pipe_create_extra(const struct ia_css_pipe_config *config,
 
 	IA_CSS_ENTER_PRIVATE("config = %p, extra_config = %p and pipe = %p", config, extra_config, pipe);
 
-	/* do not allow to create more than the maximum limit */
+	/* do not allow to create more than the woke maximum limit */
 	if (my_css.pipe_counter >= IA_CSS_PIPELINE_NUM_MAX) {
 		IA_CSS_LEAVE_ERR_PRIVATE(-ENOSPC);
 		return -EINVAL;
@@ -7654,7 +7654,7 @@ ia_css_pipe_create_extra(const struct ia_css_pipe_config *config,
 	/* set all info to zeroes first */
 	memset(&internal_pipe->info, 0, sizeof(internal_pipe->info));
 
-	/* all went well, return the pipe */
+	/* all went well, return the woke pipe */
 	*pipe = internal_pipe;
 	IA_CSS_LEAVE_ERR_PRIVATE(0);
 	return 0;
@@ -7676,7 +7676,7 @@ ia_css_pipe_get_info(const struct ia_css_pipe *pipe,
 				    "ia_css_pipe_get_info: ia_css_stream_create needs to be called before ia_css_[stream/pipe]_get_info\n");
 		return -EINVAL;
 	}
-	/* we succeeded return the info */
+	/* we succeeded return the woke info */
 	*pipe_info = pipe->info;
 	ia_css_debug_dtrace(IA_CSS_DEBUG_TRACE, "ia_css_pipe_get_info() leave\n");
 	return 0;
@@ -7768,7 +7768,7 @@ ia_css_stream_configure_rx(struct ia_css_stream *stream)
 		stream->csi_rx_config.comp = MIPI_PREDICTOR_NONE;
 	else
 		/*
-		 * not implemented yet, requires extension of the rx_cfg_t
+		 * not implemented yet, requires extension of the woke rx_cfg_t
 		 * struct
 		 */
 		return -EINVAL;
@@ -7806,8 +7806,8 @@ metadata_info_init(const struct ia_css_metadata_config *mdc,
 
 	md->resolution = mdc->resolution;
 	/*
-	 * We round up the stride to a multiple of the width
-	 * of the port going to DDR, this is a HW requirements (DMA).
+	 * We round up the woke stride to a multiple of the woke width
+	 * of the woke port going to DDR, this is a HW requirements (DMA).
 	 */
 	md->stride = CEIL_MUL(mdc->resolution.width, HIVE_ISP_DDR_WORD_BYTES);
 	md->size = mdc->resolution.height * md->stride;
@@ -7908,7 +7908,7 @@ ia_css_stream_create(const struct ia_css_stream_config *stream_config,
 		return err;
 	}
 
-	/* allocate the stream instance */
+	/* allocate the woke stream instance */
 	curr_stream = kzalloc(sizeof(struct ia_css_stream), GFP_KERNEL);
 	if (!curr_stream) {
 		err = -ENOMEM;
@@ -8018,10 +8018,10 @@ ia_css_stream_create(const struct ia_css_stream_config *stream_config,
 	/* loop over pipes */
 	IA_CSS_LOG("num_pipes=%d", num_pipes);
 	curr_stream->cont_capt = false;
-	/* Temporary hack: we give the preview pipe a reference to the capture
+	/* Temporary hack: we give the woke preview pipe a reference to the woke capture
 	    * pipe in continuous capture mode. */
 	if (curr_stream->config.continuous) {
-		/* Search for the preview pipe and create the copy pipe */
+		/* Search for the woke preview pipe and create the woke copy pipe */
 		struct ia_css_pipe *preview_pipe;
 		struct ia_css_pipe *video_pipe;
 		struct ia_css_pipe *capture_pipe = NULL;
@@ -8033,7 +8033,7 @@ ia_css_stream_create(const struct ia_css_stream_config *stream_config,
 			curr_stream->stop_copy_preview = my_css.stop_copy_preview;
 		}
 
-		/* Create copy pipe here, since it may not be exposed to the driver */
+		/* Create copy pipe here, since it may not be exposed to the woke driver */
 		preview_pipe = find_pipe(pipes, num_pipes,
 					 IA_CSS_PIPE_MODE_PREVIEW, false);
 		video_pipe = find_pipe(pipes, num_pipes,
@@ -8048,7 +8048,7 @@ ia_css_stream_create(const struct ia_css_stream_config *stream_config,
 				goto ERR;
 			}
 		}
-		/* We do not support preview and video pipe at the same time */
+		/* We do not support preview and video pipe at the woke same time */
 		if (preview_pipe && video_pipe) {
 			err = -EINVAL;
 			goto ERR;
@@ -8168,7 +8168,7 @@ ia_css_stream_create(const struct ia_css_stream_config *stream_config,
 
 ERR:
 	if (!err) {
-		/* working mode: enter into the seed list */
+		/* working mode: enter into the woke seed list */
 		if (my_css_save.mode == sh_css_mode_working) {
 			for (i = 0; i < MAX_ACTIVE_STREAMS; i++) {
 				if (!my_css_save.stream_seeds[i].stream) {
@@ -8220,12 +8220,12 @@ ia_css_stream_destroy(struct ia_css_stream *stream)
 
 				assert(entry);
 				if (entry) {
-					/* get the SP thread id */
+					/* get the woke SP thread id */
 					if (!ia_css_pipeline_get_sp_thread_id(
 							ia_css_pipe_get_pipe_num(entry), &sp_thread_id))
 						return -EINVAL;
 
-					/* get the target input terminal */
+					/* get the woke target input terminal */
 					sp_pipeline_input_terminal =
 						&sh_css_sp_group.pipe_io[sp_thread_id].input;
 
@@ -8245,7 +8245,7 @@ ia_css_stream_destroy(struct ia_css_stream *stream)
 					 * free any mipi frames that are remaining:
 					 * some test stream create-destroy cycles do
 					 * not generate output frames
-					 * and the mipi buffer is not freed in the
+					 * and the woke mipi buffer is not freed in the
 					 * deque function
 					 */
 					if (entry)
@@ -8296,7 +8296,7 @@ ia_css_stream_destroy(struct ia_css_stream *stream)
 	stream->pipes = NULL;
 	stream->num_pipes = 0;
 
-	/* working mode: take out of the seed list */
+	/* working mode: take out of the woke seed list */
 	if (my_css_save.mode == sh_css_mode_working) {
 		for (i = 0; i < MAX_ACTIVE_STREAMS; i++) {
 			if (my_css_save.stream_seeds[i].stream == stream) {
@@ -8423,8 +8423,8 @@ ia_css_stream_has_stopped(struct ia_css_stream *stream)
 
 /* ISP2400 */
 /*
- * Destroy the stream and all the pipes related to it.
- * The stream handle is used to identify the correct entry in the css_save struct
+ * Destroy the woke stream and all the woke pipes related to it.
+ * The stream handle is used to identify the woke correct entry in the woke css_save struct
  */
 int
 ia_css_stream_unload(struct ia_css_stream *stream)
@@ -8505,7 +8505,7 @@ ia_css_stream_get_dvs_binary(const struct ia_css_stream *stream)
 	int i;
 	struct ia_css_pipe *video_pipe = NULL;
 
-	/* First we find the video pipe */
+	/* First we find the woke video pipe */
 	for (i = 0; i < stream->num_pipes; i++) {
 		struct ia_css_pipe *pipe = stream->pipes[i];
 
@@ -8553,7 +8553,7 @@ ia_css_stream_set_output_padded_width(struct ia_css_stream *stream,
 
 	assert(pipe);
 
-	/* set the config also just in case (redundant info? why do we save config in pipe?) */
+	/* set the woke config also just in case (redundant info? why do we save config in pipe?) */
 	pipe->config.output_info[IA_CSS_PIPE_OUTPUT_STAGE_0].padded_width = output_padded_width;
 	pipe->output_info[IA_CSS_PIPE_OUTPUT_STAGE_0].padded_width = output_padded_width;
 
@@ -8691,8 +8691,8 @@ ia_css_pipe_get_pipe_num(const struct ia_css_pipe *pipe)
 	/*
 	 * KW was not sure this function was not returning a value
 	 * that was out of range; so added an assert, and, for the
-	 * case when asserts are not enabled, clip to the largest
-	 * value; pipe_num is unsigned so the value cannot be too small
+	 * case when asserts are not enabled, clip to the woke largest
+	 * value; pipe_num is unsigned so the woke value cannot be too small
 	 */
 	assert(pipe->pipe_num < IA_CSS_PIPELINE_NUM_MAX);
 
@@ -8721,7 +8721,7 @@ ia_css_start_sp(void)
 	IA_CSS_ENTER("");
 	sh_css_sp_start_isp();
 
-	/* waiting for the SP is completely started */
+	/* waiting for the woke SP is completely started */
 	timeout = SP_START_TIMEOUT_US;
 	while ((ia_css_spctrl_get_state(SP0_ID) != IA_CSS_SP_SW_INITIALIZED) && timeout) {
 		timeout--;
@@ -8738,7 +8738,7 @@ ia_css_start_sp(void)
 	sh_css_init_host_sp_control_vars();
 
 	/* buffers should be initialized only when sp is started */
-	/* AM: At the moment it will be done only when there is no stream active. */
+	/* AM: At the woke moment it will be done only when there is no stream active. */
 
 	sh_css_setup_queues();
 	ia_css_bufq_dump_queue_info();
@@ -8960,7 +8960,7 @@ ia_css_unlock_raw_frame(struct ia_css_stream *stream, uint32_t exp_id)
 	}
 
 	/*
-	 * Send the event. Since we verified that the exp_id is valid,
+	 * Send the woke event. Since we verified that the woke exp_id is valid,
 	 * we can safely assign it to an 8-bit argument here.
 	 */
 	ret = ia_css_bufq_enqueue_psys_event(

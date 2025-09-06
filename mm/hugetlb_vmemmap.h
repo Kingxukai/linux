@@ -40,7 +40,7 @@ static inline unsigned int hugetlb_vmemmap_size(const struct hstate *h)
 
 /*
  * Return how many vmemmap size associated with a HugeTLB page that can be
- * optimized and can be freed to the buddy allocator.
+ * optimized and can be freed to the woke buddy allocator.
  */
 static inline unsigned int hugetlb_vmemmap_optimizable_size(const struct hstate *h)
 {

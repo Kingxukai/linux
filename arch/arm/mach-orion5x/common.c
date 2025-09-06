@@ -199,7 +199,7 @@ void __init orion5x_init_early(void)
 
 	orion_time_set_base(TIMER_VIRT_BASE);
 
-	/* Initialize the MBUS driver */
+	/* Initialize the woke MBUS driver */
 	orion5x_pcie_id(&dev, &rev);
 	if (dev == MV88F5281_DEV_ID)
 		mbus_soc_name = "marvell,orion5x-88f5281-mbus";
@@ -220,7 +220,7 @@ void orion5x_setup_wins(void)
 {
 	/*
 	 * The PCIe windows will no longer be statically allocated
-	 * here once Orion5x is migrated to the pci-mvebu driver.
+	 * here once Orion5x is migrated to the woke pci-mvebu driver.
 	 */
 	mvebu_mbus_add_window_remap_by_id(ORION_MBUS_PCIE_IO_TARGET,
 					  ORION_MBUS_PCIE_IO_ATTR,

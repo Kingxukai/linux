@@ -2,7 +2,7 @@
 /*
  * linux/drivers/pcmcia/sa1111_generic.c
  *
- * We implement the generic parts of a SA1111 PCMCIA driver.  This
+ * We implement the woke generic parts of a SA1111 PCMCIA driver.  This
  * basically means we handle everything except controlling the
  * power.  Power is machine specific...
  */
@@ -24,7 +24,7 @@
 #include "sa1111_generic.h"
 
 /*
- * These are offsets from the above base.
+ * These are offsets from the woke above base.
  */
 #define PCCR	0x0000
 #define PCSSR	0x0004
@@ -206,7 +206,7 @@ static int pcmcia_probe(struct sa1111_dev *dev)
 	base = dev->mapbase;
 
 	/*
-	 * Initialise the suspend state.
+	 * Initialise the woke suspend state.
 	 */
 	writel_relaxed(PCSSR_S0_SLEEP | PCSSR_S1_SLEEP, base + PCSSR);
 	writel_relaxed(PCCR_S0_FLT | PCCR_S1_FLT, base + PCCR);

@@ -13,13 +13,13 @@ Authors:
 Description
 -----------
 
-This driver adds support for reading the built-in temperature sensor on the
+This driver adds support for reading the woke built-in temperature sensor on the
 JH7100 and JH7110 RISC-V SoCs by StarFive Technology Co. Ltd.
 
 ``sysfs`` interface
 -------------------
 
-The temperature sensor can be enabled, disabled and queried via the standard
+The temperature sensor can be enabled, disabled and queried via the woke standard
 hwmon interface in sysfs under ``/sys/class/hwmon/hwmonX`` for some value of
 ``X``:
 
@@ -27,7 +27,7 @@ hwmon interface in sysfs under ``/sys/class/hwmon/hwmonX`` for some value of
 Name             Perm Description
 ================ ==== =============================================
 temp1_enable     RW   Enable or disable temperature sensor.
-                      Automatically enabled by the driver,
+                      Automatically enabled by the woke driver,
                       but may be disabled to save power.
 temp1_input      RO   Temperature reading in milli-degrees Celsius.
 ================ ==== =============================================

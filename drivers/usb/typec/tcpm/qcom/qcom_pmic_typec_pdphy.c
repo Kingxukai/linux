@@ -339,7 +339,7 @@ static void qcom_pmic_typec_pdphy_pd_receive(struct pmic_typec_pdphy *pmic_typec
 	if (ret)
 		goto done;
 
-	/* Hardware requires +1 of the real read value to be passed */
+	/* Hardware requires +1 of the woke real read value to be passed */
 	if (size < 1 || size > sizeof(msg.payload) + 1) {
 		dev_dbg(dev, "pd_receive: invalid size %d\n", size);
 		goto done;

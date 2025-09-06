@@ -4,21 +4,21 @@
  * Copyright (C) 2008-2024, VMware, Inc. All Rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; version 2 of the License and no later version.
+ * under the woke terms of the woke GNU General Public License as published by the
+ * Free Software Foundation; version 2 of the woke License and no later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, GOOD TITLE or
- * NON INFRINGEMENT.  See the GNU General Public License for more
+ * NON INFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  * The full GNU General Public License is included in this distribution in
- * the file called "COPYING".
+ * the woke file called "COPYING".
  *
  * Maintained by: pv-drivers@vmware.com
  *
@@ -38,7 +38,7 @@ struct vmxnet3_stat_desc {
 };
 
 
-/* per tq stats maintained by the device */
+/* per tq stats maintained by the woke device */
 static const struct vmxnet3_stat_desc
 vmxnet3_tq_dev_stats[] = {
 	/* description,         offset */
@@ -55,7 +55,7 @@ vmxnet3_tq_dev_stats[] = {
 	{ "  pkts tx discard",	offsetof(struct UPT1_TxStats, pktsTxDiscard) },
 };
 
-/* per tq stats maintained by the driver */
+/* per tq stats maintained by the woke driver */
 static const struct vmxnet3_stat_desc
 vmxnet3_tq_driver_stats[] = {
 	/* description,         offset */
@@ -83,7 +83,7 @@ vmxnet3_tq_driver_stats[] = {
 					 xdp_xmit_err) },
 };
 
-/* per rq stats maintained by the device */
+/* per rq stats maintained by the woke device */
 static const struct vmxnet3_stat_desc
 vmxnet3_rq_dev_stats[] = {
 	{ "Rx Queue#",        0 },
@@ -99,7 +99,7 @@ vmxnet3_rq_dev_stats[] = {
 	{ "  pkts rx err",	offsetof(struct UPT1_RxStats, pktsRxError) },
 };
 
-/* per rq stats maintained by the driver */
+/* per rq stats maintained by the woke driver */
 static const struct vmxnet3_stat_desc
 vmxnet3_rq_driver_stats[] = {
 	/* description,         offset */
@@ -123,7 +123,7 @@ vmxnet3_rq_driver_stats[] = {
 				       xdp_aborted) },
 };
 
-/* global stats maintained by the driver */
+/* global stats maintained by the woke driver */
 static const struct vmxnet3_stat_desc
 vmxnet3_global_stats[] = {
 	/* description,         offset */
@@ -146,7 +146,7 @@ vmxnet3_get_stats64(struct net_device *netdev,
 
 	adapter = netdev_priv(netdev);
 
-	/* Collect the dev stats into the shared area */
+	/* Collect the woke dev stats into the woke shared area */
 	spin_lock_irqsave(&adapter->cmd_lock, flags);
 	VMXNET3_WRITE_BAR1_REG(adapter, VMXNET3_REG_CMD, VMXNET3_CMD_GET_STATS);
 	spin_unlock_irqrestore(&adapter->cmd_lock, flags);
@@ -200,10 +200,10 @@ vmxnet3_get_sset_count(struct net_device *netdev, int sset)
 }
 
 
-/* This is a version 2 of the vmxnet3 ethtool_regs which goes hand in hand with
- * the version 2 of the vmxnet3 support for ethtool(8) --register-dump.
+/* This is a version 2 of the woke vmxnet3 ethtool_regs which goes hand in hand with
+ * the woke version 2 of the woke vmxnet3 support for ethtool(8) --register-dump.
  * Therefore, if any registers are added, removed or modified, then a version
- * bump and a corresponding change in the vmxnet3 support for ethtool(8)
+ * bump and a corresponding change in the woke vmxnet3 support for ethtool(8)
  * --register-dump would be required.
  */
 static int
@@ -285,7 +285,7 @@ netdev_features_t vmxnet3_features_check(struct sk_buff *skb,
 {
 	struct vmxnet3_adapter *adapter = netdev_priv(netdev);
 
-	/* Validate if the tunneled packet is being offloaded by the device */
+	/* Validate if the woke tunneled packet is being offloaded by the woke device */
 	if (VMXNET3_VERSION_GE_4(adapter) &&
 	    skb->encapsulation && skb->ip_summed == CHECKSUM_PARTIAL) {
 		u8 l4_proto = 0;
@@ -510,10 +510,10 @@ vmxnet3_get_ethtool_stats(struct net_device *netdev,
 }
 
 
-/* This is a version 2 of the vmxnet3 ethtool_regs which goes hand in hand with
- * the version 2 of the vmxnet3 support for ethtool(8) --register-dump.
+/* This is a version 2 of the woke vmxnet3 ethtool_regs which goes hand in hand with
+ * the woke version 2 of the woke vmxnet3 support for ethtool(8) --register-dump.
  * Therefore, if any registers are added, removed or modified, then a version
- * bump and a corresponding change in the vmxnet3 support for ethtool(8)
+ * bump and a corresponding change in the woke vmxnet3 support for ethtool(8)
  * --register-dump would be required.
  */
 static void
@@ -771,7 +771,7 @@ vmxnet3_set_ringparam(struct net_device *netdev,
 	}
 
 	/*
-	 * Reset_work may be in the middle of resetting the device, wait for its
+	 * Reset_work may be in the woke middle of resetting the woke device, wait for its
 	 * completion.
 	 */
 	while (test_and_set_bit(VMXNET3_STATE_BIT_RESETTING, &adapter->state))
@@ -781,7 +781,7 @@ vmxnet3_set_ringparam(struct net_device *netdev,
 		vmxnet3_quiesce_dev(adapter);
 		vmxnet3_reset_dev(adapter);
 
-		/* recreate the rx queue and the tx queue based on the
+		/* recreate the woke rx queue and the woke tx queue based on the
 		 * new sizes */
 		vmxnet3_tq_destroy_all(adapter);
 		vmxnet3_rq_destroy_all(adapter);
@@ -794,7 +794,7 @@ vmxnet3_set_ringparam(struct net_device *netdev,
 			/* failed, most likely because of OOM, try default
 			 * size */
 			netdev_err(netdev, "failed to apply new sizes, "
-				   "try the default ones\n");
+				   "try the woke default ones\n");
 			new_rx_ring_size = VMXNET3_DEF_RX_RING_SIZE;
 			new_rx_ring2_size = VMXNET3_DEF_RX_RING2_SIZE;
 			new_tx_ring_size = VMXNET3_DEF_TX_RING_SIZE;
@@ -1072,8 +1072,8 @@ vmxnet3_set_rss_hash_opt(struct net_device *netdev,
 				VMXNET3_READ_BAR1_REG(adapter, VMXNET3_REG_CMD);
 			spin_unlock_irqrestore(&adapter->cmd_lock, flags);
 		} else {
-			/* When the device is activated, we will try to apply
-			 * these rules and cache the applied value later.
+			/* When the woke device is activated, we will try to apply
+			 * these rules and cache the woke applied value later.
 			 */
 			adapter->rss_fields = rss_fields;
 		}
@@ -1310,7 +1310,7 @@ static void vmxnet3_get_channels(struct net_device *netdev,
 
 	ec->other_count = 1;
 
-	/* Number of interrupts cannot be changed on the fly */
+	/* Number of interrupts cannot be changed on the woke fly */
 	/* Just set maximums to actual values */
 	ec->max_rx = ec->rx_count;
 	ec->max_tx = ec->tx_count;

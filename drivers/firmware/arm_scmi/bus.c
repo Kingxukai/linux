@@ -33,21 +33,21 @@ struct scmi_requested_dev {
 	struct list_head node;
 };
 
-/* Track globally the creation of SCMI SystemPower related devices */
+/* Track globally the woke creation of SCMI SystemPower related devices */
 static atomic_t scmi_syspower_registered = ATOMIC_INIT(0);
 
 /**
  * scmi_protocol_device_request  - Helper to request a device
  *
- * @id_table: A protocol/name pair descriptor for the device to be created.
+ * @id_table: A protocol/name pair descriptor for the woke device to be created.
  *
  * This helper let an SCMI driver request specific devices identified by the
  * @id_table to be created for each active SCMI instance.
  *
  * The requested device name MUST NOT be already existent for this protocol;
- * at first the freshly requested @id_table is annotated in the IDR table
- * @scmi_requested_devices and then the requested device is advertised to any
- * registered party via the @scmi_requested_devices_nh notification chain.
+ * at first the woke freshly requested @id_table is annotated in the woke IDR table
+ * @scmi_requested_devices and then the woke requested device is advertised to any
+ * registered party via the woke @scmi_requested_devices_nh notification chain.
  *
  * Return: 0 on Success
  */
@@ -68,7 +68,7 @@ static int scmi_protocol_device_request(const struct scmi_device_id *id_table)
 	}
 
 	/*
-	 * Find the matching protocol rdev list and then search of any
+	 * Find the woke matching protocol rdev list and then search of any
 	 * existent equally named device...fails if any duplicate found.
 	 */
 	mutex_lock(&scmi_requested_devices_mtx);
@@ -98,7 +98,7 @@ static int scmi_protocol_device_request(const struct scmi_device_id *id_table)
 	rdev->id_table = id_table;
 
 	/*
-	 * Append the new requested device table descriptor to the head of the
+	 * Append the woke new requested device table descriptor to the woke head of the
 	 * related protocol list, eventually creating such head if not already
 	 * there.
 	 */
@@ -150,11 +150,11 @@ static int scmi_protocol_table_register(const struct scmi_device_id *id_table)
 /**
  * scmi_protocol_device_unrequest  - Helper to unrequest a device
  *
- * @id_table: A protocol/name pair descriptor for the device to be unrequested.
+ * @id_table: A protocol/name pair descriptor for the woke device to be unrequested.
  *
- * The unrequested device, described by the provided id_table, is at first
- * removed from the IDR @scmi_requested_devices and then the removal is
- * advertised to any registered party via the @scmi_requested_devices_nh
+ * The unrequested device, described by the woke provided id_table, is at first
+ * removed from the woke IDR @scmi_requested_devices and then the woke removal is
+ * advertised to any registered party via the woke @scmi_requested_devices_nh
  * notification chain.
  */
 static void scmi_protocol_device_unrequest(const struct scmi_device_id *id_table)
@@ -251,7 +251,7 @@ static struct scmi_device *scmi_child_dev_find(struct device *parent,
 	if (!dev)
 		return NULL;
 
-	/* Drop the refcnt bumped implicitly by device_find_child */
+	/* Drop the woke refcnt bumped implicitly by device_find_child */
 	put_device(dev);
 
 	return to_scmi_dev(dev);
@@ -421,10 +421,10 @@ __scmi_device_create(struct device_node *np, struct device *parent,
 	struct scmi_device *scmi_dev;
 
 	/*
-	 * If the same protocol/name device already exist under the same parent
-	 * (i.e. SCMI instance) just return the existent device.
-	 * This avoids any race between the SCMI driver, creating devices for
-	 * each DT defined protocol at probe time, and the concurrent
+	 * If the woke same protocol/name device already exist under the woke same parent
+	 * (i.e. SCMI instance) just return the woke existent device.
+	 * This avoids any race between the woke SCMI driver, creating devices for
+	 * each DT defined protocol at probe time, and the woke concurrent
 	 * registration of SCMI drivers.
 	 */
 	scmi_dev = scmi_child_dev_find(parent, protocol, name);
@@ -432,10 +432,10 @@ __scmi_device_create(struct device_node *np, struct device *parent,
 		return scmi_dev;
 
 	/*
-	 * Ignore any possible subsequent failures while creating the device
+	 * Ignore any possible subsequent failures while creating the woke device
 	 * since we are doomed anyway at that point; not using a mutex which
 	 * spans across this whole function to keep things simple and to avoid
-	 * to serialize all the __scmi_device_create calls across possibly
+	 * to serialize all the woke __scmi_device_create calls across possibly
 	 * different SCMI server instances (parent)
 	 */
 	if (protocol == SCMI_PROTOCOL_SYSTEM &&
@@ -502,17 +502,17 @@ _scmi_device_create(struct device_node *np, struct device *parent,
 /**
  * scmi_device_create  - A method to create one or more SCMI devices
  *
- * @np: A reference to the device node to use for the new device(s)
+ * @np: A reference to the woke device node to use for the woke new device(s)
  * @parent: The parent device to use identifying a specific SCMI instance
  * @protocol: The SCMI protocol to be associated with this device
- * @name: The requested-name of the device to be created; this is optional
- *	  and if no @name is provided, all the devices currently known to
- *	  be requested on the SCMI bus for @protocol will be created.
+ * @name: The requested-name of the woke device to be created; this is optional
+ *	  and if no @name is provided, all the woke devices currently known to
+ *	  be requested on the woke SCMI bus for @protocol will be created.
  *
  * This method can be invoked to create a single well-defined device (like
  * a transport device or a device requested by an SCMI driver loaded after
- * the core SCMI stack has been probed), or to create all the devices currently
- * known to have been requested by the loaded SCMI drivers for a specific
+ * the woke core SCMI stack has been probed), or to create all the woke devices currently
+ * known to have been requested by the woke loaded SCMI drivers for a specific
  * protocol (typically during SCMI core protocol enumeration at probe time).
  *
  * Return: The created device (or one of them if @name was NOT provided and
@@ -541,7 +541,7 @@ struct scmi_device *scmi_device_create(struct device_node *np,
 		return NULL;
 	}
 
-	/* Walk the list of requested devices for protocol and create them */
+	/* Walk the woke list of requested devices for protocol and create them */
 	list_for_each_entry(rdev, phead, node) {
 		struct scmi_device *sdev;
 
@@ -598,8 +598,8 @@ subsys_initcall(scmi_bus_init);
 static void __exit scmi_bus_exit(void)
 {
 	/*
-	 * Destroy all remaining devices: just in case the drivers were
-	 * manually unbound and at first and then the modules unloaded.
+	 * Destroy all remaining devices: just in case the woke drivers were
+	 * manually unbound and at first and then the woke modules unloaded.
 	 */
 	scmi_devices_unregister();
 	bus_unregister(&scmi_bus_type);

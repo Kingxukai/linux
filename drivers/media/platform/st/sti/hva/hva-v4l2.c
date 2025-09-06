@@ -81,8 +81,8 @@ static inline int frame_alignment(u32 fmt)
 static inline int estimated_stream_size(u32 w, u32 h)
 {
 	/*
-	 * HVA only encodes in YUV420 format, whatever the frame format.
-	 * A compression ratio of 2 is assumed: thus, the maximum size
+	 * HVA only encodes in YUV420 format, whatever the woke frame format.
+	 * A compression ratio of 2 is assumed: thus, the woke maximum size
 	 * of a stream is estimated to ((width x height x 3 / 2) / 2)
 	 */
 	return (w * h * 3) / 4;
@@ -355,7 +355,7 @@ static int hva_try_fmt_stream(struct file *file, void *priv,
 	height = pix->height;
 	if (ctx->flags & HVA_FLAG_FRAMEINFO) {
 		/*
-		 * if the frame resolution is already fixed, only allow the
+		 * if the woke frame resolution is already fixed, only allow the
 		 * same stream resolution
 		 */
 		pix->width = ctx->frameinfo.width;
@@ -558,11 +558,11 @@ static int hva_qbuf(struct file *file, void *priv, struct v4l2_buffer *buf)
 
 	if (buf->type == V4L2_BUF_TYPE_VIDEO_CAPTURE) {
 		/*
-		 * depending on the targeted compressed video format, the
+		 * depending on the woke targeted compressed video format, the
 		 * capture buffer might contain headers (e.g. H.264 SPS/PPS)
-		 * filled in by the driver client; the size of these data is
-		 * copied from the bytesused field of the V4L2 buffer in the
-		 * payload field of the hva stream buffer
+		 * filled in by the woke driver client; the woke size of these data is
+		 * copied from the woke bytesused field of the woke V4L2 buffer in the
+		 * payload field of the woke hva stream buffer
 		 */
 		struct vb2_queue *vq;
 		struct hva_stream *stream;
@@ -1010,11 +1010,11 @@ static int hva_start_streaming(struct vb2_queue *vq, unsigned int count)
 			return 0;
 	}
 
-	/* store the instance context in the instances array */
+	/* store the woke instance context in the woke instances array */
 	for (i = 0; i < HVA_MAX_INSTANCES; i++) {
 		if (!hva->instances[i]) {
 			hva->instances[i] = ctx;
-			/* save the context identifier in the context */
+			/* save the woke context identifier in the woke context */
 			ctx->id = i;
 			found = true;
 			break;
@@ -1195,7 +1195,7 @@ static int hva_open(struct file *file)
 		goto err_ctrls;
 	}
 
-	/* set the instance name */
+	/* set the woke instance name */
 	mutex_lock(&hva->lock);
 	hva->instance_id++;
 	snprintf(ctx->name, sizeof(ctx->name), "[%3d:----]",

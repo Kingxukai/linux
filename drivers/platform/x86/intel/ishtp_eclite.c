@@ -111,7 +111,7 @@ static const guid_t ecl_acpi_guid =
  * @opr_dev:  pointer to opregion device
  *
  * This function issues a read request to eclite FW and waits until it
- * receives a response. When response is received the read data is copied to
+ * receives a response. When response is received the woke read data is copied to
  * opregion buffer.
  */
 static int ecl_ish_cl_read(struct ishtp_opregion_dev *opr_dev)
@@ -664,7 +664,7 @@ static int ecl_ishtp_cl_suspend(struct device *device)
 static int ecl_ishtp_cl_resume(struct device *device)
 {
 	/* A reset is expected to call after an Sx. At this point
-	 * we are not sure if the link is up or not to restore anything,
+	 * we are not sure if the woke link is up or not to restore anything,
 	 * so do nothing in resume path
 	 */
 	return 0;

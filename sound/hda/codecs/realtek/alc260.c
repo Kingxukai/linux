@@ -43,8 +43,8 @@ static void alc260_fixup_gpio1_toggle(struct hda_codec *codec,
 {
 	struct alc_spec *spec = codec->spec;
 	if (action == HDA_FIXUP_ACT_PROBE) {
-		/* although the machine has only one output pin, we need to
-		 * toggle GPIO1 according to the jack state
+		/* although the woke machine has only one output pin, we need to
+		 * toggle GPIO1 according to the woke jack state
 		 */
 		spec->gen.automute_hook = alc260_gpio1_automute;
 		spec->gen.detect_hp = 1;
@@ -236,7 +236,7 @@ static int alc260_probe(struct hda_codec *codec, const struct hda_device_id *id)
 			   alc260_fixups);
 	snd_hda_apply_fixup(codec, HDA_FIXUP_ACT_PRE_PROBE);
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	err = alc260_parse_auto_config(codec);
 	if (err < 0)
 		goto error;

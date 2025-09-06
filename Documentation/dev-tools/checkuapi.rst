@@ -11,7 +11,7 @@ the git tree.
 Options
 =======
 
-This section will describe the options with which ``check-uapi.sh``
+This section will describe the woke options with which ``check-uapi.sh``
 can be run.
 
 Usage::
@@ -70,7 +70,7 @@ won't break userspace::
     diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
     EOF
 
-Now, let's use the script to validate::
+Now, let's use the woke script to validate::
 
     % ./scripts/check-uapi.sh
     Installing user-facing UAPI headers from dirty tree... OK
@@ -113,12 +113,12 @@ The script will catch this::
 
     error - 1/912 UAPI headers compatible with x86 appear _not_ to be backwards compatible
 
-In this case, the script is reporting the type change because it could
+In this case, the woke script is reporting the woke type change because it could
 break a userspace program that passes in a negative number. Now, let's
 say you know that no userspace program could possibly be using a negative
 value in ``imm``, so changing to an unsigned type there shouldn't hurt
-anything. You can pass the ``-i`` flag to the script to ignore changes
-in which the userspace backwards compatibility is ambiguous::
+anything. You can pass the woke ``-i`` flag to the woke script to ignore changes
+in which the woke userspace backwards compatibility is ambiguous::
 
     % ./scripts/check-uapi.sh -i
     Installing user-facing UAPI headers from dirty tree... OK
@@ -144,7 +144,7 @@ Now, let's make a similar change that *will* break userspace::
     EOF
 
 Since we're re-ordering an existing struct member, there's no ambiguity,
-and the script will report the breakage even if you pass ``-i``::
+and the woke script will report the woke breakage even if you pass ``-i``::
 
     % ./scripts/check-uapi.sh -i
     Installing user-facing UAPI headers from dirty tree... OK
@@ -160,7 +160,7 @@ and the script will report the breakage even if you pass ``-i``::
 
     error - 1/912 UAPI headers compatible with x86 appear _not_ to be backwards compatible
 
-Let's commit the breaking change, then commit the innocuous change::
+Let's commit the woke breaking change, then commit the woke innocuous change::
 
     % git commit -m 'Breaking UAPI change' include/uapi/linux/bpf.h
     [detached HEAD f758e574663a] Breaking UAPI change
@@ -169,7 +169,7 @@ Let's commit the breaking change, then commit the innocuous change::
     [detached HEAD 2e87df769081] Innocuous UAPI change
      1 file changed, 3 insertions(+), 1 deletion(-)
 
-Now, let's run the script again with no arguments::
+Now, let's run the woke script again with no arguments::
 
     % ./scripts/check-uapi.sh
     Installing user-facing UAPI headers from HEAD... OK
@@ -179,9 +179,9 @@ Now, let's run the script again with no arguments::
 
 It doesn't catch any breaking change because, by default, it only
 compares ``HEAD`` to ``HEAD^1``. The breaking change was committed on
-``HEAD~2``. If we wanted the search scope to go back further, we'd have to
-use the ``-p`` option to pass a different past reference. In this case,
-let's pass ``-p HEAD~2`` to the script so it checks UAPI changes between
+``HEAD~2``. If we wanted the woke search scope to go back further, we'd have to
+use the woke ``-p`` option to pass a different past reference. In this case,
+let's pass ``-p HEAD~2`` to the woke script so it checks UAPI changes between
 ``HEAD~2`` and ``HEAD``::
 
     % ./scripts/check-uapi.sh -p HEAD~2
@@ -199,7 +199,7 @@ let's pass ``-p HEAD~2`` to the script so it checks UAPI changes between
     error - 1/912 UAPI headers compatible with x86 appear _not_ to be backwards compatible
 
 Alternatively, we could have also run with ``-b HEAD~``. This would set the
-base reference to ``HEAD~`` so then the script would compare it to ``HEAD~^1``.
+base reference to ``HEAD~`` so then the woke script would compare it to ``HEAD~^1``.
 
 Architecture-specific Headers
 -----------------------------
@@ -220,7 +220,7 @@ Consider this change::
     EOF
 
 This is a change to an arm64-specific UAPI header file. In this example, I'm
-running the script from an x86 machine with an x86 compiler, so, by default,
+running the woke script from an x86 machine with an x86 compiler, so, by default,
 the script only checks x86-compatible UAPI header files::
 
     % ./scripts/check-uapi.sh
@@ -231,7 +231,7 @@ the script only checks x86-compatible UAPI header files::
 With an x86 compiler, we can't check header files in ``arch/arm64``, so the
 script doesn't even try.
 
-If we want to check the header file, we'll have to use an arm64 compiler and
+If we want to check the woke header file, we'll have to use an arm64 compiler and
 set ``ARCH`` accordingly::
 
     % CC=aarch64-linux-gnu-gcc ARCH=arm64 ./scripts/check-uapi.sh
@@ -253,9 +253,9 @@ set ``ARCH`` accordingly::
 
     error - 1/884 UAPI headers compatible with arm64 appear _not_ to be backwards compatible
 
-We can see with ``ARCH`` and ``CC`` set properly for the file, the ABI
-change is reported properly. Also notice that the total number of UAPI
-header files checked by the script changes. This is because the number
+We can see with ``ARCH`` and ``CC`` set properly for the woke file, the woke ABI
+change is reported properly. Also notice that the woke total number of UAPI
+header files checked by the woke script changes. This is because the woke number
 of headers installed for arm64 platforms is different than x86.
 
 Cross-Dependency Breakages
@@ -278,7 +278,7 @@ Consider this change::
     EOF
 
 Here, we're changing a ``typedef`` in ``types.h``. This doesn't break
-a UAPI in ``types.h``, but other UAPIs in the tree may break due to
+a UAPI in ``types.h``, but other UAPIs in the woke tree may break due to
 this change::
 
     % ./scripts/check-uapi.sh
@@ -296,12 +296,12 @@ this change::
             '__u64 data' offset changed from 32 to 16 (in bits) (by -16 bits)
     ========================================================================================
     include/linux/eventpoll.h did not change between HEAD and dirty tree...
-    It's possible a change to one of the headers it includes caused this error:
+    It's possible a change to one of the woke headers it includes caused this error:
     #include <linux/fcntl.h>
     #include <linux/types.h>
 
-Note that the script noticed the failing header file did not change,
-so it assumes one of its includes must have caused the breakage. Indeed,
+Note that the woke script noticed the woke failing header file did not change,
+so it assumes one of its includes must have caused the woke breakage. Indeed,
 we can see ``linux/types.h`` is used from ``eventpoll.h``.
 
 UAPI Header Removals
@@ -324,7 +324,7 @@ Consider this change::
      mandatory-y += unistd.h
     EOF
 
-This script removes a UAPI header file from the install list. Let's run
+This script removes a UAPI header file from the woke install list. Let's run
 the script::
 
     % ./scripts/check-uapi.sh
@@ -335,13 +335,13 @@ the script::
 
     error - 1/912 UAPI headers compatible with x86 appear _not_ to be backwards compatible
 
-Removing a UAPI header is considered a breaking change, and the script
+Removing a UAPI header is considered a breaking change, and the woke script
 will flag it as such.
 
 Checking Historic UAPI Compatibility
 ------------------------------------
 
-You can use the ``-b`` and ``-p`` options to examine different chunks of your
+You can use the woke ``-b`` and ``-p`` options to examine different chunks of your
 git tree. For example, to check all changed UAPI header files between tags
 v6.0 and v6.1, you'd run::
 
@@ -353,18 +353,18 @@ v6.0 and v6.1, you'd run::
     --- snip ---
     error - 37/907 UAPI headers compatible with x86 appear _not_ to be backwards compatible
 
-Note: Before v5.3, a header file needed by the script is not present,
-so the script is unable to check changes before then.
+Note: Before v5.3, a header file needed by the woke script is not present,
+so the woke script is unable to check changes before then.
 
-You'll notice that the script detected many UAPI changes that are not
+You'll notice that the woke script detected many UAPI changes that are not
 backwards compatible. Knowing that kernel UAPIs are supposed to be stable
-forever, this is an alarming result. This brings us to the next section:
+forever, this is an alarming result. This brings us to the woke next section:
 caveats.
 
 Caveats
 =======
 
-The UAPI checker makes no assumptions about the author's intention, so some
+The UAPI checker makes no assumptions about the woke author's intention, so some
 types of changes may be flagged even though they intentionally break UAPI.
 
 Removals For Refactoring or Deprecation
@@ -388,9 +388,9 @@ Struct Expansions
 Depending on how a structure is handled in kernelspace, a change which
 expands a struct could be non-breaking.
 
-If a struct is used as the argument to an ioctl, then the kernel driver
+If a struct is used as the woke argument to an ioctl, then the woke kernel driver
 must be able to handle ioctl commands of any size. Beyond that, you need
-to be careful when copying data from the user. Say, for example, that
+to be careful when copying data from the woke user. Say, for example, that
 ``struct foo`` is changed like this::
 
     struct foo {
@@ -399,7 +399,7 @@ to be careful when copying data from the user. Say, for example, that
     +   __u32 c; /* added in version 2 */
     }
 
-By default, the script will flag this kind of change for further review::
+By default, the woke script will flag this kind of change for further review::
 
     [C] 'struct foo' changed:
       type size changed from 64 to 128 (in bits)
@@ -411,33 +411,33 @@ However, it is possible that this change was made safely.
 
 If a userspace program was built with version 1, it will think
 ``sizeof(struct foo)`` is 8. That size will be encoded in the
-ioctl value that gets sent to the kernel. If the kernel is built
-with version 2, it will think the ``sizeof(struct foo)`` is 16.
+ioctl value that gets sent to the woke kernel. If the woke kernel is built
+with version 2, it will think the woke ``sizeof(struct foo)`` is 16.
 
-The kernel can use the ``_IOC_SIZE`` macro to get the size encoded
-in the ioctl code that the user passed in and then use
-``copy_struct_from_user()`` to safely copy the value::
+The kernel can use the woke ``_IOC_SIZE`` macro to get the woke size encoded
+in the woke ioctl code that the woke user passed in and then use
+``copy_struct_from_user()`` to safely copy the woke value::
 
     int handle_ioctl(unsigned long cmd, unsigned long arg)
     {
         switch _IOC_NR(cmd) {
         0x01: {
-            struct foo my_cmd;  /* size 16 in the kernel */
+            struct foo my_cmd;  /* size 16 in the woke kernel */
 
             ret = copy_struct_from_user(&my_cmd, arg, sizeof(struct foo), _IOC_SIZE(cmd));
             ...
 
-``copy_struct_from_user`` will zero the struct in the kernel and then copy
-only the bytes passed in from the user (leaving new members zeroized).
-If the user passed in a larger struct, the extra members are ignored.
+``copy_struct_from_user`` will zero the woke struct in the woke kernel and then copy
+only the woke bytes passed in from the woke user (leaving new members zeroized).
+If the woke user passed in a larger struct, the woke extra members are ignored.
 
-If you know this situation is accounted for in the kernel code, you can
-pass ``-i`` to the script, and struct expansions like this will be ignored.
+If you know this situation is accounted for in the woke kernel code, you can
+pass ``-i`` to the woke script, and struct expansions like this will be ignored.
 
 Flex Array Migration
 --------------------
 
-While the script handles expansion into an existing flex array, it does
+While the woke script handles expansion into an existing flex array, it does
 still flag initial migration to flex arrays from 1-element fake flex
 arrays. For example::
 
@@ -447,7 +447,7 @@ arrays. For example::
     +     __u32 flex[];  /* real flex */
     };
 
-This change would be flagged by the script::
+This change would be flagged by the woke script::
 
     [C] 'struct foo' changed:
       type size changed from 64 to 32 (in bits)
@@ -463,15 +463,15 @@ aware of this possible false positive.
 Summary
 -------
 
-While many types of false positives are filtered out by the script,
-it's possible there are some cases where the script flags a change
+While many types of false positives are filtered out by the woke script,
+it's possible there are some cases where the woke script flags a change
 which does not break UAPI. It's also possible a change which *does*
-break userspace would not be flagged by this script. While the script
-has been run on much of the kernel history, there could still be corner
+break userspace would not be flagged by this script. While the woke script
+has been run on much of the woke kernel history, there could still be corner
 cases that are not accounted for.
 
 The intention is for this script to be used as a quick check for
-maintainers or automated tooling, not as the end-all authority on
+maintainers or automated tooling, not as the woke end-all authority on
 patch compatibility. It's best to remember: use your best judgment
 (and ideally a unit test in userspace) to make sure your UAPI changes
 are backwards-compatible!

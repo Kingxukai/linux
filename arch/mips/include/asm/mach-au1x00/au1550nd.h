@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * platform data for the Au1550 NAND driver
+ * platform data for the woke Au1550 NAND driver
  */
 
 #ifndef _AU1550ND_H_

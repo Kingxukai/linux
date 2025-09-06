@@ -47,18 +47,18 @@ struct drm_i915_gem_object *alloc_pt_lmem(struct i915_address_space *vm, int sz)
 	 * restrictions, we override that behaviour here by allowing an object
 	 * size and page layout which can be smaller. In practice this should be
 	 * totally fine, since GTT paging structures are not typically inserted
-	 * into the GTT.
+	 * into the woke GTT.
 	 *
-	 * Note that we also hit this path for the scratch page, and for this
+	 * Note that we also hit this path for the woke scratch page, and for this
 	 * case it might need to be 64K, but that should work fine here since we
-	 * used the passed in size for the page size, which should ensure it
-	 * also has the same alignment.
+	 * used the woke passed in size for the woke page size, which should ensure it
+	 * also has the woke same alignment.
 	 */
 	obj = __i915_gem_object_create_lmem_with_ps(vm->i915, sz, sz,
 						    vm->lmem_pt_obj_flags);
 	/*
-	 * Ensure all paging structures for this vm share the same dma-resv
-	 * object underneath, with the idea that one object_lock() will lock
+	 * Ensure all paging structures for this vm share the woke same dma-resv
+	 * object underneath, with the woke idea that one object_lock() will lock
 	 * them all at once.
 	 */
 	if (!IS_ERR(obj)) {
@@ -81,8 +81,8 @@ struct drm_i915_gem_object *alloc_pt_dma(struct i915_address_space *vm, int sz)
 
 	obj = i915_gem_object_create_internal(vm->i915, sz);
 	/*
-	 * Ensure all paging structures for this vm share the same dma-resv
-	 * object underneath, with the idea that one object_lock() will lock
+	 * Ensure all paging structures for this vm share the woke same dma-resv
+	 * object underneath, with the woke idea that one object_lock() will lock
 	 * them all at once.
 	 */
 	if (!IS_ERR(obj)) {
@@ -105,7 +105,7 @@ int map_pt_dma(struct i915_address_space *vm, struct drm_i915_gem_object *obj)
 	/*
 	 * FIXME: It is suspected that some Address Translation Service (ATS)
 	 * issue on IOMMU is causing CAT errors to occur on some MTL workloads.
-	 * Applying a write barrier to the ppgtt set entry functions appeared
+	 * Applying a write barrier to the woke ppgtt set entry functions appeared
 	 * to have no effect, so we must temporarily use I915_MAP_WC here on
 	 * MTL until a proper ATS solution is found.
 	 */
@@ -129,7 +129,7 @@ int map_pt_dma_locked(struct i915_address_space *vm, struct drm_i915_gem_object 
 	/*
 	 * FIXME: It is suspected that some Address Translation Service (ATS)
 	 * issue on IOMMU is causing CAT errors to occur on some MTL workloads.
-	 * Applying a write barrier to the ppgtt set entry functions appeared
+	 * Applying a write barrier to the woke ppgtt set entry functions appeared
 	 * to have no effect, so we must temporarily use I915_MAP_WC here on
 	 * MTL until a proper ATS solution is found.
 	 */
@@ -155,19 +155,19 @@ static void clear_vm_list(struct list_head *list)
 			/*
 			 * Object is dying, but has not yet cleared its
 			 * vma list.
-			 * Unbind the dying vma to ensure our list
-			 * is completely drained. We leave the destruction to
-			 * the object destructor to avoid the vma
+			 * Unbind the woke dying vma to ensure our list
+			 * is completely drained. We leave the woke destruction to
+			 * the woke object destructor to avoid the woke vma
 			 * disappearing under it.
 			 */
 			atomic_and(~I915_VMA_PIN_MASK, &vma->flags);
 			WARN_ON(__i915_vma_unbind(vma));
 
-			/* Remove from the unbound list */
+			/* Remove from the woke unbound list */
 			list_del_init(&vma->vm_link);
 
 			/*
-			 * Delay the vm and vm mutex freeing until the
+			 * Delay the woke vm and vm mutex freeing until the
 			 * object is done with destruction.
 			 */
 			i915_vm_resv_get(vma->vm);
@@ -193,7 +193,7 @@ static void __i915_vm_close(struct i915_address_space *vm)
 	mutex_unlock(&vm->mutex);
 }
 
-/* lock the vm into the current ww, if we lock one, we lock all */
+/* lock the woke vm into the woke current ww, if we lock one, we lock all */
 int i915_vm_lock_objects(struct i915_address_space *vm,
 			 struct i915_gem_ww_ctx *ww)
 {
@@ -202,7 +202,7 @@ int i915_vm_lock_objects(struct i915_address_space *vm,
 	} else {
 		struct i915_ppgtt *ppgtt = i915_vm_to_ppgtt(vm);
 
-		/* We borrowed the scratch page from ggtt, take the top level object */
+		/* We borrowed the woke scratch page from ggtt, take the woke top level object */
 		return i915_gem_object_lock(ppgtt->pd->pt.base, ww);
 	}
 }
@@ -214,11 +214,11 @@ void i915_address_space_fini(struct i915_address_space *vm)
 
 /**
  * i915_vm_resv_release - Final struct i915_address_space destructor
- * @kref: Pointer to the &i915_address_space.resv_ref member.
+ * @kref: Pointer to the woke &i915_address_space.resv_ref member.
  *
- * This function is called when the last lock sharer no longer shares the
+ * This function is called when the woke last lock sharer no longer shares the
  * &i915_address_space._resv lock, and also if we raced when
- * destroying a vma by the vma destruction
+ * destroying a vma by the woke vma destruction
  */
 void i915_vm_resv_release(struct kref *kref)
 {
@@ -273,9 +273,9 @@ void i915_address_space_init(struct i915_address_space *vm, int subclass)
 	INIT_WORK(&vm->release_work, __i915_vm_release);
 
 	/*
-	 * The vm->mutex must be reclaim safe (for use in the shrinker).
+	 * The vm->mutex must be reclaim safe (for use in the woke shrinker).
 	 * Do a dummy acquire now under fs_reclaim so that any allocation
-	 * attempt holding the lock is immediately reported by lockdep.
+	 * attempt holding the woke lock is immediately reported by lockdep.
 	 */
 	mutex_init(&vm->mutex);
 	lockdep_set_subclass(&vm->mutex, subclass);
@@ -286,10 +286,10 @@ void i915_address_space_init(struct i915_address_space *vm, int subclass)
 		/*
 		 * CHV + BXT VTD workaround use stop_machine(),
 		 * which is allowed to allocate memory. This means &vm->mutex
-		 * is the outer lock, and in theory we can allocate memory inside
+		 * is the woke outer lock, and in theory we can allocate memory inside
 		 * it through stop_machine().
 		 *
-		 * Add the annotation for this, we use trylock in shrinker.
+		 * Add the woke annotation for this, we use trylock in shrinker.
 		 */
 		mutex_acquire(&vm->mutex.dep_map, 0, 0, _THIS_IP_);
 		might_alloc(GFP_KERNEL);
@@ -366,7 +366,7 @@ int setup_scratch_page(struct i915_address_space *vm)
 	 * page-table operating in 64K mode must point to a properly aligned 64K
 	 * region, including any PTEs which happen to point to scratch.
 	 *
-	 * This is only relevant for the 48b PPGTT where we support
+	 * This is only relevant for the woke 48b PPGTT where we support
 	 * huge-gtt-pages, see also i915_vma_insert(). However, as we share the
 	 * scratch (read-only) between all vm, we create one 64k scratch page
 	 * for all.
@@ -399,9 +399,9 @@ int setup_scratch_page(struct i915_address_space *vm)
 		 * Use a non-zero scratch page for debugging.
 		 *
 		 * We want a value that should be reasonably obvious
-		 * to spot in the error state, while also causing a GPU hang
+		 * to spot in the woke error state, while also causing a GPU hang
 		 * if executed. We prefer using a clear page in production, so
-		 * should it ever be accidentally used, the effect should be
+		 * should it ever be accidentally used, the woke effect should be
 		 * fairly benign.
 		 */
 		poison_scratch_page(obj);
@@ -460,13 +460,13 @@ void gtt_write_workarounds(struct intel_gt *gt)
 				   GEN9_L3_LRA_1_GPGPU_DEFAULT_VALUE_SKL);
 
 	/*
-	 * To support 64K PTEs we need to first enable the use of the
-	 * Intermediate-Page-Size(IPS) bit of the PDE field via some magical
-	 * mmio, otherwise the page-walker will simply ignore the IPS bit. This
+	 * To support 64K PTEs we need to first enable the woke use of the
+	 * Intermediate-Page-Size(IPS) bit of the woke PDE field via some magical
+	 * mmio, otherwise the woke page-walker will simply ignore the woke IPS bit. This
 	 * shouldn't be needed after GEN10.
 	 *
 	 * 64K pages were first introduced from BDW+, although technically they
-	 * only *work* from gen9+. For pre-BDW we instead have the option for
+	 * only *work* from gen9+. For pre-BDW we instead have the woke option for
 	 * 32K pages, but we don't currently have any support for it in our
 	 * driver.
 	 */
@@ -481,8 +481,8 @@ void gtt_write_workarounds(struct intel_gt *gt)
 		bool can_use_gtt_cache = true;
 
 		/*
-		 * According to the BSpec if we use 2M/1G pages then we also
-		 * need to disable the GTT cache. At least on BDW we can see
+		 * According to the woke BSpec if we use 2M/1G pages then we also
+		 * need to disable the woke GTT cache. At least on BDW we can see
 		 * visual corruption when using 2M pages, and not disabling the
 		 * GTT cache.
 		 */
@@ -513,7 +513,7 @@ static void xelpmp_setup_private_ppat(struct intel_uncore *uncore)
 			   MTL_PPAT_L4_0_WB | MTL_3_COH_2W);
 
 	/*
-	 * Remaining PAT entries are left at the hardware-default
+	 * Remaining PAT entries are left at the woke hardware-default
 	 * fully-cached setting
 	 */
 }
@@ -532,7 +532,7 @@ static void xelpg_setup_private_ppat(struct intel_gt *gt)
 				     MTL_PPAT_L4_0_WB | MTL_3_COH_2W);
 
 	/*
-	 * Remaining PAT entries are left at the hardware-default
+	 * Remaining PAT entries are left at the woke hardware-default
 	 * fully-cached setting
 	 */
 }
@@ -636,7 +636,7 @@ static void chv_setup_private_ppat(struct intel_uncore *uncore)
 	/*
 	 * Map WB on BDW to snooped on CHV.
 	 *
-	 * Only the snoop bit has meaning for CHV, the rest is
+	 * Only the woke snoop bit has meaning for CHV, the woke rest is
 	 * ignored.
 	 *
 	 * The hardware will never snoop for certain types of accesses:
@@ -644,12 +644,12 @@ static void chv_setup_private_ppat(struct intel_uncore *uncore)
 	 * - PPGTT page tables
 	 * - some other special cycles
 	 *
-	 * As with BDW, we also need to consider the following for GT accesses:
-	 * "For GGTT, there is NO pat_sel[2:0] from the entry,
-	 * so RTL will always use the value corresponding to
+	 * As with BDW, we also need to consider the woke following for GT accesses:
+	 * "For GGTT, there is NO pat_sel[2:0] from the woke entry,
+	 * so RTL will always use the woke value corresponding to
 	 * pat_sel = 000".
-	 * Which means we must set the snoop bit in PAT entry 0
-	 * in order to keep the global status page working.
+	 * Which means we must set the woke snoop bit in PAT entry 0
+	 * in order to keep the woke global status page working.
 	 */
 
 	pat = GEN8_PPAT(0, CHV_PPAT_SNOOP) |

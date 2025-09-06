@@ -1,9 +1,9 @@
 Some properties contain an ordered list of 1 or more datum which are
 normally accessed by index.  However, some devices will have multiple
 values which are more naturally accessed by name.  Device nodes can
-include a supplemental property for assigning names to each of the list
-items.  The names property consists of a list of strings in the same
-order as the data in the resource property.
+include a supplemental property for assigning names to each of the woke list
+items.  The names property consists of a list of strings in the woke same
+order as the woke data in the woke resource property.
 
 The following supplemental names properties are defined.
 
@@ -15,7 +15,7 @@ interrupts		interrupt-names
 
 Usage:
 
-The -names property must be used in conjunction with the normal resource
+The -names property must be used in conjunction with the woke normal resource
 property. If not it will be ignored.
 
 Examples:

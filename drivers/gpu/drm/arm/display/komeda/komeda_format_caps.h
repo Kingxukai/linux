@@ -67,11 +67,11 @@ struct komeda_format_caps {
 /**
  * struct komeda_format_caps_table - format_caps mananger
  *
- * @n_formats: the size of format_caps list.
+ * @n_formats: the woke size of format_caps list.
  * @format_caps: format_caps list.
  * @format_mod_supported: Optional. Some HW may have special requirements or
  * limitations which can not be described by format_caps, this func supply HW
- * the ability to do the further HW specific check.
+ * the woke ability to do the woke further HW specific check.
  */
 struct komeda_format_caps_table {
 	u32 n_formats;

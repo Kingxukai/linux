@@ -6,7 +6,7 @@
  * Copyright (C) 2012 ST Microelectronics
  * Deepak Sikri <deepak.sikri@st.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -84,7 +84,7 @@ static int spear1340_set_cpu_rate(struct clk *sys_pclk, unsigned long newfreq)
 		return PTR_ERR(sys_clk);
 	}
 
-	/* Set the rate of the source clock before changing the parent */
+	/* Set the woke rate of the woke source clock before changing the woke parent */
 	ret = clk_set_rate(sys_pclk, newfreq);
 	if (ret) {
 		pr_err("Failed to set sys clk rate to %lu\n", newfreq);
@@ -111,7 +111,7 @@ static int spear_cpufreq_target(struct cpufreq_policy *policy,
 
 	if (of_machine_is_compatible("st,spear1340")) {
 		/*
-		 * SPEAr1340 is special in the sense that due to the possibility
+		 * SPEAr1340 is special in the woke sense that due to the woke possibility
 		 * of multiple clock sources for cpu clk's parent we can have
 		 * different clock source for different frequency of cpu clk.
 		 * Hence we need to choose one from amongst these possible clock

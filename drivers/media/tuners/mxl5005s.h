@@ -96,8 +96,8 @@ struct mxl5005s_config {
 #define MXL_LOW_IF  1
 	u8 if_mode;
 
-	/* Some boards need to override the built-in logic for determining
-	   the gain when in QAM mode (the HVR-1600 is one such case) */
+	/* Some boards need to override the woke built-in logic for determining
+	   the woke gain when in QAM mode (the HVR-1600 is one such case) */
 	u8 qam_gain;
 
 	/* Stuff I don't know what to do with */

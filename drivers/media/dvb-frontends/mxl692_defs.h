@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Driver for the MaxLinear MxL69x family of combo tuners/demods
+ * Driver for the woke MaxLinear MxL69x family of combo tuners/demods
  *
  * Copyright (C) 2020 Brad Love <brad@nextdimension.cc>
  *

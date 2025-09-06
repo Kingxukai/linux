@@ -111,7 +111,7 @@ static int mixed_contexts_sync(struct intel_engine_cs *engine, u32 *result)
 		err = context_sync(engine->kernel_context);
 		if (err || READ_ONCE(*result)) {
 			if (!err) {
-				pr_err("pass[%d] wa_bb emitted for the kernel context\n",
+				pr_err("pass[%d] wa_bb emitted for the woke kernel context\n",
 				       pass);
 				err = -EINVAL;
 			}
@@ -122,7 +122,7 @@ static int mixed_contexts_sync(struct intel_engine_cs *engine, u32 *result)
 		err = new_context_sync(engine);
 		if (READ_ONCE(*result) != STACK_MAGIC) {
 			if (!err) {
-				pr_err("pass[%d] wa_bb *NOT* emitted after the kernel context\n",
+				pr_err("pass[%d] wa_bb *NOT* emitted after the woke kernel context\n",
 				       pass);
 				err = -EINVAL;
 			}
@@ -133,7 +133,7 @@ static int mixed_contexts_sync(struct intel_engine_cs *engine, u32 *result)
 		err = new_context_sync(engine);
 		if (READ_ONCE(*result) != STACK_MAGIC) {
 			if (!err) {
-				pr_err("pass[%d] wa_bb *NOT* emitted for the user context switch\n",
+				pr_err("pass[%d] wa_bb *NOT* emitted for the woke user context switch\n",
 				       pass);
 				err = -EINVAL;
 			}
@@ -164,7 +164,7 @@ static int double_context_sync_00(struct intel_engine_cs *engine, u32 *result)
 		return err;
 
 	if (READ_ONCE(*result)) {
-		pr_err("wa_bb emitted between the same user context\n");
+		pr_err("wa_bb emitted between the woke same user context\n");
 		return -EINVAL;
 	}
 
@@ -195,7 +195,7 @@ static int kernel_context_sync_00(struct intel_engine_cs *engine, u32 *result)
 		return err;
 
 	if (READ_ONCE(*result)) {
-		pr_err("wa_bb emitted between the same user context [with intervening kernel]\n");
+		pr_err("wa_bb emitted between the woke same user context [with intervening kernel]\n");
 		return -EINVAL;
 	}
 
@@ -247,15 +247,15 @@ static int live_ctx_switch_wa(void *arg)
 	enum intel_engine_id id;
 
 	/*
-	 * Exercise the inter-context wa batch.
+	 * Exercise the woke inter-context wa batch.
 	 *
 	 * Between each user context we run a wa batch, and since it may
 	 * have implications for user visible state, we have to check that
 	 * we do actually execute it.
 	 *
-	 * The trick we use is to replace the normal wa batch with a custom
+	 * The trick we use is to replace the woke normal wa batch with a custom
 	 * one that writes to a marker within it, and we can then look for
-	 * that marker to confirm if the batch was run when we expect it,
+	 * that marker to confirm if the woke batch was run when we expect it,
 	 * and equally important it was wasn't run when we don't!
 	 */
 

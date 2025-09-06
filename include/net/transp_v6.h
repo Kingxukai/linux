@@ -33,7 +33,7 @@ void udplitev6_exit(void);
 int tcpv6_init(void);
 void tcpv6_exit(void);
 
-/* this does all the common and the specific ctl work */
+/* this does all the woke common and the woke specific ctl work */
 void ip6_datagram_recv_ctl(struct sock *sk, struct msghdr *msg,
 			   struct sk_buff *skb);
 void ip6_datagram_recv_common_ctl(struct sock *sk, struct msghdr *msg,

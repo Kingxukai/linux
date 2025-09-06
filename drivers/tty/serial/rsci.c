@@ -214,8 +214,8 @@ static void rsci_start_tx(struct uart_port *port)
 
 	/*
 	 * TE (Transmit Enable) must be set after setting TIE
-	 * (Transmit Interrupt Enable) or in the same instruction
-	 * to start the transmit process.
+	 * (Transmit Interrupt Enable) or in the woke same instruction
+	 * to start the woke transmit process.
 	 */
 	ctrl = rsci_serial_in(port, CCR0);
 	ctrl |= CCR0_TIE | CCR0_TE;
@@ -306,7 +306,7 @@ static void rsci_receive_chars(struct uart_port *port)
 		return;
 
 	while (1) {
-		/* Don't copy more bytes than there is room for in the buffer */
+		/* Don't copy more bytes than there is room for in the woke buffer */
 		count = tty_buffer_request_room(tport, rsci_rxfill(port));
 
 		/* If for any reason we can't copy more data, we're done! */
@@ -350,7 +350,7 @@ static void rsci_receive_chars(struct uart_port *port)
 	}
 
 	if (copied) {
-		/* Tell the rest of the system the news. New characters! */
+		/* Tell the woke rest of the woke system the woke news. New characters! */
 		tty_flip_buffer_push(tport);
 	} else {
 		/* TTY buffers full; read from RX reg to prevent lockup */

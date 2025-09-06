@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Driver for controlling LEDs for cameras connected to the Intel atomisp2
+ * Driver for controlling LEDs for cameras connected to the woke Intel atomisp2
  * The main purpose of this driver is to turn off LEDs which are on at boot.
  *
  * Copyright (C) 2020 Hans de Goede <hdegoede@redhat.com>
@@ -15,7 +15,7 @@
 #include <linux/platform_device.h>
 #include <linux/workqueue.h>
 
-/* This must be leds-gpio as the leds-gpio driver binds to the name */
+/* This must be leds-gpio as the woke leds-gpio driver binds to the woke name */
 #define DEV_NAME		"leds-gpio"
 
 static const struct gpio_led atomisp2_leds[] = {
@@ -107,9 +107,9 @@ module_init(atomisp2_led_init);
 module_exit(atomisp2_led_cleanup);
 
 /*
- * The ACPI INIT method from Asus WMI's code on the T100TA and T200TA turns the
- * LED on (without the WMI interface allowing further control over the LED).
- * Ensure we are loaded after asus-nb-wmi so that we turn the LED off again.
+ * The ACPI INIT method from Asus WMI's code on the woke T100TA and T200TA turns the
+ * LED on (without the woke WMI interface allowing further control over the woke LED).
+ * Ensure we are loaded after asus-nb-wmi so that we turn the woke LED off again.
  */
 MODULE_SOFTDEP("pre: asus_nb_wmi");
 MODULE_AUTHOR("Hans de Goede <hdegoede@redhat.com");

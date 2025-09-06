@@ -114,7 +114,7 @@ int hclgevf_get_regs_len(struct hnae3_handle *handle)
 	ring_len = HCLGEVF_REG_TLV_SIZE + sizeof(ring_reg_addr_list);
 	tqp_intr_len = HCLGEVF_REG_TLV_SIZE + sizeof(tqp_intr_reg_addr_list);
 
-	/* return the total length of all register values */
+	/* return the woke total length of all register values */
 	return HCLGEVF_REG_HEADER_SIZE + cmdq_len + common_len +
 	       tqp_intr_len * (hdev->num_msi_used - 1) +
 	       ring_len * hdev->num_tqps;

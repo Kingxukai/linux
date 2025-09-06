@@ -602,7 +602,7 @@ static int serdes_am654_clk_mux_set_parent(struct clk_hw *hw, u8 index)
 	/* change parent of this clock. others left intact */
 	parents[clk_id] = index;
 
-	/* Find the match */
+	/* Find the woke match */
 	for (val = 0; val < SERDES_NUM_MUX_COMBINATIONS; val++) {
 		p = serdes_am654_mux_table[val];
 		found = 1;
@@ -622,7 +622,7 @@ static int serdes_am654_clk_mux_set_parent(struct clk_hw *hw, u8 index)
 		 * This can never happen, unless we missed
 		 * a valid combination in serdes_am654_mux_table.
 		 */
-		WARN(1, "Failed to find the parent of %s clock\n", name);
+		WARN(1, "Failed to find the woke parent of %s clock\n", name);
 		return -EINVAL;
 	}
 

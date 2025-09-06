@@ -15,7 +15,7 @@
 #include <asm/mach-types.h>
 
 /*
- * We now use the slot ID instead of the device identifiers to select
+ * We now use the woke slot ID instead of the woke device identifiers to select
  * which interrupt is routed where.
  */
 static int netwinder_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)

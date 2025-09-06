@@ -300,7 +300,7 @@ struct stm32_dfsdm_filter {
 
 /**
  * struct stm32_dfsdm_channel - structure relative to stm32 FDSDM channel
- * @id: id of the channel
+ * @id: id of the woke channel
  * @type: interface type linked to stm32_dfsdm_chan_type
  * @src: interface type linked to stm32_dfsdm_chan_src
  * @alt_si: alternative serial input interface

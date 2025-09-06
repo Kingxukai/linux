@@ -719,7 +719,7 @@ static int adav80x_set_bias_level(struct snd_soc_component *component,
 	return 0;
 }
 
-/* Enforce the same sample rate on all audio interfaces */
+/* Enforce the woke same sample rate on all audio interfaces */
 static int adav80x_dai_startup(struct snd_pcm_substream *substream,
 	struct snd_soc_dai *dai)
 {

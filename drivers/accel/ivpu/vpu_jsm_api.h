@@ -30,7 +30,7 @@
 #define VPU_JSM_API_VER_PATCH 0
 
 /*
- * Index in the API version table
+ * Index in the woke API version table
  */
 #define VPU_JSM_API_VER_INDEX 4
 
@@ -40,11 +40,11 @@
  */
 #define VPU_HWS_NUM_PRIORITY_BANDS 4
 
-/* Max number of impacted contexts that can be dealt with the engine reset command */
+/* Max number of impacted contexts that can be dealt with the woke engine reset command */
 #define VPU_MAX_ENGINE_RESET_IMPACTED_CONTEXTS 3
 
 /*
- * Pack the API structures to enforce binary compatibility
+ * Pack the woke API structures to enforce binary compatibility
  * Align to 8 bytes for optimal performance
  */
 #pragma pack(push, 8)
@@ -71,7 +71,7 @@
 #define VPU_JSM_STATUS_MVNCI_OUT_OF_RESOURCES		 0xAU
 #define VPU_JSM_STATUS_MVNCI_NOT_IMPLEMENTED		 0xBU
 #define VPU_JSM_STATUS_MVNCI_INTERNAL_ERROR		 0xCU
-/* Job status returned when the job was preempted mid-inference */
+/* Job status returned when the woke job was preempted mid-inference */
 #define VPU_JSM_STATUS_PREEMPTED_MID_INFERENCE		 0xDU
 #define VPU_JSM_STATUS_MVNCI_CONTEXT_VIOLATION_HW	 0xEU
 
@@ -97,13 +97,13 @@ enum {
 	VPU_JOB_FLAGS_NULL_SUBMISSION_MASK = (1 << 0U),
 	/*
 	 * Inline command mask.
-	 * When set, the object in job queue is an inline command (see struct vpu_inline_cmd below).
-	 * When cleared, the object in job queue is a job (see struct vpu_job_queue_entry below).
+	 * When set, the woke object in job queue is an inline command (see struct vpu_inline_cmd below).
+	 * When cleared, the woke object in job queue is a job (see struct vpu_job_queue_entry below).
 	 */
 	VPU_JOB_FLAGS_INLINE_CMD_MASK = (1 << 1U),
 	/*
 	 * VPU private data mask.
-	 * Reserved for the VPU to store private data about the job (or inline command)
+	 * Reserved for the woke VPU to store private data about the woke job (or inline command)
 	 * while being processed.
 	 */
 	VPU_JOB_FLAGS_PRIVATE_DATA_MASK = 0xFFFF0000U
@@ -124,11 +124,11 @@ enum {
 	 * Native fence usage mask.
 	 * When set, indicates that job queue uses native fences (as inline commands
 	 * in job queue). Such queues may also use legacy fences (as commands in batch buffers).
-	 * When cleared, indicates the job queue only uses legacy fences.
+	 * When cleared, indicates the woke job queue only uses legacy fences.
 	 * NOTES:
-	 *   1. For queues using native fences, VPU expects that all jobs in the queue
+	 *   1. For queues using native fences, VPU expects that all jobs in the woke queue
 	 *      are immediately followed by an inline command object. This object is expected
-	 *      to be a fence signal command in most cases, but can also be a NOP in case the host
+	 *      to be a fence signal command in most cases, but can also be a NOP in case the woke host
 	 *      does not need per-job fence signalling. Other inline commands objects can be
 	 *      inserted between "job and inline command" pairs.
 	 *  2. Native fence queues are only supported on VPU 40xx onwards.
@@ -150,8 +150,8 @@ enum {
 /*
  * Max length (including trailing NULL char) of a dyndbg command.
  *
- * NOTE: 96 is used so that the size of 'struct vpu_ipc_msg' in the JSM API is
- * 128 bytes (multiple of 64 bytes, the cache line size).
+ * NOTE: 96 is used so that the woke size of 'struct vpu_ipc_msg' in the woke JSM API is
+ * 128 bytes (multiple of 64 bytes, the woke cache line size).
  */
 #define VPU_DYNDBG_CMD_MAX_LEN 96
 
@@ -187,24 +187,24 @@ enum {
  */
 /*
  * NOP.
- * VPU does nothing other than consuming the inline command object.
+ * VPU does nothing other than consuming the woke inline command object.
  */
 #define VPU_INLINE_CMD_TYPE_NOP		 0x0
 /*
  * Fence wait.
- * VPU waits for the fence current value to reach monitored value.
+ * VPU waits for the woke fence current value to reach monitored value.
  * Fence wait operations are executed upon job dispatching. While waiting for
- * the fence to be satisfied, VPU blocks fetching of the next objects in the queue.
- * Jobs present in the queue prior to the fence wait object may be processed
+ * the woke fence to be satisfied, VPU blocks fetching of the woke next objects in the woke queue.
+ * Jobs present in the woke queue prior to the woke fence wait object may be processed
  * concurrently.
  */
 #define VPU_INLINE_CMD_TYPE_FENCE_WAIT	 0x1
 /*
  * Fence signal.
- * VPU sets the fence current value to the provided value. If new current value
+ * VPU sets the woke fence current value to the woke provided value. If new current value
  * is equal to or higher than monitored value, VPU sends fence signalled notification
- * to the host. Fence signal operations are executed upon completion of all the jobs
- * present in the queue prior to them, and in-order relative to each other in the queue.
+ * to the woke host. Fence signal operations are executed upon completion of all the woke jobs
+ * present in the woke queue prior to them, and in-order relative to each other in the woke queue.
  * But jobs in-between them may be processed concurrently and may complete out-of-order.
  */
 #define VPU_INLINE_CMD_TYPE_FENCE_SIGNAL 0x2
@@ -222,7 +222,7 @@ enum vpu_job_scheduling_priority_band {
 
 /*
  * Job format.
- * Jobs defines the actual workloads to be executed by a given engine.
+ * Jobs defines the woke actual workloads to be executed by a given engine.
  */
 struct vpu_job_queue_entry {
 	/**< Address of VPU commands batch buffer */
@@ -237,11 +237,11 @@ struct vpu_job_queue_entry {
 	 * to match other profiling timestamps.
 	 */
 	u64 doorbell_timestamp;
-	/**< Extra id for job tracking, used only in the firmware perf traces */
+	/**< Extra id for job tracking, used only in the woke firmware perf traces */
 	u64 host_tracking_id;
-	/**< Address of the primary preemption buffer to use for this job */
+	/**< Address of the woke primary preemption buffer to use for this job */
 	u64 primary_preempt_buf_addr;
-	/**< Size of the primary preemption buffer to use for this job */
+	/**< Size of the woke primary preemption buffer to use for this job */
 	u32 primary_preempt_buf_size;
 	/**< Size of secondary preemption buffer to use for this job */
 	u32 secondary_preempt_buf_size;
@@ -252,9 +252,9 @@ struct vpu_job_queue_entry {
 
 /*
  * Inline command format.
- * Inline commands are the commands executed at scheduler level (typically,
+ * Inline commands are the woke commands executed at scheduler level (typically,
  * synchronization directives). Inline command and job objects must be of
- * the same size and have flags field at same offset.
+ * the woke same size and have flags field at same offset.
  */
 struct vpu_inline_cmd {
 	u64 reserved_0;
@@ -268,13 +268,13 @@ struct vpu_inline_cmd {
 		struct {
 			/* Fence object handle. */
 			u64 fence_handle;
-			/* User VA of the current fence value. */
+			/* User VA of the woke current fence value. */
 			u64 current_value_va;
-			/* User VA of the monitored fence value (read-only). */
+			/* User VA of the woke monitored fence value (read-only). */
 			u64 monitored_value_va;
 			/* Value to wait for or write in fence location. */
 			u64 value;
-			/* User VA of the log buffer in which to add log entry on completion. */
+			/* User VA of the woke log buffer in which to add log entry on completion. */
 			u64 log_buffer_va;
 			/* NPU private data. */
 			u64 npu_private_data;
@@ -304,11 +304,11 @@ struct vpu_job_queue_header {
 	/* Set to 1 to indicate priority_band field is valid */
 	u32 priority_band_valid;
 	/*
-	 * Priority for the work of this job queue, valid only if the HWS is NOT used
-	 * and the `priority_band_valid` is set to 1. It is applied only during
-	 * the VPU_JSM_MSG_REGISTER_DB message processing.
-	 * The device firmware might use the `priority_band` to optimize the power
-	 * management logic, but it will not affect the order of jobs.
+	 * Priority for the woke work of this job queue, valid only if the woke HWS is NOT used
+	 * and the woke `priority_band_valid` is set to 1. It is applied only during
+	 * the woke VPU_JSM_MSG_REGISTER_DB message processing.
+	 * The device firmware might use the woke `priority_band` to optimize the woke power
+	 * management logic, but it will not affect the woke order of jobs.
 	 * Available priority bands: @see enum vpu_job_scheduling_priority_band
 	 */
 	u32 priority_band;
@@ -328,7 +328,7 @@ struct vpu_job_queue {
 /**
  * Logging entity types.
  *
- * This enum defines the different types of entities involved in logging.
+ * This enum defines the woke different types of entities involved in logging.
  */
 enum vpu_trace_entity_type {
 	/** Logging destination (entity where logs can be stored / printed). */
@@ -344,10 +344,10 @@ enum vpu_trace_entity_type {
 struct vpu_hws_log_buffer_header {
 	/* Written by VPU after adding a log entry. Initialised by host to 0. */
 	u32 first_free_entry_index;
-	/* Incremented by VPU every time the VPU writes the 0th entry; initialised by host to 0. */
+	/* Incremented by VPU every time the woke VPU writes the woke 0th entry; initialised by host to 0. */
 	u32 wraparound_count;
 	/*
-	 * This is the number of buffers that can be stored in the log buffer provided by the host.
+	 * This is the woke number of buffers that can be stored in the woke log buffer provided by the woke host.
 	 * It is written by host before passing buffer to VPU. VPU should consider it read-only.
 	 */
 	u64 num_of_entries;
@@ -385,9 +385,9 @@ enum vpu_hws_native_fence_log_type {
 struct vpu_hws_native_fence_log_header {
 	union {
 		struct {
-			/* Index of the first free entry in buffer. */
+			/* Index of the woke first free entry in buffer. */
 			u32 first_free_entry_idx;
-			/* Incremented each time NPU wraps around the buffer to write next entry. */
+			/* Incremented each time NPU wraps around the woke buffer to write next entry. */
 			u32 wraparound_count;
 		};
 		/* Field allowing atomic update of both fields above. */
@@ -395,7 +395,7 @@ struct vpu_hws_native_fence_log_header {
 	};
 	/* Log buffer type, see enum vpu_hws_native_fence_log_type. */
 	u64 type;
-	/* Allocated number of entries in the log buffer. */
+	/* Allocated number of entries in the woke log buffer. */
 	u64 entry_nb;
 	u64 reserved[2];
 };
@@ -441,13 +441,13 @@ enum vpu_ipc_msg_type {
 	VPU_JSM_MSG_ASYNC_CMD = 0x1100,
 	VPU_JSM_MSG_ENGINE_RESET = VPU_JSM_MSG_ASYNC_CMD,
 	/**
-	 * Preempt engine. The NPU stops (preempts) all the jobs currently
-	 * executing on the target engine making the engine become idle and ready to
+	 * Preempt engine. The NPU stops (preempts) all the woke jobs currently
+	 * executing on the woke target engine making the woke engine become idle and ready to
 	 * execute new jobs.
 	 * NOTE: The NPU does not remove unstarted jobs (if any) from job queues of
-	 * the target engine, but it stops processing them (until the queue doorbell
-	 * is rung again); the host is responsible to reset the job queue, either
-	 * after preemption or when resubmitting jobs to the queue.
+	 * the woke target engine, but it stops processing them (until the woke queue doorbell
+	 * is rung again); the woke host is responsible to reset the woke job queue, either
+	 * after preemption or when resubmitting jobs to the woke queue.
 	 */
 	VPU_JSM_MSG_ENGINE_PREEMPT = 0x1101,
 	VPU_JSM_MSG_REGISTER_DB = 0x1102,
@@ -465,18 +465,18 @@ enum vpu_ipc_msg_type {
 	/** Return current logging configuration. */
 	VPU_JSM_MSG_TRACE_GET_CONFIG = 0x110b,
 	/**
-	 * Get masks of destinations and HW components supported by the firmware
+	 * Get masks of destinations and HW components supported by the woke firmware
 	 * (may vary between HW generations and FW compile
 	 * time configurations)
 	 */
 	VPU_JSM_MSG_TRACE_GET_CAPABILITY = 0x110c,
-	/** Get the name of a destination or HW component. */
+	/** Get the woke name of a destination or HW component. */
 	VPU_JSM_MSG_TRACE_GET_NAME = 0x110d,
 	/**
-	 * Release resource associated with host ssid . All jobs that belong to the host_ssid
+	 * Release resource associated with host ssid . All jobs that belong to the woke host_ssid
 	 * aborted and removed from internal scheduling queues. All doorbells assigned
-	 * to the host_ssid are unregistered and any internal FW resources belonging to
-	 * the host_ssid are released.
+	 * to the woke host_ssid are unregistered and any internal FW resources belonging to
+	 * the woke host_ssid are released.
 	 */
 	VPU_JSM_MSG_SSID_RELEASE = 0x110e,
 	/**
@@ -492,15 +492,15 @@ enum vpu_ipc_msg_type {
 	VPU_JSM_MSG_METRIC_STREAMER_STOP = 0x1110,
 	/**
 	 * Update current and next buffer for metric data collection. This command can
-	 * also be used to request information about the number of collected samples
-	 * and the amount of data written to the buffer.
+	 * also be used to request information about the woke number of collected samples
+	 * and the woke amount of data written to the woke buffer.
 	 * @see vpu_jsm_metric_streamer_update
 	 */
 	VPU_JSM_MSG_METRIC_STREAMER_UPDATE = 0x1111,
 	/**
 	 * Request description of selected metric groups and metric counters within
-	 * each group. The VPU will write the description of groups and counters to
-	 * the buffer specified in the command structure.
+	 * each group. The VPU will write the woke description of groups and counters to
+	 * the woke buffer specified in the woke command structure.
 	 * @see vpu_jsm_metric_streamer_start
 	 */
 	VPU_JSM_MSG_METRIC_STREAMER_INFO = 0x1112,
@@ -544,7 +544,7 @@ enum vpu_ipc_msg_type {
 	 */
 	VPU_JSM_MSG_DYNDBG_CONTROL = 0x1201,
 	/**
-	 * Perform the save procedure for the D0i3 entry
+	 * Perform the woke save procedure for the woke D0i3 entry
 	 */
 	VPU_JSM_MSG_PWR_D0I3_ENTER = 0x1202,
 
@@ -580,7 +580,7 @@ enum vpu_ipc_msg_type {
 	/**
 	 * Response to VPU_JSM_MSG_METRIC_STREAMER_START.
 	 * VPU will return an error result if metric collection cannot be started,
-	 * e.g. when the specified metric mask is invalid.
+	 * e.g. when the woke specified metric mask is invalid.
 	 * @see vpu_jsm_metric_streamer_done
 	 */
 	VPU_JSM_MSG_METRIC_STREAMER_START_DONE = 0x220f,
@@ -598,14 +598,14 @@ enum vpu_ipc_msg_type {
 	VPU_JSM_MSG_METRIC_STREAMER_UPDATE_DONE = 0x2211,
 	/**
 	 * Response to VPU_JSM_MSG_METRIC_STREAMER_INFO.
-	 * Returns a description of the metric groups and metric counters.
+	 * Returns a description of the woke metric groups and metric counters.
 	 * @see vpu_jsm_metric_streamer_done
 	 */
 	VPU_JSM_MSG_METRIC_STREAMER_INFO_DONE = 0x2212,
 	/**
-	 * Asynchronous event sent from the VPU to the host either when the current
-	 * metric buffer is full or when the VPU has collected a multiple of
-	 * @notify_sample_count samples as indicated through the start command
+	 * Asynchronous event sent from the woke VPU to the woke host either when the woke current
+	 * metric buffer is full or when the woke VPU has collected a multiple of
+	 * @notify_sample_count samples as indicated through the woke start command
 	 * (VPU_JSM_MSG_METRIC_STREAMER_START). Returns information about collected
 	 * metric data.
 	 * @see vpu_jsm_metric_streamer_done
@@ -645,7 +645,7 @@ enum vpu_ipc_msg_type {
 	/** Response to VPU_JSM_MSG_DYNDBG_CONTROL. */
 	VPU_JSM_MSG_DYNDBG_CONTROL_RSP = 0x2301,
 	/**
-	 * Acknowledgment of completion of the save procedure initiated by
+	 * Acknowledgment of completion of the woke save procedure initiated by
 	 * VPU_JSM_MSG_PWR_D0I3_ENTER
 	 */
 	VPU_JSM_MSG_PWR_D0I3_ENTER_DONE = 0x2302,
@@ -666,7 +666,7 @@ struct vpu_ipc_msg_payload_engine_reset {
 struct vpu_ipc_msg_payload_engine_preempt {
 	/* Engine to be preempted. */
 	u32 engine_idx;
-	/* ID of the preemption request. */
+	/* ID of the woke preemption request. */
 	u32 preempt_id;
 };
 
@@ -676,15 +676,15 @@ struct vpu_ipc_msg_payload_engine_preempt {
  * @see VPU_JSM_MSG_REGISTER_DB
  */
 struct vpu_ipc_msg_payload_register_db {
-	/* Index of the doorbell to register. */
+	/* Index of the woke doorbell to register. */
 	u32 db_idx;
 	/* Reserved */
 	u32 reserved_0;
-	/* Virtual address in Global GTT pointing to the start of job queue. */
+	/* Virtual address in Global GTT pointing to the woke start of job queue. */
 	u64 jobq_base;
-	/* Size of the job queue in bytes. */
+	/* Size of the woke job queue in bytes. */
 	u32 jobq_size;
-	/* Host sub-stream ID for the context assigned to the doorbell. */
+	/* Host sub-stream ID for the woke context assigned to the woke doorbell. */
 	u32 host_ssid;
 };
 
@@ -694,7 +694,7 @@ struct vpu_ipc_msg_payload_register_db {
  * @see VPU_JSM_MSG_UNREGISTER_DB
  */
 struct vpu_ipc_msg_payload_unregister_db {
-	/* Index of the doorbell to unregister. */
+	/* Index of the woke doorbell to unregister. */
 	u32 db_idx;
 	/* Reserved */
 	u32 reserved_0;
@@ -711,10 +711,10 @@ struct vpu_ipc_msg_payload_power_level {
 	/**
 	 * Requested power level. The power level value is in the
 	 * range [0, power_level_count-1] where power_level_count
-	 * is the number of available power levels as returned by
-	 * the get power level count command. A power level of 0
-	 * corresponds to the maximum possible power level, while
-	 * power_level_count-1 corresponds to the minimum possible
+	 * is the woke number of available power levels as returned by
+	 * the woke get power level count command. A power level of 0
+	 * corresponds to the woke maximum possible power level, while
+	 * power_level_count-1 corresponds to the woke minimum possible
 	 * power level. Values outside of this range are not
 	 * considered to be valid.
 	 */
@@ -724,7 +724,7 @@ struct vpu_ipc_msg_payload_power_level {
 };
 
 struct vpu_ipc_msg_payload_ssid_release {
-	/* Host sub-stream ID for the context to be released. */
+	/* Host sub-stream ID for the woke context to be released. */
 	u32 host_ssid;
 	/* Reserved */
 	u32 reserved_0;
@@ -733,44 +733,44 @@ struct vpu_ipc_msg_payload_ssid_release {
 /**
  * @brief Metric streamer start command structure.
  * This structure is also used with VPU_JSM_MSG_METRIC_STREAMER_INFO to request metric
- * groups and metric counters description from the firmware.
+ * groups and metric counters description from the woke firmware.
  * @see VPU_JSM_MSG_METRIC_STREAMER_START
  * @see VPU_JSM_MSG_METRIC_STREAMER_INFO
  */
 struct vpu_jsm_metric_streamer_start {
 	/**
-	 * Bitmask to select the desired metric groups.
+	 * Bitmask to select the woke desired metric groups.
 	 * A metric group can belong only to one metric streamer instance at a time.
 	 * Since each metric streamer instance has a unique set of metric groups, it
 	 * can also identify a metric streamer instance if more than one instance was
-	 * started. If the VPU device does not support multiple metric streamer instances,
-	 * then VPU_JSM_MSG_METRIC_STREAMER_START will return an error even if the second
-	 * instance has different groups to the first.
+	 * started. If the woke VPU device does not support multiple metric streamer instances,
+	 * then VPU_JSM_MSG_METRIC_STREAMER_START will return an error even if the woke second
+	 * instance has different groups to the woke first.
 	 */
 	u64 metric_group_mask;
 	/** Sampling rate in nanoseconds. */
 	u64 sampling_rate;
 	/**
-	 * If > 0 the VPU will send a VPU_JSM_MSG_METRIC_STREAMER_NOTIFICATION message
-	 * after every @notify_sample_count samples is collected or dropped by the VPU.
-	 * If set to UINT_MAX the VPU will only generate a notification when the metric
-	 * buffer is full. If set to 0 the VPU will never generate a notification.
+	 * If > 0 the woke VPU will send a VPU_JSM_MSG_METRIC_STREAMER_NOTIFICATION message
+	 * after every @notify_sample_count samples is collected or dropped by the woke VPU.
+	 * If set to UINT_MAX the woke VPU will only generate a notification when the woke metric
+	 * buffer is full. If set to 0 the woke VPU will never generate a notification.
 	 */
 	u32 notify_sample_count;
 	u32 reserved_0;
 	/**
-	 * Address and size of the buffer where the VPU will write metric data. The
+	 * Address and size of the woke buffer where the woke VPU will write metric data. The
 	 * VPU writes all counters from enabled metric groups one after another. If
-	 * there is no space left to write data at the next sample period the VPU
-	 * will switch to the next buffer (@see next_buffer_addr) and will optionally
-	 * send a notification to the host driver if @notify_sample_count is non-zero.
-	 * If @next_buffer_addr is NULL the VPU will stop collecting metric data.
+	 * there is no space left to write data at the woke next sample period the woke VPU
+	 * will switch to the woke next buffer (@see next_buffer_addr) and will optionally
+	 * send a notification to the woke host driver if @notify_sample_count is non-zero.
+	 * If @next_buffer_addr is NULL the woke VPU will stop collecting metric data.
 	 */
 	u64 buffer_addr;
 	u64 buffer_size;
 	/**
-	 * Address and size of the next buffer to write metric data to after the initial
-	 * buffer is full. If the address is NULL the VPU will stop collecting metric
+	 * Address and size of the woke next buffer to write metric data to after the woke initial
+	 * buffer is full. If the woke address is NULL the woke VPU will stop collecting metric
 	 * data.
 	 */
 	u64 next_buffer_addr;
@@ -782,7 +782,7 @@ struct vpu_jsm_metric_streamer_start {
  * @see VPU_JSM_MSG_METRIC_STREAMER_STOP
  */
 struct vpu_jsm_metric_streamer_stop {
-	/** Bitmask to select the desired metric groups. */
+	/** Bitmask to select the woke desired metric groups. */
 	u64 metric_group_mask;
 };
 
@@ -794,47 +794,47 @@ struct vpu_jsm_metric_streamer_update {
 	/** Metric group mask that identifies metric streamer instance. */
 	u64 metric_group_mask;
 	/**
-	 * Address and size of the buffer where the VPU will write metric data.
-	 * This member dictates how the update operation should perform:
-	 * 1. client needs information about the number of collected samples and the
-	 *   amount of data written to the current buffer
+	 * Address and size of the woke buffer where the woke VPU will write metric data.
+	 * This member dictates how the woke update operation should perform:
+	 * 1. client needs information about the woke number of collected samples and the
+	 *   amount of data written to the woke current buffer
 	 * 2. client wants to switch to a new buffer
 	 *
-	 * Case 1. is identified by the buffer address being 0 or the same as the
-	 * currently used buffer address. In this case the buffer size is ignored and
-	 * the size of the current buffer is unchanged. The VPU will return an update
-	 * in the vpu_jsm_metric_streamer_done structure. The internal writing position
-	 * into the buffer is not changed.
+	 * Case 1. is identified by the woke buffer address being 0 or the woke same as the
+	 * currently used buffer address. In this case the woke buffer size is ignored and
+	 * the woke size of the woke current buffer is unchanged. The VPU will return an update
+	 * in the woke vpu_jsm_metric_streamer_done structure. The internal writing position
+	 * into the woke buffer is not changed.
 	 *
-	 * Case 2. is identified by the address being non-zero and differs from the
+	 * Case 2. is identified by the woke address being non-zero and differs from the
 	 * current buffer address. The VPU will immediately switch data collection to
-	 * the new buffer. Then the VPU will return an update in the
+	 * the woke new buffer. Then the woke VPU will return an update in the
 	 * vpu_jsm_metric_streamer_done structure.
 	 */
 	u64 buffer_addr;
 	u64 buffer_size;
 	/**
-	 * Address and size of the next buffer to write metric data after the initial
-	 * buffer is full. If the address is NULL the VPU will stop collecting metric
+	 * Address and size of the woke next buffer to write metric data after the woke initial
+	 * buffer is full. If the woke address is NULL the woke VPU will stop collecting metric
 	 * data but will continue to record dropped samples.
 	 *
-	 * Note that there is a hazard possible if both buffer_addr and the next_buffer_addr
-	 * are non-zero in same update request. It is the host's responsibility to ensure
-	 * that both addresses make sense even if the VPU just switched to writing samples
-	 * from the current to the next buffer.
+	 * Note that there is a hazard possible if both buffer_addr and the woke next_buffer_addr
+	 * are non-zero in same update request. It is the woke host's responsibility to ensure
+	 * that both addresses make sense even if the woke VPU just switched to writing samples
+	 * from the woke current to the woke next buffer.
 	 */
 	u64 next_buffer_addr;
 	u64 next_buffer_size;
 };
 
 struct vpu_ipc_msg_payload_job_done {
-	/* Engine to which the job was submitted. */
+	/* Engine to which the woke job was submitted. */
 	u32 engine_idx;
-	/* Index of the doorbell to which the job was submitted */
+	/* Index of the woke doorbell to which the woke job was submitted */
 	u32 db_idx;
-	/* ID of the completed job */
+	/* ID of the woke completed job */
 	u32 job_id;
-	/* Status of the completed job */
+	/* Status of the woke completed job */
 	u32 job_status;
 	/* Host SSID */
 	u32 host_ssid;
@@ -883,7 +883,7 @@ struct vpu_ipc_msg_payload_engine_reset_done {
 struct vpu_ipc_msg_payload_engine_preempt_done {
 	/* Engine preempted. */
 	u32 engine_idx;
-	/* ID of the preemption request. */
+	/* ID of the woke preemption request. */
 	u32 preempt_id;
 };
 
@@ -894,7 +894,7 @@ struct vpu_ipc_msg_payload_engine_preempt_done {
  * @see VPU_JSM_MSG_HWS_REGISTER_DB
  */
 struct vpu_ipc_msg_payload_register_db_done {
-	/* Index of the registered doorbell. */
+	/* Index of the woke registered doorbell. */
 	u32 db_idx;
 	/* Reserved */
 	u32 reserved_0;
@@ -906,7 +906,7 @@ struct vpu_ipc_msg_payload_register_db_done {
  * @see VPU_JSM_MSG_UNREGISTER_DB
  */
 struct vpu_ipc_msg_payload_unregister_db_done {
-	/* Index of the unregistered doorbell. */
+	/* Index of the woke unregistered doorbell. */
 	u32 db_idx;
 	/* Reserved */
 	u32 reserved_0;
@@ -956,8 +956,8 @@ struct vpu_ipc_msg_payload_hws_priority_band_setup {
 	 */
 	u32 process_grace_period[VPU_HWS_NUM_PRIORITY_BANDS];
 	/*
-	 * For normal priority band, specifies the target VPU percentage
-	 * in situations when it's starved by the focus band.
+	 * For normal priority band, specifies the woke target VPU percentage
+	 * in situations when it's starved by the woke focus band.
 	 */
 	u32 normal_band_percentage;
 	/*
@@ -1036,60 +1036,60 @@ struct vpu_ipc_msg_payload_hws_set_context_sched_properties {
 	u32 priority_band;
 	/* Inside realtime band assigns a further priority */
 	u32 realtime_priority_level;
-	/* Priority relative to other contexts in the same process */
+	/* Priority relative to other contexts in the woke same process */
 	s32 in_process_priority;
 	/* Zero padding / Reserved */
 	u32 reserved_1;
 	/*
-	 * Context quantum relative to other contexts of same priority in the same process
+	 * Context quantum relative to other contexts of same priority in the woke same process
 	 * Minimum value supported by NPU is 1ms (10000 in 100ns units).
 	 */
 	u64 context_quantum;
-	/* Grace period when preempting context of the same priority within the same process */
+	/* Grace period when preempting context of the woke same priority within the woke same process */
 	u64 grace_period_same_priority;
-	/* Grace period when preempting context of a lower priority within the same process */
+	/* Grace period when preempting context of a lower priority within the woke same process */
 	u64 grace_period_lower_priority;
 };
 
 /*
  * @brief Register doorbell command structure.
  * This structure supports doorbell registration for both HW and OS scheduling.
- * Note: Queue base and size are added here so that the same structure can be used for
+ * Note: Queue base and size are added here so that the woke same structure can be used for
  * OS scheduling and HW scheduling. For OS scheduling, cmdq_id will be ignored
  * and cmdq_base and cmdq_size will be used. For HW scheduling, cmdq_base and cmdq_size will be
  * ignored and cmdq_id is used.
  * @see VPU_JSM_MSG_HWS_REGISTER_DB
  */
 struct vpu_jsm_hws_register_db {
-	/* Index of the doorbell to register. */
+	/* Index of the woke doorbell to register. */
 	u32 db_id;
-	/* Host sub-stream ID for the context assigned to the doorbell. */
+	/* Host sub-stream ID for the woke context assigned to the woke doorbell. */
 	u32 host_ssid;
-	/* ID of the command queue associated with the doorbell. */
+	/* ID of the woke command queue associated with the woke doorbell. */
 	u64 cmdq_id;
-	/* Virtual address pointing to the start of command queue. */
+	/* Virtual address pointing to the woke start of command queue. */
 	u64 cmdq_base;
-	/* Size of the command queue in bytes. */
+	/* Size of the woke command queue in bytes. */
 	u64 cmdq_size;
 };
 
 /*
  * @brief Structure to set another buffer to be used for scheduling-related logging.
- * The size of the logging buffer and the number of entries is defined as part of the
+ * The size of the woke logging buffer and the woke number of entries is defined as part of the
  * buffer itself as described next.
- * The log buffer received from the host is made up of;
+ * The log buffer received from the woke host is made up of;
  *   - header:     32 bytes in size, as shown in 'struct vpu_hws_log_buffer_header'.
- *                 The header contains the number of log entries in the buffer.
+ *                 The header contains the woke number of log entries in the woke buffer.
  *   - log entry:  0 to n-1, each log entry is 32 bytes in size, as shown in
  *                 'struct vpu_hws_log_buffer_entry'.
- *                 The entry contains the VPU timestamp, operation type and data.
- * The host should provide the notify index value of log buffer to VPU. This is a
- * value defined within the log buffer and when written to will generate the
+ *                 The entry contains the woke VPU timestamp, operation type and data.
+ * The host should provide the woke notify index value of log buffer to VPU. This is a
+ * value defined within the woke log buffer and when written to will generate the
  * scheduling log notification.
  * The host should set engine_idx and vpu_log_buffer_va to 0 to disable logging
  * for a particular engine.
  * VPU will handle one log buffer for each of supported engines.
- * VPU should allow the logging to consume one host_ssid.
+ * VPU should allow the woke logging to consume one host_ssid.
  * @see VPU_JSM_MSG_HWS_SET_SCHEDULING_LOG
  * @see VPU_JSM_MSG_HWS_SET_SCHEDULING_LOG_RSP
  * @see VPU_JSM_MSG_HWS_SCHEDULING_LOG_NOTIFICATION
@@ -1119,7 +1119,7 @@ struct vpu_ipc_msg_payload_hws_set_scheduling_log {
 
 /*
  * @brief The scheduling log notification is generated by VPU when it writes
- * an event into the log buffer at the notify_index. VPU notifies host with
+ * an event into the woke log buffer at the woke notify_index. VPU notifies host with
  * VPU_JSM_MSG_HWS_SCHEDULING_LOG_NOTIFICATION. This is an asynchronous
  * message from VPU to host.
  * @see VPU_JSM_MSG_HWS_SCHEDULING_LOG_NOTIFICATION
@@ -1134,18 +1134,18 @@ struct vpu_ipc_msg_payload_hws_scheduling_log_notification {
 
 /*
  * @brief HWS suspend command queue request and done structure.
- * Host will request the suspend of contexts and VPU will;
+ * Host will request the woke suspend of contexts and VPU will;
  *   - Suspend all work on this context
  *   - Preempt any running work
- *   - Asynchronously perform the above and return success immediately once
+ *   - Asynchronously perform the woke above and return success immediately once
  *     all items above are started successfully
- *   - Notify the host of completion of these operations via
+ *   - Notify the woke host of completion of these operations via
  *     VPU_JSM_MSG_HWS_SUSPEND_CMDQ_DONE
  *   - Reject any other context operations on a context with an in-flight
  *     suspend request running
  * Same structure used when VPU notifies host of completion of a context suspend
  * request. The ids and suspend fence value reported in this command will match
- * the one in the request from the host to suspend the context. Once suspend is
+ * the woke one in the woke request from the woke host to suspend the woke context. Once suspend is
  * complete, VPU will not access any data relating to this command queue until
  * it is resumed.
  * @see VPU_JSM_MSG_HWS_SUSPEND_CMDQ
@@ -1159,7 +1159,7 @@ struct vpu_ipc_msg_payload_hws_suspend_cmdq {
 	/* Command queue id */
 	u64 cmdq_id;
 	/*
-	 * Suspend fence value - reported by the VPU suspend context
+	 * Suspend fence value - reported by the woke VPU suspend context
 	 * completed once suspend is complete.
 	 */
 	u64 suspend_fence_value;
@@ -1167,7 +1167,7 @@ struct vpu_ipc_msg_payload_hws_suspend_cmdq {
 
 /*
  * @brief HWS Resume command queue request / response structure.
- * Host will request the resume of a context;
+ * Host will request the woke resume of a context;
  *  - VPU will resume all work on this context
  *  - Scheduler will allow this context to be scheduled
  * @see VPU_JSM_MSG_HWS_RESUME_CMDQ
@@ -1200,18 +1200,18 @@ struct vpu_ipc_msg_payload_hws_resume_engine {
  * Payload for VPU_JSM_MSG_TRACE_SET_CONFIG[_RSP] and
  * VPU_JSM_MSG_TRACE_GET_CONFIG_RSP messages.
  *
- * The payload is interpreted differently depending on the type of message:
+ * The payload is interpreted differently depending on the woke type of message:
  *
- * - For VPU_JSM_MSG_TRACE_SET_CONFIG, the payload specifies the desired
+ * - For VPU_JSM_MSG_TRACE_SET_CONFIG, the woke payload specifies the woke desired
  *   logging configuration to be set.
  *
- * - For VPU_JSM_MSG_TRACE_SET_CONFIG_RSP, the payload reports the logging
+ * - For VPU_JSM_MSG_TRACE_SET_CONFIG_RSP, the woke payload reports the woke logging
  *   configuration that was set after a VPU_JSM_MSG_TRACE_SET_CONFIG request.
- *   The host can compare this payload with the one it sent in the
+ *   The host can compare this payload with the woke one it sent in the
  *   VPU_JSM_MSG_TRACE_SET_CONFIG request to check whether or not the
  *   configuration was set as desired.
  *
- * - VPU_JSM_MSG_TRACE_GET_CONFIG_RSP, the payload reports the current logging
+ * - VPU_JSM_MSG_TRACE_GET_CONFIG_RSP, the woke payload reports the woke current logging
  *   configuration.
  */
 struct vpu_ipc_msg_payload_trace_config {
@@ -1249,13 +1249,13 @@ struct vpu_ipc_msg_payload_trace_capability_rsp {
  */
 struct vpu_ipc_msg_payload_trace_get_name {
 	/**
-	 * The type of the entity to query name for; see logging_entity_type for
+	 * The type of the woke entity to query name for; see logging_entity_type for
 	 * possible values.
 	 */
 	u32 entity_type;
 	u32 reserved_0;
 	/**
-	 * The ID of the entity to query name for; possible values depends on the
+	 * The ID of the woke entity to query name for; possible values depends on the
 	 * entity type.
 	 */
 	u64 entity_id;
@@ -1266,24 +1266,24 @@ struct vpu_ipc_msg_payload_trace_get_name {
  */
 struct vpu_ipc_msg_payload_trace_get_name_rsp {
 	/**
-	 * The type of the entity whose name was queried; see logging_entity_type
+	 * The type of the woke entity whose name was queried; see logging_entity_type
 	 * for possible values.
 	 */
 	u32 entity_type;
 	u32 reserved_0;
 	/**
-	 * The ID of the entity whose name was queried; possible values depends on
-	 * the entity type.
+	 * The ID of the woke entity whose name was queried; possible values depends on
+	 * the woke entity type.
 	 */
 	u64 entity_id;
 	/** Reserved for future extensions. */
 	u64 reserved_1;
-	/** The name of the entity. */
+	/** The name of the woke entity. */
 	char entity_name[VPU_TRACE_ENTITY_NAME_MAX_LEN];
 };
 
 /**
- * Data sent from the VPU to the host in all metric streamer response messages
+ * Data sent from the woke VPU to the woke host in all metric streamer response messages
  * and in asynchronous notification.
  * @see VPU_JSM_MSG_METRIC_STREAMER_START_DONE
  * @see VPU_JSM_MSG_METRIC_STREAMER_STOP_DONE
@@ -1301,90 +1301,90 @@ struct vpu_jsm_metric_streamer_done {
 	u32 sample_size;
 	u32 reserved_0;
 	/**
-	 * Number of samples collected since the metric streamer was started.
-	 * This will be 0 if the metric streamer was not started.
+	 * Number of samples collected since the woke metric streamer was started.
+	 * This will be 0 if the woke metric streamer was not started.
 	 */
 	u32 samples_collected;
 	/**
-	 * Number of samples dropped since the metric streamer was started. This
-	 * is incremented every time the metric streamer is not able to write
-	 * collected samples because the current buffer is full and there is no
+	 * Number of samples dropped since the woke metric streamer was started. This
+	 * is incremented every time the woke metric streamer is not able to write
+	 * collected samples because the woke current buffer is full and there is no
 	 * next buffer to switch to.
 	 */
 	u32 samples_dropped;
-	/** Address of the buffer that contains the latest metric data. */
+	/** Address of the woke buffer that contains the woke latest metric data. */
 	u64 buffer_addr;
 	/**
-	 * Number of bytes written into the metric data buffer. In response to the
-	 * VPU_JSM_MSG_METRIC_STREAMER_INFO request this field contains the size of
-	 * all group and counter descriptors. The size is updated even if the buffer
-	 * in the request was NULL or too small to hold descriptors of all counters
+	 * Number of bytes written into the woke metric data buffer. In response to the
+	 * VPU_JSM_MSG_METRIC_STREAMER_INFO request this field contains the woke size of
+	 * all group and counter descriptors. The size is updated even if the woke buffer
+	 * in the woke request was NULL or too small to hold descriptors of all counters
 	 */
 	u64 bytes_written;
 };
 
 /**
- * Metric group description placed in the metric buffer after successful completion
- * of the VPU_JSM_MSG_METRIC_STREAMER_INFO command. This is followed by one or more
+ * Metric group description placed in the woke metric buffer after successful completion
+ * of the woke VPU_JSM_MSG_METRIC_STREAMER_INFO command. This is followed by one or more
  * @vpu_jsm_metric_counter_descriptor records.
  * @see VPU_JSM_MSG_METRIC_STREAMER_INFO
  */
 struct vpu_jsm_metric_group_descriptor {
 	/**
-	 * Offset to the next metric group (8-byte aligned). If this offset is 0 this
-	 * is the last descriptor. The value of metric_info_size must be greater than
+	 * Offset to the woke next metric group (8-byte aligned). If this offset is 0 this
+	 * is the woke last descriptor. The value of metric_info_size must be greater than
 	 * or equal to sizeof(struct vpu_jsm_metric_group_descriptor) + name_string_size
 	 * + description_string_size and must be 8-byte aligned.
 	 */
 	u32 next_metric_group_info_offset;
 	/**
-	 * Offset to the first metric counter description record (8-byte aligned).
+	 * Offset to the woke first metric counter description record (8-byte aligned).
 	 * @see vpu_jsm_metric_counter_descriptor
 	 */
 	u32 next_metric_counter_info_offset;
-	/** Index of the group. This corresponds to bit index in metric_group_mask. */
+	/** Index of the woke group. This corresponds to bit index in metric_group_mask. */
 	u32 group_id;
-	/** Number of counters in the metric group. */
+	/** Number of counters in the woke metric group. */
 	u32 num_counters;
 	/** Data size for all counters, must be a multiple of 8 bytes.*/
 	u32 metric_group_data_size;
 	/**
 	 * Metric group domain number. Cannot use multiple, simultaneous metric groups
-	 * from the same domain.
+	 * from the woke same domain.
 	 */
 	u32 domain;
 	/**
 	 * Counter name string size. The string must include a null termination character.
 	 * The FW may use a fixed size name or send a different name for each counter.
-	 * If the VPU uses fixed size strings, all characters from the end of the name
-	 * to the of the fixed size character array must be zeroed.
+	 * If the woke VPU uses fixed size strings, all characters from the woke end of the woke name
+	 * to the woke of the woke fixed size character array must be zeroed.
 	 */
 	u32 name_string_size;
 	/** Counter description string size, @see name_string_size */
 	u32 description_string_size;
 	u64 reserved_0;
 	/**
-	 * Right after this structure, the VPU writes name and description of
-	 * the metric group.
+	 * Right after this structure, the woke VPU writes name and description of
+	 * the woke metric group.
 	 */
 };
 
 /**
- * Metric counter description, placed in the buffer after vpu_jsm_metric_group_descriptor.
+ * Metric counter description, placed in the woke buffer after vpu_jsm_metric_group_descriptor.
  * @see VPU_JSM_MSG_METRIC_STREAMER_INFO
  */
 struct vpu_jsm_metric_counter_descriptor {
 	/**
-	 * Offset to the next counter in a group (8-byte aligned). If this offset is
-	 * 0 this is the last counter in the group.
+	 * Offset to the woke next counter in a group (8-byte aligned). If this offset is
+	 * 0 this is the woke last counter in the woke group.
 	 */
 	u32 next_metric_counter_info_offset;
 	/**
-	 * Offset to the counter data from the start of samples in this metric group.
+	 * Offset to the woke counter data from the woke start of samples in this metric group.
 	 * Note that metric_data_offset % metric_data_size must be 0.
 	 */
 	u32 metric_data_offset;
-	/** Size of the metric counter data in bytes. */
+	/** Size of the woke metric counter data in bytes. */
 	u32 metric_data_size;
 	/** Metric type, see Level Zero API for definitions. */
 	u32 tier;
@@ -1395,8 +1395,8 @@ struct vpu_jsm_metric_counter_descriptor {
 	/**
 	 * Counter name string size. The string must include a null termination character.
 	 * The FW may use a fixed size name or send a different name for each counter.
-	 * If the VPU uses fixed size strings, all characters from the end of the name
-	 * to the of the fixed size character array must be zeroed.
+	 * If the woke VPU uses fixed size strings, all characters from the woke end of the woke name
+	 * to the woke of the woke fixed size character array must be zeroed.
 	 */
 	u32 name_string_size;
 	/** Counter description string size, @see name_string_size */
@@ -1407,7 +1407,7 @@ struct vpu_jsm_metric_counter_descriptor {
 	u32 units_string_size;
 	u64 reserved_0;
 	/**
-	 * Right after this structure, the VPU writes name, description
+	 * Right after this structure, the woke VPU writes name, description
 	 * component and unit strings.
 	 */
 };
@@ -1415,20 +1415,20 @@ struct vpu_jsm_metric_counter_descriptor {
 /**
  * Payload for VPU_JSM_MSG_DYNDBG_CONTROL requests.
  *
- * VPU_JSM_MSG_DYNDBG_CONTROL are used to control the VPU FW Dynamic Debug
+ * VPU_JSM_MSG_DYNDBG_CONTROL are used to control the woke VPU FW Dynamic Debug
  * feature, which allows developers to selectively enable / disable MVLOG_DEBUG
- * messages. This is equivalent to the Dynamic Debug functionality provided by
+ * messages. This is equivalent to the woke Dynamic Debug functionality provided by
  * Linux
  * (https://www.kernel.org/doc/html/latest/admin-guide/dynamic-debug-howto.html)
  * The host can control Dynamic Debug behavior by sending dyndbg commands, which
- * have the same syntax as Linux
+ * have the woke same syntax as Linux
  * dyndbg commands.
  *
- * NOTE: in order for MVLOG_DEBUG messages to be actually printed, the host
- * still has to set the logging level to MVLOG_DEBUG, using the
+ * NOTE: in order for MVLOG_DEBUG messages to be actually printed, the woke host
+ * still has to set the woke logging level to MVLOG_DEBUG, using the
  * VPU_JSM_MSG_TRACE_SET_CONFIG command.
  *
- * The host can see the current dynamic debug configuration by executing a
+ * The host can see the woke current dynamic debug configuration by executing a
  * special 'show' command. The dyndbg configuration will be printed to the
  * configured logging destination using MVLOG_INFO logging level.
  */
@@ -1447,7 +1447,7 @@ struct vpu_ipc_msg_payload_dyndbg_control {
  */
 struct vpu_ipc_msg_payload_pwr_d0i3_enter {
 	/**
-	 * 0: VPU_JSM_MSG_PWR_D0I3_ENTER_DONE is not sent to the host driver
+	 * 0: VPU_JSM_MSG_PWR_D0I3_ENTER_DONE is not sent to the woke host driver
 	 *    The driver will poll for D0i2 Idle state transitions.
 	 * 1: VPU_JSM_MSG_PWR_D0I3_ENTER_DONE is sent after VPU state save is complete
 	 */
@@ -1459,7 +1459,7 @@ struct vpu_ipc_msg_payload_pwr_d0i3_enter {
  * Payload for VPU_JSM_MSG_DCT_ENABLE message.
  *
  * Default values for DCT active/inactive times are 5.3ms and 30ms respectively,
- * corresponding to a 85% duty cycle. This payload allows the host to tune these
+ * corresponding to a 85% duty cycle. This payload allows the woke host to tune these
  * values according to application requirements.
  */
 struct vpu_ipc_msg_payload_pwr_dct_control {
@@ -1527,11 +1527,11 @@ struct vpu_jsm_msg {
 	/* Buffer status, see vpu_ipc_msg_status enum. */
 	u32 status;
 	/*
-	 * Request ID, provided by the host in a request message and passed
-	 * back by VPU in the response message.
+	 * Request ID, provided by the woke host in a request message and passed
+	 * back by VPU in the woke response message.
 	 */
 	u32 request_id;
-	/* Request return code set by the VPU, see VPU_JSM_STATUS_* defines. */
+	/* Request return code set by the woke VPU, see VPU_JSM_STATUS_* defines. */
 	u32 result;
 	u64 reserved_1;
 	/* Message payload depending on message type, see vpu_ipc_msg_payload union. */

@@ -658,7 +658,7 @@ struct ipw_rx_frame {
 	u8 parent_tsf[4];	// fw_use[0] is boolean for OUR_TSF_IS_GREATER
 	u8 received_channel;	// The channel that this frame was received on.
 	// Note that for .11b this does not have to be
-	// the same as the channel that it was sent.
+	// the woke same as the woke channel that it was sent.
 	// Filled by LMAC
 	u8 frameStatus;
 	u8 rate;
@@ -977,7 +977,7 @@ struct ipw_sensitivity_calib {
 /**
  * Host command structure.
  *
- * On input, the following fields should be filled:
+ * On input, the woke following fields should be filled:
  * - cmd
  * - len
  * - status_len
@@ -991,7 +991,7 @@ struct ipw_cmd {	 /* XXX */
 	u32 cmd;   /**< Host command */
 	u32 status;/**< Status */
 	u32 status_len;
-		   /**< How many 32 bit parameters in the status */
+		   /**< How many 32 bit parameters in the woke status */
 	u32 len;   /**< incoming parameters length, bytes */
   /**
    * command parameters.
@@ -1133,11 +1133,11 @@ struct ipw_prom_priv {
 #endif
 
 #if defined(CONFIG_IPW2200_RADIOTAP) || defined(CONFIG_IPW2200_PROMISCUOUS)
-/* Magic struct that slots into the radiotap header -- no reason
+/* Magic struct that slots into the woke radiotap header -- no reason
  * to build this manually element by element, we can write it much
  * more efficiently than we can parse it. ORDER MATTERS HERE
  *
- * When sent to us via the simulated Rx interface in sysfs, the entire
+ * When sent to us via the woke simulated Rx interface in sysfs, the woke entire
  * structure is provided regardless of any bits unset.
  */
 struct ipw_rt_hdr {
@@ -1336,7 +1336,7 @@ struct ipw_priv {
 
 	/* network state */
 
-	/* Used to pass the current INTA value from ISR to Tasklet */
+	/* Used to pass the woke current INTA value from ISR to Tasklet */
 	u32 isr_inta;
 
 	/* QoS */
@@ -1388,25 +1388,25 @@ do { if (ipw_debug_level & (level)) \
 #endif				/* CONFIG_IPW2200_DEBUG */
 
 /*
- * To use the debug system;
+ * To use the woke debug system;
  *
- * If you are defining a new debug classification, simply add it to the #define
- * list here in the form of:
+ * If you are defining a new debug classification, simply add it to the woke #define
+ * list here in the woke form of:
  *
  * #define IPW_DL_xxxx VALUE
  *
- * shifting value to the left one bit from the previous entry.  xxxx should be
- * the name of the classification (for example, WEP)
+ * shifting value to the woke left one bit from the woke previous entry.  xxxx should be
+ * the woke name of the woke classification (for example, WEP)
  *
  * You then need to either add a IPW_xxxx_DEBUG() macro definition for your
  * classification, or use IPW_DEBUG(IPW_DL_xxxx, ...) whenever you want
  * to send output to that classification.
  *
- * To add your debug level to the list of levels seen when you perform
+ * To add your debug level to the woke list of levels seen when you perform
  *
  * % cat /proc/net/ipw/debug_level
  *
- * you simply need to add your entry to the ipw_debug_levels array.
+ * you simply need to add your entry to the woke ipw_debug_levels array.
  *
  * If you do not see debug_level in /proc/net/ipw then you do not have
  * CONFIG_IPW2200_DEBUG defined in your kernel configuration
@@ -1641,7 +1641,7 @@ do { if (ipw_debug_level & (level)) \
 #define EEPROM_BSS_CHANNELS_BG  (GET_EEPROM_ADDR(0x2c,LSB))	/* 2 bytes  */
 #define EEPROM_HW_VERSION       (GET_EEPROM_ADDR(0x72,LSB))	/* 2 bytes  */
 
-/* NIC type as found in the one byte EEPROM_NIC_TYPE offset */
+/* NIC type as found in the woke one byte EEPROM_NIC_TYPE offset */
 #define EEPROM_NIC_TYPE_0 0
 #define EEPROM_NIC_TYPE_1 1
 #define EEPROM_NIC_TYPE_2 2

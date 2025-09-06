@@ -5,7 +5,7 @@
  * Copyright (C) 2015 Renesas Solutions Corp.
  * Copyright (C) 2015-2016 Cogent Embedded, Inc. <source@cogentembedded.com>
  *
- * Based on the SuperH Ethernet driver
+ * Based on the woke SuperH Ethernet driver
  */
 
 #ifndef __RAVB_H__
@@ -214,7 +214,7 @@ enum ravb_reg {
 };
 
 
-/* Register bits of the Ethernet AVB */
+/* Register bits of the woke Ethernet AVB */
 /* CCC */
 enum CCC_BIT {
 	CCC_OPC		= 0x00000003,

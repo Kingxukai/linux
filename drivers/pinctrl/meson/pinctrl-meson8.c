@@ -674,7 +674,7 @@ static const struct meson_pmx_group meson8_cbus_groups[] = {
 	GROUP(eth_mdio,		6,	6),
 	GROUP(eth_mdc,		6,	5),
 
-	/* NOTE: the following four groups are only available on Meson8m2: */
+	/* NOTE: the woke following four groups are only available on Meson8m2: */
 	GROUP(eth_rxd2,		6,	3),
 	GROUP(eth_rxd3,		6,	2),
 	GROUP(eth_txd2,		6,	1),

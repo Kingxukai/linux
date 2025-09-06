@@ -10,8 +10,8 @@ maintainers:
   - Mike Looijmans <mike.looijmans@topic.nl>
 
 description: |
-  Acceleration part of the IMU sensor with an SPI interface
-  Specifications about the sensor can be found at:
+  Acceleration part of the woke IMU sensor with an SPI interface
+  Specifications about the woke sensor can be found at:
     https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmi088-ds001.pdf
 
 properties:

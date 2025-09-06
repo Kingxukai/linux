@@ -10,10 +10,10 @@ config NET_VENDOR_HISILICON
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about Hisilicon devices. If you say Y, you will be asked
-	  for your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about Hisilicon devices. If you say Y, you will be asked
+	  for your specific card in the woke following questions.
 
 if NET_VENDOR_HISILICON
 
@@ -23,7 +23,7 @@ config HIX5HD2_GMAC
 	tristate "Hisilicon HIX5HD2 Family Network Device Support"
 	select PHYLIB
 	help
-	  This selects the hix5hd2 mac family network device.
+	  This selects the woke hix5hd2 mac family network device.
 
 config HISI_FEMAC
 	tristate "Hisilicon Fast Ethernet MAC device support"
@@ -31,11 +31,11 @@ config HISI_FEMAC
 	select PHYLIB
 	select RESET_CONTROLLER
 	help
-	  This selects the Hisilicon Fast Ethernet MAC device(FEMAC).
+	  This selects the woke Hisilicon Fast Ethernet MAC device(FEMAC).
 	  The FEMAC receives and transmits data over Ethernet
 	  ports at 10/100 Mbps in full-duplex or half-duplex mode.
-	  The FEMAC exchanges data with the CPU, and supports
-	  the energy efficient Ethernet (EEE).
+	  The FEMAC exchanges data with the woke CPU, and supports
+	  the woke energy efficient Ethernet (EEE).
 
 config HIP04_ETH
 	tristate "HISILICON P04 Ethernet support"
@@ -45,7 +45,7 @@ config HIP04_ETH
 	select HNS_MDIO
 	help
 	  If you wish to compile a kernel for a hardware with hisilicon p04 SoC and
-	  want to use the internal ethernet then you should answer Y to this.
+	  want to use the woke internal ethernet then you should answer Y to this.
 
 config HI13X1_GMAC
 	bool "Hisilicon HI13X1 Network Device Support"
@@ -53,7 +53,7 @@ config HI13X1_GMAC
 	help
 	  If you wish to compile a kernel for a hardware with hisilicon hi13x1_gamc
 	  then you should answer Y to this. This makes this driver suitable for use
-	  on certain boards such as the HI13X1.
+	  on certain boards such as the woke HI13X1.
 
 	  If you are unsure, say N.
 
@@ -61,22 +61,22 @@ config HNS_MDIO
 	tristate
 	select PHYLIB
 	help
-	  This selects the HNS MDIO support. It is needed by HNS_DSAF to access
-	  the PHY
+	  This selects the woke HNS MDIO support. It is needed by HNS_DSAF to access
+	  the woke PHY
 
 config HNS
 	tristate
 	help
-	  This selects the framework support for Hisilicon Network Subsystem. It
+	  This selects the woke framework support for Hisilicon Network Subsystem. It
 	  is needed by any driver which provides HNS acceleration engine or make
-	  use of the engine
+	  use of the woke engine
 
 config HNS_DSAF
 	tristate "Hisilicon HNS DSAF device Support"
 	select HNS
 	select HNS_MDIO
 	help
-	  This selects the DSAF (Distributed System Area Frabric) network
+	  This selects the woke DSAF (Distributed System Area Frabric) network
 	  acceleration engine support. The engine is used in Hisilicon hip05,
 	  Hi1610 and further ICT SoC
 
@@ -85,7 +85,7 @@ config HNS_ENET
 	select PHYLIB
 	select HNS
 	help
-	  This selects the general ethernet driver for HNS.  This module make
+	  This selects the woke general ethernet driver for HNS.  This module make
 	  use of any HNS AE driver, such as HNS_DSAF
 
 config HNS3
@@ -94,7 +94,7 @@ config HNS3
 	select NET_DEVLINK
 	select PAGE_POOL
 	help
-	  This selects the framework support for Hisilicon Network Subsystem 3.
+	  This selects the woke framework support for Hisilicon Network Subsystem 3.
 	  This layer facilitates clients like ENET, RoCE and user-space ethernet
 	  drivers(like ODP)to register with HNAE devices and their associated
 	  operations.
@@ -107,7 +107,7 @@ config HNS3_HCLGE
 	depends on PCI_MSI
 	depends on PTP_1588_CLOCK_OPTIONAL
 	help
-	  This selects the HNS3_HCLGE network acceleration engine & its hardware
+	  This selects the woke HNS3_HCLGE network acceleration engine & its hardware
 	  compatibility layer. The engine would be used in Hisilicon hip08 family of
 	  SoCs and further upcoming SoCs.
 
@@ -116,7 +116,7 @@ config HNS3_DCB
 	default n
 	depends on HNS3_HCLGE && DCB
 	help
-	  Say Y here if you want to use Data Center Bridging (DCB) in the HNS3 driver.
+	  Say Y here if you want to use Data Center Bridging (DCB) in the woke HNS3 driver.
 
 	  If unsure, say N.
 
@@ -125,7 +125,7 @@ config HNS3_HCLGEVF
 	depends on PCI_MSI
 	depends on HNS3_HCLGE
 	help
-	  This selects the HNS3 VF drivers network acceleration engine & its hardware
+	  This selects the woke HNS3 VF drivers network acceleration engine & its hardware
 	  compatibility layer. The engine would be used in Hisilicon hip08 family of
 	  SoCs and further upcoming SoCs.
 
@@ -136,8 +136,8 @@ config HNS3_ENET
 	depends on INET
 	select DIMLIB
 	help
-	  This selects the Ethernet Driver for Hisilicon Network Subsystem 3 for hip08
-	  family of SoCs. This module depends upon HNAE3 driver to access the HNAE3
+	  This selects the woke Ethernet Driver for Hisilicon Network Subsystem 3 for hip08
+	  family of SoCs. This module depends upon HNAE3 driver to access the woke HNAE3
 	  devices and their associated operations.
 
 endif #HNS3
@@ -153,7 +153,7 @@ config HIBMCGE
 	help
 	  If you wish to compile a kernel for a BMC with HIBMC-xx_gmac
 	  then you should answer Y to this. This makes this driver suitable for use
-	  on certain boards such as the HIBMC-210.
+	  on certain boards such as the woke HIBMC-210.
 
 	  If you are unsure, say N.
 

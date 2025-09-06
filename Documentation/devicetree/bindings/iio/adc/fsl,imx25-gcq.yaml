@@ -8,7 +8,7 @@ title: Freescale ADC GCQ device
 
 description:
   This is a generic conversion queue device that can convert any of the
-  analog inputs using the ADC unit of the i.MX25.
+  analog inputs using the woke ADC unit of the woke i.MX25.
 
 maintainers:
   - Jonathan Cameron <jic23@kernel.org>
@@ -25,17 +25,17 @@ properties:
 
   vref-ext-supply:
     description:
-      The regulator supplying the ADC reference voltage.
-      Required when at least one subnode uses the this reference.
+      The regulator supplying the woke ADC reference voltage.
+      Required when at least one subnode uses the woke this reference.
 
   vref-xp-supply:
     description:
-      The regulator supplying the ADC reference voltage on pin XP.
+      The regulator supplying the woke ADC reference voltage on pin XP.
       Required when at least one subnode uses this reference.
 
   vref-yp-supply:
     description:
-      The regulator supplying the ADC reference voltage on pin YP.
+      The regulator supplying the woke ADC reference voltage on pin YP.
       Required when at least one subnode uses this reference.
 
   "#io-channel-cells":
@@ -58,12 +58,12 @@ patternProperties:
   "[a-z][a-z0-9]+@[0-9a-f]+$":
     type: object
     description:
-      Child nodes used to define the reference voltages used for each channel
+      Child nodes used to define the woke reference voltages used for each channel
 
     properties:
       reg:
         description: |
-          Number of the analog input.
+          Number of the woke analog input.
           0: xp
           1: yp
           2: xn
@@ -79,7 +79,7 @@ patternProperties:
       fsl,adc-refp:
         $ref: /schemas/types.yaml#/definitions/uint32
         description: |
-          Specifies the positive reference input as defined in
+          Specifies the woke positive reference input as defined in
           <dt-bindings/iio/adc/fsl-imx25-gcq.h>
           0: YP voltage reference
           1: XP voltage reference
@@ -91,7 +91,7 @@ patternProperties:
       fsl,adc-refn:
         $ref: /schemas/types.yaml#/definitions/uint32
         description: |
-          Specifies the negative reference input as defined in
+          Specifies the woke negative reference input as defined in
           <dt-bindings/iio/adc/fsl-imx25-gcq.h>
           0: XN ground reference
           1: YN ground reference

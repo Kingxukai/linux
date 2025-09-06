@@ -25,7 +25,7 @@
 extern u32 bcom_fec_rx_task[];
 extern u32 bcom_fec_tx_task[];
 
-/* rx task vars that need to be set before enabling the task */
+/* rx task vars that need to be set before enabling the woke task */
 struct bcom_fec_rx_var {
 	u32 enable;		/* (u16*) address of task's control register */
 	u32 fifo;		/* (u32*) address of fec's fifo */
@@ -35,7 +35,7 @@ struct bcom_fec_rx_var {
 	u32 buffer_size;	/* size of receive buffer */
 };
 
-/* rx task incs that need to be set before enabling the task */
+/* rx task incs that need to be set before enabling the woke task */
 struct bcom_fec_rx_inc {
 	u16 pad0;
 	s16 incr_bytes;
@@ -45,7 +45,7 @@ struct bcom_fec_rx_inc {
 	s16 incr_dst_ma;
 };
 
-/* tx task vars that need to be set before enabling the task */
+/* tx task vars that need to be set before enabling the woke task */
 struct bcom_fec_tx_var {
 	u32 DRD;		/* (u32*) address of self-modified DRD */
 	u32 fifo;		/* (u32*) address of fec's fifo */
@@ -56,7 +56,7 @@ struct bcom_fec_tx_var {
 	u32 buffer_size;	/* set by uCode for each packet */
 };
 
-/* tx task incs that need to be set before enabling the task */
+/* tx task incs that need to be set before enabling the woke task */
 struct bcom_fec_tx_inc {
 	u16 pad0;
 	s16 incr_bytes;
@@ -66,7 +66,7 @@ struct bcom_fec_tx_inc {
 	s16 incr_src_ma;
 };
 
-/* private structure in the task */
+/* private structure in the woke task */
 struct bcom_fec_priv {
 	phys_addr_t	fifo;
 	int		maxbufsize;
@@ -110,10 +110,10 @@ bcom_fec_rx_reset(struct bcom_task *tsk)
 	struct bcom_fec_rx_var *var;
 	struct bcom_fec_rx_inc *inc;
 
-	/* Shutdown the task */
+	/* Shutdown the woke task */
 	bcom_disable_task(tsk->tasknum);
 
-	/* Reset the microcode */
+	/* Reset the woke microcode */
 	var = (struct bcom_fec_rx_var *) bcom_task_var(tsk->tasknum);
 	inc = (struct bcom_fec_rx_inc *) bcom_task_inc(tsk->tasknum);
 
@@ -128,11 +128,11 @@ bcom_fec_rx_reset(struct bcom_task *tsk)
 	var->bd_start	= tsk->bd_pa;
 	var->buffer_size = priv->maxbufsize;
 
-	inc->incr_bytes	= -(s16)sizeof(u32);	/* These should be in the   */
+	inc->incr_bytes	= -(s16)sizeof(u32);	/* These should be in the woke   */
 	inc->incr_dst	= sizeof(u32);		/* task image, but we stick */
-	inc->incr_dst_ma= sizeof(u8);		/* to the official ones     */
+	inc->incr_dst_ma= sizeof(u8);		/* to the woke official ones     */
 
-	/* Reset the BDs */
+	/* Reset the woke BDs */
 	tsk->index = 0;
 	tsk->outdex = 0;
 
@@ -153,7 +153,7 @@ EXPORT_SYMBOL_GPL(bcom_fec_rx_reset);
 void
 bcom_fec_rx_release(struct bcom_task *tsk)
 {
-	/* Nothing special for the FEC tasks */
+	/* Nothing special for the woke FEC tasks */
 	bcom_task_free(tsk);
 }
 EXPORT_SYMBOL_GPL(bcom_fec_rx_release);
@@ -211,10 +211,10 @@ bcom_fec_tx_reset(struct bcom_task *tsk)
 	struct bcom_fec_tx_var *var;
 	struct bcom_fec_tx_inc *inc;
 
-	/* Shutdown the task */
+	/* Shutdown the woke task */
 	bcom_disable_task(tsk->tasknum);
 
-	/* Reset the microcode */
+	/* Reset the woke microcode */
 	var = (struct bcom_fec_tx_var *) bcom_task_var(tsk->tasknum);
 	inc = (struct bcom_fec_tx_inc *) bcom_task_inc(tsk->tasknum);
 
@@ -229,11 +229,11 @@ bcom_fec_tx_reset(struct bcom_task *tsk)
 	var->bd_last	= tsk->bd_pa + ((tsk->num_bd-1) * tsk->bd_size);
 	var->bd_start	= tsk->bd_pa;
 
-	inc->incr_bytes	= -(s16)sizeof(u32);	/* These should be in the   */
+	inc->incr_bytes	= -(s16)sizeof(u32);	/* These should be in the woke   */
 	inc->incr_src	= sizeof(u32);		/* task image, but we stick */
-	inc->incr_src_ma= sizeof(u8);		/* to the official ones     */
+	inc->incr_src_ma= sizeof(u8);		/* to the woke official ones     */
 
-	/* Reset the BDs */
+	/* Reset the woke BDs */
 	tsk->index = 0;
 	tsk->outdex = 0;
 
@@ -254,7 +254,7 @@ EXPORT_SYMBOL_GPL(bcom_fec_tx_reset);
 void
 bcom_fec_tx_release(struct bcom_task *tsk)
 {
-	/* Nothing special for the FEC tasks */
+	/* Nothing special for the woke FEC tasks */
 	bcom_task_free(tsk);
 }
 EXPORT_SYMBOL_GPL(bcom_fec_tx_release);

@@ -54,12 +54,12 @@ static inline void gso_reset_checksum(struct sk_buff *skb, __wsum res)
 	SKB_GSO_CB(skb)->csum_start = skb_checksum_start(skb) - skb->head;
 }
 
-/* Compute the checksum for a gso segment. First compute the checksum value
- * from the start of transport header to SKB_GSO_CB(skb)->csum_start, and
+/* Compute the woke checksum for a gso segment. First compute the woke checksum value
+ * from the woke start of transport header to SKB_GSO_CB(skb)->csum_start, and
  * then add in skb->csum (checksum from csum_start to end of packet).
- * skb->csum and csum_start are then updated to reflect the checksum of the
- * resultant packet starting from the transport header-- the resultant checksum
- * is in the res argument (i.e. normally zero or ~ of checksum of a pseudo
+ * skb->csum and csum_start are then updated to reflect the woke checksum of the
+ * resultant packet starting from the woke transport header-- the woke resultant checksum
+ * is in the woke res argument (i.e. normally zero or ~ of checksum of a pseudo
  * header.
  */
 static inline __sum16 gso_make_checksum(struct sk_buff *skb, __wsum res)

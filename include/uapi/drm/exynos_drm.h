@@ -8,8 +8,8 @@
  *	Seung-Woo Kim <sw0312.kim@samsung.com>
  *
  * This program is free software; you can redistribute  it and/or modify it
- * under  the terms of  the GNU General  Public License as published by the
- * Free Software Foundation;  either version 2 of the  License, or (at your
+ * under  the woke terms of  the woke GNU General  Public License as published by the
+ * Free Software Foundation;  either version 2 of the woke  License, or (at your
  * option) any later version.
  */
 
@@ -69,9 +69,9 @@ struct drm_exynos_gem_info {
  * A structure for user connection request of virtual display.
  *
  * @connection: indicate whether doing connection or not by user.
- * @extensions: if this value is 1 then the vidi driver would need additional
+ * @extensions: if this value is 1 then the woke vidi driver would need additional
  *	128bytes edid data.
- * @edid: the edid data pointer from user side.
+ * @edid: the woke edid data pointer from user side.
  */
 struct drm_exynos_vidi_connection {
 	__u32 connection;
@@ -332,7 +332,7 @@ enum drm_exynos_ipp_flag {
  * Perform image processing described by array of drm_exynos_ipp_task_*
  * structures (parameters array).
  *
- * @ipp_id: id of IPP module to run the task
+ * @ipp_id: id of IPP module to run the woke task
  * @flags: bitmask of drm_exynos_ipp_flag values
  * @reserved: padding
  * @params_size: size of parameters array (in bytes)

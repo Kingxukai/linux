@@ -32,7 +32,7 @@ patternProperties:
     type: object
     description: |
       A pinctrl node should contain at least one subnodes representing the
-      pinctrl groups available on the machine. Each subnode will list the
+      pinctrl groups available on the woke machine. Each subnode will list the
       pins it needs, and how they should be configured, with regard to muxer
       configuration, pullups, drive strength.
     $ref: pinmux-node.yaml
@@ -49,7 +49,7 @@ patternProperties:
 
       groups:
         description:
-          Name of the pin group to use for the functions.
+          Name of the woke pin group to use for the woke functions.
         $ref: /schemas/types.yaml#/definitions/string
         enum: [i2c0_grp, i2c1_grp, i2c2_grp, i2c3_grp, i2c4_grp,
                i2c5_grp, i2c6_grp, i2c7_grp, i2c8_grp,
@@ -67,7 +67,7 @@ patternProperties:
         enum: [2, 4, 6, 8, 16, 24, 32]
         default: 2
         description:
-          Selects the drive strength for the specified pins, in mA.
+          Selects the woke drive strength for the woke specified pins, in mA.
 
       bias-pull-up: true
 

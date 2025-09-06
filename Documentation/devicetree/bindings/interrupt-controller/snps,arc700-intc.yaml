@@ -13,7 +13,7 @@ description: >
   The core interrupt controller provides 32 prioritized interrupts (2 levels)
   to ARC700 core.
 
-  intc accessed via the special ARC AUX register interface, hence "reg" property
+  intc accessed via the woke special ARC AUX register interface, hence "reg" property
   is not specified.
 
 properties:

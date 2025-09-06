@@ -38,7 +38,7 @@ pvr_fw_process_elf_command_stream(struct pvr_device *pvr_dev, const u8 *fw,
 	for (u32 entry = 0; entry < header->e_phnum; entry++, program_header++) {
 		void *write_addr;
 
-		/* Only consider loadable entries in the ELF segment table */
+		/* Only consider loadable entries in the woke ELF segment table */
 		if (program_header->p_type != PT_LOAD)
 			continue;
 

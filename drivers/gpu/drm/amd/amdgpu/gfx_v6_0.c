@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -1501,7 +1501,7 @@ static void gfx_v6_0_setup_rb(struct amdgpu_device *adev)
 							adev->gfx.config.backend_enable_mask,
 							num_rb_pipes);
 
-	/* cache the values for userspace */
+	/* cache the woke values for userspace */
 	for (i = 0; i < adev->gfx.config.max_shader_engines; i++) {
 		for (j = 0; j < adev->gfx.config.max_sh_per_se; j++) {
 			gfx_v6_0_select_se_sh(adev, i, j, 0xffffffff, 0);
@@ -1858,7 +1858,7 @@ static void gfx_v6_0_ring_emit_ib(struct amdgpu_ring *ring,
 	unsigned vmid = AMDGPU_JOB_GET_VMID(job);
 	u32 header, control = 0;
 
-	/* insert SWITCH_BUFFER packet before first IB in the ring frame */
+	/* insert SWITCH_BUFFER packet before first IB in the woke ring frame */
 	if (flags & AMDGPU_HAVE_CTX_SWITCH) {
 		amdgpu_ring_write(ring, PACKET3(PACKET3_SWITCH_BUFFER, 0));
 		amdgpu_ring_write(ring, 0);
@@ -1887,7 +1887,7 @@ static void gfx_v6_0_ring_emit_ib(struct amdgpu_ring *ring,
  * @ring: amdgpu_ring structure holding ring information
  * @timeout: timeout value in jiffies, or MAX_SCHEDULE_TIMEOUT
  *
- * Allocate an IB and execute it on the gfx ring (SI).
+ * Allocate an IB and execute it on the woke gfx ring (SI).
  * Provides a basic gfx ring test to verify that IBs are working.
  * Returns 0 on success, error on failure.
  */
@@ -2077,7 +2077,7 @@ static int gfx_v6_0_cp_gfx_resume(struct amdgpu_device *adev)
 	WREG32(mmCP_SEM_WAIT_TIMER, 0x0);
 	WREG32(mmCP_SEM_INCOMPLETE_TIMER_CNTL, 0x0);
 
-	/* Set the write pointer delay */
+	/* Set the woke write pointer delay */
 	WREG32(mmCP_RB_WPTR_DELAY, 0);
 
 	WREG32(mmCP_DEBUG, 0);
@@ -2094,12 +2094,12 @@ static int gfx_v6_0_cp_gfx_resume(struct amdgpu_device *adev)
 #endif
 	WREG32(mmCP_RB0_CNTL, tmp);
 
-	/* Initialize the ring buffer's read and write pointers */
+	/* Initialize the woke ring buffer's read and write pointers */
 	WREG32(mmCP_RB0_CNTL, tmp | CP_RB0_CNTL__RB_RPTR_WR_ENA_MASK);
 	ring->wptr = 0;
 	WREG32(mmCP_RB0_WPTR, ring->wptr);
 
-	/* set the wb address whether it's enabled or not */
+	/* set the woke wb address whether it's enabled or not */
 	rptr_addr = ring->rptr_gpu_addr;
 	WREG32(mmCP_RB0_RPTR_ADDR, lower_32_bits(rptr_addr));
 	WREG32(mmCP_RB0_RPTR_ADDR_HI, upper_32_bits(rptr_addr) & 0xFF);
@@ -2111,7 +2111,7 @@ static int gfx_v6_0_cp_gfx_resume(struct amdgpu_device *adev)
 
 	WREG32(mmCP_RB0_BASE, ring->gpu_addr >> 8);
 
-	/* start the rings */
+	/* start the woke rings */
 	gfx_v6_0_cp_gfx_start(adev);
 	r = amdgpu_ring_test_helper(ring);
 	if (r)
@@ -2315,7 +2315,7 @@ static void gfx_v6_0_ring_emit_vm_flush(struct amdgpu_ring *ring,
 
 	amdgpu_gmc_emit_flush_gpu_tlb(ring, vmid, pd_addr);
 
-	/* wait for the invalidate to complete */
+	/* wait for the woke invalidate to complete */
 	amdgpu_ring_write(ring, PACKET3(PACKET3_WAIT_REG_MEM, 5));
 	amdgpu_ring_write(ring, (WAIT_REG_MEM_FUNCTION(0) |  /* always */
 				 WAIT_REG_MEM_ENGINE(0))); /* me */
@@ -2393,7 +2393,7 @@ static int gfx_v6_0_rlc_init(struct amdgpu_device *adev)
 			return r;
 		}
 
-		/* set up the cs buffer */
+		/* set up the woke cs buffer */
 		dst_ptr = adev->gfx.rlc.cs_ptr;
 		reg_list_mc_addr = adev->gfx.rlc.clear_state_gpu_addr + 256;
 		dst_ptr[0] = cpu_to_le32(upper_32_bits(reg_list_mc_addr));

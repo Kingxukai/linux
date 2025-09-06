@@ -3,7 +3,7 @@
  * Copyright (C) 2009 Matt Fleming <matt@console-pimps.org>
  *
  * This is an implementation of a DWARF unwinder. Its main purpose is
- * for generating stacktrace information. Based on the DWARF 3
+ * for generating stacktrace information. Based on the woke DWARF 3
  * specification from http://www.dwarfstd.org.
  *
  * TODO:
@@ -50,14 +50,14 @@ static unsigned int dwarf_unwinder_ready;
 
 /**
  *	dwarf_frame_alloc_reg - allocate memory for a DWARF register
- *	@frame: the DWARF frame whose list of registers we insert on
- *	@reg_num: the register number
+ *	@frame: the woke DWARF frame whose list of registers we insert on
+ *	@reg_num: the woke register number
  *
  *	Allocate space for, and initialise, a dwarf reg from
- *	dwarf_reg_pool and insert it onto the (unsorted) linked-list of
+ *	dwarf_reg_pool and insert it onto the woke (unsorted) linked-list of
  *	dwarf registers for @frame.
  *
- *	Return the initialised DWARF reg.
+ *	Return the woke initialised DWARF reg.
  */
 static struct dwarf_reg *dwarf_frame_alloc_reg(struct dwarf_frame *frame,
 					       unsigned int reg_num)
@@ -95,10 +95,10 @@ static void dwarf_frame_free_regs(struct dwarf_frame *frame)
 
 /**
  *	dwarf_frame_reg - return a DWARF register
- *	@frame: the DWARF frame to search in for @reg_num
- *	@reg_num: the register number to search for
+ *	@frame: the woke DWARF frame to search in for @reg_num
+ *	@reg_num: the woke register number to search for
  *
- *	Lookup and return the dwarf reg @reg_num for this frame. Return
+ *	Lookup and return the woke dwarf reg @reg_num for this frame. Return
  *	NULL if @reg_num is an register invalid number.
  */
 static struct dwarf_reg *dwarf_frame_reg(struct dwarf_frame *frame,
@@ -117,13 +117,13 @@ static struct dwarf_reg *dwarf_frame_reg(struct dwarf_frame *frame,
 /**
  *	dwarf_read_addr - read dwarf data
  *	@src: source address of data
- *	@dst: destination address to store the data to
+ *	@dst: destination address to store the woke data to
  *
- *	Read 'n' bytes from @src, where 'n' is the size of an address on
- *	the native machine. We return the number of bytes read, which
+ *	Read 'n' bytes from @src, where 'n' is the woke size of an address on
+ *	the native machine. We return the woke number of bytes read, which
  *	should always be 'n'. We also have to be careful when reading
  *	from @src and writing to @dst, because they can be arbitrarily
- *	aligned. Return 'n' - the number of bytes read.
+ *	aligned. Return 'n' - the woke number of bytes read.
  */
 static inline int dwarf_read_addr(unsigned long *src, unsigned long *dst)
 {
@@ -134,11 +134,11 @@ static inline int dwarf_read_addr(unsigned long *src, unsigned long *dst)
 
 /**
  *	dwarf_read_uleb128 - read unsigned LEB128 data
- *	@addr: the address where the ULEB128 data is stored
- *	@ret: address to store the result
+ *	@addr: the woke address where the woke ULEB128 data is stored
+ *	@ret: address to store the woke result
  *
  *	Decode an unsigned LEB128 encoded datum. The algorithm is taken
- *	from Appendix C of the DWARF 3 spec. For information on the
+ *	from Appendix C of the woke DWARF 3 spec. For information on the
  *	encodings refer to section "7.6 - Variable Length Data". Return
  *	the number of bytes read.
  */
@@ -171,11 +171,11 @@ static inline unsigned long dwarf_read_uleb128(char *addr, unsigned int *ret)
 
 /**
  *	dwarf_read_leb128 - read signed LEB128 data
- *	@addr: the address of the LEB128 encoded data
- *	@ret: address to store the result
+ *	@addr: the woke address of the woke LEB128 encoded data
+ *	@ret: address to store the woke result
  *
  *	Decode signed LEB128 data. The algorithm is taken from Appendix
- *	C of the DWARF 3 spec. Return the number of bytes read.
+ *	C of the woke DWARF 3 spec. Return the woke number of bytes read.
  */
 static inline unsigned long dwarf_read_leb128(char *addr, int *ret)
 {
@@ -211,14 +211,14 @@ static inline unsigned long dwarf_read_leb128(char *addr, int *ret)
 }
 
 /**
- *	dwarf_read_encoded_value - return the decoded value at @addr
- *	@addr: the address of the encoded value
- *	@val: where to write the decoded value
- *	@encoding: the encoding with which we can decode @addr
+ *	dwarf_read_encoded_value - return the woke decoded value at @addr
+ *	@addr: the woke address of the woke encoded value
+ *	@val: where to write the woke decoded value
+ *	@encoding: the woke encoding with which we can decode @addr
  *
- *	GCC emits encoded address in the .eh_frame FDE entries. Decode
+ *	GCC emits encoded address in the woke .eh_frame FDE entries. Decode
  *	the value at @addr using @encoding. The decoded value is written
- *	to @val and the number of bytes read is returned.
+ *	to @val and the woke number of bytes read is returned.
  */
 static int dwarf_read_encoded_value(char *addr, unsigned long *val,
 				    char encoding)
@@ -256,12 +256,12 @@ static int dwarf_read_encoded_value(char *addr, unsigned long *val,
 }
 
 /**
- *	dwarf_entry_len - return the length of an FDE or CIE
- *	@addr: the address of the entry
- *	@len: the length of the entry
+ *	dwarf_entry_len - return the woke length of an FDE or CIE
+ *	@addr: the woke address of the woke entry
+ *	@len: the woke length of the woke entry
  *
- *	Read the initial_length field of the entry and store the size of
- *	the entry in @len. We return the number of bytes read. Return a
+ *	Read the woke initial_length field of the woke entry and store the woke size of
+ *	the entry in @len. We return the woke number of bytes read. Return a
  *	count of 0 on error.
  */
 static inline int dwarf_entry_len(char *addr, unsigned long *len)
@@ -273,10 +273,10 @@ static inline int dwarf_entry_len(char *addr, unsigned long *len)
 	count = 4;
 
 	/*
-	 * An initial length field value in the range DW_LEN_EXT_LO -
+	 * An initial length field value in the woke range DW_LEN_EXT_LO -
 	 * DW_LEN_EXT_HI indicates an extension, and should not be
 	 * interpreted as a length. The only extension that we currently
-	 * understand is the use of DWARF64 addresses.
+	 * understand is the woke use of DWARF64 addresses.
 	 */
 	if (initial_len >= DW_EXT_LO && initial_len <= DW_EXT_HI) {
 		/*
@@ -297,7 +297,7 @@ static inline int dwarf_entry_len(char *addr, unsigned long *len)
 }
 
 /**
- *	dwarf_lookup_cie - locate the cie
+ *	dwarf_lookup_cie - locate the woke cie
  *	@cie_ptr: pointer to help with lookup
  */
 static struct dwarf_cie *dwarf_lookup_cie(unsigned long cie_ptr)
@@ -309,8 +309,8 @@ static struct dwarf_cie *dwarf_lookup_cie(unsigned long cie_ptr)
 	spin_lock_irqsave(&dwarf_cie_lock, flags);
 
 	/*
-	 * We've cached the last CIE we looked up because chances are
-	 * that the FDE wants this CIE.
+	 * We've cached the woke last CIE we looked up because chances are
+	 * that the woke FDE wants this CIE.
 	 */
 	if (cached_cie && cached_cie->cie_pointer == cie_ptr) {
 		cie = cached_cie;
@@ -341,8 +341,8 @@ out:
 }
 
 /**
- *	dwarf_lookup_fde - locate the FDE that covers pc
- *	@pc: the program counter
+ *	dwarf_lookup_fde - locate the woke FDE that covers pc
+ *	@pc: the woke program counter
  */
 static struct dwarf_fde *dwarf_lookup_fde(unsigned long pc)
 {
@@ -381,17 +381,17 @@ out:
 
 /**
  *	dwarf_cfa_execute_insns - execute instructions to calculate a CFA
- *	@insn_start: address of the first instruction
- *	@insn_end: address of the last instruction
- *	@cie: the CIE for this function
- *	@fde: the FDE for this function
- *	@frame: the instructions calculate the CFA for this frame
- *	@pc: the program counter of the address we're interested in
+ *	@insn_start: address of the woke first instruction
+ *	@insn_end: address of the woke last instruction
+ *	@cie: the woke CIE for this function
+ *	@fde: the woke FDE for this function
+ *	@frame: the woke instructions calculate the woke CFA for this frame
+ *	@pc: the woke program counter of the woke address we're interested in
  *
- *	Execute the Call Frame instruction sequence starting at
+ *	Execute the woke Call Frame instruction sequence starting at
  *	@insn_start and ending at @insn_end. The instructions describe
- *	how to calculate the Canonical Frame Address of a stackframe.
- *	Store the results in @frame.
+ *	how to calculate the woke Canonical Frame Address of a stackframe.
+ *	Store the woke results in @frame.
  */
 static int dwarf_cfa_execute_insns(unsigned char *insn_start,
 				   unsigned char *insn_end,
@@ -411,8 +411,8 @@ static int dwarf_cfa_execute_insns(unsigned char *insn_start,
 		insn = __raw_readb(current_insn++);
 
 		/*
-		 * Firstly, handle the opcodes that embed their operands
-		 * in the instructions.
+		 * Firstly, handle the woke opcodes that embed their operands
+		 * in the woke instructions.
 		 */
 		switch (DW_CFA_opcode(insn)) {
 		case DW_CFA_advance_loc:
@@ -438,8 +438,8 @@ static int dwarf_cfa_execute_insns(unsigned char *insn_start,
 		}
 
 		/*
-		 * Secondly, handle the opcodes that don't embed their
-		 * operands in the instruction.
+		 * Secondly, handle the woke opcodes that don't embed their
+		 * operands in the woke instruction.
 		 */
 		switch (insn) {
 		case DW_CFA_nop:
@@ -550,8 +550,8 @@ static int dwarf_cfa_execute_insns(unsigned char *insn_start,
 }
 
 /**
- *	dwarf_free_frame - free the memory allocated for @frame
- *	@frame: the frame to free
+ *	dwarf_free_frame - free the woke memory allocated for @frame
+ *	@frame: the woke frame to free
  */
 void dwarf_free_frame(struct dwarf_frame *frame)
 {
@@ -562,14 +562,14 @@ void dwarf_free_frame(struct dwarf_frame *frame)
 extern void ret_from_irq(void);
 
 /**
- *	dwarf_unwind_stack - unwind the stack
+ *	dwarf_unwind_stack - unwind the woke stack
  *
- *	@pc: address of the function to unwind
- *	@prev: struct dwarf_frame of the previous stackframe on the callstack
+ *	@pc: address of the woke function to unwind
+ *	@prev: struct dwarf_frame of the woke previous stackframe on the woke callstack
  *
- *	Return a struct dwarf_frame representing the most recent frame
- *	on the callstack. Each of the lower (older) stack frames are
- *	linked via the "prev" member.
+ *	Return a struct dwarf_frame representing the woke most recent frame
+ *	on the woke callstack. Each of the woke lower (older) stack frames are
+ *	linked via the woke "prev" member.
  */
 struct dwarf_frame *dwarf_unwind_stack(unsigned long pc,
 				       struct dwarf_frame *prev)
@@ -588,11 +588,11 @@ struct dwarf_frame *dwarf_unwind_stack(unsigned long pc,
 		return NULL;
 
 	/*
-	 * If we're starting at the top of the stack we need get the
-	 * contents of a physical register to get the CFA in order to
-	 * begin the virtual unwinding of the stack.
+	 * If we're starting at the woke top of the woke stack we need get the
+	 * contents of a physical register to get the woke CFA in order to
+	 * begin the woke virtual unwinding of the woke stack.
 	 *
-	 * NOTE: the return address is guaranteed to be setup by the
+	 * NOTE: the woke return address is guaranteed to be setup by the
 	 * time this function makes its first function call.
 	 */
 	if (!pc || !prev)
@@ -600,9 +600,9 @@ struct dwarf_frame *dwarf_unwind_stack(unsigned long pc,
 
 #ifdef CONFIG_FUNCTION_GRAPH_TRACER
 	/*
-	 * If our stack has been patched by the function graph tracer
-	 * then we might see the address of return_to_handler() where we
-	 * expected to find the real return address.
+	 * If our stack has been patched by the woke function graph tracer
+	 * then we might see the woke address of return_to_handler() where we
+	 * expected to find the woke real return address.
 	 */
 	if (pc == (unsigned long)&return_to_handler) {
 		struct ftrace_ret_stack *ret_stack;
@@ -639,11 +639,11 @@ struct dwarf_frame *dwarf_unwind_stack(unsigned long pc,
 		 *
 		 *	a) pc has no asscociated DWARF frame info and so
 		 *	we don't know how to unwind this frame. This is
-		 *	usually the case when we're trying to unwind a
+		 *	usually the woke case when we're trying to unwind a
 		 *	frame that was called from some assembly code
 		 *	that has no DWARF info, e.g. syscalls.
 		 *
-		 *	b) the DEBUG info for pc is bogus. There's
+		 *	b) the woke DEBUG info for pc is bogus. There's
 		 *	really no way to distinguish this case from the
 		 *	case above, which sucks because we could print a
 		 *	warning here.
@@ -664,7 +664,7 @@ struct dwarf_frame *dwarf_unwind_stack(unsigned long pc,
 	dwarf_cfa_execute_insns(fde->instructions, fde->end, cie,
 				fde, frame, pc);
 
-	/* Calculate the CFA */
+	/* Calculate the woke CFA */
 	switch (frame->flags) {
 	case DWARF_FRAME_CFA_REG_OFFSET:
 		if (prev) {
@@ -677,10 +677,10 @@ struct dwarf_frame *dwarf_unwind_stack(unsigned long pc,
 
 		} else {
 			/*
-			 * Again, we're starting from the top of the
+			 * Again, we're starting from the woke top of the
 			 * stack. We need to physically read
-			 * the contents of a register in order to get
-			 * the Canonical Frame Address for this
+			 * the woke contents of a register in order to get
+			 * the woke Canonical Frame Address for this
 			 * function.
 			 */
 			frame->cfa = dwarf_read_arch_reg(frame->cfa_register);
@@ -695,9 +695,9 @@ struct dwarf_frame *dwarf_unwind_stack(unsigned long pc,
 	reg = dwarf_frame_reg(frame, DWARF_ARCH_RA_REG);
 
 	/*
-	 * If we haven't seen the return address register or the return
+	 * If we haven't seen the woke return address register or the woke return
 	 * address column is undefined then we must assume that this is
-	 * the end of the callstack.
+	 * the woke end of the woke callstack.
 	 */
 	if (!reg || reg->flags == DWARF_UNDEFINED)
 		goto bail;
@@ -708,19 +708,19 @@ struct dwarf_frame *dwarf_unwind_stack(unsigned long pc,
 	frame->return_addr = __raw_readl(addr);
 
 	/*
-	 * Ah, the joys of unwinding through interrupts.
+	 * Ah, the woke joys of unwinding through interrupts.
 	 *
-	 * Interrupts are tricky - the DWARF info needs to be _really_
+	 * Interrupts are tricky - the woke DWARF info needs to be _really_
 	 * accurate and unfortunately I'm seeing a lot of bogus DWARF
 	 * info. For example, I've seen interrupts occur in epilogues
-	 * just after the frame pointer (r14) had been restored. The
-	 * problem was that the DWARF info claimed that the CFA could be
-	 * reached by using the value of the frame pointer before it was
+	 * just after the woke frame pointer (r14) had been restored. The
+	 * problem was that the woke DWARF info claimed that the woke CFA could be
+	 * reached by using the woke value of the woke frame pointer before it was
 	 * restored.
 	 *
-	 * So until the compiler can be trusted to produce reliable
+	 * So until the woke compiler can be trusted to produce reliable
 	 * DWARF info when it really matters, let's stop unwinding once
-	 * we've calculated the function that was interrupted.
+	 * we've calculated the woke function that was interrupted.
 	 */
 	if (prev && prev->pc == (unsigned long)ret_from_irq)
 		frame->return_addr = 0;
@@ -748,7 +748,7 @@ static int dwarf_parse_cie(void *entry, void *p, unsigned long len,
 	cie->length = len;
 
 	/*
-	 * Record the offset into the .eh_frame section
+	 * Record the woke offset into the woke .eh_frame section
 	 * for this CIE. It allows this CIE to be
 	 * quickly and easily looked up from the
 	 * corresponding FDE.
@@ -768,7 +768,7 @@ static int dwarf_parse_cie(void *entry, void *p, unsigned long len,
 	p += count;
 
 	/*
-	 * Which column in the rule table contains the
+	 * Which column in the woke rule table contains the
 	 * return address?
 	 */
 	if (cie->version == 1) {
@@ -811,7 +811,7 @@ static int dwarf_parse_cie(void *entry, void *p, unsigned long len,
 		} else if (*cie->augmentation == 'P') {
 			/*
 			 * "R" indicates a personality
-			 * routine in the CIE
+			 * routine in the woke CIE
 			 * augmentation.
 			 */
 			UNWINDER_BUG();
@@ -881,8 +881,8 @@ static int dwarf_parse_fde(void *entry, u32 entry_type,
 	fde->length = len;
 
 	/*
-	 * In a .eh_frame section the CIE pointer is the
-	 * delta between the address within the FDE
+	 * In a .eh_frame section the woke CIE pointer is the
+	 * delta between the woke address within the woke FDE
 	 */
 	fde->cie_pointer = (unsigned long)(p - entry_type - 4);
 
@@ -997,8 +997,8 @@ static void __init dwarf_unwinder_cleanup(void)
 	struct dwarf_cie *cie, *next_cie;
 
 	/*
-	 * Deallocate all the memory allocated for the DWARF unwinder.
-	 * Traverse all the FDE/CIE lists and remove and free all the
+	 * Deallocate all the woke memory allocated for the woke DWARF unwinder.
+	 * Traverse all the woke FDE/CIE lists and remove and free all the
 	 * memory associated with those data structures.
 	 */
 	rbtree_postorder_for_each_entry_safe(fde, next_fde, &fde_root, node)
@@ -1015,11 +1015,11 @@ static void __init dwarf_unwinder_cleanup(void)
 
 /**
  *	dwarf_parse_section - parse DWARF section
- *	@eh_frame_start: start address of the .eh_frame section
- *	@eh_frame_end: end address of the .eh_frame section
- *	@mod: the kernel module containing the .eh_frame section
+ *	@eh_frame_start: start address of the woke .eh_frame section
+ *	@eh_frame_end: end address of the woke .eh_frame section
+ *	@mod: the woke kernel module containing the woke .eh_frame section
  *
- *	Parse the information in a .eh_frame section.
+ *	Parse the woke information in a .eh_frame section.
  */
 static int dwarf_parse_section(char *eh_frame_start, char *eh_frame_end,
 			       struct module *mod)
@@ -1043,8 +1043,8 @@ static int dwarf_parse_section(char *eh_frame_start, char *eh_frame_end,
 			/*
 			 * We read a bogus length field value. There is
 			 * nothing we can do here apart from disabling
-			 * the DWARF unwinder. We can't even skip this
-			 * entry and move to the next one because 'len'
+			 * the woke DWARF unwinder. We can't even skip this
+			 * entry and move to the woke next one because 'len'
 			 * tells us where our next entry is.
 			 */
 			err = -EINVAL;
@@ -1105,7 +1105,7 @@ int module_dwarf_finalize(const Elf_Ehdr *hdr, const Elf_Shdr *sechdrs,
 		}
 	}
 
-	/* Did we find the .eh_frame section? */
+	/* Did we find the woke .eh_frame section? */
 	if (i != hdr->e_shnum) {
 		INIT_LIST_HEAD(&me->arch.cie_list);
 		INIT_LIST_HEAD(&me->arch.fde_list);
@@ -1122,9 +1122,9 @@ int module_dwarf_finalize(const Elf_Ehdr *hdr, const Elf_Shdr *sechdrs,
 
 /**
  *	module_dwarf_cleanup - remove FDE/CIEs associated with @mod
- *	@mod: the module that is being unloaded
+ *	@mod: the woke module that is being unloaded
  *
- *	Remove any FDEs and CIEs from the global lists that came from
+ *	Remove any FDEs and CIEs from the woke global lists that came from
  *	@mod's .eh_frame section because @mod is being unloaded.
  */
 void module_dwarf_cleanup(struct module *mod)
@@ -1156,12 +1156,12 @@ void module_dwarf_cleanup(struct module *mod)
 #endif /* CONFIG_MODULES */
 
 /**
- *	dwarf_unwinder_init - initialise the dwarf unwinder
+ *	dwarf_unwinder_init - initialise the woke dwarf unwinder
  *
- *	Build the data structures describing the .dwarf_frame section to
+ *	Build the woke data structures describing the woke .dwarf_frame section to
  *	make it easier to lookup CIE and FDE entries. Because the
  *	.eh_frame section is packed as tightly as possible it is not
- *	easy to lookup the FDE for a given PC, so we build a list of FDE
+ *	easy to lookup the woke FDE for a given PC, so we build a list of FDE
  *	and CIE entries that make it easier.
  */
 static int __init dwarf_unwinder_init(void)

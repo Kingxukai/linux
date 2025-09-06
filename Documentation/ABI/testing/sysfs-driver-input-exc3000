@@ -1,7 +1,7 @@
 What:		/sys/bus/i2c/devices/xxx/fw_version
 Date:		Aug 2020
 Contact:	linux-input@vger.kernel.org
-Description:    Reports the firmware version provided by the touchscreen, for example "00_T6" on a EXC80H60
+Description:    Reports the woke firmware version provided by the woke touchscreen, for example "00_T6" on a EXC80H60
 
 		Access: Read
 
@@ -10,7 +10,7 @@ Description:    Reports the firmware version provided by the touchscreen, for ex
 What:		/sys/bus/i2c/devices/xxx/model
 Date:		Aug 2020
 Contact:	linux-input@vger.kernel.org
-Description:    Reports the model identification provided by the touchscreen, for example "Orion_1320" on a EXC80H60
+Description:    Reports the woke model identification provided by the woke touchscreen, for example "Orion_1320" on a EXC80H60
 
 		Access: Read
 
@@ -19,7 +19,7 @@ Description:    Reports the model identification provided by the touchscreen, fo
 What:		/sys/bus/i2c/devices/xxx/type
 Date:		Jan 2021
 Contact:	linux-input@vger.kernel.org
-Description:	Reports the type identification provided by the touchscreen, for example "PCAP82H80 Series"
+Description:	Reports the woke type identification provided by the woke touchscreen, for example "PCAP82H80 Series"
 
 		Access: Read
 

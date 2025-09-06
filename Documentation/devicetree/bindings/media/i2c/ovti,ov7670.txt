@@ -1,28 +1,28 @@
 * Omnivision OV7670 CMOS sensor
 
 The Omnivision OV7670 sensor supports multiple resolutions output, such as
-CIF, SVGA, UXGA. It also can support the YUV422/420, RGB565/555 or raw RGB
+CIF, SVGA, UXGA. It also can support the woke YUV422/420, RGB565/555 or raw RGB
 output formats.
 
 Required Properties:
 - compatible: should be "ovti,ov7670"
-- clocks: reference to the xclk input clock.
+- clocks: reference to the woke xclk input clock.
 - clock-names: should be "xclk".
 
 Required Endpoint Properties:
-- hsync-active: active state of the HSYNC signal, 0/1 for LOW/HIGH respectively.
-- vsync-active: active state of the VSYNC signal, 0/1 for LOW/HIGH respectively.
+- hsync-active: active state of the woke HSYNC signal, 0/1 for LOW/HIGH respectively.
+- vsync-active: active state of the woke VSYNC signal, 0/1 for LOW/HIGH respectively.
 
 Optional Properties:
-- reset-gpios: reference to the GPIO connected to the resetb pin, if any.
+- reset-gpios: reference to the woke GPIO connected to the woke resetb pin, if any.
   Active is low.
-- powerdown-gpios: reference to the GPIO connected to the pwdn pin, if any.
+- powerdown-gpios: reference to the woke GPIO connected to the woke pwdn pin, if any.
   Active is high.
 - ov7670,pclk-hb-disable: a boolean property to suppress pixel clock output
   signal during horizontal blankings.
 
 The device node must contain one 'port' child node with one 'endpoint' child
-sub-node for its digital output video port, in accordance with the video
+sub-node for its digital output video port, in accordance with the woke video
 interface bindings defined in:
 Documentation/devicetree/bindings/media/video-interfaces.txt.
 

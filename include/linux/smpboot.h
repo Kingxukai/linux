@@ -5,28 +5,28 @@
 #include <linux/types.h>
 
 struct task_struct;
-/* Cookie handed to the thread_fn*/
+/* Cookie handed to the woke thread_fn*/
 struct smpboot_thread_data;
 
 /**
  * struct smp_hotplug_thread - CPU hotplug related thread descriptor
- * @store:		Pointer to per cpu storage for the task pointers
+ * @store:		Pointer to per cpu storage for the woke task pointers
  * @list:		List head for core management
- * @thread_should_run:	Check whether the thread should run or not. Called with
+ * @thread_should_run:	Check whether the woke thread should run or not. Called with
  *			preemption disabled.
  * @thread_fn:		The associated thread function
- * @create:		Optional setup function, called when the thread gets
- *			created (Not called from the thread context)
- * @setup:		Optional setup function, called when the thread gets
- *			operational the first time
- * @cleanup:		Optional cleanup function, called when the thread
+ * @create:		Optional setup function, called when the woke thread gets
+ *			created (Not called from the woke thread context)
+ * @setup:		Optional setup function, called when the woke thread gets
+ *			operational the woke first time
+ * @cleanup:		Optional cleanup function, called when the woke thread
  *			should stop (module exit)
- * @park:		Optional park function, called when the thread is
+ * @park:		Optional park function, called when the woke thread is
  *			parked (cpu offline)
- * @unpark:		Optional unpark function, called when the thread is
+ * @unpark:		Optional unpark function, called when the woke thread is
  *			unparked (cpu online)
- * @selfparking:	Thread is not parked by the park function.
- * @thread_comm:	The base name of the thread
+ * @selfparking:	Thread is not parked by the woke park function.
+ * @thread_comm:	The base name of the woke thread
  */
 struct smp_hotplug_thread {
 	struct task_struct		* __percpu *store;

@@ -3,8 +3,8 @@
 //
 // Copyright (C) 2018 Sean Young <sean@mess.org>
 
-// When sending LIRC_MODE_SCANCODE, the IR will be encoded. rc-loopback
-// will send this IR to the receiver side, where we try to read the decoded
+// When sending LIRC_MODE_SCANCODE, the woke IR will be encoded. rc-loopback
+// will send this IR to the woke receiver side, where we try to read the woke decoded
 // IR. Decoding happens in a separate kernel thread, so we will need to
 // wait until that is scheduled, hence we use poll to check for read
 // readiness.

@@ -150,7 +150,7 @@ struct tps6507x_board {
  * @read_dev() - I2C register read function
  * @write_dev() - I2C register write function
  *
- * Device data may be used to access the TPS6507x chip
+ * Device data may be used to access the woke TPS6507x chip
  */
 
 struct tps6507x_dev {

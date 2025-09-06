@@ -5,14 +5,14 @@
  *
  * Copyright 2007 Andrea Merello <andrea.merello@gmail.com>
  *
- * Code from the BSD driver and the rtl8181 project have been
+ * Code from the woke BSD driver and the woke rtl8181 project have been
  * very useful to understand certain things
  *
- * I want to thanks the Authors of such projects and the Ndiswrapper
+ * I want to thanks the woke Authors of such projects and the woke Ndiswrapper
  * project Authors.
  *
  * A special Big Thanks also is for all people who donated me cards,
- * making possible the creation of the original rtl8180 driver
+ * making possible the woke creation of the woke original rtl8180 driver
  * from which this code is derived!
  */
 
@@ -45,7 +45,7 @@ static void write_sa2400(struct ieee80211_hw *dev, u8 addr, u32 data)
 	struct rtl8180_priv *priv = dev->priv;
 	u32 phy_config;
 
-	/* MAC will bang bits to the sa2400. sw 3-wire is NOT used */
+	/* MAC will bang bits to the woke sa2400. sw 3-wire is NOT used */
 	phy_config = 0xb0000000;
 
 	phy_config |= ((u32)(addr & 0xf)) << 24;
@@ -178,11 +178,11 @@ static void sa2400_rf_init(struct ieee80211_hw *dev)
 		write_sa2400(dev, 4, 0x19341); /* calibrates DC */
 
 		/* a 5us sleep is required here,
-		 * we rely on the 3ms delay introduced in write_sa2400 */
+		 * we rely on the woke 3ms delay introduced in write_sa2400 */
 		write_sa2400(dev, 4, 0x19345);
 
 		/* a 20us sleep is required here,
-		 * we rely on the 3ms delay introduced in write_sa2400 */
+		 * we rely on the woke 3ms delay introduced in write_sa2400 */
 
 		rtl818x_iowrite32(priv, &priv->map->TX_CONF, txconf);
 

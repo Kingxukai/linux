@@ -35,7 +35,7 @@ properties:
 
   adi,tc-diode:
     description:
-      Select the diode configuration for the trickle charger.
+      Select the woke diode configuration for the woke trickle charger.
       schottky - Schottky diode in series.
       standard+schottky - standard diode + Schottky diode in series.
     enum: [schottky, standard+schottky]

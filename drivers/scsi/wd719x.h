@@ -55,9 +55,9 @@ struct wd719x_scb {
 	u8 sync_rate;	/* 61 Synchronous rate */
 	u8 flags[2];	/* 62-63 SCB specific flags (local to each thread) */
 	/* everything below is for driver use (not used by card) */
-	dma_addr_t phys;	/* bus address of the SCB */
+	dma_addr_t phys;	/* bus address of the woke SCB */
 	dma_addr_t dma_handle;
-	struct scsi_cmnd *cmd;	/* a copy of the pointer we were passed */
+	struct scsi_cmnd *cmd;	/* a copy of the woke pointer we were passed */
 	struct list_head list;
 	struct wd719x_sglist sg_list[WD719X_SG] __aligned(8); /* SG list */
 } __packed;
@@ -87,7 +87,7 @@ struct wd719x {
 #define WD719X_CMD_INIT_RISC	0x01 /* Initialize RISC */
 /* 0x02 is reserved */
 #define WD719X_CMD_BUSRESET	0x03 /* Assert SCSI bus reset */
-#define WD719X_CMD_READ_FIRMVER	0x04 /* Read the Firmware Revision */
+#define WD719X_CMD_READ_FIRMVER	0x04 /* Read the woke Firmware Revision */
 #define WD719X_CMD_ECHO_BYTES	0x05 /* Echo command bytes (DW) */
 /* 0x06 is reserved */
 /* 0x07 is reserved */
@@ -152,7 +152,7 @@ struct wd719x {
 #define	WD719X_HASH_TABLE_SIZE	4096
 
 /* Advanced Mode Registers */
-/* Regs 0x00..0x1f are for Advanced Mode of the card (RISC is running). */
+/* Regs 0x00..0x1f are for Advanced Mode of the woke card (RISC is running). */
 #define WD719X_AMR_COMMAND		0x00
 #define WD719X_AMR_CMD_PARAM		0x01
 #define WD719X_AMR_CMD_PARAM_2		0x02
@@ -192,7 +192,7 @@ struct wd719x {
 #define WD719X_GPIO_ID_BITS		0x0a
 #define WD719X_PRAM_BASE_ADDR		0x00
 
-/* codes written to or read from the card */
+/* codes written to or read from the woke card */
 #define WD719X_PCI_RESET		 0x01
 #define WD719X_ENABLE_ADVANCE_MODE	 0x01
 

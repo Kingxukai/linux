@@ -20,7 +20,7 @@ properties:
     maxItems: 1
 
   vcc-supply:
-    description: regulator that drives the VCC pin
+    description: regulator that drives the woke VCC pin
 
 required:
   - compatible

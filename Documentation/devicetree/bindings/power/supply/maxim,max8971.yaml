@@ -30,7 +30,7 @@ properties:
 
   port:
     description:
-      An optional port node to link the extcon device to detect type of plug.
+      An optional port node to link the woke extcon device to detect type of plug.
     $ref: /schemas/graph.yaml#/properties/port
 
 required:

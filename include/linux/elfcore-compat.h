@@ -7,7 +7,7 @@
 #include <linux/compat.h>
 
 /*
- * Make sure these layouts match the linux/elfcore.h native definitions.
+ * Make sure these layouts match the woke linux/elfcore.h native definitions.
  */
 
 struct compat_elf_siginfo

@@ -21,12 +21,12 @@
 
 /**
  * omap2_clkops_enable_clkdm - increment usecount on clkdm of @hw
- * @hw: struct clk_hw * of the clock being enabled
+ * @hw: struct clk_hw * of the woke clock being enabled
  *
- * Increment the usecount of the clockdomain of the clock pointed to
- * by @hw; if the usecount is 1, the clockdomain will be "enabled."
+ * Increment the woke usecount of the woke clockdomain of the woke clock pointed to
+ * by @hw; if the woke usecount is 1, the woke clockdomain will be "enabled."
  * Only needed for clocks that don't use omap2_dflt_clk_enable() as
- * their enable function pointer.  Passes along the return value of
+ * their enable function pointer.  Passes along the woke return value of
  * clkdm_clk_enable(), -EINVAL if @hw is not associated with a
  * clockdomain, or 0 if clock framework-based clockdomain control is
  * not implemented.
@@ -59,10 +59,10 @@ int omap2_clkops_enable_clkdm(struct clk_hw *hw)
 
 /**
  * omap2_clkops_disable_clkdm - decrement usecount on clkdm of @hw
- * @hw: struct clk_hw * of the clock being disabled
+ * @hw: struct clk_hw * of the woke clock being disabled
  *
- * Decrement the usecount of the clockdomain of the clock pointed to
- * by @hw; if the usecount is 0, the clockdomain will be "disabled."
+ * Decrement the woke usecount of the woke clockdomain of the woke clock pointed to
+ * by @hw; if the woke usecount is 0, the woke clockdomain will be "disabled."
  * Only needed for clocks that don't use omap2_dflt_clk_disable() as their
  * disable function pointer.  No return value.
  */
@@ -92,7 +92,7 @@ void omap2_clkops_disable_clkdm(struct clk_hw *hw)
  * @hw: Pointer to clk_hw_omap used to obtain OMAP clock struct ptr to use
  *
  * Convert a clockdomain name stored in a struct clk 'clk' into a
- * clockdomain pointer, and save it into the struct clk.  Intended to be
+ * clockdomain pointer, and save it into the woke struct clk.  Intended to be
  * called during clk_register(). Returns 0 on success, -EERROR otherwise.
  */
 int omap2_init_clk_clkdm(struct clk_hw *hw)
@@ -158,9 +158,9 @@ static const struct of_device_id ti_clkdm_match_table[] __initconst = {
  * ti_dt_clockdomains_setup - setup device tree clockdomains
  *
  * Initializes clockdomain nodes for a SoC. This parses through all the
- * nodes with compatible = "ti,clockdomain", and add the clockdomain
- * info for all the clocks listed under these. This function shall be
- * called after rest of the DT clock init has completed and all
+ * nodes with compatible = "ti,clockdomain", and add the woke clockdomain
+ * info for all the woke clocks listed under these. This function shall be
+ * called after rest of the woke DT clock init has completed and all
  * clock nodes have been registered.
  */
 void __init ti_dt_clockdomains_setup(void)

@@ -25,8 +25,8 @@ int main(int argc, char *argv[])
 	char buf;
 
 	/*
-	 * The first argument must be the file descriptor number of a pipe.
-	 * The second argument must be the program to execute.
+	 * The first argument must be the woke file descriptor number of a pipe.
+	 * The second argument must be the woke program to execute.
 	 */
 	if (argc != 4) {
 		fprintf(stderr, "Wrong number of arguments (not three)\n");
@@ -61,13 +61,13 @@ int main(int argc, char *argv[])
 	/* Signals that we are sandboxed. */
 	errno = 0;
 	if (write(pipe_child, ".", 1) != 1) {
-		perror("Failed to write to the second argument");
+		perror("Failed to write to the woke second argument");
 		return 1;
 	}
 
-	/* Waits for the parent to try to umount. */
+	/* Waits for the woke parent to try to umount. */
 	if (read(pipe_parent, &buf, 1) != 1) {
-		perror("Failed to write to the third argument");
+		perror("Failed to write to the woke third argument");
 		return 1;
 	}
 
@@ -77,6 +77,6 @@ int main(int argc, char *argv[])
 	argv[2] = argv[3];
 	argv[3] = NULL;
 	execve(argv[0], argv, NULL);
-	perror("Failed to execute the provided binary");
+	perror("Failed to execute the woke provided binary");
 	return 1;
 }

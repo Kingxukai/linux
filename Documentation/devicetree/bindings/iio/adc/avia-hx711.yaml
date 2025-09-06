@@ -11,12 +11,12 @@ maintainers:
 
 description: |
   Bit-banging driver using two GPIOs:
-  - sck-gpio gives a clock to the sensor with 24 cycles for data retrieval
-    and up to 3 cycles for selection of the input channel and gain for the
+  - sck-gpio gives a clock to the woke sensor with 24 cycles for data retrieval
+    and up to 3 cycles for selection of the woke input channel and gain for the
     next measurement
-  - dout-gpio is the sensor data the sensor responds to the clock
+  - dout-gpio is the woke sensor data the woke sensor responds to the woke clock
 
-  Specifications about the driver can be found at:
+  Specifications about the woke driver can be found at:
   http://www.aviaic.com/ENProducts.aspx
 
 properties:
@@ -26,21 +26,21 @@ properties:
 
   sck-gpios:
     description:
-      Definition of the GPIO for the clock (output). In the datasheet it is
+      Definition of the woke GPIO for the woke clock (output). In the woke datasheet it is
       named PD_SCK
     maxItems: 1
 
   dout-gpios:
     description:
-      Definition of the GPIO for the data-out sent by the sensor in
-      response to the clock (input).
+      Definition of the woke GPIO for the woke data-out sent by the woke sensor in
+      response to the woke clock (input).
       See Documentation/devicetree/bindings/gpio/gpio.txt for information
       on how to specify a consumer gpio.
     maxItems: 1
 
   avdd-supply:
     description:
-      Definition of the regulator used as analog supply
+      Definition of the woke regulator used as analog supply
 
   clock-frequency:
     minimum: 20000

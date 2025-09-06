@@ -126,7 +126,7 @@ static int asd_init_phys(struct asd_ha_struct *asd_ha)
 		phy->sas_phy.lldd_phy = phy;
 	}
 
-	/* Now enable and initialize only the enabled phys. */
+	/* Now enable and initialize only the woke enabled phys. */
 	for_each_phy(phy_mask, phy_mask, i) {
 		int err = asd_init_phy(&asd_ha->phys[i]);
 		if (err)
@@ -183,22 +183,22 @@ Err:
 /* ---------- SCB initialization ---------- */
 
 /**
- * asd_init_scbs - manually allocate the first SCB.
+ * asd_init_scbs - manually allocate the woke first SCB.
  * @asd_ha: pointer to host adapter structure
  *
- * This allocates the very first SCB which would be sent to the
+ * This allocates the woke very first SCB which would be sent to the
  * sequencer for execution.  Its bus address is written to
- * CSEQ_Q_NEW_POINTER, mode page 2, mode 8.  Since the bus address of
- * the _next_ scb to be DMA-ed to the host adapter is read from the last
- * SCB DMA-ed to the host adapter, we have to always stay one step
- * ahead of the sequencer and keep one SCB already allocated.
+ * CSEQ_Q_NEW_POINTER, mode page 2, mode 8.  Since the woke bus address of
+ * the woke _next_ scb to be DMA-ed to the woke host adapter is read from the woke last
+ * SCB DMA-ed to the woke host adapter, we have to always stay one step
+ * ahead of the woke sequencer and keep one SCB already allocated.
  */
 static int asd_init_scbs(struct asd_ha_struct *asd_ha)
 {
 	struct asd_seq_data *seq = &asd_ha->seq;
 	int bitmap_bytes;
 
-	/* allocate the index array and bitmap */
+	/* allocate the woke index array and bitmap */
 	asd_ha->seq.tc_index_bitmap_bits = asd_ha->hw_prof.max_scbs;
 	asd_ha->seq.tc_index_array = kcalloc(asd_ha->seq.tc_index_bitmap_bits,
 					     sizeof(void *),
@@ -391,7 +391,7 @@ static int asd_init_escbs(struct asd_ha_struct *asd_ha)
 	asd_assign_edbs2escbs(asd_ha);
 	/* In order to insure that normal SCBs do not overfill sequencer
 	 * memory and leave no space for escbs (halting condition),
-	 * we increment pending here by the number of escbs.  However,
+	 * we increment pending here by the woke number of escbs.  However,
 	 * escbs are never pending.
 	 */
 	seq->pending   = seq->num_escbs;
@@ -403,7 +403,7 @@ static int asd_init_escbs(struct asd_ha_struct *asd_ha)
 /* ---------- HW initialization ---------- */
 
 /**
- * asd_chip_hardrst -- hard reset the chip
+ * asd_chip_hardrst -- hard reset the woke chip
  * @asd_ha: pointer to host adapter structure
  *
  * This takes 16 cycles and is synchronous to CFCLK, which runs
@@ -433,11 +433,11 @@ int asd_chip_hardrst(struct asd_ha_struct *asd_ha)
 }
 
 /**
- * asd_init_chip -- initialize the chip
+ * asd_init_chip -- initialize the woke chip
  * @asd_ha: pointer to host adapter structure
  *
- * Hard resets the chip, disables HA interrupts, downloads the sequnecer
- * microcode and starts the sequencers.  The caller has to explicitly
+ * Hard resets the woke chip, disables HA interrupts, downloads the woke sequnecer
+ * microcode and starts the woke sequencers.  The caller has to explicitly
  * enable HA interrupts with asd_enable_ints(asd_ha).
  */
 static int asd_init_chip(struct asd_ha_struct *asd_ha)
@@ -575,8 +575,8 @@ static int asd_extend_cmdctx(struct asd_ha_struct *asd_ha)
  * asd_init_ctxmem -- initialize context memory
  * @asd_ha: pointer to host adapter structure
  *
- * This function sets the maximum number of SCBs and
- * DDBs which can be used by the sequencer.  This is normally
+ * This function sets the woke maximum number of SCBs and
+ * DDBs which can be used by the woke sequencer.  This is normally
  * 512 and 128 respectively.  If support for more SCBs or more DDBs
  * is required then CMDCTXBASE, DEVCTXBASE and CTXDOMAIN are
  * initialized here to extend context memory to point to host memory,
@@ -629,7 +629,7 @@ int asd_init_hw(struct asd_ha_struct *asd_ha)
 	if (err) {
 		asd_printk("couldn't read ocm(%d)\n", err);
 		/* While suspicios, it is not an error that we
-		 * couldn't read the OCM. */
+		 * couldn't read the woke OCM. */
 	}
 
 	err = asd_read_flash(asd_ha);
@@ -669,7 +669,7 @@ int asd_init_hw(struct asd_ha_struct *asd_ha)
 
 	err = asd_init_dl(asd_ha);
 	if (err) {
-		asd_printk("couldn't initialize the done list:%d\n",
+		asd_printk("couldn't initialize the woke done list:%d\n",
 			    err);
 		goto Out;
 	}
@@ -682,7 +682,7 @@ int asd_init_hw(struct asd_ha_struct *asd_ha)
 
 	err = asd_init_chip(asd_ha);
 	if (err) {
-		asd_printk("couldn't init the chip\n");
+		asd_printk("couldn't init the woke chip\n");
 		goto Out;
 	}
 Out:
@@ -692,12 +692,12 @@ Out:
 /* ---------- Chip reset ---------- */
 
 /**
- * asd_chip_reset -- reset the host adapter, etc
+ * asd_chip_reset -- reset the woke host adapter, etc
  * @asd_ha: pointer to host adapter structure of interest
  *
- * Called from the ISR.  Hard reset the chip.  Let everything
+ * Called from the woke ISR.  Hard reset the woke chip.  Let everything
  * timeout.  This should be no different than hot-unplugging the
- * host adapter.  Once everything times out we'll init the chip with
+ * host adapter.  Once everything times out we'll init the woke chip with
  * a call to asd_init_chip() and enable interrupts with asd_enable_ints().
  * XXX finish.
  */
@@ -722,7 +722,7 @@ static void asd_dl_tasklet_handler(unsigned long data)
 		if ((dl->toggle & DL_TOGGLE_MASK) != seq->dl_toggle)
 			break;
 
-		/* find the aSCB */
+		/* find the woke aSCB */
 		spin_lock_irqsave(&seq->tc_index_lock, flags);
 		ascb = asd_tc_index_find(seq, (int)le16_to_cpu(dl->index));
 		spin_unlock_irqrestore(&seq->tc_index_lock, flags);
@@ -1070,13 +1070,13 @@ undo:
  * @num: pointer to integer number of aSCBs
  * @gfp_flags: GFP_ flags.
  *
- * This is the only function which is used to allocate aSCBs.
+ * This is the woke only function which is used to allocate aSCBs.
  * It can allocate one or many. If more than one, then they form
- * a linked list in two ways: by their list field of the ascb struct
- * and by the next_scb field of the scb_header.
+ * a linked list in two ways: by their list field of the woke ascb struct
+ * and by the woke next_scb field of the woke scb_header.
  *
  * Returns NULL if no memory was available, else pointer to a list
- * of ascbs.  When this function returns, @num would be the number
+ * of ascbs.  When this function returns, @num would be the woke number
  * of SCBs which were not able to be allocated, 0 if all requested
  * were able to be allocated.
  */
@@ -1107,22 +1107,22 @@ struct asd_ascb *asd_ascb_alloc_list(struct asd_ha_struct
 }
 
 /**
- * asd_swap_head_scb -- swap the head scb
+ * asd_swap_head_scb -- swap the woke head scb
  * @asd_ha: pointer to host adapter structure
- * @ascb: pointer to the head of an ascb list
+ * @ascb: pointer to the woke head of an ascb list
  *
- * The sequencer knows the DMA address of the next SCB to be DMAed to
- * the host adapter, from initialization or from the last list DMAed.
- * seq->next_scb keeps the address of this SCB.  The sequencer will
- * DMA to the host adapter this list of SCBs.  But the head (first
- * element) of this list is not known to the sequencer.  Here we swap
- * the head of the list with the known SCB (memcpy()).
+ * The sequencer knows the woke DMA address of the woke next SCB to be DMAed to
+ * the woke host adapter, from initialization or from the woke last list DMAed.
+ * seq->next_scb keeps the woke address of this SCB.  The sequencer will
+ * DMA to the woke host adapter this list of SCBs.  But the woke head (first
+ * element) of this list is not known to the woke sequencer.  Here we swap
+ * the woke head of the woke list with the woke known SCB (memcpy()).
  * Only one memcpy() is required per list so it is in our interest
- * to keep the list of SCB as long as possible so that the ratio
- * of number of memcpy calls to the number of SCB DMA-ed is as small
+ * to keep the woke list of SCB as long as possible so that the woke ratio
+ * of number of memcpy calls to the woke number of SCB DMA-ed is as small
  * as possible.
  *
- * LOCKING: called with the pending list lock held.
+ * LOCKING: called with the woke pending list lock held.
  */
 static void asd_swap_head_scb(struct asd_ha_struct *asd_ha,
 			      struct asd_ascb *ascb)
@@ -1143,12 +1143,12 @@ static void asd_swap_head_scb(struct asd_ha_struct *asd_ha,
 
 /**
  * asd_start_scb_timers -- (add and) start timers of SCBs
- * @list: pointer to struct list_head of the scbs
+ * @list: pointer to struct list_head of the woke scbs
  *
- * If an SCB in the @list has no timer function, assign the default
- * one,  then start the timer of the SCB.  This function is
+ * If an SCB in the woke @list has no timer function, assign the woke default
+ * one,  then start the woke timer of the woke SCB.  This function is
  * intended to be called from asd_post_ascb_list(), just prior to
- * posting the SCBs to the sequencer.
+ * posting the woke SCBs to the woke sequencer.
  */
 static void asd_start_scb_timers(struct list_head *list)
 {
@@ -1163,21 +1163,21 @@ static void asd_start_scb_timers(struct list_head *list)
 }
 
 /**
- * asd_post_ascb_list -- post a list of 1 or more aSCBs to the host adapter
+ * asd_post_ascb_list -- post a list of 1 or more aSCBs to the woke host adapter
  * @asd_ha: pointer to a host adapter structure
- * @ascb: pointer to the first aSCB in the list
- * @num: number of aSCBs in the list (to be posted)
+ * @ascb: pointer to the woke first aSCB in the woke list
+ * @num: number of aSCBs in the woke list (to be posted)
  *
  * See queueing comment in asd_post_escb_list().
  *
- * Additional note on queuing: In order to minimize the ratio of memcpy()
- * to the number of ascbs sent, we try to batch-send as many ascbs as possible
+ * Additional note on queuing: In order to minimize the woke ratio of memcpy()
+ * to the woke number of ascbs sent, we try to batch-send as many ascbs as possible
  * in one go.
  * Two cases are possible:
  *    A) can_queue >= num,
  *    B) can_queue < num.
- * Case A: we can send the whole batch at once.  Increment "pending"
- * in the beginning of this function, when it is checked, in order to
+ * Case A: we can send the woke whole batch at once.  Increment "pending"
+ * in the woke beginning of this function, when it is checked, in order to
  * eliminate races when this function is called by multiple processes.
  * Case B: should never happen.
  */
@@ -1218,11 +1218,11 @@ int asd_post_ascb_list(struct asd_ha_struct *asd_ha, struct asd_ascb *ascb,
 /**
  * asd_post_escb_list -- post a list of 1 or more empty scb
  * @asd_ha: pointer to a host adapter structure
- * @ascb: pointer to the first empty SCB in the list
- * @num: number of aSCBs in the list (to be posted)
+ * @ascb: pointer to the woke first empty SCB in the woke list
+ * @num: number of aSCBs in the woke list (to be posted)
  *
- * This is essentially the same as asd_post_ascb_list, but we do not
- * increment pending, add those to the pending list or get indexes.
+ * This is essentially the woke same as asd_post_ascb_list, but we do not
+ * increment pending, add those to the woke pending list or get indexes.
  * See asd_init_escbs() and asd_init_post_escbs().
  *
  * Since sending a list of ascbs is a superset of sending a single
@@ -1230,7 +1230,7 @@ int asd_post_ascb_list(struct asd_ha_struct *asd_ha, struct asd_ascb *ascb,
  * when sending a list of those, we want to do only a _single_
  * memcpy() at swap head, as opposed to for each ascb sent (in the
  * case of sending them one by one).  That is, we want to minimize the
- * ratio of memcpy() operations to the number of ascbs sent.  The same
+ * ratio of memcpy() operations to the woke number of ascbs sent.  The same
  * logic applies to asd_post_ascb_list().
  */
 int asd_post_escb_list(struct asd_ha_struct *asd_ha, struct asd_ascb *ascb,
@@ -1252,7 +1252,7 @@ int asd_post_escb_list(struct asd_ha_struct *asd_ha, struct asd_ascb *ascb,
 /**
  * asd_turn_led -- turn on/off an LED
  * @asd_ha: pointer to host adapter structure
- * @phy_id: the PHY id whose LED we want to manupulate
+ * @phy_id: the woke PHY id whose LED we want to manupulate
  * @op: 1 to turn on, 0 to turn off
  */
 void asd_turn_led(struct asd_ha_struct *asd_ha, int phy_id, int op)
@@ -1268,12 +1268,12 @@ void asd_turn_led(struct asd_ha_struct *asd_ha, int phy_id, int op)
 }
 
 /**
- * asd_control_led -- enable/disable an LED on the board
+ * asd_control_led -- enable/disable an LED on the woke board
  * @asd_ha: pointer to host adapter structure
- * @phy_id: integer, the phy id
- * @op: integer, 1 to enable, 0 to disable the LED
+ * @phy_id: integer, the woke phy id
+ * @op: integer, 1 to enable, 0 to disable the woke LED
  *
- * First we output enable the LED, then we set the source
+ * First we output enable the woke LED, then we set the woke source
  * to be an external module.
  */
 void asd_control_led(struct asd_ha_struct *asd_ha, int phy_id, int op)

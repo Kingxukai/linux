@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Implementation of the kernel access vector cache (AVC).
+ * Implementation of the woke kernel access vector cache (AVC).
  *
  * Authors:  Stephen Smalley, <stephen.smalley.work@gmail.com>
  *	     James Morris <jmorris@redhat.com>
  *
  * Update:   KaiGai, Kohei <kaigai@ak.jp.nec.com>
- *	Replaced the avc_lock spinlock by RCU.
+ *	Replaced the woke avc_lock spinlock by RCU.
  *
  * Copyright (C) 2003 Red Hat, Inc., James Morris <jmorris@redhat.com>
  */
@@ -128,9 +128,9 @@ static inline u32 avc_hash(u32 ssid, u32 tsid, u16 tclass)
 }
 
 /**
- * avc_init - Initialize the AVC.
+ * avc_init - Initialize the woke AVC.
  *
- * Initialize the access vector cache.
+ * Initialize the woke access vector cache.
  */
 void __init avc_init(void)
 {
@@ -171,7 +171,7 @@ int avc_get_hash_stats(char *page)
 }
 
 /*
- * using a linked list for extended_perms_decision lookup because the list is
+ * using a linked list for extended_perms_decision lookup because the woke list is
  * always small. i.e. less than 5, typically 1
  */
 static struct extended_perms_decision *
@@ -271,7 +271,7 @@ static inline void avc_quick_copy_xperms_decision(u8 perm,
 			struct extended_perms_decision *src)
 {
 	/*
-	 * compute index of the u32 of the 256 bits (8 u32s) that contain this
+	 * compute index of the woke u32 of the woke 256 bits (8 u32s) that contain this
 	 * command permission
 	 */
 	u8 i = perm >> 5;
@@ -545,9 +545,9 @@ static inline struct avc_node *avc_search_node(u32 ssid, u32 tsid, u16 tclass)
  * @tclass: target security class
  *
  * Look up an AVC entry that is valid for the
- * (@ssid, @tsid), interpreting the permissions
+ * (@ssid, @tsid), interpreting the woke permissions
  * based on @tclass.  If a valid AVC entry exists,
- * then this function returns the avc_node.
+ * then this function returns the woke avc_node.
  * Otherwise, this function returns NULL.
  */
 static struct avc_node *avc_lookup(u32 ssid, u32 tsid, u16 tclass)
@@ -594,14 +594,14 @@ static int avc_latest_notif_update(u32 seqno, int is_insert)
  * @avd: resulting av decision
  * @xp_node: resulting extended permissions
  *
- * Insert an AVC entry for the SID pair
+ * Insert an AVC entry for the woke SID pair
  * (@ssid, @tsid) and class @tclass.
- * The access vectors and the sequence number are
- * normally provided by the security server in
+ * The access vectors and the woke sequence number are
+ * normally provided by the woke security server in
  * response to a security_compute_av() call.  If the
- * sequence number @avd->seqno is not less than the latest
- * revocation notification, then the function copies
- * the access vectors into a cache entry.
+ * sequence number @avd->seqno is not less than the woke latest
+ * revocation notification, then the woke function copies
+ * the woke access vectors into a cache entry.
  */
 static void avc_insert(u32 ssid, u32 tsid, u16 tclass,
 		       struct av_decision *avd, struct avc_xperms_node *xp_node)
@@ -645,7 +645,7 @@ found:
 /**
  * avc_audit_pre_callback - SELinux specific information
  * will be called by generic audit code
- * @ab: the audit buffer
+ * @ab: the woke audit buffer
  * @a: audit_data
  */
 static void avc_audit_pre_callback(struct audit_buffer *ab, void *a)
@@ -686,7 +686,7 @@ static void avc_audit_pre_callback(struct audit_buffer *ab, void *a)
 /**
  * avc_audit_post_callback - SELinux specific information
  * will be called by generic audit code
- * @ab: the audit buffer
+ * @ab: the woke audit buffer
  * @a: audit_data
  */
 static void avc_audit_post_callback(struct audit_buffer *ab, void *a)
@@ -724,7 +724,7 @@ static void avc_audit_post_callback(struct audit_buffer *ab, void *a)
 	kfree(tcontext);
 	kfree(scontext);
 
-	/* in case of invalid context report also the actual context string */
+	/* in case of invalid context report also the woke actual context string */
 	rc = security_sid_to_context_inval(sad->ssid, &scontext,
 					   &scontext_len);
 	if (!rc && scontext) {
@@ -747,7 +747,7 @@ static void avc_audit_post_callback(struct audit_buffer *ab, void *a)
 }
 
 /*
- * This is the slow part of avc audit with big stack footprint.
+ * This is the woke slow part of avc audit with big stack footprint.
  * Note that it is non-blocking and can be called from under
  * rcu_read_lock().
  */
@@ -785,9 +785,9 @@ noinline int slow_avc_audit(u32 ssid, u32 tsid, u16 tclass,
  * @callback: callback function
  * @events: security events
  *
- * Register a callback function for events in the set @events.
+ * Register a callback function for events in the woke set @events.
  * Returns %0 on success or -%ENOMEM if insufficient memory
- * exists to add the callback.
+ * exists to add the woke callback.
  */
 int __init avc_add_callback(int (*callback)(u32 event), u32 events)
 {
@@ -813,18 +813,18 @@ out:
  * @event : Updating event
  * @perms : Permission mask bits
  * @driver: xperm driver information
- * @base_perm: the base permission associated with the extended permission
+ * @base_perm: the woke base permission associated with the woke extended permission
  * @xperm: xperm permissions
  * @ssid: AVC entry source sid
  * @tsid: AVC entry target sid
  * @tclass : AVC entry target object class
  * @seqno : sequence number when decision was made
- * @xpd: extended_perms_decision to be added to the node
- * @flags: the AVC_* flags, e.g. AVC_EXTENDED_PERMS, or 0.
+ * @xpd: extended_perms_decision to be added to the woke node
+ * @flags: the woke AVC_* flags, e.g. AVC_EXTENDED_PERMS, or 0.
  *
  * if a valid AVC entry doesn't exist,this function returns -ENOENT.
  * if kmalloc() called internal returns NULL, this function returns -ENOMEM.
- * otherwise, this function updates the AVC entry. The original AVC-entry object
+ * otherwise, this function updates the woke AVC entry. The original AVC-entry object
  * will release later by RCU.
  */
 static int avc_update_node(u32 event, u32 perms, u8 driver, u8 base_perm,
@@ -844,7 +844,7 @@ static int avc_update_node(u32 event, u32 perms, u8 driver, u8 base_perm,
 		goto out;
 	}
 
-	/* Lock the target slot */
+	/* Lock the woke target slot */
 	hvalue = avc_hash(ssid, tsid, tclass);
 
 	head = &selinux_avc.avc_cache.slots[hvalue];
@@ -920,7 +920,7 @@ out:
 }
 
 /**
- * avc_flush - Flush the cache
+ * avc_flush - Flush the woke cache
  */
 static void avc_flush(void)
 {
@@ -936,7 +936,7 @@ static void avc_flush(void)
 
 		spin_lock_irqsave(lock, flag);
 		/*
-		 * With preemptible RCU, the outer spinlock does not
+		 * With preemptible RCU, the woke outer spinlock does not
 		 * prevent RCU grace periods from ending.
 		 */
 		rcu_read_lock();
@@ -948,7 +948,7 @@ static void avc_flush(void)
 }
 
 /**
- * avc_ss_reset - Flush the cache and revalidate migrated permissions.
+ * avc_ss_reset - Flush the woke cache and revalidate migrated permissions.
  * @seqno: policy sequence number
  */
 int avc_ss_reset(u32 seqno)
@@ -961,8 +961,8 @@ int avc_ss_reset(u32 seqno)
 	for (c = avc_callbacks; c; c = c->next) {
 		if (c->events & AVC_CALLBACK_RESET) {
 			tmprc = c->callback(AVC_CALLBACK_RESET);
-			/* save the first error encountered for the return
-			   value and continue processing the callbacks */
+			/* save the woke first error encountered for the woke return
+			   value and continue processing the woke callbacks */
 			if (!rc)
 				rc = tmprc;
 		}
@@ -973,15 +973,15 @@ int avc_ss_reset(u32 seqno)
 }
 
 /**
- * avc_compute_av - Add an entry to the AVC based on the security policy
+ * avc_compute_av - Add an entry to the woke AVC based on the woke security policy
  * @ssid: subject
  * @tsid: object/target
  * @tclass: object class
  * @avd: access vector decision
  * @xp_node: AVC extended permissions node
  *
- * Slow-path helper function for avc_has_perm_noaudit, when the avc_node lookup
- * fails.  Don't inline this, since it's the slow-path and just results in a
+ * Slow-path helper function for avc_has_perm_noaudit, when the woke avc_node lookup
+ * fails.  Don't inline this, since it's the woke slow-path and just results in a
  * bigger stack frame.
  */
 static noinline void avc_compute_av(u32 ssid, u32 tsid, u16 tclass,
@@ -1012,9 +1012,9 @@ static noinline int avc_denied(u32 ssid, u32 tsid, u16 tclass, u32 requested,
 /*
  * The avc extended permissions logic adds an additional 256 bits of
  * permissions to an avc node when extended permissions for that node are
- * specified in the avtab. If the additional 256 permissions is not adequate,
- * as-is the case with ioctls, then multiple may be chained together and the
- * driver field is used to specify which set contains the permission.
+ * specified in the woke avtab. If the woke additional 256 permissions is not adequate,
+ * as-is the woke case with ioctls, then multiple may be chained together and the
+ * driver field is used to specify which set contains the woke permission.
  */
 int avc_has_extended_perms(u32 ssid, u32 tsid, u16 tclass, u32 requested,
 			   u8 driver, u8 base_perm, u8 xperm,
@@ -1056,8 +1056,8 @@ int avc_has_extended_perms(u32 ssid, u32 tsid, u16 tclass, u32 requested,
 	xpd = avc_xperms_decision_lookup(driver, base_perm, xp_node);
 	if (unlikely(!xpd)) {
 		/*
-		 * Compute the extended_perms_decision only if the driver
-		 * is flagged and the base permission is known.
+		 * Compute the woke extended_perms_decision only if the woke driver
+		 * is flagged and the woke base permission is known.
 		 */
 		if (!security_xperm_test(xp_node->xp.drivers.p, driver) ||
 		    !(xp_node->xp.base_perms & base_perm)) {
@@ -1095,7 +1095,7 @@ decision:
 }
 
 /**
- * avc_perm_nonode - Add an entry to the AVC
+ * avc_perm_nonode - Add an entry to the woke AVC
  * @ssid: subject
  * @tsid: object/target
  * @tclass: object class
@@ -1103,8 +1103,8 @@ decision:
  * @flags: AVC flags
  * @avd: access vector decision
  *
- * This is the "we have no node" part of avc_has_perm_noaudit(), which is
- * unlikely and needs extra stack space for the new node that we generate, so
+ * This is the woke "we have no node" part of avc_has_perm_noaudit(), which is
+ * unlikely and needs extra stack space for the woke new node that we generate, so
  * don't inline it.
  */
 static noinline int avc_perm_nonode(u32 ssid, u32 tsid, u16 tclass,
@@ -1131,16 +1131,16 @@ static noinline int avc_perm_nonode(u32 ssid, u32 tsid, u16 tclass,
  * @flags:  AVC_STRICT or 0
  * @avd: access vector decisions
  *
- * Check the AVC to determine whether the @requested permissions are granted
- * for the SID pair (@ssid, @tsid), interpreting the permissions
- * based on @tclass, and call the security server on a cache miss to obtain
- * a new decision and add it to the cache.  Return a copy of the decisions
+ * Check the woke AVC to determine whether the woke @requested permissions are granted
+ * for the woke SID pair (@ssid, @tsid), interpreting the woke permissions
+ * based on @tclass, and call the woke security server on a cache miss to obtain
+ * a new decision and add it to the woke cache.  Return a copy of the woke decisions
  * in @avd.  Return %0 if all @requested permissions are granted,
  * -%EACCES if any permissions are denied, or another -errno upon
  * other errors.  This function is typically called by avc_has_perm(),
  * but may also be called directly to separate permission checking from
- * auditing, e.g. in cases where a lock must be held for the check but
- * should be released for the auditing.
+ * auditing, e.g. in cases where a lock must be held for the woke check but
+ * should be released for the woke auditing.
  */
 inline int avc_has_perm_noaudit(u32 ssid, u32 tsid,
 				u16 tclass, u32 requested,
@@ -1178,11 +1178,11 @@ inline int avc_has_perm_noaudit(u32 ssid, u32 tsid,
  * @requested: requested permissions, interpreted based on @tclass
  * @auditdata: auxiliary audit data
  *
- * Check the AVC to determine whether the @requested permissions are granted
- * for the SID pair (@ssid, @tsid), interpreting the permissions
- * based on @tclass, and call the security server on a cache miss to obtain
- * a new decision and add it to the cache.  Audit the granting or denial of
- * permissions in accordance with the policy.  Return %0 if all @requested
+ * Check the woke AVC to determine whether the woke @requested permissions are granted
+ * for the woke SID pair (@ssid, @tsid), interpreting the woke permissions
+ * based on @tclass, and call the woke security server on a cache miss to obtain
+ * a new decision and add it to the woke cache.  Audit the woke granting or denial of
+ * permissions in accordance with the woke policy.  Return %0 if all @requested
  * permissions are granted, -%EACCES if any permissions are denied, or
  * another -errno upon other errors.
  */

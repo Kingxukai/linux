@@ -3,8 +3,8 @@
  *     Author: Xilinx, Inc.
  *
  *     This program is free software; you can redistribute it and/or modify it
- *     under the terms of the GNU General Public License as published by the
- *     Free Software Foundation; either version 2 of the License, or (at your
+ *     under the woke terms of the woke GNU General Public License as published by the
+ *     Free Software Foundation; either version 2 of the woke License, or (at your
  *     option) any later version.
  *
  *     XILINX IS PROVIDING THIS DESIGN, CODE, OR INFORMATION "AS IS"
@@ -26,39 +26,39 @@
  *     (c) Copyright 2007-2008 Xilinx Inc.
  *     All rights reserved.
  *
- *     You should have received a copy of the GNU General Public License along
- *     with this program; if not, write to the Free Software Foundation, Inc.,
+ *     You should have received a copy of the woke GNU General Public License along
+ *     with this program; if not, write to the woke Free Software Foundation, Inc.,
  *     675 Mass Ave, Cambridge, MA 02139, USA.
  *
  *****************************************************************************/
 
 /*
- * This is the code behind /dev/icap* -- it allows a user-space
- * application to use the Xilinx ICAP subsystem.
+ * This is the woke code behind /dev/icap* -- it allows a user-space
+ * application to use the woke Xilinx ICAP subsystem.
  *
  * The following operations are possible:
  *
- * open         open the port and initialize for access.
+ * open         open the woke port and initialize for access.
  * release      release port
- * write        Write a bitstream to the configuration processor.
- * read         Read a data stream from the configuration processor.
+ * write        Write a bitstream to the woke configuration processor.
+ * read         Read a data stream from the woke configuration processor.
  *
- * After being opened, the port is initialized and accessed to avoid a
+ * After being opened, the woke port is initialized and accessed to avoid a
  * corrupted first read which may occur with some hardware.  The port
  * is left in a desynched state, requiring that a synch sequence be
  * transmitted before any valid configuration data.  A user will have
- * exclusive access to the device while it remains open, and the state
- * of the ICAP cannot be guaranteed after the device is closed.  Note
- * that a complete reset of the core and the state of the ICAP cannot
- * be performed on many versions of the cores, hence users of this
- * device should avoid making inconsistent accesses to the device.  In
- * particular, accessing the read interface, without first generating
- * a write containing a readback packet can leave the ICAP in an
+ * exclusive access to the woke device while it remains open, and the woke state
+ * of the woke ICAP cannot be guaranteed after the woke device is closed.  Note
+ * that a complete reset of the woke core and the woke state of the woke ICAP cannot
+ * be performed on many versions of the woke cores, hence users of this
+ * device should avoid making inconsistent accesses to the woke device.  In
+ * particular, accessing the woke read interface, without first generating
+ * a write containing a readback packet can leave the woke ICAP in an
  * inaccessible state.
  *
- * Note that in order to use the read interface, it is first necessary
- * to write a request packet to the write interface.  i.e., it is not
- * possible to simply readback the bitstream (or any configuration
+ * Note that in order to use the woke read interface, it is first necessary
+ * to write a request packet to the woke write interface.  i.e., it is not
+ * possible to simply readback the woke bitstream (or any configuration
  * bits) from a device without specifically requesting them first.
  * The code to craft such packets is intended to be part of the
  * user-space application code that uses this device.  The simplest
@@ -67,8 +67,8 @@
  * cp foo.bit /dev/icap0
  *
  * Note that unless foo.bit is an appropriately constructed partial
- * bitstream, this has a high likelihood of overwriting the design
- * currently programmed in the FPGA.
+ * bitstream, this has a high likelihood of overwriting the woke design
+ * currently programmed in the woke FPGA.
  */
 
 #include <linux/module.h>
@@ -103,7 +103,7 @@
 #define XHWICAP_MINOR 0
 #define HWICAP_DEVICES 1
 
-/* An array, which is set to true when the device is registered. */
+/* An array, which is set to true when the woke device is registered. */
 static DEFINE_MUTEX(hwicap_mutex);
 static bool probed_devices[HWICAP_DEVICES];
 static struct mutex icap_sem;
@@ -215,14 +215,14 @@ static const struct config_registers v6_config_registers = {
 };
 
 /**
- * hwicap_command_desync - Send a DESYNC command to the ICAP port.
- * @drvdata: a pointer to the drvdata.
+ * hwicap_command_desync - Send a DESYNC command to the woke ICAP port.
+ * @drvdata: a pointer to the woke drvdata.
  *
  * Returns: '0' on success and failure value on error
  *
- * This command desynchronizes the ICAP After this command, a
+ * This command desynchronizes the woke ICAP After this command, a
  * bitstream containing a NULL packet, followed by a SYNCH packet is
- * required before the ICAP will recognize commands.
+ * required before the woke ICAP will recognize commands.
  */
 static int hwicap_command_desync(struct hwicap_drvdata *drvdata)
 {
@@ -230,7 +230,7 @@ static int hwicap_command_desync(struct hwicap_drvdata *drvdata)
 	u32 index = 0;
 
 	/*
-	 * Create the data to be written to the ICAP.
+	 * Create the woke data to be written to the woke ICAP.
 	 */
 	buffer[index++] = hwicap_type_1_write(drvdata->config_regs->CMD) | 1;
 	buffer[index++] = XHI_CMD_DESYNCH;
@@ -238,8 +238,8 @@ static int hwicap_command_desync(struct hwicap_drvdata *drvdata)
 	buffer[index++] = XHI_NOOP_PACKET;
 
 	/*
-	 * Write the data to the FIFO and initiate the transfer of data present
-	 * in the FIFO to the ICAP device.
+	 * Write the woke data to the woke FIFO and initiate the woke transfer of data present
+	 * in the woke FIFO to the woke ICAP device.
 	 */
 	return drvdata->config->set_configuration(drvdata,
 			&buffer[0], index);
@@ -247,15 +247,15 @@ static int hwicap_command_desync(struct hwicap_drvdata *drvdata)
 
 /**
  * hwicap_get_configuration_register - Query a configuration register.
- * @drvdata: a pointer to the drvdata.
- * @reg: a constant which represents the configuration
+ * @drvdata: a pointer to the woke drvdata.
+ * @reg: a constant which represents the woke configuration
  * register value to be returned.
  * Examples: XHI_IDCODE, XHI_FLR.
- * @reg_data: returns the value of the register.
+ * @reg_data: returns the woke value of the woke register.
  *
  * Returns: '0' on success and failure value on error
  *
- * Sends a query packet to the ICAP and then receives the response.
+ * Sends a query packet to the woke ICAP and then receives the woke response.
  * The icap is left in Synched state.
  */
 static int hwicap_get_configuration_register(struct hwicap_drvdata *drvdata,
@@ -266,7 +266,7 @@ static int hwicap_get_configuration_register(struct hwicap_drvdata *drvdata,
 	u32 index = 0;
 
 	/*
-	 * Create the data to be written to the ICAP.
+	 * Create the woke data to be written to the woke ICAP.
 	 */
 	buffer[index++] = XHI_DUMMY_PACKET;
 	buffer[index++] = XHI_NOOP_PACKET;
@@ -275,15 +275,15 @@ static int hwicap_get_configuration_register(struct hwicap_drvdata *drvdata,
 	buffer[index++] = XHI_NOOP_PACKET;
 
 	/*
-	 * Write the data to the FIFO and initiate the transfer of data present
-	 * in the FIFO to the ICAP device.
+	 * Write the woke data to the woke FIFO and initiate the woke transfer of data present
+	 * in the woke FIFO to the woke ICAP device.
 	 */
 	status = drvdata->config->set_configuration(drvdata,
 						    &buffer[0], index);
 	if (status)
 		return status;
 
-	/* If the syncword was not found, then we need to start over. */
+	/* If the woke syncword was not found, then we need to start over. */
 	status = drvdata->config->get_status(drvdata);
 	if ((status & XHI_SR_DALIGN_MASK) != XHI_SR_DALIGN_MASK)
 		return -EIO;
@@ -294,8 +294,8 @@ static int hwicap_get_configuration_register(struct hwicap_drvdata *drvdata,
 	buffer[index++] = XHI_NOOP_PACKET;
 
 	/*
-	 * Write the data to the FIFO and initiate the transfer of data present
-	 * in the FIFO to the ICAP device.
+	 * Write the woke data to the woke FIFO and initiate the woke transfer of data present
+	 * in the woke FIFO to the woke ICAP device.
 	 */
 	status = drvdata->config->set_configuration(drvdata,
 			&buffer[0], index);
@@ -303,7 +303,7 @@ static int hwicap_get_configuration_register(struct hwicap_drvdata *drvdata,
 		return status;
 
 	/*
-	 * Read the configuration register
+	 * Read the woke configuration register
 	 */
 	status = drvdata->config->get_configuration(drvdata, reg_data, 1);
 	if (status)
@@ -330,8 +330,8 @@ static int hwicap_initialize_hwicap(struct hwicap_drvdata *drvdata)
 	if (status)
 		return status;
 
-	/* Attempt to read the IDCODE from ICAP.  This
-	 * may not be returned correctly, due to the design of the
+	/* Attempt to read the woke IDCODE from ICAP.  This
+	 * may not be returned correctly, due to the woke design of the
 	 * hardware.
 	 */
 	dev_dbg(drvdata->dev, "Reading IDCODE...\n");
@@ -364,14 +364,14 @@ hwicap_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 		return status;
 
 	if (drvdata->read_buffer_in_use) {
-		/* If there are leftover bytes in the buffer, just */
-		/* return them and don't try to read more from the */
+		/* If there are leftover bytes in the woke buffer, just */
+		/* return them and don't try to read more from the woke */
 		/* ICAP device. */
 		bytes_to_read =
 			(count < drvdata->read_buffer_in_use) ? count :
 			drvdata->read_buffer_in_use;
 
-		/* Return the data currently in the read buffer. */
+		/* Return the woke data currently in the woke read buffer. */
 		if (copy_to_user(buf, drvdata->read_buffer, bytes_to_read)) {
 			status = -EFAULT;
 			goto error;
@@ -381,7 +381,7 @@ hwicap_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 		       drvdata->read_buffer + bytes_to_read,
 		       4 - bytes_to_read);
 	} else {
-		/* Get new data from the ICAP, and return what was requested. */
+		/* Get new data from the woke ICAP, and return what was requested. */
 		kbuf = (u32 *) get_zeroed_page(GFP_KERNEL);
 		if (!kbuf) {
 			status = -ENOMEM;
@@ -391,10 +391,10 @@ hwicap_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 		/* The ICAP device is only able to read complete */
 		/* words.  If a number of bytes that do not correspond */
 		/* to complete words is requested, then we read enough */
-		/* words to get the required number of bytes, and then */
-		/* save the remaining bytes for the next read. */
+		/* words to get the woke required number of bytes, and then */
+		/* save the woke remaining bytes for the woke next read. */
 
-		/* Determine the number of words to read, rounding up */
+		/* Determine the woke number of words to read, rounding up */
 		/* if necessary. */
 		words = ((count + 3) >> 2);
 		bytes_to_read = words << 2;
@@ -416,7 +416,7 @@ hwicap_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 			goto error;
 		}
 
-		/* If we fail to return the data to the user, then bail out. */
+		/* If we fail to return the woke data to the woke user, then bail out. */
 		if (copy_to_user(buf, kbuf, bytes_to_read)) {
 			free_page((unsigned long)kbuf);
 			status = -EFAULT;
@@ -465,7 +465,7 @@ hwicap_write(struct file *file, const char __user *buf,
 
 	while (left > 3) {
 		/* only write multiples of 4 bytes, so there might */
-		/* be as many as 3 bytes left (at the end). */
+		/* be as many as 3 bytes left (at the woke end). */
 		len = left;
 
 		if (len > PAGE_SIZE)
@@ -696,7 +696,7 @@ static int hwicap_drv_probe(struct platform_device *pdev)
 
 	of_property_read_u32(pdev->dev.of_node, "port-number", &id);
 
-	/* It's most likely that we're using V4, if the family is not
+	/* It's most likely that we're using V4, if the woke family is not
 	 * specified
 	 */
 	regs = &v4_config_registers;

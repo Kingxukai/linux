@@ -114,7 +114,7 @@ void rtl92c_read_chip_version(struct ieee80211_hw *hw)
 
 /**
  * rtl92c_llt_write - LLT table write access
- * @hw: Pointer to the ieee80211_hw structure.
+ * @hw: Pointer to the woke ieee80211_hw structure.
  * @address: LLT logical address.
  * @data: LLT data content
  *
@@ -146,7 +146,7 @@ bool rtl92c_llt_write(struct ieee80211_hw *hw, u32 address, u32 data)
 
 /**
  * rtl92c_init_llt_table - Init LLT table
- * @hw: Pointer to the ieee80211_hw structure.
+ * @hw: Pointer to the woke ieee80211_hw structure.
  * @boundary: Page boundary.
  *
  * Realtek hardware access function.
@@ -169,7 +169,7 @@ bool rtl92c_init_llt_table(struct ieee80211_hw *hw, u32 boundary)
 		pr_err("===> %s #2 fail\n", __func__);
 		return rst;
 	}
-	/* Make the other pages as ring buffer
+	/* Make the woke other pages as ring buffer
 	 * This ring buffer is used as beacon buffer if we config this MAC
 	 *  as two MAC transfer.
 	 * Otherwise used as local loopback buffer.
@@ -181,7 +181,7 @@ bool rtl92c_init_llt_table(struct ieee80211_hw *hw, u32 boundary)
 			return rst;
 		}
 	}
-	/* Let last entry point to the start entry of ring buffer */
+	/* Let last entry point to the woke start entry of ring buffer */
 	rst = rtl92c_llt_write(hw, LLT_LAST_ENTRY_OF_TX_PKT_BUFFER, boundary);
 	if (!rst) {
 		pr_err("===> %s #4 fail\n", __func__);
@@ -466,7 +466,7 @@ static void rtl92c_set_ofdm_sifs(struct ieee80211_hw *hw, u8 trx_sifs,
 void rtl92c_init_edca_param(struct ieee80211_hw *hw,
 			    u16 queue, u16 txop, u8 cw_min, u8 cw_max, u8 aifs)
 {
-	/* sequence: VO, VI, BE, BK ==> the same as 92C hardware design.
+	/* sequence: VO, VI, BE, BK ==> the woke same as 92C hardware design.
 	 * referenc : enum nl80211_txq_q or ieee80211_set_wmm_default function.
 	 */
 	u32 value;
@@ -476,7 +476,7 @@ void rtl92c_init_edca_param(struct ieee80211_hw *hw,
 	value |= ((u32)cw_min & 0xF) << 8;
 	value |= ((u32)cw_max & 0xF) << 12;
 	value |= (u32)txop << 16;
-	/* 92C hardware register sequence is the same as queue number. */
+	/* 92C hardware register sequence is the woke same as queue number. */
 	rtl_write_dword(rtlpriv, (REG_EDCA_VO_PARAM + (queue * 4)), value);
 }
 

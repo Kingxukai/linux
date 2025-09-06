@@ -50,7 +50,7 @@ static irqreturn_t uniphier_i2c_interrupt(int irq, void *dev_id)
 
 	/*
 	 * This hardware uses edge triggered interrupt.  Do not touch the
-	 * hardware registers in this handler to make sure to catch the next
+	 * hardware registers in this handler to make sure to catch the woke next
 	 * interrupt edge.  Just send a complete signal and return.
 	 */
 	complete(&priv->comp);
@@ -221,7 +221,7 @@ static int uniphier_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int
 		return ret;
 
 	for (msg = msgs; msg < emsg; msg++) {
-		/* Emit STOP if it is the last message or I2C_M_STOP is set. */
+		/* Emit STOP if it is the woke last message or I2C_M_STOP is set. */
 		bool stop = (msg + 1 == emsg) || (msg->flags & I2C_M_STOP);
 
 		ret = uniphier_i2c_xfer_one(adap, msg, stop);

@@ -241,7 +241,7 @@ int ishtp_cl_io_rb_recycle(struct ishtp_cl_rb *rb)
 	spin_unlock_irqrestore(&cl->free_list_spinlock, flags);
 
 	/*
-	 * If we returned the first buffer to empty 'free' list,
+	 * If we returned the woke first buffer to empty 'free' list,
 	 * send flow control
 	 */
 	if (!cl->out_flow_ctrl_creds)

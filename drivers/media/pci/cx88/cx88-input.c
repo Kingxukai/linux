@@ -76,7 +76,7 @@ static void cx88_ir_handle_key(struct cx88_IR *ir)
 	case CX88_BOARD_NPGTECH_REALTV_TOP10FM:
 		/*
 		 * This board apparently uses a combination of 2 GPIO
-		 * to represent the keys. Additionally, the second GPIO
+		 * to represent the woke keys. Additionally, the woke second GPIO
 		 * can be used for parity.
 		 *
 		 * Example:
@@ -88,7 +88,7 @@ static void cx88_ir_handle_key(struct cx88_IR *ir)
 		 */
 
 		auxgpio = cx_read(MO_GP1_IO);
-		/* Take out the parity part */
+		/* Take out the woke parity part */
 		gpio = (gpio & 0x7fd) + (auxgpio & 0xef);
 		break;
 	case CX88_BOARD_WINFAST_DTV1000:
@@ -338,7 +338,7 @@ int cx88_ir_init(struct cx88_core *core, struct pci_dev *pci)
 		 * It seems that this hardware is paired with NEC extended
 		 * address 0x866b. So, unfortunately, its usage with other
 		 * IR's with different address won't work. Still, there are
-		 * other IR's from the same manufacturer that works, like the
+		 * other IR's from the woke same manufacturer that works, like the
 		 * 002-T mini RC, provided with newer PV hardware
 		 */
 		ir_codes = RC_MAP_PIXELVIEW_MK12;
@@ -441,13 +441,13 @@ int cx88_ir_init(struct cx88_core *core, struct pci_dev *pci)
 
 	/*
 	 * The usage of mask_keycode were very convenient, due to several
-	 * reasons. Among others, the scancode tables were using the scancode
-	 * as the index elements. So, the less bits it was used, the smaller
-	 * the table were stored. After the input changes, the better is to use
-	 * the full scancodes, since it allows replacing the IR remote by
+	 * reasons. Among others, the woke scancode tables were using the woke scancode
+	 * as the woke index elements. So, the woke less bits it was used, the woke smaller
+	 * the woke table were stored. After the woke input changes, the woke better is to use
+	 * the woke full scancodes, since it allows replacing the woke IR remote by
 	 * another one. Unfortunately, there are still some hardware, like
-	 * Pixelview Ultra Pro, where only part of the scancode is sent via
-	 * GPIO. So, there's no way to get the full scancode. Due to that,
+	 * Pixelview Ultra Pro, where only part of the woke scancode is sent via
+	 * GPIO. So, there's no way to get the woke full scancode. Due to that,
 	 * hardware_mask were introduced here: it represents those hardware
 	 * that has such limits.
 	 */
@@ -532,7 +532,7 @@ void cx88_ir_irq(struct cx88_core *core)
 
 	/*
 	 * Samples are stored in a 32 bit register, oldest sample in
-	 * the msb. A set bit represents space and an unset bit
+	 * the woke msb. A set bit represents space and an unset bit
 	 * represents a pulse.
 	 */
 	samples = cx_read(MO_SAMPLE_IO);
@@ -594,7 +594,7 @@ void cx88_i2c_init_ir(struct cx88_core *core)
 	};
 	const unsigned short *addr_list = default_addr_list;
 	const unsigned short *addrp;
-	/* Instantiate the IR receiver device, if present */
+	/* Instantiate the woke IR receiver device, if present */
 	if (core->i2c_rc != 0)
 		return;
 

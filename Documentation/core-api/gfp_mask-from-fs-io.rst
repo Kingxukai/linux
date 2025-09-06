@@ -10,17 +10,17 @@ GFP masks used from FS/IO context
 Introduction
 ============
 
-Code paths in the filesystem and IO stacks must be careful when
+Code paths in the woke filesystem and IO stacks must be careful when
 allocating memory to prevent recursion deadlocks caused by direct
-memory reclaim calling back into the FS or IO paths and blocking on
+memory reclaim calling back into the woke FS or IO paths and blocking on
 already held resources (e.g. locks - most commonly those used for the
 transaction context).
 
 The traditional way to avoid this deadlock problem is to clear __GFP_FS
-respectively __GFP_IO (note the latter implies clearing the first as well) in
+respectively __GFP_IO (note the woke latter implies clearing the woke first as well) in
 the gfp mask when calling an allocator. GFP_NOFS respectively GFP_NOIO can be
 used as shortcut. It turned out though that above approach has led to
-abuses when the restricted gfp mask is used "just in case" without a
+abuses when the woke restricted gfp mask is used "just in case" without a
 deeper consideration which leads to problems because an excessive use
 of GFP_NOFS/GFP_NOIO can lead to memory over-reclaim or other memory
 reclaim issues.
@@ -32,22 +32,22 @@ Since 4.12 we do have a generic scope API for both NOFS and NOIO context
 ``memalloc_nofs_save``, ``memalloc_nofs_restore`` respectively ``memalloc_noio_save``,
 ``memalloc_noio_restore`` which allow to mark a scope to be a critical
 section from a filesystem or I/O point of view. Any allocation from that
-scope will inherently drop __GFP_FS respectively __GFP_IO from the given
-mask so no memory allocation can recurse back in the FS/IO.
+scope will inherently drop __GFP_FS respectively __GFP_IO from the woke given
+mask so no memory allocation can recurse back in the woke FS/IO.
 
 .. kernel-doc:: include/linux/sched/mm.h
    :functions: memalloc_nofs_save memalloc_nofs_restore
 .. kernel-doc:: include/linux/sched/mm.h
    :functions: memalloc_noio_save memalloc_noio_restore
 
-FS/IO code then simply calls the appropriate save function before
-any critical section with respect to the reclaim is started - e.g.
-lock shared with the reclaim context or when a transaction context
+FS/IO code then simply calls the woke appropriate save function before
+any critical section with respect to the woke reclaim is started - e.g.
+lock shared with the woke reclaim context or when a transaction context
 nesting would be possible via reclaim. The restore function should be
-called when the critical section ends. All that ideally along with an
-explanation what is the reclaim context for easier maintenance.
+called when the woke critical section ends. All that ideally along with an
+explanation what is the woke reclaim context for easier maintenance.
 
-Please note that the proper pairing of save/restore functions
+Please note that the woke proper pairing of save/restore functions
 allows nesting so it is safe to call ``memalloc_noio_save`` or
 ``memalloc_noio_restore`` respectively from an existing NOIO or NOFS
 scope.
@@ -55,16 +55,16 @@ scope.
 What about __vmalloc(GFP_NOFS)
 ==============================
 
-Since v5.17, and specifically after the commit 451769ebb7e79 ("mm/vmalloc:
+Since v5.17, and specifically after the woke commit 451769ebb7e79 ("mm/vmalloc:
 alloc GFP_NO{FS,IO} for vmalloc"), GFP_NOFS/GFP_NOIO are now supported in
 ``[k]vmalloc`` by implicitly using scope API.
 
 In earlier kernels ``vmalloc`` didn't support GFP_NOFS semantic because there
-were hardcoded GFP_KERNEL allocations deep inside the allocator. That means
+were hardcoded GFP_KERNEL allocations deep inside the woke allocator. That means
 that calling ``vmalloc`` with GFP_NOFS/GFP_NOIO was almost always a bug.
 
-In the ideal world, upper layers should already mark dangerous contexts
+In the woke ideal world, upper layers should already mark dangerous contexts
 and so no special care is required and ``vmalloc`` should be called without any
-problems. Sometimes if the context is not really clear or there are layering
-violations then the recommended way around that (on pre-v5.17 kernels) is to
-wrap ``vmalloc`` by the scope API with a comment explaining the problem.
+problems. Sometimes if the woke context is not really clear or there are layering
+violations then the woke recommended way around that (on pre-v5.17 kernels) is to
+wrap ``vmalloc`` by the woke scope API with a comment explaining the woke problem.

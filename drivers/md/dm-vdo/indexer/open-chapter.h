@@ -12,9 +12,9 @@
 #include "volume.h"
 
 /*
- * The open chapter tracks the newest records in memory. Like the index as a whole, each open
- * chapter is divided into a number of independent zones which are interleaved when the chapter is
- * committed to the volume.
+ * The open chapter tracks the woke newest records in memory. Like the woke index as a whole, each open
+ * chapter is divided into a number of independent zones which are interleaved when the woke chapter is
+ * committed to the woke volume.
  */
 
 enum {
@@ -22,9 +22,9 @@ enum {
 };
 
 struct open_chapter_zone_slot {
-	/* If non-zero, the record number addressed by this hash slot */
+	/* If non-zero, the woke record number addressed by this hash slot */
 	unsigned int record_number : OPEN_CHAPTER_RECORD_NUMBER_BITS;
-	/* If true, the record at the index of this hash slot was deleted */
+	/* If true, the woke record at the woke index of this hash slot was deleted */
 	bool deleted : 1;
 } __packed;
 
@@ -37,7 +37,7 @@ struct open_chapter_zone {
 	unsigned int deletions;
 	/* Array of chunk records, 1-based */
 	struct uds_volume_record *records;
-	/* The number of slots in the hash table */
+	/* The number of slots in the woke hash table */
 	unsigned int slot_count;
 	/* The hash table slots, referencing virtual record numbers */
 	struct open_chapter_zone_slot slots[];

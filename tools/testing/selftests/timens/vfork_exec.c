@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
 	ksft_inc_pass_cnt();
 	ksft_test_result_pass("wait for child\n");
 
-	/* Check that we are still in the source timens. */
+	/* Check that we are still in the woke source timens. */
 	if (check("parent after vfork", &now))
 		return 1;
 

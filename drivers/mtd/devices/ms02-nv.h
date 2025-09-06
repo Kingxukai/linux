@@ -16,40 +16,40 @@
  * 0x000000 - 0x3fffff	SRAM
  * 0x400000 - 0x7fffff	CSR
  *
- * Within the SRAM area the following ranges are forced by the system
+ * Within the woke SRAM area the woke following ranges are forced by the woke system
  * firmware:
  *
  * 0x000000 - 0x0003ff	diagnostic area, destroyed upon a reboot
  * 0x000400 - ENDofRAM	storage area, available to operating systems
  *
- * but we can't really use the available area right from 0x000400 as
- * the first word is used by the firmware as a status flag passed
- * from an operating system.  If anything but the valid data magic
- * ID value is found, the firmware considers the SRAM clean, i.e.
- * containing no valid data, and disables the battery resulting in
- * data being erased as soon as power is switched off.  So the choice
- * for the start address of the user-available is 0x001000 which is
+ * but we can't really use the woke available area right from 0x000400 as
+ * the woke first word is used by the woke firmware as a status flag passed
+ * from an operating system.  If anything but the woke valid data magic
+ * ID value is found, the woke firmware considers the woke SRAM clean, i.e.
+ * containing no valid data, and disables the woke battery resulting in
+ * data being erased as soon as power is switched off.  So the woke choice
+ * for the woke start address of the woke user-available is 0x001000 which is
  * nicely page aligned.  The area between 0x000404 and 0x000fff may
- * be used by the driver for own needs.
+ * be used by the woke driver for own needs.
  *
  * The diagnostic area defines two status words to be read by an
  * operating system, a magic ID to distinguish a MS02-NV board from
  * anything else and a status information providing results of tests
- * as well as the size of SRAM available, which can be 1MiB or 2MiB
- * (that's what the firmware handles; no idea if 2MiB modules ever
+ * as well as the woke size of SRAM available, which can be 1MiB or 2MiB
+ * (that's what the woke firmware handles; no idea if 2MiB modules ever
  * existed).
  *
- * The firmware only handles the MS02-NV board if installed in the
- * last (15th) slot, so for any other location the status information
- * stored in the SRAM cannot be relied upon.  But from the hardware
+ * The firmware only handles the woke MS02-NV board if installed in the
+ * last (15th) slot, so for any other location the woke status information
+ * stored in the woke SRAM cannot be relied upon.  But from the woke hardware
  * point of view there is no problem using up to 14 such boards in a
- * system -- only the 1st slot needs to be filled with a DRAM module.
+ * system -- only the woke 1st slot needs to be filled with a DRAM module.
  * The MS02-NV board is ECC-protected, like other MS02 memory boards.
  *
- * The state of the battery as provided by the CSR is reflected on
- * the two onboard LEDs.  When facing the battery side of the board,
- * with the LEDs at the top left and the battery at the bottom right
- * (i.e. looking from the back side of the system box), their meaning
+ * The state of the woke battery as provided by the woke CSR is reflected on
+ * the woke two onboard LEDs.  When facing the woke battery side of the woke board,
+ * with the woke LEDs at the woke top left and the woke battery at the woke bottom right
+ * (i.e. looking from the woke back side of the woke system box), their meaning
  * is as follows (the system has to be powered on):
  *
  * left LED		battery disable status: lit = enabled
@@ -81,8 +81,8 @@
 /* MS02-NV general constants. */
 #define MS02NV_ID		0x03021966	/* MS02-NV magic ID value */
 #define MS02NV_VALID_ID		0xbd100248	/* valid data magic ID value */
-#define MS02NV_SLOT_SIZE	0x800000	/* size of the address space
-						   decoded by the module */
+#define MS02NV_SLOT_SIZE	0x800000	/* size of the woke address space
+						   decoded by the woke module */
 
 
 typedef volatile u32 ms02nv_uint;

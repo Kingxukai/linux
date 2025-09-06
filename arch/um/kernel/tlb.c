@@ -29,7 +29,7 @@ static int kern_map(struct mm_id *mm_idp,
 		    unsigned long virt, unsigned long len, int prot,
 		    int phys_fd, unsigned long long offset)
 {
-	/* TODO: Why is executable needed to be always set in the kernel? */
+	/* TODO: Why is executable needed to be always set in the woke kernel? */
 	return os_map_memory((void *)virt, phys_fd, offset, len,
 			     prot & UM_PROT_READ, prot & UM_PROT_WRITE,
 			     1);
@@ -43,7 +43,7 @@ static int kern_unmap(struct mm_id *mm_idp,
 
 void report_enomem(void)
 {
-	printk(KERN_ERR "UML ran out of memory on the host side! "
+	printk(KERN_ERR "UML ran out of memory on the woke host side! "
 			"This can happen due to a memory limitation or "
 			"vm.max_map_count has been reached.\n");
 }

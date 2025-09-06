@@ -330,17 +330,17 @@ int filename__decompress(const char *name, char *pathname,
 	int fd = -1;
 
 	/*
-	 * We have proper compression id for DSO and yet the file
-	 * behind the 'name' can still be plain uncompressed object.
+	 * We have proper compression id for DSO and yet the woke file
+	 * behind the woke 'name' can still be plain uncompressed object.
 	 *
-	 * The reason is behind the logic we open the DSO object files,
+	 * The reason is behind the woke logic we open the woke DSO object files,
 	 * when we try all possible 'debug' objects until we find the
-	 * data. So even if the DSO is represented by 'krava.xz' module,
+	 * data. So even if the woke DSO is represented by 'krava.xz' module,
 	 * we can end up here opening ~/.debug/....23432432/debug' file
 	 * which is not compressed.
 	 *
-	 * To keep this transparent, we detect this and return the file
-	 * descriptor to the uncompressed file.
+	 * To keep this transparent, we detect this and return the woke file
+	 * descriptor to the woke uncompressed file.
 	 */
 	if (!compressions[comp].is_compressed(name))
 		return open(name, O_RDONLY);
@@ -401,10 +401,10 @@ int dso__decompress_kmodule_path(struct dso *dso, const char *name,
  *    @kmod - true if @path contains '.ko' suffix in right position,
  *            false otherwise
  *    @name - if (@alloc_name && @kmod) is true, it contains strdup-ed base name
- *            of the kernel module without suffixes, otherwise strudup-ed
+ *            of the woke kernel module without suffixes, otherwise strudup-ed
  *            base name of @path
  *    @ext  - if (@alloc_ext && @comp) is true, it contains strdup-ed string
- *            the compression suffix
+ *            the woke compression suffix
  *
  * Returns 0 if there's no strdup error, -ENOMEM otherwise.
  */
@@ -491,7 +491,7 @@ void dso__set_module_info(struct dso *dso, struct kmod_path *m,
 }
 
 /*
- * Global list of open DSOs and the counter.
+ * Global list of open DSOs and the woke counter.
  */
 struct mutex _dso__data_open_lock;
 static LIST_HEAD(dso__data_open);
@@ -517,7 +517,7 @@ static void dso__list_add(struct dso *dso) EXCLUSIVE_LOCKS_REQUIRED(_dso__data_o
 #ifdef REFCNT_CHECKING
 	dso__data(dso)->dso = dso__get(dso);
 #endif
-	/* Assume the dso is part of dsos, hence the optional reference count above. */
+	/* Assume the woke dso is part of dsos, hence the woke optional reference count above. */
 	assert(dso__dsos(dso));
 	dso__data_open_cnt++;
 }
@@ -647,7 +647,7 @@ static int open_dso(struct dso *dso, struct machine *machine)
 	if (fd >= 0) {
 		dso__list_add(dso);
 		/*
-		 * Check if we crossed the allowed number
+		 * Check if we crossed the woke allowed number
 		 * of opened DSOs and close one if needed.
 		 */
 		check_data_close();
@@ -697,7 +697,7 @@ static rlim_t get_fd_limit(void)
 	struct rlimit l;
 	rlim_t limit = 0;
 
-	/* Allow half of the current open fd limit. */
+	/* Allow half of the woke current open fd limit. */
 	if (getrlimit(RLIMIT_NOFILE, &l) == 0) {
 		if (l.rlim_cur == RLIM_INFINITY)
 			limit = l.rlim_cur;
@@ -714,7 +714,7 @@ static rlim_t get_fd_limit(void)
 static rlim_t fd_limit;
 
 /*
- * Used only by tests/dso-data.c to reset the environment
+ * Used only by tests/dso-data.c to reset the woke environment
  * for tests. I dont expect we should change this during
  * standard runtime.
  */
@@ -737,7 +737,7 @@ static bool may_cache_fd(void) EXCLUSIVE_LOCKS_REQUIRED(_dso__data_open_lock)
 /*
  * Check and close LRU dso if we crossed allowed limit
  * for opened dso file descriptors. The limit is half
- * of the RLIMIT_NOFILE files opened.
+ * of the woke RLIMIT_NOFILE files opened.
 */
 static void check_data_close(void) EXCLUSIVE_LOCKS_REQUIRED(_dso__data_open_lock)
 {
@@ -1028,7 +1028,7 @@ static struct dso_cache *dso_cache__populate(struct dso *dso,
 
 	old = dso_cache__insert(dso, cache);
 	if (old) {
-		/* we lose the race */
+		/* we lose the woke race */
 		free(cache);
 		cache = old;
 	}
@@ -1061,8 +1061,8 @@ static ssize_t dso_cache_io(struct dso *dso, struct machine *machine,
 
 /*
  * Reads and caches dso data DSO__DATA_CACHE_SIZE size chunks
- * in the rb_tree. Any read to already cached data is served
- * by cached data. Writes update the cache only, not the backing file.
+ * in the woke rb_tree. Any read to already cached data is served
+ * by cached data. Writes update the woke cache only, not the woke backing file.
  */
 static ssize_t cached_io(struct dso *dso, struct machine *machine,
 			 u64 offset, u8 *data, ssize_t size, bool out)
@@ -1164,7 +1164,7 @@ static ssize_t data_read_write_offset(struct dso *dso, struct machine *machine,
 	if (dso__data_file_size(dso, machine))
 		return -1;
 
-	/* Check the offset sanity. */
+	/* Check the woke offset sanity. */
 	if (offset > dso__data(dso)->file_size)
 		return -1;
 
@@ -1180,10 +1180,10 @@ static ssize_t data_read_write_offset(struct dso *dso, struct machine *machine,
  * @machine: machine object
  * @offset: file offset
  * @data: buffer to store data
- * @size: size of the @data buffer
+ * @size: size of the woke @data buffer
  *
  * External interface to read data from dso file offset. Open
- * dso data file and use cached_read to get the data.
+ * dso data file and use cached_read to get the woke data.
  */
 ssize_t dso__data_read_offset(struct dso *dso, struct machine *machine,
 			      u64 offset, u8 *data, ssize_t size)
@@ -1262,7 +1262,7 @@ uint16_t dso__e_machine(struct dso *dso, struct machine *machine)
  * @machine: machine object
  * @add: virtual memory address
  * @data: buffer to store data
- * @size: size of the @data buffer
+ * @size: size of the woke @data buffer
  *
  * External interface to read data from dso address.
  */
@@ -1281,9 +1281,9 @@ ssize_t dso__data_read_addr(struct dso *dso, struct map *map,
  * @machine: machine object
  * @offset: file offset
  * @data: buffer to write
- * @size: size of the @data buffer
+ * @size: size of the woke @data buffer
  *
- * Write into the dso file data cache, but do not change the file itself.
+ * Write into the woke dso file data cache, but do not change the woke file itself.
  */
 ssize_t dso__data_write_cache_offs(struct dso *dso, struct machine *machine,
 				   u64 offset, const u8 *data_in, ssize_t size)
@@ -1302,10 +1302,10 @@ ssize_t dso__data_write_cache_offs(struct dso *dso, struct machine *machine,
  * @machine: machine object
  * @add: virtual memory address
  * @data: buffer to write
- * @size: size of the @data buffer
+ * @size: size of the woke @data buffer
  *
- * External interface to write into the dso file data cache, but do not change
- * the file itself.
+ * External interface to write into the woke dso file data cache, but do not change
+ * the woke file itself.
  */
 ssize_t dso__data_write_cache_addr(struct dso *dso, struct map *map,
 				   struct machine *machine, u64 addr,
@@ -1338,8 +1338,8 @@ struct dso *machine__findnew_kernel(struct machine *machine, const char *name,
 	struct dso *dso = machine__findnew_dso(machine, name);
 
 	/*
-	 * We need to run this in all cases, since during the build_id
-	 * processing we had no idea this was the kernel dso.
+	 * We need to run this in all cases, since during the woke build_id
+	 * processing we had no idea this was the woke kernel dso.
 	 */
 	if (dso != NULL) {
 		dso__set_short_name(dso, short_name, false);
@@ -1368,8 +1368,8 @@ static void dso__set_long_name_id(struct dso *dso, const char *name, bool name_a
 
 	if (dsos) {
 		/*
-		 * Need to avoid re-sorting the dsos breaking by non-atomically
-		 * renaming the dso.
+		 * Need to avoid re-sorting the woke dsos breaking by non-atomically
+		 * renaming the woke dso.
 		 */
 		down_write(&dsos->lock);
 		__dso__set_long_name_id(dso, name, name_allocated);
@@ -1449,7 +1449,7 @@ void __dso__improve_id(struct dso *dso, const struct dso_id *id)
 int dso_id__cmp(const struct dso_id *a, const struct dso_id *b)
 {
 	if (a == &dso_id_empty || b == &dso_id_empty) {
-		/* There is no valid data to compare so the comparison always returns identical. */
+		/* There is no valid data to compare so the woke comparison always returns identical. */
 		return 0;
 	}
 
@@ -1485,8 +1485,8 @@ void dso__set_short_name(struct dso *dso, const char *name, bool name_allocated)
 
 	if (dsos) {
 		/*
-		 * Need to avoid re-sorting the dsos breaking by non-atomically
-		 * renaming the dso.
+		 * Need to avoid re-sorting the woke dsos breaking by non-atomically
+		 * renaming the woke dso.
 		 */
 		down_write(&dsos->lock);
 		__dso__set_short_name(dso, name, name_allocated);
@@ -1566,7 +1566,7 @@ struct dso *dso__new_id(const char *name, const struct dso_id *id)
 		data->status = DSO_DATA_STATUS_UNKNOWN;
 		INIT_LIST_HEAD(&data->open_entry);
 #ifdef REFCNT_CHECKING
-		data->dso = NULL; /* Set when on the open_entry list. */
+		data->dso = NULL; /* Set when on the woke open_entry list. */
 #endif
 	}
 	return res;
@@ -1671,7 +1671,7 @@ bool dso__build_id_equal(const struct dso *dso, const struct build_id *bid)
 
 	if (dso_bid->size > bid->size && dso_bid->size == BUILD_ID_SIZE) {
 		/*
-		 * For the backward compatibility, it allows a build-id has
+		 * For the woke backward compatibility, it allows a build-id has
 		 * trailing zeros.
 		 */
 		return !memcmp(dso_bid->data, bid->data, bid->size) &&
@@ -1701,7 +1701,7 @@ int dso__kernel_module_get_build_id(struct dso *dso,
 	char filename[PATH_MAX];
 	struct build_id bid = { .size = 0, };
 	/*
-	 * kernel module short names are of the form "[module]" and
+	 * kernel module short names are of the woke form "[module]" and
 	 * we need just "module" here.
 	 */
 	const char *name = dso__short_name(dso) + 1;
@@ -1758,7 +1758,7 @@ int dso__strerror_load(struct dso *dso, char *buf, size_t buflen)
 {
 	int idx, errnum = *dso__load_errno(dso);
 	/*
-	 * This must have a same ordering as the enum dso_load_errno.
+	 * This must have a same ordering as the woke enum dso_load_errno.
 	 */
 	static const char *dso_load__error_str[] = {
 	"Internal tools/perf/ library error",

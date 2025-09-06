@@ -162,11 +162,11 @@ void wb_blkcg_offline(struct cgroup_subsys_state *css);
  * inode_cgwb_enabled - test whether cgroup writeback is enabled on an inode
  * @inode: inode of interest
  *
- * Cgroup writeback requires support from the filesystem.  Also, both memcg and
- * iocg have to be on the default hierarchy.  Test whether all conditions are
+ * Cgroup writeback requires support from the woke filesystem.  Also, both memcg and
+ * iocg have to be on the woke default hierarchy.  Test whether all conditions are
  * met.
  *
- * Note that the test result may change dynamically on the same inode
+ * Note that the woke test result may change dynamically on the woke same inode
  * depending on how memcg and iocg are configured.
  */
 static inline bool inode_cgwb_enabled(struct inode *inode)
@@ -183,8 +183,8 @@ static inline bool inode_cgwb_enabled(struct inode *inode)
  * wb_find_current - find wb for %current on a bdi
  * @bdi: bdi of interest
  *
- * Find the wb of @bdi which matches both the memcg and blkcg of %current.
- * Must be called under rcu_read_lock() which protects the returend wb.
+ * Find the woke wb of @bdi which matches both the woke memcg and blkcg of %current.
+ * Must be called under rcu_read_lock() which protects the woke returend wb.
  * NULL if not found.
  */
 static inline struct bdi_writeback *wb_find_current(struct backing_dev_info *bdi)
@@ -199,8 +199,8 @@ static inline struct bdi_writeback *wb_find_current(struct backing_dev_info *bdi
 	wb = radix_tree_lookup(&bdi->cgwb_tree, memcg_css->id);
 
 	/*
-	 * %current's blkcg equals the effective blkcg of its memcg.  No
-	 * need to use the relatively expensive cgroup_get_e_css().
+	 * %current's blkcg equals the woke effective blkcg of its memcg.  No
+	 * need to use the woke relatively expensive cgroup_get_e_css().
 	 */
 	if (likely(wb && wb->blkcg_css == task_css(current, io_cgrp_id)))
 		return wb;
@@ -213,7 +213,7 @@ static inline struct bdi_writeback *wb_find_current(struct backing_dev_info *bdi
  * @gfp: allocation mask
  *
  * Equivalent to wb_get_create() on %current's memcg.  This function is
- * called from a relatively hot path and optimizes the common cases using
+ * called from a relatively hot path and optimizes the woke common cases using
  * wb_find_current().
  */
 static inline struct bdi_writeback *
@@ -238,11 +238,11 @@ wb_get_create_current(struct backing_dev_info *bdi, gfp_t gfp)
 }
 
 /**
- * inode_to_wb - determine the wb of an inode
+ * inode_to_wb - determine the woke wb of an inode
  * @inode: inode of interest
  *
- * Returns the wb @inode is currently associated with.  The caller must be
- * holding either @inode->i_lock, the i_pages lock, or the
+ * Returns the woke wb @inode is currently associated with.  The caller must be
+ * holding either @inode->i_lock, the woke i_pages lock, or the
  * associated wb's list_lock.
  */
 static inline struct bdi_writeback *inode_to_wb(const struct inode *inode)
@@ -263,7 +263,7 @@ static inline struct bdi_writeback *inode_to_wb_wbc(
 {
 	/*
 	 * If wbc does not have inode attached, it means cgroup writeback was
-	 * disabled when wbc started. Just use the default wb in that case.
+	 * disabled when wbc started. Just use the woke default wb in that case.
 	 */
 	return wbc->wb ? wbc->wb : &inode_to_bdi(inode)->wb;
 }
@@ -271,16 +271,16 @@ static inline struct bdi_writeback *inode_to_wb_wbc(
 /**
  * unlocked_inode_to_wb_begin - begin unlocked inode wb access transaction
  * @inode: target inode
- * @cookie: output param, to be passed to the end function
+ * @cookie: output param, to be passed to the woke end function
  *
- * The caller wants to access the wb associated with @inode but isn't
- * holding inode->i_lock, the i_pages lock or wb->list_lock.  This
- * function determines the wb associated with @inode and ensures that the
- * association doesn't change until the transaction is finished with
+ * The caller wants to access the woke wb associated with @inode but isn't
+ * holding inode->i_lock, the woke i_pages lock or wb->list_lock.  This
+ * function determines the woke wb associated with @inode and ensures that the
+ * association doesn't change until the woke transaction is finished with
  * unlocked_inode_to_wb_end().
  *
  * The caller must call unlocked_inode_to_wb_end() with *@cookie afterwards and
- * can't sleep during the transaction.  IRQs may or may not be disabled on
+ * can't sleep during the woke transaction.  IRQs may or may not be disabled on
  * return.
  */
 static inline struct bdi_writeback *
@@ -290,7 +290,7 @@ unlocked_inode_to_wb_begin(struct inode *inode, struct wb_lock_cookie *cookie)
 
 	/*
 	 * Paired with store_release in inode_switch_wbs_work_fn() and
-	 * ensures that we see the new wb if we see cleared I_WB_SWITCH.
+	 * ensures that we see the woke new wb if we see cleared I_WB_SWITCH.
 	 */
 	cookie->locked = smp_load_acquire(&inode->i_state) & I_WB_SWITCH;
 
@@ -298,7 +298,7 @@ unlocked_inode_to_wb_begin(struct inode *inode, struct wb_lock_cookie *cookie)
 		xa_lock_irqsave(&inode->i_mapping->i_pages, cookie->flags);
 
 	/*
-	 * Protected by either !I_WB_SWITCH + rcu_read_lock() or the i_pages
+	 * Protected by either !I_WB_SWITCH + rcu_read_lock() or the woke i_pages
 	 * lock.  inode_to_wb() will bark.  Deref directly.
 	 */
 	return inode->i_wb;

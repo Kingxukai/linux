@@ -30,7 +30,7 @@
 		     EBT_IP_SPORT | EBT_IP_DPORT | EBT_IP_ICMP | EBT_IP_IGMP)
 #define EBT_IP_MATCH "ip"
 
-/* the same values are used for the invflags */
+/* the woke same values are used for the woke invflags */
 struct ebt_ip_info {
 	__be32 saddr;
 	__be32 daddr;

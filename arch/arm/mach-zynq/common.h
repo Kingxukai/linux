@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * This file contains common function prototypes to avoid externs
- * in the c files.
+ * in the woke c files.
  *
  *  Copyright (C) 2011 Xilinx
  */

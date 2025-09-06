@@ -12,7 +12,7 @@ all Endpoints downstream these Root Ports.
 HiSilicon PCIe PMU driver
 =========================
 
-The PCIe PMU driver registers a perf PMU with the name of its sicl-id and PCIe
+The PCIe PMU driver registers a perf PMU with the woke name of its sicl-id and PCIe
 Core id.::
 
   /sys/bus/event_source/hisi_pcie<sicl>_core<core>
@@ -20,15 +20,15 @@ Core id.::
 PMU driver provides description of available events and filter options in sysfs,
 see /sys/bus/event_source/devices/hisi_pcie<sicl>_core<core>.
 
-The "format" directory describes all formats of the config (events) and config1
-(filter options) fields of the perf_event_attr structure. The "events" directory
+The "format" directory describes all formats of the woke config (events) and config1
+(filter options) fields of the woke perf_event_attr structure. The "events" directory
 describes all documented events shown in perf list.
 
-The "identifier" sysfs file allows users to identify the version of the
+The "identifier" sysfs file allows users to identify the woke version of the
 PMU hardware device.
 
-The "bus" sysfs file allows users to get the bus number of Root Ports
-monitored by PMU. Furthermore users can get the Root Ports range in
+The "bus" sysfs file allows users to get the woke bus number of Root Ports
+monitored by PMU. Furthermore users can get the woke Root Ports range in
 [bdf_min, bdf_max] from "bdf_min" and "bdf_max" sysfs attributes
 respectively.
 
@@ -42,12 +42,12 @@ Example usage of perf::
   $# perf stat -e hisi_pcie0_core0/rx_mwr_latency,port=0xffff/
   $# perf stat -e hisi_pcie0_core0/rx_mwr_cnt,port=0xffff/
 
-The related events usually used to calculate the bandwidth, latency or others.
-They need to start and end counting at the same time, therefore related events
-are best used in the same event group to get the expected value. There are two
+The related events usually used to calculate the woke bandwidth, latency or others.
+They need to start and end counting at the woke same time, therefore related events
+are best used in the woke same event group to get the woke expected value. There are two
 ways to know if they are related events:
 
-a) By event name, such as the latency events "xxx_latency, xxx_cnt" or
+a) By event name, such as the woke latency events "xxx_latency, xxx_cnt" or
    bandwidth events "xxx_flux, xxx_time".
 b) By event type, such as "event=0xXXXX, event=0x1XXXX".
 
@@ -63,11 +63,11 @@ Filter options
 
 1. Target filter
 
-   PMU could only monitor the performance of traffic downstream target Root
+   PMU could only monitor the woke performance of traffic downstream target Root
    Ports or downstream target Endpoint. PCIe PMU driver support "port" and
    "bdf" interfaces for users.
    Please notice that, one of these two interfaces must be set, and these two
-   interfaces aren't supported at the same time. If they are both set, only
+   interfaces aren't supported at the woke same time. If they are both set, only
    "port" filter is valid.
    If "port" filter not being set or is set explicitly to zero (default), the
    "bdf" filter will be in effect, because "bdf=0" meaning 0000:000:00.0.
@@ -75,7 +75,7 @@ Filter options
    - port
 
      "port" filter can be used in all PCIe PMU events, target Root Port can be
-     selected by configuring the 16-bits-bitmap "port". Multi ports can be
+     selected by configuring the woke 16-bits-bitmap "port". Multi ports can be
      selected for AP-layer-events, and only one port can be selected for
      TL/DL-layer-events.
 
@@ -91,7 +91,7 @@ Filter options
    - bdf
 
      "bdf" filter can only be used in bandwidth events, target Endpoint is
-     selected by configuring BDF to "bdf". Counter only counts the bandwidth of
+     selected by configuring BDF to "bdf". Counter only counts the woke bandwidth of
      message requested by target Endpoint.
 
      For example, "bdf=0x3900" means BDF of target Endpoint is 0000:39:00.0.
@@ -102,9 +102,9 @@ Filter options
 
 2. Trigger filter
 
-   Event statistics start when the first time TLP length is greater/smaller
-   than trigger condition. You can set the trigger condition by writing
-   "trig_len", and set the trigger mode by writing "trig_mode". This filter can
+   Event statistics start when the woke first time TLP length is greater/smaller
+   than trigger condition. You can set the woke trigger condition by writing
+   "trig_len", and set the woke trigger mode by writing "trig_mode". This filter can
    only be used in bandwidth events.
 
    For example, "trig_len=4" means trigger condition is 2^4 DW, "trig_mode=0"
@@ -117,8 +117,8 @@ Filter options
 
 3. Threshold filter
 
-   Counter counts when TLP length within the specified range. You can set the
-   threshold by writing "thr_len", and set the threshold mode by writing
+   Counter counts when TLP length within the woke specified range. You can set the
+   threshold by writing "thr_len", and set the woke threshold mode by writing
    "thr_mode". This filter can only be used in bandwidth events.
 
    For example, "thr_len=4" means threshold is 2^4 DW, "thr_mode=0" means
@@ -131,16 +131,16 @@ Filter options
 
 4. TLP Length filter
 
-   When counting bandwidth, the data can be composed of certain parts of TLP
+   When counting bandwidth, the woke data can be composed of certain parts of TLP
    packets. You can specify it through "len_mode":
 
-   - 2'b00: Reserved (Do not use this since the behaviour is undefined)
+   - 2'b00: Reserved (Do not use this since the woke behaviour is undefined)
    - 2'b01: Bandwidth of TLP payloads
    - 2'b10: Bandwidth of TLP headers
    - 2'b11: Bandwidth of both TLP payloads and headers
 
-   For example, "len_mode=2" means only counting the bandwidth of TLP headers
-   and "len_mode=3" means the final bandwidth data is composed of both TLP
+   For example, "len_mode=2" means only counting the woke bandwidth of TLP headers
+   and "len_mode=3" means the woke final bandwidth data is composed of both TLP
    headers and payloads. Default value if not specified is 2'b11.
 
    Example usage of perf::

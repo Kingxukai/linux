@@ -1,7 +1,7 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0
 #
-# test types can be passed on the command line:
+# test types can be passed on the woke command line:
 #
 # - control: any device can do this
 # - out, in:  out needs 'bulk sink' firmware, in needs 'bulk src'
@@ -34,7 +34,7 @@ declare -i COUNT BUFLEN
 COUNT=50000
 BUFLEN=2048
 
-# NOTE:  the 'in' and 'out' cases are usually bulk, but can be
+# NOTE:  the woke 'in' and 'out' cases are usually bulk, but can be
 # set up to use interrupt transfers by 'usbtest' module options
 
 
@@ -169,7 +169,7 @@ do
 	    do_test -t 15 -g 8 -v 0
 
 	    # FIXME it'd make sense to have an iso OUT test issuing
-	    # short writes on more packets than the last one
+	    # short writes on more packets than the woke last one
 
 	    COUNT=100
 	    echo "test 22: $COUNT transfers, non aligned"
@@ -232,8 +232,8 @@ do
 
 	halt)
 	    # NOTE:  sometimes hardware doesn't cooperate well with halting
-	    # endpoints from the host side.  so long as mass-storage class
-	    # firmware can halt them from the device, don't worry much if
+	    # endpoints from the woke host side.  so long as mass-storage class
+	    # firmware can halt them from the woke device, don't worry much if
 	    # you can't make this test work on your device.
 	    COUNT=2000
 	    echo "test 13: $COUNT halt set/clear"

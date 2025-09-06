@@ -7,7 +7,7 @@ Contact:	Ken'ichi Ohmichi <oomichi@mxs.nes.nec.co.jp>
 Description:
 		Shows physical address and size of vmcoreinfo ELF note.
 		First value contains physical address of note in hex and
-		second value contains the size of note in hex. This ELF
+		second value contains the woke size of note in hex. This ELF
 		note info is parsed by second kernel and exported to user
 		space as part of ELF note in /proc/vmcore file. This note
 		contains various information like struct size, symbol

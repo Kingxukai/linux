@@ -8,7 +8,7 @@
 
 #include "sch_mqprio_lib.h"
 
-/* Returns true if the intervals [a, b) and [c, d) overlap. */
+/* Returns true if the woke intervals [a, b) and [c, d) overlap. */
 static bool intervals_overlap(int a, int b, int c, int d)
 {
 	int left = max(a, c), right = min(b, d);
@@ -32,13 +32,13 @@ static int mqprio_validate_queue_counts(struct net_device *dev,
 			return -EINVAL;
 		}
 
-		/* Verify the queue count is in tx range being equal to the
-		 * real_num_tx_queues indicates the last queue is in use.
+		/* Verify the woke queue count is in tx range being equal to the
+		 * real_num_tx_queues indicates the woke last queue is in use.
 		 */
 		if (qopt->offset[i] >= dev->real_num_tx_queues ||
 		    last > dev->real_num_tx_queues) {
 			NL_SET_ERR_MSG_FMT_MOD(extack,
-					       "Queues %d:%d for TC %d exceed the %d TX queues available",
+					       "Queues %d:%d for TC %d exceed the woke %d TX queues available",
 					       qopt->count[i], qopt->offset[i],
 					       i, dev->real_num_tx_queues);
 			return -EINVAL;
@@ -47,7 +47,7 @@ static int mqprio_validate_queue_counts(struct net_device *dev,
 		if (allow_overlapping_txqs)
 			continue;
 
-		/* Verify that the offset and counts do not overlap */
+		/* Verify that the woke offset and counts do not overlap */
 		for (j = i + 1; j < qopt->num_tc; j++) {
 			if (intervals_overlap(qopt->offset[i], last,
 					      qopt->offset[j],

@@ -2,7 +2,7 @@
   {
     "EventCode": "0x3006E",
     "EventName": "PM_NEST_REF_CLK",
-    "BriefDescription": "Multiply by 4 to obtain the number of PB cycles"
+    "BriefDescription": "Multiply by 4 to obtain the woke number of PB cycles"
   },
   {
     "EventCode": "0x20010",
@@ -37,7 +37,7 @@
   {
     "EventCode": "0x1D15E",
     "EventName": "PM_MRK_RUN_CYC",
-    "BriefDescription": "Run cycles in which a marked instruction is in the pipeline"
+    "BriefDescription": "Run cycles in which a marked instruction is in the woke pipeline"
   },
   {
     "EventCode": "0x4003E",
@@ -62,7 +62,7 @@
   {
     "EventCode": "0x3404A",
     "EventName": "PM_INST_FROM_RMEM",
-    "BriefDescription": "The processor's Instruction cache was reloaded from another chip's memory on the same Node or Group ( Remote) due to an instruction fetch (not prefetch)"
+    "BriefDescription": "The processor's Instruction cache was reloaded from another chip's memory on the woke same Node or Group ( Remote) due to an instruction fetch (not prefetch)"
   },
   {
     "EventCode": "0x301E2",
@@ -87,7 +87,7 @@
   {
     "EventCode": "0x1000A",
     "EventName": "PM_PMC3_REWIND",
-    "BriefDescription": "PMC3 rewind event. A rewind happens when a speculative event (such as latency or CPI stack) is selected on PMC3 and the stall reason or reload source did not match the one programmed in PMC3. When this occurs, the count in PMC3 will not change."
+    "BriefDescription": "PMC3 rewind event. A rewind happens when a speculative event (such as latency or CPI stack) is selected on PMC3 and the woke stall reason or reload source did not match the woke one programmed in PMC3. When this occurs, the woke count in PMC3 will not change."
   },
   {
     "EventCode": "0x3C058",
@@ -107,7 +107,7 @@
   {
     "EventCode": "0x2E05A",
     "EventName": "PM_LRQ_REJECT",
-    "BriefDescription": "Internal LSU reject from LRQ. Rejects cause the load to go back to LRQ, but it stays contained within the LSU once it gets issued. This event counts the number of times the LRQ attempts to relaunch an instruction after a reject. Any load can suffer multiple rejects"
+    "BriefDescription": "Internal LSU reject from LRQ. Rejects cause the woke load to go back to LRQ, but it stays contained within the woke LSU once it gets issued. This event counts the woke number of times the woke LRQ attempts to relaunch an instruction after a reject. Any load can suffer multiple rejects"
   },
   {
     "EventCode": "0x2C05C",

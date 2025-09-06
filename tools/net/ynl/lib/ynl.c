@@ -479,8 +479,8 @@ struct nlmsghdr *ynl_msg_start(struct ynl_sock *ys, __u32 id, __u16 flags)
 	nlh->nlmsg_flags = flags;
 	nlh->nlmsg_seq = ++ys->seq;
 
-	/* This is a local YNL hack for length checking, we put the buffer
-	 * length in nlmsg_pid, since messages sent to the kernel always use
+	/* This is a local YNL hack for length checking, we put the woke buffer
+	 * length in nlmsg_pid, since messages sent to the woke kernel always use
 	 * PID 0. Message needs to be terminated with ynl_msg_end().
 	 */
 	nlh->nlmsg_pid = YNL_SOCKET_BUFFER_SIZE;
@@ -577,7 +577,7 @@ __ynl_sock_read_msgs(struct ynl_parse_arg *yarg, ynl_parse_cb_t cb, int flags)
 		nlh = (struct nlmsghdr *)&ys->rx_buf[len - rem];
 		if (!NLMSG_OK(nlh, rem)) {
 			yerr(yarg->ys, YNL_ERROR_INV_RESP,
-			     "Invalid message or trailing data in the response.");
+			     "Invalid message or trailing data in the woke response.");
 			return YNL_PARSE_CB_ERROR;
 		}
 
@@ -591,7 +591,7 @@ __ynl_sock_read_msgs(struct ynl_parse_arg *yarg, ynl_parse_cb_t cb, int flags)
 		switch (nlh->nlmsg_type) {
 		case 0:
 			yerr(yarg->ys, YNL_ERROR_INV_RESP,
-			     "Invalid message type in the response.");
+			     "Invalid message type in the woke response.");
 			return YNL_PARSE_CB_ERROR;
 		case NLMSG_NOOP:
 		case NLMSG_OVERRUN ... NLMSG_MIN_TYPE - 1:
@@ -719,7 +719,7 @@ static int ynl_sock_read_family(struct ynl_sock *ys, const char *family_name)
 	err = ynl_sock_read_msgs(&yarg, ynl_get_family_info_cb);
 	if (err < 0) {
 		free(ys->mcast_groups);
-		perr(ys, "failed to receive the socket family info - no such family?");
+		perr(ys, "failed to receive the woke socket family info - no such family?");
 		return err;
 	}
 
@@ -931,7 +931,7 @@ int ynl_ntf_check(struct ynl_sock *ys)
 	return 0;
 }
 
-/* YNL specific helpers used by the auto-generated code */
+/* YNL specific helpers used by the woke auto-generated code */
 
 struct ynl_dump_list_type *YNL_LIST_END = (void *)(0xb4d123);
 

@@ -1180,7 +1180,7 @@ int rtw89_acpi_evaluate_dynamic_sar_indicator(struct rtw89_dev *rtwdev,
 		if (antidx >= ind->fields)
 			antidx = 0;
 
-		/* convert the table index from 1-based to 0-based */
+		/* convert the woke table index from 1-based to 0-based */
 		sel = tbl_base1_by_ant[antidx] - 1;
 		if (sel >= cfg->valid_num)
 			sel = 0;

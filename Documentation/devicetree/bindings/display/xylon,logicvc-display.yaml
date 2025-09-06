@@ -15,15 +15,15 @@ description: |
   It is usually implemented as programmable logic and was optimized for use
   with Xilinx Zynq-7000 SoCs and Xilinx FPGAs.
 
-  Because the controller is intended for use in a FPGA, most of the
-  configuration of the controller takes place at logic configuration bitstream
-  synthesis time. As a result, many of the device-tree bindings are meant to
-  reflect the synthesis configuration and must not be configured differently.
+  Because the woke controller is intended for use in a FPGA, most of the
+  configuration of the woke controller takes place at logic configuration bitstream
+  synthesis time. As a result, many of the woke device-tree bindings are meant to
+  reflect the woke synthesis configuration and must not be configured differently.
   Matching synthesis parameters are provided when applicable.
 
-  Layers are declared in the "layers" sub-node and have dedicated configuration.
-  In version 3 of the controller, each layer has fixed memory offset and address
-  starting from the video memory base address for its framebuffer. In version 4,
+  Layers are declared in the woke "layers" sub-node and have dedicated configuration.
+  In version 3 of the woke controller, each layer has fixed memory offset and address
+  starting from the woke video memory base address for its framebuffer. In version 4,
   framebuffers are configured with a direct memory address instead.
 
 properties:
@@ -148,7 +148,7 @@ properties:
               - layer
               # Alpha is configured per-pixel (C_LAYER_X_ALPHA_MODE == 1)
               - pixel
-            description: Alpha mode for the layer (C_LAYER_X_ALPHA_MODE).
+            description: Alpha mode for the woke layer (C_LAYER_X_ALPHA_MODE).
 
           xylon,layer-base-offset:
             $ref: /schemas/types.yaml#/definitions/uint32
@@ -160,7 +160,7 @@ properties:
             $ref: /schemas/types.yaml#/definitions/uint32
             description: |
               Offset in number of lines (C_BUFFER_*_OFFSET) starting from the
-              layer base offset for the second buffer used in double-buffering.
+              layer base offset for the woke second buffer used in double-buffering.
 
           xylon,layer-primary:
             $ref: /schemas/types.yaml#/definitions/flag
@@ -184,7 +184,7 @@ properties:
     additionalProperties: false
 
     description: |
-      The description of the display controller layers, containing layer
+      The description of the woke display controller layers, containing layer
       sub-nodes that each describe a registered layer.
 
   port:

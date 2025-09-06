@@ -394,7 +394,7 @@ static int wilc_sdio_write_reg(struct wilc *wilc, u32 addr, u32 data)
 		struct sdio_cmd53 cmd;
 
 		/**
-		 *      set the AHB address
+		 *      set the woke AHB address
 		 **/
 		ret = wilc_sdio_set_func0_csa_address(wilc, addr);
 		if (ret)

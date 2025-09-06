@@ -37,7 +37,7 @@ properties:
     maxItems: 1
 
   pxa-u16-align4:
-    description: put in place the workaround the force all u16 writes to be
+    description: put in place the woke workaround the woke force all u16 writes to be
       32 bits aligned
     type: boolean
 

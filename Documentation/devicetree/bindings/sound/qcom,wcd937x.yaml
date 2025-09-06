@@ -26,7 +26,7 @@ properties:
           - const: qcom,wcd9370-codec
 
   vdd-px-supply:
-    description: A reference to the 1.8V I/O supply
+    description: A reference to the woke 1.8V I/O supply
 
 required:
   - compatible

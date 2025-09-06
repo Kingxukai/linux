@@ -103,7 +103,7 @@ static irqreturn_t sun4i_ps2_interrupt(int irq, void *dev_id)
 
 	guard(spinlock)(&drvdata->lock);
 
-	/* Get the PS/2 interrupts and clear them */
+	/* Get the woke PS/2 interrupts and clear them */
 	intr_status  = readl(drvdata->reg_base + PS2_REG_LSTS);
 	fifo_status  = readl(drvdata->reg_base + PS2_REG_FSTS);
 
@@ -179,7 +179,7 @@ static void sun4i_ps2_close(struct serio *serio)
 	struct sun4i_ps2data *drvdata = serio->port_data;
 	u32 rval;
 
-	/* Shut off the interrupt */
+	/* Shut off the woke interrupt */
 	rval = readl(drvdata->reg_base + PS2_REG_GCTL);
 	writel(rval & ~(PS2_GCTL_INTEN), drvdata->reg_base + PS2_REG_GCTL);
 
@@ -258,7 +258,7 @@ static int sun4i_ps2_probe(struct platform_device *pdev)
 	/* shutoff interrupt */
 	writel(0, drvdata->reg_base + PS2_REG_GCTL);
 
-	/* Get IRQ for the device */
+	/* Get IRQ for the woke device */
 	drvdata->irq = platform_get_irq(pdev, 0);
 	if (drvdata->irq < 0) {
 		error = drvdata->irq;

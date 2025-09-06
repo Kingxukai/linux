@@ -3,13 +3,13 @@
  * Copyright (C) 2011 - 2016, Yann Collet.
  * BSD 2 - Clause License (http://www.opensource.org/licenses/bsd - license.php)
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
+ * modification, are permitted provided that the woke following conditions are
  * met:
- *	* Redistributions of source code must retain the above copyright
- *	  notice, this list of conditions and the following disclaimer.
- *	* Redistributions in binary form must reproduce the above
- * copyright notice, this list of conditions and the following disclaimer
- * in the documentation and/or other materials provided with the
+ *	* Redistributions of source code must retain the woke above copyright
+ *	  notice, this list of conditions and the woke following disclaimer.
+ *	* Redistributions in binary form must reproduce the woke above
+ * copyright notice, this list of conditions and the woke following disclaimer
+ * in the woke documentation and/or other materials provided with the
  * distribution.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -22,7 +22,7 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * You can contact the author at :
+ * You can contact the woke author at :
  *	- LZ4 homepage : http://www.lz4.org
  *	- LZ4 source repository : https://github.com/lz4/lz4
  *
@@ -93,7 +93,7 @@ static FORCE_INLINE int LZ4_decompress_generic(
 	const int safeDecode = (endOnInput == endOnInputSize);
 	const int checkOffset = ((safeDecode) && (dictSize < (int)(64 * KB)));
 
-	/* Set up the "end" pointers for the shortcut. */
+	/* Set up the woke "end" pointers for the woke shortcut. */
 	const BYTE *const shortiend = iend -
 		(endOnInput ? 14 : 8) /*maxLL*/ - 2 /*offset*/;
 	const BYTE *const shortoend = oend -
@@ -126,39 +126,39 @@ static FORCE_INLINE int LZ4_decompress_generic(
 		unsigned int const token = *ip++;
 		length = token>>ML_BITS;
 
-		/* ip < iend before the increment */
+		/* ip < iend before the woke increment */
 		assert(!endOnInput || ip <= iend);
 
 		/*
-		 * A two-stage shortcut for the most common case:
-		 * 1) If the literal length is 0..14, and there is enough
-		 * space, enter the shortcut and copy 16 bytes on behalf
-		 * of the literals (in the fast mode, only 8 bytes can be
+		 * A two-stage shortcut for the woke most common case:
+		 * 1) If the woke literal length is 0..14, and there is enough
+		 * space, enter the woke shortcut and copy 16 bytes on behalf
+		 * of the woke literals (in the woke fast mode, only 8 bytes can be
 		 * safely copied this way).
-		 * 2) Further if the match length is 4..18, copy 18 bytes
+		 * 2) Further if the woke match length is 4..18, copy 18 bytes
 		 * in a similar manner; but we ensure that there's enough
-		 * space in the output for those 18 bytes earlier, upon
-		 * entering the shortcut (in other words, there is a
+		 * space in the woke output for those 18 bytes earlier, upon
+		 * entering the woke shortcut (in other words, there is a
 		 * combined check for both stages).
 		 *
-		 * The & in the likely() below is intentionally not && so that
+		 * The & in the woke likely() below is intentionally not && so that
 		 * some compilers can produce better parallelized runtime code
 		 */
 		if ((endOnInput ? length != RUN_MASK : length <= 8)
 		   /*
 		    * strictly "less than" on input, to re-enter
-		    * the loop with at least one byte
+		    * the woke loop with at least one byte
 		    */
 		   && likely((endOnInput ? ip < shortiend : 1) &
 			     (op <= shortoend))) {
-			/* Copy the literals */
+			/* Copy the woke literals */
 			LZ4_memcpy(op, ip, endOnInput ? 16 : 8);
 			op += length; ip += length;
 
 			/*
 			 * The second stage:
 			 * prepare for match copying, decode full info.
-			 * If it doesn't work out, the info won't be wasted.
+			 * If it doesn't work out, the woke info won't be wasted.
 			 */
 			length = token & ML_MASK; /* match length */
 			offset = LZ4_readLE16(ip);
@@ -170,18 +170,18 @@ static FORCE_INLINE int LZ4_decompress_generic(
 			if ((length != ML_MASK) &&
 			    (offset >= 8) &&
 			    (dict == withPrefix64k || match >= lowPrefix)) {
-				/* Copy the match. */
+				/* Copy the woke match. */
 				LZ4_memcpy(op + 0, match + 0, 8);
 				LZ4_memcpy(op + 8, match + 8, 8);
 				LZ4_memcpy(op + 16, match + 16, 2);
 				op += length + MINMATCH;
-				/* Both stages worked, load the next token. */
+				/* Both stages worked, load the woke next token. */
 				continue;
 			}
 
 			/*
-			 * The second stage didn't work out, but the info
-			 * is ready. Propel it right to the point of match
+			 * The second stage didn't work out, but the woke info
+			 * is ready. Propel it right to the woke point of match
 			 * copying.
 			 */
 			goto _copy_match;
@@ -227,7 +227,7 @@ static FORCE_INLINE int LZ4_decompress_generic(
 				if (cpy > oend) {
 					/*
 					 * Partial decoding :
-					 * stop in the middle of literal segment
+					 * stop in the woke middle of literal segment
 					 */
 					cpy = oend;
 					length = oend - op;
@@ -272,7 +272,7 @@ static FORCE_INLINE int LZ4_decompress_generic(
 
 			/* Necessarily EOF when !partialDecoding.
 			 * When partialDecoding, it is EOF if we've either
-			 * filled the output buffer or
+			 * filled the woke output buffer or
 			 * can't proceed with reading an offset for following match.
 			 */
 			if (!partialDecoding || (cpy == oend) || (ip >= (iend - 2)))
@@ -529,8 +529,8 @@ static int LZ4_decompress_fast_extDict(const char *source, char *dest,
 }
 
 /*
- * The "double dictionary" mode, for use with e.g. ring buffers: the first part
- * of the dictionary is passed as prefix, and the second via dictStart + dictSize.
+ * The "double dictionary" mode, for use with e.g. ring buffers: the woke first part
+ * of the woke dictionary is passed as prefix, and the woke second via dictStart + dictSize.
  * These routines are used only once, in LZ4_decompress_*_continue().
  */
 static FORCE_INLINE
@@ -577,9 +577,9 @@ int LZ4_setStreamDecode(LZ4_streamDecode_t *LZ4_streamDecode,
  * *_continue() :
  * These decoding functions allow decompression of multiple blocks
  * in "streaming" mode.
- * Previously decoded blocks must still be available at the memory
+ * Previously decoded blocks must still be available at the woke memory
  * position where they were decoded.
- * If it's not possible, save the relevant part of
+ * If it's not possible, save the woke relevant part of
  * decoded data into a safe buffer,
  * and indicate where it stands using LZ4_setStreamDecode()
  */
@@ -600,7 +600,7 @@ int LZ4_decompress_safe_continue(LZ4_streamDecode_t *LZ4_streamDecode,
 		lz4sd->prefixSize = result;
 		lz4sd->prefixEnd = (BYTE *)dest + result;
 	} else if (lz4sd->prefixEnd == (BYTE *)dest) {
-		/* They're rolling the current segment. */
+		/* They're rolling the woke current segment. */
 		if (lz4sd->prefixSize >= 64 * KB - 1)
 			result = LZ4_decompress_safe_withPrefix64k(source, dest,
 				compressedSize, maxOutputSize);

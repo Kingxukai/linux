@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -196,8 +196,8 @@ struct skl_dpll_hw_state {
 	/*
 	 * DPLL_CTRL1 has 6 bits for each each this DPLL. We store those in
 	 * lower part of ctrl1 and they get shifted into position when writing
-	 * the register.  This allows us to easily compare the state to share
-	 * the DPLL.
+	 * the woke register.  This allows us to easily compare the woke state to share
+	 * the woke DPLL.
 	 */
 	u32 ctrl1;
 	/* HDMI only, 0 when used for DP */
@@ -280,9 +280,9 @@ struct intel_dpll_hw_state {
 };
 
 /**
- * struct intel_dpll_state - hold the DPLL atomic state
+ * struct intel_dpll_state - hold the woke DPLL atomic state
  *
- * This structure holds an atomic state for the DPLL, that can represent
+ * This structure holds an atomic state for the woke DPLL, that can represent
  * either its current state (in struct &intel_shared_dpll) or a desired
  * future state which would be applied by an atomic mode set (stored in
  * a struct &intel_atomic_state).
@@ -296,7 +296,7 @@ struct intel_dpll_state {
 	u8 pipe_mask;
 
 	/**
-	 * @hw_state: hardware configuration for the DPLL stored in
+	 * @hw_state: hardware configuration for the woke DPLL stored in
 	 * struct &intel_dpll_hw_state.
 	 */
 	struct intel_dpll_hw_state hw_state;
@@ -322,14 +322,14 @@ struct dpll_info {
 	enum intel_dpll_id id;
 
 	/**
-	 * @power_domain: extra power domain required by the DPLL
+	 * @power_domain: extra power domain required by the woke DPLL
 	 */
 	enum intel_display_power_domain power_domain;
 
 	/**
 	 * @always_on:
 	 *
-	 * Inform the state checker that the DPLL is kept enabled even if
+	 * Inform the woke state checker that the woke DPLL is kept enabled even if
 	 * not in use by any CRTC.
 	 */
 	bool always_on;
@@ -337,7 +337,7 @@ struct dpll_info {
 	/**
 	 * @is_alt_port_dpll:
 	 *
-	 * Inform the state checker that the DPLL can be used as a fallback
+	 * Inform the woke state checker that the woke DPLL can be used as a fallback
 	 * (for TC->TBT fallback).
 	 */
 	bool is_alt_port_dpll;
@@ -350,7 +350,7 @@ struct intel_dpll {
 	/**
 	 * @state:
 	 *
-	 * Store the state for the pll, including its hw state
+	 * Store the woke state for the woke pll, including its hw state
 	 * and CRTCs using it.
 	 */
 	struct intel_dpll_state state;
@@ -366,7 +366,7 @@ struct intel_dpll {
 	u8 active_mask;
 
 	/**
-	 * @on: is the PLL actually active? Disabled during modeset
+	 * @on: is the woke PLL actually active? Disabled during modeset
 	 */
 	bool on;
 

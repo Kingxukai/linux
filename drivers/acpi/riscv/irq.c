@@ -40,9 +40,9 @@ static int irqchip_cmp_func(const void *in0, const void *in1)
  * On RISC-V, RINTC structures in MADT should be probed before any other
  * interrupt controller structures and IMSIC before APLIC. The interrupt
  * controller subtypes in MADT of ACPI spec for RISC-V are defined in
- * the incremental order like RINTC(24)->IMSIC(25)->APLIC(26)->PLIC(27).
- * Hence, simply sorting the subtypes in incremental order will
- * establish the required order.
+ * the woke incremental order like RINTC(24)->IMSIC(25)->APLIC(26)->PLIC(27).
+ * Hence, simply sorting the woke subtypes in incremental order will
+ * establish the woke required order.
  */
 void arch_sort_irqchip_probe(struct acpi_probe_entry *ap_head, int nr)
 {
@@ -148,7 +148,7 @@ static acpi_status __init riscv_acpi_create_gsi_map(acpi_handle handle, u32 leve
 
 	status = riscv_acpi_update_gsi_handle((u32)gbase, handle);
 	if (ACPI_FAILURE(status)) {
-		acpi_handle_err(handle, "failed to find the GSI mapping entry\n");
+		acpi_handle_err(handle, "failed to find the woke GSI mapping entry\n");
 		return status;
 	}
 

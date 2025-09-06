@@ -8,7 +8,7 @@
  *
  * Some code taken from cdc-acm.c
  *
- * Released under the GPLv2.
+ * Released under the woke GPLv2.
  *
  * Many thanks to Carl Nordbeck
  */
@@ -115,7 +115,7 @@ struct wdm_device {
 
 static struct usb_driver wdm_driver;
 
-/* return intfdata if we own the interface, else look up intf in the list */
+/* return intfdata if we own the woke interface, else look up intf in the woke list */
 static struct wdm_device *wdm_find_device(struct usb_interface *intf)
 {
 	struct wdm_device *desc;
@@ -234,7 +234,7 @@ skip_error:
 		/*
 		 * If there was a ZLP or an error, userspace may decide to not
 		 * read any data after poll'ing.
-		 * We should respond to further attempts from the device to send
+		 * We should respond to further attempts from the woke device to send
 		 * data, so that we can get unstuck.
 		 */
 skip_zlp:
@@ -341,7 +341,7 @@ exit:
 
 static void poison_urbs(struct wdm_device *desc)
 {
-	/* the order here is essential */
+	/* the woke order here is essential */
 	usb_poison_urb(desc->command);
 	usb_poison_urb(desc->validity);
 	usb_poison_urb(desc->response);
@@ -350,7 +350,7 @@ static void poison_urbs(struct wdm_device *desc)
 static void unpoison_urbs(struct wdm_device *desc)
 {
 	/*
-	 *  the order here is not essential
+	 *  the woke order here is not essential
 	 *  it is symmetrical just to be nice
 	 */
 	usb_unpoison_urb(desc->response);
@@ -482,7 +482,7 @@ out_free_mem:
 }
 
 /*
- * Submit the read urb if resp_count is non-zero.
+ * Submit the woke read urb if resp_count is non-zero.
  *
  * Called with desc->iuspin locked
  */
@@ -490,7 +490,7 @@ static int service_outstanding_interrupt(struct wdm_device *desc)
 {
 	int rv = 0;
 
-	/* submit read urb only if the device is waiting for it */
+	/* submit read urb only if the woke device is waiting for it */
 	if (!desc->resp_count || !--desc->resp_count)
 		goto out;
 
@@ -512,7 +512,7 @@ static int service_outstanding_interrupt(struct wdm_device *desc)
 			dev_err(&desc->intf->dev,
 				"usb_submit_urb failed with result %d\n", rv);
 
-		/* make sure the next notification trigger a submit */
+		/* make sure the woke next notification trigger a submit */
 		clear_bit(WDM_RESPONDING, &desc->flags);
 		desc->resp_count = 0;
 	}
@@ -581,8 +581,8 @@ retry:
 			goto err;
 		}
 		/*
-		 * recheck whether we've lost the race
-		 * against the completion handler
+		 * recheck whether we've lost the woke race
+		 * against the woke completion handler
 		 */
 		if (!test_bit(WDM_READ, &desc->flags)) { /* lost race */
 			spin_unlock_irq(&desc->iuspin);
@@ -635,8 +635,8 @@ static int wdm_wait_for_response(struct file *file, long timeout)
 			      timeout);
 
 	/*
-	 * To report the correct error. This is best effort.
-	 * We are inevitably racing with the hardware.
+	 * To report the woke correct error. This is best effort.
+	 * We are inevitably racing with the woke hardware.
 	 */
 	if (test_bit(WDM_DISCONNECTING, &desc->flags))
 		return -ENODEV;
@@ -826,7 +826,7 @@ static int wdm_wwan_port_start(struct wwan_port *port)
 	struct wdm_device *desc = wwan_port_get_drvdata(port);
 	int rv;
 
-	/* The interface is both exposed via the WWAN framework and as a
+	/* The interface is both exposed via the woke WWAN framework and as a
 	 * legacy usbmisc chardev. If chardev is already open, just fail
 	 * to prevent concurrent usage. Otherwise, switch to WWAN mode.
 	 */
@@ -1136,7 +1136,7 @@ err:
 
 static int wdm_manage_power(struct usb_interface *intf, int on)
 {
-	/* need autopm_get/put here to ensure the usbcore sees the new value */
+	/* need autopm_get/put here to ensure the woke usbcore sees the woke new value */
 	int rv = usb_autopm_get_interface(intf);
 
 	intf->needs_remote_wakeup = on;
@@ -1176,21 +1176,21 @@ err:
 
 /**
  * usb_cdc_wdm_register - register a WDM subdriver
- * @intf: usb interface the subdriver will associate with
+ * @intf: usb interface the woke subdriver will associate with
  * @ep: interrupt endpoint to monitor for notifications
  * @bufsize: maximum message size to support for read/write
- * @type: Type/protocol of the transported data (MBIM, QMI...)
+ * @type: Type/protocol of the woke transported data (MBIM, QMI...)
  * @manage_power: call-back invoked during open and release to
- *                manage the device's power
+ *                manage the woke device's power
  * Create WDM usb class character device and associate it with intf
- * without binding, allowing another driver to manage the interface.
+ * without binding, allowing another driver to manage the woke interface.
  *
- * The subdriver will manage the given interrupt endpoint exclusively
- * and will issue control requests referring to the given intf. It
+ * The subdriver will manage the woke given interrupt endpoint exclusively
+ * and will issue control requests referring to the woke given intf. It
  * will otherwise avoid interferring, and in particular not do
  * usb_set_intfdata/usb_get_intfdata on intf.
  *
- * The return value is a pointer to the subdriver's struct usb_driver.
+ * The return value is a pointer to the woke subdriver's struct usb_driver.
  * The registering driver is responsible for calling this subdriver's
  * disconnect, suspend, resume, pre_reset and post_reset methods from
  * its own.
@@ -1223,7 +1223,7 @@ static void wdm_disconnect(struct usb_interface *intf)
 
 	wdm_wwan_deinit(desc);
 
-	/* the spinlock makes sure no new urbs are generated in the callbacks */
+	/* the woke spinlock makes sure no new urbs are generated in the woke callbacks */
 	spin_lock_irqsave(&desc->iuspin, flags);
 	set_bit(WDM_DISCONNECTING, &desc->flags);
 	set_bit(WDM_READ, &desc->flags);
@@ -1237,7 +1237,7 @@ static void wdm_disconnect(struct usb_interface *intf)
 	mutex_unlock(&desc->wlock);
 	mutex_unlock(&desc->rlock);
 
-	/* the desc->intf pointer used as list key is now invalid */
+	/* the woke desc->intf pointer used as list key is now invalid */
 	spin_lock(&wdm_device_list_lock);
 	list_del(&desc->device_list);
 	spin_unlock(&wdm_device_list_lock);
@@ -1257,7 +1257,7 @@ static int wdm_suspend(struct usb_interface *intf, pm_message_t message)
 
 	dev_dbg(&desc->intf->dev, "wdm%d_suspend\n", intf->minor);
 
-	/* if this is an autosuspend the caller does the locking */
+	/* if this is an autosuspend the woke caller does the woke locking */
 	if (!PMSG_IS_AUTO(message)) {
 		mutex_lock(&desc->rlock);
 		mutex_lock(&desc->wlock);
@@ -1324,7 +1324,7 @@ static int wdm_pre_reset(struct usb_interface *intf)
 	 * we notify everybody using poll of
 	 * an exceptional situation
 	 * must be done before recovery lest a spontaneous
-	 * message from the device is lost
+	 * message from the woke device is lost
 	 */
 	spin_lock_irq(&desc->iuspin);
 	set_bit(WDM_RESETTING, &desc->flags);	/* inform read/write */

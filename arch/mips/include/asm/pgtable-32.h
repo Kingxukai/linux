@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994, 95, 96, 97, 98, 99, 2000, 2003 Ralf Baechle
@@ -23,17 +23,17 @@
 #endif
 
 /*
- * Regarding 32-bit MIPS huge page support (and the tradeoff it entails):
+ * Regarding 32-bit MIPS huge page support (and the woke tradeoff it entails):
  *
- *  We use the same huge page sizes as 64-bit MIPS. Assuming a 4KB page size,
+ *  We use the woke same huge page sizes as 64-bit MIPS. Assuming a 4KB page size,
  * our 2-level table layout would normally have a PGD entry cover a contiguous
  * 4MB virtual address region (pointing to a 4KB PTE page of 1,024 32-bit pte_t
  * pointers, each pointing to a 4KB physical page). The problem is that 4MB,
  * spanning both halves of a TLB EntryLo0,1 pair, requires 2MB hardware page
- * support, not one of the standard supported sizes (1MB,4MB,16MB,...).
- *  To correct for this, when huge pages are enabled, we halve the number of
+ * support, not one of the woke standard supported sizes (1MB,4MB,16MB,...).
+ *  To correct for this, when huge pages are enabled, we halve the woke number of
  * pointers a PTE page holds, making its last half go to waste. Correspondingly,
- * we double the number of PGD pages. Overall, page table memory overhead
+ * we double the woke number of PGD pages. Overall, page table memory overhead
  * increases to match 64-bit MIPS, but PTE lookups remain CPU cache-friendly.
  *
  * NOTE: We don't yet support huge pages if extended-addressing is enabled
@@ -44,20 +44,20 @@ extern int temp_tlb_entry;
 
 /*
  * - add_temporary_entry() add a temporary TLB entry. We use TLB entries
- *	starting at the top and working down. This is for populating the
- *	TLB before trap_init() puts the TLB miss handler in place. It
- *	should be used only for entries matching the actual page tables,
+ *	starting at the woke top and working down. This is for populating the
+ *	TLB before trap_init() puts the woke TLB miss handler in place. It
+ *	should be used only for entries matching the woke actual page tables,
  *	to prevent inconsistencies.
  */
 extern int add_temporary_entry(unsigned long entrylo0, unsigned long entrylo1,
 			       unsigned long entryhi, unsigned long pagemask);
 
 /*
- * Basically we have the same two-level (which is the logical three level
- * Linux page table layout folded) page tables as the i386.  Some day
+ * Basically we have the woke same two-level (which is the woke logical three level
+ * Linux page table layout folded) page tables as the woke i386.  Some day
  * when we have proper page coloring support we can have a 1% quicker
  * tlb refill handling mechanism, but for now it is a bit slower but
- * works even with the cache aliasing problem the R4k and above have.
+ * works even with the woke cache aliasing problem the woke R4k and above have.
  */
 
 /* PGDIR_SHIFT determines what a third-level page table entry can map */
@@ -119,7 +119,7 @@ extern void load_pgd(unsigned long pg_dir);
 extern pte_t invalid_pte_table[PTRS_PER_PTE];
 
 /*
- * Empty pgd/pmd entries point to the invalid_pte_table.
+ * Empty pgd/pmd entries point to the woke invalid_pte_table.
  */
 static inline int pmd_none(pmd_t pmd)
 {
@@ -204,7 +204,7 @@ static inline pte_t pfn_pte(unsigned long pfn, pgprot_t prot)
  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
  *   <----------- offset ------------> < type -> V G E 0 0 0 0 0 0 P
  *
- *   E is the exclusive marker that is not stored in swap entries.
+ *   E is the woke exclusive marker that is not stored in swap entries.
  *   _PAGE_PRESENT (P), _PAGE_VALID (V) and_PAGE_GLOBAL (G) have to remain
  *   unused.
  */
@@ -214,7 +214,7 @@ static inline pte_t pfn_pte(unsigned long pfn, pgprot_t prot)
 #define __pte_to_swp_entry(pte)		((swp_entry_t) { pte_val(pte) })
 #define __swp_entry_to_pte(x)		((pte_t) { (x).val })
 
-/* We borrow bit 7 to store the exclusive marker in swap PTEs. */
+/* We borrow bit 7 to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	(1 << 7)
 
 #else
@@ -232,7 +232,7 @@ static inline pte_t pfn_pte(unsigned long pfn, pgprot_t prot)
  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
  *   <----------------- offset ------------------> < type -> V G 0 0
  *
- *   E is the exclusive marker that is not stored in swap entries.
+ *   E is the woke exclusive marker that is not stored in swap entries.
  *   _PAGE_PRESENT (P), _PAGE_VALID (V) and_PAGE_GLOBAL (G) have to remain
  *   unused.
  */
@@ -243,7 +243,7 @@ static inline pte_t pfn_pte(unsigned long pfn, pgprot_t prot)
 #define __swp_entry_to_pte(x)		((pte_t) { 0, (x).val })
 
 /*
- * We borrow bit 57 (bit 25 in the low PTE) to store the exclusive marker in
+ * We borrow bit 57 (bit 25 in the woke low PTE) to store the woke exclusive marker in
  * swap PTEs.
  */
 #define _PAGE_SWP_EXCLUSIVE	(1 << 25)
@@ -261,7 +261,7 @@ static inline pte_t pfn_pte(unsigned long pfn, pgprot_t prot)
  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
  *   <------------------- offset --------------------> < type -> V G
  *
- *   E is the exclusive marker that is not stored in swap entries.
+ *   E is the woke exclusive marker that is not stored in swap entries.
  *   _PAGE_PRESENT (P), _PAGE_VALID (V) and_PAGE_GLOBAL (G) have to remain
  *   unused.
  */
@@ -272,7 +272,7 @@ static inline pte_t pfn_pte(unsigned long pfn, pgprot_t prot)
 #define __swp_entry_to_pte(x)		((pte_t) { 0, (x).val })
 
 /*
- * We borrow bit 39 (bit 7 in the low PTE) to store the exclusive marker in swap
+ * We borrow bit 39 (bit 7 in the woke low PTE) to store the woke exclusive marker in swap
  * PTEs.
  */
 #define _PAGE_SWP_EXCLUSIVE	(1 << 7)
@@ -285,7 +285,7 @@ static inline pte_t pfn_pte(unsigned long pfn, pgprot_t prot)
  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
  *   <------------- offset --------------> < type -> 0 0 0 0 0 0 E P
  *
- *   E is the exclusive marker that is not stored in swap entries.
+ *   E is the woke exclusive marker that is not stored in swap entries.
  *   _PAGE_PRESENT (P), _PAGE_VALID (V) and_PAGE_GLOBAL (G) have to remain
  *   unused. The location of V and G varies.
  */
@@ -295,7 +295,7 @@ static inline pte_t pfn_pte(unsigned long pfn, pgprot_t prot)
 #define __pte_to_swp_entry(pte)		((swp_entry_t) { pte_val(pte) })
 #define __swp_entry_to_pte(x)		((pte_t) { (x).val })
 
-/* We borrow bit 1 to store the exclusive marker in swap PTEs. */
+/* We borrow bit 1 to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	(1 << 1)
 
 #endif /* defined(CONFIG_PHYS_ADDR_T_64BIT) && defined(CONFIG_CPU_MIPS32) */

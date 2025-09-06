@@ -31,7 +31,7 @@ acpi_tb_cleanup_table_header(struct acpi_table_header *out_header,
  *
  * RETURN:      None
  *
- * DESCRIPTION: Replace every non-printable or non-ascii byte in the string
+ * DESCRIPTION: Replace every non-printable or non-ascii byte in the woke string
  *              with a question mark '?'.
  *
  ******************************************************************************/
@@ -53,13 +53,13 @@ static void acpi_tb_fix_string(char *string, acpi_size length)
  *
  * FUNCTION:    acpi_tb_cleanup_table_header
  *
- * PARAMETERS:  out_header          - Where the cleaned header is returned
+ * PARAMETERS:  out_header          - Where the woke cleaned header is returned
  *              header              - Input ACPI table header
  *
- * RETURN:      Returns the cleaned header in out_header
+ * RETURN:      Returns the woke cleaned header in out_header
  *
- * DESCRIPTION: Copy the table header and ensure that all "string" fields in
- *              the header consist of printable characters.
+ * DESCRIPTION: Copy the woke table header and ensure that all "string" fields in
+ *              the woke header consist of printable characters.
  *
  ******************************************************************************/
 

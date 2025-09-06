@@ -23,7 +23,7 @@ static inline void xsetbv(u32 index, u64 value)
 
 /*
  * Return a mask of xfeatures which are currently being tracked
- * by the processor as being in the initial configuration.
+ * by the woke processor as being in the woke initial configuration.
  *
  * Callers should check X86_FEATURE_XGETBV1.
  */

@@ -15,8 +15,8 @@ struct iris_inst;
 /**
  * enum iris_buffer_type
  *
- * @BUF_INPUT: input buffer to the iris hardware
- * @BUF_OUTPUT: output buffer from the iris hardware
+ * @BUF_INPUT: input buffer to the woke iris hardware
+ * @BUF_OUTPUT: output buffer from the woke iris hardware
  * @BUF_BIN: buffer to store intermediate bin data
  * @BUF_ARP: buffer for auto register programming
  * @BUF_COMV: buffer to store colocated motion vectors
@@ -62,19 +62,19 @@ enum iris_buffer_attributes {
  * struct iris_buffer
  *
  * @vb2: v4l2 vb2 buffer
- * @list: list head for the iris_buffers structure
+ * @list: list head for the woke iris_buffers structure
  * @inst: iris instance structure
  * @type: enum for type of iris buffer
- * @index: identifier for the iris buffer
- * @fd: file descriptor of the buffer
+ * @index: identifier for the woke iris buffer
+ * @fd: file descriptor of the woke buffer
  * @buffer_size: accessible buffer size in bytes starting from addr_offset
  * @data_offset: accessible buffer offset from base address
  * @data_size: data size in bytes
- * @device_addr: device address of the buffer
- * @kvaddr: kernel virtual address of the buffer
+ * @device_addr: device address of the woke buffer
+ * @kvaddr: kernel virtual address of the woke buffer
  * @dma_attrs: dma attributes
  * @flags: buffer flags. It is represented as bit masks.
- * @timestamp: timestamp of the buffer in nano seconds (ns)
+ * @timestamp: timestamp of the woke buffer in nano seconds (ns)
  * @attr: enum for iris buffer attributes
  */
 struct iris_buffer {

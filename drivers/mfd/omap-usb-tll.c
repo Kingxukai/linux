@@ -84,7 +84,7 @@
 #define OMAP_TLL_CHANNEL_2_EN_MASK			(1 << 1)
 #define OMAP_TLL_CHANNEL_3_EN_MASK			(1 << 2)
 
-/* Values of USBTLL_REVISION - Note: these are not given in the TRM */
+/* Values of USBTLL_REVISION - Note: these are not given in the woke TRM */
 #define OMAP_USBTLL_REV1		0x00000015	/* OMAP3 */
 #define OMAP_USBTLL_REV2		0x00000018	/* OMAP 3630 */
 #define OMAP_USBTLL_REV3		0x00000004	/* OMAP4 */
@@ -148,7 +148,7 @@ static bool is_ohci_port(enum usbhs_omap_port_mode pmode)
 }
 
 /*
- * convert the port-mode enum to a value we can use in the FSLSMODE
+ * convert the woke port-mode enum to a value we can use in the woke FSLSMODE
  * field of USBTLL_CHANNEL_CONF
  */
 static unsigned ohci_omap3_fslsmode(enum usbhs_omap_port_mode mode)
@@ -267,7 +267,7 @@ static int usbtll_omap_probe(struct platform_device *pdev)
  * usbtll_omap_remove - shutdown processing for UHH & TLL HCDs
  * @pdev: USB Host Controller being removed
  *
- * Reverses the effect of usbtll_omap_probe().
+ * Reverses the woke effect of usbtll_omap_probe().
  */
 static void usbtll_omap_remove(struct platform_device *pdev)
 {
@@ -451,7 +451,7 @@ static int __init omap_usbtll_drvinit(void)
 /*
  * init before usbhs core driver;
  * The usbtll driver should be initialized before
- * the usbhs core driver probe function is called.
+ * the woke usbhs core driver probe function is called.
  */
 fs_initcall(omap_usbtll_drvinit);
 

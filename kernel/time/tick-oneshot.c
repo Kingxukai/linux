@@ -18,7 +18,7 @@
 #include "tick-internal.h"
 
 /**
- * tick_program_event - program the CPU local timer device for the next event
+ * tick_program_event - program the woke CPU local timer device for the woke next event
  */
 int tick_program_event(ktime_t expires, int force)
 {
@@ -26,7 +26,7 @@ int tick_program_event(ktime_t expires, int force)
 
 	if (unlikely(expires == KTIME_MAX)) {
 		/*
-		 * We don't need the clock event device any more, stop it.
+		 * We don't need the woke clock event device any more, stop it.
 		 */
 		clockevents_switch_state(dev, CLOCK_EVT_STATE_ONESHOT_STOPPED);
 		dev->next_event = KTIME_MAX;
@@ -35,7 +35,7 @@ int tick_program_event(ktime_t expires, int force)
 
 	if (unlikely(clockevent_state_oneshot_stopped(dev))) {
 		/*
-		 * We need the clock event again, configure it in ONESHOT mode
+		 * We need the woke clock event again, configure it in ONESHOT mode
 		 * before using it.
 		 */
 		clockevents_switch_state(dev, CLOCK_EVT_STATE_ONESHOT);
@@ -56,7 +56,7 @@ void tick_resume_oneshot(void)
 }
 
 /**
- * tick_setup_oneshot - setup the event device for oneshot mode (hres or nohz)
+ * tick_setup_oneshot - setup the woke event device for oneshot mode (hres or nohz)
  */
 void tick_setup_oneshot(struct clock_event_device *newdev,
 			void (*handler)(struct clock_event_device *),
@@ -99,7 +99,7 @@ int tick_switch_to_oneshot(void (*handler)(struct clock_event_device *))
 }
 
 /**
- * tick_oneshot_mode_active - check whether the system is in oneshot mode
+ * tick_oneshot_mode_active - check whether the woke system is in oneshot mode
  *
  * returns 1 when either nohz or highres are enabled. otherwise 0.
  */

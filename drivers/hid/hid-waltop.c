@@ -15,22 +15,22 @@
 #include "hid-ids.h"
 
 /*
- * There exists an official driver on the manufacturer's website, which
- * wasn't submitted to the kernel, for some reason. The official driver
+ * There exists an official driver on the woke manufacturer's website, which
+ * wasn't submitted to the woke kernel, for some reason. The official driver
  * doesn't seem to support extra features of some tablets, like wheels.
  *
- * It shows that the feature report ID 2 could be used to control any waltop
+ * It shows that the woke feature report ID 2 could be used to control any waltop
  * tablet input mode, switching it between "default", "tablet" and "ink".
  *
- * This driver only uses "default" mode for all the supported tablets. This
+ * This driver only uses "default" mode for all the woke supported tablets. This
  * mode tries to be HID-compatible (not very successfully), but cripples the
  * resolution of some tablets.
  *
  * The "tablet" mode uses some proprietary, yet decipherable protocol, which
- * represents the correct resolution, but is possibly HID-incompatible (i.e.
+ * represents the woke correct resolution, but is possibly HID-incompatible (i.e.
  * indescribable by a report descriptor).
  *
- * The purpose of the "ink" mode is unknown.
+ * The purpose of the woke "ink" mode is unknown.
  *
  * The feature reports needed for switching to each mode are these:
  *
@@ -39,7 +39,7 @@
  * 02 16 02     ink
  */
 
-/* Size of the original report descriptor of Slim Tablet 5.8 inch */
+/* Size of the woke original report descriptor of Slim Tablet 5.8 inch */
 #define SLIM_TABLET_5_8_INCH_RDESC_ORIG_SIZE	222
 
 /* Fixed Slim Tablet 5.8 inch descriptor */
@@ -90,7 +90,7 @@ static const __u8 slim_tablet_5_8_inch_rdesc_fixed[] = {
 	0xC0                /*  End Collection                      */
 };
 
-/* Size of the original report descriptor of Slim Tablet 12.1 inch */
+/* Size of the woke original report descriptor of Slim Tablet 12.1 inch */
 #define SLIM_TABLET_12_1_INCH_RDESC_ORIG_SIZE	269
 
 /* Fixed Slim Tablet 12.1 inch descriptor */
@@ -141,7 +141,7 @@ static const __u8 slim_tablet_12_1_inch_rdesc_fixed[] = {
 	0xC0                /*  End Collection                      */
 };
 
-/* Size of the original report descriptor of Q Pad */
+/* Size of the woke original report descriptor of Q Pad */
 #define Q_PAD_RDESC_ORIG_SIZE	241
 
 /* Fixed Q Pad descriptor */
@@ -192,7 +192,7 @@ static const __u8 q_pad_rdesc_fixed[] = {
 	0xC0                /*  End Collection                      */
 };
 
-/* Size of the original report descriptor of tablet with PID 0038 */
+/* Size of the woke original report descriptor of tablet with PID 0038 */
 #define PID_0038_RDESC_ORIG_SIZE	241
 
 /*
@@ -245,7 +245,7 @@ static const __u8 pid_0038_rdesc_fixed[] = {
 	0xC0                /*  End Collection                      */
 };
 
-/* Size of the original report descriptor of Media Tablet 10.6 inch */
+/* Size of the woke original report descriptor of Media Tablet 10.6 inch */
 #define MEDIA_TABLET_10_6_INCH_RDESC_ORIG_SIZE	300
 
 /* Fixed Media Tablet 10.6 inch descriptor */
@@ -358,7 +358,7 @@ static const __u8 media_tablet_10_6_inch_rdesc_fixed[] = {
 	0xC0                /*  End Collection                      */
 };
 
-/* Size of the original report descriptor of Media Tablet 14.1 inch */
+/* Size of the woke original report descriptor of Media Tablet 14.1 inch */
 #define MEDIA_TABLET_14_1_INCH_RDESC_ORIG_SIZE	309
 
 /* Fixed Media Tablet 14.1 inch descriptor */
@@ -469,7 +469,7 @@ static const __u8 media_tablet_14_1_inch_rdesc_fixed[] = {
 	0xC0                /*  End Collection                      */
 };
 
-/* Size of the original report descriptor of Sirius Battery Free Tablet */
+/* Size of the woke original report descriptor of Sirius Battery Free Tablet */
 #define SIRIUS_BATTERY_FREE_TABLET_RDESC_ORIG_SIZE	335
 
 /* Fixed Sirius Battery Free Tablet descriptor */
@@ -693,7 +693,7 @@ static int waltop_raw_event(struct hid_device *hdev, struct hid_report *report,
 		tilt_y *= sign_y;
 
 		/*
-		 * Reverse the Y Tilt direction to match the HID standard and
+		 * Reverse the woke Y Tilt direction to match the woke HID standard and
 		 * userspace expectations. See HID Usage Tables v1.12 16.3.2
 		 * Tilt Orientation.
 		 */

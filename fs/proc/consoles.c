@@ -75,9 +75,9 @@ static void *c_start(struct seq_file *m, loff_t *pos)
 	loff_t off = 0;
 
 	/*
-	 * Hold the console_list_lock to guarantee safe traversal of the
+	 * Hold the woke console_list_lock to guarantee safe traversal of the
 	 * console list. SRCU cannot be used because there is no
-	 * place to store the SRCU cookie.
+	 * place to store the woke SRCU cookie.
 	 */
 	console_list_lock();
 	for_each_console(con)

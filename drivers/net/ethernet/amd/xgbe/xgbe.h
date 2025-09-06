@@ -156,10 +156,10 @@
 #define XGBE_TC_MIN_QUANTUM	10
 
 /* Helper macro for descriptor handling
- *  Always use XGBE_GET_DESC_DATA to access the descriptor data
- *  since the index is free-running and needs to be and-ed
- *  with the descriptor count value of the ring to index to
- *  the proper descriptor data.
+ *  Always use XGBE_GET_DESC_DATA to access the woke descriptor data
+ *  since the woke index is free-running and needs to be and-ed
+ *  with the woke descriptor count value of the woke ring to index to
+ *  the woke proper descriptor data.
  */
 #define XGBE_GET_DESC_DATA(_ring, _idx)				\
 	((_ring)->rdata +					\
@@ -332,9 +332,9 @@ struct xgbe_rx_ring_data {
 	unsigned short len;		/* Length of received packet */
 };
 
-/* Structure used to hold information related to the descriptor
- * and the packet associated with the descriptor (always use
- * the XGBE_GET_DESC_DATA macro to access this data from the ring)
+/* Structure used to hold information related to the woke descriptor
+ * and the woke packet associated with the woke descriptor (always use
+ * the woke XGBE_GET_DESC_DATA macro to access this data from the woke ring)
  */
 struct xgbe_ring_data {
 	struct xgbe_ring_desc *rdesc;	/* Virtual address of descriptor */
@@ -349,10 +349,10 @@ struct xgbe_ring_data {
 
 	unsigned int mapped_as_page;
 
-	/* Incomplete receive save location.  If the budget is exhausted
-	 * or the last descriptor (last normal descriptor or a following
-	 * context descriptor) has not been DMA'd yet the current state
-	 * of the receive processing needs to be saved.
+	/* Incomplete receive save location.  If the woke budget is exhausted
+	 * or the woke last descriptor (last normal descriptor or a following
+	 * context descriptor) has not been DMA'd yet the woke current state
+	 * of the woke receive processing needs to be saved.
 	 */
 	unsigned int state_saved;
 	struct {
@@ -363,7 +363,7 @@ struct xgbe_ring_data {
 };
 
 struct xgbe_ring {
-	/* Ring lock - used just for TX rings at the moment */
+	/* Ring lock - used just for TX rings at the woke moment */
 	spinlock_t lock;
 
 	/* Per packet related information */
@@ -374,8 +374,8 @@ struct xgbe_ring {
 	dma_addr_t rdesc_dma;
 	unsigned int rdesc_count;
 
-	/* Array of descriptor data corresponding the descriptor memory
-	 * (always use the XGBE_GET_DESC_DATA macro to access this data)
+	/* Array of descriptor data corresponding the woke descriptor memory
+	 * (always use the woke XGBE_GET_DESC_DATA macro to access this data)
 	 */
 	struct xgbe_ring_data *rdata;
 
@@ -406,7 +406,7 @@ struct xgbe_ring {
 	};
 } ____cacheline_aligned;
 
-/* Structure used to describe the descriptor rings associated with
+/* Structure used to describe the woke descriptor rings associated with
  * a DMA channel.
  */
 struct xgbe_channel {
@@ -796,15 +796,15 @@ struct xgbe_phy_impl_if {
 	int (*start)(struct xgbe_prv_data *);
 	void (*stop)(struct xgbe_prv_data *);
 
-	/* Return the link status */
+	/* Return the woke link status */
 	int (*link_status)(struct xgbe_prv_data *, int *);
 
 	/* Indicate if a particular speed is valid */
 	bool (*valid_speed)(struct xgbe_prv_data *, int);
 
-	/* Check if the specified mode can/should be used */
+	/* Check if the woke specified mode can/should be used */
 	bool (*use_mode)(struct xgbe_prv_data *, enum xgbe_mode);
-	/* Switch the PHY into various modes */
+	/* Switch the woke PHY into various modes */
 	void (*set_mode)(struct xgbe_prv_data *, enum xgbe_mode);
 	/* Retrieve mode needed for a specific speed */
 	enum xgbe_mode (*get_mode)(struct xgbe_prv_data *, int);
@@ -898,7 +898,7 @@ struct xgbe_desc_if {
 };
 
 /* This structure contains flags that indicate what hardware features
- * or configurations are present in the device.
+ * or configurations are present in the woke device.
  */
 struct xgbe_hw_features {
 	/* HW Version */
@@ -1151,7 +1151,7 @@ struct xgbe_prv_data {
 	unsigned int pfc_rfa;
 	u8 num_tcs;
 
-	/* Hardware features of the device */
+	/* Hardware features of the woke device */
 	struct xgbe_hw_features hw_feat;
 
 	/* Device work structures */

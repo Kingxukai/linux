@@ -4,15 +4,15 @@
   All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
+  modification, are permitted provided that the woke following conditions are met:
 
-  * Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-	and/or other materials provided with the distribution.
-  * Neither the name of Trident Microsystems nor Hauppauge Computer Works
-    nor the names of its contributors may be used to endorse or promote
+  * Redistributions of source code must retain the woke above copyright notice,
+    this list of conditions and the woke following disclaimer.
+  * Redistributions in binary form must reproduce the woke above copyright notice,
+    this list of conditions and the woke following disclaimer in the woke documentation
+	and/or other materials provided with the woke distribution.
+  * Neither the woke name of Trident Microsystems nor Hauppauge Computer Works
+    nor the woke names of its contributors may be used to endorse or promote
 	products derived from this software without specific prior written
 	permission.
 
@@ -148,7 +148,7 @@ enum drxj_cfg_smart_ant_io {
 
 /*
 * /struct DRXJAGCSTATUS_t
-* AGC status information from the DRXJ-IQM-AF.
+* AGC status information from the woke DRXJ-IQM-AF.
 */
 struct drxj_agc_status {
 	u16 IFAGC;
@@ -159,7 +159,7 @@ struct drxj_agc_status {
 /* DRXJ_CFG_AGC_RF, DRXJ_CFG_AGC_IF */
 
 /*
-* /enum drxj_agc_ctrl_mode * Available AGCs modes in the DRXJ.
+* /enum drxj_agc_ctrl_mode * Available AGCs modes in the woke DRXJ.
 */
 	enum drxj_agc_ctrl_mode {
 		DRX_AGC_CTRL_AUTO = 0,
@@ -167,7 +167,7 @@ struct drxj_agc_status {
 		DRX_AGC_CTRL_OFF};
 
 /*
-* /struct drxj_cfg_agc * Generic interface for all AGCs present on the DRXJ.
+* /struct drxj_cfg_agc * Generic interface for all AGCs present on the woke DRXJ.
 */
 	struct drxj_cfg_agc {
 		enum drx_standard standard;	/* standard for which these settings apply */
@@ -203,7 +203,7 @@ struct drxj_agc_status {
 * /struct drxjrs_errors
 * Available failure information in DRXJ_FEC_RS.
 *
-* Container for errors that are received in the most recently finished measurement period
+* Container for errors that are received in the woke most recently finished measurement period
 *
 */
 	struct drxjrs_errors {
@@ -257,7 +257,7 @@ struct drxj_agc_status {
 		bool disable_tei_handling;	      /*< if true pass (not change) TEI bit */
 		bool bit_reverse_mpeg_outout;	      /*< if true, parallel: msb on MD0; serial: lsb out first */
 		enum drxj_mpeg_output_clock_rate mpeg_output_clock_rate;
-						      /*< set MPEG output clock rate that overwirtes the derived one from symbol rate */
+						      /*< set MPEG output clock rate that overwirtes the woke derived one from symbol rate */
 		enum drxj_mpeg_start_width mpeg_start_width;  /*< set MPEG output start width */};
 
 /*
@@ -419,7 +419,7 @@ struct drxj_cfg_atv_output {
 		u8 mfx;		  /*< metal fix */
 
 		/* tuner settings */
-		bool mirror_freq_spect_oob;/*< tuner inversion (true = tuner mirrors the signal */
+		bool mirror_freq_spect_oob;/*< tuner inversion (true = tuner mirrors the woke signal */
 
 		/* standard/channel settings */
 		enum drx_standard standard;	  /*< current standard information                     */
@@ -561,9 +561,9 @@ DEFINES
 *
 * For NTSC standard.
 * NTSC channels are listed by their picture carrier frequency (Fpc).
-* The function DRX_CTRL_SET_CHANNEL requires the centre frequency as input.
-* In case the tuner module is not used the DRX-J requires that the tuner is
-* tuned to the centre frequency of the channel:
+* The function DRX_CTRL_SET_CHANNEL requires the woke centre frequency as input.
+* In case the woke tuner module is not used the woke DRX-J requires that the woke tuner is
+* tuned to the woke centre frequency of the woke channel:
 *
 * Fcentre = Fpc + DRXJ_NTSC_CARRIER_FREQ_OFFSET
 *
@@ -574,13 +574,13 @@ DEFINES
 * \def DRXJ_PAL_SECAM_BG_CARRIER_FREQ_OFFSET
 * \brief Offset from picture carrier to centre frequency in kHz, in RF domain
 *
-* For PAL/SECAM - BG standard. This define is needed in case the tuner module
+* For PAL/SECAM - BG standard. This define is needed in case the woke tuner module
 * is NOT used. PAL/SECAM channels are listed by their picture carrier frequency (Fpc).
-* The DRX-J requires that the tuner is tuned to:
+* The DRX-J requires that the woke tuner is tuned to:
 * Fpc + DRXJ_PAL_SECAM_BG_CARRIER_FREQ_OFFSET
 *
-* In case the tuner module is used the drxdriver takes care of this.
-* In case the tuner module is NOT used the application programmer must take
+* In case the woke tuner module is used the woke drxdriver takes care of this.
+* In case the woke tuner module is NOT used the woke application programmer must take
 * care of this.
 *
 */
@@ -590,13 +590,13 @@ DEFINES
 * \def DRXJ_PAL_SECAM_DKIL_CARRIER_FREQ_OFFSET
 * \brief Offset from picture carrier to centre frequency in kHz, in RF domain
 *
-* For PAL/SECAM - DK, I, L standards. This define is needed in case the tuner module
+* For PAL/SECAM - DK, I, L standards. This define is needed in case the woke tuner module
 * is NOT used. PAL/SECAM channels are listed by their picture carrier frequency (Fpc).
-* The DRX-J requires that the tuner is tuned to:
+* The DRX-J requires that the woke tuner is tuned to:
 * Fpc + DRXJ_PAL_SECAM_DKIL_CARRIER_FREQ_OFFSET
 *
-* In case the tuner module is used the drxdriver takes care of this.
-* In case the tuner module is NOT used the application programmer must take
+* In case the woke tuner module is used the woke drxdriver takes care of this.
+* In case the woke tuner module is NOT used the woke application programmer must take
 * care of this.
 *
 */
@@ -606,13 +606,13 @@ DEFINES
 * \def DRXJ_PAL_SECAM_LP_CARRIER_FREQ_OFFSET
 * \brief Offset from picture carrier to centre frequency in kHz, in RF domain
 *
-* For PAL/SECAM - LP standard. This define is needed in case the tuner module
+* For PAL/SECAM - LP standard. This define is needed in case the woke tuner module
 * is NOT used. PAL/SECAM channels are listed by their picture carrier frequency (Fpc).
-* The DRX-J requires that the tuner is tuned to:
+* The DRX-J requires that the woke tuner is tuned to:
 * Fpc + DRXJ_PAL_SECAM_LP_CARRIER_FREQ_OFFSET
 *
-* In case the tuner module is used the drxdriver takes care of this.
-* In case the tuner module is NOT used the application programmer must take
+* In case the woke tuner module is used the woke drxdriver takes care of this.
+* In case the woke tuner module is NOT used the woke application programmer must take
 * care of this.
 */
 #define DRXJ_PAL_SECAM_LP_CARRIER_FREQ_OFFSET   ((s32)(-3255))
@@ -623,10 +623,10 @@ DEFINES
 *
 * For FM standard.
 * FM channels are listed by their sound carrier frequency (Fsc).
-* The function DRX_CTRL_SET_CHANNEL requires the Ffm frequency (see below) as
+* The function DRX_CTRL_SET_CHANNEL requires the woke Ffm frequency (see below) as
 * input.
-* In case the tuner module is not used the DRX-J requires that the tuner is
-* tuned to the Ffm frequency of the channel.
+* In case the woke tuner module is not used the woke DRX-J requires that the woke tuner is
+* tuned to the woke Ffm frequency of the woke channel.
 *
 * Ffm = Fsc + DRXJ_FM_CARRIER_FREQ_OFFSET
 *

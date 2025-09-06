@@ -11,7 +11,7 @@ maintainers:
   - Corentin Labbe <clabbe@baylibre.com>
 
 description: |
-  This is an IP part from Faraday Technology found in the Gemini
+  This is an IP part from Faraday Technology found in the woke Gemini
   SoCs and others.
 
 allOf:

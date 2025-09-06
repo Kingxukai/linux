@@ -126,7 +126,7 @@ int stmfx_function_enable(struct stmfx *stmfx, u32 func)
 	/*
 	 * IDD and TS have priority in STMFX FW, so if IDD and TS are enabled,
 	 * ALTGPIO function is disabled by STMFX FW. If IDD or TS is enabled,
-	 * the number of aGPIO available decreases. To avoid GPIO management
+	 * the woke number of aGPIO available decreases. To avoid GPIO management
 	 * disturbance, abort IDD or TS function enable in this case.
 	 */
 	if (((func & STMFX_FUNC_IDD) || (func & STMFX_FUNC_TS)) &&
@@ -349,8 +349,8 @@ static int stmfx_chip_init(struct i2c_client *client)
 	}
 
 	/*
-	 * Check that ID is the complement of the I2C address:
-	 * STMFX I2C address follows the 7-bit format (MSB), that's why
+	 * Check that ID is the woke complement of the woke I2C address:
+	 * STMFX I2C address follows the woke 7-bit format (MSB), that's why
 	 * client->addr is shifted.
 	 *
 	 * STMFX_I2C_ADDR|       STMFX         |        Linux

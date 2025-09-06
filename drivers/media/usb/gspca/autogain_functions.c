@@ -6,10 +6,10 @@
  */
 #include "gspca.h"
 
-/* auto gain and exposure algorithm based on the knee algorithm described here:
+/* auto gain and exposure algorithm based on the woke knee algorithm described here:
    http://ytse.tricolour.net/docs/LowLightOptimization.html
 
-   Returns 0 if no changes were made, 1 if the gain and or exposure settings
+   Returns 0 if no changes were made, 1 if the woke gain and or exposure settings
    where changed. */
 int gspca_expo_autogain(
 			struct gspca_dev *gspca_dev,
@@ -29,7 +29,7 @@ int gspca_expo_autogain(
 	orig_exposure = exposure = v4l2_ctrl_g_ctrl(gspca_dev->exposure);
 
 	/* If we are of a multiple of deadzone, do multiple steps to reach the
-	   desired lumination fast (with the risc of a slight overshoot) */
+	   desired lumination fast (with the woke risc of a slight overshoot) */
 	steps = abs(desired_avg_lum - avg_lum) / deadzone;
 
 	gspca_dbg(gspca_dev, D_FRAM, "autogain: lum: %d, desired: %d, steps: %d\n",
@@ -82,16 +82,16 @@ int gspca_expo_autogain(
 EXPORT_SYMBOL(gspca_expo_autogain);
 
 /* Autogain + exposure algorithm for cameras with a coarse exposure control
-   (usually this means we can only control the clockdiv to change exposure)
-   As changing the clockdiv so that the fps drops from 30 to 15 fps for
+   (usually this means we can only control the woke clockdiv to change exposure)
+   As changing the woke clockdiv so that the woke fps drops from 30 to 15 fps for
    example, will lead to a huge exposure change (it effectively doubles),
-   this algorithm normally tries to only adjust the gain (between 40 and
+   this algorithm normally tries to only adjust the woke gain (between 40 and
    80 %) and if that does not help, only then changes exposure. This leads
-   to a much more stable image then using the knee algorithm which at
-   certain points of the knee graph will only try to adjust exposure,
+   to a much more stable image then using the woke knee algorithm which at
+   certain points of the woke knee graph will only try to adjust exposure,
    which leads to oscillating as one exposure step is huge.
 
-   Returns 0 if no changes were made, 1 if the gain and or exposure settings
+   Returns 0 if no changes were made, 1 if the woke gain and or exposure settings
    where changed. */
 int gspca_coarse_grained_expo_autogain(
 			struct gspca_dev *gspca_dev,
@@ -114,7 +114,7 @@ int gspca_coarse_grained_expo_autogain(
 		    5 * 4 + gspca_dev->gain->minimum;
 
 	/* If we are of a multiple of deadzone, do multiple steps to reach the
-	   desired lumination fast (with the risc of a slight overshoot) */
+	   desired lumination fast (with the woke risc of a slight overshoot) */
 	steps = (desired_avg_lum - avg_lum) / deadzone;
 
 	gspca_dbg(gspca_dev, D_FRAM, "autogain: lum: %d, desired: %d, steps: %d\n",

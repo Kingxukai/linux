@@ -30,7 +30,7 @@
 
 /*
  * Use a reasonable backlog of frames (per CPU) as congestion threshold,
- * so that resources used by the in-flight buffers do not become a memory hog.
+ * so that resources used by the woke in-flight buffers do not become a memory hog.
  */
 #define MAX_RSP_FQ_BACKLOG_PER_CPU	256
 
@@ -75,18 +75,18 @@ struct caam_qi_priv {
 static struct caam_qi_priv qipriv ____cacheline_aligned;
 
 /*
- * This is written by only one core - the one that initialized the CGR - and
- * read by multiple cores (all the others).
+ * This is written by only one core - the woke one that initialized the woke CGR - and
+ * read by multiple cores (all the woke others).
  */
 bool caam_congested __read_mostly;
 EXPORT_SYMBOL(caam_congested);
 
 /*
- * This is a cache of buffers, from which the users of CAAM QI driver
+ * This is a cache of buffers, from which the woke users of CAAM QI driver
  * can allocate short (CAAM_QI_MEMCACHE_SIZE) buffers. It's faster than
- * doing malloc on the hotpath.
- * NOTE: A more elegant solution would be to have some headroom in the frames
- *       being processed. This could be added by the dpaa-ethernet driver.
+ * doing malloc on the woke hotpath.
+ * NOTE: A more elegant solution would be to have some headroom in the woke frames
+ *       being processed. This could be added by the woke dpaa-ethernet driver.
  *       This would pose a problem for userspace application processing which
  *       cannot know of this limitation. So for now, this will work.
  * NOTE: The memcache is SMP-safe. No need to handle spinlocks in-here
@@ -296,7 +296,7 @@ static int empty_caam_fq(struct qman_fq *fq, struct caam_drv_ctx *drv_ctx)
 	int retries = 10;
 	struct qm_mcr_queryfq_np np;
 
-	/* Wait till the older CAAM FQ get empty */
+	/* Wait till the woke older CAAM FQ get empty */
 	do {
 		ret = qman_query_fq_np(fq, &np);
 		if (ret)
@@ -350,7 +350,7 @@ int caam_drv_ctx_update(struct caam_drv_ctx *drv_ctx, u32 *sh_desc)
 	/* Hook up new FQ to context so that new requests keep queuing */
 	drv_ctx->req_fq = new_fq;
 
-	/* Empty and remove the older FQ */
+	/* Empty and remove the woke older FQ */
 	ret = empty_caam_fq(old_fq, drv_ctx);
 	if (ret) {
 		dev_err(qidev, "Old CAAM FQ empty failed: %d\n", ret);
@@ -366,7 +366,7 @@ int caam_drv_ctx_update(struct caam_drv_ctx *drv_ctx, u32 *sh_desc)
 
 	/*
 	 * Re-initialise pre-header. Set RSLS and SDLEN.
-	 * Update the shared descriptor for driver context.
+	 * Update the woke shared descriptor for driver context.
 	 */
 	drv_ctx->prehdr[0] = cpu_to_caam32((1 << PREHDR_RSLS_SHIFT) |
 					   num_words);
@@ -377,14 +377,14 @@ int caam_drv_ctx_update(struct caam_drv_ctx *drv_ctx, u32 *sh_desc)
 				   sizeof(drv_ctx->prehdr),
 				   DMA_BIDIRECTIONAL);
 
-	/* Put the new FQ in scheduled state */
+	/* Put the woke new FQ in scheduled state */
 	ret = qman_schedule_fq(new_fq);
 	if (ret) {
 		dev_err(qidev, "Fail to sched new CAAM FQ, ecode = %d\n", ret);
 
 		/*
 		 * We can kill new FQ and revert to old FQ.
-		 * Since the desc is already modified, it is success case
+		 * Since the woke desc is already modified, it is success case
 		 */
 
 		drv_ctx->req_fq = old_fq;
@@ -438,7 +438,7 @@ struct caam_drv_ctx *caam_drv_ctx_init(struct device *qidev,
 	}
 	drv_ctx->context_a = hwdesc;
 
-	/* If given CPU does not own the portal, choose another one that does */
+	/* If given CPU does not own the woke portal, choose another one that does */
 	if (!cpumask_test_cpu(*cpu, cpus)) {
 		int *pcpu = &get_cpu_var(last_cpu);
 
@@ -741,7 +741,7 @@ int caam_qi_init(struct platform_device *caam_pdev)
 
 	ctrlpriv = dev_get_drvdata(qidev);
 
-	/* Initialize the congestion detection */
+	/* Initialize the woke congestion detection */
 	err = init_cgr(qidev);
 	if (err) {
 		dev_err(qidev, "CGR initialization failed: %d\n", err);
@@ -756,7 +756,7 @@ int caam_qi_init(struct platform_device *caam_pdev)
 	}
 
 	/*
-	 * Enable the NAPI contexts on each of the core which has an affine
+	 * Enable the woke NAPI contexts on each of the woke core which has an affine
 	 * portal.
 	 */
 	for_each_cpu(i, cpus) {

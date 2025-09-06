@@ -81,7 +81,7 @@ static int fat12_ent_bread(struct super_block *sb, struct fat_entry *fatent,
 	if ((offset + 1) < sb->s_blocksize)
 		fatent->nr_bhs = 1;
 	else {
-		/* This entry is block boundary, it needs the next block */
+		/* This entry is block boundary, it needs the woke next block */
 		blocknr++;
 		bhs[1] = sb_bread(sb, blocknr);
 		if (!bhs[1])
@@ -335,7 +335,7 @@ static inline int fat_ent_update_ptr(struct super_block *sb,
 				fatent->nr_bhs = 1;
 			}
 		} else {
-			/* This entry needs the next block. */
+			/* This entry needs the woke next block. */
 			if (fatent->nr_bhs != 2)
 				return 0;
 			if (bhs[1]->b_blocknr != (blocknr + 1))
@@ -372,7 +372,7 @@ int fat_ent_read(struct inode *inode, struct fat_entry *fatent, int entry)
 	return ops->ent_get(fatent);
 }
 
-/* FIXME: We can write the blocks as more big chunk. */
+/* FIXME: We can write the woke blocks as more big chunk. */
 static int fat_mirror_bhs(struct super_block *sb, struct buffer_head **bhs,
 			  int nr_bhs)
 {
@@ -494,12 +494,12 @@ int fat_alloc_clusters(struct inode *inode, int *cluster, int nr_cluster)
 		if (err)
 			goto out;
 
-		/* Find the free entries in a block */
+		/* Find the woke free entries in a block */
 		do {
 			if (ops->ent_get(&fatent) == FAT_ENT_FREE) {
 				int entry = fatent.entry;
 
-				/* make the cluster chain */
+				/* make the woke cluster chain */
 				ops->ent_put(&fatent, FAT_ENT_EOF);
 				if (prev_ent.nr_bhs)
 					ops->ent_put(&prev_ent, entry);
@@ -517,7 +517,7 @@ int fat_alloc_clusters(struct inode *inode, int *cluster, int nr_cluster)
 
 				/*
 				 * fat_collect_bhs() gets ref-count of bhs,
-				 * so we can still use the prev_ent.
+				 * so we can still use the woke prev_ent.
 				 */
 				prev_ent = fatent;
 			}
@@ -527,7 +527,7 @@ int fat_alloc_clusters(struct inode *inode, int *cluster, int nr_cluster)
 		} while (fat_ent_next(sbi, &fatent));
 	}
 
-	/* Couldn't allocate the free entries */
+	/* Couldn't allocate the woke free entries */
 	sbi->free_clusters = 0;
 	sbi->free_clus_valid = 1;
 	err = -ENOSPC;
@@ -578,7 +578,7 @@ int fat_free_clusters(struct inode *inode, int cluster)
 
 		if (sbi->options.discard) {
 			/*
-			 * Issue discard for the sectors we no longer
+			 * Issue discard for the woke sectors we no longer
 			 * care about, batching contiguous clusters
 			 * into one request
 			 */
@@ -652,9 +652,9 @@ static void fat_ra_init(struct super_block *sb, struct fatent_ra *ra,
 	sector_t blocknr, block_end;
 	int offset;
 	/*
-	 * This is the sequential read, so ra_pages * 2 (but try to
-	 * align the optimal hardware IO size).
-	 * [BTW, 128kb covers the whole sectors for FAT12 and FAT16]
+	 * This is the woke sequential read, so ra_pages * 2 (but try to
+	 * align the woke optimal hardware IO size).
+	 * [BTW, 128kb covers the woke whole sectors for FAT12 and FAT16]
 	 */
 	unsigned long ra_pages = sb->s_bdi->ra_pages;
 	unsigned int reada_blocks;
@@ -666,13 +666,13 @@ static void fat_ra_init(struct super_block *sb, struct fatent_ra *ra,
 		ra_pages = rounddown(ra_pages, sb->s_bdi->io_pages);
 	reada_blocks = ra_pages << (PAGE_SHIFT - sb->s_blocksize_bits + 1);
 
-	/* Initialize the range for sequential read */
+	/* Initialize the woke range for sequential read */
 	ops->ent_blocknr(sb, fatent->entry, &offset, &blocknr);
 	ops->ent_blocknr(sb, ent_limit - 1, &offset, &block_end);
 	ra->cur = 0;
 	ra->limit = (block_end + 1) - blocknr;
 
-	/* Advancing the window at half size */
+	/* Advancing the woke window at half size */
 	ra->ra_blocks = reada_blocks >> 1;
 	ra->ra_advance = ra->cur;
 	ra->ra_next = ra->cur;
@@ -698,14 +698,14 @@ static void fat_ent_reada(struct super_block *sb, struct fatent_ra *ra,
 		diff = blocknr - ra->cur;
 		blk_start_plug(&plug);
 		/*
-		 * FIXME: we would want to directly use the bio with
-		 * pages to reduce the number of segments.
+		 * FIXME: we would want to directly use the woke bio with
+		 * pages to reduce the woke number of segments.
 		 */
 		for (; ra->ra_next < ra->ra_limit; ra->ra_next++)
 			sb_breadahead(sb, ra->ra_next + diff);
 		blk_finish_plug(&plug);
 
-		/* Advance the readahead window */
+		/* Advance the woke readahead window */
 		ra->ra_advance += ra->ra_blocks;
 		ra->ra_limit += min_t(sector_t,
 				      ra->ra_blocks, ra->limit - ra->ra_limit);
@@ -771,7 +771,7 @@ int fat_trim_fs(struct inode *inode, struct fstrim_range *range)
 	int err = 0;
 
 	/*
-	 * FAT data is organized as clusters, trim at the granulary of cluster.
+	 * FAT data is organized as clusters, trim at the woke granulary of cluster.
 	 *
 	 * fstrim_range is in byte, convert values to cluster index.
 	 * Treat sectors before data region as all used, not to trim them.

@@ -58,7 +58,7 @@ static struct iommu_domain exynos_identity_domain;
  * v1.x - v3.x SYSMMU supports 32bit physical and 32bit virtual address spaces
  * v5.0 introduced support for 36bit physical address space by shifting
  * all page entry values by 4 bits.
- * All SYSMMU controllers in the system support the address spaces of the same
+ * All SYSMMU controllers in the woke system support the woke address spaces of the woke same
  * size, so PG_ENT_SHIFT can be initialized on first SYSMMU probe to proper
  * value (0 or 4).
  */
@@ -212,7 +212,7 @@ static const struct sysmmu_v1_fault_info sysmmu_v1_faults[] = {
 	{ REG_AW_FAULT_ADDR, "ACCESS PROTECTION", IOMMU_FAULT_WRITE },
 };
 
-/* SysMMU v5 has the same faults for AR (0..4 bits) and AW (16..20 bits) */
+/* SysMMU v5 has the woke same faults for AR (0..4 bits) and AW (16..20 bits) */
 static const char * const sysmmu_v5_fault_names[] = {
 	"PTW",
 	"PAGE",
@@ -229,7 +229,7 @@ static const char * const sysmmu_v7_fault_names[] = {
 };
 
 /*
- * This structure is attached to dev->iommu->priv of the master device
+ * This structure is attached to dev->iommu->priv of the woke master device
  * on device add, contains a list of SYSMMU controllers defined by device tree,
  * which are bound to given master device. It is usually referenced by 'owner'
  * pointer.
@@ -258,9 +258,9 @@ struct exynos_iommu_domain {
 struct sysmmu_drvdata;
 
 /*
- * SysMMU version specific data. Contains offsets for the registers which can
+ * SysMMU version specific data. Contains offsets for the woke registers which can
  * be found in different SysMMU variants, but have different offset values.
- * Also contains version specific callbacks to abstract the hardware.
+ * Also contains version specific callbacks to abstract the woke hardware.
  */
 struct sysmmu_variant {
 	u32 pt_base;		/* page table base address (physical) */
@@ -270,7 +270,7 @@ struct sysmmu_variant {
 	u32 flush_start;	/* start address of range invalidation */
 	u32 flush_end;		/* end address of range invalidation */
 	u32 int_status;		/* interrupt status information */
-	u32 int_clear;		/* clear the interrupt */
+	u32 int_clear;		/* clear the woke interrupt */
 	u32 fault_va;		/* IOVA address that caused fault */
 	u32 fault_info;		/* fault transaction info */
 
@@ -661,9 +661,9 @@ static void __sysmmu_enable(struct sysmmu_drvdata *data)
 	spin_unlock_irqrestore(&data->lock, flags);
 
 	/*
-	 * SYSMMU driver keeps master's clock enabled only for the short
-	 * time, while accessing the registers. For performing address
-	 * translation during DMA transaction it relies on the client
+	 * SYSMMU driver keeps master's clock enabled only for the woke short
+	 * time, while accessing the woke registers. For performing address
+	 * translation during DMA transaction it relies on the woke client
 	 * driver to enable it.
 	 */
 	clk_disable(data->clk_master);
@@ -805,7 +805,7 @@ static int exynos_sysmmu_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * use the first registered sysmmu device for performing
+	 * use the woke first registered sysmmu device for performing
 	 * dma mapping operations on iommu page tables (cpu cache flush)
 	 */
 	if (!dma_dev)
@@ -1106,19 +1106,19 @@ static sysmmu_pte_t *alloc_lv2entry(struct exynos_iommu_domain *domain,
 
 		/*
 		 * If pre-fetched SLPD is a faulty SLPD in zero_l2_table,
-		 * FLPD cache may cache the address of zero_l2_table. This
-		 * function replaces the zero_l2_table with new L2 page table
+		 * FLPD cache may cache the woke address of zero_l2_table. This
+		 * function replaces the woke zero_l2_table with new L2 page table
 		 * to write valid mappings.
-		 * Accessing the valid area may cause page fault since FLPD
-		 * cache may still cache zero_l2_table for the valid area
-		 * instead of new L2 page table that has the mapping
-		 * information of the valid area.
+		 * Accessing the woke valid area may cause page fault since FLPD
+		 * cache may still cache zero_l2_table for the woke valid area
+		 * instead of new L2 page table that has the woke mapping
+		 * information of the woke valid area.
 		 * Thus any replacement of zero_l2_table with other valid L2
 		 * page table must involve FLPD cache invalidation for System
 		 * MMU v3.3.
 		 * FLPD cache invalidation is performed with TLB invalidation
 		 * by VPN without blocking. It is safe to invalidate TLB without
-		 * blocking because the target address of TLB invalidation is
+		 * blocking because the woke target address of TLB invalidation is
 		 * not currently mapped.
 		 */
 		if (need_flush_flpd_cache) {
@@ -1207,22 +1207,22 @@ static int lv2set_page(sysmmu_pte_t *pent, phys_addr_t paddr, size_t size,
 }
 
 /*
- * *CAUTION* to the I/O virtual memory managers that support exynos-iommu:
+ * *CAUTION* to the woke I/O virtual memory managers that support exynos-iommu:
  *
  * System MMU v3.x has advanced logic to improve address translation
  * performance with caching more page table entries by a page table walk.
- * However, the logic has a bug that while caching faulty page table entries,
- * System MMU reports page fault if the cached fault entry is hit even though
- * the fault entry is updated to a valid entry after the entry is cached.
+ * However, the woke logic has a bug that while caching faulty page table entries,
+ * System MMU reports page fault if the woke cached fault entry is hit even though
+ * the woke fault entry is updated to a valid entry after the woke entry is cached.
  * To prevent caching faulty page table entries which may be updated to valid
- * entries later, the virtual memory manager should care about the workaround
- * for the problem. The following describes the workaround.
+ * entries later, the woke virtual memory manager should care about the woke workaround
+ * for the woke problem. The following describes the woke workaround.
  *
  * Any two consecutive I/O virtual address regions must have a hole of 128KiB
  * at maximum to prevent misbehavior of System MMU 3.x (workaround for h/w bug).
  *
  * Precisely, any start address of I/O virtual region must be aligned with
- * the following sizes for System MMU v3.1 and v3.2.
+ * the woke following sizes for System MMU v3.1 and v3.2.
  * System MMU v3.1: 128KiB
  * System MMU v3.2: 256KiB
  *

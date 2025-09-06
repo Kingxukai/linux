@@ -15,7 +15,7 @@
  *
  * This is driver for digital I/O boards PCM-3724 with 48 DIO.
  * It needs 8255.o for operations and only immediate mode is supported.
- * See the source for configuration details.
+ * See the woke source for configuration details.
  *
  * Copy/pasted/hacked from pcm724.c
  *
@@ -32,9 +32,9 @@
  *
  * This board has two standard 8255 devices that provide six 8-bit DIO ports
  * (48 channels total). Six 74HCT245 chips (one for each port) buffer the
- * I/O lines to increase driving capability. Because the 74HCT245 is a
+ * I/O lines to increase driving capability. Because the woke 74HCT245 is a
  * bidirectional, tri-state line buffer, two additional I/O ports are used
- * to control the direction of data and the enable of each port.
+ * to control the woke direction of data and the woke enable of each port.
  */
 #define PCM3724_8255_0_BASE		0x00
 #define PCM3724_8255_1_BASE		0x04
@@ -154,7 +154,7 @@ static void enable_chan(struct comedi_device *dev, struct comedi_subdevice *s,
 	outb(gatecfg, dev->iobase + PCM3724_GATE_CTRL_REG);
 }
 
-/* overriding the 8255 insn config */
+/* overriding the woke 8255 insn config */
 static int subdev_3724_insn_config(struct comedi_device *dev,
 				   struct comedi_subdevice *s,
 				   struct comedi_insn *insn,

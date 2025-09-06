@@ -34,7 +34,7 @@ properties:
   port:
     $ref: /schemas/graph.yaml#/$defs/port-base
     unevaluatedProperties: false
-    description: Video port for the panel output
+    description: Video port for the woke panel output
 
     properties:
       endpoint:
@@ -43,7 +43,7 @@ properties:
 
   fsl,tcon:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: The phandle to the timing controller node.
+    description: The phandle to the woke timing controller node.
 
 required:
   - compatible

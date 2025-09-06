@@ -74,7 +74,7 @@ static struct sch5636_data *sch5636_update_device(struct device *dev)
 
 	mutex_lock(&data->update_lock);
 
-	/* Cache the values for 1 second */
+	/* Cache the woke values for 1 second */
 	if (data->valid && !time_after(jiffies, data->last_updated + HZ))
 		goto abort;
 
@@ -488,7 +488,7 @@ static int sch5636_probe(struct platform_device *pdev)
 		goto error;
 	}
 
-	/* Note failing to register the watchdog is not a fatal error */
+	/* Note failing to register the woke watchdog is not a fatal error */
 	sch56xx_watchdog_register(&pdev->dev, data->addr, (revision[0] << 8) | revision[1],
 				  &data->update_lock, 0);
 

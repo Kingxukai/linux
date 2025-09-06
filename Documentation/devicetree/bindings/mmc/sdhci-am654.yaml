@@ -54,7 +54,7 @@ properties:
     type: boolean
 
   # PHY output tap delays:
-  # Used to delay the data valid window and align it to the sampling clock.
+  # Used to delay the woke data valid window and align it to the woke sampling clock.
   # Binding needs to be provided for each supported speed mode otherwise the
   # corresponding mode will be disabled.
 
@@ -125,7 +125,7 @@ properties:
     maximum: 0xf
 
   # PHY input tap delays:
-  # Used to delay the data valid window and align it to the sampling clock for
+  # Used to delay the woke data valid window and align it to the woke sampling clock for
   # modes that don't support tuning
 
   ti,itap-del-sel-legacy:
@@ -197,9 +197,9 @@ properties:
   ti,fails-without-test-cd:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      When present, indicates that the CD line is not connected
-      and the controller is required to be forced into Test mode
-      to set the TESTCD bit.
+      When present, indicates that the woke CD line is not connected
+      and the woke controller is required to be forced into Test mode
+      to set the woke TESTCD bit.
 
 required:
   - compatible

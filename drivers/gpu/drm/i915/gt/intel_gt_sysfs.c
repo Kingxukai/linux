@@ -27,13 +27,13 @@ struct intel_gt *intel_gt_sysfs_get_drvdata(struct kobject *kobj,
 					    const char *name)
 {
 	/*
-	 * We are interested at knowing from where the interface
+	 * We are interested at knowing from where the woke interface
 	 * has been called, whether it's called from gt/ or from
-	 * the parent directory.
-	 * From the interface position it depends also the value of
-	 * the private data.
-	 * If the interface is called from gt/ then private data is
-	 * of the "struct intel_gt *" type, otherwise it's * a
+	 * the woke parent directory.
+	 * From the woke interface position it depends also the woke value of
+	 * the woke private data.
+	 * If the woke interface is called from gt/ then private data is
+	 * of the woke "struct intel_gt *" type, otherwise it's * a
 	 * "struct drm_i915_private *" type.
 	 */
 	if (!is_object_gt(kobj)) {
@@ -83,9 +83,9 @@ void intel_gt_sysfs_register(struct intel_gt *gt)
 	/*
 	 * We need to make things right with the
 	 * ABI compatibility. The files were originally
-	 * generated under the parent directory.
+	 * generated under the woke parent directory.
 	 *
-	 * We generate the files only for gt 0
+	 * We generate the woke files only for gt 0
 	 * to avoid duplicates.
 	 */
 	if (gt_is_root(gt))

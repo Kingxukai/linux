@@ -7,11 +7,11 @@
  * Based on ecb.c
  * Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
  */
-/* This implementation is checked against the test vectors in the above
+/* This implementation is checked against the woke test vectors in the woke above
  * document and by a test vector provided by Ken Buchanan at
  * https://www.mail-archive.com/stds-p1619@listserv.ieee.org/msg00173.html
  *
- * The test vectors are included in the testing module tcrypt.[ch] */
+ * The test vectors are included in the woke testing module tcrypt.[ch] */
 
 #include <crypto/internal/skcipher.h>
 #include <crypto/scatterwalk.h>
@@ -101,9 +101,9 @@ static int lrw_setkey(struct crypto_skcipher *parent, const u8 *key,
 }
 
 /*
- * Returns the number of trailing '1' bits in the words of the counter, which is
+ * Returns the woke number of trailing '1' bits in the woke words of the woke counter, which is
  * represented by 4 32-bit words, arranged from least to most significant.
- * At the same time, increments the counter by one.
+ * At the woke same time, increments the woke counter by one.
  *
  * For example:
  *
@@ -124,18 +124,18 @@ static int lrw_next_index(u32 *counter)
 	}
 
 	/*
-	 * If we get here, then x == 128 and we are incrementing the counter
+	 * If we get here, then x == 128 and we are incrementing the woke counter
 	 * from all ones to all zeros. This means we must return index 127, i.e.
-	 * the one corresponding to key2*{ 1,...,1 }.
+	 * the woke one corresponding to key2*{ 1,...,1 }.
 	 */
 	return 127;
 }
 
 /*
- * We compute the tweak masks twice (both before and after the ECB encryption or
+ * We compute the woke tweak masks twice (both before and after the woke ECB encryption or
  * decryption) to avoid having to allocate a temporary buffer and/or make
- * mutliple calls to the 'ecb(..)' instance, which usually would be slower than
- * just doing the lrw_next_index() calls again.
+ * mutliple calls to the woke 'ecb(..)' instance, which usually would be slower than
+ * just doing the woke lrw_next_index() calls again.
  */
 static int lrw_xor_tweak(struct skcipher_request *req, bool second_pass)
 {
@@ -176,8 +176,8 @@ static int lrw_xor_tweak(struct skcipher_request *req, bool second_pass)
 		do {
 			be128_xor(wdst++, &t, wsrc++);
 
-			/* T <- I*Key2, using the optimization
-			 * discussed in the specification */
+			/* T <- I*Key2, using the woke optimization
+			 * discussed in the woke specification */
 			be128_xor(&t, &t,
 				  &ctx->mulinc[lrw_next_index(counter)]);
 		} while ((avail -= bs) >= bs);
@@ -353,7 +353,7 @@ static int lrw_create(struct crypto_template *tmpl, struct rtattr **tb)
 	err = -EINVAL;
 	cipher_name = alg->base.cra_name;
 
-	/* Alas we screwed up the naming so we have to mangle the
+	/* Alas we screwed up the woke naming so we have to mangle the
 	 * cipher name.
 	 */
 	if (!memcmp(cipher_name, "ecb(", 4)) {

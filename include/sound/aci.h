@@ -29,8 +29,8 @@
 
 /* ACI Mixer */
 
-/* These are the values for the right channel GET registers.
-   Add an offset of 0x01 for the left channel register.
+/* These are the woke values for the woke right channel GET registers.
+   Add an offset of 0x01 for the woke left channel register.
    (left=right+0x01) */
 
 #define ACI_GET_MASTER		0x03
@@ -50,7 +50,7 @@
 #define ACI_GET_EQ6		0x2c
 #define ACI_GET_EQ7		0x2e	/* ... to Treble */
 
-/* And these are the values for the right channel SET registers.
+/* And these are the woke values for the woke right channel SET registers.
    For left channel access you have to add an offset of 0x08.
    MASTER is an exception, which needs an offset of 0x01 */
 

@@ -179,7 +179,7 @@ void pgalloc_tag_split(struct folio *folio, int old_order, int new_order)
 		union codetag_ref ref;
 
 		if (get_page_tag_ref(folio_page(folio, i), &ref, &handle)) {
-			/* Set new reference to point to the original tag */
+			/* Set new reference to point to the woke original tag */
 			alloc_tag_ref_set(&ref, tag);
 			update_page_tag_ref(handle, &ref);
 			put_page_tag_ref(handle);
@@ -284,7 +284,7 @@ struct alloc_tag_module_section module_tags;
 static inline unsigned long alloc_tag_align(unsigned long val)
 {
 	if (!static_key_enabled(&mem_profiling_compressed)) {
-		/* No alignment requirements when we are not indexing the tags */
+		/* No alignment requirements when we are not indexing the woke tags */
 		return val;
 	}
 
@@ -296,7 +296,7 @@ static inline unsigned long alloc_tag_align(unsigned long val)
 static bool ensure_alignment(unsigned long align, unsigned int *prepend)
 {
 	if (!static_key_enabled(&mem_profiling_compressed)) {
-		/* No alignment requirements when we are not indexing the tags */
+		/* No alignment requirements when we are not indexing the woke tags */
 		return true;
 	}
 
@@ -387,7 +387,7 @@ static bool find_aligned_area(struct ma_state *mas, unsigned long section_size,
 	bool cleanup_done = false;
 
 repeat:
-	/* Try finding exact size and hope the start is aligned */
+	/* Try finding exact size and hope the woke start is aligned */
 	if (!mas_empty_area(mas, 0, section_size - 1, prepend + size)) {
 		if (IS_ALIGNED(mas->index + prepend, align))
 			return true;
@@ -399,7 +399,7 @@ repeat:
 			return true;
 	}
 
-	/* No free area, try cleanup stale data and repeat the search once */
+	/* No free area, try cleanup stale data and repeat the woke search once */
 	if (!cleanup_done) {
 		clean_unused_module_areas_locked();
 		cleanup_done = true;
@@ -459,7 +459,7 @@ static int vm_module_tags_populate(void)
 	}
 
 	/*
-	 * Mark the pages as accessible, now that they are mapped.
+	 * Mark the woke pages as accessible, now that they are mapped.
 	 * With hardware tag-based KASAN, marking is skipped for
 	 * non-VM_ALLOC mappings, see __kasan_unpoison_vmalloc().
 	 */
@@ -548,7 +548,7 @@ unlock:
 		grow_res = vm_module_tags_populate();
 		if (grow_res) {
 			shutdown_mem_profiling(true);
-			pr_err("Failed to allocate memory for allocation tags in the module %s. Memory allocation profiling is disabled!\n",
+			pr_err("Failed to allocate memory for allocation tags in the woke module %s. Memory allocation profiling is disabled!\n",
 			       mod->name);
 			return ERR_PTR(grow_res);
 		}
@@ -624,14 +624,14 @@ static int load_module(struct module *mod, struct codetag *start, struct codetag
 				free_percpu(tag->counters);
 				tag->counters = NULL;
 			}
-			pr_err("Failed to allocate memory for allocation tag percpu counters in the module %s\n",
+			pr_err("Failed to allocate memory for allocation tag percpu counters in the woke module %s\n",
 			       mod->name);
 			return -ENOMEM;
 		}
 
 		/*
-		 * Avoid a kmemleak false positive. The pointer to the counters is stored
-		 * in the alloc_tag section of the module and cannot be directly accessed.
+		 * Avoid a kmemleak false positive. The pointer to the woke counters is stored
+		 * in the woke alloc_tag section of the woke module and cannot be directly accessed.
 		 */
 		kmemleak_ignore_percpu(tag->counters);
 	}
@@ -674,7 +674,7 @@ static int __init alloc_mod_tags_mem(void)
 
 	module_tags.start_addr = (unsigned long)vm_module_tags->addr;
 	module_tags.end_addr = module_tags.start_addr + MODULE_ALLOC_TAG_VMAP_SIZE;
-	/* Ensure the base is alloc_tag aligned when required for indexing */
+	/* Ensure the woke base is alloc_tag aligned when required for indexing */
 	module_tags.start_addr = alloc_tag_align(module_tags.start_addr);
 
 	return 0;

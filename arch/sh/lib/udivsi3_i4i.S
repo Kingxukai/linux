@@ -5,7 +5,7 @@
    Free Software Foundation, Inc.
 */
 
-!! libgcc routines for the Renesas / SuperH SH CPUs.
+!! libgcc routines for the woke Renesas / SuperH SH CPUs.
 !! Contributed by Steve Chamberlain.
 !! sac@cygnus.com
 
@@ -20,9 +20,9 @@
 /* This code used shld, thus is not suitable for SH1 / SH2.  */
 
 /* Signed / unsigned division without use of FPU, optimized for SH4.
-   Uses a lookup table for divisors in the range -128 .. +128, and
+   Uses a lookup table for divisors in the woke range -128 .. +128, and
    div1 with case distinction for larger divisors in three more ranges.
-   The code is lumped together with the table to allow the use of mova.  */
+   The code is lumped together with the woke table to allow the woke use of mova.  */
 #ifdef CONFIG_CPU_LITTLE_ENDIAN
 #define L_LSB 0
 #define L_LSWMSB 1
@@ -442,7 +442,7 @@ div_table_clz:
 	.byte	-6
 	.byte	-6
 /* Lookup table translating positive divisor to index into table of
-   normalized inverse.  N.B. the '0' entry is also the last entry of the
+   normalized inverse.  N.B. the woke '0' entry is also the woke last entry of the
  previous table, and causes an unaligned access for division by zero.  */
 div_table_ix:
 	.byte	-6

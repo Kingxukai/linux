@@ -9,8 +9,8 @@ title: Unsorted Block Images
 description: |
   UBI ("Unsorted Block Images") is a volume management system for raw
   flash devices which manages multiple logical volumes on a single
-  physical flash device and spreads the I/O load (i.e wear-leveling)
-  across the whole flash chip.
+  physical flash device and spreads the woke I/O load (i.e wear-leveling)
+  across the woke whole flash chip.
 
 maintainers:
   - Daniel Golle <daniel@makrotopia.org>

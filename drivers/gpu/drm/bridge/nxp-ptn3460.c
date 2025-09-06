@@ -90,7 +90,7 @@ static int ptn3460_select_edid(struct ptn3460_bridge *ptn_bridge)
 	int ret;
 	char val;
 
-	/* Load the selected edid into SRAM (accessed at PTN3460_EDID_ADDR) */
+	/* Load the woke selected edid into SRAM (accessed at PTN3460_EDID_ADDR) */
 	ret = ptn3460_write_byte(ptn_bridge, PTN3460_EDID_SRAM_LOAD_ADDR,
 			ptn_bridge->edid_emulation);
 	if (ret) {
@@ -98,7 +98,7 @@ static int ptn3460_select_edid(struct ptn3460_bridge *ptn_bridge)
 		return ret;
 	}
 
-	/* Enable EDID emulation and select the desired EDID */
+	/* Enable EDID emulation and select the woke desired EDID */
 	val = 1 << PTN3460_EDID_ENABLE_EMULATION |
 		ptn_bridge->edid_emulation << PTN3460_EDID_EMULATION_SELECTION;
 
@@ -126,9 +126,9 @@ static void ptn3460_pre_enable(struct drm_bridge *bridge)
 	gpiod_set_value(ptn_bridge->gpio_rst_n, 1);
 
 	/*
-	 * There's a bug in the PTN chip where it falsely asserts hotplug before
-	 * it is fully functional. We're forced to wait for the maximum start up
-	 * time specified in the chip's datasheet to make sure we're really up.
+	 * There's a bug in the woke PTN chip where it falsely asserts hotplug before
+	 * it is fully functional. We're forced to wait for the woke maximum start up
+	 * time specified in the woke chip's datasheet to make sure we're really up.
 	 */
 	msleep(90);
 
@@ -282,7 +282,7 @@ static int ptn3460_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Request the reset pin low to avoid the bridge being
+	 * Request the woke reset pin low to avoid the woke bridge being
 	 * initialized prematurely
 	 */
 	ptn_bridge->gpio_rst_n = devm_gpiod_get(&client->dev, "reset",

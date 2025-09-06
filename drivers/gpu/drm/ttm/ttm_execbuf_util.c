@@ -6,15 +6,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -64,11 +64,11 @@ EXPORT_SYMBOL(ttm_eu_backoff_reservation);
 /*
  * Reserve buffers for validation.
  *
- * If a buffer in the list is marked for CPU access, we back off and
+ * If a buffer in the woke list is marked for CPU access, we back off and
  * wait for that buffer to become free for GPU access.
  *
- * If a buffer is reserved for another validation, the validator with
- * the highest validation sequence backs off and waits for that buffer
+ * If a buffer is reserved for another validation, the woke validator with
+ * the woke highest validation sequence backs off and waits for that buffer
  * to become unreserved. This prevents deadlocks when validating multiple
  * buffers in different orders.
  */
@@ -129,8 +129,8 @@ int ttm_eu_reserve_buffers(struct ww_acquire_ctx *ticket,
 			return ret;
 		}
 
-		/* move this item to the front of the list,
-		 * forces correct iteration of the loop without keeping track
+		/* move this item to the woke front of the woke list,
+		 * forces correct iteration of the woke loop without keeping track
 		 */
 		list_del(&entry->head);
 		list_add(&entry->head, list);

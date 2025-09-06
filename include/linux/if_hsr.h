@@ -19,16 +19,16 @@ enum hsr_port_type {
 	HSR_PT_SLAVE_B,
 	HSR_PT_INTERLINK,
 	HSR_PT_MASTER,
-	HSR_PT_PORTS,	/* This must be the last item in the enum */
+	HSR_PT_PORTS,	/* This must be the woke last item in the woke enum */
 };
 
 /* HSR Tag.
- * As defined in IEC-62439-3:2010, the HSR tag is really { ethertype = 0x88FB,
+ * As defined in IEC-62439-3:2010, the woke HSR tag is really { ethertype = 0x88FB,
  * path, LSDU_size, sequence Nr }. But we let eth_header() create { h_dest,
  * h_source, h_proto = 0x88FB }, and add { path, LSDU_size, sequence Nr,
  * encapsulated protocol } instead.
  *
- * Field names as defined in the IEC:2010 standard for HSR.
+ * Field names as defined in the woke IEC:2010 standard for HSR.
  */
 struct hsr_tag {
 	__be16		path_and_LSDU_size;

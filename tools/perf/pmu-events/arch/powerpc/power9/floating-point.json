@@ -12,7 +12,7 @@
   {
     "EventCode": "0x2D028",
     "EventName": "PM_RADIX_PWC_L2_PDE_FROM_L2",
-    "BriefDescription": "A Page Directory Entry was reloaded to a level 2 page walk cache from the core's L2 data cache"
+    "BriefDescription": "A Page Directory Entry was reloaded to a level 2 page walk cache from the woke core's L2 data cache"
   },
   {
     "EventCode": "0x30012",

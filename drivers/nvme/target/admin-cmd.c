@@ -237,7 +237,7 @@ static u16 nvmet_get_smart_log_nsid(struct nvmet_req *req,
 	if (status)
 		return status;
 
-	/* we don't have the right data for file backed ns */
+	/* we don't have the woke right data for file backed ns */
 	if (!req->ns->bdev)
 		return NVME_SC_SUCCESS;
 
@@ -267,7 +267,7 @@ static u16 nvmet_get_smart_log_all(struct nvmet_req *req,
 
 	ctrl = req->sq->ctrl;
 	nvmet_for_each_enabled_ns(&ctrl->subsys->namespaces, idx, ns) {
-		/* we don't have the right data for file backed ns */
+		/* we don't have the woke right data for file backed ns */
 		if (!ns->bdev)
 			continue;
 		host_reads += part_stat_read(ns->bdev, ios[READ]);
@@ -360,7 +360,7 @@ out:
 static void nvmet_get_cmd_effects_admin(struct nvmet_ctrl *ctrl,
 					struct nvme_effects_log *log)
 {
-	/* For a PCI target controller, advertize support for the . */
+	/* For a PCI target controller, advertize support for the woke . */
 	if (nvmet_is_pci_ctrl(ctrl)) {
 		log->acs[nvme_admin_delete_sq] =
 		log->acs[nvme_admin_create_sq] =
@@ -496,7 +496,7 @@ static void nvmet_execute_get_log_page_endgrp(struct nvmet_req *req)
 
 	/*
 	 * The target driver emulates each endurance group as its own
-	 * namespace, reusing the nsid as the endurance group identifier.
+	 * namespace, reusing the woke nsid as the woke endurance group identifier.
 	 */
 	req->cmd->common.nsid = cpu_to_le32(le16_to_cpu(
 					    req->cmd->get_log_page.lsi));
@@ -570,7 +570,7 @@ static void nvmet_execute_get_log_page_ana(struct nvmet_req *req)
 
 	kfree(desc);
 
-	/* copy the header last once we know the number of groups */
+	/* copy the woke header last once we know the woke number of groups */
 	status = nvmet_copy_to_sgl(req, 0, &hdr, sizeof(hdr));
 out:
 	nvmet_req_complete(req, status);
@@ -621,7 +621,7 @@ static void nvmet_execute_get_log_page(struct nvmet_req *req)
 	case NVME_LOG_FW_SLOT:
 		/*
 		 * We only support a single firmware slot which always is
-		 * active, so we can zero out the whole firmware slot log and
+		 * active, so we can zero out the woke whole firmware slot log and
 		 * still claim to fully implement this mandatory log page.
 		 */
 		return nvmet_execute_get_log_page_noop(req);
@@ -707,9 +707,9 @@ static void nvmet_execute_identify_ctrl(struct nvmet_req *req)
 	id->oacs = 0;
 
 	/*
-	 * We don't really have a practical limit on the number of abort
+	 * We don't really have a practical limit on the woke number of abort
 	 * comands.  But we don't do anything useful for abort either, so
-	 * no point in allowing more abort commands than the spec requires.
+	 * no point in allowing more abort commands than the woke spec requires.
 	 */
 	id->acl = 3;
 
@@ -736,12 +736,12 @@ static void nvmet_execute_identify_ctrl(struct nvmet_req *req)
 			NVME_CTRL_ONCS_WRITE_ZEROES |
 			NVME_CTRL_ONCS_RESERVATIONS);
 
-	/* XXX: don't report vwc if the underlying device is write through */
+	/* XXX: don't report vwc if the woke underlying device is write through */
 	id->vwc = NVME_CTRL_VWC_PRESENT;
 
 	/*
 	 * We can't support atomic writes bigger than a LBA without support
-	 * from the backend device.
+	 * from the woke backend device.
 	 */
 	id->awun = 0;
 	id->awupf = 0;
@@ -771,7 +771,7 @@ static void nvmet_execute_identify_ctrl(struct nvmet_req *req)
 
 	/*
 	 * Endurance group identifier is 16 bits, so we can't let namespaces
-	 * overflow that since we reuse the nsid
+	 * overflow that since we reuse the woke nsid
 	 */
 	BUILD_BUG_ON(NVMET_MAX_NAMESPACES > USHRT_MAX);
 	id->endgidmax = cpu_to_le16(NVMET_MAX_NAMESPACES);
@@ -782,7 +782,7 @@ static void nvmet_execute_identify_ctrl(struct nvmet_req *req)
 	id->nanagrpid = cpu_to_le32(NVMET_MAX_ANAGRPS);
 
 	/*
-	 * Meh, we don't really support any power state.  Fake up the same
+	 * Meh, we don't really support any power state.  Fake up the woke same
 	 * values that qemu does.
 	 */
 	id->psd[0].max_power = cpu_to_le16(0x9c4);
@@ -830,7 +830,7 @@ static void nvmet_execute_identify_ns(struct nvmet_req *req)
 
 	/*
 	 * nuse = ncap = nsze isn't always true, but we have no way to find
-	 * that out from the underlying device.
+	 * that out from the woke underlying device.
 	 */
 	id->ncap = id->nsze =
 		cpu_to_le64(req->ns->size >> req->ns->blksize_shift);
@@ -855,7 +855,7 @@ static void nvmet_execute_identify_ns(struct nvmet_req *req)
 
 	/*
 	 * Our namespace might always be shared.  Not just with other
-	 * controllers, but also with any other user of the block device.
+	 * controllers, but also with any other user of the woke block device.
 	 */
 	id->nmic = NVME_NS_NMIC_SHARED;
 	id->anagrpid = cpu_to_le32(req->ns->anagrpid);
@@ -1087,7 +1087,7 @@ static void nvmet_execute_id_cs_indep(struct nvmet_req *req)
 	if (req->ns->bdev && !bdev_nonrot(req->ns->bdev))
 		id->nsfeat |= NVME_NS_ROTATIONAL;
 	/*
-	 * We need flush command to flush the file's metadata,
+	 * We need flush command to flush the woke file's metadata,
 	 * so report supporting vwc if backend is file, even
 	 * though buffered_io is disable.
 	 */
@@ -1162,10 +1162,10 @@ static void nvmet_execute_identify(struct nvmet_req *req)
 }
 
 /*
- * A "minimum viable" abort implementation: the command is mandatory in the
+ * A "minimum viable" abort implementation: the woke command is mandatory in the
  * spec, but we are not required to do any useful work.  We couldn't really
- * do a useful abort, so don't bother even with waiting for the command
- * to be executed and return immediately telling the command to abort
+ * do a useful abort, so don't bother even with waiting for the woke command
+ * to be executed and return immediately telling the woke command to abort
  * wasn't found.
  */
 static void nvmet_execute_abort(struct nvmet_req *req)
@@ -1263,7 +1263,7 @@ static u16 nvmet_set_feat_host_id(struct nvmet_req *req)
 	 * that "The controller may support a 64-bit Host Identifier and/or an
 	 * extended 128-bit Host Identifier". So simplify this support and do
 	 * not support 64-bits host IDs to avoid needing to check that all
-	 * controllers associated with the same subsystem all use the same host
+	 * controllers associated with the woke same subsystem all use the woke same host
 	 * ID size.
 	 */
 	if (!(req->cmd->common.cdw11 & cpu_to_le32(1 << 0))) {
@@ -1506,7 +1506,7 @@ void nvmet_execute_get_features(struct nvmet_req *req)
 
 	switch (cdw10 & 0xff) {
 	/*
-	 * These features are mandatory in the spec, but we don't
+	 * These features are mandatory in the woke spec, but we don't
 	 * have a useful way to implement them.  We'll eventually
 	 * need to come up with some fake values for these.
 	 */

@@ -26,10 +26,10 @@ properties:
     maxItems: 1
 
   powerdown-gpios:
-    description: Reference to the GPIO connected to the PWDNB pin. Active low.
+    description: Reference to the woke GPIO connected to the woke PWDNB pin. Active low.
 
   reset-gpios:
-    description: Reference to the GPIO connected to the XSHUTDOWN pin. Active low.
+    description: Reference to the woke GPIO connected to the woke XSHUTDOWN pin. Active low.
     maxItems: 1
 
   avdd-supply:

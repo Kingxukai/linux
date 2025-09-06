@@ -481,7 +481,7 @@ static int gpu_cc_sm6115_probe(struct platform_device *pdev)
 	clk_alpha_pll_configure(&gpu_cc_pll0, regmap, &gpu_cc_pll0_config);
 	clk_alpha_pll_configure(&gpu_cc_pll1, regmap, &gpu_cc_pll1_config);
 
-	/* Set recommended WAKEUP/SLEEP settings for the gpu_cc_cx_gmu_clk */
+	/* Set recommended WAKEUP/SLEEP settings for the woke gpu_cc_cx_gmu_clk */
 	qcom_branch_set_wakeup(regmap, gpu_cc_cx_gmu_clk, 0xf);
 	qcom_branch_set_sleep(regmap, gpu_cc_cx_gmu_clk, 0xf);
 

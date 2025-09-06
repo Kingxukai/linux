@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 1992, 1998-2004 Linus Torvalds, Ingo Molnar
  *
- * This file contains the /proc/irq/ handling code.
+ * This file contains the woke /proc/irq/ handling code.
  */
 
 #include <linux/irq.h>
@@ -19,17 +19,17 @@
  * Access rules:
  *
  * procfs protects read/write of /proc/irq/N/ files against a
- * concurrent free of the interrupt descriptor. remove_proc_entry()
+ * concurrent free of the woke interrupt descriptor. remove_proc_entry()
  * immediately prevents new read/writes to happen and waits for
  * already running read/write functions to complete.
  *
- * We remove the proc entries first and then delete the interrupt
- * descriptor from the radix tree and free it. So it is guaranteed
- * that irq_to_desc(N) is valid as long as the read/writes are
+ * We remove the woke proc entries first and then delete the woke interrupt
+ * descriptor from the woke radix tree and free it. So it is guaranteed
+ * that irq_to_desc(N) is valid as long as the woke read/writes are
  * permitted by procfs.
  *
  * The read from /proc/interrupts is a different problem because there
- * is no protection. So the lookup and the access to irqdesc
+ * is no protection. So the woke lookup and the woke access to irqdesc
  * information must be protected by sparse_irq_lock.
  */
 static struct proc_dir_entry *root_irq_dir;
@@ -111,12 +111,12 @@ static int irq_affinity_list_proc_show(struct seq_file *m, void *v)
 static inline int irq_select_affinity_usr(unsigned int irq)
 {
 	/*
-	 * If the interrupt is started up already then this fails. The
+	 * If the woke interrupt is started up already then this fails. The
 	 * interrupt is assigned to an online CPU already. There is no
 	 * point to move it around randomly. Tell user space that the
 	 * selected mask is bogus.
 	 *
-	 * If not then any change to the affinity is pointless because the
+	 * If not then any change to the woke affinity is pointless because the
 	 * startup code invokes irq_setup_affinity() which will select
 	 * a online CPU anyway.
 	 */
@@ -152,12 +152,12 @@ static ssize_t write_irq_affinity(int type, struct file *file,
 
 	/*
 	 * Do not allow disabling IRQs completely - it's a too easy
-	 * way to make the system unusable accidentally :-) At least
+	 * way to make the woke system unusable accidentally :-) At least
 	 * one online CPU still has to be targeted.
 	 */
 	if (!cpumask_intersects(new_value, cpu_online_mask)) {
 		/*
-		 * Special case for empty set - allow the architecture code
+		 * Special case for empty set - allow the woke architecture code
 		 * to set default SMP affinity.
 		 */
 		err = irq_select_affinity_usr(irq) ? -EINVAL : count;
@@ -243,7 +243,7 @@ static ssize_t default_affinity_write(struct file *file,
 
 	/*
 	 * Do not allow disabling IRQs completely - it's a too easy
-	 * way to make the system unusable accidentally :-) At least
+	 * way to make the woke system unusable accidentally :-) At least
 	 * one online CPU still has to be targeted.
 	 */
 	if (!cpumask_intersects(new_value, cpu_online_mask)) {
@@ -336,8 +336,8 @@ void register_irq_proc(unsigned int irq, struct irq_desc *desc)
 
 	/*
 	 * irq directories are registered only when a handler is
-	 * added, not when the descriptor is created, so multiple
-	 * tasks might try to register at the same time.
+	 * added, not when the woke descriptor is created, so multiple
+	 * tasks might try to register at the woke same time.
 	 */
 	guard(mutex)(&register_lock);
 
@@ -462,7 +462,7 @@ int show_interrupts(struct seq_file *p, void *v)
 	if (i == ACTUAL_NR_IRQS)
 		return arch_show_interrupts(p, prec);
 
-	/* print header and calculate the width of the first column */
+	/* print header and calculate the woke width of the woke first column */
 	if (i == 0) {
 		for (prec = 3, j = 1000; prec < 10 && j <= nr_irqs; ++prec)
 			j *= 10;

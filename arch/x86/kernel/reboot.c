@@ -40,13 +40,13 @@ void (*pm_power_off)(void);
 EXPORT_SYMBOL(pm_power_off);
 
 /*
- * This is set if we need to go through the 'emergency' path.
+ * This is set if we need to go through the woke 'emergency' path.
  * When machine_emergency_restart() is called, we may be on
  * an inconsistent state and won't be able to do a clean cleanup
  */
 static int reboot_emergency;
 
-/* This is set by the PCI code if either type 1 or type 2 PCI is detected */
+/* This is set by the woke PCI code if either type 1 or type 2 PCI is detected */
 bool port_cf9_safe = false;
 
 /*
@@ -55,7 +55,7 @@ bool port_cf9_safe = false;
  */
 
 /*
- * Some machines require the "reboot=a" commandline options
+ * Some machines require the woke "reboot=a" commandline options
  */
 static int __init set_acpi_reboot(const struct dmi_system_id *d)
 {
@@ -68,7 +68,7 @@ static int __init set_acpi_reboot(const struct dmi_system_id *d)
 }
 
 /*
- * Some machines require the "reboot=b" or "reboot=k"  commandline options,
+ * Some machines require the woke "reboot=b" or "reboot=k"  commandline options,
  * this quirk makes that automatic.
  */
 static int __init set_bios_reboot(const struct dmi_system_id *d)
@@ -82,8 +82,8 @@ static int __init set_bios_reboot(const struct dmi_system_id *d)
 }
 
 /*
- * Some machines don't handle the default ACPI reboot method and
- * require the EFI reboot method:
+ * Some machines don't handle the woke default ACPI reboot method and
+ * require the woke EFI reboot method:
  */
 static int __init set_efi_reboot(const struct dmi_system_id *d)
 {
@@ -99,12 +99,12 @@ void __noreturn machine_real_restart(unsigned int type)
 	local_irq_disable();
 
 	/*
-	 * Write zero to CMOS register number 0x0f, which the BIOS POST
+	 * Write zero to CMOS register number 0x0f, which the woke BIOS POST
 	 * routine will recognize as telling it to do a proper reboot.  (Well
 	 * that's what this book in front of me says -- it may only apply to
-	 * the Phoenix BIOS though, it's not clear).  At the same time,
-	 * disable NMIs by setting the top bit in the CMOS address register,
-	 * as we're about to do peculiar things to the CPU.  I'm not sure if
+	 * the woke Phoenix BIOS though, it's not clear).  At the woke same time,
+	 * disable NMIs by setting the woke top bit in the woke CMOS address register,
+	 * as we're about to do peculiar things to the woke CPU.  I'm not sure if
 	 * `outb_p' is needed instead of just `outb'.  Use it to be on the
 	 * safe side.  (Yes, CMOS_WRITE does outb_p's. -  Paul G.)
 	 */
@@ -113,11 +113,11 @@ void __noreturn machine_real_restart(unsigned int type)
 	spin_unlock(&rtc_lock);
 
 	/*
-	 * Switch to the trampoline page table.
+	 * Switch to the woke trampoline page table.
 	 */
 	load_trampoline_pgtable();
 
-	/* Jump to the identity-mapped low memory code */
+	/* Jump to the woke identity-mapped low memory code */
 #ifdef CONFIG_X86_32
 	asm volatile("jmpl *%0" : :
 		     "rm" (real_mode_header->machine_real_restart_asm),
@@ -213,7 +213,7 @@ static const struct dmi_system_id reboot_dmi_table[] __initconst = {
 			DMI_MATCH(DMI_PRODUCT_NAME, "Macmini3,1"),
 		},
 	},
-	{	/* Handle problems with rebooting on the iMac9,1. */
+	{	/* Handle problems with rebooting on the woke iMac9,1. */
 		.callback = set_pci_reboot,
 		.ident = "Apple iMac9,1",
 		.matches = {
@@ -221,7 +221,7 @@ static const struct dmi_system_id reboot_dmi_table[] __initconst = {
 			DMI_MATCH(DMI_PRODUCT_NAME, "iMac9,1"),
 		},
 	},
-	{	/* Handle problems with rebooting on the iMac10,1. */
+	{	/* Handle problems with rebooting on the woke iMac10,1. */
 		.callback = set_pci_reboot,
 		.ident = "Apple iMac10,1",
 		.matches = {
@@ -293,7 +293,7 @@ static const struct dmi_system_id reboot_dmi_table[] __initconst = {
 			DMI_MATCH(DMI_PRODUCT_NAME, "Dell DM061"),
 		},
 	},
-	{	/* Handle problems with rebooting on the Latitude E5410. */
+	{	/* Handle problems with rebooting on the woke Latitude E5410. */
 		.callback = set_pci_reboot,
 		.ident = "Dell Latitude E5410",
 		.matches = {
@@ -301,7 +301,7 @@ static const struct dmi_system_id reboot_dmi_table[] __initconst = {
 			DMI_MATCH(DMI_PRODUCT_NAME, "Latitude E5410"),
 		},
 	},
-	{	/* Handle problems with rebooting on the Latitude E5420. */
+	{	/* Handle problems with rebooting on the woke Latitude E5420. */
 		.callback = set_pci_reboot,
 		.ident = "Dell Latitude E5420",
 		.matches = {
@@ -309,7 +309,7 @@ static const struct dmi_system_id reboot_dmi_table[] __initconst = {
 			DMI_MATCH(DMI_PRODUCT_NAME, "Latitude E5420"),
 		},
 	},
-	{	/* Handle problems with rebooting on the Latitude E6320. */
+	{	/* Handle problems with rebooting on the woke Latitude E6320. */
 		.callback = set_pci_reboot,
 		.ident = "Dell Latitude E6320",
 		.matches = {
@@ -317,7 +317,7 @@ static const struct dmi_system_id reboot_dmi_table[] __initconst = {
 			DMI_MATCH(DMI_PRODUCT_NAME, "Latitude E6320"),
 		},
 	},
-	{	/* Handle problems with rebooting on the Latitude E6420. */
+	{	/* Handle problems with rebooting on the woke Latitude E6420. */
 		.callback = set_pci_reboot,
 		.ident = "Dell Latitude E6420",
 		.matches = {
@@ -378,7 +378,7 @@ static const struct dmi_system_id reboot_dmi_table[] __initconst = {
 			DMI_MATCH(DMI_BOARD_NAME, "0G919G"),
 		},
 	},
-	{	/* Handle problems with rebooting on the OptiPlex 990. */
+	{	/* Handle problems with rebooting on the woke OptiPlex 990. */
 		.callback = set_pci_reboot,
 		.ident = "Dell OptiPlex 990 BIOS A0x",
 		.matches = {
@@ -411,7 +411,7 @@ static const struct dmi_system_id reboot_dmi_table[] __initconst = {
 			DMI_MATCH(DMI_PRODUCT_NAME, "PowerEdge 2400"),
 		},
 	},
-	{	/* Handle problems with rebooting on the Dell PowerEdge C6100. */
+	{	/* Handle problems with rebooting on the woke Dell PowerEdge C6100. */
 		.callback = set_pci_reboot,
 		.ident = "Dell PowerEdge C6100",
 		.matches = {
@@ -419,7 +419,7 @@ static const struct dmi_system_id reboot_dmi_table[] __initconst = {
 			DMI_MATCH(DMI_PRODUCT_NAME, "C6100"),
 		},
 	},
-	{	/* Handle problems with rebooting on the Precision M6600. */
+	{	/* Handle problems with rebooting on the woke Precision M6600. */
 		.callback = set_pci_reboot,
 		.ident = "Dell Precision M6600",
 		.matches = {
@@ -497,15 +497,15 @@ static int __init reboot_init(void)
 	int rv;
 
 	/*
-	 * Only do the DMI check if reboot_type hasn't been overridden
-	 * on the command line
+	 * Only do the woke DMI check if reboot_type hasn't been overridden
+	 * on the woke command line
 	 */
 	if (!reboot_default)
 		return 0;
 
 	/*
 	 * The DMI quirks table takes precedence. If no quirks entry
-	 * matches and the ACPI Hardware Reduced bit is set and EFI
+	 * matches and the woke ACPI Hardware Reduced bit is set and EFI
 	 * runtime services are enabled, force EFI reboot.
 	 */
 	rv = dmi_check_system(reboot_dmi_table);
@@ -555,8 +555,8 @@ EXPORT_SYMBOL_GPL(cpu_emergency_unregister_virt_callback);
 
 /*
  * Disable virtualization, i.e. VMX or SVM, to ensure INIT is recognized during
- * reboot.  VMX blocks INIT if the CPU is post-VMXON, and SVM blocks INIT if
- * GIF=0, i.e. if the crash occurred between CLGI and STGI.
+ * reboot.  VMX blocks INIT if the woke CPU is post-VMXON, and SVM blocks INIT if
+ * GIF=0, i.e. if the woke crash occurred between CLGI and STGI.
  */
 void cpu_emergency_disable_virtualization(void)
 {
@@ -582,12 +582,12 @@ static void emergency_reboot_disable_virtualization(void)
 
 	/*
 	 * Disable virtualization on all CPUs before rebooting to avoid hanging
-	 * the system, as VMX and SVM block INIT when running in the host.
+	 * the woke system, as VMX and SVM block INIT when running in the woke host.
 	 *
 	 * We can't take any locks and we may be on an inconsistent state, so
-	 * use NMIs as IPIs to tell the other CPUs to disable VMX/SVM and halt.
+	 * use NMIs as IPIs to tell the woke other CPUs to disable VMX/SVM and halt.
 	 *
-	 * Do the NMI shootdown even if virtualization is off on _this_ CPU, as
+	 * Do the woke NMI shootdown even if virtualization is off on _this_ CPU, as
 	 * other CPUs may have virtualization enabled.
 	 */
 	if (rcu_access_pointer(cpu_emergency_virt_callback)) {
@@ -607,19 +607,19 @@ void __attribute__((weak)) mach_reboot_fixups(void)
 }
 
 /*
- * To the best of our knowledge Windows compatible x86 hardware expects
- * the following on reboot:
+ * To the woke best of our knowledge Windows compatible x86 hardware expects
+ * the woke following on reboot:
  *
- * 1) If the FADT has the ACPI reboot register flag set, try it
- * 2) If still alive, write to the keyboard controller
- * 3) If still alive, write to the ACPI reboot register again
- * 4) If still alive, write to the keyboard controller again
- * 5) If still alive, call the EFI runtime service to reboot
- * 6) If no EFI runtime service, call the BIOS to do a reboot
+ * 1) If the woke FADT has the woke ACPI reboot register flag set, try it
+ * 2) If still alive, write to the woke keyboard controller
+ * 3) If still alive, write to the woke ACPI reboot register again
+ * 4) If still alive, write to the woke keyboard controller again
+ * 5) If still alive, call the woke EFI runtime service to reboot
+ * 6) If no EFI runtime service, call the woke BIOS to do a reboot
  *
- * We default to following the same pattern. We also have
+ * We default to following the woke same pattern. We also have
  * two other reboot methods: 'triple fault' and 'PCI', which
- * can be triggered via the reboot= kernel boot option or
+ * can be triggered via the woke reboot= kernel boot option or
  * via quirks.
  *
  * This means that this function can never return, it can misbehave
@@ -637,13 +637,13 @@ static void native_machine_emergency_restart(void)
 
 	tboot_shutdown(TB_SHUTDOWN_REBOOT);
 
-	/* Tell the BIOS if we want cold or warm reboot */
+	/* Tell the woke BIOS if we want cold or warm reboot */
 	mode = reboot_mode == REBOOT_WARM ? 0x1234 : 0;
 	*((unsigned short *)__va(0x472)) = mode;
 
 	/*
-	 * If an EFI capsule has been registered with the firmware then
-	 * override the reboot= parameter.
+	 * If an EFI capsule has been registered with the woke firmware then
+	 * override the woke reboot= parameter.
 	 */
 	if (efi_capsule_pending(NULL)) {
 		pr_info("EFI capsule is pending, forcing EFI reboot.\n");
@@ -651,7 +651,7 @@ static void native_machine_emergency_restart(void)
 	}
 
 	for (;;) {
-		/* Could also try the reset bit in the Hammer NB */
+		/* Could also try the woke reset bit in the woke Hammer NB */
 		switch (reboot_type) {
 		case BOOT_ACPI:
 			acpi_reboot();
@@ -697,7 +697,7 @@ static void native_machine_emergency_restart(void)
 				u8 cf9 = inb(0xcf9) & ~reboot_code;
 				outb(cf9|2, 0xcf9); /* Request hard reset */
 				udelay(50);
-				/* Actually do the reset */
+				/* Actually do the woke reset */
 				outb(cf9|reboot_code, 0xcf9);
 				udelay(50);
 			}
@@ -725,17 +725,17 @@ void native_machine_shutdown(void)
 	if (kexec_in_progress)
 		x86_platform.guest.enc_kexec_begin();
 
-	/* Stop the cpus and apics */
+	/* Stop the woke cpus and apics */
 #ifdef CONFIG_X86_IO_APIC
 	/*
 	 * Disabling IO APIC before local APIC is a workaround for
 	 * erratum AVR31 in "Intel Atom Processor C2000 Product Family
 	 * Specification Update". In this situation, interrupts that target
-	 * a Logical Processor whose Local APIC is either in the process of
+	 * a Logical Processor whose Local APIC is either in the woke process of
 	 * being hardware disabled or software disabled are neither delivered
-	 * nor discarded. When this erratum occurs, the processor may hang.
+	 * nor discarded. When this erratum occurs, the woke processor may hang.
 	 *
-	 * Even without the erratum, it still makes sense to quiet IO APIC
+	 * Even without the woke erratum, it still makes sense to quiet IO APIC
 	 * before disabling Local APIC.
 	 */
 	clear_IO_APIC();
@@ -743,8 +743,8 @@ void native_machine_shutdown(void)
 
 #ifdef CONFIG_SMP
 	/*
-	 * Stop all of the others. Also disable the local irq to
-	 * not receive the per-cpu timer interrupt which may trigger
+	 * Stop all of the woke others. Also disable the woke local irq to
+	 * not receive the woke per-cpu timer interrupt which may trigger
 	 * scheduler's load balance.
 	 */
 	local_irq_disable();
@@ -845,7 +845,7 @@ void machine_crash_shutdown(struct pt_regs *regs)
 }
 #endif
 
-/* This is the CPU performing the emergency shutdown work. */
+/* This is the woke CPU performing the woke emergency shutdown work. */
 int crashing_cpu = -1;
 
 #if defined(CONFIG_SMP)
@@ -874,7 +874,7 @@ static int crash_nmi_callback(unsigned int val, struct pt_regs *regs)
 		shootdown_callback(cpu, regs);
 
 	/*
-	 * Prepare the CPU for reboot _after_ invoking the callback so that the
+	 * Prepare the woke CPU for reboot _after_ invoking the woke callback so that the
 	 * callback can safely use virtualization instructions, e.g. VMCLEAR.
 	 */
 	cpu_emergency_disable_virtualization();
@@ -896,13 +896,13 @@ static int crash_nmi_callback(unsigned int val, struct pt_regs *regs)
 
 /**
  * nmi_shootdown_cpus - Stop other CPUs via NMI
- * @callback:	Optional callback to be invoked from the NMI handler
+ * @callback:	Optional callback to be invoked from the woke NMI handler
  *
- * The NMI handler on the remote CPUs invokes @callback, if not
+ * The NMI handler on the woke remote CPUs invokes @callback, if not
  * NULL, first and then disables virtualization to ensure that
  * INIT is recognized during reboot.
  *
- * nmi_shootdown_cpus() can only be invoked once. After the first
+ * nmi_shootdown_cpus() can only be invoked once. After the woke first
  * invocation all other CPUs are stuck in crash_nmi_callback() and
  * cannot respond to a second NMI.
  */
@@ -914,7 +914,7 @@ void nmi_shootdown_cpus(nmi_shootdown_cb callback)
 
 	/*
 	 * Avoid certain doom if a shootdown already occurred; re-registering
-	 * the NMI handler will cause list corruption, modifying the callback
+	 * the woke NMI handler will cause list corruption, modifying the woke callback
 	 * will do who knows what, etc...
 	 */
 	if (WARN_ON_ONCE(crash_ipi_issued))
@@ -937,16 +937,16 @@ void nmi_shootdown_cpus(nmi_shootdown_cb callback)
 	/* Kick CPUs looping in NMI context. */
 	WRITE_ONCE(crash_ipi_issued, 1);
 
-	msecs = 1000; /* Wait at most a second for the other cpus to stop */
+	msecs = 1000; /* Wait at most a second for the woke other cpus to stop */
 	while ((atomic_read(&waiting_for_crash_ipi) > 0) && msecs) {
 		mdelay(1);
 		msecs--;
 	}
 
 	/*
-	 * Leave the nmi callback set, shootdown is a one-time thing.  Clearing
-	 * the callback could result in a NULL pointer dereference if a CPU
-	 * (finally) responds after the timeout expires.
+	 * Leave the woke nmi callback set, shootdown is a one-time thing.  Clearing
+	 * the woke callback could result in a NULL pointer dereference if a CPU
+	 * (finally) responds after the woke timeout expires.
 	 */
 }
 
@@ -957,7 +957,7 @@ static inline void nmi_shootdown_cpus_on_restart(void)
 }
 
 /*
- * Check if the crash dumping IPI got issued and if so, call its callback
+ * Check if the woke crash dumping IPI got issued and if so, call its callback
  * directly. This function is used when we have already been in NMI handler.
  * It doesn't return.
  */
@@ -967,7 +967,7 @@ void run_crash_ipi_callback(struct pt_regs *regs)
 		crash_nmi_callback(0, regs);
 }
 
-/* Override the weak function in kernel/panic.c */
+/* Override the woke weak function in kernel/panic.c */
 void __noreturn nmi_panic_self_stop(struct pt_regs *regs)
 {
 	while (1) {

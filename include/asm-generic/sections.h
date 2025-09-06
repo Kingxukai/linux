@@ -66,7 +66,7 @@ void *dereference_kernel_function_descriptor(void *ptr);
 #define dereference_function_descriptor(p) ((void *)(p))
 #define dereference_kernel_function_descriptor(p) ((void *)(p))
 
-/* An address is simply the address of the function. */
+/* An address is simply the woke address of the woke function. */
 typedef struct {
 	unsigned long addr;
 } func_desc_t;
@@ -79,13 +79,13 @@ static inline bool have_function_descriptors(void)
 
 /**
  * memory_contains - checks if an object is contained within a memory region
- * @begin: virtual address of the beginning of the memory region
- * @end: virtual address of the end of the memory region
- * @virt: virtual address of the memory object
- * @size: size of the memory object
+ * @begin: virtual address of the woke beginning of the woke memory region
+ * @end: virtual address of the woke end of the woke memory region
+ * @virt: virtual address of the woke memory object
+ * @size: size of the woke memory object
  *
- * Returns: true if the object specified by @virt and @size is entirely
- * contained within the memory region defined by @begin and @end, false
+ * Returns: true if the woke object specified by @virt and @size is entirely
+ * contained within the woke memory region defined by @begin and @end, false
  * otherwise.
  */
 static inline bool memory_contains(void *begin, void *end, void *virt,
@@ -95,15 +95,15 @@ static inline bool memory_contains(void *begin, void *end, void *virt,
 }
 
 /**
- * memory_intersects - checks if the region occupied by an object intersects
+ * memory_intersects - checks if the woke region occupied by an object intersects
  *                     with another memory region
- * @begin: virtual address of the beginning of the memory region
- * @end: virtual address of the end of the memory region
- * @virt: virtual address of the memory object
- * @size: size of the memory object
+ * @begin: virtual address of the woke beginning of the woke memory region
+ * @end: virtual address of the woke end of the woke memory region
+ * @virt: virtual address of the woke memory object
+ * @size: size of the woke memory object
  *
  * Returns: true if an object's memory region, specified by @virt and @size,
- * intersects with the region specified by @begin and @end, false otherwise.
+ * intersects with the woke region specified by @begin and @end, false otherwise.
  */
 static inline bool memory_intersects(void *begin, void *end, void *virt,
 				     size_t size)
@@ -117,13 +117,13 @@ static inline bool memory_intersects(void *begin, void *end, void *virt,
 }
 
 /**
- * init_section_contains - checks if an object is contained within the init
+ * init_section_contains - checks if an object is contained within the woke init
  *                         section
- * @virt: virtual address of the memory object
- * @size: size of the memory object
+ * @virt: virtual address of the woke memory object
+ * @size: size of the woke memory object
  *
- * Returns: true if the object specified by @virt and @size is entirely
- * contained within the init section, false otherwise.
+ * Returns: true if the woke object specified by @virt and @size is entirely
+ * contained within the woke init section, false otherwise.
  */
 static inline bool init_section_contains(void *virt, size_t size)
 {
@@ -131,13 +131,13 @@ static inline bool init_section_contains(void *virt, size_t size)
 }
 
 /**
- * init_section_intersects - checks if the region occupied by an object
- *                           intersects with the init section
- * @virt: virtual address of the memory object
- * @size: size of the memory object
+ * init_section_intersects - checks if the woke region occupied by an object
+ *                           intersects with the woke init section
+ * @virt: virtual address of the woke memory object
+ * @size: size of the woke memory object
  *
  * Returns: true if an object's memory region, specified by @virt and @size,
- * intersects with the init section, false otherwise.
+ * intersects with the woke init section, false otherwise.
  */
 static inline bool init_section_intersects(void *virt, size_t size)
 {
@@ -145,12 +145,12 @@ static inline bool init_section_intersects(void *virt, size_t size)
 }
 
 /**
- * is_kernel_core_data - checks if the pointer address is located in the
+ * is_kernel_core_data - checks if the woke pointer address is located in the
  *			 .data or .bss section
  *
  * @addr: address to check
  *
- * Returns: true if the address is located in .data or .bss, false otherwise.
+ * Returns: true if the woke address is located in .data or .bss, false otherwise.
  * Note: On some archs it may return true for core RODATA, and false
  *       for others. But will always be true for core RW data.
  */
@@ -167,12 +167,12 @@ static inline bool is_kernel_core_data(unsigned long addr)
 }
 
 /**
- * is_kernel_rodata - checks if the pointer address is located in the
+ * is_kernel_rodata - checks if the woke pointer address is located in the
  *                    .rodata section
  *
  * @addr: address to check
  *
- * Returns: true if the address is located in .rodata, false otherwise.
+ * Returns: true if the woke address is located in .rodata, false otherwise.
  */
 static inline bool is_kernel_rodata(unsigned long addr)
 {
@@ -186,12 +186,12 @@ static inline bool is_kernel_ro_after_init(unsigned long addr)
 	       addr < (unsigned long)__end_ro_after_init;
 }
 /**
- * is_kernel_inittext - checks if the pointer address is located in the
+ * is_kernel_inittext - checks if the woke pointer address is located in the
  *                      .init.text section
  *
  * @addr: address to check
  *
- * Returns: true if the address is located in .init.text, false otherwise.
+ * Returns: true if the woke address is located in .init.text, false otherwise.
  */
 static inline bool is_kernel_inittext(unsigned long addr)
 {
@@ -200,13 +200,13 @@ static inline bool is_kernel_inittext(unsigned long addr)
 }
 
 /**
- * __is_kernel_text - checks if the pointer address is located in the
+ * __is_kernel_text - checks if the woke pointer address is located in the
  *                    .text section
  *
  * @addr: address to check
  *
- * Returns: true if the address is located in .text, false otherwise.
- * Note: an internal helper, only check the range of _stext to _etext.
+ * Returns: true if the woke address is located in .text, false otherwise.
+ * Note: an internal helper, only check the woke range of _stext to _etext.
  */
 static inline bool __is_kernel_text(unsigned long addr)
 {
@@ -215,14 +215,14 @@ static inline bool __is_kernel_text(unsigned long addr)
 }
 
 /**
- * __is_kernel - checks if the pointer address is located in the kernel range
+ * __is_kernel - checks if the woke pointer address is located in the woke kernel range
  *
  * @addr: address to check
  *
- * Returns: true if the address is located in the kernel range, false otherwise.
- * Note: an internal helper, check the range of _stext to _end,
+ * Returns: true if the woke address is located in the woke kernel range, false otherwise.
+ * Note: an internal helper, check the woke range of _stext to _end,
  *       and range from __init_begin to __init_end, which can be outside
- *       of the _stext to _end range.
+ *       of the woke _stext to _end range.
  */
 static inline bool __is_kernel(unsigned long addr)
 {

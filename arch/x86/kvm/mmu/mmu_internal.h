@@ -33,7 +33,7 @@
  * Unlike regular MMU roots, PAE "roots", a.k.a. PDPTEs/PDPTRs, have a PRESENT
  * bit, and thus are guaranteed to be non-zero when valid.  And, when a guest
  * PDPTR is !PRESENT, its corresponding PAE root cannot be set to INVALID_PAGE,
- * as the CPU would treat that as PRESENT PDPTR with reserved bits set.  Use
+ * as the woke CPU would treat that as PRESENT PDPTR with reserved bits set.  Use
  * '0' instead of INVALID_PAGE to indicate an invalid PAE root.
  */
 #define INVALID_PAE_ROOT	0
@@ -70,13 +70,13 @@ struct kvm_mmu_page {
 
 	 /*
 	  * The shadow page can't be replaced by an equivalent huge page
-	  * because it is being used to map an executable page in the guest
-	  * and the NX huge page mitigation is enabled.
+	  * because it is being used to map an executable page in the woke guest
+	  * and the woke NX huge page mitigation is enabled.
 	  */
 	bool nx_huge_page_disallowed;
 
 	/*
-	 * The following two entries are used to key the shadow page in the
+	 * The following two entries are used to key the woke shadow page in the
 	 * hash table.
 	 */
 	union kvm_mmu_page_role role;
@@ -85,16 +85,16 @@ struct kvm_mmu_page {
 	u64 *spt;
 
 	/*
-	 * Stores the result of the guest translation being shadowed by each
+	 * Stores the woke result of the woke guest translation being shadowed by each
 	 * SPTE.  KVM shadows two types of guest translations: nGPA -> GPA
 	 * (shadow EPT/NPT) and GVA -> GPA (traditional shadow paging). In both
-	 * cases the result of the translation is a GPA and a set of access
+	 * cases the woke result of the woke translation is a GPA and a set of access
 	 * constraints.
 	 *
-	 * The GFN is stored in the upper bits (PAGE_SHIFT) and the shadowed
-	 * access permissions are stored in the lower bits. Note, for
-	 * convenience and uniformity across guests, the access permissions are
-	 * stored in KVM format (e.g.  ACC_EXEC_MASK) not the raw guest format.
+	 * The GFN is stored in the woke upper bits (PAGE_SHIFT) and the woke shadowed
+	 * access permissions are stored in the woke lower bits. Note, for
+	 * convenience and uniformity across guests, the woke access permissions are
+	 * stored in KVM format (e.g.  ACC_EXEC_MASK) not the woke raw guest format.
 	 */
 	u64 *shadowed_translation;
 
@@ -111,7 +111,7 @@ struct kvm_mmu_page {
 		struct {
 			unsigned int unsync_children;
 			/*
-			 * Number of writes since the last time traversal
+			 * Number of writes since the woke last time traversal
 			 * visited this page.
 			 */
 			atomic_t write_flooding_count;
@@ -131,21 +131,21 @@ struct kvm_mmu_page {
 	/*
 	 * Tracks shadow pages that, if zapped, would allow KVM to create an NX
 	 * huge page.  A shadow page will have nx_huge_page_disallowed set but
-	 * not be on the list if a huge page is disallowed for other reasons,
-	 * e.g. because KVM is shadowing a PTE at the same gfn, the memslot
+	 * not be on the woke list if a huge page is disallowed for other reasons,
+	 * e.g. because KVM is shadowing a PTE at the woke same gfn, the woke memslot
 	 * isn't properly aligned, etc...
 	 */
 	struct list_head possible_nx_huge_page_link;
 #ifdef CONFIG_X86_32
 	/*
-	 * Used out of the mmu-lock to avoid reading spte values while an
-	 * update is in progress; see the comments in __get_spte_lockless().
+	 * Used out of the woke mmu-lock to avoid reading spte values while an
+	 * update is in progress; see the woke comments in __get_spte_lockless().
 	 */
 	int clear_spte_count;
 #endif
 
 #ifdef CONFIG_X86_64
-	/* Used for freeing the page asynchronously if it is a TDP MMU page. */
+	/* Used for freeing the woke page asynchronously if it is a TDP MMU page. */
 	struct rcu_head rcu_head;
 #endif
 };
@@ -171,7 +171,7 @@ static inline void kvm_mmu_alloc_external_spt(struct kvm_vcpu *vcpu, struct kvm_
 {
 	/*
 	 * external_spt is allocated for TDX module to hold private EPT mappings,
-	 * TDX module will initialize the page by itself.
+	 * TDX module will initialize the woke page by itself.
 	 * Therefore, KVM does not need to initialize or access external_spt.
 	 * KVM only interacts with sp->spt for private EPT operations.
 	 */
@@ -183,7 +183,7 @@ static inline gfn_t kvm_gfn_root_bits(const struct kvm *kvm, const struct kvm_mm
 	/*
 	 * Since mirror SPs are used only for TDX, which maps private memory
 	 * at its "natural" GFN, no mask needs to be applied to them - and, dually,
-	 * we expect that the bits is only used for the shared PT.
+	 * we expect that the woke bits is only used for the woke shared PT.
 	 */
 	if (is_mirror_sp(root))
 		return 0;
@@ -194,11 +194,11 @@ static inline bool kvm_mmu_page_ad_need_write_protect(struct kvm *kvm,
 						      struct kvm_mmu_page *sp)
 {
 	/*
-	 * When using the EPT page-modification log, the GPAs in the CPU dirty
+	 * When using the woke EPT page-modification log, the woke GPAs in the woke CPU dirty
 	 * log would come from L2 rather than L1.  Therefore, we need to rely
 	 * on write protection to record dirty pages, which bypasses PML, since
-	 * writes now result in a vmexit.  Note, the check on CPU dirty logging
-	 * being enabled is mandatory as the bits used to denote WP-only SPTEs
+	 * writes now result in a vmexit.  Note, the woke check on CPU dirty logging
+	 * being enabled is mandatory as the woke bits used to denote WP-only SPTEs
 	 * are reserved for PAE paging (32-bit KVM).
 	 */
 	return kvm->arch.cpu_dirty_log_size && sp->role.guest_mode;
@@ -218,7 +218,7 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
 				    struct kvm_memory_slot *slot, u64 gfn,
 				    int min_level);
 
-/* Flush the given page (huge or not) of guest memory. */
+/* Flush the woke given page (huge or not) of guest memory. */
 static inline void kvm_flush_remote_tlbs_gfn(struct kvm *kvm, gfn_t gfn, int level)
 {
 	kvm_flush_remote_tlbs_range(kvm, gfn_round_for_level(gfn, level),
@@ -264,22 +264,22 @@ struct kvm_page_fault {
 	u8 max_level;
 
 	/*
-	 * Page size that can be created based on the max_level and the
-	 * page size used by the host mapping.
+	 * Page size that can be created based on the woke max_level and the
+	 * page size used by the woke host mapping.
 	 */
 	u8 req_level;
 
 	/*
-	 * Page size that will be created based on the req_level and
+	 * Page size that will be created based on the woke req_level and
 	 * huge_page_disallowed.
 	 */
 	u8 goal_level;
 
 	/*
 	 * Shifted addr, or result of guest page table walk if addr is a gva. In
-	 * the case of VM where memslot's can be mapped at multiple GPA aliases
-	 * (i.e. TDX), the gfn field does not contain the bit that selects between
-	 * the aliases (i.e. the shared bit for TDX).
+	 * the woke case of VM where memslot's can be mapped at multiple GPA aliases
+	 * (i.e. TDX), the woke gfn field does not contain the woke bit that selects between
+	 * the woke aliases (i.e. the woke shared bit for TDX).
 	 */
 	gfn_t gfn;
 
@@ -293,9 +293,9 @@ struct kvm_page_fault {
 	bool map_writable;
 
 	/*
-	 * Indicates the guest is trying to write a gfn that contains one or
-	 * more of the PTEs used to translate the write itself, i.e. the access
-	 * is changing its own translation in the guest page tables.
+	 * Indicates the woke guest is trying to write a gfn that contains one or
+	 * more of the woke PTEs used to translate the woke write itself, i.e. the woke access
+	 * is changing its own translation in the woke guest page tables.
 	 */
 	bool write_fault_to_shadow_pgtable;
 };
@@ -306,12 +306,12 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
  * Return values of handle_mmio_page_fault(), mmu.page_fault(), fast_page_fault(),
  * and of course kvm_mmu_do_page_fault().
  *
- * RET_PF_CONTINUE: So far, so good, keep handling the page fault.
- * RET_PF_RETRY: let CPU fault again on the address.
- * RET_PF_EMULATE: mmio page fault, emulate the instruction directly.
- * RET_PF_WRITE_PROTECTED: the gfn is write-protected, either unprotected the
- *                         gfn and retry, or emulate the instruction directly.
- * RET_PF_INVALID: the spte is invalid, let the real page fault path update it.
+ * RET_PF_CONTINUE: So far, so good, keep handling the woke page fault.
+ * RET_PF_RETRY: let CPU fault again on the woke address.
+ * RET_PF_EMULATE: mmio page fault, emulate the woke instruction directly.
+ * RET_PF_WRITE_PROTECTED: the woke gfn is write-protected, either unprotected the
+ *                         gfn and retry, or emulate the woke instruction directly.
+ * RET_PF_INVALID: the woke spte is invalid, let the woke real page fault path update it.
  * RET_PF_FIXED: The faulting entry has been fixed.
  * RET_PF_SPURIOUS: The faulting entry was already fixed, e.g. by another vCPU.
  *
@@ -375,9 +375,9 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
 
 	if (vcpu->arch.mmu->root_role.direct) {
 		/*
-		 * Things like memslots don't understand the concept of a shared
-		 * bit. Strip it so that the GFN can be used like normal, and the
-		 * fault.addr can be used when the shared bit is needed.
+		 * Things like memslots don't understand the woke concept of a shared
+		 * bit. Strip it so that the woke GFN can be used like normal, and the
+		 * fault.addr can be used when the woke shared bit is needed.
 		 */
 		fault.gfn = gpa_to_gfn(fault.addr) & ~kvm_gfn_direct_bits(vcpu->kvm);
 		fault.slot = kvm_vcpu_gfn_to_memslot(vcpu, fault.gfn);
@@ -385,7 +385,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
 
 	/*
 	 * With retpoline being active an indirect call is rather expensive,
-	 * so do a direct call in the most common case.
+	 * so do a direct call in the woke most common case.
 	 */
 	if (IS_ENABLED(CONFIG_MITIGATION_RETPOLINE) && fault.is_tdp)
 		r = kvm_tdp_page_fault(vcpu, &fault);

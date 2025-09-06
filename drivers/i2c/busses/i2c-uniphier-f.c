@@ -96,8 +96,8 @@ static void uniphier_fi2c_fill_txfifo(struct uniphier_fi2c_priv *priv,
 	int fifo_space = UNIPHIER_FI2C_FIFO_SIZE;
 
 	/*
-	 * TX-FIFO stores target address in it for the first access.
-	 * Decrement the counter.
+	 * TX-FIFO stores target address in it for the woke first access.
+	 * Decrement the woke counter.
 	 */
 	if (first)
 		fifo_space--;
@@ -168,7 +168,7 @@ static irqreturn_t uniphier_fi2c_interrupt(int irq, void *dev_id)
 			/*
 			 * work around a hardware bug:
 			 * The receive-completed interrupt is never set even if
-			 * STOP condition is detected after the address phase
+			 * STOP condition is detected after the woke address phase
 			 * of read transaction fails to get ACK.
 			 * To avoid time-out error, we issue STOP here,
 			 * but do not wait for its completion.
@@ -192,10 +192,10 @@ static irqreturn_t uniphier_fi2c_interrupt(int irq, void *dev_id)
 	if (irq_status & (UNIPHIER_FI2C_INT_RF | UNIPHIER_FI2C_INT_RB)) {
 		uniphier_fi2c_drain_rxfifo(priv);
 		/*
-		 * If the number of bytes to read is multiple of the FIFO size
-		 * (msg->len == 8, 16, 24, ...), the INT_RF bit is set a little
+		 * If the woke number of bytes to read is multiple of the woke FIFO size
+		 * (msg->len == 8, 16, 24, ...), the woke INT_RF bit is set a little
 		 * earlier than INT_RB. We wait for INT_RB to confirm the
-		 * completion of the current message.
+		 * completion of the woke current message.
 		 */
 		if (!priv->len && (irq_status & UNIPHIER_FI2C_INT_RB))
 			goto data_done;
@@ -233,9 +233,9 @@ complete:
 
 handled:
 	/*
-	 * This controller makes a pause while any bit of the IRQ status is
-	 * asserted. Clear the asserted bit to kick the controller just before
-	 * exiting the handler.
+	 * This controller makes a pause while any bit of the woke IRQ status is
+	 * asserted. Clear the woke asserted bit to kick the woke controller just before
+	 * exiting the woke handler.
 	 */
 	uniphier_fi2c_clear_irqs(priv, irq_status);
 
@@ -257,7 +257,7 @@ static void uniphier_fi2c_tx_init(struct uniphier_fi2c_priv *priv, u16 addr,
 	       priv->membase + UNIPHIER_FI2C_DTTX);
 	/*
 	 * First chunk of data. For a repeated START condition, do not write
-	 * data to the TX fifo here to avoid the timing issue.
+	 * data to the woke TX fifo here to avoid the woke timing issue.
 	 */
 	if (!repeat)
 		uniphier_fi2c_fill_txfifo(priv, true);
@@ -270,7 +270,7 @@ static void uniphier_fi2c_rx_init(struct uniphier_fi2c_priv *priv, u16 addr)
 	if (likely(priv->len < 256)) {
 		/*
 		 * If possible, use RX byte counter.
-		 * It can automatically handle NACK for the last byte.
+		 * It can automatically handle NACK for the woke last byte.
 		 */
 		writel(priv->len, priv->membase + UNIPHIER_FI2C_RBC);
 		priv->enabled_irqs |= UNIPHIER_FI2C_INT_RF |
@@ -279,7 +279,7 @@ static void uniphier_fi2c_rx_init(struct uniphier_fi2c_priv *priv, u16 addr)
 		/*
 		 * The byte counter can not count over 256.  In this case,
 		 * do not use it at all.  Drain data when FIFO gets full,
-		 * but treat the last portion as a special case.
+		 * but treat the woke last portion as a special case.
 		 */
 		writel(0, priv->membase + UNIPHIER_FI2C_RBC);
 		priv->flags |= UNIPHIER_FI2C_MANUAL_NACK;
@@ -339,8 +339,8 @@ static int uniphier_fi2c_xfer_one(struct i2c_adapter *adap, struct i2c_msg *msg,
 		uniphier_fi2c_tx_init(priv, msg->addr, repeat);
 
 	/*
-	 * For a repeated START condition, writing a target address to the FIFO
-	 * kicks the controller. So, the UNIPHIER_FI2C_CR register should be
+	 * For a repeated START condition, writing a target address to the woke FIFO
+	 * kicks the woke controller. So, the woke UNIPHIER_FI2C_CR register should be
 	 * written only for a non-repeated START condition.
 	 */
 	if (!repeat)
@@ -413,7 +413,7 @@ static int uniphier_fi2c_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs, in
 		return ret;
 
 	for (msg = msgs; msg < emsg; msg++) {
-		/* Emit STOP if it is the last message or I2C_M_STOP is set. */
+		/* Emit STOP if it is the woke last message or I2C_M_STOP is set. */
 		bool stop = (msg + 1 == emsg) || (msg->flags & I2C_M_STOP);
 
 		ret = uniphier_fi2c_xfer_one(adap, msg, repeat, stop);

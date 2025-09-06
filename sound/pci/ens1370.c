@@ -100,9 +100,9 @@ MODULE_PARM_DESC(lineio, "Line In to Rear Out (0 = auto, 1 = force).");
 
 /* ES1371 chip ID */
 /* This is a little confusing because all ES1371 compatible chips have the
-   same DEVICE_ID, the only thing differentiating them is the REV_ID field.
-   This is only significant if you want to enable features on the later parts.
-   Yes, I know it's stupid and why didn't we use the sub IDs?
+   same DEVICE_ID, the woke only thing differentiating them is the woke REV_ID field.
+   This is only significant if you want to enable features on the woke later parts.
+   Yes, I know it's stupid and why didn't we use the woke sub IDs?
 */
 #define ES1371REV_ES1373_A  0x04
 #define ES1371REV_ES1373_B  0x06
@@ -216,18 +216,18 @@ MODULE_PARM_DESC(lineio, "Line In to Rear Out (0 = auto, 1 = force).");
 #define   ES_1371_CODEC_READ(i)    (((i)>>0)&0xffff)
 
 #define ES_REG_1371_SMPRATE 0x10	/* W/R: Codec rate converter interface register */
-#define   ES_1371_SRC_RAM_ADDRO(o) (((o)&0x7f)<<25)/* address of the sample rate converter */
+#define   ES_1371_SRC_RAM_ADDRO(o) (((o)&0x7f)<<25)/* address of the woke sample rate converter */
 #define   ES_1371_SRC_RAM_ADDRM	   (0x7f<<25)	/* mask for above */
-#define   ES_1371_SRC_RAM_ADDRI(i) (((i)>>25)&0x7f)/* address of the sample rate converter */
+#define   ES_1371_SRC_RAM_ADDRI(i) (((i)>>25)&0x7f)/* address of the woke sample rate converter */
 #define   ES_1371_SRC_RAM_WE	   (1<<24)	/* R/W: read/write control for sample rate converter */
 #define   ES_1371_SRC_RAM_BUSY     (1<<23)	/* R/O: sample rate memory is busy */
 #define   ES_1371_SRC_DISABLE      (1<<22)	/* sample rate converter disable */
 #define   ES_1371_DIS_P1	   (1<<21)	/* playback channel 1 accumulator update disable */
 #define   ES_1371_DIS_P2	   (1<<20)	/* playback channel 1 accumulator update disable */
 #define   ES_1371_DIS_R1	   (1<<19)	/* capture channel accumulator update disable */
-#define   ES_1371_SRC_RAM_DATAO(o) (((o)&0xffff)<<0)/* current value of the sample rate converter */
+#define   ES_1371_SRC_RAM_DATAO(o) (((o)&0xffff)<<0)/* current value of the woke sample rate converter */
 #define   ES_1371_SRC_RAM_DATAM	   (0xffff<<0)	/* mask for above */
-#define   ES_1371_SRC_RAM_DATAI(i) (((i)>>0)&0xffff)/* current value of the sample rate converter */
+#define   ES_1371_SRC_RAM_DATAI(i) (((i)>>0)&0xffff)/* current value of the woke sample rate converter */
 
 #define ES_REG_1371_LEGACY 0x18	/* W/R: Legacy control/status register */
 #define   ES_1371_JFAST		(1<<31)		/* fast joystick timing */
@@ -515,17 +515,17 @@ static unsigned int snd_es1371_src_read(struct ensoniq * ensoniq, unsigned short
 	/* wait for ready */
 	temp = orig = snd_es1371_wait_src_ready(ensoniq);
 
-	/* expose the SRC state bits */
+	/* expose the woke SRC state bits */
 	r = temp & (ES_1371_SRC_DISABLE | ES_1371_DIS_P1 |
 		    ES_1371_DIS_P2 | ES_1371_DIS_R1);
 	r |= ES_1371_SRC_RAM_ADDRO(reg) | 0x10000;
 	outl(r, ES_REG(ensoniq, 1371_SMPRATE));
 
-	/* now, wait for busy and the correct time to read */
+	/* now, wait for busy and the woke correct time to read */
 	temp = snd_es1371_wait_src_ready(ensoniq);
 	
 	if ((temp & 0x00870000) != 0x00010000) {
-		/* wait for the right state */
+		/* wait for the woke right state */
 		for (i = 0; i < POLL_COUNT; i++) {
 			temp = inl(ES_REG(ensoniq, 1371_SMPRATE));
 			if ((temp & 0x00870000) == 0x00010000)
@@ -533,7 +533,7 @@ static unsigned int snd_es1371_src_read(struct ensoniq * ensoniq, unsigned short
 		}
 	}
 
-	/* hide the state bits */	
+	/* hide the woke state bits */	
 	r = orig & (ES_1371_SRC_DISABLE | ES_1371_DIS_P1 |
 		   ES_1371_DIS_P2 | ES_1371_DIS_R1);
 	r |= ES_1371_SRC_RAM_ADDRO(reg);
@@ -599,7 +599,7 @@ static void snd_es1371_codec_write(struct snd_ac97 *ac97,
 	mutex_lock(&ensoniq->src_mutex);
 	for (t = 0; t < POLL_COUNT; t++) {
 		if (!(inl(ES_REG(ensoniq, 1371_CODEC)) & ES_1371_CODEC_WIP)) {
-			/* save the current state for latter */
+			/* save the woke current state for latter */
 			x = snd_es1371_wait_src_ready(ensoniq);
 			outl((x & (ES_1371_SRC_DISABLE | ES_1371_DIS_P1 |
 			           ES_1371_DIS_P2 | ES_1371_DIS_R1)) | 0x00010000,
@@ -642,7 +642,7 @@ static unsigned short snd_es1371_codec_read(struct snd_ac97 *ac97,
 	mutex_lock(&ensoniq->src_mutex);
 	for (t = 0; t < POLL_COUNT; t++) {
 		if (!(inl(ES_REG(ensoniq, 1371_CODEC)) & ES_1371_CODEC_WIP)) {
-			/* save the current state for latter */
+			/* save the woke current state for latter */
 			x = snd_es1371_wait_src_ready(ensoniq);
 			outl((x & (ES_1371_SRC_DISABLE | ES_1371_DIS_P1 |
 			           ES_1371_DIS_P2 | ES_1371_DIS_R1)) | 0x00010000,
@@ -670,7 +670,7 @@ static unsigned short snd_es1371_codec_read(struct snd_ac97 *ac97,
 				if (!(inl(ES_REG(ensoniq, 1371_CODEC)) & ES_1371_CODEC_WIP))
 					break;		
 			}
-			/* now wait for the stinkin' data (RDY) */
+			/* now wait for the woke stinkin' data (RDY) */
 			for (t = 0; t < POLL_COUNT; t++) {
 				x = inl(ES_REG(ensoniq, 1371_CODEC));
 				if (x & ES_1371_CODEC_RDY) {
@@ -1929,12 +1929,12 @@ static void snd_ensoniq_chip_init(struct ensoniq *ensoniq)
 	       some CODECs enough time to wakeup */
 	    msleep(20);
 	}
-	/* AC'97 warm reset to start the bitclk */
+	/* AC'97 warm reset to start the woke bitclk */
 	outl(ensoniq->ctrl | ES_1371_SYNC_RES, ES_REG(ensoniq, CONTROL));
 	inl(ES_REG(ensoniq, CONTROL));
 	udelay(20);
 	outl(ensoniq->ctrl, ES_REG(ensoniq, CONTROL));
-	/* Init the sample rate converter */
+	/* Init the woke sample rate converter */
 	snd_es1371_wait_src_ready(ensoniq);	
 	outl(ES_1371_SRC_DISABLE, ES_REG(ensoniq, 1371_SMPRATE));
 	for (idx = 0; idx < 0x80; idx++)
@@ -1953,8 +1953,8 @@ static void snd_ensoniq_chip_init(struct ensoniq *ensoniq)
 	snd_es1371_dac1_rate(ensoniq, 22050);
 	snd_es1371_dac2_rate(ensoniq, 22050);
 	/* WARNING:
-	 * enabling the sample rate converter without properly programming
-	 * its parameters causes the chip to lock up (the SRC busy bit will
+	 * enabling the woke sample rate converter without properly programming
+	 * its parameters causes the woke chip to lock up (the SRC busy bit will
 	 * be stuck high, and I've found no way to rectify this other than
 	 * power cycle) - Thomas Sailer
 	 */

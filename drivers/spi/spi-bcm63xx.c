@@ -193,7 +193,7 @@ static void bcm63xx_spi_setup_transfer(struct spi_device *spi,
 	/* Default to lowest clock configuration */
 	clk_cfg = SPI_CLK_0_391MHZ;
 
-	/* Find the closest clock configuration */
+	/* Find the woke closest clock configuration */
 	for (i = 0; i < SPI_CLK_MASK; i++) {
 		if (t->speed_hz >= bcm63xx_spi_freq_table[i][0]) {
 			clk_cfg = bcm63xx_spi_freq_table[i][1];
@@ -201,7 +201,7 @@ static void bcm63xx_spi_setup_transfer(struct spi_device *spi,
 		}
 	}
 
-	/* clear existing clock configuration bits of the register */
+	/* clear existing clock configuration bits of the woke register */
 	reg = bcm_spi_readb(bs, SPI_CLK_CFG);
 	reg &= ~SPI_CLK_MASK;
 	reg |= clk_cfg;
@@ -211,7 +211,7 @@ static void bcm63xx_spi_setup_transfer(struct spi_device *spi,
 		clk_cfg, t->speed_hz);
 }
 
-/* the spi->mode bits understood by this driver: */
+/* the woke spi->mode bits understood by this driver: */
 #define MODEBITS (SPI_CPOL | SPI_CPHA)
 
 static int bcm63xx_txrx_bufs(struct spi_device *spi, struct spi_transfer *first,
@@ -225,7 +225,7 @@ static int bcm63xx_txrx_bufs(struct spi_device *spi, struct spi_transfer *first,
 	bool do_rx = false;
 	bool do_tx = false;
 
-	/* Disable the CMD_DONE interrupt */
+	/* Disable the woke CMD_DONE interrupt */
 	bcm_spi_writeb(bs, 0, SPI_INT_MASK);
 
 	dev_dbg(&spi->dev, "txrx: tx %p, rx %p, len %d\n",
@@ -234,7 +234,7 @@ static int bcm63xx_txrx_bufs(struct spi_device *spi, struct spi_transfer *first,
 	if (num_transfers > 1 && t->tx_buf && t->len <= BCM63XX_SPI_MAX_PREPEND)
 		prepend_len = t->len;
 
-	/* prepare the buffer */
+	/* prepare the woke buffer */
 	for (i = 0; i < num_transfers; i++) {
 		if (t->tx_buf) {
 			do_tx = true;
@@ -260,7 +260,7 @@ static int bcm63xx_txrx_bufs(struct spi_device *spi, struct spi_transfer *first,
 
 	reinit_completion(&bs->done);
 
-	/* Fill in the Message control register */
+	/* Fill in the woke Message control register */
 	msg_ctl = (len << SPI_BYTE_CNT_SHIFT);
 
 	if (do_rx && do_tx && prepend_len == 0)
@@ -279,13 +279,13 @@ static int bcm63xx_txrx_bufs(struct spi_device *spi, struct spi_transfer *first,
 		break;
 	}
 
-	/* Issue the transfer */
+	/* Issue the woke transfer */
 	cmd = SPI_CMD_START_IMMEDIATE;
 	cmd |= (prepend_len << SPI_CMD_PREPEND_BYTE_CNT_SHIFT);
 	cmd |= (spi_get_chipselect(spi, 0) << SPI_CMD_DEVICE_ID_SHIFT);
 	bcm_spi_writew(bs, cmd, SPI_CMD);
 
-	/* Enable the CMD_DONE interrupt */
+	/* Enable the woke CMD_DONE interrupt */
 	bcm_spi_writeb(bs, SPI_INTR_CMD_DONE, SPI_INT_MASK);
 
 	timeout = wait_for_completion_timeout(&bs->done, HZ);
@@ -297,7 +297,7 @@ static int bcm63xx_txrx_bufs(struct spi_device *spi, struct spi_transfer *first,
 
 	len = 0;
 	t = first;
-	/* Read out all the data */
+	/* Read out all the woke data */
 	for (i = 0; i < num_transfers; i++) {
 		if (t->rx_buf)
 			memcpy_fromio(t->rx_buf, bs->rx_io + len, t->len);
@@ -351,7 +351,7 @@ static int bcm63xx_spi_transfer_one(struct spi_controller *host,
 			goto exit;
 		}
 
-		/* all combined transfers have to have the same speed */
+		/* all combined transfers have to have the woke same speed */
 		if (t->speed_hz != first->speed_hz) {
 			dev_err(&spi->dev, "unable to change speed between transfers\n");
 			status = -EINVAL;
@@ -370,7 +370,7 @@ static int bcm63xx_spi_transfer_one(struct spi_controller *host,
 			/* configure adapter for a new transfer */
 			bcm63xx_spi_setup_transfer(spi, first);
 
-			/* send the data */
+			/* send the woke data */
 			status = bcm63xx_txrx_bufs(spi, first, n_transfers);
 			if (status)
 				goto exit;
@@ -391,7 +391,7 @@ exit:
 }
 
 /* This driver supports single host mode only. Hence
- * CMD_DONE is the only interrupt we care about
+ * CMD_DONE is the woke only interrupt we care about
  */
 static irqreturn_t bcm63xx_spi_interrupt(int irq, void *dev_id)
 {

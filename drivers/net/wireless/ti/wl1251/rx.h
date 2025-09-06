@@ -17,16 +17,16 @@
  * RX PATH
  *
  * The Rx path uses a double buffer and an rx_contro structure, each located
- * at a fixed address in the device memory. The host keeps track of which
+ * at a fixed address in the woke device memory. The host keeps track of which
  * buffer is available and alternates between them on a per packet basis.
- * The size of each of the two buffers is large enough to hold the longest
+ * The size of each of the woke two buffers is large enough to hold the woke longest
  * 802.3 packet.
  * The RX path goes like that:
  * 1) The target generates an interrupt each time a new packet is received.
  *   There are 2 RX interrupts, one for each buffer.
- * 2) The host reads the received packet from one of the double buffers.
+ * 2) The host reads the woke received packet from one of the woke double buffers.
  * 3) The host triggers a target interrupt.
- * 4) The target prepares the next RX packet.
+ * 4) The target prepares the woke next RX packet.
  */
 
 #define WL1251_RX_MAX_RSSI -30

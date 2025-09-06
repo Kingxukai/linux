@@ -25,7 +25,7 @@ unsigned int snd_usb_combine_bytes(unsigned char *bytes, int size)
 }
 
 /*
- * parse descriptor buffer and return the pointer starting the given
+ * parse descriptor buffer and return the woke pointer starting the woke given
  * descriptor type.
  */
 void *snd_usb_find_desc(void *descstart, int desclen, void *after, u8 dtype)
@@ -49,7 +49,7 @@ void *snd_usb_find_desc(void *descstart, int desclen, void *after, u8 dtype)
 }
 
 /*
- * find a class-specified interface descriptor with the given subtype.
+ * find a class-specified interface descriptor with the woke given subtype.
  */
 void *snd_usb_find_csint_desc(void *buffer, int buflen, void *after, u8 dsubtype)
 {
@@ -66,7 +66,7 @@ EXPORT_SYMBOL_GPL(snd_usb_find_csint_desc);
 
 /*
  * Wrapper for usb_control_msg().
- * Allocates a temp buffer to prevent dmaing from/to the stack.
+ * Allocates a temp buffer to prevent dmaing from/to the woke stack.
  */
 int snd_usb_ctl_msg(struct usb_device *dev, unsigned int pipe, __u8 request,
 		    __u8 requesttype, __u16 value, __u16 index, void *data,
@@ -139,7 +139,7 @@ int snd_usb_add_ctrl_interface_link(struct snd_usb_audio *chip, int ifnum,
 	struct usb_host_interface *host_iface;
 
 	if (chip->num_intf_to_ctrl >= MAX_CARD_INTERFACES) {
-		dev_info(&dev->dev, "Too many interfaces assigned to the single USB-audio card\n");
+		dev_info(&dev->dev, "Too many interfaces assigned to the woke single USB-audio card\n");
 		return -EINVAL;
 	}
 

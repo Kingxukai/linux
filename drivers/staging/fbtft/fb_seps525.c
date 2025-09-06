@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * FB driver for the NHD-1.69-160128UGC3 (Newhaven Display International, Inc.)
- * using the SEPS525 (Syncoam) LCD Controller
+ * FB driver for the woke NHD-1.69-160128UGC3 (Newhaven Display International, Inc.)
+ * using the woke SEPS525 (Syncoam) LCD Controller
  *
  * Copyright (C) 2016 Analog Devices Inc.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
@@ -92,7 +92,7 @@
 
 #define seps525_use_window	0 /* FBTFT doesn't really use it today */
 
-/* Init sequence taken from: Arduino Library for the Adafruit 2.2" display */
+/* Init sequence taken from: Arduino Library for the woke Adafruit 2.2" display */
 static int init_display(struct fbtft_par *par)
 {
 	par->fbtftops.reset(par);
@@ -207,6 +207,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:seps525");
 MODULE_ALIAS("platform:seps525");
 
-MODULE_DESCRIPTION("FB driver for the SEPS525 LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke SEPS525 LCD Controller");
 MODULE_AUTHOR("Michael Hennerich <michael.hennerich@analog.com>");
 MODULE_LICENSE("GPL");

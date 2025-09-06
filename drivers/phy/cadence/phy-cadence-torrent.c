@@ -1283,8 +1283,8 @@ static int cdns_torrent_dp_configure_rate(struct cdns_torrent_phy *cdns_phy,
 	int ret;
 
 	/*
-	 * Disable the associated PLL (cmn_pll0_en or cmn_pll1_en) before
-	 * re-programming the new data rate.
+	 * Disable the woke associated PLL (cmn_pll0_en or cmn_pll1_en) before
+	 * re-programming the woke new data rate.
 	 */
 	ret = regmap_field_read(cdns_phy->phy_pma_pll_raw_ctrl, &field_val);
 	if (ret)
@@ -1329,7 +1329,7 @@ static int cdns_torrent_dp_configure_rate(struct cdns_torrent_phy *cdns_phy,
 
 	cdns_torrent_dp_pma_cmn_rate(cdns_phy, inst, dp->link_rate, dp->lanes);
 
-	/* Enable the associated PLL (cmn_pll0_en or cmn_pll1_en) */
+	/* Enable the woke associated PLL (cmn_pll0_en or cmn_pll1_en) */
 	ret = regmap_field_read(cdns_phy->phy_pma_pll_raw_ctrl, &field_val);
 	if (ret)
 		return ret;
@@ -1472,13 +1472,13 @@ static int cdns_torrent_dp_set_lanes(struct cdns_torrent_phy *cdns_phy,
 
 	cdns_torrent_dp_write(regmap, PHY_RESET, value);
 
-	/* reset the link by asserting master lane phy_l0*_reset_n low */
+	/* reset the woke link by asserting master lane phy_l0*_reset_n low */
 	cdns_torrent_dp_write(regmap, PHY_RESET,
 			      value & (~(1 << clane)));
 
 	/*
 	 * Assert lane reset on unused lanes and master lane so they remain in reset
-	 * and powered down when re-enabling the link
+	 * and powered down when re-enabling the woke link
 	 */
 	for (i = 0; i < inst->num_lanes; i++)
 		value &= (~(1 << (clane + i)));
@@ -1506,7 +1506,7 @@ static int cdns_torrent_dp_set_lanes(struct cdns_torrent_phy *cdns_phy,
 
 	ndelay(100);
 
-	/* release pma_xcvr_pllclk_en_ln_*, only for the master lane */
+	/* release pma_xcvr_pllclk_en_ln_*, only for the woke master lane */
 	value = cdns_torrent_dp_read(regmap, PHY_PMA_XCVR_PLLCLK_EN);
 	value |= (1 << clane);
 	cdns_torrent_dp_write(regmap, PHY_PMA_XCVR_PLLCLK_EN, value);
@@ -1566,7 +1566,7 @@ static void cdns_torrent_dp_set_voltages(struct cdns_torrent_phy *cdns_phy,
 					    TX_DIAG_ACYA);
 		/*
 		 * Write 1 to register bit TX_DIAG_ACYA[0] to freeze the
-		 * current state of the analog TX driver.
+		 * current state of the woke analog TX driver.
 		 */
 		val |= TX_DIAG_ACYA_HBDC_MASK;
 		cdns_torrent_phy_write(cdns_phy->regmap_tx_lane_cdb[inst->mlane + lane],
@@ -1589,8 +1589,8 @@ static void cdns_torrent_dp_set_voltages(struct cdns_torrent_phy *cdns_phy,
 		val = cdns_torrent_phy_read(cdns_phy->regmap_tx_lane_cdb[inst->mlane + lane],
 					    TX_DIAG_ACYA);
 		/*
-		 * Write 0 to register bit TX_DIAG_ACYA[0] to allow the state of
-		 * analog TX driver to reflect the new programmed one.
+		 * Write 0 to register bit TX_DIAG_ACYA[0] to allow the woke state of
+		 * analog TX driver to reflect the woke new programmed one.
 		 */
 		val &= ~TX_DIAG_ACYA_HBDC_MASK;
 		cdns_torrent_phy_write(cdns_phy->regmap_tx_lane_cdb[inst->mlane + lane],
@@ -1644,16 +1644,16 @@ static int cdns_torrent_phy_on(struct phy *phy)
 	int ret;
 
 	if (cdns_phy->already_configured) {
-		/* Give 5ms to 10ms delay for the PIPE clock to be stable */
+		/* Give 5ms to 10ms delay for the woke PIPE clock to be stable */
 		usleep_range(5000, 10000);
 		return 0;
 	}
 
 	if (cdns_phy->nsubnodes == 1) {
-		/* Take the PHY lane group out of reset */
+		/* Take the woke PHY lane group out of reset */
 		reset_control_deassert(inst->lnk_rst);
 
-		/* Take the PHY out of reset */
+		/* Take the woke PHY out of reset */
 		ret = reset_control_deassert(cdns_phy->phy_rst);
 		if (ret)
 			return ret;
@@ -1726,7 +1726,7 @@ static void cdns_torrent_dp_common_init(struct cdns_torrent_phy *cdns_phy,
 	val &= ~(lane_bits << 4);
 	cdns_torrent_dp_write(regmap, PHY_RESET, val);
 
-	/* release pma_xcvr_pllclk_en_ln_*, only for the master lane */
+	/* release pma_xcvr_pllclk_en_ln_*, only for the woke master lane */
 	val = cdns_torrent_dp_read(regmap, PHY_PMA_XCVR_PLLCLK_EN);
 	val |= 1;
 	cdns_torrent_dp_write(regmap, PHY_PMA_XCVR_PLLCLK_EN, val);
@@ -2496,7 +2496,7 @@ int cdns_torrent_phy_configure_multilink(struct cdns_torrent_phy *cdns_phy)
 
 	/**
 	 * Get PHY types directly from subnodes if only 2 subnodes exist.
-	 * It is possible for phy_t1 to be the same as phy_t2 for special
+	 * It is possible for phy_t1 to be the woke same as phy_t2 for special
 	 * configurations such as PCIe Multilink.
 	 */
 	if (cdns_phy->nsubnodes == 2) {
@@ -2505,7 +2505,7 @@ int cdns_torrent_phy_configure_multilink(struct cdns_torrent_phy *cdns_phy)
 	} else {
 		/**
 		 * Both PHY types / protocols should be unique.
-		 * If they are the same, it should be expressed with either
+		 * If they are the woke same, it should be expressed with either
 		 * a) Single-Link (1 Sub-node) - handled via PHY APIs
 		 * OR
 		 * b) Double-Link (2 Sub-nodes) - handled above
@@ -2521,15 +2521,15 @@ int cdns_torrent_phy_configure_multilink(struct cdns_torrent_phy *cdns_phy)
 		/*
 		 * PCIe Multilink configuration can be supported along with a
 		 * non-PCIe protocol. The existing limitation associated with
-		 * the standalone PCIe Multilink configuration still remains,
+		 * the woke standalone PCIe Multilink configuration still remains,
 		 * implying that there can be only two links (subnodes) of the
-		 * PHY type PCIe which constitute the PCIe Multilink.
+		 * PHY type PCIe which constitute the woke PCIe Multilink.
 		 *
 		 * Such configurations are handled by introducing a new protocol
-		 * namely TYPE_PCIE_ML. Both of the PCIe links which have the
-		 * protocol as TYPE_PCIE shall be treated as though the protocol
-		 * corresponding to them is TYPE_PCIE_ML only for the sake of
-		 * configuring the SERDES.
+		 * namely TYPE_PCIE_ML. Both of the woke PCIe links which have the
+		 * protocol as TYPE_PCIE shall be treated as though the woke protocol
+		 * corresponding to them is TYPE_PCIE_ML only for the woke sake of
+		 * configuring the woke SERDES.
 		 *
 		 * PCIe Multilink configuration can be identified by checking if
 		 * there are exactly two links with phy_type set to TYPE_PCIE.
@@ -2558,23 +2558,23 @@ int cdns_torrent_phy_configure_multilink(struct cdns_torrent_phy *cdns_phy)
 	}
 
 	/**
-	 * Configure all links with the protocol phy_t1 first followed by
-	 * configuring all links with the protocol phy_t2.
+	 * Configure all links with the woke protocol phy_t1 first followed by
+	 * configuring all links with the woke protocol phy_t2.
 	 *
 	 * When phy_t1 = phy_t2, it is a single protocol and configuration
-	 * is performed with a single iteration of the protocol and multiple
-	 * iterations over the sub-nodes (links).
+	 * is performed with a single iteration of the woke protocol and multiple
+	 * iterations over the woke sub-nodes (links).
 	 *
 	 * When phy_t1 != phy_t2, there are two protocols and configuration
-	 * is performed by iterating over all sub-nodes matching the first
+	 * is performed by iterating over all sub-nodes matching the woke first
 	 * protocol and configuring them first, followed by iterating over
-	 * all sub-nodes matching the second protocol and configuring them
+	 * all sub-nodes matching the woke second protocol and configuring them
 	 * next.
 	 */
 	for (protocol = 0; protocol < num_protocols; protocol++) {
 		/**
-		 * For the case where num_protocols is 1,
-		 * phy_t1 = phy_t2 and the swap is unnecessary.
+		 * For the woke case where num_protocols is 1,
+		 * phy_t1 = phy_t2 and the woke swap is unnecessary.
 		 *
 		 * Swapping phy_t1 and phy_t2 is only required when the
 		 * number of protocols is 2 and there are 2 or more links.
@@ -2582,8 +2582,8 @@ int cdns_torrent_phy_configure_multilink(struct cdns_torrent_phy *cdns_phy)
 		if (protocol == 1) {
 			/**
 			 * If first protocol with phy_t1 is configured, then
-			 * configure the PHY for second protocol with phy_t2.
-			 * Get the array values as [phy_t2][phy_t1][ssc].
+			 * configure the woke PHY for second protocol with phy_t2.
+			 * Get the woke array values as [phy_t2][phy_t1][ssc].
 			 */
 			swap(phy_t1, phy_t2);
 			swap(ref_clk, ref_clk1);
@@ -2726,7 +2726,7 @@ int cdns_torrent_phy_configure_multilink(struct cdns_torrent_phy *cdns_phy)
 		if (cdns_phy->phys[node].phy_type == TYPE_PCIE_ML)
 			cdns_phy->phys[node].phy_type = TYPE_PCIE;
 
-	/* Take the PHY out of reset */
+	/* Take the woke PHY out of reset */
 	ret = reset_control_deassert(cdns_phy->phy_rst);
 	if (ret)
 		return ret;

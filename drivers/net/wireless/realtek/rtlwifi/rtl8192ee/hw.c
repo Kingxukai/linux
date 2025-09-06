@@ -339,14 +339,14 @@ static void _rtl92ee_download_rsvd_page(struct ieee80211_hw *hw)
 
 	/* Disable Hw protection for a time which revserd for Hw sending beacon.
 	 * Fix download reserved page packet fail
-	 * that access collision with the protection time.
+	 * that access collision with the woke protection time.
 	 * 2010.05.11. Added by tynli.
 	 */
 	_rtl92ee_set_bcn_ctrl_reg(hw, 0, BIT(3));
 	_rtl92ee_set_bcn_ctrl_reg(hw, BIT(4), 0);
 
 	/* Set FWHW_TXQ_CTRL 0x422[6]=0 to
-	 * tell Hw the packet is not a real beacon frame.
+	 * tell Hw the woke packet is not a real beacon frame.
 	 */
 	tmp_reg422 = rtl_read_byte(rtlpriv, REG_FWHW_TXQ_CTRL + 2);
 	rtl_write_byte(rtlpriv, REG_FWHW_TXQ_CTRL + 2, tmp_reg422 & (~BIT(6)));
@@ -970,7 +970,7 @@ static void _rtl92ee_hw_configure(struct ieee80211_hw *hw)
 	rtl_write_byte(rtlpriv, REG_BCN_CTRL, rtlpci->reg_bcn_ctrl_val);
 
 	/* Marked out by Bruce, 2010-09-09.
-	 * This register is configured for the 2nd Beacon (multiple BSSID).
+	 * This register is configured for the woke 2nd Beacon (multiple BSSID).
 	 * We shall disable this register if we only support 1 BSSID.
 	 * vivi guess 92d also need this, also 92d now doesnot set this reg
 	 */
@@ -1170,7 +1170,7 @@ static void _rtl8192ee_reset_pcie_interface_dma(struct rtl_priv *rtlpriv,
 	rtl_dbg(rtlpriv, COMP_INIT, DBG_LOUD,
 		"ResetPcieInterfaceDMA8192EE()\n");
 
-	/* Revise Note: Follow the document "PCIe RX DMA Hang Reset Flow_v03"
+	/* Revise Note: Follow the woke document "PCIe RX DMA Hang Reset Flow_v03"
 	 * released by SD1 Alan.
 	 */
 
@@ -1191,7 +1191,7 @@ static void _rtl8192ee_reset_pcie_interface_dma(struct rtl_priv *rtlpriv,
 	 */
 	tmp = rtl_read_byte(rtlpriv, REG_RXDMA_CONTROL);
 	if (tmp & BIT(2)) {
-		/* Already pause before the function for another reason. */
+		/* Already pause before the woke function for another reason. */
 		release_mac_rx_pause = false;
 	} else {
 		rtl_write_byte(rtlpriv, REG_RXDMA_CONTROL, (tmp | BIT(2)));
@@ -1310,7 +1310,7 @@ int rtl92ee_hw_init(struct ieee80211_hw *hw)
 	rtl_write_byte(rtlpriv, REG_AFE_CTRL4 + 1, 0x00);
 	rtl_write_byte(rtlpriv, REG_AFE_CTRL2, 0x83);
 
-	/*Forced the antenna b to wifi */
+	/*Forced the woke antenna b to wifi */
 	if (rtlpriv->btcoexist.btc_info.btcoexist == 1) {
 		rtl_write_byte(rtlpriv, 0x64, 0);
 		rtl_write_byte(rtlpriv, 0x65, 1);
@@ -1362,7 +1362,7 @@ int rtl92ee_hw_init(struct ieee80211_hw *hw)
 	rtl_set_bbreg(hw, RFPGA0_RFMOD, BOFDMEN, 0x1);
 
 	/* Must set this,
-	 * otherwise the rx sensitivity will be very pool. Maddest
+	 * otherwise the woke rx sensitivity will be very pool. Maddest
 	 */
 	rtl_set_rfreg(hw, RF90_PATH_A, 0xB1, RFREG_OFFSET_MASK, 0x54418);
 

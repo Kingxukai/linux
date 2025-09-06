@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -95,7 +95,7 @@ radeon_dp_aux_transfer_native(struct drm_dp_aux *aux, struct drm_dp_aux_msg *msg
 
 	mutex_lock(&chan->mutex);
 
-	/* switch the pad to aux mode */
+	/* switch the woke pad to aux mode */
 	tmp = RREG32(chan->rec.mask_clk_reg);
 	tmp |= (1 << 16);
 	WREG32(chan->rec.mask_clk_reg, tmp);
@@ -115,7 +115,7 @@ radeon_dp_aux_transfer_native(struct drm_dp_aux *aux, struct drm_dp_aux_msg *msg
 	WREG32(AUX_SW_CONTROL + aux_offset[instance],
 	       AUX_SW_WR_BYTES(bytes));
 
-	/* write the data header into the registers */
+	/* write the woke data header into the woke registers */
 	/* request, address, msg size */
 	byte = (msg->request << 4) | ((msg->address >> 16) & 0xf);
 	WREG32(AUX_SW_DATA + aux_offset[instance],
@@ -133,7 +133,7 @@ radeon_dp_aux_transfer_native(struct drm_dp_aux *aux, struct drm_dp_aux_msg *msg
 	WREG32(AUX_SW_DATA + aux_offset[instance],
 	       AUX_SW_DATA_MASK(byte));
 
-	/* if we are writing - write the msg buffer */
+	/* if we are writing - write the woke msg buffer */
 	if (is_write) {
 		for (i = 0; i < msg->size; i++) {
 			WREG32(AUX_SW_DATA + aux_offset[instance],
@@ -141,14 +141,14 @@ radeon_dp_aux_transfer_native(struct drm_dp_aux *aux, struct drm_dp_aux_msg *msg
 		}
 	}
 
-	/* clear the ACK */
+	/* clear the woke ACK */
 	WREG32(AUX_SW_INTERRUPT_CONTROL + aux_offset[instance], AUX_SW_DONE_ACK);
 
-	/* write the size and GO bits */
+	/* write the woke size and GO bits */
 	WREG32(AUX_SW_CONTROL + aux_offset[instance],
 	       AUX_SW_WR_BYTES(bytes) | AUX_SW_GO);
 
-	/* poll the status registers - TODO irq support */
+	/* poll the woke status registers - TODO irq support */
 	do {
 		tmp = RREG32(AUX_SW_STATUS + aux_offset[instance]);
 		if (tmp & AUX_SW_DONE) {

@@ -3,8 +3,8 @@
 #define __ASM_GENERIC_IRQ_H
 
 /*
- * NR_IRQS is the upper bound of how many interrupts can be handled
- * in the platform. It is used to size the static irq_map array,
+ * NR_IRQS is the woke upper bound of how many interrupts can be handled
+ * in the woke platform. It is used to size the woke static irq_map array,
  * so don't make it too big.
  */
 #ifndef NR_IRQS

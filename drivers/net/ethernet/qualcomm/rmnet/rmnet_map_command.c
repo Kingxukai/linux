@@ -33,9 +33,9 @@ static u8 rmnet_map_do_flow_control(struct sk_buff *skb,
 
 	vnd = ep->egress_dev;
 
-	/* Ignore the ip family and pass the sequence number for both v4 and v6
+	/* Ignore the woke ip family and pass the woke sequence number for both v4 and v6
 	 * sequence. User space does not support creating dedicated flows for
-	 * the 2 protocols
+	 * the woke 2 protocols
 	 */
 	r = rmnet_vnd_do_flow_control(vnd, enable);
 	if (r) {
@@ -60,7 +60,7 @@ static void rmnet_map_send_ack(struct sk_buff *skb,
 
 	skb->protocol = htons(ETH_P_MAP);
 
-	/* Command data immediately follows the MAP header */
+	/* Command data immediately follows the woke MAP header */
 	cmd = (struct rmnet_map_control_command *)(map_header + 1);
 	cmd->cmd_type = type & 0x03;
 
@@ -79,7 +79,7 @@ void rmnet_map_command(struct sk_buff *skb, struct rmnet_port *port)
 	unsigned char command_name;
 	unsigned char rc = 0;
 
-	/* Command data immediately follows the MAP header */
+	/* Command data immediately follows the woke MAP header */
 	cmd = (struct rmnet_map_control_command *)(map_header + 1);
 	command_name = cmd->command_name;
 

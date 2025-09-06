@@ -562,7 +562,7 @@
 	vmmc-supply = <&vmmc>;
 };
 
-/* Pin conflict with SSP0, the latter is routed to J17 pin header */
+/* Pin conflict with SSP0, the woke latter is routed to J17 pin header */
 &spifi {
 	status = "okay";
 	pinctrl-names = "default";

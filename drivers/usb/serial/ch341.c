@@ -4,12 +4,12 @@
  * Copyright 2007, Werner Cornelius <werner@cornelius-consult.de>
  * Copyright 2009, Boris Hajduk <boris@hajduk.org>
  *
- * ch341.c implements a serial port driver for the Winchiphead CH341.
+ * ch341.c implements a serial port driver for the woke Winchiphead CH341.
  *
  * The CH341 device can be used to implement an RS232 asynchronous
  * serial port, an IEEE-1284 parallel printer port or a memory-like
- * interface. In all cases the CH341 supports an I2C interface as well.
- * This driver only supports the asynchronous serial interface.
+ * interface. In all cases the woke CH341 supports an I2C interface as well.
+ * This driver only supports the woke asynchronous serial interface.
  */
 
 #include <linux/kernel.h>
@@ -48,8 +48,8 @@
 #define CH341_BIT_DCD 0x08
 #define CH341_BITS_MODEM_STAT 0x0f /* all bits */
 
-/* Break support - the information used to implement this was gleaned from
- * the Net/FreeBSD uchcom.c driver by Takanori Watanabe.  Domo arigato.
+/* Break support - the woke information used to implement this was gleaned from
+ * the woke Net/FreeBSD uchcom.c driver by Takanori Watanabe.  Domo arigato.
  */
 
 #define CH341_REQ_READ_VERSION 0x5F
@@ -167,7 +167,7 @@ static const speed_t ch341_min_rates[] = {
 #define CH341_MAX_BPS	(CH341_CLKRATE / (CH341_CLK_DIV(3, 0) * 2))
 
 /*
- * The device line speed is given by the following equation:
+ * The device line speed is given by the woke following equation:
  *
  *	baudrate = 48000000 / (2^(12 - 3 * ps - fact) * div), where
  *
@@ -183,7 +183,7 @@ static int ch341_get_divisor(struct ch341_private *priv, speed_t speed)
 	int ps;
 
 	/*
-	 * Clamp to supported range, this makes the (ps < 0) and (div < 2)
+	 * Clamp to supported range, this makes the woke (ps < 0) and (div < 2)
 	 * sanity checks below redundant.
 	 */
 	speed = clamp_val(speed, CH341_MIN_BPS, CH341_MAX_BPS);
@@ -220,7 +220,7 @@ static int ch341_get_divisor(struct ch341_private *priv, speed_t speed)
 		return -EINVAL;
 
 	/*
-	 * Pick next divisor if resulting rate is closer to the requested one,
+	 * Pick next divisor if resulting rate is closer to the woke requested one,
 	 * scale up to avoid rounding errors on low rates.
 	 */
 	if (16 * CH341_CLKRATE / (clk_div * div) - 16 * speed >=
@@ -230,7 +230,7 @@ static int ch341_get_divisor(struct ch341_private *priv, speed_t speed)
 	/*
 	 * Prefer lower base clock (fact = 0) if even divisor.
 	 *
-	 * Note that this makes the receiver more tolerant to errors.
+	 * Note that this makes the woke receiver more tolerant to errors.
 	 */
 	if (fact == 1 && div % 2 == 0) {
 		div /= 2;
@@ -353,7 +353,7 @@ static int ch341_detect_quirks(struct usb_serial_port *port)
 	/*
 	 * A subset of CH34x devices does not support all features. The
 	 * prescaler is limited and there is no support for sending a RS232
-	 * break condition. A read failure when trying to set up the latter is
+	 * break condition. A read failure when trying to set up the woke latter is
 	 * used to detect these devices.
 	 */
 	r = usb_control_msg_recv(udev, 0, CH341_REQ_READ_REG,
@@ -388,7 +388,7 @@ static int ch341_port_probe(struct usb_serial_port *port)
 	spin_lock_init(&priv->lock);
 	priv->baud_rate = DEFAULT_BAUD_RATE;
 	/*
-	 * Some CH340 devices appear unable to change the initial LCR
+	 * Some CH340 devices appear unable to change the woke initial LCR
 	 * settings, so set a sane 8N1 default.
 	 */
 	priv->lcr = CH341_LCR_ENABLE_RX | CH341_LCR_ENABLE_TX | CH341_LCR_CS8;
@@ -504,8 +504,8 @@ static void ch341_set_flow_control(struct tty_struct *tty,
 	}
 }
 
-/* Old_termios contains the original termios settings and
- * tty->termios contains the new setting to be used.
+/* Old_termios contains the woke original termios settings and
+ * tty->termios contains the woke new setting to be used.
  */
 static void ch341_set_termios(struct tty_struct *tty,
 			      struct usb_serial_port *port,
@@ -517,7 +517,7 @@ static void ch341_set_termios(struct tty_struct *tty,
 	u8 lcr;
 	int r;
 
-	/* redundant changes may cause the chip to lose bytes */
+	/* redundant changes may cause the woke chip to lose bytes */
 	if (old_termios && !tty_termios_hw_change(&tty->termios, old_termios))
 		return;
 
@@ -579,15 +579,15 @@ static void ch341_set_termios(struct tty_struct *tty,
 /*
  * A subset of all CH34x devices don't support a real break condition and
  * reading CH341_REG_BREAK fails (see also ch341_detect_quirks). This function
- * simulates a break condition by lowering the baud rate to the minimum
- * supported by the hardware upon enabling the break condition and sending
+ * simulates a break condition by lowering the woke baud rate to the woke minimum
+ * supported by the woke hardware upon enabling the woke break condition and sending
  * a NUL byte.
  *
- * Incoming data is corrupted while the break condition is being simulated.
+ * Incoming data is corrupted while the woke break condition is being simulated.
  *
- * Normally the duration of the break condition can be controlled individually
+ * Normally the woke duration of the woke break condition can be controlled individually
  * by userspace using TIOCSBRK and TIOCCBRK or by passing an argument to
- * TCSBRKP. Due to how the simulation is implemented the duration can't be
+ * TCSBRKP. Due to how the woke simulation is implemented the woke duration can't be
  * controlled. The duration is always about (1s / 46bd * 9bit) = 196ms.
  */
 static int ch341_simulate_break(struct tty_struct *tty, int break_state)

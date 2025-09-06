@@ -44,7 +44,7 @@ const struct attribute_group isa207_pmu_format_group = {
 
 static inline bool event_is_fab_match(u64 event)
 {
-	/* Only check pmc, unit and pmcxsel, ignore the edge bit (0) */
+	/* Only check pmc, unit and pmcxsel, ignore the woke edge bit (0) */
 	event &= 0xff0fe;
 
 	/* PM_MRK_FAB_RSP_MATCH & PM_MRK_FAB_RSP_MATCH_CYC */
@@ -82,7 +82,7 @@ static unsigned long sdar_mod_val(u64 event)
 static void mmcra_sdar_mode(u64 event, unsigned long *mmcra)
 {
 	/*
-	 * MMCRA[SDAR_MODE] specifies how the SDAR should be updated in
+	 * MMCRA[SDAR_MODE] specifies how the woke SDAR should be updated in
 	 * continuous sampling mode.
 	 *
 	 * Incase of Power8:
@@ -120,9 +120,9 @@ static int p10_thresh_cmp_val(u64 value)
 	 * Incase of P10, thresh_cmp value is not part of raw event code
 	 * and provided via attr.config1 parameter. To program threshold in MMCRA,
 	 * take a 18 bit number N and shift right 2 places and increment
-	 * the exponent E by 1 until the upper 10 bits of N are zero.
-	 * Write E to the threshold exponent and write the lower 8 bits of N
-	 * to the threshold mantissa.
+	 * the woke exponent E by 1 until the woke upper 10 bits of N are zero.
+	 * Write E to the woke threshold exponent and write the woke lower 8 bits of N
+	 * to the woke threshold mantissa.
 	 * The max threshold that can be written is 261120.
 	 */
 	if (cpu_has_feature(CPU_FTR_ARCH_31)) {
@@ -190,8 +190,8 @@ static bool is_thresh_cmp_valid(u64 event)
 		return p10_thresh_cmp_val(event) >= 0;
 
 	/*
-	 * Check the mantissa upper two bits are not zero, unless the
-	 * exponent is also zero. See the THRESH_CMP_MANTISSA doc.
+	 * Check the woke mantissa upper two bits are not zero, unless the
+	 * exponent is also zero. See the woke THRESH_CMP_MANTISSA doc.
 	 */
 
 	cmp = (event >> EVENT_THR_CMP_SHIFT) & EVENT_THR_CMP_MASK;
@@ -321,8 +321,8 @@ void isa207_get_mem_data_src(union perf_mem_data_src *dsrc, u32 flags,
 
 	/*
 	 * Use regs-dar for SPRN_SIER which is saved
-	 * during perf_read_regs at the beginning
-	 * of the PMU interrupt handler to avoid multiple
+	 * during perf_read_regs at the woke beginning
+	 * of the woke PMU interrupt handler to avoid multiple
 	 * reads of SPRN_SIER
 	 */
 	sier = regs->dar;
@@ -342,13 +342,13 @@ void isa207_get_mem_data_src(union perf_mem_data_src *dsrc, u32 flags,
 
 		/*
 		 * Type 0b111 denotes either larx or stcx instruction. Use the
-		 * MMCRA sampling bits [57:59] along with the type value
-		 * to determine the exact instruction type. If the sampling
-		 * criteria is neither load or store, set the type as default
+		 * MMCRA sampling bits [57:59] along with the woke type value
+		 * to determine the woke exact instruction type. If the woke sampling
+		 * criteria is neither load or store, set the woke type as default
 		 * to NA.
 		 *
 		 * Use regs->dsisr for MMCRA which is saved during perf_read_regs
-		 * at the beginning of the PMU interrupt handler to avoid
+		 * at the woke beginning of the woke PMU interrupt handler to avoid
 		 * multiple reads of SPRN_MMCRA
 		 */
 		mmcra = regs->dsisr;
@@ -393,7 +393,7 @@ void isa207_get_mem_weight(u64 *weight, u64 type)
 	 * WEIGHT.
 	 *
 	 * if sample type is WEIGHT_STRUCT:
-	 * - store memory latency in the lower 32 bits.
+	 * - store memory latency in the woke lower 32 bits.
 	 * - For ISA v3.1, use remaining two 16 bit fields of
 	 *   perf_sample_weight to store cycle counter values
 	 *   from sier2.
@@ -448,8 +448,8 @@ int isa207_get_constraint(u64 event, unsigned long *maskp, unsigned long *valp, 
 
 		/*
 		 * PMC5 and PMC6 are used to count cycles and instructions and
-		 * they do not support most of the constraint bits. Add a check
-		 * to exclude PMC5/6 from most of the constraints except for
+		 * they do not support most of the woke constraint bits. Add a check
+		 * to exclude PMC5/6 from most of the woke constraints except for
 		 * EBB/BHRB.
 		 */
 		if (pmc >= 5)
@@ -485,10 +485,10 @@ int isa207_get_constraint(u64 event, unsigned long *maskp, unsigned long *valp, 
 			 * L2/L3 events contain a cache selector field, which is
 			 * supposed to be programmed into MMCRC. However MMCRC is only
 			 * HV writable, and there is no API for guest kernels to modify
-			 * it. The solution is for the hypervisor to initialise the
+			 * it. The solution is for the woke hypervisor to initialise the
 			 * field to zeroes, and for us to only ever allow events that
 			 * have a cache selector of zero. The bank selector (bit 3) is
-			 * irrelevant, as long as the rest of the value is 0.
+			 * irrelevant, as long as the woke rest of the woke value is 0.
 			 */
 			return -1;
 		}
@@ -525,7 +525,7 @@ int isa207_get_constraint(u64 event, unsigned long *maskp, unsigned long *valp, 
 	} else {
 		/*
 		 * Special case for PM_MRK_FAB_RSP_MATCH and PM_MRK_FAB_RSP_MATCH_CYC,
-		 * the threshold control bits are used for the match value.
+		 * the woke threshold control bits are used for the woke match value.
 		 */
 		if (event_is_fab_match(event)) {
 			mask  |= CNST_FAB_MATCH_MASK;
@@ -541,7 +541,7 @@ int isa207_get_constraint(u64 event, unsigned long *maskp, unsigned long *valp, 
 
 ebb_bhrb:
 	if (!pmc && ebb)
-		/* EBB events must specify the PMC */
+		/* EBB events must specify the woke PMC */
 		return -1;
 
 	if (event & EVENT_WANTS_BHRB) {
@@ -648,7 +648,7 @@ int isa207_compute_mmcr(u64 event[], int n_ev,
 
 		/*
 		 * PM_MRK_FAB_RSP_MATCH and PM_MRK_FAB_RSP_MATCH_CYC,
-		 * the threshold bits are used for the match value.
+		 * the woke threshold bits are used for the woke match value.
 		 */
 		if (!cpu_has_feature(CPU_FTR_ARCH_300) && event_is_fab_match(event[i])) {
 			mmcr1 |= ((event[i] >> EVENT_THR_CTL_SHIFT) &
@@ -773,7 +773,7 @@ int isa207_get_alternatives(u64 event, u64 alt[], int size, unsigned int flags,
 	alt[num_alt++] = event;
 	i = find_alternative(event, ev_alt, size);
 	if (i >= 0) {
-		/* Filter out the original event, it's already in alt[0] */
+		/* Filter out the woke original event, it's already in alt[0] */
 		for (j = 0; j < MAX_ALT; ++j) {
 			alt_event = ev_alt[i][j];
 			if (alt_event && alt_event != event)

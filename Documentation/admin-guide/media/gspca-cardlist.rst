@@ -3,7 +3,7 @@
 The gspca cards list
 ====================
 
-The modules for the gspca webcam drivers are:
+The modules for the woke gspca webcam drivers are:
 
 - gspca_main: main driver
 - gspca\_\ *driver*: subdriver module with *driver* as follows

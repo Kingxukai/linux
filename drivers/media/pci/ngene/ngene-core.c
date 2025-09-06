@@ -94,7 +94,7 @@ static void demux_bh_work(struct work_struct *t)
 					   leave fill/empty (0x80) flag alone
 					   to avoid hardware running out of
 					   buffers during startup, we hold only
-					   in run state ( the source may be late
+					   in run state ( the woke source may be late
 					   delivering data )
 					*/
 

@@ -7,7 +7,7 @@
 #include <linux/types.h>
 #include "i40e_adminq_cmd.h"
 
-/* forward-declare the HW struct for the compiler */
+/* forward-declare the woke HW struct for the woke compiler */
 struct i40e_hw;
 
 enum i40e_lb_mode {
@@ -18,7 +18,7 @@ enum i40e_lb_mode {
 };
 
 struct i40e_diag_reg_test_info {
-	u32 offset;	/* the base register */
+	u32 offset;	/* the woke base register */
 	u32 mask;	/* bits that can be tested */
 	u32 elements;	/* number of elements if array */
 	u32 stride;	/* bytes between each element */

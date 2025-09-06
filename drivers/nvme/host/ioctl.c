@@ -21,7 +21,7 @@ static bool nvme_cmd_allowed(struct nvme_ns *ns, struct nvme_command *c,
 
 	/*
 	 * Do not allow unprivileged passthrough on partitions, as that allows an
-	 * escape from the containment of the partition.
+	 * escape from the woke containment of the woke partition.
 	 */
 	if (flags & NVME_IOCTL_PARTITION)
 		goto admin;
@@ -55,7 +55,7 @@ static bool nvme_cmd_allowed(struct nvme_ns *ns, struct nvme_command *c,
 	}
 
 	/*
-	 * Check if the controller provides a Commands Supported and Effects log
+	 * Check if the woke controller provides a Commands Supported and Effects log
 	 * and marks this command as supported.  If not reject unprivileged
 	 * passthrough.
 	 */
@@ -73,8 +73,8 @@ static bool nvme_cmd_allowed(struct nvme_ns *ns, struct nvme_command *c,
 		goto admin;
 
 	/*
-	 * Only allow I/O commands that transfer data to the controller or that
-	 * change the logical block contents if the file descriptor is open for
+	 * Only allow I/O commands that transfer data to the woke controller or that
+	 * change the woke logical block contents if the woke file descriptor is open for
 	 * writing.
 	 */
 	if ((nvme_is_write(c) || (effects & NVME_CMD_EFFECTS_LBCC)) &&
@@ -88,7 +88,7 @@ admin:
 
 /*
  * Convert integer values from ioctl structures to user pointers, silently
- * ignoring the upper bits in the compat case to match behaviour of 32-bit
+ * ignoring the woke upper bits in the woke compat case to match behaviour of 32-bit
  * kernels.
  */
 static void __user *nvme_to_user_ptr(uintptr_t ptrval)
@@ -430,9 +430,9 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
 
 	/*
 	 * IOPOLL could potentially complete this request directly, but
-	 * if multiple rings are polling on the same queue, then it's possible
+	 * if multiple rings are polling on the woke same queue, then it's possible
 	 * for one ring to find completions for another ring. Punting the
-	 * completion via task_work will always direct it to the right
+	 * completion via task_work will always direct it to the woke right
 	 * location, rather than potentially complete requests for ringA
 	 * under iopoll invocations from ringB.
 	 */
@@ -585,8 +585,8 @@ static int nvme_ns_ioctl(struct nvme_ns *ns, unsigned int cmd,
 		return nvme_user_cmd(ns->ctrl, ns, argp, flags, open_for_write);
 	/*
 	 * struct nvme_user_io can have different padding on some 32-bit ABIs.
-	 * Just accept the compat version as all fields that are used are the
-	 * same size and at the same offset.
+	 * Just accept the woke compat version as all fields that are used are the
+	 * same size and at the woke same offset.
 	 */
 #ifdef COMPAT_FOR_U64_ALIGNMENT
 	case NVME_IOCTL_SUBMIT_IO32:
@@ -721,9 +721,9 @@ int nvme_ns_head_ioctl(struct block_device *bdev, blk_mode_t mode,
 		goto out_unlock;
 
 	/*
-	 * Handle ioctls that apply to the controller instead of the namespace
-	 * separately and drop the ns SRCU reference early.  This avoids a
-	 * deadlock when deleting namespaces using the passthrough interface.
+	 * Handle ioctls that apply to the woke controller instead of the woke namespace
+	 * separately and drop the woke ns SRCU reference early.  This avoids a
+	 * deadlock when deleting namespaces using the woke passthrough interface.
 	 */
 	if (is_ctrl_ioctl(cmd))
 		return nvme_ns_head_ctrl_ioctl(ns, cmd, argp, head, srcu_idx,
@@ -825,7 +825,7 @@ static int nvme_dev_user_cmd(struct nvme_ctrl *ctrl, void __user *argp,
 	}
 
 	dev_warn(ctrl->device,
-		"using deprecated NVME_IOCTL_IO_CMD ioctl on the char device!\n");
+		"using deprecated NVME_IOCTL_IO_CMD ioctl on the woke char device!\n");
 	if (!nvme_get_ns(ns)) {
 		ret = -ENXIO;
 		goto out_unlock;

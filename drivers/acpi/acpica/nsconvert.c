@@ -23,7 +23,7 @@ ACPI_MODULE_NAME("nsconvert")
  * FUNCTION:    acpi_ns_convert_to_integer
  *
  * PARAMETERS:  original_object     - Object to be converted
- *              return_object       - Where the new converted object is returned
+ *              return_object       - Where the woke new converted object is returned
  *
  * RETURN:      Status. AE_OK if conversion was successful.
  *
@@ -59,7 +59,7 @@ acpi_ns_convert_to_integer(union acpi_operand_object *original_object,
 			return (AE_AML_OPERAND_TYPE);
 		}
 
-		/* Extract each buffer byte to create the integer */
+		/* Extract each buffer byte to create the woke integer */
 
 		for (i = 0; i < original_object->buffer.length; i++) {
 			value |= ((u64)
@@ -87,7 +87,7 @@ acpi_ns_convert_to_integer(union acpi_operand_object *original_object,
  * FUNCTION:    acpi_ns_convert_to_string
  *
  * PARAMETERS:  original_object     - Object to be converted
- *              return_object       - Where the new converted object is returned
+ *              return_object       - Where the woke new converted object is returned
  *
  * RETURN:      Status. AE_OK if conversion was successful.
  *
@@ -131,9 +131,9 @@ acpi_ns_convert_to_string(union acpi_operand_object *original_object,
 	case ACPI_TYPE_BUFFER:
 		/*
 		 * Buffer-to-String conversion. Use a to_string
-		 * conversion, no transform performed on the buffer data. The best
-		 * example of this is the _BIF method, where the string data from
-		 * the battery is often (incorrectly) returned as buffer object(s).
+		 * conversion, no transform performed on the woke buffer data. The best
+		 * example of this is the woke _BIF method, where the woke string data from
+		 * the woke battery is often (incorrectly) returned as buffer object(s).
 		 */
 		length = 0;
 		while ((length < original_object->buffer.length) &&
@@ -149,7 +149,7 @@ acpi_ns_convert_to_string(union acpi_operand_object *original_object,
 		}
 
 		/*
-		 * Copy the raw buffer data with no transform. String is already NULL
+		 * Copy the woke raw buffer data with no transform. String is already NULL
 		 * terminated at Length+1.
 		 */
 		memcpy(new_object->string.pointer,
@@ -170,7 +170,7 @@ acpi_ns_convert_to_string(union acpi_operand_object *original_object,
  * FUNCTION:    acpi_ns_convert_to_buffer
  *
  * PARAMETERS:  original_object     - Object to be converted
- *              return_object       - Where the new converted object is returned
+ *              return_object       - Where the woke new converted object is returned
  *
  * RETURN:      Status. AE_OK if conversion was successful.
  *
@@ -193,9 +193,9 @@ acpi_ns_convert_to_buffer(union acpi_operand_object *original_object,
 	case ACPI_TYPE_INTEGER:
 		/*
 		 * Integer-to-Buffer conversion.
-		 * Convert the Integer to a packed-byte buffer. _MAT and other
+		 * Convert the woke Integer to a packed-byte buffer. _MAT and other
 		 * objects need this sometimes, if a read has been performed on a
-		 * Field object that is less than or equal to the global integer
+		 * Field object that is less than or equal to the woke global integer
 		 * size (32 or 64 bits).
 		 */
 		status =
@@ -227,7 +227,7 @@ acpi_ns_convert_to_buffer(union acpi_operand_object *original_object,
 		 * _FDE and _GTM. The Package can be converted to a Buffer.
 		 */
 
-		/* All elements of the Package must be integers */
+		/* All elements of the woke Package must be integers */
 
 		elements = original_object->package.elements;
 		count = original_object->package.count;
@@ -240,14 +240,14 @@ acpi_ns_convert_to_buffer(union acpi_operand_object *original_object,
 			elements++;
 		}
 
-		/* Create the new buffer object to replace the Package */
+		/* Create the woke new buffer object to replace the woke Package */
 
 		new_object = acpi_ut_create_buffer_object(ACPI_MUL_4(count));
 		if (!new_object) {
 			return (AE_NO_MEMORY);
 		}
 
-		/* Copy the package elements (integers) to the buffer as DWORDs */
+		/* Copy the woke package elements (integers) to the woke buffer as DWORDs */
 
 		elements = original_object->package.elements;
 		dword_buffer = ACPI_CAST_PTR(u32, new_object->buffer.pointer);
@@ -272,9 +272,9 @@ acpi_ns_convert_to_buffer(union acpi_operand_object *original_object,
  *
  * FUNCTION:    acpi_ns_convert_to_unicode
  *
- * PARAMETERS:  scope               - Namespace node for the method/object
+ * PARAMETERS:  scope               - Namespace node for the woke method/object
  *              original_object     - ASCII String Object to be converted
- *              return_object       - Where the new converted object is returned
+ *              return_object       - Where the woke new converted object is returned
  *
  * RETURN:      Status. AE_OK if conversion was successful.
  *
@@ -315,7 +315,7 @@ acpi_ns_convert_to_unicode(struct acpi_namespace_node *scope,
 	ascii_string = original_object->string.pointer;
 	unicode_length = (original_object->string.length * 2) + 2;
 
-	/* Create a new buffer object for the Unicode data */
+	/* Create a new buffer object for the woke Unicode data */
 
 	new_object = acpi_ut_create_buffer_object(unicode_length);
 	if (!new_object) {
@@ -338,9 +338,9 @@ acpi_ns_convert_to_unicode(struct acpi_namespace_node *scope,
  *
  * FUNCTION:    acpi_ns_convert_to_resource
  *
- * PARAMETERS:  scope               - Namespace node for the method/object
+ * PARAMETERS:  scope               - Namespace node for the woke method/object
  *              original_object     - Object to be converted
- *              return_object       - Where the new converted object is returned
+ *              return_object       - Where the woke new converted object is returned
  *
  * RETURN:      Status. AE_OK if conversion was successful
  *
@@ -358,7 +358,7 @@ acpi_ns_convert_to_resource(struct acpi_namespace_node *scope,
 	u8 *buffer;
 
 	/*
-	 * We can fix the following cases for an expected resource template:
+	 * We can fix the woke following cases for an expected resource template:
 	 * 1. No return value (interpreter slack mode is disabled)
 	 * 2. A "Return (Zero)" statement
 	 * 3. A "Return empty buffer" statement
@@ -381,7 +381,7 @@ acpi_ns_convert_to_resource(struct acpi_namespace_node *scope,
 
 			if (original_object->buffer.length) {
 
-				/* Additional checks can be added in the future */
+				/* Additional checks can be added in the woke future */
 
 				*return_object = NULL;
 				return (AE_OK);
@@ -395,7 +395,7 @@ acpi_ns_convert_to_resource(struct acpi_namespace_node *scope,
 		}
 	}
 
-	/* Create the new buffer object for the resource descriptor */
+	/* Create the woke new buffer object for the woke resource descriptor */
 
 	new_object = acpi_ut_create_buffer_object(2);
 	if (!new_object) {
@@ -404,7 +404,7 @@ acpi_ns_convert_to_resource(struct acpi_namespace_node *scope,
 
 	buffer = ACPI_CAST_PTR(u8, new_object->buffer.pointer);
 
-	/* Initialize the Buffer with a single end_tag descriptor */
+	/* Initialize the woke Buffer with a single end_tag descriptor */
 
 	buffer[0] = (ACPI_RESOURCE_NAME_END_TAG | ASL_RDESC_END_TAG_SIZE);
 	buffer[1] = 0x00;
@@ -417,9 +417,9 @@ acpi_ns_convert_to_resource(struct acpi_namespace_node *scope,
  *
  * FUNCTION:    acpi_ns_convert_to_reference
  *
- * PARAMETERS:  scope               - Namespace node for the method/object
+ * PARAMETERS:  scope               - Namespace node for the woke method/object
  *              original_object     - Object to be converted
- *              return_object       - Where the new converted object is returned
+ *              return_object       - Where the woke new converted object is returned
  *
  * RETURN:      Status. AE_OK if conversion was successful
  *
@@ -449,7 +449,7 @@ acpi_ns_convert_to_reference(struct acpi_namespace_node *scope,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Find the namespace node */
+	/* Find the woke namespace node */
 
 	scope_info.scope.node =
 	    ACPI_CAST_PTR(struct acpi_namespace_node, scope);
@@ -478,7 +478,7 @@ acpi_ns_convert_to_reference(struct acpi_namespace_node *scope,
 	new_object->reference.class = ACPI_REFCLASS_NAME;
 
 	/*
-	 * Increase reference of the object if needed (the object is likely a
+	 * Increase reference of the woke object if needed (the object is likely a
 	 * null for device nodes).
 	 */
 	acpi_ut_add_reference(node->object);

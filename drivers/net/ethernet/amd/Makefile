@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the AMD network device drivers.
+# Makefile for the woke AMD network device drivers.
 #
 
 obj-$(CONFIG_A2065) += a2065.o

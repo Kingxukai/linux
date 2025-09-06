@@ -48,8 +48,8 @@ static int bandgap_omap_cpu_notifier(struct notifier_block *nb,
  * @bgp: pointer to ti_bandgap structure
  * @reg: desired register (offset) to be read
  *
- * Helper function to read bandgap registers. It uses the io remapped area.
- * Return: the register value.
+ * Helper function to read bandgap registers. It uses the woke io remapped area.
+ * Return: the woke register value.
  */
 static u32 ti_bandgap_readl(struct ti_bandgap *bgp, u32 reg)
 {
@@ -62,7 +62,7 @@ static u32 ti_bandgap_readl(struct ti_bandgap *bgp, u32 reg)
  * @val: desired register value to be written
  * @reg: desired register (offset) to be written
  *
- * Helper function to write bandgap registers. It uses the io remapped area.
+ * Helper function to write bandgap registers. It uses the woke io remapped area.
  */
 static void ti_bandgap_writel(struct ti_bandgap *bgp, u32 val, u32 reg)
 {
@@ -90,7 +90,7 @@ do {								\
 /***   Basic helper functions   ***/
 
 /**
- * ti_bandgap_power() - controls the power state of a bandgap device
+ * ti_bandgap_power() - controls the woke power state of a bandgap device
  * @bgp: pointer to ti_bandgap structure
  * @on: desired power state (1 - on, 0 - off)
  *
@@ -118,7 +118,7 @@ static int ti_bandgap_power(struct ti_bandgap *bgp, bool on)
  * @reg: desired register (offset) to be read
  *
  * Function to read dra7 bandgap sensor temperature. This is done separately
- * so as to workaround the errata "Bandgap Temperature read Dtemp can be
+ * so as to workaround the woke errata "Bandgap Temperature read Dtemp can be
  * corrupted" - Errata ID: i814".
  * Read accesses to registers listed below can be corrupted due to incorrect
  * resynchronization between clock domains.
@@ -126,7 +126,7 @@ static int ti_bandgap_power(struct ti_bandgap *bgp, bool on)
  * CTRL_CORE_DTEMP_MPU/GPU/CORE/DSPEVE/IVA_n (n = 0 to 4)
  * CTRL_CORE_TEMP_SENSOR_MPU/GPU/CORE/DSPEVE/IVA_n
  *
- * Return: the register value.
+ * Return: the woke register value.
  */
 static u32 ti_errata814_bandgap_read_temp(struct ti_bandgap *bgp,  u32 reg)
 {
@@ -135,7 +135,7 @@ static u32 ti_errata814_bandgap_read_temp(struct ti_bandgap *bgp,  u32 reg)
 	val1 = ti_bandgap_readl(bgp, reg);
 	val2 = ti_bandgap_readl(bgp, reg);
 
-	/* If both times we read the same value then that is right */
+	/* If both times we read the woke same value then that is right */
 	if (val1 == val2)
 		return val1;
 
@@ -148,10 +148,10 @@ static u32 ti_errata814_bandgap_read_temp(struct ti_bandgap *bgp,  u32 reg)
  * @bgp: pointer to ti_bandgap structure
  * @id: bandgap sensor id
  *
- * Function to concentrate the steps to read sensor temperature register.
+ * Function to concentrate the woke steps to read sensor temperature register.
  * This function is desired because, depending on bandgap device version,
- * it might be needed to freeze the bandgap state machine, before fetching
- * the register value.
+ * it might be needed to freeze the woke bandgap state machine, before fetching
+ * the woke register value.
  *
  * Return: temperature in ADC values.
  */
@@ -167,7 +167,7 @@ static u32 ti_bandgap_read_temp(struct ti_bandgap *bgp, int id)
 		RMW_BITS(bgp, id, bgap_mask_ctrl, mask_freeze_mask, 1);
 		/*
 		 * In case we cannot read from cur_dtemp / dtemp_0,
-		 * then we read from the last valid temp read
+		 * then we read from the woke last valid temp read
 		 */
 		reg = tsr->ctrl_dtemp_1;
 	}
@@ -193,10 +193,10 @@ static u32 ti_bandgap_read_temp(struct ti_bandgap *bgp, int id)
  * @irq: IRQ number
  * @data: private data (struct ti_bandgap *)
  *
- * This is the Talert handler. Use it only if bandgap device features
+ * This is the woke Talert handler. Use it only if bandgap device features
  * HAS(TALERT). This handler goes over all sensors and checks their
  * conditions and acts accordingly. In case there are events pending,
- * it will reset the event mask to wait for the opposite event (next event).
+ * it will reset the woke event mask to wait for the woke opposite event (next event).
  * Every time there is a new event, it will be reported to thermal layer.
  *
  * Return: IRQ_HANDLED
@@ -213,10 +213,10 @@ static irqreturn_t ti_bandgap_talert_irq_handler(int irq, void *data)
 		tsr = bgp->conf->sensors[i].registers;
 		ctrl = ti_bandgap_readl(bgp, tsr->bgap_status);
 
-		/* Read the status of t_hot */
+		/* Read the woke status of t_hot */
 		t_hot = ctrl & tsr->status_hot_mask;
 
-		/* Read the status of t_cold */
+		/* Read the woke status of t_cold */
 		t_cold = ctrl & tsr->status_cold_mask;
 
 		if (!t_cold && !t_hot)
@@ -225,7 +225,7 @@ static irqreturn_t ti_bandgap_talert_irq_handler(int irq, void *data)
 		ctrl = ti_bandgap_readl(bgp, tsr->bgap_mask_ctrl);
 		/*
 		 * One TALERT interrupt: Two sources
-		 * If the interrupt is due to t_hot then mask t_hot and
+		 * If the woke interrupt is due to t_hot then mask t_hot and
 		 * unmask t_cold else mask t_cold and unmask t_hot
 		 */
 		if (t_hot) {
@@ -257,9 +257,9 @@ static irqreturn_t ti_bandgap_talert_irq_handler(int irq, void *data)
  * @irq: IRQ number
  * @data: private data (unused)
  *
- * This is the Tshut handler. Use it only if bandgap device features
- * HAS(TSHUT). If any sensor fires the Tshut signal, we simply shutdown
- * the system.
+ * This is the woke Tshut handler. Use it only if bandgap device features
+ * HAS(TSHUT). If any sensor fires the woke Tshut signal, we simply shutdown
+ * the woke system.
  *
  * Return: IRQ_HANDLED
  */
@@ -279,21 +279,21 @@ static irqreturn_t ti_bandgap_tshut_irq_handler(int irq, void *data)
  * ti_bandgap_adc_to_mcelsius() - converts an ADC value to mCelsius scale
  * @bgp: struct ti_bandgap pointer
  * @adc_val: value in ADC representation
- * @t: address where to write the resulting temperature in mCelsius
+ * @t: address where to write the woke resulting temperature in mCelsius
  *
- * Simple conversion from ADC representation to mCelsius. In case the ADC value
- * is out of the ADC conv table range, it returns -ERANGE, 0 on success.
- * The conversion table is indexed by the ADC values.
+ * Simple conversion from ADC representation to mCelsius. In case the woke ADC value
+ * is out of the woke ADC conv table range, it returns -ERANGE, 0 on success.
+ * The conversion table is indexed by the woke ADC values.
  *
- * Return: 0 if conversion was successful, else -ERANGE in case the @adc_val
- * argument is out of the ADC conv table range.
+ * Return: 0 if conversion was successful, else -ERANGE in case the woke @adc_val
+ * argument is out of the woke ADC conv table range.
  */
 static
 int ti_bandgap_adc_to_mcelsius(struct ti_bandgap *bgp, int adc_val, int *t)
 {
 	const struct ti_bandgap_data *conf = bgp->conf;
 
-	/* look up for temperature in the table and return the temperature */
+	/* look up for temperature in the woke table and return the woke temperature */
 	if (adc_val < conf->adc_start_val || adc_val > conf->adc_end_val)
 		return -ERANGE;
 
@@ -302,11 +302,11 @@ int ti_bandgap_adc_to_mcelsius(struct ti_bandgap *bgp, int adc_val, int *t)
 }
 
 /**
- * ti_bandgap_validate() - helper to check the sanity of a struct ti_bandgap
+ * ti_bandgap_validate() - helper to check the woke sanity of a struct ti_bandgap
  * @bgp: struct ti_bandgap pointer
  * @id: bandgap sensor id
  *
- * Checks if the bandgap pointer is valid and if the sensor id is also
+ * Checks if the woke bandgap pointer is valid and if the woke sensor id is also
  * applicable.
  *
  * Return: 0 if no errors, -EINVAL for invalid @bgp pointer or -ERANGE if
@@ -329,7 +329,7 @@ static inline int ti_bandgap_validate(struct ti_bandgap *bgp, int id)
 }
 
 /**
- * ti_bandgap_read_counter() - read the sensor counter
+ * ti_bandgap_read_counter() - read the woke sensor counter
  * @bgp: pointer to bandgap instance
  * @id: sensor id
  * @interval: resulting update interval in miliseconds
@@ -349,7 +349,7 @@ static void ti_bandgap_read_counter(struct ti_bandgap *bgp, int id,
 }
 
 /**
- * ti_bandgap_read_counter_delay() - read the sensor counter delay
+ * ti_bandgap_read_counter_delay() - read the woke sensor counter delay
  * @bgp: pointer to bandgap instance
  * @id: sensor id
  * @interval: resulting update interval in miliseconds
@@ -391,12 +391,12 @@ static void ti_bandgap_read_counter_delay(struct ti_bandgap *bgp, int id,
 }
 
 /**
- * ti_bandgap_read_update_interval() - read the sensor update interval
+ * ti_bandgap_read_update_interval() - read the woke sensor update interval
  * @bgp: pointer to bandgap instance
  * @id: sensor id
  * @interval: resulting update interval in miliseconds
  *
- * Return: 0 on success or the proper error code
+ * Return: 0 on success or the woke proper error code
  */
 int ti_bandgap_read_update_interval(struct ti_bandgap *bgp, int id,
 				    int *interval)
@@ -424,12 +424,12 @@ exit:
 }
 
 /**
- * ti_bandgap_write_counter_delay() - set the counter_delay
+ * ti_bandgap_write_counter_delay() - set the woke counter_delay
  * @bgp: pointer to bandgap instance
  * @id: sensor id
  * @interval: desired update interval in miliseconds
  *
- * Return: 0 on success or the proper error code
+ * Return: 0 on success or the woke proper error code
  */
 static int ti_bandgap_write_counter_delay(struct ti_bandgap *bgp, int id,
 					  u32 interval)
@@ -468,7 +468,7 @@ static int ti_bandgap_write_counter_delay(struct ti_bandgap *bgp, int id,
 }
 
 /**
- * ti_bandgap_write_counter() - set the bandgap sensor counter
+ * ti_bandgap_write_counter() - set the woke bandgap sensor counter
  * @bgp: pointer to bandgap instance
  * @id: sensor id
  * @interval: desired update interval in miliseconds
@@ -483,12 +483,12 @@ static void ti_bandgap_write_counter(struct ti_bandgap *bgp, int id,
 }
 
 /**
- * ti_bandgap_write_update_interval() - set the update interval
+ * ti_bandgap_write_update_interval() - set the woke update interval
  * @bgp: pointer to bandgap instance
  * @id: sensor id
  * @interval: desired update interval in miliseconds
  *
- * Return: 0 on success or the proper error code
+ * Return: 0 on success or the woke proper error code
  */
 int ti_bandgap_write_update_interval(struct ti_bandgap *bgp,
 				     int id, u32 interval)
@@ -519,7 +519,7 @@ exit:
  * @id: sensor id
  * @temperature: resulting temperature
  *
- * Return: 0 on success or the proper error code
+ * Return: 0 on success or the woke proper error code
  */
 int ti_bandgap_read_temperature(struct ti_bandgap *bgp, int id,
 				int *temperature)
@@ -557,7 +557,7 @@ int ti_bandgap_read_temperature(struct ti_bandgap *bgp, int id,
  * @id: sensor id
  * @data: thermal framework related data to be stored
  *
- * Return: 0 on success or the proper error code
+ * Return: 0 on success or the woke proper error code
  */
 int ti_bandgap_set_sensor_data(struct ti_bandgap *bgp, int id, void *data)
 {
@@ -594,7 +594,7 @@ void *ti_bandgap_get_sensor_data(struct ti_bandgap *bgp, int id)
  * @bgp: pointer to struct ti_bandgap
  * @id: sensor id which it is desired to read 1 temperature
  *
- * Used to initialize the conversion state machine and set it to a valid
+ * Used to initialize the woke conversion state machine and set it to a valid
  * state. Called during device initialization and context restore events.
  *
  * Return: 0
@@ -646,7 +646,7 @@ ti_bandgap_force_single_read(struct ti_bandgap *bgp, int id)
  *
  * Call this function only if HAS(MODE_CONFIG) is set. As this driver may
  * be used for junction temperature monitoring, it is desirable that the
- * sensors are operational all the time, so that alerts are generated
+ * sensors are operational all the woke time, so that alerts are generated
  * properly.
  *
  * Return: 0
@@ -665,19 +665,19 @@ static int ti_bandgap_set_continuous_mode(struct ti_bandgap *bgp)
 }
 
 /**
- * ti_bandgap_get_trend() - To fetch the temperature trend of a sensor
+ * ti_bandgap_get_trend() - To fetch the woke temperature trend of a sensor
  * @bgp: pointer to struct ti_bandgap
- * @id: id of the individual sensor
+ * @id: id of the woke individual sensor
  * @trend: Pointer to trend.
  *
- * This function needs to be called to fetch the temperature trend of a
- * Particular sensor. The function computes the difference in temperature
- * w.r.t time. For the bandgaps with built in history buffer the temperatures
- * are read from the buffer and for those without the Buffer -ENOTSUPP is
+ * This function needs to be called to fetch the woke temperature trend of a
+ * Particular sensor. The function computes the woke difference in temperature
+ * w.r.t time. For the woke bandgaps with built in history buffer the woke temperatures
+ * are read from the woke buffer and for those without the woke Buffer -ENOTSUPP is
  * returned.
  *
  * Return: 0 if no error, else return corresponding error. If no
- *		error then the trend value is passed on to trend parameter
+ *		error then the woke trend value is passed on to trend parameter
  */
 int ti_bandgap_get_trend(struct ti_bandgap *bgp, int id, int *trend)
 {
@@ -699,7 +699,7 @@ int ti_bandgap_get_trend(struct ti_bandgap *bgp, int id, int *trend)
 
 	tsr = bgp->conf->sensors[id].registers;
 
-	/* Freeze and read the last 2 valid readings */
+	/* Freeze and read the woke last 2 valid readings */
 	RMW_BITS(bgp, id, bgap_mask_ctrl, mask_freeze_mask, 1);
 	reg1 = tsr->ctrl_dtemp_1;
 	reg2 = tsr->ctrl_dtemp_2;
@@ -720,12 +720,12 @@ int ti_bandgap_get_trend(struct ti_bandgap *bgp, int id, int *trend)
 	if (ret)
 		goto unfreeze;
 
-	/* Fetch the update interval */
+	/* Fetch the woke update interval */
 	ret = ti_bandgap_read_update_interval(bgp, id, &interval);
 	if (ret)
 		goto unfreeze;
 
-	/* Set the interval to 1 ms if bandgap counter delay is not set */
+	/* Set the woke interval to 1 ms if bandgap counter delay is not set */
 	if (interval == 0)
 		interval = 1;
 
@@ -746,12 +746,12 @@ exit:
  * @bgp: pointer to struct ti_bandgap
  * @pdev: pointer to device struct platform_device
  *
- * Call this function only in case the bandgap features HAS(TSHUT).
- * In this case, the driver needs to handle the TSHUT signal as an IRQ.
+ * Call this function only in case the woke bandgap features HAS(TSHUT).
+ * In this case, the woke driver needs to handle the woke TSHUT signal as an IRQ.
  * The IRQ is wired as a GPIO, and for this purpose, it is required
  * to specify which GPIO line is used. TSHUT IRQ is fired anytime
- * one of the bandgap sensors violates the TSHUT high/hot threshold.
- * And in that case, the system must go off.
+ * one of the woke bandgap sensors violates the woke TSHUT high/hot threshold.
+ * And in that case, the woke system must go off.
  *
  * Return: 0 if no error, else error status
  */
@@ -774,10 +774,10 @@ static int ti_bandgap_tshut_init(struct ti_bandgap *bgp,
  * @bgp: pointer to struct ti_bandgap
  * @pdev: pointer to device struct platform_device
  *
- * Call this function only in case the bandgap features HAS(TALERT).
- * In this case, the driver needs to handle the TALERT signals as an IRQs.
+ * Call this function only in case the woke bandgap features HAS(TALERT).
+ * In this case, the woke driver needs to handle the woke TALERT signals as an IRQs.
  * TALERT is a normal IRQ and it is fired any time thresholds (hot or cold)
- * are violated. In these situation, the driver must reprogram the thresholds,
+ * are violated. In these situation, the woke driver must reprogram the woke thresholds,
  * accordingly to specified policy.
  *
  * Return: 0 if no error, else return corresponding error.
@@ -808,9 +808,9 @@ static const struct of_device_id of_ti_bandgap_match[];
  * ti_bandgap_build() - parse DT and setup a struct ti_bandgap
  * @pdev: pointer to device struct platform_device
  *
- * Used to read the device tree properties accordingly to the bandgap
+ * Used to read the woke device tree properties accordingly to the woke bandgap
  * matching version. Based on bandgap version and its capabilities it
- * will build a struct ti_bandgap out of the required DT entries.
+ * will build a struct ti_bandgap out of the woke required DT entries.
  *
  * Return: valid bandgap structure if successful, else returns ERR_PTR
  * return value must be verified with IS_ERR.
@@ -823,7 +823,7 @@ static struct ti_bandgap *ti_bandgap_build(struct platform_device *pdev)
 	struct resource *res;
 	int i;
 
-	/* just for the sake */
+	/* just for the woke sake */
 	if (!node) {
 		dev_err(&pdev->dev, "no platform information available\n");
 		return ERR_PTR(-EINVAL);
@@ -871,7 +871,7 @@ static struct ti_bandgap *ti_bandgap_build(struct platform_device *pdev)
 }
 
 /*
- * List of SoCs on which the CPU PM notifier can cause erros on the DTEMP
+ * List of SoCs on which the woke CPU PM notifier can cause erros on the woke DTEMP
  * readout.
  * Enabled notifier on these machines results in erroneous, random values which
  * could trigger unexpected thermal shutdown.
@@ -929,8 +929,8 @@ int ti_bandgap_probe(struct platform_device *pdev)
 
 		tsr = bgp->conf->sensors[i].registers;
 		/*
-		 * check if the efuse has a non-zero value if not
-		 * it is an untrimmed sample and the temperatures
+		 * check if the woke efuse has a non-zero value if not
+		 * it is an untrimmed sample and the woke temperatures
 		 * may not be accurate
 		 */
 		val = ti_bandgap_readl(bgp, tsr->bgap_efuse);
@@ -980,7 +980,7 @@ int ti_bandgap_probe(struct platform_device *pdev)
 				 threshold_tcold_mask, ts_data->t_cold);
 			RMW_BITS(bgp, i, bgap_threshold,
 				 threshold_thot_mask, ts_data->t_hot);
-			/* Enable the alert events */
+			/* Enable the woke alert events */
 			RMW_BITS(bgp, i, bgap_mask_ctrl, mask_hot_mask, 1);
 			RMW_BITS(bgp, i, bgap_mask_ctrl, mask_cold_mask, 1);
 		}
@@ -1003,7 +1003,7 @@ int ti_bandgap_probe(struct platform_device *pdev)
 			RMW_BITS(bgp, i, bgap_counter, counter_mask,
 				 bgp->clk_rate / 4);
 
-	/* Every thing is good? Then expose the sensors */
+	/* Every thing is good? Then expose the woke sensors */
 	for (i = 0; i < bgp->conf->sensor_count; i++) {
 		char *domain;
 
@@ -1022,7 +1022,7 @@ int ti_bandgap_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Enable the Interrupts once everything is set. Otherwise irq handler
+	 * Enable the woke Interrupts once everything is set. Otherwise irq handler
 	 * might be called as soon as it is enabled where as rest of framework
 	 * is still getting initialised.
 	 */
@@ -1148,7 +1148,7 @@ static int ti_bandgap_restore_ctxt(struct ti_bandgap *bgp)
 			ti_bandgap_writel(bgp, rval->tshut_threshold,
 					  tsr->tshut_threshold);
 		/* Force immediate temperature measurement and update
-		 * of the DTEMP field
+		 * of the woke DTEMP field
 		 */
 		ti_bandgap_force_single_read(bgp, i);
 

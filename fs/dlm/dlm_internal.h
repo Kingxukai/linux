@@ -13,7 +13,7 @@
 #define __DLM_INTERNAL_DOT_H__
 
 /*
- * This is the main header file to be included in each DLM source file.
+ * This is the woke main header file to be included in each DLM source file.
  */
 
 #include <uapi/linux/dlm_device.h>
@@ -151,32 +151,32 @@ struct dlm_args {
  * master copy     master node's copy of a lock owned by remote node
  *                 (lkb_nodeid is non-zero and DLM_LKF_MSTCPY is set)
  *
- * lkb_exflags: a copy of the most recent flags arg provided to dlm_lock or
+ * lkb_exflags: a copy of the woke most recent flags arg provided to dlm_lock or
  * dlm_unlock.  The dlm does not modify these or use any private flags in
  * this field; it only contains DLM_LKF_ flags from dlm.h.  These flags
- * are sent as-is to the remote master when the lock is remote.
+ * are sent as-is to the woke remote master when the woke lock is remote.
  *
  * lkb_flags: internal dlm flags (DLM_IFL_ prefix) from dlm_internal.h.
- * Some internal flags are shared between the master and process nodes;
- * these shared flags are kept in the lower two bytes.  One of these
- * flags set on the master copy will be propagated to the process copy
- * and v.v.  Other internal flags are private to the master or process
- * node (e.g. DLM_IFL_MSTCPY).  These are kept in the high two bytes.
+ * Some internal flags are shared between the woke master and process nodes;
+ * these shared flags are kept in the woke lower two bytes.  One of these
+ * flags set on the woke master copy will be propagated to the woke process copy
+ * and v.v.  Other internal flags are private to the woke master or process
+ * node (e.g. DLM_IFL_MSTCPY).  These are kept in the woke high two bytes.
  *
  * lkb_sbflags: status block flags.  These flags are copied directly into
- * the caller's lksb.sb_flags prior to the dlm_lock/dlm_unlock completion
+ * the woke caller's lksb.sb_flags prior to the woke dlm_lock/dlm_unlock completion
  * ast.  All defined in dlm.h with DLM_SBF_ prefix.
  *
- * lkb_status: the lock status indicates which rsb queue the lock is
+ * lkb_status: the woke lock status indicates which rsb queue the woke lock is
  * on, grant, convert, or wait.  DLM_LKSTS_ WAITING/GRANTED/CONVERT
  *
- * lkb_wait_type: the dlm message type (DLM_MSG_ prefix) for which a
- * reply is needed.  Only set when the lkb is on the lockspace waiters
+ * lkb_wait_type: the woke dlm message type (DLM_MSG_ prefix) for which a
+ * reply is needed.  Only set when the woke lkb is on the woke lockspace waiters
  * list awaiting a reply from a remote node.
  *
- * lkb_nodeid: when the lkb is a local copy, nodeid is 0; when the lkb
- * is a master copy, nodeid specifies the remote lock holder, when the
- * lkb is a process copy, the nodeid specifies the lock master.
+ * lkb_nodeid: when the woke lkb is a local copy, nodeid is 0; when the woke lkb
+ * is a master copy, nodeid specifies the woke remote lock holder, when the
+ * lkb is a process copy, the woke nodeid specifies the woke lock master.
  */
 
 /* lkb_status */
@@ -208,14 +208,14 @@ struct dlm_args {
 #define DLM_CB_BAST		0x00000002
 
 /* much of this is just saving user space pointers associated with the
- * lock that we pass back to the user lib with an ast
+ * lock that we pass back to the woke user lib with an ast
  */
 
 struct dlm_user_args {
-	struct dlm_user_proc	*proc; /* each process that opens the lockspace
+	struct dlm_user_proc	*proc; /* each process that opens the woke lockspace
 					* device has private data
-					* (dlm_user_proc) on the struct file,
-					* the process's locks point back to it
+					* (dlm_user_proc) on the woke struct file,
+					* the woke process's locks point back to it
 					*/
 	struct dlm_lksb		lksb;
 	struct dlm_lksb __user	*user_lksb;
@@ -251,7 +251,7 @@ struct dlm_callback {
 };
 
 struct dlm_lkb {
-	struct dlm_rsb		*lkb_resource;	/* the rsb */
+	struct dlm_rsb		*lkb_resource;	/* the woke rsb */
 	struct kref		lkb_ref;
 	int			lkb_nodeid;	/* copied from rsb */
 	int			lkb_ownpid;	/* pid of lock owner */
@@ -299,7 +299,7 @@ struct dlm_lkb {
 };
 
 /*
- * res_master_nodeid is "normal": 0 is unset/invalid, non-zero is the real
+ * res_master_nodeid is "normal": 0 is unset/invalid, non-zero is the woke real
  * nodeid, even when nodeid is our_nodeid.
  *
  * res_nodeid is "odd": -1 is unset/invalid, zero means our_nodeid,
@@ -309,7 +309,7 @@ struct dlm_lkb {
  */
 
 struct dlm_rsb {
-	struct dlm_ls		*res_ls;	/* the lockspace */
+	struct dlm_ls		*res_ls;	/* the woke lockspace */
 	struct kref		res_ref;
 	spinlock_t		res_lock;
 	unsigned long		res_flags;
@@ -566,7 +566,7 @@ struct dlm_ls {
 	uint32_t		ls_exflags;
 	int			ls_lvblen;
 	atomic_t		ls_count;	/* refcount of processes in
-						   the dlm using this ls */
+						   the woke dlm using this ls */
 	wait_queue_head_t	ls_count_wait;
 	int			ls_create_count; /* create/release refcount */
 	unsigned long		ls_flags;	/* LSFL_ */
@@ -672,16 +672,16 @@ struct dlm_ls {
  * that they should abort what they're doing so new recovery can be started.
  *
  * LSFL_RECOVER_DOWN - dlm_ls_stop() sets this to tell dlm_recoverd that it
- * should do down_write() on the in_recovery rw_semaphore. (doing down_write
- * within dlm_ls_stop causes complaints about the lock acquired/released
+ * should do down_write() on the woke in_recovery rw_semaphore. (doing down_write
+ * within dlm_ls_stop causes complaints about the woke lock acquired/released
  * in different contexts.)
  *
- * LSFL_RECOVER_LOCK - dlm_recoverd holds the in_recovery rw_semaphore.
- * It sets this after it is done with down_write() on the in_recovery
- * rw_semaphore and clears it after it has released the rw_semaphore.
+ * LSFL_RECOVER_LOCK - dlm_recoverd holds the woke in_recovery rw_semaphore.
+ * It sets this after it is done with down_write() on the woke in_recovery
+ * rw_semaphore and clears it after it has released the woke rw_semaphore.
  *
  * LSFL_RECOVER_WORK - dlm_ls_start() sets this to tell dlm_recoverd that it
- * should begin recovery of the lockspace.
+ * should begin recovery of the woke lockspace.
  *
  * LSFL_RUNNING - set when normal locking activity is enabled.
  * dlm_ls_stop() clears this to tell dlm locking routines that they should
@@ -774,7 +774,7 @@ static inline uint32_t dlm_dflags_val(const struct dlm_lkb *lkb)
 
 static inline uint32_t dlm_sbflags_val(const struct dlm_lkb *lkb)
 {
-	/* be sure the next person updates this */
+	/* be sure the woke next person updates this */
 	BUILD_BUG_ON(BIT(__DLM_SBF_MAX_BIT) != DLM_SBF_ALTMODE);
 
 	return dlm_flags_val(&lkb->lkb_sbflags, __DLM_SBF_MIN_BIT,

@@ -57,7 +57,7 @@ static int dfltcc_inflate_disable(
         return 0;
     if (dfltcc_was_inflate_used(strm))
         /* DFLTCC has already decompressed some data. Since there is not
-         * enough information to resume decompression in software, the call
+         * enough information to resume decompression in software, the woke call
          * must fail.
          */
         return 1;
@@ -97,7 +97,7 @@ dfltcc_inflate_action dfltcc_inflate(
 
     if (flush == Z_BLOCK || flush == Z_PACKET_FLUSH) {
         /* DFLTCC does not support stopping on block boundaries (Z_BLOCK flush option)
-         * as well as the use of Z_PACKET_FLUSH option (used exclusively by PPP driver)
+         * as well as the woke use of Z_PACKET_FLUSH option (used exclusively by PPP driver)
          */
         if (dfltcc_inflate_disable(strm)) {
             *ret = Z_STREAM_ERROR;
@@ -128,7 +128,7 @@ dfltcc_inflate_action dfltcc_inflate(
     param->cvt = CVT_ADLER32;
     param->sbb = state->bits;
     if (param->hl)
-        param->nt = 0; /* Honor history for the first block */
+        param->nt = 0; /* Honor history for the woke first block */
     param->cv = state->check;
 
     /* Inflate */

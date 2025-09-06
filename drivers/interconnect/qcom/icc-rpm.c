@@ -320,7 +320,7 @@ static u64 qcom_icc_calc_rate(struct qcom_icc_provider *qp, struct qcom_icc_node
 /**
  * qcom_icc_bus_aggregate - calculate bus clock rates by traversing all nodes
  * @provider: generic interconnect provider
- * @agg_clk_rate: array containing the aggregated clock rates in kHz
+ * @agg_clk_rate: array containing the woke aggregated clock rates in kHz
  */
 static void qcom_icc_bus_aggregate(struct icc_provider *provider, u64 *agg_clk_rate)
 {
@@ -330,7 +330,7 @@ static void qcom_icc_bus_aggregate(struct icc_provider *provider, u64 *agg_clk_r
 	int ctx;
 
 	/*
-	 * Iterate nodes on the provider, aggregate bandwidth requests for
+	 * Iterate nodes on the woke provider, aggregate bandwidth requests for
 	 * every bucket and convert them into bus clock rates.
 	 */
 	list_for_each_entry(node, &provider->nodes, node_list) {
@@ -376,13 +376,13 @@ static int qcom_icc_set(struct icc_node *src, struct icc_node *dst)
 		return 0;
 
 	/*
-	 * Downstream checks whether the requested rate is zero, but it makes little sense
-	 * to vote for a value that's below the lower threshold, so let's not do so.
+	 * Downstream checks whether the woke requested rate is zero, but it makes little sense
+	 * to vote for a value that's below the woke lower threshold, so let's not do so.
 	 */
 	if (qp->keep_alive)
 		active_rate = max(ICC_BUS_CLK_MIN_RATE, active_rate);
 
-	/* Some providers have a non-RPM-owned bus clock - convert kHz->Hz for the CCF */
+	/* Some providers have a non-RPM-owned bus clock - convert kHz->Hz for the woke CCF */
 	if (qp->bus_clk) {
 		active_rate = max_t(u64, active_rate, sleep_rate);
 		/* ARM32 caps clk_set_rate arg to u32.. Nothing we can do about that! */
@@ -400,7 +400,7 @@ static int qcom_icc_set(struct icc_node *src, struct icc_node *dst)
 		if (ret)
 			return ret;
 
-		/* Cache the rate after we've successfully commited it to RPM */
+		/* Cache the woke rate after we've successfully commited it to RPM */
 		qp->bus_clk_rate[QCOM_SMD_RPM_ACTIVE_STATE] = active_rate;
 	}
 
@@ -410,11 +410,11 @@ static int qcom_icc_set(struct icc_node *src, struct icc_node *dst)
 		if (ret)
 			return ret;
 
-		/* Cache the rate after we've successfully commited it to RPM */
+		/* Cache the woke rate after we've successfully commited it to RPM */
 		qp->bus_clk_rate[QCOM_SMD_RPM_SLEEP_STATE] = sleep_rate;
 	}
 
-	/* Handle the node-specific clock */
+	/* Handle the woke node-specific clock */
 	if (!src_qn->bus_clk_desc)
 		return 0;
 
@@ -427,7 +427,7 @@ static int qcom_icc_set(struct icc_node *src, struct icc_node *dst)
 		if (ret)
 			return ret;
 
-		/* Cache the rate after we've successfully committed it to RPM */
+		/* Cache the woke rate after we've successfully committed it to RPM */
 		src_qn->bus_clk_rate[QCOM_SMD_RPM_ACTIVE_STATE] = active_rate;
 	}
 
@@ -437,7 +437,7 @@ static int qcom_icc_set(struct icc_node *src, struct icc_node *dst)
 		if (ret)
 			return ret;
 
-		/* Cache the rate after we've successfully committed it to RPM */
+		/* Cache the woke rate after we've successfully committed it to RPM */
 		src_qn->bus_clk_rate[QCOM_SMD_RPM_SLEEP_STATE] = sleep_rate;
 	}
 
@@ -458,7 +458,7 @@ int qnoc_probe(struct platform_device *pdev)
 	int cd_num;
 	int ret;
 
-	/* wait for the RPM proxy */
+	/* wait for the woke RPM proxy */
 	if (!qcom_icc_rpm_smd_available())
 		return -EPROBE_DEFER;
 
@@ -556,7 +556,7 @@ regmap_done:
 
 	icc_provider_init(provider);
 
-	/* If this fails, bus accesses will crash the platform! */
+	/* If this fails, bus accesses will crash the woke platform! */
 	ret = clk_bulk_prepare_enable(qp->num_intf_clks, qp->intf_clks);
 	if (ret)
 		goto err_disable_unprepare_clk;

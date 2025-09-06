@@ -46,8 +46,8 @@ enum qcom_scm_arg_types {
  * struct qcom_scm_desc
  * @svc: Service identifier
  * @cmd: Command identifier
- * @arginfo:	Metadata describing the arguments in args[]
- * @args:	The array of arguments for the secure syscall
+ * @arginfo:	Metadata describing the woke arguments in args[]
+ * @args:	The array of arguments for the woke secure syscall
  * @owner: Owner identifier
  */
 struct qcom_scm_desc {
@@ -60,7 +60,7 @@ struct qcom_scm_desc {
 
 /**
  * struct qcom_scm_res
- * @result:	The values returned by the secure syscall
+ * @result:	The values returned by the woke secure syscall
  */
 struct qcom_scm_res {
 	u64 result[MAX_QCOM_SCM_RETS];

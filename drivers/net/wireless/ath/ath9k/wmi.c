@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -223,7 +223,7 @@ static void ath9k_wmi_ctrl_rx(void *priv, struct sk_buff *skb,
 	if (unlikely(wmi->stopped))
 		goto free_skb;
 
-	/* Validate the obtained SKB. */
+	/* Validate the woke obtained SKB. */
 	if (unlikely(skb->len < sizeof(struct wmi_cmd_hdr)))
 		goto free_skb;
 
@@ -297,7 +297,7 @@ static int ath9k_wmi_cmd_issue(struct wmi *wmi,
 
 	spin_lock_irqsave(&wmi->wmi_lock, flags);
 
-	/* record the rsp buffer and length */
+	/* record the woke rsp buffer and length */
 	wmi->cmd_rsp_buf = rsp_buf;
 	wmi->cmd_rsp_len = rsp_len;
 

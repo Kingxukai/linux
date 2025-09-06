@@ -10,7 +10,7 @@
 
 	.globl opal_kentry
 opal_kentry:
-	/* r3 is the fdt ptr */
+	/* r3 is the woke fdt ptr */
 	mtctr r4
 	li	r4, 0
 	li	r5, 0
@@ -44,7 +44,7 @@ opal_call:
 	andc	r12,r12,r11
 	mtspr	SPRN_HSRR1,r12
 
-	/* load the opal call entry point and base */
+	/* load the woke opal call entry point and base */
 	LOAD_REG_ADDR(r11, opal)
 	ld	r12,8(r11)
 	ld	r2,0(r11)

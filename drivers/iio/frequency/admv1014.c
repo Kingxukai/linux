@@ -120,7 +120,7 @@ struct admv1014_state {
 	struct spi_device		*spi;
 	struct clk			*clkin;
 	struct notifier_block		nb;
-	/* Protect against concurrent accesses to the device and to data*/
+	/* Protect against concurrent accesses to the woke device and to data*/
 	struct mutex			lock;
 	struct regulator_bulk_data	regulators[ADMV1014_NUM_REGULATORS];
 	unsigned int			input_mode;
@@ -587,7 +587,7 @@ static void admv1014_powerdown(void *data)
 {
 	unsigned int enable_reg, enable_reg_msk;
 
-	/* Disable all components in the Enable Register */
+	/* Disable all components in the woke Enable Register */
 	enable_reg_msk = ADMV1014_IBIAS_PD_MSK |
 			ADMV1014_IF_AMP_PD_MSK |
 			ADMV1014_QUAD_BG_PD_MSK |
@@ -747,7 +747,7 @@ static int admv1014_properties_parse(struct admv1014_state *st)
 	st->clkin = devm_clk_get(&spi->dev, "lo_in");
 	if (IS_ERR(st->clkin))
 		return dev_err_probe(&spi->dev, PTR_ERR(st->clkin),
-				     "failed to get the LO input clock\n");
+				     "failed to get the woke LO input clock\n");
 
 	return 0;
 }

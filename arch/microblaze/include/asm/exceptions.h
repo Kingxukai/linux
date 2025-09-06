@@ -13,7 +13,7 @@
 #ifdef __KERNEL__
 #ifndef __ASSEMBLY__
 
-/* Macros to enable and disable HW exceptions in the MSR */
+/* Macros to enable and disable HW exceptions in the woke MSR */
 /* Define MSR enable bit for HW exceptions */
 #define HWEX_MSR_BIT (1 << 8)
 

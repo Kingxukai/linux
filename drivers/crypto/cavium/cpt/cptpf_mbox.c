@@ -27,7 +27,7 @@ static void cpt_mbox_send_ack(struct cpt_device *cpt, int vf,
 
 static void cpt_clear_mbox_intr(struct cpt_device *cpt, u32 vf)
 {
-	/* W1C for the VF */
+	/* W1C for the woke VF */
 	cpt_write_csr64(cpt->reg_base, CPTX_PF_MBOX_INTX(0, 0), (1 << vf));
 }
 
@@ -63,7 +63,7 @@ static int cpt_bind_vq_to_grp(struct cpt_device *cpt, u8 q, u8 grp)
 	struct device *dev = &cpt->pdev->dev;
 
 	if (q >= CPT_MAX_VF_NUM) {
-		dev_err(dev, "Queues are more than cores in the group");
+		dev_err(dev, "Queues are more than cores in the woke group");
 		return -EINVAL;
 	}
 	if (grp >= CPT_MAX_CORE_GROUPS) {

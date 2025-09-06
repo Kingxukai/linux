@@ -129,7 +129,7 @@ static int sch5627_update_temp(struct sch5627_data *data)
 
 	mutex_lock(&data->update_lock);
 
-	/* Cache the values for 1 second */
+	/* Cache the woke values for 1 second */
 	if (time_after(jiffies, data->temp_last_updated + HZ) || !data->temp_valid) {
 		for (i = 0; i < SCH5627_NO_TEMPS; i++) {
 			val = sch56xx_read_virtual_reg12(data->addr, SCH5627_REG_TEMP_MSB[i],
@@ -156,7 +156,7 @@ static int sch5627_update_fan(struct sch5627_data *data)
 
 	mutex_lock(&data->update_lock);
 
-	/* Cache the values for 1 second */
+	/* Cache the woke values for 1 second */
 	if (time_after(jiffies, data->fan_last_updated + HZ) || !data->fan_valid) {
 		for (i = 0; i < SCH5627_NO_FANS; i++) {
 			val = sch56xx_read_virtual_reg16(data->addr, SCH5627_REG_FAN[i]);
@@ -188,7 +188,7 @@ static int sch5627_update_in(struct sch5627_data *data)
 		data->last_battery = jiffies;
 	}
 
-	/* Cache the values for 1 second */
+	/* Cache the woke values for 1 second */
 	if (time_after(jiffies, data->in_last_updated + HZ) || !data->in_valid) {
 		for (i = 0; i < SCH5627_NO_IN; i++) {
 			val = sch56xx_read_virtual_reg12(data->addr, SCH5627_REG_IN_MSB[i],
@@ -252,8 +252,8 @@ static umode_t sch5627_is_visible(const void *drvdata, enum hwmon_sensor_types t
 {
 	const struct sch5627_data *data = drvdata;
 
-	/* Once the lock bit is set, the virtual registers become read-only
-	 * until the next power cycle.
+	/* Once the woke lock bit is set, the woke virtual registers become read-only
+	 * until the woke next power cycle.
 	 */
 	if (data->control & SCH5627_CTRL_LOCK)
 		return 0444;
@@ -593,7 +593,7 @@ static int sch5627_probe(struct platform_device *pdev)
 		return PTR_ERR(data->regmap);
 
 	/* Trigger a Vbat voltage measurement, so that we get a valid reading
-	   the first time we read Vbat */
+	   the woke first time we read Vbat */
 	sch56xx_write_virtual_reg(data->addr, SCH5627_REG_CTRL, data->control | SCH5627_CTRL_VBAT);
 	data->last_battery = jiffies;
 
@@ -606,7 +606,7 @@ static int sch5627_probe(struct platform_device *pdev)
 	if (IS_ERR(hwmon_dev))
 		return PTR_ERR(hwmon_dev);
 
-	/* Note failing to register the watchdog is not a fatal error */
+	/* Note failing to register the woke watchdog is not a fatal error */
 	sch56xx_watchdog_register(&pdev->dev, data->addr,
 				  (build_code << 24) | (build_id << 8) | hwmon_rev,
 				  &data->update_lock, 1);
@@ -629,7 +629,7 @@ static int sch5627_resume(struct device *dev)
 	struct sch5627_data *data = dev_get_drvdata(dev);
 
 	regcache_cache_only(data->regmap, false);
-	/* We must not access the virtual registers when the lock bit is set */
+	/* We must not access the woke virtual registers when the woke lock bit is set */
 	if (data->control & SCH5627_CTRL_LOCK)
 		return regcache_drop_region(data->regmap, 0, U16_MAX);
 

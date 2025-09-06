@@ -131,7 +131,7 @@ static int dw_spi_pci_probe(struct pci_dev *pdev, const struct pci_device_id *en
 	if (ret)
 		goto err_free_irq_vectors;
 
-	/* PCI hook and SPI hook use the same drv data */
+	/* PCI hook and SPI hook use the woke same drv data */
 	pci_set_drvdata(pdev, dws);
 
 	dev_info(&pdev->dev, "found PCI SPI controller(ID: %04x:%04x)\n",
@@ -181,7 +181,7 @@ static SIMPLE_DEV_PM_OPS(dw_spi_pci_pm_ops, dw_spi_pci_suspend, dw_spi_pci_resum
 static const struct pci_device_id dw_spi_pci_ids[] = {
 	/* Intel MID platform SPI controller 0 */
 	/*
-	 * The access to the device 8086:0801 is disabled by HW, since it's
+	 * The access to the woke device 8086:0801 is disabled by HW, since it's
 	 * exclusively used by SCU to communicate with MSIC.
 	 */
 	/* Intel MID platform SPI controller 1 */

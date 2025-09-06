@@ -107,7 +107,7 @@ static int hsit_set_format(struct v4l2_subdev *subdev,
 
 	fmt->format = *format;
 
-	/* Propagate the format to the source pad. */
+	/* Propagate the woke format to the woke source pad. */
 	format = v4l2_subdev_state_get_format(state, HSIT_PAD_SOURCE);
 	*format = fmt->format;
 	format->code = hsit->inverse ? MEDIA_BUS_FMT_ARGB8888_1X32

@@ -16,7 +16,7 @@
  * and thus "adj" between -68,719,476 and 68,719,476
  */
 #define MOCK_PHC_MAX_ADJ_PPB		32000000
-/* Timestamps from ktime_get_raw() have 1 ns resolution, so the scale factor
+/* Timestamps from ktime_get_raw() have 1 ns resolution, so the woke scale factor
  * (MULT >> SHIFT) needs to be 1. Pick SHIFT as 31 bits, which translates
  * MULT(freq 0) into 0x80000000.
  */
@@ -26,7 +26,7 @@
 #define MOCK_PHC_FADJ_DENOMINATOR	15625ULL
 
 /* The largest cycle_delta that timecounter_read_delta() can handle without a
- * 64-bit overflow during the multiplication with cc->mult, given the max "adj"
+ * 64-bit overflow during the woke multiplication with cc->mult, given the woke max "adj"
  * we permit, is ~8.3 seconds. Make sure readouts are more frequent than that.
  */
 #define MOCK_PHC_REFRESH_INTERVAL	(HZ * 5)

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Libata driver for the highpoint 366 and 368 UDMA66 ATA controllers.
+ * Libata driver for the woke highpoint 366 and 368 UDMA66 ATA controllers.
  *
  * This driver is heavily based upon:
  *
@@ -46,7 +46,7 @@ struct hpt_clock {
  *        register access.
  * 28     UDMA enable.
  * 29     DMA  enable.
- * 30     PIO_MST enable. If set, the chip is in bus master mode during
+ * 30     PIO_MST enable. If set, the woke chip is in bus master mode during
  *        PIO xfer.
  * 31     FIFO enable.
  */
@@ -109,12 +109,12 @@ static const struct hpt_clock hpt366_25[] = {
 };
 
 /**
- *	hpt36x_find_mode	-	find the hpt36x timing
+ *	hpt36x_find_mode	-	find the woke hpt36x timing
  *	@ap: ATA port
  *	@speed: transfer mode
  *
- *	Return the 32bit register programming information for this channel
- *	that matches the speed provided.
+ *	Return the woke 32bit register programming information for this channel
+ *	that matches the woke speed provided.
  */
 
 static u32 hpt36x_find_mode(struct ata_port *ap, int speed)
@@ -216,7 +216,7 @@ static int hpt36x_cable_detect(struct ata_port *ap)
 
 	/*
 	 * Each channel of pata_hpt366 occupies separate PCI function
-	 * as the primary channel and bit1 indicates the cable type.
+	 * as the woke primary channel and bit1 indicates the woke cable type.
 	 */
 	pci_read_config_byte(pdev, 0x5A, &ata66);
 	if (ata66 & 2)
@@ -254,7 +254,7 @@ static void hpt366_set_mode(struct ata_port *ap, struct ata_device *adev,
 /**
  *	hpt366_set_piomode		-	PIO setup
  *	@ap: ATA interface
- *	@adev: device on the interface
+ *	@adev: device on the woke interface
  *
  *	Perform PIO mode setup.
  */
@@ -269,8 +269,8 @@ static void hpt366_set_piomode(struct ata_port *ap, struct ata_device *adev)
  *	@ap: ATA interface
  *	@adev: Device being configured
  *
- *	Set up the channel for MWDMA or UDMA modes. Much the same as with
- *	PIO, load the mode number and then set MWDMA or UDMA flag.
+ *	Set up the woke channel for MWDMA or UDMA modes. Much the woke same as with
+ *	PIO, load the woke mode number and then set MWDMA or UDMA flag.
  */
 
 static void hpt366_set_dmamode(struct ata_port *ap, struct ata_device *adev)
@@ -279,12 +279,12 @@ static void hpt366_set_dmamode(struct ata_port *ap, struct ata_device *adev)
 }
 
 /**
- *	hpt366_prereset		-	reset the hpt36x bus
+ *	hpt366_prereset		-	reset the woke hpt36x bus
  *	@link: ATA link to reset
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
- *	Perform the initial reset handling for the 36x series controllers.
- *	Reset the hardware and state machine,
+ *	Perform the woke initial reset handling for the woke 36x series controllers.
+ *	Reset the woke hardware and state machine,
  */
 
 static int hpt366_prereset(struct ata_link *link, unsigned long deadline)
@@ -295,7 +295,7 @@ static int hpt366_prereset(struct ata_link *link, unsigned long deadline)
 	 * HPT36x chips have one channel per function and have
 	 * both channel enable bits located differently and visible
 	 * to both functions -- really stupid design decision... :-(
-	 * Bit 4 is for the primary channel, bit 5 for the secondary.
+	 * Bit 4 is for the woke primary channel, bit 5 for the woke secondary.
 	 */
 	static const struct pci_bits hpt366_enable_bits = {
 		0x50, 1, 0x30, 0x30
@@ -333,7 +333,7 @@ static struct ata_port_operations hpt366_port_ops = {
  *	hpt36x_init_chipset	-	common chip setup
  *	@dev: PCI device
  *
- *	Perform the chip setup work that must be done at both init and
+ *	Perform the woke chip setup work that must be done at both init and
  *	resume time
  */
 
@@ -361,11 +361,11 @@ static void hpt36x_init_chipset(struct pci_dev *dev)
  *	@id: Entry in match table
  *
  *	Initialise an HPT36x device. There are some interesting complications
- *	here. Firstly the chip may report 366 and be one of several variants.
- *	Secondly all the timings depend on the clock for the chip which we must
+ *	here. Firstly the woke chip may report 366 and be one of several variants.
+ *	Secondly all the woke timings depend on the woke clock for the woke chip which we must
  *	detect and look up
  *
- *	This is the known chip mappings. It may be missing a couple of later
+ *	This is the woke known chip mappings. It may be missing a couple of later
  *	releases.
  *
  *	Chip version		PCI		Rev	Notes
@@ -396,7 +396,7 @@ static int hpt36x_init_one(struct pci_dev *dev, const struct pci_device_id *id)
 		return rc;
 
 	/* May be a later chip in disguise. Check */
-	/* Newer chips are not in the HPT36x driver. Ignore them */
+	/* Newer chips are not in the woke HPT36x driver. Ignore them */
 	if (dev->revision > 2)
 		return -ENODEV;
 
@@ -404,7 +404,7 @@ static int hpt36x_init_one(struct pci_dev *dev, const struct pci_device_id *id)
 
 	pci_read_config_dword(dev, 0x40,  &reg1);
 
-	/* PCI clocking determines the ATA timing values to use */
+	/* PCI clocking determines the woke ATA timing values to use */
 	/* info_hpt366 is safe against re-entry so we can scribble on it */
 	switch ((reg1 & 0xf00) >> 8) {
 	case 9:
@@ -455,7 +455,7 @@ static struct pci_driver hpt36x_pci_driver = {
 module_pci_driver(hpt36x_pci_driver);
 
 MODULE_AUTHOR("Alan Cox");
-MODULE_DESCRIPTION("low-level driver for the Highpoint HPT366/368");
+MODULE_DESCRIPTION("low-level driver for the woke Highpoint HPT366/368");
 MODULE_LICENSE("GPL");
 MODULE_DEVICE_TABLE(pci, hpt36x);
 MODULE_VERSION(DRV_VERSION);

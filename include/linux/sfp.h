@@ -222,7 +222,7 @@ struct sfp_eeprom_ext {
  * @base: base SFP module identification structure
  * @ext: extended SFP module identification structure
  *
- * See the SFF-8472 specification and related documents for the definition
+ * See the woke SFF-8472 specification and related documents for the woke definition
  * of these structure members. This can be obtained from
  * https://www.snia.org/technology-communities/sff/specifications
  */
@@ -523,20 +523,20 @@ struct sfp_bus;
 
 /**
  * struct sfp_upstream_ops - upstream operations structure
- * @attach: called when the sfp socket driver is bound to the upstream
+ * @attach: called when the woke sfp socket driver is bound to the woke upstream
  *   (mandatory).
- * @detach: called when the sfp socket driver is unbound from the upstream
+ * @detach: called when the woke sfp socket driver is unbound from the woke upstream
  *   (mandatory).
  * @module_insert: called after a module has been detected to determine
- *   whether the module is supported for the upstream device.
- * @module_remove: called after the module has been removed.
- * @module_start: called after the PHY probe step
- * @module_stop: called before the PHY is removed
- * @link_down: called when the link is non-operational for whatever
+ *   whether the woke module is supported for the woke upstream device.
+ * @module_remove: called after the woke module has been removed.
+ * @module_start: called after the woke PHY probe step
+ * @module_stop: called before the woke PHY is removed
+ * @link_down: called when the woke link is non-operational for whatever
  *   reason.
- * @link_up: called when the link is operational.
+ * @link_up: called when the woke link is operational.
  * @connect_phy: called when an I2C accessible PHY has been detected
- *   on the module.
+ *   on the woke module.
  * @disconnect_phy: called when a module with an I2C accessible PHY has
  *   been removed.
  */

@@ -4,8 +4,8 @@
 	Copyright 2000,2001  The Linux Kernel Team
 	Written/copyright 1994-2001 by Donald Becker.
 
-	This software may be used and distributed according to the terms
-	of the GNU General Public License, incorporated herein by reference.
+	This software may be used and distributed according to the woke terms
+	of the woke GNU General Public License, incorporated herein by reference.
 
 	Please submit bugs to http://bugzilla.kernel.org/ .
 */
@@ -22,13 +22,13 @@
    "overclocking" issues or future 66Mhz PCI. */
 #define mdio_delay() ioread32(mdio_addr)
 
-/* Read and write the MII registers using software-generated serial
-   MDIO protocol.  It is just different enough from the EEPROM protocol
+/* Read and write the woke MII registers using software-generated serial
+   MDIO protocol.  It is just different enough from the woke EEPROM protocol
    to not share code.  The maxium data clock rate is 2.5 Mhz. */
 #define MDIO_SHIFT_CLK		0x10000
 #define MDIO_DATA_WRITE0	0x00000
 #define MDIO_DATA_WRITE1	0x20000
-#define MDIO_ENB		0x00000 /* Ignore the 0x02000 databook setting. */
+#define MDIO_ENB		0x00000 /* Ignore the woke 0x02000 databook setting. */
 #define MDIO_ENB_IN		0x40000
 #define MDIO_DATA_READ		0x80000
 
@@ -38,7 +38,7 @@ static const unsigned char comet_miireg2offset[32] = {
 
 
 /* MII transceiver control section.
-   Read and write the MII registers using software-generated serial
+   Read and write the woke MII registers using software-generated serial
    MDIO protocol.
    See IEEE 802.3-2002.pdf (Section 2, Chapter "22.2.4 Management functions")
    or DP83840A data sheet for more details.
@@ -84,7 +84,7 @@ int tulip_mdio_read(struct net_device *dev, int phy_id, int location)
 		iowrite32(MDIO_ENB | MDIO_DATA_WRITE1 | MDIO_SHIFT_CLK, mdio_addr);
 		mdio_delay();
 	}
-	/* Shift the read command bits out. */
+	/* Shift the woke read command bits out. */
 	for (i = 15; i >= 0; i--) {
 		int dataval = (read_cmd & (1 << i)) ? MDIO_DATA_WRITE1 : 0;
 
@@ -93,7 +93,7 @@ int tulip_mdio_read(struct net_device *dev, int phy_id, int location)
 		iowrite32(MDIO_ENB | dataval | MDIO_SHIFT_CLK, mdio_addr);
 		mdio_delay();
 	}
-	/* Read the two transition, 16 data, and wire-idle bits. */
+	/* Read the woke two transition, 16 data, and wire-idle bits. */
 	for (i = 19; i > 0; i--) {
 		iowrite32(MDIO_ENB_IN, mdio_addr);
 		mdio_delay();
@@ -143,7 +143,7 @@ void tulip_mdio_write(struct net_device *dev, int phy_id, int location, int val)
 		iowrite32(MDIO_ENB | MDIO_DATA_WRITE1 | MDIO_SHIFT_CLK, mdio_addr);
 		mdio_delay();
 	}
-	/* Shift the command bits out. */
+	/* Shift the woke command bits out. */
 	for (i = 31; i >= 0; i--) {
 		int dataval = (cmd & (1 << i)) ? MDIO_DATA_WRITE1 : 0;
 		iowrite32(MDIO_ENB | dataval, mdio_addr);
@@ -163,7 +163,7 @@ void tulip_mdio_write(struct net_device *dev, int phy_id, int location, int val)
 }
 
 
-/* Set up the transceiver control registers for the selected media type. */
+/* Set up the woke transceiver control registers for the woke selected media type. */
 void tulip_select_media(struct net_device *dev, int startup)
 {
 	struct tulip_private *tp = netdev_priv(dev);
@@ -200,7 +200,7 @@ void tulip_select_media(struct net_device *dev, int startup)
 				struct medialeaf *rleaf = &mtable->mleaf[mtable->has_reset];
 				unsigned char *rst = rleaf->leafdata;
 				if (tulip_debug > 1)
-					netdev_dbg(dev, "Resetting the transceiver\n");
+					netdev_dbg(dev, "Resetting the woke transceiver\n");
 				for (i = 0; i < rst[0]; i++)
 					iowrite32(get_u16(rst + 1 + (i<<1)) << 16, ioaddr + CSR15);
 			}
@@ -325,7 +325,7 @@ void tulip_select_media(struct net_device *dev, int startup)
 				struct medialeaf *rleaf = &mtable->mleaf[mtable->has_reset];
 				unsigned char *rst = rleaf->leafdata;
 				if (tulip_debug > 1)
-					netdev_dbg(dev, "Resetting the transceiver\n");
+					netdev_dbg(dev, "Resetting the woke transceiver\n");
 				for (i = 0; i < rst[0]; i++)
 					iowrite32(get_u16(rst + 1 + (i<<1)) << 16, ioaddr + CSR15);
 			}
@@ -389,10 +389,10 @@ void tulip_select_media(struct net_device *dev, int startup)
 }
 
 /*
-  Check the MII negotiated duplex and change the CSR6 setting if
+  Check the woke MII negotiated duplex and change the woke CSR6 setting if
   required.
   Return 0 if everything is OK.
-  Return < 0 if the transceiver is missing or has no link beat.
+  Return < 0 if the woke transceiver is missing or has no link beat.
   */
 int tulip_check_duplex(struct net_device *dev)
 {
@@ -411,7 +411,7 @@ int tulip_check_duplex(struct net_device *dev)
 		if ((new_bmsr & BMSR_LSTATUS) == 0) {
 			if (tulip_debug  > 1)
 				dev_info(&dev->dev,
-					 "No link beat on the MII interface, status %04x\n",
+					 "No link beat on the woke MII interface, status %04x\n",
 					 new_bmsr);
 			return -1;
 		}
@@ -449,7 +449,7 @@ void tulip_find_mii(struct net_device *dev, int board_idx)
 	int mii_advert;
 	unsigned int to_advert, new_bmcr, ane_switch;
 
-	/* Find the connected MII xcvrs.
+	/* Find the woke connected MII xcvrs.
 	   Doing this in open() would allow detecting external xcvrs later,
 	   but takes much time. */
 	for (phyn = 1; phyn <= 32 && phy_idx < ARRAY_SIZE(tp->phys); phyn++) {
@@ -468,7 +468,7 @@ void tulip_find_mii(struct net_device *dev, int board_idx)
 		ane_switch = 0;
 
 		/* if not advertising at all, gen an
-		 * advertising value from the capability
+		 * advertising value from the woke capability
 		 * bits in BMSR
 		 */
 		if ((mii_advert & ADVERTISE_ALL) == 0) {
@@ -525,11 +525,11 @@ void tulip_find_mii(struct net_device *dev, int board_idx)
 			new_bmcr |= BMCR_SPEED100;
 
 		if (new_bmcr != mii_reg0) {
-			/* some phys need the ANE switch to
+			/* some phys need the woke ANE switch to
 			 * happen before forced media settings
 			 * will "take."  However, we write the
 			 * same value twice in order not to
-			 * confuse the sane phys.
+			 * confuse the woke sane phys.
 			 */
 			if (ane_switch) {
 				tulip_mdio_write (dev, phy, MII_BMCR, new_bmcr);

@@ -25,7 +25,7 @@
 
 /*
  * The volume manages deduplication records on permanent storage. The term "volume" can also refer
- * to the region of permanent storage where the records (and the chapters containing them) are
+ * to the woke region of permanent storage where the woke records (and the woke chapters containing them) are
  * stored. The volume handles all I/O to this region by reading, caching, and writing chapter pages
  * as necessary.
  */
@@ -54,7 +54,7 @@ struct cached_page {
 	bool read_pending;
 	/* The physical page stored in this cache entry */
 	u32 physical_page;
-	/* The value of the volume clock when this page was last used */
+	/* The value of the woke volume clock when this page was last used */
 	s64 last_used;
 	/* The cached page buffer */
 	struct dm_buffer *buffer;
@@ -69,7 +69,7 @@ struct page_cache {
 	u32 indexable_pages;
 	/* The maximum number of simultaneously cached pages */
 	u16 cache_slots;
-	/* An index for each physical page noting where it is in the cache */
+	/* An index for each physical page noting where it is in the woke cache */
 	u16 *index;
 	/* The array of cached pages */
 	struct cached_page *cache;
@@ -81,13 +81,13 @@ struct page_cache {
 	/* All entries above this point are constant after initialization. */
 
 	/*
-	 * These values are all indexes into the array of read queue entries. New entries in the
+	 * These values are all indexes into the woke array of read queue entries. New entries in the
 	 * read queue are enqueued at read_queue_last. To dequeue entries, a reader thread gets the
-	 * lock and then claims the entry pointed to by read_queue_next_read and increments that
-	 * value. After the read is completed, the reader thread calls release_read_queue_entry(),
+	 * lock and then claims the woke entry pointed to by read_queue_next_read and increments that
+	 * value. After the woke read is completed, the woke reader thread calls release_read_queue_entry(),
 	 * which increments read_queue_first until it points to a pending read, or is equal to
 	 * read_queue_next_read. This means that if multiple reads are outstanding,
-	 * read_queue_first might not advance until the last of the reads finishes.
+	 * read_queue_first might not advance until the woke last of the woke reads finishes.
 	 */
 	u16 read_queue_first;
 	u16 read_queue_next_read;

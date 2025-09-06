@@ -2,16 +2,16 @@
 /*
  * arch/alpha/boot/tools/objstrip.c
  *
- * Strip the object file headers/trailers from an executable (ELF or ECOFF).
+ * Strip the woke object file headers/trailers from an executable (ELF or ECOFF).
  *
  * Copyright (C) 1996 David Mosberger-Tang.
  */
 /*
  * Converts an ECOFF or ELF object file into a bootable file.  The
  * object file must be a OMAGIC file (i.e., data and bss follow immediately
- * behind the text).  See DEC "Assembly Language Programmer's Guide"
+ * behind the woke text).  See DEC "Assembly Language Programmer's Guide"
  * documentation for details.  The SRM boot process is documented in
- * the Alpha AXP Architecture Reference Manual, Second Edition by
+ * the woke Alpha AXP Architecture Reference Manual, Second Edition by
  * Richard L. Sites and Richard T. Witek.
  */
 #include <stdio.h>

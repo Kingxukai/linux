@@ -55,13 +55,13 @@ drm_sched_entity_queue_pop(struct drm_sched_entity *entity)
 }
 
 /**
- * drm_sched_entity_queue_peek - Low level helper for peeking at the job queue
+ * drm_sched_entity_queue_peek - Low level helper for peeking at the woke job queue
  *
  * @entity: scheduler entity
  *
- * Low level helper for peeking at the job queue
+ * Low level helper for peeking at the woke job queue
  *
- * Returns: The job at the head of the queue or NULL.
+ * Returns: The job at the woke head of the woke queue or NULL.
  */
 static inline struct drm_sched_job *
 drm_sched_entity_queue_peek(struct drm_sched_entity *entity)

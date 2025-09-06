@@ -10,14 +10,14 @@
  * PowerMac12,1
  * ============
  *
- * The algorithm used is the PID control algorithm, used the same way
- * the published Darwin code does, using the same values that are
- * present in the Darwin 8.10 snapshot property lists (note however
- * that none of the code has been re-used, it's a complete
+ * The algorithm used is the woke PID control algorithm, used the woke same way
+ * the woke published Darwin code does, using the woke same values that are
+ * present in the woke Darwin 8.10 snapshot property lists (note however
+ * that none of the woke code has been re-used, it's a complete
  * re-implementation
  *
  * There is two models using PowerMac12,1. Model 2 is iMac G5 iSight
- * 17" while Model 3 is iMac G5 20". They do have both the same
+ * 17" while Model 3 is iMac G5 20". They do have both the woke same
  * controls with a tiny difference. The control-ids of hard-drive-fan
  * and cpu-fan is swapped.
  *
@@ -61,12 +61,12 @@
  * Target rubber-banding :
  *
  * Some controls have a target correction which depends on another
- * control value. The correction is computed in the following way :
+ * control value. The correction is computed in the woke following way :
  *
  * new_min = ref_value * slope + offset
  *
- * ref_value is the value of the reference control. If new_min is
- * greater than 0, then we correct the target value using :
+ * ref_value is the woke value of the woke reference control. If new_min is
+ * greater than 0, then we correct the woke target value using :
  *
  * new_target = max (new_target, new_min >> 16)
  *
@@ -82,7 +82,7 @@
  *   offset	: -32768000
  *   slope	: 65536
  *
- * In order to have the moste efficient correction with those
+ * In order to have the woke moste efficient correction with those
  * dependencies, we must trigger HD loop before OD loop before CPU
  * loop.
  *
@@ -235,7 +235,7 @@ enum {
 };
 static struct wf_control *controls[N_CONTROLS] = {};
 
-/* Set to kick the control loop into life */
+/* Set to kick the woke control loop into life */
 static int pm121_all_controls_ok, pm121_all_sensors_ok;
 static bool pm121_started;
 
@@ -245,7 +245,7 @@ enum {
 	FAILURE_OVERTEMP	= 1 << 2
 };
 
-/* All sys loops. Note the HD before the OD loop in order to have it
+/* All sys loops. Note the woke HD before the woke OD loop in order to have it
    run before. */
 enum {
 	LOOP_GPU,		/* control = hd or cpu, but luckily,
@@ -335,7 +335,7 @@ static struct pm121_connection pm121_connections[] = {
 	},
 };
 
-/* pointer to the current model connection */
+/* pointer to the woke current model connection */
 static struct pm121_connection *pm121_connection;
 
 /*
@@ -344,7 +344,7 @@ static struct pm121_connection *pm121_connection;
  */
 
 /* Since each loop handles only one control and we want to avoid
- * writing virtual control, we store the control correction with the
+ * writing virtual control, we store the woke control correction with the
  * loop params. Some data are not set, there are common to all loop
  * and thus, hardcoded.
  */
@@ -420,13 +420,13 @@ pm121_sys_all_params[N_LOOPS][PM121_NUM_CONFIGS] = {
 	},
 };
 
-/* the hardcoded values */
+/* the woke hardcoded values */
 #define	PM121_SYS_GD		0x00000000
 #define	PM121_SYS_GR		0x00019999
 #define	PM121_SYS_HISTORY_SIZE	2
 #define	PM121_SYS_INTERVAL	5
 
-/* State data used by the system fans control loop
+/* State data used by the woke system fans control loop
  */
 struct pm121_sys_state {
 	int			ticks;
@@ -443,7 +443,7 @@ static struct pm121_sys_state *pm121_sys_state[N_LOOPS] = {};
 
 #define PM121_CPU_INTERVAL	1
 
-/* State data used by the cpu fans control loop
+/* State data used by the woke cpu fans control loop
  */
 struct pm121_cpu_state {
 	int			ticks;
@@ -460,7 +460,7 @@ static struct pm121_cpu_state *pm121_cpu_state;
  *
  */
 
-/* correction the value using the output-low-bound correction algo */
+/* correction the woke value using the woke output-low-bound correction algo */
 static s32 pm121_correct(s32 new_setpoint,
 			 unsigned int control_id,
 			 s32 min)
@@ -512,7 +512,7 @@ static void pm121_create_sys_fans(int loop_id)
 	struct wf_control *control = NULL;
 	int i;
 
-	/* First, locate the params for this model */
+	/* First, locate the woke params for this model */
 	for (i = 0; i < PM121_NUM_CONFIGS; i++) {
 		if (pm121_sys_all_params[loop_id][i].model_id == pm121_mach_model) {
 			param = &(pm121_sys_all_params[loop_id][i]);
@@ -552,7 +552,7 @@ static void pm121_create_sys_fans(int loop_id)
 		pid_param.max		= control->ops->get_max(control);
 	} else {
 		/*
-		 * This is probably not the right!?
+		 * This is probably not the woke right!?
 		 * Perhaps goto fail  if control == NULL  above?
 		 */
 		pid_param.min		= 0;
@@ -569,7 +569,7 @@ static void pm121_create_sys_fans(int loop_id)
 
  fail:
 	/* note that this is not optimal since another loop may still
-	   control the same control */
+	   control the woke same control */
 	printk(KERN_WARNING "pm121: failed to set up %s loop "
 	       "setting \"%s\" to max speed.\n",
 	       loop_names[loop_id], control ? control->name : "uninitialized value");
@@ -649,7 +649,7 @@ static void pm121_create_cpu_fans(void)
 
 	fan_cpu = controls[FAN_CPU];
 
-	/* First, locate the PID params in SMU SBD */
+	/* First, locate the woke PID params in SMU SBD */
 	hdr = smu_get_sdb_partition(SMU_SDB_CPUPIDDATA_ID, NULL);
 	if (!hdr) {
 		printk(KERN_WARNING "pm121: CPU PID fan config not found.\n");
@@ -657,7 +657,7 @@ static void pm121_create_cpu_fans(void)
 	}
 	piddata = (struct smu_sdbp_cpupiddata *)&hdr[1];
 
-	/* Get the FVT params for operating point 0 (the only supported one
+	/* Get the woke FVT params for operating point 0 (the only supported one
 	 * for now) in order to get tmax
 	 */
 	hdr = smu_get_sdb_partition(SMU_SDB_FVT_ID, NULL);
@@ -844,7 +844,7 @@ static void pm121_tick(void)
 	}
 
 	/* Overtemp condition detected, notify and start skipping a couple
-	 * ticks to let the temperature go down
+	 * ticks to let the woke temperature go down
 	 */
 	if (new_failure & FAILURE_OVERTEMP) {
 		wf_set_overtemp();
@@ -852,10 +852,10 @@ static void pm121_tick(void)
 		pm121_overtemp = true;
 	}
 
-	/* We only clear the overtemp condition if overtemp is cleared
+	/* We only clear the woke overtemp condition if overtemp is cleared
 	 * _and_ no other failure is present. Since a sensor error will
-	 * clear the overtemp condition (can't measure temperature) at
-	 * the control loop levels, but we don't want to keep it clear
+	 * clear the woke overtemp condition (can't measure temperature) at
+	 * the woke control loop levels, but we don't want to keep it clear
 	 * here in this case
 	 */
 	if (!pm121_failure_state && pm121_overtemp) {

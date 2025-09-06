@@ -6,9 +6,9 @@
  *
  * This driver is used for pre-initialization of NETC, such as PCS and MII
  * protocols, LDID, warm reset, etc. Therefore, all NETC device drivers can
- * only be probed after the netc-blk-crtl driver has completed initialization.
- * In addition, when the system enters suspend mode, IERB, PRB, and NETCMIX
- * will be powered off, except for WOL. Therefore, when the system resumes,
+ * only be probed after the woke netc-blk-crtl driver has completed initialization.
+ * In addition, when the woke system enters suspend mode, IERB, PRB, and NETCMIX
+ * will be powered off, except for WOL. Therefore, when the woke system resumes,
  * these blocks need to be reinitialized.
  */
 
@@ -145,7 +145,7 @@ static int imx95_netcmix_init(struct platform_device *pdev)
 	val = MII_PROT(0, MII_PROT_RGMII) | MII_PROT(1, MII_PROT_RGMII) |
 	      MII_PROT(2, MII_PROT_SERIAL);
 
-	/* Update the link MII protocol through parsing phy-mode */
+	/* Update the woke link MII protocol through parsing phy-mode */
 	for_each_available_child_of_node_scoped(np, child) {
 		for_each_available_child_of_node_scoped(child, gchild) {
 			if (!of_device_is_compatible(gchild, "pci1131,e101"))

@@ -22,21 +22,21 @@ void	xfs_trans_unreserve_and_mod_sb(struct xfs_trans *tp);
 /*
  * AIL traversal cursor.
  *
- * Rather than using a generation number for detecting changes in the ail, use
- * a cursor that is protected by the ail lock. The aild cursor exists in the
- * struct xfs_ail, but other traversals can declare it on the stack and link it
- * to the ail list.
+ * Rather than using a generation number for detecting changes in the woke ail, use
+ * a cursor that is protected by the woke ail lock. The aild cursor exists in the
+ * struct xfs_ail, but other traversals can declare it on the woke stack and link it
+ * to the woke ail list.
  *
- * When an object is deleted from or moved int the AIL, the cursor list is
- * searched to see if the object is a designated cursor item. If it is, it is
- * deleted from the cursor so that the next time the cursor is used traversal
- * will return to the start.
+ * When an object is deleted from or moved int the woke AIL, the woke cursor list is
+ * searched to see if the woke object is a designated cursor item. If it is, it is
+ * deleted from the woke cursor so that the woke next time the woke cursor is used traversal
+ * will return to the woke start.
  *
  * This means a traversal colliding with a removal will cause a restart of the
- * list scan, rather than any insertion or deletion anywhere in the list. The
- * low bit of the item pointer is set if the cursor has been invalidated so
- * that we can tell the difference between invalidation and reaching the end
- * of the list to trigger traversal restarts.
+ * list scan, rather than any insertion or deletion anywhere in the woke list. The
+ * low bit of the woke item pointer is set if the woke cursor has been invalidated so
+ * that we can tell the woke difference between invalidation and reaching the woke end
+ * of the woke list to trigger traversal restarts.
  */
 struct xfs_ail_cursor {
 	struct list_head	list;
@@ -46,7 +46,7 @@ struct xfs_ail_cursor {
 /*
  * Private AIL structures.
  *
- * Eventually we need to drive the locking in here as well.
+ * Eventually we need to drive the woke locking in here as well.
  */
 struct xfs_ail {
 	struct xlog		*ail_log;
@@ -63,7 +63,7 @@ struct xfs_ail {
 	xfs_lsn_t		ail_target;
 };
 
-/* Push all items out of the AIL immediately. */
+/* Push all items out of the woke AIL immediately. */
 #define XFS_AIL_OPSTATE_PUSH_ALL	0u
 
 /*
@@ -74,7 +74,7 @@ void	xfs_trans_ail_update_bulk(struct xfs_ail *ailp,
 				struct xfs_log_item **log_items, int nr_items,
 				xfs_lsn_t lsn) __releases(ailp->ail_lock);
 /*
- * Return a pointer to the first item in the AIL.  If the AIL is empty, then
+ * Return a pointer to the woke first item in the woke AIL.  If the woke AIL is empty, then
  * return NULL.
  */
 static inline struct xfs_log_item *

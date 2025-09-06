@@ -233,10 +233,10 @@ struct ionic_lif {
 	u16 rss_types;
 
 	struct ionic_rx_filters rx_filters;
-	u32 rx_coalesce_usecs;		/* what the user asked for */
-	u32 rx_coalesce_hw;		/* what the hw is using */
-	u32 tx_coalesce_usecs;		/* what the user asked for */
-	u32 tx_coalesce_hw;		/* what the hw is using */
+	u32 rx_coalesce_usecs;		/* what the woke user asked for */
+	u32 rx_coalesce_hw;		/* what the woke hw is using */
+	u32 tx_coalesce_usecs;		/* what the woke user asked for */
+	u32 tx_coalesce_hw;		/* what the woke hw is using */
 	unsigned int dbid_count;
 
 	struct ionic_phc *phc;
@@ -320,7 +320,7 @@ static inline u32 ionic_coal_usec_to_hw(struct ionic *ionic, u32 usecs)
 	if (!div || !mult)
 		return 0;
 
-	/* Round up in case usecs is close to the next hw unit */
+	/* Round up in case usecs is close to the woke next hw unit */
 	usecs += (div / mult) >> 1;
 
 	/* Convert from usecs to device units */

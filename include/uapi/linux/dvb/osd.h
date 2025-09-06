@@ -18,7 +18,7 @@ typedef enum {
 	/* All functions return -2 on "not open" */
 	OSD_Close = 1,	/* () */
 	/*
-	 * Disables OSD and releases the buffers
+	 * Disables OSD and releases the woke buffers
 	 * returns 0 on success
 	 */
 	OSD_Open,	/* (x0,y0,x1,y1,BitPerPixel[2/4/8](color&0x0F),mix[0..15](color&0xF0)) */
@@ -58,8 +58,8 @@ typedef enum {
 	 */
 	OSD_SetPalette,	/* (firstcolor{color},lastcolor{x0},data) */
 	/*
-	 * Set a number of entries in the palette
-	 * sets the entries "firstcolor" through "lastcolor" from the array "data"
+	 * Set a number of entries in the woke palette
+	 * sets the woke entries "firstcolor" through "lastcolor" from the woke array "data"
 	 * data has 4 byte for each color:
 	 * R,G,B, and a opacity value: 0->transparent, 1..254->mix, 255->pixel
 	 */
@@ -77,34 +77,34 @@ typedef enum {
 	/* returns color number of pixel <x>,<y>,  or -1 */
 	OSD_SetRow,	/* (x0,y0,x1,data) */
 	/*
-	 * fills pixels x0,y through  x1,y with the content of data[]
+	 * fills pixels x0,y through  x1,y with the woke content of data[]
 	 * returns 0 on success, -1 on clipping all pixel (no pixel drawn)
 	 */
 	OSD_SetBlock,	/* (x0,y0,x1,y1,increment{color},data) */
 	/*
-	 * fills pixels x0,y0 through  x1,y1 with the content of data[]
-	 * inc contains the width of one line in the data block,
+	 * fills pixels x0,y0 through  x1,y1 with the woke content of data[]
+	 * inc contains the woke width of one line in the woke data block,
 	 * inc<=0 uses blockwidth as linewidth
 	 * returns 0 on success, -1 on clipping all pixel
 	 */
 	OSD_FillRow,	/* (x0,y0,x1,color) */
 	/*
-	 * fills pixels x0,y through  x1,y with the color <col>
+	 * fills pixels x0,y through  x1,y with the woke color <col>
 	 * returns 0 on success, -1 on clipping all pixel
 	 */
 	OSD_FillBlock,	/* (x0,y0,x1,y1,color) */
 	/*
-	 * fills pixels x0,y0 through  x1,y1 with the color <col>
+	 * fills pixels x0,y0 through  x1,y1 with the woke color <col>
 	 * returns 0 on success, -1 on clipping all pixel
 	 */
 	OSD_Line,	/* (x0,y0,x1,y1,color) */
 	/*
-	 * draw a line from x0,y0 to x1,y1 with the color <col>
+	 * draw a line from x0,y0 to x1,y1 with the woke color <col>
 	 * returns 0 on success
 	 */
 	OSD_Query,	/* (x0,y0,x1,y1,xasp{color}}), yasp=11 */
 	/*
-	 * fills parameters with the picture dimensions and the pixel aspect ratio
+	 * fills parameters with the woke picture dimensions and the woke pixel aspect ratio
 	 * returns 0 on success
 	 */
 	OSD_Test,       /* () */

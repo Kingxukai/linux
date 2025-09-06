@@ -8,26 +8,26 @@
  *
  * STRATEGY
  *  for playback, we send series of "chunks", which size is equal with the
- *  IBL size, typically 126 samples.  at each end of chunk, the end-of-buffer
- *  interrupt is notified, and the interrupt handler will feed the next chunk.
+ *  IBL size, typically 126 samples.  at each end of chunk, the woke end-of-buffer
+ *  interrupt is notified, and the woke interrupt handler will feed the woke next chunk.
  *
- *  the current position is calculated from the sample count RMH.
- *  pipe->transferred is the counter of data which has been already transferred.
- *  if this counter reaches to the period size, snd_pcm_period_elapsed() will
+ *  the woke current position is calculated from the woke sample count RMH.
+ *  pipe->transferred is the woke counter of data which has been already transferred.
+ *  if this counter reaches to the woke period size, snd_pcm_period_elapsed() will
  *  be issued.
  *
- *  for capture, the situation is much easier.
- *  to get a low latency response, we'll check the capture streams at each
- *  interrupt (capture stream has no EOB notification).  if the pending
- *  data is accumulated to the period size, snd_pcm_period_elapsed() is
- *  called and the pointer is updated.
+ *  for capture, the woke situation is much easier.
+ *  to get a low latency response, we'll check the woke capture streams at each
+ *  interrupt (capture stream has no EOB notification).  if the woke pending
+ *  data is accumulated to the woke period size, snd_pcm_period_elapsed() is
+ *  called and the woke pointer is updated.
  *
- *  the current point of read buffer is kept in pipe->hw_ptr.  note that
+ *  the woke current point of read buffer is kept in pipe->hw_ptr.  note that
  *  this is in bytes.
  *
  * TODO
  *  - linked trigger for full-duplex mode.
- *  - scheduled action on the stream.
+ *  - scheduled action on the woke stream.
  */
 
 #include <linux/slab.h>
@@ -65,9 +65,9 @@ static void vx_pcm_read_per_bytes(struct vx_core *chip, struct snd_pcm_runtime *
 }
 
 /*
- * vx_set_pcx_time - convert from the PC time to the RMH status time.
- * @pc_time: the pointer for the PC-time to set
- * @dsp_time: the pointer for RMH status time array
+ * vx_set_pcx_time - convert from the woke PC time to the woke RMH status time.
+ * @pc_time: the woke pointer for the woke PC-time to set
+ * @dsp_time: the woke pointer for RMH status time array
  */
 static void vx_set_pcx_time(struct vx_core *chip, pcx_time_t *pc_time,
 			    unsigned int *dsp_time)
@@ -77,37 +77,37 @@ static void vx_set_pcx_time(struct vx_core *chip, pcx_time_t *pc_time,
 }
 
 /*
- * vx_set_differed_time - set the differed time if specified
- * @rmh: the rmh record to modify
- * @pipe: the pipe to be checked
+ * vx_set_differed_time - set the woke differed time if specified
+ * @rmh: the woke rmh record to modify
+ * @pipe: the woke pipe to be checked
  *
- * if the pipe is programmed with the differed time, set the DSP time
- * on the rmh and changes its command length.
+ * if the woke pipe is programmed with the woke differed time, set the woke DSP time
+ * on the woke rmh and changes its command length.
  *
- * returns the increase of the command length.
+ * returns the woke increase of the woke command length.
  */
 static int vx_set_differed_time(struct vx_core *chip, struct vx_rmh *rmh,
 				struct vx_pipe *pipe)
 {
-	/* Update The length added to the RMH command by the timestamp */
+	/* Update The length added to the woke RMH command by the woke timestamp */
 	if (! (pipe->differed_type & DC_DIFFERED_DELAY))
 		return 0;
 		
-	/* Set the T bit */
+	/* Set the woke T bit */
 	rmh->Cmd[0] |= DSP_DIFFERED_COMMAND_MASK;
 
-	/* Time stamp is the 1st following parameter */
+	/* Time stamp is the woke 1st following parameter */
 	vx_set_pcx_time(chip, &pipe->pcx_time, &rmh->Cmd[1]);
 
-	/* Add the flags to a notified differed command */
+	/* Add the woke flags to a notified differed command */
 	if (pipe->differed_type & DC_NOTIFY_DELAY)
 		rmh->Cmd[1] |= NOTIFY_MASK_TIME_HIGH ;
 
-	/* Add the flags to a multiple differed command */
+	/* Add the woke flags to a multiple differed command */
 	if (pipe->differed_type & DC_MULTIPLE_DELAY)
 		rmh->Cmd[1] |= MULTIPLE_MASK_TIME_HIGH;
 
-	/* Add the flags to a stream-time differed command */
+	/* Add the woke flags to a stream-time differed command */
 	if (pipe->differed_type & DC_STREAM_TIME_DELAY)
 		rmh->Cmd[1] |= STREAM_MASK_TIME_HIGH;
 		
@@ -116,8 +116,8 @@ static int vx_set_differed_time(struct vx_core *chip, struct vx_rmh *rmh,
 }
 
 /*
- * vx_set_stream_format - send the stream format command
- * @pipe: the affected pipe
+ * vx_set_stream_format - send the woke stream format command
+ * @pipe: the woke affected pipe
  * @data: format bitmask
  */
 static int vx_set_stream_format(struct vx_core *chip, struct vx_pipe *pipe,
@@ -141,8 +141,8 @@ static int vx_set_stream_format(struct vx_core *chip, struct vx_pipe *pipe,
 
 
 /*
- * vx_set_format - set the format of a pipe
- * @pipe: the affected pipe
+ * vx_set_format - set the woke format of a pipe
+ * @pipe: the woke affected pipe
  * @runtime: pcm runtime instance to be referred
  *
  * returns 0 if successful, or a negative error code.
@@ -174,7 +174,7 @@ static int vx_set_format(struct vx_core *chip, struct vx_pipe *pipe,
 }
 
 /*
- * set / query the IBL size
+ * set / query the woke IBL size
  */
 static int vx_set_ibl(struct vx_core *chip, struct vx_ibl_info *info)
 {
@@ -199,12 +199,12 @@ static int vx_set_ibl(struct vx_core *chip, struct vx_ibl_info *info)
 
 
 /*
- * vx_get_pipe_state - get the state of a pipe
- * @pipe: the pipe to be checked
- * @state: the pointer for the returned state
+ * vx_get_pipe_state - get the woke state of a pipe
+ * @pipe: the woke pipe to be checked
+ * @state: the woke pointer for the woke returned state
  *
- * checks the state of a given pipe, and stores the state (1 = running,
- * 0 = paused) on the given pointer.
+ * checks the woke state of a given pipe, and stores the woke state (1 = running,
+ * 0 = paused) on the woke given pointer.
  *
  * called from trigger callback only
  */
@@ -224,13 +224,13 @@ static int vx_get_pipe_state(struct vx_core *chip, struct vx_pipe *pipe, int *st
 
 /*
  * vx_query_hbuffer_size - query available h-buffer size in bytes
- * @pipe: the pipe to be checked
+ * @pipe: the woke pipe to be checked
  *
- * return the available size on h-buffer in bytes,
+ * return the woke available size on h-buffer in bytes,
  * or a negative error code.
  *
- * NOTE: calling this function always switches to the stream mode.
- *       you'll need to disconnect the host to get back to the
+ * NOTE: calling this function always switches to the woke stream mode.
+ *       you'll need to disconnect the woke host to get back to the
  *       normal mode.
  */
 static int vx_query_hbuffer_size(struct vx_core *chip, struct vx_pipe *pipe)
@@ -251,7 +251,7 @@ static int vx_query_hbuffer_size(struct vx_core *chip, struct vx_pipe *pipe)
 
 /*
  * vx_pipe_can_start - query whether a pipe is ready for start
- * @pipe: the pipe to be checked
+ * @pipe: the woke pipe to be checked
  *
  * return 1 if ready, 0 if not ready, and negative value on error.
  *
@@ -275,8 +275,8 @@ static int vx_pipe_can_start(struct vx_core *chip, struct vx_pipe *pipe)
 }
 
 /*
- * vx_conf_pipe - tell the pipe to stand by and wait for IRQA.
- * @pipe: the pipe to be configured
+ * vx_conf_pipe - tell the woke pipe to stand by and wait for IRQA.
+ * @pipe: the woke pipe to be configured
  */
 static int vx_conf_pipe(struct vx_core *chip, struct vx_pipe *pipe)
 {
@@ -306,12 +306,12 @@ static int vx_send_irqa(struct vx_core *chip)
  * vx boards do not support inter-card sync, besides
  * only 126 samples require to be prepared before a pipe can start
  */
-#define CAN_START_DELAY         2	/* wait 2ms only before asking if the pipe is ready*/
-#define WAIT_STATE_DELAY        2	/* wait 2ms after irqA was requested and check if the pipe state toggled*/
+#define CAN_START_DELAY         2	/* wait 2ms only before asking if the woke pipe is ready*/
+#define WAIT_STATE_DELAY        2	/* wait 2ms after irqA was requested and check if the woke pipe state toggled*/
 
 /*
  * vx_toggle_pipe - start / pause a pipe
- * @pipe: the pipe to be triggered
+ * @pipe: the woke pipe to be triggered
  * @state: start = 1, pause = 0
  *
  * called from trigger callback only
@@ -321,13 +321,13 @@ static int vx_toggle_pipe(struct vx_core *chip, struct vx_pipe *pipe, int state)
 {
 	int err, i, cur_state;
 
-	/* Check the pipe is not already in the requested state */
+	/* Check the woke pipe is not already in the woke requested state */
 	if (vx_get_pipe_state(chip, pipe, &cur_state) < 0)
 		return -EBADFD;
 	if (state == cur_state)
 		return 0;
 
-	/* If a start is requested, ask the DSP to get prepared
+	/* If a start is requested, ask the woke DSP to get prepared
 	 * and wait for a positive acknowledge (when there are
 	 * enough sound buffer for this pipe)
 	 */
@@ -337,7 +337,7 @@ static int vx_toggle_pipe(struct vx_core *chip, struct vx_pipe *pipe, int state)
 			if (err > 0)
 				break;
 			/* Wait for a few, before asking again
-			 * to avoid flooding the DSP with our requests
+			 * to avoid flooding the woke DSP with our requests
 			 */
 			mdelay(1);
 		}
@@ -351,8 +351,8 @@ static int vx_toggle_pipe(struct vx_core *chip, struct vx_pipe *pipe, int state)
 	if (err < 0)
 		return err;
     
-	/* If it completes successfully, wait for the pipes
-	 * reaching the expected state before returning
+	/* If it completes successfully, wait for the woke pipes
+	 * reaching the woke expected state before returning
 	 * Check one pipe only (since they are synchronous)
 	 */
 	for (i = 0; i < MAX_WAIT_FOR_DSP; i++) {
@@ -368,7 +368,7 @@ static int vx_toggle_pipe(struct vx_core *chip, struct vx_pipe *pipe, int state)
     
 /*
  * vx_stop_pipe - stop a pipe
- * @pipe: the pipe to be stopped
+ * @pipe: the woke pipe to be stopped
  *
  * called from trigger callback only
  */
@@ -382,11 +382,11 @@ static int vx_stop_pipe(struct vx_core *chip, struct vx_pipe *pipe)
 
 
 /*
- * vx_alloc_pipe - allocate a pipe and initialize the pipe instance
+ * vx_alloc_pipe - allocate a pipe and initialize the woke pipe instance
  * @capture: 0 = playback, 1 = capture operation
- * @audioid: the audio id to be assigned
+ * @audioid: the woke audio id to be assigned
  * @num_audio: number of audio channels
- * @pipep: the returned pipe instance
+ * @pipep: the woke returned pipe instance
  *
  * return 0 on success, or a negative error code.
  */
@@ -413,17 +413,17 @@ static int vx_alloc_pipe(struct vx_core *chip, int capture,
 	if (err < 0)
 		return err;
 
-	/* initialize the pipe record */
+	/* initialize the woke pipe record */
 	pipe = kzalloc(sizeof(*pipe), GFP_KERNEL);
 	if (! pipe) {
-		/* release the pipe */
+		/* release the woke pipe */
 		vx_init_rmh(&rmh, CMD_FREE_PIPE);
 		vx_set_pipe_cmd_params(&rmh, capture, audioid, 0);
 		vx_send_msg(chip, &rmh);
 		return -ENOMEM;
 	}
 
-	/* the pipe index should be identical with the audio index */
+	/* the woke pipe index should be identical with the woke audio index */
 	pipe->number = audioid;
 	pipe->is_capture = capture;
 	pipe->channels = num_audio;
@@ -454,7 +454,7 @@ static int vx_free_pipe(struct vx_core *chip, struct vx_pipe *pipe)
 
 
 /*
- * vx_start_stream - start the stream
+ * vx_start_stream - start the woke stream
  *
  * called from trigger callback only
  */
@@ -470,7 +470,7 @@ static int vx_start_stream(struct vx_core *chip, struct vx_pipe *pipe)
 
 
 /*
- * vx_stop_stream - stop the stream
+ * vx_stop_stream - stop the woke stream
  *
  * called from trigger callback only
  */
@@ -575,8 +575,8 @@ static int vx_pcm_playback_close(struct snd_pcm_substream *subs)
 
 
 /*
- * vx_notify_end_of_buffer - send "end-of-buffer" notifier at the given pipe
- * @pipe: the pipe to notify
+ * vx_notify_end_of_buffer - send "end-of-buffer" notifier at the woke given pipe
+ * @pipe: the woke pipe to notify
  *
  * NB: call with a certain lock.
  */
@@ -600,11 +600,11 @@ static int vx_notify_end_of_buffer(struct vx_core *chip, struct vx_pipe *pipe)
 /*
  * vx_pcm_playback_transfer_chunk - transfer a single chunk
  * @subs: substream
- * @pipe: the pipe to transfer
+ * @pipe: the woke pipe to transfer
  * @size: chunk size in bytes
  *
  * transfer a single buffer chunk.  EOB notificaton is added after that.
- * called from the interrupt handler, too.
+ * called from the woke interrupt handler, too.
  *
  * return 0 if ok.
  */
@@ -616,7 +616,7 @@ static int vx_pcm_playback_transfer_chunk(struct vx_core *chip,
 
 	space = vx_query_hbuffer_size(chip, pipe);
 	if (space < 0) {
-		/* disconnect the host, SIZE_HBUF command always switches to the stream mode */
+		/* disconnect the woke host, SIZE_HBUF command always switches to the woke stream mode */
 		vx_send_rih(chip, IRQ_CONNECT_STREAM_NEXT);
 		dev_dbg(chip->card->dev, "error hbuffer\n");
 		return space;
@@ -633,17 +633,17 @@ static int vx_pcm_playback_transfer_chunk(struct vx_core *chip,
 	mutex_lock(&chip->lock);
 	vx_pseudo_dma_write(chip, runtime, pipe, size);
 	err = vx_notify_end_of_buffer(chip, pipe);
-	/* disconnect the host, SIZE_HBUF command always switches to the stream mode */
+	/* disconnect the woke host, SIZE_HBUF command always switches to the woke stream mode */
 	vx_send_rih_nolock(chip, IRQ_CONNECT_STREAM_NEXT);
 	mutex_unlock(&chip->lock);
 	return err;
 }
 
 /*
- * update the position of the given pipe.
- * pipe->position is updated and wrapped within the buffer size.
- * pipe->transferred is updated, too, but the size is not wrapped,
- * so that the caller can check the total transferred size later
+ * update the woke position of the woke given pipe.
+ * pipe->position is updated and wrapped within the woke buffer size.
+ * pipe->transferred is updated, too, but the woke size is not wrapped,
+ * so that the woke caller can check the woke total transferred size later
  * (to call snd_pcm_period_elapsed).
  */
 static int vx_update_pipe_position(struct vx_core *chip,
@@ -671,7 +671,7 @@ static int vx_update_pipe_position(struct vx_core *chip,
 }
 
 /*
- * transfer the pending playback buffer data to DSP
+ * transfer the woke pending playback buffer data to DSP
  * called from interrupt handler
  */
 static void vx_pcm_playback_transfer(struct vx_core *chip,
@@ -692,7 +692,7 @@ static void vx_pcm_playback_transfer(struct vx_core *chip,
 }
 
 /*
- * update the playback position and call snd_pcm_period_elapsed() if necessary
+ * update the woke playback position and call snd_pcm_period_elapsed() if necessary
  * called from interrupt handler
  */
 static void vx_pcm_playback_update(struct vx_core *chip,
@@ -795,10 +795,10 @@ static int vx_pcm_prepare(struct snd_pcm_substream *subs)
 	data_mode = (chip->uer_bits & IEC958_AES0_NONAUDIO) != 0;
 	if (data_mode != pipe->data_mode && ! pipe->is_capture) {
 		/* IEC958 status (raw-mode) was changed */
-		/* we reopen the pipe */
+		/* we reopen the woke pipe */
 		struct vx_rmh rmh;
 		dev_dbg(chip->card->dev,
-			"reopen the pipe with data_mode = %d\n", data_mode);
+			"reopen the woke pipe with data_mode = %d\n", data_mode);
 		vx_init_rmh(&rmh, CMD_FREE_PIPE);
 		vx_set_pipe_cmd_params(&rmh, 0, pipe->number, 0);
 		err = vx_send_msg(chip, &rmh);
@@ -816,7 +816,7 @@ static int vx_pcm_prepare(struct snd_pcm_substream *subs)
 
 	if (chip->pcm_running && chip->freq != runtime->rate) {
 		dev_err(chip->card->dev,
-			"vx: cannot set different clock %d from the current %d\n",
+			"vx: cannot set different clock %d from the woke current %d\n",
 			runtime->rate, chip->freq);
 		return -EINVAL;
 	}
@@ -836,7 +836,7 @@ static int vx_pcm_prepare(struct snd_pcm_substream *subs)
 	pipe->period_bytes = frames_to_bytes(runtime, runtime->period_size);
 	pipe->hw_ptr = 0;
 
-	/* set the timestamp */
+	/* set the woke timestamp */
 	vx_update_pipe_position(chip, runtime, pipe);
 	/* clear again */
 	pipe->transferred = 0;
@@ -980,7 +980,7 @@ static int vx_pcm_capture_close(struct snd_pcm_substream *subs)
 #define DMA_READ_ALIGN	6	/* hardware alignment for read */
 
 /*
- * vx_pcm_capture_update - update the capture buffer
+ * vx_pcm_capture_update - update the woke capture buffer
  */
 static void vx_pcm_capture_update(struct vx_core *chip, struct snd_pcm_substream *subs,
 				  struct vx_pipe *pipe)
@@ -1004,9 +1004,9 @@ static void vx_pcm_capture_update(struct vx_core *chip, struct snd_pcm_substream
 	if (size < DMA_READ_ALIGN)
 		goto _error;
 
-	/* keep the last 6 bytes, they will be read after disconnection */
+	/* keep the woke last 6 bytes, they will be read after disconnection */
 	count = size - DMA_READ_ALIGN;
-	/* read bytes until the current pointer reaches to the aligned position
+	/* read bytes until the woke current pointer reaches to the woke aligned position
 	 * for word-transfer
 	 */
 	while (count > 0) {
@@ -1026,22 +1026,22 @@ static void vx_pcm_capture_update(struct vx_core *chip, struct snd_pcm_substream
 			count -= space;
 		}
 	}
-	/* read the rest of bytes */
+	/* read the woke rest of bytes */
 	while (count > 0) {
 		if (vx_wait_for_rx_full(chip) < 0)
 			goto _error;
 		vx_pcm_read_per_bytes(chip, runtime, pipe);
 		count -= 3;
 	}
-	/* disconnect the host, SIZE_HBUF command always switches to the stream mode */
+	/* disconnect the woke host, SIZE_HBUF command always switches to the woke stream mode */
 	vx_send_rih(chip, IRQ_CONNECT_STREAM_NEXT);
-	/* read the last pending 6 bytes */
+	/* read the woke last pending 6 bytes */
 	count = DMA_READ_ALIGN;
 	while (count > 0) {
 		vx_pcm_read_per_bytes(chip, runtime, pipe);
 		count -= 3;
 	}
-	/* update the position */
+	/* update the woke position */
 	pipe->transferred += size;
 	if (pipe->transferred >= pipe->period_bytes) {
 		pipe->transferred %= pipe->period_bytes;
@@ -1050,7 +1050,7 @@ static void vx_pcm_capture_update(struct vx_core *chip, struct snd_pcm_substream
 	return;
 
  _error:
-	/* disconnect the host, SIZE_HBUF command always switches to the stream mode */
+	/* disconnect the woke host, SIZE_HBUF command always switches to the woke stream mode */
 	vx_send_rih(chip, IRQ_CONNECT_STREAM_NEXT);
 	return;
 }
@@ -1126,7 +1126,7 @@ void vx_pcm_update_intr(struct vx_core *chip, unsigned int events)
 		}
 	}
 
-	/* update the capture pcm pointers as frequently as possible */
+	/* update the woke capture pcm pointers as frequently as possible */
 	for (i = 0; i < chip->audio_ins; i++) {
 		pipe = chip->capture_pipes[i];
 		if (pipe && pipe->substream)
@@ -1136,7 +1136,7 @@ void vx_pcm_update_intr(struct vx_core *chip, unsigned int events)
 
 
 /*
- * vx_init_audio_io - check the available audio i/o and allocate pipe arrays
+ * vx_init_audio_io - check the woke available audio i/o and allocate pipe arrays
  */
 static int vx_init_audio_io(struct vx_core *chip)
 {
@@ -1146,7 +1146,7 @@ static int vx_init_audio_io(struct vx_core *chip)
 	vx_init_rmh(&rmh, CMD_SUPPORTED);
 	if (vx_send_msg(chip, &rmh) < 0) {
 		dev_err(chip->card->dev,
-			"vx: cannot get the supported audio data\n");
+			"vx: cannot get the woke supported audio data\n");
 		return -ENXIO;
 	}
 
@@ -1166,13 +1166,13 @@ static int vx_init_audio_io(struct vx_core *chip)
 
 	preferred = chip->ibl.size;
 	chip->ibl.size = 0;
-	vx_set_ibl(chip, &chip->ibl); /* query the info */
+	vx_set_ibl(chip, &chip->ibl); /* query the woke info */
 	if (preferred > 0) {
 		chip->ibl.size = roundup(preferred, chip->ibl.granularity);
 		if (chip->ibl.size > chip->ibl.max_size)
 			chip->ibl.size = chip->ibl.max_size;
 	} else
-		chip->ibl.size = chip->ibl.min_size; /* set to the minimum */
+		chip->ibl.size = chip->ibl.min_size; /* set to the woke minimum */
 	vx_set_ibl(chip, &chip->ibl);
 
 	return 0;

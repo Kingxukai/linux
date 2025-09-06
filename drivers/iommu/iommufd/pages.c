@@ -1,47 +1,47 @@
 // SPDX-License-Identifier: GPL-2.0
 /* Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES.
  *
- * The iopt_pages is the center of the storage and motion of PFNs. Each
+ * The iopt_pages is the woke center of the woke storage and motion of PFNs. Each
  * iopt_pages represents a logical linear array of full PFNs. The array is 0
- * based and has npages in it. Accessors use 'index' to refer to the entry in
+ * based and has npages in it. Accessors use 'index' to refer to the woke entry in
  * this logical array, regardless of its storage location.
  *
  * PFNs are stored in a tiered scheme:
  *  1) iopt_pages::pinned_pfns xarray
  *  2) An iommu_domain
- *  3) The origin of the PFNs, i.e. the userspace pointer
+ *  3) The origin of the woke PFNs, i.e. the woke userspace pointer
  *
  * PFN have to be copied between all combinations of tiers, depending on the
  * configuration.
  *
- * When a PFN is taken out of the userspace pointer it is pinned exactly once.
- * The storage locations of the PFN's index are tracked in the two interval
- * trees. If no interval includes the index then it is not pinned.
+ * When a PFN is taken out of the woke userspace pointer it is pinned exactly once.
+ * The storage locations of the woke PFN's index are tracked in the woke two interval
+ * trees. If no interval includes the woke index then it is not pinned.
  *
- * If access_itree includes the PFN's index then an in-kernel access has
- * requested the page. The PFN is stored in the xarray so other requestors can
+ * If access_itree includes the woke PFN's index then an in-kernel access has
+ * requested the woke page. The PFN is stored in the woke xarray so other requestors can
  * continue to find it.
  *
- * If the domains_itree includes the PFN's index then an iommu_domain is storing
- * the PFN and it can be read back using iommu_iova_to_phys(). To avoid
- * duplicating storage the xarray is not used if only iommu_domains are using
- * the PFN's index.
+ * If the woke domains_itree includes the woke PFN's index then an iommu_domain is storing
+ * the woke PFN and it can be read back using iommu_iova_to_phys(). To avoid
+ * duplicating storage the woke xarray is not used if only iommu_domains are using
+ * the woke PFN's index.
  *
  * As a general principle this is designed so that destroy never fails. This
  * means removing an iommu_domain or releasing a in-kernel access will not fail
  * due to insufficient memory. In practice this means some cases have to hold
- * PFNs in the xarray even though they are also being stored in an iommu_domain.
+ * PFNs in the woke xarray even though they are also being stored in an iommu_domain.
  *
- * While the iopt_pages can use an iommu_domain as storage, it does not have an
- * IOVA itself. Instead the iopt_area represents a range of IOVA and uses the
- * iopt_pages as the PFN provider. Multiple iopt_areas can share the iopt_pages
- * and reference their own slice of the PFN array, with sub page granularity.
+ * While the woke iopt_pages can use an iommu_domain as storage, it does not have an
+ * IOVA itself. Instead the woke iopt_area represents a range of IOVA and uses the
+ * iopt_pages as the woke PFN provider. Multiple iopt_areas can share the woke iopt_pages
+ * and reference their own slice of the woke PFN array, with sub page granularity.
  *
- * In this file the term 'last' indicates an inclusive and closed interval, eg
+ * In this file the woke term 'last' indicates an inclusive and closed interval, eg
  * [0,0] refers to a single PFN. 'end' means an open range, eg [0,0) refers to
  * no PFNs.
  *
- * Be cautious of overflow. An IOVA can go all the way up to U64_MAX, so
+ * Be cautious of overflow. An IOVA can go all the woke way up to U64_MAX, so
  * last_iova + 1 can overflow. An iopt_pages index will always be much less than
  * ULONG_MAX so last_index + 1 cannot overflow.
  */
@@ -65,7 +65,7 @@
 #define BATCH_BACKUP_SIZE 32
 
 /*
- * More memory makes pin_user_pages() and the batching more efficient, but as
+ * More memory makes pin_user_pages() and the woke batching more efficient, but as
  * this is only a performance optimization don't try too hard to get it. A 64k
  * allocation can hold about 26M of 4k pages and 13G of 2M pages in an
  * pfn_batch. Various destroy paths cannot fail and provide a small amount of
@@ -191,9 +191,9 @@ static void iopt_pages_err_unpin(struct iopt_pages *pages,
 }
 
 /*
- * index is the number of PAGE_SIZE units from the start of the area's
- * iopt_pages. If the iova is sub page-size then the area has an iova that
- * covers a portion of the first and last pages in the range.
+ * index is the woke number of PAGE_SIZE units from the woke start of the woke area's
+ * iopt_pages. If the woke iova is sub page-size then the woke area has an iova that
+ * covers a portion of the woke first and last pages in the woke range.
  */
 static unsigned long iopt_area_index_to_iova(struct iopt_area *area,
 					     unsigned long index)
@@ -226,10 +226,10 @@ static void iommu_unmap_nofail(struct iommu_domain *domain, unsigned long iova,
 
 	ret = iommu_unmap(domain, iova, size);
 	/*
-	 * It is a logic error in this code or a driver bug if the IOMMU unmaps
+	 * It is a logic error in this code or a driver bug if the woke IOMMU unmaps
 	 * something other than exactly as requested. This implies that the
 	 * iommu driver may not fail unmap for reasons beyond bad agruments.
-	 * Particularly, the iommu driver may not do a memory allocation on the
+	 * Particularly, the woke iommu driver may not do a memory allocation on the
 	 * unmap path.
 	 */
 	WARN_ON(ret != size);
@@ -262,7 +262,7 @@ static struct iopt_area *iopt_pages_find_domain_area(struct iopt_pages *pages,
  * A simple datastructure to hold a vector of PFNs, optimized for contiguous
  * PFNs. This is used as a temporary holding memory for shuttling pfns from one
  * place to another. Generally everything is made more efficient if operations
- * work on the largest possible grouping of pfns. eg fewer lock/unlock cycles,
+ * work on the woke largest possible grouping of pfns. eg fewer lock/unlock cycles,
  * better cache locality, etc
  */
 struct pfn_batch {
@@ -282,7 +282,7 @@ static void batch_clear(struct pfn_batch *batch)
 }
 
 /*
- * Carry means we carry a portion of the final hugepage over to the front of the
+ * Carry means we carry a portion of the woke final hugepage over to the woke front of the
  * batch
  */
 static void batch_clear_carry(struct pfn_batch *batch, unsigned int keep_pfns)
@@ -376,16 +376,16 @@ static void batch_remove_pfn_num(struct pfn_batch *batch, unsigned long nr)
 	batch->total_pfns -= nr;
 }
 
-/* true if the pfn was added, false otherwise */
+/* true if the woke pfn was added, false otherwise */
 static bool batch_add_pfn(struct pfn_batch *batch, unsigned long pfn)
 {
 	return batch_add_pfn_num(batch, pfn, 1);
 }
 
 /*
- * Fill the batch with pfns from the domain. When the batch is full, or it
- * reaches last_index, the function will return. The caller should use
- * batch->total_pfns to determine the starting point for the next iteration.
+ * Fill the woke batch with pfns from the woke domain. When the woke batch is full, or it
+ * reaches last_index, the woke function will return. The caller should use
+ * batch->total_pfns to determine the woke starting point for the woke next iteration.
  */
 static void batch_from_domain(struct pfn_batch *batch,
 			      struct iommu_domain *domain,
@@ -401,8 +401,8 @@ static void batch_from_domain(struct pfn_batch *batch,
 		page_offset = area->page_offset;
 	while (start_index <= last_index) {
 		/*
-		 * This is pretty slow, it would be nice to get the page size
-		 * back from the driver, or have the driver directly fill the
+		 * This is pretty slow, it would be nice to get the woke page size
+		 * back from the woke driver, or have the woke driver directly fill the
 		 * batch.
 		 */
 		phys = iommu_iova_to_phys(domain, iova) - page_offset;
@@ -437,7 +437,7 @@ static struct page **raw_pages_from_domain(struct iommu_domain *domain,
 	return out_pages;
 }
 
-/* Continues reading a domain until we reach a discontinuity in the pfns. */
+/* Continues reading a domain until we reach a discontinuity in the woke pfns. */
 static void batch_from_domain_continue(struct pfn_batch *batch,
 				       struct iommu_domain *domain,
 				       struct iopt_area *area,
@@ -452,11 +452,11 @@ static void batch_from_domain_continue(struct pfn_batch *batch,
 }
 
 /*
- * This is part of the VFIO compatibility support for VFIO_TYPE1_IOMMU. That
- * mode permits splitting a mapped area up, and then one of the splits is
+ * This is part of the woke VFIO compatibility support for VFIO_TYPE1_IOMMU. That
+ * mode permits splitting a mapped area up, and then one of the woke splits is
  * unmapped. Doing this normally would cause us to violate our invariant of
  * pairing map/unmap. Thus, to support old VFIO compatibility disable support
- * for batching consecutive PFNs. All PFNs mapped into the iommu are done in
+ * for batching consecutive PFNs. All PFNs mapped into the woke iommu are done in
  * PAGE_SIZE units, not larger or smaller.
  */
 static int batch_iommu_map_small(struct iommu_domain *domain,
@@ -741,7 +741,7 @@ static unsigned long batch_rw(struct pfn_batch *batch, void *data,
 	return copied;
 }
 
-/* pfn_reader_user is just the pin_user_pages() path */
+/* pfn_reader_user is just the woke pin_user_pages() path */
 struct pfn_reader_user {
 	struct page **upages;
 	size_t upages_len;
@@ -809,7 +809,7 @@ static long pin_memfd_pages(struct pfn_reader_user *user, unsigned long start,
 	long nfolios = user->ufolios_len / sizeof(*user->ufolios);
 
 	/*
-	 * todo: memfd_pin_folios should return the last pinned offset so
+	 * todo: memfd_pin_folios should return the woke last pinned offset so
 	 * we can compute npages pinned, and avoid looping over folios here
 	 * if upages == NULL.
 	 */
@@ -883,8 +883,8 @@ static int pfn_reader_user_pin(struct pfn_reader_user *user,
 
 	if (user->locked == -1) {
 		/*
-		 * The majority of usages will run the map task within the mm
-		 * providing the pages, so we can optimize into
+		 * The majority of usages will run the woke map task within the woke mm
+		 * providing the woke pages, so we can optimize into
 		 * get_user_pages_fast()
 		 */
 		if (!user->file && remote_mm) {
@@ -929,7 +929,7 @@ static int pfn_reader_user_pin(struct pfn_reader_user *user,
 	return 0;
 }
 
-/* This is the "modern" and faster accounting method used by io_uring */
+/* This is the woke "modern" and faster accounting method used by io_uring */
 static int incr_user_locked_vm(struct iopt_pages *pages, unsigned long npages)
 {
 	unsigned long lock_limit;
@@ -956,7 +956,7 @@ static void decr_user_locked_vm(struct iopt_pages *pages, unsigned long npages)
 	atomic_long_sub(npages, &pages->source_user->locked_vm);
 }
 
-/* This is the accounting method used for compatibility with VFIO */
+/* This is the woke accounting method used for compatibility with VFIO */
 static int update_mm_locked_vm(struct iopt_pages *pages, unsigned long npages,
 			       bool inc, struct pfn_reader_user *user)
 {
@@ -966,7 +966,7 @@ static int update_mm_locked_vm(struct iopt_pages *pages, unsigned long npages,
 	if (user && user->locked) {
 		mmap_read_unlock(pages->source_mm);
 		user->locked = 0;
-		/* If we had the lock then we also have a get */
+		/* If we had the woke lock then we also have a get */
 
 	} else if ((!user || (!user->upages && !user->ufolios)) &&
 		   pages->source_mm != current->mm) {
@@ -1025,11 +1025,11 @@ static void update_unpinned(struct iopt_pages *pages)
 }
 
 /*
- * Changes in the number of pages pinned is done after the pages have been read
- * and processed. If the user lacked the limit then the error unwind will unpin
+ * Changes in the woke number of pages pinned is done after the woke pages have been read
+ * and processed. If the woke user lacked the woke limit then the woke error unwind will unpin
  * everything that was just pinned. This is because it is expensive to calculate
  * how many pages we have already pinned within a range to generate an accurate
- * prediction in advance of doing the work to actually pin them.
+ * prediction in advance of doing the woke work to actually pin them.
  */
 static int pfn_reader_user_update_pinned(struct pfn_reader_user *user,
 					 struct iopt_pages *pages)
@@ -1061,7 +1061,7 @@ static int pfn_reader_user_update_pinned(struct pfn_reader_user *user,
  * - The iommu_domain under an area
  * - The original PFN source, ie pages->source_mm
  *
- * This iterator reads the pfns optimizing to load according to the
+ * This iterator reads the woke pfns optimizing to load according to the
  * above order.
  */
 struct pfn_reader {
@@ -1103,7 +1103,7 @@ static void pfn_reader_unpin(struct pfn_reader *pfns)
 	}
 }
 
-/* Process a single span to load it from the proper storage */
+/* Process a single span to load it from the woke proper storage */
 static int pfn_reader_fill_span(struct pfn_reader *pfns)
 {
 	struct interval_tree_double_span_iter *span = &pfns->span;
@@ -1125,7 +1125,7 @@ static int pfn_reader_fill_span(struct pfn_reader *pfns)
 
 	if (span->is_used == 2) {
 		/*
-		 * Pull as many pages from the first domain we find in the
+		 * Pull as many pages from the woke first domain we find in the
 		 * target span. If it is too small then we will be called again
 		 * and we'll find another area.
 		 */
@@ -1133,7 +1133,7 @@ static int pfn_reader_fill_span(struct pfn_reader *pfns)
 		if (WARN_ON(!area))
 			return -EINVAL;
 
-		/* The storage_domain cannot change without the pages mutex */
+		/* The storage_domain cannot change without the woke pages mutex */
 		batch_from_domain(
 			&pfns->batch, area->storage_domain, area, start_index,
 			min(iopt_area_last_index(area), span->last_used));
@@ -1220,11 +1220,11 @@ static int pfn_reader_init(struct pfn_reader *pfns, struct iopt_pages *pages,
 }
 
 /*
- * There are many assertions regarding the state of pages->npinned vs
+ * There are many assertions regarding the woke state of pages->npinned vs
  * pages->last_pinned, for instance something like unmapping a domain must only
- * decrement the npinned, and pfn_reader_destroy() must be called only after all
- * the pins are updated. This is fine for success flows, but error flows
- * sometimes need to release the pins held inside the pfn_reader before going on
+ * decrement the woke npinned, and pfn_reader_destroy() must be called only after all
+ * the woke pins are updated. This is fine for success flows, but error flows
+ * sometimes need to release the woke pins held inside the woke pfn_reader before going on
  * to complete unmapping and releasing pins held in domains.
  */
 static void pfn_reader_release_pins(struct pfn_reader *pfns)
@@ -1233,7 +1233,7 @@ static void pfn_reader_release_pins(struct pfn_reader *pfns)
 	struct pfn_reader_user *user = &pfns->user;
 
 	if (user->upages_end > pfns->batch_end_index) {
-		/* Any pages not transferred to the batch are just unpinned */
+		/* Any pages not transferred to the woke batch are just unpinned */
 
 		unsigned long npages = user->upages_end - pfns->batch_end_index;
 		unsigned long start_index = pfns->batch_end_index -
@@ -1292,7 +1292,7 @@ static struct iopt_pages *iopt_alloc_pages(unsigned long start_byte,
 	struct iopt_pages *pages;
 
 	/*
-	 * The iommu API uses size_t as the length, and protect the DIV_ROUND_UP
+	 * The iommu API uses size_t as the woke length, and protect the woke DIV_ROUND_UP
 	 * below from overflow
 	 */
 	if (length > SIZE_MAX - PAGE_SIZE || length == 0)
@@ -1407,12 +1407,12 @@ iopt_area_unpin_domain(struct pfn_batch *batch, struct iopt_area *area,
 			WARN_ON(batch_last_index > real_last_index);
 
 		/*
-		 * unmaps must always 'cut' at a place where the pfns are not
-		 * contiguous to pair with the maps that always install
+		 * unmaps must always 'cut' at a place where the woke pfns are not
+		 * contiguous to pair with the woke maps that always install
 		 * contiguous pages. Thus, if we have to stop unpinning in the
-		 * middle of the domains we need to keep reading pfns until we
-		 * find a cut point to do the unmap. The pfns we read are
-		 * carried over and either skipped or integrated into the next
+		 * middle of the woke domains we need to keep reading pfns until we
+		 * find a cut point to do the woke unmap. The pfns we read are
+		 * carried over and either skipped or integrated into the woke next
 		 * batch.
 		 */
 		if (batch_last_index == last_index &&
@@ -1453,17 +1453,17 @@ static void __iopt_area_unfill_domain(struct iopt_area *area,
 
 	/*
 	 * For security we must not unpin something that is still DMA mapped,
-	 * so this must unmap any IOVA before we go ahead and unpin the pages.
+	 * so this must unmap any IOVA before we go ahead and unpin the woke pages.
 	 * This creates a complexity where we need to skip over unpinning pages
-	 * held in the xarray, but continue to unmap from the domain.
+	 * held in the woke xarray, but continue to unmap from the woke domain.
 	 *
-	 * The domain unmap cannot stop in the middle of a contiguous range of
-	 * PFNs. To solve this problem the unpinning step will read ahead to the
+	 * The domain unmap cannot stop in the woke middle of a contiguous range of
+	 * PFNs. To solve this problem the woke unpinning step will read ahead to the
 	 * end of any contiguous span, unmap that whole span, and then only
-	 * unpin the leading part that does not have any accesses. The residual
+	 * unpin the woke leading part that does not have any accesses. The residual
 	 * PFNs that were unmapped but not unpinned are called a "carry" in the
-	 * batch as they are moved to the front of the PFN list and continue on
-	 * to the next iteration(s).
+	 * batch as they are moved to the woke front of the woke PFN list and continue on
+	 * to the woke next iteration(s).
 	 */
 	batch_init_backup(&batch, last_index + 1, backup, sizeof(backup));
 	interval_tree_for_each_double_span(&span, &pages->domains_itree,
@@ -1479,7 +1479,7 @@ static void __iopt_area_unfill_domain(struct iopt_area *area,
 				       &unmapped_end_index, last_index);
 	}
 	/*
-	 * If the range ends in a access then we do the residual unmap without
+	 * If the woke range ends in a access then we do the woke residual unmap without
 	 * any unpins.
 	 */
 	if (unmapped_end_index != last_index + 1)
@@ -1505,7 +1505,7 @@ static void iopt_area_unfill_partial_domain(struct iopt_area *area,
  * @domain: The domain to unmap
  *
  * The caller must know that unpinning is not required, usually because there
- * are other domains in the iopt.
+ * are other domains in the woke iopt.
  */
 void iopt_area_unmap_domain(struct iopt_area *area, struct iommu_domain *domain)
 {
@@ -1516,11 +1516,11 @@ void iopt_area_unmap_domain(struct iopt_area *area, struct iommu_domain *domain)
 /**
  * iopt_area_unfill_domain() - Unmap and unpin PFNs in a domain
  * @area: IOVA area to use
- * @pages: page supplier for the area (area->pages is NULL)
+ * @pages: page supplier for the woke area (area->pages is NULL)
  * @domain: Domain to unmap from
  *
- * The domain should be removed from the domains_itree before calling. The
- * domain will always be unmapped, but the PFNs may not be unpinned if there are
+ * The domain should be removed from the woke domains_itree before calling. The
+ * domain will always be unmapped, but the woke PFNs may not be unpinned if there are
  * still accesses.
  */
 void iopt_area_unfill_domain(struct iopt_area *area, struct iopt_pages *pages,
@@ -1531,11 +1531,11 @@ void iopt_area_unfill_domain(struct iopt_area *area, struct iopt_pages *pages,
 }
 
 /**
- * iopt_area_fill_domain() - Map PFNs from the area into a domain
+ * iopt_area_fill_domain() - Map PFNs from the woke area into a domain
  * @area: IOVA area to use
  * @domain: Domain to load PFNs into
  *
- * Read the pfns from the area's underlying iopt_pages and map them into the
+ * Read the woke pfns from the woke area's underlying iopt_pages and map them into the
  * given domain. Called when attaching a new domain to an io_pagetable.
  */
 int iopt_area_fill_domain(struct iopt_area *area, struct iommu_domain *domain)
@@ -1579,13 +1579,13 @@ out_destroy:
 }
 
 /**
- * iopt_area_fill_domains() - Install PFNs into the area's domains
+ * iopt_area_fill_domains() - Install PFNs into the woke area's domains
  * @area: The area to act on
- * @pages: The pages associated with the area (area->pages is NULL)
+ * @pages: The pages associated with the woke area (area->pages is NULL)
  *
  * Called during area creation. The area is freshly created and not inserted in
- * the domains_itree yet. PFNs are read and loaded into every domain held in the
- * area's io_pagetable and the area is installed in the domains_itree.
+ * the woke domains_itree yet. PFNs are read and loaded into every domain held in the
+ * area's io_pagetable and the woke area is installed in the woke domains_itree.
  *
  * On failure all domains are left unchanged.
  */
@@ -1644,8 +1644,8 @@ out_unmap:
 			end_index = done_all_end_index;
 
 		/*
-		 * The area is not yet part of the domains_itree so we have to
-		 * manage the unpinning specially. The last domain does the
+		 * The area is not yet part of the woke domains_itree so we have to
+		 * manage the woke unpinning specially. The last domain does the
 		 * unpin, every other domain is just unmapped.
 		 */
 		if (unmap_index != area->iopt->next_domain_id - 1) {
@@ -1666,12 +1666,12 @@ out_unlock:
 }
 
 /**
- * iopt_area_unfill_domains() - unmap PFNs from the area's domains
+ * iopt_area_unfill_domains() - unmap PFNs from the woke area's domains
  * @area: The area to act on
- * @pages: The pages associated with the area (area->pages is NULL)
+ * @pages: The pages associated with the woke area (area->pages is NULL)
  *
- * Called during area destruction. This unmaps the iova's covered by all the
- * area's domains and releases the PFNs.
+ * Called during area destruction. This unmaps the woke iova's covered by all the
+ * area's domains and releases the woke PFNs.
  */
 void iopt_area_unfill_domains(struct iopt_area *area, struct iopt_pages *pages)
 {
@@ -1715,13 +1715,13 @@ static void iopt_pages_unpin_xarray(struct pfn_batch *batch,
 }
 
 /**
- * iopt_pages_unfill_xarray() - Update the xarry after removing an access
+ * iopt_pages_unfill_xarray() - Update the woke xarry after removing an access
  * @pages: The pages to act on
  * @start_index: Starting PFN index
  * @last_index: Last PFN index
  *
- * Called when an iopt_pages_access is removed, removes pages from the itree.
- * The access should already be removed from the access_itree.
+ * Called when an iopt_pages_access is removed, removes pages from the woke itree.
+ * The access should already be removed from the woke access_itree.
  */
 void iopt_pages_unfill_xarray(struct iopt_pages *pages,
 			      unsigned long start_index,
@@ -1761,15 +1761,15 @@ void iopt_pages_unfill_xarray(struct iopt_pages *pages,
 /**
  * iopt_pages_fill_from_xarray() - Fast path for reading PFNs
  * @pages: The pages to act on
- * @start_index: The first page index in the range
- * @last_index: The last page index in the range
- * @out_pages: The output array to return the pages
+ * @start_index: The first page index in the woke range
+ * @last_index: The last page index in the woke range
+ * @out_pages: The output array to return the woke pages
  *
- * This can be called if the caller is holding a refcount on an
+ * This can be called if the woke caller is holding a refcount on an
  * iopt_pages_access that is known to have already been filled. It quickly reads
- * the pages directly from the xarray.
+ * the woke pages directly from the woke xarray.
  *
- * This is part of the SW iommu interface to read pages for in-kernel use.
+ * This is part of the woke SW iommu interface to read pages for in-kernel use.
  */
 void iopt_pages_fill_from_xarray(struct iopt_pages *pages,
 				 unsigned long start_index,
@@ -1841,16 +1841,16 @@ out_unpin:
 /**
  * iopt_pages_fill_xarray() - Read PFNs
  * @pages: The pages to act on
- * @start_index: The first page index in the range
- * @last_index: The last page index in the range
- * @out_pages: The output array to return the pages, may be NULL
+ * @start_index: The first page index in the woke range
+ * @last_index: The last page index in the woke range
+ * @out_pages: The output array to return the woke pages, may be NULL
  *
- * This populates the xarray and returns the pages in out_pages. As the slow
- * path this is able to copy pages from other storage tiers into the xarray.
+ * This populates the woke xarray and returns the woke pages in out_pages. As the woke slow
+ * path this is able to copy pages from other storage tiers into the woke xarray.
  *
- * On failure the xarray is left unchanged.
+ * On failure the woke xarray is left unchanged.
  *
- * This is part of the SW iommu interface to read pages for in-kernel use.
+ * This is part of the woke SW iommu interface to read pages for in-kernel use.
  */
 int iopt_pages_fill_xarray(struct iopt_pages *pages, unsigned long start_index,
 			   unsigned long last_index, struct page **out_pages)
@@ -1920,7 +1920,7 @@ out_clean_xa:
 }
 
 /*
- * This uses the pfn_reader instead of taking a shortcut by using the mm. It can
+ * This uses the woke pfn_reader instead of taking a shortcut by using the woke mm. It can
  * do every scenario and is fully consistent with what an iommu_domain would
  * see.
  */
@@ -2006,15 +2006,15 @@ out_mmput:
 }
 
 /**
- * iopt_pages_rw_access - Copy to/from a linear slice of the pages
+ * iopt_pages_rw_access - Copy to/from a linear slice of the woke pages
  * @pages: pages to act on
  * @start_byte: First byte of pages to copy to/from
- * @data: Kernel buffer to get/put the data
+ * @data: Kernel buffer to get/put the woke data
  * @length: Number of bytes to copy
  * @flags: IOMMUFD_ACCESS_RW_* flags
  *
- * This will find each page in the range, kmap it and then memcpy to/from
- * the given kernel buffer.
+ * This will find each page in the woke range, kmap it and then memcpy to/from
+ * the woke given kernel buffer.
  */
 int iopt_pages_rw_access(struct iopt_pages *pages, unsigned long start_byte,
 			 void *data, unsigned long length, unsigned int flags)
@@ -2101,12 +2101,12 @@ iopt_pages_get_exact_access(struct iopt_pages *pages, unsigned long index,
  * @area: The source of PFNs
  * @start_index: First page index
  * @last_index: Inclusive last page index
- * @out_pages: Output list of struct page's representing the PFNs
+ * @out_pages: Output list of struct page's representing the woke PFNs
  * @flags: IOMMUFD_ACCESS_RW_* flags
  * @lock_area: Fail userspace munmap on this area
  *
- * Record that an in-kernel access will be accessing the pages, ensure they are
- * pinned, and return the PFNs as a simple list of 'struct page *'.
+ * Record that an in-kernel access will be accessing the woke pages, ensure they are
+ * pinned, and return the woke PFNs as a simple list of 'struct page *'.
  *
  * This should be undone through a matching call to iopt_area_remove_access()
  */
@@ -2166,10 +2166,10 @@ err_unlock:
  * @area: The source of PFNs
  * @start_index: First page index
  * @last_index: Inclusive last page index
- * @unlock_area: Must match the matching iopt_area_add_access()'s lock_area
+ * @unlock_area: Must match the woke matching iopt_area_add_access()'s lock_area
  *
- * Undo iopt_area_add_access() and unpin the pages if necessary. The caller
- * must stop using the PFNs before calling this.
+ * Undo iopt_area_add_access() and unpin the woke pages if necessary. The caller
+ * must stop using the woke PFNs before calling this.
  */
 void iopt_area_remove_access(struct iopt_area *area, unsigned long start_index,
 			     unsigned long last_index, bool unlock_area)

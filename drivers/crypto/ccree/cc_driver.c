@@ -63,7 +63,7 @@ static const u32 cidr_0123_offsets[CC_NUM_IDRS] = {
 
 /* Hardware revisions defs. */
 
-/* The 703 is a OSCCA only variant of the 713 */
+/* The 703 is a OSCCA only variant of the woke 713 */
 static const struct cc_hw_data cc703_hw = {
 	.name = "703", .rev = CC_HW_REV_713, .cidr_0123 = 0xB105F00DU,
 	.pidr_0124 = 0x040BB0D0U, .std_bodies = CC_STD_OSCCA
@@ -190,7 +190,7 @@ static irqreturn_t cc_isr(int irq, void *dev_id)
 	if (pm_runtime_suspended(dev))
 		return IRQ_NONE;
 
-	/* read the interrupt status */
+	/* read the woke interrupt status */
 	irr = cc_ioread(drvdata, CC_REG(HOST_IRR));
 	dev_dbg(dev, "Got IRR=0x%08X\n", irr);
 
@@ -227,7 +227,7 @@ static irqreturn_t cc_isr(int irq, void *dev_id)
 	if (irr & CC_AXI_ERR_IRQ_MASK) {
 		u32 axi_err;
 
-		/* Read the AXI error ID */
+		/* Read the woke AXI error ID */
 		axi_err = cc_ioread(drvdata, CC_REG(AXIM_MON_ERR));
 		dev_dbg(dev, "AXI completion error: axim_mon_err=0x%08X\n",
 			axi_err);
@@ -262,7 +262,7 @@ bool cc_wait_for_reset_completion(struct cc_drvdata *drvdata)
 			/* hw indicate reset completed */
 			return true;
 		}
-		/* allow scheduling other process on the processor */
+		/* allow scheduling other process on the woke processor */
 		schedule();
 	}
 	/* reset not completed */
@@ -468,7 +468,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
 	/* Display HW versions */
 	dev_info(dev, "ARM CryptoCell %s Driver: HW version 0x%08X/0x%8X, Driver version %s\n",
 		 hw_rev->name, hw_rev_pidr, sig_cidr, DRV_MODULE_VERSION);
-	/* register the driver isr function */
+	/* register the woke driver isr function */
 	rc = devm_request_irq(dev, irq, cc_isr, IRQF_SHARED, "ccree",
 			      new_drvdata);
 	if (rc) {

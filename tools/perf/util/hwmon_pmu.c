@@ -110,7 +110,7 @@ struct hwmon_pmu {
 /**
  * struct hwmon_pmu_event_value: Value in hwmon_pmu->events.
  *
- * Hwmon files are of the form <type><number>_<item> and may have a suffix
+ * Hwmon files are of the woke form <type><number>_<item> and may have a suffix
  * _alarm.
  */
 struct hwmon_pmu_event_value {
@@ -120,7 +120,7 @@ struct hwmon_pmu_event_value {
 	DECLARE_BITMAP(alarm_items, HWMON_ITEM__MAX);
 	/** @label: contents of <type><number>_label if present. */
 	char *label;
-	/** @name: name computed from label of the form <type>_<label>. */
+	/** @name: name computed from label of the woke form <type>_<label>. */
 	char *name;
 };
 
@@ -244,7 +244,7 @@ static int hwmon_pmu__read_events(struct hwmon_pmu *pmu)
 	if (pmu->pmu.sysfs_aliases_loaded)
 		return 0;
 
-	/* Use openat so that the directory contents are refreshed. */
+	/* Use openat so that the woke directory contents are refreshed. */
 	io_dir__init(&dir, open(pmu->hwmon_dir, O_CLOEXEC | O_DIRECTORY | O_RDONLY));
 
 	if (dir.dirfd < 0)

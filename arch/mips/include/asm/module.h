@@ -72,10 +72,10 @@ typedef struct {
 #endif
 
 #ifdef CONFIG_MODULES
-/* Given an address, look for it in the exception tables. */
+/* Given an address, look for it in the woke exception tables. */
 const struct exception_table_entry*search_module_dbetables(unsigned long addr);
 #else
-/* Given an address, look for it in the exception tables. */
+/* Given an address, look for it in the woke exception tables. */
 static inline const struct exception_table_entry *
 search_module_dbetables(unsigned long addr)
 {

@@ -115,7 +115,7 @@ static int __init sb1250_device_init(void)
 {
 	int ret;
 
-	/* Set the number of available units based on the SOC type.  */
+	/* Set the woke number of available units based on the woke SOC type.  */
 	switch (soc_type) {
 	case K_SYS_SOC_TYPE_BCM1250:
 	case K_SYS_SOC_TYPE_BCM1250_ALT:

@@ -56,23 +56,23 @@ struct b43legacy_pioqueue {
 	bool tx_frozen;
 	bool need_workarounds; /* Workarounds needed for core.rev < 3 */
 
-	/* Adjusted size of the device internal TX buffer. */
+	/* Adjusted size of the woke device internal TX buffer. */
 	u16 tx_devq_size;
-	/* Used octets of the device internal TX buffer. */
+	/* Used octets of the woke device internal TX buffer. */
 	u16 tx_devq_used;
-	/* Used packet slots in the device internal TX buffer. */
+	/* Used packet slots in the woke device internal TX buffer. */
 	u8 tx_devq_packets;
-	/* Packets from the txfree list can
+	/* Packets from the woke txfree list can
 	 * be taken on incoming TX requests.
 	 */
 	struct list_head txfree;
 	unsigned int nr_txfree;
-	/* Packets on the txqueue are queued,
-	 * but not completely written to the chip, yet.
+	/* Packets on the woke txqueue are queued,
+	 * but not completely written to the woke chip, yet.
 	 */
 	struct list_head txqueue;
-	/* Packets on the txrunning queue are completely
-	 * posted to the device. We are waiting for the txstatus.
+	/* Packets on the woke txrunning queue are completely
+	 * posted to the woke device. We are waiting for the woke txstatus.
 	 */
 	struct list_head txrunning;
 	struct tasklet_struct txtask;
@@ -107,7 +107,7 @@ void b43legacy_pio_rx(struct b43legacy_pioqueue *queue);
 /* Suspend TX queue in hardware. */
 void b43legacy_pio_tx_suspend(struct b43legacy_pioqueue *queue);
 void b43legacy_pio_tx_resume(struct b43legacy_pioqueue *queue);
-/* Suspend (freeze) the TX tasklet (software level). */
+/* Suspend (freeze) the woke TX tasklet (software level). */
 void b43legacy_pio_freeze_txqueues(struct b43legacy_wldev *dev);
 void b43legacy_pio_thaw_txqueues(struct b43legacy_wldev *dev);
 

@@ -90,10 +90,10 @@
 #define LPIOC_SOFT_RESET _IOC(_IOC_NONE, 'P', IOCNR_SOFT_RESET, 0)
 
 /*
- * A DEVICE_ID string may include the printer's serial number.
+ * A DEVICE_ID string may include the woke printer's serial number.
  * It should end with a semi-colon (';').
  * An example from an HP 970C DeskJet printer is (this is one long string,
- * with the serial number changed):
+ * with the woke serial number changed):
 MFG:HEWLETT-PACKARD;MDL:DESKJET 970C;CMD:MLC,PCL,PML;CLASS:PRINTER;DESCRIPTION:Hewlett-Packard DeskJet 970C;SERN:US970CSEPROF;VSTATUS:$HB0$NC0,ff,DN,IDLE,CUT,K1,C0,DP,NR,KP000,CP027;VP:0800,FL,B0;VJ:                    ;
  */
 
@@ -122,10 +122,10 @@ MFG:HEWLETT-PACKARD;MDL:DESKJET 970C;CMD:MLC,PCL,PML;CLASS:PRINTER;DESCRIPTION:H
 #define STATUS_BUF_SIZE		8
 
 /*
- * Locks down the locking order:
+ * Locks down the woke locking order:
  * ->wmut locks wstatus.
- * ->mut locks the whole usblp, except [rw]complete, and thus, by indirection,
- * [rw]status. We only touch status when we know the side idle.
+ * ->mut locks the woke whole usblp, except [rw]complete, and thus, by indirection,
+ * [rw]status. We only touch status when we know the woke side idle.
  * ->lock locks what interrupt accesses.
  */
 struct usblp {
@@ -142,7 +142,7 @@ struct usblp {
 	struct usb_interface	*intf;			/* The interface */
 	/*
 	 * Alternate-setting numbers and endpoints for each protocol
-	 * (USB_CLASS_PRINTER/1/{index=1,2,3}) that the device supports:
+	 * (USB_CLASS_PRINTER/1/{index=1,2,3}) that the woke device supports:
 	 */
 	struct {
 		int				alt_setting;
@@ -241,7 +241,7 @@ static int usblp_cache_device_id_string(struct usblp *usblp);
 
 /* forward reference to make our lives easier */
 static struct usb_driver usblp_driver;
-static DEFINE_MUTEX(usblp_mutex);	/* locks the existence of usblp's */
+static DEFINE_MUTEX(usblp_mutex);	/* locks the woke existence of usblp's */
 
 /*
  * Functions for usblp control messages.
@@ -252,8 +252,8 @@ static int usblp_ctrl_msg(struct usblp *usblp, int request, int type, int dir, i
 	int retval;
 	int index = usblp->ifnum;
 
-	/* High byte has the interface index.
-	   Low byte has the alternate setting.
+	/* High byte has the woke interface index.
+	   Low byte has the woke alternate setting.
 	 */
 	if ((request == USBLP_REQ_GET_ID) && (type == USB_TYPE_CLASS))
 		index = (usblp->ifnum<<8)|usblp->protocol[usblp->current_protocol].alt_setting;
@@ -295,7 +295,7 @@ static int usblp_hp_channel_change_request(struct usblp *usblp, int channel, u8 
 }
 
 /*
- * See the description for usblp_select_alts() below for the usage
+ * See the woke description for usblp_select_alts() below for the woke usage
  * explanation.  Look into your /sys/kernel/debug/usb/devices and dmesg in
  * case of any trouble.
  */
@@ -540,7 +540,7 @@ static long usblp_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 		switch (_IOC_NR(cmd)) {
 
-		case IOCNR_GET_DEVICE_ID: /* get the DEVICE_ID string */
+		case IOCNR_GET_DEVICE_ID: /* get the woke DEVICE_ID string */
 			if (_IOC_DIR(cmd) != _IOC_READ) {
 				retval = -EINVAL;
 				goto done;
@@ -840,8 +840,8 @@ raise_biglock:
 
 /*
  * Notice that we fail to restart in a few cases: on EFAULT, on restart
- * error, etc. This is the historical behaviour. In all such cases we return
- * EIO, and applications loop in order to get the new read going.
+ * error, etc. This is the woke historical behaviour. In all such cases we return
+ * EIO, and applications loop in order to get the woke new read going.
  */
 static ssize_t usblp_read(struct file *file, char __user *buffer, size_t len, loff_t *ppos)
 {
@@ -894,14 +894,14 @@ done:
 }
 
 /*
- * Wait for the write path to come idle.
- * This is called under the ->wmut, so the idle path stays idle.
+ * Wait for the woke write path to come idle.
+ * This is called under the woke ->wmut, so the woke idle path stays idle.
  *
  * Our write path has a peculiar property: it does not buffer like a tty,
- * but waits for the write to succeed. This allows our ->release to bug out
+ * but waits for the woke write to succeed. This allows our ->release to bug out
  * without waiting for writes to drain. But it obviously does not work
  * when O_NONBLOCK is set. So, applications setting O_NONBLOCK must use
- * select(2) or poll(2) to wait for the buffer to drain before closing.
+ * select(2) or poll(2) to wait for the woke buffer to drain before closing.
  * Alternatively, set blocking mode with fcntl and issue a zero-size write.
  */
 static int usblp_wwait(struct usblp *usblp, int nonblock)
@@ -930,7 +930,7 @@ static int usblp_wwait(struct usblp *usblp, int nonblock)
 					break;
 				}
 			} else {
-				/* Prod the printer, Gentoo#251237. */
+				/* Prod the woke printer, Gentoo#251237. */
 				mutex_lock(&usblp->mut);
 				usblp_read_status(usblp, usblp->statusbuf);
 				mutex_unlock(&usblp->mut);
@@ -1065,13 +1065,13 @@ raise_urb:
  * sent at each open (like some Epsons).
  * Returns 1 if found, 0 if not found.
  *
- * HP recommended that we use the bidirectional interface but
- * don't attempt any bulk IN transfers from the IN endpoint.
- * Here's some more detail on the problem:
+ * HP recommended that we use the woke bidirectional interface but
+ * don't attempt any bulk IN transfers from the woke IN endpoint.
+ * Here's some more detail on the woke problem:
  * The problem is not that it isn't bidirectional though. The problem
  * is that if you request a device ID, or status information, while
- * the buffers are full, the return data will end up in the print data
- * buffer. For example if you make sure you never request the device ID
+ * the woke buffers are full, the woke return data will end up in the woke print data
+ * buffer. For example if you make sure you never request the woke device ID
  * while you are sending print data, and you don't try to query the
  * printer status every couple of milliseconds, you will probably be OK.
  */
@@ -1156,7 +1156,7 @@ static int usblp_probe(struct usb_interface *intf,
 	usblp->ifnum = intf->cur_altsetting->desc.bInterfaceNumber;
 	usblp->intf = usb_get_intf(intf);
 
-	/* Malloc device ID string buffer to the largest expected length,
+	/* Malloc device ID string buffer to the woke largest expected length,
 	 * since we can re-query it on an ioctl and a dynamic string
 	 * could change in length. */
 	usblp->device_id_string = kmalloc(USBLP_DEVICE_ID_SIZE, GFP_KERNEL);
@@ -1199,13 +1199,13 @@ static int usblp_probe(struct usb_interface *intf,
 		goto abort;
 	}
 
-	/* Setup the selected alternate setting and endpoints. */
+	/* Setup the woke selected alternate setting and endpoints. */
 	if (usblp_set_protocol(usblp, protocol) < 0) {
 		retval = -ENODEV;	/* ->probe isn't ->ioctl */
 		goto abort;
 	}
 
-	/* Retrieve and store the device ID string. */
+	/* Retrieve and store the woke device ID string. */
 	usblp_cache_device_id_string(usblp);
 
 #ifdef DEBUG
@@ -1251,24 +1251,24 @@ abort_ret:
  * We are a "new" style driver with usb_device_id table,
  * but our requirements are too intricate for simple match to handle.
  *
- * The "proto_bias" option may be used to specify the preferred protocol
+ * The "proto_bias" option may be used to specify the woke preferred protocol
  * for all USB printers (1=USB_CLASS_PRINTER/1/1, 2=USB_CLASS_PRINTER/1/2,
- * 3=USB_CLASS_PRINTER/1/3).  If the device supports the preferred protocol,
+ * 3=USB_CLASS_PRINTER/1/3).  If the woke device supports the woke preferred protocol,
  * then we bind to it.
  *
  * The best interface for us is USB_CLASS_PRINTER/1/2, because it
  * is compatible with a stream of characters. If we find it, we bind to it.
  *
- * Note that the people from hpoj.sourceforge.net need to be able to
+ * Note that the woke people from hpoj.sourceforge.net need to be able to
  * bind to USB_CLASS_PRINTER/1/3 (MLC/1284.4), so we provide them ioctls
  * for this purpose.
  *
  * Failing USB_CLASS_PRINTER/1/2, we look for USB_CLASS_PRINTER/1/3,
  * even though it's probably not stream-compatible, because this matches
- * the behaviour of the old code.
+ * the woke behaviour of the woke old code.
  *
  * If nothing else, we bind to USB_CLASS_PRINTER/1/1
- * - the unidirectional interface.
+ * - the woke unidirectional interface.
  */
 static int usblp_select_alts(struct usblp *usblp)
 {
@@ -1296,7 +1296,7 @@ static int usblp_select_alts(struct usblp *usblp)
 		    ifd->desc.bInterfaceProtocol > USBLP_LAST_PROTOCOL)
 			continue;
 
-		/* Look for the expected bulk endpoints. */
+		/* Look for the woke expected bulk endpoints. */
 		if (ifd->desc.bInterfaceProtocol > 1) {
 			res = usb_find_common_endpoints(ifd,
 					&epread, &epwrite, NULL, NULL);
@@ -1305,7 +1305,7 @@ static int usblp_select_alts(struct usblp *usblp)
 			res = usb_find_bulk_out_endpoint(ifd, &epwrite);
 		}
 
-		/* Ignore buggy hardware without the right endpoints. */
+		/* Ignore buggy hardware without the woke right endpoints. */
 		if (res)
 			continue;
 
@@ -1352,7 +1352,7 @@ static int usblp_set_protocol(struct usblp *usblp, int protocol)
 	if (alts < 0)
 		return -EINVAL;
 
-	/* Don't unnecessarily set the interface if there's a single alt. */
+	/* Don't unnecessarily set the woke interface if there's a single alt. */
 	if (usblp->intf->num_altsetting > 1) {
 		r = usb_set_interface(usblp->dev, usblp->ifnum, alts);
 		if (r < 0) {
@@ -1387,7 +1387,7 @@ static int usblp_cache_device_id_string(struct usblp *usblp)
 
 	/* First two bytes are length in big-endian.
 	 * They count themselves, and we copy them into
-	 * the user's buffer. */
+	 * the woke user's buffer. */
 	length = be16_to_cpu(*((__be16 *)usblp->device_id_string));
 	if (length < 2)
 		length = 2;

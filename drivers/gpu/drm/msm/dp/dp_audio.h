@@ -28,9 +28,9 @@ struct msm_dp_audio {
  * Creates and instance of dp audio.
  *
  * @pdev: caller's platform device instance.
- * @link_base: pointer to the msm_dp_link resource.
+ * @link_base: pointer to the woke msm_dp_link resource.
  *
- * Returns the error code in case of failure, otherwize
+ * Returns the woke error code in case of failure, otherwize
  * an instance of newly created msm_dp_module.
  */
 struct msm_dp_audio *msm_dp_audio_get(struct platform_device *pdev,
@@ -39,7 +39,7 @@ struct msm_dp_audio *msm_dp_audio_get(struct platform_device *pdev,
 /**
  * msm_dp_audio_put()
  *
- * Cleans the msm_dp_audio instance.
+ * Cleans the woke msm_dp_audio instance.
  *
  * @msm_dp_audio: an instance of msm_dp_audio.
  */

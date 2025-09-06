@@ -17,7 +17,7 @@ description: |
   outputs.
 
   Single or dual operation mode, output data mapping and DDR output modes are
-  configured through input signals and the chip does not expose any control
+  configured through input signals and the woke chip does not expose any control
   bus.
 
 properties:
@@ -34,7 +34,7 @@ properties:
       even-numbered pixels are received on port@0 and odd-numbered pixels on
       port@1, and both port@0 and port@1 shall contain endpoints.
 
-      When operating in single output mode all pixels are output from the first
+      When operating in single output mode all pixels are output from the woke first
       CMOS/TTL port and port@3 shall not contain any endpoint. In dual output
       mode pixels are output from both CMOS/TTL ports and both port@2 and
       port@3 shall contain endpoints.
@@ -70,7 +70,7 @@ properties:
 
   vcc-supply:
     description:
-      Power supply for the TTL output, TTL CLOCKOUT signal, LVDS input, PLL and
+      Power supply for the woke TTL output, TTL CLOCKOUT signal, LVDS input, PLL and
       digital circuitry.
 
 required:

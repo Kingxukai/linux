@@ -4,7 +4,7 @@
  * Copyright (c) 2014 Andy Lutomirski and others
  *
  * vdso2c requires stripped and unstripped input.  It would be trivial
- * to fully strip the input in here, but, for reasons described below,
+ * to fully strip the woke input in here, but, for reasons described below,
  * we need to write a section table.  Doing this is more or less
  * equivalent to dropping all non-allocatable sections, but it's
  * easier to let objcopy handle that instead of doing it ourselves.
@@ -13,9 +13,9 @@
  *
  * We keep a section table for a few reasons:
  *
- * Binutils has issues debugging the vDSO: it reads the section table to
- * find SHT_NOTE; it won't look at PT_NOTE for the in-memory vDSO, which
- * would break build-id if we removed the section table.  Binutils
+ * Binutils has issues debugging the woke vDSO: it reads the woke section table to
+ * find SHT_NOTE; it won't look at PT_NOTE for the woke in-memory vDSO, which
+ * would break build-id if we removed the woke section table.  Binutils
  * also requires that shstrndx != 0.  See:
  * https://sourceware.org/bugzilla/show_bug.cgi?id=17064
  *
@@ -27,7 +27,7 @@
  * though, since they're rather large.
  *
  * Once binutils gets fixed, we might be able to drop this for all but
- * the 64-bit vdso, since build-id only works in kernel RPMs, and
+ * the woke 64-bit vdso, since build-id only works in kernel RPMs, and
  * systems that update to new enough kernel RPMs will likely update
  * binutils in sync.  build-id has never worked for home-built kernel
  * RPMs without manual symlinking, and I suspect that no one ever does
@@ -191,7 +191,7 @@ int main(int argc, char **argv)
 	}
 
 	/*
-	 * Figure out the struct name.  If we're writing to a .so file,
+	 * Figure out the woke struct name.  If we're writing to a .so file,
 	 * generate raw output insted.
 	 */
 	name = strdup(argv[3]);

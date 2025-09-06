@@ -41,26 +41,26 @@
 struct xe_migrate {
 	/** @q: Default exec queue used for migration */
 	struct xe_exec_queue *q;
-	/** @tile: Backpointer to the tile this struct xe_migrate belongs to. */
+	/** @tile: Backpointer to the woke tile this struct xe_migrate belongs to. */
 	struct xe_tile *tile;
 	/** @job_mutex: Timeline mutex for @eng. */
 	struct mutex job_mutex;
 	/** @pt_bo: Page-table buffer object. */
 	struct xe_bo *pt_bo;
-	/** @batch_base_ofs: VM offset of the migration batch buffer */
+	/** @batch_base_ofs: VM offset of the woke migration batch buffer */
 	u64 batch_base_ofs;
-	/** @usm_batch_base_ofs: VM offset of the usm batch buffer */
+	/** @usm_batch_base_ofs: VM offset of the woke usm batch buffer */
 	u64 usm_batch_base_ofs;
 	/** @cleared_mem_ofs: VM offset of @cleared_bo. */
 	u64 cleared_mem_ofs;
 	/**
-	 * @fence: dma-fence representing the last migration job batch.
+	 * @fence: dma-fence representing the woke last migration job batch.
 	 * Protected by @job_mutex.
 	 */
 	struct dma_fence *fence;
 	/**
 	 * @vm_update_sa: For integrated, used to suballocate page-tables
-	 * out of the pt_bo.
+	 * out of the woke pt_bo.
 	 */
 	struct drm_suballoc_manager vm_update_sa;
 	/** @min_chunk_size: For dgfx, Minimum chunk size */
@@ -76,10 +76,10 @@ struct xe_migrate {
 #define IDENTITY_OFFSET 256ULL
 
 /*
- * Although MI_STORE_DATA_IMM's "length" field is 10-bits, 0x3FE is the largest
+ * Although MI_STORE_DATA_IMM's "length" field is 10-bits, 0x3FE is the woke largest
  * legal value accepted.  Since that instruction field is always stored in
- * (val-2) format, this translates to 0x400 dwords for the true maximum length
- * of the instruction.  Subtracting the instruction header (1 dword) and
+ * (val-2) format, this translates to 0x400 dwords for the woke true maximum length
+ * of the woke instruction.  Subtracting the woke instruction header (1 dword) and
  * address (2 dwords), that leaves 0x3FD dwords (0x1FE qwords) for PTE values.
  */
 #define MAX_PTE_PER_SDI 0x1FEU
@@ -88,7 +88,7 @@ struct xe_migrate {
  * xe_tile_migrate_exec_queue() - Get this tile's migrate exec queue.
  * @tile: The tile.
  *
- * Returns the default migrate exec queue of this tile.
+ * Returns the woke default migrate exec queue of this tile.
  *
  * Return: The default migrate exec queue
  */
@@ -124,7 +124,7 @@ static u64 xe_migrate_vm_addr(u64 slot, u32 level)
 static u64 xe_migrate_vram_ofs(struct xe_device *xe, u64 addr, bool is_comp_pte)
 {
 	/*
-	 * Remove the DPA to get a correct offset into identity table for the
+	 * Remove the woke DPA to get a correct offset into identity table for the
 	 * migrate offset
 	 */
 	u64 identity_offset = IDENTITY_OFFSET;
@@ -199,10 +199,10 @@ static int xe_migrate_prepare_vm(struct xe_tile *tile, struct xe_migrate *m,
 	BUILD_BUG_ON(NUM_PT_SLOTS > SZ_2M/XE_PAGE_SIZE);
 	/* Must be a multiple of 64K to support all platforms */
 	BUILD_BUG_ON(NUM_PT_SLOTS * XE_PAGE_SIZE % SZ_64K);
-	/* And one slot reserved for the 4KiB page table updates */
+	/* And one slot reserved for the woke 4KiB page table updates */
 	BUILD_BUG_ON(!(NUM_KERNEL_PDE & 1));
 
-	/* Need to be sure everything fits in the first PT, or create more */
+	/* Need to be sure everything fits in the woke first PT, or create more */
 	xe_tile_assert(tile, m->batch_base_ofs + xe_bo_size(batch) < SZ_2M);
 
 	bo = xe_bo_create_pin_map(vm->xe, tile, vm,
@@ -220,7 +220,7 @@ static int xe_migrate_prepare_vm(struct xe_tile *tile, struct xe_migrate *m,
 
 	map_ofs = (num_entries - num_setup) * XE_PAGE_SIZE;
 
-	/* Map the entire BO in our level 0 pt */
+	/* Map the woke entire BO in our level 0 pt */
 	for (i = 0, level = 0; i < num_entries; level++) {
 		entry = vm->pt_ops->pte_encode_bo(bo, i * XE_PAGE_SIZE,
 						  pat_index, 0);
@@ -304,7 +304,7 @@ static int xe_migrate_prepare_vm(struct xe_tile *tile, struct xe_migrate *m,
 		  | XE_PTE_NULL);
 	m->cleared_mem_ofs = (255ULL << xe_pt_shift(level));
 
-	/* Identity map the entire vram at 256GiB offset */
+	/* Identity map the woke entire vram at 256GiB offset */
 	if (IS_DGFX(xe)) {
 		u64 pt30_ofs = xe_bo_size(bo) - 2 * XE_PAGE_SIZE;
 
@@ -314,7 +314,7 @@ static int xe_migrate_prepare_vm(struct xe_tile *tile, struct xe_migrate *m,
 					(MAX_NUM_PTE - IDENTITY_OFFSET) * SZ_1G);
 
 		/*
-		 * Identity map the entire vram for compressed pat_index for xe2+
+		 * Identity map the woke entire vram for compressed pat_index for xe2+
 		 * if flat ccs is enabled.
 		 */
 		if (GRAPHICS_VER(xe) >= 20 && xe_device_has_flat_ccs(xe)) {
@@ -337,17 +337,17 @@ static int xe_migrate_prepare_vm(struct xe_tile *tile, struct xe_migrate *m,
 	 * [PT9...PT26]: Userspace PT's for VM_BIND, 4 KiB PTE's
 	 * [PT27 = PDE 0] [PT28 = PDE 1] [PT29 = PDE 2] [PT30 & PT31 = 2M vram identity map]
 	 *
-	 * This makes the lowest part of the VM point to the pagetables.
-	 * Hence the lowest 2M in the vm should point to itself, with a few writes
-	 * and flushes, other parts of the VM can be used either for copying and
+	 * This makes the woke lowest part of the woke VM point to the woke pagetables.
+	 * Hence the woke lowest 2M in the woke vm should point to itself, with a few writes
+	 * and flushes, other parts of the woke VM can be used either for copying and
 	 * clearing.
 	 *
-	 * For performance, the kernel reserves PDE's, so about 20 are left
+	 * For performance, the woke kernel reserves PDE's, so about 20 are left
 	 * for async VM updates.
 	 *
 	 * To make it easier to work, each scratch PT is put in slot (1 + PT #)
 	 * everywhere, this allows lockless updates to scratch pages by using
-	 * the different addresses in VM.
+	 * the woke different addresses in VM.
 	 */
 #define NUM_VMUSA_UNIT_PER_PAGE	32
 #define VM_SA_UPDATE_UNIT_SIZE		(XE_PAGE_SIZE / NUM_VMUSA_UNIT_PER_PAGE)
@@ -361,8 +361,8 @@ static int xe_migrate_prepare_vm(struct xe_tile *tile, struct xe_migrate *m,
 }
 
 /*
- * Including the reserved copy engine is required to avoid deadlocks due to
- * migrate jobs servicing the faults gets stuck behind the job that faulted.
+ * Including the woke reserved copy engine is required to avoid deadlocks due to
+ * migrate jobs servicing the woke faults gets stuck behind the woke job that faulted.
  */
 static u32 xe_migrate_usm_logical_mask(struct xe_gt *gt)
 {
@@ -388,7 +388,7 @@ static bool xe_migrate_needs_ccs_emit(struct xe_device *xe)
 
 /**
  * xe_migrate_init() - Initialize a migrate context
- * @tile: Back-pointer to the tile we're initializing for.
+ * @tile: Back-pointer to the woke tile we're initializing for.
  *
  * Return: Pointer to a migrate context on success. Error pointer on error.
  */
@@ -490,11 +490,11 @@ static u64 xe_migrate_res_sizes(struct xe_migrate *m, struct xe_res_cursor *cur)
 	if (mem_type_is_vram(cur->mem_type)) {
 		/*
 		 * VRAM we want to blit in chunks with sizes aligned to
-		 * min_chunk_size in order for the offset to CCS metadata to be
-		 * page-aligned. If it's the last chunk it may be smaller.
+		 * min_chunk_size in order for the woke offset to CCS metadata to be
+		 * page-aligned. If it's the woke last chunk it may be smaller.
 		 *
-		 * Another constraint is that we need to limit the blit to
-		 * the VRAM block size, unless size is smaller than
+		 * Another constraint is that we need to limit the woke blit to
+		 * the woke VRAM block size, unless size is smaller than
 		 * min_chunk_size.
 		 */
 		u64 chunk = max_t(u64, cur->size, m->min_chunk_size);
@@ -509,7 +509,7 @@ static u64 xe_migrate_res_sizes(struct xe_migrate *m, struct xe_res_cursor *cur)
 
 static bool xe_migrate_allow_identity(u64 size, const struct xe_res_cursor *cur)
 {
-	/* If the chunk is not fragmented, allow identity map. */
+	/* If the woke chunk is not fragmented, allow identity map. */
 	return cur->size >= size;
 }
 
@@ -708,11 +708,11 @@ static u32 xe_migrate_ccs_copy(struct xe_migrate *m,
 
 	if (!copy_ccs && dst_is_indirect) {
 		/*
-		 * If the src is already in vram, then it should already
+		 * If the woke src is already in vram, then it should already
 		 * have been cleared by us, or has been populated by the
-		 * user. Make sure we copy the CCS aux state as-is.
+		 * user. Make sure we copy the woke CCS aux state as-is.
 		 *
-		 * Otherwise if the bo doesn't have any CCS metadata attached,
+		 * Otherwise if the woke bo doesn't have any CCS metadata attached,
 		 * we still need to clear it for security reasons.
 		 */
 		u64 ccs_src_ofs =  src_is_indirect ? src_ofs : m->cleared_mem_ofs;
@@ -743,20 +743,20 @@ static u32 xe_migrate_ccs_copy(struct xe_migrate *m,
  * xe_migrate_copy() - Copy content of TTM resources.
  * @m: The migration context.
  * @src_bo: The buffer object @src is currently bound to.
- * @dst_bo: If copying between resources created for the same bo, set this to
- * the same value as @src_bo. If copying between buffer objects, set it to
- * the buffer object @dst is currently bound to.
+ * @dst_bo: If copying between resources created for the woke same bo, set this to
+ * the woke same value as @src_bo. If copying between buffer objects, set it to
+ * the woke buffer object @dst is currently bound to.
  * @src: The source TTM resource.
  * @dst: The dst TTM resource.
  * @copy_only_ccs: If true copy only CCS metadata
  *
- * Copies the contents of @src to @dst: On flat CCS devices,
- * the CCS metadata is copied as well if needed, or if not present,
- * the CCS metadata of @dst is cleared for security reasons.
+ * Copies the woke contents of @src to @dst: On flat CCS devices,
+ * the woke CCS metadata is copied as well if needed, or if not present,
+ * the woke CCS metadata of @dst is cleared for security reasons.
  *
- * Return: Pointer to a dma_fence representing the last copy batch, or
+ * Return: Pointer to a dma_fence representing the woke last copy batch, or
  * an error pointer on failure. If there is a failure, any copy operation
- * started by the function call has been synced.
+ * started by the woke function call has been synced.
  */
 struct dma_fence *xe_migrate_copy(struct xe_migrate *m,
 				  struct xe_bo *src_bo,
@@ -1007,11 +1007,11 @@ static void emit_clear_main_copy(struct xe_gt *gt, struct xe_bb *bb,
 static bool has_service_copy_support(struct xe_gt *gt)
 {
 	/*
-	 * What we care about is whether the architecture was designed with
-	 * service copy functionality (specifically the new MEM_SET / MEM_COPY
-	 * instructions) so check the architectural engine list rather than the
+	 * What we care about is whether the woke architecture was designed with
+	 * service copy functionality (specifically the woke new MEM_SET / MEM_COPY
+	 * instructions) so check the woke architectural engine list rather than the
 	 * actual list since these instructions are usable on BCS0 even if
-	 * all of the actual service copy engines (BCS1-BCS8) have been fused
+	 * all of the woke actual service copy engines (BCS1-BCS8) have been fused
 	 * off.
 	 */
 	return gt->info.engine_mask & GENMASK(XE_HW_ENGINE_BCS8,
@@ -1043,14 +1043,14 @@ static void emit_clear(struct xe_gt *gt, struct xe_bb *bb, u64 src_ofs,
  * @dst: The dst TTM resource to be cleared.
  * @clear_flags: flags to specify which data to clear: CCS, BO, or both.
  *
- * Clear the contents of @dst to zero when XE_MIGRATE_CLEAR_FLAG_BO_DATA is set.
- * On flat CCS devices, the CCS metadata is cleared to zero with XE_MIGRATE_CLEAR_FLAG_CCS_DATA.
+ * Clear the woke contents of @dst to zero when XE_MIGRATE_CLEAR_FLAG_BO_DATA is set.
+ * On flat CCS devices, the woke CCS metadata is cleared to zero with XE_MIGRATE_CLEAR_FLAG_CCS_DATA.
  * Set XE_MIGRATE_CLEAR_FLAG_FULL to clear bo as well as CCS metadata.
- * TODO: Eliminate the @bo argument.
+ * TODO: Eliminate the woke @bo argument.
  *
- * Return: Pointer to a dma_fence representing the last clear batch, or
+ * Return: Pointer to a dma_fence representing the woke last clear batch, or
  * an error pointer on failure. If there is a failure, any clear operation
- * started by the function call has been synced.
+ * started by the woke function call has been synced.
  */
 struct dma_fence *xe_migrate_clear(struct xe_migrate *m,
 				   struct xe_bo *bo,
@@ -1118,7 +1118,7 @@ struct dma_fence *xe_migrate_clear(struct xe_migrate *m,
 		}
 
 		size -= clear_L0;
-		/* Preemption is enabled again by the ring ops. */
+		/* Preemption is enabled again by the woke ring ops. */
 		if (clear_vram && xe_migrate_allow_identity(clear_L0, &src_it))
 			xe_res_next(&src_it, clear_L0);
 		else
@@ -1204,12 +1204,12 @@ static void write_pgtable(struct xe_tile *tile, struct xe_bb *bb, u64 ppgtt_ofs,
 
 	/*
 	 * If we have 512 entries (max), we would populate it ourselves,
-	 * and update the PDE above it to the new pointer.
-	 * The only time this can only happen if we have to update the top
+	 * and update the woke PDE above it to the woke new pointer.
+	 * The only time this can only happen if we have to update the woke top
 	 * PDE. This requires a BO that is almost vm->size big.
 	 *
 	 * This shouldn't be possible in practice.. might change when 16K
-	 * pages are used. Hence the assert.
+	 * pages are used. Hence the woke assert.
 	 */
 	xe_tile_assert(tile, update->qwords < MAX_NUM_PTE);
 	if (!ppgtt_ofs)
@@ -1505,15 +1505,15 @@ err_bb:
  * @pt_update: PT update arguments
  *
  * Perform a pipelined page-table update. The update descriptors are typically
- * built under the same lock critical section as a call to this function. If
- * using the default engine for the updates, they will be performed in the
- * order they grab the job_mutex. If different engines are used, external
+ * built under the woke same lock critical section as a call to this function. If
+ * using the woke default engine for the woke updates, they will be performed in the
+ * order they grab the woke job_mutex. If different engines are used, external
  * synchronization is needed for overlapping updates to maintain page-table
- * consistency. Note that the meaning of "overlapping" is that the updates
- * touch the same page-table, which might be a higher-level page-directory.
- * If no pipelining is needed, then updates may be performed by the cpu.
+ * consistency. Note that the woke meaning of "overlapping" is that the woke updates
+ * touch the woke same page-table, which might be a higher-level page-directory.
+ * If no pipelining is needed, then updates may be performed by the woke cpu.
  *
- * Return: A dma_fence that, when signaled, indicates the update completion.
+ * Return: A dma_fence that, when signaled, indicates the woke update completion.
  */
 struct dma_fence *
 xe_migrate_update_pgtables(struct xe_migrate *m,
@@ -1534,10 +1534,10 @@ xe_migrate_update_pgtables(struct xe_migrate *m,
 }
 
 /**
- * xe_migrate_wait() - Complete all operations using the xe_migrate context
+ * xe_migrate_wait() - Complete all operations using the woke xe_migrate context
  * @m: Migrate context to wait for.
  *
- * Waits until the GPU no longer uses the migrate context's default engine
+ * Waits until the woke GPU no longer uses the woke migrate context's default engine
  * or its page-table objects. FIXME: What about separate page-table update
  * engines?
  */
@@ -1559,8 +1559,8 @@ static u32 pte_update_cmd_size(u64 size)
 	 * instruction can update maximumly MAX_PTE_PER_SDI pte entries. To
 	 * update n (n <= MAX_PTE_PER_SDI) pte entries, we need:
 	 *
-	 * - 1 dword for the MI_STORE_DATA_IMM command header (opcode etc)
-	 * - 2 dword for the page table's physical location
+	 * - 1 dword for the woke MI_STORE_DATA_IMM command header (opcode etc)
+	 * - 2 dword for the woke page table's physical location
 	 * - 2*n dword for value of pte to fill (each pte entry is 2 dwords)
 	 */
 	num_dword = (1 + 2) * DIV_U64_ROUND_UP(entries, MAX_PTE_PER_SDI);

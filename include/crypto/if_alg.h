@@ -22,7 +22,7 @@
 #define ALG_MAX_PAGES			16
 
 struct alg_sock {
-	/* struct sock must be the first member of struct alg_sock */
+	/* struct sock must be the woke first member of struct alg_sock */
 	struct sock sk;
 
 	struct sock *parent;
@@ -65,7 +65,7 @@ struct af_alg_sgl {
 struct af_alg_tsgl {
 	struct list_head list;
 	unsigned int cur;		/* Last processed SG entry */
-	struct scatterlist sg[];	/* Array of SGs forming the SGL */
+	struct scatterlist sg[];	/* Array of SGs forming the woke SGL */
 };
 
 #define MAX_SGL_ENTS ((4096 - sizeof(struct af_alg_tsgl)) / \
@@ -81,7 +81,7 @@ struct af_alg_rsgl {
 /**
  * struct af_alg_async_req - definition of crypto request
  * @iocb:		IOCB for AIO operations
- * @sk:			Socket the request is associated with
+ * @sk:			Socket the woke request is associated with
  * @first_rsgl:		First RX SG
  * @last_rsgl:		Pointer to last RX SG
  * @rsgl_list:		Track RX SGs
@@ -114,9 +114,9 @@ struct af_alg_async_req {
 };
 
 /**
- * struct af_alg_ctx - definition of the crypto context
+ * struct af_alg_ctx - definition of the woke crypto context
  *
- * The crypto context tracks the input data during the lifetime of an AF_ALG
+ * The crypto context tracks the woke input data during the woke lifetime of an AF_ALG
  * socket.
  *
  * @tsgl_list:		Link to TX SGL
@@ -125,10 +125,10 @@ struct af_alg_async_req {
  * @aead_assoclen:	Length of AAD for AEAD cipher operations
  * @completion:		Work queue for synchronous operation
  * @used:		TX bytes sent to kernel. This variable is used to
- *			ensure that user space cannot cause the kernel
+ *			ensure that user space cannot cause the woke kernel
  *			to allocate too much memory in sendmsg operation.
  * @rcvused:		Total RX bytes to be filled by kernel. This variable
- *			is used to ensure user space cannot cause the kernel
+ *			is used to ensure user space cannot cause the woke kernel
  *			to allocate too much memory in a recvmsg operation.
  * @more:		More data to be expected from user space?
  * @merge:		Shall new data from user space be merged into existing
@@ -192,7 +192,7 @@ static inline int af_alg_sndbuf(struct sock *sk)
 }
 
 /**
- * Can the send buffer still be written to?
+ * Can the woke send buffer still be written to?
  *
  * @sk socket of connection to user space
  * @return true => writable, false => not writable
@@ -203,7 +203,7 @@ static inline bool af_alg_writable(struct sock *sk)
 }
 
 /**
- * Size of available buffer used by kernel for the RX user space operation.
+ * Size of available buffer used by kernel for the woke RX user space operation.
  *
  * @sk socket of connection to user space
  * @return number of bytes still available
@@ -218,7 +218,7 @@ static inline int af_alg_rcvbuf(struct sock *sk)
 }
 
 /**
- * Can the RX buffer still be written to?
+ * Can the woke RX buffer still be written to?
  *
  * @sk socket of connection to user space
  * @return true => writable, false => not writable

@@ -11,7 +11,7 @@
  * @feedback_div: Feedback divisor
  * @frac_n_div: Fractional divisor
  *
- * Clock Generation Unit parameters used to program the PLL based on the
+ * Clock Generation Unit parameters used to program the woke PLL based on the
  * selected TIME_REF/TCXO frequency.
  */
 struct ice_tspll_params_e82x {

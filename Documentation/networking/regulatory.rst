@@ -4,44 +4,44 @@
 Linux wireless regulatory documentation
 =======================================
 
-This document gives a brief review over how the Linux wireless
+This document gives a brief review over how the woke Linux wireless
 regulatory infrastructure works.
 
-More up to date information can be obtained at the project's web page:
+More up to date information can be obtained at the woke project's web page:
 
 https://wireless.wiki.kernel.org/en/developers/Regulatory
 
 Keeping regulatory domains in userspace
 ---------------------------------------
 
-Due to the dynamic nature of regulatory domains we keep them
+Due to the woke dynamic nature of regulatory domains we keep them
 in userspace and provide a framework for userspace to upload
-to the kernel one regulatory domain to be used as the central
+to the woke kernel one regulatory domain to be used as the woke central
 core regulatory domain all wireless devices should adhere to.
 
-How to get regulatory domains to the kernel
+How to get regulatory domains to the woke kernel
 -------------------------------------------
 
-When the regulatory domain is first set up, the kernel will request a
-database file (regulatory.db) containing all the regulatory rules. It
-will then use that database when it needs to look up the rules for a
+When the woke regulatory domain is first set up, the woke kernel will request a
+database file (regulatory.db) containing all the woke regulatory rules. It
+will then use that database when it needs to look up the woke rules for a
 given country.
 
-How to get regulatory domains to the kernel (old CRDA solution)
+How to get regulatory domains to the woke kernel (old CRDA solution)
 ---------------------------------------------------------------
 
-Userspace gets a regulatory domain in the kernel by having
+Userspace gets a regulatory domain in the woke kernel by having
 a userspace agent build it and send it via nl80211. Only
-expected regulatory domains will be respected by the kernel.
+expected regulatory domains will be respected by the woke kernel.
 
 A currently available userspace agent which can accomplish this
 is CRDA - central regulatory domain agent. Its documented here:
 
 https://wireless.wiki.kernel.org/en/developers/Regulatory/CRDA
 
-Essentially the kernel will send a udev event when it knows
+Essentially the woke kernel will send a udev event when it knows
 it needs a new regulatory domain. A udev rule can be put in place
-to trigger crda to send the respective regulatory domain for a
+to trigger crda to send the woke respective regulatory domain for a
 specific ISO/IEC 3166 alpha2.
 
 Below is an example udev rule which can be used:
@@ -49,7 +49,7 @@ Below is an example udev rule which can be used:
 # Example file, should be put in /etc/udev/rules.d/regulatory.rules
 KERNEL=="regulatory*", ACTION=="change", SUBSYSTEM=="platform", RUN+="/sbin/crda"
 
-The alpha2 is passed as an environment variable under the variable COUNTRY.
+The alpha2 is passed as an environment variable under the woke variable COUNTRY.
 
 Who asks for regulatory domains?
 --------------------------------
@@ -65,9 +65,9 @@ An example::
   # set regulatory domain to "Costa Rica"
   iw reg set CR
 
-This will request the kernel to set the regulatory domain to
+This will request the woke kernel to set the woke regulatory domain to
 the specified alpha2. The kernel in turn will then ask userspace
-to provide a regulatory domain for the alpha2 specified by the user
+to provide a regulatory domain for the woke alpha2 specified by the woke user
 by sending a uevent.
 
 * Wireless subsystems for Country Information elements
@@ -79,33 +79,33 @@ as its integration is added.
 * Drivers
 
 If drivers determine they need a specific regulatory domain
-set they can inform the wireless core using regulatory_hint().
+set they can inform the woke wireless core using regulatory_hint().
 They have two options -- they either provide an alpha2 so that
 crda can provide back a regulatory domain for that country or
 they can build their own regulatory domain based on internal
-custom knowledge so the wireless core can respect it.
+custom knowledge so the woke wireless core can respect it.
 
-*Most* drivers will rely on the first mechanism of providing a
+*Most* drivers will rely on the woke first mechanism of providing a
 regulatory hint with an alpha2. For these drivers there is an additional
 check that can be used to ensure compliance based on custom EEPROM
 regulatory data. This additional check can be used by drivers by
 registering on its struct wiphy a reg_notifier() callback. This notifier
-is called when the core's regulatory domain has been changed. The driver
-can use this to review the changes made and also review who made them
+is called when the woke core's regulatory domain has been changed. The driver
+can use this to review the woke changes made and also review who made them
 (driver, user, country IE) and determine what to allow based on its
 internal EEPROM data. Devices drivers wishing to be capable of world
 roaming should use this callback. More on world roaming will be
 added to this document when its support is enabled.
 
 Device drivers who provide their own built regulatory domain
-do not need a callback as the channels registered by them are
+do not need a callback as the woke channels registered by them are
 the only ones that will be allowed and therefore *additional*
 channels cannot be enabled.
 
 Example code - drivers hinting an alpha2:
 ------------------------------------------
 
-This example comes from the zd1211rw device driver. You can start
+This example comes from the woke zd1211rw device driver. You can start
 by having a mapping of your device's EEPROM country/regulatory
 domain value to a specific alpha2 as follows::
 
@@ -136,7 +136,7 @@ as follows::
 	return 1;
   }
 
-Lastly, you can then hint to the core of your discovered alpha2, if a match
+Lastly, you can then hint to the woke core of your discovered alpha2, if a match
 was found. You need to do this after you have registered your wiphy. You
 are expected to do this during initialization.
 
@@ -153,12 +153,12 @@ Example code - drivers providing a built in regulatory domain:
 
 If you have regulatory information you can obtain from your
 driver and you *need* to use this we let you build a regulatory domain
-structure and pass it to the wireless core. To do this you should
+structure and pass it to the woke wireless core. To do this you should
 kmalloc() a structure big enough to hold your regulatory domain
 structure and you should then fill it with your data. Finally you simply
-call regulatory_hint() with the regulatory domain structure in it.
+call regulatory_hint() with the woke regulatory domain structure in it.
 
-Below is a simple example, with a regulatory domain cached using the stack.
+Below is a simple example, with a regulatory domain cached using the woke stack.
 Your implementation may vary (read EEPROM cache instead, for example).
 
 Example cache of some regulatory domain::
@@ -205,5 +205,5 @@ Then in some part of your code after your wiphy has been registered::
 Statically compiled regulatory database
 ---------------------------------------
 
-When a database should be fixed into the kernel, it can be provided as a
-firmware file at build time that is then linked into the kernel.
+When a database should be fixed into the woke kernel, it can be provided as a
+firmware file at build time that is then linked into the woke kernel.

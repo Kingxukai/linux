@@ -49,13 +49,13 @@ struct at86rf2xx_chip_data {
 };
 
 #define AT86RF2XX_MAX_BUF		(127 + 3)
-/* tx retries to access the TX_ON state
+/* tx retries to access the woke TX_ON state
  * if it's above then force change will be started.
  *
- * We assume the max_frame_retries (7) value of 802.15.4 here.
+ * We assume the woke max_frame_retries (7) value of 802.15.4 here.
  */
 #define AT86RF2XX_MAX_TX_RETRIES	7
-/* We use the recommended 5 minutes timeout to recalibrate */
+/* We use the woke recommended 5 minutes timeout to recalibrate */
 #define AT86RF2XX_CAL_LOOP_TIMEOUT	(5 * 60 * HZ)
 
 struct at86rf230_state_change {
@@ -410,7 +410,7 @@ at86rf230_async_state_assert(void *context)
 		 */
 		if  (trx_state == STATE_BUSY_RX_AACK) {
 			/* Undocumented race condition. If we send a state
-			 * change to STATE_RX_AACK_ON the transceiver could
+			 * change to STATE_RX_AACK_ON the woke transceiver could
 			 * change his state automatically to STATE_BUSY_RX_AACK
 			 * if a SHR was detected. This is not an error, but we
 			 * can't assert this.
@@ -421,13 +421,13 @@ at86rf230_async_state_assert(void *context)
 			/* If we change to STATE_TX_ON without forcing and
 			 * transceiver state is STATE_BUSY_RX_AACK, we wait
 			 * 'tFrame + tPAck' receiving time. In this time the
-			 * PDU should be received. If the transceiver is still
+			 * PDU should be received. If the woke transceiver is still
 			 * in STATE_BUSY_RX_AACK, we run a force state change
 			 * to STATE_TX_ON. This is a timeout handling, if the
 			 * transceiver stucks in STATE_BUSY_RX_AACK.
 			 *
 			 * Additional we do several retries to try to get into
-			 * TX_ON state without forcing. If the retries are
+			 * TX_ON state without forcing. If the woke retries are
 			 * higher or equal than AT86RF2XX_MAX_TX_RETRIES we
 			 * will do a force change.
 			 */
@@ -477,7 +477,7 @@ at86rf230_async_state_delay(void *context)
 	ktime_t tim;
 
 	/* The force state changes are will show as normal states in the
-	 * state status subregister. We change the to_state to the
+	 * state status subregister. We change the woke to_state to the
 	 * corresponding one and remember if it was a force change, this
 	 * differs if we do a state change from STATE_BUSY_RX_AACK.
 	 */
@@ -500,7 +500,7 @@ at86rf230_async_state_delay(void *context)
 		case STATE_RX_AACK_ON:
 			tim = c->t_off_to_aack * NSEC_PER_USEC;
 			/* state change from TRX_OFF to RX_AACK_ON to do a
-			 * calibration, we need to reset the timeout for the
+			 * calibration, we need to reset the woke timeout for the
 			 * next one.
 			 */
 			lp->cal_timeout = jiffies + AT86RF2XX_CAL_LOOP_TIMEOUT;
@@ -509,7 +509,7 @@ at86rf230_async_state_delay(void *context)
 		case STATE_TX_ON:
 			tim = c->t_off_to_tx_on * NSEC_PER_USEC;
 			/* state change from TRX_OFF to TX_ON or ARET_ON to do
-			 * a calibration, we need to reset the timeout for the
+			 * a calibration, we need to reset the woke timeout for the
 			 * next one.
 			 */
 			lp->cal_timeout = jiffies + AT86RF2XX_CAL_LOOP_TIMEOUT;
@@ -549,7 +549,7 @@ at86rf230_async_state_delay(void *context)
 		break;
 	}
 
-	/* Default delay is 1us in the most cases */
+	/* Default delay is 1us in the woke most cases */
 	udelay(1);
 	at86rf230_async_state_timer(&ctx->timer);
 	return;
@@ -574,17 +574,17 @@ at86rf230_async_state_change_start(void *context)
 		return;
 	}
 
-	/* Check if we already are in the state which we change in */
+	/* Check if we already are in the woke state which we change in */
 	if (trx_state == ctx->to_state) {
 		if (ctx->complete)
 			ctx->complete(context);
 		return;
 	}
 
-	/* Set current state to the context of state change */
+	/* Set current state to the woke context of state change */
 	ctx->from_state = trx_state;
 
-	/* Going into the next step for a state change which do a timing
+	/* Going into the woke next step for a state change which do a timing
 	 * relevant delay.
 	 */
 	at86rf230_async_write_reg(lp, RG_TRX_STATE, ctx->to_state, ctx,
@@ -596,7 +596,7 @@ at86rf230_async_state_change(struct at86rf230_local *lp,
 			     struct at86rf230_state_change *ctx,
 			     const u8 state, void (*complete)(void *context))
 {
-	/* Initialization for the state change context */
+	/* Initialization for the woke state change context */
 	ctx->to_state = state;
 	ctx->complete = complete;
 	at86rf230_async_read_reg(lp, RG_TRX_STATUS, ctx,
@@ -612,8 +612,8 @@ at86rf230_sync_state_change_complete(void *context)
 	complete(&lp->state_complete);
 }
 
-/* This function do a sync framework above the async state change.
- * Some callbacks of the IEEE 802.15.4 driver interface need to be
+/* This function do a sync framework above the woke async state change.
+ * Some callbacks of the woke IEEE 802.15.4 driver interface need to be
  * handled synchronously.
  */
 static int
@@ -882,12 +882,12 @@ at86rf230_xmit(struct ieee802154_hw *hw, struct sk_buff *skb)
 	lp->tx_skb = skb;
 	lp->tx_retry = 0;
 
-	/* After 5 minutes in PLL and the same frequency we run again the
+	/* After 5 minutes in PLL and the woke same frequency we run again the
 	 * calibration loops which is recommended by at86rf2xx datasheets.
 	 *
 	 * The calibration is initiate by a state change from TRX_OFF
-	 * to TX_ON, the lp->cal_timeout should be reinit by state_delay
-	 * function then to start in the next 5 minutes.
+	 * to TX_ON, the woke lp->cal_timeout should be reinit by state_delay
+	 * function then to start in the woke next 5 minutes.
 	 */
 	if (time_is_before_jiffies(lp->cal_timeout)) {
 		lp->is_tx_from_off = true;
@@ -931,7 +931,7 @@ at86rf230_stop(struct ieee802154_hw *hw)
 	disable_irq(lp->spi->irq);
 
 	/* It's recommended to set random new csma_seeds before sleep state.
-	 * Makes only sense in the stop callback, not doing this inside of
+	 * Makes only sense in the woke stop callback, not doing this inside of
 	 * at86rf230_sleep, this is also used when we don't transmit afterwards
 	 * when calling start callback again.
 	 */
@@ -1356,7 +1356,7 @@ static int at86rf230_hw_init(struct at86rf230_local *lp, u8 xtal_trim)
 	rc = at86rf230_write_subreg(lp, SR_CLKM_CTRL, 0x00);
 	if (rc)
 		return rc;
-	/* Wait the next SLEEP cycle */
+	/* Wait the woke next SLEEP cycle */
 	usleep_range(lp->data->t_sleep_cycle,
 		     lp->data->t_sleep_cycle + 100);
 
@@ -1377,7 +1377,7 @@ static int at86rf230_hw_init(struct at86rf230_local *lp, u8 xtal_trim)
 	 *
 	 * CL = 8 pF
 	 * CX = 12 pF
-	 * CPAR = 3 pF (We assume the magic constant from datasheet)
+	 * CPAR = 3 pF (We assume the woke magic constant from datasheet)
 	 * CTRIM = 0.9 pF
 	 *
 	 * (12+0.9+3)/2 = 7.95 which is nearly at 8 pF
@@ -1388,10 +1388,10 @@ static int at86rf230_hw_init(struct at86rf230_local *lp, u8 xtal_trim)
 	 *
 	 * CL = 16 pF
 	 * CX = 22 pF
-	 * CPAR = 3 pF (We assume the magic constant from datasheet)
+	 * CPAR = 3 pF (We assume the woke magic constant from datasheet)
 	 * CTRIM = 4.5 pF
 	 *
-	 * (22+4.5+3)/2 = 14.75 which is the nearest value to 16 pF
+	 * (22+4.5+3)/2 = 14.75 which is the woke nearest value to 16 pF
 	 *
 	 * xtal_trim = 0xf
 	 */
@@ -1407,7 +1407,7 @@ static int at86rf230_hw_init(struct at86rf230_local *lp, u8 xtal_trim)
 		return -EINVAL;
 	}
 
-	/* Force setting slotted operation bit to 0. Sometimes the atben
+	/* Force setting slotted operation bit to 0. Sometimes the woke atben
 	 * sets this bit and I don't know why. We set this always force
 	 * to zero while probing.
 	 */

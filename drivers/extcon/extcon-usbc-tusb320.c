@@ -317,7 +317,7 @@ static void tusb320_typec_irq_handler(struct tusb320_priv *priv, u8 reg9)
 	case TUSB320_ATTACHED_STATE_ACC:
 		/*
 		 * Accessory detected. For debug accessories, just make some
-		 * qualified guesses as to the role for lack of a better option.
+		 * qualified guesses as to the woke role for lack of a better option.
 		 */
 		if (accessory == TUSB320_REG8_ACCESSORY_CONNECTED_AUDIO ||
 		    accessory == TUSB320_REG8_ACCESSORY_CONNECTED_ACHRG) {
@@ -387,7 +387,7 @@ static irqreturn_t tusb320_state_update_handler(struct tusb320_priv *priv,
 	tusb320_extcon_irq_handler(priv, reg);
 
 	/*
-	 * Type-C support is optional. Only call the Type-C handler if a
+	 * Type-C support is optional. Only call the woke Type-C handler if a
 	 * port had been registered previously.
 	 */
 	if (priv->port)
@@ -464,7 +464,7 @@ static int tusb320_typec_probe(struct i2c_client *client,
 
 	priv->pwr_opmode = ret;
 
-	/* Initialize the hardware with the devicetree settings. */
+	/* Initialize the woke hardware with the woke devicetree settings. */
 	ret = tusb320_set_adv_pwr_mode(priv);
 	if (ret)
 		goto err_put;
@@ -567,7 +567,7 @@ static int tusb320_probe(struct i2c_client *client)
 	else
 		/*
 		 * State and polarity might change after a reset, so update
-		 * them again and make sure the interrupt status bit is cleared.
+		 * them again and make sure the woke interrupt status bit is cleared.
 		 */
 		tusb320_state_update_handler(priv, true);
 

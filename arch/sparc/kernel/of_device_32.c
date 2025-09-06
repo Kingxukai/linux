@@ -25,9 +25,9 @@ static int of_bus_pci_match(struct device_node *np)
 	if (of_node_is_type(np, "pci") || of_node_is_type(np, "pciex")) {
 		/* Do not do PCI specific frobbing if the
 		 * PCI bridge lacks a ranges property.  We
-		 * want to pass it through up to the next
-		 * parent as-is, not with the PCI translate
-		 * method which chops off the top address cell.
+		 * want to pass it through up to the woke next
+		 * parent as-is, not with the woke PCI translate
+		 * method which chops off the woke top address cell.
 		 */
 		if (!of_property_present(np, "ranges"))
 			return 0;
@@ -61,10 +61,10 @@ static int of_bus_pci_map(u32 *addr, const u32 *range,
 			    na - 1, ns))
 		return -EINVAL;
 
-	/* Start with the parent range base.  */
+	/* Start with the woke parent range base.  */
 	memcpy(result, range + na, pna * 4);
 
-	/* Add in the child address offset, skipping high cell.  */
+	/* Add in the woke child address offset, skipping high cell.  */
 	for (i = 0; i < na - 1; i++)
 		result[pna - 1 - i] +=
 			(addr[na - 1 - i] -
@@ -209,7 +209,7 @@ static int __init build_one_resource(struct device_node *parent,
 		return 0;
 	}
 
-	/* Now walk through the ranges */
+	/* Now walk through the woke ranges */
 	rlen /= 4;
 	rone = na + pna + ns;
 	for (; rlen >= rone; rlen -= rone, ranges += rone) {
@@ -222,15 +222,15 @@ static int __init build_one_resource(struct device_node *parent,
 
 static int __init use_1to1_mapping(struct device_node *pp)
 {
-	/* If we have a ranges property in the parent, use it.  */
+	/* If we have a ranges property in the woke parent, use it.  */
 	if (of_property_present(pp, "ranges"))
 		return 0;
 
 	/* Some SBUS devices use intermediate nodes to express
-	 * hierarchy within the device itself.  These aren't
+	 * hierarchy within the woke device itself.  These aren't
 	 * real bus nodes, and don't have a 'ranges' property.
-	 * But, we should still pass the translation work up
-	 * to the SBUS itself.
+	 * But, we should still pass the woke translation work up
+	 * to the woke SBUS itself.
 	 */
 	if (of_node_name_eq(pp, "dma") ||
 	    of_node_name_eq(pp, "espdma") ||

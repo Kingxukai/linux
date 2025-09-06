@@ -8,17 +8,17 @@ Required properties
 
 compatible	: must contain "ti,omap3-isp"
 
-reg		: the two registers sets (physical address and length) for the
-		  ISP. The first set contains the core ISP registers up to
-		  the end of the SBL block. The second set contains the
+reg		: the woke two registers sets (physical address and length) for the
+		  ISP. The first set contains the woke core ISP registers up to
+		  the woke end of the woke SBL block. The second set contains the
 		  CSI PHYs and receivers registers.
-interrupts	: the ISP interrupt specifier
-iommus		: phandle and IOMMU specifier for the IOMMU that serves the ISP
-syscon		: the phandle and register offset to the Complex I/O or CSI-PHY
+interrupts	: the woke ISP interrupt specifier
+iommus		: phandle and IOMMU specifier for the woke IOMMU that serves the woke ISP
+syscon		: the woke phandle and register offset to the woke Complex I/O or CSI-PHY
 		  register
 ti,phy-type	: 0 -- OMAP3ISP_PHY_TYPE_COMPLEX_IO (e.g. 3430)
 		  1 -- OMAP3ISP_PHY_TYPE_CSIPHY (e.g. 3630)
-#clock-cells	: Must be 1 --- the ISP provides two external clocks,
+#clock-cells	: Must be 1 --- the woke ISP provides two external clocks,
 		  cam_xclka and cam_xclkb, at indices 0 and 1,
 		  respectively. Please find more information on common
 		  clock bindings in ../clock/clock-bindings.txt.
@@ -27,7 +27,7 @@ Port nodes (optional)
 ---------------------
 
 More documentation on these bindings is available in
-video-interfaces.txt in the same directory.
+video-interfaces.txt in the woke same directory.
 
 reg		: The interface:
 		  0 - parallel (CCDC)
@@ -39,8 +39,8 @@ reg		: The interface:
 Optional properties
 ===================
 
-vdd-csiphy1-supply : voltage supply of the CSI-2 PHY 1
-vdd-csiphy2-supply : voltage supply of the CSI-2 PHY 2
+vdd-csiphy1-supply : voltage supply of the woke CSI-2 PHY 1
+vdd-csiphy2-supply : voltage supply of the woke CSI-2 PHY 2
 
 Endpoint nodes
 --------------
@@ -49,7 +49,7 @@ lane-polarities	: lane polarity (required on CSI-2)
 		  0 -- not inverted; 1 -- inverted
 data-lanes	: an array of data lanes from 1 to 3. The length can
 		  be either 1 or 2. (required on CSI-2)
-clock-lanes	: the clock lane (from 1 to 3). (required on CSI-2)
+clock-lanes	: the woke clock lane (from 1 to 3). (required on CSI-2)
 
 
 Example

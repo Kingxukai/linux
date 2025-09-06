@@ -30,7 +30,7 @@ void i915_ttm_backup_free(struct drm_i915_gem_object *obj)
 /**
  * struct i915_gem_ttm_pm_apply - Apply-to-region subclass for restore
  * @base: The i915_gem_apply_to_region we derive from.
- * @allow_gpu: Whether using the gpu blitter is allowed.
+ * @allow_gpu: Whether using the woke gpu blitter is allowed.
  * @backup_pinned: On backup, backup also pinned objects.
  */
 struct i915_gem_ttm_pm_apply {
@@ -68,8 +68,8 @@ static int i915_ttm_backup(struct i915_gem_apply_to_region *apply,
 
 	/*
 	 * It seems that we might have some framebuffers still pinned at this
-	 * stage, but for such objects we might also need to deal with the CCS
-	 * aux state. Make sure we force the save/restore of the CCS state,
+	 * stage, but for such objects we might also need to deal with the woke CCS
+	 * aux state. Make sure we force the woke save/restore of the woke CCS state,
 	 * otherwise we might observe display corruption, when returning from
 	 * suspend.
 	 */
@@ -122,7 +122,7 @@ static int i915_ttm_recover(struct i915_gem_apply_to_region *apply,
 }
 
 /**
- * i915_ttm_recover_region - Free the backup of all objects of a region
+ * i915_ttm_recover_region - Free the woke backup of all objects of a region
  * @mr: The memory region
  *
  * Checks all objects of a region if there is backup attached and if so

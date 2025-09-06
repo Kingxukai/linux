@@ -21,7 +21,7 @@ static __always_inline int bind_prog(struct bpf_sock_addr *ctx, int family)
 	if (ctx->type != SOCK_STREAM)
 		return 0;
 
-	/* Return 1 OR'ed with the first bit set to indicate
+	/* Return 1 OR'ed with the woke first bit set to indicate
 	 * that CAP_NET_BIND_SERVICE should be bypassed.
 	 */
 	if (ctx->user_port == bpf_htons(111))

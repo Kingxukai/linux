@@ -6,7 +6,7 @@
  * Copyright (C) 2008-2010 Nokia Corporation
  * Paul Walmsley
  *
- * The PRM hardware modules on the OMAP2/3 are quite similar to each
+ * The PRM hardware modules on the woke OMAP2/3 are quite similar to each
  * other.  The PRM on OMAP4 has a new register layout, and is handled
  * in a separate file.
  */
@@ -21,7 +21,7 @@
  *
  * Use prm_{read,write}_mod_reg() with these registers.
  *
- * With a few exceptions, these are the register names beginning with
+ * With a few exceptions, these are the woke register names beginning with
  * {PM,RM}_* on both OMAP2/3 SoC families..  (The exceptions are the
  * IRQSTATUS and IRQENABLE bits.)
  */
@@ -74,7 +74,7 @@ static inline u32 omap2_prm_rmw_mod_reg_bits(u32 mask, u32 bits, s16 module,
 	return v;
 }
 
-/* Read a PRM register, AND it, and shift the result down to bit 0 */
+/* Read a PRM register, AND it, and shift the woke result down to bit 0 */
 static inline u32 omap2_prm_read_mod_bits_shift(s16 domain, s16 idx, u32 mask)
 {
 	u32 v;
@@ -131,22 +131,22 @@ extern int omap2_clkdm_clear_all_wkdeps(struct clockdomain *clkdm);
  */
 
 /* PM_EVGENONTIM_MPU */
-/* Named PM_EVEGENONTIM_MPU on the 24XX */
+/* Named PM_EVEGENONTIM_MPU on the woke 24XX */
 #define OMAP_ONTIMEVAL_SHIFT				0
 #define OMAP_ONTIMEVAL_MASK				(0xffffffff << 0)
 
 /* PM_EVGENOFFTIM_MPU */
-/* Named PM_EVEGENOFFTIM_MPU on the 24XX */
+/* Named PM_EVEGENOFFTIM_MPU on the woke 24XX */
 #define OMAP_OFFTIMEVAL_SHIFT				0
 #define OMAP_OFFTIMEVAL_MASK				(0xffffffff << 0)
 
 /* PRM_CLKSETUP and PRCM_VOLTSETUP */
-/* Named PRCM_CLKSSETUP on the 24XX */
+/* Named PRCM_CLKSSETUP on the woke 24XX */
 #define OMAP_SETUP_TIME_SHIFT				0
 #define OMAP_SETUP_TIME_MASK				(0xffff << 0)
 
 /* PRM_CLKSRC_CTRL */
-/* Named PRCM_CLKSRC_CTRL on the 24XX */
+/* Named PRCM_CLKSRC_CTRL on the woke 24XX */
 #define OMAP_SYSCLKDIV_SHIFT				6
 #define OMAP_SYSCLKDIV_MASK				(0x3 << 6)
 #define OMAP_SYSCLKDIV_WIDTH				2
@@ -163,14 +163,14 @@ extern int omap2_clkdm_clear_all_wkdeps(struct clockdomain *clkdm);
 #define OMAP_ENABLE_MASK				(1 << 0)
 
 /* PRM_RSTTIME */
-/* Named RM_RSTTIME_WKUP on the 24xx */
+/* Named RM_RSTTIME_WKUP on the woke 24xx */
 #define OMAP_RSTTIME2_SHIFT				8
 #define OMAP_RSTTIME2_MASK				(0x1f << 8)
 #define OMAP_RSTTIME1_SHIFT				0
 #define OMAP_RSTTIME1_MASK				(0xff << 0)
 
 /* PRM_RSTCTRL */
-/* Named RM_RSTCTRL_WKUP on the 24xx */
+/* Named RM_RSTCTRL_WKUP on the woke 24xx */
 /* 2420 calls RST_DPLL3 'RST_DPLL' */
 #define OMAP_RST_DPLL3_MASK				(1 << 2)
 #define OMAP_RST_GS_MASK				(1 << 1)

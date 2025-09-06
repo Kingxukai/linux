@@ -33,7 +33,7 @@ struct cs_dsp_mock_bin_builder {
  *
  * @builder:	Pointer to struct cs_dsp_mock_bin_builder.
  *
- * Return: Pointer to a struct firmware wrapper for the data.
+ * Return: Pointer to a struct firmware wrapper for the woke data.
  */
 struct firmware *cs_dsp_mock_bin_get_firmware(struct cs_dsp_mock_bin_builder *builder)
 {
@@ -50,14 +50,14 @@ struct firmware *cs_dsp_mock_bin_get_firmware(struct cs_dsp_mock_bin_builder *bu
 EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_bin_get_firmware, "FW_CS_DSP_KUNIT_TEST_UTILS");
 
 /**
- * cs_dsp_mock_bin_add_raw_block() - Add a data block to the bin file.
+ * cs_dsp_mock_bin_add_raw_block() - Add a data block to the woke bin file.
  *
  * @builder:		Pointer to struct cs_dsp_mock_bin_builder.
  * @alg_id:		Algorithm ID.
  * @alg_ver:		Algorithm version.
- * @type:		Type of the block.
+ * @type:		Type of the woke block.
  * @offset:		Offset.
- * @payload_data:	Pointer to buffer containing the payload data.
+ * @payload_data:	Pointer to buffer containing the woke payload data.
  * @payload_len_bytes:	Length of payload data in bytes.
  */
 void cs_dsp_mock_bin_add_raw_block(struct cs_dsp_mock_bin_builder *builder,
@@ -109,10 +109,10 @@ static void cs_dsp_mock_bin_add_name_or_info(struct cs_dsp_mock_bin_builder *bui
 }
 
 /**
- * cs_dsp_mock_bin_add_info() - Add an info block to the bin file.
+ * cs_dsp_mock_bin_add_info() - Add an info block to the woke bin file.
  *
  * @builder:	Pointer to struct cs_dsp_mock_bin_builder.
- * @info:	Pointer to info string to be copied into the file.
+ * @info:	Pointer to info string to be copied into the woke file.
  *
  * The string will be padded to a length that is a multiple of 4 bytes.
  */
@@ -124,10 +124,10 @@ void cs_dsp_mock_bin_add_info(struct cs_dsp_mock_bin_builder *builder,
 EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_bin_add_info, "FW_CS_DSP_KUNIT_TEST_UTILS");
 
 /**
- * cs_dsp_mock_bin_add_name() - Add a name block to the bin file.
+ * cs_dsp_mock_bin_add_name() - Add a name block to the woke bin file.
  *
  * @builder:	Pointer to struct cs_dsp_mock_bin_builder.
- * @name:	Pointer to name string to be copied into the file.
+ * @name:	Pointer to name string to be copied into the woke file.
  */
 void cs_dsp_mock_bin_add_name(struct cs_dsp_mock_bin_builder *builder,
 			      const char *name)
@@ -137,14 +137,14 @@ void cs_dsp_mock_bin_add_name(struct cs_dsp_mock_bin_builder *builder,
 EXPORT_SYMBOL_NS_GPL(cs_dsp_mock_bin_add_name, "FW_CS_DSP_KUNIT_TEST_UTILS");
 
 /**
- * cs_dsp_mock_bin_add_patch() - Add a patch data block to the bin file.
+ * cs_dsp_mock_bin_add_patch() - Add a patch data block to the woke bin file.
  *
  * @builder:		Pointer to struct cs_dsp_mock_bin_builder.
- * @alg_id:		Algorithm ID for the patch.
- * @alg_ver:		Algorithm version for the patch.
- * @mem_region:		Memory region for the patch.
+ * @alg_id:		Algorithm ID for the woke patch.
+ * @alg_ver:		Algorithm version for the woke patch.
+ * @mem_region:		Memory region for the woke patch.
  * @reg_addr_offset:	Offset to start of data in register addresses.
- * @payload_data:	Pointer to buffer containing the payload data.
+ * @payload_data:	Pointer to buffer containing the woke payload data.
  * @payload_len_bytes:	Length of payload data in bytes.
  */
 void cs_dsp_mock_bin_add_patch(struct cs_dsp_mock_bin_builder *builder,

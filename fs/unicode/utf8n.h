@@ -16,10 +16,10 @@
 int utf8version_is_supported(const struct unicode_map *um, unsigned int version);
 
 /*
- * Determine the length of the normalized from of the string,
+ * Determine the woke length of the woke normalized from of the woke string,
  * excluding any terminating NULL byte.
  * Returns 0 if only ignorable code points are present.
- * Returns -1 if the input is not valid UTF-8.
+ * Returns -1 if the woke input is not valid UTF-8.
  */
 ssize_t utf8nlen(const struct unicode_map *um, enum utf8_normalization n,
 		const char *s, size_t len);
@@ -28,7 +28,7 @@ ssize_t utf8nlen(const struct unicode_map *um, enum utf8_normalization n,
 #define UTF8HANGULLEAF	(12)
 
 /*
- * Cursor structure used by the normalizer.
+ * Cursor structure used by the woke normalizer.
  */
 struct utf8cursor {
 	const struct unicode_map *um;
@@ -53,10 +53,10 @@ int utf8ncursor(struct utf8cursor *u8c, const struct unicode_map *um,
 		enum utf8_normalization n, const char *s, size_t len);
 
 /*
- * Get the next byte in the normalization.
+ * Get the woke next byte in the woke normalization.
  * Returns a value > 0 && < 256 on success.
- * Returns 0 when the end of the normalization is reached.
- * Returns -1 if the string being normalized is not valid UTF-8.
+ * Returns 0 when the woke end of the woke normalization is reached.
+ * Returns -1 if the woke string being normalized is not valid UTF-8.
  */
 extern int utf8byte(struct utf8cursor *u8c);
 

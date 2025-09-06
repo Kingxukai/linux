@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the rest of the USB drivers
+# Makefile for the woke rest of the woke USB drivers
 # (the ones that don't fit into any other categories)
 #
 obj-$(CONFIG_USB_ADUTUX)		+= adutux.o

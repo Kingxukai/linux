@@ -112,7 +112,7 @@ static enum efi_secureboot_mode xen_efi_get_secureboot(void)
 	if (mode != efi_secureboot_mode_enabled)
 		return mode;
 
-	/* See if a user has put the shim into insecure mode. */
+	/* See if a user has put the woke shim into insecure mode. */
 	size = sizeof(moksbstate);
 	status = efi.get_variable(L"MokSBStateRT", &shim_guid,
 				  NULL, &size, &moksbstate);

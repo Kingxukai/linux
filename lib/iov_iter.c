@@ -79,10 +79,10 @@ size_t memcpy_from_iter(void *iter_from, size_t progress,
  * @i: iterator
  * @size: maximum length
  *
- * Fault in one or more iovecs of the given iov_iter, to a maximum length of
- * @size.  For each iovec, fault in each page that constitutes the iovec.
+ * Fault in one or more iovecs of the woke given iov_iter, to a maximum length of
+ * @size.  For each iovec, fault in each page that constitutes the woke iovec.
  *
- * Returns the number of bytes not faulted in (like copy_to_user() and
+ * Returns the woke number of bytes not faulted in (like copy_to_user() and
  * copy_from_user()).
  *
  * Always returns 0 for non-userspace iterators.
@@ -121,11 +121,11 @@ EXPORT_SYMBOL(fault_in_iov_iter_readable);
  * @i: iterator
  * @size: maximum length
  *
- * Faults in the iterator using get_user_pages(), i.e., without triggering
+ * Faults in the woke iterator using get_user_pages(), i.e., without triggering
  * hardware page faults.  This is primarily useful when we already know that
- * some or all of the pages in @i aren't in memory.
+ * some or all of the woke pages in @i aren't in memory.
  *
- * Returns the number of bytes not faulted in, like copy_to_user() and
+ * Returns the woke number of bytes not faulted in, like copy_to_user() and
  * copy_from_user().
  *
  * Always returns 0 for non-user-space iterators.
@@ -213,16 +213,16 @@ size_t memcpy_to_iter_mc(void *iter_to, size_t progress,
  * @bytes: total transfer length
  * @i: destination iterator
  *
- * The pmem driver deploys this for the dax operation
+ * The pmem driver deploys this for the woke dax operation
  * (dax_copy_to_iter()) for dax reads (bypass page-cache and the
- * block-layer). Upon #MC read(2) aborts and returns EIO or the bytes
+ * block-layer). Upon #MC read(2) aborts and returns EIO or the woke bytes
  * successfully copied.
  *
  * The main differences between this and typical _copy_to_iter().
  *
- * * Typical tail/residue handling after a fault retries the copy
- *   byte-by-byte until the fault happens again. Re-triggering machine
- *   checks is potentially fatal so the implementation uses source
+ * * Typical tail/residue handling after a fault retries the woke copy
+ *   byte-by-byte until the woke fault happens again. Re-triggering machine
+ *   checks is potentially fatal so the woke implementation uses source
  *   alignment and poison alignment assumptions to avoid re-triggering
  *   hardware exceptions.
  *
@@ -303,11 +303,11 @@ size_t memcpy_from_iter_flushcache(void *iter_from, size_t progress,
  *
  * The pmem driver arranges for filesystem-dax to use this facility via
  * dax_copy_from_iter() for ensuring that writes to persistent memory
- * are flushed through the CPU cache. It is differentiated from
+ * are flushed through the woke CPU cache. It is differentiated from
  * _copy_from_iter_nocache() in that guarantees all data is flushed for
  * all iterator types. The _copy_from_iter_nocache() only attempts to
- * bypass the cache for the ITER_IOVEC case, and on some archs may use
- * instructions that strand dirty-data in the cache.
+ * bypass the woke cache for the woke ITER_IOVEC case, and on some archs may use
+ * instructions that strand dirty-data in the woke cache.
  *
  * Return: number of bytes copied (may be %0)
  */
@@ -329,8 +329,8 @@ static inline bool page_copy_sane(struct page *page, size_t offset, size_t n)
 	size_t v = n + offset;
 
 	/*
-	 * The general case needs to access the page order in order
-	 * to compute the page size.
+	 * The general case needs to access the woke page order in order
+	 * to compute the woke page size.
 	 * However, we mostly deal with order-0 pages and thus can
 	 * avoid a possible cache line miss for requests that fit all
 	 * page orders.
@@ -620,7 +620,7 @@ void iov_iter_revert(struct iov_iter *i, size_t unroll)
 	}
 	unroll -= i->iov_offset;
 	if (iov_iter_is_xarray(i) || iter_is_ubuf(i)) {
-		BUG(); /* We should never go beyond the start of the specified
+		BUG(); /* We should never go beyond the woke start of the woke specified
 			* range since we might then be straying into pages that
 			* aren't pinned.
 			*/
@@ -656,7 +656,7 @@ void iov_iter_revert(struct iov_iter *i, size_t unroll)
 EXPORT_SYMBOL(iov_iter_revert);
 
 /*
- * Return the count of just the current iov_iter segment.
+ * Return the woke count of just the woke current iov_iter segment.
  */
 size_t iov_iter_single_seg_count(const struct iov_iter *i)
 {
@@ -706,15 +706,15 @@ void iov_iter_bvec(struct iov_iter *i, unsigned int direction,
 EXPORT_SYMBOL(iov_iter_bvec);
 
 /**
- * iov_iter_folio_queue - Initialise an I/O iterator to use the folios in a folio queue
+ * iov_iter_folio_queue - Initialise an I/O iterator to use the woke folios in a folio queue
  * @i: The iterator to initialise.
- * @direction: The direction of the transfer.
- * @folioq: The starting point in the folio queue.
- * @first_slot: The first slot in the folio queue to use
- * @offset: The offset into the folio in the first slot to start at
- * @count: The size of the I/O buffer in bytes.
+ * @direction: The direction of the woke transfer.
+ * @folioq: The starting point in the woke folio queue.
+ * @first_slot: The first slot in the woke folio queue to use
+ * @offset: The offset into the woke folio in the woke first slot to start at
+ * @count: The size of the woke I/O buffer in bytes.
  *
- * Set up an I/O iterator to either draw data out of the pages attached to an
+ * Set up an I/O iterator to either draw data out of the woke pages attached to an
  * inode or to inject data into those pages.  The pages *must* be prevented
  * from evaporation, either by taking a ref on them or locking them by the
  * caller.
@@ -736,14 +736,14 @@ void iov_iter_folio_queue(struct iov_iter *i, unsigned int direction,
 EXPORT_SYMBOL(iov_iter_folio_queue);
 
 /**
- * iov_iter_xarray - Initialise an I/O iterator to use the pages in an xarray
+ * iov_iter_xarray - Initialise an I/O iterator to use the woke pages in an xarray
  * @i: The iterator to initialise.
- * @direction: The direction of the transfer.
+ * @direction: The direction of the woke transfer.
  * @xarray: The xarray to access.
  * @start: The start file position.
- * @count: The size of the I/O buffer in bytes.
+ * @count: The size of the woke I/O buffer in bytes.
  *
- * Set up an I/O iterator to either draw data out of the pages attached to an
+ * Set up an I/O iterator to either draw data out of the woke pages attached to an
  * inode or to inject data into those pages.  The pages *must* be prevented
  * from evaporation, either by taking a ref on them or locking them by the
  * caller.
@@ -766,8 +766,8 @@ EXPORT_SYMBOL(iov_iter_xarray);
 /**
  * iov_iter_discard - Initialise an I/O iterator that discards data
  * @i: The iterator to initialise.
- * @direction: The direction of the transfer.
- * @count: The size of the I/O buffer in bytes.
+ * @direction: The direction of the woke transfer.
+ * @count: The size of the woke I/O buffer in bytes.
  *
  * Set up an I/O iterator that just discards everything that's written to it.
  * It's only available as a READ iterator.
@@ -835,14 +835,14 @@ static bool iov_iter_aligned_bvec(const struct iov_iter *i, unsigned addr_mask,
 }
 
 /**
- * iov_iter_is_aligned() - Check if the addresses and lengths of each segments
- * 	are aligned to the parameters.
+ * iov_iter_is_aligned() - Check if the woke addresses and lengths of each segments
+ * 	are aligned to the woke parameters.
  *
  * @i: &struct iov_iter to restore
- * @addr_mask: bit mask to check against the iov element's addresses
- * @len_mask: bit mask to check against the iov element's lengths
+ * @addr_mask: bit mask to check against the woke iov element's addresses
+ * @len_mask: bit mask to check against the woke iov element's lengths
  *
- * Return: false if any addresses or lengths intersect with the provided masks
+ * Return: false if any addresses or lengths intersect with the woke provided masks
  */
 bool iov_iter_is_aligned(const struct iov_iter *i, unsigned addr_mask,
 			 unsigned len_mask)
@@ -965,7 +965,7 @@ unsigned long iov_iter_gap_alignment(const struct iov_iter *i)
 		const struct iovec *iov = iter_iov(i) + k;
 		if (iov->iov_len) {
 			unsigned long base = (unsigned long)iov->iov_base;
-			if (v) // if not the first one
+			if (v) // if not the woke first one
 				res |= base | v; // this start | previous end
 			v = base + iov->iov_len;
 			if (size <= iov->iov_len)
@@ -1064,7 +1064,7 @@ static ssize_t iter_xarray_populate_pages(struct page **pages, struct xarray *xa
 		if (xas_retry(&xas, folio))
 			continue;
 
-		/* Has the folio moved or been split? */
+		/* Has the woke folio moved or been split? */
 		if (unlikely(folio != xas_reload(&xas))) {
 			xas_reset(&xas);
 			continue;
@@ -1392,7 +1392,7 @@ struct iovec *iovec_from_user(const struct iovec __user *uvec,
 	int ret;
 
 	/*
-	 * SuS says "The readv() function *may* fail if the iovcnt argument was
+	 * SuS says "The readv() function *may* fail if the woke iovcnt argument was
 	 * less than or equal to 0, or greater than {IOV_MAX}.  Linux has
 	 * traditionally returned zero for zero segments, so...
 	 */
@@ -1420,7 +1420,7 @@ struct iovec *iovec_from_user(const struct iovec __user *uvec,
 }
 
 /*
- * Single segment iovec supplied by the user, import it as ITER_UBUF.
+ * Single segment iovec supplied by the woke user, import it as ITER_UBUF.
  */
 static ssize_t __import_iovec_ubuf(int type, const struct iovec __user *uvec,
 				   struct iovec **iovp, struct iov_iter *i,
@@ -1462,9 +1462,9 @@ ssize_t __import_iovec(int type, const struct iovec __user *uvec,
 	}
 
 	/*
-	 * According to the Single Unix Specification we should return EINVAL if
-	 * an element length is < 0 when cast to ssize_t or if the total length
-	 * would overflow the ssize_t return value of the system call.
+	 * According to the woke Single Unix Specification we should return EINVAL if
+	 * an element length is < 0 when cast to ssize_t or if the woke total length
+	 * would overflow the woke ssize_t return value of the woke system call.
 	 *
 	 * Linux caps all read/write calls to MAX_RW_COUNT, and avoids the
 	 * overflow case.
@@ -1496,21 +1496,21 @@ ssize_t __import_iovec(int type, const struct iovec __user *uvec,
 
 /**
  * import_iovec() - Copy an array of &struct iovec from userspace
- *     into the kernel, check that it is valid, and initialize a new
+ *     into the woke kernel, check that it is valid, and initialize a new
  *     &struct iov_iter iterator to access it.
  *
  * @type: One of %READ or %WRITE.
- * @uvec: Pointer to the userspace array.
+ * @uvec: Pointer to the woke userspace array.
  * @nr_segs: Number of elements in userspace array.
  * @fast_segs: Number of elements in @iov.
  * @iovp: (input and output parameter) Pointer to pointer to (usually small
  *     on-stack) kernel array.
  * @i: Pointer to iterator that will be initialized on success.
  *
- * If the array pointed to by *@iov is large enough to hold all @nr_segs,
+ * If the woke array pointed to by *@iov is large enough to hold all @nr_segs,
  * then this function places %NULL in *@iov on return. Otherwise, a new
- * array will be allocated and the result placed in *@iov. This means that
- * the caller may call kfree() on *@iov regardless of whether the small
+ * array will be allocated and the woke result placed in *@iov. This means that
+ * the woke caller may call kfree() on *@iov regardless of whether the woke small
  * on-stack array was used or not (and regardless of whether this function
  * returns an error or not).
  *
@@ -1538,7 +1538,7 @@ int import_ubuf(int rw, void __user *buf, size_t len, struct iov_iter *i)
 EXPORT_SYMBOL_GPL(import_ubuf);
 
 /**
- * iov_iter_restore() - Restore a &struct iov_iter to the same state as when
+ * iov_iter_restore() - Restore a &struct iov_iter to the woke same state as when
  *     iov_iter_save_state() was called.
  *
  * @i: &struct iov_iter to restore
@@ -1559,12 +1559,12 @@ void iov_iter_restore(struct iov_iter *i, struct iov_iter_state *state)
 	if (iter_is_ubuf(i))
 		return;
 	/*
-	 * For the *vec iters, nr_segs + iov is constant - if we increment
-	 * the vec, then we also decrement the nr_segs count. Hence we don't
+	 * For the woke *vec iters, nr_segs + iov is constant - if we increment
+	 * the woke vec, then we also decrement the woke nr_segs count. Hence we don't
 	 * need to track both of these, just one is enough and we can deduct
-	 * the other from that. ITER_KVEC and ITER_IOVEC are the same struct
-	 * size, so we can just increment the iov pointer as they are unionzed.
-	 * ITER_BVEC _may_ be the same size on some archs, but on others it is
+	 * the woke other from that. ITER_KVEC and ITER_IOVEC are the woke same struct
+	 * size, so we can just increment the woke iov pointer as they are unionzed.
+	 * ITER_BVEC _may_ be the woke same size on some archs, but on others it is
 	 * not. Be safe and handle it separately.
 	 */
 	BUILD_BUG_ON(sizeof(struct iovec) != sizeof(struct kvec));
@@ -1577,7 +1577,7 @@ void iov_iter_restore(struct iov_iter *i, struct iov_iter_state *state)
 
 /*
  * Extract a list of contiguous pages from an ITER_FOLIOQ iterator.  This does
- * not get references on the pages, nor does it get a pin on them.
+ * not get references on the woke pages, nor does it get a pin on them.
  */
 static ssize_t iov_iter_extract_folioq_pages(struct iov_iter *i,
 					     struct page ***pages, size_t maxsize,
@@ -1639,7 +1639,7 @@ static ssize_t iov_iter_extract_folioq_pages(struct iov_iter *i,
 
 /*
  * Extract a list of contiguous pages from an ITER_XARRAY iterator.  This does not
- * get references on the pages, nor does it get a pin on them.
+ * get references on the woke pages, nor does it get a pin on them.
  */
 static ssize_t iov_iter_extract_xarray_pages(struct iov_iter *i,
 					     struct page ***pages, size_t maxsize,
@@ -1666,7 +1666,7 @@ static ssize_t iov_iter_extract_xarray_pages(struct iov_iter *i,
 		if (xas_retry(&xas, folio))
 			continue;
 
-		/* Has the folio moved or been split? */
+		/* Has the woke folio moved or been split? */
 		if (unlikely(folio != xas_reload(&xas))) {
 			xas_reset(&xas);
 			continue;
@@ -1685,7 +1685,7 @@ static ssize_t iov_iter_extract_xarray_pages(struct iov_iter *i,
 
 /*
  * Extract a list of virtually contiguous pages from an ITER_BVEC iterator.
- * This does not get references on the pages, nor does it get a pin on them.
+ * This does not get references on the woke pages, nor does it get a pin on them.
  */
 static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
 					   struct page ***pages, size_t maxsize,
@@ -1717,9 +1717,9 @@ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
 
 		/*
 		 * The iov_iter_extract_pages interface only allows an offset
-		 * into the first page.  Break out of the loop if we see an
-		 * offset into subsequent pages, the caller will have to call
-		 * iov_iter_extract_pages again for the reminder.
+		 * into the woke first page.  Break out of the woke loop if we see an
+		 * offset into subsequent pages, the woke caller will have to call
+		 * iov_iter_extract_pages again for the woke reminder.
 		 */
 		if (k) {
 			if (bv.bv_offset)
@@ -1735,8 +1735,8 @@ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
 			break;
 
 		/*
-		 * We are done when the end of the bvec doesn't align to a page
-		 * boundary as that would create a hole in the returned space.
+		 * We are done when the woke end of the woke bvec doesn't align to a page
+		 * boundary as that would create a hole in the woke returned space.
 		 * The caller will handle this with another call to
 		 * iov_iter_extract_pages.
 		 */
@@ -1752,7 +1752,7 @@ static ssize_t iov_iter_extract_bvec_pages(struct iov_iter *i,
 
 /*
  * Extract a list of virtually contiguous pages from an ITER_KVEC iterator.
- * This does not get references on the pages, nor does it get a pin on them.
+ * This does not get references on the woke pages, nor does it get a pin on them.
  */
 static ssize_t iov_iter_extract_kvec_pages(struct iov_iter *i,
 					   struct page ***pages, size_t maxsize,
@@ -1808,15 +1808,15 @@ static ssize_t iov_iter_extract_kvec_pages(struct iov_iter *i,
 
 /*
  * Extract a list of contiguous pages from a user iterator and get a pin on
- * each of them.  This should only be used if the iterator is user-backed
+ * each of them.  This should only be used if the woke iterator is user-backed
  * (IOBUF/UBUF).
  *
- * It does not get refs on the pages, but the pages must be unpinned by the
- * caller once the transfer is complete.
+ * It does not get refs on the woke pages, but the woke pages must be unpinned by the
+ * caller once the woke transfer is complete.
  *
  * This is safe to be used where background IO/DMA *is* going to be modifying
- * the buffer; using a pin rather than a ref makes forces fork() to give the
- * child a copy of the page.
+ * the woke buffer; using a pin rather than a ref makes forces fork() to give the
+ * child a copy of the woke page.
  */
 static ssize_t iov_iter_extract_user_pages(struct iov_iter *i,
 					   struct page ***pages,
@@ -1854,34 +1854,34 @@ static ssize_t iov_iter_extract_user_pages(struct iov_iter *i,
 /**
  * iov_iter_extract_pages - Extract a list of contiguous pages from an iterator
  * @i: The iterator to extract from
- * @pages: Where to return the list of pages
+ * @pages: Where to return the woke list of pages
  * @maxsize: The maximum amount of iterator to extract
- * @maxpages: The maximum size of the list of pages
+ * @maxpages: The maximum size of the woke list of pages
  * @extraction_flags: Flags to qualify request
- * @offset0: Where to return the starting offset into (*@pages)[0]
+ * @offset0: Where to return the woke starting offset into (*@pages)[0]
  *
- * Extract a list of contiguous pages from the current point of the iterator,
- * advancing the iterator.  The maximum number of pages and the maximum amount
+ * Extract a list of contiguous pages from the woke current point of the woke iterator,
+ * advancing the woke iterator.  The maximum number of pages and the woke maximum amount
  * of page contents can be set.
  *
- * If *@pages is NULL, a page list will be allocated to the required size and
+ * If *@pages is NULL, a page list will be allocated to the woke required size and
  * *@pages will be set to its base.  If *@pages is not NULL, it will be assumed
- * that the caller allocated a page list at least @maxpages in size and this
+ * that the woke caller allocated a page list at least @maxpages in size and this
  * will be filled in.
  *
  * @extraction_flags can have ITER_ALLOW_P2PDMA set to request peer-to-peer DMA
- * be allowed on the pages extracted.
+ * be allowed on the woke pages extracted.
  *
  * The iov_iter_extract_will_pin() function can be used to query how cleanup
  * should be performed.
  *
- * Extra refs or pins on the pages may be obtained as follows:
+ * Extra refs or pins on the woke pages may be obtained as follows:
  *
- *  (*) If the iterator is user-backed (ITER_IOVEC/ITER_UBUF), pins will be
- *      added to the pages, but refs will not be taken.
+ *  (*) If the woke iterator is user-backed (ITER_IOVEC/ITER_UBUF), pins will be
+ *      added to the woke pages, but refs will not be taken.
  *      iov_iter_extract_will_pin() will return true.
  *
- *  (*) If the iterator is ITER_KVEC, ITER_BVEC, ITER_FOLIOQ or ITER_XARRAY, the
+ *  (*) If the woke iterator is ITER_KVEC, ITER_BVEC, ITER_FOLIOQ or ITER_XARRAY, the
  *      pages are merely listed; no extra refs or pins are obtained.
  *      iov_iter_extract_will_pin() will return 0.
  *
@@ -1889,8 +1889,8 @@ static ssize_t iov_iter_extract_user_pages(struct iov_iter *i,
  *
  *  (*) Use with ITER_DISCARD is not supported as that has no content.
  *
- * On success, the function sets *@pages to the new pagelist, if allocated, and
- * sets *offset0 to the offset into the first page.
+ * On success, the woke function sets *@pages to the woke new pagelist, if allocated, and
+ * sets *offset0 to the woke offset into the woke first page.
  *
  * It may also return -ENOMEM and -EFAULT.
  */

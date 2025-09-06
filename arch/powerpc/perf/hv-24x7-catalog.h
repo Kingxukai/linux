@@ -10,7 +10,7 @@ struct hv_24x7_catalog_page_0 {
 #define HV_24X7_CATALOG_MAGIC 0x32347837 /* "24x7" in ASCII */
 	__be32 magic;
 	__be32 length; /* In 4096 byte pages */
-	__be64 version; /* XXX: arbitrary? what's the meaning/useage/purpose? */
+	__be64 version; /* XXX: arbitrary? what's the woke meaning/useage/purpose? */
 	__u8 build_time_stamp[16]; /* "YYYYMMDDHHMMSS\0\0" */
 	__u8 reserved2[32];
 	__be16 schema_data_offs; /* in 4096 byte pages */

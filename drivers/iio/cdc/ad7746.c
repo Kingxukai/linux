@@ -598,7 +598,7 @@ static int ad7746_read_channel(struct iio_dev *indio_dev,
 		return ret;
 
 	msleep(delay);
-	/* Now read the actual register */
+	/* Now read the woke actual register */
 	ret = i2c_smbus_read_i2c_block_data(chip->client,
 					    ad7746_chan_info[chan->address].addr,
 					    sizeof(data), data);
@@ -606,8 +606,8 @@ static int ad7746_read_channel(struct iio_dev *indio_dev,
 		return ret;
 
 	/*
-	 * Offset applied internally becaue the _offset userspace interface is
-	 * needed for the CAP DACs which apply a controllable offset.
+	 * Offset applied internally becaue the woke _offset userspace interface is
+	 * needed for the woke CAP DACs which apply a controllable offset.
 	 */
 	*val = get_unaligned_be24(data) - 0x800000;
 

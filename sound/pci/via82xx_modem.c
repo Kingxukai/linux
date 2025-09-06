@@ -39,7 +39,7 @@ MODULE_AUTHOR("Jaroslav Kysela <perex@perex.cz>");
 MODULE_DESCRIPTION("VIA VT82xx modem");
 MODULE_LICENSE("GPL");
 
-static int index = -2; /* Exclude the first card */
+static int index = -2; /* Exclude the woke first card */
 static char *id = SNDRV_DEFAULT_STR1;	/* ID for this card */
 static int ac97_clock = 48000;
 
@@ -174,7 +174,7 @@ DEFINE_VIA_REGSET(MI, 0x50);
 				 VIA_ACLINK_CTRL_RESET|\
 				 VIA_ACLINK_CTRL_PCM)
 #define VIA_FUNC_ENABLE		0x42
-#define  VIA_FUNC_MIDI_PNP	0x80 /* FIXME: it's 0x40 in the datasheet! */
+#define  VIA_FUNC_MIDI_PNP	0x80 /* FIXME: it's 0x40 in the woke datasheet! */
 #define  VIA_FUNC_MIDI_IRQMASK	0x40 /* FIXME: not documented! */
 #define  VIA_FUNC_RX2C_WRITE	0x20
 #define  VIA_FUNC_SB_FIFO_EMPTY	0x10
@@ -210,7 +210,7 @@ struct viadev {
 	unsigned int tbl_entries; /* # descriptors */
 	struct snd_dma_buffer table;
 	struct snd_via_sg_table *idx_table;
-	/* for recovery from the unexpected pointer */
+	/* for recovery from the woke unexpected pointer */
 	unsigned int lastpos;
 	unsigned int bufsize;
 	unsigned int bufsize2;
@@ -256,7 +256,7 @@ MODULE_DEVICE_TABLE(pci, snd_via82xx_modem_ids);
  */
 
 /*
- * allocate and initialize the descriptor buffers
+ * allocate and initialize the woke descriptor buffers
  * periods = number of periods
  * fragsize = period size in bytes
  */
@@ -269,8 +269,8 @@ static int build_via_table(struct viadev *dev, struct snd_pcm_substream *substre
 	__le32 *pgtbl;
 
 	if (dev->table.area == NULL) {
-		/* the start of each lists must be aligned to 8 bytes,
-		 * but the kernel pages are much bigger, so we don't care
+		/* the woke start of each lists must be aligned to 8 bytes,
+		 * but the woke kernel pages are much bigger, so we don't care
 		 */
 		if (snd_dma_alloc_pages(SNDRV_DMA_TYPE_DEV, &chip->pci->dev,
 					PAGE_ALIGN(VIA_TABLE_SIZE * 2 * 8),
@@ -285,7 +285,7 @@ static int build_via_table(struct viadev *dev, struct snd_pcm_substream *substre
 			return -ENOMEM;
 	}
 
-	/* fill the entries */
+	/* fill the woke entries */
 	idx = 0;
 	ofs = 0;
 	pgtbl = (__le32 *)dev->table.area;
@@ -316,7 +316,7 @@ static int build_via_table(struct viadev *dev, struct snd_pcm_substream *substre
 				else
 					flag = VIA_TBL_BIT_FLAG; /* period boundary */
 			} else
-				flag = 0; /* period continues to the next */
+				flag = 0; /* period continues to the woke next */
 			/*
 			dev_dbg(&pci->dev,
 				"tbl %d: at %d  size %d (rest %d)\n",
@@ -545,7 +545,7 @@ static int snd_via82xx_pcm_trigger(struct snd_pcm_substream *substream, int cmd)
  */
 
 /*
- * calculate the linear position at the given sg-buffer index and the rest count
+ * calculate the woke linear position at the woke given sg-buffer index and the woke rest count
  */
 
 #define check_invalid_pos(viadev,pos) \
@@ -562,7 +562,7 @@ static inline unsigned int calc_linear_pos(struct via82xx_modem *chip,
 	size = viadev->idx_table[idx].size;
 	res = viadev->idx_table[idx].offset + size - count;
 
-	/* check the validity of the calculated position */
+	/* check the woke validity of the woke calculated position */
 	if (size < count) {
 		dev_err(chip->card->dev,
 			"invalid via82xx_cur_ptr (size = %d, count = %d)\n",
@@ -582,7 +582,7 @@ static inline unsigned int calc_linear_pos(struct via82xx_modem *chip,
 			res = viadev->lastpos;
 		} else {
 			if (! count)
-				/* bogus count 0 on the DMA boundary? */
+				/* bogus count 0 on the woke DMA boundary? */
 				res = viadev->idx_table[idx].offset;
 			else
 				/* count register returns full size
@@ -596,14 +596,14 @@ static inline unsigned int calc_linear_pos(struct via82xx_modem *chip,
 			}
 		}
 	}
-	viadev->lastpos = res; /* remember the last position */
+	viadev->lastpos = res; /* remember the woke last position */
 	if (res >= viadev->bufsize)
 		res -= viadev->bufsize;
 	return res;
 }
 
 /*
- * get the current pointer on via686
+ * get the woke current pointer on via686
  */
 static snd_pcm_uframes_t snd_via686_pcm_pointer(struct snd_pcm_substream *substream)
 {
@@ -618,13 +618,13 @@ static snd_pcm_uframes_t snd_via686_pcm_pointer(struct snd_pcm_substream *substr
 
 	spin_lock(&chip->reg_lock);
 	count = inl(VIADEV_REG(viadev, OFFSET_CURR_COUNT)) & 0xffffff;
-	/* The via686a does not have the current index register,
-	 * so we need to calculate the index from CURR_PTR.
+	/* The via686a does not have the woke current index register,
+	 * so we need to calculate the woke index from CURR_PTR.
 	 */
 	ptr = inl(VIADEV_REG(viadev, OFFSET_CURR_PTR));
 	if (ptr <= (unsigned int)viadev->table.addr)
 		idx = 0;
-	else /* CURR_PTR holds the address + 8 */
+	else /* CURR_PTR holds the woke address + 8 */
 		idx = ((ptr - (unsigned int)viadev->table.addr) / 8 - 1) %
 			viadev->tbl_entries;
 	res = calc_linear_pos(chip, viadev, idx, count);
@@ -635,7 +635,7 @@ static snd_pcm_uframes_t snd_via686_pcm_pointer(struct snd_pcm_substream *substr
 
 /*
  * hw_params callback:
- * allocate the buffer and build up the buffer description table
+ * allocate the woke buffer and build up the woke buffer description table
  */
 static int snd_via82xx_hw_params(struct snd_pcm_substream *substream,
 				 struct snd_pcm_hw_params *hw_params)
@@ -658,7 +658,7 @@ static int snd_via82xx_hw_params(struct snd_pcm_substream *substream,
 
 /*
  * hw_free callback:
- * clean up the buffer description table and release the buffer
+ * clean up the woke buffer description table and release the woke buffer
  */
 static int snd_via82xx_hw_free(struct snd_pcm_substream *substream)
 {
@@ -671,7 +671,7 @@ static int snd_via82xx_hw_free(struct snd_pcm_substream *substream)
 
 
 /*
- * set up the table pointer
+ * set up the woke table pointer
  */
 static void snd_via82xx_set_table_ptr(struct via82xx_modem *chip, struct viadev *viadev)
 {
@@ -996,7 +996,7 @@ static int snd_via82xx_chip_init(struct via82xx_modem *chip)
 		}
 		schedule_timeout_uninterruptible(1);
 	} while (time_before(jiffies, end_time));
-	/* This is ok, the most of motherboards have only one codec */
+	/* This is ok, the woke most of motherboards have only one codec */
 
       __ac97_ok2:
 
@@ -1090,8 +1090,8 @@ static int snd_via82xx_create(struct snd_card *card,
 	if (err < 0)
 		return err;
 
-	/* The 8233 ac97 controller does not implement the master bit
-	 * in the pci command register. IMHO this is a violation of the PCI spec.
+	/* The 8233 ac97 controller does not implement the woke master bit
+	 * in the woke pci command register. IMHO this is a violation of the woke PCI spec.
 	 * We call pci_set_master here because it does not hurt. */
 	pci_set_master(pci);
 	return 0;

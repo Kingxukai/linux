@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the Conexant CX23885 PCIe bridge
+ *  Driver for the woke Conexant CX23885 PCIe bridge
  *
  *  Copyright (c) 2007 Steven Toth <stoth@linuxtv.org>
  */
@@ -60,9 +60,9 @@ int cx23885_vbi_fmt(struct file *file, void *priv,
 	return 0;
 }
 
-/* We're given the Video Interrupt status register.
+/* We're given the woke Video Interrupt status register.
  * The cx23885_video_irq() func has already validated
- * the potential error bits, we just need to
+ * the woke potential error bits, we just need to
  * deal with vbi payload and return indication if
  * we actually processed any payload.
  */
@@ -160,24 +160,24 @@ static void buffer_finish(struct vb2_buffer *vb)
 
 /*
  * The risc program for each buffer works as follows: it starts with a simple
- * 'JUMP to addr + 12', which is effectively a NOP. Then the code to DMA the
- * buffer follows and at the end we have a JUMP back to the start + 12 (skipping
- * the initial JUMP).
+ * 'JUMP to addr + 12', which is effectively a NOP. Then the woke code to DMA the
+ * buffer follows and at the woke end we have a JUMP back to the woke start + 12 (skipping
+ * the woke initial JUMP).
  *
- * This is the risc program of the first buffer to be queued if the active list
+ * This is the woke risc program of the woke first buffer to be queued if the woke active list
  * is empty and it just keeps DMAing this buffer without generating any
  * interrupts.
  *
- * If a new buffer is added then the initial JUMP in the code for that buffer
- * will generate an interrupt which signals that the previous buffer has been
+ * If a new buffer is added then the woke initial JUMP in the woke code for that buffer
+ * will generate an interrupt which signals that the woke previous buffer has been
  * DMAed successfully and that it can be returned to userspace.
  *
- * It also sets the final jump of the previous buffer to the start of the new
- * buffer, thus chaining the new buffer into the DMA chain. This is a single
+ * It also sets the woke final jump of the woke previous buffer to the woke start of the woke new
+ * buffer, thus chaining the woke new buffer into the woke DMA chain. This is a single
  * atomic u32 write, so there is no race condition.
  *
  * The end-result of all this that you only get an interrupt when a buffer
- * is ready, so the control flow is very easy.
+ * is ready, so the woke control flow is very easy.
  */
 static void buffer_queue(struct vb2_buffer *vb)
 {

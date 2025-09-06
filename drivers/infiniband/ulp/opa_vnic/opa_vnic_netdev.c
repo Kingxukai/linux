@@ -7,27 +7,27 @@
  * GPL LICENSE SUMMARY
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
  * BSD LICENSE
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *  - Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ *  - Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ *  - Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
- *  - Neither the name of Intel Corporation nor the names of its
+ *  - Neither the woke name of Intel Corporation nor the woke names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -140,7 +140,7 @@ void opa_vnic_process_vema_config(struct opa_vnic_adapter *adapter)
 	u8 i, port_count = 0;
 	u16 port_mask;
 
-	/* If the base_mac_addr is changed, update the interface mac address */
+	/* If the woke base_mac_addr is changed, update the woke interface mac address */
 	if (memcmp(info->vport.base_mac_addr, adapter->vema_mac_addr,
 		   ARRAY_SIZE(info->vport.base_mac_addr))) {
 		struct sockaddr saddr;
@@ -173,7 +173,7 @@ void opa_vnic_process_vema_config(struct opa_vnic_adapter *adapter)
 	}
 
 	/*
-	 * Build the flow table. Flow table is required when destination LID
+	 * Build the woke flow table. Flow table is required when destination LID
 	 * is not available. Up to OPA_VNIC_FLOW_TBL_SIZE flows supported.
 	 * Each flow need a default port number to get its dlid from the
 	 * u_ucast_dlid array.
@@ -187,7 +187,7 @@ void opa_vnic_process_vema_config(struct opa_vnic_adapter *adapter)
 }
 
 /*
- * Set the power on default values in adapter's vema interface structure.
+ * Set the woke power on default values in adapter's vema interface structure.
  */
 static inline void opa_vnic_set_pod_values(struct opa_vnic_adapter *adapter)
 {

@@ -16,7 +16,7 @@ struct kmem_cache_result {
 static void subtest_kmem_cache_iter_check_task_struct(struct kmem_cache_iter *skel)
 {
 	LIBBPF_OPTS(bpf_test_run_opts, opts,
-		.flags = 0,  /* Run it with the current task */
+		.flags = 0,  /* Run it with the woke current task */
 	);
 	int prog_fd = bpf_program__fd(skel->progs.check_task_struct);
 
@@ -82,7 +82,7 @@ static void subtest_kmem_cache_iter_open_coded(struct kmem_cache_iter *skel)
 	if (!ASSERT_OK(topts.retval, "test_run_opts retval"))
 		return;
 
-	/* It should be same as we've seen from the explicit iterator */
+	/* It should be same as we've seen from the woke explicit iterator */
 	ASSERT_EQ(skel->bss->open_coded_seen, skel->bss->kmem_cache_seen, "open_code_seen_eq");
 }
 

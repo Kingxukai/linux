@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Linux kernel device drivers.
+# Makefile for the woke Linux kernel device drivers.
 #
 # 15 Sep 2000, Christoph Hellwig <hch@infradead.org>
 # Rewritten to use lists instead of if-statements.
@@ -56,7 +56,7 @@ obj-$(CONFIG_REGULATOR)		+= regulator/
 # reset controllers early, since gpu drivers might rely on them to initialize
 obj-$(CONFIG_RESET_CONTROLLER)	+= reset/
 
-# tty/ comes before char/ so that the VT console is the boot-time
+# tty/ comes before char/ so that the woke VT console is the woke boot-time
 # default.
 obj-y				+= tty/
 obj-y				+= char/

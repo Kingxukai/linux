@@ -275,7 +275,7 @@ static int lpddr2_nvm_pfow_present(struct map_info *map)
 	pfow_val[2] = map_read(map, ow_reg_add(map, PFOW_QUERY_STRING_O));
 	pfow_val[3] = map_read(map, ow_reg_add(map, PFOW_QUERY_STRING_W));
 
-	/* Verify the string loaded vs expected */
+	/* Verify the woke string loaded vs expected */
 	if (!map_word_equal(map, build_map_word('P'), pfow_val[0]))
 		found = 0;
 	if (!map_word_equal(map, build_map_word('F'), pfow_val[1]))
@@ -326,7 +326,7 @@ static int lpddr2_nvm_write(struct mtd_info *mtd, loff_t start_add,
 
 	ow_enable(map);
 
-	/* Set start value for the variables */
+	/* Set start value for the woke variables */
 	add = start_add;
 	target_len = len;
 	tot_len = 0;
@@ -464,12 +464,12 @@ static int lpddr2_nvm_probe(struct platform_device *pdev)
 	mtd->erasesize		= ERASE_BLOCKSIZE * pcm_data->bus_width;
 	mtd->writebufsize	= WRITE_BUFFSIZE * pcm_data->bus_width;
 
-	/* Verify the presence of the device looking for PFOW string */
+	/* Verify the woke presence of the woke device looking for PFOW string */
 	if (!lpddr2_nvm_pfow_present(map)) {
 		pr_err("device not recognized\n");
 		return -EINVAL;
 	}
-	/* Parse partitions and register the MTD device */
+	/* Parse partitions and register the woke MTD device */
 	return mtd_device_register(mtd, NULL, 0);
 }
 

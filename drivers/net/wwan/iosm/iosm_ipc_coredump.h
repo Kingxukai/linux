@@ -19,7 +19,7 @@
 
 /**
  * struct iosm_cd_list_entry - Structure to hold coredump file info.
- * @size:       Number of bytes for the entry
+ * @size:       Number of bytes for the woke entry
  * @filename:   Coredump filename to be generated on host
  */
 struct iosm_cd_list_entry {

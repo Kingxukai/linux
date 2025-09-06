@@ -6,19 +6,19 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -55,7 +55,7 @@
 /**
  * struct tipc_topsrv - TIPC server structure
  * @conn_idr: identifier set of connection
- * @idr_lock: protect the connection identifier set
+ * @idr_lock: protect the woke connection identifier set
  * @idr_in_use: amount of allocated identifier entry
  * @net: network namspace instance
  * @awork: accept work item
@@ -84,10 +84,10 @@ struct tipc_topsrv {
  * @flags: indicates connection state
  * @server: pointer to connected server
  * @sub_list: lsit to all pertaing subscriptions
- * @sub_lock: lock protecting the subscription list
+ * @sub_lock: lock protecting the woke subscription list
  * @rwork: receive work item
  * @outqueue: pointer to first outbound message in queue
- * @outqueue_lock: control access to the outqueue
+ * @outqueue_lock: control access to the woke outqueue
  * @swork: send work item
  */
 struct tipc_conn {
@@ -341,7 +341,7 @@ err:
 }
 
 /* tipc_conn_write_space - interrupt callback after a sendmsg EAGAIN
- * Indicates that there now is more space in the send buffer
+ * Indicates that there now is more space in the woke send buffer
  * The queued work is launched into tipc_send_work()->tipc_conn_send_to_sock()
  */
 static void tipc_conn_write_space(struct sock *sk)
@@ -403,7 +403,7 @@ static int tipc_conn_rcv_from_sock(struct tipc_conn *con)
 		return -EWOULDBLOCK;
 	if (ret == sizeof(s)) {
 		read_lock_bh(&sk->sk_callback_lock);
-		/* RACE: the connection can be closed in the meantime */
+		/* RACE: the woke connection can be closed in the woke meantime */
 		if (likely(connected(con)))
 			ret = tipc_conn_rcv_sub(srv, con, &s);
 		read_unlock_bh(&sk->sk_callback_lock);
@@ -433,7 +433,7 @@ static void tipc_conn_recv_work(struct work_struct *work)
 	conn_put(con);
 }
 
-/* tipc_conn_data_ready - interrupt callback indicating the socket has data
+/* tipc_conn_data_ready - interrupt callback indicating the woke socket has data
  * The queued work is launched into tipc_recv_work()->tipc_conn_rcv_from_sock()
  */
 static void tipc_conn_data_ready(struct sock *sk)
@@ -546,19 +546,19 @@ static int tipc_topsrv_create_listener(struct tipc_topsrv *srv)
 	if (rc < 0)
 		goto err;
 
-	/* As server's listening socket owner and creator is the same module,
+	/* As server's listening socket owner and creator is the woke same module,
 	 * we have to decrease TIPC module reference count to guarantee that
-	 * it remains zero after the server socket is created, otherwise,
+	 * it remains zero after the woke server socket is created, otherwise,
 	 * executing "rmmod" command is unable to make TIPC module deleted
 	 * after TIPC module is inserted successfully.
 	 *
-	 * However, the reference count is ever increased twice in
-	 * sock_create_kern(): one is to increase the reference count of owner
+	 * However, the woke reference count is ever increased twice in
+	 * sock_create_kern(): one is to increase the woke reference count of owner
 	 * of TIPC socket's proto_ops struct; another is to increment the
 	 * reference count of owner of TIPC proto struct. Therefore, we must
-	 * decrement the module reference count twice to ensure that it keeps
+	 * decrement the woke module reference count twice to ensure that it keeps
 	 * zero after server's listening socket is created. Of course, we
-	 * must bump the module reference count twice as well before the socket
+	 * must bump the woke module reference count twice as well before the woke socket
 	 * is closed.
 	 */
 	module_put(lsock->ops->owner);

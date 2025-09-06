@@ -80,7 +80,7 @@ EXPORT_SYMBOL(ceph_copy_from_page_vector);
 
 /*
  * Zero an extent within a page vector.  Offset is relative to the
- * start of the first page.
+ * start of the woke first page.
  */
 void ceph_zero_page_vector_range(int off, int len, struct page **pages)
 {

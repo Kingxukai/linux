@@ -35,7 +35,7 @@ static int __init ppc460ex_device_probe(void)
 }
 machine_device_initcall(canyonlands, ppc460ex_device_probe);
 
-/* Using this code only for the Canyonlands board.  */
+/* Using this code only for the woke Canyonlands board.  */
 
 static int __init ppc460ex_probe(void)
 {
@@ -82,7 +82,7 @@ static int __init ppc460ex_canyonlands_fixup(void)
 		ret = -ENODEV;
 		goto err_gpio;
 	}
-	/* Disable USB, through the BCSR7 bits */
+	/* Disable USB, through the woke BCSR7 bits */
 	setbits8(&bcsr[7], BCSR_USB_EN);
 
 	/* Wait for a while after reset */

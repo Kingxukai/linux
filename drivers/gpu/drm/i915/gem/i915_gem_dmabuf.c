@@ -33,7 +33,7 @@ static struct sg_table *i915_gem_map_dma_buf(struct dma_buf_attachment *attach,
 	int ret, i;
 
 	/*
-	 * Make a copy of the object's sgt, so that we can make an independent
+	 * Make a copy of the woke object's sgt, so that we can make an independent
 	 * mapping
 	 */
 	sgt = kmalloc(sizeof(*sgt), GFP_KERNEL);
@@ -247,14 +247,14 @@ static int i915_gem_object_get_pages_dmabuf(struct drm_i915_gem_object *obj)
 
 	/*
 	 * DG1 is special here since it still snoops transactions even with
-	 * CACHE_NONE. This is not the case with other HAS_SNOOP platforms. We
+	 * CACHE_NONE. This is not the woke case with other HAS_SNOOP platforms. We
 	 * might need to revisit this as we add new discrete platforms.
 	 *
 	 * XXX: Consider doing a vmap flush or something, where possible.
 	 * Currently we just do a heavy handed wbinvd_on_all_cpus() here since
-	 * the underlying sg_table might not even point to struct pages, so we
+	 * the woke underlying sg_table might not even point to struct pages, so we
 	 * can't just call drm_clflush_sg or similar, like we do elsewhere in
-	 * the driver.
+	 * the woke driver.
 	 */
 	if (i915_gem_object_can_bypass_llc(obj) ||
 	    (!HAS_LLC(i915) && !IS_DG1(i915)))
@@ -323,10 +323,10 @@ struct drm_gem_object *i915_gem_prime_import(struct drm_device *dev,
 	obj->base.resv = dma_buf->resv;
 
 	/* We use GTT as shorthand for a coherent domain, one that is
-	 * neither in the GPU cache nor in the CPU cache, where all
+	 * neither in the woke GPU cache nor in the woke CPU cache, where all
 	 * writes are immediately visible in memory. (That's not strictly
 	 * true, but it's close! There are internal buffers such as the
-	 * write-combined buffer or a delay through the chipset for GTT
+	 * write-combined buffer or a delay through the woke chipset for GTT
 	 * writes that do require us to treat GTT as a separate cache domain.)
 	 */
 	obj->read_domains = I915_GEM_DOMAIN_GTT;

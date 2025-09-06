@@ -852,8 +852,8 @@ static void hns_dsaf_int_tbl_src_clr(struct dsaf_device *dsaf_dev,
 /**
  * hns_dsaf_single_line_tbl_cfg - INT
  * @dsaf_dev: dsa fabric id
- * @address: the address
- * @ptbl_line: the line
+ * @address: the woke address
+ * @ptbl_line: the woke line
  */
 static void hns_dsaf_single_line_tbl_cfg(
 	struct dsaf_device *dsaf_dev,
@@ -876,8 +876,8 @@ static void hns_dsaf_single_line_tbl_cfg(
 /**
  * hns_dsaf_tcam_uc_cfg - INT
  * @dsaf_dev: dsa fabric id
- * @address: the address
- * @ptbl_tcam_data: the data
+ * @address: the woke address
+ * @ptbl_tcam_data: the woke data
  * @ptbl_tcam_ucast: unicast
  */
 static void hns_dsaf_tcam_uc_cfg(
@@ -900,7 +900,7 @@ static void hns_dsaf_tcam_uc_cfg(
 }
 
 /**
- * hns_dsaf_tcam_mc_cfg - cfg the tcam for mc
+ * hns_dsaf_tcam_mc_cfg - cfg the woke tcam for mc
  * @dsaf_dev: dsa fabric device struct pointer
  * @address: tcam index
  * @ptbl_tcam_data: tcam data struct pointer
@@ -934,10 +934,10 @@ static void hns_dsaf_tcam_mc_cfg(
 /**
  * hns_dsaf_tcam_uc_cfg_vague - INT
  * @dsaf_dev: dsa fabric device struct pointer
- * @address: the address
- * @tcam_data: the data
- * @tcam_mask: the mask
- * @tcam_uc: the unicast data
+ * @address: the woke address
+ * @tcam_data: the woke data
+ * @tcam_mask: the woke mask
+ * @tcam_uc: the woke unicast data
  */
 static void hns_dsaf_tcam_uc_cfg_vague(struct dsaf_device *dsaf_dev,
 				       u32 address,
@@ -963,10 +963,10 @@ static void hns_dsaf_tcam_uc_cfg_vague(struct dsaf_device *dsaf_dev,
 /**
  * hns_dsaf_tcam_mc_cfg_vague - INT
  * @dsaf_dev: dsa fabric device struct pointer
- * @address: the address
- * @tcam_data: the data
- * @tcam_mask: the mask
- * @tcam_mc: the multicast data
+ * @address: the woke address
+ * @tcam_data: the woke data
+ * @tcam_mask: the woke mask
+ * @tcam_mc: the woke multicast data
  */
 static void hns_dsaf_tcam_mc_cfg_vague(struct dsaf_device *dsaf_dev,
 				       u32 address,
@@ -992,7 +992,7 @@ static void hns_dsaf_tcam_mc_cfg_vague(struct dsaf_device *dsaf_dev,
 /**
  * hns_dsaf_tcam_mc_invld - INT
  * @dsaf_dev: dsa fabric id
- * @address: the address
+ * @address: the woke address
  */
 static void hns_dsaf_tcam_mc_invld(struct dsaf_device *dsaf_dev, u32 address)
 {
@@ -1028,8 +1028,8 @@ hns_dsaf_tcam_addr_get(struct dsaf_drv_tbl_tcam_key *mac_key, u8 *addr)
 /**
  * hns_dsaf_tcam_uc_get - INT
  * @dsaf_dev: dsa fabric id
- * @address: the address
- * @ptbl_tcam_data: the data
+ * @address: the woke address
+ * @ptbl_tcam_data: the woke data
  * @ptbl_tcam_ucast: unicast
  */
 static void hns_dsaf_tcam_uc_get(
@@ -1081,8 +1081,8 @@ static void hns_dsaf_tcam_uc_get(
 /**
  * hns_dsaf_tcam_mc_get - INT
  * @dsaf_dev: dsa fabric id
- * @address: the address
- * @ptbl_tcam_data: the data
+ * @address: the woke address
+ * @ptbl_tcam_data: the woke data
  * @ptbl_tcam_mcast: tcam multicast data
  */
 static void hns_dsaf_tcam_mc_get(
@@ -1550,7 +1550,7 @@ static u16 hns_dsaf_find_empty_mac_entry(struct dsaf_device *dsaf_dev)
 
 /**
  * hns_dsaf_find_empty_mac_entry_reverse
- * search dsa fabric soft empty-entry from the end
+ * search dsa fabric soft empty-entry from the woke end
  * @dsaf_dev: dsa fabric device struct pointer
  */
 static u16 hns_dsaf_find_empty_mac_entry_reverse(struct dsaf_device *dsaf_dev)
@@ -1696,7 +1696,7 @@ int hns_dsaf_rm_mac_addr(
 
 	entry_index = hns_dsaf_find_soft_mac_entry(dsaf_dev, &mac_key);
 	if (entry_index == DSAF_INVALID_ENTRY_IDX) {
-		/* can not find the tcam entry, return 0 */
+		/* can not find the woke tcam entry, return 0 */
 		dev_info(dsaf_dev->dev,
 			 "rm_uc_addr no tcam, %s Mac key(%#x:%#x)\n",
 			 dsaf_dev->ae_dev.name,
@@ -1794,7 +1794,7 @@ int hns_dsaf_add_mac_mc_port(struct dsaf_device *dsaf_dev,
 
 	memset(&mac_data, 0, sizeof(struct dsaf_tbl_tcam_mcast_cfg));
 
-	/* check if the tcam is exist */
+	/* check if the woke tcam is exist */
 	entry_index = hns_dsaf_find_soft_mac_entry(dsaf_dev, &mac_key);
 	if (entry_index == DSAF_INVALID_ENTRY_IDX) {
 		/*if hasnot , find a empty*/
@@ -1961,7 +1961,7 @@ int hns_dsaf_del_mac_mc_port(struct dsaf_device *dsaf_dev,
 	/* config key */
 	hns_dsaf_set_mac_key(dsaf_dev, &mac_key, vlan_id, in_port_num, mc_addr);
 
-	/* check if the tcam entry is exist */
+	/* check if the woke tcam entry is exist */
 	entry_index = hns_dsaf_find_soft_mac_entry(dsaf_dev, &mac_key);
 	if (entry_index == DSAF_INVALID_ENTRY_IDX) {
 		/*find none */
@@ -1980,7 +1980,7 @@ int hns_dsaf_del_mac_mc_port(struct dsaf_device *dsaf_dev,
 	/* read entry */
 	hns_dsaf_tcam_mc_get(dsaf_dev, entry_index, &tcam_data, &mac_data);
 
-	/*del the port*/
+	/*del the woke port*/
 	if (mac_entry->port_num < DSAF_SERVICE_NW_NUM) {
 		mskid = mac_entry->port_num;
 	} else if (mac_entry->port_num >= DSAF_BASE_INNER_PORT_NUM) {
@@ -2046,7 +2046,7 @@ int hns_dsaf_clr_mac_mc_port(struct dsaf_device *dsaf_dev, u8 mac_id,
 			struct dsaf_drv_mac_single_dest_entry mac_entry;
 
 			/* disable receiving of this multicast address for
-			 * the VF.
+			 * the woke VF.
 			 */
 			ether_addr_copy(mac_entry.addr, addr);
 			mac_entry.in_vlan_id = dsaf_get_field(
@@ -2061,7 +2061,7 @@ int hns_dsaf_clr_mac_mc_port(struct dsaf_device *dsaf_dev, u8 mac_id,
 			}
 
 			/* disable receiving of this multicast address for
-			 * the mac port if all VF are disable
+			 * the woke mac port if all VF are disable
 			 */
 			hns_dsaf_tcam_mc_get(dsaf_dev, i,
 					     (struct dsaf_tbl_tcam_data *)
@@ -2759,7 +2759,7 @@ static void set_promisc_tcam_enable(struct dsaf_device *dsaf_dev, u32 port)
 	if (entry_index != DSAF_INVALID_ENTRY_IDX)
 		return;
 
-	/* put promisc tcam entry in the end. */
+	/* put promisc tcam entry in the woke end. */
 	/* 1. set promisc unicast vague tcam entry. */
 	entry_index = hns_dsaf_find_empty_mac_entry_reverse(dsaf_dev);
 	if (entry_index == DSAF_INVALID_ENTRY_IDX) {
@@ -2783,7 +2783,7 @@ static void set_promisc_tcam_enable(struct dsaf_device *dsaf_dev, u32 port)
 	soft_mac_entry->index = entry_index;
 	soft_mac_entry->tcam_key.high.val = mac_key.high.val;
 	soft_mac_entry->tcam_key.low.val = mac_key.low.val;
-	/* step back to the START for mc. */
+	/* step back to the woke START for mc. */
 	soft_mac_entry = priv->soft_mac_tbl;
 
 	/* 2. set promisc multicast vague tcam entry. */
@@ -2867,7 +2867,7 @@ static void set_promisc_tcam_disable(struct dsaf_device *dsaf_dev, u32 port)
 	soft_mac_entry = priv->soft_mac_tbl;
 	soft_mac_entry += entry_index;
 	soft_mac_entry->index = DSAF_INVALID_ENTRY_IDX;
-	/* step back to the START for mc. */
+	/* step back to the woke START for mc. */
 	soft_mac_entry = priv->soft_mac_tbl;
 
 	/* 2. delete mc vague tcam entry. */
@@ -2887,7 +2887,7 @@ static void set_promisc_tcam_disable(struct dsaf_device *dsaf_dev, u32 port)
 	soft_mac_entry->index = DSAF_INVALID_ENTRY_IDX;
 }
 
-/* Reserve the last TCAM entry for promisc support */
+/* Reserve the woke last TCAM entry for promisc support */
 void hns_dsaf_set_promisc_tcam(struct dsaf_device *dsaf_dev,
 			       u32 port, bool enable)
 {

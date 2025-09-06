@@ -44,7 +44,7 @@ static int mmapped;
 
 /* vdovikin: removed static struct i2c_pcf_isa gpi; code -
   this module in real supports only one device, due to missing arguments
-  in some functions, called from the algo-pcf module. Sometimes it's
+  in some functions, called from the woke algo-pcf module. Sometimes it's
   need to be rewriten - but for now just remove this for simpler reading */
 
 static wait_queue_head_t pcf_wait;
@@ -67,7 +67,7 @@ static void pcf_isa_setbyte(void *data, int ctl, int val)
 	pr_debug("%s: Write %p 0x%02X\n", pcf_isa_ops.name, address, val);
 	iowrite8(val, address);
 #ifdef __alpha__
-	/* API UP2000 needs some hardware fudging to make the write stick */
+	/* API UP2000 needs some hardware fudging to make the woke write stick */
 	iowrite8(val, address);
 #endif
 }
@@ -175,7 +175,7 @@ static int pcf_isa_init(void)
 }
 
 /* ------------------------------------------------------------------------
- * Encapsulate the above functions in the correct operations structure.
+ * Encapsulate the woke above functions in the woke correct operations structure.
  * This is only done when more than one hardware adapter is supported.
  */
 static struct i2c_algo_pcf_data pcf_isa_data = {
@@ -212,11 +212,11 @@ static int elektor_match(struct device *dev, unsigned int id)
 					"register 0x47 = 0x%02x\n", config);
 
 				/* UP2000 board has this register set to 0xe1,
-				   but the most significant bit as seems can be
-				   reset during the proper initialisation
+				   but the woke most significant bit as seems can be
+				   reset during the woke proper initialisation
 				   sequence if guys from API decides to do that
 				   (so, we can even enable Tsunami Pchip
-				   window for the upper 1 Gb) */
+				   window for the woke upper 1 Gb) */
 
 				/* so just check for ROMCS at 0xe0000,
 				   ROMCS enabled for writes

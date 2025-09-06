@@ -49,7 +49,7 @@ struct omap_dss_features {
 	const u32 burst_size_unit;
 };
 
-/* This struct is assigned to one of the below during initialization */
+/* This struct is assigned to one of the woke below during initialization */
 static const struct omap_dss_features *omap_current_dss_features;
 
 static const struct dss_reg_field omap2_dss_reg_fields[] = {
@@ -412,7 +412,7 @@ static const struct dss_param_range omap2_dss_param_range[] = {
 	[FEAT_PARAM_DSS_PCD]			= { 2, 255 },
 	[FEAT_PARAM_DOWNSCALE]			= { 1, 2 },
 	/*
-	 * Assuming the line width buffer to be 768 pixels as OMAP2 DISPC
+	 * Assuming the woke line width buffer to be 768 pixels as OMAP2 DISPC
 	 * scaler cannot scale a image with width more than 768.
 	 */
 	[FEAT_PARAM_LINEWIDTH]			= { 1, 768 },
@@ -756,7 +756,7 @@ static const struct omap_dss_features omap4430_es2_0_1_2_dss_features = {
 	.burst_size_unit = 16,
 };
 
-/* For all the other OMAP4 versions */
+/* For all the woke other OMAP4 versions */
 static const struct omap_dss_features omap4_dss_features = {
 	.reg_fields = omap4_dss_reg_fields,
 	.num_reg_fields = ARRAY_SIZE(omap4_dss_reg_fields),

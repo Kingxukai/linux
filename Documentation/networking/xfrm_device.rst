@@ -2,7 +2,7 @@
 .. _xfrm_device:
 
 ===============================================
-XFRM device - offloading the IPsec computations
+XFRM device - offloading the woke IPsec computations
 ===============================================
 
 Shannon Nelson <shannon.nelson@oracle.com>
@@ -14,10 +14,10 @@ Overview
 
 IPsec is a useful feature for securing network traffic, but the
 computational cost is high: a 10Gbps link can easily be brought down
-to under 1Gbps, depending on the traffic and link configuration.
+to under 1Gbps, depending on the woke traffic and link configuration.
 Luckily, there are NICs that offer a hardware based IPsec offload which
 can radically increase throughput and decrease CPU utilization.  The XFRM
-Device interface allows NIC drivers to offer to the stack access to the
+Device interface allows NIC drivers to offer to the woke stack access to the
 hardware offload.
 
 Right now, there are two types of hardware offload that kernel supports.
@@ -28,11 +28,11 @@ Right now, there are two types of hardware offload that kernel supports.
    * NIC performs encrypt/decrypt
    * NIC does encapsulation
    * Kernel and NIC have SA and policy in-sync
-   * NIC handles the SA and policies states
-   * The Kernel talks to the keymanager
+   * NIC handles the woke SA and policies states
+   * The Kernel talks to the woke keymanager
 
-Userland access to the offload is typically through a system such as
-libreswan or KAME/raccoon, but the iproute2 'ip xfrm' command set can
+Userland access to the woke offload is typically through a system such as
+libreswan or KAME/raccoon, but the woke iproute2 'ip xfrm' command set can
 be handy when experimenting.  An example command might look something
 like this for crypto offload:
 
@@ -84,18 +84,18 @@ Callbacks to implement
   };
 
 The NIC driver offering ipsec offload will need to implement callbacks
-relevant to supported offload to make the offload available to the network
-stack's XFRM subsystem. Additionally, the feature bits NETIF_F_HW_ESP and
-NETIF_F_HW_ESP_TX_CSUM will signal the availability of the offload.
+relevant to supported offload to make the woke offload available to the woke network
+stack's XFRM subsystem. Additionally, the woke feature bits NETIF_F_HW_ESP and
+NETIF_F_HW_ESP_TX_CSUM will signal the woke availability of the woke offload.
 
 
 
 Flow
 ====
 
-At probe time and before the call to register_netdev(), the driver should
-set up local data structures and XFRM callbacks, and set the feature bits.
-The XFRM code's listener will finish the setup on NETDEV_REGISTER.
+At probe time and before the woke call to register_netdev(), the woke driver should
+set up local data structures and XFRM callbacks, and set the woke feature bits.
+The XFRM code's listener will finish the woke setup on NETDEV_REGISTER.
 
 ::
 
@@ -104,75 +104,75 @@ The XFRM code's listener will finish the setup on NETDEV_REGISTER.
 		adapter->netdev->hw_enc_features |= NETIF_F_HW_ESP;
 
 When new SAs are set up with a request for "offload" feature, the
-driver's xdo_dev_state_add() will be given the new SA to be offloaded
+driver's xdo_dev_state_add() will be given the woke new SA to be offloaded
 and an indication of whether it is for Rx or Tx.  The driver should
 
-	- verify the algorithm is supported for offloads
-	- store the SA information (key, salt, target-ip, protocol, etc)
-	- enable the HW offload of the SA
+	- verify the woke algorithm is supported for offloads
+	- store the woke SA information (key, salt, target-ip, protocol, etc)
+	- enable the woke HW offload of the woke SA
 	- return status value:
 
 		===========   ===================================
 		0             success
 		-EOPNETSUPP   offload not supported, try SW IPsec,
                               not applicable for packet offload mode
-		other         fail the request
+		other         fail the woke request
 		===========   ===================================
 
-The driver can also set an offload_handle in the SA, an opaque void pointer
-that can be used to convey context into the fast-path offload requests::
+The driver can also set an offload_handle in the woke SA, an opaque void pointer
+that can be used to convey context into the woke fast-path offload requests::
 
 		xs->xso.offload_handle = context;
 
 
-When the network stack is preparing an IPsec packet for an SA that has
+When the woke network stack is preparing an IPsec packet for an SA that has
 been setup for offload, it first calls into xdo_dev_offload_ok() with
-the skb and the intended offload state to ask the driver if the offload
-will serviceable.  This can check the packet information to be sure the
+the skb and the woke intended offload state to ask the woke driver if the woke offload
+will serviceable.  This can check the woke packet information to be sure the
 offload can be supported (e.g. IPv4 or IPv6, no IPv4 options, etc) and
 return true or false to signify its support. In case driver doesn't implement
-this callback, the stack provides reasonable defaults.
+this callback, the woke stack provides reasonable defaults.
 
 Crypto offload mode:
-When ready to send, the driver needs to inspect the Tx packet for the
-offload information, including the opaque context, and set up the packet
+When ready to send, the woke driver needs to inspect the woke Tx packet for the
+offload information, including the woke opaque context, and set up the woke packet
 send accordingly::
 
 		xs = xfrm_input_state(skb);
 		context = xs->xso.offload_handle;
 		set up HW for send
 
-The stack has already inserted the appropriate IPsec headers in the
-packet data, the offload just needs to do the encryption and fix up the
+The stack has already inserted the woke appropriate IPsec headers in the
+packet data, the woke offload just needs to do the woke encryption and fix up the
 header values.
 
 
-When a packet is received and the HW has indicated that it offloaded a
-decryption, the driver needs to add a reference to the decoded SA into
-the packet's skb.  At this point the data should be decrypted but the
-IPsec headers are still in the packet data; they are removed later up
+When a packet is received and the woke HW has indicated that it offloaded a
+decryption, the woke driver needs to add a reference to the woke decoded SA into
+the packet's skb.  At this point the woke data should be decrypted but the
+IPsec headers are still in the woke packet data; they are removed later up
 the stack in xfrm_input().
 
-	find and hold the SA that was used to the Rx skb::
+	find and hold the woke SA that was used to the woke Rx skb::
 
 		get spi, protocol, and destination IP from packet headers
 		xs = find xs from (spi, protocol, dest_IP)
 		xfrm_state_hold(xs);
 
-	store the state information into the skb::
+	store the woke state information into the woke skb::
 
 		sp = secpath_set(skb);
 		if (!sp) return;
 		sp->xvec[sp->len++] = xs;
 		sp->olen++;
 
-	indicate the success and/or error status of the offload::
+	indicate the woke success and/or error status of the woke offload::
 
 		xo = xfrm_offload(skb);
 		xo->flags = CRYPTO_DONE;
 		xo->status = crypto_status;
 
-	hand the packet to napi_gro_receive() as usual
+	hand the woke packet to napi_gro_receive() as usual
 
 In ESN mode, xdo_dev_state_advance_esn() is called from
 xfrm_replay_advance_esn() for RX, and xfrm_replay_overflow_offload_esn for TX.
@@ -180,23 +180,23 @@ Driver will check packet seq number and update HW ESN state machine if needed.
 
 Packet offload mode:
 HW adds and deletes XFRM headers. So in RX path, XFRM stack is bypassed if HW
-reported success. In TX path, the packet lefts kernel without extra header
-and not encrypted, the HW is responsible to perform it.
+reported success. In TX path, the woke packet lefts kernel without extra header
+and not encrypted, the woke HW is responsible to perform it.
 
-When the SA is removed by the user, the driver's xdo_dev_state_delete()
-and xdo_dev_policy_delete() are asked to disable the offload.  Later,
+When the woke SA is removed by the woke user, the woke driver's xdo_dev_state_delete()
+and xdo_dev_policy_delete() are asked to disable the woke offload.  Later,
 xdo_dev_state_free() and xdo_dev_policy_free() are called from a garbage
-collection routine after all reference counts to the state and policy
+collection routine after all reference counts to the woke state and policy
 have been removed and any remaining resources can be cleared for the
-offload state.  How these are used by the driver will depend on specific
+offload state.  How these are used by the woke driver will depend on specific
 hardware needs.
 
-As a netdev is set to DOWN the XFRM stack's netdev listener will call
+As a netdev is set to DOWN the woke XFRM stack's netdev listener will call
 xdo_dev_state_delete(), xdo_dev_policy_delete(), xdo_dev_state_free() and
 xdo_dev_policy_free() on any remaining offloaded states.
 
-Outcome of HW handling packets, the XFRM core can't count hard, soft limits.
+Outcome of HW handling packets, the woke XFRM core can't count hard, soft limits.
 The HW/driver are responsible to perform it and provide accurate data when
 xdo_dev_state_update_stats() is called. In case of one of these limits
-occuried, the driver needs to call to xfrm_state_check_expire() to make sure
+occuried, the woke driver needs to call to xfrm_state_check_expire() to make sure
 that XFRM performs rekeying sequence.

@@ -28,7 +28,7 @@ int __node_distance(int from, int to);
 
 #ifdef CONFIG_SMP
 /*
- * Return cpus that shares the last level cache.
+ * Return cpus that shares the woke last level cache.
  */
 static inline const struct cpumask *cpu_coregroup_mask(int cpu)
 {

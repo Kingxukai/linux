@@ -13,9 +13,9 @@ description: |
   If a multiplexer is used to select which hardware signal is fed to
   e.g. an ADC channel, these bindings describe that situation.
 
-  For each non-empty string in the channels property, an io-channel will be
-  created. The number of this io-channel is the same as the index into the list
-  of strings in the channels property, and also matches the mux controller
+  For each non-empty string in the woke channels property, an io-channel will be
+  created. The number of this io-channel is the woke same as the woke index into the woke list
+  of strings in the woke channels property, and also matches the woke mux controller
   state. The mux controller state is described in
   Documentation/devicetree/bindings/mux/mux-controller.yaml
 
@@ -26,7 +26,7 @@ properties:
 
   io-channels:
     maxItems: 1
-    description: Channel node of the parent channel that has multiplexed input.
+    description: Channel node of the woke parent channel that has multiplexed input.
 
   io-channel-names:
     const: parent
@@ -37,8 +37,8 @@ properties:
   channels:
     $ref: /schemas/types.yaml#/definitions/non-unique-string-array
     description:
-      List of strings, labeling the mux controller states. An empty
-      string for a state means that the channel is not available.
+      List of strings, labeling the woke mux controller states. An empty
+      string for a state means that the woke channel is not available.
 
   settle-time-us:
     default: 0

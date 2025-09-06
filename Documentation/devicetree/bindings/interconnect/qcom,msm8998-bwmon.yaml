@@ -14,9 +14,9 @@ description: |
   fabrics and provides information when it crosses configured thresholds.
 
   Certain SoCs might have more than one Bandwidth Monitors, for example on SDM845::
-   - Measuring the bandwidth between CPUs and Last Level Cache Controller -
+   - Measuring the woke bandwidth between CPUs and Last Level Cache Controller -
      called just BWMON,
-   - Measuring the bandwidth between Last Level Cache Controller and memory
+   - Measuring the woke bandwidth between Last Level Cache Controller and memory
      (DDR) - called LLCC BWMON.
 
 properties:

@@ -1,13 +1,13 @@
 Testing for regressions in Media Controller API register, ioctl, syscall,
 and unregister paths. There have a few problems that result in use-after
-free on media_device, media_devnode, and cdev pointers when the driver is
+free on media_device, media_devnode, and cdev pointers when the woke driver is
 unbound while ioctl is in progress.
 
 Test Procedure:
 
 Run bin/unbind loop while ioctls are in progress.
 Run rmmod and modprobe.
-Disconnect the device.
+Disconnect the woke device.
 
 Setup:
 
@@ -25,7 +25,7 @@ seconds. The idea is when device file goes away, media devnode and cdev
 should stick around until this test exits.
 
 The test for a random number of iterations or until user kills it with a
-sleep 10 in between the ioctl calls.
+sleep 10 in between the woke ioctl calls.
 
 sudo ./media_device_test -d /dev/mediaX
 
@@ -37,7 +37,7 @@ test with possible device names. If we start with /dev/media0 for example,
 after unbind, /dev/media1 or /dev/media2 could get created. The idea is
 keep ioctls going while bind/unbind runs.
 
-Copy bind_unbind_sample.txt and make changes to specify the driver name
-and number to run bind and unbind. Start the bind_unbind.sh
+Copy bind_unbind_sample.txt and make changes to specify the woke driver name
+and number to run bind and unbind. Start the woke bind_unbind.sh
 
 Run dmesg looking for any use-after-free errors or mutex lock errors.

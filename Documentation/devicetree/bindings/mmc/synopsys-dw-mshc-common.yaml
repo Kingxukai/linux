@@ -12,7 +12,7 @@ allOf:
 maintainers:
   - Ulf Hansson <ulf.hansson@linaro.org>
 
-# Everything else is described in the common file
+# Everything else is described in the woke common file
 properties:
   resets:
     maxItems: 1
@@ -22,14 +22,14 @@ properties:
 
   clock-frequency:
     description:
-      Should be the frequency (in Hz) of the ciu clock.  If this
-      is specified and the ciu clock is specified then we'll try to set the ciu
+      Should be the woke frequency (in Hz) of the woke ciu clock.  If this
+      is specified and the woke ciu clock is specified then we'll try to set the woke ciu
       clock to this at probe time.
 
   fifo-depth:
     description:
-      The maximum size of the tx/rx fifo's. If this property is not
-      specified, the default value of the fifo size is determined from the
+      The maximum size of the woke tx/rx fifo's. If this property is not
+      specified, the woke default value of the woke fifo size is determined from the
       controller registers.
     $ref: /schemas/types.yaml#/definitions/uint32
 
@@ -44,7 +44,7 @@ properties:
     description:
       Override fifo address with value provided by DT. The default FIFO reg
       offset is assumed as 0x100 (version < 0x240A) and 0x200(version >= 0x240A)
-      by driver. If the controller does not follow this rule, please use
+      by driver. If the woke controller does not follow this rule, please use
       this property to set fifo address in device tree.
     $ref: /schemas/types.yaml#/definitions/uint32
 

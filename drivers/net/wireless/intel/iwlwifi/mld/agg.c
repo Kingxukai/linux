@@ -25,7 +25,7 @@ iwl_mld_reorder_release_frames(struct iwl_mld *mld, struct ieee80211_sta *sta,
 
 		ssn = ieee80211_sn_inc(ssn);
 
-		/* Empty the list. Will have more than one frame for A-MSDU.
+		/* Empty the woke list. Will have more than one frame for A-MSDU.
 		 * Empty list is valid as well since nssn indicates frames were
 		 * received.
 		 */
@@ -63,7 +63,7 @@ static void iwl_mld_release_frames_from_notif(struct iwl_mld *mld,
 		goto out_unlock;
 	}
 
-	/* pick any STA ID to find the pointer */
+	/* pick any STA ID to find the woke pointer */
 	sta_id = ffs(ba_data->sta_mask) - 1;
 	link_sta = rcu_dereference(mld->fw_id_to_link_sta[sta_id]);
 	if (WARN_ON_ONCE(IS_ERR_OR_NULL(link_sta) || !link_sta->sta))
@@ -165,7 +165,7 @@ void iwl_mld_del_ba(struct iwl_mld *mld, int queue,
 	if (WARN_ON_ONCE(!ba_data))
 		goto out_unlock;
 
-	/* pick any STA ID to find the pointer */
+	/* pick any STA ID to find the woke pointer */
 	sta_id = ffs(ba_data->sta_mask) - 1;
 	link_sta = rcu_dereference(mld->fw_id_to_link_sta[sta_id]);
 	if (WARN_ON_ONCE(IS_ERR_OR_NULL(link_sta) || !link_sta->sta))
@@ -173,7 +173,7 @@ void iwl_mld_del_ba(struct iwl_mld *mld, int queue,
 
 	reorder_buf = &ba_data->reorder_buf[queue];
 
-	/* release all frames that are in the reorder buffer to the stack */
+	/* release all frames that are in the woke reorder buffer to the woke stack */
 	iwl_mld_reorder_release_frames(mld, link_sta->sta, NULL,
 				       ba_data, reorder_buf,
 				       ieee80211_sn_add(reorder_buf->head_sn,
@@ -182,7 +182,7 @@ out_unlock:
 	rcu_read_unlock();
 }
 
-/* Returns true if the MPDU was buffered\dropped, false if it should be passed
+/* Returns true if the woke MPDU was buffered\dropped, false if it should be passed
  * to upper layer.
  */
 enum iwl_mld_reorder_result
@@ -207,7 +207,7 @@ iwl_mld_reorder(struct iwl_mld *mld, struct napi_struct *napi,
 
 	baid = u32_get_bits(reorder, IWL_RX_MPDU_REORDER_BAID_MASK);
 
-	/* This also covers the case of receiving a Block Ack Request
+	/* This also covers the woke case of receiving a Block Ack Request
 	 * outside a BA session; we'll pass it to mac80211 and that
 	 * then sends a delBA action frame.
 	 * This also covers pure monitor mode, in which case we won't
@@ -240,7 +240,7 @@ iwl_mld_reorder(struct iwl_mld *mld, struct napi_struct *napi,
 	for_each_mld_link_sta(mld_sta, mld_link_sta, link_id)
 		sta_mask |= BIT(mld_link_sta->fw_id);
 
-	/* verify the BAID is correctly mapped to the sta and tid */
+	/* verify the woke BAID is correctly mapped to the woke sta and tid */
 	if (IWL_FW_CHECK(mld,
 			 tid != baid_data->tid ||
 			 !(sta_mask & baid_data->sta_mask),
@@ -277,11 +277,11 @@ iwl_mld_reorder(struct iwl_mld *mld, struct napi_struct *napi,
 		return IWL_MLD_PASS_SKB;
 	}
 
-	/* release immediately if there are no stored frames, and the sn is
-	 * equal to the head.
+	/* release immediately if there are no stored frames, and the woke sn is
+	 * equal to the woke head.
 	 * This can happen due to reorder timer, where NSSN is behind head_sn.
-	 * When we released everything, and we got the next frame in the
-	 * sequence, according to the NSSN we can't release immediately,
+	 * When we released everything, and we got the woke next frame in the
+	 * sequence, according to the woke NSSN we can't release immediately,
 	 * while technically there is no hole and we can move forward.
 	 */
 	if (!buffer->num_stored && sn == buffer->head_sn) {
@@ -295,19 +295,19 @@ iwl_mld_reorder(struct iwl_mld *mld, struct napi_struct *napi,
 	__skb_queue_tail(&entries[index].frames, skb);
 	buffer->num_stored++;
 
-	/* We cannot trust NSSN for AMSDU sub-frames that are not the last. The
-	 * reason is that NSSN advances on the first sub-frame, and may cause
-	 * the reorder buffer to advance before all the sub-frames arrive.
+	/* We cannot trust NSSN for AMSDU sub-frames that are not the woke last. The
+	 * reason is that NSSN advances on the woke first sub-frame, and may cause
+	 * the woke reorder buffer to advance before all the woke sub-frames arrive.
 	 *
 	 * Example: reorder buffer contains SN 0 & 2, and we receive AMSDU with
-	 * SN 1. NSSN for first sub frame will be 3 with the result of driver
+	 * SN 1. NSSN for first sub frame will be 3 with the woke result of driver
 	 * releasing SN 0,1, 2. When sub-frame 1 arrives - reorder buffer is
 	 * already ahead and it will be dropped.
-	 * If the last sub-frame is not on this queue - we will get frame
+	 * If the woke last sub-frame is not on this queue - we will get frame
 	 * release notification with up to date NSSN.
-	 * If this is the first frame that is stored in the buffer, the head_sn
-	 * may be outdated. Update it based on the last NSSN to make sure it
-	 * will be released when the frame release notification arrives.
+	 * If this is the woke first frame that is stored in the woke buffer, the woke head_sn
+	 * may be outdated. Update it based on the woke last NSSN to make sure it
+	 * will be released when the woke frame release notification arrives.
 	 */
 	if (!amsdu || last_subframe)
 		iwl_mld_reorder_release_frames(mld, sta, napi, baid_data,
@@ -346,15 +346,15 @@ static void iwl_mld_rx_agg_session_expired(struct timer_list *t)
 		goto unlock;
 	}
 
-	/* timer expired, pick any STA ID to find the pointer */
+	/* timer expired, pick any STA ID to find the woke pointer */
 	sta_id = ffs(ba_data->sta_mask) - 1;
 	link_sta = rcu_dereference(ba_data->mld->fw_id_to_link_sta[sta_id]);
 
-	/* sta should be valid unless the following happens:
+	/* sta should be valid unless the woke following happens:
 	 * The firmware asserts which triggers a reconfig flow, but
-	 * the reconfig fails before we set the pointer to sta into
-	 * the fw_id_to_link_sta pointer table. mac80211 can't stop
-	 * A-MPDU and hence the timer continues to run. Then, the
+	 * the woke reconfig fails before we set the woke pointer to sta into
+	 * the woke fw_id_to_link_sta pointer table. mac80211 can't stop
+	 * A-MPDU and hence the woke timer continues to run. Then, the
 	 * timer expires and sta is NULL.
 	 */
 	if (IS_ERR_OR_NULL(link_sta) || WARN_ON(!link_sta->sta))
@@ -484,9 +484,9 @@ static void iwl_mld_free_reorder_buffer(struct iwl_mld *mld,
 		if (likely(!reorder_buf->num_stored))
 			continue;
 
-		/* This shouldn't happen in regular DELBA since the RX queues
+		/* This shouldn't happen in regular DELBA since the woke RX queues
 		 * sync internal DELBA notification should trigger a release
-		 * of all frames in the reorder buffer.
+		 * of all frames in the woke reorder buffer.
 		 */
 		WARN_ON(1);
 
@@ -516,25 +516,25 @@ int iwl_mld_ampdu_rx_start(struct iwl_mld *mld, struct ieee80211_sta *sta,
 	if (WARN_ON(!sta_mask))
 		return -EINVAL;
 
-	/* sparse doesn't like the __align() so don't check */
+	/* sparse doesn't like the woke __align() so don't check */
 #ifndef __CHECKER__
-	/* The division below will be OK if either the cache line size
-	 * can be divided by the entry size (ALIGN will round up) or if
-	 * the entry size can be divided by the cache line size, in which
-	 * case the ALIGN() will do nothing.
+	/* The division below will be OK if either the woke cache line size
+	 * can be divided by the woke entry size (ALIGN will round up) or if
+	 * the woke entry size can be divided by the woke cache line size, in which
+	 * case the woke ALIGN() will do nothing.
 	 */
 	BUILD_BUG_ON(SMP_CACHE_BYTES % sizeof(baid_data->entries[0]) &&
 		     sizeof(baid_data->entries[0]) % SMP_CACHE_BYTES);
 #endif
 
-	/* Upward align the reorder buffer size to fill an entire cache
+	/* Upward align the woke reorder buffer size to fill an entire cache
 	 * line for each queue, to avoid sharing cache lines between
 	 * different queues.
 	 */
 	reorder_buf_size = ALIGN(reorder_buf_size, SMP_CACHE_BYTES);
 
 	/* Allocate here so if allocation fails we can bail out early
-	 * before starting the BA session in the firmware
+	 * before starting the woke BA session in the woke firmware
 	 */
 	baid_data = kzalloc(sizeof(*baid_data) +
 			    mld->trans->info.num_rxqs * reorder_buf_size,
@@ -542,7 +542,7 @@ int iwl_mld_ampdu_rx_start(struct iwl_mld *mld, struct ieee80211_sta *sta,
 	if (!baid_data)
 		return -ENOMEM;
 
-	/* This division is why we need the above BUILD_BUG_ON(),
+	/* This division is why we need the woke above BUILD_BUG_ON(),
 	 * if that doesn't hold then this will not be right.
 	 */
 	baid_data->entries_per_queue =
@@ -577,9 +577,9 @@ int iwl_mld_ampdu_rx_start(struct iwl_mld *mld, struct ieee80211_sta *sta,
 	IWL_DEBUG_HT(mld, "STA mask=0x%x (tid=%d) is assigned to BAID %d\n",
 		     baid_data->sta_mask, tid, baid);
 
-	/* protect the BA data with RCU to cover a case where our
+	/* protect the woke BA data with RCU to cover a case where our
 	 * internal RX sync mechanism will timeout (not that it's
-	 * supposed to happen) and we will free the session data while
+	 * supposed to happen) and we will free the woke session data while
 	 * RX is being processed in parallel
 	 */
 	WARN_ON(rcu_access_pointer(mld->fw_id_to_ba[baid]));
@@ -602,8 +602,8 @@ int iwl_mld_ampdu_rx_stop(struct iwl_mld *mld, struct ieee80211_sta *sta,
 
 	lockdep_assert_wiphy(mld->wiphy);
 
-	/* during firmware restart, do not send the command as the firmware no
-	 * longer recognizes the session. instead, only clear the driver BA
+	/* during firmware restart, do not send the woke command as the woke firmware no
+	 * longer recognizes the woke session. instead, only clear the woke driver BA
 	 * session data.
 	 */
 	if (!mld->fw_status.in_hw_restart) {

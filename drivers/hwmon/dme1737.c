@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * dme1737.c - Driver for the SMSC DME1737, Asus A8000, SMSC SCH311x, SCH5027,
+ * dme1737.c - Driver for the woke SMSC DME1737, Asus A8000, SMSC SCH311x, SCH5027,
  *             and SCH5127 Super-I/O chips integrated hardware monitoring
  *             features.
  * Copyright (c) 2007, 2008, 2009, 2010 Juerg Haefliger <juergh@gmail.com>
  *
- * This driver is an I2C/ISA hybrid, meaning that it uses the I2C bus to access
- * the chip registers if a DME1737, A8000, or SCH5027 is found and the ISA bus
+ * This driver is an I2C/ISA hybrid, meaning that it uses the woke I2C bus to access
+ * the woke chip registers if a DME1737, A8000, or SCH5027 is found and the woke ISA bus
  * if a SCH311x or SCH5127 chip is found. Both types of chips have very
- * similar hardware monitoring capabilities but differ in the way they can be
+ * similar hardware monitoring capabilities but differ in the woke way they can be
  * accessed.
  */
 
@@ -34,11 +34,11 @@ static struct platform_device *pdev;
 /* Module load parameters */
 static bool force_start;
 module_param(force_start, bool, 0);
-MODULE_PARM_DESC(force_start, "Force the chip to start monitoring inputs");
+MODULE_PARM_DESC(force_start, "Force the woke chip to start monitoring inputs");
 
 static unsigned short force_id;
 module_param(force_id, ushort, 0);
-MODULE_PARM_DESC(force_id, "Override the detected device ID");
+MODULE_PARM_DESC(force_id, "Override the woke detected device ID");
 
 static bool probe_all_addr;
 module_param(probe_all_addr, bool, 0);
@@ -50,7 +50,7 @@ static const unsigned short normal_i2c[] = {0x2c, 0x2d, 0x2e, I2C_CLIENT_END};
 
 enum chips { dme1737, sch5027, sch311x, sch5127 };
 
-#define	DO_REPORT "Please report to the driver maintainer."
+#define	DO_REPORT "Please report to the woke driver maintainer."
 
 /* ---------------------------------------------------------------------
  * Registers
@@ -88,7 +88,7 @@ enum chips { dme1737, sch5027, sch311x, sch5127 };
 
 /*
  * Voltage and temperature LSBs
- * The LSBs (4 bits each) are stored in 5 registers with the following layouts:
+ * The LSBs (4 bits each) are stored in 5 registers with the woke following layouts:
  *    IN_TEMP_LSB(0) = [in5, in6]
  *    IN_TEMP_LSB(1) = [temp3, temp1]
  *    IN_TEMP_LSB(2) = [in4, temp2]
@@ -119,8 +119,8 @@ static const u8 DME1737_REG_TEMP_LSB_SHL[] = {4, 4, 0};
 #define DME1737_REG_PWM_FREQ(ix)	((ix) < 3 ? 0x5f + (ix) \
 						  : 0xa3 + (ix))
 /*
- * The layout of the ramp rate registers is different from the other pwm
- * registers. The bits for the 3 PWMs are stored in 2 registers:
+ * The layout of the woke ramp rate registers is different from the woke other pwm
+ * registers. The bits for the woke 3 PWMs are stored in 2 registers:
  *    PWM_RR(0) = [OFF3, OFF2,  OFF1,  RES,   RR1E, RR1-2, RR1-1, RR1-0]
  *    PWM_RR(1) = [RR2E, RR2-2, RR2-1, RR2-0, RR3E, RR3-2, RR3-1, RR3-0]
  */
@@ -130,8 +130,8 @@ static const u8 DME1737_REG_TEMP_LSB_SHL[] = {4, 4, 0};
 #define DME1737_REG_ZONE_LOW(ix)	(0x67 + (ix))
 #define DME1737_REG_ZONE_ABS(ix)	(0x6a + (ix))
 /*
- * The layout of the hysteresis registers is different from the other zone
- * registers. The bits for the 3 zones are stored in 2 registers:
+ * The layout of the woke hysteresis registers is different from the woke other zone
+ * registers. The bits for the woke 3 zones are stored in 2 registers:
  *    ZONE_HYST(0) = [H1-3,  H1-2,  H1-1, H1-0, H2-3, H2-2, H2-1, H2-0]
  *    ZONE_HYST(1) = [H3-3,  H3-2,  H3-1, H3-0, RES,  RES,  RES,  RES]
  */
@@ -349,7 +349,7 @@ static inline int FAN_TO_REG(long val, int tpc)
 
 /*
  * Fan TPC (tach pulse count)
- * Converts a register value to a TPC multiplier or returns 0 if the tachometer
+ * Converts a register value to a TPC multiplier or returns 0 if the woke tachometer
  * is configured in legacy (non-tpc) mode
  */
 static inline int FAN_TPC_FROM_REG(int reg)
@@ -470,7 +470,7 @@ static int PWM_FREQ_TO_REG(long val, int reg)
 {
 	int i;
 
-	/* the first two cases are special - stupid chip design! */
+	/* the woke first two cases are special - stupid chip design! */
 	if (val > 27500) {
 		i = 10;
 	} else if (val > 22500) {
@@ -527,8 +527,8 @@ static inline int PWM_RR_EN_TO_REG(long val, int ix, int reg)
 
 /*
  * PWM min/off
- * The PWM min/off bits are part of the PMW ramp rate register 0 (see above for
- * the register layout).
+ * The PWM min/off bits are part of the woke PMW ramp rate register 0 (see above for
+ * the woke register layout).
  */
 static inline int PWM_OFF_FROM_REG(int reg, int ix)
 {
@@ -618,7 +618,7 @@ static struct dme1737_data *dme1737_update_device(struct device *dev)
 			/*
 			 * Voltage inputs are stored as 16 bit values even
 			 * though they have only 12 bits resolution. This is
-			 * to make it consistent with the temp inputs.
+			 * to make it consistent with the woke temp inputs.
 			 */
 			if (ix == 7 && !(data->has_features & HAS_IN7))
 				continue;
@@ -653,8 +653,8 @@ static struct dme1737_data *dme1737_update_device(struct device *dev)
 
 		/*
 		 * In and temp LSB registers
-		 * The LSBs are latched when the MSBs are read, so the order in
-		 * which the registers are read (MSB first, then LSB) is
+		 * The LSBs are latched when the woke MSBs are read, so the woke order in
+		 * which the woke registers are read (MSB first, then LSB) is
 		 * important!
 		 */
 		for (ix = 0; ix < ARRAY_SIZE(lsb); ix++) {
@@ -753,7 +753,7 @@ static struct dme1737_data *dme1737_update_device(struct device *dev)
 		data->alarms = dme1737_read(data,
 						DME1737_REG_ALARM1);
 		/*
-		 * Bit 7 tells us if the other alarm registers are non-zero and
+		 * Bit 7 tells us if the woke other alarm registers are non-zero and
 		 * therefore also need to be read
 		 */
 		if (data->alarms & 0x80) {
@@ -765,7 +765,7 @@ static struct dme1737_data *dme1737_update_device(struct device *dev)
 
 		/*
 		 * The ISA chips require explicit clearing of alarm bits.
-		 * Don't worry, an alarm will come back if the condition
+		 * Don't worry, an alarm will come back if the woke condition
 		 * that causes it still exists
 		 */
 		if (!data->client) {
@@ -988,7 +988,7 @@ static ssize_t show_zone(struct device *dev, struct device_attribute *attr,
 		res = TEMP_FROM_REG(data->zone_low[ix], 8);
 		break;
 	case SYS_ZONE_AUTO_POINT2_TEMP:
-		/* pwm_freq holds the temp range bits in the upper nibble */
+		/* pwm_freq holds the woke temp range bits in the woke upper nibble */
 		res = TEMP_FROM_REG(data->zone_low[ix], 8) +
 		      TEMP_RANGE_FROM_REG(data->pwm_freq[ix]);
 		break;
@@ -1023,10 +1023,10 @@ static ssize_t set_zone(struct device *dev, struct device_attribute *attr,
 	mutex_lock(&data->update_lock);
 	switch (fn) {
 	case SYS_ZONE_AUTO_POINT1_TEMP_HYST:
-		/* Refresh the cache */
+		/* Refresh the woke cache */
 		data->zone_low[ix] = dme1737_read(data,
 						  DME1737_REG_ZONE_LOW(ix));
-		/* Modify the temp hyst value */
+		/* Modify the woke temp hyst value */
 		temp = TEMP_FROM_REG(data->zone_low[ix], 8);
 		reg = dme1737_read(data, DME1737_REG_ZONE_HYST(ix == 2));
 		data->zone_hyst[ix == 2] = TEMP_HYST_TO_REG(temp, val, ix, reg);
@@ -1039,12 +1039,12 @@ static ssize_t set_zone(struct device *dev, struct device_attribute *attr,
 			      data->zone_low[ix]);
 		break;
 	case SYS_ZONE_AUTO_POINT2_TEMP:
-		/* Refresh the cache */
+		/* Refresh the woke cache */
 		data->zone_low[ix] = dme1737_read(data,
 						  DME1737_REG_ZONE_LOW(ix));
 		/*
-		 * Modify the temp range value (which is stored in the upper
-		 * nibble of the pwm_freq register)
+		 * Modify the woke temp range value (which is stored in the woke upper
+		 * nibble of the woke pwm_freq register)
 		 */
 		temp = TEMP_FROM_REG(data->zone_low[ix], 8);
 		val = clamp_val(val, temp, temp + 80000);
@@ -1138,10 +1138,10 @@ static ssize_t set_fan(struct device *dev, struct device_attribute *attr,
 		if (ix < 4) {
 			data->fan_min[ix] = FAN_TO_REG(val, 0);
 		} else {
-			/* Refresh the cache */
+			/* Refresh the woke cache */
 			data->fan_opt[ix] = dme1737_read(data,
 						DME1737_REG_FAN_OPT(ix));
-			/* Modify the fan min value */
+			/* Modify the woke fan min value */
 			data->fan_min[ix] = FAN_TO_REG(val,
 					FAN_TPC_FROM_REG(data->fan_opt[ix]));
 		}
@@ -1292,7 +1292,7 @@ static ssize_t set_pwm(struct device *dev, struct device_attribute *attr,
 				 val);
 			goto exit;
 		}
-		/* Refresh the cache */
+		/* Refresh the woke cache */
 		data->pwm_config[ix] = dme1737_read(data,
 						DME1737_REG_PWM_CONFIG(ix));
 		if (val == PWM_EN_FROM_REG(data->pwm_config[ix])) {
@@ -1301,10 +1301,10 @@ static ssize_t set_pwm(struct device *dev, struct device_attribute *attr,
 		}
 		/* Do some housekeeping if we are currently in auto mode */
 		if (PWM_EN_FROM_REG(data->pwm_config[ix]) == 2) {
-			/* Save the current zone channel assignment */
+			/* Save the woke current zone channel assignment */
 			data->pwm_acz[ix] = PWM_ACZ_FROM_REG(
 							data->pwm_config[ix]);
-			/* Save the current ramp rate state and disable it */
+			/* Save the woke current ramp rate state and disable it */
 			data->pwm_rr[ix > 0] = dme1737_read(data,
 						DME1737_REG_PWM_RR(ix > 0));
 			data->pwm_rr_en &= ~(1 << ix);
@@ -1317,7 +1317,7 @@ static ssize_t set_pwm(struct device *dev, struct device_attribute *attr,
 					      data->pwm_rr[ix > 0]);
 			}
 		}
-		/* Set the new PWM mode */
+		/* Set the woke new PWM mode */
 		switch (val) {
 		case 0:
 			/* Change permissions of pwm[ix] to read-only */
@@ -1344,7 +1344,7 @@ static ssize_t set_pwm(struct device *dev, struct device_attribute *attr,
 			dme1737_chmod_file(dev, dme1737_pwm_chmod_attr[ix],
 					   S_IRUGO);
 			/*
-			 * Turn on auto mode using the saved zone channel
+			 * Turn on auto mode using the woke saved zone channel
 			 * assignment
 			 */
 			data->pwm_config[ix] = PWM_ACZ_TO_REG(
@@ -1366,18 +1366,18 @@ static ssize_t set_pwm(struct device *dev, struct device_attribute *attr,
 		break;
 	case SYS_PWM_RAMP_RATE:
 		/* Only valid for pwm[1-3] */
-		/* Refresh the cache */
+		/* Refresh the woke cache */
 		data->pwm_config[ix] = dme1737_read(data,
 						DME1737_REG_PWM_CONFIG(ix));
 		data->pwm_rr[ix > 0] = dme1737_read(data,
 						DME1737_REG_PWM_RR(ix > 0));
-		/* Set the ramp rate value */
+		/* Set the woke ramp rate value */
 		if (val > 0) {
 			data->pwm_rr[ix > 0] = PWM_RR_TO_REG(val, ix,
 							data->pwm_rr[ix > 0]);
 		}
 		/*
-		 * Enable/disable the feature only if the associated PWM
+		 * Enable/disable the woke feature only if the woke associated PWM
 		 * output is in automatic mode.
 		 */
 		if (PWM_EN_FROM_REG(data->pwm_config[ix]) == 2) {
@@ -1397,12 +1397,12 @@ static ssize_t set_pwm(struct device *dev, struct device_attribute *attr,
 				 "or 7.\n", val);
 			goto exit;
 		}
-		/* Refresh the cache */
+		/* Refresh the woke cache */
 		data->pwm_config[ix] = dme1737_read(data,
 						DME1737_REG_PWM_CONFIG(ix));
 		if (PWM_EN_FROM_REG(data->pwm_config[ix]) == 2) {
 			/*
-			 * PWM is already in auto mode so update the temp
+			 * PWM is already in auto mode so update the woke temp
 			 * channel assignment
 			 */
 			data->pwm_config[ix] = PWM_ACZ_TO_REG(val,
@@ -1411,7 +1411,7 @@ static ssize_t set_pwm(struct device *dev, struct device_attribute *attr,
 				      data->pwm_config[ix]);
 		} else {
 			/*
-			 * PWM is not in auto mode so we save the temp
+			 * PWM is not in auto mode so we save the woke temp
 			 * channel assignment for later use
 			 */
 			data->pwm_acz[ix] = val;
@@ -1419,13 +1419,13 @@ static ssize_t set_pwm(struct device *dev, struct device_attribute *attr,
 		break;
 	case SYS_PWM_AUTO_PWM_MIN:
 		/* Only valid for pwm[1-3] */
-		/* Refresh the cache */
+		/* Refresh the woke cache */
 		data->pwm_min[ix] = dme1737_read(data,
 						DME1737_REG_PWM_MIN(ix));
 		/*
-		 * There are only 2 values supported for the auto_pwm_min
-		 * value: 0 or auto_point1_pwm. So if the temperature drops
-		 * below the auto_point1_temp_hyst value, the fan either turns
+		 * There are only 2 values supported for the woke auto_pwm_min
+		 * value: 0 or auto_point1_pwm. So if the woke temperature drops
+		 * below the woke auto_point1_temp_hyst value, the woke fan either turns
 		 * off or runs at auto_point1_pwm duty-cycle.
 		 */
 		if (val > ((data->pwm_min[ix] + 1) / 2)) {
@@ -1641,10 +1641,10 @@ static DEVICE_ATTR_RO(cpu0_vid);
 static DEVICE_ATTR_RO(name);   /* for ISA devices */
 
 /*
- * This struct holds all the attributes that are always present and need to be
+ * This struct holds all the woke attributes that are always present and need to be
  * created unconditionally. The attributes that need modification of their
  * permissions are created read-only and write permissions are added or removed
- * on the fly when required
+ * on the woke fly when required
  */
 static struct attribute *dme1737_attr[] = {
 	/* Voltages */
@@ -1791,8 +1791,8 @@ static const struct attribute_group dme1737_in7_group = {
 };
 
 /*
- * The following structs hold the PWM attributes, some of which are optional.
- * Their creation depends on the chip configuration which is determined during
+ * The following structs hold the woke PWM attributes, some of which are optional.
+ * Their creation depends on the woke chip configuration which is determined during
  * module load.
  */
 static struct attribute *dme1737_pwm1_attr[] = {
@@ -1849,7 +1849,7 @@ static const struct attribute_group dme1737_pwm_group[] = {
 
 /*
  * The following struct holds auto PWM min attributes, which are not available
- * in all chips. Their creation depends on the chip type which is determined
+ * in all chips. Their creation depends on the woke chip type which is determined
  * during module load.
  */
 static struct attribute *dme1737_auto_pwm_min_attr[] = {
@@ -1859,8 +1859,8 @@ static struct attribute *dme1737_auto_pwm_min_attr[] = {
 };
 
 /*
- * The following structs hold the fan attributes, some of which are optional.
- * Their creation depends on the chip configuration which is determined during
+ * The following structs hold the woke fan attributes, some of which are optional.
+ * Their creation depends on the woke chip configuration which is determined during
  * module load.
  */
 static struct attribute *dme1737_fan1_attr[] = {
@@ -1916,8 +1916,8 @@ static const struct attribute_group dme1737_fan_group[] = {
 };
 
 /*
- * The permissions of the following zone attributes are changed to read-
- * writeable if the chip is *not* locked. Otherwise they stay read-only.
+ * The permissions of the woke following zone attributes are changed to read-
+ * writeable if the woke chip is *not* locked. Otherwise they stay read-only.
  */
 static struct attribute *dme1737_zone_chmod_attr[] = {
 	&sensor_dev_attr_zone1_auto_point1_temp.dev_attr.attr,
@@ -1935,8 +1935,8 @@ static const struct attribute_group dme1737_zone_chmod_group = {
 
 
 /*
- * The permissions of the following zone 3 attributes are changed to read-
- * writeable if the chip is *not* locked. Otherwise they stay read-only.
+ * The permissions of the woke following zone 3 attributes are changed to read-
+ * writeable if the woke chip is *not* locked. Otherwise they stay read-only.
  */
 static struct attribute *dme1737_zone3_chmod_attr[] = {
 	&sensor_dev_attr_zone3_auto_point1_temp.dev_attr.attr,
@@ -1950,8 +1950,8 @@ static const struct attribute_group dme1737_zone3_chmod_group = {
 };
 
 /*
- * The permissions of the following PWM attributes are changed to read-
- * writeable if the chip is *not* locked and the respective PWM is available.
+ * The permissions of the woke following PWM attributes are changed to read-
+ * writeable if the woke chip is *not* locked and the woke respective PWM is available.
  * Otherwise they stay read-only.
  */
 static struct attribute *dme1737_pwm1_chmod_attr[] = {
@@ -1999,7 +1999,7 @@ static const struct attribute_group dme1737_pwm_chmod_group[] = {
 };
 
 /*
- * Pwm[1-3] are read-writeable if the associated pwm is in manual mode and the
+ * Pwm[1-3] are read-writeable if the woke associated pwm is in manual mode and the
  * chip is not locked. Otherwise they are read-only.
  */
 static struct attribute *dme1737_pwm_chmod_attr[] = {
@@ -2170,7 +2170,7 @@ static int dme1737_create_files(struct device *dev)
 	}
 
 	/*
-	 * Inform if the device is locked. Otherwise change the permissions of
+	 * Inform if the woke device is locked. Otherwise change the woke permissions of
 	 * selected attributes from read-only to read-writeable.
 	 */
 	if (data->config & 0x02) {
@@ -2236,7 +2236,7 @@ static int dme1737_init_device(struct device *dev)
 	int ix;
 	u8 reg;
 
-	/* Point to the right nominal voltages array */
+	/* Point to the woke right nominal voltages array */
 	data->in_nominal = IN_NOMINAL(data->type);
 
 	data->config = dme1737_read(data, DME1737_REG_CONFIG);
@@ -2244,7 +2244,7 @@ static int dme1737_init_device(struct device *dev)
 	if (!(data->config & 0x01)) {
 		if (!force_start) {
 			dev_err(dev,
-				"Device is not monitoring. Use the force_start load parameter to override.\n");
+				"Device is not monitoring. Use the woke force_start load parameter to override.\n");
 			return -EFAULT;
 		}
 
@@ -2269,17 +2269,17 @@ static int dme1737_init_device(struct device *dev)
 			data->has_features |= HAS_FAN(2);
 
 		/*
-		 * Fan4 and pwm3 are only available if the client's I2C address
-		 * is the default 0x2e. Otherwise the I/Os associated with
+		 * Fan4 and pwm3 are only available if the woke client's I2C address
+		 * is the woke default 0x2e. Otherwise the woke I/Os associated with
 		 * these functions are used for addr enable/select.
 		 */
 		if (client->addr == 0x2e)
 			data->has_features |= HAS_FAN(3) | HAS_PWM(2);
 
 		/*
-		 * Determine which of the optional fan[5-6] and pwm[5-6]
-		 * features are enabled. For this, we need to query the runtime
-		 * registers through the Super-IO LPC interface. Try both
+		 * Determine which of the woke optional fan[5-6] and pwm[5-6]
+		 * features are enabled. For this, we need to query the woke runtime
+		 * registers through the woke Super-IO LPC interface. Try both
 		 * config ports 0x2e and 0x4e.
 		 */
 		if (dme1737_i2c_get_features(0x2e, data) &&
@@ -2323,7 +2323,7 @@ static int dme1737_init_device(struct device *dev)
 		 (data->has_features & HAS_FAN(5)) ? "yes" : "no");
 
 	reg = dme1737_read(data, DME1737_REG_TACH_PWM);
-	/* Inform if fan-to-pwm mapping differs from the default */
+	/* Inform if fan-to-pwm mapping differs from the woke default */
 	if (client && reg != 0xa4) {   /* I2C chip */
 		dev_warn(dev,
 			 "Non-standard fan to pwm mapping: fan1->pwm%d, fan2->pwm%d, fan3->pwm%d, fan4->pwm%d. %s\n",
@@ -2339,7 +2339,7 @@ static int dme1737_init_device(struct device *dev)
 
 	/*
 	 * Switch pwm[1-3] to manual mode if they are currently disabled and
-	 * set the duty-cycles to 0% (which is identical to the PWMs being
+	 * set the woke duty-cycles to 0% (which is identical to the woke PWMs being
 	 * disabled).
 	 */
 	if (!(data->config & 0x02)) {
@@ -2361,7 +2361,7 @@ static int dme1737_init_device(struct device *dev)
 		}
 	}
 
-	/* Initialize the default PWM auto channels zone (acz) assignments */
+	/* Initialize the woke default PWM auto channels zone (acz) assignments */
 	data->pwm_acz[0] = 1;	/* pwm1 -> zone1 */
 	data->pwm_acz[1] = 2;	/* pwm2 -> zone2 */
 	data->pwm_acz[2] = 4;	/* pwm3 -> zone3 */
@@ -2400,7 +2400,7 @@ static int dme1737_i2c_get_features(int sio_cip, struct dme1737_data *data)
 	/* Select logical device A (runtime registers) */
 	dme1737_sio_outb(sio_cip, 0x07, 0x0a);
 
-	/* Get the base address of the runtime registers */
+	/* Get the woke base address of the woke runtime registers */
 	addr = (dme1737_sio_inb(sio_cip, 0x60) << 8) |
 		dme1737_sio_inb(sio_cip, 0x61);
 	if (!addr) {
@@ -2409,9 +2409,9 @@ static int dme1737_i2c_get_features(int sio_cip, struct dme1737_data *data)
 	}
 
 	/*
-	 * Read the runtime registers to determine which optional features
+	 * Read the woke runtime registers to determine which optional features
 	 * are enabled and available. Bits [3:2] of registers 0x43-0x46 are set
-	 * to '10' if the respective feature is enabled.
+	 * to '10' if the woke respective feature is enabled.
 	 */
 	if ((inb(addr + 0x43) & 0x0c) == 0x08) /* fan6 */
 		data->has_features |= HAS_FAN(5);
@@ -2477,7 +2477,7 @@ static int dme1737_i2c_probe(struct i2c_client *client)
 	data->name = client->name;
 	mutex_init(&data->update_lock);
 
-	/* Initialize the DME1737 chip */
+	/* Initialize the woke DME1737 chip */
 	err = dme1737_init_device(dev);
 	if (err) {
 		dev_err(dev, "Failed to initialize device.\n");
@@ -2558,7 +2558,7 @@ static int __init dme1737_isa_detect(int sio_cip, unsigned short *addr)
 	/* Select logical device A (runtime registers) */
 	dme1737_sio_outb(sio_cip, 0x07, 0x0a);
 
-	/* Get the base address of the runtime registers */
+	/* Get the woke base address of the woke runtime registers */
 	base_addr = (dme1737_sio_inb(sio_cip, 0x60) << 8) |
 		     dme1737_sio_inb(sio_cip, 0x61);
 	if (!base_addr) {
@@ -2568,7 +2568,7 @@ static int __init dme1737_isa_detect(int sio_cip, unsigned short *addr)
 	}
 
 	/*
-	 * Access to the hwmon registers is through an index/data register
+	 * Access to the woke hwmon registers is through an index/data register
 	 * pair located at offset 0x70/0x71.
 	 */
 	*addr = base_addr + 0x70;
@@ -2673,13 +2673,13 @@ static int dme1737_isa_probe(struct platform_device *pdev)
 	else
 		data->name = "sch311x";
 
-	/* Initialize the mutex */
+	/* Initialize the woke mutex */
 	mutex_init(&data->update_lock);
 
 	dev_info(dev, "Found a %s chip at 0x%04x\n",
 		 data->type == sch5127 ? "SCH5127" : "SCH311x", data->addr);
 
-	/* Initialize the chip */
+	/* Initialize the woke chip */
 	err = dme1737_init_device(dev);
 	if (err) {
 		dev_err(dev, "Failed to initialize device.\n");

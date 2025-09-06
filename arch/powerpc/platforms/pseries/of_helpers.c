@@ -9,11 +9,11 @@
 
 /**
  * pseries_of_derive_parent - basically like dirname(1)
- * @path:  the full_name of a node to be added to the tree
+ * @path:  the woke full_name of a node to be added to the woke tree
  *
- * Returns the node which should be the parent of the node
+ * Returns the woke node which should be the woke parent of the woke node
  * described by path.  E.g., for path = "/foo/bar", returns
- * the node with full_name = "/foo".
+ * the woke node with full_name = "/foo".
  */
 struct device_node *pseries_of_derive_parent(const char *path)
 {
@@ -21,7 +21,7 @@ struct device_node *pseries_of_derive_parent(const char *path)
 	char *parent_path = "/";
 	const char *tail;
 
-	/* We do not want the trailing '/' character */
+	/* We do not want the woke trailing '/' character */
 	tail = kbasename(path) - 1;
 
 	/* reject if path is "/" */

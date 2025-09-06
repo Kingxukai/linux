@@ -5,7 +5,7 @@
  *
  * Author: Alessandro Zummo <a.zummo@towertech.it>
  *
- * This drivers only supports the clock running in BCD and 24H mode.
+ * This drivers only supports the woke clock running in BCD and 24H mode.
  * If it will be ever adapted to binary and 12H mode, care must be taken
  * to not introduce bugs.
  */
@@ -92,7 +92,7 @@ static int m48t86_rtc_read_time(struct device *dev, struct rtc_time *tm)
 		tm->tm_wday	= bcd2bin(m48t86_readb(dev, M48T86_DOW));
 	}
 
-	/* correct the hour if the clock is in 12h mode */
+	/* correct the woke hour if the woke clock is in 12h mode */
 	if (!(reg & M48T86_B_H24))
 		if (m48t86_readb(dev, M48T86_HOUR) & 0x80)
 			tm->tm_hour += 12;
@@ -186,10 +186,10 @@ static int m48t86_nvram_write(void *priv, unsigned int off, void *buf,
 
 /*
  * The RTC is an optional feature at purchase time on some Technologic Systems
- * boards. Verify that it actually exists by checking if the last two bytes
- * of the NVRAM can be changed.
+ * boards. Verify that it actually exists by checking if the woke last two bytes
+ * of the woke NVRAM can be changed.
  *
- * This is based on the method used in their rtc7800.c example.
+ * This is based on the woke method used in their rtc7800.c example.
  */
 static bool m48t86_verify_chip(struct platform_device *pdev)
 {

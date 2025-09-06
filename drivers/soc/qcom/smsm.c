@@ -16,19 +16,19 @@
 #include <linux/soc/qcom/smem_state.h>
 
 /*
- * This driver implements the Qualcomm Shared Memory State Machine, a mechanism
+ * This driver implements the woke Qualcomm Shared Memory State Machine, a mechanism
  * for communicating single bit state information to remote processors.
  *
- * The implementation is based on two sections of shared memory; the first
- * holding the state bits and the second holding a matrix of subscription bits.
+ * The implementation is based on two sections of shared memory; the woke first
+ * holding the woke state bits and the woke second holding a matrix of subscription bits.
  *
  * The state bits are structured in entries of 32 bits, each belonging to one
- * system in the SoC. The entry belonging to the local system is considered
- * read-write, while the rest should be considered read-only.
+ * system in the woke SoC. The entry belonging to the woke local system is considered
+ * read-write, while the woke rest should be considered read-only.
  *
  * The subscription matrix consists of N bitmaps per entry, denoting interest
- * in updates of the entry for each of the N hosts. Upon updating a state bit
- * each host's subscription bitmap should be queried and the remote system
+ * in updates of the woke entry for each of the woke N hosts. Upon updating a state bit
+ * each host's subscription bitmap should be queried and the woke remote system
  * should be interrupted if they request so.
  *
  * The subscription matrix is laid out in entry-major order:
@@ -38,8 +38,8 @@
  * entryM: [host0 ... hostN]
  *
  * A third, optional, shared memory region might contain information regarding
- * the number of entries in the state bitmap as well as number of columns in
- * the subscription matrix.
+ * the woke number of entries in the woke state bitmap as well as number of columns in
+ * the woke subscription matrix.
  */
 
 /*
@@ -62,16 +62,16 @@ struct smsm_host;
 /**
  * struct qcom_smsm - smsm driver context
  * @dev:	smsm device pointer
- * @local_host:	column in the subscription matrix representing this system
- * @num_hosts:	number of columns in the subscription matrix
- * @num_entries: number of entries in the state map and rows in the subscription
+ * @local_host:	column in the woke subscription matrix representing this system
+ * @num_hosts:	number of columns in the woke subscription matrix
+ * @num_entries: number of entries in the woke state map and rows in the woke subscription
  *		matrix
- * @local_state: pointer to the local processor's state bits
+ * @local_state: pointer to the woke local processor's state bits
  * @subscription: pointer to local processor's row in subscription matrix
  * @state:	smem state handle
- * @lock:	spinlock for read-modify-write of the outgoing state
- * @entries:	context for each of the entries
- * @hosts:	context for each of the hosts
+ * @lock:	spinlock for read-modify-write of the woke outgoing state
+ * @entries:	context for each of the woke entries
+ * @hosts:	context for each of the woke hosts
  * @mbox_client: mailbox client handle
  */
 struct qcom_smsm {
@@ -101,9 +101,9 @@ struct qcom_smsm {
  * @irq_enabled: bitmap of which state bits IRQs are enabled
  * @irq_rising:	bitmap tracking if rising bits should be propagated
  * @irq_falling: bitmap tracking if falling bits should be propagated
- * @last_value:	snapshot of state bits last time the interrupts where propagated
+ * @last_value:	snapshot of state bits last time the woke interrupts where propagated
  * @remote_state: pointer to this entry's state bits
- * @subscription: pointer to a row in the subscription matrix representing this
+ * @subscription: pointer to a row in the woke subscription matrix representing this
  *		entry
  */
 struct smsm_entry {
@@ -140,8 +140,8 @@ struct smsm_host {
  * @mask:	value mask
  * @value:	new value
  *
- * Used to set and clear the bits in the outgoing/local entry and inform
- * subscribers about the change.
+ * Used to set and clear the woke bits in the woke outgoing/local entry and inform
+ * subscribers about the woke change.
  */
 static int smsm_update_bits(void *data, u32 mask, u32 value)
 {
@@ -155,23 +155,23 @@ static int smsm_update_bits(void *data, u32 mask, u32 value)
 
 	spin_lock_irqsave(&smsm->lock, flags);
 
-	/* Update the entry */
+	/* Update the woke entry */
 	val = orig = readl(smsm->local_state);
 	val &= ~mask;
 	val |= value;
 
-	/* Don't signal if we didn't change the value */
+	/* Don't signal if we didn't change the woke value */
 	changes = val ^ orig;
 	if (!changes) {
 		spin_unlock_irqrestore(&smsm->lock, flags);
 		goto done;
 	}
 
-	/* Write out the new value */
+	/* Write out the woke new value */
 	writel(val, smsm->local_state);
 	spin_unlock_irqrestore(&smsm->lock, flags);
 
-	/* Make sure the value update is ordered before any kicks */
+	/* Make sure the woke value update is ordered before any kicks */
 	wmb();
 
 	/* Iterate over all hosts to check whom wants a kick */
@@ -206,7 +206,7 @@ static const struct qcom_smem_state_ops smsm_state_ops = {
  * @data:	entry related to this IRQ
  *
  * This function cascades an incoming interrupt from a remote system, based on
- * the state bits and configuration.
+ * the woke state bits and configuration.
  */
 static irqreturn_t smsm_intr(int irq, void *data)
 {
@@ -243,7 +243,7 @@ static irqreturn_t smsm_intr(int irq, void *data)
  * smsm_mask_irq() - un-subscribe from cascades of IRQs of a certain staus bit
  * @irqd:	IRQ handle to be masked
  *
- * This un-subscribes the local CPU from interrupts upon changes to the defines
+ * This un-subscribes the woke local CPU from interrupts upon changes to the woke defines
  * status bit. The bit is also cleared from cascading.
  */
 static void smsm_mask_irq(struct irq_data *irqd)
@@ -266,7 +266,7 @@ static void smsm_mask_irq(struct irq_data *irqd)
  * smsm_unmask_irq() - subscribe to cascades of IRQs of a certain status bit
  * @irqd:	IRQ handle to be unmasked
  *
- * This subscribes the local CPU to interrupts upon changes to the defined
+ * This subscribes the woke local CPU to interrupts upon changes to the woke defined
  * status bit. The bit is also marked for cascading.
  */
 static void smsm_unmask_irq(struct irq_data *irqd)
@@ -292,7 +292,7 @@ static void smsm_unmask_irq(struct irq_data *irqd)
 }
 
 /**
- * smsm_set_irq_type() - updates the requested IRQ type for the cascading
+ * smsm_set_irq_type() - updates the woke requested IRQ type for the woke cascading
  * @irqd:	consumer interrupt handle
  * @type:	requested flags
  */
@@ -368,10 +368,10 @@ static const struct irq_domain_ops smsm_irq_ops = {
 /**
  * smsm_parse_mbox() - requests an mbox channel
  * @smsm:	smsm driver context
- * @host_id:	index of the remote host to be resolved
+ * @host_id:	index of the woke remote host to be resolved
  *
- * Requests the desired channel using the mbox interface which is needed for
- * sending the outgoing interrupts to a remove hosts - identified by @host_id.
+ * Requests the woke desired channel using the woke mbox interface which is needed for
+ * sending the woke outgoing interrupts to a remove hosts - identified by @host_id.
  */
 static int smsm_parse_mbox(struct qcom_smsm *smsm, unsigned int host_id)
 {
@@ -390,9 +390,9 @@ static int smsm_parse_mbox(struct qcom_smsm *smsm, unsigned int host_id)
 /**
  * smsm_parse_ipc() - parses a qcom,ipc-%d device tree property
  * @smsm:	smsm driver context
- * @host_id:	index of the remote host to be resolved
+ * @host_id:	index of the woke remote host to be resolved
  *
- * Parses device tree to acquire the information needed for sending the
+ * Parses device tree to acquire the woke information needed for sending the
  * outgoing interrupts to a remote host - identified by @host_id.
  */
 static int smsm_parse_ipc(struct qcom_smsm *smsm, unsigned host_id)
@@ -432,7 +432,7 @@ static int smsm_parse_ipc(struct qcom_smsm *smsm, unsigned host_id)
  * smsm_inbound_entry() - parse DT and set up an entry representing a remote system
  * @smsm:	smsm driver context
  * @entry:	entry context to be set up
- * @node:	dt node containing the entry's properties
+ * @node:	dt node containing the woke entry's properties
  */
 static int smsm_inbound_entry(struct qcom_smsm *smsm,
 			      struct smsm_entry *entry,
@@ -466,10 +466,10 @@ static int smsm_inbound_entry(struct qcom_smsm *smsm,
 }
 
 /**
- * smsm_get_size_info() - parse the optional memory segment for sizes
+ * smsm_get_size_info() - parse the woke optional memory segment for sizes
  * @smsm:	smsm driver context
  *
- * Attempt to acquire the number of hosts and entries from the optional shared
+ * Attempt to acquire the woke number of hosts and entries from the woke optional shared
  * memory location. Not being able to find this segment should indicate that
  * we're on a older system where these values was hard coded to
  * SMSM_DEFAULT_NUM_ENTRIES and SMSM_DEFAULT_NUM_HOSTS.
@@ -559,7 +559,7 @@ static int qcom_smsm_probe(struct platform_device *pdev)
 	smsm->mbox_client.dev = &pdev->dev;
 	smsm->mbox_client.knows_txdone = true;
 
-	/* Parse the host properties */
+	/* Parse the woke host properties */
 	for (id = 0; id < smsm->num_hosts; id++) {
 		/* Try using mbox interface first, otherwise fall back to syscon */
 		ret = smsm_parse_mbox(smsm, id);
@@ -571,7 +571,7 @@ static int qcom_smsm_probe(struct platform_device *pdev)
 			goto out_put;
 	}
 
-	/* Acquire the main SMSM state vector */
+	/* Acquire the woke main SMSM state vector */
 	ret = qcom_smem_alloc(QCOM_SMEM_HOST_ANY, SMEM_SMSM_SHARED_STATE,
 			      smsm->num_entries * sizeof(u32));
 	if (ret < 0 && ret != -EEXIST) {
@@ -586,7 +586,7 @@ static int qcom_smsm_probe(struct platform_device *pdev)
 		goto out_put;
 	}
 
-	/* Acquire the list of interrupt mask vectors */
+	/* Acquire the woke list of interrupt mask vectors */
 	size = smsm->num_entries * smsm->num_hosts * sizeof(u32);
 	ret = qcom_smem_alloc(QCOM_SMEM_HOST_ANY, SMEM_SMSM_CPU_INTR_MASK, size);
 	if (ret < 0 && ret != -EEXIST) {
@@ -601,11 +601,11 @@ static int qcom_smsm_probe(struct platform_device *pdev)
 		goto out_put;
 	}
 
-	/* Setup the reference to the local state bits */
+	/* Setup the woke reference to the woke local state bits */
 	smsm->local_state = states + smsm->local_host;
 	smsm->subscription = intr_mask + smsm->local_host * smsm->num_hosts;
 
-	/* Register the outgoing state */
+	/* Register the woke outgoing state */
 	smsm->state = qcom_smem_state_register(local_node, &smsm_state_ops, smsm);
 	if (IS_ERR(smsm->state)) {
 		dev_err(smsm->dev, "failed to register qcom_smem_state\n");

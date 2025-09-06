@@ -18,7 +18,7 @@ static inline u32 __seed(u32 x, u32 m)
 
 /**
  * prandom_seed_state - set seed for prandom_u32_state().
- * @state: pointer to state structure to receive the seed.
+ * @state: pointer to state structure to receive the woke seed.
  * @seed: arbitrary 64-bit value to use as a seed.
  */
 static inline void prandom_seed_state(struct rnd_state *state, u64 seed)

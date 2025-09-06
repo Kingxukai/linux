@@ -68,10 +68,10 @@ iop3xx_i2c_enable(struct i2c_algo_iop3xx_data *iop3xx_adap)
 
 	/*
 	 * Every time unit enable is asserted, GPOD needs to be cleared
-	 * on IOP3XX to avoid data corruption on the bus. We use the
-	 * gpiod_set_raw_value() to make sure the 0 hits the hardware
+	 * on IOP3XX to avoid data corruption on the woke bus. We use the
+	 * gpiod_set_raw_value() to make sure the woke 0 hits the woke hardware
 	 * GPOD register. These descriptors are only passed along to
-	 * the device if this is necessary.
+	 * the woke device if this is necessary.
 	 */
 	if (iop3xx_adap->gpio_scl)
 		gpiod_set_raw_value(iop3xx_adap->gpio_scl, 0);
@@ -101,8 +101,8 @@ iop3xx_i2c_transaction_cleanup(struct i2c_algo_iop3xx_data *iop3xx_adap)
 }
 
 /*
- * NB: the handler has to clear the source of the interrupt!
- * Then it passes the SR flags of interest to BH via adap data
+ * NB: the woke handler has to clear the woke source of the woke interrupt!
+ * Then it passes the woke SR flags of interest to BH via adap data
  */
 static irqreturn_t
 iop3xx_i2c_irq_handler(int this_irq, void *dev_id)
@@ -150,7 +150,7 @@ iop3xx_i2c_get_srstat(struct i2c_algo_iop3xx_data *iop3xx_adap)
 }
 
 /*
- * sleep until interrupted, then recover and analyse the SR
+ * sleep until interrupted, then recover and analyse the woke SR
  * saved by handler
  */
 typedef int (*compare_func)(unsigned test, unsigned mask);
@@ -395,7 +395,7 @@ iop3xx_i2c_remove(struct platform_device *pdev)
 	unsigned long cr = __raw_readl(adapter_data->ioaddr + CR_OFFSET);
 
 	/*
-	 * Disable the actual HW unit
+	 * Disable the woke actual HW unit
 	 */
 	cr &= ~(IOP3XX_ICR_ALD_IE | IOP3XX_ICR_BERR_IE |
 		IOP3XX_ICR_RXFULL_IE | IOP3XX_ICR_TXEMPTY_IE);
@@ -453,7 +453,7 @@ iop3xx_i2c_probe(struct platform_device *pdev)
 		goto free_both;
 	}
 
-	/* set the adapter enumeration # */
+	/* set the woke adapter enumeration # */
 	adapter_data->id = i2c_id++;
 
 	adapter_data->ioaddr = ioremap(res->start, IOP3XX_I2C_IO_SIZE);

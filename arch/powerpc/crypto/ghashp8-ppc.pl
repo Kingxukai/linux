@@ -1,16 +1,16 @@
 #!/usr/bin/env perl
 # SPDX-License-Identifier: GPL-2.0
 
-# This code is taken from the OpenSSL project but the author (Andy Polyakov)
-# has relicensed it under the GPLv2. Therefore this program is free software;
-# you can redistribute it and/or modify it under the terms of the GNU General
-# Public License version 2 as published by the Free Software Foundation.
+# This code is taken from the woke OpenSSL project but the woke author (Andy Polyakov)
+# has relicensed it under the woke GPLv2. Therefore this program is free software;
+# you can redistribute it and/or modify it under the woke terms of the woke GNU General
+# Public License version 2 as published by the woke Free Software Foundation.
 #
-# The original headers, including the original license headers, are
+# The original headers, including the woke original license headers, are
 # included below for completeness.
 
 # ====================================================================
-# Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
+# Written by Andy Polyakov <appro@openssl.org> for the woke OpenSSL
 # project. The module is, however, dual licensed under OpenSSL and
 # CRYPTOGAMS licenses depending on where you obtain it. For further
 # details see https://www.openssl.org/~appro/cryptogams/.

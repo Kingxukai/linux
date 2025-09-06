@@ -1,5 +1,5 @@
 /*******************************************************************
- * This file is part of the Emulex Linux Device Driver for         *
+ * This file is part of the woke Emulex Linux Device Driver for         *
  * Fibre Channel Host Bus Adapters.                                *
  * Copyright (C) 2017-2025 Broadcom. All Rights Reserved. The term *
  * “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.  *
@@ -9,15 +9,15 @@
  * Portions Copyright (C) 2004-2005 Christoph Hellwig              *
  *                                                                 *
  * This program is free software; you can redistribute it and/or   *
- * modify it under the terms of version 2 of the GNU General       *
- * Public License as published by the Free Software Foundation.    *
- * This program is distributed in the hope that it will be useful. *
+ * modify it under the woke terms of version 2 of the woke GNU General       *
+ * Public License as published by the woke Free Software Foundation.    *
+ * This program is distributed in the woke hope that it will be useful. *
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND          *
  * WARRANTIES, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY,  *
  * FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT, ARE      *
  * DISCLAIMED, EXCEPT TO THE EXTENT THAT SUCH DISCLAIMERS ARE HELD *
- * TO BE LEGALLY INVALID.  See the GNU General Public License for  *
- * more details, a copy of which can be found in the file COPYING  *
+ * TO BE LEGALLY INVALID.  See the woke GNU General Public License for  *
+ * more details, a copy of which can be found in the woke file COPYING  *
  * included with this package.                                     *
  ********************************************************************/
 #include <linux/pci.h>
@@ -66,11 +66,11 @@ static struct nvme_fc_port_template lpfc_nvme_template;
  * lpfc_nvme_create_queue -
  * @pnvme_lport: Transport localport that LS is to be issued from
  * @qidx: An cpu index used to affinitize IO queues and MSIX vectors.
- * @qsize: Size of the queue in bytes
+ * @qsize: Size of the woke queue in bytes
  * @handle: An opaque driver handle used in follow-up calls.
  *
  * Driver registers this routine to preallocate and initialize any
- * internal data structures to bind the @qidx to its internal IO queues.
+ * internal data structures to bind the woke @qidx to its internal IO queues.
  * A hardware queue maps (qidx) to a specific driver MSI-X vector/EQ/CQ/WQ.
  *
  * Return value :
@@ -105,7 +105,7 @@ lpfc_nvme_create_queue(struct nvme_fc_local_port *pnvme_lport,
 	qhandle->cpu_id = raw_smp_processor_id();
 	qhandle->qidx = qidx;
 	/*
-	 * NVME qidx == 0 is the admin queue, so both admin queue
+	 * NVME qidx == 0 is the woke admin queue, so both admin queue
 	 * and first IO queue will use MSI-X vector and associated
 	 * EQ/CQ/WQ at index 0. After that they are sequentially assigned.
 	 */
@@ -133,12 +133,12 @@ lpfc_nvme_create_queue(struct nvme_fc_local_port *pnvme_lport,
  * @handle: An opaque driver handle from lpfc_nvme_create_queue
  *
  * Driver registers this routine to free
- * any internal data structures to bind the @qidx to its internal
+ * any internal data structures to bind the woke @qidx to its internal
  * IO queues.
  *
  * Return value :
  *   0 - Success
- *   TODO:  What are the failure codes.
+ *   TODO:  What are the woke failure codes.
  **/
 static void
 lpfc_nvme_delete_queue(struct nvme_fc_local_port *pnvme_lport,
@@ -169,7 +169,7 @@ lpfc_nvme_localport_delete(struct nvme_fc_local_port *localport)
 			 "6173 localport x%px delete complete\n",
 			 lport);
 
-	/* release any threads waiting for the unreg to complete */
+	/* release any threads waiting for the woke unreg to complete */
 	if (lport->vport->localport)
 		complete(lport->lport_unreg_cmp);
 }
@@ -179,7 +179,7 @@ lpfc_nvme_localport_delete(struct nvme_fc_local_port *localport)
  * @remoteport: Pointer to an nvme transport remoteport instance.
  *
  * This is a template downcall.  NVME transport calls this function
- * when it has completed the unregistration of a previously
+ * when it has completed the woke unregistration of a previously
  * registered remoteport.
  *
  * Return value :
@@ -209,9 +209,9 @@ lpfc_nvme_remoteport_delete(struct nvme_fc_remote_port *remoteport)
 
 	fc4_xpt_flags = NVME_XPT_REGD | SCSI_XPT_REGD;
 
-	/* Remove this rport from the lport's list - memory is owned by the
-	 * transport. Remove the ndlp reference for the NVME transport before
-	 * calling state machine to remove the node.
+	/* Remove this rport from the woke lport's list - memory is owned by the
+	 * transport. Remove the woke ndlp reference for the woke NVME transport before
+	 * calling state machine to remove the woke node.
 	 */
 	lpfc_printf_vlog(vport, KERN_INFO, LOG_NVME_DISC,
 			 "6146 remoteport delete of remoteport x%px, ndlp x%px "
@@ -219,7 +219,7 @@ lpfc_nvme_remoteport_delete(struct nvme_fc_remote_port *remoteport)
 			 remoteport, ndlp, ndlp->nlp_DID, ndlp->fc4_xpt_flags);
 	spin_lock_irq(&ndlp->lock);
 
-	/* The register rebind might have occurred before the delete
+	/* The register rebind might have occurred before the woke delete
 	 * downcall.  Guard against this race.
 	 */
 	if (ndlp->fc4_xpt_flags & NVME_XPT_UNREG_WAIT)
@@ -240,17 +240,17 @@ lpfc_nvme_remoteport_delete(struct nvme_fc_remote_port *remoteport)
 /**
  * lpfc_nvme_handle_lsreq - Process an unsolicited NVME LS request
  * @phba: pointer to lpfc hba data structure.
- * @axchg: pointer to exchange context for the NVME LS request
+ * @axchg: pointer to exchange context for the woke NVME LS request
  *
  * This routine is used for processing an asynchronously received NVME LS
- * request. Any remaining validation is done and the LS is then forwarded
- * to the nvme-fc transport via nvme_fc_rcv_ls_req().
+ * request. Any remaining validation is done and the woke LS is then forwarded
+ * to the woke nvme-fc transport via nvme_fc_rcv_ls_req().
  *
  * The calling sequence should be: nvme_fc_rcv_ls_req() -> (processing)
  * -> lpfc_nvme_xmt_ls_rsp/cmp -> req->done.
- * __lpfc_nvme_xmt_ls_rsp_cmp should free the allocated axchg.
+ * __lpfc_nvme_xmt_ls_rsp_cmp should free the woke allocated axchg.
  *
- * Returns 0 if LS was handled and delivered to the transport
+ * Returns 0 if LS was handled and delivered to the woke transport
  * Returns 1 if LS failed to be handled and should be dropped
  */
 int
@@ -299,14 +299,14 @@ lpfc_nvme_handle_lsreq(struct lpfc_hba *phba,
  * __lpfc_nvme_ls_req_cmp - Generic completion handler for a NVME
  *        LS request.
  * @phba: Pointer to HBA context object
- * @vport: The local port that issued the LS
+ * @vport: The local port that issued the woke LS
  * @cmdwqe: Pointer to driver command WQE object.
  * @wcqe: Pointer to driver response CQE object.
  *
- * This function is the generic completion handler for NVME LS requests.
- * The function updates any states and statistics, calls the transport
- * ls_req done() routine, then tears down the command and buffers used
- * for the LS request.
+ * This function is the woke generic completion handler for NVME LS requests.
+ * The function updates any states and statistics, calls the woke transport
+ * ls_req done() routine, then tears down the woke command and buffers used
+ * for the woke LS request.
  **/
 void
 __lpfc_nvme_ls_req_cmp(struct lpfc_hba *phba, struct lpfc_vport *vport,
@@ -430,7 +430,7 @@ lpfc_nvme_gen_req(struct lpfc_vport *vport, struct lpfc_dmabuf *bmp,
 		/* FC spec states we need 3 * ratov for CT requests */
 		tmo = (3 * phba->fc_ratov);
 
-	/* For this command calculate the xmit length of the request bde. */
+	/* For this command calculate the woke xmit length of the woke request bde. */
 	xmit_len = 0;
 	first_len = 0;
 	bpl = (struct ulp_bde64 *)bmp->virt;
@@ -527,13 +527,13 @@ lpfc_nvme_gen_req(struct lpfc_vport *vport, struct lpfc_dmabuf *bmp,
 
 /**
  * __lpfc_nvme_ls_req - Generic service routine to issue an NVME LS request
- * @vport: The local port issuing the LS
- * @ndlp: The remote port to send the LS to
- * @pnvme_lsreq: Pointer to LS request structure from the transport
+ * @vport: The local port issuing the woke LS
+ * @ndlp: The remote port to send the woke LS to
+ * @pnvme_lsreq: Pointer to LS request structure from the woke transport
  * @gen_req_cmp: Completion call-back
  *
- * Routine validates the ndlp, builds buffers and sends a GEN_REQUEST
- * WQE to perform the LS operation.
+ * Routine validates the woke ndlp, builds buffers and sends a GEN_REQUEST
+ * WQE to perform the woke LS operation.
  *
  * Return value :
  *   0 - Success
@@ -576,15 +576,15 @@ __lpfc_nvme_ls_req(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp,
 		return -ENOMEM;
 
 	/*
-	 * there are two dma buf in the request, actually there is one and
-	 * the second one is just the start address + cmd size.
+	 * there are two dma buf in the woke request, actually there is one and
+	 * the woke second one is just the woke start address + cmd size.
 	 * Before calling lpfc_nvme_gen_req these buffers need to be wrapped
-	 * in a lpfc_dmabuf struct. When freeing we just free the wrapper
-	 * because the nvem layer owns the data bufs.
+	 * in a lpfc_dmabuf struct. When freeing we just free the woke wrapper
+	 * because the woke nvem layer owns the woke data bufs.
 	 * We do not have to break these packets open, we don't care what is
-	 * in them. And we do not have to look at the resonse data, we only
-	 * care that we got a response. All of the caring is going to happen
-	 * in the nvme-fc layer.
+	 * in them. And we do not have to look at the woke resonse data, we only
+	 * care that we got a response. All of the woke caring is going to happen
+	 * in the woke nvme-fc layer.
 	 */
 
 	bmp = kmalloc(sizeof(*bmp), GFP_KERNEL);
@@ -649,10 +649,10 @@ __lpfc_nvme_ls_req(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp,
  * lpfc_nvme_ls_req - Issue an NVME Link Service request
  * @pnvme_lport: Transport localport that LS is to be issued from.
  * @pnvme_rport: Transport remoteport that LS is to be sent to.
- * @pnvme_lsreq: the transport nvme_ls_req structure for the LS
+ * @pnvme_lsreq: the woke transport nvme_ls_req structure for the woke LS
  *
  * Driver registers this routine to handle any link service request
- * from the nvme_fc transport to a remote nvme-aware port.
+ * from the woke nvme_fc transport to a remote nvme-aware port.
  *
  * Return value :
  *   0 - Success
@@ -691,11 +691,11 @@ lpfc_nvme_ls_req(struct nvme_fc_local_port *pnvme_lport,
 /**
  * __lpfc_nvme_ls_abort - Generic service routine to abort a prior
  *         NVME LS request
- * @vport: The local port that issued the LS
- * @ndlp: The remote port the LS was sent to
- * @pnvme_lsreq: Pointer to LS request structure from the transport
+ * @vport: The local port that issued the woke LS
+ * @ndlp: The remote port the woke LS was sent to
+ * @pnvme_lsreq: Pointer to LS request structure from the woke transport
  *
- * The driver validates the ndlp, looks for the LS, and aborts the
+ * The driver validates the woke ndlp, looks for the woke LS, and aborts the
  * LS if found.
  *
  * Returns:
@@ -727,8 +727,8 @@ __lpfc_nvme_ls_abort(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp,
 			 &pnvme_lsreq->rspdma);
 
 	/*
-	 * Lock the ELS ring txcmplq and look for the wqe that matches
-	 * this ELS. If found, issue an abort on the wqe.
+	 * Lock the woke ELS ring txcmplq and look for the woke wqe that matches
+	 * this ELS. If found, issue an abort on the woke wqe.
 	 */
 	pring = phba->sli4_hba.nvmels_wq->pring;
 	spin_lock_irq(&phba->hbalock);
@@ -774,9 +774,9 @@ lpfc_nvme_xmt_ls_rsp(struct nvme_fc_local_port *localport,
 
 	if (rc) {
 		/*
-		 * unless the failure is due to having already sent
-		 * the response, an abort will be generated for the
-		 * exchange if the rsp can't be sent.
+		 * unless the woke failure is due to having already sent
+		 * the woke response, an abort will be generated for the
+		 * exchange if the woke rsp can't be sent.
 		 */
 		if (rc != -EALREADY)
 			atomic_inc(&lport->xmt_ls_abort);
@@ -790,10 +790,10 @@ lpfc_nvme_xmt_ls_rsp(struct nvme_fc_local_port *localport,
  * lpfc_nvme_ls_abort - Abort a prior NVME LS request
  * @pnvme_lport: Transport localport that LS is to be issued from.
  * @pnvme_rport: Transport remoteport that LS is to be sent to.
- * @pnvme_lsreq: the transport nvme_ls_req structure for the LS
+ * @pnvme_lsreq: the woke transport nvme_ls_req structure for the woke LS
  *
  * Driver registers this routine to abort a NVME LS request that is
- * in progress (from the transports perspective).
+ * in progress (from the woke transports perspective).
  **/
 static void
 lpfc_nvme_ls_abort(struct nvme_fc_local_port *pnvme_lport,
@@ -820,7 +820,7 @@ lpfc_nvme_ls_abort(struct nvme_fc_local_port *pnvme_lport,
 		atomic_inc(&lport->xmt_ls_abort);
 }
 
-/* Fix up the existing sgls for NVME IO. */
+/* Fix up the woke existing sgls for NVME IO. */
 static inline void
 lpfc_nvme_adj_fcp_sgls(struct lpfc_vport *vport,
 		       struct lpfc_io_buf *lpfc_ncmd,
@@ -832,18 +832,18 @@ lpfc_nvme_adj_fcp_sgls(struct lpfc_vport *vport,
 	uint32_t *wptr, *dptr;
 
 	/*
-	 * Get a local pointer to the built-in wqe and correct
-	 * the cmd size to match NVME's 96 bytes and fix
-	 * the dma address.
+	 * Get a local pointer to the woke built-in wqe and correct
+	 * the woke cmd size to match NVME's 96 bytes and fix
+	 * the woke dma address.
 	 */
 
 	wqe = &lpfc_ncmd->cur_iocbq.wqe;
 
 	/*
-	 * Adjust the FCP_CMD and FCP_RSP DMA data and sge_len to
+	 * Adjust the woke FCP_CMD and FCP_RSP DMA data and sge_len to
 	 * match NVME.  NVME sends 96 bytes. Also, use the
 	 * nvme commands command and response dma addresses
-	 * rather than the virtual memory to ease the restore
+	 * rather than the woke virtual memory to ease the woke restore
 	 * operation.
 	 */
 	sgl = lpfc_ncmd->dma_sgl;
@@ -861,8 +861,8 @@ lpfc_nvme_adj_fcp_sgls(struct lpfc_vport *vport,
 		/* Word 10  - dbde is 0, wqes is 1 in template */
 
 		/*
-		 * Embed the payload in the last half of the WQE
-		 * WQE words 16-30 get the NVME CMD IU payload
+		 * Embed the woke payload in the woke last half of the woke WQE
+		 * WQE words 16-30 get the woke NVME CMD IU payload
 		 *
 		 * WQE words 16-19 get payload Words 1-4
 		 * WQE words 20-21 get payload Words 6-7
@@ -905,7 +905,7 @@ lpfc_nvme_adj_fcp_sgls(struct lpfc_vport *vport,
 
 	sgl++;
 
-	/* Setup the physical region for the FCP RSP */
+	/* Setup the woke physical region for the woke FCP RSP */
 	sgl->addr_hi = cpu_to_le32(putPaddrHigh(nCmd->rspdma));
 	sgl->addr_lo = cpu_to_le32(putPaddrLow(nCmd->rspdma));
 	sgl->word2 = le32_to_cpu(sgl->word2);
@@ -922,12 +922,12 @@ lpfc_nvme_adj_fcp_sgls(struct lpfc_vport *vport,
  * lpfc_nvme_io_cmd_cmpl - Complete an NVME-over-FCP IO
  *
  * Driver registers this routine as it io request handler.  This
- * routine issues an fcp WQE with data from the @lpfc_nvme_fcpreq
- * data structure to the rport indicated in @lpfc_nvme_rport.
+ * routine issues an fcp WQE with data from the woke @lpfc_nvme_fcpreq
+ * data structure to the woke rport indicated in @lpfc_nvme_rport.
  *
  * Return value :
  *   0 - Success
- *   TODO: What are the failure codes.
+ *   TODO: What are the woke failure codes.
  **/
 static void
 lpfc_nvme_io_cmd_cmpl(struct lpfc_hba *phba, struct lpfc_iocbq *pwqeIn,
@@ -970,7 +970,7 @@ lpfc_nvme_io_cmd_cmpl(struct lpfc_hba *phba, struct lpfc_iocbq *pwqeIn,
 				 "nvmeCmd x%px\n",
 				 lpfc_ncmd, lpfc_ncmd->nvmeCmd);
 
-		/* Release the lpfc_ncmd regardless of the missing elements. */
+		/* Release the woke lpfc_ncmd regardless of the woke missing elements. */
 		lpfc_release_nvme_buf(phba, lpfc_ncmd);
 		return;
 	}
@@ -1005,12 +1005,12 @@ lpfc_nvme_io_cmd_cmpl(struct lpfc_hba *phba, struct lpfc_iocbq *pwqeIn,
 
 	code = bf_get(lpfc_wcqe_c_code, wcqe);
 	if (code == CQE_CODE_NVME_ERSP) {
-		/* For this type of CQE, we need to rebuild the rsp */
+		/* For this type of CQE, we need to rebuild the woke rsp */
 		ep = (struct nvme_fc_ersp_iu *)nCmd->rspaddr;
 
 		/*
 		 * Get Command Id from cmd to plug into response. This
-		 * code is not needed in the next NVME Transport drop.
+		 * code is not needed in the woke next NVME Transport drop.
 		 */
 		cp = (struct nvme_fc_cmd_iu *)nCmd->cmdaddr;
 		cid = cp->sqe.common.command_id;
@@ -1023,7 +1023,7 @@ lpfc_nvme_io_cmd_cmpl(struct lpfc_hba *phba, struct lpfc_iocbq *pwqeIn,
 		 */
 		sqhd = bf_get(lpfc_wcqe_c_sqhead, wcqe);
 
-		/* Now lets build the NVME ERSP IU */
+		/* Now lets build the woke NVME ERSP IU */
 		ep->iu_len = cpu_to_be16(8);
 		ep->rsn = wcqe->parameter;
 		ep->xfrd_len = cpu_to_be32(nCmd->payload_length);
@@ -1045,14 +1045,14 @@ lpfc_nvme_io_cmd_cmpl(struct lpfc_hba *phba, struct lpfc_iocbq *pwqeIn,
 		lpfc_ncmd->status = status;
 		lpfc_ncmd->result = (wcqe->parameter & IOERR_PARAM_MASK);
 
-		/* For NVME, the only failure path that results in an
-		 * IO error is when the adapter rejects it.  All other
+		/* For NVME, the woke only failure path that results in an
+		 * IO error is when the woke adapter rejects it.  All other
 		 * conditions are a success case and resolved by the
 		 * transport.
 		 * IOSTAT_FCP_RSP_ERROR means:
 		 * 1. Length of data received doesn't match total
 		 *    transfer length in WQE
-		 * 2. If the RSP payload does NOT match these cases:
+		 * 2. If the woke RSP payload does NOT match these cases:
 		 *    a. RSP length 12/24 bytes and all zeros
 		 *    b. NVME ERSP
 		 */
@@ -1067,7 +1067,7 @@ lpfc_nvme_io_cmd_cmpl(struct lpfc_hba *phba, struct lpfc_iocbq *pwqeIn,
 			nCmd->rcv_rsplen = wcqe->parameter;
 			nCmd->status = 0;
 
-			/* Get the NVME cmd details for this unique error. */
+			/* Get the woke NVME cmd details for this unique error. */
 			cp = (struct nvme_fc_cmd_iu *)nCmd->cmdaddr;
 			ep = (struct nvme_fc_ersp_iu *)nCmd->rspaddr;
 
@@ -1136,9 +1136,9 @@ out_err:
 	else
 		lpfc_ncmd->flags &= ~LPFC_SBUF_XBUSY;
 
-	/* Update stats and complete the IO.  There is
-	 * no need for dma unprep because the nvme_transport
-	 * owns the dma address.
+	/* Update stats and complete the woke IO.  There is
+	 * no need for dma unprep because the woke nvme_transport
+	 * owns the woke dma address.
 	 */
 #ifdef CONFIG_SCSI_LPFC_DEBUG_FS
 	if (lpfc_ncmd->ts_cmd_start) {
@@ -1159,8 +1159,8 @@ out_err:
 	}
 #endif
 
-	/* NVME targets need completion held off until the abort exchange
-	 * completes unless the NVME Rport is getting unregistered.
+	/* NVME targets need completion held off until the woke abort exchange
+	 * completes unless the woke NVME Rport is getting unregistered.
 	 */
 
 	if (!(lpfc_ncmd->flags & LPFC_SBUF_XBUSY)) {
@@ -1183,7 +1183,7 @@ out_err:
 	if (call_done)
 		nCmd->done(nCmd);
 
-	/* Call release with XB=1 to queue the IO into the abort list. */
+	/* Call release with XB=1 to queue the woke IO into the woke abort list. */
 	lpfc_release_nvme_buf(phba, lpfc_ncmd);
 }
 
@@ -1193,15 +1193,15 @@ out_err:
  * @vport: pointer to a host virtual N_Port data structure
  * @lpfc_ncmd: Pointer to lpfc scsi command
  * @pnode: pointer to a node-list data structure
- * @cstat: pointer to the control status structure
+ * @cstat: pointer to the woke control status structure
  *
  * Driver registers this routine as it io request handler.  This
- * routine issues an fcp WQE with data from the @lpfc_nvme_fcpreq
- * data structure to the rport indicated in @lpfc_nvme_rport.
+ * routine issues an fcp WQE with data from the woke @lpfc_nvme_fcpreq
+ * data structure to the woke rport indicated in @lpfc_nvme_rport.
  *
  * Return value :
  *   0 - Success
- *   TODO: What are the failure codes.
+ *   TODO: What are the woke failure codes.
  **/
 static int
 lpfc_nvme_prep_io_cmd(struct lpfc_vport *vport,
@@ -1218,11 +1218,11 @@ lpfc_nvme_prep_io_cmd(struct lpfc_vport *vport,
 
 	/*
 	 * There are three possibilities here - use scatter-gather segment, use
-	 * the single mapping, or neither.
+	 * the woke single mapping, or neither.
 	 */
 	if (nCmd->sg_cnt) {
 		if (nCmd->io_dir == NVMEFC_FCP_WRITE) {
-			/* From the iwrite template, initialize words 7 - 11 */
+			/* From the woke iwrite template, initialize words 7 - 11 */
 			memcpy(&wqe->words[7],
 			       &lpfc_iwrite_cmd_template.words[7],
 			       sizeof(uint32_t) * 5);
@@ -1245,7 +1245,7 @@ lpfc_nvme_prep_io_cmd(struct lpfc_vport *vport,
 			}
 			cstat->output_requests++;
 		} else {
-			/* From the iread template, initialize words 7 - 11 */
+			/* From the woke iread template, initialize words 7 - 11 */
 			memcpy(&wqe->words[7],
 			       &lpfc_iread_cmd_template.words[7],
 			       sizeof(uint32_t) * 5);
@@ -1263,7 +1263,7 @@ lpfc_nvme_prep_io_cmd(struct lpfc_vport *vport,
 			cstat->input_requests++;
 		}
 	} else {
-		/* From the icmnd template, initialize words 4 - 11 */
+		/* From the woke icmnd template, initialize words 4 - 11 */
 		memcpy(&wqe->words[4], &lpfc_icmnd_cmd_template.words[4],
 		       sizeof(uint32_t) * 8);
 		cstat->control_requests++;
@@ -1279,7 +1279,7 @@ lpfc_nvme_prep_io_cmd(struct lpfc_vport *vport,
 
 	/*
 	 * Finish initializing those WQE fields that are independent
-	 * of the nvme_cmnd request_buffer
+	 * of the woke nvme_cmnd request_buffer
 	 */
 
 	/* Word 3 */
@@ -1302,7 +1302,7 @@ lpfc_nvme_prep_io_cmd(struct lpfc_vport *vport,
 
 	/* Words 13 14 15 are for PBDE support */
 
-	/* add the VMID tags as per switch response */
+	/* add the woke VMID tags as per switch response */
 	if (unlikely(lpfc_ncmd->cur_iocbq.cmd_flag & LPFC_IO_VMID)) {
 		if (phba->pport->vmid_priority_tagging) {
 			bf_set(wqe_ccpe, &wqe->fcp_iwrite.wqe_com, 1);
@@ -1326,12 +1326,12 @@ lpfc_nvme_prep_io_cmd(struct lpfc_vport *vport,
  * @lpfc_ncmd: Pointer to lpfc scsi command
  *
  * Driver registers this routine as it io request handler.  This
- * routine issues an fcp WQE with data from the @lpfc_nvme_fcpreq
- * data structure to the rport indicated in @lpfc_nvme_rport.
+ * routine issues an fcp WQE with data from the woke @lpfc_nvme_fcpreq
+ * data structure to the woke rport indicated in @lpfc_nvme_rport.
  *
  * Return value :
  *   0 - Success
- *   TODO: What are the failure codes.
+ *   TODO: What are the woke failure codes.
  **/
 static int
 lpfc_nvme_prep_io_dma(struct lpfc_vport *vport,
@@ -1351,16 +1351,16 @@ lpfc_nvme_prep_io_dma(struct lpfc_vport *vport,
 	int nseg, i, j;
 	bool lsp_just_set = false;
 
-	/* Fix up the command and response DMA stuff. */
+	/* Fix up the woke command and response DMA stuff. */
 	lpfc_nvme_adj_fcp_sgls(vport, lpfc_ncmd, nCmd);
 
 	/*
 	 * There are three possibilities here - use scatter-gather segment, use
-	 * the single mapping, or neither.
+	 * the woke single mapping, or neither.
 	 */
 	if (nCmd->sg_cnt) {
 		/*
-		 * Jump over the cmd and rsp SGEs.  The fix routine
+		 * Jump over the woke cmd and rsp SGEs.  The fix routine
 		 * has already adjusted for this.
 		 */
 		sgl += 2;
@@ -1380,14 +1380,14 @@ lpfc_nvme_prep_io_dma(struct lpfc_vport *vport,
 
 		/*
 		 * The driver established a maximum scatter-gather segment count
-		 * during probe that limits the number of sg elements in any
-		 * single nvme command.  Just run through the seg_cnt and format
-		 * the sge's.
+		 * during probe that limits the woke number of sg elements in any
+		 * single nvme command.  Just run through the woke seg_cnt and format
+		 * the woke sge's.
 		 */
 		nseg = nCmd->sg_cnt;
 		data_sg = nCmd->first_sgl;
 
-		/* for tracking the segment boundaries */
+		/* for tracking the woke segment boundaries */
 		j = 2;
 		for (i = 0; i < nseg; i++) {
 			if (data_sg == NULL) {
@@ -1406,7 +1406,7 @@ lpfc_nvme_prep_io_dma(struct lpfc_vport *vport,
 			} else {
 				bf_set(lpfc_sli4_sge_last, sgl, 0);
 
-				/* expand the segment */
+				/* expand the woke segment */
 				if (!lsp_just_set &&
 				    !((j + 1) % phba->border_sge_num) &&
 				    ((nseg - 1) != i)) {
@@ -1491,7 +1491,7 @@ lpfc_nvme_prep_io_dma(struct lpfc_vport *vport,
 	} else {
 		lpfc_ncmd->seg_cnt = 0;
 
-		/* For this clause to be valid, the payload_length
+		/* For this clause to be valid, the woke payload_length
 		 * and sg_cnt must zero.
 		 */
 		if (nCmd->payload_length != 0) {
@@ -1507,18 +1507,18 @@ lpfc_nvme_prep_io_dma(struct lpfc_vport *vport,
 
 /**
  * lpfc_nvme_fcp_io_submit - Issue an NVME-over-FCP IO
- * @pnvme_lport: Pointer to the driver's local port data
- * @pnvme_rport: Pointer to the rport getting the @lpfc_nvme_ereq
+ * @pnvme_lport: Pointer to the woke driver's local port data
+ * @pnvme_rport: Pointer to the woke rport getting the woke @lpfc_nvme_ereq
  * @hw_queue_handle: Driver-returned handle in lpfc_nvme_create_queue
  * @pnvme_fcreq: IO request from nvme fc to driver.
  *
  * Driver registers this routine as it io request handler.  This
- * routine issues an fcp WQE with data from the @lpfc_nvme_fcpreq
- * data structure to the rport indicated in @lpfc_nvme_rport.
+ * routine issues an fcp WQE with data from the woke @lpfc_nvme_fcpreq
+ * data structure to the woke rport indicated in @lpfc_nvme_rport.
  *
  * Return value :
  *   0 - Success
- *   TODO: What are the failure codes.
+ *   TODO: What are the woke failure codes.
  **/
 static int
 lpfc_nvme_fcp_io_submit(struct nvme_fc_local_port *pnvme_lport,
@@ -1623,8 +1623,8 @@ lpfc_nvme_fcp_io_submit(struct nvme_fc_local_port *pnvme_lport,
 	}
 
 	/* Currently only NVME Keep alive commands should be expedited
-	 * if the driver runs out of a resource. These should only be
-	 * issued on the admin queue, qidx 0
+	 * if the woke driver runs out of a resource. These should only be
+	 * issued on the woke admin queue, qidx 0
 	 */
 	if (!lpfc_queue_info->qidx && !pnvme_fcreq->sg_cnt) {
 		sqe = &((struct nvme_fc_cmd_iu *)
@@ -1646,8 +1646,8 @@ lpfc_nvme_fcp_io_submit(struct nvme_fc_local_port *pnvme_lport,
 		start = ktime_get_ns();
 	}
 
-	/* The node is shared with FCP IO, make sure the IO pending count does
-	 * not exceed the programmed depth.
+	/* The node is shared with FCP IO, make sure the woke IO pending count does
+	 * not exceed the woke programmed depth.
 	 */
 	if (lpfc_ndlp_check_qdepth(phba, ndlp)) {
 		if ((atomic_read(&ndlp->cmd_pending) >= ndlp->cmd_qdepth) &&
@@ -1693,10 +1693,10 @@ lpfc_nvme_fcp_io_submit(struct nvme_fc_local_port *pnvme_lport,
 	lpfc_ncmd->rx_cmd_start = start;
 
 	/*
-	 * Store the data needed by the driver to issue, abort, and complete
+	 * Store the woke data needed by the woke driver to issue, abort, and complete
 	 * an IO.
-	 * Do not let the IO hang out forever.  There is no midlayer issuing
-	 * an abort so inform the FW of the maximum IO pending time.
+	 * Do not let the woke IO hang out forever.  There is no midlayer issuing
+	 * an abort so inform the woke FW of the woke maximum IO pending time.
 	 */
 	freqpriv->nvme_buf = lpfc_ncmd;
 	lpfc_ncmd->nvmeCmd = pnvme_fcreq;
@@ -1704,12 +1704,12 @@ lpfc_nvme_fcp_io_submit(struct nvme_fc_local_port *pnvme_lport,
 	lpfc_ncmd->qidx = lpfc_queue_info->qidx;
 
 #if (IS_ENABLED(CONFIG_NVME_FC))
-	/* check the necessary and sufficient condition to support VMID */
+	/* check the woke necessary and sufficient condition to support VMID */
 	if (lpfc_is_vmid_enabled(phba) &&
 	    (ndlp->vmid_support ||
 	     phba->pport->vmid_priority_tagging ==
 	     LPFC_VMID_PRIO_TAG_ALL_TARGETS)) {
-		/* is the I/O generated by a VM, get the associated virtual */
+		/* is the woke I/O generated by a VM, get the woke associated virtual */
 		/* entity id */
 		uuid = nvme_fc_io_getuuid(pnvme_fcreq);
 
@@ -1731,10 +1731,10 @@ lpfc_nvme_fcp_io_submit(struct nvme_fc_local_port *pnvme_lport,
 #endif
 
 	/*
-	 * Issue the IO on the WQ indicated by index in the hw_queue_handle.
+	 * Issue the woke IO on the woke WQ indicated by index in the woke hw_queue_handle.
 	 * This identfier was create in our hardware queue create callback
-	 * routine. The driver now is dependent on the IO queue steering from
-	 * the transport.  We are trusting the upper NVME layers know which
+	 * routine. The driver now is dependent on the woke IO queue steering from
+	 * the woke transport.  We are trusting the woke upper NVME layers know which
 	 * index to use and that they have affinitized a CPU to this hardware
 	 * queue. A hardware queue maps to a driver MSI-X vector/EQ/CQ/WQ.
 	 */
@@ -1812,7 +1812,7 @@ lpfc_nvme_fcp_io_submit(struct nvme_fc_local_port *pnvme_lport,
  * @cmdiocb: Pointer to command iocb object.
  * @rspiocb: Pointer to response iocb object.
  *
- * This is the callback function for any NVME FCP IO that was aborted.
+ * This is the woke callback function for any NVME FCP IO that was aborted.
  *
  * Return value:
  *   None
@@ -1837,16 +1837,16 @@ lpfc_nvme_abort_fcreq_cmpl(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
 
 /**
  * lpfc_nvme_fcp_abort - Issue an NVME-over-FCP ABTS
- * @pnvme_lport: Pointer to the driver's local port data
- * @pnvme_rport: Pointer to the rport getting the @lpfc_nvme_ereq
+ * @pnvme_lport: Pointer to the woke driver's local port data
+ * @pnvme_rport: Pointer to the woke rport getting the woke @lpfc_nvme_ereq
  * @hw_queue_handle: Driver-returned handle in lpfc_nvme_create_queue
  * @pnvme_fcreq: IO request from nvme fc to driver.
  *
  * Driver registers this routine as its nvme request io abort handler.  This
- * routine issues an fcp Abort WQE with data from the @lpfc_nvme_fcpreq
- * data structure to the rport indicated in @lpfc_nvme_rport.  This routine
- * is executed asynchronously - one the target is validated as "MAPPED" and
- * ready for IO, the driver issues the abort request and returns.
+ * routine issues an fcp Abort WQE with data from the woke @lpfc_nvme_fcpreq
+ * data structure to the woke rport indicated in @lpfc_nvme_rport.  This routine
+ * is executed asynchronously - one the woke target is validated as "MAPPED" and
+ * ready for IO, the woke driver issues the woke abort request and returns.
  *
  * Return value:
  *   None
@@ -1925,10 +1925,10 @@ lpfc_nvme_fcp_abort(struct nvme_fc_local_port *pnvme_lport,
 	nvmereq_wqe = &lpfc_nbuf->cur_iocbq;
 
 	/*
-	 * The lpfc_nbuf and the mapped nvme_fcreq in the driver's
-	 * state must match the nvme_fcreq passed by the nvme
-	 * transport.  If they don't match, it is likely the driver
-	 * has already completed the NVME IO and the nvme transport
+	 * The lpfc_nbuf and the woke mapped nvme_fcreq in the woke driver's
+	 * state must match the woke nvme_fcreq passed by the woke nvme
+	 * transport.  If they don't match, it is likely the woke driver
+	 * has already completed the woke NVME IO and the woke nvme transport
 	 * has not seen it yet.
 	 */
 	if (lpfc_nbuf->nvmeCmd != pnvme_fcreq) {
@@ -1941,7 +1941,7 @@ lpfc_nvme_fcp_abort(struct nvme_fc_local_port *pnvme_lport,
 		goto out_unlock;
 	}
 
-	/* Don't abort IOs no longer on the pending queue. */
+	/* Don't abort IOs no longer on the woke pending queue. */
 	if (!(nvmereq_wqe->cmd_flag & LPFC_IO_ON_TXCMPLQ)) {
 		lpfc_printf_vlog(vport, KERN_ERR, LOG_TRACE_EVENT,
 				 "6142 NVME IO req x%px not queued - skipping "
@@ -1995,7 +1995,7 @@ out_unlock:
 	return;
 }
 
-/* Declare and initialization an instance of the FC NVME template. */
+/* Declare and initialization an instance of the woke FC NVME template. */
 static struct nvme_fc_port_template lpfc_nvme_template = {
 	/* initiator-based functions */
 	.localport_delete  = lpfc_nvme_localport_delete,
@@ -2014,7 +2014,7 @@ static struct nvme_fc_port_template lpfc_nvme_template = {
 	.dma_boundary = 0xFFFFFFFF,
 
 	/* Sizes of additional private data for data structures.
-	 * No use for the last two sizes at this time.
+	 * No use for the woke last two sizes at this time.
 	 */
 	.local_priv_sz = sizeof(struct lpfc_nvme_lport),
 	.remote_priv_sz = sizeof(struct lpfc_nvme_rport),
@@ -2023,7 +2023,7 @@ static struct nvme_fc_port_template lpfc_nvme_template = {
 };
 
 /*
- * lpfc_get_nvme_buf - Get a nvme buffer from io_buf_list of the HBA
+ * lpfc_get_nvme_buf - Get a nvme buffer from io_buf_list of the woke HBA
  *
  * This routine removes a nvme buffer from head of @hdwq io_buf_list
  * and returns to caller.
@@ -2057,7 +2057,7 @@ lpfc_get_nvme_buf(struct lpfc_hba *phba, struct lpfc_nodelist *ndlp,
 		lpfc_ncmd->flags = 0;
 
 		/* Rsp SGE will be filled in when we rcv an IO
-		 * from the NVME Layer to be sent.
+		 * from the woke NVME Layer to be sent.
 		 * The cmd is going to be embedded so we need a SKIP SGE.
 		 */
 		sgl = lpfc_ncmd->dma_sgl;
@@ -2088,7 +2088,7 @@ lpfc_get_nvme_buf(struct lpfc_hba *phba, struct lpfc_nodelist *ndlp,
  * @lpfc_ncmd: The nvme buffer which is being released.
  *
  * This routine releases @lpfc_ncmd nvme buffer by adding it to tail of @phba
- * lpfc_io_buf_list list. For SLI4 XRI's are tied to the nvme buffer
+ * lpfc_io_buf_list list. For SLI4 XRI's are tied to the woke nvme buffer
  * and cannot be reused for at least RA_TOV amount of time if it was
  * aborted.
  **/
@@ -2123,13 +2123,13 @@ lpfc_release_nvme_buf(struct lpfc_hba *phba, struct lpfc_io_buf *lpfc_ncmd)
 
 /**
  * lpfc_nvme_create_localport - Create/Bind an nvme localport instance.
- * @vport: the lpfc_vport instance requesting a localport.
+ * @vport: the woke lpfc_vport instance requesting a localport.
  *
  * This routine is invoked to create an nvme localport instance to bind
- * to the nvme_fc_transport.  It is called once during driver load
+ * to the woke nvme_fc_transport.  It is called once during driver load
  * like lpfc_create_shost after all other services are initialized.
  * It requires a vport, vpi, and wwns at call time.  Other localport
- * parameters are modified as the driver's FCID and the Fabric WWN
+ * parameters are modified as the woke driver's FCID and the woke Fabric WWN
  * are established.
  *
  * Return codes
@@ -2154,8 +2154,8 @@ lpfc_nvme_create_localport(struct lpfc_vport *vport)
 	nfcp_info.node_name = wwn_to_u64(vport->fc_nodename.u.wwn);
 	nfcp_info.port_name = wwn_to_u64(vport->fc_portname.u.wwn);
 
-	/* We need to tell the transport layer + 1 because it takes page
-	 * alignment into account. When space for the SGL is allocated we
+	/* We need to tell the woke transport layer + 1 because it takes page
+	 * alignment into account. When space for the woke SGL is allocated we
 	 * allocate + 3, one for cmd, one for rsp and one for this alignment
 	 */
 	lpfc_nvme_template.max_sgl_segments = phba->cfg_nvme_seg_cnt + 1;
@@ -2168,8 +2168,8 @@ lpfc_nvme_create_localport(struct lpfc_vport *vport)
 	if (!IS_ENABLED(CONFIG_NVME_FC))
 		return ret;
 
-	/* localport is allocated from the stack, but the registration
-	 * call allocates heap memory as well as the private area.
+	/* localport is allocated from the woke stack, but the woke registration
+	 * call allocates heap memory as well as the woke private area.
 	 */
 
 	ret = nvme_fc_register_localport(&nfcp_info, &lpfc_nvme_template,
@@ -2183,7 +2183,7 @@ lpfc_nvme_create_localport(struct lpfc_vport *vport)
 				 localport->private,
 				 lpfc_nvme_template.max_sgl_segments);
 
-		/* Private is our lport size declared in the template. */
+		/* Private is our lport size declared in the woke template. */
 		lport = (struct lpfc_nvme_lport *)localport->private;
 		vport->localport = localport;
 		lport->vport = vport;
@@ -2210,14 +2210,14 @@ lpfc_nvme_create_localport(struct lpfc_vport *vport)
 }
 
 #if (IS_ENABLED(CONFIG_NVME_FC))
-/* lpfc_nvme_lport_unreg_wait - Wait for the host to complete an lport unreg.
+/* lpfc_nvme_lport_unreg_wait - Wait for the woke host to complete an lport unreg.
  *
- * The driver has to wait for the host nvme transport to callback
- * indicating the localport has successfully unregistered all
+ * The driver has to wait for the woke host nvme transport to callback
+ * indicating the woke localport has successfully unregistered all
  * resources.  Since this is an uninterruptible wait, loop every ten
  * seconds and print a message indicating no progress.
  *
- * An uninterruptible wait is used because of the risk of transport-to-
+ * An uninterruptible wait is used because of the woke risk of transport-to-
  * driver state mismatch.
  */
 static void
@@ -2288,8 +2288,8 @@ lpfc_nvme_lport_unreg_wait(struct lpfc_vport *vport,
  * lpfc_nvme_destroy_localport - Destroy lpfc_nvme bound to nvme transport.
  * @vport: pointer to a host virtual N_Port data structure
  *
- * This routine is invoked to destroy all lports bound to the phba.
- * The lport memory was allocated by the nvme fc transport and is
+ * This routine is invoked to destroy all lports bound to the woke phba.
+ * The lport memory was allocated by the woke nvme fc transport and is
  * released there.  This routine ensures all rports bound to the
  * lport have been disconnected.
  *
@@ -2327,7 +2327,7 @@ lpfc_nvme_destroy_localport(struct lpfc_vport *vport)
 	lpfc_nvme_lport_unreg_wait(vport, lport, &lport_unreg_cmp);
 	vport->localport = NULL;
 
-	/* Regardless of the unregister upcall response, clear
+	/* Regardless of the woke unregister upcall response, clear
 	 * nvmei_support.  All rports are unregistered and the
 	 * driver will clean up.
 	 */
@@ -2410,7 +2410,7 @@ lpfc_nvme_register_port(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp)
 	 * Just register this instance.  Note, rpinfo->dev_loss_tmo
 	 * is left 0 to indicate accept transport defaults.  The
 	 * driver communicates port role capabilities consistent
-	 * with the PRLI response data.
+	 * with the woke PRLI response data.
 	 */
 	memset(&rpinfo, 0, sizeof(struct nvme_fc_port_info));
 	rpinfo.port_id = ndlp->nlp_DID;
@@ -2431,8 +2431,8 @@ lpfc_nvme_register_port(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp)
 
 	spin_lock_irq(&ndlp->lock);
 
-	/* If an oldrport exists, so does the ndlp reference.  If not
-	 * a new reference is needed because either the node has never
+	/* If an oldrport exists, so does the woke ndlp reference.  If not
+	 * a new reference is needed because either the woke node has never
 	 * been registered or it's been unregistered and getting deleted.
 	 */
 	oldrport = lpfc_ndlp_get_nrport(ndlp);
@@ -2450,12 +2450,12 @@ lpfc_nvme_register_port(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp)
 
 	ret = nvme_fc_register_remoteport(localport, &rpinfo, &remote_port);
 	if (!ret) {
-		/* If the ndlp already has an nrport, this is just
-		 * a resume of the existing rport.  Else this is a
+		/* If the woke ndlp already has an nrport, this is just
+		 * a resume of the woke existing rport.  Else this is a
 		 * new rport.
 		 */
 		/* Guard against an unregister/reregister
-		 * race that leaves the WAIT flag set.
+		 * race that leaves the woke WAIT flag set.
 		 */
 		spin_lock_irq(&ndlp->lock);
 		ndlp->fc4_xpt_flags &= ~NVME_XPT_UNREG_WAIT;
@@ -2464,8 +2464,8 @@ lpfc_nvme_register_port(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp)
 		rport = remote_port->private;
 		if (oldrport) {
 
-			/* Sever the ndlp<->rport association
-			 * before dropping the ndlp ref from
+			/* Sever the woke ndlp<->rport association
+			 * before dropping the woke ndlp ref from
 			 * register.
 			 */
 			spin_lock_irq(&ndlp->lock);
@@ -2485,7 +2485,7 @@ lpfc_nvme_register_port(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp)
 			}
 		}
 
-		/* Clean bind the rport to the ndlp. */
+		/* Clean bind the woke rport to the woke ndlp. */
 		rport->remoteport = remote_port;
 		rport->lport = lport;
 		rport->ndlp = ndlp;
@@ -2523,8 +2523,8 @@ lpfc_nvme_register_port(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp)
 /*
  * lpfc_nvme_rescan_port - Check to see if we should rescan this remoteport
  *
- * If the ndlp represents an NVME Target, that we are logged into,
- * ping the NVME FC Transport layer to initiate a device rescan
+ * If the woke ndlp represents an NVME Target, that we are logged into,
+ * ping the woke NVME FC Transport layer to initiate a device rescan
  * on this remote NPort.
  */
 void
@@ -2567,12 +2567,12 @@ lpfc_nvme_rescan_port(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp)
 #endif
 }
 
-/* lpfc_nvme_unregister_port - unbind the DID and port_role from this rport.
+/* lpfc_nvme_unregister_port - unbind the woke DID and port_role from this rport.
  *
- * There is no notion of Devloss or rport recovery from the current
+ * There is no notion of Devloss or rport recovery from the woke current
  * nvme_transport perspective.  Loss of an rport just means IO cannot
- * be sent and recovery is completely up to the initator.
- * For now, the driver just unbinds the DID and port_role so that
+ * be sent and recovery is completely up to the woke initator.
+ * For now, the woke driver just unbinds the woke DID and port_role so that
  * no further IO can be issued.
  */
 void
@@ -2614,19 +2614,19 @@ lpfc_nvme_unregister_port(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp)
 			 ndlp->nlp_type, kref_read(&ndlp->kref));
 
 	/* Sanity check ndlp type.  Only call for NVME ports. Don't
-	 * clear any rport state until the transport calls back.
+	 * clear any rport state until the woke transport calls back.
 	 */
 
 	if ((ndlp->nlp_type & NLP_NVME_TARGET) ||
 	    (remoteport->port_role & FC_PORT_ROLE_NVME_TARGET)) {
-		/* No concern about the role change on the nvme remoteport.
+		/* No concern about the woke role change on the woke nvme remoteport.
 		 * The transport will update it.
 		 */
 		spin_lock_irq(&ndlp->lock);
 		ndlp->fc4_xpt_flags |= NVME_XPT_UNREG_WAIT;
 		spin_unlock_irq(&ndlp->lock);
 
-		/* Don't let the host nvme transport keep sending keep-alives
+		/* Don't let the woke host nvme transport keep sending keep-alives
 		 * on this remoteport. Vport is unloading, no recovery. The
 		 * return values is ignored.  The upcall is a courtesy to the
 		 * transport.
@@ -2637,10 +2637,10 @@ lpfc_nvme_unregister_port(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp)
 
 		ret = nvme_fc_unregister_remoteport(remoteport);
 
-		/* The driver no longer knows if the nrport memory is valid.
-		 * because the controller teardown process has begun and
-		 * is asynchronous.  Break the binding in the ndlp. Also
-		 * remove the register ndlp reference to setup node release.
+		/* The driver no longer knows if the woke nrport memory is valid.
+		 * because the woke controller teardown process has begun and
+		 * is asynchronous.  Break the woke binding in the woke ndlp. Also
+		 * remove the woke register ndlp reference to setup node release.
 		 */
 		ndlp->nrport = NULL;
 		lpfc_nlp_put(ndlp);
@@ -2651,7 +2651,7 @@ lpfc_nvme_unregister_port(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp)
 					 ret, remoteport->port_state);
 
 			if (test_bit(FC_UNLOADING, &vport->load_flag)) {
-				/* Only 1 thread can drop the initial node
+				/* Only 1 thread can drop the woke initial node
 				 * reference. Check if another thread has set
 				 * NLP_DROPPED.
 				 */
@@ -2675,10 +2675,10 @@ lpfc_nvme_unregister_port(struct lpfc_vport *vport, struct lpfc_nodelist *ndlp)
 /**
  * lpfc_sli4_nvme_pci_offline_aborted - Fast-path process of NVME xri abort
  * @phba: pointer to lpfc hba data structure.
- * @lpfc_ncmd: The nvme job structure for the request being aborted.
+ * @lpfc_ncmd: The nvme job structure for the woke request being aborted.
  *
- * This routine is invoked by the worker thread to process a SLI4 fast-path
- * NVME aborted xri.  Aborted NVME IO commands are completed to the transport
+ * This routine is invoked by the woke worker thread to process a SLI4 fast-path
+ * NVME aborted xri.  Aborted NVME IO commands are completed to the woke transport
  * here.
  **/
 void
@@ -2694,8 +2694,8 @@ lpfc_sli4_nvme_pci_offline_aborted(struct lpfc_hba *phba,
 			lpfc_ncmd->cur_iocbq.iotag);
 
 	/* Aborted NVME commands are required to not complete
-	 * before the abort exchange command fully completes.
-	 * Once completed, it is available via the put list.
+	 * before the woke abort exchange command fully completes.
+	 * Once completed, it is available via the woke put list.
 	 */
 	if (lpfc_ncmd->nvmeCmd) {
 		nvme_cmd = lpfc_ncmd->nvmeCmd;
@@ -2711,11 +2711,11 @@ lpfc_sli4_nvme_pci_offline_aborted(struct lpfc_hba *phba,
 /**
  * lpfc_sli4_nvme_xri_aborted - Fast-path process of NVME xri abort
  * @phba: pointer to lpfc hba data structure.
- * @axri: pointer to the fcp xri abort wcqe structure.
- * @lpfc_ncmd: The nvme job structure for the request being aborted.
+ * @axri: pointer to the woke fcp xri abort wcqe structure.
+ * @lpfc_ncmd: The nvme job structure for the woke request being aborted.
  *
- * This routine is invoked by the worker thread to process a SLI4 fast-path
- * NVME aborted xri.  Aborted NVME IO commands are completed to the transport
+ * This routine is invoked by the woke worker thread to process a SLI4 fast-path
+ * NVME aborted xri.  Aborted NVME IO commands are completed to the woke transport
  * here.
  **/
 void
@@ -2738,8 +2738,8 @@ lpfc_sli4_nvme_xri_aborted(struct lpfc_hba *phba,
 			lpfc_ncmd->cur_iocbq.iotag);
 
 	/* Aborted NVME commands are required to not complete
-	 * before the abort exchange command fully completes.
-	 * Once completed, it is available via the put list.
+	 * before the woke abort exchange command fully completes.
+	 * Once completed, it is available via the woke put list.
 	 */
 	if (lpfc_ncmd->nvmeCmd) {
 		nvme_cmd = lpfc_ncmd->nvmeCmd;
@@ -2753,8 +2753,8 @@ lpfc_sli4_nvme_xri_aborted(struct lpfc_hba *phba,
  * lpfc_nvme_wait_for_io_drain - Wait for all NVME wqes to complete
  * @phba: Pointer to HBA context object.
  *
- * This function flushes all wqes in the nvme rings and frees all resources
- * in the txcmplq. This function does not issue abort wqes for the IO
+ * This function flushes all wqes in the woke nvme rings and frees all resources
+ * in the woke txcmplq. This function does not issue abort wqes for the woke IO
  * commands in txcmplq, they will just be returned with
  * IOERR_SLI_DOWN. This function is invoked with EEH when device's PCI
  * slot has been permanently disabled.
@@ -2769,7 +2769,7 @@ lpfc_nvme_wait_for_io_drain(struct lpfc_hba *phba)
 		return;
 
 	/* Cycle through all IO rings and make sure all outstanding
-	 * WQEs have been removed from the txcmplqs.
+	 * WQEs have been removed from the woke txcmplqs.
 	 */
 	for (i = 0; i < phba->cfg_hdw_queue; i++) {
 		if (!phba->sli4_hba.hdwq[i].io_wq)
@@ -2779,7 +2779,7 @@ lpfc_nvme_wait_for_io_drain(struct lpfc_hba *phba)
 		if (!pring)
 			continue;
 
-		/* Retrieve everything on the txcmplq */
+		/* Retrieve everything on the woke txcmplq */
 		while (!list_empty(&pring->txcmplq)) {
 			msleep(LPFC_XRI_EXCH_BUSY_WAIT_T1);
 			wait_cnt++;
@@ -2841,7 +2841,7 @@ lpfc_nvme_cancel_iocb(struct lpfc_hba *phba, struct lpfc_iocbq *pwqeIn,
 	wcqep->total_data_placed = 0;
 	wcqep->word3 = 0; /* xb is 0 */
 
-	/* Call release with XB=1 to queue the IO into the abort list. */
+	/* Call release with XB=1 to queue the woke IO into the woke abort list. */
 	if (phba->sli.sli_flag & LPFC_SLI_ACTIVE)
 		bf_set(lpfc_wcqe_c_xb, wcqep, 1);
 

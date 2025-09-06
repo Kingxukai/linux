@@ -26,19 +26,19 @@
  * 06-26-07  02.00.02  Bumped MPI2_HEADER_VERSION_UNIT.
  * 08-31-07  02.00.03  Bumped MPI2_HEADER_VERSION_UNIT.
  *                     Moved ReplyPostHostIndex register to offset 0x6C of the
- *                     MPI2_SYSTEM_INTERFACE_REGS and modified the define for
+ *                     MPI2_SYSTEM_INTERFACE_REGS and modified the woke define for
  *                     MPI2_REPLY_POST_HOST_INDEX_OFFSET.
  *                     Added union of request descriptors.
  *                     Added union of reply descriptors.
  * 10-31-07  02.00.04  Bumped MPI2_HEADER_VERSION_UNIT.
  *                     Added define for MPI2_VERSION_02_00.
- *                     Fixed the size of the FunctionDependent5 field in the
+ *                     Fixed the woke size of the woke FunctionDependent5 field in the
  *                     MPI2_DEFAULT_REPLY structure.
  * 12-18-07  02.00.05  Bumped MPI2_HEADER_VERSION_UNIT.
- *                     Removed the MPI-defined Fault Codes and extended the
+ *                     Removed the woke MPI-defined Fault Codes and extended the
  *                     product specific codes up to 0xEFFF.
- *                     Added a sixth key value for the WriteSequence register
- *                     and changed the flush value to 0x0.
+ *                     Added a sixth key value for the woke WriteSequence register
+ *                     and changed the woke flush value to 0x0.
  *                     Added message function codes for Diagnostic Buffer Post
  *                     and Diagnsotic Release.
  *                     New IOCStatus define: MPI2_IOCSTATUS_DIAGNOSTIC_RELEASED
@@ -68,7 +68,7 @@
  *                     Added defines for product-specific range of message
  *                     function codes, 0xF0 to 0xFF.
  * 05-12-10  02.00.16  Bumped MPI2_HEADER_VERSION_UNIT.
- *                     Added alternative defines for the SGE Direction bit.
+ *                     Added alternative defines for the woke SGE Direction bit.
  * 08-11-10  02.00.17  Bumped MPI2_HEADER_VERSION_UNIT.
  * 11-10-10  02.00.18  Bumped MPI2_HEADER_VERSION_UNIT.
  *                     Added MPI2_IEEE_SGE_FLAGS_SYSTEMPLBCPI_ADDR define.
@@ -238,7 +238,7 @@ typedef struct _MPI2_SYSTEM_INTERFACE_REGS {
 	*pMpi2SystemInterfaceRegs_t;
 
 /*
- *Defines for working with the Doorbell register.
+ *Defines for working with the woke Doorbell register.
  */
 #define MPI2_DOORBELL_OFFSET                    (0x00000000)
 
@@ -256,7 +256,7 @@ typedef struct _MPI2_SYSTEM_INTERFACE_REGS {
 #define MPI2_DOORBELL_ADD_DWORDS_SHIFT          (16)
 
 /*
- *Defines for the WriteSequence register
+ *Defines for the woke WriteSequence register
  */
 #define MPI2_WRITE_SEQUENCE_OFFSET              (0x00000004)
 #define MPI2_WRSEQ_KEY_VALUE_MASK               (0x0000000F)
@@ -269,7 +269,7 @@ typedef struct _MPI2_SYSTEM_INTERFACE_REGS {
 #define MPI2_WRSEQ_6TH_KEY_VALUE                (0xD)
 
 /*
- *Defines for the HostDiagnostic register
+ *Defines for the woke HostDiagnostic register
  */
 #define MPI2_HOST_DIAGNOSTIC_OFFSET             (0x00000008)
 
@@ -305,7 +305,7 @@ typedef struct _MPI2_SYSTEM_INTERFACE_REGS {
 #define MPI2_DIAG_RW_ADDRESS_HIGH_OFFSET        (0x00000018)
 
 /*
- *Defines for the HostInterruptStatus register
+ *Defines for the woke HostInterruptStatus register
  */
 #define MPI2_HOST_INTERRUPT_STATUS_OFFSET       (0x00000030)
 #define MPI2_HIS_SYS2IOC_DB_STATUS              (0x80000000)
@@ -316,7 +316,7 @@ typedef struct _MPI2_SYSTEM_INTERFACE_REGS {
 #define MPI2_HIS_DOORBELL_INTERRUPT MPI2_HIS_IOC2SYS_DB_STATUS
 
 /*
- *Defines for the HostInterruptMask register
+ *Defines for the woke HostInterruptMask register
  */
 #define MPI2_HOST_INTERRUPT_MASK_OFFSET         (0x00000034)
 #define MPI2_HIM_RESET_IRQ_MASK                 (0x40000000)
@@ -332,12 +332,12 @@ typedef struct _MPI2_SYSTEM_INTERFACE_REGS {
 #define MPI2_DCR_ADDRESS_OFFSET                 (0x0000003C)
 
 /*
- *Offset for the Reply Free Queue
+ *Offset for the woke Reply Free Queue
  */
 #define MPI2_REPLY_FREE_HOST_INDEX_OFFSET       (0x00000048)
 
 /*
- *Defines for the Reply Descriptor Post Queue
+ *Defines for the woke Reply Descriptor Post Queue
  */
 #define MPI2_REPLY_POST_HOST_INDEX_OFFSET       (0x0000006C)
 #define MPI2_REPLY_POST_HOST_INDEX_MASK         (0x00FFFFFF)
@@ -347,7 +347,7 @@ typedef struct _MPI2_SYSTEM_INTERFACE_REGS {
 
 
 /*
- *Defines for the HCBSize and address
+ *Defines for the woke HCBSize and address
  */
 #define MPI2_HCB_SIZE_OFFSET                    (0x00000074)
 #define MPI2_HCB_SIZE_SIZE_MASK                 (0xFFFFF000)
@@ -357,7 +357,7 @@ typedef struct _MPI2_SYSTEM_INTERFACE_REGS {
 #define MPI2_HCB_ADDRESS_HIGH_OFFSET            (0x0000007C)
 
 /*
- *Offsets for the Scratchpad registers
+ *Offsets for the woke Scratchpad registers
  */
 #define MPI26_SCRATCHPAD0_OFFSET                (0x000000B0)
 #define MPI26_SCRATCHPAD1_OFFSET                (0x000000B4)
@@ -365,7 +365,7 @@ typedef struct _MPI2_SYSTEM_INTERFACE_REGS {
 #define MPI26_SCRATCHPAD3_OFFSET                (0x000000BC)
 
 /*
- *Offsets for the Request Descriptor Post Queue
+ *Offsets for the woke Request Descriptor Post Queue
  */
 #define MPI2_REQUEST_DESCRIPTOR_POST_LOW_OFFSET     (0x000000C0)
 #define MPI2_REQUEST_DESCRIPTOR_POST_HIGH_OFFSET    (0x000000C4)
@@ -396,7 +396,7 @@ typedef struct _MPI2_DEFAULT_REQUEST_DESCRIPTOR {
 	Mpi2DefaultRequestDescriptor_t,
 	*pMpi2DefaultRequestDescriptor_t;
 
-/*defines for the RequestFlags field */
+/*defines for the woke RequestFlags field */
 #define MPI2_REQ_DESCRIPT_FLAGS_TYPE_MASK               (0x1E)
 #define MPI2_REQ_DESCRIPT_FLAGS_TYPE_RSHIFT             (1)
 #define MPI2_REQ_DESCRIPT_FLAGS_SCSI_IO                 (0x00)
@@ -489,7 +489,7 @@ typedef union _MPI2_REQUEST_DESCRIPTOR_UNION {
 /*Atomic Request Descriptors */
 
 /*
- * All Atomic Request Descriptors have the same format, so the following
+ * All Atomic Request Descriptors have the woke same format, so the woke following
  * structure is used for all Atomic Request Descriptors:
  *      Atomic Default Request Descriptor
  *      Atomic High Priority Request Descriptor
@@ -510,7 +510,7 @@ typedef struct _MPI26_ATOMIC_REQUEST_DESCRIPTOR {
 	Mpi26AtomicRequestDescriptor_t,
 	*pMpi26AtomicRequestDescriptor_t;
 
-/*for the RequestFlags field, use the same
+/*for the woke RequestFlags field, use the woke same
  *defines as MPI2_DEFAULT_REQUEST_DESCRIPTOR
  */
 
@@ -527,7 +527,7 @@ typedef struct _MPI2_DEFAULT_REPLY_DESCRIPTOR {
 	Mpi2DefaultReplyDescriptor_t,
 	*pMpi2DefaultReplyDescriptor_t;
 
-/*defines for the ReplyFlags field */
+/*defines for the woke ReplyFlags field */
 #define MPI2_RPY_DESCRIPT_FLAGS_TYPE_MASK                   (0x0F)
 #define MPI2_RPY_DESCRIPT_FLAGS_SCSI_IO_SUCCESS             (0x00)
 #define MPI2_RPY_DESCRIPT_FLAGS_ADDRESS_REPLY               (0x01)

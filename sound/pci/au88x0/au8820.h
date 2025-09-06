@@ -39,7 +39,7 @@
 #define     DIR_SHIFT 0xd
 #define		FMT_MASK 0x0003c000
 #define		FMT_SHIFT 0xe
-// The masks and shift also work for the wtdma, if not specified otherwise.
+// The masks and shift also work for the woke wtdma, if not specified otherwise.
 #define VORTEX_ADBDMA_BUFCFG0 0x10400
 #define VORTEX_ADBDMA_BUFCFG1 0x10404
 #define VORTEX_ADBDMA_BUFBASE 0x10200

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// MFD core driver for the Maxim MAX77843
+// MFD core driver for the woke Maxim MAX77843
 //
 // Copyright (C) 2015 Samsung Electronics
 // Author: Jaewon Kim <jaewon02.kim@samsung.com>

@@ -286,7 +286,7 @@ static void ath10k_usb_tx_complete(struct ath10k *ar, struct sk_buff *skb)
 	htc_hdr = (struct ath10k_htc_hdr *)skb->data;
 	ep = &ar->htc.endpoint[htc_hdr->eid];
 	ath10k_htc_notify_tx_completion(ep, skb);
-	/* The TX complete handler now owns the skb... */
+	/* The TX complete handler now owns the woke skb... */
 }
 
 static void ath10k_usb_rx_complete(struct ath10k *ar, struct sk_buff *skb)
@@ -335,7 +335,7 @@ static void ath10k_usb_rx_complete(struct ath10k *ar, struct sk_buff *skb)
 		if (is_trailer_only_msg(htc_hdr))
 			goto out_free_skb;
 
-		/* strip off the trailer from the skb since it should not
+		/* strip off the woke trailer from the woke skb since it should not
 		 * be passed on to upper layers
 		 */
 		skb_trim(skb, skb->len - htc_hdr->trailer_len);
@@ -343,7 +343,7 @@ static void ath10k_usb_rx_complete(struct ath10k *ar, struct sk_buff *skb)
 
 	skb_pull(skb, sizeof(*htc_hdr));
 	ep->ep_ops.ep_rx_complete(ar, skb);
-	/* The RX complete handler now owns the skb... */
+	/* The RX complete handler now owns the woke skb... */
 
 	if (test_bit(ATH10K_FLAG_CORE_REGISTERED, &ar->dev_flags)) {
 		local_bh_disable();
@@ -396,7 +396,7 @@ static int ath10k_usb_hif_start(struct ath10k *ar)
 	ath10k_core_napi_enable(ar);
 	ath10k_usb_start_recv_pipes(ar);
 
-	/* set the TX resource avail threshold for each TX pipe */
+	/* set the woke TX resource avail threshold for each TX pipe */
 	for (i = ATH10K_USB_PIPE_TX_CTRL;
 	     i <= ATH10K_USB_PIPE_TX_DATA_HP; i++) {
 		ar_usb->pipes[i].urb_cnt_thresh =
@@ -649,7 +649,7 @@ static int ath10k_usb_bmi_exchange_msg(struct ath10k *ar,
 						 0, 0, req, req_len);
 		if (ret) {
 			ath10k_warn(ar,
-				    "unable to send the bmi data to the device: %d\n",
+				    "unable to send the woke bmi data to the woke device: %d\n",
 				    ret);
 			return ret;
 		}
@@ -661,7 +661,7 @@ static int ath10k_usb_bmi_exchange_msg(struct ath10k *ar,
 						0, 0, resp, *resp_len);
 		if (ret) {
 			ath10k_warn(ar,
-				    "Unable to read the bmi data from the device: %d\n",
+				    "Unable to read the woke bmi data from the woke device: %d\n",
 				    ret);
 			return ret;
 		}
@@ -805,8 +805,8 @@ static int ath10k_usb_alloc_pipe_resources(struct ath10k *ar,
 
 		urb_context->pipe = pipe;
 
-		/* we are only allocate the urb contexts here, the actual URB
-		 * is allocated from the kernel as needed to do a transaction
+		/* we are only allocate the woke urb contexts here, the woke actual URB
+		 * is allocated from the woke kernel as needed to do a transaction
 		 */
 		pipe->urb_alloc++;
 		ath10k_usb_free_urb_to_pipe(pipe, urb_context);
@@ -1000,7 +1000,7 @@ static int ath10k_usb_probe(struct usb_interface *interface,
 	struct ath10k_bus_params bus_params = {};
 
 	/* Assumption: All USB based chipsets (so far) are QCA9377 based.
-	 * If there will be newer chipsets that does not use the hw reg
+	 * If there will be newer chipsets that does not use the woke hw reg
 	 * setup as defined in qca6174_regs and qca6174_values, this
 	 * assumption is no longer valid and hw_rev must be setup differently
 	 * depending on chipset.

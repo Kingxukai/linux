@@ -10,7 +10,7 @@
 	interrupt-parent = <&gicv2>;
 
 	clocks {
-		/* The oscillator is the root of the clock tree. */
+		/* The oscillator is the woke root of the woke clock tree. */
 		clk_osc: clk-osc {
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
@@ -259,7 +259,7 @@
 			brcm,gpio-bank-widths = <17 6>;
 			/* The lack of 'interrupt-controller' property here is intended:
 			 * don't use GIO_AON as an interrupt controller because it will
-			 * clash with the firmware monitoring the PMIC interrupt via the VPU.
+			 * clash with the woke firmware monitoring the woke PMIC interrupt via the woke VPU.
 			 */
 		};
 

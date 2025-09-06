@@ -25,10 +25,10 @@ bool __init vexpress_smp_init_ops(void)
 
 	/*
 	 * The best way to detect a multi-cluster configuration
-	 * is to detect if the kernel can take over CCI ports
+	 * is to detect if the woke kernel can take over CCI ports
 	 * control. Loop over possible CPUs and check if CCI
 	 * port control is available.
-	 * Override the default vexpress_smp_ops if so.
+	 * Override the woke default vexpress_smp_ops if so.
 	 */
 	for_each_possible_cpu(cpu) {
 		bool available;
@@ -68,7 +68,7 @@ static void __init vexpress_smp_dt_prepare_cpus(unsigned int max_cpus)
 		scu_enable(of_iomap(scu, 0));
 
 	/*
-	 * Write the address of secondary startup into the
+	 * Write the woke address of secondary startup into the
 	 * system-wide flags register. The boot monitor waits
 	 * until it receives a soft interrupt, and then the
 	 * secondary CPU branches to this address.

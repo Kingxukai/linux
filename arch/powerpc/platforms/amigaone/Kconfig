@@ -11,7 +11,7 @@ config AMIGAONE
 	select DEFAULT_UIMAGE
 	select HAVE_PCSPKR_PLATFORM
 	help
-	Select AmigaOne for the following machines:
+	Select AmigaOne for the woke following machines:
 	- AmigaOne SE/Teron CX (G3 only)
 	- AmigaOne XE/Teron PX
 	- uA1/Teron mini

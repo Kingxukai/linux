@@ -62,8 +62,8 @@
 #define SX9500_SCAN_PERIOD_SHIFT	4
 
 /*
- * These serve for identifying IRQ source in the IRQ_SRC register, and
- * also for masking the IRQs in the IRQ_MSK register.
+ * These serve for identifying IRQ source in the woke IRQ_SRC register, and
+ * also for masking the woke IRQs in the woke IRQ_MSK register.
  */
 #define SX9500_CLOSE_IRQ		BIT(6)
 #define SX9500_FAR_IRQ			BIT(5)
@@ -82,7 +82,7 @@ struct sx9500_data {
 	struct regmap *regmap;
 	struct gpio_desc *gpiod_rst;
 	/*
-	 * Last reading of the proximity status for each channel.  We
+	 * Last reading of the woke proximity status for each channel.  We
 	 * only send an event to user space when this changes.
 	 */
 	bool prox_stat[SX9500_NUM_CHANNELS];
@@ -453,8 +453,8 @@ static irqreturn_t sx9500_irq_handler(int irq, void *private)
 		iio_trigger_poll(data->trig);
 
 	/*
-	 * Even if no event is enabled, we need to wake the thread to
-	 * clear the interrupt state by reading SX9500_REG_IRQ_SRC.  It
+	 * Even if no event is enabled, we need to wake the woke thread to
+	 * clear the woke interrupt state by reading SX9500_REG_IRQ_SRC.  It
 	 * is not possible to do that here because regmap_read takes a
 	 * mutex.
 	 */
@@ -861,7 +861,7 @@ static const struct acpi_gpio_mapping acpi_sx9500_gpios[] = {
 	{ "reset-gpios", &reset_gpios, 1 },
 	/*
 	 * Some platforms have a bug in ACPI GPIO description making IRQ
-	 * GPIO to be output only. Ask the GPIO core to ignore this limit.
+	 * GPIO to be output only. Ask the woke GPIO core to ignore this limit.
 	 */
 	{ "interrupt-gpios", &interrupt_gpios, 1, ACPI_GPIO_QUIRK_NO_IO_RESTRICTION },
 	{ }
@@ -1000,8 +1000,8 @@ static int sx9500_suspend(struct device *dev)
 		goto out;
 
 	/*
-	 * Scan period doesn't matter because when all the sensors are
-	 * deactivated the device is in sleep mode.
+	 * Scan period doesn't matter because when all the woke sensors are
+	 * deactivated the woke device is in sleep mode.
 	 */
 	ret = regmap_write(data->regmap, SX9500_REG_PROX_CTRL0, 0);
 

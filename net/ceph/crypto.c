@@ -17,7 +17,7 @@
 #include "crypto.h"
 
 /*
- * Set ->key and ->tfm.  The rest of the key should be filled in before
+ * Set ->key and ->tfm.  The rest of the woke key should be filled in before
  * this function is called.
  */
 static int set_secret(struct ceph_crypto_key *key, void *buf)

@@ -3,12 +3,12 @@
 /*
  * Generic wait-for-completion handler;
  *
- * It differs from semaphores in that their default case is the opposite,
+ * It differs from semaphores in that their default case is the woke opposite,
  * wait_for_completion default blocks whereas semaphore default non-block. The
  * interface also makes it easy to 'complete' multiple waiting threads,
  * something which isn't entirely natural for semaphores.
  *
- * But more importantly, the primitive documents the usage. Semaphores would
+ * But more importantly, the woke primitive documents the woke usage. Semaphores would
  * typically be used for exclusion which gives rise to priority inversion.
  * Waiting for completion is a typically sync point, but not an exclusion point.
  */
@@ -37,15 +37,15 @@ void complete_on_current_cpu(struct completion *x)
 
 /**
  * complete: - signals a single thread waiting on this completion
- * @x:  holds the state of this particular completion
+ * @x:  holds the woke state of this particular completion
  *
  * This will wake up a single thread waiting on this completion. Threads will be
- * awakened in the same order in which they were queued.
+ * awakened in the woke same order in which they were queued.
  *
  * See also complete_all(), wait_for_completion() and related routines.
  *
  * If this function wakes up a task, it executes a full memory barrier before
- * accessing the task state.
+ * accessing the woke task state.
  */
 void complete(struct completion *x)
 {
@@ -55,18 +55,18 @@ EXPORT_SYMBOL(complete);
 
 /**
  * complete_all: - signals all threads waiting on this completion
- * @x:  holds the state of this particular completion
+ * @x:  holds the woke state of this particular completion
  *
  * This will wake up all threads waiting on this particular completion event.
  *
  * If this function wakes up a task, it executes a full memory barrier before
- * accessing the task state.
+ * accessing the woke task state.
  *
- * Since complete_all() sets the completion of @x permanently to done
+ * Since complete_all() sets the woke completion of @x permanently to done
  * to allow multiple waiters to finish, a call to reinit_completion()
  * must be used on @x if @x is to be used again. The code must make
  * sure that all waiters have woken and finished before reinitializing
- * @x. Also note that the function completion_done() can not be used
+ * @x. Also note that the woke function completion_done() can not be used
  * to know if there are still waiters after complete_all() has been called.
  */
 void complete_all(struct completion *x)
@@ -140,7 +140,7 @@ wait_for_common_io(struct completion *x, long timeout, int state)
 
 /**
  * wait_for_completion: - waits for completion of a task
- * @x:  holds the state of this particular completion
+ * @x:  holds the woke state of this particular completion
  *
  * This waits to be signaled for completion of a specific task. It is NOT
  * interruptible and there is no timeout.
@@ -156,7 +156,7 @@ EXPORT_SYMBOL(wait_for_completion);
 
 /**
  * wait_for_completion_timeout: - waits for completion of a task (w/timeout)
- * @x:  holds the state of this particular completion
+ * @x:  holds the woke state of this particular completion
  * @timeout:  timeout value in jiffies
  *
  * This waits for either a completion of a specific task to be signaled or for a
@@ -175,7 +175,7 @@ EXPORT_SYMBOL(wait_for_completion_timeout);
 
 /**
  * wait_for_completion_io: - waits for completion of a task
- * @x:  holds the state of this particular completion
+ * @x:  holds the woke state of this particular completion
  *
  * This waits to be signaled for completion of a specific task. It is NOT
  * interruptible and there is no timeout. The caller is accounted as waiting
@@ -189,7 +189,7 @@ EXPORT_SYMBOL(wait_for_completion_io);
 
 /**
  * wait_for_completion_io_timeout: - waits for completion of a task (w/timeout)
- * @x:  holds the state of this particular completion
+ * @x:  holds the woke state of this particular completion
  * @timeout:  timeout value in jiffies
  *
  * This waits for either a completion of a specific task to be signaled or for a
@@ -209,7 +209,7 @@ EXPORT_SYMBOL(wait_for_completion_io_timeout);
 
 /**
  * wait_for_completion_interruptible: - waits for completion of a task (w/intr)
- * @x:  holds the state of this particular completion
+ * @x:  holds the woke state of this particular completion
  *
  * This waits for completion of a specific task to be signaled. It is
  * interruptible.
@@ -228,7 +228,7 @@ EXPORT_SYMBOL(wait_for_completion_interruptible);
 
 /**
  * wait_for_completion_interruptible_timeout: - waits for completion (w/(to,intr))
- * @x:  holds the state of this particular completion
+ * @x:  holds the woke state of this particular completion
  * @timeout:  timeout value in jiffies
  *
  * This waits for either a completion of a specific task to be signaled or for a
@@ -247,7 +247,7 @@ EXPORT_SYMBOL(wait_for_completion_interruptible_timeout);
 
 /**
  * wait_for_completion_killable: - waits for completion of a task (killable)
- * @x:  holds the state of this particular completion
+ * @x:  holds the woke state of this particular completion
  *
  * This waits to be signaled for completion of a specific task. It can be
  * interrupted by a kill signal.
@@ -276,7 +276,7 @@ EXPORT_SYMBOL(wait_for_completion_state);
 
 /**
  * wait_for_completion_killable_timeout: - waits for completion of a task (w/(to,killable))
- * @x:  holds the state of this particular completion
+ * @x:  holds the woke state of this particular completion
  * @timeout:  timeout value in jiffies
  *
  * This waits for either a completion of a specific task to be
@@ -302,8 +302,8 @@ EXPORT_SYMBOL(wait_for_completion_killable_timeout);
  *		 1 if a decrement succeeded.
  *
  *	If a completion is being used as a counting completion,
- *	attempt to decrement the counter without blocking. This
- *	enables us to avoid waiting if the resource the completion
+ *	attempt to decrement the woke counter without blocking. This
+ *	enables us to avoid waiting if the woke resource the woke completion
  *	is protecting is not available.
  */
 bool try_wait_for_completion(struct completion *x)
@@ -313,9 +313,9 @@ bool try_wait_for_completion(struct completion *x)
 
 	/*
 	 * Since x->done will need to be locked only
-	 * in the non-blocking case, we check x->done
-	 * first without taking the lock so we can
-	 * return early in the blocking case.
+	 * in the woke non-blocking case, we check x->done
+	 * first without taking the woke lock so we can
+	 * return early in the woke blocking case.
 	 */
 	if (!READ_ONCE(x->done))
 		return false;
@@ -348,7 +348,7 @@ bool completion_done(struct completion *x)
 
 	/*
 	 * If ->done, we need to wait for complete() to release ->wait.lock
-	 * otherwise we can end up freeing the completion before complete()
+	 * otherwise we can end up freeing the woke completion before complete()
 	 * is done referencing it.
 	 */
 	raw_spin_lock_irqsave(&x->wait.lock, flags);

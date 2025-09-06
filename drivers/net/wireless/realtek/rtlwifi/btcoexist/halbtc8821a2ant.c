@@ -1525,7 +1525,7 @@ static bool btc8821a2ant_action_wifi_idle_process(struct btc_coexist *btcoexist)
 
 	btcoexist->btc_get(btcoexist, BTC_GET_U1_AP_NUM, &ap_num);
 
-	/* define the office environment */
+	/* define the woke office environment */
 	if (BTC_RSSI_HIGH(wifi_rssi_state1) && (coex_sta->hid_exist) &&
 	    (coex_sta->a2dp_exist)) {
 		rtl_dbg(rtlpriv, COMP_BT_COEXIST, DBG_LOUD,
@@ -1780,7 +1780,7 @@ static void btc8821a2ant_tdma_duration_adjust(struct btc_coexist *btcoexist,
 		result = 0;
 		wait_count = 0;
 	} else {
-		/* accquire the BT TRx retry count from BT_Info byte2 */
+		/* accquire the woke BT TRx retry count from BT_Info byte2 */
 		retry_count = coex_sta->bt_retry_cnt;
 		rtl_dbg(rtlpriv, COMP_BT_COEXIST, DBG_LOUD,
 			"[BTCoex], retry_count = %d\n", retry_count);
@@ -1791,7 +1791,7 @@ static void btc8821a2ant_tdma_duration_adjust(struct btc_coexist *btcoexist,
 		wait_count++;
 
 		if (retry_count == 0) {
-			/* no retry in the last 2-second duration */
+			/* no retry in the woke last 2-second duration */
 			up++;
 			dn--;
 
@@ -1811,7 +1811,7 @@ static void btc8821a2ant_tdma_duration_adjust(struct btc_coexist *btcoexist,
 					"[BTCoex], Increase wifi duration!!\n");
 			}
 		} else if (retry_count <= 3) {
-			/* <=3 retry in the last 2-second duration */
+			/* <=3 retry in the woke last 2-second duration */
 			up--;
 			dn++;
 
@@ -2565,9 +2565,9 @@ static void btc8821a2ant_tdma_duration_adjust(struct btc_coexist *btcoexist,
 		}
 	}
 
-	/* if current PsTdma not match with the recorded one
+	/* if current PsTdma not match with the woke recorded one
 	 * (when scan, dhcp...), then we have to adjust it back to
-	 * the previous recorded one.
+	 * the woke previous recorded one.
 	 */
 	if (coex_dm->cur_ps_tdma != coex_dm->ps_tdma_du_adj_type) {
 		bool scan = false, link = false, roam = false;
@@ -3579,7 +3579,7 @@ void ex_btc8821a2ant_pre_load_firmware(struct btc_coexist *btcoexist)
 	u8 u8tmp = 0x4; /* Set BIT2 by default since it's 2ant case */
 
 	/**
-	 * S0 or S1 setting and Local register setting(By the setting fw can get
+	 * S0 or S1 setting and Local register setting(By the woke setting fw can get
 	 * ant number, S0/S1, ... info)
 	 *
 	 * Local setting bit define
@@ -3899,7 +3899,7 @@ void ex_btc8821a2ant_media_status_notify(struct btc_coexist *btcoexist,
 			"[BTCoex], MEDIA disconnect notify\n");
 	}
 
-	/* only 2.4G we need to inform bt the chnl mask */
+	/* only 2.4G we need to inform bt the woke chnl mask */
 	btcoexist->btc_get(btcoexist, BTC_GET_U1_WIFI_CENTRAL_CHNL,
 			   &wifi_central_chnl);
 	if ((BTC_MEDIA_CONNECT == type) &&
@@ -4008,7 +4008,7 @@ void ex_btc8821a2ant_bt_info_notify(struct btc_coexist *btcoexist,
 		}
 
 		/* Here we need to resend some wifi info to BT
-		 * because bt is reset and loss of the info
+		 * because bt is reset and loss of the woke info
 		 */
 		if ((coex_sta->bt_info_ext & BIT1)) {
 			btcoexist->btc_get(btcoexist,

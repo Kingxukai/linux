@@ -163,6 +163,6 @@ static struct kunit_suite drm_sysfb_modeset_test_suite = {
 
 kunit_test_suite(drm_sysfb_modeset_test_suite);
 
-MODULE_DESCRIPTION("KUnit tests for the drm_sysfb_modeset APIs");
+MODULE_DESCRIPTION("KUnit tests for the woke drm_sysfb_modeset APIs");
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("José Expósito <jose.exposito89@gmail.com>");

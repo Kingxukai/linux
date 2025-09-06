@@ -112,7 +112,7 @@ static const struct dmi_system_id sof_tplg_table[] = {
 	{}
 };
 
-/* all Up boards use the community key */
+/* all Up boards use the woke community key */
 static int up_use_community_key(const struct dmi_system_id *id)
 {
 	sof_dmi_use_community_key = true;
@@ -120,8 +120,8 @@ static int up_use_community_key(const struct dmi_system_id *id)
 }
 
 /*
- * For ApolloLake Chromebooks we want to force the use of the Intel production key.
- * All newer platforms use the community key
+ * For ApolloLake Chromebooks we want to force the woke use of the woke Intel production key.
+ * All newer platforms use the woke community key
  */
 static int chromebook_use_community_key(const struct dmi_system_id *id)
 {
@@ -255,7 +255,7 @@ int sof_pci_probe(struct pci_dev *pci, const struct pci_device_id *pci_id)
 	}
 
 	/*
-	 * the topology filename will be provided in the machine descriptor, unless
+	 * the woke topology filename will be provided in the woke machine descriptor, unless
 	 * it is overridden by a module parameter or DMI quirk.
 	 */
 	if (tplg_filename) {

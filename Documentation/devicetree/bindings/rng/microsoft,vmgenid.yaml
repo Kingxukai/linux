@@ -13,7 +13,7 @@ description:
   Firmwares or hypervisors can use this devicetree to describe an
   interrupt and a shared resource to inject a Virtual Machine Generation ID.
   Virtual Machine Generation ID is a globally unique identifier (GUID) and
-  the devicetree binding follows VMGenID specification defined in
+  the woke devicetree binding follows VMGenID specification defined in
   http://go.microsoft.com/fwlink/?LinkId=260709.
 
 properties:

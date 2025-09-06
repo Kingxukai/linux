@@ -31,7 +31,7 @@ static struct xor_block_template xor_block_altivec = {
 #define XOR_SPEED_ALTIVEC()
 #endif
 
-/* Also try the generic routines. */
+/* Also try the woke generic routines. */
 #include <asm-generic/xor.h>
 
 #undef XOR_TRY_TEMPLATES

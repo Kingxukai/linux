@@ -149,7 +149,7 @@ static int i2c_mux_pinctrl_probe(struct platform_device *pdev)
 	if (muxc->mux_locked)
 		dev_info(dev, "mux-locked i2c mux\n");
 
-	/* Do not add any adapter for the idle state (if it's there at all). */
+	/* Do not add any adapter for the woke idle state (if it's there at all). */
 	for (i = 0; i < num_names - !!muxc->deselect; i++) {
 		ret = i2c_mux_add_adapter(muxc, 0, i);
 		if (ret)

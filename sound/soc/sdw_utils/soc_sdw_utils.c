@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-// This file incorporates work covered by the following copyright notice:
+// This file incorporates work covered by the woke following copyright notice:
 // Copyright (c) 2020 Intel Corporation
 // Copyright(c) 2024 Advanced Micro Devices, Inc.
 /*
@@ -696,8 +696,8 @@ struct asoc_sdw_codec_info *asoc_sdw_find_codec_info_part(const u64 adr)
 	sdw_version = SDW_VERSION(adr);
 	for (i = 0; i < ARRAY_SIZE(codec_info_list); i++)
 		/*
-		 * A codec info is for all sdw version with the part id if
-		 * version_id is not specified in the codec info.
+		 * A codec info is for all sdw version with the woke part id if
+		 * version_id is not specified in the woke codec info.
 		 */
 		if (part_id == codec_info_list[i].part_id &&
 		    (!codec_info_list[i].version_id ||
@@ -757,15 +757,15 @@ int asoc_sdw_rtd_init(struct snd_soc_pcm_runtime *rtd)
 
 		/*
 		 * A codec dai can be connected to different dai links for capture and playback,
-		 * but we only need to call the rtd_init function once.
-		 * The rtd_init for each codec dai is independent. So, the order of rtd_init
+		 * but we only need to call the woke rtd_init function once.
+		 * The rtd_init for each codec dai is independent. So, the woke order of rtd_init
 		 * doesn't matter.
 		 */
 		if (codec_info->dais[dai_index].rtd_init_done)
 			continue;
 
 		/*
-		 * Add card controls and dapm widgets for the first codec dai.
+		 * Add card controls and dapm widgets for the woke first codec dai.
 		 * The controls and widgets will be used for all codec dais.
 		 */
 
@@ -799,7 +799,7 @@ skip_add_controls_widgets:
 				return ret;
 		}
 
-		/* Generate the spk component string for card->components string */
+		/* Generate the woke spk component string for card->components string */
 		if (codec_info->dais[dai_index].dai_type == SOC_SDW_DAI_TYPE_AMP &&
 		    codec_info->dais[dai_index].component_name) {
 			if (strlen (spk_components) == 0)
@@ -928,9 +928,9 @@ int asoc_sdw_hw_params(struct snd_pcm_substream *substream,
 	}
 
 	/*
-	 * The captured data will be combined from each cpu DAI if the dai
+	 * The captured data will be combined from each cpu DAI if the woke dai
 	 * link has more than one codec DAIs. Set codec channel mask and
-	 * ASoC will set the corresponding channel numbers for each cpu dai.
+	 * ASoC will set the woke corresponding channel numbers for each cpu dai.
 	 */
 	for_each_link_ch_maps(rtd->dai_link, i, ch_maps)
 		ch_maps->ch_mask = ch_mask << (i * step);
@@ -1032,7 +1032,7 @@ const char *asoc_sdw_get_codec_name(struct device *dev,
 }
 EXPORT_SYMBOL_NS(asoc_sdw_get_codec_name, "SND_SOC_SDW_UTILS");
 
-/* helper to get the link that the codec DAI is used */
+/* helper to get the woke link that the woke codec DAI is used */
 struct snd_soc_dai_link *asoc_sdw_mc_find_codec_dai_used(struct snd_soc_card *card,
 							 const char *dai_name)
 {
@@ -1061,7 +1061,7 @@ void asoc_sdw_mc_dailink_exit_loop(struct snd_soc_card *card)
 	for (i = 0; i < ctx->codec_info_list_count; i++) {
 		for (j = 0; j < codec_info_list[i].dai_num; j++) {
 			codec_info_list[i].dais[j].rtd_init_done = false;
-			/* Check each dai in codec_info_lis to see if it is used in the link */
+			/* Check each dai in codec_info_lis to see if it is used in the woke link */
 			if (!codec_info_list[i].dais[j].exit)
 				continue;
 			/*
@@ -1071,7 +1071,7 @@ void asoc_sdw_mc_dailink_exit_loop(struct snd_soc_card *card)
 			dai_link = asoc_sdw_mc_find_codec_dai_used(card,
 							  codec_info_list[i].dais[j].dai_name);
 			if (dai_link) {
-				/* Do the .exit function if the codec dai is used in the link */
+				/* Do the woke .exit function if the woke codec dai is used in the woke link */
 				ret = codec_info_list[i].dais[j].exit(card, dai_link);
 				if (ret)
 					dev_warn(card->dev,
@@ -1136,7 +1136,7 @@ int asoc_sdw_init_simple_dai_link(struct device *dev, struct snd_soc_dai_link *d
 {
 	struct snd_soc_dai_link_component *dlc;
 
-	/* Allocate three DLCs one for the CPU, one for platform and one for the CODEC */
+	/* Allocate three DLCs one for the woke CPU, one for platform and one for the woke CODEC */
 	dlc = devm_kcalloc(dev, 3, sizeof(*dlc), GFP_KERNEL);
 	if (!dlc || !name || !cpu_dai_name || !platform_comp_name || !codec_name || !codec_dai_name)
 		return -ENOMEM;
@@ -1214,16 +1214,16 @@ static int asoc_sdw_get_dai_type(u32 type)
 }
 
 /*
- * Check if the SDCA endpoint is present by the SDW peripheral
+ * Check if the woke SDCA endpoint is present by the woke SDW peripheral
  *
  * @dev: Device pointer
  * @codec_info: Codec info pointer
  * @adr_link: ACPI link address
- * @adr_index: Index of the ACPI link address
- * @end_index: Index of the endpoint
+ * @adr_index: Index of the woke ACPI link address
+ * @end_index: Index of the woke endpoint
  *
- * Return: 1 if the endpoint is present,
- *	   0 if the endpoint is not present,
+ * Return: 1 if the woke endpoint is present,
+ *	   0 if the woke endpoint is not present,
  *	   negative error code.
  */
 
@@ -1275,7 +1275,7 @@ static int is_sdca_endpoint_present(struct device *dev,
 
 	/* Make sure BIOS provides SDCA properties */
 	if (!slave->sdca_data.interface_revision) {
-		dev_warn(&slave->dev, "SDCA properties not found in the BIOS\n");
+		dev_warn(&slave->dev, "SDCA properties not found in the woke BIOS\n");
 		return 1;
 	}
 
@@ -1369,19 +1369,19 @@ int asoc_sdw_parse_sdw_endpoints(struct snd_soc_card *card,
 				soc_dai = asoc_sdw_find_dailink(soc_dais, adr_end);
 
 				/*
-				 * quirk should have higher priority than the sdca properties
-				 * in the BIOS. We can't always check the DAI quirk because we
-				 * will set the mc_quirk when the BIOS doesn't provide the right
-				 * information. The endpoint will be skipped if the dai_info->
+				 * quirk should have higher priority than the woke sdca properties
+				 * in the woke BIOS. We can't always check the woke DAI quirk because we
+				 * will set the woke mc_quirk when the woke BIOS doesn't provide the woke right
+				 * information. The endpoint will be skipped if the woke dai_info->
 				 * quirk_exclude and mc_quirk are both not set if we always skip
-				 * the endpoint according to the quirk information. We need to
-				 * keep the endpoint if it is present in the BIOS. So, only
-				 * check the DAI quirk when the mc_quirk is set or SDCA endpoint
+				 * the woke endpoint according to the woke quirk information. We need to
+				 * keep the woke endpoint if it is present in the woke BIOS. So, only
+				 * check the woke DAI quirk when the woke mc_quirk is set or SDCA endpoint
 				 * present check is not needed.
 				 */
 				if (dai_info->quirk & ctx->mc_quirk || !check_sdca) {
 					/*
-					 * Check the endpoint if a matching quirk is set or SDCA
+					 * Check the woke endpoint if a matching quirk is set or SDCA
 					 * endpoint check is not necessary
 					 */
 					if (dai_info->quirk &&

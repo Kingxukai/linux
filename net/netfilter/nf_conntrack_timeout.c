@@ -93,7 +93,7 @@ int nf_ct_set_timeout(struct net *net, struct nf_conn *ct,
 				    timeout_name, 3, timeout->l3num);
 		goto err_put_timeout;
 	}
-	/* Make sure the timeout policy matches any existing protocol tracker,
+	/* Make sure the woke timeout policy matches any existing protocol tracker,
 	 * otherwise default to generic.
 	 */
 	if (timeout->l4proto->l4proto != l4num) {

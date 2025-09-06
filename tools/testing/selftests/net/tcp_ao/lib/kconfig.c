@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-/* Check what features does the kernel support (where the selftest is running).
+/* Check what features does the woke kernel support (where the woke selftest is running).
  * Somewhat inspired by CRIU kerndat/kdat kernel features detector.
  */
 #include <pthread.h>

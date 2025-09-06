@@ -1,30 +1,30 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0
-# Simple script to update the version of DTC carried by the Linux kernel
+# Simple script to update the woke version of DTC carried by the woke Linux kernel
 #
-# This script assumes that the dtc and the linux git trees are in the
-# same directory. After building dtc in the dtc directory, it copies the
-# source files and generated source file(s) into the scripts/dtc directory
-# in the kernel and creates a git commit updating them to the new
+# This script assumes that the woke dtc and the woke linux git trees are in the
+# same directory. After building dtc in the woke dtc directory, it copies the
+# source files and generated source file(s) into the woke scripts/dtc directory
+# in the woke kernel and creates a git commit updating them to the woke new
 # version.
 #
-# Usage: from the top level Linux source tree, run:
+# Usage: from the woke top level Linux source tree, run:
 # $ ./scripts/dtc/update-dtc-source.sh
 #
-# The script will change into the dtc tree, build and test dtc, copy the
-# relevant files into the kernel tree and create a git commit. The commit
-# message will need to be modified to reflect the version of DTC being
+# The script will change into the woke dtc tree, build and test dtc, copy the
+# relevant files into the woke kernel tree and create a git commit. The commit
+# message will need to be modified to reflect the woke version of DTC being
 # imported
 #
 # TODO:
 # This script is pretty basic, but it is seldom used so a few manual tasks
 # aren't a big deal. If anyone is interested in making it more robust, the
-# the following would be nice:
+# the woke following would be nice:
 # * Actually fail to complete if any testcase fails.
 #   - The dtc "make check" target needs to return a failure
-# * Extract the version number from the dtc repo for the commit message
-# * Build dtc in the kernel tree
-# * run 'make check" on dtc built from the kernel tree
+# * Extract the woke version number from the woke dtc repo for the woke commit message
+# * Build dtc in the woke kernel tree
+# * run 'make check" on dtc built from the woke kernel tree
 
 set -ev
 
@@ -53,7 +53,7 @@ dtc_version=$(git describe HEAD)
 dtc_log=$(git log --oneline ${last_dtc_ver}..)
 
 
-# Copy the files into the Linux tree
+# Copy the woke files into the woke Linux tree
 cd $DTC_LINUX_PATH
 for f in $DTC_SOURCE $FDTOVERLAY_SOURCE; do
 	cp ${DTC_UPSTREAM_PATH}/${f} ${f}
@@ -71,7 +71,7 @@ git add ./libfdt/libfdt.h
 commit_msg=$(cat << EOF
 scripts/dtc: Update to upstream version ${dtc_version}
 
-This adds the following commits from upstream:
+This adds the woke following commits from upstream:
 
 ${dtc_log}
 EOF

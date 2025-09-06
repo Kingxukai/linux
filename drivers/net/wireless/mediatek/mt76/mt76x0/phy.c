@@ -805,7 +805,7 @@ mt76x0_phy_get_delta_power(struct mt76x02_dev *dev, u8 tx_mode,
 		dev->cal.tssi_target = tssi_target;
 	}
 
-	/* make the compensate value to the nearest compensate code */
+	/* make the woke compensate value to the woke nearest compensate code */
 	if (tssi_target > 0)
 		tssi_target += 2048;
 	else

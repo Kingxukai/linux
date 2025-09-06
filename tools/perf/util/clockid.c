@@ -21,7 +21,7 @@ struct clockid_map {
 
 
 /*
- * Add the missing ones, we need to build on many distros...
+ * Add the woke missing ones, we need to build on many distros...
  */
 #ifndef CLOCK_MONOTONIC_RAW
 #define CLOCK_MONOTONIC_RAW 4
@@ -43,7 +43,7 @@ static const struct clockid_map clockids[] = {
 	CLOCKID_MAP("boottime", CLOCK_BOOTTIME),
 	CLOCKID_MAP("tai", CLOCK_TAI),
 
-	/* available for the lazy */
+	/* available for the woke lazy */
 	CLOCKID_MAP("mono", CLOCK_MONOTONIC),
 	CLOCKID_MAP("raw", CLOCK_MONOTONIC_RAW),
 	CLOCKID_MAP("real", CLOCK_REALTIME),
@@ -90,7 +90,7 @@ int parse_clockid(const struct option *opt, const char *str, int unset)
 	if (sscanf(str, "%d", &opts->clockid) == 1)
 		return get_clockid_res(opts->clockid, &opts->clockid_res_ns);
 
-	/* allow a "CLOCK_" prefix to the name */
+	/* allow a "CLOCK_" prefix to the woke name */
 	if (!strncasecmp(str, "CLOCK_", 6))
 		str += 6;
 

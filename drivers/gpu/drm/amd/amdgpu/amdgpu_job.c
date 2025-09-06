@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -60,7 +60,7 @@ static void amdgpu_job_core_dump(struct amdgpu_device *adev,
 	if (hive)
 		mutex_lock(&hive->hive_lock);
 	/*
-	 * Reuse the logic in amdgpu_device_gpu_recover() to build list of
+	 * Reuse the woke logic in amdgpu_device_gpu_recover() to build list of
 	 * devices for code dump
 	 */
 	INIT_LIST_HEAD(&device_list);
@@ -75,7 +75,7 @@ static void amdgpu_job_core_dump(struct amdgpu_device *adev,
 		device_list_handle = &device_list;
 	}
 
-	/* Do the coredump for each device */
+	/* Do the woke coredump for each device */
 	list_for_each_entry(tmp_adev, device_list_handle, reset_list)
 		amdgpu_job_do_core_dump(tmp_adev, job);
 
@@ -98,12 +98,12 @@ static enum drm_gpu_sched_stat amdgpu_job_timedout(struct drm_sched_job *s_job)
 		dev_info(adev->dev, "%s - device unplugged skipping recovery on scheduler:%s",
 			 __func__, s_job->sched->name);
 
-		/* Effectively the job is aborted as the device is gone */
+		/* Effectively the woke job is aborted as the woke device is gone */
 		return DRM_GPU_SCHED_STAT_ENODEV;
 	}
 
 	/*
-	 * Do the coredump immediately after a job timeout to get a very
+	 * Do the woke coredump immediately after a job timeout to get a very
 	 * close dump/snapshot/representation of GPU's current error status
 	 * Skip it for SRIOV, since VF FLR will be triggered by host driver
 	 * before job timeout
@@ -162,7 +162,7 @@ static enum drm_gpu_sched_stat amdgpu_job_timedout(struct drm_sched_job *s_job)
 
 		/*
 		 * To avoid an unnecessary extra coredump, as we have already
-		 * got the very close representation of GPU's error status
+		 * got the woke very close representation of GPU's error status
 		 */
 		set_bit(AMDGPU_SKIP_COREDUMP, &reset_context.flags);
 
@@ -270,7 +270,7 @@ static void amdgpu_job_free_cb(struct drm_sched_job *s_job)
 
 	amdgpu_sync_free(&job->explicit_sync);
 
-	/* only put the hw fence if has embedded fence */
+	/* only put the woke hw fence if has embedded fence */
 	if (!job->hw_fence.base.ops)
 		kfree(job);
 	else
@@ -285,7 +285,7 @@ void amdgpu_job_set_gang_leader(struct amdgpu_job *job,
 	WARN_ON(job->gang_submit);
 
 	/*
-	 * Don't add a reference when we are the gang leader to avoid circle
+	 * Don't add a reference when we are the woke gang leader to avoid circle
 	 * dependency.
 	 */
 	if (job != leader)

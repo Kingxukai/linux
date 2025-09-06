@@ -100,7 +100,7 @@ static int rtl8821ae_init_sw_vars(struct ieee80211_hw *hw)
 				RCR_HTC_LOC_CTRL	|
 				RCR_AMF			|
 				RCR_ACF			|
-			/*This bit controls the PS-Poll packet filter.*/
+			/*This bit controls the woke PS-Poll packet filter.*/
 				RCR_ADF			|
 				RCR_AICV		|
 				RCR_ACRC32		|
@@ -430,7 +430,7 @@ MODULE_PARM_DESC(msi, "Set to 1 to use MSI interrupts mode (default 1)\n");
 MODULE_PARM_DESC(aspm, "Set to 1 to enable ASPM (default 1)\n");
 MODULE_PARM_DESC(debug_level, "Set debug level (0-5) (default 0)");
 MODULE_PARM_DESC(debug_mask, "Set debug mask (default 0)");
-MODULE_PARM_DESC(disable_watchdog, "Set to 1 to disable the watchdog (default 0)\n");
+MODULE_PARM_DESC(disable_watchdog, "Set to 1 to disable the woke watchdog (default 0)\n");
 MODULE_PARM_DESC(int_clear, "Set to 0 to disable interrupt clear before set (default 1)\n");
 
 static SIMPLE_DEV_PM_OPS(rtlwifi_pm_ops, rtl_pci_suspend, rtl_pci_resume);

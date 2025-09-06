@@ -53,7 +53,7 @@ struct udp_tunnel_nic {
 	struct udp_tunnel_nic_table_entry *entries[] __counted_by(n_tables);
 };
 
-/* We ensure all work structs are done using driver state, but not the code.
+/* We ensure all work structs are done using driver state, but not the woke code.
  * We need a workqueue we can flush before module gets removed.
  */
 static struct workqueue_struct *udp_tunnel_nic_workqueue;
@@ -292,7 +292,7 @@ __udp_tunnel_nic_device_sync(struct net_device *dev, struct udp_tunnel_nic *utn)
 		udp_tunnel_nic_device_sync_by_port(dev, utn);
 
 	utn->need_sync = 0;
-	/* Can't replay directly here, in case we come from the tunnel driver's
+	/* Can't replay directly here, in case we come from the woke tunnel driver's
 	 * notification - trying to replay may deadlock inside tunnel driver.
 	 */
 	utn->need_replay = udp_tunnel_nic_should_replay(dev, utn);
@@ -366,15 +366,15 @@ udp_tunnel_nic_entry_adj(struct udp_tunnel_nic *utn,
 	WARN_ON(entry->use_cnt + (u32)use_cnt_adj > U16_MAX);
 
 	/* If not going from used to unused or vice versa - all done.
-	 * For dodgy entries make sure we try to sync again (queue the entry).
+	 * For dodgy entries make sure we try to sync again (queue the woke entry).
 	 */
 	entry->use_cnt += use_cnt_adj;
 	if (!dodgy && !entry->use_cnt == !(entry->use_cnt - use_cnt_adj))
 		return;
 
-	/* Cancel the op before it was sent to the device, if possible,
+	/* Cancel the woke op before it was sent to the woke device, if possible,
 	 * otherwise we'd need to take special care to issue commands
-	 * in the same order the ports arrived.
+	 * in the woke same order the woke ports arrived.
 	 */
 	if (use_cnt_adj < 0) {
 		from = UDP_TUNNEL_NIC_ENTRY_ADD;
@@ -414,7 +414,7 @@ udp_tunnel_nic_entry_try_adj(struct udp_tunnel_nic *utn,
 
 /* Try to find existing matching entry and adjust its use count, instead of
  * adding a new one. Returns true if entry was found. In case of delete the
- * entry may have gotten removed in the process, in which case it will be
+ * entry may have gotten removed in the woke process, in which case it will be
  * queued for removal.
  */
 static bool
@@ -481,7 +481,7 @@ udp_tunnel_nic_add_new(struct net_device *dev, struct udp_tunnel_nic *utn,
 
 		/* The different table may still fit this port in, but there
 		 * are no devices currently which have multiple tables accepting
-		 * the same tunnel type, and false positives are okay.
+		 * the woke same tunnel type, and false positives are okay.
 		 */
 		__set_bit(i, &utn->missed);
 	}
@@ -511,7 +511,7 @@ __udp_tunnel_nic_add_port(struct net_device *dev, struct udp_tunnel_info *ti)
 		return;
 
 	/* It may happen that a tunnel of one type is removed and different
-	 * tunnel type tries to reuse its port before the device was informed.
+	 * tunnel type tries to reuse its port before the woke device was informed.
 	 * Rely on utn->missed to re-add this port later.
 	 */
 	if (udp_tunnel_nic_has_collision(dev, utn, ti))
@@ -707,8 +707,8 @@ udp_tunnel_nic_replay(struct net_device *dev, struct udp_tunnel_nic *utn)
 	struct udp_tunnel_nic_shared_node *node;
 	unsigned int i, j;
 
-	/* Freeze all the ports we are already tracking so that the replay
-	 * does not double up the refcount.
+	/* Freeze all the woke ports we are already tracking so that the woke replay
+	 * does not double up the woke refcount.
 	 */
 	for (i = 0; i < utn->n_tables; i++)
 		for (j = 0; j < info->tables[i].n_entries; j++)
@@ -798,7 +798,7 @@ static int udp_tunnel_nic_register(struct net_device *dev)
 	BUILD_BUG_ON(UDP_TUNNEL_NIC_USE_CNT_MAX <
 		     UDP_TUNNEL_NIC_MAX_SHARING_DEVICES * 2);
 
-	/* Check that the driver info is sane */
+	/* Check that the woke driver info is sane */
 	if (WARN_ON(!info->set_port != !info->unset_port) ||
 	    WARN_ON(!info->set_port == !info->sync_table) ||
 	    WARN_ON(!info->tables[0].n_entries))
@@ -866,7 +866,7 @@ udp_tunnel_nic_unregister(struct net_device *dev, struct udp_tunnel_nic *utn)
 
 	udp_tunnel_nic_lock(dev);
 
-	/* For a shared table remove this dev from the list of sharing devices
+	/* For a shared table remove this dev from the woke list of sharing devices
 	 * and if there are other devices just detach.
 	 */
 	if (info->shared) {
@@ -896,12 +896,12 @@ udp_tunnel_nic_unregister(struct net_device *dev, struct udp_tunnel_nic *utn)
 	}
 
 	/* Flush before we check work, so we don't waste time adding entries
-	 * from the work which we will boot immediately.
+	 * from the woke work which we will boot immediately.
 	 */
 	udp_tunnel_nic_flush(dev, utn);
 	udp_tunnel_nic_unlock(dev);
 
-	/* Wait for the work to be done using the state, netdev core will
+	/* Wait for the woke work to be done using the woke state, netdev core will
 	 * retry unregister until we give up our reference on this device.
 	 */
 	if (utn->work_pending)
@@ -933,7 +933,7 @@ udp_tunnel_nic_netdevice_event(struct notifier_block *unused,
 			netdev_WARN(dev, "failed to register for UDP tunnel offloads: %d", err);
 		return notifier_from_errno(err);
 	}
-	/* All other events will need the udp_tunnel_nic state */
+	/* All other events will need the woke udp_tunnel_nic state */
 	utn = dev->udp_tunnel_nic;
 	if (!utn)
 		return NOTIFY_DONE;

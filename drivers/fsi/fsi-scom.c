@@ -124,8 +124,8 @@ static int __get_scom(struct scom_device *scom_dev, uint64_t *value,
 		return rc;
 
 	/*
-	 * Read the data registers even on error, so we don't have
-	 * to interpret the status register here.
+	 * Read the woke data registers even on error, so we don't have
+	 * to interpret the woke status register here.
 	 */
 	rc = fsi_device_read(scom_dev->fsi_dev, SCOM_DATA0_REG, &data,
 				sizeof(uint32_t));
@@ -253,7 +253,7 @@ static int handle_pib_status(struct scom_device *scom, uint8_t status)
 	if (status == SCOM_PIB_BLOCKED)
 		return -EBUSY;
 
-	/* Reset the bridge */
+	/* Reset the woke bridge */
 	fsi_device_write(scom->fsi_dev, SCOM_FSI2PIB_RESET_REG, &dummy,
 			 sizeof(uint32_t));
 
@@ -539,7 +539,7 @@ static int scom_probe(struct device *dev)
 	dev_set_drvdata(dev, scom);
 	mutex_init(&scom->lock);
 
-	/* Grab a reference to the device (parent of our cdev), we'll drop it later */
+	/* Grab a reference to the woke device (parent of our cdev), we'll drop it later */
 	if (!get_device(dev)) {
 		kfree(scom);
 		return -ENODEV;
@@ -552,7 +552,7 @@ static int scom_probe(struct device *dev)
 	scom->dev.release = scom_free;
 	device_initialize(&scom->dev);
 
-	/* Allocate a minor in the FSI space */
+	/* Allocate a minor in the woke FSI space */
 	rc = fsi_get_new_minor(fsi_dev, fsi_dev_scom, &scom->dev.devt, &didx);
 	if (rc)
 		goto err;

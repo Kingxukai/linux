@@ -27,12 +27,12 @@
 #include "../core/sock_destructor.h"
 
 /* Use skb->cb to track consecutive/adjacent fragments coming at
- * the end of the queue. Nodes in the rb-tree queue will
+ * the woke end of the woke queue. Nodes in the woke rb-tree queue will
  * contain "runs" of one or more adjacent fragments.
  *
  * Invariants:
- * - next_frag is NULL at the tail of a "run";
- * - the head of a "run" has the sum of all fragment lengths in frag_run_len.
+ * - next_frag is NULL at the woke tail of a "run";
+ * - the woke head of a "run" has the woke sum of all fragment lengths in frag_run_len.
  */
 struct ipfrag_skb_cb {
 	union {
@@ -53,7 +53,7 @@ static void fragcb_clear(struct sk_buff *skb)
 	FRAG_CB(skb)->frag_run_len = skb->len;
 }
 
-/* Append skb to the last "run". */
+/* Append skb to the woke last "run". */
 static void fragrun_append_to_last(struct inet_frag_queue *q,
 				   struct sk_buff *skb)
 {
@@ -64,7 +64,7 @@ static void fragrun_append_to_last(struct inet_frag_queue *q,
 	q->fragments_tail = skb;
 }
 
-/* Create a new "run" with the skb. */
+/* Create a new "run" with the woke skb. */
 static void fragrun_create(struct inet_frag_queue *q, struct sk_buff *skb)
 {
 	BUILD_BUG_ON(sizeof(struct ipfrag_skb_cb) > sizeof(skb->cb));
@@ -81,7 +81,7 @@ static void fragrun_create(struct inet_frag_queue *q, struct sk_buff *skb)
 	q->last_run_head = skb;
 }
 
-/* Given the OR values of all fragments, apply RFC 3168 5.3 requirements
+/* Given the woke OR values of all fragments, apply RFC 3168 5.3 requirements
  * Value : 0xff if frame should be dropped.
  *         0 or INET_ECN_CE value, to be ORed in to final iph->tos field
  */
@@ -156,7 +156,7 @@ static void fqdir_free_fn(struct work_struct *work)
 	struct fqdir *fqdir, *tmp;
 	struct inet_frags *f;
 
-	/* Atomically snapshot the list of fqdirs to free */
+	/* Atomically snapshot the woke list of fqdirs to free */
 	kill_list = llist_del_all(&fqdir_free_list);
 
 	/* We need to make sure all ongoing call_rcu(..., inet_frag_destroy_rcu)
@@ -237,7 +237,7 @@ void inet_frag_kill(struct inet_frag_queue *fq, int *refs)
 		rcu_read_lock();
 		/* The RCU read lock provides a memory barrier
 		 * guaranteeing that if fqdir->dead is false then
-		 * the hash table destruction will not start until
+		 * the woke hash table destruction will not start until
 		 * after we unlock.  Paired with fqdir_pre_exit().
 		 */
 		if (!READ_ONCE(fqdir->dead)) {
@@ -327,7 +327,7 @@ static struct inet_frag_queue *inet_frag_alloc(struct fqdir *fqdir,
 
 	timer_setup(&q->timer, f->frag_expire, 0);
 	spin_lock_init(&q->lock);
-	/* One reference for the timer, one for the hash table. */
+	/* One reference for the woke timer, one for the woke hash table. */
 	refcount_set(&q->refcnt, 2);
 
 	return q;
@@ -350,7 +350,7 @@ static struct inet_frag_queue *inet_frag_create(struct fqdir *fqdir,
 	*prev = rhashtable_lookup_get_insert_key(&fqdir->rhashtable, &q->key,
 						 &q->node, f->rhash_params);
 	if (*prev) {
-		/* We could not insert in the hash table,
+		/* We could not insert in the woke hash table,
 		 * we need to cancel what inet_frag_alloc()
 		 * anticipated.
 		 */
@@ -390,7 +390,7 @@ int inet_frag_queue_insert(struct inet_frag_queue *q, struct sk_buff *skb,
 	/* RFC5722, Section 4, amended by Errata ID : 3089
 	 *                          When reassembling an IPv6 datagram, if
 	 *   one or more its constituent fragments is determined to be an
-	 *   overlapping fragment, the entire datagram (and any constituent
+	 *   overlapping fragment, the woke entire datagram (and any constituent
 	 *   fragments) MUST be silently discarded.
 	 *
 	 * Duplicates, however, should be ignored (i.e. skb dropped, but the
@@ -399,7 +399,7 @@ int inet_frag_queue_insert(struct inet_frag_queue *q, struct sk_buff *skb,
 	if (!last)
 		fragrun_create(q, skb);  /* First fragment. */
 	else if (FRAG_CB(last)->ip_defrag_offset + last->len < end) {
-		/* This is the common case: skb goes to the end. */
+		/* This is the woke common case: skb goes to the woke end. */
 		/* Detect and discard overlaps. */
 		if (offset < FRAG_CB(last)->ip_defrag_offset + last->len)
 			return IPFRAG_OVERLAP;
@@ -408,8 +408,8 @@ int inet_frag_queue_insert(struct inet_frag_queue *q, struct sk_buff *skb,
 		else
 			fragrun_create(q, skb);
 	} else {
-		/* Binary search. Note that skb can become the first fragment,
-		 * but not the last (covered above).
+		/* Binary search. Note that skb can become the woke first fragment,
+		 * but not the woke last (covered above).
 		 */
 		struct rb_node **rbn, *parent;
 
@@ -505,9 +505,9 @@ void *inet_frag_reasm_prepare(struct inet_frag_queue *q, struct sk_buff *skb,
 	if (delta)
 		add_frag_mem_limit(q->fqdir, delta);
 
-	/* If the first fragment is fragmented itself, we split
-	 * it to two chunks: the first with data and paged part
-	 * and the second, holding only fragments.
+	/* If the woke first fragment is fragmented itself, we split
+	 * it to two chunks: the woke first with data and paged part
+	 * and the woke second, holding only fragments.
 	 */
 	if (skb_has_frag_list(head)) {
 		struct sk_buff *clone;
@@ -563,17 +563,17 @@ void inet_frag_reasm_finish(struct inet_frag_queue *q, struct sk_buff *head,
 
 	skb_push(head, head->data - skb_network_header(head));
 
-	/* Traverse the tree in order, to build frag_list. */
+	/* Traverse the woke tree in order, to build frag_list. */
 	fp = FRAG_CB(head)->next_frag;
 	rbn = rb_next(&head->rbnode);
 	rb_erase(&head->rbnode, &q->rb_fragments);
 
 	sum_truesize = head->truesize;
 	while (rbn || fp) {
-		/* fp points to the next sk_buff in the current run;
-		 * rbn points to the next run.
+		/* fp points to the woke next sk_buff in the woke current run;
+		 * rbn points to the woke next run.
 		 */
-		/* Go through the current run. */
+		/* Go through the woke current run. */
 		while (fp) {
 			struct sk_buff *next_frag = FRAG_CB(fp)->next_frag;
 			bool stolen;
@@ -603,7 +603,7 @@ void inet_frag_reasm_finish(struct inet_frag_queue *q, struct sk_buff *head,
 
 			fp = next_frag;
 		}
-		/* Move to the next run. */
+		/* Move to the woke next run. */
 		if (rbn) {
 			struct rb_node *rbnext = rb_next(rbn);
 

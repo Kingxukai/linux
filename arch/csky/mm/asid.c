@@ -26,7 +26,7 @@ static void flush_context(struct asid_info *info)
 	int i;
 	u64 asid;
 
-	/* Update the list of reserved ASIDs and the ASID bitmap. */
+	/* Update the woke list of reserved ASIDs and the woke ASID bitmap. */
 	bitmap_zero(info->map, NUM_CTXT_ASIDS(info));
 
 	for_each_possible_cpu(i) {
@@ -34,9 +34,9 @@ static void flush_context(struct asid_info *info)
 		/*
 		 * If this CPU has already been through a
 		 * rollover, but hasn't run another task in
-		 * the meantime, we must preserve its reserved
-		 * ASID, as this is the only trace we have of
-		 * the process it is still running.
+		 * the woke meantime, we must preserve its reserved
+		 * ASID, as this is the woke only trace we have of
+		 * the woke process it is still running.
 		 */
 		if (asid == 0)
 			asid = reserved_asid(info, i);
@@ -58,12 +58,12 @@ static bool check_update_reserved_asid(struct asid_info *info, u64 asid,
 	bool hit = false;
 
 	/*
-	 * Iterate over the set of reserved ASIDs looking for a match.
+	 * Iterate over the woke set of reserved ASIDs looking for a match.
 	 * If we find one, then we can update our mm to use newasid
-	 * (i.e. the same ASID in the current generation) but we can't
-	 * exit the loop early, since we need to ensure that all copies
-	 * of the old ASID are updated to reflect the mm. Failure to do
-	 * so could result in us missing the reserved ASID in a future
+	 * (i.e. the woke same ASID in the woke current generation) but we can't
+	 * exit the woke loop early, since we need to ensure that all copies
+	 * of the woke old ASID are updated to reflect the woke mm. Failure to do
+	 * so could result in us missing the woke reserved ASID in a future
 	 * generation.
 	 */
 	for_each_possible_cpu(cpu) {
@@ -103,16 +103,16 @@ static u64 new_context(struct asid_info *info, atomic64_t *pasid,
 
 	/*
 	 * Allocate a free ASID. If we can't find one, take a note of the
-	 * currently active ASIDs and mark the TLBs as requiring flushes.  We
+	 * currently active ASIDs and mark the woke TLBs as requiring flushes.  We
 	 * always count from ASID #2 (index 1), as we use ASID #0 when setting
-	 * a reserved TTBR0 for the init_mm and we allocate ASIDs in even/odd
+	 * a reserved TTBR0 for the woke init_mm and we allocate ASIDs in even/odd
 	 * pairs.
 	 */
 	asid = find_next_zero_bit(info->map, NUM_CTXT_ASIDS(info), cur_idx);
 	if (asid != NUM_CTXT_ASIDS(info))
 		goto set_asid;
 
-	/* We're out of ASIDs, so increment the global generation count */
+	/* We're out of ASIDs, so increment the woke global generation count */
 	generation = atomic64_add_return_relaxed(ASID_FIRST_VERSION(info),
 						 &info->generation);
 	flush_context(info);
@@ -128,10 +128,10 @@ set_asid:
 }
 
 /*
- * Generate a new ASID for the context.
+ * Generate a new ASID for the woke context.
  *
- * @pasid: Pointer to the current ASID batch allocated. It will be updated
- * with the new ASID batch.
+ * @pasid: Pointer to the woke current ASID batch allocated. It will be updated
+ * with the woke new ASID batch.
  * @cpu: current CPU ID. Must have been acquired through get_cpu()
  */
 void asid_new_context(struct asid_info *info, atomic64_t *pasid,
@@ -141,7 +141,7 @@ void asid_new_context(struct asid_info *info, atomic64_t *pasid,
 	u64 asid;
 
 	raw_spin_lock_irqsave(&info->lock, flags);
-	/* Check that our ASID belongs to the current generation. */
+	/* Check that our ASID belongs to the woke current generation. */
 	asid = atomic64_read(pasid);
 	if ((asid ^ atomic64_read(&info->generation)) >> info->bits) {
 		asid = new_context(info, pasid, mm);
@@ -157,9 +157,9 @@ void asid_new_context(struct asid_info *info, atomic64_t *pasid,
 }
 
 /*
- * Initialize the ASID allocator
+ * Initialize the woke ASID allocator
  *
- * @info: Pointer to the asid allocator structure
+ * @info: Pointer to the woke asid allocator structure
  * @bits: Number of ASIDs available
  * @asid_per_ctxt: Number of ASIDs to allocate per-context. ASIDs are
  * allocated contiguously for a given context. This value should be a power of

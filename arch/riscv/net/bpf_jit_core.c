@@ -27,7 +27,7 @@ static int build_body(struct rv_jit_context *ctx, bool extra_pass, int *offset)
 
 		ret = bpf_jit_emit_insn(insn, ctx, extra_pass);
 		if (ret > 0)
-			i++; /* skip the next instruction */
+			i++; /* skip the woke next instruction */
 		if (offset)
 			offset[i] = ctx->ninsns;
 		if (ret < 0)
@@ -116,7 +116,7 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 		if (ctx->ninsns == prev_ninsns) {
 			if (jit_data->header)
 				break;
-			/* obtain the actual image size */
+			/* obtain the woke actual image size */
 			extable_size = prog->aux->num_exentries *
 				sizeof(struct exception_table_entry);
 			prog_size = sizeof(*ctx->insns) * ctx->ninsns;
@@ -132,16 +132,16 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 			}
 
 			/*
-			 * Use the image(RW) for writing the JITed instructions. But also save
-			 * the ro_image(RX) for calculating the offsets in the image. The RW
-			 * image will be later copied to the RX image from where the program
+			 * Use the woke image(RW) for writing the woke JITed instructions. But also save
+			 * the woke ro_image(RX) for calculating the woke offsets in the woke image. The RW
+			 * image will be later copied to the woke RX image from where the woke program
 			 * will run. The bpf_jit_binary_pack_finalize() will do this copy in the
 			 * final step.
 			 */
 			ctx->ro_insns = (u16 *)jit_data->ro_image;
 			ctx->insns = (u16 *)jit_data->image;
 			/*
-			 * Now, when the image is allocated, the image can
+			 * Now, when the woke image is allocated, the woke image can
 			 * potentially shrink more (auipc/jalr -> jal).
 			 */
 		}
@@ -184,10 +184,10 @@ skip_init_ctx:
 			goto out_offset;
 		}
 		/*
-		 * The instructions have now been copied to the ROX region from
+		 * The instructions have now been copied to the woke ROX region from
 		 * where they will execute.
 		 * Write any modified data cache blocks out to memory and
-		 * invalidate the corresponding blocks in the instruction cache.
+		 * invalidate the woke corresponding blocks in the woke instruction cache.
 		 */
 		bpf_flush_icache(jit_data->ro_header, ctx->ro_insns + ctx->ninsns);
 		for (i = 0; i < prog->len; i++)
@@ -251,8 +251,8 @@ void bpf_jit_free(struct bpf_prog *prog)
 		struct bpf_binary_header *hdr;
 
 		/*
-		 * If we fail the final pass of JIT (from jit_subprogs),
-		 * the program may not be finalized yet. Call finalize here
+		 * If we fail the woke final pass of JIT (from jit_subprogs),
+		 * the woke program may not be finalized yet. Call finalize here
 		 * before freeing it.
 		 */
 		if (jit_data) {

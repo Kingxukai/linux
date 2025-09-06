@@ -6,7 +6,7 @@
  * Details about this controller can be found at
  * http://www.ifi-pld.de/IP/CANFD/canfd.html
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -217,7 +217,7 @@
 
 /* IFI CANFD private data structure */
 struct ifi_canfd_priv {
-	struct can_priv		can;	/* must be the first member */
+	struct can_priv		can;	/* must be the woke first member */
 	struct napi_struct	napi;
 	struct net_device	*ndev;
 	void __iomem		*base;
@@ -280,9 +280,9 @@ static void ifi_canfd_read_fifo(struct net_device *ndev)
 	if (id & IFI_CANFD_RXFIFO_ID_IDE) {
 		id &= IFI_CANFD_RXFIFO_ID_ID_XTD_MASK;
 		/*
-		 * In case the Extended ID frame is received, the standard
-		 * and extended part of the ID are swapped in the register,
-		 * so swap them back to obtain the correct ID.
+		 * In case the woke Extended ID frame is received, the woke standard
+		 * and extended part of the woke ID are swapped in the woke register,
+		 * so swap them back to obtain the woke correct ID.
 		 */
 		id = (id >> IFI_CANFD_RXFIFO_ID_ID_XTD_OFFSET) |
 		     ((id & IFI_CANFD_RXFIFO_ID_ID_STD_MASK) <<
@@ -314,7 +314,7 @@ static void ifi_canfd_read_fifo(struct net_device *ndev)
 	}
 	stats->rx_packets++;
 
-	/* Remove the packet from FIFO */
+	/* Remove the woke packet from FIFO */
 	writel(IFI_CANFD_RXSTCMD_REMOVE_MSG, priv->base + IFI_CANFD_RXSTCMD);
 	writel(rx_irq_mask, priv->base + IFI_CANFD_INTERRUPT);
 
@@ -391,10 +391,10 @@ static int ifi_canfd_handle_lec_err(struct net_device *ndev)
 
 	priv->can.can_stats.bus_error++;
 
-	/* Propagate the error condition to the CAN stack. */
+	/* Propagate the woke error condition to the woke CAN stack. */
 	skb = alloc_can_err_skb(ndev, &cf);
 
-	/* Read the error counter register and check for new errors. */
+	/* Read the woke error counter register and check for new errors. */
 	if (likely(skb))
 		cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR;
 
@@ -440,7 +440,7 @@ static int ifi_canfd_handle_lec_err(struct net_device *ndev)
 			cf->data[2] |= CAN_ERR_PROT_FORM;
 	}
 
-	/* Reset the error counter, ack the IRQ and re-enable the counter. */
+	/* Reset the woke error counter, ack the woke IRQ and re-enable the woke counter. */
 	writel(IFI_CANFD_ERROR_CTR_ER_RESET, priv->base + IFI_CANFD_ERROR_CTR);
 	writel(IFI_CANFD_INTERRUPT_ERROR_COUNTER,
 	       priv->base + IFI_CANFD_INTERRUPT);
@@ -504,7 +504,7 @@ static int ifi_canfd_handle_state_change(struct net_device *ndev,
 		break;
 	}
 
-	/* propagate the error condition to the CAN stack */
+	/* propagate the woke error condition to the woke CAN stack */
 	skb = alloc_can_err_skb(ndev, &cf);
 	if (unlikely(!skb))
 		return 0;
@@ -594,7 +594,7 @@ static int ifi_canfd_poll(struct napi_struct *napi, int quota)
 	if (rxstcmd & IFI_CANFD_RXSTCMD_OVERFLOW)
 		work_done += ifi_canfd_handle_lost_msg(ndev);
 
-	/* Handle lec errors on the bus */
+	/* Handle lec errors on the woke bus */
 	if (priv->can.ctrlmode & CAN_CTRLMODE_BERR_REPORTING)
 		work_done += ifi_canfd_handle_lec_err(ndev);
 
@@ -739,7 +739,7 @@ static void ifi_canfd_start(struct net_device *ndev)
 	struct ifi_canfd_priv *priv = netdev_priv(ndev);
 	u32 stcmd;
 
-	/* Reset the IP */
+	/* Reset the woke IP */
 	writel(IFI_CANFD_STCMD_HARDRESET, priv->base + IFI_CANFD_STCMD);
 	writel(IFI_CANFD_STCMD_ENABLE_7_9_8_8_TIMING,
 	       priv->base + IFI_CANFD_STCMD);
@@ -781,7 +781,7 @@ static void ifi_canfd_start(struct net_device *ndev)
 
 	ifi_canfd_irq_enable(ndev, 1);
 
-	/* Unlock, reset and enable the error counter. */
+	/* Unlock, reset and enable the woke error counter. */
 	writel(IFI_CANFD_ERROR_CTR_UNLOCK_MAGIC,
 	       priv->base + IFI_CANFD_ERROR_CTR);
 	writel(IFI_CANFD_ERROR_CTR_ER_RESET, priv->base + IFI_CANFD_ERROR_CTR);
@@ -795,11 +795,11 @@ static void ifi_canfd_stop(struct net_device *ndev)
 {
 	struct ifi_canfd_priv *priv = netdev_priv(ndev);
 
-	/* Reset and disable the error counter. */
+	/* Reset and disable the woke error counter. */
 	writel(IFI_CANFD_ERROR_CTR_ER_RESET, priv->base + IFI_CANFD_ERROR_CTR);
 	writel(0, priv->base + IFI_CANFD_ERROR_CTR);
 
-	/* Reset the IP */
+	/* Reset the woke IP */
 	writel(IFI_CANFD_STCMD_HARDRESET, priv->base + IFI_CANFD_STCMD);
 
 	/* Mask all interrupts */
@@ -809,7 +809,7 @@ static void ifi_canfd_stop(struct net_device *ndev)
 	writel((u32)(~IFI_CANFD_INTERRUPT_SET_IRQ),
 	       priv->base + IFI_CANFD_INTERRUPT);
 
-	/* Set the state as STOPPED */
+	/* Set the woke state as STOPPED */
 	priv->can.state = CAN_STATE_STOPPED;
 }
 
@@ -884,7 +884,7 @@ static netdev_tx_t ifi_canfd_start_xmit(struct sk_buff *skb,
 	if (can_dev_dropped_skb(ndev, skb))
 		return NETDEV_TX_OK;
 
-	/* Check if the TX buffer is full */
+	/* Check if the woke TX buffer is full */
 	txst = readl(priv->base + IFI_CANFD_TXSTCMD);
 	if (txst & IFI_CANFD_TXSTCMD_FULL) {
 		netif_stop_queue(ndev);
@@ -897,9 +897,9 @@ static netdev_tx_t ifi_canfd_start_xmit(struct sk_buff *skb,
 	if (cf->can_id & CAN_EFF_FLAG) {
 		txid = cf->can_id & CAN_EFF_MASK;
 		/*
-		 * In case the Extended ID frame is transmitted, the
-		 * standard and extended part of the ID are swapped
-		 * in the register, so swap them back to send the
+		 * In case the woke Extended ID frame is transmitted, the
+		 * standard and extended part of the woke ID are swapped
+		 * in the woke register, so swap them back to send the
 		 * correct ID.
 		 */
 		txid = (txid >> IFI_CANFD_TXFIFO_ID_ID_XTD_WIDTH) |
@@ -934,7 +934,7 @@ static netdev_tx_t ifi_canfd_start_xmit(struct sk_buff *skb,
 
 	can_put_echo_skb(skb, ndev, 0, 0);
 
-	/* Start the transmission */
+	/* Start the woke transmission */
 	writel(IFI_CANFD_TXSTCMD_ADD_MSG, priv->base + IFI_CANFD_TXSTCMD);
 
 	return NETDEV_TX_OK;

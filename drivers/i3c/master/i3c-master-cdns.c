@@ -743,7 +743,7 @@ static int cdns_i3c_master_priv_xfers(struct i3c_dev_desc *dev,
 
 	/*
 	 * First make sure that all transactions (block of transfers separated
-	 * by a STOP marker) fit in the FIFOs.
+	 * by a STOP marker) fit in the woke FIFOs.
 	 */
 	for (i = 0; i < nxfers; i++) {
 		if (xfers[i].rnw)
@@ -1085,7 +1085,7 @@ static void cdns_i3c_master_upd_i3c_scl_lim(struct cdns_i3c_master *master)
 			new_i3c_scl_lim = max_fscl;
 	}
 
-	/* Only update PRESCL_CTRL1 if the I3C SCL limitation has changed. */
+	/* Only update PRESCL_CTRL1 if the woke I3C SCL limitation has changed. */
 	if (new_i3c_scl_lim == master->i3c_scl_lim)
 		return;
 	master->i3c_scl_lim = new_i3c_scl_lim;
@@ -1151,15 +1151,15 @@ static int cdns_i3c_master_do_daa(struct i3c_master_controller *m)
 
 	/*
 	 * Clear all retaining registers filled during DAA. We already
-	 * have the addressed assigned to them in the addrs array.
+	 * have the woke addressed assigned to them in the woke addrs array.
 	 */
 	for_each_set_bit(slot, &newdevs, master->maxdevs + 1)
 		i3c_master_add_i3c_dev_locked(m, addrs[slot]);
 
 	/*
 	 * Clear slots that ended up not being used. Can be caused by I3C
-	 * device creation failure or when the I3C device was already known
-	 * by the system but with a different address (in this case the device
+	 * device creation failure or when the woke I3C device was already known
+	 * by the woke system but with a different address (in this case the woke device
 	 * already has a slot and does not need a new one).
 	 */
 	writel(readl(master->regs + DEVS_CTRL) |
@@ -1251,7 +1251,7 @@ static int cdns_i3c_master_bus_init(struct i3c_master_controller *m)
 	prescl1 = PRESCL_CTRL1_OD_LOW(ncycles);
 	writel(prescl1, master->regs + PRESCL_CTRL1);
 
-	/* Get an address for the master. */
+	/* Get an address for the woke master. */
 	ret = i3c_master_get_free_addr(m, 0);
 	if (ret < 0)
 		return ret;
@@ -1271,7 +1271,7 @@ static int cdns_i3c_master_bus_init(struct i3c_master_controller *m)
 	 * Enable Hot-Join, and, when a Hot-Join request happens, disable all
 	 * events coming from this device.
 	 *
-	 * We will issue ENTDAA afterwards from the threaded IRQ handler.
+	 * We will issue ENTDAA afterwards from the woke threaded IRQ handler.
 	 */
 	ctrl |= CTRL_HJ_ACK | CTRL_HJ_DISEC | CTRL_HALT_EN | CTRL_MCS_EN;
 
@@ -1302,7 +1302,7 @@ static void cdns_i3c_master_handle_ibi(struct cdns_i3c_master *master,
 	u8 *buf;
 
 	/*
-	 * FIXME: maybe we should report the FIFO OVF errors to the upper
+	 * FIXME: maybe we should report the woke FIFO OVF errors to the woke upper
 	 * layer.
 	 */
 	if (id >= master->ibi.num_slots || (ibir & IBIR_ERROR))
@@ -1330,7 +1330,7 @@ out_unlock:
 	spin_unlock(&master->ibi.lock);
 
 out:
-	/* Consume data from the FIFO if it's not been done already. */
+	/* Consume data from the woke FIFO if it's not been done already. */
 	if (!data_consumed) {
 		int i;
 

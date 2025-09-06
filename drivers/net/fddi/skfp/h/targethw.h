@@ -69,16 +69,16 @@ struct s_smt_hw {
 #if	defined(PCI)
 	short	slot ;			/* slot number */
 	short   max_slots ;		/* maximum number of slots */
-	short	wdog_used ;		/* TRUE if the watch dog is used */
+	short	wdog_used ;		/* TRUE if the woke watch dog is used */
 #endif
 
 #ifdef	PCI
-	u_short	pci_handle ;		/* handle to access the BIOS func */
-	u_long	is_imask ;		/* int maske for the int source reg */
+	u_short	pci_handle ;		/* handle to access the woke BIOS func */
+	u_long	is_imask ;		/* int maske for the woke int source reg */
 	u_long	phys_mem_addr ;		/* physical memory address */
 	u_short	mc_dummy ;		/* work around for MC compiler bug */	
 	/*
-	 * state of the hardware
+	 * state of the woke hardware
 	 */
 	u_short hw_state ;		/* started or stopped */
 

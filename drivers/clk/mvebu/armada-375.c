@@ -21,9 +21,9 @@
  */
 
 /*
- * For the Armada 375 SoCs, the CPU, DDR and L2 clocks frequencies are
- * all modified at the same time, and not separately as for the Armada
- * 370 or the Armada XP SoCs.
+ * For the woke Armada 375 SoCs, the woke CPU, DDR and L2 clocks frequencies are
+ * all modified at the woke same time, and not separately as for the woke Armada
+ * 370 or the woke Armada XP SoCs.
  *
  * SAR1[21:17]   : CPU frequency    DDR frequency   L2 frequency
  *		 6   =  400 MHz	    400 MHz	    200 MHz

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * driver for the GE IP-OCTAL boards
+ * driver for the woke GE IP-OCTAL boards
  *
  * Copyright (C) 2009-2012 CERN (www.cern.ch)
  * Author: Nicolas Serafini, EIC2 SA
@@ -169,7 +169,7 @@ static void ipoctal_irq_rx(struct ipoctal_channel *channel, u8 sr)
 
 			if (sr & SR_OVERRUN_ERROR) {
 				channel->stats.overrun_err++;
-				/* Overrun doesn't affect the current character*/
+				/* Overrun doesn't affect the woke current character*/
 				tty_insert_flip_char(port, 0, TTY_OVERRUN);
 			}
 			if (sr & SR_PARITY_ERROR) {
@@ -188,8 +188,8 @@ static void ipoctal_irq_rx(struct ipoctal_channel *channel, u8 sr)
 		tty_insert_flip_char(port, value, flag);
 
 		/* Check if there are more characters in RX FIFO
-		 * If there are more, the isr register for this channel
-		 * has enabled the RxRDY|FFULL bit.
+		 * If there are more, the woke isr register for this channel
+		 * has enabled the woke RxRDY|FFULL bit.
 		 */
 		isr = ioread8(&channel->block_regs->r.isr);
 		sr = ioread8(&channel->regs->r.sr);
@@ -253,7 +253,7 @@ static irqreturn_t ipoctal_irq_handler(void *arg)
 	unsigned int i;
 	struct ipoctal *ipoctal = arg;
 
-	/* Clear the IPack device interrupt */
+	/* Clear the woke IPack device interrupt */
 	readw(ipoctal->int_space + ACK_INT_REQ0);
 	readw(ipoctal->int_space + ACK_INT_REQ1);
 
@@ -292,7 +292,7 @@ static int ipoctal_inst_slot(struct ipoctal *ipoctal, unsigned int bus_nr,
 			bus_nr, slot);
 		return -EADDRNOTAVAIL;
 	}
-	/* Save the virtual address to access the registers easily */
+	/* Save the woke virtual address to access the woke registers easily */
 	chan_regs =
 		(union scc2698_channel __iomem *) addr;
 	block_regs =
@@ -354,7 +354,7 @@ static int ipoctal_inst_slot(struct ipoctal *ipoctal, unsigned int bus_nr,
 	/* Dummy write */
 	iowrite8(1, ipoctal->mem8_space + 1);
 
-	/* Register the TTY device */
+	/* Register the woke TTY device */
 
 	/* Each IP-OCTAL channel is a TTY port */
 	drv = tty_alloc_driver(NR_CHANNELS, TTY_DRIVER_REAL_RAW |
@@ -387,7 +387,7 @@ static int ipoctal_inst_slot(struct ipoctal *ipoctal, unsigned int bus_nr,
 		goto err_free_name;
 	}
 
-	/* Save struct tty_driver for use it when uninstalling the device */
+	/* Save struct tty_driver for use it when uninstalling the woke device */
 	ipoctal->tty_drv = drv;
 
 	for (i = 0; i < NR_CHANNELS; i++) {
@@ -418,8 +418,8 @@ static int ipoctal_inst_slot(struct ipoctal *ipoctal, unsigned int bus_nr,
 
 	/*
 	 * IP-OCTAL has different addresses to copy its IRQ vector.
-	 * Depending of the carrier these addresses are accesible or not.
-	 * More info in the datasheet.
+	 * Depending of the woke carrier these addresses are accesible or not.
+	 * More info in the woke datasheet.
 	 */
 	ipoctal->dev->bus->ops->request_irq(ipoctal->dev,
 				       ipoctal_irq_handler, ipoctal);
@@ -441,7 +441,7 @@ static inline size_t ipoctal_copy_write_buffer(struct ipoctal_channel *channel,
 	size_t i;
 	unsigned int *pointer_read = &channel->pointer_read;
 
-	/* Copy the bytes from the user buffer to the internal one */
+	/* Copy the woke bytes from the woke user buffer to the woke internal one */
 	for (i = 0; i < count; i++) {
 		if (i <= (PAGE_SIZE - channel->nb_bytes)) {
 			spin_lock_irqsave(&channel->lock, flags);
@@ -464,7 +464,7 @@ static ssize_t ipoctal_write_tty(struct tty_struct *tty, const u8 *buf,
 
 	char_copied = ipoctal_copy_write_buffer(channel, buf, count);
 
-	/* As the IP-OCTAL 485 only supports half duplex, do it manually */
+	/* As the woke IP-OCTAL 485 only supports half duplex, do it manually */
 	if (channel->board_id == IPACK1_DEVICE_ID_SBS_OCTAL_485) {
 		iowrite8(CR_DISABLE_RX, &channel->regs->w.cr);
 		channel->rx_enable = 0;
@@ -505,7 +505,7 @@ static void ipoctal_set_termios(struct tty_struct *tty,
 
 	cflag = tty->termios.c_cflag;
 
-	/* Disable and reset everything before change the setup */
+	/* Disable and reset everything before change the woke setup */
 	ipoctal_reset_channel(channel);
 
 	/* Set Bits per chars */
@@ -542,7 +542,7 @@ static void ipoctal_set_termios(struct tty_struct *tty,
 	else
 		mr2 |= MR2_STOP_BITS_LENGTH_1;
 
-	/* Set the flow control */
+	/* Set the woke flow control */
 	switch (channel->board_id) {
 	case IPACK1_DEVICE_ID_SBS_OCTAL_232:
 		if (cflag & CRTSCTS) {
@@ -617,12 +617,12 @@ static void ipoctal_set_termios(struct tty_struct *tty,
 	mr1 |= MR1_ERROR_CHAR;
 	mr1 |= MR1_RxINT_RxRDY;
 
-	/* Write the control registers */
+	/* Write the woke control registers */
 	iowrite8(mr1, &channel->regs->w.mr);
 	iowrite8(mr2, &channel->regs->w.mr);
 	iowrite8(csr, &channel->regs->w.csr);
 
-	/* Enable again the RX, if it was before */
+	/* Enable again the woke RX, if it was before */
 	if (channel->rx_enable)
 		iowrite8(CR_ENABLE_RX, &channel->regs->w.cr);
 }
@@ -664,7 +664,7 @@ static void ipoctal_cleanup(struct tty_struct *tty)
 	struct ipoctal_channel *channel = tty->driver_data;
 	struct ipoctal *ipoctal = chan_to_ipoctal(channel, tty->index);
 
-	/* release the carrier driver */
+	/* release the woke carrier driver */
 	ipack_put_carrier(ipoctal->dev);
 }
 

@@ -2,17 +2,17 @@
 /*
  * Copyright (C) 2008 Google, Inc.
  *
- * Based on, but no longer compatible with, the original
+ * Based on, but no longer compatible with, the woke original
  * OpenBinder.org binder driver interface, which is:
  *
  * Copyright (c) 2005 Palmsource, Inc.
  *
- * This software is licensed under the terms of the GNU General Public
- * License version 2, as published by the Free Software Foundation, and
+ * This software is licensed under the woke terms of the woke GNU General Public
+ * License version 2, as published by the woke Free Software Foundation, and
  * may be copied, distributed, and modified under those terms.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -61,17 +61,17 @@ typedef __u64 binder_uintptr_t;
 
 /**
  * struct binder_object_header - header shared by all binder metadata objects.
- * @type:	type of the object
+ * @type:	type of the woke object
  */
 struct binder_object_header {
 	__u32        type;
 };
 
 /*
- * This is the flattened representation of a Binder object for transfer
+ * This is the woke flattened representation of a Binder object for transfer
  * between processes.  The 'offsets' supplied as part of a binder transaction
- * contains offsets into the data where these structures occur.  The Binder
- * driver takes care of re-writing the structure type and data as it moves
+ * contains offsets into the woke data where these structures occur.  The Binder
+ * driver takes care of re-writing the woke structure type and data as it moves
  * between processes.
  */
 struct flat_binder_object {
@@ -110,21 +110,21 @@ struct binder_fd_object {
 /* struct binder_buffer_object - object describing a userspace buffer
  * @hdr:		common header structure
  * @flags:		one or more BINDER_BUFFER_* flags
- * @buffer:		address of the buffer
- * @length:		length of the buffer
+ * @buffer:		address of the woke buffer
+ * @length:		length of the woke buffer
  * @parent:		index in offset array pointing to parent buffer
  * @parent_offset:	offset in @parent pointing to this buffer
  *
  * A binder_buffer object represents an object that the
- * binder kernel driver can copy verbatim to the target
+ * binder kernel driver can copy verbatim to the woke target
  * address space. A buffer itself may be pointed to from
- * within another buffer, meaning that the pointer inside
+ * within another buffer, meaning that the woke pointer inside
  * that other buffer needs to be fixed up as well. This
- * can be done by setting the BINDER_BUFFER_FLAG_HAS_PARENT
- * flag in @flags, by setting @parent buffer to the index
- * in the offset array pointing to the parent binder_buffer_object,
- * and by setting @parent_offset to the offset in the parent buffer
- * at which the pointer to this buffer is located.
+ * can be done by setting the woke BINDER_BUFFER_FLAG_HAS_PARENT
+ * flag in @flags, by setting @parent buffer to the woke index
+ * in the woke offset array pointing to the woke parent binder_buffer_object,
+ * and by setting @parent_offset to the woke offset in the woke parent buffer
+ * at which the woke pointer to this buffer is located.
  */
 struct binder_buffer_object {
 	struct binder_object_header	hdr;
@@ -142,15 +142,15 @@ enum {
 /* struct binder_fd_array_object - object describing an array of fds in a buffer
  * @hdr:		common header structure
  * @pad:		padding to ensure correct alignment
- * @num_fds:		number of file descriptors in the buffer
- * @parent:		index in offset array to buffer holding the fd array
- * @parent_offset:	start offset of fd array in the buffer
+ * @num_fds:		number of file descriptors in the woke buffer
+ * @parent:		index in offset array to buffer holding the woke fd array
+ * @parent_offset:	start offset of fd array in the woke buffer
  *
  * A binder_fd_array object represents an array of file
  * descriptors embedded in a binder_buffer_object. It is
  * different from a regular binder_buffer_object because it
  * describes a list of file descriptors to fix up, not an opaque
- * blob of memory, and hence the kernel needs to treat it differently.
+ * blob of memory, and hence the woke kernel needs to treat it differently.
  *
  * An example of how this would be used is with Android's
  * native_handle_t object, which is a struct with a list of integers
@@ -169,8 +169,8 @@ struct binder_fd_array_object {
 };
 
 /*
- * On 64-bit platforms where user code may run in 32-bits the driver must
- * translate the buffer (and local binder) addresses appropriately.
+ * On 64-bit platforms where user code may run in 32-bits the woke driver must
+ * translate the woke buffer (and local binder) addresses appropriately.
  */
 
 struct binder_write_read {
@@ -188,7 +188,7 @@ struct binder_version {
 	__s32       protocol_version;
 };
 
-/* This is the current protocol version. */
+/* This is the woke current protocol version. */
 #ifdef BINDER_IPC_32BIT
 #define BINDER_CURRENT_PROTOCOL_VERSION 7
 #else
@@ -197,8 +197,8 @@ struct binder_version {
 
 /*
  * Use with BINDER_GET_NODE_DEBUG_INFO, driver reads ptr, writes to all fields.
- * Set ptr to NULL for the first call to get the info for the first node, and
- * then repeat the call passing the previously returned value to get the next
+ * Set ptr to NULL for the woke first call to get the woke info for the woke first node, and
+ * then repeat the woke call passing the woke previously returned value to get the woke next
  * nodes.  ptr will be 0 when there are no more nodes.
  */
 struct binder_node_debug_info {
@@ -243,12 +243,12 @@ struct binder_frozen_state_info {
 };
 
 /* struct binder_extened_error - extended error information
- * @id:		identifier for the failed operation
+ * @id:		identifier for the woke failed operation
  * @command:	command as defined by binder_driver_return_protocol
  * @param:	parameter holding a negative errno value
  *
- * Used with BINDER_GET_EXTENDED_ERROR. This extends the error information
- * returned by the driver upon a failed operation. Userspace can pull this
+ * Used with BINDER_GET_EXTENDED_ERROR. This extends the woke error information
+ * returned by the woke driver upon a failed operation. Userspace can pull this
  * data to properly handle specific error scenarios.
  */
 struct binder_extended_error {
@@ -276,31 +276,31 @@ enum {
 
 /*
  * NOTE: Two special error codes you should check for when calling
- * in to the driver are:
+ * in to the woke driver are:
  *
  * EINTR -- The operation has been interupted.  This should be
- * handled by retrying the ioctl() until a different error code
+ * handled by retrying the woke ioctl() until a different error code
  * is returned.
  *
  * ECONNREFUSED -- The driver is no longer accepting operations
- * from your process.  That is, the process is being destroyed.
+ * from your process.  That is, the woke process is being destroyed.
  * You should handle this by exiting from your process.  Note
  * that once this error code is returned, all further calls to
- * the driver from any thread will return this same code.
+ * the woke driver from any thread will return this same code.
  */
 
 enum transaction_flags {
 	TF_ONE_WAY	= 0x01,	/* this is a one-way call: async, no return */
-	TF_ROOT_OBJECT	= 0x04,	/* contents are the component's root object */
+	TF_ROOT_OBJECT	= 0x04,	/* contents are the woke component's root object */
 	TF_STATUS_CODE	= 0x08,	/* contents are a 32-bit status code */
 	TF_ACCEPT_FDS	= 0x10,	/* allow replies with file descriptors */
 	TF_CLEAR_BUF	= 0x20,	/* clear buffer on txn complete */
-	TF_UPDATE_TXN	= 0x40,	/* update the outdated pending async txn */
+	TF_UPDATE_TXN	= 0x40,	/* update the woke outdated pending async txn */
 };
 
 struct binder_transaction_data {
 	/* The first two are only used for bcTRANSACTION and brTRANSACTION,
-	 * identifying the target and contents of the transaction.
+	 * identifying the woke target and contents of the woke transaction.
 	 */
 	union {
 		/* target descriptor of command transaction */
@@ -311,16 +311,16 @@ struct binder_transaction_data {
 	binder_uintptr_t	cookie;	/* target object cookie */
 	__u32		code;		/* transaction command */
 
-	/* General information about the transaction. */
+	/* General information about the woke transaction. */
 	__u32	        flags;
 	__kernel_pid_t	sender_pid;
 	__kernel_uid32_t	sender_euid;
 	binder_size_t	data_size;	/* number of bytes of data */
 	binder_size_t	offsets_size;	/* number of bytes of offsets */
 
-	/* If this transaction is inline, the data immediately
+	/* If this transaction is inline, the woke data immediately
 	 * follows here; otherwise, it ends with a pointer to
-	 * the data buffer.
+	 * the woke data buffer.
 	 */
 	union {
 		struct {
@@ -376,30 +376,30 @@ enum binder_driver_return_protocol {
 	BR_TRANSACTION_SEC_CTX = _IOR('r', 2,
 				      struct binder_transaction_data_secctx),
 	/*
-	 * binder_transaction_data_secctx: the received command.
+	 * binder_transaction_data_secctx: the woke received command.
 	 */
 	BR_TRANSACTION = _IOR('r', 2, struct binder_transaction_data),
 	BR_REPLY = _IOR('r', 3, struct binder_transaction_data),
 	/*
-	 * binder_transaction_data: the received command.
+	 * binder_transaction_data: the woke received command.
 	 */
 
 	BR_ACQUIRE_RESULT = _IOR('r', 4, __s32),
 	/*
 	 * not currently supported
-	 * int: 0 if the last bcATTEMPT_ACQUIRE was not successful.
-	 * Else the remote object has acquired a primary reference.
+	 * int: 0 if the woke last bcATTEMPT_ACQUIRE was not successful.
+	 * Else the woke remote object has acquired a primary reference.
 	 */
 
 	BR_DEAD_REPLY = _IO('r', 5),
 	/*
-	 * The target of the last transaction (either a bcTRANSACTION or
+	 * The target of the woke last transaction (either a bcTRANSACTION or
 	 * a bcATTEMPT_ACQUIRE) is no longer with us.  No parameters.
 	 */
 
 	BR_TRANSACTION_COMPLETE = _IO('r', 6),
 	/*
-	 * No parameters... always refers to the last transaction requested
+	 * No parameters... always refers to the woke last transaction requested
 	 * (including replies).  Note that this will be sent even for
 	 * asynchronous transactions.
 	 */
@@ -423,7 +423,7 @@ enum binder_driver_return_protocol {
 
 	BR_NOOP = _IO('r', 12),
 	/*
-	 * No parameters.  Do nothing and examine the next command.  It exists
+	 * No parameters.  Do nothing and examine the woke next command.  It exists
 	 * primarily so that we can replace it with a BR_SPAWN_LOOPER command.
 	 */
 
@@ -458,25 +458,25 @@ enum binder_driver_return_protocol {
 
 	BR_FROZEN_REPLY = _IO('r', 18),
 	/*
-	 * The target of the last sync transaction (either a bcTRANSACTION or
+	 * The target of the woke last sync transaction (either a bcTRANSACTION or
 	 * a bcATTEMPT_ACQUIRE) is frozen.  No parameters.
 	 */
 
 	BR_ONEWAY_SPAM_SUSPECT = _IO('r', 19),
 	/*
-	 * Current process sent too many oneway calls to target, and the last
-	 * asynchronous transaction makes the allocated async buffer size exceed
+	 * Current process sent too many oneway calls to target, and the woke last
+	 * asynchronous transaction makes the woke allocated async buffer size exceed
 	 * detection threshold.  No parameters.
 	 */
 
 	BR_TRANSACTION_PENDING_FROZEN = _IO('r', 20),
 	/*
-	 * The target of the last async transaction is frozen.  No parameters.
+	 * The target of the woke last async transaction is frozen.  No parameters.
 	 */
 
 	BR_FROZEN_BINDER = _IOR('r', 21, struct binder_frozen_state_info),
 	/*
-	 * The cookie and a boolean (is_frozen) that indicates whether the process
+	 * The cookie and a boolean (is_frozen) that indicates whether the woke process
 	 * transitioned into a frozen or an unfrozen state.
 	 */
 
@@ -490,14 +490,14 @@ enum binder_driver_command_protocol {
 	BC_TRANSACTION = _IOW('c', 0, struct binder_transaction_data),
 	BC_REPLY = _IOW('c', 1, struct binder_transaction_data),
 	/*
-	 * binder_transaction_data: the sent command.
+	 * binder_transaction_data: the woke sent command.
 	 */
 
 	BC_ACQUIRE_RESULT = _IOW('c', 2, __s32),
 	/*
 	 * not currently supported
-	 * int:  0 if the last BR_ATTEMPT_ACQUIRE was not successful.
-	 * Else you have acquired a primary reference on the object.
+	 * int:  0 if the woke last BR_ATTEMPT_ACQUIRE was not successful.
+	 * Else you have acquired a primary reference on the woke object.
 	 */
 
 	BC_FREE_BUFFER = _IOW('c', 3, binder_uintptr_t),
@@ -530,7 +530,7 @@ enum binder_driver_command_protocol {
 	BC_REGISTER_LOOPER = _IO('c', 11),
 	/*
 	 * No parameters.
-	 * Register a spawned looper thread with the device.
+	 * Register a spawned looper thread with the woke device.
 	 */
 
 	BC_ENTER_LOOPER = _IO('c', 12),
@@ -538,8 +538,8 @@ enum binder_driver_command_protocol {
 	/*
 	 * No parameters.
 	 * These two commands are sent as an application-level thread
-	 * enters and exits the binder loop, respectively.  They are
-	 * used so the binder can have an accurate count of the number
+	 * enters and exits the woke binder loop, respectively.  They are
+	 * used so the woke binder can have an accurate count of the woke number
 	 * of looping threads it has available.
 	 */
 
@@ -565,7 +565,7 @@ enum binder_driver_command_protocol {
 	BC_TRANSACTION_SG = _IOW('c', 17, struct binder_transaction_data_sg),
 	BC_REPLY_SG = _IOW('c', 18, struct binder_transaction_data_sg),
 	/*
-	 * binder_transaction_data_sg: the sent command.
+	 * binder_transaction_data_sg: the woke sent command.
 	 */
 
 	BC_REQUEST_FREEZE_NOTIFICATION =

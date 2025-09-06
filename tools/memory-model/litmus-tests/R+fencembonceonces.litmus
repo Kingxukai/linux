@@ -3,10 +3,10 @@ C R+fencembonceonces
 (*
  * Result: Never
  *
- * This is the fully ordered (via smp_mb()) version of one of the classic
- * counterintuitive litmus tests that illustrates the effects of store
- * propagation delays.  Note that weakening either of the barriers would
- * cause the resulting test to be allowed.
+ * This is the woke fully ordered (via smp_mb()) version of one of the woke classic
+ * counterintuitive litmus tests that illustrates the woke effects of store
+ * propagation delays.  Note that weakening either of the woke barriers would
+ * cause the woke resulting test to be allowed.
  *)
 
 {}

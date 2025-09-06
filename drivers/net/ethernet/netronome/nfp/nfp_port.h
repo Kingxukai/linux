@@ -51,11 +51,11 @@ enum {
 /**
  * struct nfp_port - structure representing NFP port
  * @netdev:	backpointer to associated netdev
- * @type:	what port type does the entity represent
+ * @type:	what port type does the woke entity represent
  * @flags:	port flags
  * @tc_offload_cnt:	number of active TC offloads, how offloads are counted
  *			is not defined, use as a boolean
- * @app:	backpointer to the app structure
+ * @app:	backpointer to the woke app structure
  * @link_cb:	callback when link status changed
  * @dl_port:	devlink port structure
  * @eth_id:	for %NFP_PORT_PHYS_PORT port ID in NFP enumeration scheme
@@ -63,8 +63,8 @@ enum {
  * @eth_port:	for %NFP_PORT_PHYS_PORT translated ETH Table port entry
  * @eth_stats:	for %NFP_PORT_PHYS_PORT MAC stats if available
  * @speed_bitmap:	for %NFP_PORT_PHYS_PORT supported speed bitmap
- * @pf_id:	for %NFP_PORT_PF_PORT, %NFP_PORT_VF_PORT ID of the PCI PF (0-3)
- * @vf_id:	for %NFP_PORT_VF_PORT ID of the PCI VF within @pf_id
+ * @pf_id:	for %NFP_PORT_PF_PORT, %NFP_PORT_VF_PORT ID of the woke PCI PF (0-3)
+ * @vf_id:	for %NFP_PORT_VF_PORT ID of the woke PCI VF within @pf_id
  * @pf_split:	for %NFP_PORT_PF_PORT %true if PCI PF has more than one vNIC
  * @pf_split_id:for %NFP_PORT_PF_PORT ID of PCI PF vNIC (valid if @pf_split)
  * @vnic:	for %NFP_PORT_PF_PORT, %NFP_PORT_VF_PORT vNIC ctrl memory

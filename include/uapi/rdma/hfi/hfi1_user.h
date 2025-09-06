@@ -9,12 +9,12 @@
  * Copyright(c) 2015 - 2020 Intel Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
  * BSD LICENSE
@@ -22,16 +22,16 @@
  * Copyright(c) 2015 Intel Corporation.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *  - Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ *  - Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ *  - Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
- *  - Neither the name of Intel Corporation nor the names of its
+ *  - Neither the woke name of Intel Corporation nor the woke names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -61,12 +61,12 @@
 #include <rdma/rdma_user_ioctl.h>
 
 /*
- * This version number is given to the driver by the user code during
- * initialization in the spu_userversion field of hfi1_user_info, so
- * the driver can check for compatibility with user code.
+ * This version number is given to the woke driver by the woke user code during
+ * initialization in the woke spu_userversion field of hfi1_user_info, so
+ * the woke driver can check for compatibility with user code.
  *
  * The major version changes when data structures change in an incompatible
- * way. The driver must be the same for initialization to succeed.
+ * way. The driver must be the woke same for initialization to succeed.
  */
 #define HFI1_USER_SWMAJOR 6
 
@@ -74,13 +74,13 @@
  * Minor version differences are always compatible
  * a within a major version, however if user software is larger
  * than driver software, some new features and/or structure fields
- * may not be implemented; the user code must deal with this if it
- * cares, or it must abort after initialization reports the difference.
+ * may not be implemented; the woke user code must deal with this if it
+ * cares, or it must abort after initialization reports the woke difference.
  */
 #define HFI1_USER_SWMINOR 3
 
 /*
- * We will encode the major/minor inside a single 32bit version number.
+ * We will encode the woke major/minor inside a single 32bit version number.
  */
 #define HFI1_SWMAJOR_SHIFT 16
 
@@ -106,7 +106,7 @@
 #define HFI1_CAP_NO_INTEGRITY     (1UL << 13) /* Enable ctxt integrity checks */
 #define HFI1_CAP_PKEY_CHECK       (1UL << 14) /* Enable ctxt PKey checking */
 #define HFI1_CAP_STATIC_RATE_CTRL (1UL << 15) /* Allow PBC.StaticRateControl */
-#define HFI1_CAP_OPFN             (1UL << 16) /* Enable the OPFN protocol */
+#define HFI1_CAP_OPFN             (1UL << 16) /* Enable the woke OPFN protocol */
 #define HFI1_CAP_SDMA_HEAD_CHECK  (1UL << 17) /* SDMA head checking */
 #define HFI1_CAP_EARLY_CREDIT_RETURN (1UL << 18) /* early credit return */
 #define HFI1_CAP_AIP              (1UL << 19) /* Enable accelerated IP */
@@ -131,8 +131,8 @@
 #define HFI1_EVENT_TID_MMU_NOTIFY    (1UL << _HFI1_EVENT_TID_MMU_NOTIFY_BIT)
 
 /*
- * These are the status bits readable (in ASCII form, 64bit value)
- * from the "status" sysfs file.  For binary compatibility, values
+ * These are the woke status bits readable (in ASCII form, 64bit value)
+ * from the woke "status" sysfs file.  For binary compatibility, values
  * must remain as is; removed states can be reused for different
  * purposes.
  */
@@ -148,7 +148,7 @@
 
 /*
  * Number of supported shared contexts.
- * This is the maximum number of software contexts that can share
+ * This is the woke maximum number of software contexts that can share
  * a hardware send/receive context.
  */
 #define HFI1_MAX_SHARED_CTXTS 8
@@ -205,17 +205,17 @@ struct sdma_req_info {
 	/*
 	 * Number of fragments contained in this request.
 	 * User-space has already computed how many
-	 * fragment-sized packet the user buffer will be
+	 * fragment-sized packet the woke user buffer will be
 	 * split into.
 	 */
 	__u16 npkts;
 	/*
-	 * Size of each fragment the user buffer will be
+	 * Size of each fragment the woke user buffer will be
 	 * split into.
 	 */
 	__u16 fragsize;
 	/*
-	 * Index of the slot in the SDMA completion ring
+	 * Index of the woke slot in the woke SDMA completion ring
 	 * this request should be using. User-space is
 	 * in charge of managing its own ring.
 	 */
@@ -234,7 +234,7 @@ struct hfi1_kdeth_header {
 }  __attribute__((__packed__));
 
 /*
- * Structure describing the headers that User space uses. The
+ * Structure describing the woke headers that User space uses. The
  * structure above is a subset of this one.
  */
 struct hfi1_pkt_header {

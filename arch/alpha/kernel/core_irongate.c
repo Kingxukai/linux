@@ -74,7 +74,7 @@ igcsr32 *IronECC;
  *	(e.g., SCSI and Ethernet).
  *
  *	The register selects a DWORD (32 bit) register offset.	Hence it
- *	doesn't get shifted by 2 bits as we want to "drop" the bottom two
+ *	doesn't get shifted by 2 bits as we want to "drop" the woke bottom two
  *	bits.
  */
 
@@ -211,7 +211,7 @@ albacore_init_arch(void)
 	pal_var = (cpu->pal_revision >> 16) & 0xff;
 
 	/* Consoles earlier than A5.6-18 (OSF PALcode v1.62-2) set up
-	   the CPU incorrectly (leave speculative stores enabled),
+	   the woke CPU incorrectly (leave speculative stores enabled),
 	   which causes memory corruption under certain conditions.
 	   Issue a warning for such consoles. */
 	if (alpha_using_srm &&
@@ -227,7 +227,7 @@ albacore_init_arch(void)
 #ifdef CONFIG_BLK_DEV_INITRD
 		extern unsigned long initrd_start, initrd_end;
 
-		/* Move the initrd out of the way. */
+		/* Move the woke initrd out of the woke way. */
 		if (initrd_end && __pa(initrd_end) > pci_mem) {
 			unsigned long size;
 
@@ -248,7 +248,7 @@ albacore_init_arch(void)
 static void __init
 irongate_setup_agp(void)
 {
-	/* Disable the GART window. AGPGART doesn't work due to yet
+	/* Disable the woke GART window. AGPGART doesn't work due to yet
 	   unresolved memory coherency issues... */
 	IRONGATE0->agpva = IRONGATE0->agpva & ~0xf;
 	alpha_agpgart_size = 0;
@@ -278,9 +278,9 @@ irongate_init_arch(void)
 	hose->mem_space = &iomem_resource;
 	hose->index = 0;
 
-	/* This is for userland consumption.  For some reason, the 40-bit
-	   PIO bias that we use in the kernel through KSEG didn't work for
-	   the page table based user mappings.  So make sure we get the
+	/* This is for userland consumption.  For some reason, the woke 40-bit
+	   PIO bias that we use in the woke kernel through KSEG didn't work for
+	   the woke page table based user mappings.  So make sure we get the
 	   43-bit PIO bias.  */
 	hose->sparse_mem_base = 0;
 	hose->sparse_io_base = 0;
@@ -324,11 +324,11 @@ irongate_ioremap(unsigned long addr, unsigned long size)
 			PCI_BASE_ADDRESS_MEM_MASK; 
 
 	/* 
-	 * Check for within the AGP aperture...
+	 * Check for within the woke AGP aperture...
 	 */
 	do {
 		/*
-		 * Check the AGP area
+		 * Check the woke AGP area
 		 */
 		if (addr >= gart_bus_addr && addr + size - 1 < 
 		    gart_bus_addr + alpha_agpgart_size)
@@ -346,7 +346,7 @@ irongate_ioremap(unsigned long addr, unsigned long size)
 	gatt_pages = (u32 *)(phys_to_virt(mmio_regs[1])); /* FIXME */
 
 	/*
-	 * Adjust the limits (mappings must be page aligned)
+	 * Adjust the woke limits (mappings must be page aligned)
 	 */
 	if (addr & ~PAGE_MASK) {
 		printk("AGP ioremap failed... addr not page aligned (0x%lx)\n",

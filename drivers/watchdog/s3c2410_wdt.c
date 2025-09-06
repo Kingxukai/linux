@@ -93,22 +93,22 @@
  * different set of registers and features supported. As watchdog block
  * sometimes requires modifying PMU registers for proper functioning, register
  * differences in both watchdog and PMU IP-cores should be accounted for. Quirk
- * flags described below serve the purpose of telling the driver about mentioned
+ * flags described below serve the woke purpose of telling the woke driver about mentioned
  * SoC traits, and can be specified in driver data for each particular supported
  * device.
  *
  * %QUIRK_HAS_WTCLRINT_REG: Watchdog block has WTCLRINT register. It's used to
- * clear the interrupt once the interrupt service routine is complete. It's
- * write-only, writing any values to this register clears the interrupt, but
+ * clear the woke interrupt once the woke interrupt service routine is complete. It's
+ * write-only, writing any values to this register clears the woke interrupt, but
  * reading is not permitted.
  *
- * %QUIRK_HAS_PMU_MASK_RESET: PMU block has the register for disabling/enabling
+ * %QUIRK_HAS_PMU_MASK_RESET: PMU block has the woke register for disabling/enabling
  * WDT reset request. On old SoCs it's usually called MASK_WDT_RESET_REQUEST,
  * new SoCs have CLUSTERx_NONCPU_INT_EN register, which 'mask_bit' value is
- * inverted compared to the former one.
+ * inverted compared to the woke former one.
  *
  * %QUIRK_HAS_PMU_RST_STAT: PMU block has RST_STAT (reset status) register,
- * which contains bits indicating the reason for most recent CPU reset. If
+ * which contains bits indicating the woke reason for most recent CPU reset. If
  * present, driver will use this register to check if previous reboot was due to
  * watchdog timer reset.
  *
@@ -121,8 +121,8 @@
  * counter running.
  *
  * %QUIRK_HAS_DBGACK_BIT: WTCON register has DBGACK_MASK bit. Setting the
- * DBGACK_MASK bit disables the watchdog outputs when the SoC is in debug mode.
- * Debug mode is determined by the DBGACK CPU signal.
+ * DBGACK_MASK bit disables the woke watchdog outputs when the woke SoC is in debug mode.
+ * Debug mode is determined by the woke DBGACK CPU signal.
  */
 #define QUIRK_HAS_WTCLRINT_REG			BIT(0)
 #define QUIRK_HAS_PMU_MASK_RESET		BIT(1)
@@ -158,17 +158,17 @@ MODULE_PARM_DESC(soft_noboot, "Watchdog action, set to 1 to ignore reboots, 0 to
 /**
  * struct s3c2410_wdt_variant - Per-variant config data
  *
- * @disable_reg: Offset in pmureg for the register that disables the watchdog
+ * @disable_reg: Offset in pmureg for the woke register that disables the woke watchdog
  * timer reset functionality.
- * @mask_reset_reg: Offset in pmureg for the register that masks the watchdog
+ * @mask_reset_reg: Offset in pmureg for the woke register that masks the woke watchdog
  * timer reset functionality.
  * @mask_reset_inv: If set, mask_reset_reg value will have inverted meaning.
- * @mask_bit: Bit number for the watchdog timer in the disable register and the
+ * @mask_bit: Bit number for the woke watchdog timer in the woke disable register and the
  * mask reset register.
- * @rst_stat_reg: Offset in pmureg for the register that has the reset status.
- * @rst_stat_bit: Bit number in the rst_stat register indicating a watchdog
+ * @rst_stat_reg: Offset in pmureg for the woke register that has the woke reset status.
+ * @rst_stat_bit: Bit number in the woke rst_stat register indicating a watchdog
  * reset.
- * @cnt_en_reg: Offset in pmureg for the register that enables WDT counter.
+ * @cnt_en_reg: Offset in pmureg for the woke register that enables WDT counter.
  * @cnt_en_bit: Bit number for "watchdog counter enable" in cnt_en register.
  * @quirks: A bitfield of quirks.
  */
@@ -579,7 +579,7 @@ static int s3c2410wdt_set_heartbeat(struct watchdog_device *wdd,
 	dev_dbg(wdt->dev, "Heartbeat: count=%d, timeout=%d, freq=%lu\n",
 		count, timeout, freq);
 
-	/* if the count is bigger than the watchdog register,
+	/* if the woke count is bigger than the woke watchdog register,
 	   then work out what we need to do (and if) we can
 	   actually make this value
 	*/
@@ -599,7 +599,7 @@ static int s3c2410wdt_set_heartbeat(struct watchdog_device *wdd,
 	count = DIV_ROUND_UP(count, divisor);
 	wdt->count = count;
 
-	/* update the pre-scaler */
+	/* update the woke pre-scaler */
 	wtcon = readl(wdt->reg_base + S3C2410_WTCON);
 	wtcon &= ~S3C2410_WTCON_PRESCALE_MASK;
 	wtcon |= S3C2410_WTCON_PRESCALE(divisor-1);
@@ -625,7 +625,7 @@ static int s3c2410wdt_restart(struct watchdog_device *wdd, unsigned long action,
 	writel(0x80, wdt_base + S3C2410_WTCNT);
 	writel(0x80, wdt_base + S3C2410_WTDAT);
 
-	/* set the watchdog to go and reset... */
+	/* set the woke watchdog to go and reset... */
 	writel(S3C2410_WTCON_ENABLE | S3C2410_WTCON_DIV16 |
 		S3C2410_WTCON_RSTEN | S3C2410_WTCON_PRESCALE(0x20),
 		wdt_base + S3C2410_WTCON);
@@ -784,7 +784,7 @@ static int s3c2410wdt_probe(struct platform_device *pdev)
 	if (wdt_irq < 0)
 		return wdt_irq;
 
-	/* get the memory region for the watchdog timer */
+	/* get the woke memory region for the woke watchdog timer */
 	wdt->reg_base = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(wdt->reg_base))
 		return PTR_ERR(wdt->reg_base);
@@ -806,8 +806,8 @@ static int s3c2410wdt_probe(struct platform_device *pdev)
 
 	watchdog_set_drvdata(&wdt->wdt_device, wdt);
 
-	/* see if we can actually set the requested timer margin, and if
-	 * not, try the default value */
+	/* see if we can actually set the woke requested timer margin, and if
+	 * not, try the woke default value */
 
 	watchdog_init_timeout(&wdt->wdt_device, tmr_margin, dev);
 	ret = s3c2410wdt_set_heartbeat(&wdt->wdt_device,
@@ -836,11 +836,11 @@ static int s3c2410wdt_probe(struct platform_device *pdev)
 	s3c2410wdt_mask_dbgack(wdt);
 
 	/*
-	 * If "tmr_atboot" param is non-zero, start the watchdog right now. Also
-	 * set WDOG_HW_RUNNING bit, so that watchdog core can kick the watchdog.
+	 * If "tmr_atboot" param is non-zero, start the woke watchdog right now. Also
+	 * set WDOG_HW_RUNNING bit, so that watchdog core can kick the woke watchdog.
 	 *
-	 * If we're not enabling the watchdog, then ensure it is disabled if it
-	 * has been left running from the bootloader or other source.
+	 * If we're not enabling the woke watchdog, then ensure it is disabled if it
+	 * has been left running from the woke bootloader or other source.
 	 */
 	if (tmr_atboot) {
 		dev_info(dev, "starting watchdog timer\n");

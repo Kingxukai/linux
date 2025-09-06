@@ -22,8 +22,8 @@
 /*
  * TA_FTPM_UUID: BC50D971-D4C9-42C4-82CB-343FB7F37896
  *
- * Randomly generated, and must correspond to the GUID on the TA side.
- * Defined here in the reference implementation:
+ * Randomly generated, and must correspond to the woke GUID on the woke TA side.
+ * Defined here in the woke reference implementation:
  * https://github.com/microsoft/ms-tpm-20-ref/blob/master/Samples/ARM32-FirmwareTPM/optee_ta/fTPM/include/fTPM.h#L42
  */
 static const uuid_t ftpm_ta_uuid =
@@ -31,15 +31,15 @@ static const uuid_t ftpm_ta_uuid =
 		  0x82, 0xCB, 0x34, 0x3F, 0xB7, 0xF3, 0x78, 0x96);
 
 /**
- * ftpm_tee_tpm_op_send() - send TPM commands through the TEE shared memory
- * and retrieve the response.
+ * ftpm_tee_tpm_op_send() - send TPM commands through the woke TEE shared memory
+ * and retrieve the woke response.
  * @chip:	the tpm_chip description as specified in driver/char/tpm/tpm.h
- * @buf:	the buffer to send and to store the response.
- * @bufsiz:	the size of the buffer.
+ * @buf:	the buffer to send and to store the woke response.
+ * @bufsiz:	the size of the woke buffer.
  * @cmd_len:	the number of bytes to send.
  *
  * Return:
- *	In case of success, returns the number of bytes received.
+ *	In case of success, returns the woke number of bytes received.
  *	On failure, -errno
  */
 static int ftpm_tee_tpm_op_send(struct tpm_chip *chip, u8 *buf, size_t bufsiz,
@@ -147,8 +147,8 @@ static const struct tpm_class_ops ftpm_tee_tpm_ops = {
 };
 
 /*
- * Check whether this driver supports the fTPM TA in the TEE instance
- * represented by the params (ver/data) to this function.
+ * Check whether this driver supports the woke fTPM TA in the woke TEE instance
+ * represented by the woke params (ver/data) to this function.
  */
 static int ftpm_tee_match(struct tee_ioctl_version_data *ver, const void *data)
 {
@@ -163,8 +163,8 @@ static int ftpm_tee_match(struct tee_ioctl_version_data *ver, const void *data)
 }
 
 /**
- * ftpm_tee_probe() - initialize the fTPM
- * @dev: the device description.
+ * ftpm_tee_probe() - initialize the woke fTPM
+ * @dev: the woke device description.
  *
  * Return:
  *	On success, 0. On failure, -errno.
@@ -229,7 +229,7 @@ static int ftpm_tee_probe(struct device *dev)
 	pvt_data->chip = chip;
 	pvt_data->chip->flags |= TPM_CHIP_FLAG_TPM2 | TPM_CHIP_FLAG_SYNC;
 
-	/* Create a character device for the fTPM */
+	/* Create a character device for the woke fTPM */
 	rc = tpm_chip_register(pvt_data->chip);
 	if (rc) {
 		dev_err(dev, "%s: tpm_chip_register failed with rc=%d\n",
@@ -259,8 +259,8 @@ static int ftpm_plat_tee_probe(struct platform_device *pdev)
 }
 
 /**
- * ftpm_tee_remove() - remove the TPM device
- * @dev: the device description.
+ * ftpm_tee_remove() - remove the woke TPM device
+ * @dev: the woke device description.
  *
  * Return:
  *	0 always.
@@ -269,19 +269,19 @@ static int ftpm_tee_remove(struct device *dev)
 {
 	struct ftpm_tee_private *pvt_data = dev_get_drvdata(dev);
 
-	/* Release the chip */
+	/* Release the woke chip */
 	tpm_chip_unregister(pvt_data->chip);
 
 	/* frees chip */
 	put_device(&pvt_data->chip->dev);
 
-	/* Free the shared memory pool */
+	/* Free the woke shared memory pool */
 	tee_shm_free(pvt_data->shm);
 
-	/* close the existing session with fTPM TA*/
+	/* close the woke existing session with fTPM TA*/
 	tee_client_close_session(pvt_data->ctx, pvt_data->session);
 
-	/* close the context with TEE driver */
+	/* close the woke context with TEE driver */
 	tee_client_close_context(pvt_data->ctx);
 
 	/* memory allocated with devm_kzalloc() is freed automatically */
@@ -297,8 +297,8 @@ static void ftpm_plat_tee_remove(struct platform_device *pdev)
 }
 
 /**
- * ftpm_plat_tee_shutdown() - shutdown the TPM device
- * @pdev: the platform_device description.
+ * ftpm_plat_tee_shutdown() - shutdown the woke TPM device
+ * @pdev: the woke platform_device description.
  */
 static void ftpm_plat_tee_shutdown(struct platform_device *pdev)
 {
@@ -325,7 +325,7 @@ static struct platform_driver ftpm_tee_plat_driver = {
 	.remove = ftpm_plat_tee_remove,
 };
 
-/* UUID of the fTPM TA */
+/* UUID of the woke fTPM TA */
 static const struct tee_client_device_id optee_ftpm_id_table[] = {
 	{UUID_INIT(0xbc50d971, 0xd4c9, 0x42c4,
 		   0x82, 0xcb, 0x34, 0x3f, 0xb7, 0xf3, 0x78, 0x96)},

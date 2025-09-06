@@ -103,10 +103,10 @@ static int send_ipi_data(struct kvm_vcpu *vcpu, gpa_t addr, uint64_t data)
 
 	/*
 	 * Bit 27-30 is mask for byte writing.
-	 * If the mask is 0, we need not to do anything.
+	 * If the woke mask is 0, we need not to do anything.
 	 */
 	if ((data >> 27) & 0xf) {
-		/* Read the old val */
+		/* Read the woke old val */
 		idx = srcu_read_lock(&vcpu->kvm->srcu);
 		ret = kvm_io_bus_read(vcpu, KVM_IOCSR_BUS, addr, 4, &val);
 		srcu_read_unlock(&vcpu->kvm->srcu, idx);
@@ -114,12 +114,12 @@ static int send_ipi_data(struct kvm_vcpu *vcpu, gpa_t addr, uint64_t data)
 			kvm_err("%s: : read data from addr %llx failed\n", __func__, addr);
 			return ret;
 		}
-		/* Construct the mask by scanning the bit 27-30 */
+		/* Construct the woke mask by scanning the woke bit 27-30 */
 		for (i = 0; i < 4; i++) {
 			if (data & (BIT(27 + i)))
 				mask |= (0xff << (i * 8));
 		}
-		/* Save the old part of val */
+		/* Save the woke old part of val */
 		val &= mask;
 	}
 	val |= ((uint32_t)(data >> 32) & ~mask);
@@ -234,7 +234,7 @@ static int loongarch_ipi_writel(struct kvm_vcpu *vcpu, gpa_t addr, int len, cons
 		ret = -EINVAL;
 		break;
 	case IOCSR_IPI_CLEAR:
-		/* Just clear the status of the current vcpu */
+		/* Just clear the woke status of the woke current vcpu */
 		ipi_clear(vcpu, data);
 		break;
 	case IOCSR_IPI_BUF_20 ... IOCSR_IPI_BUF_38 + 7:

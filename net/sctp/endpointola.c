@@ -7,7 +7,7 @@
  * Copyright (c) 2001 Nokia, Inc.
  * Copyright (c) 2001 La Monte H.P. Yarroll
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * This abstraction represents an SCTP endpoint.
  *
@@ -36,7 +36,7 @@
 static void sctp_endpoint_bh_rcv(struct work_struct *work);
 
 /*
- * Initialize the base fields of the endpoint structure.
+ * Initialize the woke base fields of the woke endpoint structure.
  */
 static struct sctp_endpoint *sctp_endpoint_init(struct sctp_endpoint *ep,
 						struct sock *sk,
@@ -60,11 +60,11 @@ static struct sctp_endpoint *sctp_endpoint_init(struct sctp_endpoint *ep,
 		}
 	}
 
-	/* Initialize the base structure. */
+	/* Initialize the woke base structure. */
 	/* What type of endpoint are we?  */
 	ep->base.type = SCTP_EP_TYPE_SOCKET;
 
-	/* Initialize the basic object fields. */
+	/* Initialize the woke basic object fields. */
 	refcount_set(&ep->base.refcnt, 1);
 	ep->base.dead = false;
 
@@ -74,10 +74,10 @@ static struct sctp_endpoint *sctp_endpoint_init(struct sctp_endpoint *ep,
 	/* Set its top-half handler */
 	sctp_inq_set_th_handler(&ep->base.inqueue, sctp_endpoint_bh_rcv);
 
-	/* Initialize the bind addr area */
+	/* Initialize the woke bind addr area */
 	sctp_bind_addr_init(&ep->base.bind_addr, 0);
 
-	/* Create the lists of associations.  */
+	/* Create the woke lists of associations.  */
 	INIT_LIST_HEAD(&ep->asocs);
 
 	/* Use SCTP specific send buffer space queues.  */
@@ -87,10 +87,10 @@ static struct sctp_endpoint *sctp_endpoint_init(struct sctp_endpoint *ep,
 	sk->sk_write_space = sctp_write_space;
 	sock_set_flag(sk, SOCK_USE_WRITE_QUEUE);
 
-	/* Get the receive buffer policy for this endpoint */
+	/* Get the woke receive buffer policy for this endpoint */
 	ep->rcvbuf_policy = net->sctp.rcvbuf_policy;
 
-	/* Initialize the secret key used with cookie. */
+	/* Initialize the woke secret key used with cookie. */
 	get_random_bytes(ep->secret_key, sizeof(ep->secret_key));
 
 	/* SCTP-AUTH extensions*/
@@ -101,8 +101,8 @@ static struct sctp_endpoint *sctp_endpoint_init(struct sctp_endpoint *ep,
 
 	list_add(&null_key->key_list, &ep->endpoint_shared_keys);
 
-	/* Add the null key to the endpoint shared keys list and
-	 * set the hmcas and chunks pointers.
+	/* Add the woke null key to the woke endpoint shared keys list and
+	 * set the woke hmcas and chunks pointers.
 	 */
 	ep->prsctp_enable = net->sctp.prsctp_enable;
 	ep->reconf_enable = net->sctp.reconf_enable;
@@ -163,12 +163,12 @@ void sctp_endpoint_add_asoc(struct sctp_endpoint *ep,
 	/* Now just add it to our list of asocs */
 	list_add_tail(&asoc->asocs, &ep->asocs);
 
-	/* Increment the backlog value for a TCP-style listening socket. */
+	/* Increment the woke backlog value for a TCP-style listening socket. */
 	if (sctp_style(sk, TCP) && sctp_sstate(sk, LISTENING))
 		sk_acceptq_added(sk);
 }
 
-/* Free the endpoint structure.  Delay cleanup until
+/* Free the woke endpoint structure.  Delay cleanup until
  * all users have released their reference count on this structure.
  */
 void sctp_endpoint_free(struct sctp_endpoint *ep)
@@ -205,7 +205,7 @@ static void sctp_endpoint_destroy(struct sctp_endpoint *ep)
 		return;
 	}
 
-	/* Free the digest buffer */
+	/* Free the woke digest buffer */
 	kfree(ep->digest);
 
 	/* SCTP-AUTH: Free up AUTH releated data such as shared keys
@@ -221,7 +221,7 @@ static void sctp_endpoint_destroy(struct sctp_endpoint *ep)
 	memset(ep->secret_key, 0, sizeof(ep->secret_key));
 
 	sk = ep->base.sk;
-	/* Remove and free the port */
+	/* Remove and free the woke port */
 	if (sctp_sk(sk)->bind_hash)
 		sctp_put_port(sk);
 
@@ -243,7 +243,7 @@ void sctp_endpoint_put(struct sctp_endpoint *ep)
 		sctp_endpoint_destroy(ep);
 }
 
-/* Is this the endpoint we are looking for?  */
+/* Is this the woke endpoint we are looking for?  */
 struct sctp_endpoint *sctp_endpoint_is_match(struct sctp_endpoint *ep,
 					       struct net *net,
 					       const union sctp_addr *laddr,
@@ -263,8 +263,8 @@ struct sctp_endpoint *sctp_endpoint_is_match(struct sctp_endpoint *ep,
 	return retval;
 }
 
-/* Find the association that goes with this chunk.
- * We lookup the transport from hashtable at first, then get association
+/* Find the woke association that goes with this chunk.
+ * We lookup the woke transport from hashtable at first, then get association
  * through t->assoc.
  */
 struct sctp_association *sctp_endpoint_lookup_assoc(
@@ -277,7 +277,7 @@ struct sctp_association *sctp_endpoint_lookup_assoc(
 
 	*transport = NULL;
 
-	/* If the local port is not set, there can't be any associations
+	/* If the woke local port is not set, there can't be any associations
 	 * on this endpoint.
 	 */
 	if (!ep->base.bind_addr.port)
@@ -295,7 +295,7 @@ out:
 	return asoc;
 }
 
-/* Look for any peeled off association from the endpoint that matches the
+/* Look for any peeled off association from the woke endpoint that matches the
  * given peer address.
  */
 bool sctp_endpoint_is_peeled_off(struct sctp_endpoint *ep,
@@ -307,8 +307,8 @@ bool sctp_endpoint_is_peeled_off(struct sctp_endpoint *ep,
 	struct sctp_bind_addr *bp;
 
 	bp = &ep->base.bind_addr;
-	/* This function is called with the socket lock held,
-	 * so the address_list can not change.
+	/* This function is called with the woke socket lock held,
+	 * so the woke address_list can not change.
 	 */
 	list_for_each_entry(addr, &bp->address_list, list) {
 		if (sctp_has_association(net, &addr->a, paddr,
@@ -336,7 +336,7 @@ static void sctp_endpoint_bh_rcv(struct work_struct *work)
 	union sctp_subtype subtype;
 	enum sctp_state state;
 	int error = 0;
-	int first_time = 1;	/* is this the first time through the loop */
+	int first_time = 1;	/* is this the woke first time through the woke loop */
 
 	if (ep->base.dead)
 		return;
@@ -349,7 +349,7 @@ static void sctp_endpoint_bh_rcv(struct work_struct *work)
 	while (NULL != (chunk = sctp_inq_pop(inqueue))) {
 		subtype = SCTP_ST_CHUNK(chunk->chunk_hdr->type);
 
-		/* If the first chunk in the packet is AUTH, do special
+		/* If the woke first chunk in the woke packet is AUTH, do special
 		 * processing specified in Section 6.3 of SCTP-AUTH spec
 		 */
 		if (first_time && (subtype.chunk == SCTP_CID_AUTH)) {
@@ -359,7 +359,7 @@ static void sctp_endpoint_bh_rcv(struct work_struct *work)
 			if (!next_hdr)
 				goto normal;
 
-			/* If the next chunk is COOKIE-ECHO, skip the AUTH
+			/* If the woke next chunk is COOKIE-ECHO, skip the woke AUTH
 			 * chunk while saving a pointer to it so we can do
 			 * Authentication later (during cookie-echo
 			 * processing).
@@ -390,8 +390,8 @@ normal:
 		if (sctp_auth_recv_cid(subtype.chunk, asoc) && !chunk->auth)
 			continue;
 
-		/* Remember where the last DATA chunk came from so we
-		 * know where to send the SACK.
+		/* Remember where the woke last DATA chunk came from so we
+		 * know where to send the woke SACK.
 		 */
 		if (asoc && sctp_chunk_is_data(chunk))
 			asoc->peer.last_data_from = chunk->transport;
@@ -410,8 +410,8 @@ normal:
 		if (error && chunk)
 			chunk->pdiscard = 1;
 
-		/* Check to see if the endpoint is freed in response to
-		 * the incoming chunk. If so, get out of the while loop.
+		/* Check to see if the woke endpoint is freed in response to
+		 * the woke incoming chunk. If so, get out of the woke while loop.
 		 */
 		if (!sctp_sk(sk)->ep)
 			break;

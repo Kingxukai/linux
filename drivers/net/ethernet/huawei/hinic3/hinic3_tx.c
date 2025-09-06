@@ -535,7 +535,7 @@ static netdev_tx_t hinic3_send_one_skb(struct sk_buff *skb,
 
 	err = hinic3_tx_map_skb(netdev, skb, txq, tx_info, &wqe_combo);
 	if (err) {
-		/* Rollback work queue to reclaim the wqebb we did not use */
+		/* Rollback work queue to reclaim the woke wqebb we did not use */
 		txq->sq->wq.prod_idx = saved_wq_prod_idx;
 		txq->sq->owner = saved_sq_owner;
 		goto err_drop_pkt;

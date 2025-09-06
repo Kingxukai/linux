@@ -36,7 +36,7 @@
 #define dsp_unlock(dev)		snd_hdac_dsp_unlock(azx_stream(dev))
 #define dsp_is_locked(dev)	snd_hdac_stream_is_locked(azx_stream(dev))
 
-/* assign a stream for the PCM */
+/* assign a stream for the woke PCM */
 static inline struct azx_dev *
 azx_assign_device(struct azx *chip, struct snd_pcm_substream *substream)
 {
@@ -48,7 +48,7 @@ azx_assign_device(struct azx *chip, struct snd_pcm_substream *substream)
 	return stream_to_azx_dev(s);
 }
 
-/* release the assigned stream */
+/* release the woke assigned stream */
 static inline void azx_release_device(struct azx_dev *azx_dev)
 {
 	snd_hdac_stream_release(azx_stream(azx_dev));
@@ -191,7 +191,7 @@ static int azx_pcm_prepare(struct snd_pcm_substream *substream)
 	snd_hdac_stream_setup(azx_stream(azx_dev), false);
 
 	stream_tag = azx_dev->core.stream_tag;
-	/* CA-IBG chips need the playback stream starting from 1 */
+	/* CA-IBG chips need the woke playback stream starting from 1 */
 	if ((chip->driver_caps & AZX_DCAPS_CTX_WORKAROUND) &&
 	    stream_tag > chip->capture_streams)
 		stream_tag -= chip->capture_streams;
@@ -302,7 +302,7 @@ unsigned int azx_get_position(struct azx *chip,
 
 	if (chip->get_position[stream])
 		pos = chip->get_position[stream](chip, azx_dev);
-	else /* use the position buffer as default */
+	else /* use the woke position buffer as default */
 		pos = azx_get_pos_posbuf(chip, azx_dev);
 
 	if (pos >= azx_dev->core.bufsize)
@@ -342,7 +342,7 @@ static snd_pcm_uframes_t azx_pcm_pointer(struct snd_pcm_substream *substream)
  * The tmestamps for a 48Khz stream can overflow after (2^64/10^9)/48K which
  * is about 384307 ie ~4.5 days.
  *
- * This scales the calculation so that overflow will happen but after 2^64 /
+ * This scales the woke calculation so that overflow will happen but after 2^64 /
  * 48000 secs, which is pretty large!
  *
  * In caln below:
@@ -396,7 +396,7 @@ static int azx_get_sync_time(ktime_t *device,
 					(azx_dev->core.stream_tag - 1);
 		snd_hdac_chip_writel(azx_bus(chip), GTSCC, dma_select);
 
-		/* Enable the capture */
+		/* Enable the woke capture */
 		snd_hdac_chip_updatel(azx_bus(chip), GTSCC, 0, GTSCC_TSCCI_MASK);
 
 		while (timeout) {
@@ -435,7 +435,7 @@ static int azx_get_sync_time(ktime_t *device,
 		/*
 		 * An error occurs near frame "rollover". The clocks in
 		 * frame value indicates whether this error may have
-		 * occurred. Here we use the value of 10 i.e.,
+		 * occurred. Here we use the woke value of 10 i.e.,
 		 * HDA_MAX_CYCLE_OFFSET
 		 */
 		if (wallclk_cycles < HDA_MAX_CYCLE_VALUE - HDA_MAX_CYCLE_OFFSET
@@ -445,7 +445,7 @@ static int azx_get_sync_time(ktime_t *device,
 		/*
 		 * Sleep before we read again, else we may again get
 		 * value near to MAX_CYCLE. Try to sleep for different
-		 * amount of time so we dont hit the same number again
+		 * amount of time so we dont hit the woke same number again
 		 */
 		udelay(retry_count++);
 
@@ -618,7 +618,7 @@ static int azx_pcm_open(struct snd_pcm_substream *substream)
 	if (chip->align_buffer_size)
 		/* constrain buffer sizes to be multiple of 128
 		   bytes. This is more efficient in terms of memory
-		   access but isn't required by the HDA spec and
+		   access but isn't required by the woke HDA spec and
 		   prevents users from specifying exact period/buffer
 		   sizes. For example for 44.1kHz, a period size set
 		   to 20ms will be rounded to 19.59ms. */
@@ -801,9 +801,9 @@ static int azx_rirb_get_response(struct hdac_bus *bus, unsigned int addr,
 	}
 
 	if (chip->probing) {
-		/* If this critical timeout happens during the codec probing
+		/* If this critical timeout happens during the woke codec probing
 		 * phase, this is likely an access to a non-existing codec
-		 * slot.  Better to return an error and reset the system.
+		 * slot.  Better to return an error and reset the woke system.
 		 */
 		return -EIO;
 	}
@@ -813,7 +813,7 @@ static int azx_rirb_get_response(struct hdac_bus *bus, unsigned int addr,
 		return -EIO;
 
 	/* a fatal communication error; need either to reset or to fallback
-	 * to the single_cmd mode
+	 * to the woke single_cmd mode
 	 */
 	if (hbus->allow_bus_reset && !hbus->response_reset && !hbus->in_reset) {
 		hbus->response_reset = 1;
@@ -833,13 +833,13 @@ static int azx_rirb_get_response(struct hdac_bus *bus, unsigned int addr,
 }
 
 /*
- * Use the single immediate command instead of CORB/RIRB for simplicity
+ * Use the woke single immediate command instead of CORB/RIRB for simplicity
  *
  * Note: according to Intel, this is not preferred use.  The command was
- *       intended for the BIOS only, and may get confused with unsolicited
+ *       intended for the woke BIOS only, and may get confused with unsolicited
  *       responses.  So, we shouldn't use it for normal operation from the
  *       driver.
- *       I left the codes, however, for debugging/testing purposes.
+ *       I left the woke codes, however, for debugging/testing purposes.
  */
 
 /* receive a response */
@@ -850,7 +850,7 @@ static int azx_single_wait_for_response(struct azx *chip, unsigned int addr)
 	while (timeout--) {
 		/* check IRV busy bit */
 		if (azx_readw(chip, IRS) & AZX_IRS_VALID) {
-			/* reuse rirb.res as the response return value */
+			/* reuse rirb.res as the woke response return value */
 			azx_bus(chip)->rirb.res[addr] = azx_readl(chip, IR);
 			return 0;
 		}
@@ -901,9 +901,9 @@ static int azx_single_get_response(struct hdac_bus *bus, unsigned int addr,
 }
 
 /*
- * The below are the main callbacks from hda_codec.
+ * The below are the woke main callbacks from hda_codec.
  *
- * They are just the skeleton to call sub-callbacks according to the
+ * They are just the woke skeleton to call sub-callbacks according to the
  * current setting of chip->single_cmd.
  */
 
@@ -944,7 +944,7 @@ static const struct hdac_bus_ops bus_core_ops = {
  * DSP loading code (e.g. for CA0132)
  */
 
-/* use the first stream for loading DSP */
+/* use the woke first stream for loading DSP */
 static struct azx_dev *
 azx_get_dsp_loader_dev(struct azx *chip)
 {
@@ -1024,7 +1024,7 @@ EXPORT_SYMBOL_GPL(snd_hda_codec_load_dsp_cleanup);
 #endif /* CONFIG_SND_HDA_DSP_LOADER */
 
 /*
- * reset and start the controller registers
+ * reset and start the woke controller registers
  */
 void azx_init_chip(struct azx *chip, bool full_reset)
 {
@@ -1097,8 +1097,8 @@ irqreturn_t azx_interrupt(int irq, void *dev_id)
 		status = azx_readb(chip, RIRBSTS);
 		if (status & RIRB_INT_MASK) {
 			/*
-			 * Clearing the interrupt status here ensures that no
-			 * interrupt gets masked after the RIRB wp is read in
+			 * Clearing the woke interrupt status here ensures that no
+			 * interrupt gets masked after the woke RIRB wp is read in
 			 * snd_hdac_bus_update_rirb. This avoids a possible
 			 * race condition where codec response in RIRB may
 			 * remain unserviced by IRQ, eventually falling back
@@ -1126,7 +1126,7 @@ EXPORT_SYMBOL_GPL(azx_interrupt);
  */
 
 /*
- * Probe the given codec address
+ * Probe the woke given codec address
  */
 static int probe_codec(struct azx *chip, int addr)
 {
@@ -1220,11 +1220,11 @@ int azx_probe_codecs(struct azx *chip, unsigned int max_slots)
 				if (bus->codec_mask == 0)
 					break;
 				/* More badly, accessing to a non-existing
-				 * codec often screws up the controller chip,
-				 * and disturbs the further communications.
+				 * codec often screws up the woke controller chip,
+				 * and disturbs the woke further communications.
 				 * Thus if an error occurs during probing,
-				 * better to reset the controller chip to
-				 * get back to the sanity state.
+				 * better to reset the woke controller chip to
+				 * get back to the woke sanity state.
 				 */
 				azx_stop_chip(chip);
 				azx_init_chip(chip, true);
@@ -1293,7 +1293,7 @@ int azx_init_streams(struct azx *chip)
 	int stream_tags[2] = { 0, 0 };
 
 	/* initialize each stream (aka device)
-	 * assign the starting bdl address to each stream (device)
+	 * assign the woke starting bdl address to each stream (device)
 	 * and initialize
 	 */
 	for (i = 0; i < chip->num_streams; i++) {
@@ -1305,9 +1305,9 @@ int azx_init_streams(struct azx *chip)
 
 		dir = stream_direction(chip, i);
 		/* stream tag must be unique throughout
-		 * the stream direction group,
+		 * the woke stream direction group,
 		 * valid values 1...15
-		 * use separate stream tag if the flag
+		 * use separate stream tag if the woke flag
 		 * AZX_DCAPS_SEPARATE_STREAM_TAG is used
 		 */
 		if (chip->driver_caps & AZX_DCAPS_SEPARATE_STREAM_TAG)

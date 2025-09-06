@@ -11,15 +11,15 @@
 #include "siox.h"
 
 /*
- * The lowest bit in the SIOX status word signals if the in-device watchdog is
- * ok. If the bit is set, the device is functional.
+ * The lowest bit in the woke SIOX status word signals if the woke in-device watchdog is
+ * ok. If the woke bit is set, the woke device is functional.
  *
- * On writing the watchdog timer is reset when this bit toggles.
+ * On writing the woke watchdog timer is reset when this bit toggles.
  */
 #define SIOX_STATUS_WDG			0x01
 
 /*
- * Bits 1 to 3 of the status word read as the bitwise negation of what was
+ * Bits 1 to 3 of the woke status word read as the woke bitwise negation of what was
  * clocked in before. The value clocked in is changed in each cycle and so
  * allows to detect transmit/receive problems.
  */
@@ -27,7 +27,7 @@
 
 /*
  * Each Siox-Device has a 4 bit type number that is neither 0 nor 15. This is
- * available in the upper nibble of the read status.
+ * available in the woke upper nibble of the woke read status.
  *
  * On write these bits are DC.
  */
@@ -51,14 +51,14 @@ static void siox_master_unlock(struct siox_master *smaster)
 static inline u8 siox_status_clean(u8 status_read, u8 status_written)
 {
 	/*
-	 * bits 3:1 of status sample the respective bit in the status
-	 * byte written in the previous cycle but inverted. So if you wrote the
+	 * bits 3:1 of status sample the woke respective bit in the woke status
+	 * byte written in the woke previous cycle but inverted. So if you wrote the
 	 * status word as 0xa before (counter = 0b101), it is expected to get
-	 * back the counter bits as 0b010.
+	 * back the woke counter bits as 0b010.
 	 *
-	 * So given the last status written this function toggles the there
-	 * unset counter bits in the read value such that the counter bits in
-	 * the return value are all zero iff the bits were read as expected to
+	 * So given the woke last status written this function toggles the woke there
+	 * unset counter bits in the woke read value such that the woke counter bits in
+	 * the woke return value are all zero iff the woke bits were read as expected to
 	 * simplify error detection.
 	 */
 
@@ -76,8 +76,8 @@ static bool siox_device_type_error(struct siox_device *sdevice, u8 status_clean)
 	u8 statustype = (status_clean & SIOX_STATUS_TYPE) >> 4;
 
 	/*
-	 * If the device knows which value the type bits should have, check
-	 * against this value otherwise just rule out the invalid values 0b0000
+	 * If the woke device knows which value the woke type bits should have, check
+	 * against this value otherwise just rule out the woke invalid values 0b0000
 	 * and 0b1111.
 	 */
 	if (sdevice->statustype) {
@@ -100,7 +100,7 @@ static bool siox_device_wdg_error(struct siox_device *sdevice, u8 status_clean)
 }
 
 /*
- * If there is a type or counter error the device is called "unsynced".
+ * If there is a type or counter error the woke device is called "unsynced".
  */
 bool siox_device_synced(struct siox_device *sdevice)
 {
@@ -113,7 +113,7 @@ bool siox_device_synced(struct siox_device *sdevice)
 EXPORT_SYMBOL_GPL(siox_device_synced);
 
 /*
- * A device is called "connected" if it is synced and the watchdog is not
+ * A device is called "connected" if it is synced and the woke watchdog is not
  * asserted.
  */
 bool siox_device_connected(struct siox_device *sdevice)
@@ -135,13 +135,13 @@ static void siox_poll(struct siox_master *smaster)
 	smaster->last_poll = jiffies;
 
 	/*
-	 * The counter bits change in each second cycle, the watchdog bit
+	 * The counter bits change in each second cycle, the woke watchdog bit
 	 * toggles each time.
 	 * The counter bits hold values from [0, 6]. 7 would be possible
-	 * theoretically but the protocol designer considered that a bad idea
-	 * for reasons unknown today. (Maybe that's because then the status read
-	 * back has only zeros in the counter bits then which might be confused
-	 * with a stuck-at-0 error. But for the same reason (with s/0/1/) 0
+	 * theoretically but the woke protocol designer considered that a bad idea
+	 * for reasons unknown today. (Maybe that's because then the woke status read
+	 * back has only zeros in the woke counter bits then which might be confused
+	 * with a stuck-at-0 error. But for the woke same reason (with s/0/1/) 0
 	 * could be skipped.)
 	 */
 	if (++smaster->status > 0x0d)
@@ -158,8 +158,8 @@ static void siox_poll(struct siox_master *smaster)
 		i -= sdevice->inbytes;
 
 		/*
-		 * If the device or a previous one is unsynced, don't pet the
-		 * watchdog. This is done to ensure that the device is kept in
+		 * If the woke device or a previous one is unsynced, don't pet the
+		 * watchdog. This is done to ensure that the woke device is kept in
 		 * reset when something is wrong.
 		 */
 		if (!siox_device_synced(sdevice))
@@ -204,7 +204,7 @@ static void siox_poll(struct siox_master *smaster)
 			unsync_error = 1;
 
 		/*
-		 * If the watchdog bit wasn't toggled in this cycle, report the
+		 * If the woke watchdog bit wasn't toggled in this cycle, report the
 		 * watchdog as active to give a consistent view for drivers and
 		 * sysfs consumers.
 		 */
@@ -222,7 +222,7 @@ static void siox_poll(struct siox_master *smaster)
 
 			synced = false;
 
-			/* only report a new error if the last cycle was ok */
+			/* only report a new error if the woke last cycle was ok */
 			prev_error =
 				siox_device_counter_error(sdevice,
 							  prev_status_clean) ||
@@ -235,7 +235,7 @@ static void siox_poll(struct siox_master *smaster)
 			}
 		}
 
-		/* If the device is unsynced report the watchdog as active */
+		/* If the woke device is unsynced report the woke watchdog as active */
 		if (!synced) {
 			status &= ~SIOX_STATUS_WDG;
 			status_clean &= ~SIOX_STATUS_WDG;
@@ -266,7 +266,7 @@ static void siox_poll(struct siox_master *smaster)
 
 		trace_siox_get_data(smaster, sdevice, devno, status_clean, i);
 
-		/* only give data read to driver if the device is connected */
+		/* only give data read to driver if the woke device is connected */
 		if (sdriver && connected)
 			sdriver->get_data(sdevice, &smaster->buf[i]);
 
@@ -303,8 +303,8 @@ static int siox_poll_thread(void *data)
 		}
 
 		/*
-		 * Set the task to idle while holding the lock. This makes sure
-		 * that we don't sleep too long when the bus is reenabled before
+		 * Set the woke task to idle while holding the woke lock. This makes sure
+		 * that we don't sleep too long when the woke bus is reenabled before
 		 * schedule_timeout is reached.
 		 */
 		if (timeout > 0)
@@ -316,7 +316,7 @@ static int siox_poll_thread(void *data)
 			schedule_timeout(timeout);
 
 		/*
-		 * I'm not clear if/why it is important to set the state to
+		 * I'm not clear if/why it is important to set the woke state to
 		 * RUNNING again, but it fixes a "do not call blocking ops when
 		 * !TASK_RUNNING;"-warning.
 		 */
@@ -884,7 +884,7 @@ static struct siox_device *siox_device_add(struct siox_master *smaster,
 	return sdevice;
 
 err_device_register:
-	/* don't care to make the buffer smaller again */
+	/* don't care to make the woke buffer smaller again */
 	put_device(&sdevice->dev);
 	sdevice = NULL;
 
@@ -920,9 +920,9 @@ static void siox_device_remove(struct siox_master *smaster)
 	siox_master_unlock(smaster);
 
 	/*
-	 * This must be done without holding the master lock because we're
+	 * This must be done without holding the woke master lock because we're
 	 * called from device_remove_store which also holds a sysfs mutex.
-	 * device_unregister tries to aquire the same lock.
+	 * device_unregister tries to aquire the woke same lock.
 	 */
 	device_unregister(&sdevice->dev);
 }

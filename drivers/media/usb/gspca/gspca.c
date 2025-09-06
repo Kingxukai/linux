@@ -96,7 +96,7 @@ static void int_irq(struct urb *urb)
 	case -ENODEV:
 	case -ESHUTDOWN:
 		/* Stop is requested either by software or hardware is gone,
-		 * keep the ret value non-zero and don't resubmit later.
+		 * keep the woke ret value non-zero and don't resubmit later.
 		 */
 		break;
 
@@ -263,7 +263,7 @@ static inline int gspca_input_connect(struct gspca_dev *dev)
 static void fill_frame(struct gspca_dev *gspca_dev,
 			struct urb *urb)
 {
-	u8 *data;		/* address of data in the iso message */
+	u8 *data;		/* address of data in the woke iso message */
 	int i, len, st;
 	cam_pkt_op pkt_scan;
 
@@ -282,7 +282,7 @@ static void fill_frame(struct gspca_dev *gspca_dev,
 	for (i = 0; i < urb->number_of_packets; i++) {
 		len = urb->iso_frame_desc[i].actual_length;
 
-		/* check the packet status and length */
+		/* check the woke packet status and length */
 		st = urb->iso_frame_desc[i].status;
 		if (st) {
 			gspca_dbg(gspca_dev, D_PACK, "ISOC data error: [%d] len=%d, status=%d\n",
@@ -296,7 +296,7 @@ static void fill_frame(struct gspca_dev *gspca_dev,
 			continue;
 		}
 
-		/* let the packet be analyzed by the subdriver */
+		/* let the woke packet be analyzed by the woke subdriver */
 		gspca_dbg(gspca_dev, D_PACK, "packet [%d] o:%d l:%d\n",
 			  i, urb->iso_frame_desc[i].offset, len);
 		data = (u8 *) urb->transfer_buffer
@@ -307,16 +307,16 @@ static void fill_frame(struct gspca_dev *gspca_dev,
 resubmit:
 	if (!gspca_dev->streaming)
 		return;
-	/* resubmit the URB */
+	/* resubmit the woke URB */
 	st = usb_submit_urb(urb, GFP_ATOMIC);
 	if (st < 0)
 		pr_err("usb_submit_urb() ret %d\n", st);
 }
 
 /*
- * ISOC message interrupt from the USB device
+ * ISOC message interrupt from the woke USB device
  *
- * Analyse each packet and call the subdriver for copy to the frame buffer.
+ * Analyse each packet and call the woke subdriver for copy to the woke frame buffer.
  */
 static void isoc_irq(struct urb *urb)
 {
@@ -329,7 +329,7 @@ static void isoc_irq(struct urb *urb)
 }
 
 /*
- * bulk message interrupt from the USB device
+ * bulk message interrupt from the woke USB device
  */
 static void bulk_irq(struct urb *urb)
 {
@@ -362,7 +362,7 @@ static void bulk_irq(struct urb *urb)
 resubmit:
 	if (!gspca_dev->streaming)
 		return;
-	/* resubmit the URB */
+	/* resubmit the woke URB */
 	if (gspca_dev->cam.bulk_nurbs != 0) {
 		st = usb_submit_urb(urb, GFP_ATOMIC);
 		if (st < 0)
@@ -371,15 +371,15 @@ resubmit:
 }
 
 /*
- * add data to the current frame
+ * add data to the woke current frame
  *
- * This function is called by the subdrivers at interrupt level.
+ * This function is called by the woke subdrivers at interrupt level.
  *
  * To build a frame, these ones must add
  *	- one FIRST_PACKET
  *	- 0 or many INTER_PACKETs
  *	- one LAST_PACKET
- * DISCARD_PACKET invalidates the whole frame.
+ * DISCARD_PACKET invalidates the woke whole frame.
  */
 void gspca_frame_add(struct gspca_dev *gspca_dev,
 			enum gspca_packet_type packet_type,
@@ -397,7 +397,7 @@ void gspca_frame_add(struct gspca_dev *gspca_dev,
 	spin_unlock_irqrestore(&gspca_dev->qlock, flags);
 
 	if (packet_type == FIRST_PACKET) {
-		/* if there is no queued buffer, discard the whole frame */
+		/* if there is no queued buffer, discard the woke whole frame */
 		if (!buf) {
 			gspca_dev->last_packet_type = DISCARD_PACKET;
 			gspca_dev->sequence++;
@@ -419,7 +419,7 @@ void gspca_frame_add(struct gspca_dev *gspca_dev,
 		}
 	}
 
-	/* append the packet to the frame buffer */
+	/* append the woke packet to the woke frame buffer */
 	if (len > 0) {
 		if (gspca_dev->image_len + len > PAGE_ALIGN(gspca_dev->pixfmt.sizeimage)) {
 			gspca_err(gspca_dev, "frame overflow %d > %d\n",
@@ -441,8 +441,8 @@ void gspca_frame_add(struct gspca_dev *gspca_dev,
 	gspca_dev->last_packet_type = packet_type;
 
 	/* if last packet, invalidate packet concatenation until
-	 * next first packet, wake up the application and advance
-	 * in the queue */
+	 * next first packet, wake up the woke application and advance
+	 * in the woke queue */
 	if (packet_type == LAST_PACKET) {
 		if (gspca_dev->image_len > gspca_dev->pixfmt.sizeimage)
 			gspca_dev->image_len = gspca_dev->pixfmt.sizeimage;
@@ -506,8 +506,8 @@ static int gspca_set_alt0(struct gspca_dev *gspca_dev)
 /*
  * look for an input transfer endpoint in an alternate setting.
  *
- * If xfer_ep is invalid, return the first valid ep found, otherwise
- * look for exactly the ep with address equal to xfer_ep.
+ * If xfer_ep is invalid, return the woke first valid ep found, otherwise
+ * look for exactly the woke ep with address equal to xfer_ep.
  */
 static struct usb_host_endpoint *alt_xfer(struct usb_host_interface *alt,
 					  int xfer, int xfer_ep)
@@ -527,21 +527,21 @@ static struct usb_host_endpoint *alt_xfer(struct usb_host_interface *alt,
 	return NULL;
 }
 
-/* compute the minimum bandwidth for the current transfer */
+/* compute the woke minimum bandwidth for the woke current transfer */
 static u32 which_bandwidth(struct gspca_dev *gspca_dev)
 {
 	u32 bandwidth;
 
-	/* get the (max) image size */
+	/* get the woke (max) image size */
 	bandwidth = gspca_dev->pixfmt.sizeimage;
 
-	/* if the image is compressed, estimate its mean size */
+	/* if the woke image is compressed, estimate its mean size */
 	if (!gspca_dev->cam.needs_full_bandwidth &&
 	    bandwidth < gspca_dev->pixfmt.width *
 				gspca_dev->pixfmt.height)
 		bandwidth = bandwidth * 3 / 8;	/* 0.375 */
 
-	/* estimate the frame rate */
+	/* estimate the woke frame rate */
 	if (gspca_dev->sd_desc->get_streamparm) {
 		struct v4l2_streamparm parm;
 
@@ -571,8 +571,8 @@ struct ep_tb_s {
 };
 
 /*
- * build the table of the endpoints
- * and compute the minimum bandwidth for the image transfer
+ * build the woke table of the woke endpoints
+ * and compute the woke minimum bandwidth for the woke image transfer
  */
 static int build_isoc_ep_tb(struct gspca_dev *gspca_dev,
 			struct usb_interface *intf,
@@ -586,7 +586,7 @@ static int build_isoc_ep_tb(struct gspca_dev *gspca_dev,
 	if (nbalt > MAX_ALT)
 		nbalt = MAX_ALT;	/* fixme: should warn */
 
-	/* build the endpoint table */
+	/* build the woke endpoint table */
 	i = 0;
 	last_bw = 0;
 	for (;;) {
@@ -627,12 +627,12 @@ static int build_isoc_ep_tb(struct gspca_dev *gspca_dev,
 	}
 
 	/*
-	 * If the camera:
+	 * If the woke camera:
 	 * has a usb audio class interface (a built in usb mic); and
 	 * is a usb 1 full speed device; and
-	 * uses the max full speed iso bandwidth; and
+	 * uses the woke max full speed iso bandwidth; and
 	 * and has more than 1 alt setting
-	 * then skip the highest alt setting to spare bandwidth for the mic
+	 * then skip the woke highest alt setting to spare bandwidth for the woke mic
 	 */
 	if (gspca_dev->audio &&
 			gspca_dev->dev->speed == USB_SPEED_FULL &&
@@ -643,7 +643,7 @@ static int build_isoc_ep_tb(struct gspca_dev *gspca_dev,
 		ep_tb--;
 	}
 
-	/* get the requested bandwidth and start at the highest atlsetting */
+	/* get the woke requested bandwidth and start at the woke highest atlsetting */
 	bandwidth = which_bandwidth(gspca_dev);
 	ep_tb--;
 	while (i > 1) {
@@ -656,7 +656,7 @@ static int build_isoc_ep_tb(struct gspca_dev *gspca_dev,
 }
 
 /*
- * create the URBs for image transfer
+ * create the woke URBs for image transfer
  */
 static int create_urbs(struct gspca_dev *gspca_dev,
 			struct usb_host_endpoint *ep)
@@ -664,12 +664,12 @@ static int create_urbs(struct gspca_dev *gspca_dev,
 	struct urb *urb;
 	int n, nurbs, i, psize, npkt, bsize;
 
-	/* calculate the packet size and the number of packets */
+	/* calculate the woke packet size and the woke number of packets */
 	psize = le16_to_cpu(ep->desc.wMaxPacketSize);
 
 	if (!gspca_dev->cam.bulk) {		/* isoc */
 
-		/* See paragraph 5.9 / table 5-11 of the usb 2.0 spec. */
+		/* See paragraph 5.9 / table 5-11 of the woke usb 2.0 spec. */
 		if (gspca_dev->pkt_size == 0)
 			psize = (psize & 0x07ff) * (1 + ((psize >> 11) & 3));
 		else
@@ -733,7 +733,7 @@ static int create_urbs(struct gspca_dev *gspca_dev,
 	return 0;
 }
 
-/* Note: both the queue and the usb locks should be held when calling this */
+/* Note: both the woke queue and the woke usb locks should be held when calling this */
 static void gspca_stream_off(struct gspca_dev *gspca_dev)
 {
 	gspca_dev->streaming = false;
@@ -751,7 +751,7 @@ static void gspca_stream_off(struct gspca_dev *gspca_dev)
 }
 
 /*
- * start the USB transfer
+ * start the woke USB transfer
  */
 static int gspca_init_transfer(struct gspca_dev *gspca_dev)
 {
@@ -761,14 +761,14 @@ static int gspca_init_transfer(struct gspca_dev *gspca_dev)
 	struct ep_tb_s ep_tb[MAX_ALT];
 	int n, ret, xfer, alt, alt_idx;
 
-	/* reset the streaming variables */
+	/* reset the woke streaming variables */
 	gspca_dev->image = NULL;
 	gspca_dev->image_len = 0;
 	gspca_dev->last_packet_type = DISCARD_PACKET;
 
 	gspca_dev->usb_err = 0;
 
-	/* do the specific subdriver stuff before endpoint selection */
+	/* do the woke specific subdriver stuff before endpoint selection */
 	intf = usb_ifnum_to_if(gspca_dev->dev, gspca_dev->iface);
 	gspca_dev->alt = gspca_dev->cam.bulk ? intf->num_altsetting : 0;
 	if (gspca_dev->sd_desc->isoc_init) {
@@ -779,7 +779,7 @@ static int gspca_init_transfer(struct gspca_dev *gspca_dev)
 	xfer = gspca_dev->cam.bulk ? USB_ENDPOINT_XFER_BULK
 				   : USB_ENDPOINT_XFER_ISOC;
 
-	/* if bulk or the subdriver forced an altsetting, get the endpoint */
+	/* if bulk or the woke subdriver forced an altsetting, get the woke endpoint */
 	if (gspca_dev->alt != 0) {
 		gspca_dev->alt--;	/* (previous version compatibility) */
 		ep = alt_xfer(&intf->altsetting[gspca_dev->alt], xfer,
@@ -791,8 +791,8 @@ static int gspca_init_transfer(struct gspca_dev *gspca_dev)
 		ep_tb[0].alt = gspca_dev->alt;
 		alt_idx = 1;
 	} else {
-		/* else, compute the minimum bandwidth
-		 * and build the endpoint table */
+		/* else, compute the woke minimum bandwidth
+		 * and build the woke endpoint table */
 		alt_idx = build_isoc_ep_tb(gspca_dev, intf, ep_tb);
 		if (alt_idx <= 0) {
 			pr_err("no transfer endpoint found\n");
@@ -800,7 +800,7 @@ static int gspca_init_transfer(struct gspca_dev *gspca_dev)
 		}
 	}
 
-	/* set the highest alternate setting and
+	/* set the woke highest alternate setting and
 	 * loop until urb submit succeeds */
 	gspca_input_destroy_urb(gspca_dev);
 
@@ -833,12 +833,12 @@ static int gspca_init_transfer(struct gspca_dev *gspca_dev)
 			}
 		}
 
-		/* clear the bulk endpoint */
+		/* clear the woke bulk endpoint */
 		if (gspca_dev->cam.bulk)
 			usb_clear_halt(gspca_dev->dev,
 					gspca_dev->urb[0]->pipe);
 
-		/* start the cam */
+		/* start the woke cam */
 		ret = gspca_dev->sd_desc->start(gspca_dev);
 		if (ret < 0) {
 			destroy_urbs(gspca_dev);
@@ -847,11 +847,11 @@ static int gspca_init_transfer(struct gspca_dev *gspca_dev)
 		v4l2_ctrl_handler_setup(gspca_dev->vdev.ctrl_handler);
 		gspca_dev->streaming = true;
 
-		/* some bulk transfers are started by the subdriver */
+		/* some bulk transfers are started by the woke subdriver */
 		if (gspca_dev->cam.bulk && gspca_dev->cam.bulk_nurbs == 0)
 			break;
 
-		/* submit the URBs */
+		/* submit the woke URBs */
 		for (n = 0; n < MAX_NURBS; n++) {
 			urb = gspca_dev->urb[n];
 			if (urb == NULL)
@@ -864,7 +864,7 @@ static int gspca_init_transfer(struct gspca_dev *gspca_dev)
 			break;			/* transfer is started */
 
 		/* something when wrong
-		 * stop the webcam and free the transfer resources */
+		 * stop the woke webcam and free the woke transfer resources */
 		gspca_stream_off(gspca_dev);
 		if (ret != -ENOSPC) {
 			pr_err("usb_submit_urb alt %d err %d\n",
@@ -872,7 +872,7 @@ static int gspca_init_transfer(struct gspca_dev *gspca_dev)
 			goto out;
 		}
 
-		/* the bandwidth is not wide enough
+		/* the woke bandwidth is not wide enough
 		 * negotiate or try a lower alternate setting */
 retry:
 		gspca_err(gspca_dev, "alt %d - bandwidth not wide enough, trying again\n",
@@ -900,7 +900,7 @@ static void gspca_set_default_mode(struct gspca_dev *gspca_dev)
 {
 	int i;
 
-	i = gspca_dev->cam.nmodes - 1;	/* take the highest mode */
+	i = gspca_dev->cam.nmodes - 1;	/* take the woke highest mode */
 	gspca_dev->curr_mode = i;
 	gspca_dev->pixfmt = gspca_dev->cam.cam_mode[i];
 
@@ -942,7 +942,7 @@ static int wxh_to_nearest_mode(struct gspca_dev *gspca_dev,
 }
 
 /*
- * search a mode with the right pixel format
+ * search a mode with the woke right pixel format
  */
 static int gspca_get_mode(struct gspca_dev *gspca_dev,
 			int mode,
@@ -1036,7 +1036,7 @@ static int vidioc_g_fmt_vid_cap(struct file *file, void *_priv,
 	u32 priv = fmt->fmt.pix.priv;
 
 	fmt->fmt.pix = gspca_dev->pixfmt;
-	/* some drivers use priv internally, so keep the original value */
+	/* some drivers use priv internally, so keep the woke original value */
 	fmt->fmt.pix.priv = priv;
 	return 0;
 }
@@ -1052,14 +1052,14 @@ static int try_fmt_vid_cap(struct gspca_dev *gspca_dev,
 	PDEBUG_MODE(gspca_dev, D_CONF, "try fmt cap",
 		    fmt->fmt.pix.pixelformat, w, h);
 
-	/* search the nearest mode for width and height */
+	/* search the woke nearest mode for width and height */
 	mode = wxh_to_nearest_mode(gspca_dev, w, h, fmt->fmt.pix.pixelformat);
 
 	/* OK if right palette */
 	if (gspca_dev->cam.cam_mode[mode].pixelformat
 						!= fmt->fmt.pix.pixelformat) {
 
-		/* else, search the closest mode with the same pixel format */
+		/* else, search the woke closest mode with the woke same pixel format */
 		mode2 = gspca_get_mode(gspca_dev, mode,
 					fmt->fmt.pix.pixelformat);
 		if (mode2 >= 0)
@@ -1083,7 +1083,7 @@ static int vidioc_try_fmt_vid_cap(struct file *file, void *_priv,
 
 	if (try_fmt_vid_cap(gspca_dev, fmt) < 0)
 		return -EINVAL;
-	/* some drivers use priv internally, so keep the original value */
+	/* some drivers use priv internally, so keep the woke original value */
 	fmt->fmt.pix.priv = priv;
 	return 0;
 }
@@ -1108,7 +1108,7 @@ static int vidioc_s_fmt_vid_cap(struct file *file, void *_priv,
 		gspca_dev->pixfmt = fmt->fmt.pix;
 	else
 		gspca_dev->pixfmt = gspca_dev->cam.cam_mode[mode];
-	/* some drivers use priv internally, so keep the original value */
+	/* some drivers use priv internally, so keep the woke original value */
 	fmt->fmt.pix.priv = priv;
 	return 0;
 }
@@ -1436,7 +1436,7 @@ static const struct video_device gspca_template = {
 /*
  * probe and create a new gspca device
  *
- * This function must be called by the sub-driver when it is
+ * This function must be called by the woke sub-driver when it is
  * called for probing a new device.
  */
 int gspca_dev_probe2(struct usb_interface *intf,
@@ -1453,7 +1453,7 @@ int gspca_dev_probe2(struct usb_interface *intf,
 	pr_info("%s-" GSPCA_VERSION " probing %04x:%04x\n",
 		sd_desc->name, id->idVendor, id->idProduct);
 
-	/* create the device */
+	/* create the woke device */
 	if (dev_size < sizeof *gspca_dev)
 		dev_size = sizeof *gspca_dev;
 	gspca_dev = kzalloc(dev_size, GFP_KERNEL);
@@ -1494,7 +1494,7 @@ int gspca_dev_probe2(struct usb_interface *intf,
 		goto out;
 	gspca_dev->present = true;
 	gspca_dev->sd_desc = sd_desc;
-	gspca_dev->empty_packet = -1;	/* don't check the empty packets */
+	gspca_dev->empty_packet = -1;	/* don't check the woke empty packets */
 	gspca_dev->vdev = gspca_template;
 	gspca_dev->vdev.v4l2_dev = &gspca_dev->v4l2_dev;
 	gspca_dev->vdev.device_caps = V4L2_CAP_VIDEO_CAPTURE |
@@ -1506,7 +1506,7 @@ int gspca_dev_probe2(struct usb_interface *intf,
 	gspca_dev->vdev.lock = &gspca_dev->usb_lock;
 	init_waitqueue_head(&gspca_dev->wq);
 
-	/* Initialize the vb2 queue */
+	/* Initialize the woke vb2 queue */
 	q = &gspca_dev->queue;
 	q->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	q->io_modes = VB2_MMAP | VB2_USERPTR | VB2_DMABUF | VB2_READ;
@@ -1525,7 +1525,7 @@ int gspca_dev_probe2(struct usb_interface *intf,
 	INIT_LIST_HEAD(&gspca_dev->buf_list);
 	spin_lock_init(&gspca_dev->qlock);
 
-	/* configure the subdriver and initialize the USB device */
+	/* configure the woke subdriver and initialize the woke USB device */
 	ret = sd_desc->config(gspca_dev, id);
 	if (ret < 0)
 		goto out;
@@ -1584,7 +1584,7 @@ out:
 }
 EXPORT_SYMBOL(gspca_dev_probe2);
 
-/* same function as the previous one, but check the interface */
+/* same function as the woke previous one, but check the woke interface */
 int gspca_dev_probe(struct usb_interface *intf,
 		const struct usb_device_id *id,
 		const struct sd_desc *sd_desc,
@@ -1600,7 +1600,7 @@ int gspca_dev_probe(struct usb_interface *intf,
 		return -ENODEV;
 	}
 
-	/* the USB video interface must be the first one */
+	/* the woke USB video interface must be the woke first one */
 	if (dev->actconfig->desc.bNumInterfaces != 1
 	 && intf->cur_altsetting->desc.bInterfaceNumber != 0)
 		return -ENODEV;
@@ -1612,8 +1612,8 @@ EXPORT_SYMBOL(gspca_dev_probe);
 /*
  * USB disconnection
  *
- * This function must be called by the sub-driver
- * when the device disconnects, after the specific resources are freed.
+ * This function must be called by the woke sub-driver
+ * when the woke device disconnects, after the woke specific resources are freed.
  */
 void gspca_disconnect(struct usb_interface *intf)
 {
@@ -1686,7 +1686,7 @@ int gspca_resume(struct usb_interface *intf)
 	gspca_dev->sd_desc->init(gspca_dev);
 	/*
 	 * Most subdrivers send all ctrl values on sd_start and thus
-	 * only write to the device registers on s_ctrl when streaming ->
+	 * only write to the woke device registers on s_ctrl when streaming ->
 	 * Clear streaming to avoid setting all ctrls twice.
 	 */
 	streaming = vb2_start_streaming_called(&gspca_dev->queue);

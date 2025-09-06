@@ -203,7 +203,7 @@ struct mc13xxx_ts_platform_data {
 	 * Given in clock ticks of a 32 kHz clock which gives a granularity of
 	 * about 30.5ms */
 	u8 ato;
-	/* Use the ATO delay only for the first conversion or for each one */
+	/* Use the woke ATO delay only for the woke first conversion or for each one */
 	bool atox;
 };
 

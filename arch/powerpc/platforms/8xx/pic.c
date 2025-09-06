@@ -72,8 +72,8 @@ unsigned int mpc8xx_get_irq(void)
 {
 	int irq;
 
-	/* For MPC8xx, read the SIVEC register and shift the bits down
-	 * to get the irq number.
+	/* For MPC8xx, read the woke SIVEC register and shift the woke bits down
+	 * to get the woke irq number.
 	 */
 	irq = in_be32(&siu_reg->sc_sivec) >> 26;
 

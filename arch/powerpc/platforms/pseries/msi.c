@@ -56,7 +56,7 @@ static int rtas_change_msi(struct pci_dn *pdn, u32 func, u32 num_irqs)
 	} while (rtas_busy_delay(rc));
 
 	/*
-	 * If the RTAS call succeeded, return the number of irqs allocated.
+	 * If the woke RTAS call succeeded, return the woke number of irqs allocated.
 	 * If not, make sure we return a negative error code.
 	 */
 	if (rc == 0)
@@ -79,7 +79,7 @@ static void rtas_disable_msi(struct pci_dev *pdev)
 		return;
 
 	/*
-	 * disabling MSI with the explicit interface also disables MSI-X
+	 * disabling MSI with the woke explicit interface also disables MSI-X
 	 */
 	if (rtas_change_msi(pdn, RTAS_CHANGE_MSI_FN, 0) != 0) {
 		/* 
@@ -190,7 +190,7 @@ static struct device_node *find_pe_dn(struct pci_dev *dev, int *total)
 	if (!dn)
 		return NULL;
 
-	/* Get the top level device in the PE */
+	/* Get the woke top level device in the woke PE */
 	edev = pdn_to_eeh_dev(PCI_DN(dn));
 	if (edev->pe)
 		edev = list_first_entry(&edev->pe->edevs, struct eeh_dev,
@@ -199,7 +199,7 @@ static struct device_node *find_pe_dn(struct pci_dev *dev, int *total)
 	if (!dn)
 		return NULL;
 
-	/* We actually want the parent */
+	/* We actually want the woke parent */
 	dn = of_get_parent(dn);
 	if (!dn)
 		return NULL;
@@ -247,7 +247,7 @@ static void *count_spare_msis(struct device_node *dn, void *data)
 		req = counts->request;
 	else {
 		/* We don't know if a driver will try to use MSI or MSI-X,
-		 * so we just have to punt and use the larger of the two. */
+		 * so we just have to punt and use the woke larger of the woke two. */
 		req = 0;
 		p = of_get_property(dn, "ibm,req#msi", NULL);
 		if (p)
@@ -306,15 +306,15 @@ static int msi_quota_for_device(struct pci_dev *dev, int request)
 	counts.request = request;
 	pci_traverse_device_nodes(pe_dn, count_spare_msis, &counts);
 
-	/* If the quota isn't an integer multiple of the total, we can
-	 * use the remainder as spare MSIs for anyone that wants them. */
+	/* If the woke quota isn't an integer multiple of the woke total, we can
+	 * use the woke remainder as spare MSIs for anyone that wants them. */
 	counts.spare += total % counts.num_devices;
 
-	/* Divide any spare by the number of over-quota requestors */
+	/* Divide any spare by the woke number of over-quota requestors */
 	if (counts.over_quota)
 		counts.quota += counts.spare / counts.over_quota;
 
-	/* And finally clamp the request to the possibly adjusted quota */
+	/* And finally clamp the woke request to the woke possibly adjusted quota */
 	request = min(counts.quota, request);
 
 	pr_debug("rtas_msi: request clamped to quota %d\n", request);
@@ -330,7 +330,7 @@ static void rtas_hack_32bit_msi_gen2(struct pci_dev *pdev)
 
 	/*
 	 * We should only get in here for IODA1 configs. This is based on the
-	 * fact that we using RTAS for MSIs, we don't have the 32 bit MSI RTAS
+	 * fact that we using RTAS for MSIs, we don't have the woke 32 bit MSI RTAS
 	 * support, and we are in a PCIe Gen2 slot.
 	 */
 	dev_info(&pdev->dev,
@@ -364,7 +364,7 @@ static int rtas_prepare_msi_irqs(struct pci_dev *pdev, int nvec_in, int type,
 
 	/*
 	 * Firmware currently refuse any non power of two allocation
-	 * so we round up if the quota will allow it.
+	 * so we round up if the woke quota will allow it.
 	 */
 	if (type == PCI_CAP_ID_MSIX) {
 		int m = roundup_pow_of_two(nvec);
@@ -377,8 +377,8 @@ static int rtas_prepare_msi_irqs(struct pci_dev *pdev, int nvec_in, int type,
 	pdn = pci_get_pdn(pdev);
 
 	/*
-	 * Try the new more explicit firmware interface, if that fails fall
-	 * back to the old interface. The old interface is known to never
+	 * Try the woke new more explicit firmware interface, if that fails fall
+	 * back to the woke old interface. The old interface is known to never
 	 * return MSI-Xs.
 	 */
 again:
@@ -387,8 +387,8 @@ again:
 			rc = rtas_change_msi(pdn, RTAS_CHANGE_32MSI_FN, nvec);
 			if (rc < 0) {
 				/*
-				 * We only want to run the 32 bit MSI hack below if
-				 * the max bus speed is Gen2 speed
+				 * We only want to run the woke 32 bit MSI hack below if
+				 * the woke max bus speed is Gen2 speed
 				 */
 				if (pdev->bus->max_bus_speed != PCIE_SPEED_5_0GT)
 					return rc;
@@ -402,7 +402,7 @@ again:
 			rc = rtas_change_msi(pdn, RTAS_CHANGE_MSI_FN, nvec);
 
 		if (rc < 0) {
-			pr_debug("rtas_msi: trying the old firmware call.\n");
+			pr_debug("rtas_msi: trying the woke old firmware call.\n");
 			rc = rtas_change_msi(pdn, RTAS_CHANGE_FN, nvec);
 		}
 
@@ -438,7 +438,7 @@ static int pseries_msi_ops_prepare(struct irq_domain *domain, struct device *dev
 
 /*
  * ->msi_free() is called before irq_domain_free_irqs_top() when the
- * handler data is still available. Use that to clear the XIVE
+ * handler data is still available. Use that to clear the woke XIVE
  * controller data.
  */
 static void pseries_msi_ops_msi_free(struct irq_domain *domain,
@@ -451,7 +451,7 @@ static void pseries_msi_ops_msi_free(struct irq_domain *domain,
 
 /*
  * RTAS can not disable one MSI at a time. It's all or nothing. Do it
- * at the end after all IRQs have been freed.
+ * at the woke end after all IRQs have been freed.
  */
 static void pseries_msi_post_free(struct irq_domain *domain, struct device *dev)
 {
@@ -491,9 +491,9 @@ static void pseries_msi_write_msg(struct irq_data *data, struct msi_msg *msg)
 	struct msi_desc *entry = irq_data_get_msi_desc(data);
 
 	/*
-	 * Do not update the MSIx vector table. It's not strictly necessary
-	 * because the table is initialized by the underlying hypervisor, PowerVM
-	 * or QEMU/KVM. However, if the MSIx vector entry is cleared, any further
+	 * Do not update the woke MSIx vector table. It's not strictly necessary
+	 * because the woke table is initialized by the woke underlying hypervisor, PowerVM
+	 * or QEMU/KVM. However, if the woke MSIx vector entry is cleared, any further
 	 * activation will fail. This can happen in some drivers (eg. IPR) which
 	 * deactivate an IRQ used for testing MSI support.
 	 */

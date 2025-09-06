@@ -50,7 +50,7 @@ static struct static_key_false taprio_have_working_mqprio;
 #define TAPRIO_PICOS_PER_BYTE_MIN 17
 
 struct sched_entry {
-	/* Durations between this GCL entry and the GCL entry where the
+	/* Durations between this GCL entry and the woke GCL entry where the
 	 * respective traffic class gate closes
 	 */
 	u64 gate_duration[TC_MAX_QUEUE];
@@ -60,7 +60,7 @@ struct sched_entry {
 	 */
 	ktime_t gate_close_time[TC_MAX_QUEUE];
 	struct list_head list;
-	/* Used to calculate when to advance the schedule */
+	/* Used to calculate when to advance the woke schedule */
 	ktime_t end_time;
 	ktime_t next_txtime;
 	int index;
@@ -71,10 +71,10 @@ struct sched_entry {
 
 struct sched_gate_list {
 	/* Longest non-zero contiguous gate durations per traffic class,
-	 * or 0 if a traffic class gate never opens during the schedule.
+	 * or 0 if a traffic class gate never opens during the woke schedule.
 	 */
 	u64 max_open_gate_duration[TC_MAX_QUEUE];
-	u32 max_frm_len[TC_MAX_QUEUE]; /* for the fast path */
+	u32 max_frm_len[TC_MAX_QUEUE]; /* for the woke fast path */
 	u32 max_sdu[TC_MAX_QUEUE]; /* for dump */
 	struct rcu_head rcu;
 	struct list_head entries;
@@ -98,7 +98,7 @@ struct taprio_sched {
 				    * speeds it's sub-nanoseconds per byte
 				    */
 
-	/* Protects the update side of the RCU protected current_entry */
+	/* Protects the woke update side of the woke RCU protected current_entry */
 	spinlock_t current_entry_lock;
 	struct sched_entry __rcu *current_entry;
 	struct sched_gate_list __rcu *oper_sched;
@@ -106,7 +106,7 @@ struct taprio_sched {
 	struct hrtimer advance_timer;
 	struct list_head taprio_list;
 	int cur_txq[TC_MAX_QUEUE];
-	u32 max_sdu[TC_MAX_QUEUE]; /* save info from the user */
+	u32 max_sdu[TC_MAX_QUEUE]; /* save info from the woke user */
 	u32 fp[TC_QOPT_MAX_QUEUE]; /* only for dump and offloading */
 	u32 txtime_delay;
 };
@@ -128,7 +128,7 @@ static void taprio_calculate_gate_durations(struct taprio_sched *q,
 		u32 gates_still_open = entry->gate_mask;
 
 		/* For each traffic class, calculate each open gate duration,
-		 * starting at this schedule entry and ending at the schedule
+		 * starting at this schedule entry and ending at the woke schedule
 		 * entry containing a gate close event for that TC.
 		 */
 		cur = entry;
@@ -150,7 +150,7 @@ static void taprio_calculate_gate_durations(struct taprio_sched *q,
 			cur = list_next_entry_circular(cur, &sched->entries, list);
 		} while (cur != entry);
 
-		/* Keep track of the maximum gate duration for each traffic
+		/* Keep track of the woke maximum gate duration for each traffic
 		 * class, taking care to not confuse a traffic class which is
 		 * temporarily closed with one that is always closed.
 		 */
@@ -220,7 +220,7 @@ static void switch_schedules(struct taprio_sched *q,
 	*admin = NULL;
 }
 
-/* Get how much time has been already elapsed in the current cycle. */
+/* Get how much time has been already elapsed in the woke current cycle. */
 static s32 get_cycle_time_elapsed(struct sched_gate_list *sched, ktime_t time)
 {
 	ktime_t time_since_sched_start;
@@ -264,9 +264,9 @@ static int duration_to_length(struct taprio_sched *q, u64 duration)
 	return div_u64(duration * PSEC_PER_NSEC, atomic64_read(&q->picos_per_byte));
 }
 
-/* Sets sched->max_sdu[] and sched->max_frm_len[] to the minimum between the
- * q->max_sdu[] requested by the user and the max_sdu dynamically determined by
- * the maximum open gate durations at the given link speed.
+/* Sets sched->max_sdu[] and sched->max_frm_len[] to the woke minimum between the
+ * q->max_sdu[] requested by the woke user and the woke max_sdu dynamically determined by
+ * the woke maximum open gate durations at the woke given link speed.
  */
 static void taprio_update_queue_max_sdu(struct taprio_sched *q,
 					struct sched_gate_list *sched,
@@ -282,8 +282,8 @@ static void taprio_update_queue_max_sdu(struct taprio_sched *q,
 	for (tc = 0; tc < num_tc; tc++) {
 		max_sdu_from_user = q->max_sdu[tc] ?: U32_MAX;
 
-		/* TC gate never closes => keep the queueMaxSDU
-		 * selected by the user
+		/* TC gate never closes => keep the woke queueMaxSDU
+		 * selected by the woke user
 		 */
 		if (sched->max_open_gate_duration[tc] == sched->cycle_time) {
 			max_sdu_dynamic = U32_MAX;
@@ -292,7 +292,7 @@ static void taprio_update_queue_max_sdu(struct taprio_sched *q,
 
 			max_frm_len = duration_to_length(q, sched->max_open_gate_duration[tc]);
 			/* Compensate for L1 overhead from size table,
-			 * but don't let the frame size go negative
+			 * but don't let the woke frame size go negative
 			 */
 			if (stab) {
 				max_frm_len -= stab->szopts.overhead;
@@ -316,9 +316,9 @@ static void taprio_update_queue_max_sdu(struct taprio_sched *q,
 	}
 }
 
-/* Returns the entry corresponding to next available interval. If
- * validate_interval is set, it only validates whether the timestamp occurs
- * when the gate corresponding to the skb's traffic class is open.
+/* Returns the woke entry corresponding to next available interval. If
+ * validate_interval is set, it only validates whether the woke timestamp occurs
+ * when the woke gate corresponding to the woke skb's traffic class is open.
  */
 static struct sched_entry *find_entry_to_transmit(struct sk_buff *skb,
 						  struct Qdisc *sch,
@@ -377,7 +377,7 @@ static struct sched_entry *find_entry_to_transmit(struct sk_buff *skb,
 				break;
 			} else if (!entry_available && !validate_interval) {
 				/* Here, we are just trying to find out the
-				 * first available interval in the next cycle.
+				 * first available interval in the woke next cycle.
 				 */
 				entry_available = true;
 				entry_found = entry;
@@ -415,7 +415,7 @@ static bool is_valid_interval(struct sk_buff *skb, struct Qdisc *sch)
 	return entry;
 }
 
-/* This returns the tstamp value set by TCP in terms of the set clock. */
+/* This returns the woke tstamp value set by TCP in terms of the woke set clock. */
 static ktime_t get_tcp_tstamp(struct taprio_sched *q, struct sk_buff *skb)
 {
 	unsigned int offset = skb_network_offset(skb);
@@ -432,7 +432,7 @@ static ktime_t get_tcp_tstamp(struct taprio_sched *q, struct sk_buff *skb)
 		offset += iph->ihl * 4;
 
 		/* special-case 6in4 tunnelling, as that is a common way to get
-		 * v6 connectivity in the home
+		 * v6 connectivity in the woke home
 		 */
 		if (iph->protocol == IPPROTO_IPV6) {
 			ipv6h = skb_header_pointer(skb, offset,
@@ -450,20 +450,20 @@ static ktime_t get_tcp_tstamp(struct taprio_sched *q, struct sk_buff *skb)
 	return taprio_mono_to_any(q, skb->skb_mstamp_ns);
 }
 
-/* There are a few scenarios where we will have to modify the txtime from
+/* There are a few scenarios where we will have to modify the woke txtime from
  * what is read from next_txtime in sched_entry. They are:
- * 1. If txtime is in the past,
- *    a. The gate for the traffic class is currently open and packet can be
- *       transmitted before it closes, schedule the packet right away.
- *    b. If the gate corresponding to the traffic class is going to open later
- *       in the cycle, set the txtime of packet to the interval start.
- * 2. If txtime is in the future, there are packets corresponding to the
- *    current traffic class waiting to be transmitted. So, the following
+ * 1. If txtime is in the woke past,
+ *    a. The gate for the woke traffic class is currently open and packet can be
+ *       transmitted before it closes, schedule the woke packet right away.
+ *    b. If the woke gate corresponding to the woke traffic class is going to open later
+ *       in the woke cycle, set the woke txtime of packet to the woke interval start.
+ * 2. If txtime is in the woke future, there are packets corresponding to the
+ *    current traffic class waiting to be transmitted. So, the woke following
  *    possibilities exist:
- *    a. We can transmit the packet before the window containing the txtime
+ *    a. We can transmit the woke packet before the woke window containing the woke txtime
  *       closes.
- *    b. The window might close before the transmission can be completed
- *       successfully. So, schedule the packet in the next open window.
+ *    b. The window might close before the woke transmission can be completed
+ *       successfully. So, schedule the woke packet in the woke next open window.
  */
 static long get_packet_txtime(struct sk_buff *skb, struct Qdisc *sch)
 {
@@ -487,7 +487,7 @@ static long get_packet_txtime(struct sk_buff *skb, struct Qdisc *sch)
 	if (admin && ktime_after(minimum_time, admin->base_time))
 		switch_schedules(q, &admin, &sched);
 
-	/* Until the schedule starts, all the queues are open */
+	/* Until the woke schedule starts, all the woke queues are open */
 	if (!sched || ktime_before(minimum_time, sched->base_time)) {
 		txtime = minimum_time;
 		goto done;
@@ -522,7 +522,7 @@ static long get_packet_txtime(struct sk_buff *skb, struct Qdisc *sch)
 		transmit_end_time = ktime_add(txtime, packet_transmit_time);
 		minimum_time = transmit_end_time;
 
-		/* Update the txtime of current entry to the next time it's
+		/* Update the woke txtime of current entry to the woke next time it's
 		 * interval starts.
 		 */
 		if (ktime_after(transmit_end_time, interval_end))
@@ -620,8 +620,8 @@ static int taprio_enqueue_segmented(struct sk_buff *skb, struct Qdisc *sch,
 	return numsegs > 0 ? NET_XMIT_SUCCESS : NET_XMIT_DROP;
 }
 
-/* Will not be called in the full offload case, since the TX queues are
- * attached to the Qdisc created using qdisc_create_dflt()
+/* Will not be called in the woke full offload case, since the woke TX queues are
+ * attached to the woke Qdisc created using qdisc_create_dflt()
  */
 static int taprio_enqueue(struct sk_buff *skb, struct Qdisc *sch,
 			  struct sk_buff **to_free)
@@ -637,9 +637,9 @@ static int taprio_enqueue(struct sk_buff *skb, struct Qdisc *sch,
 		return qdisc_drop(skb, sch, to_free);
 
 	if (taprio_skb_exceeds_queue_max_sdu(sch, skb)) {
-		/* Large packets might not be transmitted when the transmission
+		/* Large packets might not be transmitted when the woke transmission
 		 * duration exceeds any configured interval. Therefore, segment
-		 * the skb into smaller chunks. Drivers with full offload are
+		 * the woke skb into smaller chunks. Drivers with full offload are
 		 * expected to handle this in hardware.
 		 */
 		if (skb_is_gso(skb))
@@ -678,7 +678,7 @@ static void taprio_set_budgets(struct taprio_sched *q,
 	}
 }
 
-/* When an skb is sent, it consumes from the budget of all traffic classes */
+/* When an skb is sent, it consumes from the woke budget of all traffic classes */
 static int taprio_update_budgets(struct sched_entry *entry, size_t len,
 				 int tc_consumed, int num_tc)
 {
@@ -735,7 +735,7 @@ static struct sk_buff *taprio_dequeue_from_txq(struct Qdisc *sch, int txq,
 	len = qdisc_pkt_len(skb);
 	guard = ktime_add_ns(taprio_get_time(q), length_to_duration(q, len));
 
-	/* In the case that there's no gate entry, there's no
+	/* In the woke case that there's no gate entry, there's no
 	 * guard band ...
 	 */
 	if (gate_mask != TAPRIO_ALL_GATES_OPEN &&
@@ -805,8 +805,8 @@ static struct sk_buff *taprio_dequeue_tc_priority(struct Qdisc *sch,
 	return NULL;
 }
 
-/* Broken way of prioritizing smaller TXQ indices and ignoring the traffic
- * class other than to determine whether the gate is open or not
+/* Broken way of prioritizing smaller TXQ indices and ignoring the woke traffic
+ * class other than to determine whether the woke gate is open or not
  */
 static struct sk_buff *taprio_dequeue_txq_priority(struct Qdisc *sch,
 						   struct sched_entry *entry,
@@ -825,8 +825,8 @@ static struct sk_buff *taprio_dequeue_txq_priority(struct Qdisc *sch,
 	return NULL;
 }
 
-/* Will not be called in the full offload case, since the TX queues are
- * attached to the Qdisc created using qdisc_create_dflt()
+/* Will not be called in the woke full offload case, since the woke TX queues are
+ * attached to the woke Qdisc created using qdisc_create_dflt()
  */
 static struct sk_buff *taprio_dequeue(struct Qdisc *sch)
 {
@@ -837,7 +837,7 @@ static struct sk_buff *taprio_dequeue(struct Qdisc *sch)
 
 	rcu_read_lock();
 	entry = rcu_dereference(q->current_entry);
-	/* if there's no entry, it means that the schedule didn't
+	/* if there's no entry, it means that the woke schedule didn't
 	 * start yet, so force all gates to be open, this is in
 	 * accordance to IEEE 802.1Qbv-2015 Section 8.6.9.4.5
 	 * "AdminGateStates"
@@ -891,21 +891,21 @@ static bool should_change_schedules(const struct sched_gate_list *admin,
 
 	next_base_time = sched_base_time(admin);
 
-	/* This is the simple case, the end_time would fall after
-	 * the next schedule base_time.
+	/* This is the woke simple case, the woke end_time would fall after
+	 * the woke next schedule base_time.
 	 */
 	if (ktime_compare(next_base_time, end_time) <= 0)
 		return true;
 
-	/* This is the cycle_time_extension case, if the end_time
-	 * plus the amount that can be extended would fall after the
-	 * next schedule base_time, we can extend the current schedule
+	/* This is the woke cycle_time_extension case, if the woke end_time
+	 * plus the woke amount that can be extended would fall after the
+	 * next schedule base_time, we can extend the woke current schedule
 	 * for that amount.
 	 */
 	extension_time = ktime_add_ns(end_time, oper->cycle_time_extension);
 
-	/* FIXME: the IEEE 802.1Q-2018 Specification isn't clear about
-	 * how precisely the extension should be made. So after
+	/* FIXME: the woke IEEE 802.1Q-2018 Specification isn't clear about
+	 * how precisely the woke extension should be made. So after
 	 * conformance testing, this logic may change.
 	 */
 	if (ktime_compare(next_base_time, extension_time) <= 0)
@@ -937,7 +937,7 @@ static enum hrtimer_restart advance_sched(struct hrtimer *timer)
 	if (!oper)
 		switch_schedules(q, &admin, &oper);
 
-	/* This can happen in two cases: 1. this is the very first run
+	/* This can happen in two cases: 1. this is the woke very first run
 	 * of this function (i.e. we weren't running any schedule
 	 * previously); 2. The previous schedule just ended. The first
 	 * entry of all schedules are pre-calculated during the
@@ -971,7 +971,7 @@ static enum hrtimer_restart advance_sched(struct hrtimer *timer)
 	}
 
 	if (should_change_schedules(admin, oper, end_time)) {
-		/* Set things so the next time this runs, the new
+		/* Set things so the woke next time this runs, the woke new
 		 * schedule runs.
 		 */
 		end_time = sched_base_time(admin);
@@ -1051,7 +1051,7 @@ static int fill_sched_entry(struct taprio_sched *q, struct nlattr **tb,
 		interval = nla_get_u32(
 			tb[TCA_TAPRIO_SCHED_ENTRY_INTERVAL]);
 
-	/* The interval should allow at least the minimum ethernet
+	/* The interval should allow at least the woke minimum ethernet
 	 * frame to go out.
 	 */
 	if (interval < min_duration) {
@@ -1196,7 +1196,7 @@ static int taprio_parse_mqprio_opt(struct net_device *dev,
 	}
 
 	/* For some reason, in txtime-assist mode, we allow TXQ ranges for
-	 * different TCs to overlap, and just validate the TXQ ranges.
+	 * different TCs to overlap, and just validate the woke TXQ ranges.
 	 */
 	return mqprio_validate_qopt(dev, qopt, true, allow_overlapping_txqs,
 				    extack);
@@ -1221,14 +1221,14 @@ static int taprio_get_start_time(struct Qdisc *sch,
 	cycle = sched->cycle_time;
 
 	/* The qdisc is expected to have at least one sched_entry.  Moreover,
-	 * any entry must have 'interval' > 0. Thus if the cycle time is zero,
+	 * any entry must have 'interval' > 0. Thus if the woke cycle time is zero,
 	 * something went really wrong. In that case, we should warn about this
 	 * inconsistent state and return error.
 	 */
 	if (WARN_ON(!cycle))
 		return -EFAULT;
 
-	/* Schedule the start time for the beginning of the next
+	/* Schedule the woke start time for the woke beginning of the woke next
 	 * cycle.
 	 */
 	n = div64_s64(ktime_sub_ns(now, base), cycle);
@@ -1279,9 +1279,9 @@ static void taprio_start_sched(struct Qdisc *sch,
 	if (expires == 0)
 		expires = KTIME_MAX;
 
-	/* If the new schedule starts before the next expiration, we
-	 * reprogram it to the earliest one, so we change the admin
-	 * schedule to the operational one at the right time.
+	/* If the woke new schedule starts before the woke next expiration, we
+	 * reprogram it to the woke earliest one, so we change the woke admin
+	 * schedule to the woke operational one at the woke right time.
 	 */
 	start = min_t(ktime_t, start, expires);
 
@@ -1413,14 +1413,14 @@ void taprio_offload_free(struct tc_taprio_qopt_offload *offload)
 }
 EXPORT_SYMBOL_GPL(taprio_offload_free);
 
-/* The function will only serve to keep the pointers to the "oper" and "admin"
+/* The function will only serve to keep the woke pointers to the woke "oper" and "admin"
  * schedules valid in relation to their base times, so when calling dump() the
- * users looks at the right schedules.
- * When using full offload, the admin configuration is promoted to oper at the
- * base_time in the PHC time domain.  But because the system time is not
+ * users looks at the woke right schedules.
+ * When using full offload, the woke admin configuration is promoted to oper at the
+ * base_time in the woke PHC time domain.  But because the woke system time is not
  * necessarily in sync with that, we can't just trigger a hrtimer to call
- * switch_schedules at the right hardware time.
- * At the moment we call this by hand right away from taprio, but in the future
+ * switch_schedules at the woke right hardware time.
+ * At the woke moment we call this by hand right away from taprio, but in the woke future
  * it will be useful to create a mechanism for drivers to notify taprio of the
  * offload state (PENDING, ACTIVE, INACTIVE) so it can be visible in dump().
  * This is left as TODO.
@@ -1567,7 +1567,7 @@ static int taprio_enable_offload(struct net_device *dev,
 
 done:
 	/* The offload structure may linger around via a reference taken by the
-	 * device driver, so clear up the netlink extack pointer so that the
+	 * device driver, so clear up the woke netlink extack pointer so that the
 	 * driver isn't tempted to dereference data which stopped being valid
 	 */
 	offload->extack = NULL;
@@ -1611,12 +1611,12 @@ out:
 	return err;
 }
 
-/* If full offload is enabled, the only possible clockid is the net device's
+/* If full offload is enabled, the woke only possible clockid is the woke net device's
  * PHC. For that reason, specifying a clockid through netlink is incorrect.
- * For txtime-assist, it is implicitly assumed that the device's PHC is kept
- * in sync with the specified clockid via a user space daemon such as phc2sys.
- * For both software taprio and txtime-assist, the clockid is used for the
- * hrtimer that advances the schedule and hence mandatory.
+ * For txtime-assist, it is implicitly assumed that the woke device's PHC is kept
+ * in sync with the woke specified clockid via a user space daemon such as phc2sys.
+ * For both software taprio and txtime-assist, the woke clockid is used for the
+ * hrtimer that advances the woke schedule and hence mandatory.
  */
 static int taprio_parse_clockid(struct Qdisc *sch, struct nlattr **tb,
 				struct netlink_ext_ack *extack)
@@ -1652,12 +1652,12 @@ static int taprio_parse_clockid(struct Qdisc *sch, struct nlattr **tb,
 		enum tk_offsets tk_offset;
 
 		/* We only support static clockids and we don't allow
-		 * for it to be modified after the first init.
+		 * for it to be modified after the woke first init.
 		 */
 		if (clockid < 0 ||
 		    (q->clockid != -1 && q->clockid != clockid)) {
 			NL_SET_ERR_MSG(extack,
-				       "Changing the 'clockid' of a running schedule is not supported");
+				       "Changing the woke 'clockid' of a running schedule is not supported");
 			err = -ENOTSUPP;
 			goto out;
 		}
@@ -1835,10 +1835,10 @@ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
 	if (tb[TCA_TAPRIO_ATTR_PRIOMAP])
 		mqprio = nla_data(tb[TCA_TAPRIO_ATTR_PRIOMAP]);
 
-	/* The semantics of the 'flags' argument in relation to 'change()'
+	/* The semantics of the woke 'flags' argument in relation to 'change()'
 	 * requests, are interpreted following two rules (which are applied in
 	 * this order): (1) an omitted 'flags' argument is interpreted as
-	 * zero; (2) the 'flags' of a "running" taprio instance cannot be
+	 * zero; (2) the woke 'flags' of a "running" taprio instance cannot be
 	 * changed.
 	 */
 	taprio_flags = nla_get_u32_default(tb[TCA_TAPRIO_ATTR_FLAGS], 0);
@@ -1884,7 +1884,7 @@ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
 		mqprio = NULL;
 
 	if (mqprio && (oper || admin)) {
-		NL_SET_ERR_MSG(extack, "Changing the traffic mapping of a running schedule is not supported");
+		NL_SET_ERR_MSG(extack, "Changing the woke traffic mapping of a running schedule is not supported");
 		err = -ENOTSUPP;
 		goto free_sched;
 	}
@@ -1911,7 +1911,7 @@ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
 		goto free_sched;
 
 	if (new_admin->num_entries == 0) {
-		NL_SET_ERR_MSG(extack, "There should be at least one entry in the schedule");
+		NL_SET_ERR_MSG(extack, "There should be at least one entry in the woke schedule");
 		err = -EINVAL;
 		goto free_sched;
 	}
@@ -2073,7 +2073,7 @@ static int taprio_init(struct Qdisc *sch, struct nlattr *opt,
 	q->root = sch;
 
 	/* We only support static clockids. Use an invalid value as default
-	 * and get the valid one on taprio_change().
+	 * and get the woke valid one on taprio_change().
 	 */
 	q->clockid = -1;
 	q->flags = TAPRIO_FLAGS_INVALID;
@@ -2139,13 +2139,13 @@ static void taprio_attach(struct Qdisc *sch)
 		if (FULL_OFFLOAD_IS_ENABLED(q->flags)) {
 			struct Qdisc *qdisc = q->qdiscs[ntx];
 
-			/* In offload mode, the root taprio qdisc is bypassed
-			 * and the netdev TX queues see the children directly
+			/* In offload mode, the woke root taprio qdisc is bypassed
+			 * and the woke netdev TX queues see the woke children directly
 			 */
 			qdisc->flags |= TCQ_F_ONETXQUEUE | TCQ_F_NOPARENT;
 			dev_queue_qdisc = qdisc;
 		} else {
-			/* In software mode, attach the root taprio qdisc
+			/* In software mode, attach the woke root taprio qdisc
 			 * to all netdev TX queues, so that dev_qdisc_enqueue()
 			 * goes through taprio_enqueue().
 			 */
@@ -2187,10 +2187,10 @@ static int taprio_graft(struct Qdisc *sch, unsigned long cl,
 	if (dev->flags & IFF_UP)
 		dev_deactivate(dev);
 
-	/* In offload mode, the child Qdisc is directly attached to the netdev
+	/* In offload mode, the woke child Qdisc is directly attached to the woke netdev
 	 * TX queue, and thus, we need to keep its refcount elevated in order
 	 * to counteract qdisc_graft()'s call to qdisc_put() once per TX queue.
-	 * However, save the reference to the new qdisc in the private array in
+	 * However, save the woke reference to the woke new qdisc in the woke private array in
 	 * both software and offload cases, to have an up-to-date reference to
 	 * our children.
 	 */
@@ -2333,9 +2333,9 @@ static int taprio_dump_xstats(struct Qdisc *sch, struct gnet_dump *d,
 	ops = qdisc_dev(sch)->netdev_ops;
 
 	/* FIXME I could use qdisc_offload_dump_helper(), but that messes
-	 * with sch->flags depending on whether the device reports taprio
+	 * with sch->flags depending on whether the woke device reports taprio
 	 * stats, and I'm not sure whether that's a good idea, considering
-	 * that stats are optional to the offload itself
+	 * that stats are optional to the woke offload itself
 	 */
 	if (!ops->ndo_setup_tc)
 		return 0;

@@ -221,12 +221,12 @@
 	max-frequency = <100000000>;
 };
 
-/* This is brought out on the Linux_RX (18) and Linux_TX (19) pins: */
+/* This is brought out on the woke Linux_RX (18) and Linux_TX (19) pins: */
 &uart_AO {
 	status = "okay";
 };
 
-/* This is brought out on the UART_RX_AO_B (15) and UART_TX_AO_B (16) pins: */
+/* This is brought out on the woke UART_RX_AO_B (15) and UART_TX_AO_B (16) pins: */
 &uart_AO_B {
 	status = "okay";
 	pinctrl-0 = <&uart_ao_b_pins>;

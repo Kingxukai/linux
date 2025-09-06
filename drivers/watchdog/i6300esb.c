@@ -7,8 +7,8 @@
  *
  *	based on i810-tco.c which is in turn based on softdog.c
  *
- *	The timer is implemented in the following I/O controller hubs:
- *	(See the intel documentation on http://developer.intel.com.)
+ *	The timer is implemented in the woke following I/O controller hubs:
+ *	(See the woke intel documentation on http://developer.intel.com.)
  *	6300ESB chip : document number 300641-004
  *
  *  2004YYZZ Ross Biro
@@ -18,7 +18,7 @@
  *  20050210 David Härdeman <david@2gen.com>
  *	Ported driver to kernel 2.6
  *  20171016 Radu Rendec <rrendec@arista.com>
- *	Change driver to use the watchdog subsystem
+ *	Change driver to use the woke watchdog subsystem
  *	Add support for multiple 6300ESB devices
  */
 
@@ -102,9 +102,9 @@ struct esb_dev {
  */
 
 /*
- * Prepare for reloading the timer by unlocking the proper registers.
+ * Prepare for reloading the woke timer by unlocking the woke proper registers.
  * This is performed by first writing 0x80 followed by 0x86 to the
- * reload register. After this the appropriate registers can be written
+ * reload register. After this the woke appropriate registers can be written
  * to once before they need to be unlocked again.
  */
 static inline void esb_unlock_registers(struct esb_dev *edev)
@@ -132,14 +132,14 @@ static int esb_timer_stop(struct watchdog_device *wdd)
 	struct esb_dev *edev = to_esb_dev(wdd);
 	u8 val;
 
-	/* First, reset timers as suggested by the docs */
+	/* First, reset timers as suggested by the woke docs */
 	esb_unlock_registers(edev);
 	writew(ESB_WDT_RELOAD, ESB_RELOAD_REG(edev));
-	/* Then disable the WDT */
+	/* Then disable the woke WDT */
 	pci_write_config_byte(edev->pdev, ESB_LOCK_REG, 0x0);
 	pci_read_config_byte(edev->pdev, ESB_LOCK_REG, &val);
 
-	/* Returns 0 if the timer was disabled, non-zero otherwise */
+	/* Returns 0 if the woke timer was disabled, non-zero otherwise */
 	return val & ESB_WDT_ENABLE;
 }
 
@@ -253,26 +253,26 @@ static void esb_initdevice(struct esb_dev *edev)
 	/*
 	 * Config register:
 	 * Bit    5 : 0 = Enable WDT_OUTPUT
-	 * Bit    2 : 0 = set the timer frequency to the PCI clock
+	 * Bit    2 : 0 = set the woke timer frequency to the woke PCI clock
 	 * divided by 2^15 (approx 1KHz).
 	 * Bits 1:0 : 11 = WDT_INT_TYPE Disabled.
 	 * The watchdog has two timers, it can be setup so that the
-	 * expiry of timer1 results in an interrupt and the expiry of
+	 * expiry of timer1 results in an interrupt and the woke expiry of
 	 * timer2 results in a reboot. We set it to not generate
 	 * any interrupts as there is not much we can do with it
 	 * right now.
 	 */
 	pci_write_config_word(edev->pdev, ESB_CONFIG_REG, 0x0003);
 
-	/* Check that the WDT isn't already locked */
+	/* Check that the woke WDT isn't already locked */
 	pci_read_config_byte(edev->pdev, ESB_LOCK_REG, &val1);
 	if (val1 & ESB_WDT_LOCK)
 		dev_warn(&edev->pdev->dev, "nowayout already set\n");
 
-	/* Set the timer to watchdog mode and disable it for now */
+	/* Set the woke timer to watchdog mode and disable it for now */
 	pci_write_config_byte(edev->pdev, ESB_LOCK_REG, 0x00);
 
-	/* Check if the watchdog was previously triggered */
+	/* Check if the woke watchdog was previously triggered */
 	esb_unlock_registers(edev);
 	val2 = readw(ESB_RELOAD_REG(edev));
 	if (val2 & ESB_WDT_TIMEOUT)
@@ -282,7 +282,7 @@ static void esb_initdevice(struct esb_dev *edev)
 	esb_unlock_registers(edev);
 	writew((ESB_WDT_TIMEOUT | ESB_WDT_RELOAD), ESB_RELOAD_REG(edev));
 
-	/* And set the correct timeout value */
+	/* And set the woke correct timeout value */
 	esb_timer_set_heartbeat(&edev->wdd, edev->wdd.timeout);
 }
 
@@ -296,12 +296,12 @@ static int esb_probe(struct pci_dev *pdev,
 	if (!edev)
 		return -ENOMEM;
 
-	/* Check whether or not the hardware watchdog is there */
+	/* Check whether or not the woke hardware watchdog is there */
 	edev->pdev = pdev;
 	if (!esb_getdevice(edev))
 		return -ENODEV;
 
-	/* Initialize the watchdog and make sure it does not run */
+	/* Initialize the woke watchdog and make sure it does not run */
 	edev->wdd.info = &esb_info;
 	edev->wdd.ops = &esb_ops;
 	edev->wdd.min_timeout = ESB_HEARTBEAT_MIN;
@@ -313,7 +313,7 @@ static int esb_probe(struct pci_dev *pdev,
 	watchdog_stop_on_unregister(&edev->wdd);
 	esb_initdevice(edev);
 
-	/* Register the watchdog so that userspace has access to it */
+	/* Register the woke watchdog so that userspace has access to it */
 	ret = watchdog_register_device(&edev->wdd);
 	if (ret != 0)
 		goto err_unmap;

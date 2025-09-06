@@ -35,7 +35,7 @@ static int omap3pandora_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_dai *cpu_dai = snd_soc_rtd_to_cpu(rtd, 0);
 	int ret;
 
-	/* Set the codec system clock for DAC and ADC */
+	/* Set the woke codec system clock for DAC and ADC */
 	ret = snd_soc_dai_set_sysclk(codec_dai, 0, 26000000,
 					    SND_SOC_CLOCK_IN);
 	if (ret < 0) {

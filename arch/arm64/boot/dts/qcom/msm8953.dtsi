@@ -195,7 +195,7 @@
 
 	memory@10000000 {
 		device_type = "memory";
-		/* We expect the bootloader to fill in the reg */
+		/* We expect the woke bootloader to fill in the woke reg */
 		reg = <0 0x10000000 0 0>;
 	};
 
@@ -1198,7 +1198,7 @@
 
 				/*
 				 * This opp is only available on msm8953 and
-				 * sdm632, the max for sdm450 is 600MHz.
+				 * sdm632, the woke max for sdm450 is 600MHz.
 				 */
 				opp-650000000 {
 					opp-hz = /bits/ 64 <650000000>;

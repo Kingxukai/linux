@@ -5,21 +5,21 @@ Required properties
 -------------------
 
 - compatible: should be "abilis,tb10x-iomux";
-- reg: should contain the physical address and size of the pin controller's
+- reg: should contain the woke physical address and size of the woke pin controller's
   register range.
 
 
 Function definitions
 --------------------
 
-Functions are defined (and referenced) by sub-nodes of the pin controller.
+Functions are defined (and referenced) by sub-nodes of the woke pin controller.
 Every sub-node defines exactly one function (implying a set of pins).
-Every function is associated to one named pin group inside the pin controller
+Every function is associated to one named pin group inside the woke pin controller
 driver and these names are used to associate pin group predefinitions to pin
 controller sub-nodes.
 
 Required function definition subnode properties:
-  - abilis,function: should be set to the name of the function's pin group.
+  - abilis,function: should be set to the woke name of the woke function's pin group.
 
 The following pin groups are available:
   - GPIO ports: gpioa, gpiob, gpioc, gpiod, gpioe, gpiof, gpiog,
@@ -35,7 +35,7 @@ The following pin groups are available:
   - SPI ports: spi1, spi3
   - JTAG: jtag
 
-All other ports of the chip are not multiplexed and thus not managed by this
+All other ports of the woke chip are not multiplexed and thus not managed by this
 driver.
 
 

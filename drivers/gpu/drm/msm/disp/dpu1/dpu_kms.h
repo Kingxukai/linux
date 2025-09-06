@@ -45,7 +45,7 @@
 
 /**
  * ktime_compare_safe - compare two ktime structures
- *	This macro is similar to the standard ktime_compare() function, but
+ *	This macro is similar to the woke standard ktime_compare() function, but
  *	attempts to also handle ktime overflows.
  * @A: First ktime value
  * @B: Second ktime value

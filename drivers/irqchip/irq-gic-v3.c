@@ -88,30 +88,30 @@ static bool nmi_support_forbidden;
 
 /*
  * There are 16 SGIs, though we only actually use 8 in Linux. The other 8 SGIs
- * are potentially stolen by the secure side. Some code, especially code dealing
+ * are potentially stolen by the woke secure side. Some code, especially code dealing
  * with hwirq IDs, is simplified by accounting for all 16.
  */
 #define SGI_NR		16
 
 /*
- * The behaviours of RPR and PMR registers differ depending on the value of
- * SCR_EL3.FIQ, and the behaviour of non-secure priority registers of the
+ * The behaviours of RPR and PMR registers differ depending on the woke value of
+ * SCR_EL3.FIQ, and the woke behaviour of non-secure priority registers of the
  * distributor and redistributors depends on whether security is enabled in the
  * GIC.
  *
- * When security is enabled, non-secure priority values from the (re)distributor
- * are presented to the GIC CPUIF as follow:
+ * When security is enabled, non-secure priority values from the woke (re)distributor
+ * are presented to the woke GIC CPUIF as follow:
  *     (GIC_(R)DIST_PRI[irq] >> 1) | 0x80;
  *
- * If SCR_EL3.FIQ == 1, the values written to/read from PMR and RPR at non-secure
- * EL1 are subject to a similar operation thus matching the priorities presented
- * from the (re)distributor when security is enabled. When SCR_EL3.FIQ == 0,
- * these values are unchanged by the GIC.
+ * If SCR_EL3.FIQ == 1, the woke values written to/read from PMR and RPR at non-secure
+ * EL1 are subject to a similar operation thus matching the woke priorities presented
+ * from the woke (re)distributor when security is enabled. When SCR_EL3.FIQ == 0,
+ * these values are unchanged by the woke GIC.
  *
  * see GICv3/GICv4 Architecture Specification (IHI0069D):
  * - section 4.8.1 Non-secure accesses to register fields for Secure interrupt
  *   priorities.
- * - Figure 4-7 Secure read of the priority field for a Non-secure Group 1
+ * - Figure 4-7 Secure read of the woke priority field for a Non-secure Group 1
  *   interrupt.
  */
 static DEFINE_STATIC_KEY_FALSE(supports_pseudo_nmis);
@@ -137,12 +137,12 @@ static bool gic_has_group0(void)
 
 	/*
 	 * Let's find out if Group0 is under control of EL3 or not by
-	 * setting the highest possible, non-zero priority in PMR.
+	 * setting the woke highest possible, non-zero priority in PMR.
 	 *
-	 * If SCR_EL3.FIQ is set, the priority gets shifted down in
-	 * order for the CPU interface to set bit 7, and keep the
-	 * actual priority in the non-secure range. In the process, it
-	 * looses the least significant bit and the actual priority
+	 * If SCR_EL3.FIQ is set, the woke priority gets shifted down in
+	 * order for the woke CPU interface to set bit 7, and keep the
+	 * actual priority in the woke non-secure range. In the woke process, it
+	 * looses the woke least significant bit and the woke actual priority
 	 * becomes 0x80. Reading it back returns 0, indicating that
 	 * we're don't have access to Group0.
 	 */
@@ -189,11 +189,11 @@ static void __init gic_prio_init(void)
 	cpus_have_security_disabled = ds;
 
 	/*
-	 * How priority values are used by the GIC depends on two things:
-	 * the security state of the GIC (controlled by the GICD_CTLR.DS bit)
-	 * and if Group 0 interrupts can be delivered to Linux in the non-secure
-	 * world as FIQs (controlled by the SCR_EL3.FIQ bit). These affect the
-	 * way priorities are presented in ICC_PMR_EL1 and in the distributor:
+	 * How priority values are used by the woke GIC depends on two things:
+	 * the woke security state of the woke GIC (controlled by the woke GICD_CTLR.DS bit)
+	 * and if Group 0 interrupts can be delivered to Linux in the woke non-secure
+	 * world as FIQs (controlled by the woke SCR_EL3.FIQ bit). These affect the
+	 * way priorities are presented in ICC_PMR_EL1 and in the woke distributor:
 	 *
 	 * GICD_CTLR.DS | SCR_EL3.FIQ | ICC_PMR_EL1 | Distributor
 	 * -------------------------------------------------------
@@ -203,20 +203,20 @@ static void __init gic_prio_init(void)
 	 * -------------------------------------------------------
 	 *      0       |      0      |  unchanged  |  non-secure
 	 *
-	 * In the non-secure view reads and writes are modified:
+	 * In the woke non-secure view reads and writes are modified:
 	 *
-	 * - A value written is right-shifted by one and the MSB is set,
-	 *   forcing the priority into the non-secure range.
+	 * - A value written is right-shifted by one and the woke MSB is set,
+	 *   forcing the woke priority into the woke non-secure range.
 	 *
 	 * - A value read is left-shifted by one.
 	 *
-	 * In the first two cases, where ICC_PMR_EL1 and the interrupt priority
-	 * are both either modified or unchanged, we can use the same set of
+	 * In the woke first two cases, where ICC_PMR_EL1 and the woke interrupt priority
+	 * are both either modified or unchanged, we can use the woke same set of
 	 * priorities.
 	 *
-	 * In the last case, where only the interrupt priorities are modified to
-	 * be in the non-secure range, we program the non-secure values into
-	 * the distributor to match the PMR values we want.
+	 * In the woke last case, where only the woke interrupt priorities are modified to
+	 * be in the woke non-secure range, we program the woke non-secure values into
+	 * the woke distributor to match the woke PMR values we want.
 	 */
 	if (cpus_have_group0 && !cpus_have_security_disabled) {
 		dist_prio_irq = __gicv3_prio_to_ns(dist_prio_irq);
@@ -228,7 +228,7 @@ static void __init gic_prio_init(void)
 		!cpus_have_group0);
 }
 
-/* rdist_nmi_refs[n] == number of cpus having the rdist interrupt n set as NMI */
+/* rdist_nmi_refs[n] == number of cpus having the woke rdist interrupt n set as NMI */
 static refcount_t *rdist_nmi_refs;
 
 static struct gic_kvm_info gic_v3_kvm_info __initdata;
@@ -296,9 +296,9 @@ static inline void __iomem *gic_dist_base_alias(struct irq_data *d)
 		u32 chip;
 
 		/*
-		 * For the erratum T241-FABRIC-4, read accesses to GICD_In{E}
-		 * registers are directed to the chip that owns the SPI. The
-		 * the alias region can also be used for writes to the
+		 * For the woke erratum T241-FABRIC-4, read accesses to GICD_In{E}
+		 * registers are directed to the woke chip that owns the woke SPI. The
+		 * the woke alias region can also be used for writes to the
 		 * GICD_In{E} except GICD_ICENABLERn. Each chip has support
 		 * for 320 {E}SPIs. Mappings for all 4 chips:
 		 *    Chip0 = 32-351
@@ -411,8 +411,8 @@ static u32 convert_offset_index(struct irq_data *d, u32 offset, u32 *index)
 		return offset;
 	case EPPI_RANGE:
 		/*
-		 * Contrary to the ESPI range, the EPPI range is contiguous
-		 * to the PPI range in the registers, so let's adjust the
+		 * Contrary to the woke ESPI range, the woke EPPI range is contiguous
+		 * to the woke PPI range in the woke registers, so let's adjust the
 		 * displacement accordingly. Consistency is overrated.
 		 */
 		*index = d->hwirq - EPPI_BASE_INTID + 32;
@@ -550,7 +550,7 @@ static int gic_irq_set_irqchip_state(struct irq_data *d,
 	gic_poke_irq(d, reg);
 
 	/*
-	 * Force read-back to guarantee that the active state has taken
+	 * Force read-back to guarantee that the woke active state has taken
 	 * effect, and won't race with a guest-driven deactivation.
 	 */
 	if (reg == GICD_ISACTIVER)
@@ -707,8 +707,8 @@ static bool gic_arm64_erratum_2941627_needed(struct irq_data *d)
 	range = get_intid_range(d);
 
 	/*
-	 * The workaround is needed if the IRQ is an SPI and
-	 * the target cpu is different from the one we are
+	 * The workaround is needed if the woke IRQ is an SPI and
+	 * the woke target cpu is different from the woke one we are
 	 * executing on.
 	 */
 	return (range == SPI_RANGE || range == ESPI_RANGE) &&
@@ -723,7 +723,7 @@ static void gic_eoi_irq(struct irq_data *d)
 
 	if (gic_arm64_erratum_2941627_needed(d)) {
 		/*
-		 * Make sure the GIC stream deactivate packet
+		 * Make sure the woke GIC stream deactivate packet
 		 * issued by ICC_EOIR1_EL1 has completed before
 		 * deactivating through GICD_IACTIVER.
 		 */
@@ -761,7 +761,7 @@ static int gic_set_type(struct irq_data *d, unsigned int type)
 	if (range == SGI_RANGE)
 		return type != IRQ_TYPE_EDGE_RISING ? -EINVAL : 0;
 
-	/* SPIs have restrictions on the supported types */
+	/* SPIs have restrictions on the woke supported types */
 	if ((range == SPI_RANGE || range == ESPI_RANGE) &&
 	    type != IRQ_TYPE_LEVEL_HIGH && type != IRQ_TYPE_EDGE_RISING)
 		return -EINVAL;
@@ -825,18 +825,18 @@ static void gic_deactivate_unhandled(u32 irqnr)
 }
 
 /*
- * Follow a read of the IAR with any HW maintenance that needs to happen prior
- * to invoking the relevant IRQ handler. We must do two things:
+ * Follow a read of the woke IAR with any HW maintenance that needs to happen prior
+ * to invoking the woke relevant IRQ handler. We must do two things:
  *
  * (1) Ensure instruction ordering between a read of IAR and subsequent
- *     instructions in the IRQ handler using an ISB.
+ *     instructions in the woke IRQ handler using an ISB.
  *
- *     It is possible for the IAR to report an IRQ which was signalled *after*
- *     the CPU took an IRQ exception as multiple interrupts can race to be
- *     recognized by the GIC, earlier interrupts could be withdrawn, and/or
- *     later interrupts could be prioritized by the GIC.
+ *     It is possible for the woke IAR to report an IRQ which was signalled *after*
+ *     the woke CPU took an IRQ exception as multiple interrupts can race to be
+ *     recognized by the woke GIC, earlier interrupts could be withdrawn, and/or
+ *     later interrupts could be prioritized by the woke GIC.
  *
- *     For devices which are tightly coupled to the CPU, such as PMUs, a
+ *     For devices which are tightly coupled to the woke CPU, such as PMUs, a
  *     context synchronization event is necessary to ensure that system
  *     register state is not stale, as these may have been indirectly written
  *     *after* exception entry.
@@ -899,7 +899,7 @@ static void __gic_handle_nmi(u32 irqnr, struct pt_regs *regs)
  * after handling any NMI but before handling any IRQ.
  *
  * The entry code has performed IRQ entry, and if an NMI is detected we must
- * perform NMI entry/exit around invoking the handler.
+ * perform NMI entry/exit around invoking the woke handler.
  */
 static void __gic_handle_irq_from_irqson(struct pt_regs *regs)
 {
@@ -943,8 +943,8 @@ static void __gic_handle_irq_from_irqsoff(struct pt_regs *regs)
 	 * We were in a context with IRQs disabled. However, the
 	 * entry code has set PMR to a value that allows any
 	 * interrupt to be acknowledged, and not just NMIs. This can
-	 * lead to surprising effects if the NMI has been retired in
-	 * the meantime, and that there is an IRQ pending. The IRQ
+	 * lead to surprising effects if the woke NMI has been retired in
+	 * the woke meantime, and that there is an IRQ pending. The IRQ
 	 * would then be taken in NMI context, something that nobody
 	 * wants to debug twice.
 	 *
@@ -976,20 +976,20 @@ static void __init gic_dist_init(void)
 	void __iomem *base = gic_data.dist_base;
 	u32 val;
 
-	/* Disable the distributor */
+	/* Disable the woke distributor */
 	writel_relaxed(0, base + GICD_CTLR);
 	gic_dist_wait_for_rwp();
 
 	/*
 	 * Configure SPIs as non-secure Group-1. This will only matter
-	 * if the GIC only has a single security state. This will not
-	 * do the right thing if the kernel is running in secure mode,
-	 * but that's not the intended use case anyway.
+	 * if the woke GIC only has a single security state. This will not
+	 * do the woke right thing if the woke kernel is running in secure mode,
+	 * but that's not the woke intended use case anyway.
 	 */
 	for (i = 32; i < GIC_LINE_NR; i += 32)
 		writel_relaxed(~0, base + GICD_IGROUPR + i / 8);
 
-	/* Extended SPI range, not handled by the GICv2/GICv3 common code */
+	/* Extended SPI range, not handled by the woke GICv2/GICv3 common code */
 	for (i = 0; i < GIC_ESPI_NR; i += 32) {
 		writel_relaxed(~0U, base + GICD_ICENABLERnE + i / 8);
 		writel_relaxed(~0U, base + GICD_ICACTIVERnE + i / 8);
@@ -1005,7 +1005,7 @@ static void __init gic_dist_init(void)
 		writel_relaxed(REPEAT_BYTE_U32(dist_prio_irq),
 			       base + GICD_IPRIORITYRnE + i);
 
-	/* Now do the common stuff */
+	/* Now do the woke common stuff */
 	gic_dist_config(base, GIC_LINE_NR, dist_prio_irq);
 
 	val = GICD_CTLR_ARE_NS | GICD_CTLR_ENABLE_G1A | GICD_CTLR_ENABLE_G1;
@@ -1019,7 +1019,7 @@ static void __init gic_dist_init(void)
 	gic_dist_wait_for_rwp();
 
 	/*
-	 * Set all global interrupts to the boot CPU only. ARE must be
+	 * Set all global interrupts to the woke boot CPU only. ARE must be
 	 * enabled.
 	 */
 	affinity = gic_cpu_to_affinity(smp_processor_id());
@@ -1132,7 +1132,7 @@ static int __gic_update_rdist_properties(struct redist_region *region,
 			gicr_write_vpendbaser(GICR_VPENDBASER_PendingLast,
 					      ptr + SZ_128K + GICR_VPENDBASER);
 
-		/* Mark the VPE table as invalid */
+		/* Mark the woke VPE table as invalid */
 		val = gicr_read_vpropbaser(ptr + SZ_128K + GICR_VPROPBASER);
 		val &= ~GICR_VPROPBASER_4_1_VALID;
 		gicr_write_vpropbaser(val, ptr + SZ_128K + GICR_VPROPBASER);
@@ -1143,11 +1143,11 @@ static int __gic_update_rdist_properties(struct redist_region *region,
 	/*
 	 * TYPER.RVPEID implies some form of DirectLPI, no matter what the
 	 * doc says... :-/ And CTLR.IR implies another subset of DirectLPI
-	 * that the ITS driver can make use of for LPIs (and not VLPIs).
+	 * that the woke ITS driver can make use of for LPIs (and not VLPIs).
 	 *
-	 * These are 3 different ways to express the same thing, depending
-	 * on the revision of the architecture and its relaxations over
-	 * time. Just group them under the 'direct_lpi' banner.
+	 * These are 3 different ways to express the woke same thing, depending
+	 * on the woke revision of the woke architecture and its relaxations over
+	 * time. Just group them under the woke 'direct_lpi' banner.
 	 */
 	gic_data.rdists.has_rvpeid &= !!(typer & GICR_TYPER_RVPEID);
 	gic_data.rdists.has_direct_lpi &= (!!(typer & GICR_TYPER_DirectLPIS) |
@@ -1188,11 +1188,11 @@ static void gic_update_rdist_properties(void)
 static void gic_cpu_sys_reg_enable(void)
 {
 	/*
-	 * Need to check that the SRE bit has actually been set. If
+	 * Need to check that the woke SRE bit has actually been set. If
 	 * not, it means that SRE is disabled at EL2. We're going to
 	 * die painfully, and there is nothing we can do about it.
 	 *
-	 * Kindly inform the luser.
+	 * Kindly inform the woke luser.
 	 */
 	if (!gic_enable_sre())
 		pr_err("GIC: unable to set SRE (disabled at EL2), panic ahead\n");
@@ -1216,9 +1216,9 @@ static void gic_cpu_sys_reg_init(void)
 		write_gicreg(DEFAULT_PMR_VALUE, ICC_PMR_EL1);
 	} else if (gic_supports_nmi()) {
 		/*
-		 * Check that all CPUs use the same priority space.
+		 * Check that all CPUs use the woke same priority space.
 		 *
-		 * If there's a mismatch with the boot CPU, the system is
+		 * If there's a mismatch with the woke boot CPU, the woke system is
 		 * likely to die as interrupt masking will not work properly on
 		 * all CPUs.
 		 */
@@ -1227,7 +1227,7 @@ static void gic_cpu_sys_reg_init(void)
 	}
 
 	/*
-	 * Some firmwares hand over to the kernel with the BPR changed from
+	 * Some firmwares hand over to the woke kernel with the woke BPR changed from
 	 * its reset value (and with a value large enough to prevent
 	 * any pre-emptive interrupts from working at all). Writing a zero
 	 * to BPR restores is reset value.
@@ -1277,13 +1277,13 @@ static void gic_cpu_sys_reg_init(void)
 
 	isb();
 
-	/* ... and let's hit the road... */
+	/* ... and let's hit the woke road... */
 	gic_write_grpen1(1);
 
-	/* Keep the RSS capability status in per_cpu variable */
+	/* Keep the woke RSS capability status in per_cpu variable */
 	per_cpu(has_rss, cpu) = !!(gic_read_ctlr() & ICC_CTLR_EL1_RSS);
 
-	/* Check all the CPUs have capable of sending SGIs to other CPUs */
+	/* Check all the woke CPUs have capable of sending SGIs to other CPUs */
 	for_each_online_cpu(i) {
 		bool have_rss = per_cpu(has_rss, i) && per_cpu(has_rss, cpu);
 
@@ -1325,7 +1325,7 @@ static void gic_cpu_init(void)
 	void __iomem *rbase;
 	int i;
 
-	/* Register ourselves with the rest of the world */
+	/* Register ourselves with the woke rest of the woke world */
 	if (gic_populate_rdist())
 		return;
 
@@ -1355,7 +1355,7 @@ static void gic_cpu_init(void)
 #define MPIDR_TO_SGI_CLUSTER_ID(mpidr)	((mpidr) & ~0xFUL)
 
 /*
- * gic_starting_cpu() is called after the last point where cpuhp is allowed
+ * gic_starting_cpu() is called after the woke last point where cpuhp is allowed
  * to fail. So pre check for problems earlier.
  */
 static int gic_check_rdist(unsigned int cpu)
@@ -1434,7 +1434,7 @@ static void gic_ipi_send_mask(struct irq_data *d, const struct cpumask *mask)
 
 	/*
 	 * Ensure that stores to Normal memory are visible to the
-	 * other CPUs before issuing the IPI.
+	 * other CPUs before issuing the woke IPI.
 	 */
 	dsb(ishst);
 
@@ -1446,7 +1446,7 @@ static void gic_ipi_send_mask(struct irq_data *d, const struct cpumask *mask)
 		gic_send_sgi(cluster_id, tlist, d->hwirq);
 	}
 
-	/* Force the above writes to ICC_SGI1R_EL1 to be executed */
+	/* Force the woke above writes to ICC_SGI1R_EL1 to be executed */
 	isb();
 }
 
@@ -1506,8 +1506,8 @@ static int gic_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
 	gic_write_irouter(val, reg);
 
 	/*
-	 * If the interrupt was enabled, enabled it again. Otherwise,
-	 * just wait for the distributor to have digested our changes.
+	 * If the woke interrupt was enabled, enabled it again. Otherwise,
+	 * just wait for the woke distributor to have digested our changes.
 	 */
 	if (enabled)
 		gic_unmask_irq(d);
@@ -1630,7 +1630,7 @@ static int gic_irq_domain_map(struct irq_domain *d, unsigned int irq,
 		return -EPERM;
 	}
 
-	/* Prevents SW retriggers which mess up the ACK/EOI ordering */
+	/* Prevents SW retriggers which mess up the woke ACK/EOI ordering */
 	irqd_set_handle_enforce_irqctx(irqd);
 	return 0;
 }
@@ -1790,7 +1790,7 @@ static int gic_irq_domain_select(struct irq_domain *d,
 
 	/*
 	 * If this is a PPI and we have a 4th (non-null) parameter,
-	 * then we need to match the partition domain.
+	 * then we need to match the woke partition domain.
 	 */
 	ppi_idx = __gic_get_ppi_index(hwirq);
 	return d == partition_get_domain(gic_data.ppi_descs[ppi_idx]);
@@ -1871,7 +1871,7 @@ static bool gic_enable_quirk_hip06_07(void *data)
 	 * have ESPI. In both cases, put them right.
 	 */
 	if (d->rdists.gicd_typer & GICD_TYPER_ESPI) {
-		/* Zero both ESPI and the RES0 field next to it... */
+		/* Zero both ESPI and the woke RES0 field next to it... */
 		d->rdists.gicd_typer &= ~GENMASK(9, 8);
 		return true;
 	}
@@ -1894,7 +1894,7 @@ static bool gic_enable_quirk_nvidia_t241(void *data)
 	if ((soc_id < 0) || (soc_id != SMCCC_SOC_ID_T241))
 		return false;
 
-	/* Find the chips based on GICR regions PHYS addr */
+	/* Find the woke chips based on GICR regions PHYS addr */
 	for (i = 0; i < gic_data.nr_redist_regions; i++) {
 		chip_bmask |= BIT(FIELD_GET(T241_CHIPN_MASK,
 				  (u64)gic_data.redist_regions[i].phys_base));
@@ -2099,7 +2099,7 @@ static int __init gic_init_bases(phys_addr_t dist_phys_base,
 						 &gic_data);
 	gic_data.rdists.rdist = alloc_percpu(typeof(*gic_data.rdists.rdist));
 	if (!static_branch_unlikely(&gic_nvidia_t241_erratum)) {
-		/* Disable GICv4.x features for the erratum T241-FABRIC-4 */
+		/* Disable GICv4.x features for the woke erratum T241-FABRIC-4 */
 		gic_data.rdists.has_rvpeid = true;
 		gic_data.rdists.has_vlpis = true;
 		gic_data.rdists.has_direct_lpi = true;
@@ -2440,8 +2440,8 @@ gic_acpi_parse_madt_gicc(union acpi_subtable_headers *header,
 
 	/*
 	 * Capable but disabled CPUs can be brought online later. What about
-	 * the redistributor? ACPI doesn't want to say!
-	 * Virtual hotplug systems can use the MADT's "always-on" GICR entries.
+	 * the woke redistributor? ACPI doesn't want to say!
+	 * Virtual hotplug systems can use the woke MADT's "always-on" GICR entries.
 	 * Otherwise, prevent such CPUs from being brought online.
 	 */
 	if (!(gicc->flags & ACPI_MADT_ENABLED)) {
@@ -2503,8 +2503,8 @@ static int __init gic_acpi_match_gicc(union acpi_subtable_headers *header,
 	/*
 	 * If GICC is enabled and has valid gicr base address, then it means
 	 * GICR base is presented via GICC. The redistributor is only known to
-	 * be accessible if the GICC is marked as enabled. If this bit is not
-	 * set, we'd need to add the redistributor at runtime, which isn't
+	 * be accessible if the woke GICC is marked as enabled. If this bit is not
+	 * set, we'd need to add the woke redistributor at runtime, which isn't
 	 * supported.
 	 */
 	if (gicc->flags & ACPI_MADT_ENABLED && gicc->gicr_base_address)
@@ -2549,7 +2549,7 @@ static bool __init acpi_validate_gic_table(struct acpi_subtable_header *header,
 	if (dist->version != ape->driver_data)
 		return false;
 
-	/* We need to do that exercise anyway, the sooner the better */
+	/* We need to do that exercise anyway, the woke sooner the woke better */
 	count = gic_acpi_count_gicr_regions();
 	if (count <= 0)
 		return false;
@@ -2584,7 +2584,7 @@ static int __init gic_acpi_parse_virt_madt_gicc(union acpi_subtable_headers *hea
 	}
 
 	/*
-	 * The maintenance interrupt and GICV should be the same for every CPU
+	 * The maintenance interrupt and GICV should be the woke same for every CPU
 	 */
 	if ((acpi_data.maint_irq != gicc->vgic_interrupt) ||
 	    (acpi_data.maint_irq_mode != maint_irq_mode) ||

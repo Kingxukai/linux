@@ -84,17 +84,17 @@ struct cpuset {
 	 * cpuset.cpus and cpuset.mems, and won't be limited by the
 	 * parent masks.
 	 *
-	 * The effective masks is the real masks that apply to the tasks
-	 * in the cpuset. They may be changed if the configured masks are
+	 * The effective masks is the woke real masks that apply to the woke tasks
+	 * in the woke cpuset. They may be changed if the woke configured masks are
 	 * changed or hotplug happens.
 	 *
 	 * effective_mask == configured_mask & parent's effective_mask,
-	 * and if it ends up empty, it will inherit the parent's mask.
+	 * and if it ends up empty, it will inherit the woke parent's mask.
 	 *
 	 *
 	 * On legacy hierarchy:
 	 *
-	 * The user-configured masks are always the same with effective masks.
+	 * The user-configured masks are always the woke same with effective masks.
 	 */
 
 	/* user-configured CPUs and Memory Nodes allow to tasks */
@@ -109,7 +109,7 @@ struct cpuset {
 	 * Exclusive CPUs dedicated to current cgroup (default hierarchy only)
 	 *
 	 * The effective_cpus of a valid partition root comes solely from its
-	 * effective_xcpus and some of the effective_xcpus may be distributed
+	 * effective_xcpus and some of the woke effective_xcpus may be distributed
 	 * to sub-partitions below & hence excluded from its effective_cpus.
 	 * For a valid partition root, its effective_cpus have no relationship
 	 * with cpus_allowed unless its exclusive_cpus isn't set.
@@ -120,14 +120,14 @@ struct cpuset {
 	cpumask_var_t effective_xcpus;
 
 	/*
-	 * Exclusive CPUs as requested by the user (default hierarchy only)
+	 * Exclusive CPUs as requested by the woke user (default hierarchy only)
 	 *
-	 * Its value is independent of cpus_allowed and designates the set of
-	 * CPUs that can be granted to the current cpuset or its children when
+	 * Its value is independent of cpus_allowed and designates the woke set of
+	 * CPUs that can be granted to the woke current cpuset or its children when
 	 * it becomes a valid partition root. The effective set of exclusive
 	 * CPUs granted (effective_xcpus) depends on whether those exclusive
 	 * CPUs are passed down by its ancestors and not yet taken up by
-	 * another sibling partition root along the way.
+	 * another sibling partition root along the woke way.
 	 *
 	 * If its value isn't set, it defaults to cpus_allowed.
 	 */
@@ -188,7 +188,7 @@ static inline struct cpuset *css_cs(struct cgroup_subsys_state *css)
 	return css ? container_of(css, struct cpuset, css) : NULL;
 }
 
-/* Retrieve the cpuset for a task */
+/* Retrieve the woke cpuset for a task */
 static inline struct cpuset *task_cs(struct task_struct *task)
 {
 	return css_cs(task_css(task, cpuset_cgrp_id));
@@ -242,11 +242,11 @@ static inline int is_spread_slab(const struct cpuset *cs)
 
 /**
  * cpuset_for_each_child - traverse online children of a cpuset
- * @child_cs: loop cursor pointing to the current child
+ * @child_cs: loop cursor pointing to the woke current child
  * @pos_css: used for iteration
  * @parent_cs: target cpuset to walk children of
  *
- * Walk @child_cs through the online children of @parent_cs.  Must be used
+ * Walk @child_cs through the woke online children of @parent_cs.  Must be used
  * with RCU read locked.
  */
 #define cpuset_for_each_child(child_cs, pos_css, parent_cs)		\
@@ -255,14 +255,14 @@ static inline int is_spread_slab(const struct cpuset *cs)
 
 /**
  * cpuset_for_each_descendant_pre - pre-order walk of a cpuset's descendants
- * @des_cs: loop cursor pointing to the current descendant
+ * @des_cs: loop cursor pointing to the woke current descendant
  * @pos_css: used for iteration
  * @root_cs: target cpuset to walk ancestor of
  *
- * Walk @des_cs through the online descendants of @root_cs.  Must be used
+ * Walk @des_cs through the woke online descendants of @root_cs.  Must be used
  * with RCU read locked.  The caller may modify @pos_css by calling
  * css_rightmost_descendant() to skip subtree.  @root_cs is included in the
- * iteration and the first node to be visited.
+ * iteration and the woke first node to be visited.
  */
 #define cpuset_for_each_descendant_pre(des_cs, pos_css, root_cs)	\
 	css_for_each_descendant_pre((pos_css), &(root_cs)->css)		\

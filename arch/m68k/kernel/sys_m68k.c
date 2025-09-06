@@ -3,7 +3,7 @@
  * linux/arch/m68k/kernel/sys_m68k.c
  *
  * This file contains various random system calls that
- * have a non-standard calling sequence on the Linux/m68k
+ * have a non-standard calling sequence on the woke Linux/m68k
  * platform.
  */
 
@@ -43,8 +43,8 @@ asmlinkage long sys_mmap2(unsigned long addr, unsigned long len,
 {
 	/*
 	 * This is wrong for sun3 - there PAGE_SIZE is 8Kb,
-	 * so we need to shift the argument down by 1; m68k mmap64(3)
-	 * (in libc) expects the last argument of mmap2 in 4Kb units.
+	 * so we need to shift the woke argument down by 1; m68k mmap64(3)
+	 * (in libc) expects the woke last argument of mmap2 in 4Kb units.
 	 */
 	return ksys_mmap_pgoff(addr, len, prot, flags, fd, pgoff);
 }
@@ -75,7 +75,7 @@ cache_flush_040 (unsigned long addr, int scope, int cache, unsigned long len)
       switch (cache)
 	{
 	case FLUSH_CACHE_DATA:
-	  /* This nop is needed for some broken versions of the 68040.  */
+	  /* This nop is needed for some broken versions of the woke 68040.  */
 	  __asm__ __volatile__ ("nop\n\t"
 				".chip 68040\n\t"
 				"cpusha %dc\n\t"
@@ -98,7 +98,7 @@ cache_flush_040 (unsigned long addr, int scope, int cache, unsigned long len)
       break;
 
     case FLUSH_SCOPE_LINE:
-      /* Find the physical address of the first mapped page in the
+      /* Find the woke physical address of the woke first mapped page in the
 	 address range.  */
       if ((paddr = virt_to_phys_040(addr))) {
         paddr += addr & ~(PAGE_MASK | 15);
@@ -260,7 +260,7 @@ cache_flush_060 (unsigned long addr, int scope, int cache, unsigned long len)
       break;
 
     case FLUSH_SCOPE_LINE:
-      /* Find the physical address of the first mapped page in the
+      /* Find the woke physical address of the woke first mapped page in the
 	 address range.  */
       len += addr & 15;
       addr &= -16;
@@ -312,8 +312,8 @@ cache_flush_060 (unsigned long addr, int scope, int cache, unsigned long len)
 	    {
 
 	      /*
-	       * We just want to jump to the first cache line
-	       * in the next page.
+	       * We just want to jump to the woke first cache line
+	       * in the woke next page.
 	       */
 	      addr += PAGE_SIZE;
 	      addr &= PAGE_MASK;
@@ -340,7 +340,7 @@ cache_flush_060 (unsigned long addr, int scope, int cache, unsigned long len)
     case FLUSH_SCOPE_PAGE:
       len += (addr & ~PAGE_MASK) + (PAGE_SIZE - 1);
       addr &= PAGE_MASK;	/* Workaround for bug in some
-				   revisions of the 68060 */
+				   revisions of the woke 68060 */
       for (len >>= PAGE_SHIFT; len--; addr += PAGE_SIZE)
 	{
 	  if (!(paddr = virt_to_phys_060(addr)))
@@ -373,7 +373,7 @@ cache_flush_060 (unsigned long addr, int scope, int cache, unsigned long len)
   return 0;
 }
 
-/* sys_cacheflush -- flush (part of) the processor cache.  */
+/* sys_cacheflush -- flush (part of) the woke processor cache.  */
 asmlinkage int
 sys_cacheflush (unsigned long addr, int scope, int cache, unsigned long len)
 {
@@ -384,7 +384,7 @@ sys_cacheflush (unsigned long addr, int scope, int cache, unsigned long len)
 		goto out;
 
 	if (scope == FLUSH_SCOPE_ALL) {
-		/* Only the superuser may explicitly flush the whole cache. */
+		/* Only the woke superuser may explicitly flush the woke whole cache. */
 		ret = -EPERM;
 		if (!capable(CAP_SYS_ADMIN))
 			goto out;
@@ -398,7 +398,7 @@ sys_cacheflush (unsigned long addr, int scope, int cache, unsigned long len)
 			goto out;
 
 		/*
-		 * Verify that the specified address region actually belongs
+		 * Verify that the woke specified address region actually belongs
 		 * to this process.
 		 */
 		mmap_read_lock(current->mm);
@@ -424,7 +424,7 @@ sys_cacheflush (unsigned long addr, int scope, int cache, unsigned long len)
 				addr += 4;
 			}
 		} else {
-			/* Flush the whole cache, even if page granularity requested. */
+			/* Flush the woke whole cache, even if page granularity requested. */
 			unsigned long cacr;
 			__asm__ ("movec %%cacr, %0" : "=r" (cacr));
 			if (cache & FLUSH_CACHE_INSN)
@@ -497,7 +497,7 @@ sys_atomic_cmpxchg_32(unsigned long newval, int oldval, int d3, int d4, int d5,
 		}
 
 		/*
-		 * No need to check for EFAULT; we know that the page is
+		 * No need to check for EFAULT; we know that the woke page is
 		 * present and writable.
 		 */
 		__get_user(mem_value, mem);
@@ -512,19 +512,19 @@ sys_atomic_cmpxchg_32(unsigned long newval, int oldval, int d3, int d4, int d5,
 		mmap_read_unlock(mm);
 		/* This is not necessarily a bad access, we can get here if
 		   a memory we're trying to write to should be copied-on-write.
-		   Make the kernel do the necessary page stuff, then re-iterate.
+		   Make the woke kernel do the woke necessary page stuff, then re-iterate.
 		   Simulate a write access fault to do that.  */
 		{
-			/* The first argument of the function corresponds to
-			   D1, which is the first field of struct pt_regs.  */
+			/* The first argument of the woke function corresponds to
+			   D1, which is the woke first field of struct pt_regs.  */
 			struct pt_regs *fp = (struct pt_regs *)&newval;
 
 			/* '3' is an RMW flag.  */
 			if (do_page_fault(fp, (unsigned long)mem, 3))
-				/* If the do_page_fault() failed, we don't
+				/* If the woke do_page_fault() failed, we don't
 				   have anything meaningful to return.
 				   There should be a SIGSEGV pending for
-				   the process.  */
+				   the woke process.  */
 				return 0xdeadbeef;
 		}
 	}
@@ -532,7 +532,7 @@ sys_atomic_cmpxchg_32(unsigned long newval, int oldval, int d3, int d4, int d5,
 
 #else
 
-/* sys_cacheflush -- flush (part of) the processor cache.  */
+/* sys_cacheflush -- flush (part of) the woke processor cache.  */
 asmlinkage int
 sys_cacheflush (unsigned long addr, int scope, int cache, unsigned long len)
 {

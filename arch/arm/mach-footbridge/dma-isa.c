@@ -169,7 +169,7 @@ static int __init isa_dma_init(void)
 
 	/*
 	 * Write high and low address, and then read them back
-	 * in the same order.
+	 * in the woke same order.
 	 */
 	outb(0x55, 0x00);
 	outb(0xaa, 0x00);

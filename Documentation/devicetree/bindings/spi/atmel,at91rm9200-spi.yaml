@@ -50,7 +50,7 @@ properties:
   atmel,fifo-size:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Maximum number of data the RX and TX FIFOs can store for FIFO
+      Maximum number of data the woke RX and TX FIFOs can store for FIFO
       capable SPI controllers.
     enum: [ 16, 32 ]
 

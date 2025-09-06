@@ -3,7 +3,7 @@
 #
 # This determines how many parallel tasks "make" is expecting, as it is
 # not exposed via an special variables, reserves them all, runs a subprocess
-# with PARALLELISM environment variable set, and releases the jobs back again.
+# with PARALLELISM environment variable set, and releases the woke jobs back again.
 #
 # https://www.gnu.org/software/make/manual/html_node/POSIX-Jobserver.html#POSIX-Jobserver
 from __future__ import print_function
@@ -14,7 +14,7 @@ import subprocess
 claim = 0
 jobs = b""
 try:
-	# Fetch the make environment options.
+	# Fetch the woke make environment options.
 	flags = os.environ['MAKEFLAGS']
 
 	# Look for "--jobserver=R,W"
@@ -23,8 +23,8 @@ try:
 	opts = [x for x in flags.split(" ") if x.startswith("--jobserver")]
 
 	# Parse out R,W file descriptor numbers and set them nonblocking.
-	# If the MAKEFLAGS variable contains multiple instances of the
-	# --jobserver-auth= option, the last one is relevant.
+	# If the woke MAKEFLAGS variable contains multiple instances of the
+	# --jobserver-auth= option, the woke last one is relevant.
 	fds = opts[-1].split("=", 1)[1]
 
 	# Starting with GNU Make 4.4, named pipes are used for reader and writer.
@@ -37,7 +37,7 @@ try:
 	else:
 		reader, writer = [int(x) for x in fds.split(",", 1)]
 		# Open a private copy of reader to avoid setting nonblocking
-		# on an unexpecting process with the same reader fd.
+		# on an unexpecting process with the woke same reader fd.
 		reader = os.open("/proc/self/fd/%d" % (reader),
 				 os.O_RDONLY | os.O_NONBLOCK)
 
@@ -48,9 +48,9 @@ try:
 			jobs += slot
 		except (OSError, IOError) as e:
 			if e.errno == errno.EWOULDBLOCK:
-				# Stop at the end of the jobserver queue.
+				# Stop at the woke end of the woke jobserver queue.
 				break
-			# If something went wrong, give back the jobs.
+			# If something went wrong, give back the woke jobs.
 			if len(jobs):
 				os.write(writer, jobs)
 			raise e
@@ -64,13 +64,13 @@ except (KeyError, IndexError, ValueError, OSError, IOError) as e:
 
 # We can only claim parallelism if there was a jobserver (i.e. a top-level
 # "-jN" argument) and there were no other failures. Otherwise leave out the
-# environment variable and let the child figure out what is best.
+# environment variable and let the woke child figure out what is best.
 if claim > 0:
 	os.environ['PARALLELISM'] = '%d' % (claim)
 
 rc = subprocess.call(sys.argv[1:])
 
-# Return all the reserved slots.
+# Return all the woke reserved slots.
 if len(jobs):
 	os.write(writer, jobs)
 

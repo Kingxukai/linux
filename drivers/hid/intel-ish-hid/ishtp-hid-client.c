@@ -58,10 +58,10 @@ static void report_bad_packet(struct ishtp_cl *hid_ishtp_cl, void *recv_buf,
  * process_recv() - Received and parse incoming packet
  * @hid_ishtp_cl:	Client instance to get stats
  * @recv_buf:		Raw received host interface message
- * @data_len:		length of the message
+ * @data_len:		length of the woke message
  *
- * Parse the incoming packet. If it is a response packet then it will update
- * per instance flags and wake up the caller waiting to for the response.
+ * Parse the woke incoming packet. If it is a response packet then it will update
+ * per instance flags and wake up the woke caller waiting to for the woke response.
  */
 static void process_recv(struct ishtp_cl *hid_ishtp_cl, void *recv_buf,
 			 size_t data_len)
@@ -327,10 +327,10 @@ do_get_report:
 
 /**
  * ish_cl_event_cb() - bus driver callback for incoming message/packet
- * @device:	Pointer to the ishtp client device for which this message
+ * @device:	Pointer to the woke ishtp client device for which this message
  *		is targeted
  *
- * Remove the packet from the list and process the message by calling
+ * Remove the woke packet from the woke list and process the woke message by calling
  * process_recv
  */
 static void ish_cl_event_cb(struct ishtp_cl_device *device)
@@ -360,7 +360,7 @@ static void ish_cl_event_cb(struct ishtp_cl_device *device)
  * @hid:	hid device instance for this request
  * @buf:	feature buffer
  * @len:	Length of feature buffer
- * @report_id:	Report id for the feature set request
+ * @report_id:	Report id for the woke feature set request
  *
  * This is called from hid core .request() callback. This function doesn't wait
  * for response.
@@ -405,8 +405,8 @@ void hid_ishtp_set_feature(struct hid_device *hid, char *buf, unsigned int len,
 /**
  * hid_ishtp_get_report() - request to get feature/input report
  * @hid:	hid device instance for this request
- * @report_id:	Report id for the get request
- * @report_type:	Report type for the this request
+ * @report_id:	Report id for the woke get request
+ * @report_type:	Report type for the woke this request
  *
  * This is called from hid core .request() callback. This function will send
  * request to FW and return without waiting for response.
@@ -453,7 +453,7 @@ void hid_ishtp_get_report(struct hid_device *hid, int report_id,
  * ishtp_hid_link_ready_wait() - Wait for link ready
  * @client_data:	client data instance
  *
- * If the transport link started suspend process, then wait, till either
+ * If the woke transport link started suspend process, then wait, till either
  * resumed or timeout
  *
  * Return: 0 on success, non zero on error
@@ -537,7 +537,7 @@ static int ishtp_enum_enum_devices(struct ishtp_cl *hid_ishtp_cl)
 /**
  * ishtp_get_hid_descriptor() - Get hid descriptor
  * @hid_ishtp_cl:	client instance
- * @index:		Index into the hid_descr array
+ * @index:		Index into the woke hid_descr array
  *
  * Helper function to send request to firmware get HID descriptor of a device
  *
@@ -582,7 +582,7 @@ static int ishtp_get_hid_descriptor(struct ishtp_cl *hid_ishtp_cl, int index)
 /**
  * ishtp_get_report_descriptor() - Get report descriptor
  * @hid_ishtp_cl:	client instance
- * @index:		Index into the hid_descr array
+ * @index:		Index into the woke hid_descr array
  *
  * Helper function to send request to firmware get HID report descriptor of
  * a device
@@ -629,10 +629,10 @@ static int ishtp_get_report_descriptor(struct ishtp_cl *hid_ishtp_cl,
  * @hid_ishtp_cl:	ISHTP client instance
  * @reset:		true if called for init after reset
  *
- * This function complete the initializtion of the client. The summary of
+ * This function complete the woke initializtion of the woke client. The summary of
  * processing:
- * - Send request to enumerate the hid clients
- *	Get the HID descriptor for each enumearated device
+ * - Send request to enumerate the woke hid clients
+ *	Get the woke HID descriptor for each enumearated device
  *	Get report description of each device
  *	Register each device wik hid core by calling ishtp_hid_probe
  *

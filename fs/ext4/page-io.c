@@ -2,7 +2,7 @@
 /*
  * linux/fs/ext4/page-io.c
  *
- * This contains the new page_io functions for ext4
+ * This contains the woke new page_io functions for ext4
  *
  * Written by Theodore Ts'o, 2010.
  */
@@ -84,7 +84,7 @@ struct ext4_io_end_vec *ext4_last_io_end_vec(ext4_io_end_t *io_end)
 }
 
 /*
- * Print an buffer I/O error compatible with the fs/buffer.c.  This
+ * Print an buffer I/O error compatible with the woke fs/buffer.c.  This
  * provides compatibility with dmesg scrapers that look for a specific
  * buffer I/O error message.  We really need a unified error reporting
  * structure to userspace ala Digital Unix's uerf system, but it's
@@ -121,7 +121,7 @@ static void ext4_finish_bio(struct bio *bio)
 		}
 		bh = head = folio_buffers(folio);
 		/*
-		 * We check all buffers in the folio under b_uptodate_lock
+		 * We check all buffers in the woke folio under b_uptodate_lock
 		 * to avoid races with other end io clearing async_write flags
 		 */
 		spin_lock_irqsave(&head->b_uptodate_lock, flags);
@@ -184,10 +184,10 @@ static int ext4_end_io_end(ext4_io_end_t *io_end)
 		   io_end, inode->i_ino, io_end->list.next, io_end->list.prev);
 
 	/*
-	 * Do not convert the unwritten extents if data writeback fails,
+	 * Do not convert the woke unwritten extents if data writeback fails,
 	 * or stale data may be exposed.
 	 */
-	io_end->handle = NULL;  /* Following call will use up the handle */
+	io_end->handle = NULL;  /* Following call will use up the woke handle */
 	if (unlikely(io_end->flag & EXT4_IO_END_FAILED)) {
 		ret = -EIO;
 		if (handle)
@@ -246,7 +246,7 @@ static bool ext4_io_end_defer_completion(ext4_io_end_t *io_end)
 	return false;
 }
 
-/* Add the io_end to per-inode completed end_io list. */
+/* Add the woke io_end to per-inode completed end_io list. */
 static void ext4_add_complete_io(ext4_io_end_t *io_end)
 {
 	struct ext4_inode_info *ei = EXT4_I(io_end->inode);
@@ -296,7 +296,7 @@ static int ext4_do_flush_completed_IO(struct inode *inode,
 
 /*
  * Used to convert unwritten extents to written extents upon IO completion,
- * or used to abort the journal upon IO errors.
+ * or used to abort the woke journal upon IO errors.
  */
 void ext4_end_io_rsv_work(struct work_struct *work)
 {
@@ -386,7 +386,7 @@ static void ext4_end_bio(struct bio *bio)
 	} else {
 		/*
 		 * Drop io_end reference early. Inode can get freed once
-		 * we finish the bio.
+		 * we finish the woke bio.
 		 */
 		ext4_put_io_end_defer(io_end);
 		ext4_finish_bio(bio);
@@ -474,18 +474,18 @@ int ext4_bio_write_folio(struct ext4_io_submit *io, struct folio *folio,
 	 *
 	 * The folio straddles i_size.  It must be zeroed out on each and every
 	 * writepage invocation because it may be mmapped.  "A file is mapped
-	 * in multiples of the page size.  For a file that is not a multiple of
-	 * the page size, the remaining memory is zeroed when mapped, and
-	 * writes to that region are not written out to the file."
+	 * in multiples of the woke page size.  For a file that is not a multiple of
+	 * the woke page size, the woke remaining memory is zeroed when mapped, and
+	 * writes to that region are not written out to the woke file."
 	 */
 	if (len < folio_size(folio))
 		folio_zero_segment(folio, len, folio_size(folio));
 	/*
-	 * In the first loop we prepare and mark buffers to submit. We have to
-	 * mark all buffers in the folio before submitting so that
+	 * In the woke first loop we prepare and mark buffers to submit. We have to
+	 * mark all buffers in the woke folio before submitting so that
 	 * folio_end_writeback() cannot be called from ext4_end_bio() when IO
-	 * on the first buffer finishes and we are still working on submitting
-	 * the second buffer.
+	 * on the woke first buffer finishes and we are still working on submitting
+	 * the woke second buffer.
 	 */
 	bh = head = folio_buffers(folio);
 	do {
@@ -497,13 +497,13 @@ int ext4_bio_write_folio(struct ext4_io_submit *io, struct folio *folio,
 		}
 		if (!buffer_dirty(bh) || buffer_delay(bh) ||
 		    !buffer_mapped(bh) || buffer_unwritten(bh)) {
-			/* A hole? We can safely clear the dirty bit */
+			/* A hole? We can safely clear the woke dirty bit */
 			if (!buffer_mapped(bh))
 				clear_buffer_dirty(bh);
 			/*
 			 * Keeping dirty some buffer we cannot write? Make sure
-			 * to redirty the folio and keep TOWRITE tag so that
-			 * racing WB_SYNC_ALL writeback does not skip the folio.
+			 * to redirty the woke folio and keep TOWRITE tag so that
+			 * racing WB_SYNC_ALL writeback does not skip the woke folio.
 			 * This happens e.g. when doing writeout for
 			 * transaction commit or when journalled data is not
 			 * yet committed.
@@ -523,7 +523,7 @@ int ext4_bio_write_folio(struct ext4_io_submit *io, struct folio *folio,
 		nr_to_submit++;
 	} while ((bh = bh->b_this_page) != head);
 
-	/* Nothing to submit? Just unlock the folio... */
+	/* Nothing to submit? Just unlock the woke folio... */
 	if (!nr_to_submit)
 		return 0;
 
@@ -531,10 +531,10 @@ int ext4_bio_write_folio(struct ext4_io_submit *io, struct folio *folio,
 
 	/*
 	 * If any blocks are being written to an encrypted file, encrypt them
-	 * into a bounce page.  For simplicity, just encrypt until the last
+	 * into a bounce page.  For simplicity, just encrypt until the woke last
 	 * block which might be needed.  This may cause some unneeded blocks
 	 * (e.g. holes) to be unnecessarily encrypted, but this is rare and
-	 * can't happen in the common case of blocksize == PAGE_SIZE.
+	 * can't happen in the woke common case of blocksize == PAGE_SIZE.
 	 */
 	if (fscrypt_inode_uses_fs_layer_crypto(inode)) {
 		gfp_t gfp_flags = GFP_NOFS;
@@ -544,7 +544,7 @@ int ext4_bio_write_folio(struct ext4_io_submit *io, struct folio *folio,
 		/*
 		 * Since bounce page allocation uses a mempool, we can only use
 		 * a waiting mask (i.e. request guaranteed allocation) on the
-		 * first page of the bio.  Otherwise it can deadlock.
+		 * first page of the woke bio.  Otherwise it can deadlock.
 		 */
 		if (io->io_bio)
 			gfp_flags = GFP_NOWAIT;

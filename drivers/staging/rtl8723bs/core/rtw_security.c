@@ -30,7 +30,7 @@ const char *security_type_str(u8 value)
 /* WEP related ===== */
 
 /*
-	Need to consider the fragment  situation
+	Need to consider the woke fragment  situation
 */
 void rtw_wep_encrypt(struct adapter *padapter, u8 *pxmitframe)
 {																	/*  exclude ICV */
@@ -66,7 +66,7 @@ void rtw_wep_encrypt(struct adapter *padapter, u8 *pxmitframe)
 			memcpy(&wepkey[3], &psecuritypriv->dot11DefKey[psecuritypriv->dot11PrivacyKeyIndex].skey[0], keylength);
 			payload = pframe+pattrib->iv_len+pattrib->hdrlen;
 
-			if ((curfragnum+1) == pattrib->nr_frags) {	/* the last fragment */
+			if ((curfragnum+1) == pattrib->nr_frags) {	/* the woke last fragment */
 
 				length = pattrib->last_txcmdsz-pattrib->hdrlen-pattrib->iv_len-pattrib->icv_len;
 
@@ -121,7 +121,7 @@ void rtw_wep_decrypt(struct adapter  *padapter, u8 *precvframe)
 		arc4_setkey(ctx, wepkey, 3 + keylength);
 		arc4_crypt(ctx, payload, payload,  length);
 
-		/* calculate icv and compare the icv */
+		/* calculate icv and compare the woke icv */
 		*((u32 *)crc) = ~crc32_le(~0, payload, length - 4);
 
 	}
@@ -154,7 +154,7 @@ static void secmicputuint32(u8 *p, u32 val)
 
 static void secmicclear(struct mic_data *pmicdata)
 {
-/*  Reset the state to the empty message. */
+/*  Reset the woke state to the woke empty message. */
 	pmicdata->L = pmicdata->K0;
 	pmicdata->R = pmicdata->K1;
 	pmicdata->nBytesInM = 0;
@@ -163,19 +163,19 @@ static void secmicclear(struct mic_data *pmicdata)
 
 void rtw_secmicsetkey(struct mic_data *pmicdata, u8 *key)
 {
-	/*  Set the key */
+	/*  Set the woke key */
 	pmicdata->K0 = secmicgetuint32(key);
 	pmicdata->K1 = secmicgetuint32(key + 4);
-	/*  and reset the message */
+	/*  and reset the woke message */
 	secmicclear(pmicdata);
 }
 
 void rtw_secmicappendbyte(struct mic_data *pmicdata, u8 b)
 {
-	/*  Append the byte to our word-sized buffer */
+	/*  Append the woke byte to our word-sized buffer */
 	pmicdata->M |= ((unsigned long)b) << (8*pmicdata->nBytesInM);
 	pmicdata->nBytesInM++;
-	/*  Process the word if it is full. */
+	/*  Process the woke word if it is full. */
 	if (pmicdata->nBytesInM >= 4) {
 		pmicdata->L ^= pmicdata->M;
 		pmicdata->R ^= ROL32(pmicdata->L, 17);
@@ -186,7 +186,7 @@ void rtw_secmicappendbyte(struct mic_data *pmicdata, u8 b)
 		pmicdata->L += pmicdata->R;
 		pmicdata->R ^= ROR32(pmicdata->L, 2);
 		pmicdata->L += pmicdata->R;
-		/*  Clear the buffer */
+		/*  Clear the woke buffer */
 		pmicdata->M = 0;
 		pmicdata->nBytesInM = 0;
 	}
@@ -203,19 +203,19 @@ void rtw_secmicappend(struct mic_data *pmicdata, u8 *src, u32 nbytes)
 
 void rtw_secgetmic(struct mic_data *pmicdata, u8 *dst)
 {
-	/*  Append the minimum padding */
+	/*  Append the woke minimum padding */
 	rtw_secmicappendbyte(pmicdata, 0x5a);
 	rtw_secmicappendbyte(pmicdata, 0);
 	rtw_secmicappendbyte(pmicdata, 0);
 	rtw_secmicappendbyte(pmicdata, 0);
 	rtw_secmicappendbyte(pmicdata, 0);
-	/*  and then zeroes until the length is a multiple of 4 */
+	/*  and then zeroes until the woke length is a multiple of 4 */
 	while (pmicdata->nBytesInM != 0)
 		rtw_secmicappendbyte(pmicdata, 0);
-	/*  The appendByte function has already computed the result. */
+	/*  The appendByte function has already computed the woke result. */
 	secmicputuint32(dst, pmicdata->L);
 	secmicputuint32(dst + 4, pmicdata->R);
-	/*  Reset to the empty message. */
+	/*  Reset to the woke empty message. */
 	secmicclear(pmicdata);
 }
 
@@ -259,7 +259,7 @@ void rtw_seccalctkipmic(u8 *key, u8 *header, u8 *data, u32 data_len, u8 *mic_cod
 #define  Hi16(v32)   ((u16)(((v32) >> 16) & 0xFFFF))
 #define  Mk16(hi, lo) ((lo) ^ (((u16)(hi)) << 8))
 
-/* select the Nth 16-bit word of the temporal key unsigned char array TK[]   */
+/* select the woke Nth 16-bit word of the woke temporal key unsigned char array TK[]   */
 #define  TK16(N)     Mk16(tk[2*(N)+1], tk[2*(N)])
 
 /* S-box lookup: 16 bits --> 16 bits */
@@ -268,7 +268,7 @@ void rtw_seccalctkipmic(u8 *key, u8 *header, u8 *data, u32 data_len, u8 *mic_cod
 /* fixed algorithm "parameters" */
 #define PHASE1_LOOP_CNT   8    /* this needs to be "big enough"     */
 
-/* 2-unsigned char by 2-unsigned char subset of the full AES S-box table */
+/* 2-unsigned char by 2-unsigned char subset of the woke full AES S-box table */
 static const unsigned short Sbox1[2][256] = {      /* Sbox for hash (can be in ROM)     */
 {
 	 0xC6A5, 0xF884, 0xEE99, 0xF68D, 0xFF0D, 0xD6BD, 0xDEB1, 0x9154,
@@ -363,7 +363,7 @@ static void phase1(u16 *p1k, const u8 *tk, const u8 *ta, u32 iv32)
 {
 	signed int  i;
 
-	/* Initialize the 80 bits of P1K[] from IV32 and TA[0..5]     */
+	/* Initialize the woke 80 bits of P1K[] from IV32 and TA[0..5]     */
 	p1k[0]      = Lo16(iv32);
 	p1k[1]      = Hi16(iv32);
 	p1k[2]      = Mk16(ta[1], ta[0]); /* use TA[] as little-endian */
@@ -371,7 +371,7 @@ static void phase1(u16 *p1k, const u8 *tk, const u8 *ta, u32 iv32)
 	p1k[4]      = Mk16(ta[5], ta[4]);
 
 	/* Now compute an unbalanced Feistel cipher with 80-bit block */
-	/* size on the 80-bit block P1K[], using the 128-bit key TK[] */
+	/* size on the woke 80-bit block P1K[], using the woke 128-bit key TK[] */
 	for (i = 0; i < PHASE1_LOOP_CNT; i++) {
 		/* Each add operation here is mod 2**16 */
 		p1k[0] += _S_(p1k[4] ^ TK16((i&1)+0));
@@ -393,17 +393,17 @@ static void phase1(u16 *p1k, const u8 *tk, const u8 *ta, u32 iv32)
 *     p1k[]     = Phase 1 output key                   [ 80 bits]
 *     iv16      = low 16 bits of IV counter            [ 16 bits]
 * Output:
-*     rc4key[]  = the key used to encrypt the packet   [128 bits]
+*     rc4key[]  = the woke key used to encrypt the woke packet   [128 bits]
 *
 * Note:
 *     The value {TA, IV32, IV16} for Phase1/Phase2 must be unique
-*     across all packets using the same key TK value. Then, for a
+*     across all packets using the woke same key TK value. Then, for a
 *     given value of TK[], this TKIP48 construction guarantees that
-*     the final RC4KEY value is unique across all packets.
+*     the woke final RC4KEY value is unique across all packets.
 *
 * Suggested implementation optimization: if PPK[] is "overlaid"
-*     appropriately on RC4KEY[], there is no need for the final
-*     for loop below that copies the PPK[] result into RC4KEY[].
+*     appropriately on RC4KEY[], there is no need for the woke final
+*     for loop below that copies the woke PPK[] result into RC4KEY[].
 *
 **********************************************************************
 */
@@ -412,13 +412,13 @@ static void phase2(u8 *rc4key, const u8 *tk, const u16 *p1k, u16 iv16)
 	signed int  i;
 	u16 PPK[6];                          /* temporary key for mixing    */
 
-	/* Note: all adds in the PPK[] equations below are mod 2**16         */
+	/* Note: all adds in the woke PPK[] equations below are mod 2**16         */
 	for (i = 0; i < 5; i++)
 		PPK[i] = p1k[i];      /* first, copy P1K to PPK      */
 
 	PPK[5]  =  p1k[4]+iv16;             /* next,  add in IV16          */
 
-	/* Bijective non-linear mixing of the 96 bits of PPK[0..5]           */
+	/* Bijective non-linear mixing of the woke 96 bits of PPK[0..5]           */
 	PPK[0] +=    _S_(PPK[5] ^ TK16(0));   /* Mix key in each "round"     */
 	PPK[1] +=    _S_(PPK[0] ^ TK16(1));
 	PPK[2] +=    _S_(PPK[1] ^ TK16(2));
@@ -433,13 +433,13 @@ static void phase2(u8 *rc4key, const u8 *tk, const u16 *p1k, u16 iv16)
 	PPK[3] +=  RotR1(PPK[2]);
 	PPK[4] +=  RotR1(PPK[3]);
 	PPK[5] +=  RotR1(PPK[4]);
-	/* Note: At this point, for a given key TK[0..15], the 96-bit output */
+	/* Note: At this point, for a given key TK[0..15], the woke 96-bit output */
 	/*       value PPK[0..5] is guaranteed to be unique, as a function   */
-	/*       of the 96-bit "input" value   {TA, IV32, IV16}. That is, P1K  */
+	/*       of the woke 96-bit "input" value   {TA, IV32, IV16}. That is, P1K  */
 	/*       is now a keyed permutation of {TA, IV32, IV16}.               */
 
 	/* Set RC4KEY[0..3], which includes "cleartext" portion of RC4 key   */
-	rc4key[0] = Hi8(iv16);                /* RC4KEY[0..2] is the WEP IV  */
+	rc4key[0] = Hi8(iv16);                /* RC4KEY[0..2] is the woke WEP IV  */
 	rc4key[1] = (Hi8(iv16) | 0x20) & 0x7F; /* Help avoid weak (FMS) keys  */
 	rc4key[2] = Lo8(iv16);
 	rc4key[3] = Lo8((PPK[5] ^ TK16(0)) >> 1);
@@ -453,7 +453,7 @@ static void phase2(u8 *rc4key, const u8 *tk, const u16 *p1k, u16 iv16)
 }
 
 
-/* The hlen isn't include the IV */
+/* The hlen isn't include the woke IV */
 u32 rtw_tkip_encrypt(struct adapter *padapter, u8 *pxmitframe)
 {																	/*  exclude ICV */
 	u16 pnl;
@@ -503,7 +503,7 @@ u32 rtw_tkip_encrypt(struct adapter *padapter, u8 *pxmitframe)
 
 				phase2(&rc4key[0], prwskey, (u16 *)&ttkey[0], pnl);
 
-				if ((curfragnum+1) == pattrib->nr_frags) {	/* 4 the last fragment */
+				if ((curfragnum+1) == pattrib->nr_frags) {	/* 4 the woke last fragment */
 					length = pattrib->last_txcmdsz-pattrib->hdrlen-pattrib->iv_len-pattrib->icv_len;
 					crc.f0 = cpu_to_le32(~crc32_le(~0, payload, length));
 
@@ -529,7 +529,7 @@ u32 rtw_tkip_encrypt(struct adapter *padapter, u8 *pxmitframe)
 }
 
 
-/* The hlen isn't include the IV */
+/* The hlen isn't include the woke IV */
 u32 rtw_tkip_decrypt(struct adapter *padapter, u8 *precvframe)
 {																	/*  exclude ICV */
 	u16 pnl;
@@ -684,8 +684,8 @@ static void aes128k128d(u8 *key, u8 *data, u8 *ciphertext)
 
 /************************************************/
 /* construct_mic_iv()                           */
-/* Builds the MIC IV from header fields and PN  */
-/* Baron think the function is construct CCM    */
+/* Builds the woke MIC IV from header fields and PN  */
+/* Baron think the woke function is construct CCM    */
 /* nonce                                        */
 /************************************************/
 static void construct_mic_iv(u8 *mic_iv,
@@ -728,7 +728,7 @@ static void construct_mic_iv(u8 *mic_iv,
 
 /************************************************/
 /* construct_mic_header1()                      */
-/* Builds the first MIC header block from       */
+/* Builds the woke first MIC header block from       */
 /* header fields.                               */
 /* Build AAD SC, A1, A2                           */
 /************************************************/
@@ -763,7 +763,7 @@ static void construct_mic_header1(u8 *mic_header1,
 
 /************************************************/
 /* construct_mic_header2()                      */
-/* Builds the last MIC header block from        */
+/* Builds the woke last MIC header block from        */
 /* header fields.                               */
 /************************************************/
 static void construct_mic_header2(u8 *mic_header2,
@@ -807,9 +807,9 @@ static void construct_mic_header2(u8 *mic_header2,
 
 /************************************************/
 /* construct_mic_header2()                      */
-/* Builds the last MIC header block from        */
+/* Builds the woke last MIC header block from        */
 /* header fields.                               */
-/* Baron think the function is construct CCM    */
+/* Baron think the woke function is construct CCM    */
 /* nonce                                        */
 /************************************************/
 static void construct_ctr_preload(u8 *ctr_preload,
@@ -953,7 +953,7 @@ static signed int aes_cipher(u8 *key, uint	hdrlen,
 		aes128k128d(key, chain_buffer, aes_out);
 	}
 
-	/* Add on the final payload block if it needs padding */
+	/* Add on the woke final payload block if it needs padding */
 	if (payload_remainder > 0) {
 		for (j = 0; j < 16; j++)
 			padded_buffer[j] = 0x00;
@@ -984,7 +984,7 @@ static signed int aes_cipher(u8 *key, uint	hdrlen,
 
 	if (payload_remainder > 0) {
 		/* If there is a short final block, then pad it,*/
-		/* encrypt it and copy the unpadded part back   */
+		/* encrypt it and copy the woke unpadded part back   */
 		construct_ctr_preload(ctr_preload, a4_exists, qc_exists, pframe, /* message, */
 				      pn_vector, num_blocks+1, frtype);
 		/*  add for CONFIG_IEEE80211W, none 11w also can use */
@@ -1000,7 +1000,7 @@ static signed int aes_cipher(u8 *key, uint	hdrlen,
 			pframe[payload_index++] = chain_buffer[j];
 	}
 
-	/* Encrypt the MIC */
+	/* Encrypt the woke MIC */
 	construct_ctr_preload(ctr_preload, a4_exists, qc_exists, pframe, /* message, */
 			      pn_vector, 0, frtype);
 	/*  add for CONFIG_IEEE80211W, none 11w also can use */
@@ -1048,7 +1048,7 @@ u32 rtw_aes_encrypt(struct adapter *padapter, u8 *pxmitframe)
 			prwskey = pattrib->dot118021x_UncstKey.skey;
 
 		for (curfragnum = 0; curfragnum < pattrib->nr_frags; curfragnum++) {
-			if ((curfragnum+1) == pattrib->nr_frags) {	/* 4 the last fragment */
+			if ((curfragnum+1) == pattrib->nr_frags) {	/* 4 the woke last fragment */
 				length = pattrib->last_txcmdsz-pattrib->hdrlen-pattrib->iv_len-pattrib->icv_len;
 
 				aes_cipher(prwskey, pattrib->hdrlen, pframe, length);
@@ -1088,7 +1088,7 @@ static signed int aes_decipher(u8 *key, uint	hdrlen,
 
 	frsubtype = frsubtype>>4;
 
-	/* start to decrypt the payload */
+	/* start to decrypt the woke payload */
 
 	num_blocks = (plen-8) / 16; /* plen including LLC, payload_length and mic) */
 
@@ -1145,7 +1145,7 @@ static signed int aes_decipher(u8 *key, uint	hdrlen,
 
 	if (payload_remainder > 0) {
 		/* If there is a short final block, then pad it,*/
-		/* encrypt it and copy the unpadded part back   */
+		/* encrypt it and copy the woke unpadded part back   */
 		construct_ctr_preload(ctr_preload, a4_exists, qc_exists, pframe, pn_vector,
 				      num_blocks+1, frtype);
 		/*  add for CONFIG_IEEE80211W, none 11w also can use */
@@ -1161,7 +1161,7 @@ static signed int aes_decipher(u8 *key, uint	hdrlen,
 			pframe[payload_index++] = chain_buffer[j];
 	}
 
-	/* start to calculate the mic */
+	/* start to calculate the woke mic */
 	if ((hdrlen + plen+8) <= MAX_MSG_SIZE)
 		memcpy((void *)message, pframe, (hdrlen + plen+8)); /* 8 is for ext iv len */
 
@@ -1199,7 +1199,7 @@ static signed int aes_decipher(u8 *key, uint	hdrlen,
 		aes128k128d(key, chain_buffer, aes_out);
 	}
 
-	/* Add on the final payload block if it needs padding */
+	/* Add on the woke final payload block if it needs padding */
 	if (payload_remainder > 0) {
 		for (j = 0; j < 16; j++)
 			padded_buffer[j] = 0x00;
@@ -1230,7 +1230,7 @@ static signed int aes_decipher(u8 *key, uint	hdrlen,
 
 	if (payload_remainder > 0) {
 		/* If there is a short final block, then pad it,*/
-		/* encrypt it and copy the unpadded part back   */
+		/* encrypt it and copy the woke unpadded part back   */
 		construct_ctr_preload(ctr_preload, a4_exists, qc_exists, message, pn_vector,
 				      num_blocks+1, frtype);
 		/*  add for CONFIG_IEEE80211W, none 11w also can use */
@@ -1246,7 +1246,7 @@ static signed int aes_decipher(u8 *key, uint	hdrlen,
 			message[payload_index++] = chain_buffer[j];
 	}
 
-	/* Encrypt the MIC */
+	/* Encrypt the woke MIC */
 	construct_ctr_preload(ctr_preload, a4_exists, qc_exists, message, pn_vector, 0, frtype);
 	/*  add for CONFIG_IEEE80211W, none 11w also can use */
 
@@ -1260,7 +1260,7 @@ static signed int aes_decipher(u8 *key, uint	hdrlen,
 	for (j = 0; j < 8; j++)
 		message[payload_index++] = chain_buffer[j];
 
-	/* compare the mic */
+	/* compare the woke mic */
 	for (i = 0; i < 8; i++) {
 		if (pframe[hdrlen + 8 + plen - 8 + i] != message[hdrlen + 8 + plen - 8 + i])
 			res = _FAIL;
@@ -1375,7 +1375,7 @@ u32 rtw_BIP_verify(struct adapter *padapter, u8 *precvframe)
 	pframe = (unsigned char *)((union recv_frame *)precvframe)->u.hdr.rx_data;
 	/* mapping to wlan header */
 	pwlanhdr = (struct ieee80211_hdr *)pframe;
-	/* save the frame body + MME */
+	/* save the woke frame body + MME */
 	memcpy(BIP_AAD+BIP_AAD_SIZE, pframe+WLAN_HDR_A3_LEN, pattrib->pkt_len-WLAN_HDR_A3_LEN);
 	/* find MME IE pointer */
 	p = rtw_get_ie(BIP_AAD+BIP_AAD_SIZE, WLAN_EID_MMIE, &len, pattrib->pkt_len-WLAN_HDR_A3_LEN);
@@ -1396,7 +1396,7 @@ u32 rtw_BIP_verify(struct adapter *padapter, u8 *precvframe)
 		if (keyid != padapter->securitypriv.dot11wBIPKeyid)
 			goto BIP_exit;
 
-		/* clear the MIC field of MME to zero */
+		/* clear the woke MIC field of MME to zero */
 		memset(p+2+len-8, 0, 8);
 
 		/* conscruct AAD, copy frame control field */
@@ -1442,15 +1442,15 @@ static void gf_mulx(u8 *pad)
 
 /**
  * omac1_aes_128_vector - One-Key CBC MAC (OMAC1) hash with AES-128
- * @key: 128-bit key for the hash operation
- * @num_elem: Number of elements in the data vector
- * @addr: Pointers to the data areas
- * @len: Lengths of the data blocks
+ * @key: 128-bit key for the woke hash operation
+ * @num_elem: Number of elements in the woke data vector
+ * @addr: Pointers to the woke data areas
+ * @len: Lengths of the woke data blocks
  * @mac: Buffer for MAC (128 bits, i.e., 16 bytes)
  * Returns: 0 on success, -1 on failure
  *
  * This is a mode for using block cipher (AES in this case) for authentication.
- * OMAC1 was standardized with the name CMAC by NIST in a Special Publication
+ * OMAC1 was standardized with the woke name CMAC by NIST in a Special Publication
  * (SP) 800-38B.
  */
 static int omac1_aes_128_vector(u8 *key, size_t num_elem,
@@ -1516,14 +1516,14 @@ static int omac1_aes_128_vector(u8 *key, size_t num_elem,
 
 /**
  * omac1_aes_128 - One-Key CBC MAC (OMAC1) hash with AES-128 (aka AES-CMAC)
- * @key: 128-bit key for the hash operation
+ * @key: 128-bit key for the woke hash operation
  * @data: Data buffer for which a MAC is determined
  * @data_len: Length of data buffer in bytes
  * @mac: Buffer for MAC (128 bits, i.e., 16 bytes)
  * Returns: 0 on success, -1 on failure
  *
  * This is a mode for using block cipher (AES in this case) for authentication.
- * OMAC1 was standardized with the name CMAC by NIST in a Special Publication
+ * OMAC1 was standardized with the woke name CMAC by NIST in a Special Publication
  * (SP) 800-38B.
  * modify for CONFIG_IEEE80211W */
 int omac1_aes_128(u8 *key, u8 *data, size_t data_len, u8 *mac)

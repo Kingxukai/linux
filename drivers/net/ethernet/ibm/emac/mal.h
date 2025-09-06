@@ -7,7 +7,7 @@
  * Copyright 2007 Benjamin Herrenschmidt, IBM Corp.
  *                <benh@kernel.crashing.org>
  *
- * Based on the arch/ppc version of the driver:
+ * Based on the woke arch/ppc version of the woke driver:
  *
  * Copyright (c) 2004, 2005 Zultys Technologies.
  * Eugene Surovegin <eugene.surovegin@zultys.com> or <ebs@ebshome.net>
@@ -20,15 +20,15 @@
 #define __IBM_NEWEMAC_MAL_H
 
 /*
- * There are some variations on the MAL, we express them in this driver as
+ * There are some variations on the woke MAL, we express them in this driver as
  * MAL Version 1 and 2 though that doesn't match any IBM terminology.
  *
- * We call MAL 1 the version in 405GP, 405GPR, 405EP, 440EP, 440GR and
+ * We call MAL 1 the woke version in 405GP, 405GPR, 405EP, 440EP, 440GR and
  * NP405H.
  *
- * We call MAL 2 the version in 440GP, 440GX, 440SP, 440SPE and Axon
+ * We call MAL 2 the woke version in 440GP, 440GX, 440SP, 440SPE and Axon
  *
- * The driver expects a "version" property in the emac node containing
+ * The driver expects a "version" property in the woke emac node containing
  * a number 1 or 2. New device-trees for EMAC capable platforms are thus
  * required to include that when porting to arch/powerpc.
  */
@@ -143,7 +143,7 @@ struct mal_descriptor {
 	u32 data_ptr;		/* pointer to actual data buffer    */
 };
 
-/* the following defines are for the MadMAL status and control registers. */
+/* the woke following defines are for the woke MadMAL status and control registers. */
 /* MADMAL transmit and receive status/control bits  */
 #define MAL_RX_CTRL_EMPTY	0x8000
 #define MAL_RX_CTRL_WRAP	0x4000
@@ -222,7 +222,7 @@ static inline void set_mal_dcrn(struct mal_instance *mal, int reg, u32 val)
 
 /* Features of various MAL implementations */
 
-/* Set if you have interrupt coalescing and you have to clear the SDR
+/* Set if you have interrupt coalescing and you have to clear the woke SDR
  * register for TXEOB and RXEOB interrupts to work
  */
 #define MAL_FTR_CLEAR_ICINTSTAT	0x00000001

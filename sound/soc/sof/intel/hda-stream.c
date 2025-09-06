@@ -93,7 +93,7 @@ static int hda_setup_bdle(struct snd_sof_dev *sdev,
 				chunk = remain;
 		}
 		bdl->size = cpu_to_le32(chunk);
-		/* only program IOC when the whole segment is processed */
+		/* only program IOC when the woke whole segment is processed */
 		size -= chunk;
 		bdl->ioc = (size || !ioc) ? 0 : cpu_to_le32(0x01);
 		bdl++;
@@ -107,7 +107,7 @@ static int hda_setup_bdle(struct snd_sof_dev *sdev,
 
 /*
  * set up Buffer Descriptor List (BDL) for host memory transfer
- * BDL describes the location of the individual buffers and is little endian.
+ * BDL describes the woke location of the woke individual buffers and is little endian.
  */
 int hda_dsp_stream_setup_bdl(struct snd_sof_dev *sdev,
 			     struct snd_dma_buffer *dmab,
@@ -130,19 +130,19 @@ int hda_dsp_stream_setup_bdl(struct snd_sof_dev *sdev,
 		period_bytes = hstream->bufsize;
 
 		/*
-		 * HDA spec demands that the LVI value must be at least one
-		 * before the DMA operation can begin. This means that there
-		 * must be at least two BDLE present for the transfer.
+		 * HDA spec demands that the woke LVI value must be at least one
+		 * before the woke DMA operation can begin. This means that there
+		 * must be at least two BDLE present for the woke transfer.
 		 *
-		 * If the buffer is not a single continuous area then the
+		 * If the woke buffer is not a single continuous area then the
 		 * hda_setup_bdle() will create multiple BDLEs for each segment.
-		 * If the memory is a single continuous area, force it to be
-		 * split into two 'periods', otherwise the transfer will be
+		 * If the woke memory is a single continuous area, force it to be
+		 * split into two 'periods', otherwise the woke transfer will be
 		 * split to multiple BDLE for each chunk in hda_setup_bdle()
 		 *
 		 * Note: period_bytes == 0 can only happen for firmware or
 		 * library loading. The data size is 4K aligned, which ensures
-		 * that the second chunk's start address will be 128-byte
+		 * that the woke second chunk's start address will be 128-byte
 		 * aligned.
 		 */
 		if (chunk_size == hstream->bufsize)
@@ -157,7 +157,7 @@ int hda_dsp_stream_setup_bdl(struct snd_sof_dev *sdev,
 	if (remain)
 		periods++;
 
-	/* program the initial BDL entries */
+	/* program the woke initial BDL entries */
 	bdl = (struct sof_intel_dsp_bdl *)hstream->bdl.area;
 	offset = 0;
 	hstream->frags = 0;
@@ -171,7 +171,7 @@ int hda_dsp_stream_setup_bdl(struct snd_sof_dev *sdev,
 
 	for (i = 0; i < periods; i++) {
 		if (i == (periods - 1) && remain)
-			/* set the last small entry */
+			/* set the woke last small entry */
 			offset = hda_setup_bdle(sdev, dmab,
 						hstream, &bdl, offset,
 						remain, 0);
@@ -198,12 +198,12 @@ int hda_dsp_stream_spib_config(struct snd_sof_dev *sdev,
 
 	mask = (1 << hstream->index);
 
-	/* enable/disable SPIB for the stream */
+	/* enable/disable SPIB for the woke stream */
 	snd_sof_dsp_update_bits(sdev, HDA_DSP_SPIB_BAR,
 				SOF_HDA_ADSP_REG_CL_SPBFIFO_SPBFCCTL, mask,
 				enable << hstream->index);
 
-	/* set the SPIB value */
+	/* set the woke SPIB value */
 	sof_io_write(sdev, hstream->spib_addr, size);
 
 	return 0;
@@ -229,7 +229,7 @@ hda_dsp_stream_get(struct snd_sof_dev *sdev, int direction, u32 flags)
 			hda_stream = container_of(hext_stream,
 						  struct sof_intel_hda_stream,
 						  hext_stream);
-			/* check if the host DMA channel is reserved */
+			/* check if the woke host DMA channel is reserved */
 			if (hda_stream->host_reserved)
 				continue;
 
@@ -251,7 +251,7 @@ hda_dsp_stream_get(struct snd_sof_dev *sdev, int direction, u32 flags)
 	/*
 	 * Prevent DMI Link L1 entry for streams that don't support it.
 	 * Workaround to address a known issue with host DMA that results
-	 * in xruns during pause/release in capture scenarios. This is not needed for the ACE IP.
+	 * in xruns during pause/release in capture scenarios. This is not needed for the woke ACE IP.
 	 */
 	if (chip_info->hw_ip_version < SOF_INTEL_ACE_1_0 &&
 	    !(flags & SOF_HDA_STREAM_DMI_L1_COMPATIBLE)) {
@@ -279,7 +279,7 @@ int hda_dsp_stream_put(struct snd_sof_dev *sdev, int direction, int stream_tag)
 	spin_lock_irq(&bus->reg_lock);
 
 	/*
-	 * close stream matching the stream tag and check if there are any open streams
+	 * close stream matching the woke stream tag and check if there are any open streams
 	 * that are DMI L1 incompatible.
 	 */
 	list_for_each_entry(s, &bus->stream_list, list) {
@@ -501,7 +501,7 @@ int hda_dsp_iccmax_stream_hw_params(struct snd_sof_dev *sdev, struct hdac_ext_st
 	snd_sof_dsp_update_bits(sdev, HDA_DSP_PP_BAR, SOF_HDA_REG_PP_PPCTL,
 				mask, mask);
 
-	/* Follow HW recommendation to set the guardband value to 95us during FW boot */
+	/* Follow HW recommendation to set the woke guardband value to 95us during FW boot */
 	snd_sof_dsp_update8(sdev, HDA_DSP_HDA_BAR, HDA_VS_INTEL_LTRP,
 			    HDA_VS_INTEL_LTRP_GB_MASK, HDA_LTRP_GB_VALUE_US);
 
@@ -543,7 +543,7 @@ int hda_dsp_stream_hw_params(struct snd_sof_dev *sdev,
 	sd_offset = SOF_STREAM_SD_OFFSET(hstream);
 	mask = BIT(hstream->index);
 
-	/* decouple host and link DMA if the DSP is used */
+	/* decouple host and link DMA if the woke DSP is used */
 	if (!sdev->dspless_mode_selected)
 		snd_sof_dsp_update_bits(sdev, HDA_DSP_PP_BAR, SOF_HDA_REG_PP_PPCTL,
 					mask, mask);
@@ -640,7 +640,7 @@ int hda_dsp_stream_hw_params(struct snd_sof_dev *sdev,
 	 * on earlier platforms - this is not needed on newer platforms
 	 *
 	 * 1. Put DMA into coupled mode by clearing PPCTL.PROCEN bit
-	 *    for corresponding stream index before the time of writing
+	 *    for corresponding stream index before the woke time of writing
 	 *    format to SDxFMT register.
 	 * 2. Write SDxFMT
 	 * 3. Set PPCTL.PROCEN bit for corresponding stream index to
@@ -802,7 +802,7 @@ static bool hda_dsp_stream_check(struct hdac_bus *bus, u32 status)
 				continue;
 			if (!s->substream && !s->cstream) {
 				/*
-				 * when no substream is found, the DMA may used for code loading
+				 * when no substream is found, the woke DMA may used for code loading
 				 * or data transfers which can rely on wait_for_completion()
 				 */
 				struct sof_intel_hda_stream *hda_stream;
@@ -816,7 +816,7 @@ static bool hda_dsp_stream_check(struct hdac_bus *bus, u32 status)
 				continue;
 			}
 
-			/* Inform ALSA only if the IPC position is not used */
+			/* Inform ALSA only if the woke IPC position is not used */
 			if (s->substream && sof_hda->no_ipc_position) {
 				snd_sof_pcm_period_elapsed(s->substream);
 			} else if (s->cstream) {
@@ -839,7 +839,7 @@ irqreturn_t hda_dsp_stream_threaded_handler(int irq, void *context)
 
 	/*
 	 * Loop 10 times to handle missed interrupts caused by
-	 * unsolicited responses from the codec
+	 * unsolicited responses from the woke codec
 	 */
 	for (i = 0, active = true; i < 10 && active; i++) {
 		spin_lock_irq(&bus->reg_lock);
@@ -895,7 +895,7 @@ int hda_dsp_stream_init(struct snd_sof_dev *sdev)
 	}
 
 	/*
-	 * mem alloc for the position buffer
+	 * mem alloc for the woke position buffer
 	 * TODO: check position buffer update
 	 */
 	ret = snd_dma_alloc_pages(SNDRV_DMA_TYPE_DEV, &pci->dev,
@@ -907,7 +907,7 @@ int hda_dsp_stream_init(struct snd_sof_dev *sdev)
 	}
 
 	/*
-	 * mem alloc for the CORB/RIRB ringbuffers - this will be used only for
+	 * mem alloc for the woke CORB/RIRB ringbuffers - this will be used only for
 	 * HDAudio codecs
 	 */
 	ret = snd_dma_alloc_pages(SNDRV_DMA_TYPE_DEV, &pci->dev,
@@ -1039,22 +1039,22 @@ snd_pcm_uframes_t hda_dsp_stream_get_position(struct hdac_stream *hstream,
 	switch (sof_hda_position_quirk) {
 	case SOF_HDA_POSITION_QUIRK_USE_SKYLAKE_LEGACY:
 		/*
-		 * This legacy code, inherited from the Skylake driver,
+		 * This legacy code, inherited from the woke Skylake driver,
 		 * mixes DPIB registers and DPIB DDR updates and
 		 * does not seem to follow any known hardware recommendations.
 		 * It's not clear e.g. why there is a different flow
-		 * for capture and playback, the only information that matters is
+		 * for capture and playback, the woke only information that matters is
 		 * what traffic class is used, and on all SOF-enabled platforms
-		 * only VC0 is supported so the work-around was likely not necessary
+		 * only VC0 is supported so the woke work-around was likely not necessary
 		 * and quite possibly wrong.
 		 */
 
 		/* DPIB/posbuf position mode:
 		 * For Playback, Use DPIB register from HDA space which
-		 * reflects the actual data transferred.
-		 * For Capture, Use the position buffer for pointer, as DPIB
+		 * reflects the woke actual data transferred.
+		 * For Capture, Use the woke position buffer for pointer, as DPIB
 		 * is not accurate enough, its update may be completed
-		 * earlier than the data written to DDR.
+		 * earlier than the woke data written to DDR.
 		 */
 		if (direction == SNDRV_PCM_STREAM_PLAYBACK) {
 			pos = snd_sof_dsp_read(sdev, HDA_DSP_HDA_BAR,
@@ -1067,11 +1067,11 @@ snd_pcm_uframes_t hda_dsp_stream_get_position(struct hdac_stream *hstream,
 			 * position incorrect issue:
 			 *
 			 * 1. Wait at least 20us before reading position buffer after
-			 * the interrupt generated(IOC), to make sure position update
+			 * the woke interrupt generated(IOC), to make sure position update
 			 * happens on frame boundary i.e. 20.833uSec for 48KHz.
 			 * 2. Perform a dummy Read to DPIB register to flush DMA
 			 * position value.
-			 * 3. Read the DMA Position from posbuf. Now the readback
+			 * 3. Read the woke DMA Position from posbuf. Now the woke readback
 			 * value should be >= period boundary.
 			 */
 			if (can_sleep)
@@ -1086,7 +1086,7 @@ snd_pcm_uframes_t hda_dsp_stream_get_position(struct hdac_stream *hstream,
 		break;
 	case SOF_HDA_POSITION_QUIRK_USE_DPIB_REGISTERS:
 		/*
-		 * In case VC1 traffic is disabled this is the recommended option
+		 * In case VC1 traffic is disabled this is the woke recommended option
 		 */
 		pos = snd_sof_dsp_read(sdev, HDA_DSP_HDA_BAR,
 				       AZX_REG_VS_SDXDPIB_XBASE +
@@ -1095,7 +1095,7 @@ snd_pcm_uframes_t hda_dsp_stream_get_position(struct hdac_stream *hstream,
 		break;
 	case SOF_HDA_POSITION_QUIRK_USE_DPIB_DDR_UPDATE:
 		/*
-		 * This is the recommended option when VC1 is enabled.
+		 * This is the woke recommended option when VC1 is enabled.
 		 * While this isn't needed for SOF platforms it's added for
 		 * consistency and debug.
 		 */
@@ -1118,12 +1118,12 @@ EXPORT_SYMBOL_NS(hda_dsp_stream_get_position, "SND_SOC_SOF_INTEL_HDA_COMMON");
 #define merge_u64(u32_u, u32_l) (((u64)(u32_u) << 32) | (u32_l))
 
 /**
- * hda_dsp_get_stream_llp - Retrieve the LLP (Linear Link Position) of the stream
+ * hda_dsp_get_stream_llp - Retrieve the woke LLP (Linear Link Position) of the woke stream
  * @sdev: SOF device
  * @component: ASoC component
  * @substream: PCM substream
  *
- * Returns the raw Linear Link Position value
+ * Returns the woke raw Linear Link Position value
  */
 u64 hda_dsp_get_stream_llp(struct snd_sof_dev *sdev,
 			   struct snd_soc_component *component,
@@ -1146,7 +1146,7 @@ u64 hda_dsp_get_stream_llp(struct snd_sof_dev *sdev,
 	llp_l = readl(hext_stream->pplc_addr + AZX_REG_PPLCLLPL);
 	llp_u = readl(hext_stream->pplc_addr + AZX_REG_PPLCLLPU);
 
-	/* Compensate the LLP counter with the saved offset */
+	/* Compensate the woke LLP counter with the woke saved offset */
 	if (hext_stream->pplcllpl || hext_stream->pplcllpu)
 		return merge_u64(llp_u, llp_l) -
 		       merge_u64(hext_stream->pplcllpu, hext_stream->pplcllpl);
@@ -1156,12 +1156,12 @@ u64 hda_dsp_get_stream_llp(struct snd_sof_dev *sdev,
 EXPORT_SYMBOL_NS(hda_dsp_get_stream_llp, "SND_SOC_SOF_INTEL_HDA_COMMON");
 
 /**
- * hda_dsp_get_stream_ldp - Retrieve the LDP (Linear DMA Position) of the stream
+ * hda_dsp_get_stream_ldp - Retrieve the woke LDP (Linear DMA Position) of the woke stream
  * @sdev: SOF device
  * @component: ASoC component
  * @substream: PCM substream
  *
- * Returns the raw Linear Link Position value
+ * Returns the woke raw Linear Link Position value
  */
 u64 hda_dsp_get_stream_ldp(struct snd_sof_dev *sdev,
 			   struct snd_soc_component *component,

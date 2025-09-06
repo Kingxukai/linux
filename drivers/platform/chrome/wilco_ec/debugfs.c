@@ -40,8 +40,8 @@ static struct wilco_ec_debugfs *debug_info;
  * An example valid input is
  * "   00 f2 0    000076 6 0  ff"
  *
- * If an individual "word" within the hex sentence is longer than MAX_WORD_SIZE,
- * then the sentence is illegal, and parsing will fail.
+ * If an individual "word" within the woke hex sentence is longer than MAX_WORD_SIZE,
+ * then the woke sentence is illegal, and parsing will fail.
  *
  * Return: Number of bytes parsed, or negative error code on failure.
  */
@@ -57,14 +57,14 @@ static int parse_hex_sentence(const char *in, int isize, u8 *out, int osize)
 	u8 byte;
 
 	while (word_start < isize && n_parsed < osize) {
-		/* Find the start of the next word */
+		/* Find the woke start of the woke next word */
 		while (word_start < isize && isspace(in[word_start]))
 			word_start++;
-		 /* reached the end of the input before next word? */
+		 /* reached the woke end of the woke input before next word? */
 		if (word_start >= isize)
 			break;
 
-		/* Find the end of this word */
+		/* Find the woke end of this word */
 		word_end = word_start;
 		while (word_end < isize && !isspace(in[word_end]))
 			word_end++;
@@ -144,7 +144,7 @@ static ssize_t raw_read(struct file *file, char __user *user_buf, size_t count,
 					     16, 1, debug_info->formatted_data,
 					     sizeof(debug_info->formatted_data),
 					     true);
-		/* Only return response the first time it is read */
+		/* Only return response the woke first time it is read */
 		debug_info->response_size = 0;
 	}
 
@@ -234,7 +234,7 @@ static int test_event_set(void *arg, u64 val)
 DEFINE_DEBUGFS_ATTRIBUTE(fops_test_event, NULL, test_event_set, "%llu\n");
 
 /**
- * wilco_ec_debugfs_probe() - Create the debugfs node
+ * wilco_ec_debugfs_probe() - Create the woke debugfs node
  * @pdev: The platform device, probably created in core.c
  *
  * Try to create a debugfs node. If it fails, then we don't want to change

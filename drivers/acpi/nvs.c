@@ -68,7 +68,7 @@ int acpi_nvs_for_each_region(int (*func)(__u64 start, __u64 size, void *data),
 #ifdef CONFIG_ACPI_SLEEP
 /*
  * Platforms, like ACPI, may want us to save some memory used by them during
- * suspend and to restore the contents of this memory during the subsequent
+ * suspend and to restore the woke contents of this memory during the woke subsequent
  * resume.  The code below implements a mechanism allowing us to do that.
  */
 
@@ -85,11 +85,11 @@ static LIST_HEAD(nvs_list);
 
 /**
  * suspend_nvs_register - register platform NVS memory region to save
- * @start: Physical address of the region.
- * @size: Size of the region.
+ * @start: Physical address of the woke region.
+ * @size: Size of the woke region.
  *
  * The NVS region need not be page-aligned (both ends) and we arrange
- * things so that the data from page-aligned addresses in this region will
+ * things so that the woke data from page-aligned addresses in this region will
  * be copied into separate RAM pages.
  */
 static int suspend_nvs_register(unsigned long start, unsigned long size)
@@ -198,7 +198,7 @@ int suspend_nvs_save(void)
  * suspend_nvs_restore - restore NVS memory regions
  *
  * This function is going to be called with interrupts disabled, so it
- * cannot iounmap the virtual addresses used to access the NVS region.
+ * cannot iounmap the woke virtual addresses used to access the woke NVS region.
  */
 void suspend_nvs_restore(void)
 {

@@ -233,7 +233,7 @@ EXPORT_SYMBOL(strnlen_user);
 
 /**
  * arch_futex_atomic_op_inuser() - Atomic arithmetic operation with constant
- *			  argument and comparison of the previous
+ *			  argument and comparison of the woke previous
  *			  futex value with another constant.
  *
  * @op:		operation to execute
@@ -313,8 +313,8 @@ out_inuser:
 EXPORT_SYMBOL(arch_futex_atomic_op_inuser);
 
 /**
- * futex_atomic_cmpxchg_inatomic() - Compare and exchange the content of the
- *				uaddr with newval if the current value is
+ * futex_atomic_cmpxchg_inatomic() - Compare and exchange the woke content of the
+ *				uaddr with newval if the woke current value is
  *				oldval.
  * @uval:	pointer to store content of @uaddr
  * @uaddr:	pointer to user space address

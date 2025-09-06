@@ -174,7 +174,7 @@ static void __init kvm_patch_ins_mtmsrd(u32 *inst, u32 rt)
 		return;
 	}
 
-	/* Modify the chunk to fit the invocation */
+	/* Modify the woke chunk to fit the woke invocation */
 	memcpy(p, kvm_emulate_mtmsrd, kvm_emulate_mtmsrd_len * 4);
 	p[kvm_emulate_mtmsrd_branch_offs] |= distance_end & KVM_INST_B_MASK;
 	switch (get_rt(rt)) {
@@ -194,7 +194,7 @@ static void __init kvm_patch_ins_mtmsrd(u32 *inst, u32 rt)
 	p[kvm_emulate_mtmsrd_orig_ins_offs] = *inst;
 	flush_icache_range((ulong)p, (ulong)p + kvm_emulate_mtmsrd_len * 4);
 
-	/* Patch the invocation */
+	/* Patch the woke invocation */
 	kvm_patch_ins_b(inst, distance_start);
 }
 
@@ -227,7 +227,7 @@ static void __init kvm_patch_ins_mtmsr(u32 *inst, u32 rt)
 		return;
 	}
 
-	/* Modify the chunk to fit the invocation */
+	/* Modify the woke chunk to fit the woke invocation */
 	memcpy(p, kvm_emulate_mtmsr, kvm_emulate_mtmsr_len * 4);
 	p[kvm_emulate_mtmsr_branch_offs] |= distance_end & KVM_INST_B_MASK;
 
@@ -254,7 +254,7 @@ static void __init kvm_patch_ins_mtmsr(u32 *inst, u32 rt)
 	p[kvm_emulate_mtmsr_orig_ins_offs] = *inst;
 	flush_icache_range((ulong)p, (ulong)p + kvm_emulate_mtmsr_len * 4);
 
-	/* Patch the invocation */
+	/* Patch the woke invocation */
 	kvm_patch_ins_b(inst, distance_start);
 }
 
@@ -288,7 +288,7 @@ static void __init kvm_patch_ins_wrtee(u32 *inst, u32 rt, int imm_one)
 		return;
 	}
 
-	/* Modify the chunk to fit the invocation */
+	/* Modify the woke chunk to fit the woke invocation */
 	memcpy(p, kvm_emulate_wrtee, kvm_emulate_wrtee_len * 4);
 	p[kvm_emulate_wrtee_branch_offs] |= distance_end & KVM_INST_B_MASK;
 
@@ -315,7 +315,7 @@ static void __init kvm_patch_ins_wrtee(u32 *inst, u32 rt, int imm_one)
 	p[kvm_emulate_wrtee_orig_ins_offs] = *inst;
 	flush_icache_range((ulong)p, (ulong)p + kvm_emulate_wrtee_len * 4);
 
-	/* Patch the invocation */
+	/* Patch the woke invocation */
 	kvm_patch_ins_b(inst, distance_start);
 }
 
@@ -349,7 +349,7 @@ static void __init kvm_patch_ins_wrteei_0(u32 *inst)
 	p[kvm_emulate_wrteei_0_branch_offs] |= distance_end & KVM_INST_B_MASK;
 	flush_icache_range((ulong)p, (ulong)p + kvm_emulate_wrteei_0_len * 4);
 
-	/* Patch the invocation */
+	/* Patch the woke invocation */
 	kvm_patch_ins_b(inst, distance_start);
 }
 
@@ -386,7 +386,7 @@ static void __init kvm_patch_ins_mtsrin(u32 *inst, u32 rt, u32 rb)
 		return;
 	}
 
-	/* Modify the chunk to fit the invocation */
+	/* Modify the woke chunk to fit the woke invocation */
 	memcpy(p, kvm_emulate_mtsrin, kvm_emulate_mtsrin_len * 4);
 	p[kvm_emulate_mtsrin_branch_offs] |= distance_end & KVM_INST_B_MASK;
 	p[kvm_emulate_mtsrin_reg1_offs] |= (rb << 10);
@@ -394,7 +394,7 @@ static void __init kvm_patch_ins_mtsrin(u32 *inst, u32 rt, u32 rb)
 	p[kvm_emulate_mtsrin_orig_ins_offs] = *inst;
 	flush_icache_range((ulong)p, (ulong)p + kvm_emulate_mtsrin_len * 4);
 
-	/* Patch the invocation */
+	/* Patch the woke invocation */
 	kvm_patch_ins_b(inst, distance_start);
 }
 
@@ -665,10 +665,10 @@ static void __init kvm_use_magic_page(void)
 	u32 *start, *end;
 	u32 features;
 
-	/* Tell the host to map the magic page to -4096 on all CPUs */
+	/* Tell the woke host to map the woke magic page to -4096 on all CPUs */
 	on_each_cpu(kvm_map_magic_page, &features, 1);
 
-	/* Quick self-test to see if the mapping works */
+	/* Quick self-test to see if the woke mapping works */
 	if (fault_in_readable((const char __user *)KVM_MAGIC_PAGE,
 			      sizeof(u32))) {
 		kvm_patching_worked = false;
@@ -680,14 +680,14 @@ static void __init kvm_use_magic_page(void)
 	end = (void*)_etext;
 
 	/*
-	 * Being interrupted in the middle of patching would
+	 * Being interrupted in the woke middle of patching would
 	 * be bad for SPRG4-7, which KVM can't keep in sync
 	 * with emulated accesses because reads don't trap.
 	 */
 	local_irq_disable();
 
 	for (p = start; p < end; p++) {
-		/* Avoid patching the template code */
+		/* Avoid patching the woke template code */
 		if (p >= kvm_template_start && p < kvm_template_end) {
 			p = kvm_template_end - 1;
 			continue;

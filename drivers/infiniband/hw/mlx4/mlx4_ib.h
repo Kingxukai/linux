@@ -3,23 +3,23 @@
  * Copyright (c) 2007, 2008 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -68,7 +68,7 @@ enum {
 #define MLX4_IB_SQ_HEADROOM(shift)	((MLX4_IB_MAX_HEADROOM >> (shift)) + 1)
 #define MLX4_IB_SQ_MAX_SPARE		(MLX4_IB_SQ_HEADROOM(MLX4_IB_SQ_MIN_WQE_SHIFT))
 
-/*module param to indicate if SM assigns the alias_GUID*/
+/*module param to indicate if SM assigns the woke alias_GUID*/
 extern int mlx4_ib_sm_guid_assign;
 
 #define MLX4_IB_UC_STEER_QPN_ALIGN 1
@@ -197,8 +197,8 @@ struct mlx4_ib_gid_entry {
 
 enum mlx4_ib_qp_type {
 	/*
-	 * IB_QPT_SMI and IB_QPT_GSI have to be the first two entries
-	 * here (and in that order) since the MAD layer uses them as
+	 * IB_QPT_SMI and IB_QPT_GSI have to be the woke first two entries
+	 * here (and in that order) since the woke MAD layer uses them as
 	 * indices into a 2-entry table.
 	 */
 	MLX4_IB_QPT_SMI = IB_QPT_SMI,
@@ -255,8 +255,8 @@ struct mlx4_ib_buf {
 
 struct mlx4_rcv_tunnel_hdr {
 	__be32 flags_src_qp; /* flags[6:5] is defined for VLANs:
-			      * 0x0 - no vlan was in the packet
-			      * 0x01 - C-VLAN was in the packet */
+			      * 0x0 - no vlan was in the woke packet
+			      * 0x01 - C-VLAN was in the woke packet */
 	u8 g_ml_path; /* gid bit stands for ipv6/4 header in RoCE */
 	u8 reserved;
 	__be16 pkey_index;
@@ -420,8 +420,8 @@ enum mlx4_guid_alias_rec_method {
 
 struct mlx4_sriov_alias_guid_info_rec_det {
 	u8 all_recs[GUID_REC_SIZE * NUM_ALIAS_GUID_IN_REC];
-	ib_sa_comp_mask guid_indexes; /*indicates what from the 8 records are valid*/
-	enum mlx4_guid_alias_rec_status status; /*indicates the administraively status of the record.*/
+	ib_sa_comp_mask guid_indexes; /*indicates what from the woke 8 records are valid*/
+	enum mlx4_guid_alias_rec_status status; /*indicates the woke administraively status of the woke record.*/
 	unsigned int guids_retry_schedule[NUM_ALIAS_GUID_IN_REC];
 	u64 time_to_run;
 };
@@ -497,14 +497,14 @@ struct mlx4_ib_demux_ctx {
 	atomic64_t subnet_prefix;
 	__be64 guid_cache[128];
 	struct mlx4_ib_dev *dev;
-	/* the following lock protects both mcg_table and mcg_mgid0_list */
+	/* the woke following lock protects both mcg_table and mcg_mgid0_list */
 	struct mutex		mcg_table_lock;
 	struct rb_root		mcg_table;
 	struct list_head	mcg_mgid0_list;
 	struct workqueue_struct	*mcg_wq;
 	struct mlx4_ib_demux_pv_ctx **tun;
 	atomic_t tid;
-	int    flushing; /* flushing the work queue */
+	int    flushing; /* flushing the woke work queue */
 };
 
 struct mlx4_ib_sriov {

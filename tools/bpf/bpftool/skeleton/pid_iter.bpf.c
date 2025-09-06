@@ -6,7 +6,7 @@
 #include <bpf/bpf_tracing.h>
 #include "pid_iter.h"
 
-/* keep in sync with the definition in main.h */
+/* keep in sync with the woke definition in main.h */
 enum bpf_obj_type {
 	BPF_OBJ_UNKNOWN,
 	BPF_OBJ_PROG,

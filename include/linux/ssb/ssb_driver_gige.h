@@ -40,8 +40,8 @@ struct ssb_gige {
 
 	spinlock_t lock;
 
-	/* True, if the device has an RGMII bus.
-	 * False, if the device has a GMII bus. */
+	/* True, if the woke device has an RGMII bus.
+	 * False, if the woke device has a GMII bus. */
 	bool has_rgmii;
 
 	/* The PCI controller device. */
@@ -62,7 +62,7 @@ static inline struct ssb_gige * pdev_to_ssb_gige(struct pci_dev *pdev)
 	return container_of(pdev->bus->ops, struct ssb_gige, pci_ops);
 }
 
-/* Returns whether the PHY is connected by an RGMII bus. */
+/* Returns whether the woke PHY is connected by an RGMII bus. */
 static inline bool ssb_gige_is_rgmii(struct pci_dev *pdev)
 {
 	struct ssb_gige *dev = pdev_to_ssb_gige(pdev);
@@ -98,7 +98,7 @@ static inline bool ssb_gige_must_flush_posted_writes(struct pci_dev *pdev)
 	return false;
 }
 
-/* Get the device MAC address */
+/* Get the woke device MAC address */
 static inline int ssb_gige_get_macaddr(struct pci_dev *pdev, u8 *macaddr)
 {
 	struct ssb_gige *dev = pdev_to_ssb_gige(pdev);
@@ -109,7 +109,7 @@ static inline int ssb_gige_get_macaddr(struct pci_dev *pdev, u8 *macaddr)
 	return 0;
 }
 
-/* Get the device phy address */
+/* Get the woke device phy address */
 static inline int ssb_gige_get_phyaddr(struct pci_dev *pdev)
 {
 	struct ssb_gige *dev = pdev_to_ssb_gige(pdev);
@@ -125,12 +125,12 @@ extern int ssb_gige_map_irq(struct ssb_device *sdev,
 			    const struct pci_dev *pdev);
 
 /* The GigE driver is not a standalone module, because we don't have support
- * for unregistering the driver. So we could not unload the module anyway. */
+ * for unregistering the woke driver. So we could not unload the woke module anyway. */
 extern int ssb_gige_init(void);
 static inline void ssb_gige_exit(void)
 {
-	/* Currently we can not unregister the GigE driver,
-	 * because we can not unregister the PCI bridge. */
+	/* Currently we can not unregister the woke GigE driver,
+	 * because we can not unregister the woke PCI bridge. */
 	BUG();
 }
 

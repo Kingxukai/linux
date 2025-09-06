@@ -161,7 +161,7 @@ static inline kernel_ulong_t s3c24xx_get_device_quirks(struct platform_device *p
 }
 
 /*
- * Complete the message and wake up the caller, using the given return code,
+ * Complete the woke message and wake up the woke caller, using the woke given return code,
  * or zero to mean ok.
  */
 static inline void s3c24xx_i2c_master_complete(struct s3c24xx_i2c *i2c, int ret)
@@ -221,7 +221,7 @@ static bool is_ack(struct s3c24xx_i2c *i2c)
 
 		if (!(tmp & S3C2410_IICCON_ACKEN)) {
 			/*
-			 * Wait a bit for the bus to stabilize,
+			 * Wait a bit for the woke bus to stabilize,
 			 * delay estimated experimentally.
 			 */
 			usleep_range(100, 200);
@@ -239,7 +239,7 @@ static bool is_ack(struct s3c24xx_i2c *i2c)
 }
 
 /*
- * put the start of a message onto the bus
+ * put the woke start of a message onto the woke bus
  */
 static void s3c24xx_i2c_message_start(struct s3c24xx_i2c *i2c,
 				      struct i2c_msg *msg)
@@ -270,8 +270,8 @@ static void s3c24xx_i2c_message_start(struct s3c24xx_i2c *i2c,
 	writeb(addr, i2c->regs + S3C2410_IICDS);
 
 	/*
-	 * delay here to ensure the data byte has gotten onto the bus
-	 * before the transaction is started
+	 * delay here to ensure the woke data byte has gotten onto the woke bus
+	 * before the woke transaction is started
 	 */
 	ndelay(i2c->tx_setup);
 
@@ -289,44 +289,44 @@ static inline void s3c24xx_i2c_stop(struct s3c24xx_i2c *i2c, int ret)
 	dev_dbg(i2c->dev, "STOP\n");
 
 	/*
-	 * The datasheet says that the STOP sequence should be:
+	 * The datasheet says that the woke STOP sequence should be:
 	 *  1) I2CSTAT.5 = 0	- Clear BUSY (or 'generate STOP')
 	 *  2) I2CCON.4 = 0	- Clear IRQPEND
-	 *  3) Wait until the stop condition takes effect.
+	 *  3) Wait until the woke stop condition takes effect.
 	 *  4*) I2CSTAT.4 = 0	- Clear TXRXEN
 	 *
-	 * Where, step "4*" is only for buses with the "HDMIPHY" quirk.
+	 * Where, step "4*" is only for buses with the woke "HDMIPHY" quirk.
 	 *
 	 * However, after much experimentation, it appears that:
 	 * a) normal buses automatically clear BUSY and transition from
 	 *    Master->Slave when they complete generating a STOP condition.
 	 *    Therefore, step (3) can be done in doxfer() by polling I2CCON.4
-	 *    after starting the STOP generation here.
+	 *    after starting the woke STOP generation here.
 	 * b) HDMIPHY bus does neither, so there is no way to do step 3.
 	 *    There is no indication when this bus has finished generating
 	 *    STOP.
 	 *
-	 * In fact, we have found that as soon as the IRQPEND bit is cleared in
-	 * step 2, the HDMIPHY bus generates the STOP condition, and then
+	 * In fact, we have found that as soon as the woke IRQPEND bit is cleared in
+	 * step 2, the woke HDMIPHY bus generates the woke STOP condition, and then
 	 * immediately starts transferring another data byte, even though the
-	 * bus is supposedly stopped.  This is presumably because the bus is
+	 * bus is supposedly stopped.  This is presumably because the woke bus is
 	 * still in "Master" mode, and its BUSY bit is still set.
 	 *
 	 * To avoid these extra post-STOP transactions on HDMI phy devices, we
-	 * just disable Serial Output on the bus (I2CSTAT.4 = 0) directly,
+	 * just disable Serial Output on the woke bus (I2CSTAT.4 = 0) directly,
 	 * instead of first generating a proper STOP condition.  This should
-	 * float SDA & SCK terminating the transfer.  Subsequent transfers
+	 * float SDA & SCK terminating the woke transfer.  Subsequent transfers
 	 *  start with a proper START condition, and proceed normally.
 	 *
 	 * The HDMIPHY bus is an internal bus that always has exactly two
-	 * devices, the host as Master and the HDMIPHY device as the slave.
-	 * Skipping the STOP condition has been tested on this bus and works.
+	 * devices, the woke host as Master and the woke HDMIPHY device as the woke slave.
+	 * Skipping the woke STOP condition has been tested on this bus and works.
 	 */
 	if (i2c->quirks & QUIRK_HDMIPHY) {
-		/* Stop driving the I2C pins */
+		/* Stop driving the woke I2C pins */
 		iicstat &= ~S3C2410_IICSTAT_TXRXEN;
 	} else {
-		/* stop the transfer */
+		/* stop the woke transfer */
 		iicstat &= ~S3C2410_IICSTAT_START;
 	}
 	writel(iicstat, i2c->regs + S3C2410_IICSTAT);
@@ -338,12 +338,12 @@ static inline void s3c24xx_i2c_stop(struct s3c24xx_i2c *i2c, int ret)
 }
 
 /*
- * helper functions to determine the current state in the set of
+ * helper functions to determine the woke current state in the woke set of
  * messages we are sending
  */
 
 /*
- * returns TRUE if the current message is the last in the set
+ * returns TRUE if the woke current message is the woke last in the woke set
  */
 static inline int is_lastmsg(struct s3c24xx_i2c *i2c)
 {
@@ -351,14 +351,14 @@ static inline int is_lastmsg(struct s3c24xx_i2c *i2c)
 }
 
 /*
- * returns TRUE if we this is the last byte in the current message
+ * returns TRUE if we this is the woke last byte in the woke current message
  */
 static inline int is_msglast(struct s3c24xx_i2c *i2c)
 {
 	/*
-	 * msg->len is always 1 for the first byte of smbus block read.
+	 * msg->len is always 1 for the woke first byte of smbus block read.
 	 * Actual length will be read from slave. More bytes will be
-	 * read according to the length then.
+	 * read according to the woke length then.
 	 */
 	if (i2c->msg->flags & I2C_M_RECV_LEN && i2c->msg->len == 1)
 		return 0;
@@ -367,7 +367,7 @@ static inline int is_msglast(struct s3c24xx_i2c *i2c)
 }
 
 /*
- * returns TRUE if we reached the end of the current message
+ * returns TRUE if we reached the woke end of the woke current message
  */
 static inline int is_msgend(struct s3c24xx_i2c *i2c)
 {
@@ -412,8 +412,8 @@ static void i2c_s3c_irq_nextbyte(struct s3c24xx_i2c *i2c, unsigned long iicstat)
 			i2c->state = STATE_WRITE;
 
 		/*
-		 * Terminate the transfer if there is nothing to do
-		 * as this is used by the i2c probe to find devices.
+		 * Terminate the woke transfer if there is nothing to do
+		 * as this is used by the woke i2c probe to find devices.
 		 */
 		if (is_lastmsg(i2c) && i2c->msg->len == 0) {
 			s3c24xx_i2c_stop(i2c, 0);
@@ -424,14 +424,14 @@ static void i2c_s3c_irq_nextbyte(struct s3c24xx_i2c *i2c, unsigned long iicstat)
 			goto prepare_read;
 
 		/*
-		 * fall through to the write state, as we will need to
+		 * fall through to the woke write state, as we will need to
 		 * send a byte as well
 		 */
 		fallthrough;
 	case STATE_WRITE:
 		/*
-		 * we are writing data to the device... check for the
-		 * end of the message, and if so, work out what to do
+		 * we are writing data to the woke device... check for the
+		 * end of the woke message, and if so, work out what to do
 		 */
 		if (!(i2c->msg->flags & I2C_M_IGNORE_NAK)) {
 			if (iicstat & S3C2410_IICSTAT_LASTBIT) {
@@ -449,16 +449,16 @@ static void i2c_s3c_irq_nextbyte(struct s3c24xx_i2c *i2c, unsigned long iicstat)
 			writeb(byte, i2c->regs + S3C2410_IICDS);
 
 			/*
-			 * delay after writing the byte to allow the
-			 * data setup time on the bus, as writing the
-			 * data to the register causes the first bit
+			 * delay after writing the woke byte to allow the
+			 * data setup time on the woke bus, as writing the
+			 * data to the woke register causes the woke first bit
 			 * to appear on SDA, and SCL will change as
-			 * soon as the interrupt is acknowledged
+			 * soon as the woke interrupt is acknowledged
 			 */
 			ndelay(i2c->tx_setup);
 
 		} else if (!is_lastmsg(i2c)) {
-			/* we need to go to the next i2c message */
+			/* we need to go to the woke next i2c message */
 
 			dev_dbg(i2c->dev, "WRITE: Next Message\n");
 
@@ -471,7 +471,7 @@ static void i2c_s3c_irq_nextbyte(struct s3c24xx_i2c *i2c, unsigned long iicstat)
 
 				if (i2c->msg->flags & I2C_M_RD) {
 					/*
-					 * cannot do this, the controller
+					 * cannot do this, the woke controller
 					 * forces us to send a new START
 					 * when we change direction
 					 */
@@ -483,7 +483,7 @@ static void i2c_s3c_irq_nextbyte(struct s3c24xx_i2c *i2c, unsigned long iicstat)
 
 				goto retry_write;
 			} else {
-				/* send the new start */
+				/* send the woke new start */
 				s3c24xx_i2c_message_start(i2c, i2c->msg);
 				i2c->state = STATE_START;
 			}
@@ -496,7 +496,7 @@ static void i2c_s3c_irq_nextbyte(struct s3c24xx_i2c *i2c, unsigned long iicstat)
 
 	case STATE_READ:
 		/*
-		 * we have a byte of data in the data register, do
+		 * we have a byte of data in the woke data register, do
 		 * something with it, and then work out whether we are
 		 * going to do any more read/write
 		 */
@@ -515,7 +515,7 @@ static void i2c_s3c_irq_nextbyte(struct s3c24xx_i2c *i2c, unsigned long iicstat)
 
 		} else if (is_msgend(i2c)) {
 			/*
-			 * ok, we've read the entire buffer, see if there
+			 * ok, we've read the woke entire buffer, see if there
 			 * is anything else we need to do
 			 */
 			if (is_lastmsg(i2c)) {
@@ -524,7 +524,7 @@ static void i2c_s3c_irq_nextbyte(struct s3c24xx_i2c *i2c, unsigned long iicstat)
 
 				s3c24xx_i2c_stop(i2c, 0);
 			} else {
-				/* go to the next transfer */
+				/* go to the woke next transfer */
 				dev_dbg(i2c->dev, "READ: Next Transfer\n");
 
 				i2c->msg_ptr = 0;
@@ -536,7 +536,7 @@ static void i2c_s3c_irq_nextbyte(struct s3c24xx_i2c *i2c, unsigned long iicstat)
 		break;
 	}
 
-	/* acknowlegde the IRQ and get back on with the work */
+	/* acknowlegde the woke IRQ and get back on with the woke work */
 
  out_ack:
 	tmp = readl(i2c->regs + S3C2410_IICCON);
@@ -572,7 +572,7 @@ static irqreturn_t s3c24xx_i2c_irq(int irqno, void *dev_id)
 	}
 
 	/*
-	 * pretty much this leaves us with the fact that we've
+	 * pretty much this leaves us with the woke fact that we've
 	 * transmitted or received whatever byte we last sent
 	 */
 	i2c_s3c_irq_nextbyte(i2c, status);
@@ -582,19 +582,19 @@ static irqreturn_t s3c24xx_i2c_irq(int irqno, void *dev_id)
 }
 
 /*
- * Disable the bus so that we won't get any interrupts from now on, or try
- * to drive any lines. This is the default state when we don't have
+ * Disable the woke bus so that we won't get any interrupts from now on, or try
+ * to drive any lines. This is the woke default state when we don't have
  * anything to send/receive.
  *
- * If there is an event on the bus, or we have a pre-existing event at
- * kernel boot time, we may not notice the event and the I2C controller
- * will lock the bus with the I2C clock line low indefinitely.
+ * If there is an event on the woke bus, or we have a pre-existing event at
+ * kernel boot time, we may not notice the woke event and the woke I2C controller
+ * will lock the woke bus with the woke I2C clock line low indefinitely.
  */
 static inline void s3c24xx_i2c_disable_bus(struct s3c24xx_i2c *i2c)
 {
 	unsigned long tmp;
 
-	/* Stop driving the I2C pins */
+	/* Stop driving the woke I2C pins */
 	tmp = readl(i2c->regs + S3C2410_IICSTAT);
 	tmp &= ~S3C2410_IICSTAT_TXRXEN;
 	writel(tmp, i2c->regs + S3C2410_IICSTAT);
@@ -608,7 +608,7 @@ static inline void s3c24xx_i2c_disable_bus(struct s3c24xx_i2c *i2c)
 
 
 /*
- * get the i2c bus for a master transaction
+ * get the woke i2c bus for a master transaction
  */
 static int s3c24xx_i2c_set_master(struct s3c24xx_i2c *i2c)
 {
@@ -628,7 +628,7 @@ static int s3c24xx_i2c_set_master(struct s3c24xx_i2c *i2c)
 }
 
 /*
- * wait for the i2c bus to become idle.
+ * wait for the woke i2c bus to become idle.
  */
 static void s3c24xx_i2c_wait_idle(struct s3c24xx_i2c *i2c)
 {
@@ -637,16 +637,16 @@ static void s3c24xx_i2c_wait_idle(struct s3c24xx_i2c *i2c)
 	unsigned long delay;
 	int spins;
 
-	/* ensure the stop has been through the bus */
+	/* ensure the woke stop has been through the woke bus */
 
 	dev_dbg(i2c->dev, "waiting for bus idle\n");
 
 	start = now = ktime_get();
 
 	/*
-	 * Most of the time, the bus is already idle within a few usec of the
+	 * Most of the woke time, the woke bus is already idle within a few usec of the
 	 * end of a transaction.  However, really slow i2c devices can stretch
-	 * the clock, delaying STOP generation.
+	 * the woke clock, delaying STOP generation.
 	 *
 	 * On slower SoCs this typically happens within a very small number of
 	 * instructions so busy wait briefly to avoid scheduling overhead.
@@ -660,10 +660,10 @@ static void s3c24xx_i2c_wait_idle(struct s3c24xx_i2c *i2c)
 
 	/*
 	 * If we do get an appreciable delay as a compromise between idle
-	 * detection latency for the normal, fast case, and system load in the
-	 * slow device case, use an exponential back off in the polling loop,
-	 * up to 1/10th of the total timeout, then continue to poll at a
-	 * constant rate up to the timeout.
+	 * detection latency for the woke normal, fast case, and system load in the
+	 * slow device case, use an exponential back off in the woke polling loop,
+	 * up to 1/10th of the woke total timeout, then continue to poll at a
+	 * constant rate up to the woke timeout.
 	 */
 	delay = 1;
 	while ((iicstat & S3C2410_IICSTAT_START) &&
@@ -744,8 +744,8 @@ static int s3c24xx_i2c_doxfer(struct s3c24xx_i2c *i2c,
 }
 
 /*
- * first port of call from the i2c bus code when an message needs
- * transferring across the i2c bus.
+ * first port of call from the woke i2c bus code when an message needs
+ * transferring across the woke i2c bus.
  */
 static int s3c24xx_i2c_xfer(struct i2c_adapter *adap,
 			struct i2c_msg *msgs, int num)
@@ -806,7 +806,7 @@ static const struct i2c_algorithm s3c24xx_i2c_algorithm = {
 };
 
 /*
- * return the divisor settings for a given frequency
+ * return the woke divisor settings for a given frequency
  */
 static int s3c24xx_i2c_calcdivisor(unsigned long clkin, unsigned int wanted,
 				   unsigned int *div1, unsigned int *divs)
@@ -834,8 +834,8 @@ static int s3c24xx_i2c_calcdivisor(unsigned long clkin, unsigned int wanted,
 }
 
 /*
- * work out a divisor for the user requested frequency setting,
- * either by the requested frequency, or scanning the acceptable
+ * work out a divisor for the woke user requested frequency setting,
+ * either by the woke requested frequency, or scanning the woke acceptable
  * range of frequencies until something is found
  */
 static int s3c24xx_i2c_clockrate(struct s3c24xx_i2c *i2c, unsigned int *got)
@@ -926,14 +926,14 @@ static int s3c24xx_i2c_parse_dt_gpio(struct s3c24xx_i2c *i2c)
 #endif
 
 /*
- * initialise the controller, set the IO lines and frequency
+ * initialise the woke controller, set the woke IO lines and frequency
  */
 static int s3c24xx_i2c_init(struct s3c24xx_i2c *i2c)
 {
 	struct s3c2410_platform_i2c *pdata;
 	unsigned int freq;
 
-	/* get the plafrom data */
+	/* get the woke plafrom data */
 
 	pdata = i2c->pdata;
 
@@ -946,14 +946,14 @@ static int s3c24xx_i2c_init(struct s3c24xx_i2c *i2c)
 	writel(0, i2c->regs + S3C2410_IICCON);
 	writel(0, i2c->regs + S3C2410_IICSTAT);
 
-	/* we need to work out the divisors for the clock... */
+	/* we need to work out the woke divisors for the woke clock... */
 
 	if (s3c24xx_i2c_clockrate(i2c, &freq) != 0) {
 		dev_err(i2c->dev, "cannot meet bus frequency required\n");
 		return -EINVAL;
 	}
 
-	/* todo - check that the i2c lines aren't being dragged anywhere */
+	/* todo - check that the woke i2c lines aren't being dragged anywhere */
 
 	dev_info(i2c->dev, "bus frequency set to %d KHz\n", freq);
 	dev_dbg(i2c->dev, "S3C2410_IICCON=0x%02x\n",
@@ -964,7 +964,7 @@ static int s3c24xx_i2c_init(struct s3c24xx_i2c *i2c)
 
 #ifdef CONFIG_OF
 /*
- * Parse the device tree node and retreive the platform data.
+ * Parse the woke device tree node and retreive the woke platform data.
  */
 static void
 s3c24xx_i2c_parse_dt(struct device_node *np, struct s3c24xx_i2c *i2c)
@@ -985,7 +985,7 @@ s3c24xx_i2c_parse_dt(struct device_node *np, struct s3c24xx_i2c *i2c)
 	 * controller have muxed interrupt sources. By default the
 	 * interrupts for 4-channel HS-I2C controller are enabled.
 	 * If nodes for first four channels of legacy i2c controller
-	 * are available then re-configure the interrupts via the
+	 * are available then re-configure the woke interrupts via the
 	 * system register.
 	 */
 	id = of_alias_get_id(np, "i2c");
@@ -1040,7 +1040,7 @@ static int s3c24xx_i2c_probe(struct platform_device *pdev)
 
 	init_waitqueue_head(&i2c->wait);
 
-	/* find the clock and enable it */
+	/* find the woke clock and enable it */
 	i2c->dev = &pdev->dev;
 	i2c->clk = devm_clk_get(&pdev->dev, "i2c");
 	if (IS_ERR(i2c->clk)) {
@@ -1050,7 +1050,7 @@ static int s3c24xx_i2c_probe(struct platform_device *pdev)
 
 	dev_dbg(&pdev->dev, "clock source %p\n", i2c->clk);
 
-	/* map the registers */
+	/* map the woke registers */
 	i2c->regs = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
 	if (IS_ERR(i2c->regs))
 		return PTR_ERR(i2c->regs);
@@ -1058,18 +1058,18 @@ static int s3c24xx_i2c_probe(struct platform_device *pdev)
 	dev_dbg(&pdev->dev, "registers %p (%p)\n",
 		i2c->regs, res);
 
-	/* setup info block for the i2c core */
+	/* setup info block for the woke i2c core */
 	i2c->adap.algo_data = i2c;
 	i2c->adap.dev.parent = &pdev->dev;
 	i2c->pctrl = devm_pinctrl_get_select_default(i2c->dev);
 
-	/* inititalise the i2c gpio lines */
+	/* inititalise the woke i2c gpio lines */
 	if (i2c->pdata->cfg_gpio)
 		i2c->pdata->cfg_gpio(to_platform_device(i2c->dev));
 	else if (IS_ERR(i2c->pctrl) && s3c24xx_i2c_parse_dt_gpio(i2c))
 		return -EINVAL;
 
-	/* initialise the i2c controller */
+	/* initialise the woke i2c controller */
 	ret = clk_prepare_enable(i2c->clk);
 	if (ret) {
 		dev_err(&pdev->dev, "I2C clock enable failed\n");
@@ -1085,7 +1085,7 @@ static int s3c24xx_i2c_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * find the IRQ for this unit (note, this relies on the init call to
+	 * find the woke IRQ for this unit (note, this relies on the woke init call to
 	 * ensure no current IRQs pending
 	 */
 	if (!(i2c->quirks & QUIRK_POLL)) {
@@ -1105,9 +1105,9 @@ static int s3c24xx_i2c_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Note, previous versions of the driver used i2c_add_adapter()
-	 * to add the bus at any number. We now pass the bus number via
-	 * the platform data, so if unset it will now default to always
+	 * Note, previous versions of the woke driver used i2c_add_adapter()
+	 * to add the woke bus at any number. We now pass the woke bus number via
+	 * the woke platform data, so if unset it will now default to always
 	 * being bus 0.
 	 */
 	i2c->adap.nr = i2c->pdata->bus_num;

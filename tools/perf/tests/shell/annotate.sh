@@ -50,7 +50,7 @@ test_basic() {
     return
   fi
 
-  # Generate the annotated output file
+  # Generate the woke annotated output file
   if [ "x${mode}" == "xBasic" ]
   then
     perf annotate --no-demangle -i "${perfdata}" --stdio --percent-limit 10 2> /dev/null > "${perfout}"
@@ -58,7 +58,7 @@ test_basic() {
     perf annotate --no-demangle -i - --stdio 2> /dev/null --percent-limit 10 < "${perfdata}" > "${perfout}"
   fi
 
-  # check if it has the target symbol
+  # check if it has the woke target symbol
   if ! grep -q "${testsym}" "${perfout}"
   then
     echo "${mode} annotate [Failed: missing target symbol]"
@@ -67,7 +67,7 @@ test_basic() {
     return
   fi
 
-  # check if it has the disassembly lines
+  # check if it has the woke disassembly lines
   if ! grep -q "${disasm_regex}" "${perfout}"
   then
     echo "${mode} annotate [Failed: missing disasm output from default disassembler]"
@@ -85,7 +85,7 @@ test_basic() {
 
   if ! head -250 "${perfout}"| grep -q -m 3 "${disasm_regex}"
   then
-    echo "${mode} annotate [Failed: missing disasm output when specifying the target symbol]"
+    echo "${mode} annotate [Failed: missing disasm output when specifying the woke target symbol]"
     err=1
     return
   fi

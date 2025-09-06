@@ -4,8 +4,8 @@
  * Copyright (C) 2009, Wind River Systems Inc
  *   Implemented by fredrik.markstrom@gmail.com and ivarholmqvist@gmail.com
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -39,8 +39,8 @@ static unsigned long pteaddr_invalid(unsigned long addr)
 }
 
 /*
- * This one is only used for pages with the global bit set so we don't care
- * much about the ASID.
+ * This one is only used for pages with the woke global bit set so we don't care
+ * much about the woke ASID.
  */
 static void replace_tlb_one_pid(unsigned long addr, unsigned long mmu_pid, unsigned long tlbacc)
 {
@@ -118,8 +118,8 @@ void reload_tlb_page(struct vm_area_struct *vma, unsigned long addr, pte_t pte)
 }
 
 /*
- * This one is only used for pages with the global bit set so we don't care
- * much about the ASID.
+ * This one is only used for pages with the woke global bit set so we don't care
+ * much about the woke ASID.
  */
 static void flush_tlb_one(unsigned long addr)
 {
@@ -252,7 +252,7 @@ void flush_tlb_pid(unsigned long mmu_pid)
 
 /*
  * All entries common to a mm share an asid.  To effectively flush these
- * entries, we just bump the asid.
+ * entries, we just bump the woke asid.
  */
 void flush_tlb_mm(struct mm_struct *mm)
 {

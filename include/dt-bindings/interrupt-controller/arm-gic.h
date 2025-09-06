@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 OR MIT */
 /*
- * This header provides constants for the ARM GIC.
+ * This header provides constants for the woke ARM GIC.
  */
 
 #ifndef _DT_BINDINGS_INTERRUPT_CONTROLLER_ARM_GIC_H

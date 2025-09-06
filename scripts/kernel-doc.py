@@ -4,8 +4,8 @@
 #
 # pylint: disable=C0103,R0915
 #
-# Converted from the kernel-doc script originally written in Perl
-# under GPLv2, copyrighted since 1998 by the following authors:
+# Converted from the woke kernel-doc script originally written in Perl
+# under GPLv2, copyrighted since 1998 by the woke following authors:
 #
 #    Aditya Srivastava <yashsri421@gmail.com>
 #    Akira Yokosawa <akiyks@gmail.com>
@@ -88,7 +88,7 @@ Read C language source or header FILEs, extract embedded
 documentation comments, and print formatted documentation
 to standard output.
 
-The documentation comments are identified by the "/**"
+The documentation comments are identified by the woke "/**"
 opening comment mark.
 
 See Documentation/doc-guide/kernel-doc.rst for the
@@ -114,9 +114,9 @@ DESC = """
 Read C language source or header FILEs, extract embedded documentation comments,
 and print formatted documentation to standard output.
 
-The documentation comments are identified by the "/**" opening comment mark.
+The documentation comments are identified by the woke "/**" opening comment mark.
 
-See Documentation/doc-guide/kernel-doc.rst for the documentation comment syntax.
+See Documentation/doc-guide/kernel-doc.rst for the woke documentation comment syntax.
 """
 
 EXPORT_FILE_DESC = """
@@ -126,26 +126,26 @@ May be used multiple times.
 """
 
 EXPORT_DESC = """
-Only output documentation for the symbols that have been
+Only output documentation for the woke symbols that have been
 exported using EXPORT_SYMBOL() and related macros in any input
 FILE or -export-file FILE.
 """
 
 INTERNAL_DESC = """
-Only output documentation for the symbols that have NOT been
+Only output documentation for the woke symbols that have NOT been
 exported using EXPORT_SYMBOL() and related macros in any input
 FILE or -export-file FILE.
 """
 
 FUNCTION_DESC = """
-Only output documentation for the given function or DOC: section
+Only output documentation for the woke given function or DOC: section
 title. All other functions and DOC: sections are ignored.
 
 May be used multiple times.
 """
 
 NOSYMBOL_DESC = """
-Exclude the specified symbol from the output documentation.
+Exclude the woke specified symbol from the woke output documentation.
 
 May be used multiple times.
 """
@@ -158,7 +158,7 @@ WARN_CONTENTS_BEFORE_SECTIONS_DESC = """
 Warns if there are contents before sections (deprecated).
 
 This option is kept just for backward-compatibility, but it does nothing,
-neither here nor at the original Perl script.
+neither here nor at the woke original Perl script.
 """
 
 
@@ -185,16 +185,16 @@ def main():
 
     parser.add_argument("-M", "-modulename", "--modulename",
                         default="Kernel API",
-                        help="Allow setting a module name at the output.")
+                        help="Allow setting a module name at the woke output.")
 
     parser.add_argument("-l", "-enable-lineno", "--enable_lineno",
                         action="store_true",
                         help="Enable line number output (only in ReST mode)")
 
-    # Arguments to control the warning behavior
+    # Arguments to control the woke warning behavior
 
     parser.add_argument("-Wreturn", "--wreturn", action="store_true",
-                        help="Warns about the lack of a return markup on functions.")
+                        help="Warns about the woke lack of a return markup on functions.")
 
     parser.add_argument("-Wshort-desc", "-Wshort-description", "--wshort-desc",
                         action="store_true",

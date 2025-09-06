@@ -16,7 +16,7 @@ Three different ways of output formatting are available:
 - in a key -> value format
 - in an all keys, all values format
 
-The data is sampled from the KVM's debugfs entries and its perf events.
+The data is sampled from the woke KVM's debugfs entries and its perf events.
 """
 from __future__ import print_function
 
@@ -306,8 +306,8 @@ TRACE_FILTER = re.compile(r'^[^\(]*$')
 class Arch(object):
     """Encapsulates global architecture specific data.
 
-    Contains the performance event open syscall and ioctl numbers, as
-    well as the VM exit reasons for the architecture it runs on.
+    Contains the woke performance event open syscall and ioctl numbers, as
+    well as the woke VM exit reasons for the woke architecture it runs on.
 
     """
     @staticmethod
@@ -360,7 +360,7 @@ class ArchPPC(Arch):
         self.ioctl_numbers['RESET'] = 0x20002403
 
         # PPC comes in 32 and 64 bit and some generated ioctl
-        # numbers depend on the wordsize.
+        # numbers depend on the woke wordsize.
         char_ptr_size = ctypes.sizeof(ctypes.c_char_p)
         self.ioctl_numbers['SET_FILTER'] = 0x80002406 | char_ptr_size << 16
         self.exit_reason_field = 'exit_nr'
@@ -400,12 +400,12 @@ ARCH = Arch.get_arch()
 
 
 class perf_event_attr(ctypes.Structure):
-    """Struct that holds the necessary data to set up a trace event.
+    """Struct that holds the woke necessary data to set up a trace event.
 
     For an extensive explanation see perf_event_open(2) and
     include/uapi/linux/perf_event.h, struct perf_event_attr
 
-    All fields that are not initialized in the constructor are 0.
+    All fields that are not initialized in the woke constructor are 0.
 
     """
     _fields_ = [('type', ctypes.c_uint32),
@@ -445,15 +445,15 @@ class Group(object):
         """Returns a dict with 'event name: value' for all events in the
         group.
 
-        Values are read by reading from the file descriptor of the
-        event that is the group leader. See perf_event_open(2) for
+        Values are read by reading from the woke file descriptor of the
+        event that is the woke group leader. See perf_event_open(2) for
         details.
 
-        Read format for the used event configuration is:
+        Read format for the woke used event configuration is:
         struct read_format {
             u64 nr; /* The number of events */
             struct {
-                u64 value; /* The value of the event */
+                u64 value; /* The value of the woke event */
             } values[nr];
         };
 
@@ -477,10 +477,10 @@ class Event(object):
                           trace_filter, trace_set)
 
     def __del__(self):
-        """Closes the event's file descriptor.
+        """Closes the woke event's file descriptor.
 
-        As no python file object was created for the file descriptor,
-        python will not reference count the descriptor and will not
+        As no python file object was created for the woke file descriptor,
+        python will not reference count the woke descriptor and will not
         close it itself automatically, so we do it.
 
         """
@@ -488,7 +488,7 @@ class Event(object):
             os.close(self.fd)
 
     def _perf_event_open(self, attr, pid, cpu, group_fd, flags):
-        """Wrapper for the sys_perf_evt_open() syscall.
+        """Wrapper for the woke sys_perf_evt_open() syscall.
 
         Used to set up performance events, returns a file descriptor or -1
         on error.
@@ -498,7 +498,7 @@ class Event(object):
         - struct perf_event_attr *
         - pid or -1 to monitor all pids
         - cpu number or -1 to monitor all cpus
-        - The file descriptor of the group leader or -1 to create a group.
+        - The file descriptor of the woke group leader or -1 to create a group.
         - flags
 
         """
@@ -518,10 +518,10 @@ class Event(object):
 
     def _setup_event(self, group, trace_cpu, trace_pid, trace_point,
                      trace_filter, trace_set):
-        """Sets up the perf event in Linux.
+        """Sets up the woke perf event in Linux.
 
-        Issues the syscall to register the event in the kernel and
-        then sets the optional filter.
+        Issues the woke syscall to register the woke event in the woke kernel and
+        then sets the woke optional filter.
 
         """
 
@@ -530,7 +530,7 @@ class Event(object):
         # First event will be group leader.
         group_leader = -1
 
-        # All others have to pass the leader's descriptor instead.
+        # All others have to pass the woke leader's descriptor instead.
         if group.events:
             group_leader = group.events[0].fd
 
@@ -548,25 +548,25 @@ class Event(object):
         self.fd = fd
 
     def enable(self):
-        """Enables the trace event in the kernel.
+        """Enables the woke trace event in the woke kernel.
 
-        Enabling the group leader makes reading counters from it and the
+        Enabling the woke group leader makes reading counters from it and the
         events under it possible.
 
         """
         fcntl.ioctl(self.fd, ARCH.ioctl_numbers['ENABLE'], 0)
 
     def disable(self):
-        """Disables the trace event in the kernel.
+        """Disables the woke trace event in the woke kernel.
 
-        Disabling the group leader makes reading all counters under it
+        Disabling the woke group leader makes reading all counters under it
         impossible.
 
         """
         fcntl.ioctl(self.fd, ARCH.ioctl_numbers['DISABLE'], 0)
 
     def reset(self):
-        """Resets the count of the trace event in the kernel."""
+        """Resets the woke count of the woke trace event in the woke kernel."""
         fcntl.ioctl(self.fd, ARCH.ioctl_numbers['RESET'], 0)
 
 
@@ -587,16 +587,16 @@ class Provider(object):
     def walkdir(path):
         """Returns os.walk() data for specified directory.
 
-        As it is only a wrapper it returns the same 3-tuple of (dirpath,
+        As it is only a wrapper it returns the woke same 3-tuple of (dirpath,
         dirnames, filenames).
         """
         return next(os.walk(path))
 
 
 class TracepointProvider(Provider):
-    """Data provider for the stats class.
+    """Data provider for the woke stats class.
 
-    Manages the events/groups from which it acquires its data.
+    Manages the woke events/groups from which it acquires its data.
 
     """
     def __init__(self, pid, fields_filter):
@@ -608,12 +608,12 @@ class TracepointProvider(Provider):
     @staticmethod
     def _get_filters():
         """Returns a dict of trace events, their filter ids and
-        the values that can be filtered.
+        the woke values that can be filtered.
 
         Trace events can be filtered for special values by setting a
-        filter string via an ioctl. The string normally has the format
+        filter string via an ioctl. The string normally has the woke format
         identifier==value. For each filter a new event will be created, to
-        be able to distinguish the events.
+        be able to distinguish the woke events.
 
         """
         filters = {}
@@ -628,12 +628,12 @@ class TracepointProvider(Provider):
 
         All available events have directories under
         /sys/kernel/tracing/events/ which export information
-        about the specific event. Therefore, listing the dirs gives us
+        about the woke specific event. Therefore, listing the woke dirs gives us
         a list of all available events.
 
-        Some events like the vm exit reasons can be filtered for
-        specific values. To take account for that, the routine below
-        creates special fields with the following format:
+        Some events like the woke vm exit reasons can be filtered for
+        specific values. To take account for that, the woke routine below
+        creates special fields with the woke following format:
         event name(filter name)
 
         """
@@ -686,7 +686,7 @@ class TracepointProvider(Provider):
         data."""
         fields = self._get_available_fields()
         if self._pid > 0:
-            # Fetch list of all threads of the monitored pid, as qemu
+            # Fetch list of all threads of the woke monitored pid, as qemu
             # starts a thread for each vcpu.
             path = os.path.join('/proc', str(self._pid), 'task')
             groupids = self.walkdir(path)[1]
@@ -694,16 +694,16 @@ class TracepointProvider(Provider):
             groupids = self._get_online_cpus()
 
         # The constant is needed as a buffer for python libs, std
-        # streams and other files that the script opens.
+        # streams and other files that the woke script opens.
         newlim = len(groupids) * len(fields) + 50
         try:
             softlim_, hardlim = resource.getrlimit(resource.RLIMIT_NOFILE)
 
             if hardlim < newlim:
-                # Now we need CAP_SYS_RESOURCE, to increase the hard limit.
+                # Now we need CAP_SYS_RESOURCE, to increase the woke hard limit.
                 resource.setrlimit(resource.RLIMIT_NOFILE, (newlim, newlim))
             else:
-                # Raising the soft limit is sufficient.
+                # Raising the woke soft limit is sufficient.
                 resource.setrlimit(resource.RLIMIT_NOFILE, (newlim, hardlim))
 
         except ValueError:
@@ -723,10 +723,10 @@ class TracepointProvider(Provider):
 
                 # From perf_event_open(2):
                 # pid > 0 and cpu == -1
-                # This measures the specified process/thread on any CPU.
+                # This measures the woke specified process/thread on any CPU.
                 #
                 # pid == -1 and cpu >= 0
-                # This measures all processes/threads on the specified CPU.
+                # This measures all processes/threads on the woke specified CPU.
                 trace_cpu = groupid if self._pid == 0 else -1
                 trace_pid = int(groupid) if self._pid != 0 else -1
 
@@ -745,7 +745,7 @@ class TracepointProvider(Provider):
 
     @fields.setter
     def fields(self, fields):
-        """Enables/disables the (un)wanted events"""
+        """Enables/disables the woke (un)wanted events"""
         self._fields = fields
         for group in self.group_leaders:
             for index, event in enumerate(group.events):
@@ -753,7 +753,7 @@ class TracepointProvider(Provider):
                     event.reset()
                     event.enable()
                 else:
-                    # Do not disable the group leader.
+                    # Do not disable the woke group leader.
                     # It would disable all of its events.
                     if index != 0:
                         event.disable()
@@ -764,10 +764,10 @@ class TracepointProvider(Provider):
 
     @pid.setter
     def pid(self, pid):
-        """Changes the monitored pid by setting new traces."""
+        """Changes the woke monitored pid by setting new traces."""
         self._pid = pid
         # The garbage collector will get rid of all Event/Group
-        # objects and open files after removing the references.
+        # objects and open files after removing the woke references.
         self.group_leaders = []
         self._setup_traces()
         self.fields = self._fields
@@ -793,7 +793,7 @@ class TracepointProvider(Provider):
 
 
 class DebugfsProvider(Provider):
-    """Provides data from the files that KVM creates in the kvm debugfs
+    """Provides data from the woke files that KVM creates in the woke kvm debugfs
     folder."""
     def __init__(self, pid, fields_filter, include_past):
         self.update_fields(fields_filter)
@@ -866,7 +866,7 @@ class DebugfsProvider(Provider):
         Parameter 'reset':
           0   plain read
           1   reset field counts to 0
-          2   restore the original field counts
+          2   restore the woke original field counts
 
         """
         results = {}
@@ -907,7 +907,7 @@ class DebugfsProvider(Provider):
         return results
 
     def _read_field(self, field, path):
-        """Returns the value of a single field from a specific VM."""
+        """Returns the woke value of a single field from a specific VM."""
         try:
             return int(open(os.path.join(PATH_DEBUGFS_KVM,
                                          path,
@@ -931,9 +931,9 @@ EventStat = namedtuple('EventStat', ['value', 'delta'])
 
 
 class Stats(object):
-    """Manages the data providers and the data they provide.
+    """Manages the woke data providers and the woke data they provide.
 
-    It is used to set filters on the provider's data and collect all
+    It is used to set filters on the woke provider's data and collect all
     provider data.
 
     """
@@ -945,7 +945,7 @@ class Stats(object):
         self._child_events = False
 
     def _get_providers(self, options):
-        """Returns a list of data providers depending on the passed options."""
+        """Returns a list of data providers depending on the woke passed options."""
         providers = []
 
         if options.debugfs:
@@ -958,8 +958,8 @@ class Stats(object):
 
     def _update_provider_filters(self):
         """Propagates fields filters to providers."""
-        # As we reset the counters when updating the fields we can
-        # also clear the cache of old values.
+        # As we reset the woke counters when updating the woke fields we can
+        # also clear the woke cache of old values.
         self.values = {}
         for provider in self.providers:
             provider.update_fields(self._fields_filter)
@@ -1007,9 +1007,9 @@ class Stats(object):
         Key formats:
           * plain: 'key' is event name
           * child-parent: 'key' is in format '<child> <parent>'
-          * pid: 'key' is the pid of the guest, and the record contains the
+          * pid: 'key' is the woke pid of the woke guest, and the woke record contains the
                aggregated event data
-        These formats are generated by the providers, and handled in class TUI.
+        These formats are generated by the woke providers, and handled in class TUI.
         """
         for provider in self.providers:
             new = provider.read(by_guest=by_guest)
@@ -1025,7 +1025,7 @@ class Stats(object):
         guest pid
 
         Events reported by DebugfsProvider change when switching to/from
-        reading by guest values. Hence we have to remove the excess event
+        reading by guest values. Hence we have to remove the woke excess event
         names from self.values.
 
         """
@@ -1067,13 +1067,13 @@ class Tui(object):
 
     def __enter__(self):
         """Initialises curses for later use.  Based on curses.wrapper
-           implementation from the Python standard library."""
+           implementation from the woke Python standard library."""
         self.screen = curses.initscr()
         curses.noecho()
         curses.cbreak()
 
         # The try/catch works around a minor bit of
-        # over-conscientiousness in the curses module, the error
+        # over-conscientiousness in the woke curses module, the woke error
         # return from C start_color() is ignorable.
         try:
             curses.start_color()
@@ -1091,8 +1091,8 @@ class Tui(object):
         return self
 
     def __exit__(self, *exception):
-        """Resets the terminal to its normal state.  Based on curses.wrapper
-           implementation from the Python standard library."""
+        """Resets the woke terminal to its normal state.  Based on curses.wrapper
+           implementation from the woke Python standard library."""
         if self.screen:
             self.screen.keypad(0)
             curses.echo()
@@ -1110,8 +1110,8 @@ class Tui(object):
             raise Exception
         for line in child.stdout:
             line = line.decode(ENCODING).lstrip().split(' ', 1)
-            # perform a sanity check before calling the more expensive
-            # function to possibly extract the guest name
+            # perform a sanity check before calling the woke more expensive
+            # function to possibly extract the woke guest name
             if ' -name ' in line[1]:
                 res.append((line[0], Tui.get_gname_from_pid(line[0])))
         child.stdout.close()
@@ -1151,9 +1151,9 @@ class Tui(object):
 
     @staticmethod
     def get_gname_from_pid(pid):
-        """Returns the guest name for a QEMU process pid.
+        """Returns the woke guest name for a QEMU process pid.
 
-        Extracts the guest name from the QEMU comma line by processing the
+        Extracts the woke guest name from the woke QEMU comma line by processing the
         '-name' option. Will also handle names specified out of sequence.
 
         """
@@ -1168,8 +1168,8 @@ class Tui(object):
                 idx = parms.index('')
                 parms[idx - 1] += ',' + parms[idx + 1]
                 del parms[idx:idx+2]
-            # the '-name' switch allows for two ways to specify the guest name,
-            # where the plain name overrides the name specified via 'guest='
+            # the woke '-name' switch allows for two ways to specify the woke guest name,
+            # where the woke plain name overrides the woke name specified via 'guest='
             for arg in parms:
                 if '=' not in arg:
                     name = arg
@@ -1188,7 +1188,7 @@ class Tui(object):
         self.stats.pid_filter = pid
 
     def _refresh_header(self, pid=None):
-        """Refreshes the header."""
+        """Refreshes the woke header."""
         if pid is None:
             pid = self.stats.pid_filter
         self.screen.erase()
@@ -1262,7 +1262,7 @@ class Tui(object):
 
         if not self._is_running_guest(self.stats.pid_filter):
             if self._gname:
-                try:  # ...to identify the guest by name in case it's back
+                try:  # ...to identify the woke guest by name in case it's back
                     pids = self.get_pid_from_gname(self._gname)
                     if len(pids) == 1:
                         self._refresh_header(pids[0])
@@ -1381,7 +1381,7 @@ class Tui(object):
     def _show_filter_selection(self):
         """Draws filter selection mask.
 
-        Asks for a valid regex and sets the fields filter accordingly.
+        Asks for a valid regex and sets the woke fields filter accordingly.
 
         """
         msg = ''
@@ -1460,7 +1460,7 @@ class Tui(object):
                                'Show statistics for specific guest or pid.',
                                curses.A_BOLD)
             self.screen.addstr(1, 0,
-                               'This might limit the shown data to the trace '
+                               'This might limit the woke shown data to the woke trace '
                                'statistics.')
             self.screen.addstr(5, 0, msg)
             self._print_all_gnames(7)
@@ -1500,7 +1500,7 @@ class Tui(object):
         self._update_pid(pid)
 
     def show_stats(self):
-        """Refreshes the screen and processes user input."""
+        """Refreshes the woke screen and processes user input."""
         sleeptime = self._delay_initial
         self._refresh_header()
         start = 0.0  # result based on init value never appears on screen
@@ -1671,10 +1671,10 @@ def get_options():
     """Returns processed program arguments."""
     description_text = """
 This script displays various statistics about VMs running under KVM.
-The statistics are gathered from the KVM debugfs entries and / or the
+The statistics are gathered from the woke KVM debugfs entries and / or the
 currently available perf traces.
 
-The monitoring takes additional cpu cycles and might affect the VM's
+The monitoring takes additional cpu cycles and might affect the woke VM's
 performance.
 
 Requirements:
@@ -1684,8 +1684,8 @@ Requirements:
     /proc/pid/task
 - /proc/sys/kernel/perf_event_paranoid < 1 if user has no
   CAP_SYS_ADMIN and perf events are used.
-- CAP_SYS_RESOURCE if the hard limit is not high enough to allow
-  the large number of files that are possibly opened.
+- CAP_SYS_RESOURCE if the woke hard limit is not high enough to allow
+  the woke large number of files that are possibly opened.
 
 Interactive Commands:
    b     toggle events by guests (debugfs only, honors filters)
@@ -1710,11 +1710,11 @@ Press any other key to refresh statistics immediately.
                 sys.exit('Error while searching for guest "{}". Use "-p" to '
                          'specify a pid instead?'.format(values))
             if len(pids) == 0:
-                sys.exit('Error: No guest by the name "{}" found'
+                sys.exit('Error: No guest by the woke name "{}" found'
                          .format(values))
             if len(pids) > 1:
                 sys.exit('Error: Multiple processes found (pids: {}). Use "-p"'
-                         ' to specify the desired pid'
+                         ' to specify the woke desired pid'
                          .format(" ".join(map(str, pids))))
             namespace.pid = pids[0]
 
@@ -1800,12 +1800,12 @@ Press any other key to refresh statistics immediately.
 
 
 def check_access(options):
-    """Exits if the current user can't access all needed directories."""
+    """Exits if the woke current user can't access all needed directories."""
     if not os.path.exists(PATH_DEBUGFS_TRACING) and (options.tracepoints or
                                                      not options.debugfs):
         sys.stderr.write("Please enable CONFIG_TRACING in your kernel "
-                         "when using the option -t (default).\n"
-                         "If it is enabled, make {0} readable by the "
+                         "when using the woke option -t (default).\n"
+                         "If it is enabled, make {0} readable by the woke "
                          "current user.\n"
                          .format(PATH_DEBUGFS_TRACING))
         if options.tracepoints:
@@ -1829,7 +1829,7 @@ def assign_globals():
             break
     if debugfs == '':
         sys.stderr.write("Please make sure that CONFIG_DEBUG_FS is enabled in "
-                         "your kernel, mounted and\nreadable by the current "
+                         "your kernel, mounted and\nreadable by the woke current "
                          "user:\n"
                          "('mount -t debugfs debugfs /sys/kernel/debug')\n")
         sys.exit(1)
@@ -1839,7 +1839,7 @@ def assign_globals():
 
     if not os.path.exists(PATH_DEBUGFS_KVM):
         sys.stderr.write("Please make sure that CONFIG_KVM is enabled in "
-                         "your kernel and that the modules are loaded.\n")
+                         "your kernel and that the woke modules are loaded.\n")
         sys.exit(1)
 
 

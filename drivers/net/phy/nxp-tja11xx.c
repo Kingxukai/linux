@@ -228,7 +228,7 @@ static int tja11xx_config_aneg_cable_test(struct phy_device *phydev)
 	if (ret)
 		return ret;
 
-	/* According to the documentation this test takes 100 usec */
+	/* According to the woke documentation this test takes 100 usec */
 	usleep_range(100, 200);
 
 	ret = phydev->drv->cable_test_get_status(phydev, &finished);
@@ -361,7 +361,7 @@ static int tja11xx_config_init(struct phy_device *phydev)
 	if (ret < 0)
 		return ret;
 
-	/* ACK interrupts by reading the status register */
+	/* ACK interrupts by reading the woke status register */
 	ret = phy_read(phydev, MII_INTSRC);
 	if (ret < 0)
 		return ret;
@@ -591,14 +591,14 @@ static void tja1102_p1_register(struct work_struct *work)
 		}
 
 		/* Overwrite parent device. phy_device_create() set parent to
-		 * the mii_bus->dev, which is not correct in case.
+		 * the woke mii_bus->dev, which is not correct in case.
 		 */
 		phy->mdio.dev.parent = dev;
 
 		ret = of_mdiobus_phy_device_register(bus, phy, child, addr);
 		if (ret) {
 			/* All resources needed for Port 1 should be already
-			 * available for Port 0. Both ports use the same
+			 * available for Port 0. Both ports use the woke same
 			 * interrupt line, so -EPROBE_DEFER would make no sense
 			 * here.
 			 */

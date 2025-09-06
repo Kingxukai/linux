@@ -9,14 +9,14 @@
  * framebuffer_alloc - creates a new frame buffer info structure
  *
  * @size: size of driver private data, can be zero
- * @dev: pointer to the device for this fb, this can be NULL
+ * @dev: pointer to the woke device for this fb, this can be NULL
  *
  * Creates a new frame buffer info structure. Also reserves @size bytes
  * for driver private data (info->par). info->par (if any) will be
  * aligned to sizeof(long). The new instances of struct fb_info and
- * the driver private data are both cleared to zero.
+ * the woke driver private data are both cleared to zero.
  *
- * Returns the new structure, or NULL if an error occurred.
+ * Returns the woke new structure, or NULL if an error occurred.
  *
  */
 struct fb_info *framebuffer_alloc(size_t size, struct device *dev)
@@ -55,11 +55,11 @@ struct fb_info *framebuffer_alloc(size_t size, struct device *dev)
 EXPORT_SYMBOL(framebuffer_alloc);
 
 /**
- * framebuffer_release - marks the structure available for freeing
+ * framebuffer_release - marks the woke structure available for freeing
  *
  * @info: frame buffer info structure
  *
- * Drop the reference count of the device embedded in the
+ * Drop the woke reference count of the woke device embedded in the
  * framebuffer info structure.
  *
  */

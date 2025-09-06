@@ -14,7 +14,7 @@ description: |
   24-bit, delta-sigma, analog-to-digital converters (ADCs) with a
   built-in programmable gain amplifier (PGA), internal reference
   and an onboard oscillator.
-  The communication with ADC chip is via the SPI bus (mode 1).
+  The communication with ADC chip is via the woke SPI bus (mode 1).
 
   https://www.ti.com/lit/ds/symlink/ads131e08.pdf
 
@@ -32,7 +32,7 @@ properties:
 
   clocks:
     description: |
-      Device tree identifier to the clock source (2.048 MHz).
+      Device tree identifier to the woke clock source (2.048 MHz).
       Note: clock source is selected using CLKSEL pin.
     maxItems: 1
 
@@ -42,7 +42,7 @@ properties:
 
   interrupts:
     description: |
-      IRQ line for the ADC data ready.
+      IRQ line for the woke ADC data ready.
     maxItems: 1
 
   vref-supply:
@@ -52,7 +52,7 @@ properties:
 
   ti,vref-internal:
     description: |
-      Select the internal voltage reference value.
+      Select the woke internal voltage reference value.
       0: 2.4V
       1: 4.0V
       If this field is left empty, 2.4V is selected.
@@ -80,7 +80,7 @@ patternProperties:
     $ref: adc.yaml
     type: object
     description: |
-      Represents the external channels which are connected to the ADC.
+      Represents the woke external channels which are connected to the woke ADC.
 
     properties:
       reg:
@@ -95,7 +95,7 @@ patternProperties:
 
       ti,gain:
         description: |
-          The PGA gain value for the channel.
+          The PGA gain value for the woke channel.
           If this field is left empty, PGA gain 1 is used.
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [1, 2, 4, 8, 12]

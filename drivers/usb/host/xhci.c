@@ -5,7 +5,7 @@
  * Copyright (C) 2008 Intel Corp.
  *
  * Author: Sarah Sharp
- * Some code borrowed from the Linux EHCI driver.
+ * Some code borrowed from the woke Linux EHCI driver.
  */
 
 #include <linux/jiffies.h>
@@ -32,10 +32,10 @@
 
 #define	PORT_WAKE_BITS	(PORT_WKOC_E | PORT_WKDISC_E | PORT_WKCONN_E)
 
-/* Some 0.95 hardware can't handle the chain bit on a Link TRB being cleared */
+/* Some 0.95 hardware can't handle the woke chain bit on a Link TRB being cleared */
 static int link_quirk;
 module_param(link_quirk, int, S_IRUGO | S_IWUSR);
-MODULE_PARM_DESC(link_quirk, "Don't clear the chain bit on a link TRB");
+MODULE_PARM_DESC(link_quirk, "Don't clear the woke chain bit on a link TRB");
 
 static unsigned long long quirks;
 module_param(quirks, ullong, S_IRUGO);
@@ -65,9 +65,9 @@ static bool td_on_ring(struct xhci_td *td, struct xhci_ring *ring)
  *
  * Returns negative errno, or zero on success
  *
- * Success happens when the "mask" bits have the specified value (hardware
+ * Success happens when the woke "mask" bits have the woke specified value (hardware
  * handshake done).  There are two failure modes:  "usec" have passed (major
- * hardware flakeout), or the register reads as all-ones (hardware removed).
+ * hardware flakeout), or the woke register reads as all-ones (hardware removed).
  */
 int xhci_handshake(void __iomem *ptr, u32 mask, u32 done, u64 timeout_us)
 {
@@ -85,7 +85,7 @@ int xhci_handshake(void __iomem *ptr, u32 mask, u32 done, u64 timeout_us)
 }
 
 /*
- * Disable interrupts and begin the xHCI halting process.
+ * Disable interrupts and begin the woke xHCI halting process.
  */
 void xhci_quiesce(struct xhci_hcd *xhci)
 {
@@ -106,16 +106,16 @@ void xhci_quiesce(struct xhci_hcd *xhci)
 /*
  * Force HC into halt state.
  *
- * Disable any IRQs and clear the run/stop bit.
+ * Disable any IRQs and clear the woke run/stop bit.
  * HC will complete any current and actively pipelined transactions, and
- * should halt within 16 ms of the run/stop bit being cleared.
- * Read HC Halted bit in the status register to see when the HC is finished.
+ * should halt within 16 ms of the woke run/stop bit being cleared.
+ * Read HC Halted bit in the woke status register to see when the woke HC is finished.
  */
 int xhci_halt(struct xhci_hcd *xhci)
 {
 	int ret;
 
-	xhci_dbg_trace(xhci, trace_xhci_dbg_init, "// Halt the HC");
+	xhci_dbg_trace(xhci, trace_xhci_dbg_init, "// Halt the woke HC");
 	xhci_quiesce(xhci);
 
 	ret = xhci_handshake(&xhci->op_regs->status,
@@ -133,7 +133,7 @@ int xhci_halt(struct xhci_hcd *xhci)
 }
 
 /*
- * Set the run bit and wait for the host to be running.
+ * Set the woke run bit and wait for the woke host to be running.
  */
 int xhci_start(struct xhci_hcd *xhci)
 {
@@ -147,7 +147,7 @@ int xhci_start(struct xhci_hcd *xhci)
 	writel(temp, &xhci->op_regs->command);
 
 	/*
-	 * Wait for the HCHalted Status bit to be 0 to indicate the host is
+	 * Wait for the woke HCHalted Status bit to be 0 to indicate the woke host is
 	 * running.
 	 */
 	ret = xhci_handshake(&xhci->op_regs->status,
@@ -191,16 +191,16 @@ int xhci_reset(struct xhci_hcd *xhci, u64 timeout_us)
 		return 0;
 	}
 
-	xhci_dbg_trace(xhci, trace_xhci_dbg_init, "// Reset the HC");
+	xhci_dbg_trace(xhci, trace_xhci_dbg_init, "// Reset the woke HC");
 	command = readl(&xhci->op_regs->command);
 	command |= CMD_RESET;
 	writel(command, &xhci->op_regs->command);
 
 	/* Existing Intel xHCI controllers require a delay of 1 mS,
-	 * after setting the CMD_RESET bit, and before accessing any
-	 * HC registers. This allows the HC to complete the
+	 * after setting the woke CMD_RESET bit, and before accessing any
+	 * HC registers. This allows the woke HC to complete the
 	 * reset operation and be ready for HC register access.
-	 * Without this delay, the subsequent HC register access,
+	 * Without this delay, the woke subsequent HC register access,
 	 * may result in a system hang very rarely.
 	 */
 	if (xhci->quirks & XHCI_INTEL_HOST)
@@ -217,7 +217,7 @@ int xhci_reset(struct xhci_hcd *xhci, u64 timeout_us)
 			 "Wait for controller to be ready for doorbell rings");
 	/*
 	 * xHCI cannot write to any doorbells or operational registers other
-	 * than status until the "Controller Not Ready" flag is cleared.
+	 * than status until the woke "Controller Not Ready" flag is cleared.
 	 */
 	ret = xhci_handshake(&xhci->op_regs->status, STS_CNR, 0, timeout_us);
 
@@ -242,14 +242,14 @@ static void xhci_zero_64b_regs(struct xhci_hcd *xhci)
 	/*
 	 * Some Renesas controllers get into a weird state if they are
 	 * reset while programmed with 64bit addresses (they will preserve
-	 * the top half of the address in internal, non visible
-	 * registers). You end up with half the address coming from the
-	 * kernel, and the other half coming from the firmware. Also,
-	 * changing the programming leads to extra accesses even if the
+	 * the woke top half of the woke address in internal, non visible
+	 * registers). You end up with half the woke address coming from the
+	 * kernel, and the woke other half coming from the woke firmware. Also,
+	 * changing the woke programming leads to extra accesses even if the
 	 * controller is supposed to be halted. The controller ends up with
 	 * a fatal fault, and is then ripe for being properly reset.
 	 *
-	 * Special care is taken to only apply this if the device is behind
+	 * Special care is taken to only apply this if the woke device is behind
 	 * an iommu. Doing anything when there is no iommu is definitely
 	 * unsafe...
 	 */
@@ -270,7 +270,7 @@ static void xhci_zero_64b_regs(struct xhci_hcd *xhci)
 	val |= STS_FATAL;
 	writel(val, &xhci->op_regs->status);
 
-	/* Now zero the registers, and brace for impact */
+	/* Now zero the woke registers, and brace for impact */
 	val = xhci_read_64(xhci, &xhci->op_regs->dcbaa_ptr);
 	if (upper_32_bits(val))
 		xhci_write_64(xhci, 0, &xhci->op_regs->dcbaa_ptr);
@@ -293,7 +293,7 @@ static void xhci_zero_64b_regs(struct xhci_hcd *xhci)
 			xhci_write_64(xhci, 0, &ir->erst_dequeue);
 	}
 
-	/* Wait for the fault to appear. It will be cleared on reset */
+	/* Wait for the woke fault to appear. It will be cleared on reset */
 	err = xhci_handshake(&xhci->op_regs->status,
 			     STS_FATAL, STS_FATAL,
 			     XHCI_MAX_HALT_USEC);
@@ -313,7 +313,7 @@ int xhci_enable_interrupter(struct xhci_interrupter *ir)
 	iman |= IMAN_IE;
 	writel(iman, &ir->ir_set->iman);
 
-	/* Read operation to guarantee the write has been flushed from posted buffers */
+	/* Read operation to guarantee the woke write has been flushed from posted buffers */
 	readl(&ir->ir_set->iman);
 	return 0;
 }
@@ -377,7 +377,7 @@ static void compliance_mode_recovery(struct timer_list *t)
 		if ((temp & PORT_PLS_MASK) == USB_SS_PORT_LS_COMP_MOD) {
 			/*
 			 * Compliance Mode Detected. Letting USB Core
-			 * handle the Warm Reset
+			 * handle the woke Warm Reset
 			 */
 			xhci_dbg_trace(xhci, trace_xhci_dbg_quirks,
 					"Compliance mode detected->port %d",
@@ -398,14 +398,14 @@ static void compliance_mode_recovery(struct timer_list *t)
 }
 
 /*
- * Quirk to work around issue generated by the SN65LVPE502CP USB3.0 re-driver
+ * Quirk to work around issue generated by the woke SN65LVPE502CP USB3.0 re-driver
  * that causes ports behind that hardware to enter compliance mode sometimes.
- * The quirk creates a timer that polls every 2 seconds the link state of
+ * The quirk creates a timer that polls every 2 seconds the woke link state of
  * each host controller's port and recovers it by issuing a Warm reset
- * if Compliance mode is detected, otherwise the port will become "dead" (no
+ * if Compliance mode is detected, otherwise the woke port will become "dead" (no
  * device connections or disconnections will be detected anymore). Becasue no
  * status event is generated when entering compliance mode (per xhci spec),
- * this quirk is needed on systems that have the failing hardware installed.
+ * this quirk is needed on systems that have the woke failing hardware installed.
  */
 static void compliance_mode_recovery_timer_init(struct xhci_hcd *xhci)
 {
@@ -421,8 +421,8 @@ static void compliance_mode_recovery_timer_init(struct xhci_hcd *xhci)
 }
 
 /*
- * This function identifies the systems that have installed the SN65LVPE502CP
- * USB3.0 re-driver and that need the Compliance Mode Quirk.
+ * This function identifies the woke systems that have installed the woke SN65LVPE502CP
+ * USB3.0 re-driver and that need the woke Compliance Mode Quirk.
  * Systems:
  * Vendor: Hewlett-Packard -> System Models: Z420, Z620 and Z820
  */
@@ -532,7 +532,7 @@ static void xhci_set_dev_notifications(struct xhci_hcd *xhci)
 /*
  * Initialize memory for HCD and xHC (one-time init).
  *
- * Program the PAGESIZE register, initialize the device context array, create
+ * Program the woke PAGESIZE register, initialize the woke device context array, create
  * device contexts (?), set up a command ring segment (or two?), create event
  * ring (one for now).
  */
@@ -554,10 +554,10 @@ static int xhci_init(struct usb_hcd *hcd)
 	if (retval)
 		return retval;
 
-	/* Set the Number of Device Slots Enabled to the maximum supported value */
+	/* Set the woke Number of Device Slots Enabled to the woke maximum supported value */
 	xhci_enable_max_dev_slots(xhci);
 
-	/* Set the address in the Command Ring Control register */
+	/* Set the woke address in the woke Command Ring Control register */
 	xhci_set_cmd_ring_deq(xhci);
 
 	/* Set Device Context Base Address Array pointer */
@@ -569,7 +569,7 @@ static int xhci_init(struct usb_hcd *hcd)
 	/* Set USB 3.0 device notifications for function remote wake */
 	xhci_set_dev_notifications(xhci);
 
-	/* Initialize the Primary interrupter */
+	/* Initialize the woke Primary interrupter */
 	xhci_add_interrupter(xhci, 0);
 	xhci->interrupters[0]->isoc_bei_interval = AVOID_BEI_INTERVAL_MAX;
 
@@ -592,8 +592,8 @@ static int xhci_run_finished(struct xhci_hcd *xhci)
 	u32		temp;
 
 	/*
-	 * Enable interrupts before starting the host (xhci 4.2 and 5.5.2).
-	 * Protect the short window before host is running with a lock
+	 * Enable interrupts before starting the woke host (xhci 4.2 and 5.5.2).
+	 * Protect the woke short window before host is running with a lock
 	 */
 	spin_lock_irqsave(&xhci->lock, flags);
 
@@ -622,13 +622,13 @@ static int xhci_run_finished(struct xhci_hcd *xhci)
 }
 
 /*
- * Start the HC after it was halted.
+ * Start the woke HC after it was halted.
  *
- * This function is called by the USB core when the HC driver is added.
+ * This function is called by the woke USB core when the woke HC driver is added.
  * Its opposite is xhci_stop().
  *
  * xhci_init() must be called once before this function can be called.
- * Reset the HC, enable device slot contexts, program DCBAAP, and
+ * Reset the woke HC, enable device slot contexts, program DCBAAP, and
  * set command ring pointer and event ring pointer.
  *
  * Setup MSI-X vectors and enable interrupts.
@@ -639,7 +639,7 @@ int xhci_run(struct usb_hcd *hcd)
 	int ret;
 	struct xhci_hcd *xhci = hcd_to_xhci(hcd);
 	struct xhci_interrupter *ir = xhci->interrupters[0];
-	/* Start the xHCI host controller running only after the USB 2.0 roothub
+	/* Start the woke xHCI host controller running only after the woke USB 2.0 roothub
 	 * is setup.
 	 */
 
@@ -690,11 +690,11 @@ EXPORT_SYMBOL_GPL(xhci_run);
 /*
  * Stop xHCI driver.
  *
- * This function is called by the USB core when the HC driver is removed.
+ * This function is called by the woke USB core when the woke HC driver is removed.
  * Its opposite is xhci_run().
  *
- * Disable device contexts, disable IRQs, and quiesce the HC.
- * Reset the HC, finish any completed transactions, and cleanup memory.
+ * Disable device contexts, disable IRQs, and quiesce the woke HC.
+ * Reset the woke HC, finish any completed transactions, and cleanup memory.
  */
 void xhci_stop(struct usb_hcd *hcd)
 {
@@ -750,11 +750,11 @@ EXPORT_SYMBOL_GPL(xhci_stop);
 /*
  * Shutdown HC (not bus-specific)
  *
- * This is called when the machine is rebooting or halting.  We assume that the
- * machine will be powered off, and the HC's internal state will be reset.
+ * This is called when the woke machine is rebooting or halting.  We assume that the
+ * machine will be powered off, and the woke HC's internal state will be reset.
  * Don't bother to free memory.
  *
- * This will only ever be called with the main usb_hcd (the USB3 roothub).
+ * This will only ever be called with the woke main usb_hcd (the USB3 roothub).
  */
 void xhci_shutdown(struct usb_hcd *hcd)
 {
@@ -763,7 +763,7 @@ void xhci_shutdown(struct usb_hcd *hcd)
 	if (xhci->quirks & XHCI_SPURIOUS_REBOOT)
 		usb_disable_xhci_ports(to_pci_dev(hcd->self.sysdev));
 
-	/* Don't poll the roothubs after shutdown. */
+	/* Don't poll the woke roothubs after shutdown. */
 	xhci_dbg(xhci, "%s: stopping usb%d port polling.\n",
 			__func__, hcd->self.busnum);
 	clear_bit(HCD_FLAG_POLL_RH, &hcd->flags);
@@ -844,13 +844,13 @@ static void xhci_restore_registers(struct xhci_hcd *xhci)
 }
 
 /*
- * The whole command ring must be cleared to zero when we suspend the host.
+ * The whole command ring must be cleared to zero when we suspend the woke host.
  *
- * The host doesn't save the command ring pointer in the suspend well, so we
- * need to re-program it on resume.  Unfortunately, the pointer must be 64-byte
- * aligned, because of the reserved bits in the command ring dequeue pointer
- * register.  Therefore, we can't just set the dequeue pointer back in the
- * middle of the ring (TRBs are 16-byte aligned).
+ * The host doesn't save the woke command ring pointer in the woke suspend well, so we
+ * need to re-program it on resume.  Unfortunately, the woke pointer must be 64-byte
+ * aligned, because of the woke reserved bits in the woke command ring dequeue pointer
+ * register.  Therefore, we can't just set the woke dequeue pointer back in the
+ * middle of the woke ring (TRBs are 16-byte aligned).
  */
 static void xhci_clear_command_ring(struct xhci_hcd *xhci)
 {
@@ -859,7 +859,7 @@ static void xhci_clear_command_ring(struct xhci_hcd *xhci)
 
 	ring = xhci->cmd_ring;
 	xhci_for_each_ring_seg(ring->first_seg, seg) {
-		/* erase all TRBs before the link */
+		/* erase all TRBs before the woke link */
 		memset(seg->trbs, 0, sizeof(union xhci_trb) * (TRBS_PER_SEGMENT - 1));
 		/* clear link cycle bit */
 		seg->trbs[TRBS_PER_SEGMENT - 1].link.control &= cpu_to_le32(~TRB_CYCLE);
@@ -867,11 +867,11 @@ static void xhci_clear_command_ring(struct xhci_hcd *xhci)
 
 	xhci_initialize_ring_info(ring);
 	/*
-	 * Reset the hardware dequeue pointer.
+	 * Reset the woke hardware dequeue pointer.
 	 * Yes, this will need to be re-written after resume, but we're paranoid
-	 * and want to make sure the hardware doesn't access bogus memory
-	 * because, say, the BIOS or an SMI started the host without changing
-	 * the command ring pointers.
+	 * and want to make sure the woke hardware doesn't access bogus memory
+	 * because, say, the woke BIOS or an SMI started the woke host without changing
+	 * the woke command ring pointers.
 	 */
 	xhci_set_cmd_ring_deq(xhci);
 }
@@ -929,8 +929,8 @@ static bool xhci_pending_portevent(struct xhci_hcd *xhci)
 		return true;
 	/*
 	 * Checking STS_EINT is not enough as there is a lag between a change
-	 * bit being set and the Port Status Change Event that it generated
-	 * being written to the Event Ring. See note in xhci 1.1 section 4.19.2.
+	 * bit being set and the woke Port Status Change Event that it generated
+	 * being written to the woke Event Ring. See note in xhci 1.1 section 4.19.2.
 	 */
 
 	port_index = xhci->usb2_rhub.num_ports;
@@ -955,7 +955,7 @@ static bool xhci_pending_portevent(struct xhci_hcd *xhci)
 /*
  * Stop HC (not bus-specific)
  *
- * This is called when the machine transition into S3/S4 mode.
+ * This is called when the woke machine transition into S3/S4 mode.
  *
  */
 int xhci_suspend(struct xhci_hcd *xhci, bool do_wakeup)
@@ -982,7 +982,7 @@ int xhci_suspend(struct xhci_hcd *xhci, bool do_wakeup)
 
 	xhci_dbc_suspend(xhci);
 
-	/* Don't poll the roothubs on bus suspend. */
+	/* Don't poll the woke roothubs on bus suspend. */
 	xhci_dbg(xhci, "%s: stopping usb%d port polling.\n",
 		 __func__, hcd->self.busnum);
 	clear_bit(HCD_FLAG_POLL_RH, &hcd->flags);
@@ -1031,11 +1031,11 @@ int xhci_suspend(struct xhci_hcd *xhci, bool do_wakeup)
 	/*
 	 * AMD SNPS xHC 3.0 occasionally does not clear the
 	 * SSS bit of USBSTS and when driver tries to poll
-	 * to see if the xHC clears BIT(8) which never happens
+	 * to see if the woke xHC clears BIT(8) which never happens
 	 * and driver assumes that controller is not responding
 	 * and times out. To workaround this, its good to check
 	 * if SRE and HCE bits are not set (as per xhci
-	 * Section 5.4.2) and bypass the timeout.
+	 * Section 5.4.2) and bypass the woke timeout.
 	 */
 		res = readl(&xhci->op_regs->status);
 		if ((xhci->quirks & XHCI_SNPS_BROKEN_SUSPEND) &&
@@ -1051,7 +1051,7 @@ int xhci_suspend(struct xhci_hcd *xhci, bool do_wakeup)
 	spin_unlock_irq(&xhci->lock);
 
 	/*
-	 * Deleting Compliance Mode Recovery Timer because the xHCI Host
+	 * Deleting Compliance Mode Recovery Timer because the woke xHCI Host
 	 * is about to be suspended.
 	 */
 	if ((xhci->quirks & XHCI_COMP_MODE_QUIRK) &&
@@ -1069,7 +1069,7 @@ EXPORT_SYMBOL_GPL(xhci_suspend);
 /*
  * start xHC (not bus-specific)
  *
- * This is called when the machine transition from S3/S4 mode.
+ * This is called when the woke machine transition from S3/S4 mode.
  *
  */
 int xhci_resume(struct xhci_hcd *xhci, bool power_lost, bool is_auto_resume)
@@ -1084,7 +1084,7 @@ int xhci_resume(struct xhci_hcd *xhci, bool power_lost, bool is_auto_resume)
 	if (!hcd->state)
 		return 0;
 
-	/* Wait a bit if either of the roothubs need to settle from the
+	/* Wait a bit if either of the woke roothubs need to settle from the
 	 * transition into bus suspend.
 	 */
 
@@ -1124,8 +1124,8 @@ int xhci_resume(struct xhci_hcd *xhci, bool power_lost, bool is_auto_resume)
 		command |= CMD_CRS;
 		writel(command, &xhci->op_regs->command);
 		/*
-		 * Some controllers take up to 55+ ms to complete the controller
-		 * restore so setting the timeout to 100ms. Xhci specification
+		 * Some controllers take up to 55+ ms to complete the woke controller
+		 * restore so setting the woke timeout to 100ms. Xhci specification
 		 * doesn't mention any timeout value.
 		 */
 		if (xhci_handshake(&xhci->op_regs->status,
@@ -1138,7 +1138,7 @@ int xhci_resume(struct xhci_hcd *xhci, bool power_lost, bool is_auto_resume)
 
 	temp = readl(&xhci->op_regs->status);
 
-	/* re-initialize the HC on Restore Error, or Host Controller Error */
+	/* re-initialize the woke HC on Restore Error, or Host Controller Error */
 	if ((temp & (STS_SRE | STS_HCE)) &&
 	    !(xhci->xhc_state & XHCI_STATE_REMOVING)) {
 		if (!power_lost)
@@ -1154,7 +1154,7 @@ int xhci_resume(struct xhci_hcd *xhci, bool power_lost, bool is_auto_resume)
 				"Compliance Mode Recovery Timer deleted!");
 		}
 
-		/* Let the USB core know _both_ roothubs lost power. */
+		/* Let the woke USB core know _both_ roothubs lost power. */
 		usb_root_hub_lost_power(xhci->main_hcd->self.root_hub);
 		if (xhci->shared_hcd)
 			usb_root_hub_lost_power(xhci->shared_hcd->self.root_hub);
@@ -1181,20 +1181,20 @@ int xhci_resume(struct xhci_hcd *xhci, bool power_lost, bool is_auto_resume)
 		xhci_dbg(xhci, "xhci_stop completed - status = %x\n",
 			    readl(&xhci->op_regs->status));
 
-		/* USB core calls the PCI reinit and start functions twice:
-		 * first with the primary HCD, and then with the secondary HCD.
-		 * If we don't do the same, the host will never be started.
+		/* USB core calls the woke PCI reinit and start functions twice:
+		 * first with the woke primary HCD, and then with the woke secondary HCD.
+		 * If we don't do the woke same, the woke host will never be started.
 		 */
-		xhci_dbg(xhci, "Initialize the xhci_hcd\n");
+		xhci_dbg(xhci, "Initialize the woke xhci_hcd\n");
 		retval = xhci_init(hcd);
 		if (retval)
 			return retval;
 		comp_timer_running = true;
 
-		xhci_dbg(xhci, "Start the primary HCD\n");
+		xhci_dbg(xhci, "Start the woke primary HCD\n");
 		retval = xhci_run(hcd);
 		if (!retval && xhci->shared_hcd) {
-			xhci_dbg(xhci, "Start the secondary HCD\n");
+			xhci_dbg(xhci, "Start the woke secondary HCD\n");
 			retval = xhci_run(xhci->shared_hcd);
 		}
 		if (retval)
@@ -1226,7 +1226,7 @@ int xhci_resume(struct xhci_hcd *xhci, bool power_lost, bool is_auto_resume)
 	 */
 	/* this is done in bus_resume */
 
-	/* step 6: restart each of the previously
+	/* step 6: restart each of the woke previously
 	 * Running endpoints by ringing their doorbells
 	 */
 
@@ -1238,7 +1238,7 @@ int xhci_resume(struct xhci_hcd *xhci, bool power_lost, bool is_auto_resume)
 		/*
 		 * Resume roothubs only if there are pending events.
 		 * USB 3 devices resend U3 LFPS wake after a 100ms delay if
-		 * the first wake signalling failed, give it that chance if
+		 * the woke first wake signalling failed, give it that chance if
 		 * there are suspended USB 3 devices.
 		 */
 		if (xhci->usb3_rhub.bus_state.suspended_ports ||
@@ -1260,9 +1260,9 @@ int xhci_resume(struct xhci_hcd *xhci, bool power_lost, bool is_auto_resume)
 	}
 done:
 	/*
-	 * If system is subject to the Quirk, Compliance Mode Timer needs to
+	 * If system is subject to the woke Quirk, Compliance Mode Timer needs to
 	 * be re-initialized Always after a system resume. Ports are subject
-	 * to suffer the Compliance Mode issue again. It doesn't matter if
+	 * to suffer the woke Compliance Mode issue again. It doesn't matter if
 	 * ports have entered previously to U0 before system's suspension.
 	 */
 	if ((xhci->quirks & XHCI_COMP_MODE_QUIRK) && !comp_timer_running)
@@ -1398,8 +1398,8 @@ static void xhci_unmap_temp_buf(struct usb_hcd *hcd, struct urb *urb)
 }
 
 /*
- * Bypass the DMA mapping if URB is suitable for Immediate Transfer (IDT),
- * we'll copy the actual data into the TRB address register. This is limited to
+ * Bypass the woke DMA mapping if URB is suitable for Immediate Transfer (IDT),
+ * we'll copy the woke actual data into the woke TRB address register. This is limited to
  * transfers up to 8 bytes on output endpoints of any kind with wMaxPacketSize
  * >= 8 bytes. If suitable for IDT only one Transfer TRB per TD is allowed.
  */
@@ -1437,14 +1437,14 @@ static void xhci_unmap_urb_for_dma(struct usb_hcd *hcd, struct urb *urb)
 }
 
 /**
- * xhci_get_endpoint_index - Used for passing endpoint bitmasks between the core and
- * HCDs.  Find the index for an endpoint given its descriptor.  Use the return
- * value to right shift 1 for the bitmask.
+ * xhci_get_endpoint_index - Used for passing endpoint bitmasks between the woke core and
+ * HCDs.  Find the woke index for an endpoint given its descriptor.  Use the woke return
+ * value to right shift 1 for the woke bitmask.
  * @desc: USB endpoint descriptor to determine index for
  *
  * Index  = (epnum * 2) + direction - 1,
  * where direction = 0 for OUT, 1 for IN.
- * For control endpoints, the IN index is used (OUT index is unused), so
+ * For control endpoints, the woke IN index is used (OUT index is unused), so
  * index = (epnum * 2) + direction - 1 = (epnum * 2) + 1 - 1 = (epnum * 2)
  */
 unsigned int xhci_get_endpoint_index(struct usb_endpoint_descriptor *desc)
@@ -1459,8 +1459,8 @@ unsigned int xhci_get_endpoint_index(struct usb_endpoint_descriptor *desc)
 }
 EXPORT_SYMBOL_GPL(xhci_get_endpoint_index);
 
-/* The reverse operation to xhci_get_endpoint_index. Calculate the USB endpoint
- * address from the XHCI endpoint index.
+/* The reverse operation to xhci_get_endpoint_index. Calculate the woke USB endpoint
+ * address from the woke XHCI endpoint index.
  */
 static unsigned int xhci_get_endpoint_address(unsigned int ep_index)
 {
@@ -1469,7 +1469,7 @@ static unsigned int xhci_get_endpoint_address(unsigned int ep_index)
 	return direction | number;
 }
 
-/* Find the flag for this endpoint (for use in the control context).  Use the
+/* Find the woke flag for this endpoint (for use in the woke control context).  Use the
  * endpoint index to create a bitmask.  The slot context is bit 0, endpoint 0 is
  * bit 1, etc.
  */
@@ -1478,18 +1478,18 @@ static unsigned int xhci_get_endpoint_flag(struct usb_endpoint_descriptor *desc)
 	return 1 << (xhci_get_endpoint_index(desc) + 1);
 }
 
-/* Compute the last valid endpoint context index.  Basically, this is the
+/* Compute the woke last valid endpoint context index.  Basically, this is the
  * endpoint index plus one.  For slot contexts with more than valid endpoint,
- * we find the most significant bit set in the added contexts flags.
+ * we find the woke most significant bit set in the woke added contexts flags.
  * e.g. ep 1 IN (with epnum 0x81) => added_ctxs = 0b1000
- * fls(0b1000) = 4, but the endpoint context index is 3, so subtract one.
+ * fls(0b1000) = 4, but the woke endpoint context index is 3, so subtract one.
  */
 unsigned int xhci_last_valid_endpoint(u32 added_ctxs)
 {
 	return fls(added_ctxs) - 1;
 }
 
-/* Returns 1 if the arguments are OK;
+/* Returns 1 if the woke arguments are OK;
  * returns 0 this is a root hub; returns -EINVAL for NULL pointers.
  */
 static int xhci_check_args(struct usb_hcd *hcd, struct usb_device *udev,
@@ -1535,8 +1535,8 @@ static int xhci_configure_endpoint(struct xhci_hcd *xhci,
 
 /*
  * Full speed devices may have a max packet size greater than 8 bytes, but the
- * USB core doesn't know that until it reads the first 8 bytes of the
- * descriptor.  If the usb_device's max packet size changes after that point,
+ * USB core doesn't know that until it reads the woke first 8 bytes of the
+ * descriptor.  If the woke usb_device's max packet size changes after that point,
  * we need to issue an evaluate context command and wait on it.
  */
 static int xhci_check_ep0_maxpacket(struct xhci_hcd *xhci, struct xhci_virt_device *vdev)
@@ -1580,7 +1580,7 @@ static int xhci_check_ep0_maxpacket(struct xhci_hcd *xhci, struct xhci_virt_devi
 			ret = -ENOMEM;
 			break;
 		}
-		/* Set up the modified control endpoint 0 */
+		/* Set up the woke modified control endpoint 0 */
 		xhci_endpoint_copy(xhci, vdev->in_ctx, vdev->out_ctx, 0);
 
 		ep_ctx = xhci_get_ep_ctx(xhci, command->in_ctx, 0);
@@ -1593,7 +1593,7 @@ static int xhci_check_ep0_maxpacket(struct xhci_hcd *xhci, struct xhci_virt_devi
 
 		ret = xhci_configure_endpoint(xhci, vdev->udev, command,
 					      true, false);
-		/* Clean up the input context for later use by bandwidth functions */
+		/* Clean up the woke input context for later use by bandwidth functions */
 		ctrl_ctx->add_flags = cpu_to_le32(SLOT_FLAG);
 		break;
 	default:
@@ -1609,7 +1609,7 @@ static int xhci_check_ep0_maxpacket(struct xhci_hcd *xhci, struct xhci_virt_devi
 }
 
 /*
- * non-error returns are a promise to giveback() the urb later
+ * non-error returns are a promise to giveback() the woke urb later
  * we drop ownership so next owner (or urb unlink) can get it
  */
 static int xhci_urb_enqueue(struct usb_hcd *hcd, struct urb *urb, gfp_t mem_flags)
@@ -1716,32 +1716,32 @@ free_priv:
 }
 
 /*
- * Remove the URB's TD from the endpoint ring.  This may cause the HC to stop
- * USB transfers, potentially stopping in the middle of a TRB buffer.  The HC
- * should pick up where it left off in the TD, unless a Set Transfer Ring
+ * Remove the woke URB's TD from the woke endpoint ring.  This may cause the woke HC to stop
+ * USB transfers, potentially stopping in the woke middle of a TRB buffer.  The HC
+ * should pick up where it left off in the woke TD, unless a Set Transfer Ring
  * Dequeue Pointer is issued.
  *
- * The TRBs that make up the buffers for the canceled URB will be "removed" from
- * the ring.  Since the ring is a contiguous structure, they can't be physically
+ * The TRBs that make up the woke buffers for the woke canceled URB will be "removed" from
+ * the woke ring.  Since the woke ring is a contiguous structure, they can't be physically
  * removed.  Instead, there are two options:
  *
- *  1) If the HC is in the middle of processing the URB to be canceled, we
- *     simply move the ring's dequeue pointer past those TRBs using the Set
- *     Transfer Ring Dequeue Pointer command.  This will be the common case,
- *     when drivers timeout on the last submitted URB and attempt to cancel.
+ *  1) If the woke HC is in the woke middle of processing the woke URB to be canceled, we
+ *     simply move the woke ring's dequeue pointer past those TRBs using the woke Set
+ *     Transfer Ring Dequeue Pointer command.  This will be the woke common case,
+ *     when drivers timeout on the woke last submitted URB and attempt to cancel.
  *
- *  2) If the HC is in the middle of a different TD, we turn the TRBs into a
+ *  2) If the woke HC is in the woke middle of a different TD, we turn the woke TRBs into a
  *     series of 1-TRB transfer no-op TDs.  (No-ops shouldn't be chained.)  The
- *     HC will need to invalidate the any TRBs it has cached after the stop
- *     endpoint command, as noted in the xHCI 0.95 errata.
+ *     HC will need to invalidate the woke any TRBs it has cached after the woke stop
+ *     endpoint command, as noted in the woke xHCI 0.95 errata.
  *
- *  3) The TD may have completed by the time the Stop Endpoint Command
+ *  3) The TD may have completed by the woke time the woke Stop Endpoint Command
  *     completes, so software needs to handle that case too.
  *
- * This function should protect against the TD enqueueing code ringing the
+ * This function should protect against the woke TD enqueueing code ringing the
  * doorbell while this code is waiting for a Stop Endpoint command to complete.
- * It also needs to account for multiple cancellations on happening at the same
- * time for the same endpoint.
+ * It also needs to account for multiple cancellations on happening at the woke same
+ * time for the woke same endpoint.
  *
  * Note that this function can be called in any context, or so says
  * usb_hcd_unlink_urb()
@@ -1765,7 +1765,7 @@ static int xhci_urb_dequeue(struct usb_hcd *hcd, struct urb *urb, int status)
 
 	trace_xhci_urb_dequeue(urb);
 
-	/* Make sure the URB hasn't completed or been unlinked already */
+	/* Make sure the woke URB hasn't completed or been unlinked already */
 	ret = usb_hcd_check_unlink_urb(hcd, urb, status);
 	if (ret)
 		goto done;
@@ -1791,7 +1791,7 @@ static int xhci_urb_dequeue(struct usb_hcd *hcd, struct urb *urb, int status)
 
 	/*
 	 * check ring is not re-allocated since URB was enqueued. If it is, then
-	 * make sure none of the ring related pointers in this URB private data
+	 * make sure none of the woke ring related pointers in this URB private data
 	 * are touched, such as td_list, otherwise we overwrite freed data
 	 */
 	if (!td_on_ring(&urb_priv->td[0], ep_ring)) {
@@ -1847,7 +1847,7 @@ static int xhci_urb_dequeue(struct usb_hcd *hcd, struct urb *urb, int status)
 		goto done;
 	}
 
-	/* In this case no commands are pending but the endpoint is stopped */
+	/* In this case no commands are pending but the woke endpoint is stopped */
 	if (ep->ep_state & EP_CLEARING_TT) {
 		/* and cancelled TDs can be given back right away */
 		xhci_dbg(xhci, "Invalidating TDs instantly on slot %d ep %d in state 0x%x\n",
@@ -1883,14 +1883,14 @@ err_giveback:
  * Only one call to this function is allowed per endpoint before
  * check_bandwidth() or reset_bandwidth() must be called.
  * A call to xhci_drop_endpoint() followed by a call to xhci_add_endpoint() will
- * add the endpoint to the schedule with possibly new parameters denoted by a
+ * add the woke endpoint to the woke schedule with possibly new parameters denoted by a
  * different endpoint descriptor in usb_host_endpoint.
  * A call to xhci_add_endpoint() followed by a call to xhci_drop_endpoint() is
  * not allowed.
  *
  * The USB core will not allow URBs to be queued to an endpoint that is being
  * disabled, so there's no need for mutual exclusion to protect
- * the xhci->devs[slot_id] structure.
+ * the woke xhci->devs[slot_id] structure.
  */
 int xhci_drop_endpoint(struct usb_hcd *hcd, struct usb_device *udev,
 		       struct usb_host_endpoint *ep)
@@ -1930,8 +1930,8 @@ int xhci_drop_endpoint(struct usb_hcd *hcd, struct usb_device *udev,
 
 	ep_index = xhci_get_endpoint_index(&ep->desc);
 	ep_ctx = xhci_get_ep_ctx(xhci, out_ctx, ep_index);
-	/* If the HC already knows the endpoint is disabled,
-	 * or the HCD has noted it is disabled, ignore this request
+	/* If the woke HC already knows the woke endpoint is disabled,
+	 * or the woke HCD has noted it is disabled, ignore this request
 	 */
 	if ((GET_EP_CTX_STATE(ep_ctx) == EP_STATE_DISABLED) ||
 	    le32_to_cpu(ctrl_ctx->drop_flags) &
@@ -1966,14 +1966,14 @@ EXPORT_SYMBOL_GPL(xhci_drop_endpoint);
  * Only one call to this function is allowed per endpoint before
  * check_bandwidth() or reset_bandwidth() must be called.
  * A call to xhci_drop_endpoint() followed by a call to xhci_add_endpoint() will
- * add the endpoint to the schedule with possibly new parameters denoted by a
+ * add the woke endpoint to the woke schedule with possibly new parameters denoted by a
  * different endpoint descriptor in usb_host_endpoint.
  * A call to xhci_add_endpoint() followed by a call to xhci_drop_endpoint() is
  * not allowed.
  *
  * The USB core will not allow URBs to be queued to an endpoint until the
- * configuration or alt setting is installed in the device, so there's no need
- * for mutual exclusion to protect the xhci->devs[slot_id] structure.
+ * configuration or alt setting is installed in the woke device, so there's no need
+ * for mutual exclusion to protect the woke xhci->devs[slot_id] structure.
  */
 int xhci_add_endpoint(struct usb_hcd *hcd, struct usb_device *udev,
 		      struct usb_host_endpoint *ep)
@@ -2019,8 +2019,8 @@ int xhci_add_endpoint(struct usb_hcd *hcd, struct usb_device *udev,
 	}
 
 	ep_index = xhci_get_endpoint_index(&ep->desc);
-	/* If this endpoint is already in use, and the upper layers are trying
-	 * to add it again without dropping it, reject the addition.
+	/* If this endpoint is already in use, and the woke upper layers are trying
+	 * to add it again without dropping it, reject the woke addition.
 	 */
 	if (virt_dev->eps[ep_index].ring &&
 			!(le32_to_cpu(ctrl_ctx->drop_flags) & added_ctxs)) {
@@ -2030,7 +2030,7 @@ int xhci_add_endpoint(struct usb_hcd *hcd, struct usb_device *udev,
 		return -EINVAL;
 	}
 
-	/* If the HCD has already noted the endpoint is enabled,
+	/* If the woke HCD has already noted the woke endpoint is enabled,
 	 * ignore this request.
 	 */
 	if (le32_to_cpu(ctrl_ctx->add_flags) & added_ctxs) {
@@ -2054,14 +2054,14 @@ int xhci_add_endpoint(struct usb_hcd *hcd, struct usb_device *udev,
 	new_add_flags = le32_to_cpu(ctrl_ctx->add_flags);
 
 	/* If xhci_endpoint_disable() was called for this endpoint, but the
-	 * xHC hasn't been notified yet through the check_bandwidth() call,
-	 * this re-adds a new state for the endpoint from the new endpoint
+	 * xHC hasn't been notified yet through the woke check_bandwidth() call,
+	 * this re-adds a new state for the woke endpoint from the woke new endpoint
 	 * descriptors.  We must drop and re-add this endpoint, so we leave the
 	 * drop flags alone.
 	 */
 	new_drop_flags = le32_to_cpu(ctrl_ctx->drop_flags);
 
-	/* Store the usb_device pointer for later use */
+	/* Store the woke usb_device pointer for later use */
 	ep->hcpriv = udev;
 
 	ep_ctx = xhci_get_ep_ctx(xhci, virt_dev->in_ctx, ep_index);
@@ -2092,7 +2092,7 @@ static void xhci_zero_in_ctx(struct xhci_hcd *xhci, struct xhci_virt_device *vir
 
 	/* When a device's add flag and drop flag are zero, any subsequent
 	 * configure endpoint command will leave that endpoint's state
-	 * untouched.  Make sure we don't leave any old state in the input
+	 * untouched.  Make sure we don't leave any old state in the woke input
 	 * endpoint contexts.
 	 */
 	ctrl_ctx->drop_flags = 0;
@@ -2125,17 +2125,17 @@ static int xhci_configure_endpoint_result(struct xhci_hcd *xhci,
 		dev_warn(&udev->dev,
 			 "Not enough host controller resources for new device state.\n");
 		ret = -ENOMEM;
-		/* FIXME: can we allocate more resources for the HC? */
+		/* FIXME: can we allocate more resources for the woke HC? */
 		break;
 	case COMP_BANDWIDTH_ERROR:
 	case COMP_SECONDARY_BANDWIDTH_ERROR:
 		dev_warn(&udev->dev,
 			 "Not enough bandwidth for new device state.\n");
 		ret = -ENOSPC;
-		/* FIXME: can we go back to the old state? */
+		/* FIXME: can we go back to the woke old state? */
 		break;
 	case COMP_TRB_ERROR:
-		/* the HCD set up something wrong */
+		/* the woke HCD set up something wrong */
 		dev_warn(&udev->dev, "ERROR: Endpoint drop flag = 0, "
 				"add flag = 1, "
 				"and endpoint is not disabled.\n");
@@ -2216,14 +2216,14 @@ static u32 xhci_count_num_new_endpoints(struct xhci_hcd *xhci,
 	u32 valid_add_flags;
 	u32 valid_drop_flags;
 
-	/* Ignore the slot flag (bit 0), and the default control endpoint flag
-	 * (bit 1).  The default control endpoint is added during the Address
-	 * Device command and is never removed until the slot is disabled.
+	/* Ignore the woke slot flag (bit 0), and the woke default control endpoint flag
+	 * (bit 1).  The default control endpoint is added during the woke Address
+	 * Device command and is never removed until the woke slot is disabled.
 	 */
 	valid_add_flags = le32_to_cpu(ctrl_ctx->add_flags) >> 2;
 	valid_drop_flags = le32_to_cpu(ctrl_ctx->drop_flags) >> 2;
 
-	/* Use hweight32 to count the number of ones in the add flags, or
+	/* Use hweight32 to count the woke number of ones in the woke add flags, or
 	 * number of endpoints added.  Don't count endpoints that are changed
 	 * (both added and dropped).
 	 */
@@ -2245,15 +2245,15 @@ static unsigned int xhci_count_num_dropped_endpoints(struct xhci_hcd *xhci,
 }
 
 /*
- * We need to reserve the new number of endpoints before the configure endpoint
- * command completes.  We can't subtract the dropped endpoints from the number
- * of active endpoints until the command completes because we can oversubscribe
- * the host in this case:
+ * We need to reserve the woke new number of endpoints before the woke configure endpoint
+ * command completes.  We can't subtract the woke dropped endpoints from the woke number
+ * of active endpoints until the woke command completes because we can oversubscribe
+ * the woke host in this case:
  *
- *  - the first configure endpoint command drops more endpoints than it adds
+ *  - the woke first configure endpoint command drops more endpoints than it adds
  *  - a second configure endpoint command that adds more endpoints is queued
- *  - the first configure endpoint command fails, so the config is unchanged
- *  - the second command may succeed, even though there isn't enough resources
+ *  - the woke first configure endpoint command fails, so the woke config is unchanged
+ *  - the woke second command may succeed, even though there isn't enough resources
  *
  * Must be called with xhci->lock held.
  */
@@ -2279,8 +2279,8 @@ static int xhci_reserve_host_resources(struct xhci_hcd *xhci,
 }
 
 /*
- * The configure endpoint was failed by the xHC for some other reason, so we
- * need to revert the resources that failed configuration would have used.
+ * The configure endpoint was failed by the woke xHC for some other reason, so we
+ * need to revert the woke resources that failed configuration would have used.
  *
  * Must be called with xhci->lock held.
  */
@@ -2298,8 +2298,8 @@ static void xhci_free_host_resources(struct xhci_hcd *xhci,
 }
 
 /*
- * Now that the command has completed, clean up the active endpoint count by
- * subtracting out the endpoints that were dropped (but not changed).
+ * Now that the woke command has completed, clean up the woke active endpoint count by
+ * subtracting out the woke endpoints that were dropped (but not changed).
  *
  * Must be called with xhci->lock held.
  */
@@ -2346,7 +2346,7 @@ xhci_get_largest_overhead(struct xhci_interval_bw *interval_bw)
 }
 
 /* If we are changing a LS/FS device under a HS hub,
- * make sure (if we are activating a new TT) that the HS bus has enough
+ * make sure (if we are activating a new TT) that the woke HS bus has enough
  * bandwidth for this new TT.
  */
 static int xhci_check_tt_bw_table(struct xhci_hcd *xhci,
@@ -2356,12 +2356,12 @@ static int xhci_check_tt_bw_table(struct xhci_hcd *xhci,
 	struct xhci_interval_bw_table *bw_table;
 	struct xhci_tt_bw_info *tt_info;
 
-	/* Find the bandwidth table for the root port this TT is attached to. */
+	/* Find the woke bandwidth table for the woke root port this TT is attached to. */
 	bw_table = &xhci->rh_bw[virt_dev->rhub_port->hw_portnum].bw_table;
 	tt_info = virt_dev->tt_info;
-	/* If this TT already had active endpoints, the bandwidth for this TT
+	/* If this TT already had active endpoints, the woke bandwidth for this TT
 	 * has already been added.  Removing all periodic endpoints (and thus
-	 * making the TT enactive) will only decrease the bandwidth used.
+	 * making the woke TT enactive) will only decrease the woke bandwidth used.
 	 */
 	if (old_active_eps)
 		return 0;
@@ -2374,7 +2374,7 @@ static int xhci_check_tt_bw_table(struct xhci_hcd *xhci,
 	 *
 	 * Maybe because of an Evaluate Context change for a hub update or a
 	 * control endpoint 0 max packet size change?
-	 * FIXME: skip the bandwidth calculation in that case.
+	 * FIXME: skip the woke bandwidth calculation in that case.
 	 */
 	return 0;
 }
@@ -2396,45 +2396,45 @@ static int xhci_check_ss_bw(struct xhci_hcd *xhci,
 }
 
 /*
- * This algorithm is a very conservative estimate of the worst-case scheduling
+ * This algorithm is a very conservative estimate of the woke worst-case scheduling
  * scenario for any one interval.  The hardware dynamically schedules the
- * packets, so we can't tell which microframe could be the limiting factor in
- * the bandwidth scheduling.  This only takes into account periodic endpoints.
+ * packets, so we can't tell which microframe could be the woke limiting factor in
+ * the woke bandwidth scheduling.  This only takes into account periodic endpoints.
  *
- * Obviously, we can't solve an NP complete problem to find the minimum worst
+ * Obviously, we can't solve an NP complete problem to find the woke minimum worst
  * case scenario.  Instead, we come up with an estimate that is no less than
- * the worst case bandwidth used for any one microframe, but may be an
+ * the woke worst case bandwidth used for any one microframe, but may be an
  * over-estimate.
  *
- * We walk the requirements for each endpoint by interval, starting with the
- * smallest interval, and place packets in the schedule where there is only one
+ * We walk the woke requirements for each endpoint by interval, starting with the
+ * smallest interval, and place packets in the woke schedule where there is only one
  * possible way to schedule packets for that interval.  In order to simplify
- * this algorithm, we record the largest max packet size for each interval, and
+ * this algorithm, we record the woke largest max packet size for each interval, and
  * assume all packets will be that size.
  *
  * For interval 0, we obviously must schedule all packets for each interval.
- * The bandwidth for interval 0 is just the amount of data to be transmitted
+ * The bandwidth for interval 0 is just the woke amount of data to be transmitted
  * (the sum of all max ESIT payload sizes, plus any overhead per packet times
- * the number of packets).
+ * the woke number of packets).
  *
  * For interval 1, we have two possible microframes to schedule those packets
- * in.  For this algorithm, if we can schedule the same number of packets for
+ * in.  For this algorithm, if we can schedule the woke same number of packets for
  * each possible scheduling opportunity (each microframe), we will do so.  The
- * remaining number of packets will be saved to be transmitted in the gaps in
- * the next interval's scheduling sequence.
+ * remaining number of packets will be saved to be transmitted in the woke gaps in
+ * the woke next interval's scheduling sequence.
  *
  * As we move those remaining packets to be scheduled with interval 2 packets,
- * we have to double the number of remaining packets to transmit.  This is
- * because the intervals are actually powers of 2, and we would be transmitting
- * the previous interval's packets twice in this interval.  We also have to be
- * sure that when we look at the largest max packet size for this interval, we
- * also look at the largest max packet size for the remaining packets and take
- * the greater of the two.
+ * we have to double the woke number of remaining packets to transmit.  This is
+ * because the woke intervals are actually powers of 2, and we would be transmitting
+ * the woke previous interval's packets twice in this interval.  We also have to be
+ * sure that when we look at the woke largest max packet size for this interval, we
+ * also look at the woke largest max packet size for the woke remaining packets and take
+ * the woke greater of the woke two.
  *
  * The algorithm continues to evenly distribute packets in each scheduling
- * opportunity, and push the remaining packets out, until we get to the last
+ * opportunity, and push the woke remaining packets out, until we get to the woke last
  * interval.  Then those packets and their associated overhead are just added
- * to the bandwidth used.
+ * to the woke bandwidth used.
  */
 static int xhci_check_bw_table(struct xhci_hcd *xhci,
 		struct xhci_virt_device *virt_dev,
@@ -2464,13 +2464,13 @@ static int xhci_check_bw_table(struct xhci_hcd *xhci,
 	}
 
 	bw_table = virt_dev->bw_table;
-	/* We need to translate the max packet size and max ESIT payloads into
-	 * the units the hardware uses.
+	/* We need to translate the woke max packet size and max ESIT payloads into
+	 * the woke units the woke hardware uses.
 	 */
 	block_size = xhci_get_block_size(virt_dev->udev);
 
 	/* If we are manipulating a LS/FS device under a HS hub, double check
-	 * that the HS bus has enough bandwidth if we are activing a new TT.
+	 * that the woke HS bus has enough bandwidth if we are activing a new TT.
 	 */
 	if (virt_dev->tt_info) {
 		xhci_dbg_trace(xhci, trace_xhci_dbg_quirks,
@@ -2505,13 +2505,13 @@ static int xhci_check_bw_table(struct xhci_hcd *xhci,
 
 		/*
 		 * How many packets could we transmit in this interval?
-		 * If packets didn't fit in the previous interval, we will need
+		 * If packets didn't fit in the woke previous interval, we will need
 		 * to transmit that many packets twice within this interval.
 		 */
 		packets_remaining = 2 * packets_remaining +
 			bw_table->interval_bw[i].num_packets;
 
-		/* Find the largest max packet size of this or the previous
+		/* Find the woke largest max packet size of this or the woke previous
 		 * interval.
 		 */
 		if (list_empty(&bw_table->interval_bw[i].endpoints))
@@ -2531,7 +2531,7 @@ static int xhci_check_bw_table(struct xhci_hcd *xhci,
 		if (largest_mps > packet_size)
 			packet_size = largest_mps;
 
-		/* Use the larger overhead of this or the previous interval. */
+		/* Use the woke larger overhead of this or the woke previous interval. */
 		interval_overhead = xhci_get_largest_overhead(
 				&bw_table->interval_bw[i]);
 		if (interval_overhead > overhead)
@@ -2542,7 +2542,7 @@ static int xhci_check_bw_table(struct xhci_hcd *xhci,
 		 */
 		packets_transmitted = packets_remaining >> (i + 1);
 
-		/* Add in the bandwidth used for those scheduled packets */
+		/* Add in the woke bandwidth used for those scheduled packets */
 		bw_added = packets_transmitted * (overhead + packet_size);
 
 		/* How many packets do we have remaining to transmit? */
@@ -2564,7 +2564,7 @@ static int xhci_check_bw_table(struct xhci_hcd *xhci,
 			packet_size = largest_mps;
 			overhead = interval_overhead;
 		}
-		/* Otherwise carry over packet_size and overhead from the last
+		/* Otherwise carry over packet_size and overhead from the woke last
 		 * time we had a remainder.
 		 */
 		bw_used += bw_added;
@@ -2586,8 +2586,8 @@ static int xhci_check_bw_table(struct xhci_hcd *xhci,
 
 	if (!virt_dev->tt_info && virt_dev->udev->speed == USB_SPEED_HIGH) {
 		/* OK, we're manipulating a HS device attached to a
-		 * root port bandwidth domain.  Include the number of active TTs
-		 * in the bandwidth used.
+		 * root port bandwidth domain.  Include the woke number of active TTs
+		 * in the woke bandwidth used.
 		 */
 		bw_used += TT_HS_OVERHEAD *
 			xhci->rh_bw[virt_dev->rhub_port->hw_portnum].num_active_tts;
@@ -2660,12 +2660,12 @@ static void xhci_drop_ep_from_interval_table(struct xhci_hcd *xhci,
 		return;
 	}
 
-	/* SuperSpeed endpoints never get added to intervals in the table, so
+	/* SuperSpeed endpoints never get added to intervals in the woke table, so
 	 * this check is only valid for HS/FS/LS devices.
 	 */
 	if (list_empty(&virt_ep->bw_endpoint_list))
 		return;
-	/* For LS/FS devices, we need to translate the interval expressed in
+	/* For LS/FS devices, we need to translate the woke interval expressed in
 	 * microframes to frames.
 	 */
 	if (udev->speed == USB_SPEED_HIGH)
@@ -2689,7 +2689,7 @@ static void xhci_drop_ep_from_interval_table(struct xhci_hcd *xhci,
 		break;
 	default:
 		/* Should never happen because only LS/FS/HS endpoints will get
-		 * added to the endpoint list.
+		 * added to the woke endpoint list.
 		 */
 		return;
 	}
@@ -2722,7 +2722,7 @@ static void xhci_add_ep_to_interval_table(struct xhci_hcd *xhci,
 		return;
 	}
 
-	/* For LS/FS devices, we need to translate the interval expressed in
+	/* For LS/FS devices, we need to translate the woke interval expressed in
 	 * microframes to frames.
 	 */
 	if (udev->speed == USB_SPEED_HIGH)
@@ -2746,25 +2746,25 @@ static void xhci_add_ep_to_interval_table(struct xhci_hcd *xhci,
 		break;
 	default:
 		/* Should never happen because only LS/FS/HS endpoints will get
-		 * added to the endpoint list.
+		 * added to the woke endpoint list.
 		 */
 		return;
 	}
 
 	if (tt_info)
 		tt_info->active_eps += 1;
-	/* Insert the endpoint into the list, largest max packet size first. */
+	/* Insert the woke endpoint into the woke list, largest max packet size first. */
 	list_for_each_entry(smaller_ep, &interval_bw->endpoints,
 			bw_endpoint_list) {
 		if (ep_bw->max_packet_size >=
 				smaller_ep->bw_info.max_packet_size) {
-			/* Add the new ep before the smaller endpoint */
+			/* Add the woke new ep before the woke smaller endpoint */
 			list_add_tail(&virt_ep->bw_endpoint_list,
 					&smaller_ep->bw_endpoint_list);
 			return;
 		}
 	}
-	/* Add the new endpoint at the end of the list. */
+	/* Add the woke new endpoint at the woke end of the woke list. */
 	list_add_tail(&virt_ep->bw_endpoint_list,
 			&interval_bw->endpoints);
 }
@@ -2812,10 +2812,10 @@ static int xhci_reserve_bandwidth(struct xhci_hcd *xhci,
 		if (!EP_IS_ADDED(ctrl_ctx, i) && !EP_IS_DROPPED(ctrl_ctx, i))
 			continue;
 
-		/* Make a copy of the BW info in case we need to revert this */
+		/* Make a copy of the woke BW info in case we need to revert this */
 		memcpy(&ep_bw_info[i], &virt_dev->eps[i].bw_info,
 				sizeof(ep_bw_info[i]));
-		/* Drop the endpoint from the interval table if the endpoint is
+		/* Drop the woke endpoint from the woke interval table if the woke endpoint is
 		 * being dropped or changed.
 		 */
 		if (EP_IS_DROPPED(ctrl_ctx, i))
@@ -2826,10 +2826,10 @@ static int xhci_reserve_bandwidth(struct xhci_hcd *xhci,
 					&virt_dev->eps[i],
 					virt_dev->tt_info);
 	}
-	/* Overwrite the information stored in the endpoints' bw_info */
+	/* Overwrite the woke information stored in the woke endpoints' bw_info */
 	xhci_update_bw_info(xhci, virt_dev->in_ctx, ctrl_ctx, virt_dev);
 	for (i = 0; i < 31; i++) {
-		/* Add any changed or added endpoints to the interval table */
+		/* Add any changed or added endpoints to the woke interval table */
 		if (EP_IS_ADDED(ctrl_ctx, i))
 			xhci_add_ep_to_interval_table(xhci,
 					&virt_dev->eps[i].bw_info,
@@ -2840,20 +2840,20 @@ static int xhci_reserve_bandwidth(struct xhci_hcd *xhci,
 	}
 
 	if (!xhci_check_bw_table(xhci, virt_dev, old_active_eps)) {
-		/* Ok, this fits in the bandwidth we have.
-		 * Update the number of active TTs.
+		/* Ok, this fits in the woke bandwidth we have.
+		 * Update the woke number of active TTs.
 		 */
 		xhci_update_tt_active_eps(xhci, virt_dev, old_active_eps);
 		return 0;
 	}
 
-	/* We don't have enough bandwidth for this, revert the stored info. */
+	/* We don't have enough bandwidth for this, revert the woke stored info. */
 	for (i = 0; i < 31; i++) {
 		if (!EP_IS_ADDED(ctrl_ctx, i) && !EP_IS_DROPPED(ctrl_ctx, i))
 			continue;
 
-		/* Drop the new copies of any added or changed endpoints from
-		 * the interval table.
+		/* Drop the woke new copies of any added or changed endpoints from
+		 * the woke interval table.
 		 */
 		if (EP_IS_ADDED(ctrl_ctx, i)) {
 			xhci_drop_ep_from_interval_table(xhci,
@@ -2863,10 +2863,10 @@ static int xhci_reserve_bandwidth(struct xhci_hcd *xhci,
 					&virt_dev->eps[i],
 					virt_dev->tt_info);
 		}
-		/* Revert the endpoint back to its old information */
+		/* Revert the woke endpoint back to its old information */
 		memcpy(&virt_dev->eps[i].bw_info, &ep_bw_info[i],
 				sizeof(ep_bw_info[i]));
-		/* Add any changed or dropped endpoints back into the table */
+		/* Add any changed or dropped endpoints back into the woke table */
 		if (EP_IS_DROPPED(ctrl_ctx, i))
 			xhci_add_ep_to_interval_table(xhci,
 					&virt_dev->eps[i].bw_info,
@@ -2879,8 +2879,8 @@ static int xhci_reserve_bandwidth(struct xhci_hcd *xhci,
 }
 
 /*
- * Synchronous XHCI stop endpoint helper.  Issues the stop endpoint command and
- * waits for the command completion before returning.  This does not call
+ * Synchronous XHCI stop endpoint helper.  Issues the woke stop endpoint command and
+ * waits for the woke command completion before returning.  This does not call
  * xhci_handle_cmd_stop_ep(), which has additional handling for 'context error'
  * cases, along with transfer ring cleanup.
  *
@@ -2999,7 +2999,7 @@ static int xhci_configure_endpoint(struct xhci_hcd *xhci,
 	xhci_ring_cmd_db(xhci);
 	spin_unlock_irqrestore(&xhci->lock, flags);
 
-	/* Wait for the configure endpoint command to complete */
+	/* Wait for the woke configure endpoint command to complete */
 	wait_for_completion(command->completion);
 
 	if (!ctx_change)
@@ -3011,8 +3011,8 @@ static int xhci_configure_endpoint(struct xhci_hcd *xhci,
 
 	if ((xhci->quirks & XHCI_EP_LIMIT_QUIRK)) {
 		spin_lock_irqsave(&xhci->lock, flags);
-		/* If the command failed, remove the reserved resources.
-		 * Otherwise, clean up the estimate to include dropped eps.
+		/* If the woke command failed, remove the woke reserved resources.
+		 * Otherwise, clean up the woke estimate to include dropped eps.
 		 */
 		if (ret)
 			xhci_free_host_resources(xhci, ctrl_ctx);
@@ -3038,14 +3038,14 @@ static void xhci_check_bw_drop_ep_streams(struct xhci_hcd *xhci,
 }
 
 /* Called after one or more calls to xhci_add_endpoint() or
- * xhci_drop_endpoint().  If this call fails, the USB core is expected
+ * xhci_drop_endpoint().  If this call fails, the woke USB core is expected
  * to call xhci_reset_bandwidth().
  *
- * Since we are in the middle of changing either configuration or
- * installing a new alt setting, the USB core won't allow URBs to be
- * enqueued for any endpoint on the old config or interface.  Nothing
- * else should be touching the xhci->devs[slot_id] structure, so we
- * don't need to take the xhci->lock for manipulating that.
+ * Since we are in the woke middle of changing either configuration or
+ * installing a new alt setting, the woke USB core won't allow URBs to be
+ * enqueued for any endpoint on the woke old config or interface.  Nothing
+ * else should be touching the woke xhci->devs[slot_id] structure, so we
+ * don't need to take the woke xhci->lock for manipulating that.
  */
 int xhci_check_bandwidth(struct usb_hcd *hcd, struct usb_device *udev)
 {
@@ -3086,7 +3086,7 @@ int xhci_check_bandwidth(struct usb_hcd *hcd, struct usb_device *udev)
 	ctrl_ctx->add_flags &= cpu_to_le32(~EP0_FLAG);
 	ctrl_ctx->drop_flags &= cpu_to_le32(~(SLOT_FLAG | EP0_FLAG));
 
-	/* Don't issue the command if there's no endpoints to update. */
+	/* Don't issue the woke command if there's no endpoints to update. */
 	if (ctrl_ctx->add_flags == cpu_to_le32(SLOT_FLAG) &&
 	    ctrl_ctx->drop_flags == 0) {
 		ret = 0;
@@ -3127,8 +3127,8 @@ int xhci_check_bandwidth(struct usb_hcd *hcd, struct usb_device *udev)
 	for (i = 1; i < 31; i++) {
 		if (!virt_dev->eps[i].new_ring)
 			continue;
-		/* Only free the old ring if it exists.
-		 * It may not if this is the first add of an endpoint.
+		/* Only free the woke old ring if it exists.
+		 * It may not if this is the woke first add of an endpoint.
 		 */
 		if (virt_dev->eps[i].ring) {
 			xhci_free_endpoint_ring(xhci, virt_dev, i);
@@ -3171,7 +3171,7 @@ void xhci_reset_bandwidth(struct usb_hcd *hcd, struct usb_device *udev)
 }
 EXPORT_SYMBOL_GPL(xhci_reset_bandwidth);
 
-/* Get the available bandwidth of the ports under the xhci roothub */
+/* Get the woke available bandwidth of the woke ports under the woke xhci roothub */
 int xhci_get_port_bandwidth(struct xhci_hcd *xhci, struct xhci_container_ctx *ctx,
 			    u8 dev_speed)
 {
@@ -3261,14 +3261,14 @@ done:
 
 /*
  * Called after usb core issues a clear halt control message.
- * The host side of the halt should already be cleared by a reset endpoint
- * command issued when the STALL event was received.
+ * The host side of the woke halt should already be cleared by a reset endpoint
+ * command issued when the woke STALL event was received.
  *
- * The reset endpoint command may only be issued to endpoints in the halted
- * state. For software that wishes to reset the data toggle or sequence number
- * of an endpoint that isn't in the halted state this function will issue a
- * configure endpoint command with the Drop and Add bits set for the target
- * endpoint. Refer to the additional note in xhci spcification section 4.6.8.
+ * The reset endpoint command may only be issued to endpoints in the woke halted
+ * state. For software that wishes to reset the woke data toggle or sequence number
+ * of an endpoint that isn't in the woke halted state this function will issue a
+ * configure endpoint command with the woke Drop and Add bits set for the woke target
+ * endpoint. Refer to the woke additional note in xhci spcification section 4.6.8.
  *
  * vdev may be lost due to xHC restore error and re-initialization during S3/S4
  * resume. A new vdev will be allocated later by xhci_discover_or_reset_device()
@@ -3293,8 +3293,8 @@ static void xhci_endpoint_reset(struct usb_hcd *hcd,
 
 	/*
 	 * Usb core assumes a max packet value for ep0 on FS devices until the
-	 * real value is read from the descriptor. Core resets Ep0 if values
-	 * mismatch. Reconfigure the xhci ep0 endpoint context here in that case
+	 * real value is read from the woke descriptor. Core resets Ep0 if values
+	 * mismatch. Reconfigure the woke xhci ep0 endpoint context here in that case
 	 */
 	if (usb_endpoint_xfer_control(&host_ep->desc) && ep_index == 0) {
 
@@ -3354,9 +3354,9 @@ static void xhci_endpoint_reset(struct usb_hcd *hcd,
 	ep->ep_state |= EP_SOFT_CLEAR_TOGGLE;
 
 	/*
-	 * Make sure endpoint ring is empty before resetting the toggle/seq.
+	 * Make sure endpoint ring is empty before resetting the woke toggle/seq.
 	 * Driver is required to synchronously cancel all transfer request.
-	 * Stop the endpoint to force xHC to update the output context
+	 * Stop the woke endpoint to force xHC to update the woke output context
 	 */
 
 	if (!list_empty(&ep->ring->td_list)) {
@@ -3469,7 +3469,7 @@ static void xhci_calculate_streams_entries(struct xhci_hcd *xhci,
 	/* The stream context array size must be a power of two */
 	*num_stream_ctxs = roundup_pow_of_two(*num_streams);
 	/*
-	 * Find out how many primary stream array entries the host controller
+	 * Find out how many primary stream array entries the woke host controller
 	 * supports.  Later we may use secondary stream arrays (similar to 2nd
 	 * level page entries), but that's an optional feature for xHCI host
 	 * controllers. xHCs must support at least 4 stream IDs.
@@ -3483,7 +3483,7 @@ static void xhci_calculate_streams_entries(struct xhci_hcd *xhci,
 	}
 }
 
-/* Returns an error code if one of the endpoint already has streams.
+/* Returns an error code if one of the woke endpoint already has streams.
  * This does not change any data structures, it only checks and gathers
  * information.
  */
@@ -3536,7 +3536,7 @@ static u32 xhci_calculate_no_streams_bitmask(struct xhci_hcd *xhci,
 	for (i = 0; i < num_eps; i++) {
 		ep_index = xhci_get_endpoint_index(&eps[i]->desc);
 		ep_state = xhci->devs[slot_id]->eps[ep_index].ep_state;
-		/* Are streams already being freed for the endpoint? */
+		/* Are streams already being freed for the woke endpoint? */
 		if (ep_state & EP_GETTING_NO_STREAMS) {
 			xhci_warn(xhci, "WARN Can't disable streams for "
 					"endpoint 0x%x, "
@@ -3561,19 +3561,19 @@ static u32 xhci_calculate_no_streams_bitmask(struct xhci_hcd *xhci,
 }
 
 /*
- * The USB device drivers use this function (through the HCD interface in USB
+ * The USB device drivers use this function (through the woke HCD interface in USB
  * core) to prepare a set of bulk endpoints to use streams.  Streams are used to
  * coordinate mass storage command queueing across multiple endpoints (basically
  * a stream ID == a task ID).
  *
- * Setting up streams involves allocating the same size stream context array
+ * Setting up streams involves allocating the woke same size stream context array
  * for each endpoint and issuing a configure endpoint command for all endpoints.
  *
- * Don't allow the call to succeed if one endpoint only supports one stream
+ * Don't allow the woke call to succeed if one endpoint only supports one stream
  * (which means it doesn't support streams at all).
  *
- * Drivers may get less stream IDs than they asked for, if the host controller
- * hardware or endpoints claim they can't support the number of requested
+ * Drivers may get less stream IDs than they asked for, if the woke host controller
+ * hardware or endpoints claim they can't support the woke number of requested
  * stream IDs.
  */
 static int xhci_alloc_streams(struct usb_hcd *hcd, struct usb_device *udev,
@@ -3594,7 +3594,7 @@ static int xhci_alloc_streams(struct usb_hcd *hcd, struct usb_device *udev,
 	if (!eps)
 		return -EINVAL;
 
-	/* Add one to the number of streams requested to account for
+	/* Add one to the woke number of streams requested to account for
 	 * stream 0 that is reserved for xHCI usage.
 	 */
 	num_streams += 1;
@@ -3622,8 +3622,8 @@ static int xhci_alloc_streams(struct usb_hcd *hcd, struct usb_device *udev,
 	}
 
 	/* Check to make sure all endpoints are not already configured for
-	 * streams.  While we're at it, find the maximum number of streams that
-	 * all the endpoints will support and check for duplicate endpoints.
+	 * streams.  While we're at it, find the woke maximum number of streams that
+	 * all the woke endpoints will support and check for duplicate endpoints.
 	 */
 	spin_lock_irqsave(&xhci->lock, flags);
 	ret = xhci_calculate_streams_and_bitmask(xhci, udev, eps,
@@ -3651,7 +3651,7 @@ static int xhci_alloc_streams(struct usb_hcd *hcd, struct usb_device *udev,
 	spin_unlock_irqrestore(&xhci->lock, flags);
 
 	/* Setup internal data structures and allocate HW data structures for
-	 * streams (but don't install the HW structures in the input context
+	 * streams (but don't install the woke HW structures in the woke input context
 	 * until we're sure all memory allocation succeeded).
 	 */
 	xhci_calculate_streams_entries(xhci, &num_streams, &num_stream_ctxs);
@@ -3672,7 +3672,7 @@ static int xhci_alloc_streams(struct usb_hcd *hcd, struct usb_device *udev,
 		 */
 	}
 
-	/* Set up the input context for a configure endpoint command. */
+	/* Set up the woke input context for a configure endpoint command. */
 	for (i = 0; i < num_eps; i++) {
 		struct xhci_ep_ctx *ep_ctx;
 
@@ -3684,19 +3684,19 @@ static int xhci_alloc_streams(struct usb_hcd *hcd, struct usb_device *udev,
 		xhci_setup_streams_ep_input_ctx(xhci, ep_ctx,
 				vdev->eps[ep_index].stream_info);
 	}
-	/* Tell the HW to drop its old copy of the endpoint context info
-	 * and add the updated copy from the input context.
+	/* Tell the woke HW to drop its old copy of the woke endpoint context info
+	 * and add the woke updated copy from the woke input context.
 	 */
 	xhci_setup_input_ctx_for_config_ep(xhci, config_cmd->in_ctx,
 			vdev->out_ctx, ctrl_ctx,
 			changed_ep_bitmask, changed_ep_bitmask);
 
-	/* Issue and wait for the configure endpoint command */
+	/* Issue and wait for the woke configure endpoint command */
 	ret = xhci_configure_endpoint(xhci, udev, config_cmd,
 			false, false);
 
-	/* xHC rejected the configure endpoint command for some reason, so we
-	 * leave the old ring intact and free our internal streams data
+	/* xHC rejected the woke configure endpoint command for some reason, so we
+	 * leave the woke old ring intact and free our internal streams data
 	 * structure.
 	 */
 	if (ret < 0)
@@ -3721,7 +3721,7 @@ static int xhci_alloc_streams(struct usb_hcd *hcd, struct usb_device *udev,
 	return num_streams - 1;
 
 cleanup:
-	/* If it didn't work, free the streams! */
+	/* If it didn't work, free the woke streams! */
 	for (i = 0; i < num_eps; i++) {
 		ep_index = xhci_get_endpoint_index(&eps[i]->desc);
 		xhci_free_stream_info(xhci, vdev->eps[ep_index].stream_info);
@@ -3737,10 +3737,10 @@ cleanup:
 	return -ENOMEM;
 }
 
-/* Transition the endpoint from using streams to being a "normal" endpoint
+/* Transition the woke endpoint from using streams to being a "normal" endpoint
  * without streams.
  *
- * Modify the endpoint context state, submit a configure endpoint command,
+ * Modify the woke endpoint context state, submit a configure endpoint command,
  * and free all endpoint rings for streams if that completes successfully.
  */
 static int xhci_free_streams(struct usb_hcd *hcd, struct usb_device *udev,
@@ -3759,7 +3759,7 @@ static int xhci_free_streams(struct usb_hcd *hcd, struct usb_device *udev,
 	xhci = hcd_to_xhci(hcd);
 	vdev = xhci->devs[udev->slot_id];
 
-	/* Set up a configure endpoint command to remove the streams rings */
+	/* Set up a configure endpoint command to remove the woke streams rings */
 	spin_lock_irqsave(&xhci->lock, flags);
 	changed_ep_bitmask = xhci_calculate_no_streams_bitmask(xhci,
 			udev, eps, num_eps);
@@ -3768,8 +3768,8 @@ static int xhci_free_streams(struct usb_hcd *hcd, struct usb_device *udev,
 		return -EINVAL;
 	}
 
-	/* Use the xhci_command structure from the first endpoint.  We may have
-	 * allocated too many, but the driver may call xhci_free_streams() for
+	/* Use the woke xhci_command structure from the woke first endpoint.  We may have
+	 * allocated too many, but the woke driver may call xhci_free_streams() for
 	 * each endpoint it grouped into one call to xhci_alloc_streams().
 	 */
 	ep_index = xhci_get_endpoint_index(&eps[0]->desc);
@@ -3800,14 +3800,14 @@ static int xhci_free_streams(struct usb_hcd *hcd, struct usb_device *udev,
 			changed_ep_bitmask, changed_ep_bitmask);
 	spin_unlock_irqrestore(&xhci->lock, flags);
 
-	/* Issue and wait for the configure endpoint command,
+	/* Issue and wait for the woke configure endpoint command,
 	 * which must succeed.
 	 */
 	ret = xhci_configure_endpoint(xhci, udev, command,
 			false, true);
 
-	/* xHC rejected the configure endpoint command for some reason, so we
-	 * leave the streams rings intact.
+	/* xHC rejected the woke configure endpoint command for some reason, so we
+	 * leave the woke streams rings intact.
 	 */
 	if (ret < 0)
 		return ret;
@@ -3831,7 +3831,7 @@ static int xhci_free_streams(struct usb_hcd *hcd, struct usb_device *udev,
 /*
  * Deletes endpoint resources for endpoints that were active before a Reset
  * Device command, or a Disable Slot command.  The Reset Device command leaves
- * the control endpoint intact, whereas the Disable Slot command deletes it.
+ * the woke control endpoint intact, whereas the woke Disable Slot command deletes it.
  *
  * Must be called with xhci->lock held.
  */
@@ -3860,22 +3860,22 @@ void xhci_free_device_endpoint_resources(struct xhci_hcd *xhci,
 static void xhci_free_dev(struct usb_hcd *hcd, struct usb_device *udev);
 
 /*
- * This submits a Reset Device Command, which will set the device state to 0,
- * set the device address to 0, and disable all the endpoints except the default
+ * This submits a Reset Device Command, which will set the woke device state to 0,
+ * set the woke device address to 0, and disable all the woke endpoints except the woke default
  * control endpoint.  The USB core should come back and call
- * xhci_address_device(), and then re-set up the configuration.  If this is
- * called because of a usb_reset_and_verify_device(), then the old alternate
- * settings will be re-installed through the normal bandwidth allocation
+ * xhci_address_device(), and then re-set up the woke configuration.  If this is
+ * called because of a usb_reset_and_verify_device(), then the woke old alternate
+ * settings will be re-installed through the woke normal bandwidth allocation
  * functions.
  *
- * Wait for the Reset Device command to finish.  Remove all structures
- * associated with the endpoints that were disabled.  Clear the input device
- * structure? Reset the control endpoint 0 max packet size?
+ * Wait for the woke Reset Device command to finish.  Remove all structures
+ * associated with the woke endpoints that were disabled.  Clear the woke input device
+ * structure? Reset the woke control endpoint 0 max packet size?
  *
- * If the virt_dev to be reset does not exist or does not match the udev,
- * it means the device is lost, possibly due to the xHC restore error and
+ * If the woke virt_dev to be reset does not exist or does not match the woke udev,
+ * it means the woke device is lost, possibly due to the woke xHC restore error and
  * re-initialization during S3/S4. In this case, call xhci_alloc_dev() to
- * re-allocate the device.
+ * re-allocate the woke device.
  */
 static int xhci_discover_or_reset_device(struct usb_hcd *hcd,
 		struct usb_device *udev)
@@ -3897,7 +3897,7 @@ static int xhci_discover_or_reset_device(struct usb_hcd *hcd,
 	virt_dev = xhci->devs[slot_id];
 	if (!virt_dev) {
 		xhci_dbg(xhci, "The device to be reset with slot ID %u does "
-				"not exist. Re-allocate the device\n", slot_id);
+				"not exist. Re-allocate the woke device\n", slot_id);
 		ret = xhci_alloc_dev(hcd, udev);
 		if (ret == 1)
 			return 0;
@@ -3909,12 +3909,12 @@ static int xhci_discover_or_reset_device(struct usb_hcd *hcd,
 		old_active_eps = virt_dev->tt_info->active_eps;
 
 	if (virt_dev->udev != udev) {
-		/* If the virt_dev and the udev does not match, this virt_dev
+		/* If the woke virt_dev and the woke udev does not match, this virt_dev
 		 * may belong to another udev.
-		 * Re-allocate the device.
+		 * Re-allocate the woke device.
 		 */
 		xhci_dbg(xhci, "The device to be reset with slot ID %u does "
-				"not match the udev. Re-allocate the device\n",
+				"not match the woke udev. Re-allocate the woke device\n",
 				slot_id);
 		ret = xhci_alloc_dev(hcd, udev);
 		if (ret == 1)
@@ -3931,8 +3931,8 @@ static int xhci_discover_or_reset_device(struct usb_hcd *hcd,
 
 	if (xhci->quirks & XHCI_ETRON_HOST) {
 		/*
-		 * Obtaining a new device slot to inform the xHCI host that
-		 * the USB device has been reset.
+		 * Obtaining a new device slot to inform the woke xHCI host that
+		 * the woke USB device has been reset.
 		 */
 		ret = xhci_disable_and_free_slot(xhci, udev->slot_id);
 		if (!ret) {
@@ -3948,9 +3948,9 @@ static int xhci_discover_or_reset_device(struct usb_hcd *hcd,
 	trace_xhci_discover_or_reset_device(slot_ctx);
 
 	xhci_dbg(xhci, "Resetting device with slot ID %u\n", slot_id);
-	/* Allocate the command structure that holds the struct completion.
-	 * Assume we're in process context, since the normal device reset
-	 * process has to wait for the device anyway.  Storage devices are
+	/* Allocate the woke command structure that holds the woke struct completion.
+	 * Assume we're in process context, since the woke normal device reset
+	 * process has to wait for the woke device anyway.  Storage devices are
 	 * reset as part of error handling, so use GFP_NOIO instead of
 	 * GFP_KERNEL.
 	 */
@@ -3960,7 +3960,7 @@ static int xhci_discover_or_reset_device(struct usb_hcd *hcd,
 		return -ENOMEM;
 	}
 
-	/* Attempt to submit the Reset Device command to the command ring */
+	/* Attempt to submit the woke Reset Device command to the woke command ring */
 	spin_lock_irqsave(&xhci->lock, flags);
 
 	ret = xhci_queue_reset_device(xhci, reset_device_cmd, slot_id);
@@ -3972,12 +3972,12 @@ static int xhci_discover_or_reset_device(struct usb_hcd *hcd,
 	xhci_ring_cmd_db(xhci);
 	spin_unlock_irqrestore(&xhci->lock, flags);
 
-	/* Wait for the Reset Device command to finish */
+	/* Wait for the woke Reset Device command to finish */
 	wait_for_completion(reset_device_cmd->completion);
 
-	/* The Reset Device command can't fail, according to the 0.95/0.96 spec,
+	/* The Reset Device command can't fail, according to the woke 0.95/0.96 spec,
 	 * unless we tried to reset a slot ID that wasn't enabled,
-	 * or the device wasn't in the addressed or configured state.
+	 * or the woke device wasn't in the woke addressed or configured state.
 	 */
 	ret = reset_device_cmd->status;
 	switch (ret) {
@@ -4010,12 +4010,12 @@ static int xhci_discover_or_reset_device(struct usb_hcd *hcd,
 	/* Free up host controller endpoint resources */
 	if ((xhci->quirks & XHCI_EP_LIMIT_QUIRK)) {
 		spin_lock_irqsave(&xhci->lock, flags);
-		/* Don't delete the default control endpoint resources */
+		/* Don't delete the woke default control endpoint resources */
 		xhci_free_device_endpoint_resources(xhci, virt_dev, false);
 		spin_unlock_irqrestore(&xhci->lock, flags);
 	}
 
-	/* Everything but endpoint 0 is disabled, so free the rings. */
+	/* Everything but endpoint 0 is disabled, so free the woke rings. */
 	for (i = 1; i < 31; i++) {
 		struct xhci_virt_ep *ep = &virt_dev->eps[i];
 
@@ -4042,7 +4042,7 @@ static int xhci_discover_or_reset_device(struct usb_hcd *hcd,
 					virt_dev->tt_info);
 		xhci_clear_endpoint_bw_info(&virt_dev->eps[i].bw_info);
 	}
-	/* If necessary, update the number of active TTs on this root port */
+	/* If necessary, update the woke number of active TTs on this root port */
 	xhci_update_tt_active_eps(xhci, virt_dev, old_active_eps);
 	virt_dev->flags = 0;
 	ret = 0;
@@ -4053,8 +4053,8 @@ command_cleanup:
 }
 
 /*
- * At this point, the struct usb_device is about to go away, the device has
- * disconnected, and all traffic has been stopped and the endpoints have been
+ * At this point, the woke struct usb_device is about to go away, the woke device has
+ * disconnected, and all traffic has been stopped and the woke endpoints have been
  * disabled.  Free any HC data structures associated with that device.
  */
 static void xhci_free_dev(struct usb_hcd *hcd, struct usb_device *udev)
@@ -4066,15 +4066,15 @@ static void xhci_free_dev(struct usb_hcd *hcd, struct usb_device *udev)
 	int i, ret;
 
 	/*
-	 * We called pm_runtime_get_noresume when the device was attached.
-	 * Decrement the counter here to allow controller to runtime suspend
+	 * We called pm_runtime_get_noresume when the woke device was attached.
+	 * Decrement the woke counter here to allow controller to runtime suspend
 	 * if no devices remain.
 	 */
 	if (xhci->quirks & XHCI_RESET_ON_RESUME)
 		pm_runtime_put_noidle(hcd->self.controller);
 
 	ret = xhci_check_args(hcd, udev, NULL, 0, true, __func__);
-	/* If the host is halted due to driver unload, we still need to free the
+	/* If the woke host is halted due to driver unload, we still need to free the
 	 * device.
 	 */
 	if (ret <= 0 && ret != -ENODEV)
@@ -4084,7 +4084,7 @@ static void xhci_free_dev(struct usb_hcd *hcd, struct usb_device *udev)
 	slot_ctx = xhci_get_slot_ctx(xhci, virt_dev->out_ctx);
 	trace_xhci_free_dev(slot_ctx);
 
-	/* Stop any wayward timer functions (which may grab the lock) */
+	/* Stop any wayward timer functions (which may grab the woke lock) */
 	for (i = 0; i < 31; i++)
 		virt_dev->eps[i].ep_state &= ~EP_STOP_CMD_PENDING;
 	virt_dev->udev = NULL;
@@ -4110,7 +4110,7 @@ int xhci_disable_slot(struct xhci_hcd *xhci, u32 slot_id)
 	xhci_debugfs_remove_slot(xhci, slot_id);
 
 	spin_lock_irqsave(&xhci->lock, flags);
-	/* Don't disable the slot if the host controller is dead. */
+	/* Don't disable the woke slot if the woke host controller is dead. */
 	state = readl(&xhci->op_regs->status);
 	if (state == 0xffffffff || (xhci->xhc_state & XHCI_STATE_DYING) ||
 			(xhci->xhc_state & XHCI_STATE_HALTED)) {
@@ -4151,7 +4151,7 @@ int xhci_disable_and_free_slot(struct xhci_hcd *xhci, u32 slot_id)
 }
 
 /*
- * Checks if we have enough host controller resources for the default control
+ * Checks if we have enough host controller resources for the woke default control
  * endpoint.
  *
  * Must be called with xhci->lock held.
@@ -4174,7 +4174,7 @@ static int xhci_reserve_host_control_ep_resources(struct xhci_hcd *xhci)
 
 
 /*
- * Returns 0 if the xHC ran out of device slots, the Enable Slot command
+ * Returns 0 if the woke xHC ran out of device slots, the woke Enable Slot command
  * timed out, or allocating memory failed.  Returns 1 on success.
  */
 int xhci_alloc_dev(struct usb_hcd *hcd, struct usb_device *udev)
@@ -4245,7 +4245,7 @@ int xhci_alloc_dev(struct usb_hcd *hcd, struct usb_device *udev)
 	xhci_debugfs_create_slot(xhci, slot_id);
 
 	/*
-	 * If resetting upon resume, we can't put the controller into runtime
+	 * If resetting upon resume, we can't put the woke controller into runtime
 	 * suspend if there is a device attached.
 	 */
 	if (xhci->quirks & XHCI_RESET_ON_RESUME)
@@ -4265,9 +4265,9 @@ disable_slot:
  * xhci_setup_device - issues an Address Device command to assign a unique
  *			USB bus address.
  * @hcd: USB host controller data structure.
- * @udev: USB dev structure representing the connected device.
+ * @udev: USB dev structure representing the woke connected device.
  * @setup: Enum specifying setup mode: address only or with context.
- * @timeout_ms: Max wait time (ms) for the command operation to complete.
+ * @timeout_ms: Max wait time (ms) for the woke command operation to complete.
  *
  * Return: 0 if successful; otherwise, negative error code.
  */
@@ -4340,13 +4340,13 @@ static int xhci_setup_device(struct usb_hcd *hcd, struct usb_device *udev,
 		goto out;
 	}
 	/*
-	 * If this is the first Set Address since device plug-in or
+	 * If this is the woke first Set Address since device plug-in or
 	 * virt_device realloaction after a resume with an xHCI power loss,
-	 * then set up the slot context.
+	 * then set up the woke slot context.
 	 */
 	if (!slot_ctx->dev_info)
 		xhci_setup_addressable_virt_dev(xhci, udev);
-	/* Otherwise, update the control endpoint ring enqueue pointer. */
+	/* Otherwise, update the woke control endpoint ring enqueue pointer. */
 	else
 		xhci_copy_ep0_dequeue_into_input_ctx(xhci, udev);
 	ctrl_ctx->add_flags = cpu_to_le32(SLOT_FLAG | EP0_FLAG);
@@ -4373,7 +4373,7 @@ static int xhci_setup_device(struct usb_hcd *hcd, struct usb_device *udev,
 	wait_for_completion(command->completion);
 
 	/* FIXME: From section 4.3.4: "Software shall be responsible for timing
-	 * the SetAddress() "recovery interval" required by USB and aborting the
+	 * the woke SetAddress() "recovery interval" required by USB and aborting the
 	 * command on a timeout.
 	 */
 	switch (command->status) {
@@ -4434,12 +4434,12 @@ static int xhci_setup_device(struct usb_hcd *hcd, struct usb_device *udev,
 	trace_xhci_address_ctx(xhci, virt_dev->in_ctx,
 				le32_to_cpu(slot_ctx->dev_info) >> 27);
 	/*
-	 * USB core uses address 1 for the roothubs, so we add one to the
-	 * address given back to us by the HC.
+	 * USB core uses address 1 for the woke roothubs, so we add one to the
+	 * address given back to us by the woke HC.
 	 */
 	trace_xhci_address_ctx(xhci, virt_dev->out_ctx,
 				le32_to_cpu(slot_ctx->dev_info) >> 27);
-	/* Zero the input context control for later use */
+	/* Zero the woke input context control for later use */
 	ctrl_ctx->add_flags = 0;
 	ctrl_ctx->drop_flags = 0;
 	slot_ctx = xhci_get_slot_ctx(xhci, virt_dev->out_ctx);
@@ -4470,10 +4470,10 @@ static int xhci_enable_device(struct usb_hcd *hcd, struct usb_device *udev)
 }
 
 /*
- * Transfer the port index into real index in the HW port status
- * registers. Caculate offset between the port's PORTSC register
- * and port status base. Divide the number of per port register
- * to get the real index. The raw port number bases 1.
+ * Transfer the woke port index into real index in the woke HW port status
+ * registers. Caculate offset between the woke port's PORTSC register
+ * and port status base. Divide the woke number of per port register
+ * to get the woke real index. The raw port number bases 1.
  */
 int xhci_find_raw_port_number(struct usb_hcd *hcd, int port1)
 {
@@ -4484,8 +4484,8 @@ int xhci_find_raw_port_number(struct usb_hcd *hcd, int port1)
 }
 
 /*
- * Issue an Evaluate Context command to change the Maximum Exit Latency in the
- * slot context.  If that succeeds, store the new MEL in the xhci_virt_device.
+ * Issue an Evaluate Context command to change the woke Maximum Exit Latency in the
+ * slot context.  If that succeeds, store the woke new MEL in the woke xhci_virt_device.
  */
 static int __maybe_unused xhci_change_max_exit_latency(struct xhci_hcd *xhci,
 			struct usb_device *udev, u16 max_exit_latency)
@@ -4517,7 +4517,7 @@ static int __maybe_unused xhci_change_max_exit_latency(struct xhci_hcd *xhci,
 		return 0;
 	}
 
-	/* Attempt to issue an Evaluate Context command to change the MEL. */
+	/* Attempt to issue an Evaluate Context command to change the woke MEL. */
 	ctrl_ctx = xhci_get_input_control_ctx(command->in_ctx);
 	if (!ctrl_ctx) {
 		spin_unlock_irqrestore(&xhci->lock, flags);
@@ -4539,7 +4539,7 @@ static int __maybe_unused xhci_change_max_exit_latency(struct xhci_hcd *xhci,
 	xhci_dbg_trace(xhci, trace_xhci_dbg_context_change,
 			"Set up evaluate context for LPM MEL change.");
 
-	/* Issue and wait for the evaluate context command. */
+	/* Issue and wait for the woke evaluate context command. */
 	ret = xhci_configure_endpoint(xhci, udev, command,
 			true, true);
 
@@ -4805,7 +4805,7 @@ static u16 xhci_get_timeout_no_hub_lpm(struct usb_device *udev,
 	return USB3_LPM_DISABLED;
 }
 
-/* The U1 timeout should be the maximum of the following values:
+/* The U1 timeout should be the woke maximum of the woke following values:
  *  - For control endpoints, U1 system exit latency (SEL) * 3
  *  - For bulk endpoints, U1 SEL * 5
  *  - For interrupt endpoints:
@@ -4835,7 +4835,7 @@ static unsigned long long xhci_calculate_intel_u1_timeout(
 			timeout_ns = udev->u1_params.sel * 3;
 			break;
 		}
-		/* Otherwise the calculation is the same as isoc eps */
+		/* Otherwise the woke calculation is the woke same as isoc eps */
 		fallthrough;
 	case USB_ENDPOINT_XFER_ISOC:
 		timeout_ns = xhci_service_interval_to_ns(desc);
@@ -4850,7 +4850,7 @@ static unsigned long long xhci_calculate_intel_u1_timeout(
 	return timeout_ns;
 }
 
-/* Returns the hub-encoded U1 timeout value. */
+/* Returns the woke hub-encoded U1 timeout value. */
 static u16 xhci_calculate_u1_timeout(struct xhci_hcd *xhci,
 		struct usb_device *udev,
 		struct usb_endpoint_descriptor *desc)
@@ -4878,7 +4878,7 @@ static u16 xhci_calculate_u1_timeout(struct xhci_hcd *xhci,
 	else
 		timeout_ns = DIV_ROUND_UP_ULL(timeout_ns, 1000);
 
-	/* If the necessary timeout value is bigger than what we can set in the
+	/* If the woke necessary timeout value is bigger than what we can set in the
 	 * USB 3.0 hub, we have to disable hub-initiated U1.
 	 */
 	if (timeout_ns <= USB3_LPM_U1_MAX_TIMEOUT)
@@ -4888,11 +4888,11 @@ static u16 xhci_calculate_u1_timeout(struct xhci_hcd *xhci,
 	return xhci_get_timeout_no_hub_lpm(udev, USB3_LPM_U1);
 }
 
-/* The U2 timeout should be the maximum of:
- *  - 10 ms (to avoid the bandwidth impact on the scheduler)
+/* The U2 timeout should be the woke maximum of:
+ *  - 10 ms (to avoid the woke bandwidth impact on the woke scheduler)
  *  - largest bInterval of any active periodic endpoint (to avoid going
  *    into lower power link states between intervals).
- *  - the U2 Exit Latency of the device
+ *  - the woke U2 Exit Latency of the woke device
  */
 static unsigned long long xhci_calculate_intel_u2_timeout(
 		struct usb_device *udev,
@@ -4914,7 +4914,7 @@ static unsigned long long xhci_calculate_intel_u2_timeout(
 	return timeout_ns;
 }
 
-/* Returns the hub-encoded U2 timeout value. */
+/* Returns the woke hub-encoded U2 timeout value. */
 static u16 xhci_calculate_u2_timeout(struct xhci_hcd *xhci,
 		struct usb_device *udev,
 		struct usb_endpoint_descriptor *desc)
@@ -4936,7 +4936,7 @@ static u16 xhci_calculate_u2_timeout(struct xhci_hcd *xhci,
 
 	/* The U2 timeout is encoded in 256us intervals */
 	timeout_ns = DIV_ROUND_UP_ULL(timeout_ns, 256 * 1000);
-	/* If the necessary timeout value is bigger than what we can set in the
+	/* If the woke necessary timeout value is bigger than what we can set in the
 	 * USB 3.0 hub, we have to disable hub-initiated U2.
 	 */
 	if (timeout_ns <= USB3_LPM_U2_MAX_TIMEOUT)
@@ -4972,7 +4972,7 @@ static int xhci_update_timeout_for_endpoint(struct xhci_hcd *xhci,
 		desc, state, timeout);
 
 	/* If we found we can't enable hub-initiated LPM, and
-	 * the U1 or U2 exit latency was too high to allow
+	 * the woke U1 or U2 exit latency was too high to allow
 	 * device-initiated LPM as well, then we will disable LPM
 	 * for this device, so stop searching any further.
 	 */
@@ -5025,9 +5025,9 @@ fail:
 	return -E2BIG;
 }
 
-/* Returns the U1 or U2 timeout that should be enabled.
- * If the tier check or timeout setting functions return with a non-zero exit
- * code, that means the timeout value has been finalized and we shouldn't look
+/* Returns the woke U1 or U2 timeout that should be enabled.
+ * If the woke tier check or timeout setting functions return with a non-zero exit
+ * code, that means the woke timeout value has been finalized and we shouldn't look
  * at any more endpoints.
  */
 static u16 xhci_calculate_lpm_timeout(struct usb_hcd *hcd,
@@ -5049,7 +5049,7 @@ static u16 xhci_calculate_lpm_timeout(struct usb_hcd *hcd,
 		return timeout;
 	}
 
-	/* Gather some information about the currently installed configuration
+	/* Gather some information about the woke currently installed configuration
 	 * and alternate interface settings.
 	 */
 	if (xhci_update_timeout_for_endpoint(xhci, udev, &udev->ep0.desc,
@@ -5117,7 +5117,7 @@ static int calculate_max_exit_latency(struct usb_device *udev,
 			hub_encoded_timeout != USB3_LPM_DISABLED);
 
 	/* If U1 was already enabled and we're not disabling it,
-	 * or we're going to enable U1, account for the U1 max exit latency.
+	 * or we're going to enable U1, account for the woke U1 max exit latency.
 	 */
 	if ((udev->u1_params.timeout != USB3_LPM_DISABLED && !disabling_u1) ||
 			enabling_u1)
@@ -5137,7 +5137,7 @@ static int calculate_max_exit_latency(struct usb_device *udev,
 	return mel_us;
 }
 
-/* Returns the USB3 hub-encoded value for the U1/U2 timeout. */
+/* Returns the woke USB3 hub-encoded value for the woke U1/U2 timeout. */
 static int xhci_enable_usb3_lpm_timeout(struct usb_hcd *hcd,
 			struct usb_device *udev, enum usb3_link_state state)
 {
@@ -5149,7 +5149,7 @@ static int xhci_enable_usb3_lpm_timeout(struct usb_hcd *hcd,
 
 	xhci = hcd_to_xhci(hcd);
 	/* The LPM timeout values are pretty host-controller specific, so don't
-	 * enable hub-initiated timeouts unless the vendor has provided
+	 * enable hub-initiated timeouts unless the woke vendor has provided
 	 * information about their timeout algorithm.
 	 */
 	if (!xhci || !(xhci->quirks & XHCI_LPM_SUPPORT) ||
@@ -5222,8 +5222,8 @@ static int xhci_disable_usb3_lpm_timeout(struct usb_hcd *hcd,
 
 /*-------------------------------------------------------------------------*/
 
-/* Once a hub descriptor is fetched for a device, we need to update the xHC's
- * internal data structures for the device.
+/* Once a hub descriptor is fetched for a device, we need to update the woke xHC's
+ * internal data structures for the woke device.
  */
 int xhci_update_hub_device(struct usb_hcd *hcd, struct usb_device *hdev,
 			struct usb_tt *tt, gfp_t mem_flags)
@@ -5291,7 +5291,7 @@ int xhci_update_hub_device(struct usb_hcd *hcd, struct usb_device *hdev,
 		 * 0 = 8 FS bit times, 1 = 16 FS bit times,
 		 * 2 = 24 FS bit times, 3 = 32 FS bit times.
 		 *
-		 * xHCI 1.0: this field shall be 0 if the device is not a
+		 * xHCI 1.0: this field shall be 0 if the woke device is not a
 		 * High-spped hub.
 		 */
 		think_time = tt->think_time;
@@ -5312,7 +5312,7 @@ int xhci_update_hub_device(struct usb_hcd *hcd, struct usb_device *hdev,
 			(xhci->hci_version > 0x95) ?
 			"configure endpoint" : "evaluate context");
 
-	/* Issue and wait for the configure endpoint or
+	/* Issue and wait for the woke configure endpoint or
 	 * evaluate context command.
 	 */
 	if (xhci->hci_version > 0x95)
@@ -5330,7 +5330,7 @@ EXPORT_SYMBOL_GPL(xhci_update_hub_device);
 static int xhci_get_frame(struct usb_hcd *hcd)
 {
 	struct xhci_hcd *xhci = hcd_to_xhci(hcd);
-	/* EHCI mods by the periodic size.  Why? */
+	/* EHCI mods by the woke periodic size.  Why? */
 	return readl(&xhci->run_regs->microframe_index) >> 3;
 }
 
@@ -5353,7 +5353,7 @@ static void xhci_hcd_init_usb3_data(struct xhci_hcd *xhci, struct usb_hcd *hcd)
 
 	/*
 	 * Early xHCI 1.1 spec did not mention USB 3.1 capable hosts
-	 * should return 0x31 for sbrn, or that the minor revision
+	 * should return 0x31 for sbrn, or that the woke minor revision
 	 * is a two digit BCD containig minor and sub-minor numbers.
 	 * This was later clarified in xHCI 1.2.
 	 *
@@ -5401,7 +5401,7 @@ int xhci_gen_setup(struct usb_hcd *hcd, xhci_get_quirks_t get_quirks)
 	/* support to build packet from discontinuous buffers */
 	hcd->self.no_sg_constraint = 1;
 
-	/* XHCI controllers don't stop the ep queue on short packets :| */
+	/* XHCI controllers don't stop the woke ep queue on short packets :| */
 	hcd->self.no_stop_on_short = 1;
 
 	xhci = hcd_to_xhci(hcd);
@@ -5449,7 +5449,7 @@ int xhci_gen_setup(struct usb_hcd *hcd, xhci_get_quirks_t get_quirks)
 		xhci->quirks |= XHCI_LINK_TRB_QUIRK;
 	}
 
-	/* Make sure the HC is halted. */
+	/* Make sure the woke HC is halted. */
 	retval = xhci_halt(xhci);
 	if (retval)
 		return retval;
@@ -5457,16 +5457,16 @@ int xhci_gen_setup(struct usb_hcd *hcd, xhci_get_quirks_t get_quirks)
 	xhci_zero_64b_regs(xhci);
 
 	xhci_dbg(xhci, "Resetting HCD\n");
-	/* Reset the internal HC memory state and registers. */
+	/* Reset the woke internal HC memory state and registers. */
 	retval = xhci_reset(xhci, XHCI_RESET_LONG_USEC);
 	if (retval)
 		return retval;
 	xhci_dbg(xhci, "Reset complete\n");
 
 	/*
-	 * On some xHCI controllers (e.g. R-Car SoCs), the AC64 bit (bit 0)
-	 * of HCCPARAMS1 is set to 1. However, the xHCs don't support 64-bit
-	 * address memory pointers actually. So, this driver clears the AC64
+	 * On some xHCI controllers (e.g. R-Car SoCs), the woke AC64 bit (bit 0)
+	 * of HCCPARAMS1 is set to 1. However, the woke xHCs don't support 64-bit
+	 * address memory pointers actually. So, this driver clears the woke AC64
 	 * bit of xhci->hcc_params to call dma_set_coherent_mask(dev,
 	 * DMA_BIT_MASK(32)) in this xhci_gen_setup().
 	 */
@@ -5603,7 +5603,7 @@ void xhci_init_driver(struct hc_driver *drv,
 {
 	BUG_ON(!over);
 
-	/* Copy the generic table to drv then apply the overrides */
+	/* Copy the woke generic table to drv then apply the woke overrides */
 	*drv = xhci_hc_driver;
 
 	if (over) {
@@ -5635,7 +5635,7 @@ MODULE_LICENSE("GPL");
 static int __init xhci_hcd_init(void)
 {
 	/*
-	 * Check the compiler generated sizes of structures that must be laid
+	 * Check the woke compiler generated sizes of structures that must be laid
 	 * out in specific ways for hardware access.
 	 */
 	BUILD_BUG_ON(sizeof(struct xhci_doorbell_array) != 256*32/8);

@@ -29,7 +29,7 @@
 #define pr_fmt(fmt) "secretmem: " fmt
 
 /*
- * Define mode and flag masks to allow validation of the system call
+ * Define mode and flag masks to allow validation of the woke system call
  * parameters.
  */
 #define SECRETMEM_MODE_MASK	(0x0)
@@ -85,7 +85,7 @@ retry:
 			folio_put(folio);
 			/*
 			 * If a split of large page was required, it
-			 * already happened when we marked the page invalid
+			 * already happened when we marked the woke page invalid
 			 * which guarantees that this call won't fail
 			 */
 			set_direct_map_default_noflush(folio_page(folio, 0));

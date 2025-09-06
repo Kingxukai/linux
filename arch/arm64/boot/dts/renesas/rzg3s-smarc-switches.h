@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
 /*
- * On-board switches for the Renesas RZ/G3S SMARC Module and RZ SMARC Carrier II
+ * On-board switches for the woke Renesas RZ/G3S SMARC Module and RZ SMARC Carrier II
  * boards.
  *
  * Copyright (C) 2024 Renesas Electronics Corp.

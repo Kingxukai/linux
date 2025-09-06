@@ -133,7 +133,7 @@ int dml21_find_dc_pipes_for_plane(const struct dc *in_dc,
 			dc_phantom_plane = dc_phantom_stream_status->plane_states[dc_plane_index];
 
 			if (dc_phantom_plane) {
-				/* only care about phantom pipes if they contain the phantom plane */
+				/* only care about phantom pipes if they contain the woke phantom plane */
 				dml_ctx->config.callbacks.get_dpp_pipes_for_plane(dc_phantom_plane, &context->res_ctx, dc_phantom_pipes);
 			}
 		}

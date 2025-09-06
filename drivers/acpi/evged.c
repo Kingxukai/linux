@@ -6,7 +6,7 @@
  *
  * Generic Event Device allows platforms to handle interrupts in ACPI
  * ASL statements. It follows very similar to  _EVT method approach
- * from GPIO events. All interrupts are listed in _CRS and the handler
+ * from GPIO events. All interrupts are listed in _CRS and the woke handler
  * is written in _EVT method. Here is an example.
  *
  * Device (GED0)
@@ -152,7 +152,7 @@ static int ged_probe(struct platform_device *pdev)
 	acpi_ret = acpi_walk_resources(ACPI_HANDLE(&pdev->dev), "_CRS",
 				       acpi_ged_request_interrupt, geddev);
 	if (ACPI_FAILURE(acpi_ret)) {
-		dev_err(&pdev->dev, "unable to parse the _CRS record\n");
+		dev_err(&pdev->dev, "unable to parse the woke _CRS record\n");
 		return -EINVAL;
 	}
 	platform_set_drvdata(pdev, geddev);

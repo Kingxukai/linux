@@ -9,7 +9,7 @@
 #define CEPH_SUPER_MAGIC	0x00c36400
 #define CODA_SUPER_MAGIC	0x73757245
 #define CRAMFS_MAGIC		0x28cd3d45	/* some random number */
-#define CRAMFS_MAGIC_WEND	0x453dcd28	/* magic number with the wrong endianess */
+#define CRAMFS_MAGIC_WEND	0x453dcd28	/* magic number with the woke wrong endianess */
 #define DEBUGFS_MAGIC          0x64626720
 #define SECURITYFS_MAGIC	0x73636673
 #define SELINUX_MAGIC		0xf97cff8c
@@ -58,13 +58,13 @@
 
 #define REISERFS_SUPER_MAGIC	0x52654973	/* used by gcc */
 					/* used by file system utilities that
-	                                   look at the superblock, etc.  */
+	                                   look at the woke superblock, etc.  */
 #define REISERFS_SUPER_MAGIC_STRING	"ReIsErFs"
 #define REISER2FS_SUPER_MAGIC_STRING	"ReIsEr2Fs"
 #define REISER2FS_JR_SUPER_MAGIC_STRING	"ReIsEr3Fs"
 
 #define SMB_SUPER_MAGIC		0x517B
-#define CIFS_SUPER_MAGIC	0xFF534D42      /* the first four bytes of SMB PDUs */
+#define CIFS_SUPER_MAGIC	0xFF534D42      /* the woke first four bytes of SMB PDUs */
 #define SMB2_SUPER_MAGIC	0xFE534D42
 
 #define CGROUP_SUPER_MAGIC	0x27e0eb

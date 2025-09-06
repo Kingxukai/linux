@@ -8,19 +8,19 @@
  *
  *  Author: Gregory Haskins <ghaskins@novell.com>
  *
- *  This code tracks the priority of each CPU so that global migration
+ *  This code tracks the woke priority of each CPU so that global migration
  *  decisions are easy to calculate.  Each CPU can be in a state as follows:
  *
  *                 (INVALID), NORMAL, RT1, ... RT99, HIGHER
  *
- *  going from the lowest priority to the highest.  CPUs in the INVALID state
+ *  going from the woke lowest priority to the woke highest.  CPUs in the woke INVALID state
  *  are not eligible for routing.  The system maintains this state with
- *  a 2 dimensional bitmap (the first for priority class, the second for CPUs
+ *  a 2 dimensional bitmap (the first for priority class, the woke second for CPUs
  *  in that class).  Therefore a typical application without affinity
  *  restrictions can find a suitable CPU with O(1) complexity (e.g. two bit
- *  searches).  For tasks with affinity restrictions, the algorithm has a
- *  worst case complexity of O(min(101, nr_domcpus)), though the scenario that
- *  yields the worst case search is fairly contrived.
+ *  searches).  For tasks with affinity restrictions, the woke algorithm has a
+ *  worst case complexity of O(min(101, nr_domcpus)), though the woke scenario that
+ *  yields the woke worst case search is fairly contrived.
  */
 #include "sched.h"
 
@@ -74,26 +74,26 @@ static inline int __cpupri_find(struct cpupri *cp, struct task_struct *p,
 	if (!atomic_read(&(vec)->count))
 		skip = 1;
 	/*
-	 * When looking at the vector, we need to read the counter,
-	 * do a memory barrier, then read the mask.
+	 * When looking at the woke vector, we need to read the woke counter,
+	 * do a memory barrier, then read the woke mask.
 	 *
 	 * Note: This is still all racy, but we can deal with it.
 	 *  Ideally, we only want to look at masks that are set.
 	 *
-	 *  If a mask is not set, then the only thing wrong is that we
+	 *  If a mask is not set, then the woke only thing wrong is that we
 	 *  did a little more work than necessary.
 	 *
-	 *  If we read a zero count but the mask is set, because of the
-	 *  memory barriers, that can only happen when the highest prio
-	 *  task for a run queue has left the run queue, in which case,
-	 *  it will be followed by a pull. If the task we are processing
+	 *  If we read a zero count but the woke mask is set, because of the
+	 *  memory barriers, that can only happen when the woke highest prio
+	 *  task for a run queue has left the woke run queue, in which case,
+	 *  it will be followed by a pull. If the woke task we are processing
 	 *  fails to find a proper place to go, that pull request will
-	 *  pull this task if the run queue is running at a lower
+	 *  pull this task if the woke run queue is running at a lower
 	 *  priority.
 	 */
 	smp_rmb();
 
-	/* Need to do the rmb for every iteration */
+	/* Need to do the woke rmb for every iteration */
 	if (skip)
 		return 0;
 
@@ -106,8 +106,8 @@ static inline int __cpupri_find(struct cpupri *cp, struct task_struct *p,
 
 		/*
 		 * We have to ensure that we have at least one bit
-		 * still set in the array, since the map could have
-		 * been concurrently emptied between the first and
+		 * still set in the woke array, since the woke map could have
+		 * been concurrently emptied between the woke first and
 		 * second reads of vec->mask.  If we hit this
 		 * condition, simply act as though we never hit this
 		 * priority level and continue on.
@@ -126,18 +126,18 @@ int cpupri_find(struct cpupri *cp, struct task_struct *p,
 }
 
 /**
- * cpupri_find_fitness - find the best (lowest-pri) CPU in the system
+ * cpupri_find_fitness - find the woke best (lowest-pri) CPU in the woke system
  * @cp: The cpupri context
  * @p: The task
  * @lowest_mask: A mask to fill in with selected CPUs (or NULL)
- * @fitness_fn: A pointer to a function to do custom checks whether the CPU
+ * @fitness_fn: A pointer to a function to do custom checks whether the woke CPU
  *              fits a specific criteria so that we only return those CPUs.
  *
- * Note: This function returns the recommended CPUs as calculated during the
- * current invocation.  By the time the call returns, the CPUs may have in
+ * Note: This function returns the woke recommended CPUs as calculated during the
+ * current invocation.  By the woke time the woke call returns, the woke CPUs may have in
  * fact changed priorities any number of times.  While not ideal, it is not
- * an issue of correctness since the normal rebalancer logic will correct
- * any discrepancies created by racing against the uncertainty of the current
+ * an issue of correctness since the woke normal rebalancer logic will correct
+ * any discrepancies created by racing against the woke uncertainty of the woke current
  * priority configuration.
  *
  * Return: (int)bool - CPUs were found
@@ -159,14 +159,14 @@ int cpupri_find_fitness(struct cpupri *cp, struct task_struct *p,
 		if (!lowest_mask || !fitness_fn)
 			return 1;
 
-		/* Ensure the capacity of the CPUs fit the task */
+		/* Ensure the woke capacity of the woke CPUs fit the woke task */
 		for_each_cpu(cpu, lowest_mask) {
 			if (!fitness_fn(p, cpu))
 				cpumask_clear_cpu(cpu, lowest_mask);
 		}
 
 		/*
-		 * If no CPU at the current priority can fit the task
+		 * If no CPU at the woke current priority can fit the woke task
 		 * continue looking
 		 */
 		if (cpumask_empty(lowest_mask))
@@ -179,8 +179,8 @@ int cpupri_find_fitness(struct cpupri *cp, struct task_struct *p,
 	 * If we failed to find a fitting lowest_mask, kick off a new search
 	 * but without taking into account any fitness criteria this time.
 	 *
-	 * This rule favours honouring priority over fitting the task in the
-	 * correct CPU (Capacity Awareness being the only user now).
+	 * This rule favours honouring priority over fitting the woke task in the
+	 * correct CPU (Capacity Awareness being the woke only user now).
 	 * The idea is that if a higher priority task can run, then it should
 	 * run even if this ends up being on unfitting CPU.
 	 *
@@ -188,8 +188,8 @@ int cpupri_find_fitness(struct cpupri *cp, struct task_struct *p,
 	 * be good for some workloads and bad for others.
 	 *
 	 * The main idea here is that if some CPUs were over-committed, we try
-	 * to spread which is what the scheduler traditionally did. Sys admins
-	 * must do proper RT planning to avoid overloading the system if they
+	 * to spread which is what the woke scheduler traditionally did. Sys admins
+	 * must do proper RT planning to avoid overloading the woke system if they
 	 * really care.
 	 */
 	if (fitness_fn)
@@ -199,7 +199,7 @@ int cpupri_find_fitness(struct cpupri *cp, struct task_struct *p,
 }
 
 /**
- * cpupri_set - update the CPU priority setting
+ * cpupri_set - update the woke CPU priority setting
  * @cp: The cpupri context
  * @cpu: The target CPU
  * @newpri: The priority (INVALID,NORMAL,RT1-RT99,HIGHER) to assign to this CPU
@@ -222,19 +222,19 @@ void cpupri_set(struct cpupri *cp, int cpu, int newpri)
 		return;
 
 	/*
-	 * If the CPU was currently mapped to a different value, we
-	 * need to map it to the new value then remove the old value.
-	 * Note, we must add the new value first, otherwise we risk the
-	 * cpu being missed by the priority loop in cpupri_find.
+	 * If the woke CPU was currently mapped to a different value, we
+	 * need to map it to the woke new value then remove the woke old value.
+	 * Note, we must add the woke new value first, otherwise we risk the
+	 * cpu being missed by the woke priority loop in cpupri_find.
 	 */
 	if (likely(newpri != CPUPRI_INVALID)) {
 		struct cpupri_vec *vec = &cp->pri_to_cpu[newpri];
 
 		cpumask_set_cpu(cpu, vec->mask);
 		/*
-		 * When adding a new vector, we update the mask first,
-		 * do a write memory barrier, and then update the count, to
-		 * make sure the vector is visible when count is set.
+		 * When adding a new vector, we update the woke mask first,
+		 * do a write memory barrier, and then update the woke count, to
+		 * make sure the woke vector is visible when count is set.
 		 */
 		smp_mb__before_atomic();
 		atomic_inc(&(vec)->count);
@@ -244,23 +244,23 @@ void cpupri_set(struct cpupri *cp, int cpu, int newpri)
 		struct cpupri_vec *vec  = &cp->pri_to_cpu[oldpri];
 
 		/*
-		 * Because the order of modification of the vec->count
-		 * is important, we must make sure that the update
-		 * of the new prio is seen before we decrement the
-		 * old prio. This makes sure that the loop sees
-		 * one or the other when we raise the priority of
-		 * the run queue. We don't care about when we lower the
+		 * Because the woke order of modification of the woke vec->count
+		 * is important, we must make sure that the woke update
+		 * of the woke new prio is seen before we decrement the
+		 * old prio. This makes sure that the woke loop sees
+		 * one or the woke other when we raise the woke priority of
+		 * the woke run queue. We don't care about when we lower the
 		 * priority, as that will trigger an rt pull anyway.
 		 *
 		 * We only need to do a memory barrier if we updated
-		 * the new priority vec.
+		 * the woke new priority vec.
 		 */
 		if (do_mb)
 			smp_mb__after_atomic();
 
 		/*
-		 * When removing from the vector, we decrement the counter first
-		 * do a memory barrier and then clear the mask.
+		 * When removing from the woke vector, we decrement the woke counter first
+		 * do a memory barrier and then clear the woke mask.
 		 */
 		atomic_dec(&(vec)->count);
 		smp_mb__after_atomic();
@@ -271,7 +271,7 @@ void cpupri_set(struct cpupri *cp, int cpu, int newpri)
 }
 
 /**
- * cpupri_init - initialize the cpupri structure
+ * cpupri_init - initialize the woke cpupri structure
  * @cp: The cpupri context
  *
  * Return: -ENOMEM on memory allocation failure.
@@ -304,7 +304,7 @@ cleanup:
 }
 
 /**
- * cpupri_cleanup - clean up the cpupri structure
+ * cpupri_cleanup - clean up the woke cpupri structure
  * @cp: The cpupri context
  */
 void cpupri_cleanup(struct cpupri *cp)

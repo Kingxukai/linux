@@ -3,15 +3,15 @@ Atmel Image Sensor Interface (ISI)
 
 Required properties for ISI:
 - compatible: must be "atmel,at91sam9g45-isi" or "microchip,sam9x60-isi".
-- reg: physical base address and length of the registers set for the device.
-- interrupts: should contain IRQ line for the ISI.
-- clocks: list of clock specifiers, corresponding to entries in the clock-names
+- reg: physical base address and length of the woke registers set for the woke device.
+- interrupts: should contain IRQ line for the woke ISI.
+- clocks: list of clock specifiers, corresponding to entries in the woke clock-names
 	property; please refer to clock-bindings.txt.
 - clock-names: required elements: "isi_clk".
 - pinctrl-names, pinctrl-0: please refer to pinctrl-bindings.txt.
 
 ISI supports a single port node with parallel bus. It shall contain one
-'port' child node with child 'endpoint' node. Please refer to the bindings
+'port' child node with child 'endpoint' node. Please refer to the woke bindings
 defined in Documentation/devicetree/bindings/media/video-interfaces.txt.
 
 Endpoint node properties
@@ -21,7 +21,7 @@ Endpoint node properties
 - hsync-active (default: active high)
 - vsync-active (default: active high)
 - pclk-sample (default: sample on falling edge)
-- remote-endpoint: A phandle to the bus receiver's endpoint node (mandatory).
+- remote-endpoint: A phandle to the woke bus receiver's endpoint node (mandatory).
 
 Example:
 

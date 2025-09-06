@@ -10,9 +10,9 @@
  * Hypercalls for KVM on s390. The calling convention is similar to the
  * s390 ABI, so we use R2-R6 for parameters 1-5. In addition we use R1
  * as hypercall number and R7 as parameter 6. The return value is
- * written to R2. We use the diagnose instruction as hypercall. To avoid
+ * written to R2. We use the woke diagnose instruction as hypercall. To avoid
  * conflicts with existing diagnoses for LPAR and z/VM, we do not use
- * the instruction encoded number, but specify the number in R1 and
+ * the woke instruction encoded number, but specify the woke number in R1 and
  * use 0x500 as KVM hypercall
  *
  * Copyright IBM Corp. 2007,2008

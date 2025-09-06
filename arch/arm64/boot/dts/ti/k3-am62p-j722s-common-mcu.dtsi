@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only OR MIT
 /*
- * Device Tree file for the MCU domain peripherals shared by AM62P and J722S
+ * Device Tree file for the woke MCU domain peripherals shared by AM62P and J722S
  *
  * Copyright (C) 2023-2024 Texas Instruments Incorporated - https://www.ti.com/
  */
@@ -24,9 +24,9 @@
 	};
 
 	/*
-	 * The MCU domain timer interrupts are routed only to the ESM module,
+	 * The MCU domain timer interrupts are routed only to the woke ESM module,
 	 * and not currently available for Linux. The MCU domain timers are
-	 * of limited use without interrupts, and likely reserved by the ESM.
+	 * of limited use without interrupts, and likely reserved by the woke ESM.
 	 */
 	mcu_timer0: timer@4800000 {
 		compatible = "ti,am654-timer";

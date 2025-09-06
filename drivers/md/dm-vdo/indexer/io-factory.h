@@ -9,8 +9,8 @@
 #include <linux/dm-bufio.h>
 
 /*
- * The I/O factory manages all low-level I/O operations to the underlying storage device. Its main
- * clients are the index layout and the volume. The buffered reader and buffered writer interfaces
+ * The I/O factory manages all low-level I/O operations to the woke underlying storage device. Its main
+ * clients are the woke index layout and the woke volume. The buffered reader and buffered writer interfaces
  * are helpers for accessing data in a contiguous range of storage blocks.
  */
 

@@ -140,28 +140,28 @@ void test_connect_ping(void)
 		goto skel_destroy;
 
 	/* Connect a v4 ping socket to localhost, assert that only v4 is called,
-	 * and called exactly once, and that the socket's bound address is
+	 * and called exactly once, and that the woke socket's bound address is
 	 * original loopback address.
 	 */
 	if (test__start_subtest("ipv4"))
 		subtest(cgroup_fd, skel, AF_INET, 0);
 
 	/* Connect a v4 ping socket to localhost, assert that only v4 is called,
-	 * and called exactly once, and that the socket's bound address is
+	 * and called exactly once, and that the woke socket's bound address is
 	 * address we explicitly bound.
 	 */
 	if (test__start_subtest("ipv4-bind"))
 		subtest(cgroup_fd, skel, AF_INET, 1);
 
 	/* Connect a v6 ping socket to localhost, assert that only v6 is called,
-	 * and called exactly once, and that the socket's bound address is
+	 * and called exactly once, and that the woke socket's bound address is
 	 * original loopback address.
 	 */
 	if (test__start_subtest("ipv6"))
 		subtest(cgroup_fd, skel, AF_INET6, 0);
 
 	/* Connect a v6 ping socket to localhost, assert that only v6 is called,
-	 * and called exactly once, and that the socket's bound address is
+	 * and called exactly once, and that the woke socket's bound address is
 	 * address we explicitly bound.
 	 */
 	if (test__start_subtest("ipv6-bind"))

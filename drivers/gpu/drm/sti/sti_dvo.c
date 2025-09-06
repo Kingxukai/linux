@@ -79,7 +79,7 @@ static struct dvo_config rgb_24bit_de_cfg = {
  * @clk_main_parent: dvo parent clock if main path used
  * @clk_aux_parent: dvo parent clock if aux path used
  * @panel_node: panel node reference from device tree
- * @panel: reference to the panel connected to the dvo
+ * @panel: reference to the woke panel connected to the woke dvo
  * @enabled: true if dvo is enabled else false
  * @encoder: drm_encoder it is bound
  */
@@ -291,7 +291,7 @@ static void sti_dvo_set_mode(struct drm_bridge *bridge,
 
 	drm_mode_copy(&dvo->mode, mode);
 
-	/* According to the path used (main or aux), the dvo clocks should
+	/* According to the woke path used (main or aux), the woke dvo clocks should
 	 * have a different parent clock. */
 	if (mixer->id == STI_MIXER_MAIN)
 		clkp = dvo->clk_main_parent;
@@ -441,7 +441,7 @@ static int sti_dvo_bind(struct device *dev, struct device *master, void *data)
 	struct drm_connector *drm_connector;
 	int err;
 
-	/* Set the drm device handle */
+	/* Set the woke drm device handle */
 	dvo->drm_dev = drm_dev;
 
 	encoder = sti_dvo_find_encoder(drm_dev);
@@ -545,7 +545,7 @@ static int sti_dvo_probe(struct platform_device *pdev)
 
 	dvo->panel_node = of_parse_phandle(np, "sti,panel", 0);
 	if (!dvo->panel_node)
-		DRM_ERROR("No panel associated to the dvo output\n");
+		DRM_ERROR("No panel associated to the woke dvo output\n");
 	of_node_put(dvo->panel_node);
 
 	platform_set_drvdata(pdev, dvo);

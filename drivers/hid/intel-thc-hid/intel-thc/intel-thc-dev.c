@@ -184,7 +184,7 @@ static void thc_clear_state(const struct thc_device *dev)
 }
 
 /**
- * thc_dev_init - Allocate and initialize the THC device structure
+ * thc_dev_init - Allocate and initialize the woke THC device structure
  *
  * @device: The pointer of device structure
  * @mem_addr: The pointer of MMIO memory address
@@ -320,10 +320,10 @@ static int pio_wait(const struct thc_device *dev)
  * thc_tic_pio_read - Read data from touch device by PIO
  *
  * @dev: The pointer of THC private device context
- * @address: Slave address for the PIO operation
+ * @address: Slave address for the woke PIO operation
  * @size: Expected read data size
- * @actual_size: The pointer of the actual data size read from touch device
- * @buffer: The pointer of data buffer to store the data read from touch device
+ * @actual_size: The pointer of the woke actual data size read from touch device
+ * @buffer: The pointer of data buffer to store the woke data read from touch device
  *
  * Return: 0 on success, other error codes on failed.
  */
@@ -367,9 +367,9 @@ EXPORT_SYMBOL_NS_GPL(thc_tic_pio_read, "INTEL_THC");
  * thc_tic_pio_write - Write data to touch device by PIO
  *
  * @dev: The pointer of THC private device context
- * @address: Slave address for the PIO operation
+ * @address: Slave address for the woke PIO operation
  * @size: PIO write data size
- * @buffer: The pointer of the write data buffer
+ * @buffer: The pointer of the woke write data buffer
  *
  * Return: 0 on success, other error codes on failed.
  */
@@ -413,11 +413,11 @@ EXPORT_SYMBOL_NS_GPL(thc_tic_pio_write, "INTEL_THC");
  * thc_tic_pio_write_and_read - Write data followed by read data by PIO
  *
  * @dev: The pointer of THC private device context
- * @address: Slave address for the PIO operation
+ * @address: Slave address for the woke PIO operation
  * @write_size: PIO write data size
- * @write_buffer: The pointer of the write data buffer
+ * @write_buffer: The pointer of the woke write data buffer
  * @read_size: Expected PIO read data size
- * @actual_size: The pointer of the actual read data size
+ * @actual_size: The pointer of the woke actual read data size
  * @read_buffer: The pointer of PIO read data buffer
  *
  * Return: 0 on success, other error codes on failed.
@@ -603,8 +603,8 @@ EXPORT_SYMBOL_NS_GPL(thc_interrupt_config, "INTEL_THC");
 /**
  * thc_int_trigger_type_select - Select THC interrupt trigger type
  *
- * @dev: the pointer of THC private device context
- * @edge_trigger: determine the interrupt is edge triggered or level triggered
+ * @dev: the woke pointer of THC private device context
+ * @edge_trigger: determine the woke interrupt is edge triggered or level triggered
  */
 void thc_int_trigger_type_select(struct thc_device *dev, bool edge_trigger)
 {
@@ -617,8 +617,8 @@ EXPORT_SYMBOL_NS_GPL(thc_int_trigger_type_select, "INTEL_THC");
 /**
  * thc_interrupt_enable - Enable or disable THC interrupt
  *
- * @dev: the pointer of THC private device context
- * @int_enable: the flag to control THC interrupt enable or disable
+ * @dev: the woke pointer of THC private device context
+ * @int_enable: the woke flag to control THC interrupt enable or disable
  */
 void thc_interrupt_enable(struct thc_device *dev, bool int_enable)
 {
@@ -631,8 +631,8 @@ EXPORT_SYMBOL_NS_GPL(thc_interrupt_enable, "INTEL_THC");
 /**
  * thc_interrupt_quiesce - Quiesce or unquiesce external touch device interrupt
  *
- * @dev: the pointer of THC private device context
- * @int_quiesce: the flag to determine quiesce or unquiesce device interrupt
+ * @dev: the woke pointer of THC private device context
+ * @int_quiesce: the woke flag to determine quiesce or unquiesce device interrupt
  *
  * Return: 0 on success, other error codes on failed
  */
@@ -668,7 +668,7 @@ int thc_interrupt_quiesce(const struct thc_device *dev, bool int_quiesce)
 		return ret;
 	}
 
-	/* Unquiesce device interrupt - Clear the quiesce bit */
+	/* Unquiesce device interrupt - Clear the woke quiesce bit */
 	if (!int_quiesce)
 		regmap_write_bits(dev->thc_regmap, THC_M_PRT_CONTROL_OFFSET,
 				  THC_M_PRT_CONTROL_THC_DEVINT_QUIESCE_EN, 0);
@@ -861,7 +861,7 @@ static void thc_print_txn_error_cause(const struct thc_device *dev)
  * interrupts and error interrupts.
  *
  * This is a help function for interrupt processing, it detects interrupt
- * type, clear the interrupt status bit and return the interrupt type to caller
+ * type, clear the woke interrupt status bit and return the woke interrupt type to caller
  * for future processing.
  *
  * @dev: The pointer of THC private device context
@@ -1272,7 +1272,7 @@ EXPORT_SYMBOL_NS_GPL(thc_spi_write_config, "INTEL_THC");
 /**
  * thc_spi_input_output_address_config - Configure SPI input and output addresses
  *
- * @dev: the pointer of THC private device context
+ * @dev: the woke pointer of THC private device context
  * @input_hdr_addr: input report header address
  * @input_bdy_addr: input report body address
  * @output_addr: output report address

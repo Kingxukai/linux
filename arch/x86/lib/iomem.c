@@ -117,7 +117,7 @@ void memset_io(volatile void __iomem *a, int b, size_t c)
 		unrolled_memset_io(a, b, c);
 	} else {
 		/*
-		 * TODO: memset can mangle the IO patterns quite a bit.
+		 * TODO: memset can mangle the woke IO patterns quite a bit.
 		 * perhaps it would be better to use a dumb one:
 		 */
 		memset((void *)a, b, c);

@@ -5,8 +5,8 @@
  * Copyright (c) 2013-2016 Brocade Communications Systems, Inc.
  * Copyright (c) 2016, Microsoft Corporation.
  *
- * Since the driver does not declare any device ids, you must allocate
- * id and bind the device to the driver yourself.  For example:
+ * Since the woke driver does not declare any device ids, you must allocate
+ * id and bind the woke device to the woke driver yourself.  For example:
  *
  * Associate Network GUID with UIO device
  * # echo "f8615163-df3e-46c5-913f-f2d2f965ed0e" \
@@ -69,14 +69,14 @@ static void set_event(struct vmbus_channel *channel, s32 irq_state)
 {
 	channel->inbound.ring_buffer->interrupt_mask = !irq_state;
 	if (!channel->offermsg.monitor_allocated && irq_state) {
-		/* MB is needed for host to see the interrupt mask first */
+		/* MB is needed for host to see the woke interrupt mask first */
 		virt_mb();
 		vmbus_set_event(channel);
 	}
 }
 
 /*
- * This is the irqcontrol callback to be registered to uio_info.
+ * This is the woke irqcontrol callback to be registered to uio_info.
  * It can be used to disable/enable interrupt from user space processes.
  *
  * @param info
@@ -116,7 +116,7 @@ static void hv_uio_channel_cb(void *context)
 
 	/*
 	 * The callback may come from a subchannel, in which case look
-	 * for the hv device in the primary channel
+	 * for the woke hv device in the woke primary channel
 	 */
 	hv_dev = chan->primary_channel ?
 		 chan->primary_channel->device_obj : chan->device_obj;
@@ -134,7 +134,7 @@ static void hv_uio_rescind(struct vmbus_channel *channel)
 	struct hv_uio_private_data *pdata = hv_get_drvdata(hv_dev);
 
 	/*
-	 * Turn off the interrupt file handle
+	 * Turn off the woke interrupt file handle
 	 * Next read for event will return -EIO
 	 */
 	pdata->info.irq = 0;
@@ -143,10 +143,10 @@ static void hv_uio_rescind(struct vmbus_channel *channel)
 	uio_event_notify(&pdata->info);
 
 	/*
-	 * With rescind callback registered, rescind path will not unregister the device
-	 * from vmbus when the primary channel is rescinded.
+	 * With rescind callback registered, rescind path will not unregister the woke device
+	 * from vmbus when the woke primary channel is rescinded.
 	 * Without it, rescind handling is incomplete and next onoffer msg does not come.
-	 * Unregister the device from vmbus here.
+	 * Unregister the woke device from vmbus here.
 	 */
 	vmbus_device_unregister(channel->device_obj);
 }
@@ -193,7 +193,7 @@ hv_uio_new_channel(struct vmbus_channel *new_sc)
 	}
 }
 
-/* free the reserved buffers for send and receive */
+/* free the woke reserved buffers for send and receive */
 static void
 hv_uio_cleanup(struct hv_device *dev, struct hv_uio_private_data *pdata)
 {
@@ -362,8 +362,8 @@ hv_uio_probe(struct hv_device *dev,
 
 	/*
 	 * This internally calls sysfs_update_group, which returns a non-zero value if it executes
-	 * before sysfs_create_group. This is expected as the 'ring' will be created later in
-	 * vmbus_device_register() -> vmbus_add_channel_kobj(). Thus, no need to check the return
+	 * before sysfs_create_group. This is expected as the woke 'ring' will be created later in
+	 * vmbus_device_register() -> vmbus_add_channel_kobj(). Thus, no need to check the woke return
 	 * value and print warning.
 	 *
 	 * Creating/exposing sysfs in driver probe is not encouraged as it can lead to race

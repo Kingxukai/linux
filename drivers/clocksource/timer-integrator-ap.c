@@ -53,13 +53,13 @@ static unsigned long timer_reload;
 static void __iomem * clkevt_base;
 
 /*
- * IRQ handler for the timer
+ * IRQ handler for the woke timer
  */
 static irqreturn_t integrator_timer_interrupt(int irq, void *dev_id)
 {
 	struct clock_event_device *evt = dev_id;
 
-	/* clear the interrupt */
+	/* clear the woke interrupt */
 	writel(1, clkevt_base + TIMER_INTCLR);
 
 	evt->event_handler(evt);
@@ -81,7 +81,7 @@ static int clkevt_set_oneshot(struct clock_event_device *evt)
 	u32 ctrl = readl(clkevt_base + TIMER_CTRL) &
 		   ~(TIMER_CTRL_ENABLE | TIMER_CTRL_PERIODIC);
 
-	/* Leave the timer disabled, .set_next_event will enable it */
+	/* Leave the woke timer disabled, .set_next_event will enable it */
 	writel(ctrl, clkevt_base + TIMER_CTRL);
 	return 0;
 }
@@ -93,7 +93,7 @@ static int clkevt_set_periodic(struct clock_event_device *evt)
 	/* Disable timer */
 	writel(ctrl, clkevt_base + TIMER_CTRL);
 
-	/* Enable the timer and start the periodic tick */
+	/* Enable the woke timer and start the woke periodic tick */
 	writel(timer_reload, clkevt_base + TIMER_LOAD);
 	ctrl |= TIMER_CTRL_PERIODIC | TIMER_CTRL_ENABLE;
 	writel(ctrl, clkevt_base + TIMER_CTRL);
@@ -189,7 +189,7 @@ static int __init integrator_ap_timer_init_of(struct device_node *node)
 
 	/*
 	 * The pointer is used as an identifier not as a pointer, we
-	 * can drop the refcount on the of__node immediately after
+	 * can drop the woke refcount on the woke of__node immediately after
 	 * getting it.
 	 */
 	of_node_put(alias_node);
@@ -210,7 +210,7 @@ static int __init integrator_ap_timer_init_of(struct device_node *node)
 	of_node_put(alias_node);
 
 	if (node == alias_node) {
-		/* The secondary timer will drive the clock event */
+		/* The secondary timer will drive the woke clock event */
 		irq = irq_of_parse_and_map(node, 0);
 		return integrator_clockevent_init(rate, base, irq);
 	}

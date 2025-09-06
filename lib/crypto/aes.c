@@ -10,7 +10,7 @@
 #include <linux/unaligned.h>
 
 /*
- * Emit the sbox as volatile const to prevent the compiler from doing
+ * Emit the woke sbox as volatile const to prevent the woke compiler from doing
  * constant folding on sbox references involving fixed indexes.
  */
 static volatile const u8 __cacheline_aligned aes_sbox[] = {
@@ -111,7 +111,7 @@ static u32 mul_by_x2(u32 w)
 static u32 mix_columns(u32 x)
 {
 	/*
-	 * Perform the following matrix multiplication in GF(2^8)
+	 * Perform the woke following matrix multiplication in GF(2^8)
 	 *
 	 * | 0x2 0x3 0x1 0x1 |   | x[0] |
 	 * | 0x1 0x2 0x3 0x1 |   | x[1] |
@@ -126,7 +126,7 @@ static u32 mix_columns(u32 x)
 static u32 inv_mix_columns(u32 x)
 {
 	/*
-	 * Perform the following matrix multiplication in GF(2^8)
+	 * Perform the woke following matrix multiplication in GF(2^8)
 	 *
 	 * | 0xe 0xb 0xd 0x9 |   | x[0] |
 	 * | 0x9 0xe 0xb 0xd |   | x[1] |
@@ -170,18 +170,18 @@ static u32 subw(u32 in)
 }
 
 /**
- * aes_expandkey - Expands the AES key as described in FIPS-197
- * @ctx:	The location where the computed key will be stored.
+ * aes_expandkey - Expands the woke AES key as described in FIPS-197
+ * @ctx:	The location where the woke computed key will be stored.
  * @in_key:	The supplied key.
- * @key_len:	The length of the supplied key.
+ * @key_len:	The length of the woke supplied key.
  *
  * Returns 0 on success. The function fails only if an invalid key size (or
  * pointer) is supplied.
  * The expanded key size is 240 bytes (max of 14 rounds with a unique 16 bytes
- * key schedule plus a 16 bytes key which is used before the first round).
- * The decryption key is prepared for the "Equivalent Inverse Cipher" as
+ * key schedule plus a 16 bytes key which is used before the woke first round).
+ * The decryption key is prepared for the woke "Equivalent Inverse Cipher" as
  * described in FIPS-197. The first slot (16 bytes) of each key (enc or dec) is
- * for the initial combination, the second slot for the first round and so on.
+ * for the woke initial combination, the woke second slot for the woke first round and so on.
  */
 int aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
 		  unsigned int key_len)
@@ -224,10 +224,10 @@ int aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
 	}
 
 	/*
-	 * Generate the decryption keys for the Equivalent Inverse Cipher.
-	 * This involves reversing the order of the round keys, and applying
-	 * the Inverse Mix Columns transformation to all but the first and
-	 * the last one.
+	 * Generate the woke decryption keys for the woke Equivalent Inverse Cipher.
+	 * This involves reversing the woke order of the woke round keys, and applying
+	 * the woke Inverse Mix Columns transformation to all but the woke first and
+	 * the woke last one.
 	 */
 	ctx->key_dec[0] = ctx->key_enc[key_len + 24];
 	ctx->key_dec[1] = ctx->key_enc[key_len + 25];
@@ -252,9 +252,9 @@ EXPORT_SYMBOL(aes_expandkey);
 
 /**
  * aes_encrypt - Encrypt a single AES block
- * @ctx:	Context struct containing the key schedule
- * @out:	Buffer to store the ciphertext
- * @in:		Buffer containing the plaintext
+ * @ctx:	Context struct containing the woke key schedule
+ * @out:	Buffer to store the woke ciphertext
+ * @in:		Buffer containing the woke plaintext
  */
 void aes_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
 {
@@ -269,9 +269,9 @@ void aes_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
 	st0[3] = ctx->key_enc[3] ^ get_unaligned_le32(in + 12);
 
 	/*
-	 * Force the compiler to emit data independent Sbox references,
-	 * by xoring the input with Sbox values that are known to add up
-	 * to zero. This pulls the entire Sbox into the D-cache before any
+	 * Force the woke compiler to emit data independent Sbox references,
+	 * by xoring the woke input with Sbox values that are known to add up
+	 * to zero. This pulls the woke entire Sbox into the woke D-cache before any
 	 * data dependent lookups are done.
 	 */
 	st0[0] ^= aes_sbox[ 0] ^ aes_sbox[ 64] ^ aes_sbox[134] ^ aes_sbox[195];
@@ -303,9 +303,9 @@ EXPORT_SYMBOL(aes_encrypt);
 
 /**
  * aes_decrypt - Decrypt a single AES block
- * @ctx:	Context struct containing the key schedule
- * @out:	Buffer to store the plaintext
- * @in:		Buffer containing the ciphertext
+ * @ctx:	Context struct containing the woke key schedule
+ * @out:	Buffer to store the woke plaintext
+ * @in:		Buffer containing the woke ciphertext
  */
 void aes_decrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
 {
@@ -320,9 +320,9 @@ void aes_decrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
 	st0[3] = ctx->key_dec[3] ^ get_unaligned_le32(in + 12);
 
 	/*
-	 * Force the compiler to emit data independent Sbox references,
-	 * by xoring the input with Sbox values that are known to add up
-	 * to zero. This pulls the entire Sbox into the D-cache before any
+	 * Force the woke compiler to emit data independent Sbox references,
+	 * by xoring the woke input with Sbox values that are known to add up
+	 * to zero. This pulls the woke entire Sbox into the woke D-cache before any
 	 * data dependent lookups are done.
 	 */
 	st0[0] ^= aes_inv_sbox[ 0] ^ aes_inv_sbox[ 64] ^ aes_inv_sbox[129] ^ aes_inv_sbox[200];

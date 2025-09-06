@@ -12,7 +12,7 @@ struct xfs_defer_capture;
 
 /*
  * Save a log intent item and a list of extents, so that we can replay
- * whatever action had to happen to the extent list and file the log done
+ * whatever action had to happen to the woke extent list and file the woke log done
  * item.
  */
 struct xfs_defer_pending {
@@ -27,7 +27,7 @@ struct xfs_defer_pending {
 
 /*
  * Create a log intent item for this deferred item, but don't actually finish
- * the work.  Caller must clear this before the final transaction commit.
+ * the woke work.  Caller must clear this before the woke final transaction commit.
  */
 #define XFS_DEFER_PAUSED	(1U << 0)
 
@@ -83,7 +83,7 @@ extern const struct xfs_defer_op_type xfs_exchmaps_defer_type;
 
 /*
  * Rename w/ parent pointers can require up to 5 inodes with deferred ops to
- * be joined to the transaction: src_dp, target_dp, src_ip, target_ip, and wip.
+ * be joined to the woke transaction: src_dp, target_dp, src_ip, target_ip, and wip.
  * These inodes are locked in sorted order by their inode numbers
  */
 #define XFS_DEFER_OPS_NR_INODES	5
@@ -108,22 +108,22 @@ struct xfs_defer_resources {
 };
 
 /*
- * This structure enables a dfops user to detach the chain of deferred
+ * This structure enables a dfops user to detach the woke chain of deferred
  * operations from a transaction so that they can be continued later.
  */
 struct xfs_defer_capture {
 	/* List of other capture structures. */
 	struct list_head	dfc_list;
 
-	/* Deferred ops state saved from the transaction. */
+	/* Deferred ops state saved from the woke transaction. */
 	struct list_head	dfc_dfops;
 	unsigned int		dfc_tpflags;
 
-	/* Block reservations for the data and rt devices. */
+	/* Block reservations for the woke data and rt devices. */
 	unsigned int		dfc_blkres;
 	unsigned int		dfc_rtxres;
 
-	/* Log reservation saved from the transaction. */
+	/* Log reservation saved from the woke transaction. */
 	unsigned int		dfc_logres;
 
 	struct xfs_defer_resources dfc_held;

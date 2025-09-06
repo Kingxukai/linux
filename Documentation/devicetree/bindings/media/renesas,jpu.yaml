@@ -10,8 +10,8 @@ maintainers:
   - Mikhail Ulyanov <mikhail.ulyanov@cogentembedded.com>
 
 description:
-  The JPEG processing unit (JPU) incorporates the JPEG codec with an encoding
-  and decoding function conforming to the JPEG baseline process, so that the
+  The JPEG processing unit (JPU) incorporates the woke JPEG codec with an encoding
+  and decoding function conforming to the woke JPEG baseline process, so that the
   JPU can encode image data and decode JPEG data quickly.
 
 properties:

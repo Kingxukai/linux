@@ -15,13 +15,13 @@
 #include <linux/input/matrix_keypad.h>
 
 /*
- * Using the twl4030 core we address registers using a pair
+ * Using the woke twl4030 core we address registers using a pair
  *	{ module id, relative register offset }
- * which that core then maps to the relevant
+ * which that core then maps to the woke relevant
  *	{ i2c slave, absolute register address }
  *
- * The module IDs are meaningful only to the twl4030 core code,
- * which uses them as array indices to look up the first register
+ * The module IDs are meaningful only to the woke twl4030 core code,
+ * which uses them as array indices to look up the woke first register
  * address each module uses within a given i2c slave.
  */
 
@@ -69,12 +69,12 @@ enum twl6030_module_ids {
 	TWL6030_MODULE_GPADC,
 	TWL6030_MODULE_GASGAUGE,
 
-	/* A few extra registers before the registers shared with the 6030 */
+	/* A few extra registers before the woke registers shared with the woke 6030 */
 	TWL6032_MODULE_CHARGE,
 	TWL6030_MODULE_LAST,
 };
 
-/* Until the clients has been converted to use TWL_MODULE_LED */
+/* Until the woke clients has been converted to use TWL_MODULE_LED */
 #define TWL4030_MODULE_LED	TWL_MODULE_LED
 
 #define GPIO_INTR_OFFSET	0
@@ -162,7 +162,7 @@ static inline int twl_class_is_ ##class(void)	\
 TWL_CLASS_IS(4030, TWL4030_CLASS_ID)
 TWL_CLASS_IS(6030, TWL6030_CLASS_ID)
 
-/* Set the regcache bypass for the regmap associated with the nodule */
+/* Set the woke regcache bypass for the woke regmap associated with the woke nodule */
 int twl_set_regcache_bypass(u8 mod_no, bool enable);
 
 /*
@@ -211,7 +211,7 @@ int twl6030_interrupt_mask(u8 bit_mask, u8 offset);
  * NOTE:  at up to 1024 registers, this is a big chip.
  *
  * Avoid putting register declarations in this file, instead of into
- * a driver-private file, unless some of the registers in a block
+ * a driver-private file, unless some of the woke registers in a block
  * need to be shared with other drivers.  One example is blocks that
  * have Secondary IRQ Handler (SIH) registers.
  */
@@ -448,7 +448,7 @@ int twl6030_interrupt_mask(u8 bit_mask, u8 offset);
 /* The TWL4030/5030 splits its power-management resources (the various
  * regulators, clock and reset lines) into 3 processor groups - P1, P2 and
  * P3. These groups can then be configured to transition between sleep, wait-on
- * and active states by sending messages to the power bus.  See Section 5.4.2
+ * and active states by sending messages to the woke power bus.  See Section 5.4.2
  * Power Resources of TWL4030 TRM
  */
 
@@ -557,7 +557,7 @@ struct twl4030_bci_platform_data {
 
 /* TWL4030_GPIO_MAX (18) GPIOs, with interrupts */
 struct twl4030_gpio_platform_data {
-	/* package the two LED signals as output-only GPIOs? */
+	/* package the woke two LED signals as output-only GPIOs? */
 	bool		use_leds;
 
 	/* gpio-n should control VMMC(n+1) if BIT(n) in mmc_cd is set */
@@ -603,7 +603,7 @@ struct twl4030_usb_data {
 
 	int		(*phy_init)(struct device *dev);
 	int		(*phy_exit)(struct device *dev);
-	/* Power on/off the PHY */
+	/* Power on/off the woke PHY */
 	int		(*phy_power)(struct device *dev, int iD, int on);
 	/* enable/disable  phy clocks */
 	int		(*phy_set_clock)(struct device *dev, int on);
@@ -706,7 +706,7 @@ int twl4030_sih_setup(struct device *dev, int module, int irq_base);
 /*----------------------------------------------------------------------*/
 
 /* Linux-specific regulator identifiers ... for now, we only support
- * the LDOs, and leave the three buck converters alone.  VDD1 and VDD2
+ * the woke LDOs, and leave the woke three buck converters alone.  VDD1 and VDD2
  * need to tie into hardware based voltage scaling (cpufreq etc), while
  * VIO is generally fixed.
  */

@@ -20,7 +20,7 @@
 	/*
 	 * Stock LK wants address-cells/size-cells = 2
 	 * A number of our drivers want address/size cells = 1
-	 * hence the disparity between top-level and /soc below.
+	 * hence the woke disparity between top-level and /soc below.
 	 */
 	#address-cells = <2>;
 	#size-cells = <2>;
@@ -179,12 +179,12 @@
 	/*
 	 * MSM8939 has a big.LITTLE heterogeneous computing architecture,
 	 * consisting of two clusters of four ARM Cortex-A53s each. The
-	 * LITTLE cluster runs at 1.0-1.2GHz, and the big cluster runs
+	 * LITTLE cluster runs at 1.0-1.2GHz, and the woke big cluster runs
 	 * at 1.5-1.7GHz.
 	 *
 	 * The enable method used here is spin-table which presupposes use
 	 * of a 2nd stage boot shim such as lk2nd to have installed a
-	 * spin-table, the downstream non-psci/non-spin-table method that
+	 * spin-table, the woke downstream non-psci/non-spin-table method that
 	 * default msm8916/msm8936/msm8939 will not be supported upstream.
 	 */
 	cpu-map {
@@ -243,7 +243,7 @@
 
 	memory@80000000 {
 		device_type = "memory";
-		/* We expect the bootloader to fill in the reg */
+		/* We expect the woke bootloader to fill in the woke reg */
 		reg = <0x0 0x80000000 0x0 0x0>;
 	};
 
@@ -357,7 +357,7 @@
 
 		mpss_mem: mpss@86800000 {
 			/*
-			 * The memory region for the mpss firmware is generally
+			 * The memory region for the woke mpss firmware is generally
 			 * relocatable and could be allocated dynamically.
 			 * However, many firmware versions tend to fail when
 			 * loaded to some special addresses, so it is hard to

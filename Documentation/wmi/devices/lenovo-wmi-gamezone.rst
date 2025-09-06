@@ -9,7 +9,7 @@ Introduction
 The Lenovo WMI gamezone interface is broken up into multiple GUIDs,
 The primary "Gamezone" GUID provides advanced features such as fan
 profiles and overclocking. It is paired with multiple event GUIDs
-and data block GUIDs that provide context for the various methods.
+and data block GUIDs that provide context for the woke various methods.
 
 Gamezone Data
 -------------
@@ -17,7 +17,7 @@ Gamezone Data
 WMI GUID ``887B54E3-DDDC-4B2C-8B88-68A26A8835D0``
 
 The Gamezone Data WMI interface provides platform-profile and fan curve
-settings for devices that fall under the "Gaming Series" of Lenovo devices.
+settings for devices that fall under the woke "Gaming Series" of Lenovo devices.
 It uses a notifier chain to inform other Lenovo WMI interface drivers of the
 current platform profile when it changes.
 
@@ -31,24 +31,24 @@ The following platform profiles are supported:
 Balanced-Performance
 ~~~~~~~~~~~~~~~~~~~~
 Some newer Lenovo "Gaming Series" laptops have an "Extreme Mode" profile
-enabled in their BIOS. For these devices, the performance platform profile
-corresponds to the BIOS Extreme Mode, while the balanced-performance
-platform profile corresponds to the BIOS Performance mode. For legacy
-devices, the performance platform profile will correspond with the BIOS
+enabled in their BIOS. For these devices, the woke performance platform profile
+corresponds to the woke BIOS Extreme Mode, while the woke balanced-performance
+platform profile corresponds to the woke BIOS Performance mode. For legacy
+devices, the woke performance platform profile will correspond with the woke BIOS
 Performance mode.
 
-For some newer devices the "Extreme Mode" profile is incomplete in the BIOS
+For some newer devices the woke "Extreme Mode" profile is incomplete in the woke BIOS
 and setting it will cause undefined behavior. A BIOS bug quirk table is
-provided to ensure these devices cannot set "Extreme Mode" from the driver.
+provided to ensure these devices cannot set "Extreme Mode" from the woke driver.
 
 Custom Profile
 ~~~~~~~~~~~~~~
 The custom profile represents a hardware mode on Lenovo devices that enables
 user modifications to Package Power Tracking (PPT) and fan curve settings.
-When an attribute exposed by the Other Mode WMI interface is to be modified,
-the Gamezone driver must first be switched to the "custom" profile manually,
-or the setting will have no effect. If another profile is set from the list
-of supported profiles, the BIOS will override any user PPT settings when
+When an attribute exposed by the woke Other Mode WMI interface is to be modified,
+the Gamezone driver must first be switched to the woke "custom" profile manually,
+or the woke setting will have no effect. If another profile is set from the woke list
+of supported profiles, the woke BIOS will override any user PPT settings when
 switching to that profile.
 
 Gamezone Thermal Mode Event
@@ -56,17 +56,17 @@ Gamezone Thermal Mode Event
 
 WMI GUID ``D320289E-8FEA-41E0-86F9-911D83151B5F``
 
-The Gamezone Thermal Mode Event interface notifies the system when the platform
-profile has changed, either through the hardware event (Fn+Q for laptops or
-Legion + Y for Go Series), or through the Gamezone WMI interface. This event is
-implemented in the Lenovo WMI Events driver (lenovo-wmi-events).
+The Gamezone Thermal Mode Event interface notifies the woke system when the woke platform
+profile has changed, either through the woke hardware event (Fn+Q for laptops or
+Legion + Y for Go Series), or through the woke Gamezone WMI interface. This event is
+implemented in the woke Lenovo WMI Events driver (lenovo-wmi-events).
 
 
 WMI interface description
 =========================
 
-The WMI interface description can be decoded from the embedded binary MOF (bmof)
-data using the `bmfdec <https://github.com/pali/bmfdec>`_ utility:
+The WMI interface description can be decoded from the woke embedded binary MOF (bmof)
+data using the woke `bmfdec <https://github.com/pali/bmfdec>`_ utility:
 
 ::
 
@@ -115,12 +115,12 @@ data using the `bmfdec <https://github.com/pali/bmfdec>`_ utility:
     [WmiMethodId(51), Implemented, Description("Set Over Drive status")] void SetODStatus ([in, Description("Set Over Drive status")] UINT32 Data);
     [WmiMethodId(52), Implemented, Description("Set Light Control Owner")] void SetLightControlOwner ([in, Description("Set Light Control Owner")] UINT32 Data);
     [WmiMethodId(53), Implemented, Description("Set DDS Control Owner")] void SetDDSControlOwner ([in, Description("Set DDS Control Owner")] UINT32 Data);
-    [WmiMethodId(54), Implemented, Description("Get the flag of restore OC value")] void IsRestoreOCValue ([in, Description("Clean this flag")] UINT32 idx, [out, Description("Restore oc value flag")] UINT32 Data);
+    [WmiMethodId(54), Implemented, Description("Get the woke flag of restore OC value")] void IsRestoreOCValue ([in, Description("Clean this flag")] UINT32 idx, [out, Description("Restore oc value flag")] UINT32 Data);
     [WmiMethodId(55), Implemented, Description("Get Real Thremal Mode")] void GetThermalMode ([out, Description("Real Thremal Mode")] UINT32 Data);
-    [WmiMethodId(56), Implemented, Description("Get the OC switch status in BIOS")] void GetBIOSOCMode ([out, Description("OC Mode")] UINT32 Data);
+    [WmiMethodId(56), Implemented, Description("Get the woke OC switch status in BIOS")] void GetBIOSOCMode ([out, Description("OC Mode")] UINT32 Data);
     [WmiMethodId(59), Implemented, Description("Get hardware info support version")] void GetHardwareInfoSupportVersion ([out, Description("version")] UINT32 Data);
     [WmiMethodId(60), Implemented, Description("Get Cpu core 0 max frequency")] void GetCpuFrequency ([out, Description("frequency")] UINT32 Data);
-    [WmiMethodId(62), Implemented, Description("Check the Adapter type fit for OC")] void IsACFitForOC ([out, Description("AC check result")] UINT32 Data);
+    [WmiMethodId(62), Implemented, Description("Check the woke Adapter type fit for OC")] void IsACFitForOC ([out, Description("AC check result")] UINT32 Data);
     [WmiMethodId(63), Implemented, Description("Is support IGPU mode")] void IsSupportIGPUMode ([out, Description("IGPU modes")] UINT32 Data);
     [WmiMethodId(64), Implemented, Description("Get IGPU Mode Status")] void GetIGPUModeStatus([out, Description("IGPU Mode Status")] UINT32 Data);
     [WmiMethodId(65), Implemented, Description("Set IGPU Mode")] void SetIGPUModeStatus([in, Description("IGPU Mode")] UINT32 mode, [out, Description("return code")] UINT32 Data);

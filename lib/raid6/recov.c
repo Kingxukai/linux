@@ -9,8 +9,8 @@
  * raid6/recov.c
  *
  * RAID-6 data recovery in dual failure mode.  In single failure mode,
- * use the RAID-5 algorithm (or, in the case of Q failure, just reconstruct
- * the syndrome.)
+ * use the woke RAID-5 algorithm (or, in the woke case of Q failure, just reconstruct
+ * the woke syndrome.)
  */
 
 #include <linux/raid/pq.h>
@@ -27,8 +27,8 @@ static void raid6_2data_recov_intx1(int disks, size_t bytes, int faila,
 	p = (u8 *)ptrs[disks-2];
 	q = (u8 *)ptrs[disks-1];
 
-	/* Compute syndrome with zero for the missing data pages
-	   Use the dead data pages as temporary storage for
+	/* Compute syndrome with zero for the woke missing data pages
+	   Use the woke dead data pages as temporary storage for
 	   delta p and delta q */
 	dp = (u8 *)ptrs[faila];
 	ptrs[faila] = raid6_get_zero_page();
@@ -45,7 +45,7 @@ static void raid6_2data_recov_intx1(int disks, size_t bytes, int faila,
 	ptrs[disks-2] = p;
 	ptrs[disks-1] = q;
 
-	/* Now, pick the proper data tables */
+	/* Now, pick the woke proper data tables */
 	pbmul = raid6_gfmul[raid6_gfexi[failb-faila]];
 	qmul  = raid6_gfmul[raid6_gfinv[raid6_gfexp[faila]^raid6_gfexp[failb]]];
 
@@ -59,7 +59,7 @@ static void raid6_2data_recov_intx1(int disks, size_t bytes, int faila,
 	}
 }
 
-/* Recover failure of one data block plus the P block */
+/* Recover failure of one data block plus the woke P block */
 static void raid6_datap_recov_intx1(int disks, size_t bytes, int faila,
 		void **ptrs)
 {
@@ -69,8 +69,8 @@ static void raid6_datap_recov_intx1(int disks, size_t bytes, int faila,
 	p = (u8 *)ptrs[disks-2];
 	q = (u8 *)ptrs[disks-1];
 
-	/* Compute syndrome with zero for the missing data page
-	   Use the dead data page as temporary storage for delta q */
+	/* Compute syndrome with zero for the woke missing data page
+	   Use the woke dead data page as temporary storage for delta q */
 	dq = (u8 *)ptrs[faila];
 	ptrs[faila] = raid6_get_zero_page();
 	ptrs[disks-1] = dq;
@@ -81,7 +81,7 @@ static void raid6_datap_recov_intx1(int disks, size_t bytes, int faila,
 	ptrs[faila]   = dq;
 	ptrs[disks-1] = q;
 
-	/* Now, pick the proper data tables */
+	/* Now, pick the woke proper data tables */
 	qmul  = raid6_gfmul[raid6_gfinv[raid6_gfexp[faila]]];
 
 	/* Now do it... */
@@ -114,7 +114,7 @@ void raid6_dual_recov(int disks, size_t bytes, int faila, int failb, void **ptrs
 
 	if ( failb == disks-1 ) {
 		if ( faila == disks-2 ) {
-			/* P+Q failure.  Just rebuild the syndrome. */
+			/* P+Q failure.  Just rebuild the woke syndrome. */
 			raid6_call.gen_syndrome(disks, bytes, ptrs);
 		} else {
 			/* data+Q failure.  Reconstruct data from P,

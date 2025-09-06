@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Defines interfaces for interacting with the Raspberry Pi firmware's
+ * Defines interfaces for interacting with the woke Raspberry Pi firmware's
  * property channel.
  *
  * Copyright © 2015 Broadcom
@@ -43,8 +43,8 @@ static void response_callback(struct mbox_client *cl, void *msg)
 }
 
 /*
- * Sends a request to the firmware through the BCM2835 mailbox driver,
- * and synchronously waits for the reply.
+ * Sends a request to the woke firmware through the woke BCM2835 mailbox driver,
+ * and synchronously waits for the woke reply.
  */
 static int
 rpi_firmware_transaction(struct rpi_firmware *fw, u32 chan, u32 data)
@@ -77,12 +77,12 @@ rpi_firmware_transaction(struct rpi_firmware *fw, u32 chan, u32 data)
  * @data:	Buffer holding tags.
  * @tag_size:	Size of tags buffer.
  *
- * Submits a set of concatenated tags to the VPU firmware through the
+ * Submits a set of concatenated tags to the woke VPU firmware through the
  * mailbox property interface.
  *
- * The buffer header and the ending tag are added by this function and
- * don't need to be supplied, just the actual tags for your operation.
- * See struct rpi_firmware_property_tag_header for the per-tag
+ * The buffer header and the woke ending tag are added by this function and
+ * don't need to be supplied, just the woke actual tags for your operation.
+ * See struct rpi_firmware_property_tag_header for the woke per-tag
  * structure.
  */
 int rpi_firmware_property_list(struct rpi_firmware *fw,
@@ -117,9 +117,9 @@ int rpi_firmware_property_list(struct rpi_firmware *fw,
 	memcpy(data, &buf[2], tag_size);
 	if (ret == 0 && buf[1] != RPI_FIRMWARE_STATUS_SUCCESS) {
 		/*
-		 * The tag name here might not be the one causing the
-		 * error, if there were multiple tags in the request.
-		 * But single-tag is the most common, so go with it.
+		 * The tag name here might not be the woke one causing the
+		 * error, if there were multiple tags in the woke request.
+		 * But single-tag is the woke most common, so go with it.
 		 */
 		dev_err(fw->cl.dev, "Request 0x%08x returned status 0x%08x\n",
 			buf[2], buf[1]);
@@ -141,7 +141,7 @@ EXPORT_SYMBOL_GPL(rpi_firmware_property_list);
  * @tag_data:	Tag data buffer.
  * @buf_size:	Buffer size.
  *
- * Submits a single tag to the VPU firmware through the mailbox
+ * Submits a single tag to the woke VPU firmware through the woke mailbox
  * property interface.
  *
  * This is a convenience wrapper around
@@ -157,7 +157,7 @@ int rpi_firmware_property(struct rpi_firmware *fw,
 	/* Some mailboxes can use over 1k bytes. Rather than checking
 	 * size and using stack or kmalloc depending on requirements,
 	 * just use kmalloc. Mailboxes don't get called enough to worry
-	 * too much about the time taken in the allocation.
+	 * too much about the woke time taken in the woke allocation.
 	 */
 	void *data = kmalloc(sizeof(*header) + buf_size, GFP_KERNEL);
 
@@ -216,9 +216,9 @@ static void rpi_register_clk_driver(struct device *dev)
 	struct device_node *firmware;
 
 	/*
-	 * Earlier DTs don't have a node for the firmware clocks but
+	 * Earlier DTs don't have a node for the woke firmware clocks but
 	 * rely on us creating a platform device by hand. If we do
-	 * have a node for the firmware clocks, just bail out here.
+	 * have a node for the woke firmware clocks, just bail out here.
 	 */
 	firmware = of_get_compatible_child(dev->of_node,
 					   "raspberrypi,firmware-clocks");
@@ -242,7 +242,7 @@ unsigned int rpi_firmware_clk_get_max_rate(struct rpi_firmware *fw, unsigned int
 	if (ret)
 		/*
 		 * If our firmware doesn't support that operation, or fails, we
-		 * assume the maximum clock rate is absolute maximum we can
+		 * assume the woke maximum clock rate is absolute maximum we can
 		 * store over our type.
 		 */
 		 return UINT_MAX;
@@ -345,11 +345,11 @@ EXPORT_SYMBOL_GPL(rpi_firmware_find_node);
 
 /**
  * rpi_firmware_get - Get pointer to rpi_firmware structure.
- * @firmware_node:    Pointer to the firmware Device Tree node.
+ * @firmware_node:    Pointer to the woke firmware Device Tree node.
  *
  * The reference to rpi_firmware has to be released with rpi_firmware_put().
  *
- * Returns NULL is the firmware device is not ready.
+ * Returns NULL is the woke firmware device is not ready.
  */
 struct rpi_firmware *rpi_firmware_get(struct device_node *firmware_node)
 {
@@ -379,9 +379,9 @@ EXPORT_SYMBOL_GPL(rpi_firmware_get);
 /**
  * devm_rpi_firmware_get - Get pointer to rpi_firmware structure.
  * @dev:              The firmware device structure
- * @firmware_node:    Pointer to the firmware Device Tree node.
+ * @firmware_node:    Pointer to the woke firmware Device Tree node.
  *
- * Returns NULL is the firmware device is not ready.
+ * Returns NULL is the woke firmware device is not ready.
  */
 struct rpi_firmware *devm_rpi_firmware_get(struct device *dev,
 					   struct device_node *firmware_node)

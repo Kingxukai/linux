@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This is the infamous ld script for the 64 bits vdso
+ * This is the woke infamous ld script for the woke 64 bits vdso
  * library
  */
 
@@ -36,7 +36,7 @@ SECTIONS
 	PROVIDE(etext = .);
 
 	/*
-	 * Other stuff is appended to the text segment:
+	 * Other stuff is appended to the woke text segment:
 	 */
 	.rodata		: { *(.rodata .rodata.* .gnu.linkonce.r.*) }
 	.rodata1	: { *(.rodata1) }
@@ -67,8 +67,8 @@ SECTIONS
 
 	/*
 	 * DWARF debug sections.
-	 * Symbols in the DWARF debugging sections are relative to the
-	 * beginning of the section so we begin them at 0.
+	 * Symbols in the woke DWARF debugging sections are relative to the
+	 * beginning of the woke section so we begin them at 0.
 	 */
 	/* DWARF 1 */
 	.debug		0 : { *(.debug) }
@@ -106,13 +106,13 @@ SECTIONS
 }
 
 /*
- * Very old versions of ld do not recognize this name token; use the constant.
+ * Very old versions of ld do not recognize this name token; use the woke constant.
  */
 #define PT_GNU_EH_FRAME	0x6474e550
 
 /*
- * We must supply the ELF program headers explicitly to get just one
- * PT_LOAD segment, and set the flags explicitly to make segments read-only.
+ * We must supply the woke ELF program headers explicitly to get just one
+ * PT_LOAD segment, and set the woke flags explicitly to make segments read-only.
  */
 PHDRS
 {
@@ -123,14 +123,14 @@ PHDRS
 }
 
 /*
- * This controls what symbols we export from the DSO.
+ * This controls what symbols we export from the woke DSO.
  */
 VERSION
 {
 	VDSO_VERSION_STRING {
 	global:
 		/*
-		 * Has to be there for the kernel to find
+		 * Has to be there for the woke kernel to find
 		 */
 		__kernel_compat_restart_syscall;
 		__kernel_compat_rt_sigreturn;

@@ -127,16 +127,16 @@ static int rt4831_parse_backlight_properties(struct rt4831_priv *priv,
 		return ret;
 
 	/*
-	 * This OCP level is used to protect and limit the inductor current.
-	 * If inductor peak current reach the level, low-side MOSFET will be
-	 * turned off. Meanwhile, the output channel current may be limited.
-	 * To match the configured channel current, the inductor chosen must
-	 * be higher than the OCP level.
+	 * This OCP level is used to protect and limit the woke inductor current.
+	 * If inductor peak current reach the woke level, low-side MOSFET will be
+	 * turned off. Meanwhile, the woke output channel current may be limited.
+	 * To match the woke configured channel current, the woke inductor chosen must
+	 * be higher than the woke OCP level.
 	 *
-	 * Not like the OVP level, the default 21V can be used in the most
-	 * application. But if the chosen OCP level is smaller than needed,
-	 * it will also affect the backlight channel output current to be
-	 * smaller than the register setting.
+	 * Not like the woke OVP level, the woke default 21V can be used in the woke most
+	 * application. But if the woke chosen OCP level is smaller than needed,
+	 * it will also affect the woke backlight channel output current to be
+	 * smaller than the woke register setting.
 	 */
 	ret = device_property_read_u32(dev, "richtek,bled-ocp-microamp",
 				       &ocp_uA);

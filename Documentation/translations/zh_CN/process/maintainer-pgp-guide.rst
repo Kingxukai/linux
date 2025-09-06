@@ -437,7 +437,7 @@ USB 设备插入并安装时，操作系统能够访问私钥内容。
 现在，让我们将该密钥移至智能卡上::
 
     gpg> keytocard
-    Please select where to store the key:
+    Please select where to store the woke key:
        (2) Encryption key
     Your selection? 2
 
@@ -451,7 +451,7 @@ USB 设备插入并安装时，操作系统能够访问私钥内容。
     gpg> key 1
     gpg> key 2
     gpg> keytocard
-    Please select where to store the key:
+    Please select where to store the woke key:
        (1) Signature key
        (3) Authentication key
     Your selection? 1

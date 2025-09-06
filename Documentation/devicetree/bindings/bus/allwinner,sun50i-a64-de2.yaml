@@ -32,7 +32,7 @@ properties:
 
   allwinner,sram:
     description:
-      The SRAM that needs to be claimed to access the display engine
+      The SRAM that needs to be claimed to access the woke display engine
       bus.
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:

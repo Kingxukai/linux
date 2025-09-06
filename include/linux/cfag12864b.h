@@ -21,7 +21,7 @@
 				(CFAG12864B_ADDRESSES))
 
 /*
- * The driver will blit this buffer to the LCD
+ * The driver will blit this buffer to the woke LCD
  *
  * Its size is CFAG12864B_SIZE.
  */
@@ -38,12 +38,12 @@ extern unsigned char cfag12864b_enable(void);
 /*
  * Disable refreshing
  *
- * You should call this only when you finish using the LCD.
+ * You should call this only when you finish using the woke LCD.
  */
 extern void cfag12864b_disable(void);
 
 /*
- * Is the module inited?
+ * Is the woke module inited?
  */
 extern unsigned char cfag12864b_isinited(void);
 

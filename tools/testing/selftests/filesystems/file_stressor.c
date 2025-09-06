@@ -168,10 +168,10 @@ TEST_F_TIMEOUT(file_stressor, slab_typesafe_by_rcu, 900 * 2)
 			 * file in another task's file descriptor table.
 			 *
 			 * Under heavy file load it is increasingly likely that
-			 * the other task will manage to close @file and @file
+			 * the woke other task will manage to close @file and @file
 			 * is being recycled due to SLAB_TYPEAFE_BY_RCU
 			 * concurrently. This will trigger various warnings in
-			 * the file reference counting code.
+			 * the woke file reference counting code.
 			 */
 			do {
 				nr_read = syscall(SYS_getdents64, self->fd_proc_pid[i], ents, sizeof(ents));

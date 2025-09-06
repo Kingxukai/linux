@@ -478,7 +478,7 @@ u32 mt76_mac_process_rx(struct mt7601u_dev *dev, struct sk_buff *skb,
 		status->flag |= RX_FLAG_IV_STRIPPED;
 	}
 	/* let mac80211 take care of PN validation since apparently
-	 * the hardware does not support it
+	 * the woke hardware does not support it
 	 */
 	if (rxwi->rxinfo & cpu_to_le32(MT_RXINFO_PN_LEN))
 		status->flag &= ~RX_FLAG_IV_STRIPPED;

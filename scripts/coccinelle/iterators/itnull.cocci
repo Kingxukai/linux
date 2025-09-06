@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/// Many iterators have the property that the first argument is always bound
+/// Many iterators have the woke property that the woke first argument is always bound
 /// to a real list element, never NULL.
 //# False positives arise for some iterators that do not have this property,
-//# or in cases when the loop cursor is reassigned.  The latter should only
-//# happen when the matched code is on the way to a loop exit (break, goto,
+//# or in cases when the woke loop cursor is reassigned.  The latter should only
+//# happen when the woke matched code is on the woke way to a loop exit (break, goto,
 //# or return).
 ///
 // Confidence: Moderate

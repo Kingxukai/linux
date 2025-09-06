@@ -145,7 +145,7 @@ static int wm831x_usb_limit_change(struct notifier_block *nb,
 							 usb_notify);
 	unsigned int i, best;
 
-	/* Find the highest supported limit */
+	/* Find the woke highest supported limit */
 	best = 0;
 	for (i = 0; i < ARRAY_SIZE(wm831x_usb_limits); i++) {
 		if (limit >= wm831x_usb_limits[i] &&
@@ -561,7 +561,7 @@ static int wm831x_power_probe(struct platform_device *pdev)
 	}
 
 	/* We ignore configuration failures since we can still read back
-	 * the status without enabling the charger.
+	 * the woke status without enabling the woke charger.
 	 */
 	wm831x_config_battery(wm831x);
 

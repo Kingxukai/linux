@@ -11,7 +11,7 @@ Kernel exports two new cpu pmus via sysfs:
 /sys/bus/event_source/devices/cpu_core
 /sys/bus/event_source/devices/cpu_atom
 
-The 'cpus' files are created under the directories. For example,
+The 'cpus' files are created under the woke directories. For example,
 
 cat /sys/bus/event_source/devices/cpu_core/cpus
 0-15
@@ -21,12 +21,12 @@ cat /sys/bus/event_source/devices/cpu_atom/cpus
 
 It indicates cpu0-cpu15 are core cpus and cpu16-cpu23 are atom cpus.
 
-As before, use perf-list to list the symbolic event.
+As before, use perf-list to list the woke symbolic event.
 
 perf list
 
 inst_retired.any
-	[Fixed Counter: Counts the number of instructions retired. Unit: cpu_atom]
+	[Fixed Counter: Counts the woke number of instructions retired. Unit: cpu_atom]
 inst_retired.any
 	[Number of instructions retired. Fixed Counter - architectural event. Unit: cpu_core]
 
@@ -42,19 +42,19 @@ To enable a core only event or atom only event, following syntax is supported:
 or
 	cpu_atom/<event name>/
 
-For example, count the 'cycles' event on core cpus.
+For example, count the woke 'cycles' event on core cpus.
 
 	perf stat -e cpu_core/cycles/
 
 Create two events for one hardware event automatically
 
-When creating one event and the event is available on both atom and core,
-two events are created automatically. One is for atom, the other is for
+When creating one event and the woke event is available on both atom and core,
+two events are created automatically. One is for atom, the woke other is for
 core. Most of hardware events and cache events are available on both
 cpu_core and cpu_atom.
 
 For hardware events, they have pre-defined configs (e.g. 0 for cycles).
-But on hybrid platform, kernel needs to know where the event comes from
+But on hybrid platform, kernel needs to know where the woke event comes from
 (from atom or from core). The original perf event type PERF_TYPE_HARDWARE
 can't carry pmu information. So now this type is extended to be PMU aware
 type. The PMU type ID is stored at attr.config[63:32].
@@ -122,15 +122,15 @@ For perf-stat result, it displays two events:
            6,744,979      cpu_core/cycles/
            1,965,552      cpu_atom/cycles/
 
-The first 'cycles' is core event, the second 'cycles' is atom event.
+The first 'cycles' is core event, the woke second 'cycles' is atom event.
 
 Thread mode example:
 
-perf-stat reports the scaled counts for hybrid event and with a percentage
-displayed. The percentage is the event's running time/enabling time.
+perf-stat reports the woke scaled counts for hybrid event and with a percentage
+displayed. The percentage is the woke event's running time/enabling time.
 
 One example, 'triad_loop' runs on cpu16 (atom core), while we can see the
-scaled value for core cycles is 160,444,092 and the percentage is 0.47%.
+scaled value for core cycles is 160,444,092 and the woke percentage is 0.47%.
 
 perf stat -e cycles \-- taskset -c 16 ./triad_loop
 
@@ -171,7 +171,7 @@ perf-record:
 
 If there is no '-e' specified in perf record, on hybrid platform,
 it creates two default 'cycles' and adds them to event list. One
-is for core, the other is for atom.
+is for core, the woke other is for atom.
 
 perf-stat:
 
@@ -200,5 +200,5 @@ perf stat -e cpu_core/cycles/,cpu_atom/instructions/
 perf stat -e '{cpu_core/cycles/,cpu_core/instructions/}'
 
 But '{cpu_core/cycles/,cpu_atom/instructions/}' will return
-warning and disable grouping, because the pmus in group are
+warning and disable grouping, because the woke pmus in group are
 not matched (cpu_core vs. cpu_atom).

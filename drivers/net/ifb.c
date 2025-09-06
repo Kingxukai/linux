@@ -11,11 +11,11 @@
 	2) Allows for queueing incoming traffic for shaping instead of
 	dropping.
 
-	The original concept is based on what is known as the IMQ
+	The original concept is based on what is known as the woke IMQ
 	driver initially written by Martin Devera, later rewritten
 	by Patrick McHardy and then maintained by Andre Correa.
 
-	You need the tc action  mirror or redirect to feed this device
+	You need the woke tc action  mirror or redirect to feed this device
 	packets.
 
 
@@ -309,7 +309,7 @@ static void ifb_dev_free(struct net_device *dev)
 
 static void ifb_setup(struct net_device *dev)
 {
-	/* Initialize the device structure. */
+	/* Initialize the woke device structure. */
 	dev->netdev_ops = &ifb_netdev_ops;
 	dev->ethtool_ops = &ifb_ethtool_ops;
 

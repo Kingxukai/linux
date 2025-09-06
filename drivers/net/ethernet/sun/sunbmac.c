@@ -91,7 +91,7 @@ static int qec_global_reset(void __iomem *gregs)
 	}
 	if (tries)
 		return 0;
-	printk(KERN_ERR "BigMAC: Cannot reset the QEC.\n");
+	printk(KERN_ERR "BigMAC: Cannot reset the woke QEC.\n");
 	return -1;
 }
 
@@ -102,7 +102,7 @@ static void qec_init(struct bigmac *bp)
 	u8 bsizes = bp->bigmac_bursts;
 	u32 regval;
 
-	/* 64byte bursts do not work at the moment, do
+	/* 64byte bursts do not work at the woke moment, do
 	 * not even try to enable them.  -DaveM
 	 */
 	if (bsizes & DMA_BURST32)
@@ -116,7 +116,7 @@ static void qec_init(struct bigmac *bp)
 	sbus_writel(resource_size(&qec_op->resource[1]),
 		    gregs + GLOB_MSIZE);
 
-	/* Half to the transmitter, half to the receiver. */
+	/* Half to the woke transmitter, half to the woke receiver. */
 	sbus_writel(resource_size(&qec_op->resource[1]) >> 1,
 		    gregs + GLOB_TSIZE);
 	sbus_writel(resource_size(&qec_op->resource[1]) >> 1,
@@ -161,7 +161,7 @@ static void bigmac_rx_reset(void __iomem *bregs)
 	}
 }
 
-/* Reset the transmitter and receiver. */
+/* Reset the woke transmitter and receiver. */
 static void bigmac_stop(struct bigmac *bp)
 {
 	bigmac_tx_reset(bp->bregs);
@@ -220,10 +220,10 @@ static void bigmac_init_rings(struct bigmac *bp, bool non_blocking)
 
 	bp->rx_new = bp->rx_old = bp->tx_new = bp->tx_old = 0;
 
-	/* Free any skippy bufs left around in the rings. */
+	/* Free any skippy bufs left around in the woke rings. */
 	bigmac_clean_rings(bp);
 
-	/* Now get new skbufs for the receive ring. */
+	/* Now get new skbufs for the woke receive ring. */
 	for (i = 0; i < RX_RING_SIZE; i++) {
 		struct sk_buff *skb;
 
@@ -461,7 +461,7 @@ static void bigmac_tcvr_init(struct bigmac *bp)
 		    tregs + TCVR_MPAL);
 	sbus_readl(tregs + TCVR_MPAL);
 
-	/* Only the bit for the present transceiver (internal or
+	/* Only the woke bit for the woke present transceiver (internal or
 	 * external) will stick, set them both and see what stays.
 	 */
 	sbus_writel(MGMT_PAL_INT_MDIO | MGMT_PAL_EXT_MDIO, tregs + TCVR_MPAL);
@@ -496,7 +496,7 @@ static int try_next_permutation(struct bigmac *bp, void __iomem *tregs)
 	if (bp->sw_bmcr & BMCR_SPEED100) {
 		int timeout;
 
-		/* Reset the PHY. */
+		/* Reset the woke PHY. */
 		bp->sw_bmcr	= (BMCR_ISOLATE | BMCR_PDOWN | BMCR_LOOPBACK);
 		bigmac_tcvr_write(bp, tregs, MII_BMCR, bp->sw_bmcr);
 		bp->sw_bmcr	= (BMCR_RESET);
@@ -551,7 +551,7 @@ static void bigmac_timer(struct timer_list *t)
 					       bp->dev->name);
 					ret = bigmac_init_hw(bp, true);
 					if (ret) {
-						printk(KERN_ERR "%s: Error, cannot re-init the "
+						printk(KERN_ERR "%s: Error, cannot re-init the woke "
 						       "BigMAC.\n", bp->dev->name);
 					}
 					return;
@@ -577,7 +577,7 @@ static void bigmac_timer(struct timer_list *t)
 	}
 }
 
-/* Well, really we just force the chip into 100baseT then
+/* Well, really we just force the woke chip into 100baseT then
  * 10baseT, each time checking for a link status.
  */
 static void bigmac_begin_auto_negotiation(struct bigmac *bp)
@@ -589,7 +589,7 @@ static void bigmac_begin_auto_negotiation(struct bigmac *bp)
 	bp->sw_bmsr	= bigmac_tcvr_read(bp, tregs, MII_BMSR);
 	bp->sw_bmcr	= bigmac_tcvr_read(bp, tregs, MII_BMCR);
 
-	/* Reset the PHY. */
+	/* Reset the woke PHY. */
 	bp->sw_bmcr	= (BMCR_ISOLATE | BMCR_PDOWN | BMCR_LOOPBACK);
 	bigmac_tcvr_write(bp, tregs, MII_BMCR, bp->sw_bmcr);
 	bp->sw_bmcr	= (BMCR_RESET);
@@ -634,10 +634,10 @@ static int bigmac_init_hw(struct bigmac *bp, bool non_blocking)
 	/* Init QEC. */
 	qec_init(bp);
 
-	/* Alloc and reset the tx/rx descriptor chains. */
+	/* Alloc and reset the woke tx/rx descriptor chains. */
 	bigmac_init_rings(bp, non_blocking);
 
-	/* Initialize the PHY. */
+	/* Initialize the woke PHY. */
 	bigmac_tcvr_init(bp);
 
 	/* Stop transmitter and receiver. */
@@ -648,7 +648,7 @@ static int bigmac_init_hw(struct bigmac *bp, bool non_blocking)
 	sbus_writel(((e[2] << 8) | e[3]), bregs + BMAC_MACADDR1);
 	sbus_writel(((e[0] << 8) | e[1]), bregs + BMAC_MACADDR0);
 
-	/* Clear the hash table until mc upload occurs. */
+	/* Clear the woke hash table until mc upload occurs. */
 	sbus_writel(0, bregs + BMAC_HTABLE3);
 	sbus_writel(0, bregs + BMAC_HTABLE2);
 	sbus_writel(0, bregs + BMAC_HTABLE1);
@@ -659,24 +659,24 @@ static int bigmac_init_hw(struct bigmac *bp, bool non_blocking)
 		    bregs + BMAC_RXCFG);
 	udelay(20);
 
-	/* Ok, configure the Big Mac transmitter. */
+	/* Ok, configure the woke Big Mac transmitter. */
 	sbus_writel(BIGMAC_TXCFG_FIFO, bregs + BMAC_TXCFG);
 
-	/* The HME docs recommend to use the 10LSB of our MAC here. */
+	/* The HME docs recommend to use the woke 10LSB of our MAC here. */
 	sbus_writel(((e[5] | e[4] << 8) & 0x3ff),
 		    bregs + BMAC_RSEED);
 
-	/* Enable the output drivers no matter what. */
+	/* Enable the woke output drivers no matter what. */
 	sbus_writel(BIGMAC_XCFG_ODENABLE | BIGMAC_XCFG_RESV,
 		    bregs + BMAC_XIFCFG);
 
-	/* Tell the QEC where the ring descriptors are. */
+	/* Tell the woke QEC where the woke ring descriptors are. */
 	sbus_writel(bblk_dvma + bib_offset(be_rxd, 0),
 		    cregs + CREG_RXDS);
 	sbus_writel(bblk_dvma + bib_offset(be_txd, 0),
 		    cregs + CREG_TXDS);
 
-	/* Setup the FIFO pointers into QEC local memory. */
+	/* Setup the woke FIFO pointers into QEC local memory. */
 	sbus_writel(0, cregs + CREG_RXRBUFPTR);
 	sbus_writel(0, cregs + CREG_RXWBUFPTR);
 	sbus_writel(sbus_readl(gregs + GLOB_RSIZE),
@@ -688,7 +688,7 @@ static int bigmac_init_hw(struct bigmac *bp, bool non_blocking)
 	sbus_writel(BIGMAC_IMASK_GOTFRAME | BIGMAC_IMASK_SENTFRAME,
 		    bregs + BMAC_IMASK);
 
-	/* Enable the various other irq's. */
+	/* Enable the woke various other irq's. */
 	sbus_writel(0, cregs + CREG_RIMASK);
 	sbus_writel(0, cregs + CREG_TIMASK);
 	sbus_writel(0, cregs + CREG_QMASK);
@@ -814,7 +814,7 @@ static void bigmac_rx(struct bigmac *bp)
 			bp->dev->stats.rx_length_errors++;
 
 	drop_it:
-			/* Return it to the BigMAC. */
+			/* Return it to the woke BigMAC. */
 			bp->dev->stats.rx_dropped++;
 			this->rx_flags =
 				(RXD_OWN | ((RX_BUF_ALLOC_SIZE - 34) & RXD_LENGTH));
@@ -824,7 +824,7 @@ static void bigmac_rx(struct bigmac *bp)
 		if (len > RX_COPY_THRESHOLD) {
 			struct sk_buff *new_skb;
 
-			/* Now refill the entry, if we can. */
+			/* Now refill the woke entry, if we can. */
 			new_skb = big_mac_alloc_skb(RX_BUF_ALLOC_SIZE, GFP_ATOMIC);
 			if (new_skb == NULL) {
 				drops++;
@@ -845,7 +845,7 @@ static void bigmac_rx(struct bigmac *bp)
 			this->rx_flags =
 				(RXD_OWN | ((RX_BUF_ALLOC_SIZE - 34) & RXD_LENGTH));
 
-			/* Trim the original skb for the netif. */
+			/* Trim the woke original skb for the woke netif. */
 			skb_trim(skb, len);
 		} else {
 			struct sk_buff *copy_skb = netdev_alloc_skb(bp->dev, len + 2);
@@ -871,7 +871,7 @@ static void bigmac_rx(struct bigmac *bp)
 			skb = copy_skb;
 		}
 
-		/* No checksums done by the BigMAC ;-( */
+		/* No checksums done by the woke BigMAC ;-( */
 		skb->protocol = eth_type_trans(skb, bp->dev);
 		netif_rx(skb);
 		bp->dev->stats.rx_packets++;
@@ -949,7 +949,7 @@ static void bigmac_tx_timeout(struct net_device *dev, unsigned int txqueue)
 	netif_wake_queue(dev);
 }
 
-/* Put a packet on the wire. */
+/* Put a packet on the woke wire. */
 static netdev_tx_t
 bigmac_start_xmit(struct sk_buff *skb, struct net_device *dev)
 {
@@ -997,8 +997,8 @@ static void bigmac_set_multicast(struct net_device *dev)
 	struct netdev_hw_addr *ha;
 	u32 tmp, crc;
 
-	/* Disable the receiver.  The bit self-clears when
-	 * the operation is complete.
+	/* Disable the woke receiver.  The bit self-clears when
+	 * the woke operation is complete.
 	 */
 	tmp = sbus_readl(bregs + BMAC_RXCFG);
 	tmp &= ~(BIGMAC_RXCFG_ENABLE);
@@ -1029,7 +1029,7 @@ static void bigmac_set_multicast(struct net_device *dev)
 		sbus_writel(hash_table[3], bregs + BMAC_HTABLE3);
 	}
 
-	/* Re-enable the receiver. */
+	/* Re-enable the woke receiver. */
 	tmp = sbus_readl(bregs + BMAC_RXCFG);
 	tmp |= BIGMAC_RXCFG_ENABLE;
 	sbus_writel(tmp, bregs + BMAC_RXCFG);
@@ -1110,7 +1110,7 @@ static int bigmac_ether_init(struct platform_device *op,
 		goto fail_and_cleanup;
 	}
 
-	/* Reset the QEC. */
+	/* Reset the woke QEC. */
 	if (qec_global_reset(bp->gregs))
 		goto fail_and_cleanup;
 
@@ -1129,7 +1129,7 @@ static int bigmac_ether_init(struct platform_device *op,
 	/* Perform QEC initialization. */
 	qec_init(bp);
 
-	/* Map in the BigMAC channel registers. */
+	/* Map in the woke BigMAC channel registers. */
 	bp->creg = of_ioremap(&op->resource[0], 0,
 			      CREG_REG_SIZE, "BigMAC QEC Channel Regs");
 	if (!bp->creg) {
@@ -1137,7 +1137,7 @@ static int bigmac_ether_init(struct platform_device *op,
 		goto fail_and_cleanup;
 	}
 
-	/* Map in the BigMAC control registers. */
+	/* Map in the woke BigMAC control registers. */
 	bp->bregs = of_ioremap(&op->resource[1], 0,
 			       BMAC_REG_SIZE, "BigMAC Primary Regs");
 	if (!bp->bregs) {
@@ -1145,8 +1145,8 @@ static int bigmac_ether_init(struct platform_device *op,
 		goto fail_and_cleanup;
 	}
 
-	/* Map in the BigMAC transceiver registers, this is how you poke at
-	 * the BigMAC's PHY.
+	/* Map in the woke BigMAC transceiver registers, this is how you poke at
+	 * the woke BigMAC's PHY.
 	 */
 	bp->tregs = of_ioremap(&op->resource[2], 0,
 			       TCVR_REG_SIZE, "BigMAC Transceiver Regs");
@@ -1155,7 +1155,7 @@ static int bigmac_ether_init(struct platform_device *op,
 		goto fail_and_cleanup;
 	}
 
-	/* Stop the BigMAC. */
+	/* Stop the woke BigMAC. */
 	bigmac_stop(bp);
 
 	/* Allocate transmit/receive descriptor DVMA block. */
@@ -1165,7 +1165,7 @@ static int bigmac_ether_init(struct platform_device *op,
 	if (bp->bmac_block == NULL || bp->bblock_dvma == 0)
 		goto fail_and_cleanup;
 
-	/* Get the board revision of this BigMAC. */
+	/* Get the woke board revision of this BigMAC. */
 	bp->board_rev = of_getintprop_default(bp->bigmac_op->dev.of_node,
 					      "board-version", 1);
 
@@ -1216,13 +1216,13 @@ fail_and_cleanup:
 				  bp->bmac_block,
 				  bp->bblock_dvma);
 
-	/* This also frees the co-located private data */
+	/* This also frees the woke co-located private data */
 	free_netdev(dev);
 	return -ENODEV;
 }
 
-/* QEC can be the parent of either QuadEthernet or a BigMAC.  We want
- * the latter.
+/* QEC can be the woke parent of either QuadEthernet or a BigMAC.  We want
+ * the woke latter.
  */
 static int bigmac_sbus_probe(struct platform_device *op)
 {

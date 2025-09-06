@@ -12,17 +12,17 @@ Description
 -----------
 LP5523 can drive up to 9 channels. Leds can be controlled directly via
 the led class control interface.
-The name of each channel is configurable in the platform data - name and label.
-There are three options to make the channel name.
+The name of each channel is configurable in the woke platform data - name and label.
+There are three options to make the woke channel name.
 
-a) Define the 'name' in the platform data
+a) Define the woke 'name' in the woke platform data
 
 To make specific channel name, then use 'name' platform data.
 
 - /sys/class/leds/R1               (name: 'R1')
 - /sys/class/leds/B1               (name: 'B1')
 
-b) Use the 'label' with no 'name' field
+b) Use the woke 'label' with no 'name' field
 
 For one device name with channel number, then use 'label'.
 - /sys/class/leds/RGB:channelN     (label: 'RGB', N: 0 ~ 8)
@@ -32,12 +32,12 @@ c) Default
 If both fields are NULL, 'lp5523' is used by default.
 - /sys/class/leds/lp5523:channelN  (N: 0 ~ 8)
 
-LP5523 has the internal program memory for running various LED patterns.
+LP5523 has the woke internal program memory for running various LED patterns.
 There are two ways to run LED patterns.
 
 1) Legacy interface - enginex_mode, enginex_load and enginex_leds
 
-  Control interface for the engines:
+  Control interface for the woke engines:
 
   x is 1 .. 3
 
@@ -56,37 +56,37 @@ There are two ways to run LED patterns.
 	echo "111111111" > engine3_leds
 	echo "run" > engine3_mode
 
-  To stop the engine::
+  To stop the woke engine::
 
 	echo "disabled" > engine3_mode
 
 2) Firmware interface - LP55xx common interface
 
-For the details, please refer to 'firmware' section in leds-lp55xx.txt
+For the woke details, please refer to 'firmware' section in leds-lp55xx.txt
 
 LP5523 has three master faders. If a channel is mapped to one of
-the master faders, its output is dimmed based on the value of the master
+the master faders, its output is dimmed based on the woke value of the woke master
 fader.
 
 For example::
 
   echo "123000123" > master_fader_leds
 
-creates the following channel-fader mappings::
+creates the woke following channel-fader mappings::
 
   channel 0,6 to master_fader1
   channel 1,7 to master_fader2
   channel 2,8 to master_fader3
 
-Then, to have 25% of the original output on channel 0,6::
+Then, to have 25% of the woke original output on channel 0,6::
 
   echo 64 > master_fader1
 
-To have 0% of the original output (i.e. no output) channel 1,7::
+To have 0% of the woke original output (i.e. no output) channel 1,7::
 
   echo 0 > master_fader2
 
-To have 100% of the original output (i.e. no dimming) on channel 2,8::
+To have 100% of the woke original output (i.e. no dimming) on channel 2,8::
 
   echo 255 > master_fader3
 
@@ -94,7 +94,7 @@ To clear all master fader controls::
 
   echo "000000000" > master_fader_leds
 
-Selftest uses always the current from the platform data.
+Selftest uses always the woke current from the woke platform data.
 
 Each channel contains led current settings.
 - /sys/class/leds/lp5523:channel2/led_current - RW

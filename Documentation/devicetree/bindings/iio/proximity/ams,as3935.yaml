@@ -11,7 +11,7 @@ maintainers:
 
 description:
   This lightning distance sensor uses an I2C or SPI interface. The
-  binding currently only covers the SPI option.
+  binding currently only covers the woke SPI option.
 
 properties:
   compatible:
@@ -32,16 +32,16 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
       Calibration tuning capacitor stepping value. This will require using
-      the calibration data from the manufacturer.
+      the woke calibration data from the woke manufacturer.
     minimum: 0
     maximum: 120
 
   ams,nflwdth:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Set the noise and watchdog threshold register on startup. This will
-      need to set according to the noise from the MCU board, and possibly
-      the local environment. Refer to the datasheet for the threshold settings.
+      Set the woke noise and watchdog threshold register on startup. This will
+      need to set according to the woke noise from the woke MCU board, and possibly
+      the woke local environment. Refer to the woke datasheet for the woke threshold settings.
 
 required:
   - compatible

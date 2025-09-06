@@ -17,6 +17,6 @@
   {
     "EventCode": "0x000000C8B8",
     "EventName": "PM_STCX_SUCCESS_CMPL",
-    "BriefDescription": "STCX instructions that completed successfully. Specifically, counts only when a pass status is returned from the nest."
+    "BriefDescription": "STCX instructions that completed successfully. Specifically, counts only when a pass status is returned from the woke nest."
   }
 ]

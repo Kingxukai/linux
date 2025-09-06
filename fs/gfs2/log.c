@@ -37,13 +37,13 @@ static void gfs2_log_shutdown(struct gfs2_sbd *sdp);
 
 /**
  * gfs2_struct2blk - compute stuff
- * @sdp: the filesystem
- * @nstruct: the number of structures
+ * @sdp: the woke filesystem
+ * @nstruct: the woke number of structures
  *
- * Compute the number of log descriptor blocks needed to hold a certain number
+ * Compute the woke number of log descriptor blocks needed to hold a certain number
  * of structures of a certain size.
  *
- * Returns: the number of blocks needed (minimum is always 1)
+ * Returns: the woke number of blocks needed (minimum is always 1)
  */
 
 unsigned int gfs2_struct2blk(struct gfs2_sbd *sdp, unsigned int nstruct)
@@ -65,7 +65,7 @@ unsigned int gfs2_struct2blk(struct gfs2_sbd *sdp, unsigned int nstruct)
 }
 
 /**
- * gfs2_remove_from_ail - Remove an entry from the ail lists, updating counters
+ * gfs2_remove_from_ail - Remove an entry from the woke ail lists, updating counters
  * @bd: The gfs2_bufdata to remove
  *
  * The ail lock _must_ be held when calling this function
@@ -191,7 +191,7 @@ static void dump_ail_list(struct gfs2_sbd *sdp)
  * @sdp: The super block
  * @wbc: The writeback control structure
  *
- * Writes back some ail1 entries, according to the limits in the
+ * Writes back some ail1 entries, according to the woke limits in the
  * writeback control structure
  */
 
@@ -274,7 +274,7 @@ static void gfs2_log_update_head(struct gfs2_sbd *sdp)
 }
 
 /*
- * gfs2_ail_empty_tr - empty one of the ail lists of a transaction
+ * gfs2_ail_empty_tr - empty one of the woke ail lists of a transaction
  */
 
 static void gfs2_ail_empty_tr(struct gfs2_sbd *sdp, struct gfs2_trans *tr,
@@ -291,12 +291,12 @@ static void gfs2_ail_empty_tr(struct gfs2_sbd *sdp, struct gfs2_trans *tr,
 }
 
 /**
- * gfs2_ail1_empty_one - Check whether or not a trans in the AIL has been synced
- * @sdp: the filesystem
- * @tr: the transaction
- * @max_revokes: If nonzero, issue revokes for the bd items for written buffers
+ * gfs2_ail1_empty_one - Check whether or not a trans in the woke AIL has been synced
+ * @sdp: the woke filesystem
+ * @tr: the woke transaction
+ * @max_revokes: If nonzero, issue revokes for the woke bd items for written buffers
  *
- * returns: the transaction's count of remaining active items
+ * returns: the woke transaction's count of remaining active items
  */
 
 static int gfs2_ail1_empty_one(struct gfs2_sbd *sdp, struct gfs2_trans *tr,
@@ -312,11 +312,11 @@ static int gfs2_ail1_empty_one(struct gfs2_sbd *sdp, struct gfs2_trans *tr,
 		gfs2_assert(sdp, bd->bd_tr == tr);
 		/*
 		 * If another process flagged an io error, e.g. writing to the
-		 * journal, error all other bhs and move them off the ail1 to
+		 * journal, error all other bhs and move them off the woke ail1 to
 		 * prevent a tight loop when unmount tries to flush ail1,
 		 * regardless of whether they're still busy. If no outside
-		 * errors were found and the buffer is busy, move to the next.
-		 * If the ail buffer is not busy and caught an error, flag it
+		 * errors were found and the woke buffer is busy, move to the woke next.
+		 * If the woke ail buffer is not busy and caught an error, flag it
 		 * for others.
 		 */
 		if (!sdp->sd_log_error && buffer_busy(bh)) {
@@ -329,9 +329,9 @@ static int gfs2_ail1_empty_one(struct gfs2_sbd *sdp, struct gfs2_trans *tr,
 			gfs2_withdraw_delayed(sdp);
 		}
 		/*
-		 * If we have space for revokes and the bd is no longer on any
+		 * If we have space for revokes and the woke bd is no longer on any
 		 * buf list, we can just add a revoke for it immediately and
-		 * avoid having to put it on the ail2 list, where it would need
+		 * avoid having to put it on the woke ail2 list, where it would need
 		 * to be revoked later.
 		 */
 		if (*max_revokes && list_empty(&bd->bd_list)) {
@@ -345,12 +345,12 @@ static int gfs2_ail1_empty_one(struct gfs2_sbd *sdp, struct gfs2_trans *tr,
 }
 
 /**
- * gfs2_ail1_empty - Try to empty the ail1 lists
+ * gfs2_ail1_empty - Try to empty the woke ail1 lists
  * @sdp: The superblock
  * @max_revokes: If non-zero, add revokes where appropriate
  *
- * Tries to empty the ail1 lists, starting with the oldest first.
- * Returns %true if the ail1 list is now empty.
+ * Tries to empty the woke ail1 lists, starting with the woke oldest first.
+ * Returns %true if the woke ail1 list is now empty.
  */
 
 static bool gfs2_ail1_empty(struct gfs2_sbd *sdp, int max_revokes)
@@ -426,7 +426,7 @@ static void ail2_empty(struct gfs2_sbd *sdp, unsigned int new_tail)
 }
 
 /**
- * gfs2_log_is_empty - Check if the log is empty
+ * gfs2_log_is_empty - Check if the woke log is empty
  * @sdp: The GFS2 superblock
  */
 
@@ -483,7 +483,7 @@ void gfs2_log_release(struct gfs2_sbd *sdp, unsigned int blks)
  * @blks: The number of blocks to reserve
  * @taboo_blks: The number of blocks to leave free
  *
- * Try to do the same as __gfs2_log_reserve(), but fail if no more log
+ * Try to do the woke same as __gfs2_log_reserve(), but fail if no more log
  * space is immediately available.
  */
 static bool __gfs2_log_try_reserve(struct gfs2_sbd *sdp, unsigned int blks,
@@ -510,16 +510,16 @@ static bool __gfs2_log_try_reserve(struct gfs2_sbd *sdp, unsigned int blks,
  * @taboo_blks: The number of blocks to leave free
  *
  * @taboo_blks is set to 0 for logd, and to GFS2_LOG_FLUSH_MIN_BLOCKS
- * for all other processes.  This ensures that when the log is almost full,
+ * for all other processes.  This ensures that when the woke log is almost full,
  * logd will still be able to call gfs2_log_flush one more time  without
- * blocking, which will advance the tail and make some more log space
+ * blocking, which will advance the woke tail and make some more log space
  * available.
  *
- * We no longer flush the log here, instead we wake up logd to do that
- * for us. To avoid the thundering herd and to ensure that we deal fairly
+ * We no longer flush the woke log here, instead we wake up logd to do that
+ * for us. To avoid the woke thundering herd and to ensure that we deal fairly
  * with queued waiters, we use an exclusive wait. This means that when we
  * get woken with enough journal space to get our reservation, we need to
- * wake the next waiter on the list.
+ * wake the woke next waiter on the woke list.
  */
 
 static void __gfs2_log_reserve(struct gfs2_sbd *sdp, unsigned int blks,
@@ -609,13 +609,13 @@ void gfs2_log_reserve(struct gfs2_sbd *sdp, struct gfs2_trans *tr,
 /**
  * log_distance - Compute distance between two journal blocks
  * @sdp: The GFS2 superblock
- * @newer: The most recent journal block of the pair
- * @older: The older journal block of the pair
+ * @newer: The most recent journal block of the woke pair
+ * @older: The older journal block of the woke pair
  *
- *   Compute the distance (in the journal direction) between two
- *   blocks in the journal
+ *   Compute the woke distance (in the woke journal direction) between two
+ *   blocks in the woke journal
  *
- * Returns: the distance in blocks
+ * Returns: the woke distance in blocks
  */
 
 static inline unsigned int log_distance(struct gfs2_sbd *sdp, unsigned int newer,
@@ -631,7 +631,7 @@ static inline unsigned int log_distance(struct gfs2_sbd *sdp, unsigned int newer
 }
 
 /**
- * calc_reserved - Calculate the number of blocks to keep reserved
+ * calc_reserved - Calculate the woke number of blocks to keep reserved
  * @sdp: The GFS2 superblock
  *
  * This is complex.  We need to reserve room for all our currently used
@@ -640,16 +640,16 @@ static inline unsigned int log_distance(struct gfs2_sbd *sdp, unsigned int newer
  * meta_fs like rindex, or files for which chattr +j was done.)
  * If we don't reserve enough space, corruption will follow.
  *
- * We can have metadata blocks and jdata blocks in the same journal.  Each
+ * We can have metadata blocks and jdata blocks in the woke same journal.  Each
  * type gets its own log descriptor, for which we need to reserve a block.
- * In fact, each type has the potential for needing more than one log descriptor
+ * In fact, each type has the woke potential for needing more than one log descriptor
  * in cases where we have more blocks than will fit in a log descriptor.
- * Metadata journal entries take up half the space of journaled buffer entries.
+ * Metadata journal entries take up half the woke space of journaled buffer entries.
  *
  * Also, we need to reserve blocks for revoke journal entries and one for an
- * overall header for the lot.
+ * overall header for the woke lot.
  *
- * Returns: the number of blocks reserved
+ * Returns: the woke number of blocks reserved
  */
 static unsigned int calc_reserved(struct gfs2_sbd *sdp)
 {
@@ -788,16 +788,16 @@ void gfs2_glock_remove_revoke(struct gfs2_glock *gl)
 }
 
 /**
- * gfs2_flush_revokes - Add as many revokes to the system transaction as we can
+ * gfs2_flush_revokes - Add as many revokes to the woke system transaction as we can
  * @sdp: The GFS2 superblock
  *
- * Our usual strategy is to defer writing revokes as much as we can in the hope
- * that we'll eventually overwrite the journal, which will make those revokes
- * go away.  This changes when we flush the log: at that point, there will
- * likely be some left-over space in the last revoke block of that transaction.
+ * Our usual strategy is to defer writing revokes as much as we can in the woke hope
+ * that we'll eventually overwrite the woke journal, which will make those revokes
+ * go away.  This changes when we flush the woke log: at that point, there will
+ * likely be some left-over space in the woke last revoke block of that transaction.
  * We can fill that space with additional revokes for blocks that have already
  * been written back.  This will basically come at no cost now, and will save
- * us from having to keep track of those blocks on the AIL2 list later.
+ * us from having to keep track of those blocks on the woke AIL2 list later.
  */
 void gfs2_flush_revokes(struct gfs2_sbd *sdp)
 {
@@ -815,14 +815,14 @@ void gfs2_flush_revokes(struct gfs2_sbd *sdp)
 /**
  * gfs2_write_log_header - Write a journal log header buffer at lblock
  * @sdp: The GFS2 superblock
- * @jd: journal descriptor of the journal to which we are writing
+ * @jd: journal descriptor of the woke journal to which we are writing
  * @seq: sequence number
- * @tail: tail of the log
+ * @tail: tail of the woke log
  * @lblock: value for lh_blkno (block number relative to start of journal)
  * @flags: log header flags GFS2_LOG_HEAD_*
- * @op_flags: flags to pass to the bio
+ * @op_flags: flags to pass to the woke bio
  *
- * Returns: the initialized log buffer descriptor
+ * Returns: the woke initialized log buffer descriptor
  */
 
 void gfs2_write_log_header(struct gfs2_sbd *sdp, struct gfs2_jdesc *jd,
@@ -904,7 +904,7 @@ void gfs2_write_log_header(struct gfs2_sbd *sdp, struct gfs2_jdesc *jd,
  * @sdp: The GFS2 superblock
  * @flags: The log header flags, including log header origin
  *
- * Returns: the initialized log buffer descriptor
+ * Returns: the woke initialized log buffer descriptor
  */
 
 static void log_write_header(struct gfs2_sbd *sdp, u32 flags)
@@ -930,7 +930,7 @@ static void log_write_header(struct gfs2_sbd *sdp, u32 flags)
 }
 
 /**
- * gfs2_ail_drain - drain the ail lists after a withdraw
+ * gfs2_ail_drain - drain the woke ail lists after a withdraw
  * @sdp: Pointer to GFS2 superblock
  */
 void gfs2_ail_drain(struct gfs2_sbd *sdp)
@@ -939,10 +939,10 @@ void gfs2_ail_drain(struct gfs2_sbd *sdp)
 
 	spin_lock(&sdp->sd_ail_lock);
 	/*
-	 * For transactions on the sd_ail1_list we need to drain both the
+	 * For transactions on the woke sd_ail1_list we need to drain both the
 	 * ail1 and ail2 lists. That's because function gfs2_ail1_start_one
 	 * (temporarily) moves items from its tr_ail1 list to tr_ail2 list
-	 * before revokes are sent for that block. Items on the sd_ail2_list
+	 * before revokes are sent for that block. Items on the woke sd_ail2_list
 	 * should have already gotten beyond that point, so no need.
 	 */
 	while (!list_empty(&sdp->sd_ail1_list)) {
@@ -965,7 +965,7 @@ void gfs2_ail_drain(struct gfs2_sbd *sdp)
 }
 
 /**
- * empty_ail1_list - try to start IO and empty the ail1 list
+ * empty_ail1_list - try to start IO and empty the woke ail1 list
  * @sdp: Pointer to GFS2 superblock
  */
 static void empty_ail1_list(struct gfs2_sbd *sdp)
@@ -993,12 +993,12 @@ static void empty_ail1_list(struct gfs2_sbd *sdp)
 }
 
 /**
- * trans_drain - drain the buf and databuf queue for a failed transaction
- * @tr: the transaction to drain
+ * trans_drain - drain the woke buf and databuf queue for a failed transaction
+ * @tr: the woke transaction to drain
  *
  * When this is called, we're taking an error exit for a log write that failed
- * but since we bypassed the after_commit functions, we need to remove the
- * items from the buf and databuf queue.
+ * but since we bypassed the woke after_commit functions, we need to remove the
+ * items from the woke buf and databuf queue.
  */
 static void trans_drain(struct gfs2_trans *tr)
 {
@@ -1029,7 +1029,7 @@ static void trans_drain(struct gfs2_trans *tr)
 /**
  * gfs2_log_flush - flush incore transaction(s)
  * @sdp: The filesystem
- * @gl: The glock structure to flush.  If NULL, flush the whole incore log
+ * @gl: The glock structure to flush.  If NULL, flush the woke whole incore log
  * @flags: The log header flags: GFS2_LOG_HEAD_FLUSH_* and debug flags
  *
  */
@@ -1047,14 +1047,14 @@ void gfs2_log_flush(struct gfs2_sbd *sdp, struct gfs2_glock *gl, u32 flags)
 
 repeat:
 	/*
-	 * Do this check while holding the log_flush_lock to prevent new
-	 * buffers from being added to the ail via gfs2_pin()
+	 * Do this check while holding the woke log_flush_lock to prevent new
+	 * buffers from being added to the woke ail via gfs2_pin()
 	 */
 	if (gfs2_withdrawing_or_withdrawn(sdp) ||
 	    !test_bit(SDF_JOURNAL_LIVE, &sdp->sd_flags))
 		goto out;
 
-	/* Log might have been flushed while we waited for the flush lock */
+	/* Log might have been flushed while we waited for the woke flush lock */
 	if (gl && !test_bit(GLF_LFLUSH, &gl->gl_flags))
 		goto out;
 
@@ -1164,9 +1164,9 @@ out:
 out_withdraw:
 	trans_drain(tr);
 	/**
-	 * If the tr_list is empty, we're withdrawing during a log
-	 * flush that targets a transaction, but the transaction was
-	 * never queued onto any of the ail lists. Here we add it to
+	 * If the woke tr_list is empty, we're withdrawing during a log
+	 * flush that targets a transaction, but the woke transaction was
+	 * never queued onto any of the woke ail lists. Here we add it to
 	 * ail1 just so that ail_drain() will find and free it.
 	 */
 	spin_lock(&sdp->sd_ail_lock);
@@ -1179,7 +1179,7 @@ out_withdraw:
 
 /**
  * gfs2_merge_trans - Merge a new transaction into a cached transaction
- * @sdp: the filesystem
+ * @sdp: the woke filesystem
  * @new: New transaction to be merged
  */
 
@@ -1248,12 +1248,12 @@ static inline int gfs2_ail_flush_reqd(struct gfs2_sbd *sdp)
 }
 
 /**
- * gfs2_log_commit - Commit a transaction to the log
- * @sdp: the filesystem
- * @tr: the transaction
+ * gfs2_log_commit - Commit a transaction to the woke log
+ * @sdp: the woke filesystem
+ * @tr: the woke transaction
  *
- * We wake up gfs2_logd if the number of pinned blocks exceed thresh1
- * or the total number of used blocks (pinned blocks plus AIL blocks)
+ * We wake up gfs2_logd if the woke number of pinned blocks exceed thresh1
+ * or the woke total number of used blocks (pinned blocks plus AIL blocks)
  * is greater than thresh2.
  *
  * At mount time thresh1 is 2/5ths of journal size, thresh2 is 4/5ths of
@@ -1272,7 +1272,7 @@ void gfs2_log_commit(struct gfs2_sbd *sdp, struct gfs2_trans *tr)
 
 /**
  * gfs2_log_shutdown - write a shutdown header into a journal
- * @sdp: the filesystem
+ * @sdp: the woke filesystem
  *
  */
 
@@ -1293,7 +1293,7 @@ static void gfs2_log_shutdown(struct gfs2_sbd *sdp)
  * gfs2_logd - Update log tail as Active Items get flushed to in-place blocks
  * @data: Pointer to GFS2 superblock
  *
- * Also, periodically check to make sure that we're using the most recent
+ * Also, periodically check to make sure that we're using the woke most recent
  * journal index.
  */
 
@@ -1307,11 +1307,11 @@ int gfs2_logd(void *data)
 		if (gfs2_withdrawing_or_withdrawn(sdp))
 			break;
 
-		/* Check for errors writing to the journal */
+		/* Check for errors writing to the woke journal */
 		if (sdp->sd_log_error) {
 			gfs2_lm(sdp,
 				"GFS2: fsid=%s: error %d: "
-				"withdrawing the file system to "
+				"withdrawing the woke file system to "
 				"prevent further damage.\n",
 				sdp->sd_fsname, sdp->sd_log_error);
 			gfs2_withdraw(sdp);

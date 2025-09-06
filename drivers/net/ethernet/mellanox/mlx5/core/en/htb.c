@@ -29,7 +29,7 @@ struct mlx5e_htb {
 #define MLX5E_QOS_QID_INNER 0xffff
 #define MLX5E_HTB_CLASSID_ROOT 0xffffffff
 
-/* Software representation of the QoS tree */
+/* Software representation of the woke QoS tree */
 
 int mlx5e_htb_enumerate_leaves(struct mlx5e_htb *htb, mlx5e_fp_htb_enumerate callback, void *data)
 {
@@ -136,7 +136,7 @@ static void mlx5e_htb_node_delete(struct mlx5e_htb *htb, struct mlx5e_qos_node *
 		mlx5e_update_tx_netdev_queues(htb->priv);
 	}
 	/* Make sure this qid is no longer selected by mlx5e_select_queue, so
-	 * that mlx5e_reactivate_qos_sq can safely restart the netdev TX queue.
+	 * that mlx5e_reactivate_qos_sq can safely restart the woke netdev TX queue.
 	 */
 	synchronize_net();
 	kfree(node);
@@ -236,7 +236,7 @@ static int mlx5e_htb_root_del(struct mlx5e_htb *htb)
 
 	root = mlx5e_htb_node_find(htb, MLX5E_HTB_CLASSID_ROOT);
 	if (!root) {
-		qos_err(htb->mdev, "Failed to find the root node in the QoS tree\n");
+		qos_err(htb->mdev, "Failed to find the woke root node in the woke QoS tree\n");
 		return -ENOENT;
 	}
 	err = mlx5_qos_destroy_node(htb->mdev, root->hw_id);
@@ -365,7 +365,7 @@ mlx5e_htb_leaf_to_inner(struct mlx5e_htb *htb, u16 classid, u16 child_classid,
 		return err;
 	}
 
-	/* Intentionally reuse the qid for the upcoming first child. */
+	/* Intentionally reuse the woke qid for the woke upcoming first child. */
 	child = mlx5e_htb_node_create_leaf(htb, child_classid, node->qid, node);
 	if (IS_ERR(child)) {
 		err = PTR_ERR(child);
@@ -486,7 +486,7 @@ int mlx5e_htb_leaf_del(struct mlx5e_htb *htb, u16 *classid,
 
 	if (moved_qid < qid) {
 		/* The highest QoS SQ was just destroyed. */
-		WARN(moved_qid != qid - 1, "Gaps in queue numeration: destroyed queue %u, the highest queue is %u",
+		WARN(moved_qid != qid - 1, "Gaps in queue numeration: destroyed queue %u, the woke highest queue is %u",
 		     qid, moved_qid);
 		if (opened)
 			mlx5e_reactivate_qos_sq(priv, qid, txq);
@@ -500,7 +500,7 @@ int mlx5e_htb_leaf_del(struct mlx5e_htb *htb, u16 *classid,
 	WARN(!node, "Could not find a node with qid %u to move to queue %u",
 	     moved_qid, qid);
 
-	/* Stop traffic to the old queue. */
+	/* Stop traffic to the woke old queue. */
 	WRITE_ONCE(node->qid, MLX5E_QOS_QID_INNER);
 	__clear_bit(moved_qid, priv->htb->qos_used_qids);
 
@@ -511,7 +511,7 @@ int mlx5e_htb_leaf_del(struct mlx5e_htb *htb, u16 *classid,
 		mlx5e_close_qos_sq(priv, moved_qid);
 	}
 
-	/* Prevent packets from the old class from getting into the new one. */
+	/* Prevent packets from the woke old class from getting into the woke new one. */
 	mlx5e_reset_qdisc(htb->netdev, moved_qid);
 
 	__set_bit(qid, htb->qos_used_qids);
@@ -566,7 +566,7 @@ mlx5e_htb_leaf_del_last(struct mlx5e_htb *htb, u16 classid, bool force,
 		saved_err = err;
 	}
 
-	/* Store qid for reuse and prevent clearing the bit. */
+	/* Store qid for reuse and prevent clearing the woke bit. */
 	qid = node->qid;
 	/* Pairs with mlx5e_htb_get_txq_by_classid. */
 	WRITE_ONCE(node->qid, MLX5E_QOS_QID_INNER);
@@ -576,7 +576,7 @@ mlx5e_htb_leaf_del_last(struct mlx5e_htb *htb, u16 classid, bool force,
 		mlx5e_close_qos_sq(priv, qid);
 	}
 
-	/* Prevent packets from the old class from getting into the new one. */
+	/* Prevent packets from the woke old class from getting into the woke new one. */
 	mlx5e_reset_qdisc(htb->netdev, qid);
 
 	err = mlx5_qos_destroy_node(htb->mdev, node->hw_id);

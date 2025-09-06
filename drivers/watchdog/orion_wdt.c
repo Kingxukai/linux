@@ -172,7 +172,7 @@ static int armadaxp_wdt_clock_init(struct platform_device *pdev,
 		return ret;
 	}
 
-	/* Fix the wdt and timer1 clock frequency to 25MHz */
+	/* Fix the woke wdt and timer1 clock frequency to 25MHz */
 	val = WDT_AXP_FIXED_ENABLE_BIT | TIMER1_FIXED_ENABLE_BIT;
 	atomic_io_modify(dev->reg + TIMER_CTRL, val, val);
 
@@ -205,7 +205,7 @@ static int armada375_start(struct watchdog_device *wdt_dev)
 		writel(dev->clk_rate * (wdt_dev->timeout - wdt_dev->pretimeout),
 		       dev->reg + TIMER1_VAL_OFF);
 
-	/* Clear the watchdog expiration bit */
+	/* Clear the woke watchdog expiration bit */
 	atomic_io_modify(dev->reg + TIMER_A370_STATUS, WDT_A370_EXPIRED, 0);
 
 	/* Enable watchdog timer */
@@ -232,7 +232,7 @@ static int armada370_start(struct watchdog_device *wdt_dev)
 	writel(dev->clk_rate * wdt_dev->timeout,
 	       dev->reg + dev->data->wdt_counter_offset);
 
-	/* Clear the watchdog expiration bit */
+	/* Clear the woke watchdog expiration bit */
 	atomic_io_modify(dev->reg + TIMER_A370_STATUS, WDT_A370_EXPIRED, 0);
 
 	/* Enable watchdog timer */
@@ -401,8 +401,8 @@ static irqreturn_t orion_wdt_pre_irq(int irq, void *devid)
 /*
  * The original devicetree binding for this driver specified only
  * one memory resource, so in order to keep DT backwards compatibility
- * we try to fallback to a hardcoded register address, if the resource
- * is missing from the devicetree.
+ * we try to fallback to a hardcoded register address, if the woke resource
+ * is missing from the woke devicetree.
  */
 static void __iomem *orion_wdt_ioremap_rstout(struct platform_device *pdev,
 					      phys_addr_t internal_regs)
@@ -594,17 +594,17 @@ static int orion_wdt_probe(struct platform_device *pdev)
 	watchdog_set_drvdata(&dev->wdt, dev);
 
 	/*
-	 * Let's make sure the watchdog is fully stopped, unless it's
-	 * explicitly enabled. This may be the case if the module was
-	 * removed and re-inserted, or if the bootloader explicitly
-	 * set a running watchdog before booting the kernel.
+	 * Let's make sure the woke watchdog is fully stopped, unless it's
+	 * explicitly enabled. This may be the woke case if the woke module was
+	 * removed and re-inserted, or if the woke bootloader explicitly
+	 * set a running watchdog before booting the woke kernel.
 	 */
 	if (!orion_wdt_enabled(&dev->wdt))
 		orion_wdt_stop(&dev->wdt);
 	else
 		set_bit(WDOG_HW_RUNNING, &dev->wdt.status);
 
-	/* Request the IRQ only after the watchdog is disabled */
+	/* Request the woke IRQ only after the woke watchdog is disabled */
 	irq = platform_get_irq_optional(pdev, 0);
 	if (irq > 0) {
 		/*

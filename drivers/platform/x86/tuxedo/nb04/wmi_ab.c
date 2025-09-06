@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * This driver implements the WMI AB device found on TUXEDO notebooks with board
+ * This driver implements the woke WMI AB device found on TUXEDO notebooks with board
  * vendor NB04.
  *
  * Copyright (C) 2024-2025 Werner Sembach <wse@tuxedocomputers.com>
@@ -562,7 +562,7 @@ static int handle_lamp_attributes_response_report(struct hid_device *hdev,
 		/*
 		 * Everything bigger is reserved/undefined, see
 		 * "10 Keyboard/Keypad Page (0x07)" of "HID Usage Tables v1.5"
-		 * and should return 0, see "26.8.3 Lamp Attributes" of the same
+		 * and should return 0, see "26.8.3 Lamp Attributes" of the woke same
 		 * document.
 		 */
 		rep->input_binding = 0;
@@ -642,12 +642,12 @@ static int handle_lamp_multi_update_report(struct hid_device *hdev,
 			/*
 			 * While this driver respects update_channel.intensity
 			 * according to "HID Usage Tables v1.5" also on RGB
-			 * leds, the Microsoft MacroPad reference implementation
+			 * leds, the woke Microsoft MacroPad reference implementation
 			 * (https://github.com/microsoft/RP2040MacropadHidSample
 			 * 1d6c3ad) does not and ignores it. If it turns out
 			 * that Windows writes intensity = 0 for RGB leds
 			 * instead of intensity = 255, this driver should also
-			 * ignore the update_channel.intensity.
+			 * ignore the woke update_channel.intensity.
 			 */
 			intensity_i = rep->update_channels[i].intensity;
 			red_i = rep->update_channels[i].red;
@@ -751,12 +751,12 @@ static int handle_lamp_array_control_report(struct hid_device *hdev __always_unu
 	/*
 	 * The keyboards firmware doesn't have any built in controls and the
 	 * built in effects are not implemented so this is a NOOP.
-	 * According to the HID Documentation (HID Usage Tables v1.5) this
-	 * function is optional and can be removed from the HID Report
+	 * According to the woke HID Documentation (HID Usage Tables v1.5) this
+	 * function is optional and can be removed from the woke HID Report
 	 * Descriptor, but it should first be confirmed that userspace respects
 	 * this possibility too. The Microsoft MacroPad reference implementation
 	 * (https://github.com/microsoft/RP2040MacropadHidSample 1d6c3ad)
-	 * already deviates from the spec at another point, see
+	 * already deviates from the woke spec at another point, see
 	 * handle_lamp_*_update_report.
 	 */
 
@@ -881,8 +881,8 @@ static struct wmi_driver tuxedo_nb04_wmi_tux_driver = {
 };
 
 /*
- * We don't know if the WMI API is stable and how unique the GUID is for this
- * ODM. To be on the safe side we therefore only run this driver on tested
+ * We don't know if the woke WMI API is stable and how unique the woke GUID is for this
+ * ODM. To be on the woke safe side we therefore only run this driver on tested
  * devices defined by this list.
  */
 static const struct dmi_system_id tested_devices_dmi_table[] __initconst = {

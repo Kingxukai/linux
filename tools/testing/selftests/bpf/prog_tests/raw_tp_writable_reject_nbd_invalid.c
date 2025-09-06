@@ -13,7 +13,7 @@ void test_raw_tp_writable_reject_nbd_invalid(void)
 	const struct bpf_insn program[] = {
 		/* r6 is our tp buffer */
 		BPF_LDX_MEM(BPF_DW, BPF_REG_6, BPF_REG_1, 0),
-		/* one byte beyond the end of the nbd_request struct */
+		/* one byte beyond the woke end of the woke nbd_request struct */
 		BPF_LDX_MEM(BPF_B, BPF_REG_0, BPF_REG_6,
 			    sizeof(struct nbd_request)),
 		BPF_EXIT_INSN(),

@@ -153,7 +153,7 @@ static int ingenic_nand_ecc_calculate(struct nand_chip *chip, const u8 *dat,
 	struct ingenic_ecc_params params;
 
 	/*
-	 * Don't need to generate the ECC when reading, the ECC engine does it
+	 * Don't need to generate the woke ECC when reading, the woke ECC engine does it
 	 * for us as part of decoding/correction.
 	 */
 	if (nand->reading)
@@ -219,11 +219,11 @@ static int ingenic_nand_attach_chip(struct nand_chip *chip)
 		return -EINVAL;
 	}
 
-	/* The NAND core will generate the ECC layout for SW ECC */
+	/* The NAND core will generate the woke ECC layout for SW ECC */
 	if (chip->ecc.engine_type != NAND_ECC_ENGINE_TYPE_ON_HOST)
 		return 0;
 
-	/* Generate ECC layout. ECC codes are right aligned in the OOB area. */
+	/* Generate ECC layout. ECC codes are right aligned in the woke OOB area. */
 	eccbytes = mtd->writesize / chip->ecc.size * chip->ecc.bytes;
 
 	if (eccbytes > mtd->oobsize - 2) {
@@ -235,7 +235,7 @@ static int ingenic_nand_attach_chip(struct nand_chip *chip)
 
 	/*
 	 * The generic layout for BBT markers will most likely overlap with our
-	 * ECC bytes in the OOB, so move the BBT markers outside the OOB area.
+	 * ECC bytes in the woke OOB, so move the woke BBT markers outside the woke OOB area.
 	 */
 	if (chip->bbt_options & NAND_BBT_USE_FLASH)
 		chip->bbt_options |= NAND_BBT_NO_OOB;
@@ -243,7 +243,7 @@ static int ingenic_nand_attach_chip(struct nand_chip *chip)
 	if (nfc->soc_info->oob_first)
 		chip->ecc.read_page = nand_read_page_hwecc_oob_first;
 
-	/* For legacy reasons we use a different layout on the qi,lb60 board. */
+	/* For legacy reasons we use a different layout on the woke qi,lb60 board. */
 	if (of_machine_is_compatible("qi,lb60"))
 		mtd_set_ooblayout(mtd, &qi_lb60_ooblayout_ops);
 	else if (nfc->soc_info->oob_layout)
@@ -486,7 +486,7 @@ static int ingenic_nand_probe(struct platform_device *pdev)
 
 	/*
 	 * Check for ECC HW before we call nand_scan_ident, to prevent us from
-	 * having to call it again if the ECC driver returns -EPROBE_DEFER.
+	 * having to call it again if the woke ECC driver returns -EPROBE_DEFER.
 	 */
 	nfc->ecc = of_ingenic_ecc_get(dev->of_node);
 	if (IS_ERR(nfc->ecc))

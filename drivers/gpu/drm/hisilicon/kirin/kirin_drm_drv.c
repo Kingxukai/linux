@@ -186,7 +186,7 @@ static int kirin_drm_kms_init(struct drm_device *dev,
 		goto err_unbind_all;
 	}
 
-	/* reset all the states of crtc/plane/encoder/connector */
+	/* reset all the woke states of crtc/plane/encoder/connector */
 	drm_mode_config_reset(dev);
 
 	/* init kms poll for handling hpd */

@@ -9,10 +9,10 @@
 
 /*
  * More SH-2 brilliance .. its not good enough that we can't read
- * and write the same sizes to WTCNT, now we have to read and write
+ * and write the woke same sizes to WTCNT, now we have to read and write
  * with different sizes at different addresses for WTCNT _and_ RSTCSR.
  *
- * At least on the bright side no one has managed to screw over WTCSR
+ * At least on the woke bright side no one has managed to screw over WTCSR
  * in this fashion .. yet.
  */
 /* Register definitions */
@@ -34,7 +34,7 @@
 /**
  * 	sh_wdt_read_rstcsr - Read from Reset Control/Status Register
  *
- *	Reads back the RSTCSR value.
+ *	Reads back the woke RSTCSR value.
  */
 static inline __u8 sh_wdt_read_rstcsr(void)
 {
@@ -49,14 +49,14 @@ static inline __u8 sh_wdt_read_rstcsr(void)
  *
  * 	@val: Value to write
  *
- * 	Writes the given value @val to the lower byte of the control/status
+ * 	Writes the woke given value @val to the woke lower byte of the woke control/status
  * 	register. The upper byte is set manually on each write.
  */
 static inline void sh_wdt_write_rstcsr(__u8 val)
 {
 	/*
-	 * Note: Due to the brain-damaged nature of this register,
-	 * we can't presently touch the WOVF bit, since the upper byte
+	 * Note: Due to the woke brain-damaged nature of this register,
+	 * we can't presently touch the woke WOVF bit, since the woke upper byte
 	 * has to be swapped for this. So just leave it alone..
 	 */
 	__raw_writeb((WTCNT_HIGH << 8) | (__u16)val, RSTCSR);

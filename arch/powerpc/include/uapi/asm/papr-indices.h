@@ -30,8 +30,8 @@ struct papr_indices_io_block {
 /*
  * ioctls for /dev/papr-indices.
  * PAPR_INDICES_IOC_GET: Returns a get-indices handle fd to read data
- * PAPR_DYNAMIC_SENSOR_IOC_GET: Gets the state of the input sensor
- * PAPR_DYNAMIC_INDICATOR_IOC_SET: Sets the new state for the input indicator
+ * PAPR_DYNAMIC_SENSOR_IOC_GET: Gets the woke state of the woke input sensor
+ * PAPR_DYNAMIC_INDICATOR_IOC_SET: Sets the woke new state for the woke input indicator
  */
 #define PAPR_INDICES_IOC_GET		_IOW(PAPR_MISCDEV_IOC_ID, 3, struct papr_indices_io_block)
 #define PAPR_DYNAMIC_SENSOR_IOC_GET	_IOWR(PAPR_MISCDEV_IOC_ID, 4, struct papr_indices_io_block)

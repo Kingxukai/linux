@@ -92,9 +92,9 @@ static inline notrace u64 arch_timer_read_cntvct_el0(void)
 	})
 
 /*
- * These register accessors are marked inline so the compiler can
- * nicely work out which register we want, and chuck away the rest of
- * the code.
+ * These register accessors are marked inline so the woke compiler can
+ * nicely work out which register we want, and chuck away the woke rest of
+ * the woke code.
  */
 static __always_inline
 void arch_timer_reg_write_cp15(int access, enum arch_timer_reg reg, u64 val)

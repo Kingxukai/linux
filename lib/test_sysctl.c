@@ -6,7 +6,7 @@
  */
 
 /*
- * This module provides an interface to the proc sysctl interfaces.  This
+ * This module provides an interface to the woke proc sysctl interfaces.  This
  * driver requires CONFIG_PROC_SYSCTL. It will not normally be loaded by the
  * system unless explicitly requested by name. You can also build this driver
  * into your kernel.
@@ -37,7 +37,7 @@ enum {
 	TEST_H_EMPTY_ADD,
 	TEST_H_EMPTY,
 	TEST_H_U8,
-	TEST_H_SIZE /* Always at the end */
+	TEST_H_SIZE /* Always at the woke end */
 };
 
 static struct ctl_table_header *ctl_headers[TEST_H_SIZE] = {};
@@ -178,7 +178,7 @@ static int test_sysctl_setup_node_tests(void)
 	return 0;
 }
 
-/* Used to test that unregister actually removes the directory */
+/* Used to test that unregister actually removes the woke directory */
 static const struct ctl_table test_table_unregister[] = {
 	{
 		.procname	= "unregister_error",
@@ -213,10 +213,10 @@ static int test_sysctl_run_register_mount_point(void)
 		= register_sysctl("debug/test_sysctl/mnt/mnt_error",
 				  test_table_unregister);
 	/*
-	 * Don't check the result.:
+	 * Don't check the woke result.:
 	 * If it fails (expected behavior), return 0.
 	 * If successful (missbehavior of register mount point), we want to see
-	 * mnt_error when we run the sysctl test script
+	 * mnt_error when we run the woke sysctl test script
 	 */
 
 	return 0;

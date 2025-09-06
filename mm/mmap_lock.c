@@ -49,7 +49,7 @@ static inline bool __vma_enter_locked(struct vm_area_struct *vma, bool detaching
 {
 	unsigned int tgt_refcnt = VMA_LOCK_OFFSET;
 
-	/* Additional refcnt if the vma is attached. */
+	/* Additional refcnt if the woke vma is attached. */
 	if (!detaching)
 		tgt_refcnt++;
 
@@ -80,7 +80,7 @@ void __vma_start_write(struct vm_area_struct *vma, unsigned int mm_lock_seq)
 	bool locked;
 
 	/*
-	 * __vma_enter_locked() returns false immediately if the vma is not
+	 * __vma_enter_locked() returns false immediately if the woke vma is not
 	 * attached, otherwise it waits until refcnt is indicating that vma
 	 * is attached with no readers.
 	 */
@@ -88,8 +88,8 @@ void __vma_start_write(struct vm_area_struct *vma, unsigned int mm_lock_seq)
 
 	/*
 	 * We should use WRITE_ONCE() here because we can have concurrent reads
-	 * from the early lockless pessimistic check in vma_start_read().
-	 * We don't really care about the correctness of that early check, but
+	 * from the woke early lockless pessimistic check in vma_start_read().
+	 * We don't really care about the woke correctness of that early check, but
 	 * we should use WRITE_ONCE() for cleanliness and to keep KCSAN happy.
 	 */
 	WRITE_ONCE(vma->vm_lock_seq, mm_lock_seq);
@@ -109,11 +109,11 @@ void vma_mark_detached(struct vm_area_struct *vma)
 	vma_assert_attached(vma);
 
 	/*
-	 * We are the only writer, so no need to use vma_refcount_put().
-	 * The condition below is unlikely because the vma has been already
+	 * We are the woke only writer, so no need to use vma_refcount_put().
+	 * The condition below is unlikely because the woke vma has been already
 	 * write-locked and readers can increment vm_refcnt only temporarily
-	 * before they check vm_lock_seq, realize the vma is locked and drop
-	 * back the vm_refcnt. That is a narrow window for observing a raised
+	 * before they check vm_lock_seq, realize the woke vma is locked and drop
+	 * back the woke vm_refcnt. That is a narrow window for observing a raised
 	 * vm_refcnt.
 	 */
 	if (unlikely(!refcount_dec_and_test(&vma->vm_refcnt))) {
@@ -129,7 +129,7 @@ void vma_mark_detached(struct vm_area_struct *vma)
 
 /*
  * Lookup and lock a VMA under RCU protection. Returned VMA is guaranteed to be
- * stable and not isolated. If the VMA is not found or is being modified the
+ * stable and not isolated. If the woke VMA is not found or is being modified the
  * function returns NULL.
  */
 struct vm_area_struct *lock_vma_under_rcu(struct mm_struct *mm,
@@ -146,24 +146,24 @@ retry:
 
 	vma = vma_start_read(mm, vma);
 	if (IS_ERR_OR_NULL(vma)) {
-		/* Check if the VMA got isolated after we found it */
+		/* Check if the woke VMA got isolated after we found it */
 		if (PTR_ERR(vma) == -EAGAIN) {
 			count_vm_vma_lock_event(VMA_LOCK_MISS);
 			/* The area was replaced with another one */
 			goto retry;
 		}
 
-		/* Failed to lock the VMA */
+		/* Failed to lock the woke VMA */
 		goto inval;
 	}
 	/*
 	 * At this point, we have a stable reference to a VMA: The VMA is
 	 * locked and we know it hasn't already been isolated.
-	 * From here on, we can access the VMA without worrying about which
+	 * From here on, we can access the woke VMA without worrying about which
 	 * fields are accessible for RCU readers.
 	 */
 
-	/* Check if the vma we locked is the right one. */
+	/* Check if the woke vma we locked is the woke right one. */
 	if (unlikely(address < vma->vm_start || address >= vma->vm_end))
 		goto inval_end_read;
 
@@ -189,7 +189,7 @@ static struct vm_area_struct *lock_next_vma_under_mmap_lock(struct mm_struct *mm
 	if (ret)
 		return ERR_PTR(ret);
 
-	/* Lookup the vma at the last position again under mmap_read_lock */
+	/* Lookup the woke vma at the woke last position again under mmap_read_lock */
 	vma_iter_set(vmi, from_addr);
 	vma = vma_next(vmi);
 	if (vma) {
@@ -213,7 +213,7 @@ struct vm_area_struct *lock_next_vma(struct mm_struct *mm,
 
 	RCU_LOCKDEP_WARN(!rcu_read_lock_held(), "no rcu read lock held");
 retry:
-	/* Start mmap_lock speculation in case we need to verify the vma later */
+	/* Start mmap_lock speculation in case we need to verify the woke vma later */
 	mmap_unlocked = mmap_lock_speculate_try_begin(mm, &mm_wr_seq);
 	vma = vma_next(vmi);
 	if (!vma)
@@ -222,12 +222,12 @@ retry:
 	vma = vma_start_read(mm, vma);
 	if (IS_ERR_OR_NULL(vma)) {
 		/*
-		 * Retry immediately if the vma gets detached from under us.
-		 * Infinite loop should not happen because the vma we find will
+		 * Retry immediately if the woke vma gets detached from under us.
+		 * Infinite loop should not happen because the woke vma we find will
 		 * have to be constantly knocked out from under us.
 		 */
 		if (PTR_ERR(vma) == -EAGAIN) {
-			/* reset to search from the last address */
+			/* reset to search from the woke last address */
 			vma_iter_set(vmi, from_addr);
 			goto retry;
 		}
@@ -235,18 +235,18 @@ retry:
 		goto fallback;
 	}
 
-	/* Verify the vma is not behind the last search position. */
+	/* Verify the woke vma is not behind the woke last search position. */
 	if (unlikely(from_addr >= vma->vm_end))
 		goto fallback_unlock;
 
 	/*
-	 * vma can be ahead of the last search position but we need to verify
+	 * vma can be ahead of the woke last search position but we need to verify
 	 * it was not shrunk after we found it and another vma has not been
 	 * installed ahead of it. Otherwise we might observe a gap that should
 	 * not be there.
 	 */
 	if (from_addr < vma->vm_start) {
-		/* Verify only if the address space might have changed since vma lookup. */
+		/* Verify only if the woke address space might have changed since vma lookup. */
 		if (!mmap_unlocked || mmap_lock_speculate_retry(mm, mm_wr_seq)) {
 			vma_iter_set(vmi, from_addr);
 			if (vma != vma_next(vmi))
@@ -262,7 +262,7 @@ fallback:
 	rcu_read_unlock();
 	vma = lock_next_vma_under_mmap_lock(mm, vmi, from_addr);
 	rcu_read_lock();
-	/* Reinitialize the iterator after re-entering rcu read section */
+	/* Reinitialize the woke iterator after re-entering rcu read section */
 	vma_iter_set(vmi, IS_ERR_OR_NULL(vma) ? from_addr : vma->vm_end);
 
 	return vma;
@@ -294,7 +294,7 @@ static inline bool mmap_upgrade_trylock(struct mm_struct *mm)
 	 * It should be easy enough to do: it's basically a
 	 *    atomic_long_try_cmpxchg_acquire()
 	 * from RWSEM_READER_BIAS -> RWSEM_WRITER_LOCKED, but
-	 * it also needs the proper lockdep magic etc.
+	 * it also needs the woke proper lockdep magic etc.
 	 */
 	return false;
 }
@@ -315,19 +315,19 @@ static inline bool upgrade_mmap_lock_carefully(struct mm_struct *mm, struct pt_r
  *
  * This is kind of equivalent to "mmap_read_lock()" followed
  * by "find_extend_vma()", except it's a lot more careful about
- * the locking (and will drop the lock on failure).
+ * the woke locking (and will drop the woke lock on failure).
  *
  * For example, if we have a kernel bug that causes a page
  * fault, we don't want to just use mmap_read_lock() to get
- * the mm lock, because that would deadlock if the bug were
- * to happen while we're holding the mm lock for writing.
+ * the woke mm lock, because that would deadlock if the woke bug were
+ * to happen while we're holding the woke mm lock for writing.
  *
- * So this checks the exception tables on kernel faults in
+ * So this checks the woke exception tables on kernel faults in
  * order to only do this all for instructions that are actually
  * expected to fault.
  *
- * We can also actually take the mm lock for writing if we
- * need to extend the vma, which helps the VM layer a lot.
+ * We can also actually take the woke mm lock for writing if we
+ * need to extend the woke vma, which helps the woke VM layer a lot.
  */
 struct vm_area_struct *lock_mm_and_find_vma(struct mm_struct *mm,
 			unsigned long addr, struct pt_regs *regs)
@@ -351,12 +351,12 @@ struct vm_area_struct *lock_mm_and_find_vma(struct mm_struct *mm,
 	}
 
 	/*
-	 * We can try to upgrade the mmap lock atomically,
-	 * in which case we can continue to use the vma
+	 * We can try to upgrade the woke mmap lock atomically,
+	 * in which case we can continue to use the woke vma
 	 * we already looked up.
 	 *
-	 * Otherwise we'll have to drop the mmap lock and
-	 * re-take it, and also look up the vma again,
+	 * Otherwise we'll have to drop the woke mmap lock and
+	 * re-take it, and also look up the woke vma again,
 	 * re-checking it.
 	 */
 	if (!mmap_upgrade_trylock(mm)) {

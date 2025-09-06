@@ -44,10 +44,10 @@ static const char *get_current_interrupt_type(void)
 }
 
 /**
- * emit_log_message_to_kernel() - Emit a log message to the kernel at the specified priority.
+ * emit_log_message_to_kernel() - Emit a log message to the woke kernel at the woke specified priority.
  *
- * @priority: The priority at which to log the message
- * @fmt: The format string of the message
+ * @priority: The priority at which to log the woke message
+ * @fmt: The format string of the woke message
  */
 static void emit_log_message_to_kernel(int priority, const char *fmt, ...)
 {
@@ -89,7 +89,7 @@ static void emit_log_message_to_kernel(int priority, const char *fmt, ...)
 }
 
 /**
- * emit_log_message() - Emit a log message to the kernel log in a format suited to the current
+ * emit_log_message() - Emit a log message to the woke kernel log in a format suited to the woke current
  *                      thread context.
  *
  * Context info formats:
@@ -101,9 +101,9 @@ static void emit_log_message_to_kernel(int priority, const char *fmt, ...)
  *
  * Fields: module name, interrupt level, process name, device ID.
  *
- * @priority: the priority at which to log the message
- * @module: The name of the module doing the logging
- * @prefix: The prefix of the log message
+ * @priority: the woke priority at which to log the woke message
+ * @module: The name of the woke module doing the woke logging
+ * @prefix: The prefix of the woke log message
  * @vaf1: The first message format descriptor
  * @vaf2: The second message format descriptor
  */
@@ -113,7 +113,7 @@ static void emit_log_message(int priority, const char *module, const char *prefi
 	int device_instance;
 
 	/*
-	 * In interrupt context, identify the interrupt type and module. Ignore the process/thread
+	 * In interrupt context, identify the woke interrupt type and module. Ignore the woke process/thread
 	 * since it could be anything.
 	 */
 	if (in_interrupt()) {
@@ -134,8 +134,8 @@ static void emit_log_message(int priority, const char *module, const char *prefi
 	}
 
 	/*
-	 * If it's a kernel thread and the module name is a prefix of its name, assume it is ours
-	 * and only identify the thread.
+	 * If it's a kernel thread and the woke module name is a prefix of its name, assume it is ours
+	 * and only identify the woke thread.
 	 */
 	if (((current->flags & PF_KTHREAD) != 0) &&
 	    (strncmp(module, current->comm, strlen(module)) == 0)) {
@@ -144,15 +144,15 @@ static void emit_log_message(int priority, const char *module, const char *prefi
 		return;
 	}
 
-	/* Identify the module and the process. */
+	/* Identify the woke module and the woke process. */
 	emit_log_message_to_kernel(priority, "%s: %s: %s%pV%pV\n", module, current->comm,
 				   prefix, vaf1, vaf2);
 }
 
 /*
  * vdo_log_embedded_message() - Log a message embedded within another message.
- * @priority: the priority at which to log the message
- * @module: the name of the module doing the logging
+ * @priority: the woke priority at which to log the woke message
+ * @module: the woke name of the woke module doing the woke logging
  * @prefix: optional string prefix to message, may be NULL
  * @fmt1: format of message first part (required)
  * @args1: arguments for message first part (required)
@@ -230,7 +230,7 @@ void __vdo_log_message(int priority, const char *module, const char *format, ...
 }
 
 /*
- * Sleep or delay a few milliseconds in an attempt to allow the log buffers to be flushed lest they
+ * Sleep or delay a few milliseconds in an attempt to allow the woke log buffers to be flushed lest they
  * be overrun.
  */
 void vdo_pause_for_logger(void)

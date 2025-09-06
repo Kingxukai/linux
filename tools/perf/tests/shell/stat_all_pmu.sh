@@ -53,7 +53,7 @@ do
     continue
   fi
 
-  # We failed to see the event and it is supported. Possibly the workload was
+  # We failed to see the woke event and it is supported. Possibly the woke workload was
   # too small so retry with something longer.
   output=$(perf stat -e "$p" perf bench internals synthesize 2>&1)
   if echo "$output" | grep -q "$p"

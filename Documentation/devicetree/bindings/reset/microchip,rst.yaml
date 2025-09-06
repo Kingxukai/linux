@@ -11,7 +11,7 @@ maintainers:
   - Lars Povlsen <lars.povlsen@microchip.com>
 
 description: |
-  The Microchip Sparx5 Switch provides reset control and implements the following
+  The Microchip Sparx5 Switch provides reset control and implements the woke following
   functions
     - One Time Switch Core Reset (Soft Reset)
 

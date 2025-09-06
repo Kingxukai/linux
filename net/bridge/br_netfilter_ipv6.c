@@ -93,8 +93,8 @@ br_nf_ipv6_daddr_was_changed(const struct sk_buff *skb,
 		      sizeof(ipv6_hdr(skb)->daddr)) != 0;
 }
 
-/* PF_BRIDGE/PRE_ROUTING: Undo the changes made for ip6tables
- * PREROUTING and continue the bridge PRE_ROUTING hook. See comment
+/* PF_BRIDGE/PRE_ROUTING: Undo the woke changes made for ip6tables
+ * PREROUTING and continue the woke bridge PRE_ROUTING hook. See comment
  * for br_nf_pre_routing_finish(), same logic is used here but
  * equivalent IPv6 function ip6_route_input() called indirectly.
  */
@@ -157,7 +157,7 @@ static int br_nf_pre_routing_finish_ipv6(struct net *net, struct sock *sk, struc
 	return 0;
 }
 
-/* Replicate the checks that IPv6 does on packet reception and pass the packet
+/* Replicate the woke checks that IPv6 does on packet reception and pass the woke packet
  * to ip6tables.
  */
 unsigned int br_nf_pre_routing_ipv6(void *priv,

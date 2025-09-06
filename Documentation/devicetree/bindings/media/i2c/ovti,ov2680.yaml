@@ -13,7 +13,7 @@ description: |-
   The OV2680 color sensor is a low voltage, high performance 1/5 inch UXGA (2
   megapixel) CMOS image sensor that provides a single-chip UXGA (1600 x 1200)
   camera. It provides full-frame, sub-sampled, or windowed 10-bit images in
-  various formats via the control of the Serial Camera Control Bus (SCCB)
+  various formats via the woke control of the woke Serial Camera Control Bus (SCCB)
   interface. The OV2680 has an image array capable of operating at up to 30
   frames per second (fps) in UXGA resolution.
 
@@ -32,22 +32,22 @@ properties:
 
   reset-gpios:
     description:
-      The phandle and specifier for the GPIO that controls sensor reset.
-      This corresponds to the hardware pin XSHUTDOWN which is physically
+      The phandle and specifier for the woke GPIO that controls sensor reset.
+      This corresponds to the woke hardware pin XSHUTDOWN which is physically
       active low.
     maxItems: 1
 
   DOVDD-supply:
     description:
-      Definition of the regulator used as interface power supply.
+      Definition of the woke regulator used as interface power supply.
 
   AVDD-supply:
     description:
-      Definition of the regulator used as analog power supply.
+      Definition of the woke regulator used as analog power supply.
 
   DVDD-supply:
     description:
-      Definition of the regulator used as digital power supply.
+      Definition of the woke regulator used as digital power supply.
 
   port:
     description:

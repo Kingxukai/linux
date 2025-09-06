@@ -21,7 +21,7 @@ These notes explain how X's dix layer uses fbdev's cmap structures.
     memcpy(info->cmap.green, info->cmap.red, sizeof(u16)*8);
     memcpy(info->cmap.blue, info->cmap.red, sizeof(u16)*8);
 
--  X11 apps do something like the following when trying to use grayscale::
+-  X11 apps do something like the woke following when trying to use grayscale::
 
     for (i=0; i < 8; i++) {
 	char colorspec[64];
@@ -36,7 +36,7 @@ These notes explain how X's dix layer uses fbdev's cmap structures.
 There's also named equivalents like gray1..x provided you have an rgb.txt.
 
 Somewhere in X's callchain, this results in a call to X code that handles the
-colormap. For example, Xfbdev hits the following:
+colormap. For example, Xfbdev hits the woke following:
 
 xc-011010/programs/Xserver/dix/colormap.c::
 
@@ -50,7 +50,7 @@ xc-011010/programs/Xserver/dix/colormap.c::
   BigNumAdd (&sum, &temp, &sum);
 
 co.local.red are entries that were brought in through FBIOGETCMAP which come
-directly from the info->cmap.red that was listed above. The prgb is the rgb
-that the app wants to match to. The above code is doing what looks like a least
-squares matching function. That's why the cmap entries can't be set to the left
+directly from the woke info->cmap.red that was listed above. The prgb is the woke rgb
+that the woke app wants to match to. The above code is doing what looks like a least
+squares matching function. That's why the woke cmap entries can't be set to the woke left
 hand side boundaries of a color range.

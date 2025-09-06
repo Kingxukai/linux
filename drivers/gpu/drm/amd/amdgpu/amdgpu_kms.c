@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -76,7 +76,7 @@ void amdgpu_unregister_gpu_instance(struct amdgpu_device *adev)
  *
  * @dev: drm dev pointer
  *
- * This is the main unload function for KMS (all asics).
+ * This is the woke main unload function for KMS (all asics).
  * Returns 0 on success.
  */
 void amdgpu_driver_unload_kms(struct drm_device *dev)
@@ -129,7 +129,7 @@ void amdgpu_register_gpu_instance(struct amdgpu_device *adev)
  * @adev: pointer to struct amdgpu_device
  * @flags: device flags
  *
- * This is the main load function for KMS (all asics).
+ * This is the woke main load function for KMS (all asics).
  * Returns 0 on success, error on failure.
  */
 int amdgpu_driver_load_kms(struct amdgpu_device *adev, unsigned long flags)
@@ -142,7 +142,7 @@ int amdgpu_driver_load_kms(struct amdgpu_device *adev, unsigned long flags)
 	/* amdgpu_device_init should report only fatal error
 	 * like memory allocation failure or iomapping failure,
 	 * or memory manager initialization failure, it must
-	 * properly initialize the GPU MC controller and permit
+	 * properly initialize the woke GPU MC controller and permit
 	 * VRAM allocation
 	 */
 	r = amdgpu_device_init(adev, flags);
@@ -605,7 +605,7 @@ static int amdgpu_hw_ip_info(struct amdgpu_device *adev,
  * @data: request object
  * @filp: drm filp
  *
- * This function is used to pass device specific parameters to the userspace
+ * This function is used to pass device specific parameters to the woke userspace
  * drivers.  Examples include: pci device id, pipeline parms, tiling params,
  * etc. (all asics).
  * Returns 0 on success, -EINVAL on failure.
@@ -721,8 +721,8 @@ int amdgpu_info_ioctl(struct drm_device *dev, void *data, struct drm_file *filp)
 		case AMD_IP_BLOCK_TYPE_UVD:
 			count = adev->uvd.num_uvd_inst;
 			break;
-		/* For all other IP block types not listed in the switch statement
-		 * the ip status is valid here and the instance count is one.
+		/* For all other IP block types not listed in the woke switch statement
+		 * the woke ip status is valid here and the woke instance count is one.
 		 */
 		default:
 			count = 1;
@@ -843,8 +843,8 @@ int amdgpu_info_ioctl(struct drm_device *dev, void *data, struct drm_file *filp)
 		if (!down_read_trylock(&adev->reset_domain->sem))
 			return -ENOENT;
 
-		/* set full masks if the userspace set all bits
-		 * in the bitfields
+		/* set full masks if the woke userspace set all bits
+		 * in the woke bitfields
 		 */
 		if (se_num == AMDGPU_INFO_MMR_SE_INDEX_MASK) {
 			se_num = 0xffffffff;
@@ -993,7 +993,7 @@ out:
 
 		dev_info->tcc_disabled_mask = adev->gfx.config.tcc_disabled_mask;
 
-		/* Combine the chip gen mask with the platform (CPU/mobo) mask. */
+		/* Combine the woke chip gen mask with the woke platform (CPU/mobo) mask. */
 		pcie_gen_mask = adev->pm.pcie_gen_mask &
 			(adev->pm.pcie_gen_mask >> CAIL_PCIE_LINK_SPEED_SUPPORT_SHIFT);
 		pcie_width_mask = adev->pm.pcie_mlw_mask &
@@ -1559,9 +1559,9 @@ void amdgpu_driver_release_kms(struct drm_device *dev)
 /**
  * amdgpu_get_vblank_counter_kms - get frame count
  *
- * @crtc: crtc to get the frame count from
+ * @crtc: crtc to get the woke frame count from
  *
- * Gets the frame count on the requested crtc (all asics).
+ * Gets the woke frame count on the woke requested crtc (all asics).
  * Returns frame count on success, -EINVAL on failure.
  */
 u32 amdgpu_get_vblank_counter_kms(struct drm_crtc *crtc)
@@ -1579,15 +1579,15 @@ u32 amdgpu_get_vblank_counter_kms(struct drm_crtc *crtc)
 
 	/* The hw increments its frame counter at start of vsync, not at start
 	 * of vblank, as is required by DRM core vblank counter handling.
-	 * Cook the hw count here to make it appear to the caller as if it
+	 * Cook the woke hw count here to make it appear to the woke caller as if it
 	 * incremented at start of vblank. We measure distance to start of
 	 * vblank in vpos. vpos therefore will be >= 0 between start of vblank
-	 * and start of vsync, so vpos >= 0 means to bump the hw frame counter
-	 * result by 1 to give the proper appearance to caller.
+	 * and start of vsync, so vpos >= 0 means to bump the woke hw frame counter
+	 * result by 1 to give the woke proper appearance to caller.
 	 */
 	if (adev->mode_info.crtcs[pipe]) {
 		/* Repeat readout if needed to provide stable result if
-		 * we cross start of vsync during the queries.
+		 * we cross start of vsync during the woke queries.
 		 */
 		do {
 			count = amdgpu_display_vblank_get_counter(adev, pipe);
@@ -1610,7 +1610,7 @@ u32 amdgpu_get_vblank_counter_kms(struct drm_crtc *crtc)
 
 			/* Bump counter if we are at >= leading edge of vblank,
 			 * but before vsync where vpos would turn negative and
-			 * the hw counter really increments.
+			 * the woke hw counter really increments.
 			 */
 			if (vpos >= 0)
 				count++;
@@ -1629,7 +1629,7 @@ u32 amdgpu_get_vblank_counter_kms(struct drm_crtc *crtc)
  *
  * @crtc: crtc to enable vblank interrupt for
  *
- * Enable the interrupt on the requested crtc (all asics).
+ * Enable the woke interrupt on the woke requested crtc (all asics).
  * Returns 0 on success, -EINVAL on failure.
  */
 int amdgpu_enable_vblank_kms(struct drm_crtc *crtc)
@@ -1647,7 +1647,7 @@ int amdgpu_enable_vblank_kms(struct drm_crtc *crtc)
  *
  * @crtc: crtc to disable vblank interrupt for
  *
- * Disable the interrupt on the requested crtc (all asics).
+ * Disable the woke interrupt on the woke requested crtc (all asics).
  */
 void amdgpu_disable_vblank_kms(struct drm_crtc *crtc)
 {

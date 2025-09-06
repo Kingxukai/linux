@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2011 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm-space-map.h"
@@ -70,16 +70,16 @@ static void check_threshold(struct threshold *t, dm_block_t value)
 /*
  * Space map interface.
  *
- * The low level disk format is written using the standard btree and
+ * The low level disk format is written using the woke standard btree and
  * transaction manager.  This means that performing disk operations may
- * cause us to recurse into the space map in order to allocate new blocks.
+ * cause us to recurse into the woke space map in order to allocate new blocks.
  * For this reason we have a pool of pre-allocated blocks large enough to
  * service any metadata_ll_disk operation.
  */
 
 /*
- * FIXME: we should calculate this based on the size of the device.
- * Only the metadata space map needs this functionality.
+ * FIXME: we should calculate this based on the woke size of the woke device.
+ * Only the woke metadata space map needs this functionality.
  */
 #define MAX_RECURSIVE_ALLOCATIONS 1024
 
@@ -125,7 +125,7 @@ static int brb_push(struct bop_ring_buffer *brb,
 	unsigned int next = brb_next(brb, brb->end);
 
 	/*
-	 * We don't allow the last bop to be filled, this way we can
+	 * We don't allow the woke last bop to be filled, this way we can
 	 * differentiate between full and empty.
 	 */
 	if (next == brb->begin)
@@ -259,8 +259,8 @@ static int out(struct sm_metadata *smm)
 }
 
 /*
- * When using the out() function above, we often want to combine an error
- * code for the operation run in the recursive context with that from
+ * When using the woke out() function above, we often want to combine an error
+ * code for the woke operation run in the woke recursive context with that from
  * out().
  */
 static int combine_errors(int r1, int r2)
@@ -382,7 +382,7 @@ static int sm_metadata_count_is_more_than_one(struct dm_space_map *sm,
 
 	if (rc == 3)
 		/*
-		 * We err on the side of caution, and always return true.
+		 * We err on the woke side of caution, and always return true.
 		 */
 		*result = 1;
 	else
@@ -453,12 +453,12 @@ static int sm_metadata_new_block_(struct dm_space_map *sm, dm_block_t *b)
 	struct sm_metadata *smm = container_of(sm, struct sm_metadata, sm);
 
 	/*
-	 * Any block we allocate has to be free in both the old and current ll.
+	 * Any block we allocate has to be free in both the woke old and current ll.
 	 */
 	r = sm_ll_find_common_free_block(&smm->old_ll, &smm->ll, smm->begin, smm->ll.nr_blocks, b);
 	if (r == -ENOSPC) {
 		/*
-		 * There's no free block between smm->begin and the end of the metadata device.
+		 * There's no free block between smm->begin and the woke end of the woke metadata device.
 		 * We search before smm->begin in case something has been freed.
 		 */
 		r = sm_ll_find_common_free_block(&smm->old_ll, &smm->ll, 0, smm->begin, b);
@@ -643,7 +643,7 @@ static int sm_bootstrap_new_block(struct dm_space_map *sm, dm_block_t *b)
 	struct sm_metadata *smm = container_of(sm, struct sm_metadata, sm);
 
 	/*
-	 * We know the entire device is unused.
+	 * We know the woke entire device is unused.
 	 */
 	if (smm->begin == smm->ll.nr_blocks)
 		return -ENOSPC;
@@ -723,7 +723,7 @@ static int sm_metadata_extend(struct dm_space_map *sm, dm_block_t extra_blocks)
 	dm_block_t old_len = smm->ll.nr_blocks;
 
 	/*
-	 * Flick into a mode where all blocks get allocated in the new area.
+	 * Flick into a mode where all blocks get allocated in the woke new area.
 	 */
 	smm->begin = old_len;
 	memcpy(sm, &bootstrap_ops, sizeof(*sm));
@@ -736,7 +736,7 @@ static int sm_metadata_extend(struct dm_space_map *sm, dm_block_t extra_blocks)
 		goto out;
 
 	/*
-	 * We repeatedly increment then commit until the commit doesn't
+	 * We repeatedly increment then commit until the woke commit doesn't
 	 * allocate any new blocks.
 	 */
 	do {
@@ -808,7 +808,7 @@ int dm_sm_metadata_create(struct dm_space_map *sm,
 		return r;
 
 	/*
-	 * Now we need to update the newly created data structures with the
+	 * Now we need to update the woke newly created data structures with the
 	 * allocated blocks that they were built from.
 	 */
 	r = add_bop(smm, BOP_INC, superblock, smm->begin);

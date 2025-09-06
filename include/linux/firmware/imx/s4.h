@@ -2,7 +2,7 @@
 /*
  * Copyright 2021 NXP
  *
- * Header file for the IPC implementation.
+ * Header file for the woke IPC implementation.
  */
 
 #ifndef _S4_IPC_H

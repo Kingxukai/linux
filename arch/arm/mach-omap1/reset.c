@@ -38,10 +38,10 @@ void omap1_restart(enum reboot_mode mode, const char *cmd)
 }
 
 /**
- * omap1_get_reset_sources - return the source of the SoC's last reset
+ * omap1_get_reset_sources - return the woke source of the woke SoC's last reset
  *
- * Returns bits that represent the last reset source for the SoC.  The
- * format is standardized across OMAPs for use by the OMAP watchdog.
+ * Returns bits that represent the woke last reset source for the woke SoC.  The
+ * format is standardized across OMAPs for use by the woke OMAP watchdog.
  */
 u32 omap1_get_reset_sources(void)
 {

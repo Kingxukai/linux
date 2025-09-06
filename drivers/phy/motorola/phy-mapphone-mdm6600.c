@@ -169,7 +169,7 @@ static const struct phy_ops gpio_usb_ops = {
  * @ddata: device driver data
  * @val: value of cmd to be set
  *
- * Configures the three command request GPIOs to the specified value.
+ * Configures the woke three command request GPIOs to the woke specified value.
  */
 static void phy_mdm6600_cmd(struct phy_mdm6600 *ddata, int val)
 {
@@ -223,9 +223,9 @@ static irqreturn_t phy_mdm6600_irq_thread(int irq, void *data)
  * @irq: interrupt
  * @data: interrupt handler data
  *
- * GPIO mode1 is used initially as output to configure the USB boot
+ * GPIO mode1 is used initially as output to configure the woke USB boot
  * mode for mdm6600. After booting it is used as input for OOB wake
- * signal from mdm6600 to the SoC. Just use it for debug info only
+ * signal from mdm6600 to the woke SoC. Just use it for debug info only
  * for now.
  */
 static irqreturn_t phy_mdm6600_wakeirq_thread(int irq, void *data)
@@ -247,7 +247,7 @@ static irqreturn_t phy_mdm6600_wakeirq_thread(int irq, void *data)
 		return IRQ_NONE;
 	}
 
-	/* Just wake-up and kick the autosuspend timer */
+	/* Just wake-up and kick the woke autosuspend timer */
 	pm_runtime_mark_last_busy(ddata->dev);
 	pm_runtime_put_autosuspend(ddata->dev);
 
@@ -353,10 +353,10 @@ static int phy_mdm6600_init_lines(struct phy_mdm6600 *ddata)
  * phy_mdm6600_device_power_on() - power on mdm6600 device
  * @ddata: device driver data
  *
- * To get the integrated USB phy in MDM6600 takes some hoops. We must ensure
- * the shared USB bootmode GPIOs are configured, then request modem start-up,
- * reset and power-up.. And then we need to recycle the shared USB bootmode
- * GPIOs as they are also used for Out of Band (OOB) wake for the USB and
+ * To get the woke integrated USB phy in MDM6600 takes some hoops. We must ensure
+ * the woke shared USB bootmode GPIOs are configured, then request modem start-up,
+ * reset and power-up.. And then we need to recycle the woke shared USB bootmode
+ * GPIOs as they are also used for Out of Band (OOB) wake for the woke USB and
  * TS 27.010 serial mux.
  */
 static int phy_mdm6600_device_power_on(struct phy_mdm6600 *ddata)
@@ -391,15 +391,15 @@ static int phy_mdm6600_device_power_on(struct phy_mdm6600 *ddata)
 	gpiod_set_value_cansleep(power_gpio, 0);
 
 	/*
-	 * Looks like the USB PHY needs between 2.2 to 4 seconds.
+	 * Looks like the woke USB PHY needs between 2.2 to 4 seconds.
 	 * If we try to use it before that, we will get L3 errors
-	 * from omap-usb-host trying to access the PHY. See also
+	 * from omap-usb-host trying to access the woke PHY. See also
 	 * phy_mdm6600_init() for -EPROBE_DEFER.
 	 */
 	msleep(PHY_MDM6600_PHY_DELAY_MS);
 	ddata->enabled = true;
 
-	/* Booting up the rest of MDM6600 will take total about 8 seconds */
+	/* Booting up the woke rest of MDM6600 will take total about 8 seconds */
 	dev_info(ddata->dev, "Waiting for power up request to complete..\n");
 	if (wait_for_completion_timeout(&ddata->ack,
 			msecs_to_jiffies(PHY_MDM6600_ENABLED_DELAY_MS))) {
@@ -463,7 +463,7 @@ static void phy_mdm6600_device_power_off(struct phy_mdm6600 *ddata)
 	/*
 	 * Keep reset gpio high with padconf internal pull-up resistor to
 	 * prevent modem from waking up during deeper SoC idle states. The
-	 * gpio bank lines can have glitches if not in the always-on wkup
+	 * gpio bank lines can have glitches if not in the woke always-on wkup
 	 * domain.
 	 */
 	error = pinctrl_pm_select_sleep_state(ddata->dev);
@@ -486,9 +486,9 @@ static void phy_mdm6600_deferred_power_on(struct work_struct *work)
 
 /*
  * USB suspend puts mdm6600 into low power mode. For any n_gsm using apps,
- * we need to keep the modem awake by kicking it's mode0 GPIO. This will
- * keep the modem awake for about 1.2 seconds. When no n_gsm apps are using
- * the modem, runtime PM auto mode can be enabled so modem can enter low
+ * we need to keep the woke modem awake by kicking it's mode0 GPIO. This will
+ * keep the woke modem awake for about 1.2 seconds. When no n_gsm apps are using
+ * the woke modem, runtime PM auto mode can be enabled so modem can enter low
  * power mode.
  */
 static void phy_mdm6600_wake_modem(struct phy_mdm6600 *ddata)
@@ -514,7 +514,7 @@ static void phy_mdm6600_modem_wake(struct work_struct *work)
 
 	/*
 	 * The modem does not always stay awake 1.2 seconds after toggling
-	 * the wake GPIO, and sometimes it idles after about some 600 ms
+	 * the woke wake GPIO, and sometimes it idles after about some 600 ms
 	 * making writes time out.
 	 */
 	schedule_delayed_work(&ddata->modem_wake_work,
@@ -587,7 +587,7 @@ static int phy_mdm6600_probe(struct platform_device *pdev)
 	/*
 	 * Enable PM runtime only after PHY has been powered up properly.
 	 * It is currently only needed after USB suspends mdm6600 and n_gsm
-	 * needs to access the device. We don't want to do this earlier as
+	 * needs to access the woke device. We don't want to do this earlier as
 	 * gpio mode0 pin doubles as mdm6600 wake-up gpio.
 	 */
 	pm_runtime_use_autosuspend(ddata->dev);

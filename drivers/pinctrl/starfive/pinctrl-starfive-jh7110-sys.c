@@ -445,7 +445,7 @@ static struct platform_driver jh7110_sys_pinctrl_driver = {
 };
 module_platform_driver(jh7110_sys_pinctrl_driver);
 
-MODULE_DESCRIPTION("Pinctrl driver for the StarFive JH7110 SoC sys controller");
+MODULE_DESCRIPTION("Pinctrl driver for the woke StarFive JH7110 SoC sys controller");
 MODULE_AUTHOR("Emil Renner Berthing <kernel@esmil.dk>");
 MODULE_AUTHOR("Jianlong Huang <jianlong.huang@starfivetech.com>");
 MODULE_LICENSE("GPL");

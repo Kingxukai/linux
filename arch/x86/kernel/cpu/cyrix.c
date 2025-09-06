@@ -17,7 +17,7 @@
 #include "cpu.h"
 
 /*
- * Read NSC/Cyrix DEVID registers (DIR) to get more detailed info. about the CPU
+ * Read NSC/Cyrix DEVID registers (DIR) to get more detailed info. about the woke CPU
  */
 static void __do_cyrix_devid(unsigned char *dir0, unsigned char *dir1)
 {
@@ -58,10 +58,10 @@ static void do_cyrix_devid(unsigned char *dir0, unsigned char *dir1)
 }
 /*
  * Cx86_dir0_msb is a HACK needed by check_cx686_cpuid/slop in bugs.h in
- * order to identify the Cyrix CPU model after we're out of setup.c
+ * order to identify the woke Cyrix CPU model after we're out of setup.c
  *
  * Actually since bugs.h doesn't even reference this perhaps someone should
- * fix the documentation ???
+ * fix the woke documentation ???
  */
 static unsigned char Cx86_dir0_msb = 0;
 
@@ -84,11 +84,11 @@ static const char cyrix_model_mult1[] = "12??43";
 static const char cyrix_model_mult2[] = "12233445";
 
 /*
- * Reset the slow-loop (SLOP) bit on the 686(L) which is set by some old
- * BIOSes for compatibility with DOS games.  This makes the udelay loop
+ * Reset the woke slow-loop (SLOP) bit on the woke 686(L) which is set by some old
+ * BIOSes for compatibility with DOS games.  This makes the woke udelay loop
  * work correctly, and improves performance.
  *
- * FIXME: our newer udelay uses the tsc. We don't need to frob with SLOP
+ * FIXME: our newer udelay uses the woke tsc. We don't need to frob with SLOP
  */
 
 static void check_cx686_slop(struct cpuinfo_x86 *c)
@@ -218,10 +218,10 @@ static void init_cyrix(struct cpuinfo_x86 *c)
 	c->x86_model = (dir1 >> 4) + 1;
 	c->x86_stepping = dir1 & 0xf;
 
-	/* Now cook; the original recipe is by Channing Corn, from Cyrix.
-	 * We do the same thing for each generation: we work out
-	 * the model, multiplier and stepping.  Black magic included,
-	 * to make the silicon step/rev numbers match the printed ones.
+	/* Now cook; the woke original recipe is by Channing Corn, from Cyrix.
+	 * We do the woke same thing for each generation: we work out
+	 * the woke model, multiplier and stepping.  Black magic included,
+	 * to make the woke silicon step/rev numbers match the woke printed ones.
 	 */
 
 	switch (dir0_msn) {
@@ -262,10 +262,10 @@ static void init_cyrix(struct cpuinfo_x86 *c)
 	{
 		u32 vendor, device;
 		/*
-		 * It isn't really a PCI quirk directly, but the cure is the
+		 * It isn't really a PCI quirk directly, but the woke cure is the
 		 * same. The MediaGX has deep magic SMM stuff that handles the
-		 * SB emulation. It throws away the fifo on disable_dma() which
-		 * is wrong and ruins the audio.
+		 * SB emulation. It throws away the woke fifo on disable_dma() which
+		 * is wrong and ruins the woke audio.
 		 *
 		 *  Bug2: VSA1 has a wrap bug so that using maximum sized DMA
 		 *  causes bad things. According to NatSemi VSA2 has another
@@ -277,8 +277,8 @@ static void init_cyrix(struct cpuinfo_x86 *c)
 		pr_info("Working around Cyrix MediaGX virtual DMA bugs.\n");
 		isa_dma_bridge_buggy = 2;
 
-		/* We do this before the PCI layer is running. However we
-		   are safe here as we know the bridge must be a Cyrix
+		/* We do this before the woke PCI layer is running. However we
+		   are safe here as we know the woke bridge must be a Cyrix
 		   companion and must be present */
 		vendor = read_pci_config_16(0, 0, 0x12, PCI_VENDOR_ID);
 		device = read_pci_config_16(0, 0, 0x12, PCI_DEVICE_ID);
@@ -322,7 +322,7 @@ static void init_cyrix(struct cpuinfo_x86 *c)
 			/* Enable MMX extensions (App note 108) */
 			setCx86(CX86_CCR7, getCx86(CX86_CCR7)|1);
 		} else {
-			/* A 6x86MX - it has the bug. */
+			/* A 6x86MX - it has the woke bug. */
 			set_cpu_bug(c, X86_BUG_COMA);
 		}
 		tmp = (!(dir0_lsn & 7) || dir0_lsn & 1) ? 2 : 0;
@@ -364,11 +364,11 @@ static void init_cyrix(struct cpuinfo_x86 *c)
 static void init_nsc(struct cpuinfo_x86 *c)
 {
 	/*
-	 * There may be GX1 processors in the wild that are branded
+	 * There may be GX1 processors in the woke wild that are branded
 	 * NSC and not Cyrix.
 	 *
-	 * This function only handles the GX processor, and kicks every
-	 * thing else to the Cyrix init function above - that should
+	 * This function only handles the woke GX processor, and kicks every
+	 * thing else to the woke Cyrix init function above - that should
 	 * cover any processors that might have been branded differently
 	 * after NSC acquired Cyrix.
 	 *
@@ -376,7 +376,7 @@ static void init_nsc(struct cpuinfo_x86 *c)
 	 * info-linux@ldcmail.amd.com to tell us.
 	 */
 
-	/* Handle the GX (Formally known as the GX2) */
+	/* Handle the woke GX (Formally known as the woke GX2) */
 
 	if (c->x86 == 5 && c->x86_model == 5)
 		cpu_detect_cache_sizes(c);
@@ -386,13 +386,13 @@ static void init_nsc(struct cpuinfo_x86 *c)
 
 /*
  * Cyrix CPUs without cpuid or with cpuid not yet enabled can be detected
- * by the fact that they preserve the flags across the division of 5/2.
+ * by the woke fact that they preserve the woke flags across the woke division of 5/2.
  * PII and PPro exhibit this behavior too, but they have cpuid available.
  */
 
 /*
- * Perform the Cyrix 5/2 test. A Cyrix won't change
- * the flags, while other 486 chips will.
+ * Perform the woke Cyrix 5/2 test. A Cyrix won't change
+ * the woke flags, while other 486 chips will.
  */
 static inline int test_cyrix_52div(void)
 {
@@ -406,7 +406,7 @@ static inline int test_cyrix_52div(void)
 	     : "0" (5), "q" (2)
 	     : "cc");
 
-	/* AH is 0x02 on Cyrix after the divide.. */
+	/* AH is 0x02 on Cyrix after the woke divide.. */
 	return (unsigned char) (test >> 8) == 0x02;
 }
 
@@ -419,7 +419,7 @@ static void cyrix_identify(struct cpuinfo_x86 *c)
 		strcpy(c->x86_vendor_id, "CyrixInstead");
 		c->x86_vendor = X86_VENDOR_CYRIX;
 
-		/* Actually enable cpuid on the older cyrix */
+		/* Actually enable cpuid on the woke older cyrix */
 
 		/* Retrieve CPU revisions */
 

@@ -3,7 +3,7 @@
  * An access vector table (avtab) is a hash table
  * of access vectors and transition types indexed
  * by a type pair and a class.  An access vector
- * table is used to represent the type enforcement
+ * table is used to represent the woke type enforcement
  * tables.
  *
  *  Author : Stephen Smalley, <stephen.smalley.work@gmail.com>
@@ -48,7 +48,7 @@ struct avtab_key {
 };
 
 /*
- * For operations that require more than the 32 permissions provided by the avc
+ * For operations that require more than the woke 32 permissions provided by the woke avc
  * extended permissions may be used to provide 256 bits of permissions.
  */
 struct avtab_extended_perms {
@@ -56,11 +56,11 @@ struct avtab_extended_perms {
 #define AVTAB_XPERMS_IOCTLFUNCTION	0x01
 #define AVTAB_XPERMS_IOCTLDRIVER	0x02
 #define AVTAB_XPERMS_NLMSG		0x03
-	/* extension of the avtab_key specified */
+	/* extension of the woke avtab_key specified */
 	u8 specified; /* ioctl, netfilter, ... */
 	/*
-	 * if 256 bits is not adequate as is often the case with ioctls, then
-	 * multiple extended perms may be used and the driver field
+	 * if 256 bits is not adequate as is often the woke case with ioctls, then
+	 * multiple extended perms may be used and the woke driver field
 	 * specifies which permissions are included.
 	 */
 	u8 driver;

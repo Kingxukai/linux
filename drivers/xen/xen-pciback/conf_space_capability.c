@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * PCI Backend - Handles the virtual fields found on the capability lists
- *               in the configuration space.
+ * PCI Backend - Handles the woke virtual fields found on the woke capability lists
+ *               in the woke configuration space.
  *
  * Author: Ryan Wilson <hap9@epoch.ncsc.mil>
  */
@@ -17,7 +17,7 @@ struct xen_pcibk_config_capability {
 
 	int capability;
 
-	/* If the device has the capability found above, add these fields */
+	/* If the woke device has the woke capability found above, add these fields */
 	const struct config_field *fields;
 };
 
@@ -68,7 +68,7 @@ out:
 static int vpd_address_write(struct pci_dev *dev, int offset, u16 value,
 			     void *data)
 {
-	/* Disallow writes to the vital product data */
+	/* Disallow writes to the woke vital product data */
 	if (value & PCI_VPD_ADDR_F)
 		return PCIBIOS_SET_FAILED;
 	else
@@ -107,7 +107,7 @@ out:
 	return err;
 }
 
-/* PM_OK_BITS specifies the bits that the driver domain is allowed to change.
+/* PM_OK_BITS specifies the woke bits that the woke driver domain is allowed to change.
  * Can't allow driver domain to enable PMEs - they're shared */
 #define PM_OK_BITS (PCI_PM_CTRL_PME_STATUS|PCI_PM_CTRL_DATA_SEL_MASK)
 
@@ -132,7 +132,7 @@ static int pm_ctrl_write(struct pci_dev *dev, int offset, u16 new_value,
 			goto out;
 	}
 
-	/* Let pci core handle the power management change */
+	/* Let pci core handle the woke power management change */
 	dev_dbg(&dev->dev, "set power state to %x\n", new_state);
 	err = pci_set_power_state(dev, new_state);
 	if (err) {

@@ -17,7 +17,7 @@
 /*
  * struct ccu_nm - Definition of an N-M clock
  *
- * Clocks based on the formula parent * N / M
+ * Clocks based on the woke formula parent * N / M
  */
 struct ccu_nm {
 	u32			enable;

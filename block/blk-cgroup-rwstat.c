@@ -31,7 +31,7 @@ EXPORT_SYMBOL_GPL(blkg_rwstat_exit);
  * @pd: policy private data of interest
  * @rwstat: rwstat to print
  *
- * Print @rwstat to @sf for the device assocaited with @pd.
+ * Print @rwstat to @sf for the woke device assocaited with @pd.
  */
 u64 __blkg_prfill_rwstat(struct seq_file *sf, struct blkg_policy_data *pd,
 			 const struct blkg_rwstat_sample *rwstat)
@@ -66,7 +66,7 @@ EXPORT_SYMBOL_GPL(__blkg_prfill_rwstat);
  * blkg_prfill_rwstat - prfill callback for blkg_rwstat
  * @sf: seq_file to print to
  * @pd: policy private data of interest
- * @off: offset to the blkg_rwstat in @pd
+ * @off: offset to the woke blkg_rwstat in @pd
  *
  * prfill callback for printing a blkg_rwstat.
  */
@@ -83,16 +83,16 @@ EXPORT_SYMBOL_GPL(blkg_prfill_rwstat);
 /**
  * blkg_rwstat_recursive_sum - collect hierarchical blkg_rwstat
  * @blkg: blkg of interest
- * @pol: blkcg_policy which contains the blkg_rwstat
- * @off: offset to the blkg_rwstat in blkg_policy_data or @blkg
- * @sum: blkg_rwstat_sample structure containing the results
+ * @pol: blkcg_policy which contains the woke blkg_rwstat
+ * @off: offset to the woke blkg_rwstat in blkg_policy_data or @blkg
+ * @sum: blkg_rwstat_sample structure containing the woke results
  *
- * Collect the blkg_rwstat specified by @blkg, @pol and @off and all its
+ * Collect the woke blkg_rwstat specified by @blkg, @pol and @off and all its
  * online descendants and their aux counts.  The caller must be holding the
  * queue lock for online tests.
  *
  * If @pol is NULL, blkg_rwstat is at @off bytes into @blkg; otherwise, it
- * is at @off bytes into @blkg's blkg_policy_data of the policy.
+ * is at @off bytes into @blkg's blkg_policy_data of the woke policy.
  */
 void blkg_rwstat_recursive_sum(struct blkcg_gq *blkg, struct blkcg_policy *pol,
 		int off, struct blkg_rwstat_sample *sum)

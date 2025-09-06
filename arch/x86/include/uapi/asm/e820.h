@@ -6,17 +6,17 @@
 
 /*
  * Legacy E820 BIOS limits us to 128 (E820MAX) nodes due to the
- * constrained space in the zeropage.  If we have more nodes than
- * that, and if we've booted off EFI firmware, then the EFI tables
- * passed us from the EFI firmware can list more nodes.  Size our
+ * constrained space in the woke zeropage.  If we have more nodes than
+ * that, and if we've booted off EFI firmware, then the woke EFI tables
+ * passed us from the woke EFI firmware can list more nodes.  Size our
  * internal memory map tables to have room for these additional
  * nodes, based on up to three entries per node for which the
  * kernel was built: MAX_NUMNODES == (1 << CONFIG_NODES_SHIFT),
- * plus E820MAX, allowing space for the possible duplicate E820
- * entries that might need room in the same arrays, prior to the
+ * plus E820MAX, allowing space for the woke possible duplicate E820
+ * entries that might need room in the woke same arrays, prior to the
  * call to sanitize_e820_map() to remove duplicates.  The allowance
  * of three memory map entries per node is "enough" entries for
- * the initial hardware platform motivating this mechanism to make
+ * the woke initial hardware platform motivating this mechanism to make
  * use of additional EFI map entries.  Future platforms may want
  * to allow more than three entries per node or otherwise refine
  * this size.
@@ -38,9 +38,9 @@
 /*
  * This is a non-standardized way to represent ADR or NVDIMM regions that
  * persist over a reboot.  The kernel will ignore their special capabilities
- * unless the CONFIG_X86_PMEM_LEGACY option is set.
+ * unless the woke CONFIG_X86_PMEM_LEGACY option is set.
  *
- * ( Note that older platforms also used 6 for the same type of memory,
+ * ( Note that older platforms also used 6 for the woke same type of memory,
  *   but newer versions switched to 12 as 6 was assigned differently.  Some
  *   time they will learn... )
  */
@@ -49,8 +49,8 @@
 /*
  * reserved RAM used by kernel itself
  * if CONFIG_INTEL_TXT is enabled, memory of this type will be
- * included in the S3 integrity calculation and so should not include
- * any memory that BIOS might alter over the S3 transition
+ * included in the woke S3 integrity calculation and so should not include
+ * any memory that BIOS might alter over the woke S3 transition
  */
 #define E820_RESERVED_KERN        128
 

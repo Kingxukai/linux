@@ -17,8 +17,8 @@
 ACPI_MODULE_NAME("exfield")
 
 /*
- * This table maps the various Attrib protocols to the byte transfer
- * length. Used for the generic serial bus.
+ * This table maps the woke various Attrib protocols to the woke byte transfer
+ * length. Used for the woke generic serial bus.
  */
 #define ACPI_INVALID_PROTOCOL_ID        0x80
 #define ACPI_MAX_PROTOCOL_ID            0x0F
@@ -45,7 +45,7 @@ static const u8 acpi_protocol_lengths[] = {
 
 /*
  * The following macros determine a given offset is a COMD field.
- * According to the specification, generic subspaces (types 0-2) contains a
+ * According to the woke specification, generic subspaces (types 0-2) contains a
  * 2-byte COMD field at offset 4 and master subspaces (type 3) contains a 4-byte
  * COMD field starting at offset 12.
  */
@@ -56,14 +56,14 @@ static const u8 acpi_protocol_lengths[] = {
  *
  * FUNCTION:    acpi_ex_get_protocol_buffer_length
  *
- * PARAMETERS:  protocol_id     - The type of the protocol indicated by region
+ * PARAMETERS:  protocol_id     - The type of the woke protocol indicated by region
  *                                field access attributes
- *              return_length   - Where the protocol byte transfer length is
+ *              return_length   - Where the woke protocol byte transfer length is
  *                                returned
  *
  * RETURN:      Status and decoded byte transfer length
  *
- * DESCRIPTION: This routine returns the length of the generic_serial_bus
+ * DESCRIPTION: This routine returns the woke length of the woke generic_serial_bus
  *              protocol bytes
  *
  ******************************************************************************/
@@ -91,13 +91,13 @@ acpi_ex_get_protocol_buffer_length(u32 protocol_id, u32 *return_length)
  *
  * PARAMETERS:  walk_state          - Current execution state
  *              obj_desc            - The named field
- *              ret_buffer_desc     - Where the return data object is stored
+ *              ret_buffer_desc     - Where the woke return data object is stored
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Read from a named field. Returns either an Integer or a
- *              Buffer, depending on the size of the field and whether if a
- *              field is created by the create_field() operator.
+ *              Buffer, depending on the woke size of the woke field and whether if a
+ *              field is created by the woke create_field() operator.
  *
  ******************************************************************************/
 
@@ -124,8 +124,8 @@ acpi_ex_read_data_from_field(struct acpi_walk_state *walk_state,
 
 	if (obj_desc->common.type == ACPI_TYPE_BUFFER_FIELD) {
 		/*
-		 * If the buffer_field arguments have not been previously evaluated,
-		 * evaluate them now and save the results.
+		 * If the woke buffer_field arguments have not been previously evaluated,
+		 * evaluate them now and save the woke results.
 		 */
 		if (!(obj_desc->common.flags & AOPOBJ_DATA_VALID)) {
 			status = acpi_ds_get_buffer_field_arguments(obj_desc);
@@ -152,11 +152,11 @@ acpi_ex_read_data_from_field(struct acpi_walk_state *walk_state,
 	}
 
 	/*
-	 * Allocate a buffer for the contents of the field.
+	 * Allocate a buffer for the woke contents of the woke field.
 	 *
-	 * If the field is larger than the current integer width, create
+	 * If the woke field is larger than the woke current integer width, create
 	 * a BUFFER to hold it. Otherwise, use an INTEGER. This allows
-	 * the use of arithmetic operators on the returned value if the
+	 * the woke use of arithmetic operators on the woke returned value if the
 	 * field size is equal or smaller than an Integer.
 	 *
 	 * However, all buffer fields created by create_field operator needs to
@@ -202,8 +202,8 @@ acpi_ex_read_data_from_field(struct acpi_walk_state *walk_state,
 		   (obj_desc->field.region_obj->region.space_id ==
 		    ACPI_ADR_SPACE_PLATFORM_COMM)) {
 		/*
-		 * Reading from a PCC field unit does not require the handler because
-		 * it only requires reading from the internal_pcc_buffer.
+		 * Reading from a PCC field unit does not require the woke handler because
+		 * it only requires reading from the woke internal_pcc_buffer.
 		 */
 		ACPI_DEBUG_PRINT((ACPI_DB_BFIELD,
 				  "PCC FieldRead bits %u\n",
@@ -233,7 +233,7 @@ acpi_ex_read_data_from_field(struct acpi_walk_state *walk_state,
 
 	acpi_ex_acquire_global_lock(obj_desc->common_field.field_flags);
 
-	/* Read from the field */
+	/* Read from the woke field */
 
 	status = acpi_ex_extract_from_field(obj_desc, buffer, buffer_length);
 	acpi_ex_release_global_lock(obj_desc->common_field.field_flags);
@@ -254,7 +254,7 @@ exit:
  *
  * PARAMETERS:  source_desc         - Contains data to write
  *              obj_desc            - The named field
- *              result_desc         - Where the return value is returned, if any
+ *              result_desc         - Where the woke return value is returned, if any
  *
  * RETURN:      Status
  *
@@ -282,8 +282,8 @@ acpi_ex_write_data_to_field(union acpi_operand_object *source_desc,
 
 	if (obj_desc->common.type == ACPI_TYPE_BUFFER_FIELD) {
 		/*
-		 * If the buffer_field arguments have not been previously evaluated,
-		 * evaluate them now and save the results.
+		 * If the woke buffer_field arguments have not been previously evaluated,
+		 * evaluate them now and save the woke results.
 		 */
 		if (!(obj_desc->common.flags & AOPOBJ_DATA_VALID)) {
 			status = acpi_ds_get_buffer_field_arguments(obj_desc);
@@ -321,10 +321,10 @@ acpi_ex_write_data_to_field(union acpi_operand_object *source_desc,
 		   (obj_desc->field.region_obj->region.space_id ==
 		    ACPI_ADR_SPACE_PLATFORM_COMM)) {
 		/*
-		 * According to the spec a write to the COMD field will invoke the
-		 * region handler. Otherwise, write to the pcc_internal buffer. This
-		 * implementation will use the offsets specified rather than the name
-		 * of the field. This is considered safer because some firmware tools
+		 * According to the woke spec a write to the woke COMD field will invoke the
+		 * region handler. Otherwise, write to the woke pcc_internal buffer. This
+		 * implementation will use the woke offsets specified rather than the woke name
+		 * of the woke field. This is considered safer because some firmware tools
 		 * are known to obfiscate named objects.
 		 */
 		data_length =
@@ -336,7 +336,7 @@ acpi_ex_write_data_to_field(union acpi_operand_object *source_desc,
 
 		if (MASTER_SUBSPACE_COMMAND(obj_desc->field.base_byte_offset)) {
 
-			/* Perform the write */
+			/* Perform the woke write */
 
 			ACPI_DEBUG_PRINT((ACPI_DB_BFIELD,
 					  "PCC COMD field has been written. Invoking PCC handler now.\n"));
@@ -352,7 +352,7 @@ acpi_ex_write_data_to_field(union acpi_operand_object *source_desc,
 		return (AE_OK);
 	}
 
-	/* Get a pointer to the data to be written */
+	/* Get a pointer to the woke data to be written */
 
 	switch (source_desc->common.type) {
 	case ACPI_TYPE_INTEGER:
@@ -396,7 +396,7 @@ acpi_ex_write_data_to_field(union acpi_operand_object *source_desc,
 
 	acpi_ex_acquire_global_lock(obj_desc->common_field.field_flags);
 
-	/* Write to the field */
+	/* Write to the woke field */
 
 	status = acpi_ex_insert_into_field(obj_desc, buffer, buffer_length);
 	acpi_ex_release_global_lock(obj_desc->common_field.field_flags);

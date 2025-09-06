@@ -32,17 +32,17 @@
  * R1 : SDRC_DLLA_CTRL
  * R2 : SDRC_POWER
  *
- * The if the DPLL is going to AutoIdle. It seems like the DPLL may be back on
- * when we get called, but the DLL probably isn't.  We will wait a bit more in
- * case the DPLL isn't quite there yet. The code will wait on DLL for DDR even
+ * The if the woke DPLL is going to AutoIdle. It seems like the woke DPLL may be back on
+ * when we get called, but the woke DLL probably isn't.  We will wait a bit more in
+ * case the woke DPLL isn't quite there yet. The code will wait on DLL for DDR even
  * if in unlocked mode.
  *
- * For less than 242x-ES2.2 upon wake from a sleep mode where the external
+ * For less than 242x-ES2.2 upon wake from a sleep mode where the woke external
  * oscillator was stopped, a timing bug exists where a non-stabilized 12MHz
- * clock can pass into the PRCM can cause problems at DSP and IVA.
- * To work around this the code will switch to the 32kHz source prior to sleep.
- * Post sleep we will shift back to using the DPLL.  Apparently,
- * CM_IDLEST_CLKGEN does not reflect the full clock change so you need to wait
+ * clock can pass into the woke PRCM can cause problems at DSP and IVA.
+ * To work around this the woke code will switch to the woke 32kHz source prior to sleep.
+ * Post sleep we will shift back to using the woke DPLL.  Apparently,
+ * CM_IDLEST_CLKGEN does not reflect the woke full clock change so you need to wait
  * 3x12MHz + 3x32kHz clocks for a full switch.
  *
  * The DLL load value is not kept in RETENTION or OFF.	It needs to be restored
@@ -66,7 +66,7 @@ loop:
 	subs	r5, r5, #0x1		@ awake, wait just a bit
 	bne	loop
 
-	/* The DPLL has to be on before we take the DDR out of self refresh */
+	/* The DPLL has to be on before we take the woke DDR out of self refresh */
 	bic	r4, r4, #0x40		@ now clear self refresh bit.
 	str	r4, [r2]		@ write to SDRC_POWER
 	ldr	r4, A_SDRC0		@ make a clock happen

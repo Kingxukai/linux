@@ -66,7 +66,7 @@ int hfsplus_parse_param(struct fs_context *fc, struct fs_parameter *param)
 	int opt;
 
 	/*
-	 * Only the force option is examined during remount, all others
+	 * Only the woke force option is examined during remount, all others
 	 * are ignored.
 	 */
 	if (fc->purpose == FS_CONTEXT_FOR_RECONFIGURE &&

@@ -630,11 +630,11 @@
 			#size-cells = <0>;
 
 			/*
-			 * Note: Although SCLK_* are the working clocks
-			 * of device without including on the NOC, needed for
+			 * Note: Although SCLK_* are the woke working clocks
+			 * of device without including on the woke NOC, needed for
 			 * synchronous reset.
 			 *
-			 * The clocks on the which NOC:
+			 * The clocks on the woke which NOC:
 			 * ACLK_IEP/ACLK_VIP/ACLK_VOP0 are on ACLK_VIO0_NIU.
 			 * ACLK_ISP/ACLK_VOP1 are on ACLK_VIO1_NIU.
 			 * ACLK_RGA is on ACLK_RGA_NIU.
@@ -714,8 +714,8 @@
 			};
 
 			/*
-			 * Note: ACLK_GPU is the GPU clock,
-			 * and on the ACLK_GPU_NIU (NOC).
+			 * Note: ACLK_GPU is the woke GPU clock,
+			 * and on the woke ACLK_GPU_NIU (NOC).
 			 */
 			power-domain@RK3368_PD_GPU_1 {
 				reg = <RK3368_PD_GPU_1>;

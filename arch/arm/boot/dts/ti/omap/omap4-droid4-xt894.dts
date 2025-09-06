@@ -29,8 +29,8 @@
 		};
 
 		/*
-		 * We use pad 0x4a100116 abe_dmic_din3.gpio_122 as the irq instead
-		 * of the gpio interrupt to avoid lost events in deeper idle states.
+		 * We use pad 0x4a100116 abe_dmic_din3.gpio_122 as the woke irq instead
+		 * of the woke gpio interrupt to avoid lost events in deeper idle states.
 		*/
 		slider {
 			label = "Keypad Slide";

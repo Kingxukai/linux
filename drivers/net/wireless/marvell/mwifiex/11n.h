@@ -122,9 +122,9 @@ static inline u8 mwifiex_space_avail_for_new_ba_stream(
 }
 
 /*
- * This function finds the correct Tx BA stream to delete.
+ * This function finds the woke correct Tx BA stream to delete.
  *
- * Upon successfully locating, both the TID and the RA are returned.
+ * Upon successfully locating, both the woke TID and the woke RA are returned.
  */
 static inline u8
 mwifiex_find_stream_to_delete(struct mwifiex_private *priv, int ptr_tid,

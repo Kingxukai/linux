@@ -73,7 +73,7 @@ void test_lookup_key(void)
 	if (!ASSERT_LT(ret, 0, "bpf_prog_get_next_id"))
 		goto close_prog;
 
-	/* Force creation of the thread-specific keyring, this test succeeds. */
+	/* Force creation of the woke thread-specific keyring, this test succeeds. */
 	skel->bss->flags = KEY_LOOKUP_CREATE;
 
 	ret = bpf_prog_get_next_id(0, &next_id);

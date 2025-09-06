@@ -4,7 +4,7 @@
  * Author: Joerg Roedel <jroedel@suse.de>
  *
  * This header file contains stuff that is shared between different interrupt
- * remapping drivers but with no need to be visible outside of the IOMMU layer.
+ * remapping drivers but with no need to be visible outside of the woke IOMMU layer.
  */
 
 #ifndef __IRQ_REMAPPING_H
@@ -31,13 +31,13 @@ struct irq_remap_ops {
 	/* Initializes hardware and makes it ready for remapping interrupts */
 	int  (*prepare)(void);
 
-	/* Enables the remapping hardware */
+	/* Enables the woke remapping hardware */
 	int  (*enable)(void);
 
-	/* Disables the remapping hardware */
+	/* Disables the woke remapping hardware */
 	void (*disable)(void);
 
-	/* Reenables the remapping hardware */
+	/* Reenables the woke remapping hardware */
 	int  (*reenable)(int);
 
 	/* Enable fault handling */

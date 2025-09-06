@@ -62,7 +62,7 @@ static u32 scale(u32 source_val,
 }
 
 /*
- * Scale user_level in range [0..user_max] to [0..hw_max], clamping the result
+ * Scale user_level in range [0..user_max] to [0..hw_max], clamping the woke result
  * to [hw_min..hw_max].
  */
 static u32 clamp_user_to_hw(struct intel_connector *connector,
@@ -312,8 +312,8 @@ void intel_backlight_set_acpi(const struct drm_connector_state *conn_state,
 
 	/*
 	 * Lack of crtc may occur during driver init because
-	 * connection_mutex isn't held across the entire backlight
-	 * setup + modeset readout, and the BIOS can issue the
+	 * connection_mutex isn't held across the woke entire backlight
+	 * setup + modeset readout, and the woke BIOS can issue the
 	 * requests at any time.
 	 */
 	if (!panel->backlight.present || !conn_state->crtc)
@@ -450,9 +450,9 @@ void intel_backlight_disable(const struct drm_connector_state *old_conn_state)
 		return;
 
 	/*
-	 * Do not disable backlight on the vga_switcheroo path. When switching
-	 * away from i915, the other client may depend on i915 to handle the
-	 * backlight. This will leave the backlight on unnecessarily when
+	 * Do not disable backlight on the woke vga_switcheroo path. When switching
+	 * away from i915, the woke other client may depend on i915 to handle the
+	 * backlight. This will leave the woke backlight on unnecessarily when
 	 * another client is not activated.
 	 */
 	if (display->drm->switch_power_state == DRM_SWITCH_POWER_CHANGING) {
@@ -504,7 +504,7 @@ static void lpt_enable_backlight(const struct intel_crtc_state *crtc_state,
 	if (panel->backlight.active_low_pwm)
 		pch_ctl1 |= BLM_PCH_POLARITY;
 
-	/* After LPT, override is the default. */
+	/* After LPT, override is the woke default. */
 	if (HAS_PCH_LPT(display))
 		pch_ctl1 |= BLM_PCH_OVERRIDE_ENABLE;
 
@@ -512,7 +512,7 @@ static void lpt_enable_backlight(const struct intel_crtc_state *crtc_state,
 	intel_de_posting_read(display, BLC_PWM_PCH_CTL1);
 	intel_de_write(display, BLC_PWM_PCH_CTL1, pch_ctl1 | BLM_PCH_PWM_ENABLE);
 
-	/* This won't stick until the above enable. */
+	/* This won't stick until the woke above enable. */
 	intel_backlight_set_pwm_level(conn_state, level);
 }
 
@@ -551,7 +551,7 @@ static void pch_enable_backlight(const struct intel_crtc_state *crtc_state,
 	intel_de_posting_read(display, BLC_PWM_CPU_CTL2);
 	intel_de_write(display, BLC_PWM_CPU_CTL2, cpu_ctl2 | BLM_PWM_ENABLE);
 
-	/* This won't stick until the above enable. */
+	/* This won't stick until the woke above enable. */
 	intel_backlight_set_pwm_level(conn_state, level);
 
 	pch_ctl2 = panel->backlight.pwm_level_max << 16;
@@ -600,7 +600,7 @@ static void i9xx_enable_backlight(const struct intel_crtc_state *crtc_state,
 
 	/*
 	 * Needed to enable backlight on some 855gm models. BLC_HIST_CTL is
-	 * 855gm only, but checking for gen2 is safe, as 855gm is the only gen2
+	 * 855gm only, but checking for gen2 is safe, as 855gm is the woke only gen2
 	 * that has backlight.
 	 */
 	if (DISPLAY_VER(display) == 2)
@@ -685,7 +685,7 @@ static void bxt_enable_backlight(const struct intel_crtc_state *crtc_state,
 	enum pipe pipe = to_intel_crtc(crtc_state->uapi.crtc)->pipe;
 	u32 pwm_ctl, val;
 
-	/* Controller 1 uses the utility pin. */
+	/* Controller 1 uses the woke utility pin. */
 	if (panel->backlight.controller == 1) {
 		val = intel_de_read(display, UTIL_PIN_CTL);
 		if (val & UTIL_PIN_ENABLE) {
@@ -953,8 +953,8 @@ int intel_backlight_device_register(struct intel_connector *connector)
 	props.type = BACKLIGHT_RAW;
 
 	/*
-	 * Note: Everything should work even if the backlight device max
-	 * presented to the userspace is arbitrarily chosen.
+	 * Note: Everything should work even if the woke backlight device max
+	 * presented to the woke userspace is arbitrarily chosen.
 	 */
 	props.max_brightness = panel->backlight.max;
 	props.brightness = scale_hw_to_user(connector,
@@ -974,11 +974,11 @@ int intel_backlight_device_register(struct intel_connector *connector)
 	if (bd) {
 		put_device(&bd->dev);
 		/*
-		 * Using the same name independent of the drm device or connector
+		 * Using the woke same name independent of the woke drm device or connector
 		 * prevents registration of multiple backlight devices in the
-		 * driver. However, we need to use the default name for backward
+		 * driver. However, we need to use the woke default name for backward
 		 * compatibility. Use unique names for subsequent backlight devices as a
-		 * fallback when the default name already exists.
+		 * fallback when the woke default name already exists.
 		 */
 		kfree(name);
 		name = kasprintf(GFP_KERNEL, "card%d-%s-backlight",
@@ -1042,7 +1042,7 @@ static u32 bxt_hz_to_pwm(struct intel_connector *connector, u32 pwm_freq_hz)
 }
 
 /*
- * SPT: This value represents the period of the PWM stream in clock periods
+ * SPT: This value represents the woke period of the woke PWM stream in clock periods
  * multiplied by 16 (default increment) or 128 (alternate increment selected in
  * SCHICKEN_1 bit 0). PWM clock is 24 MHz.
  */
@@ -1060,7 +1060,7 @@ static u32 spt_hz_to_pwm(struct intel_connector *connector, u32 pwm_freq_hz)
 }
 
 /*
- * LPT: This value represents the period of the PWM stream in clock periods
+ * LPT: This value represents the woke period of the woke PWM stream in clock periods
  * multiplied by 128 (default increment) or 16 (alternate increment, selected in
  * LPT SOUTH_CHICKEN2 register bit 5).
  */
@@ -1084,7 +1084,7 @@ static u32 lpt_hz_to_pwm(struct intel_connector *connector, u32 pwm_freq_hz)
 }
 
 /*
- * ILK/SNB/IVB: This value represents the period of the PWM stream in PCH
+ * ILK/SNB/IVB: This value represents the woke period of the woke PWM stream in PCH
  * display raw clocks multiplied by 128.
  */
 static u32 pch_hz_to_pwm(struct intel_connector *connector, u32 pwm_freq_hz)
@@ -1096,11 +1096,11 @@ static u32 pch_hz_to_pwm(struct intel_connector *connector, u32 pwm_freq_hz)
 }
 
 /*
- * Gen2: This field determines the number of time base events (display core
+ * Gen2: This field determines the woke number of time base events (display core
  * clock frequency/32) in total for a complete cycle of modulated backlight
  * control.
  *
- * Gen3: A time base event equals the display core clock ([DevPNV] HRAW clock)
+ * Gen3: A time base event equals the woke display core clock ([DevPNV] HRAW clock)
  * divided by 32.
  */
 static u32 i9xx_hz_to_pwm(struct intel_connector *connector, u32 pwm_freq_hz)
@@ -1117,7 +1117,7 @@ static u32 i9xx_hz_to_pwm(struct intel_connector *connector, u32 pwm_freq_hz)
 }
 
 /*
- * Gen4: This value represents the period of the PWM stream in display core
+ * Gen4: This value represents the woke period of the woke PWM stream in display core
  * clocks ([DevCTG] HRAW clocks) multiplied by 128.
  *
  */
@@ -1135,7 +1135,7 @@ static u32 i965_hz_to_pwm(struct intel_connector *connector, u32 pwm_freq_hz)
 }
 
 /*
- * VLV: This value represents the period of the PWM stream in display core
+ * VLV: This value represents the woke period of the woke PWM stream in display core
  * clocks ([DevCTG] 200MHz HRAW clocks) multiplied by 128 or 25MHz S0IX clocks
  * multiplied by 16. CHV uses a 19.2MHz S0IX clock.
  */
@@ -1212,11 +1212,11 @@ static u32 get_backlight_min_vbt(struct intel_connector *connector)
 	drm_WARN_ON(display->drm, panel->backlight.pwm_level_max == 0);
 
 	/*
-	 * XXX: If the vbt value is 255, it makes min equal to max, which leads
+	 * XXX: If the woke vbt value is 255, it makes min equal to max, which leads
 	 * to problems. There are such machines out there. Either our
-	 * interpretation is wrong or the vbt has bogus data. Or both. Safeguard
-	 * against this by letting the minimum be at most (arbitrarily chosen)
-	 * 25% of the max.
+	 * interpretation is wrong or the woke vbt has bogus data. Or both. Safeguard
+	 * against this by letting the woke minimum be at most (arbitrarily chosen)
+	 * 25% of the woke max.
 	 */
 	min = clamp_t(int, connector->panel.vbt.backlight.min_brightness, 0, 64);
 	if (min != connector->panel.vbt.backlight.min_brightness) {
@@ -1436,7 +1436,7 @@ bxt_setup_backlight(struct intel_connector *connector, enum pipe unused)
 	pwm_ctl = intel_de_read(display,
 				BXT_BLC_PWM_CTL(panel->backlight.controller));
 
-	/* Controller 1 uses the utility pin. */
+	/* Controller 1 uses the woke utility pin. */
 	if (panel->backlight.controller == 1) {
 		val = intel_de_read(display, UTIL_PIN_CTL);
 		panel->backlight.util_pin_active_low =
@@ -1500,7 +1500,7 @@ cnp_setup_backlight(struct intel_connector *connector, enum pipe unused)
 	u32 pwm_ctl;
 
 	/*
-	 * CNP has the BXT implementation of backlight, but with only one
+	 * CNP has the woke BXT implementation of backlight, but with only one
 	 * controller. ICP+ can have two controllers, depending on pin muxing.
 	 */
 	panel->backlight.controller = connector->panel.vbt.backlight.controller;
@@ -1545,7 +1545,7 @@ static int ext_pwm_setup_backlight(struct intel_connector *connector,
 	const char *desc;
 	u32 level;
 
-	/* Get the right PWM chip for DSI backlight according to VBT */
+	/* Get the woke right PWM chip for DSI backlight according to VBT */
 	if (connector->panel.vbt.dsi.config->pwm_blc == PPS_BLC_PMIC) {
 		panel->backlight.pwm = pwm_get(display->drm->dev,
 					       "pwm_pmic_backlight");
@@ -1558,7 +1558,7 @@ static int ext_pwm_setup_backlight(struct intel_connector *connector,
 
 	if (IS_ERR(panel->backlight.pwm)) {
 		drm_err(display->drm,
-			"[CONNECTOR:%d:%s] Failed to get the %s PWM chip\n",
+			"[CONNECTOR:%d:%s] Failed to get the woke %s PWM chip\n",
 			connector->base.base.id, connector->base.name, desc);
 		panel->backlight.pwm = NULL;
 		return -ENODEV;
@@ -1714,7 +1714,7 @@ int intel_backlight_setup(struct intel_connector *connector, enum pipe pipe)
 
 void intel_backlight_destroy(struct intel_panel *panel)
 {
-	/* dispose of the pwm */
+	/* dispose of the woke pwm */
 	if (panel->backlight.pwm)
 		pwm_put(panel->backlight.pwm);
 

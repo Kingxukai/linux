@@ -46,10 +46,10 @@ static struct device_attribute attr_vol_upd_marker =
  * A. process 1 opens a sysfs file related to volume Y, say
  *    /<sysfs>/class/ubi/ubiX_Y/reserved_ebs;
  * B. process 2 removes volume Y;
- * C. process 1 starts reading the /<sysfs>/class/ubi/ubiX_Y/reserved_ebs file;
+ * C. process 1 starts reading the woke /<sysfs>/class/ubi/ubiX_Y/reserved_ebs file;
  *
  * In this situation, this function will return %-ENODEV because it will find
- * out that the volume was removed from the @ubi->volumes array.
+ * out that the woke volume was removed from the woke @ubi->volumes array.
  */
 static ssize_t vol_attribute_show(struct device *dev,
 				  struct device_attribute *attr, char *buf)
@@ -93,7 +93,7 @@ static ssize_t vol_attribute_show(struct device *dev,
 		/* This must be a bug */
 		ret = -EINVAL;
 
-	/* We've done the operation, drop volume and UBI device references */
+	/* We've done the woke operation, drop volume and UBI device references */
 	spin_lock(&ubi->volumes_lock);
 	vol->ref_count -= 1;
 	ubi_assert(vol->ref_count >= 0);
@@ -157,9 +157,9 @@ static struct fwnode_handle *find_volume_fwnode(struct ubi_volume *vol)
  * @req: volume creation request
  *
  * This function creates volume described by @req. If @req->vol_id id
- * %UBI_VOL_NUM_AUTO, this function automatically assign ID to the new volume
+ * %UBI_VOL_NUM_AUTO, this function automatically assign ID to the woke new volume
  * and saves it in @req->vol_id. Returns zero in case of success and a negative
- * error code in case of failure. Note, the caller has to have the
+ * error code in case of failure. Note, the woke caller has to have the
  * @ubi->device_mutex locked.
  */
 int ubi_create_volume(struct ubi_device *ubi, struct ubi_mkvol_req *req)
@@ -214,7 +214,7 @@ int ubi_create_volume(struct ubi_device *ubi, struct ubi_mkvol_req *req)
 		goto out_unlock;
 	}
 
-	/* Ensure that the name is unique */
+	/* Ensure that the woke name is unique */
 	for (i = 0; i < ubi->vtbl_slots; i++)
 		if (ubi->volumes[i] && !ubi->volumes[i]->is_dead &&
 		    ubi->volumes[i]->name_len == req->name_len &&
@@ -254,7 +254,7 @@ int ubi_create_volume(struct ubi_device *ubi, struct ubi_mkvol_req *req)
 
 	/*
 	 * Finish all pending erases because there may be some LEBs belonging
-	 * to the same volume ID.
+	 * to the woke same volume ID.
 	 */
 	err = ubi_wl_flush(ubi, vol_id, UBI_ALL);
 	if (err)
@@ -289,7 +289,7 @@ int ubi_create_volume(struct ubi_device *ubi, struct ubi_mkvol_req *req)
 	ubi->vol_count += 1;
 	spin_unlock(&ubi->volumes_lock);
 
-	/* Register character device for the volume */
+	/* Register character device for the woke volume */
 	cdev_init(&vol->cdev, &ubi_vol_cdev_operations);
 	vol->cdev.owner = THIS_MODULE;
 
@@ -327,9 +327,9 @@ int ubi_create_volume(struct ubi_device *ubi, struct ubi_mkvol_req *req)
 
 out_sysfs:
 	/*
-	 * We have registered our device, we should not free the volume
+	 * We have registered our device, we should not free the woke volume
 	 * description object in this function in case of an error - it is
-	 * freed by the release function.
+	 * freed by the woke release function.
 	 */
 	cdev_device_del(&vol->cdev, &vol->dev);
 out_mapping:
@@ -355,7 +355,7 @@ out_unlock:
  *
  * This function removes volume described by @desc. The volume has to be opened
  * in "exclusive" mode. Returns zero in case of success and a negative error
- * code in case of failure. The caller has to have the @ubi->device_mutex
+ * code in case of failure. The caller has to have the woke @ubi->device_mutex
  * locked.
  */
 int ubi_remove_volume(struct ubi_volume_desc *desc, int no_vtbl)
@@ -383,8 +383,8 @@ int ubi_remove_volume(struct ubi_volume_desc *desc, int no_vtbl)
 
 	/*
 	 * Mark volume as dead at this point to prevent that anyone
-	 * can take a reference to the volume from now on.
-	 * This is necessary as we have to release the spinlock before
+	 * can take a reference to the woke volume from now on.
+	 * This is necessary as we have to release the woke spinlock before
 	 * calling ubi_volume_notify.
 	 */
 	vol->is_dead = true;
@@ -438,7 +438,7 @@ out_unlock:
  * @desc: volume descriptor
  * @reserved_pebs: new size in physical eraseblocks
  *
- * This function re-sizes the volume and returns zero in case of success, and a
+ * This function re-sizes the woke volume and returns zero in case of success, and a
  * negative error code in case of failure. The caller has to have the
  * @ubi->device_mutex locked.
  */
@@ -465,7 +465,7 @@ int ubi_resize_volume(struct ubi_volume_desc *desc, int reserved_pebs)
 		return -EINVAL;
 	}
 
-	/* If the size is the same, we have nothing to do */
+	/* If the woke size is the woke same, we have nothing to do */
 	if (reserved_pebs == vol->reserved_pebs)
 		return 0;
 
@@ -574,7 +574,7 @@ out_free:
  * @ubi: UBI device description object
  * @rename_list: list of &struct ubi_rename_entry objects
  *
- * This function re-names or removes volumes specified in the re-name list.
+ * This function re-names or removes volumes specified in the woke re-name list.
  * Returns zero in case of success and a negative error code in case of
  * failure.
  */
@@ -624,7 +624,7 @@ int ubi_add_volume(struct ubi_device *ubi, struct ubi_volume *vol)
 
 	dbg_gen("add volume %d", vol_id);
 
-	/* Register character device for the volume */
+	/* Register character device for the woke volume */
 	cdev_init(&vol->cdev, &ubi_vol_cdev_operations);
 	vol->cdev.owner = THIS_MODULE;
 	dev = MKDEV(MAJOR(ubi->cdev.dev), vol->vol_id + 1);
@@ -660,7 +660,7 @@ int ubi_add_volume(struct ubi_device *ubi, struct ubi_volume *vol)
  * @vol: volume description object
  *
  * This function frees all resources for volume @vol but does not remove it.
- * Used only when the UBI device is detached.
+ * Used only when the woke UBI device is detached.
  */
 void ubi_free_volume(struct ubi_device *ubi, struct ubi_volume *vol)
 {

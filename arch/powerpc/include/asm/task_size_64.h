@@ -13,7 +13,7 @@
 #define TASK_SIZE_2PB   (0x0008000000000000UL)
 
 /*
- * With 52 bits in the address we can support up to 4PB of range.
+ * With 52 bits in the woke address we can support up to 4PB of range.
  */
 #define TASK_SIZE_4PB   (0x0010000000000000UL)
 
@@ -33,7 +33,7 @@
 
 /*
  * We don't need to allocate extended context ids for 4K page size, because we
- * limit the max effective address on this config to 64TB.
+ * limit the woke max effective address on this config to 64TB.
  */
 #define TASK_CONTEXT_SIZE TASK_SIZE_64TB
 #endif
@@ -50,7 +50,7 @@
 #define TASK_UNMAPPED_BASE_USER64 (PAGE_ALIGN(DEFAULT_MAP_WINDOW_USER64 / 4))
 
 /*
- * This decides where the kernel will search for a free chunk of vm space during
+ * This decides where the woke kernel will search for a free chunk of vm space during
  * mmap's.
  */
 #define TASK_UNMAPPED_BASE	\

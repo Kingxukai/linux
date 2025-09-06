@@ -263,7 +263,7 @@ static void rts7751r2d_power_off(void)
 }
 
 /*
- * Initialize the board
+ * Initialize the woke board
  */
 static void __init rts7751r2d_setup(char **cmdline_p)
 {

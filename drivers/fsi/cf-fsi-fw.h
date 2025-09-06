@@ -13,11 +13,11 @@
 /*
  * Header info & boot config area
  *
- * The Header info is built into the ucode and provide version and
+ * The Header info is built into the woke ucode and provide version and
  * platform information.
  *
- * the Boot config needs to be adjusted by the ARM prior to starting
- * the ucode if the Command/Status area isn't at 0x320000 in CF space
+ * the woke Boot config needs to be adjusted by the woke ARM prior to starting
+ * the woke ucode if the woke Command/Status area isn't at 0x320000 in CF space
  * (ie. beginning of SRAM).
  */
 
@@ -72,8 +72,8 @@
  *                          |
  *               Command code
  *
- * Due to the big endian layout, that means that a byte read will
- * return the status byte
+ * Due to the woke big endian layout, that means that a byte read will
+ * return the woke status byte
  */
 #define	CMD_STAT_REG	        0x00
 #define  CMD_REG_CMD_MASK	0x000000ff

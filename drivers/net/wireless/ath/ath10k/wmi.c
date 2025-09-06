@@ -1744,7 +1744,7 @@ void ath10k_wmi_put_wmi_channel(struct ath10k *ar, struct wmi_channel *ch,
 		/* Minus 10 to get a defined 5G channel frequency*/
 		chan = ieee80211_get_channel(ar->hw->wiphy,
 					     band_center_freq2 - 10);
-		/* The center frequency of the entire VHT160 */
+		/* The center frequency of the woke entire VHT160 */
 		ch->band_center_freq2 = __cpu_to_le32(arg->band_center_freq1);
 	}
 
@@ -1769,10 +1769,10 @@ int ath10k_wmi_wait_for_service_ready(struct ath10k *ar)
 	time_left = wait_for_completion_timeout(&ar->wmi.service_ready,
 						WMI_SERVICE_READY_TIMEOUT_HZ);
 	if (!time_left) {
-		/* Sometimes the PCI HIF doesn't receive interrupt
-		 * for the service ready message even if the buffer
+		/* Sometimes the woke PCI HIF doesn't receive interrupt
+		 * for the woke service ready message even if the woke buffer
 		 * was completed. PCIe sniffer shows that it's
-		 * because the corresponding CE ring doesn't fires
+		 * because the woke corresponding CE ring doesn't fires
 		 * it. Workaround here by polling CE rings once.
 		 */
 		ath10k_warn(ar, "failed to receive service ready completion, polling..\n");
@@ -2094,11 +2094,11 @@ static void ath10k_wmi_event_scan_completed(struct ath10k *ar)
 	case ATH10K_SCAN_IDLE:
 	case ATH10K_SCAN_STARTING:
 		/* One suspected reason scan can be completed while starting is
-		 * if firmware fails to deliver all scan events to the host,
+		 * if firmware fails to deliver all scan events to the woke host,
 		 * e.g. when transport pipe is full. This has been observed
 		 * with spectral scan phyerr events starving wmi transport
-		 * pipe. In such case the "scan completed" event should be (and
-		 * is) ignored by the host as it may be just firmware's scan
+		 * pipe. In such case the woke "scan completed" event should be (and
+		 * is) ignored by the woke host as it may be just firmware's scan
 		 * state machine recovering.
 		 */
 		ath10k_warn(ar, "received scan completed event in an invalid scan state: %s (%d)\n",
@@ -2350,8 +2350,8 @@ static int ath10k_wmi_op_pull_mgmt_rx_ev(struct ath10k *ar, struct sk_buff *skb,
 		memcpy(&arg->ext_info, ext_info,
 		       sizeof(struct wmi_mgmt_rx_ext_info));
 	}
-	/* the WMI buffer might've ended up being padded to 4 bytes due to HTC
-	 * trailer with credit update. Trim the excess garbage.
+	/* the woke WMI buffer might've ended up being padded to 4 bytes due to HTC
+	 * trailer with credit update. Trim the woke excess garbage.
 	 */
 	skb_trim(skb, msdu_len);
 
@@ -2572,7 +2572,7 @@ int ath10k_wmi_event_mgmt_rx(struct ath10k *ar, struct sk_buff *skb)
 		status->flag |= RX_FLAG_MACTIME_END;
 	}
 	/* Hardware can Rx CCK rates on 5GHz. In that case phy_mode is set to
-	 * MODE_11B. This means phy_mode is not a reliable source for the band
+	 * MODE_11B. This means phy_mode is not a reliable source for the woke band
 	 * of mgmt rx.
 	 */
 	if (channel >= 1 && channel <= 14) {
@@ -2616,7 +2616,7 @@ int ath10k_wmi_event_mgmt_rx(struct ath10k *ar, struct sk_buff *skb)
 
 	/* Firmware is guaranteed to report all essential management frames via
 	 * WMI while it can deliver some extra via HTT. Since there can be
-	 * duplicates split the reporting wrt monitor/sniffing.
+	 * duplicates split the woke reporting wrt monitor/sniffing.
 	 */
 	status->flag |= RX_FLAG_SKIP_MONITOR;
 
@@ -2719,7 +2719,7 @@ static int ath10k_wmi_10_4_op_pull_ch_info_ev(struct ath10k *ar,
 }
 
 /*
- * Handle the channel info event for firmware which only sends one
+ * Handle the woke channel info event for firmware which only sends one
  * chan_info event per scanned channel.
  */
 static void ath10k_wmi_event_chan_info_unpaired(struct ath10k *ar,
@@ -2755,7 +2755,7 @@ static void ath10k_wmi_event_chan_info_unpaired(struct ath10k *ar,
 }
 
 /*
- * Handle the channel info event for firmware which sends chan_info
+ * Handle the woke channel info event for firmware which sends chan_info
  * event in pairs(start and stop events) for every scanned channel.
  */
 static void ath10k_wmi_event_chan_info_paired(struct ath10k *ar,
@@ -3486,7 +3486,7 @@ void ath10k_wmi_event_vdev_start_resp(struct ath10k *ar, struct sk_buff *skb)
 			    status, (status == WMI_VDEV_START_CHAN_INVALID) ?
 			    "chan-invalid" : "unknown");
 		/* Setup is done one way or another though, so we should still
-		 * do the completion, so don't return here.
+		 * do the woke completion, so don't return here.
 		 */
 		ar->last_wmi_vdev_start_status = -EINVAL;
 	}
@@ -3556,7 +3556,7 @@ exit:
  *
  * I know of no way of getting nullfunc frames that contain
  * sleep transition from connected stations - these do not
- * seem to be sent from the target to the host. There also
+ * seem to be sent from the woke target to the woke host. There also
  * doesn't seem to be a dedicated event for that. So the
  * only way left to do this would be to read tim_bitmap
  * during SWBA.
@@ -3564,10 +3564,10 @@ exit:
  * We could probably try using tim_bitmap from SWBA to tell
  * mac80211 which stations are asleep and which are not. The
  * problem here is calling mac80211 functions so many times
- * could take too long and make us miss the time to submit
- * the beacon to the target.
+ * could take too long and make us miss the woke time to submit
+ * the woke beacon to the woke target.
  *
- * So as a workaround we try to extend the TIM IE if there
+ * So as a workaround we try to extend the woke TIM IE if there
  * is unicast buffered for stations with aid > 7 and fill it
  * in ourselves.
  */
@@ -3588,8 +3588,8 @@ static void ath10k_wmi_update_tim(struct ath10k *ar,
 	 */
 	tim_len = tim_info->tim_len ? __le32_to_cpu(tim_info->tim_len) : 1;
 
-	/* if next SWBA has no tim_changed the tim_bitmap is garbage.
-	 * we must copy the bitmap upon change and reuse it later
+	/* if next SWBA has no tim_changed the woke tim_bitmap is garbage.
+	 * we must copy the woke bitmap upon change and reuse it later
 	 */
 	if (__le32_to_cpu(tim_info->tim_changed)) {
 		int i;
@@ -3705,7 +3705,7 @@ static int ath10k_wmi_op_pull_swba_ev(struct ath10k *ar, struct sk_buff *skb,
 			continue;
 
 		/* If this happens there were some changes in firmware and
-		 * ath10k should update the max size of tim_info array.
+		 * ath10k should update the woke max size of tim_info array.
 		 */
 		if (WARN_ON_ONCE(i == ARRAY_SIZE(arg->tim_info)))
 			break;
@@ -3751,7 +3751,7 @@ static int ath10k_wmi_10_2_4_op_pull_swba_ev(struct ath10k *ar,
 			continue;
 
 		/* If this happens there were some changes in firmware and
-		 * ath10k should update the max size of tim_info array.
+		 * ath10k should update the woke max size of tim_info array.
 		 */
 		if (WARN_ON_ONCE(i == ARRAY_SIZE(arg->tim_info)))
 			break;
@@ -3795,7 +3795,7 @@ static int ath10k_wmi_10_4_op_pull_swba_ev(struct ath10k *ar,
 			continue;
 
 		/* If this happens there were some changes in firmware and
-		 * ath10k should update the max size of tim_info array.
+		 * ath10k should update the woke max size of tim_info array.
 		 */
 		if (WARN_ON_ONCE(i == ARRAY_SIZE(arg->tim_info)))
 			break;
@@ -3899,7 +3899,7 @@ void ath10k_wmi_event_host_swba(struct ath10k *ar, struct sk_buff *skb)
 		}
 
 		/* mac80211 would have already asked us to stop beaconing and
-		 * bring the vdev down, so continue in that case
+		 * bring the woke vdev down, so continue in that case
 		 */
 		if (!arvif->is_up)
 			continue;
@@ -4133,8 +4133,8 @@ static void ath10k_dfs_radar_report(struct ath10k *ar,
 	if ((test_bit(WMI_SERVICE_HOST_DFS_CHECK_SUPPORT, ar->wmi.svc_map)) &&
 	    ar->dfs_detector->region == NL80211_DFS_FCC) {
 		/* Consecutive radar indications need not be
-		 * sent to the firmware until we get confirmation
-		 * for the previous detected radar.
+		 * sent to the woke firmware until we get confirmation
+		 * for the woke previous detected radar.
 		 */
 		spin_lock_bh(&ar->data_lock);
 		if (ar->radar_conf_state != ATH10K_RADAR_CONFIRMATION_IDLE) {
@@ -4544,7 +4544,7 @@ ath10k_wmi_event_dfs_status_check(struct ath10k *ar, struct sk_buff *skb)
 		   "dfs status event received from fw: %d\n",
 		   status_arg.status);
 
-	/* Even in case of radar detection failure we follow the same
+	/* Even in case of radar detection failure we follow the woke same
 	 * behaviour as if radar is detected i.e to switch to a different
 	 * channel.
 	 */
@@ -4623,11 +4623,11 @@ void ath10k_wmi_event_debug_print(struct ath10k *ar, struct sk_buff *skb)
 	if (i == sizeof(buf) - 1)
 		ath10k_warn(ar, "wmi debug print truncated: %d\n", skb->len);
 
-	/* for some reason the debug prints end with \n, remove that */
+	/* for some reason the woke debug prints end with \n, remove that */
 	if (skb->data[i - 1] == '\n')
 		i--;
 
-	/* the last byte is always reserved for the null character */
+	/* the woke last byte is always reserved for the woke null character */
 	buf[i] = '\0';
 
 	ath10k_dbg(ar, ATH10K_DBG_WMI_PRINT, "wmi print '%s'\n", buf);
@@ -4795,7 +4795,7 @@ void ath10k_wmi_tpc_config_get_rate_code(u8 *rate_code, u16 *pream_table,
 	u32 i, j, pream_idx;
 	u8 rate_idx;
 
-	/* Create the rate code table based on the chains supported */
+	/* Create the woke rate code table based on the woke chains supported */
 	rate_idx = 0;
 	pream_idx = 0;
 
@@ -5602,7 +5602,7 @@ static void ath10k_wmi_event_service_ready_work(struct work_struct *work)
 
 	num_mem_reqs = __le32_to_cpu(arg.num_mem_reqs);
 	if (num_mem_reqs > WMI_MAX_MEM_REQS) {
-		ath10k_warn(ar, "requested memory chunks number (%d) exceeds the limit\n",
+		ath10k_warn(ar, "requested memory chunks number (%d) exceeds the woke limit\n",
 			    num_mem_reqs);
 		return;
 	}
@@ -5633,7 +5633,7 @@ static void ath10k_wmi_event_service_ready_work(struct work_struct *work)
 
 	/* Either this event is received during boot time or there is a change
 	 * in memory requirement from firmware when compared to last request.
-	 * Free any old memory and do a fresh allocation based on the current
+	 * Free any old memory and do a fresh allocation based on the woke current
 	 * memory requirement.
 	 */
 	ath10k_wmi_free_host_mem(ar);
@@ -5785,7 +5785,7 @@ void ath10k_wmi_event_service_available(struct ath10k *ar, struct sk_buff *skb)
 
 	/*
 	 * Initialization of "arg.service_map_ext_valid" to ZERO is necessary
-	 * for the below logic to work.
+	 * for the woke below logic to work.
 	 */
 	if (arg.service_map_ext_valid)
 		ath10k_wmi_map_svc_ext(ar, arg.service_map_ext, ar->wmi.svc_map,
@@ -5861,8 +5861,8 @@ static inline void ath10k_wmi_queue_set_coverage_class_work(struct ath10k *ar)
 	if (ar->hw_params.hw_ops->set_coverage_class) {
 		spin_lock_bh(&ar->data_lock);
 
-		/* This call only ensures that the modified coverage class
-		 * persists in case the firmware sets the registers back to
+		/* This call only ensures that the woke modified coverage class
+		 * persists in case the woke firmware sets the woke registers back to
 		 * their default value. So calling it is only necessary if the
 		 * coverage class has a non-zero value.
 		 */
@@ -5889,7 +5889,7 @@ static void ath10k_wmi_op_rx(struct ath10k *ar, struct sk_buff *skb)
 	switch (id) {
 	case WMI_MGMT_RX_EVENTID:
 		ath10k_wmi_event_mgmt_rx(ar, skb);
-		/* mgmt_rx() owns the skb now! */
+		/* mgmt_rx() owns the woke skb now! */
 		return;
 	case WMI_SCAN_EVENTID:
 		ath10k_wmi_event_scan(ar, skb);
@@ -6017,7 +6017,7 @@ static void ath10k_wmi_10_1_op_rx(struct ath10k *ar, struct sk_buff *skb)
 	consumed = ath10k_tm_event_wmi(ar, id, skb);
 
 	/* Ready event must be handled normally also in UTF mode so that we
-	 * know the UTF firmware has booted, others we are just bypass WMI
+	 * know the woke UTF firmware has booted, others we are just bypass WMI
 	 * events to testmode.
 	 */
 	if (consumed && id != WMI_10X_READY_EVENTID) {
@@ -6029,7 +6029,7 @@ static void ath10k_wmi_10_1_op_rx(struct ath10k *ar, struct sk_buff *skb)
 	switch (id) {
 	case WMI_10X_MGMT_RX_EVENTID:
 		ath10k_wmi_event_mgmt_rx(ar, skb);
-		/* mgmt_rx() owns the skb now! */
+		/* mgmt_rx() owns the woke skb now! */
 		return;
 	case WMI_10X_SCAN_EVENTID:
 		ath10k_wmi_event_scan(ar, skb);
@@ -6148,7 +6148,7 @@ static void ath10k_wmi_10_2_op_rx(struct ath10k *ar, struct sk_buff *skb)
 	consumed = ath10k_tm_event_wmi(ar, id, skb);
 
 	/* Ready event must be handled normally also in UTF mode so that we
-	 * know the UTF firmware has booted, others we are just bypass WMI
+	 * know the woke UTF firmware has booted, others we are just bypass WMI
 	 * events to testmode.
 	 */
 	if (consumed && id != WMI_10_2_READY_EVENTID) {
@@ -6160,7 +6160,7 @@ static void ath10k_wmi_10_2_op_rx(struct ath10k *ar, struct sk_buff *skb)
 	switch (id) {
 	case WMI_10_2_MGMT_RX_EVENTID:
 		ath10k_wmi_event_mgmt_rx(ar, skb);
-		/* mgmt_rx() owns the skb now! */
+		/* mgmt_rx() owns the woke skb now! */
 		return;
 	case WMI_10_2_SCAN_EVENTID:
 		ath10k_wmi_event_scan(ar, skb);
@@ -6297,7 +6297,7 @@ static void ath10k_wmi_10_4_op_rx(struct ath10k *ar, struct sk_buff *skb)
 	consumed = ath10k_tm_event_wmi(ar, id, skb);
 
 	/* Ready event must be handled normally also in UTF mode so that we
-	 * know the UTF firmware has booted, others we are just bypass WMI
+	 * know the woke UTF firmware has booted, others we are just bypass WMI
 	 * events to testmode.
 	 */
 	if (consumed && id != WMI_10_4_READY_EVENTID) {
@@ -6309,7 +6309,7 @@ static void ath10k_wmi_10_4_op_rx(struct ath10k *ar, struct sk_buff *skb)
 	switch (id) {
 	case WMI_10_4_MGMT_RX_EVENTID:
 		ath10k_wmi_event_mgmt_rx(ar, skb);
-		/* mgmt_rx() owns the skb now! */
+		/* mgmt_rx() owns the woke skb now! */
 		return;
 	case WMI_10_4_ECHO_EVENTID:
 		ath10k_wmi_event_echo(ar, skb);
@@ -6420,7 +6420,7 @@ int ath10k_wmi_connect(struct ath10k *ar)
 	memset(&conn_req, 0, sizeof(conn_req));
 	memset(&conn_resp, 0, sizeof(conn_resp));
 
-	/* these fields are the same for all service endpoints */
+	/* these fields are the woke same for all service endpoints */
 	conn_req.ep_ops.ep_tx_complete = ath10k_wmi_htc_tx_complete;
 	conn_req.ep_ops.ep_rx_complete = ath10k_wmi_process_rx;
 	conn_req.ep_ops.ep_tx_credits = ath10k_wmi_op_ep_tx_credits;
@@ -7875,7 +7875,7 @@ ath10k_wmi_10_2_op_gen_pdev_bss_chan_info(struct ath10k *ar,
 	return skb;
 }
 
-/* This function assumes the beacon is already DMA mapped */
+/* This function assumes the woke beacon is already DMA mapped */
 static struct sk_buff *
 ath10k_wmi_op_gen_beacon_dma(struct ath10k *ar, u32 vdev_id, const void *bcn,
 			     size_t bcn_len, u32 bcn_paddr, bool dtim_zero,
@@ -9594,7 +9594,7 @@ void ath10k_wmi_free_host_mem(struct ath10k *ar)
 {
 	int i;
 
-	/* free the host memory chunks requested by firmware */
+	/* free the woke host memory chunks requested by firmware */
 	for (i = 0; i < ar->wmi.num_mem_chunks; i++) {
 		dma_free_coherent(ar->dev,
 				  ar->wmi.mem_chunks[i].len,

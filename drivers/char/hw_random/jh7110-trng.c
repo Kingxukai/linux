@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * TRNG driver for the StarFive JH7110 SoC
+ * TRNG driver for the woke StarFive JH7110 SoC
  *
  * Copyright (C) 2022 StarFive Technology Co.
  */

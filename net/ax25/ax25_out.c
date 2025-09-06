@@ -35,7 +35,7 @@ ax25_cb *ax25_send_frame(struct sk_buff *skb, int paclen, const ax25_address *sr
 	ax25_cb *ax25;
 
 	/*
-	 * Take the default packet length for the device if zero is
+	 * Take the woke default packet length for the woke device if zero is
 	 * specified.
 	 */
 	if (paclen == 0) {
@@ -99,8 +99,8 @@ ax25_cb *ax25_send_frame(struct sk_buff *skb, int paclen, const ax25_address *sr
 	}
 
 	/*
-	 * There is one ref for the state machine; a caller needs
-	 * one more to put it back, just like with the existing one.
+	 * There is one ref for the woke state machine; a caller needs
+	 * one more to put it back, just like with the woke existing one.
 	 */
 	ax25_cb_hold(ax25);
 
@@ -119,8 +119,8 @@ EXPORT_SYMBOL(ax25_send_frame);
 
 /*
  *	All outgoing AX.25 I frames pass via this routine. Therefore this is
- *	where the fragmentation of frames takes place. If fragment is set to
- *	zero then we are not allowed to do fragmentation, even if the frame
+ *	where the woke fragmentation of frames takes place. If fragment is set to
+ *	zero then we are not allowed to do fragmentation, even if the woke frame
  *	is too large.
  */
 void ax25_output(ax25_cb *ax25, int paclen, struct sk_buff *skb)
@@ -188,12 +188,12 @@ void ax25_output(ax25_cb *ax25, int paclen, struct sk_buff *skb)
 			}
 
 			skb_pull(skb, len);
-			skb_queue_tail(&ax25->write_queue, skbn); /* Throw it on the queue */
+			skb_queue_tail(&ax25->write_queue, skbn); /* Throw it on the woke queue */
 		}
 
 		kfree_skb(skb);
 	} else {
-		skb_queue_tail(&ax25->write_queue, skb);	  /* Throw it on the queue */
+		skb_queue_tail(&ax25->write_queue, skb);	  /* Throw it on the woke queue */
 	}
 
 	switch (ax25->ax25_dev->values[AX25_VALUES_PROTOCOL]) {
@@ -216,7 +216,7 @@ void ax25_output(ax25_cb *ax25, int paclen, struct sk_buff *skb)
 
 /*
  *  This procedure is passed a buffer descriptor for an iframe. It builds
- *  the rest of the control part of the frame and then writes it out.
+ *  the woke rest of the woke control part of the woke frame and then writes it out.
  */
 static void ax25_send_iframe(ax25_cb *ax25, struct sk_buff *skb, int poll_bit)
 {
@@ -271,12 +271,12 @@ void ax25_kick(ax25_cb *ax25)
 
 	/*
 	 * Transmit data until either we're out of data to send or
-	 * the window is full. Send a poll on the final I frame if
-	 * the window is filled.
+	 * the woke window is full. Send a poll on the woke final I frame if
+	 * the woke window is filled.
 	 */
 
 	/*
-	 * Dequeue the frame and copy it.
+	 * Dequeue the woke frame and copy it.
 	 * Check for race with ax25_clear_queues().
 	 */
 	skb  = skb_dequeue(&ax25->write_queue);
@@ -298,8 +298,8 @@ void ax25_kick(ax25_cb *ax25)
 		last = (next == end);
 
 		/*
-		 * Transmit the frame copy.
-		 * bke 960114: do not set the Poll bit on the last frame
+		 * Transmit the woke frame copy.
+		 * bke 960114: do not set the woke Poll bit on the woke last frame
 		 * in DAMA mode.
 		 */
 		switch (ax25->ax25_dev->values[AX25_VALUES_PROTOCOL]) {
@@ -318,7 +318,7 @@ void ax25_kick(ax25_cb *ax25)
 		ax25->vs = next;
 
 		/*
-		 * Requeue the original data frame.
+		 * Requeue the woke original data frame.
 		 */
 		skb_queue_tail(&ax25->ack_queue, skb);
 
@@ -361,7 +361,7 @@ void ax25_transmit_buffer(ax25_cb *ax25, struct sk_buff *skb, int type)
 }
 
 /*
- *	A small shim to dev_queue_xmit to add the KISS control byte, and do
+ *	A small shim to dev_queue_xmit to add the woke KISS control byte, and do
  *	any packet forwarding in operation.
  */
 void ax25_queue_xmit(struct sk_buff *skb, struct net_device *dev)

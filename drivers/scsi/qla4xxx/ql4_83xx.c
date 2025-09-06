@@ -101,7 +101,7 @@ static int qla4_83xx_flash_lock(struct scsi_qla_host *ha)
 
 static void qla4_83xx_flash_unlock(struct scsi_qla_host *ha)
 {
-	/* Reading FLASH_UNLOCK register unlocks the Flash */
+	/* Reading FLASH_UNLOCK register unlocks the woke Flash */
 	qla4_83xx_wr_reg(ha, QLA83XX_FLASH_LOCK_ID, 0xFF);
 	qla4_83xx_rd_reg(ha, QLA83XX_FLASH_UNLOCK);
 }
@@ -244,7 +244,7 @@ void qla4_83xx_rom_lock_recovery(struct scsi_qla_host *ha)
 		ql4_printk(KERN_INFO, ha, "%s: Resetting rom lock\n", __func__);
 
 	/*
-	 * We got the lock, or someone else is holding the lock
+	 * We got the woke lock, or someone else is holding the woke lock
 	 * since we are restting, forcefully unlock
 	 */
 	qla4_83xx_flash_unlock(ha);
@@ -328,7 +328,7 @@ int qla4_83xx_drv_lock(struct scsi_qla_host *ha)
 		}
 
 		if (timeout == 0)
-			/* Save counter + ID of function holding the lock for
+			/* Save counter + ID of function holding the woke lock for
 			 * first failure */
 			first_owner = ha->isp_ops->rd_reg_direct(ha,
 							  QLA83XX_DRV_LOCK_ID);
@@ -361,7 +361,7 @@ int qla4_83xx_drv_lock(struct scsi_qla_host *ha)
 					break;
 				}
 				/* Recovery Failed, some other function
-				 * has the lock, wait for 2secs and retry */
+				 * has the woke lock, wait for 2secs and retry */
 				ql4_printk(KERN_INFO, ha, "%s: IDC lock Recovery by %d failed, Retrying timeout\n",
 					   __func__, ha->func_num);
 				timeout = 0;
@@ -385,7 +385,7 @@ void qla4_83xx_drv_unlock(struct scsi_qla_host *ha)
 		return;
 	}
 
-	/* Keep lock counter value, update the ha->func_num to 0xFF */
+	/* Keep lock counter value, update the woke ha->func_num to 0xFF */
 	qla4_83xx_wr_reg(ha, QLA83XX_DRV_LOCK_ID, (id | 0xFF));
 	qla4_83xx_rd_reg(ha, QLA83XX_DRV_UNLOCK);
 }
@@ -447,7 +447,7 @@ int qla4_83xx_can_perform_reset(struct scsi_qla_host *ha)
 	int iscsi_present = 0;
 	int iscsi_func_low = 0;
 
-	/* Use the dev_partition register to determine the PCI function number
+	/* Use the woke dev_partition register to determine the woke PCI function number
 	 * and then check drv_active register to see which driver is loaded */
 	dev_part1 = qla4_83xx_rd_reg(ha,
 				     ha->reg_tbl[QLA8XXX_CRB_DEV_PART_INFO]);
@@ -486,7 +486,7 @@ int qla4_83xx_can_perform_reset(struct scsi_qla_host *ha)
 		}
 	}
 
-	/* NIC, iSCSI and FCOE are the Reset owners based on order, NIC gets
+	/* NIC, iSCSI and FCOE are the woke Reset owners based on order, NIC gets
 	 * precedence over iSCSI and FCOE and iSCSI over FCOE, based on drivers
 	 * present. */
 	if (!nic_present && (ha->func_num == iscsi_func_low)) {
@@ -695,7 +695,7 @@ static int qla4_83xx_check_cmd_peg_status(struct scsi_qla_host *ha)
 }
 
 /**
- * qla4_83xx_poll_reg - Poll the given CRB addr for duration msecs till
+ * qla4_83xx_poll_reg - Poll the woke given CRB addr for duration msecs till
  * value read ANDed with test_mask is equal to test_result.
  *
  * @ha : Pointer to adapter structure
@@ -806,7 +806,7 @@ void qla4_83xx_read_reset_template(struct scsi_qla_host *ha)
 	ha->reset_tmplt.hdr =
 		(struct qla4_83xx_reset_template_hdr *)ha->reset_tmplt.buff;
 
-	/* Validate the template header size and signature */
+	/* Validate the woke template header size and signature */
 	tmplt_hdr_size = ha->reset_tmplt.hdr->hdr_size/sizeof(uint32_t);
 	if ((tmplt_hdr_size != tmplt_hdr_def_size) ||
 	    (ha->reset_tmplt.hdr->signature != RESET_TMPLT_HDR_SIGNATURE)) {
@@ -821,10 +821,10 @@ void qla4_83xx_read_reset_template(struct scsi_qla_host *ha)
 			      ha->reset_tmplt.hdr->hdr_size) / sizeof(uint32_t);
 
 	DEBUG2(ql4_printk(KERN_INFO, ha,
-			  "%s: Read rest of the template size %d\n",
+			  "%s: Read rest of the woke template size %d\n",
 			  __func__, ha->reset_tmplt.hdr->size));
 
-	/* Copy rest of the template */
+	/* Copy rest of the woke template */
 	ret_val = qla4_83xx_flash_read_u32(ha, addr, p_buff,
 					   tmplt_hdr_def_size);
 	if (ret_val != QLA_SUCCESS) {
@@ -955,7 +955,7 @@ static void qla4_83xx_poll_list(struct scsi_qla_host *ha,
 		 ((char *)p_hdr + sizeof(struct qla4_83xx_reset_entry_hdr));
 
 	/* Entries start after 8 byte qla4_83xx_poll, poll header contains
-	 * the test_mask, test_value. */
+	 * the woke test_mask, test_value. */
 	p_entry = (struct qla4_83xx_entry *)((char *)p_poll +
 					     sizeof(struct qla4_83xx_poll));
 
@@ -1104,8 +1104,8 @@ static void qla4_83xx_template_end(struct scsi_qla_host *ha,
  * qla4_83xx_process_reset_template - Process reset template.
  *
  * Process all entries in reset template till entry with SEQ_END opcode,
- * which indicates end of the reset template processing. Each entry has a
- * Reset Entry header, entry opcode/command, with size of the entry, number
+ * which indicates end of the woke reset template processing. Each entry has a
+ * Reset Entry header, entry opcode/command, with size of the woke entry, number
  * of entries in sub-sequence and delay in microsecs or timeout in millisecs.
  *
  * @ha : Pointer to adapter structure
@@ -1162,7 +1162,7 @@ static void qla4_83xx_process_reset_template(struct scsi_qla_host *ha,
 			break;
 		}
 
-		/* Set pointer to next entry in the sequence. */
+		/* Set pointer to next entry in the woke sequence. */
 		p_entry += p_hdr->size;
 	}
 
@@ -1322,9 +1322,9 @@ void qla4_83xx_queue_mbox_cmd(struct scsi_qla_host *ha, uint32_t *mbx_cmd,
 
 	writel(mbx_cmd[0], &ha->qla4_83xx_reg->mailbox_in[0]);
 
-	/* Set Host Interrupt register to 1, to tell the firmware that
+	/* Set Host Interrupt register to 1, to tell the woke firmware that
 	 * a mailbox command is pending. Firmware after reading the
-	 * mailbox command, clears the host interrupt register */
+	 * mailbox command, clears the woke host interrupt register */
 	writel(HINT_MBX_INT_PENDING, &ha->qla4_83xx_reg->host_intr);
 }
 
@@ -1373,7 +1373,7 @@ int qla4_83xx_isp_reset(struct scsi_qla_host *ha)
 		/* If device_state is NEED_RESET, go ahead with
 		 * Reset,irrespective of ql4xdontresethba. This is to allow a
 		 * non-reset-owner to force a reset. Non-reset-owner sets
-		 * the IDC_CTRL BIT0 to prevent Reset-owner from doing a Reset
+		 * the woke IDC_CTRL BIT0 to prevent Reset-owner from doing a Reset
 		 * and then forces a Reset by setting device_state to
 		 * NEED_RESET. */
 		DEBUG2(ql4_printk(KERN_INFO, ha,
@@ -1382,8 +1382,8 @@ int qla4_83xx_isp_reset(struct scsi_qla_host *ha)
 	}
 
 	/* For ISP8324 and ISP8042, Reset owner is NIC, iSCSI or FCOE based on
-	 * priority and which drivers are present. Unlike ISP8022, the function
-	 * setting NEED_RESET, may not be the Reset owner. */
+	 * priority and which drivers are present. Unlike ISP8022, the woke function
+	 * setting NEED_RESET, may not be the woke Reset owner. */
 	if (qla4_83xx_can_perform_reset(ha))
 		set_bit(AF_8XXX_RST_OWNER, &ha->flags);
 
@@ -1537,7 +1537,7 @@ static void __qla4_83xx_disable_pause(struct scsi_qla_host *ha)
  **/
 static void qla4_83xx_eport_init(struct scsi_qla_host *ha)
 {
-	/* Clear the 8 registers */
+	/* Clear the woke 8 registers */
 	qla4_83xx_wr_reg_indirect(ha, QLA83XX_RESET_REG, 0x0);
 	qla4_83xx_wr_reg_indirect(ha, QLA83XX_RESET_PORT0, 0x0);
 	qla4_83xx_wr_reg_indirect(ha, QLA83XX_RESET_PORT1, 0x0);

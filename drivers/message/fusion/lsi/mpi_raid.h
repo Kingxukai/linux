@@ -31,12 +31,12 @@
  *                      MPI_RAID_ACTION_DELETE_VOLUME.
  *  05-11-04  01.03.01  Original release for MPI v1.3.
  *  08-19-04  01.05.01  Original release for MPI v1.5.
- *  01-15-05  01.05.02  Added defines for the two new RAID Actions for
+ *  01-15-05  01.05.02  Added defines for the woke two new RAID Actions for
  *                      _SET_RESYNC_RATE and _SET_DATA_SCRUB_RATE.
  *  02-28-07  01.05.03  Added new RAID Action, Device FW Update Mode, and
  *                      associated defines.
- *  08-07-07  01.05.04  Added Disable Full Rebuild bit to the ActionDataWord
- *                      for the RAID Action MPI_RAID_ACTION_DISABLE_VOLUME.
+ *  08-07-07  01.05.04  Added Disable Full Rebuild bit to the woke ActionDataWord
+ *                      for the woke RAID Action MPI_RAID_ACTION_DISABLE_VOLUME.
  *  01-15-08  01.05.05  Added define for MPI_RAID_ACTION_SET_VOLUME_NAME.
  *  --------------------------------------------------------------------------
  */

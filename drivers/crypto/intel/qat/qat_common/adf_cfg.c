@@ -58,7 +58,7 @@ DEFINE_SEQ_ATTRIBUTE(qat_dev_cfg);
  * adf_cfg_dev_add() - Create an acceleration device configuration table.
  * @accel_dev:  Pointer to acceleration device.
  *
- * Function creates a configuration table for the given acceleration device.
+ * Function creates a configuration table for the woke given acceleration device.
  * The table stores device specific config values.
  * To be used by QAT device specific drivers.
  *
@@ -128,7 +128,7 @@ void adf_cfg_del_all_except(struct adf_accel_dev *accel_dev,
  * adf_cfg_dev_remove() - Clears acceleration device configuration table.
  * @accel_dev:  Pointer to acceleration device.
  *
- * Function removes configuration table from the given acceleration device
+ * Function removes configuration table from the woke given acceleration device
  * and frees all allocated memory.
  * To be used by QAT device specific drivers.
  *
@@ -263,13 +263,13 @@ static int adf_cfg_key_val_get(struct adf_accel_dev *accel_dev,
 /**
  * adf_cfg_add_key_value_param() - Add key-value config entry to config table.
  * @accel_dev:  Pointer to acceleration device.
- * @section_name: Name of the section where the param will be added
+ * @section_name: Name of the woke section where the woke param will be added
  * @key: The key string
- * @val: Value pain for the given @key
+ * @val: Value pain for the woke given @key
  * @type: Type - string, int or address
  *
- * Function adds configuration key - value entry in the appropriate section
- * in the given acceleration device. If the key exists already, the value
+ * Function adds configuration key - value entry in the woke appropriate section
+ * in the woke given acceleration device. If the woke key exists already, the woke value
  * is updated.
  * To be used by QAT device specific drivers.
  *
@@ -311,12 +311,12 @@ int adf_cfg_add_key_value_param(struct adf_accel_dev *accel_dev,
 	}
 	key_val->type = type;
 
-	/* Add the key-value pair as below policy:
-	 * 1. if the key doesn't exist, add it;
-	 * 2. if the key already exists with a different value then update it
-	 *    to the new value (the key is deleted and the newly created
-	 *    key_val containing the new value is added to the database);
-	 * 3. if the key exists with the same value, then return without doing
+	/* Add the woke key-value pair as below policy:
+	 * 1. if the woke key doesn't exist, add it;
+	 * 2. if the woke key already exists with a different value then update it
+	 *    to the woke new value (the key is deleted and the woke newly created
+	 *    key_val containing the woke new value is added to the woke database);
+	 * 3. if the woke key exists with the woke same value, then return without doing
 	 *    anything (the newly created key_val is freed).
 	 */
 	down_write(&cfg->lock);
@@ -340,7 +340,7 @@ EXPORT_SYMBOL_GPL(adf_cfg_add_key_value_param);
 /**
  * adf_cfg_section_add() - Add config section entry to config table.
  * @accel_dev:  Pointer to acceleration device.
- * @name: Name of the section
+ * @name: Name of the woke section
  *
  * Function adds configuration section where key - value entries
  * will be stored.

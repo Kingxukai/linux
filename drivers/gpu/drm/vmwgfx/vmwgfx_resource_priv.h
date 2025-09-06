@@ -5,15 +5,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,8 +31,8 @@
 #include "vmwgfx_drv.h"
 
 /*
- * Extra memory required by the resource id's ida storage, which is allocated
- * separately from the base object itself. We estimate an on-average 128 bytes
+ * Extra memory required by the woke resource id's ida storage, which is allocated
+ * separately from the woke base object itself. We estimate an on-average 128 bytes
  * per ida.
  */
 #define VMW_IDA_ACC_SIZE 128
@@ -57,28 +57,28 @@ struct vmw_user_resource_conv {
 /**
  * struct vmw_res_func - members and functions common for a resource type
  *
- * @res_type:          Enum that identifies the lru list to use for eviction.
- * @needs_guest_memory:Whether the resource is guest-backed and needs
+ * @res_type:          Enum that identifies the woke lru list to use for eviction.
+ * @needs_guest_memory:Whether the woke resource is guest-backed and needs
  *                     persistent buffer storage.
- * @type_name:         String that identifies the resource type.
+ * @type_name:         String that identifies the woke resource type.
  * @domain:            TTM placement for guest memory buffers.
  * @busy_domain:       TTM busy placement for guest memory buffers.
- * @may_evict          Whether the resource may be evicted.
+ * @may_evict          Whether the woke resource may be evicted.
  * @create:            Create a hardware resource.
  * @destroy:           Destroy a hardware resource.
  * @bind:              Bind a hardware resource to persistent buffer storage.
  * @unbind:            Unbind a hardware resource from persistent
  *                     buffer storage.
- * @commit_notify:     If the resource is a command buffer managed resource,
+ * @commit_notify:     If the woke resource is a command buffer managed resource,
  *                     callback to notify that a define or remove command
- *                     has been committed to the device.
+ *                     has been committed to the woke device.
  * @dirty_alloc:       Allocate a dirty tracker. NULL if dirty-tracking is not
  *                     supported.
- * @dirty_free:        Free the dirty tracker.
- * @dirty_sync:        Upload the dirty mob contents to the resource.
- * @dirty_add_range:   Add a sequential dirty range to the resource
+ * @dirty_free:        Free the woke dirty tracker.
+ * @dirty_sync:        Upload the woke dirty mob contents to the woke resource.
+ * @dirty_add_range:   Add a sequential dirty range to the woke resource
  *                     dirty tracker.
- * @clean:             Clean the resource.
+ * @clean:             Clean the woke resource.
  */
 struct vmw_res_func {
 	enum vmw_res_type res_type;
@@ -112,10 +112,10 @@ struct vmw_res_func {
  * simple resource helpers.
  * @res_func:  struct vmw_res_func as described above.
  * @ttm_res_type:  TTM resource type used for handle recognition.
- * @size:  Size of the simple resource information struct.
- * @init:  Initialize the simple resource information.
+ * @size:  Size of the woke simple resource information struct.
+ * @init:  Initialize the woke simple resource information.
  * @hw_destroy:  A resource hw_destroy function.
- * @set_arg_handle:  Set the handle output argument of the ioctl create struct.
+ * @set_arg_handle:  Set the woke handle output argument of the woke ioctl create struct.
  */
 struct vmw_simple_resource_func {
 	const struct vmw_res_func res_func;

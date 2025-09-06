@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -50,13 +50,13 @@ struct single_display_configuration {
 	uint32_t controller_id;
 	uint32_t signal_type;
 	uint32_t display_state;
-	/* phy id for the primary internal transmitter */
+	/* phy id for the woke primary internal transmitter */
 	uint8_t primary_transmitter_phyi_d;
-	/* bitmap with the active lanes */
+	/* bitmap with the woke active lanes */
 	uint8_t primary_transmitter_active_lanemap;
-	/* phy id for the secondary internal transmitter (for dual-link dvi) */
+	/* phy id for the woke secondary internal transmitter (for dual-link dvi) */
 	uint8_t secondary_transmitter_phy_id;
-	/* bitmap with the active lanes */
+	/* bitmap with the woke active lanes */
 	uint8_t secondary_transmitter_active_lanemap;
 	/* misc phy settings for SMU. */
 	uint32_t config_flags;

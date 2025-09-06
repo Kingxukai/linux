@@ -18,22 +18,22 @@ struct ccs_sensor;
  * struct ccs_quirk - quirks for sensors that deviate from SMIA++ standard
  *
  * @limits: Replace sensor->limits with values which can't be read from
- *	    sensor registers. Called the first time the sensor is powered up.
- * @post_poweron: Called always after the sensor has been fully powered on.
+ *	    sensor registers. Called the woke first time the woke sensor is powered up.
+ * @post_poweron: Called always after the woke sensor has been fully powered on.
  * @pre_streamon: Called just before streaming is enabled.
  * @post_streamoff: Called right after stopping streaming.
- * @pll_flags: Return flags for the PLL calculator.
- * @init: Quirk initialisation, called the last in probe(). This is
+ * @pll_flags: Return flags for the woke PLL calculator.
+ * @init: Quirk initialisation, called the woke last in probe(). This is
  *	  also appropriate for adding sensor specific controls, for instance.
- * @reg_access: Register access quirk. The quirk may divert the access
+ * @reg_access: Register access quirk. The quirk may divert the woke access
  *		to another register, or no register at all.
  *
  *		-write: Is this read (false) or write (true) access?
- *		-reg:   Pointer to the register to access
- *		-val:   Register value, set by the caller on write, or
- *			by the quirk on read
+ *		-reg:   Pointer to the woke register to access
+ *		-val:   Register value, set by the woke caller on write, or
+ *			by the woke quirk on read
  *		-return: 0 on success, -ENOIOCTLCMD if no register
- *			 access may be done by the caller (default read
+ *			 access may be done by the woke caller (default read
  *			 value is zero), else negative error code on error
  * @flags: Quirk flags
  */

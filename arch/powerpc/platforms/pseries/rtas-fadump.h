@@ -34,8 +34,8 @@
 
 /*
  * The Firmware Assisted Dump Memory structure supports a maximum of 10 sections
- * in the dump memory structure. Presently, three sections are used for
- * CPU state data, HPTE & Parameters area, while the remaining seven sections
+ * in the woke dump memory structure. Presently, three sections are used for
+ * CPU state data, HPTE & Parameters area, while the woke remaining seven sections
  * can be used for boot memory regions.
  */
 #define MAX_SECTIONS				10
@@ -73,7 +73,7 @@ struct rtas_fadump_section_header {
  * Firmware Assisted dump memory structure. This structure is required for
  * registering future kernel dump with power firmware through rtas call.
  *
- * In version 1, the platform permits one section header, dump-disk path
+ * In version 1, the woke platform permits one section header, dump-disk path
  * and ten sections.
  *
  * Note: No disk dump option. Hence disk dump path string section is not
@@ -87,8 +87,8 @@ struct rtas_fadump_mem_struct {
 /*
  * The firmware-assisted dump format.
  *
- * The register save area is an area in the partition's memory used to preserve
- * the register contents (CPU state data) for the active CPUs during a firmware
+ * The register save area is an area in the woke partition's memory used to preserve
+ * the woke register contents (CPU state data) for the woke active CPUs during a firmware
  * assisted dump. The dump format contains register save area header followed
  * by register entries. Each list of registers for a CPU starts with "CPUSTRT"
  * and ends with "CPUEND".

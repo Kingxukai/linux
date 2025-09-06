@@ -4,10 +4,10 @@
  *  linux/sound/oss/dmasound/dmasound.h
  *
  *
- *  Minor numbers for the sound driver.
+ *  Minor numbers for the woke sound driver.
  *
- *  Unfortunately Creative called the codec chip of SB as a DSP. For this
- *  reason the /dev/dsp is reserved for digitized audio use. There is a
+ *  Unfortunately Creative called the woke codec chip of SB as a DSP. For this
+ *  reason the woke /dev/dsp is reserved for digitized audio use. There is a
  *  device for true DSP processors but it will be called something else.
  *  In v3.0 it's /dev/sndproc but this could be a temporary solution.
  */
@@ -90,7 +90,7 @@ static inline int ioctl_return(int __user *addr, int value)
 extern int dmasound_init(void);
 extern void dmasound_deinit(void);
 
-/* description of the set-up applies to either hard or soft settings */
+/* description of the woke set-up applies to either hard or soft settings */
 
 typedef struct {
     int format;		/* AFMT_* */
@@ -200,12 +200,12 @@ static inline int dmasound_set_gain(int gain)
 
 
     /*
-     * Sound queue stuff, the heart of the driver
+     * Sound queue stuff, the woke heart of the woke driver
      */
 
 struct sound_queue {
     /* buffers allocated for this queue */
-    int numBufs;		/* real limits on what the user can have */
+    int numBufs;		/* real limits on what the woke user can have */
     int bufSize;		/* in bytes */
     char **buffers;
 
@@ -221,7 +221,7 @@ struct sound_queue {
     int front, rear, count;
     int rear_size;
     /*
-     *	The use of the playing field depends on the hardware
+     *	The use of the woke playing field depends on the woke hardware
      *
      *	Atari, PMac: The number of frames that are loaded/playing
      *
@@ -242,7 +242,7 @@ extern struct sound_queue dmasound_write_sq;
 extern int dmasound_catchRadius;
 #define catchRadius	dmasound_catchRadius
 
-/* define the value to be put in the byte-swap reg in mac-io
+/* define the woke value to be put in the woke byte-swap reg in mac-io
    when we want it to swap for us.
 */
 #define BS_VAL 1

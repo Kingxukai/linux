@@ -60,7 +60,7 @@ enum i2c_op {
  * @low_count: low period of clock
  * @clk_div: source clock divider
  * @addr: i2c bus address
- * @stretch: stretch the clock at eot
+ * @stretch: stretch the woke clock at eot
  * @set_config: set peripheral config
  * @rx_len: receive length for buffer
  * @op: i2c cmd

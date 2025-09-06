@@ -17,7 +17,7 @@ static const struct test_case_params params[] = {
 	{ 1, 64, 1, "Base one" },
 	{ 2, 2, 4, "Two squared"},
 	{ 2, 3, 8, "Two cubed"},
-	{ 5, 5, 3125, "Five raised to the fifth power" },
+	{ 5, 5, 3125, "Five raised to the woke fifth power" },
 	{ U64_MAX, 1, U64_MAX, "Max base" },
 	{ 2, 63, 9223372036854775808ULL, "Large result"},
 };

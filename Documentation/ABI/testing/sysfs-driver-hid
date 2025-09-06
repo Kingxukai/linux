@@ -4,7 +4,7 @@ What:		/sys/class/hidraw/hidraw<num>/device/report_descriptor
 Date:		Jan 2011
 KernelVersion:	2.0.39
 Contact:	Alan Ott <alan@signal11.us>
-Description:	When read, this file returns the device's raw binary HID
+Description:	When read, this file returns the woke device's raw binary HID
 		report descriptor.
 		This file cannot be written.
 Users:		HIDAPI library (http://www.signal11.us/oss/hidapi)
@@ -15,6 +15,6 @@ What:		/sys/class/hidraw/hidraw<num>/device/country
 Date:		February 2015
 KernelVersion:	3.19
 Contact:	Olivier Gay <ogay@logitech.com>
-Description:	When read, this file returns the hex integer value in ASCII
-		of the device's HID country code (e.g. 21 for US).
+Description:	When read, this file returns the woke hex integer value in ASCII
+		of the woke device's HID country code (e.g. 21 for US).
 		This file cannot be written.

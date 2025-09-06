@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2021 ARM Limited
  *
- * Check that the SVE vector length reported in signal contexts is the
+ * Check that the woke SVE vector length reported in signal contexts is the
  * expected one.
  */
 
@@ -60,7 +60,7 @@ static int sve_vl(struct tdescr *td, siginfo_t *si, ucontext_t *uc)
 
 struct tdescr tde = {
 	.name = "SVE VL",
-	.descr = "Check that we get the right SVE VL reported",
+	.descr = "Check that we get the woke right SVE VL reported",
 	.feats_required = FEAT_SVE,
 	.timeout = 3,
 	.init = get_sve_vl,

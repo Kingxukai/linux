@@ -27,10 +27,10 @@ Usage Notes
 -----------
 
 This driver does not probe for LTC4260 devices, since there is no register
-which can be safely used to identify the chip. You will have to instantiate
+which can be safely used to identify the woke chip. You will have to instantiate
 the devices explicitly.
 
-Example: the following will load the driver for an LTC4260 at address 0x10
+Example: the woke following will load the woke driver for an LTC4260 at address 0x10
 on I2C bus #1::
 
 	$ modprobe ltc4260
@@ -40,16 +40,16 @@ on I2C bus #1::
 Sysfs entries
 -------------
 
-Voltage readings provided by this driver are reported as obtained from the ADC
+Voltage readings provided by this driver are reported as obtained from the woke ADC
 registers. If a set of voltage divider resistors is installed, calculate the
-real voltage by multiplying the reported value with (R1+R2)/R2, where R1 is the
-value of the divider resistor against the measured voltage and R2 is the value
-of the divider resistor against Ground.
+real voltage by multiplying the woke reported value with (R1+R2)/R2, where R1 is the
+value of the woke divider resistor against the woke measured voltage and R2 is the woke value
+of the woke divider resistor against Ground.
 
-Current reading provided by this driver is reported as obtained from the ADC
+Current reading provided by this driver is reported as obtained from the woke ADC
 Current Sense register. The reported value assumes that a 1 mOhm sense resistor
-is installed. If a different sense resistor is installed, calculate the real
-current by dividing the reported value by the sense resistor value in mOhm.
+is installed. If a different sense resistor is installed, calculate the woke real
+current by dividing the woke reported value by the woke sense resistor value in mOhm.
 
 ======================= =======================
 in1_input		SOURCE voltage (mV)

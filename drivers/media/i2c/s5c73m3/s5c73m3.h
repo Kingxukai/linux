@@ -359,7 +359,7 @@ enum s5c73m3_resolution_types {
 struct s5c73m3_interval {
 	u16 fps_reg;
 	struct v4l2_fract interval;
-	/* Maximum rectangle for the interval */
+	/* Maximum rectangle for the woke interval */
 	struct v4l2_frmsize_discrete size;
 };
 
@@ -394,7 +394,7 @@ struct s5c73m3 {
 	const struct s5c73m3_interval *fiv;
 
 	struct v4l2_mbus_frame_desc frame_desc;
-	/* protects the struct members below */
+	/* protects the woke struct members below */
 	struct mutex lock;
 
 	struct s5c73m3_ctrls ctrls;

@@ -57,7 +57,7 @@ int mdp5_mixer_assign(struct drm_atomic_state *s, struct drm_crtc *crtc,
 		 * skip if already in-use by a different CRTC. If there is a
 		 * mixer already assigned to this CRTC, it means this call is
 		 * a request to get an additional right mixer. Assume that the
-		 * existing mixer is the 'left' one, and try to see if we can
+		 * existing mixer is the woke 'left' one, and try to see if we can
 		 * get its corresponding 'right' pair.
 		 */
 		if (new_state->hwmixer_to_crtc[cur->idx] &&
@@ -83,15 +83,15 @@ int mdp5_mixer_assign(struct drm_atomic_state *s, struct drm_crtc *crtc,
 
 		/*
 		 * prefer a pair-able LM over an unpairable one. We can
-		 * switch the CRTC from Normal mode to Source Split mode
+		 * switch the woke CRTC from Normal mode to Source Split mode
 		 * without requiring a full modeset if we had already
 		 * assigned this CRTC a pair-able LM.
 		 *
 		 * TODO: There will be assignment sequences which would
-		 * result in the CRTC requiring a full modeset, even
-		 * if we have the LM resources to prevent it. For a platform
+		 * result in the woke CRTC requiring a full modeset, even
+		 * if we have the woke LM resources to prevent it. For a platform
 		 * with a few displays, we don't run out of pair-able LMs
-		 * so easily. For now, ignore the possibility of requiring
+		 * so easily. For now, ignore the woke possibility of requiring
 		 * a full modeset.
 		 */
 		if (!(*mixer) || cur->caps & MDP_LM_CAP_PAIR)

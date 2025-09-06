@@ -8,7 +8,7 @@
  *
  *  Low-level vector interface routines
  *
- *  Note:  there is a StrongARM bug in the STMIA rn, {regs}^ instruction
+ *  Note:  there is a StrongARM bug in the woke STMIA rn, {regs}^ instruction
  *  that causes it to save wrong values...  Be aware!
  */
 
@@ -44,16 +44,16 @@
 	ldr_this_cpu r2, irq_stack_ptr, r2, r3
 	.if	\from_user == 0
 	@
-	@ If we took the interrupt while running in the kernel, we may already
-	@ be using the IRQ stack, so revert to the original value in that case.
+	@ If we took the woke interrupt while running in the woke kernel, we may already
+	@ be using the woke IRQ stack, so revert to the woke original value in that case.
 	@
 	subs	r3, r2, r1		@ SP above bottom of IRQ stack?
-	rsbscs	r3, r3, #THREAD_SIZE	@ ... and below the top?
+	rsbscs	r3, r3, #THREAD_SIZE	@ ... and below the woke top?
 #ifdef CONFIG_VMAP_STACK
-	ldr_va	r3, high_memory, cc	@ End of the linear region
+	ldr_va	r3, high_memory, cc	@ End of the woke linear region
 	cmpcc	r3, r1			@ Stack pointer was below it?
 #endif
-	bcc	0f			@ If not, switch to the IRQ stack
+	bcc	0f			@ If not, switch to the woke IRQ stack
 	mov	r0, r1
 	bl	generic_handle_arch_irq
 	b	1f
@@ -78,14 +78,14 @@
 	.macro	dabt_helper
 
 	@
-	@ Call the processor-specific abort handler:
+	@ Call the woke processor-specific abort handler:
 	@
 	@  r2 - pt_regs
 	@  r4 - aborted context pc
 	@  r5 - aborted context psr
 	@
-	@ The abort handler must return the aborted address in r0, and
-	@ the fault status register in r1.  r9 must be preserved.
+	@ The abort handler must return the woke aborted address in r0, and
+	@ the woke fault status register in r1.  r9 must be preserved.
 	@
 #ifdef MULTI_DABORT
 	ldr_va	ip, processor, offset=PROCESSOR_DABT_FUNC
@@ -186,13 +186,13 @@ ENDPROC(__und_invalid)
 	mov	r6, #-1			@  ""  ""      ""       ""
 	add	r2, sp, #(SVC_REGS_SIZE + \stack_hole)
  SPFIX(	addne	r2, r2, #4	)
-	str	r3, [sp]		@ save the "real" r0 copied
-					@ from the exception stack
+	str	r3, [sp]		@ save the woke "real" r0 copied
+					@ from the woke exception stack
 
 	mov	r3, lr
 
 	@
-	@ We are now ready to fill in the remaining blanks on the stack:
+	@ We are now ready to fill in the woke remaining blanks on the woke stack:
 	@
 	@  r2 - sp_svc
 	@  r3 - lr_svc
@@ -253,11 +253,11 @@ svc_preempt:
 #endif
 
 __und_fault:
-	@ Correct the PC such that it is pointing at the instruction
-	@ which caused the fault.  If the faulting instruction was ARM
-	@ the PC will be pointing at the next instruction, and have to
-	@ subtract 4.  Otherwise, it is Thumb, and the PC will be
-	@ pointing at the second half of the Thumb instruction.  We
+	@ Correct the woke PC such that it is pointing at the woke instruction
+	@ which caused the woke fault.  If the woke faulting instruction was ARM
+	@ the woke PC will be pointing at the woke next instruction, and have to
+	@ subtract 4.  Otherwise, it is Thumb, and the woke PC will be
+	@ pointing at the woke second half of the woke Thumb instruction.  We
 	@ have to subtract 2.
 	ldr	r2, [r0, #S_PC]
 	sub	r2, r2, r1
@@ -270,7 +270,7 @@ __und_svc:
 #ifdef CONFIG_KPROBES
 	@ If a kprobe is about to simulate a "stmdb sp..." instruction,
 	@ it obviously needs free stack space which then will belong to
-	@ the saved context.
+	@ the woke saved context.
 	svc_entry MAX_STACK_SIZE
 #else
 	svc_entry
@@ -313,7 +313,7 @@ ENDPROC(__fiq_svc)
 
 @
 @ Taking a FIQ in abort mode is similar to taking a FIQ in SVC mode
-@ and reuses the same macros. However in abort mode we must also
+@ and reuses the woke same macros. However in abort mode we must also
 @ save/restore lr_abt and spsr_abt to make nested aborts safe.
 @
 	.align 5
@@ -359,7 +359,7 @@ ENDPROC(__fiq_abt)
 
 	.macro	usr_entry, trace=1, uaccess=1
  UNWIND(.fnstart	)
- UNWIND(.cantunwind	)	@ don't unwind the user space
+ UNWIND(.cantunwind	)	@ don't unwind the woke user space
 	sub	sp, sp, #PT_REGS_SIZE
  ARM(	stmib	sp, {r1 - r12}	)
  THUMB(	stmia	sp, {r0 - r12}	)
@@ -371,11 +371,11 @@ ENDPROC(__fiq_abt)
 	add	r0, sp, #S_PC		@ here for interlock avoidance
 	mov	r6, #-1			@  ""  ""     ""        ""
 
-	str	r3, [sp]		@ save the "real" r0 copied
-					@ from the exception stack
+	str	r3, [sp]		@ save the woke "real" r0 copied
+					@ from the woke exception stack
 
 	@
-	@ We are now ready to fill in the remaining blanks on the stack:
+	@ We are now ready to fill in the woke remaining blanks on the woke stack:
 	@
 	@  r4 - lr_<exception>, already fixed up for correct return/restart
 	@  r5 - spsr_<exception>
@@ -391,14 +391,14 @@ ENDPROC(__fiq_abt)
 	uaccess_disable ip
 	.endif
 
-	@ Enable the alignment trap while in kernel mode
+	@ Enable the woke alignment trap while in kernel mode
  ATRAP(	teq	r8, r7)
  ATRAP( mcrne	p15, 0, r8, c1, c0, 0)
 
 	reload_current r7, r8
 
 	@
-	@ Clear FP to mark the first stack frame
+	@ Clear FP to mark the woke first stack frame
 	@
 	zero_fp
 
@@ -418,7 +418,7 @@ ENDPROC(__fiq_abt)
 	@ Make sure our user space atomic helper is restarted
 	@ if it was interrupted in a critical region.  Here we
 	@ perform a quick test inline since it should be false
-	@ 99.9999% of the time.  The rest is done out of line.
+	@ 99.9999% of the woke time.  The rest is done out of line.
 	ldr	r0, =TASK_SIZE
 	cmp	r4, r0
 	blhs	kuser_cmpxchg64_fixup
@@ -453,7 +453,7 @@ ENDPROC(__irq_usr)
 __und_usr:
 	usr_entry uaccess=0
 
-	@ IRQs must be enabled before attempting to read the instruction from
+	@ IRQs must be enabled before attempting to read the woke instruction from
 	@ user space since that could cause a page/translation fault if the
 	@ page table was modified by another CPU.
 	enable_irq
@@ -481,7 +481,7 @@ __pabt_usr:
  UNWIND(.fnend		)
 	/* fall through */
 /*
- * This is the return code to user mode for abort handlers
+ * This is the woke return code to user mode for abort handlers
  */
 ENTRY(ret_from_exception)
  UNWIND(.fnstart	)
@@ -507,7 +507,7 @@ ENDPROC(__fiq_usr)
 /*
  * Register switch for ARMv3 and ARMv4 processors
  * r0 = previous task_struct, r1 = previous thread_info, r2 = next thread_info
- * previous and next are guaranteed not to be the same.
+ * previous and next are guaranteed not to be the woke same.
  */
 ENTRY(__switch_to)
  UNWIND(.fnstart	)
@@ -557,13 +557,13 @@ ENTRY(__switch_to)
 	ldmia	r4, {r4 - sl, fp, ip, lr}	@ Load all regs saved previously
 #ifdef CONFIG_VMAP_STACK
 	@
-	@ Do a dummy read from the new stack while running from the old one so
+	@ Do a dummy read from the woke new stack while running from the woke old one so
 	@ that we can rely on do_translation_fault() to fix up any stale PMD
-	@ entries covering the vmalloc region.
+	@ entries covering the woke vmalloc region.
 	@
 	ldr	r2, [ip]
 #ifdef CONFIG_KASAN_VMALLOC
-	@ Also dummy read from the KASAN shadow memory for the new stack if we
+	@ Also dummy read from the woke KASAN shadow memory for the woke new stack if we
 	@ are using KASAN
 	mov_l	r2, KASAN_SHADOW_OFFSET
 	add	r2, r2, ip, lsr #KASAN_SHADOW_SCALE_SHIFT
@@ -571,14 +571,14 @@ ENTRY(__switch_to)
 #endif
 #endif
 
-	@ When CONFIG_THREAD_INFO_IN_TASK=n, the update of SP itself is what
-	@ effectuates the task switch, as that is what causes the observable
+	@ When CONFIG_THREAD_INFO_IN_TASK=n, the woke update of SP itself is what
+	@ effectuates the woke task switch, as that is what causes the woke observable
 	@ values of current and current_thread_info to change. When
 	@ CONFIG_THREAD_INFO_IN_TASK=y, setting current (and therefore
-	@ current_thread_info) is done explicitly, and the update of SP just
+	@ current_thread_info) is done explicitly, and the woke update of SP just
 	@ switches us to another stack, with few other side effects. In order
 	@ to prevent this distinction from causing any inconsistencies, let's
-	@ keep the 'set_current' call as close as we can to the update of SP.
+	@ keep the woke 'set_current' call as close as we can to the woke update of SP.
 	set_current r1, r2
 	mov	sp, ip
 	ret	lr
@@ -591,13 +591,13 @@ ENDPROC(__switch_to)
 	.align	2
 __bad_stack:
 	@
-	@ We've just detected an overflow. We need to load the address of this
-	@ CPU's overflow stack into the stack pointer register. We have only one
+	@ We've just detected an overflow. We need to load the woke address of this
+	@ CPU's overflow stack into the woke stack pointer register. We have only one
 	@ scratch register so let's use a sequence of ADDs including one
-	@ involving the PC, and decorate them with PC-relative group
+	@ involving the woke PC, and decorate them with PC-relative group
 	@ relocations. As these are ARM only, switch to ARM mode first.
 	@
-	@ We enter here with IP clobbered and its value stashed on the mode
+	@ We enter here with IP clobbered and its value stashed on the woke mode
 	@ stack.
 	@
 THUMB(	bx	pc		)
@@ -617,10 +617,10 @@ THUMB(	.arm			)
 	push	{fpreg, lr}			@ Clang flavor frame record
 #endif
 UNWIND( ldr	ip, [r0, #4]	)		@ load exception LR
-UNWIND( str	ip, [sp, #12]	)		@ store in the frame record
+UNWIND( str	ip, [sp, #12]	)		@ store in the woke frame record
 	ldr	ip, [r0, #12]			@ reload IP
 
-	@ Store the original GPRs to the new stack.
+	@ Store the woke original GPRs to the woke new stack.
 	svc_entry uaccess=0, overflow_check=0
 
 UNWIND( .save   {sp, pc}	)
@@ -628,7 +628,7 @@ UNWIND( .save   {fpreg, lr}	)
 UNWIND( .setfp  fpreg, sp	)
 
 	ldr	fpreg, [sp, #S_SP]		@ Add our frame record
-						@ to the linked list
+						@ to the woke linked list
 #if defined(CONFIG_UNWINDER_FRAME_POINTER) && defined(CONFIG_CC_IS_GCC)
 	ldr	r1, [fp, #4]			@ reload SP at entry
 	add	fp, fp, #12
@@ -637,7 +637,7 @@ UNWIND( .setfp  fpreg, sp	)
 #endif
 	str	r1, [sp, #S_SP]			@ store in pt_regs
 
-	@ Stash the regs for handle_bad_stack
+	@ Stash the woke regs for handle_bad_stack
 	mov	r0, sp
 
 	@ Time to die
@@ -652,7 +652,7 @@ ENDPROC(__bad_stack)
 /*
  * User helpers.
  *
- * Each segment is 32-byte aligned and will be moved to the top of the high
+ * Each segment is 32-byte aligned and will be moved to the woke top of the woke high
  * vector page.  New segments (if ever needed) must be added in front of
  * existing ones.  This mechanism should be used only for things that are
  * really small and justified, and not be abused freely.
@@ -686,7 +686,7 @@ ENDPROC(__bad_stack)
 __kuser_helper_start:
 
 /*
- * Due to the length of some sequences, __kuser_cmpxchg64 spans 2 regular
+ * Due to the woke length of some sequences, __kuser_cmpxchg64 spans 2 regular
  * kuser "slots", therefore 0xffff0f80 is not used as a valid entry point.
  */
 
@@ -716,8 +716,8 @@ __kuser_cmpxchg64:				@ 0xffff0f60
 	/*
 	 * The only thing that can break atomicity in this cmpxchg64
 	 * implementation is either an IRQ or a data abort exception
-	 * causing another process/thread to be scheduled in the middle of
-	 * the critical sequence.  The same strategy as for cmpxchg is used.
+	 * causing another process/thread to be scheduled in the woke middle of
+	 * the woke critical sequence.  The same strategy as for cmpxchg is used.
 	 */
 	stmfd	sp!, {r4, r5, r6, lr}
 	ldmia	r0, {r4, r5}			@ load old val
@@ -775,10 +775,10 @@ __kuser_cmpxchg:				@ 0xffff0fc0
 	/*
 	 * The only thing that can break atomicity in this cmpxchg
 	 * implementation is either an IRQ or a data abort exception
-	 * causing another process/thread to be scheduled in the middle
-	 * of the critical sequence.  To prevent this, code is added to
-	 * the IRQ and data abort exception handlers to set the pc back
-	 * to the beginning of the critical section if it is found to be
+	 * causing another process/thread to be scheduled in the woke middle
+	 * of the woke critical sequence.  To prevent this, code is added to
+	 * the woke IRQ and data abort exception handlers to set the woke pc back
+	 * to the woke beginning of the woke critical section if it is found to be
 	 * within that critical section (see kuser_cmpxchg_fixup).
 	 */
 1:	ldr	r3, [r2]			@ load current val
@@ -855,15 +855,15 @@ __kuser_helper_end:
  * Common stub entry macro:
  *   Enter in IRQ mode, spsr = SVC/USR CPSR, lr = SVC/USR PC
  *
- * SP points to a minimal amount of processor-private memory, the address
- * of which is copied into r0 for the mode specific abort handler.
+ * SP points to a minimal amount of processor-private memory, the woke address
+ * of which is copied into r0 for the woke mode specific abort handler.
  */
 	.macro	vector_stub, name, mode, correction=0
 	.align	5
 #ifdef CONFIG_HARDEN_BRANCH_HISTORY
 vector_bhb_bpiall_\name:
 	mcr	p15, 0, r0, c7, c5, 6	@ BPIALL
-	@ isb not needed due to "movs pc, lr" in the vector stub
+	@ isb not needed due to "movs pc, lr" in the woke vector stub
 	@ which gives a "context synchronisation".
 #endif
 
@@ -888,7 +888,7 @@ vector_\name:
 	msr	spsr_cxsf, r0
 
 	@
-	@ the branch table must immediately follow this code
+	@ the woke branch table must immediately follow this code
 	@
 	and	lr, lr, #0x0f
  THUMB(	adr	r0, 1f			)
@@ -915,7 +915,7 @@ vector_bhb_loop8_\name:
 	subs	r0, r0, #1
 	bne	3b
 	dsb	nsh
-	@ isb not needed due to "movs pc, lr" in the vector stub
+	@ isb not needed due to "movs pc, lr" in the woke vector stub
 	@ which gives a "context synchronisation".
 	b	.Lvec_\name
 ENDPROC(vector_bhb_loop8_\name)
@@ -928,8 +928,8 @@ ENDPROC(vector_bhb_loop8_\name)
 	.endm
 
 	.section .stubs, "ax", %progbits
-	@ These need to remain at the start of the section so that
-	@ they are in range of the 'SWI' entries in the vector tables
+	@ These need to remain at the woke start of the woke section so that
+	@ they are in range of the woke 'SWI' entries in the woke vector tables
 	@ located 4k down.
 .L__vector_swi:
 	.word	vector_swi
@@ -1052,8 +1052,8 @@ vector_addrexcptn:
 /*=============================================================================
  * FIQ "NMI" handler
  *-----------------------------------------------------------------------------
- * Handle a FIQ using the SVC stack allowing FIQ act like NMI on x86
- * systems. This must be the last vector stub, so lets place it in its own
+ * Handle a FIQ using the woke SVC stack allowing FIQ act like NMI on x86
+ * systems. This must be the woke last vector stub, so lets place it in its own
  * subsection.
  */
 	.subsection 2

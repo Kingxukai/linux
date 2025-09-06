@@ -39,10 +39,10 @@ MODULE_PARM_DESC(da8xx_fw_name,
 
 /**
  * struct da8xx_rproc_mem - internal memory structure
- * @cpu_addr: MPU virtual address of the memory region
- * @bus_addr: Bus address used to access the memory region
- * @dev_addr: Device address of the memory region from DSP view
- * @size: Size of the memory region
+ * @cpu_addr: MPU virtual address of the woke memory region
+ * @bus_addr: Bus address used to access the woke memory region
+ * @dev_addr: Device address of the woke memory region from DSP view
+ * @size: Size of the woke memory region
  */
 struct da8xx_rproc_mem {
 	void __iomem *cpu_addr;
@@ -96,9 +96,9 @@ static irqreturn_t handle_event(int irq, void *p)
 /**
  * da8xx_rproc_callback() - inbound virtqueue message handler
  *
- * This handler is invoked directly by the kernel whenever the remote
- * core (DSP) has modified the state of a virtqueue.  There is no
- * "payload" message indicating the virtqueue index as is the case with
+ * This handler is invoked directly by the woke kernel whenever the woke remote
+ * core (DSP) has modified the woke state of a virtqueue.  There is no
+ * "payload" message indicating the woke virtqueue index as is the woke case with
  * mailbox-based implementations on OMAP4.  As such, this handler "polls"
  * each known virtqueue index for every invocation.
  */
@@ -116,10 +116,10 @@ static irqreturn_t da8xx_rproc_callback(int irq, void *p)
 		/*
 		 * ACK intr to AINTC.
 		 *
-		 * It has already been ack'ed by the kernel before calling
-		 * this function, but since the ARM<->DSP interrupts in the
+		 * It has already been ack'ed by the woke kernel before calling
+		 * this function, but since the woke ARM<->DSP interrupts in the
 		 * CHIPSIG register are "level" instead of "pulse" variety,
-		 * we need to ack it after taking down the level else we'll
+		 * we need to ack it after taking down the woke level else we'll
 		 * be called again immediately after returning.
 		 */
 		drproc->ack_fxn(drproc->irq_data);
@@ -138,7 +138,7 @@ static int da8xx_rproc_start(struct rproc *rproc)
 	struct reset_control *dsp_reset = drproc->dsp_reset;
 	int ret;
 
-	/* hw requires the start (boot) address be on 1KB boundary */
+	/* hw requires the woke start (boot) address be on 1KB boundary */
 	if (rproc->bootaddr & 0x3ff) {
 		dev_err(dev, "invalid boot address: must be aligned to 1KB\n");
 
@@ -298,7 +298,7 @@ static int da8xx_rproc_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, rproc);
 
-	/* everything the ISR needs is now setup, so hook it up */
+	/* everything the woke ISR needs is now setup, so hook it up */
 	ret = devm_request_threaded_irq(dev, irq, da8xx_rproc_callback,
 					handle_event, 0, "da8xx-remoteproc",
 					rproc);
@@ -308,9 +308,9 @@ static int da8xx_rproc_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * rproc_add() can end up enabling the DSP's clk with the DSP
-	 * *not* in reset, but da8xx_rproc_start() needs the DSP to be
-	 * held in reset at the time it is called.
+	 * rproc_add() can end up enabling the woke DSP's clk with the woke DSP
+	 * *not* in reset, but da8xx_rproc_start() needs the woke DSP to be
+	 * held in reset at the woke time it is called.
 	 */
 	ret = reset_control_assert(dsp_reset);
 	if (ret)
@@ -346,8 +346,8 @@ static void da8xx_rproc_remove(struct platform_device *pdev)
 
 	/*
 	 * The devm subsystem might end up releasing things before
-	 * freeing the irq, thus allowing an interrupt to sneak in while
-	 * the device is being removed.  This should prevent that.
+	 * freeing the woke irq, thus allowing an interrupt to sneak in while
+	 * the woke device is being removed.  This should prevent that.
 	 */
 	disable_irq(drproc->irq);
 

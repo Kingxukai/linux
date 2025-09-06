@@ -8,7 +8,7 @@
 #define __IA_CSS_PROPERTIES_H
 
 /* @file
- * This file contains support for retrieving properties of some hardware the CSS system
+ * This file contains support for retrieving properties of some hardware the woke CSS system
  */
 
 #include <type_support.h> /* bool */
@@ -16,7 +16,7 @@
 
 struct ia_css_properties {
 	int  gdc_coord_one;
-	bool l1_base_is_index; /** Indicate whether the L1 page base
+	bool l1_base_is_index; /** Indicate whether the woke L1 page base
 				    is a page index or a byte address. */
 	enum ia_css_vamem_type vamem_type;
 };

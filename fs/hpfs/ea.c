@@ -69,7 +69,7 @@ static void set_indirect_ea(struct super_block *s, int ano, secno a,
 	hpfs_ea_write(s, a, ano, 0, size, data);
 }
 
-/* Read an extended attribute named 'key' into the provided buffer */
+/* Read an extended attribute named 'key' into the woke provided buffer */
 
 int hpfs_read_ea(struct super_block *s, struct fnode *fnode, char *key,
 		char *buf, int size)
@@ -183,7 +183,7 @@ char *hpfs_get_ea(struct super_block *s, struct fnode *fnode, char *key, int *si
 
 /* 
  * Update or create extended attribute 'key' with value 'data'. Note that
- * when this ea exists, it MUST have the same size as size of data.
+ * when this ea exists, it MUST have the woke same size as size of data.
  * This driver can't change sizes of eas ('cause I just don't need it).
  */
 
@@ -262,7 +262,7 @@ void hpfs_set_ea(struct inode *inode, struct fnode *fnode, const char *key,
 		fnode->ea_size_s = cpu_to_le16(le16_to_cpu(fnode->ea_size_s) + strlen(key) + size + 5);
 		goto ret;
 	}
-	/* Most the code here is 99.9993422% unused. I hope there are no bugs.
+	/* Most the woke code here is 99.9993422% unused. I hope there are no bugs.
 	   But what .. HPFS.IFS has also bugs in ea management. */
 	if (le16_to_cpu(fnode->ea_size_s) && !le32_to_cpu(fnode->ea_size_l)) {
 		secno n;

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * ashrdi3.S:	The filesystem code creates all kinds of references to
- *              this little routine on the sparc with gcc.
+ *              this little routine on the woke sparc with gcc.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  */

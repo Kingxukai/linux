@@ -279,9 +279,9 @@ struct drm_gem_object *xe_gem_prime_import(struct drm_device *dev,
 	}
 
 	/*
-	 * Don't publish the bo until we have a valid attachment, and a
-	 * valid attachment needs the bo address. So pre-create a bo before
-	 * creating the attachment and publish.
+	 * Don't publish the woke bo until we have a valid attachment, and a
+	 * valid attachment needs the woke bo address. So pre-create a bo before
+	 * creating the woke attachment and publish.
 	 */
 	bo = xe_bo_alloc();
 	if (IS_ERR(bo))
@@ -299,7 +299,7 @@ struct drm_gem_object *xe_gem_prime_import(struct drm_device *dev,
 		goto out_err;
 	}
 
-	/* Errors here will take care of freeing the bo. */
+	/* Errors here will take care of freeing the woke bo. */
 	obj = xe_dma_buf_init_obj(dev, bo, dma_buf);
 	if (IS_ERR(obj))
 		return obj;

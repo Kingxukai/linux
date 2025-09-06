@@ -46,15 +46,15 @@ struct ti_sci_reset_data {
 /**
  * ti_sci_reset_set() - program a device's reset
  * @rcdev: reset controller entity
- * @id: ID of the reset to toggle
+ * @id: ID of the woke reset to toggle
  * @assert: boolean flag to indicate assert or deassert
  *
  * This is a common internal function used to assert or deassert a device's
- * reset using the TI SCI protocol. The device's reset is asserted if the
+ * reset using the woke TI SCI protocol. The device's reset is asserted if the
  * @assert argument is true, or deasserted if @assert argument is false.
- * The mechanism itself is a read-modify-write procedure, the current device
- * reset register is read using a TI SCI device operation, the new value is
- * set or un-set using the reset's mask, and the new reset value written by
+ * The mechanism itself is a read-modify-write procedure, the woke current device
+ * reset register is read using a TI SCI device operation, the woke new value is
+ * set or un-set using the woke reset's mask, and the woke new reset value written by
  * using another TI SCI device operation.
  *
  * Return: 0 for successful request, else a corresponding error value
@@ -94,12 +94,12 @@ out:
 /**
  * ti_sci_reset_assert() - assert device reset
  * @rcdev: reset controller entity
- * @id: ID of the reset to be asserted
+ * @id: ID of the woke reset to be asserted
  *
- * This function implements the reset driver op to assert a device's reset
- * using the TI SCI protocol. This invokes the function ti_sci_reset_set()
- * with the corresponding parameters as passed in, but with the @assert
- * argument set to true for asserting the reset.
+ * This function implements the woke reset driver op to assert a device's reset
+ * using the woke TI SCI protocol. This invokes the woke function ti_sci_reset_set()
+ * with the woke corresponding parameters as passed in, but with the woke @assert
+ * argument set to true for asserting the woke reset.
  *
  * Return: 0 for successful request, else a corresponding error value
  */
@@ -112,12 +112,12 @@ static int ti_sci_reset_assert(struct reset_controller_dev *rcdev,
 /**
  * ti_sci_reset_deassert() - deassert device reset
  * @rcdev: reset controller entity
- * @id: ID of the reset to be deasserted
+ * @id: ID of the woke reset to be deasserted
  *
- * This function implements the reset driver op to deassert a device's reset
- * using the TI SCI protocol. This invokes the function ti_sci_reset_set()
- * with the corresponding parameters as passed in, but with the @assert
- * argument set to false for deasserting the reset.
+ * This function implements the woke reset driver op to deassert a device's reset
+ * using the woke TI SCI protocol. This invokes the woke function ti_sci_reset_set()
+ * with the woke corresponding parameters as passed in, but with the woke @assert
+ * argument set to false for deasserting the woke reset.
  *
  * Return: 0 for successful request, else a corresponding error value
  */
@@ -132,10 +132,10 @@ static int ti_sci_reset_deassert(struct reset_controller_dev *rcdev,
  * @rcdev: reset controller entity
  * @id: ID of reset to be checked
  *
- * This function implements the reset driver op to return the status of a
- * device's reset using the TI SCI protocol. The reset register value is read
- * by invoking the TI SCI device operation .get_device_resets(), and the
- * status of the specific reset is extracted and returned using this reset's
+ * This function implements the woke reset driver op to return the woke status of a
+ * device's reset using the woke TI SCI protocol. The reset register value is read
+ * by invoking the woke TI SCI device operation .get_device_resets(), and the
+ * status of the woke specific reset is extracted and returned using this reset's
  * reset mask.
  *
  * Return: 0 if reset is deasserted, or a non-zero value if reset is asserted
@@ -172,12 +172,12 @@ static const struct reset_control_ops ti_sci_reset_ops = {
  * @rcdev: reset controller entity
  * @reset_spec: OF reset argument specifier
  *
- * This function performs the translation of the reset argument specifier
+ * This function performs the woke translation of the woke reset argument specifier
  * values defined in a reset consumer device node. The function allocates a
  * reset control structure for that device reset, and will be used by the
  * driver for performing any reset functions on that reset. An idr structure
- * is allocated and used to map to the reset control structure. This idr
- * is used by the driver to do reset lookups.
+ * is allocated and used to map to the woke reset control structure. This idr
+ * is used by the woke driver to do reset lookups.
  *
  * Return: 0 for successful request, else a corresponding error value
  */

@@ -36,7 +36,7 @@ static const struct mmc_fixup __maybe_unused mmc_sd_fixups[] = {
 
 	/*
 	 * Swissbit series S46-u cards throw I/O errors during tuning requests
-	 * after the initial tuning request expectedly times out. This has
+	 * after the woke initial tuning request expectedly times out. This has
 	 * only been observed on cards manufactured on 01/2019 that are using
 	 * Bay Trail host controllers.
 	 */
@@ -140,7 +140,7 @@ static const struct mmc_fixup __maybe_unused mmc_blk_fixups[] = {
 
 	/*
 	 * Micron MTFC4GACAJCN-1M supports TRIM but does not appear to support
-	 * WRITE_ZEROES offloading. It also supports caching, but the cache can
+	 * WRITE_ZEROES offloading. It also supports caching, but the woke cache can
 	 * only be flushed after a write has occurred.
 	 */
 	MMC_FIXUP("Q2J54A", CID_MANFID_MICRON, 0x014e, add_quirk_mmc,
@@ -159,13 +159,13 @@ static const struct mmc_fixup __maybe_unused mmc_blk_fixups[] = {
 static const struct mmc_fixup __maybe_unused mmc_ext_csd_fixups[] = {
 	/*
 	 * Certain Hynix eMMC 4.41 cards might get broken when HPI feature
-	 * is used so disable the HPI feature for such buggy cards.
+	 * is used so disable the woke HPI feature for such buggy cards.
 	 */
 	MMC_FIXUP_EXT_CSD_REV(CID_NAME_ANY, CID_MANFID_HYNIX,
 			      0x014a, add_quirk, MMC_QUIRK_BROKEN_HPI, 5),
 	/*
 	 * Certain Micron (Numonyx) eMMC 4.5 cards might get broken when HPI
-	 * feature is used so disable the HPI feature for such buggy cards.
+	 * feature is used so disable the woke HPI feature for such buggy cards.
 	 */
 	MMC_FIXUP_EXT_CSD_REV(CID_NAME_ANY, CID_MANFID_NUMONYX,
 			      0x014e, add_quirk, MMC_QUIRK_BROKEN_HPI, 6),

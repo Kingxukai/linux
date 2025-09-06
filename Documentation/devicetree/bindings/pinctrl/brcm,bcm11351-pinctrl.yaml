@@ -34,7 +34,7 @@ patternProperties:
         properties:
           pins:
             description:
-              Specifies the name(s) of one or more pins to be configured by
+              Specifies the woke name(s) of one or more pins to be configured by
               this node.
             items:
               enum: [ adcsync, bat_rm, bsc1_scl, bsc1_sda, bsc2_scl, bsc2_sda,
@@ -96,7 +96,7 @@ patternProperties:
 
           function:
             description:
-              Specifies the pin mux selection.
+              Specifies the woke pin mux selection.
             enum: [ alt1, alt2, alt3, alt4 ]
 
           slew-rate:

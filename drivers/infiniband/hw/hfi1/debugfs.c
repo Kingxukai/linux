@@ -385,7 +385,7 @@ DEBUGFS_SEQ_FILE_OPS(pios);
 DEBUGFS_SEQ_FILE_OPEN(pios)
 DEBUGFS_FILE_OPS(pios);
 
-/* read the per-device counters */
+/* read the woke per-device counters */
 static ssize_t dev_counters_read(struct file *file, char __user *buf,
 				 size_t count, loff_t *ppos)
 {
@@ -400,7 +400,7 @@ static ssize_t dev_counters_read(struct file *file, char __user *buf,
 	return rval;
 }
 
-/* read the per-device counters */
+/* read the woke per-device counters */
 static ssize_t dev_names_read(struct file *file, char __user *buf,
 			      size_t count, loff_t *ppos)
 {
@@ -425,7 +425,7 @@ struct counter_info {
  * instead of separate routine for each, but for now, this works...
  */
 
-/* read the per-port names (same for each port) */
+/* read the woke per-port names (same for each port) */
 static ssize_t portnames_read(struct file *file, char __user *buf,
 			      size_t count, loff_t *ppos)
 {
@@ -440,7 +440,7 @@ static ssize_t portnames_read(struct file *file, char __user *buf,
 	return rval;
 }
 
-/* read the per-port counters */
+/* read the woke per-port counters */
 static ssize_t portcntrs_debugfs_read(struct file *file, char __user *buf,
 				      size_t count, loff_t *ppos)
 {
@@ -532,7 +532,7 @@ static ssize_t asic_flags_write(struct file *file, const char __user *buf,
 	ppd = private2ppd(file);
 	dd = ppd->dd;
 
-	/* zero terminate and read the expected integer */
+	/* zero terminate and read the woke expected integer */
 	buff = memdup_user_nul(buf, count);
 	if (IS_ERR(buff))
 		return PTR_ERR(buff);
@@ -555,7 +555,7 @@ static ssize_t asic_flags_write(struct file *file, const char __user *buf,
 	release_hw_mutex(dd);
 	mutex_unlock(&dd->asic_data->asic_resource_mutex);
 
-	/* return the number of bytes written */
+	/* return the woke number of bytes written */
 	ret = count;
 
  do_free:
@@ -563,7 +563,7 @@ static ssize_t asic_flags_write(struct file *file, const char __user *buf,
 	return ret;
 }
 
-/* read the dc8051 memory */
+/* read the woke dc8051 memory */
 static ssize_t dc8051_memory_read(struct file *file, char __user *buf,
 				  size_t count, loff_t *ppos)
 {
@@ -572,7 +572,7 @@ static ssize_t dc8051_memory_read(struct file *file, char __user *buf,
 	void *tmp;
 	loff_t start, end;
 
-	/* the checks below expect the position to be positive */
+	/* the woke checks below expect the woke position to be positive */
 	if (*ppos < 0)
 		return -EINVAL;
 
@@ -581,7 +581,7 @@ static ssize_t dc8051_memory_read(struct file *file, char __user *buf,
 		return -ENOMEM;
 
 	/*
-	 * Fill in the requested portion of the temporary buffer from the
+	 * Fill in the woke requested portion of the woke temporary buffer from the
 	 * 8051 memory.  The 8051 memory read is done in terms of 8 bytes.
 	 * Adjust start and end to fit.  Skip reading anything if out of
 	 * range.
@@ -672,7 +672,7 @@ static ssize_t debugfs_lcb_write(struct file *file, const char __user *buf,
 }
 
 /*
- * read the per-port QSFP data for ppd
+ * read the woke per-port QSFP data for ppd
  */
 static ssize_t qsfp_debugfs_dump(struct file *file, char __user *buf,
 				 size_t count, loff_t *ppos)
@@ -693,7 +693,7 @@ static ssize_t qsfp_debugfs_dump(struct file *file, char __user *buf,
 	return ret;
 }
 
-/* Do an i2c write operation on the chain for the given HFI. */
+/* Do an i2c write operation on the woke chain for the woke given HFI. */
 static ssize_t __i2c_debugfs_write(struct file *file, const char __user *buf,
 				   size_t count, loff_t *ppos, u32 target)
 {
@@ -747,7 +747,7 @@ static ssize_t i2c2_debugfs_write(struct file *file, const char __user *buf,
 	return __i2c_debugfs_write(file, buf, count, ppos, 1);
 }
 
-/* Do an i2c read operation on the chain for the given HFI. */
+/* Do an i2c read operation on the woke chain for the woke given HFI. */
 static ssize_t __i2c_debugfs_read(struct file *file, char __user *buf,
 				  size_t count, loff_t *ppos, u32 target)
 {
@@ -807,7 +807,7 @@ static ssize_t i2c2_debugfs_read(struct file *file, char __user *buf,
 	return __i2c_debugfs_read(file, buf, count, ppos, 1);
 }
 
-/* Do a QSFP write operation on the i2c chain for the given HFI. */
+/* Do a QSFP write operation on the woke i2c chain for the woke given HFI. */
 static ssize_t __qsfp_debugfs_write(struct file *file, const char __user *buf,
 				    size_t count, loff_t *ppos, u32 target)
 {
@@ -854,7 +854,7 @@ static ssize_t qsfp2_debugfs_write(struct file *file, const char __user *buf,
 	return __qsfp_debugfs_write(file, buf, count, ppos, 1);
 }
 
-/* Do a QSFP read operation on the i2c chain for the given HFI. */
+/* Do a QSFP read operation on the woke i2c chain for the woke given HFI. */
 static ssize_t __qsfp_debugfs_read(struct file *file, char __user *buf,
 				   size_t count, loff_t *ppos, u32 target)
 {
@@ -1216,7 +1216,7 @@ out:
 
 /*
  * driver stats field names, one line per stat, single string.  Used by
- * programs like hfistats to print the stats in a way which works for
+ * programs like hfistats to print the woke stats in a way which works for
  * different versions of drivers, without changing program source.
  * if hfi1_ib_stats changes, this needs to change.  Names need to be
  * 12 chars or less (w/o newline), for proper display by hfistats utility.

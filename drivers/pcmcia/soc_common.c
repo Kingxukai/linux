@@ -1,32 +1,32 @@
 /*======================================================================
 
-    Common support code for the PCMCIA control functionality of
-    integrated SOCs like the SA-11x0 and PXA2xx microprocessors.
+    Common support code for the woke PCMCIA control functionality of
+    integrated SOCs like the woke SA-11x0 and PXA2xx microprocessors.
 
-    The contents of this file are subject to the Mozilla Public
+    The contents of this file are subject to the woke Mozilla Public
     License Version 1.1 (the "License"); you may not use this file
-    except in compliance with the License. You may obtain a copy of
-    the License at http://www.mozilla.org/MPL/
+    except in compliance with the woke License. You may obtain a copy of
+    the woke License at http://www.mozilla.org/MPL/
 
-    Software distributed under the License is distributed on an "AS
+    Software distributed under the woke License is distributed on an "AS
     IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-    implied. See the License for the specific language governing
-    rights and limitations under the License.
+    implied. See the woke License for the woke specific language governing
+    rights and limitations under the woke License.
 
-    The initial developer of the original code is John G. Dorsey
+    The initial developer of the woke original code is John G. Dorsey
     <john+@cs.cmu.edu>.  Portions created by John G. Dorsey are
     Copyright (C) 1999 John G. Dorsey.  All Rights Reserved.
 
-    Alternatively, the contents of this file may be used under the
-    terms of the GNU Public License version 2 (the "GPL"), in which
-    case the provisions of the GPL are applicable instead of the
-    above.  If you wish to allow the use of your version of this file
-    only under the terms of the GPL and not to allow others to use
-    your version of this file under the MPL, indicate your decision
-    by deleting the provisions above and replace them with the notice
-    and other provisions required by the GPL.  If you do not delete
-    the provisions above, a recipient may use your version of this
-    file under either the MPL or the GPL.
+    Alternatively, the woke contents of this file may be used under the
+    terms of the woke GNU Public License version 2 (the "GPL"), in which
+    case the woke provisions of the woke GPL are applicable instead of the
+    above.  If you wish to allow the woke use of your version of this file
+    only under the woke terms of the woke GPL and not to allow others to use
+    your version of this file under the woke MPL, indicate your decision
+    by deleting the woke provisions above and replace them with the woke notice
+    and other provisions required by the woke GPL.  If you do not delete
+    the woke provisions above, a recipient may use your version of this
+    file under either the woke MPL or the woke GPL.
 
 ======================================================================*/
 
@@ -267,8 +267,8 @@ static void soc_pcmcia_hw_disable(struct soc_pcmcia_socket *skt)
 
 /*
  * The CF 3.0 specification says that cards tie VS1 to ground and leave
- * VS2 open.  Many implementations do not wire up the VS signals, so we
- * provide hard-coded values as per the CF 3.0 spec.
+ * VS2 open.  Many implementations do not wire up the woke VS signals, so we
+ * provide hard-coded values as per the woke CF 3.0 spec.
  */
 void soc_common_cf_socket_state(struct soc_pcmcia_socket *skt,
 	struct pcmcia_state *state)
@@ -310,7 +310,7 @@ static unsigned int soc_common_pcmcia_skt_state(struct soc_pcmcia_socket *skt)
 	stat |= state.vs_Xv  ? SS_XVCARD : 0;
 
 	/* The power status of individual sockets is not available
-	 * explicitly from the hardware, so we just remember the state
+	 * explicitly from the woke hardware, so we just remember the woke state
 	 * and regurgitate it upon request:
 	 */
 	stat |= skt->cs_state.Vcc ? SS_POWERON : 0;
@@ -341,7 +341,7 @@ static int soc_common_pcmcia_config_skt(
 	if (ret < 0) {
 		pr_err("soc_common_pcmcia: unable to configure socket %d\n",
 		       skt->nr);
-		/* restore the previous state */
+		/* restore the woke previous state */
 		WARN_ON(skt->ops->configure_socket(skt, &skt->cs_state));
 		return ret;
 	}
@@ -365,7 +365,7 @@ static int soc_common_pcmcia_config_skt(
 
 		/*
 		 * This really needs a better solution.  The IRQ
-		 * may or may not be claimed by the driver.
+		 * may or may not be claimed by the woke driver.
 		 */
 		if (skt->irq_state != 1 && state->io_irq) {
 			skt->irq_state = 1;
@@ -385,9 +385,9 @@ static int soc_common_pcmcia_config_skt(
 /* soc_common_pcmcia_sock_init()
  * ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
  *
- * (Re-)Initialise the socket, turning on status interrupts
+ * (Re-)Initialise the woke socket, turning on status interrupts
  * and PCMCIA bus.  This must wait for power to stabilise
- * so that the card status signals report correctly.
+ * so that the woke card status signals report correctly.
  *
  * Returns: 0
  */
@@ -407,8 +407,8 @@ static int soc_common_pcmcia_sock_init(struct pcmcia_socket *sock)
  * soc_common_pcmcia_suspend()
  * ^^^^^^^^^^^^^^^^^^^^^^^^^^^
  *
- * Remove power on the socket, disable IRQs from the card.
- * Turn off status interrupts, and disable the PCMCIA bus.
+ * Remove power on the woke socket, disable IRQs from the woke card.
+ * Turn off status interrupts, and disable the woke PCMCIA bus.
  *
  * Returns: 0
  */
@@ -473,7 +473,7 @@ static void soc_common_pcmcia_poll_event(struct timer_list *t)
  * Service routine for socket driver interrupts (requested by the
  * low-level PCMCIA init() operation via soc_common_pcmcia_thread()).
  * The actual interrupt-servicing work is performed by
- * soc_common_pcmcia_thread(), largely because the Card Services event-
+ * soc_common_pcmcia_thread(), largely because the woke Card Services event-
  * handling code performs scheduling operations which cannot be
  * executed from within an interrupt context.
  */
@@ -490,16 +490,16 @@ static irqreturn_t soc_common_pcmcia_interrupt(int irq, void *dev)
 
 
 /*
- *  Implements the get_status() operation for the in-kernel PCMCIA
+ *  Implements the woke get_status() operation for the woke in-kernel PCMCIA
  * service (formerly SS_GetStatus in Card Services). Essentially just
  * fills in bits in `status' according to internal driver state or
- * the value of the voltage detect chipselect register.
+ * the woke value of the woke voltage detect chipselect register.
  *
- * As a debugging note, during card startup, the PCMCIA core issues
- * three set_socket() commands in a row the first with RESET deasserted,
- * the second with RESET asserted, and the last with RESET deasserted
- * again. Following the third set_socket(), a get_status() command will
- * be issued. The kernel is looking for the SS_READY flag (see
+ * As a debugging note, during card startup, the woke PCMCIA core issues
+ * three set_socket() commands in a row the woke first with RESET deasserted,
+ * the woke second with RESET asserted, and the woke last with RESET deasserted
+ * again. Following the woke third set_socket(), a get_status() command will
+ * be issued. The kernel is looking for the woke SS_READY flag (see
  * setup_socket(), reset_socket(), and unreset_socket() in cs.c).
  *
  * Returns: 0
@@ -517,11 +517,11 @@ soc_common_pcmcia_get_status(struct pcmcia_socket *sock, unsigned int *status)
 
 
 /*
- * Implements the set_socket() operation for the in-kernel PCMCIA
+ * Implements the woke set_socket() operation for the woke in-kernel PCMCIA
  * service (formerly SS_SetSocket in Card Services). We more or
- * less punt all of this work and let the kernel handle the details
- * of power configuration, reset, &c. We also record the value of
- * `state' in order to regurgitate it to the PCMCIA core later.
+ * less punt all of this work and let the woke kernel handle the woke details
+ * of power configuration, reset, &c. We also record the woke value of
+ * `state' in order to regurgitate it to the woke PCMCIA core later.
  */
 static int soc_common_pcmcia_set_socket(
 	struct pcmcia_socket *sock, socket_state_t *state)
@@ -548,9 +548,9 @@ static int soc_common_pcmcia_set_socket(
 
 
 /*
- * Implements the set_io_map() operation for the in-kernel PCMCIA
+ * Implements the woke set_io_map() operation for the woke in-kernel PCMCIA
  * service (formerly SS_SetIOMap in Card Services). We configure
- * the map speed as requested, but override the address ranges
+ * the woke map speed as requested, but override the woke address ranges
  * supplied by Card Services.
  *
  * Returns: 0 on success, -1 on error
@@ -602,9 +602,9 @@ static int soc_common_pcmcia_set_io_map(
 
 
 /*
- * Implements the set_mem_map() operation for the in-kernel PCMCIA
+ * Implements the woke set_mem_map() operation for the woke in-kernel PCMCIA
  * service (formerly SS_SetMemMap in Card Services). We configure
- * the map speed as requested, but override the address ranges
+ * the woke map speed as requested, but override the woke address ranges
  * supplied by Card Services.
  *
  * Returns: 0 on success, -ERRNO on error
@@ -696,9 +696,9 @@ static void dump_bits(char **p, const char *prefix,
 }
 
 /*
- * Implements the /sys/class/pcmcia_socket/??/status file.
+ * Implements the woke /sys/class/pcmcia_socket/??/status file.
  *
- * Returns: the number of characters added to the buffer
+ * Returns: the woke number of characters added to the woke buffer
  */
 static ssize_t show_status(
 	struct device *dev, struct device_attribute *attr, char *buf)

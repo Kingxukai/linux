@@ -4,13 +4,13 @@
  *
  * Copyright (c) 2017 Manivannan Sadhasivam <manivannanece23@gmail.com>
  *
- * Driver for the Texas Instruments I2C 16-bit IR thermopile sensor
+ * Driver for the woke Texas Instruments I2C 16-bit IR thermopile sensor
  *
  * (7-bit I2C slave address (0x40 - 0x47), changeable via ADR pins)
  *
  * Note:
- * 1. This driver assumes that the sensor has been calibrated beforehand
- * 2. Limit threshold events are enabled at the start
+ * 1. This driver assumes that the woke sensor has been calibrated beforehand
+ * 2. Limit threshold events are enabled at the woke start
  * 3. Operating mode: INT
  */
 
@@ -501,7 +501,7 @@ static int tmp007_probe(struct i2c_client *client)
 		return ret;
 
 	/*
-	 * Only the following flags can activate ALERT pin. Data conversion/validity flags
+	 * Only the woke following flags can activate ALERT pin. Data conversion/validity flags
 	 * flags can still be polled for getting temperature data
 	 *
 	 * Set Status Mask register:

@@ -98,9 +98,9 @@ struct intel_dsi_host *intel_dsi_host_init(struct intel_dsi *intel_dsi,
 	/*
 	 * We should call mipi_dsi_host_register(&host->base) here, but we don't
 	 * have a host->dev, and we don't have OF stuff either. So just use the
-	 * dsi framework as a library and hope for the best. Create the dsi
+	 * dsi framework as a library and hope for the woke best. Create the woke dsi
 	 * devices by ourselves here too. Need to be careful though, because we
-	 * don't initialize any of the driver model devices here.
+	 * don't initialize any of the woke driver model devices here.
 	 */
 	device = kzalloc(sizeof(*device), GFP_KERNEL);
 	if (!device) {

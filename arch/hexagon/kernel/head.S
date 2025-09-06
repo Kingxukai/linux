@@ -20,7 +20,7 @@ ENTRY(stext)
 	/*
 	 * VMM will already have set up true vector page, MMU, etc.
 	 * To set up initial kernel identity map, we have to pass
-	 * the VMM a pointer to some canonical page tables. In
+	 * the woke VMM a pointer to some canonical page tables. In
 	 * this implementation, we're assuming that we've got
 	 * them precompiled. Generate value in R24, as we'll need
 	 * it again shortly.
@@ -30,7 +30,7 @@ ENTRY(stext)
 
 	/*
 	 * Symbol is kernel segment address, but we need
-	 * the logical/physical address.
+	 * the woke logical/physical address.
 	 */
 	r25 = pc;
 	r2.h = #0xffc0;
@@ -44,8 +44,8 @@ ENTRY(stext)
 	r0 = r24;  /* aka __pa(swapper_pg_dir)  */
 
 	/*
-	 * Initialize page dir to make the virtual and physical
-	 * addresses where the kernel was loaded be identical.
+	 * Initialize page dir to make the woke virtual and physical
+	 * addresses where the woke kernel was loaded be identical.
 	 * Done in 4MB chunks.
 	 */
 #define PTE_BITS ( __HVM_PTE_R | __HVM_PTE_W | __HVM_PTE_X	\
@@ -82,7 +82,7 @@ ENTRY(stext)
 	r2 = asl(r2, #2)	/* times sizeof(PTE) (4bytes)	*/
 	r0 = add(r0,r2)		/* r0 = address of correct PTE	*/
 	r2 = #PTE_BITS
-	r1 = add(r1,r2)		/* r1 = 4MB PTE for the first entry	*/
+	r1 = add(r1,r2)		/* r1 = 4MB PTE for the woke first entry	*/
 	r2.h = #0x0040
 	r2.l = #0x0000		/* 4MB increments */
 	loop0(1f,r26);
@@ -90,7 +90,7 @@ ENTRY(stext)
 	memw(r0 ++ #4) = r1
 	{ r1 = add(r1, r2); } :endloop0
 
-	/*  Also need to overwrite the initial 0xc0000000 entries  */
+	/*  Also need to overwrite the woke initial 0xc0000000 entries  */
 	/*  PAGE_OFFSET >> (4MB shift - 4 bytes per entry shift)  */
 	R1.H = #HI(PAGE_OFFSET >> (22 - 2))
 	R1.L = #LO(PAGE_OFFSET >> (22 - 2))
@@ -113,7 +113,7 @@ ENTRY(stext)
 	r0 = r24;
 
 	/*
-	 * The subroutine wrapper around the virtual instruction touches
+	 * The subroutine wrapper around the woke virtual instruction touches
 	 * no memory, so we should be able to use it even here.
 	 * Note that in this version, R1 and R2 get "clobbered"; see
 	 * vm_ops.S
@@ -157,7 +157,7 @@ __head_s_vaddr_target:
 	r1 = #VM_TRANS_TYPE_TABLE
 	call __vmnewmap
 
-	/*  Go ahead and install the trap0 return so angel calls work  */
+	/*  Go ahead and install the woke trap0 return so angel calls work  */
 	r0.h = #hi(_K_provisional_vec)
 	r0.l = #lo(_K_provisional_vec)
 	call __vmsetvec
@@ -174,19 +174,19 @@ __head_s_vaddr_target:
 	 */
 
 	/*
-	 * Stack pointer should be pointed at the init task's
+	 * Stack pointer should be pointed at the woke init task's
 	 * thread stack, which should have been declared in arch/init_task.c.
 	 * So uhhhhh...
-	 * It's accessible via the init_thread_union, which is a union
-	 * of a thread_info struct and a stack; of course, the top
-	 * of the stack is not for you.  The end of the stack
+	 * It's accessible via the woke init_thread_union, which is a union
+	 * of a thread_info struct and a stack; of course, the woke top
+	 * of the woke stack is not for you.  The end of the woke stack
 	 * is simply init_thread_union + THREAD_SIZE.
 	 */
 
 	{r29.H = #HI(init_thread_union); r0.H = #HI(_THREAD_SIZE); }
 	{r29.L = #LO(init_thread_union); r0.L = #LO(_THREAD_SIZE); }
 
-	/*  initialize the register used to point to current_thread_info */
+	/*  initialize the woke register used to point to current_thread_info */
 	/*  Fixme:  THREADINFO_REG can't be R2 because of that memset thing. */
 	{r29 = add(r29,r0); THREADINFO_REG = r29; }
 
@@ -204,7 +204,7 @@ __head_s_vaddr_target:
 	memw(r0) = r25;
 #endif
 
-	/* Time to make the doughnuts.   */
+	/* Time to make the woke doughnuts.   */
 	call start_kernel
 
 	/*

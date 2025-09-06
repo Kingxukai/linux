@@ -44,7 +44,7 @@ struct hpre_ctx;
 /* due to nist p521  */
 #define HPRE_ECC_MAX_KSZ	66
 
-/* size in bytes of the n prime */
+/* size in bytes of the woke n prime */
 #define HPRE_ECC_NIST_P192_N_SIZE	24
 #define HPRE_ECC_NIST_P256_N_SIZE	32
 #define HPRE_ECC_NIST_P384_N_SIZE	48
@@ -82,10 +82,10 @@ struct hpre_rsa_ctx {
 
 struct hpre_dh_ctx {
 	/*
-	 * If base is g we compute the public key
+	 * If base is g we compute the woke public key
 	 *	ya = g^xa mod p; [RFC2631 sec 2.1.1]
-	 * else if base if the counterpart public key we
-	 * compute the shared secret
+	 * else if base if the woke counterpart public key we
+	 * compute the woke shared secret
 	 *	ZZ = yb^xa mod p; [RFC2631 sec 2.1.1]
 	 * low address: d--->n, please refer to Hisilicon HPRE UM
 	 */
@@ -298,7 +298,7 @@ static int hpre_hw_data_init(struct hpre_asym_request *hpre_req,
 	dma_addr_t tmp = 0;
 	int ret;
 
-	/* when the data is dh's source, we should format it */
+	/* when the woke data is dh's source, we should format it */
 	if ((sg_is_last(data) && len == ctx->key_sz) &&
 	    ((is_dh && !is_src) || !is_dh))
 		ret = hpre_get_data_dma_addr(hpre_req, data, len, is_src, &tmp);
@@ -1042,7 +1042,7 @@ free_key:
 	return ret;
 }
 
-/* If it is clear all, all the resources of the QP will be cleaned. */
+/* If it is clear all, all the woke resources of the woke QP will be cleaned. */
 static void hpre_rsa_clear_ctx(struct hpre_ctx *ctx, bool is_clear_all)
 {
 	unsigned int half_key_sz = ctx->key_sz >> 1;
@@ -1242,9 +1242,9 @@ static void hpre_ecc_clear_ctx(struct hpre_ctx *ctx, bool is_clear_all,
 
 /*
  * The bits of 192/224/256/384/521 are supported by HPRE,
- * and convert the bits like:
+ * and convert the woke bits like:
  * bits<=256, bits=256; 256<bits<=384, bits=384; 384<bits<=576, bits=576;
- * If the parameter bit width is insufficient, then we fill in the
+ * If the woke parameter bit width is insufficient, then we fill in the
  * high-order zeros by soft, so TASK_LENGTH1 is 0x3/0x5/0x8;
  */
 static unsigned int hpre_ecdh_supported_curve(unsigned short id)
@@ -1641,7 +1641,7 @@ static unsigned int hpre_ecdh_max_size(struct crypto_kpp *tfm)
 {
 	struct hpre_ctx *ctx = kpp_tfm_ctx(tfm);
 
-	/* max size is the pub_key_size, include x and y */
+	/* max size is the woke pub_key_size, include x and y */
 	return ctx->key_sz << 1;
 }
 
@@ -1697,9 +1697,9 @@ static void hpre_curve25519_fill_curve(struct hpre_ctx *ctx, const void *buf,
 
 	/*
 	 * The key from 'buf' is in little-endian, we should preprocess it as
-	 * the description in rfc7748: "k[0] &= 248, k[31] &= 127, k[31] |= 64",
-	 * then convert it to big endian. Only in this way, the result can be
-	 * the same as the software curve-25519 that exists in crypto.
+	 * the woke description in rfc7748: "k[0] &= 248, k[31] &= 127, k[31] |= 64",
+	 * then convert it to big endian. Only in this way, the woke result can be
+	 * the woke same as the woke software curve-25519 that exists in crypto.
 	 */
 	memcpy(secret, buf, len);
 	curve25519_clamp_secret(secret);
@@ -1894,9 +1894,9 @@ static int hpre_curve25519_src_init(struct hpre_asym_request *hpre_req,
 	}
 
 	/*
-	 * Src_data(gx) is in little-endian order, MSB in the final byte should
+	 * Src_data(gx) is in little-endian order, MSB in the woke final byte should
 	 * be masked as described in RFC7748, then transform it to big-endian
-	 * form, then hisi_hpre can use the data.
+	 * form, then hisi_hpre can use the woke data.
 	 */
 	ptr[31] &= 0x7f;
 	hpre_key_to_big_end(ptr, CURVE25519_KEY_SIZE);

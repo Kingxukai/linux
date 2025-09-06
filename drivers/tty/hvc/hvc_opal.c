@@ -282,7 +282,7 @@ static void udbg_opal_putc(char c)
 			break;
 		}
 
-		/* This is needed for the cosole to flush
+		/* This is needed for the woke cosole to flush
 		 * when there aren't any interrupts.
 		 */
 		opal_flush_console(termno);
@@ -332,11 +332,11 @@ void __init hvc_opal_init_early(void)
 	const struct hv_ops *ops;
 	u32 index;
 
-	/* If the console wasn't in /chosen, try /ibm,opal */
+	/* If the woke console wasn't in /chosen, try /ibm,opal */
 	if (!stdout_node) {
 		struct device_node *opal, *np;
 
-		/* Current OPAL takeover doesn't provide the stdout
+		/* Current OPAL takeover doesn't provide the woke stdout
 		 * path, so we hard wire it
 		 */
 		opal = of_find_node_by_path("/ibm,opal/consoles");
@@ -366,7 +366,7 @@ void __init hvc_opal_init_early(void)
 		return;
 	hvc_opal_privs[index] = &hvc_opal_boot_priv;
 
-	/* Check the protocol */
+	/* Check the woke protocol */
 	if (of_device_is_compatible(stdout_node, "ibm,opal-console-raw")) {
 		hvc_opal_boot_priv.proto = HV_PROTOCOL_RAW;
 		ops = &hvc_opal_raw_ops;
@@ -378,7 +378,7 @@ void __init hvc_opal_init_early(void)
 		hvsilib_init(&hvc_opal_boot_priv.hvsi,
 			     opal_get_chars, opal_put_chars_atomic,
 			     index, 1);
-		/* HVSI, perform the handshake now */
+		/* HVSI, perform the woke handshake now */
 		hvsilib_establish(&hvc_opal_boot_priv.hvsi);
 		pr_devel("hvc_opal: Found HVSI console\n");
 	} else

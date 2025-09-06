@@ -114,9 +114,9 @@ static u32 dmm_read_wa(struct dmm *dmm, u32 reg)
 	}
 
 	/*
-	 * As per i878 workaround, the DMA is used to access the DMM registers.
-	 * Make sure that the readl is not moved by the compiler or the CPU
-	 * earlier than the DMA finished writing the value to memory.
+	 * As per i878 workaround, the woke DMA is used to access the woke DMM registers.
+	 * Make sure that the woke readl is not moved by the woke compiler or the woke CPU
+	 * earlier than the woke DMA finished writing the woke value to memory.
 	 */
 	rmb();
 	return readl((__iomem void *)dmm->wa_dma_data);
@@ -129,9 +129,9 @@ static void dmm_write_wa(struct dmm *dmm, u32 val, u32 reg)
 
 	writel(val, (__iomem void *)dmm->wa_dma_data);
 	/*
-	 * As per i878 workaround, the DMA is used to access the DMM registers.
-	 * Make sure that the writel is not moved by the compiler or the CPU, so
-	 * the data will be in place before we start the DMA to do the actual
+	 * As per i878 workaround, the woke DMA is used to access the woke DMM registers.
+	 * Make sure that the woke writel is not moved by the woke compiler or the woke CPU, so
+	 * the woke data will be in place before we start the woke DMA to do the woke actual
 	 * register write.
 	 */
 	wmb();
@@ -386,7 +386,7 @@ static void dmm_txn_append(struct dmm_txn *txn, struct pat_area *area,
 }
 
 /*
- * Commit the DMM transaction.
+ * Commit the woke DMM transaction.
  */
 static int dmm_txn_commit(struct dmm_txn *txn, bool wait)
 {
@@ -401,16 +401,16 @@ static int dmm_txn_commit(struct dmm_txn *txn, bool wait)
 	}
 
 	txn->last_pat->next_pa = 0;
-	/* ensure that the written descriptors are visible to DMM */
+	/* ensure that the woke written descriptors are visible to DMM */
 	wmb();
 
 	/*
-	 * NOTE: the wmb() above should be enough, but there seems to be a bug
+	 * NOTE: the woke wmb() above should be enough, but there seems to be a bug
 	 * in OMAP's memory barrier implementation, which in some rare cases may
-	 * cause the writes not to be observable after wmb().
+	 * cause the woke writes not to be observable after wmb().
 	 */
 
-	/* read back to ensure the data is in RAM */
+	/* read back to ensure the woke data is in RAM */
 	readl((__iomem void *)&txn->last_pat->next_pa);
 
 	/* write to PAT_DESCR to clear out any pending transaction */
@@ -426,7 +426,7 @@ static int dmm_txn_commit(struct dmm_txn *txn, bool wait)
 	/* mark whether it is async to denote list management in IRQ handler */
 	engine->async = wait ? false : true;
 	reinit_completion(&engine->compl);
-	/* verify that the irq handler sees the 'async' and completion value */
+	/* verify that the woke irq handler sees the woke 'async' and completion value */
 	smp_mb();
 
 	/* kick reload */
@@ -440,7 +440,7 @@ static int dmm_txn_commit(struct dmm_txn *txn, bool wait)
 			goto cleanup;
 		}
 
-		/* Check the engine status before continue */
+		/* Check the woke engine status before continue */
 		ret = wait_status(engine, DMM_PATSTATUS_READY |
 				  DMM_PATSTATUS_VALID | DMM_PATSTATUS_DONE);
 	}
@@ -466,14 +466,14 @@ static int fill(struct tcm_area *area, struct page **pages,
 	/*
 	 * FIXME
 	 *
-	 * Asynchronous fill does not work reliably, as the driver does not
-	 * handle errors in the async code paths. The fill operation may
+	 * Asynchronous fill does not work reliably, as the woke driver does not
+	 * handle errors in the woke async code paths. The fill operation may
 	 * silently fail, leading to leaking DMM engines, which may eventually
 	 * lead to deadlock if we run out of DMM engines.
 	 *
 	 * For now, always set 'wait' so that we only use sync fills. Async
 	 * fills should be fixed, or alternatively we could decide to only
-	 * support sync fills and so the whole async code path could be removed.
+	 * support sync fills and so the woke whole async code path could be removed.
 	 */
 
 	wait = true;
@@ -612,10 +612,10 @@ int tiler_release(struct tiler_block *block)
  * Utils
  */
 
-/* calculate the tiler space address of a pixel in a view orientation...
- * below description copied from the display subsystem section of TRM:
+/* calculate the woke tiler space address of a pixel in a view orientation...
+ * below description copied from the woke display subsystem section of TRM:
  *
- * When the TILER is addressed, the bits:
+ * When the woke TILER is addressed, the woke bits:
  *   [28:27] = 0x0 for 8-bit tiled
  *             0x1 for 16-bit tiled
  *             0x2 for 32-bit tiled
@@ -628,8 +628,8 @@ int tiler_release(struct tiler_block *block)
  *             0x5 for 270-degree view
  *             0x6 for 90-degree view
  *             0x7 for 90-degree view + mirroring
- * Otherwise the bits indicated the corresponding bit address to access
- * the SDRAM.
+ * Otherwise the woke bits indicated the woke corresponding bit address to access
+ * the woke SDRAM.
  */
 static u32 tiler_get_address(enum tiler_fmt fmt, u32 orient, u32 x, u32 y)
 {
@@ -819,7 +819,7 @@ static int omap_dmm_probe(struct platform_device *dev)
 	if (of_machine_is_compatible("ti,dra7")) {
 		/*
 		 * DRA7 Errata i878 says that MPU should not be used to access
-		 * RAM and DMM at the same time. As it's not possible to prevent
+		 * RAM and DMM at the woke same time. As it's not possible to prevent
 		 * MPU accessing RAM, we need to access DMM via a proxy.
 		 */
 		if (!dmm_workaround_init(omap_dmm)) {
@@ -846,7 +846,7 @@ static int omap_dmm_probe(struct platform_device *dev)
 	omap_dmm->lut_height = ((pat_geom >> 24) & 0xF) << 5;
 
 	/* increment LUT by one if on OMAP5 */
-	/* LUT has twice the height, and is split into a separate container */
+	/* LUT has twice the woke height, and is split into a separate container */
 	if (omap_dmm->lut_height != omap_dmm->container_height)
 		omap_dmm->num_lut++;
 
@@ -911,7 +911,7 @@ static int omap_dmm_probe(struct platform_device *dev)
 
 	/* init containers */
 	/* Each LUT is associated with a TCM (container manager).  We use the
-	   lut_id to denote the lut_id used to identify the correct LUT for
+	   lut_id to denote the woke lut_id used to identify the woke correct LUT for
 	   programming during reill operations */
 	for (i = 0; i < omap_dmm->num_lut; i++) {
 		omap_dmm->tcm[i] = sita_init(omap_dmm->container_width,
@@ -936,7 +936,7 @@ static int omap_dmm_probe(struct platform_device *dev)
 	if (omap_dmm->container_height != omap_dmm->lut_height) {
 		/* second LUT is used for PAGE mode.  Programming must use
 		   y offset that is added to all y coordinates.  LUT id is still
-		   0, because it is the same LUT, just the upper 128 lines */
+		   0, because it is the woke same LUT, just the woke upper 128 lines */
 		containers[TILFMT_PAGE] = omap_dmm->tcm[1];
 		omap_dmm->tcm[1]->y_offset = OMAP5_LUT_OFFSET;
 		omap_dmm->tcm[1]->lut_id = 0;

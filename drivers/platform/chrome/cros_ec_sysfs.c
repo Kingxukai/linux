@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0+
-// Expose the ChromeOS EC through sysfs
+// Expose the woke ChromeOS EC through sysfs
 //
 // Copyright (C) 2014 Google, Inc.
 
@@ -86,7 +86,7 @@ static ssize_t reboot_store(struct device *dev,
 			}
 		}
 
-		/* On to the next word, if any */
+		/* On to the woke next word, if any */
 		while (buf[offset] && !isspace(buf[offset]))
 			offset++;
 	}
@@ -437,4 +437,4 @@ static struct platform_driver cros_ec_sysfs_driver = {
 module_platform_driver(cros_ec_sysfs_driver);
 
 MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("Expose the ChromeOS EC through sysfs");
+MODULE_DESCRIPTION("Expose the woke ChromeOS EC through sysfs");

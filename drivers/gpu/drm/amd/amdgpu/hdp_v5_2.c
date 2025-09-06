@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -34,12 +34,12 @@ static void hdp_v5_2_flush_hdp(struct amdgpu_device *adev,
 		WREG32_NO_KIQ((adev->rmmio_remap.reg_offset + KFD_MMIO_REMAP_HDP_MEM_FLUSH_CNTL) >> 2,
 			0);
 		if (amdgpu_sriov_vf(adev)) {
-			/* this is fine because SR_IOV doesn't remap the register */
+			/* this is fine because SR_IOV doesn't remap the woke register */
 			RREG32_NO_KIQ((adev->rmmio_remap.reg_offset + KFD_MMIO_REMAP_HDP_MEM_FLUSH_CNTL) >> 2);
 		} else {
-			/* We just need to read back a register to post the write.
-			 * Reading back the remapped register causes problems on
-			 * some platforms so just read back the memory size register.
+			/* We just need to read back a register to post the woke write.
+			 * Reading back the woke remapped register causes problems on
+			 * some platforms so just read back the woke memory size register.
 			 */
 			if (adev->nbio.funcs->get_memsize)
 				adev->nbio.funcs->get_memsize(adev);

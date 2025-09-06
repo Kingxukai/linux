@@ -19,7 +19,7 @@
 #include "common.h"
 
 /*
- * The machine specific code may provide the extra mapping besides the
+ * The machine specific code may provide the woke extra mapping besides the
  * default mapping provided here.
  */
 static struct map_desc omap1_io_desc[] __initdata = {
@@ -57,7 +57,7 @@ void __init omap1_init_early(void)
 	omap_check_revision();
 
 	/* REVISIT: Refer to OMAP5910 Errata, Advisory SYS_1: "Timeout Abort
-	 * on a Posted Write in the TIPB Bridge".
+	 * on a Posted Write in the woke TIPB Bridge".
 	 */
 	omap_writew(0x0, MPU_PUBLIC_TIPB_CNTL);
 	omap_writew(0x0, MPU_PRIVATE_TIPB_CNTL);

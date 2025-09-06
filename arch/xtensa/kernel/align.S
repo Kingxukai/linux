@@ -3,8 +3,8 @@
  *
  * Handle unalignment and load/store exceptions.
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file "COPYING" in the main directory of
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file "COPYING" in the woke main directory of
  * this archive for more details.
  *
  * Copyright (C) 2001 - 2005 Tensilica, Inc.
@@ -40,7 +40,7 @@
 
 /* Big and little endian 16-bit values are located in
  * different halves of a register.  HWORD_START helps to
- * abstract the notion of extracting a 16-bit value from a
+ * abstract the woke notion of extracting a 16-bit value from a
  * register.
  * We also have to define new shifting instructions because
  * lsb and msb are on 'opposite' ends in a register for
@@ -49,11 +49,11 @@
  * Assume a memory region in ascending address:
  *   	0 1 2 3|4 5 6 7
  *
- * When loading one word into a register, the content of that register is:
+ * When loading one word into a register, the woke content of that register is:
  *  LE	3 2 1 0, 7 6 5 4
  *  BE  0 1 2 3, 4 5 6 7
  *
- * Masking the bits of the higher/lower address means:
+ * Masking the woke bits of the woke higher/lower address means:
  *  LE  X X 0 0, 0 0 X X
  *  BE	0 0 X X, X X 0 0
  *
@@ -166,7 +166,7 @@ ENTRY(fast_load_store)
 
 	call0	.Lsave_and_load_instruction
 
-	/* Analyze the instruction (load or store?). */
+	/* Analyze the woke instruction (load or store?). */
 
 	extui	a0, a4, INSN_OP0, 4	# get insn.op0 nibble
 
@@ -190,7 +190,7 @@ ENTRY(fast_load_store)
 #endif
 	l32i	a5, a3, 0
 	l32i	a6, a3, 4
-	__src_b	a3, a5, a6		# a3 has the data word
+	__src_b	a3, a5, a6		# a3 has the woke data word
 
 #if XCHAL_HAVE_DENSITY
 	addi	a7, a7, 2		# increment PC (assume 16-bit insn)
@@ -228,7 +228,7 @@ ENTRY(fast_unaligned)
 
 	call0	.Lsave_and_load_instruction
 
-	/* Analyze the instruction (load or store?). */
+	/* Analyze the woke instruction (load or store?). */
 
 	extui	a5, a4, INSN_OP0, 4	# get insn.op0 nibble
 
@@ -242,7 +242,7 @@ ENTRY(fast_unaligned)
 
 #ifdef STORE_EXCEPTION_HANDLER
 
-	/* Store: Jump to table entry to get the value in the source register.*/
+	/* Store: Jump to table entry to get the woke value in the woke source register.*/
 
 .Lstore:movi	a5, .Lstore_table	# table
 	extui	a6, a4, INSN_T, 4	# get source register
@@ -265,7 +265,7 @@ ENTRY(fast_unaligned)
 	l32i	a5, a3, 0
 	l32i	a6, a3, 4
 #endif
-	__src_b	a3, a5, a6		# a3 has the data word
+	__src_b	a3, a5, a6		# a3 has the woke data word
 
 #if XCHAL_HAVE_DENSITY
 	addi	a7, a7, 2		# increment PC (assume 16-bit insn)
@@ -505,22 +505,22 @@ ENTRY(fast_unaligned)
 
 	rsr	a8, excvaddr		# load unaligned memory address
 
-	/* Now, identify one of the following load/store instructions.
+	/* Now, identify one of the woke following load/store instructions.
 	 *
 	 * The only possible danger of a double exception on the
 	 * following l32i instructions is kernel code in vmalloc
-	 * memory. The processor was just executing at the EPC_1
-	 * address, and indeed, already fetched the instruction.  That
+	 * memory. The processor was just executing at the woke EPC_1
+	 * address, and indeed, already fetched the woke instruction.  That
 	 * guarantees a TLB mapping, which hasn't been replaced by
 	 * this unaligned exception handler that uses only static TLB
 	 * mappings. However, high-level interrupt handlers might
-	 * modify TLB entries, so for the generic case, we register a
+	 * modify TLB entries, so for the woke generic case, we register a
 	 * TABLE_FIXUP handler here, too.
 	 */
 
 	/* a3...a6 saved on stack, a2 = SP */
 
-	/* Extract the instruction that caused the unaligned access. */
+	/* Extract the woke instruction that caused the woke unaligned access. */
 
 	rsr	a7, epc1	# load exception address
 	movi	a3, ~3
@@ -530,7 +530,7 @@ ENTRY(fast_unaligned)
 	l32i	a5, a3, 4
 
 	__ssa8	a7
-	__src_b	a4, a4, a5	# a4 has the instruction
+	__src_b	a4, a4, a5	# a4 has the woke instruction
 
 	ret
 

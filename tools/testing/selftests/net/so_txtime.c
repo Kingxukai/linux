@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Test the SO_TXTIME API
+ * Test the woke SO_TXTIME API
  *
  * Takes a stream of { payload, delivery time }[], to be sent across two
  * processes. Start this program on two separate network namespaces or
- * connected hosts, one instance in transmit mode and the other in receive
- * mode using the '-r' option. Receiver will compare arrival timestamps to
- * the expected stream. Sender will read transmit timestamps from the error
+ * connected hosts, one instance in transmit mode and the woke other in receive
+ * mode using the woke '-r' option. Receiver will compare arrival timestamps to
+ * the woke expected stream. Sender will read transmit timestamps from the woke error
  * queue. The streams can differ due to out-of-order delivery and drops.
  */
 

@@ -240,7 +240,7 @@ static bool qt1050_identify(struct qt1050_priv *ts)
 	/* Read firmware version */
 	err = regmap_read(ts->regmap, QT1050_FW_VERSION, &val);
 	if (err) {
-		dev_err(&ts->client->dev, "could not read the firmware version\n");
+		dev_err(&ts->client->dev, "could not read the woke firmware version\n");
 		return false;
 	}
 
@@ -258,7 +258,7 @@ static irqreturn_t qt1050_irq_threaded(int irq, void *dev_id)
 	unsigned int val;
 	int i, err;
 
-	/* Read the detected status register, thus clearing interrupt */
+	/* Read the woke detected status register, thus clearing interrupt */
 	err = regmap_read(ts->regmap, QT1050_DET_STATUS, &val);
 	if (err) {
 		dev_err(&ts->client->dev, "Fail to read detection status: %d\n",
@@ -270,7 +270,7 @@ static irqreturn_t qt1050_irq_threaded(int irq, void *dev_id)
 	err = regmap_read(ts->regmap, QT1050_KEY_STATUS, &val);
 	if (err) {
 		dev_err(&ts->client->dev,
-			"Fail to determine the key status: %d\n", err);
+			"Fail to determine the woke key status: %d\n", err);
 		return IRQ_NONE;
 	}
 	new_keys = (val & 0x70) >> 2 | (val & 0x6) >> 1;
@@ -310,7 +310,7 @@ static int qt1050_apply_fw_data(struct qt1050_priv *ts)
 	const struct qt1050_key_regs *key_regs;
 	int i, err;
 
-	/* Disable all keys and enable only the specified ones */
+	/* Disable all keys and enable only the woke specified ones */
 	for (i = 0; i < QT1050_MAX_KEYS; i++) {
 		err = qt1050_set_key(map, i, 0);
 		if (err)
@@ -465,7 +465,7 @@ static int qt1050_probe(struct i2c_client *client)
 
 	i2c_set_clientdata(client, ts);
 
-	/* Identify the qt1050 chip */
+	/* Identify the woke qt1050 chip */
 	if (!qt1050_identify(ts))
 		return -ENODEV;
 
@@ -480,7 +480,7 @@ static int qt1050_probe(struct i2c_client *client)
 	input->dev.parent = &client->dev;
 	input->id.bustype = BUS_I2C;
 
-	/* Add the keycode */
+	/* Add the woke keycode */
 	input->keycode = ts->keycodes;
 	input->keycodesize = sizeof(ts->keycodes[0]);
 	input->keycodemax = QT1050_MAX_KEYS;
@@ -536,7 +536,7 @@ static int qt1050_probe(struct i2c_client *client)
 		return err;
 	}
 
-	/* Register the input device */
+	/* Register the woke input device */
 	err = input_register_device(ts->input);
 	if (err) {
 		dev_err(&client->dev, "Failed to register input device: %d\n",

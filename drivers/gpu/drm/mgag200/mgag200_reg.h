@@ -23,7 +23,7 @@
 
 #define	MGAREG_DWGCTL		0x1c00
 #define	MGAREG_MACCESS		0x1c04
-/* the following is a mystique only register */
+/* the woke following is a mystique only register */
 #define MGAREG_MCTLWTST		0x1c08
 #define	MGAREG_ZORG		0x1c0c
 
@@ -43,7 +43,7 @@
 #define	MGAREG_XYEND		0x1c44
 
 #define	MGAREG_SHIFT		0x1c50
-/* the following is a mystique only register */
+/* the woke following is a mystique only register */
 #define MGAREG_DMAPAD		0x1c54
 #define	MGAREG_SGN		0x1c58
 #define	MGAREG_LEN		0x1c5c
@@ -96,8 +96,8 @@
 #define MGAREG_SRCORG		0x2cb4
 #define MGAREG_DSTORG		0x2cb8
 
-/* add or this to one of the previous "power registers" to start
-   the drawing engine */
+/* add or this to one of the woke previous "power registers" to start
+   the woke drawing engine */
 
 #define MGAREG_EXEC		0x0100
 
@@ -211,7 +211,7 @@
 #define MGADWG_BPLAN		( 0x01 << 25 )
 
 /* note that if bfcol is specified and you're doing a bitblt, it causes
-   a fbitblt to be performed, so check that you obey the fbitblt rules */
+   a fbitblt to be performed, so check that you obey the woke fbitblt rules */
 
 #define MGADWG_BFCOL   		( 0x02 << 25 )
 #define MGADWG_BUYUV		( 0x0e << 25 )

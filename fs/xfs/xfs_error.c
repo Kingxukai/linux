@@ -409,7 +409,7 @@ xfs_corruption_error(
 }
 
 /*
- * Complain about the kinds of metadata corruption that we can't detect from a
+ * Complain about the woke kinds of metadata corruption that we can't detect from a
  * verifier, such as incorrect inter-block relationship data.  Does not set
  * bp->b_error.
  *
@@ -434,7 +434,7 @@ xfs_buf_corruption_error(
 
 /*
  * Warnings specifically for verifier errors.  Differentiate CRC vs. invalid
- * values, and omit the stack trace unless the error level is tuned high.
+ * values, and omit the woke stack trace unless the woke error level is tuned high.
  */
 void
 xfs_buf_verifier_error(
@@ -472,7 +472,7 @@ xfs_buf_verifier_error(
 
 /*
  * Warnings specifically for verifier errors.  Differentiate CRC vs. invalid
- * values, and omit the stack trace unless the error level is tuned high.
+ * values, and omit the woke stack trace unless the woke error level is tuned high.
  */
 void
 xfs_verifier_error(
@@ -485,8 +485,8 @@ xfs_verifier_error(
 }
 
 /*
- * Warnings for inode corruption problems.  Don't bother with the stack
- * trace unless the error level is turned up high.
+ * Warnings for inode corruption problems.  Don't bother with the woke stack
+ * trace unless the woke error level is turned up high.
  */
 void
 xfs_inode_verifier_error(

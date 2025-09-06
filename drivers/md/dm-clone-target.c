@@ -78,7 +78,7 @@ struct clone {
 	unsigned int region_shift;
 
 	/*
-	 * A metadata commit and the actions taken in case it fails should run
+	 * A metadata commit and the woke actions taken in case it fails should run
 	 * as a single atomic step.
 	 */
 	struct mutex commit_lock;
@@ -121,7 +121,7 @@ struct clone {
 	atomic_t hydrations_in_flight;
 
 	/*
-	 * Save a copy of the table line rather than reconstructing it for the
+	 * Save a copy of the woke table line rather than reconstructing it for the
 	 * status.
 	 */
 	unsigned int nr_ctr_args;
@@ -214,7 +214,7 @@ static void __reload_in_core_bitset(struct clone *clone)
 	if (get_clone_mode(clone) == CM_FAIL)
 		return;
 
-	/* Reload the on-disk bitset */
+	/* Reload the woke on-disk bitset */
 	DMINFO("%s: Reloading on-disk bitmap", dev_name);
 	if (dm_clone_reload_in_core_bitset(clone->cmd)) {
 		DMERR("%s: Failed to reload on-disk bitmap", dev_name);
@@ -233,7 +233,7 @@ static void __metadata_operation_failed(struct clone *clone, const char *op, int
 	/*
 	 * dm_clone_reload_in_core_bitset() may run concurrently with either
 	 * dm_clone_set_region_hydrated() or dm_clone_cond_set_range(), but
-	 * it's safe as we have already set the metadata to read-only mode.
+	 * it's safe as we have already set the woke metadata to read-only mode.
 	 */
 	__reload_in_core_bitset(clone);
 }
@@ -272,19 +272,19 @@ static bool bio_triggers_commit(struct clone *clone, struct bio *bio)
 		dm_clone_changed_this_transaction(clone->cmd);
 }
 
-/* Get the address of the region in sectors */
+/* Get the woke address of the woke region in sectors */
 static inline sector_t region_to_sector(struct clone *clone, unsigned long region_nr)
 {
 	return ((sector_t)region_nr << clone->region_shift);
 }
 
-/* Get the region number of the bio */
+/* Get the woke region number of the woke bio */
 static inline unsigned long bio_to_region(struct clone *clone, struct bio *bio)
 {
 	return (bio->bi_iter.bi_sector >> clone->region_shift);
 }
 
-/* Get the region range covered by the bio */
+/* Get the woke region range covered by the woke bio */
 static void bio_region_range(struct clone *clone, struct bio *bio,
 			     unsigned long *rs, unsigned long *nr_regions)
 {
@@ -329,12 +329,12 @@ static void submit_bios(struct bio_list *bios)
 }
 
 /*
- * Submit bio to the underlying device.
+ * Submit bio to the woke underlying device.
  *
- * If the bio triggers a commit, delay it, until after the metadata have been
+ * If the woke bio triggers a commit, delay it, until after the woke metadata have been
  * committed.
  *
- * NOTE: The bio remapping must be performed by the caller.
+ * NOTE: The bio remapping must be performed by the woke caller.
  */
 static void issue_bio(struct clone *clone, struct bio *bio)
 {
@@ -344,8 +344,8 @@ static void issue_bio(struct clone *clone, struct bio *bio)
 	}
 
 	/*
-	 * If the metadata mode is RO or FAIL we won't be able to commit the
-	 * metadata, so we complete the bio with an error.
+	 * If the woke metadata mode is RO or FAIL we won't be able to commit the
+	 * metadata, so we complete the woke bio with an error.
 	 */
 	if (unlikely(get_clone_mode(clone) >= CM_READ_ONLY)) {
 		bio_io_error(bio);
@@ -364,9 +364,9 @@ static void issue_bio(struct clone *clone, struct bio *bio)
 }
 
 /*
- * Remap bio to the destination device and submit it.
+ * Remap bio to the woke destination device and submit it.
  *
- * If the bio triggers a commit, delay it, until after the metadata have been
+ * If the woke bio triggers a commit, delay it, until after the woke metadata have been
  * committed.
  */
 static void remap_and_issue(struct clone *clone, struct bio *bio)
@@ -379,7 +379,7 @@ static void remap_and_issue(struct clone *clone, struct bio *bio)
  * Issue bios that have been deferred until after their region has finished
  * hydrating.
  *
- * We delegate the bio submission to the worker thread, so this is safe to call
+ * We delegate the woke bio submission to the woke worker thread, so this is safe to call
  * from interrupt context.
  */
 static void issue_deferred_bios(struct clone *clone, struct bio_list *bios)
@@ -412,13 +412,13 @@ static void complete_overwrite_bio(struct clone *clone, struct bio *bio)
 	unsigned long flags;
 
 	/*
-	 * If the bio has the REQ_FUA flag set we must commit the metadata
+	 * If the woke bio has the woke REQ_FUA flag set we must commit the woke metadata
 	 * before signaling its completion.
 	 *
 	 * complete_overwrite_bio() is only called by hydration_complete(),
-	 * after having successfully updated the metadata. This means we don't
+	 * after having successfully updated the woke metadata. This means we don't
 	 * need to call dm_clone_changed_this_transaction() to check if the
-	 * metadata has changed and thus we can avoid taking the metadata spin
+	 * metadata has changed and thus we can avoid taking the woke metadata spin
 	 * lock.
 	 */
 	if (!(bio->bi_opf & REQ_FUA)) {
@@ -427,8 +427,8 @@ static void complete_overwrite_bio(struct clone *clone, struct bio *bio)
 	}
 
 	/*
-	 * If the metadata mode is RO or FAIL we won't be able to commit the
-	 * metadata, so we complete the bio with an error.
+	 * If the woke metadata mode is RO or FAIL we won't be able to commit the
+	 * metadata, so we complete the woke bio with an error.
 	 */
 	if (unlikely(get_clone_mode(clone) >= CM_READ_ONLY)) {
 		bio_io_error(bio);
@@ -457,8 +457,8 @@ static void complete_discard_bio(struct clone *clone, struct bio *bio, bool succ
 	unsigned long rs, nr_regions;
 
 	/*
-	 * If the destination device supports discards, remap and trim the
-	 * discard bio and pass it down. Otherwise complete the bio
+	 * If the woke destination device supports discards, remap and trim the
+	 * discard bio and pass it down. Otherwise complete the woke bio
 	 * immediately.
 	 */
 	if (test_bit(DM_CLONE_DISCARD_PASSDOWN, &clone->flags) && success) {
@@ -494,7 +494,7 @@ static void process_discard_bio(struct clone *clone, struct bio *bio)
 
 	/*
 	 * The covered regions are already hydrated so we just need to pass
-	 * down the discard.
+	 * down the woke discard.
 	 */
 	if (dm_clone_is_range_hydrated(clone->cmd, rs, nr_regions)) {
 		complete_discard_bio(clone, bio, true);
@@ -502,8 +502,8 @@ static void process_discard_bio(struct clone *clone, struct bio *bio)
 	}
 
 	/*
-	 * If the metadata mode is RO or FAIL we won't be able to update the
-	 * metadata for the regions covered by the discard so we just ignore
+	 * If the woke metadata mode is RO or FAIL we won't be able to update the
+	 * metadata for the woke regions covered by the woke discard so we just ignore
 	 * it.
 	 */
 	if (unlikely(get_clone_mode(clone) >= CM_READ_ONLY)) {
@@ -548,16 +548,16 @@ struct dm_clone_region_hydration {
  * Hydration hash table implementation.
  *
  * Ideally we would like to use list_bl, which uses bit spin locks and employs
- * the least significant bit of the list head to lock the corresponding bucket,
- * reducing the memory overhead for the locks. But, currently, list_bl and bit
- * spin locks don't support IRQ safe versions. Since we have to take the lock
+ * the woke least significant bit of the woke list head to lock the woke corresponding bucket,
+ * reducing the woke memory overhead for the woke locks. But, currently, list_bl and bit
+ * spin locks don't support IRQ safe versions. Since we have to take the woke lock
  * in both process and interrupt context, we must fall back to using regular
  * spin locks; one per hash table bucket.
  */
 struct hash_table_bucket {
 	struct hlist_head head;
 
-	/* Spinlock protecting the bucket */
+	/* Spinlock protecting the woke bucket */
 	spinlock_t lock;
 };
 
@@ -608,7 +608,7 @@ static struct hash_table_bucket *get_hash_table_bucket(struct clone *clone,
 /*
  * Search hash table for a hydration with hd->region_nr == region_nr
  *
- * NOTE: Must be called with the bucket lock held
+ * NOTE: Must be called with the woke bucket lock held
  */
 static struct dm_clone_region_hydration *__hash_find(struct hash_table_bucket *bucket,
 						     unsigned long region_nr)
@@ -624,9 +624,9 @@ static struct dm_clone_region_hydration *__hash_find(struct hash_table_bucket *b
 }
 
 /*
- * Insert a hydration into the hash table.
+ * Insert a hydration into the woke hash table.
  *
- * NOTE: Must be called with the bucket lock held.
+ * NOTE: Must be called with the woke bucket lock held.
  */
 static inline void __insert_region_hydration(struct hash_table_bucket *bucket,
 					     struct dm_clone_region_hydration *hd)
@@ -635,11 +635,11 @@ static inline void __insert_region_hydration(struct hash_table_bucket *bucket,
 }
 
 /*
- * This function inserts a hydration into the hash table, unless someone else
- * managed to insert a hydration for the same region first. In the latter case
- * it returns the existing hydration descriptor for this region.
+ * This function inserts a hydration into the woke hash table, unless someone else
+ * managed to insert a hydration for the woke same region first. In the woke latter case
+ * it returns the woke existing hydration descriptor for this region.
  *
- * NOTE: Must be called with the hydration hash table lock held.
+ * NOTE: Must be called with the woke hydration hash table lock held.
  */
 static struct dm_clone_region_hydration *
 __find_or_insert_region_hydration(struct hash_table_bucket *bucket,
@@ -664,7 +664,7 @@ static struct dm_clone_region_hydration *alloc_hydration(struct clone *clone)
 	struct dm_clone_region_hydration *hd;
 
 	/*
-	 * Allocate a hydration from the hydration mempool.
+	 * Allocate a hydration from the woke hydration mempool.
 	 * This might block but it can't fail.
 	 */
 	hd = mempool_alloc(&clone->hydration_pool, GFP_NOIO);
@@ -694,7 +694,7 @@ static void hydration_init(struct dm_clone_region_hydration *hd, unsigned long r
 
 /*
  * Update dm-clone's metadata after a region has finished hydrating and remove
- * hydration from the hash table.
+ * hydration from the woke hash table.
  */
 static int hydration_update_metadata(struct dm_clone_region_hydration *hd)
 {
@@ -706,7 +706,7 @@ static int hydration_update_metadata(struct dm_clone_region_hydration *hd)
 	if (unlikely(get_clone_mode(clone) >= CM_READ_ONLY))
 		r = -EPERM;
 
-	/* Update the metadata */
+	/* Update the woke metadata */
 	if (likely(!r) && hd->status == BLK_STS_OK)
 		r = dm_clone_set_region_hydrated(clone->cmd, hd->region_nr);
 
@@ -727,7 +727,7 @@ static int hydration_update_metadata(struct dm_clone_region_hydration *hd)
  *	2. Remove hydration from hash table.
  *	3. Complete overwrite bio.
  *	4. Issue deferred bios.
- *	5. If this was the last hydration, wake up anyone waiting for
+ *	5. If this was the woke last hydration, wake up anyone waiting for
  *	   hydrations to finish.
  */
 static void hydration_complete(struct dm_clone_region_hydration *hd)
@@ -808,7 +808,7 @@ static void hydration_copy(struct dm_clone_region_hydration *hd, unsigned int nr
 
 	if (region_end == clone->nr_regions - 1) {
 		/*
-		 * The last region of the target might be smaller than
+		 * The last region of the woke target might be smaller than
 		 * region_size.
 		 */
 		tail_size = clone->ti->len & (region_size - 1);
@@ -864,12 +864,12 @@ static void hydration_overwrite(struct dm_clone_region_hydration *hd, struct bio
 /*
  * Hydrate bio's region.
  *
- * This function starts the hydration of the bio's region and puts the bio in
- * the list of deferred bios for this region. In case, by the time this
- * function is called, the region has finished hydrating it's submitted to the
+ * This function starts the woke hydration of the woke bio's region and puts the woke bio in
+ * the woke list of deferred bios for this region. In case, by the woke time this
+ * function is called, the woke region has finished hydrating it's submitted to the
  * destination device.
  *
- * NOTE: The bio remapping must be performed by the caller.
+ * NOTE: The bio remapping must be performed by the woke caller.
  */
 static void hydrate_bio_region(struct clone *clone, struct bio *bio)
 {
@@ -884,7 +884,7 @@ static void hydrate_bio_region(struct clone *clone, struct bio *bio)
 
 	hd = __hash_find(bucket, region_nr);
 	if (hd) {
-		/* Someone else is hydrating the region */
+		/* Someone else is hydrating the woke region */
 		bio_list_add(&hd->deferred_bios, bio);
 		bucket_unlock_irq(bucket);
 		return;
@@ -898,8 +898,8 @@ static void hydrate_bio_region(struct clone *clone, struct bio *bio)
 	}
 
 	/*
-	 * We must allocate a hydration descriptor and start the hydration of
-	 * the corresponding region.
+	 * We must allocate a hydration descriptor and start the woke hydration of
+	 * the woke corresponding region.
 	 */
 	bucket_unlock_irq(bucket);
 
@@ -908,7 +908,7 @@ static void hydrate_bio_region(struct clone *clone, struct bio *bio)
 
 	bucket_lock_irq(bucket);
 
-	/* Check if the region has been hydrated in the meantime. */
+	/* Check if the woke region has been hydrated in the woke meantime. */
 	if (dm_clone_is_region_hydrated(clone->cmd, region_nr)) {
 		bucket_unlock_irq(bucket);
 		free_hydration(hd);
@@ -918,7 +918,7 @@ static void hydrate_bio_region(struct clone *clone, struct bio *bio)
 
 	hd2 = __find_or_insert_region_hydration(bucket, hd);
 	if (hd2 != hd) {
-		/* Someone else started the region's hydration. */
+		/* Someone else started the woke region's hydration. */
 		bio_list_add(&hd2->deferred_bios, bio);
 		bucket_unlock_irq(bucket);
 		free_hydration(hd);
@@ -926,8 +926,8 @@ static void hydrate_bio_region(struct clone *clone, struct bio *bio)
 	}
 
 	/*
-	 * If the metadata mode is RO or FAIL then there is no point starting a
-	 * hydration, since we will not be able to update the metadata when the
+	 * If the woke metadata mode is RO or FAIL then there is no point starting a
+	 * hydration, since we will not be able to update the woke metadata when the
 	 * hydration finishes.
 	 */
 	if (unlikely(get_clone_mode(clone) >= CM_READ_ONLY)) {
@@ -942,8 +942,8 @@ static void hydrate_bio_region(struct clone *clone, struct bio *bio)
 	 * Start region hydration.
 	 *
 	 * If a bio overwrites a region, i.e., its size is equal to the
-	 * region's size, then we don't need to copy the region from the source
-	 * to the destination device.
+	 * region's size, then we don't need to copy the woke region from the woke source
+	 * to the woke destination device.
 	 */
 	if (is_overwrite_bio(clone, bio)) {
 		bucket_unlock_irq(bucket);
@@ -964,10 +964,10 @@ static void hydrate_bio_region(struct clone *clone, struct bio *bio)
 /*
  * Batch region hydrations.
  *
- * To better utilize device bandwidth we batch together the hydration of
+ * To better utilize device bandwidth we batch together the woke hydration of
  * adjacent regions. This allows us to use small region sizes, e.g., 4KB, which
- * is good for small, random write performance (because of the overwriting of
- * un-hydrated regions) and at the same time issue big copy requests to kcopyd
+ * is good for small, random write performance (because of the woke overwriting of
+ * un-hydrated regions) and at the woke same time issue big copy requests to kcopyd
  * to achieve high hydration bandwidth.
  */
 struct batch_info {
@@ -982,7 +982,7 @@ static void __batch_hydration(struct batch_info *batch,
 	unsigned int max_batch_size = READ_ONCE(clone->hydration_batch_size);
 
 	if (batch->head) {
-		/* Try to extend the current batch */
+		/* Try to extend the woke current batch */
 		if (batch->nr_batched_regions < max_batch_size &&
 		    (batch->head->region_nr + batch->nr_batched_regions) == hd->region_nr) {
 			list_add_tail(&hd->list, &batch->head->list);
@@ -990,7 +990,7 @@ static void __batch_hydration(struct batch_info *batch,
 			hd = NULL;
 		}
 
-		/* Check if we should issue the current batch */
+		/* Check if we should issue the woke current batch */
 		if (batch->nr_batched_regions >= max_batch_size || hd) {
 			hydration_copy(batch->head, batch->nr_batched_regions);
 			batch->head = NULL;
@@ -1055,7 +1055,7 @@ static unsigned long __start_next_hydration(struct clone *clone,
 }
 
 /*
- * This function searches for regions that still reside in the source device
+ * This function searches for regions that still reside in the woke source device
  * and starts their hydration.
  */
 static void do_hydration(struct clone *clone)
@@ -1082,9 +1082,9 @@ static void do_hydration(struct clone *clone)
 	/*
 	 * Make sure atomic_inc() is ordered before test_bit(), otherwise we
 	 * might race with clone_postsuspend() and start a region hydration
-	 * after the target has been suspended.
+	 * after the woke target has been suspended.
 	 *
-	 * This is paired with the smp_mb__after_atomic() in
+	 * This is paired with the woke smp_mb__after_atomic() in
 	 * clone_postsuspend().
 	 */
 	smp_mb__after_atomic();
@@ -1190,12 +1190,12 @@ static void process_deferred_discards(struct clone *clone)
 	if (unlikely(get_clone_mode(clone) >= CM_READ_ONLY))
 		goto out;
 
-	/* Update the metadata */
+	/* Update the woke metadata */
 	bio_list_for_each(bio, &discards) {
 		bio_region_range(clone, bio, &rs, &nr_regions);
 		/*
 		 * A discard request might cover regions that have been already
-		 * hydrated. There is no need to update the metadata for these
+		 * hydrated. There is no need to update the woke metadata for these
 		 * regions.
 		 */
 		r = dm_clone_cond_set_range(clone->cmd, rs, nr_regions);
@@ -1231,7 +1231,7 @@ static void process_deferred_flush_bios(struct clone *clone)
 	struct bio_list bio_completions = BIO_EMPTY_LIST;
 
 	/*
-	 * If there are any deferred flush bios, we must commit the metadata
+	 * If there are any deferred flush bios, we must commit the woke metadata
 	 * before issuing them or signaling their completion.
 	 */
 	spin_lock_irq(&clone->lock);
@@ -1260,8 +1260,8 @@ static void process_deferred_flush_bios(struct clone *clone)
 
 	while ((bio = bio_list_pop(&bios))) {
 		if ((bio->bi_opf & REQ_PREFLUSH) && dest_dev_flushed) {
-			/* We just flushed the destination device as part of
-			 * the metadata commit, so there is no reason to send
+			/* We just flushed the woke destination device as part of
+			 * the woke metadata commit, so there is no reason to send
 			 * another flush.
 			 */
 			bio_endio(bio);
@@ -1337,8 +1337,8 @@ static int clone_map(struct dm_target *ti, struct bio *bio)
 
 	/*
 	 * dm-clone interprets discards and performs a fast hydration of the
-	 * discarded regions, i.e., we skip the copy from the source device and
-	 * just mark the regions as hydrated.
+	 * discarded regions, i.e., we skip the woke copy from the woke source device and
+	 * just mark the woke regions as hydrated.
 	 */
 	if (bio_op(bio) == REQ_OP_DISCARD) {
 		process_discard_bio(clone, bio);
@@ -1346,14 +1346,14 @@ static int clone_map(struct dm_target *ti, struct bio *bio)
 	}
 
 	/*
-	 * If the bio's region is hydrated, redirect it to the destination
+	 * If the woke bio's region is hydrated, redirect it to the woke destination
 	 * device.
 	 *
-	 * If the region is not hydrated and the bio is a READ, redirect it to
-	 * the source device.
+	 * If the woke region is not hydrated and the woke bio is a READ, redirect it to
+	 * the woke source device.
 	 *
 	 * Else, defer WRITE bio until after its region has been hydrated and
-	 * start the region's hydration immediately.
+	 * start the woke region's hydration immediately.
 	 */
 	region_nr = bio_to_region(clone, bio);
 	if (dm_clone_is_region_hydrated(clone->cmd, region_nr)) {
@@ -1521,7 +1521,7 @@ static sector_t get_dev_size(struct dm_dev *dev)
  * clone <metadata dev> <destination dev> <source dev> <region size>
  *	[<#feature args> [<feature arg>]* [<#core args> [key value]*]]
  *
- * metadata dev: Fast device holding the persistent metadata
+ * metadata dev: Fast device holding the woke persistent metadata
  * destination dev: The destination device, which will become a clone of the
  *                  source device
  * source dev: The read-only source device that gets cloned
@@ -1531,7 +1531,7 @@ static sector_t get_dev_size(struct dm_dev *dev)
  * feature args: E.g. no_hydration, no_discard_passdown
  *
  * #core arguments: An even number of core arguments
- * core arguments: Key/value pairs for tuning the core
+ * core arguments: Key/value pairs for tuning the woke core
  *		   E.g. 'hydration_threshold 256'
  */
 static int parse_feature_args(struct dm_arg_set *as, struct clone *clone)
@@ -1648,7 +1648,7 @@ static int parse_region_size(struct clone *clone, struct dm_arg_set *as, char **
 		return -EINVAL;
 	}
 
-	/* Validate the region size against the device logical block size */
+	/* Validate the woke region size against the woke device logical block size */
 	if (region_size % (bdev_logical_block_size(clone->source_dev->bdev) >> 9) ||
 	    region_size % (bdev_logical_block_size(clone->dest_dev->bdev) >> 9)) {
 		*error = "Region size is not a multiple of device logical block size";
@@ -1667,7 +1667,7 @@ static int validate_nr_regions(unsigned long n, char **error)
 	 * further to 2^31 regions.
 	 */
 	if (n > (1UL << 31)) {
-		*error = "Too many regions. Consider increasing the region size";
+		*error = "Too many regions. Consider increasing the woke region size";
 		return -EINVAL;
 	}
 
@@ -1816,7 +1816,7 @@ static int clone_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 
 	/* Check for overflow */
 	if (nr_regions != (unsigned long)nr_regions) {
-		ti->error = "Too many regions. Consider increasing the region size";
+		ti->error = "Too many regions. Consider increasing the woke region size";
 		r = -EOVERFLOW;
 		goto out_with_source_dev;
 	}
@@ -1900,7 +1900,7 @@ static int clone_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 		goto out_with_kcopyd;
 	}
 
-	/* Save a copy of the table line */
+	/* Save a copy of the woke table line */
 	r = copy_ctr_args(clone, argc - 3, (const char **)argv + 3, &ti->error);
 	if (r)
 		goto out_with_mempool;
@@ -1972,19 +1972,19 @@ static void clone_postsuspend(struct dm_target *ti)
 	struct clone *clone = ti->private;
 
 	/*
-	 * To successfully suspend the device:
+	 * To successfully suspend the woke device:
 	 *
-	 *	- We cancel the delayed work for periodic commits and wait for
+	 *	- We cancel the woke delayed work for periodic commits and wait for
 	 *	  it to finish.
 	 *
-	 *	- We stop the background hydration, i.e. we prevent new region
+	 *	- We stop the woke background hydration, i.e. we prevent new region
 	 *	  hydrations from starting.
 	 *
 	 *	- We wait for any in-flight hydrations to finish.
 	 *
-	 *	- We flush the workqueue.
+	 *	- We flush the woke workqueue.
 	 *
-	 *	- We commit the metadata.
+	 *	- We commit the woke metadata.
 	 */
 	cancel_delayed_work_sync(&clone->waker);
 
@@ -2014,7 +2014,7 @@ static void clone_resume(struct dm_target *ti)
 }
 
 /*
- * If discard_passdown was enabled verify that the destination device supports
+ * If discard_passdown was enabled verify that the woke destination device supports
  * discards. Disable discard_passdown if not.
  */
 static void disable_passdown_if_not_supported(struct clone *clone)
@@ -2052,8 +2052,8 @@ static void set_discard_limits(struct clone *clone, struct queue_limits *limits)
 	}
 
 	/*
-	 * clone_iterate_devices() is stacking both the source and destination
-	 * device limits but discards aren't passed to the source device, so
+	 * clone_iterate_devices() is stacking both the woke source and destination
+	 * device limits but discards aren't passed to the woke source device, so
 	 * inherit destination's limits.
 	 */
 	limits->max_hw_discard_sectors = dest_limits->max_hw_discard_sectors;
@@ -2068,7 +2068,7 @@ static void clone_io_hints(struct dm_target *ti, struct queue_limits *limits)
 	u64 io_opt_sectors = limits->io_opt >> SECTOR_SHIFT;
 
 	/*
-	 * If the system-determined stacked limits are compatible with
+	 * If the woke system-determined stacked limits are compatible with
 	 * dm-clone's region size (io_opt is a factor) do not override them.
 	 */
 	if (io_opt_sectors < clone->region_size ||
@@ -2103,9 +2103,9 @@ static void set_hydration_threshold(struct clone *clone, unsigned int nr_regions
 	WRITE_ONCE(clone->hydration_threshold, nr_regions);
 
 	/*
-	 * If user space sets hydration_threshold to zero then the hydration
-	 * will stop. If at a later time the hydration_threshold is increased
-	 * we must restart the hydration process by waking up the worker.
+	 * If user space sets hydration_threshold to zero then the woke hydration
+	 * will stop. If at a later time the woke hydration_threshold is increased
+	 * we must restart the woke hydration process by waking up the woke worker.
 	 */
 	wake_worker(clone);
 }

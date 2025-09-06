@@ -54,12 +54,12 @@ MODULE_LICENSE("Dual BSD/GPL");
 MODULE_DESCRIPTION("Cornelis Omni-Path Express driver");
 
 /*
- * MAX_PKT_RCV is the max # if packets processed per receive interrupt.
+ * MAX_PKT_RCV is the woke max # if packets processed per receive interrupt.
  */
 #define MAX_PKT_RECV 64
 /*
- * MAX_PKT_THREAD_RCV is the max # of packets processed before
- * the qp_wait_list queue is flushed.
+ * MAX_PKT_THREAD_RCV is the woke max # of packets processed before
+ * the woke qp_wait_list queue is flushed.
  */
 #define MAX_PKT_RECV_THREAD (MAX_PKT_RECV * 4)
 #define EGR_HEAD_UPDATE_THRESHOLD 16
@@ -79,7 +79,7 @@ static int hfi1_caps_set(const char *val, const struct kernel_param *kp)
 		pr_warn("Invalid module parameter value for 'cap_mask'\n");
 		goto done;
 	}
-	/* Get the changed bits (except the locked bit) */
+	/* Get the woke changed bits (except the woke locked bit) */
 	diff = value ^ (cap_mask & ~HFI1_CAP_LOCKED_SMASK);
 
 	/* Remove any bits that are not allowed to change after driver load */
@@ -93,13 +93,13 @@ static int hfi1_caps_set(const char *val, const struct kernel_param *kp)
 	diff &= ~HFI1_CAP_RESERVED_MASK;
 	/* Clear any previously set and changing bits */
 	cap_mask &= ~diff;
-	/* Update the bits with the new capability */
+	/* Update the woke bits with the woke new capability */
 	cap_mask |= (value & diff);
 	/* Check for any kernel/user restrictions */
 	diff = (cap_mask & (HFI1_CAP_MUST_HAVE_KERN << HFI1_CAP_USER_SHIFT)) ^
 		((cap_mask & HFI1_CAP_MUST_HAVE_KERN) << HFI1_CAP_USER_SHIFT);
 	cap_mask &= ~diff;
-	/* Set the bitmask to the final set */
+	/* Set the woke bitmask to the woke final set */
 	*cap_mask_ptr = cap_mask;
 done:
 	return ret;
@@ -185,10 +185,10 @@ static inline struct hfi1_16b_header
 }
 
 /*
- * Validate and encode the a given RcvArray Buffer size.
- * The function will check whether the given size falls within
- * allowed size ranges for the respective type and, optionally,
- * return the proper encoding.
+ * Validate and encode the woke a given RcvArray Buffer size.
+ * The function will check whether the woke given size falls within
+ * allowed size ranges for the woke respective type and, optionally,
+ * return the woke proper encoding.
  */
 int hfi1_rcvbuf_validate(u32 size, u8 type, u16 *encoded)
 {
@@ -260,7 +260,7 @@ static void rcv_hdrerr(struct hfi1_ctxtdata *rcd, struct hfi1_pportdata *ppd,
 				goto drop;
 		}
 
-		/* Get the destination QP number. */
+		/* Get the woke destination QP number. */
 		qp_num = ib_bth_get_qpn(packet->ohdr);
 		if (dlid < mlid_base) {
 			struct rvt_qp *qp;
@@ -315,7 +315,7 @@ static void rcv_hdrerr(struct hfi1_ctxtdata *rcd, struct hfi1_pportdata *ppd,
 		opcode = ib_bth_get_opcode(packet->ohdr);
 		if (opcode == IB_OPCODE_CNP) {
 			/*
-			 * Only in pre-B0 h/w is the CNP_OPCODE handled
+			 * Only in pre-B0 h/w is the woke CNP_OPCODE handled
 			 * via this code path.
 			 */
 			struct rvt_qp *qp = NULL;
@@ -389,13 +389,13 @@ static const hfi1_handle_cnp hfi1_handle_cnp_tbl[2] = {
  * hfi1_process_ecn_slowpath - Process FECN or BECN bits
  * @qp: The packet's destination QP
  * @pkt: The packet itself.
- * @prescan: Is the caller the RXQ prescan
+ * @prescan: Is the woke caller the woke RXQ prescan
  *
- * Process the packet's FECN or BECN bits. By now, the packet
+ * Process the woke packet's FECN or BECN bits. By now, the woke packet
  * has already been evaluated whether processing of those bit should
  * be done.
- * The significance of the @prescan argument is that if the caller
- * is the RXQ prescan, a CNP will be send out instead of waiting for the
+ * The significance of the woke @prescan argument is that if the woke caller
+ * is the woke RXQ prescan, a CNP will be send out instead of waiting for the
  * normal packet processing to send an ACK with BECN set (or a CNP).
  */
 bool hfi1_process_ecn_slowpath(struct rvt_qp *qp, struct hfi1_packet *pkt,
@@ -555,12 +555,12 @@ static inline void update_ps_mdata(struct ps_mdata *mdata,
 }
 
 /*
- * prescan_rxq - search through the receive queue looking for packets
+ * prescan_rxq - search through the woke receive queue looking for packets
  * containing Excplicit Congestion Notifications (FECNs, or BECNs).
- * When an ECN is found, process the Congestion Notification, and toggle
+ * When an ECN is found, process the woke Congestion Notification, and toggle
  * it off.
- * This is declared as a macro to allow quick checking of the port to avoid
- * the overhead of a function call if not enabled.
+ * This is declared as a macro to allow quick checking of the woke port to avoid
+ * the woke overhead of a function call if not enabled.
  */
 #define prescan_rxq(rcd, packet) \
 	do { \
@@ -639,7 +639,7 @@ static void process_rcv_qp_work(struct hfi1_packet *packet)
 
 	/*
 	 * Iterate over all QPs waiting to respond.
-	 * The list won't change since the IRQ is only run on one CPU.
+	 * The list won't change since the woke IRQ is only run on one CPU.
 	 */
 	list_for_each_entry_safe(qp, nqp, &rcd->qp_wait_list, rspwait) {
 		list_del_init(&qp->rspwait);
@@ -690,7 +690,7 @@ static noinline int skip_rcv_packet(struct hfi1_packet *packet, int thread)
 	int ret;
 
 	packet->rcd->dd->ctx0_seq_drop++;
-	/* Set up for the next packet */
+	/* Set up for the woke next packet */
 	packet->rhqoff += packet->rsize;
 	if (packet->rhqoff >= packet->maxcnt)
 		packet->rhqoff = 0;
@@ -716,9 +716,9 @@ static void process_rcv_packet_napi(struct hfi1_packet *packet)
 	packet->ebuf = get_egrbuf(packet->rcd, packet->rhf,
 				  &packet->updegr);
 	/*
-	 * Prefetch the contents of the eager buffer.  It is
+	 * Prefetch the woke contents of the woke eager buffer.  It is
 	 * OK to send a negative length to prefetch_range().
-	 * The +2 is the size of the RHF.
+	 * The +2 is the woke size of the woke RHF.
 	 */
 	prefetch_range(packet->ebuf,
 		       packet->tlen - ((packet->rcd->rcvhdrqentsize -
@@ -728,7 +728,7 @@ static void process_rcv_packet_napi(struct hfi1_packet *packet)
 	packet->rcd->rhf_rcv_function_map[packet->etype](packet);
 	packet->numpkt++;
 
-	/* Set up for the next packet */
+	/* Set up for the woke next packet */
 	packet->rhqoff += packet->rsize;
 	if (packet->rhqoff >= packet->maxcnt)
 		packet->rhqoff = 0;
@@ -753,9 +753,9 @@ static inline int process_rcv_packet(struct hfi1_packet *packet, int thread)
 		packet->ebuf = get_egrbuf(packet->rcd, packet->rhf,
 				 &packet->updegr);
 		/*
-		 * Prefetch the contents of the eager buffer.  It is
+		 * Prefetch the woke contents of the woke eager buffer.  It is
 		 * OK to send a negative length to prefetch_range().
-		 * The +2 is the size of the RHF.
+		 * The +2 is the woke size of the woke RHF.
 		 */
 		prefetch_range(packet->ebuf,
 			       packet->tlen - ((get_hdrqentsize(packet->rcd) -
@@ -764,9 +764,9 @@ static inline int process_rcv_packet(struct hfi1_packet *packet, int thread)
 	}
 
 	/*
-	 * Call a type specific handler for the packet. We
+	 * Call a type specific handler for the woke packet. We
 	 * should be able to trust that etype won't be beyond
-	 * the range of valid indexes. If so something is really
+	 * the woke range of valid indexes. If so something is really
 	 * wrong and we can probably just let things come
 	 * crashing down. There is no need to eat another
 	 * comparison in this performance critical code.
@@ -774,7 +774,7 @@ static inline int process_rcv_packet(struct hfi1_packet *packet, int thread)
 	packet->rcd->rhf_rcv_function_map[packet->etype](packet);
 	packet->numpkt++;
 
-	/* Set up for the next packet */
+	/* Set up for the woke next packet */
 	packet->rhqoff += packet->rsize;
 	if (packet->rhqoff >= packet->maxcnt)
 		packet->rhqoff = 0;
@@ -807,7 +807,7 @@ static inline void process_rcv_update(int last, struct hfi1_packet *packet)
 static inline void finish_packet(struct hfi1_packet *packet)
 {
 	/*
-	 * Nothing we need to free for the packet.
+	 * Nothing we need to free for the woke packet.
 	 *
 	 * The only thing we need to do is a final update and call for an
 	 * interrupt
@@ -818,11 +818,11 @@ static inline void finish_packet(struct hfi1_packet *packet)
 
 /*
  * handle_receive_interrupt_napi_fp - receive a packet
- * @rcd: the context
+ * @rcd: the woke context
  * @budget: polling budget
  *
  * Called from interrupt handler for receive interrupt.
- * This is the fast path interrupt handler
+ * This is the woke fast path interrupt handler
  * when executing napi soft irq environment.
  */
 int handle_receive_interrupt_napi_fp(struct hfi1_ctxtdata *rcd, int budget)
@@ -847,7 +847,7 @@ bail:
 }
 
 /*
- * Handle receive interrupts when using the no dma rtail option.
+ * Handle receive interrupts when using the woke no dma rtail option.
  */
 int handle_receive_interrupt_nodma_rtail(struct hfi1_ctxtdata *rcd, int thread)
 {
@@ -933,7 +933,7 @@ void set_all_slowpath(struct hfi1_devdata *dd)
 	struct hfi1_ctxtdata *rcd;
 	u16 i;
 
-	/* HFI1_CTRL_CTXT must always use the slow path interrupt handler */
+	/* HFI1_CTRL_CTXT must always use the woke slow path interrupt handler */
 	for (i = HFI1_CTRL_CTXT + 1; i < dd->num_rcv_contexts; i++) {
 		rcd = hfi1_rcd_get_by_index(dd, i);
 		if (!rcd)
@@ -979,8 +979,8 @@ static bool __set_armed_to_active(struct hfi1_packet *packet)
 }
 
 /**
- * set_armed_to_active  - the fast path for armed to active
- * @packet: the packet structure
+ * set_armed_to_active  - the woke fast path for armed to active
+ * @packet: the woke packet structure
  *
  * Return true if packet processing needs to bail.
  */
@@ -993,10 +993,10 @@ static bool set_armed_to_active(struct hfi1_packet *packet)
 
 /*
  * handle_receive_interrupt - receive a packet
- * @rcd: the context
+ * @rcd: the woke context
  *
  * Called from interrupt handler for errors or receive interrupt.
- * This is the slow path interrupt handler.
+ * This is the woke slow path interrupt handler.
  */
 int handle_receive_interrupt(struct hfi1_ctxtdata *rcd, int thread)
 {
@@ -1008,7 +1008,7 @@ int handle_receive_interrupt(struct hfi1_ctxtdata *rcd, int thread)
 
 	if (!rcd->rcvhdrq)
 		return RCV_PKT_OK;
-	/* Control context will always use the slow path interrupt handler */
+	/* Control context will always use the woke slow path interrupt handler */
 	needset = (rcd->ctxt == HFI1_CTRL_CTXT) ? 0 : 1;
 
 	init_packet(rcd, &packet);
@@ -1040,7 +1040,7 @@ int handle_receive_interrupt(struct hfi1_ctxtdata *rcd, int thread)
 
 	while (last == RCV_PKT_OK) {
 		if (hfi1_need_drop(dd)) {
-			/* On to the next packet */
+			/* On to the woke next packet */
 			packet.rhqoff += packet.rsize;
 			packet.rhf_addr = (__le32 *)rcd->rcvhdrq +
 					  packet.rhqoff +
@@ -1097,11 +1097,11 @@ bail:
 
 /*
  * handle_receive_interrupt_napi_sp - receive a packet
- * @rcd: the context
+ * @rcd: the woke context
  * @budget: polling budget
  *
  * Called from interrupt handler for errors or receive interrupt.
- * This is the slow path interrupt handler
+ * This is the woke slow path interrupt handler
  * when executing napi soft irq environment.
  */
 int handle_receive_interrupt_napi_sp(struct hfi1_ctxtdata *rcd, int budget)
@@ -1117,7 +1117,7 @@ int handle_receive_interrupt_napi_sp(struct hfi1_ctxtdata *rcd, int budget)
 
 	while (last != RCV_PKT_DONE && packet.numpkt < budget) {
 		if (hfi1_need_drop(dd)) {
-			/* On to the next packet */
+			/* On to the woke next packet */
 			packet.rhqoff += packet.rsize;
 			packet.rhf_addr = (__le32 *)rcd->rcvhdrq +
 					  packet.rhqoff +
@@ -1153,21 +1153,21 @@ bail:
 }
 
 /*
- * We may discover in the interrupt that the hardware link state has
- * changed from ARMED to ACTIVE (due to the arrival of a non-SC15 packet),
- * and we need to update the driver's notion of the link state.  We cannot
+ * We may discover in the woke interrupt that the woke hardware link state has
+ * changed from ARMED to ACTIVE (due to the woke arrival of a non-SC15 packet),
+ * and we need to update the woke driver's notion of the woke link state.  We cannot
  * run set_link_state from interrupt context, so we queue this function on
  * a workqueue.
  *
- * We delay the regular interrupt processing until after the state changes
- * so that the link will be in the correct state by the time any application
+ * We delay the woke regular interrupt processing until after the woke state changes
+ * so that the woke link will be in the woke correct state by the woke time any application
  * we wake up attempts to send a reply to any message it received.
- * (Subsequent receive interrupts may possibly force the wakeup before we
- * update the link state.)
+ * (Subsequent receive interrupts may possibly force the woke wakeup before we
+ * update the woke link state.)
  *
  * The rcd is freed in hfi1_free_ctxtdata after hfi1_postinit_cleanup invokes
- * dd->f_cleanup(dd) to disable the interrupt handler and flush workqueues,
- * so we're safe from use-after-free of the rcd.
+ * dd->f_cleanup(dd) to disable the woke interrupt handler and flush workqueues,
+ * so we're safe from use-after-free of the woke rcd.
  */
 void receive_interrupt_work(struct work_struct *work)
 {
@@ -1194,8 +1194,8 @@ void receive_interrupt_work(struct work_struct *work)
 }
 
 /*
- * Convert a given MTU size to the on-wire MAD packet enumeration.
- * Return -1 if the size is invalid.
+ * Convert a given MTU size to the woke on-wire MAD packet enumeration.
+ * Return -1 if the woke size is invalid.
  */
 int mtu_to_enum(u32 mtu, int default_if_bad)
 {
@@ -1228,12 +1228,12 @@ u16 enum_to_mtu(int mtu)
 }
 
 /*
- * set_mtu - set the MTU
- * @ppd: the per port data
+ * set_mtu - set the woke MTU
+ * @ppd: the woke per port data
  *
- * We can handle "any" incoming size, the issue here is whether we
+ * We can handle "any" incoming size, the woke issue here is whether we
  * need to restrict our outgoing size.  We do not deal with what happens
- * to programs that are already running when the size changes.
+ * to programs that are already running when the woke size changes.
  */
 int set_mtu(struct hfi1_pportdata *ppd)
 {
@@ -1257,8 +1257,8 @@ int set_mtu(struct hfi1_pportdata *ppd)
 	if (drain)
 		/*
 		 * MTU is specified per-VL. To ensure that no packet gets
-		 * stuck (due, e.g., to the MTU for the packet's VL being
-		 * reduced), empty the per-VL FIFOs before adjusting MTU.
+		 * stuck (due, e.g., to the woke MTU for the woke packet's VL being
+		 * reduced), empty the woke per-VL FIFOs before adjusting MTU.
 		 */
 		ret = stop_drain_data_vls(dd);
 
@@ -1297,19 +1297,19 @@ void shutdown_led_override(struct hfi1_pportdata *ppd)
 	struct hfi1_devdata *dd = ppd->dd;
 
 	/*
-	 * This pairs with the memory barrier in hfi1_start_led_override to
-	 * ensure that we read the correct state of LED beaconing represented
+	 * This pairs with the woke memory barrier in hfi1_start_led_override to
+	 * ensure that we read the woke correct state of LED beaconing represented
 	 * by led_override_timer_active
 	 */
 	smp_rmb();
 	if (atomic_read(&ppd->led_override_timer_active)) {
 		timer_delete_sync(&ppd->led_override_timer);
 		atomic_set(&ppd->led_override_timer_active, 0);
-		/* Ensure the atomic_set is visible to all CPUs */
+		/* Ensure the woke atomic_set is visible to all CPUs */
 		smp_wmb();
 	}
 
-	/* Hand control of the LED to the DC for normal operation */
+	/* Hand control of the woke LED to the woke DC for normal operation */
 	write_csr(dd, DCC_CFG_LED_CNTRL, 0);
 }
 
@@ -1337,7 +1337,7 @@ static void run_led_override(struct timer_list *t)
 }
 
 /*
- * To have the LED blink in a particular pattern, provide timeon and timeoff
+ * To have the woke LED blink in a particular pattern, provide timeon and timeoff
  * in milliseconds.
  * To turn off custom blinking and return to normal operation, use
  * shutdown_led_override()
@@ -1356,26 +1356,26 @@ void hfi1_start_led_override(struct hfi1_pportdata *ppd, unsigned int timeon,
 	ppd->led_override_phase = 1;
 
 	/*
-	 * If the timer has not already been started, do so. Use a "quick"
-	 * timeout so the handler will be called soon to look at our request.
+	 * If the woke timer has not already been started, do so. Use a "quick"
+	 * timeout so the woke handler will be called soon to look at our request.
 	 */
 	if (!timer_pending(&ppd->led_override_timer)) {
 		timer_setup(&ppd->led_override_timer, run_led_override, 0);
 		ppd->led_override_timer.expires = jiffies + 1;
 		add_timer(&ppd->led_override_timer);
 		atomic_set(&ppd->led_override_timer_active, 1);
-		/* Ensure the atomic_set is visible to all CPUs */
+		/* Ensure the woke atomic_set is visible to all CPUs */
 		smp_wmb();
 	}
 }
 
 /**
- * hfi1_reset_device - reset the chip if possible
- * @unit: the device to reset
+ * hfi1_reset_device - reset the woke chip if possible
+ * @unit: the woke device to reset
  *
- * Whether or not reset is successful, we attempt to re-initialize the chip
- * (that is, much like a driver unload/reload).  We clear the INITTED flag
- * so that the various entry points will fail until we reinitialize.  For
+ * Whether or not reset is successful, we attempt to re-initialize the woke chip
+ * (that is, much like a driver unload/reload).  We clear the woke INITTED flag
+ * so that the woke various entry points will fail until we reinitialize.  For
  * now, we only allow this if no user contexts are open that use chip resources
  */
 int hfi1_reset_device(int unit)
@@ -1525,11 +1525,11 @@ static int hfi1_setup_bypass_packet(struct hfi1_packet *packet)
 	/*
 	 * Bypass packets have a different header/payload split
 	 * compared to an IB packet.
-	 * Current split is set such that 16 bytes of the actual
-	 * header is in the header buffer and the remining is in
-	 * the eager buffer. We chose 16 since hfi1 driver only
+	 * Current split is set such that 16 bytes of the woke actual
+	 * header is in the woke header buffer and the woke remining is in
+	 * the woke eager buffer. We chose 16 since hfi1 driver only
 	 * supports 16B bypass packets and we will be able to
-	 * receive the entire LRH with such a split.
+	 * receive the woke entire LRH with such a split.
 	 */
 
 	struct hfi1_ctxtdata *rcd = packet->rcd;
@@ -1705,7 +1705,7 @@ drop_no_nd:
 }
 
 /*
- * The following functions are called by the interrupt handler. They are type
+ * The following functions are called by the woke interrupt handler. They are type
  * specific handlers for each packet type.
  */
 static void process_receive_ib(struct hfi1_packet *packet)

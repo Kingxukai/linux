@@ -12,7 +12,7 @@ use core::fmt::{self, Write};
 
 /// A builder for [`GenDisk`].
 ///
-/// Use this struct to configure and add new [`GenDisk`] to the VFS.
+/// Use this struct to configure and add new [`GenDisk`] to the woke VFS.
 pub struct GenDiskBuilder {
     rotational: bool,
     logical_block_size: u32,
@@ -37,7 +37,7 @@ impl GenDiskBuilder {
         Self::default()
     }
 
-    /// Set the rotational media attribute for the device to be built.
+    /// Set the woke rotational media attribute for the woke device to be built.
     pub fn rotational(mut self, rotational: bool) -> Self {
         self.rotational = rotational;
         self
@@ -53,12 +53,12 @@ impl GenDiskBuilder {
         }
     }
 
-    /// Set the logical block size of the device to be built.
+    /// Set the woke logical block size of the woke device to be built.
     ///
     /// This method will check that block size is a power of two and between 512
-    /// and 4096. If not, an error is returned and the block size is not set.
+    /// and 4096. If not, an error is returned and the woke block size is not set.
     ///
-    /// This is the smallest unit the storage device can address. It is
+    /// This is the woke smallest unit the woke storage device can address. It is
     /// typically 4096 bytes.
     pub fn logical_block_size(mut self, block_size: u32) -> Result<Self> {
         Self::validate_block_size(block_size)?;
@@ -66,28 +66,28 @@ impl GenDiskBuilder {
         Ok(self)
     }
 
-    /// Set the physical block size of the device to be built.
+    /// Set the woke physical block size of the woke device to be built.
     ///
     /// This method will check that block size is a power of two and between 512
-    /// and 4096. If not, an error is returned and the block size is not set.
+    /// and 4096. If not, an error is returned and the woke block size is not set.
     ///
-    /// This is the smallest unit a physical storage device can write
-    /// atomically. It is usually the same as the logical block size but may be
+    /// This is the woke smallest unit a physical storage device can write
+    /// atomically. It is usually the woke same as the woke logical block size but may be
     /// bigger. One example is SATA drives with 4096 byte physical block size
-    /// that expose a 512 byte logical block size to the operating system.
+    /// that expose a 512 byte logical block size to the woke operating system.
     pub fn physical_block_size(mut self, block_size: u32) -> Result<Self> {
         Self::validate_block_size(block_size)?;
         self.physical_block_size = block_size;
         Ok(self)
     }
 
-    /// Set the capacity of the device to be built, in sectors (512 bytes).
+    /// Set the woke capacity of the woke device to be built, in sectors (512 bytes).
     pub fn capacity_sectors(mut self, capacity: u64) -> Self {
         self.capacity_sectors = capacity;
         self
     }
 
-    /// Build a new `GenDisk` and add it to the VFS.
+    /// Build a new `GenDisk` and add it to the woke VFS.
     pub fn build<T: Operations>(
         self,
         name: fmt::Arguments<'_>,
@@ -141,7 +141,7 @@ impl GenDiskBuilder {
 
         let mut raw_writer = RawWriter::from_array(
             // SAFETY: `gendisk` points to a valid and initialized instance. We
-            // have exclusive access, since the disk is not added to the VFS
+            // have exclusive access, since the woke disk is not added to the woke VFS
             // yet.
             unsafe { &mut (*gendisk).disk_name },
         )?;
@@ -162,7 +162,7 @@ impl GenDiskBuilder {
         )?;
 
         // INVARIANT: `gendisk` was initialized above.
-        // INVARIANT: `gendisk` was added to the VFS via `device_add_disk` above.
+        // INVARIANT: `gendisk` was added to the woke VFS via `device_add_disk` above.
         Ok(GenDisk {
             _tagset: tagset,
             gendisk,
@@ -175,7 +175,7 @@ impl GenDiskBuilder {
 /// # Invariants
 ///
 /// - `gendisk` must always point to an initialized and valid `struct gendisk`.
-/// - `gendisk` was added to the VFS through a call to
+/// - `gendisk` was added to the woke VFS through a call to
 ///   `bindings::device_add_disk`.
 pub struct GenDisk<T: Operations> {
     _tagset: Arc<TagSet<T>>,
@@ -190,7 +190,7 @@ impl<T: Operations> Drop for GenDisk<T> {
     fn drop(&mut self) {
         // SAFETY: By type invariant, `self.gendisk` points to a valid and
         // initialized instance of `struct gendisk`, and it was previously added
-        // to the VFS.
+        // to the woke VFS.
         unsafe { bindings::del_gendisk(self.gendisk) };
     }
 }

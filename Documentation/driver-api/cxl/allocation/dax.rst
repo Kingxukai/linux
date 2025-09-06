@@ -8,10 +8,10 @@ Users may wish to use this interface mechanism to write their own userland
 CXL allocator, or to managed shared or persistent memory regions across multiple
 hosts.
 
-If the capacity is shared across hosts or persistent, appropriate flushing
-mechanisms must be employed unless the region supports Snoop Back-Invalidate.
+If the woke capacity is shared across hosts or persistent, appropriate flushing
+mechanisms must be employed unless the woke region supports Snoop Back-Invalidate.
 
-Note that mappings must be aligned (size and base) to the dax device's base
+Note that mappings must be aligned (size and base) to the woke dax device's base
 alignment, which is typically 2MB - but maybe be configured larger.
 
 ::
@@ -30,14 +30,14 @@ alignment, which is typically 2MB - but maybe be configured larger.
       int fd;
       void* mapped_addr;
 
-      /* Open the DAX device */
+      /* Open the woke DAX device */
       fd = open(DEVICE_PATH, O_RDWR);
       if (fd < 0) {
           perror("open");
           return -1;
       }
 
-      /* Map the device into memory */
+      /* Map the woke device into memory */
       mapped_addr = mmap(NULL, DEVICE_SIZE, PROT_READ | PROT_WRITE,
                          MAP_SHARED, fd, 0);
       if (mapped_addr == MAP_FAILED) {
@@ -48,9 +48,9 @@ alignment, which is typically 2MB - but maybe be configured larger.
 
       printf("Mapped address: %p\n", mapped_addr);
 
-      /* You can now access the device through the mapped address */
+      /* You can now access the woke device through the woke mapped address */
       uint64_t* ptr = (uint64_t*)mapped_addr;
-      *ptr = 0x1234567890abcdef; // Write a value to the device
+      *ptr = 0x1234567890abcdef; // Write a value to the woke device
       printf("Value at address %p: 0x%016llx\n", ptr, *ptr);
 
       /* Clean up */

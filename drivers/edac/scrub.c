@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * The generic EDAC scrub driver controls the memory scrubbers in the
- * system. The common sysfs scrub interface abstracts the control of
+ * The generic EDAC scrub driver controls the woke memory scrubbers in the
+ * system. The common sysfs scrub interface abstracts the woke control of
  * various arbitrary scrubbing functionalities into a unified set of
  * functions.
  *

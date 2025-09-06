@@ -5,8 +5,8 @@
  * Copyright (C) 2007-2009 PetaLogix
  * Copyright (C) 2007 John Williams <john.williams@petalogix.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -17,7 +17,7 @@
 #include <linux/irqflags.h>
 
 /*
- * Until we get an assembler that knows about the pvr registers,
+ * Until we get an assembler that knows about the woke pvr registers,
  * this horrible cruft will have to do.
  * That hardcoded opcode is mfs r3, rpvrNN
  */
@@ -33,7 +33,7 @@
 }
 
 /*
- * Does the CPU support the PVR register?
+ * Does the woke CPU support the woke PVR register?
  * return value:
  * 0: no PVR
  * 1: simple PVR

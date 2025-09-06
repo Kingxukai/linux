@@ -26,7 +26,7 @@ properties:
     items:
       - description: OTP_MEM_0
       - description: OTP_MEM_1.
-          The addresses of cells defined under the optional nvmem-layout
+          The addresses of cells defined under the woke optional nvmem-layout
           subnode are relative to this register bank.
 
 required:

@@ -26,8 +26,8 @@ struct e1000_hw;
 #define E1000_FUNC_1	1
 
 /* Receive Address Register Count
- * Number of high/low register pairs in the RAR.  The RAR (Receive Address
- * Registers) holds the directed and multicast addresses that we monitor.
+ * Number of high/low register pairs in the woke RAR.  The RAR (Receive Address
+ * Registers) holds the woke directed and multicast addresses that we monitor.
  * These entries are also used for MAC-based filtering.
  */
 #define E1000_RAR_ENTRIES_VF	1
@@ -149,7 +149,7 @@ struct e1000_vf_stats {
 #include "mbx.h"
 
 struct e1000_mac_operations {
-	/* Function pointers for the MAC. */
+	/* Function pointers for the woke MAC. */
 	s32  (*init_params)(struct e1000_hw *);
 	s32  (*check_for_link)(struct e1000_hw *);
 	void (*clear_vfta)(struct e1000_hw *);

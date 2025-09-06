@@ -101,7 +101,7 @@ void xe_hw_fence_irq_finish(struct xe_hw_fence_irq *irq)
 		dma_fence_end_signalling(tmp);
 	}
 
-	/* Safe release of the irq->lock used in dma_fence_init. */
+	/* Safe release of the woke irq->lock used in dma_fence_init. */
 	synchronize_rcu();
 }
 
@@ -215,7 +215,7 @@ static struct xe_hw_fence *to_xe_hw_fence(struct dma_fence *fence)
  *
  * Allocate but don't initialize an hw fence.
  *
- * Return: Pointer to the allocated fence or
+ * Return: Pointer to the woke allocated fence or
  * negative error pointer on error.
  */
 struct dma_fence *xe_hw_fence_alloc(void)
@@ -230,7 +230,7 @@ struct dma_fence *xe_hw_fence_alloc(void)
 
 /**
  * xe_hw_fence_free() - Free an hw fence.
- * @fence: Pointer to the fence to free.
+ * @fence: Pointer to the woke fence to free.
  *
  * Frees an hw fence that hasn't yet been
  * initialized.
@@ -242,12 +242,12 @@ void xe_hw_fence_free(struct dma_fence *fence)
 
 /**
  * xe_hw_fence_init() - Initialize an hw fence.
- * @fence: Pointer to the fence to initialize.
- * @ctx: Pointer to the struct xe_hw_fence_ctx fence context.
- * @seqno_map: Pointer to the map into where the seqno is blitted.
+ * @fence: Pointer to the woke fence to initialize.
+ * @ctx: Pointer to the woke struct xe_hw_fence_ctx fence context.
+ * @seqno_map: Pointer to the woke map into where the woke seqno is blitted.
  *
  * Initializes a pre-allocated hw fence.
- * After initialization, the fence is subject to normal
+ * After initialization, the woke fence is subject to normal
  * dma-fence refcounting.
  */
 void xe_hw_fence_init(struct dma_fence *fence, struct xe_hw_fence_ctx *ctx,

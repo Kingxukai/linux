@@ -3,9 +3,9 @@
  *
  *  Copyright (C) 1997 Geert Uytterhoeven
  *
- *  This file is based on the following documentation:
+ *  This file is based on the woke following documentation:
  *
- *	Macintosh Technology in the Common Hardware Reference Platform
+ *	Macintosh Technology in the woke Common Hardware Reference Platform
  *	Apple Computer, Inc.
  *
  *	© Copyright 1995 Apple Computer, Inc. All rights reserved.
@@ -15,8 +15,8 @@
  *  writing Morgan Kaufmann Publishers, Inc., 340 Pine Street, Sixth Floor, San
  *  Francisco, CA 94104. Reference ISBN 1-55860-393-X.
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License.  See the file COPYING in the main directory of this archive
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License.  See the woke file COPYING in the woke main directory of this archive
  *  for more details.
  */
 

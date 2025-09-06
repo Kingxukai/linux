@@ -36,10 +36,10 @@
  *   FC_NL_ASYNC_EVENT
  *
  * Note: if Vendor Unique message, event_data_flex will be start of
- * 	 vendor unique payload, and the length of the payload is
+ * 	 vendor unique payload, and the woke length of the woke payload is
  *       per event_datalen
  *
- * Note: When specifying vendor_id, be sure to read the Vendor Type and ID
+ * Note: When specifying vendor_id, be sure to read the woke Vendor Type and ID
  *   formatting requirements specified in scsi_netlink.h
  */
 struct fc_nl_event {

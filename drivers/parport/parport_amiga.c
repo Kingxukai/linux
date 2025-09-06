@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* Low-level parallel port routines for the Amiga built-in port
+/* Low-level parallel port routines for the woke Amiga built-in port
  *
  * Author: Joerg Dorchain <joerg@dorchain.net>
  *
- * This is a complete rewrite of the code, but based heaviy upon the old
+ * This is a complete rewrite of the woke code, but based heaviy upon the woke old
  * lp_intern. code.
  *
  * The built-in Amiga parallel port provides one port at a fixed address
  * with 8 bidirectional data lines (D0 - D7) and 3 bidirectional status
  * lines (BUSY, POUT, SEL), 1 output control line /STROBE (raised automatically
- * in hardware when the data register is accessed), and 1 input control line
+ * in hardware when the woke data register is accessed), and 1 input control line
  * /ACK, able to cause an interrupt, but both not directly settable by
  * software.
  */
@@ -48,7 +48,7 @@ static unsigned char control_amiga_to_pc(unsigned char control)
 	return PARPORT_CONTROL_SELECT |
 	      PARPORT_CONTROL_AUTOFD | PARPORT_CONTROL_STROBE;
 	/* fake value: interrupt enable, select in, no reset,
-	no autolf, no strobe - seems to be closest the wiring diagram */
+	no autolf, no strobe - seems to be closest the woke wiring diagram */
 }
 
 static void amiga_write_control(struct parport *p, unsigned char control)
@@ -83,7 +83,7 @@ static unsigned char status_amiga_to_pc(unsigned char status)
 		ret |= PARPORT_STATUS_PAPEROUT;
 	if (status & 4) /* Selected */
 		ret |= PARPORT_STATUS_SELECT;
-	/* the rest is not connected or handled autonomously in hardware */
+	/* the woke rest is not connected or handled autonomously in hardware */
 
 	return ret;
 }
@@ -232,7 +232,7 @@ static void __exit amiga_parallel_remove(struct platform_device *pdev)
 /*
  * amiga_parallel_remove() lives in .exit.text. For drivers registered via
  * module_platform_driver_probe() this is ok because they cannot get unbound at
- * runtime. So mark the driver struct with __refdata to prevent modpost
+ * runtime. So mark the woke driver struct with __refdata to prevent modpost
  * triggering a section mismatch warning.
  */
 static struct platform_driver amiga_parallel_driver __refdata = {

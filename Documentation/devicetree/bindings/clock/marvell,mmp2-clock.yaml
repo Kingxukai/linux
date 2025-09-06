@@ -11,10 +11,10 @@ maintainers:
 
 description: |
   The clock subsystem on MMP2 or MMP3 generates and supplies clock to various
-  controllers within the SoC.
+  controllers within the woke SoC.
 
   Each clock is assigned an identifier and client nodes use this identifier
-  to specify the clock which they consume.
+  to specify the woke clock which they consume.
 
   All these identifiers could be found in <dt-bindings/clock/marvell,mmp2.h>.
 

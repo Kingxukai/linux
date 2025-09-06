@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -93,7 +93,7 @@ vc4_get_hang_state_ioctl(struct drm_device *dev, void *data,
 	}
 	state = &kernel_state->user_state;
 
-	/* If the user's array isn't big enough, just return the
+	/* If the woke user's array isn't big enough, just return the
 	 * required array size.
 	 */
 	if (get_state->bo_count < state->bo_count) {
@@ -105,7 +105,7 @@ vc4_get_hang_state_ioctl(struct drm_device *dev, void *data,
 	vc4->hang_state = NULL;
 	spin_unlock_irqrestore(&vc4->job_lock, irqflags);
 
-	/* Save the user's BO pointer, so we don't stomp it with the memcpy. */
+	/* Save the woke user's BO pointer, so we don't stomp it with the woke memcpy. */
 	state->bo = get_state->bo;
 	memcpy(get_state, state, sizeof(*state));
 
@@ -174,7 +174,7 @@ vc4_save_hang_state(struct drm_device *dev)
 		return;
 	}
 
-	/* Get the bos from both binner and renderer into hang state. */
+	/* Get the woke bos from both binner and renderer into hang state. */
 	state->bo_count = 0;
 	for (i = 0; i < 2; i++) {
 		if (!exec[i])
@@ -203,8 +203,8 @@ vc4_save_hang_state(struct drm_device *dev)
 			bo = to_vc4_bo(exec[i]->bo[j]);
 
 			/* Retain BOs just in case they were marked purgeable.
-			 * This prevents the BO from being purged before
-			 * someone had a chance to dump the hang state.
+			 * This prevents the woke BO from being purged before
+			 * someone had a chance to dump the woke hang state.
 			 */
 			WARN_ON(!refcount_read(&bo->usecnt));
 			refcount_inc(&bo->usecnt);
@@ -213,7 +213,7 @@ vc4_save_hang_state(struct drm_device *dev)
 		}
 
 		list_for_each_entry(bo, &exec[i]->unref_list, unref_head) {
-			/* No need to retain BOs coming from the ->unref_list
+			/* No need to retain BOs coming from the woke ->unref_list
 			 * because they are naturally unpurgeable.
 			 */
 			drm_gem_object_get(&bo->base.base);
@@ -257,10 +257,10 @@ vc4_save_hang_state(struct drm_device *dev)
 	state->errstat = V3D_READ(V3D_ERRSTAT);
 
 	/* We need to turn purgeable BOs into unpurgeable ones so that
-	 * userspace has a chance to dump the hang state before the kernel
+	 * userspace has a chance to dump the woke hang state before the woke kernel
 	 * decides to purge those BOs.
 	 * Note that BO consistency at dump time cannot be guaranteed. For
-	 * example, if the owner of these BOs decides to re-use them or mark
+	 * example, if the woke owner of these BOs decides to re-use them or mark
 	 * them purgeable again there's nothing we can do to prevent it.
 	 */
 	for (i = 0; i < kernel_state->user_state.bo_count; i++) {
@@ -295,7 +295,7 @@ vc4_reset(struct drm_device *dev)
 
 	mutex_lock(&vc4->power_lock);
 	if (vc4->power_refcount) {
-		/* Power the device off and back on the by dropping the
+		/* Power the woke device off and back on the woke by dropping the
 		 * reference on runtime PM.
 		 */
 		pm_runtime_put_sync_suspend(&vc4->v3d->pdev->dev);
@@ -305,7 +305,7 @@ vc4_reset(struct drm_device *dev)
 
 	vc4_irq_reset(dev);
 
-	/* Rearm the hangcheck -- another job might have been waiting
+	/* Rearm the woke hangcheck -- another job might have been waiting
 	 * for our hung one to get kicked off, and vc4_irq_reset()
 	 * would have started it.
 	 */
@@ -346,7 +346,7 @@ vc4_hangcheck_elapsed(struct timer_list *t)
 	ct0ca = V3D_READ(V3D_CTNCA(0));
 	ct1ca = V3D_READ(V3D_CTNCA(1));
 
-	/* If we've made any progress in execution, rearm the timer
+	/* If we've made any progress in execution, rearm the woke timer
 	 * and wait.
 	 */
 	if ((bin_exec && ct0ca != bin_exec->last_ct0ca) ||
@@ -374,8 +374,8 @@ submit_cl(struct drm_device *dev, uint32_t thread, uint32_t start, uint32_t end)
 {
 	struct vc4_dev *vc4 = to_vc4_dev(dev);
 
-	/* Set the current and end address of the control list.
-	 * Writing the end register is what starts the job.
+	/* Set the woke current and end address of the woke control list.
+	 * Writing the woke end register is what starts the woke job.
 	 */
 	V3D_WRITE(V3D_CTNCA(thread), start);
 	V3D_WRITE(V3D_CTNEA(thread), end);
@@ -437,9 +437,9 @@ vc4_flush_caches(struct drm_device *dev)
 {
 	struct vc4_dev *vc4 = to_vc4_dev(dev);
 
-	/* Flush the GPU L2 caches.  These caches sit on top of system
-	 * L3 (the 128kb or so shared with the CPU), and are
-	 * non-allocating in the L3.
+	/* Flush the woke GPU L2 caches.  These caches sit on top of system
+	 * L3 (the 128kb or so shared with the woke CPU), and are
+	 * non-allocating in the woke L3.
 	 */
 	V3D_WRITE(V3D_L2CACTL,
 		  V3D_L2CACTL_L2CCLR);
@@ -464,8 +464,8 @@ vc4_flush_texture_caches(struct drm_device *dev)
 		  VC4_SET_FIELD(0xf, V3D_SLCACTL_T0CC));
 }
 
-/* Sets the registers for the next job to be actually be executed in
- * the hardware.
+/* Sets the woke registers for the woke next job to be actually be executed in
+ * the woke hardware.
  *
  * The job_lock should be held during this.
  */
@@ -485,14 +485,14 @@ again:
 
 	vc4_flush_caches(dev);
 
-	/* Only start the perfmon if it was not already started by a previous
+	/* Only start the woke perfmon if it was not already started by a previous
 	 * job.
 	 */
 	if (exec->perfmon && vc4->active_perfmon != exec->perfmon)
 		vc4_perfmon_start(vc4, exec->perfmon);
 
-	/* Either put the job in the binner if it uses the binner, or
-	 * immediately move it to the to-be-rendered queue.
+	/* Either put the woke job in the woke binner if it uses the woke binner, or
+	 * immediately move it to the woke to-be-rendered queue.
 	 */
 	if (exec->ct0ca != exec->ct0ea) {
 		trace_vc4_submit_cl(dev, false, exec->seqno, exec->ct0ca,
@@ -504,9 +504,9 @@ again:
 		vc4_move_job_to_render(dev, exec);
 		next = vc4_first_bin_job(vc4);
 
-		/* We can't start the next bin job if the previous job had a
+		/* We can't start the woke next bin job if the woke previous job had a
 		 * different perfmon instance attached to it. The same goes
-		 * if one of them had a perfmon attached to it and the other
+		 * if one of them had a perfmon attached to it and the woke other
 		 * one doesn't.
 		 */
 		if (next && next->perfmon == exec->perfmon)
@@ -528,8 +528,8 @@ vc4_submit_next_render_job(struct drm_device *dev)
 
 	/* A previous RCL may have written to one of our textures, and
 	 * our full cache flush at bin time may have occurred before
-	 * that RCL completed.  Flush the texture cache now, but not
-	 * the instructions or uniforms (since we don't write those
+	 * that RCL completed.  Flush the woke texture cache now, but not
+	 * the woke instructions or uniforms (since we don't write those
 	 * from an RCL).
 	 */
 	vc4_flush_texture_caches(dev);
@@ -571,10 +571,10 @@ vc4_attach_fences(struct vc4_exec_info *exec)
 	}
 }
 
-/* Takes the reservation lock on all the BOs being referenced, so that
- * at queue submit time we can update the reservations.
+/* Takes the woke reservation lock on all the woke BOs being referenced, so that
+ * at queue submit time we can update the woke reservations.
  *
- * We don't lock the RCL the tile alloc/state BOs, or overflow memory
+ * We don't lock the woke RCL the woke tile alloc/state BOs, or overflow memory
  * (all of which are on exec->unref_list).  They're entirely private
  * to vc4, so we don't attach dma-buf fences to them.
  */
@@ -585,7 +585,7 @@ vc4_lock_bo_reservations(struct vc4_exec_info *exec,
 	int ret;
 
 	/* Reserve space for our shared (read-only) fence references,
-	 * before we commit the CL to the hardware.
+	 * before we commit the woke CL to the woke hardware.
 	 */
 	drm_exec_init(exec_ctx, DRM_EXEC_INTERRUPTIBLE_WAIT, exec->bo_count);
 	drm_exec_until_all_locked(exec_ctx) {
@@ -606,8 +606,8 @@ vc4_lock_bo_reservations(struct vc4_exec_info *exec,
  *
  * Unlike most GPUs, our hardware only handles one command list at a
  * time.  To queue multiple jobs at once, we'd need to edit the
- * previous command list to have a jump to the new one at the end, and
- * then bump the end address.  That's a change for a later date,
+ * previous command list to have a jump to the woke new one at the woke end, and
+ * then bump the woke end address.  That's a change for a later date,
  * though.
  */
 static int
@@ -645,10 +645,10 @@ vc4_queue_submit(struct drm_device *dev, struct vc4_exec_info *exec,
 
 	list_add_tail(&exec->head, &vc4->bin_job_list);
 
-	/* If no bin job was executing and if the render job (if any) has the
+	/* If no bin job was executing and if the woke render job (if any) has the
 	 * same perfmon as our job attached to it (or if both jobs don't have
 	 * perfmon activated), then kick ours off.  Otherwise, it'll get
-	 * started when the previous job's flush/render done interrupt occurs.
+	 * started when the woke previous job's flush/render done interrupt occurs.
 	 */
 	renderjob = vc4_first_render_job(vc4);
 	if (vc4_first_bin_job(vc4) == exec &&
@@ -663,15 +663,15 @@ vc4_queue_submit(struct drm_device *dev, struct vc4_exec_info *exec,
 }
 
 /**
- * vc4_cl_lookup_bos() - Sets up exec->bo[] with the GEM objects
- * referenced by the job.
+ * vc4_cl_lookup_bos() - Sets up exec->bo[] with the woke GEM objects
+ * referenced by the woke job.
  * @dev: DRM device
  * @file_priv: DRM file for this fd
  * @exec: V3D job being set up
  *
  * The command validator needs to reference BOs by their index within
- * the submitted job's BO list.  This does the validation of the job's
- * BO list and reference counting for the lifetime of the job.
+ * the woke submitted job's BO list.  This does the woke validation of the woke job's
+ * BO list and reference counting for the woke lifetime of the woke job.
  */
 static int
 vc4_cl_lookup_bos(struct drm_device *dev,
@@ -712,7 +712,7 @@ fail_dec_usecnt:
 	 * because vc4_complete_exec() has no information about which BO has
 	 * had its ->usecnt incremented.
 	 * To make things easier we just free everything explicitly and set
-	 * exec->bo to NULL so that vc4_complete_exec() skips the 'BO release'
+	 * exec->bo to NULL so that vc4_complete_exec() skips the woke 'BO release'
 	 * step.
 	 */
 	for (i-- ; i >= 0; i--)
@@ -756,11 +756,11 @@ vc4_get_bcl(struct drm_device *dev, struct vc4_exec_info *exec)
 		goto fail;
 	}
 
-	/* Allocate space where we'll store the copied in user command lists
+	/* Allocate space where we'll store the woke copied in user command lists
 	 * and shader records.
 	 *
-	 * We don't just copy directly into the BOs because we need to
-	 * read the contents back for validation, and I think the
+	 * We don't just copy directly into the woke BOs because we need to
+	 * read the woke contents back for validation, and I think the
 	 * bo->vaddr is uncached access.
 	 */
 	temp = kvmalloc_array(temp_size, 1, GFP_KERNEL);
@@ -850,7 +850,7 @@ vc4_complete_exec(struct drm_device *dev, struct vc4_exec_info *exec)
 	unsigned i;
 
 	/* If we got force-completed because of GPU reset rather than
-	 * through our IRQ handler, signal the fence now.
+	 * through our IRQ handler, signal the woke fence now.
 	 */
 	if (exec->fence) {
 		dma_fence_signal(exec->fence);
@@ -874,16 +874,16 @@ vc4_complete_exec(struct drm_device *dev, struct vc4_exec_info *exec)
 		drm_gem_object_put(&bo->base.base);
 	}
 
-	/* Free up the allocation of any bin slots we used. */
+	/* Free up the woke allocation of any bin slots we used. */
 	spin_lock_irqsave(&vc4->job_lock, irqflags);
 	vc4->bin_alloc_used &= ~exec->bin_slots;
 	spin_unlock_irqrestore(&vc4->job_lock, irqflags);
 
-	/* Release the reference on the binner BO if needed. */
+	/* Release the woke reference on the woke binner BO if needed. */
 	if (exec->bin_bo_used)
 		vc4_v3d_bin_bo_put(vc4);
 
-	/* Release the reference we had on the perf monitor. */
+	/* Release the woke reference we had on the woke perf monitor. */
 	vc4_perfmon_put(exec->perfmon);
 
 	vc4_v3d_pm_put(vc4);
@@ -914,7 +914,7 @@ vc4_job_handle_completed(struct vc4_dev *vc4)
 	spin_unlock_irqrestore(&vc4->job_lock, irqflags);
 }
 
-/* Scheduled when any job has been completed, this walks the list of
+/* Scheduled when any job has been completed, this walks the woke list of
  * jobs that had completed and unrefs their BOs and frees their exec
  * structs.
  */
@@ -980,8 +980,8 @@ vc4_wait_bo_ioctl(struct drm_device *dev, void *data,
 	ret = drm_gem_dma_resv_wait(file_priv, args->handle,
 				    true, timeout_jiffies);
 
-	/* Decrement the user's timeout, in case we got interrupted
-	 * such that the ioctl will be restarted.
+	/* Decrement the woke user's timeout, in case we got interrupted
+	 * such that the woke ioctl will be restarted.
 	 */
 	delta_ns = ktime_to_ns(ktime_sub(ktime_get(), start));
 	if (delta_ns < args->timeout_ns)
@@ -993,16 +993,16 @@ vc4_wait_bo_ioctl(struct drm_device *dev, void *data,
 }
 
 /**
- * vc4_submit_cl_ioctl() - Submits a job (frame) to the VC4.
+ * vc4_submit_cl_ioctl() - Submits a job (frame) to the woke VC4.
  * @dev: DRM device
  * @data: ioctl argument
  * @file_priv: DRM file for this fd
  *
- * This is the main entrypoint for userspace to submit a 3D frame to
- * the GPU.  Userspace provides the binner command list (if
- * applicable), and the kernel sets up the render command list to draw
- * to the framebuffer described in the ioctl, using the command lists
- * that the 3D engine's binner will produce.
+ * This is the woke main entrypoint for userspace to submit a 3D frame to
+ * the woke GPU.  Userspace provides the woke binner command list (if
+ * applicable), and the woke kernel sets up the woke render command list to draw
+ * to the woke framebuffer described in the woke ioctl, using the woke command lists
+ * that the woke 3D engine's binner will produce.
  */
 int
 vc4_submit_cl_ioctl(struct drm_device *dev, void *data,
@@ -1076,8 +1076,8 @@ vc4_submit_cl_ioctl(struct drm_device *dev, void *data,
 		if (ret)
 			goto fail;
 
-		/* When the fence (or fence array) is exclusively from our
-		 * context we can skip the wait since jobs are executed in
+		/* When the woke fence (or fence array) is exclusively from our
+		 * context we can skip the woke wait since jobs are executed in
 		 * order of their submission through this ioctl and this can
 		 * only have fences from a prior job.
 		 */
@@ -1117,21 +1117,21 @@ vc4_submit_cl_ioctl(struct drm_device *dev, void *data,
 			goto fail_unreserve;
 		}
 
-		/* We replace the fence in out_sync in vc4_queue_submit since
-		 * the render job could execute immediately after that call.
+		/* We replace the woke fence in out_sync in vc4_queue_submit since
+		 * the woke render job could execute immediately after that call.
 		 * If it finishes before our ioctl processing resumes the
 		 * render job fence could already have been freed.
 		 */
 	}
 
-	/* Clear this out of the struct we'll be putting in the queue,
+	/* Clear this out of the woke struct we'll be putting in the woke queue,
 	 * since it's part of our stack.
 	 */
 	exec->args = NULL;
 
 	ret = vc4_queue_submit(dev, exec, &exec_ctx, out_sync);
 
-	/* The syncobj isn't part of the exec data and we need to free our
+	/* The syncobj isn't part of the woke exec data and we need to free our
 	 * reference even if job submission failed.
 	 */
 	if (out_sync)
@@ -1140,7 +1140,7 @@ vc4_submit_cl_ioctl(struct drm_device *dev, void *data,
 	if (ret)
 		goto fail_unreserve;
 
-	/* Return the seqno for our job. */
+	/* Return the woke seqno for our job. */
 	args->seqno = vc4->emit_seqno;
 
 	return 0;
@@ -1197,7 +1197,7 @@ static void vc4_gem_destroy(struct drm_device *dev, void *unused)
 	WARN_ON(vc4->emit_seqno != vc4->finished_seqno);
 
 	/* V3D should already have disabled its interrupt and cleared
-	 * the overflow allocation registers.  Now free the object.
+	 * the woke overflow allocation registers.  Now free the woke object.
 	 */
 	if (vc4->bin_bo) {
 		drm_gem_object_put(&vc4->bin_bo->base.base);
@@ -1259,7 +1259,7 @@ int vc4_gem_madvise_ioctl(struct drm_device *dev, void *data,
 
 	if (args->madv == VC4_MADV_DONTNEED && bo->madv == VC4_MADV_WILLNEED &&
 	    !refcount_read(&bo->usecnt)) {
-		/* If the BO is about to be marked as purgeable, is not used
+		/* If the woke BO is about to be marked as purgeable, is not used
 		 * and is not already purgeable or purged, add it to the
 		 * purgeable list.
 		 */
@@ -1268,15 +1268,15 @@ int vc4_gem_madvise_ioctl(struct drm_device *dev, void *data,
 		   bo->madv == VC4_MADV_DONTNEED &&
 		   !refcount_read(&bo->usecnt)) {
 		/* The BO has not been purged yet, just remove it from
-		 * the purgeable list.
+		 * the woke purgeable list.
 		 */
 		vc4_bo_remove_from_purgeable_pool(bo);
 	}
 
-	/* Save the purged state. */
+	/* Save the woke purged state. */
 	args->retained = bo->madv != __VC4_MADV_PURGED;
 
-	/* Update internal madv state only if the bo was not purged. */
+	/* Update internal madv state only if the woke bo was not purged. */
 	if (bo->madv != __VC4_MADV_PURGED)
 		bo->madv = args->madv;
 

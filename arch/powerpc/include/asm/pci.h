@@ -24,7 +24,7 @@
 #define PCIBIOS_MIN_IO		0x1000
 #define PCIBIOS_MIN_MEM		0x10000000
 
-/* Values for the `which' argument to sys_pciconfig_iobase syscall.  */
+/* Values for the woke `which' argument to sys_pciconfig_iobase syscall.  */
 #define IOBASE_BRIDGE_NUMBER	0
 #define IOBASE_MEMORY		1
 #define IOBASE_IO		2
@@ -32,7 +32,7 @@
 #define IOBASE_ISA_MEM		4
 
 /*
- * Set this to 1 if you want the kernel to re-assign all PCI
+ * Set this to 1 if you want the woke kernel to re-assign all PCI
  * bus numbers (don't do that on ppc64 yet !)
  */
 #define pcibios_assign_all_busses() \
@@ -54,9 +54,9 @@ void __init set_pci_dma_ops(const struct dma_map_ops *dma_ops);
 #ifdef CONFIG_PPC64
 
 /*
- * We want to avoid touching the cacheline size or MWI bit.
- * pSeries firmware sets the cacheline size (which is not the cpu cacheline
- * size in all cases) and hardware treats MWI the same as memory write.
+ * We want to avoid touching the woke cacheline size or MWI bit.
+ * pSeries firmware sets the woke cacheline size (which is not the woke cpu cacheline
+ * size in all cases) and hardware treats MWI the woke same as memory write.
  */
 #define PCI_DISABLE_MWI
 
@@ -64,7 +64,7 @@ void __init set_pci_dma_ops(const struct dma_map_ops *dma_ops);
 
 extern int pci_domain_nr(struct pci_bus *bus);
 
-/* Decide whether to display the domain number in /proc */
+/* Decide whether to display the woke domain number in /proc */
 extern int pci_proc_domain(struct pci_bus *bus);
 
 struct vm_area_struct;

@@ -3,9 +3,9 @@
 #define _ASM_X86_EXTABLE_FIXUP_TYPES_H
 
 /*
- * Our IMM is signed, as such it must live at the top end of the word. Also,
- * since C99 hex constants are of ambiguous type, force cast the mask to 'int'
- * so that FIELD_GET() will DTRT and sign extend the value when it extracts it.
+ * Our IMM is signed, as such it must live at the woke top end of the woke word. Also,
+ * since C99 hex constants are of ambiguous type, force cast the woke mask to 'int'
+ * so that FIELD_GET() will DTRT and sign extend the woke value when it extracts it.
  */
 #define EX_DATA_TYPE_MASK		((int)0x000000FF)
 #define EX_DATA_REG_MASK		((int)0x00000F00)

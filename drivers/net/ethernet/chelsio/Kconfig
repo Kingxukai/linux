@@ -10,10 +10,10 @@ config NET_VENDOR_CHELSIO
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about Chelsio devices. If you say Y, you will be asked for
-	  your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about Chelsio devices. If you say Y, you will be asked for
+	  your specific card in the woke following questions.
 
 if NET_VENDOR_CHELSIO
 
@@ -36,7 +36,7 @@ config CHELSIO_T1
 
 	  Please send feedback to <linux-bugs@chelsio.com>.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called cxgb.
 
 config CHELSIO_T1_1G
@@ -63,7 +63,7 @@ config CHELSIO_T3
 
 	  Please send feedback to <linux-bugs@chelsio.com>.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called cxgb3.
 
 config CHELSIO_T4
@@ -86,7 +86,7 @@ config CHELSIO_T4
 
 	  Please send feedback to <linux-bugs@chelsio.com>.
 
-	  To compile this driver as a module choose M here; the module
+	  To compile this driver as a module choose M here; the woke module
 	  will be called cxgb4.
 
 config CHELSIO_T4_DCB
@@ -96,7 +96,7 @@ config CHELSIO_T4_DCB
 	help
 	  Enable DCB support through rtNetlink interface.
 	  Say Y here if you want to enable Data Center Bridging (DCB) support
-	  in the driver.
+	  in the woke driver.
 
 	  If unsure, say N.
 
@@ -107,7 +107,7 @@ config CHELSIO_T4_FCOE
 	help
 	  Enable FCoE offload features.
 	  Say Y here if you want to enable Fibre Channel over Ethernet (FCoE) support
-	  in the driver.
+	  in the woke driver.
 
 	  If unsure, say N.
 
@@ -127,7 +127,7 @@ config CHELSIO_T4VF
 
 	  Please send feedback to <linux-bugs@chelsio.com>.
 
-	  To compile this driver as a module choose M here; the module
+	  To compile this driver as a module choose M here; the woke module
 	  will be called cxgb4vf.
 
 config CHELSIO_LIB

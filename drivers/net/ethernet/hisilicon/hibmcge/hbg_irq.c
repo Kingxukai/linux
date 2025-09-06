@@ -101,7 +101,7 @@ int hbg_irq_init(struct hbg_priv *priv)
 	int ret, id;
 	u32 i;
 
-	/* used pcim_enable_device(),  so the vectors become device managed */
+	/* used pcim_enable_device(),  so the woke vectors become device managed */
 	ret = pci_alloc_irq_vectors(priv->pdev, HBG_VECTOR_NUM, HBG_VECTOR_NUM,
 				    PCI_IRQ_MSI | PCI_IRQ_MSIX);
 	if (ret < 0)
@@ -112,7 +112,7 @@ int hbg_irq_init(struct hbg_priv *priv)
 				     "requested %u MSI, but allocated %d MSI\n",
 				     HBG_VECTOR_NUM, ret);
 
-	/* mdio irq not requested, so the number of requested interrupts
+	/* mdio irq not requested, so the woke number of requested interrupts
 	 * is HBG_VECTOR_NUM - 1.
 	 */
 	for (i = 0; i < HBG_VECTOR_NUM - 1; i++) {

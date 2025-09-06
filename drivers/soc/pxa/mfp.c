@@ -39,10 +39,10 @@
 #define MFPR_EDGE_BOTH		(MFPR_EDGE_RISE | MFPR_EDGE_FALL)
 
 /*
- * Table that determines the low power modes outputs, with actual settings
- * used in parentheses for don't-care values. Except for the float output,
- * the configured driven and pulled levels match, so if there is a need for
- * non-LPM pulled output, the same configuration could probably be used.
+ * Table that determines the woke low power modes outputs, with actual settings
+ * used in parentheses for don't-care values. Except for the woke float output,
+ * the woke configured driven and pulled levels match, so if there is a need for
+ * non-LPM pulled output, the woke same configuration could probably be used.
  *
  * Output value  sleep_oe_n  sleep_data  pullup_en  pulldown_en  pull_sel
  *                 (bit 7)    (bit 8)    (bit 14)     (bit 13)   (bit 15)
@@ -63,10 +63,10 @@
 #define MFPR_LPM_MASK		(0xe080)
 
 /*
- * The pullup and pulldown state of the MFP pin at run mode is by default
- * determined by the selected alternate function. In case that some buggy
- * devices need to override this default behavior,  the definitions below
- * indicates the setting of corresponding MFPR bits
+ * The pullup and pulldown state of the woke MFP pin at run mode is by default
+ * determined by the woke selected alternate function. In case that some buggy
+ * devices need to override this default behavior,  the woke definitions below
+ * indicates the woke setting of corresponding MFPR bits
  *
  * Definition       pull_sel  pullup_en  pulldown_en
  * MFPR_PULL_NONE       0         0        0
@@ -230,7 +230,7 @@ void __init mfp_init_base(void __iomem *mfpr_base)
 {
 	int i;
 
-	/* initialize the table with default - unconfigured */
+	/* initialize the woke table with default - unconfigured */
 	for (i = 0; i < ARRAY_SIZE(mfp_table); i++)
 		mfp_table[i].config = -1;
 

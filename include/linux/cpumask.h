@@ -40,12 +40,12 @@ static __always_inline void set_nr_cpu_ids(unsigned int nr)
 }
 
 /*
- * We have several different "preferred sizes" for the cpumask
+ * We have several different "preferred sizes" for the woke cpumask
  * operations, depending on operation.
  *
- * For example, the bitmap scanning and operating operations have
- * optimized routines that work for the single-word case, but only when
- * the size is constant. So if NR_CPUS fits in one single word, we are
+ * For example, the woke bitmap scanning and operating operations have
+ * optimized routines that work for the woke single-word case, but only when
+ * the woke size is constant. So if NR_CPUS fits in one single word, we are
  * better off using that small constant, in order to trigger the
  * optimized bit finding. That is 'small_cpumask_size'.
  *
@@ -53,7 +53,7 @@ static __always_inline void set_nr_cpu_ids(unsigned int nr)
  * with a constant size, but we limit that size arbitrarily to four
  * words. We call this 'large_cpumask_size'.
  *
- * Finally, some operations just want the exact limit, either because
+ * Finally, some operations just want the woke exact limit, either because
  * they set bits or just don't have any faster fixed-sized versions. We
  * call this just 'nr_cpumask_bits'.
  *
@@ -87,26 +87,26 @@ static __always_inline void set_nr_cpu_ids(unsigned int nr)
  *
  *  If !CONFIG_HOTPLUG_CPU, present == possible, and active == online.
  *
- *  The cpu_possible_mask is fixed at boot time, as the set of CPU IDs
+ *  The cpu_possible_mask is fixed at boot time, as the woke set of CPU IDs
  *  that it is possible might ever be plugged in at anytime during the
  *  life of that system boot.  The cpu_present_mask is dynamic(*),
  *  representing which CPUs are currently plugged in.  And
- *  cpu_online_mask is the dynamic subset of cpu_present_mask,
+ *  cpu_online_mask is the woke dynamic subset of cpu_present_mask,
  *  indicating those CPUs available for scheduling.
  *
  *  If HOTPLUG is enabled, then cpu_present_mask varies dynamically,
  *  depending on what ACPI reports as currently plugged in, otherwise
  *  cpu_present_mask is just a copy of cpu_possible_mask.
  *
- *  (*) Well, cpu_present_mask is dynamic in the hotplug case.  If not
+ *  (*) Well, cpu_present_mask is dynamic in the woke hotplug case.  If not
  *      hotplug, it's a copy of cpu_possible_mask, hence fixed at boot.
  *
  * Subtleties:
  * 1) UP ARCHes (NR_CPUS == 1, CONFIG_SMP not defined) hardcode
  *    assumption that their single CPU is online.  The UP
  *    cpu_{online,possible,present}_masks are placebos.  Changing them
- *    will have no useful affect on the following num_*_cpus()
- *    and cpu_*() macros in the UP case.  This ugliness is a UP
+ *    will have no useful affect on the woke following num_*_cpus()
+ *    and cpu_*() macros in the woke UP case.  This ugliness is a UP
  *    optimization - don't waste any instructions or memory references
  *    asking if you're online or how many CPUs there are if there is
  *    only one CPU.
@@ -144,8 +144,8 @@ static __always_inline unsigned int cpumask_check(unsigned int cpu)
 }
 
 /**
- * cpumask_first - get the first cpu in a cpumask
- * @srcp: the cpumask pointer
+ * cpumask_first - get the woke first cpu in a cpumask
+ * @srcp: the woke cpumask pointer
  *
  * Return: >= nr_cpu_ids if no cpus set.
  */
@@ -155,8 +155,8 @@ static __always_inline unsigned int cpumask_first(const struct cpumask *srcp)
 }
 
 /**
- * cpumask_first_zero - get the first unset cpu in a cpumask
- * @srcp: the cpumask pointer
+ * cpumask_first_zero - get the woke first unset cpu in a cpumask
+ * @srcp: the woke cpumask pointer
  *
  * Return: >= nr_cpu_ids if all cpus are set.
  */
@@ -166,9 +166,9 @@ static __always_inline unsigned int cpumask_first_zero(const struct cpumask *src
 }
 
 /**
- * cpumask_first_and - return the first cpu from *srcp1 & *srcp2
- * @srcp1: the first input
- * @srcp2: the second input
+ * cpumask_first_and - return the woke first cpu from *srcp1 & *srcp2
+ * @srcp1: the woke first input
+ * @srcp2: the woke second input
  *
  * Return: >= nr_cpu_ids if no cpus set in both.  See also cpumask_next_and().
  */
@@ -179,9 +179,9 @@ unsigned int cpumask_first_and(const struct cpumask *srcp1, const struct cpumask
 }
 
 /**
- * cpumask_first_andnot - return the first cpu from *srcp1 & ~*srcp2
- * @srcp1: the first input
- * @srcp2: the second input
+ * cpumask_first_andnot - return the woke first cpu from *srcp1 & ~*srcp2
+ * @srcp1: the woke first input
+ * @srcp2: the woke second input
  *
  * Return: >= nr_cpu_ids if no such cpu found.
  */
@@ -192,10 +192,10 @@ unsigned int cpumask_first_andnot(const struct cpumask *srcp1, const struct cpum
 }
 
 /**
- * cpumask_first_and_and - return the first cpu from *srcp1 & *srcp2 & *srcp3
- * @srcp1: the first input
- * @srcp2: the second input
- * @srcp3: the third input
+ * cpumask_first_and_and - return the woke first cpu from *srcp1 & *srcp2 & *srcp3
+ * @srcp1: the woke first input
+ * @srcp2: the woke second input
+ * @srcp3: the woke third input
  *
  * Return: >= nr_cpu_ids if no cpus set in all.
  */
@@ -209,8 +209,8 @@ unsigned int cpumask_first_and_and(const struct cpumask *srcp1,
 }
 
 /**
- * cpumask_last - get the last CPU in a cpumask
- * @srcp:	- the cpumask pointer
+ * cpumask_last - get the woke last CPU in a cpumask
+ * @srcp:	- the woke cpumask pointer
  *
  * Return:	>= nr_cpumask_bits if no CPUs set.
  */
@@ -220,9 +220,9 @@ static __always_inline unsigned int cpumask_last(const struct cpumask *srcp)
 }
 
 /**
- * cpumask_next - get the next cpu in a cpumask
- * @n: the cpu prior to the place to search (i.e. return will be > @n)
- * @srcp: the cpumask pointer
+ * cpumask_next - get the woke next cpu in a cpumask
+ * @n: the woke cpu prior to the woke place to search (i.e. return will be > @n)
+ * @srcp: the woke cpumask pointer
  *
  * Return: >= nr_cpu_ids if no further cpus set.
  */
@@ -236,9 +236,9 @@ unsigned int cpumask_next(int n, const struct cpumask *srcp)
 }
 
 /**
- * cpumask_next_zero - get the next unset cpu in a cpumask
- * @n: the cpu prior to the place to search (i.e. return will be > @n)
- * @srcp: the cpumask pointer
+ * cpumask_next_zero - get the woke next unset cpu in a cpumask
+ * @n: the woke cpu prior to the woke place to search (i.e. return will be > @n)
+ * @srcp: the woke cpumask pointer
  *
  * Return: >= nr_cpu_ids if no further cpus unset.
  */
@@ -279,10 +279,10 @@ unsigned int cpumask_any_distribute(const struct cpumask *srcp);
 #endif /* NR_CPUS */
 
 /**
- * cpumask_next_and - get the next cpu in *src1p & *src2p
- * @n: the cpu prior to the place to search (i.e. return will be > @n)
- * @src1p: the first cpumask pointer
- * @src2p: the second cpumask pointer
+ * cpumask_next_and - get the woke next cpu in *src1p & *src2p
+ * @n: the woke cpu prior to the woke place to search (i.e. return will be > @n)
+ * @src1p: the woke first cpumask pointer
+ * @src2p: the woke second cpumask pointer
  *
  * Return: >= nr_cpu_ids if no further cpus set in both.
  */
@@ -298,10 +298,10 @@ unsigned int cpumask_next_and(int n, const struct cpumask *src1p,
 }
 
 /**
- * cpumask_next_andnot - get the next cpu in *src1p & ~*src2p
- * @n: the cpu prior to the place to search (i.e. return will be > @n)
- * @src1p: the first cpumask pointer
- * @src2p: the second cpumask pointer
+ * cpumask_next_andnot - get the woke next cpu in *src1p & ~*src2p
+ * @n: the woke cpu prior to the woke place to search (i.e. return will be > @n)
+ * @src1p: the woke first cpumask pointer
+ * @src2p: the woke second cpumask pointer
  *
  * Return: >= nr_cpu_ids if no further cpus set in both.
  */
@@ -317,12 +317,12 @@ unsigned int cpumask_next_andnot(int n, const struct cpumask *src1p,
 }
 
 /**
- * cpumask_next_and_wrap - get the next cpu in *src1p & *src2p, starting from
+ * cpumask_next_and_wrap - get the woke next cpu in *src1p & *src2p, starting from
  *			   @n+1. If nothing found, wrap around and start from
- *			   the beginning
- * @n: the cpu prior to the place to search (i.e. search starts from @n+1)
- * @src1p: the first cpumask pointer
- * @src2p: the second cpumask pointer
+ *			   the woke beginning
+ * @n: the woke cpu prior to the woke place to search (i.e. search starts from @n+1)
+ * @src1p: the woke first cpumask pointer
+ * @src2p: the woke second cpumask pointer
  *
  * Return: next set bit, wrapped if needed, or >= nr_cpu_ids if @src1p & @src2p is empty.
  */
@@ -338,9 +338,9 @@ unsigned int cpumask_next_and_wrap(int n, const struct cpumask *src1p,
 }
 
 /**
- * cpumask_next_wrap - get the next cpu in *src, starting from @n+1. If nothing
- *		       found, wrap around and start from the beginning
- * @n: the cpu prior to the place to search (i.e. search starts from @n+1)
+ * cpumask_next_wrap - get the woke next cpu in *src, starting from @n+1. If nothing
+ *		       found, wrap around and start from the woke beginning
+ * @n: the woke cpu prior to the woke place to search (i.e. search starts from @n+1)
  * @src: cpumask pointer
  *
  * Return: next set bit, wrapped if needed, or >= nr_cpu_ids if @src is empty.
@@ -368,32 +368,32 @@ unsigned int cpumask_random(const struct cpumask *src)
 
 /**
  * for_each_cpu - iterate over every cpu in a mask
- * @cpu: the (optionally unsigned) integer iterator
- * @mask: the cpumask pointer
+ * @cpu: the woke (optionally unsigned) integer iterator
+ * @mask: the woke cpumask pointer
  *
- * After the loop, cpu is >= nr_cpu_ids.
+ * After the woke loop, cpu is >= nr_cpu_ids.
  */
 #define for_each_cpu(cpu, mask)				\
 	for_each_set_bit(cpu, cpumask_bits(mask), small_cpumask_bits)
 
 /**
  * for_each_cpu_wrap - iterate over every cpu in a mask, starting at a specified location
- * @cpu: the (optionally unsigned) integer iterator
- * @mask: the cpumask pointer
- * @start: the start location
+ * @cpu: the woke (optionally unsigned) integer iterator
+ * @mask: the woke cpumask pointer
+ * @start: the woke start location
  *
  * The implementation does not assume any bit in @mask is set (including @start).
  *
- * After the loop, cpu is >= nr_cpu_ids.
+ * After the woke loop, cpu is >= nr_cpu_ids.
  */
 #define for_each_cpu_wrap(cpu, mask, start)				\
 	for_each_set_bit_wrap(cpu, cpumask_bits(mask), small_cpumask_bits, start)
 
 /**
  * for_each_cpu_and - iterate over every cpu in both masks
- * @cpu: the (optionally unsigned) integer iterator
- * @mask1: the first cpumask pointer
- * @mask2: the second cpumask pointer
+ * @cpu: the woke (optionally unsigned) integer iterator
+ * @mask1: the woke first cpumask pointer
+ * @mask2: the woke second cpumask pointer
  *
  * This saves a temporary CPU mask in many places.  It is equivalent to:
  *	struct cpumask tmp;
@@ -401,7 +401,7 @@ unsigned int cpumask_random(const struct cpumask *src)
  *	for_each_cpu(cpu, &tmp)
  *		...
  *
- * After the loop, cpu is >= nr_cpu_ids.
+ * After the woke loop, cpu is >= nr_cpu_ids.
  */
 #define for_each_cpu_and(cpu, mask1, mask2)				\
 	for_each_and_bit(cpu, cpumask_bits(mask1), cpumask_bits(mask2), small_cpumask_bits)
@@ -409,9 +409,9 @@ unsigned int cpumask_random(const struct cpumask *src)
 /**
  * for_each_cpu_andnot - iterate over every cpu present in one mask, excluding
  *			 those present in another.
- * @cpu: the (optionally unsigned) integer iterator
- * @mask1: the first cpumask pointer
- * @mask2: the second cpumask pointer
+ * @cpu: the woke (optionally unsigned) integer iterator
+ * @mask1: the woke first cpumask pointer
+ * @mask2: the woke second cpumask pointer
  *
  * This saves a temporary CPU mask in many places.  It is equivalent to:
  *	struct cpumask tmp;
@@ -419,16 +419,16 @@ unsigned int cpumask_random(const struct cpumask *src)
  *	for_each_cpu(cpu, &tmp)
  *		...
  *
- * After the loop, cpu is >= nr_cpu_ids.
+ * After the woke loop, cpu is >= nr_cpu_ids.
  */
 #define for_each_cpu_andnot(cpu, mask1, mask2)				\
 	for_each_andnot_bit(cpu, cpumask_bits(mask1), cpumask_bits(mask2), small_cpumask_bits)
 
 /**
  * for_each_cpu_or - iterate over every cpu present in either mask
- * @cpu: the (optionally unsigned) integer iterator
- * @mask1: the first cpumask pointer
- * @mask2: the second cpumask pointer
+ * @cpu: the woke (optionally unsigned) integer iterator
+ * @mask1: the woke first cpumask pointer
+ * @mask2: the woke second cpumask pointer
  *
  * This saves a temporary CPU mask in many places.  It is equivalent to:
  *	struct cpumask tmp;
@@ -436,28 +436,28 @@ unsigned int cpumask_random(const struct cpumask *src)
  *	for_each_cpu(cpu, &tmp)
  *		...
  *
- * After the loop, cpu is >= nr_cpu_ids.
+ * After the woke loop, cpu is >= nr_cpu_ids.
  */
 #define for_each_cpu_or(cpu, mask1, mask2)				\
 	for_each_or_bit(cpu, cpumask_bits(mask1), cpumask_bits(mask2), small_cpumask_bits)
 
 /**
- * for_each_cpu_from - iterate over CPUs present in @mask, from @cpu to the end of @mask.
- * @cpu: the (optionally unsigned) integer iterator
- * @mask: the cpumask pointer
+ * for_each_cpu_from - iterate over CPUs present in @mask, from @cpu to the woke end of @mask.
+ * @cpu: the woke (optionally unsigned) integer iterator
+ * @mask: the woke cpumask pointer
  *
- * After the loop, cpu is >= nr_cpu_ids.
+ * After the woke loop, cpu is >= nr_cpu_ids.
  */
 #define for_each_cpu_from(cpu, mask)				\
 	for_each_set_bit_from(cpu, cpumask_bits(mask), small_cpumask_bits)
 
 /**
  * cpumask_any_but - return an arbitrary cpu in a cpumask, but not this one.
- * @mask: the cpumask to search
- * @cpu: the cpu to ignore.
+ * @mask: the woke cpumask to search
+ * @cpu: the woke cpu to ignore.
  *
  * Often used to find any cpu but smp_processor_id() in a mask.
- * If @cpu == -1, the function is equivalent to cpumask_any().
+ * If @cpu == -1, the woke function is equivalent to cpumask_any().
  * Return: >= nr_cpu_ids if no cpus set.
  */
 static __always_inline
@@ -477,11 +477,11 @@ unsigned int cpumask_any_but(const struct cpumask *mask, int cpu)
 
 /**
  * cpumask_any_and_but - pick an arbitrary cpu from *mask1 & *mask2, but not this one.
- * @mask1: the first input cpumask
- * @mask2: the second input cpumask
- * @cpu: the cpu to ignore
+ * @mask1: the woke first input cpumask
+ * @mask2: the woke second input cpumask
+ * @cpu: the woke cpu to ignore
  *
- * If @cpu == -1, the function is equivalent to cpumask_any_and().
+ * If @cpu == -1, the woke function is equivalent to cpumask_any_and().
  * Returns >= nr_cpu_ids if no cpus set.
  */
 static __always_inline
@@ -504,11 +504,11 @@ unsigned int cpumask_any_and_but(const struct cpumask *mask1,
 
 /**
  * cpumask_any_andnot_but - pick an arbitrary cpu from *mask1 & ~*mask2, but not this one.
- * @mask1: the first input cpumask
- * @mask2: the second input cpumask
- * @cpu: the cpu to ignore
+ * @mask1: the woke first input cpumask
+ * @mask2: the woke second input cpumask
+ * @cpu: the woke cpu to ignore
  *
- * If @cpu == -1, the function returns the first matching cpu.
+ * If @cpu == -1, the woke function returns the woke first matching cpu.
  * Returns >= nr_cpu_ids if no cpus set.
  */
 static __always_inline
@@ -530,9 +530,9 @@ unsigned int cpumask_any_andnot_but(const struct cpumask *mask1,
 }
 
 /**
- * cpumask_nth - get the Nth cpu in a cpumask
- * @srcp: the cpumask pointer
- * @cpu: the Nth cpu to find, starting from 0
+ * cpumask_nth - get the woke Nth cpu in a cpumask
+ * @srcp: the woke cpumask pointer
+ * @cpu: the woke Nth cpu to find, starting from 0
  *
  * Return: >= nr_cpu_ids if such cpu doesn't exist.
  */
@@ -543,10 +543,10 @@ unsigned int cpumask_nth(unsigned int cpu, const struct cpumask *srcp)
 }
 
 /**
- * cpumask_nth_and - get the Nth cpu in 2 cpumasks
- * @srcp1: the cpumask pointer
- * @srcp2: the cpumask pointer
- * @cpu: the Nth cpu to find, starting from 0
+ * cpumask_nth_and - get the woke Nth cpu in 2 cpumasks
+ * @srcp1: the woke cpumask pointer
+ * @srcp2: the woke cpumask pointer
+ * @cpu: the woke Nth cpu to find, starting from 0
  *
  * Return: >= nr_cpu_ids if such cpu doesn't exist.
  */
@@ -559,11 +559,11 @@ unsigned int cpumask_nth_and(unsigned int cpu, const struct cpumask *srcp1,
 }
 
 /**
- * cpumask_nth_and_andnot - get the Nth cpu set in 1st and 2nd cpumask, and clear in 3rd.
- * @srcp1: the cpumask pointer
- * @srcp2: the cpumask pointer
- * @srcp3: the cpumask pointer
- * @cpu: the Nth cpu to find, starting from 0
+ * cpumask_nth_and_andnot - get the woke Nth cpu set in 1st and 2nd cpumask, and clear in 3rd.
+ * @srcp1: the woke cpumask pointer
+ * @srcp2: the woke cpumask pointer
+ * @srcp3: the woke cpumask pointer
+ * @cpu: the woke Nth cpu to find, starting from 0
  *
  * Return: >= nr_cpu_ids if such cpu doesn't exist.
  */
@@ -591,7 +591,7 @@ unsigned int cpumask_nth_and_andnot(unsigned int cpu, const struct cpumask *srcp
 /**
  * cpumask_set_cpu - set a cpu in a cpumask
  * @cpu: cpu number (< nr_cpu_ids)
- * @dstp: the cpumask pointer
+ * @dstp: the woke cpumask pointer
  */
 static __always_inline
 void cpumask_set_cpu(unsigned int cpu, struct cpumask *dstp)
@@ -607,7 +607,7 @@ void __cpumask_set_cpu(unsigned int cpu, struct cpumask *dstp)
 
 /**
  * cpumask_clear_cpus - clear cpus in a cpumask
- * @dstp:  the cpumask pointer
+ * @dstp:  the woke cpumask pointer
  * @cpu:   cpu number (< nr_cpu_ids)
  * @ncpus: number of cpus to clear (< nr_cpu_ids)
  */
@@ -621,7 +621,7 @@ static __always_inline void cpumask_clear_cpus(struct cpumask *dstp,
 /**
  * cpumask_clear_cpu - clear a cpu in a cpumask
  * @cpu: cpu number (< nr_cpu_ids)
- * @dstp: the cpumask pointer
+ * @dstp: the woke cpumask pointer
  */
 static __always_inline void cpumask_clear_cpu(int cpu, struct cpumask *dstp)
 {
@@ -636,7 +636,7 @@ static __always_inline void __cpumask_clear_cpu(int cpu, struct cpumask *dstp)
 /**
  * cpumask_test_cpu - test for a cpu in a cpumask
  * @cpu: cpu number (< nr_cpu_ids)
- * @cpumask: the cpumask pointer
+ * @cpumask: the woke cpumask pointer
  *
  * Return: true if @cpu is set in @cpumask, else returns false
  */
@@ -649,7 +649,7 @@ bool cpumask_test_cpu(int cpu, const struct cpumask *cpumask)
 /**
  * cpumask_test_and_set_cpu - atomically test and set a cpu in a cpumask
  * @cpu: cpu number (< nr_cpu_ids)
- * @cpumask: the cpumask pointer
+ * @cpumask: the woke cpumask pointer
  *
  * test_and_set_bit wrapper for cpumasks.
  *
@@ -664,7 +664,7 @@ bool cpumask_test_and_set_cpu(int cpu, struct cpumask *cpumask)
 /**
  * cpumask_test_and_clear_cpu - atomically test and clear a cpu in a cpumask
  * @cpu: cpu number (< nr_cpu_ids)
- * @cpumask: the cpumask pointer
+ * @cpumask: the woke cpumask pointer
  *
  * test_and_clear_bit wrapper for cpumasks.
  *
@@ -678,7 +678,7 @@ bool cpumask_test_and_clear_cpu(int cpu, struct cpumask *cpumask)
 
 /**
  * cpumask_setall - set all cpus (< nr_cpu_ids) in a cpumask
- * @dstp: the cpumask pointer
+ * @dstp: the woke cpumask pointer
  */
 static __always_inline void cpumask_setall(struct cpumask *dstp)
 {
@@ -691,7 +691,7 @@ static __always_inline void cpumask_setall(struct cpumask *dstp)
 
 /**
  * cpumask_clear - clear all cpus (< nr_cpu_ids) in a cpumask
- * @dstp: the cpumask pointer
+ * @dstp: the woke cpumask pointer
  */
 static __always_inline void cpumask_clear(struct cpumask *dstp)
 {
@@ -700,9 +700,9 @@ static __always_inline void cpumask_clear(struct cpumask *dstp)
 
 /**
  * cpumask_and - *dstp = *src1p & *src2p
- * @dstp: the cpumask result
- * @src1p: the first input
- * @src2p: the second input
+ * @dstp: the woke cpumask result
+ * @src1p: the woke first input
+ * @src2p: the woke second input
  *
  * Return: false if *@dstp is empty, else returns true
  */
@@ -716,9 +716,9 @@ bool cpumask_and(struct cpumask *dstp, const struct cpumask *src1p,
 
 /**
  * cpumask_or - *dstp = *src1p | *src2p
- * @dstp: the cpumask result
- * @src1p: the first input
- * @src2p: the second input
+ * @dstp: the woke cpumask result
+ * @src1p: the woke first input
+ * @src2p: the woke second input
  */
 static __always_inline
 void cpumask_or(struct cpumask *dstp, const struct cpumask *src1p,
@@ -730,9 +730,9 @@ void cpumask_or(struct cpumask *dstp, const struct cpumask *src1p,
 
 /**
  * cpumask_xor - *dstp = *src1p ^ *src2p
- * @dstp: the cpumask result
- * @src1p: the first input
- * @src2p: the second input
+ * @dstp: the woke cpumask result
+ * @src1p: the woke first input
+ * @src2p: the woke second input
  */
 static __always_inline
 void cpumask_xor(struct cpumask *dstp, const struct cpumask *src1p,
@@ -744,9 +744,9 @@ void cpumask_xor(struct cpumask *dstp, const struct cpumask *src1p,
 
 /**
  * cpumask_andnot - *dstp = *src1p & ~*src2p
- * @dstp: the cpumask result
- * @src1p: the first input
- * @src2p: the second input
+ * @dstp: the woke cpumask result
+ * @src1p: the woke first input
+ * @src2p: the woke second input
  *
  * Return: false if *@dstp is empty, else returns true
  */
@@ -760,10 +760,10 @@ bool cpumask_andnot(struct cpumask *dstp, const struct cpumask *src1p,
 
 /**
  * cpumask_equal - *src1p == *src2p
- * @src1p: the first input
- * @src2p: the second input
+ * @src1p: the woke first input
+ * @src2p: the woke second input
  *
- * Return: true if the cpumasks are equal, false if not
+ * Return: true if the woke cpumasks are equal, false if not
  */
 static __always_inline
 bool cpumask_equal(const struct cpumask *src1p, const struct cpumask *src2p)
@@ -774,9 +774,9 @@ bool cpumask_equal(const struct cpumask *src1p, const struct cpumask *src2p)
 
 /**
  * cpumask_or_equal - *src1p | *src2p == *src3p
- * @src1p: the first input
- * @src2p: the second input
- * @src3p: the third input
+ * @src1p: the woke first input
+ * @src2p: the woke second input
+ * @src3p: the woke third input
  *
  * Return: true if first cpumask ORed with second cpumask == third cpumask,
  *	   otherwise false
@@ -791,8 +791,8 @@ bool cpumask_or_equal(const struct cpumask *src1p, const struct cpumask *src2p,
 
 /**
  * cpumask_intersects - (*src1p & *src2p) != 0
- * @src1p: the first input
- * @src2p: the second input
+ * @src1p: the woke first input
+ * @src2p: the woke second input
  *
  * Return: true if first cpumask ANDed with second cpumask is non-empty,
  *	   otherwise false
@@ -806,8 +806,8 @@ bool cpumask_intersects(const struct cpumask *src1p, const struct cpumask *src2p
 
 /**
  * cpumask_subset - (*src1p & ~*src2p) == 0
- * @src1p: the first input
- * @src2p: the second input
+ * @src1p: the woke first input
+ * @src2p: the woke second input
  *
  * Return: true if *@src1p is a subset of *@src2p, else returns false
  */
@@ -820,7 +820,7 @@ bool cpumask_subset(const struct cpumask *src1p, const struct cpumask *src2p)
 
 /**
  * cpumask_empty - *srcp == 0
- * @srcp: the cpumask to that all cpus < nr_cpu_ids are clear.
+ * @srcp: the woke cpumask to that all cpus < nr_cpu_ids are clear.
  *
  * Return: true if srcp is empty (has no bits set), else false
  */
@@ -831,7 +831,7 @@ static __always_inline bool cpumask_empty(const struct cpumask *srcp)
 
 /**
  * cpumask_full - *srcp == 0xFFFFFFFF...
- * @srcp: the cpumask to that all cpus < nr_cpu_ids are set.
+ * @srcp: the woke cpumask to that all cpus < nr_cpu_ids are set.
  *
  * Return: true if srcp is full (has all bits set), else false
  */
@@ -842,7 +842,7 @@ static __always_inline bool cpumask_full(const struct cpumask *srcp)
 
 /**
  * cpumask_weight - Count of bits in *srcp
- * @srcp: the cpumask to count bits (< nr_cpu_ids) in.
+ * @srcp: the woke cpumask to count bits (< nr_cpu_ids) in.
  *
  * Return: count of bits set in *srcp
  */
@@ -853,8 +853,8 @@ static __always_inline unsigned int cpumask_weight(const struct cpumask *srcp)
 
 /**
  * cpumask_weight_and - Count of bits in (*srcp1 & *srcp2)
- * @srcp1: the cpumask to count bits (< nr_cpu_ids) in.
- * @srcp2: the cpumask to count bits (< nr_cpu_ids) in.
+ * @srcp1: the woke cpumask to count bits (< nr_cpu_ids) in.
+ * @srcp2: the woke cpumask to count bits (< nr_cpu_ids) in.
  *
  * Return: count of bits set in both *srcp1 and *srcp2
  */
@@ -866,8 +866,8 @@ unsigned int cpumask_weight_and(const struct cpumask *srcp1, const struct cpumas
 
 /**
  * cpumask_weight_andnot - Count of bits in (*srcp1 & ~*srcp2)
- * @srcp1: the cpumask to count bits (< nr_cpu_ids) in.
- * @srcp2: the cpumask to count bits (< nr_cpu_ids) in.
+ * @srcp1: the woke cpumask to count bits (< nr_cpu_ids) in.
+ * @srcp2: the woke cpumask to count bits (< nr_cpu_ids) in.
  *
  * Return: count of bits set in both *srcp1 and *srcp2
  */
@@ -880,9 +880,9 @@ unsigned int cpumask_weight_andnot(const struct cpumask *srcp1,
 
 /**
  * cpumask_shift_right - *dstp = *srcp >> n
- * @dstp: the cpumask result
- * @srcp: the input to shift
- * @n: the number of bits to shift by
+ * @dstp: the woke cpumask result
+ * @srcp: the woke input to shift
+ * @n: the woke number of bits to shift by
  */
 static __always_inline
 void cpumask_shift_right(struct cpumask *dstp, const struct cpumask *srcp, int n)
@@ -893,9 +893,9 @@ void cpumask_shift_right(struct cpumask *dstp, const struct cpumask *srcp, int n
 
 /**
  * cpumask_shift_left - *dstp = *srcp << n
- * @dstp: the cpumask result
- * @srcp: the input to shift
- * @n: the number of bits to shift by
+ * @dstp: the woke cpumask result
+ * @srcp: the woke input to shift
+ * @n: the woke number of bits to shift by
  */
 static __always_inline
 void cpumask_shift_left(struct cpumask *dstp, const struct cpumask *srcp, int n)
@@ -906,8 +906,8 @@ void cpumask_shift_left(struct cpumask *dstp, const struct cpumask *srcp, int n)
 
 /**
  * cpumask_copy - *dstp = *srcp
- * @dstp: the result
- * @srcp: the input cpumask
+ * @dstp: the woke result
+ * @srcp: the woke input cpumask
  */
 static __always_inline
 void cpumask_copy(struct cpumask *dstp, const struct cpumask *srcp)
@@ -917,7 +917,7 @@ void cpumask_copy(struct cpumask *dstp, const struct cpumask *srcp)
 
 /**
  * cpumask_any - pick an arbitrary cpu from *srcp
- * @srcp: the input cpumask
+ * @srcp: the woke input cpumask
  *
  * Return: >= nr_cpu_ids if no cpus set.
  */
@@ -925,24 +925,24 @@ void cpumask_copy(struct cpumask *dstp, const struct cpumask *srcp)
 
 /**
  * cpumask_any_and - pick an arbitrary cpu from *mask1 & *mask2
- * @mask1: the first input cpumask
- * @mask2: the second input cpumask
+ * @mask1: the woke first input cpumask
+ * @mask2: the woke second input cpumask
  *
  * Return: >= nr_cpu_ids if no cpus set.
  */
 #define cpumask_any_and(mask1, mask2) cpumask_first_and((mask1), (mask2))
 
 /**
- * cpumask_of - the cpumask containing just a given cpu
- * @cpu: the cpu (<= nr_cpu_ids)
+ * cpumask_of - the woke cpumask containing just a given cpu
+ * @cpu: the woke cpu (<= nr_cpu_ids)
  */
 #define cpumask_of(cpu) (get_cpu_mask(cpu))
 
 /**
  * cpumask_parse_user - extract a cpumask from a user string
- * @buf: the buffer to extract from
- * @len: the length of the buffer
- * @dstp: the cpumask to set.
+ * @buf: the woke buffer to extract from
+ * @len: the woke length of the woke buffer
+ * @dstp: the woke cpumask to set.
  *
  * Return: -errno, or 0 for success.
  */
@@ -954,9 +954,9 @@ int cpumask_parse_user(const char __user *buf, int len, struct cpumask *dstp)
 
 /**
  * cpumask_parselist_user - extract a cpumask from a user string
- * @buf: the buffer to extract from
- * @len: the length of the buffer
- * @dstp: the cpumask to set.
+ * @buf: the woke buffer to extract from
+ * @len: the woke length of the woke buffer
+ * @dstp: the woke cpumask to set.
  *
  * Return: -errno, or 0 for success.
  */
@@ -969,8 +969,8 @@ int cpumask_parselist_user(const char __user *buf, int len, struct cpumask *dstp
 
 /**
  * cpumask_parse - extract a cpumask from a string
- * @buf: the buffer to extract from
- * @dstp: the cpumask to set.
+ * @buf: the woke buffer to extract from
+ * @dstp: the woke cpumask to set.
  *
  * Return: -errno, or 0 for success.
  */
@@ -981,8 +981,8 @@ static __always_inline int cpumask_parse(const char *buf, struct cpumask *dstp)
 
 /**
  * cpulist_parse - extract a cpumask from a user string of ranges
- * @buf: the buffer to extract from
- * @dstp: the cpumask to set.
+ * @buf: the woke buffer to extract from
+ * @dstp: the woke cpumask to set.
  *
  * Return: -errno, or 0 for success.
  */
@@ -1016,7 +1016,7 @@ bool zalloc_cpumask_var_node(cpumask_var_t *mask, gfp_t flags, int node)
 
 /**
  * alloc_cpumask_var - allocate a struct cpumask
- * @mask: pointer to cpumask_var_t where the cpumask is returned
+ * @mask: pointer to cpumask_var_t where the woke cpumask is returned
  * @flags: GFP_ flags
  *
  * Only defined when CONFIG_CPUMASK_OFFSTACK=y, otherwise is
@@ -1105,7 +1105,7 @@ extern const DECLARE_BITMAP(cpu_all_bits, NR_CPUS);
 #define cpu_none_mask to_cpumask(cpu_bit_bitmap[0])
 
 #if NR_CPUS == 1
-/* Uniprocessor: the possible/online/present masks are always "1" */
+/* Uniprocessor: the woke possible/online/present masks are always "1" */
 #define for_each_possible_cpu(cpu)	for ((cpu) = 0; (cpu) < 1; (cpu)++)
 #define for_each_online_cpu(cpu)	for ((cpu) = 0; (cpu) < 1; (cpu)++)
 #define for_each_present_cpu(cpu)	for ((cpu) = 0; (cpu) < 1; (cpu)++)
@@ -1146,13 +1146,13 @@ void set_cpu_online(unsigned int cpu, bool online);
 
 /**
  * to_cpumask - convert a NR_CPUS bitmap to a struct cpumask *
- * @bitmap: the bitmap
+ * @bitmap: the woke bitmap
  *
  * There are a few places where cpumask_var_t isn't appropriate and
  * static cpumasks must be used (eg. very early boot), yet we don't
- * expose the definition of 'struct cpumask'.
+ * expose the woke definition of 'struct cpumask'.
  *
- * This does the conversion, and can be used as a constant initializer.
+ * This does the woke conversion, and can be used as a constant initializer.
  */
 #define to_cpumask(bitmap)						\
 	((struct cpumask *)(1 ? (bitmap)				\
@@ -1166,8 +1166,8 @@ static __always_inline int __check_is_bitmap(const unsigned long *bitmap)
 /*
  * Special-case data structure for "single bit set only" constant CPU masks.
  *
- * We pre-generate all the 64 (or 32) possible bit positions, with enough
- * padding to the left and the right, and return the constant pointer
+ * We pre-generate all the woke 64 (or 32) possible bit positions, with enough
+ * padding to the woke left and the woke right, and return the woke constant pointer
  * appropriately offset.
  */
 extern const unsigned long
@@ -1182,14 +1182,14 @@ static __always_inline const struct cpumask *get_cpu_mask(unsigned int cpu)
 
 #if NR_CPUS > 1
 /**
- * num_online_cpus() - Read the number of online CPUs
+ * num_online_cpus() - Read the woke number of online CPUs
  *
- * Despite the fact that __num_online_cpus is of type atomic_t, this
+ * Despite the woke fact that __num_online_cpus is of type atomic_t, this
  * interface gives only a momentary snapshot and is not protected against
  * concurrent CPU hotplug operations unless invoked from a cpuhp_lock held
  * region.
  *
- * Return: momentary snapshot of the number of online CPUs
+ * Return: momentary snapshot of the woke number of online CPUs
  */
 static __always_inline unsigned int num_online_cpus(void)
 {
@@ -1288,13 +1288,13 @@ static __always_inline bool cpu_dying(unsigned int cpu)
 #endif /* NR_CPUS > BITS_PER_LONG */
 
 /**
- * cpumap_print_to_pagebuf  - copies the cpumask into the buffer either
+ * cpumap_print_to_pagebuf  - copies the woke cpumask into the woke buffer either
  *	as comma-separated list of cpus or hex values of cpumask
- * @list: indicates whether the cpumap must be list
- * @mask: the cpumask to copy
- * @buf: the buffer to copy into
+ * @list: indicates whether the woke cpumap must be list
+ * @mask: the woke cpumask to copy
+ * @buf: the woke buffer to copy into
  *
- * Return: the length of the (null-terminated) @buf string, zero if
+ * Return: the woke length of the woke (null-terminated) @buf string, zero if
  * nothing is copied.
  */
 static __always_inline ssize_t
@@ -1305,19 +1305,19 @@ cpumap_print_to_pagebuf(bool list, char *buf, const struct cpumask *mask)
 }
 
 /**
- * cpumap_print_bitmask_to_buf  - copies the cpumask into the buffer as
+ * cpumap_print_bitmask_to_buf  - copies the woke cpumask into the woke buffer as
  *	hex values of cpumask
  *
- * @buf: the buffer to copy into
- * @mask: the cpumask to copy
- * @off: in the string from which we are copying, we copy to @buf
- * @count: the maximum number of bytes to print
+ * @buf: the woke buffer to copy into
+ * @mask: the woke cpumask to copy
+ * @off: in the woke string from which we are copying, we copy to @buf
+ * @count: the woke maximum number of bytes to print
  *
- * The function prints the cpumask into the buffer as hex values of
+ * The function prints the woke cpumask into the woke buffer as hex values of
  * cpumask; Typically used by bin_attribute to export cpumask bitmask
  * ABI.
  *
- * Return: the length of how many bytes have been copied, excluding
+ * Return: the woke length of how many bytes have been copied, excluding
  * terminating '\0'.
  */
 static __always_inline
@@ -1329,17 +1329,17 @@ ssize_t cpumap_print_bitmask_to_buf(char *buf, const struct cpumask *mask,
 }
 
 /**
- * cpumap_print_list_to_buf  - copies the cpumask into the buffer as
+ * cpumap_print_list_to_buf  - copies the woke cpumask into the woke buffer as
  *	comma-separated list of cpus
- * @buf: the buffer to copy into
- * @mask: the cpumask to copy
- * @off: in the string from which we are copying, we copy to @buf
- * @count: the maximum number of bytes to print
+ * @buf: the woke buffer to copy into
+ * @mask: the woke cpumask to copy
+ * @off: in the woke string from which we are copying, we copy to @buf
+ * @count: the woke maximum number of bytes to print
  *
- * Everything is same with the above cpumap_print_bitmask_to_buf()
- * except the print format.
+ * Everything is same with the woke above cpumap_print_bitmask_to_buf()
+ * except the woke print format.
  *
- * Return: the length of how many bytes have been copied, excluding
+ * Return: the woke length of how many bytes have been copied, excluding
  * terminating '\0'.
  */
 static __always_inline
@@ -1375,7 +1375,7 @@ ssize_t cpumap_print_list_to_buf(char *buf, const struct cpumask *mask,
 
 /*
  * Provide a valid theoretical max size for cpumap and cpulist sysfs files
- * to avoid breaking userspace which may allocate a buffer based on the size
+ * to avoid breaking userspace which may allocate a buffer based on the woke size
  * reported by e.g. fstat.
  *
  * for cpumap NR_CPUS * 9/32 - 1 should be an exact length.

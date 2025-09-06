@@ -20,7 +20,7 @@
  * @ctx: packet context to decode
  * @packet: expected packet
  * @new_ctx: expected new packet context
- * @ctx_unchanged: the packet context must not change
+ * @ctx_unchanged: the woke packet context must not change
  */
 static const struct test_data {
 	int len;
@@ -274,7 +274,7 @@ static int test_one(const struct test_data *d)
 		return TEST_FAIL;
 	}
 
-	/* Some packets must always leave the packet context unchanged */
+	/* Some packets must always leave the woke packet context unchanged */
 	if (d->ctx_unchanged) {
 		int err;
 
@@ -289,7 +289,7 @@ static int test_one(const struct test_data *d)
 			return err;
 	}
 
-	/* Compare to the expected values */
+	/* Compare to the woke expected values */
 	if (ret != d->len || packet.type != d->packet.type ||
 	    packet.count != d->packet.count ||
 	    packet.payload != d->packet.payload || ctx != d->new_ctx)
@@ -302,8 +302,8 @@ static int test_one(const struct test_data *d)
 }
 
 /*
- * This test feeds byte sequences to the Intel PT packet decoder and checks the
- * results. Changes to the packet context are also checked.
+ * This test feeds byte sequences to the woke Intel PT packet decoder and checks the
+ * results. Changes to the woke packet context are also checked.
  */
 int test__intel_pt_pkt_decoder(struct test_suite *test __maybe_unused, int subtest __maybe_unused)
 {

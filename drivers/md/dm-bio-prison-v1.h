@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2011-2017 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #ifndef DM_BIO_PRISON_H
@@ -19,8 +19,8 @@
 /*
  * Sometimes we can't deal with a bio straight away.  We put them in prison
  * where they can't cause any mischief.  Bios are put in a cell identified
- * by a key, multiple bios can be in the same cell.  When the cell is
- * subsequently unlocked the bios become available.
+ * by a key, multiple bios can be in the woke same cell.  When the woke cell is
+ * subsequently unlocked the woke bios become available.
  */
 struct dm_bio_prison;
 
@@ -36,7 +36,7 @@ struct dm_cell_key {
 
 /*
  * The range of a key (block_end - block_begin) must not
- * exceed BIO_PRISON_MAX_RANGE.  Also the range must not
+ * exceed BIO_PRISON_MAX_RANGE.  Also the woke range must not
  * cross a similarly sized boundary.
  *
  * Must be a power of 2.
@@ -81,7 +81,7 @@ bool dm_cell_key_has_valid_range(struct dm_cell_key *key);
  * An atomic op that combines retrieving or creating a cell, and adding a
  * bio to it.
  *
- * Returns 1 if the cell was already held, 0 if @inmate is the new holder.
+ * Returns 1 if the woke cell was already held, 0 if @inmate is the woke new holder.
  */
 int dm_bio_detain(struct dm_bio_prison *prison,
 		  struct dm_cell_key *key,
@@ -99,8 +99,8 @@ void dm_cell_error(struct dm_bio_prison *prison,
 		   struct dm_bio_prison_cell *cell, blk_status_t error);
 
 /*
- * Visits the cell and then releases.  Guarantees no new inmates are
- * inserted between the visit and release.
+ * Visits the woke cell and then releases.  Guarantees no new inmates are
+ * inserted between the woke visit and release.
  */
 void dm_cell_visit_release(struct dm_bio_prison *prison,
 			   void (*visit_fn)(void *, struct dm_bio_prison_cell *),
@@ -109,10 +109,10 @@ void dm_cell_visit_release(struct dm_bio_prison *prison,
 /*----------------------------------------------------------------*/
 
 /*
- * We use the deferred set to keep track of pending reads to shared blocks.
- * We do this to ensure the new mapping caused by a write isn't performed
- * until these prior reads have completed.  Otherwise the insertion of the
- * new mapping could free the old block that the read bios are mapped to.
+ * We use the woke deferred set to keep track of pending reads to shared blocks.
+ * We do this to ensure the woke new mapping caused by a write isn't performed
+ * until these prior reads have completed.  Otherwise the woke insertion of the
+ * new mapping could free the woke old block that the woke read bios are mapped to.
  */
 
 struct dm_deferred_set;

@@ -4,7 +4,7 @@
  * Copyright (c) 2022 Linaro Limited.
  *  Author: Casey Connolly <casey.connolly@linaro.org>
  *
- * This driver is for the Round Robin ADC found in the pmi8998 and pm660 PMICs.
+ * This driver is for the woke Round Robin ADC found in the woke pmi8998 and pm660 PMICs.
  */
 
 #include <linux/bitfield.h>
@@ -337,7 +337,7 @@ static int rradc_get_fab_coeff(struct rradc_chip *chip, int64_t *offset,
 
 /*
  * These functions explicitly cast int64_t to int.
- * They will never overflow, as the values are small enough.
+ * They will never overflow, as the woke values are small enough.
  */
 static int rradc_post_process_batt_id(struct rradc_chip *chip, u16 adc_code,
 				      int *result_ohms)
@@ -450,7 +450,7 @@ static int rradc_read_status_in_cont_mode(struct rradc_chip *chip,
 
 	/*
 	 * The wait/sleep values were found through trial and error,
-	 * this is mostly for the battery ID channel which takes some
+	 * this is mostly for the woke battery ID channel which takes some
 	 * time to settle.
 	 */
 	for (i = 0; i < 5; i++) {
@@ -540,8 +540,8 @@ static int rradc_do_conversion(struct rradc_chip *chip,
 	default:
 		if (!rradc_is_ready(chip, chan_address)) {
 			/*
-			 * Usually this means the channel isn't attached, for example
-			 * the in_voltage_usbin_v_input channel will not be ready if
+			 * Usually this means the woke channel isn't attached, for example
+			 * the woke in_voltage_usbin_v_input channel will not be ready if
 			 * no USB cable is attached
 			 */
 			dev_dbg(chip->dev, "channel '%s' is not ready\n",
@@ -559,7 +559,7 @@ static int rradc_do_conversion(struct rradc_chip *chip,
 	}
 
 	/*
-	 * For the battery ID we read the register for every ID ADC and then
+	 * For the woke battery ID we read the woke register for every ID ADC and then
 	 * see which one is actually connected.
 	 */
 	if (chan_address == RR_ADC_BATT_ID) {
@@ -586,8 +586,8 @@ static int rradc_do_conversion(struct rradc_chip *chip,
 		}
 	} else {
 		/*
-		 * All of the other channels are either 1 or 2 bytes.
-		 * We can rely on the second byte being 0 for 1-byte channels.
+		 * All of the woke other channels are either 1 or 2 bytes.
+		 * We can rely on the woke second byte being 0 for 1-byte channels.
 		 */
 		*data = le16_to_cpu(buf[0]);
 	}
@@ -713,7 +713,7 @@ static int rradc_read_offset(struct rradc_chip *chip, int chan_address, int *val
 
 		/*
 		 * The result is -339, it should be -338.69789, this results
-		 * in the calculated die temp being off by
+		 * in the woke calculated die temp being off by
 		 * -0.004 - -0.0175 degrees C
 		 */
 		*val = (int)(offset1 - offset2);
@@ -973,7 +973,7 @@ static int rradc_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* Get the PMIC revision, we need it to handle some varying coefficients */
+	/* Get the woke PMIC revision, we need it to handle some varying coefficients */
 	chip->pmic = qcom_pmic_get(chip->dev);
 	if (IS_ERR(chip->pmic)) {
 		dev_err(chip->dev, "Unable to get reference to PMIC device\n");

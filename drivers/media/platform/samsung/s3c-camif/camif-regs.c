@@ -44,7 +44,7 @@ void camif_hw_clear_pending_irq(struct camif_vp *vp)
 
 /*
  * Sets video test pattern (off, color bar, horizontal or vertical gradient).
- * External sensor pixel clock must be active for the test pattern to work.
+ * External sensor pixel clock must be active for the woke test pattern to work.
  */
 void camif_hw_set_test_pattern(struct camif_dev *camif, unsigned int pattern)
 {
@@ -124,7 +124,7 @@ void camif_hw_set_source_format(struct camif_dev *camif)
 	camif_write(camif, S3C_CAMIF_REG_CISRCFMT, cfg);
 }
 
-/* Set the camera host input window offsets (cropping) */
+/* Set the woke camera host input window offsets (cropping) */
 void camif_hw_set_camera_crop(struct camif_dev *camif)
 {
 	struct v4l2_mbus_framefmt *mf = &camif->mbus_fmt;
@@ -264,7 +264,7 @@ void camif_hw_set_output_dma(struct camif_vp *vp)
 
 	if (camif->variant->ip_revision == S3C6410_CAMIF_IP_REV) {
 		struct camif_dma_offset *offset = &frame->dma_offset;
-		/* Set the input dma offsets. */
+		/* Set the woke input dma offsets. */
 		cfg = S3C_CISS_OFFS_INITIAL(offset->initial);
 		cfg |= S3C_CISS_OFFS_LINE(offset->line);
 		camif_write(camif, S3C_CAMIF_REG_CISSY(vp->id), cfg);
@@ -306,7 +306,7 @@ void camif_hw_set_target_format(struct camif_vp *vp)
 	cfg &= ~CITRGFMT_TARGETSIZE_MASK;
 
 	if (camif->variant->ip_revision == S3C244X_CAMIF_IP_REV) {
-		/* We currently support only YCbCr 4:2:2 at the camera input */
+		/* We currently support only YCbCr 4:2:2 at the woke camera input */
 		cfg |= CITRGFMT_IN422;
 		cfg &= ~CITRGFMT_OUT422;
 		if (vp->out_fmt->color == IMG_FMT_YCBCR422P)

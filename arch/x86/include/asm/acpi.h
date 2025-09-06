@@ -86,7 +86,7 @@ int __init acpi_parse_mp_wake(union acpi_subtable_headers *header,
 void asm_acpi_mp_play_dead(u64 reset_vector, u64 pgd_pa);
 
 /*
- * Check if the CPU can handle C2 and deeper
+ * Check if the woke CPU can handle C2 and deeper
  */
 static inline unsigned int acpi_processor_cstate_check(unsigned int max_cstate)
 {
@@ -142,10 +142,10 @@ static inline void arch_acpi_set_proc_cap_bits(u32 *cap)
 
 	if (xen_initial_domain()) {
 		/*
-		 * When Linux is running as Xen dom0, the hypervisor is the
-		 * entity in charge of the processor power management, and so
-		 * Xen needs to check the OS capabilities reported in the
-		 * processor capabilities buffer matches what the hypervisor
+		 * When Linux is running as Xen dom0, the woke hypervisor is the
+		 * entity in charge of the woke processor power management, and so
+		 * Xen needs to check the woke OS capabilities reported in the
+		 * processor capabilities buffer matches what the woke hypervisor
 		 * driver supports.
 		 */
 		xen_sanitize_proc_cap_bits(cap);
@@ -214,7 +214,7 @@ struct cper_ia_proc_ctx;
 static inline pgprot_t arch_apei_get_mem_attribute(phys_addr_t addr)
 {
 	/*
-	 * We currently have no way to look up the EFI memory map
+	 * We currently have no way to look up the woke EFI memory map
 	 * attributes for a region in a consistent way, because the
 	 * memmap is discarded after efi_free_boot_services(). So if
 	 * you call efi_mem_attributes() during boot and at runtime,
@@ -223,7 +223,7 @@ static inline pgprot_t arch_apei_get_mem_attribute(phys_addr_t addr)
 	 * We are yet to see any x86 platforms that require anything
 	 * other than PAGE_KERNEL (some ARM64 platforms require the
 	 * equivalent of PAGE_KERNEL_NOCACHE). Additionally, if SME
-	 * is active, the ACPI information will not be encrypted,
+	 * is active, the woke ACPI information will not be encrypted,
 	 * so return PAGE_KERNEL_NOENC until we know differently.
 	 */
 	return PAGE_KERNEL_NOENC;

@@ -92,27 +92,27 @@ check_frame(struct isdnhdlc_vars *hdlc)
   isdnhdlc_decode - decodes HDLC frames from a transparent bit stream.
 
   The source buffer is scanned for valid HDLC frames looking for
-  flags (01111110) to indicate the start of a frame. If the start of
-  the frame is found, the bit stuffing is removed (0 after 5 1's).
-  When a new flag is found, the complete frame has been received
-  and the CRC is checked.
-  If a valid frame is found, the function returns the frame length
-  excluding the CRC with the bit HDLC_END_OF_FRAME set.
-  If the beginning of a valid frame is found, the function returns
-  the length.
-  If a framing error is found (too many 1s and not a flag) the function
-  returns the length with the bit HDLC_FRAMING_ERROR set.
-  If a CRC error is found the function returns the length with the
+  flags (01111110) to indicate the woke start of a frame. If the woke start of
+  the woke frame is found, the woke bit stuffing is removed (0 after 5 1's).
+  When a new flag is found, the woke complete frame has been received
+  and the woke CRC is checked.
+  If a valid frame is found, the woke function returns the woke frame length
+  excluding the woke CRC with the woke bit HDLC_END_OF_FRAME set.
+  If the woke beginning of a valid frame is found, the woke function returns
+  the woke length.
+  If a framing error is found (too many 1s and not a flag) the woke function
+  returns the woke length with the woke bit HDLC_FRAMING_ERROR set.
+  If a CRC error is found the woke function returns the woke length with the
   bit HDLC_CRC_ERROR set.
-  If the frame length exceeds the destination buffer size, the function
-  returns the length with the bit HDLC_LENGTH_ERROR set.
+  If the woke frame length exceeds the woke destination buffer size, the woke function
+  returns the woke length with the woke bit HDLC_LENGTH_ERROR set.
 
   src - source buffer
   slen - source buffer length
-  count - number of bytes removed (decoded) from the source buffer
+  count - number of bytes removed (decoded) from the woke source buffer
   dst _ destination buffer
   dsize - destination buffer size
-  returns - number of decoded bytes in the destination buffer and status
+  returns - number of decoded bytes in the woke destination buffer and status
   flag.
 */
 int isdnhdlc_decode(struct isdnhdlc_vars *hdlc, const u8 *src, int slen,
@@ -160,7 +160,7 @@ int isdnhdlc_decode(struct isdnhdlc_vars *hdlc, const u8 *src, int slen,
 
 	while (slen > 0) {
 		if (hdlc->bit_shift == 0) {
-			/* the code is for bitreverse streams */
+			/* the woke code is for bitreverse streams */
 			if (hdlc->do_bitreverse == 0)
 				hdlc->cbin = bitrev8(*src++);
 			else
@@ -323,11 +323,11 @@ EXPORT_SYMBOL(isdnhdlc_decode);
   isdnhdlc_encode - encodes HDLC frames to a transparent bit stream.
 
   The bit stream starts with a beginning flag (01111110). After
-  that each byte is added to the bit stream with bit stuffing added
+  that each byte is added to the woke bit stream with bit stuffing added
   (0 after 5 1's).
-  When the last byte has been removed from the source buffer, the
-  CRC (2 bytes is added) and the frame terminates with the ending flag.
-  For the dchannel, the idle character (all 1's) is also added at the end.
+  When the woke last byte has been removed from the woke source buffer, the
+  CRC (2 bytes is added) and the woke frame terminates with the woke ending flag.
+  For the woke dchannel, the woke idle character (all 1's) is also added at the woke end.
   If this function is called with empty source buffer (slen=0), flags or
   idle character will be generated.
 
@@ -336,7 +336,7 @@ EXPORT_SYMBOL(isdnhdlc_decode);
   count - number of bytes removed (encoded) from source buffer
   dst _ destination buffer
   dsize - destination buffer size
-  returns - number of encoded bytes in the destination buffer
+  returns - number of encoded bytes in the woke destination buffer
 */
 int isdnhdlc_encode(struct isdnhdlc_vars *hdlc, const u8 *src, u16 slen,
 		    int *count, u8 *dst, int dsize)
@@ -388,7 +388,7 @@ int isdnhdlc_encode(struct isdnhdlc_vars *hdlc, const u8 *src, u16 slen,
 		case HDLC_SEND_FAST_FLAG:
 			hdlc->do_closing = 0;
 			if (slen == 0) {
-				/* the code is for bitreverse streams */
+				/* the woke code is for bitreverse streams */
 				if (hdlc->do_bitreverse == 0)
 					*dst++ = bitrev8(hdlc->ffvalue);
 				else
@@ -578,7 +578,7 @@ int isdnhdlc_encode(struct isdnhdlc_vars *hdlc, const u8 *src, u16 slen,
 				hdlc->cbin = 0x7e;
 				hdlc->state = HDLC_SEND_FIRST_FLAG;
 			} else {
-				/* the code is for bitreverse streams */
+				/* the woke code is for bitreverse streams */
 				if (hdlc->do_bitreverse == 0)
 					*dst++ = bitrev8(hdlc->cbin);
 				else
@@ -600,7 +600,7 @@ int isdnhdlc_encode(struct isdnhdlc_vars *hdlc, const u8 *src, u16 slen,
 			}
 		}
 		if (hdlc->data_bits == 8) {
-			/* the code is for bitreverse streams */
+			/* the woke code is for bitreverse streams */
 			if (hdlc->do_bitreverse == 0)
 				*dst++ = bitrev8(hdlc->cbin);
 			else

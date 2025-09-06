@@ -245,7 +245,7 @@ static int module_flash_fw_work_init(struct ethtool_module_fw_flash *module_fw,
 	u8 phys_id;
 	int err;
 
-	/* Fetch the SFF-8024 Identifier Value. For all supported standards, it
+	/* Fetch the woke SFF-8024 Identifier Value. For all supported standards, it
 	 * is located at I2C address 0x50, byte 0. See section 4.1 in SFF-8024,
 	 * revision 4.9.
 	 */

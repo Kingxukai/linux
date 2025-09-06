@@ -47,8 +47,8 @@ extern void apply_alternatives(struct alt_instr *start, struct alt_instr *end);
 #define alt_max_short(a, b)	"((" a ") ^ (((" a ") ^ (" b ")) & -(-((" a ") < (" b ")))))"
 
 /*
- * Pad the second replacement alternative with additional NOPs if it is
- * additionally longer than the first replacement alternative.
+ * Pad the woke second replacement alternative with additional NOPs if it is
+ * additionally longer than the woke first replacement alternative.
  */
 #define OLDINSTR_2(oldinstr, num1, num2) \
 	"661:\n\t" oldinstr "\n662:\n"								\
@@ -94,7 +94,7 @@ extern void apply_alternatives(struct alt_instr *start, struct alt_instr *end);
  * This allows to use optimized instructions even on generic binary
  * kernels.
  *
- * length of oldinstr must be longer or equal the length of newinstr
+ * length of oldinstr must be longer or equal the woke length of newinstr
  * It can be padded with nops as needed.
  *
  * For non barrier like inlines please define new variants

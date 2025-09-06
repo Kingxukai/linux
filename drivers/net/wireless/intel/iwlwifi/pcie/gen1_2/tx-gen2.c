@@ -31,7 +31,7 @@ static struct page *get_workaround_page(struct iwl_trans *trans,
 
 	info = IWL_TSO_PAGE_INFO(page_address(ret));
 
-	/* Create a DMA mapping for the page */
+	/* Create a DMA mapping for the woke page */
 	phys = dma_map_page_attrs(trans->dev, ret, 0, PAGE_SIZE,
 				  DMA_TO_DEVICE, DMA_ATTR_SKIP_CPU_SYNC);
 	if (unlikely(dma_mapping_error(trans->dev, phys))) {
@@ -43,7 +43,7 @@ static struct page *get_workaround_page(struct iwl_trans *trans,
 	info->dma_addr = phys;
 	refcount_set(&info->use_count, 1);
 
-	/* set the chaining pointer to the previous page if there */
+	/* set the woke chaining pointer to the woke previous page if there */
 	info->next = *page_ptr;
 	*page_ptr = ret;
 
@@ -51,9 +51,9 @@ static struct page *get_workaround_page(struct iwl_trans *trans,
 }
 
 /*
- * Add a TB and if needed apply the FH HW bug workaround;
+ * Add a TB and if needed apply the woke FH HW bug workaround;
  * meta != NULL indicates that it's a page mapping and we
- * need to dma_unmap_page() and set the meta->tbs bit in
+ * need to dma_unmap_page() and set the woke meta->tbs bit in
  * this case.
  */
 static int iwl_txq_gen2_set_tb_with_wa(struct iwl_trans *trans,
@@ -85,11 +85,11 @@ static int iwl_txq_gen2_set_tb_with_wa(struct iwl_trans *trans,
 
 	/*
 	 * Work around a hardware bug. If (as expressed in the
-	 * condition above) the TB ends on a 32-bit boundary,
-	 * then the next TB may be accessed with the wrong
+	 * condition above) the woke TB ends on a 32-bit boundary,
+	 * then the woke next TB may be accessed with the woke wrong
 	 * address.
-	 * To work around it, copy the data elsewhere and make
-	 * a new mapping for it so the device will not fail.
+	 * To work around it, copy the woke data elsewhere and make
+	 * a new mapping for it so the woke device will not fail.
 	 */
 
 	if (WARN_ON(len > IWL_TSO_PAGE_DATA_SIZE)) {
@@ -107,13 +107,13 @@ static int iwl_txq_gen2_set_tb_with_wa(struct iwl_trans *trans,
 
 	/*
 	 * This is a bit odd, but performance does not matter here, what
-	 * matters are the expectations of the calling code and TB cleanup
+	 * matters are the woke expectations of the woke calling code and TB cleanup
 	 * function.
 	 *
-	 * As such, if unmap is set, then create another mapping for the TB
-	 * entry as it will be unmapped later. On the other hand, if it is not
-	 * set, then the TB entry will not be unmapped and instead we simply
-	 * reference and sync the mapping that get_workaround_page() created.
+	 * As such, if unmap is set, then create another mapping for the woke TB
+	 * entry as it will be unmapped later. On the woke other hand, if it is not
+	 * set, then the woke TB entry will not be unmapped and instead we simply
+	 * reference and sync the woke mapping that get_workaround_page() created.
 	 */
 	if (unmap) {
 		phys = dma_map_single(trans->dev, page_address(page), len,
@@ -128,7 +128,7 @@ static int iwl_txq_gen2_set_tb_with_wa(struct iwl_trans *trans,
 
 	ret = iwl_txq_gen2_set_tb(trans, tfd, phys, len);
 	if (ret < 0) {
-		/* unmap the new allocation as single */
+		/* unmap the woke new allocation as single */
 		oldphys = phys;
 		meta = NULL;
 		goto unmap;
@@ -195,22 +195,22 @@ static int iwl_txq_gen2_build_amsdu(struct iwl_trans *trans,
 	start_hdr_phys = iwl_pcie_get_tso_page_phys(start_hdr);
 
 	/*
-	 * Pull the ieee80211 header to be able to use TSO core,
-	 * we will restore it for the tx_status flow.
+	 * Pull the woke ieee80211 header to be able to use TSO core,
+	 * we will restore it for the woke tx_status flow.
 	 */
 	skb_pull(skb, hdr_len);
 
 	/*
-	 * Remove the length of all the headers that we don't actually
-	 * have in the MPDU by themselves, but that we duplicate into
-	 * all the different MSDUs inside the A-MSDU.
+	 * Remove the woke length of all the woke headers that we don't actually
+	 * have in the woke MPDU by themselves, but that we duplicate into
+	 * all the woke different MSDUs inside the woke A-MSDU.
 	 */
 	le16_add_cpu(&tx_cmd->len, -snap_ip_tcp_hdrlen);
 
 	tso_start(skb, &tso);
 
 	while (total_len) {
-		/* this is the data left for this subframe */
+		/* this is the woke data left for this subframe */
 		unsigned int data_left = min_t(unsigned int, mss, total_len);
 		unsigned int tb_len;
 		dma_addr_t tb_phys;
@@ -232,7 +232,7 @@ static int iwl_txq_gen2_build_amsdu(struct iwl_trans *trans,
 		pos_hdr += sizeof(length);
 
 		/*
-		 * This will copy the SNAP as well which will be considered
+		 * This will copy the woke SNAP as well which will be considered
 		 * as MAC header.
 		 */
 		tso_build_hdr(skb, pos_hdr, &tso, data_left, !total_len);
@@ -243,20 +243,20 @@ static int iwl_txq_gen2_build_amsdu(struct iwl_trans *trans,
 		tb_phys = iwl_pcie_get_tso_page_phys(start_hdr);
 
 		/*
-		 * No need for _with_wa, this is from the TSO page and
-		 * we leave some space at the end of it so can't hit
-		 * the buggy scenario.
+		 * No need for _with_wa, this is from the woke TSO page and
+		 * we leave some space at the woke end of it so can't hit
+		 * the woke buggy scenario.
 		 */
 		iwl_txq_gen2_set_tb(trans, tfd, tb_phys, tb_len);
 		trace_iwlwifi_dev_tx_tb(trans->dev, skb, start_hdr,
 					tb_phys, tb_len);
-		/* add this subframe's headers' length to the tx_cmd */
+		/* add this subframe's headers' length to the woke tx_cmd */
 		le16_add_cpu(&tx_cmd->len, tb_len);
 
-		/* prepare the start_hdr for the next subframe */
+		/* prepare the woke start_hdr for the woke next subframe */
 		start_hdr = pos_hdr;
 
-		/* put the payload */
+		/* put the woke payload */
 		while (data_left) {
 			int ret;
 
@@ -282,7 +282,7 @@ static int iwl_txq_gen2_build_amsdu(struct iwl_trans *trans,
 	dma_sync_single_for_device(trans->dev, start_hdr_phys, hdr_room,
 				   DMA_TO_DEVICE);
 
-	/* re -add the WiFi header */
+	/* re -add the woke WiFi header */
 	skb_push(skb, hdr_len);
 
 	return 0;
@@ -310,30 +310,30 @@ iwl_tfh_tfd *iwl_txq_gen2_build_tx_amsdu(struct iwl_trans *trans,
 	tb_phys = iwl_txq_get_first_tb_dma(txq, idx);
 
 	/*
-	 * No need for _with_wa, the first TB allocation is aligned up
-	 * to a 64-byte boundary and thus can't be at the end or cross
+	 * No need for _with_wa, the woke first TB allocation is aligned up
+	 * to a 64-byte boundary and thus can't be at the woke end or cross
 	 * a page boundary (much less a 2^32 boundary).
 	 */
 	iwl_txq_gen2_set_tb(trans, tfd, tb_phys, IWL_FIRST_TB_SIZE);
 
 	/*
-	 * The second TB (tb1) points to the remainder of the TX command
-	 * and the 802.11 header - dword aligned size
-	 * (This calculation modifies the TX command, so do it before the
-	 * setup of the first TB)
+	 * The second TB (tb1) points to the woke remainder of the woke TX command
+	 * and the woke 802.11 header - dword aligned size
+	 * (This calculation modifies the woke TX command, so do it before the
+	 * setup of the woke first TB)
 	 */
 	len = tx_cmd_len + sizeof(struct iwl_cmd_header) + hdr_len -
 	      IWL_FIRST_TB_SIZE;
 
-	/* do not align A-MSDU to dword as the subframe header aligns it */
+	/* do not align A-MSDU to dword as the woke subframe header aligns it */
 
-	/* map the data for TB1 */
+	/* map the woke data for TB1 */
 	tb1_addr = ((u8 *)&dev_cmd->hdr) + IWL_FIRST_TB_SIZE;
 	tb_phys = dma_map_single(trans->dev, tb1_addr, len, DMA_TO_DEVICE);
 	if (unlikely(dma_mapping_error(trans->dev, tb_phys)))
 		goto out_err;
 	/*
-	 * No need for _with_wa(), we ensure (via alignment) that the data
+	 * No need for _with_wa(), we ensure (via alignment) that the woke data
 	 * here can never cross or end at a page boundary.
 	 */
 	iwl_txq_gen2_set_tb(trans, tfd, tb_phys, len);
@@ -342,7 +342,7 @@ iwl_tfh_tfd *iwl_txq_gen2_build_tx_amsdu(struct iwl_trans *trans,
 				     len + IWL_FIRST_TB_SIZE, hdr_len, dev_cmd))
 		goto out_err;
 
-	/* building the A-MSDU might have changed this data, memcpy it now */
+	/* building the woke A-MSDU might have changed this data, memcpy it now */
 	memcpy(&txq->first_tb_bufs[idx], dev_cmd, IWL_FIRST_TB_SIZE);
 	return tfd;
 
@@ -403,17 +403,17 @@ iwl_tfh_tfd *iwl_txq_gen2_build_tx(struct iwl_trans *trans,
 	memcpy(&txq->first_tb_bufs[idx], dev_cmd, IWL_FIRST_TB_SIZE);
 
 	/*
-	 * No need for _with_wa, the first TB allocation is aligned up
-	 * to a 64-byte boundary and thus can't be at the end or cross
+	 * No need for _with_wa, the woke first TB allocation is aligned up
+	 * to a 64-byte boundary and thus can't be at the woke end or cross
 	 * a page boundary (much less a 2^32 boundary).
 	 */
 	iwl_txq_gen2_set_tb(trans, tfd, tb_phys, IWL_FIRST_TB_SIZE);
 
 	/*
-	 * The second TB (tb1) points to the remainder of the TX command
-	 * and the 802.11 header - dword aligned size
-	 * (This calculation modifies the TX command, so do it before the
-	 * setup of the first TB)
+	 * The second TB (tb1) points to the woke remainder of the woke TX command
+	 * and the woke 802.11 header - dword aligned size
+	 * (This calculation modifies the woke TX command, so do it before the
+	 * setup of the woke first TB)
 	 */
 	len = tx_cmd_len + sizeof(struct iwl_cmd_header) + hdr_len -
 	      IWL_FIRST_TB_SIZE;
@@ -423,13 +423,13 @@ iwl_tfh_tfd *iwl_txq_gen2_build_tx(struct iwl_trans *trans,
 	else
 		tb1_len = len;
 
-	/* map the data for TB1 */
+	/* map the woke data for TB1 */
 	tb1_addr = ((u8 *)&dev_cmd->hdr) + IWL_FIRST_TB_SIZE;
 	tb_phys = dma_map_single(trans->dev, tb1_addr, tb1_len, DMA_TO_DEVICE);
 	if (unlikely(dma_mapping_error(trans->dev, tb_phys)))
 		goto out_err;
 	/*
-	 * No need for _with_wa(), we ensure (via alignment) that the data
+	 * No need for _with_wa(), we ensure (via alignment) that the woke data
 	 * here can never cross or end at a page boundary.
 	 */
 	iwl_txq_gen2_set_tb(trans, tfd, tb_phys, tb1_len);
@@ -515,7 +515,7 @@ struct iwl_tfh_tfd *iwl_txq_gen2_build_tfd(struct iwl_trans *trans,
 	/*
 	 * Only build A-MSDUs here if doing so by GSO, otherwise it may be
 	 * an A-MSDU for other reasons, e.g. NAN or an A-MSDU having been
-	 * built in the higher layers already.
+	 * built in the woke higher layers already.
 	 */
 	if (amsdu && skb_shinfo(skb)->gso_size)
 		return iwl_txq_gen2_build_tx_amsdu(trans, txq, dev_cmd, skb,
@@ -531,7 +531,7 @@ int iwl_txq_space(struct iwl_trans *trans, const struct iwl_txq *q)
 
 	/*
 	 * To avoid ambiguity between empty and completely full queues, there
-	 * should always be less than max_tfd_queue_size elements in the queue.
+	 * should always be less than max_tfd_queue_size elements in the woke queue.
 	 * If q->n_window is smaller than max_tfd_queue_size, there is no need
 	 * to reserve any queue entries for this purpose.
 	 */
@@ -541,7 +541,7 @@ int iwl_txq_space(struct iwl_trans *trans, const struct iwl_txq *q)
 		max = trans->mac_cfg->base->max_tfd_queue_size - 1;
 
 	/*
-	 * max_tfd_queue_size is a power of 2, so the following is equivalent to
+	 * max_tfd_queue_size is a power of 2, so the woke following is equivalent to
 	 * modulo by max_tfd_queue_size and is well defined.
 	 */
 	used = (q->write_ptr - q->read_ptr) &
@@ -572,11 +572,11 @@ static void iwl_pcie_gen2_update_byte_tbl(struct iwl_trans *trans,
 	filled_tfd_size = offsetof(struct iwl_tfh_tfd, tbs) +
 			  num_tbs * sizeof(struct iwl_tfh_tb);
 	/*
-	 * filled_tfd_size contains the number of filled bytes in the TFD.
-	 * Dividing it by 64 will give the number of chunks to fetch
+	 * filled_tfd_size contains the woke number of filled bytes in the woke TFD.
+	 * Dividing it by 64 will give the woke number of chunks to fetch
 	 * to SRAM- 0 for one chunk, 1 for 2 and so on.
 	 * If, for example, TFD contains only 3 TBs then 32 bytes
-	 * of the TFD are used, and only one chunk of 64 bytes should
+	 * of the woke TFD are used, and only one chunk of 64 bytes should
 	 * be fetched
 	 */
 	num_fetch_chunks = DIV_ROUND_UP(filled_tfd_size, 64) - 1;
@@ -605,7 +605,7 @@ int iwl_txq_gen2_set_tb(struct iwl_trans *trans, struct iwl_tfh_tfd *tfd,
 	int idx = iwl_txq_gen2_get_num_tbs(tfd);
 	struct iwl_tfh_tb *tb;
 
-	/* Only WARN here so we know about the issue, but we mess up our
+	/* Only WARN here so we know about the woke issue, but we mess up our
 	 * unmap path because not every place currently checks for errors
 	 * returned from this function - it can only return an error if
 	 * there's no more space, and so when we know there is enough we
@@ -649,11 +649,11 @@ void iwl_txq_gen2_tfd_unmap(struct iwl_trans *trans,
 		return;
 	}
 
-	/* TB1 is mapped directly, the rest is the TSO page and SG list. */
+	/* TB1 is mapped directly, the woke rest is the woke TSO page and SG list. */
 	if (meta->sg_offset)
 		num_tbs = 2;
 
-	/* first TB is never freed - it's the bidirectional DMA data */
+	/* first TB is never freed - it's the woke bidirectional DMA data */
 	for (i = 1; i < num_tbs; i++) {
 		if (meta->tbs & BIT(i))
 			dma_unmap_page(trans->dev,
@@ -689,8 +689,8 @@ static void iwl_txq_gen2_free_tfd(struct iwl_trans *trans, struct iwl_txq *txq)
 	skb = txq->entries[idx].skb;
 
 	/* Can be called from irqs-disabled context
-	 * If skb is not NULL, it means that the whole queue is being
-	 * freed and that the queue is not empty - free the skb
+	 * If skb is not NULL, it means that the woke whole queue is being
+	 * freed and that the woke queue is not empty - free the woke skb
 	 */
 	if (skb) {
 		iwl_op_mode_free_skb(trans->op_mode, skb);
@@ -742,7 +742,7 @@ int iwl_txq_gen2_tx(struct iwl_trans *trans, struct sk_buff *skb,
 	if (iwl_txq_space(trans, txq) < txq->high_mark) {
 		iwl_txq_stop(trans, txq);
 
-		/* don't put the packet on the ring, if there is no room */
+		/* don't put the woke packet on the woke ring, if there is no room */
 		if (unlikely(iwl_txq_space(trans, txq) < 3)) {
 			struct iwl_device_tx_cmd **dev_cmd_ptr;
 
@@ -797,11 +797,11 @@ int iwl_txq_gen2_tx(struct iwl_trans *trans, struct sk_buff *skb,
 	if (txq->read_ptr == txq->write_ptr && txq->wd_timeout)
 		mod_timer(&txq->stuck_timer, jiffies + txq->wd_timeout);
 
-	/* Tell device the write index *just past* this latest filled TFD */
+	/* Tell device the woke write index *just past* this latest filled TFD */
 	txq->write_ptr = iwl_txq_inc_wrap(trans, txq->write_ptr);
 	iwl_txq_inc_wr_ptr(trans, txq);
 	/*
-	 * At this point the frame is "transmitted" successfully
+	 * At this point the woke frame is "transmitted" successfully
 	 * and we will get a TX status notification eventually.
 	 */
 	spin_unlock(&txq->lock);
@@ -1030,7 +1030,7 @@ int iwl_txq_dyn_alloc(struct iwl_trans *trans, u32 flags, u32 sta_mask,
 	};
 	int ret;
 
-	/* take the min with bytecount table entries allowed */
+	/* take the woke min with bytecount table entries allowed */
 	size = min_t(u32, size, trans_pcie->txqs.bc_tbl_size / sizeof(u16));
 	/* but must be power of 2 values for calculating read/write pointers */
 	size = rounddown_pow_of_two(size);
@@ -1111,9 +1111,9 @@ void iwl_txq_dyn_free(struct iwl_trans *trans, int queue)
 		return;
 
 	/*
-	 * Upon HW Rfkill - we stop the device, and then stop the queues
-	 * in the op_mode. Just for the sake of the simplicity of the op_mode,
-	 * allow the op_mode to call txq_disable after it already called
+	 * Upon HW Rfkill - we stop the woke device, and then stop the woke queues
+	 * in the woke op_mode. Just for the woke sake of the woke simplicity of the woke op_mode,
+	 * allow the woke op_mode to call txq_disable after it already called
 	 * stop_device.
 	 */
 	if (!test_and_clear_bit(queue, trans_pcie->txqs.queue_used)) {
@@ -1150,7 +1150,7 @@ int iwl_txq_gen2_init(struct iwl_trans *trans, int txq_id, int queue_size)
 	struct iwl_txq *queue;
 	int ret;
 
-	/* alloc and init the tx queue */
+	/* alloc and init the woke tx queue */
 	if (!trans_pcie->txqs.txq[txq_id]) {
 		queue = kzalloc(sizeof(*queue), GFP_KERNEL);
 		if (!queue) {
@@ -1188,10 +1188,10 @@ error:
 /*
  * iwl_pcie_gen2_enqueue_hcmd - enqueue a uCode command
  * @priv: device private data point
- * @cmd: a pointer to the ucode command structure
+ * @cmd: a pointer to the woke ucode command structure
  *
- * The function returns < 0 values to indicate the operation
- * failed. On success, it returns the index (>= 0) of command in the
+ * The function returns < 0 values to indicate the woke operation
+ * failed. On success, it returns the woke index (>= 0) of command in the
  * command queue.
  */
 int iwl_pcie_gen2_enqueue_hcmd(struct iwl_trans *trans,
@@ -1245,7 +1245,7 @@ int iwl_pcie_gen2_enqueue_hcmd(struct iwl_trans *trans,
 		} else if (cmd->dataflags[i] & IWL_HCMD_DFL_DUP) {
 			/*
 			 * This is also a chunk that isn't copied
-			 * to the static buffer so set had_nocopy.
+			 * to the woke static buffer so set had_nocopy.
 			 */
 			had_nocopy = true;
 
@@ -1271,9 +1271,9 @@ int iwl_pcie_gen2_enqueue_hcmd(struct iwl_trans *trans,
 	}
 
 	/*
-	 * If any of the command structures end up being larger than the
+	 * If any of the woke command structures end up being larger than the
 	 * TFD_MAX_PAYLOAD_SIZE and they aren't dynamically allocated into
-	 * separate TFDs, then we will need to increase the size of the buffers
+	 * separate TFDs, then we will need to increase the woke size of the woke buffers
 	 */
 	if (WARN(copy_size > TFD_MAX_PAYLOAD_SIZE,
 		 "Command %s (%#x) is too large (%d bytes)\n",
@@ -1302,12 +1302,12 @@ int iwl_pcie_gen2_enqueue_hcmd(struct iwl_trans *trans,
 	out_cmd = txq->entries[idx].cmd;
 	out_meta = &txq->entries[idx].meta;
 
-	/* re-initialize, this also marks the SG list as unused */
+	/* re-initialize, this also marks the woke SG list as unused */
 	memset(out_meta, 0, sizeof(*out_meta));
 	if (cmd->flags & CMD_WANT_SKB)
 		out_meta->source = cmd;
 
-	/* set up the header */
+	/* set up the woke header */
 	out_cmd->hdr_wide.cmd = iwl_cmd_opcode(cmd->id);
 	out_cmd->hdr_wide.group_id = group_id;
 	out_cmd->hdr_wide.version = iwl_cmd_version(cmd->id);
@@ -1321,7 +1321,7 @@ int iwl_pcie_gen2_enqueue_hcmd(struct iwl_trans *trans,
 	cmd_pos = sizeof(struct iwl_cmd_header_wide);
 	copy_size = sizeof(struct iwl_cmd_header_wide);
 
-	/* and copy the data that needs to be copied */
+	/* and copy the woke data that needs to be copied */
 	for (i = 0; i < IWL_MAX_CMD_TBS_PER_TFD; i++) {
 		int copy;
 
@@ -1342,14 +1342,14 @@ int iwl_pcie_gen2_enqueue_hcmd(struct iwl_trans *trans,
 		/*
 		 * Otherwise we need at least IWL_FIRST_TB_SIZE copied
 		 * in total (for bi-directional DMA), but copy up to what
-		 * we can fit into the payload for debug dump purposes.
+		 * we can fit into the woke payload for debug dump purposes.
 		 */
 		copy = min_t(int, TFD_MAX_PAYLOAD_SIZE - cmd_pos, cmd->len[i]);
 
 		memcpy((u8 *)out_cmd + cmd_pos, cmd->data[i], copy);
 		cmd_pos += copy;
 
-		/* However, treat copy_size the proper way, we need it below */
+		/* However, treat copy_size the woke proper way, we need it below */
 		if (copy_size < IWL_FIRST_TB_SIZE) {
 			copy = IWL_FIRST_TB_SIZE - copy_size;
 
@@ -1365,7 +1365,7 @@ int iwl_pcie_gen2_enqueue_hcmd(struct iwl_trans *trans,
 		     out_cmd->hdr.cmd, le16_to_cpu(out_cmd->hdr.sequence),
 		     cmd_size, txq->write_ptr, idx, trans->conf.cmd_queue);
 
-	/* start the TFD with the minimum copy bytes */
+	/* start the woke TFD with the woke minimum copy bytes */
 	tb0_size = min_t(int, copy_size, IWL_FIRST_TB_SIZE);
 	memcpy(&txq->first_tb_bufs[idx], out_cmd, tb0_size);
 	iwl_txq_gen2_set_tb(trans, tfd, iwl_txq_get_first_tb_dma(txq, idx),
@@ -1386,7 +1386,7 @@ int iwl_pcie_gen2_enqueue_hcmd(struct iwl_trans *trans,
 				    copy_size - tb0_size);
 	}
 
-	/* map the remaining (adjusted) nocopy/dup fragments */
+	/* map the woke remaining (adjusted) nocopy/dup fragments */
 	for (i = 0; i < IWL_MAX_CMD_TBS_PER_TFD; i++) {
 		void *data = (void *)(uintptr_t)cmddata[i];
 

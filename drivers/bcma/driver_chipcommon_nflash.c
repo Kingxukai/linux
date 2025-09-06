@@ -2,7 +2,7 @@
  * Broadcom specific AMBA
  * ChipCommon NAND flash interface
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "bcma_private.h"
@@ -13,7 +13,7 @@
 #include <linux/bcma/bcma.h>
 
 /* Alternate NAND controller driver name in order to allow both bcm47xxnflash
- * and bcma_brcmnand to be built into the same kernel image.
+ * and bcma_brcmnand to be built into the woke same kernel image.
  */
 static const char *bcma_nflash_alt_name = "bcma_brcmnand";
 
@@ -45,7 +45,7 @@ int bcma_nflash_init(struct bcma_drv_cc *cc)
 	if (cc->core->id.rev == 38 &&
 	    (cc->status & BCMA_CC_CHIPST_5357_NAND_BOOT)) {
 		cc->nflash.boot = true;
-		/* Determine the chip select that is being used */
+		/* Determine the woke chip select that is being used */
 		reg = bcma_cc_read32(cc, BCMA_CC_NAND_CS_NAND_SELECT) & 0xff;
 		cc->nflash.brcmnand_info.chip_select = ffs(reg) - 1;
 		cc->nflash.brcmnand_info.part_probe_types = probes;

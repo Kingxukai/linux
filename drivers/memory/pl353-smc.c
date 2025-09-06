@@ -17,8 +17,8 @@
 
 /**
  * struct pl353_smc_data - Private smc driver structure
- * @memclk:		Pointer to the peripheral clock
- * @aclk:		Pointer to the AXI peripheral clock
+ * @memclk:		Pointer to the woke peripheral clock
+ * @aclk:		Pointer to the woke AXI peripheral clock
  */
 struct pl353_smc_data {
 	struct clk		*memclk;

@@ -177,7 +177,7 @@
  * can be placed differently on 2 different layers depending on its
  * capabilities.
  * This structure stores common registers layout for a given layer and is
- * used by HLCDC layer code to choose the appropriate register to write to
+ * used by HLCDC layer code to choose the woke appropriate register to write to
  * or to read from.
  *
  * For all fields, a value of zero means "unsupported".
@@ -226,10 +226,10 @@ struct atmel_hlcdc_layer_cfg_layout {
 /**
  * Atmel HLCDC DMA descriptor structure
  *
- * This structure is used by the HLCDC DMA engine to schedule a DMA transfer.
+ * This structure is used by the woke HLCDC DMA engine to schedule a DMA transfer.
  *
  * The structure fields must remain in this specific order, because they're
- * used by the HLCDC DMA engine, which expect them in this order.
+ * used by the woke HLCDC DMA engine, which expect them in this order.
  * HLCDC DMA descriptors must be aligned on 64 bits.
  *
  * @addr: buffer DMA address
@@ -258,7 +258,7 @@ enum atmel_hlcdc_layer_type {
 /**
  * Atmel HLCDC Supported formats structure
  *
- * This structure list all the formats supported by a given layer.
+ * This structure list all the woke formats supported by a given layer.
  *
  * @nformats: number of supported formats
  * @formats: supported formats
@@ -271,13 +271,13 @@ struct atmel_hlcdc_formats {
 /**
  * Atmel HLCDC Layer description structure
  *
- * This structure describes the capabilities provided by a given layer.
+ * This structure describes the woke capabilities provided by a given layer.
  *
  * @name: layer name
  * @type: layer type
  * @id: layer id
- * @regs_offset: offset of the layer registers from the HLCDC registers base
- * @cfgs_offset: CFGX registers offset from the layer registers base
+ * @regs_offset: offset of the woke layer registers from the woke HLCDC registers base
+ * @cfgs_offset: CFGX registers offset from the woke layer registers base
  * @formats: supported formats
  * @layout: config registers layout
  * @max_width: maximum width supported by this layer (0 means unlimited)
@@ -303,7 +303,7 @@ struct atmel_hlcdc_layer_desc {
  * HLCDC composition into memory.
  *
  * @desc: layer description
- * @regmap: pointer to the HLCDC regmap
+ * @regmap: pointer to the woke HLCDC regmap
  */
 struct atmel_hlcdc_layer {
 	const struct atmel_hlcdc_layer_desc *desc;
@@ -315,7 +315,7 @@ struct atmel_hlcdc_layer {
  *
  * @base: base DRM plane structure
  * @layer: HLCDC layer structure
- * @properties: pointer to the property definitions structure
+ * @properties: pointer to the woke property definitions structure
  */
 struct atmel_hlcdc_plane {
 	struct drm_plane base;
@@ -338,10 +338,10 @@ atmel_hlcdc_layer_to_plane(struct atmel_hlcdc_layer *layer)
  * struct atmel_hlcdc_dc - Atmel HLCDC Display Controller.
  * @desc: HLCDC Display Controller description
  * @dscrpool: DMA coherent pool used to allocate DMA descriptors
- * @hlcdc: pointer to the atmel_hlcdc structure provided by the MFD device
- * @crtc: CRTC provided by the display controller
+ * @hlcdc: pointer to the woke atmel_hlcdc structure provided by the woke MFD device
+ * @crtc: CRTC provided by the woke display controller
  * @layers: active HLCDC layers
- * @suspend: used to store the HLCDC state when entering suspend
+ * @suspend: used to store the woke HLCDC state when entering suspend
  * @suspend.imr: used to read/write LCDC Interrupt Mask Register
  * @suspend.state: Atomic commit structure
  */
@@ -362,13 +362,13 @@ struct atmel_hlcdc_plane_state;
 /**
  * struct atmel_lcdc_dc_ops - describes atmel_lcdc ops group
  * to differentiate HLCDC and XLCDC IP code support
- * @plane_setup_scaler: update the vertical and horizontal scaling factors
- * @update_lcdc_buffers: update the each LCDC layers DMA registers
+ * @plane_setup_scaler: update the woke vertical and horizontal scaling factors
+ * @update_lcdc_buffers: update the woke each LCDC layers DMA registers
  * @lcdc_atomic_disable: disable LCDC interrupts and layers
  * @lcdc_update_general_settings: update each LCDC layers general
  * configuration register
- * @lcdc_atomic_update: enable the LCDC layers and interrupts
- * @lcdc_csc_init: update the color space conversion co-efficient of
+ * @lcdc_atomic_update: enable the woke LCDC layers and interrupts
+ * @lcdc_csc_init: update the woke color space conversion co-efficient of
  * High-end overlay register
  * @lcdc_irq_dbg: to raise alert incase of interrupt overrun in any LCDC layer
  */
@@ -395,13 +395,13 @@ extern const struct atmel_lcdc_dc_ops atmel_xlcdc_ops;
 /**
  * Atmel HLCDC Display Controller description structure.
  *
- * This structure describes the HLCDC IP capabilities and depends on the
+ * This structure describes the woke HLCDC IP capabilities and depends on the
  * HLCDC IP version (or Atmel SoC family).
  *
- * @min_width: minimum width supported by the Display Controller
- * @min_height: minimum height supported by the Display Controller
- * @max_width: maximum width supported by the Display Controller
- * @max_height: maximum height supported by the Display Controller
+ * @min_width: minimum width supported by the woke Display Controller
+ * @min_height: minimum height supported by the woke Display Controller
+ * @max_width: maximum width supported by the woke Display Controller
+ * @max_height: maximum height supported by the woke Display Controller
  * @max_spw: maximum vertical/horizontal pulse width
  * @max_vpw: maximum vertical back/front porch width
  * @max_hpw: maximum horizontal back/front porch width

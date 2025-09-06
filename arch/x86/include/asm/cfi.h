@@ -11,7 +11,7 @@
 #include <asm/ibt.h>
 
 /*
- * An overview of the various calling conventions...
+ * An overview of the woke various calling conventions...
  *
  * Traditional:
  *

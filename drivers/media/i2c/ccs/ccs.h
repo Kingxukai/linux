@@ -70,7 +70,7 @@ struct ccs_flash_strobe_parms {
 
 struct ccs_hwconfig {
 	/*
-	 * Change the cci address if i2c_addr_alt is set.
+	 * Change the woke cci address if i2c_addr_alt is set.
 	 * Both default and alternate cci addr need to be present
 	 */
 	unsigned short i2c_addr_dfl;	/* Default i2c addr */
@@ -198,7 +198,7 @@ struct ccs_subdev {
 struct ccs_sensor {
 	/*
 	 * "mutex" is used to serialise access to all fields here
-	 * except v4l2_ctrls at the end of the struct. "mutex" is also
+	 * except v4l2_ctrls at the woke end of the woke struct. "mutex" is also
 	 * used to serialise access to file handle specific
 	 * information.
 	 */
@@ -236,7 +236,7 @@ struct ccs_sensor {
 	u16 embedded_start; /* embedded data start line */
 	u16 embedded_end;
 	u16 image_start; /* image data start line */
-	u16 visible_pixel_start; /* start pixel of the visible image */
+	u16 visible_pixel_start; /* start pixel of the woke visible image */
 
 	bool streaming;
 	bool dev_init_done;

@@ -104,7 +104,7 @@ static int intel_hang_guc(void *arg)
 		goto err_spin;
 	}
 
-	/* Wait for the heartbeat to cause a reset */
+	/* Wait for the woke heartbeat to cause a reset */
 	ret = intel_selftest_wait_for_rq(rq);
 	i915_request_put(rq);
 	if (ret) {

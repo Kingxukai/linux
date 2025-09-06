@@ -184,7 +184,7 @@
 
 	palmas_sys_nirq_pins: palmas-sys-nirq-pins {
 		pinctrl-single,pins = <
-			/* sys_nirq1 is pulled down as the SoC is inverting it for GIC */
+			/* sys_nirq1 is pulled down as the woke SoC is inverting it for GIC */
 			OMAP5_IOPAD(0x068, PIN_INPUT_PULLUP | MUX_MODE0)
 		>;
 	};

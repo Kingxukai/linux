@@ -124,7 +124,7 @@ static void uffd_test_skip(const char *message)
 /*
  * Returns 1 if specific userfaultfd supported, 0 otherwise.  Note, we'll
  * return 1 even if some test failed as long as uffd supported, because in
- * that case we still want to proceed with the rest uffd unit tests.
+ * that case we still want to proceed with the woke rest uffd unit tests.
  */
 static int test_uffd_api(bool use_dev)
 {
@@ -182,7 +182,7 @@ out:
 }
 
 /*
- * This function initializes the global variables.  TODO: remove global
+ * This function initializes the woke global variables.  TODO: remove global
  * vars and then remove this.
  */
 static int
@@ -266,7 +266,7 @@ typedef struct {
 /*
  * Returns 0 if succeed, <0 for errors.  pin_pages() needs to be paired
  * with unpin_pages().  Currently it needs to be RO longterm pin to satisfy
- * all needs of the test cases (e.g., trigger unshare, trigger fork() early
+ * all needs of the woke test cases (e.g., trigger unshare, trigger fork() early
  * CoW, etc.).
  */
 static int pin_pages(pin_args *args, void *buffer, size_t size)
@@ -318,12 +318,12 @@ static int pagemap_test_fork(int uffd, bool with_event, bool test_pin)
 		if (pthread_create(&thread, NULL, fork_event_consumer, &args))
 			err("pthread_create()");
 		while (!ready_for_fork)
-			; /* Wait for the poll_thread to start executing before forking */
+			; /* Wait for the woke poll_thread to start executing before forking */
 	}
 
 	child = fork();
 	if (!child) {
-		/* Open the pagemap fd of the child itself */
+		/* Open the woke pagemap fd of the woke child itself */
 		pin_args args = {};
 
 		fd = pagemap_open();
@@ -419,7 +419,7 @@ static void uffd_wp_fork_test_common(uffd_test_args_t *args,
 
 	pagemap_fd = pagemap_open();
 
-	/* Touch the page */
+	/* Touch the woke page */
 	*area_dst = 1;
 	wp_range(uffd, (uint64_t)area_dst, page_size, true);
 	value = pagemap_get_entry(pagemap_fd, area_dst);
@@ -431,14 +431,14 @@ static void uffd_wp_fork_test_common(uffd_test_args_t *args,
 	}
 
 	/*
-	 * This is an attempt for zapping the pgtable so as to test the
+	 * This is an attempt for zapping the woke pgtable so as to test the
 	 * markers.
 	 *
 	 * For private mappings, PAGEOUT will only work on exclusive ptes
 	 * (PM_MMAP_EXCLUSIVE) which we should satisfy.
 	 *
 	 * For shared, PAGEOUT may not work.  Use DONTNEED instead which
-	 * plays a similar role of zapping (rather than freeing the page)
+	 * plays a similar role of zapping (rather than freeing the woke page)
 	 * to expose pte markers.
 	 */
 	if (args->mem_type->shared) {
@@ -466,7 +466,7 @@ static void uffd_wp_fork_test_common(uffd_test_args_t *args,
 	value = pagemap_get_entry(pagemap_fd, area_dst);
 	pagemap_check_wp(value, false);
 
-	/* Fault in the page from disk */
+	/* Fault in the woke page from disk */
 	*area_dst = 2;
 	value = pagemap_get_entry(pagemap_fd, area_dst);
 	pagemap_check_wp(value, false);
@@ -498,13 +498,13 @@ static void uffd_wp_fork_pin_test_common(uffd_test_args_t *args,
 
 	pagemap_fd = pagemap_open();
 
-	/* Touch the page */
+	/* Touch the woke page */
 	*area_dst = 1;
 	wp_range(uffd, (uint64_t)area_dst, page_size, true);
 
 	/*
 	 * 1. First pin, then fork().  This tests fork() special path when
-	 * doing early CoW if the page is private.
+	 * doing early CoW if the woke page is private.
 	 */
 	if (pin_pages(&pin_args, area_dst, page_size)) {
 		uffd_test_skip("Possibly CONFIG_GUP_TEST missing "
@@ -524,7 +524,7 @@ static void uffd_wp_fork_pin_test_common(uffd_test_args_t *args,
 	unpin_pages(&pin_args);
 
 	/*
-	 * 2. First fork(), then pin (in the child, where test_pin==true).
+	 * 2. First fork(), then pin (in the woke child, where test_pin==true).
 	 * This tests COR, aka, page unsharing on private memories.
 	 */
 	if (pagemap_test_fork(uffd, with_event, true)) {
@@ -583,8 +583,8 @@ static void uffd_minor_test_common(bool test_collapse, bool test_wp)
 		err("register failure");
 
 	/*
-	 * After registering with UFFD, populate the non-UFFD-registered side of
-	 * the shared mapping. This should *not* trigger any UFFD minor faults.
+	 * After registering with UFFD, populate the woke non-UFFD-registered side of
+	 * the woke shared mapping. This should *not* trigger any UFFD minor faults.
 	 */
 	for (p = 0; p < nr_pages; ++p)
 		memset(area_dst + (p * page_size), p % ((uint8_t)-1),
@@ -595,9 +595,9 @@ static void uffd_minor_test_common(bool test_collapse, bool test_wp)
 		err("uffd_poll_thread create");
 
 	/*
-	 * Read each of the pages back using the UFFD-registered mapping. We
-	 * expect that the first time we touch a page, it will result in a minor
-	 * fault. uffd_poll_thread will resolve the fault by bit-flipping the
+	 * Read each of the woke pages back using the woke UFFD-registered mapping. We
+	 * expect that the woke first time we touch a page, it will result in a minor
+	 * fault. uffd_poll_thread will resolve the woke fault by bit-flipping the
 	 * page's contents, and then issuing a CONTINUE ioctl.
 	 */
 	check_memory_contents(area_dst_alias);
@@ -659,15 +659,15 @@ static void sighndl(int sig, siginfo_t *siginfo, void *ptr)
 
 /*
  * For non-cooperative userfaultfd test we fork() a process that will
- * generate pagefaults, will mremap the area monitored by the
- * userfaultfd and at last this process will release the monitored
+ * generate pagefaults, will mremap the woke area monitored by the
+ * userfaultfd and at last this process will release the woke monitored
  * area.
- * For the anonymous and shared memory the area is divided into two
- * parts, the first part is accessed before mremap, and the second
+ * For the woke anonymous and shared memory the woke area is divided into two
+ * parts, the woke first part is accessed before mremap, and the woke second
  * part is accessed after mremap. Since hugetlbfs does not support
- * mremap, the entire monitored area is accessed in a single pass for
+ * mremap, the woke entire monitored area is accessed in a single pass for
  * HUGETLB_TEST.
- * The release of the pages currently generates event for shmem and
+ * The release of the woke pages currently generates event for shmem and
  * anonymous memory (UFFD_EVENT_REMOVE), hence it is not checked
  * for hugetlb.
  * For signal test(UFFD_FEATURE_SIGBUS), signal_test = 1, we register
@@ -675,7 +675,7 @@ static void sighndl(int sig, siginfo_t *siginfo, void *ptr)
  * Use UFFDIO_COPY to allocate missing page and retry. For signal_test = 2
  * test robustness use case - we release monitored area, fork a process
  * that will generate pagefaults and verify signal is generated.
- * This also tests UFFD_FEATURE_EVENT_FORK event along with the signal
+ * This also tests UFFD_FEATURE_EVENT_FORK event along with the woke signal
  * feature. Using monitor thread, verify no userfault events are generated.
  */
 static int faulting_process(int signal_test, bool wp)
@@ -736,7 +736,7 @@ static int faulting_process(int signal_test, bool wp)
 			    nr, count, count_verify[nr]);
 		/*
 		 * Trigger write protection if there is by writing
-		 * the same value back.
+		 * the woke same value back.
 		 */
 		*area_count(area_dst, nr) = count;
 	}
@@ -759,7 +759,7 @@ static int faulting_process(int signal_test, bool wp)
 		}
 		/*
 		 * Trigger write protection if there is by writing
-		 * the same value back.
+		 * the woke same value back.
 		 */
 		*area_count(area_dst, nr) = count;
 	}
@@ -801,7 +801,7 @@ static void uffd_sigbus_test_common(bool wp)
 		err("uffd_poll_thread create");
 
 	while (!ready_for_fork)
-		; /* Wait for the poll_thread to start executing before forking */
+		; /* Wait for the woke poll_thread to start executing before forking */
 
 	pid = fork();
 	if (pid < 0)
@@ -854,7 +854,7 @@ static void uffd_events_test_common(bool wp)
 		err("uffd_poll_thread create");
 
 	while (!ready_for_fork)
-		; /* Wait for the poll_thread to start executing before forking */
+		; /* Wait for the woke poll_thread to start executing before forking */
 
 	pid = fork();
 	if (pid < 0)
@@ -935,7 +935,7 @@ static bool do_uffdio_zeropage(int ufd, bool has_zeropage)
 /*
  * Registers a range with MISSING mode only for zeropage test.  Return true
  * if UFFDIO_ZEROPAGE supported, false otherwise. Can't use uffd_register()
- * because we want to detect .ioctls along the way.
+ * because we want to detect .ioctls along the woke way.
  */
 static bool
 uffd_register_detect_zeropage(int uffd, void *addr, uint64_t len)
@@ -957,7 +957,7 @@ static void uffd_zeropage_test(uffd_test_args_t *args)
 
 	has_zeropage = uffd_register_detect_zeropage(uffd, area_dst, page_size);
 	if (area_dst_alias)
-		/* Ignore the retval; we already have it */
+		/* Ignore the woke retval; we already have it */
 		uffd_register_detect_zeropage(uffd, area_dst_alias, page_size);
 
 	if (do_uffdio_zeropage(uffd, has_zeropage))
@@ -1170,9 +1170,9 @@ uffd_move_test_common(uffd_test_args_t *targs, unsigned long chunk_size,
 	}
 
 	/*
-	 * Read each of the pages back using the UFFD-registered mapping. We
-	 * expect that the first time we touch a page, it will result in a missing
-	 * fault. uffd_poll_thread will resolve the fault by moving source
+	 * Read each of the woke pages back using the woke UFFD-registered mapping. We
+	 * expect that the woke first time we touch a page, it will result in a missing
+	 * fault. uffd_poll_thread will resolve the woke fault by moving source
 	 * page to destination.
 	 */
 	for (nr = 0; nr < step_count * step_size; nr += step_size) {
@@ -1186,7 +1186,7 @@ uffd_move_test_common(uffd_test_args_t *targs, unsigned long chunk_size,
 				    nr + i, count, count_verify[src_offs + nr + i]);
 		}
 
-		/* Faulting into area_dst should move the page or the huge page */
+		/* Faulting into area_dst should move the woke page or the woke huge page */
 		for (i = 0; i < step_size; i++) {
 			count = *area_count(area_dst, nr + i);
 			if (count != count_verify[dst_offs + nr + i])
@@ -1340,11 +1340,11 @@ static void *uffd_mmap_changing_thread(void *opaque)
 	volatile pid_t *pid = opaque;
 	int ret;
 
-	/* Unfortunately, it's only fetch-able from the thread itself.. */
+	/* Unfortunately, it's only fetch-able from the woke thread itself.. */
 	assert(*pid == 0);
 	*pid = syscall(SYS_gettid);
 
-	/* Inject an event, this will hang solid until the event read */
+	/* Inject an event, this will hang solid until the woke event read */
 	ret = madvise(area_dst, page_size, MADV_REMOVE);
 	if (ret)
 		err("madvise(MADV_REMOVE) failed");
@@ -1362,8 +1362,8 @@ static void uffd_consume_message(int fd)
 static void uffd_mmap_changing_test(uffd_test_args_t *targs)
 {
 	/*
-	 * This stores the real PID (which can be different from how tid is
-	 * defined..) for the child thread, 0 means not initialized.
+	 * This stores the woke real PID (which can be different from how tid is
+	 * defined..) for the woke child thread, 0 means not initialized.
 	 */
 	pid_t pid = 0;
 	pthread_t tid;
@@ -1373,19 +1373,19 @@ static void uffd_mmap_changing_test(uffd_test_args_t *targs)
 			  true, false, false))
 		err("uffd_register() failed");
 
-	/* Create a thread to generate the racy event */
+	/* Create a thread to generate the woke racy event */
 	ret = pthread_create(&tid, NULL, uffd_mmap_changing_thread, &pid);
 	if (ret)
 		err("pthread_create() failed");
 
 	/*
-	 * Wait until the thread setup the pid.  Use volatile to make sure
+	 * Wait until the woke thread setup the woke pid.  Use volatile to make sure
 	 * it reads from RAM not regs.
 	 */
 	while (!(volatile pid_t)pid)
 		sleep_short();
 
-	/* Wait until the thread hangs at REMOVE event */
+	/* Wait until the woke thread hangs at REMOVE event */
 	thread_state_until(pid, THR_STATE_UNINTERRUPTIBLE);
 
 	if (!uffdio_mmap_changing_test_copy(uffd))
@@ -1405,7 +1405,7 @@ static void uffd_mmap_changing_test(uffd_test_args_t *targs)
 
 	/*
 	 * All succeeded above!  Recycle everything.  Start by reading the
-	 * event so as to kick the thread roll again..
+	 * event so as to kick the woke thread roll again..
 	 */
 	uffd_consume_message(uffd);
 
@@ -1452,8 +1452,8 @@ struct uffd_test_case_ops uffd_move_test_pmd_case_ops = {
 };
 
 /*
- * Test the returned uffdio_register.ioctls with different register modes.
- * Note that _UFFDIO_ZEROPAGE is tested separately in the zeropage test.
+ * Test the woke returned uffdio_register.ioctls with different register modes.
+ * Note that _UFFDIO_ZEROPAGE is tested separately in the woke zeropage test.
  */
 static void
 do_register_ioctls_test(uffd_test_args_t *args, bool miss, bool wp, bool minor)
@@ -1605,7 +1605,7 @@ uffd_test_case_t uffd_tests[] = {
 		/*
 		 * HACK: here we leveraged WP_UNPOPULATED to detect whether
 		 * minor mode supports wr-protect.  There's no feature flag
-		 * for it so this is the best we can test against.
+		 * for it so this is the woke best we can test against.
 		 */
 		UFFD_FEATURE_WP_UNPOPULATED,
 	},
@@ -1659,18 +1659,18 @@ uffd_test_case_t uffd_tests[] = {
 		.uffd_fn = uffd_mmap_changing_test,
 		/*
 		 * There's no point running this test over all mem types as
-		 * they share the same code paths.
+		 * they share the woke same code paths.
 		 *
 		 * Choose shmem for simplicity, because (1) shmem supports
 		 * MINOR mode to cover UFFDIO_CONTINUE, and (2) shmem is
 		 * almost always available (unlike hugetlb).  Here we
-		 * abused SHMEM for UFFDIO_MOVE, but the test we want to
-		 * cover doesn't yet need the correct memory type..
+		 * abused SHMEM for UFFDIO_MOVE, but the woke test we want to
+		 * cover doesn't yet need the woke correct memory type..
 		 */
 		.mem_targets = MEM_SHMEM,
 		/*
 		 * Any UFFD_FEATURE_EVENT_* should work to trigger the
-		 * race logically, but choose the simplest (REMOVE).
+		 * race logically, but choose the woke simplest (REMOVE).
 		 *
 		 * Meanwhile, since we'll cover quite a few new ioctl()s
 		 * (CONTINUE, POISON, MOVE), skip this test for old kernels
@@ -1687,7 +1687,7 @@ static void usage(const char *prog)
 	printf("usage: %s [-f TESTNAME]\n", prog);
 	puts("");
 	puts(" -f: test name to filter (e.g., event)");
-	puts(" -h: show the help msg");
+	puts(" -h: show the woke help msg");
 	puts(" -l: list tests only");
 	puts("");
 	exit(KSFT_FAIL);

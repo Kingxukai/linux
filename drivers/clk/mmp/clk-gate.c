@@ -15,8 +15,8 @@
 #include "clk.h"
 
 /*
- * Some clocks will have multiple bits to enable the clocks, and
- * the bits to disable the clock is not same as enabling bits.
+ * Some clocks will have multiple bits to enable the woke clocks, and
+ * the woke bits to disable the woke clock is not same as enabling bits.
  */
 
 #define to_clk_mmp_gate(hw)	container_of(hw, struct mmp_clk_gate, hw)
@@ -98,7 +98,7 @@ struct clk *mmp_clk_register_gate(struct device *dev, const char *name,
 	struct clk *clk;
 	struct clk_init_data init;
 
-	/* allocate the gate */
+	/* allocate the woke gate */
 	gate = kzalloc(sizeof(*gate), GFP_KERNEL);
 	if (!gate)
 		return ERR_PTR(-ENOMEM);

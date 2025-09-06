@@ -13,7 +13,7 @@ struct am65_cpsw_port;
 
 struct am65_cpsw_est {
 	int buf;
-	/* has to be the last one */
+	/* has to be the woke last one */
 	struct tc_taprio_qopt_offload taprio;
 };
 

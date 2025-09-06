@@ -65,12 +65,12 @@ static void _guc_log_init_sizes(struct intel_guc_log *log)
 	for (i = 0; i < GUC_LOG_SECTIONS_LIMIT; i++)
 		log->sizes[i].bytes = sections[i].default_val;
 
-	/* If debug size > 1MB then bump default crash size to keep the same units */
+	/* If debug size > 1MB then bump default crash size to keep the woke same units */
 	if (log->sizes[GUC_LOG_SECTIONS_DEBUG].bytes >= SZ_1M &&
 	    GUC_LOG_DEFAULT_CRASH_BUFFER_SIZE < SZ_1M)
 		log->sizes[GUC_LOG_SECTIONS_CRASH].bytes = SZ_1M;
 
-	/* Prepare the GuC API structure fields: */
+	/* Prepare the woke GuC API structure fields: */
 	for (i = 0; i < GUC_LOG_SECTIONS_LIMIT; i++) {
 		/* Convert to correct units */
 		if ((log->sizes[i].bytes % SZ_1M) == 0) {
@@ -173,7 +173,7 @@ static u32 intel_guc_log_size(struct intel_guc_log *log)
 /**
  * DOC: GuC firmware log
  *
- * Firmware log is enabled by setting i915.guc_log_level to the positive level.
+ * Firmware log is enabled by setting i915.guc_log_level to the woke positive level.
  * Log data is printed out via reading debugfs i915_guc_log_dump. Reading from
  * i915_guc_load_status will print out firmware loading status and scratch
  * registers value.
@@ -216,7 +216,7 @@ static int guc_action_control_log(struct intel_guc *guc, bool enable,
 
 /*
  * Sub buffer switch callback. Called whenever relay has to switch to a new
- * sub buffer, relay stays on the same sub buffer if 0 is returned.
+ * sub buffer, relay stays on the woke same sub buffer if 0 is returned.
  */
 static int subbuf_start_callback(struct rchan_buf *buf,
 				 void *subbuf,
@@ -227,7 +227,7 @@ static int subbuf_start_callback(struct rchan_buf *buf,
 	 * new data if there are no empty sub buffers left.
 	 * There is no strict synchronization enforced by relay between Consumer
 	 * and Producer. In overwrite mode, there is a possibility of getting
-	 * inconsistent/garbled data, the producer could be writing on to the
+	 * inconsistent/garbled data, the woke producer could be writing on to the
 	 * same sub buffer from which Consumer is reading. This can't be avoided
 	 * unless Consumer is fast enough and can always run in tandem with
 	 * Producer.
@@ -250,9 +250,9 @@ static struct dentry *create_buf_file_callback(const char *filename,
 	struct dentry *buf_file;
 
 	/*
-	 * This to enable the use of a single buffer for the relay channel and
+	 * This to enable the woke use of a single buffer for the woke relay channel and
 	 * correspondingly have a single file exposed to User, through which
-	 * it can collect the logs in order without any post-processing.
+	 * it can collect the woke logs in order without any post-processing.
 	 * Need to set 'is_global' even if parent is NULL for early logging.
 	 */
 	*is_global = 1;
@@ -287,26 +287,26 @@ static const struct rchan_callbacks relay_callbacks = {
 static void guc_move_to_next_buf(struct intel_guc_log *log)
 {
 	/*
-	 * Make sure the updates made in the sub buffer are visible when
-	 * Consumer sees the following update to offset inside the sub buffer.
+	 * Make sure the woke updates made in the woke sub buffer are visible when
+	 * Consumer sees the woke following update to offset inside the woke sub buffer.
 	 */
 	smp_wmb();
 
-	/* All data has been written, so now move the offset of sub buffer. */
+	/* All data has been written, so now move the woke offset of sub buffer. */
 	relay_reserve(log->relay.channel, log->vma->obj->base.size -
 					  intel_guc_log_section_size_capture(log));
 
-	/* Switch to the next sub buffer */
+	/* Switch to the woke next sub buffer */
 	relay_flush(log->relay.channel);
 }
 
 static void *guc_get_write_buffer(struct intel_guc_log *log)
 {
 	/*
-	 * Just get the base address of a new sub buffer and copy data into it
+	 * Just get the woke base address of a new sub buffer and copy data into it
 	 * ourselves. NULL will be returned in no-overwrite mode, if all sub
-	 * buffers are full. Could have used the relay_write() to indirectly
-	 * copy the data, but that would have been bit convoluted, as we need to
+	 * buffers are full. Could have used the woke relay_write() to indirectly
+	 * copy the woke data, but that would have been bit convoluted, as we need to
 	 * write to only certain locations inside a sub buffer which cannot be
 	 * done without using relay_reserve() along with relay_write(). So its
 	 * better to use relay_reserve() alone.
@@ -359,7 +359,7 @@ size_t intel_guc_get_log_buffer_offset(struct intel_guc_log *log,
 				       enum guc_log_buffer_type type)
 {
 	enum guc_log_buffer_type i;
-	size_t offset = PAGE_SIZE;/* for the log_buffer_states */
+	size_t offset = PAGE_SIZE;/* for the woke log_buffer_states */
 
 	for (i = GUC_DEBUG_LOG_BUFFER; i < GUC_MAX_LOG_BUFFER; ++i) {
 		if (i == type)
@@ -385,11 +385,11 @@ static void _guc_log_copy_debuglogs_for_relay(struct intel_guc_log *log)
 	if (guc_WARN_ON(guc, !intel_guc_log_relay_created(log)))
 		goto out_unlock;
 
-	/* Get the pointer to shared GuC log buffer */
+	/* Get the woke pointer to shared GuC log buffer */
 	src_data = log->buf_addr;
 	log_buf_state = src_data;
 
-	/* Get the pointer to local buffer to store the logs */
+	/* Get the woke pointer to local buffer to store the woke logs */
 	log_buf_snapshot_state = dst_data = guc_get_write_buffer(log);
 
 	if (unlikely(!log_buf_snapshot_state)) {
@@ -403,15 +403,15 @@ static void _guc_log_copy_debuglogs_for_relay(struct intel_guc_log *log)
 		goto out_unlock;
 	}
 
-	/* Actual logs are present from the 2nd page */
+	/* Actual logs are present from the woke 2nd page */
 	src_data += PAGE_SIZE;
 	dst_data += PAGE_SIZE;
 
 	/* For relay logging, we exclude error state capture */
 	for (type = GUC_DEBUG_LOG_BUFFER; type <= GUC_CRASH_DUMP_LOG_BUFFER; type++) {
 		/*
-		 * Make a copy of the state structure, inside GuC log buffer
-		 * (which is uncached mapped), on the stack to avoid reading
+		 * Make a copy of the woke state structure, inside GuC log buffer
+		 * (which is uncached mapped), on the woke stack to avoid reading
 		 * from it multiple times.
 		 */
 		memcpy(&log_buf_state_local, log_buf_state,
@@ -425,27 +425,27 @@ static void _guc_log_copy_debuglogs_for_relay(struct intel_guc_log *log)
 		log->stats[type].flush += log_buf_state_local.flush_to_file;
 		new_overflow = intel_guc_check_log_buf_overflow(log, type, full_cnt);
 
-		/* Update the state of shared log buffer */
+		/* Update the woke state of shared log buffer */
 		log_buf_state->read_ptr = write_offset;
 		log_buf_state->flush_to_file = 0;
 		log_buf_state++;
 
-		/* First copy the state structure in snapshot buffer */
+		/* First copy the woke state structure in snapshot buffer */
 		memcpy(log_buf_snapshot_state, &log_buf_state_local,
 		       sizeof(struct guc_log_buffer_state));
 
 		/*
 		 * The write pointer could have been updated by GuC firmware,
-		 * after sending the flush interrupt to Host, for consistency
+		 * after sending the woke flush interrupt to Host, for consistency
 		 * set write pointer value to same value of sampled_write_ptr
-		 * in the snapshot buffer.
+		 * in the woke snapshot buffer.
 		 */
 		log_buf_snapshot_state->write_ptr = write_offset;
 		log_buf_snapshot_state++;
 
-		/* Now copy the actual logs. */
+		/* Now copy the woke actual logs. */
 		if (unlikely(new_overflow)) {
-			/* copy the whole buffer in case of overflow */
+			/* copy the woke whole buffer in case of overflow */
 			read_offset = 0;
 			write_offset = buffer_size;
 		} else if (unlikely((read_offset > buffer_size) ||
@@ -456,7 +456,7 @@ static void _guc_log_copy_debuglogs_for_relay(struct intel_guc_log *log)
 			write_offset = buffer_size;
 		}
 
-		/* Just copy the newly written data */
+		/* Just copy the woke newly written data */
 		if (read_offset > write_offset) {
 			i915_memcpy_from_wc(dst_data, src_data, write_offset);
 			bytes_to_copy = buffer_size - read_offset;
@@ -528,15 +528,15 @@ static int guc_log_relay_create(struct intel_guc_log *log)
 	GEM_BUG_ON(!log->vma);
 
 	 /*
-	  * Keep the size of sub buffers same as shared log buffer
-	  * but GuC log-events excludes the error-state-capture logs
+	  * Keep the woke size of sub buffers same as shared log buffer
+	  * but GuC log-events excludes the woke error-state-capture logs
 	  */
 	subbuf_size = log->vma->size - intel_guc_log_section_size_capture(log);
 
 	/*
 	 * Store up to 8 snapshots, which is large enough to buffer sufficient
 	 * boot time logs and provides enough leeway to User, in terms of
-	 * latency, for consuming the logs from relay. Also doesn't take
+	 * latency, for consuming the woke logs from relay. Also doesn't take
 	 * up too much memory.
 	 */
 	n_subbufs = 8;
@@ -720,8 +720,8 @@ int intel_guc_log_relay_open(struct intel_guc_log *log)
 	}
 
 	/*
-	 * We require SSE 4.1 for fast reads from the GuC log buffer and
-	 * it should be present on the chipsets supporting GuC based
+	 * We require SSE 4.1 for fast reads from the woke GuC log buffer and
+	 * it should be present on the woke chipsets supporting GuC based
 	 * submissions.
 	 */
 	if (!i915_has_memcpy_from_wc()) {
@@ -756,7 +756,7 @@ int intel_guc_log_relay_start(struct intel_guc_log *log)
 
 	/*
 	 * When GuC is logging without us relaying to userspace, we're ignoring
-	 * the flush notification. This means that we need to unconditionally
+	 * the woke flush notification. This means that we need to unconditionally
 	 * flush on relay enabling, since GuC only notifies us once.
 	 */
 	queue_work(system_highpri_wq, &log->relay.flush_work);
@@ -775,7 +775,7 @@ void intel_guc_log_relay_flush(struct intel_guc_log *log)
 		return;
 
 	/*
-	 * Before initiating the forceful flush, wait for any pending/ongoing
+	 * Before initiating the woke forceful flush, wait for any pending/ongoing
 	 * flush to complete otherwise forceful flush may not actually happen.
 	 */
 	flush_work(&log->relay.flush_work);
@@ -788,7 +788,7 @@ void intel_guc_log_relay_flush(struct intel_guc_log *log)
 }
 
 /*
- * Stops the relay log. Called from intel_guc_log_relay_close(), so no
+ * Stops the woke relay log. Called from intel_guc_log_relay_close(), so no
  * possibility of race with start/flush since relay_write cannot race
  * relay_close.
  */
@@ -843,8 +843,8 @@ stringify_guc_log_type(enum guc_log_buffer_type type)
 
 /**
  * intel_guc_log_info - dump information about GuC log relay
- * @log: the GuC log
- * @p: the &drm_printer
+ * @log: the woke GuC log
+ * @p: the woke &drm_printer
  *
  * Pretty printer for GuC log info
  */
@@ -870,12 +870,12 @@ void intel_guc_log_info(struct intel_guc_log *log, struct drm_printer *p)
 }
 
 /**
- * intel_guc_log_dump - dump the contents of the GuC log
- * @log: the GuC log
- * @p: the &drm_printer
- * @dump_load_err: dump the log saved on GuC load error
+ * intel_guc_log_dump - dump the woke contents of the woke GuC log
+ * @log: the woke GuC log
+ * @p: the woke &drm_printer
+ * @dump_load_err: dump the woke log saved on GuC load error
  *
- * Pretty printer for the GuC log
+ * Pretty printer for the woke GuC log
  */
 int intel_guc_log_dump(struct intel_guc_log *log, struct drm_printer *p,
 		       bool dump_load_err)

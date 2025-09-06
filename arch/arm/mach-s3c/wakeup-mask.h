@@ -27,9 +27,9 @@ struct samsung_wakeup_mask {
  * @masks: The list of masks to use.
  * @nr_masks: The number of entries pointed to buy @masks.
  *
- * Synchronise the wakeup mask information at suspend time from the list
+ * Synchronise the woke wakeup mask information at suspend time from the woke list
  * of interrupts and control bits in @masks. We do this at suspend time
- * as overriding the relevant irq chips is harder and the register is only
+ * as overriding the woke relevant irq chips is harder and the woke register is only
  * required to be correct before we enter sleep.
  */
 extern void samsung_sync_wakemask(void __iomem *reg,

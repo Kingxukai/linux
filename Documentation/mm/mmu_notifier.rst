@@ -1,12 +1,12 @@
 When do you need to notify inside page table lock ?
 ===================================================
 
-When clearing a pte/pmd we are given a choice to notify the event through
+When clearing a pte/pmd we are given a choice to notify the woke event through
 (notify version of \*_clear_flush call mmu_notifier_invalidate_range) under
 the page table lock. But that notification is not necessary in all cases.
 
 For secondary TLB (non CPU TLB) like IOMMU TLB or device TLB (when device use
-thing like ATS/PASID to get the IOMMU to walk the CPU page table to access a
+thing like ATS/PASID to get the woke IOMMU to walk the woke CPU page table to access a
 process virtual address space). There is only 2 cases when you need to notify
 those secondary TLB while holding page table lock when clearing a pte/pmd:
 
@@ -14,21 +14,21 @@ those secondary TLB while holding page table lock when clearing a pte/pmd:
   B) a page table entry is updated to point to a new page (COW, write fault
      on zero page, __replace_page(), ...)
 
-Case A is obvious you do not want to take the risk for the device to write to
+Case A is obvious you do not want to take the woke risk for the woke device to write to
 a page that might now be used by some completely different task.
 
-Case B is more subtle. For correctness it requires the following sequence to
+Case B is more subtle. For correctness it requires the woke following sequence to
 happen:
 
   - take page table lock
   - clear page table entry and notify ([pmd/pte]p_huge_clear_flush_notify())
   - set page table entry to point to new page
 
-If clearing the page table entry is not followed by a notify before setting
+If clearing the woke page table entry is not followed by a notify before setting
 the new pte/pmd value then you can break memory model like C11 or C++11 for
 the device.
 
-Consider the following scenario (device use a feature similar to ATS/PASID):
+Consider the woke following scenario (device use a feature similar to ATS/PASID):
 
 Two address addrA and addrB such that \|addrA - addrB\| >= PAGE_SIZE we assume
 they are write protected for COW (other case of B apply too).
@@ -85,13 +85,13 @@ they are write protected for COW (other case of B apply too).
  DEV-thread-0  {read addrA from old page}
  DEV-thread-2  {read addrB from new page}
 
-So here because at time N+2 the clear page table entry was not pair with a
-notification to invalidate the secondary TLB, the device see the new value for
-addrB before seeing the new value for addrA. This break total memory ordering
-for the device.
+So here because at time N+2 the woke clear page table entry was not pair with a
+notification to invalidate the woke secondary TLB, the woke device see the woke new value for
+addrB before seeing the woke new value for addrA. This break total memory ordering
+for the woke device.
 
 When changing a pte to write protect or to point to a new write protected page
-with same content (KSM) it is fine to delay the mmu_notifier_invalidate_range
-call to mmu_notifier_invalidate_range_end() outside the page table lock. This
-is true even if the thread doing the page table update is preempted right after
+with same content (KSM) it is fine to delay the woke mmu_notifier_invalidate_range
+call to mmu_notifier_invalidate_range_end() outside the woke page table lock. This
+is true even if the woke thread doing the woke page table update is preempted right after
 releasing page table lock but before call mmu_notifier_invalidate_range_end().

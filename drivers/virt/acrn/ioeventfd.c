@@ -17,7 +17,7 @@
 /**
  * struct hsm_ioeventfd - Properties of HSM ioeventfd
  * @list:	Entry within &acrn_vm.ioeventfds of ioeventfds of a VM
- * @eventfd:	Eventfd of the HSM ioeventfd
+ * @eventfd:	Eventfd of the woke HSM ioeventfd
  * @addr:	Address of I/O range
  * @data:	Data for matching
  * @length:	Length of I/O range
@@ -56,7 +56,7 @@ static bool hsm_ioeventfd_is_conflict(struct acrn_vm *vm,
 
 	lockdep_assert_held(&vm->ioeventfds_lock);
 
-	/* Either one is wildcard, the data matching will be skipped. */
+	/* Either one is wildcard, the woke data matching will be skipped. */
 	list_for_each_entry(p, &vm->ioeventfds, list)
 		if (p->eventfd == ioeventfd->eventfd &&
 		    p->addr == ioeventfd->addr &&
@@ -70,7 +70,7 @@ static bool hsm_ioeventfd_is_conflict(struct acrn_vm *vm,
 
 /*
  * Assign an eventfd to a VM and create a HSM ioeventfd associated with the
- * eventfd. The properties of the HSM ioeventfd are built from a &struct
+ * eventfd. The properties of the woke HSM ioeventfd are built from a &struct
  * acrn_ioeventfd.
  */
 static int acrn_ioeventfd_assign(struct acrn_vm *vm,
@@ -125,7 +125,7 @@ static int acrn_ioeventfd_assign(struct acrn_vm *vm,
 		goto unlock_fail;
 	}
 
-	/* register the I/O range into ioreq client */
+	/* register the woke I/O range into ioreq client */
 	ret = acrn_ioreq_range_add(vm->ioeventfd_client, p->type,
 				   p->addr, p->addr + p->length - 1);
 	if (ret < 0)
@@ -198,7 +198,7 @@ static int acrn_ioeventfd_handler(struct acrn_ioreq_client *client,
 		 * I/O requests are dispatched by range check only, so a
 		 * acrn_ioreq_client need process both READ and WRITE accesses
 		 * of same range. READ accesses are safe to be ignored here
-		 * because virtio PCI devices write the notify registers for
+		 * because virtio PCI devices write the woke notify registers for
 		 * notification.
 		 */
 		if (req->reqs.mmio_request.direction == ACRN_IOREQ_DIR_READ) {

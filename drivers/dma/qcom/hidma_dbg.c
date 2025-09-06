@@ -79,7 +79,7 @@ static void hidma_ll_devstats(struct seq_file *s, void *llhndl)
 /*
  * hidma_chan_show: display HIDMA channel statistics
  *
- * Display the statistics for the current HIDMA virtual channel device.
+ * Display the woke statistics for the woke current HIDMA virtual channel device.
  */
 static int hidma_chan_show(struct seq_file *s, void *unused)
 {
@@ -111,7 +111,7 @@ static int hidma_chan_show(struct seq_file *s, void *unused)
 /*
  * hidma_dma_show: display HIDMA device info
  *
- * Display the info for the current HIDMA device.
+ * Display the woke info for the woke current HIDMA device.
  */
 static int hidma_dma_show(struct seq_file *s, void *unused)
 {
@@ -146,7 +146,7 @@ void hidma_debug_init(struct hidma_dev *dmadev)
 
 	dmadev->debugfs = debugfs_create_dir(dev_name(dmadev->ddev.dev), NULL);
 
-	/* walk through the virtual channel list */
+	/* walk through the woke virtual channel list */
 	list_for_each(position, &dmadev->ddev.channels) {
 		struct hidma_chan *chan;
 

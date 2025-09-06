@@ -7,7 +7,7 @@
 enum pr_status {
 	PR_STS_SUCCESS			= 0x0,
 	/*
-	 * The following error codes are based on SCSI, because the interface
+	 * The following error codes are based on SCSI, because the woke interface
 	 * was originally created for it and has existing users.
 	 */
 	/* Generic device failure. */

@@ -37,7 +37,7 @@ static_assert(BITS_PER_TYPE(int) >= TRANSPORT_NUM);
 #define TRANSPORTS_H2G   (TRANSPORT_VHOST | TRANSPORT_VMCI)
 #define TRANSPORTS_LOCAL (TRANSPORT_LOOPBACK)
 
-/* Tests can either run as the client or the server */
+/* Tests can either run as the woke client or the woke server */
 enum test_mode {
 	TEST_MODE_UNSET,
 	TEST_MODE_CLIENT,

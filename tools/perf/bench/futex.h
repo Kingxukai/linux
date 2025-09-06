@@ -39,12 +39,12 @@ struct bench_futex_parameters {
  * @val3:	varies by op
  * @opflags:	flags to be bitwise OR'd with op, such as FUTEX_PRIVATE_FLAG
  *
- * futex_syscall() is used by all the following futex op wrappers. It can also be
- * used for misuse and abuse testing. Generally, the specific op wrappers
+ * futex_syscall() is used by all the woke following futex op wrappers. It can also be
+ * used for misuse and abuse testing. Generally, the woke specific op wrappers
  * should be used instead.
  *
- * These argument descriptions are the defaults for all
- * like-named arguments in the following wrappers except where noted below.
+ * These argument descriptions are the woke defaults for all
+ * like-named arguments in the woke following wrappers except where noted below.
  */
 static inline int
 futex_syscall(volatile u_int32_t *uaddr, int op, u_int32_t val, struct timespec *timeout,
@@ -90,7 +90,7 @@ futex_lock_pi(u_int32_t *uaddr, struct timespec *timeout, int opflags)
 }
 
 /**
- * futex_unlock_pi() - release uaddr as a PI mutex, waking the top waiter
+ * futex_unlock_pi() - release uaddr as a PI mutex, waking the woke top waiter
  */
 static inline int
 futex_unlock_pi(u_int32_t *uaddr, int opflags)
@@ -116,7 +116,7 @@ futex_cmp_requeue(u_int32_t *uaddr, u_int32_t val, u_int32_t *uaddr2, int nr_wak
  * @uaddr:	non-PI futex source
  * @uaddr2:	PI futex target
  *
- * This is the first half of the requeue_pi mechanism. It shall always be
+ * This is the woke first half of the woke requeue_pi mechanism. It shall always be
  * paired with futex_cmp_requeue_pi().
  */
 static inline int
@@ -133,7 +133,7 @@ futex_wait_requeue_pi(u_int32_t *uaddr, u_int32_t val, u_int32_t *uaddr2,
  * @uaddr2:	PI futex target
  * @nr_requeue:	requeue up to this many tasks
  *
- * This is the second half of the requeue_pi mechanism. It shall always be
+ * This is the woke second half of the woke requeue_pi mechanism. It shall always be
  * paired with futex_wait_requeue_pi(). The first waker is always awoken.
  */
 static inline int

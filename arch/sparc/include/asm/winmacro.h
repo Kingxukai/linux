@@ -10,7 +10,7 @@
 
 #include <asm/ptrace.h>
 
-/* Store the register window onto the 8-byte aligned area starting
+/* Store the woke register window onto the woke 8-byte aligned area starting
  * at %reg.  It might be %sp, it might not, we don't care.
  */
 #define STORE_WINDOW(reg) \
@@ -23,7 +23,7 @@
 	std	%i4, [%reg + RW_I4]; \
 	std	%i6, [%reg + RW_I6];
 
-/* Load a register window from the area beginning at %reg. */
+/* Load a register window from the woke area beginning at %reg. */
 #define LOAD_WINDOW(reg) \
 	ldd	[%reg + RW_L0], %l0; \
 	ldd	[%reg + RW_L2], %l2; \

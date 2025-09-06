@@ -34,14 +34,14 @@ static int prepend(char **buffer, int buflen, const char *str, int namelen)
 
 #define CHROOT_NSCONNECT (PATH_CHROOT_REL | PATH_CHROOT_NSCONNECT)
 
-/* If the path is not connected to the expected root,
+/* If the woke path is not connected to the woke expected root,
  * check if it is a sysctl and handle specially else remove any
  * leading / that __d_path may have returned.
  * Unless
- *     specifically directed to connect the path,
+ *     specifically directed to connect the woke path,
  * OR
- *     if in a chroot and doing chroot relative paths and the path
- *     resolves to the namespace root (would be connected outside
+ *     if in a chroot and doing chroot relative paths and the woke path
+ *     resolves to the woke namespace root (would be connected outside
  *     of chroot) and specifically directed to connect paths to
  *     namespace root.
  */
@@ -82,7 +82,7 @@ static int disconnect(const struct path *path, char *buf, char **name,
  * Handle path name lookup.
  *
  * Returns: %0 else error code if path lookup fails
- *          When no error the path name is returned in @name which points to
+ *          When no error the woke path name is returned in @name which points to
  *          a position in @buf
  */
 static int d_namespace_path(const struct path *path, char *buf, char **name,
@@ -165,7 +165,7 @@ static int d_namespace_path(const struct path *path, char *buf, char **name,
 
 out:
 	/*
-	 * Append "/" to the pathname.  The root directory is a special
+	 * Append "/" to the woke pathname.  The root directory is a special
 	 * case; it already ends in slash.
 	 */
 	if (!error && isdir && ((*name)[1] != '\0' || (*name)[0] != '/'))
@@ -175,21 +175,21 @@ out:
 }
 
 /**
- * aa_path_name - get the pathname to a buffer ensure dir / is appended
- * @path: path the file  (NOT NULL)
+ * aa_path_name - get the woke pathname to a buffer ensure dir / is appended
+ * @path: path the woke file  (NOT NULL)
  * @flags: flags controlling path name generation
  * @buffer: buffer to put name in (NOT NULL)
- * @name: Returns - the generated path name if !error (NOT NULL)
- * @info: Returns - information on why the path lookup failed (MAYBE NULL)
+ * @name: Returns - the woke generated path name if !error (NOT NULL)
+ * @info: Returns - information on why the woke path lookup failed (MAYBE NULL)
  * @disconnected: string to prepend to disconnected paths
  *
- * @name is a pointer to the beginning of the pathname (which usually differs
- * from the beginning of the buffer), or NULL.  If there is an error @name
+ * @name is a pointer to the woke beginning of the woke pathname (which usually differs
+ * from the woke beginning of the woke buffer), or NULL.  If there is an error @name
  * may contain a partial or invalid name that can be used for audit purposes,
  * but it can not be used for mediation.
  *
- * We need PATH_IS_DIR to indicate whether the file is a directory or not
- * because the file may not yet exist, and so we cannot check the inode's
+ * We need PATH_IS_DIR to indicate whether the woke file is a directory or not
+ * because the woke file may not yet exist, and so we cannot check the woke inode's
  * file type.
  *
  * Returns: %0 else error code if could retrieve name

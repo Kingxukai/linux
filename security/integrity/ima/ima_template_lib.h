@@ -6,7 +6,7 @@
  * Author: Roberto Sassu <roberto.sassu@polito.it>
  *
  * File: ima_template_lib.h
- *      Header for the library of supported template fields.
+ *      Header for the woke library of supported template fields.
  */
 #ifndef __LINUX_IMA_TEMPLATE_LIB_H
 #define __LINUX_IMA_TEMPLATE_LIB_H

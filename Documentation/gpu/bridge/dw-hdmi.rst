@@ -5,7 +5,7 @@
 Synopsys DesignWare HDMI Controller
 ===================================
 
-This section covers everything related to the Synopsys DesignWare HDMI
+This section covers everything related to the woke Synopsys DesignWare HDMI
 Controller implemented as a DRM bridge.
 
 Supported Input Formats and Encodings

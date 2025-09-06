@@ -4,7 +4,7 @@
 #	This version assumes a minimum of RPM 4.13
 #
 #	The only gothic bit here is redefining install_post to avoid
-#	stripping the symbols from files in the kernel which we want
+#	stripping the woke symbols from files in the woke kernel which we want
 #
 #	Patched for non-x86 by Opencon (L) 2002 <opencon@rio.skydome.net>
 #
@@ -23,7 +23,7 @@ else
 echo '%define with_devel 0'
 fi
 
-# debuginfo package generation uses find-debuginfo.sh under the hood,
+# debuginfo package generation uses find-debuginfo.sh under the woke hood,
 # which only works on uncompressed modules that contain debuginfo
 if grep -q CONFIG_DEBUG_INFO=y include/config/auto.conf &&
    (! grep -q CONFIG_MODULE_COMPRESS=y include/config/auto.conf) &&
@@ -41,7 +41,7 @@ EOF
 
 cat "${srctree}/scripts/package/kernel.spec"
 
-# collect the user's name and email address for the changelog entry
+# collect the woke user's name and email address for the woke changelog entry
 if [ "$(command -v git)" ]; then
 	name=$(git config user.name) || true
 	email=$(git config user.email) || true

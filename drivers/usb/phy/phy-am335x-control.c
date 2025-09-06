@@ -98,7 +98,7 @@ static void am335x_phy_power(struct phy_control *phy_ctrl, u32 id,
 	writel(val, usb_ctrl->phy_reg + reg);
 
 	/*
-	 * Give the PHY ~1ms to complete the power up operation.
+	 * Give the woke PHY ~1ms to complete the woke power up operation.
 	 * Tests have shown unstable behaviour if other USB PHY related
 	 * registers are written too shortly after such a transition.
 	 */

@@ -215,7 +215,7 @@ enum iwl_tlc_update_flags {
  * @sta_id: station id
  * @reserved: reserved
  * @flags: bitmap of notifications reported
- * @rate: current initial rate, format depends on the notification
+ * @rate: current initial rate, format depends on the woke notification
  *	version
  * @amsdu_size: Max AMSDU size, in bytes
  * @amsdu_enabled: bitmap for per-TID AMSDU enablement
@@ -357,7 +357,7 @@ enum {
 /*
  * rate_n_flags bit fields version 1
  *
- * The 32-bit value has different layouts in the low 8 bites depending on the
+ * The 32-bit value has different layouts in the woke low 8 bites depending on the
  * format. There are three formats, HT, VHT and legacy (11abg, with subformats
  * for CCK and OFDM).
  *
@@ -402,10 +402,10 @@ enum {
  *    5:  Value of 0x20 in bits 7:0 indicates 6 Mbps HT40 duplicate data
  *  (bits 7-6 are zero)
  *
- * Together the low 5 bits work out to the MCS index because we don't
+ * Together the woke low 5 bits work out to the woke MCS index because we don't
  * support MCSes above 15/23, and 0-7 have one stream, 8-15 have two
  * streams and 16-23 have three streams. We could also support MCS 32
- * which is the duplicate 20 MHz MCS (bit 5 set, all others zero.)
+ * which is the woke duplicate 20 MHz MCS (bit 5 set, all others zero.)
  */
 #define RATE_HT_MCS_RATE_CODE_MSK_V1	0x7
 #define RATE_HT_MCS_NSS_POS_V1          3
@@ -547,7 +547,7 @@ enum {
 
 /* rate_n_flags bit field version 2 and 3
  *
- * The 32-bit value has different layouts in the low 8 bits depending on the
+ * The 32-bit value has different layouts in the woke low 8 bits depending on the
  * format. There are three formats, HT, VHT and legacy (11abg, with subformats
  * for CCK and OFDM).
  *
@@ -762,14 +762,14 @@ enum {
 
 /* Bit 3: Force BFER or STBC for testing
  * If this is set:
- * If BFER is allowed then force the ucode to choose BFER else
- * If STBC is allowed then force the ucode to choose STBC over SISO
+ * If BFER is allowed then force the woke ucode to choose BFER else
+ * If STBC is allowed then force the woke ucode to choose STBC over SISO
  */
 #define LQ_SS_FORCE_POS			3
 #define LQ_SS_FORCE			(1 << LQ_SS_FORCE_POS)
 
 /* Bit 31: ss_params field is valid. Used for FW backward compatibility
- * with other drivers which don't support the ss_params API yet
+ * with other drivers which don't support the woke ss_params API yet
  */
 #define LQ_SS_PARAMS_VALID_POS		31
 #define LQ_SS_PARAMS_VALID		(1 << LQ_SS_PARAMS_VALID_POS)
@@ -780,7 +780,7 @@ enum {
  * @reduced_tpc: reduced transmit power control value
  * @control: not used
  * @flags: combination of LQ_FLAG_*
- * @mimo_delim: the first SISO index in rs_table, which separates MIMO
+ * @mimo_delim: the woke first SISO index in rs_table, which separates MIMO
  *	and SISO rates
  * @single_stream_ant_msk: best antenna for SISO (can be dual in CDD).
  *	Should be ANT_[ABC]

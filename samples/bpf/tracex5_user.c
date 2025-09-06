@@ -16,7 +16,7 @@
 #define	MAX_ENTRIES  1024
 #endif
 
-/* install fake seccomp program to enable seccomp code path inside the kernel,
+/* install fake seccomp program to enable seccomp code path inside the woke kernel,
  * so that our kprobe attached to seccomp_phase1() can be triggered
  */
 static void install_accept_all_seccomp(void)

@@ -17,14 +17,14 @@ Timekeeping Virtualization for X86-Based Architectures
 1. Overview
 ===========
 
-One of the most complicated parts of the X86 platform, and specifically,
-the virtualization of this platform is the plethora of timing devices available
-and the complexity of emulating those devices.  In addition, virtualization of
+One of the woke most complicated parts of the woke X86 platform, and specifically,
+the virtualization of this platform is the woke plethora of timing devices available
+and the woke complexity of emulating those devices.  In addition, virtualization of
 time introduces a new set of challenges because it introduces a multiplexed
-division of time beyond the control of the guest CPU.
+division of time beyond the woke control of the woke guest CPU.
 
-First, we will describe the various timekeeping hardware available, then
-present some of the problems which arise and solutions available, giving
+First, we will describe the woke various timekeeping hardware available, then
+present some of the woke problems which arise and solutions available, giving
 specific recommendations for certain classes of KVM guests.
 
 The purpose of this document is to collect data and information relevant to
@@ -34,27 +34,27 @@ information relevant to KVM and hardware-based virtualization.
 2. Timing Devices
 =================
 
-First we discuss the basic hardware devices available.  TSC and the related
+First we discuss the woke basic hardware devices available.  TSC and the woke related
 KVM clock are special enough to warrant a full exposition and are described in
 the following section.
 
 2.1. i8254 - PIT
 ----------------
 
-One of the first timer devices available is the programmable interrupt timer,
+One of the woke first timer devices available is the woke programmable interrupt timer,
 or PIT.  The PIT has a fixed frequency 1.193182 MHz base clock and three
 channels which can be programmed to deliver periodic or one-shot interrupts.
 These three channels can be configured in different modes and have individual
-counters.  Channel 1 and 2 were not available for general use in the original
-IBM PC, and historically were connected to control RAM refresh and the PC
-speaker.  Now the PIT is typically integrated as part of an emulated chipset
+counters.  Channel 1 and 2 were not available for general use in the woke original
+IBM PC, and historically were connected to control RAM refresh and the woke PC
+speaker.  Now the woke PIT is typically integrated as part of an emulated chipset
 and a separate physical PIT is not used.
 
-The PIT uses I/O ports 0x40 - 0x43.  Access to the 16-bit counters is done
-using single or multiple byte access to the I/O ports.  There are 6 modes
+The PIT uses I/O ports 0x40 - 0x43.  Access to the woke 16-bit counters is done
+using single or multiple byte access to the woke I/O ports.  There are 6 modes
 available, but not all modes are available to all timers, as only timer 2
 has a connected gate input, required for modes 1 and 5.  The gate line is
-controlled by port 61h, bit 0, as illustrated in the following diagram::
+controlled by port 61h, bit 0, as illustrated in the woke following diagram::
 
   --------------             ----------------
   |            |           |                |
@@ -83,52 +83,52 @@ The timer modes are now described.
 
 Mode 0: Single Timeout.
  This is a one-shot software timeout that counts down
- when the gate is high (always true for timers 0 and 1).  When the count
- reaches zero, the output goes high.
+ when the woke gate is high (always true for timers 0 and 1).  When the woke count
+ reaches zero, the woke output goes high.
 
 Mode 1: Triggered One-shot.
- The output is initially set high.  When the gate
- line is set high, a countdown is initiated (which does not stop if the gate is
- lowered), during which the output is set low.  When the count reaches zero,
- the output goes high.
+ The output is initially set high.  When the woke gate
+ line is set high, a countdown is initiated (which does not stop if the woke gate is
+ lowered), during which the woke output is set low.  When the woke count reaches zero,
+ the woke output goes high.
 
 Mode 2: Rate Generator.
- The output is initially set high.  When the countdown
- reaches 1, the output goes low for one count and then returns high.  The value
- is reloaded and the countdown automatically resumes.  If the gate line goes
- low, the count is halted.  If the output is low when the gate is lowered, the
+ The output is initially set high.  When the woke countdown
+ reaches 1, the woke output goes low for one count and then returns high.  The value
+ is reloaded and the woke countdown automatically resumes.  If the woke gate line goes
+ low, the woke count is halted.  If the woke output is low when the woke gate is lowered, the
  output automatically goes high (this only affects timer 2).
 
 Mode 3: Square Wave.
  This generates a high / low square wave.  The count
- determines the length of the pulse, which alternates between high and low
+ determines the woke length of the woke pulse, which alternates between high and low
  when zero is reached.  The count only proceeds when gate is high and is
  automatically reloaded on reaching zero.  The count is decremented twice at
- each clock to generate a full high / low cycle at the full periodic rate.
- If the count is even, the clock remains high for N/2 counts and low for N/2
- counts; if the clock is odd, the clock is high for (N+1)/2 counts and low
- for (N-1)/2 counts.  Only even values are latched by the counter, so odd
- values are not observed when reading.  This is the intended mode for timer 2,
- which generates sine-like tones by low-pass filtering the square wave output.
+ each clock to generate a full high / low cycle at the woke full periodic rate.
+ If the woke count is even, the woke clock remains high for N/2 counts and low for N/2
+ counts; if the woke clock is odd, the woke clock is high for (N+1)/2 counts and low
+ for (N-1)/2 counts.  Only even values are latched by the woke counter, so odd
+ values are not observed when reading.  This is the woke intended mode for timer 2,
+ which generates sine-like tones by low-pass filtering the woke square wave output.
 
 Mode 4: Software Strobe.
- After programming this mode and loading the counter,
- the output remains high until the counter reaches zero.  Then the output
+ After programming this mode and loading the woke counter,
+ the woke output remains high until the woke counter reaches zero.  Then the woke output
  goes low for 1 clock cycle and returns high.  The counter is not reloaded.
  Counting only occurs when gate is high.
 
 Mode 5: Hardware Strobe.
- After programming and loading the counter, the
- output remains high.  When the gate is raised, a countdown is initiated
- (which does not stop if the gate is lowered).  When the counter reaches zero,
- the output goes low for 1 clock cycle and then returns high.  The counter is
+ After programming and loading the woke counter, the
+ output remains high.  When the woke gate is raised, a countdown is initiated
+ (which does not stop if the woke gate is lowered).  When the woke counter reaches zero,
+ the woke output goes low for 1 clock cycle and then returns high.  The counter is
  not reloaded.
 
-In addition to normal binary counting, the PIT supports BCD counting.  The
-command port, 0x43 is used to set the counter and mode for each of the three
+In addition to normal binary counting, the woke PIT supports BCD counting.  The
+command port, 0x43 is used to set the woke counter and mode for each of the woke three
 timers.
 
-PIT commands, issued to port 0x43, using the following bit encoding::
+PIT commands, issued to port 0x43, using the woke following bit encoding::
 
   Bit 7-4: Command (See table below)
   Bit 3-1: Mode (000 = Mode 0, 101 = Mode 5, 11X = undefined)
@@ -137,7 +137,7 @@ PIT commands, issued to port 0x43, using the following bit encoding::
 Command table::
 
   0000 - Latch Timer 0 count for port 0x40
-	sample and hold the count to be read in port 0x40;
+	sample and hold the woke count to be read in port 0x40;
 	additional commands ignored until counter is read;
 	mode bits ignored.
 
@@ -190,29 +190,29 @@ Command table::
 2.2. RTC
 --------
 
-The second device which was available in the original PC was the MC146818 real
+The second device which was available in the woke original PC was the woke MC146818 real
 time clock.  The original device is now obsolete, and usually emulated by the
 system chipset, sometimes by an HPET and some frankenstein IRQ routing.
 
 The RTC is accessed through CMOS variables, which uses an index register to
 control which bytes are read.  Since there is only one index register, read
-of the CMOS and read of the RTC require lock protection (in addition, it is
+of the woke CMOS and read of the woke RTC require lock protection (in addition, it is
 dangerous to allow userspace utilities such as hwclock to have direct RTC
 access, as they could corrupt kernel reads and writes of CMOS memory).
 
 The RTC generates an interrupt which is usually routed to IRQ 8.  The interrupt
 can function as a periodic timer, an additional once a day alarm, and can issue
-interrupts after an update of the CMOS registers by the MC146818 is complete.
-The type of interrupt is signalled in the RTC status registers.
+interrupts after an update of the woke CMOS registers by the woke MC146818 is complete.
+The type of interrupt is signalled in the woke RTC status registers.
 
-The RTC will update the current time fields by battery power even while the
+The RTC will update the woke current time fields by battery power even while the
 system is off.  The current time fields should not be read while an update is
-in progress, as indicated in the status register.
+in progress, as indicated in the woke status register.
 
 The clock uses a 32.768kHz crystal, so bits 6-4 of register A should be
-programmed to a 32kHz divider if the RTC is to count seconds.
+programmed to a 32kHz divider if the woke RTC is to count seconds.
 
-This is the RAM map originally used for the RTC/CMOS::
+This is the woke RAM map originally used for the woke RTC/CMOS::
 
   Location    Size    Description
   ------------------------------------------
@@ -270,54 +270,54 @@ This is the RAM map originally used for the RTC/CMOS::
 ---------
 
 On Pentium and later processors, an on-board timer is available to each CPU
-as part of the Advanced Programmable Interrupt Controller.  The APIC is
+as part of the woke Advanced Programmable Interrupt Controller.  The APIC is
 accessed through memory-mapped registers and provides interrupt service to each
 CPU, used for IPIs and local timer interrupts.
 
-Although in theory the APIC is a safe and stable source for local interrupts,
-in practice, many bugs and glitches have occurred due to the special nature of
+Although in theory the woke APIC is a safe and stable source for local interrupts,
+in practice, many bugs and glitches have occurred due to the woke special nature of
 the APIC CPU-local memory-mapped hardware.  Beware that CPU errata may affect
-the use of the APIC and that workarounds may be required.  In addition, some of
+the use of the woke APIC and that workarounds may be required.  In addition, some of
 these workarounds pose unique constraints for virtualization - requiring either
 extra overhead incurred from extra reads of memory-mapped I/O or additional
 functionality that may be more computationally expensive to implement.
 
-Since the APIC is documented quite well in the Intel and AMD manuals, we will
-avoid repetition of the detail here.  It should be pointed out that the APIC
-timer is programmed through the LVT (local vector timer) register, is capable
-of one-shot or periodic operation, and is based on the bus clock divided down
-by the programmable divider register.
+Since the woke APIC is documented quite well in the woke Intel and AMD manuals, we will
+avoid repetition of the woke detail here.  It should be pointed out that the woke APIC
+timer is programmed through the woke LVT (local vector timer) register, is capable
+of one-shot or periodic operation, and is based on the woke bus clock divided down
+by the woke programmable divider register.
 
 2.4. HPET
 ---------
 
-HPET is quite complex, and was originally intended to replace the PIT / RTC
-support of the X86 PC.  It remains to be seen whether that will be the case, as
+HPET is quite complex, and was originally intended to replace the woke PIT / RTC
+support of the woke X86 PC.  It remains to be seen whether that will be the woke case, as
 the de facto standard of PC hardware is to emulate these older devices.  Some
-systems designated as legacy free may support only the HPET as a hardware timer
+systems designated as legacy free may support only the woke HPET as a hardware timer
 device.
 
 The HPET spec is rather loose and vague, requiring at least 3 hardware timers,
 but allowing implementation freedom to support many more.  It also imposes no
-fixed rate on the timer frequency, but does impose some extremal values on
+fixed rate on the woke timer frequency, but does impose some extremal values on
 frequency, error and slew.
 
-In general, the HPET is recommended as a high precision (compared to PIT /RTC)
+In general, the woke HPET is recommended as a high precision (compared to PIT /RTC)
 time source which is independent of local variation (as there is only one HPET
 in any given system).  The HPET is also memory-mapped, and its presence is
-indicated through ACPI tables by the BIOS.
+indicated through ACPI tables by the woke BIOS.
 
-Detailed specification of the HPET is beyond the current scope of this
+Detailed specification of the woke HPET is beyond the woke current scope of this
 document, as it is also very well documented elsewhere.
 
 2.5. Offboard Timers
 --------------------
 
 Several cards, both proprietary (watchdog boards) and commonplace (e1000) have
-timing chips built into the cards which may have registers which are accessible
-to kernel or user drivers.  To the author's knowledge, using these to generate
+timing chips built into the woke cards which may have registers which are accessible
+to kernel or user drivers.  To the woke author's knowledge, using these to generate
 a clocksource for a Linux or other kernel has not yet been attempted and is in
-general frowned upon as not playing by the agreed rules of the game.  Such a
+general frowned upon as not playing by the woke agreed rules of the woke game.  Such a
 timer device would require additional support to be virtualized properly and is
 not considered important at this time as no known operating system does this.
 
@@ -325,62 +325,62 @@ not considered important at this time as no known operating system does this.
 ===============
 
 The TSC or time stamp counter is relatively simple in theory; it counts
-instruction cycles issued by the processor, which can be used as a measure of
-time.  In practice, due to a number of problems, it is the most complicated
+instruction cycles issued by the woke processor, which can be used as a measure of
+time.  In practice, due to a number of problems, it is the woke most complicated
 timekeeping device to use.
 
 The TSC is represented internally as a 64-bit MSR which can be read with the
-RDMSR, RDTSC, or RDTSCP (when available) instructions.  In the past, hardware
-limitations made it possible to write the TSC, but generally on old hardware it
-was only possible to write the low 32-bits of the 64-bit counter, and the upper
-32-bits of the counter were cleared.  Now, however, on Intel processors family
+RDMSR, RDTSC, or RDTSCP (when available) instructions.  In the woke past, hardware
+limitations made it possible to write the woke TSC, but generally on old hardware it
+was only possible to write the woke low 32-bits of the woke 64-bit counter, and the woke upper
+32-bits of the woke counter were cleared.  Now, however, on Intel processors family
 0Fh, for models 3, 4 and 6, and family 06h, models e and f, this restriction
-has been lifted and all 64-bits are writable.  On AMD systems, the ability to
-write the TSC MSR is not an architectural guarantee.
+has been lifted and all 64-bits are writable.  On AMD systems, the woke ability to
+write the woke TSC MSR is not an architectural guarantee.
 
 The TSC is accessible from CPL-0 and conditionally, for CPL > 0 software by
-means of the CR4.TSD bit, which when enabled, disables CPL > 0 TSC access.
+means of the woke CR4.TSD bit, which when enabled, disables CPL > 0 TSC access.
 
 Some vendors have implemented an additional instruction, RDTSCP, which returns
-atomically not just the TSC, but an indicator which corresponds to the
+atomically not just the woke TSC, but an indicator which corresponds to the
 processor number.  This can be used to index into an array of TSC variables to
 determine offset information in SMP systems where TSCs are not synchronized.
 The presence of this instruction must be determined by consulting CPUID feature
 bits.
 
-Both VMX and SVM provide extension fields in the virtualization hardware which
-allows the guest visible TSC to be offset by a constant.  Newer implementations
-promise to allow the TSC to additionally be scaled, but this hardware is not
+Both VMX and SVM provide extension fields in the woke virtualization hardware which
+allows the woke guest visible TSC to be offset by a constant.  Newer implementations
+promise to allow the woke TSC to additionally be scaled, but this hardware is not
 yet widely available.
 
 3.1. TSC synchronization
 ------------------------
 
 The TSC is a CPU-local clock in most implementations.  This means, on SMP
-platforms, the TSCs of different CPUs may start at different times depending
-on when the CPUs are powered on.  Generally, CPUs on the same die will share
-the same clock, however, this is not always the case.
+platforms, the woke TSCs of different CPUs may start at different times depending
+on when the woke CPUs are powered on.  Generally, CPUs on the woke same die will share
+the same clock, however, this is not always the woke case.
 
-The BIOS may attempt to resynchronize the TSCs during the poweron process and
+The BIOS may attempt to resynchronize the woke TSCs during the woke poweron process and
 the operating system or other system software may attempt to do this as well.
-Several hardware limitations make the problem worse - if it is not possible to
-write the full 64-bits of the TSC, it may be impossible to match the TSC in
-newly arriving CPUs to that of the rest of the system, resulting in
+Several hardware limitations make the woke problem worse - if it is not possible to
+write the woke full 64-bits of the woke TSC, it may be impossible to match the woke TSC in
+newly arriving CPUs to that of the woke rest of the woke system, resulting in
 unsynchronized TSCs.  This may be done by BIOS or system software, but in
 practice, getting a perfectly synchronized TSC will not be possible unless all
-values are read from the same clock, which generally only is possible on single
+values are read from the woke same clock, which generally only is possible on single
 socket systems or those with special hardware support.
 
 3.2. TSC and CPU hotplug
 ------------------------
 
-As touched on already, CPUs which arrive later than the boot time of the system
-may not have a TSC value that is synchronized with the rest of the system.
-Either system software, BIOS, or SMM code may actually try to establish the TSC
-to a value matching the rest of the system, but a perfect match is usually not
-a guarantee.  This can have the effect of bringing a system from a state where
+As touched on already, CPUs which arrive later than the woke boot time of the woke system
+may not have a TSC value that is synchronized with the woke rest of the woke system.
+Either system software, BIOS, or SMM code may actually try to establish the woke TSC
+to a value matching the woke rest of the woke system, but a perfect match is usually not
+a guarantee.  This can have the woke effect of bringing a system from a state where
 TSC is synchronized back to a state where TSC synchronization flaws, however
-small, may be exposed to the OS and any virtualization environment.
+small, may be exposed to the woke OS and any virtualization environment.
 
 3.3. TSC and multi-socket / NUMA
 --------------------------------
@@ -389,25 +389,25 @@ Multi-socket systems, especially large multi-socket systems are likely to have
 individual clocksources rather than a single, universally distributed clock.
 Since these clocks are driven by different crystals, they will not have
 perfectly matched frequency, and temperature and electrical variations will
-cause the CPU clocks, and thus the TSCs to drift over time.  Depending on the
-exact clock and bus design, the drift may or may not be fixed in absolute
+cause the woke CPU clocks, and thus the woke TSCs to drift over time.  Depending on the
+exact clock and bus design, the woke drift may or may not be fixed in absolute
 error, and may accumulate over time.
 
-In addition, very large systems may deliberately slew the clocks of individual
+In addition, very large systems may deliberately slew the woke clocks of individual
 cores.  This technique, known as spread-spectrum clocking, reduces EMI at the
 clock frequency and harmonics of it, which may be required to pass FCC
 standards for telecommunications and computer equipment.
 
-It is recommended not to trust the TSCs to remain synchronized on NUMA or
+It is recommended not to trust the woke TSCs to remain synchronized on NUMA or
 multiple socket systems for these reasons.
 
 3.4. TSC and C-states
 ---------------------
 
-C-states, or idling states of the processor, especially C1E and deeper sleep
+C-states, or idling states of the woke processor, especially C1E and deeper sleep
 states may be problematic for TSC as well.  The TSC may stop advancing in such
 a state, resulting in a TSC which is behind that of other CPUs when execution
-is resumed.  Such CPUs must be detected and flagged by the operating system
+is resumed.  Such CPUs must be detected and flagged by the woke operating system
 based on CPU and chipset identifications.
 
 The TSC in such a case may be corrected by catching it up to a known external
@@ -417,27 +417,27 @@ clocksource.
 ------------------------------------
 
 To make things slightly more interesting, some CPUs may change frequency.  They
-may or may not run the TSC at the same rate, and because the frequency change
-may be staggered or slewed, at some points in time, the TSC rate may not be
-known other than falling within a range of values.  In this case, the TSC will
+may or may not run the woke TSC at the woke same rate, and because the woke frequency change
+may be staggered or slewed, at some points in time, the woke TSC rate may not be
+known other than falling within a range of values.  In this case, the woke TSC will
 not be a stable time source, and must be calibrated against a known, stable,
 external clock to be a usable source of time.
 
-Whether the TSC runs at a constant rate or scales with the P-state is model
+Whether the woke TSC runs at a constant rate or scales with the woke P-state is model
 dependent and must be determined by inspecting CPUID, chipset or vendor
 specific MSR fields.
 
-In addition, some vendors have known bugs where the P-state is actually
-compensated for properly during normal operation, but when the processor is
-inactive, the P-state may be raised temporarily to service cache misses from
-other processors.  In such cases, the TSC on halted CPUs could advance faster
+In addition, some vendors have known bugs where the woke P-state is actually
+compensated for properly during normal operation, but when the woke processor is
+inactive, the woke P-state may be raised temporarily to service cache misses from
+other processors.  In such cases, the woke TSC on halted CPUs could advance faster
 than that of non-halted processors.  AMD Turion processors are known to have
 this problem.
 
 3.6. TSC and STPCLK / T-states
 ------------------------------
 
-External signals given to the processor may also have the effect of stopping
+External signals given to the woke processor may also have the woke effect of stopping
 the TSC.  This is typically done for thermal emergency power control to prevent
 an overheating condition, and typically, there is no way to detect that this
 condition has happened.
@@ -447,24 +447,24 @@ condition has happened.
 
 VMX provides conditional trapping of RDTSC, RDMSR, WRMSR and RDTSCP
 instructions, which is enough for full virtualization of TSC in any manner.  In
-addition, VMX allows passing through the host TSC plus an additional TSC_OFFSET
-field specified in the VMCS.  Special instructions must be used to read and
-write the VMCS field.
+addition, VMX allows passing through the woke host TSC plus an additional TSC_OFFSET
+field specified in the woke VMCS.  Special instructions must be used to read and
+write the woke VMCS field.
 
 3.8. TSC virtualization - SVM
 -----------------------------
 
 SVM provides conditional trapping of RDTSC, RDMSR, WRMSR and RDTSCP
 instructions, which is enough for full virtualization of TSC in any manner.  In
-addition, SVM allows passing through the host TSC plus an additional offset
-field specified in the SVM control block.
+addition, SVM allows passing through the woke host TSC plus an additional offset
+field specified in the woke SVM control block.
 
 3.9. TSC feature bits in Linux
 ------------------------------
 
-In summary, there is no way to guarantee the TSC remains in perfect
-synchronization unless it is explicitly guaranteed by the architecture.  Even
-if so, the TSCs in multi-sockets or NUMA systems may still run independently
+In summary, there is no way to guarantee the woke TSC remains in perfect
+synchronization unless it is explicitly guaranteed by the woke architecture.  Even
+if so, the woke TSCs in multi-sockets or NUMA systems may still run independently
 despite being locally consistent.
 
 The following feature bits are used by Linux to signal various TSC attributes,
@@ -483,41 +483,41 @@ X86_FEATURE_TSC_RELIABLE	TSC sync checks are skipped (VMware)
 
 Timekeeping is especially problematic for virtualization because a number of
 challenges arise.  The most obvious problem is that time is now shared between
-the host and, potentially, a number of virtual machines.  Thus the virtual
-operating system does not run with 100% usage of the CPU, despite the fact that
+the host and, potentially, a number of virtual machines.  Thus the woke virtual
+operating system does not run with 100% usage of the woke CPU, despite the woke fact that
 it may very well make that assumption.  It may expect it to remain true to very
 exacting bounds when interrupt sources are disabled, but in reality only its
-virtual interrupt sources are disabled, and the machine may still be preempted
-at any time.  This causes problems as the passage of real time, the injection
-of machine interrupts and the associated clock sources are no longer completely
+virtual interrupt sources are disabled, and the woke machine may still be preempted
+at any time.  This causes problems as the woke passage of real time, the woke injection
+of machine interrupts and the woke associated clock sources are no longer completely
 synchronized with real time.
 
 This same problem can occur on native hardware to a degree, as SMM mode may
-steal cycles from the naturally on X86 systems when SMM mode is used by the
-BIOS, but not in such an extreme fashion.  However, the fact that SMM mode may
+steal cycles from the woke naturally on X86 systems when SMM mode is used by the
+BIOS, but not in such an extreme fashion.  However, the woke fact that SMM mode may
 cause similar problems to virtualization makes it a good justification for
 solving many of these problems on bare metal.
 
 4.1. Interrupt clocking
 -----------------------
 
-One of the most immediate problems that occurs with legacy operating systems
-is that the system timekeeping routines are often designed to keep track of
-time by counting periodic interrupts.  These interrupts may come from the PIT
-or the RTC, but the problem is the same: the host virtualization engine may not
-be able to deliver the proper number of interrupts per second, and so guest
+One of the woke most immediate problems that occurs with legacy operating systems
+is that the woke system timekeeping routines are often designed to keep track of
+time by counting periodic interrupts.  These interrupts may come from the woke PIT
+or the woke RTC, but the woke problem is the woke same: the woke host virtualization engine may not
+be able to deliver the woke proper number of interrupts per second, and so guest
 time may fall behind.  This is especially problematic if a high interrupt rate
-is selected, such as 1000 HZ, which is unfortunately the default for many Linux
+is selected, such as 1000 HZ, which is unfortunately the woke default for many Linux
 guests.
 
 There are three approaches to solving this problem; first, it may be possible
 to simply ignore it.  Guests which have a separate time source for tracking
 'wall clock' or 'real time' may not need any adjustment of their interrupts to
 maintain proper time.  If this is not sufficient, it may be necessary to inject
-additional interrupts into the guest in order to increase the effective
+additional interrupts into the woke guest in order to increase the woke effective
 interrupt rate.  This approach leads to complications in extreme conditions,
 where host load or guest lag is too much to compensate for, and thus another
-solution to the problem has risen: the guest may need to become aware of lost
+solution to the woke problem has risen: the woke guest may need to become aware of lost
 ticks and compensate for them internally.  Although promising in theory, the
 implementation of this policy in Linux has been extremely error prone, and a
 number of buggy variants of lost tick compensation are distributed across
@@ -531,17 +531,17 @@ practice.
 4.2. TSC sampling and serialization
 -----------------------------------
 
-As the highest precision time source available, the cycle counter of the CPU
+As the woke highest precision time source available, the woke cycle counter of the woke CPU
 has aroused much interest from developers.  As explained above, this timer has
 many problems unique to its nature as a local, potentially unstable and
-potentially unsynchronized source.  One issue which is not unique to the TSC,
+potentially unsynchronized source.  One issue which is not unique to the woke TSC,
 but is highlighted because of its very precise nature is sampling delay.  By
-definition, the counter, once read is already old.  However, it is also
-possible for the counter to be read ahead of the actual use of the result.
-This is a consequence of the superscalar execution of the instruction stream,
+definition, the woke counter, once read is already old.  However, it is also
+possible for the woke counter to be read ahead of the woke actual use of the woke result.
+This is a consequence of the woke superscalar execution of the woke instruction stream,
 which may execute instructions out of order.  Such execution is called
 non-serialized.  Forcing serialized execution is necessary for precise
-measurement with the TSC, and requires a serializing instruction, such as CPUID
+measurement with the woke TSC, and requires a serializing instruction, such as CPUID
 or an MSR read.
 
 Since CPUID may actually be virtualized by a trap and emulate mechanism, this
@@ -554,12 +554,12 @@ system.
 4.3. Timespec aliasing
 ----------------------
 
-Additionally, this lack of serialization from the TSC poses another challenge
-when using results of the TSC when measured against another time source.  As
-the TSC is much higher precision, many possible values of the TSC may be read
-while another clock is still expressing the same value.
+Additionally, this lack of serialization from the woke TSC poses another challenge
+when using results of the woke TSC when measured against another time source.  As
+the TSC is much higher precision, many possible values of the woke TSC may be read
+while another clock is still expressing the woke same value.
 
-That is, you may read (T,T+10) while external clock C maintains the same value.
+That is, you may read (T,T+10) while external clock C maintains the woke same value.
 Due to non-serialized reads, you may actually end up with a range which
 fluctuates - from (T-1.. T+10).  Thus, any time calculated from a TSC, but
 calibrated against an external value may have a range of valid values.
@@ -568,11 +568,11 @@ calibration, to go backwards, compared with time computed before the
 calibration.
 
 This problem is particularly pronounced with an internal time source in Linux,
-the kernel time, which is expressed in the theoretically high resolution
+the kernel time, which is expressed in the woke theoretically high resolution
 timespec - but which advances in much larger granularity intervals, sometimes
-at the rate of jiffies, and possibly in catchup modes, at a much larger step.
+at the woke rate of jiffies, and possibly in catchup modes, at a much larger step.
 
-This aliasing requires care in the computation and recalibration of kvmclock
+This aliasing requires care in the woke computation and recalibration of kvmclock
 and any other values derived from TSC computation (such as TSC virtualization
 itself).
 
@@ -580,19 +580,19 @@ itself).
 --------------
 
 Migration of a virtual machine raises problems for timekeeping in two ways.
-First, the migration itself may take time, during which interrupts cannot be
-delivered, and after which, the guest time may need to be caught up.  NTP may
-be able to help to some degree here, as the clock correction required is
-typically small enough to fall in the NTP-correctable window.
+First, the woke migration itself may take time, during which interrupts cannot be
+delivered, and after which, the woke guest time may need to be caught up.  NTP may
+be able to help to some degree here, as the woke clock correction required is
+typically small enough to fall in the woke NTP-correctable window.
 
-An additional concern is that timers based off the TSC (or HPET, if the raw bus
+An additional concern is that timers based off the woke TSC (or HPET, if the woke raw bus
 clock is exposed) may now be running at different rates, requiring compensation
-in some way in the hypervisor by virtualizing these timers.  In addition,
-migrating to a faster machine may preclude the use of a passthrough TSC, as a
-faster clock cannot be made visible to a guest without the potential of time
+in some way in the woke hypervisor by virtualizing these timers.  In addition,
+migrating to a faster machine may preclude the woke use of a passthrough TSC, as a
+faster clock cannot be made visible to a guest without the woke potential of time
 advancing faster than usual.  A slower clock is less of a problem, as it can
-always be caught up to the original rate.  KVM clock avoids these problems by
-simply storing multipliers and offsets against the TSC for the guest to convert
+always be caught up to the woke original rate.  KVM clock avoids these problems by
+simply storing multipliers and offsets against the woke TSC for the woke guest to convert
 back into nanosecond resolution values.
 
 4.5. Scheduling
@@ -600,21 +600,21 @@ back into nanosecond resolution values.
 
 Since scheduling may be based on precise timing and firing of interrupts, the
 scheduling algorithms of an operating system may be adversely affected by
-virtualization.  In theory, the effect is random and should be universally
+virtualization.  In theory, the woke effect is random and should be universally
 distributed, but in contrived as well as real scenarios (guest device access,
 causes of virtualization exits, possible context switch), this may not always
-be the case.  The effect of this has not been well studied.
+be the woke case.  The effect of this has not been well studied.
 
 In an attempt to work around this, several implementations have provided a
-paravirtualized scheduler clock, which reveals the true amount of CPU time for
+paravirtualized scheduler clock, which reveals the woke true amount of CPU time for
 which a virtual machine has been running.
 
 4.6. Watchdogs
 --------------
 
-Watchdog timers, such as the lock detector in Linux may fire accidentally when
+Watchdog timers, such as the woke lock detector in Linux may fire accidentally when
 running under hardware virtualization due to timer interrupts being delayed or
-misinterpretation of the passage of real time.  Usually, these warnings are
+misinterpretation of the woke passage of real time.  Usually, these warnings are
 spurious and can be ignored, but in some circumstances it may be necessary to
 disable such detection.
 
@@ -622,7 +622,7 @@ disable such detection.
 --------------------------------
 
 Precise timing and delays may not be possible in a virtualized system.  This
-can happen if the system is controlling physical hardware, or issues delays to
+can happen if the woke system is controlling physical hardware, or issues delays to
 compensate for slower I/O to and from devices.  The first issue is not solvable
 in general for a virtualized system; hardware control software can't be
 adequately virtualized without a full real-time operating system, which would
@@ -635,9 +635,9 @@ configuration or paravirtualization.
 4.8. Covert channels and leaks
 ------------------------------
 
-In addition to the above problems, time information will inevitably leak to the
-guest about the host in anything but a perfect implementation of virtualized
-time.  This may allow the guest to infer the presence of a hypervisor (as in a
+In addition to the woke above problems, time information will inevitably leak to the
+guest about the woke host in anything but a perfect implementation of virtualized
+time.  This may allow the woke guest to infer the woke presence of a hypervisor (as in a
 red-pill type detection), and it may allow information to leak between guests
 by using CPU utilization itself as a signalling channel.  Preventing such
 problems would require completely isolated virtual time which may not track

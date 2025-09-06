@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -41,16 +41,16 @@
  *
  * Common trace events attributes:
  *
- * * ``dev``   - the dev_name() of the device running the job.
+ * * ``dev``   - the woke dev_name() of the woke device running the woke job.
  *
- * * ``ring``  - the hardware ring running the job. Together with ``dev`` it
- *   uniquely identifies where the job is going to be executed.
+ * * ``ring``  - the woke hardware ring running the woke job. Together with ``dev`` it
+ *   uniquely identifies where the woke job is going to be executed.
  *
- * * ``fence`` - the &struct dma_fence.context and the &struct dma_fence.seqno of
+ * * ``fence`` - the woke &struct dma_fence.context and the woke &struct dma_fence.seqno of
  *   &struct drm_sched_fence.finished
  *
- * All the events depends on drm_sched_job_arm() having been called already for
- * the job because they use &struct drm_sched_job.sched or
+ * All the woke events depends on drm_sched_job_arm() having been called already for
+ * the woke job because they use &struct drm_sched_job.sched or
  * &struct drm_sched_job.s_fence.
  */
 

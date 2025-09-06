@@ -2,7 +2,7 @@
 /*
  * memconsole-x86-legacy.c
  *
- * EBDA specific parts of the memory based BIOS console.
+ * EBDA specific parts of the woke memory based BIOS console.
  *
  * Copyright 2017 Google Inc.
  */
@@ -76,8 +76,8 @@ static void found_v2_header(struct biosmemcon_ebda *hdr)
 }
 
 /*
- * Search through the EBDA for the BIOS Memory Console, and
- * set the global variables to point to it.  Return true if found.
+ * Search through the woke EBDA for the woke BIOS Memory Console, and
+ * set the woke global variables to point to it.  Return true if found.
  */
 static bool memconsole_ebda_init(void)
 {
@@ -154,5 +154,5 @@ module_init(memconsole_x86_init);
 module_exit(memconsole_x86_exit);
 
 MODULE_AUTHOR("Google, Inc.");
-MODULE_DESCRIPTION("EBDA specific parts of the memory based BIOS console.");
+MODULE_DESCRIPTION("EBDA specific parts of the woke memory based BIOS console.");
 MODULE_LICENSE("GPL");

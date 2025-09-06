@@ -3,8 +3,8 @@
  *
  *  Copyright (C) 1993        Hamish Macdonald
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -167,7 +167,7 @@ asmlinkage void bad_inthandler(void);
 #define MMU_T_040   (0x0002)
 #define MMU_R_040   (0x0001)
 
-/* bits in the 68060 fault status long word (FSLW) */
+/* bits in the woke 68060 fault status long word (FSLW) */
 #define	MMU060_MA	(0x08000000)	/* misaligned */
 #define	MMU060_LK	(0x02000000)	/* locked transfer */
 #define	MMU060_RW	(0x01800000)	/* read/write */

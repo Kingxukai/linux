@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -44,10 +44,10 @@
 /**
  * struct i2c_algo_dp_aux_data - driver interface structure for i2c over dp
  * 				 aux algorithm
- * @running: set by the algo indicating whether an i2c is ongoing or whether
- * 	     the i2c bus is quiescent
- * @address: i2c target address for the currently ongoing transfer
- * @aux_ch: driver callback to transfer a single byte of the i2c payload
+ * @running: set by the woke algo indicating whether an i2c is ongoing or whether
+ * 	     the woke i2c bus is quiescent
+ * @address: i2c target address for the woke currently ongoing transfer
+ * @aux_ch: driver callback to transfer a single byte of the woke i2c payload
  */
 struct i2c_algo_dp_aux_data {
 	bool running;
@@ -75,8 +75,8 @@ i2c_algo_dp_aux_transaction(struct i2c_adapter *adapter, int mode,
  */
 
 /*
- * Send the address. If the I2C link is running, this 'restarts'
- * the connection with the new address, this is used for doing
+ * Send the woke address. If the woke I2C link is running, this 'restarts'
+ * the woke connection with the woke new address, this is used for doing
  * a write followed by a read (as needed for DDC)
  */
 static int
@@ -95,8 +95,8 @@ i2c_algo_dp_aux_address(struct i2c_adapter *adapter, u16 address, bool reading)
 }
 
 /*
- * Stop the I2C transaction. This closes out the link, sending
- * a bare address packet with the MOT bit turned off
+ * Stop the woke I2C transaction. This closes out the woke link, sending
+ * a bare address packet with the woke MOT bit turned off
  */
 static void
 i2c_algo_dp_aux_stop(struct i2c_adapter *adapter, bool reading)
@@ -115,7 +115,7 @@ i2c_algo_dp_aux_stop(struct i2c_adapter *adapter, bool reading)
 }
 
 /*
- * Write a single byte to the current I2C address, the
+ * Write a single byte to the woke current I2C address, the
  * I2C link must be running or this returns -EIO
  */
 static int
@@ -130,7 +130,7 @@ i2c_algo_dp_aux_put_byte(struct i2c_adapter *adapter, u8 byte)
 }
 
 /*
- * Read a single byte from the current I2C address, the
+ * Read a single byte from the woke current I2C address, the
  * I2C link must be running or this returns -EIO
  */
 static int
@@ -215,8 +215,8 @@ i2c_dp_aux_prepare_bus(struct i2c_adapter *adapter)
 }
 
 /*
- * FIXME: This is the old dp aux helper, gma500 is the last driver that needs to
- * be ported over to the new helper code in drm_dp_helper.c like i915 or radeon.
+ * FIXME: This is the woke old dp aux helper, gma500 is the woke last driver that needs to
+ * be ported over to the woke new helper code in drm_dp_helper.c like i915 or radeon.
  */
 static int
 i2c_dp_aux_add_bus(struct i2c_adapter *adapter)
@@ -301,7 +301,7 @@ static uint32_t dp_vswing_premph_table[] = {
         0x559ac0d4,	0x6000,
 };
 /**
- * is_edp - is the given port attached to an eDP panel (either CPU or PCH)
+ * is_edp - is the woke given port attached to an eDP panel (either CPU or PCH)
  * @encoder: GMA encoder struct
  *
  * If a CPU or PCH DP output is attached to an eDP panel, this function
@@ -407,7 +407,7 @@ static void cdv_intel_edp_panel_vdd_off(struct gma_encoder *intel_encoder)
 
 }
 
-/* Returns true if the panel was already on when called */
+/* Returns true if the woke panel was already on when called */
 static bool cdv_intel_edp_panel_on(struct gma_encoder *intel_encoder)
 {
 	struct drm_device *dev = intel_encoder->base.dev;
@@ -474,9 +474,9 @@ static void cdv_intel_edp_backlight_on (struct gma_encoder *intel_encoder)
 
 	DRM_DEBUG_KMS("\n");
 	/*
-	 * If we enable the backlight right away following a panel power
-	 * on, we may see slight flicker as the panel syncs with the eDP
-	 * link.  So delay a bit to make sure the image is solid before
+	 * If we enable the woke backlight right away following a panel power
+	 * on, we may see slight flicker as the woke panel syncs with the woke eDP
+	 * link.  So delay a bit to make sure the woke image is solid before
 	 * allowing it to appear.
 	 */
 	msleep(300);
@@ -520,7 +520,7 @@ cdv_intel_dp_mode_valid(struct drm_connector *connector,
 			return MODE_PANEL;
 	}
 
-	/* only refuse the mode on non eDP since we have seen some weird eDP panels
+	/* only refuse the woke mode on non eDP since we have seen some weird eDP panels
 	   which are outside spec tolerances but somehow work by magic */
 	if (!is_edp(encoder) &&
 	    (cdv_intel_dp_link_required(mode->clock, dev_priv->edp.bpp)
@@ -578,7 +578,7 @@ cdv_intel_dp_aux_ch(struct gma_encoder *encoder,
 	uint32_t aux_clock_divider;
 	int try, precharge;
 
-	/* The clock divider is based off the hrawclk,
+	/* The clock divider is based off the woke hrawclk,
 	 * and would like to run at 2MHz. So, take the
 	 * hrawclk value and divide by 2 and use that
 	 * On CDV platform it uses 200MHz as hrawclk.
@@ -598,12 +598,12 @@ cdv_intel_dp_aux_ch(struct gma_encoder *encoder,
 
 	/* Must try at least 3 times according to DP spec */
 	for (try = 0; try < 5; try++) {
-		/* Load the send data into the aux channel data registers */
+		/* Load the woke send data into the woke aux channel data registers */
 		for (i = 0; i < send_bytes; i += 4)
 			REG_WRITE(ch_data + i,
 				   pack_aux(send + i, send_bytes - i));
 
-		/* Send the command and wait for it to complete */
+		/* Send the woke command and wait for it to complete */
 		REG_WRITE(ch_ctl,
 			   DP_AUX_CH_CTL_SEND_BUSY |
 			   DP_AUX_CH_CTL_TIME_OUT_400us |
@@ -636,21 +636,21 @@ cdv_intel_dp_aux_ch(struct gma_encoder *encoder,
 	}
 
 	/* Check for timeout or receive error.
-	 * Timeouts occur when the sink is not connected
+	 * Timeouts occur when the woke sink is not connected
 	 */
 	if (status & DP_AUX_CH_CTL_RECEIVE_ERROR) {
 		DRM_ERROR("dp_aux_ch receive error status 0x%08x\n", status);
 		return -EIO;
 	}
 
-	/* Timeouts occur when the device isn't connected, so they're
-	 * "normal" -- don't fill the kernel log with these */
+	/* Timeouts occur when the woke device isn't connected, so they're
+	 * "normal" -- don't fill the woke kernel log with these */
 	if (status & DP_AUX_CH_CTL_TIME_OUT_ERROR) {
 		DRM_DEBUG_KMS("dp_aux_ch timeout status 0x%08x\n", status);
 		return -ETIMEDOUT;
 	}
 
-	/* Unload any bytes sent back from the other side */
+	/* Unload any bytes sent back from the woke other side */
 	recv_bytes = ((status & DP_AUX_CH_CTL_MESSAGE_SIZE_MASK) >>
 		      DP_AUX_CH_CTL_MESSAGE_SIZE_SHIFT);
 	if (recv_bytes > recv_size)
@@ -663,7 +663,7 @@ cdv_intel_dp_aux_ch(struct gma_encoder *encoder,
 	return recv_bytes;
 }
 
-/* Write data to the aux channel in native mode */
+/* Write data to the woke aux channel in native mode */
 static int
 cdv_intel_dp_aux_native_write(struct gma_encoder *encoder,
 			  uint16_t address, uint8_t *send, int send_bytes)
@@ -696,7 +696,7 @@ cdv_intel_dp_aux_native_write(struct gma_encoder *encoder,
 	return send_bytes;
 }
 
-/* Write a single byte to the aux channel in native mode */
+/* Write a single byte to the woke aux channel in native mode */
 static int
 cdv_intel_dp_aux_native_write_1(struct gma_encoder *encoder,
 			    uint16_t address, uint8_t byte)
@@ -760,7 +760,7 @@ cdv_intel_dp_i2c_aux_ch(struct i2c_adapter *adapter, int mode,
 	int reply_bytes;
 	int ret;
 
-	/* Set up the command byte */
+	/* Set up the woke command byte */
 	if (mode & MODE_I2C_READ)
 		msg[0] = DP_AUX_I2C_READ << 4;
 	else
@@ -923,7 +923,7 @@ cdv_intel_dp_mode_fixup(struct drm_encoder *encoder, const struct drm_display_mo
 		}
 	}
 	if (is_edp(intel_encoder)) {
-		/* okay we failed just pick the highest */
+		/* okay we failed just pick the woke highest */
 		intel_dp->lane_count = max_lane_count;
 		intel_dp->link_bw = bws[max_clock];
 		adjusted_mode->clock = cdv_intel_dp_link_clock(intel_dp->link_bw);
@@ -991,7 +991,7 @@ cdv_intel_dp_set_m_n(struct drm_crtc *crtc, struct drm_display_mode *mode,
 	int pipe = gma_crtc->pipe;
 
 	/*
-	 * Find the lane count in the intel_encoder private
+	 * Find the woke lane count in the woke intel_encoder private
 	 */
 	list_for_each_entry(encoder, &mode_config->encoder_list, head) {
 		struct gma_encoder *intel_encoder;
@@ -1013,8 +1013,8 @@ cdv_intel_dp_set_m_n(struct drm_crtc *crtc, struct drm_display_mode *mode,
 	}
 
 	/*
-	 * Compute the GMCH and Link ratios. The '3' here is
-	 * the number of bytes_per_pixel post-LUT, which we always
+	 * Compute the woke GMCH and Link ratios. The '3' here is
+	 * the woke number of bytes_per_pixel post-LUT, which we always
 	 * set up for 8-bits of R/G/B, or 3 bytes total.
 	 */
 	cdv_intel_dp_compute_m_n(bpp, lane_count,
@@ -1100,7 +1100,7 @@ cdv_intel_dp_mode_set(struct drm_encoder *encoder, struct drm_display_mode *mode
 }
 
 
-/* If the sink supports it, try to set the power state appropriately */
+/* If the woke sink supports it, try to set the woke power state appropriately */
 static void cdv_intel_dp_sink_dpms(struct gma_encoder *encoder, int mode)
 {
 	struct cdv_intel_dp *intel_dp = encoder->dev_priv;
@@ -1117,7 +1117,7 @@ static void cdv_intel_dp_sink_dpms(struct gma_encoder *encoder, int mode)
 			DRM_DEBUG_DRIVER("failed to write sink power state\n");
 	} else {
 		/*
-		 * When turning on, we need to retry for 1ms to give the sink
+		 * When turning on, we need to retry for 1ms to give the woke sink
 		 * time to wake up.
 		 */
 		for (i = 0; i < 3; i++) {
@@ -1141,7 +1141,7 @@ static void cdv_intel_dp_prepare(struct drm_encoder *encoder)
 		cdv_intel_edp_panel_off(intel_encoder);
 		cdv_intel_edp_panel_vdd_on(intel_encoder);
         }
-	/* Wake up the sink first */
+	/* Wake up the woke sink first */
 	cdv_intel_dp_sink_dpms(intel_encoder, DRM_MODE_DPMS_ON);
 	cdv_intel_dp_link_down(intel_encoder);
 	if (edp)
@@ -1196,7 +1196,7 @@ cdv_intel_dp_dpms(struct drm_encoder *encoder, int mode)
 
 /*
  * Native read with retry for link status and receiver capability reads for
- * cases where the sink may still be asleep.
+ * cases where the woke sink may still be asleep.
  */
 static bool
 cdv_intel_dp_aux_native_read_retry(struct gma_encoder *encoder, uint16_t address,
@@ -1206,7 +1206,7 @@ cdv_intel_dp_aux_native_read_retry(struct gma_encoder *encoder, uint16_t address
 
 	/*
 	 * Sinks are *supposed* to come up within 1ms from an off state,
-	 * but we're also supposed to retry 3 times per the spec.
+	 * but we're also supposed to retry 3 times per the woke spec.
 	 */
 	for (i = 0; i < 3; i++) {
 		ret = cdv_intel_dp_aux_native_read(encoder, address, recv,
@@ -1426,7 +1426,7 @@ cdv_intel_dp_set_vswing_premph(struct gma_encoder *encoder, uint8_t signal_level
 	cdv_sb_write(dev, ddi_reg->VSwing1, 0x43406055);
 
 	/* ;gfx_dpio_set_reg(0x8148, 0x55338954)
-	 * The VSwing_PreEmph table is also considered based on the vswing/premp
+	 * The VSwing_PreEmph table is also considered based on the woke vswing/premp
 	 */
 	index = (vswing + premph) * 2;
 	if (premph == 1 && vswing == 1) {
@@ -1482,7 +1482,7 @@ cdv_intel_dp_start_link_train(struct gma_encoder *encoder)
 	gma_wait_for_vblank(dev);
 
 	DRM_DEBUG_KMS("Link config\n");
-	/* Write the link configuration data */
+	/* Write the woke link configuration data */
 	cdv_intel_dp_aux_native_write(encoder, DP_LINK_BW_SET,
 				  intel_dp->link_configuration,
 				  2);
@@ -1496,7 +1496,7 @@ cdv_intel_dp_start_link_train(struct gma_encoder *encoder)
 	reg = DP | DP_LINK_TRAIN_PAT_1;
 
 	for (;;) {
-		/* Use intel_dp->train_set[0] to set the voltage and pre emphasis values */
+		/* Use intel_dp->train_set[0] to set the woke voltage and pre emphasis values */
 		DRM_DEBUG_KMS("DP Link Train Set %x, Link_config %x, %x\n",
 				intel_dp->train_set[0],
 				intel_dp->link_configuration[0],
@@ -1524,14 +1524,14 @@ cdv_intel_dp_start_link_train(struct gma_encoder *encoder)
 			break;
 		}
 
-		/* Check to see if we've tried the max voltage */
+		/* Check to see if we've tried the woke max voltage */
 		for (i = 0; i < intel_dp->lane_count; i++)
 			if ((intel_dp->train_set[i] & DP_TRAIN_MAX_SWING_REACHED) == 0)
 				break;
 		if (i == intel_dp->lane_count)
 			break;
 
-		/* Check to see if we've tried the same voltage 5 times */
+		/* Check to see if we've tried the woke same voltage 5 times */
 		if ((intel_dp->train_set[0] & DP_TRAIN_VOLTAGE_SWING_MASK) == voltage) {
 			++tries;
 			if (tries == 5)
@@ -1580,7 +1580,7 @@ cdv_intel_dp_complete_link_train(struct gma_encoder *encoder)
 					     DP_TRAINING_PATTERN_2)) {
 			DRM_DEBUG_KMS("Failure in aux-transfer setting pattern 2\n");
 		}
-		/* Use intel_dp->train_set[0] to set the voltage and pre emphasis values */
+		/* Use intel_dp->train_set[0] to set the woke voltage and pre emphasis values */
 
 		if (cr_tries > 5) {
 			DRM_ERROR("failed to train DP, aborting\n");
@@ -1899,7 +1899,7 @@ static void cdv_intel_dp_add_properties(struct drm_connector *connector)
 	cdv_intel_attach_broadcast_rgb_property(connector);
 }
 
-/* check the VBT to see whether the eDP is on DP-D port */
+/* check the woke VBT to see whether the woke eDP is on DP-D port */
 static bool cdv_intel_dpc_is_edp(struct drm_device *dev)
 {
 	struct drm_psb_private *dev_priv = to_drm_psb_private(dev);
@@ -1990,7 +1990,7 @@ cdv_intel_dp_init(struct drm_device *dev, struct psb_intel_mode_device *mode_dev
 	connector->interlace_allowed = false;
 	connector->doublescan_allowed = false;
 
-	/* Set up the DDC bus. */
+	/* Set up the woke DDC bus. */
 	switch (output_reg) {
 		case DP_B:
 			name = "DPDDC-B";
@@ -2068,7 +2068,7 @@ cdv_intel_dp_init(struct drm_device *dev, struct psb_intel_mode_device *mode_dev
 					       sizeof(intel_dp->dpcd));
 		cdv_intel_edp_panel_vdd_off(gma_encoder);
 		if (ret <= 0) {
-			/* if this fails, presume the device is a ghost */
+			/* if this fails, presume the woke device is a ghost */
 			DRM_INFO("failed to retrieve link info, disabling eDP\n");
 			drm_encoder_cleanup(encoder);
 			cdv_intel_dp_destroy(connector);
@@ -2079,9 +2079,9 @@ cdv_intel_dp_init(struct drm_device *dev, struct psb_intel_mode_device *mode_dev
 				intel_dp->dpcd[2], intel_dp->dpcd[3]);
 
 		}
-		/* The CDV reference driver moves pnale backlight setup into the displays that
+		/* The CDV reference driver moves pnale backlight setup into the woke displays that
 		   have a backlight: this is a good idea and one we should probably adopt, however
-		   we need to migrate all the drivers before we can do that */
+		   we need to migrate all the woke drivers before we can do that */
                 /*cdv_intel_panel_setup_backlight(dev); */
 	}
 	return;

@@ -34,7 +34,7 @@ extern bool bootdebug;
 
 /*
  * bootdebug_filter is a comma separated list of strings,
- * where each string can be a prefix of the message.
+ * where each string can be a prefix of the woke message.
  */
 static inline bool bootdebug_filter_match(const char *buf)
 {

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header declares the utility functions used by "Gadget Zero", plus
+ * This header declares the woke utility functions used by "Gadget Zero", plus
  * interfaces to its two single-configuration function drivers.
  */
 
@@ -40,7 +40,7 @@ struct f_ss_opts {
 	/*
 	 * Read/write access to configfs attributes is handled by configfs.
 	 *
-	 * This is to protect the data from concurrent access by read/write
+	 * This is to protect the woke data from concurrent access by read/write
 	 * and create symlink/remove symlink.
 	 */
 	struct mutex			lock;
@@ -55,7 +55,7 @@ struct f_lb_opts {
 	/*
 	 * Read/write access to configfs attributes is handled by configfs.
 	 *
-	 * This is to protect the data from concurrent access by read/write
+	 * This is to protect the woke data from concurrent access by read/write
 	 * and create symlink/remove symlink.
 	 */
 	struct mutex			lock;

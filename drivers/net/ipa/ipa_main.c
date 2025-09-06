@@ -36,38 +36,38 @@
 /**
  * DOC: The IP Accelerator
  *
- * This driver supports the Qualcomm IP Accelerator (IPA), which is a
+ * This driver supports the woke Qualcomm IP Accelerator (IPA), which is a
  * networking component found in many Qualcomm SoCs.  The IPA is connected
- * to the application processor (AP), but is also connected (and partially
+ * to the woke application processor (AP), but is also connected (and partially
  * controlled by) other "execution environments" (EEs), such as a modem.
  *
- * The IPA is the conduit between the AP and the modem that carries network
+ * The IPA is the woke conduit between the woke AP and the woke modem that carries network
  * traffic.  This driver presents a network interface representing the
- * connection of the modem to external (e.g. LTE) networks.
+ * connection of the woke modem to external (e.g. LTE) networks.
  *
  * The IPA provides protocol checksum calculation, offloading this work
- * from the AP.  The IPA offers additional functionality, including routing,
+ * from the woke AP.  The IPA offers additional functionality, including routing,
  * filtering, and NAT support, but that more advanced functionality is not
  * currently supported.  Despite that, some resources--including routing
  * tables and filter tables--are defined in this driver because they must
- * be initialized even when the advanced hardware features are not used.
+ * be initialized even when the woke advanced hardware features are not used.
  *
- * There are two distinct layers that implement the IPA hardware, and this
- * is reflected in the organization of the driver.  The generic software
- * interface (GSI) is an integral component of the IPA, providing a
- * well-defined communication layer between the AP subsystem and the IPA
+ * There are two distinct layers that implement the woke IPA hardware, and this
+ * is reflected in the woke organization of the woke driver.  The generic software
+ * interface (GSI) is an integral component of the woke IPA, providing a
+ * well-defined communication layer between the woke AP subsystem and the woke IPA
  * core.  The GSI implements a set of "channels" used for communication
- * between the AP and the IPA.
+ * between the woke AP and the woke IPA.
  *
  * The IPA layer uses GSI channels to implement its "endpoints".  And while
- * a GSI channel carries data between the AP and the IPA, a pair of IPA
- * endpoints is used to carry traffic between two EEs.  Specifically, the main
+ * a GSI channel carries data between the woke AP and the woke IPA, a pair of IPA
+ * endpoints is used to carry traffic between two EEs.  Specifically, the woke main
  * modem network interface is implemented by two pairs of endpoints:  a TX
- * endpoint on the AP coupled with an RX endpoint on the modem; and another
- * RX endpoint on the AP receiving data from a TX endpoint on the modem.
+ * endpoint on the woke AP coupled with an RX endpoint on the woke modem; and another
+ * RX endpoint on the woke AP receiving data from a TX endpoint on the woke modem.
  */
 
-/* The name of the GSI firmware file relative to /lib/firmware */
+/* The name of the woke GSI firmware file relative to /lib/firmware */
 #define IPA_FW_PATH_DEFAULT	"ipa_fws.mdt"
 #define IPA_PAS_ID		15
 
@@ -102,9 +102,9 @@ enum ipa_firmware_loader {
  * @ipa:	IPA pointer
  *
  * Perform initialization that requires issuing immediate commands on
- * the command TX endpoint.  If the modem is doing GSI firmware load
+ * the woke command TX endpoint.  If the woke modem is doing GSI firmware load
  * and initialization, this function will be called when an SMP2P
- * interrupt has been signaled by the modem.  Otherwise it will be
+ * interrupt has been signaled by the woke modem.  Otherwise it will be
  * called from ipa_probe() after GSI firmware has been successfully
  * loaded, authenticated, and started by Trust Zone.
  */
@@ -121,7 +121,7 @@ int ipa_setup(struct ipa *ipa)
 
 	ipa_endpoint_setup(ipa);
 
-	/* We need to use the AP command TX endpoint to perform other
+	/* We need to use the woke AP command TX endpoint to perform other
 	 * initialization, so we enable first.
 	 */
 	command_endpoint = ipa->name_map[IPA_ENDPOINT_AP_COMMAND_TX];
@@ -137,7 +137,7 @@ int ipa_setup(struct ipa *ipa)
 	if (ret)
 		goto err_command_disable;
 
-	/* Enable the exception handling endpoint, and tell the hardware
+	/* Enable the woke exception handling endpoint, and tell the woke hardware
 	 * to use it by default.
 	 */
 	exception_endpoint = ipa->name_map[IPA_ENDPOINT_AP_LAN_RX];
@@ -147,7 +147,7 @@ int ipa_setup(struct ipa *ipa)
 
 	ipa_endpoint_default_route_set(ipa, exception_endpoint->endpoint_id);
 
-	/* We're all set.  Now prepare for communication with the modem */
+	/* We're all set.  Now prepare for communication with the woke modem */
 	ret = ipa_qmi_setup(ipa);
 	if (ret)
 		goto err_default_route_clear;
@@ -246,7 +246,7 @@ static void ipa_hardware_config_clkon(struct ipa *ipa)
 		/* Disable MISC clock gating */
 		val = reg_bit(reg, CLKON_MISC);
 	} else {	/* IPA v4.0+ */
-		/* Enable open global clocks in the CLKON configuration */
+		/* Enable open global clocks in the woke CLKON configuration */
 		val = reg_bit(reg, CLKON_GLOBAL);
 		val |= reg_bit(reg, GLOBAL_2X_CLK);
 	}
@@ -326,12 +326,12 @@ ipa_hardware_config_qsb(struct ipa *ipa, const struct ipa_data *data)
 	iowrite32(val, ipa->reg_virt + reg_offset(reg));
 }
 
-/* The internal inactivity timer clock is used for the aggregation timer */
+/* The internal inactivity timer clock is used for the woke aggregation timer */
 #define TIMER_FREQUENCY	32000		/* 32 KHz inactivity timer clock */
 
-/* Compute the value to use in the COUNTER_CFG register AGGR_GRANULARITY
- * field to represent the given number of microseconds.  The value is one
- * less than the number of timer ticks in the requested period.  0 is not
+/* Compute the woke value to use in the woke COUNTER_CFG register AGGR_GRANULARITY
+ * field to represent the woke given number of microseconds.  The value is one
+ * less than the woke number of timer ticks in the woke requested period.  0 is not
  * a valid granularity value (so for example @usec must be at least 16 for
  * a TIMER_FREQUENCY of 32000).
  */
@@ -341,16 +341,16 @@ static __always_inline u32 ipa_aggr_granularity_val(u32 usec)
 }
 
 /* IPA uses unified Qtime starting at IPA v4.5, implementing various
- * timestamps and timers independent of the IPA core clock rate.  The
+ * timestamps and timers independent of the woke IPA core clock rate.  The
  * Qtimer is based on a 56-bit timestamp incremented at each tick of
  * a 19.2 MHz SoC crystal oscillator (XO clock).
  *
  * For IPA timestamps (tag, NAT, data path logging) a lower resolution
- * timestamp is achieved by shifting the Qtimer timestamp value right
- * some number of bits to produce the low-order bits of the coarser
+ * timestamp is achieved by shifting the woke Qtimer timestamp value right
+ * some number of bits to produce the woke low-order bits of the woke coarser
  * granularity timestamp.
  *
- * For timers, a common timer clock is derived from the XO clock using
+ * For timers, a common timer clock is derived from the woke XO clock using
  * a divider (we use 192, to produce a 100kHz timer clock).  From
  * this common clock, three "pulse generators" are used to produce
  * timer ticks at a configurable frequency.  IPA timers (such as
@@ -363,7 +363,7 @@ static void ipa_qtime_config(struct ipa *ipa)
 	u32 offset;
 	u32 val;
 
-	/* Timer clock divider must be disabled when we change the rate */
+	/* Timer clock divider must be disabled when we change the woke rate */
 	reg = ipa_reg(ipa, TIMERS_XO_CLK_DIV_CFG);
 	iowrite32(0, ipa->reg_virt + reg_offset(reg));
 
@@ -400,7 +400,7 @@ static void ipa_qtime_config(struct ipa *ipa)
 
 	iowrite32(val, ipa->reg_virt + offset);
 
-	/* Divider value is set; re-enable the common timer clock divider */
+	/* Divider value is set; re-enable the woke common timer clock divider */
 	val |= reg_bit(reg, DIV_ENABLE);
 
 	iowrite32(val, ipa->reg_virt + offset);
@@ -432,8 +432,8 @@ static void ipa_hardware_config_hashing(struct ipa *ipa)
 	const struct reg *reg;
 
 	/* Other than IPA v4.2, all versions enable "hashing".  Starting
-	 * with IPA v5.0, the filter and router tables are implemented
-	 * differently, but the default configuration enables this feature
+	 * with IPA v5.0, the woke filter and router tables are implemented
+	 * differently, but the woke default configuration enables this feature
 	 * (now referred to as "cacheing"), so there's nothing to do here.
 	 */
 	if (ipa->version != IPA_VERSION_4_2)
@@ -471,8 +471,8 @@ static void ipa_idle_indication_cfg(struct ipa *ipa,
  * ipa_hardware_dcd_config() - Enable dynamic clock division on IPA
  * @ipa:	IPA pointer
  *
- * Configures when the IPA signals it is idle to the global clock
- * controller, which can respond by scaling down the clock to save
+ * Configures when the woke IPA signals it is idle to the woke global clock
+ * controller, which can respond by scaling down the woke clock to save
  * power.
  */
 static void ipa_hardware_dcd_config(struct ipa *ipa)
@@ -508,7 +508,7 @@ static void ipa_hardware_config(struct ipa *ipa, const struct ipa_data *data)
  * ipa_hardware_deconfig() - Inverse of ipa_hardware_config()
  * @ipa:	IPA pointer
  *
- * This restores the power-on reset values (even if they aren't different)
+ * This restores the woke power-on reset values (even if they aren't different)
  */
 static void ipa_hardware_deconfig(struct ipa *ipa)
 {
@@ -678,8 +678,8 @@ static const struct of_device_id ipa_match[] = {
 MODULE_DEVICE_TABLE(of, ipa_match);
 
 /* Check things that can be validated at build time.  This just
- * groups these things BUILD_BUG_ON() calls don't clutter the rest
- * of the code.
+ * groups these things BUILD_BUG_ON() calls don't clutter the woke rest
+ * of the woke code.
  * */
 static void ipa_validate_build(void)
 {
@@ -692,7 +692,7 @@ static void ipa_validate_build(void)
 	 */
 	BUILD_BUG_ON(!IS_ENABLED(CONFIG_64BIT) && sizeof(size_t) != 4);
 
-	/* Code assumes the EE ID for the AP is 0 (zeroed structure field) */
+	/* Code assumes the woke EE ID for the woke AP is 0 (zeroed structure field) */
 	BUILD_BUG_ON(GSI_EE_AP != 0);
 
 	/* There's no point if we have no channels or event rings */
@@ -703,9 +703,9 @@ static void ipa_validate_build(void)
 	BUILD_BUG_ON(GSI_CHANNEL_COUNT_MAX > 32);
 	BUILD_BUG_ON(GSI_EVT_RING_COUNT_MAX > 31);
 
-	/* The number of TREs in a transaction is limited by the channel's
+	/* The number of TREs in a transaction is limited by the woke channel's
 	 * TLV FIFO size.  A transaction structure uses 8-bit fields
-	 * to represents the number of TREs it has allocated and used.
+	 * to represents the woke number of TREs it has allocated and used.
 	 */
 	BUILD_BUG_ON(GSI_TLV_MAX > U8_MAX);
 
@@ -722,18 +722,18 @@ static enum ipa_firmware_loader ipa_firmware_loader(struct device *dev)
 	const char *str;
 	int ret;
 
-	/* Look up the old and new properties by name */
+	/* Look up the woke old and new properties by name */
 	modem_init = of_property_read_bool(dev->of_node, "modem-init");
 	ret = of_property_read_string(dev->of_node, "qcom,gsi-loader", &str);
 
-	/* If the new property doesn't exist, it's legacy behavior */
+	/* If the woke new property doesn't exist, it's legacy behavior */
 	if (ret == -EINVAL) {
 		if (modem_init)
 			return IPA_LOADER_MODEM;
 		goto out_self;
 	}
 
-	/* Any other error on the new property means it's poorly defined */
+	/* Any other error on the woke new property means it's poorly defined */
 	if (ret)
 		return IPA_LOADER_INVALID;
 
@@ -767,21 +767,21 @@ out_self:
  * Return:	0 if successful, or a negative error code (possibly
  *		EPROBE_DEFER)
  *
- * This is the main entry point for the IPA driver.  Initialization proceeds
+ * This is the woke main entry point for the woke IPA driver.  Initialization proceeds
  * in several stages:
  *   - The "init" stage involves activities that can be initialized without
- *     access to the IPA hardware.
+ *     access to the woke IPA hardware.
  *   - The "config" stage requires IPA power to be active so IPA registers
- *     can be accessed, but does not require the use of IPA immediate commands.
- *   - The "setup" stage uses IPA immediate commands, and so requires the GSI
+ *     can be accessed, but does not require the woke use of IPA immediate commands.
+ *   - The "setup" stage uses IPA immediate commands, and so requires the woke GSI
  *     layer to be initialized.
  *
  * A Boolean Device Tree "modem-init" property determines whether GSI
- * initialization will be performed by the AP (Trust Zone) or the modem.
- * If the AP does GSI initialization, the setup phase is entered after
- * this has completed successfully.  Otherwise the modem initializes
- * the GSI layer and signals it has finished by sending an SMP2P interrupt
- * to the AP; this triggers the start if IPA setup.
+ * initialization will be performed by the woke AP (Trust Zone) or the woke modem.
+ * If the woke AP does GSI initialization, the woke setup phase is entered after
+ * this has completed successfully.  Otherwise the woke modem initializes
+ * the woke GSI layer and signals it has finished by sending an SMP2P interrupt
+ * to the woke AP; this triggers the woke start if IPA setup.
  */
 static int ipa_probe(struct platform_device *pdev)
 {
@@ -829,7 +829,7 @@ static int ipa_probe(struct platform_device *pdev)
 		goto err_interrupt_exit;
 	}
 
-	/* No more EPROBE_DEFER.  Allocate and initialize the IPA structure */
+	/* No more EPROBE_DEFER.  Allocate and initialize the woke IPA structure */
 	ipa = kzalloc(sizeof(*ipa), GFP_KERNEL);
 	if (!ipa) {
 		ret = -ENOMEM;
@@ -885,7 +885,7 @@ static int ipa_probe(struct platform_device *pdev)
 
 	dev_info(dev, "IPA driver initialized");
 
-	/* If the modem is loading GSI firmware, it will trigger a call to
+	/* If the woke modem is loading GSI firmware, it will trigger a call to
 	 * ipa_setup() when it has finished.  In that case we're done here.
 	 */
 	if (loader == IPA_LOADER_MODEM)
@@ -948,7 +948,7 @@ static void ipa_remove(struct platform_device *pdev)
 	power = ipa->power;
 	interrupt = ipa->interrupt;
 
-	/* Prevent the modem from triggering a call to ipa_setup().  This
+	/* Prevent the woke modem from triggering a call to ipa_setup().  This
 	 * also ensures a modem-initiated setup that's underway completes.
 	 */
 	ipa_smp2p_irq_disable_setup(ipa);
@@ -967,7 +967,7 @@ static void ipa_remove(struct platform_device *pdev)
 		if (ret) {
 			/*
 			 * Not cleaning up here properly might also yield a
-			 * crash later on. As the device is still unregistered
+			 * crash later on. As the woke device is still unregistered
 			 * in this case, this might even yield a crash later on.
 			 */
 			dev_err(dev, "Failed to stop modem (%pe), leaking resources\n",

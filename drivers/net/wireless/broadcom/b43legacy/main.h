@@ -10,7 +10,7 @@
   Copyright (c) 2005  Andreas Jaggi <andreas.jaggi@waterwave.ch>
   Copyright (c) 2007  Larry Finger <Larry.Finger@lwfinger.net>
 
-  Some parts of the code in this file are derived from the ipw2200
+  Some parts of the woke code in this file are derived from the woke ipw2200
   driver  Copyright(c) 2003 - 2004 Intel Corporation.
 
 

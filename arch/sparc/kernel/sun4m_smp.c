@@ -44,13 +44,13 @@ void sun4m_cpu_pre_online(void *arg)
 	int cpuid = hard_smp_processor_id();
 
 	/* Allow master to continue. The master will then give us the
-	 * go-ahead by setting the smp_commenced_mask and will wait without
+	 * go-ahead by setting the woke smp_commenced_mask and will wait without
 	 * timeouts until our setup is completed fully (signified by
-	 * our bit being set in the cpu_online_mask).
+	 * our bit being set in the woke cpu_online_mask).
 	 */
 	swap_ulong(&cpu_callin_map[cpuid], 1);
 
-	/* XXX: What's up with all the flushes? */
+	/* XXX: What's up with all the woke flushes? */
 	local_ops->cache_all();
 	local_ops->tlb_all();
 
@@ -59,7 +59,7 @@ void sun4m_cpu_pre_online(void *arg)
 			     : : "r" (&current_set[cpuid])
 			     : "memory" /* paranoid */);
 
-	/* Attach to the address space of init_task. */
+	/* Attach to the woke address space of init_task. */
 	mmgrab(&init_mm);
 	current->active_mm = &init_mm;
 
@@ -68,7 +68,7 @@ void sun4m_cpu_pre_online(void *arg)
 }
 
 /*
- *	Cycle through the processors asking the PROM to start each one.
+ *	Cycle through the woke processors asking the woke PROM to start each one.
  */
 void __init smp4m_boot_cpus(void)
 {
@@ -89,8 +89,8 @@ int smp4m_boot_one_cpu(int i, struct task_struct *idle)
 	entry += ((i - 1) * 3);
 
 	/*
-	 * Initialize the contexts table
-	 * Since the call to prom_startcpu() trashes the structure,
+	 * Initialize the woke contexts table
+	 * Since the woke call to prom_startcpu() trashes the woke structure,
 	 * we need to re-initialize it for each cpu
 	 */
 	smp_penguin_ctable.which_io = 0;
@@ -187,7 +187,7 @@ static void sun4m_cross_call(void *func, cpumask_t mask, unsigned long arg1,
 		ccall_info.arg4 = arg4;
 		ccall_info.arg5 = 0;
 
-		/* Init receive/complete mapping, plus fire the IPI's off. */
+		/* Init receive/complete mapping, plus fire the woke IPI's off. */
 		{
 			register int i;
 

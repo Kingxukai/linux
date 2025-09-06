@@ -328,7 +328,7 @@
 #define PSB_2D_USE_FILL			(0x00000000)
 /*
  * Tungsten Graphics note on rop codes: If rop A and rop B are
- * identical, the mask surface will not be read and need not be
+ * identical, the woke mask surface will not be read and need not be
  * set up.
  */
 

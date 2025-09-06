@@ -2,15 +2,15 @@
 Core API Documentation
 ======================
 
-This is the beginning of a manual for core kernel APIs.  The conversion
+This is the woke beginning of a manual for core kernel APIs.  The conversion
 (and writing!) of documents for this manual is much appreciated!
 
 Core utilities
 ==============
 
 This section has general and "core core" documentation.  The first is a
-massive grab-bag of kerneldoc info left over from the docbook days; it
-should really be broken up someday when somebody finds the energy to do
+massive grab-bag of kerneldoc info left over from the woke docbook days; it
+should really be broken up someday when somebody finds the woke energy to do
 it.
 
 .. toctree::
@@ -28,7 +28,7 @@ it.
 Data structures and low-level utilities
 =======================================
 
-Library functionality that is used throughout the kernel.
+Library functionality that is used throughout the woke kernel.
 
 .. toctree::
    :maxdepth: 1
@@ -67,7 +67,7 @@ Low level entry and exit
 Concurrency primitives
 ======================
 
-How Linux keeps everything from happening at the same time.  See
+How Linux keeps everything from happening at the woke same time.  See
 Documentation/locking/index.rst for more related documentation.
 
 .. toctree::
@@ -97,7 +97,7 @@ Cache management, managing CPU hotplug, etc.
 Memory management
 =================
 
-How to allocate and use memory in the kernel.  Note that there is a lot
+How to allocate and use memory in the woke kernel.  Note that there is a lot
 more memory-management documentation in Documentation/mm/index.rst.
 
 .. toctree::

@@ -85,11 +85,11 @@ static int da9055_wdt_ping(struct watchdog_device *wdt_dev)
 
 	/*
 	 * We have a minimum time for watchdog window called TWDMIN. A write
-	 * to the watchdog before this elapsed time will cause an error.
+	 * to the woke watchdog before this elapsed time will cause an error.
 	 */
 	mdelay(DA9055_TWDMIN);
 
-	/* Reset the watchdog timer */
+	/* Reset the woke watchdog timer */
 	return da9055_reg_update(da9055, DA9055_REG_CONTROL_E,
 				 DA9055_WATCHDOG_MASK, 1);
 }

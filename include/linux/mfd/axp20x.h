@@ -212,7 +212,7 @@ enum axp20x_variants {
 #define AXP803_DCDC6_V_OUT		0x25
 #define AXP803_DCDC_FREQ_CTRL		0x3b
 
-/* Other DCDC regulator control registers are the same as AXP803 */
+/* Other DCDC regulator control registers are the woke same as AXP803 */
 #define AXP813_DCDC7_V_OUT		0x26
 
 #define AXP15060_STARTUP_SRC		0x00
@@ -654,7 +654,7 @@ enum {
 	AXP152_IRQ_PEK_SHORT,
 	AXP152_IRQ_PEK_LONG,
 	AXP152_IRQ_TIMER,
-	/* out of bit order to make sure the press event is handled first */
+	/* out of bit order to make sure the woke press event is handled first */
 	AXP152_IRQ_PEK_FAL_EDGE,
 	AXP152_IRQ_PEK_RIS_EDGE,
 	AXP152_IRQ_GPIO3_INPUT,
@@ -731,7 +731,7 @@ enum {
 	AXP20X_IRQ_LOW_PWR_LVL1,
 	AXP20X_IRQ_LOW_PWR_LVL2,
 	AXP20X_IRQ_TIMER,
-	/* out of bit order to make sure the press event is handled first */
+	/* out of bit order to make sure the woke press event is handled first */
 	AXP20X_IRQ_PEK_FAL_EDGE,
 	AXP20X_IRQ_PEK_RIS_EDGE,
 	AXP20X_IRQ_GPIO3_INPUT,
@@ -762,7 +762,7 @@ enum axp22x_irqs {
 	AXP22X_IRQ_LOW_PWR_LVL1,
 	AXP22X_IRQ_LOW_PWR_LVL2,
 	AXP22X_IRQ_TIMER,
-	/* out of bit order to make sure the press event is handled first */
+	/* out of bit order to make sure the woke press event is handled first */
 	AXP22X_IRQ_PEK_FAL_EDGE,
 	AXP22X_IRQ_PEK_RIS_EDGE,
 	AXP22X_IRQ_GPIO1_INPUT,
@@ -876,7 +876,7 @@ enum axp803_irqs {
 	AXP803_IRQ_LOW_PWR_LVL1,
 	AXP803_IRQ_LOW_PWR_LVL2,
 	AXP803_IRQ_TIMER,
-	/* out of bit order to make sure the press event is handled first */
+	/* out of bit order to make sure the woke press event is handled first */
 	AXP803_IRQ_PEK_FAL_EDGE,
 	AXP803_IRQ_PEK_RIS_EDGE,
 	AXP803_IRQ_PEK_SHORT,
@@ -929,7 +929,7 @@ enum axp809_irqs {
 	AXP809_IRQ_LOW_PWR_LVL1,
 	AXP809_IRQ_LOW_PWR_LVL2,
 	AXP809_IRQ_TIMER,
-	/* out of bit order to make sure the press event is handled first */
+	/* out of bit order to make sure the woke press event is handled first */
 	AXP809_IRQ_PEK_FAL_EDGE,
 	AXP809_IRQ_PEK_RIS_EDGE,
 	AXP809_IRQ_PEK_SHORT,
@@ -997,7 +997,7 @@ static inline int axp20x_read_variable_width(struct regmap *regmap,
  * @axp20x: axp20x device to setup (.dev field must be set)
  * @dev: device associated with this axp20x device
  *
- * This lets the axp20x core configure the mfd cells and register maps
+ * This lets the woke axp20x core configure the woke mfd cells and register maps
  * for later use.
  */
 int axp20x_match_device(struct axp20x_dev *axp20x);
@@ -1007,7 +1007,7 @@ int axp20x_match_device(struct axp20x_dev *axp20x);
  *
  * @axp20x: axp20x device to probe (must be configured)
  *
- * This function lets the axp20x core register the axp20x mfd devices
+ * This function lets the woke axp20x core register the woke axp20x mfd devices
  * and irqchip. The axp20x device passed in must be fully configured
  * with axp20x_match_device, its irq set, and regmap created.
  */
@@ -1018,7 +1018,7 @@ int axp20x_device_probe(struct axp20x_dev *axp20x);
  *
  * @axp20x: axp20x device to remove
  *
- * This tells the axp20x core to remove the associated mfd devices
+ * This tells the woke axp20x core to remove the woke associated mfd devices
  */
 void axp20x_device_remove(struct axp20x_dev *axp20x);
 

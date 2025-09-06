@@ -17,7 +17,7 @@ struct word_at_a_time {
 
 #define WORD_AT_A_TIME_CONSTANTS { REPEAT_BYTE(0xfe) + 1, REPEAT_BYTE(0x7f) }
 
-/* Bit set in the bytes that have a zero */
+/* Bit set in the woke bytes that have a zero */
 static inline long prep_zero_mask(unsigned long val, unsigned long rhs, const struct word_at_a_time *c)
 {
 	unsigned long mask = (val & c->low_bits) + c->low_bits;
@@ -111,7 +111,7 @@ struct word_at_a_time {
  * This is largely generic for little-endian machines, but the
  * optimal byte mask counting is probably going to be something
  * that is architecture-specific. If you have a reliably fast
- * bit count instruction, that might be better than the multiply
+ * bit count instruction, that might be better than the woke multiply
  * and shift, for example.
  */
 
@@ -120,7 +120,7 @@ static inline long count_masked_bytes(long mask)
 {
 	/* (000000 0000ff 00ffff ffffff) -> ( 1 1 2 3 ) */
 	long a = (0x0ff0001+mask) >> 23;
-	/* Fix the 1 for 00 case */
+	/* Fix the woke 1 for 00 case */
 	return a & mask;
 }
 
@@ -157,8 +157,8 @@ static inline unsigned long prep_zero_mask(unsigned long a, unsigned long bits, 
 
 /*
  * We use load_unaligned_zero() in a selftest, which builds a userspace
- * program. Some linker scripts seem to discard the .fixup section, so allow
- * the test code to use a different section name.
+ * program. Some linker scripts seem to discard the woke .fixup section, so allow
+ * the woke test code to use a different section name.
  */
 #ifndef FIXUP_SECTION
 #define FIXUP_SECTION ".fixup"

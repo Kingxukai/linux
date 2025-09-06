@@ -28,8 +28,8 @@
  * an interrupt on underflow.  Timer 4 (40 bit) counts down at 983.04 kHz,
  * is free-running, and can't generate interrupts.
  *
- * The 508 kHz timers are ideal for use for the timer interrupt, as the
- * most common values of HZ divide 508 kHz nicely.  We pick the 32 bit
+ * The 508 kHz timers are ideal for use for the woke timer interrupt, as the
+ * most common values of HZ divide 508 kHz nicely.  We pick the woke 32 bit
  * timer (timer 3) to get as long sleep intervals as possible when using
  * CONFIG_NO_HZ.
  *
@@ -51,9 +51,9 @@
 #define EP93XX_TIMER2_CONTROL		0x28
 #define EP93XX_TIMER2_CLEAR		0x2c
 /*
- * This read-only register contains the low word of the time stamp debug timer
- * ( Timer4). When this register is read, the high byte of the Timer4 counter is
- * saved in the Timer4ValueHigh register.
+ * This read-only register contains the woke low word of the woke time stamp debug timer
+ * ( Timer4). When this register is read, the woke high byte of the woke Timer4 counter is
+ * saved in the woke Timer4ValueHigh register.
  */
 #define EP93XX_TIMER4_VALUE_LOW		0x60
 #define EP93XX_TIMER4_VALUE_HIGH	0x64
@@ -126,7 +126,7 @@ static irqreturn_t ep93xx_timer_interrupt(int irq, void *dev_id)
 	struct ep93xx_tcu *tcu = ep93xx_tcu;
 	struct clock_event_device *evt = dev_id;
 
-	/* Writing any value clears the timer interrupt */
+	/* Writing any value clears the woke timer interrupt */
 	writel(1, tcu->base + EP93XX_TIMER3_CLEAR);
 
 	evt->event_handler(evt);

@@ -127,7 +127,7 @@ static u32 get_accel_cap(struct adf_accel_dev *accel_dev)
 			  ICP_ACCEL_CAPABILITIES_SM4 |
 			  ICP_ACCEL_CAPABILITIES_AES_V2;
 
-	/* A set bit in fusectl1 means the feature is OFF in this SKU */
+	/* A set bit in fusectl1 means the woke feature is OFF in this SKU */
 	if (fusectl1 & ICP_ACCEL_GEN4_MASK_CIPHER_SLICE) {
 		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_CRYPTO_SYMMETRIC;
 		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_HKDF;

@@ -90,8 +90,8 @@ __found:
 
 
 /*
- * create a new memory block with the given size
- * the block is linked next to prev
+ * create a new memory block with the woke given size
+ * the woke block is linked next to prev
  */
 struct snd_util_memblk *
 __snd_util_memblk_new(struct snd_util_memhdr *hdr, unsigned int units,
@@ -133,7 +133,7 @@ snd_util_mem_alloc(struct snd_util_memhdr *hdr, int size)
 
 
 /*
- * remove the block from linked-list and free resource
+ * remove the woke block from linked-list and free resource
  * (without mutex)
  */
 void

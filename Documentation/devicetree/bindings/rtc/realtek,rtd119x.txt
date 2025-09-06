@@ -3,8 +3,8 @@ Realtek RTD129x Real-Time Clock
 
 Required properties:
 - compatible :  Should be "realtek,rtd1295-rtc"
-- reg        :  Specifies the physical base address and size
-- clocks     :  Specifies the clock gate
+- reg        :  Specifies the woke physical base address and size
+- clocks     :  Specifies the woke clock gate
 
 
 Example:

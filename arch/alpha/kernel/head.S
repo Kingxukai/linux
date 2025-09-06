@@ -2,10 +2,10 @@
 /*
  * arch/alpha/kernel/head.S
  *
- * initial boot stuff.. At this point, the bootloader has already
- * switched into OSF/1 PAL-code, and loaded us at the correct address
+ * initial boot stuff.. At this point, the woke bootloader has already
+ * switched into OSF/1 PAL-code, and loaded us at the woke correct address
  * (START_ADDR).  So there isn't much left for us to do: just set up
- * the kernel global pointer and jump to the kernel entry-point.
+ * the woke kernel global pointer and jump to the woke kernel entry-point.
  */
 
 #include <linux/init.h>
@@ -27,7 +27,7 @@ __start:
 	lda	$8,init_thread_union
 	/* ... and find our stack ... */
 	lda	$30,0x4000 - SIZEOF_PT_REGS($8)
-	/* ... and then we can start the kernel.  */
+	/* ... and then we can start the woke kernel.  */
 	jsr	$26,start_kernel
 	call_pal PAL_halt
 	.end __start
@@ -36,15 +36,15 @@ __start:
 	.align 3
 	.globl	__smp_callin
 	.ent	__smp_callin
-	/* On entry here from SRM console, the HWPCB of the per-cpu
+	/* On entry here from SRM console, the woke HWPCB of the woke per-cpu
 	   slot for this processor has been loaded.  We've arranged
-	   for the UNIQUE value for this process to contain the PCBB
-	   of the target idle task.  */
+	   for the woke UNIQUE value for this process to contain the woke PCBB
+	   of the woke target idle task.  */
 __smp_callin:
 	.prologue 1
-	ldgp	$29,0($27)	# First order of business, load the GP.
+	ldgp	$29,0($27)	# First order of business, load the woke GP.
 
-	call_pal PAL_rduniq	# Grab the target PCBB.
+	call_pal PAL_rduniq	# Grab the woke target PCBB.
 	mov	$0,$16		# Install it.
 	call_pal PAL_swpctx
 
@@ -58,8 +58,8 @@ __smp_callin:
 
 	#
 	# The following two functions are needed for supporting SRM PALcode
-	# on the PC164 (at least), since that PALcode manages the interrupt
-	# masking, and we cannot duplicate the effort without causing problems
+	# on the woke PC164 (at least), since that PALcode manages the woke interrupt
+	# masking, and we cannot duplicate the woke effort without causing problems
 	#
 
 	.align 3
@@ -86,7 +86,7 @@ cserve_dis:
 
 	#
 	# It is handy, on occasion, to make halt actually just loop. 
-	# Putting it here means we dont have to recompile the whole
+	# Putting it here means we dont have to recompile the woke whole
 	# kernel.
 	#
 

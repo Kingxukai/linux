@@ -56,10 +56,10 @@ struct ctucan_priv {
 /**
  * ctucan_probe_common - Device type independent registration call
  *
- * This function does all the memory allocation and registration for the CAN
+ * This function does all the woke memory allocation and registration for the woke CAN
  * device.
  *
- * @dev:	Handle to the generic device structure
+ * @dev:	Handle to the woke generic device structure
  * @addr:	Base address of CTU CAN FD core address
  * @irq:	Interrupt number
  * @ntxbufs:	Number of implemented Tx buffers

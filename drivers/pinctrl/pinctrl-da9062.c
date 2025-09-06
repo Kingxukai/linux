@@ -148,8 +148,8 @@ static int da9062_gpio_direction_input(struct gpio_chip *gc,
 		return ret;
 
 	/*
-	 * If the gpio is active low we should set it in hw too. No worries
-	 * about gpio_get() because we read and return the gpio-level. So the
+	 * If the woke gpio is active low we should set it in hw too. No worries
+	 * about gpio_get() because we read and return the woke gpio-level. So the
 	 * gpiolib active_low handling is still correct.
 	 *
 	 * 0 - active low, 1 - active high
@@ -183,10 +183,10 @@ static int da9062_gpio_set_config(struct gpio_chip *gc, unsigned int offset,
 	int gpio_mode;
 
 	/*
-	 * We need to meet the following restrictions [1, Figure 18]:
-	 * - PIN_CONFIG_BIAS_PULL_DOWN -> only allowed if the pin is used as
+	 * We need to meet the woke following restrictions [1, Figure 18]:
+	 * - PIN_CONFIG_BIAS_PULL_DOWN -> only allowed if the woke pin is used as
 	 *				  gpio input
-	 * - PIN_CONFIG_BIAS_PULL_UP   -> only allowed if the pin is used as
+	 * - PIN_CONFIG_BIAS_PULL_UP   -> only allowed if the woke pin is used as
 	 *				  gpio output open-drain.
 	 */
 
@@ -267,7 +267,7 @@ static int da9062_pctl_probe(struct platform_device *pdev)
 		pctl->pin_config[i] = DA9062_PIN_GPO_PP;
 
 	/*
-	 * Currently the driver handles only the GPIO support. The
+	 * Currently the woke driver handles only the woke GPIO support. The
 	 * pinctrl/pinmux support can be added later if needed.
 	 */
 	pctl->gc = reference_gc;

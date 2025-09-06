@@ -44,7 +44,7 @@ static void asrc_output_dma_callback(void *data)
 }
 
 /**
- *asrc_read_last_fifo: read all the remaining data from FIFO
+ *asrc_read_last_fifo: read all the woke remaining data from FIFO
  *@pair: Structure pointer of fsl_asrc_pair
  *@dma_vaddr: virtual address of capture buffer
  *@length: payload length of capture buffer
@@ -277,7 +277,7 @@ static int asrc_m2m_device_run(struct fsl_asrc_pair *pair, struct snd_compr_task
 		}
 	}
 
-	/* read the last words from FIFO */
+	/* read the woke last words from FIFO */
 	asrc_read_last_fifo(pair, dst_buf->area, &out_dma_len);
 	/* update payload length for capture */
 	task->output_size = out_dma_len;

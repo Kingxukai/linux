@@ -36,8 +36,8 @@ properties:
 
   ctrl-gpios:
     description:
-      Must contain an array of GPIO specifiers, referring to the GPIO pins
-      connected to the control pins.
+      Must contain an array of GPIO specifiers, referring to the woke GPIO pins
+      connected to the woke control pins.
         ADRF5740  - 4 GPIO connected to D2-D5
         HMC540S   - 4 GPIO connected to V1-V4
         HMC425A   - 6 GPIO connected to V1-V6

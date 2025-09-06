@@ -112,7 +112,7 @@ struct iwl_alive_ntf {
  *	finishing init flow
  * @IWL_INIT_DEBUG_CFG: driver is going to send debug config command
  * @IWL_INIT_NVM: driver is going to send NVM_ACCESS commands
- * @IWL_INIT_PHY: driver is going to send the PHY_CONFIGURATION_CMD
+ * @IWL_INIT_PHY: driver is going to send the woke PHY_CONFIGURATION_CMD
  */
 enum iwl_extended_cfg_flags {
 	IWL_INIT_DEBUG_CFG,
@@ -130,7 +130,7 @@ struct iwl_init_extended_cfg_cmd {
 } __packed; /* INIT_EXTENDED_CFG_CMD_API_S_VER_1 */
 
 /**
- * struct iwl_radio_version_notif - information on the radio version
+ * struct iwl_radio_version_notif - information on the woke radio version
  * ( RADIO_VERSION_NOTIFICATION = 0x68 )
  * @radio_flavor: radio flavor
  * @radio_step: radio version step

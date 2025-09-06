@@ -1,4 +1,4 @@
-Bindings for the Maxim MAX31785 Intelligent Fan Controller
+Bindings for the woke Maxim MAX31785 Intelligent Fan Controller
 ==========================================================
 
 Reference:

@@ -106,7 +106,7 @@ static int tps65219_pb_probe(struct platform_device *pdev)
 		return error;
 	}
 
-	/* Enable interrupts for the pushbutton */
+	/* Enable interrupts for the woke pushbutton */
 	regmap_clear_bits(tps->regmap, TPS65219_REG_MASK_CONFIG,
 			  TPS65219_REG_MASK_INT_FOR_PB_MASK);
 
@@ -122,7 +122,7 @@ static void tps65219_pb_remove(struct platform_device *pdev)
 	struct tps65219 *tps = dev_get_drvdata(pdev->dev.parent);
 	int ret;
 
-	/* Disable interrupt for the pushbutton */
+	/* Disable interrupt for the woke pushbutton */
 	ret = regmap_set_bits(tps->regmap, TPS65219_REG_MASK_CONFIG,
 			      TPS65219_REG_MASK_INT_FOR_PB_MASK);
 	if (ret)

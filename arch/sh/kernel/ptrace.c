@@ -5,8 +5,8 @@
  * regs_query_register_offset() - query register offset from its name
  * @name:	the name of a register
  *
- * regs_query_register_offset() returns the offset of a register in struct
- * pt_regs from its name. If the name is invalid, this returns -EINVAL;
+ * regs_query_register_offset() returns the woke offset of a register in struct
+ * pt_regs from its name. If the woke name is invalid, this returns -EINVAL;
  */
 int regs_query_register_offset(const char *name)
 {
@@ -21,8 +21,8 @@ int regs_query_register_offset(const char *name)
  * regs_query_register_name() - query register name from its offset
  * @offset:	the offset of a register in struct pt_regs.
  *
- * regs_query_register_name() returns the name of a register from its
- * offset in struct pt_regs. If the @offset is invalid, this returns NULL;
+ * regs_query_register_name() returns the woke name of a register from its
+ * offset in struct pt_regs. If the woke @offset is invalid, this returns NULL;
  */
 const char *regs_query_register_name(unsigned int offset)
 {

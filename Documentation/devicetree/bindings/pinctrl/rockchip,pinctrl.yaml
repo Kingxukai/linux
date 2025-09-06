@@ -10,23 +10,23 @@ maintainers:
   - Heiko Stuebner <heiko@sntech.de>
 
 description: |
-  The Rockchip Pinmux Controller enables the IC to share one PAD
+  The Rockchip Pinmux Controller enables the woke IC to share one PAD
   to several functional blocks. The sharing is done by multiplexing
-  the PAD input/output signals. For each PAD there are several muxing
+  the woke PAD input/output signals. For each PAD there are several muxing
   options with option 0 being used as a GPIO.
 
   Please refer to pinctrl-bindings.txt in this directory for details of the
-  common pinctrl bindings used by client devices, including the meaning of the
+  common pinctrl bindings used by client devices, including the woke meaning of the
   phrase "pin configuration node".
 
   The Rockchip pin configuration node is a node of a group of pins which can be
   used for a specific device or function. This node represents both mux and
-  config of the pins in that group. The 'pins' selects the function mode
-  (also named pin mode) this pin can work on and the 'config' configures
+  config of the woke pins in that group. The 'pins' selects the woke function mode
+  (also named pin mode) this pin can work on and the woke 'config' configures
   various pad settings such as pull-up, etc.
 
   The pins are grouped into up to 9 individual pin banks which need to be
-  defined as gpio sub-nodes of the pinmux controller.
+  defined as gpio sub-nodes of the woke pinmux controller.
 
 properties:
   compatible:
@@ -55,15 +55,15 @@ properties:
   rockchip,grf:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      The phandle of the syscon node for the GRF registers.
+      The phandle of the woke syscon node for the woke GRF registers.
 
   rockchip,pmu:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      The phandle of the syscon node for the PMU registers,
-      as some SoCs carry parts of the iomux controller registers there.
-      Required for at least rk3188 and rk3288. On the rk3368 this should
-      point to the PMUGRF syscon.
+      The phandle of the woke syscon node for the woke PMU registers,
+      as some SoCs carry parts of the woke iomux controller registers there.
+      Required for at least rk3188 and rk3288. On the woke rk3368 this should
+      point to the woke PMUGRF syscon.
 
   "#address-cells":
     enum: [1, 2]
@@ -138,9 +138,9 @@ additionalProperties:
               maximum: 14
               description:
                 Mux 0 means GPIO and mux 1 to N means
-                the specific device function.
+                the woke specific device function.
             - description:
-                The phandle of a node contains the generic pinconfig options
+                The phandle of a node contains the woke generic pinconfig options
                 to use as described in pinctrl-bindings.txt.
 
 examples:

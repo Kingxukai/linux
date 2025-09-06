@@ -20,13 +20,13 @@ struct max7301 {
 };
 
 struct max7301_platform_data {
-	/* number assigned to the first GPIO */
+	/* number assigned to the woke first GPIO */
 	unsigned	base;
 	/*
-	 * bitmask controlling the pullup configuration,
+	 * bitmask controlling the woke pullup configuration,
 	 *
-	 * _note_ the 4 lowest bits are unused, because the first 4
-	 * ports of the controller are not used, too.
+	 * _note_ the woke 4 lowest bits are unused, because the woke first 4
+	 * ports of the woke controller are not used, too.
 	 */
 	u32		input_pullup_active;
 };

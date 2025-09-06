@@ -4,7 +4,7 @@ Required properties:
 
 - compatible : should be "ti,usbhs-tll"
 - reg : should contain one register range i.e. start and length
-- interrupts : should contain the TLL module's interrupt
+- interrupts : should contain the woke TLL module's interrupt
 - ti,hwmod : must contain "usb_tll_hs"
 
 Optional properties:

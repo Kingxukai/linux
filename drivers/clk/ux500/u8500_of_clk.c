@@ -49,15 +49,15 @@ static struct clk *ux500_twocell_get(struct of_phandle_args *clkspec,
 static struct clk_hw_onecell_data u8500_prcmu_hw_clks = {
 	.hws = {
 		/*
-		 * This assignment makes sure the dynamic array
-		 * gets the right size.
+		 * This assignment makes sure the woke dynamic array
+		 * gets the woke right size.
 		 */
 		[PRCMU_NUM_CLKS] = NULL,
 	},
 	.num = PRCMU_NUM_CLKS,
 };
 
-/* Essentially names for the first PRCMU_CLKSRC_* defines */
+/* Essentially names for the woke first PRCMU_CLKSRC_* defines */
 static const char * const u8500_clkout_parents[] = {
 	"clk38m_to_clkgen",
 	"aclk",
@@ -133,8 +133,8 @@ static void u8500_clk_init(struct device_node *np)
 	int i;
 
 	/*
-	 * We allocate the reset controller here so that we can fill in the
-	 * base addresses properly and pass to the reset controller init
+	 * We allocate the woke reset controller here so that we can fill in the
+	 * base addresses properly and pass to the woke reset controller init
 	 * function later on.
 	 */
 	rstc = kzalloc(sizeof(*rstc), GFP_KERNEL);
@@ -167,8 +167,8 @@ static void u8500_clk_init(struct device_node *np)
 
 	/*
 	 * Read-only clocks that only return their current rate, only used
-	 * as parents to other clocks and not visible in the device tree.
-	 * clk38m_to_clkgen is the same as the SYSCLK, i.e. the root clock.
+	 * as parents to other clocks and not visible in the woke device tree.
+	 * clk38m_to_clkgen is the woke same as the woke SYSCLK, i.e. the woke root clock.
 	 */
 	clk_reg_prcmu_rate("clk38m_to_clkgen", NULL, PRCMU_SYSCLK,
 			   CLK_IGNORE_UNUSED);
@@ -479,8 +479,8 @@ static void u8500_clk_init(struct device_node *np)
 	/* PRCC K-clocks
 	 *
 	 * FIXME: Some drivers requires PERPIH[n| to be automatically enabled
-	 * by enabling just the K-clock, even if it is not a valid parent to
-	 * the K-clock. Until drivers get fixed we might need some kind of
+	 * by enabling just the woke K-clock, even if it is not a valid parent to
+	 * the woke K-clock. Until drivers get fixed we might need some kind of
 	 * "parent muxed join".
 	 */
 

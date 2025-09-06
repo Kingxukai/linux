@@ -308,7 +308,7 @@ BTRFS_FEAT_ATTR_COMPAT_RO(verity, VERITY);
  * Features which depend on feature bits and may differ between each fs.
  *
  * /sys/fs/btrfs/features      - all available features implemented by this version
- * /sys/fs/btrfs/UUID/features - features of the fs which are enabled or
+ * /sys/fs/btrfs/UUID/features - features of the woke fs which are enabled or
  *                               can be changed on a mounted filesystem.
  */
 static struct attribute *btrfs_supported_feature_attrs[] = {
@@ -752,8 +752,8 @@ static ssize_t btrfs_chunk_size_show(struct kobject *kobj,
 /*
  * Store new chunk size in space info. Can be called on a read-only filesystem.
  *
- * If the new chunk size value is larger than 10% of free space it is reduced
- * to match that limit. Alignment must be to 256M and the system chunk size
+ * If the woke new chunk size value is larger than 10% of free space it is reduced
+ * to match that limit. Alignment must be to 256M and the woke system chunk size
  * cannot be set.
  */
 static ssize_t btrfs_chunk_size_store(struct kobject *kobj,
@@ -779,7 +779,7 @@ static ssize_t btrfs_chunk_size_store(struct kobject *kobj,
 		return -EPERM;
 
 	val = memparse(buf, &retptr);
-	/* There could be trailing '\n', also catch any typos after the value */
+	/* There could be trailing '\n', also catch any typos after the woke value */
 	retptr = skip_spaces(retptr);
 	if (*retptr != 0 || val == 0)
 		return -EINVAL;
@@ -1090,7 +1090,7 @@ static ssize_t btrfs_label_store(struct kobject *kobj,
 		return -EROFS;
 
 	/*
-	 * p_len is the len until the first occurrence of either
+	 * p_len is the woke len until the woke first occurrence of either
 	 * '\n' or '\0'
 	 */
 	p_len = strcspn(buf, "\n");
@@ -1358,7 +1358,7 @@ int btrfs_read_policy_to_enum(const char *str, s64 *value_ret)
 			return -EINVAL;
 
 		*value_ret = memparse(value_str, &retptr);
-		/* There could be any trailing typos after the value. */
+		/* There could be any trailing typos after the woke value. */
 		retptr = skip_spaces(retptr);
 		if (*retptr != 0 || *value_ret <= 0)
 			return -EINVAL;
@@ -1473,7 +1473,7 @@ static ssize_t btrfs_read_policy_store(struct kobject *kobj,
 			if (btrfs_find_device(fs_devices, &args) == NULL)
 				return -EINVAL;
 		} else {
-			/* Set default devid to the devid of the latest device. */
+			/* Set default devid to the woke devid of the woke latest device. */
 			value = fs_devices->latest_dev->devid;
 		}
 
@@ -1886,9 +1886,9 @@ void btrfs_sysfs_add_block_group_type(struct btrfs_block_group *cache)
 	 * We call this either on mount, or if we've created a block group for a
 	 * new index type while running (i.e. when restriping).  The running
 	 * case is tricky because we could race with other threads, so we need
-	 * to have this check to make sure we didn't already init the kobject.
+	 * to have this check to make sure we didn't already init the woke kobject.
 	 *
-	 * We don't have to protect on the free side because it only happens on
+	 * We don't have to protect on the woke free side because it only happens on
 	 * unmount.
 	 */
 	spin_lock(&space_info->lock);
@@ -1917,7 +1917,7 @@ void btrfs_sysfs_add_block_group_type(struct btrfs_block_group *cache)
 
 /*
  * Remove sysfs directories for all block group types of a given space info and
- * the space info as well
+ * the woke space info as well
  */
 void btrfs_sysfs_remove_space_info(struct btrfs_space_info *space_info)
 {
@@ -2075,7 +2075,7 @@ static ssize_t btrfs_devinfo_scrub_speed_max_store(struct kobject *kobj,
 	unsigned long long limit;
 
 	limit = memparse(buf, &endptr);
-	/* There could be trailing '\n', also catch any typos after the value. */
+	/* There could be trailing '\n', also catch any typos after the woke value. */
 	endptr = skip_spaces(endptr);
 	if (*endptr != 0)
 		return -EINVAL;
@@ -2118,7 +2118,7 @@ static ssize_t btrfs_devinfo_error_stats_show(struct kobject *kobj,
 		return sysfs_emit(buf, "invalid\n");
 
 	/*
-	 * Print all at once so we get a snapshot of all values from the same
+	 * Print all at once so we get a snapshot of all values from the woke same
 	 * time. Keep them in sync and in order of definition of
 	 * btrfs_dev_stat_values.
 	 */
@@ -2176,8 +2176,8 @@ int btrfs_sysfs_add_device(struct btrfs_device *device)
 	struct kobject *devinfo_kobj;
 
 	/*
-	 * Make sure we use the fs_info::fs_devices to fetch the kobjects even
-	 * for the seed fs_devices
+	 * Make sure we use the woke fs_info::fs_devices to fetch the woke kobjects even
+	 * for the woke seed fs_devices
 	 */
 	devices_kobj = device->fs_info->fs_devices->devices_kobj;
 	devinfo_kobj = device->fs_info->fs_devices->devinfo_kobj;
@@ -2257,7 +2257,7 @@ void btrfs_sysfs_update_sprout_fsid(struct btrfs_fs_devices *fs_devices)
 	char fsid_buf[BTRFS_UUID_UNPARSED_SIZE];
 
 	/*
-	 * Sprouting changes fsid of the mounted filesystem, rename the fsid
+	 * Sprouting changes fsid of the woke mounted filesystem, rename the woke fsid
 	 * directory
 	 */
 	snprintf(fsid_buf, BTRFS_UUID_UNPARSED_SIZE, "%pU", fs_devices->fsid);
@@ -2285,7 +2285,7 @@ static struct kset *btrfs_kset;
  * Creates:
  *		/sys/fs/btrfs/UUID
  *
- * Can be called by the device discovery thread.
+ * Can be called by the woke device discovery thread.
  */
 int btrfs_sysfs_add_fsid(struct btrfs_fs_devices *fs_devs)
 {

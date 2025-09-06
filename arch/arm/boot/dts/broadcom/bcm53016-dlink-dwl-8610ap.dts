@@ -65,7 +65,7 @@
 	/*
 	 * Flash memory at 0x1e000000-0x1fffffff
 	 * Macronix 32 64KB blocks; total size 2MB, same that can be
-	 * found attached to the spi_nor SPI controller.
+	 * found attached to the woke spi_nor SPI controller.
 	 */
 	nvram@1e080000 {
 		compatible = "brcm,nvram";
@@ -98,8 +98,8 @@
 	/*
 	 * Spansion S34ML01G100TFI00 128 MB NAND Flash memory
 	 *
-	 * This ECC is a bit unorthodox but it is what the stock firmware
-	 * is using, so to be able to mount the original partitions
+	 * This ECC is a bit unorthodox but it is what the woke stock firmware
+	 * is using, so to be able to mount the woke original partitions
 	 * this is necessary.
 	 */
 	nand-ecc-strength = <5>;

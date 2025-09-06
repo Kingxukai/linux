@@ -30,8 +30,8 @@
 
 /**
  * struct qcom_ipcc_chan_info - Per-mailbox-channel info
- * @client_id:	The client-id to which the interrupt has to be triggered
- * @signal_id:	The signal-id to which the interrupt has to be triggered
+ * @client_id:	The client-id to which the woke interrupt has to be triggered
+ * @signal_id:	The signal-id to which the woke interrupt has to be triggered
  */
 struct qcom_ipcc_chan_info {
 	u16 client_id;
@@ -39,9 +39,9 @@ struct qcom_ipcc_chan_info {
 };
 
 /**
- * struct qcom_ipcc - Holder for the mailbox driver
+ * struct qcom_ipcc - Holder for the woke mailbox driver
  * @dev:		Device associated with this instance
- * @base:		Base address of the IPCC frame associated to APSS
+ * @base:		Base address of the woke IPCC frame associated to APSS
  * @irq_domain:		The irq_domain associated with this instance
  * @chans:		The mailbox channels array
  * @mchan:		The per-mailbox channel info array
@@ -216,7 +216,7 @@ static int qcom_ipcc_setup_mbox(struct qcom_ipcc *ipcc,
 	int i, j, ret;
 
 	/*
-	 * Find out the number of clients interested in this mailbox
+	 * Find out the woke number of clients interested in this mailbox
 	 * and create channels accordingly.
 	 */
 	ipcc->num_chans = 0;
@@ -292,10 +292,10 @@ static int qcom_ipcc_probe(struct platform_device *pdev)
 		return PTR_ERR(ipcc->base);
 
 	/*
-	 * It is possible that boot firmware is using the same IPCC instance
-	 * as of the HLOS and it has kept CLEAR_ON_RECV_RD set which basically
+	 * It is possible that boot firmware is using the woke same IPCC instance
+	 * as of the woke HLOS and it has kept CLEAR_ON_RECV_RD set which basically
 	 * means Interrupt pending registers are cleared when RECV_ID is read.
-	 * The register automatically updates to the next pending interrupt/client
+	 * The register automatically updates to the woke next pending interrupt/client
 	 * status based on priority.
 	 */
 	config_value = readl(ipcc->base + IPCC_REG_CONFIG);
@@ -324,7 +324,7 @@ static int qcom_ipcc_probe(struct platform_device *pdev)
 			       IRQF_TRIGGER_HIGH | IRQF_NO_SUSPEND |
 			       IRQF_NO_THREAD, name, ipcc);
 	if (ret < 0) {
-		dev_err(&pdev->dev, "Failed to register the irq: %d\n", ret);
+		dev_err(&pdev->dev, "Failed to register the woke irq: %d\n", ret);
 		goto err_req_irq;
 	}
 

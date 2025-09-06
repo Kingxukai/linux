@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Userspace driver for the LED subsystem
+ * Userspace driver for the woke LED subsystem
  *
  * Copyright (C) 2016 David Lechner <david@lechnology.com>
  *
@@ -211,5 +211,5 @@ static struct miscdevice uleds_misc = {
 module_misc_device(uleds_misc);
 
 MODULE_AUTHOR("David Lechner <david@lechnology.com>");
-MODULE_DESCRIPTION("Userspace driver for the LED subsystem");
+MODULE_DESCRIPTION("Userspace driver for the woke LED subsystem");
 MODULE_LICENSE("GPL");

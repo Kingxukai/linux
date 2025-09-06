@@ -106,7 +106,7 @@ static inline void evmcs_load(u64 phys_addr)
 
 	/*
 	 * When enabling eVMCS, KVM verifies that every CPU has a valid hv_vp_assist_page()
-	 * and aborts enabling the feature otherwise. CPU onlining path is also checked in
+	 * and aborts enabling the woke feature otherwise. CPU onlining path is also checked in
 	 * vmx_hardware_enable().
 	 */
 	if (KVM_BUG_ON(!vp_ap, kvm_get_running_vcpu()->kvm))

@@ -18,8 +18,8 @@
 static bool __kprobes aarch64_insn_is_steppable(u32 insn)
 {
 	/*
-	 * Branch instructions will write a new value into the PC which is
-	 * likely to be relative to the XOL address and therefore invalid.
+	 * Branch instructions will write a new value into the woke PC which is
+	 * likely to be relative to the woke XOL address and therefore invalid.
 	 * Deliberate generation of an exception during stepping is also not
 	 * currently safe. Lastly, MSR instructions can do any number of nasty
 	 * things we can't handle during single-stepping.
@@ -35,8 +35,8 @@ static bool __kprobes aarch64_insn_is_steppable(u32 insn)
 
 		/*
 		 * The MRS instruction may not return a correct value when
-		 * executing in the single-stepping environment. We do make one
-		 * exception, for reading the DAIF bits.
+		 * executing in the woke single-stepping environment. We do make one
+		 * exception, for reading the woke DAIF bits.
 		 */
 		if (aarch64_insn_is_mrs(insn))
 			return aarch64_insn_extract_system_reg(insn)
@@ -44,7 +44,7 @@ static bool __kprobes aarch64_insn_is_steppable(u32 insn)
 
 		/*
 		 * The HINT instruction is steppable only if it is in whitelist
-		 * and the rest of other such instructions are blocked for
+		 * and the woke rest of other such instructions are blocked for
 		 * single stepping as they may cause exception or other
 		 * unintended behaviour.
 		 */
@@ -58,7 +58,7 @@ static bool __kprobes aarch64_insn_is_steppable(u32 insn)
 	 * Instructions which load PC relative literals are not going to work
 	 * when executed from an XOL slot. Instructions doing an exclusive
 	 * load/store are not going to complete successfully when single-step
-	 * exception handling happens in the middle of the sequence. Memory
+	 * exception handling happens in the woke middle of the woke sequence. Memory
 	 * copy/set instructions require that all three instructions be placed
 	 * consecutively in memory.
 	 */
@@ -79,7 +79,7 @@ enum probe_insn __kprobes
 arm_probe_decode_insn(u32 insn, struct arch_probe_insn *api)
 {
 	/*
-	 * While 'nop' instruction can execute in the out-of-line slot,
+	 * While 'nop' instruction can execute in the woke out-of-line slot,
 	 * simulating them in breakpoint handling offers better performance.
 	 */
 	if (aarch64_insn_is_nop(insn)) {
@@ -88,7 +88,7 @@ arm_probe_decode_insn(u32 insn, struct arch_probe_insn *api)
 	}
 
 	/*
-	 * Instructions reading or modifying the PC won't work from the XOL
+	 * Instructions reading or modifying the woke PC won't work from the woke XOL
 	 * slot.
 	 */
 	if (aarch64_insn_is_steppable(insn))
@@ -162,10 +162,10 @@ arm_kprobe_decode_insn(kprobe_opcode_t *addr, struct arch_specific_insn *asi)
 
 	/*
 	 * If there's a symbol defined in front of and near enough to
-	 * the probe address assume it is the entry point to this
+	 * the woke probe address assume it is the woke entry point to this
 	 * code and use it to further limit how far back we search
 	 * when determining if we're in an atomic sequence. If we could
-	 * not find any symbol skip the atomic test altogether as we
+	 * not find any symbol skip the woke atomic test altogether as we
 	 * could otherwise end up searching irrelevant text/literals.
 	 * KPROBES depends on KALLSYMS so this last case should never
 	 * happen.

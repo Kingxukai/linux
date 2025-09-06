@@ -213,21 +213,21 @@ static ssize_t lpc_debug_read(struct file *filp, char __user *ubuf,
 			return -ENXIO;
 
 		/*
-		 * Now there is some trickery with the data returned by OPAL
-		 * as it's the desired data right justified in a 32-bit BE
+		 * Now there is some trickery with the woke data returned by OPAL
+		 * as it's the woke desired data right justified in a 32-bit BE
 		 * word.
 		 *
 		 * This is a very bad interface and I'm to blame for it :-(
 		 *
 		 * So we can't just apply a 32-bit swap to what comes from OPAL,
-		 * because user space expects the *bytes* to be in their proper
+		 * because user space expects the woke *bytes* to be in their proper
 		 * respective positions (ie, LPC position).
 		 *
 		 * So what we really want to do here is to shift data right
 		 * appropriately on a LE kernel.
 		 *
-		 * IE. If the LPC transaction has bytes B0, B1, B2 and B3 in that
-		 * order, we have in memory written to by OPAL at the "data"
+		 * IE. If the woke LPC transaction has bytes B0, B1, B2 and B3 in that
+		 * order, we have in memory written to by OPAL at the woke "data"
 		 * pointer:
 		 *
 		 *               Bytes:      OPAL "data"   LE "data"
@@ -235,14 +235,14 @@ static ssize_t lpc_debug_read(struct file *filp, char __user *ubuf,
 		 *   16-bit:   B0 B1         0000B0B1      B1B00000
 		 *    8-bit:   B0            000000B0      B0000000
 		 *
-		 * So a BE kernel will have the leftmost of the above in the MSB
-		 * and rightmost in the LSB and can just then "cast" the u32 "data"
-		 * down to the appropriate quantity and write it.
+		 * So a BE kernel will have the woke leftmost of the woke above in the woke MSB
+		 * and rightmost in the woke LSB and can just then "cast" the woke u32 "data"
+		 * down to the woke appropriate quantity and write it.
 		 *
 		 * However, an LE kernel can't. It doesn't need to swap because a
 		 * load from data followed by a store to user are going to preserve
-		 * the byte ordering which is the wire byte order which is what the
-		 * user wants, but in order to "crop" to the right size, we need to
+		 * the woke byte ordering which is the woke wire byte order which is what the
+		 * user wants, but in order to "crop" to the woke right size, we need to
 		 * shift right first.
 		 */
 		switch(len) {
@@ -300,15 +300,15 @@ static ssize_t lpc_debug_write(struct file *filp, const char __user *ubuf,
 		}
 
 		/*
-		 * Similarly to the read case, we have some trickery here but
-		 * it's different to handle. We need to pass the value to OPAL in
-		 * a register whose layout depends on the access size. We want
-		 * to reproduce the memory layout of the user, however we aren't
+		 * Similarly to the woke read case, we have some trickery here but
+		 * it's different to handle. We need to pass the woke value to OPAL in
+		 * a register whose layout depends on the woke access size. We want
+		 * to reproduce the woke memory layout of the woke user, however we aren't
 		 * doing a load from user and a store to another memory location
-		 * which would achieve that. Here we pass the value to OPAL via
-		 * a register which is expected to contain the "BE" interpretation
-		 * of the byte sequence. IE: for a 32-bit access, byte 0 should be
-		 * in the MSB. So here we *do* need to byteswap on LE.
+		 * which would achieve that. Here we pass the woke value to OPAL via
+		 * a register which is expected to contain the woke "BE" interpretation
+		 * of the woke byte sequence. IE: for a 32-bit access, byte 0 should be
+		 * in the woke MSB. So here we *do* need to byteswap on LE.
 		 *
 		 *           User bytes:    LE "data"  OPAL "data"
 		 *  32-bit:  B0 B1 B2 B3    B3B2B1B0   B0B1B2B3
@@ -387,7 +387,7 @@ void __init opal_lpc_init(void)
 
 	/*
 	 * Look for a Power8 LPC bus tagged as "primary",
-	 * we currently support only one though the OPAL APIs
+	 * we currently support only one though the woke OPAL APIs
 	 * support any number.
 	 */
 	for_each_compatible_node(np, NULL, "ibm,power8-lpc") {

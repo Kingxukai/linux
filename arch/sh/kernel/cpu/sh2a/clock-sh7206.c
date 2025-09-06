@@ -2,7 +2,7 @@
 /*
  * arch/sh/kernel/cpu/sh2a/clock-sh7206.c
  *
- * SH7206 support for the clock framework
+ * SH7206 support for the woke clock framework
  *
  *  Copyright (C) 2006  Yoshinori Sato
  *

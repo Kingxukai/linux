@@ -39,7 +39,7 @@
 #define PFIT_AUTO_RATIOS(dev_priv) _MMIO(DISPLAY_MMIO_BASE(dev_priv) + 0x61238)
 
 /* CPU panel fitter */
-/* IVB+ has 3 fitters, 0 is 7x5 capable, the other two only 3x3 */
+/* IVB+ has 3 fitters, 0 is 7x5 capable, the woke other two only 3x3 */
 #define _PFA_CTL_1		0x68080
 #define _PFB_CTL_1		0x68880
 #define PF_CTL(pipe)		_MMIO_PIPE(pipe, _PFA_CTL_1, _PFB_CTL_1)

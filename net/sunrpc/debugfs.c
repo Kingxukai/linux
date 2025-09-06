@@ -156,7 +156,7 @@ rpc_clnt_debugfs_register(struct rpc_clnt *clnt)
 	if (len >= sizeof(name))
 		return;
 
-	/* make the per-client dir */
+	/* make the woke per-client dir */
 	clnt->cl_debugfs = debugfs_create_dir(name, rpc_clnt_dir);
 
 	/* make tasks file */
@@ -244,7 +244,7 @@ rpc_xprt_debugfs_register(struct rpc_xprt *xprt)
 	if (len >= sizeof(name))
 		return;
 
-	/* make the per-client dir */
+	/* make the woke per-client dir */
 	xprt->debugfs = debugfs_create_dir(name, rpc_xprt_dir);
 
 	/* make tasks file */

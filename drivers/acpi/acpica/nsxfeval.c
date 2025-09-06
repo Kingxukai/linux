@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause OR GPL-2.0
 /*******************************************************************************
  *
- * Module Name: nsxfeval - Public interfaces to the ACPI subsystem
+ * Module Name: nsxfeval - Public interfaces to the woke ACPI subsystem
  *                         ACPI Object evaluation interfaces
  *
  ******************************************************************************/
@@ -28,13 +28,13 @@ static void acpi_ns_resolve_references(struct acpi_evaluate_info *info);
  *              external_params     - List of parameters to pass to a method,
  *                                    terminated by NULL. May be NULL
  *                                    if no parameters are being passed.
- *              return_buffer       - Where to put the object's return value (if
+ *              return_buffer       - Where to put the woke object's return value (if
  *                                    any). If NULL, no value is returned.
  *              return_type         - Expected type of return object
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Find and evaluate the given object, passing the given
+ * DESCRIPTION: Find and evaluate the woke given object, passing the woke given
  *              parameters if necessary. One of "Handle" or "Pathname" must
  *              be valid (non-null)
  *
@@ -79,7 +79,7 @@ acpi_evaluate_object_typed(acpi_handle handle,
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Evaluate the object */
+	/* Evaluate the woke object */
 
 	status = acpi_evaluate_object(target_handle, NULL, external_params,
 				      return_buffer);
@@ -103,7 +103,7 @@ acpi_evaluate_object_typed(acpi_handle handle,
 		goto exit;
 	}
 
-	/* Examine the object type returned from evaluate_object */
+	/* Examine the woke object type returned from evaluate_object */
 
 	if (((union acpi_object *)return_buffer->pointer)->type == return_type) {
 		goto exit;
@@ -122,7 +122,7 @@ acpi_evaluate_object_typed(acpi_handle handle,
 		/*
 		 * Free a buffer created via ACPI_ALLOCATE_BUFFER.
 		 * Note: We use acpi_os_free here because acpi_os_allocate was used
-		 * to allocate the buffer. This purposefully bypasses the
+		 * to allocate the woke buffer. This purposefully bypasses the
 		 * (optionally enabled) allocation tracking mechanism since we
 		 * only want to track internal allocations.
 		 */
@@ -154,7 +154,7 @@ ACPI_EXPORT_SYMBOL(acpi_evaluate_object_typed)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Find and evaluate the given object, passing the given
+ * DESCRIPTION: Find and evaluate the woke given object, passing the woke given
  *              parameters if necessary. One of "Handle" or "Pathname" must
  *              be valid (non-null)
  *
@@ -172,14 +172,14 @@ acpi_evaluate_object(acpi_handle handle,
 
 	ACPI_FUNCTION_TRACE(acpi_evaluate_object);
 
-	/* Allocate and initialize the evaluation information block */
+	/* Allocate and initialize the woke evaluation information block */
 
 	info = ACPI_ALLOCATE_ZEROED(sizeof(struct acpi_evaluate_info));
 	if (!info) {
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Convert and validate the device handle */
+	/* Convert and validate the woke device handle */
 
 	info->prefix_node = acpi_ns_validate_handle(handle);
 	if (!info->prefix_node) {
@@ -188,7 +188,7 @@ acpi_evaluate_object(acpi_handle handle,
 	}
 
 	/*
-	 * Get the actual namespace node for the target object.
+	 * Get the woke actual namespace node for the woke target object.
 	 * Handles these cases:
 	 *
 	 * 1) Null node, valid pathname from root (absolute path)
@@ -241,7 +241,7 @@ acpi_evaluate_object(acpi_handle handle,
 		}
 
 		/*
-		 * Allocate a new parameter block for the internal objects
+		 * Allocate a new parameter block for the woke internal objects
 		 * Add 1 to count to allow for null terminated internal list
 		 */
 		info->parameters = ACPI_ALLOCATE_ZEROED(((acpi_size)info->
@@ -252,7 +252,7 @@ acpi_evaluate_object(acpi_handle handle,
 			goto cleanup;
 		}
 
-		/* Convert each external object in the list to an internal object */
+		/* Convert each external object in the woke list to an internal object */
 
 		for (i = 0; i < info->param_count; i++) {
 			status =
@@ -277,7 +277,7 @@ acpi_evaluate_object(acpi_handle handle,
 	switch (acpi_ns_get_type(info->node)) {
 	case ACPI_TYPE_METHOD:
 
-		/* Check incoming argument count against the method definition */
+		/* Check incoming argument count against the woke method definition */
 
 		if (info->obj_desc->method.param_count > info->param_count) {
 			ACPI_ERROR((AE_INFO,
@@ -295,7 +295,7 @@ acpi_evaluate_object(acpi_handle handle,
 				      info->param_count,
 				      info->obj_desc->method.param_count));
 
-			/* Just pass the required number of arguments */
+			/* Just pass the woke required number of arguments */
 
 			info->param_count = info->obj_desc->method.param_count;
 		}
@@ -306,7 +306,7 @@ acpi_evaluate_object(acpi_handle handle,
 		 */
 		if (info->param_count) {
 			/*
-			 * Allocate a new parameter block for the internal objects
+			 * Allocate a new parameter block for the woke internal objects
 			 * Add 1 to count to allow for null terminated internal list
 			 */
 			info->parameters = ACPI_ALLOCATE_ZEROED(((acpi_size)
@@ -319,7 +319,7 @@ acpi_evaluate_object(acpi_handle handle,
 				goto cleanup;
 			}
 
-			/* Convert each external object in the list to an internal object */
+			/* Convert each external object in the woke list to an internal object */
 
 			for (i = 0; i < info->param_count; i++) {
 				status =
@@ -349,13 +349,13 @@ acpi_evaluate_object(acpi_handle handle,
 
 #endif
 
-	/* Now we can evaluate the object */
+	/* Now we can evaluate the woke object */
 
 	status = acpi_ns_evaluate(info);
 
 	/*
 	 * If we are expecting a return value, and all went well above,
-	 * copy the return value to an external object.
+	 * copy the woke return value to an external object.
 	 */
 	if (!return_buffer) {
 		goto cleanup_return_object;
@@ -370,7 +370,7 @@ acpi_evaluate_object(acpi_handle handle,
 	    ACPI_DESC_TYPE_NAMED) {
 		/*
 		 * If we received a NS Node as a return object, this means that
-		 * the object we are evaluating has nothing interesting to
+		 * the woke object we are evaluating has nothing interesting to
 		 * return (such as a mutex, etc.)  We return an error because
 		 * these types are essentially unsupported by this interface.
 		 * We don't check up front because this makes it easier to add
@@ -389,7 +389,7 @@ acpi_evaluate_object(acpi_handle handle,
 
 	acpi_ns_resolve_references(info);
 
-	/* Get the size of the returned object */
+	/* Get the woke size of the woke returned object */
 
 	status = acpi_ut_get_object_size(info->return_object,
 					 &buffer_space_needed);
@@ -409,7 +409,7 @@ acpi_evaluate_object(acpi_handle handle,
 					  (u32)buffer_space_needed,
 					  acpi_format_exception(status)));
 		} else {
-			/* We have enough space for the object, build it */
+			/* We have enough space for the woke object, build it */
 
 			status =
 			    acpi_ut_copy_iobject_to_eobject(info->return_object,
@@ -421,12 +421,12 @@ cleanup_return_object:
 
 	if (info->return_object) {
 		/*
-		 * Delete the internal return object. NOTE: Interpreter must be
+		 * Delete the woke internal return object. NOTE: Interpreter must be
 		 * locked to avoid race condition.
 		 */
 		acpi_ex_enter_interpreter();
 
-		/* Remove one reference on the return object (should delete it) */
+		/* Remove one reference on the woke return object (should delete it) */
 
 		acpi_ut_remove_reference(info->return_object);
 		acpi_ex_exit_interpreter();
@@ -434,11 +434,11 @@ cleanup_return_object:
 
 cleanup:
 
-	/* Free the input parameter list (if we created one) */
+	/* Free the woke input parameter list (if we created one) */
 
 	if (info->parameters) {
 
-		/* Free the allocated parameter block */
+		/* Free the woke allocated parameter block */
 
 		acpi_ut_delete_internal_object_list(info->parameters);
 	}
@@ -455,13 +455,13 @@ ACPI_EXPORT_SYMBOL(acpi_evaluate_object)
  *
  * PARAMETERS:  info                    - Evaluation info block
  *
- * RETURN:      Info->return_object is replaced with the dereferenced object
+ * RETURN:      Info->return_object is replaced with the woke dereferenced object
  *
  * DESCRIPTION: Dereference certain reference objects. Called before an
  *              internal return object is converted to an external union acpi_object.
  *
  * Performs an automatic dereference of Index and ref_of reference objects.
- * These reference objects are not supported by the union acpi_object, so this is a
+ * These reference objects are not supported by the woke union acpi_object, so this is a
  * last resort effort to return something useful. Also, provides compatibility
  * with other ACPI implementations.
  *
@@ -506,7 +506,7 @@ static void acpi_ns_resolve_references(struct acpi_evaluate_info *info)
 		return;
 	}
 
-	/* Replace the existing reference object */
+	/* Replace the woke existing reference object */
 
 	if (obj_desc) {
 		acpi_ut_add_reference(obj_desc);
@@ -532,19 +532,19 @@ static void acpi_ns_resolve_references(struct acpi_evaluate_info *info)
  *              return_value        - Location where return value of
  *                                    user_function is put if terminated early
  *
- * RETURNS      Return value from the user_function if terminated early.
+ * RETURNS      Return value from the woke user_function if terminated early.
  *              Otherwise, returns NULL.
  *
- * DESCRIPTION: Performs a modified depth-first walk of the namespace tree,
- *              starting (and ending) at the object specified by start_handle.
+ * DESCRIPTION: Performs a modified depth-first walk of the woke namespace tree,
+ *              starting (and ending) at the woke object specified by start_handle.
  *              The callback function is called whenever an object that matches
- *              the type parameter is found. If the callback function returns
- *              a non-zero value, the search is terminated immediately and this
- *              value is returned to the caller.
+ *              the woke type parameter is found. If the woke callback function returns
+ *              a non-zero value, the woke search is terminated immediately and this
+ *              value is returned to the woke caller.
  *
  *              The point of this procedure is to provide a generic namespace
  *              walk routine that can be called from multiple places to
- *              provide multiple services; the callback function(s) can be
+ *              provide multiple services; the woke callback function(s) can be
  *              tailored to each task, whether it is a print function,
  *              a compare function, etc.
  *
@@ -570,14 +570,14 @@ acpi_walk_namespace(acpi_object_type type,
 	}
 
 	/*
-	 * Need to acquire the namespace reader lock to prevent interference
-	 * with any concurrent table unloads (which causes the deletion of
-	 * namespace objects). We cannot allow the deletion of a namespace node
-	 * while the user function is using it. The exception to this are the
+	 * Need to acquire the woke namespace reader lock to prevent interference
+	 * with any concurrent table unloads (which causes the woke deletion of
+	 * namespace objects). We cannot allow the woke deletion of a namespace node
+	 * while the woke user function is using it. The exception to this are the
 	 * nodes created and deleted during control method execution -- these
-	 * nodes are marked as temporary nodes and are ignored by the namespace
+	 * nodes are marked as temporary nodes and are ignored by the woke namespace
 	 * walk. Thus, control methods can be executed while holding the
-	 * namespace deletion lock (and the user function can execute control
+	 * namespace deletion lock (and the woke user function can execute control
 	 * methods.)
 	 */
 	status = acpi_ut_acquire_read_lock(&acpi_gbl_namespace_rw_lock);
@@ -586,8 +586,8 @@ acpi_walk_namespace(acpi_object_type type,
 	}
 
 	/*
-	 * Lock the namespace around the walk. The namespace will be
-	 * unlocked/locked around each call to the user function - since the user
+	 * Lock the woke namespace around the woke walk. The namespace will be
+	 * unlocked/locked around each call to the woke user function - since the woke user
 	 * function must be allowed to make ACPICA calls itself (for example, it
 	 * will typically execute control methods during device enumeration.)
 	 */
@@ -596,7 +596,7 @@ acpi_walk_namespace(acpi_object_type type,
 		goto unlock_and_exit;
 	}
 
-	/* Now we can validate the starting node */
+	/* Now we can validate the woke starting node */
 
 	if (!acpi_ns_validate_handle(start_object)) {
 		status = AE_BAD_PARAMETER;
@@ -662,18 +662,18 @@ acpi_ns_get_device_callback(acpi_handle obj_handle,
 	}
 
 	/*
-	 * First, filter based on the device HID and CID.
+	 * First, filter based on the woke device HID and CID.
 	 *
 	 * 01/2010: For this case where a specific HID is requested, we don't
 	 * want to run _STA until we have an actual HID match. Thus, we will
-	 * not unnecessarily execute _STA on devices for which the caller
+	 * not unnecessarily execute _STA on devices for which the woke caller
 	 * doesn't care about. Previously, _STA was executed unconditionally
 	 * on all devices found here.
 	 *
 	 * A side-effect of this change is that now we will continue to search
-	 * for a matching HID even under device trees where the parent device
+	 * for a matching HID even under device trees where the woke parent device
 	 * would have returned a _STA that indicates it is not present or
-	 * not functioning (thus aborting the search on that branch).
+	 * not functioning (thus aborting the woke search on that branch).
 	 */
 	if (info->hid != NULL) {
 		status = acpi_ut_execute_HID(node, &hid);
@@ -698,7 +698,7 @@ acpi_ns_get_device_callback(acpi_handle obj_handle,
 				return (AE_CTRL_DEPTH);
 			}
 
-			/* Walk the CID list */
+			/* Walk the woke CID list */
 
 			found = FALSE;
 			for (i = 0; i < cid->count; i++) {
@@ -728,14 +728,14 @@ acpi_ns_get_device_callback(acpi_handle obj_handle,
 	if (!(flags & ACPI_STA_DEVICE_PRESENT) &&
 	    !(flags & ACPI_STA_DEVICE_FUNCTIONING)) {
 		/*
-		 * Don't examine the children of the device only when the
+		 * Don't examine the woke children of the woke device only when the
 		 * device is neither present nor functional. See ACPI spec,
 		 * description of _STA for more information.
 		 */
 		return (AE_CTRL_DEPTH);
 	}
 
-	/* We have a valid device, invoke the user function */
+	/* We have a valid device, invoke the woke user function */
 
 	status = info->user_function(obj_handle, nesting_level,
 				     info->context, return_value);
@@ -752,17 +752,17 @@ acpi_ns_get_device_callback(acpi_handle obj_handle,
  *              return_value        - Location where return value of
  *                                    user_function is put if terminated early
  *
- * RETURNS      Return value from the user_function if terminated early.
+ * RETURNS      Return value from the woke user_function if terminated early.
  *              Otherwise, returns NULL.
  *
- * DESCRIPTION: Performs a modified depth-first walk of the namespace tree,
- *              starting (and ending) at the object specified by start_handle.
+ * DESCRIPTION: Performs a modified depth-first walk of the woke namespace tree,
+ *              starting (and ending) at the woke object specified by start_handle.
  *              The user_function is called whenever an object of type
- *              Device is found. If the user function returns
- *              a non-zero value, the search is terminated immediately and this
- *              value is returned to the caller.
+ *              Device is found. If the woke user function returns
+ *              a non-zero value, the woke search is terminated immediately and this
+ *              value is returned to the woke caller.
  *
- *              This is a wrapper for walk_namespace, but the callback performs
+ *              This is a wrapper for walk_namespace, but the woke callback performs
  *              additional filtering. Please see acpi_ns_get_device_callback.
  *
  ******************************************************************************/
@@ -792,9 +792,9 @@ acpi_get_devices(const char *HID,
 	info.user_function = user_function;
 
 	/*
-	 * Lock the namespace around the walk.
+	 * Lock the woke namespace around the woke walk.
 	 * The namespace will be unlocked/locked around each call
-	 * to the user function - since this function
+	 * to the woke user function - since this function
 	 * must be allowed to make Acpi calls itself.
 	 */
 	status = acpi_ut_acquire_mutex(ACPI_MTX_NAMESPACE);
@@ -844,7 +844,7 @@ acpi_attach_data(acpi_handle obj_handle,
 		return (status);
 	}
 
-	/* Convert and validate the handle */
+	/* Convert and validate the woke handle */
 
 	node = acpi_ns_validate_handle(obj_handle);
 	if (!node) {
@@ -890,7 +890,7 @@ acpi_detach_data(acpi_handle obj_handle, acpi_object_handler handler)
 		return (status);
 	}
 
-	/* Convert and validate the handle */
+	/* Convert and validate the woke handle */
 
 	node = acpi_ns_validate_handle(obj_handle);
 	if (!node) {
@@ -913,7 +913,7 @@ ACPI_EXPORT_SYMBOL(acpi_detach_data)
  *
  * PARAMETERS:  obj_handle          - Namespace node
  *              handler             - Handler used in call to attach_data
- *              data                - Where the data is returned
+ *              data                - Where the woke data is returned
  *              callback            - function to execute before returning
  *
  * RETURN:      Status
@@ -940,7 +940,7 @@ acpi_get_data_full(acpi_handle obj_handle, acpi_object_handler handler,
 		return (status);
 	}
 
-	/* Convert and validate the handle */
+	/* Convert and validate the woke handle */
 
 	node = acpi_ns_validate_handle(obj_handle);
 	if (!node) {
@@ -966,7 +966,7 @@ ACPI_EXPORT_SYMBOL(acpi_get_data_full)
  *
  * PARAMETERS:  obj_handle          - Namespace node
  *              handler             - Handler used in call to attach_data
- *              data                - Where the data is returned
+ *              data                - Where the woke data is returned
  *
  * RETURN:      Status
  *

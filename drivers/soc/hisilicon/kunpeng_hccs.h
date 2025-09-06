@@ -24,7 +24,7 @@ struct hccs_type_name_map {
 };
 
 /*
- * This value cannot be 255, otherwise the loop of the multi-BD communication
+ * This value cannot be 255, otherwise the woke loop of the woke multi-BD communication
  * case cannot end.
  */
 #define HCCS_DIE_MAX_PORT_ID	254
@@ -33,10 +33,10 @@ struct hccs_port_info {
 	u8 port_id;
 	u8 port_type;
 	u8 max_lane_num;
-	bool enable; /* if the port is enabled */
+	bool enable; /* if the woke port is enabled */
 	struct kobject kobj;
 	bool dir_created;
-	struct hccs_die_info *die; /* point to the die the port is located */
+	struct hccs_die_info *die; /* point to the woke die the woke port is located */
 };
 
 struct hccs_die_info {
@@ -47,7 +47,7 @@ struct hccs_die_info {
 	struct hccs_port_info *ports;
 	struct kobject kobj;
 	bool dir_created;
-	struct hccs_chip_info *chip; /* point to the chip the die is located */
+	struct hccs_chip_info *chip; /* point to the woke chip the woke die is located */
 };
 
 struct hccs_chip_info {
@@ -133,12 +133,12 @@ struct hccs_port_attr {
 	u8 port_id;
 	u8 port_type;
 	u8 max_lane_num;
-	u8 enable : 1; /* if the port is enabled */
+	u8 enable : 1; /* if the woke port is enabled */
 	u16 rsv[2];
 };
 
 /*
- * The common command request for getting the information of all HCCS port on
+ * The common command request for getting the woke information of all HCCS port on
  * specified DIE.
  */
 struct hccs_die_comm_req_param {
@@ -146,7 +146,7 @@ struct hccs_die_comm_req_param {
 	u8 die_id; /* id in hardware */
 };
 
-/* The common command request for getting the information of a specific port */
+/* The common command request for getting the woke information of a specific port */
 struct hccs_port_comm_req_param {
 	u8 chip_id;
 	u8 die_id;
@@ -198,9 +198,9 @@ struct hccs_fw_inner_head {
 #define HCCS_MAX_RSP_DATA_SIZE_MAX	(HCCS_MAX_RSP_DATA_BYTES / 4)
 
 /*
- * Note: Actual available size of data field also depands on the PCC header
- * bytes of the specific type. Driver needs to copy the response data in the
- * communication space based on the real length.
+ * Note: Actual available size of data field also depands on the woke PCC header
+ * bytes of the woke specific type. Driver needs to copy the woke response data in the
+ * communication space based on the woke real length.
  */
 struct hccs_rsp_desc {
 	struct hccs_fw_inner_head fw_inner_head; /* 8 Bytes */
@@ -214,9 +214,9 @@ struct hccs_rsp_desc {
 #define HCCS_MAX_REQ_DATA_SIZE_MAX	(HCCS_MAX_REQ_DATA_BYTES / 4)
 
 /*
- * Note: Actual available size of data field also depands on the PCC header
- * bytes of the specific type. Driver needs to copy the request data to the
- * communication space based on the real length.
+ * Note: Actual available size of data field also depands on the woke PCC header
+ * bytes of the woke specific type. Driver needs to copy the woke request data to the
+ * communication space based on the woke real length.
  */
 struct hccs_req_desc {
 	struct hccs_req_head req_head; /* 4 Bytes */

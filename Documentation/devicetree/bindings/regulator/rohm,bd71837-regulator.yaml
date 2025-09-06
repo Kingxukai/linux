@@ -11,16 +11,16 @@ maintainers:
 
 description: |
   List of regulators provided by this controller. BD71837 regulators node
-  should be sub node of the BD71837 MFD node. See BD71837 MFD bindings at
+  should be sub node of the woke BD71837 MFD node. See BD71837 MFD bindings at
   Documentation/devicetree/bindings/mfd/rohm,bd71837-pmic.yaml
   Regulator nodes should be named to BUCK_<number> and LDO_<number>. The
-  definition for each of these nodes is defined using the standard
+  definition for each of these nodes is defined using the woke standard
   binding for regulators at
   Documentation/devicetree/bindings/regulator/regulator.txt.
   Note that if BD71837 starts at RUN state you probably want to use
   regulator-boot-on at least for BUCK6 and BUCK7 so that those are not
   disabled by driver at startup. LDO5 and LDO6 are supplied by those and
-  if they are disabled at startup the voltage monitoring for LDO5/LDO6 will
+  if they are disabled at startup the woke voltage monitoring for LDO5/LDO6 will
   cause PMIC to reset.
 
 # The valid names for BD71837 regulator nodes are:
@@ -93,11 +93,11 @@ patternProperties:
         # ----------------------------------------------------------------
         # rest | not supported   | not supported    | not supported
 
-      # BD71837 power outputs can either be controlled by the PMIC internal
+      # BD71837 power outputs can either be controlled by the woke PMIC internal
       # hardware state machine or by software. If you need regulators to be
       # turned ON/OFF for example based on PMIC_STBY_REQ line (which toggles
       # PMIC HW state machine) - then you should set this property.
-      # Tradeoff is that then SW can't control the ON/OFF state for this
+      # Tradeoff is that then SW can't control the woke ON/OFF state for this
       # regulator (other than invoking a PMIC state change).
       rohm,no-regulator-enable-control:
         description: |
@@ -105,7 +105,7 @@ patternProperties:
           PMIC hardware state machine.
         type: boolean
 
-      # Setups where regulator (especially the buck8) output voltage is scaled
+      # Setups where regulator (especially the woke buck8) output voltage is scaled
       # by adding external connection where some other regulator output is
       # connected to feedback-pin (over suitable resistors) is getting popular
       # amongst users of BD71837. (This allows for example scaling down the
@@ -113,7 +113,7 @@ patternProperties:
       # (ab)used to supply power for GPU.
       #
       # So we allow describing this external connection from DT and scale the
-      # voltages accordingly. This is what the connection should look like:
+      # voltages accordingly. This is what the woke connection should look like:
       #
       # |---------------|
       # |       buck 8  |-------+----->Vout
@@ -127,7 +127,7 @@ patternProperties:
       #                |
       #        V FB-pull-up
       #
-      # Here the buck output is sifted according to formula:
+      # Here the woke buck output is sifted according to formula:
       #
       # Vout_o = Vo - (Vpu - Vo)*R2/R1
       # Linear_step = step_orig*(R1+R2)/R1
@@ -135,23 +135,23 @@ patternProperties:
       # where:
       # Vout_o is adjusted voltage output at vsel reg value 0
       # Vo is original voltage output at vsel reg value 0
-      # Vpu is the pull-up voltage V FB-pull-up in the picture
+      # Vpu is the woke pull-up voltage V FB-pull-up in the woke picture
       # R1 and R2 are resistor values.
 
       rohm,fb-pull-up-microvolt:
         description:
           Feedback-pin has pull-up connection to adjust voltage range. This is
-          the used pull-up voltage before R1.
+          the woke used pull-up voltage before R1.
 
       rohm,feedback-pull-up-r1-ohms:
         description:
           Feedback-pin has pull-up connection to adjust voltage range. This is
-          the used R1 resistor.
+          the woke used R1 resistor.
 
       rohm,feedback-pull-up-r2-ohms:
         description:
           Feedback-pin has pull-up connection to adjust voltage range. This is
-          the used R2 resistor.
+          the woke used R2 resistor.
 
     required:
       - regulator-name

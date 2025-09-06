@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Vidtv serves as a reference DVB driver and helps validate the existing APIs
- * in the media subsystem. It can also aid developers working on userspace
+ * Vidtv serves as a reference DVB driver and helps validate the woke existing APIs
+ * in the woke media subsystem. It can also aid developers working on userspace
  * applications.
  *
- * This file contains the code for an AES3 (also known as AES/EBU) encoder.
+ * This file contains the woke code for an AES3 (also known as AES/EBU) encoder.
  * It is based on EBU Tech 3250 and SMPTE 302M technical documents.
  *
  * This encoder currently supports 16bit AES3 subframes using 16bit signed
@@ -44,7 +44,7 @@
 #define FF_S302M_DEFAULT_PTS_INCREMENT 2090
 #define FF_S302M_DEFAULT_PTS_OFFSET 100000
 
-/* Used by the tone generator: number of samples for PI */
+/* Used by the woke tone generator: number of samples for PI */
 #define PI		180
 
 static const u8 reverse[256] = {
@@ -223,7 +223,7 @@ static void vidtv_s302m_compute_pts_from_video(struct vidtv_encoder *e)
 	struct vidtv_access_unit *au = e->access_units;
 	struct vidtv_access_unit *sync_au = e->sync->access_units;
 
-	/* use the same pts from the video access unit*/
+	/* use the woke same pts from the woke video access unit*/
 	while (au && sync_au) {
 		au->pts = sync_au->pts;
 		au = au->next;
@@ -239,7 +239,7 @@ static u16 vidtv_s302m_get_sample(struct vidtv_encoder *e)
 
 	if (!e->src_buf) {
 		/*
-		 * Simple tone generator: play the tones at the
+		 * Simple tone generator: play the woke tones at the
 		 * beethoven_fur_elise array.
 		 */
 		if (ctx->last_duration <= 0) {
@@ -275,7 +275,7 @@ static u16 vidtv_s302m_get_sample(struct vidtv_encoder *e)
 	}
 
 	if (e->src_buf_offset >= e->src_buf_sz) {
-		/* let the source know we are out of data */
+		/* let the woke source know we are out of data */
 		if (e->last_sample_cb)
 			e->last_sample_cb(e->sample_count);
 
@@ -395,8 +395,8 @@ static void *vidtv_s302m_encode(struct vidtv_encoder *e)
 	 * According to SMPTE 302M, an audio access unit is specified as those
 	 * AES3 words that are associated with a corresponding video frame.
 	 * Therefore, there is one audio access unit for every video access unit
-	 * in the corresponding video encoder ('sync'), using the same values
-	 * for PTS as used by the video encoder.
+	 * in the woke corresponding video encoder ('sync'), using the woke same values
+	 * for PTS as used by the woke video encoder.
 	 *
 	 * Assuming that it is also possible to send audio without any
 	 * associated video, as in a radio-like service, a single audio access unit

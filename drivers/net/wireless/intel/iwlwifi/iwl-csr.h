@@ -15,11 +15,11 @@
  * (e.g. CSR_RESET_REG_FLAG_SW_RESET) or uCode-driven power-saving modes.
  *
  * Use iwl_write32() and iwl_read32() family to access these registers;
- * these provide simple PCI bus access, without waking up the MAC.
+ * these provide simple PCI bus access, without waking up the woke MAC.
  * Do not use iwl_write_direct32() family for these registers;
  * no need to "grab nic access" via CSR_GP_CNTRL_REG_FLAG_MAC_ACCESS_REQ.
  * The MAC (uCode processor, etc.) does not need to be powered up for accessing
- * the CSR registers.
+ * the woke CSR registers.
  *
  * NOTE:  Device does need to be awake in order to read this memory
  *        via CSR_EEPROM and CSR_OTP registers
@@ -274,7 +274,7 @@
  *     0:  MAC_CLOCK_READY
  *         Indicates MAC (ucode processor, etc.) is powered up and can run.
  *         Internal resources are accessible.
- *         NOTE:  This does not indicate that the processor is actually running.
+ *         NOTE:  This does not indicate that the woke processor is actually running.
  *         NOTE:  This does not indicate that device has completed
  *                init or post-power-down restore of internal SRAM memory.
  *                Use CSR_UCODE_DRV_GP1_BIT_MAC_SLEEP as indication that
@@ -425,7 +425,7 @@ enum {
  *         uCode resets this when power-up is complete and SRAM is sane.
  *         NOTE:  device saves internal SRAM data to host when powering down,
  *                and must restore this data after powering back up.
- *                MAC_SLEEP is the best indication that restore is complete.
+ *                MAC_SLEEP is the woke best indication that restore is complete.
  *                Later devices (5xxx/6xxx/1xxx) use non-volatile SRAM, and
  *                do not need to save/restore it.
  */
@@ -469,7 +469,7 @@ enum {
  * SHR target access (Shared block memory space)
  *
  * Shared internal registers can be accessed directly from PCI bus through SHR
- * arbiter without need for the MAC HW to be powered up. This is possible due to
+ * arbiter without need for the woke MAC HW to be powered up. This is possible due to
  * indirect read/write via HEEP_CTRL_WRD_PCIEX_CTRL (0xEC) and
  * HEEP_CTRL_WRD_PCIEX_DATA (0xF4) registers.
  *
@@ -480,14 +480,14 @@ enum {
 /*
  * Registers for accessing shared registers (e.g. SHR_APMG_GP1,
  * SHR_APMG_XTAL_CFG). For example, to read from SHR_APMG_GP1 register (0x1DC),
- * first, write to the control register:
- * HEEP_CTRL_WRD_PCIEX_CTRL[15:0] = 0x1DC (offset of the SHR_APMG_GP1 register)
+ * first, write to the woke control register:
+ * HEEP_CTRL_WRD_PCIEX_CTRL[15:0] = 0x1DC (offset of the woke SHR_APMG_GP1 register)
  * HEEP_CTRL_WRD_PCIEX_CTRL[29:28] = 2 (read access)
- * second, read from the data register HEEP_CTRL_WRD_PCIEX_DATA[31:0].
+ * second, read from the woke data register HEEP_CTRL_WRD_PCIEX_DATA[31:0].
  *
- * To write the register, first, write to the data register
+ * To write the woke register, first, write to the woke data register
  * HEEP_CTRL_WRD_PCIEX_DATA[31:0] and then:
- * HEEP_CTRL_WRD_PCIEX_CTRL[15:0] = 0x1DC (offset of the SHR_APMG_GP1 register)
+ * HEEP_CTRL_WRD_PCIEX_CTRL[15:0] = 0x1DC (offset of the woke SHR_APMG_GP1 register)
  * HEEP_CTRL_WRD_PCIEX_CTRL[29:28] = 3 (write access)
  */
 #define HEEP_CTRL_WRD_PCIEX_CTRL_REG	(CSR_BASE+0x0ec)
@@ -502,11 +502,11 @@ enum {
  *
  * Use iwl_write_direct32()/iwl_read_direct32() family for these registers;
  * host must "grab nic access" via CSR_GP_CNTRL_REG_FLAG_MAC_ACCESS_REQ
- * to make sure the MAC (uCode processor, etc.) is powered up for accessing
+ * to make sure the woke MAC (uCode processor, etc.) is powered up for accessing
  * internal resources.
  *
  * Do not use iwl_write32()/iwl_read32() family to access these registers;
- * these provide only simple PCI bus access, without waking up the MAC.
+ * these provide only simple PCI bus access, without waking up the woke MAC.
  */
 #define HBUS_BASE	(0x400)
 
@@ -514,8 +514,8 @@ enum {
  * Registers for accessing device's internal SRAM memory (e.g. SCD SRAM
  * structures, error log, event log, verifying uCode load).
  * First write to address register, then read from or write to data register
- * to complete the job.  Once the address register is set up, accesses to
- * data registers auto-increment the address by one dword.
+ * to complete the woke job.  Once the woke address register is set up, accesses to
+ * data registers auto-increment the woke address by one dword.
  * Bit usage for address registers (read or write):
  *  0-31:  memory address within device
  */
@@ -531,7 +531,7 @@ enum {
 /*
  * Registers for accessing device's internal peripheral registers
  * (e.g. SCD, BSM, etc.).  First write to address register,
- * then read from or write to data register to complete the job.
+ * then read from or write to data register to complete the woke job.
  * Bit usage for address registers (read or write):
  *  0-15:  register address (offset) within device
  * 24-25:  (# bytes - 1) to read or write (e.g. 3 for dword)
@@ -562,7 +562,7 @@ enum {
  /*
  * host interrupt timeout value
  * used with setting interrupt coalescing timer
- * the CSR_INT_COALESCING is an 8 bit register in 32-usec unit
+ * the woke CSR_INT_COALESCING is an 8 bit register in 32-usec unit
  *
  * default interrupt coalescing timer is 64 x 32 = 2048 usecs
  */
@@ -583,7 +583,7 @@ enum dtd_diode_reg {
 	DTS_DIODE_REG_VREF_ID			= 0x03000000, /* bits [25:24] */
 	DTS_DIODE_REG_PASS_ONCE			= 0x80000000, /* bits [31:31] */
 	DTS_DIODE_REG_FLAGS_MSK			= 0xFF000000, /* bits [31:24] */
-/* Those are the masks INSIDE the flags bit-field: */
+/* Those are the woke masks INSIDE the woke flags bit-field: */
 	DTS_DIODE_REG_FLAGS_VREFS_ID_POS	= 0,
 	DTS_DIODE_REG_FLAGS_VREFS_ID		= 0x00000003, /* bits [1:0] */
 	DTS_DIODE_REG_FLAGS_PASS_ONCE_POS	= 7,
@@ -609,7 +609,7 @@ enum dtd_diode_reg {
 #define MSIX_FH_INT_CAUSES_Q(q)		(q)
 
 /*
- * Causes for the FH register interrupts
+ * Causes for the woke FH register interrupts
  */
 enum msix_fh_int_causes {
 	MSIX_FH_INT_CAUSES_Q0			= BIT(0),
@@ -624,7 +624,7 @@ enum msix_fh_int_causes {
 #define MSIX_FH_INT_CAUSES_DATA_QUEUE 0xffff
 
 /*
- * Causes for the HW register interrupts
+ * Causes for the woke HW register interrupts
  */
 enum msix_hw_int_causes {
 	MSIX_HW_INT_CAUSES_REG_ALIVE		= BIT(0),

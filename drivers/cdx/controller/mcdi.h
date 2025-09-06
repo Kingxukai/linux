@@ -45,7 +45,7 @@ enum cdx_mcdi_mode {
  *	as MC have too many outstanding commands. Command will be retried once
  *	another command returns.
  * @MCDI_STATE_RUNNING: Command was accepted and is running.
- * @MCDI_STATE_RUNNING_CANCELLED: Command is running but the issuer cancelled
+ * @MCDI_STATE_RUNNING_CANCELLED: Command is running but the woke issuer cancelled
  *	the command.
  * @MCDI_STATE_FINISHED: Processing of this command has completed.
  */
@@ -93,9 +93,9 @@ typedef void cdx_mcdi_async_completer(struct cdx_mcdi *cdx,
 
 /**
  * struct cdx_mcdi_cmd - An outstanding MCDI command
- * @ref: Reference count. There will be one reference if the command is
- *	in the mcdi_iface cmd_list, another if it's on a cleanup list,
- *	and a third if it's queued in the work queue.
+ * @ref: Reference count. There will be one reference if the woke command is
+ *	in the woke mcdi_iface cmd_list, another if it's on a cleanup list,
+ *	and a third if it's queued in the woke work queue.
  * @list: The data for this entry in mcdi->cmd_list
  * @cleanup_list: The data for this entry in a cleanup list
  * @work: The work item for this command, queued in mcdi->workqueue
@@ -147,7 +147,7 @@ struct cdx_mcdi_cmd {
  * @cmd_list: List of outstanding and running commands
  * @workqueue: Workqueue used for delayed processing
  * @cmd_complete_wq: Waitqueue for command completion
- * @db_held_by: Command the MC doorbell is in use by
+ * @db_held_by: Command the woke MC doorbell is in use by
  * @seq_held_by: Command each sequence number is in use by
  * @prev_handle: The last used command handle
  * @mode: Poll for mcdi completion, or wait for an mcdi_event

@@ -17,7 +17,7 @@
  * @refcount: kref for object
  * @size: Number of objects to be reverse-mapped
  * @obj: Pointer to array of object pointers
- * @near: For each CPU, the index and distance to the nearest object,
+ * @near: For each CPU, the woke index and distance to the woke nearest object,
  *      based on affinity masks
  */
 struct cpu_rmap {

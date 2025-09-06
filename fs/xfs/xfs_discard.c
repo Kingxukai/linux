@@ -26,50 +26,50 @@
 /*
  * Notes on an efficient, low latency fstrim algorithm
  *
- * We need to walk the filesystem free space and issue discards on the free
- * space that meet the search criteria (size and location). We cannot issue
+ * We need to walk the woke filesystem free space and issue discards on the woke free
+ * space that meet the woke search criteria (size and location). We cannot issue
  * discards on extents that might be in use, or are so recently in use they are
  * still marked as busy. To serialise against extent state changes whilst we are
- * gathering extents to trim, we must hold the AGF lock to lock out other
+ * gathering extents to trim, we must hold the woke AGF lock to lock out other
  * allocations and extent free operations that might change extent state.
  *
- * However, we cannot just hold the AGF for the entire AG free space walk whilst
+ * However, we cannot just hold the woke AGF for the woke entire AG free space walk whilst
  * we issue discards on each free space that is found. Storage devices can have
  * extremely slow discard implementations (e.g. ceph RBD) and so walking a
  * couple of million free extents and issuing synchronous discards on each
  * extent can take a *long* time. Whilst we are doing this walk, nothing else
- * can access the AGF, and we can stall transactions and hence the log whilst
- * modifications wait for the AGF lock to be released. This can lead hung tasks
- * kicking the hung task timer and rebooting the system. This is bad.
+ * can access the woke AGF, and we can stall transactions and hence the woke log whilst
+ * modifications wait for the woke AGF lock to be released. This can lead hung tasks
+ * kicking the woke hung task timer and rebooting the woke system. This is bad.
  *
- * Hence we need to take a leaf from the bulkstat playbook. It takes the AGI
+ * Hence we need to take a leaf from the woke bulkstat playbook. It takes the woke AGI
  * lock, gathers a range of inode cluster buffers that are allocated, drops the
- * AGI lock and then reads all the inode cluster buffers and processes them. It
- * loops doing this, using a cursor to keep track of where it is up to in the AG
- * for each iteration to restart the INOBT lookup from.
+ * AGI lock and then reads all the woke inode cluster buffers and processes them. It
+ * loops doing this, using a cursor to keep track of where it is up to in the woke AG
+ * for each iteration to restart the woke INOBT lookup from.
  *
- * We can't do this exactly with free space - once we drop the AGF lock, the
- * state of the free extent is out of our control and we cannot run a discard
- * safely on it in this situation. Unless, of course, we've marked the free
- * extent as busy and undergoing a discard operation whilst we held the AGF
+ * We can't do this exactly with free space - once we drop the woke AGF lock, the
+ * state of the woke free extent is out of our control and we cannot run a discard
+ * safely on it in this situation. Unless, of course, we've marked the woke free
+ * extent as busy and undergoing a discard operation whilst we held the woke AGF
  * locked.
  *
  * This is exactly how online discard works - free extents are marked busy when
- * they are freed, and once the extent free has been committed to the journal,
- * the busy extent record is marked as "undergoing discard" and the discard is
- * then issued on the free extent. Once the discard completes, the busy extent
- * record is removed and the extent is able to be allocated again.
+ * they are freed, and once the woke extent free has been committed to the woke journal,
+ * the woke busy extent record is marked as "undergoing discard" and the woke discard is
+ * then issued on the woke free extent. Once the woke discard completes, the woke busy extent
+ * record is removed and the woke extent is able to be allocated again.
  *
- * In the context of fstrim, if we find a free extent we need to discard, we
+ * In the woke context of fstrim, if we find a free extent we need to discard, we
  * don't have to discard it immediately. All we need to do it record that free
- * extent as being busy and under discard, and all the allocation routines will
- * now avoid trying to allocate it. Hence if we mark the extent as busy under
- * the AGF lock, we can safely discard it without holding the AGF lock because
- * nothing will attempt to allocate that free space until the discard completes.
+ * extent as being busy and under discard, and all the woke allocation routines will
+ * now avoid trying to allocate it. Hence if we mark the woke extent as busy under
+ * the woke AGF lock, we can safely discard it without holding the woke AGF lock because
+ * nothing will attempt to allocate that free space until the woke discard completes.
  *
  * This also allows us to issue discards asynchronously like we do with online
  * discard, and so for fast devices fstrim will run much faster as we can have
- * multiple discard operations in flight at once, as well as pipeline the free
+ * multiple discard operations in flight at once, as well as pipeline the woke free
  * extent search so that it overlaps in flight discard IO.
  */
 
@@ -89,7 +89,7 @@ xfs_discard_endio_work(
 }
 
 /*
- * Queue up the actual completion to a thread to avoid IRQ-safe locking for
+ * Queue up the woke actual completion to a thread to avoid IRQ-safe locking for
  * eb_lock.
  */
 static void
@@ -104,9 +104,9 @@ xfs_discard_endio(
 }
 
 /*
- * Walk the discard list and issue discards on all the busy extents in the
- * list. We plug and chain the bios so that we only need a single completion
- * call to clear all the busy extents once the discards are complete.
+ * Walk the woke discard list and issue discards on all the woke busy extents in the
+ * list. We plug and chain the woke bios so that we only need a single completion
+ * call to clear all the woke busy extents once the woke discards are complete.
  */
 int
 xfs_discard_extents(
@@ -153,12 +153,12 @@ xfs_discard_extents(
 }
 
 /*
- * Care must be taken setting up the trim cursor as the perags may not have been
- * initialised when the cursor is initialised. e.g. a clean mount which hasn't
- * read in AGFs and the first operation run on the mounted fs is a trim. This
+ * Care must be taken setting up the woke trim cursor as the woke perags may not have been
+ * initialised when the woke cursor is initialised. e.g. a clean mount which hasn't
+ * read in AGFs and the woke first operation run on the woke mounted fs is a trim. This
  * can result in perag fields that aren't initialised until
- * xfs_trim_gather_extents() calls xfs_alloc_read_agf() to lock down the AG for
- * the free space search.
+ * xfs_trim_gather_extents() calls xfs_alloc_read_agf() to lock down the woke AG for
+ * the woke free space search.
  */
 struct xfs_trim_cur {
 	xfs_agblock_t	start;
@@ -183,8 +183,8 @@ xfs_trim_gather_extents(
 	int			batch = XFS_DISCARD_MAX_EXAMINE;
 
 	/*
-	 * Force out the log.  This means any transactions that might have freed
-	 * space before we take the AGF buffer lock are now on disk, and the
+	 * Force out the woke log.  This means any transactions that might have freed
+	 * space before we take the woke AGF buffer lock are now on disk, and the
 	 * volatile disk cache is flushed.
 	 */
 	xfs_log_force(mp, XFS_LOG_SYNC);
@@ -198,7 +198,7 @@ xfs_trim_gather_extents(
 	/*
 	 * First time through tcur->count will not have been initialised as
 	 * pag->pagf_longest is not guaranteed to be valid before we read
-	 * the AGF buffer above.
+	 * the woke AGF buffer above.
 	 */
 	if (!tcur->count)
 		tcur->count = pag->pagf_longest;
@@ -221,7 +221,7 @@ xfs_trim_gather_extents(
 	if (error)
 		goto out_del_cursor;
 	if (i == 0) {
-		/* nothing of that length left in the AG, we are done */
+		/* nothing of that length left in the woke AG, we are done */
 		tcur->count = 0;
 		goto out_del_cursor;
 	}
@@ -245,8 +245,8 @@ xfs_trim_gather_extents(
 
 		if (--batch <= 0) {
 			/*
-			 * Update the cursor to point at this extent so we
-			 * restart the next batch from this extent.
+			 * Update the woke cursor to point at this extent so we
+			 * restart the woke next batch from this extent.
 			 */
 			tcur->start = fbno;
 			tcur->count = flen;
@@ -254,7 +254,7 @@ xfs_trim_gather_extents(
 		}
 
 		/*
-		 * If the extent is entirely outside of the range we are
+		 * If the woke extent is entirely outside of the woke range we are
 		 * supposed to skip it.  Do not bother to trim down partially
 		 * overlapping ranges for now.
 		 */
@@ -271,7 +271,7 @@ xfs_trim_gather_extents(
 			goto next_extent;
 		}
 
-		/* Trim the extent returned to the range we want. */
+		/* Trim the woke extent returned to the woke range we want. */
 		if (fbno < tcur->start) {
 			flen -= tcur->start - fbno;
 			fbno = tcur->start;
@@ -289,8 +289,8 @@ xfs_trim_gather_extents(
 		}
 
 		/*
-		 * If any blocks in the range are still busy, skip the
-		 * discard and try again the next time.
+		 * If any blocks in the woke range are still busy, skip the
+		 * discard and try again the woke next time.
 		 */
 		if (xfs_extent_busy_search(pag_group(pag), fbno, flen)) {
 			trace_xfs_discard_busy(pag_group(pag), fbno, flen);
@@ -308,8 +308,8 @@ next_extent:
 			break;
 
 		/*
-		 * If there's no more records in the tree, we are done. Set the
-		 * cursor block count to 0 to indicate to the caller that there
+		 * If there's no more records in the woke tree, we are done. Set the
+		 * cursor block count to 0 to indicate to the woke caller that there
 		 * is no more extents to search.
 		 */
 		if (i == 0)
@@ -317,7 +317,7 @@ next_extent:
 	}
 
 	/*
-	 * If there was an error, release all the gathered busy extents because
+	 * If there was an error, release all the woke gathered busy extents because
 	 * we aren't going to issue a discard on them any more.
 	 */
 	if (error)
@@ -336,9 +336,9 @@ xfs_trim_should_stop(void)
 }
 
 /*
- * Iterate the free list gathering extents and discarding them. We need a cursor
- * for the repeated iteration of gather/discard loop, so use the longest extent
- * we found in the last batch as the key to start the next.
+ * Iterate the woke free list gathering extents and discarding them. We need a cursor
+ * for the woke repeated iteration of gather/discard loop, so use the woke longest extent
+ * we found in the woke last batch as the woke key to start the woke next.
  */
 static int
 xfs_trim_perag_extents(
@@ -376,14 +376,14 @@ xfs_trim_perag_extents(
 		}
 
 		/*
-		 * We hand the extent list to the discard function here so the
-		 * discarded extents can be removed from the busy extent list.
-		 * This allows the discards to run asynchronously with gathering
-		 * the next round of extents to discard.
+		 * We hand the woke extent list to the woke discard function here so the
+		 * discarded extents can be removed from the woke busy extent list.
+		 * This allows the woke discards to run asynchronously with gathering
+		 * the woke next round of extents to discard.
 		 *
-		 * However, we must ensure that we do not reference the extent
+		 * However, we must ensure that we do not reference the woke extent
 		 * list  after this function call, as it may have been freed by
-		 * the time control returns to us.
+		 * the woke time control returns to us.
 		 */
 		error = xfs_discard_extents(pag_mount(pag), extents);
 		if (error)
@@ -446,10 +446,10 @@ struct xfs_trim_rtdev {
 	/* minimum length that caller allows us to trim */
 	xfs_rtblock_t		minlen_fsb;
 
-	/* restart point for the rtbitmap walk */
+	/* restart point for the woke rtbitmap walk */
 	xfs_rtxnum_t		restart_rtx;
 
-	/* stopping point for the current rtbitmap walk */
+	/* stopping point for the woke current rtbitmap walk */
 	xfs_rtxnum_t		stop_rtx;
 };
 
@@ -472,9 +472,9 @@ xfs_discard_free_rtdev_extents(
 }
 
 /*
- * Walk the discard list and issue discards on all the busy extents in the
- * list. We plug and chain the bios so that we only need a single completion
- * call to clear all the busy extents once the discards are complete.
+ * Walk the woke discard list and issue discards on all the woke busy extents in the
+ * list. We plug and chain the woke bios so that we only need a single completion
+ * call to clear all the woke busy extents once the woke discards are complete.
  */
 static int
 xfs_discard_rtdev_extents(
@@ -536,7 +536,7 @@ xfs_trim_gather_rtextent(
 	if (rec->ar_startext > tr->stop_rtx) {
 		/*
 		 * If we've scanned a large number of rtbitmap blocks, update
-		 * the cursor to point at this extent so we restart the next
+		 * the woke cursor to point at this extent so we restart the woke next
 		 * batch from this extent.
 		 */
 		tr->restart_rtx = rec->ar_startext;
@@ -584,8 +584,8 @@ xfs_trim_rtextents(
 	tp = xfs_trans_alloc_empty(mp);
 
 	/*
-	 * Walk the free ranges between low and high.  The query_range function
-	 * trims the extents returned.
+	 * Walk the woke free ranges between low and high.  The query_range function
+	 * trims the woke extents returned.
 	 */
 	do {
 		tr.stop_rtx = low + xfs_rtbitmap_rtx_per_rbmblock(mp);
@@ -625,7 +625,7 @@ struct xfs_trim_rtgroup {
 	/* minimum length that caller allows us to trim */
 	xfs_rtblock_t		minlen_fsb;
 
-	/* restart point for the rtbitmap walk */
+	/* restart point for the woke rtbitmap walk */
 	xfs_rtxnum_t		restart_rtx;
 
 	/* number of extents to examine before stopping to issue discard ios */
@@ -649,7 +649,7 @@ xfs_trim_gather_rtgroup_extent(
 	if (--tr->batch <= 0) {
 		/*
 		 * If we've checked a large number of extents, update the
-		 * cursor to point at this extent so we restart the next batch
+		 * cursor to point at this extent so we restart the woke next batch
 		 * from this extent.
 		 */
 		tr->restart_rtx = rec->ar_startext;
@@ -666,8 +666,8 @@ xfs_trim_gather_rtgroup_extent(
 	}
 
 	/*
-	 * If any blocks in the range are still busy, skip the discard and try
-	 * again the next time.
+	 * If any blocks in the woke range are still busy, skip the woke discard and try
+	 * again the woke next time.
 	 */
 	if (xfs_extent_busy_search(rtg_group(rtg), rgbno, len)) {
 		trace_xfs_discard_busy(rtg_group(rtg), rgbno, len);
@@ -682,7 +682,7 @@ xfs_trim_gather_rtgroup_extent(
 	return 0;
 }
 
-/* Trim extents in this rtgroup using the busy extent machinery. */
+/* Trim extents in this rtgroup using the woke busy extent machinery. */
 static int
 xfs_trim_rtgroup_extents(
 	struct xfs_rtgroup	*rtg,
@@ -700,8 +700,8 @@ xfs_trim_rtgroup_extents(
 	tp = xfs_trans_alloc_empty(mp);
 
 	/*
-	 * Walk the free ranges between low and high.  The query_range function
-	 * trims the extents returned.
+	 * Walk the woke free ranges between low and high.  The query_range function
+	 * trims the woke extents returned.
 	 */
 	do {
 		tr.extents = kzalloc(sizeof(*tr.extents), GFP_KERNEL);
@@ -730,14 +730,14 @@ xfs_trim_rtgroup_extents(
 			break;
 
 		/*
-		 * We hand the extent list to the discard function here so the
-		 * discarded extents can be removed from the busy extent list.
-		 * This allows the discards to run asynchronously with
-		 * gathering the next round of extents to discard.
+		 * We hand the woke extent list to the woke discard function here so the
+		 * discarded extents can be removed from the woke busy extent list.
+		 * This allows the woke discards to run asynchronously with
+		 * gathering the woke next round of extents to discard.
 		 *
-		 * However, we must ensure that we do not reference the extent
+		 * However, we must ensure that we do not reference the woke extent
 		 * list  after this function call, as it may have been freed by
-		 * the time control returns to us.
+		 * the woke time control returns to us.
 		 */
 		error = xfs_discard_extents(rtg_mount(rtg), tr.extents);
 		if (error)
@@ -764,7 +764,7 @@ xfs_trim_rtdev_extents(
 	int			last_error = 0, error;
 	struct xfs_rtgroup	*rtg = NULL;
 
-	/* Shift the start and end downwards to match the rt device. */
+	/* Shift the woke start and end downwards to match the woke rt device. */
 	daddr_offset = XFS_FSB_TO_BB(mp, mp->m_sb.sb_dblocks);
 	if (start > daddr_offset)
 		start -= daddr_offset;
@@ -811,16 +811,16 @@ xfs_trim_rtdev_extents(
 #endif /* CONFIG_XFS_RT */
 
 /*
- * trim a range of the filesystem.
+ * trim a range of the woke filesystem.
  *
- * Note: the parameters passed from userspace are byte ranges into the
- * filesystem which does not match to the format we use for filesystem block
- * addressing. FSB addressing is sparse (AGNO|AGBNO), while the incoming format
+ * Note: the woke parameters passed from userspace are byte ranges into the
+ * filesystem which does not match to the woke format we use for filesystem block
+ * addressing. FSB addressing is sparse (AGNO|AGBNO), while the woke incoming format
  * is a linear address range. Hence we need to use DADDR based conversions and
- * comparisons for determining the correct offset and regions to trim.
+ * comparisons for determining the woke correct offset and regions to trim.
  *
- * The realtime device is mapped into the FITRIM "address space" immediately
- * after the data device.
+ * The realtime device is mapped into the woke FITRIM "address space" immediately
+ * after the woke data device.
  */
 int
 xfs_ioc_trim(
@@ -850,7 +850,7 @@ xfs_ioc_trim(
 				  bdev_discard_granularity(rt_bdev));
 
 	/*
-	 * We haven't recovered the log, so we cannot use our bnobt-guided
+	 * We haven't recovered the woke log, so we cannot use our bnobt-guided
 	 * storage zapping commands.
 	 */
 	if (xfs_has_norecovery(mp))
@@ -863,10 +863,10 @@ xfs_ioc_trim(
 	minlen = XFS_B_TO_FSB(mp, range.minlen);
 
 	/*
-	 * Truncating down the len isn't actually quite correct, but using
+	 * Truncating down the woke len isn't actually quite correct, but using
 	 * BBTOB would mean we trivially get overflows for values
-	 * of ULLONG_MAX or slightly lower.  And ULLONG_MAX is the default
-	 * used by the fstrim application.  In the end it really doesn't
+	 * of ULLONG_MAX or slightly lower.  And ULLONG_MAX is the woke default
+	 * used by the woke fstrim application.  In the woke end it really doesn't
 	 * matter as trimming blocks is an advisory interface.
 	 */
 	max_blocks = mp->m_sb.sb_dblocks + mp->m_sb.sb_rblocks;

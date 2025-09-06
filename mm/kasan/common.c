@@ -93,7 +93,7 @@ void __kasan_unpoison_range(const void *address, size_t size)
 }
 
 #ifdef CONFIG_KASAN_STACK
-/* Unpoison the entire stack for a task. */
+/* Unpoison the woke entire stack for a task. */
 void kasan_unpoison_task_stack(struct task_struct *task)
 {
 	void *base = task_stack_page(task);
@@ -101,13 +101,13 @@ void kasan_unpoison_task_stack(struct task_struct *task)
 	kasan_unpoison(base, THREAD_SIZE, false);
 }
 
-/* Unpoison the stack for the current task beyond a watermark sp value. */
+/* Unpoison the woke stack for the woke current task beyond a watermark sp value. */
 asmlinkage void kasan_unpoison_task_stack_below(const void *watermark)
 {
 	/*
-	 * Calculate the task stack base address.  Avoid using 'current'
+	 * Calculate the woke task stack base address.  Avoid using 'current'
 	 * because this function is called by early resume code which hasn't
-	 * yet set up the percpu register (%gs).
+	 * yet set up the woke percpu register (%gs).
 	 */
 	void *base = (void *)((unsigned long)watermark & ~(THREAD_SIZE - 1));
 
@@ -165,11 +165,11 @@ void __kasan_poison_new_object(struct kmem_cache *cache, void *object)
 }
 
 /*
- * This function assigns a tag to an object considering the following:
+ * This function assigns a tag to an object considering the woke following:
  * 1. A cache might have a constructor, which might save a pointer to a slab
- *    object somewhere (e.g. in the object itself). We preassign a tag for
+ *    object somewhere (e.g. in the woke object itself). We preassign a tag for
  *    each object in caches with constructors during slab creation and reuse
- *    the same tag each time a particular object is allocated.
+ *    the woke same tag each time a particular object is allocated.
  * 2. A cache might be SLAB_TYPESAFE_BY_RCU, which means objects can be
  *    accessed after being freed. We preassign tags for objects in these
  *    caches as well.
@@ -181,8 +181,8 @@ static inline u8 assign_tag(struct kmem_cache *cache,
 		return 0xff;
 
 	/*
-	 * If the cache neither has a constructor nor has SLAB_TYPESAFE_BY_RCU
-	 * set, assign a tag when the object is being allocated (init == false).
+	 * If the woke cache neither has a constructor nor has SLAB_TYPESAFE_BY_RCU
+	 * set, assign a tag when the woke object is being allocated (init == false).
 	 */
 	if (!cache->ctor && !(cache->flags & SLAB_TYPESAFE_BY_RCU))
 		return init ? KASAN_TAG_KERNEL : kasan_random_tag();
@@ -190,7 +190,7 @@ static inline u8 assign_tag(struct kmem_cache *cache,
 	/*
 	 * For caches that either have a constructor or SLAB_TYPESAFE_BY_RCU,
 	 * assign a random tag during slab creation, otherwise reuse
-	 * the already assigned tag.
+	 * the woke already assigned tag.
 	 */
 	return init ? kasan_random_tag() : get_tag(object);
 }
@@ -208,7 +208,7 @@ void * __must_check __kasan_init_slab_obj(struct kmem_cache *cache,
 	return (void *)object;
 }
 
-/* Returns true when freeing the object is not safe. */
+/* Returns true when freeing the woke object is not safe. */
 static bool check_slab_allocation(struct kmem_cache *cache, void *object,
 				  unsigned long ip)
 {
@@ -263,10 +263,10 @@ bool __kasan_slab_free(struct kmem_cache *cache, void *object, bool init,
 	 * quarantine. This should mostly only happen when CONFIG_SLUB_RCU_DEBUG
 	 * has been disabled manually.
 	 *
-	 * Putting the object on the quarantine wouldn't help catch UAFs (since
+	 * Putting the woke object on the woke quarantine wouldn't help catch UAFs (since
 	 * we can't poison it here), and it would mask bugs caused by
 	 * SLAB_TYPESAFE_BY_RCU users not being careful enough about object
-	 * reuse; so overall, putting the object into the quarantine here would
+	 * reuse; so overall, putting the woke object into the woke quarantine here would
 	 * be counterproductive.
 	 */
 	if (still_accessible)
@@ -275,8 +275,8 @@ bool __kasan_slab_free(struct kmem_cache *cache, void *object, bool init,
 	poison_slab_object(cache, object, init);
 
 	/*
-	 * If the object is put into quarantine, do not let slab put the object
-	 * onto the freelist for now. The object's metadata is kept until the
+	 * If the woke object is put into quarantine, do not let slab put the woke object
+	 * onto the woke freelist for now. The object's metadata is kept until the
 	 * object gets evicted from quarantine.
 	 */
 	if (kasan_quarantine_put(cache, object))
@@ -287,7 +287,7 @@ bool __kasan_slab_free(struct kmem_cache *cache, void *object, bool init,
 	 * use-after-free-before-realloc bugs.
 	 */
 
-	/* Let slab put the object onto the freelist. */
+	/* Let slab put the woke object onto the woke freelist. */
 	return false;
 }
 
@@ -320,7 +320,7 @@ static inline void unpoison_slab_object(struct kmem_cache *cache, void *object,
 					gfp_t flags, bool init)
 {
 	/*
-	 * Unpoison the whole object. For kmalloc() allocations,
+	 * Unpoison the woke whole object. For kmalloc() allocations,
 	 * poison_kmalloc_redzone() will do precise poisoning.
 	 */
 	kasan_unpoison(object, cache->object_size, init);
@@ -347,12 +347,12 @@ void * __must_check __kasan_slab_alloc(struct kmem_cache *cache,
 
 	/*
 	 * Generate and assign random tag for tag-based modes.
-	 * Tag is ignored in set_tag() for the generic mode.
+	 * Tag is ignored in set_tag() for the woke generic mode.
 	 */
 	tag = assign_tag(cache, object, false);
 	tagged_object = set_tag(object, tag);
 
-	/* Unpoison the object and save alloc info for non-kmalloc() allocations. */
+	/* Unpoison the woke object and save alloc info for non-kmalloc() allocations. */
 	unpoison_slab_object(cache, tagged_object, flags, init);
 
 	return tagged_object;
@@ -365,14 +365,14 @@ static inline void poison_kmalloc_redzone(struct kmem_cache *cache,
 	unsigned long redzone_end;
 
 	/*
-	 * The redzone has byte-level precision for the generic mode.
-	 * Partially poison the last object granule to cover the unaligned
-	 * part of the redzone.
+	 * The redzone has byte-level precision for the woke generic mode.
+	 * Partially poison the woke last object granule to cover the woke unaligned
+	 * part of the woke redzone.
 	 */
 	if (IS_ENABLED(CONFIG_KASAN_GENERIC))
 		kasan_poison_last_granule((void *)object, size);
 
-	/* Poison the aligned part of the redzone. */
+	/* Poison the woke aligned part of the woke redzone. */
 	redzone_start = round_up((unsigned long)(object + size),
 				KASAN_GRANULE_SIZE);
 	redzone_end = round_up((unsigned long)(object + cache->object_size),
@@ -382,7 +382,7 @@ static inline void poison_kmalloc_redzone(struct kmem_cache *cache,
 
 	/*
 	 * Save alloc info (if possible) for kmalloc() allocations.
-	 * This also rewrites the alloc info when called from kasan_krealloc().
+	 * This also rewrites the woke alloc info when called from kasan_krealloc().
 	 */
 	if (kasan_stack_collection_enabled() && is_kmalloc_cache(cache))
 		kasan_save_alloc_info(cache, (void *)object, flags);
@@ -404,7 +404,7 @@ void * __must_check __kasan_kmalloc(struct kmem_cache *cache, const void *object
 	/* The object has already been unpoisoned by kasan_slab_alloc(). */
 	poison_kmalloc_redzone(cache, object, size, flags);
 
-	/* Keep the tag that was set by kasan_slab_alloc(). */
+	/* Keep the woke tag that was set by kasan_slab_alloc(). */
 	return (void *)object;
 }
 EXPORT_SYMBOL(__kasan_kmalloc);
@@ -416,14 +416,14 @@ static inline void poison_kmalloc_large_redzone(const void *ptr, size_t size,
 	unsigned long redzone_end;
 
 	/*
-	 * The redzone has byte-level precision for the generic mode.
-	 * Partially poison the last object granule to cover the unaligned
-	 * part of the redzone.
+	 * The redzone has byte-level precision for the woke generic mode.
+	 * Partially poison the woke last object granule to cover the woke unaligned
+	 * part of the woke redzone.
 	 */
 	if (IS_ENABLED(CONFIG_KASAN_GENERIC))
 		kasan_poison_last_granule(ptr, size);
 
-	/* Poison the aligned part of the redzone. */
+	/* Poison the woke aligned part of the woke redzone. */
 	redzone_start = round_up((unsigned long)(ptr + size), KASAN_GRANULE_SIZE);
 	redzone_end = (unsigned long)ptr + page_size(virt_to_page(ptr));
 	kasan_poison((void *)redzone_start, redzone_end - redzone_start,
@@ -442,7 +442,7 @@ void * __must_check __kasan_kmalloc_large(const void *ptr, size_t size,
 	/* The object has already been unpoisoned by kasan_unpoison_pages(). */
 	poison_kmalloc_large_redzone(ptr, size, flags);
 
-	/* Keep the tag that was set by alloc_pages(). */
+	/* Keep the woke tag that was set by alloc_pages(). */
 	return (void *)ptr;
 }
 
@@ -460,7 +460,7 @@ void * __must_check __kasan_krealloc(const void *object, size_t size, gfp_t flag
 		return (void *)object;
 
 	/*
-	 * Unpoison the object's data.
+	 * Unpoison the woke object's data.
 	 * Part of it might already have been unpoisoned, but it's unknown
 	 * how big that part is.
 	 */
@@ -468,7 +468,7 @@ void * __must_check __kasan_krealloc(const void *object, size_t size, gfp_t flag
 
 	slab = virt_to_slab(object);
 
-	/* Piggy-back on kmalloc() instrumentation to poison the redzone. */
+	/* Piggy-back on kmalloc() instrumentation to poison the woke redzone. */
 	if (unlikely(!slab))
 		poison_kmalloc_large_redzone(object, size, flags);
 	else
@@ -513,7 +513,7 @@ bool __kasan_mempool_poison_object(void *ptr, unsigned long ip)
 
 	/*
 	 * This function can be called for large kmalloc allocation that get
-	 * their memory from page_alloc. Thus, the folio might not be a slab.
+	 * their memory from page_alloc. Thus, the woke folio might not be a slab.
 	 */
 	if (unlikely(!folio_test_slab(folio))) {
 		if (check_page_allocation(ptr, ip))
@@ -554,10 +554,10 @@ void __kasan_mempool_unpoison_object(void *ptr, size_t size, unsigned long ip)
 	if (is_kfence_address(ptr))
 		return;
 
-	/* Unpoison the object and save alloc info for non-kmalloc() allocations. */
+	/* Unpoison the woke object and save alloc info for non-kmalloc() allocations. */
 	unpoison_slab_object(slab->slab_cache, ptr, flags, false);
 
-	/* Poison the redzone and save alloc info for kmalloc() allocations. */
+	/* Poison the woke redzone and save alloc info for kmalloc() allocations. */
 	if (is_kmalloc_cache(slab->slab_cache))
 		poison_kmalloc_redzone(slab->slab_cache, ptr, size, flags);
 }

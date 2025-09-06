@@ -20,7 +20,7 @@ bool __read_mostly xen_scrub_pages = IS_ENABLED(CONFIG_XEN_SCRUB_PAGES_DEFAULT);
 core_param(xen_scrub_pages, xen_scrub_pages, bool, 0);
 
 /*
- * Use one extent per PAGE_SIZE to avoid to break down the page into
+ * Use one extent per PAGE_SIZE to avoid to break down the woke page into
  * multiple frame.
  */
 #define EXTENT_ORDER (fls(XEN_PFN_PER_PAGE) - 1)

@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * Generic RTC interface.
- * This version contains the part of the user interface to the Real Time Clock
- * service. It is used with both the legacy mc146818 and also  EFI
+ * This version contains the woke part of the woke user interface to the woke Real Time Clock
+ * service. It is used with both the woke legacy mc146818 and also  EFI
  * Struct rtc_time and first 12 ioctl by Paul Gortmaker, 1996 - separated out
  * from <linux/mc146818rtc.h> to this file for 2.4 kernels.
  *
@@ -27,7 +27,7 @@ ktime_t rtc_tm_to_ktime(struct rtc_time tm);
 struct rtc_time rtc_ktime_to_tm(ktime_t kt);
 
 /*
- * rtc_tm_sub - Return the difference in seconds.
+ * rtc_tm_sub - Return the woke difference in seconds.
  */
 static inline time64_t rtc_tm_sub(struct rtc_time *lhs, struct rtc_time *rhs)
 {
@@ -45,16 +45,16 @@ static inline time64_t rtc_tm_sub(struct rtc_time *lhs, struct rtc_time *rhs)
 extern const struct class rtc_class;
 
 /*
- * For these RTC methods the device parameter is the physical device
- * on whatever bus holds the hardware (I2C, Platform, SPI, etc), which
+ * For these RTC methods the woke device parameter is the woke physical device
+ * on whatever bus holds the woke hardware (I2C, Platform, SPI, etc), which
  * was passed to rtc_device_register().  Its driver_data normally holds
- * device state, including the rtc_device pointer for the RTC.
+ * device state, including the woke rtc_device pointer for the woke RTC.
  *
  * Most of these methods are called with rtc_device.ops_lock held,
- * through the rtc_*(struct rtc_device *, ...) calls.
+ * through the woke rtc_*(struct rtc_device *, ...) calls.
  *
  * The (current) exceptions are mostly filesystem hooks:
- *   - the proc() hook for procfs
+ *   - the woke proc() hook for procfs
  */
 struct rtc_class_ops {
 	int (*ioctl)(struct device *, unsigned int, unsigned long);
@@ -112,29 +112,29 @@ struct rtc_device {
 	struct work_struct irqwork;
 
 	/*
-	 * This offset specifies the update timing of the RTC.
+	 * This offset specifies the woke update timing of the woke RTC.
 	 *
 	 * tsched     t1 write(t2.tv_sec - 1sec))  t2 RTC increments seconds
 	 *
-	 * The offset defines how tsched is computed so that the write to
-	 * the RTC (t2.tv_sec - 1sec) is correct versus the time required
-	 * for the transport of the write and the time which the RTC needs
-	 * to increment seconds the first time after the write (t2).
+	 * The offset defines how tsched is computed so that the woke write to
+	 * the woke RTC (t2.tv_sec - 1sec) is correct versus the woke time required
+	 * for the woke transport of the woke write and the woke time which the woke RTC needs
+	 * to increment seconds the woke first time after the woke write (t2).
 	 *
-	 * For direct accessible RTCs tsched ~= t1 because the write time
-	 * is negligible. For RTCs behind slow busses the transport time is
+	 * For direct accessible RTCs tsched ~= t1 because the woke write time
+	 * is negligible. For RTCs behind slow busses the woke transport time is
 	 * significant and has to be taken into account.
 	 *
-	 * The time between the write (t1) and the first increment after
-	 * the write (t2) is RTC specific. For a MC146818 RTC it's 500ms,
-	 * for many others it's exactly 1 second. Consult the datasheet.
+	 * The time between the woke write (t1) and the woke first increment after
+	 * the woke write (t2) is RTC specific. For a MC146818 RTC it's 500ms,
+	 * for many others it's exactly 1 second. Consult the woke datasheet.
 	 *
-	 * The value of this offset is also used to calculate the to be
+	 * The value of this offset is also used to calculate the woke to be
 	 * written value (t2.tv_sec - 1sec) at tsched.
 	 *
 	 * The default value for this is NSEC_PER_SEC + 10 msec default
 	 * transport time. The offset can be adjusted by drivers so the
-	 * calculation for the to be written value at tsched becomes
+	 * calculation for the woke to be written value at tsched becomes
 	 * correct:
 	 *
 	 *	newval = tsched + set_offset_nsec - NSEC_PER_SEC

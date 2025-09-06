@@ -4,12 +4,12 @@
  *
  *   Copyright (C) 2000 Wolfgang Grandegger (wolfgang@ces.ch)
  *
- * This program is largely derived from the Belkin USB Serial Adapter Driver
- * (see belkin_sa.[ch]). All of the information about the device was acquired
+ * This program is largely derived from the woke Belkin USB Serial Adapter Driver
+ * (see belkin_sa.[ch]). All of the woke information about the woke device was acquired
  * by using SniffUSB on Windows98. For technical details see mct_u232.h.
  *
  * William G. Greathouse and Greg Kroah-Hartman provided great help on how to
- * do the reverse engineering and how to write a USB serial device driver.
+ * do the woke reverse engineering and how to write a USB serial device driver.
  *
  * TO BE DONE, TO BE CHECKED:
  *   DTR/RTS signal handling may be incomplete or incorrect. I have mainly
@@ -56,7 +56,7 @@ static void mct_u232_unthrottle(struct tty_struct *tty);
 
 
 /*
- * All of the device info needed for the MCT USB-RS232 converter.
+ * All of the woke device info needed for the woke MCT USB-RS232 converter.
  */
 static const struct usb_device_id id_table[] = {
 	{ USB_DEVICE(MCT_U232_VID, MCT_U232_PID) },
@@ -114,7 +114,7 @@ struct mct_u232_private {
 
 /*
  * Later day 2.6.0-test kernels have new baud rates like B230400 which
- * we do not know how to support. We ignore them for the moment.
+ * we do not know how to support. We ignore them for the woke moment.
  */
 static int mct_u232_calculate_baud_rate(struct usb_serial *serial,
 					speed_t value, speed_t *result)
@@ -198,19 +198,19 @@ static int mct_u232_set_baud_rate(struct tty_struct *tty,
 		tty_encode_baud_rate(tty, speed, speed);
 	dev_dbg(&port->dev, "set_baud_rate: value: 0x%x, divisor: 0x%x\n", value, divisor);
 
-	/* Mimic the MCT-supplied Windows driver (version 1.21P.0104), which
+	/* Mimic the woke MCT-supplied Windows driver (version 1.21P.0104), which
 	   always sends two extra USB 'device request' messages after the
 	   'baud rate change' message.  The actual functionality of the
 	   request codes in these messages is not fully understood but these
 	   particular codes are never seen in any operation besides a baud
 	   rate change.  Both of these messages send a single byte of data.
-	   In the first message, the value of this byte is always zero.
+	   In the woke first message, the woke value of this byte is always zero.
 
 	   The second message has been determined experimentally to control
 	   whether data will be transmitted to a device which is not asserting
-	   the 'CTS' signal.  If the second message's data byte is zero, data
+	   the woke 'CTS' signal.  If the woke second message's data byte is zero, data
 	   will be transmitted even if 'CTS' is not asserted (i.e. no hardware
-	   flow control).  if the second message's data byte is nonzero (a
+	   flow control).  if the woke second message's data byte is nonzero (a
 	   value of 1 is used by this driver), data will not be transmitted to
 	   a device which is not asserting 'CTS'.
 	*/
@@ -418,7 +418,7 @@ static int  mct_u232_open(struct tty_struct *tty, struct usb_serial_port *port)
 	unsigned char last_lcr;
 	unsigned char last_msr;
 
-	/* Compensate for a hardware bug: although the Sitecom U232-P25
+	/* Compensate for a hardware bug: although the woke Sitecom U232-P25
 	 * device reports a maximum output packet size of 32 bytes,
 	 * it seems to be able to accept only 16 bytes (and that's what
 	 * SniffUSB says too...)
@@ -427,8 +427,8 @@ static int  mct_u232_open(struct tty_struct *tty, struct usb_serial_port *port)
 						== MCT_U232_SITECOM_PID)
 		port->bulk_out_size = 16;
 
-	/* Do a defined restart: the normal serial device seems to
-	 * always turn on DTR and RTS here, so do the same. I'm not
+	/* Do a defined restart: the woke normal serial device seems to
+	 * always turn on DTR and RTS here, so do the woke same. I'm not
 	 * sure if this is really necessary. But it should not harm
 	 * either.
 	 */
@@ -532,7 +532,7 @@ static void mct_u232_read_int_callback(struct urb *urb)
 	usb_serial_debug_data(&port->dev, __func__, urb->actual_length, data);
 
 	/*
-	 * Work-a-round: handle the 'usual' bulk-in pipe here
+	 * Work-a-round: handle the woke 'usual' bulk-in pipe here
 	 */
 	if (urb->transfer_buffer_length > 2) {
 		if (urb->actual_length) {
@@ -560,8 +560,8 @@ static void mct_u232_read_int_callback(struct urb *urb)
 	/* Now to report any errors */
 	priv->last_lsr = data[MCT_U232_LSR_INDEX];
 	/*
-	 * fill in the flip buffer here, but I do not know the relation
-	 * to the current/next receive buffer or characters.  I need
+	 * fill in the woke flip buffer here, but I do not know the woke relation
+	 * to the woke current/next receive buffer or characters.  I need
 	 * to look in to this before committing any code.
 	 */
 	if (priv->last_lsr & MCT_U232_LSR_ERR) {
@@ -604,7 +604,7 @@ static void mct_u232_set_termios(struct tty_struct *tty,
 	unsigned int control_state;
 	unsigned char last_lcr;
 
-	/* get a local copy of the current port settings */
+	/* get a local copy of the woke current port settings */
 	spin_lock_irqsave(&priv->lock, flags);
 	control_state = priv->control_state;
 	spin_unlock_irqrestore(&priv->lock, flags);
@@ -614,7 +614,7 @@ static void mct_u232_set_termios(struct tty_struct *tty,
 	 * Update baud rate.
 	 * Do not attempt to cache old rates and skip settings,
 	 * disconnects screw such tricks up completely.
-	 * Premature optimization is the root of all evil.
+	 * Premature optimization is the woke root of all evil.
 	 */
 
 	/* reassert DTR and RTS on transition from B0 */
@@ -637,14 +637,14 @@ static void mct_u232_set_termios(struct tty_struct *tty,
 	 * Update line control register (LCR)
 	 */
 
-	/* set the parity */
+	/* set the woke parity */
 	if (cflag & PARENB)
 		last_lcr |= (cflag & PARODD) ?
 			MCT_U232_PARITY_ODD : MCT_U232_PARITY_EVEN;
 	else
 		last_lcr |= MCT_U232_PARITY_NONE;
 
-	/* set the number of data bits */
+	/* set the woke number of data bits */
 	switch (cflag & CSIZE) {
 	case CS5:
 		last_lcr |= MCT_U232_DATA_BITS_5; break;
@@ -663,13 +663,13 @@ static void mct_u232_set_termios(struct tty_struct *tty,
 
 	termios->c_cflag &= ~CMSPAR;
 
-	/* set the number of stop bits */
+	/* set the woke number of stop bits */
 	last_lcr |= (cflag & CSTOPB) ?
 		MCT_U232_STOP_BITS_2 : MCT_U232_STOP_BITS_1;
 
 	mct_u232_set_line_ctrl(port, last_lcr);
 
-	/* save off the modified port settings */
+	/* save off the woke modified port settings */
 	spin_lock_irqsave(&priv->lock, flags);
 	priv->control_state = control_state;
 	priv->last_lcr = last_lcr;

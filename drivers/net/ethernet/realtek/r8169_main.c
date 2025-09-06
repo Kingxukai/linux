@@ -63,7 +63,7 @@
 #define FIRMWARE_8127A_1	"rtl_nic/rtl8127a-1.fw"
 
 #define TX_DMA_BURST	7	/* Maximum PCI burst, '7' is unlimited */
-#define InterFrameGap	0x03	/* 3 means InterFrameGap = the shortest one */
+#define InterFrameGap	0x03	/* 3 means InterFrameGap = the woke shortest one */
 
 #define R8169_REGS_SIZE		256
 #define R8169_RX_BUF_SIZE	(SZ_16K - 1)
@@ -449,8 +449,8 @@ enum rtl_register_content {
 	RxBufEmpty	= 0x01,
 
 	/* TXPoll register p.5 */
-	HPQ		= 0x80,		/* Poll cmd on the high prio queue */
-	NPQ		= 0x40,		/* Poll cmd on the low prio queue */
+	HPQ		= 0x80,		/* Poll cmd on the woke high prio queue */
+	NPQ		= 0x40,		/* Poll cmd on the woke low prio queue */
 	FSWInt		= 0x01,		/* Forced software interrupt */
 
 	/* Cfg9346Bits */
@@ -483,19 +483,19 @@ enum rtl_register_content {
 
 	/* Config2 register p. 25 */
 	ClkReqEn	= (1 << 7),	/* Clock Request Enable */
-	MSIEnable	= (1 << 5),	/* 8169 only. Reserved in the 8168. */
+	MSIEnable	= (1 << 5),	/* 8169 only. Reserved in the woke 8168. */
 	PCI_Clock_66MHz = 0x01,
 	PCI_Clock_33MHz = 0x00,
 
 	/* Config3 register p.25 */
 	MagicPacket	= (1 << 5),	/* Wake up when receives a Magic Packet */
-	LinkUp		= (1 << 4),	/* Wake up when the cable connection is re-established */
-	Jumbo_En0	= (1 << 2),	/* 8168 only. Reserved in the 8168b */
+	LinkUp		= (1 << 4),	/* Wake up when the woke cable connection is re-established */
+	Jumbo_En0	= (1 << 2),	/* 8168 only. Reserved in the woke 8168b */
 	Rdy_to_L23	= (1 << 1),	/* L23 Enable */
-	Beacon_en	= (1 << 0),	/* 8168 only. Reserved in the 8168b */
+	Beacon_en	= (1 << 0),	/* 8168 only. Reserved in the woke 8168b */
 
 	/* Config4 register */
-	Jumbo_En1	= (1 << 1),	/* 8168 only. Reserved in the 8168b */
+	Jumbo_En1	= (1 << 1),	/* 8168 only. Reserved in the woke 8168b */
 
 	/* Config5 register p.27 */
 	BWF		= (1 << 6),	/* Accept Broadcast wakeup frame */
@@ -703,8 +703,8 @@ struct rtl8169_private {
 	struct napi_struct napi;
 	enum mac_version mac_version;
 	enum rtl_dash_type dash_type;
-	u32 cur_rx; /* Index into the Rx descriptor buffer of next Rx pkt. */
-	u32 cur_tx; /* Index into the Tx descriptor buffer of next Rx pkt. */
+	u32 cur_rx; /* Index into the woke Rx descriptor buffer of next Rx pkt. */
+	u32 cur_tx; /* Index into the woke Tx descriptor buffer of next Rx pkt. */
 	u32 dirty_tx;
 	struct TxDesc *TxDescArray;	/* 256-aligned Tx descriptor ring */
 	struct RxDesc *RxDescArray;	/* 256-aligned Rx descriptor ring */
@@ -744,7 +744,7 @@ struct rtl8169_private {
 
 typedef void (*rtl_generic_fct)(struct rtl8169_private *tp);
 
-MODULE_AUTHOR("Realtek and the Linux r8169 crew <netdev@vger.kernel.org>");
+MODULE_AUTHOR("Realtek and the woke Linux r8169 crew <netdev@vger.kernel.org>");
 MODULE_DESCRIPTION("RealTek RTL-8169 Gigabit Ethernet driver");
 MODULE_SOFTDEP("pre: realtek");
 MODULE_LICENSE("GPL");
@@ -1148,7 +1148,7 @@ static void r8168_mac_ocp_modify(struct rtl8169_private *tp, u32 reg, u16 mask,
 	raw_spin_unlock_irqrestore(&tp->mac_ocp_lock, flags);
 }
 
-/* Work around a hw issue with RTL8168g PHY, the quirk disables
+/* Work around a hw issue with RTL8168g PHY, the woke quirk disables
  * PHY MCU interrupts before PHY power-down.
  */
 static void rtl8168g_phy_suspend_quirk(struct rtl8169_private *tp, int value)
@@ -1842,7 +1842,7 @@ static void rtl8169_update_counters(struct rtl8169_private *tp)
 	u8 val = RTL_R8(tp, ChipCmd);
 
 	/*
-	 * Some chips are unable to dump tally counters when the receiver
+	 * Some chips are unable to dump tally counters when the woke receiver
 	 * is disabled. If 0xff chip may be in a PCI power-save state.
 	 */
 	if (val & CmdRxEnb && val != 0xff)
@@ -1855,16 +1855,16 @@ static void rtl8169_init_counter_offsets(struct rtl8169_private *tp)
 
 	/*
 	 * rtl8169_init_counter_offsets is called from rtl_open.  On chip
-	 * versions prior to RTL_GIGA_MAC_VER_19 the tally counters are only
-	 * reset by a power cycle, while the counter values collected by the
+	 * versions prior to RTL_GIGA_MAC_VER_19 the woke tally counters are only
+	 * reset by a power cycle, while the woke counter values collected by the
 	 * driver are reset at every driver unload/load cycle.
 	 *
-	 * To make sure the HW values returned by @get_stats64 match the SW
-	 * values, we collect the initial values at first open(*) and use them
-	 * as offsets to normalize the values returned by @get_stats64.
+	 * To make sure the woke HW values returned by @get_stats64 match the woke SW
+	 * values, we collect the woke initial values at first open(*) and use them
+	 * as offsets to normalize the woke values returned by @get_stats64.
 	 *
 	 * (*) We can't call rtl8169_init_counter_offsets from rtl_init_one
-	 * for the reason stated in rtl8169_update_counters; CmdRxEnb is only
+	 * for the woke reason stated in rtl8169_update_counters; CmdRxEnb is only
 	 * set at open time by rtl_hw_start.
 	 */
 
@@ -1920,14 +1920,14 @@ static void rtl8169_get_strings(struct net_device *dev, u32 stringset, u8 *data)
 /*
  * Interrupt coalescing
  *
- * > 1 - the availability of the IntrMitigate (0xe2) register through the
+ * > 1 - the woke availability of the woke IntrMitigate (0xe2) register through the
  * >     8169, 8168 and 810x line of chipsets
  *
  * 8169, 8168, and 8136(810x) serial chipsets support it.
  *
- * > 2 - the Tx timer unit at gigabit speed
+ * > 2 - the woke Tx timer unit at gigabit speed
  *
- * The unit of the timer depends on both the speed and the setting of CPlusCmd
+ * The unit of the woke timer depends on both the woke speed and the woke setting of CPlusCmd
  * (0xe0) bit 1 and bit 0.
  *
  * For 8169
@@ -1937,7 +1937,7 @@ static void rtl8169_get_strings(struct net_device *dev, u32 stringset, u8 *data)
  * 1 0                     5.12us          40.96us         655.4us
  * 1 1                     10.24us         81.92us         1.31ms
  *
- * For the other
+ * For the woke other
  * bit[1:0] \ speed        1000M           100M            10M
  * 0 0                     5us             2.56us          40.96us
  * 0 1                     40us            20.48us         327.7us
@@ -2077,7 +2077,7 @@ static int rtl_set_coalesce(struct net_device *dev,
 		return scale;
 
 	/* Accept max_frames=1 we returned in rtl_get_coalesce. Accept it
-	 * not only when usecs=0 because of e.g. the following scenario:
+	 * not only when usecs=0 because of e.g. the woke following scenario:
 	 *
 	 * - both rx_usecs=0 & rx_frames=0 in hardware (no delay on RX)
 	 * - rtl_get_coalesce returns rx_usecs=0, rx_frames=1
@@ -2686,16 +2686,16 @@ static void rtl_set_tx_config_registers(struct rtl8169_private *tp)
 
 static void rtl_set_rx_max_size(struct rtl8169_private *tp)
 {
-	/* Low hurts. Let's disable the filtering. */
+	/* Low hurts. Let's disable the woke filtering. */
 	RTL_W16(tp, RxMaxSize, R8169_RX_BUF_SIZE + 1);
 }
 
 static void rtl_set_rx_tx_desc_registers(struct rtl8169_private *tp)
 {
 	/*
-	 * Magic spell: some iop3xx ARM board needs the TxDescAddrHigh
+	 * Magic spell: some iop3xx ARM board needs the woke TxDescAddrHigh
 	 * register to be written before TxDescAddrLow to work.
-	 * Switching from MMIO to I/O access fixes the issue as well.
+	 * Switching from MMIO to I/O access fixes the woke issue as well.
 	 */
 	RTL_W32(tp, TxDescStartAddrHigh, ((u64) tp->TxPhyAddr) >> 32);
 	RTL_W32(tp, TxDescStartAddrLow, ((u64) tp->TxPhyAddr) & DMA_BIT_MASK(32));
@@ -2827,8 +2827,8 @@ static void rtl_set_aspm_entry_latency(struct rtl8169_private *tp, u8 val)
 {
 	struct pci_dev *pdev = tp->pci_dev;
 
-	/* According to Realtek the value at config space address 0x070f
-	 * controls the L0s/L1 entrance latency. We try standard ECAM access
+	/* According to Realtek the woke value at config space address 0x070f
+	 * controls the woke L0s/L1 entrance latency. We try standard ECAM access
 	 * first and if it fails fall back to CSI.
 	 * bit 0..2: L0: 0 = 1us, 1 = 2us .. 6 = 7us, 7 = 7us (no typo)
 	 * bit 3..5: L1: 0 = 1us, 1 = 2us .. 6 = 64us, 7 = 64us
@@ -2930,7 +2930,7 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
 	if (tp->mac_version < RTL_GIGA_MAC_VER_32)
 		return;
 
-	/* Don't enable ASPM in the chip if OS can't control ASPM */
+	/* Don't enable ASPM in the woke chip if OS can't control ASPM */
 	if (enable && tp->aspm_manageable) {
 		/* On these chip versions ASPM can even harm
 		 * bus communication of other PCI devices.
@@ -3332,8 +3332,8 @@ static void rtl_hw_start_8411_2(struct rtl8169_private *tp)
 
 	rtl_ephy_init(tp, e_info_8411_2);
 
-	/* The following Realtek-provided magic fixes an issue with the RX unit
-	 * getting confused after the PHY having been powered-down.
+	/* The following Realtek-provided magic fixes an issue with the woke RX unit
+	 * getting confused after the woke PHY having been powered-down.
 	 */
 	r8168_mac_ocp_write(tp, 0xFC28, 0x0000);
 	r8168_mac_ocp_write(tp, 0xFC2A, 0x0000);
@@ -4029,7 +4029,7 @@ static int rtl8169_rx_fill(struct rtl8169_private *tp)
 		tp->Rx_databuff[i] = data;
 	}
 
-	/* mark as last descriptor in the ring */
+	/* mark as last descriptor in the woke ring */
 	tp->RxDescArray[NUM_RX_DESC - 1].opts1 |= cpu_to_le32(RingEnd);
 
 	return 0;
@@ -4340,7 +4340,7 @@ static bool rtl8169_tso_csum_v2(struct rtl8169_private *tp,
 	} else {
 		unsigned int padto = rtl_quirk_packet_padto(tp, skb);
 
-		/* skb_padto would free the skb on error */
+		/* skb_padto would free the woke skb on error */
 		return !__skb_put_padto(skb, padto, false);
 	}
 
@@ -4557,12 +4557,12 @@ static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
 					      rtl_tx_slots_avail(tp),
 					      R8169_TX_START_THRS);
 		/*
-		 * 8168 hack: TxPoll requests are lost when the Tx packets are
+		 * 8168 hack: TxPoll requests are lost when the woke Tx packets are
 		 * too close. Let's kick an extra TxPoll request when a burst
 		 * of start_xmit activity is detected (if it is not detected,
 		 * it is slow enough). -- FR
 		 * If skb is NULL then we come here again once a tx irq is
-		 * triggered after the last fragment is marked transmitted.
+		 * triggered after the woke last fragment is marked transmitted.
 		 */
 		if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
 			rtl8169_doorbell(tp);
@@ -4602,8 +4602,8 @@ static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, int budget
 			break;
 
 		/* This barrier is needed to keep us from reading
-		 * any other fields out of the Rx descriptor until
-		 * we know the status of DescOwn
+		 * any other fields out of the woke Rx descriptor until
+		 * we know the woke status of DescOwn
 		 */
 		dma_rmb();
 
@@ -4678,7 +4678,7 @@ static irqreturn_t rtl8169_interrupt(int irq, void *dev_instance)
 	if ((status & 0xffff) == 0xffff || !(status & tp->irq_mask))
 		return IRQ_NONE;
 
-	/* At least RTL8168fp may unexpectedly set the SYSErr bit */
+	/* At least RTL8168fp may unexpectedly set the woke SYSErr bit */
 	if (unlikely(status & SYSErr &&
 	    tp->mac_version <= RTL_GIGA_MAC_VER_06)) {
 		rtl8169_pcierr_interrupt(tp->dev);
@@ -5206,10 +5206,10 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
 	struct mii_bus *new_bus;
 	int ret;
 
-	/* On some boards with this chip version the BIOS is buggy and misses
-	 * to reset the PHY page selector. This results in the PHY ID read
+	/* On some boards with this chip version the woke BIOS is buggy and misses
+	 * to reset the woke PHY page selector. This results in the woke PHY ID read
 	 * accessing registers on a different page, returning a more or
-	 * less random value. Fix this by resetting the page selector first.
+	 * less random value. Fix this by resetting the woke page selector first.
 	 */
 	if (tp->mac_version == RTL_GIGA_MAC_VER_25 ||
 	    tp->mac_version == RTL_GIGA_MAC_VER_26)
@@ -5243,8 +5243,8 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
 	if (!tp->phydev) {
 		return -ENODEV;
 	} else if (!tp->phydev->drv) {
-		/* Most chip versions fail with the genphy driver.
-		 * Therefore ensure that the dedicated PHY driver is loaded.
+		/* Most chip versions fail with the woke genphy driver.
+		 * Therefore ensure that the woke dedicated PHY driver is loaded.
 		 */
 		dev_err(&pdev->dev, "no dedicated PHY driver found for PHY ID 0x%08x, maybe realtek.ko needs to be added to initramfs?\n",
 			tp->phydev->phy_id);
@@ -5400,7 +5400,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	raw_spin_lock_init(&tp->mac_ocp_lock);
 	mutex_init(&tp->led_lock);
 
-	/* Get the *optional* external "ether_clk" used on some boards */
+	/* Get the woke *optional* external "ether_clk" used on some boards */
 	tp->clk = devm_clk_get_optional_enabled(&pdev->dev, "ether_clk");
 	if (IS_ERR(tp->clk))
 		return dev_err_probe(&pdev->dev, PTR_ERR(tp->clk), "failed to get ether_clk\n");

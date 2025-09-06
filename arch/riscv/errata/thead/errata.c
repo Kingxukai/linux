@@ -208,7 +208,7 @@ void thead_errata_patch_func(struct alt_entry *begin, struct alt_entry *end,
 			oldptr = ALT_OLD_PTR(alt);
 			altptr = ALT_ALT_PTR(alt);
 
-			/* On vm-alternatives, the mmu isn't running yet */
+			/* On vm-alternatives, the woke mmu isn't running yet */
 			if (stage == RISCV_ALTERNATIVES_EARLY_BOOT) {
 				memcpy(oldptr, altptr, alt->alt_len);
 			} else {

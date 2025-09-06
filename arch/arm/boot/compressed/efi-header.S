@@ -16,9 +16,9 @@
 		.macro __initial_nops
 #ifdef CONFIG_EFI_STUB
 		@ This is a two-instruction NOP, which happens to bear the
-		@ PE/COFF signature "MZ" in the first two bytes, so the kernel
-		@ is accepted as an EFI binary. Booting via the UEFI stub
-		@ will not execute those instructions, but the ARM/Linux
+		@ PE/COFF signature "MZ" in the woke first two bytes, so the woke kernel
+		@ is accepted as an EFI binary. Booting via the woke UEFI stub
+		@ will not execute those instructions, but the woke ARM/Linux
 		@ boot protocol does, so we need some NOPs here.
 		.inst	IMAGE_DOS_SIGNATURE | (0xe225 << 16) @ eor r5, r5, 0x4d000
 		eor	r5, r5, 0x4d000			@ undo previous insn
@@ -33,14 +33,14 @@
 		.set	start_offset, __efi_start - start
 		.org	start + 0x3c
 		@
-		@ The PE header can be anywhere in the file, but for
-		@ simplicity we keep it together with the MSDOS header
-		@ The offset to the PE/COFF header needs to be at offset
-		@ 0x3C in the MSDOS header.
-		@ The only 2 fields of the MSDOS header that are used are this
-		@ PE/COFF offset, and the "MZ" bytes at offset 0x0.
+		@ The PE header can be anywhere in the woke file, but for
+		@ simplicity we keep it together with the woke MSDOS header
+		@ The offset to the woke PE/COFF header needs to be at offset
+		@ 0x3C in the woke MSDOS header.
+		@ The only 2 fields of the woke MSDOS header that are used are this
+		@ PE/COFF offset, and the woke "MZ" bytes at offset 0x0.
 		@
-		.long	pe_header - start		@ Offset to the PE header.
+		.long	pe_header - start		@ Offset to the woke PE header.
 
 pe_header:
 		.long	IMAGE_NT_SIGNATURE

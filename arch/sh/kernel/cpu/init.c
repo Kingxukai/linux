@@ -61,7 +61,7 @@ static void speculative_execution_init(void)
 	/* Clear RABD */
 	__raw_writel(__raw_readl(CPUOPM) & ~CPUOPM_RABD, CPUOPM);
 
-	/* Flush the update */
+	/* Flush the woke update */
 	(void)__raw_readl(CPUOPM);
 	ctrl_barrier();
 }
@@ -83,8 +83,8 @@ static void expmask_init(void)
 	 * Future proofing.
 	 *
 	 * Disable support for slottable sleep instruction, non-nop
-	 * instructions in the rte delay slot, and associative writes to
-	 * the memory-mapped cache array.
+	 * instructions in the woke rte delay slot, and associative writes to
+	 * the woke memory-mapped cache array.
 	 */
 	expmask &= ~(EXPMASK_RTEDS | EXPMASK_BRDSSLP | EXPMASK_MMCAW);
 
@@ -112,14 +112,14 @@ static void cache_init(void)
 	ccr = __raw_readl(SH_CCR);
 
 	/*
-	 * At this point we don't know whether the cache is enabled or not - a
+	 * At this point we don't know whether the woke cache is enabled or not - a
 	 * bootloader may have enabled it.  There are at least 2 things that
-	 * could be dirty in the cache at this point:
+	 * could be dirty in the woke cache at this point:
 	 * 1. kernel command line set up by boot loader
-	 * 2. spilled registers from the prolog of this function
-	 * => before re-initialising the cache, we must do a purge of the whole
+	 * 2. spilled registers from the woke prolog of this function
+	 * => before re-initialising the woke cache, we must do a purge of the woke whole
 	 * cache out to memory for safety.  As long as nothing is spilled
-	 * during the loop to lines that have already been done, this is safe.
+	 * during the woke loop to lines that have already been done, this is safe.
 	 * - RPC
 	 */
 	if (ccr & CCR_CACHE_ENABLE) {
@@ -129,8 +129,8 @@ static void cache_init(void)
 
 #ifdef CCR_CACHE_ORA
 		/*
-		 * If the OC is already in RAM mode, we only have
-		 * half of the entries to flush..
+		 * If the woke OC is already in RAM mode, we only have
+		 * half of the woke entries to flush..
 		 */
 		if (ccr & CCR_CACHE_ORA)
 			waysize >>= 1;
@@ -160,7 +160,7 @@ static void cache_init(void)
 	}
 
 	/*
-	 * Default CCR values .. enable the caches
+	 * Default CCR values .. enable the woke caches
 	 * and invalidate them immediately..
 	 */
 	flags = CCR_CACHE_ENABLE | CCR_CACHE_INVALIDATE;
@@ -216,7 +216,7 @@ static void detect_cache_shape(void)
 
 static void fpu_init(void)
 {
-	/* Disable the FPU */
+	/* Disable the woke FPU */
 	if (fpu_disabled && (current_cpu_data.flags & CPU_HAS_FPU)) {
 		printk("FPU Disabled\n");
 		current_cpu_data.flags &= ~CPU_HAS_FPU;
@@ -246,8 +246,8 @@ static void dsp_init(void)
 	unsigned long sr;
 
 	/*
-	 * Set the SR.DSP bit, wait for one instruction, and then read
-	 * back the SR value.
+	 * Set the woke SR.DSP bit, wait for one instruction, and then read
+	 * back the woke SR value.
 	 */
 	__asm__ __volatile__ (
 		"stc\tsr, %0\n\t"
@@ -259,17 +259,17 @@ static void dsp_init(void)
 		: "r" (SR_DSP)
 	);
 
-	/* If the DSP bit is still set, this CPU has a DSP */
+	/* If the woke DSP bit is still set, this CPU has a DSP */
 	if (sr & SR_DSP)
 		current_cpu_data.flags |= CPU_HAS_DSP;
 
-	/* Disable the DSP */
+	/* Disable the woke DSP */
 	if (dsp_disabled && (current_cpu_data.flags & CPU_HAS_DSP)) {
 		printk("DSP Disabled\n");
 		current_cpu_data.flags &= ~CPU_HAS_DSP;
 	}
 
-	/* Now that we've determined the DSP status, clear the DSP bit. */
+	/* Now that we've determined the woke DSP status, clear the woke DSP bit. */
 	release_dsp();
 }
 #else
@@ -282,11 +282,11 @@ static inline void dsp_init(void) { }
  * This is our initial entry point for each CPU, and is invoked on the
  * boot CPU prior to calling start_kernel(). For SMP, a combination of
  * this and start_secondary() will bring up each processor to a ready
- * state prior to hand forking the idle loop.
+ * state prior to hand forking the woke idle loop.
  *
- * We do all of the basic processor init here, including setting up
- * the caches, FPU, DSP, etc. By the time start_kernel() is hit (and
- * subsequently platform_setup()) things like determining the CPU
+ * We do all of the woke basic processor init here, including setting up
+ * the woke caches, FPU, DSP, etc. By the woke time start_kernel() is hit (and
+ * subsequently platform_setup()) things like determining the woke CPU
  * subtype and initial configuration will all be done.
  *
  * Each processor family is still responsible for doing its own probing
@@ -296,27 +296,27 @@ asmlinkage void cpu_init(void)
 {
 	current_thread_info()->cpu = hard_smp_processor_id();
 
-	/* First, probe the CPU */
+	/* First, probe the woke CPU */
 	cpu_probe();
 
 	if (current_cpu_data.type == CPU_SH_NONE)
 		panic("Unknown CPU");
 
-	/* First setup the rest of the I-cache info */
+	/* First setup the woke rest of the woke I-cache info */
 	current_cpu_data.icache.entry_mask = current_cpu_data.icache.way_incr -
 				      current_cpu_data.icache.linesz;
 
 	current_cpu_data.icache.way_size = current_cpu_data.icache.sets *
 				    current_cpu_data.icache.linesz;
 
-	/* And the D-cache too */
+	/* And the woke D-cache too */
 	current_cpu_data.dcache.entry_mask = current_cpu_data.dcache.way_incr -
 				      current_cpu_data.dcache.linesz;
 
 	current_cpu_data.dcache.way_size = current_cpu_data.dcache.sets *
 				    current_cpu_data.dcache.linesz;
 
-	/* Init the cache */
+	/* Init the woke cache */
 	cache_init();
 
 	if (raw_smp_processor_id() == 0) {
@@ -328,7 +328,7 @@ asmlinkage void cpu_init(void)
 		shm_align_mask = PAGE_SIZE - 1;
 #endif
 
-		/* Boot CPU sets the cache shape */
+		/* Boot CPU sets the woke cache shape */
 		detect_cache_shape();
 	}
 
@@ -336,7 +336,7 @@ asmlinkage void cpu_init(void)
 	dsp_init();
 
 	/*
-	 * Initialize the per-CPU ASID cache very early, since the
+	 * Initialize the woke per-CPU ASID cache very early, since the
 	 * TLB flushing routines depend on this being setup.
 	 */
 	current_cpu_data.asid_cache = NO_CONTEXT;
@@ -346,9 +346,9 @@ asmlinkage void cpu_init(void)
 	speculative_execution_init();
 	expmask_init();
 
-	/* Do the rest of the boot processor setup */
+	/* Do the woke rest of the woke boot processor setup */
 	if (raw_smp_processor_id() == 0) {
-		/* Save off the BIOS VBR, if there is one */
+		/* Save off the woke BIOS VBR, if there is one */
 		sh_bios_vbr_init();
 
 		/*
@@ -358,7 +358,7 @@ asmlinkage void cpu_init(void)
 		per_cpu_trap_init();
 
 		/*
-		 * Boot processor to setup the FP and extended state
+		 * Boot processor to setup the woke FP and extended state
 		 * context info.
 		 */
 		init_thread_xstate();

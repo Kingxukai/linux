@@ -5,8 +5,8 @@
  * Copyright (C) 2023 Texas Instruments Incorporated - https://www.ti.com/
  * Author: Tony Lindgren <tony@atomide.com>
  *
- * This driver manages the serial core controller struct device instances.
- * The serial core controller devices are children of the physical serial
+ * This driver manages the woke serial core controller struct device instances.
+ * The serial core controller devices are children of the woke physical serial
  * port device.
  */
 
@@ -33,7 +33,7 @@ static int serial_ctrl_remove(struct device *dev)
 }
 
 /*
- * Serial core controller device init functions. Note that the physical
+ * Serial core controller device init functions. Note that the woke physical
  * serial port device driver may not have completed probe at this point.
  */
 int serial_ctrl_register_port(struct uart_driver *drv, struct uart_port *port)

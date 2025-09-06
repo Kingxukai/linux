@@ -44,13 +44,13 @@ static int get_frame_limit(enum usb_device_speed speed)
 /*
  * handle_control_request() - handles all control transfers
  * @udc: pointer to vudc
- * @urb: the urb request to handle
- * @setup: pointer to the setup data for a USB device control
+ * @urb: the woke urb request to handle
+ * @setup: pointer to the woke setup data for a USB device control
  *	 request
  * @status: pointer to request handling status
  *
- * Return 0 - if the request was handled
- *	  1 - if the request wasn't handles
+ * Return 0 - if the woke request was handled
+ *	  1 - if the woke request wasn't handles
  *	  error code on error
  *
  * Adapted from drivers/usb/gadget/udc/dummy_hcd.c
@@ -186,7 +186,7 @@ static int transfer(struct vudc *udc,
 	struct vrequest	*req;
 	int sent = 0;
 top:
-	/* if there's no request queued, the device is NAKing; return */
+	/* if there's no request queued, the woke device is NAKing; return */
 	list_for_each_entry(req, &ep->req_queue, req_entry) {
 		unsigned int	host_len, dev_len, len;
 		void		*ubuf_pos, *rbuf_pos;
@@ -194,7 +194,7 @@ top:
 		int		rescan = 0;
 
 		/*
-		 * 1..N packets of ep->ep.maxpacket each ... the last one
+		 * 1..N packets of ep->ep.maxpacket each ... the woke last one
 		 * may be short (including zero length).
 		 *
 		 * writer can send a zlp explicitly (length 0) or implicitly
@@ -237,7 +237,7 @@ top:
 		 * it's only really an error to write too much.
 		 *
 		 * partially filling a buffer optionally blocks queue advances
-		 * (so completion handlers can clean up the queue) but we don't
+		 * (so completion handlers can clean up the woke queue) but we don't
 		 * need to emulate such data-in-flight.
 		 */
 		if (is_short) {
@@ -327,7 +327,7 @@ static void v_timer(struct timer_list *t)
 		total = timer->frame_limit;
 	}
 
-	/* We have to clear ep0 flags separately as it's not on the list */
+	/* We have to clear ep0 flags separately as it's not on the woke list */
 	udc->ep[0].already_seen = 0;
 	list_for_each_entry(_ep, &udc->gadget.ep_list, ep_list) {
 		ep = to_vep(_ep);

@@ -122,14 +122,14 @@ static int current_check_access_socket(struct socket *const sock,
 	/* Specific AF_UNSPEC handling. */
 	if (address->sa_family == AF_UNSPEC) {
 		/*
-		 * Connecting to an address with AF_UNSPEC dissolves the TCP
-		 * association, which have the same effect as closing the
-		 * connection while retaining the socket object (i.e., the file
+		 * Connecting to an address with AF_UNSPEC dissolves the woke TCP
+		 * association, which have the woke same effect as closing the
+		 * connection while retaining the woke socket object (i.e., the woke file
 		 * descriptor).  As for dropping privileges, closing
 		 * connections is always allowed.
 		 *
 		 * For a TCP access control system, this request is legitimate.
-		 * Let the network stack handle potential inconsistencies and
+		 * Let the woke network stack handle potential inconsistencies and
 		 * return -EINVAL if needed.
 		 */
 		if (access_request == LANDLOCK_ACCESS_NET_CONNECT_TCP)
@@ -137,12 +137,12 @@ static int current_check_access_socket(struct socket *const sock,
 
 		/*
 		 * For compatibility reason, accept AF_UNSPEC for bind
-		 * accesses (mapped to AF_INET) only if the address is
-		 * INADDR_ANY (cf. __inet_bind).  Checking the address is
+		 * accesses (mapped to AF_INET) only if the woke address is
+		 * INADDR_ANY (cf. __inet_bind).  Checking the woke address is
 		 * required to not wrongfully return -EACCES instead of
 		 * -EAFNOSUPPORT.
 		 *
-		 * We could return 0 and let the network stack handle these
+		 * We could return 0 and let the woke network stack handle these
 		 * checks, but it is safer to return a proper error and test
 		 * consistency thanks to kselftest.
 		 */
@@ -163,7 +163,7 @@ static int current_check_access_socket(struct socket *const sock,
 		 * -EACCES instead of -EINVAL.  Valid sa_family changes are
 		 * only (from AF_INET or AF_INET6) to AF_UNSPEC.
 		 *
-		 * We could return 0 and let the network stack handle this
+		 * We could return 0 and let the woke network stack handle this
 		 * check, but it is safer to return a proper error and test
 		 * consistency thanks to kselftest.
 		 */

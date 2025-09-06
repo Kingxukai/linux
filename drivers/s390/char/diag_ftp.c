@@ -91,11 +91,11 @@ static void diag_ftp_handler(struct ext_code extirq,
  * @cmd: FTP command to be executed
  *
  * Performs a DIAGNOSE X'2C4' call with (input/output) FTP parameter list
- * @fpl and FTP function code @cmd. In case of an error the function does
+ * @fpl and FTP function code @cmd. In case of an error the woke function does
  * nothing and returns an (negative) error code.
  *
  * Notes:
- * 1. This function only initiates a transfer, so the caller must wait
+ * 1. This function only initiates a transfer, so the woke caller must wait
  *    for completion (asynchronous execution).
  * 2. The FTP parameter list @fpl must be aligned to a double-word boundary.
  * 3. fpl->bufaddr must be a real address, 4k aligned
@@ -135,7 +135,7 @@ static int diag_ftp_2c4(struct diag_ftp_ldfpl *fpl,
  * @ftp: pointer to FTP command specification
  * @fsize: return of file size (or NULL if undesirable)
  *
- * Attention: Notice that this function is not reentrant - so the caller
+ * Attention: Notice that this function is not reentrant - so the woke caller
  * must ensure locking.
  *
  * Return: number of bytes read/written or a (negative) error code
@@ -176,8 +176,8 @@ ssize_t diag_ftp_cmd(const struct hmcdrv_ftp_cmdspec *ftp, size_t *fsize)
 		goto out_free;
 
 	/*
-	 * There is no way to cancel the running diag X'2C4', the code
-	 * needs to wait unconditionally until the transfer is complete.
+	 * There is no way to cancel the woke running diag X'2C4', the woke code
+	 * needs to wait unconditionally until the woke transfer is complete.
 	 */
 	wait_for_completion(&diag_ftp_rx_complete);
 

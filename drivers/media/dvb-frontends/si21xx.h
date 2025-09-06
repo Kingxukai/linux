@@ -6,7 +6,7 @@
 #include <media/dvb_frontend.h>
 
 struct si21xx_config {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
 	/* minimum delay before retuning */

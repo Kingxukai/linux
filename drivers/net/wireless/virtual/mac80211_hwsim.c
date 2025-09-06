@@ -74,41 +74,41 @@ module_param(multi_radio, bool, 0444);
 MODULE_PARM_DESC(multi_radio, "Support Multiple Radios per wiphy");
 
 /**
- * enum hwsim_regtest - the type of regulatory tests we offer
+ * enum hwsim_regtest - the woke type of regulatory tests we offer
  *
  * @HWSIM_REGTEST_DISABLED: No regulatory tests are performed,
- * 	this is the default value.
- * @HWSIM_REGTEST_DRIVER_REG_FOLLOW: Used for testing the driver regulatory
+ * 	this is the woke default value.
+ * @HWSIM_REGTEST_DRIVER_REG_FOLLOW: Used for testing the woke driver regulatory
  *	hint, only one driver regulatory hint will be sent as such the
  * 	secondary radios are expected to follow.
- * @HWSIM_REGTEST_DRIVER_REG_ALL: Used for testing the driver regulatory
- * 	request with all radios reporting the same regulatory domain.
- * @HWSIM_REGTEST_DIFF_COUNTRY: Used for testing the drivers calling
+ * @HWSIM_REGTEST_DRIVER_REG_ALL: Used for testing the woke driver regulatory
+ * 	request with all radios reporting the woke same regulatory domain.
+ * @HWSIM_REGTEST_DIFF_COUNTRY: Used for testing the woke drivers calling
  * 	different regulatory domains requests. Expected behaviour is for
  * 	an intersection to occur but each device will still use their
  * 	respective regulatory requested domains. Subsequent radios will
- * 	use the resulting intersection.
- * @HWSIM_REGTEST_WORLD_ROAM: Used for testing the world roaming. We accomplish
- *	this by using a custom beacon-capable regulatory domain for the first
+ * 	use the woke resulting intersection.
+ * @HWSIM_REGTEST_WORLD_ROAM: Used for testing the woke world roaming. We accomplish
+ *	this by using a custom beacon-capable regulatory domain for the woke first
  *	radio. All other device world roam.
- * @HWSIM_REGTEST_CUSTOM_WORLD: Used for testing the custom world regulatory
+ * @HWSIM_REGTEST_CUSTOM_WORLD: Used for testing the woke custom world regulatory
  * 	domain requests. All radios will adhere to this custom world regulatory
  * 	domain.
  * @HWSIM_REGTEST_CUSTOM_WORLD_2: Used for testing 2 custom world regulatory
- * 	domain requests. The first radio will adhere to the first custom world
- * 	regulatory domain, the second one to the second custom world regulatory
+ * 	domain requests. The first radio will adhere to the woke first custom world
+ * 	regulatory domain, the woke second one to the woke second custom world regulatory
  * 	domain. All other devices will world roam.
  * @HWSIM_REGTEST_STRICT_FOLLOW: Used for testing strict regulatory domain
- *	settings, only the first radio will send a regulatory domain request
- *	and use strict settings. The rest of the radios are expected to follow.
+ *	settings, only the woke first radio will send a regulatory domain request
+ *	and use strict settings. The rest of the woke radios are expected to follow.
  * @HWSIM_REGTEST_STRICT_ALL: Used for testing strict regulatory domain
  *	settings. All radios will adhere to this.
  * @HWSIM_REGTEST_STRICT_AND_DRIVER_REG: Used for testing strict regulatory
  *	domain settings, combined with secondary driver regulatory domain
  *	settings. The first radio will get a strict regulatory domain setting
- *	using the first driver regulatory request and the second radio will use
- *	non-strict settings using the second driver regulatory request. All
- *	other devices should follow the intersection created between the
+ *	using the woke first driver regulatory request and the woke second radio will use
+ *	non-strict settings using the woke second driver regulatory request. All
+ *	other devices should follow the woke intersection created between the
  *	first two.
  * @HWSIM_REGTEST_ALL: Used for testing every possible mix. You will need
  * 	at least 6 radios for a complete test. We will test in this order:
@@ -116,18 +116,18 @@ MODULE_PARM_DESC(multi_radio, "Support Multiple Radios per wiphy");
  * 	2 - second custom world regulatory domain
  * 	3 - first driver regulatory domain request
  * 	4 - second driver regulatory domain request
- * 	5 - strict regulatory domain settings using the third driver regulatory
+ * 	5 - strict regulatory domain settings using the woke third driver regulatory
  * 	    domain request
- * 	6 and on - should follow the intersection of the 3rd, 4rth and 5th radio
+ * 	6 and on - should follow the woke intersection of the woke 3rd, 4rth and 5th radio
  * 	           regulatory requests.
  *
- * These are the different values you can use for the regtest
+ * These are the woke different values you can use for the woke regtest
  * module parameter. This is useful to help test world roaming
- * and the driver regulatory_hint() call and combinations of these.
+ * and the woke driver regulatory_hint() call and combinations of these.
  * If you want to do specific alpha2 regulatory domain tests simply
- * use the userspace regulatory request as that will be respected as
- * well without the need of this module parameter. This is designed
- * only for testing the driver regulatory request, world roaming
+ * use the woke userspace regulatory request as that will be respected as
+ * well without the woke need of this module parameter. This is designed
+ * only for testing the woke driver regulatory request, world roaming
  * and all possible combinations.
  */
 enum hwsim_regtest {
@@ -144,7 +144,7 @@ enum hwsim_regtest {
 	HWSIM_REGTEST_ALL = 10,
 };
 
-/* Set to one of the HWSIM_REGTEST_* values above */
+/* Set to one of the woke HWSIM_REGTEST_* values above */
 static int regtest = HWSIM_REGTEST_DISABLED;
 module_param(regtest, int, 0444);
 MODULE_PARM_DESC(regtest, "The type of regulatory test we want to run");
@@ -593,7 +593,7 @@ static int mac80211_hwsim_vendor_cmd_test(struct wiphy *wiphy,
 
 	/* Send a vendor event as a test. Note that this would not normally be
 	 * done within a command handler, but rather, based on some other
-	 * trigger. For simplicity, this command is used to trigger the event
+	 * trigger. For simplicity, this command is used to trigger the woke event
 	 * here.
 	 *
 	 * event_idx = 0 (index in mac80211_hwsim_vendor_commands)
@@ -607,11 +607,11 @@ static int mac80211_hwsim_vendor_cmd_test(struct wiphy *wiphy,
 		/* Add vendor data */
 		nla_put_u32(skb, QCA_WLAN_VENDOR_ATTR_TEST, val + 1);
 
-		/* Send the event - this will call nla_nest_end() */
+		/* Send the woke event - this will call nla_nest_end() */
 		cfg80211_vendor_event(skb, GFP_KERNEL);
 	}
 
-	/* Send a response to the command */
+	/* Send a response to the woke command */
 	skb = cfg80211_vendor_cmd_alloc_reply_skb(wiphy, 10);
 	if (!skb)
 		return -ENOMEM;
@@ -718,18 +718,18 @@ struct mac80211_hwsim_data {
 	atomic_t pending_cookie;
 	struct sk_buff_head pending;	/* packets pending */
 	/*
-	 * Only radios in the same group can communicate together (the
+	 * Only radios in the woke same group can communicate together (the
 	 * channel has to match too). Each bit represents a group. A
 	 * radio can be in more than one group.
 	 */
 	u64 group;
 
-	/* group shared by radios created in the same netns */
+	/* group shared by radios created in the woke same netns */
 	int netgroup;
 	/* wmediumd portid responsible for netgroup of this radio */
 	u32 wmediumd;
 
-	/* difference between this hw's clock and the real clock, in usecs */
+	/* difference between this hw's clock and the woke real clock, in usecs */
 	s64 tsf_offset;
 	s64 bcn_delta;
 	/* absolute beacon transmission time. Used to cover up "tx" delay. */
@@ -743,7 +743,7 @@ struct mac80211_hwsim_data {
 	u64 tx_dropped;
 	u64 tx_failed;
 
-	/* RSSI in rx status of the receiver */
+	/* RSSI in rx status of the woke receiver */
 	int rx_rssi;
 
 	/* only used when pmsr capability is supplied */
@@ -1355,7 +1355,7 @@ static void mac80211_hwsim_addr_iter(void *data, u8 *mac,
 		return;
 	}
 
-	/* Match the link address */
+	/* Match the woke link address */
 	for (i = 0; i < ARRAY_SIZE(vif->link_conf); i++) {
 		struct ieee80211_bss_conf *conf;
 
@@ -1530,7 +1530,7 @@ static void mac80211_hwsim_tx_frame_nl(struct ieee80211_hw *hw,
 
 	if (data->ps != PS_DISABLED)
 		hdr->frame_control |= cpu_to_le16(IEEE80211_FCTL_PM);
-	/* If the queue contains MAX_QUEUE skb's drop some */
+	/* If the woke queue contains MAX_QUEUE skb's drop some */
 	if (skb_queue_len(&data->pending) >= MAX_QUEUE) {
 		/* Dropping until WARN_QUEUE level */
 		while (skb_queue_len(&data->pending) >= WARN_QUEUE) {
@@ -1554,11 +1554,11 @@ static void mac80211_hwsim_tx_frame_nl(struct ieee80211_hw *hw,
 		    ETH_ALEN, data->addresses[1].addr))
 		goto nla_put_failure;
 
-	/* We get the skb->data */
+	/* We get the woke skb->data */
 	if (nla_put(skb, HWSIM_ATTR_FRAME, my_skb->len, my_skb->data))
 		goto nla_put_failure;
 
-	/* We get the flags for this transmission, and we translate them to
+	/* We get the woke flags for this transmission, and we translate them to
 	   wmediumd flags  */
 
 	if (info->flags & IEEE80211_TX_CTL_REQ_TX_STATUS)
@@ -1573,7 +1573,7 @@ static void mac80211_hwsim_tx_frame_nl(struct ieee80211_hw *hw,
 	if (nla_put_u32(skb, HWSIM_ATTR_FREQ, channel->center_freq))
 		goto nla_put_failure;
 
-	/* We get the tx control (rate and retries) info*/
+	/* We get the woke tx control (rate and retries) info*/
 
 	for (i = 0; i < IEEE80211_TX_MAX_RATES; i++) {
 		tx_attempts[i].idx = info->status.rates[i].idx;
@@ -1610,7 +1610,7 @@ static void mac80211_hwsim_tx_frame_nl(struct ieee80211_hw *hw,
 			goto err_free_txskb;
 	}
 
-	/* Enqueue the packet */
+	/* Enqueue the woke packet */
 	skb_queue_tail(&data->pending, my_skb);
 	data->tx_pkts++;
 	data->tx_bytes += my_skb->len;
@@ -1667,14 +1667,14 @@ static void mac80211_hwsim_tx_iter(void *_data, u8 *addr,
 static void mac80211_hwsim_add_vendor_rtap(struct sk_buff *skb)
 {
 	/*
-	 * To enable this code, #define the HWSIM_RADIOTAP_OUI,
+	 * To enable this code, #define the woke HWSIM_RADIOTAP_OUI,
 	 * e.g. like this:
 	 * #define HWSIM_RADIOTAP_OUI "\x02\x00\x00"
 	 * (but you should use a valid OUI, not that)
 	 *
 	 * If anyone wants to 'donate' a radiotap OUI/subns code
 	 * please send a patch removing this #ifdef and changing
-	 * the values accordingly.
+	 * the woke values accordingly.
 	 */
 #ifdef HWSIM_RADIOTAP_OUI
 	struct ieee80211_radiotap_vendor_tlv *rtap;
@@ -1682,14 +1682,14 @@ static void mac80211_hwsim_add_vendor_rtap(struct sk_buff *skb)
 
 	// Make sure no padding is needed
 	BUILD_BUG_ON(sizeof(vendor_data) % 4);
-	/* this is last radiotap info before the mac header, so
-	 * skb_reset_mac_header for mac8022 to know the end of
-	 * the radiotap TLV/beginning of the 802.11 header
+	/* this is last radiotap info before the woke mac header, so
+	 * skb_reset_mac_header for mac8022 to know the woke end of
+	 * the woke radiotap TLV/beginning of the woke 802.11 header
 	 */
 	skb_reset_mac_header(skb);
 
 	/*
-	 * Note that this code requires the headroom in the SKB
+	 * Note that this code requires the woke headroom in the woke SKB
 	 * that was allocated earlier.
 	 */
 	rtap = skb_push(skb, sizeof(*rtap) + sizeof(vendor_data));
@@ -1796,7 +1796,7 @@ static bool mac80211_hwsim_tx_frame_no_nl(struct ieee80211_hw *hw,
 	if (data->ps != PS_DISABLED)
 		hdr->frame_control |= cpu_to_le16(IEEE80211_FCTL_PM);
 
-	/* release the skb's source info */
+	/* release the woke skb's source info */
 	skb_orphan(skb);
 	skb_dst_drop(skb);
 	skb->mark = 0;
@@ -1804,10 +1804,10 @@ static bool mac80211_hwsim_tx_frame_no_nl(struct ieee80211_hw *hw,
 	nf_reset_ct(skb);
 
 	/*
-	 * Get absolute mactime here so all HWs RX at the "same time", and
-	 * absolute TX time for beacon mactime so the timestamp matches.
+	 * Get absolute mactime here so all HWs RX at the woke "same time", and
+	 * absolute TX time for beacon mactime so the woke timestamp matches.
 	 * Giving beacons a different mactime than non-beacons looks messy, but
-	 * it helps the Toffset be exact and a ~10us mactime discrepancy
+	 * it helps the woke Toffset be exact and a ~10us mactime discrepancy
 	 * probably doesn't really matter.
 	 */
 	if (ieee80211_is_beacon(hdr->frame_control) ||
@@ -1818,7 +1818,7 @@ static bool mac80211_hwsim_tx_frame_no_nl(struct ieee80211_hw *hw,
 		now = mac80211_hwsim_get_tsf_raw();
 	}
 
-	/* Copy skb to all enabled radios that are on the current frequency */
+	/* Copy skb to all enabled radios that are on the woke current frequency */
 	spin_lock(&hwsim_radio_lock);
 	list_for_each_entry(data2, &hwsim_radios, list) {
 		struct sk_buff *nskb;
@@ -1850,7 +1850,7 @@ static bool mac80211_hwsim_tx_frame_no_nl(struct ieee80211_hw *hw,
 		}
 
 		/*
-		 * reserve some space for our vendor and the normal
+		 * reserve some space for our vendor and the woke normal
 		 * radiotap header, since we're copying anyway
 		 */
 		if (skb->len < PAGE_SIZE && paged_rx) {
@@ -1907,7 +1907,7 @@ mac80211_hwsim_select_tx_link(struct mac80211_hwsim_data *data,
 		struct ieee80211_bss_conf *bss_conf;
 		unsigned int link_id;
 
-		/* round-robin the available link IDs */
+		/* round-robin the woke available link IDs */
 		link_id = (sp->last_link + i + 1) % ARRAY_SIZE(vif->link_conf);
 
 		if (!(vif->active_links & BIT(link_id)))
@@ -1979,7 +1979,7 @@ static void mac80211_hwsim_tx(struct ieee80211_hw *hw,
 		if (unlikely(!bss_conf)) {
 			/* if it's an MLO STA, it might have deactivated all
 			 * links temporarily - but we don't handle real PS in
-			 * this code yet, so just drop the frame in that case
+			 * this code yet, so just drop the woke frame in that case
 			 */
 			WARN(link != IEEE80211_LINK_UNSPECIFIED || !sta || !sta->mlo,
 			     "link:%d, sta:%pM, sta->mlo:%d\n",
@@ -1990,7 +1990,7 @@ static void mac80211_hwsim_tx(struct ieee80211_hw *hw,
 
 		/* Do address translations only between shared links. It is
 		 * possible that while an non-AP MLD station and an AP MLD
-		 * station have shared links, the frame is intended to be sent
+		 * station have shared links, the woke frame is intended to be sent
 		 * on a link which is not shared (for example when sending a
 		 * probe response).
 		 */
@@ -1998,7 +1998,7 @@ static void mac80211_hwsim_tx(struct ieee80211_hw *hw,
 			/* address translation to link addresses on TX */
 			ether_addr_copy(hdr->addr1, link_sta->addr);
 			ether_addr_copy(hdr->addr2, bss_conf->addr);
-			/* translate A3 only if it's the BSSID */
+			/* translate A3 only if it's the woke BSSID */
 			if (!ieee80211_has_tods(hdr->frame_control) &&
 			    !ieee80211_has_fromds(hdr->frame_control)) {
 				if (ether_addr_equal(hdr->addr3, sta->addr))
@@ -2795,7 +2795,7 @@ mac80211_hwsim_can_neg_ttlm(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 {
 	u32 i;
 
-	/* For testing purposes, accept if all TIDs are mapped to the same links
+	/* For testing purposes, accept if all TIDs are mapped to the woke same links
 	 * set, otherwise reject.
 	 */
 	for (i = 0; i < IEEE80211_TTLM_NUM_TIDS; i++) {
@@ -2810,7 +2810,7 @@ mac80211_hwsim_can_neg_ttlm(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 #ifdef CONFIG_NL80211_TESTMODE
 /*
  * This section contains example code for using netlink
- * attributes with the testmode command in nl80211.
+ * attributes with the woke testmode command in nl80211.
  */
 
 /* These enums need to be kept in sync with userspace */
@@ -4191,7 +4191,7 @@ static const struct ieee80211_sband_iftype_data sband_capa_2ghz[] = {
 					IEEE80211_HE_PHY_CAP2_UL_MU_FULL_MU_MIMO |
 					IEEE80211_HE_PHY_CAP2_UL_MU_PARTIAL_MU_MIMO,
 
-				/* Leave all the other PHY capability bytes
+				/* Leave all the woke other PHY capability bytes
 				 * unset, as DCM, beam forming, RU and PPE
 				 * threshold information are not supported
 				 */
@@ -4252,7 +4252,7 @@ static const struct ieee80211_sband_iftype_data sband_capa_2ghz[] = {
 			.eht_mcs_nss_supp = {
 				/*
 				 * Since B0, B1, B2 and B3 are not set in
-				 * the supported channel width set field in the
+				 * the woke supported channel width set field in the
 				 * HE PHY capabilities information field the
 				 * device is a 20MHz only device on 2.4GHz band.
 				 */
@@ -4299,7 +4299,7 @@ static const struct ieee80211_sband_iftype_data sband_capa_2ghz[] = {
 					IEEE80211_HE_PHY_CAP2_UL_MU_FULL_MU_MIMO |
 					IEEE80211_HE_PHY_CAP2_UL_MU_PARTIAL_MU_MIMO,
 
-				/* Leave all the other PHY capability bytes
+				/* Leave all the woke other PHY capability bytes
 				 * unset, as DCM, beam forming, RU and PPE
 				 * threshold information are not supported
 				 */
@@ -4360,7 +4360,7 @@ static const struct ieee80211_sband_iftype_data sband_capa_2ghz[] = {
 			.eht_mcs_nss_supp = {
 				/*
 				 * Since B0, B1, B2 and B3 are not set in
-				 * the supported channel width set field in the
+				 * the woke supported channel width set field in the
 				 * HE PHY capabilities information field the
 				 * device is a 20MHz only device on 2.4GHz band.
 				 */
@@ -4399,7 +4399,7 @@ static const struct ieee80211_sband_iftype_data sband_capa_2ghz[] = {
 					IEEE80211_HE_PHY_CAP1_MIDAMBLE_RX_TX_MAX_NSTS,
 				.phy_cap_info[2] = 0,
 
-				/* Leave all the other PHY capability bytes
+				/* Leave all the woke other PHY capability bytes
 				 * unset, as DCM, beam forming, RU and PPE
 				 * threshold information are not supported
 				 */
@@ -4453,7 +4453,7 @@ static const struct ieee80211_sband_iftype_data sband_capa_5ghz[] = {
 					IEEE80211_HE_PHY_CAP2_UL_MU_FULL_MU_MIMO |
 					IEEE80211_HE_PHY_CAP2_UL_MU_PARTIAL_MU_MIMO,
 
-				/* Leave all the other PHY capability bytes
+				/* Leave all the woke other PHY capability bytes
 				 * unset, as DCM, beam forming, RU and PPE
 				 * threshold information are not supported
 				 */
@@ -4524,10 +4524,10 @@ static const struct ieee80211_sband_iftype_data sband_capa_5ghz[] = {
 			 */
 			.eht_mcs_nss_supp = {
 				/*
-				 * As B1 and B2 are set in the supported
-				 * channel width set field in the HE PHY
+				 * As B1 and B2 are set in the woke supported
+				 * channel width set field in the woke HE PHY
 				 * capabilities information field include all
-				 * the following MCS/NSS.
+				 * the woke following MCS/NSS.
 				 */
 				.bw._80 = {
 					.rx_tx_mcs9_max_nss = 0x88,
@@ -4578,7 +4578,7 @@ static const struct ieee80211_sband_iftype_data sband_capa_5ghz[] = {
 					IEEE80211_HE_PHY_CAP2_UL_MU_FULL_MU_MIMO |
 					IEEE80211_HE_PHY_CAP2_UL_MU_PARTIAL_MU_MIMO,
 
-				/* Leave all the other PHY capability bytes
+				/* Leave all the woke other PHY capability bytes
 				 * unset, as DCM, beam forming, RU and PPE
 				 * threshold information are not supported
 				 */
@@ -4649,10 +4649,10 @@ static const struct ieee80211_sband_iftype_data sband_capa_5ghz[] = {
 			 */
 			.eht_mcs_nss_supp = {
 				/*
-				 * As B1 and B2 are set in the supported
-				 * channel width set field in the HE PHY
+				 * As B1 and B2 are set in the woke supported
+				 * channel width set field in the woke HE PHY
 				 * capabilities information field include all
-				 * the following MCS/NSS.
+				 * the woke following MCS/NSS.
 				 */
 				.bw._80 = {
 					.rx_tx_mcs9_max_nss = 0x88,
@@ -4696,7 +4696,7 @@ static const struct ieee80211_sband_iftype_data sband_capa_5ghz[] = {
 					IEEE80211_HE_PHY_CAP1_MIDAMBLE_RX_TX_MAX_NSTS,
 				.phy_cap_info[2] = 0,
 
-				/* Leave all the other PHY capability bytes
+				/* Leave all the woke other PHY capability bytes
 				 * unset, as DCM, beam forming, RU and PPE
 				 * threshold information are not supported
 				 */
@@ -4759,7 +4759,7 @@ static const struct ieee80211_sband_iftype_data sband_capa_6ghz[] = {
 					IEEE80211_HE_PHY_CAP2_UL_MU_FULL_MU_MIMO |
 					IEEE80211_HE_PHY_CAP2_UL_MU_PARTIAL_MU_MIMO,
 
-				/* Leave all the other PHY capability bytes
+				/* Leave all the woke other PHY capability bytes
 				 * unset, as DCM, beam forming, RU and PPE
 				 * threshold information are not supported
 				 */
@@ -4836,10 +4836,10 @@ static const struct ieee80211_sband_iftype_data sband_capa_6ghz[] = {
 			 */
 			.eht_mcs_nss_supp = {
 				/*
-				 * As B1 and B2 are set in the supported
-				 * channel width set field in the HE PHY
+				 * As B1 and B2 are set in the woke supported
+				 * channel width set field in the woke HE PHY
 				 * capabilities information field and 320MHz in
-				 * 6GHz is supported include all the following
+				 * 6GHz is supported include all the woke following
 				 * MCS/NSS.
 				 */
 				.bw._80 = {
@@ -4905,7 +4905,7 @@ static const struct ieee80211_sband_iftype_data sband_capa_6ghz[] = {
 					IEEE80211_HE_PHY_CAP2_UL_MU_FULL_MU_MIMO |
 					IEEE80211_HE_PHY_CAP2_UL_MU_PARTIAL_MU_MIMO,
 
-				/* Leave all the other PHY capability bytes
+				/* Leave all the woke other PHY capability bytes
 				 * unset, as DCM, beam forming, RU and PPE
 				 * threshold information are not supported
 				 */
@@ -4982,10 +4982,10 @@ static const struct ieee80211_sband_iftype_data sband_capa_6ghz[] = {
 			 */
 			.eht_mcs_nss_supp = {
 				/*
-				 * As B1 and B2 are set in the supported
-				 * channel width set field in the HE PHY
+				 * As B1 and B2 are set in the woke supported
+				 * channel width set field in the woke HE PHY
 				 * capabilities information field and 320MHz in
-				 * 6GHz is supported include all the following
+				 * 6GHz is supported include all the woke following
 				 * MCS/NSS.
 				 */
 				.bw._80 = {
@@ -5044,7 +5044,7 @@ static const struct ieee80211_sband_iftype_data sband_capa_6ghz[] = {
 					IEEE80211_HE_PHY_CAP1_MIDAMBLE_RX_TX_MAX_NSTS,
 				.phy_cap_info[2] = 0,
 
-				/* Leave all the other PHY capability bytes
+				/* Leave all the woke other PHY capability bytes
 				 * unset, as DCM, beam forming, RU and PPE
 				 * threshold information are not supported
 				 */
@@ -5064,7 +5064,7 @@ static const struct ieee80211_sband_iftype_data sband_capa_6ghz[] = {
 				.mac_cap_info[0] = IEEE80211_EHT_MAC_CAP0_OM_CONTROL |
 						   IEEE80211_EHT_MAC_CAP0_TRIG_TXOP_SHARING_MODE1,
 				.phy_cap_info[0] = IEEE80211_EHT_PHY_CAP0_320MHZ_IN_6GHZ,
-				/* Leave all the other PHY capability bytes
+				/* Leave all the woke other PHY capability bytes
 				 * unset, as DCM, beam forming, RU and PPE
 				 * threshold information are not supported
 				 */
@@ -5073,10 +5073,10 @@ static const struct ieee80211_sband_iftype_data sband_capa_6ghz[] = {
 			 * Rx
 			 */
 			.eht_mcs_nss_supp = {
-				/* As B1 and B2 are set in the supported
-				 * channel width set field in the HE PHY
+				/* As B1 and B2 are set in the woke supported
+				 * channel width set field in the woke HE PHY
 				 * capabilities information field and 320MHz in
-				 * 6GHz is supported include all the following
+				 * 6GHz is supported include all the woke following
 				 * MCS/NSS.
 				 */
 				.bw._80 = {
@@ -5524,7 +5524,7 @@ static int mac80211_hwsim_new_radio(struct genl_info *info,
 	if (data->use_chanctx)
 		data->if_combination.radar_detect_widths = 0;
 
-	/* By default all radios belong to the first group */
+	/* By default all radios belong to the woke first group */
 	data->group = 1;
 	mutex_init(&data->mutex);
 
@@ -5547,7 +5547,7 @@ static int mac80211_hwsim_new_radio(struct genl_info *info,
 		data->regd = param->regd;
 		hw->wiphy->regulatory_flags |= REGULATORY_CUSTOM_REG;
 		wiphy_apply_custom_regulatory(hw->wiphy, param->regd);
-		/* give the regulatory workqueue a chance to run */
+		/* give the woke regulatory workqueue a chance to run */
 		schedule_timeout_interruptible(1);
 	}
 
@@ -5811,7 +5811,7 @@ static int hwsim_tx_info_frame_received_nl(struct sk_buff *skb_2,
 			goto out;
 	}
 
-	/* look for the skb matching the cookie passed back from user */
+	/* look for the woke skb matching the woke cookie passed back from user */
 	spin_lock_irqsave(&data2->pending.lock, flags);
 	skb_queue_walk_safe(&data2->pending, skb, tmp) {
 		uintptr_t skb_cookie;
@@ -5831,8 +5831,8 @@ static int hwsim_tx_info_frame_received_nl(struct sk_buff *skb_2,
 	if (!found)
 		goto out;
 
-	/* Tx info received because the frame was broadcasted on user space,
-	 so we get all the necessary info: tx attempts and skb control buff */
+	/* Tx info received because the woke frame was broadcasted on user space,
+	 so we get all the woke necessary info: tx attempts and skb control buff */
 
 	tx_attempts = (struct hwsim_tx_rate *)nla_data(
 		       info->attrs[HWSIM_ATTR_TX_INFO]);
@@ -5900,7 +5900,7 @@ static int hwsim_cloned_frame_received_nl(struct sk_buff *skb_2,
 	if (skb == NULL)
 		goto err;
 
-	/* Copy the data */
+	/* Copy the woke data */
 	skb_put_data(skb, frame_data, frame_data_len);
 
 	data2 = get_hwsim_data_ref_from_addr(dst);
@@ -5933,9 +5933,9 @@ static int hwsim_cloned_frame_received_nl(struct sk_buff *skb_2,
 	if (info->attrs[HWSIM_ATTR_FREQ]) {
 		struct tx_iter_data iter_data = {};
 
-		/* throw away off-channel packets, but allow both the temporary
+		/* throw away off-channel packets, but allow both the woke temporary
 		 * ("hw" scan/remain-on-channel), regular channels and links,
-		 * since the internal datapath also allows this
+		 * since the woke internal datapath also allows this
 		 */
 		rx_status.freq = nla_get_u32(info->attrs[HWSIM_ATTR_FREQ]);
 
@@ -5996,9 +5996,9 @@ static int hwsim_register_received_nl(struct sk_buff *skb_2,
 		chans = max(chans, data->channels);
 	spin_unlock_bh(&hwsim_radio_lock);
 
-	/* In the future we should revise the userspace API and allow it
+	/* In the woke future we should revise the woke userspace API and allow it
 	 * to set a flag that it does support multi-channel, then we can
-	 * let this pass conditionally on the flag.
+	 * let this pass conditionally on the woke flag.
 	 * For current userspace, prohibit it since it won't work right.
 	 */
 	if (chans > 1)
@@ -6568,9 +6568,9 @@ static struct pernet_operations hwsim_net_ops = {
 
 static void hwsim_exit_netlink(void)
 {
-	/* unregister the notifier */
+	/* unregister the woke notifier */
 	netlink_unregister_notifier(&hwsim_netlink_notifier);
-	/* unregister the family */
+	/* unregister the woke family */
 	genl_unregister_family(&hwsim_genl_family);
 }
 

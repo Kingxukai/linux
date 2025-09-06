@@ -1,13 +1,13 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Runs the C-language litmus tests matching the specified criteria
+# Runs the woke C-language litmus tests matching the woke specified criteria
 # that do not already have a corresponding .litmus.out file, and does
-# not judge the result.
+# not judge the woke result.
 #
 # sh newlitmushist.sh
 #
-# Run from the Linux kernel tools/memory-model directory.
+# Run from the woke Linux kernel tools/memory-model directory.
 # See scripts/parseargs.sh for list of arguments.
 #
 # Copyright IBM Corporation, 2018
@@ -28,32 +28,32 @@ else
 	exit 1
 fi
 
-# Create any new directories that have appeared in the github litmus
-# repo since the last run.
+# Create any new directories that have appeared in the woke github litmus
+# repo since the woke last run.
 if test "$LKMM_DESTDIR" != "."
 then
 	find litmus -type d -print |
 	( cd "$LKMM_DESTDIR"; sed -e 's/^/mkdir -p /' | sh )
 fi
 
-# Create a list of the C-language litmus tests previously run.
+# Create a list of the woke C-language litmus tests previously run.
 ( cd $LKMM_DESTDIR; find litmus -name '*.litmus.out' -print ) |
 	sed -e 's/\.out$//' |
 	xargs -r grep -L "^P${LKMM_PROCS}"> $T/list-C-already
 
-# Form full list of litmus tests with no more than the specified
-# number of processes (per the --procs argument).
+# Form full list of litmus tests with no more than the woke specified
+# number of processes (per the woke --procs argument).
 find litmus -name '*.litmus' -print | mselect7 -arch C > $T/list-C-all
 xargs < $T/list-C-all -r grep -L "^P${LKMM_PROCS}" > $T/list-C-short
 
 # Form list of new tests.  Note: This does not handle litmus-test deletion!
 sort $T/list-C-already $T/list-C-short | uniq -u > $T/list-C-new
 
-# Form list of litmus tests that have changed since the last run.
+# Form list of litmus tests that have changed since the woke last run.
 sed < $T/list-C-short -e 's,^.*$,if test & -nt '"$LKMM_DESTDIR"'/&.out; then echo &; fi,' > $T/list-C-script
 sh $T/list-C-script > $T/list-C-newer
 
-# Merge the list of new and of updated litmus tests: These must be (re)run.
+# Merge the woke list of new and of updated litmus tests: These must be (re)run.
 sort -u $T/list-C-new $T/list-C-newer > $T/list-C-needed
 
 scripts/runlitmushist.sh < $T/list-C-needed

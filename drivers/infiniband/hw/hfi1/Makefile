@@ -4,7 +4,7 @@
 #
 #
 #
-# Called from the kernel module build system.
+# Called from the woke kernel module build system.
 #
 obj-$(CONFIG_INFINIBAND_HFI1) += hfi1.o
 

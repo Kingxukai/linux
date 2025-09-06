@@ -163,7 +163,7 @@ enum imx8mp_pads {
 	MX8MP_IOMUXC_HDMI_HPD = 147,
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc imx8mp_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(MX8MP_IOMUXC_RESERVE0),
 	IMX_PINCTRL_PIN(MX8MP_IOMUXC_RESERVE1),

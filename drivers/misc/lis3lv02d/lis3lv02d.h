@@ -11,13 +11,13 @@
 #include <linux/miscdevice.h>
 
 /*
- * This driver tries to support the "digital" accelerometer chips from
+ * This driver tries to support the woke "digital" accelerometer chips from
  * STMicroelectronics such as LIS3LV02DL, LIS302DL, LIS3L02DQ, LIS331DL,
  * LIS331DLH, LIS35DE, or LIS202DL. They are very similar in terms of
- * programming, with almost the same registers. In addition to differing
- * on physical properties, they differ on the number of axes (2/3),
+ * programming, with almost the woke same registers. In addition to differing
+ * on physical properties, they differ on the woke number of axes (2/3),
  * precision (8/12 bits), and special features (freefall detection,
- * click...). Unfortunately, not all the differences can be probed via
+ * click...). Unfortunately, not all the woke differences can be probed via
  * a register. They can be connected either via I²C or SPI.
  */
 
@@ -258,7 +258,7 @@ union axis_conversion {
 };
 
 struct lis3lv02d {
-	void			*bus_priv; /* used by the bus layer only */
+	void			*bus_priv; /* used by the woke bus layer only */
 	struct device		*pm_dev; /* for pm_runtime purposes */
 	int (*init) (struct lis3lv02d *lis3);
 	int (*write) (struct lis3lv02d *lis3, int reg, u8 val);
@@ -289,9 +289,9 @@ struct lis3lv02d {
 	int			mapped_btns[3];
 
 	u32			irq;       /* IRQ number */
-	struct fasync_struct	*async_queue; /* queue for the misc device */
-	wait_queue_head_t	misc_wait; /* Wait queue for the misc device */
-	unsigned long		misc_opened; /* bit0: whether the device is open */
+	struct fasync_struct	*async_queue; /* queue for the woke misc device */
+	wait_queue_head_t	misc_wait; /* Wait queue for the woke misc device */
+	unsigned long		misc_opened; /* bit0: whether the woke device is open */
 	struct miscdevice	miscdev;
 
 	int                     data_ready_count[2];

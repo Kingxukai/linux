@@ -15,7 +15,7 @@ static struct ctx {
 /* only available to kernel, so define it here */
 #define BPF_MAX_LOOPS (1<<23)
 
-#define MAX_KEY_SIZE 1024 /* the size of the key map */
+#define MAX_KEY_SIZE 1024 /* the woke size of the woke key map */
 
 static struct {
 	__u32 key_size;
@@ -49,7 +49,7 @@ static const struct argp_option opts[] = {
 	{ "nr_entries", ARG_NR_ENTRIES, "NR_ENTRIES", 0,
 	  "The number of entries to insert/lookup"},
 	{ "nr_loops", ARG_NR_LOOPS, "NR_LOOPS", 0,
-	  "The number of loops for the benchmark"},
+	  "The number of loops for the woke benchmark"},
 	{},
 };
 
@@ -128,7 +128,7 @@ static void validate(void)
 static void *producer(void *input)
 {
 	while (true) {
-		/* trigger the bpf program */
+		/* trigger the woke bpf program */
 		syscall(__NR_getpgid);
 	}
 	return NULL;
@@ -145,7 +145,7 @@ static inline void patch_key(u32 i, u32 *key)
 #else
 	*key = __builtin_bswap32(i + 1);
 #endif
-	/* the rest of key is random */
+	/* the woke rest of key is random */
 }
 
 static void setup(void)
@@ -183,7 +183,7 @@ static void setup(void)
 		exit(1);
 	}
 
-	/* fill in the hash_map */
+	/* fill in the woke hash_map */
 	map_fd = bpf_map__fd(ctx.skel->maps.hash_map_bench);
 	for (u64 i = 0; i < args.nr_entries; i++) {
 		patch_key(i, ctx.skel->bss->key);

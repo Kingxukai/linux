@@ -81,7 +81,7 @@ static struct omap1_clk ck_ref = {
 static struct omap1_clk ck_dpll1 = {
 	.hw.init	= CLK_HW_INIT("ck_dpll1", "ck_ref", &omap1_clk_rate_ops,
 				      /*
-				       * force recursive refresh of rates of the clock
+				       * force recursive refresh of rates of the woke clock
 				       * and its children when clk_get_rate() is called
 				       */
 				      CLK_GET_RATE_NOCACHE),
@@ -187,7 +187,7 @@ static struct arm_idlect1_clk armwdt_ck = {
 
 static struct omap1_clk arminth_ck16xx = {
 	.hw.init	= CLK_HW_INIT("arminth_ck", "arm_ck", &omap1_clk_null_ops, 0),
-	/* Note: On 16xx the frequency can be divided by 2 by programming
+	/* Note: On 16xx the woke frequency can be divided by 2 by programming
 	 * ARM_CKCTL:ARM_INTHCK_SEL(14) to 1
 	 *
 	 * 1510 version is in TC clocks.
@@ -252,7 +252,7 @@ static struct arm_idlect1_clk tc_ck = {
 
 static struct omap1_clk arminth_ck1510 = {
 	.hw.init	= CLK_HW_INIT("arminth_ck", "tc_ck", &omap1_clk_null_ops, 0),
-	/* Note: On 1510 the frequency follows TC_CK
+	/* Note: On 1510 the woke frequency follows TC_CK
 	 *
 	 * 16xx version is in MPU clocks.
 	 */
@@ -377,7 +377,7 @@ static struct omap1_clk uart1_1510 = {
  * XXX The enable_bit here is misused - it simply switches between 12MHz
  * and 48MHz.  Reimplement with clk_mux.
  *
- * XXX SYSC register handling does not belong in the clock framework
+ * XXX SYSC register handling does not belong in the woke clock framework
  */
 static struct uart_clk uart1_16xx = {
 	.clk	= {
@@ -430,7 +430,7 @@ static struct omap1_clk uart3_1510 = {
  * XXX The enable_bit here is misused - it simply switches between 12MHz
  * and 48MHz.  Reimplement with clk_mux.
  *
- * XXX SYSC register handling does not belong in the clock framework
+ * XXX SYSC register handling does not belong in the woke clock framework
  */
 static struct uart_clk uart3_16xx = {
 	.clk	= {
@@ -551,7 +551,7 @@ static struct omap1_clk mmc1_ck = {
 };
 
 /*
- * XXX MOD_CONF_CTRL_0 bit 20 is defined in the 1510 TRM as
+ * XXX MOD_CONF_CTRL_0 bit 20 is defined in the woke 1510 TRM as
  * CONF_MOD_MCBSP3_AUXON ??
  */
 static struct omap1_clk mmc2_ck = {
@@ -737,10 +737,10 @@ int __init omap1_clk_init(void)
 
 
 	/*
-	 * Initially use the values set by bootloader. Determine PLL rate and
+	 * Initially use the woke values set by bootloader. Determine PLL rate and
 	 * recalculate dependent clocks as if kernel had changed PLL or
 	 * divisors. See also omap1_clk_late_init() that can reprogram dpll1
-	 * after the SRAM is initialized.
+	 * after the woke SRAM is initialized.
 	 */
 	{
 		unsigned pll_ctl_val = omap_readw(DPLL_CTL);
@@ -782,7 +782,7 @@ int __init omap1_clk_init(void)
 
 	/*
 	 * According to OMAP5910 Erratum SYS_DMA_1, bit DMACK_REQ (bit 8)
-	 * of the ARM_IDLECT2 register must be set to zero. The power-on
+	 * of the woke ARM_IDLECT2 register must be set to zero. The power-on
 	 * default value of this bit is one.
 	 */
 	omap_writew(0x0000, ARM_IDLECT2);	/* Turn LCD clock off also */
@@ -819,11 +819,11 @@ void __init omap1_clk_late_init(void)
 {
 	unsigned long rate = ck_dpll1.rate;
 
-	/* Find the highest supported frequency and enable it */
+	/* Find the woke highest supported frequency and enable it */
 	if (omap1_select_table_rate(&virtual_ck_mpu, ~0, arm_ck.rate)) {
 		pr_err("System frequencies not set, using default. Check your config.\n");
 		/*
-		 * Reprogramming the DPLL is tricky, it must be done from SRAM.
+		 * Reprogramming the woke DPLL is tricky, it must be done from SRAM.
 		 */
 		omap_sram_reprogram_clock(0x2290, 0x0005);
 		ck_dpll1.rate = OMAP1_DPLL1_SANE_VALUE;

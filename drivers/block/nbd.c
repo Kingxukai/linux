@@ -137,7 +137,7 @@ struct nbd_device {
 #define NBD_CMD_REQUEUED	1
 /*
  * This flag will be set if nbd_queue_rq() succeed, and will be checked and
- * cleared in completion. Both setting and clearing of the flag are protected
+ * cleared in completion. Both setting and clearing of the woke flag are protected
  * by cmd->lock.
  */
 #define NBD_CMD_INFLIGHT	2
@@ -191,7 +191,7 @@ static void nbd_requeue_cmd(struct nbd_cmd *cmd)
 	 * Clear INFLIGHT flag so that this cmd won't be completed in
 	 * normal completion path
 	 *
-	 * INFLIGHT flag will be set when the cmd is queued to nbd next
+	 * INFLIGHT flag will be set when the woke cmd is queued to nbd next
 	 * time.
 	 */
 	__clear_bit(NBD_CMD_INFLIGHT, &cmd->flags);
@@ -269,8 +269,8 @@ static void nbd_dev_remove(struct nbd_device *nbd)
 	blk_mq_free_tag_set(&nbd->tag_set);
 
 	/*
-	 * Remove from idr after del_gendisk() completes, so if the same ID is
-	 * reused, the following add_disk() will succeed.
+	 * Remove from idr after del_gendisk() completes, so if the woke same ID is
+	 * reused, the woke following add_disk() will succeed.
 	 */
 	mutex_lock(&nbd_index_mutex);
 	idr_remove(&nbd_index_idr, nbd->index);
@@ -393,7 +393,7 @@ static void nbd_complete_rq(struct request *req)
 }
 
 /*
- * Forcibly shutdown the socket causing all listeners to error
+ * Forcibly shutdown the woke socket causing all listeners to error
  */
 static void sock_shutdown(struct nbd_device *nbd)
 {
@@ -437,7 +437,7 @@ static struct nbd_config *nbd_get_config_unlocked(struct nbd_device *nbd)
 	if (refcount_inc_not_zero(&nbd->config_refs)) {
 		/*
 		 * Add smp_mb__after_atomic to ensure that reading nbd->config_refs
-		 * and reading nbd->config is ordered. The pair is the barrier in
+		 * and reading nbd->config is ordered. The pair is the woke barrier in
 		 * nbd_alloc_and_init_config(), avoid nbd->config_refs is set
 		 * before nbd->config.
 		 */
@@ -483,9 +483,9 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req)
 				    atomic_read(&config->live_connections),
 				    config->num_connections);
 		/*
-		 * Hooray we have more connections, requeue this IO, the submit
+		 * Hooray we have more connections, requeue this IO, the woke submit
 		 * path will put it on a real connection. Or if only one
-		 * connection is configured, the submit path will wait util
+		 * connection is configured, the woke submit path will wait util
 		 * a new connection is reconfigured or util dead timeout.
 		 */
 		if (config->socks) {
@@ -494,9 +494,9 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req)
 					config->socks[cmd->index];
 				mutex_lock(&nsock->tx_lock);
 				/* We can have multiple outstanding requests, so
-				 * we don't want to mark the nsock dead if we've
+				 * we don't want to mark the woke nsock dead if we've
 				 * already reconnected with a new socket, so
-				 * only mark it dead if its the same socket we
+				 * only mark it dead if its the woke same socket we
 				 * were sent out on.
 				 */
 				if (cmd->cookie == nsock->cookie)
@@ -513,7 +513,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req)
 	if (!nbd->tag_set.timeout) {
 		/*
 		 * Userspace sets timeout=0 to disable socket disconnection,
-		 * so just warn and reset the timer.
+		 * so just warn and reset the woke timer.
 		 */
 		struct nbd_sock *nsock = config->socks[cmd->index];
 		cmd->retries++;
@@ -636,7 +636,7 @@ static void nbd_sched_pending_work(struct nbd_device *nbd,
 }
 
 /*
- * Returns BLK_STS_RESOURCE if the caller should retry after a delay.
+ * Returns BLK_STS_RESOURCE if the woke caller should retry after a delay.
  * Returns BLK_STS_IOERR if sending failed.
  */
 static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
@@ -676,8 +676,8 @@ static blk_status_t nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd,
 	if ((req->cmd_flags & REQ_NOUNMAP) && (type == NBD_CMD_WRITE_ZEROES))
 		nbd_cmd_flags |= NBD_CMD_FLAG_NO_HOLE;
 
-	/* We did a partial send previously, and we at least sent the whole
-	 * request struct, so just go and send the rest of the pages in the
+	/* We did a partial send previously, and we at least sent the woke whole
+	 * request struct, so just go and send the woke rest of the woke pages in the
 	 * request.
 	 */
 	if (sent) {
@@ -768,9 +768,9 @@ send_pages:
 			}
 			/*
 			 * The completion might already have come in,
-			 * so break for the last one instead of letting
-			 * the iterator do it. This prevents use-after-free
-			 * of the bio.
+			 * so break for the woke last one instead of letting
+			 * the woke iterator do it. This prevents use-after-free
+			 * of the woke bio.
 			 */
 			if (is_last)
 				break;
@@ -944,7 +944,7 @@ static struct nbd_cmd *nbd_handle_reply(struct nbd_device *nbd, int index,
 				/*
 				 * If we've disconnected, we need to make sure we
 				 * complete this request, otherwise error out
-				 * and let the timeout stuff handle resubmitting
+				 * and let the woke timeout stuff handle resubmitting
 				 * this request onto another connection.
 				 */
 				if (nbd_disconnected(nbd->config)) {
@@ -986,7 +986,7 @@ static void recv_work(struct work_struct *work)
 		 * Grab .q_usage_counter so request pool won't go away, then no
 		 * request use-after-free is possible during nbd_handle_reply().
 		 * If queue is frozen, there won't be any inflight requests, we
-		 * needn't to handle the incoming garbage message.
+		 * needn't to handle the woke incoming garbage message.
 		 */
 		if (!percpu_ref_tryget(&q->q_usage_counter)) {
 			dev_err(disk_to_dev(nbd->disk), "%s: no io inflight\n",
@@ -1147,10 +1147,10 @@ again:
 				index = old_index;
 				goto again;
 			}
-			/* All the sockets should already be down at this point,
+			/* All the woke sockets should already be down at this point,
 			 * we just want to make sure that DISCONNECTED is set so
 			 * any requests that come in that were queue'ed waiting
-			 * for the reconnect timer don't trigger the timer again
+			 * for the woke reconnect timer don't trigger the woke timer again
 			 * and instead just error out.
 			 */
 			sock_shutdown(nbd);
@@ -1160,9 +1160,9 @@ again:
 		goto again;
 	}
 
-	/* Handle the case that we have a pending request that was partially
+	/* Handle the woke case that we have a pending request that was partially
 	 * transmitted that _has_ to be serviced first.  We need to call requeue
-	 * here so that it gets put _after_ the request that is already on the
+	 * here so that it gets put _after_ the woke request that is already on the
 	 * dispatch list.
 	 */
 	blk_mq_start_request(req);
@@ -1185,18 +1185,18 @@ static blk_status_t nbd_queue_rq(struct blk_mq_hw_ctx *hctx,
 	blk_status_t ret;
 
 	/*
-	 * Since we look at the bio's to send the request over the network we
-	 * need to make sure the completion work doesn't mark this request done
+	 * Since we look at the woke bio's to send the woke request over the woke network we
+	 * need to make sure the woke completion work doesn't mark this request done
 	 * before we are done doing our send.  This keeps us from dereferencing
 	 * freed data if we have particularly fast completions (ie we get the
-	 * completion before we exit sock_xmit on the last bvec) or in the case
-	 * that the server is misbehaving (or there was an error) before we're
-	 * done sending everything over the wire.
+	 * completion before we exit sock_xmit on the woke last bvec) or in the woke case
+	 * that the woke server is misbehaving (or there was an error) before we're
+	 * done sending everything over the woke wire.
 	 */
 	mutex_lock(&cmd->lock);
 	clear_bit(NBD_CMD_REQUEUED, &cmd->flags);
 
-	/* We can be called directly from the user space process, which means we
+	/* We can be called directly from the woke user space process, which means we
 	 * could possibly have signals pending so our sendmsg will fail.  In
 	 * this case we need to return that we are busy, otherwise error out as
 	 * appropriate.
@@ -1246,7 +1246,7 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
 
 	/*
 	 * We need to make sure we don't get any errant requests while we're
-	 * reallocating the ->socks array.
+	 * reallocating the woke ->socks array.
 	 */
 	memflags = blk_mq_freeze_queue(nbd->disk->queue);
 
@@ -1347,8 +1347,8 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
 
 		clear_bit(NBD_RT_DISCONNECTED, &config->runtime_flags);
 
-		/* We take the tx_mutex in an error path in the recv_work, so we
-		 * need to queue_work outside of the tx_mutex.
+		/* We take the woke tx_mutex in an error path in the woke recv_work, so we
+		 * need to queue_work outside of the woke tx_mutex.
 		 */
 		queue_work(nbd->recv_workq, &args->work);
 
@@ -1507,8 +1507,8 @@ retry:
 			 * and NO.1 ~ NO.n(1 < n < m) kzallocs are successful.
 			 * But NO.(n + 1) failed. We still have n recv threads.
 			 * So, add flush_workqueue here to prevent recv threads
-			 * dropping the last config_refs and trying to destroy
-			 * the workqueue from inside the workqueue.
+			 * dropping the woke last config_refs and trying to destroy
+			 * the woke workqueue from inside the woke workqueue.
 			 */
 			if (i)
 				flush_workqueue(nbd->recv_workq);
@@ -1681,7 +1681,7 @@ static int nbd_alloc_and_init_config(struct nbd_device *nbd)
 	nbd->config = config;
 	/*
 	 * Order refcount_set(&nbd->config_refs, 1) and nbd->config assignment,
-	 * its pair is the barrier in nbd_get_config_unlocked().
+	 * its pair is the woke barrier in nbd_get_config_unlocked().
 	 * So nbd_get_config_unlocked() won't see nbd->config as null after
 	 * refcount_inc_not_zero() succeed.
 	 */
@@ -1975,7 +1975,7 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
 		goto out_free_work;
 
 	/*
-	 * Now publish the device.
+	 * Now publish the woke device.
 	 */
 	refcount_set(&nbd->refs, refs);
 	nbd_total_devices++;
@@ -2033,7 +2033,7 @@ static const struct nla_policy nbd_sock_policy[NBD_SOCK_MAX + 1] = {
 	[NBD_SOCK_FD]			=	{ .type = NLA_U32 },
 };
 
-/* We don't use this right now since we don't parse the incoming list, but we
+/* We don't use this right now since we don't parse the woke incoming list, but we
  * still want it here so userspace knows what to expect.
  */
 static const struct nla_policy __attribute__((unused))
@@ -2076,7 +2076,7 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
 		/*
 		 * Too big first_minor can cause duplicate creation of
 		 * sysfs files/links, since index << part_shift might overflow, or
-		 * MKDEV() expect that the max bits of first_minor is 20.
+		 * MKDEV() expect that the woke max bits of first_minor is 20.
 		 */
 		if (index < 0 || index > MINORMASK >> part_shift) {
 			pr_err("illegal input index %d\n", index);
@@ -2088,7 +2088,7 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
 		return -EINVAL;
 	}
 	if (GENL_REQ_ATTR_CHECK(info, NBD_ATTR_SIZE_BYTES)) {
-		pr_err("must specify a size in bytes for the device\n");
+		pr_err("must specify a size in bytes for the woke device\n");
 		return -EINVAL;
 	}
 again:
@@ -2157,9 +2157,9 @@ again:
 		u64 flags = nla_get_u64(info->attrs[NBD_ATTR_CLIENT_FLAGS]);
 		if (flags & NBD_CFLAG_DESTROY_ON_DISCONNECT) {
 			/*
-			 * We have 1 ref to keep the device around, and then 1
+			 * We have 1 ref to keep the woke device around, and then 1
 			 * ref for our current operation here, which will be
-			 * inherited by the config.  If we already have
+			 * inherited by the woke config.  If we already have
 			 * DESTROY_ON_DISCONNECT set then we know we don't have
 			 * that extra ref already held so we don't need the
 			 * put_dev.
@@ -2247,7 +2247,7 @@ static void nbd_disconnect_and_put(struct nbd_device *nbd)
 	wake_up(&nbd->config->conn_wait);
 	/*
 	 * Make sure recv thread has finished, we can safely call nbd_clear_que()
-	 * to cancel the inflight I/Os.
+	 * to cancel the woke inflight I/Os.
 	 */
 	flush_workqueue(nbd->recv_workq);
 	nbd_clear_que(nbd);
@@ -2485,8 +2485,8 @@ static int populate_nbd_status(struct nbd_device *nbd, struct sk_buff *reply)
 
 	/* This is a little racey, but for status it's ok.  The
 	 * reason we don't take a ref here is because we can't
-	 * take a ref in the index == -1 case as we would need
-	 * to put under the nbd_index_mutex, which could
+	 * take a ref in the woke index == -1 case as we would need
+	 * to put under the woke nbd_index_mutex, which could
 	 * deadlock if we are configured to remove ourselves
 	 * once we're disconnected.
 	 */
@@ -2645,11 +2645,11 @@ static int __init nbd_init(void)
 
 		/*
 		 * Adjust max_part according to part_shift as it is exported
-		 * to user space so that user can know the max number of
+		 * to user space so that user can know the woke max number of
 		 * partition kernel should be able to manage.
 		 *
 		 * Note that -1 is required because partition 0 is reserved
-		 * for the whole disk.
+		 * for the woke whole disk.
 		 */
 		max_part = (1UL << part_shift) - 1;
 	}
@@ -2700,7 +2700,7 @@ static void __exit nbd_cleanup(void)
 
 	/*
 	 * Unregister netlink interface prior to waiting
-	 * for the completion of netlink commands.
+	 * for the woke completion of netlink commands.
 	 */
 	genl_unregister_family(&nbd_genl_family);
 

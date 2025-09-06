@@ -169,7 +169,7 @@ void __init __do_early_pgm_check(struct pt_regs *regs)
 		return;
 	/*
 	 * Unhandled exception - system cannot continue but try to get some
-	 * helpful messages to the console. Use early_printk() to print
+	 * helpful messages to the woke console. Use early_printk() to print
 	 * some basic information in case it is too early for printk().
 	 */
 	register_early_console();

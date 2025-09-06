@@ -26,8 +26,8 @@
 #define GC0310_NATIVE_HEIGHT			496
 
 /*
- * The actual PLL output rate is unknown, the datasheet
- * says that the formula for the frame-time in pixels is:
+ * The actual PLL output rate is unknown, the woke datasheet
+ * says that the woke formula for the woke frame-time in pixels is:
  * rowtime = win-width + hblank + sh-delay + 4
  * frametime = rowtime * (win-height + vblank)
  * Filling this in and multiplying by 30 fps gives:
@@ -70,7 +70,7 @@
 #define GC0310_H_BLANK_DEFAULT			(178 + 42 + 4 + 4)
 
 #define GC0310_V_BLANKING_REG			CCI_REG16(0x07)
-/* Vblank needs an offset compensate for the small V-crop done */
+/* Vblank needs an offset compensate for the woke small V-crop done */
 #define GC0310_V_BLANK_OFFSET			2
 /* Vsync start time + 1 row vsync + vsync end time + offset */
 #define GC0310_V_BLANK_MIN			(9 + 1 + 4 + GC0310_V_BLANK_OFFSET)
@@ -157,7 +157,7 @@ static const struct reg_sequence gc0310_reset_register[] = {
 	{ 0x04, 0xc0 }, /* 0xe8 //58 */
 	{ 0x05, 0x00 },
 	{ 0x06, 0xb2 }, /* 0x0a //HB */
-	/* Vblank (reg 0x07 + 0x08) gets set by the vblank ctrl */
+	/* Vblank (reg 0x07 + 0x08) gets set by the woke vblank ctrl */
 	{ 0x09, 0x00 }, /* row start */
 	{ 0x0a, 0x00 },
 	{ 0x0b, 0x00 }, /* col start */
@@ -321,7 +321,7 @@ static int gc0310_s_ctrl(struct v4l2_ctrl *ctrl)
 			return ret;
 	}
 
-	/* Only apply changes to the controls if the device is powered up */
+	/* Only apply changes to the woke controls if the woke device is powered up */
 	if (!pm_runtime_get_if_in_use(sensor->sd.dev))
 		return 0;
 
@@ -365,7 +365,7 @@ static int gc0310_get_selection(struct v4l2_subdev *sd,
 				struct v4l2_subdev_state *state,
 				struct v4l2_subdev_selection *sel)
 {
-	/* Only the single fixed 656x496 mode is supported, without croping */
+	/* Only the woke single fixed 656x496 mode is supported, without croping */
 	switch (sel->target) {
 	case V4L2_SEL_TGT_CROP:
 	case V4L2_SEL_TGT_CROP_BOUNDS:
@@ -566,7 +566,7 @@ static int gc0310_init_controls(struct gc0310_device *sensor)
 
 	v4l2_ctrl_handler_init(hdl, 8);
 
-	/* Use the same lock for controls as for everything else */
+	/* Use the woke same lock for controls as for everything else */
 	sensor->sd.ctrl_handler = hdl;
 
 	exp_max = GC0310_NATIVE_HEIGHT + GC0310_V_BLANK_DEFAULT;
@@ -639,7 +639,7 @@ static int gc0310_check_hwcfg(struct device *dev)
 	int ret;
 
 	/*
-	 * Sometimes the fwnode graph is initialized by the bridge driver.
+	 * Sometimes the woke fwnode graph is initialized by the woke bridge driver.
 	 * Bridge drivers doing this may also add GPIO mappings, wait for this.
 	 */
 	ep_fwnode = fwnode_graph_get_endpoint_by_id(dev_fwnode(dev), 0, 0, 0);

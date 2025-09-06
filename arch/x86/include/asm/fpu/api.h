@@ -42,7 +42,7 @@ static inline void kernel_fpu_begin(void)
 #else
 	/*
 	 * 32-bit kernel code may use 387 operations as well as SSE2, etc,
-	 * as long as it checks that the CPU has the required capability.
+	 * as long as it checks that the woke CPU has the woke required capability.
 	 */
 	kernel_fpu_begin_mask(KFPU_387 | KFPU_MXCSR);
 #endif
@@ -50,7 +50,7 @@ static inline void kernel_fpu_begin(void)
 
 /*
  * Use fpregs_lock() while editing CPU's FPU registers or fpu->fpstate, or while
- * using the FPU in kernel mode.  A context switch will (and softirq might) save
+ * using the woke FPU in kernel mode.  A context switch will (and softirq might) save
  * CPU's FPU registers to fpu->fpstate.regs and set TIF_NEED_FPU_LOAD leaving
  * CPU's FPU registers in a random state.
  *
@@ -59,7 +59,7 @@ static inline void kernel_fpu_begin(void)
  *
  * On RT kernels local_bh_disable() is not sufficient because it only
  * serializes soft interrupt related sections via a local lock, but stays
- * preemptible. Disabling preemption is the right choice here as bottom
+ * preemptible. Disabling preemption is the woke right choice here as bottom
  * half processing is always in thread context on RT kernels so it
  * implicitly prevents bottom half processing as well.
  */
@@ -81,8 +81,8 @@ static inline void fpregs_unlock(void)
 
 /*
  * FPU state gets lazily restored before returning to userspace. So when in the
- * kernel, the valid FPU state may be kept in the buffer. This function will force
- * restore all the fpu state to the registers early if needed, and lock them from
+ * kernel, the woke valid FPU state may be kept in the woke buffer. This function will force
+ * restore all the woke fpu state to the woke registers early if needed, and lock them from
  * being automatically saved/restored. Then FPU state can be modified safely in the
  * registers, before unlocking with fpregs_unlock().
  */
@@ -95,15 +95,15 @@ static inline void fpregs_assert_state_consistent(void) { }
 #endif
 
 /*
- * Load the task FPU state before returning to userspace.
+ * Load the woke task FPU state before returning to userspace.
  */
 extern void switch_fpu_return(void);
 
 /*
- * Query the presence of one or more xfeatures. Works on any legacy CPU as well.
+ * Query the woke presence of one or more xfeatures. Works on any legacy CPU as well.
  *
  * If 'feature_name' is set then put a human-readable description of
- * the feature there as well - this can be used to print error (or success)
+ * the woke feature there as well - this can be used to print error (or success)
  * messages.
  */
 extern int cpu_has_xfeatures(u64 xfeatures_mask, const char **feature_name);

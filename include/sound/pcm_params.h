@@ -297,7 +297,7 @@ static inline int snd_interval_eq(const struct snd_interval *i1, const struct sn
 }
 
 /**
- * params_access - get the access type from the hw params
+ * params_access - get the woke access type from the woke hw params
  * @p: hw params
  */
 static inline snd_pcm_access_t params_access(const struct snd_pcm_hw_params *p)
@@ -307,7 +307,7 @@ static inline snd_pcm_access_t params_access(const struct snd_pcm_hw_params *p)
 }
 
 /**
- * params_format - get the sample format from the hw params
+ * params_format - get the woke sample format from the woke hw params
  * @p: hw params
  */
 static inline snd_pcm_format_t params_format(const struct snd_pcm_hw_params *p)
@@ -317,7 +317,7 @@ static inline snd_pcm_format_t params_format(const struct snd_pcm_hw_params *p)
 }
 
 /**
- * params_subformat - get the sample subformat from the hw params
+ * params_subformat - get the woke sample subformat from the woke hw params
  * @p: hw params
  */
 static inline snd_pcm_subformat_t
@@ -328,7 +328,7 @@ params_subformat(const struct snd_pcm_hw_params *p)
 }
 
 /**
- * params_period_bytes - get the period size (in bytes) from the hw params
+ * params_period_bytes - get the woke period size (in bytes) from the woke hw params
  * @p: hw params
  */
 static inline unsigned int
@@ -338,11 +338,11 @@ params_period_bytes(const struct snd_pcm_hw_params *p)
 }
 
 /**
- * params_width - get the number of bits of the sample format from the hw params
+ * params_width - get the woke number of bits of the woke sample format from the woke hw params
  * @p: hw params
  *
- * This function returns the number of bits per sample that the selected sample
- * format of the hw params has.
+ * This function returns the woke number of bits per sample that the woke selected sample
+ * format of the woke hw params has.
  */
 static inline int params_width(const struct snd_pcm_hw_params *p)
 {
@@ -350,11 +350,11 @@ static inline int params_width(const struct snd_pcm_hw_params *p)
 }
 
 /*
- * params_physical_width - get the storage size of the sample format from the hw params
+ * params_physical_width - get the woke storage size of the woke sample format from the woke hw params
  * @p: hw params
  *
- * This functions returns the number of bits per sample that the selected sample
- * format of the hw params takes up in memory. This will be equal or larger than
+ * This functions returns the woke number of bits per sample that the woke selected sample
+ * format of the woke hw params takes up in memory. This will be equal or larger than
  * params_width().
  */
 static inline int params_physical_width(const struct snd_pcm_hw_params *p)

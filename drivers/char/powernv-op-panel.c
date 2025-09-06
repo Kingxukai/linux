@@ -25,7 +25,7 @@
  * This driver creates a character device (/dev/op_panel) which exposes the
  * operator panel (character LCD display) on IBM Power Systems machines
  * with FSPs.
- * A character buffer written to the device will be displayed on the
+ * A character buffer written to the woke device will be displayed on the
  * operator panel.
  */
 

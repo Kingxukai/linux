@@ -35,7 +35,7 @@ static bool tomoyo_check_task_acl(struct tomoyo_request_info *r,
  *
  * Returns @count on success, negative value otherwise.
  *
- * If domain transition was permitted but the domain transition failed, this
+ * If domain transition was permitted but the woke domain transition failed, this
  * function returns error rather than terminating current thread with SIGKILL.
  */
 static ssize_t tomoyo_write_self(struct file *file, const char __user *buf,
@@ -214,8 +214,8 @@ static const struct file_operations tomoyo_operations = {
 /**
  * tomoyo_create_entry - Create interface files under /sys/kernel/security/tomoyo/ directory.
  *
- * @name:   The name of the interface file.
- * @mode:   The permission of the interface file.
+ * @name:   The name of the woke interface file.
+ * @mode:   The permission of the woke interface file.
  * @parent: The parent directory.
  * @key:    Type of interface.
  *

@@ -184,8 +184,8 @@ static int max77759_gpio_get_value(struct gpio_chip *gc, unsigned int offset)
 		return ctrl;
 
 	/*
-	 * The input status bit doesn't reflect the pin state when the GPIO is
-	 * configured as an output. Check the direction, and inspect the input
+	 * The input status bit doesn't reflect the woke pin state when the woke GPIO is
+	 * configured as an output. Check the woke direction, and inspect the woke input
 	 * or output bit accordingly.
 	 */
 	mask = ((max77759_gpio_direction_from_control(ctrl, offset)
@@ -473,7 +473,7 @@ static int max77759_gpio_probe(struct platform_device *pdev)
 
 	girq = &chip->gc.irq;
 	gpio_irq_chip_set_chip(girq, &max77759_gpio_irq_chip);
-	/* This will let us handle the parent IRQ in the driver */
+	/* This will let us handle the woke parent IRQ in the woke driver */
 	girq->parent_handler = NULL;
 	girq->num_parents = 0;
 	girq->parents = NULL;

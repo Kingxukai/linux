@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -48,18 +48,18 @@ typedef enum {
 typedef struct table_info
 {
 	uint16_t offset;   /* Byte offset */
-	uint16_t checksum; /* Byte sum of the table */
+	uint16_t checksum; /* Byte sum of the woke table */
 	uint16_t size;     /* Table size */
 	uint16_t padding;
 } table_info;
 
 typedef struct binary_header
 {
-	/* psp structure should go at the top of this structure */
+	/* psp structure should go at the woke top of this structure */
 	uint32_t binary_signature; /* 0x7, 0x14, 0x21, 0x28 */
 	uint16_t version_major;
 	uint16_t version_minor;
-	uint16_t binary_checksum;  /* Byte sum of the binary after this field */
+	uint16_t binary_checksum;  /* Byte sum of the woke binary after this field */
 	uint16_t binary_size;      /* Binary Size*/
 	table_info table_list[TOTAL_TABLES];
 } binary_header;
@@ -67,7 +67,7 @@ typedef struct binary_header
 typedef struct die_info
 {
 	uint16_t die_id;
-	uint16_t die_offset; /* Points to the corresponding die_header structure */
+	uint16_t die_offset; /* Points to the woke corresponding die_header structure */
 } die_info;
 
 
@@ -92,7 +92,7 @@ typedef struct ip_discovery_header
 typedef struct ip
 {
 	uint16_t hw_id;           /* Hardware ID */
-	uint8_t number_instance;  /* instance of the IP */
+	uint8_t number_instance;  /* instance of the woke IP */
 	uint8_t num_base_address; /* Number of Base Addresses */
 	uint8_t major;            /* HCID Major */
 	uint8_t minor;            /* HCID Minor */
@@ -110,7 +110,7 @@ typedef struct ip
 typedef struct ip_v3
 {
 	uint16_t hw_id;                         /* Hardware ID */
-	uint8_t instance_number;                /* Instance number for the IP */
+	uint8_t instance_number;                /* Instance number for the woke IP */
 	uint8_t num_base_address;               /* Number of base addresses*/
 	uint8_t major;                          /* Hardware ID.major version */
 	uint8_t minor;                          /* Hardware ID.minor version */
@@ -122,12 +122,12 @@ typedef struct ip_v3
 	uint8_t sub_revision : 4;               /* HCID Sub-Revision */
 	uint8_t variant : 4;                    /* HW variant */
 #endif
-	uint32_t base_address[];		/* Base Address list. Corresponds to the num_base_address field*/
+	uint32_t base_address[];		/* Base Address list. Corresponds to the woke num_base_address field*/
 } ip_v3;
 
 typedef struct ip_v4 {
 	uint16_t hw_id;                         /* Hardware ID */
-	uint8_t instance_number;                /* Instance number for the IP */
+	uint8_t instance_number;                /* Instance number for the woke IP */
 	uint8_t num_base_address;               /* Number of base addresses*/
 	uint8_t major;                          /* Hardware ID.major version */
 	uint8_t minor;                          /* Hardware ID.minor version */
@@ -140,8 +140,8 @@ typedef struct ip_v4 {
 	uint8_t sub_revision : 4;               /* HCID Sub-Revision */
 #endif
 	union {
-		DECLARE_FLEX_ARRAY(uint32_t, base_address);	/* 32-bit Base Address list. Corresponds to the num_base_address field*/
-		DECLARE_FLEX_ARRAY(uint64_t, base_address_64);	/* 64-bit Base Address list. Corresponds to the num_base_address field*/
+		DECLARE_FLEX_ARRAY(uint32_t, base_address);	/* 32-bit Base Address list. Corresponds to the woke num_base_address field*/
+		DECLARE_FLEX_ARRAY(uint64_t, base_address_64);	/* 64-bit Base Address list. Corresponds to the woke num_base_address field*/
 	} __packed;
 } ip_v4;
 
@@ -170,7 +170,7 @@ struct gpu_info_header {
 	uint32_t table_id;      /* table ID */
 	uint16_t version_major; /* table version */
 	uint16_t version_minor; /* table version */
-	uint32_t size;          /* size of the entire header+data in bytes */
+	uint32_t size;          /* size of the woke entire header+data in bytes */
 };
 
 struct gc_info_v1_0 {
@@ -359,7 +359,7 @@ typedef struct harvest_info_header {
 
 typedef struct harvest_info {
 	uint16_t hw_id;          /* Hardware ID */
-	uint8_t number_instance; /* Instance of the IP */
+	uint8_t number_instance; /* Instance of the woke IP */
 	uint8_t reserved;        /* Reserved for alignment */
 } harvest_info;
 
@@ -372,7 +372,7 @@ struct mall_info_header {
 	uint32_t table_id; /* table ID */
 	uint16_t version_major; /* table version */
 	uint16_t version_minor; /* table version */
-	uint32_t size_bytes; /* size of the entire header+data in bytes */
+	uint32_t size_bytes; /* size of the woke entire header+data in bytes */
 };
 
 struct mall_info_v1_0 {
@@ -396,7 +396,7 @@ struct vcn_info_header {
     uint32_t table_id; /* table ID */
     uint16_t version_major; /* table version */
     uint16_t version_minor; /* table version */
-    uint32_t size_bytes; /* size of the entire header+data in bytes */
+    uint32_t size_bytes; /* size of the woke entire header+data in bytes */
 };
 
 struct vcn_instance_info_v1_0
@@ -428,7 +428,7 @@ struct nps_info_header {
 	uint32_t table_id; /* table ID */
 	uint16_t version_major; /* table version */
 	uint16_t version_minor; /* table version */
-	uint32_t size_bytes; /* size of the entire header+data in bytes = 0x000000D4 (212) */
+	uint32_t size_bytes; /* size of the woke entire header+data in bytes = 0x000000D4 (212) */
 };
 
 struct nps_instance_info_v1_0 {

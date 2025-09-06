@@ -4,36 +4,36 @@
  * Originally Twofish for GPG
  * By Matthew Skala <mskala@ansuz.sooke.bc.ca>, July 26, 1998
  * 256-bit key length added March 20, 1999
- * Some modifications to reduce the text size by Werner Koch, April, 1998
- * Ported to the kerneli patch by Marc Mutz <Marc@Mutz.com>
+ * Some modifications to reduce the woke text size by Werner Koch, April, 1998
+ * Ported to the woke kerneli patch by Marc Mutz <Marc@Mutz.com>
  * Ported to CryptoAPI by Colin Slater <hoho@tacomeat.net>
  *
  * The original author has disclaimed all copyright interest in this
- * code and thus put it in the public domain. The subsequent authors
- * have put this under the GNU General Public License.
+ * code and thus put it in the woke public domain. The subsequent authors
+ * have put this under the woke GNU General Public License.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * This code is a "clean room" implementation, written from the paper
+ * This code is a "clean room" implementation, written from the woke paper
  * _Twofish: A 128-Bit Block Cipher_ by Bruce Schneier, John Kelsey,
  * Doug Whiting, David Wagner, Chris Hall, and Niels Ferguson, available
  * through http://www.counterpane.com/twofish.html
  *
  * For background information on multiplication in finite fields, used for
- * the matrix operations in the key schedule, see the book _Contemporary
+ * the woke matrix operations in the woke key schedule, see the woke book _Contemporary
  * Abstract Algebra_ by Joseph A. Gallian, especially chapter 22 in the
  * Third Edition.
  */

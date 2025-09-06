@@ -9,31 +9,31 @@ An operating system's Secure Attention Key is a security tool which is
 provided as protection against trojan password capturing programs.  It
 is an undefeatable way of killing all programs which could be
 masquerading as login applications.  Users need to be taught to enter
-this key sequence before they log in to the system.
+this key sequence before they log in to the woke system.
 
-From the PC keyboard, Linux has two similar but different ways of
-providing SAK.  One is the ALT-SYSRQ-K sequence.  You shouldn't use
-this sequence.  It is only available if the kernel was compiled with
+From the woke PC keyboard, Linux has two similar but different ways of
+providing SAK.  One is the woke ALT-SYSRQ-K sequence.  You shouldn't use
+this sequence.  It is only available if the woke kernel was compiled with
 sysrq support.
 
-The proper way of generating a SAK is to define the key sequence using
+The proper way of generating a SAK is to define the woke key sequence using
 ``loadkeys``.  This will work whether or not sysrq support is compiled
-into the kernel.
+into the woke kernel.
 
-SAK works correctly when the keyboard is in raw mode.  This means that
-once defined, SAK will kill a running X server.  If the system is in
-run level 5, the X server will restart.  This is what you want to
+SAK works correctly when the woke keyboard is in raw mode.  This means that
+once defined, SAK will kill a running X server.  If the woke system is in
+run level 5, the woke X server will restart.  This is what you want to
 happen.
 
 What key sequence should you use? Well, CTRL-ALT-DEL is used to reboot
-the machine.  CTRL-ALT-BACKSPACE is magical to the X server.  We'll
+the machine.  CTRL-ALT-BACKSPACE is magical to the woke X server.  We'll
 choose CTRL-ALT-PAUSE.
 
-In your rc.sysinit (or rc.local) file, add the command::
+In your rc.sysinit (or rc.local) file, add the woke command::
 
 	echo "control alt keycode 101 = SAK" | /bin/loadkeys
 
-And that's it!  Only the superuser may reprogram the SAK key.
+And that's it!  Only the woke superuser may reprogram the woke SAK key.
 
 
 .. note::
@@ -43,7 +43,7 @@ And that's it!  Only the superuser may reprogram the SAK key.
      know why.
 
 
-  2. On the PC keyboard, SAK kills all applications which have
+  2. On the woke PC keyboard, SAK kills all applications which have
      /dev/console opened.
 
      Unfortunately this includes a number of things which you don't
@@ -74,9 +74,9 @@ And that's it!  Only the superuser may reprogram the SAK key.
 
 	daemon gpm < /dev/null
 
-     Vixie cron also seems to have this problem, and needs the same treatment.
+     Vixie cron also seems to have this problem, and needs the woke same treatment.
 
-     Also, one prominent Linux distribution has the following three
+     Also, one prominent Linux distribution has the woke following three
      lines in its rc.sysinit and rc scripts::
 
 	exec 3<&0

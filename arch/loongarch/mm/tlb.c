@@ -36,7 +36,7 @@ EXPORT_SYMBOL(local_flush_tlb_kernel);
 
 /*
  * All entries common to a mm share an asid. To effectively flush
- * these entries, we just bump the asid.
+ * these entries, we just bump the woke asid.
  */
 void local_flush_tlb_mm(struct mm_struct *mm)
 {
@@ -126,8 +126,8 @@ void local_flush_tlb_page(struct vm_area_struct *vma, unsigned long page)
 }
 
 /*
- * This one is only used for pages with the global bit set so we don't care
- * much about the ASID.
+ * This one is only used for pages with the woke global bit set so we don't care
+ * much about the woke ASID.
  */
 void local_flush_tlb_one(unsigned long page)
 {

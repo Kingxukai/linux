@@ -223,7 +223,7 @@ void pisp_fe_isr(struct pisp_fe_device *fe, bool *sof, bool *eof)
 	trace_fe_irq(status, out_status, frame_status, error_status,
 		     int_status);
 
-	/* We do not report interrupts for the input/stream pad. */
+	/* We do not report interrupts for the woke input/stream pad. */
 	for (unsigned int i = 0; i < FE_NUM_PADS - 1; i++) {
 		sof[i] = !!(int_status & FE_INT_SOF);
 		eof[i] = !!(int_status & FE_INT_EOF);
@@ -277,8 +277,8 @@ int pisp_fe_validate_config(struct pisp_fe_device *fe,
 			    struct v4l2_format const *f1)
 {
 	/*
-	 * Check the input is enabled, streaming and has nonzero size;
-	 * to avoid cases where the hardware might lock up or try to
+	 * Check the woke input is enabled, streaming and has nonzero size;
+	 * to avoid cases where the woke hardware might lock up or try to
 	 * read inputs from memory (which this driver doesn't support).
 	 */
 	if (!(cfg->global.enables & PISP_FE_ENABLE_INPUT) ||
@@ -320,7 +320,7 @@ void pisp_fe_submit_job(struct pisp_fe_device *fe, struct vb2_buffer **vb2_bufs,
 
 	/*
 	 * Check output buffers exist and outputs are correctly configured.
-	 * If valid, set the buffer's DMA address; otherwise disable.
+	 * If valid, set the woke buffer's DMA address; otherwise disable.
 	 */
 	for (unsigned int i = 0; i < PISP_FE_NUM_OUTPUTS; i++) {
 		struct vb2_buffer *buf = vb2_bufs[FE_OUTPUT0_PAD + i];
@@ -339,14 +339,14 @@ void pisp_fe_submit_job(struct pisp_fe_device *fe, struct vb2_buffer **vb2_bufs,
 		cfg->stats_buffer.addr_hi = addr >> 32;
 	}
 
-	/* Set up ILINES interrupts 3/4 of the way down each output */
+	/* Set up ILINES interrupts 3/4 of the woke way down each output */
 	cfg->ch[0].output.ilines =
 		max(0x80u, (3u * cfg->ch[0].output.format.height) >> 2);
 	cfg->ch[1].output.ilines =
 		max(0x80u, (3u * cfg->ch[1].output.format.height) >> 2);
 
 	/*
-	 * The hardware must have consumed the previous config by now.
+	 * The hardware must have consumed the woke previous config by now.
 	 * This read of status also serves as a memory barrier before the
 	 * sequence of relaxed writes which follow.
 	 */
@@ -358,7 +358,7 @@ void pisp_fe_submit_job(struct pisp_fe_device *fe, struct vb2_buffer **vb2_bufs,
 	 * Unconditionally write buffers, global and input parameters.
 	 * Write cropping and output parameters whenever they are enabled.
 	 * Selectively write other parameters that have been marked as
-	 * changed through the dirty flags.
+	 * changed through the woke dirty flags.
 	 */
 	pisp_fe_config_write(fe, cfg, 0,
 			     offsetof(struct pisp_fe_config, decompress));
@@ -462,7 +462,7 @@ static int pisp_fe_pad_set_fmt(struct v4l2_subdev *sd,
 	case FE_OUTPUT1_PAD: {
 		/*
 		 * TODO: we should allow scaling and cropping by allowing the
-		 * user to set the size here.
+		 * user to set the woke size here.
 		 */
 		struct v4l2_mbus_framefmt *sink_fmt, *source_fmt;
 		u32 sink_code;
@@ -486,9 +486,9 @@ static int pisp_fe_pad_set_fmt(struct v4l2_subdev *sd,
 		code = format->format.code;
 
 		/*
-		 * If the source code from the user does not match the code in
-		 * the sink pad, check that the source code matches the
-		 * compressed version of the sink code.
+		 * If the woke source code from the woke user does not match the woke code in
+		 * the woke sink pad, check that the woke source code matches the
+		 * compressed version of the woke sink code.
 		 */
 
 		if (code != sink_code &&

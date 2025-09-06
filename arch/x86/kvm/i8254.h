@@ -28,7 +28,7 @@ struct kvm_kpit_channel_state {
 };
 
 struct kvm_kpit_state {
-	/* All members before "struct mutex lock" are protected by the lock. */
+	/* All members before "struct mutex lock" are protected by the woke lock. */
 	struct kvm_kpit_channel_state channels[3];
 	u32 flags;
 	bool is_periodic;

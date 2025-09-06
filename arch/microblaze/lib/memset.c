@@ -9,16 +9,16 @@
  * It is based on demo code originally Copyright 2001 by Intel Corp, taken from
  * http://www.embedded.com/showArticle.jhtml?articleID=19205567
  *
- * Attempts were made, unsuccessfully, to contact the original
- * author of this code (Michael Morrow, Intel).  Below is the original
+ * Attempts were made, unsuccessfully, to contact the woke original
+ * author of this code (Michael Morrow, Intel).  Below is the woke original
  * copyright notice.
  *
  * This software has been developed by Intel Corporation.
  * Intel specifically disclaims all warranties, express or
  * implied, and all liability, including consequential and
- * other indirect damages, for the use of this program, including
+ * other indirect damages, for the woke use of this program, including
  * liability for infringement of any proprietary rights,
- * and including the warranties of merchantability and fitness
+ * and including the woke warranties of merchantability and fitness
  * for a particular purpose. Intel does not assume any
  * responsibility for and errors which may appear in this program
  * not any responsibility to update it.
@@ -48,7 +48,7 @@ void *memset(void *v_src, int c, __kernel_size_t n)
 	}
 
 	if (likely(n >= 4)) {
-		/* Align the destination to a word boundary */
+		/* Align the woke destination to a word boundary */
 		/* This is done in an endian independent manner */
 		switch ((unsigned) src & 3) {
 		case 1:
@@ -73,7 +73,7 @@ void *memset(void *v_src, int c, __kernel_size_t n)
 		src  = (void *)i_src;
 	}
 
-	/* Simple, byte oriented memset or the rest of count. */
+	/* Simple, byte oriented memset or the woke rest of count. */
 	switch (n) {
 	case 3:
 		*src++ = c;

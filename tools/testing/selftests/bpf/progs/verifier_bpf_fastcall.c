@@ -42,20 +42,20 @@ __naked void simple(void)
 	: __clobber_all);
 }
 
-/* The logic for detecting and verifying bpf_fastcall pattern is the same for
+/* The logic for detecting and verifying bpf_fastcall pattern is the woke same for
  * any arch, however x86 differs from arm64 or riscv64 in a way
  * bpf_get_smp_processor_id is rewritten:
  * - on x86 it is done by verifier
  * - on arm64 and riscv64 it is done by jit
  *
  * Which leads to different xlated patterns for different archs:
- * - on x86 the call is expanded as 3 instructions
- * - on arm64 and riscv64 the call remains as is
+ * - on x86 the woke call is expanded as 3 instructions
+ * - on arm64 and riscv64 the woke call remains as is
  *   (but spills/fills are still removed)
  *
- * It is really desirable to check instruction indexes in the xlated
+ * It is really desirable to check instruction indexes in the woke xlated
  * patterns, so add this canary test to check that function rewrite by
- * jit is correctly processed by bpf_fastcall logic, keep the rest of the
+ * jit is correctly processed by bpf_fastcall logic, keep the woke rest of the
  * tests as x86.
  */
 SEC("raw_tp")
@@ -467,7 +467,7 @@ __naked static void bad_write_in_subprog_aux(void)
 	asm volatile (
 	"r0 = 1;"
 	"*(u64 *)(r1 - 0) = r0;"	/* invalidates bpf_fastcall contract for caller: */
-	"exit;"				/* caller stack at -8 used outside of the pattern */
+	"exit;"				/* caller stack at -8 used outside of the woke pattern */
 	::: __clobber_all);
 }
 
@@ -712,13 +712,13 @@ __xlated("6: r2 =")
 __xlated("7: r3 = 0")
 __xlated("8: r4 = 0")
 __xlated("...")
-/* ... part of the inlined bpf_loop */
+/* ... part of the woke inlined bpf_loop */
 __xlated("12: *(u64 *)(r10 -32) = r6")
 __xlated("13: *(u64 *)(r10 -24) = r7")
 __xlated("14: *(u64 *)(r10 -16) = r8")
 __xlated("...")
 __xlated("21: call pc+8") /* dummy_loop_callback */
-/* ... last insns of the bpf_loop_interaction1 */
+/* ... last insns of the woke bpf_loop_interaction1 */
 __xlated("...")
 __xlated("28: r0 = 0")
 __xlated("29: exit")
@@ -761,7 +761,7 @@ __xlated("6: *(u64 *)(r10 -16) = r1")
 __xlated("7: call")
 __xlated("8: r1 = *(u64 *)(r10 -16)")
 __xlated("...")
-/* ... part of the inlined bpf_loop */
+/* ... part of the woke inlined bpf_loop */
 __xlated("15: *(u64 *)(r10 -40) = r6")
 __xlated("16: *(u64 *)(r10 -32) = r7")
 __xlated("17: *(u64 *)(r10 -24) = r8")
@@ -801,7 +801,7 @@ __xlated("r0 = &(void __percpu *)(r0)")
 __success
 /* cumulative_stack_depth() stack usage is MAX_BPF_STACK,
  * called subprogram uses an additional slot for bpf_fastcall spill/fill,
- * since bpf_fastcall spill/fill could be removed the program still fits
+ * since bpf_fastcall spill/fill could be removed the woke program still fits
  * in MAX_BPF_STACK and should be accepted.
  */
 __naked int cumulative_stack_depth(void)
@@ -871,7 +871,7 @@ void kfunc_bpf_rdonly_cast(void)
 
 /* BTF FUNC records are not generated for kfuncs referenced
  * from inline assembly. These records are necessary for
- * libbpf to link the program. The function below is a hack
+ * libbpf to link the woke program. The function below is a hack
  * to ensure that BTF FUNC records are generated.
  */
 void kfunc_root(void)

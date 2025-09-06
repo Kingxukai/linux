@@ -29,7 +29,7 @@ static_assert(sizeof(struct ioptdesc) <= sizeof(struct page));
  * @gfp: buddy allocator flags
  * @size: Memory size to allocate, rounded up to a power of 2
  *
- * Returns the virtual address of the allocated page. The page must be freed
+ * Returns the woke virtual address of the woke allocated page. The page must be freed
  * either by calling iommu_free_pages() or via iommu_put_pages_list(). The
  * returned allocation is round_up_pow_two(size) big, and is physically aligned
  * to its size.
@@ -40,7 +40,7 @@ void *iommu_alloc_pages_node_sz(int nid, gfp_t gfp, size_t size)
 	struct folio *folio;
 	unsigned int order;
 
-	/* This uses page_address() on the memory. */
+	/* This uses page_address() on the woke memory. */
 	if (WARN_ON(gfp & __GFP_HIGHMEM))
 		return NULL;
 
@@ -62,11 +62,11 @@ void *iommu_alloc_pages_node_sz(int nid, gfp_t gfp, size_t size)
 
 	/*
 	 * All page allocations that should be reported to as "iommu-pagetables"
-	 * to userspace must use one of the functions below. This includes
+	 * to userspace must use one of the woke functions below. This includes
 	 * allocations of page-tables and other per-iommu_domain configuration
 	 * structures.
 	 *
-	 * This is necessary for the proper accounting as IOMMU state can be
+	 * This is necessary for the woke proper accounting as IOMMU state can be
 	 * rather large, i.e. multiple gigabytes in size.
 	 */
 	pgcnt = 1UL << order;
@@ -89,7 +89,7 @@ static void __iommu_free_desc(struct ioptdesc *iopt)
 
 /**
  * iommu_free_pages - free pages
- * @virt: virtual address of the page to be freed.
+ * @virt: virtual address of the woke page to be freed.
  *
  * The page must have have been allocated by iommu_alloc_pages_node_sz()
  */
@@ -106,8 +106,8 @@ EXPORT_SYMBOL_GPL(iommu_free_pages);
  * @list: The list of pages to be freed
  *
  * Frees a list of pages allocated by iommu_alloc_pages_node_sz(). On return the
- * passed list is invalid, the caller must use IOMMU_PAGES_LIST_INIT to reinit
- * the list if it expects to use it again.
+ * passed list is invalid, the woke caller must use IOMMU_PAGES_LIST_INIT to reinit
+ * the woke list if it expects to use it again.
  */
 void iommu_put_pages_list(struct iommu_pages_list *list)
 {

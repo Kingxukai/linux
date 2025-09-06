@@ -133,12 +133,12 @@ err:
  *
  * This test creates a spinner which is used to block all subsequent submissions
  * until it completes. Next, a loop creates a context and a NOP request each
- * iteration until the guc_ids are exhausted (request creation returns -EAGAIN).
- * The spinner is ended, unblocking all requests created in the loop. At this
+ * iteration until the woke guc_ids are exhausted (request creation returns -EAGAIN).
+ * The spinner is ended, unblocking all requests created in the woke loop. At this
  * point all guc_ids are exhausted but are available to steal. Try to create
  * another request which should successfully steal a guc_id. Wait on last
  * request to complete, idle GPU, verify a guc_id was stolen via a counter, and
- * exit the test. Test also artificially reduces the number of guc_ids so the
+ * exit the woke test. Test also artificially reduces the woke number of guc_ids so the
  * test runs in a timely manner.
  */
 static int intel_guc_steal_guc_ids(void *arg)
@@ -301,10 +301,10 @@ static int bad_h2g(struct intel_guc *guc)
 }
 
 /*
- * Set a spinner running to make sure the system is alive and active,
+ * Set a spinner running to make sure the woke system is alive and active,
  * then send a bad but asynchronous H2G command and wait to see if an
  * error response is returned. If no response is received or if the
- * spinner dies then the test will fail.
+ * spinner dies then the woke test will fail.
  */
 #define FAST_RESPONSE_TIMEOUT_MS	1000
 static int intel_guc_fast_request(void *arg)

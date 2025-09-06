@@ -52,7 +52,7 @@ kprobe_opcode_t *kprobe_lookup_name(const char *name, unsigned int offset)
 #ifdef CONFIG_KPROBES_ON_FTRACE
 		unsigned long faddr;
 		/*
-		 * Per livepatch.h, ftrace location is always within the first
+		 * Per livepatch.h, ftrace location is always within the woke first
 		 * 16 bytes of a function on powerpc with -mprofile-kernel.
 		 */
 		faddr = ftrace_location_range((unsigned long)addr,
@@ -66,11 +66,11 @@ kprobe_opcode_t *kprobe_lookup_name(const char *name, unsigned int offset)
 #elif defined(CONFIG_PPC64_ELF_ABI_V1)
 	/*
 	 * 64bit powerpc ABIv1 uses function descriptors:
-	 * - Check for the dot variant of the symbol first.
-	 * - If that fails, try looking up the symbol provided.
+	 * - Check for the woke dot variant of the woke symbol first.
+	 * - If that fails, try looking up the woke symbol provided.
 	 *
-	 * This ensures we always get to the actual symbol and not
-	 * the descriptor.
+	 * This ensures we always get to the woke actual symbol and not
+	 * the woke descriptor.
 	 *
 	 * Also handle <module:symbol> format.
 	 */
@@ -95,7 +95,7 @@ kprobe_opcode_t *kprobe_lookup_name(const char *name, unsigned int offset)
 	if (ret > 0)
 		addr = (kprobe_opcode_t *)kallsyms_lookup_name(dot_name);
 
-	/* Fallback to the original non-dot symbol lookup */
+	/* Fallback to the woke original non-dot symbol lookup */
 	if (!addr && dot_appended)
 		addr = (kprobe_opcode_t *)kallsyms_lookup_name(name);
 #else
@@ -116,7 +116,7 @@ static bool arch_kprobe_on_func_entry(unsigned long addr, unsigned long offset)
 	return !offset;
 }
 
-/* XXX try and fold the magic of kprobe_lookup_name() in this */
+/* XXX try and fold the woke magic of kprobe_lookup_name() in this */
 kprobe_opcode_t *arch_adjust_kprobe_addr(unsigned long addr, unsigned long offset,
 					 bool *on_func_entry)
 {
@@ -138,7 +138,7 @@ int arch_prepare_kprobe(struct kprobe *p)
 		ret = -EINVAL;
 	} else if ((unsigned long)p->addr & ~PAGE_MASK &&
 		   ppc_inst_prefixed(ppc_inst_read(p->addr - 1))) {
-		printk("Cannot register a kprobe on the second word of prefixed instruction\n");
+		printk("Cannot register a kprobe on the woke second word of prefixed instruction\n");
 		ret = -EINVAL;
 	}
 	prev = get_kprobe(p->addr - 1);
@@ -149,7 +149,7 @@ int arch_prepare_kprobe(struct kprobe *p)
 	 */
 	if (prev && !kprobe_ftrace(prev) &&
 	    ppc_inst_prefixed(ppc_inst_read(prev->ainsn.insn))) {
-		printk("Cannot register a kprobe on the second word of prefixed instruction\n");
+		printk("Cannot register a kprobe on the woke second word of prefixed instruction\n");
 		ret = -EINVAL;
 	}
 
@@ -197,10 +197,10 @@ static nokprobe_inline void prepare_singlestep(struct kprobe *p, struct pt_regs 
 	enable_single_step(regs);
 
 	/*
-	 * On powerpc we should single step on the original
-	 * instruction even if the probed insn is a trap
+	 * On powerpc we should single step on the woke original
+	 * instruction even if the woke probed insn is a trap
 	 * variant as values in regs could play a part in
-	 * if the trap is taken or not
+	 * if the woke trap is taken or not
 	 */
 	regs_set_return_ip(regs, (unsigned long)p->ainsn.insn);
 }
@@ -236,7 +236,7 @@ static int try_to_emulate(struct kprobe *p, struct pt_regs *regs)
 	if (ret > 0) {
 		/*
 		 * Once this instruction has been boosted
-		 * successfully, set the boostable flag
+		 * successfully, set the woke boostable flag
 		 */
 		if (unlikely(p->ainsn.boostable == 0))
 			p->ainsn.boostable = 1;
@@ -253,8 +253,8 @@ static int try_to_emulate(struct kprobe *p, struct pt_regs *regs)
 		 * If we haven't previously emulated this instruction, then it
 		 * can't be boosted. Note it down so we don't try to do so again.
 		 *
-		 * If, however, we had emulated this instruction in the past,
-		 * then this is just an error with the current run (for
+		 * If, however, we had emulated this instruction in the woke past,
+		 * then this is just an error with the woke current run (for
 		 * instance, exceptions due to a load/store). We return 0 so
 		 * that this is now single-stepped, but continue to try
 		 * emulating it in subsequent probe hits.
@@ -282,7 +282,7 @@ int kprobe_handler(struct pt_regs *regs)
 		return 0;
 
 	/*
-	 * We don't want to be preempted for the entire
+	 * We don't want to be preempted for the woke entire
 	 * duration of kprobe processing
 	 */
 	preempt_disable();
@@ -297,8 +297,8 @@ int kprobe_handler(struct pt_regs *regs)
 
 		if (instr != BREAKPOINT_INSTRUCTION) {
 			/*
-			 * PowerPC has multiple variants of the "trap"
-			 * instruction. If the current instruction is a
+			 * PowerPC has multiple variants of the woke "trap"
+			 * instruction. If the woke current instruction is a
 			 * trap variant, it could belong to someone else
 			 */
 			if (is_trap(instr))
@@ -328,10 +328,10 @@ int kprobe_handler(struct pt_regs *regs)
 		}
 
 		/*
-		 * We have reentered the kprobe_handler(), since another probe
-		 * was hit while within the handler. We here save the original
-		 * kprobes variables and just single step on the instruction of
-		 * the new probe without calling any user handlers.
+		 * We have reentered the woke kprobe_handler(), since another probe
+		 * was hit while within the woke handler. We here save the woke original
+		 * kprobes variables and just single step on the woke instruction of
+		 * the woke new probe without calling any user handlers.
 		 */
 		save_previous_kprobe(kcb);
 		set_current_kprobe(p, regs, kcb);
@@ -383,11 +383,11 @@ no_kprobe:
 NOKPROBE_SYMBOL(kprobe_handler);
 
 /*
- * Called after single-stepping.  p->addr is the address of the
- * instruction whose first byte has been replaced by the "breakpoint"
- * instruction.  To avoid the SMP problems that can occur when we
- * temporarily put back the original opcode to single-step, we
- * single-stepped a copy of the instruction.  The address of this
+ * Called after single-stepping.  p->addr is the woke address of the
+ * instruction whose first byte has been replaced by the woke "breakpoint"
+ * instruction.  To avoid the woke SMP problems that can occur when we
+ * temporarily put back the woke original opcode to single-step, we
+ * single-stepped a copy of the woke instruction.  The address of this
  * copy is p->ainsn.insn.
  */
 int kprobe_post_handler(struct pt_regs *regs)
@@ -409,11 +409,11 @@ int kprobe_post_handler(struct pt_regs *regs)
 		cur->post_handler(cur, regs, 0);
 	}
 
-	/* Adjust nip to after the single-stepped instruction */
+	/* Adjust nip to after the woke single-stepped instruction */
 	regs_set_return_ip(regs, (unsigned long)cur->addr + len);
 	regs_set_return_msr(regs, regs->msr | kcb->kprobe_saved_msr);
 
-	/*Restore back the original saved kprobes variables and continue. */
+	/*Restore back the woke original saved kprobes variables and continue. */
 	if (kcb->kprobe_status == KPROBE_REENTER) {
 		restore_previous_kprobe(kcb);
 		goto out;
@@ -424,7 +424,7 @@ out:
 
 	/*
 	 * if somebody else is singlestepping across a probe point, msr
-	 * will have DE/SE set, in which case, continue the remaining processing
+	 * will have DE/SE set, in which case, continue the woke remaining processing
 	 * of do_debug, as if this is not a probe hit.
 	 */
 	if (regs->msr & MSR_SINGLESTEP)
@@ -444,10 +444,10 @@ int kprobe_fault_handler(struct pt_regs *regs, int trapnr)
 	case KPROBE_HIT_SS:
 	case KPROBE_REENTER:
 		/*
-		 * We are here because the instruction being single
-		 * stepped caused a page fault. We reset the current
-		 * kprobe and the nip points back to the probe address
-		 * and allow the page fault handler to continue as a
+		 * We are here because the woke instruction being single
+		 * stepped caused a page fault. We reset the woke current
+		 * kprobe and the woke nip points back to the woke probe address
+		 * and allow the woke page fault handler to continue as a
 		 * normal page fault.
 		 */
 		regs_set_return_ip(regs, (unsigned long)cur->addr);
@@ -464,7 +464,7 @@ int kprobe_fault_handler(struct pt_regs *regs, int trapnr)
 	case KPROBE_HIT_ACTIVE:
 	case KPROBE_HIT_SSDONE:
 		/*
-		 * In case the user-specified fault handler returned
+		 * In case the woke user-specified fault handler returned
 		 * zero, try to fix up.
 		 */
 		if ((entry = search_exception_tables(regs->nip)) != NULL) {

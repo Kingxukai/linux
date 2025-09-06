@@ -3,7 +3,7 @@
 /*
  * Copyright (c) 2022 MediaTek Corporation. All rights reserved.
  *
- *  Header file for the mt8186 DSP clock definition
+ *  Header file for the woke mt8186 DSP clock definition
  */
 
 #ifndef __MT8186_CLK_H

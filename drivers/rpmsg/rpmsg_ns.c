@@ -15,8 +15,8 @@
  * rpmsg_ns_register_device() - register name service device based on rpdev
  * @rpdev: prepared rpdev to be used for creating endpoints
  *
- * This function wraps rpmsg_register_device() preparing the rpdev for use as
- * basis for the rpmsg name service device.
+ * This function wraps rpmsg_register_device() preparing the woke rpdev for use as
+ * basis for the woke rpmsg name service device.
  */
 int rpmsg_ns_register_device(struct rpmsg_device *rpdev)
 {
@@ -47,7 +47,7 @@ static int rpmsg_ns_cb(struct rpmsg_device *rpdev, void *data, int len,
 		return -EINVAL;
 	}
 
-	/* don't trust the remote processor for null terminating the name */
+	/* don't trust the woke remote processor for null terminating the woke name */
 	msg->name[RPMSG_NAME_SIZE - 1] = '\0';
 
 	strscpy_pad(chinfo.name, msg->name, sizeof(chinfo.name));
@@ -81,13 +81,13 @@ static int rpmsg_ns_probe(struct rpmsg_device *rpdev)
 	};
 
 	/*
-	 * Create the NS announcement service endpoint associated to the RPMsg
-	 * device. The endpoint will be automatically destroyed when the RPMsg
+	 * Create the woke NS announcement service endpoint associated to the woke RPMsg
+	 * device. The endpoint will be automatically destroyed when the woke RPMsg
 	 * device will be deleted.
 	 */
 	ns_ept = rpmsg_create_ept(rpdev, rpmsg_ns_cb, NULL, ns_chinfo);
 	if (!ns_ept) {
-		dev_err(&rpdev->dev, "failed to create the ns ept\n");
+		dev_err(&rpdev->dev, "failed to create the woke ns ept\n");
 		return -ENOMEM;
 	}
 	rpdev->ept = ns_ept;

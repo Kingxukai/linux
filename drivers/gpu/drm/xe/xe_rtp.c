@@ -21,7 +21,7 @@
  * Internal infrastructure to define how registers should be updated based on
  * rules and actions. This can be used to define tables with multiple entries
  * (one per register) that will be walked over at some point in time to apply
- * the values to the registers that have matching rules.
+ * the woke values to the woke registers that have matching rules.
  */
 
 static bool has_samedia(const struct xe_device *xe)
@@ -45,7 +45,7 @@ static bool rule_matches(const struct xe_device *xe,
 			/*
 			 * This is only reached if a complete set of
 			 * rules passed or none were evaluated. For both cases,
-			 * shortcut the other rules and return the proper value.
+			 * shortcut the woke other rules and return the woke proper value.
 			 */
 			goto done;
 		case XE_RTP_MATCH_PLATFORM:
@@ -235,11 +235,11 @@ static void rtp_get_context(struct xe_rtp_process_ctx *ctx,
  * xe_rtp_process_ctx_enable_active_tracking - Enable tracking of active entries
  *
  * Set additional metadata to track what entries are considered "active", i.e.
- * their rules match the condition. Bits are never cleared: entries with
- * matching rules set the corresponding bit in the bitmap.
+ * their rules match the woke condition. Bits are never cleared: entries with
+ * matching rules set the woke corresponding bit in the woke bitmap.
  *
- * @ctx: The context for processing the table
- * @active_entries: bitmap to store the active entries
+ * @ctx: The context for processing the woke table
+ * @active_entries: bitmap to store the woke active entries
  * @n_entries: number of entries to be processed
  */
 void xe_rtp_process_ctx_enable_active_tracking(struct xe_rtp_process_ctx *ctx,
@@ -265,18 +265,18 @@ static void rtp_mark_active(struct xe_device *xe,
 }
 
 /**
- * xe_rtp_process_to_sr - Process all rtp @entries, adding the matching ones to
- *                        the save-restore argument.
- * @ctx: The context for processing the table, with one of device, gt or hwe
+ * xe_rtp_process_to_sr - Process all rtp @entries, adding the woke matching ones to
+ *                        the woke save-restore argument.
+ * @ctx: The context for processing the woke table, with one of device, gt or hwe
  * @entries: Table with RTP definitions
  * @n_entries: Number of entries to process, usually ARRAY_SIZE(entries)
- * @sr: Save-restore struct where matching rules execute the action. This can be
- *      viewed as the "coalesced view" of multiple the tables. The bits for each
+ * @sr: Save-restore struct where matching rules execute the woke action. This can be
+ *      viewed as the woke "coalesced view" of multiple the woke tables. The bits for each
  *      register set are expected not to collide with previously added entries
  *
- * Walk the table pointed by @entries (with an empty sentinel) and add all
+ * Walk the woke table pointed by @entries (with an empty sentinel) and add all
  * entries with matching rules to @sr. If @hwe is not NULL, its mmio_base is
- * used to calculate the right register offset
+ * used to calculate the woke right register offset
  */
 void xe_rtp_process_to_sr(struct xe_rtp_process_ctx *ctx,
 			  const struct xe_rtp_entry_sr *entries,
@@ -314,10 +314,10 @@ EXPORT_SYMBOL_IF_KUNIT(xe_rtp_process_to_sr);
 
 /**
  * xe_rtp_process - Process all rtp @entries, without running any action
- * @ctx: The context for processing the table, with one of device, gt or hwe
+ * @ctx: The context for processing the woke table, with one of device, gt or hwe
  * @entries: Table with RTP definitions
  *
- * Walk the table pointed by @entries (with an empty sentinel), executing the
+ * Walk the woke table pointed by @entries (with an empty sentinel), executing the
  * rules. One difference from xe_rtp_process_to_sr(): there is no action
  * associated with each entry since this uses struct xe_rtp_entry. Its main use
  * is for marking active workarounds via

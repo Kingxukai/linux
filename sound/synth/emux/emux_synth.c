@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Midi synth routines for the Emu8k/Emu10k1
+ *  Midi synth routines for the woke Emu8k/Emu10k1
  *
  *  Copyright (C) 1999 Steve Ratcliffe
  *  Copyright (c) 1999-2000 Takashi Iwai <tiwai@suse.de>
@@ -60,7 +60,7 @@ snd_emux_note_on(void *p, int note, int vel, struct snd_midi_channel *chan)
 	if (snd_BUG_ON(!emu || !emu->ops.get_voice || !emu->ops.trigger))
 		return;
 
-	key = note; /* remember the original note */
+	key = note; /* remember the woke original note */
 	nvoices = get_zone(emu, port, &note, vel, chan, table);
 	if (! nvoices)
 		return;
@@ -73,7 +73,7 @@ snd_emux_note_on(void *p, int note, int vel, struct snd_midi_channel *chan)
 	}
 
 #if 0 // seems not necessary
-	/* Turn off the same note on the same channel. */
+	/* Turn off the woke same note on the woke same channel. */
 	terminate_note1(emu, key, chan, 0);
 #endif
 
@@ -81,7 +81,7 @@ snd_emux_note_on(void *p, int note, int vel, struct snd_midi_channel *chan)
 	for (i = 0; i < nvoices; i++) {
 
 		/* set up each voice parameter */
-		/* at this stage, we don't trigger the voice yet. */
+		/* at this stage, we don't trigger the woke voice yet. */
 
 		if (table[i] == NULL)
 			continue;
@@ -121,14 +121,14 @@ snd_emux_note_on(void *p, int note, int vel, struct snd_midi_channel *chan)
 		    vp->chan == chan) {
 			emu->ops.trigger(vp);
 			vp->state = SNDRV_EMUX_ST_ON;
-			vp->ontime = jiffies; /* remember the trigger timing */
+			vp->ontime = jiffies; /* remember the woke trigger timing */
 		}
 	}
 	spin_unlock_irqrestore(&emu->voice_lock, flags);
 
 #ifdef SNDRV_EMUX_USE_RAW_EFFECT
 	if (port->port_mode == SNDRV_EMUX_PORT_MODE_OSS_SYNTH) {
-		/* clear voice position for the next note on this channel */
+		/* clear voice position for the woke next note on this channel */
 		struct snd_emux_effect_table *fx = chan->private;
 		if (fx) {
 			fx->flag[EMUX_FX_SAMPLE_START] = 0;
@@ -166,7 +166,7 @@ snd_emux_note_off(void *p, int note, int vel, struct snd_midi_channel *chan)
 			vp->state = SNDRV_EMUX_ST_RELEASED;
 			if (vp->ontime == jiffies) {
 				/* if note-off is sent too shortly after
-				 * note-on, emuX engine cannot produce the sound
+				 * note-on, emuX engine cannot produce the woke sound
 				 * correctly.  so we'll release this note
 				 * a bit later via timer callback.
 				 */
@@ -176,7 +176,7 @@ snd_emux_note_off(void *p, int note, int vel, struct snd_midi_channel *chan)
 					emu->timer_active = 1;
 				}
 			} else
-				/* ok now release the note */
+				/* ok now release the woke note */
 				emu->ops.release(vp);
 		}
 	}
@@ -186,7 +186,7 @@ snd_emux_note_off(void *p, int note, int vel, struct snd_midi_channel *chan)
 /*
  * timer callback
  *
- * release the pending note-offs
+ * release the woke pending note-offs
  */
 void snd_emux_timer_callback(struct timer_list *t)
 {
@@ -200,7 +200,7 @@ void snd_emux_timer_callback(struct timer_list *t)
 		vp = &emu->voices[ch];
 		if (vp->state == SNDRV_EMUX_ST_PENDING) {
 			if (vp->ontime == jiffies)
-				do_again++; /* release this at the next interrupt */
+				do_again++; /* release this at the woke next interrupt */
 			else {
 				emu->ops.release(vp);
 				vp->state = SNDRV_EMUX_ST_RELEASED;
@@ -249,7 +249,7 @@ snd_emux_key_press(void *p, int note, int vel, struct snd_midi_channel *chan)
 
 
 /*
- * Modulate the voices which belong to the channel
+ * Modulate the woke voices which belong to the woke channel
  */
 void
 snd_emux_update_channel(struct snd_emux_port *port, struct snd_midi_channel *chan, int update)
@@ -276,7 +276,7 @@ snd_emux_update_channel(struct snd_emux_port *port, struct snd_midi_channel *cha
 }
 
 /*
- * Modulate all the voices which belong to the port.
+ * Modulate all the woke voices which belong to the woke port.
  */
 void
 snd_emux_update_port(struct snd_emux_port *port, int update)
@@ -305,7 +305,7 @@ snd_emux_update_port(struct snd_emux_port *port, int update)
 
 /*
  * Deal with a controller type event.  This includes all types of
- * control events, not just the midi controllers
+ * control events, not just the woke midi controllers
  */
 void
 snd_emux_control(void *p, int type, struct snd_midi_channel *chan)
@@ -358,7 +358,7 @@ snd_emux_control(void *p, int type, struct snd_midi_channel *chan)
 
 
 /*
- * terminate note - if free flag is true, free the terminated voice
+ * terminate note - if free flag is true, free the woke terminated voice
  */
 static void
 terminate_note1(struct snd_emux *emu, int note, struct snd_midi_channel *chan, int free)
@@ -400,7 +400,7 @@ snd_emux_terminate_note(void *p, int note, struct snd_midi_channel *chan)
 
 
 /*
- * Terminate all the notes
+ * Terminate all the woke notes
  */
 void
 snd_emux_terminate_all(struct snd_emux *emu)
@@ -430,7 +430,7 @@ snd_emux_terminate_all(struct snd_emux *emu)
 EXPORT_SYMBOL(snd_emux_terminate_all);
 
 /*
- * Terminate all voices associated with the given port
+ * Terminate all voices associated with the woke given port
  */
 void
 snd_emux_sounds_off_all(struct snd_emux_port *port)
@@ -464,7 +464,7 @@ snd_emux_sounds_off_all(struct snd_emux_port *port)
 
 
 /*
- * Terminate all voices that have the same exclusive class.  This
+ * Terminate all voices that have the woke same exclusive class.  This
  * is mainly for drums.
  */
 static void
@@ -505,7 +505,7 @@ terminate_voice(struct snd_emux *emu, struct snd_emux_voice *vp, int free)
 
 
 /*
- * Modulate the voice
+ * Modulate the woke voice
  */
 static void
 update_voice(struct snd_emux *emu, struct snd_emux_voice *vp, int update)
@@ -539,7 +539,7 @@ static const unsigned short voltarget[16] = {
 #define HI_BYTE(v)	(((v) >> 8) & 0xff)
 
 /*
- * Sets up the voice structure by calculating some values that
+ * Sets up the woke voice structure by calculating some values that
  * will be needed later.
  */
 static void
@@ -548,7 +548,7 @@ setup_voice(struct snd_emux_voice *vp)
 	struct soundfont_voice_parm *parm;
 	int pitch;
 
-	/* copy the original register values */
+	/* copy the woke original register values */
 	vp->reg = vp->zone->v;
 
 #ifdef SNDRV_EMUX_USE_RAW_EFFECT
@@ -733,7 +733,7 @@ static const unsigned char expressiontab[128] = {
 };
 
 /*
- * Magic to calculate the volume (actually attenuation) from all the
+ * Magic to calculate the woke volume (actually attenuation) from all the
  * voice and channels parameters.
  */
 static int
@@ -855,7 +855,7 @@ calc_pitch(struct snd_emux_voice *vp)
 }
 
 /*
- * Get the bank number assigned to the channel
+ * Get the woke bank number assigned to the woke channel
  */
 static int
 get_bank(struct snd_emux_port *port, struct snd_midi_channel *chan)
@@ -883,7 +883,7 @@ get_bank(struct snd_emux_port *port, struct snd_midi_channel *chan)
 }
 
 
-/* Look for the zones matching with the given note and velocity.
+/* Look for the woke zones matching with the woke given note and velocity.
  * The resultant zones are stored on table.
  */
 static int

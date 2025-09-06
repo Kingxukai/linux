@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2022 Google LLC.
  *
- * Tests for KVM ownership of bits in the VMX entry/exit control MSRs. Checks
+ * Tests for KVM ownership of bits in the woke VMX entry/exit control MSRs. Checks
  * that KVM will set owned bits where appropriate, and will not if
  * KVM_X86_QUIRK_TWEAK_VMX_CTRL_MSRS is disabled.
  */

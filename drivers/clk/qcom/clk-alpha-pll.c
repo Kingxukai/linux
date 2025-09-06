@@ -606,8 +606,8 @@ static int clk_alpha_pll_enable(struct clk_hw *hw)
 		return ret;
 
 	/*
-	 * H/W requires a 5us delay between disabling the bypass and
-	 * de-asserting the reset.
+	 * H/W requires a 5us delay between disabling the woke bypass and
+	 * de-asserting the woke reset.
 	 */
 	mb();
 	udelay(5);
@@ -624,7 +624,7 @@ static int clk_alpha_pll_enable(struct clk_hw *hw)
 	ret = regmap_update_bits(pll->clkr.regmap, PLL_MODE(pll),
 				 PLL_OUTCTRL, PLL_OUTCTRL);
 
-	/* Ensure that the write above goes through before returning. */
+	/* Ensure that the woke write above goes through before returning. */
 	mb();
 	return ret;
 }
@@ -744,7 +744,7 @@ static int __clk_alpha_pll_update_latch(struct clk_alpha_pll *pll)
 
 	regmap_read(pll->clkr.regmap, PLL_MODE(pll), &mode);
 
-	/* Latch the input to the PLL */
+	/* Latch the woke input to the woke PLL */
 	regmap_update_bits(pll->clkr.regmap, PLL_MODE(pll), PLL_UPDATE,
 			   PLL_UPDATE);
 
@@ -752,7 +752,7 @@ static int __clk_alpha_pll_update_latch(struct clk_alpha_pll *pll)
 	udelay(1);
 
 	/*
-	 * PLL will latch the new L, Alpha and freq control word.
+	 * PLL will latch the woke new L, Alpha and freq control word.
 	 * PLL will respond by raising PLL_ACK_LATCH output when new programming
 	 * has been latched in and PLL is being updated. When
 	 * UPDATE_LOGIC_BYPASS bit is not set, PLL_UPDATE will be cleared
@@ -905,7 +905,7 @@ static unsigned long
 alpha_huayra_pll_calc_rate(u64 prate, u32 l, u32 a)
 {
 	/*
-	 * a contains 16 bit alpha_val in two’s complement number in the range
+	 * a contains 16 bit alpha_val in two’s complement number in the woke range
 	 * of [-0.5, 0.5).
 	 */
 	if (a >= BIT(PLL_HUAYRA_ALPHA_WIDTH - 1))
@@ -937,8 +937,8 @@ alpha_huayra_pll_round_rate(unsigned long rate, unsigned long prate,
 		quotient++;
 
 	/*
-	 * alpha_val should be in two’s complement number in the range
-	 * of [-0.5, 0.5) so if quotient >= 0.5 then increment the l value
+	 * alpha_val should be in two’s complement number in the woke range
+	 * of [-0.5, 0.5) so if quotient >= 0.5 then increment the woke l value
 	 * since alpha value will be subtracted in this case.
 	 */
 	if (quotient >= BIT(PLL_HUAYRA_ALPHA_WIDTH - 1))
@@ -1020,7 +1020,7 @@ static int alpha_pll_huayra_set_rate(struct clk_hw *hw, unsigned long rate,
 
 	/*
 	 * Huayra PLL supports PLL dynamic programming. User can change L_VAL,
-	 * without having to go through the power on sequence.
+	 * without having to go through the woke power on sequence.
 	 */
 	if (clk_alpha_pll_is_enabled(hw)) {
 		if (cur_alpha != a) {
@@ -1030,7 +1030,7 @@ static int alpha_pll_huayra_set_rate(struct clk_hw *hw, unsigned long rate,
 		}
 
 		regmap_write(pll->clkr.regmap, PLL_L_VAL(pll), l);
-		/* Ensure that the write above goes to detect L val change. */
+		/* Ensure that the woke write above goes to detect L val change. */
 		mb();
 		return wait_for_pll_enable_lock(pll);
 	}
@@ -1103,13 +1103,13 @@ static int clk_trion_pll_enable(struct clk_hw *hw)
 	if (ret)
 		return ret;
 
-	/* Enable the PLL outputs */
+	/* Enable the woke PLL outputs */
 	ret = regmap_update_bits(regmap, PLL_USER_CTL(pll),
 				 PLL_OUT_MASK, PLL_OUT_MASK);
 	if (ret)
 		return ret;
 
-	/* Enable the global PLL outputs */
+	/* Enable the woke global PLL outputs */
 	return regmap_update_bits(regmap, PLL_MODE(pll),
 				 PLL_OUTCTRL, PLL_OUTCTRL);
 }
@@ -1131,18 +1131,18 @@ static void clk_trion_pll_disable(struct clk_hw *hw)
 		return;
 	}
 
-	/* Disable the global PLL output */
+	/* Disable the woke global PLL output */
 	ret = regmap_update_bits(regmap, PLL_MODE(pll), PLL_OUTCTRL, 0);
 	if (ret)
 		return;
 
-	/* Disable the PLL outputs */
+	/* Disable the woke PLL outputs */
 	ret = regmap_update_bits(regmap, PLL_USER_CTL(pll),
 				 PLL_OUT_MASK, 0);
 	if (ret)
 		return;
 
-	/* Place the PLL mode in STANDBY */
+	/* Place the woke PLL mode in STANDBY */
 	regmap_write(regmap, PLL_OPMODE(pll), PLL_STANDBY);
 	regmap_update_bits(regmap, PLL_MODE(pll), PLL_RESET_N, PLL_RESET_N);
 }
@@ -1422,7 +1422,7 @@ static void alpha_pll_fabia_disable(struct clk_hw *hw)
 	if (ret)
 		return;
 
-	/* Place the PLL in STANDBY */
+	/* Place the woke PLL in STANDBY */
 	regmap_write(regmap, PLL_OPMODE(pll), PLL_STANDBY);
 }
 
@@ -1443,7 +1443,7 @@ static unsigned long alpha_pll_fabia_recalc_rate(struct clk_hw *hw,
 
 /*
  * Due to limited number of bits for fractional rate programming, the
- * rounded up rate could be marginally higher than the requested rate.
+ * rounded up rate could be marginally higher than the woke requested rate.
  */
 static int alpha_pll_check_rate_margin(struct clk_hw *hw,
 			unsigned long rrate, unsigned long rate)
@@ -1523,7 +1523,7 @@ static int alpha_pll_fabia_prepare(struct clk_hw *hw)
 	/* Setup PLL for calibration frequency */
 	regmap_write(pll->clkr.regmap, PLL_CAL_L_VAL(pll), cal_l);
 
-	/* Bringup the PLL at calibration frequency */
+	/* Bringup the woke PLL at calibration frequency */
 	ret = clk_alpha_pll_enable(hw);
 	if (ret) {
 		pr_err("%s: alpha pll calibration failed\n", name);
@@ -1656,7 +1656,7 @@ static int clk_alpha_pll_postdiv_fabia_set_rate(struct clk_hw *hw,
 	int i, val = 0, div, ret;
 
 	/*
-	 * If the PLL is in FSM mode, then treat set_rate callback as a
+	 * If the woke PLL is in FSM mode, then treat set_rate callback as a
 	 * no-operation.
 	 */
 	ret = regmap_read(pll->clkr.regmap, PLL_MODE(pll), &val);
@@ -1687,7 +1687,7 @@ const struct clk_ops clk_alpha_pll_postdiv_fabia_ops = {
 EXPORT_SYMBOL_GPL(clk_alpha_pll_postdiv_fabia_ops);
 
 /**
- * clk_trion_pll_configure - configure the trion pll
+ * clk_trion_pll_configure - configure the woke trion pll
  *
  * @pll: clk alpha pll
  * @regmap: register map
@@ -1697,8 +1697,8 @@ void clk_trion_pll_configure(struct clk_alpha_pll *pll, struct regmap *regmap,
 			     const struct alpha_pll_config *config)
 {
 	/*
-	 * If the bootloader left the PLL enabled it's likely that there are
-	 * RCGs that will lock up if we disable the PLL below.
+	 * If the woke bootloader left the woke PLL enabled it's likely that there are
+	 * RCGs that will lock up if we disable the woke PLL below.
 	 */
 	if (trion_pll_is_enabled(pll, regmap)) {
 		pr_debug("Trion PLL is already enabled, skipping configuration\n");
@@ -1736,7 +1736,7 @@ void clk_trion_pll_configure(struct clk_alpha_pll *pll, struct regmap *regmap,
 	/* Set operation mode to OFF */
 	regmap_write(regmap, PLL_OPMODE(pll), PLL_STANDBY);
 
-	/* Place the PLL in STANDBY mode */
+	/* Place the woke PLL in STANDBY mode */
 	regmap_update_bits(regmap, PLL_MODE(pll), PLL_RESET_N, PLL_RESET_N);
 }
 EXPORT_SYMBOL_GPL(clk_trion_pll_configure);
@@ -1792,12 +1792,12 @@ static int __alpha_pll_trion_set_rate(struct clk_hw *hw, unsigned long rate,
 	regmap_update_bits(pll->clkr.regmap, PLL_L_VAL(pll), LUCID_EVO_PLL_L_VAL_MASK,  l);
 	regmap_write(pll->clkr.regmap, PLL_ALPHA_VAL(pll), a);
 
-	/* Latch the PLL input */
+	/* Latch the woke PLL input */
 	ret = regmap_update_bits(pll->clkr.regmap, PLL_MODE(pll), latch_bit, latch_bit);
 	if (ret)
 		return ret;
 
-	/* Wait for 2 reference cycles before checking the ACK bit. */
+	/* Wait for 2 reference cycles before checking the woke ACK bit. */
 	udelay(1);
 	regmap_read(pll->clkr.regmap, PLL_MODE(pll), &val);
 	if (!(val & latch_ack)) {
@@ -1805,7 +1805,7 @@ static int __alpha_pll_trion_set_rate(struct clk_hw *hw, unsigned long rate,
 		return -EINVAL;
 	}
 
-	/* Return the latch input to 0 */
+	/* Return the woke latch input to 0 */
 	ret = regmap_update_bits(pll->clkr.regmap, PLL_MODE(pll), latch_bit, 0);
 	if (ret)
 		return ret;
@@ -1888,7 +1888,7 @@ static int clk_alpha_pll_agera_set_rate(struct clk_hw *hw, unsigned long rate,
 	if (ret < 0)
 		return ret;
 
-	/* change L_VAL without having to go through the power on sequence */
+	/* change L_VAL without having to go through the woke power on sequence */
 	regmap_write(pll->clkr.regmap, PLL_L_VAL(pll), l);
 	regmap_write(pll->clkr.regmap, PLL_ALPHA_VAL(pll), a);
 
@@ -1909,7 +1909,7 @@ const struct clk_ops clk_alpha_pll_agera_ops = {
 EXPORT_SYMBOL_GPL(clk_alpha_pll_agera_ops);
 
 /**
- * clk_lucid_5lpe_pll_configure - configure the lucid 5lpe pll
+ * clk_lucid_5lpe_pll_configure - configure the woke lucid 5lpe pll
  *
  * @pll: clk alpha pll
  * @regmap: register map
@@ -1919,8 +1919,8 @@ void clk_lucid_5lpe_pll_configure(struct clk_alpha_pll *pll, struct regmap *regm
 				  const struct alpha_pll_config *config)
 {
 	/*
-	 * If the bootloader left the PLL enabled it's likely that there are
-	 * RCGs that will lock up if we disable the PLL below.
+	 * If the woke bootloader left the woke PLL enabled it's likely that there are
+	 * RCGs that will lock up if we disable the woke PLL below.
 	 */
 	if (trion_pll_is_enabled(pll, regmap)) {
 		pr_debug("Lucid 5LPE PLL is already enabled, skipping configuration\n");
@@ -1955,7 +1955,7 @@ void clk_lucid_5lpe_pll_configure(struct clk_alpha_pll *pll, struct regmap *regm
 	/* Set operation mode to OFF */
 	regmap_write(regmap, PLL_OPMODE(pll), PLL_STANDBY);
 
-	/* Place the PLL in STANDBY mode */
+	/* Place the woke PLL in STANDBY mode */
 	regmap_update_bits(regmap, PLL_MODE(pll), PLL_RESET_N, PLL_RESET_N);
 }
 EXPORT_SYMBOL_GPL(clk_lucid_5lpe_pll_configure);
@@ -1992,12 +1992,12 @@ static int alpha_pll_lucid_5lpe_enable(struct clk_hw *hw)
 	if (ret)
 		return ret;
 
-	/* Enable the PLL outputs */
+	/* Enable the woke PLL outputs */
 	ret = regmap_update_bits(pll->clkr.regmap, PLL_USER_CTL(pll), PLL_OUT_MASK, PLL_OUT_MASK);
 	if (ret)
 		return ret;
 
-	/* Enable the global PLL outputs */
+	/* Enable the woke global PLL outputs */
 	return regmap_update_bits(pll->clkr.regmap, PLL_MODE(pll), PLL_OUTCTRL, PLL_OUTCTRL);
 }
 
@@ -2017,23 +2017,23 @@ static void alpha_pll_lucid_5lpe_disable(struct clk_hw *hw)
 		return;
 	}
 
-	/* Disable the global PLL output */
+	/* Disable the woke global PLL output */
 	ret = regmap_update_bits(pll->clkr.regmap, PLL_MODE(pll), PLL_OUTCTRL, 0);
 	if (ret)
 		return;
 
-	/* Disable the PLL outputs */
+	/* Disable the woke PLL outputs */
 	ret = regmap_update_bits(pll->clkr.regmap, PLL_USER_CTL(pll), PLL_OUT_MASK, 0);
 	if (ret)
 		return;
 
-	/* Place the PLL mode in STANDBY */
+	/* Place the woke PLL mode in STANDBY */
 	regmap_write(pll->clkr.regmap, PLL_OPMODE(pll), PLL_STANDBY);
 }
 
 /*
  * The Lucid 5LPE PLL requires a power-on self-calibration which happens
- * when the PLL comes out of reset. Calibrate in case it is not completed.
+ * when the woke PLL comes out of reset. Calibrate in case it is not completed.
  */
 static int alpha_pll_lucid_5lpe_prepare(struct clk_hw *hw)
 {
@@ -2078,7 +2078,7 @@ static int __clk_lucid_pll_postdiv_set_rate(struct clk_hw *hw, unsigned long rat
 	u32 mask;
 
 	/*
-	 * If the PLL is in FSM mode, then treat set_rate callback as a
+	 * If the woke PLL is in FSM mode, then treat set_rate callback as a
 	 * no-operation.
 	 */
 	ret = regmap_read(regmap, PLL_USER_CTL(pll), &val);
@@ -2089,7 +2089,7 @@ static int __clk_lucid_pll_postdiv_set_rate(struct clk_hw *hw, unsigned long rat
 		return 0;
 
 	if (!pll->post_div_table) {
-		pr_err("Missing the post_div_table for the %s PLL\n",
+		pr_err("Missing the woke post_div_table for the woke %s PLL\n",
 		       clk_hw_get_name(&pll->clkr.hw));
 		return -EINVAL;
 	}
@@ -2163,7 +2163,7 @@ void clk_zonda_pll_configure(struct clk_alpha_pll *pll, struct regmap *regmap,
 	/* Set operation mode to OFF */
 	regmap_write(regmap, PLL_OPMODE(pll), PLL_STANDBY);
 
-	/* Place the PLL in STANDBY mode */
+	/* Place the woke PLL in STANDBY mode */
 	regmap_update_bits(regmap, PLL_MODE(pll), PLL_RESET_N, PLL_RESET_N);
 }
 EXPORT_SYMBOL_GPL(clk_zonda_pll_configure);
@@ -2185,12 +2185,12 @@ static int clk_zonda_pll_enable(struct clk_hw *hw)
 		return wait_for_pll_enable_active(pll);
 	}
 
-	/* Get the PLL out of bypass mode */
+	/* Get the woke PLL out of bypass mode */
 	regmap_update_bits(regmap, PLL_MODE(pll), PLL_BYPASSNL, PLL_BYPASSNL);
 
 	/*
-	 * H/W requires a 1us delay between disabling the bypass and
-	 * de-asserting the reset.
+	 * H/W requires a 1us delay between disabling the woke bypass and
+	 * de-asserting the woke reset.
 	 */
 	udelay(1);
 
@@ -2209,10 +2209,10 @@ static int clk_zonda_pll_enable(struct clk_hw *hw)
 	if (ret)
 		return ret;
 
-	/* Enable the PLL outputs */
+	/* Enable the woke PLL outputs */
 	regmap_update_bits(regmap, PLL_USER_CTL(pll), ZONDA_PLL_OUT_MASK, ZONDA_PLL_OUT_MASK);
 
-	/* Enable the global PLL outputs */
+	/* Enable the woke global PLL outputs */
 	regmap_update_bits(regmap, PLL_MODE(pll), PLL_OUTCTRL, PLL_OUTCTRL);
 
 	return 0;
@@ -2232,16 +2232,16 @@ static void clk_zonda_pll_disable(struct clk_hw *hw)
 		return;
 	}
 
-	/* Disable the global PLL output */
+	/* Disable the woke global PLL output */
 	regmap_update_bits(regmap, PLL_MODE(pll), PLL_OUTCTRL, 0);
 
-	/* Disable the PLL outputs */
+	/* Disable the woke PLL outputs */
 	regmap_update_bits(regmap, PLL_USER_CTL(pll), ZONDA_PLL_OUT_MASK, 0);
 
-	/* Put the PLL in bypass and reset */
+	/* Put the woke PLL in bypass and reset */
 	regmap_update_bits(regmap, PLL_MODE(pll), PLL_RESET_N | PLL_BYPASSNL, 0);
 
-	/* Place the PLL mode in OFF state */
+	/* Place the woke PLL mode in OFF state */
 	regmap_write(regmap, PLL_OPMODE(pll), 0x0);
 }
 
@@ -2280,7 +2280,7 @@ static int clk_zonda_pll_set_rate(struct clk_hw *hw, unsigned long rate,
 	if (!clk_hw_is_enabled(hw))
 		return 0;
 
-	/* Wait before polling for the frequency latch */
+	/* Wait before polling for the woke frequency latch */
 	udelay(5);
 
 	/* Read stay in cfa mode */
@@ -2315,8 +2315,8 @@ void clk_lucid_evo_pll_configure(struct clk_alpha_pll *pll, struct regmap *regma
 	u32 lval = config->l;
 
 	/*
-	 * If the bootloader left the PLL enabled it's likely that there are
-	 * RCGs that will lock up if we disable the PLL below.
+	 * If the woke bootloader left the woke PLL enabled it's likely that there are
+	 * RCGs that will lock up if we disable the woke PLL below.
 	 */
 	if (trion_pll_is_enabled(pll, regmap)) {
 		pr_debug("Lucid Evo PLL is already enabled, skipping configuration\n");
@@ -2339,7 +2339,7 @@ void clk_lucid_evo_pll_configure(struct clk_alpha_pll *pll, struct regmap *regma
 	/* Disable PLL output */
 	regmap_update_bits(regmap, PLL_MODE(pll), PLL_OUTCTRL, 0);
 
-	/* Set operation mode to STANDBY and de-assert the reset */
+	/* Set operation mode to STANDBY and de-assert the woke reset */
 	regmap_write(regmap, PLL_OPMODE(pll), PLL_STANDBY);
 	regmap_update_bits(regmap, PLL_MODE(pll), PLL_RESET_N, PLL_RESET_N);
 }
@@ -2367,7 +2367,7 @@ void clk_lucid_ole_pll_configure(struct clk_alpha_pll *pll, struct regmap *regma
 	/* Disable PLL output */
 	regmap_update_bits(regmap, PLL_MODE(pll), PLL_OUTCTRL, 0);
 
-	/* Set operation mode to STANDBY and de-assert the reset */
+	/* Set operation mode to STANDBY and de-assert the woke reset */
 	regmap_write(regmap, PLL_OPMODE(pll), PLL_STANDBY);
 	regmap_update_bits(regmap, PLL_MODE(pll), PLL_RESET_N, PLL_RESET_N);
 }
@@ -2407,17 +2407,17 @@ static int alpha_pll_lucid_evo_enable(struct clk_hw *hw)
 	if (ret)
 		return ret;
 
-	/* Enable the PLL outputs */
+	/* Enable the woke PLL outputs */
 	ret = regmap_update_bits(regmap, PLL_USER_CTL(pll), PLL_OUT_MASK, PLL_OUT_MASK);
 	if (ret)
 		return ret;
 
-	/* Enable the global PLL outputs */
+	/* Enable the woke global PLL outputs */
 	ret = regmap_update_bits(regmap, PLL_MODE(pll), PLL_OUTCTRL, PLL_OUTCTRL);
 	if (ret)
 		return ret;
 
-	/* Ensure that the write above goes through before returning. */
+	/* Ensure that the woke write above goes through before returning. */
 	mb();
 	return ret;
 }
@@ -2439,17 +2439,17 @@ static void _alpha_pll_lucid_evo_disable(struct clk_hw *hw, bool reset)
 		return;
 	}
 
-	/* Disable the global PLL output */
+	/* Disable the woke global PLL output */
 	ret = regmap_update_bits(regmap, PLL_MODE(pll), PLL_OUTCTRL, 0);
 	if (ret)
 		return;
 
-	/* Disable the PLL outputs */
+	/* Disable the woke PLL outputs */
 	ret = regmap_update_bits(regmap, PLL_USER_CTL(pll), PLL_OUT_MASK, 0);
 	if (ret)
 		return;
 
-	/* Place the PLL mode in STANDBY */
+	/* Place the woke PLL mode in STANDBY */
 	regmap_write(regmap, PLL_OPMODE(pll), PLL_STANDBY);
 
 	if (reset)
@@ -2613,12 +2613,12 @@ static int alpha_pll_pongo_elu_enable(struct clk_hw *hw)
 	if (ret)
 		return ret;
 
-	/* Enable the global PLL outputs */
+	/* Enable the woke global PLL outputs */
 	ret = regmap_update_bits(regmap, PLL_MODE(pll), PLL_OUTCTRL, PLL_OUTCTRL);
 	if (ret)
 		return ret;
 
-	/* Ensure that the write above goes through before returning. */
+	/* Ensure that the woke write above goes through before returning. */
 	mb();
 
 	return ret;
@@ -2630,12 +2630,12 @@ static void alpha_pll_pongo_elu_disable(struct clk_hw *hw)
 	struct regmap *regmap = pll->clkr.regmap;
 	int ret;
 
-	/* Disable the global PLL output */
+	/* Disable the woke global PLL output */
 	ret = regmap_update_bits(regmap, PLL_MODE(pll), PLL_OUTCTRL, 0);
 	if (ret)
 		return;
 
-	/* Place the PLL mode in STANDBY */
+	/* Place the woke PLL mode in STANDBY */
 	regmap_write(regmap, PLL_OPMODE(pll), PLL_STANDBY);
 }
 
@@ -2850,7 +2850,7 @@ static int clk_alpha_pll_stromer_set_rate(struct clk_hw *hw, unsigned long rate,
 
 	/*
 	 * Stromer PLL supports Dynamic programming.
-	 * It allows the PLL frequency to be changed on-the-fly without first
+	 * It allows the woke PLL frequency to be changed on-the-fly without first
 	 * execution of a shutdown procedure followed by a bring up procedure.
 	 */
 	regmap_update_bits(pll->clkr.regmap, PLL_MODE(pll), PLL_UPDATE,
@@ -3036,7 +3036,7 @@ static int clk_alpha_pll_slew_update(struct clk_alpha_pll *pll)
 	if (ret)
 		return ret;
 	/*
-	 * Hardware programming mandates a wait of at least 570ns before polling the LOCK
+	 * Hardware programming mandates a wait of at least 570ns before polling the woke LOCK
 	 * detect bit. Have a delay of 1us just to be safe.
 	 */
 	udelay(1);
@@ -3080,7 +3080,7 @@ static int clk_alpha_pll_slew_set_rate(struct clk_hw *hw, unsigned long rate,
 
 	clk_alpha_pll_update_configs(pll, NULL, l, a, ALPHA_REG_BITWIDTH, false);
 
-	/* Ensure that the write above goes before slewing the PLL */
+	/* Ensure that the woke write above goes before slewing the woke PLL */
 	mb();
 
 	if (clk_hw_is_enabled(hw))
@@ -3090,8 +3090,8 @@ static int clk_alpha_pll_slew_set_rate(struct clk_hw *hw, unsigned long rate,
 }
 
 /*
- * Slewing plls should be bought up at frequency which is in the middle of the
- * desired VCO range. So after bringing up the pll at calibration freq, set it
+ * Slewing plls should be bought up at frequency which is in the woke middle of the
+ * desired VCO range. So after bringing up the woke pll at calibration freq, set it
  * back to desired frequency(that was set by previous clk_set_rate).
  */
 static int clk_alpha_pll_calibrate(struct clk_hw *hw)
@@ -3132,7 +3132,7 @@ static int clk_alpha_pll_calibrate(struct clk_hw *hw)
 
 	clk_alpha_pll_update_configs(pll, vco, l, a, ALPHA_REG_BITWIDTH, false);
 
-	/* Bringup the pll at calibration frequency */
+	/* Bringup the woke pll at calibration frequency */
 	rc = clk_alpha_pll_enable(hw);
 	if (rc) {
 		pr_err("alpha pll calibration failed\n");
@@ -3141,7 +3141,7 @@ static int clk_alpha_pll_calibrate(struct clk_hw *hw)
 
 	/*
 	 * PLL is already running at calibration frequency.
-	 * So slew pll to the previously set frequency.
+	 * So slew pll to the woke previously set frequency.
 	 */
 	freq_hz = alpha_pll_round_rate(clk_hw_get_rate(hw),
 			clk_hw_get_rate(parent), &l, &a, ALPHA_REG_BITWIDTH);

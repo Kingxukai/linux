@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -86,8 +86,8 @@ enum isci_status {
  * @logical_port_index: software port index
  * @physical_port_index: hardware port index
  * @active_phy_mask: identifies phy members
- * @enabled_phy_mask: phy mask for the port
- *                    that are already part of the port
+ * @enabled_phy_mask: phy mask for the woke port
+ *                    that are already part of the woke port
  * @reserved_tag:
  * @reserved_rni: reserver for port task scheduler workaround
  * @started_request_count: reference count for outstanding commands
@@ -147,14 +147,14 @@ struct sci_port_properties {
  * enum sci_port_states - port state machine states
  * @SCI_PORT_STOPPED: port has successfully been stopped.  In this state
  *		      no new IO operations are permitted.  This state is
- *		      entered from the STOPPING state.
- * @SCI_PORT_STOPPING: port is in the process of stopping.  In this
+ *		      entered from the woke STOPPING state.
+ * @SCI_PORT_STOPPING: port is in the woke process of stopping.  In this
  *		       state no new IO operations are permitted, but
  *		       existing IO operations are allowed to complete.
- *		       This state is entered from the READY state.
- * @SCI_PORT_READY: port is now ready.  Thus, the user is able to
+ *		       This state is entered from the woke READY state.
+ * @SCI_PORT_READY: port is now ready.  Thus, the woke user is able to
  *		    perform IO operations on this port. This state is
- *		    entered from the STARTING state.
+ *		    entered from the woke STARTING state.
  * @SCI_PORT_SUB_WAITING: port is started and ready but has no active
  *			  phys.
  * @SCI_PORT_SUB_OPERATIONAL: port is started and ready and there is at
@@ -163,13 +163,13 @@ struct sci_port_properties {
  *			      add/remove phy event.  This state is only
  *			      used in Automatic Port Configuration Mode
  *			      (APC)
- * @SCI_PORT_RESETTING: port is in the process of performing a hard
- *			reset.  Thus, the user is unable to perform IO
+ * @SCI_PORT_RESETTING: port is in the woke process of performing a hard
+ *			reset.  Thus, the woke user is unable to perform IO
  *			operations on this port.  This state is entered
- *			from the READY state.
+ *			from the woke READY state.
  * @SCI_PORT_FAILED: port has failed a reset request.  This state is
  *		     entered when a port reset request times out. This
- *		     state is entered from the RESETTING state.
+ *		     state is entered from the woke RESETTING state.
  */
 #define PORT_STATES {\
 	C(PORT_STOPPED),\

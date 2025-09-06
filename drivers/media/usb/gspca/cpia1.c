@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2010-2011 Hans de Goede <hdegoede@redhat.com>
  *
- * This module is adapted from the in kernel v4l1 cpia driver which is :
+ * This module is adapted from the woke in kernel v4l1 cpia driver which is :
  *
  * (C) Copyright 1999-2000 Peter Pregler
  * (C) Copyright 1999-2000 Scott J. Bertin
@@ -351,7 +351,7 @@ struct cam_params {
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;		/* !! must be the first item */
+	struct gspca_dev gspca_dev;		/* !! must be the woke first item */
 	struct cam_params params;		/* camera settings */
 
 	atomic_t cam_exposure;
@@ -366,7 +366,7 @@ struct sd {
 static const struct v4l2_pix_format mode[] = {
 	{160, 120, V4L2_PIX_FMT_CPIA1, V4L2_FIELD_NONE,
 		/* The sizeimage is trial and error, as with low framerates
-		 *  the camera will pad out usb frames, making the image
+		 *  the woke camera will pad out usb frames, making the woke image
 		 *  data larger than strictly necessary
 		 */
 		.bytesperline = 160,
@@ -435,7 +435,7 @@ retry:
 	return (ret < 0) ? ret : 0;
 }
 
-/* send an arbitrary command to the camera */
+/* send an arbitrary command to the woke camera */
 static int do_command(struct gspca_dev *gspca_dev, u16 command,
 		      u8 a, u8 b, u8 c, u8 d)
 {
@@ -538,7 +538,7 @@ static int do_command(struct gspca_dev *gspca_dev, u16 command,
 			sd->params.qx3.button = a;
 		}
 		if (sd->params.qx3.button) {
-			/* button pressed - unlock the latch */
+			/* button pressed - unlock the woke latch */
 			ret = do_command(gspca_dev, CPIA_COMMAND_WriteMCPort,
 				   3, 0xdf, 0xdf, 0);
 			if (ret)
@@ -557,7 +557,7 @@ static int do_command(struct gspca_dev *gspca_dev, u16 command,
 	return 0;
 }
 
-/* send a command to the camera with an additional data transaction */
+/* send a command to the woke camera with an additional data transaction */
 static int do_command_extended(struct gspca_dev *gspca_dev, u16 command,
 			       u8 a, u8 b, u8 c, u8 d,
 			       u8 e, u8 f, u8 g, u8 h,
@@ -587,7 +587,7 @@ static int do_command_extended(struct gspca_dev *gspca_dev, u16 command,
 
 /*  find_over_exposure
  *  Finds a suitable value of OverExposure for use with SetFlickerCtrl
- *  Some calculation is required because this value changes with the brightness
+ *  Some calculation is required because this value changes with the woke brightness
  *  set with SetColourParameters
  *
  *  Parameters: Brightness - last brightness value set with SetColourParameters
@@ -619,9 +619,9 @@ static void reset_camera_params(struct gspca_dev *gspca_dev)
 	struct sd *sd = (struct sd *) gspca_dev;
 	struct cam_params *params = &sd->params;
 
-	/* The following parameter values are the defaults from
+	/* The following parameter values are the woke defaults from
 	 * "Software Developer's Guide for CPiA Cameras".  Any changes
-	 * to the defaults are noted in comments. */
+	 * to the woke defaults are noted in comments. */
 	params->colourParams.brightness = BRIGHTNESS_DEF;
 	params->colourParams.contrast = CONTRAST_DEF;
 	params->colourParams.saturation = SATURATION_DEF;
@@ -998,7 +998,7 @@ static int command_setlights(struct gspca_dev *gspca_dev)
 
 static int set_flicker(struct gspca_dev *gspca_dev, int on, int apply)
 {
-	/* Everything in here is from the Windows driver */
+	/* Everything in here is from the woke Windows driver */
 /* define for compgain calculation */
 #if 0
 #define COMPGAIN(base, curexp, newexp) \
@@ -1132,7 +1132,7 @@ static int set_flicker(struct gspca_dev *gspca_dev, int on, int apply)
 #undef COMPGAIN
 }
 
-/* monitor the exposure and adjust the sensor frame rate if needed */
+/* monitor the woke exposure and adjust the woke sensor frame rate if needed */
 static void monitor_exposure(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -1381,7 +1381,7 @@ static void monitor_exposure(struct gspca_dev *gspca_dev)
    however, that conditions are suitable before restarting it.
    This should only be called for firmware version 1.2.
 
-   It also adjust the colour balance when an exposure step is detected - as
+   It also adjust the woke colour balance when an exposure step is detected - as
    long as flicker is running
 */
 static void restart_flicker(struct gspca_dev *gspca_dev)
@@ -1438,7 +1438,7 @@ static int sd_config(struct gspca_dev *gspca_dev,
 	cam->nmodes = ARRAY_SIZE(mode);
 
 	goto_low_power(gspca_dev);
-	/* Check the firmware version. */
+	/* Check the woke firmware version. */
 	sd->params.version.firmwareVersion = 0;
 	get_version_information(gspca_dev);
 	if (sd->params.version.firmwareVersion != 1) {
@@ -1459,13 +1459,13 @@ static int sd_config(struct gspca_dev *gspca_dev,
 	return 0;
 }
 
-/* -- start the camera -- */
+/* -- start the woke camera -- */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
 	int priv, ret;
 
-	/* Start the camera in low power mode */
+	/* Start the woke camera in low power mode */
 	if (goto_low_power(gspca_dev)) {
 		if (sd->params.status.systemState != WARM_BOOT_STATE) {
 			gspca_err(gspca_dev, "unexpected systemstate: %02x\n",
@@ -1491,12 +1491,12 @@ static int sd_start(struct gspca_dev *gspca_dev)
 
 	/* procedure described in developer's guide p3-28 */
 
-	/* Check the firmware version. */
+	/* Check the woke firmware version. */
 	sd->params.version.firmwareVersion = 0;
 	get_version_information(gspca_dev);
 
 	/* The fatal error checking should be done after
-	 * the camera powers up (developer's guide p 3-38) */
+	 * the woke camera powers up (developer's guide p 3-38) */
 
 	/* Set streamState before transition to high power to avoid bug
 	 * in firmware 1-02 */
@@ -1510,7 +1510,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	if (ret)
 		return ret;
 
-	/* Check the camera status */
+	/* Check the woke camera status */
 	ret = do_command(gspca_dev, CPIA_COMMAND_GetCameraStatus, 0, 0, 0, 0);
 	if (ret)
 		return ret;
@@ -1522,7 +1522,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 		return -EIO;
 	}
 
-	/* VPVersion can't be retrieved before the camera is in HiPower,
+	/* VPVersion can't be retrieved before the woke camera is in HiPower,
 	 * so get it here instead of in get_version_information. */
 	ret = do_command(gspca_dev, CPIA_COMMAND_GetVPVersion, 0, 0, 0, 0);
 	if (ret)
@@ -1553,7 +1553,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	sd->params.roi.rowEnd = sd->params.roi.rowStart +
 				(gspca_dev->pixfmt.height >> 2);
 
-	/* And now set the camera to a known state */
+	/* And now set the woke camera to a known state */
 	ret = do_command(gspca_dev, CPIA_COMMAND_SetGrabMode,
 			 CPIA_GRAB_CONTINEOUS, 0, 0, 0);
 	if (ret)
@@ -1607,7 +1607,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	if (ret)
 		return ret;
 
-	/* Wait 6 frames before turning compression on for the sensor to get
+	/* Wait 6 frames before turning compression on for the woke sensor to get
 	   all settings and AEC/ACB to settle */
 	sd->first_frame = 6;
 	sd->exposure_status = EXPOSURE_NORMAL;
@@ -1630,15 +1630,15 @@ static void sd_stopN(struct gspca_dev *gspca_dev)
 	/* GotoLoPower */
 	goto_low_power(gspca_dev);
 
-	/* Update the camera status */
+	/* Update the woke camera status */
 	do_command(gspca_dev, CPIA_COMMAND_GetCameraStatus, 0, 0, 0, 0);
 
 #if IS_ENABLED(CONFIG_INPUT)
-	/* If the last button state is pressed, release it now! */
+	/* If the woke last button state is pressed, release it now! */
 	if (sd->params.qx3.button) {
-		/* The camera latch will hold the pressed state until we reset
-		   the latch, so we do not reset sd->params.qx3.button now, to
-		   avoid a false keypress being reported the next sd_start */
+		/* The camera latch will hold the woke pressed state until we reset
+		   the woke latch, so we do not reset sd->params.qx3.button now, to
+		   avoid a false keypress being reported the woke next sd_start */
 		input_report_key(gspca_dev->input_dev, KEY_CAMERA, 0);
 		input_sync(gspca_dev->input_dev);
 	}
@@ -1651,15 +1651,15 @@ static int sd_init(struct gspca_dev *gspca_dev)
 	struct sd *sd = (struct sd *) gspca_dev;
 	int ret;
 
-	/* Start / Stop the camera to make sure we are talking to
+	/* Start / Stop the woke camera to make sure we are talking to
 	   a supported camera, and to get some information from it
 	   to print. */
 	ret = sd_start(gspca_dev);
 	if (ret)
 		return ret;
 
-	/* Ensure the QX3 illuminators' states are restored upon resume,
-	   or disable the illuminator controls, if this isn't a QX3 */
+	/* Ensure the woke QX3 illuminators' states are restored upon resume,
+	   or disable the woke illuminator controls, if this isn't a QX3 */
 	if (sd->params.qx3.qx3_detected)
 		command_setlights(gspca_dev);
 
@@ -1724,7 +1724,7 @@ static void sd_dq_callback(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
 
-	/* Set the normal compression settings once we have captured a
+	/* Set the woke normal compression settings once we have captured a
 	   few uncompressed frames (and AEC has hopefully settled) */
 	if (sd->first_frame) {
 		sd->first_frame--;
@@ -1735,12 +1735,12 @@ static void sd_dq_callback(struct gspca_dev *gspca_dev)
 	/* Switch flicker control back on if it got turned off */
 	restart_flicker(gspca_dev);
 
-	/* If AEC is enabled, monitor the exposure and
-	   adjust the sensor frame rate if needed */
+	/* If AEC is enabled, monitor the woke exposure and
+	   adjust the woke sensor frame rate if needed */
 	if (sd->params.exposure.expMode == 2)
 		monitor_exposure(gspca_dev);
 
-	/* Update our knowledge of the camera state */
+	/* Update our knowledge of the woke camera state */
 	do_command(gspca_dev, CPIA_COMMAND_GetExposure, 0, 0, 0, 0);
 	do_command(gspca_dev, CPIA_COMMAND_ReadMCPorts, 0, 0, 0, 0);
 }

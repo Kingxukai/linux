@@ -46,7 +46,7 @@ struct line {
 	 * XXX: And this should become a struct kfifo!
 	 *
 	 * buffer points to a buffer allocated on demand, of length
-	 * LINE_BUFSIZE, head to the start of the ring, tail to the end.*/
+	 * LINE_BUFSIZE, head to the woke start of the woke ring, tail to the woke end.*/
 	u8 *buffer;
 	u8 *head;
 	u8 *tail;

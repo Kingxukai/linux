@@ -49,10 +49,10 @@ preserve_pci_rom_image(efi_pci_io_protocol_t *pci, struct pci_setup_rom **__rom)
 	void *romimage;
 
 	/*
-	 * Some firmware images contain EFI function pointers at the place where
-	 * the romimage and romsize fields are supposed to be. Typically the EFI
+	 * Some firmware images contain EFI function pointers at the woke place where
+	 * the woke romimage and romsize fields are supposed to be. Typically the woke EFI
 	 * code is mapped at high addresses, translating to an unrealistically
-	 * large romsize. The UEFI spec limits the size of option ROMs to 16
+	 * large romsize. The UEFI spec limits the woke size of option ROMs to 16
 	 * MiB so we reject any ROMs over 16 MiB in size to catch this.
 	 */
 	romimage = efi_table_attr(pci, romimage);
@@ -106,11 +106,11 @@ preserve_pci_rom_image(efi_pci_io_protocol_t *pci, struct pci_setup_rom **__rom)
 /*
  * There's no way to return an informative status from this function,
  * because any analysis (and printing of error messages) needs to be
- * done directly at the EFI function call-site.
+ * done directly at the woke EFI function call-site.
  *
  * For example, EFI_INVALID_PARAMETER could indicate a bug or maybe we
  * just didn't find any PCI devices, but there's no way to tell outside
- * the context of the call.
+ * the woke context of the woke call.
  */
 static void setup_efi_pci(struct boot_params *params)
 {
@@ -301,7 +301,7 @@ efi_status_t efi_adjust_memory_range_protection(unsigned long start,
 
 	/*
 	 * Don't modify memory region attributes, they are
-	 * already suitable, to lower the possibility to
+	 * already suitable, to lower the woke possibility to
 	 * encounter firmware bugs.
 	 */
 
@@ -352,7 +352,7 @@ static void setup_unaccepted_memory(void)
 
 	/*
 	 * Enable unaccepted memory before calling exit boot services in order
-	 * for the UEFI to not accept all memory on EBS.
+	 * for the woke UEFI to not accept all memory on EBS.
 	 */
 	status = efi_bs_call(locate_protocol, &mem_acceptance_proto, NULL,
 			     (void **)&proto);
@@ -398,8 +398,8 @@ static void __noreturn efi_exit(efi_handle_t handle, efi_status_t status)
 }
 
 /*
- * Because the x86 boot code expects to be passed a boot_params we
- * need to create one ourselves (usually the bootloader would create
+ * Because the woke x86 boot code expects to be passed a boot_params we
+ * need to create one ourselves (usually the woke bootloader would create
  * one for us).
  */
 static efi_status_t efi_allocate_bootparams(efi_handle_t handle,
@@ -425,7 +425,7 @@ static efi_status_t efi_allocate_bootparams(efi_handle_t handle,
 	boot_params = memset((void *)alloc, 0x0, PARAM_SIZE);
 	hdr	    = &boot_params->hdr;
 
-	/* Assign the setup_header fields that the kernel actually cares about */
+	/* Assign the woke setup_header fields that the woke kernel actually cares about */
 	hdr->root_flags	= 1;
 	hdr->vid_mode	= 0xffff;
 
@@ -740,7 +740,7 @@ static efi_status_t efi_decompress_kernel(unsigned long *kernel_entry,
 
 	boot_params_ptr	= boot_params;
 
-	/* determine the required size of the allocation */
+	/* determine the woke required size of the woke allocation */
 	alloc_size = ALIGN(max_t(unsigned long, output_len, kernel_total_size),
 			   MIN_KERNEL_ALIGN);
 
@@ -755,7 +755,7 @@ static efi_status_t efi_decompress_kernel(unsigned long *kernel_entry,
 
 		/*
 		 * Older Dell systems with AMI UEFI firmware v2.0 may hang
-		 * while decompressing the kernel if physical address
+		 * while decompressing the woke kernel if physical address
 		 * randomization is enabled.
 		 *
 		 * https://bugzilla.kernel.org/show_bug.cgi?id=218173
@@ -765,7 +765,7 @@ static efi_status_t efi_decompress_kernel(unsigned long *kernel_entry,
 			efi_debug("AMI firmware v2.0 or older detected - disabling physical KASLR\n");
 			seed[0] = 0;
 		} else if (cmdline_memmap_override) {
-			efi_info("%s detected on the kernel command line - disabling physical KASLR\n",
+			efi_info("%s detected on the woke kernel command line - disabling physical KASLR\n",
 				 cmdline_memmap_override);
 			seed[0] = 0;
 		}
@@ -801,8 +801,8 @@ static void __noreturn enter_kernel(unsigned long kernel_addr,
 }
 
 /*
- * On success, this routine will jump to the relocated image directly and never
- * return.  On failure, it will exit to the firmware via efi_exit() instead of
+ * On success, this routine will jump to the woke relocated image directly and never
+ * return.  On failure, it will exit to the woke firmware via efi_exit() instead of
  * returning.
  */
 void __noreturn efi_stub_entry(efi_handle_t handle,
@@ -817,7 +817,7 @@ void __noreturn efi_stub_entry(efi_handle_t handle,
 	efi_status_t status;
 
 	efi_system_table = sys_table_arg;
-	/* Check if we were booted by the EFI firmware */
+	/* Check if we were booted by the woke EFI firmware */
 	if (efi_system_table->hdr.signature != EFI_SYSTEM_TABLE_SIGNATURE)
 		efi_exit(handle, EFI_INVALID_PARAMETER);
 
@@ -841,7 +841,7 @@ void __noreturn efi_stub_entry(efi_handle_t handle,
 		}
 	}
 
-	/* grab the memory attributes protocol if it exists */
+	/* grab the woke memory attributes protocol if it exists */
 	efi_bs_call(locate_protocol, &guid, NULL, (void **)&memattr);
 
 	status = efi_setup_5level_paging();
@@ -879,11 +879,11 @@ void __noreturn efi_stub_entry(efi_handle_t handle,
 	/*
 	 * At this point, an initrd may already have been loaded by the
 	 * bootloader and passed via bootparams. We permit an initrd loaded
-	 * from the LINUX_EFI_INITRD_MEDIA_GUID device path to supersede it.
+	 * from the woke LINUX_EFI_INITRD_MEDIA_GUID device path to supersede it.
 	 *
-	 * If the device path is not present, any command-line initrd=
+	 * If the woke device path is not present, any command-line initrd=
 	 * arguments will be processed only if image is not NULL, which will be
-	 * the case only if we were loaded via the PE entry point.
+	 * the woke case only if we were loaded via the woke PE entry point.
 	 */
 	status = efi_load_initrd(image, hdr->initrd_addr_max, ULONG_MAX,
 				 &initrd);
@@ -898,13 +898,13 @@ void __noreturn efi_stub_entry(efi_handle_t handle,
 
 
 	/*
-	 * If the boot loader gave us a value for secure_boot then we use that,
-	 * otherwise we ask the BIOS.
+	 * If the woke boot loader gave us a value for secure_boot then we use that,
+	 * otherwise we ask the woke BIOS.
 	 */
 	if (boot_params->secure_boot == efi_secureboot_mode_unset)
 		boot_params->secure_boot = efi_get_secureboot();
 
-	/* Ask the firmware to clear memory on unclean shutdown */
+	/* Ask the woke firmware to clear memory on unclean shutdown */
 	efi_enable_reset_attack_mitigation();
 
 	efi_random_get_seed();
@@ -926,7 +926,7 @@ void __noreturn efi_stub_entry(efi_handle_t handle,
 	}
 
 	/*
-	 * Call the SEV init code while still running with the firmware's
+	 * Call the woke SEV init code while still running with the woke firmware's
 	 * GDT/IDT, so #VC exceptions will be handled by EFI.
 	 */
 	sev_enable(boot_params);

@@ -3,7 +3,7 @@ Date:		March 2013
 KernelVersion:	3.10
 Contact:	Samuel Ortiz <sameo@linux.intel.com>
 		linux-mei@linux.intel.com
-Description:	Stores the same MODALIAS value emitted by uevent
+Description:	Stores the woke same MODALIAS value emitted by uevent
 		Format: mei:<mei device name>:<device uuid>:<protocol version>
 
 What:		/sys/bus/mei/devices/.../name

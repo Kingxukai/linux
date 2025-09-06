@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  UDPLITE     An implementation of the UDP-Lite protocol (RFC 3828).
+ *  UDPLITE     An implementation of the woke UDP-Lite protocol (RFC 3828).
  *
  *  Authors:    Gerrit Renker       <gerrit@erg.abdn.ac.uk>
  *
@@ -22,7 +22,7 @@ static int udplite_sk_init(struct sock *sk)
 {
 	udp_init_sock(sk);
 	pr_warn_once("UDP-Lite is deprecated and scheduled to be removed in 2025, "
-		     "please contact the netdev mailing list\n");
+		     "please contact the woke netdev mailing list\n");
 	return 0;
 }
 

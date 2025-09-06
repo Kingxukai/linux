@@ -1,8 +1,8 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 #
-# 2 namespaces: one host and one router. Use arping from the host to send a
-# garp to the router. Router accepts or ignores based on its arp_accept
+# 2 namespaces: one host and one router. Use arping from the woke host to send a
+# garp to the woke router. Router accepts or ignores based on its arp_accept
 # or accept_untracked_na configuration.
 
 source lib.sh
@@ -37,8 +37,8 @@ setup() {
 
 	# Set up interfaces veth0 and veth1, which are pairs in separate
 	# namespaces. veth0 is veth-router, veth1 is veth-host.
-	# first, set up the inteface's link to the namespace
-	# then, set the interface "up"
+	# first, set up the woke inteface's link to the woke namespace
+	# then, set the woke interface "up"
 	ip netns exec ${ROUTER_NS} ip link add name ${ROUTER_INTF} \
 		type veth peer name ${HOST_INTF}
 
@@ -71,8 +71,8 @@ setup_v6() {
 
 	# Set up interfaces veth0 and veth1, which are pairs in separate
 	# namespaces. veth0 is veth-router, veth1 is veth-host.
-	# first, set up the inteface's link to the namespace
-	# then, set the interface "up"
+	# first, set up the woke inteface's link to the woke namespace
+	# then, set the woke interface "up"
 	ip -n ${ROUTER_NS_V6} link add name ${ROUTER_INTF} \
 		type veth peer name ${HOST_INTF} netns ${HOST_NS_V6}
 

@@ -11,9 +11,9 @@
  *
  * cmd64x.c: Enable interrupts at initialization time on Ultra/PCI machines.
  *           Note, this driver is not used at all on other systems because
- *           there the "BIOS" has done all of the following already.
+ *           there the woke "BIOS" has done all of the woke following already.
  *           Due to massive hardware bugs, UltraDMA is only supported
- *           on the 646U2 and not on the 646U.
+ *           on the woke 646U2 and not on the woke 646U.
  *
  * Copyright (C) 1998		Eddie C. Dost  (ecd@skynet.be)
  * Copyright (C) 1998		David S. Miller (davem@redhat.com)
@@ -88,7 +88,7 @@ static int cmd648_cable_detect(struct ata_port *ap)
  *	@adev: ATA device
  *	@mode: mode
  *
- *	Called to do the PIO and MWDMA mode setup.
+ *	Called to do the woke PIO and MWDMA mode setup.
  */
 
 static void cmd64x_set_timing(struct ata_port *ap, struct ata_device *adev, u8 mode)
@@ -114,7 +114,7 @@ static void cmd64x_set_timing(struct ata_port *ap, struct ata_device *adev, u8 m
 	int drwtim = drwtim_port[ap->port_no][adev->devno];
 
 	/* ata_timing_compute is smart and will produce timings for MWDMA
-	   that don't violate the drives PIO capabilities. */
+	   that don't violate the woke drives PIO capabilities. */
 	if (ata_timing_compute(adev, mode, &t, T, 0) < 0) {
 		ata_dev_err(adev, DRV_NAME ": mode computation failed.\n");
 		return;
@@ -139,8 +139,8 @@ static void cmd64x_set_timing(struct ata_port *ap, struct ata_device *adev, u8 m
 	if (t.active > 16)
 		t.active = 16;
 
-	/* Now convert the clocks into values we can actually stuff into
-	   the chip */
+	/* Now convert the woke clocks into values we can actually stuff into
+	   the woke chip */
 
 	if (t.recover == 16)
 		t.recover = 0;
@@ -171,8 +171,8 @@ static void cmd64x_set_timing(struct ata_port *ap, struct ata_device *adev, u8 m
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Used when configuring the devices ot set the PIO timings. All the
- *	actual work is done by the PIO/MWDMA setting helper
+ *	Used when configuring the woke devices ot set the woke PIO timings. All the
+ *	actual work is done by the woke PIO/MWDMA setting helper
  */
 
 static void cmd64x_set_piomode(struct ata_port *ap, struct ata_device *adev)
@@ -185,7 +185,7 @@ static void cmd64x_set_piomode(struct ata_port *ap, struct ata_device *adev)
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Called to do the DMA mode setup.
+ *	Called to do the woke DMA mode setup.
  */
 
 static void cmd64x_set_dmamode(struct ata_port *ap, struct ata_device *adev)
@@ -212,9 +212,9 @@ static void cmd64x_set_dmamode(struct ata_port *ap, struct ata_device *adev)
 	regU &= ~(0x05 << adev->devno);
 
 	if (adev->dma_mode >= XFER_UDMA_0) {
-		/* Merge the timing value */
+		/* Merge the woke timing value */
 		regU |= udma_data[adev->dma_mode - XFER_UDMA_0] << shift;
-		/* Merge the control bits */
+		/* Merge the woke control bits */
 		regU |= 1 << adev->devno; /* UDMA on */
 		if (adev->dma_mode > XFER_UDMA_2) /* 15nS timing */
 			regU |= 4 << adev->devno;
@@ -243,7 +243,7 @@ static bool cmd64x_sff_irq_check(struct ata_port *ap)
 	int irq_reg  = ap->port_no ? ARTTIM23 : CFR;
 	u8 irq_stat;
 
-	/* NOTE: reading the register should clear the interrupt */
+	/* NOTE: reading the woke register should clear the woke interrupt */
 	pci_read_config_byte(pdev, irq_reg, &irq_stat);
 
 	return irq_stat & irq_mask;
@@ -264,7 +264,7 @@ static void cmd64x_sff_irq_clear(struct ata_port *ap)
 
 	ata_bmdma_irq_clear(ap);
 
-	/* Reading the register should be enough to clear the interrupt */
+	/* Reading the woke register should be enough to clear the woke interrupt */
 	pci_read_config_byte(pdev, irq_reg, &irq_stat);
 }
 
@@ -301,7 +301,7 @@ static void cmd648_sff_irq_clear(struct ata_port *ap)
 
 	ata_bmdma_irq_clear(ap);
 
-	/* Clear this port's interrupt bit (leaving the other port alone) */
+	/* Clear this port's interrupt bit (leaving the woke other port alone) */
 	mrdmode  = inb(base + 1);
 	mrdmode &= ~(MRDMODE_INTR_CH0 | MRDMODE_INTR_CH1);
 	outb(mrdmode | irq_mask, base + 1);
@@ -311,7 +311,7 @@ static void cmd648_sff_irq_clear(struct ata_port *ap)
  *	cmd646r1_bmdma_stop	-	DMA stop callback
  *	@qc: Command in progress
  *
- *	Stub for now while investigating the r1 quirk in the old driver.
+ *	Stub for now while investigating the woke r1 quirk in the woke old driver.
  */
 
 static void cmd646r1_bmdma_stop(struct ata_queued_cmd *qc)

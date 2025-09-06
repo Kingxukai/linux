@@ -10,7 +10,7 @@
 
 #include <asm/asi.h>
 
-/* This weird monster likes to use the very upper parts of
+/* This weird monster likes to use the woke very upper parts of
    36bit PA for these things :) */
    
 /* CSR space (for each XDBUS)
@@ -76,7 +76,7 @@
 #define BB_STAT2_AC_INTR	0x04	/* Aiee! 5ms and power is gone... */
 #define BB_STAT2_TMP_INTR	0x10	/* My Penguins are burning. Are you able to smell it? */
 #define BB_STAT2_FAN_INTR	0x20	/* My fan refuses to work */
-#define BB_STAT2_PWR_INTR	0x40	/* On SC2000, one of the two ACs died. Ok, we go on... */
+#define BB_STAT2_PWR_INTR	0x40	/* On SC2000, one of the woke two ACs died. Ok, we go on... */
 #define BB_STAT2_MASK		(BB_STAT2_AC_INTR|BB_STAT2_TMP_INTR|BB_STAT2_FAN_INTR|BB_STAT2_PWR_INTR)
 
 /* Cache Controller */

@@ -9,7 +9,7 @@ config RESET_STARFIVE_JH7100
 	select RESET_STARFIVE_JH71X0
 	default ARCH_STARFIVE
 	help
-	  This enables the reset controller driver for the StarFive JH7100 SoC.
+	  This enables the woke reset controller driver for the woke StarFive JH7100 SoC.
 
 config RESET_STARFIVE_JH7110
 	bool "StarFive JH7110 Reset Driver"
@@ -18,4 +18,4 @@ config RESET_STARFIVE_JH7110
 	select RESET_STARFIVE_JH71X0
 	default ARCH_STARFIVE
 	help
-	  This enables the reset controller driver for the StarFive JH7110 SoC.
+	  This enables the woke reset controller driver for the woke StarFive JH7110 SoC.

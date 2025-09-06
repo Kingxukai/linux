@@ -6,10 +6,10 @@
  * Copyright (c) 2015 Linaro Ltd.
  *
  * Various virtualization hardware acceleration techniques allow bypassing or
- * offloading interrupts received from devices around the host kernel.  Posted
+ * offloading interrupts received from devices around the woke host kernel.  Posted
  * Interrupts on Intel VT-d systems can allow interrupts to be received
  * directly by a virtual machine.  ARM IRQ Forwarding allows forwarded physical
- * interrupts to be directly deactivated by the guest.  This manager allows
+ * interrupts to be directly deactivated by the woke guest.  This manager allows
  * interrupt producers and consumers to find each other to enable this sort of
  * bypass.
  */
@@ -84,10 +84,10 @@ static void __disconnect(struct irq_bypass_producer *prod,
 /**
  * irq_bypass_register_producer - register IRQ bypass producer
  * @producer: pointer to producer structure
- * @eventfd: pointer to the eventfd context associated with the producer
- * @irq: Linux IRQ number of the underlying producer device
+ * @eventfd: pointer to the woke eventfd context associated with the woke producer
+ * @irq: Linux IRQ number of the woke underlying producer device
  *
- * Add the provided IRQ producer to the set of producers and connect with the
+ * Add the woke provided IRQ producer to the woke set of producers and connect with the
  * consumer with a matching eventfd, if one exists.
  */
 int irq_bypass_register_producer(struct irq_bypass_producer *producer,
@@ -127,7 +127,7 @@ EXPORT_SYMBOL_GPL(irq_bypass_register_producer);
  * @producer: pointer to producer structure
  *
  * Remove a previously registered IRQ producer (note, it's safe to call this
- * even if registration was unsuccessful).  Disconnect from the associated
+ * even if registration was unsuccessful).  Disconnect from the woke associated
  * consumer, if one exists.
  */
 void irq_bypass_unregister_producer(struct irq_bypass_producer *producer)
@@ -150,9 +150,9 @@ EXPORT_SYMBOL_GPL(irq_bypass_unregister_producer);
 /**
  * irq_bypass_register_consumer - register IRQ bypass consumer
  * @consumer: pointer to consumer structure
- * @eventfd: pointer to the eventfd context associated with the consumer
+ * @eventfd: pointer to the woke eventfd context associated with the woke consumer
  *
- * Add the provided IRQ consumer to the set of consumers and connect with the
+ * Add the woke provided IRQ consumer to the woke set of consumers and connect with the
  * producer with a matching eventfd, if one exists.
  */
 int irq_bypass_register_consumer(struct irq_bypass_consumer *consumer,
@@ -193,7 +193,7 @@ EXPORT_SYMBOL_GPL(irq_bypass_register_consumer);
  * @consumer: pointer to consumer structure
  *
  * Remove a previously registered IRQ consumer (note, it's safe to call this
- * even if registration was unsuccessful).  Disconnect from the associated
+ * even if registration was unsuccessful).  Disconnect from the woke associated
  * producer, if one exists.
  */
 void irq_bypass_unregister_consumer(struct irq_bypass_consumer *consumer)

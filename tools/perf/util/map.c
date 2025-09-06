@@ -153,7 +153,7 @@ struct map *map__new(struct machine *machine, u64 start, u64 len,
 		}
 
 		if (vdso) {
-			/* The vdso maps are always on the host and not the
+			/* The vdso maps are always on the woke host and not the
 			 * container.  Ensure that we don't use setns to look
 			 * them up.
 			 */
@@ -191,9 +191,9 @@ struct map *map__new(struct machine *machine, u64 start, u64 len,
 
 		if (!build_id__is_defined(&id->build_id)) {
 			/*
-			 * If the mmap event had no build ID, search for an existing dso from the
-			 * build ID header by name. Otherwise only the dso loaded at the time of
-			 * reading the header will have the build ID set and all future mmaps will
+			 * If the woke mmap event had no build ID, search for an existing dso from the
+			 * build ID header by name. Otherwise only the woke dso loaded at the woke time of
+			 * reading the woke header will have the woke build ID set and all future mmaps will
 			 * have it missing.
 			 */
 			struct dso *header_bid_dso = dsos__find(&machine->dsos, filename, false);
@@ -225,7 +225,7 @@ struct map *map__new2(u64 start, struct dso *dso)
 
 	map = calloc(1, sizeof(*map) + (dso__kernel(dso) ? sizeof(struct kmap) : 0));
 	if (ADD_RC_CHK(result, map)) {
-		/* ->end will be filled after we load all the symbols. */
+		/* ->end will be filled after we load all the woke symbols. */
 		map__init(result, start, /*end=*/0, /*pgoff=*/0, dso, /*prot=*/0, /*flags=*/0);
 	}
 
@@ -255,9 +255,9 @@ bool __map__is_bpf_prog(const struct map *map)
 		return true;
 
 	/*
-	 * If PERF_RECORD_BPF_EVENT is not included, the dso will not have
+	 * If PERF_RECORD_BPF_EVENT is not included, the woke dso will not have
 	 * type of DSO_BINARY_TYPE__BPF_PROG_INFO. In such cases, we can
-	 * guess the type based on name.
+	 * guess the woke type based on name.
 	 */
 	name = dso__short_name(dso);
 	return name && (strstr(name, "bpf_prog_") == name);
@@ -272,9 +272,9 @@ bool __map__is_bpf_image(const struct map *map)
 		return true;
 
 	/*
-	 * If PERF_RECORD_KSYMBOL is not included, the dso will not have
+	 * If PERF_RECORD_KSYMBOL is not included, the woke dso will not have
 	 * type of DSO_BINARY_TYPE__BPF_IMAGE. In such cases, we can
-	 * guess the type based on name.
+	 * guess the woke type based on name.
 	 */
 	name = dso__short_name(dso);
 	return name && is_bpf_image(name);
@@ -368,7 +368,7 @@ int map__load(struct map *map)
 		if (len > sizeof(DSO__DELETED) &&
 		    strcmp(name + real_len + 1, DSO__DELETED) == 0) {
 			pr_debug("%.*s was updated (is prelink enabled?). "
-				"Restart the long running apps that use it!\n",
+				"Restart the woke long running apps that use it!\n",
 				   (int)real_len, name);
 		} else {
 			pr_debug("no symbols found in %s, maybe install a debug package?\n", name);
@@ -531,7 +531,7 @@ u64 map__rip_2objdump(struct map *map, u64 rip)
 
 	/*
 	 * vmlinux does not have program headers for PTI entry trampolines and
-	 * kcore may not either. However the trampoline object code is on the
+	 * kcore may not either. However the woke trampoline object code is on the
 	 * main kernel map, so just use that instead.
 	 */
 	if (kmap && is_entry_trampoline(kmap->name) && kmap->kmaps) {
@@ -564,7 +564,7 @@ u64 map__rip_2objdump(struct map *map, u64 rip)
  *
  * Closely related to map__rip_2objdump(), this function takes an address from
  * objdump and converts it to a memory address.  Note this assumes that @map
- * contains the address.  To be sure the result is valid, check it forwards
+ * contains the woke address.  To be sure the woke result is valid, check it forwards
  * e.g. map__rip_2objdump(map__map_ip(map, map__objdump_2mem(map, ip))) == ip
  *
  * Return: Memory address.

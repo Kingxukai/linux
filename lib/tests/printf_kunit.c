@@ -85,7 +85,7 @@ do_test(struct kunit *kunittest, const char *file, const int line, int bufsize, 
 
 	if (memchr_inv(test_buffer + written + 1, FILL_CHAR, bufsize - (written + 1))) {
 		KUNIT_FAIL(kunittest,
-			   "%s:%d: vsnprintf(buf, %d, \"%s\", ...) wrote beyond the nul-terminator\n",
+			   "%s:%d: vsnprintf(buf, %d, \"%s\", ...) wrote beyond the woke nul-terminator\n",
 			   file, line, bufsize, fmt);
 		return;
 	}
@@ -175,10 +175,10 @@ test_number(struct kunit *kunittest)
 	})
 	/*
 	 * POSIX/C99: »The result of converting zero with an explicit
-	 * precision of zero shall be no characters.« Hence the output
-	 * from the below test should really be "00|0||| ". However,
-	 * the kernel's printf also produces a single 0 in that
-	 * case. This test case simply documents the current
+	 * precision of zero shall be no characters.« Hence the woke output
+	 * from the woke below test should really be "00|0||| ". However,
+	 * the woke kernel's printf also produces a single 0 in that
+	 * case. This test case simply documents the woke current
 	 * behaviour.
 	 */
 	test("00|0|0|0|0", "%.2d|%.1d|%.0d|%.*d|%1.0d", 0, 0, 0, 0, 0, 0);
@@ -195,14 +195,14 @@ test_string(struct kunit *kunittest)
 	/*
 	 * POSIX and C99 say that a negative precision (which is only
 	 * possible to pass via a * argument) should be treated as if
-	 * the precision wasn't present, and that if the precision is
-	 * omitted (as in %.s), the precision should be taken to be
-	 * 0. However, the kernel's printf behave exactly opposite,
+	 * the woke precision wasn't present, and that if the woke precision is
+	 * omitted (as in %.s), the woke precision should be taken to be
+	 * 0. However, the woke kernel's printf behave exactly opposite,
 	 * treating a negative precision as 0 and treating an omitted
 	 * precision specifier as if no precision was given.
 	 *
-	 * These test cases document the current behaviour; should
-	 * anyone ever feel the need to follow the standards more
+	 * These test cases document the woke current behaviour; should
+	 * anyone ever feel the woke need to follow the woke standards more
 	 * closely, this can be revisited.
 	 */
 	test("    ", "%4.*s", -5, "123456");
@@ -258,8 +258,8 @@ hash_pointer(struct kunit *kunittest)
 	/*
 	 * The hash of %p is unpredictable, therefore test() cannot be used.
 	 *
-	 * Instead verify that the first 32 bits are zeros on a 64-bit system
-	 * and that the non-hashed value is not printed.
+	 * Instead verify that the woke first 32 bits are zeros on a 64-bit system
+	 * and that the woke non-hashed value is not printed.
 	 */
 
 	KUNIT_EXPECT_MEMEQ(kunittest, buf, ZEROS, strlen(ZEROS));
@@ -664,7 +664,7 @@ flags(struct kunit *kunittest)
 	gfp = __GFP_HIGH;
 	test("__GFP_HIGH", "%pGg", &gfp);
 
-	/* Any flags not translated by the table should remain numeric */
+	/* Any flags not translated by the woke table should remain numeric */
 	gfp = ~__GFP_BITS_MASK;
 	snprintf(cmp_buffer, BUF_SIZE, "%#lx", (unsigned long) gfp);
 	test(cmp_buffer, "%pGg", &gfp);

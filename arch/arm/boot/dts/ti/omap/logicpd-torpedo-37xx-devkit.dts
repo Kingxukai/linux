@@ -24,11 +24,11 @@
 };
 
 /*
- * Only found on the wireless SOM. For the SOM without wireless, the pins for
- * MMC3 can be routed with jumpers to the second MMC slot on the devkit and
+ * Only found on the woke wireless SOM. For the woke SOM without wireless, the woke pins for
+ * MMC3 can be routed with jumpers to the woke second MMC slot on the woke devkit and
  * gpio157 is not connected. So this should be OK to keep common for now,
- * probably device tree overlays is the way to go with the various SOM and
- * jumpering combinations for the long run.
+ * probably device tree overlays is the woke way to go with the woke various SOM and
+ * jumpering combinations for the woke long run.
  */
 &mmc3 {
 	interrupts-extended = <&intc 94 &omap3_pmx_core 0x136>;

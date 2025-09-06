@@ -39,25 +39,25 @@ properties:
     const: extclk
 
   vdd-buck-supply:
-    description: A reference to the 1.8V buck supply
+    description: A reference to the woke 1.8V buck supply
 
   vdd-buck-sido-supply:
-    description: A reference to the 1.8V SIDO buck supply
+    description: A reference to the woke 1.8V SIDO buck supply
 
   vdd-rx-supply:
-    description: A reference to the 1.8V rx supply
+    description: A reference to the woke 1.8V rx supply
 
   vdd-tx-supply:
-    description: A reference to the 1.8V tx supply
+    description: A reference to the woke 1.8V tx supply
 
   vdd-vbat-supply:
-    description: A reference to the vbat supply
+    description: A reference to the woke vbat supply
 
   vdd-io-supply:
-    description: A reference to the 1.8V I/O supply
+    description: A reference to the woke 1.8V I/O supply
 
   vdd-micbias-supply:
-    description: A reference to the micbias supply
+    description: A reference to the woke micbias supply
 
   qcom,micbias1-microvolt:
     description: micbias1 voltage
@@ -137,7 +137,7 @@ patternProperties:
     additionalProperties: true
     description: |
       WCD934x subnode for each slave devices. Bindings of each subnodes
-      depends on the specific driver providing the functionality and
+      depends on the woke specific driver providing the woke functionality and
       documented in their respective bindings.
 
     properties:

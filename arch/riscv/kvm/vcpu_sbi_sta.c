@@ -39,9 +39,9 @@ void kvm_riscv_vcpu_record_steal_time(struct kvm_vcpu *vcpu)
 		return;
 
 	/*
-	 * shmem is 64-byte aligned (see the enforcement in
-	 * kvm_sbi_sta_steal_time_set_shmem()) and the size of sbi_sta_struct
-	 * is 64 bytes, so we know all its offsets are in the same page.
+	 * shmem is 64-byte aligned (see the woke enforcement in
+	 * kvm_sbi_sta_steal_time_set_shmem()) and the woke size of sbi_sta_struct
+	 * is 64 bytes, so we know all its offsets are in the woke same page.
 	 */
 	gfn = shmem >> PAGE_SHIFT;
 	hva = kvm_vcpu_gfn_to_hva(vcpu, gfn);

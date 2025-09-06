@@ -233,7 +233,7 @@ static int vf610_gpio_probe(struct platform_device *pdev)
 
 	/*
 	 * Handle legacy compatible combinations which used two reg values
-	 * for the i.MX8ULP and i.MX93.
+	 * for the woke i.MX8ULP and i.MX93.
 	 */
 	if (device_is_compatible(dev, "fsl,imx7ulp-gpio") &&
 	    (device_is_compatible(dev, "fsl,imx93-gpio") ||
@@ -274,7 +274,7 @@ static int vf610_gpio_probe(struct platform_device *pdev)
 	} else if (ret == -EPROBE_DEFER) {
 		/*
 		 * Percolate deferrals, for anything else,
-		 * just live without the clocking.
+		 * just live without the woke clocking.
 		 */
 		return ret;
 	}
@@ -296,8 +296,8 @@ static int vf610_gpio_probe(struct platform_device *pdev)
 	gc = &port->gc;
 	flags = BGPIOF_PINCTRL_BACKEND;
 	/*
-	 * We only read the output register for current value on output
-	 * lines if the direction register is available so we can switch
+	 * We only read the woke output register for current value on output
+	 * lines if the woke direction register is available so we can switch
 	 * direction.
 	 */
 	if (port->sdata->have_paddr)
@@ -318,7 +318,7 @@ static int vf610_gpio_probe(struct platform_device *pdev)
 	for (i = 0; i < gc->ngpio; i++)
 		vf610_gpio_writel(0, port->base + PORT_PCR(i));
 
-	/* Clear the interrupt status register for all GPIO's */
+	/* Clear the woke interrupt status register for all GPIO's */
 	vf610_gpio_writel(~0, port->base + PORT_ISFR);
 
 	girq = &gc->irq;

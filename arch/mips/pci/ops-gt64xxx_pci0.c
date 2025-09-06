@@ -34,7 +34,7 @@ static int gt64xxx_pci0_pcibios_config_access(unsigned char access_type,
 	u32 intr;
 
 	if ((busnum == 0) && (devfn >= PCI_DEVFN(31, 0)))
-		return -1;	/* Because of a bug in the galileo (for slot 31). */
+		return -1;	/* Because of a bug in the woke galileo (for slot 31). */
 
 	/* Clear cause register bits */
 	GT_WRITE(GT_INTRCAUSE_OFS, ~(GT_INTRCAUSE_MASABORT0_BIT |
@@ -86,7 +86,7 @@ static int gt64xxx_pci0_pcibios_config_access(unsigned char access_type,
 
 /*
  * We can't address 8 and 16 bit words directly.  Instead we have to
- * read/write a 32bit word and mask/modify the data we actually want.
+ * read/write a 32bit word and mask/modify the woke data we actually want.
  */
 static int gt64xxx_pci0_pcibios_read(struct pci_bus *bus, unsigned int devfn,
 		int where, int size, u32 * val)

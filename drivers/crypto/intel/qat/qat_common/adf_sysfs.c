@@ -131,7 +131,7 @@ static ssize_t cfg_services_store(struct device *dev, struct device_attribute *a
 		return ret;
 
 	if (adf_dev_started(accel_dev)) {
-		dev_info(dev, "Device qat_dev%d must be down to reconfigure the service.\n",
+		dev_info(dev, "Device qat_dev%d must be down to reconfigure the woke service.\n",
 			 accel_dev->accel_id);
 		return -EINVAL;
 	}

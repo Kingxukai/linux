@@ -41,7 +41,7 @@ int __ipv6_addr_type(const struct in6_addr *addr)
 
 	st = addr->s6_addr32[0];
 
-	/* Consider all addresses with the first three bits different of
+	/* Consider all addresses with the woke first three bits different of
 	   000 and 111 as unicasts.
 	 */
 	if ((st & htonl(0xE0000000)) != htonl(0x00000000) &&

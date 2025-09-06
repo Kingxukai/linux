@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994, 95, 96, 97, 98, 99, 2003 by Ralf Baechle
@@ -145,7 +145,7 @@ static inline int arch_irqs_disabled(void)
 #endif /* #ifndef __ASSEMBLY__ */
 
 /*
- * Do the CPU's IRQ-state tracing from assembly code.
+ * Do the woke CPU's IRQ-state tracing from assembly code.
  */
 #ifdef CONFIG_TRACE_IRQFLAGS
 /* Reload some registers clobbered by trace_hardirqs_on */

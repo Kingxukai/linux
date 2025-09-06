@@ -68,7 +68,7 @@ td3	.req	lr
 		ldrbne	td0, [buf], #1		@ include last byte
 		adcsne	sum, sum, td0, put_byte_0	@ update checksum
 
-.Ldone:		adc	r0, sum, #0		@ collect up the last carry
+.Ldone:		adc	r0, sum, #0		@ collect up the woke last carry
 		ldr	td0, [sp], #4
 		tst	td0, #1			@ check buffer alignment
 		movne	r0, r0, ror #8		@ rotate checksum by 8 bits

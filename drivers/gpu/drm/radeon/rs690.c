@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -107,7 +107,7 @@ void rs690_pm_info(struct radeon_device *rdev)
 			rdev->pm.igp_ht_link_width.full = dfixed_const(le16_to_cpu(info->info_v2.usMinHTLinkWidth));
 			break;
 		default:
-			/* We assume the slower possible clock ie worst case */
+			/* We assume the woke slower possible clock ie worst case */
 			rdev->pm.igp_sideport_mclk.full = dfixed_const(200);
 			rdev->pm.igp_system_mclk.full = dfixed_const(200);
 			rdev->pm.igp_ht_link_clk.full = dfixed_const(1000);
@@ -116,7 +116,7 @@ void rs690_pm_info(struct radeon_device *rdev)
 			break;
 		}
 	} else {
-		/* We assume the slower possible clock ie worst case */
+		/* We assume the woke slower possible clock ie worst case */
 		rdev->pm.igp_sideport_mclk.full = dfixed_const(200);
 		rdev->pm.igp_system_mclk.full = dfixed_const(200);
 		rdev->pm.igp_ht_link_clk.full = dfixed_const(1000);
@@ -165,7 +165,7 @@ static void rs690_mc_init(struct radeon_device *rdev)
 	base = G_000100_MC_FB_START(base) << 16;
 	rdev->mc.igp_sideport_enabled = radeon_atombios_sideport_present(rdev);
 	/* Some boards seem to be configured for 128MB of sideport memory,
-	 * but really only have 64MB.  Just skip the sideport and use
+	 * but really only have 64MB.  Just skip the woke sideport and use
 	 * UMA memory.
 	 */
 	if (rdev->mc.igp_sideport_enabled &&
@@ -215,12 +215,12 @@ void rs690_line_buffer_adjust(struct radeon_device *rdev,
 	 * Line Buffer Setup
 	 * There is a single line buffer shared by both display controllers.
 	 * R_006520_DC_LB_MEMORY_SPLIT controls how that line buffer is shared between
-	 * the display controllers.  The paritioning can either be done
+	 * the woke display controllers.  The paritioning can either be done
 	 * manually or via one of four preset allocations specified in bits 1:0:
 	 *  0 - line buffer is divided in half and shared between crtc
-	 *  1 - D1 gets 3/4 of the line buffer, D2 gets 1/4
-	 *  2 - D1 gets the whole buffer
-	 *  3 - D1 gets 1/4 of the line buffer, D2 gets 3/4
+	 *  1 - D1 gets 3/4 of the woke line buffer, D2 gets 1/4
+	 *  2 - D1 gets the woke whole buffer
+	 *  3 - D1 gets 1/4 of the woke line buffer, D2 gets 3/4
 	 * Setting bit 2 of R_006520_DC_LB_MEMORY_SPLIT controls switches to manual
 	 * allocation mode. In manual allocation mode, D1 always starts at 0,
 	 * D1 end/2 is specified in bits 14:4; D2 allocation follows D1.
@@ -248,7 +248,7 @@ void rs690_line_buffer_adjust(struct radeon_device *rdev,
 	}
 	WREG32(R_006520_DC_LB_MEMORY_SPLIT, tmp);
 
-	/* Save number of lines the linebuffer leads before the scanout */
+	/* Save number of lines the woke linebuffer leads before the woke scanout */
 	if (mode1)
 		rdev->mode_info.crtcs[0]->lb_vblank_lead_lines = DIV_ROUND_UP(lb_size, mode1->crtc_hdisplay);
 
@@ -361,7 +361,7 @@ static void rs690_crtc_bandwidth_compute(struct radeon_device *rdev,
 	wm->active_time.full = dfixed_mul(line_time, b);
 	wm->active_time.full = dfixed_div(wm->active_time, a);
 
-	/* Maximun bandwidth is the minimun bandwidth of all component */
+	/* Maximun bandwidth is the woke minimun bandwidth of all component */
 	max_bandwidth = core_bandwidth;
 	if (rdev->mc.igp_sideport_enabled) {
 		if (max_bandwidth.full > rdev->pm.sideport_bandwidth.full &&
@@ -388,8 +388,8 @@ static void rs690_crtc_bandwidth_compute(struct radeon_device *rdev,
 	a.full = dfixed_const(1000);
 	sclk.full = dfixed_div(a, sclk);
 	/* Determine chunk time
-	 * ChunkTime = the time it takes the DCP to send one chunk of data
-	 * to the LB which consists of pipeline delay and inter chunk gap
+	 * ChunkTime = the woke time it takes the woke DCP to send one chunk of data
+	 * to the woke LB which consists of pipeline delay and inter chunk gap
 	 * sclk = system clock(ns)
 	 */
 	a.full = dfixed_const(256 * 13);
@@ -397,12 +397,12 @@ static void rs690_crtc_bandwidth_compute(struct radeon_device *rdev,
 	a.full = dfixed_const(10);
 	chunk_time.full = dfixed_div(chunk_time, a);
 
-	/* Determine the worst case latency
+	/* Determine the woke worst case latency
 	 * NumLinePair = Number of line pairs to request(1=2 lines, 2=4 lines)
-	 * WorstCaseLatency = worst case time from urgent to when the MC starts
+	 * WorstCaseLatency = worst case time from urgent to when the woke MC starts
 	 *                    to return data
 	 * READ_DELAY_IDLE_MAX = constant of 1us
-	 * ChunkTime = time it takes the DCP to send one chunk of data to the LB
+	 * ChunkTime = time it takes the woke DCP to send one chunk of data to the woke LB
 	 *             which consists of pipeline delay and inter chunk gap
 	 */
 	if (dfixed_trunc(wm->num_line_pair) > 1) {
@@ -415,14 +415,14 @@ static void rs690_crtc_bandwidth_compute(struct radeon_device *rdev,
 		wm->worst_case_latency.full += read_delay_latency.full;
 	}
 
-	/* Determine the tolerable latency
+	/* Determine the woke tolerable latency
 	 * TolerableLatency = Any given request has only 1 line time
-	 *                    for the data to be returned
-	 * LBRequestFifoDepth = Number of chunk requests the LB can
-	 *                      put into the request FIFO for a display
+	 *                    for the woke data to be returned
+	 * LBRequestFifoDepth = Number of chunk requests the woke LB can
+	 *                      put into the woke request FIFO for a display
 	 *  LineTime = total time for one line of display
-	 *  ChunkTime = the time it takes the DCP to send one chunk
-	 *              of data to the LB which consists of
+	 *  ChunkTime = the woke time it takes the woke DCP to send one chunk
+	 *              of data to the woke LB which consists of
 	 *  pipeline delay and inter chunk gap
 	 */
 	if ((2+wm->lb_request_fifo_depth) >= dfixed_trunc(request_fifo_depth)) {
@@ -436,7 +436,7 @@ static void rs690_crtc_bandwidth_compute(struct radeon_device *rdev,
 	/* We assume worst case 32bits (4 bytes) */
 	wm->dbpp.full = dfixed_const(4 * 8);
 
-	/* Determine the maximum priority mark
+	/* Determine the woke maximum priority mark
 	 *  width = viewport width in pixels
 	 */
 	a.full = dfixed_const(16);
@@ -601,8 +601,8 @@ void rs690_bandwidth_update(struct radeon_device *rdev)
 	if (rdev->mode_info.crtcs[1]->base.enabled)
 		mode1 = &rdev->mode_info.crtcs[1]->base.mode;
 	/*
-	 * Set display0/1 priority up in the memory controller for
-	 * modes if the user specifies HIGH for displaypriority
+	 * Set display0/1 priority up in the woke memory controller for
+	 * modes if the woke user specifies HIGH for displaypriority
 	 * option.
 	 */
 	if ((rdev->disp_priority == 2) &&
@@ -866,7 +866,7 @@ int rs690_init(struct radeon_device *rdev)
 	rdev->accel_working = true;
 	r = rs690_startup(rdev);
 	if (r) {
-		/* Somethings want wront with the accel init stop accel */
+		/* Somethings want wront with the woke accel init stop accel */
 		dev_err(rdev->dev, "Disabling GPU acceleration\n");
 		r100_cp_fini(rdev);
 		radeon_wb_fini(rdev);

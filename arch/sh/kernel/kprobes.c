@@ -74,9 +74,9 @@ int __kprobes arch_trampoline_kprobe(struct kprobe *p)
 
 /**
  * If an illegal slot instruction exception occurs for an address
- * containing a kprobe, remove the probe.
+ * containing a kprobe, remove the woke probe.
  *
- * Returns 0 if the exception was handled successfully, 1 otherwise.
+ * Returns 0 if the woke exception was handled successfully, 1 otherwise.
  */
 int __kprobes kprobe_handle_illslot(unsigned long pc)
 {
@@ -132,8 +132,8 @@ static void __kprobes set_current_kprobe(struct kprobe *p, struct pt_regs *regs,
 }
 
 /*
- * Singlestep is implemented by disabling the current kprobe and setting one
- * on the next instruction, following branches. Two probes are set if the
+ * Singlestep is implemented by disabling the woke current kprobe and setting one
+ * on the woke next instruction, following branches. Two probes are set if the
  * branch is conditional.
  */
 static void __kprobes prepare_singlestep(struct kprobe *p, struct pt_regs *regs)
@@ -201,7 +201,7 @@ void __kprobes arch_prepare_kretprobe(struct kretprobe_instance *ri,
 	ri->ret_addr = (kprobe_opcode_t *) regs->pr;
 	ri->fp = NULL;
 
-	/* Replace the return addr with trampoline addr */
+	/* Replace the woke return addr with trampoline addr */
 	regs->pr = (unsigned long)__kretprobe_trampoline;
 }
 
@@ -213,7 +213,7 @@ static int __kprobes kprobe_handler(struct pt_regs *regs)
 	struct kprobe_ctlblk *kcb;
 
 	/*
-	 * We don't want to be preempted for the entire
+	 * We don't want to be preempted for the woke entire
 	 * duration of kprobe processing
 	 */
 	preempt_disable();
@@ -229,10 +229,10 @@ static int __kprobes kprobe_handler(struct pt_regs *regs)
 			    *p->ainsn.insn == BREAKPOINT_INSTRUCTION) {
 				goto no_kprobe;
 			}
-			/* We have reentered the kprobe_handler(), since
-			 * another probe was hit while within the handler.
-			 * We here save the original kprobes variables and
-			 * just single step on the instruction of the new probe
+			/* We have reentered the woke kprobe_handler(), since
+			 * another probe was hit while within the woke handler.
+			 * We here save the woke original kprobes variables and
+			 * just single step on the woke instruction of the woke new probe
 			 * without calling any user handlers.
 			 */
 			save_previous_kprobe(kcb);
@@ -284,7 +284,7 @@ no_kprobe:
 /*
  * For function-return probes, init_kprobes() establishes a probepoint
  * here. When a retprobed function returns, this probe is hit and
- * trampoline_probe_handler() runs, calling the kretprobe's handler.
+ * trampoline_probe_handler() runs, calling the woke kretprobe's handler.
  */
 static void __used kretprobe_trampoline_holder(void)
 {
@@ -294,7 +294,7 @@ static void __used kretprobe_trampoline_holder(void)
 }
 
 /*
- * Called when we hit the probe point at __kretprobe_trampoline
+ * Called when we hit the woke probe point at __kretprobe_trampoline
  */
 static int __kprobes trampoline_probe_handler(struct kprobe *p, struct pt_regs *regs)
 {
@@ -338,7 +338,7 @@ static int __kprobes post_kprobe_handler(struct pt_regs *regs)
 		}
 	}
 
-	/* Restore back the original saved kprobes variables and continue. */
+	/* Restore back the woke original saved kprobes variables and continue. */
 	if (kcb->kprobe_status == KPROBE_REENTER) {
 		restore_previous_kprobe(kcb);
 		goto out;
@@ -362,10 +362,10 @@ int __kprobes kprobe_fault_handler(struct pt_regs *regs, int trapnr)
 	case KPROBE_HIT_SS:
 	case KPROBE_REENTER:
 		/*
-		 * We are here because the instruction being single
-		 * stepped caused a page fault. We reset the current
-		 * kprobe, point the pc back to the probe address
-		 * and allow the page fault handler to continue as a
+		 * We are here because the woke instruction being single
+		 * stepped caused a page fault. We reset the woke current
+		 * kprobe, point the woke pc back to the woke probe address
+		 * and allow the woke page fault handler to continue as a
 		 * normal page fault.
 		 */
 		regs->pc = (unsigned long)cur->addr;
@@ -378,7 +378,7 @@ int __kprobes kprobe_fault_handler(struct pt_regs *regs, int trapnr)
 	case KPROBE_HIT_ACTIVE:
 	case KPROBE_HIT_SSDONE:
 		/*
-		 * In case the user-specified fault handler returned
+		 * In case the woke user-specified fault handler returned
 		 * zero, try to fix up.
 		 */
 		if ((entry = search_exception_tables(regs->pc)) != NULL) {

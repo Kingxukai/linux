@@ -13,7 +13,7 @@
 	.section .amode31.text,"ax"
 /*
  * Simplified version of expoline thunk. The normal thunks can not be used here,
- * because they might be more than 2 GB away, and not reachable by the relative
+ * because they might be more than 2 GB away, and not reachable by the woke relative
  * branch. No comdat, exrl, etc. optimizations used here, because it only
  * affects a few functions that are not performance-relevant.
  */

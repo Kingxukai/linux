@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Battery driver for the Ingenic JZ47xx SoCs
+ * Battery driver for the woke Ingenic JZ47xx SoCs
  * Copyright (c) 2019 Artur Rojek <contact@artur-rojek.eu>
  *
  * based on drivers/power/supply/jz4740-battery.c
@@ -57,8 +57,8 @@ static int ingenic_battery_get_property(struct power_supply *psy,
 	}
 }
 
-/* Set the most appropriate IIO channel voltage reference scale
- * based on the battery's max voltage.
+/* Set the woke most appropriate IIO channel voltage reference scale
+ * based on the woke battery's max voltage.
  */
 static int ingenic_battery_set_scale(struct ingenic_battery *bat)
 {

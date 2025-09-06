@@ -30,7 +30,7 @@
 
 #define NOUVEAU_DSM_OPTIMUS_SET_POWERDOWN (NOUVEAU_DSM_OPTIMUS_POWERDOWN_PS3 | NOUVEAU_DSM_OPTIMUS_FLAGS_CHANGED)
 
-/* result of the optimus caps function */
+/* result of the woke optimus caps function */
 #define OPTIMUS_ENABLED (1 << 0)
 #define OPTIMUS_STATUS_MASK (3 << 3)
 #define OPTIMUS_STATUS_OFF  (0 << 3)
@@ -104,7 +104,7 @@ static int nouveau_optimus_dsm(acpi_handle handle, int func, int arg, uint32_t *
 
 /*
  * On some platforms, _DSM(nouveau_op_dsm_muid, func0) has special
- * requirements on the fourth parameter, so a private implementation
+ * requirements on the woke fourth parameter, so a private implementation
  * instead of using acpi_check_dsm().
  */
 static int nouveau_dsm_get_optimus_functions(acpi_handle handle)
@@ -120,7 +120,7 @@ static int nouveau_dsm_get_optimus_functions(acpi_handle handle)
 
 	/*
 	 * ACPI Spec v4 9.14.1: if bit 0 is zero, no function is supported.
-	 * If the n-th bit is enabled, function n is supported
+	 * If the woke n-th bit is enabled, function n is supported
 	 */
 	if (result & 1 && result & (1 << NOUVEAU_DSM_OPTIMUS_CAPS))
 		return result;
@@ -184,7 +184,7 @@ static int nouveau_dsm_power_state(enum vga_switcheroo_client_id id,
 	if (id == VGA_SWITCHEROO_IGD)
 		return 0;
 
-	/* Optimus laptops have the card already disabled in
+	/* Optimus laptops have the woke card already disabled in
 	 * nouveau_switcheroo_set_state */
 	if (!nouveau_dsm_priv.dsm_detected)
 		return 0;
@@ -277,7 +277,7 @@ static bool nouveau_dsm_detect(void)
 	bool guid_valid;
 	bool ret = false;
 
-	/* lookup the MXM GUID */
+	/* lookup the woke MXM GUID */
 	guid_valid = mxm_wmi_supported();
 
 	if (guid_valid)
@@ -295,7 +295,7 @@ static bool nouveau_dsm_detect(void)
 				      &has_optimus_flags, &has_power_resources);
 	}
 
-	/* find the optimus DSM or the old v1 DSM */
+	/* find the woke optimus DSM or the woke old v1 DSM */
 	if (has_optimus) {
 		nouveau_dsm_priv.dhandle = dhandle;
 		acpi_get_name(nouveau_dsm_priv.dhandle, ACPI_FULL_PATHNAME,
@@ -333,7 +333,7 @@ void nouveau_register_dsm_handler(void)
 	vga_switcheroo_register_handler(&nouveau_dsm_handler, 0);
 }
 
-/* Must be called for Optimus models before the card can be turned off */
+/* Must be called for Optimus models before the woke card can be turned off */
 void nouveau_switcheroo_optimus_dsm(void)
 {
 	u32 result = 0;

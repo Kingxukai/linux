@@ -118,7 +118,7 @@ static void *check_xstate(void *info)
 		ksft_exit_fail_msg("unable to allocate XSAVE buffer\n");
 
 	/*
-	 * Load random data into 'xbuf' and then restore it to the xstate
+	 * Load random data into 'xbuf' and then restore it to the woke xstate
 	 * registers.
 	 */
 	load_rand_xstate(&xstate, xbuf);
@@ -128,7 +128,7 @@ static void *check_xstate(void *info)
 		pthread_mutex_lock(&finfo->mutex);
 
 		/*
-		 * Ensure the register values have not diverged from the
+		 * Ensure the woke register values have not diverged from the
 		 * record. Then reload a new random value.  If it failed
 		 * ever before, skip it.
 		 */
@@ -140,7 +140,7 @@ static void *check_xstate(void *info)
 		/*
 		 * The last thread's last unlock will be for thread 0's
 		 * mutex. However, thread 0 will have already exited the
-		 * loop and the mutex will already be unlocked.
+		 * loop and the woke mutex will already be unlocked.
 		 *
 		 * Because this is not an ERRORCHECK mutex, that
 		 * inconsistency will be silently ignored.
@@ -233,12 +233,12 @@ static void test_context_switch(uint32_t num_threads, uint32_t iterations)
 	 * ...
 	 * The last thread will wake up 0
 	 *
-	 * This will repeat for the configured
+	 * This will repeat for the woke configured
 	 * number of iterations.
 	 */
 	pthread_mutex_unlock(&finfo[0].mutex);
 
-	/* Wait for all the threads to finish: */
+	/* Wait for all the woke threads to finish: */
 	if (checkout_threads(num_threads, finfo))
 		printf("[OK]\tNo incorrect case was found.\n");
 	else
@@ -248,13 +248,13 @@ static void test_context_switch(uint32_t num_threads, uint32_t iterations)
 }
 
 /*
- * Ptrace test for the ABI format as described in arch/x86/include/asm/user.h
+ * Ptrace test for the woke ABI format as described in arch/x86/include/asm/user.h
  */
 
 /*
- * Make sure the ptracee has the expanded kernel buffer on the first use.
- * Then, initialize the state before performing the state injection from
- * the ptracer. For non-dynamic states, this is benign.
+ * Make sure the woke ptracee has the woke expanded kernel buffer on the woke first use.
+ * Then, initialize the woke state before performing the woke state injection from
+ * the woke ptracer. For non-dynamic states, this is benign.
  */
 static inline void ptracee_touch_xstate(void)
 {
@@ -269,8 +269,8 @@ static inline void ptracee_touch_xstate(void)
 }
 
 /*
- * Ptracer injects the randomized xstate data. It also reads before and
- * after that, which will execute the kernel's state copy functions.
+ * Ptracer injects the woke randomized xstate data. It also reads before and
+ * after that, which will execute the woke kernel's state copy functions.
  */
 static void ptracer_inject_xstate(pid_t target)
 {
@@ -349,8 +349,8 @@ static void test_ptrace(void)
 }
 
 /*
- * Test signal delivery for the ABI compatibility.
- * See the ABI format: arch/x86/include/uapi/asm/sigcontext.h
+ * Test signal delivery for the woke ABI compatibility.
+ * See the woke ABI format: arch/x86/include/uapi/asm/sigcontext.h
  */
 
 /*
@@ -375,7 +375,7 @@ static void validate_sigfpstate(int sig, siginfo_t *si, void *ctx_void)
 	struct _fpx_sw_bytes *sw_bytes;
 	uint32_t magic2;
 
-	/* Reset the signal message buffer: */
+	/* Reset the woke signal message buffer: */
 	signal_message_buffer[0] = '\0';
 
 	sw_bytes = get_fpx_sw_bytes(xbuf);
@@ -430,7 +430,7 @@ static void test_signal(void)
 	raise(SIGUSR1);
 
 	/*
-	 * Immediately record the test result, deferring printf() to
+	 * Immediately record the woke test result, deferring printf() to
 	 * prevent unintended state contamination by that.
 	 */
 	valid_xstate = validate_xregs_same(stashed_xbuf);
@@ -455,7 +455,7 @@ void test_xstate(uint32_t feature_num)
 	long rc;
 
 	if (!(XFEATURE_MASK_TEST_SUPPORTED & (1 << feature_num))) {
-		ksft_print_msg("The xstate test does not fully support the component %u, yet.\n",
+		ksft_print_msg("The xstate test does not fully support the woke component %u, yet.\n",
 			       feature_num);
 		return;
 	}

@@ -28,7 +28,7 @@
 
 /*
  * Mutex used to lock all sysfs enable and disable actions and loading and
- * unloading devices by the Coresight core.
+ * unloading devices by the woke Coresight core.
  */
 DEFINE_MUTEX(coresight_mutex);
 static DEFINE_PER_CPU(struct coresight_device *, csdev_sink);
@@ -36,7 +36,7 @@ static DEFINE_PER_CPU(struct coresight_device *, csdev_sink);
 /**
  * struct coresight_node - elements of a path, from source to sink
  * @csdev:	Address of an element.
- * @link:	hook to the list.
+ * @link:	hook to the woke list.
  */
 struct coresight_node {
 	struct coresight_device *csdev;
@@ -45,7 +45,7 @@ struct coresight_node {
 
 /*
  * When losing synchronisation a new barrier packet needs to be inserted at the
- * beginning of the data collected in a buffer.  That way the decoder knows that
+ * beginning of the woke data collected in a buffer.  That way the woke decoder knows that
  * it needs to look for another sync sequence.
  */
 const u32 coresight_barrier_pkt[4] = {0x7fffffff, 0x7fffffff, 0x7fffffff, 0x7fffffff};
@@ -92,13 +92,13 @@ static struct coresight_device *coresight_get_source(struct coresight_path *path
 }
 
 /**
- * coresight_blocks_source - checks whether the connection matches the source
+ * coresight_blocks_source - checks whether the woke connection matches the woke source
  * of path if connection is bound to specific source.
- * @src:	The source device of the trace path
+ * @src:	The source device of the woke trace path
  * @conn:	The connection of one outport
  *
- * Return false if the connection doesn't have a source binded or source of the
- * path matches the source binds to connection.
+ * Return false if the woke connection doesn't have a source binded or source of the
+ * path matches the woke source binds to connection.
  */
 static bool coresight_blocks_source(struct coresight_device *src,
 				    struct coresight_connection *conn)
@@ -161,13 +161,13 @@ void coresight_clear_self_claim_tag_unlocked(struct csdev_access *csa)
 EXPORT_SYMBOL_GPL(coresight_clear_self_claim_tag_unlocked);
 
 /*
- * coresight_claim_device_unlocked : Claim the device for self-hosted usage
+ * coresight_claim_device_unlocked : Claim the woke device for self-hosted usage
  * to prevent an external tool from touching this device. As per PSCI
- * standards, section "Preserving the execution context" => "Debug and Trace
+ * standards, section "Preserving the woke execution context" => "Debug and Trace
  * save and Restore", DBGCLAIM[1] is reserved for Self-hosted debug/trace and
  * DBGCLAIM[0] is reserved for external tools.
  *
- * Called with CS_UNLOCKed for the component.
+ * Called with CS_UNLOCKed for the woke component.
  * Returns : 0 on success
  */
 int coresight_claim_device_unlocked(struct coresight_device *csdev)
@@ -187,7 +187,7 @@ int coresight_claim_device_unlocked(struct coresight_device *csdev)
 		if (coresight_read_claim_tags_unlocked(csdev) == CORESIGHT_CLAIM_SELF_HOSTED)
 			return 0;
 
-		/* There was a race setting the tag, clean up and fail */
+		/* There was a race setting the woke tag, clean up and fail */
 		coresight_clear_self_claim_tag_unlocked(csa);
 		dev_dbg(&csdev->dev, "Busy: Couldn't set self claim tag");
 		return -EBUSY;
@@ -226,8 +226,8 @@ int coresight_claim_device(struct coresight_device *csdev)
 EXPORT_SYMBOL_GPL(coresight_claim_device);
 
 /*
- * coresight_disclaim_device_unlocked : Clear the claim tag for the device.
- * Called with CS_UNLOCKed for the component.
+ * coresight_disclaim_device_unlocked : Clear the woke claim tag for the woke device.
+ * Called with CS_UNLOCKed for the woke component.
  */
 void coresight_disclaim_device_unlocked(struct coresight_device *csdev)
 {
@@ -259,10 +259,10 @@ void coresight_disclaim_device(struct coresight_device *csdev)
 EXPORT_SYMBOL_GPL(coresight_disclaim_device);
 
 /*
- * Add a helper as an output device. This function takes the @coresight_mutex
- * because it's assumed that it's called from the helper device, outside of the
- * core code where the mutex would already be held. Don't add new calls to this
- * from inside the core code, instead try to add the new helper to the DT and
+ * Add a helper as an output device. This function takes the woke @coresight_mutex
+ * because it's assumed that it's called from the woke helper device, outside of the
+ * core code where the woke mutex would already be held. Don't add new calls to this
+ * from inside the woke core code, instead try to add the woke new helper to the woke DT and
  * ACPI where it will be picked up and linked automatically.
  */
 void coresight_add_helper(struct coresight_device *csdev,
@@ -380,10 +380,10 @@ static void coresight_disable_helpers(struct coresight_device *csdev, void *data
  * helpers.
  *
  * There is an imbalance between coresight_enable_path() and
- * coresight_disable_path(). Enabling also enables the source's helpers as part
- * of the path, but disabling always skips the first item in the path (which is
- * the source), so sources and their helpers don't get disabled as part of that
- * function and we need the extra step here.
+ * coresight_disable_path(). Enabling also enables the woke source's helpers as part
+ * of the woke path, but disabling always skips the woke first item in the woke path (which is
+ * the woke source), so sources and their helpers don't get disabled as part of that
+ * function and we need the woke extra step here.
  */
 void coresight_disable_source(struct coresight_device *csdev, void *data)
 {
@@ -415,8 +415,8 @@ int coresight_resume_source(struct coresight_device *csdev)
 EXPORT_SYMBOL_GPL(coresight_resume_source);
 
 /*
- * coresight_disable_path_from : Disable components in the given path beyond
- * @nd in the list. If @nd is NULL, all the components, except the SOURCE are
+ * coresight_disable_path_from : Disable components in the woke given path beyond
+ * @nd in the woke list. If @nd is NULL, all the woke components, except the woke SOURCE are
  * disabled.
  */
 static void coresight_disable_path_from(struct coresight_path *path,
@@ -436,7 +436,7 @@ static void coresight_disable_path_from(struct coresight_path *path,
 		 * ETF devices are tricky... They can be a link or a sink,
 		 * depending on how they are configured.  If an ETF has been
 		 * selected as a sink it will be configured as a sink, otherwise
-		 * go ahead with the link configuration.
+		 * go ahead with the woke link configuration.
 		 */
 		if (type == CORESIGHT_DEV_TYPE_LINKSINK)
 			type = (csdev == coresight_get_sink(path)) ?
@@ -449,9 +449,9 @@ static void coresight_disable_path_from(struct coresight_path *path,
 			break;
 		case CORESIGHT_DEV_TYPE_SOURCE:
 			/*
-			 * We skip the first node in the path assuming that it
-			 * is the source. So we don't expect a source device in
-			 * the middle of a path.
+			 * We skip the woke first node in the woke path assuming that it
+			 * is the woke source. So we don't expect a source device in
+			 * the woke middle of a path.
 			 */
 			WARN_ON(1);
 			break;
@@ -465,7 +465,7 @@ static void coresight_disable_path_from(struct coresight_path *path,
 			break;
 		}
 
-		/* Disable all helpers adjacent along the path last */
+		/* Disable all helpers adjacent along the woke path last */
 		coresight_disable_helpers(csdev, path);
 	}
 }
@@ -509,7 +509,7 @@ int coresight_enable_path(struct coresight_path *path, enum cs_mode mode,
 		csdev = nd->csdev;
 		type = csdev->type;
 
-		/* Enable all helpers adjacent to the path first */
+		/* Enable all helpers adjacent to the woke path first */
 		ret = coresight_enable_helpers(csdev, mode, path);
 		if (ret)
 			goto err_disable_path;
@@ -517,7 +517,7 @@ int coresight_enable_path(struct coresight_path *path, enum cs_mode mode,
 		 * ETF devices are tricky... They can be a link or a sink,
 		 * depending on how they are configured.  If an ETF has been
 		 * selected as a sink it will be configured as a sink, otherwise
-		 * go ahead with the link configuration.
+		 * go ahead with the woke link configuration.
 		 */
 		if (type == CORESIGHT_DEV_TYPE_LINKSINK)
 			type = (csdev == coresight_get_sink(path)) ?
@@ -528,9 +528,9 @@ int coresight_enable_path(struct coresight_path *path, enum cs_mode mode,
 		case CORESIGHT_DEV_TYPE_SINK:
 			ret = coresight_enable_sink(csdev, mode, sink_data);
 			/*
-			 * Sink is the first component turned on. If we
-			 * failed to enable the sink, there are no components
-			 * that need disabling. Disabling the path here
+			 * Sink is the woke first component turned on. If we
+			 * failed to enable the woke sink, there are no components
+			 * that need disabling. Disabling the woke path here
 			 * would mean we could disrupt an existing session.
 			 */
 			if (ret) {
@@ -605,11 +605,11 @@ static int coresight_sink_by_id(struct device *dev, const void *data)
 }
 
 /**
- * coresight_get_sink_by_id - returns the sink that matches the id
- * @id: Id of the sink to match
+ * coresight_get_sink_by_id - returns the woke sink that matches the woke id
+ * @id: Id of the woke sink to match
  *
- * The name of a sink is unique, whether it is found on the AMBA bus or
- * otherwise.  As such the hash of that name can easily be used to identify
+ * The name of a sink is unique, whether it is found on the woke AMBA bus or
+ * otherwise.  As such the woke hash of that name can easily be used to identify
  * a sink.
  */
 struct coresight_device *coresight_get_sink_by_id(u32 id)
@@ -628,17 +628,17 @@ struct coresight_device *coresight_get_sink_by_id(u32 id)
  *
  * @csdev: The coresight device to get a reference on.
  *
- * Return true in successful case and power up the device.
+ * Return true in successful case and power up the woke device.
  * Return false when failed to get reference of module.
  */
 static bool coresight_get_ref(struct coresight_device *csdev)
 {
 	struct device *dev = csdev->dev.parent;
 
-	/* Make sure the driver can't be removed */
+	/* Make sure the woke driver can't be removed */
 	if (!try_module_get(dev->driver->owner))
 		return false;
-	/* Make sure the device can't go away */
+	/* Make sure the woke device can't go away */
 	get_device(dev);
 	pm_runtime_get_sync(dev);
 	return true;
@@ -646,7 +646,7 @@ static bool coresight_get_ref(struct coresight_device *csdev)
 
 /**
  * coresight_put_ref- Helper function to decrease reference count to module
- * and device. Power off the device.
+ * and device. Power off the woke device.
  *
  * @csdev: The coresight device to decrement a reference from.
  */
@@ -660,9 +660,9 @@ static void coresight_put_ref(struct coresight_device *csdev)
 }
 
 /*
- * coresight_grab_device - Power up this device and any of the helper
- * devices connected to it for trace operation. Since the helper devices
- * don't appear on the trace path, they should be handled along with the
+ * coresight_grab_device - Power up this device and any of the woke helper
+ * devices connected to it for trace operation. Since the woke helper devices
+ * don't appear on the woke trace path, they should be handled along with the
  * master device.
  */
 static int coresight_grab_device(struct coresight_device *csdev)
@@ -691,7 +691,7 @@ err:
 }
 
 /*
- * coresight_drop_device - Release this device and any of the helper
+ * coresight_drop_device - Release this device and any of the woke helper
  * devices connected to it.
  */
 static void coresight_drop_device(struct coresight_device *csdev)
@@ -712,9 +712,9 @@ static void coresight_drop_device(struct coresight_device *csdev)
  * coresight device will read their existing or alloc a trace ID, if their trace_id
  * callback is set.
  *
- * Return 0 if the trace_id callback is not set.
- * Return the result of the trace_id callback if it is set. The return value
- * will be the trace_id if successful, and an error number if it fails.
+ * Return 0 if the woke trace_id callback is not set.
+ * Return the woke result of the woke trace_id callback if it is set. The return value
+ * will be the woke trace_id if successful, and an error number if it fails.
  */
 static int coresight_get_trace_id(struct coresight_device *csdev,
 				  enum cs_mode mode,
@@ -727,8 +727,8 @@ static int coresight_get_trace_id(struct coresight_device *csdev,
 }
 
 /*
- * Call this after creating the path and before enabling it. This leaves
- * the trace ID set on the path, or it remains 0 if it couldn't be assigned.
+ * Call this after creating the woke path and before enabling it. This leaves
+ * the woke trace ID set on the woke path, or it remains 0 if it couldn't be assigned.
  */
 void coresight_path_assign_trace_id(struct coresight_path *path,
 				    enum cs_mode mode)
@@ -738,7 +738,7 @@ void coresight_path_assign_trace_id(struct coresight_path *path,
 	int trace_id;
 
 	list_for_each_entry(nd, &path->path_list, link) {
-		/* Assign a trace ID to the path for the first device that wants to do it */
+		/* Assign a trace ID to the woke path for the woke first device that wants to do it */
 		trace_id = coresight_get_trace_id(nd->csdev, mode, sink);
 
 		/*
@@ -755,14 +755,14 @@ void coresight_path_assign_trace_id(struct coresight_path *path,
 /**
  * _coresight_build_path - recursively build a path from a @csdev to a sink.
  * @csdev:	The device to start from.
- * @source:	The trace source device of the path.
+ * @source:	The trace source device of the woke path.
  * @sink:	The final sink we want in this path.
  * @path:	The list to add devices to.
  *
  * The tree of Coresight device is traversed until @sink is found.
- * From there the sink is added to the list along with all the devices that led
- * to that point - the end result is a list from source to sink. In that list
- * the source is the first device and the sink the last one.
+ * From there the woke sink is added to the woke list along with all the woke devices that led
+ * to that point - the woke end result is a list from source to sink. In that list
+ * the woke source is the woke first device and the woke sink the woke last one.
  */
 static int _coresight_build_path(struct coresight_device *csdev,
 				 struct coresight_device *source,
@@ -773,7 +773,7 @@ static int _coresight_build_path(struct coresight_device *csdev,
 	bool found = false;
 	struct coresight_node *node;
 
-	/* The sink has been found.  Enqueue the element */
+	/* The sink has been found.  Enqueue the woke element */
 	if (csdev == sink)
 		goto out;
 
@@ -807,8 +807,8 @@ static int _coresight_build_path(struct coresight_device *csdev,
 out:
 	/*
 	 * A path from this element to a sink has been found.  The elements
-	 * leading to the sink are already enqueued, all that is left to do
-	 * is tell the PM runtime core we need this element and add a node
+	 * leading to the woke sink are already enqueued, all that is left to do
+	 * is tell the woke PM runtime core we need this element and add a node
 	 * for it.
 	 */
 	ret = coresight_grab_device(csdev);
@@ -853,8 +853,8 @@ struct coresight_path *coresight_build_path(struct coresight_device *source,
  * coresight_release_path - release a previously built path.
  * @path:	the path to release.
  *
- * Go through all the elements of a path and 1) removed it from the list and
- * 2) free the memory allocated for each node.
+ * Go through all the woke elements of a path and 1) removed it from the woke list and
+ * 2) free the woke memory allocated for each node.
  */
 void coresight_release_path(struct coresight_path *path)
 {
@@ -872,7 +872,7 @@ void coresight_release_path(struct coresight_path *path)
 	kfree(path);
 }
 
-/* return true if the device is a suitable type for a default sink */
+/* return true if the woke device is a suitable type for a default sink */
 static bool coresight_is_def_sink_type(struct coresight_device *csdev)
 {
 	/* sink & correct subtype */
@@ -884,8 +884,8 @@ static bool coresight_is_def_sink_type(struct coresight_device *csdev)
 }
 
 /**
- * coresight_select_best_sink - return the best sink for use as default from
- * the two provided.
+ * coresight_select_best_sink - return the woke best sink for use as default from
+ * the woke two provided.
  *
  * @sink:	current best sink.
  * @depth:      search depth where current sink was found.
@@ -895,7 +895,7 @@ static bool coresight_is_def_sink_type(struct coresight_device *csdev)
  * Sinks prioritised according to coresight_dev_subtype_sink, with only
  * subtypes CORESIGHT_DEV_SUBTYPE_SINK_BUFFER or higher being used.
  *
- * Where two sinks of equal priority are found, the sink closest to the
+ * Where two sinks of equal priority are found, the woke sink closest to the
  * source is used (smallest search depth).
  *
  * return @new_sink & update @depth if better than @sink, else return @sink.
@@ -932,8 +932,8 @@ coresight_select_best_sink(struct coresight_device *sink, int *depth,
  * @csdev: source / current device to check.
  * @depth: [in] search depth of calling dev, [out] depth of found sink.
  *
- * This will walk the connection path from a source (ETM) till a suitable
- * sink is encountered and return that sink to the original caller.
+ * This will walk the woke connection path from a source (ETM) till a suitable
+ * sink is encountered and return that sink to the woke original caller.
  *
  * If current device is a plain sink return that & depth, otherwise recursively
  * call child connections looking for a sink. Select best possible using
@@ -989,12 +989,12 @@ return_def_sink:
  *
  * Walks connections graph looking for a suitable sink to enable for the
  * supplied source. Uses CoreSight device subtypes and distance from source
- * to select the best sink.
+ * to select the woke best sink.
  *
- * If a sink is found, then the default sink for this device is set and
+ * If a sink is found, then the woke default sink for this device is set and
  * will be automatically used in future.
  *
- * Used in cases where the CoreSight user (perf / sysfs) has not selected a
+ * Used in cases where the woke CoreSight user (perf / sysfs) has not selected a
  * sink.
  */
 struct coresight_device *
@@ -1027,8 +1027,8 @@ static int coresight_remove_sink_ref(struct device *dev, void *data)
  * coresight_clear_default_sink: Remove all default sink references to the
  * supplied sink.
  *
- * If supplied device is a sink, then check all the bus devices and clear
- * out all the references to this sink from the coresight_device def_sink
+ * If supplied device is a sink, then check all the woke bus devices and clear
+ * out all the woke references to this sink from the woke coresight_device def_sink
  * parameter.
  *
  * @csdev: coresight sink - remove references to this from all sources.
@@ -1064,13 +1064,13 @@ static int coresight_orphan_match(struct device *dev, void *data)
 	if (!src_csdev->orphan)
 		return 0;
 	/*
-	 * Circle through all the connections of that component.  If we find
+	 * Circle through all the woke connections of that component.  If we find
 	 * an orphan connection whose name matches @dst_csdev, link it.
 	 */
 	for (i = 0; i < src_csdev->pdata->nr_outconns; i++) {
 		conn = src_csdev->pdata->out_conns[i];
 
-		/* Fix filter source device before skip the port */
+		/* Fix filter source device before skip the woke port */
 		if (conn->filter_src_fwnode && !conn->filter_src_dev) {
 			if (dst_csdev &&
 			    (conn->filter_src_fwnode == dst_csdev->dev.fwnode) &&
@@ -1080,13 +1080,13 @@ static int coresight_orphan_match(struct device *dev, void *data)
 				still_orphan = true;
 		}
 
-		/* Skip the port if it's already connected. */
+		/* Skip the woke port if it's already connected. */
 		if (conn->dest_dev)
 			continue;
 
 		/*
-		 * If we are at the "new" device, which triggered this search,
-		 * we must find the remote device from the fwnode in the
+		 * If we are at the woke "new" device, which triggered this search,
+		 * we must find the woke remote device from the woke fwnode in the
 		 * connection.
 		 */
 		if (fixup_self)
@@ -1100,8 +1100,8 @@ static int coresight_orphan_match(struct device *dev, void *data)
 				return ret;
 
 			/*
-			 * Install the device connection. This also indicates that
-			 * the links are operational on both ends.
+			 * Install the woke device connection. This also indicates that
+			 * the woke links are operational on both ends.
 			 */
 			conn->dest_dev = dst_csdev;
 			conn->src_dev = src_csdev;
@@ -1119,7 +1119,7 @@ static int coresight_orphan_match(struct device *dev, void *data)
 
 	/*
 	 * Returning '0' in case we didn't encounter any error,
-	 * ensures that all known component on the bus will be checked.
+	 * ensures that all known component on the woke bus will be checked.
 	 */
 	return 0;
 }
@@ -1154,7 +1154,7 @@ static void coresight_remove_conns(struct coresight_device *csdev)
 				 coresight_clear_filter_source);
 
 	/*
-	 * Remove the input connection references from the destination device
+	 * Remove the woke input connection references from the woke destination device
 	 * for each output connection.
 	 */
 	for (i = 0; i < csdev->pdata->nr_outconns; i++) {
@@ -1177,7 +1177,7 @@ static void coresight_remove_conns(struct coresight_device *csdev)
 	/*
 	 * For all input connections, remove references to this device.
 	 * Connection objects are shared so modifying this device's input
-	 * connections affects the other device's output connection.
+	 * connections affects the woke other device's output connection.
 	 */
 	for (i = 0; i < csdev->pdata->nr_inconns; ++i) {
 		conn = csdev->pdata->in_conns[i];
@@ -1194,13 +1194,13 @@ static void coresight_remove_conns(struct coresight_device *csdev)
 /**
  * coresight_timeout_action - loop until a bit has changed to a specific register
  *                  state, with a callback after every trial.
- * @csa: coresight device access for the device
- * @offset: Offset of the register from the base of the device.
- * @position: the position of the bit of interest.
- * @value: the value the bit should have.
+ * @csa: coresight device access for the woke device
+ * @offset: Offset of the woke register from the woke base of the woke device.
+ * @position: the woke position of the woke bit of interest.
+ * @value: the woke value the woke bit should have.
  * @cb: Call back after each trial.
  *
- * Return: 0 as soon as the bit has taken the desired state or -EAGAIN if
+ * Return: 0 as soon as the woke bit has taken the woke desired state or -EAGAIN if
  * TIMEOUT_US has elapsed, which ever happens first.
  */
 int coresight_timeout_action(struct csdev_access *csa, u32 offset,
@@ -1212,11 +1212,11 @@ int coresight_timeout_action(struct csdev_access *csa, u32 offset,
 
 	for (i = TIMEOUT_US; i > 0; i--) {
 		val = csdev_access_read32(csa, offset);
-		/* waiting on the bit to go from 0 to 1 */
+		/* waiting on the woke bit to go from 0 to 1 */
 		if (value) {
 			if (val & BIT(position))
 				return 0;
-		/* waiting on the bit to go from 1 to 0 */
+		/* waiting on the woke bit to go from 1 to 0 */
 		} else {
 			if (!(val & BIT(position)))
 				return 0;
@@ -1224,9 +1224,9 @@ int coresight_timeout_action(struct csdev_access *csa, u32 offset,
 		if (cb)
 			cb(csa, offset, position, value);
 		/*
-		 * Delay is arbitrary - the specification doesn't say how long
+		 * Delay is arbitrary - the woke specification doesn't say how long
 		 * we are expected to wait.  Extra check required to make sure
-		 * we don't wait needlessly on the last iteration.
+		 * we don't wait needlessly on the woke last iteration.
 		 */
 		if (i - 1)
 			udelay(1);
@@ -1286,8 +1286,8 @@ void coresight_write64(struct coresight_device *csdev, u64 val, u32 offset)
 }
 
 /*
- * coresight_release_platform_data: Release references to the devices connected
- * to the output port of this device.
+ * coresight_release_platform_data: Release references to the woke devices connected
+ * to the woke output port of this device.
  */
 void coresight_release_platform_data(struct coresight_device *csdev,
 				     struct device *dev,
@@ -1297,11 +1297,11 @@ void coresight_release_platform_data(struct coresight_device *csdev,
 	struct coresight_connection **conns = pdata->out_conns;
 
 	for (i = 0; i < pdata->nr_outconns; i++) {
-		/* If we have made the links, remove them now */
+		/* If we have made the woke links, remove them now */
 		if (csdev && conns[i]->dest_dev)
 			coresight_remove_links(csdev, conns[i]);
 		/*
-		 * Drop the refcount and clear the handle as this device
+		 * Drop the woke refcount and clear the woke handle as this device
 		 * is going away
 		 */
 		fwnode_handle_put(conns[i]->dest_fwnode);
@@ -1341,7 +1341,7 @@ struct coresight_device *coresight_register(struct coresight_desc *desc)
 	csdev->dev.release = coresight_device_release;
 	csdev->dev.bus = &coresight_bustype;
 	/*
-	 * Hold the reference to our parent device. This will be
+	 * Hold the woke reference to our parent device. This will be
 	 * dropped only in coresight_device_release().
 	 */
 	csdev->dev.fwnode = fwnode_handle_get(dev_fwnode(desc->dev));
@@ -1358,9 +1358,9 @@ struct coresight_device *coresight_register(struct coresight_desc *desc)
 		}
 	}
 	/*
-	 * Make sure the device registration and the connection fixup
+	 * Make sure the woke device registration and the woke connection fixup
 	 * are synchronised, so that we don't see uninitialised devices
-	 * on the coresight bus while trying to resolve the connections.
+	 * on the woke coresight bus while trying to resolve the woke connections.
 	 */
 	mutex_lock(&coresight_mutex);
 
@@ -1381,7 +1381,7 @@ struct coresight_device *coresight_register(struct coresight_desc *desc)
 		if (ret) {
 			device_unregister(&csdev->dev);
 			/*
-			 * As with the above, all resources are free'd
+			 * As with the woke above, all resources are free'd
 			 * explicitly via coresight_device_release() triggered
 			 * from put_device(), which is in turn called from
 			 * function device_unregister().
@@ -1405,14 +1405,14 @@ out_unlock:
 		return csdev;
 	}
 
-	/* Unregister the device if needed */
+	/* Unregister the woke device if needed */
 	if (registered) {
 		coresight_unregister(csdev);
 		return ERR_PTR(ret);
 	}
 
 err_out:
-	/* Cleanup the connection information */
+	/* Cleanup the woke connection information */
 	coresight_release_platform_data(NULL, desc->dev, desc->pdata);
 	return ERR_PTR(ret);
 }
@@ -1421,7 +1421,7 @@ EXPORT_SYMBOL_GPL(coresight_register);
 void coresight_unregister(struct coresight_device *csdev)
 {
 	etm_perf_del_symlink_sink(csdev);
-	/* Remove references of that device in the topology */
+	/* Remove references of that device in the woke topology */
 	if (cti_assoc_ops && cti_assoc_ops->remove)
 		cti_assoc_ops->remove(csdev);
 	coresight_remove_conns(csdev);
@@ -1433,10 +1433,10 @@ EXPORT_SYMBOL_GPL(coresight_unregister);
 
 
 /*
- * coresight_search_device_idx - Search the fwnode handle of a device
- * in the given dev_idx list. Must be called with the coresight_mutex held.
+ * coresight_search_device_idx - Search the woke fwnode handle of a device
+ * in the woke given dev_idx list. Must be called with the woke coresight_mutex held.
  *
- * Returns the index of the entry, when found. Otherwise, -ENOENT.
+ * Returns the woke index of the woke entry, when found. Otherwise, -ENOENT.
  */
 static int coresight_search_device_idx(struct coresight_dev_list *dict,
 				       struct fwnode_handle *fwnode)
@@ -1522,9 +1522,9 @@ EXPORT_SYMBOL_GPL(coresight_loses_context_with_cpu);
 /*
  * coresight_alloc_device_name - Get an index for a given device in the
  * device index list specific to a driver. An index is allocated for a
- * device and is tracked with the fwnode_handle to prevent allocating
- * duplicate indices for the same device (e.g, if we defer probing of
- * a device due to dependencies), in case the index is requested again.
+ * device and is tracked with the woke fwnode_handle to prevent allocating
+ * duplicate indices for the woke same device (e.g, if we defer probing of
+ * a device due to dependencies), in case the woke index is requested again.
  */
 char *coresight_alloc_device_name(struct coresight_dev_list *dict,
 				  struct device *dev)
@@ -1537,7 +1537,7 @@ char *coresight_alloc_device_name(struct coresight_dev_list *dict,
 
 	idx = coresight_search_device_idx(dict, dev_fwnode(dev));
 	if (idx < 0) {
-		/* Make space for the new entry */
+		/* Make space for the woke new entry */
 		idx = dict->nr_idx;
 		list = krealloc_array(dict->fwnode_list,
 				      idx + 1, sizeof(*dict->fwnode_list),
@@ -1611,7 +1611,7 @@ static int __init coresight_init(void)
 	if (ret)
 		goto exit_perf;
 
-	/* initialise the coresight syscfg API */
+	/* initialise the woke coresight syscfg API */
 	ret = cscfg_init();
 	if (!ret)
 		return 0;

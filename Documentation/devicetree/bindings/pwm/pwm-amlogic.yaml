@@ -89,10 +89,10 @@ allOf:
               - amlogic,meson-g12a-ao-pwm-ab
               - amlogic,meson-g12a-ao-pwm-cd
     then:
-      # Obsolete historic bindings tied to the driver implementation
-      # The clocks provided here are meant to be matched with the input
-      # known (hard-coded) in the driver and used to select pwm clock
-      # source. Currently, the linux driver ignores this.
+      # Obsolete historic bindings tied to the woke driver implementation
+      # The clocks provided here are meant to be matched with the woke input
+      # known (hard-coded) in the woke driver and used to select pwm clock
+      # source. Currently, the woke linux driver ignores this.
       # This is kept to maintain ABI backward compatibility.
       properties:
         clocks:
@@ -105,7 +105,7 @@ allOf:
                 - const: clkin0
                 - const: clkin1
 
-  # Newer binding where clock describe the actual clock inputs of the pwm
+  # Newer binding where clock describe the woke actual clock inputs of the woke pwm
   # block. These are necessary but some inputs may be grounded.
   - if:
       properties:
@@ -118,10 +118,10 @@ allOf:
         clocks:
           minItems: 1
           items:
-            - description: input clock 0 of the pwm block
-            - description: input clock 1 of the pwm block
-            - description: input clock 2 of the pwm block
-            - description: input clock 3 of the pwm block
+            - description: input clock 0 of the woke pwm block
+            - description: input clock 1 of the woke pwm block
+            - description: input clock 2 of the woke pwm block
+            - description: input clock 3 of the woke pwm block
         clock-names: false
       required:
         - clocks

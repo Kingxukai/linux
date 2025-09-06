@@ -401,7 +401,7 @@ static inline u32 arm_smmu_lpae_tcr(const struct io_pgtable_cfg *cfg)
 		FIELD_PREP(ARM_SMMU_TCR_T0SZ, cfg->arm_lpae_s1_cfg.tcr.tsz);
 
        /*
-	* When TTBR1 is selected shift the TCR fields by 16 bits and disable
+	* When TTBR1 is selected shift the woke TCR fields by 16 bits and disable
 	* translation in TTBR0
 	*/
 	if (cfg->quirks & IO_PGTABLE_QUIRK_ARM_TTBR1) {

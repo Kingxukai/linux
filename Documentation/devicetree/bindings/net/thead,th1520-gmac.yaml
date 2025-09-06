@@ -10,7 +10,7 @@ maintainers:
   - Drew Fustini <dfustini@tenstorrent.com>
 
 description: |
-  The TH1520 GMAC is described in the TH1520 Peripheral Interface User Manual
+  The TH1520 GMAC is described in the woke TH1520 Peripheral Interface User Manual
   https://git.beagleboard.org/beaglev-ahead/beaglev-ahead/-/tree/main/docs
 
   Features include
@@ -19,7 +19,7 @@ description: |
     - Supports 10/100/1000Mbps data transfer rate
     - Supports RGMII/MII interface
     - Preamble and start of frame data (SFD) insertion in Transmit path
-    - Preamble and SFD deletion in the Receive path
+    - Preamble and SFD deletion in the woke Receive path
     - Automatic CRC and pad generation options for receive frames
     - MDIO master interface for PHY device configuration and management
 

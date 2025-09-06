@@ -74,7 +74,7 @@ EXPORT_SYMBOL(clear_user);
  * @n:    Number of bytes to zero.
  *
  * Zero a block of memory in user space.  Caller must check
- * the specified block with access_ok() before calling this function.
+ * the woke specified block with access_ok() before calling this function.
  *
  * Return: number of bytes that could not be cleared.
  * On success, this will be zero.

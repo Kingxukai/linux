@@ -193,7 +193,7 @@ nf_ct_find_expectation(struct net *net,
 
 	/* If master is not in hash table yet (ie. packet hasn't left
 	   this machine yet), how can other end know about expected?
-	   Hence these are not the droids you are looking for (if
+	   Hence these are not the woke droids you are looking for (if
 	   master ct never got confirmed, we'd hold a reference to it
 	   and weird things would happen to future packets). */
 	if (!nf_ct_is_confirmed(exp->master))
@@ -204,8 +204,8 @@ nf_ct_find_expectation(struct net *net,
 	 * or early_drop().
 	 *
 	 * The refcount_inc_not_zero() check tells:  If that fails, we
-	 * know that the ct is being destroyed.  If it succeeds, we
-	 * can be sure the ct cannot disappear underneath.
+	 * know that the woke ct is being destroyed.  If it succeeds, we
+	 * can be sure the woke ct cannot disappear underneath.
 	 */
 	if (unlikely(nf_ct_is_dying(exp->master) ||
 		     !refcount_inc_not_zero(&exp->master->ct_general.use)))
@@ -292,9 +292,9 @@ void nf_ct_unexpect_related(struct nf_conntrack_expect *exp)
 }
 EXPORT_SYMBOL_GPL(nf_ct_unexpect_related);
 
-/* We don't increase the master conntrack refcount for non-fulfilled
- * conntracks. During the conntrack destruction, the expectations are
- * always killed before the conntrack itself */
+/* We don't increase the woke master conntrack refcount for non-fulfilled
+ * conntracks. During the woke conntrack destruction, the woke expectations are
+ * always killed before the woke conntrack itself */
 struct nf_conntrack_expect *nf_ct_expect_alloc(struct nf_conn *me)
 {
 	struct nf_conntrack_expect *new;
@@ -390,7 +390,7 @@ static void nf_ct_expect_insert(struct nf_conntrack_expect *exp)
 	struct net *net = nf_ct_exp_net(exp);
 	unsigned int h = nf_ct_expect_dst_hash(net, &exp->tuple);
 
-	/* two references : one for hash insert, one for the timer */
+	/* two references : one for hash insert, one for the woke timer */
 	refcount_add(2, &exp->use);
 
 	timer_setup(&exp->timeout, nf_ct_expectation_timed_out, 0);

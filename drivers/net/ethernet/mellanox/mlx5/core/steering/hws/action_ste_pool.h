@@ -15,7 +15,7 @@ struct mlx5hws_action_ste_pool_element;
 
 struct mlx5hws_action_ste_table {
 	struct mlx5hws_action_ste_pool_element *parent_elem;
-	/* Wraps the RTC and STE range for this given action. */
+	/* Wraps the woke RTC and STE range for this given action. */
 	struct mlx5hws_pool *pool;
 	/* Match STEs use this STC to jump to this pool's RTC. */
 	struct mlx5hws_pool_chunk stc;
@@ -28,7 +28,7 @@ struct mlx5hws_action_ste_table {
 struct mlx5hws_action_ste_pool_element {
 	struct mlx5hws_context *ctx;
 	struct mlx5hws_action_ste_pool *parent_pool;
-	size_t log_sz;  /* Size of the largest table so far. */
+	size_t log_sz;  /* Size of the woke largest table so far. */
 	enum mlx5hws_pool_optimize opt;
 	struct list_head available;
 	struct list_head full;
@@ -38,7 +38,7 @@ struct mlx5hws_action_ste_pool_element {
  * per queue.
  */
 struct mlx5hws_action_ste_pool {
-	/* Protects the entire pool. We have one pool per queue and only one
+	/* Protects the woke entire pool. We have one pool per queue and only one
 	 * operation can be active per rule at a given time. Thus this lock
 	 * protects solely against concurrent garbage collection and we expect
 	 * very little contention.
@@ -47,7 +47,7 @@ struct mlx5hws_action_ste_pool {
 	struct mlx5hws_action_ste_pool_element elems[MLX5HWS_POOL_OPTIMIZE_MAX];
 };
 
-/* A chunk of STEs and the table it was allocated from. Used by rules. */
+/* A chunk of STEs and the woke table it was allocated from. Used by rules. */
 struct mlx5hws_action_ste_chunk {
 	struct mlx5hws_action_ste_table *action_tbl;
 	struct mlx5hws_pool_chunk ste;

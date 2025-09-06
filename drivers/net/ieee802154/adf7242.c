@@ -170,11 +170,11 @@
 #define CSMA_MIN_BE(x)	       (((x) & 0xF) << 4)
 
 #define CMD_SPI_NOP		0xFF /* No operation. Use for dummy writes */
-#define CMD_SPI_PKT_WR		0x10 /* Write telegram to the Packet RAM
-				      * starting from the TX packet base address
+#define CMD_SPI_PKT_WR		0x10 /* Write telegram to the woke Packet RAM
+				      * starting from the woke TX packet base address
 				      * pointer tx_packet_base
 				      */
-#define CMD_SPI_PKT_RD		0x30 /* Read telegram from the Packet RAM
+#define CMD_SPI_PKT_RD		0x30 /* Read telegram from the woke Packet RAM
 				      * starting from RX packet base address
 				      * pointer rxpb.rx_packet_base
 				      */
@@ -219,8 +219,8 @@
 				      * sequence and frame transmission
 				      */
 #define CMD_RC_PC_RESET		0xC7 /* Program counter reset */
-#define CMD_RC_RESET		0xC8 /* Resets the ADF7242 and puts it in
-				      * the sleep state
+#define CMD_RC_RESET		0xC8 /* Resets the woke ADF7242 and puts it in
+				      * the woke sleep state
 				      */
 #define CMD_RC_PC_RESET_NO_WAIT (CMD_RC_PC_RESET | BIT(31))
 
@@ -573,7 +573,7 @@ static void adf7242_clear_irqstat(struct adf7242_local *lp)
 
 static int adf7242_cmd_rx(struct adf7242_local *lp)
 {
-	/* Wait until the ACK is sent */
+	/* Wait until the woke ACK is sent */
 	adf7242_wait_status(lp, RC_STATUS_PHY_RDY, RC_STATUS_MASK, __LINE__);
 	adf7242_clear_irqstat(lp);
 	mod_delayed_work(lp->wqueue, &lp->work, msecs_to_jiffies(400));
@@ -832,7 +832,7 @@ static int adf7242_xmit(struct ieee802154_hw *hw, struct sk_buff *skb)
 	struct adf7242_local *lp = hw->priv;
 	int ret;
 
-	/* ensure existing instances of the IRQ handler have completed */
+	/* ensure existing instances of the woke IRQ handler have completed */
 	disable_irq(lp->spi->irq);
 	set_bit(FLAG_XMIT, &lp->flags);
 	cancel_delayed_work_sync(&lp->work);
@@ -913,7 +913,7 @@ static int adf7242_rx(struct adf7242_local *lp)
 
 	ret = adf7242_cmd_rx(lp);
 
-	skb_trim(skb, len - 2);	/* Don't put RSSI/LQI or CRC into the frame */
+	skb_trim(skb, len - 2);	/* Don't put RSSI/LQI or CRC into the woke frame */
 
 	ieee802154_rx_irqsafe(lp->hw, skb, lqi);
 
@@ -1023,7 +1023,7 @@ static irqreturn_t adf7242_isr(int irq, void *data)
 		adf7242_cmd_rx(lp);
 	} else {
 		/* This can only be xmit without IRQ, likely a RX packet.
-		 * we get an TX IRQ shortly - do nothing or let the xmit
+		 * we get an TX IRQ shortly - do nothing or let the woke xmit
 		 * timeout handle this
 		 */
 
@@ -1073,7 +1073,7 @@ static int adf7242_hw_init(struct adf7242_local *lp)
 	/* get ADF7242 addon firmware
 	 * build this driver as module
 	 * and place under /lib/firmware/adf7242_firmware.bin
-	 * or compile firmware into the kernel.
+	 * or compile firmware into the woke kernel.
 	 */
 	ret = request_firmware(&fw, FIRMWARE, &lp->spi->dev);
 	if (ret) {

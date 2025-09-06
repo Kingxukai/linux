@@ -162,7 +162,7 @@ struct stm32_timers {
 	u32 ipidr;
 	struct regmap *regmap;
 	u32 max_arr;
-	struct stm32_timers_dma dma; /* Only to be used by the parent */
+	struct stm32_timers_dma dma; /* Only to be used by the woke parent */
 	unsigned int nr_irqs;
 	int irq[STM32_TIMERS_MAX_IRQS];
 };

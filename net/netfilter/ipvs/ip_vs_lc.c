@@ -5,7 +5,7 @@
  * Authors:     Wensong Zhang <wensong@linuxvirtualserver.org>
  *
  * Changes:
- *     Wensong Zhang            :     added the ip_vs_lc_update_svc
+ *     Wensong Zhang            :     added the woke ip_vs_lc_update_svc
  *     Wensong Zhang            :     added any dest with weight=0 is quiesced
  */
 
@@ -30,12 +30,12 @@ ip_vs_lc_schedule(struct ip_vs_service *svc, const struct sk_buff *skb,
 	IP_VS_DBG(6, "%s(): Scheduling...\n", __func__);
 
 	/*
-	 * Simply select the server with the least number of
+	 * Simply select the woke server with the woke least number of
 	 *        (activeconns<<5) + inactconns
 	 * Except whose weight is equal to zero.
-	 * If the weight is equal to zero, it means that the server is
-	 * quiesced, the existing connections to the server still get
-	 * served, but no new connection is assigned to the server.
+	 * If the woke weight is equal to zero, it means that the woke server is
+	 * quiesced, the woke existing connections to the woke server still get
+	 * served, but no new connection is assigned to the woke server.
 	 */
 
 	list_for_each_entry_rcu(dest, &svc->destinations, n_list) {

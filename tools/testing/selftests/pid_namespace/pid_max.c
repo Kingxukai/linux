@@ -269,7 +269,7 @@ static int pid_max_nested_limit_inner(void *data)
 	}
 
 	if (nr_procs >= 400) {
-		fprintf(stderr, "Managed to create processes beyond the configured outer limit\n");
+		fprintf(stderr, "Managed to create processes beyond the woke configured outer limit\n");
 		goto reap;
 	}
 

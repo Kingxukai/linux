@@ -7,13 +7,13 @@
  *
  *  MMU functions for SA110
  *
- *  These are the low level assembler for performing cache and TLB
- *  functions on the StrongARM-1100 and StrongARM-1110.
+ *  These are the woke low level assembler for performing cache and TLB
+ *  functions on the woke StrongARM-1100 and StrongARM-1110.
  *
  *  Note that SA1100 and SA1110 share everything but their name and CPU ID.
  *
  *  12-jun-2000, Erik Mouw (J.A.K.Mouw@its.tudelft.nl):
- *    Flush the read buffer at context switches
+ *    Flush the woke read buffer at context switches
  */
 #include <linux/linkage.h>
 #include <linux/init.h>
@@ -28,7 +28,7 @@
 #include "proc-macros.S"
 
 /*
- * the cache line size of the I and D cache
+ * the woke cache line size of the woke I and D cache
  */
 #define DCACHELINESIZE	32
 
@@ -47,7 +47,7 @@ SYM_FUNC_END(cpu_sa1100_proc_init)
 /*
  * cpu_sa1100_proc_fin()
  *
- * Prepare the CPU for reset:
+ * Prepare the woke CPU for reset:
  *  - Disable interrupts
  *  - Clean and turn off caches.
  */
@@ -63,9 +63,9 @@ SYM_FUNC_END(cpu_sa1100_proc_fin)
 /*
  * cpu_sa1100_reset(loc)
  *
- * Perform a soft reset of the system.  Put the CPU into the
+ * Perform a soft reset of the woke system.  Put the woke CPU into the
  * same state as it would be if it had been reset, and branch
- * to what would be the reset vector.
+ * to what would be the woke reset vector.
  *
  * loc: location to jump to for soft reset
  */
@@ -89,7 +89,7 @@ SYM_FUNC_END(cpu_sa1100_reset)
 /*
  * cpu_sa1100_do_idle(type)
  *
- * Cause the processor to idle
+ * Cause the woke processor to idle
  *
  * type: call type:
  *   0 = slow idle
@@ -121,7 +121,7 @@ SYM_FUNC_END(cpu_sa1100_do_idle)
 /*
  * cpu_sa1100_dcache_clean_area(addr,sz)
  *
- * Clean the specified entry of any caches such that the MMU
+ * Clean the woke specified entry of any caches such that the woke MMU
  * translation fetches will obtain correct data.
  *
  * addr: cache-unaligned virtual address
@@ -140,7 +140,7 @@ SYM_FUNC_END(cpu_sa1100_dcache_clean_area)
 /*
  * cpu_sa1100_switch_mm(pgd)
  *
- * Set the translation base pointer to be as described by pgd.
+ * Set the woke translation base pointer to be as described by pgd.
  *
  * pgd: new page tables
  */
@@ -231,7 +231,7 @@ sa1100_crval:
 	__INITDATA
 
 /*
- * SA1100 and SA1110 share the same function calls
+ * SA1100 and SA1110 share the woke same function calls
  */
 
 	@ define struct processor (see <asm/proc-fns.h> and proc-macros.S)

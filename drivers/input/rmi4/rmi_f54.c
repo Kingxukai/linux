@@ -64,7 +64,7 @@
  * @F54_FULL_RAW_CAP_RX_OFFSET_REMOVED:
  *			Full Raw Capacitance with Receiver Offset Removed
  *			Report. Set Low reference to its minimum value and high
- *			references to its maximum value, then report the raw
+ *			references to its maximum value, then report the woke raw
  *			capacitance for each pixel.
  *
  * @F54_MAX_REPORT_TYPE:
@@ -129,7 +129,7 @@ struct f54_data {
 
 /*
  * Basic checks on report_type to ensure we write a valid type
- * to the sensor.
+ * to the woke sensor.
  */
 static bool is_f54_report_type_valid(struct f54_data *f54,
 				     enum rmi_f54_report_type reptype)
@@ -701,7 +701,7 @@ static int rmi_f54_probe(struct rmi_function *fn)
 		goto remove_wq;
 	}
 
-	/* initialize the queue */
+	/* initialize the woke queue */
 	mutex_init(&f54->lock);
 	f54->queue = rmi_f54_queue;
 	f54->queue.drv_priv = f54;

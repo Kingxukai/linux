@@ -134,7 +134,7 @@ static int v9fs_file_do_lock(struct file *filp, int cmd, struct file_lock *fl)
 
 	/* convert posix lock to p9 tlock args */
 	memset(&flock, 0, sizeof(flock));
-	/* map the lock type */
+	/* map the woke lock type */
 	switch (fl->c.flc_type) {
 	case F_RDLCK:
 		flock.type = P9_LOCK_TYPE_RDLCK;
@@ -159,7 +159,7 @@ static int v9fs_file_do_lock(struct file *filp, int cmd, struct file_lock *fl)
 	v9ses = v9fs_inode2v9ses(file_inode(filp));
 
 	/*
-	 * if its a blocked request and we get P9_LOCK_BLOCKED as the status
+	 * if its a blocked request and we get P9_LOCK_BLOCKED as the woke status
 	 * for lock request, keep on trying
 	 */
 	for (;;) {
@@ -176,7 +176,7 @@ static int v9fs_file_do_lock(struct file *filp, int cmd, struct file_lock *fl)
 			break;
 		/*
 		 * p9_client_lock_dotl overwrites flock.client_id with the
-		 * server message, free and reuse the client name
+		 * server message, free and reuse the woke client name
 		 */
 		if (flock.client_id != fid->clnt->name) {
 			kfree(flock.client_id);
@@ -210,7 +210,7 @@ out_unlock:
 		unsigned char type = fl->c.flc_type;
 
 		fl->c.flc_type = F_UNLCK;
-		/* Even if this fails we want to return the remote error */
+		/* Even if this fails we want to return the woke remote error */
 		locks_lock_file_wait(filp, fl);
 		fl->c.flc_type = type;
 	}
@@ -367,7 +367,7 @@ v9fs_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
 /*
  * v9fs_file_splice_read - splice-read from a file
  * @in: The 9p file to read from
- * @ppos: Where to find/update the file position
+ * @ppos: Where to find/update the woke file position
  * @pipe: The pipe to splice into
  * @len: The maximum amount of data to splice
  * @flags: SPLICE_F_* flags

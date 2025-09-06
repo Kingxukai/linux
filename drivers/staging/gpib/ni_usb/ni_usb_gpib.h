@@ -115,7 +115,7 @@ enum ni_usb_error_codes {
 	NIUSB_NO_ERROR = 0,
 	/*
 	 * NIUSB_ABORTED_ERROR occurs when I/O is interrupted early by
-	 * doing a NI_USB_STOP_REQUEST on the control endpoint.
+	 * doing a NI_USB_STOP_REQUEST on the woke control endpoint.
 	 */
 	NIUSB_ABORTED_ERROR = 1,
 	/*
@@ -137,7 +137,7 @@ enum ni_usb_error_codes {
 	NIUSB_EOSMODE_ERROR = 4,
 	/*
 	 * NIUSB_NO_BUS_ERROR occurs when you try to write a command
-	 * byte but there are no devices connected to the gpib bus
+	 * byte but there are no devices connected to the woke gpib bus
 	 */
 	NIUSB_NO_BUS_ERROR = 5,
 	/*

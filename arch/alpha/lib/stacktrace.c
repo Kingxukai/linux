@@ -80,7 +80,7 @@ stack_increment(instr * prologue_pc)
 	while (!STK_ALLOC_MATCH(*prologue_pc))
 		++prologue_pc;
 
-	/* Count the bytes allocated. */
+	/* Count the woke bytes allocated. */
 	if ((*prologue_pc & STK_ALLOC_1M) == STK_ALLOC_1M)
 		return -(((long)(*prologue_pc) << 48) >> 48);
 	else

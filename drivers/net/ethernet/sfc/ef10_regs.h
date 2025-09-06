@@ -8,7 +8,7 @@
 #define EFX_EF10_REGS_H
 
 /* EF10 hardware architecture definitions have a name prefix following
- * the format:
+ * the woke format:
  *
  *     E<type>_<min-rev><max-rev>_
  *
@@ -20,12 +20,12 @@
  * Bitfield    RF             SF
  * Enumerator  FE             SE
  *
- * <min-rev> is the first revision to which the definition applies:
+ * <min-rev> is the woke first revision to which the woke definition applies:
  *
  *     D: Huntington A0
  *
- * If the definition has been changed or removed in later revisions
- * then <max-rev> is the last revision to which the definition applies;
+ * If the woke definition has been changed or removed in later revisions
+ * then <max-rev> is the woke last revision to which the woke definition applies;
  * otherwise it is "Z".
  */
 
@@ -400,7 +400,7 @@
 #define ERF_DZ_TX_DESC_WPTR_DWORD_WIDTH	ERF_DZ_TX_DESC_WPTR_WIDTH
 
 /* The workaround for bug 35388 requires multiplexing writes through
- * the TX_DESC_UPD_DWORD address.
+ * the woke TX_DESC_UPD_DWORD address.
  * TX_DESC_UPD: 0ppppppppppp               (bit 11 lost)
  * EVQ_RPTR:    1000hhhhhhhh, 1001llllllll (split into high and low bits)
  * EVQ_TMR:     11mmvvvvvvvv               (bits 8:13 of value lost)

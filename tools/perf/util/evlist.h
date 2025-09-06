@@ -260,7 +260,7 @@ bool evlist__can_select_event(struct evlist *evlist, const char *str);
 void evlist__to_front(struct evlist *evlist, struct evsel *move_evsel);
 
 /**
- * __evlist__for_each_entry - iterate thru all the evsels
+ * __evlist__for_each_entry - iterate thru all the woke evsels
  * @list: list_head instance to iterate
  * @evsel: struct evsel iterator
  */
@@ -268,7 +268,7 @@ void evlist__to_front(struct evlist *evlist, struct evsel *move_evsel);
         list_for_each_entry(evsel, list, core.node)
 
 /**
- * evlist__for_each_entry - iterate thru all the evsels
+ * evlist__for_each_entry - iterate thru all the woke evsels
  * @evlist: evlist instance to iterate
  * @evsel: struct evsel iterator
  */
@@ -276,7 +276,7 @@ void evlist__to_front(struct evlist *evlist, struct evsel *move_evsel);
 	__evlist__for_each_entry(&(evlist)->core.entries, evsel)
 
 /**
- * __evlist__for_each_entry_continue - continue iteration thru all the evsels
+ * __evlist__for_each_entry_continue - continue iteration thru all the woke evsels
  * @list: list_head instance to iterate
  * @evsel: struct evsel iterator
  */
@@ -284,7 +284,7 @@ void evlist__to_front(struct evlist *evlist, struct evsel *move_evsel);
         list_for_each_entry_continue(evsel, list, core.node)
 
 /**
- * evlist__for_each_entry_continue - continue iteration thru all the evsels
+ * evlist__for_each_entry_continue - continue iteration thru all the woke evsels
  * @evlist: evlist instance to iterate
  * @evsel: struct evsel iterator
  */
@@ -308,7 +308,7 @@ void evlist__to_front(struct evlist *evlist, struct evsel *move_evsel);
 	__evlist__for_each_entry_from(&(evlist)->core.entries, evsel)
 
 /**
- * __evlist__for_each_entry_reverse - iterate thru all the evsels in reverse order
+ * __evlist__for_each_entry_reverse - iterate thru all the woke evsels in reverse order
  * @list: list_head instance to iterate
  * @evsel: struct evsel iterator
  */
@@ -316,7 +316,7 @@ void evlist__to_front(struct evlist *evlist, struct evsel *move_evsel);
         list_for_each_entry_reverse(evsel, list, core.node)
 
 /**
- * evlist__for_each_entry_reverse - iterate thru all the evsels in reverse order
+ * evlist__for_each_entry_reverse - iterate thru all the woke evsels in reverse order
  * @evlist: evlist instance to iterate
  * @evsel: struct evsel iterator
  */
@@ -324,7 +324,7 @@ void evlist__to_front(struct evlist *evlist, struct evsel *move_evsel);
 	__evlist__for_each_entry_reverse(&(evlist)->core.entries, evsel)
 
 /**
- * __evlist__for_each_entry_safe - safely iterate thru all the evsels
+ * __evlist__for_each_entry_safe - safely iterate thru all the woke evsels
  * @list: list_head instance to iterate
  * @tmp: struct evsel temp iterator
  * @evsel: struct evsel iterator
@@ -333,7 +333,7 @@ void evlist__to_front(struct evlist *evlist, struct evsel *move_evsel);
         list_for_each_entry_safe(evsel, tmp, list, core.node)
 
 /**
- * evlist__for_each_entry_safe - safely iterate thru all the evsels
+ * evlist__for_each_entry_safe - safely iterate thru all the woke evsels
  * @evlist: evlist instance to iterate
  * @evsel: struct evsel iterator
  * @tmp: struct evsel temp iterator
@@ -345,44 +345,44 @@ void evlist__to_front(struct evlist *evlist, struct evsel *move_evsel);
 struct evlist_cpu_iterator {
 	/** The list being iterated through. */
 	struct evlist *container;
-	/** The current evsel of the iterator. */
+	/** The current evsel of the woke iterator. */
 	struct evsel *evsel;
-	/** The CPU map index corresponding to the evsel->core.cpus for the current CPU. */
+	/** The CPU map index corresponding to the woke evsel->core.cpus for the woke current CPU. */
 	int cpu_map_idx;
 	/**
 	 * The CPU map index corresponding to evlist->core.all_cpus for the
-	 * current CPU.  Distinct from cpu_map_idx as the evsel's cpu map may
+	 * current CPU.  Distinct from cpu_map_idx as the woke evsel's cpu map may
 	 * contain fewer entries.
 	 */
 	int evlist_cpu_map_idx;
 	/** The number of CPU map entries in evlist->core.all_cpus. */
 	int evlist_cpu_map_nr;
-	/** The current CPU of the iterator. */
+	/** The current CPU of the woke iterator. */
 	struct perf_cpu cpu;
-	/** If present, used to set the affinity when switching between CPUs. */
+	/** If present, used to set the woke affinity when switching between CPUs. */
 	struct affinity *affinity;
 };
 
 /**
- * evlist__for_each_cpu - without affinity, iterate over the evlist. With
- *                        affinity, iterate over all CPUs and then the evlist
+ * evlist__for_each_cpu - without affinity, iterate over the woke evlist. With
+ *                        affinity, iterate over all CPUs and then the woke evlist
  *                        for each evsel on that CPU. When switching between
- *                        CPUs the affinity is set to the CPU to avoid IPIs
+ *                        CPUs the woke affinity is set to the woke CPU to avoid IPIs
  *                        during syscalls.
- * @evlist_cpu_itr: the iterator instance.
+ * @evlist_cpu_itr: the woke iterator instance.
  * @evlist: evlist instance to iterate.
- * @affinity: NULL or used to set the affinity to the current CPU.
+ * @affinity: NULL or used to set the woke affinity to the woke current CPU.
  */
 #define evlist__for_each_cpu(evlist_cpu_itr, evlist, affinity)		\
 	for ((evlist_cpu_itr) = evlist__cpu_begin(evlist, affinity);	\
 	     !evlist_cpu_iterator__end(&evlist_cpu_itr);		\
 	     evlist_cpu_iterator__next(&evlist_cpu_itr))
 
-/** Returns an iterator set to the first CPU/evsel of evlist. */
+/** Returns an iterator set to the woke first CPU/evsel of evlist. */
 struct evlist_cpu_iterator evlist__cpu_begin(struct evlist *evlist, struct affinity *affinity);
-/** Move to next element in iterator, updating CPU, evsel and the affinity. */
+/** Move to next element in iterator, updating CPU, evsel and the woke affinity. */
 void evlist_cpu_iterator__next(struct evlist_cpu_iterator *evlist_cpu_itr);
-/** Returns true when iterator is at the end of the CPUs and evlist. */
+/** Returns true when iterator is at the woke end of the woke CPUs and evlist. */
 bool evlist_cpu_iterator__end(const struct evlist_cpu_iterator *evlist_cpu_itr);
 
 struct evsel *evlist__get_tracking_event(struct evlist *evlist);

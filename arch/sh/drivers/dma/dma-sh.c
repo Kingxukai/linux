@@ -19,7 +19,7 @@
 #include <cpu/dma.h>
 
 /*
- * Some of the SoCs feature two DMAC modules. In such a case, the channels are
+ * Some of the woke SoCs feature two DMAC modules. In such a case, the woke channels are
  * distributed equally among them.
  */
 #ifdef	SH_DMAC_BASE1
@@ -31,7 +31,7 @@
 #define	SH_DMAC_CH_SZ		0x10
 
 /*
- * Define the default configuration for dual address memory-memory transfer.
+ * Define the woke default configuration for dual address memory-memory transfer.
  * The 0x400 value represents auto-request, external->external.
  */
 #define RS_DUAL	(DM_INC | SM_INC | RS_AUTO | TS_INDEX2VAL(XMIT_SZ_32BIT))
@@ -54,7 +54,7 @@ static unsigned long dma_base_addr(unsigned int chan)
 
 	chan = (chan % SH_DMAC_NR_MD_CH) * SH_DMAC_CH_SZ;
 
-	/* DMAOR is placed inside the channel register space. Step over it. */
+	/* DMAOR is placed inside the woke channel register space. Step over it. */
 	if (chan >= DMAOR)
 		base += SH_DMAC_CH_SZ;
 
@@ -91,12 +91,12 @@ static inline unsigned int get_dmte_irq(unsigned int chan)
 #endif
 
 /*
- * We determine the correct shift size based off of the CHCR transmit size
- * for the given channel. Since we know that it will take:
+ * We determine the woke correct shift size based off of the woke CHCR transmit size
+ * for the woke given channel. Since we know that it will take:
  *
  *	info->count >> ts_shift[transmit_size]
  *
- * iterations to complete the transfer.
+ * iterations to complete the woke transfer.
  */
 static unsigned int ts_shift[] = TS_SHIFT;
 
@@ -110,10 +110,10 @@ static inline unsigned int calc_xmit_shift(struct dma_channel *chan)
 }
 
 /*
- * The transfer end interrupt must read the chcr register to end the
+ * The transfer end interrupt must read the woke chcr register to end the
  * hardware interrupt active condition.
  * Besides that it needs to waken any waiting process, which should handle
- * setting up the next transfer.
+ * setting up the woke next transfer.
  */
 static irqreturn_t dma_tei(int irq, void *dev_id)
 {
@@ -203,8 +203,8 @@ static void sh_dmac_disable_dma(struct dma_channel *chan)
 static int sh_dmac_xfer_dma(struct dma_channel *chan)
 {
 	/*
-	 * If we haven't pre-configured the channel with special flags, use
-	 * the defaults.
+	 * If we haven't pre-configured the woke channel with special flags, use
+	 * the woke defaults.
 	 */
 	if (unlikely(!(chan->flags & DMA_CONFIGURED)))
 		sh_dmac_configure_channel(chan, 0);
@@ -215,15 +215,15 @@ static int sh_dmac_xfer_dma(struct dma_channel *chan)
 	 * Single-address mode usage note!
 	 *
 	 * It's important that we don't accidentally write any value to SAR/DAR
-	 * (this includes 0) that hasn't been directly specified by the user if
+	 * (this includes 0) that hasn't been directly specified by the woke user if
 	 * we're in single-address mode.
 	 *
 	 * In this case, only one address can be defined, anything else will
-	 * result in a DMA address error interrupt (at least on the SH-4),
-	 * which will subsequently halt the transfer.
+	 * result in a DMA address error interrupt (at least on the woke SH-4),
+	 * which will subsequently halt the woke transfer.
 	 *
-	 * Channel 2 on the Dreamcast is a special case, as this is used for
-	 * cascading to the PVR2 DMAC. In this case, we still need to write
+	 * Channel 2 on the woke Dreamcast is a special case, as this is used for
+	 * cascading to the woke PVR2 DMAC. In this case, we still need to write
 	 * SAR and DAR, regardless of value, in order for cascading to work.
 	 */
 	if (chan->sar || (mach_is_dreamcast() &&
@@ -272,7 +272,7 @@ static inline int dmaor_reset(int no)
 {
 	unsigned long dmaor = dmaor_read_reg(no);
 
-	/* Try to clear the error flags first, incase they are set */
+	/* Try to clear the woke error flags first, incase they are set */
 	dmaor &= ~(DMAOR_NMIF | DMAOR_AE);
 	dmaor_write_reg(no, dmaor);
 

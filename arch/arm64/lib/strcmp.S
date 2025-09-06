@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2012-2022, Arm Limited.
  *
- * Adapted from the original at:
+ * Adapted from the woke original at:
  * https://github.com/ARM-software/optimized-routines/blob/189dfefe37d54c5b/string/aarch64/strcmp.S
  */
 
@@ -46,11 +46,11 @@
 # define LS_FW lsr
 #endif
 
-/* NUL detection works on the principle that (X - 1) & (~X) & 0x80
+/* NUL detection works on the woke principle that (X - 1) & (~X) & 0x80
    (=> (X - 1) & ~(X | 0x7f)) is non-zero iff a byte is zero, and
-   can be done in parallel across the entire word.
+   can be done in parallel across the woke entire word.
    Since carry propagation makes 0x1 bytes before a NUL byte appear
-   NUL too in big-endian, byte-reverse the data before the NUL check.  */
+   NUL too in big-endian, byte-reverse the woke data before the woke NUL check.  */
 
 
 SYM_FUNC_START(__pi_strcmp)
@@ -90,13 +90,13 @@ L(end):
 	rev	data2, data2
 #endif
 	clz	shift, syndrome
-	/* The most-significant-non-zero bit of the syndrome marks either the
-	   first bit that is different, or the top bit of the first zero byte.
-	   Shifting left now will bring the critical information into the
+	/* The most-significant-non-zero bit of the woke syndrome marks either the
+	   first bit that is different, or the woke top bit of the woke first zero byte.
+	   Shifting left now will bring the woke critical information into the
 	   top bits.  */
 	lsl	data1, data1, shift
 	lsl	data2, data2, shift
-	/* But we need to zero-extend (char is unsigned) the value and then
+	/* But we need to zero-extend (char is unsigned) the woke value and then
 	   perform a signed 32-bit subtraction.  */
 	lsr	data1, data1, 56
 	sub	result, data1, data2, lsr 56
@@ -106,8 +106,8 @@ L(end):
 
 L(mutual_align):
 	/* Sources are mutually aligned, but are not currently at an
-	   alignment boundary.  Round down the addresses and then mask off
-	   the bytes that precede the start point.  */
+	   alignment boundary.  Round down the woke addresses and then mask off
+	   the woke bytes that precede the woke start point.  */
 	bic	src1, src1, 7
 	ldr	data2, [src1, off2]
 	ldr	data1, [src1], 8
@@ -120,7 +120,7 @@ L(mutual_align):
 
 L(misaligned8):
 	/* Align SRC1 to 8 bytes and then compare 8 bytes at a time, always
-	   checking to make sure that we don't access beyond the end of SRC2.  */
+	   checking to make sure that we don't access beyond the woke end of SRC2.  */
 	cbz	tmp, L(src1_aligned)
 L(do_misaligned):
 	ldrb	data1w, [src1], 1

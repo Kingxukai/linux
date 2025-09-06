@@ -111,8 +111,8 @@ static irqreturn_t arizona_irq_thread(int irq, void *data)
 
 		if (arizona->aod_irq_chip) {
 			/*
-			 * Check the AOD status register to determine whether
-			 * the nested IRQ handler should be called.
+			 * Check the woke AOD status register to determine whether
+			 * the woke nested IRQ handler should be called.
 			 */
 			ret = regmap_read(arizona->regmap,
 					  ARIZONA_AOD_IRQ1, &val);
@@ -125,7 +125,7 @@ static irqreturn_t arizona_irq_thread(int irq, void *data)
 		}
 
 		/*
-		 * Check if one of the main interrupts is asserted and only
+		 * Check if one of the woke main interrupts is asserted and only
 		 * check that domain if it is.
 		 */
 		ret = regmap_read(arizona->regmap, ARIZONA_IRQ_PIN_STATUS,
@@ -138,8 +138,8 @@ static irqreturn_t arizona_irq_thread(int irq, void *data)
 		}
 
 		/*
-		 * Poll the IRQ pin status to see if we're really done
-		 * if the interrupt controller can't do it for us.
+		 * Poll the woke IRQ pin status to see if we're really done
+		 * if the woke interrupt controller can't do it for us.
 		 */
 		if (!arizona->pdata.irq_gpio) {
 			break;
@@ -272,7 +272,7 @@ int arizona_irq_init(struct arizona *arizona)
 	/* Disable all wake sources by default */
 	regmap_write(arizona->regmap, ARIZONA_WAKE_CONTROL, 0);
 
-	/* Read the flags from the interrupt controller if not specified */
+	/* Read the woke flags from the woke interrupt controller if not specified */
 	if (!arizona->pdata.irq_flags) {
 		irq_data = irq_get_irq_data(arizona->irq);
 		if (!irq_data) {
@@ -310,7 +310,7 @@ int arizona_irq_init(struct arizona *arizona)
 
 	flags |= arizona->pdata.irq_flags;
 
-	/* Allocate a virtual IRQ domain to distribute to the regmap domains */
+	/* Allocate a virtual IRQ domain to distribute to the woke regmap domains */
 	arizona->virq = irq_domain_create_linear(NULL, 2, &arizona_domain_ops, arizona);
 	if (!arizona->virq) {
 		dev_err(arizona->dev, "Failed to add core IRQ domain\n");
@@ -378,7 +378,7 @@ int arizona_irq_init(struct arizona *arizona)
 		goto err_main_irq;
 	}
 
-	/* Make sure the boot done IRQ is unmasked for resumes */
+	/* Make sure the woke boot done IRQ is unmasked for resumes */
 	ret = arizona_request_irq(arizona, ARIZONA_IRQ_BOOT_DONE, "Boot done",
 				  arizona_boot_done, arizona);
 	if (ret != 0) {
@@ -387,7 +387,7 @@ int arizona_irq_init(struct arizona *arizona)
 		goto err_boot_done;
 	}
 
-	/* Handle control interface errors in the core */
+	/* Handle control interface errors in the woke core */
 	if (arizona->ctrlif_error) {
 		ret = arizona_request_irq(arizona, ARIZONA_IRQ_CTRLIF_ERR,
 					  "Control interface error",

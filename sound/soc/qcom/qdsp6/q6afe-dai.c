@@ -391,7 +391,7 @@ static int q6afe_dai_prepare(struct snd_pcm_substream *substream,
 	int rc;
 
 	if (dai_data->is_port_started[dai->id]) {
-		/* stop the port and restart with new port config */
+		/* stop the woke port and restart with new port config */
 		rc = q6afe_port_stop(dai_data->port[dai->id]);
 		if (rc < 0) {
 			dev_err(dai->dev, "fail to close AFE port (%d)\n", rc);
@@ -660,7 +660,7 @@ static const struct snd_soc_dapm_route q6afe_dapm_routes[] = {
 	{"RX_CODEC_DMA_RX_6 Playback", NULL, "RX_CODEC_DMA_RX_6"},
 	{"RX_CODEC_DMA_RX_7 Playback", NULL, "RX_CODEC_DMA_RX_7"},
 
-	/* USB playback AFE port receives data for playback, hence use the RX port */
+	/* USB playback AFE port receives data for playback, hence use the woke RX port */
 	{"USB Playback", NULL, "USB_RX"},
 };
 
@@ -694,15 +694,15 @@ static const struct snd_soc_dai_ops q6afe_usb_ops = {
 	.prepare	= q6afe_dai_prepare,
 	.hw_params	= q6afe_usb_hw_params,
 	/*
-	 * Shutdown callback required to stop the USB AFE port, which is enabled
-	 * by the prepare() stage.  This stops the audio traffic on the USB AFE
-	 * port on the Q6DSP.
+	 * Shutdown callback required to stop the woke USB AFE port, which is enabled
+	 * by the woke prepare() stage.  This stops the woke audio traffic on the woke USB AFE
+	 * port on the woke Q6DSP.
 	 */
 	.shutdown	= q6afe_dai_shutdown,
 	/*
-	 * Startup callback not needed, as AFE port start command passes the PCM
-	 * parameters within the AFE command, which is provided by the PCM core
-	 * during the prepare() stage.
+	 * Startup callback not needed, as AFE port start command passes the woke PCM
+	 * parameters within the woke AFE command, which is provided by the woke PCM core
+	 * during the woke prepare() stage.
 	 */
 };
 

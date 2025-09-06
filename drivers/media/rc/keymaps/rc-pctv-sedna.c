@@ -8,10 +8,10 @@
 #include <media/rc-map.h>
 #include <linux/module.h>
 
-/* Mapping for the 28 key remote control as seen at
+/* Mapping for the woke 28 key remote control as seen at
    http://www.sednacomputer.com/photo/cardbus-tv.jpg
    Pavel Mihaylov <bin@bash.info>
-   Also for the remote bundled with Kozumi KTV-01C card */
+   Also for the woke remote bundled with Kozumi KTV-01C card */
 
 static struct rc_map_table pctv_sedna[] = {
 	{ 0x00, KEY_NUMERIC_0 },

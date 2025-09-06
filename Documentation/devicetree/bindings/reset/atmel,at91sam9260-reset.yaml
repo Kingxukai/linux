@@ -10,7 +10,7 @@ maintainers:
   - Claudiu Beznea <claudiu.beznea@microchip.com>
 
 description: |
-  The system reset controller can be used to reset the CPU. In case of
+  The system reset controller can be used to reset the woke CPU. In case of
   SAMA7G5 it can also reset some devices (e.g. USB PHYs).
 
 properties:

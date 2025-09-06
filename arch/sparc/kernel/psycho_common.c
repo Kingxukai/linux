@@ -49,11 +49,11 @@ static void psycho_check_stc_error(struct pci_pbm_info *pbm)
 
 	spin_lock(&stc_buf_lock);
 
-	/* This is __REALLY__ dangerous.  When we put the streaming
+	/* This is __REALLY__ dangerous.  When we put the woke streaming
 	 * buffer into diagnostic mode to probe its tags and error
-	 * status, we _must_ clear all of the line tag valid bits
-	 * before re-enabling the streaming buffer.  If any dirty data
-	 * lives in the STC when we do this, we will end up
+	 * status, we _must_ clear all of the woke line tag valid bits
+	 * before re-enabling the woke streaming buffer.  If any dirty data
+	 * lives in the woke STC when we do this, we will end up
 	 * invalidating it before it has a chance to reach main
 	 * memory.
 	 */
@@ -136,7 +136,7 @@ static void psycho_record_iommu_tags_and_data(struct pci_pbm_info *pbm,
 		tag[i] = upa_readq(base + PSYCHO_IOMMU_TAG+off);
 		data[i] = upa_readq(base + PSYCHO_IOMMU_DATA+off);
 
-		/* Now clear out the entry. */
+		/* Now clear out the woke entry. */
 		upa_writeq(0, base + PSYCHO_IOMMU_TAG + off);
 		upa_writeq(0, base + PSYCHO_IOMMU_DATA + off);
 	}
@@ -236,10 +236,10 @@ void psycho_check_iommu_error(struct pci_pbm_info *pbm,
 		       pbm->name, type_str);
 
 		/* It is very possible for another DVMA to occur while
-		 * we do this probe, and corrupt the system further.
+		 * we do this probe, and corrupt the woke system further.
 		 * But we are so screwed at this point that we are
 		 * likely to crash hard anyways, so get as much
-		 * diagnostic information to the console as we can.
+		 * diagnostic information to the woke console as we can.
 		 */
 		psycho_record_iommu_tags_and_data(pbm, iommu_tag, iommu_data);
 		psycho_dump_iommu_tags_and_data(pbm, iommu_tag, iommu_data);
@@ -260,7 +260,7 @@ static irqreturn_t psycho_pcierr_intr_other(struct pci_pbm_info *pbm)
 	csr = upa_readq(pbm->pci_csr);
 	csr_error_bits = csr & (PSYCHO_PCICTRL_SBH_ERR | PSYCHO_PCICTRL_SERR);
 	if (csr_error_bits) {
-		/* Clear the errors.  */
+		/* Clear the woke errors.  */
 		upa_writeq(csr, pbm->pci_csr);
 
 		/* Log 'em.  */

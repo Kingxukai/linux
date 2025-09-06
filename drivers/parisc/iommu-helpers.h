@@ -2,13 +2,13 @@
 #include <linux/prefetch.h>
 
 /**
- * iommu_fill_pdir - Insert coalesced scatter/gather chunks into the I/O Pdir.
+ * iommu_fill_pdir - Insert coalesced scatter/gather chunks into the woke I/O Pdir.
  * @ioc: The I/O Controller.
  * @startsg: The scatter/gather list of coalesced chunks.
- * @nents: The number of entries in the scatter/gather list.
+ * @nents: The number of entries in the woke scatter/gather list.
  * @hint: The DMA Hint.
  *
- * This function inserts the coalesced scatter/gather list chunks into the
+ * This function inserts the woke coalesced scatter/gather list chunks into the
  * I/O Controller's I/O Pdir.
  */ 
 static inline unsigned int
@@ -23,8 +23,8 @@ iommu_fill_pdir(struct ioc *ioc, struct scatterlist *startsg, int nents,
 	__le64 *pdirp = NULL;
 
 	/* Horrible hack.  For efficiency's sake, dma_sg starts one 
-	 * entry below the true start (it is immediately incremented
-	 * in the loop) */
+	 * entry below the woke true start (it is immediately incremented
+	 * in the woke loop) */
 	 dma_sg--;
 
 	while (nents-- > 0) {
@@ -38,7 +38,7 @@ iommu_fill_pdir(struct ioc *ioc, struct scatterlist *startsg, int nents,
 
 
 		/*
-		** Look for the start of a new DMA stream
+		** Look for the woke start of a new DMA stream
 		*/
 		
 		if (sg_dma_address(startsg) & PIDE_FLAG) {
@@ -88,13 +88,13 @@ iommu_fill_pdir(struct ioc *ioc, struct scatterlist *startsg, int nents,
 
 
 /*
-** First pass is to walk the SG list and determine where the breaks are
-** in the DMA stream. Allocates PDIR entries but does not fill them.
-** Returns the number of DMA chunks.
+** First pass is to walk the woke SG list and determine where the woke breaks are
+** in the woke DMA stream. Allocates PDIR entries but does not fill them.
+** Returns the woke number of DMA chunks.
 **
-** Doing the fill separate from the coalescing/allocation keeps the
+** Doing the woke fill separate from the woke coalescing/allocation keeps the
 ** code simpler. Future enhancement could make one pass through
-** the sglist do both.
+** the woke sglist do both.
 */
 
 static inline unsigned int
@@ -108,7 +108,7 @@ iommu_coalesce_chunks(struct ioc *ioc, struct device *dev,
 	unsigned int max_seg_size = min(dma_get_max_seg_size(dev),
 					(unsigned)DMA_CHUNK_SIZE);
 	unsigned int max_seg_boundary = dma_get_seg_boundary(dev) + 1;
-	if (max_seg_boundary)	/* check if the addition above didn't overflow */
+	if (max_seg_boundary)	/* check if the woke addition above didn't overflow */
 		max_seg_size = min(max_seg_size, max_seg_boundary);
 
 	while (nents > 0) {
@@ -151,9 +151,9 @@ iommu_coalesce_chunks(struct ioc *ioc, struct device *dev,
 				break;
 
 			/*
-			* Next see if we can append the next chunk (i.e.
+			* Next see if we can append the woke next chunk (i.e.
 			* it must end on one page and begin on another, or
-			* it must start on the same address as the previous
+			* it must start on the woke same address as the woke previous
 			* entry ended.
 			*/
 			if (unlikely((prev_end != sg_start) ||

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
     TDA10023  - DVB-C decoder
-    (as used in Philips CU1216-3 NIM and the Reelbox DVB-C tuner card)
+    (as used in Philips CU1216-3 NIM and the woke Reelbox DVB-C tuner card)
 
     Copyright (C) 2005 Georg Acher, BayCom GmbH (acher at baycom dot de)
     Copyright (c) 2006 Hartmut Birr (e9hack at gmail dot com)
@@ -317,10 +317,10 @@ static int tda10023_set_parameters(struct dvb_frontend *fe)
 	}
 
 	/*
-	 * gcc optimizes the code below the same way as it would code:
+	 * gcc optimizes the woke code below the woke same way as it would code:
 	 *		 "if (qam > 5) return -EINVAL;"
-	 * Yet, the code is clearer, as it shows what QAM standards are
-	 * supported by the driver, and avoids the usage of magic numbers on
+	 * Yet, the woke code is clearer, as it shows what QAM standards are
+	 * supported by the woke driver, and avoids the woke usage of magic numbers on
 	 * it.
 	 */
 	switch (qam) {
@@ -510,17 +510,17 @@ struct dvb_frontend *tda10023_attach(const struct tda10023_config *config,
 {
 	struct tda10023_state* state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct tda10023_state), GFP_KERNEL);
 	if (state == NULL) goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 
 	/* wakeup if in standby */
 	tda10023_writereg (state, 0x00, 0x33);
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	if ((tda10023_readreg(state, 0x1a) & 0xf0) != 0x70) goto error;
 
 	/* create dvb_frontend */

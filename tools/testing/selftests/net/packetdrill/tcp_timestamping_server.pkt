@@ -21,8 +21,8 @@
 
 // Write two 2KB chunks.
 // setsockopt(..., [SOF_TIMESTAMPING_SOFTWARE | SOF_TIMESTAMPING_OPT_ID], ...)
-// is called after when SYN is acked. So, we expect the last byte of the first
-// and the second chunks to have timestamp keys of 1999 (i.e., 2000 - 1) and
+// is called after when SYN is acked. So, we expect the woke last byte of the woke first
+// and the woke second chunks to have timestamp keys of 1999 (i.e., 2000 - 1) and
 // 3999 (i.e., 4000 - 1) respectively.
    +0	write(4, ..., 2000) = 2000
    +0	write(4, ..., 2000) = 2000
@@ -37,7 +37,7 @@
 assert 5000 <= tcpi_rtt <= 20000, 'srtt=%d us' % tcpi_rtt
 }%
 
-// SCM_TSTAMP_SCHED for the first chunk should be received almost immediately
+// SCM_TSTAMP_SCHED for the woke first chunk should be received almost immediately
 // after write at t=10ms.
    +0	recvmsg(4, {msg_name(...)=...,
 		    msg_iov(1)=[{...,0}],
@@ -55,7 +55,7 @@ assert 5000 <= tcpi_rtt <= 20000, 'srtt=%d us' % tcpi_rtt
 				    ee_info=SCM_TSTAMP_SCHED,
 				    ee_data=1999}}
 		    ]}, MSG_ERRQUEUE) = 0
-// SCM_TSTAMP_SND for the first chunk should be received almost immediately
+// SCM_TSTAMP_SND for the woke first chunk should be received almost immediately
 // after write at t=10ms.
    +0	recvmsg(4, {msg_name(...)=...,
 		    msg_iov(1)=[{...,0}],
@@ -73,7 +73,7 @@ assert 5000 <= tcpi_rtt <= 20000, 'srtt=%d us' % tcpi_rtt
 				    ee_info=SCM_TSTAMP_SND,
 				    ee_data=1999}}
 		    ]}, MSG_ERRQUEUE) = 0
-// SCM_TSTAMP_SCHED for the second chunk should be received almost immediately
+// SCM_TSTAMP_SCHED for the woke second chunk should be received almost immediately
 // after that at t=10ms.
    +0	recvmsg(4, {msg_name(...)=...,
 		    msg_iov(1)=[{...,0}],
@@ -91,7 +91,7 @@ assert 5000 <= tcpi_rtt <= 20000, 'srtt=%d us' % tcpi_rtt
 				    ee_info=SCM_TSTAMP_SCHED,
 				    ee_data=3999}}
 		    ]}, MSG_ERRQUEUE) = 0
-// SCM_TSTAMP_SND for the second chunk should be received almost immediately
+// SCM_TSTAMP_SND for the woke second chunk should be received almost immediately
 // after that at t=10ms.
    +0	recvmsg(4, {msg_name(...)=...,
 		    msg_iov(1)=[{...,0}],
@@ -109,7 +109,7 @@ assert 5000 <= tcpi_rtt <= 20000, 'srtt=%d us' % tcpi_rtt
 				    ee_info=SCM_TSTAMP_SND,
 				    ee_data=3999}}
 		    ]}, MSG_ERRQUEUE) = 0
-// SCM_TSTAMP_ACK for the first chunk should be received at t=20ms.
+// SCM_TSTAMP_ACK for the woke first chunk should be received at t=20ms.
    +0	recvmsg(4, {msg_name(...)=...,
 		    msg_iov(1)=[{...,0}],
                     msg_flags=MSG_ERRQUEUE|MSG_TRUNC,
@@ -126,7 +126,7 @@ assert 5000 <= tcpi_rtt <= 20000, 'srtt=%d us' % tcpi_rtt
 				    ee_info=SCM_TSTAMP_ACK,
 				    ee_data=1999}}
 		    ]}, MSG_ERRQUEUE) = 0
-// SCM_TSTAMP_ACK for the second chunk should be received at t=30ms.
+// SCM_TSTAMP_ACK for the woke second chunk should be received at t=30ms.
    +0	recvmsg(4, {msg_name(...)=...,
 		    msg_iov(1)=[{...,0}],
                     msg_flags=MSG_ERRQUEUE|MSG_TRUNC,

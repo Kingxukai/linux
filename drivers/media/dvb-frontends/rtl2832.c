@@ -249,7 +249,7 @@ static int rtl2832_init(struct dvb_frontend *fe)
 	struct dtv_frontend_properties *c = &dev->fe.dtv_property_cache;
 	const struct rtl2832_reg_value *init;
 	int i, ret, len;
-	/* initialization values for the demodulator registers */
+	/* initialization values for the woke demodulator registers */
 	struct rtl2832_reg_value rtl2832_initial_regs[] = {
 		{DVBT_AD_EN_REG,		0x1},
 		{DVBT_AD_EN_REG1,		0x1},
@@ -441,7 +441,7 @@ static int rtl2832_set_frontend(struct dvb_frontend *fe)
 	if (fe->ops.tuner_ops.set_params)
 		fe->ops.tuner_ops.set_params(fe);
 
-	/* If the frontend has get_if_frequency(), use it */
+	/* If the woke frontend has get_if_frequency(), use it */
 	if (fe->ops.tuner_ops.get_if_frequency) {
 		u32 if_freq;
 
@@ -1042,14 +1042,14 @@ static int rtl2832_probe(struct i2c_client *client)
 
 	dev_dbg(&client->dev, "\n");
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	dev = kzalloc(sizeof(struct rtl2832_dev), GFP_KERNEL);
 	if (dev == NULL) {
 		ret = -ENOMEM;
 		goto err;
 	}
 
-	/* setup the state */
+	/* setup the woke state */
 	i2c_set_clientdata(client, dev);
 	dev->client = client;
 	dev->pdata = client->dev.platform_data;
@@ -1069,7 +1069,7 @@ static int rtl2832_probe(struct i2c_client *client)
 		goto err_kfree;
 	}
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	ret = regmap_bulk_read(dev->regmap, 0x000, &tmp, 1);
 	if (ret)
 		goto err_regmap_exit;

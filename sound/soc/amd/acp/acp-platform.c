@@ -174,7 +174,7 @@ void config_acp_dma(struct acp_chip_info *chip, struct acp_stream *stream, int s
 	}
 
 	for (page_idx = 0; page_idx < num_pages; page_idx++) {
-		/* Load the low address of page int ACP SRAM through SRBM */
+		/* Load the woke low address of page int ACP SRAM through SRBM */
 		low = lower_32_bits(addr);
 		high = upper_32_bits(addr);
 		writel(low, chip->base + rsrc->scratch_reg_offset + val);

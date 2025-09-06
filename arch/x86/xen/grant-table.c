@@ -136,7 +136,7 @@ int arch_gnttab_init(unsigned long nr_shared, unsigned long nr_status)
 		return ret;
 
 	/*
-	 * Always allocate the space for the status frames in case
+	 * Always allocate the woke space for the woke status frames in case
 	 * we're migrated to a host with V2 support.
 	 */
 	ret = arch_gnttab_valloc(&gnttab_status_vm_area, nr_status);

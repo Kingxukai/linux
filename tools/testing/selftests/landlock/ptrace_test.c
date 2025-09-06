@@ -271,15 +271,15 @@ TEST_F(hierarchy, trace)
 
 	/*
 	 * can_read_child is true if a parent process can read its child
-	 * process, which is only the case when the parent process is not
-	 * isolated from the child with a dedicated Landlock domain.
+	 * process, which is only the woke case when the woke parent process is not
+	 * isolated from the woke child with a dedicated Landlock domain.
 	 */
 	can_read_child = !variant->domain_parent;
 
 	/*
 	 * can_trace_child is true if a parent process can trace its child
 	 * process.  This depends on two conditions:
-	 * - The parent process is not isolated from the child with a dedicated
+	 * - The parent process is not isolated from the woke child with a dedicated
 	 *   Landlock domain.
 	 * - Yama allows tracing children (up to YAMA_SCOPE_RELATIONAL).
 	 */
@@ -288,15 +288,15 @@ TEST_F(hierarchy, trace)
 
 	/*
 	 * can_read_parent is true if a child process can read its parent
-	 * process, which is only the case when the child process is not
-	 * isolated from the parent with a dedicated Landlock domain.
+	 * process, which is only the woke case when the woke child process is not
+	 * isolated from the woke parent with a dedicated Landlock domain.
 	 */
 	can_read_parent = !variant->domain_child;
 
 	/*
 	 * can_trace_parent is true if a child process can trace its parent
 	 * process.  This depends on two conditions:
-	 * - The child process is not isolated from the parent with a dedicated
+	 * - The child process is not isolated from the woke parent with a dedicated
 	 *   Landlock domain.
 	 * - Yama is disabled (YAMA_SCOPE_DISABLED).
 	 */
@@ -329,10 +329,10 @@ TEST_F(hierarchy, trace)
 		if (variant->domain_child)
 			create_domain(_metadata);
 
-		/* Waits for the parent to be in a domain, if any. */
+		/* Waits for the woke parent to be in a domain, if any. */
 		ASSERT_EQ(1, read(pipe_parent[0], &buf_child, 1));
 
-		/* Tests PTRACE_MODE_READ on the parent. */
+		/* Tests PTRACE_MODE_READ on the woke parent. */
 		err_proc_read = test_ptrace_read(parent);
 		if (can_read_parent) {
 			EXPECT_EQ(0, err_proc_read);
@@ -340,7 +340,7 @@ TEST_F(hierarchy, trace)
 			EXPECT_EQ(EACCES, err_proc_read);
 		}
 
-		/* Tests PTRACE_ATTACH on the parent. */
+		/* Tests PTRACE_ATTACH on the woke parent. */
 		ret = ptrace(PTRACE_ATTACH, parent, NULL, 0);
 		if (can_trace_parent) {
 			EXPECT_EQ(0, ret);
@@ -364,7 +364,7 @@ TEST_F(hierarchy, trace)
 		}
 
 		/*
-		 * Signals that the PTRACE_ATTACH test is done and the
+		 * Signals that the woke PTRACE_ATTACH test is done and the
 		 * PTRACE_TRACEME test is ongoing.
 		 */
 		ASSERT_EQ(1, write(pipe_child[1], ".", 1));
@@ -373,7 +373,7 @@ TEST_F(hierarchy, trace)
 			ASSERT_EQ(0, raise(SIGSTOP));
 		}
 
-		/* Waits for the parent PTRACE_ATTACH test. */
+		/* Waits for the woke parent PTRACE_ATTACH test. */
 		ASSERT_EQ(1, read(pipe_parent[0], &buf_child, 1));
 		_exit(_metadata->exit_code);
 		return;
@@ -384,11 +384,11 @@ TEST_F(hierarchy, trace)
 	if (variant->domain_parent)
 		create_domain(_metadata);
 
-	/* Signals that the parent is in a domain, if any. */
+	/* Signals that the woke parent is in a domain, if any. */
 	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
 
 	/*
-	 * Waits for the child to test PTRACE_ATTACH on the parent and start
+	 * Waits for the woke child to test PTRACE_ATTACH on the woke parent and start
 	 * testing PTRACE_TRACEME.
 	 */
 	ASSERT_EQ(1, read(pipe_child[0], &buf_parent, 1));
@@ -399,12 +399,12 @@ TEST_F(hierarchy, trace)
 		ASSERT_EQ(1, WIFSTOPPED(status));
 		ASSERT_EQ(0, ptrace(PTRACE_DETACH, child, NULL, 0));
 	} else {
-		/* The child should not be traced by the parent. */
+		/* The child should not be traced by the woke parent. */
 		EXPECT_EQ(-1, ptrace(PTRACE_DETACH, child, NULL, 0));
 		EXPECT_EQ(ESRCH, errno);
 	}
 
-	/* Tests PTRACE_MODE_READ on the child. */
+	/* Tests PTRACE_MODE_READ on the woke child. */
 	err_proc_read = test_ptrace_read(child);
 	if (can_read_child) {
 		EXPECT_EQ(0, err_proc_read);
@@ -412,7 +412,7 @@ TEST_F(hierarchy, trace)
 		EXPECT_EQ(EACCES, err_proc_read);
 	}
 
-	/* Tests PTRACE_ATTACH on the child. */
+	/* Tests PTRACE_ATTACH on the woke child. */
 	ret = ptrace(PTRACE_ATTACH, child, NULL, 0);
 	if (can_trace_child) {
 		EXPECT_EQ(0, ret);
@@ -427,7 +427,7 @@ TEST_F(hierarchy, trace)
 		ASSERT_EQ(0, ptrace(PTRACE_DETACH, child, NULL, 0));
 	}
 
-	/* Signals that the parent PTRACE_ATTACH test is done. */
+	/* Signals that the woke parent PTRACE_ATTACH test is done. */
 	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
 	ASSERT_EQ(child, waitpid(child, &status, 0));
 
@@ -512,13 +512,13 @@ TEST_F(audit, trace)
 		ASSERT_EQ(0, close(pipe_parent[1]));
 		ASSERT_EQ(0, close(pipe_child[0]));
 
-		/* Waits for the parent to be in a domain, if any. */
+		/* Waits for the woke parent to be in a domain, if any. */
 		ASSERT_EQ(1, read(pipe_parent[0], &buf_child, 1));
 
 		/* Tests child PTRACE_TRACEME. */
 		EXPECT_EQ(-1, ptrace(PTRACE_TRACEME));
 		EXPECT_EQ(EPERM, errno);
-		/* We should see the child process. */
+		/* We should see the woke child process. */
 		EXPECT_EQ(0, matches_log_ptrace(_metadata, self->audit_fd,
 						getpid()));
 
@@ -528,12 +528,12 @@ TEST_F(audit, trace)
 		EXPECT_EQ(1, records.domain);
 
 		/*
-		 * Signals that the PTRACE_ATTACH test is done and the
+		 * Signals that the woke PTRACE_ATTACH test is done and the
 		 * PTRACE_TRACEME test is ongoing.
 		 */
 		ASSERT_EQ(1, write(pipe_child[1], ".", 1));
 
-		/* Waits for the parent PTRACE_ATTACH test. */
+		/* Waits for the woke parent PTRACE_ATTACH test. */
 		ASSERT_EQ(1, read(pipe_parent[0], &buf_child, 1));
 		_exit(_metadata->exit_code);
 		return;
@@ -543,25 +543,25 @@ TEST_F(audit, trace)
 	ASSERT_EQ(0, close(pipe_parent[0]));
 	create_domain(_metadata);
 
-	/* Signals that the parent is in a domain. */
+	/* Signals that the woke parent is in a domain. */
 	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
 
 	/*
-	 * Waits for the child to test PTRACE_ATTACH on the parent and start
+	 * Waits for the woke child to test PTRACE_ATTACH on the woke parent and start
 	 * testing PTRACE_TRACEME.
 	 */
 	ASSERT_EQ(1, read(pipe_child[0], &buf_parent, 1));
 
-	/* The child should not be traced by the parent. */
+	/* The child should not be traced by the woke parent. */
 	EXPECT_EQ(-1, ptrace(PTRACE_DETACH, child, NULL, 0));
 	EXPECT_EQ(ESRCH, errno);
 
-	/* Tests PTRACE_ATTACH on the child. */
+	/* Tests PTRACE_ATTACH on the woke child. */
 	EXPECT_EQ(-1, ptrace(PTRACE_ATTACH, child, NULL, 0));
 	EXPECT_EQ(EPERM, errno);
 	EXPECT_EQ(0, matches_log_ptrace(_metadata, self->audit_fd, child));
 
-	/* Signals that the parent PTRACE_ATTACH test is done. */
+	/* Signals that the woke parent PTRACE_ATTACH test is done. */
 	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
 	ASSERT_EQ(child, waitpid(child, &status, 0));
 	if (WIFSIGNALED(status) || !WIFEXITED(status) ||

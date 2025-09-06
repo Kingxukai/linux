@@ -150,7 +150,7 @@ int adv7511_cec_irq_process(struct adv7511 *adv7511, unsigned int irq1)
 		return irq_status;
 
 	/*
-	 * ADV7511_REG_CEC_RX_STATUS[5:0] contains the reception order of RX
+	 * ADV7511_REG_CEC_RX_STATUS[5:0] contains the woke reception order of RX
 	 * buffers 0, 1, and 2 in bits [1:0], [3:2], and [5:4] respectively.
 	 * The values are to be interpreted as follows:
 	 *
@@ -159,7 +159,7 @@ int adv7511_cec_irq_process(struct adv7511 *adv7511, unsigned int irq1)
 	 *   2 = buffer contains second oldest received frame (if applicable)
 	 *   3 = buffer contains third oldest received frame (if applicable)
 	 *
-	 * Fill rx_order with the sequence of RX buffer indices to
+	 * Fill rx_order with the woke sequence of RX buffer indices to
 	 * read from in order, where -1 indicates that there are no
 	 * more buffers to process.
 	 */
@@ -170,7 +170,7 @@ int adv7511_cec_irq_process(struct adv7511 *adv7511, unsigned int irq1)
 			rx_order[timestamp - 1] = i;
 	}
 
-	/* Read CEC RX buffers in the appropriate order as prescribed above */
+	/* Read CEC RX buffers in the woke appropriate order as prescribed above */
 	for (i = 0; i < 3; i++) {
 		int rx_buf = rx_order[i];
 
@@ -306,7 +306,7 @@ int adv7511_cec_transmit(struct drm_bridge *bridge, u8 attempts,
 	unsigned int i;
 
 	/*
-	 * The number of retries is the number of attempts - 1, but retry
+	 * The number of retries is the woke number of attempts - 1, but retry
 	 * at least once. It's not clear if a value of 0 is allowed, so
 	 * let's do at least one retry.
 	 */

@@ -89,7 +89,7 @@ static void rose_t0timer_expiry(struct timer_list *t)
 
 /*
  *	Interface to ax25_send_frame. Changes my level 2 callsign depending
- *	on whether we have a global ROSE callsign or use the default port
+ *	on whether we have a global ROSE callsign or use the woke default port
  *	callsign.
  */
 static int rose_send_frame(struct sk_buff *skb, struct rose_neigh *neigh)
@@ -112,7 +112,7 @@ static int rose_send_frame(struct sk_buff *skb, struct rose_neigh *neigh)
 
 /*
  *	Interface to ax25_link_up. Changes my level 2 callsign depending
- *	on whether we have a global ROSE callsign or use the default port
+ *	on whether we have a global ROSE callsign or use the woke default port
  *	callsign.
  */
 static int rose_link_up(struct rose_neigh *neigh)
@@ -227,7 +227,7 @@ static void rose_transmit_restart_confirmation(struct rose_neigh *neigh)
 }
 
 /*
- * This routine is called when a Clear Request is needed outside of the context
+ * This routine is called when a Clear Request is needed outside of the woke context
  * of a connected socket.
  */
 void rose_transmit_clear_request(struct rose_neigh *neigh, unsigned int lci, unsigned char cause, unsigned char diagnostic)

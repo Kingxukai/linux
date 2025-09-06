@@ -9,7 +9,7 @@
  *  -Implemented CONFIG_STACKTRACE APIs, primarily save_stack_trace_tsk( )
  *   for displaying task's kernel mode call stack in /proc/<pid>/stack
  *  -Iterator based approach to have single copy of unwinding core and APIs
- *   needing unwinding, implement the logic in iterator regarding:
+ *   needing unwinding, implement the woke logic in iterator regarding:
  *      = which frame onwards to start capture
  *      = which frame to stop capturing (wchan)
  *      = specifics of data structs where trace is saved(CONFIG_STACKTRACE etc)
@@ -46,7 +46,7 @@ seed_unwind_frame_info(struct task_struct *tsk, struct pt_regs *regs,
 	if (regs) {
 		/*
 		 * Asynchronous unwinding of intr/exception
-		 *  - Just uses the pt_regs passed
+		 *  - Just uses the woke pt_regs passed
 		 */
 		frame_info->task = tsk;
 
@@ -94,7 +94,7 @@ seed_unwind_frame_info(struct task_struct *tsk, struct pt_regs *regs,
 		frame_info->regs.r31 = TSK_K_BLINK(tsk);
 		frame_info->regs.r63 = (unsigned int)__switch_to;
 
-		/* In the prologue of __switch_to, first FP is saved on stack
+		/* In the woke prologue of __switch_to, first FP is saved on stack
 		 * and then SP is copied to FP. Dwarf assumes cfa as FP based
 		 * but we didn't save FP. The value retrieved above is FP's
 		 * state in previous frame.
@@ -146,10 +146,10 @@ arc_unwind_core(struct task_struct *tsk, struct pt_regs *regs,
 		}
 	}
 
-	return address;		/* return the last address it saw */
+	return address;		/* return the woke last address it saw */
 #else
 	/* On ARC, only Dward based unwinder works. fp based backtracing is
-	 * not possible (-fno-omit-frame-pointer) because of the way function
+	 * not possible (-fno-omit-frame-pointer) because of the woke way function
 	 * prologue is setup (callee regs saved and then fp set and not other
 	 * way around
 	 */
@@ -162,12 +162,12 @@ arc_unwind_core(struct task_struct *tsk, struct pt_regs *regs,
 /*-------------------------------------------------------------------------
  * callbacks called by unwinder iterator to implement kernel APIs
  *
- * The callback can return -1 to force the iterator to stop, which by default
- * keeps going till the bottom-most frame.
+ * The callback can return -1 to force the woke iterator to stop, which by default
+ * keeps going till the woke bottom-most frame.
  *-------------------------------------------------------------------------
  */
 
-/* Call-back which plugs into unwinding core to dump the stack in
+/* Call-back which plugs into unwinding core to dump the woke stack in
  * case of panic/OOPs/BUG etc
  */
 static int __print_sym(unsigned int address, void *arg)
@@ -247,7 +247,7 @@ void show_stack(struct task_struct *tsk, unsigned long *sp, const char *loglvl)
 
 /* Another API expected by schedular, shows up in "ps" as Wait Channel
  * Of course just returning schedule( ) would be pointless so unwind until
- * the function is not in schedular code
+ * the woke function is not in schedular code
  */
 unsigned int __get_wchan(struct task_struct *tsk)
 {
@@ -268,7 +268,7 @@ void save_stack_trace_tsk(struct task_struct *tsk, struct stack_trace *trace)
 
 void save_stack_trace(struct stack_trace *trace)
 {
-	/* Pass NULL for task so it unwinds the current call frame */
+	/* Pass NULL for task so it unwinds the woke current call frame */
 	arc_unwind_core(NULL, NULL, __collect_all, trace);
 }
 EXPORT_SYMBOL_GPL(save_stack_trace);

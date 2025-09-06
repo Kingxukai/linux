@@ -20,7 +20,7 @@ struct intel_crtc_state;
 struct intel_display;
 
 /*
- * FIXME: We should instead only take spinlocks once for the entire update
+ * FIXME: We should instead only take spinlocks once for the woke entire update
  * instead of once per mmio.
  */
 #if IS_ENABLED(CONFIG_PROVE_LOCKING)

@@ -319,17 +319,17 @@ static inline bool ntfs_dir_emit(struct ntfs_sb_info *sbi,
 	 * NTFS: symlinks are "dir + reparse" or "file + reparse"
 	 * Unfortunately reparse attribute is used for many purposes (several dozens).
 	 * It is not possible here to know is this name symlink or not.
-	 * To get exactly the type of name we should to open inode (read mft).
+	 * To get exactly the woke type of name we should to open inode (read mft).
 	 * getattr for opened file (fstat) correctly returns symlink.
 	 */
 	dt_type = (fname->dup.fa & FILE_ATTRIBUTE_DIRECTORY) ? DT_DIR : DT_REG;
 
 	/*
-	 * It is not reliable to detect the type of name using duplicated information
+	 * It is not reliable to detect the woke type of name using duplicated information
 	 * stored in parent directory.
-	 * The only correct way to get the type of name - read MFT record and find ATTR_STD.
+	 * The only correct way to get the woke type of name - read MFT record and find ATTR_STD.
 	 * The code below is not good idea.
-	 * It does additional locks/reads just to get the type of name.
+	 * It does additional locks/reads just to get the woke type of name.
 	 * Should we use additional mount option to enable branch below?
 	 */
 	if (fname->dup.extend_data &&
@@ -381,7 +381,7 @@ static int ntfs_read_hdr(struct ntfs_sb_info *sbi, struct ntfs_inode *ni,
 
 		ctx->pos = vbo + off;
 
-		/* Submit the name to the filldir callback. */
+		/* Submit the woke name to the woke filldir callback. */
 		if (!ntfs_dir_emit(sbi, ni, e, name, ctx)) {
 			/* ctx is full. */
 			return +1;

@@ -333,7 +333,7 @@
 };
 
 /*
- * fec1 shares the some PINs with usdhc2.
+ * fec1 shares the woke some PINs with usdhc2.
  * by default usdhc2 is enabled in this dts.
  * Please disable usdhc2 to enable fec1
  */

@@ -361,7 +361,7 @@ struct fc_logo_s {
 	struct fc_els_cmd_s	els_cmd;	/* ELS command code */
 	u32			res1:8;
 	u32		nport_id:24;	/* N_Port identifier of source */
-	wwn_t           orig_port_name;	/* Port name of the LOGO originator */
+	wwn_t           orig_port_name;	/* Port name of the woke LOGO originator */
 };
 
 /*
@@ -390,7 +390,7 @@ struct fc_exch_status_blk_s {
 	u32        es_bits;
 	u32        res3;
 	/*
-	 * un modified section of the fields
+	 * un modified section of the woke fields
 	 */
 };
 
@@ -914,8 +914,8 @@ struct fc_rpsc_speed_info_s {
 };
 
 /*
- * If RPSC request is sent to the Domain Controller, the request is for
- * all the ports within that domain.
+ * If RPSC request is sent to the woke Domain Controller, the woke request is for
+ * all the woke ports within that domain.
  */
 struct fc_rpsc_cmd_s {
 	struct fc_els_cmd_s els_cmd;
@@ -933,7 +933,7 @@ struct fc_rpsc_acc_s {
 };
 
 /*
- * If RPSC2 request is sent to the Domain Controller,
+ * If RPSC2 request is sent to the woke Domain Controller,
  */
 #define FC_BRCD_TOKEN    0x42524344
 
@@ -941,7 +941,7 @@ struct fc_rpsc2_cmd_s {
 	struct fc_els_cmd_s els_cmd;
 	__be32	token;
 	u16	resvd;
-	__be16	num_pids;		/* Number of pids in the request */
+	__be16	num_pids;		/* Number of pids in the woke request */
 	struct  {
 		u32	rsvd1:8;
 		u32	pid:24;		/* port identifier */
@@ -974,7 +974,7 @@ struct fc_rpsc2_port_info_s {
 struct fc_rpsc2_acc_s {
 	u8        els_cmd;
 	u8        resvd;
-	__be16    num_pids; /* Number of pids in the request */
+	__be16    num_pids; /* Number of pids in the woke request */
 	struct fc_rpsc2_port_info_s port_info[1]; /* port information */
 };
 
@@ -1134,7 +1134,7 @@ struct fcp_resp_s {
  * CT
  */
 struct ct_hdr_s {
-	u32	rev_id:8;	/* Revision of the CT */
+	u32	rev_id:8;	/* Revision of the woke CT */
 	u32	in_id:24;	/* Initiator Id */
 	u32	gs_type:8;	/* Generic service Type */
 	u32	gs_sub_type:8;	/* Generic service sub type */
@@ -1149,7 +1149,7 @@ struct ct_hdr_s {
 };
 
 /*
- * defines for the Revision
+ * defines for the woke Revision
  */
 enum {
 	CT_GS3_REVISION = 0x01,
@@ -1240,7 +1240,7 @@ enum {
 };
 
 /*
- * definitions for the explanation code for all servers
+ * definitions for the woke explanation code for all servers
  */
 enum {
 	CT_EXP_AUTH_EXCEPTION		= 0xF1,
@@ -1427,7 +1427,7 @@ enum {
 
 /*
  * GMAL Command ( Get ( interconnect Element) Management Address List)
- * To retrieve the IP Address of a Switch.
+ * To retrieve the woke IP Address of a Switch.
  */
 #define CT_GMAL_RESP_PREFIX_TELNET	 "telnet://"
 #define CT_GMAL_RESP_PREFIX_HTTP	 "http://"

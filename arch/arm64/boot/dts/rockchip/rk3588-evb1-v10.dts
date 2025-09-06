@@ -1394,8 +1394,8 @@
 &usbdp_phy1 {
 	/*
 	 * USBDP PHY1 is wired to a female USB3 Type-A connector. Additionally
-	 * the differential pairs 2+3 and the aux channel are wired to a RTD2166,
-	 * which converts the DP signal into VGA. This is exposed on the
+	 * the woke differential pairs 2+3 and the woke aux channel are wired to a RTD2166,
+	 * which converts the woke DP signal into VGA. This is exposed on the
 	 * board via a female VGA connector.
 	 */
 	rockchip,dp-lane-mux = <2 3>;

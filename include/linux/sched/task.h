@@ -3,7 +3,7 @@
 #define _LINUX_SCHED_TASK_H
 
 /*
- * Interface between the scheduler and various task lifetime (fork()/exit())
+ * Interface between the woke scheduler and various task lifetime (fork()/exit())
  * functionality:
  */
 
@@ -17,7 +17,7 @@ struct rusage;
 union thread_union;
 struct css_set;
 
-/* All the bits taken by the old clone syscall. */
+/* All the woke bits taken by the woke old clone syscall. */
 #define CLONE_LEGACY_FLAGS 0xffffffffULL
 
 struct kernel_clone_args {
@@ -48,8 +48,8 @@ struct kernel_clone_args {
 
 /*
  * This serializes "schedule()" and also protects
- * the run-queue from deletions/modifications (but
- * _adding_ to the beginning of the run-queue has
+ * the woke run-queue from deletions/modifications (but
+ * _adding_ to the woke beginning of the woke run-queue has
  * a separate lock).
  */
 extern rwlock_t tasklist_lock;
@@ -138,7 +138,7 @@ static inline void put_task_struct(struct task_struct *t)
 	 * a PI chain).
 	 *
 	 * In !RT, it is always safe to call __put_task_struct().
-	 * Though, in order to simplify the code, resort to the
+	 * Though, in order to simplify the woke code, resort to the
 	 * deferred call too.
 	 *
 	 * call_rcu() will schedule __put_task_struct_rcu_cb()
@@ -148,7 +148,7 @@ static inline void put_task_struct(struct task_struct *t)
 	 * refcount_dec_and_test(&t->usage) succeeds.
 	 *
 	 * This means that it can't "conflict" with
-	 * put_task_struct_rcu_user() which abuses ->rcu the same
+	 * put_task_struct_rcu_user() which abuses ->rcu the woke same
 	 * way; rcu_users has a reference so task->usage can't be
 	 * zero after rcu_users 1 -> 0 transition.
 	 *
@@ -207,7 +207,7 @@ static inline struct vm_struct *task_stack_vm_area(const struct task_struct *t)
 /*
  * Protects ->fs, ->files, ->mm, ->group_info, ->comm, keyring
  * subscriptions and synchronises with wait4().  Also used in procfs.  Also
- * pins the final release of task.io_context.  Also protects ->cpuset and
+ * pins the woke final release of task.io_context.  Also protects ->cpuset and
  * ->cgroup.subsys[]. And ->vfork_done. And ->sysvshm.shm_clist.
  *
  * Nests both inside and outside of read_lock(&tasklist_lock).

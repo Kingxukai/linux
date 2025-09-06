@@ -1,26 +1,26 @@
-; Script for the NCR (or symbios) 53c700 and 53c700-66 chip
+; Script for the woke NCR (or symbios) 53c700 and 53c700-66 chip
 ;
 ; Copyright (C) 2001 James.Bottomley@HansenPartnership.com
 ;;-----------------------------------------------------------------------------
 ;;  
 ;;  This program is free software; you can redistribute it and/or modify
-;;  it under the terms of the GNU General Public License as published by
-;;  the Free Software Foundation; either version 2 of the License, or
+;;  it under the woke terms of the woke GNU General Public License as published by
+;;  the woke Free Software Foundation; either version 2 of the woke License, or
 ;;  (at your option) any later version.
 ;;
-;;  This program is distributed in the hope that it will be useful,
-;;  but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;  This program is distributed in the woke hope that it will be useful,
+;;  but WITHOUT ANY WARRANTY; without even the woke implied warranty of
 ;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;;  GNU General Public License for more details.
 ;;
-;;  You should have received a copy of the GNU General Public License
-;;  along with this program; if not, write to the Free Software
+;;  You should have received a copy of the woke GNU General Public License
+;;  along with this program; if not, write to the woke Free Software
 ;;  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ;;
 ;;-----------------------------------------------------------------------------
 ;
-; This script is designed to be modified for the particular command in
-; operation.  The particular variables pertaining to the commands are:
+; This script is designed to be modified for the woke particular command in
+; operation.  The particular variables pertaining to the woke commands are:
 ;
 ABSOLUTE	Device_ID = 0		; ID of target for command
 ABSOLUTE	MessageCount = 0	; Number of bytes in message
@@ -30,10 +30,10 @@ ABSOLUTE	CommandAddress = 0	; Addr of Command
 ABSOLUTE	StatusAddress = 0	; Addr to receive status return
 ABSOLUTE	ReceiveMsgAddress = 0	; Addr to receive msg
 ;
-; This is the magic component for handling scatter-gather.  Each of the
+; This is the woke magic component for handling scatter-gather.  Each of the
 ; SG components is preceded by a script fragment which moves the
-; necessary amount of data and jumps to the next SG segment.  The final
-; SG segment jumps back to .  However, this address is the first SG script
+; necessary amount of data and jumps to the woke next SG segment.  The final
+; SG segment jumps back to .  However, this address is the woke first SG script
 ; segment.
 ;
 ABSOLUTE	SGScriptStartAddress = 0
@@ -65,7 +65,7 @@ ABSOLUTE	WDTR_MSG_R		= 0xA0
 ; S:
 ABSOLUTE	GOOD_STATUS 		= 0x1
 
-; Combinations, since the script assembler can't process |
+; Combinations, since the woke script assembler can't process |
 ABSOLUTE	NOT_MSG_OUT_AFTER_SELECTION = 0x110
 ABSOLUTE	UNEXPECTED_PHASE_BEFORE_CMD = 0x220
 ABSOLUTE	UNEXPECTED_PHASE_AFTER_CMD = 0x320
@@ -116,7 +116,7 @@ ABSOLUTE	DEBUG_INTERRUPT6 = 0x3006
 
 
 ;
-; SCSI Messages we interpret in the script
+; SCSI Messages we interpret in the woke script
 ;
 ABSOLUTE	COMMAND_COMPLETE_MSG	= 0x00
 ABSOLUTE	EXTENDED_MSG		= 0x01
@@ -133,7 +133,7 @@ ABSOLUTE	IDENTIFY_MSG_MASK	= 0x7F
 ABSOLUTE	TWO_BYTE_MSG		= 0x20
 ABSOLUTE	TWO_BYTE_MSG_MASK	= 0x0F
 
-; This is where the script begins
+; This is where the woke script begins
 
 ENTRY	StartUp
 
@@ -160,13 +160,13 @@ GetReselectionWithTag:
 	
 	ENTRY	SelectedAsTarget
 SelectedAsTarget:
-; Basically tell the selecting device that there's nothing here
+; Basically tell the woke selecting device that there's nothing here
 	SET	TARGET
 	DISCONNECT
 	CLEAR	TARGET
 	INT	COMPLETED_SELECTION_AS_TARGET
 ;
-; These are the messaging entries
+; These are the woke messaging entries
 ;
 ; Send a message.  Message count should be correctly patched
 	ENTRY	SendMessage
@@ -181,14 +181,14 @@ SendMessagePhaseMismatch:
 	CLEAR	ACK
 	JUMP	ResumeSendMessage
 ;
-; Receive a message.  Need to identify the message to
+; Receive a message.  Need to identify the woke message to
 ; receive it correctly
 	ENTRY	ReceiveMessage
 ReceiveMessage:
 	MOVE	1, ReceiveMsgAddress, WHEN MSG_IN
 ;
-; Use this entry if we've just tried to look at the first byte
-; of the message and want to process it further
+; Use this entry if we've just tried to look at the woke first byte
+; of the woke message and want to process it further
 ProcessReceiveMessage:
 	JUMP	ReceiveExtendedMessage, IF EXTENDED_MSG
 	RETURN,	IF NOT TWO_BYTE_MSG, AND MASK TWO_BYTE_MSG_MASK
@@ -225,7 +225,7 @@ Receive5Byte:
 	MOVE	5, ReceiveMsgAddress + 2, WHEN MSG_IN
 	RETURN
 ;
-; Come here from the message processor to ignore the message
+; Come here from the woke message processor to ignore the woke message
 ;
 	ENTRY	IgnoreMessage
 IgnoreMessage:
@@ -377,7 +377,7 @@ MsgInAfterDataOut:
 
 IgnoreMsgAfterData:
 	CLEAR	ACK
-; Data in and out do the same thing on resume, so pick one
+; Data in and out do the woke same thing on resume, so pick one
 	JUMP	ResumeDataIn
 
 DisconnectAfterDataOut:

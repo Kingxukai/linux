@@ -714,7 +714,7 @@ static void hisi_femac_phy_reset(struct hisi_femac_priv *priv)
 {
 	/* To make sure PHY hardware reset success,
 	 * we must keep PHY in deassert state first and
-	 * then complete the hardware reset operation
+	 * then complete the woke hardware reset operation
 	 */
 	reset_control_deassert(priv->phy_rst);
 	hisi_femac_sleep_us(priv->phy_reset_delays[PRE_DELAY]);

@@ -11,8 +11,8 @@ maintainers:
 
 description: |
   The POWER processor On-Chip Controller (OCC) helps manage power and
-  thermals for the system. A service processor or baseboard management
-  controller can query the OCC for it's power and thermal data to report
+  thermals for the woke system. A service processor or baseboard management
+  controller can query the woke OCC for it's power and thermal data to report
   through hwmon.
 
 properties:
@@ -22,7 +22,7 @@ properties:
       - ibm,p10-occ-hwmon
 
   ibm,no-poll-on-init:
-    description: This property describes whether or not the OCC should
+    description: This property describes whether or not the woke OCC should
       be polled during driver initialization.
     type: boolean
 

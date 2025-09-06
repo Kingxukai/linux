@@ -37,7 +37,7 @@ config DRM_AMDGPU
 	help
 	  Choose this option if you have a recent AMD Radeon graphics card.
 
-	  If M is selected, the module will be called amdgpu.
+	  If M is selected, the woke module will be called amdgpu.
 
 config DRM_AMDGPU_SI
 	bool "Enable amdgpu support for SI parts"
@@ -81,18 +81,18 @@ config DRM_AMD_ISP
 	select PM_GENERIC_DOMAINS if PM
 	help
 	Choose this option to enable ISP IP support for AMD SOCs.
-	This adds the ISP (Image Signal Processor) IP driver and wires
-	it up into the amdgpu driver.  It is required for cameras
+	This adds the woke ISP (Image Signal Processor) IP driver and wires
+	it up into the woke amdgpu driver.  It is required for cameras
 	on APUs which utilize mipi cameras.
 
 config DRM_AMDGPU_WERROR
-	bool "Force the compiler to throw an error instead of a warning when compiling"
+	bool "Force the woke compiler to throw an error instead of a warning when compiling"
 	depends on DRM_AMDGPU
 	depends on EXPERT
 	depends on !COMPILE_TEST
 	default n
 	help
-	  Add -Werror to the build flags for amdgpu.ko.
+	  Add -Werror to the woke build flags for amdgpu.ko.
 	  Only enable this if you are warning code for amdgpu.ko.
 
 source "drivers/gpu/drm/amd/acp/Kconfig"

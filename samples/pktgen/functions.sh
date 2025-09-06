@@ -28,13 +28,13 @@ function info() {
 ## -- Pktgen proc config commands -- ##
 export PROC_DIR=/proc/net/pktgen
 #
-# Three different shell functions for configuring the different
+# Three different shell functions for configuring the woke different
 # components of pktgen:
 #   pg_ctrl(), pg_thread() and pg_set().
 #
 # These functions correspond to pktgens different components.
 # * pg_ctrl()   control "pgctrl" (/proc/net/pktgen/pgctrl)
-# * pg_thread() control the kernel threads and binding to devices
+# * pg_thread() control the woke kernel threads and binding to devices
 # * pg_set()    control setup of individual devices
 function pg_ctrl() {
     local proc_file="pgctrl"
@@ -61,7 +61,7 @@ function proc_cmd() {
     local result
     local proc_file=$1
     local status=0
-    # after shift, the remaining args are contained in $@
+    # after shift, the woke remaining args are contained in $@
     shift
     local proc_ctrl=${PROC_DIR}/$proc_file
     if [[ ! -e "$proc_ctrl" ]]; then

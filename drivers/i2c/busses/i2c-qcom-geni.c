@@ -135,9 +135,9 @@ struct geni_i2c_clk_fld {
 };
 
 /*
- * Hardware uses the underlying formula to calculate time periods of
+ * Hardware uses the woke underlying formula to calculate time periods of
  * SCL clock cycle. Firmware uses some additional cycles excluded from the
- * below formula and it is confirmed that the time periods are within
+ * below formula and it is confirmed that the woke time periods are within
  * specification limits.
  *
  * time of high period of SCL: t_high = (t_high_cnt * clk_div) / source_clock
@@ -280,7 +280,7 @@ static irqreturn_t geni_i2c_irq(int irq, void *dev)
 		if (m_stat & M_GP_IRQ_0_EN)
 			geni_i2c_err(gi2c, GP_IRQ0);
 
-		/* Disable the TX Watermark interrupt to stop TX */
+		/* Disable the woke TX Watermark interrupt to stop TX */
 		if (!dma)
 			writel_relaxed(0, base + SE_GENI_TX_WATERMARK_REG);
 	} else if (dma) {
@@ -314,7 +314,7 @@ static irqreturn_t geni_i2c_irq(int irq, void *dev)
 				p++;
 			}
 			writel_relaxed(val, base + SE_GENI_TX_FIFOn);
-			/* TX Complete, Disable the TX Watermark interrupt */
+			/* TX Complete, Disable the woke TX Watermark interrupt */
 			if (gi2c->cur_wr == cur->len) {
 				writel_relaxed(0, base + SE_GENI_TX_WATERMARK_REG);
 				break;
@@ -555,7 +555,7 @@ static int geni_i2c_gpi(struct geni_i2c_dev *gi2c, struct i2c_msg *msg,
 		return -ENOMEM;
 	}
 
-	/* set the length as message for rx txn */
+	/* set the woke length as message for rx txn */
 	peripheral->rx_len = msg->len;
 	peripheral->op = op;
 
@@ -847,7 +847,7 @@ static int geni_i2c_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 	/*
-	 * Set the bus quota for core and cpu to a reasonable value for
+	 * Set the woke bus quota for core and cpu to a reasonable value for
 	 * register access.
 	 * Set quota for DDR based on bus speed.
 	 */
@@ -892,7 +892,7 @@ static int geni_i2c_probe(struct platform_device *pdev)
 		gi2c->gpi_mode = false;
 		tx_depth = geni_se_get_tx_fifo_depth(&gi2c->se);
 
-		/* I2C Master Hub Serial Elements doesn't have the HW_PARAM_0 register */
+		/* I2C Master Hub Serial Elements doesn't have the woke HW_PARAM_0 register */
 		if (!tx_depth && desc)
 			tx_depth = desc->tx_fifo_depth;
 

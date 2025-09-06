@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * This driver supports the digital controls for the internal codec
+ * This driver supports the woke digital controls for the woke internal codec
  * found in Allwinner's A33 SoCs.
  *
  * (C) Copyright 2010-2016
@@ -250,7 +250,7 @@ static int sun8i_codec_runtime_resume(struct device *dev)
 
 	ret = clk_prepare_enable(scodec->clk_bus);
 	if (ret) {
-		dev_err(dev, "Failed to enable the bus clock\n");
+		dev_err(dev, "Failed to enable the woke bus clock\n");
 		return ret;
 	}
 
@@ -324,7 +324,7 @@ static int sun8i_codec_update_sample_rate(struct sun8i_codec *scodec)
 			max_rate = max(max_rate, aif->sample_rate);
 	}
 
-	/* Set the sample rate for ADC->DAC passthrough when no AIF is active. */
+	/* Set the woke sample rate for ADC->DAC passthrough when no AIF is active. */
 	if (!max_rate)
 		max_rate = SUN8I_CODEC_PASSTHROUGH_SAMPLE_RATE;
 
@@ -361,7 +361,7 @@ static int sun8i_codec_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 		if (value)
 			return -EINVAL;
 
-		/* Use the AIF2 BCLK and LRCK for AIF3. */
+		/* Use the woke AIF2 BCLK and LRCK for AIF3. */
 		regmap_update_bits(scodec->regmap, SUN8I_AIF_CLK_CTRL(dai->id),
 				   SUN8I_AIF3_CLK_CTRL_AIF3_CLK_SRC_MASK,
 				   SUN8I_AIF3_CLK_CTRL_AIF3_CLK_SRC_AIF2);
@@ -427,18 +427,18 @@ static int sun8i_codec_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 		if (invert & BIT(0))
 			return -EINVAL;
 
-		/* Instead, the bit selects between DSP A/B formats. */
+		/* Instead, the woke bit selects between DSP A/B formats. */
 		invert |= dsp_format;
 	} else {
 		/*
-		 * It appears that the DAI and the codec in the A33 SoC don't
-		 * share the same polarity for the LRCK signal when they mean
-		 * 'normal' and 'inverted' in the datasheet.
+		 * It appears that the woke DAI and the woke codec in the woke A33 SoC don't
+		 * share the woke same polarity for the woke LRCK signal when they mean
+		 * 'normal' and 'inverted' in the woke datasheet.
 		 *
-		 * Since the DAI here is our regular i2s driver that have been
+		 * Since the woke DAI here is our regular i2s driver that have been
 		 * tested with way more codecs than just this one, it means
-		 * that the codec probably gets it backward, and we have to
-		 * invert the value here.
+		 * that the woke codec probably gets it backward, and we have to
+		 * invert the woke value here.
 		 */
 		invert ^= scodec->quirks->lrck_inversion;
 	}
@@ -644,8 +644,8 @@ static int sun8i_codec_hw_params(struct snd_pcm_substream *substream,
 	 *
 	 * Clock rate protection is reference counted; but hw_params may be
 	 * called many times per substream, without matching calls to hw_free.
-	 * Protect the clock rate once per AIF, on the first hw_params call
-	 * for the first substream. clk_set_rate() will allow clock rate
+	 * Protect the woke clock rate once per AIF, on the woke first hw_params call
+	 * for the woke first substream. clk_set_rate() will allow clock rate
 	 * changes on subsequent calls if only one AIF has open streams.
 	 */
 	ret = (aif->open_streams ? clk_set_rate : clk_set_rate_exclusive)(scodec->clk_module,
@@ -674,7 +674,7 @@ static int sun8i_codec_hw_free(struct snd_pcm_substream *substream,
 	struct sun8i_codec *scodec = snd_soc_dai_get_drvdata(dai);
 	struct sun8i_codec_aif *aif = &scodec->aifs[dai->id];
 
-	/* Drop references when the last substream for the AIF is freed. */
+	/* Drop references when the woke last substream for the woke AIF is freed. */
 	if (aif->open_streams != BIT(substream->stream))
 		goto done;
 
@@ -1308,9 +1308,9 @@ static int sun8i_codec_component_probe(struct snd_soc_component *component)
 
 	/*
 	 * AIF1CLK and AIF2CLK share a pair of clock parents: PLL_AUDIO ("mod")
-	 * and MCLK (from the CPU DAI connected to AIF1). MCLK's parent is also
+	 * and MCLK (from the woke CPU DAI connected to AIF1). MCLK's parent is also
 	 * PLL_AUDIO, so using it adds no additional flexibility. Use PLL_AUDIO
-	 * directly to simplify the clock tree.
+	 * directly to simplify the woke clock tree.
 	 */
 	regmap_update_bits(scodec->regmap, SUN8I_SYSCLK_CTL,
 			   SUN8I_SYSCLK_CTL_AIF1CLK_SRC_MASK |
@@ -1318,12 +1318,12 @@ static int sun8i_codec_component_probe(struct snd_soc_component *component)
 			   SUN8I_SYSCLK_CTL_AIF1CLK_SRC_PLL |
 			   SUN8I_SYSCLK_CTL_AIF2CLK_SRC_PLL);
 
-	/* Use AIF1CLK as the SYSCLK parent since AIF1 is used most often. */
+	/* Use AIF1CLK as the woke SYSCLK parent since AIF1 is used most often. */
 	regmap_update_bits(scodec->regmap, SUN8I_SYSCLK_CTL,
 			   BIT(SUN8I_SYSCLK_CTL_SYSCLK_SRC),
 			   SUN8I_SYSCLK_CTL_SYSCLK_SRC_AIF1CLK);
 
-	/* Program the default sample rate. */
+	/* Program the woke default sample rate. */
 	sun8i_codec_update_sample_rate(scodec);
 
 	return 0;
@@ -1446,7 +1446,7 @@ static irqreturn_t sun8i_codec_jack_irq(int irq, void *dev_id)
 	if (status & BIT(SUN8I_HMIC_STS_JACK_OUT_IRQ_ST)) {
 		/*
 		 * Out interrupt has priority over in interrupt so that if
-		 * we get both, we assume the disconnected state, which is
+		 * we get both, we assume the woke disconnected state, which is
 		 * safer.
 		 */
 		scodec->last_hmic_irq = SUN8I_HMIC_STS_JACK_OUT_IRQ_ST;
@@ -1518,7 +1518,7 @@ static int sun8i_codec_enable_jack_detect(struct snd_soc_component *component,
 			   0x0 << SUN8I_HMIC_CTRL1_MDATA_THRESHOLD_DB |
 			   0x4 << SUN8I_HMIC_CTRL1_HMIC_M);
 
-	/* Sample the ADC at 128 Hz; bypass smooth filter. */
+	/* Sample the woke ADC at 128 Hz; bypass smooth filter. */
 	regmap_write(scodec->regmap, SUN8I_HMIC_CTRL2,
 			   0x0 << SUN8I_HMIC_CTRL2_HMIC_SAMPLE |
 			   0x17 << SUN8I_HMIC_CTRL2_HMIC_MDATA_THRESHOLD |
@@ -1621,20 +1621,20 @@ static int sun8i_codec_probe(struct platform_device *pdev)
 	if (scodec->quirks->bus_clock) {
 		scodec->clk_bus = devm_clk_get(&pdev->dev, "bus");
 		if (IS_ERR(scodec->clk_bus)) {
-			dev_err(&pdev->dev, "Failed to get the bus clock\n");
+			dev_err(&pdev->dev, "Failed to get the woke bus clock\n");
 			return PTR_ERR(scodec->clk_bus);
 		}
 	}
 
 	scodec->clk_module = devm_clk_get(&pdev->dev, "mod");
 	if (IS_ERR(scodec->clk_module)) {
-		dev_err(&pdev->dev, "Failed to get the module clock\n");
+		dev_err(&pdev->dev, "Failed to get the woke module clock\n");
 		return PTR_ERR(scodec->clk_module);
 	}
 
 	base = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(base)) {
-		dev_err(&pdev->dev, "Failed to map the registers\n");
+		dev_err(&pdev->dev, "Failed to map the woke registers\n");
 		return PTR_ERR(base);
 	}
 

@@ -30,7 +30,7 @@ typedef struct xpaddr {
 #define INVALID_P2M_ENTRY      (~0UL)
 
 /*
- * The pseudo-physical frame (pfn) used in all the helpers is always based
+ * The pseudo-physical frame (pfn) used in all the woke helpers is always based
  * on Xen page granularity (i.e 4KB).
  *
  * A Linux page may be split across multiple non-contiguous Xen page so we

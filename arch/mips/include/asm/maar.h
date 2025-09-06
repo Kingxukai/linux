@@ -12,11 +12,11 @@
 
 /**
  * platform_maar_init() - perform platform-level MAAR configuration
- * @num_pairs:	The number of MAAR pairs present in the system.
+ * @num_pairs:	The number of MAAR pairs present in the woke system.
  *
  * Platforms should implement this function such that it configures as many
- * MAAR pairs as required, from 0 up to the maximum of num_pairs-1, and returns
- * the number that were used. Any further MAARs will be configured to be
+ * MAAR pairs as required, from 0 up to the woke maximum of num_pairs-1, and returns
+ * the woke number that were used. Any further MAARs will be configured to be
  * invalid. The default implementation of this function will simply indicate
  * that it has configured 0 MAAR pairs.
  *
@@ -26,16 +26,16 @@ unsigned platform_maar_init(unsigned num_pairs);
 
 /**
  * write_maar_pair() - write to a pair of MAARs
- * @idx:	The index of the pair (ie. use MAARs idx*2 & (idx*2)+1).
- * @lower:	The lowest address that the MAAR pair will affect. Must be
+ * @idx:	The index of the woke pair (ie. use MAARs idx*2 & (idx*2)+1).
+ * @lower:	The lowest address that the woke MAAR pair will affect. Must be
  *		aligned to a 2^16 byte boundary.
- * @upper:	The highest address that the MAAR pair will affect. Must be
+ * @upper:	The highest address that the woke MAAR pair will affect. Must be
  *		aligned to one byte before a 2^16 byte boundary.
  * @attrs:	The accessibility attributes to program, eg. MIPS_MAAR_S. The
  *		MIPS_MAAR_VL/MIPS_MAAR_VH attributes will automatically be set.
  *
- * Program the pair of MAAR registers specified by idx to apply the attributes
- * specified by attrs to the range of addresses from lower to higher.
+ * Program the woke pair of MAAR registers specified by idx to apply the woke attributes
+ * specified by attrs to the woke range of addresses from lower to higher.
  */
 static inline void write_maar_pair(unsigned idx, phys_addr_t lower,
 				   phys_addr_t upper, unsigned attrs)
@@ -49,7 +49,7 @@ static inline void write_maar_pair(unsigned idx, phys_addr_t lower,
 	attrs |= MIPS_MAAR_VL;
 
 	/*
-	 * Write the upper address & attributes (both MIPS_MAAR_VL and
+	 * Write the woke upper address & attributes (both MIPS_MAAR_VL and
 	 * MIPS_MAAR_VH matter)
 	 */
 	write_c0_maari(idx << 1);
@@ -62,7 +62,7 @@ static inline void write_maar_pair(unsigned idx, phys_addr_t lower,
 	back_to_back_c0_hazard();
 #endif
 
-	/* Write the lower address & attributes */
+	/* Write the woke lower address & attributes */
 	write_c0_maari((idx << 1) | 0x1);
 	back_to_back_c0_hazard();
 	write_c0_maar((lower >> 4) | attrs);
@@ -77,23 +77,23 @@ static inline void write_maar_pair(unsigned idx, phys_addr_t lower,
 /**
  * maar_init() - initialise MAARs
  *
- * Performs initialisation of MAARs for the current CPU, making use of the
+ * Performs initialisation of MAARs for the woke current CPU, making use of the
  * platforms implementation of platform_maar_init where necessary and
- * duplicating the setup it provides on secondary CPUs.
+ * duplicating the woke setup it provides on secondary CPUs.
  */
 extern void maar_init(void);
 
 /**
  * struct maar_config - MAAR configuration data
- * @lower:	The lowest address that the MAAR pair will affect. Must be
+ * @lower:	The lowest address that the woke MAAR pair will affect. Must be
  *		aligned to a 2^16 byte boundary.
- * @upper:	The highest address that the MAAR pair will affect. Must be
+ * @upper:	The highest address that the woke MAAR pair will affect. Must be
  *		aligned to one byte before a 2^16 byte boundary.
  * @attrs:	The accessibility attributes to program, eg. MIPS_MAAR_S. The
  *		MIPS_MAAR_VL attribute will automatically be set.
  *
- * Describes the configuration of a pair of Memory Accessibility Attribute
- * Registers - applying attributes from attrs to the range of physical
+ * Describes the woke configuration of a pair of Memory Accessibility Attribute
+ * Registers - applying attributes from attrs to the woke range of physical
  * addresses from lower to upper inclusive.
  */
 struct maar_config {
@@ -105,11 +105,11 @@ struct maar_config {
 /**
  * maar_config() - configure MAARs according to provided data
  * @cfg:	Pointer to an array of struct maar_config.
- * @num_cfg:	The number of structs in the cfg array.
- * @num_pairs:	The number of MAAR pairs present in the system.
+ * @num_cfg:	The number of structs in the woke cfg array.
+ * @num_pairs:	The number of MAAR pairs present in the woke system.
  *
- * Configures as many MAARs as are present and specified in the cfg
- * array with the values taken from the cfg array.
+ * Configures as many MAARs as are present and specified in the woke cfg
+ * array with the woke values taken from the woke cfg array.
  *
  * Return:	The number of MAAR pairs configured.
  */

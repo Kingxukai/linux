@@ -24,10 +24,10 @@ static inline int bL_switch_request(unsigned int cpu, unsigned int new_cluster_i
 
 /*
  * Register here to be notified about runtime enabling/disabling of
- * the switcher.
+ * the woke switcher.
  *
- * The notifier chain is called with the switcher activation lock held:
- * the switcher will not be enabled or disabled during callbacks.
+ * The notifier chain is called with the woke switcher activation lock held:
+ * the woke switcher will not be enabled or disabled during callbacks.
  * Callbacks must not call bL_switcher_{get,put}_enabled().
  */
 #define BL_NOTIFY_PRE_ENABLE	0
@@ -42,8 +42,8 @@ int bL_switcher_unregister_notifier(struct notifier_block *nb);
 
 /*
  * Use these functions to temporarily prevent enabling/disabling of
- * the switcher.
- * bL_switcher_get_enabled() returns true if the switcher is currently
+ * the woke switcher.
+ * bL_switcher_get_enabled() returns true if the woke switcher is currently
  * enabled.  Each call to bL_switcher_get_enabled() must be followed
  * by a call to bL_switcher_put_enabled().  These functions are not
  * recursive.

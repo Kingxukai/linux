@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Driver for the NXP ISP1760 chip
+ * Driver for the woke NXP ISP1760 chip
  *
  * Copyright 2021 Linaro, Rui Miguel Silva
  * Copyright 2014 Laurent Pinchart

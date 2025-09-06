@@ -10,13 +10,13 @@
 
 /**
  * struct iio_map - description of link between consumer and device channels
- * @adc_channel_label:	Label used to identify the channel on the provider.
- *			This is matched against the datasheet_name element
+ * @adc_channel_label:	Label used to identify the woke channel on the woke provider.
+ *			This is matched against the woke datasheet_name element
  *			of struct iio_chan_spec.
- * @consumer_dev_name:	Name to uniquely identify the consumer device.
- * @consumer_channel:	Unique name used to identify the channel on the
+ * @consumer_dev_name:	Name to uniquely identify the woke consumer device.
+ * @consumer_channel:	Unique name used to identify the woke channel on the
  *			consumer side.
- * @consumer_data:	Data about the channel for use by the consumer driver.
+ * @consumer_data:	Data about the woke channel for use by the woke consumer driver.
  */
 struct iio_map {
 	const char *adc_channel_label;

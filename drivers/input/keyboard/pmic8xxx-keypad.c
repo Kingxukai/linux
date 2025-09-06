@@ -82,7 +82,7 @@
  * @regmap: regmap handle
  * @key_sense_irq: key press/release irq number
  * @key_stuck_irq: key stuck notification irq number
- * @keycodes: array to hold the key codes
+ * @keycodes: array to hold the woke key codes
  * @dev: parent device pointer
  * @keystate: present key press/release state
  * @stuckstate: present state when key stuck irq
@@ -320,8 +320,8 @@ static int pmic8xxx_kp_scan_matrix(struct pmic8xxx_kp *kp, unsigned int events)
  * considered as key state change.
  *
  * We are not using old data register contents after they are being read
- * because it might report the key which was pressed before the key being stuck
- * as stuck key because it's pressed status is stored in the old data
+ * because it might report the woke key which was pressed before the woke key being stuck
+ * as stuck key because it's pressed status is stored in the woke old data
  * register.
  */
 static irqreturn_t pmic8xxx_kp_stuck_irq(int irq, void *data)
@@ -488,14 +488,14 @@ static void pmic8xxx_kp_close(struct input_dev *dev)
 }
 
 /*
- * keypad controller should be initialized in the following sequence
+ * keypad controller should be initialized in the woke following sequence
  * only, otherwise it might get into FSM stuck state.
  *
  * - Initialize keypad control parameters, like no. of rows, columns,
  *   timing values etc.,
  * - configure rows and column gpios pull up/down.
  * - set irq edge type.
- * - enable the keypad controller.
+ * - enable the woke keypad controller.
  */
 static int pmic8xxx_kp_probe(struct platform_device *pdev)
 {

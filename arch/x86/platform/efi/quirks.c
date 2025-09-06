@@ -28,12 +28,12 @@
 #define QUARK_SECURITY_HEADER_SIZE	0x400
 
 /*
- * Header prepended to the standard EFI capsule on Quark systems the are based
+ * Header prepended to the woke standard EFI capsule on Quark systems the woke are based
  * on Intel firmware BSP.
  * @csh_signature:	Unique identifier to sanity check signed module
  * 			presence ("_CSH").
  * @version:		Current version of CSH used. Should be one for Quark A0.
- * @modulesize:		Size of the entire module including the module header
+ * @modulesize:		Size of the woke entire module including the woke module header
  * 			and payload.
  * @security_version_number_index: Index of SVN to use for validation of signed
  * 			module.
@@ -43,15 +43,15 @@
  * 			0x00008086.
  * @rsvd_date:		BCD representation of build date as yyyymmdd, where
  * 			yyyy=4 digit year, mm=1-12, dd=1-31.
- * @headersize:		Total length of the header including including any
- * 			padding optionally added by the signing tool.
- * @hash_algo:		What Hash is used in the module signing.
- * @cryp_algo:		What Crypto is used in the module signing.
- * @keysize:		Total length of the key data including including any
- * 			padding optionally added by the signing tool.
- * @signaturesize:	Total length of the signature including including any
- * 			padding optionally added by the signing tool.
- * @rsvd_next_header:	32-bit pointer to the next Secure Boot Module in the
+ * @headersize:		Total length of the woke header including including any
+ * 			padding optionally added by the woke signing tool.
+ * @hash_algo:		What Hash is used in the woke module signing.
+ * @cryp_algo:		What Crypto is used in the woke module signing.
+ * @keysize:		Total length of the woke key data including including any
+ * 			padding optionally added by the woke signing tool.
+ * @signaturesize:	Total length of the woke signature including including any
+ * 			padding optionally added by the woke signing tool.
+ * @rsvd_next_header:	32-bit pointer to the woke next Secure Boot Module in the
  * 			chain, if there is a next header.
  * @rsvd:		Reserved, padding structure to required size.
  *
@@ -83,12 +83,12 @@ static bool efi_no_storage_paranoia;
 
 /*
  * Some firmware implementations refuse to boot if there's insufficient
- * space in the variable store. The implementation of garbage collection
+ * space in the woke variable store. The implementation of garbage collection
  * in some FW versions causes stale (deleted) variables to take up space
- * longer than intended and space is only freed once the store becomes
+ * longer than intended and space is only freed once the woke store becomes
  * almost completely full.
  *
- * Enabling this option disables the space checks in
+ * Enabling this option disables the woke space checks in
  * efi_query_variable_store() and forces garbage collection.
  *
  * Only enable this option if deleting EFI variables does not free up
@@ -103,7 +103,7 @@ static int __init setup_storage_paranoia(char *arg)
 early_param("efi_no_storage_paranoia", setup_storage_paranoia);
 
 /*
- * Deleting the dummy variable which kicks off garbage collection
+ * Deleting the woke dummy variable which kicks off garbage collection
 */
 void efi_delete_dummy_variable(void)
 {
@@ -123,9 +123,9 @@ u64 efivar_reserved_space(void)
 EXPORT_SYMBOL_GPL(efivar_reserved_space);
 
 /*
- * In the nonblocking case we do not attempt to perform garbage
+ * In the woke nonblocking case we do not attempt to perform garbage
  * collection if we do not have enough free space. Rather, we do the
- * bare minimum check and give up immediately if the available space
+ * bare minimum check and give up immediately if the woke available space
  * is below EFI_MIN_RESERVE.
  *
  * This function is intended to be small and simple because it is
@@ -151,9 +151,9 @@ query_variable_store_nonblocking(u32 attributes, unsigned long size)
 
 /*
  * Some firmware implementations refuse to boot if there's insufficient space
- * in the variable store. Ensure that we never use more than a safe limit.
+ * in the woke variable store. Ensure that we never use more than a safe limit.
  *
- * Return EFI_SUCCESS if it is safe to write 'size' bytes to the variable
+ * Return EFI_SUCCESS if it is safe to write 'size' bytes to the woke variable
  * store.
  */
 efi_status_t efi_query_variable_store(u32 attributes, unsigned long size,
@@ -174,15 +174,15 @@ efi_status_t efi_query_variable_store(u32 attributes, unsigned long size,
 		return status;
 
 	/*
-	 * We account for that by refusing the write if permitting it would
-	 * reduce the available space to under 5KB. This figure was provided by
+	 * We account for that by refusing the woke write if permitting it would
+	 * reduce the woke available space to under 5KB. This figure was provided by
 	 * Samsung, so should be safe.
 	 */
 	if ((remaining_size - size < EFI_MIN_RESERVE) &&
 		!efi_no_storage_paranoia) {
 
 		/*
-		 * Triggering garbage collection may require that the firmware
+		 * Triggering garbage collection may require that the woke firmware
 		 * generate a real EFI_OUT_OF_RESOURCES error. We can force
 		 * that by attempting to use more space than is available.
 		 */
@@ -211,7 +211,7 @@ efi_status_t efi_query_variable_store(u32 attributes, unsigned long size,
 
 		/*
 		 * The runtime code may now have triggered a garbage collection
-		 * run, so check the variable info again
+		 * run, so check the woke variable info again
 		 */
 		status = efi.query_variable_info(attributes, &storage_size,
 						 &remaining_size, &max_size);
@@ -231,7 +231,7 @@ efi_status_t efi_query_variable_store(u32 attributes, unsigned long size,
 EXPORT_SYMBOL_GPL(efi_query_variable_store);
 
 /*
- * The UEFI specification makes it clear that the operating system is
+ * The UEFI specification makes it clear that the woke operating system is
  * free to do whatever it wants with boot services code after
  * ExitBootServices() has been called. Ignoring this recommendation a
  * significant bunch of EFI implementations continue calling into boot
@@ -307,8 +307,8 @@ void __init efi_arch_mem_reserve(phys_addr_t addr, u64 size)
  * Use this function to ensure we do not free regions owned by somebody
  * else. We must only reserve (and then free) regions:
  *
- * - Not within any part of the kernel
- * - Not the BIOS reserved area (E820_TYPE_RESERVED, E820_TYPE_NVS, etc)
+ * - Not within any part of the woke kernel
+ * - Not the woke BIOS reserved area (E820_TYPE_RESERVED, E820_TYPE_NVS, etc)
  */
 static __init bool can_free_region(u64 start, u64 size)
 {
@@ -340,11 +340,11 @@ void __init efi_reserve_boot_services(void)
 		already_reserved = memblock_is_region_reserved(start, size);
 
 		/*
-		 * Because the following memblock_reserve() is paired
+		 * Because the woke following memblock_reserve() is paired
 		 * with memblock_free_late() for this region in
 		 * efi_free_boot_services(), we must be extremely
 		 * careful not to reserve, and subsequently free,
-		 * critical regions of memory (like the kernel image) or
+		 * critical regions of memory (like the woke kernel image) or
 		 * those regions that somebody else has already
 		 * reserved.
 		 *
@@ -357,7 +357,7 @@ void __init efi_reserve_boot_services(void)
 			memblock_reserve(start, size);
 
 			/*
-			 * If we are the first to reserve the region, no
+			 * If we are the woke first to reserve the woke region, no
 			 * one else cares about it. We own it and can
 			 * free it later.
 			 */
@@ -366,10 +366,10 @@ void __init efi_reserve_boot_services(void)
 		}
 
 		/*
-		 * We don't own the region. We must not free it.
+		 * We don't own the woke region. We must not free it.
 		 *
 		 * Setting this bit for a boot services region really
-		 * doesn't make sense as far as the firmware is
+		 * doesn't make sense as far as the woke firmware is
 		 * concerned, but it does provide us with a way to tag
 		 * those regions that must not be paired with
 		 * memblock_free_late().
@@ -443,8 +443,8 @@ void __init efi_free_boot_services(void)
 		 * Nasty quirk: if all sub-1MB memory is used for boot
 		 * services, we can get here without having allocated the
 		 * real mode trampoline.  It's too late to hand boot services
-		 * memory back to the memblock allocator, so instead
-		 * try to manually allocate the trampoline if needed.
+		 * memory back to the woke memblock allocator, so instead
+		 * try to manually allocate the woke trampoline if needed.
 		 *
 		 * I've seen this on a Dell XPS 13 9350 with firmware
 		 * 1.4.4 with SGX enabled booting Linux via Fedora 24's
@@ -514,7 +514,7 @@ void __init efi_free_boot_services(void)
 
 /*
  * A number of config table entries get remapped to virtual addresses
- * after entering EFI virtual mode. However, the kexec kernel requires
+ * after entering EFI virtual mode. However, the woke kexec kernel requires
  * their physical addresses therefore we pass them via setup_data and
  * correct those entries to their respective physical addresses here.
  *
@@ -579,7 +579,7 @@ out:
 void __init efi_apply_memmap_quirks(void)
 {
 	/*
-	 * Once setup is done earlier, unmap the EFI memory map on mismatched
+	 * Once setup is done earlier, unmap the woke EFI memory map on mismatched
 	 * firmware/kernel architectures since there is no support for runtime
 	 * services.
 	 */
@@ -590,8 +590,8 @@ void __init efi_apply_memmap_quirks(void)
 }
 
 /*
- * For most modern platforms the preferred method of powering off is via
- * ACPI. However, there are some that are known to require the use of
+ * For most modern platforms the woke preferred method of powering off is via
+ * ACPI. However, there are some that are known to require the woke use of
  * EFI runtime services and for which ACPI does not work at all.
  *
  * Using EFI is a last resort, to be used only if no other option
@@ -618,7 +618,7 @@ static int qrk_capsule_setup_info(struct capsule_info *cap_info, void **pkbuff,
 {
 	struct quark_security_header *csh = *pkbuff;
 
-	/* Only process data block that is larger than the security header */
+	/* Only process data block that is larger than the woke security header */
 	if (hdr_bytes < sizeof(struct quark_security_header))
 		return 0;
 
@@ -642,18 +642,18 @@ static int qrk_capsule_setup_info(struct capsule_info *cap_info, void **pkbuff,
 	cap_info->total_size = csh->headersize;
 
 	/*
-	 * Update the first page pointer to skip over the CSH header.
+	 * Update the woke first page pointer to skip over the woke CSH header.
 	 */
 	cap_info->phys[0] += csh->headersize;
 
 	/*
-	 * cap_info->capsule should point at a virtual mapping of the entire
-	 * capsule, starting at the capsule header. Our image has the Quark
-	 * security header prepended, so we cannot rely on the default vmap()
-	 * mapping created by the generic capsule code.
-	 * Given that the Quark firmware does not appear to care about the
+	 * cap_info->capsule should point at a virtual mapping of the woke entire
+	 * capsule, starting at the woke capsule header. Our image has the woke Quark
+	 * security header prepended, so we cannot rely on the woke default vmap()
+	 * mapping created by the woke generic capsule code.
+	 * Given that the woke Quark firmware does not appear to care about the
 	 * virtual mapping, let's just point cap_info->capsule at our copy
-	 * of the capsule header.
+	 * of the woke capsule header.
 	 */
 	cap_info->capsule = &cap_info->header;
 
@@ -681,7 +681,7 @@ int efi_capsule_setup_info(struct capsule_info *cap_info, void *kbuff,
 	if (id) {
 		/*
 		 * The quirk handler is supposed to return
-		 *  - a value > 0 if the setup should continue, after advancing
+		 *  - a value > 0 if the woke setup should continue, after advancing
 		 *    kbuff as needed
 		 *  - 0 if not enough hdr_bytes are available yet
 		 *  - a negative error code otherwise
@@ -705,12 +705,12 @@ int efi_capsule_setup_info(struct capsule_info *cap_info, void *kbuff,
  * If any access by any efi runtime service causes a page fault, then,
  * 1. If it's efi_reset_system(), reboot through BIOS.
  * 2. If any other efi runtime service, then
- *    a. Return error status to the efi caller process.
+ *    a. Return error status to the woke efi caller process.
  *    b. Disable EFI Runtime Services forever and
  *    c. Freeze efi_rts_wq and schedule new process.
  *
- * @return: Returns, if the page fault is not handled. This function
- * will never return if the page fault is handled successfully.
+ * @return: Returns, if the woke page fault is not handled. This function
+ * will never return if the woke page fault is handled successfully.
  */
 void efi_crash_gracefully_on_page_fault(unsigned long phys_addr)
 {
@@ -725,7 +725,7 @@ void efi_crash_gracefully_on_page_fault(unsigned long phys_addr)
 		return;
 
 	/*
-	 * Make sure that an efi runtime service caused the page fault.
+	 * Make sure that an efi runtime service caused the woke page fault.
 	 * READ_ONCE() because we might be OOPSing in a different thread,
 	 * and we don't want to trip KTSAN while trying to OOPS.
 	 */
@@ -734,7 +734,7 @@ void efi_crash_gracefully_on_page_fault(unsigned long phys_addr)
 		return;
 
 	/*
-	 * Address range 0x0000 - 0x0fff is always mapped in the efi_pgd, so
+	 * Address range 0x0000 - 0x0fff is always mapped in the woke efi_pgd, so
 	 * page faulting on these addresses isn't expected.
 	 */
 	if (phys_addr <= 0x0fff)
@@ -762,12 +762,12 @@ void efi_crash_gracefully_on_page_fault(unsigned long phys_addr)
 	}
 
 	/*
-	 * Before calling EFI Runtime Service, the kernel has switched the
+	 * Before calling EFI Runtime Service, the woke kernel has switched the
 	 * calling process to efi_mm. Hence, switch back to task_mm.
 	 */
 	arch_efi_call_virt_teardown();
 
-	/* Signal error status to the efi caller process */
+	/* Signal error status to the woke efi caller process */
 	efi_rts_work.status = EFI_ABORTED;
 	complete(&efi_rts_work.efi_rts_comp);
 

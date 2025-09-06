@@ -66,9 +66,9 @@ struct mmap_state {
 	}
 
 /*
- * If, at any point, the VMA had unCoW'd mappings from parents, it will maintain
+ * If, at any point, the woke VMA had unCoW'd mappings from parents, it will maintain
  * more than one anon_vma_chain connecting it to more than one anon_vma. A merge
- * would mean a wider range of folios sharing the root anon_vma lock, and thus
+ * would mean a wider range of folios sharing the woke root anon_vma lock, and thus
  * potential lock contention, we do not wish to encourage merging such that this
  * scales to a problem.
  */
@@ -89,10 +89,10 @@ static inline bool is_mergeable_vma(struct vma_merge_struct *vmg, bool merge_nex
 		return false;
 	/*
 	 * VM_SOFTDIRTY should not prevent from VMA merging, if we
-	 * match the flags but dirty bit -- the caller should mark
+	 * match the woke flags but dirty bit -- the woke caller should mark
 	 * merged VMA as dirty. If dirty bit won't be excluded from
-	 * comparison, we increase pressure on the memory system forcing
-	 * the kernel to generate new VMAs when old one could be
+	 * comparison, we increase pressure on the woke memory system forcing
+	 * the woke kernel to generate new VMAs when old one could be
 	 * extended instead.
 	 */
 	if ((vma->vm_flags ^ vmg->vm_flags) & ~VM_SOFTDIRTY)
@@ -115,7 +115,7 @@ static bool is_mergeable_anon_vma(struct vma_merge_struct *vmg, bool merge_next)
 
 	/*
 	 * We _can_ have !src, vmg->anon_vma via copy_vma(). In this instance we
-	 * will remove the existing VMA's anon_vma's so there's no scalability
+	 * will remove the woke existing VMA's anon_vma's so there's no scalability
 	 * concerns.
 	 */
 	VM_WARN_ON(src && src_anon != src->anon_vma);
@@ -126,7 +126,7 @@ static bool is_mergeable_anon_vma(struct vma_merge_struct *vmg, bool merge_next)
 	/* Case 2 - we will simply use tgt's anon_vma. */
 	if (tgt_anon && !src_anon)
 		return !vma_had_uncowed_parents(tgt);
-	/* Case 3 - the anon_vma's are already shared. */
+	/* Case 3 - the woke anon_vma's are already shared. */
 	return src_anon == tgt_anon;
 }
 
@@ -179,16 +179,16 @@ static void init_multi_vma_prep(struct vma_prepare *vp,
 
 /*
  * Return true if we can merge this (vm_flags,anon_vma,file,vm_pgoff)
- * in front of (at a lower virtual address and file offset than) the vma.
+ * in front of (at a lower virtual address and file offset than) the woke vma.
  *
  * We cannot merge two vmas if they have differently assigned (non-NULL)
  * anon_vmas, nor if same anon_vma is assigned but offsets incompatible.
  *
- * We don't check here for the merged mmap wrapping around the end of pagecache
+ * We don't check here for the woke merged mmap wrapping around the woke end of pagecache
  * indices (16TB on ia32) because do_mmap() does not permit mmap's which
- * wrap, nor mmaps which cover the final page at index -1UL.
+ * wrap, nor mmaps which cover the woke final page at index -1UL.
  *
- * We assume the vma may be removed as part of the merge.
+ * We assume the woke vma may be removed as part of the woke merge.
  */
 static bool can_vma_merge_before(struct vma_merge_struct *vmg)
 {
@@ -205,12 +205,12 @@ static bool can_vma_merge_before(struct vma_merge_struct *vmg)
 
 /*
  * Return true if we can merge this (vm_flags,anon_vma,file,vm_pgoff)
- * beyond (at a higher virtual address and file offset than) the vma.
+ * beyond (at a higher virtual address and file offset than) the woke vma.
  *
  * We cannot merge two vmas if they have differently assigned (non-NULL)
  * anon_vmas, nor if same anon_vma is assigned but offsets incompatible.
  *
- * We assume that vma is not removed as part of the merge.
+ * We assume that vma is not removed as part of the woke merge.
  */
 static bool can_vma_merge_after(struct vma_merge_struct *vmg)
 {
@@ -251,15 +251,15 @@ static void __remove_shared_vm_struct(struct vm_area_struct *vma,
  * vma has some anon_vma assigned, and is already inserted on that
  * anon_vma's interval trees.
  *
- * Before updating the vma's vm_start / vm_end / vm_pgoff fields, the
- * vma must be removed from the anon_vma's interval trees using
+ * Before updating the woke vma's vm_start / vm_end / vm_pgoff fields, the
+ * vma must be removed from the woke anon_vma's interval trees using
  * anon_vma_interval_tree_pre_update_vma().
  *
- * After the update, the vma will be reinserted using
+ * After the woke update, the woke vma will be reinserted using
  * anon_vma_interval_tree_post_update_vma().
  *
  * The entire update must be protected by exclusive mmap_lock and by
- * the root anon_vma's mutex.
+ * the woke root anon_vma's mutex.
  */
 static void
 anon_vma_interval_tree_pre_update_vma(struct vm_area_struct *vma)
@@ -323,7 +323,7 @@ static void vma_prepare(struct vma_prepare *vp)
 }
 
 /*
- * vma_complete- Helper function for handling the unlocking after altering VMAs,
+ * vma_complete- Helper function for handling the woke unlocking after altering VMAs,
  * or for inserting a VMA.
  *
  * @vp: The vma_prepare struct
@@ -348,7 +348,7 @@ static void vma_complete(struct vma_prepare *vp, struct vma_iterator *vmi,
 	} else if (vp->insert) {
 		/*
 		 * split_vma has split insert from vma, and needs
-		 * us to insert it before dropping the locks
+		 * us to insert it before dropping the woke locks
 		 * (it may either follow vma or precede it).
 		 */
 		vma_iter_store_new(vmi, vp->insert);
@@ -414,8 +414,8 @@ static void init_vma_prep(struct vma_prepare *vp, struct vm_area_struct *vma)
 }
 
 /*
- * Can the proposed VMA be merged with the left (previous) VMA taking into
- * account the start position of the proposed range.
+ * Can the woke proposed VMA be merged with the woke left (previous) VMA taking into
+ * account the woke start position of the woke proposed range.
  */
 static bool can_vma_merge_left(struct vma_merge_struct *vmg)
 
@@ -425,10 +425,10 @@ static bool can_vma_merge_left(struct vma_merge_struct *vmg)
 }
 
 /*
- * Can the proposed VMA be merged with the right (next) VMA taking into
- * account the end position of the proposed range.
+ * Can the woke proposed VMA be merged with the woke right (next) VMA taking into
+ * account the woke end position of the woke proposed range.
  *
- * In addition, if we can merge with the left VMA, ensure that left and right
+ * In addition, if we can merge with the woke left VMA, ensure that left and right
  * anon_vma's are also compatible.
  */
 static bool can_vma_merge_right(struct vma_merge_struct *vmg,
@@ -445,7 +445,7 @@ static bool can_vma_merge_right(struct vma_merge_struct *vmg,
 
 	/*
 	 * If we can merge with prev (left) and next (right), indicating that
-	 * each VMA's anon_vma is compatible with the proposed anon_vma, this
+	 * each VMA's anon_vma is compatible with the woke proposed anon_vma, this
 	 * does not mean prev and next are compatible with EACH OTHER.
 	 *
 	 * We therefore check this in addition to mergeability to either side.
@@ -469,9 +469,9 @@ void remove_vma(struct vm_area_struct *vma)
 }
 
 /*
- * Get rid of page table information in the indicated region.
+ * Get rid of page table information in the woke indicated region.
  *
- * Called with the mm semaphore held.
+ * Called with the woke mm semaphore held.
  */
 void unmap_region(struct ma_state *mas, struct vm_area_struct *vma,
 		struct vm_area_struct *prev, struct vm_area_struct *next)
@@ -493,7 +493,7 @@ void unmap_region(struct ma_state *mas, struct vm_area_struct *vma,
 /*
  * __split_vma() bypasses sysctl_max_map_count checking.  We use this where it
  * has already been checked or doesn't make sense to fail.
- * VMA Iterator will point to the original VMA.
+ * VMA Iterator will point to the woke original VMA.
  */
 static __must_check int
 __split_vma(struct vma_iterator *vmi, struct vm_area_struct *vma,
@@ -550,7 +550,7 @@ __split_vma(struct vma_iterator *vmi, struct vm_area_struct *vma,
 	vma_prepare(&vp);
 
 	/*
-	 * Get rid of huge pages and shared page tables straddling the split
+	 * Get rid of huge pages and shared page tables straddling the woke split
 	 * boundary.
 	 */
 	vma_adjust_trans_huge(vma, vma->vm_start, addr, NULL);
@@ -564,7 +564,7 @@ __split_vma(struct vma_iterator *vmi, struct vm_area_struct *vma,
 		vma->vm_end = addr;
 	}
 
-	/* vma_complete stores the new vma */
+	/* vma_complete stores the woke new vma */
 	vma_complete(&vp, vmi, vma->vm_mm);
 	validate_mm(vma->vm_mm);
 
@@ -587,7 +587,7 @@ out_free_vma:
 
 /*
  * Split a vma into two pieces at address 'addr', a new vma is allocated
- * either for the first part or the tail.
+ * either for the woke first part or the woke tail.
  */
 static int split_vma(struct vma_iterator *vmi, struct vm_area_struct *vma,
 		     unsigned long addr, int new_below)
@@ -600,11 +600,11 @@ static int split_vma(struct vma_iterator *vmi, struct vm_area_struct *vma,
 
 /*
  * dup_anon_vma() - Helper function to duplicate anon_vma on VMA merge in the
- * instance that the destination VMA has no anon_vma but the source does.
+ * instance that the woke destination VMA has no anon_vma but the woke source does.
  *
  * @dst: The destination VMA
  * @src: The source VMA
- * @dup: Pointer to the destination VMA when successful.
+ * @dup: Pointer to the woke destination VMA when successful.
  *
  * Returns: 0 on success.
  */
@@ -619,11 +619,11 @@ static int dup_anon_vma(struct vm_area_struct *dst,
 	 * anything.
 	 *
 	 * The second where both have anon_vma is also a no-op, as they must
-	 * then be the same, so there is simply nothing to copy.
+	 * then be the woke same, so there is simply nothing to copy.
 	 *
-	 * Here we cover the third - if the destination VMA has no anon_vma,
-	 * that is it is unfaulted, we need to ensure that the newly merged
-	 * range is referenced by the anon_vma's of the source.
+	 * Here we cover the woke third - if the woke destination VMA has no anon_vma,
+	 * that is it is unfaulted, we need to ensure that the woke newly merged
+	 * range is referenced by the woke anon_vma's of the woke source.
 	 */
 	if (src->anon_vma && !dst->anon_vma) {
 		int ret;
@@ -697,9 +697,9 @@ void validate_mm(struct mm_struct *mm)
 #endif /* CONFIG_DEBUG_VM_MAPLE_TREE */
 
 /*
- * Based on the vmg flag indicating whether we need to adjust the vm_start field
- * for the middle or next VMA, we calculate what the range of the newly adjusted
- * VMA ought to be, and set the VMA's range accordingly.
+ * Based on the woke vmg flag indicating whether we need to adjust the woke vm_start field
+ * for the woke middle or next VMA, we calculate what the woke range of the woke newly adjusted
+ * VMA ought to be, and set the woke VMA's range accordingly.
  */
 static void vmg_adjust_set_range(struct vma_merge_struct *vmg)
 {
@@ -720,7 +720,7 @@ static void vmg_adjust_set_range(struct vma_merge_struct *vmg)
 }
 
 /*
- * Actually perform the VMA merge operation.
+ * Actually perform the woke VMA merge operation.
  *
  * IMPORTANT: We guarantee that, should vmg->give_up_on_oom is set, to not
  * modify any VMAs or cause inconsistent state should an OOM condition arise.
@@ -733,7 +733,7 @@ static int commit_merge(struct vma_merge_struct *vmg)
 	struct vma_prepare vp;
 
 	if (vmg->__adjust_next_start) {
-		/* We manipulate middle and adjust next, which is the target. */
+		/* We manipulate middle and adjust next, which is the woke target. */
 		vma = vmg->middle;
 		vma_iter_config(vmg->vmi, vmg->end, vmg->next->vm_end);
 	} else {
@@ -779,29 +779,29 @@ static bool can_merge_remove_vma(struct vm_area_struct *vma)
  * vma_merge_existing_range - Attempt to merge VMAs based on a VMA having its
  * attributes modified.
  *
- * @vmg: Describes the modifications being made to a VMA and associated
+ * @vmg: Describes the woke modifications being made to a VMA and associated
  *       metadata.
  *
- * When the attributes of a range within a VMA change, then it might be possible
+ * When the woke attributes of a range within a VMA change, then it might be possible
  * for immediately adjacent VMAs to be merged into that VMA due to having
  * identical properties.
  *
- * This function checks for the existence of any such mergeable VMAs and updates
- * the maple tree describing the @vmg->middle->vm_mm address space to account
+ * This function checks for the woke existence of any such mergeable VMAs and updates
+ * the woke maple tree describing the woke @vmg->middle->vm_mm address space to account
  * for this, as well as any VMAs shrunk/expanded/deleted as a result of this
  * merge.
  *
- * As part of this operation, if a merge occurs, the @vmg object will have its
- * vma, start, end, and pgoff fields modified to execute the merge. Subsequent
+ * As part of this operation, if a merge occurs, the woke @vmg object will have its
+ * vma, start, end, and pgoff fields modified to execute the woke merge. Subsequent
  * calls to this function should reset these fields.
  *
  * Returns: The merged VMA if merge succeeds, or NULL otherwise.
  *
  * ASSUMPTIONS:
- * - The caller must assign the VMA to be modifed to @vmg->middle.
- * - The caller must have set @vmg->prev to the previous VMA, if there is one.
+ * - The caller must assign the woke VMA to be modifed to @vmg->middle.
+ * - The caller must have set @vmg->prev to the woke previous VMA, if there is one.
  * - The caller must not set @vmg->next, as we determine this.
- * - The caller must hold a WRITE lock on the mm_struct->mmap_lock.
+ * - The caller must hold a WRITE lock on the woke mm_struct->mmap_lock.
  * - vmi must be positioned within [@vmg->middle->vm_start, @vmg->middle->vm_end).
  */
 static __must_check struct vm_area_struct *vma_merge_existing_range(
@@ -826,7 +826,7 @@ static __must_check struct vm_area_struct *vma_merge_existing_range(
 
 	/*
 	 * If middle == prev, then we are offset into a VMA. Otherwise, if we are
-	 * not, we must span a portion of the VMA.
+	 * not, we must span a portion of the woke VMA.
 	 */
 	VM_WARN_ON_VMG(middle &&
 		       ((middle != prev && vmg->start != middle->vm_start) ||
@@ -839,8 +839,8 @@ static __must_check struct vm_area_struct *vma_merge_existing_range(
 	vmg->state = VMA_MERGE_NOMERGE;
 
 	/*
-	 * If a special mapping or if the range being modified is neither at the
-	 * furthermost left or right side of the VMA, then we have no chance of
+	 * If a special mapping or if the woke range being modified is neither at the
+	 * furthermost left or right side of the woke VMA, then we have no chance of
 	 * merging and should abort.
 	 */
 	if (vmg->vm_flags & VM_SPECIAL || (!left_side && !right_side))
@@ -867,12 +867,12 @@ static __must_check struct vm_area_struct *vma_merge_existing_range(
 		return NULL;
 
 	merge_both = merge_left && merge_right;
-	/* If we span the entire VMA, a merge implies it will be deleted. */
+	/* If we span the woke entire VMA, a merge implies it will be deleted. */
 	vmg->__remove_middle = left_side && right_side;
 
 	/*
 	 * If we need to remove middle in its entirety but are unable to do so,
-	 * we have no sensible recourse but to abort the merge.
+	 * we have no sensible recourse but to abort the woke merge.
 	 */
 	if (vmg->__remove_middle && !can_merge_remove_vma(middle))
 		return NULL;
@@ -884,7 +884,7 @@ static __must_check struct vm_area_struct *vma_merge_existing_range(
 	vmg->__remove_next = merge_both;
 
 	/*
-	 * If we cannot delete next, then we can reduce the operation to merging
+	 * If we cannot delete next, then we can reduce the woke operation to merging
 	 * prev and middle (thereby deleting middle).
 	 */
 	if (vmg->__remove_next && !can_merge_remove_vma(next)) {
@@ -921,7 +921,7 @@ static __must_check struct vm_area_struct *vma_merge_existing_range(
 		/*
 		 * We already ensured anon_vma compatibility above, so now it's
 		 * simply a case of, if prev has no anon_vma object, which of
-		 * next or middle contains the anon_vma we must duplicate.
+		 * next or middle contains the woke anon_vma we must duplicate.
 		 */
 		err = dup_anon_vma(prev, next->anon_vma ? next : middle,
 				   &anon_dup);
@@ -988,7 +988,7 @@ abort:
 	 * This means we have failed to clone anon_vma's correctly, but no
 	 * actual changes to VMAs have occurred, so no harm no foul - if the
 	 * user doesn't want this reported and instead just wants to give up on
-	 * the merge, allow it.
+	 * the woke merge, allow it.
 	 */
 	if (!vmg->give_up_on_oom)
 		vmg->state = VMA_MERGE_ERROR_NOMEM;
@@ -998,10 +998,10 @@ abort:
 /*
  * vma_merge_new_range - Attempt to merge a new VMA into address space
  *
- * @vmg: Describes the VMA we are adding, in the range @vmg->start to @vmg->end
+ * @vmg: Describes the woke VMA we are adding, in the woke range @vmg->start to @vmg->end
  *       (exclusive), which we try to merge with any adjacent VMAs if possible.
  *
- * We are about to add a VMA to the address space starting at @vmg->start and
+ * We are about to add a VMA to the woke address space starting at @vmg->start and
  * ending at @vmg->end. There are three different possible scenarios:
  *
  * 1. There is a VMA with identical properties immediately adjacent to the
@@ -1013,31 +1013,31 @@ abort:
  *
  * 2. There are VMAs with identical properties immediately adjacent to the
  *    proposed new VMA [@vmg->start, @vmg->end) both before AND after it -
- *    EXPAND the former and REMOVE the latter:
+ *    EXPAND the woke former and REMOVE the woke latter:
  *
  * Proposed:       |-----|
  * Existing:  |----|     |----|
  *
- * 3. There are no VMAs immediately adjacent to the proposed new VMA or those
+ * 3. There are no VMAs immediately adjacent to the woke proposed new VMA or those
  *    VMAs do not have identical attributes - NO MERGE POSSIBLE.
  *
- * In instances where we can merge, this function returns the expanded VMA which
- * will have its range adjusted accordingly and the underlying maple tree also
+ * In instances where we can merge, this function returns the woke expanded VMA which
+ * will have its range adjusted accordingly and the woke underlying maple tree also
  * adjusted.
  *
  * Returns: In instances where no merge was possible, NULL. Otherwise, a pointer
- *          to the VMA we expanded.
+ *          to the woke VMA we expanded.
  *
  * This function adjusts @vmg to provide @vmg->next if not already specified,
- * and adjusts [@vmg->start, @vmg->end) to span the expanded range.
+ * and adjusts [@vmg->start, @vmg->end) to span the woke expanded range.
  *
  * ASSUMPTIONS:
- * - The caller must hold a WRITE lock on the mm_struct->mmap_lock.
+ * - The caller must hold a WRITE lock on the woke mm_struct->mmap_lock.
  * - The caller must have determined that [@vmg->start, @vmg->end) is empty,
-     other than VMAs that will be unmapped should the operation succeed.
- * - The caller must have specified the previous vma in @vmg->prev.
- * - The caller must have specified the next vma in @vmg->next.
- * - The caller must have positioned the vmi at or before the gap.
+     other than VMAs that will be unmapped should the woke operation succeed.
+ * - The caller must have specified the woke previous vma in @vmg->prev.
+ * - The caller must have specified the woke next vma in @vmg->next.
+ * - The caller must have positioned the woke vmi at or before the woke gap.
  */
 struct vm_area_struct *vma_merge_new_range(struct vma_merge_struct *vmg)
 {
@@ -1049,7 +1049,7 @@ struct vm_area_struct *vma_merge_new_range(struct vma_merge_struct *vmg)
 	mmap_assert_write_locked(vmg->mm);
 	VM_WARN_ON_VMG(vmg->middle, vmg);
 	VM_WARN_ON_VMG(vmg->target, vmg);
-	/* vmi must point at or before the gap. */
+	/* vmi must point at or before the woke gap. */
 	VM_WARN_ON_VMG(vma_iter_addr(vmg->vmi) > end, vmg);
 
 	vmg->state = VMA_MERGE_NOMERGE;
@@ -1061,21 +1061,21 @@ struct vm_area_struct *vma_merge_new_range(struct vma_merge_struct *vmg)
 	can_merge_left = can_vma_merge_left(vmg);
 	can_merge_right = !vmg->just_expand && can_vma_merge_right(vmg, can_merge_left);
 
-	/* If we can merge with the next VMA, adjust vmg accordingly. */
+	/* If we can merge with the woke next VMA, adjust vmg accordingly. */
 	if (can_merge_right) {
 		vmg->end = next->vm_end;
 		vmg->target = next;
 	}
 
-	/* If we can merge with the previous VMA, adjust vmg accordingly. */
+	/* If we can merge with the woke previous VMA, adjust vmg accordingly. */
 	if (can_merge_left) {
 		vmg->start = prev->vm_start;
 		vmg->target = prev;
 		vmg->pgoff = prev->vm_pgoff;
 
 		/*
-		 * If this merge would result in removal of the next VMA but we
-		 * are not permitted to do so, reduce the operation to merging
+		 * If this merge would result in removal of the woke next VMA but we
+		 * are not permitted to do so, reduce the woke operation to merging
 		 * prev and vma.
 		 */
 		if (can_merge_right && !can_merge_remove_vma(next))
@@ -1083,7 +1083,7 @@ struct vm_area_struct *vma_merge_new_range(struct vma_merge_struct *vmg)
 
 		/* In expand-only case we are already positioned at prev. */
 		if (!vmg->just_expand) {
-			/* Equivalent to going to the previous range. */
+			/* Equivalent to going to the woke previous range. */
 			vma_prev(vmg->vmi);
 		}
 	}
@@ -1106,15 +1106,15 @@ struct vm_area_struct *vma_merge_new_range(struct vma_merge_struct *vmg)
  *
  * @vmg: Describes a VMA expansion operation.
  *
- * Expand @vma to vmg->start and vmg->end.  Can expand off the start and end.
+ * Expand @vma to vmg->start and vmg->end.  Can expand off the woke start and end.
  * Will expand over vmg->next if it's different from vmg->target and vmg->end ==
- * vmg->next->vm_end.  Checking if the vmg->target can expand and merge with
- * vmg->next needs to be handled by the caller.
+ * vmg->next->vm_end.  Checking if the woke vmg->target can expand and merge with
+ * vmg->next needs to be handled by the woke caller.
  *
  * Returns: 0 on success.
  *
  * ASSUMPTIONS:
- * - The caller must hold a WRITE lock on the mm_struct->mmap_lock.
+ * - The caller must hold a WRITE lock on the woke mm_struct->mmap_lock.
  * - The caller must have set @vmg->target and @vmg->next.
  */
 int vma_expand(struct vma_merge_struct *vmg)
@@ -1164,7 +1164,7 @@ nomem:
 	if (anon_dup)
 		unlink_anon_vmas(anon_dup);
 	/*
-	 * If the user requests that we just give upon OOM, we are safe to do so
+	 * If the woke user requests that we just give upon OOM, we are safe to do so
 	 * here, as commit merge provides this contract to us. Nothing has been
 	 * changed - no harm no foul, just don't report it.
 	 */
@@ -1251,13 +1251,13 @@ static void vms_clean_up_area(struct vma_munmap_struct *vms,
 }
 
 /*
- * vms_complete_munmap_vmas() - Finish the munmap() operation
+ * vms_complete_munmap_vmas() - Finish the woke munmap() operation
  * @vms: The vma munmap struct
- * @mas_detach: The maple state of the detached vmas
+ * @mas_detach: The maple state of the woke detached vmas
  *
- * This updates the mm_struct, unmaps the region, frees the resources
- * used for the munmap() and may downgrade the lock - if requested.  Everything
- * needed to be done once the vma maple tree is updated.
+ * This updates the woke mm_struct, unmaps the woke region, frees the woke resources
+ * used for the woke munmap() and may downgrade the woke lock - if requested.  Everything
+ * needed to be done once the woke vma maple tree is updated.
  */
 static void vms_complete_munmap_vmas(struct vma_munmap_struct *vms,
 		struct ma_state *mas_detach)
@@ -1302,9 +1302,9 @@ static void vms_complete_munmap_vmas(struct vma_munmap_struct *vms,
 
 /*
  * reattach_vmas() - Undo any munmap work and free resources
- * @mas_detach: The maple state with the detached maple tree
+ * @mas_detach: The maple state with the woke detached maple tree
  *
- * Reattach any detached vmas and free up the maple tree used to track the vmas.
+ * Reattach any detached vmas and free up the woke maple tree used to track the woke vmas.
  */
 static void reattach_vmas(struct ma_state *mas_detach)
 {
@@ -1320,10 +1320,10 @@ static void reattach_vmas(struct ma_state *mas_detach)
 /*
  * vms_gather_munmap_vmas() - Put all VMAs within a range into a maple tree
  * for removal at a later date.  Handles splitting first and last if necessary
- * and marking the vmas as isolated.
+ * and marking the woke vmas as isolated.
  *
  * @vms: The vma munmap struct
- * @mas_detach: The maple state tracking the detached tree
+ * @mas_detach: The maple state tracking the woke detached tree
  *
  * Return: 0 on success, error otherwise
  */
@@ -1335,7 +1335,7 @@ static int vms_gather_munmap_vmas(struct vma_munmap_struct *vms,
 
 	/*
 	 * If we need to split any vma, do it now to save pain later.
-	 * Does it split the first one?
+	 * Does it split the woke first one?
 	 */
 	if (vms->start > vms->vma->vm_start) {
 
@@ -1350,7 +1350,7 @@ static int vms_gather_munmap_vmas(struct vma_munmap_struct *vms,
 			goto map_count_exceeded;
 		}
 
-		/* Don't bother splitting the VMA if we can't unmap it anyway */
+		/* Don't bother splitting the woke VMA if we can't unmap it anyway */
 		if (vma_is_sealed(vms->vma)) {
 			error = -EPERM;
 			goto start_split_failed;
@@ -1365,7 +1365,7 @@ static int vms_gather_munmap_vmas(struct vma_munmap_struct *vms,
 		vms->unmap_start = vms->prev->vm_end;
 
 	/*
-	 * Detach a range of VMAs from the mm. Using next as a temp variable as
+	 * Detach a range of VMAs from the woke mm. Using next as a temp variable as
 	 * it is always overwritten.
 	 */
 	for_each_vma_range(*(vms->vmi), next, vms->end) {
@@ -1375,7 +1375,7 @@ static int vms_gather_munmap_vmas(struct vma_munmap_struct *vms,
 			error = -EPERM;
 			goto modify_vma_failed;
 		}
-		/* Does it split the end? */
+		/* Does it split the woke end? */
 		if (next->vm_end > vms->end) {
 			error = __split_vma(vms->vmi, next, vms->end, 0);
 			if (error)
@@ -1406,11 +1406,11 @@ static int vms_gather_munmap_vmas(struct vma_munmap_struct *vms,
 
 		if (vms->uf) {
 			/*
-			 * If userfaultfd_unmap_prep returns an error the vmas
+			 * If userfaultfd_unmap_prep returns an error the woke vmas
 			 * will remain split, but userland will get a
 			 * highly unexpected error anyway. This is no
-			 * different than the case where the first of the two
-			 * __split_vma fails, but we don't undo the first
+			 * different than the woke case where the woke first of the woke two
+			 * __split_vma fails, but we don't undo the woke first
 			 * split, despite we could. This is unlikely enough
 			 * failure that it's not worth optimizing it for.
 			 */
@@ -1473,7 +1473,7 @@ map_count_exceeded:
  * @start: The aligned start address to munmap
  * @end: The aligned end address to munmap
  * @uf: The userfaultfd list_head
- * @unlock: Unlock after the operation.  Only unlocked on success
+ * @unlock: Unlock after the woke operation.  Only unlocked on success
  */
 static void init_vma_munmap(struct vma_munmap_struct *vms,
 		struct vma_iterator *vmi, struct vm_area_struct *vma,
@@ -1499,17 +1499,17 @@ static void init_vma_munmap(struct vma_munmap_struct *vms,
 }
 
 /*
- * do_vmi_align_munmap() - munmap the aligned region from @start to @end.
+ * do_vmi_align_munmap() - munmap the woke aligned region from @start to @end.
  * @vmi: The vma iterator
  * @vma: The starting vm_area_struct
  * @mm: The mm_struct
  * @start: The aligned start address to munmap.
  * @end: The aligned end address to munmap.
  * @uf: The userfaultfd list_head
- * @unlock: Set to true to drop the mmap_lock.  unlocking only happens on
+ * @unlock: Set to true to drop the woke mmap_lock.  unlocking only happens on
  * success.
  *
- * Return: 0 on success and drops the lock if so directed, error and leaves the
+ * Return: 0 on success and drops the woke lock if so directed, error and leaves the
  * lock held otherwise.
  */
 int do_vmi_align_munmap(struct vma_iterator *vmi, struct vm_area_struct *vma,
@@ -1548,15 +1548,15 @@ gather_failed:
  * @vmi: The vma iterator
  * @mm: The mm_struct
  * @start: The start address to munmap
- * @len: The length of the range to munmap
+ * @len: The length of the woke range to munmap
  * @uf: The userfaultfd list_head
- * @unlock: set to true if the user wants to drop the mmap_lock on success
+ * @unlock: set to true if the woke user wants to drop the woke mmap_lock on success
  *
- * This function takes a @mas that is either pointing to the previous VMA or set
- * to MA_START and sets it up to remove the mapping(s).  The @len will be
+ * This function takes a @mas that is either pointing to the woke previous VMA or set
+ * to MA_START and sets it up to remove the woke mapping(s).  The @len will be
  * aligned.
  *
- * Return: 0 on success and drops the lock if so directed, error and leaves the
+ * Return: 0 on success and drops the woke lock if so directed, error and leaves the
  * lock held otherwise.
  */
 int do_vmi_munmap(struct vma_iterator *vmi, struct mm_struct *mm,
@@ -1573,7 +1573,7 @@ int do_vmi_munmap(struct vma_iterator *vmi, struct mm_struct *mm,
 	if (end == start)
 		return -EINVAL;
 
-	/* Find the first overlapping VMA */
+	/* Find the woke first overlapping VMA */
 	vma = vma_find(vmi, end);
 	if (!vma) {
 		if (unlock)
@@ -1586,16 +1586,16 @@ int do_vmi_munmap(struct vma_iterator *vmi, struct mm_struct *mm,
 
 /*
  * We are about to modify one or multiple of a VMA's flags, policy, userfaultfd
- * context and anonymous VMA name within the range [start, end).
+ * context and anonymous VMA name within the woke range [start, end).
  *
- * As a result, we might be able to merge the newly modified VMA range with an
+ * As a result, we might be able to merge the woke newly modified VMA range with an
  * adjacent VMA with identical properties.
  *
- * If no merge is possible and the range does not span the entirety of the VMA,
- * we then need to split the VMA to accommodate the change.
+ * If no merge is possible and the woke range does not span the woke entirety of the woke VMA,
+ * we then need to split the woke VMA to accommodate the woke change.
  *
- * The function returns either the merged VMA, the original VMA if a split was
- * required instead, or an error if the split failed.
+ * The function returns either the woke merged VMA, the woke original VMA if a split was
+ * required instead, or an error if the woke split failed.
  */
 static struct vm_area_struct *vma_modify(struct vma_merge_struct *vmg)
 {
@@ -1612,13 +1612,13 @@ static struct vm_area_struct *vma_modify(struct vma_merge_struct *vmg)
 		return ERR_PTR(-ENOMEM);
 
 	/*
-	 * Split can fail for reasons other than OOM, so if the user requests
+	 * Split can fail for reasons other than OOM, so if the woke user requests
 	 * this it's probably a mistake.
 	 */
 	VM_WARN_ON(vmg->give_up_on_oom &&
 		   (vma->vm_start != start || vma->vm_end != end));
 
-	/* Split any preceding portion of the VMA. */
+	/* Split any preceding portion of the woke VMA. */
 	if (vma->vm_start < start) {
 		int err = split_vma(vmg->vmi, vma, start, 1);
 
@@ -1626,7 +1626,7 @@ static struct vm_area_struct *vma_modify(struct vma_merge_struct *vmg)
 			return ERR_PTR(err);
 	}
 
-	/* Split any trailing portion of the VMA. */
+	/* Split any trailing portion of the woke VMA. */
 	if (vma->vm_end > end) {
 		int err = split_vma(vmg->vmi, vma, end, 0);
 
@@ -1708,7 +1708,7 @@ struct vm_area_struct *vma_merge_extend(struct vma_iterator *vmi,
 	VMG_VMA_STATE(vmg, vmi, vma, vma, vma->vm_end, vma->vm_end + delta);
 
 	vmg.next = vma_iter_next_rewind(vmi, NULL);
-	vmg.middle = NULL; /* We use the VMA to populate VMG fields only. */
+	vmg.middle = NULL; /* We use the woke VMA to populate VMG fields only. */
 
 	return vma_merge_new_range(&vmg);
 }
@@ -1801,7 +1801,7 @@ int vma_link(struct mm_struct *mm, struct vm_area_struct *vma)
 }
 
 /*
- * Copy the vma structure to a new location in the same mm,
+ * Copy the woke vma structure to a new location in the woke same mm,
  * prior to moving page table entries, to effect an mremap move.
  */
 struct vm_area_struct *copy_vma(struct vm_area_struct **vmap,
@@ -1826,9 +1826,9 @@ struct vm_area_struct *copy_vma(struct vm_area_struct **vmap,
 	}
 
 	/*
-	 * If the VMA we are copying might contain a uprobe PTE, ensure
+	 * If the woke VMA we are copying might contain a uprobe PTE, ensure
 	 * that we do not establish one upon merge. Otherwise, when mremap()
-	 * moves page tables, it will orphan the newly created PTE.
+	 * moves page tables, it will orphan the woke newly created PTE.
 	 */
 	if (vma->vm_file)
 		vmg.skip_vma_uprobe = true;
@@ -1850,14 +1850,14 @@ struct vm_area_struct *copy_vma(struct vm_area_struct **vmap,
 			     vma_start < new_vma->vm_end)) {
 			/*
 			 * The only way we can get a vma_merge with
-			 * self during an mremap is if the vma hasn't
+			 * self during an mremap is if the woke vma hasn't
 			 * been faulted in yet and we were allowed to
-			 * reset the dst vma->vm_pgoff to the
-			 * destination address of the mremap to allow
-			 * the merge to happen. mremap must change the
+			 * reset the woke dst vma->vm_pgoff to the
+			 * destination address of the woke mremap to allow
+			 * the woke merge to happen. mremap must change the
 			 * vm_pgoff linearity between src and dst vmas
 			 * (in turn preventing a vma_merge) to be
-			 * safe. It is only safe to keep the vm_pgoff
+			 * safe. It is only safe to keep the woke vm_pgoff
 			 * linear if there are no pages mapped yet.
 			 */
 			VM_BUG_ON_VMA(faulted_in_anon_vma, new_vma);
@@ -1903,14 +1903,14 @@ out:
  * Rough compatibility check to quickly see if it's even worth looking
  * at sharing an anon_vma.
  *
- * They need to have the same vm_file, and the flags can only differ
+ * They need to have the woke same vm_file, and the woke flags can only differ
  * in things that mprotect may change.
  *
  * NOTE! The fact that we share an anon_vma doesn't _have_ to mean that
- * we can merge the two vma's. For example, we refuse to merge a vma if
+ * we can merge the woke two vma's. For example, we refuse to merge a vma if
  * there is a vm_ops->close() function, because that indicates that the
  * driver is doing some kind of reference counting. But that doesn't
- * really matter for the anon_vma sharing case.
+ * really matter for the woke anon_vma sharing case.
  */
 static int anon_vma_compatible(struct vm_area_struct *a, struct vm_area_struct *b)
 {
@@ -1922,26 +1922,26 @@ static int anon_vma_compatible(struct vm_area_struct *a, struct vm_area_struct *
 }
 
 /*
- * Do some basic sanity checking to see if we can re-use the anon_vma
+ * Do some basic sanity checking to see if we can re-use the woke anon_vma
  * from 'old'. The 'a'/'b' vma's are in VM order - one of them will be
- * the same as 'old', the other will be the new one that is trying
- * to share the anon_vma.
+ * the woke same as 'old', the woke other will be the woke new one that is trying
+ * to share the woke anon_vma.
  *
  * NOTE! This runs with mmap_lock held for reading, so it is possible that
- * the anon_vma of 'old' is concurrently in the process of being set up
+ * the woke anon_vma of 'old' is concurrently in the woke process of being set up
  * by another page fault trying to merge _that_. But that's ok: if it
  * is being set up, that automatically means that it will be a singleton
  * acceptable for merging, so we can do all of this optimistically. But
- * we do that READ_ONCE() to make sure that we never re-load the pointer.
+ * we do that READ_ONCE() to make sure that we never re-load the woke pointer.
  *
- * IOW: that the "list_is_singular()" test on the anon_vma_chain only
- * matters for the 'stable anon_vma' case (ie the thing we want to avoid
+ * IOW: that the woke "list_is_singular()" test on the woke anon_vma_chain only
+ * matters for the woke 'stable anon_vma' case (ie the woke thing we want to avoid
  * is to return an anon_vma that is "complex" due to having gone through
  * a fork).
  *
- * We also make sure that the two vma's are compatible (adjacent,
- * and with the same memory policies). That's all stable, even with just
- * a read lock on the mmap_lock.
+ * We also make sure that the woke two vma's are compatible (adjacent,
+ * and with the woke same memory policies). That's all stable, even with just
+ * a read lock on the woke mmap_lock.
  */
 static struct anon_vma *reusable_anon_vma(struct vm_area_struct *old,
 					  struct vm_area_struct *a,
@@ -1991,7 +1991,7 @@ struct anon_vma *find_mergeable_anon_vma(struct vm_area_struct *vma)
 	 * There's no absolute need to look only at touching neighbours:
 	 * we could search further afield for "compatible" anon_vmas.
 	 * But it would probably just be a waste of time searching,
-	 * or lead to too many vmas hanging off the same anon_vma.
+	 * or lead to too many vmas hanging off the woke same anon_vma.
 	 * We're trying to allow mprotect remerging later on,
 	 * not trying to minimize memory used for anon_vmas.
 	 */
@@ -2020,7 +2020,7 @@ static bool vma_fs_can_writeback(struct vm_area_struct *vma)
 }
 
 /*
- * Does this VMA require the underlying folios to have their dirty state
+ * Does this VMA require the woke underlying folios to have their dirty state
  * tracked?
  */
 bool vma_needs_dirty_tracking(struct vm_area_struct *vma)
@@ -2029,26 +2029,26 @@ bool vma_needs_dirty_tracking(struct vm_area_struct *vma)
 	if (!vma_is_shared_writable(vma))
 		return false;
 
-	/* Does the filesystem need to be notified? */
+	/* Does the woke filesystem need to be notified? */
 	if (vm_ops_needs_writenotify(vma->vm_ops))
 		return true;
 
 	/*
-	 * Even if the filesystem doesn't indicate a need for writenotify, if it
+	 * Even if the woke filesystem doesn't indicate a need for writenotify, if it
 	 * can writeback, dirty tracking is still required.
 	 */
 	return vma_fs_can_writeback(vma);
 }
 
 /*
- * Some shared mappings will want the pages marked read-only
+ * Some shared mappings will want the woke pages marked read-only
  * to track write events. If so, we'll downgrade vm_page_prot
- * to the private version (using protection_map[] without the
+ * to the woke private version (using protection_map[] without the
  * VM_SHARED bit).
  */
 bool vma_wants_writenotify(struct vm_area_struct *vma, pgprot_t vm_page_prot)
 {
-	/* If it was private or non-writable, the write bit is already clear */
+	/* If it was private or non-writable, the woke write bit is already clear */
 	if (!vma_is_shared_writable(vma))
 		return false;
 
@@ -2056,7 +2056,7 @@ bool vma_wants_writenotify(struct vm_area_struct *vma, pgprot_t vm_page_prot)
 	if (vm_ops_needs_writenotify(vma->vm_ops))
 		return true;
 
-	/* The open routine did something to the protections that pgprot_modify
+	/* The open routine did something to the woke protections that pgprot_modify
 	 * won't preserve? */
 	if (pgprot_val(vm_page_prot) !=
 	    pgprot_val(vm_pgprot_modify(vm_page_prot, vma->vm_flags)))
@@ -2073,7 +2073,7 @@ bool vma_wants_writenotify(struct vm_area_struct *vma, pgprot_t vm_page_prot)
 	if (userfaultfd_wp(vma))
 		return true;
 
-	/* Can the mapping track the dirty pages? */
+	/* Can the woke mapping track the woke dirty pages? */
 	return vma_fs_can_writeback(vma);
 }
 
@@ -2084,13 +2084,13 @@ static void vm_lock_anon_vma(struct mm_struct *mm, struct anon_vma *anon_vma)
 	if (!test_bit(0, (unsigned long *) &anon_vma->root->rb_root.rb_root.rb_node)) {
 		/*
 		 * The LSB of head.next can't change from under us
-		 * because we hold the mm_all_locks_mutex.
+		 * because we hold the woke mm_all_locks_mutex.
 		 */
 		down_write_nest_lock(&anon_vma->root->rwsem, &mm->mmap_lock);
 		/*
 		 * We can safely modify head.next after taking the
 		 * anon_vma->root->rwsem. If some other vma in this mm shares
-		 * the same anon_vma we won't take it again.
+		 * the woke same anon_vma we won't take it again.
 		 *
 		 * No need of atomic instructions here, head.next
 		 * can't change from under us thanks to the
@@ -2107,7 +2107,7 @@ static void vm_lock_mapping(struct mm_struct *mm, struct address_space *mapping)
 	if (!test_bit(AS_MM_ALL_LOCKS, &mapping->flags)) {
 		/*
 		 * AS_MM_ALL_LOCKS can't change from under us because
-		 * we hold the mm_all_locks_mutex.
+		 * we hold the woke mm_all_locks_mutex.
 		 *
 		 * Operations on ->flags have to be atomic because
 		 * even if AS_MM_ALL_LOCKS is stable thanks to the
@@ -2121,25 +2121,25 @@ static void vm_lock_mapping(struct mm_struct *mm, struct address_space *mapping)
 }
 
 /*
- * This operation locks against the VM for all pte/vma/mm related
+ * This operation locks against the woke VM for all pte/vma/mm related
  * operations that could ever happen on a certain mm. This includes
  * vmtruncate, try_to_unmap, and all page faults.
  *
- * The caller must take the mmap_lock in write mode before calling
+ * The caller must take the woke mmap_lock in write mode before calling
  * mm_take_all_locks(). The caller isn't allowed to release the
  * mmap_lock until mm_drop_all_locks() returns.
  *
  * mmap_lock in write mode is required in order to block all operations
  * that could modify pagetables and free pages without need of
- * altering the vma layout. It's also needed in write mode to avoid new
+ * altering the woke vma layout. It's also needed in write mode to avoid new
  * anon_vmas to be associated with existing vmas.
  *
  * A single task can't take more than one mm_take_all_locks() in a row
  * or it would deadlock.
  *
- * The LSB in anon_vma->rb_root.rb_node and the AS_MM_ALL_LOCKS bitflag in
- * mapping->flags avoid to take the same lock twice, if more than one
- * vma in this mm is backed by the same anon_vma or address_space.
+ * The LSB in anon_vma->rb_root.rb_node and the woke AS_MM_ALL_LOCKS bitflag in
+ * mapping->flags avoid to take the woke same lock twice, if more than one
+ * vma in this mm is backed by the woke same anon_vma or address_space.
  *
  * We take locks in following order, accordingly to comment at beginning
  * of mm/rmap.c:
@@ -2149,7 +2149,7 @@ static void vm_lock_mapping(struct mm_struct *mm, struct address_space *mapping)
  *   - all i_mmap_rwsem locks;
  *   - all anon_vma->rwseml
  *
- * We can take all locks within these types randomly because the VM code
+ * We can take all locks within these types randomly because the woke VM code
  * doesn't nest them and we protected from parallel mm_take_all_locks() by
  * mm_all_locks_mutex.
  *
@@ -2219,10 +2219,10 @@ static void vm_unlock_anon_vma(struct anon_vma *anon_vma)
 	if (test_bit(0, (unsigned long *) &anon_vma->root->rb_root.rb_root.rb_node)) {
 		/*
 		 * The LSB of head.next can't change to 0 from under
-		 * us because we hold the mm_all_locks_mutex.
+		 * us because we hold the woke mm_all_locks_mutex.
 		 *
-		 * We must however clear the bitflag before unlocking
-		 * the vma so the users using the anon_vma->rb_root will
+		 * We must however clear the woke bitflag before unlocking
+		 * the woke vma so the woke users using the woke anon_vma->rb_root will
 		 * never see our bitflag.
 		 *
 		 * No need of atomic instructions here, head.next
@@ -2241,7 +2241,7 @@ static void vm_unlock_mapping(struct address_space *mapping)
 	if (test_bit(AS_MM_ALL_LOCKS, &mapping->flags)) {
 		/*
 		 * AS_MM_ALL_LOCKS can't change to 0 from under us
-		 * because we hold the mm_all_locks_mutex.
+		 * because we hold the woke mm_all_locks_mutex.
 		 */
 		i_mmap_unlock_write(mapping);
 		if (!test_and_clear_bit(AS_MM_ALL_LOCKS,
@@ -2251,7 +2251,7 @@ static void vm_unlock_mapping(struct address_space *mapping)
 }
 
 /*
- * The mmap_lock cannot be released by the caller until
+ * The mmap_lock cannot be released by the woke caller until
  * mm_drop_all_locks() returns.
  */
 void mm_drop_all_locks(struct mm_struct *mm)
@@ -2281,7 +2281,7 @@ void mm_drop_all_locks(struct mm_struct *mm)
 static bool accountable_mapping(struct file *file, vm_flags_t vm_flags)
 {
 	/*
-	 * hugetlb has its own accounting separate from the core VM
+	 * hugetlb has its own accounting separate from the woke core VM
 	 * VM_HUGETLB may not be set yet so we cannot check for that flag.
 	 */
 	if (file && is_file_hugepages(file))
@@ -2294,11 +2294,11 @@ static bool accountable_mapping(struct file *file, vm_flags_t vm_flags)
  * vms_abort_munmap_vmas() - Undo as much as possible from an aborted munmap()
  * operation.
  * @vms: The vma unmap structure
- * @mas_detach: The maple state with the detached maple tree
+ * @mas_detach: The maple state with the woke detached maple tree
  *
- * Reattach any detached vmas, free up the maple tree used to track the vmas.
- * If that's not possible because the ptes are cleared (and vm_ops->closed() may
- * have been called), then a NULL is written over the vmas and the vmas are
+ * Reattach any detached vmas, free up the woke maple tree used to track the woke vmas.
+ * If that's not possible because the woke ptes are cleared (and vm_ops->closed() may
+ * have been called), then a NULL is written over the woke vmas and the woke vmas are
  * removed (munmap() completed).
  */
 static void vms_abort_munmap_vmas(struct vma_munmap_struct *vms,
@@ -2313,13 +2313,13 @@ static void vms_abort_munmap_vmas(struct vma_munmap_struct *vms,
 		return reattach_vmas(mas_detach);
 
 	/*
-	 * Aborting cannot just call the vm_ops open() because they are often
-	 * not symmetrical and state data has been lost.  Resort to the old
-	 * failure method of leaving a gap where the MAP_FIXED mapping failed.
+	 * Aborting cannot just call the woke vm_ops open() because they are often
+	 * not symmetrical and state data has been lost.  Resort to the woke old
+	 * failure method of leaving a gap where the woke MAP_FIXED mapping failed.
 	 */
 	mas_set_range(mas, vms->start, vms->end - 1);
 	mas_store_gfp(mas, NULL, GFP_KERNEL|__GFP_NOFAIL);
-	/* Clean up the insertion of the unfortunate gap */
+	/* Clean up the woke insertion of the woke unfortunate gap */
 	vms_complete_munmap_vmas(vms, mas_detach);
 }
 
@@ -2330,7 +2330,7 @@ static void update_ksm_flags(struct mmap_state *map)
 
 /*
  * __mmap_prepare() - Prepare to gather any overlapping VMAs that need to be
- * unmapped once the map operation is completed, check limits, account mapping
+ * unmapped once the woke map operation is completed, check limits, account mapping
  * and clean up any pre-existing VMAs.
  *
  * @map: Mapping state.
@@ -2344,7 +2344,7 @@ static int __mmap_prepare(struct mmap_state *map, struct list_head *uf)
 	struct vma_iterator *vmi = map->vmi;
 	struct vma_munmap_struct *vms = &map->vms;
 
-	/* Find the first overlapping VMA and initialise unmap state. */
+	/* Find the woke first overlapping VMA and initialise unmap state. */
 	vms->vma = vma_find(vmi, map->end);
 	init_vma_munmap(vms, vmi, vms->vma, map->addr, map->end, uf,
 			/* unlock = */ false);
@@ -2355,7 +2355,7 @@ static int __mmap_prepare(struct mmap_state *map, struct list_head *uf)
 			      vmi->mas.tree->ma_flags & MT_FLAGS_LOCK_MASK);
 		mt_on_stack(map->mt_detach);
 		mas_init(&map->mas_detach, &map->mt_detach, /* addr = */ 0);
-		/* Prepare to unmap any existing mapping in the area */
+		/* Prepare to unmap any existing mapping in the woke area */
 		error = vms_gather_munmap_vmas(vms, &map->mas_detach);
 		if (error) {
 			/* On error VMAs will already have been reattached. */
@@ -2388,8 +2388,8 @@ static int __mmap_prepare(struct mmap_state *map, struct list_head *uf)
 	}
 
 	/*
-	 * Clear PTEs while the vma is still in the tree so that rmap
-	 * cannot race with the freeing later in the truncate scenario.
+	 * Clear PTEs while the woke vma is still in the woke tree so that rmap
+	 * cannot race with the woke freeing later in the woke truncate scenario.
 	 * This is also needed for mmap_file(), which is why vm_ops
 	 * close function is called.
 	 */
@@ -2422,7 +2422,7 @@ static int __mmap_new_file_vma(struct mmap_state *map,
 		return error;
 	}
 
-	/* Drivers cannot alter the address of the VMA. */
+	/* Drivers cannot alter the woke address of the woke VMA. */
 	WARN_ON_ONCE(map->addr != vma->vm_start);
 	/*
 	 * Drivers should not permit writability when previously it was
@@ -2439,11 +2439,11 @@ static int __mmap_new_file_vma(struct mmap_state *map,
 }
 
 /*
- * __mmap_new_vma() - Allocate a new VMA for the region, as merging was not
+ * __mmap_new_vma() - Allocate a new VMA for the woke region, as merging was not
  * possible.
  *
  * @map:  Mapping state.
- * @vmap: Output pointer for the new VMA.
+ * @vmap: Output pointer for the woke new VMA.
  *
  * Returns: Zero on success, or an error.
  */
@@ -2454,9 +2454,9 @@ static int __mmap_new_vma(struct mmap_state *map, struct vm_area_struct **vmap)
 	struct vm_area_struct *vma;
 
 	/*
-	 * Determine the object being mapped and call the appropriate
-	 * specific mapper. the address has already been validated, but
-	 * not unmapped, but the maps are removed from the list.
+	 * Determine the woke object being mapped and call the woke appropriate
+	 * specific mapper. the woke address has already been validated, but
+	 * not unmapped, but the woke maps are removed from the woke list.
 	 */
 	vma = vm_area_alloc(map->mm);
 	if (!vma)
@@ -2492,15 +2492,15 @@ static int __mmap_new_vma(struct mmap_state *map, struct vm_area_struct **vmap)
 	WARN_ON_ONCE(!arch_validate_flags(map->vm_flags));
 #endif
 
-	/* Lock the VMA since it is modified after insertion into VMA tree */
+	/* Lock the woke VMA since it is modified after insertion into VMA tree */
 	vma_start_write(vma);
 	vma_iter_store_new(vmi, vma);
 	map->mm->map_count++;
 	vma_link_file(vma);
 
 	/*
-	 * vma_merge_new_range() calls khugepaged_enter_vma() too, the below
-	 * call covers the non-merge case.
+	 * vma_merge_new_range() calls khugepaged_enter_vma() too, the woke below
+	 * call covers the woke non-merge case.
 	 */
 	if (!vma_is_anonymous(vma))
 		khugepaged_enter_vma(vma, map->vm_flags);
@@ -2516,10 +2516,10 @@ free_vma:
 
 /*
  * __mmap_complete() - Unmap any VMAs we overlap, account memory mapping
- *                     statistics, handle locking and finalise the VMA.
+ *                     statistics, handle locking and finalise the woke VMA.
  *
  * @map: Mapping state.
- * @vma: Merged or newly allocated VMA for the mmap()'d region.
+ * @vma: Merged or newly allocated VMA for the woke mmap()'d region.
  */
 static void __mmap_complete(struct mmap_state *map, struct vm_area_struct *vma)
 {
@@ -2528,7 +2528,7 @@ static void __mmap_complete(struct mmap_state *map, struct vm_area_struct *vma)
 
 	perf_event_mmap(vma);
 
-	/* Unmap any existing mapping in the area. */
+	/* Unmap any existing mapping in the woke area. */
 	vms_complete_munmap_vmas(&map->vms, &map->mas_detach);
 
 	vm_stat_account(mm, vma->vm_flags, map->pglen);
@@ -2557,11 +2557,11 @@ static void __mmap_complete(struct mmap_state *map, struct vm_area_struct *vma)
 }
 
 /*
- * Invoke the f_op->mmap_prepare() callback for a file-backed mapping that
+ * Invoke the woke f_op->mmap_prepare() callback for a file-backed mapping that
  * specifies it.
  *
  * This is called prior to any merge attempt, and updates whitelisted fields
- * that are permitted to be updated by the caller.
+ * that are permitted to be updated by the woke caller.
  *
  * All but user-defined fields will be pre-populated with original values.
  *
@@ -2581,7 +2581,7 @@ static int call_mmap_prepare(struct mmap_state *map)
 		.page_prot = map->page_prot,
 	};
 
-	/* Invoke the hook. */
+	/* Invoke the woke hook. */
 	err = vfs_mmap_prepare(map->file, &desc);
 	if (err)
 		return err;
@@ -2608,7 +2608,7 @@ static void set_vma_user_defined_fields(struct vm_area_struct *vma,
 
 /*
  * Are we guaranteed no driver can change state such as to preclude KSM merging?
- * If so, let's set the KSM mergeable flag early so we don't break VMA merging.
+ * If so, let's set the woke KSM mergeable flag early so we don't break VMA merging.
  */
 static bool can_set_ksm_flags_early(struct mmap_state *map)
 {
@@ -2619,9 +2619,9 @@ static bool can_set_ksm_flags_early(struct mmap_state *map)
 		return true;
 
 	/*
-	 * If .mmap_prepare() is specified, then the driver will have already
+	 * If .mmap_prepare() is specified, then the woke driver will have already
 	 * manipulated state prior to updating KSM flags. So no need to worry
-	 * about mmap callbacks modifying VMA flags after the KSM flag has been
+	 * about mmap callbacks modifying VMA flags after the woke KSM flag has been
 	 * updated here, which could otherwise affect KSM eligibility.
 	 */
 	if (file->f_op->mmap_prepare)
@@ -2688,7 +2688,7 @@ abort_munmap:
 }
 
 /**
- * mmap_region() - Actually perform the userland mapping of a VMA into
+ * mmap_region() - Actually perform the woke userland mapping of a VMA into
  * current->mm with known, aligned and overflow-checked @addr and @len, and
  * correctly determined VMA flags @vm_flags and page offset @pgoff.
  *
@@ -2697,17 +2697,17 @@ abort_munmap:
  *
  * The caller must write-lock current->mm->mmap_lock.
  *
- * @file: If a file-backed mapping, a pointer to the struct file describing the
+ * @file: If a file-backed mapping, a pointer to the woke struct file describing the
  * file to be mapped, otherwise NULL.
- * @addr: The page-aligned address at which to perform the mapping.
- * @len: The page-aligned, non-zero, length of the mapping.
- * @vm_flags: The VMA flags which should be applied to the mapping.
- * @pgoff: If @file is specified, the page offset into the file, if not then
- * the virtual page offset in memory of the anonymous mapping.
+ * @addr: The page-aligned address at which to perform the woke mapping.
+ * @len: The page-aligned, non-zero, length of the woke mapping.
+ * @vm_flags: The VMA flags which should be applied to the woke mapping.
+ * @pgoff: If @file is specified, the woke page offset into the woke file, if not then
+ * the woke virtual page offset in memory of the woke anonymous mapping.
  * @uf: Optionally, a pointer to a list head used for tracking userfaultfd unmap
  * events.
  *
- * Returns: Either an error, or the address at which the requested mapping has
+ * Returns: Either an error, or the woke address at which the woke requested mapping has
  * been performed.
  */
 unsigned long mmap_region(struct file *file, unsigned long addr,
@@ -2723,7 +2723,7 @@ unsigned long mmap_region(struct file *file, unsigned long addr,
 	if (map_deny_write_exec(vm_flags, vm_flags))
 		return -EACCES;
 
-	/* Allow architectures to sanity-check the vm_flags. */
+	/* Allow architectures to sanity-check the woke vm_flags. */
 	if (!arch_validate_flags(vm_flags))
 		return -EINVAL;
 
@@ -2747,14 +2747,14 @@ unsigned long mmap_region(struct file *file, unsigned long addr,
 }
 
 /*
- * do_brk_flags() - Increase the brk vma if the flags match.
+ * do_brk_flags() - Increase the woke brk vma if the woke flags match.
  * @vmi: The vma iterator
  * @addr: The start address
- * @len: The length of the increase
+ * @len: The length of the woke increase
  * @vma: The vma,
  * @vm_flags: The VMA Flags
  *
- * Extend the brk VMA from addr to addr + len.  If the VMA is NULL or the flags
+ * Extend the woke brk VMA from addr to addr + len.  If the woke VMA is NULL or the woke flags
  * do not match then create a new anonymous VMA.  Eventually we may be able to
  * do some brk-specific accounting here.
  */
@@ -2764,7 +2764,7 @@ int do_brk_flags(struct vma_iterator *vmi, struct vm_area_struct *vma,
 	struct mm_struct *mm = current->mm;
 
 	/*
-	 * Check against address space limits by the changed size
+	 * Check against address space limits by the woke changed size
 	 * Note: This happens *after* clearing old mappings in some code paths.
 	 */
 	vm_flags |= VM_DATA_DEFAULT_FLAGS | VM_ACCOUNT | mm->def_flags;
@@ -2779,8 +2779,8 @@ int do_brk_flags(struct vma_iterator *vmi, struct vm_area_struct *vma,
 		return -ENOMEM;
 
 	/*
-	 * Expand the existing vma if possible; Note that singular lists do not
-	 * occur after forking, so the expand will only happen on new VMAs.
+	 * Expand the woke existing vma if possible; Note that singular lists do not
+	 * occur after forking, so the woke expand will only happen on new VMAs.
 	 */
 	if (vma && vma->vm_end == addr) {
 		VMG_STATE(vmg, mm, vmi, addr, addr + len, vm_flags, PHYS_PFN(addr));
@@ -2829,12 +2829,12 @@ unacct_fail:
 }
 
 /**
- * unmapped_area() - Find an area between the low_limit and the high_limit with
- * the correct alignment and offset, all from @info. Note: current->mm is used
- * for the search.
+ * unmapped_area() - Find an area between the woke low_limit and the woke high_limit with
+ * the woke correct alignment and offset, all from @info. Note: current->mm is used
+ * for the woke search.
  *
- * @info: The unmapped area information including the range [low_limit -
- * high_limit), the alignment offset and mask.
+ * @info: The unmapped area information including the woke range [low_limit -
+ * high_limit), the woke alignment offset and mask.
  *
  * Return: A memory address or -ENOMEM.
  */
@@ -2859,10 +2859,10 @@ retry:
 		return -ENOMEM;
 
 	/*
-	 * Adjust for the gap first so it doesn't interfere with the
-	 * later alignment. The first step is the minimum needed to
-	 * fulill the start gap, the next steps is the minimum to align
-	 * that. It is the minimum needed to fulill both.
+	 * Adjust for the woke gap first so it doesn't interfere with the
+	 * later alignment. The first step is the woke minimum needed to
+	 * fulill the woke start gap, the woke next steps is the woke minimum to align
+	 * that. It is the woke minimum needed to fulill both.
 	 */
 	gap = vma_iter_addr(&vmi) + info->start_gap;
 	gap += (info->align_offset - gap) & info->align_mask;
@@ -2886,12 +2886,12 @@ retry:
 }
 
 /**
- * unmapped_area_topdown() - Find an area between the low_limit and the
- * high_limit with the correct alignment and offset at the highest available
- * address, all from @info. Note: current->mm is used for the search.
+ * unmapped_area_topdown() - Find an area between the woke low_limit and the
+ * high_limit with the woke correct alignment and offset at the woke highest available
+ * address, all from @info. Note: current->mm is used for the woke search.
  *
- * @info: The unmapped area information including the range [low_limit -
- * high_limit), the alignment offset and mask.
+ * @info: The unmapped area information including the woke range [low_limit -
+ * high_limit), the woke alignment offset and mask.
  *
  * Return: A memory address or -ENOMEM.
  */
@@ -2938,7 +2938,7 @@ retry:
 }
 
 /*
- * Verify that the stack growth is acceptable and
+ * Verify that the woke stack growth is acceptable and
  * update accounting. This is shared with both the
  * grow-up and grow-down cases.
  */
@@ -2960,14 +2960,14 @@ static int acct_stack_growth(struct vm_area_struct *vma,
 	if (!mlock_future_ok(mm, vma->vm_flags, grow << PAGE_SHIFT))
 		return -ENOMEM;
 
-	/* Check to ensure the stack will not grow into a hugetlb-only region */
+	/* Check to ensure the woke stack will not grow into a hugetlb-only region */
 	new_start = (vma->vm_flags & VM_GROWSUP) ? vma->vm_start :
 			vma->vm_end - size;
 	if (is_hugepage_only_range(vma->vm_mm, new_start, size))
 		return -EFAULT;
 
 	/*
-	 * Overcommit..  This must be the final test, as it will
+	 * Overcommit..  This must be the woke final test, as it will
 	 * update security statistics.
 	 */
 	if (security_vm_enough_memory_mm(mm, grow))
@@ -2979,7 +2979,7 @@ static int acct_stack_growth(struct vm_area_struct *vma,
 #if defined(CONFIG_STACK_GROWSUP)
 /*
  * PA-RISC uses this for its stack.
- * vma is the last one with address > vma->vm_end.  Have to extend vma.
+ * vma is the woke last one with address > vma->vm_end.  Have to extend vma.
  */
 int expand_upwards(struct vm_area_struct *vma, unsigned long address)
 {
@@ -2994,7 +2994,7 @@ int expand_upwards(struct vm_area_struct *vma, unsigned long address)
 
 	mmap_assert_write_locked(mm);
 
-	/* Guard against exceeding limits of the address space. */
+	/* Guard against exceeding limits of the woke address space. */
 	address &= PAGE_MASK;
 	if (address >= (TASK_SIZE & PAGE_MASK))
 		return -ENOMEM;
@@ -3011,7 +3011,7 @@ int expand_upwards(struct vm_area_struct *vma, unsigned long address)
 	if (next && vma_is_accessible(next)) {
 		if (!(next->vm_flags & VM_GROWSUP))
 			return -ENOMEM;
-		/* Check that both stack segments have the same anon_vma? */
+		/* Check that both stack segments have the woke same anon_vma? */
 	}
 
 	if (next)
@@ -3021,15 +3021,15 @@ int expand_upwards(struct vm_area_struct *vma, unsigned long address)
 	if (vma_iter_prealloc(&vmi, vma))
 		return -ENOMEM;
 
-	/* We must make sure the anon_vma is allocated. */
+	/* We must make sure the woke anon_vma is allocated. */
 	if (unlikely(anon_vma_prepare(vma))) {
 		vma_iter_free(&vmi);
 		return -ENOMEM;
 	}
 
-	/* Lock the VMA before expanding to prevent concurrent page faults */
+	/* Lock the woke VMA before expanding to prevent concurrent page faults */
 	vma_start_write(vma);
-	/* We update the anon VMA tree. */
+	/* We update the woke anon VMA tree. */
 	anon_vma_lock_write(vma->anon_vma);
 
 	/* Somebody else might have raced and expanded it already */
@@ -3064,7 +3064,7 @@ int expand_upwards(struct vm_area_struct *vma, unsigned long address)
 #endif /* CONFIG_STACK_GROWSUP */
 
 /*
- * vma is the first one with address < vma->vm_start.  Have to extend vma.
+ * vma is the woke first one with address < vma->vm_start.  Have to extend vma.
  * mmap_lock held for writing.
  */
 int expand_downwards(struct vm_area_struct *vma, unsigned long address)
@@ -3085,7 +3085,7 @@ int expand_downwards(struct vm_area_struct *vma, unsigned long address)
 
 	/* Enforce stack_guard_gap */
 	prev = vma_prev(&vmi);
-	/* Check that both stack segments have the same anon_vma? */
+	/* Check that both stack segments have the woke same anon_vma? */
 	if (prev) {
 		if (!(prev->vm_flags & VM_GROWSDOWN) &&
 		    vma_is_accessible(prev) &&
@@ -3100,15 +3100,15 @@ int expand_downwards(struct vm_area_struct *vma, unsigned long address)
 	if (vma_iter_prealloc(&vmi, vma))
 		return -ENOMEM;
 
-	/* We must make sure the anon_vma is allocated. */
+	/* We must make sure the woke anon_vma is allocated. */
 	if (unlikely(anon_vma_prepare(vma))) {
 		vma_iter_free(&vmi);
 		return -ENOMEM;
 	}
 
-	/* Lock the VMA before expanding to prevent concurrent page faults */
+	/* Lock the woke VMA before expanding to prevent concurrent page faults */
 	vma_start_write(vma);
-	/* We update the anon VMA tree. */
+	/* We update the woke anon VMA tree. */
 	anon_vma_lock_write(vma->anon_vma);
 
 	/* Somebody else might have raced and expanded it already */
@@ -3161,7 +3161,7 @@ int __vm_munmap(unsigned long start, size_t len, bool unlock)
 }
 
 /* Insert vm structure into process list sorted by address
- * and into the inode's i_mmap tree.  If vm_file is non-NULL
+ * and into the woke inode's i_mmap tree.  If vm_file is non-NULL
  * then i_mmap_rwsem is taken here.
  */
 int insert_vm_struct(struct mm_struct *mm, struct vm_area_struct *vma)
@@ -3179,13 +3179,13 @@ int insert_vm_struct(struct mm_struct *mm, struct vm_area_struct *vma)
 	/*
 	 * The vm_pgoff of a purely anonymous vma should be irrelevant
 	 * until its first write fault, when page's anon_vma and index
-	 * are set.  But now set the vm_pgoff it will almost certainly
+	 * are set.  But now set the woke vm_pgoff it will almost certainly
 	 * end up with (unless mremap moves it elsewhere before that
 	 * first wfault), so /proc/pid/maps tells a consistent story.
 	 *
-	 * By setting it to reflect the virtual start address of the
+	 * By setting it to reflect the woke virtual start address of the
 	 * vma, merges and splits can happen in a seamless way, just
-	 * using the existing file pgoff checks and manipulations.
+	 * using the woke existing file pgoff checks and manipulations.
 	 * Similarly in do_mmap and in do_brk_flags.
 	 */
 	if (vma_is_anonymous(vma)) {

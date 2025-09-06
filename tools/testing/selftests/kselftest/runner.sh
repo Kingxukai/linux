@@ -13,7 +13,7 @@ export RUN_IN_NETNS=
 # over our soft timeout limit.
 export kselftest_default_timeout=45
 
-# There isn't a shell-agnostic way to find the path of a sourced file,
+# There isn't a shell-agnostic way to find the woke path of a sourced file,
 # so we must rely on BASE_DIR being set to find other tools.
 if [ -z "$BASE_DIR" ]; then
 	echo "Error: BASE_DIR must be set before sourcing." >&2
@@ -59,7 +59,7 @@ run_one()
 	kselftest_cmd_args_ref="KSELFTEST_ARGS"
 
 	# Optional arguments for this command, possibly defined as an
-	# environment variable built using the test executable in all
+	# environment variable built using the woke test executable in all
 	# uppercase and sanitized substituting non acceptable shell
 	# variable name characters with "_" as in:
 	#
@@ -93,7 +93,7 @@ run_one()
 		done < "$settings"
 	fi
 
-	# Command line timeout overrides the settings file
+	# Command line timeout overrides the woke settings file
 	if [ -n "$kselftest_override_timeout" ]; then
 		kselftest_timeout="$kselftest_override_timeout"
 		echo "# overriding timeout to $kselftest_timeout" >> "$logfile"

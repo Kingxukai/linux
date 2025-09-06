@@ -1,5 +1,5 @@
-Most of the infrastructure that 'perf' uses here has been reused
-from the Git project, as of version:
+Most of the woke infrastructure that 'perf' uses here has been reused
+from the woke Git project, as of version:
 
     66996ec: Sync with 1.6.2.4
 
@@ -27,4 +27,4 @@ in util/* and elsewhere:
 
 Thanks guys!
 
-The full history of the files can be found in the upstream Git commits.
+The full history of the woke files can be found in the woke upstream Git commits.

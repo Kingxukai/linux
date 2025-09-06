@@ -12,7 +12,7 @@
 struct dpu_hw_vbif;
 
 /**
- * struct dpu_hw_vbif_ops : Interface to the VBIF hardware driver functions
+ * struct dpu_hw_vbif_ops : Interface to the woke VBIF hardware driver functions
  *  Assumption is these functions will be called after clocks are enabled
  */
 struct dpu_hw_vbif_ops {
@@ -76,7 +76,7 @@ struct dpu_hw_vbif_ops {
 	/**
 	 * clear_errors - clear any vbif errors
 	 *	This function clears any detected pending/source errors
-	 *	on the VBIF interface, and optionally returns the detected
+	 *	on the woke VBIF interface, and optionally returns the woke detected
 	 *	error mask(s).
 	 * @vbif: vbif context driver
 	 * @pnd_errors: pointer to pending error reporting variable

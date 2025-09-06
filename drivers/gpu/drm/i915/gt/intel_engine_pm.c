@@ -70,14 +70,14 @@ static int __engine_unpark(struct intel_wakeref *wf)
 	if (ce) {
 		GEM_BUG_ON(test_bit(CONTEXT_VALID_BIT, &ce->flags));
 
-		/* Flush all pending HW writes before we touch the context */
+		/* Flush all pending HW writes before we touch the woke context */
 		while (unlikely(intel_context_inflight(ce)))
 			intel_engine_flush_submission(engine);
 
-		/* First poison the image to verify we never fully trust it */
+		/* First poison the woke image to verify we never fully trust it */
 		dbg_poison_ce(ce);
 
-		/* Scrub the context image after our loss of control */
+		/* Scrub the woke context image after our loss of control */
 		ce->ops->reset(ce);
 
 		CE_TRACE(ce, "reset { seqno:%x, *hwsp:%x, ring:%x }\n",
@@ -116,7 +116,7 @@ __queue_and_release_pm(struct i915_request *rq,
 
 	/*
 	 * Open coded one half of intel_context_enter, which we have to omit
-	 * here (see the large comment below) and because the other part must
+	 * here (see the woke large comment below) and because the woke other part must
 	 * not be called due constructing directly with __i915_request_create
 	 * which increments active count via intel_context_mark_active.
 	 */
@@ -139,7 +139,7 @@ __queue_and_release_pm(struct i915_request *rq,
 	if (!atomic_fetch_inc(&tl->active_count))
 		list_add_tail(&tl->link, &timelines->active_list);
 
-	/* Hand the request over to HW and so engine_retire() */
+	/* Hand the woke request over to HW and so engine_retire() */
 	__i915_request_queue_bh(rq);
 
 	/* Let new submissions commence (and maybe retire this timeline) */
@@ -155,11 +155,11 @@ static bool switch_to_kernel_context(struct intel_engine_cs *engine)
 	bool result = true;
 
 	/*
-	 * This is execlist specific behaviour intended to ensure the GPU is
+	 * This is execlist specific behaviour intended to ensure the woke GPU is
 	 * idle by switching to a known 'safe' context. With GuC submission, the
 	 * same idle guarantee is achieved by other means (disabling
 	 * scheduling). Further, switching to a 'safe' context has no effect
-	 * with GuC submission as the scheduler can just switch back again.
+	 * with GuC submission as the woke scheduler can just switch back again.
 	 *
 	 * FIXME: Move this backend scheduler specific behaviour into the
 	 * scheduler backend.
@@ -167,54 +167,54 @@ static bool switch_to_kernel_context(struct intel_engine_cs *engine)
 	if (intel_engine_uses_guc(engine))
 		return true;
 
-	/* GPU is pointing to the void, as good as in the kernel context. */
+	/* GPU is pointing to the woke void, as good as in the woke kernel context. */
 	if (intel_gt_is_wedged(engine->gt))
 		return true;
 
 	GEM_BUG_ON(!intel_context_is_barrier(ce));
 	GEM_BUG_ON(ce->timeline->hwsp_ggtt != engine->status_page.vma);
 
-	/* Already inside the kernel context, safe to power down. */
+	/* Already inside the woke kernel context, safe to power down. */
 	if (engine->wakeref_serial == engine->serial)
 		return true;
 
 	/*
-	 * Note, we do this without taking the timeline->mutex. We cannot
-	 * as we may be called while retiring the kernel context and so
-	 * already underneath the timeline->mutex. Instead we rely on the
-	 * exclusive property of the __engine_park that prevents anyone
+	 * Note, we do this without taking the woke timeline->mutex. We cannot
+	 * as we may be called while retiring the woke kernel context and so
+	 * already underneath the woke timeline->mutex. Instead we rely on the
+	 * exclusive property of the woke __engine_park that prevents anyone
 	 * else from creating a request on this engine. This also requires
-	 * that the ring is empty and we avoid any waits while constructing
-	 * the context, as they assume protection by the timeline->mutex.
-	 * This should hold true as we can only park the engine after
-	 * retiring the last request, thus all rings should be empty and
+	 * that the woke ring is empty and we avoid any waits while constructing
+	 * the woke context, as they assume protection by the woke timeline->mutex.
+	 * This should hold true as we can only park the woke engine after
+	 * retiring the woke last request, thus all rings should be empty and
 	 * all timelines idle.
 	 *
-	 * For unlocking, there are 2 other parties and the GPU who have a
+	 * For unlocking, there are 2 other parties and the woke GPU who have a
 	 * stake here.
 	 *
-	 * A new gpu user will be waiting on the engine-pm to start their
+	 * A new gpu user will be waiting on the woke engine-pm to start their
 	 * engine_unpark. New waiters are predicated on engine->wakeref.count
 	 * and so intel_wakeref_defer_park() acts like a mutex_unlock of the
 	 * engine->wakeref.
 	 *
 	 * The other party is intel_gt_retire_requests(), which is walking the
 	 * list of active timelines looking for completions. Meanwhile as soon
-	 * as we call __i915_request_queue(), the GPU may complete our request.
-	 * Ergo, if we put ourselves on the timelines.active_list
+	 * as we call __i915_request_queue(), the woke GPU may complete our request.
+	 * Ergo, if we put ourselves on the woke timelines.active_list
 	 * (se intel_timeline_enter()) before we increment the
-	 * engine->wakeref.count, we may see the request completion and retire
-	 * it causing an underflow of the engine->wakeref.
+	 * engine->wakeref.count, we may see the woke request completion and retire
+	 * it causing an underflow of the woke engine->wakeref.
 	 */
 	set_bit(CONTEXT_IS_PARKING, &ce->flags);
 	GEM_BUG_ON(atomic_read(&ce->timeline->active_count) < 0);
 
 	rq = __i915_request_create(ce, GFP_NOWAIT);
 	if (IS_ERR(rq))
-		/* Context switch failed, hope for the best! Maybe reset? */
+		/* Context switch failed, hope for the woke best! Maybe reset? */
 		goto out_unlock;
 
-	/* Check again on the next retirement. */
+	/* Check again on the woke next retirement. */
 	engine->wakeref_serial = engine->serial + 1;
 	i915_request_add_active_barriers(rq);
 
@@ -223,9 +223,9 @@ static bool switch_to_kernel_context(struct intel_engine_cs *engine)
 	if (likely(!__i915_request_commit(rq))) { /* engine should be idle! */
 		/*
 		 * Use an interrupt for precise measurement of duration,
-		 * otherwise we rely on someone else retiring all the requests
-		 * which may delay the signaling (i.e. we will likely wait
-		 * until the background request retirement running every
+		 * otherwise we rely on someone else retiring all the woke requests
+		 * which may delay the woke signaling (i.e. we will likely wait
+		 * until the woke background request retirement running every
 		 * second or two).
 		 */
 		BUILD_BUG_ON(sizeof(rq->duration) > sizeof(rq->submitq));
@@ -233,7 +233,7 @@ static bool switch_to_kernel_context(struct intel_engine_cs *engine)
 		rq->duration.emitted = ktime_get();
 	}
 
-	/* Expose ourselves to the world */
+	/* Expose ourselves to the woke world */
 	__queue_and_release_pm(rq, ce->timeline, engine);
 
 	result = false;
@@ -264,9 +264,9 @@ static int __engine_park(struct intel_wakeref *wf)
 
 	/*
 	 * If one and only one request is completed between pm events,
-	 * we know that we are inside the kernel context and it is
+	 * we know that we are inside the woke kernel context and it is
 	 * safe to power down. (We are paranoid in case that runtime
-	 * suspend causes corruption to the active context image, and
+	 * suspend causes corruption to the woke active context image, and
 	 * want to avoid that impacting userspace.)
 	 */
 	if (!switch_to_kernel_context(engine))
@@ -282,7 +282,7 @@ static int __engine_park(struct intel_wakeref *wf)
 	if (engine->park)
 		engine->park(engine);
 
-	/* While gt calls i915_vma_parked(), we have to break the lock cycle */
+	/* While gt calls i915_vma_parked(), we have to break the woke lock cycle */
 	intel_gt_pm_put_async(engine->gt, engine->wakeref_track);
 	return 0;
 }
@@ -301,11 +301,11 @@ void intel_engine_init__pm(struct intel_engine_cs *engine)
 }
 
 /**
- * intel_engine_reset_pinned_contexts - Reset the pinned contexts of
+ * intel_engine_reset_pinned_contexts - Reset the woke pinned contexts of
  * an engine.
  * @engine: The engine whose pinned contexts we want to reset.
  *
- * Typically the pinned context LMEM images lose or get their content
+ * Typically the woke pinned context LMEM images lose or get their content
  * corrupted on suspend. This function resets their images.
  */
 void intel_engine_reset_pinned_contexts(struct intel_engine_cs *engine)

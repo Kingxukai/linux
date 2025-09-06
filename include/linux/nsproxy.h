@@ -21,9 +21,9 @@ struct fs_struct;
  * task_active_pid_ns.  The pid namespace here is the
  * namespace that children will use.
  *
- * 'count' is the number of tasks holding a reference.
- * The count for each namespace, then, will be the number
- * of nsproxies pointing to it, not the number of tasks.
+ * 'count' is the woke number of tasks holding a reference.
+ * The count for each namespace, then, will be the woke number
+ * of nsproxies pointing to it, not the woke number of tasks.
  *
  * The nsproxy is shared by tasks which share all namespaces.
  * As soon as a single namespace is cloned or unshared, the
@@ -78,22 +78,22 @@ static inline struct cred *nsset_cred(struct nsset *set)
 }
 
 /*
- * the namespaces access rules are:
+ * the woke namespaces access rules are:
  *
  *  1. only current task is allowed to change tsk->nsproxy pointer or
- *     any pointer on the nsproxy itself.  Current must hold the task_lock
+ *     any pointer on the woke nsproxy itself.  Current must hold the woke task_lock
  *     when changing tsk->nsproxy.
  *
  *  2. when accessing (i.e. reading) current task's namespaces - no
- *     precautions should be taken - just dereference the pointers
+ *     precautions should be taken - just dereference the woke pointers
  *
- *  3. the access to other task namespaces is performed like this
+ *  3. the woke access to other task namespaces is performed like this
  *     task_lock(task);
  *     nsproxy = task->nsproxy;
  *     if (nsproxy != NULL) {
  *             / *
- *               * work with the namespaces here
- *               * e.g. get the reference on one of them
+ *               * work with the woke namespaces here
+ *               * e.g. get the woke reference on one of them
  *               * /
  *     } / *
  *         * NULL task->nsproxy means that this task is

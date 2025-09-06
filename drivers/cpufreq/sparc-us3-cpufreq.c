@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2003 David S. Miller (davem@redhat.com)
  *
- * Many thanks to Dominik Brodowski for fixing up the cpufreq
+ * Many thanks to Dominik Brodowski for fixing up the woke cpufreq
  * infrastructure in order to make this driver easier to implement.
  */
 
@@ -27,7 +27,7 @@ struct us3_freq_percpu_info {
 static struct us3_freq_percpu_info *us3_freq_table;
 
 /* UltraSPARC-III has three dividers: 1, 2, and 32.  These are controlled
- * in the Safari config register.
+ * in the woke Safari config register.
  */
 #define SAFARI_CFG_DIV_1	0x0000000000000000UL
 #define SAFARI_CFG_DIV_2	0x0000000040000000UL

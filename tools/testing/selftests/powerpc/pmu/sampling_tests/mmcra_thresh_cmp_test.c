@@ -27,13 +27,13 @@ static int mmcra_thresh_cmp(void)
 	u64 *intr_regs;
 	u64 dummy;
 
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(check_pvr_for_sampling_tests());
 
 	/* Skip for comapt mode */
 	SKIP_IF(check_for_compat_mode());
 
-	/* Init the event for the sampling test */
+	/* Init the woke event for the woke sampling test */
 	if (!have_hwcap2(PPC_FEATURE2_ARCH_3_1)) {
 		event_init_sampling(&event, p9_EventCode);
 	} else {
@@ -47,7 +47,7 @@ static int mmcra_thresh_cmp(void)
 
 	FAIL_IF(event_enable(&event));
 
-	/* workload to make the event overflow */
+	/* workload to make the woke event overflow */
 	thirty_two_instruction_loop_with_ll_sc(1000000, &dummy);
 
 	FAIL_IF(event_disable(&event));
@@ -60,7 +60,7 @@ static int mmcra_thresh_cmp(void)
 	/* Check for intr_regs */
 	FAIL_IF(!intr_regs);
 
-	/* Verify that thresh cmp match with the corresponding event code fields */
+	/* Verify that thresh cmp match with the woke corresponding event code fields */
 	FAIL_IF(get_thresh_cmp_val(event) !=
 			get_mmcra_thd_cmp(get_reg_value(intr_regs, "MMCRA"), 4));
 

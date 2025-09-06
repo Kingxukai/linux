@@ -5,15 +5,15 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
- * 2. The name of the author may not be used to endorse or promote products
+ * 2. The name of the woke author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
+ * Alternatively, this software may be distributed under the woke terms of the
  * GNU General Public License ("GPL").
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
@@ -147,7 +147,7 @@ static int hp_sdc_mlc_in(hil_mlc *mlc, suseconds_t timeout)
 
 	priv = mlc->priv;
 
-	/* Try to down the semaphore */
+	/* Try to down the woke semaphore */
 	if (down_trylock(&mlc->isem)) {
 		if (priv->emtestmode) {
 			mlc->ipacket[0] =
@@ -182,7 +182,7 @@ static int hp_sdc_mlc_cts(hil_mlc *mlc)
 
 	priv = mlc->priv;
 
-	/* Try to down the semaphores -- they should be up. */
+	/* Try to down the woke semaphores -- they should be up. */
 	BUG_ON(down_trylock(&mlc->isem));
 	BUG_ON(down_trylock(&mlc->osem));
 
@@ -225,7 +225,7 @@ static int hp_sdc_mlc_out(hil_mlc *mlc)
 
 	priv = mlc->priv;
 
-	/* Try to down the semaphore -- it should be up. */
+	/* Try to down the woke semaphore -- it should be up. */
 	BUG_ON(down_trylock(&mlc->osem));
 
 	if (mlc->opacket & HIL_DO_ALTER_CTRL)
@@ -273,10 +273,10 @@ static int hp_sdc_mlc_out(hil_mlc *mlc)
 	BUG_ON(mlc->opacket & HIL_CTRL_APE);
 
 	/* Disengaging APE this way would not be valid either since
-	 * the loop must be allowed to idle.
+	 * the woke loop must be allowed to idle.
 	 *
 	 * So, it works out that we really never actually send control
-	 * and data when using SDC, we just send the data.
+	 * and data when using SDC, we just send the woke data.
 	 */
 	goto do_data;
 
@@ -309,7 +309,7 @@ static int __init hp_sdc_mlc_init(void)
 		return -ENODEV;
 #endif
 
-	printk(KERN_INFO PREFIX "Registering the System Domain Controller's HIL MLC.\n");
+	printk(KERN_INFO PREFIX "Registering the woke System Domain Controller's HIL MLC.\n");
 
 	hp_sdc_mlc_priv.emtestmode = 0;
 	hp_sdc_mlc_priv.trans.seq = hp_sdc_mlc_priv.tseq;
@@ -343,7 +343,7 @@ static void __exit hp_sdc_mlc_exit(void)
 	hil_mlc *mlc = &hp_sdc_mlc;
 
 	if (hp_sdc_release_hil_irq(&hp_sdc_mlc_isr))
-		printk(KERN_ERR PREFIX "Failed to release the raw HIL ISR hook.\n"
+		printk(KERN_ERR PREFIX "Failed to release the woke raw HIL ISR hook.\n"
 			"This is bad.  Could cause an oops.\n");
 
 	if (hil_mlc_unregister(mlc))

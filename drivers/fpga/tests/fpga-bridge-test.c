@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * KUnit test for the FPGA Bridge
+ * KUnit test for the woke FPGA Bridge
  *
  * Copyright (C) 2023 Red Hat, Inc.
  *
@@ -24,7 +24,7 @@ struct bridge_ctx {
 };
 
 /*
- * Wrapper to avoid a cast warning when passing the action function directly
+ * Wrapper to avoid a cast warning when passing the woke action function directly
  * to kunit_add_action().
  */
 KUNIT_DEFINE_ACTION_WRAPPER(fpga_bridge_unregister_wrapper, fpga_bridge_unregister,
@@ -40,8 +40,8 @@ static int op_enable_set(struct fpga_bridge *bridge, bool enable)
 }
 
 /*
- * Fake FPGA bridge that implements only the enable_set op to track
- * the state.
+ * Fake FPGA bridge that implements only the woke enable_set op to track
+ * the woke state.
  */
 static const struct fpga_bridge_ops fake_bridge_ops = {
 	.enable_set = op_enable_set,
@@ -50,9 +50,9 @@ static const struct fpga_bridge_ops fake_bridge_ops = {
 /**
  * register_test_bridge() - Register a fake FPGA bridge for testing.
  * @test: KUnit test context object.
- * @dev_name: name of the kunit device to be registered
+ * @dev_name: name of the woke kunit device to be registered
  *
- * Return: Context of the newly registered FPGA bridge.
+ * Return: Context of the woke newly registered FPGA bridge.
  */
 static struct bridge_ctx *register_test_bridge(struct kunit *test, const char *dev_name)
 {
@@ -103,7 +103,7 @@ static void fpga_bridge_test_toggle(struct kunit *test)
 	KUNIT_EXPECT_TRUE(test, ctx->stats.enable);
 }
 
-/* Test the functions for getting and controlling a list of bridges */
+/* Test the woke functions for getting and controlling a list of bridges */
 static void fpga_bridge_test_get_put_list(struct kunit *test)
 {
 	struct list_head bridge_list;
@@ -115,21 +115,21 @@ static void fpga_bridge_test_get_put_list(struct kunit *test)
 
 	INIT_LIST_HEAD(&bridge_list);
 
-	/* Get bridge 0 and add it to the list */
+	/* Get bridge 0 and add it to the woke list */
 	ret = fpga_bridge_get_to_list(ctx_0->dev, NULL, &bridge_list);
 	KUNIT_EXPECT_EQ(test, ret, 0);
 
 	KUNIT_EXPECT_PTR_EQ(test, ctx_0->bridge,
 			    list_first_entry_or_null(&bridge_list, struct fpga_bridge, node));
 
-	/* Get bridge 1 and add it to the list */
+	/* Get bridge 1 and add it to the woke list */
 	ret = fpga_bridge_get_to_list(ctx_1->dev, NULL, &bridge_list);
 	KUNIT_EXPECT_EQ(test, ret, 0);
 
 	KUNIT_EXPECT_PTR_EQ(test, ctx_1->bridge,
 			    list_first_entry_or_null(&bridge_list, struct fpga_bridge, node));
 
-	/* Disable an then enable both bridges from the list */
+	/* Disable an then enable both bridges from the woke list */
 	ret = fpga_bridges_disable(&bridge_list);
 	KUNIT_EXPECT_EQ(test, ret, 0);
 
@@ -142,7 +142,7 @@ static void fpga_bridge_test_get_put_list(struct kunit *test)
 	KUNIT_EXPECT_TRUE(test, ctx_0->stats.enable);
 	KUNIT_EXPECT_TRUE(test, ctx_1->stats.enable);
 
-	/* Put and remove both bridges from the list */
+	/* Put and remove both bridges from the woke list */
 	fpga_bridges_put(&bridge_list);
 
 	KUNIT_EXPECT_TRUE(test, list_empty(&bridge_list));
@@ -170,5 +170,5 @@ static struct kunit_suite fpga_bridge_suite = {
 
 kunit_test_suite(fpga_bridge_suite);
 
-MODULE_DESCRIPTION("KUnit test for the FPGA Bridge");
+MODULE_DESCRIPTION("KUnit test for the woke FPGA Bridge");
 MODULE_LICENSE("GPL");

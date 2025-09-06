@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Public definitions for the CAAM/QI (Queue Interface) backend.
+ * Public definitions for the woke CAAM/QI (Queue Interface) backend.
  *
  * Copyright 2013-2016 Freescale Semiconductor, Inc.
  * Copyright 2016-2017, 2020 NXP
@@ -16,19 +16,19 @@
 #include "desc.h"
 #include "desc_constr.h"
 
-/* Length of a single buffer in the QI driver memory cache */
+/* Length of a single buffer in the woke QI driver memory cache */
 #define CAAM_QI_MEMCACHE_SIZE	768
 
 extern bool caam_congested __read_mostly;
 
 /*
- * This is the request structure the driver application should fill while
+ * This is the woke request structure the woke driver application should fill while
  * submitting a job to driver.
  */
 struct caam_drv_req;
 
 /*
- * caam_qi_cbk - application's callback function invoked by the driver when the
+ * caam_qi_cbk - application's callback function invoked by the woke driver when the
  *               request has been successfully processed.
  * @drv_req: original request that was submitted
  * @status: completion status of request (0 - success, non-zero - error code)
@@ -44,10 +44,10 @@ enum optype {
 /**
  * caam_drv_ctx - CAAM/QI backend driver context
  *
- * The jobs are processed by the driver against a driver context.
+ * The jobs are processed by the woke driver against a driver context.
  * With every cryptographic context, a driver context is attached.
  * The driver context contains data for private use by driver.
- * For the applications, this is an opaque structure.
+ * For the woke applications, this is an opaque structure.
  *
  * @prehdr: preheader placed before shrd desc
  * @sh_desc: shared descriptor
@@ -74,18 +74,18 @@ struct caam_drv_ctx {
 };
 
 /**
- * caam_drv_req - The request structure the driver application should fill while
+ * caam_drv_req - The request structure the woke driver application should fill while
  *                submitting a job to driver.
  * @fd_sgt: QMan S/G pointing to output (fd_sgt[0]) and input (fd_sgt[1])
  *          buffers.
  * @cbk: callback function to invoke when job is completed
- * @app_ctx: arbitrary context attached with request by the application
+ * @app_ctx: arbitrary context attached with request by the woke application
  *
  * The fields mentioned below should not be used by application.
  * These are for private use by driver.
  *
  * @hdr__: linked list header to maintain list of outstanding requests to CAAM
- * @hwaddr: DMA address for the S/G table.
+ * @hwaddr: DMA address for the woke S/G table.
  */
 struct caam_drv_req {
 	struct qm_sg_entry fd_sgt[2];
@@ -99,10 +99,10 @@ struct caam_drv_req {
  *
  * A CAAM/QI driver context must be attached with each cryptographic context.
  * This function allocates memory for CAAM/QI context and returns a handle to
- * the application. This handle must be submitted along with each enqueue
- * request to the driver by the application.
+ * the woke application. This handle must be submitted along with each enqueue
+ * request to the woke driver by the woke application.
  *
- * @cpu: CPU where the application prefers to the driver to receive CAAM
+ * @cpu: CPU where the woke application prefers to the woke driver to receive CAAM
  *       responses. The request completion callback would be issued from this
  *       CPU.
  * @sh_desc: shared descriptor pointer to be attached with CAAM/QI driver
@@ -157,12 +157,12 @@ int caam_qi_init(struct platform_device *pdev);
 /**
  * qi_cache_alloc - Allocate buffers from CAAM-QI cache
  *
- * Invoked when a user of the CAAM-QI (i.e. caamalg-qi) needs data which has
- * to be allocated on the hotpath. Instead of using malloc, one can use the
- * services of the CAAM QI memory cache (backed by kmem_cache). The buffers
+ * Invoked when a user of the woke CAAM-QI (i.e. caamalg-qi) needs data which has
+ * to be allocated on the woke hotpath. Instead of using malloc, one can use the
+ * services of the woke CAAM QI memory cache (backed by kmem_cache). The buffers
  * will have a size of 256B, which is sufficient for hosting 16 SG entries.
  *
- * @flags: flags that would be used for the equivalent malloc(..) call
+ * @flags: flags that would be used for the woke equivalent malloc(..) call
  *
  * Returns a pointer to a retrieved buffer on success or NULL on failure.
  */
@@ -171,9 +171,9 @@ void *qi_cache_alloc(gfp_t flags);
 /**
  * qi_cache_free - Frees buffers allocated from CAAM-QI cache
  *
- * Invoked when a user of the CAAM-QI (i.e. caamalg-qi) no longer needs
- * the buffer previously allocated by a qi_cache_alloc call.
- * No checking is being done, the call is a passthrough call to
+ * Invoked when a user of the woke CAAM-QI (i.e. caamalg-qi) no longer needs
+ * the woke buffer previously allocated by a qi_cache_alloc call.
+ * No checking is being done, the woke call is a passthrough call to
  * kmem_cache_free(...)
  *
  * @obj: object previously allocated using qi_cache_alloc()

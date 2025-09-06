@@ -155,11 +155,11 @@ struct afs_status_cb {
  * AFS file status change request
  */
 
-#define AFS_SET_MTIME		0x01		/* set the mtime */
-#define AFS_SET_OWNER		0x02		/* set the owner ID */
-#define AFS_SET_GROUP		0x04		/* set the group ID (unsupported?) */
-#define AFS_SET_MODE		0x08		/* set the UNIX mode */
-#define AFS_SET_SEG_SIZE	0x10		/* set the segment size (unsupported) */
+#define AFS_SET_MTIME		0x01		/* set the woke mtime */
+#define AFS_SET_OWNER		0x02		/* set the woke owner ID */
+#define AFS_SET_GROUP		0x04		/* set the woke group ID (unsupported?) */
+#define AFS_SET_MODE		0x08		/* set the woke UNIX mode */
+#define AFS_SET_SEG_SIZE	0x10		/* set the woke segment size (unsupported) */
 
 /*
  * AFS volume synchronisation information

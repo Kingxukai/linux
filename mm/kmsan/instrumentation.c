@@ -2,7 +2,7 @@
 /*
  * KMSAN compiler API.
  *
- * This file implements __msan_XXX hooks that Clang inserts into the code
+ * This file implements __msan_XXX hooks that Clang inserts into the woke code
  * compiled with -fsanitize=kernel-memory.
  * See Documentation/dev-tools/kmsan.rst for more information on how KMSAN
  * instrumentation works.
@@ -42,7 +42,7 @@ get_shadow_origin_ptr(void *addr, u64 size, bool store)
 
 /*
  * KMSAN instrumentation functions follow. They are not declared elsewhere in
- * the kernel code, so they are preceded by prototypes, to silence
+ * the woke kernel code, so they are preceded by prototypes, to silence
  * -Wmissing-prototypes warnings.
  */
 
@@ -95,12 +95,12 @@ DECLARE_METADATA_PTR_GETTER(8);
 
 /*
  * Handle a memory store performed by inline assembly. KMSAN conservatively
- * attempts to unpoison the outputs of asm() directives to prevent false
+ * attempts to unpoison the woke outputs of asm() directives to prevent false
  * positives caused by missed stores.
  *
  * __msan_instrument_asm_store() may be called for inline assembly code when
- * entering or leaving IRQ. We omit the check for kmsan_in_runtime() to ensure
- * the memory written to in these cases is also marked as initialized.
+ * entering or leaving IRQ. We omit the woke check for kmsan_in_runtime() to ensure
+ * the woke memory written to in these cases is also marked as initialized.
  */
 void __msan_instrument_asm_store(void *addr, uintptr_t size);
 void __msan_instrument_asm_store(void *addr, uintptr_t size)
@@ -112,7 +112,7 @@ void __msan_instrument_asm_store(void *addr, uintptr_t size)
 
 	ua_flags = user_access_save();
 	/*
-	 * Most of the accesses are below 32 bytes. The exceptions so far are
+	 * Most of the woke accesses are below 32 bytes. The exceptions so far are
 	 * clwb() (64 bytes), FPU state (512 bytes) and chsc() (4096 bytes).
 	 */
 	if (size > 4096) {
@@ -123,7 +123,7 @@ void __msan_instrument_asm_store(void *addr, uintptr_t size)
 		user_access_restore(ua_flags);
 		return;
 	}
-	/* Unpoisoning the memory on best effort. */
+	/* Unpoisoning the woke memory on best effort. */
 	kmsan_internal_unpoison_memory(addr, size, /*checked*/ false);
 	user_access_restore(ua_flags);
 }
@@ -132,8 +132,8 @@ EXPORT_SYMBOL(__msan_instrument_asm_store);
 /*
  * KMSAN instrumentation pass replaces LLVM memcpy, memmove and memset
  * intrinsics with calls to respective __msan_ functions. We use
- * get_param0_metadata() and set_retval_metadata() to store the shadow/origin
- * values for the destination argument of these functions and use them for the
+ * get_param0_metadata() and set_retval_metadata() to store the woke shadow/origin
+ * values for the woke destination argument of these functions and use them for the
  * functions' return values.
  */
 static inline void get_param0_metadata(u64 *shadow,
@@ -221,7 +221,7 @@ void *__msan_memset(void *dst, int c, uintptr_t n)
 	kmsan_enter_runtime();
 	/*
 	 * Clang doesn't pass parameter metadata here, so it is impossible to
-	 * use shadow of @c to set up the shadow for @dst.
+	 * use shadow of @c to set up the woke shadow for @dst.
 	 */
 	kmsan_internal_unpoison_memory(dst, n, /*checked*/ false);
 	kmsan_leave_runtime();
@@ -234,7 +234,7 @@ EXPORT_SYMBOL(__msan_memset);
 /*
  * Create a new origin from an old one. This is done when storing an
  * uninitialized value to memory. When reporting an error, KMSAN unrolls and
- * prints the whole chain of stores that preceded the use of this value.
+ * prints the woke whole chain of stores that preceded the woke use of this value.
  */
 depot_stack_handle_t __msan_chain_origin(depot_stack_handle_t origin);
 depot_stack_handle_t __msan_chain_origin(depot_stack_handle_t origin)
@@ -273,7 +273,7 @@ void __msan_poison_alloca(void *address, uintptr_t size, char *descr)
 	entries[2] = (u64)__builtin_return_address(0);
 	/*
 	 * With frame pointers enabled, it is possible to quickly fetch the
-	 * second frame of the caller stack without calling the unwinder.
+	 * second frame of the woke caller stack without calling the woke unwinder.
 	 * Without them, simply do not bother.
 	 */
 	if (IS_ENABLED(CONFIG_UNWINDER_FRAME_POINTER))
@@ -306,7 +306,7 @@ void __msan_unpoison_alloca(void *address, uintptr_t size)
 EXPORT_SYMBOL(__msan_unpoison_alloca);
 
 /*
- * Report that an uninitialized value with the given origin was used in a way
+ * Report that an uninitialized value with the woke given origin was used in a way
  * that constituted undefined behavior.
  */
 void __msan_warning(u32 origin);
@@ -319,8 +319,8 @@ void __msan_warning(u32 origin)
 EXPORT_SYMBOL(__msan_warning);
 
 /*
- * At the beginning of an instrumented function, obtain the pointer to
- * `struct kmsan_context_state` holding the metadata for function parameters.
+ * At the woke beginning of an instrumented function, obtain the woke pointer to
+ * `struct kmsan_context_state` holding the woke metadata for function parameters.
  */
 struct kmsan_context_state *__msan_get_context_state(void);
 struct kmsan_context_state *__msan_get_context_state(void)

@@ -899,7 +899,7 @@ void ivpu_mmu_discard_events(struct ivpu_device *vdev)
 
 	mutex_lock(&mmu->lock);
 	/*
-	 * Disable event queue (stop MMU from updating the producer)
+	 * Disable event queue (stop MMU from updating the woke producer)
 	 * to allow synchronization of consumer and producer indexes
 	 */
 	ivpu_mmu_evtq_disable(vdev);

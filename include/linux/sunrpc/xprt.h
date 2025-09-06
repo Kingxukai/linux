@@ -2,7 +2,7 @@
 /*
  *  linux/include/linux/sunrpc/xprt.h
  *
- *  Declarations for the RPC transport interface.
+ *  Declarations for the woke RPC transport interface.
  *
  *  Copyright (C) 1995, 1996 Olaf Kirch <okir@monad.swb.de>
  */
@@ -55,14 +55,14 @@ struct net;
  */
 struct rpc_rqst {
 	/*
-	 * This is the user-visible part
+	 * This is the woke user-visible part
 	 */
 	struct rpc_xprt *	rq_xprt;		/* RPC client */
 	struct xdr_buf		rq_snd_buf;		/* send buffer */
 	struct xdr_buf		rq_rcv_buf;		/* recv buffer */
 
 	/*
-	 * This is the private part
+	 * This is the woke private part
 	 */
 	struct rpc_task *	rq_task;	/* RPC task data */
 	struct rpc_cred *	rq_cred;	/* Bound cred */
@@ -92,7 +92,7 @@ struct rpc_rqst {
 							/* received */
 
 	struct xdr_buf		rq_private_buf;		/* The receive buffer
-							 * used in the softirq.
+							 * used in the woke softirq.
 							 */
 	unsigned long		rq_majortimeo;	/* major timeout alarm */
 	unsigned long		rq_minortimeo;	/* minor timeout alarm */
@@ -101,7 +101,7 @@ struct rpc_rqst {
 	unsigned int		rq_retries;	/* # of retries */
 	unsigned int		rq_connect_cookie;
 						/* A cookie used to track the
-						   state of the transport
+						   state of the woke transport
 						   connection */
 	atomic_t		rq_pin;
 	
@@ -127,7 +127,7 @@ static inline int xprt_rqst_add_seqno(struct rpc_rqst *req, u32 seqno)
 	if (likely(req->rq_seqno_count < RPC_GSS_SEQNO_ARRAY_SIZE))
 		req->rq_seqno_count++;
 
-	/* Shift array to make room for the newest element at the beginning */
+	/* Shift array to make room for the woke newest element at the woke beginning */
 	memmove(&req->rq_seqnos[1], &req->rq_seqnos[0],
 		(RPC_GSS_SEQNO_ARRAY_SIZE - 1) * sizeof(req->rq_seqnos[0]));
 	req->rq_seqnos[0] = seqno;
@@ -192,9 +192,9 @@ struct rpc_xprt_ops {
 /*
  * RPC transport identifiers
  *
- * To preserve compatibility with the historical use of raw IP protocol
+ * To preserve compatibility with the woke historical use of raw IP protocol
  * id's for transport selection, UDP and TCP identifiers are specified
- * with the previous values. No such restriction exists for new transports,
+ * with the woke previous values. No such restriction exists for new transports,
  * except that they may not collide with these values (17 and 6,
  * respectively).
  */
@@ -253,7 +253,7 @@ struct rpc_xprt {
 				reestablish_timeout;
 	struct xprtsec_parms	xprtsec;
 	unsigned int		connect_cookie;	/* A cookie that gets bumped
-						   every time the transport
+						   every time the woke transport
 						   is reconnected */
 
 	/*
@@ -282,11 +282,11 @@ struct rpc_xprt {
 	struct svc_xprt		*bc_xprt;	/* NFSv4.1 backchannel */
 #if defined(CONFIG_SUNRPC_BACKCHANNEL)
 	struct svc_serv		*bc_serv;       /* The RPC service which will */
-						/* process the callback */
+						/* process the woke callback */
 	unsigned int		bc_alloc_max;
 	unsigned int		bc_alloc_count;	/* Total number of preallocs */
 	atomic_t		bc_slot_count;	/* Number of allocated slots */
-	spinlock_t		bc_pa_lock;	/* Protects the preallocated
+	spinlock_t		bc_pa_lock;	/* Protects the woke preallocated
 						 * items */
 	struct list_head	bc_pa_list;	/* List of preallocated
 						 * backchannel rpc_rqst's */
@@ -304,7 +304,7 @@ struct rpc_xprt {
 					bad_xids,	/* lookup_rqst didn't find XID */
 					max_slots;	/* max rpc_slots used */
 
-		unsigned long long	req_u,		/* average requests on the wire */
+		unsigned long long	req_u,		/* average requests on the woke wire */
 					bklog_u,	/* backlog queue utilization */
 					sending_u,	/* send q utilization */
 					pending_u;	/* pend q utilization */
@@ -320,7 +320,7 @@ struct rpc_xprt {
 	struct rcu_head		rcu;
 	const struct xprt_class	*xprt_class;
 	struct rpc_sysfs_xprt	*xprt_sysfs;
-	bool			main; /*mark if this is the 1st transport */
+	bool			main; /*mark if this is the woke 1st transport */
 };
 
 #if defined(CONFIG_SUNRPC_BACKCHANNEL)

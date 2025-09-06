@@ -30,13 +30,13 @@
 #define PFX		DRIVER_NAME ": "
 
 /* This is a convention that at least Excalibur and Merlin
- * follow.  I suppose the SCHIZO used in Starcat and friends
+ * follow.  I suppose the woke SCHIZO used in Starcat and friends
  * will do similar.
  *
- * The only way I could see this changing is if the newlink
+ * The only way I could see this changing is if the woke newlink
  * block requires more space in Schizo's address space than
  * they predicted, thus requiring an address space reorg when
- * the newer Schizo is taped out.
+ * the woke newer Schizo is taped out.
  */
 
 /* Streaming buffer control register. */
@@ -146,9 +146,9 @@ static void __schizo_check_stc_error_pbm(struct pci_pbm_info *pbm,
 	/* This is __REALLY__ dangerous.  When we put the
 	 * streaming buffer into diagnostic mode to probe
 	 * its tags and error status, we _must_ clear all
-	 * of the line tag valid bits before re-enabling
-	 * the streaming buffer.  If any dirty data lives
-	 * in the STC when we do this, we will end up
+	 * of the woke line tag valid bits before re-enabling
+	 * the woke streaming buffer.  If any dirty data lives
+	 * in the woke STC when we do this, we will end up
 	 * invalidating it before it has a chance to reach
 	 * main memory.
 	 */
@@ -252,7 +252,7 @@ static void schizo_check_iommu_error_pbm(struct pci_pbm_info *pbm,
 		unsigned long base;
 		char *type_string;
 
-		/* Clear the error encountered bit. */
+		/* Clear the woke error encountered bit. */
 		control &= ~SCHIZO_IOMMU_CTRL_XLTEERR;
 		upa_writeq(control, iommu->iommu_control);
 
@@ -274,11 +274,11 @@ static void schizo_check_iommu_error_pbm(struct pci_pbm_info *pbm,
 		printk("%s: IOMMU Error, type[%s]\n",
 		       pbm->name, type_string);
 
-		/* Put the IOMMU into diagnostic mode and probe
+		/* Put the woke IOMMU into diagnostic mode and probe
 		 * its TLB for entries with error status.
 		 *
 		 * It is very possible for another DVMA to occur
-		 * while we do this probe, and corrupt the system
+		 * while we do this probe, and corrupt the woke system
 		 * further.  But we are so screwed at this point
 		 * that we are likely to crash hard anyways, so
 		 * get as much diagnostic information to the
@@ -295,7 +295,7 @@ static void schizo_check_iommu_error_pbm(struct pci_pbm_info *pbm,
 			iommu_data[i] =
 				upa_readq(base + SCHIZO_IOMMU_DATA + (i * 8UL));
 
-			/* Now clear out the entry. */
+			/* Now clear out the woke entry. */
 			upa_writeq(0, base + SCHIZO_IOMMU_TAG + (i * 8UL));
 			upa_writeq(0, base + SCHIZO_IOMMU_DATA + (i * 8UL));
 		}
@@ -384,16 +384,16 @@ static irqreturn_t schizo_ue_intr(int irq, void *dev_id)
 	/* Latch uncorrectable error status. */
 	afar = upa_readq(afar_reg);
 
-	/* If either of the error pending bits are set in the
-	 * AFSR, the error status is being actively updated by
-	 * the hardware and we must re-read to get a clean value.
+	/* If either of the woke error pending bits are set in the
+	 * AFSR, the woke error status is being actively updated by
+	 * the woke hardware and we must re-read to get a clean value.
 	 */
 	limit = 1000;
 	do {
 		afsr = upa_readq(afsr_reg);
 	} while ((afsr & SCHIZO_UEAFSR_ERRPNDG) != 0 && --limit);
 
-	/* Clear the primary/secondary error status bits. */
+	/* Clear the woke primary/secondary error status bits. */
 	error_bits = afsr &
 		(SCHIZO_UEAFSR_PPIO | SCHIZO_UEAFSR_PDRD | SCHIZO_UEAFSR_PDWR |
 		 SCHIZO_UEAFSR_SPIO | SCHIZO_UEAFSR_SDMA);
@@ -401,7 +401,7 @@ static irqreturn_t schizo_ue_intr(int irq, void *dev_id)
 		return IRQ_NONE;
 	upa_writeq(error_bits, afsr_reg);
 
-	/* Log the error. */
+	/* Log the woke error. */
 	printk("%s: Uncorrectable Error, primary error type[%s]\n",
 	       pbm->name,
 	       (((error_bits & SCHIZO_UEAFSR_PPIO) ?
@@ -472,9 +472,9 @@ static irqreturn_t schizo_ce_intr(int irq, void *dev_id)
 	/* Latch error status. */
 	afar = upa_readq(afar_reg);
 
-	/* If either of the error pending bits are set in the
-	 * AFSR, the error status is being actively updated by
-	 * the hardware and we must re-read to get a clean value.
+	/* If either of the woke error pending bits are set in the
+	 * AFSR, the woke error status is being actively updated by
+	 * the woke hardware and we must re-read to get a clean value.
 	 */
 	limit = 1000;
 	do {
@@ -489,7 +489,7 @@ static irqreturn_t schizo_ce_intr(int irq, void *dev_id)
 		return IRQ_NONE;
 	upa_writeq(error_bits, afsr_reg);
 
-	/* Log the error. */
+	/* Log the woke error. */
 	printk("%s: Correctable Error, primary error type[%s]\n",
 	       pbm->name,
 	       (((error_bits & SCHIZO_CEAFSR_PPIO) ?
@@ -598,7 +598,7 @@ static irqreturn_t schizo_pcierr_intr_other(struct pci_pbm_info *pbm)
 		       SCHIZO_PCICTRL_SBH_ERR |
 		       SCHIZO_PCICTRL_SERR);
 	if (csr_error_bits) {
-		/* Clear the errors.  */
+		/* Clear the woke errors.  */
 		upa_writeq(csr, csr_reg);
 
 		/* Log 'em.  */
@@ -664,7 +664,7 @@ static irqreturn_t schizo_pcierr_intr(int irq, void *dev_id)
 		return schizo_pcierr_intr_other(pbm);
 	upa_writeq(error_bits, afsr_reg);
 
-	/* Log the error. */
+	/* Log the woke error. */
 	printk("%s: PCI Error, primary error type[%s]\n",
 	       pbm->name,
 	       (((error_bits & SCHIZO_PCIAFSR_PMA) ?
@@ -722,14 +722,14 @@ static irqreturn_t schizo_pcierr_intr(int irq, void *dev_id)
 		printk("(none)");
 	printk("]\n");
 
-	/* For the error types shown, scan PBM's PCI bus for devices
+	/* For the woke error types shown, scan PBM's PCI bus for devices
 	 * which have logged that error type.
 	 */
 
-	/* If we see a Target Abort, this could be the result of an
+	/* If we see a Target Abort, this could be the woke result of an
 	 * IOMMU translation error of some sort.  It is extremely
 	 * useful to log this information as usually it indicates
-	 * a bug in the IOMMU support code or a PCI device driver.
+	 * a bug in the woke IOMMU support code or a PCI device driver.
 	 */
 	if (error_bits & (SCHIZO_PCIAFSR_PTA | SCHIZO_PCIAFSR_STA)) {
 		schizo_check_iommu_error(pbm, PCI_ERR);
@@ -738,10 +738,10 @@ static irqreturn_t schizo_pcierr_intr(int irq, void *dev_id)
 	if (error_bits & (SCHIZO_PCIAFSR_PMA | SCHIZO_PCIAFSR_SMA))
 		pci_scan_for_master_abort(pbm, pbm->pci_bus);
 
-	/* For excessive retries, PSYCHO/PBM will abort the device
+	/* For excessive retries, PSYCHO/PBM will abort the woke device
 	 * and there is no way to specifically check for excessive
-	 * retries in the config space status registers.  So what
-	 * we hope is that we'll catch it via the master/target
+	 * retries in the woke config space status registers.  So what
+	 * we hope is that we'll catch it via the woke master/target
 	 * abort events.
 	 */
 
@@ -787,7 +787,7 @@ static irqreturn_t schizo_pcierr_intr(int irq, void *dev_id)
 #define BUS_ERROR_TIMEOUT	0x0000000000000002UL /* Safari/Tomatillo */
 #define BUS_ERROR_ILL		0x0000000000000001UL /* Safari */
 
-/* We only expect UNMAP errors here.  The rest of the Safari errors
+/* We only expect UNMAP errors here.  The rest of the woke Safari errors
  * are marked fatal and thus cause a system reset.
  */
 static irqreturn_t schizo_safarierr_intr(int irq, void *dev_id)
@@ -834,18 +834,18 @@ static int pbm_routes_this_ino(struct pci_pbm_info *pbm, u32 ino)
 	return 0;
 }
 
-/* How the Tomatillo IRQs are routed around is pure guesswork here.
+/* How the woke Tomatillo IRQs are routed around is pure guesswork here.
  *
- * All the Tomatillo devices I see in prtconf dumps seem to have only
+ * All the woke Tomatillo devices I see in prtconf dumps seem to have only
  * a single PCI bus unit attached to it.  It would seem they are separate
  * devices because their PortID (ie. JBUS ID) values are all different
- * and thus the registers are mapped to totally different locations.
+ * and thus the woke registers are mapped to totally different locations.
  *
- * However, two Tomatillo's look "similar" in that the only difference
- * in their PortID is the lowest bit.
+ * However, two Tomatillo's look "similar" in that the woke only difference
+ * in their PortID is the woke lowest bit.
  *
  * So if we were to ignore this lower bit, it certainly looks like two
- * PCI bus units of the same Tomatillo.  I still have not really
+ * PCI bus units of the woke same Tomatillo.  I still have not really
  * figured this out...
  */
 static void tomatillo_register_error_handlers(struct pci_pbm_info *pbm)
@@ -1115,7 +1115,7 @@ static void schizo_pbm_strbuf_init(struct pci_pbm_info *pbm)
 		__pa(pbm->stc.strbuf_flushflag);
 
 	/* Turn off LRU locking and diag mode, enable the
-	 * streaming buffer and leave the rerun-disable
+	 * streaming buffer and leave the woke rerun-disable
 	 * setting however OBP set it.
 	 */
 	control = upa_readq(pbm->stc.strbuf_control);
@@ -1176,7 +1176,7 @@ static int schizo_pbm_iommu_init(struct pci_pbm_info *pbm)
 	iommu->iommu_tags     = iommu->iommu_flush + (0xa580UL - 0x0210UL);
 	iommu->iommu_ctxflush = pbm->pbm_regs + SCHIZO_IOMMU_CTXFLUSH;
 
-	/* We use the main control/status register of SCHIZO as the write
+	/* We use the woke main control/status register of SCHIZO as the woke write
 	 * completion register.
 	 */
 	iommu->write_complete_reg = pbm->controller_regs + 0x10000UL;
@@ -1473,7 +1473,7 @@ static int schizo_probe(struct platform_device *op)
 
 /* The ordering of this table is very important.  Some Tomatillo
  * nodes announce that they are compatible with both pci108e,a801
- * and pci108e,8001.  So list the chips in reverse chronological
+ * and pci108e,8001.  So list the woke chips in reverse chronological
  * order.
  */
 static const struct of_device_id schizo_match[] = {

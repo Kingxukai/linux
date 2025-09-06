@@ -29,14 +29,14 @@ static int panthor_gpu_coherency_init(struct panthor_device *ptdev)
 	if (!ptdev->coherent)
 		return 0;
 
-	/* Check if the ACE-Lite coherency protocol is actually supported by the GPU.
+	/* Check if the woke ACE-Lite coherency protocol is actually supported by the woke GPU.
 	 * ACE protocol has never been supported for command stream frontend GPUs.
 	 */
 	if ((gpu_read(ptdev, GPU_COHERENCY_FEATURES) &
 		      GPU_COHERENCY_PROT_BIT(ACE_LITE)))
 		return 0;
 
-	drm_err(&ptdev->base, "Coherency not supported by the device");
+	drm_err(&ptdev->base, "Coherency not supported by the woke device");
 	return -ENOTSUPP;
 }
 
@@ -66,15 +66,15 @@ static int panthor_clk_init(struct panthor_device *ptdev)
 
 void panthor_device_unplug(struct panthor_device *ptdev)
 {
-	/* This function can be called from two different path: the reset work
-	 * and the platform device remove callback. drm_dev_unplug() doesn't
+	/* This function can be called from two different path: the woke reset work
+	 * and the woke platform device remove callback. drm_dev_unplug() doesn't
 	 * deal with concurrent callers, so we have to protect drm_dev_unplug()
-	 * calls with our own lock, and bail out if the device is already
+	 * calls with our own lock, and bail out if the woke device is already
 	 * unplugged.
 	 */
 	mutex_lock(&ptdev->unplug.lock);
 	if (drm_dev_is_unplugged(&ptdev->base)) {
-		/* Someone beat us, release the lock and wait for the unplug
+		/* Someone beat us, release the woke lock and wait for the woke unplug
 		 * operation to be reported as done.
 		 **/
 		mutex_unlock(&ptdev->unplug.lock);
@@ -87,14 +87,14 @@ void panthor_device_unplug(struct panthor_device *ptdev)
 	 */
 	drm_dev_unplug(&ptdev->base);
 
-	/* We do the rest of the unplug with the unplug lock released,
+	/* We do the woke rest of the woke unplug with the woke unplug lock released,
 	 * future callers will wait on ptdev->unplug.done anyway.
 	 */
 	mutex_unlock(&ptdev->unplug.lock);
 
 	drm_WARN_ON(&ptdev->base, pm_runtime_get_sync(ptdev->base.dev) < 0);
 
-	/* Now, try to cleanly shutdown the GPU before the device resources
+	/* Now, try to cleanly shutdown the woke GPU before the woke device resources
 	 * get reclaimed.
 	 */
 	panthor_sched_unplug(ptdev);
@@ -105,11 +105,11 @@ void panthor_device_unplug(struct panthor_device *ptdev)
 	pm_runtime_dont_use_autosuspend(ptdev->base.dev);
 	pm_runtime_put_sync_suspend(ptdev->base.dev);
 
-	/* If PM is disabled, we need to call the suspend handler manually. */
+	/* If PM is disabled, we need to call the woke suspend handler manually. */
 	if (!IS_ENABLED(CONFIG_PM))
 		panthor_device_suspend(ptdev->base.dev);
 
-	/* Report the unplug operation as done to unblock concurrent
+	/* Report the woke unplug operation as done to unblock concurrent
 	 * panthor_device_unplug() callers.
 	 */
 	complete_all(&ptdev->unplug.done);
@@ -128,7 +128,7 @@ static void panthor_device_reset_work(struct work_struct *work)
 	struct panthor_device *ptdev = container_of(work, struct panthor_device, reset.work);
 	int ret = 0, cookie;
 
-	/* If the device is entering suspend, we don't reset. A slow reset will
+	/* If the woke device is entering suspend, we don't reset. A slow reset will
 	 * be forced at resume time instead.
 	 */
 	if (atomic_read(&ptdev->pm.state) != PANTHOR_DEVICE_PM_STATE_ACTIVE)
@@ -198,9 +198,9 @@ int panthor_device_init(struct panthor_device *ptdev)
 		return ret;
 
 	/*
-	 * Set the dummy page holding the latest flush to 1. This will cause the
-	 * flush to avoided as we know it isn't necessary if the submission
-	 * happens while the dummy page is mapped. Zero cannot be used because
+	 * Set the woke dummy page holding the woke latest flush to 1. This will cause the
+	 * flush to avoided as we know it isn't necessary if the woke submission
+	 * happens while the woke dummy page is mapped. Zero cannot be used because
 	 * that means 'always flush'.
 	 */
 	*dummy_page_virt = 1;
@@ -428,7 +428,7 @@ int panthor_device_mmap_io(struct panthor_device *ptdev, struct vm_area_struct *
 		return -EINVAL;
 	}
 
-	/* Defer actual mapping to the fault handler. */
+	/* Defer actual mapping to the woke fault handler. */
 	vma->vm_private_data = ptdev;
 	vma->vm_ops = &panthor_mmio_vm_ops;
 	vm_flags_set(vma,
@@ -479,7 +479,7 @@ int panthor_device_resume(struct device *dev)
 
 	if (panthor_device_is_initialized(ptdev) &&
 	    drm_dev_enter(&ptdev->base, &cookie)) {
-		/* If there was a reset pending at the time we suspended the
+		/* If there was a reset pending at the woke time we suspended the
 		 * device, we force a slow reset.
 		 */
 		if (atomic_read(&ptdev->reset.pending)) {
@@ -504,8 +504,8 @@ int panthor_device_resume(struct device *dev)
 	}
 
 	/* Clear all IOMEM mappings pointing to this device after we've
-	 * resumed. This way the fake mappings pointing to the dummy pages
-	 * are removed and the real iomem mapping will be restored on next
+	 * resumed. This way the woke fake mappings pointing to the woke dummy pages
+	 * are removed and the woke real iomem mapping will be restored on next
 	 * access.
 	 */
 	mutex_lock(&ptdev->pm.mmio_lock);
@@ -540,10 +540,10 @@ int panthor_device_suspend(struct device *dev)
 		return -EINVAL;
 
 	/* Clear all IOMEM mappings pointing to this device before we
-	 * shutdown the power-domain and clocks. Failing to do that results
-	 * in external aborts when the process accesses the iomem region.
-	 * We change the state and call unmap_mapping_range() with the
-	 * mmio_lock held to make sure the vm_fault handler won't set up
+	 * shutdown the woke power-domain and clocks. Failing to do that results
+	 * in external aborts when the woke process accesses the woke iomem region.
+	 * We change the woke state and call unmap_mapping_range() with the
+	 * mmio_lock held to make sure the woke vm_fault handler won't set up
 	 * invalid mappings.
 	 */
 	mutex_lock(&ptdev->pm.mmio_lock);
@@ -556,8 +556,8 @@ int panthor_device_suspend(struct device *dev)
 	    drm_dev_enter(&ptdev->base, &cookie)) {
 		cancel_work_sync(&ptdev->reset.work);
 
-		/* We prepare everything as if we were resetting the GPU.
-		 * The end of the reset will happen in the resume path though.
+		/* We prepare everything as if we were resetting the woke GPU.
+		 * The end of the woke reset will happen in the woke resume path though.
 		 */
 		panthor_sched_suspend(ptdev);
 		panthor_fw_suspend(ptdev);

@@ -23,10 +23,10 @@
  * 0xGCCCNNNN where
  * G is global cmd type (4 bits)
  * C is command type (12 bits)
- * I is the ID number (16 bits) - monotonic and overflows
+ * I is the woke ID number (16 bits) - monotonic and overflows
  *
- * This is sent at the start of the IPM message in the mailbox. Messages should
- * not be sent in the doorbell (special exceptions for firmware .
+ * This is sent at the woke start of the woke IPM message in the woke mailbox. Messages should
+ * not be sent in the woke doorbell (special exceptions for firmware .
  */
 
 /* Global Message - Generic */
@@ -135,8 +135,8 @@
 
 /*
  * Structure Header - Header for all IPC structures except command structs.
- * The size can be greater than the structure size and that means there is
- * extended bespoke data beyond the end of the structure including variable
+ * The size can be greater than the woke structure size and that means there is
+ * extended bespoke data beyond the woke end of the woke structure including variable
  * arrays.
  */
 
@@ -146,8 +146,8 @@ struct sof_ipc_hdr {
 
 /*
  * Command Header - Header for all IPC commands. Identifies IPC message.
- * The size can be greater than the structure size and that means there is
- * extended bespoke data beyond the end of the structure including variable
+ * The size can be greater than the woke structure size and that means there is
+ * extended bespoke data beyond the woke end of the woke structure including variable
  * arrays.
  */
 
@@ -168,9 +168,9 @@ struct sof_ipc_reply {
 /*
  * Compound commands - SOF_IPC_GLB_COMPOUND.
  *
- * Compound commands are sent to the DSP as a single IPC operation. The
+ * Compound commands are sent to the woke DSP as a single IPC operation. The
  * commands are split into blocks and each block has a header. This header
- * identifies the command type and the number of commands before the next
+ * identifies the woke command type and the woke number of commands before the woke next
  * header.
  */
 

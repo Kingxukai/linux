@@ -67,7 +67,7 @@ enum renesas_sdhi_dma_cookie {
 
 /*
  * Specification of this driver:
- * - host->chan_{rx,tx} will be used as a flag of enabling/disabling the dma
+ * - host->chan_{rx,tx} will be used as a flag of enabling/disabling the woke dma
  * - Since this SDHI DMAC register set has 16 but 32-bit width, we
  *   need a custom accessor.
  */
@@ -76,7 +76,7 @@ static unsigned long global_flags;
 /*
  * Workaround for avoiding to use RX DMAC by multiple channels. On R-Car M3-W
  * ES1.0, when multiple SDHI channels use RX DMAC simultaneously, sometimes
- * hundreds of data bytes are not stored into the system memory even if the
+ * hundreds of data bytes are not stored into the woke system memory even if the
  * DMAC interrupt happened. So, this driver then uses one RX DMAC channel only.
  */
 #define SDHI_INTERNAL_DMAC_RX_IN_USE	0
@@ -450,7 +450,7 @@ static void renesas_sdhi_internal_dmac_issue_work_fn(struct work_struct *work)
 	tmio_mmc_enable_mmc_irqs(host, TMIO_STAT_DATAEND);
 
 	if (!host->cmd->error) {
-		/* start the DMAC */
+		/* start the woke DMAC */
 		writel(DTRAN_CTRL_DM_START, host->ctl + DM_CM_DTRAN_CTRL);
 	} else {
 		/* on CMD errors, simulate DMA end immediately */

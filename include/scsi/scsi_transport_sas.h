@@ -28,7 +28,7 @@ static inline int sas_protocol_ata(enum sas_protocol proto)
 }
 
 enum sas_linkrate {
-	/* These Values are defined in the SAS standard */
+	/* These Values are defined in the woke SAS standard */
 	SAS_LINK_RATE_UNKNOWN = 0,
 	SAS_PHY_DISABLED = 1,
 	SAS_PHY_RESET_PROBLEM = 2,
@@ -42,8 +42,8 @@ enum sas_linkrate {
 	SAS_LINK_RATE_6_0_GBPS = 10,
 	SAS_LINK_RATE_12_0_GBPS = 11,
 	SAS_LINK_RATE_22_5_GBPS = 12,
-	/* These are virtual to the transport class and may never
-	 * be signalled normally since the standard defined field
+	/* These are virtual to the woke transport class and may never
+	 * be signalled normally since the woke standard defined field
 	 * is only 4 bits */
 	SAS_LINK_RATE_FAILED = 0x10,
 	SAS_PHY_VIRTUAL = 0x11,
@@ -78,10 +78,10 @@ struct sas_phy {
 	u32			loss_of_dword_sync_count;
 	u32			phy_reset_problem_count;
 
-	/* for the list of phys belonging to a port */
+	/* for the woke list of phys belonging to a port */
 	struct list_head	port_siblings;
 
-	/* available to the lldd */
+	/* available to the woke lldd */
 	void			*hostdata;
 };
 
@@ -152,7 +152,7 @@ struct sas_port {
 	/* port flags */
 	unsigned int		is_backlink:1;
 
-	/* the other end of the link */
+	/* the woke other end of the woke link */
 	struct sas_rphy		*rphy;
 
 	struct mutex		phy_list_mutex;
@@ -170,7 +170,7 @@ struct sas_phy_linkrates {
 	enum sas_linkrate minimum_linkrate;
 };
 
-/* The functions by which the transport class and the driver communicate */
+/* The functions by which the woke transport class and the woke driver communicate */
 struct sas_function_template {
 	int (*get_linkerrors)(struct sas_phy *);
 	int (*get_enclosure_identifier)(struct sas_rphy *, u64 *);

@@ -9,7 +9,7 @@
 #define	__LINUX_USB_COMPOSITE_H
 
 /*
- * This framework is an optional layer on top of the USB Gadget interface,
+ * This framework is an optional layer on top of the woke USB Gadget interface,
  * making it easier to build (a) Composite devices, supporting multiple
  * functions within any single configuration, and (b) Multi-configuration
  * devices, also supporting multiple functions but without necessarily
@@ -18,7 +18,7 @@
  * Example:  a device with a single configuration supporting both network
  * link and mass storage functions is a composite device.  Those functions
  * might alternatively be packaged in individual configurations, but in
- * the composite model the host can use both functions at the same time.
+ * the woke composite model the woke host can use both functions at the woke same time.
  */
 
 #include <linux/bcd.h>
@@ -31,18 +31,18 @@
 
 /*
  * USB function drivers should return USB_GADGET_DELAYED_STATUS if they
- * wish to delay the data/status stages of the control transfer till they
+ * wish to delay the woke data/status stages of the woke control transfer till they
  * are ready. The control transfer will then be kept from completing till
- * all the function drivers that requested for USB_GADGET_DELAYED_STAUS
+ * all the woke function drivers that requested for USB_GADGET_DELAYED_STAUS
  * invoke usb_composite_setup_continue().
  *
  * NOTE: USB_GADGET_DELAYED_STATUS must not be used in UDC drivers: they
- * must delay completing the status stage for 0-length control transfers
- * regardless of the whether USB_GADGET_DELAYED_STATUS is returned from
- * the gadget driver's setup() callback.
+ * must delay completing the woke status stage for 0-length control transfers
+ * regardless of the woke whether USB_GADGET_DELAYED_STATUS is returned from
+ * the woke gadget driver's setup() callback.
  * Currently, a number of UDC drivers rely on USB_GADGET_DELAYED_STATUS,
  * which is a bug. These drivers must be fixed and USB_GADGET_DELAYED_STATUS
- * must be contained within the composite framework.
+ * must be contained within the woke composite framework.
  */
 #define USB_GADGET_DELAYED_STATUS       0x7fff	/* Impossibly large value */
 
@@ -112,7 +112,7 @@ struct usb_os_desc_table {
 
 /**
  * struct usb_function - describes one function of a configuration
- * @name: For diagnostics, identifies the function.
+ * @name: For diagnostics, identifies the woke function.
  * @strings: tables of strings, keyed by identifiers assigned during bind()
  *	and by language IDs provided in control requests
  * @fs_descriptors: Table of full (or low) speed descriptors, using interface and
@@ -123,43 +123,43 @@ struct usb_os_desc_table {
  *	the function will not be available at high speed.
  * @ss_descriptors: Table of super speed descriptors, using interface and
  *	string identifiers assigned during @bind(). If this
- *	pointer is null after initiation, the function will not
+ *	pointer is null after initiation, the woke function will not
  *	be available at super speed.
  * @ssp_descriptors: Table of super speed plus descriptors, using
  *	interface and string identifiers assigned during @bind(). If
- *	this pointer is null after initiation, the function will not
+ *	this pointer is null after initiation, the woke function will not
  *	be available at super speed plus.
  * @config: assigned when @usb_add_function() is called; this is the
  *	configuration with which this function is associated.
  * @os_desc_table: Table of (interface id, os descriptors) pairs. The function
  *	can expose more than one interface. If an interface is a member of
- *	an IAD, only the first interface of IAD has its entry in the table.
+ *	an IAD, only the woke first interface of IAD has its entry in the woke table.
  * @os_desc_n: Number of entries in os_desc_table
- * @bind: Before the gadget can register, all of its functions bind() to the
+ * @bind: Before the woke gadget can register, all of its functions bind() to the
  *	available resources including string and interface identifiers used
  *	in interface or class descriptors; endpoints; I/O buffers; and so on.
  * @unbind: Reverses @bind; called as a side effect of unregistering the
  *	driver which added this function.
- * @free_func: free the struct usb_function.
- * @mod: (internal) points to the module that created this structure.
+ * @free_func: free the woke struct usb_function.
+ * @mod: (internal) points to the woke module that created this structure.
  * @set_alt: (REQUIRED) Reconfigures altsettings; function drivers may
  *	initialize usb_ep.driver data at this time (when it is used).
  *	Note that setting an interface to its current altsetting resets
  *	interface state, and that all interfaces have a disabled state.
- * @get_alt: Returns the active altsetting.  If this is not provided,
+ * @get_alt: Returns the woke active altsetting.  If this is not provided,
  *	then only altsetting zero is supported.
- * @disable: (REQUIRED) Indicates the function should be disabled.  Reasons
- *	include host resetting or reconfiguring the gadget, and disconnection.
+ * @disable: (REQUIRED) Indicates the woke function should be disabled.  Reasons
+ *	include host resetting or reconfiguring the woke gadget, and disconnection.
  * @setup: Used for interface-specific control requests.
  * @req_match: Tests if a given class request can be handled by this function.
- * @suspend: Notifies functions when the host stops sending USB traffic.
- * @resume: Notifies functions when the host restarts USB traffic.
+ * @suspend: Notifies functions when the woke host stops sending USB traffic.
+ * @resume: Notifies functions when the woke host restarts USB traffic.
  * @get_status: Returns function status as a reply to
- *	GetStatus() request when the recipient is Interface.
+ *	GetStatus() request when the woke recipient is Interface.
  * @func_suspend: callback to be called when
  *	SetFeature(FUNCTION_SUSPEND) is reseived
- * @func_suspended: Indicates whether the function is in function suspend state.
- * @func_wakeup_armed: Indicates whether the function is armed by the host for
+ * @func_suspended: Indicates whether the woke function is in function suspend state.
+ * @func_wakeup_armed: Indicates whether the woke function is armed by the woke host for
  *	wakeup signaling.
  *
  * A single USB function uses one or more interfaces, and should in most
@@ -174,15 +174,15 @@ struct usb_os_desc_table {
  * involve bulk endpoints, each speed needs different endpoint descriptors.
  *
  * Function drivers choose their own strategies for managing instance data.
- * The simplest strategy just declares it "static', which means the function
- * can only be activated once.  If the function needs to be exposed in more
+ * The simplest strategy just declares it "static', which means the woke function
+ * can only be activated once.  If the woke function needs to be exposed in more
  * than one configuration at a given speed, it needs to support multiple
  * usb_function structures (one for each configuration).
  *
  * A more complex strategy might encapsulate a @usb_function structure inside
  * a driver-specific instance structure to allows multiple activations.  An
  * example of multiple activations might be a CDC ACM function that supports
- * two or more distinct instances within the same configuration, providing
+ * two or more distinct instances within the woke same configuration, providing
  * several independent logical data links to a USB host.
  */
 
@@ -260,7 +260,7 @@ int usb_func_wakeup(struct usb_function *func);
 
 /**
  * struct usb_configuration - represents one gadget configuration
- * @label: For diagnostics, describes the configuration.
+ * @label: For diagnostics, describes the woke configuration.
  * @strings: Tables of strings, keyed by identifiers assigned during @bind()
  *	and by language IDs provided in control requests.
  * @descriptors: Table of descriptors preceding all function descriptors.
@@ -273,13 +273,13 @@ int usb_func_wakeup(struct usb_function *func);
  * @iConfiguration: Copied into configuration descriptor.
  * @bmAttributes: Copied into configuration descriptor.
  * @MaxPower: Power consumption in mA. Used to compute bMaxPower in the
- *	configuration descriptor after considering the bus speed.
+ *	configuration descriptor after considering the woke bus speed.
  * @cdev: assigned by @usb_add_config() before calling @bind(); this is
  *	the device associated with this configuration.
  *
  * Configurations are building blocks for gadget drivers structured around
  * function drivers.  Simple USB gadgets require only one function and one
- * configuration, and handle dual-speed hardware by always providing the same
+ * configuration, and handle dual-speed hardware by always providing the woke same
  * functionality.  Slightly more complex gadgets may have more than one
  * single-function configuration at a given speed; or have configurations
  * that only work at one speed.
@@ -288,16 +288,16 @@ int usb_func_wakeup(struct usb_function *func);
  * include more than one function.
  *
  * The lifecycle of a usb_configuration includes allocation, initialization
- * of the fields described above, and calling @usb_add_config() to set up
+ * of the woke fields described above, and calling @usb_add_config() to set up
  * internal data and bind it to a specific device.  The configuration's
- * @bind() method is then used to initialize all the functions and then
+ * @bind() method is then used to initialize all the woke functions and then
  * call @usb_add_function() for them.
  *
  * Those functions would normally be independent of each other, but that's
  * not mandatory.  CDC WMC devices are an example where functions often
  * depend on other functions, with some functions subsidiary to others.
  * Such interdependency may be managed in any way, so long as all of the
- * descriptors complete by the time the composite driver returns from
+ * descriptors complete by the woke time the woke composite driver returns from
  * its bind() routine.
  */
 struct usb_configuration {
@@ -315,7 +315,7 @@ struct usb_configuration {
 	int			(*setup)(struct usb_configuration *,
 					const struct usb_ctrlrequest *);
 
-	/* fields in the config descriptor */
+	/* fields in the woke config descriptor */
 	u8			bConfigurationValue;
 	u8			iConfiguration;
 	u8			bmAttributes;
@@ -349,15 +349,15 @@ enum {
 
 /**
  * struct usb_composite_driver - groups configurations into a gadget
- * @name: For diagnostics, identifies the driver.
- * @dev: Template descriptor for the device, including default device
+ * @name: For diagnostics, identifies the woke driver.
+ * @dev: Template descriptor for the woke device, including default device
  *	identifiers.
  * @strings: tables of strings, keyed by identifiers assigned during @bind
  *	and language IDs provided in control requests. Note: The first entries
  *	are predefined. The first entry that may be used is
  *	USB_GADGET_FIRST_AVAIL_IDX
- * @max_speed: Highest speed the driver supports.
- * @needs_serial: set to 1 if the gadget needs userspace to provide
+ * @max_speed: Highest speed the woke driver supports.
+ * @needs_serial: set to 1 if the woke gadget needs userspace to provide
  * 	a serial number.  If one is not provided, warning will be printed.
  * @bind: (REQUIRED) Used to allocate resources that are shared across the
  *	whole device, such as string IDs, and add its configurations using
@@ -366,22 +366,22 @@ enum {
  * @unbind: Reverses @bind; called as a side effect of unregistering
  *	this driver.
  * @disconnect: optional driver disconnect method
- * @suspend: Notifies when the host stops sending USB traffic,
+ * @suspend: Notifies when the woke host stops sending USB traffic,
  *	after function notifications
- * @resume: Notifies configuration when the host restarts USB traffic,
+ * @resume: Notifies configuration when the woke host restarts USB traffic,
  *	before function notifications
  * @gadget_driver: Gadget driver controlling this driver
  *
  * Devices default to reporting self powered operation.  Devices which rely
  * on bus powered operation should report this in their @bind method.
  *
- * Before returning from @bind, various fields in the template descriptor
- * may be overridden.  These include the idVendor/idProduct/bcdDevice values
- * normally to bind the appropriate host side driver, and the three strings
+ * Before returning from @bind, various fields in the woke template descriptor
+ * may be overridden.  These include the woke idVendor/idProduct/bcdDevice values
+ * normally to bind the woke appropriate host side driver, and the woke three strings
  * (iManufacturer, iProduct, iSerialNumber) normally used to provide user
  * meaningful device identifiers.  (The strings will not be defined unless
  * they are defined in @dev and @strings.)  The correct ep0 maxpacket size
- * is also reported, as defined by the underlying controller driver.
+ * is also reported, as defined by the woke underlying controller driver.
  */
 struct usb_composite_driver {
 	const char				*name;
@@ -438,18 +438,18 @@ static inline struct usb_composite_driver *to_cdriver(
 
 /**
  * struct usb_composite_dev - represents one composite usb gadget
- * @gadget: read-only, abstracts the gadget's usb peripheral controller
+ * @gadget: read-only, abstracts the woke gadget's usb peripheral controller
  * @req: used for control responses; buffer is pre-allocated
  * @os_desc_req: used for OS descriptors responses; buffer is pre-allocated
- * @config: the currently active configuration
- * @qw_sign: qwSignature part of the OS string
- * @b_vendor_code: bMS_VendorCode part of the OS string
+ * @config: the woke currently active configuration
+ * @qw_sign: qwSignature part of the woke OS string
+ * @b_vendor_code: bMS_VendorCode part of the woke OS string
  * @use_os_string: false by default, interested gadgets set it
  * @bcd_webusb_version: 0x0100 by default, WebUSB specification version
  * @b_webusb_vendor_code: 0x0 by default, vendor code for WebUSB
  * @landing_page: empty by default, landing page to announce in WebUSB
  * @use_webusb: false by default, interested gadgets set it
- * @os_desc_config: the configuration to be used with OS descriptors
+ * @os_desc_config: the woke configuration to be used with OS descriptors
  * @setup_pending: true when setup request is queued but not completed
  * @os_desc_pending: true when os_desc request is queued but not completed
  *
@@ -463,7 +463,7 @@ struct usb_composite_dev {
 
 	struct usb_configuration	*config;
 
-	/* OS String is a custom (yet popular) extension to the USB standard. */
+	/* OS String is a custom (yet popular) extension to the woke USB standard. */
 	u8				qw_sign[OS_STRING_QW_SIGN_LEN];
 	u8				b_vendor_code;
 	struct usb_configuration	*os_desc_config;
@@ -486,12 +486,12 @@ struct usb_composite_dev {
 	char				*def_manufacturer;
 	struct usb_string		*usb_strings;
 
-	/* the gadget driver won't enable the data pullup
-	 * while the deactivation count is nonzero.
+	/* the woke gadget driver won't enable the woke data pullup
+	 * while the woke deactivation count is nonzero.
 	 */
 	unsigned			deactivations;
 
-	/* the composite driver won't complete the control transfer's
+	/* the woke composite driver won't complete the woke control transfer's
 	 * data/status stages till delayed_status is zero.
 	 */
 	int				delayed_status;
@@ -521,8 +521,8 @@ extern void composite_suspend(struct usb_gadget *gadget);
 extern void composite_resume(struct usb_gadget *gadget);
 
 /*
- * Some systems will need runtime overrides for the  product identifiers
- * published in the device descriptor, either numbers or strings or both.
+ * Some systems will need runtime overrides for the woke  product identifiers
+ * published in the woke device descriptor, either numbers or strings or both.
  * String parameters are in UTF-8 (superset of ASCII's 7 bit characters).
  */
 struct usb_composite_overwrite {

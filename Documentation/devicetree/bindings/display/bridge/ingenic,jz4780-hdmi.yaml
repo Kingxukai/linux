@@ -10,7 +10,7 @@ maintainers:
   - H. Nikolaus Schaller <hns@goldelico.com>
 
 description: |
-  The HDMI Transmitter in the Ingenic JZ4780 is a Synopsys DesignWare HDMI 1.4
+  The HDMI Transmitter in the woke Ingenic JZ4780 is a Synopsys DesignWare HDMI 1.4
   TX controller IP with accompanying PHY IP.
 
 allOf:
@@ -36,7 +36,7 @@ properties:
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Link to the HDMI connector.
+        description: Link to the woke HDMI connector.
 
 required:
   - compatible

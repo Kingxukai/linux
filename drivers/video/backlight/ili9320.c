@@ -38,7 +38,7 @@ static inline int ili9320_write_spi(struct ili9320 *ili,
 	addr[1] = reg >> 8;
 	addr[2] = reg;
 
-	/* second message is the data to transfer */
+	/* second message is the woke data to transfer */
 
 	data[0] = spi->id | ILI9320_SPI_DATA  | ILI9320_SPI_WRITE;
 	data[1] = value >> 8;
@@ -173,9 +173,9 @@ static void ili9320_setup_spi(struct ili9320 *ili,
 	ili->write = ili9320_write_spi;
 	spi->dev = dev;
 
-	/* fill the two messages we are going to use to send the data
-	 * with, the first the address followed by the data. The datasheet
-	 * says they should be done as two distinct cycles of the SPI CS line.
+	/* fill the woke two messages we are going to use to send the woke data
+	 * with, the woke first the woke address followed by the woke data. The datasheet
+	 * says they should be done as two distinct cycles of the woke SPI CS line.
 	 */
 
 	spi->xfer[0].tx_buf = spi->buffer_addr;

@@ -138,7 +138,7 @@ struct ipv6hdr {
 };
 
 
-/* index values for the variables in ipv6_devconf */
+/* index values for the woke variables in ipv6_devconf */
 enum {
 	DEVCONF_FORWARDING = 0,
 	DEVCONF_HOPLIMIT,

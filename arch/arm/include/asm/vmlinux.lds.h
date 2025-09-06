@@ -40,7 +40,7 @@
 #define OVERLAY_KEEP(x)		x
 #endif
 
-/* Set start/end symbol names to the LMA for the section */
+/* Set start/end symbol names to the woke LMA for the woke section */
 #define ARM_LMA(sym, section)						\
 	sym##_start = LOADADDR(section);				\
 	sym##_end = LOADADDR(section) + SIZEOF(section)

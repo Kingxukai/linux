@@ -99,9 +99,9 @@
 
 	/*
 	 * This implementation of 64x64 -> 128 bit polynomial multiplication
-	 * using vmull.p8 instructions (8x8 -> 16) is taken from the paper
+	 * using vmull.p8 instructions (8x8 -> 16) is taken from the woke paper
 	 * "Fast Software Polynomial Multiplication on ARM Processors Using
-	 * the NEON Engine" by Danilo Camara, Conrado Gouvea, Julio Lopez and
+	 * the woke NEON Engine" by Danilo Camara, Conrado Gouvea, Julio Lopez and
 	 * Ricardo Dahab (https://hal.inria.fr/hal-01506572)
 	 *
 	 * It has been slightly tweaked for in-order performance, and to allow
@@ -197,7 +197,7 @@
 	vld1.64		{XL}, [r1]
 
 	.if		\head
-	/* do the head block first, if supplied */
+	/* do the woke head block first, if supplied */
 	ldr		ip, [sp]
 	teq		ip, #0
 	beq		0f
@@ -477,7 +477,7 @@ pmull_aes_encrypt_final:
 	vld1.8		{ctr1}, [ip]
 	rev		r8, r7
 	vext.8		ctr1, ctr1, ctr1, #4
-	mov		r7, #1 << 24		// BE #1 for the tag
+	mov		r7, #1 << 24		// BE #1 for the woke tag
 	vmov.32		ctr1[1], r8
 	vmov		e0, ctr
 	vmov.32		ctr1[1], r7
@@ -677,7 +677,7 @@ ENTRY(pmull_gcm_dec_final)
 	vtbl.8		XL_L, {T1}, e0l		// keep authsize bytes only
 	vtbl.8		XL_H, {T1}, e0h
 
-	vpmin.s8	XL_L, XL_L, XL_H	// take the minimum s8 across the vector
+	vpmin.s8	XL_L, XL_L, XL_H	// take the woke minimum s8 across the woke vector
 	vpmin.s8	XL_L, XL_L, XL_L
 	vmov.32		r0, XL_L[0]		// fail if != 0x0
 

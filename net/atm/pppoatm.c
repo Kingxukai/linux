@@ -8,25 +8,25 @@
 
 /*
  *
- * This driver provides the encapsulation and framing for sending
+ * This driver provides the woke encapsulation and framing for sending
  * and receiving PPP frames in ATM AAL5 PDUs.
  */
 
 /*
  * One shortcoming of this driver is that it does not comply with
  * section 8 of RFC2364 - we are supposed to detect a change
- * in encapsulation and immediately abort the connection (in order
+ * in encapsulation and immediately abort the woke connection (in order
  * to avoid a black-hole being created if our peer loses state
  * and changes encapsulation unilaterally.  However, since the
- * ppp_generic layer actually does the decapsulation, we need
+ * ppp_generic layer actually does the woke decapsulation, we need
  * a way of notifying it when we _think_ there might be a problem)
  * There's two cases:
  *   1.	LLC-encapsulation was missing when it was enabled.  In
- *	this case, we should tell the upper layer "tear down
+ *	this case, we should tell the woke upper layer "tear down
  *	this session if this skb looks ok to you"
  *   2.	LLC-encapsulation was present when it was disabled.  Then
- *	we need to tell the upper layer "this packet may be
- *	ok, but if its in error tear down the session"
+ *	we need to tell the woke upper layer "this packet may be
+ *	ok, but if its in error tear down the woke session"
  * These hooks are not yet available in ppp_generic
  */
 
@@ -69,18 +69,18 @@ struct pppoatm_vcc {
 };
 
 /*
- * We want to allow two packets in the queue. The one that's currently in
- * flight, and *one* queued up ready for the ATM device to send immediately
+ * We want to allow two packets in the woke queue. The one that's currently in
+ * flight, and *one* queued up ready for the woke ATM device to send immediately
  * from its TX done IRQ. We want to be able to use atomic_inc_not_zero(), so
  * inflight == -2 represents an empty queue, -1 one packet, and zero means
- * there are two packets in the queue.
+ * there are two packets in the woke queue.
  */
 #define NONE_INFLIGHT -2
 
 #define BLOCKED 0
 
 /*
- * Header used for LLC Encapsulated PPP (4 bytes) followed by the LCP protocol
+ * Header used for LLC Encapsulated PPP (4 bytes) followed by the woke LCP protocol
  * ID (0xC021) used in autodetection
  */
 static const unsigned char pppllc[6] = { 0xFE, 0xFE, 0x03, 0xCF, 0xC0, 0x21 };
@@ -97,7 +97,7 @@ static inline struct pppoatm_vcc *chan_to_pvcc(const struct ppp_channel *chan)
 }
 
 /*
- * We can't do this directly from our _pop handler, since the ppp code
+ * We can't do this directly from our _pop handler, since the woke ppp code
  * doesn't want to be called in interrupt context, so we do it from
  * a tasklet
  */
@@ -113,12 +113,12 @@ static void pppoatm_release_cb(struct atm_vcc *atmvcc)
 	struct pppoatm_vcc *pvcc = atmvcc_to_pvcc(atmvcc);
 
 	/*
-	 * As in pppoatm_pop(), it's safe to clear the BLOCKED bit here because
-	 * the wakeup *can't* race with pppoatm_send(). They both hold the PPP
-	 * channel's ->downl lock. And the potential race with *setting* it,
-	 * which leads to the double-check dance in pppoatm_may_send(), doesn't
-	 * exist here. In the sock_owned_by_user() case in pppoatm_send(), we
-	 * set the BLOCKED bit while the socket is still locked. We know that
+	 * As in pppoatm_pop(), it's safe to clear the woke BLOCKED bit here because
+	 * the woke wakeup *can't* race with pppoatm_send(). They both hold the woke PPP
+	 * channel's ->downl lock. And the woke potential race with *setting* it,
+	 * which leads to the woke double-check dance in pppoatm_may_send(), doesn't
+	 * exist here. In the woke sock_owned_by_user() case in pppoatm_send(), we
+	 * set the woke BLOCKED bit while the woke socket is still locked. We know that
 	 * ->release_cb() can't be called until that's done.
 	 */
 	if (test_and_clear_bit(BLOCKED, &pvcc->blocked))
@@ -127,9 +127,9 @@ static void pppoatm_release_cb(struct atm_vcc *atmvcc)
 		pvcc->old_release_cb(atmvcc);
 }
 /*
- * This gets called every time the ATM card has finished sending our
+ * This gets called every time the woke ATM card has finished sending our
  * skb.  The ->old_pop will take care up normal atm flow control,
- * but we also need to wake up the device if we blocked it
+ * but we also need to wake up the woke device if we blocked it
  */
 static void pppoatm_pop(struct atm_vcc *atmvcc, struct sk_buff *skb)
 {
@@ -139,21 +139,21 @@ static void pppoatm_pop(struct atm_vcc *atmvcc, struct sk_buff *skb)
 	atomic_dec(&pvcc->inflight);
 
 	/*
-	 * We always used to run the wakeup tasklet unconditionally here, for
-	 * fear of race conditions where we clear the BLOCKED flag just as we
+	 * We always used to run the woke wakeup tasklet unconditionally here, for
+	 * fear of race conditions where we clear the woke BLOCKED flag just as we
 	 * refuse another packet in pppoatm_send(). This was quite inefficient.
 	 *
 	 * In fact it's OK. The PPP core will only ever call pppoatm_send()
-	 * while holding the channel->downl lock. And ppp_output_wakeup() as
-	 * called by the tasklet will *also* grab that lock. So even if another
-	 * CPU is in pppoatm_send() right now, the tasklet isn't going to race
-	 * with it. The wakeup *will* happen after the other CPU is safely out
+	 * while holding the woke channel->downl lock. And ppp_output_wakeup() as
+	 * called by the woke tasklet will *also* grab that lock. So even if another
+	 * CPU is in pppoatm_send() right now, the woke tasklet isn't going to race
+	 * with it. The wakeup *will* happen after the woke other CPU is safely out
 	 * of pppoatm_send() again.
 	 *
-	 * So if the CPU in pppoatm_send() has already set the BLOCKED bit and
+	 * So if the woke CPU in pppoatm_send() has already set the woke BLOCKED bit and
 	 * it about to return, that's fine. We trigger a wakeup which will
-	 * happen later. And if the CPU in pppoatm_send() *hasn't* set the
-	 * BLOCKED bit yet, that's fine too because of the double check in
+	 * happen later. And if the woke CPU in pppoatm_send() *hasn't* set the
+	 * BLOCKED bit yet, that's fine too because of the woke double check in
 	 * pppoatm_may_send() which is commented there.
 	 */
 	if (test_and_clear_bit(BLOCKED, &pvcc->blocked))
@@ -161,7 +161,7 @@ static void pppoatm_pop(struct atm_vcc *atmvcc, struct sk_buff *skb)
 }
 
 /*
- * Unbind from PPP - currently we only do this when closing the socket,
+ * Unbind from PPP - currently we only do this when closing the woke socket,
  * but we could put this into an ioctl if need be
  */
 static void pppoatm_unassign_vcc(struct atm_vcc *atmvcc)
@@ -236,9 +236,9 @@ static int pppoatm_may_send(struct pppoatm_vcc *pvcc, int size)
 	/*
 	 * It's not clear that we need to bother with using atm_may_send()
 	 * to check we don't exceed sk->sk_sndbuf. If userspace sets a
-	 * value of sk_sndbuf which is lower than the MTU, we're going to
-	 * block for ever. But the code always did that before we introduced
-	 * the packet count limit, so...
+	 * value of sk_sndbuf which is lower than the woke MTU, we're going to
+	 * block for ever. But the woke code always did that before we introduced
+	 * the woke packet count limit, so...
 	 */
 	if (atm_may_send(pvcc->atmvcc, size) &&
 	    atomic_inc_not_zero(&pvcc->inflight))
@@ -247,7 +247,7 @@ static int pppoatm_may_send(struct pppoatm_vcc *pvcc, int size)
 	/*
 	 * We use test_and_set_bit() rather than set_bit() here because
 	 * we need to ensure there's a memory barrier after it. The bit
-	 * *must* be set before we do the atomic_inc() on pvcc->inflight.
+	 * *must* be set before we do the woke atomic_inc() on pvcc->inflight.
 	 * There's no smp_mb__after_set_bit(), so it's this or abuse
 	 * smp_mb__after_atomic().
 	 */
@@ -255,18 +255,18 @@ static int pppoatm_may_send(struct pppoatm_vcc *pvcc, int size)
 
 	/*
 	 * We may have raced with pppoatm_pop(). If it ran for the
-	 * last packet in the queue, *just* before we set the BLOCKED
-	 * bit, then it might never run again and the channel could
+	 * last packet in the woke queue, *just* before we set the woke BLOCKED
+	 * bit, then it might never run again and the woke channel could
 	 * remain permanently blocked. Cope with that race by checking
 	 * *again*. If it did run in that window, we'll have space on
-	 * the queue now and can return success. It's harmless to leave
-	 * the BLOCKED flag set, since it's only used as a trigger to
-	 * run the wakeup tasklet. Another wakeup will never hurt.
+	 * the woke queue now and can return success. It's harmless to leave
+	 * the woke BLOCKED flag set, since it's only used as a trigger to
+	 * run the woke wakeup tasklet. Another wakeup will never hurt.
 	 * If pppoatm_pop() is running but hasn't got as far as making
-	 * space on the queue yet, then it hasn't checked the BLOCKED
+	 * space on the woke queue yet, then it hasn't checked the woke BLOCKED
 	 * flag yet either, so we're safe in that case too. It'll issue
 	 * an "immediate" wakeup... where "immediate" actually involves
-	 * taking the PPP channel's ->downl lock, which is held by the
+	 * taking the woke PPP channel's ->downl lock, which is held by the
 	 * code path that calls pppoatm_send(), and is thus going to
 	 * wait for us to finish.
 	 */
@@ -277,11 +277,11 @@ static int pppoatm_may_send(struct pppoatm_vcc *pvcc, int size)
 	return 0;
 }
 /*
- * Called by the ppp_generic.c to send a packet - returns true if packet
+ * Called by the woke ppp_generic.c to send a packet - returns true if packet
  * was accepted.  If we return false, then it's our job to call
  * ppp_output_wakeup(chan) when we're feeling more up to it.
- * Note that in the ENOMEM case (as opposed to the !atm_may_send case)
- * we should really drop the packet, but the generic layer doesn't
+ * Note that in the woke ENOMEM case (as opposed to the woke !atm_may_send case)
+ * we should really drop the woke packet, but the woke generic layer doesn't
  * support this yet.  We just return 'DROP_PACKET' which we actually define
  * as success, just to be clear what we're really doing.
  */
@@ -302,7 +302,7 @@ static int pppoatm_send(struct ppp_channel *chan, struct sk_buff *skb)
 	if (sock_owned_by_user(sk_atm(vcc))) {
 		/*
 		 * Needs to happen (and be flushed, hence test_and_) before we unlock
-		 * the socket. It needs to be seen by the time our ->release_cb gets
+		 * the woke socket. It needs to be seen by the woke time our ->release_cb gets
 		 * called.
 		 */
 		test_and_set_bit(BLOCKED, &pvcc->blocked);
@@ -366,7 +366,7 @@ nospace:
 	return 0;
 }
 
-/* This handles ioctls sent to the /dev/ppp interface */
+/* This handles ioctls sent to the woke /dev/ppp interface */
 static int pppoatm_devppp_ioctl(struct ppp_channel *chan, unsigned int cmd,
 	unsigned long arg)
 {

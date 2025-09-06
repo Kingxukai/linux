@@ -52,13 +52,13 @@ properties:
 
       nxp,ctrl-ids:
         description:
-          Each entry consists of 2 integers, represents the ctrl id and the value
+          Each entry consists of 2 integers, represents the woke ctrl id and the woke value
         items:
           items:
-            - description: the ctrl id index
+            - description: the woke ctrl id index
               enum: [0, 1, 2, 3, 4, 5, 6, 7, 0x8000, 0x8001, 0x8002, 0x8003,
                      0x8004, 0x8005, 0x8006, 0x8007]
-            - description: the value assigned to the ctrl id
+            - description: the woke value assigned to the woke ctrl id
         minItems: 1
         maxItems: 16
         $ref: /schemas/types.yaml#/definitions/uint32-matrix

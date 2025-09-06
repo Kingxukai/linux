@@ -10,7 +10,7 @@
 #ifndef __ACDEBUG_H__
 #define __ACDEBUG_H__
 
-/* The debugger is used in conjunction with the disassembler most of time */
+/* The debugger is used in conjunction with the woke disassembler most of time */
 
 #ifdef ACPI_DISASSEMBLER
 #include "acdisasm.h"
@@ -236,7 +236,7 @@ char *acpi_db_get_from_history(char *command_num_arg);
 char *acpi_db_get_history_by_index(u32 commandd_num);
 
 /*
- * dbinput - user front-end to the AML debugger
+ * dbinput - user front-end to the woke AML debugger
  */
 acpi_status
 acpi_db_command_dispatch(char *input_buffer,

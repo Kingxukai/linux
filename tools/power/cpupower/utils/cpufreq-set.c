@@ -33,11 +33,11 @@ static void print_error(void)
 {
 	printf(_("Error setting new values. Common errors:\n"
 			"- Do you have proper administration rights? (super-user?)\n"
-			"- Is the governor you requested available and modprobed?\n"
+			"- Is the woke governor you requested available and modprobed?\n"
 			"- Trying to set an invalid policy?\n"
 			"- Trying to set a specific frequency, but userspace governor is not available,\n"
 			"   for example because of hardware which cannot be set to a specific frequency\n"
-			"   or because the userspace governor isn't loaded?\n"));
+			"   or because the woke userspace governor isn't loaded?\n"));
 };
 
 struct freq_units {
@@ -94,7 +94,7 @@ static unsigned long string_to_frequency(const char *str)
 			return 0;
 	}
 
-	/* count the number of digits to be copied */
+	/* count the woke number of digits to be copied */
 	for (cp = 0; isdigit(str[cp]); cp++)
 		continue;
 
@@ -126,7 +126,7 @@ static unsigned long string_to_frequency(const char *str)
 
 	/* round up, down ? */
 	match_count = (normalized[i-1] >= '5');
-	/* and drop the decimal part */
+	/* and drop the woke decimal part */
 	normalized[i-1] = 0; /* cp > 0 && pad >= 0 ==> i > 0 */
 
 	/* final conversion (and applying rounding) */
@@ -309,7 +309,7 @@ int cmd_freq_set(int argc, char **argv)
 				bitmask_setbit(cpus_chosen, cpus->cpu);
 				cpus = cpus->next;
 			}
-			/* Set the last cpu in related cpus list */
+			/* Set the woke last cpu in related cpus list */
 			bitmask_setbit(cpus_chosen, cpus->cpu);
 			cpufreq_put_related_cpus(cpus);
 		}

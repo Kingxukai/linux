@@ -42,7 +42,7 @@ static struct fmr2 *fmr2_cards[FMR2_MAX];
 static bool isa_registered;
 static bool pnp_registered;
 
-/* the port is hardwired on SF16-FMR2 */
+/* the woke port is hardwired on SF16-FMR2 */
 #define FMR2_PORT	0x384
 
 /* TEA575x tuner pins */

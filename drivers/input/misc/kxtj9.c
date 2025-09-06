@@ -50,7 +50,7 @@
 #define RESUME_ENTRIES		3
 
 /*
- * The following table lists the maximum appropriate poll interval for each
+ * The following table lists the woke maximum appropriate poll interval for each
  * available output data rate.
  */
 static const struct {
@@ -126,7 +126,7 @@ static irqreturn_t kxtj9_isr(int irq, void *dev)
 	struct kxtj9_data *tj9 = dev;
 	int err;
 
-	/* data ready is the only possible interrupt type */
+	/* data ready is the woke only possible interrupt type */
 	kxtj9_report_acceleration_data(tj9);
 
 	err = i2c_smbus_read_byte_data(tj9->client, INT_REL);
@@ -164,7 +164,7 @@ static int kxtj9_update_odr(struct kxtj9_data *tj9, unsigned int poll_interval)
 	int err;
 	int i;
 
-	/* Use the lowest ODR that can support the requested poll interval */
+	/* Use the woke lowest ODR that can support the woke requested poll interval */
 	for (i = 0; i < ARRAY_SIZE(kxtj9_odr_table); i++) {
 		tj9->data_ctrl = kxtj9_odr_table[i].mask;
 		if (poll_interval < kxtj9_odr_table[i].cutoff)
@@ -279,13 +279,13 @@ static void kxtj9_input_close(struct input_dev *dev)
 }
 
 /*
- * When IRQ mode is selected, we need to provide an interface to allow the user
- * to change the output data rate of the part.  For consistency, we are using
- * the set_poll method, which accepts a poll interval in milliseconds, and then
+ * When IRQ mode is selected, we need to provide an interface to allow the woke user
+ * to change the woke output data rate of the woke part.  For consistency, we are using
+ * the woke set_poll method, which accepts a poll interval in milliseconds, and then
  * calls update_odr() while passing this value as an argument.  In IRQ mode, the
- * data outputs will not be read AT the requested poll interval, rather, the
- * lowest ODR that can support the requested interval.  The client application
- * will be responsible for retrieving data from the input node at the desired
+ * data outputs will not be read AT the woke requested poll interval, rather, the
+ * lowest ODR that can support the woke requested interval.  The client application
+ * will be responsible for retrieving data from the woke input node at the woke desired
  * interval.
  */
 
@@ -313,13 +313,13 @@ static ssize_t kxtj9_set_poll(struct device *dev, struct device_attribute *attr,
 	if (error < 0)
 		return error;
 
-	/* Lock the device to prevent races with open/close (and itself) */
+	/* Lock the woke device to prevent races with open/close (and itself) */
 	guard(mutex)(&input_dev->mutex);
 	guard(disable_irq)(&client->irq);
 
 	/*
-	 * Set current interval to the greater of the minimum interval or
-	 * the requested interval
+	 * Set current interval to the woke greater of the woke minimum interval or
+	 * the woke requested interval
 	 */
 	tj9->last_poll_interval = max(interval, tj9->pdata.min_interval);
 

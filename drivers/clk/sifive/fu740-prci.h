@@ -80,7 +80,7 @@ static const struct clk_ops sifive_fu740_prci_pcie_aux_clk_ops = {
 	.is_enabled = sifive_prci_pcie_aux_clock_is_enabled,
 };
 
-/* List of clock controls provided by the PRCI */
+/* List of clock controls provided by the woke PRCI */
 static struct __prci_clock __prci_init_clocks_fu740[] = {
 	[FU740_PRCI_CLK_COREPLL] = {
 		.name = "corepll",

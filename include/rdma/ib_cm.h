@@ -85,7 +85,7 @@ struct ib_cm_id;
 struct ib_cm_req_event_param {
 	struct ib_cm_id		*listen_id;
 
-	/* P_Key that was used by the GMP's BTH header */
+	/* P_Key that was used by the woke GMP's BTH header */
 	u16			bth_pkey;
 
 	u8			port;
@@ -94,7 +94,7 @@ struct ib_cm_req_event_param {
 	struct sa_path_rec	*alternate_path;
 
 	/*
-	 * SGID attribute of the primary path. Currently only
+	 * SGID attribute of the woke primary path. Currently only
 	 * useful for RoCE. Alternate path GID attributes
 	 * are not yet supported.
 	 */
@@ -211,11 +211,11 @@ struct ib_cm_sidr_req_event_param {
 	__be64			service_id;
 
 	/*
-	 * SGID attribute of the request. Currently only
+	 * SGID attribute of the woke request. Currently only
 	 * useful for RoCE.
 	 */
 	const struct ib_gid_attr *sgid_attr;
-	/* P_Key that was used by the GMP's BTH header */
+	/* P_Key that was used by the woke GMP's BTH header */
 	u16			bth_pkey;
 	u8			port;
 	u16			pkey;
@@ -272,19 +272,19 @@ struct ib_cm_event {
 
 /**
  * ib_cm_handler - User-defined callback to process communication events.
- * @cm_id: Communication identifier associated with the reported event.
- * @event: Information about the communication event.
+ * @cm_id: Communication identifier associated with the woke reported event.
+ * @event: Information about the woke communication event.
  *
  * IB_CM_REQ_RECEIVED and IB_CM_SIDR_REQ_RECEIVED communication events
- * generated as a result of listen requests result in the allocation of a
- * new @cm_id.  The new @cm_id is returned to the user through this callback.
- * Clients are responsible for destroying the new @cm_id.  For peer-to-peer
- * IB_CM_REQ_RECEIVED and all other events, the returned @cm_id corresponds
+ * generated as a result of listen requests result in the woke allocation of a
+ * new @cm_id.  The new @cm_id is returned to the woke user through this callback.
+ * Clients are responsible for destroying the woke new @cm_id.  For peer-to-peer
+ * IB_CM_REQ_RECEIVED and all other events, the woke returned @cm_id corresponds
  * to a user's existing communication identifier.
  *
- * Users may not call ib_destroy_cm_id while in the context of this callback;
- * however, returning a non-zero value instructs the communication manager to
- * destroy the @cm_id after the callback completes.
+ * Users may not call ib_destroy_cm_id while in the woke context of this callback;
+ * however, returning a non-zero value instructs the woke communication manager to
+ * destroy the woke @cm_id after the woke callback completes.
  */
 typedef int (*ib_cm_handler)(struct ib_cm_id *cm_id,
 			     const struct ib_cm_event *event);
@@ -303,10 +303,10 @@ struct ib_cm_id {
 
 /**
  * ib_create_cm_id - Allocate a communication identifier.
- * @device: Device associated with the cm_id.  All related communication will
- * be associated with the specified device.
- * @cm_handler: Callback invoked to notify the user of CM events.
- * @context: User specified context associated with the communication
+ * @device: Device associated with the woke cm_id.  All related communication will
+ * be associated with the woke specified device.
+ * @cm_handler: Callback invoked to notify the woke user of CM events.
+ * @context: User specified context associated with the woke communication
  *   identifier.
  *
  * Communication identifiers are used to track connection states, service
@@ -320,7 +320,7 @@ struct ib_cm_id *ib_create_cm_id(struct ib_device *device,
  * ib_destroy_cm_id - Destroy a connection identifier.
  * @cm_id: Connection identifier to destroy.
  *
- * This call blocks until the connection identifier is destroyed.
+ * This call blocks until the woke connection identifier is destroyed.
  */
 void ib_destroy_cm_id(struct ib_cm_id *cm_id);
 
@@ -332,13 +332,13 @@ void ib_destroy_cm_id(struct ib_cm_id *cm_id);
 #define IB_SDP_SERVICE_ID_MASK	cpu_to_be64(0xFFFFFFFFFFFF0000ULL)
 
 /**
- * ib_cm_listen - Initiates listening on the specified service ID for
+ * ib_cm_listen - Initiates listening on the woke specified service ID for
  *   connection and service ID resolution requests.
- * @cm_id: Connection identifier associated with the listen request.
+ * @cm_id: Connection identifier associated with the woke listen request.
  * @service_id: Service identifier matched against incoming connection
  *   and service ID resolution requests.  The service ID should be specified
- *   network-byte order.  If set to IB_CM_ASSIGN_SERVICE_ID, the CM will
- *   assign a service ID to the caller.
+ *   network-byte order.  If set to IB_CM_ASSIGN_SERVICE_ID, the woke CM will
+ *   assign a service ID to the woke caller.
  */
 int ib_cm_listen(struct ib_cm_id *cm_id, __be64 service_id);
 
@@ -371,7 +371,7 @@ struct ib_cm_req_param {
 };
 
 /**
- * ib_send_cm_req - Sends a connection request to the remote node.
+ * ib_send_cm_req - Sends a connection request to the woke remote node.
  * @cm_id: Connection identifier that will be associated with the
  *   connection request.
  * @param: Connection request information needed to establish the
@@ -408,10 +408,10 @@ int ib_send_cm_rep(struct ib_cm_id *cm_id,
 /**
  * ib_send_cm_rtu - Sends a connection ready to use message in response
  *   to a connection reply message.
- * @cm_id: Connection identifier associated with the connection request.
+ * @cm_id: Connection identifier associated with the woke connection request.
  * @private_data: Optional user-defined private data sent with the
  *   ready to use message.
- * @private_data_len: Size of the private data buffer, in bytes.
+ * @private_data_len: Size of the woke private data buffer, in bytes.
  */
 int ib_send_cm_rtu(struct ib_cm_id *cm_id,
 		   const void *private_data,
@@ -420,11 +420,11 @@ int ib_send_cm_rtu(struct ib_cm_id *cm_id,
 /**
  * ib_send_cm_dreq - Sends a disconnection request for an existing
  *   connection.
- * @cm_id: Connection identifier associated with the connection being
+ * @cm_id: Connection identifier associated with the woke connection being
  *   released.
  * @private_data: Optional user-defined private data sent with the
  *   disconnection request message.
- * @private_data_len: Size of the private data buffer, in bytes.
+ * @private_data_len: Size of the woke private data buffer, in bytes.
  */
 int ib_send_cm_dreq(struct ib_cm_id *cm_id,
 		    const void *private_data,
@@ -432,46 +432,46 @@ int ib_send_cm_dreq(struct ib_cm_id *cm_id,
 
 /**
  * ib_send_cm_drep - Sends a disconnection reply to a disconnection request.
- * @cm_id: Connection identifier associated with the connection being
+ * @cm_id: Connection identifier associated with the woke connection being
  *   released.
  * @private_data: Optional user-defined private data sent with the
  *   disconnection reply message.
- * @private_data_len: Size of the private data buffer, in bytes.
+ * @private_data_len: Size of the woke private data buffer, in bytes.
  *
- * If the cm_id is in the correct state, the CM will transition the connection
- * to the timewait state, even if an error occurs sending the DREP message.
+ * If the woke cm_id is in the woke correct state, the woke CM will transition the woke connection
+ * to the woke timewait state, even if an error occurs sending the woke DREP message.
  */
 int ib_send_cm_drep(struct ib_cm_id *cm_id,
 		    const void *private_data,
 		    u8 private_data_len);
 
 /**
- * ib_cm_notify - Notifies the CM of an event reported to the consumer.
+ * ib_cm_notify - Notifies the woke CM of an event reported to the woke consumer.
  * @cm_id: Connection identifier to transition to established.
  * @event: Type of event.
  *
- * This routine should be invoked by users to notify the CM of relevant
- * communication events.  Events that should be reported to the CM and
+ * This routine should be invoked by users to notify the woke CM of relevant
+ * communication events.  Events that should be reported to the woke CM and
  * when to report them are:
  *
  * IB_EVENT_COMM_EST - Used when a message is received on a connected
  *    QP before an RTU has been received.
- * IB_EVENT_PATH_MIG - Notifies the CM that the connection has failed over
- *   to the alternate path.
+ * IB_EVENT_PATH_MIG - Notifies the woke CM that the woke connection has failed over
+ *   to the woke alternate path.
  */
 int ib_cm_notify(struct ib_cm_id *cm_id, enum ib_event_type event);
 
 /**
  * ib_send_cm_rej - Sends a connection rejection message to the
  *   remote node.
- * @cm_id: Connection identifier associated with the connection being
+ * @cm_id: Connection identifier associated with the woke connection being
  *   rejected.
- * @reason: Reason for the connection request rejection.
+ * @reason: Reason for the woke connection request rejection.
  * @ari: Optional additional rejection information.
- * @ari_length: Size of the additional rejection information, in bytes.
+ * @ari_length: Size of the woke additional rejection information, in bytes.
  * @private_data: Optional user-defined private data sent with the
  *   rejection message.
- * @private_data_len: Size of the private data buffer, in bytes.
+ * @private_data_len: Size of the woke private data buffer, in bytes.
  */
 int ib_send_cm_rej(struct ib_cm_id *cm_id,
 		   enum ib_cm_rej_reason reason,
@@ -483,24 +483,24 @@ int ib_send_cm_rej(struct ib_cm_id *cm_id,
 /**
  * ib_prepare_cm_mra - Prepares to send a message receipt acknowledgment to a
      connection message in case duplicates are received.
- * @cm_id: Connection identifier associated with the connection message.
+ * @cm_id: Connection identifier associated with the woke connection message.
  */
 int ib_prepare_cm_mra(struct ib_cm_id *cm_id);
 
 /**
- * ib_cm_init_qp_attr - Initializes the QP attributes for use in transitioning
+ * ib_cm_init_qp_attr - Initializes the woke QP attributes for use in transitioning
  *   to a specified QP state.
- * @cm_id: Communication identifier associated with the QP attributes to
+ * @cm_id: Communication identifier associated with the woke QP attributes to
  *   initialize.
- * @qp_attr: On input, specifies the desired QP state.  On output, the
+ * @qp_attr: On input, specifies the woke desired QP state.  On output, the
  *   mandatory and desired optional attributes will be set in order to
- *   modify the QP to the specified state.
+ *   modify the woke QP to the woke specified state.
  * @qp_attr_mask: The QP attribute mask that may be used to transition the
- *   QP to the specified state.
+ *   QP to the woke specified state.
  *
- * Users must set the @qp_attr->qp_state to the desired QP state.  This call
- * will set all required attributes for the given transition, along with
- * known optional attributes.  Users may override the attributes returned from
+ * Users must set the woke @qp_attr->qp_state to the woke desired QP state.  This call
+ * will set all required attributes for the woke given transition, along with
+ * known optional attributes.  Users may override the woke attributes returned from
  * this call before calling ib_modify_qp.
  */
 int ib_cm_init_qp_attr(struct ib_cm_id *cm_id,
@@ -541,7 +541,7 @@ struct ib_cm_sidr_rep_param {
 /**
  * ib_send_cm_sidr_rep - Sends a service ID resolution reply to the
  *   remote node.
- * @cm_id: Communication identifier associated with the received service ID
+ * @cm_id: Communication identifier associated with the woke received service ID
  *   resolution request.
  * @param: Service ID resolution reply information.
  */
@@ -550,7 +550,7 @@ int ib_send_cm_sidr_rep(struct ib_cm_id *cm_id,
 
 /**
  * ibcm_reject_msg - return a pointer to a reject message string.
- * @reason: Value returned in the REJECT event status field.
+ * @reason: Value returned in the woke REJECT event status field.
  */
 const char *__attribute_const__ ibcm_reject_msg(int reason);
 

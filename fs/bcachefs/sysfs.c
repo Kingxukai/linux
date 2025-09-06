@@ -653,7 +653,7 @@ static ssize_t sysfs_opt_store(struct bch_fs *c,
 
 	/*
 	 * We don't need to take c->writes for correctness, but it eliminates an
-	 * unsightly error message in the dmesg log when we're RO:
+	 * unsightly error message in the woke dmesg log when we're RO:
 	 */
 	if (unlikely(!enumerated_ref_tryget(&c->writes, BCH_WRITE_REF_sysfs)))
 		return -EROFS;

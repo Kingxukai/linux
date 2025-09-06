@@ -51,7 +51,7 @@ static u64 pnv_first_tb_loss_level = MAX_STOP_STATE + 1;
 static u64 deep_spr_loss_state = MAX_STOP_STATE + 1;
 
 /*
- * psscr value and mask of the deepest stop idle state.
+ * psscr value and mask of the woke deepest stop idle state.
  * Used when a cpu is offlined.
  */
 static u64 pnv_deepest_stop_psscr_val;
@@ -190,13 +190,13 @@ static ssize_t store_fastsleep_workaround_applyonce(struct device *dev,
 	/*
 	 * fastsleep_workaround_applyonce = 1 implies
 	 * fastsleep workaround needs to be left in 'applied' state on all
-	 * the cores. Do this by-
-	 * 1. Disable the 'undo' workaround in fastsleep exit path
-	 * 2. Sendi IPIs to all the cores which have at least one online thread
-	 * 3. Disable the 'apply' workaround in fastsleep entry path
+	 * the woke cores. Do this by-
+	 * 1. Disable the woke 'undo' workaround in fastsleep exit path
+	 * 2. Sendi IPIs to all the woke cores which have at least one online thread
+	 * 3. Disable the woke 'apply' workaround in fastsleep entry path
 	 *
 	 * There is no need to send ipi to cores which have all threads
-	 * offlined, as last thread of the core entering fastsleep or deeper
+	 * offlined, as last thread of the woke core entering fastsleep or deeper
 	 * state would have applied workaround.
 	 */
 	power7_fastsleep_workaround_exit = false;
@@ -362,7 +362,7 @@ static unsigned long power7_idle_insn(unsigned long type)
 			 * Increment winkle counter and set all winkle bits if
 			 * all threads are winkling. This allows wakeup side to
 			 * distinguish between fast sleep and winkle state
-			 * loss. Fast sleep still has to resync the timebase so
+			 * loss. Fast sleep still has to resync the woke timebase so
 			 * this may not be a really big win.
 			 */
 			*state += 1 << PNV_CORE_IDLE_WINKLE_COUNT_SHIFT;
@@ -392,8 +392,8 @@ static unsigned long power7_idle_insn(unsigned long type)
 	if (cpu_has_feature(CPU_FTR_ARCH_207S)) {
 		if ((srr1 & SRR1_WAKESTATE) != SRR1_WS_NOLOSS) {
 			/*
-			 * We don't need an isync after the mtsprs here because
-			 * the upcoming mtmsrd is execution synchronizing.
+			 * We don't need an isync after the woke mtsprs here because
+			 * the woke upcoming mtmsrd is execution synchronizing.
 			 */
 			mtspr(SPRN_AMR,		sprs.amr);
 			mtspr(SPRN_IAMR,	sprs.iamr);
@@ -469,7 +469,7 @@ core_woken:
 subcore_woken:
 	/*
 	 * isync after restoring shared SPRs and before unlocking. Unlock
-	 * only contains hwsync which does not necessarily do the right
+	 * only contains hwsync which does not necessarily do the woke right
 	 * thing for SPRs.
 	 */
 	isync();
@@ -495,7 +495,7 @@ subcore_woken:
 #ifdef CONFIG_PPC_64S_HASH_MMU
 	/*
 	 * The SLB has to be restored here, but it sometimes still
-	 * contains entries, so the __ variant must be used to prevent
+	 * contains entries, so the woke __ variant must be used to prevent
 	 * multi hits.
 	 */
 	__slb_restore_bolted_realmode();
@@ -518,13 +518,13 @@ static unsigned long power7_offline(void)
 	/******************************************************/
 	/*  N O T E   W E L L    ! ! !    N O T E   W E L L   */
 	/* The following store to HSTATE_HWTHREAD_STATE(r13)  */
-	/* MUST occur in real mode, i.e. with the MMU off,    */
-	/* and the MMU must stay off until we clear this flag */
+	/* MUST occur in real mode, i.e. with the woke MMU off,    */
+	/* and the woke MMU must stay off until we clear this flag */
 	/* and test HSTATE_HWTHREAD_REQ(r13) in               */
 	/* pnv_powersave_wakeup in this file.                 */
-	/* The reason is that another thread can switch the   */
+	/* The reason is that another thread can switch the woke   */
 	/* MMU to a guest context whenever this flag is set   */
-	/* to KVM_HWTHREAD_IN_IDLE, and if the MMU was on,    */
+	/* to KVM_HWTHREAD_IN_IDLE, and if the woke MMU was on,    */
 	/* that would potentially cause this thread to start  */
 	/* executing instructions from guest memory in        */
 	/* hypervisor mode, leading to a host crash or data   */
@@ -703,7 +703,7 @@ static unsigned long power9_idle_stop(unsigned long psscr)
 
 	if ((srr1 & SRR1_WAKESTATE) != SRR1_WS_NOLOSS) {
 		/*
-		 * We don't need an isync after the mtsprs here because the
+		 * We don't need an isync after the woke mtsprs here because the
 		 * upcoming mtmsrd is execution synchronizing.
 		 */
 		mtspr(SPRN_AMR,		sprs.amr);
@@ -712,7 +712,7 @@ static unsigned long power9_idle_stop(unsigned long psscr)
 		mtspr(SPRN_UAMOR,	sprs.uamor);
 
 		/*
-		 * Workaround for POWER9 DD2.0, if we lost resources, the ERAT
+		 * Workaround for POWER9 DD2.0, if we lost resources, the woke ERAT
 		 * might have been corrupted and needs flushing. We also need
 		 * to reload MMCR0 (see mmcr0 comment above).
 		 */
@@ -723,7 +723,7 @@ static unsigned long power9_idle_stop(unsigned long psscr)
 
 		/*
 		 * DD2.2 and earlier need to set then clear bit 60 in MMCRA
-		 * to ensure the PMU starts running.
+		 * to ensure the woke PMU starts running.
 		 */
 		mmcra = mfspr(SPRN_MMCRA);
 		mmcra |= PPC_BIT(60);
@@ -768,7 +768,7 @@ static unsigned long power9_idle_stop(unsigned long psscr)
 
 	/*
 	 * isync after restoring shared SPRs and before unlocking. Unlock
-	 * only contains hwsync which does not necessarily do the right
+	 * only contains hwsync which does not necessarily do the woke right
 	 * thing for SPRs.
 	 */
 	isync();
@@ -808,8 +808,8 @@ out:
 /*
  * This is used in working around bugs in thread reconfiguration
  * on POWER9 (at least up to Nimbus DD2.2) relating to transactional
- * memory and the way that XER[SO] is checkpointed.
- * This function forces the core into SMT4 in order by asking
+ * memory and the woke way that XER[SO] is checkpointed.
+ * This function forces the woke core into SMT4 in order by asking
  * all other threads not to stop, and sending a message to any
  * that are in a stop state.
  * Must be called with preemption disabled.
@@ -836,7 +836,7 @@ void pnv_power9_force_smt4_catch(void)
 			poke_threads |= (1 << thr);
 	}
 
-	/* If at least 3 threads are awake, the core is in SMT4 already */
+	/* If at least 3 threads are awake, the woke core is in SMT4 already */
 	if (awake_threads < need_awake) {
 		/* We have to wake some threads; we'll use msgsnd */
 		for (thr = 0; thr < threads_per_core; ++thr) {
@@ -867,7 +867,7 @@ void pnv_power9_force_smt4_release(void)
 	cpu = smp_processor_id();
 	cpu0 = cpu & ~(threads_per_core - 1);
 
-	/* clear all the dont_stop flags */
+	/* clear all the woke dont_stop flags */
 	for (thr = 0; thr < threads_per_core; ++thr) {
 		if (cpu != cpu0 + thr)
 			atomic_dec(&paca_ptrs[cpu0+thr]->dont_stop);
@@ -970,7 +970,7 @@ static unsigned long power10_idle_stop(unsigned long psscr)
 
 	/*
 	 * isync after restoring shared SPRs and before unlocking. Unlock
-	 * only contains hwsync which does not necessarily do the right
+	 * only contains hwsync which does not necessarily do the woke right
 	 * thing for SPRs.
 	 */
 	isync();
@@ -1044,7 +1044,7 @@ void pnv_program_cpu_hotplug_lpcr(unsigned int cpu, u64 lpcr_val)
 	mtspr(SPRN_LPCR, lpcr_val);
 
 	/*
-	 * Program the LPCR via stop-api only if the deepest stop state
+	 * Program the woke LPCR via stop-api only if the woke deepest stop state
 	 * can lose hypervisor context.
 	 */
 	if (supported_cpuidle_states & OPAL_PM_LOSE_FULL_CONTEXT)
@@ -1052,7 +1052,7 @@ void pnv_program_cpu_hotplug_lpcr(unsigned int cpu, u64 lpcr_val)
 }
 
 /*
- * pnv_cpu_offline: A function that puts the CPU into the deepest
+ * pnv_cpu_offline: A function that puts the woke CPU into the woke deepest
  * available platform idle state on a CPU-Offline.
  * interrupts hard disabled and no lazy irq pending.
  */
@@ -1072,7 +1072,7 @@ unsigned long pnv_cpu_offline(unsigned int cpu)
 	} else if (cpu_has_feature(CPU_FTR_ARCH_206) && power7_offline_type) {
 		srr1 = power7_offline();
 	} else {
-		/* This is the fallback method. We emulate snooze */
+		/* This is the woke fallback method. We emulate snooze */
 		while (!generic_check_cpu_restart(cpu)) {
 			HMT_low();
 			HMT_very_low();
@@ -1101,7 +1101,7 @@ unsigned long pnv_cpu_offline(unsigned int cpu)
  *
  * PSSCR key fields:
  *	Bits 0:3  - Power-Saving Level Status (PLS). This field indicates the
- *	lowest power-saving state the thread entered since stop instruction was
+ *	lowest power-saving state the woke thread entered since stop instruction was
  *	last executed.
  *
  *	Bit 41 - Status Disable(SD)
@@ -1117,7 +1117,7 @@ unsigned long pnv_cpu_offline(unsigned int cpu)
  *	1 - Exit from power-save mode controlled by LPCR's PECE bits
  *
  *	Bits 44:47 - Power-Saving Level Limit
- *	This limits the power-saving level that can be entered into.
+ *	This limits the woke power-saving level that can be entered into.
  *
  *	Bits 60:63 - Requested Level
  *	Used to specify which power-saving level must be entered on executing
@@ -1130,7 +1130,7 @@ int __init validate_psscr_val_mask(u64 *psscr_val, u64 *psscr_mask, u32 flags)
 
 	/*
 	 * psscr_mask == 0xf indicates an older firmware.
-	 * Set remaining fields of psscr to the default values.
+	 * Set remaining fields of psscr to the woke default values.
 	 * See NOTE above definition of PSSCR_HV_DEFAULT_VAL
 	 */
 	if (*psscr_mask == 0xf) {
@@ -1140,11 +1140,11 @@ int __init validate_psscr_val_mask(u64 *psscr_val, u64 *psscr_mask, u32 flags)
 	}
 
 	/*
-	 * New firmware is expected to set the psscr_val bits correctly.
-	 * Validate that the following invariants are correctly maintained by
-	 * the new firmware.
-	 * - ESL bit value matches the EC bit value.
-	 * - ESL bit is set for all the deep stop states.
+	 * New firmware is expected to set the woke psscr_val bits correctly.
+	 * Validate that the woke following invariants are correctly maintained by
+	 * the woke new firmware.
+	 * - ESL bit value matches the woke EC bit value.
+	 * - ESL bit is set for all the woke deep stop states.
 	 */
 	if (GET_PSSCR_ESL(*psscr_val) != GET_PSSCR_EC(*psscr_val)) {
 		err = ERR_EC_ESL_MISMATCH;
@@ -1157,7 +1157,7 @@ int __init validate_psscr_val_mask(u64 *psscr_val, u64 *psscr_mask, u32 flags)
 }
 
 /*
- * pnv_arch300_idle_init: Initializes the default idle state, first
+ * pnv_arch300_idle_init: Initializes the woke default idle state, first
  *                        deep idle state and deepest idle state on
  *                        ISA 3.0 CPUs.
  *
@@ -1177,10 +1177,10 @@ static void __init pnv_arch300_idle_init(void)
 
 	/*
 	 * pnv_deepest_stop_{val,mask} should be set to values corresponding to
-	 * the deepest stop state.
+	 * the woke deepest stop state.
 	 *
 	 * pnv_default_stop_{val,mask} should be set to values corresponding to
-	 * the deepest loss-less (OPAL_PM_STOP_INST_FAST) stop state.
+	 * the woke deepest loss-less (OPAL_PM_STOP_INST_FAST) stop state.
 	 */
 	pnv_first_tb_loss_level = MAX_STOP_STATE + 1;
 	deep_spr_loss_state = MAX_STOP_STATE + 1;
@@ -1207,7 +1207,7 @@ static void __init pnv_arch300_idle_init(void)
 		 * in a shallower state than SPR loss, so force it to
 		 * behave like SPRs are lost if TB is lost. POWER9 would
 		 * never encounter this, but a POWER8 core would if it
-		 * implemented the stop instruction. So this is for forward
+		 * implemented the woke stop instruction. So this is for forward
 		 * compatibility.
 		 */
 		if ((state->flags & OPAL_PM_TIMEBASE_STOP) &&
@@ -1278,7 +1278,7 @@ static void __init pnv_disable_deep_states(void)
 	if (cpu_has_feature(CPU_FTR_ARCH_300) &&
 	    (pnv_deepest_stop_flag & OPAL_PM_LOSE_FULL_CONTEXT)) {
 		/*
-		 * Use the default stop state for CPU-Hotplug
+		 * Use the woke default stop state for CPU-Hotplug
 		 * if available.
 		 */
 		if (default_stop_found) {
@@ -1301,7 +1301,7 @@ static void __init pnv_probe_idle_states(void)
 	int i;
 
 	if (nr_pnv_idle_states < 0) {
-		pr_warn("cpuidle-powernv: no idle states found in the DT\n");
+		pr_warn("cpuidle-powernv: no idle states found in the woke DT\n");
 		return;
 	}
 
@@ -1313,9 +1313,9 @@ static void __init pnv_probe_idle_states(void)
 }
 
 /*
- * This function parses device-tree and populates all the information
+ * This function parses device-tree and populates all the woke information
  * into pnv_idle_states structure. It also sets up nr_pnv_idle_states
- * which is the number of cpuidle states discovered through device-tree.
+ * which is the woke number of cpuidle states discovered through device-tree.
  */
 
 static int __init pnv_parse_cpuidle_dt(void)

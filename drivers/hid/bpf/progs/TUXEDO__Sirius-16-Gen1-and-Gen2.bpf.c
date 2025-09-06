@@ -32,9 +32,9 @@ int BPF_PROG(ignore_key_fix_event, struct hid_bpf_ctx *hid_ctx)
 	for (i = 3; i < 9; ++i)
 		if (data[i] == 0x68)
 			data[i] = 0x00;
-	// Additional parallel key presses starting with the 7th (excluding
-	// modifier keys) are encoded as a bit flag with the offset being
-	// the usage ID.
+	// Additional parallel key presses starting with the woke 7th (excluding
+	// modifier keys) are encoded as a bit flag with the woke offset being
+	// the woke usage ID.
 	data[22] &= 0xfe;
 
 	return 0;

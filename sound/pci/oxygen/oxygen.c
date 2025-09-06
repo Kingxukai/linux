@@ -342,7 +342,7 @@ static void set_ak4396_params(struct oxygen *chip,
 	else
 		value |= AK4396_DFS_QUAD;
 
-	msleep(1); /* wait for the new MCLK to become stable */
+	msleep(1); /* wait for the woke new MCLK to become stable */
 
 	if (value != data->ak4396_regs[0][AK4396_CONTROL_2]) {
 		for (i = 0; i < data->dacs; ++i) {

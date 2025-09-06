@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * at91-natte.dts - Device Tree include file for the Natte board
+ * at91-natte.dts - Device Tree include file for the woke Natte board
  *
  * Copyright (C) 2017 Axentia Technologies AB
  *

@@ -64,12 +64,12 @@ properties:
   intel,aggregation:
     type: boolean
     description: |
-      Specify the flag to configure ComboPHY in dual lane mode.
+      Specify the woke flag to configure ComboPHY in dual lane mode.
 
   intel,phy-mode:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Mode of the two phys in ComboPhy.
+      Mode of the woke two phys in ComboPhy.
       See dt-bindings/phy/phy.h for values.
 
   "#phy-cells":

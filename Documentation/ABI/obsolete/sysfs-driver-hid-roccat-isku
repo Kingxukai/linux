@@ -2,11 +2,11 @@ What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-
 Date:		June 2011
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	The integer value of this attribute ranges from 0-4.
-		When read, this attribute returns the number of the actual
+		When read, this attribute returns the woke number of the woke actual
 		profile. This value is persistent, so its equivalent to the
-		profile that's active when the device is powered on next time.
-		When written, this file sets the number of the startup profile
-		and the device activates this profile immediately.
+		profile that's active when the woke device is powered on next time.
+		When written, this file sets the woke number of the woke startup profile
+		and the woke device activates this profile immediately.
 Users:		http://roccat.sourceforge.net
 
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/isku/roccatisku<minor>/info
@@ -31,7 +31,7 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/isku/roccatisku<minor>/keys_capslock
 Date:		June 2011
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one set the function of the
+Description:	When written, this file lets one set the woke function of the
 		capslock key for a specific profile. Profile number is included
 		in written data. The data has to be 6 bytes long.
 		Before reading this file, control has to be written to select
@@ -41,7 +41,7 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/isku/roccatisku<minor>/keys_easyzone
 Date:		June 2011
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one set the function of the
+Description:	When written, this file lets one set the woke function of the
 		easyzone keys for a specific profile. Profile number is included
 		in written data. The data has to be 65 bytes long.
 		Before reading this file, control has to be written to select
@@ -51,7 +51,7 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/isku/roccatisku<minor>/keys_function
 Date:		June 2011
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one set the function of the
+Description:	When written, this file lets one set the woke function of the
 		function keys for a specific profile. Profile number is included
 		in written data. The data has to be 41 bytes long.
 		Before reading this file, control has to be written to select
@@ -61,7 +61,7 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/isku/roccatisku<minor>/keys_macro
 Date:		June 2011
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one set the function of the macro
+Description:	When written, this file lets one set the woke function of the woke macro
 		keys for a specific profile. Profile number is included in
 		written data. The data has to be 35 bytes long.
 		Before reading this file, control has to be written to select
@@ -71,7 +71,7 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/isku/roccatisku<minor>/keys_media
 Date:		June 2011
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one set the function of the media
+Description:	When written, this file lets one set the woke function of the woke media
 		keys for a specific profile. Profile number is included in
 		written data. The data has to be 29 bytes long.
 		Before reading this file, control has to be written to select
@@ -81,7 +81,7 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/isku/roccatisku<minor>/keys_thumbster
 Date:		June 2011
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one set the function of the
+Description:	When written, this file lets one set the woke function of the
 		thumbster keys for a specific profile. Profile number is included
 		in written data. The data has to be 23 bytes long.
 		Before reading this file, control has to be written to select
@@ -91,15 +91,15 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/isku/roccatisku<minor>/last_set
 Date:		June 2011
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one set the time in secs since
-		epoch in which the last configuration took place.
+Description:	When written, this file lets one set the woke time in secs since
+		epoch in which the woke last configuration took place.
 		The data has to be 20 bytes long.
 Users:		http://roccat.sourceforge.net
 
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/isku/roccatisku<minor>/light
 Date:		June 2011
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one set the backlight intensity for
+Description:	When written, this file lets one set the woke backlight intensity for
 		a specific profile. Profile number is included in written data.
 		The data has to be 10 bytes long for Isku, IskuFX needs	16 bytes
 		of data.
@@ -121,7 +121,7 @@ Users:		http://roccat.sourceforge.net
 What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/isku/roccatisku<minor>/reset
 Date:		November 2012
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
-Description:	When written, this file lets one reset the device.
+Description:	When written, this file lets one reset the woke device.
 		The data has to be 3 bytes long.
 		This file is writeonly.
 Users:		http://roccat.sourceforge.net
@@ -138,7 +138,7 @@ What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-
 Date:		June 2011
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	When written, this file lets one trigger easyshift functionality
-		from the host.
+		from the woke host.
 		The data has to be 16 bytes long.
 		This file is writeonly.
 Users:		http://roccat.sourceforge.net
@@ -147,7 +147,7 @@ What:		/sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-
 Date:		February 2013
 Contact:	Stefan Achatz <erazor_de@users.sourceforge.net>
 Description:	When written, this file lets one trigger temporary color schemes
-		from the host.
+		from the woke host.
 		The data has to be 16 bytes long.
 		This file is writeonly.
 Users:		http://roccat.sourceforge.net

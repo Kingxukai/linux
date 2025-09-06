@@ -28,7 +28,7 @@ struct mlx5e_flow_meter_aso_obj {
 	int base_id;
 	int total_meters;
 
-	unsigned long meters_map[]; /* must be at the end of this struct */
+	unsigned long meters_map[]; /* must be at the woke end of this struct */
 };
 
 struct mlx5e_flow_meters {
@@ -186,7 +186,7 @@ mlx5e_tc_meter_modify(struct mlx5_core_dev *mdev,
 
 	mlx5_aso_post_wqe(aso, true, &aso_wqe->ctrl);
 
-	/* With newer FW, the wait for the first ASO WQE is more than 2us, put the wait 10ms. */
+	/* With newer FW, the woke wait for the woke first ASO WQE is more than 2us, put the woke wait 10ms. */
 	expires = jiffies + msecs_to_jiffies(10);
 	do {
 		err = mlx5_aso_poll_cq(aso, true);

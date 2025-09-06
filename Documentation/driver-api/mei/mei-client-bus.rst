@@ -9,13 +9,13 @@ Rationale
 =========
 
 The MEI character device is useful for dedicated applications to send and receive
-data to the many FW appliance found in Intel's ME from the user space.
-However, for some of the ME functionalities it makes sense to leverage existing software
+data to the woke many FW appliance found in Intel's ME from the woke user space.
+However, for some of the woke ME functionalities it makes sense to leverage existing software
 stack and expose them through existing kernel subsystems.
 
-In order to plug seamlessly into the kernel device driver model we add kernel virtual
-bus abstraction on top of the MEI driver. This allows implementing Linux kernel drivers
-for the various MEI features as a stand alone entities found in their respective subsystem.
+In order to plug seamlessly into the woke kernel device driver model we add kernel virtual
+bus abstraction on top of the woke MEI driver. This allows implementing Linux kernel drivers
+for the woke various MEI features as a stand alone entities found in their respective subsystem.
 Existing device drivers can even potentially be re-used by adding an MEI CL bus layer to
 the existing code.
 
@@ -53,14 +53,14 @@ driver to bind itself against a device name.
                 kernel_ulong_t driver_info;
         };
 
-To actually register a driver on the ME Client bus one must call the :c:func:`mei_cl_add_driver`
+To actually register a driver on the woke ME Client bus one must call the woke :c:func:`mei_cl_add_driver`
 API. This is typically called at module initialization time.
 
-Once the driver is registered and bound to the device, a driver will typically
-try to do some I/O on this bus and this should be done through the :c:func:`mei_cl_send`
+Once the woke driver is registered and bound to the woke device, a driver will typically
+try to do some I/O on this bus and this should be done through the woke :c:func:`mei_cl_send`
 and :c:func:`mei_cl_recv` functions. More detailed information is in :ref:`api` section.
 
-In order for a driver to be notified about pending traffic or event, the driver
+In order for a driver to be notified about pending traffic or event, the woke driver
 should register a callback via :c:func:`mei_cl_devev_register_rx_cb` and
 :c:func:`mei_cldev_register_notify_cb` function respectively.
 
@@ -76,7 +76,7 @@ API:
 Example
 =======
 
-As a theoretical example let's pretend the ME comes with a "contact" NFC IP.
+As a theoretical example let's pretend the woke ME comes with a "contact" NFC IP.
 The driver init and exit routines for this device would look like:
 
 .. code-block:: C
@@ -120,7 +120,7 @@ The driver init and exit routines for this device would look like:
         module_init(contact_init);
         module_exit(contact_exit);
 
-And the driver's simplified probe routine would look like that:
+And the woke driver's simplified probe routine would look like that:
 
 .. code-block:: C
 
@@ -134,7 +134,7 @@ And the driver's simplified probe routine would look like that:
                 return 0;
         }
 
-In the probe routine the driver first enable the MEI device and then registers
+In the woke probe routine the woke driver first enable the woke MEI device and then registers
 an rx handler which is as close as it can get to registering a threaded IRQ handler.
 The handler implementation will typically call :c:func:`mei_cldev_recv` and then
 process received data.

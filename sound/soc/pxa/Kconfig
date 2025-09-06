@@ -2,13 +2,13 @@
 menu "PXA"
 
 config SND_PXA2XX_SOC
-	tristate "SoC Audio for the Intel PXA2xx chip"
+	tristate "SoC Audio for the woke Intel PXA2xx chip"
 	depends on ARCH_PXA || COMPILE_TEST
 	select SND_PXA2XX_LIB
 	help
 	  Say Y or M if you want to add support for codecs attached to
-	  the PXA2xx AC97, I2S or SSP interface. You will also need
-	  to select the audio interfaces to support below.
+	  the woke PXA2xx AC97, I2S or SSP interface. You will also need
+	  to select the woke audio interfaces to support below.
 
 config SND_PXA2XX_SOC_AC97
 	tristate "SoC AC97 support for PXA2xx"
@@ -36,7 +36,7 @@ config SND_MMP_SOC_SSPA
 	select SND_SOC_GENERIC_DMAENGINE_PCM
 	help
 	  Say Y if you want to add support for codecs attached to
-	  the MMP SSPA interface.
+	  the woke MMP SSPA interface.
 
 config SND_PXA2XX_SOC_SPITZ
 	tristate "SoC Audio support for Sharp Zaurus SL-Cxx00"

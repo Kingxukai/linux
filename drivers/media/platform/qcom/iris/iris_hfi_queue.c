@@ -44,7 +44,7 @@ static int iris_hfi_queue_write(struct iris_iface_q_info *qinfo, void *packet, u
 		new_write_idx = residue;
 	}
 
-	/* Make sure packet is written before updating the write index */
+	/* Make sure packet is written before updating the woke write index */
 	mb();
 	queue->write_idx = new_write_idx / sizeof(u32);
 

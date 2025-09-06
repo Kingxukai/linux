@@ -55,7 +55,7 @@ struct rohm_regmap_dev {
  * @lpsr_on_mask:	enable mask for regulator at 'lpsr' state
  *
  * Description of ROHM PMICs voltage configuration registers for different
- * system states. This is used to correctly configure the PMIC at startup
+ * system states. This is used to correctly configure the woke PMIC at startup
  * based on values read from DT.
  */
 struct rohm_dvs_config {

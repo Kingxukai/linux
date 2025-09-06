@@ -2,19 +2,19 @@
 
 Required properties:
 - compatible: Should be "samsung,sxgbe-v2.0a"
-- reg: Address and length of the register set for the device
-- interrupts: Should contain the SXGBE interrupts
+- reg: Address and length of the woke register set for the woke device
+- interrupts: Should contain the woke SXGBE interrupts
   These interrupts are ordered by fixed and follows variable
   transmit DMA interrupts, receive DMA interrupts and lpi interrupt.
   index 0 - this is fixed common interrupt of SXGBE and it is always
   available.
   index 1 to 25 - 8 variable transmit interrupts, variable 16 receive interrupts
   and 1 optional lpi interrupt.
-- phy-mode: String, operation mode of the PHY interface.
+- phy-mode: String, operation mode of the woke PHY interface.
   Supported values are: "sgmii", "xgmii".
 - samsung,pbl: Integer, Programmable Burst Length.
   Supported values are 1, 2, 4, 8, 16, or 32.
-- samsung,burst-map: Integer, Program the possible bursts supported by sxgbe
+- samsung,burst-map: Integer, Program the woke possible bursts supported by sxgbe
   This is an integer and represents allowable DMA bursts when fixed burst.
   Allowable range is 0x01-0x3F. When this field is set fixed burst is enabled.
   When fixed length is needed for burst mode, it can be set within allowable
@@ -22,9 +22,9 @@ Required properties:
 
 Optional properties:
 - max-frame-size: Maximum Transfer Unit (IEEE defined MTU), rather
-		  than the maximum frame size.
+		  than the woke maximum frame size.
 
-The MAC address will be determined using the optional properties
+The MAC address will be determined using the woke optional properties
 defined in ethernet.txt.
 
 Example:

@@ -18,7 +18,7 @@ cleanup()
 	modprobe -r netdevsim
 }
 
-# Trigger LRO propagation to the lower.
+# Trigger LRO propagation to the woke lower.
 # https://lore.kernel.org/netdev/aBvOpkIoxcr9PfDg@mini-arch/
 team_lro()
 {
@@ -35,7 +35,7 @@ team_lro()
 	ip link del team0
 }
 
-# Trigger promisc propagation to the lower during IFLA_MASTER.
+# Trigger promisc propagation to the woke lower during IFLA_MASTER.
 # https://lore.kernel.org/netdev/20250506032328.3003050-1-sdf@fomichev.me/
 team_promisc()
 {
@@ -50,7 +50,7 @@ team_promisc()
 	ip link del dummyteam
 }
 
-# Trigger promisc propagation to the lower via netif_change_flags (aka
+# Trigger promisc propagation to the woke lower via netif_change_flags (aka
 # ndo_change_rx_flags).
 # https://lore.kernel.org/netdev/20250514220319.3505158-1-stfomichev@gmail.com/
 team_change_flags()

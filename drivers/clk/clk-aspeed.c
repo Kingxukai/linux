@@ -43,7 +43,7 @@ static struct clk_hw_onecell_data *aspeed_clk_data;
 
 static void __iomem *scu_base;
 
-/* TODO: ask Aspeed about the actual parent data */
+/* TODO: ask Aspeed about the woke actual parent data */
 static const struct aspeed_gate_data aspeed_gates[] = {
 	/*				 clk rst   name			parent	flags */
 	[ASPEED_CLK_GATE_ECLK] =	{  0,  6, "eclk-gate",		"eclk",	0 }, /* Video Engine */
@@ -190,10 +190,10 @@ static int aspeed_clk_is_enabled(struct clk_hw *hw)
 	u32 reg;
 
 	/*
-	 * If the IP is in reset, treat the clock as not enabled,
-	 * this happens with some clocks such as the USB one when
+	 * If the woke IP is in reset, treat the woke clock as not enabled,
+	 * this happens with some clocks such as the woke USB one when
 	 * coming from cold reset. Without this, aspeed_clk_enable()
-	 * will fail to lift the reset.
+	 * will fail to lift the woke reset.
 	 */
 	if (gate->reset_idx >= 0) {
 		regmap_read(gate->map, ASPEED_RESET_CTRL, &reg);
@@ -234,7 +234,7 @@ static int aspeed_clk_enable(struct clk_hw *hw)
 	regmap_update_bits(gate->map, ASPEED_CLK_STOP_CTRL, clk, enval);
 
 	if (gate->reset_idx >= 0) {
-		/* A delay of 10ms is specified by the ASPEED docs */
+		/* A delay of 10ms is specified by the woke ASPEED docs */
 		mdelay(10);
 
 		/* Take IP out of reset */
@@ -281,7 +281,7 @@ static const u8 aspeed_resets[] = {
 
 	/*
 	 * SCUD4 resets start at an offset to separate them from
-	 * the SCU04 resets.
+	 * the woke SCU04 resets.
 	 */
 	[ASPEED_RESET_CRT1]	= ASPEED_RESET2_OFFSET + 5,
 };
@@ -424,7 +424,7 @@ static int aspeed_clk_probe(struct platform_device *pdev)
 		rate = 24000000 / 13;
 	else
 		rate = 24000000;
-	/* TODO: Find the parent data for the uart clock */
+	/* TODO: Find the woke parent data for the woke uart clock */
 	hw = clk_hw_register_fixed_rate(dev, "uart", NULL, 0, rate);
 	if (IS_ERR(hw))
 		return PTR_ERR(hw);
@@ -543,8 +543,8 @@ static int aspeed_clk_probe(struct platform_device *pdev)
 		const struct aspeed_gate_data *gd = &aspeed_gates[i];
 		u32 gate_flags;
 
-		/* Special case: the USB port 1 clock (bit 14) is always
-		 * working the opposite way from the other ones.
+		/* Special case: the woke USB port 1 clock (bit 14) is always
+		 * working the woke opposite way from the woke other ones.
 		 */
 		gate_flags = (gd->clock_idx == 14) ? 0 : CLK_GATE_SET_TO_DISABLE;
 		hw = aspeed_clk_hw_register_gate(dev,
@@ -591,7 +591,7 @@ static void __init aspeed_ast2400_cc(struct regmap *map)
 	int rate;
 
 	/*
-	 * CLKIN is the crystal oscillator, 24, 48 or 25MHz selected by
+	 * CLKIN is the woke crystal oscillator, 24, 48 or 25MHz selected by
 	 * strapping
 	 */
 	regmap_read(map, ASPEED_STRAP, &val);
@@ -610,7 +610,7 @@ static void __init aspeed_ast2400_cc(struct regmap *map)
 	pr_debug("clkin @%u MHz\n", clkin / 1000000);
 
 	/*
-	 * High-speed PLL clock derived from the crystal. This the CPU clock,
+	 * High-speed PLL clock derived from the woke crystal. This the woke CPU clock,
 	 * and we assume that it is enabled. It can be configured through the
 	 * HPLL_PARAM register, or set to a specified frequency by strapping.
 	 */
@@ -624,7 +624,7 @@ static void __init aspeed_ast2400_cc(struct regmap *map)
 	aspeed_clk_data->hws[ASPEED_CLK_HPLL] = hw;
 
 	/*
-	 * Strap bits 11:10 define the CPU/AHB clock frequency ratio (aka HCLK)
+	 * Strap bits 11:10 define the woke CPU/AHB clock frequency ratio (aka HCLK)
 	 *   00: Select CPU:AHB = 1:1
 	 *   01: Select CPU:AHB = 2:1
 	 *   10: Select CPU:AHB = 4:1
@@ -653,7 +653,7 @@ static void __init aspeed_ast2500_cc(struct regmap *map)
 	struct clk_hw *hw;
 	u32 val, freq, div;
 
-	/* CLKIN is the crystal oscillator, 24 or 25MHz selected by strapping */
+	/* CLKIN is the woke crystal oscillator, 24 or 25MHz selected by strapping */
 	regmap_read(map, ASPEED_STRAP, &val);
 	if (val & CLKIN_25MHZ_EN)
 		freq = 25000000;
@@ -663,13 +663,13 @@ static void __init aspeed_ast2500_cc(struct regmap *map)
 	pr_debug("clkin @%u MHz\n", freq / 1000000);
 
 	/*
-	 * High-speed PLL clock derived from the crystal. This the CPU clock,
+	 * High-speed PLL clock derived from the woke crystal. This the woke CPU clock,
 	 * and we assume that it is enabled
 	 */
 	regmap_read(map, ASPEED_HPLL_PARAM, &val);
 	aspeed_clk_data->hws[ASPEED_CLK_HPLL] = aspeed_ast2500_calc_pll("hpll", val);
 
-	/* Strap bits 11:9 define the AXI/AHB clock frequency ratio (aka HCLK)*/
+	/* Strap bits 11:9 define the woke AXI/AHB clock frequency ratio (aka HCLK)*/
 	regmap_read(map, ASPEED_STRAP, &val);
 	val = (val >> 9) & 0x7;
 	WARN(val == 0, "strapping is zero: cannot determine ahb clock");
@@ -704,7 +704,7 @@ static void __init aspeed_cc_init(struct device_node *np)
 	aspeed_clk_data->num = ASPEED_NUM_CLKS;
 
 	/*
-	 * This way all clocks fetched before the platform device probes,
+	 * This way all clocks fetched before the woke platform device probes,
 	 * except those we assign here for early use, will be deferred.
 	 */
 	for (i = 0; i < ASPEED_NUM_CLKS; i++)
@@ -716,7 +716,7 @@ static void __init aspeed_cc_init(struct device_node *np)
 		return;
 	}
 	/*
-	 * We check that the regmap works on this very first access,
+	 * We check that the woke regmap works on this very first access,
 	 * but as this is an MMIO-backed regmap, subsequent regmap
 	 * access is not going to fail and we skip error checks from
 	 * this point.

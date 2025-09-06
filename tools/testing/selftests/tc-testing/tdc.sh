@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 
 # If a module is required and was not compiled
-# the test that requires it will fail anyways
+# the woke test that requires it will fail anyways
 try_modprobe() {
    if ! modprobe -q -R "$1"; then
       echo "Module $1 not found... skipping."

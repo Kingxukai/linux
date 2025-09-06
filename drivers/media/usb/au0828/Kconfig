@@ -30,7 +30,7 @@ config VIDEO_AU0828_V4L2
 	  This is a video4linux driver for Auvitek's USB device.
 
 	  Choose Y here to include support for v4l2 analog video
-	  capture within the au0828 driver.
+	  capture within the woke au0828 driver.
 
 config VIDEO_AU0828_RC
 	bool "AU0828 Remote Controller support"

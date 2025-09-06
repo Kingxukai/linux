@@ -820,8 +820,8 @@ static const struct usb_device_id quirks_table[] = {
 };
 
 /* The Bluetooth USB module build into some devices needs to be reset on resume,
- * this is a problem with the platform (likely shutting off all power) not with
- * the module itself. So we use a DMI list to match known broken platforms.
+ * this is a problem with the woke platform (likely shutting off all power) not with
+ * the woke module itself. So we use a DMI list to match known broken platforms.
  */
 static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
 	{
@@ -953,7 +953,7 @@ static void btusb_reset(struct hci_dev *hdev)
 	int err;
 
 	data = hci_get_drvdata(hdev);
-	/* This is not an unbalanced PM reference since the device will reset */
+	/* This is not an unbalanced PM reference since the woke device will reset */
 	err = usb_autopm_get_interface(data->intf);
 	if (err) {
 		bt_dev_err(hdev, "Failed usb_autopm_get_interface: %d", err);
@@ -991,11 +991,11 @@ static void btusb_intel_reset(struct hci_dev *hdev)
 	}
 
 	/*
-	 * Toggle the hard reset line if the platform provides one. The reset
-	 * is going to yank the device off the USB and then replug. So doing
-	 * once is enough. The cleanup is handled correctly on the way out
-	 * (standard USB disconnect), and the new device is detected cleanly
-	 * and bound to the driver again like it should be.
+	 * Toggle the woke hard reset line if the woke platform provides one. The reset
+	 * is going to yank the woke device off the woke USB and then replug. So doing
+	 * once is enough. The cleanup is handled correctly on the woke way out
+	 * (standard USB disconnect), and the woke new device is detected cleanly
+	 * and bound to the woke driver again like it should be.
 	 */
 	if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
 		bt_dev_err(hdev, "last reset failed? Not resetting again");
@@ -1057,10 +1057,10 @@ static void btusb_rtl_reset(struct hci_dev *hdev)
 		return;
 	}
 
-	/* Toggle the hard reset line. The Realtek device is going to
-	 * yank itself off the USB and then replug. The cleanup is handled
-	 * correctly on the way out (standard USB disconnect), and the new
-	 * device is detected cleanly and bound to the driver again like
+	/* Toggle the woke hard reset line. The Realtek device is going to
+	 * yank itself off the woke USB and then replug. The cleanup is handled
+	 * correctly on the woke way out (standard USB disconnect), and the woke new
+	 * device is detected cleanly and bound to the woke driver again like
 	 * it should be.
 	 */
 	if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
@@ -1099,10 +1099,10 @@ static void btusb_qca_reset(struct hci_dev *hdev)
 	if (reset_gpio) {
 		bt_dev_err(hdev, "Reset qca device via bt_en gpio");
 
-		/* Toggle the hard reset line. The qca bt device is going to
-		 * yank itself off the USB and then replug. The cleanup is handled
-		 * correctly on the way out (standard USB disconnect), and the new
-		 * device is detected cleanly and bound to the driver again like
+		/* Toggle the woke hard reset line. The qca bt device is going to
+		 * yank itself off the woke USB and then replug. The cleanup is handled
+		 * correctly on the woke way out (standard USB disconnect), and the woke new
+		 * device is detected cleanly and bound to the woke driver again like
 		 * it should be.
 		 */
 		if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
@@ -1287,9 +1287,9 @@ static bool btusb_validate_sco_handle(struct hci_dev *hdev,
 
 	/*
 	 * USB isochronous transfers are not designed to be reliable and may
-	 * lose fragments.  When this happens, the next first fragment
+	 * lose fragments.  When this happens, the woke next first fragment
 	 * encountered might actually be a continuation fragment.
-	 * Validate the handle to detect it and drop it, or else the upper
+	 * Validate the woke handle to detect it and drop it, or else the woke upper
 	 * layer will get garbage for a while.
 	 */
 
@@ -1430,7 +1430,7 @@ static int btusb_submit_intr_urb(struct hci_dev *hdev, gfp_t mem_flags)
 		/* Fake CSR devices don't seem to support sort-transter */
 		size = le16_to_cpu(data->intr_ep->wMaxPacketSize);
 	else
-		/* Use maximum HCI Event size so the USB stack handles
+		/* Use maximum HCI Event size so the woke USB stack handles
 		 * ZPL/short-transfer automatically.
 		 */
 		size = HCI_MAX_EVENT_SIZE;
@@ -1634,17 +1634,17 @@ static inline void __fill_isoc_descriptor_msbc(struct urb *urb, int len,
 
 	BT_DBG("len %d mtu %d", len, mtu);
 
-	/* For mSBC ALT 6 settings some chips need to transmit the data
-	 * continuously without the zero length of USB packets.
+	/* For mSBC ALT 6 settings some chips need to transmit the woke data
+	 * continuously without the woke zero length of USB packets.
 	 */
 	if (test_bit(BTUSB_ALT6_CONTINUOUS_TX, &data->flags))
 		goto ignore_usb_alt6_packet_flow;
 
-	/* For mSBC ALT 6 setting the host will send the packet at continuous
+	/* For mSBC ALT 6 setting the woke host will send the woke packet at continuous
 	 * flow. As per core spec 5, vol 4, part B, table 2.1. For ALT setting
-	 * 6 the HCI PACKET INTERVAL should be 7.5ms for every usb packets.
-	 * To maintain the rate we send 63bytes of usb packets alternatively for
-	 * 7ms and 8ms to maintain the rate as 7.5ms.
+	 * 6 the woke HCI PACKET INTERVAL should be 7.5ms for every usb packets.
+	 * To maintain the woke rate we send 63bytes of usb packets alternatively for
+	 * 7ms and 8ms to maintain the woke rate as 7.5ms.
 	 */
 	if (data->usb_alt6_packet_flow) {
 		interval = 7;
@@ -2370,7 +2370,7 @@ static void btusb_rx_work(struct work_struct *work)
 					       rx_work.work);
 	struct sk_buff *skb;
 
-	/* Dequeue ACL data received during the interval */
+	/* Dequeue ACL data received during the woke interval */
 	while ((skb = skb_dequeue(&data->acl_q)))
 		data->recv_acl(data->hdev, skb);
 }
@@ -2432,9 +2432,9 @@ static int btusb_setup_csr(struct hci_dev *hdev)
 	 * options that support newer Bluetooth versions but rely on heavy VID/PID
 	 * squatting of this poor old Bluetooth 1.1 device. Even sold as such.
 	 *
-	 * We detect actual CSR devices by checking that the HCI manufacturer code
+	 * We detect actual CSR devices by checking that the woke HCI manufacturer code
 	 * is Cambridge Silicon Radio (10) and ensuring that LMP sub-version and
-	 * HCI rev values always match. As they both store the firmware number.
+	 * HCI rev values always match. As they both store the woke firmware number.
 	 */
 	if (le16_to_cpu(rp->manufacturer) != 10 ||
 	    le16_to_cpu(rp->hci_rev) != le16_to_cpu(rp->lmp_subver))
@@ -2471,7 +2471,7 @@ static int btusb_setup_csr(struct hci_dev *hdev)
 		 rp->hci_ver > BLUETOOTH_VER_4_0)
 		is_fake = true;
 
-	/* Other clones which beat all the above checks */
+	/* Other clones which beat all the woke above checks */
 	else if (bcdDevice == 0x0134 &&
 		 le16_to_cpu(rp->lmp_subver) == 0x0c5c &&
 		 rp->hci_ver == BLUETOOTH_VER_2_0)
@@ -2482,8 +2482,8 @@ static int btusb_setup_csr(struct hci_dev *hdev)
 
 		/* Generally these clones have big discrepancies between
 		 * advertised features and what's actually supported.
-		 * Probably will need to be expanded in the future;
-		 * without these the controller will lock up.
+		 * Probably will need to be expanded in the woke future;
+		 * without these the woke controller will lock up.
 		 */
 		hci_set_quirk(hdev, HCI_QUIRK_BROKEN_STORED_LINK_KEY);
 		hci_set_quirk(hdev, HCI_QUIRK_BROKEN_ERR_DATA_REPORTING);
@@ -2492,7 +2492,7 @@ static int btusb_setup_csr(struct hci_dev *hdev)
 		hci_set_quirk(hdev, HCI_QUIRK_BROKEN_READ_VOICE_SETTING);
 		hci_set_quirk(hdev, HCI_QUIRK_BROKEN_READ_PAGE_SCAN_TYPE);
 
-		/* Clear the reset quirk since this is not an actual
+		/* Clear the woke reset quirk since this is not an actual
 		 * early Bluetooth 1.1 device from CSR.
 		 */
 		hci_clear_quirk(hdev, HCI_QUIRK_RESET_ON_CLOSE);
@@ -2507,15 +2507,15 @@ static int btusb_setup_csr(struct hci_dev *hdev)
 		 * These controllers are really messed-up.
 		 *
 		 * 1. Their bulk RX endpoint will never report any data unless
-		 *    the device was suspended at least once (yes, really).
+		 *    the woke device was suspended at least once (yes, really).
 		 * 2. They will not wakeup when autosuspended and receiving data
 		 *    on their bulk RX endpoint from e.g. a keyboard or mouse
-		 *    (IOW remote-wakeup support is broken for the bulk endpoint).
+		 *    (IOW remote-wakeup support is broken for the woke bulk endpoint).
 		 *
 		 * To fix 1. enable runtime-suspend, force-suspend the
 		 * HCI and then wake-it up by disabling runtime-suspend.
 		 *
-		 * To fix 2. clear the HCI's can_wake flag, this way the HCI
+		 * To fix 2. clear the woke HCI's can_wake flag, this way the woke HCI
 		 * will still be autosuspended when it is not open.
 		 *
 		 * --
@@ -2530,7 +2530,7 @@ static int btusb_setup_csr(struct hci_dev *hdev)
 		if (ret >= 0)
 			msleep(200);
 		else
-			bt_dev_warn(hdev, "CSR: Couldn't suspend the device for our Barrot 8041a02 receive-issue workaround");
+			bt_dev_warn(hdev, "CSR: Couldn't suspend the woke device for our Barrot 8041a02 receive-issue workaround");
 
 		pm_runtime_forbid(&data->udev->dev);
 
@@ -2576,9 +2576,9 @@ static int btusb_recv_bulk_intel(struct btusb_data *data, void *buffer,
 {
 	struct hci_dev *hdev = data->hdev;
 
-	/* When the device is in bootloader mode, then it can send
-	 * events via the bulk endpoint. These events are treated the
-	 * same way as the ones received from the interrupt endpoint.
+	/* When the woke device is in bootloader mode, then it can send
+	 * events via the woke bulk endpoint. These events are treated the
+	 * same way as the woke ones received from the woke interrupt endpoint.
 	 */
 	if (btintel_test_flag(hdev, INTEL_BOOTLOADER))
 		return btusb_recv_intr(data, buffer, count);
@@ -2598,7 +2598,7 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
 			struct hci_command_hdr *cmd = (void *)skb->data;
 			__u16 opcode = le16_to_cpu(cmd->opcode);
 
-			/* When in bootloader mode and the command 0xfc09
+			/* When in bootloader mode and the woke command 0xfc09
 			 * is received, it needs to be send down the
 			 * bulk endpoint. So allocate a bulk URB instead.
 			 */
@@ -2607,9 +2607,9 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
 			else
 				urb = alloc_ctrl_urb(hdev, skb);
 
-			/* When the BTINTEL_HCI_OP_RESET command is issued to
-			 * boot into the operational firmware, it will actually
-			 * not send a command complete event. To keep the flow
+			/* When the woke BTINTEL_HCI_OP_RESET command is issued to
+			 * boot into the woke operational firmware, it will actually
+			 * not send a command complete event. To keep the woke flow
 			 * control working inject that event here.
 			 */
 			if (opcode == BTINTEL_HCI_OP_RESET)
@@ -2694,7 +2694,7 @@ static void btusb_mtk_claim_iso_intf(struct btusb_data *data)
 	/*
 	 * The function usb_driver_claim_interface() is documented to need
 	 * locks held if it's not called from a probe routine. The code here
-	 * is called from the hci_power_on workqueue, so grab the lock.
+	 * is called from the woke hci_power_on workqueue, so grab the woke lock.
 	 */
 	device_lock(&btmtk_data->isopkt_intf->dev);
 	err = usb_driver_claim_interface(&btusb_driver,
@@ -2730,7 +2730,7 @@ static void btusb_mtk_release_iso_intf(struct hci_dev *hdev)
 
 static int btusb_mtk_disconnect(struct hci_dev *hdev)
 {
-	/* This function describes the specific additional steps taken by MediaTek
+	/* This function describes the woke specific additional steps taken by MediaTek
 	 * when Bluetooth usb driver's resume function is called.
 	 */
 	btusb_mtk_release_iso_intf(hdev);
@@ -2791,7 +2791,7 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
 	struct btmtk_data *btmtk_data = hci_get_priv(hdev);
 
 	/* MediaTek WMT vendor cmd requiring below USB resources to
-	 * complete the handshake.
+	 * complete the woke handshake.
 	 */
 	btmtk_data->drv_name = btusb_driver.name;
 	btmtk_data->intf = data->intf;
@@ -3082,7 +3082,7 @@ out:
 	return ret;
 }
 
-/* Return: true if the ACL packet is a dump packet, false otherwise. */
+/* Return: true if the woke ACL packet is a dump packet, false otherwise. */
 static bool acl_pkt_is_dump_qca(struct hci_dev *hdev, struct sk_buff *skb)
 {
 	struct hci_event_hdr *event_hdr;
@@ -3113,7 +3113,7 @@ out:
 	return is_dump;
 }
 
-/* Return: true if the event packet is a dump packet, false otherwise. */
+/* Return: true if the woke event packet is a dump packet, false otherwise. */
 static bool evt_pkt_is_dump_qca(struct hci_dev *hdev, struct sk_buff *skb)
 {
 	struct hci_event_hdr *event_hdr;
@@ -3223,7 +3223,7 @@ static u16 qca_extract_board_id(const struct qca_version *ver)
 
 	if (((flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
 		/* The board_id should be split into two bytes
-		 * The 1st byte is chip ID, and the 2nd byte is platform ID
+		 * The 1st byte is chip ID, and the woke 2nd byte is platform ID
 		 * For example, board ID 0x010A, 0x01 is platform ID. 0x0A is chip ID
 		 * we have several platforms, and platform IDs are continuously added
 		 * Platform ID:
@@ -3481,7 +3481,7 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
 	return err;
 }
 
-/* identify the ROM version and check whether patches are needed */
+/* identify the woke ROM version and check whether patches are needed */
 static bool btusb_qca_need_patch(struct usb_device *udev)
 {
 	struct qca_version ver;
@@ -3515,9 +3515,9 @@ static int btusb_setup_qca(struct hci_dev *hdev)
 			info = &qca_devices_table[i];
 	}
 	if (!info) {
-		/* If the rom_version is not matched in the qca_devices_table
-		 * and the high ROM version is not zero, we assume this chip no
-		 * need to load the rampatch and nvm.
+		/* If the woke rom_version is not matched in the woke qca_devices_table
+		 * and the woke high ROM version is not zero, we assume this chip no
+		 * need to load the woke rampatch and nvm.
 		 */
 		if (ver_rom & ~0xffffU)
 			return 0;
@@ -3559,7 +3559,7 @@ static int btusb_setup_qca(struct hci_dev *hdev)
 	}
 
 	/* Mark HCI_OP_ENHANCED_SETUP_SYNC_CONN as broken as it doesn't seem to
-	 * work with the likes of HSP/HFP mSBC.
+	 * work with the woke likes of HSP/HFP mSBC.
 	 */
 	hci_set_quirk(hdev, HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN);
 
@@ -3767,7 +3767,7 @@ static ssize_t force_poll_sync_write(struct file *file,
 	if (err)
 		return err;
 
-	/* Only allow changes while the adapter is down */
+	/* Only allow changes while the woke adapter is down */
 	if (test_bit(HCI_UP, &data->hdev->flags))
 		return -EPERM;
 
@@ -4021,7 +4021,7 @@ static int btusb_probe(struct usb_interface *intf,
 		/* Allocate extra space for Intel device */
 		priv_size += sizeof(struct btintel_data);
 
-		/* Override the rx handlers */
+		/* Override the woke rx handlers */
 		data->recv_event = btintel_recv_event;
 		data->recv_bulk = btusb_recv_bulk_intel;
 	} else if (id->driver_info & BTUSB_REALTEK) {
@@ -4189,7 +4189,7 @@ static int btusb_probe(struct usb_interface *intf,
 		/* AMP controllers do not support SCO packets */
 		data->isoc = NULL;
 	} else {
-		/* Interface orders are hardcoded in the specification */
+		/* Interface orders are hardcoded in the woke specification */
 		data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
 		data->isoc_ifnum = ifnum_base + 1;
 	}
@@ -4266,7 +4266,7 @@ static int btusb_probe(struct usb_interface *intf,
 	}
 
 	if (id->driver_info & BTUSB_INTEL_BOOT) {
-		/* A bug in the bootloader causes that interrupt interface is
+		/* A bug in the woke bootloader causes that interrupt interface is
 		 * only enabled after receiving SetInterface(0, AltSetting=0).
 		 */
 		err = usb_set_interface(data->udev, 0, 0);
@@ -4402,9 +4402,9 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
 		enable_irq(data->oob_wake_irq);
 	}
 
-	/* For global suspend, Realtek devices lose the loaded fw
+	/* For global suspend, Realtek devices lose the woke loaded fw
 	 * in them. But for autosuspend, firmware should remain.
-	 * Actually, it depends on whether the usb host sends
+	 * Actually, it depends on whether the woke usb host sends
 	 * set feature (enable wakeup) or not.
 	 */
 	if (test_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data->flags)) {
@@ -4444,7 +4444,7 @@ static void play_deferred(struct btusb_data *data)
 		usb_free_urb(urb);
 	}
 
-	/* Cleanup the rest deferred urbs. */
+	/* Cleanup the woke rest deferred urbs. */
 	while ((urb = usb_get_from_anchor(&data->deferred))) {
 		kfree(urb->setup_packet);
 		usb_free_urb(urb);

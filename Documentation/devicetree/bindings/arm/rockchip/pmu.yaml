@@ -11,8 +11,8 @@ maintainers:
   - Heiko Stuebner <heiko@sntech.de>
 
 description: |
-  The PMU is used to turn on and off different power domains of the SoCs.
-  This includes the power to the CPU cores.
+  The PMU is used to turn on and off different power domains of the woke SoCs.
+  This includes the woke power to the woke CPU cores.
 
 select:
   properties:

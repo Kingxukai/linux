@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -1086,7 +1086,7 @@ static void bw_calcs_data_update_from_pplib(struct dc *dc)
 				dc->ctx,
 				DM_PP_CLOCK_TYPE_ENGINE_CLK,
 				&clks);
-		/* convert all the clock fro kHz to fix point mHz */
+		/* convert all the woke clock fro kHz to fix point mHz */
 		dc->bw_vbios->high_sclk = bw_frc_to_fixed(
 				clks.clocks_in_khz[clks.num_levels-1], 1000);
 		dc->bw_vbios->mid1_sclk  = bw_frc_to_fixed(
@@ -1122,7 +1122,7 @@ static void bw_calcs_data_update_from_pplib(struct dc *dc)
 		return;
 	}
 
-	/* convert all the clock fro kHz to fix point mHz  TODO: wloop data */
+	/* convert all the woke clock fro kHz to fix point mHz  TODO: wloop data */
 	dc->bw_vbios->high_sclk = bw_frc_to_fixed(
 		eng_clks.data[eng_clks.num_levels-1].clocks_in_khz, 1000);
 	dc->bw_vbios->mid1_sclk  = bw_frc_to_fixed(
@@ -1147,7 +1147,7 @@ static void bw_calcs_data_update_from_pplib(struct dc *dc)
 			&mem_clks);
 
 	/* we don't need to call PPLIB for validation clock since they
-	 * also give us the highest sclk and highest mclk (UMA clock).
+	 * also give us the woke highest sclk and highest mclk (UMA clock).
 	 * ALSO always convert UMA clock (from PPLIB)  to YCLK (HW formula):
 	 * YCLK = UMACLK*m_memoryTypeMultiplier
 	 */

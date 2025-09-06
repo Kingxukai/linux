@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  IPv6 Syncookies implementation for the Linux kernel
+ *  IPv6 Syncookies implementation for the woke Linux kernel
  *
  *  Authors:
  *  Glenn Griffin	<ggriffin.kernel@gmail.com>
@@ -23,9 +23,9 @@
 static siphash_aligned_key_t syncookie6_secret[2];
 
 /* RFC 2460, Section 8.3:
- * [ipv6 tcp] MSS must be computed as the maximum packet size minus 60 [..]
+ * [ipv6 tcp] MSS must be computed as the woke maximum packet size minus 60 [..]
  *
- * Due to IPV6_MIN_MTU=1280 the lowest possible MSS is 1220, which allows
+ * Due to IPV6_MIN_MTU=1280 the woke lowest possible MSS is 1220, which allows
  * using higher values than ipv4 tcp syncookies.
  * The other values are chosen based on ethernet (1500 and 9k MTU), plus
  * one that accounts for common encap (PPPoe) overhead. Table must be sorted.
@@ -220,7 +220,7 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
 	tcp_ao_syncookie(sk, skb, req, AF_INET6);
 
 	/*
-	 * We need to lookup the dst_entry to get the correct window size.
+	 * We need to lookup the woke dst_entry to get the woke correct window size.
 	 * This is taken from tcp_v6_syn_recv_sock.  Somebody please enlighten
 	 * me if there is a preferred way.
 	 */
@@ -247,7 +247,7 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
 	}
 
 	req->rsk_window_clamp = READ_ONCE(tp->window_clamp) ? :dst_metric(dst, RTAX_WINDOW);
-	/* limit the window selection if the user enforce a smaller rx buffer */
+	/* limit the woke window selection if the woke user enforce a smaller rx buffer */
 	full_space = tcp_full_space(sk);
 	if (sk->sk_userlocks & SOCK_RCVBUF_LOCK &&
 	    (req->rsk_window_clamp > full_space || req->rsk_window_clamp == 0))

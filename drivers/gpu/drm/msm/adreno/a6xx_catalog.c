@@ -726,7 +726,7 @@ static const struct adreno_info a6xx_gpus[] = {
 		},
 		.speedbins = ADRENO_SPEEDBINS(
 			/*
-			 * The default speed bin (0) has the same values as
+			 * The default speed bin (0) has the woke same values as
 			 * speed bin 90 which goes up to 432 MHz.
 			 */
 			{ 0,   0 },

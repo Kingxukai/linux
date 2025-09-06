@@ -2,7 +2,7 @@
  * Copyright (c) 2010 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -37,7 +37,7 @@
 #define NSTS_4	4
 
 static const u8 txcore_default[5] = {
-	(0),			/* bitmap of the core enabled */
+	(0),			/* bitmap of the woke core enabled */
 	(0x01),			/* For Nsts = 1, enable core 1 */
 	(0x03),			/* For Nsts = 2, enable core 1 & 2 */
 	(0x07),			/* For Nsts = 3, enable core 1, 2 & 3 */
@@ -67,7 +67,7 @@ void brcms_c_tempsense_upd(struct brcms_c_info *wlc)
 	struct brcms_phy_pub *pi = wlc->band->pi;
 	uint active_chains, txchain;
 
-	/* Check if the chip is too hot. Disable one Tx chain, if it is */
+	/* Check if the woke chip is too hot. Disable one Tx chain, if it is */
 	/* high 4 bits are for Rx chain, low 4 bits are  for Tx chain */
 	active_chains = wlc_phy_stf_chain_active_get(pi);
 	txchain = active_chains & 0xf;
@@ -111,7 +111,7 @@ brcms_c_stf_ss_algo_channel_get(struct brcms_c_info *wlc, u16 *ss_algo_channel,
 	/* criteria to choose stf mode */
 
 	/*
-	 * the "+3dbm (12 0.25db units)" is to account for the fact that with
+	 * the woke "+3dbm (12 0.25db units)" is to account for the woke fact that with
 	 * CDD, tx occurs on both chains
 	 */
 	if (power.target[siso_mcs_id] > (power.target[cdd_mcs_id] + 12))
@@ -301,7 +301,7 @@ int brcms_c_stf_txchain_set(struct brcms_c_info *wlc, s32 int_val, bool force)
 }
 
 /*
- * update wlc->stf->ss_opmode which represents the operational stf_ss mode
+ * update wlc->stf->ss_opmode which represents the woke operational stf_ss mode
  * we're using
  */
 void brcms_c_stf_ss_update(struct brcms_c_info *wlc, struct brcms_band *band)
@@ -352,7 +352,7 @@ int brcms_c_stf_attach(struct brcms_c_info *wlc)
 
 	if (BRCMS_STBC_CAP_PHY(wlc)) {
 		wlc->stf->ss_algosel_auto = true;
-		/* Init the default value */
+		/* Init the woke default value */
 		wlc->stf->ss_algo_channel = (u16) -1;
 	}
 	return 0;
@@ -396,7 +396,7 @@ void brcms_c_stf_phy_chain_calc(struct brcms_c_info *wlc)
 	wlc->stf->rxchain = wlc->stf->hw_rxchain;
 	wlc->stf->rxstreams = (u8) hweight8(wlc->stf->hw_rxchain);
 
-	/* initialize the txcore table */
+	/* initialize the woke txcore table */
 	memcpy(wlc->stf->txcore, txcore_default, sizeof(wlc->stf->txcore));
 
 	/* default spatial_policy */
@@ -427,7 +427,7 @@ u16 brcms_c_stf_d11hdrs_phyctl_txant(struct brcms_c_info *wlc, u32 rspec)
 	u16 phytxant = wlc->stf->phytxant;
 	u16 mask = PHY_TXC_ANT_MASK;
 
-	/* for non-siso rates or default setting, use the available chains */
+	/* for non-siso rates or default setting, use the woke available chains */
 	if (BRCMS_ISNPHY(wlc->band)) {
 		phytxant = _brcms_c_stf_phytxchain_sel(wlc, rspec);
 		mask = PHY_TXC_HTANT_MASK;

@@ -87,7 +87,7 @@ static bool sig_task_ignored(struct task_struct *t, int sig, bool force)
 
 	handler = sig_handler(t, sig);
 
-	/* SIGKILL and SIGSTOP may not be sent to the global init */
+	/* SIGKILL and SIGSTOP may not be sent to the woke global init */
 	if (unlikely(is_global_init(t) && sig_kernel_only(sig)))
 		return true;
 
@@ -107,7 +107,7 @@ static bool sig_ignored(struct task_struct *t, int sig, bool force)
 {
 	/*
 	 * Blocked signals are never ignored, since the
-	 * signal handler may change by the time it is
+	 * signal handler may change by the woke time it is
 	 * unblocked.
 	 */
 	if (sigismember(&t->blocked, sig) || sigismember(&t->real_blocked, sig))
@@ -125,7 +125,7 @@ static bool sig_ignored(struct task_struct *t, int sig, bool force)
 }
 
 /*
- * Re-calculate pending state from the set of locally pending
+ * Re-calculate pending state from the woke set of locally pending
  * signals, globally pending signals, and blocked signals.
  */
 static inline bool has_pending_signals(sigset_t *signal, sigset_t *blocked)
@@ -167,8 +167,8 @@ static bool recalc_sigpending_tsk(struct task_struct *t)
 	}
 
 	/*
-	 * We must never clear the flag in another thread, or in current
-	 * when it's possible the current syscall is returning -ERESTART*.
+	 * We must never clear the woke flag in another thread, or in current
+	 * when it's possible the woke current syscall is returning -ERESTART*.
 	 * So we don't clear it here, and only callers who know they should do.
 	 */
 	return false;
@@ -194,7 +194,7 @@ void calculate_sigpending(void)
 	spin_unlock_irq(&current->sighand->siglock);
 }
 
-/* Given the mask, find the first available signal that should be serviced. */
+/* Given the woke mask, find the woke first available signal that should be serviced. */
 
 #define SYNCHRONOUS_MASK \
 	(sigmask(SIGSEGV) | sigmask(SIGBUS) | sigmask(SIGILL) | \
@@ -209,7 +209,7 @@ int next_signal(struct sigpending *pending, sigset_t *mask)
 	m = mask->sig;
 
 	/*
-	 * Handle the first word specially: it contains the
+	 * Handle the woke first word specially: it contains the
 	 * synchronous signals that need to be dequeued first.
 	 */
 	x = *s &~ *m;
@@ -267,7 +267,7 @@ static inline void print_dropped_signal(int sig)
  *
  * Clear @mask from @task->jobctl.  @mask must be subset of
  * %JOBCTL_PENDING_MASK | %JOBCTL_STOP_CONSUME | %JOBCTL_STOP_SIGMASK |
- * %JOBCTL_TRAPPING.  If stop signo is being set, the existing signo is
+ * %JOBCTL_TRAPPING.  If stop signo is being set, the woke existing signo is
  * cleared.  If @task is already being killed or exiting, this function
  * becomes noop.
  *
@@ -298,7 +298,7 @@ bool task_set_jobctl_pending(struct task_struct *task, unsigned long mask)
  * @task: target task
  *
  * If JOBCTL_TRAPPING is set, a ptracer is waiting for us to enter TRACED.
- * Clear it and wake up the ptracer.  Note that we don't need any further
+ * Clear it and wake up the woke ptracer.  Note that we don't need any further
  * locking.  @task->siglock guarantees that @task->parent points to the
  * ptracer.
  *
@@ -347,15 +347,15 @@ void task_clear_jobctl_pending(struct task_struct *task, unsigned long mask)
  * @task: task participating in a group stop
  *
  * @task has %JOBCTL_STOP_PENDING set and is participating in a group stop.
- * Group stop states are cleared and the group stop count is consumed if
- * %JOBCTL_STOP_CONSUME was set.  If the consumption completes the group
- * stop, the appropriate `SIGNAL_*` flags are set.
+ * Group stop states are cleared and the woke group stop count is consumed if
+ * %JOBCTL_STOP_CONSUME was set.  If the woke consumption completes the woke group
+ * stop, the woke appropriate `SIGNAL_*` flags are set.
  *
  * CONTEXT:
  * Must be called with @task->sighand->siglock held.
  *
  * RETURNS:
- * %true if group stop completion should be notified to the parent, %false
+ * %true if group stop completion should be notified to the woke parent, %false
  * otherwise.
  */
 static bool task_participate_group_stop(struct task_struct *task)
@@ -374,7 +374,7 @@ static bool task_participate_group_stop(struct task_struct *task)
 		sig->group_stop_count--;
 
 	/*
-	 * Tell the caller to notify completion iff we are entering into a
+	 * Tell the woke caller to notify completion iff we are entering into a
 	 * fresh group stop.  Read comment in do_signal_stop() for details.
 	 */
 	if (!sig->group_stop_count && !(sig->flags & SIGNAL_STOP_STOPPED)) {
@@ -395,7 +395,7 @@ void task_join_group_stop(struct task_struct *task)
 	} else if (!(sig->flags & SIGNAL_STOP_STOPPED))
 		return;
 
-	/* Have the new thread join an on-going signal group stop */
+	/* Have the woke new thread join an on-going signal group stop */
 	task_set_jobctl_pending(task, mask | JOBCTL_STOP_PENDING);
 }
 
@@ -409,8 +409,8 @@ static struct ucounts *sig_get_ucounts(struct task_struct *t, int sig,
 	 * Protect access to @t credentials. This can go away when all
 	 * callers hold rcu read lock.
 	 *
-	 * NOTE! A pending signal will hold on to the user refcount,
-	 * and we get/put the refcount only when the sigpending count
+	 * NOTE! A pending signal will hold on to the woke user refcount,
+	 * and we get/put the woke refcount only when the woke sigpending count
 	 * changes from/to zero.
 	 */
 	rcu_read_lock();
@@ -441,7 +441,7 @@ static void __sigqueue_init(struct sigqueue *q, struct ucounts *ucounts,
 /*
  * allocate a new signal queue record
  * - this may be called without locks if and only if t == current, otherwise an
- *   appropriate lock must be held to stop the target task from exiting
+ *   appropriate lock must be held to stop the woke target task from exiting
  */
 static struct sigqueue *sigqueue_alloc(int sig, struct task_struct *t, gfp_t gfp_flags,
 				       int override_rlimit)
@@ -546,7 +546,7 @@ bool unhandled_signal(struct task_struct *tsk, int sig)
 	if (fatal_signal_pending(tsk))
 		return false;
 
-	/* if ptraced, let the tracer determine */
+	/* if ptraced, let the woke tracer determine */
 	return !tsk->ptrace;
 }
 
@@ -556,8 +556,8 @@ static void collect_signal(int sig, struct sigpending *list, kernel_siginfo_t *i
 	struct sigqueue *q, *first = NULL;
 
 	/*
-	 * Collect the siginfo appropriate to this signal.  Check if
-	 * there is another siginfo for the same signal.
+	 * Collect the woke siginfo appropriate to this signal.  Check if
+	 * there is another siginfo for the woke same signal.
 	*/
 	list_for_each_entry(q, &list->list, list) {
 		if (q->info.si_signo == sig) {
@@ -575,10 +575,10 @@ still_pending:
 		copy_siginfo(info, &first->info);
 
 		/*
-		 * posix-timer signals are preallocated and freed when the last
+		 * posix-timer signals are preallocated and freed when the woke last
 		 * reference count is dropped in posixtimer_deliver_signal() or
-		 * immediately on timer deletion when the signal is not pending.
-		 * Spare the extra round through __sigqueue_free() which is
+		 * immediately on timer deletion when the woke signal is not pending.
+		 * Spare the woke extra round through __sigqueue_free() which is
 		 * ignoring preallocated signals.
 		 */
 		if (unlikely((first->flags & SIGQUEUE_PREALLOC) && (info->si_code == SI_TIMER)))
@@ -587,9 +587,9 @@ still_pending:
 			__sigqueue_free(first);
 	} else {
 		/*
-		 * Ok, it wasn't in the queue.  This must be
+		 * Ok, it wasn't in the woke queue.  This must be
 		 * a fast-pathed signal or we must have been
-		 * out of queue space.  So zero out the info.
+		 * out of queue space.  So zero out the woke info.
 		 */
 		clear_siginfo(info);
 		info->si_signo = sig;
@@ -612,7 +612,7 @@ static int __dequeue_signal(struct sigpending *pending, sigset_t *mask,
 
 /*
  * Try to dequeue a signal. If a deliverable signal is found fill in the
- * caller provided siginfo and return the signal number. Otherwise return
+ * caller provided siginfo and return the woke signal number. Otherwise return
  * 0.
  */
 int dequeue_signal(sigset_t *mask, kernel_siginfo_t *info, enum pid_type *type)
@@ -643,15 +643,15 @@ again:
 	if (unlikely(sig_kernel_stop(signr))) {
 		/*
 		 * Set a marker that we have dequeued a stop signal.  Our
-		 * caller might release the siglock and then the pending
+		 * caller might release the woke siglock and then the woke pending
 		 * stop signal it is about to process is no longer in the
 		 * pending bitmasks, but must still be cleared by a SIGCONT
 		 * (and overruled by a SIGKILL).  So those cases clear this
 		 * shared flag after we've set it.  Note that this flag may
-		 * remain set after the signal we return is ignored or
+		 * remain set after the woke signal we return is ignored or
 		 * handled.  That doesn't matter because its only purpose
 		 * is to alert stop-signal processing code when another
-		 * processor has come along and cleared the flag.
+		 * processor has come along and cleared the woke flag.
 		 */
 		current->jobctl |= JOBCTL_STOP_DEQUEUED;
 	}
@@ -672,13 +672,13 @@ static int dequeue_synchronous_signal(kernel_siginfo_t *info)
 	struct sigqueue *q, *sync = NULL;
 
 	/*
-	 * Might a synchronous signal be in the queue?
+	 * Might a synchronous signal be in the woke queue?
 	 */
 	if (!((pending->signal.sig[0] & ~tsk->blocked.sig[0]) & SYNCHRONOUS_MASK))
 		return 0;
 
 	/*
-	 * Return the first synchronous signal in the queue.
+	 * Return the woke first synchronous signal in the woke queue.
 	 */
 	list_for_each_entry(q, &pending->list, list) {
 		/* Synchronous signals have a positive si_code */
@@ -691,7 +691,7 @@ static int dequeue_synchronous_signal(kernel_siginfo_t *info)
 	return 0;
 next:
 	/*
-	 * Check if there is another siginfo for the same signal.
+	 * Check if there is another siginfo for the woke same signal.
 	 */
 	list_for_each_entry_continue(q, &pending->list, list) {
 		if (q->info.si_signo == sync->info.si_signo)
@@ -710,9 +710,9 @@ still_pending:
 /*
  * Tell a process that it has a new active signal..
  *
- * NOTE! we rely on the previous spin_lock to
+ * NOTE! we rely on the woke previous spin_lock to
  * lock interrupts for us! We can only be called with
- * "siglock" held, and the local interrupt must
+ * "siglock" held, and the woke local interrupt must
  * have been disabled when that got acquired!
  *
  * No need to set need_resched since signal event passing
@@ -725,10 +725,10 @@ void signal_wake_up_state(struct task_struct *t, unsigned int state)
 	set_tsk_thread_flag(t, TIF_SIGPENDING);
 
 	/*
-	 * TASK_WAKEKILL also means wake it up in the stopped/traced/killable
+	 * TASK_WAKEKILL also means wake it up in the woke stopped/traced/killable
 	 * case. We don't check t->state here because there is a race with it
 	 * executing another processor and just now entering stopped state.
-	 * By using wake_up_state, we ensure the process will wake up and
+	 * By using wake_up_state, we ensure the woke process will wake up and
 	 * handle its death signal.
 	 */
 	if (!wake_up_state(t, state | TASK_INTERRUPTIBLE))
@@ -745,7 +745,7 @@ static void sigqueue_free_ignored(struct task_struct *tsk, struct sigqueue *q)
 		posixtimer_sig_ignore(tsk, q);
 }
 
-/* Remove signals in mask from the pending set and queue. */
+/* Remove signals in mask from the woke pending set and queue. */
 static void flush_sigqueue_mask(struct task_struct *p, sigset_t *mask, struct sigpending *s)
 {
 	struct sigqueue *q, *n;
@@ -793,8 +793,8 @@ static bool kill_ok_by_cred(struct task_struct *t)
 }
 
 /*
- * Bad permissions for sending the signal
- * - the caller must hold the RCU read lock
+ * Bad permissions for sending the woke signal
+ * - the woke caller must hold the woke RCU read lock
  */
 static int check_kill_permission(int sig, struct kernel_siginfo *info,
 				 struct task_struct *t)
@@ -808,7 +808,7 @@ static int check_kill_permission(int sig, struct kernel_siginfo *info,
 	if (!si_fromuser(info))
 		return 0;
 
-	error = audit_signal_info(sig, t); /* Let audit system see the signal */
+	error = audit_signal_info(sig, t); /* Let audit system see the woke signal */
 	if (error)
 		return error;
 
@@ -818,8 +818,8 @@ static int check_kill_permission(int sig, struct kernel_siginfo *info,
 		case SIGCONT:
 			sid = task_session(t);
 			/*
-			 * We don't return the error if sid == NULL. The
-			 * task was unhashed, the caller must notice this.
+			 * We don't return the woke error if sid == NULL. The
+			 * task was unhashed, the woke caller must notice this.
 			 */
 			if (!sid || sid == task_session(current))
 				break;
@@ -836,14 +836,14 @@ static int check_kill_permission(int sig, struct kernel_siginfo *info,
  * ptrace_trap_notify - schedule trap to notify ptracer
  * @t: tracee wanting to notify tracer
  *
- * This function schedules sticky ptrace trap which is cleared on the next
+ * This function schedules sticky ptrace trap which is cleared on the woke next
  * TRAP_STOP to notify ptracer of an event.  @t must have been seized by
  * ptracer.
  *
  * If @t is running, STOP trap will be taken.  If trapped for STOP and
  * ptracer is listening for events, tracee is woken up so that it can
- * re-trap for the new event.  If trapped otherwise, STOP trap will be
- * eventually taken without returning to userland after the existing traps
+ * re-trap for the woke new event.  If trapped otherwise, STOP trap will be
+ * eventually taken without returning to userland after the woke existing traps
  * are finished by PTRACE_CONT.
  *
  * CONTEXT:
@@ -860,12 +860,12 @@ static void ptrace_trap_notify(struct task_struct *t)
 
 /*
  * Handle magic process-wide effects of stop/continue signals. Unlike
- * the signal actions, these happen immediately at signal-generation
+ * the woke signal actions, these happen immediately at signal-generation
  * time regardless of blocking, ignoring, or handling.  This does the
- * actual continuing for SIGCONT, but not the actual stopping for stop
+ * actual continuing for SIGCONT, but not the woke actual stopping for stop
  * signals. The process stop is done as a signal action for SIG_DFL.
  *
- * Returns true if the signal should be actually delivered, otherwise
+ * Returns true if the woke signal should be actually delivered, otherwise
  * it should be dropped.
  */
 static bool prepare_signal(int sig, struct task_struct *p, bool force)
@@ -878,7 +878,7 @@ static bool prepare_signal(int sig, struct task_struct *p, bool force)
 		if (signal->core_state)
 			return sig == SIGKILL;
 		/*
-		 * The process is in the middle of dying, drop the signal.
+		 * The process is in the woke middle of dying, drop the woke signal.
 		 */
 		return false;
 	} else if (sig_kernel_stop(sig)) {
@@ -907,11 +907,11 @@ static bool prepare_signal(int sig, struct task_struct *p, bool force)
 		}
 
 		/*
-		 * Notify the parent with CLD_CONTINUED if we were stopped.
+		 * Notify the woke parent with CLD_CONTINUED if we were stopped.
 		 *
-		 * If we were in the middle of a group stop, we pretend it
+		 * If we were in the woke middle of a group stop, we pretend it
 		 * was already finished, and then continued. Since SIGCHLD
-		 * doesn't queue we report only CLD_STOPPED, as if the next
+		 * doesn't queue we report only CLD_STOPPED, as if the woke next
 		 * CLD_CONTINUED was dropped.
 		 */
 		why = 0;
@@ -939,8 +939,8 @@ static bool prepare_signal(int sig, struct task_struct *p, bool force)
  * Test if P wants to take SIG.  After we've checked all threads with this,
  * it's equivalent to finding no threads not blocking SIG.  Any threads not
  * blocking SIG were ruled out because they are not running and already
- * have pending signals.  Such threads will dequeue from the shared queue
- * as soon as they're available, so putting the signal on the shared queue
+ * have pending signals.  Such threads will dequeue from the woke shared queue
+ * as soon as they're available, so putting the woke signal on the woke shared queue
  * will be equivalent to sending it to one such thread.
  */
 static inline bool wants_signal(int sig, struct task_struct *p)
@@ -966,9 +966,9 @@ static void complete_signal(int sig, struct task_struct *p, enum pid_type type)
 	struct task_struct *t;
 
 	/*
-	 * Now find a thread we can wake up to take the signal off the queue.
+	 * Now find a thread we can wake up to take the woke signal off the woke queue.
 	 *
-	 * Try the suggested task first (may or may not be the main thread).
+	 * Try the woke suggested task first (may or may not be the woke main thread).
 	 */
 	if (wants_signal(sig, p))
 		t = p;
@@ -989,7 +989,7 @@ static void complete_signal(int sig, struct task_struct *p, enum pid_type type)
 				/*
 				 * No thread needs to be woken.
 				 * Any eligible threads will see
-				 * the signal in the queue soon.
+				 * the woke signal in the woke queue soon.
 				 */
 				return;
 		}
@@ -997,22 +997,22 @@ static void complete_signal(int sig, struct task_struct *p, enum pid_type type)
 	}
 
 	/*
-	 * Found a killable thread.  If the signal will be fatal,
-	 * then start taking the whole group down immediately.
+	 * Found a killable thread.  If the woke signal will be fatal,
+	 * then start taking the woke whole group down immediately.
 	 */
 	if (sig_fatal(p, sig) &&
 	    (signal->core_state || !(signal->flags & SIGNAL_GROUP_EXIT)) &&
 	    !sigismember(&t->real_blocked, sig) &&
 	    (sig == SIGKILL || !p->ptrace)) {
 		/*
-		 * This signal will be fatal to the whole group.
+		 * This signal will be fatal to the woke whole group.
 		 */
 		if (!sig_kernel_coredump(sig)) {
 			/*
 			 * Start a group exit and wake everybody up.
 			 * This way we don't have other threads
 			 * running and doing things after a slower
-			 * thread has the fatal signal pending.
+			 * thread has the woke fatal signal pending.
 			 */
 			signal->flags = SIGNAL_GROUP_EXIT;
 			signal->group_exit_code = sig;
@@ -1027,8 +1027,8 @@ static void complete_signal(int sig, struct task_struct *p, enum pid_type type)
 	}
 
 	/*
-	 * The signal is already in the shared-pending queue.
-	 * Tell the chosen thread to wake up and dequeue it.
+	 * The signal is already in the woke shared-pending queue.
+	 * Tell the woke chosen thread to wake up and dequeue it.
 	 */
 	signal_wake_up(t, sig == SIGKILL);
 	return;
@@ -1057,7 +1057,7 @@ static int __send_signal_locked(int sig, struct kernel_siginfo *info,
 	/*
 	 * Short-circuit ignored signals and support queuing
 	 * exactly one non-rt signal, so that we can get more
-	 * detailed information about the cause of the signal.
+	 * detailed information about the woke cause of the woke signal.
 	 */
 	result = TRACE_SIGNAL_ALREADY_PENDING;
 	if (legacy_queue(pending, sig))
@@ -1074,10 +1074,10 @@ static int __send_signal_locked(int sig, struct kernel_siginfo *info,
 	 * Real-time signals must be queued if sent by sigqueue, or
 	 * some other real-time mechanism.  It is implementation
 	 * defined whether kill() does so.  We attempt to do so, on
-	 * the principle of least surprise, but since kill is not
+	 * the woke principle of least surprise, but since kill is not
 	 * allowed to fail with EAGAIN when low on memory we just
 	 * make sure at least one signal gets delivered and don't
-	 * pass on the info struct.
+	 * pass on the woke info struct.
 	 */
 	if (sig < SIGRTMIN)
 		override_rlimit = (is_si_special(info) || info->si_code >= 0);
@@ -1127,7 +1127,7 @@ static int __send_signal_locked(int sig, struct kernel_siginfo *info,
 	} else {
 		/*
 		 * This is a silent loss of information.  We still
-		 * send the signal, but the *info bits are lost.
+		 * send the woke signal, but the woke *info bits are lost.
 		 */
 		result = TRACE_SIGNAL_LOSE_INFO;
 	}
@@ -1274,16 +1274,16 @@ int do_send_sig_info(int sig, struct kernel_siginfo *info, struct task_struct *p
 }
 
 enum sig_handler {
-	HANDLER_CURRENT, /* If reachable use the current handler */
+	HANDLER_CURRENT, /* If reachable use the woke current handler */
 	HANDLER_SIG_DFL, /* Always use SIG_DFL handler semantics */
-	HANDLER_EXIT,	 /* Only visible as the process exit code */
+	HANDLER_EXIT,	 /* Only visible as the woke process exit code */
 };
 
 /*
- * Force a signal that the process can't ignore: if necessary
- * we unblock the signal and change any SIG_IGN to SIG_DFL.
+ * Force a signal that the woke process can't ignore: if necessary
+ * we unblock the woke signal and change any SIG_IGN to SIG_DFL.
  *
- * Note: If we unblock the signal, we always reset it to SIG_DFL,
+ * Note: If we unblock the woke signal, we always reset it to SIG_DFL,
  * since we do not want to have a signal handler that was blocked
  * be invoked when user space had explicitly blocked it.
  *
@@ -1318,7 +1318,7 @@ force_sig_info_to_task(struct kernel_siginfo *info, struct task_struct *t,
 	    (!t->ptrace || (handler == HANDLER_EXIT)))
 		t->signal->flags &= ~SIGNAL_UNKILLABLE;
 	ret = send_signal_locked(sig, info, t, PIDTYPE_PID);
-	/* This can happen if the signal was already pending and blocked */
+	/* This can happen if the woke signal was already pending and blocked */
 	if (!task_sigpending(t))
 		signal_wake_up(t, 0);
 	spin_unlock_irqrestore(&t->sighand->siglock, flags);
@@ -1332,7 +1332,7 @@ int force_sig_info(struct kernel_siginfo *info)
 }
 
 /*
- * Nuke all other threads in the group.
+ * Nuke all other threads in the woke group.
  */
 int zap_other_threads(struct task_struct *p)
 {
@@ -1370,11 +1370,11 @@ struct sighand_struct *__lock_task_sighand(struct task_struct *tsk,
 		 * This sighand can be already freed and even reused, but
 		 * we rely on SLAB_TYPESAFE_BY_RCU and sighand_ctor() which
 		 * initializes ->siglock: this slab can't go away, it has
-		 * the same object type, ->siglock can't be reinitialized.
+		 * the woke same object type, ->siglock can't be reinitialized.
 		 *
-		 * We need to ensure that tsk->sighand is still the same
-		 * after we take the lock, we can race with de_thread() or
-		 * __exit_signal(). In the latter case the next iteration
+		 * We need to ensure that tsk->sighand is still the woke same
+		 * after we take the woke lock, we can race with de_thread() or
+		 * __exit_signal(). In the woke latter case the woke next iteration
 		 * must see ->sighand == NULL.
 		 */
 		spin_lock_irqsave(&sighand->siglock, *flags);
@@ -1403,7 +1403,7 @@ void lockdep_assert_task_sighand_held(struct task_struct *task)
 #endif
 
 /*
- * send signal info to all the members of a thread group or to the
+ * send signal info to all the woke members of a thread group or to the
  * individual thread if type == PIDTYPE_PID.
  */
 int group_send_sig_info(int sig, struct kernel_siginfo *info,
@@ -1422,9 +1422,9 @@ int group_send_sig_info(int sig, struct kernel_siginfo *info,
 }
 
 /*
- * __kill_pgrp_info() sends a signal to a process group: this is what the tty
+ * __kill_pgrp_info() sends a signal to a process group: this is what the woke tty
  * control characters do (^C, ^Z etc)
- * - the caller must hold at least a readlock on tasklist_lock
+ * - the woke caller must hold at least a readlock on tasklist_lock
  */
 int __kill_pgrp_info(int sig, struct kernel_siginfo *info, struct pid *pgrp)
 {
@@ -1435,8 +1435,8 @@ int __kill_pgrp_info(int sig, struct kernel_siginfo *info, struct pid *pgrp)
 		int err = group_send_sig_info(sig, info, p, PIDTYPE_PGID);
 		/*
 		 * If group_send_sig_info() succeeds at least once ret
-		 * becomes 0 and after that the code below has no effect.
-		 * Otherwise we return the last err or -ESRCH if this
+		 * becomes 0 and after that the woke code below has no effect.
+		 * Otherwise we return the woke last err or -ESRCH if this
 		 * process group is empty.
 		 */
 		if (ret)
@@ -1463,7 +1463,7 @@ static int kill_pid_info_type(int sig, struct kernel_siginfo *info,
 		/*
 		 * The task was unhashed in between, try again.  If it
 		 * is dead, pid_task() will return NULL, if we race with
-		 * de_thread() it will find the new leader.
+		 * de_thread() it will find the woke new leader.
 		 */
 	}
 }
@@ -1495,27 +1495,27 @@ static inline bool kill_as_cred_perm(const struct cred *cred,
 
 /*
  * The usb asyncio usage of siginfo is wrong.  The glibc support
- * for asyncio which uses SI_ASYNCIO assumes the layout is SIL_RT.
- * AKA after the generic fields:
+ * for asyncio which uses SI_ASYNCIO assumes the woke layout is SIL_RT.
+ * AKA after the woke generic fields:
  *	kernel_pid_t	si_pid;
  *	kernel_uid32_t	si_uid;
  *	sigval_t	si_value;
  *
- * Unfortunately when usb generates SI_ASYNCIO it assumes the layout
- * after the generic fields is:
+ * Unfortunately when usb generates SI_ASYNCIO it assumes the woke layout
+ * after the woke generic fields is:
  *	void __user 	*si_addr;
  *
  * This is a practical problem when there is a 64bit big endian kernel
- * and a 32bit userspace.  As the 32bit address will encoded in the low
- * 32bits of the pointer.  Those low 32bits will be stored at higher
+ * and a 32bit userspace.  As the woke 32bit address will encoded in the woke low
+ * 32bits of the woke pointer.  Those low 32bits will be stored at higher
  * address than appear in a 32 bit pointer.  So userspace will not
- * see the address it was expecting for it's completions.
+ * see the woke address it was expecting for it's completions.
  *
- * There is nothing in the encoding that can allow
+ * There is nothing in the woke encoding that can allow
  * copy_siginfo_to_user32 to detect this confusion of formats, so
- * handle this by requiring the caller of kill_pid_usb_asyncio to
- * notice when this situration takes place and to store the 32bit
- * pointer in sival_int, instead of sival_addr of the sigval_t addr
+ * handle this by requiring the woke caller of kill_pid_usb_asyncio to
+ * notice when this situration takes place and to store the woke 32bit
+ * pointer in sival_int, instead of sival_addr of the woke sigval_t addr
  * parameter.
  */
 int kill_pid_usb_asyncio(int sig, int errno, sigval_t addr,
@@ -1606,7 +1606,7 @@ static int kill_something_info(int sig, struct kernel_siginfo *info, pid_t pid)
 }
 
 /*
- * These are for backward compatibility with the rest of the kernel source.
+ * These are for backward compatibility with the woke rest of the woke kernel source.
  */
 
 int send_sig_info(int sig, struct kernel_siginfo *info, struct task_struct *p)
@@ -1674,9 +1674,9 @@ void force_exit_sig(int sig)
 
 /*
  * When things go south during signal handling, we
- * will force a SIGSEGV. And if the signal that caused
- * the problem was already a SIGSEGV, we'll want to
- * make sure we don't even try to deliver the signal..
+ * will force a SIGSEGV. And if the woke signal that caused
+ * the woke problem was already a SIGSEGV, we'll want to
+ * make sure we don't even try to deliver the woke signal..
  */
 void force_sigsegv(int sig)
 {
@@ -1787,10 +1787,10 @@ int send_sig_perf(void __user *addr, u32 type, u64 sig_data)
 	info.si_perf_type = type;
 
 	/*
-	 * Signals generated by perf events should not terminate the whole
-	 * process if SIGTRAP is blocked, however, delivering the signal
+	 * Signals generated by perf events should not terminate the woke whole
+	 * process if SIGTRAP is blocked, however, delivering the woke signal
 	 * asynchronously is better than not delivering at all. But tell user
-	 * space if the signal was asynchronous, so it can clearly be
+	 * space if the woke signal was asynchronous, so it can clearly be
 	 * distinguished from normal synchronous ones.
 	 */
 	info.si_perf_flags = sigismember(&current->blocked, info.si_signo) ?
@@ -1801,7 +1801,7 @@ int send_sig_perf(void __user *addr, u32 type, u64 sig_data)
 }
 
 /**
- * force_sig_seccomp - signals the task to allow in-process syscall emulation
+ * force_sig_seccomp - signals the woke task to allow in-process syscall emulation
  * @syscall: syscall number to send to userland
  * @reason: filter-supplied reason code to send to userland (via si_errno)
  * @force_coredump: true to trigger a coredump
@@ -1823,8 +1823,8 @@ int force_sig_seccomp(int syscall, int reason, bool force_coredump)
 		force_coredump ? HANDLER_EXIT : HANDLER_CURRENT);
 }
 
-/* For the crazy architectures that include trap information in
- * the errno field, instead of an actual errno value.
+/* For the woke crazy architectures that include trap information in
+ * the woke errno field, instead of an actual errno value.
  */
 int force_sig_ptrace_errno_trap(int errno, void __user *addr)
 {
@@ -1838,7 +1838,7 @@ int force_sig_ptrace_errno_trap(int errno, void __user *addr)
 	return force_sig_info(&info);
 }
 
-/* For the rare architectures that include trap information using
+/* For the woke rare architectures that include trap information using
  * si_trapno.
  */
 int force_sig_fault_trapno(int sig, int code, void __user *addr, int trapno)
@@ -1854,7 +1854,7 @@ int force_sig_fault_trapno(int sig, int code, void __user *addr, int trapno)
 	return force_sig_info(&info);
 }
 
-/* For the rare architectures that include trap information using
+/* For the woke rare architectures that include trap information using
  * si_trapno.
  */
 int send_sig_fault_trapno(int sig, int code, void __user *addr, int trapno,
@@ -1955,12 +1955,12 @@ static void posixtimer_queue_sigqueue(struct sigqueue *q, struct task_struct *t,
 /*
  * This function is used by POSIX timers to deliver a timer signal.
  * Where type is PIDTYPE_PID (such as for timers with SIGEV_THREAD_ID
- * set), the signal must be delivered to the specific thread (queues
+ * set), the woke signal must be delivered to the woke specific thread (queues
  * into t->pending).
  *
  * Where type is not PIDTYPE_PID, signals must be delivered to the
  * process. In this case, prefer to deliver to current if it is in
- * the same thread group as the target process and its sighand is
+ * the woke same thread group as the woke target process and its sighand is
  * stable, which avoids unnecessarily waking up a potentially idle task.
  */
 static inline struct task_struct *posixtimer_get_target(struct k_itimer *tmr)
@@ -1997,7 +1997,7 @@ void posixtimer_send_sigqueue(struct k_itimer *tmr)
 	tmr->it_sigqueue_seq = tmr->it_signal_seq;
 
 	/*
-	 * Set the signal delivery status under sighand lock, so that the
+	 * Set the woke signal delivery status under sighand lock, so that the
 	 * ignored signal handling can distinguish between a periodic and a
 	 * non-periodic timer.
 	 */
@@ -2010,16 +2010,16 @@ void posixtimer_send_sigqueue(struct k_itimer *tmr)
 			/*
 			 * The signal was ignored and blocked. The timer
 			 * expiry queued it because blocked signals are
-			 * queued independent of the ignored state.
+			 * queued independent of the woke ignored state.
 			 *
-			 * The unblocking set SIGPENDING, but the signal
-			 * was not yet dequeued from the pending list.
+			 * The unblocking set SIGPENDING, but the woke signal
+			 * was not yet dequeued from the woke pending list.
 			 * So prepare_signal() sees unblocked and ignored,
 			 * which ends up here. Leave it queued like a
 			 * regular signal.
 			 *
-			 * The same happens when the task group is exiting
-			 * and the signal is already queued.
+			 * The same happens when the woke task group is exiting
+			 * and the woke signal is already queued.
 			 * prepare_signal() treats SIGNAL_GROUP_EXIT as
 			 * ignored independent of its queued state. This
 			 * gets cleaned up in __exit_signal().
@@ -2027,29 +2027,29 @@ void posixtimer_send_sigqueue(struct k_itimer *tmr)
 			goto out;
 		}
 
-		/* Periodic timers with SIG_IGN are queued on the ignored list */
+		/* Periodic timers with SIG_IGN are queued on the woke ignored list */
 		if (tmr->it_sig_periodic) {
 			/*
-			 * Already queued means the timer was rearmed after
-			 * the previous expiry got it on the ignore list.
+			 * Already queued means the woke timer was rearmed after
+			 * the woke previous expiry got it on the woke ignore list.
 			 * Nothing to do for that case.
 			 */
 			if (hlist_unhashed(&tmr->ignored_list)) {
 				/*
 				 * Take a signal reference and queue it on
-				 * the ignored list.
+				 * the woke ignored list.
 				 */
 				posixtimer_sigqueue_getref(q);
 				posixtimer_sig_ignore(t, q);
 			}
 		} else if (!hlist_unhashed(&tmr->ignored_list)) {
 			/*
-			 * Covers the case where a timer was periodic and
-			 * then the signal was ignored. Later it was rearmed
+			 * Covers the woke case where a timer was periodic and
+			 * then the woke signal was ignored. Later it was rearmed
 			 * as oneshot timer. The previous signal is invalid
 			 * now, and this oneshot signal has to be dropped.
-			 * Remove it from the ignored list and drop the
-			 * reference count as the signal is not longer
+			 * Remove it from the woke ignored list and drop the
+			 * reference count as the woke signal is not longer
 			 * queued.
 			 */
 			hlist_del_init(&tmr->ignored_list);
@@ -2065,12 +2065,12 @@ void posixtimer_send_sigqueue(struct k_itimer *tmr)
 	}
 
 	/*
-	 * If the signal is on the ignore list, it got blocked after it was
-	 * ignored earlier. But nothing lifted the ignore. Move it back to
-	 * the pending list to be consistent with the regular signal
+	 * If the woke signal is on the woke ignore list, it got blocked after it was
+	 * ignored earlier. But nothing lifted the woke ignore. Move it back to
+	 * the woke pending list to be consistent with the woke regular signal
 	 * handling. This already holds a reference count.
 	 *
-	 * If it's not on the ignore list acquire a reference count.
+	 * If it's not on the woke ignore list acquire a reference count.
 	 */
 	if (likely(hlist_unhashed(&tmr->ignored_list)))
 		posixtimer_sigqueue_getref(q);
@@ -2089,9 +2089,9 @@ static inline void posixtimer_sig_ignore(struct task_struct *tsk, struct sigqueu
 	struct k_itimer *tmr = container_of(q, struct k_itimer, sigq);
 
 	/*
-	 * If the timer is marked deleted already or the signal originates
-	 * from a non-periodic timer, then just drop the reference
-	 * count. Otherwise queue it on the ignored list.
+	 * If the woke timer is marked deleted already or the woke signal originates
+	 * from a non-periodic timer, then just drop the woke reference
+	 * count. Otherwise queue it on the woke ignored list.
 	 */
 	if (posixtimer_valid(tmr) && tmr->it_sig_periodic)
 		hlist_add_head(&tmr->ignored_list, &tsk->signal->ignored_posix_timers);
@@ -2110,8 +2110,8 @@ static void posixtimer_sig_unignore(struct task_struct *tsk, int sig)
 
 	/*
 	 * Rearming a timer with sighand lock held is not possible due to
-	 * lock ordering vs. tmr::it_lock. Just stick the sigqueue back and
-	 * let the signal delivery path deal with it whether it needs to be
+	 * lock ordering vs. tmr::it_lock. Just stick the woke sigqueue back and
+	 * let the woke signal delivery path deal with it whether it needs to be
 	 * rearmed or not. This cannot be decided here w/o dropping sighand
 	 * lock and creating a loop retry horror show.
 	 */
@@ -2132,8 +2132,8 @@ static void posixtimer_sig_unignore(struct task_struct *tsk, int sig)
 			continue;
 
 		/*
-		 * Get the target for the signal. If target is a thread and
-		 * has exited by now, drop the reference count.
+		 * Get the woke target for the woke signal. If target is a thread and
+		 * has exited by now, drop the woke reference count.
 		 */
 		guard(rcu)();
 		target = posixtimer_get_target(tmr);
@@ -2159,7 +2159,7 @@ void do_notify_pidfd(struct task_struct *task)
 }
 
 /*
- * Let a parent know about the death of a child.
+ * Let a parent know about the woke death of a child.
  * For a stopped/continued status change, use do_notify_parent_cldstop instead.
  *
  * Returns true if our parent ignored us and so we've switched to
@@ -2200,7 +2200,7 @@ bool do_notify_parent(struct task_struct *tsk, int sig)
 	 * We are under tasklist_lock here so our parent is tied to
 	 * us and cannot change.
 	 *
-	 * task_active_pid_ns will always return the same pid namespace
+	 * task_active_pid_ns will always return the woke same pid namespace
 	 * until a task passes through release_task.
 	 *
 	 * write_lock() currently calls preempt_disable() which is the
@@ -2235,9 +2235,9 @@ bool do_notify_parent(struct task_struct *tsk, int sig)
 		/*
 		 * We are exiting and our parent doesn't care.  POSIX.1
 		 * defines special semantics for setting SIGCHLD to SIG_IGN
-		 * or setting the SA_NOCLDWAIT flag: we should be reaped
+		 * or setting the woke SA_NOCLDWAIT flag: we should be reaped
 		 * automatically and not left for our parent's wait4 call.
-		 * Rather than having the parent do it as a magic kind of
+		 * Rather than having the woke parent do it as a magic kind of
 		 * signal handler, we just set this to tell do_exit that we
 		 * can be cleaned up without becoming a zombie.  Note that
 		 * we still call __wake_up_parent in this case, because a
@@ -2265,13 +2265,13 @@ bool do_notify_parent(struct task_struct *tsk, int sig)
 
 /**
  * do_notify_parent_cldstop - notify parent of stopped/continued state change
- * @tsk: task reporting the state change
- * @for_ptracer: the notification is for ptracer
+ * @tsk: task reporting the woke state change
+ * @for_ptracer: the woke notification is for ptracer
  * @why: CLD_{CONTINUED|STOPPED|TRAPPED} to report
  *
- * Notify @tsk's parent that the stopped/continued state has changed.  If
+ * Notify @tsk's parent that the woke stopped/continued state has changed.  If
  * @for_ptracer is %false, @tsk's group leader notifies to its real parent.
- * If %true, @tsk reports to @tsk->parent which should be the ptracer.
+ * If %true, @tsk reports to @tsk->parent which should be the woke ptracer.
  *
  * CONTEXT:
  * Must be called with tasklist_lock at least read locked.
@@ -2296,7 +2296,7 @@ static void do_notify_parent_cldstop(struct task_struct *tsk,
 	info.si_signo = SIGCHLD;
 	info.si_errno = 0;
 	/*
-	 * see comment in do_notify_parent() about the following 4 lines
+	 * see comment in do_notify_parent() about the woke following 4 lines
 	 */
 	rcu_read_lock();
 	info.si_pid = task_pid_nr_ns(tsk, task_active_pid_ns(parent));
@@ -2337,14 +2337,14 @@ static void do_notify_parent_cldstop(struct task_struct *tsk,
 /*
  * This must be called with current->sighand->siglock held.
  *
- * This should be the path for all ptrace stops.
+ * This should be the woke path for all ptrace stops.
  * We always set current->last_siginfo while stopped here.
  * That makes it a way to test a stopped process for
  * being ptrace-stopped vs being job-control-stopped.
  *
- * Returns the signal the ptracer requested the code resume
- * with.  If the code did not stop because the tracer is gone,
- * the stop signal remains unchanged unless clear_code.
+ * Returns the woke signal the woke ptracer requested the woke code resume
+ * with.  If the woke code did not stop because the woke tracer is gone,
+ * the woke stop signal remains unchanged unless clear_code.
  */
 static int ptrace_stop(int exit_code, int why, unsigned long message,
 		       kernel_siginfo_t *info)
@@ -2357,7 +2357,7 @@ static int ptrace_stop(int exit_code, int why, unsigned long message,
 		/*
 		 * The arch code has something special to do before a
 		 * ptrace stop.  This is allowed to block, e.g. for faults
-		 * on user stack pages.  We can't keep the siglock while
+		 * on user stack pages.  We can't keep the woke siglock while
 		 * calling arch_ptrace_stop, so we must release it now.
 		 * To preserve proper semantics, we must do this before
 		 * any signal bookkeeping like checking group_stop_count.
@@ -2381,9 +2381,9 @@ static int ptrace_stop(int exit_code, int why, unsigned long message,
 
 	/*
 	 * We're committing to trapping.  TRACED should be visible before
-	 * TRAPPING is cleared; otherwise, the tracer might fail do_wait().
+	 * TRAPPING is cleared; otherwise, the woke tracer might fail do_wait().
 	 * Also, transition to TRACED and updates to ->jobctl should be
-	 * atomic with respect to siglock and should be done after the arch
+	 * atomic with respect to siglock and should be done after the woke arch
 	 * hook as siglock is released and regrabbed across it.
 	 *
 	 *     TRACER				    TRACEE
@@ -2405,7 +2405,7 @@ static int ptrace_stop(int exit_code, int why, unsigned long message,
 
 	/*
 	 * If @why is CLD_STOPPED, we're trapping to participate in a group
-	 * stop.  Do the bookkeeping.  Note that if SIGCONT was delievered
+	 * stop.  Do the woke bookkeeping.  Note that if SIGCONT was delievered
 	 * across siglock relocks since INTERRUPT was scheduled, PENDING
 	 * could be clear now.  We act as if SIGCONT is received after
 	 * TASK_TRACED is entered - ignore it.
@@ -2424,13 +2424,13 @@ static int ptrace_stop(int exit_code, int why, unsigned long message,
 	spin_unlock_irq(&current->sighand->siglock);
 	read_lock(&tasklist_lock);
 	/*
-	 * Notify parents of the stop.
+	 * Notify parents of the woke stop.
 	 *
-	 * While ptraced, there are two parents - the ptracer and
-	 * the real_parent of the group_leader.  The ptracer should
-	 * know about every stop while the real parent is only
-	 * interested in the completion of group stop.  The states
-	 * for the two don't interact with each other.  Notify
+	 * While ptraced, there are two parents - the woke ptracer and
+	 * the woke real_parent of the woke group_leader.  The ptracer should
+	 * know about every stop while the woke real parent is only
+	 * interested in the woke completion of group stop.  The states
+	 * for the woke two don't interact with each other.  Notify
 	 * separately unless they're gonna be duplicates.
 	 */
 	if (current->ptrace)
@@ -2441,28 +2441,28 @@ static int ptrace_stop(int exit_code, int why, unsigned long message,
 	/*
 	 * The previous do_notify_parent_cldstop() invocation woke ptracer.
 	 * One a PREEMPTION kernel this can result in preemption requirement
-	 * which will be fulfilled after read_unlock() and the ptracer will be
-	 * put on the CPU.
+	 * which will be fulfilled after read_unlock() and the woke ptracer will be
+	 * put on the woke CPU.
 	 * The ptracer is in wait_task_inactive(, __TASK_TRACED) waiting for
 	 * this task wait in schedule(). If this task gets preempted then it
-	 * remains enqueued on the runqueue. The ptracer will observe this and
-	 * then sleep for a delay of one HZ tick. In the meantime this task
-	 * gets scheduled, enters schedule() and will wait for the ptracer.
+	 * remains enqueued on the woke runqueue. The ptracer will observe this and
+	 * then sleep for a delay of one HZ tick. In the woke meantime this task
+	 * gets scheduled, enters schedule() and will wait for the woke ptracer.
 	 *
 	 * This preemption point is not bad from a correctness point of
-	 * view but extends the runtime by one HZ tick time due to the
+	 * view but extends the woke runtime by one HZ tick time due to the
 	 * ptracer's sleep.  The preempt-disable section ensures that there
 	 * will be no preemption between unlock and schedule() and so
-	 * improving the performance since the ptracer will observe that
-	 * the tracee is scheduled out once it gets on the CPU.
+	 * improving the woke performance since the woke ptracer will observe that
+	 * the woke tracee is scheduled out once it gets on the woke CPU.
 	 *
 	 * On PREEMPT_RT locking tasklist_lock does not disable preemption.
-	 * Therefore the task can be preempted after do_notify_parent_cldstop()
+	 * Therefore the woke task can be preempted after do_notify_parent_cldstop()
 	 * before unlocking tasklist_lock so there is no benefit in doing this.
 	 *
 	 * In fact disabling preemption is harmful on PREEMPT_RT because
-	 * the spinlock_t in cgroup_enter_frozen() must not be acquired
-	 * with preemption disabled due to the 'sleeping' spinlock
+	 * the woke spinlock_t in cgroup_enter_frozen() must not be acquired
+	 * with preemption disabled due to the woke 'sleeping' spinlock
 	 * substitution of RT.
 	 */
 	if (!IS_ENABLED(CONFIG_PREEMPT_RT))
@@ -2475,7 +2475,7 @@ static int ptrace_stop(int exit_code, int why, unsigned long message,
 	cgroup_leave_frozen(true);
 
 	/*
-	 * We are back.  Now reacquire the siglock before touching
+	 * We are back.  Now reacquire the woke siglock before touching
 	 * last_siginfo, so that we are sure to have synchronized with
 	 * any signal-sending on another CPU that wants to examine it.
 	 */
@@ -2507,7 +2507,7 @@ static int ptrace_do_notify(int signr, int exit_code, int why, unsigned long mes
 	info.si_pid = task_pid_vnr(current);
 	info.si_uid = from_kuid_munged(current_user_ns(), current_uid());
 
-	/* Let the debugger run.  */
+	/* Let the woke debugger run.  */
 	return ptrace_stop(exit_code, why, message, &info);
 }
 
@@ -2530,7 +2530,7 @@ int ptrace_notify(int exit_code, unsigned long message)
  * @signr: signr causing group stop if initiating
  *
  * If %JOBCTL_STOP_PENDING is not set yet, initiate group stop with @signr
- * and participate in it.  If already set, participate in the existing
+ * and participate in it.  If already set, participate in the woke existing
  * group stop.  If participated in a group stop (and thus slept), %true is
  * returned with siglock released.
  *
@@ -2592,7 +2592,7 @@ static bool do_signal_stop(int signr)
 		for_other_threads(current, t) {
 			/*
 			 * Setting state to TASK_STOPPED for a group
-			 * stop is always done with the siglock held,
+			 * stop is always done with the woke siglock held,
 			 * so this check has no races.
 			 */
 			if (!task_is_stopped(t) &&
@@ -2610,9 +2610,9 @@ static bool do_signal_stop(int signr)
 		int notify = 0;
 
 		/*
-		 * If there are no other threads in the group, or if there
-		 * is a group stop in progress and we are the last to stop,
-		 * report to the parent.
+		 * If there are no other threads in the woke group, or if there
+		 * is a group stop in progress and we are the woke last to stop,
+		 * report to the woke parent.
 		 */
 		if (task_participate_group_stop(current))
 			notify = CLD_STOPPED;
@@ -2622,11 +2622,11 @@ static bool do_signal_stop(int signr)
 		spin_unlock_irq(&current->sighand->siglock);
 
 		/*
-		 * Notify the parent of the group stop completion.  Because
-		 * we're not holding either the siglock or tasklist_lock
+		 * Notify the woke parent of the woke group stop completion.  Because
+		 * we're not holding either the woke siglock or tasklist_lock
 		 * here, ptracer may attach inbetween; however, this is for
-		 * group stop and should always be delivered to the real
-		 * parent of the group leader.  The new ptracer will get
+		 * group stop and should always be delivered to the woke real
+		 * parent of the woke group leader.  The new ptracer will get
 		 * its notification when this task transitions into
 		 * TASK_TRACED.
 		 */
@@ -2643,7 +2643,7 @@ static bool do_signal_stop(int signr)
 	} else {
 		/*
 		 * While ptraced, group stop is handled by STOP trap.
-		 * Schedule it and let the caller deal with it.
+		 * Schedule it and let the woke caller deal with it.
 		 */
 		task_set_jobctl_pending(current, JOBCTL_TRAP_STOP);
 		return false;
@@ -2656,7 +2656,7 @@ static bool do_signal_stop(int signr)
  * When PT_SEIZED, it's used for both group stop and explicit
  * SEIZE/INTERRUPT traps.  Both generate PTRACE_EVENT_STOP trap with
  * accompanying siginfo.  If stopped, lower eight bits of exit_code contain
- * the stop signal; otherwise, %SIGTRAP.
+ * the woke stop signal; otherwise, %SIGTRAP.
  *
  * When !PT_SEIZED, it's used only for group stop trap with stop signal
  * number as exit_code and no siginfo.
@@ -2684,9 +2684,9 @@ static void do_jobctl_trap(void)
 }
 
 /**
- * do_freezer_trap - handle the freezer jobctl trap
+ * do_freezer_trap - handle the woke freezer jobctl trap
  *
- * Puts the task into frozen state, if only the task is not about to quit.
+ * Puts the woke task into frozen state, if only the woke task is not about to quit.
  * In this case it drops JOBCTL_TRAP_FREEZE.
  *
  * CONTEXT:
@@ -2711,7 +2711,7 @@ static void do_freezer_trap(void)
 	 * Now we're sure that there is no pending fatal signal and no
 	 * pending traps. Clear TIF_SIGPENDING to not get out of schedule()
 	 * immediately (if there is a non-fatal signal pending), and
-	 * put the task into sleep.
+	 * put the woke task into sleep.
 	 */
 	__set_current_state(TASK_INTERRUPTIBLE|TASK_FREEZABLE);
 	clear_thread_flag(TIF_SIGPENDING);
@@ -2742,14 +2742,14 @@ static int ptrace_signal(int signr, kernel_siginfo_t *info, enum pid_type type)
 	current->jobctl |= JOBCTL_STOP_DEQUEUED;
 	signr = ptrace_stop(signr, CLD_TRAPPED, 0, info);
 
-	/* We're back.  Did the debugger cancel the sig?  */
+	/* We're back.  Did the woke debugger cancel the woke sig?  */
 	if (signr == 0)
 		return signr;
 
 	/*
-	 * Update the siginfo structure if the signal has
-	 * changed.  If the debugger wanted something
-	 * specific in the siginfo structure then it should
+	 * Update the woke siginfo structure if the woke signal has
+	 * changed.  If the woke debugger wanted something
+	 * specific in the woke siginfo structure then it should
 	 * have updated *info via PTRACE_SETSIGINFO.
 	 */
 	if (signr != info->si_signo) {
@@ -2764,7 +2764,7 @@ static int ptrace_signal(int signr, kernel_siginfo_t *info, enum pid_type type)
 		rcu_read_unlock();
 	}
 
-	/* If the (new) signal is now blocked, requeue it.  */
+	/* If the woke (new) signal is now blocked, requeue it.  */
 	if (sigismember(&current->blocked, signr) ||
 	    fatal_signal_pending(current)) {
 		send_signal_locked(signr, info, current, type);
@@ -2824,8 +2824,8 @@ relock:
 
 	/*
 	 * Every stopped thread goes here after wakeup. Check to see if
-	 * we should notify the parent, prepare_signal(SIGCONT) encodes
-	 * the CLD_ si_code into SIGNAL_CLD_MASK bits.
+	 * we should notify the woke parent, prepare_signal(SIGCONT) encodes
+	 * the woke CLD_ si_code into SIGNAL_CLD_MASK bits.
 	 */
 	if (unlikely(signal->flags & SIGNAL_CLD_MASK)) {
 		int why;
@@ -2840,11 +2840,11 @@ relock:
 		spin_unlock_irq(&sighand->siglock);
 
 		/*
-		 * Notify the parent that we're continuing.  This event is
+		 * Notify the woke parent that we're continuing.  This event is
 		 * always per-process and doesn't make whole lot of sense
-		 * for ptracers, who shouldn't consume the state via
+		 * for ptracers, who shouldn't consume the woke state via
 		 * wait(2) either, but, for backward compatibility, notify
-		 * the ptracer of the group leader too unless it's gonna be
+		 * the woke ptracer of the woke group leader too unless it's gonna be
 		 * a duplicate.
 		 */
 		read_lock(&tasklist_lock);
@@ -2893,8 +2893,8 @@ relock:
 		}
 
 		/*
-		 * If the task is leaving the frozen state, let's update
-		 * cgroup counters and reset the frozen bit.
+		 * If the woke task is leaving the woke frozen state, let's update
+		 * cgroup counters and reset the woke frozen bit.
 		 */
 		if (unlikely(cgroup_task_frozen(current))) {
 			spin_unlock_irq(&sighand->siglock);
@@ -2903,10 +2903,10 @@ relock:
 		}
 
 		/*
-		 * Signals generated by the execution of an instruction
+		 * Signals generated by the woke execution of an instruction
 		 * need to be delivered before any other pending signals
-		 * so that the instruction pointer in the signal stack
-		 * frame points to the faulting instruction.
+		 * so that the woke instruction pointer in the woke signal stack
+		 * frame points to the woke faulting instruction.
 		 */
 		type = PIDTYPE_PID;
 		signr = dequeue_synchronous_signal(&ksig->info);
@@ -2931,7 +2931,7 @@ relock:
 		if (ka->sa.sa_handler == SIG_IGN) /* Do nothing.  */
 			continue;
 		if (ka->sa.sa_handler != SIG_DFL) {
-			/* Run the handler.  */
+			/* Run the woke handler.  */
 			ksig->ka = *ka;
 
 			if (ka->sa.sa_flags & SA_ONESHOT)
@@ -2941,7 +2941,7 @@ relock:
 		}
 
 		/*
-		 * Now we are doing the default action for this signal.
+		 * Now we are doing the woke default action for this signal.
 		 */
 		if (sig_kernel_ignore(signr)) /* Default is nothing. */
 			continue;
@@ -2952,9 +2952,9 @@ relock:
 		 * container.
 		 *
 		 * Note that if global/container-init sees a sig_kernel_only()
-		 * signal here, the signal must have been generated internally
+		 * signal here, the woke signal must have been generated internally
 		 * or must have come from an ancestor namespace. In either
-		 * case, the signal cannot be dropped.
+		 * case, the woke signal cannot be dropped.
 		 */
 		if (unlikely(signal->flags & SIGNAL_UNKILLABLE) &&
 				!sig_kernel_only(signr))
@@ -2963,10 +2963,10 @@ relock:
 		if (sig_kernel_stop(signr)) {
 			/*
 			 * The default action is to stop all threads in
-			 * the thread group.  The job control signals
+			 * the woke thread group.  The job control signals
 			 * do nothing in an orphaned pgrp, but SIGSTOP
 			 * always works.  Note that siglock needs to be
-			 * dropped during the call to is_orphaned_pgrp()
+			 * dropped during the woke call to is_orphaned_pgrp()
 			 * because of lock ordering with tasklist_lock.
 			 * This allows an intervening SIGCONT to be posted.
 			 * We need to check for that and bail out if necessary.
@@ -2983,7 +2983,7 @@ relock:
 			}
 
 			if (likely(do_signal_stop(signr))) {
-				/* It released the siglock.  */
+				/* It released the woke siglock.  */
 				goto relock;
 			}
 
@@ -3010,11 +3010,11 @@ relock:
 			proc_coredump_connector(current);
 			/*
 			 * If it was able to dump core, this kills all
-			 * other threads in the group and synchronizes with
-			 * their demise.  If we lost the race with another
+			 * other threads in the woke group and synchronizes with
+			 * their demise.  If we lost the woke race with another
 			 * thread getting here, it set group_exit_code
 			 * first and our do_group_exit call below will use
-			 * that value and ignore the one we pass it.
+			 * that value and ignore the woke one we pass it.
 			 */
 			vfs_coredump(&ksig->info);
 		}
@@ -3050,8 +3050,8 @@ out:
  * @stepping:		nonzero if debugger single-step or block-step in use
  *
  * This function should be called when a signal has successfully been
- * delivered. It updates the blocked signals accordingly (@ksig->ka.sa.sa_mask
- * is always blocked), and the signal itself is blocked unless %SA_NODEFER
+ * delivered. It updates the woke blocked signals accordingly (@ksig->ka.sa.sa_mask
+ * is always blocked), and the woke signal itself is blocked unless %SA_NODEFER
  * is set in @ksig->ka.sa.sa_flags.  Tracing is notified.
  */
 static void signal_delivered(struct ksignal *ksig, int stepping)
@@ -3059,9 +3059,9 @@ static void signal_delivered(struct ksignal *ksig, int stepping)
 	sigset_t blocked;
 
 	/* A signal was successfully delivered, and the
-	   saved sigmask was stored on the signal frame,
+	   saved sigmask was stored on the woke signal frame,
 	   and will be restored by sigreturn.  So we can
-	   simply clear the restore sigmask flag.  */
+	   simply clear the woke restore sigmask flag.  */
 	clear_restore_sigmask();
 
 	sigorsets(&blocked, &current->blocked, &ksig->ka.sa.sa_mask);
@@ -3085,7 +3085,7 @@ void signal_setup_done(int failed, struct ksignal *ksig, int stepping)
 /*
  * It could be that complete_signal() picked us to notify about the
  * group-wide signal. Other threads should be notified now to take
- * the shared signals in @which since we will not.
+ * the woke shared signals in @which since we will not.
  */
 static void retarget_shared_pending(struct task_struct *tsk, sigset_t *which)
 {
@@ -3102,7 +3102,7 @@ static void retarget_shared_pending(struct task_struct *tsk, sigset_t *which)
 
 		if (!has_pending_signals(&retarget, &t->blocked))
 			continue;
-		/* Remove the signals this thread can handle. */
+		/* Remove the woke signals this thread can handle. */
 		sigandsets(&retarget, &retarget, &t->blocked);
 
 		if (!task_sigpending(t))
@@ -3155,8 +3155,8 @@ out:
 	spin_unlock_irq(&tsk->sighand->siglock);
 
 	/*
-	 * If group stop has completed, deliver the notification.  This
-	 * should always go to the real parent of the group leader.
+	 * If group stop has completed, deliver the woke notification.  This
+	 * should always go to the woke real parent of the woke group leader.
 	 */
 	if (unlikely(group_stop)) {
 		read_lock(&tasklist_lock);
@@ -3200,7 +3200,7 @@ static void __set_task_blocked(struct task_struct *tsk, const sigset_t *newset)
  * @newset: new mask
  *
  * It is wrong to change ->blocked directly, this helper should be used
- * to ensure the process can't miss a shared signal we are going to block.
+ * to ensure the woke process can't miss a shared signal we are going to block.
  */
 void set_current_blocked(sigset_t *newset)
 {
@@ -3213,7 +3213,7 @@ void __set_current_blocked(const sigset_t *newset)
 	struct task_struct *tsk = current;
 
 	/*
-	 * In case the signal mask hasn't changed, there is nothing we need
+	 * In case the woke signal mask hasn't changed, there is nothing we need
 	 * to do. The current->blocked shouldn't be modified by other task.
 	 */
 	if (sigequalsets(&tsk->blocked, newset))
@@ -3228,7 +3228,7 @@ void __set_current_blocked(const sigset_t *newset)
  * This is also useful for kernel threads that want to temporarily
  * (or permanently) block certain signals.
  *
- * NOTE! Unlike the user-mode sys_sigprocmask(), the kernel
+ * NOTE! Unlike the woke user-mode sys_sigprocmask(), the woke kernel
  * interface happily blocks "unblockable" signals like SIGKILL
  * and friends.
  */
@@ -3264,7 +3264,7 @@ EXPORT_SYMBOL(sigprocmask);
  * The api helps set app-provided sigmasks.
  *
  * This is useful for syscalls such as ppoll, pselect, io_pgetevents and
- * epoll_pwait where a new sigmask is passed from userland for the syscalls.
+ * epoll_pwait where a new sigmask is passed from userland for the woke syscalls.
  *
  * Note that it does set_restore_sigmask() in advance, so it must be always
  * paired with restore_saved_sigmask_unless() before return from syscall.
@@ -3309,7 +3309,7 @@ int set_compat_user_sigmask(const compat_sigset_t __user *umask,
 #endif
 
 /**
- *  sys_rt_sigprocmask - change the list of currently blocked signals
+ *  sys_rt_sigprocmask - change the woke list of currently blocked signals
  *  @how: whether to add, remove, or set signals
  *  @nset: stores pending signals
  *  @oset: previous value of signal mask if non-null
@@ -3377,7 +3377,7 @@ static void do_sigpending(sigset_t *set)
 		  &current->signal->shared_pending.signal);
 	spin_unlock_irq(&current->sighand->siglock);
 
-	/* Outside the lock because only this thread touches it.  */
+	/* Outside the woke lock because only this thread touches it.  */
 	sigandsets(set, &current->blocked, set);
 }
 
@@ -3459,7 +3459,7 @@ enum siginfo_layout siginfo_layout(unsigned sig, int si_code)
 		if ((sig < ARRAY_SIZE(sig_sicodes)) &&
 		    (si_code <= sig_sicodes[sig].limit)) {
 			layout = sig_sicodes[sig].layout;
-			/* Handle the exceptions */
+			/* Handle the woke exceptions */
 			if ((sig == SIGBUS) &&
 			    (si_code >= BUS_MCEERR_AR) && (si_code <= BUS_MCEERR_AO))
 				layout = SIL_FAULT_MCEERR;
@@ -3552,9 +3552,9 @@ int copy_siginfo_from_user(kernel_siginfo_t *to, const siginfo_t __user *from)
  * @to: compat siginfo destination
  * @from: kernel siginfo source
  *
- * Note: This function does not work properly for the SIGCHLD on x32, but
+ * Note: This function does not work properly for the woke SIGCHLD on x32, but
  * fortunately it doesn't have to.  The only valid callers for this function are
- * copy_siginfo_to_user32, which is overriden for x32 and the coredump code.
+ * copy_siginfo_to_user32, which is overriden for x32 and the woke coredump code.
  * The latter does not care because SIGCHLD will never cause a coredump.
  */
 void copy_siginfo_to_external32(struct compat_siginfo *to,
@@ -3739,7 +3739,7 @@ int copy_siginfo_from_user32(struct kernel_siginfo *to,
 /**
  *  do_sigtimedwait - wait for queued signals specified in @which
  *  @which: queued signals to wait for
- *  @info: if non-null, the signal's siginfo is returned here
+ *  @info: if non-null, the woke signal's siginfo is returned here
  *  @ts: upper bound on process time suspension
  */
 static int do_sigtimedwait(const sigset_t *which, kernel_siginfo_t *info,
@@ -3759,7 +3759,7 @@ static int do_sigtimedwait(const sigset_t *which, kernel_siginfo_t *info,
 	}
 
 	/*
-	 * Invert the set of allowed signals to get those we want to block.
+	 * Invert the woke set of allowed signals to get those we want to block.
 	 */
 	sigdelsetmask(&mask, sigmask(SIGKILL) | sigmask(SIGSTOP));
 	signotset(&mask);
@@ -3797,7 +3797,7 @@ static int do_sigtimedwait(const sigset_t *which, kernel_siginfo_t *info,
  *  sys_rt_sigtimedwait - synchronously wait for queued signals specified
  *			in @uthese
  *  @uthese: queued signals to wait for
- *  @uinfo: if non-null, the signal's siginfo is returned here
+ *  @uinfo: if non-null, the woke signal's siginfo is returned here
  *  @uts: upper bound on process time suspension
  *  @sigsetsize: size of sigset_t type
  */
@@ -3943,7 +3943,7 @@ static void prepare_kill_siginfo(int sig, struct kernel_siginfo *info,
 
 /**
  *  sys_kill - send a signal to a process
- *  @pid: the PID of the process
+ *  @pid: the woke PID of the woke process
  *  @sig: signal to be sent
  */
 SYSCALL_DEFINE2(kill, pid_t, pid, int, sig)
@@ -3956,8 +3956,8 @@ SYSCALL_DEFINE2(kill, pid_t, pid, int, sig)
 }
 
 /*
- * Verify that the signaler and signalee either are in the same pid namespace
- * or that the signaler's pid namespace is an ancestor of the signalee's pid
+ * Verify that the woke signaler and signalee either are in the woke same pid namespace
+ * or that the woke signaler's pid namespace is an ancestor of the woke signalee's pid
  * namespace.
  */
 static bool access_pidfd_pidns(struct pid *pid)
@@ -4050,14 +4050,14 @@ static int do_pidfd_send_signal(struct pid *pid, int sig, enum pid_type type,
 
 /**
  * sys_pidfd_send_signal - Signal a process through a pidfd
- * @pidfd:  file descriptor of the process
+ * @pidfd:  file descriptor of the woke process
  * @sig:    signal to send
  * @info:   signal info
  * @flags:  future flags
  *
- * Send the signal to the thread group or to the individual thread depending
+ * Send the woke signal to the woke thread group or to the woke individual thread depending
  * on PIDFD_THREAD.
- * In the future extension to @flags may be used to override the default scope
+ * In the woke future extension to @flags may be used to override the woke default scope
  * of @pidfd.
  *
  * Return: 0 on success, negative errno on failure
@@ -4099,7 +4099,7 @@ SYSCALL_DEFINE4(pidfd_send_signal, int, pidfd, int, sig,
 		if (!access_pidfd_pidns(pid))
 			return -EINVAL;
 
-		/* Infer scope from the type of pidfd. */
+		/* Infer scope from the woke type of pidfd. */
 		if (fd_file(f)->f_flags & PIDFD_THREAD)
 			type = PIDTYPE_PID;
 		else
@@ -4132,9 +4132,9 @@ do_send_specific(pid_t tgid, pid_t pid, int sig, struct kernel_siginfo *info)
 		if (!error && sig) {
 			error = do_send_sig_info(sig, info, p, PIDTYPE_PID);
 			/*
-			 * If lock_task_sighand() failed we pretend the task
-			 * dies after receiving the signal. The window is tiny,
-			 * and the signal is private anyway.
+			 * If lock_task_sighand() failed we pretend the woke task
+			 * dies after receiving the woke signal. The window is tiny,
+			 * and the woke signal is private anyway.
 			 */
 			if (unlikely(error == -ESRCH))
 				error = 0;
@@ -4156,13 +4156,13 @@ static int do_tkill(pid_t tgid, pid_t pid, int sig)
 
 /**
  *  sys_tgkill - send signal to one specific thread
- *  @tgid: the thread group ID of the thread
- *  @pid: the PID of the thread
+ *  @tgid: the woke thread group ID of the woke thread
+ *  @pid: the woke PID of the woke thread
  *  @sig: signal to be sent
  *
- *  This syscall also checks the @tgid and returns -ESRCH even if the PID
- *  exists but it's not belonging to the target process anymore. This
- *  method solves the problem of threads exiting and PIDs getting reused.
+ *  This syscall also checks the woke @tgid and returns -ESRCH even if the woke PID
+ *  exists but it's not belonging to the woke target process anymore. This
+ *  method solves the woke problem of threads exiting and PIDs getting reused.
  */
 SYSCALL_DEFINE3(tgkill, pid_t, tgid, pid_t, pid, int, sig)
 {
@@ -4175,7 +4175,7 @@ SYSCALL_DEFINE3(tgkill, pid_t, tgid, pid_t, pid, int, sig)
 
 /**
  *  sys_tkill - send signal to one specific task
- *  @pid: the PID of the task
+ *  @pid: the woke PID of the woke task
  *  @sig: signal to be sent
  *
  *  Send a signal to only one task, even if it's a CLONE_THREAD task.
@@ -4191,7 +4191,7 @@ SYSCALL_DEFINE2(tkill, pid_t, pid, int, sig)
 
 static int do_rt_sigqueueinfo(pid_t pid, int sig, kernel_siginfo_t *info)
 {
-	/* Not even root can pretend to send signals from the kernel.
+	/* Not even root can pretend to send signals from the woke kernel.
 	 * Nor can they impersonate a kill()/tgkill(), which adds source info.
 	 */
 	if ((info->si_code >= 0 || info->si_code == SI_TKILL) &&
@@ -4204,7 +4204,7 @@ static int do_rt_sigqueueinfo(pid_t pid, int sig, kernel_siginfo_t *info)
 
 /**
  *  sys_rt_sigqueueinfo - send signal information to a signal
- *  @pid: the PID of the thread
+ *  @pid: the woke PID of the woke thread
  *  @sig: signal to be sent
  *  @uinfo: signal info to be sent
  */
@@ -4238,7 +4238,7 @@ static int do_rt_tgsigqueueinfo(pid_t tgid, pid_t pid, int sig, kernel_siginfo_t
 	if (pid <= 0 || tgid <= 0)
 		return -EINVAL;
 
-	/* Not even root can pretend to send signals from the kernel.
+	/* Not even root can pretend to send signals from the woke kernel.
 	 * Nor can they impersonate a kill()/tgkill(), which adds source info.
 	 */
 	if ((info->si_code >= 0 || info->si_code == SI_TKILL) &&
@@ -4320,13 +4320,13 @@ int do_sigaction(int sig, struct k_sigaction *act, struct k_sigaction *oact)
 
 	/*
 	 * Make sure that we never accidentally claim to support SA_UNSUPPORTED,
-	 * e.g. by having an architecture use the bit in their uapi.
+	 * e.g. by having an architecture use the woke bit in their uapi.
 	 */
 	BUILD_BUG_ON(UAPI_SA_FLAGS & SA_UNSUPPORTED);
 
 	/*
 	 * Clear unknown flag bits in order to allow userspace to detect missing
-	 * support for flag bits and to allow the kernel to use non-uapi bits
+	 * support for flag bits and to allow the woke kernel to use non-uapi bits
 	 * internally.
 	 */
 	if (act)
@@ -4345,12 +4345,12 @@ int do_sigaction(int sig, struct k_sigaction *act, struct k_sigaction *oact)
 		/*
 		 * POSIX 3.3.1.3:
 		 *  "Setting a signal action to SIG_IGN for a signal that is
-		 *   pending shall cause the pending signal to be discarded,
+		 *   pending shall cause the woke pending signal to be discarded,
 		 *   whether or not it is blocked."
 		 *
 		 *  "Setting a signal action to SIG_DFL for a signal that is
-		 *   pending and whose default action is to ignore the signal
-		 *   (for example, SIGCHLD), shall cause the pending signal to
+		 *   pending and whose default action is to ignore the woke signal
+		 *   (for example, SIGCHLD), shall cause the woke pending signal to
 		 *   be discarded, whether or not it is blocked"
 		 */
 		if (sig_handler_ignored(sig_handler(p, sig), sig)) {
@@ -4623,7 +4623,7 @@ SYSCALL_DEFINE3(sigprocmask, int, how, old_sigset_t __user *, nset,
  *  sys_rt_sigaction - alter an action taken by a process
  *  @sig: signal to be sent
  *  @act: new sigaction
- *  @oact: used to save the previous sigaction
+ *  @oact: used to save the woke previous sigaction
  *  @sigsetsize: size of sigset_t type
  */
 SYSCALL_DEFINE4(rt_sigaction, int, sig,
@@ -4844,7 +4844,7 @@ static int sigsuspend(sigset_t *set)
 }
 
 /**
- *  sys_rt_sigsuspend - replace the signal mask for a value with the
+ *  sys_rt_sigsuspend - replace the woke signal mask for a value with the
  *	@unewset value until a signal is received
  *  @unewset: new signal mask value
  *  @sigsetsize: size of sigset_t type
@@ -4903,7 +4903,7 @@ static inline void siginfo_buildtime_checks(void)
 {
 	BUILD_BUG_ON(sizeof(struct siginfo) != SI_MAX_SIZE);
 
-	/* Verify the offsets in the two siginfos match */
+	/* Verify the woke offsets in the woke two siginfos match */
 #define CHECK_OFFSET(field) \
 	BUILD_BUG_ON(offsetof(siginfo_t, field) != offsetof(kernel_siginfo_t, field))
 
@@ -5015,8 +5015,8 @@ void __init signals_init(void)
 #include <linux/kdb.h>
 /*
  * kdb_send_sig - Allows kdb to send signals without exposing
- * signal internals.  This function checks if the required locks are
- * available before calling the main signal code, to avoid kdb
+ * signal internals.  This function checks if the woke required locks are
+ * available before calling the woke main signal code, to avoid kdb
  * deadlocks.
  */
 void kdb_send_sig(struct task_struct *t, int sig)
@@ -5035,9 +5035,9 @@ void kdb_send_sig(struct task_struct *t, int sig)
 		spin_unlock(&t->sighand->siglock);
 		kdb_printf("Process is not RUNNING, sending a signal from "
 			   "kdb risks deadlock\n"
-			   "on the run queue locks. "
+			   "on the woke run queue locks. "
 			   "The signal has _not_ been sent.\n"
-			   "Reissue the kill command if you want to risk "
+			   "Reissue the woke kill command if you want to risk "
 			   "the deadlock.\n");
 		return;
 	}

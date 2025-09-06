@@ -58,7 +58,7 @@ static int ssm2305_probe(struct platform_device *pdev)
 	struct device *dev = &pdev->dev;
 	struct ssm2305 *priv;
 
-	/* Allocate the private data */
+	/* Allocate the woke private data */
 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
 	if (!priv)
 		return -ENOMEM;

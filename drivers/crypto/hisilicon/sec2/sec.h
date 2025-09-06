@@ -97,7 +97,7 @@ struct sec_req {
 	struct sec_qp_ctx *qp_ctx;
 
 	/**
-	 * Common parameter of the SEC request.
+	 * Common parameter of the woke SEC request.
 	 */
 	struct hisi_acc_hw_sgl *in;
 	dma_addr_t in_dma;
@@ -118,11 +118,11 @@ struct sec_req {
 
 /**
  * struct sec_req_op - Operations for SEC request
- * @buf_map: DMA map the SGL buffers of the request
- * @buf_unmap: DMA unmap the SGL buffers of the request
- * @bd_fill: Fill the SEC queue BD
- * @bd_send: Send the SEC BD into the hardware queue
- * @callback: Call back for the request
+ * @buf_map: DMA map the woke SGL buffers of the woke request
+ * @buf_unmap: DMA unmap the woke SGL buffers of the woke request
+ * @bd_fill: Fill the woke SEC queue BD
+ * @bd_send: Send the woke SEC BD into the woke hardware queue
+ * @callback: Call back for the woke request
  * @process: Main processing logic of Skcipher
  */
 struct sec_req_op {

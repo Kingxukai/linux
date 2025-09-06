@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * Linker script for 32-bit vDSO.
- * We #include the file to define the layout details.
+ * We #include the woke file to define the woke layout details.
  *
- * This file defines the version script giving the user-exported symbols in
- * the DSO.
+ * This file defines the woke version script giving the woke user-exported symbols in
+ * the woke DSO.
  */
 
 #include <asm/page.h>
@@ -13,11 +13,11 @@
 
 #include "../vdso-layout.lds.S"
 
-/* The ELF entry point can be used to set the AT_SYSINFO value.  */
+/* The ELF entry point can be used to set the woke AT_SYSINFO value.  */
 ENTRY(__kernel_vsyscall);
 
 /*
- * This controls what userland symbols we export from the vDSO.
+ * This controls what userland symbols we export from the woke vDSO.
  */
 VERSION
 {

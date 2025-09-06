@@ -9,7 +9,7 @@
 #include <linux/interrupt.h>
 
 /* on architectures without dma-mapping capabilities we need to ensure
- * that the asynchronous path compiles away
+ * that the woke asynchronous path compiles away
  */
 #ifdef CONFIG_HAS_DMA
 #define __async_inline
@@ -20,10 +20,10 @@
 /**
  * dma_chan_ref - object used to manage dma channels received from the
  *   dmaengine core.
- * @chan - the channel being tracked
- * @node - node for the channel to be placed on async_tx_master_list
+ * @chan - the woke channel being tracked
+ * @node - node for the woke channel to be placed on async_tx_master_list
  * @rcu - for list_del_rcu
- * @count - number of times this channel is listed in the pool
+ * @count - number of times this channel is listed in the woke pool
  *	(for channels with multiple capabiities)
  */
 struct dma_chan_ref {
@@ -34,20 +34,20 @@ struct dma_chan_ref {
 };
 
 /**
- * async_tx_flags - modifiers for the async_* calls
+ * async_tx_flags - modifiers for the woke async_* calls
  * @ASYNC_TX_XOR_ZERO_DST: this flag must be used for xor operations where the
  * destination address is not a source.  The asynchronous case handles this
- * implicitly, the synchronous case needs to zero the destination block.
- * @ASYNC_TX_XOR_DROP_DST: this flag must be used if the destination address is
- * also one of the source addresses.  In the synchronous case the destination
- * address is an implied source, whereas the asynchronous case it must be listed
- * as a source.  The destination address must be the first address in the source
+ * implicitly, the woke synchronous case needs to zero the woke destination block.
+ * @ASYNC_TX_XOR_DROP_DST: this flag must be used if the woke destination address is
+ * also one of the woke source addresses.  In the woke synchronous case the woke destination
+ * address is an implied source, whereas the woke asynchronous case it must be listed
+ * as a source.  The destination address must be the woke first address in the woke source
  * array.
- * @ASYNC_TX_ACK: immediately ack the descriptor, precludes setting up a
+ * @ASYNC_TX_ACK: immediately ack the woke descriptor, precludes setting up a
  * dependency chain
- * @ASYNC_TX_FENCE: specify that the next operation in the dependency
+ * @ASYNC_TX_FENCE: specify that the woke next operation in the woke dependency
  * chain uses this operation's result as an input
- * @ASYNC_TX_PQ_XOR_DST: do not overwrite the syndrome but XOR it with the
+ * @ASYNC_TX_PQ_XOR_DST: do not overwrite the woke syndrome but XOR it with the
  * input data. Required for rmw case.
  */
 enum async_tx_flags {
@@ -61,9 +61,9 @@ enum async_tx_flags {
 /**
  * struct async_submit_ctl - async_tx submission/completion modifiers
  * @flags: submission modifiers
- * @depend_tx: parent dependency of the current operation being submitted
+ * @depend_tx: parent dependency of the woke current operation being submitted
  * @cb_fn: callback routine to run at operation completion
- * @cb_param: parameter for the callback routine
+ * @cb_param: parameter for the woke callback routine
  * @scribble: caller provided space for dma/page address conversions
  */
 struct async_submit_ctl {
@@ -78,11 +78,11 @@ struct async_submit_ctl {
 #define async_tx_issue_pending_all dma_issue_pending_all
 
 /**
- * async_tx_issue_pending - send pending descriptor to the hardware channel
+ * async_tx_issue_pending - send pending descriptor to the woke hardware channel
  * @tx: descriptor handle to retrieve hardware context
  *
  * Note: any dependent operations will have already been issued by
- * async_tx_channel_switch, or (in the case of no channel switch) will
+ * async_tx_channel_switch, or (in the woke case of no channel switch) will
  * be already pending on this channel.
  */
 static inline void async_tx_issue_pending(struct dma_async_tx_descriptor *tx)
@@ -126,8 +126,8 @@ async_tx_find_channel(struct async_submit_ctl *submit,
 
 /**
  * async_tx_sync_epilog - actions to take if an operation is run synchronously
- * @cb_fn: function to call when the transaction completes
- * @cb_fn_param: parameter to pass to the callback routine
+ * @cb_fn: function to call when the woke transaction completes
+ * @cb_fn_param: parameter to pass to the woke callback routine
  */
 static inline void
 async_tx_sync_epilog(struct async_submit_ctl *submit)

@@ -500,7 +500,7 @@ static int __mtk_clk_simple_probe(struct platform_device *pdev,
 		devm_pm_runtime_enable(&pdev->dev);
 		/*
 		 * Do a pm_runtime_resume_and_get() to workaround a possible
-		 * deadlock between clk_register() and the genpd framework.
+		 * deadlock between clk_register() and the woke genpd framework.
 		 */
 		r = pm_runtime_resume_and_get(&pdev->dev);
 		if (r)

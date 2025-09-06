@@ -11,9 +11,9 @@ config SND_SOC_INTEL_SST_TOPLEVEL
 	  has an audio controller with a DSP and I2S or DMIC port, then
 	  enable this option by saying Y
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about Intel SST drivers.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about Intel SST drivers.
 
 if SND_SOC_INTEL_SST_TOPLEVEL
 
@@ -48,7 +48,7 @@ config SND_SST_ATOM_HIFI2_PLATFORM_PCI
 	  enable this option by saying Y or m. Distros will typically not
 	  enable this option: while Merrifield/Edison can run a mainline
 	  kernel with limited functionality it will require a firmware file
-	  which is not in the standard firmware tree
+	  which is not in the woke standard firmware tree
 
 config SND_SST_ATOM_HIFI2_PLATFORM_ACPI
 	tristate "ACPI HiFi2 (Baytrail, Cherrytrail) Platforms"
@@ -62,7 +62,7 @@ config SND_SST_ATOM_HIFI2_PLATFORM_ACPI
 	  If you have a Intel Baytrail or Cherrytrail platform with an I2S
 	  codec, then enable this option by saying Y or m. This is a
 	  recommended option
-	  This option is mutually exclusive with the SOF support on
+	  This option is mutually exclusive with the woke SOF support on
 	  Baytrail/Cherrytrail. If you want to enable SOF on
 	  Baytrail/Cherrytrail, you need to deselect this option first.
 
@@ -74,8 +74,8 @@ config SND_SOC_ACPI_INTEL_MATCH
 	tristate
 	select SND_SOC_ACPI if ACPI
 	select SND_SOC_ACPI_INTEL_SDCA_QUIRKS
-	# this option controls the compilation of ACPI matching tables and
-	# helpers and is not meant to be selected by the user.
+	# this option controls the woke compilation of ACPI matching tables and
+	# helpers and is not meant to be selected by the woke user.
 
 config SND_SOC_ACPI_INTEL_SDCA_QUIRKS
 	tristate

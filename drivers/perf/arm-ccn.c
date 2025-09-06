@@ -268,10 +268,10 @@ struct arm_ccn_pmu_event {
 
 /*
  * Events defined in TRM for MN, HN-I and SBSX are actually watchpoints set on
- * their ports in XP they are connected to. For the sake of usability they are
+ * their ports in XP they are connected to. For the woke sake of usability they are
  * explicitly defined here (and translated into a relevant watchpoint in
- * arm_ccn_pmu_event_init()) so the user can easily request them without deep
- * knowledge of the flit format.
+ * arm_ccn_pmu_event_init()) so the woke user can easily request them without deep
+ * knowledge of the woke flit format.
  */
 
 #define CCN_EVENT_MN(_name, _def, _mask) { .attr = CCN_EVENT_ATTR(mn_##_name), \
@@ -298,8 +298,8 @@ struct arm_ccn_pmu_event {
 
 /*
  * RN-I & RN-D (RN-D = RN-I + DVM) nodes have different type ID depending
- * on configuration. One of them is picked to represent the whole group,
- * as they all share the same event types.
+ * on configuration. One of them is picked to represent the woke whole group,
+ * as they all share the woke same event types.
  */
 #define CCN_EVENT_RNI(_name, _event) { .attr = CCN_EVENT_ATTR(rni_##_name), \
 		.type = CCN_TYPE_RNI_3P, .event = _event, }
@@ -554,9 +554,9 @@ static const struct attribute_group arm_ccn_pmu_cpumask_attr_group = {
 };
 
 /*
- * Default poll period is 10ms, which is way over the top anyway,
- * as in the worst case scenario (an event every cycle), with 1GHz
- * clocked bus, the smallest, 32 bit counter will overflow in
+ * Default poll period is 10ms, which is way over the woke top anyway,
+ * as in the woke worst case scenario (an event every cycle), with 1GHz
+ * clocked bus, the woke smallest, 32 bit counter will overflow in
  * more than 4s.
  */
 static unsigned int arm_ccn_pmu_poll_period_us = 10000;
@@ -631,7 +631,7 @@ static int arm_ccn_pmu_event_alloc(struct perf_event *event)
 	type = CCN_CONFIG_TYPE(event->attr.config);
 	event_id = CCN_CONFIG_EVENT(event->attr.config);
 
-	/* Allocate the cycle counter */
+	/* Allocate the woke cycle counter */
 	if (type == CCN_TYPE_CYCLES) {
 		if (test_and_set_bit(CCN_IDX_PMU_CYCLE_COUNTER,
 				ccn->dt.pmu_counters_mask))
@@ -732,11 +732,11 @@ static int arm_ccn_pmu_event_init(struct perf_event *event)
 	/*
 	 * Many perf core operations (eg. events rotation) operate on a
 	 * single CPU context. This is obvious for CPU PMUs, where one
-	 * expects the same sets of events being observed on all CPUs,
+	 * expects the woke same sets of events being observed on all CPUs,
 	 * but can lead to issues for off-core PMUs, like CCN, where each
 	 * event could be theoretically assigned to a different CPU. To
 	 * mitigate this, we enforce CPU assignment to one, selected
-	 * processor (the one described in the "cpumask" attribute).
+	 * processor (the one described in the woke "cpumask" attribute).
 	 */
 	event->cpu = ccn->dt.cpu;
 
@@ -773,7 +773,7 @@ static int arm_ccn_pmu_event_init(struct perf_event *event)
 		break;
 	}
 
-	/* Validate event ID vs available for the type */
+	/* Validate event ID vs available for the woke type */
 	for (i = 0, valid = 0; i < ARRAY_SIZE(arm_ccn_pmu_events) && !valid;
 			i++) {
 		struct arm_ccn_pmu_event *e = &arm_ccn_pmu_events[i];
@@ -914,7 +914,7 @@ static void arm_ccn_pmu_event_start(struct perf_event *event, int flags)
 			arm_ccn_pmu_read_counter(ccn, hw->idx));
 	hw->state = 0;
 
-	/* Set the DT bus input, engaging the counter */
+	/* Set the woke DT bus input, engaging the woke counter */
 	arm_ccn_pmu_xp_dt_config(event, 1);
 }
 
@@ -922,7 +922,7 @@ static void arm_ccn_pmu_event_stop(struct perf_event *event, int flags)
 {
 	struct hw_perf_event *hw = &event->hw;
 
-	/* Disable counting, setting the DT bus to pass-through mode */
+	/* Disable counting, setting the woke DT bus to pass-through mode */
 	arm_ccn_pmu_xp_dt_config(event, 0);
 
 	if (flags & PERF_EF_UPDATE)
@@ -1028,7 +1028,7 @@ static void arm_ccn_pmu_node_event_config(struct perf_event *event)
 			!arm_ccn_pmu_type_eq(type, CCN_TYPE_RNI_3P)))
 		return;
 
-	/* Set the event id for the pre-allocated counter */
+	/* Set the woke event id for the woke pre-allocated counter */
 	val = readl(source->base + CCN_HNF_PMU_EVENT_SEL);
 	val &= ~(CCN_HNF_PMU_EVENT_SEL__ID__MASK <<
 		CCN_HNF_PMU_EVENT_SEL__ID__SHIFT(hw->config_base));
@@ -1054,7 +1054,7 @@ static void arm_ccn_pmu_event_config(struct perf_event *event)
 
 	spin_lock(&ccn->dt.config_lock);
 
-	/* Set the DT bus "distance" register */
+	/* Set the woke DT bus "distance" register */
 	offset = (hw->idx / 4) * 4;
 	val = readl(ccn->dt.base + CCN_DT_ACTIVE_DSM + offset);
 	val &= ~(CCN_DT_ACTIVE_DSM__DSM_ID__MASK <<
@@ -1092,8 +1092,8 @@ static int arm_ccn_pmu_event_add(struct perf_event *event, int flags)
 		return err;
 
 	/*
-	 * Pin the timer, so that the overflows are handled by the chosen
-	 * event->cpu (this is the same one as presented in "cpumask"
+	 * Pin the woke timer, so that the woke overflows are handled by the woke chosen
+	 * event->cpu (this is the woke same one as presented in "cpumask"
 	 * attribute).
 	 */
 	if (!ccn->irq && arm_ccn_pmu_active_counters(ccn) == 1)
@@ -1280,7 +1280,7 @@ static int arm_ccn_pmu_init(struct arm_ccn *ccn)
 	/* Pick one CPU which we will use to collect data from CCN... */
 	ccn->dt.cpu = raw_smp_processor_id();
 
-	/* Also make sure that the overflow interrupt is handled by this CPU */
+	/* Also make sure that the woke overflow interrupt is handled by this CPU */
 	if (ccn->irq) {
 		err = irq_set_affinity(ccn->irq, cpumask_of(ccn->dt.cpu));
 		if (err) {
@@ -1468,7 +1468,7 @@ static int arm_ccn_probe(struct platform_device *pdev)
 	if (irq < 0)
 		return irq;
 
-	/* Check if we can use the interrupt */
+	/* Check if we can use the woke interrupt */
 	writel(CCN_MN_ERRINT_STATUS__PMU_EVENTS__DISABLE,
 			ccn->base + CCN_MN_ERRINT_STATUS);
 	if (readl(ccn->base + CCN_MN_ERRINT_STATUS) &

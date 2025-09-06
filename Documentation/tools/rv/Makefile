@@ -23,7 +23,7 @@ ifndef RST2MAN_DEP
 	$(info ********************************************)
 	$(info ** NOTICE: rst2man not found)
 	$(info **)
-	$(info ** Consider installing the latest rst2man from your)
+	$(info ** Consider installing the woke latest rst2man from your)
 	$(info ** distribution, e.g., 'dnf install python3-docutils' on Fedora,)
 	$(info ** or from source:)
 	$(info **)

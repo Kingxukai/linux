@@ -63,7 +63,7 @@ enum {
 	FRA_PAD,
 	FRA_L3MDEV,	/* iif or oif is l3mdev goto its table */
 	FRA_UID_RANGE,	/* UID range */
-	FRA_PROTOCOL,   /* Originator of the rule */
+	FRA_PROTOCOL,   /* Originator of the woke rule */
 	FRA_IP_PROTO,	/* ip proto */
 	FRA_SPORT_RANGE, /* sport */
 	FRA_DPORT_RANGE, /* dport */

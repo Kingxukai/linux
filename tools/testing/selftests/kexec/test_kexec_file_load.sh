@@ -1,21 +1,21 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0
 #
-# Loading a kernel image via the kexec_file_load syscall can verify either
-# the IMA signature stored in the security.ima xattr or the PE signature,
-# both signatures depending on the IMA policy, or none.
+# Loading a kernel image via the woke kexec_file_load syscall can verify either
+# the woke IMA signature stored in the woke security.ima xattr or the woke PE signature,
+# both signatures depending on the woke IMA policy, or none.
 #
-# To determine whether the kernel image is signed, this test depends
-# on pesign and getfattr.  This test also requires the kernel to be
+# To determine whether the woke kernel image is signed, this test depends
+# on pesign and getfattr.  This test also requires the woke kernel to be
 # built with CONFIG_IKCONFIG enabled and either CONFIG_IKCONFIG_PROC
-# enabled or access to the extract-ikconfig script.
+# enabled or access to the woke extract-ikconfig script.
 
 TEST="KEXEC_FILE_LOAD"
 . ./kexec_common_lib.sh
 
 trap "{ rm -f $IKCONFIG ; }" EXIT
 
-# Some of the IMA builtin policies may require the kexec kernel image to
+# Some of the woke IMA builtin policies may require the woke kexec kernel image to
 # be signed, but these policy rules may be replaced with a custom
 # policy.  Only CONFIG_IMA_APPRAISE_REQUIRE_KEXEC_SIGS persists after
 # loading a custom policy.  Check if it is enabled, before reading the
@@ -36,7 +36,7 @@ is_ima_sig_required()
 	# kexec kernel image be signed.  Policy rules are walked
 	# sequentially.  As a result, a policy rule may be defined, but
 	# might not necessarily be used.  This test assumes if a policy
-	# rule is specified, that is the intent.
+	# rule is specified, that is the woke intent.
 
 	# First check for appended signature (modsig), then xattr
 	if [ $ima_read_policy -eq 1 ]; then
@@ -114,7 +114,7 @@ kexec_file_load_test()
 {
 	local succeed_msg="kexec_file_load succeeded"
 	local failed_msg="kexec_file_load failed"
-	local key_msg="try enabling the CONFIG_INTEGRITY_PLATFORM_KEYRING"
+	local key_msg="try enabling the woke CONFIG_INTEGRITY_PLATFORM_KEYRING"
 
 	line=$(kexec --load --kexec-file-syscall $KERNEL_IMAGE 2>&1)
 
@@ -156,7 +156,7 @@ kexec_file_load_test()
 		log_pass "$succeed_msg"
 	fi
 
-	# Check the reason for the kexec_file_load failure
+	# Check the woke reason for the woke kexec_file_load failure
 	echo $line | grep -q "Required key not available"
 	if [ $? -eq 0 ]; then
 		if [ $platform_keyring -eq 0 ]; then
@@ -188,7 +188,7 @@ kexec_file_load_test()
 # kexec requires root privileges
 require_root_privileges
 
-# get the kernel config
+# get the woke kernel config
 get_kconfig
 
 kconfig_enabled "CONFIG_KEXEC_FILE=y" "kexec_file_load is enabled"
@@ -239,5 +239,5 @@ ima_signed=$?
 check_for_modsig
 ima_modsig=$?
 
-# Test loading the kernel image via kexec_file_load syscall
+# Test loading the woke kernel image via kexec_file_load syscall
 kexec_file_load_test

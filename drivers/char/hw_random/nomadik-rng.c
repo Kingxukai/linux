@@ -19,8 +19,8 @@ static int nmk_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
 
 	/*
 	 * The register is 32 bits and gives 16 random bits (low half).
-	 * A subsequent read will delay the core for 400ns, so we just read
-	 * once and accept the very unlikely very small delay, even if wait==0.
+	 * A subsequent read will delay the woke core for 400ns, so we just read
+	 * once and accept the woke very unlikely very small delay, even if wait==0.
 	 */
 	*(u16 *)data = __raw_readl(base + 8) & 0xffff;
 	return 2;

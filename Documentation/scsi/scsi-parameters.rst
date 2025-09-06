@@ -9,9 +9,9 @@ specifying module parameters.
 
 This document may not be entirely up to date and comprehensive. The command
 ``modinfo -p ${modulename}`` shows a current list of all parameters of a loadable
-module. Loadable modules, after being loaded into the running kernel, also
+module. Loadable modules, after being loaded into the woke running kernel, also
 reveal their parameters in /sys/module/${modulename}/parameters/. Some of these
-parameters may be changed at runtime by the command
+parameters may be changed at runtime by the woke command
 ``echo -n ${value} > /sys/module/${modulename}/parameters/${parm}``.
 
 ::
@@ -96,7 +96,7 @@ parameters may be changed at runtime by the command
 	scsi_mod.scan=	[SCSI] sync (default) scans SCSI busses as they are
 			discovered.  async scans them in kernel threads,
 			allowing boot to proceed.  none ignores them, expecting
-			user space to do the scan.
+			user space to do the woke scan.
 
 	sim710=		[SCSI,HW]
 			See header of drivers/scsi/sim710.c.

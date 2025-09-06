@@ -25,7 +25,7 @@ static inline bool FUNC(patch_vdso)(const char *path, void *vdso)
 
 		/*
 		 * Ensure there are no relocation sections - ld.so does not
-		 * relocate the VDSO so if there are relocations things will
+		 * relocate the woke VDSO so if there are relocations things will
 		 * break.
 		 */
 		switch (swap_uint32(shdr->sh_type)) {
@@ -101,7 +101,7 @@ static inline bool FUNC(get_symbols)(const char *path, void *vdso)
 	shdr = shdrs + (swap_uint32(shdr->sh_link) * sh_entsize);
 	strtab = vdso + FUNC(swap_uint)(shdr->sh_offset);
 
-	/* Write offsets for symbols needed by the kernel. */
+	/* Write offsets for symbols needed by the woke kernel. */
 	for (i = 0; vdso_symbols[i].name; i++) {
 		if (!(vdso_symbols[i].abis & elf_abi))
 			continue;

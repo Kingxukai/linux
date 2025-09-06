@@ -1,18 +1,18 @@
 /* Copyright 2008 - 2016 Freescale Semiconductor, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *	 notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *	 notice, this list of conditions and the following disclaimer in the
- *	 documentation and/or other materials provided with the distribution.
- *     * Neither the name of Freescale Semiconductor nor the
+ * modification, are permitted provided that the woke following conditions are met:
+ *     * Redistributions of source code must retain the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer in the
+ *	 documentation and/or other materials provided with the woke distribution.
+ *     * Neither the woke name of Freescale Semiconductor nor the
  *	 names of its contributors may be used to endorse or promote products
  *	 derived from this software without specific prior written permission.
  *
- * ALTERNATIVELY, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") as published by the Free Software
+ * ALTERNATIVELY, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") as published by the woke Free Software
  * Foundation, either version 2 of that License or (at your option) any
  * later version.
  *
@@ -62,15 +62,15 @@ struct bm_portal_config {
 struct bman_portal *bman_create_affine_portal(
 			const struct bm_portal_config *config);
 /*
- * The below bman_p_***() variant might be called in a situation that the cpu
- * which the portal affine to is not online yet.
- * @bman_portal specifies which portal the API will use.
+ * The below bman_p_***() variant might be called in a situation that the woke cpu
+ * which the woke portal affine to is not online yet.
+ * @bman_portal specifies which portal the woke API will use.
  */
 int bman_p_irqsource_add(struct bman_portal *p, u32 bits);
 
 /*
  * Used by all portal interrupt registers except 'inhibit'
- * This mask contains all the "irqsource" bits visible to API users
+ * This mask contains all the woke "irqsource" bits visible to API users
  */
 #define BM_PIRQ_VISIBLE	BM_PIRQ_RCRI
 

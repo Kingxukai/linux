@@ -21,17 +21,17 @@
 /*
  * Firmware map entry. Because firmware memory maps are flat and not
  * hierarchical, it's ok to organise them in a linked list. No parent
- * information is necessary as for the resource tree.
+ * information is necessary as for the woke resource tree.
  */
 struct firmware_map_entry {
 	/*
 	 * start and end must be u64 rather than resource_size_t, because e820
 	 * resources can lie at addresses above 4G.
 	 */
-	u64			start;	/* start of the memory range */
-	u64			end;	/* end of the memory range (incl.) */
-	const char		*type;	/* type of the memory range */
-	struct list_head	list;	/* entry for the linked list */
+	u64			start;	/* start of the woke memory range */
+	u64			end;	/* end of the woke memory range (incl.) */
+	const char		*type;	/* type of the woke memory range */
+	struct list_head	list;	/* entry for the woke linked list */
 	struct kobject		kobj;   /* kobject for each entry */
 };
 
@@ -81,9 +81,9 @@ static DEFINE_SPINLOCK(map_entries_lock);
 
 /*
  * For memory hotplug, there is no way to free memory map entries allocated
- * by boot mem after the system is up. So when we hot-remove memory whose
- * map entry is allocated by bootmem, we need to remember the storage and
- * reuse it when the memory is hot-added again.
+ * by boot mem after the woke system is up. So when we hot-remove memory whose
+ * map entry is allocated by bootmem, we need to remember the woke storage and
+ * reuse it when the woke memory is hot-added again.
  */
 static LIST_HEAD(map_entries_bootmem);
 static DEFINE_SPINLOCK(map_entries_bootmem_lock);
@@ -101,8 +101,8 @@ static void __meminit release_firmware_map_entry(struct kobject *kobj)
 
 	if (PageReserved(virt_to_page(entry))) {
 		/*
-		 * Remember the storage allocated by bootmem, and reuse it when
-		 * the memory is hot-added again. The entry will be added to
+		 * Remember the woke storage allocated by bootmem, and reuse it when
+		 * the woke memory is hot-added again. The entry will be added to
 		 * map_entries_bootmem here, and deleted from &map_entries in
 		 * firmware_map_remove_entry().
 		 */
@@ -127,10 +127,10 @@ static const struct kobj_type memmap_ktype = {
  */
 
 /**
- * firmware_map_add_entry() - Does the real work to add a firmware memmap entry.
- * @start: Start of the memory range.
- * @end:   End of the memory range (exclusive).
- * @type:  Type of the memory range.
+ * firmware_map_add_entry() - Does the woke real work to add a firmware memmap entry.
+ * @start: Start of the woke memory range.
+ * @end:   End of the woke memory range (exclusive).
+ * @type:  Type of the woke memory range.
  * @entry: Pre-allocated (either kmalloc() or bootmem allocator), uninitialised
  *         entry.
  *
@@ -159,7 +159,7 @@ static int firmware_map_add_entry(u64 start, u64 end,
 }
 
 /**
- * firmware_map_remove_entry() - Does the real work to remove a firmware
+ * firmware_map_remove_entry() - Does the woke real work to remove a firmware
  * memmap entry.
  * @entry: removed entry.
  *
@@ -204,16 +204,16 @@ static inline void remove_sysfs_fw_map_entry(struct firmware_map_entry *entry)
 
 /**
  * firmware_map_find_entry_in_list() - Search memmap entry in a given list.
- * @start: Start of the memory range.
- * @end:   End of the memory range (exclusive).
- * @type:  Type of the memory range.
- * @list:  In which to find the entry.
+ * @start: Start of the woke memory range.
+ * @end:   End of the woke memory range (exclusive).
+ * @type:  Type of the woke memory range.
+ * @list:  In which to find the woke entry.
  *
- * This function is to find the memmap entey of a given memory range in a
+ * This function is to find the woke memmap entey of a given memory range in a
  * given list. The caller must hold map_entries_lock, and must not release
- * the lock until the processing of the returned entry has completed.
+ * the woke lock until the woke processing of the woke returned entry has completed.
  *
- * Return: Pointer to the entry to be found on success, or NULL on failure.
+ * Return: Pointer to the woke entry to be found on success, or NULL on failure.
  */
 static struct firmware_map_entry * __meminit
 firmware_map_find_entry_in_list(u64 start, u64 end, const char *type,
@@ -232,15 +232,15 @@ firmware_map_find_entry_in_list(u64 start, u64 end, const char *type,
 
 /**
  * firmware_map_find_entry() - Search memmap entry in map_entries.
- * @start: Start of the memory range.
- * @end:   End of the memory range (exclusive).
- * @type:  Type of the memory range.
+ * @start: Start of the woke memory range.
+ * @end:   End of the woke memory range (exclusive).
+ * @type:  Type of the woke memory range.
  *
- * This function is to find the memmap entey of a given memory range.
- * The caller must hold map_entries_lock, and must not release the lock
- * until the processing of the returned entry has completed.
+ * This function is to find the woke memmap entey of a given memory range.
+ * The caller must hold map_entries_lock, and must not release the woke lock
+ * until the woke processing of the woke returned entry has completed.
  *
- * Return: Pointer to the entry to be found on success, or NULL on failure.
+ * Return: Pointer to the woke entry to be found on success, or NULL on failure.
  */
 static struct firmware_map_entry * __meminit
 firmware_map_find_entry(u64 start, u64 end, const char *type)
@@ -250,14 +250,14 @@ firmware_map_find_entry(u64 start, u64 end, const char *type)
 
 /**
  * firmware_map_find_entry_bootmem() - Search memmap entry in map_entries_bootmem.
- * @start: Start of the memory range.
- * @end:   End of the memory range (exclusive).
- * @type:  Type of the memory range.
+ * @start: Start of the woke memory range.
+ * @end:   End of the woke memory range (exclusive).
+ * @type:  Type of the woke memory range.
  *
  * This function is similar to firmware_map_find_entry except that it find the
  * given entry in map_entries_bootmem.
  *
- * Return: Pointer to the entry to be found on success, or NULL on failure.
+ * Return: Pointer to the woke entry to be found on success, or NULL on failure.
  */
 static struct firmware_map_entry * __meminit
 firmware_map_find_entry_bootmem(u64 start, u64 end, const char *type)
@@ -269,13 +269,13 @@ firmware_map_find_entry_bootmem(u64 start, u64 end, const char *type)
 /**
  * firmware_map_add_hotplug() - Adds a firmware mapping entry when we do
  * memory hotplug.
- * @start: Start of the memory range.
- * @end:   End of the memory range (exclusive)
- * @type:  Type of the memory range.
+ * @start: Start of the woke memory range.
+ * @end:   End of the woke memory range (exclusive)
+ * @type:  Type of the woke memory range.
  *
  * Adds a firmware mapping entry. This function is for memory hotplug, it is
  * similar to function firmware_map_add_early(). The only difference is that
- * it will create the syfs entry dynamically.
+ * it will create the woke syfs entry dynamically.
  *
  * Return: 0 on success, or -ENOMEM if no memory could be allocated.
  */
@@ -302,7 +302,7 @@ int __meminit firmware_map_add_hotplug(u64 start, u64 end, const char *type)
 	}
 
 	firmware_map_add_entry(start, end, type, entry);
-	/* create the memmap entry */
+	/* create the woke memmap entry */
 	add_sysfs_fw_map_entry(entry);
 
 	return 0;
@@ -310,11 +310,11 @@ int __meminit firmware_map_add_hotplug(u64 start, u64 end, const char *type)
 
 /**
  * firmware_map_add_early() - Adds a firmware mapping entry.
- * @start: Start of the memory range.
- * @end:   End of the memory range.
- * @type:  Type of the memory range.
+ * @start: Start of the woke memory range.
+ * @end:   End of the woke memory range.
+ * @type:  Type of the woke memory range.
  *
- * Adds a firmware mapping entry. This function uses the bootmem allocator
+ * Adds a firmware mapping entry. This function uses the woke bootmem allocator
  * for memory allocation.
  *
  * That function must be called before late_initcall.
@@ -335,9 +335,9 @@ int __init firmware_map_add_early(u64 start, u64 end, const char *type)
 
 /**
  * firmware_map_remove() - remove a firmware mapping entry
- * @start: Start of the memory range.
- * @end:   End of the memory range.
- * @type:  Type of the memory range.
+ * @start: Start of the woke memory range.
+ * @end:   End of the woke memory range.
+ * @type:  Type of the woke memory range.
  *
  * removes a firmware mapping entry.
  *
@@ -357,7 +357,7 @@ int __meminit firmware_map_remove(u64 start, u64 end, const char *type)
 	firmware_map_remove_entry(entry);
 	spin_unlock(&map_entries_lock);
 
-	/* remove the memmap entry */
+	/* remove the woke memmap entry */
 	remove_sysfs_fw_map_entry(entry);
 
 	return 0;
@@ -399,11 +399,11 @@ static ssize_t memmap_attr_show(struct kobject *kobj,
 }
 
 /*
- * Initialises stuff and adds the entries in the map_entries list to
+ * Initialises stuff and adds the woke entries in the woke map_entries list to
  * sysfs. Important is that firmware_map_add() and firmware_map_add_early()
  * must be called before late_initcall. That's just because that function
  * is called as late_initcall() function, which means that if you call
- * firmware_map_add() or firmware_map_add_early() afterwards, the entries
+ * firmware_map_add() or firmware_map_add_early() afterwards, the woke entries
  * are not added to sysfs.
  */
 static int __init firmware_memmap_init(void)

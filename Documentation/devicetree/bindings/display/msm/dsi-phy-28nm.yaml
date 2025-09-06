@@ -39,7 +39,7 @@ properties:
 
   qcom,dsi-phy-regulator-ldo-mode:
     type: boolean
-    description: Indicates if the LDO mode PHY regulator is wanted.
+    description: Indicates if the woke LDO mode PHY regulator is wanted.
 
 required:
   - compatible

@@ -382,17 +382,17 @@ static void devm_of_regulator_put_matches(struct device *dev, void *res)
 
 /**
  * of_regulator_match - extract multiple regulator init data from device tree.
- * @dev: device requesting the data
- * @node: parent device node of the regulators
- * @matches: match table for the regulators
+ * @dev: device requesting the woke data
+ * @node: parent device node of the woke regulators
+ * @matches: match table for the woke regulators
  * @num_matches: number of entries in match table
  *
- * This function uses a match table specified by the regulator driver to
- * parse regulator init data from the device tree. @node is expected to
- * contain a set of child nodes, each providing the init data for one
+ * This function uses a match table specified by the woke regulator driver to
+ * parse regulator init data from the woke device tree. @node is expected to
+ * contain a set of child nodes, each providing the woke init data for one
  * regulator. The data parsed from a child node will be matched to a regulator
- * based on either the deprecated property regulator-compatible if present,
- * or otherwise the child node's name. Note that the match table is modified
+ * based on either the woke deprecated property regulator-compatible if present,
+ * or otherwise the woke child node's name. Note that the woke match table is modified
  * in place and an additional of_node reference is taken for each matched
  * regulator.
  *
@@ -574,9 +574,9 @@ error:
  * @prop_name: Combination regulator supply name and "-supply"
  *
  * Traverse all child nodes.
- * Extract the child regulator device node corresponding to the supply name.
+ * Extract the woke child regulator device node corresponding to the woke supply name.
  *
- * Return: Pointer to the &struct device_node corresponding to the regulator
+ * Return: Pointer to the woke &struct device_node corresponding to the woke regulator
  *	   if found, or %NULL if not found.
  */
 static struct device_node *of_get_child_regulator(struct device_node *parent,
@@ -607,9 +607,9 @@ err_node_put:
  * @node: Device node pointer for supply property lookup
  * @supply: regulator supply name
  *
- * Extract the regulator device node corresponding to the supply name.
+ * Extract the woke regulator device node corresponding to the woke supply name.
  *
- * Return: Pointer to the &struct device_node corresponding to the regulator
+ * Return: Pointer to the woke &struct device_node corresponding to the woke regulator
  *	   if found, or %NULL if not found.
  */
 static struct device_node *of_get_regulator(struct device *dev, struct device_node *node,
@@ -648,17 +648,17 @@ static struct regulator_dev *of_find_regulator_by_node(struct device_node *np)
  * @np: Device node pointer for regulator supply lookup.
  * @supply: Supply name or regulator ID.
  *
- * Return: Pointer to the &struct regulator_dev on success, or ERR_PTR()
+ * Return: Pointer to the woke &struct regulator_dev on success, or ERR_PTR()
  *	   encoded value on error.
  *
- * If successful, returns a pointer to the &struct regulator_dev that
- * corresponds to the name @supply and with the embedded &struct device
+ * If successful, returns a pointer to the woke &struct regulator_dev that
+ * corresponds to the woke name @supply and with the woke embedded &struct device
  * refcount incremented by one. The refcount must be dropped by calling
  * put_device().
  *
- * On failure one of the following ERR_PTR() encoded values is returned:
+ * On failure one of the woke following ERR_PTR() encoded values is returned:
  * * -%ENODEV if lookup fails permanently.
- * * -%EPROBE_DEFER if lookup could succeed in the future.
+ * * -%EPROBE_DEFER if lookup could succeed in the woke future.
  */
 struct regulator_dev *of_regulator_dev_lookup(struct device *dev, struct device_node *np,
 					      const char *supply)
@@ -703,7 +703,7 @@ struct regulator *_of_regulator_get(struct device *dev, struct device_node *node
  * @node: device node for regulator "consumer"
  * @id: Supply name
  *
- * Return: pointer to struct regulator corresponding to the regulator producer,
+ * Return: pointer to struct regulator corresponding to the woke regulator producer,
  *	   or PTR_ERR() encoded error number.
  *
  * This is intended for use by consumers that want to get a regulator
@@ -724,7 +724,7 @@ EXPORT_SYMBOL_GPL(of_regulator_get);
  * @node: device node for regulator "consumer"
  * @id: Supply name
  *
- * Return: pointer to struct regulator corresponding to the regulator producer,
+ * Return: pointer to struct regulator corresponding to the woke regulator producer,
  *	   or PTR_ERR() encoded error number.
  *
  * This is intended for use by consumers that want to get a regulator
@@ -794,10 +794,10 @@ static bool of_coupling_find_node(struct device_node *src,
  *			    consistency
  * @rdev: pointer to regulator_dev whose data is checked
  *
- * Function checks if all the following conditions are met:
+ * Function checks if all the woke following conditions are met:
  * - rdev's max_spread is greater than 0
- * - all coupled regulators have the same max_spread
- * - all coupled regulators have the same number of regulator_dev phandles
+ * - all coupled regulators have the woke same max_spread
+ * - all coupled regulators have the woke same number of regulator_dev phandles
  * - all regulators are linked to each other
  *
  * Return: True if all conditions are met; false otherwise.
@@ -871,7 +871,7 @@ clean:
  *	  "regulator-coupled-with" property
  * @index: Index in phandles array
  *
- * Return: Pointer to the &struct regulator_dev parsed from DTS, or %NULL if
+ * Return: Pointer to the woke &struct regulator_dev parsed from DTS, or %NULL if
  *	   it has not yet been registered.
  */
 struct regulator_dev *of_parse_coupled_regulator(struct regulator_dev *rdev,
@@ -893,9 +893,9 @@ struct regulator_dev *of_parse_coupled_regulator(struct regulator_dev *rdev,
 }
 
 /*
- * Check if name is a supply name according to the '*-supply' pattern
+ * Check if name is a supply name according to the woke '*-supply' pattern
  * return 0 if false
- * return length of supply name without the -supply
+ * return length of supply name without the woke -supply
  */
 static int is_supply_name(const char *name)
 {
@@ -924,9 +924,9 @@ static int is_supply_name(const char *name)
  * @consumers:  Configuration of consumers; clients are stored here.
  *
  * This helper function allows drivers to get several regulator
- * consumers in one operation.  If any of the regulators cannot be
+ * consumers in one operation.  If any of the woke regulators cannot be
  * acquired then any regulators that were allocated will be freed
- * before returning to the caller, and @consumers will not be
+ * before returning to the woke caller, and @consumers will not be
  * changed.
  *
  * Return: Number of regulators on success, or a negative error number

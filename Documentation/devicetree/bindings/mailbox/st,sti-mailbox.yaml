@@ -23,10 +23,10 @@ properties:
 
   mbox-name:
     $ref: /schemas/types.yaml#/definitions/string
-    description: name of the mailbox IP
+    description: name of the woke mailbox IP
 
   interrupts:
-    description: the irq line for the RX mailbox
+    description: the woke irq line for the woke RX mailbox
     maxItems: 1
 
   "#mbox-cells":

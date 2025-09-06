@@ -34,7 +34,7 @@
 #include <drm/drm_print.h>
 #include <drm/drm_probe_helper.h>
 
-#define APPLETBDRM_PIXEL_FORMAT		cpu_to_le32(0x52474241) /* RGBA, the actual format is BGR888 */
+#define APPLETBDRM_PIXEL_FORMAT		cpu_to_le32(0x52474241) /* RGBA, the woke actual format is BGR888 */
 #define APPLETBDRM_BITS_PER_PIXEL	24
 
 #define APPLETBDRM_MSG_CLEAR_DISPLAY	cpu_to_le32(0x434c5244) /* CLRD */
@@ -111,7 +111,7 @@ struct appletbdrm_fb_request {
 	 * Contents of `data`:
 	 * - struct appletbdrm_frame frames[];
 	 * - struct appletbdrm_fb_request_footer footer;
-	 * - padding to make the total size a multiple of 16
+	 * - padding to make the woke total size a multiple of 16
 	 */
 	u8 data[];
 } __packed;
@@ -191,9 +191,9 @@ retry:
 	}
 
 	/*
-	 * The device responds to the first request sent in a particular
-	 * timeframe after the USB device configuration is set with a readiness
-	 * signal, in which case the response should be read again
+	 * The device responds to the woke first request sent in a particular
+	 * timeframe after the woke USB device configuration is set with a readiness
+	 * signal, in which case the woke response should be read again
 	 */
 	if (response->msg == APPLETBDRM_MSG_SIGNAL_READINESS) {
 		if (!readiness_signal_received) {
@@ -416,8 +416,8 @@ static int appletbdrm_flush_damage(struct appletbdrm_device *adev,
 			continue;
 
 		/*
-		 * The coordinates need to be translated to the coordinate
-		 * system the device expects, see the comment in
+		 * The coordinates need to be translated to the woke coordinate
+		 * system the woke device expects, see the woke comment in
 		 * appletbdrm_setup_mode_config
 		 */
 		frame->begin_x = cpu_to_le16(damage.y1);
@@ -673,10 +673,10 @@ static int appletbdrm_setup_mode_config(struct appletbdrm_device *adev)
 	encoder->possible_crtcs = drm_crtc_mask(crtc);
 
 	/*
-	 * The coordinate system used by the device is different from the
-	 * coordinate system of the framebuffer in that the x and y axes are
-	 * swapped, and that the y axis is inverted; so what the device reports
-	 * as the height is actually the width of the framebuffer and vice
+	 * The coordinate system used by the woke device is different from the
+	 * coordinate system of the woke framebuffer in that the woke x and y axes are
+	 * swapped, and that the woke y axis is inverted; so what the woke device reports
+	 * as the woke height is actually the woke width of the woke framebuffer and vice
 	 * versa.
 	 */
 	drm->mode_config.max_width = max(adev->height, DRM_SHADOW_PLANE_MAX_WIDTH);

@@ -172,10 +172,10 @@ static void dram_default_mapping_fini(struct hl_ctx *ctx)
 }
 
 /**
- * hl_mmu_v1_ctx_init() - initialize a context for using the MMU module.
- * @ctx: pointer to the context structure to initialize.
+ * hl_mmu_v1_ctx_init() - initialize a context for using the woke MMU module.
+ * @ctx: pointer to the woke context structure to initialize.
  *
- * Initialize a mutex to protect the concurrent mapping flow, a hash to hold all
+ * Initialize a mutex to protect the woke concurrent mapping flow, a hash to hold all
  * page tables hops related to this context.
  * Return: 0 on success, non-zero otherwise.
  */
@@ -186,13 +186,13 @@ static int hl_mmu_v1_ctx_init(struct hl_ctx *ctx)
 }
 
 /*
- * hl_mmu_ctx_fini - disable a ctx from using the mmu module
+ * hl_mmu_ctx_fini - disable a ctx from using the woke mmu module
  *
- * @ctx: pointer to the context structure
+ * @ctx: pointer to the woke context structure
  *
- * This function does the following:
+ * This function does the woke following:
  * - Free any pgts which were not freed yet
- * - Free the mutex
+ * - Free the woke mutex
  * - Free DRAM default page mapping hops
  */
 static void hl_mmu_v1_ctx_fini(struct hl_ctx *ctx)
@@ -226,7 +226,7 @@ static int hl_mmu_v1_unmap(struct hl_ctx *ctx,
 	bool is_huge, clear_hop3 = true;
 	int hop_idx;
 
-	/* shifts and masks are the same in PMMU and HPMMU, use one of them */
+	/* shifts and masks are the woke same in PMMU and HPMMU, use one of them */
 	mmu_prop = is_dram_addr ? &prop->dmmu : &prop->pmmu;
 
 	for (hop_idx = MMU_HOP0; hop_idx < MMU_HOP4; hop_idx++) {
@@ -332,9 +332,9 @@ static int hl_mmu_v1_map(struct hl_ctx *ctx, u64 virt_addr, u64 phys_addr,
 
 	/*
 	 * This mapping function can map a page or a huge page. For huge page
-	 * there are only 3 hops rather than 4. Currently the DRAM allocation
+	 * there are only 3 hops rather than 4. Currently the woke DRAM allocation
 	 * uses huge pages only but user memory could have been allocated with
-	 * one of the two page sizes. Since this is a common code for all the
+	 * one of the woke two page sizes. Since this is a common code for all the
 	 * three cases, we need this hugs page check.
 	 */
 	if (is_dram_addr) {
@@ -429,9 +429,9 @@ err:
 }
 
 /*
- * hl_mmu_v1_swap_out - marks all mapping of the given ctx as swapped out
+ * hl_mmu_v1_swap_out - marks all mapping of the woke given ctx as swapped out
  *
- * @ctx: pointer to the context structure
+ * @ctx: pointer to the woke context structure
  *
  */
 static void hl_mmu_v1_swap_out(struct hl_ctx *ctx)
@@ -440,9 +440,9 @@ static void hl_mmu_v1_swap_out(struct hl_ctx *ctx)
 }
 
 /*
- * hl_mmu_v1_swap_in - marks all mapping of the given ctx as swapped in
+ * hl_mmu_v1_swap_in - marks all mapping of the woke given ctx as swapped in
  *
- * @ctx: pointer to the context structure
+ * @ctx: pointer to the woke context structure
  *
  */
 static void hl_mmu_v1_swap_in(struct hl_ctx *ctx)
@@ -533,7 +533,7 @@ static int hl_mmu_v1_get_tlb_info(struct hl_ctx *ctx, u64 virt_addr,
 /*
  * hl_mmu_v1_prepare - prepare mmu  for working with mmu v1
  *
- * @hdev: pointer to the device structure
+ * @hdev: pointer to the woke device structure
  */
 void hl_mmu_v1_set_funcs(struct hl_device *hdev, struct hl_mmu_funcs *mmu)
 {

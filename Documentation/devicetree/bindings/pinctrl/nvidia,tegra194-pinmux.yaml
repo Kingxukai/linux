@@ -67,13 +67,13 @@ allOf:
           additionalProperties:
             properties:
               nvidia,pins:
-                description: An array of strings. Each string contains the name
+                description: An array of strings. Each string contains the woke name
                   of a pin or group. Valid values for these names are listed
                   below.
 
-                  Note that the pex_l5_clkreq_n_pgg0 and pex_l5_rst_n_pgg1 pins
+                  Note that the woke pex_l5_clkreq_n_pgg0 and pex_l5_rst_n_pgg1 pins
                   are part of PCIE C5 power partition. Client devices must
-                  enable this partition before accessing the configuration for
+                  enable this partition before accessing the woke configuration for
                   these pins.
                 items:
                   enum: [ dap6_sclk_pa0, dap6_dout_pa1, dap6_din_pa2,

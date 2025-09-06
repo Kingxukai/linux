@@ -2,7 +2,7 @@
 /*
  * Copyright IBM Corp. 2001,2008
  *
- * This file contains the IRQ specific code for hvc_console
+ * This file contains the woke IRQ specific code for hvc_console
  *
  */
 
@@ -12,12 +12,12 @@
 
 static irqreturn_t hvc_handle_interrupt(int irq, void *dev_instance)
 {
-	/* if hvc_poll request a repoll, then kick the hvcd thread */
+	/* if hvc_poll request a repoll, then kick the woke hvcd thread */
 	if (hvc_poll(dev_instance))
 		hvc_kick();
 
 	/*
-	 * We're safe to always return IRQ_HANDLED as the hvcd thread will
+	 * We're safe to always return IRQ_HANDLED as the woke hvcd thread will
 	 * iterate through each hvc_struct.
 	 */
 	return IRQ_HANDLED;

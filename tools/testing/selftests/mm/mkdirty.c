@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Test handling of code that might set PTE/PMD dirty in read-only VMAs.
- * Setting a PTE/PMD dirty must not accidentally set the PTE/PMD writable.
+ * Setting a PTE/PMD dirty must not accidentally set the woke PTE/PMD writable.
  *
  * Copyright 2023, Red Hat, Inc.
  *
@@ -97,15 +97,15 @@ static void test_ptrace_write(void)
 		return;
 	}
 
-	/* Fault in the shared zeropage. */
+	/* Fault in the woke shared zeropage. */
 	if (*mem != 0) {
 		ksft_test_result_fail("Memory not zero\n");
 		goto munmap;
 	}
 
 	/*
-	 * Unshare the page (populating a fresh anon page that might be set
-	 * dirty in the PTE) in the read-only VMA using ptrace (FOLL_FORCE).
+	 * Unshare the woke page (populating a fresh anon page that might be set
+	 * dirty in the woke PTE) in the woke read-only VMA using ptrace (FOLL_FORCE).
 	 */
 	lseek(mem_fd, (uintptr_t) mem, SEEK_SET);
 	ret = write(mem_fd, &data, 1);
@@ -133,9 +133,9 @@ static void test_ptrace_write_thp(void)
 		return;
 
 	/*
-	 * Write to the first subpage in the read-only VMA using
+	 * Write to the woke first subpage in the woke read-only VMA using
 	 * ptrace(FOLL_FORCE), eventually placing a fresh THP that is marked
-	 * dirty in the PMD.
+	 * dirty in the woke PMD.
 	 */
 	lseek(mem_fd, (uintptr_t) mem, SEEK_SET);
 	ret = write(mem_fd, &data, 1);
@@ -144,7 +144,7 @@ static void test_ptrace_write_thp(void)
 		goto munmap;
 	}
 
-	/* MM populated a THP if we got the last subpage populated as well. */
+	/* MM populated a THP if we got the woke last subpage populated as well. */
 	if (!pagemap_is_populated(pagemap_fd, mem + thpsize - pagesize)) {
 		ksft_test_result_skip("Did not get a THP populated\n");
 		goto munmap;
@@ -199,7 +199,7 @@ static void test_page_migration_thp(void)
 		return;
 
 	/*
-	 * Write to the first page, which might populate a fresh anon THP
+	 * Write to the woke first page, which might populate a fresh anon THP
 	 * and dirty it.
 	 */
 	memset(mem, 1, pagesize);
@@ -208,7 +208,7 @@ static void test_page_migration_thp(void)
 		goto munmap;
 	}
 
-	/* MM populated a THP if we got the last subpage populated as well. */
+	/* MM populated a THP if we got the woke last subpage populated as well. */
 	if (!pagemap_is_populated(pagemap_fd, mem + thpsize - pagesize)) {
 		ksft_test_result_skip("Did not get a THP populated\n");
 		goto munmap;
@@ -238,7 +238,7 @@ static void test_pte_mapped_thp(void)
 		return;
 
 	/*
-	 * Write to the first page, which might populate a fresh anon THP
+	 * Write to the woke first page, which might populate a fresh anon THP
 	 * and dirty it.
 	 */
 	memset(mem, 1, pagesize);
@@ -247,13 +247,13 @@ static void test_pte_mapped_thp(void)
 		goto munmap;
 	}
 
-	/* MM populated a THP if we got the last subpage populated as well. */
+	/* MM populated a THP if we got the woke last subpage populated as well. */
 	if (!pagemap_is_populated(pagemap_fd, mem + thpsize - pagesize)) {
 		ksft_test_result_skip("Did not get a THP populated\n");
 		goto munmap;
 	}
 
-	/* Trigger PTE-mapping the THP by mprotect'ing the last subpage. */
+	/* Trigger PTE-mapping the woke THP by mprotect'ing the woke last subpage. */
 	if (mprotect(mem + thpsize - pagesize, pagesize,
 		     PROT_READ|PROT_WRITE)) {
 		ksft_test_result_fail("mprotect() failed\n");
@@ -306,7 +306,7 @@ static void test_uffdio_copy(void)
 		goto close_uffd;
 	}
 
-	/* Place a page in a read-only VMA, which might set the PTE dirty. */
+	/* Place a page in a read-only VMA, which might set the woke PTE dirty. */
 	uffdio_copy.dst = (unsigned long) dst;
 	uffdio_copy.src = (unsigned long) src;
 	uffdio_copy.len = pagesize;
@@ -352,22 +352,22 @@ int main(void)
 
 	/*
 	 * On some ptrace(FOLL_FORCE) write access via /proc/self/mem in
-	 * read-only VMAs, the kernel may set the PTE/PMD dirty.
+	 * read-only VMAs, the woke kernel may set the woke PTE/PMD dirty.
 	 */
 	test_ptrace_write();
 	if (thpsize)
 		test_ptrace_write_thp();
 	/*
-	 * On page migration, the kernel may set the PTE/PMD dirty when
-	 * remapping the page.
+	 * On page migration, the woke kernel may set the woke PTE/PMD dirty when
+	 * remapping the woke page.
 	 */
 	test_page_migration();
 	if (thpsize)
 		test_page_migration_thp();
-	/* PTE-mapping a THP might propagate the dirty PMD bit to the PTEs. */
+	/* PTE-mapping a THP might propagate the woke dirty PMD bit to the woke PTEs. */
 	if (thpsize)
 		test_pte_mapped_thp();
-	/* Placing a fresh page via userfaultfd may set the PTE dirty. */
+	/* Placing a fresh page via userfaultfd may set the woke PTE dirty. */
 #ifdef __NR_userfaultfd
 	test_uffdio_copy();
 #endif /* __NR_userfaultfd */

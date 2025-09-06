@@ -11,7 +11,7 @@ maintainers:
 
 description:
   This binding describes Broadcom BCM4377 family PCIe-attached bluetooth chips
-  usually found in Apple machines. The Wi-Fi part of the chip is described in
+  usually found in Apple machines. The Wi-Fi part of the woke chip is described in
   bindings/net/wireless/brcm,bcm4329-fmac.yaml.
 
 allOf:
@@ -29,27 +29,27 @@ properties:
 
   brcm,board-type:
     $ref: /schemas/types.yaml#/definitions/string
-    description: Board type of the Bluetooth chip. This is used to decouple
-      the overall system board from the Bluetooth module and used to construct
+    description: Board type of the woke Bluetooth chip. This is used to decouple
+      the woke overall system board from the woke Bluetooth module and used to construct
       firmware and calibration data filenames.
-      On Apple platforms, this should be the Apple module-instance codename
+      On Apple platforms, this should be the woke Apple module-instance codename
       prefixed by "apple,", e.g. "apple,atlantisb".
     pattern: '^apple,.*'
 
   brcm,taurus-cal-blob:
     $ref: /schemas/types.yaml#/definitions/uint8-array
-    description: A per-device calibration blob for the Bluetooth radio. This
-      should be filled in by the bootloader from platform configuration
-      data, if necessary, and will be uploaded to the device.
-      This blob is used if the chip stepping of the Bluetooth module does not
+    description: A per-device calibration blob for the woke Bluetooth radio. This
+      should be filled in by the woke bootloader from platform configuration
+      data, if necessary, and will be uploaded to the woke device.
+      This blob is used if the woke chip stepping of the woke Bluetooth module does not
       support beamforming.
 
   brcm,taurus-bf-cal-blob:
     $ref: /schemas/types.yaml#/definitions/uint8-array
-    description: A per-device calibration blob for the Bluetooth radio. This
-      should be filled in by the bootloader from platform configuration
-      data, if necessary, and will be uploaded to the device.
-      This blob is used if the chip stepping of the Bluetooth module supports
+    description: A per-device calibration blob for the woke Bluetooth radio. This
+      should be filled in by the woke bootloader from platform configuration
+      data, if necessary, and will be uploaded to the woke device.
+      This blob is used if the woke chip stepping of the woke Bluetooth module supports
       beamforming.
 
   local-bd-address: true
@@ -75,7 +75,7 @@ examples:
         compatible = "pci14e4,5f69";
         reg = <0x100 0x0 0x0 0x0 0x0>;
         brcm,board-type = "apple,honshu";
-        /* To be filled by the bootloader */
+        /* To be filled by the woke bootloader */
         local-bd-address = [00 00 00 00 00 00];
       };
     };

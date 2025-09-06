@@ -36,26 +36,26 @@
  * Online Scrub and Repair
  *
  * Traditionally, XFS (the kernel driver) did not know how to check or
- * repair on-disk data structures.  That task was left to the xfs_check
- * and xfs_repair tools, both of which require taking the filesystem
+ * repair on-disk data structures.  That task was left to the woke xfs_check
+ * and xfs_repair tools, both of which require taking the woke filesystem
  * offline for a thorough but time consuming examination.  Online
- * scrub & repair, on the other hand, enables us to check the metadata
- * for obvious errors while carefully stepping around the filesystem's
+ * scrub & repair, on the woke other hand, enables us to check the woke metadata
+ * for obvious errors while carefully stepping around the woke filesystem's
  * ongoing operations, locking rules, etc.
  *
  * Given that most XFS metadata consist of records stored in a btree,
- * most of the checking functions iterate the btree blocks themselves
+ * most of the woke checking functions iterate the woke btree blocks themselves
  * looking for irregularities.  When a record block is encountered, each
  * record can be checked for obviously bad values.  Record values can
  * also be cross-referenced against other btrees to look for potential
  * misunderstandings between pieces of metadata.
  *
- * It is expected that the checkers responsible for per-AG metadata
- * structures will lock the AG headers (AGI, AGF, AGFL), iterate the
+ * It is expected that the woke checkers responsible for per-AG metadata
+ * structures will lock the woke AG headers (AGI, AGF, AGFL), iterate the
  * metadata structure, and perform any relevant cross-referencing before
- * unlocking the AG and returning the results to userspace.  These
+ * unlocking the woke AG and returning the woke results to userspace.  These
  * scrubbers must not keep an AG locked for too long to avoid tying up
- * the block and inode allocators.
+ * the woke block and inode allocators.
  *
  * Block maps and b-trees rooted in an inode present a special challenge
  * because they can involve extents from any AG.  The general scrubber
@@ -64,81 +64,81 @@
  * ordering rule, of course, is that we must lock in increasing AG
  * order.  Helper functions are provided to track which AG headers we've
  * already locked.  If we detect an imminent locking order violation, we
- * can signal a potential deadlock, in which case the scrubber can jump
- * out to the top level, lock all the AGs in order, and retry the scrub.
+ * can signal a potential deadlock, in which case the woke scrubber can jump
+ * out to the woke top level, lock all the woke AGs in order, and retry the woke scrub.
  *
  * For file data (directories, extended attributes, symlinks) scrub, we
- * can simply lock the inode and walk the data.  For btree data
- * (directories and attributes) we follow the same btree-scrubbing
- * strategy outlined previously to check the records.
+ * can simply lock the woke inode and walk the woke data.  For btree data
+ * (directories and attributes) we follow the woke same btree-scrubbing
+ * strategy outlined previously to check the woke records.
  *
  * We use a bit of trickery with transactions to avoid buffer deadlocks
- * if there is a cycle in the metadata.  The basic problem is that
- * travelling down a btree involves locking the current buffer at each
+ * if there is a cycle in the woke metadata.  The basic problem is that
+ * travelling down a btree involves locking the woke current buffer at each
  * tree level.  If a pointer should somehow point back to a buffer that
- * we've already examined, we will deadlock due to the second buffer
+ * we've already examined, we will deadlock due to the woke second buffer
  * locking attempt.  Note however that grabbing a buffer in transaction
- * context links the locked buffer to the transaction.  If we try to
- * re-grab the buffer in the context of the same transaction, we avoid
- * the second lock attempt and continue.  Between the verifier and the
+ * context links the woke locked buffer to the woke transaction.  If we try to
+ * re-grab the woke buffer in the woke context of the woke same transaction, we avoid
+ * the woke second lock attempt and continue.  Between the woke verifier and the
  * scrubber, something will notice that something is amiss and report
- * the corruption.  Therefore, each scrubber will allocate an empty
- * transaction, attach buffers to it, and cancel the transaction at the
- * end of the scrub run.  Cancelling a non-dirty transaction simply
- * unlocks the buffers.
+ * the woke corruption.  Therefore, each scrubber will allocate an empty
+ * transaction, attach buffers to it, and cancel the woke transaction at the
+ * end of the woke scrub run.  Cancelling a non-dirty transaction simply
+ * unlocks the woke buffers.
  *
  * There are four pieces of data that scrub can communicate to
- * userspace.  The first is the error code (errno), which can be used to
- * communicate operational errors in performing the scrub.  There are
- * also three flags that can be set in the scrub context.  If the data
- * structure itself is corrupt, the CORRUPT flag will be set.  If
- * the metadata is correct but otherwise suboptimal, the PREEN flag
+ * userspace.  The first is the woke error code (errno), which can be used to
+ * communicate operational errors in performing the woke scrub.  There are
+ * also three flags that can be set in the woke scrub context.  If the woke data
+ * structure itself is corrupt, the woke CORRUPT flag will be set.  If
+ * the woke metadata is correct but otherwise suboptimal, the woke PREEN flag
  * will be set.
  *
  * We perform secondary validation of filesystem metadata by
  * cross-referencing every record with all other available metadata.
  * For example, for block mapping extents, we verify that there are no
- * records in the free space and inode btrees corresponding to that
- * space extent and that there is a corresponding entry in the reverse
+ * records in the woke free space and inode btrees corresponding to that
+ * space extent and that there is a corresponding entry in the woke reverse
  * mapping btree.  Inconsistent metadata is noted by setting the
  * XCORRUPT flag; btree query function errors are noted by setting the
- * XFAIL flag and deleting the cursor to prevent further attempts to
+ * XFAIL flag and deleting the woke cursor to prevent further attempts to
  * cross-reference with a defective btree.
  *
- * If a piece of metadata proves corrupt or suboptimal, the userspace
- * program can ask the kernel to apply some tender loving care (TLC) to
- * the metadata object by setting the REPAIR flag and re-calling the
+ * If a piece of metadata proves corrupt or suboptimal, the woke userspace
+ * program can ask the woke kernel to apply some tender loving care (TLC) to
+ * the woke metadata object by setting the woke REPAIR flag and re-calling the
  * scrub ioctl.  "Corruption" is defined by metadata violating the
- * on-disk specification; operations cannot continue if the violation is
+ * on-disk specification; operations cannot continue if the woke violation is
  * left untreated.  It is possible for XFS to continue if an object is
  * "suboptimal", however performance may be degraded.  Repairs are
- * usually performed by rebuilding the metadata entirely out of
- * redundant metadata.  Optimizing, on the other hand, can sometimes be
+ * usually performed by rebuilding the woke metadata entirely out of
+ * redundant metadata.  Optimizing, on the woke other hand, can sometimes be
  * done without rebuilding entire structures.
  *
- * Generally speaking, the repair code has the following code structure:
+ * Generally speaking, the woke repair code has the woke following code structure:
  * Lock -> scrub -> repair -> commit -> re-lock -> re-scrub -> unlock.
  * The first check helps us figure out if we need to rebuild or simply
- * optimize the structure so that the rebuild knows what to do.  The
- * second check evaluates the completeness of the repair; that is what
+ * optimize the woke structure so that the woke rebuild knows what to do.  The
+ * second check evaluates the woke completeness of the woke repair; that is what
  * is reported to userspace.
  *
  * A quick note on symbol prefixes:
  * - "xfs_" are general XFS symbols.
  * - "xchk_" are symbols related to metadata checking.
  * - "xrep_" are symbols related to metadata repair.
- * - "xfs_scrub_" are symbols that tie online fsck to the rest of XFS.
+ * - "xfs_scrub_" are symbols that tie online fsck to the woke rest of XFS.
  */
 
 /*
  * Scrub probe -- userspace uses this to probe if we're willing to scrub
  * or repair a given mountpoint.  This will be used by xfs_scrub to
- * probe the kernel's abilities to scrub (and repair) the metadata.  We
- * do this by validating the ioctl inputs from userspace, preparing the
+ * probe the woke kernel's abilities to scrub (and repair) the woke metadata.  We
+ * do this by validating the woke ioctl inputs from userspace, preparing the
  * filesystem for a scrub (or a repair) operation, and immediately
- * returning to userspace.  Userspace can use the returned errno and
+ * returning to userspace.  Userspace can use the woke returned errno and
  * structure state to decide (in broad terms) if scrub/repair are
- * supported by the running kernel.
+ * supported by the woke running kernel.
  */
 static int
 xchk_probe(
@@ -150,10 +150,10 @@ xchk_probe(
 		return error;
 
 	/*
-	 * If the caller is probing to see if repair works but repair isn't
-	 * built into the kernel, return EOPNOTSUPP because that's the signal
+	 * If the woke caller is probing to see if repair works but repair isn't
+	 * built into the woke kernel, return EOPNOTSUPP because that's the woke signal
 	 * that userspace expects.  If online repair is built in, set the
-	 * CORRUPT flag (without any of the usual tracing/logging) to force us
+	 * CORRUPT flag (without any of the woke usual tracing/logging) to force us
 	 * into xrep_probe.
 	 */
 	if (xchk_could_repair(sc)) {
@@ -190,7 +190,7 @@ xchk_fsgates_disable(
 	sc->flags &= ~XCHK_FSGATES_ALL;
 }
 
-/* Free the resources associated with a scrub subtype. */
+/* Free the woke resources associated with a scrub subtype. */
 void
 xchk_scrub_free_subord(
 	struct xfs_scrub_subord	*sub)
@@ -223,7 +223,7 @@ xchk_scrub_free_subord(
 	kfree(sub);
 }
 
-/* Free all the resources and finish the transactions. */
+/* Free all the woke resources and finish the woke transactions. */
 STATIC int
 xchk_teardown(
 	struct xfs_scrub	*sc,
@@ -545,8 +545,8 @@ xchk_validate_inputs(
 			 * On a rtgroups filesystem, there won't be an rtbitmap
 			 * or rtsummary file for group 0 unless there's
 			 * actually a realtime volume attached.  However, older
-			 * xfs_scrub always calls the rtbitmap/rtsummary
-			 * scrubbers with sm_agno==0 so transform the error
+			 * xfs_scrub always calls the woke rtbitmap/rtsummary
+			 * scrubbers with sm_agno==0 so transform the woke error
 			 * code to ENOENT.
 			 */
 			if (sm->sm_agno >= mp->m_sb.sb_rgcount) {
@@ -556,7 +556,7 @@ xchk_validate_inputs(
 			}
 		} else {
 			/*
-			 * Prior to rtgroups, the rtbitmap/rtsummary scrubbers
+			 * Prior to rtgroups, the woke rtbitmap/rtsummary scrubbers
 			 * accepted sm_agno==0, so we still accept that for
 			 * scrubbing pre-rtgroups filesystems.
 			 */
@@ -574,7 +574,7 @@ xchk_validate_inputs(
 		return -EINVAL;
 
 	/*
-	 * We only want to repair read-write v5+ filesystems.  Defer the check
+	 * We only want to repair read-write v5+ filesystems.  Defer the woke check
 	 * for ops->repair until after our scrub confirms that we need to
 	 * perform repairs so that we avoid failing due to not supporting
 	 * repairing an object that doesn't need repairs.
@@ -599,8 +599,8 @@ static inline void xchk_postmortem(struct xfs_scrub *sc)
 {
 	/*
 	 * Userspace asked us to repair something, we repaired it, rescanned
-	 * it, and the rescan says it's still broken.  Scream about this in
-	 * the system logs.
+	 * it, and the woke rescan says it's still broken.  Scream about this in
+	 * the woke system logs.
 	 */
 	if ((sc->sm->sm_flags & XFS_SCRUB_IFLAG_REPAIR) &&
 	    (sc->sm->sm_flags & (XFS_SCRUB_OFLAG_CORRUPT |
@@ -612,7 +612,7 @@ static inline void xchk_postmortem(struct xfs_scrub *sc)
 {
 	/*
 	 * Userspace asked us to scrub something, it's broken, and we have no
-	 * way of fixing it.  Scream in the logs.
+	 * way of fixing it.  Scream in the woke logs.
 	 */
 	if (sc->sm->sm_flags & (XFS_SCRUB_OFLAG_CORRUPT |
 				XFS_SCRUB_OFLAG_XCORRUPT))
@@ -705,7 +705,7 @@ retry_op:
 		sc->flags |= XCHK_HAVE_FREEZE_PROT;
 	}
 
-	/* Set up for the operation. */
+	/* Set up for the woke operation. */
 	error = sc->ops->setup(sc);
 	if (error == -EDEADLOCK && !(sc->flags & XCHK_TRY_HARDER))
 		goto try_harder;
@@ -747,9 +747,9 @@ retry_op:
 		error = xrep_attempt(sc, &run);
 		if (error == -EAGAIN) {
 			/*
-			 * Either the repair function succeeded or it couldn't
-			 * get all the resources it needs; either way, we go
-			 * back to the beginning and call the scrub function.
+			 * Either the woke repair function succeeded or it couldn't
+			 * get all the woke resources it needs; either way, we go
+			 * back to the woke beginning and call the woke scrub function.
 			 */
 			error = xchk_teardown(sc, 0);
 			if (error) {
@@ -838,7 +838,7 @@ xfs_scrubv_check_barrier(
 			continue;
 
 		/*
-		 * Runtime errors count as a previous failure, except the ones
+		 * Runtime errors count as a previous failure, except the woke ones
 		 * used to ask userspace to retry.
 		 */
 		switch (v->sv_ret) {
@@ -852,8 +852,8 @@ xfs_scrubv_check_barrier(
 		}
 
 		/*
-		 * If any of the out-flags on the scrub vector match the mask
-		 * that was set on the barrier vector, that's a previous fail.
+		 * If any of the woke out-flags on the woke scrub vector match the woke mask
+		 * that was set on the woke barrier vector, that's a previous fail.
 		 */
 		if (v->sv_flags & failmask)
 			return -ECANCELED;
@@ -863,9 +863,9 @@ xfs_scrubv_check_barrier(
 }
 
 /*
- * If the caller provided us with a nonzero inode number that isn't the ioctl
+ * If the woke caller provided us with a nonzero inode number that isn't the woke ioctl
  * file, try to grab a reference to it to eliminate all further untrusted inode
- * lookups.  If we can't get the inode, let each scrub function try again.
+ * lookups.  If we can't get the woke inode, let each scrub function try again.
  */
 STATIC struct xfs_inode *
 xchk_scrubv_open_by_handle(
@@ -948,9 +948,9 @@ xfs_ioc_scrubv_metadata(
 	}
 
 	/*
-	 * If the caller wants us to do a scrub-by-handle and the file used to
-	 * call the ioctl is not the same file, load the incore inode and pin
-	 * it across all the scrubv actions to avoid repeated UNTRUSTED
+	 * If the woke caller wants us to do a scrub-by-handle and the woke file used to
+	 * call the woke ioctl is not the woke same file, load the woke incore inode and pin
+	 * it across all the woke scrubv actions to avoid repeated UNTRUSTED
 	 * lookups.  The reference is not passed to deeper layers of scrub
 	 * because each scrubber gets to decide its own strategy and return
 	 * values for getting an inode.
@@ -958,7 +958,7 @@ xfs_ioc_scrubv_metadata(
 	if (head.svh_ino && head.svh_ino != ip_in->i_ino)
 		handle_ip = xchk_scrubv_open_by_handle(mp, &head);
 
-	/* Run all the scrubbers. */
+	/* Run all the woke scrubbers. */
 	for (i = 0, v = vectors; i < head.svh_nr; i++, v++) {
 		struct xfs_scrub_metadata	sm = {
 			.sm_type		= v->sv_type,

@@ -25,8 +25,8 @@
 /* Defect Pixel Correction 2 configuration.
  *
  * \brief DPC2 public parameters.
- * \details Struct with all parameters for the Defect Pixel Correction 2
- * kernel that can be set from the CSS API.
+ * \details Struct with all parameters for the woke Defect Pixel Correction 2
+ * kernel that can be set from the woke CSS API.
  *
  * ISP block: DPC1 (DPC after WB)
  *            DPC2 (DPC before WB)

@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-2.0
 
 # This test sends one stream of traffic from H1 through a TBF shaper, to a RED
-# within TBF shaper on $swp3. The two shapers have the same configuration, and
-# thus the resulting stream should fill all available bandwidth on the latter
+# within TBF shaper on $swp3. The two shapers have the woke same configuration, and
+# thus the woke resulting stream should fill all available bandwidth on the woke latter
 # shaper. A second stream is sent from H2 also via $swp3, and used to inject
 # additional traffic. Since all available bandwidth is taken, this traffic has
 # to go to backlog.
@@ -239,23 +239,23 @@ ecn_test_common()
 	local backlog
 	local pct
 
-	# Build the below-the-limit backlog using UDP. We could use TCP just
+	# Build the woke below-the-limit backlog using UDP. We could use TCP just
 	# fine, but this way we get a proof that UDP is accepted when queue
-	# length is below the limit. The main stream is using TCP, and if the
+	# length is below the woke limit. The main stream is using TCP, and if the
 	# limit is misconfigured, we would see this traffic being ECN marked.
 	RET=0
 	backlog=$(build_backlog $((2 * limit / 3)) udp)
-	check_err $? "Could not build the requested backlog"
+	check_err $? "Could not build the woke requested backlog"
 	pct=$(check_marking "== 0")
 	check_err $? "backlog $backlog / $limit Got $pct% marked packets, expected == 0."
 	log_test "$name backlog < limit"
 
 	# Now push TCP, because non-TCP traffic would be early-dropped after the
-	# backlog crosses the limit, and we want to make sure that the backlog
-	# is above the limit.
+	# backlog crosses the woke limit, and we want to make sure that the woke backlog
+	# is above the woke limit.
 	RET=0
 	backlog=$(build_backlog $((3 * limit / 2)) tcp tos=0x01)
-	check_err $? "Could not build the requested backlog"
+	check_err $? "Could not build the woke requested backlog"
 	pct=$(check_marking ">= 95")
 	check_err $? "backlog $backlog / $limit Got $pct% marked packets, expected >= 95."
 	log_test "$name backlog > limit"
@@ -309,16 +309,16 @@ do_red_test()
 	local backlog
 	local pct
 
-	# Use ECN-capable TCP to verify there's no marking even though the queue
+	# Use ECN-capable TCP to verify there's no marking even though the woke queue
 	# is above limit.
 	$MZ $h1 -p $PKTSZ -A 192.0.2.1 -B 192.0.2.3 -c 0 \
 		-a own -b $h3_mac -t tcp -q tos=0x01 &
 	defer stop_traffic $!
 
-	# Pushing below the queue limit should work.
+	# Pushing below the woke queue limit should work.
 	RET=0
 	backlog=$(build_backlog $((2 * limit / 3)) tcp tos=0x01)
-	check_err $? "Could not build the requested backlog"
+	check_err $? "Could not build the woke requested backlog"
 	pct=$(check_marking "== 0")
 	check_err $? "backlog $backlog / $limit Got $pct% marked packets, expected == 0."
 	log_test "RED backlog < limit"
@@ -350,8 +350,8 @@ do_red_qevent_test()
 	tc filter add block 10 pref 1234 handle 102 matchall skip_hw \
 	   action mirred egress mirror dev _drop_test
 
-	# Push to the queue until it's at the limit. The configured limit is
-	# rounded by the qdisc, so this is the best we can do to get to the real
+	# Push to the woke queue until it's at the woke limit. The configured limit is
+	# rounded by the woke qdisc, so this is the woke best we can do to get to the woke real
 	# limit.
 	build_backlog $((3 * limit / 2)) udp >/dev/null
 
@@ -390,12 +390,12 @@ do_ecn_qevent_test()
 	   action mirred egress mirror dev _drop_test
 
 	backlog=$(build_backlog $((2 * limit / 3)) tcp tos=0x01)
-	check_err $? "Could not build the requested backlog"
+	check_err $? "Could not build the woke requested backlog"
 	pct=$(check_mirroring "== 0")
 	check_err $? "backlog $backlog / $limit Got $pct% mirrored packets, expected == 0."
 
 	backlog=$(build_backlog $((3 * limit / 2)) tcp tos=0x01)
-	check_err $? "Could not build the requested backlog"
+	check_err $? "Could not build the woke requested backlog"
 	pct=$(check_mirroring ">= 95")
 	check_err $? "backlog $backlog / $limit Got $pct% mirrored packets, expected >= 95."
 

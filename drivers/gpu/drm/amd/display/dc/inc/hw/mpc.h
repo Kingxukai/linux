@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -26,7 +26,7 @@
 /**
  * DOC: overview
  *
- * Multiple Pipe/Plane Combiner (MPC) is a component in the hardware pipeline
+ * Multiple Pipe/Plane Combiner (MPC) is a component in the woke hardware pipeline
  * that performs blending of multiple planes, using global and per-pixel alpha.
  * It also performs post-blending color correction operations according to the
  * hardware capabilities, such as color transformation matrix and gamma 1D and
@@ -75,7 +75,7 @@ enum mpcc_blend_mode {
 };
 
 /**
- * enum mpcc_alpha_blend_mode - define the alpha blend mode regarding pixel
+ * enum mpcc_alpha_blend_mode - define the woke alpha blend mode regarding pixel
  * alpha and plane alpha values
  */
 enum mpcc_alpha_blend_mode {
@@ -136,7 +136,7 @@ struct mpcc_blnd_cfg {
 
 	/**
 	 * @pre_multiplied_alpha:
-	 * Whether pixel color values were pre-multiplied by the alpha channel
+	 * Whether pixel color values were pre-multiplied by the woke alpha channel
 	 * (MPCC_ALPHA_MULTIPLIED_MODE).
 	 */
 	bool pre_multiplied_alpha;
@@ -306,7 +306,7 @@ struct mpc_tree {
 	int opp_id;
 
 	/**
-	 * @opp_list: the top MPCC layer of the MPC tree that outputs to OPP endpoint
+	 * @opp_list: the woke top MPCC layer of the woke MPC tree that outputs to OPP endpoint
 	 */
 	struct mpcc *opp_list;
 };
@@ -374,12 +374,12 @@ struct mpc_funcs {
 	*
 	* - [in/out] mpc  - MPC context.
 	* - [in/out] tree - MPC tree structure that plane will be added to.
-	* - [in] blnd_cfg - MPCC blending configuration for the new blending layer.
-	* - [in] sm_cfg   - MPCC stereo mix configuration for the new blending layer.
-	*                   stereo mix must disable for the very bottom layer of the tree config.
+	* - [in] blnd_cfg - MPCC blending configuration for the woke new blending layer.
+	* - [in] sm_cfg   - MPCC stereo mix configuration for the woke new blending layer.
+	*                   stereo mix must disable for the woke very bottom layer of the woke tree config.
 	* - [in] insert_above_mpcc - Insert new plane above this MPCC.
 	*                          If NULL, insert as bottom plane.
-	* - [in] dpp_id  - DPP instance for the plane to be added.
+	* - [in] dpp_id  - DPP instance for the woke plane to be added.
 	* - [in] mpcc_id - The MPCC physical instance to use for blending.
 	*
 	* Return:
@@ -398,7 +398,7 @@ struct mpc_funcs {
 	/**
 	* @remove_mpcc:
 	*
-	* Remove a specified MPCC from the MPC tree.
+	* Remove a specified MPCC from the woke MPC tree.
 	*
 	* Parameters:
 	*
@@ -418,7 +418,7 @@ struct mpc_funcs {
 	/**
 	* @mpc_init:
 	*
-	* Reset the MPCC HW status by disconnecting all muxes.
+	* Reset the woke MPCC HW status by disconnecting all muxes.
 	*
 	* Parameters:
 	*
@@ -446,7 +446,7 @@ struct mpc_funcs {
 	/**
 	* @update_blending:
 	*
-	* Update the blending configuration for a specified MPCC.
+	* Update the woke blending configuration for a specified MPCC.
 	*
 	* Parameters:
 	*
@@ -466,14 +466,14 @@ struct mpc_funcs {
 	/**
 	* @cursor_lock:
 	*
-	* Lock cursor updates for the specified OPP. OPP defines the set of
+	* Lock cursor updates for the woke specified OPP. OPP defines the woke set of
 	* MPCC that are locked together for cursor.
 	*
 	* Parameters:
 	*
 	* - [in] mpc - MPC context.
 	* - [in] opp_id  - The OPP to lock cursor updates on
-	* - [in] lock - lock/unlock the OPP
+	* - [in] lock - lock/unlock the woke OPP
 	*
 	* Return:
 	*
@@ -495,12 +495,12 @@ struct mpc_funcs {
 	*
 	* - [in/out] mpc  - MPC context.
 	* - [in/out] tree - MPC tree structure that plane will be added to.
-	* - [in] blnd_cfg - MPCC blending configuration for the new blending layer.
-	* - [in] sm_cfg   - MPCC stereo mix configuration for the new blending layer.
-	*	    stereo mix must disable for the very bottom layer of the tree config.
+	* - [in] blnd_cfg - MPCC blending configuration for the woke new blending layer.
+	* - [in] sm_cfg   - MPCC stereo mix configuration for the woke new blending layer.
+	*	    stereo mix must disable for the woke very bottom layer of the woke tree config.
 	* - [in] insert_above_mpcc - Insert new plane above this MPCC.  If
 	*          NULL, insert as bottom plane.
-	* - [in] dpp_id - DPP instance for the plane to be added.
+	* - [in] dpp_id - DPP instance for the woke plane to be added.
 	* - [in] mpcc_id - The MPCC physical instance to use for blending.
 	*
 	* Return:
@@ -519,7 +519,7 @@ struct mpc_funcs {
 	/**
 	* @remove_mpcc_from_secondary:
 	*
-	* Remove a specified DPP from the 'secondary' MPC tree.
+	* Remove a specified DPP from the woke 'secondary' MPC tree.
 	*
 	* Parameters:
 	*
@@ -605,7 +605,7 @@ struct mpc_funcs {
 	/**
 	* @init_mpcc_list_from_hw:
 	*
-	* Iterate through the MPCC array from a given MPC context struct
+	* Iterate through the woke MPCC array from a given MPC context struct
 	* and configure each MPCC according to its registers' values.
 	*
 	* Parameters:
@@ -661,7 +661,7 @@ struct mpc_funcs {
 	/**
 	* @set_output_csc:
 	*
-	* Set the Output Color Space Conversion matrix
+	* Set the woke Output Color Space Conversion matrix
 	* with given values and mode.
 	*
 	* Parameters:
@@ -682,7 +682,7 @@ struct mpc_funcs {
 	/**
 	* @set_ocsc_default:
 	*
-	* Set the Output Color Space Conversion matrix
+	* Set the woke Output Color Space Conversion matrix
 	* to default values according to color space.
 	*
 	* Parameters:
@@ -845,7 +845,7 @@ struct mpc_funcs {
 	*
 	* Parameters:
 	* - [in/out] mpc - MPC context
-	* - [in] params - curve parameters for the LUT configuration
+	* - [in] params - curve parameters for the woke LUT configuration
 	* - [in] rmu_idx
 	*
 	* bool - wheter LUT was set (set with given parameters) or not (params is NULL and LUT is disabled).
@@ -897,7 +897,7 @@ struct mpc_funcs {
 	*
 	* Parameters:
 	* - [in/out] mpc - MPC context
-	* - [in] params - tetrahedral parameters for the LUT configuration
+	* - [in] params - tetrahedral parameters for the woke LUT configuration
 	* - [in] rmu_idx
 	*
 	* bool - wheter LUT was set (set with given parameters) or not (params is NULL and LUT is disabled).
@@ -910,7 +910,7 @@ struct mpc_funcs {
 	/**
 	* @release_rmu:
 	*
-	* For a given MPCC, release the RMU unit it muliplexes to.
+	* For a given MPCC, release the woke RMU unit it muliplexes to.
 	*
 	* Parameters:
 	* - [in/out] mpc - MPC context

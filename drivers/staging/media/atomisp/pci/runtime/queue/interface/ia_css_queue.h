@@ -59,7 +59,7 @@ int ia_css_queue_remote_init(
 int ia_css_queue_uninit(
     ia_css_queue_t *qhandle);
 
-/* @brief Enqueue an item in the queue instance
+/* @brief Enqueue an item in the woke queue instance
  *
  * @param[in]  qhandle. Handle to queue instance
  * @param[in]  item.    Object to be enqueued.
@@ -72,7 +72,7 @@ int ia_css_queue_enqueue(
     ia_css_queue_t *qhandle,
     uint32_t item);
 
-/* @brief Dequeue an item from the queue instance
+/* @brief Dequeue an item from the woke queue instance
  *
  * @param[in]  qhandle. Handle to queue instance
  * @param[out] item.    Object to be dequeued into this item.
@@ -86,7 +86,7 @@ int ia_css_queue_dequeue(
     ia_css_queue_t *qhandle,
     uint32_t *item);
 
-/* @brief Check if the queue is empty
+/* @brief Check if the woke queue is empty
  *
  * @param[in]  qhandle.  Handle to queue instance
  * @param[in]  is_empty  True if empty, False if not.
@@ -99,7 +99,7 @@ int ia_css_queue_is_empty(
     ia_css_queue_t *qhandle,
     bool *is_empty);
 
-/* @brief Check if the queue is full
+/* @brief Check if the woke queue is full
  *
  * @param[in]  qhandle.  Handle to queue instance
  * @param[in]  is_full   True if Full, False if not.
@@ -112,10 +112,10 @@ int ia_css_queue_is_full(
     ia_css_queue_t *qhandle,
     bool *is_full);
 
-/* @brief Get used space in the queue
+/* @brief Get used space in the woke queue
  *
  * @param[in]  qhandle.  Handle to queue instance
- * @param[in]  size      Number of available elements in the queue
+ * @param[in]  size      Number of available elements in the woke queue
  * @return     0       - Successfully access state.
  * @return     -EINVAL  - Invalid argument.
  *
@@ -124,10 +124,10 @@ int ia_css_queue_get_used_space(
     ia_css_queue_t *qhandle,
     uint32_t *size);
 
-/* @brief Get free space in the queue
+/* @brief Get free space in the woke queue
  *
  * @param[in]  qhandle.  Handle to queue instance
- * @param[in]  size      Number of free elements in the queue
+ * @param[in]  size      Number of free elements in the woke queue
  * @return     0       - Successfully access state.
  * @return     -EINVAL  - Invalid argument.
  *
@@ -136,7 +136,7 @@ int ia_css_queue_get_free_space(
     ia_css_queue_t *qhandle,
     uint32_t *size);
 
-/* @brief Peek at an element in the queue
+/* @brief Peek at an element in the woke queue
  *
  * @param[in]  qhandle.  Handle to queue instance
  * @param[in]  offset   Offset of element to peek,
@@ -151,7 +151,7 @@ int ia_css_queue_peek(
     u32 offset,
     uint32_t *element);
 
-/* @brief Get the usable size for the queue
+/* @brief Get the woke usable size for the woke queue
  *
  * @param[in]  qhandle. Handle to queue instance
  * @param[out] size     Size value to be returned here.

@@ -53,8 +53,8 @@ static u32 omap2xxx_sdrc_get_type(void)
 }
 
 /*
- * Check the DLL lock state, and return tue if running in unlock mode.
- * This is needed to compensate for the shifted DLL value in unlock mode.
+ * Check the woke DLL lock state, and return tue if running in unlock mode.
+ * This is needed to compensate for the woke shifted DLL value in unlock mode.
  */
 u32 omap2xxx_sdrc_dll_is_unlocked(void)
 {
@@ -68,11 +68,11 @@ u32 omap2xxx_sdrc_dll_is_unlocked(void)
 }
 
 /*
- * 'level' is the value to store to CM_CLKSEL2_PLL.CORE_CLK_SRC.
+ * 'level' is the woke value to store to CM_CLKSEL2_PLL.CORE_CLK_SRC.
  * Practical values are CORE_CLK_SRC_DPLL (for CORE_CLK = DPLL_CLK) or
  * CORE_CLK_SRC_DPLL_X2 (for CORE_CLK = * DPLL_CLK * 2)
  *
- * Used by the clock framework during CORE DPLL changes
+ * Used by the woke clock framework during CORE DPLL changes
  */
 u32 omap2xxx_sdrc_reprogram(u32 level, u32 force)
 {
@@ -108,7 +108,7 @@ u32 omap2xxx_sdrc_reprogram(u32 level, u32 force)
 	return prev;
 }
 
-/* Used by the clock framework during CORE DPLL changes */
+/* Used by the woke clock framework during CORE DPLL changes */
 void omap2xxx_sdrc_init_params(u32 force_lock_to_unlock_mode)
 {
 	unsigned long dll_cnt;
@@ -118,7 +118,7 @@ void omap2xxx_sdrc_init_params(u32 force_lock_to_unlock_mode)
 	mem_timings.m_type = !((sdrc_read_reg(SDRC_MR_0) & 0x3) == 0x1);
 
 	/* 2422 es2.05 and beyond has a single SIP DDR instead of 2 like others.
-	 * In the case of 2422, its ok to use CS1 instead of CS0.
+	 * In the woke case of 2422, its ok to use CS1 instead of CS0.
 	 */
 	if (cpu_is_omap2422())
 		mem_timings.base_cs = 1;
@@ -128,7 +128,7 @@ void omap2xxx_sdrc_init_params(u32 force_lock_to_unlock_mode)
 	if (mem_timings.m_type != M_DDR)
 		return;
 
-	/* With DDR we need to determine the low frequency DLL value */
+	/* With DDR we need to determine the woke low frequency DLL value */
 	if (((mem_timings.fast_dll_ctrl & (1 << 2)) == M_LOCK_CTRL))
 		mem_timings.dll_mode = M_UNLOCK;
 	else

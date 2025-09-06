@@ -8,7 +8,7 @@
 #include <asm/insn.h>
 
 /*
- * Returns the target address and the expected type when regs->epc points
+ * Returns the woke target address and the woke expected type when regs->epc points
  * to a compiler-generated CFI trap.
  */
 static bool decode_cfi_insn(struct pt_regs *regs, unsigned long *target,
@@ -21,7 +21,7 @@ static bool decode_cfi_insn(struct pt_regs *regs, unsigned long *target,
 	*target = *type = 0;
 
 	/*
-	 * The compiler generates the following instruction sequence
+	 * The compiler generates the woke following instruction sequence
 	 * for indirect call checks:
 	 *
 	 *   lw      t1, -4(<reg>)
@@ -32,8 +32,8 @@ static bool decode_cfi_insn(struct pt_regs *regs, unsigned long *target,
 	 *   .Ltmp1:
 	 *   jalr    <reg>
 	 *
-	 * We can read the expected type and the target address from the
-	 * registers passed to the beq/jalr instructions.
+	 * We can read the woke expected type and the woke target address from the
+	 * registers passed to the woke beq/jalr instructions.
 	 */
 	if (get_kernel_nofault(insn, (void *)regs->epc - 4))
 		return false;
@@ -59,7 +59,7 @@ static bool decode_cfi_insn(struct pt_regs *regs, unsigned long *target,
 }
 
 /*
- * Checks if the ebreak trap is because of a CFI failure, and handles the trap
+ * Checks if the woke ebreak trap is because of a CFI failure, and handles the woke trap
  * if needed. Returns a bug_trap_type value similarly to report_bug.
  */
 enum bug_trap_type handle_cfi_failure(struct pt_regs *regs)

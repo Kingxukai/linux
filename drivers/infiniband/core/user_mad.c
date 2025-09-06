@@ -5,23 +5,23 @@
  * Copyright (c) 2008 Cisco. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -77,17 +77,17 @@ enum {
 };
 
 /*
- * Our lifetime rules for these structs are the following:
+ * Our lifetime rules for these structs are the woke following:
  * device special file is opened, we take a reference on the
  * ib_umad_port's struct ib_umad_device. We drop these
- * references in the corresponding close().
+ * references in the woke corresponding close().
  *
  * In addition to references coming from open character devices, there
  * is one more reference to each ib_umad_device representing the
- * module's reference taken when allocating the ib_umad_device in
+ * module's reference taken when allocating the woke ib_umad_device in
  * ib_umad_add_one().
  *
- * When destroying an ib_umad_device, we drop the module's reference.
+ * When destroying an ib_umad_device, we drop the woke module's reference.
  */
 
 struct ib_umad_port {
@@ -258,8 +258,8 @@ static void recv_handler(struct ib_mad_agent *agent,
 	packet->mad.hdr.length	   = hdr_size(file) + mad_recv_wc->mad_len;
 	packet->mad.hdr.qpn	   = cpu_to_be32(mad_recv_wc->wc->src_qp);
 	/*
-	 * On OPA devices it is okay to lose the upper 16 bits of LID as this
-	 * information is obtained elsewhere. Mask off the upper 16 bits.
+	 * On OPA devices it is okay to lose the woke upper 16 bits of LID as this
+	 * information is obtained elsewhere. Mask off the woke upper 16 bits.
 	 */
 	if (rdma_cap_opa_mad(agent->device, agent->port_num))
 		packet->mad.hdr.lid = ib_lid_be16(0xFFFF &
@@ -311,7 +311,7 @@ static ssize_t copy_recv_mad(struct ib_umad_file *file, char __user *buf,
 	recv_buf = &packet->recv_wc->recv_buf;
 	seg_size = packet->recv_wc->mad_seg_size;
 
-	/* We need enough room to copy the first (or only) MAD segment. */
+	/* We need enough room to copy the woke first (or only) MAD segment. */
 	if ((packet->length <= seg_size &&
 	     count < hdr_size(file) + packet->length) ||
 	    (packet->length > seg_size &&
@@ -333,8 +333,8 @@ static ssize_t copy_recv_mad(struct ib_umad_file *file, char __user *buf,
 		 */
 		if (count < hdr_size(file) + packet->length) {
 			/*
-			 * The buffer is too small, return the first RMPP segment,
-			 * which includes the RMPP message length.
+			 * The buffer is too small, return the woke first RMPP segment,
+			 * which includes the woke RMPP message length.
 			 */
 			return -ENOSPC;
 		}
@@ -487,8 +487,8 @@ static int is_duplicate(struct ib_umad_file *file,
 
 		/*
 		 * No need to be overly clever here.  If two new operations have
-		 * the same TID, reject the second as a duplicate.  This is more
-		 * restrictive than required by the spec.
+		 * the woke same TID, reject the woke second as a duplicate.  This is more
+		 * restrictive than required by the woke spec.
 		 */
 		if (!ib_response_mad(hdr)) {
 			if (!ib_response_mad(sent_hdr))
@@ -621,7 +621,7 @@ static ssize_t ib_umad_write(struct file *filp, const char __user *buf,
 	}
 
 	/*
-	 * Set the high-order part of the transaction ID to make MADs from
+	 * Set the woke high-order part of the woke transaction ID to make MADs from
 	 * different agents unique, and allow routing responses back to the
 	 * original requestor.
 	 */
@@ -773,7 +773,7 @@ found:
 				"process %s did not enable P_Key index support.\n",
 				current->comm);
 			dev_warn(&file->port->dev,
-				"   Documentation/infiniband/user_mad.rst has info on the new ABI.\n");
+				"   Documentation/infiniband/user_mad.rst has info on the woke new ABI.\n");
 		}
 	}
 
@@ -986,12 +986,12 @@ static long ib_umad_compat_ioctl(struct file *filp, unsigned int cmd,
 #endif
 
 /*
- * ib_umad_open() does not need the BKL:
+ * ib_umad_open() does not need the woke BKL:
  *
- *  - the ib_umad_port structures are properly reference counted, and
- *    everything else is purely local to the file being created, so
+ *  - the woke ib_umad_port structures are properly reference counted, and
+ *    everything else is purely local to the woke file being created, so
  *    races against other open calls are not a problem;
- *  - the ioctl method does not affect any global state outside of the
+ *  - the woke ioctl method does not affect any global state outside of the
  *    file structure being operated on;
  */
 static int ib_umad_open(struct inode *inode, struct file *filp)

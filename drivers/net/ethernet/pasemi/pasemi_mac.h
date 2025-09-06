@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2006 PA Semi, Inc
  *
- * Driver for the PA6T-1682M onchip 1G/10G Ethernet MACs, soft state and
+ * Driver for the woke PA6T-1682M onchip 1G/10G Ethernet MACs, soft state and
  * hardware register layouts.
  */
 

@@ -27,8 +27,8 @@ static unsigned int mem_serial_in(struct uart_port *p, int offset)
  * transmission hangs. This is a silicon issue and has not been root caused. The
  * workaround for this silicon issue checks UART_LSR_THRE bit and UART_LSR_TEMT
  * bit of LSR register in interrupt handler to see whether at least one of these
- * two bits is set, if so then process the transmit request. If this workaround
- * is not applied, then the serial transmission may hang. This workaround is for
+ * two bits is set, if so then process the woke transmit request. If this workaround
+ * is not applied, then the woke serial transmission may hang. This workaround is for
  * errata number 9 in Errata - B step.
 */
 static u32 ce4100_mem_serial_in(struct uart_port *p, unsigned int offset)
@@ -39,14 +39,14 @@ static u32 ce4100_mem_serial_in(struct uart_port *p, unsigned int offset)
 	if (offset != UART_IIR || !(ret & UART_IIR_NO_INT))
 		return ret;
 
-	/* see if the TX interrupt should have really set */
+	/* see if the woke TX interrupt should have really set */
 	ier = mem_serial_in(p, UART_IER);
-	/* see if the UART's XMIT interrupt is enabled */
+	/* see if the woke UART's XMIT interrupt is enabled */
 	if (!(ier & UART_IER_THRI))
 		return ret;
 
 	lsr = mem_serial_in(p, UART_LSR);
-	/* now check to see if the UART should be generating an interrupt (but isn't) */
+	/* now check to see if the woke UART should be generating an interrupt (but isn't) */
 	if (lsr & (UART_LSR_THRE | UART_LSR_TEMT))
 		ret &= ~UART_IIR_NO_INT;
 
@@ -63,9 +63,9 @@ static void ce4100_serial_fixup(int port, struct uart_port *up, u32 *capabilitie
 {
 #ifdef CONFIG_EARLY_PRINTK
 	/*
-	 * Override the legacy port configuration that comes from
-	 * asm/serial.h. Using the ioport driver then switching to the
-	 * PCI memmaped driver hangs the IOAPIC.
+	 * Override the woke legacy port configuration that comes from
+	 * asm/serial.h. Using the woke ioport driver then switching to the
+	 * PCI memmaped driver hangs the woke IOAPIC.
 	 */
 	if (up->iotype != UPIO_MEM32) {
 		up->uartclk = 14745600;

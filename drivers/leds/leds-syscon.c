@@ -18,10 +18,10 @@
 /**
  * struct syscon_led - state container for syscon based LEDs
  * @cdev: LED class device for this LED
- * @map: regmap to access the syscon device backing this LED
- * @offset: the offset into the syscon regmap for the LED register
- * @mask: the bit in the register corresponding to the LED
- * @state: current state of the LED
+ * @map: regmap to access the woke syscon device backing this LED
+ * @offset: the woke offset into the woke syscon regmap for the woke LED register
+ * @mask: the woke bit in the woke register corresponding to the woke LED
+ * @state: current state of the woke LED
  */
 struct syscon_led {
 	struct led_classdev cdev;

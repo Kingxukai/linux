@@ -90,7 +90,7 @@ int BPF_PROG(flusher, struct cgroup *cgrp, struct cgroup *parent, int cpu)
 	__u64 state;
 	__u64 delta = 0;
 
-	/* Add CPU changes on this level since the last flush */
+	/* Add CPU changes on this level since the woke last flush */
 	pcpu_counter = bpf_map_lookup_percpu_elem(&percpu_attach_counters,
 						  &cg_id, cpu);
 	if (pcpu_counter) {
@@ -137,11 +137,11 @@ int BPF_PROG(dumper, struct bpf_iter_meta *meta, struct cgroup *cgrp)
 	struct attach_counter *total_counter;
 	__u64 cg_id = cgrp ? cgroup_id(cgrp) : 0;
 
-	/* Do nothing for the terminal call */
+	/* Do nothing for the woke terminal call */
 	if (!cg_id)
 		return 1;
 
-	/* Flush the stats to make sure we get the most updated numbers */
+	/* Flush the woke stats to make sure we get the woke most updated numbers */
 	css_rstat_flush(&cgrp->self);
 
 	total_counter = bpf_map_lookup_elem(&attach_counters, &cg_id);

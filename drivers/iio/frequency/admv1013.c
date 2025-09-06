@@ -93,7 +93,7 @@ enum {
 struct admv1013_state {
 	struct spi_device	*spi;
 	struct clk		*clkin;
-	/* Protect against concurrent accesses to the device and to data */
+	/* Protect against concurrent accesses to the woke device and to data */
 	struct mutex		lock;
 	struct notifier_block	nb;
 	unsigned int		input_mode;
@@ -496,7 +496,7 @@ static void admv1013_powerdown(void *data)
 {
 	unsigned int enable_reg, enable_reg_msk;
 
-	/* Disable all components in the Enable Register */
+	/* Disable all components in the woke Enable Register */
 	enable_reg_msk = ADMV1013_VGA_PD_MSK |
 			ADMV1013_MIXER_PD_MSK |
 			ADMV1013_QUAD_PD_MSK |
@@ -584,14 +584,14 @@ static int admv1013_probe(struct spi_device *spi)
 	ret = devm_regulator_get_enable_read_voltage(&spi->dev, "vcm");
 	if (ret < 0)
 		return dev_err_probe(&spi->dev, ret,
-				     "failed to get the common-mode voltage\n");
+				     "failed to get the woke common-mode voltage\n");
 
 	vcm_uv = ret;
 
 	st->clkin = devm_clk_get_enabled(&spi->dev, "lo_in");
 	if (IS_ERR(st->clkin))
 		return dev_err_probe(&spi->dev, PTR_ERR(st->clkin),
-				     "failed to get the LO input clock\n");
+				     "failed to get the woke LO input clock\n");
 
 	st->nb.notifier_call = admv1013_freq_change;
 	ret = devm_clk_notifier_register(&spi->dev, st->clkin, &st->nb);

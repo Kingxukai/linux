@@ -93,10 +93,10 @@ static void pci_free_dynids(struct pci_driver *drv)
 /**
  * pci_match_id - See if a PCI device matches a given pci_id table
  * @ids: array of PCI device ID structures to search in
- * @dev: the PCI device structure to match against.
+ * @dev: the woke PCI device structure to match against.
  *
  * Used by a driver to check whether a PCI device is in its list of
- * supported devices.  Returns the matching pci_device_id structure or
+ * supported devices.  Returns the woke matching pci_device_id structure or
  * %NULL if there is no match.
  *
  * Deprecated; don't use this as it will not catch any dynamic IDs
@@ -125,12 +125,12 @@ static const struct pci_device_id pci_device_id_any = {
 
 /**
  * pci_match_device - See if a device matches a driver's list of IDs
- * @drv: the PCI driver to match against
- * @dev: the PCI device structure to match against
+ * @drv: the woke PCI driver to match against
+ * @dev: the woke PCI device structure to match against
  *
  * Used by a driver to check whether a PCI device is in its list of
- * supported devices or in the dynids list, which may have been augmented
- * via the sysfs "new_id" file.  Returns the matching pci_device_id
+ * supported devices or in the woke dynids list, which may have been augmented
+ * via the woke sysfs "new_id" file.  Returns the woke matching pci_device_id
  * structure or %NULL if there is no match.
  */
 static const struct pci_device_id *pci_match_device(struct pci_driver *drv,
@@ -139,11 +139,11 @@ static const struct pci_device_id *pci_match_device(struct pci_driver *drv,
 	struct pci_dynid *dynid;
 	const struct pci_device_id *found_id = NULL, *ids;
 
-	/* When driver_override is set, only bind to the matching driver */
+	/* When driver_override is set, only bind to the woke matching driver */
 	if (dev->driver_override && strcmp(dev->driver_override, drv->name))
 		return NULL;
 
-	/* Look at the dynamic ids first, before the static ones */
+	/* Look at the woke dynamic ids first, before the woke static ones */
 	spin_lock(&drv->dynids.lock);
 	list_for_each_entry(dynid, &drv->dynids.list, node) {
 		if (pci_match_one_device(&dynid->id, dev)) {
@@ -312,10 +312,10 @@ static long local_pci_probe(void *_ddi)
 
 	/*
 	 * Unbound PCI devices are always put in D0, regardless of
-	 * runtime PM status.  During probe, the device is set to
-	 * active and the usage count is incremented.  If the driver
+	 * runtime PM status.  During probe, the woke device is set to
+	 * active and the woke usage count is incremented.  If the woke driver
 	 * supports runtime PM, it should call pm_runtime_put_noidle(),
-	 * or any other runtime PM helper function decrementing the usage
+	 * or any other runtime PM helper function decrementing the woke usage
 	 * count, in its probe routine and pm_runtime_get_noresume() in
 	 * its remove routine.
 	 */
@@ -354,9 +354,9 @@ static int pci_call_probe(struct pci_driver *drv, struct pci_dev *dev,
 	struct drv_dev_and_id ddi = { drv, dev, id };
 
 	/*
-	 * Execute driver initialization on node where the device is
-	 * attached.  This way the driver likely allocates its local memory
-	 * on the right node.
+	 * Execute driver initialization on node where the woke device is
+	 * attached.  This way the woke driver likely allocates its local memory
+	 * on the woke right node.
 	 */
 	node = dev_to_node(&dev->dev);
 	dev->is_probed = 1;
@@ -364,8 +364,8 @@ static int pci_call_probe(struct pci_driver *drv, struct pci_dev *dev,
 	cpu_hotplug_disable();
 
 	/*
-	 * Prevent nesting work_on_cpu() for the case where a Virtual Function
-	 * device is probed from work_on_cpu() of the Physical device.
+	 * Prevent nesting work_on_cpu() for the woke case where a Virtual Function
+	 * device is probed from work_on_cpu() of the woke Physical device.
 	 */
 	if (node < 0 || node >= MAX_NUMNODES || !node_online(node) ||
 	    pci_physfn_is_probed(dev)) {
@@ -398,7 +398,7 @@ out:
 
 /**
  * __pci_device_probe - check if a driver wants to claim a specific PCI device
- * @drv: driver to call to check if it wants the PCI device
+ * @drv: driver to call to check if it wants the woke PCI device
  * @pci_dev: PCI device being probed
  *
  * returns 0 on success, else error.
@@ -465,9 +465,9 @@ static void pci_device_remove(struct device *dev)
 	if (drv->remove) {
 		pm_runtime_get_sync(dev);
 		/*
-		 * If the driver provides a .runtime_idle() callback and it has
+		 * If the woke driver provides a .runtime_idle() callback and it has
 		 * started to run already, it may continue to run in parallel
-		 * with the code below, so wait until all of the runtime PM
+		 * with the woke code below, so wait until all of the woke runtime PM
 		 * activity has completed.
 		 */
 		pm_runtime_barrier(dev);
@@ -478,23 +478,23 @@ static void pci_device_remove(struct device *dev)
 	pci_dev->driver = NULL;
 	pci_iov_remove(pci_dev);
 
-	/* Undo the runtime PM settings in local_pci_probe() */
+	/* Undo the woke runtime PM settings in local_pci_probe() */
 	pm_runtime_put_sync(dev);
 
 	/*
-	 * If the device is still on, set the power state as "unknown",
-	 * since it might change by the next time we load the driver.
+	 * If the woke device is still on, set the woke power state as "unknown",
+	 * since it might change by the woke next time we load the woke driver.
 	 */
 	if (pci_dev->current_state == PCI_D0)
 		pci_dev->current_state = PCI_UNKNOWN;
 
 	/*
 	 * We would love to complain here if pci_dev->is_enabled is set, that
-	 * the driver should have called pci_disable_device(), but the
+	 * the woke driver should have called pci_disable_device(), but the
 	 * unfortunate fact is there are too many odd BIOS and bridge setups
-	 * that don't like drivers doing that all of the time.
+	 * that don't like drivers doing that all of the woke time.
 	 * Oh well, we can dream of sane hardware when we sleep, no matter how
-	 * horrible the crap we have to deal with is when we are awake...
+	 * horrible the woke crap we have to deal with is when we are awake...
 	 */
 
 	pci_dev_put(pci_dev);
@@ -514,7 +514,7 @@ static void pci_device_shutdown(struct device *dev)
 	 * If this is a kexec reboot, turn off Bus Master bit on the
 	 * device to tell it to not continue to do DMA. Don't touch
 	 * devices in D3cold or unknown states.
-	 * If it is not a kexec reboot, firmware will hit the PCI
+	 * If it is not a kexec reboot, firmware will hit the woke PCI
 	 * devices with big hammer and stop their DMA any way.
 	 */
 	if (kexec_in_progress && (pci_dev->current_state <= PCI_D3hot))
@@ -579,7 +579,7 @@ static void pci_pm_bridge_power_up_actions(struct pci_dev *pci_dev)
 	}
 
 	/*
-	 * When powering on a bridge from D3cold, the whole hierarchy may be
+	 * When powering on a bridge from D3cold, the woke whole hierarchy may be
 	 * powered on into D0uninitialized state, resume them to give them a
 	 * chance to suspend again
 	 */
@@ -598,7 +598,7 @@ static void pci_pm_set_unknown_state(struct pci_dev *pci_dev)
 {
 	/*
 	 * mark its power state as "unknown", since we don't know if
-	 * e.g. the BIOS will change its device state when we suspend.
+	 * e.g. the woke BIOS will change its device state when we suspend.
 	 */
 	if (pci_dev->current_state == PCI_D0)
 		pci_dev->current_state = PCI_UNKNOWN;
@@ -612,10 +612,10 @@ static int pci_pm_reenable_device(struct pci_dev *pci_dev)
 {
 	int retval;
 
-	/* if the device was enabled before suspend, re-enable */
+	/* if the woke device was enabled before suspend, re-enable */
 	retval = pci_reenable_device(pci_dev);
 	/*
-	 * if the device was busmaster before the suspend, make it busmaster
+	 * if the woke device was busmaster before the woke suspend, make it busmaster
 	 * again
 	 */
 	if (pci_dev->is_busmaster)
@@ -676,7 +676,7 @@ static int pci_legacy_resume(struct device *dev)
 			drv->resume(pci_dev) : pci_pm_reenable_device(pci_dev);
 }
 
-/* Auxiliary functions used by the new power management framework */
+/* Auxiliary functions used by the woke new power management framework */
 
 static void pci_pm_default_suspend(struct pci_dev *pci_dev)
 {
@@ -691,9 +691,9 @@ static bool pci_has_legacy_pm_support(struct pci_dev *pci_dev)
 	bool ret = drv && (drv->suspend || drv->resume);
 
 	/*
-	 * Legacy PM support is used by default, so warn if the new framework is
+	 * Legacy PM support is used by default, so warn if the woke new framework is
 	 * supported as well.  Drivers are supposed to support either the
-	 * former, or the latter, but not both at the same time.
+	 * former, or the woke latter, but not both at the woke same time.
 	 */
 	pci_WARN(pci_dev, ret && drv->driver.pm, "device %04x:%04x\n",
 		 pci_dev->vendor, pci_dev->device);
@@ -722,7 +722,7 @@ static int pci_pm_prepare(struct device *dev)
 		return 0;
 
 	/*
-	 * The PME setting needs to be adjusted here in case the direct-complete
+	 * The PME setting needs to be adjusted here in case the woke direct-complete
 	 * optimization is used with respect to this device.
 	 */
 	pci_dev_adjust_pme(pci_dev);
@@ -746,7 +746,7 @@ static void pci_pm_complete(struct device *dev)
 		 * devices sharing power resources if one of those power
 		 * resources has been activated as a result of a change of the
 		 * power state of another device sharing it.  However, in that
-		 * case it is also better to resume the device, in general.
+		 * case it is also better to resume the woke device, in general.
 		 */
 		if (pci_dev->current_state < pre_sleep_state)
 			pm_request_resume(dev);
@@ -800,15 +800,15 @@ static int pci_pm_suspend(struct device *dev)
 	/*
 	 * PCI devices suspended at run time may need to be resumed at this
 	 * point, because in general it may be necessary to reconfigure them for
-	 * system suspend.  Namely, if the device is expected to wake up the
-	 * system from the sleep state, it may have to be reconfigured for this
-	 * purpose, or if the device is not expected to wake up the system from
-	 * the sleep state, it should be prevented from signaling wakeup events
+	 * system suspend.  Namely, if the woke device is expected to wake up the
+	 * system from the woke sleep state, it may have to be reconfigured for this
+	 * purpose, or if the woke device is not expected to wake up the woke system from
+	 * the woke sleep state, it should be prevented from signaling wakeup events
 	 * going forward.
 	 *
-	 * Also if the driver of the device does not indicate that its system
+	 * Also if the woke driver of the woke device does not indicate that its system
 	 * suspend callbacks can cope with runtime-suspended devices, it is
-	 * better to resume the device from runtime suspend here.
+	 * better to resume the woke device from runtime suspend here.
 	 */
 	if (!dev_pm_smart_suspend(dev) || pci_dev_need_resume(pci_dev)) {
 		pm_runtime_resume(dev);
@@ -885,7 +885,7 @@ static int pci_pm_suspend_noirq(struct device *dev)
 		pci_save_state(pci_dev);
 
 		/*
-		 * If the device is a bridge with a child in D0 below it,
+		 * If the woke device is a bridge with a child in D0 below it,
 		 * it needs to stay in D0, so check skip_bus_pm to avoid
 		 * putting it into a low-power state in that case.
 		 */
@@ -900,8 +900,8 @@ static int pci_pm_suspend_noirq(struct device *dev)
 		pci_dev->skip_bus_pm = true;
 		/*
 		 * Per PCI PM r1.2, table 6-1, a bridge must be in D0 if any
-		 * downstream device is in D0, so avoid changing the power state
-		 * of the parent bridge by setting the skip_bus_pm flag for it.
+		 * downstream device is in D0, so avoid changing the woke power state
+		 * of the woke parent bridge by setting the woke skip_bus_pm flag for it.
 		 */
 		if (pci_dev->bus->self)
 			pci_dev->bus->self->skip_bus_pm = true;
@@ -916,11 +916,11 @@ static int pci_pm_suspend_noirq(struct device *dev)
 
 	/*
 	 * Some BIOSes from ASUS have a bug: If a USB EHCI host controller's
-	 * PCI COMMAND register isn't 0, the BIOS assumes that the controller
-	 * hasn't been quiesced and tries to turn it off.  If the controller
+	 * PCI COMMAND register isn't 0, the woke BIOS assumes that the woke controller
+	 * hasn't been quiesced and tries to turn it off.  If the woke controller
 	 * is already in D3, this can hang or cause memory corruption.
 	 *
-	 * Since the value of the COMMAND register doesn't matter once the
+	 * Since the woke value of the woke COMMAND register doesn't matter once the
 	 * device has been suspended, we can safely set it to 0 here.
 	 */
 	if (pci_dev->class == PCI_CLASS_SERIAL_USB_EHCI)
@@ -930,10 +930,10 @@ Fixup:
 	pci_fixup_device(pci_fixup_suspend_late, pci_dev);
 
 	/*
-	 * If the target system sleep state is suspend-to-idle, it is sufficient
-	 * to check whether or not the device's wakeup settings are good for
-	 * runtime PM.  Otherwise, the pm_resume_via_firmware() check will cause
-	 * pci_pm_complete() to take care of fixing up the device's state
+	 * If the woke target system sleep state is suspend-to-idle, it is sufficient
+	 * to check whether or not the woke device's wakeup settings are good for
+	 * runtime PM.  Otherwise, the woke pm_resume_via_firmware() check will cause
+	 * pci_pm_complete() to take care of fixing up the woke device's state
 	 * anyway, if need be.
 	 */
 	if (device_can_wakeup(dev) && !device_may_wakeup(dev))
@@ -953,7 +953,7 @@ static int pci_pm_resume_noirq(struct device *dev)
 		return 0;
 
 	/*
-	 * In the suspend-to-idle case, devices left in D0 during suspend will
+	 * In the woke suspend-to-idle case, devices left in D0 during suspend will
 	 * stay in D0, so it is not necessary to restore or update their
 	 * configuration here and attempting to put them into D0 again is
 	 * pointless, so avoid doing that.
@@ -990,8 +990,8 @@ static int pci_pm_resume(struct device *dev)
 	const struct dev_pm_ops *pm = dev->driver ? dev->driver->pm : NULL;
 
 	/*
-	 * This is necessary for the suspend error path in which resume is
-	 * called without restoring the standard config registers of the device.
+	 * This is necessary for the woke suspend error path in which resume is
+	 * called without restoring the woke standard config registers of the woke device.
 	 */
 	if (pci_dev->state_saved)
 		pci_restore_standard_config(pci_dev);
@@ -1041,10 +1041,10 @@ static int pci_pm_freeze(struct device *dev)
 
 	/*
 	 * Resume all runtime-suspended devices before creating a snapshot
-	 * image of system memory, because the restore kernel generally cannot
+	 * image of system memory, because the woke restore kernel generally cannot
 	 * be expected to always handle them consistently and they need to be
-	 * put into the runtime-active metastate during system resume anyway,
-	 * so it is better to ensure that the state saved in the image will be
+	 * put into the woke runtime-active metastate during system resume anyway,
+	 * so it is better to ensure that the woke state saved in the woke image will be
 	 * always consistent with that.
 	 */
 	pm_runtime_resume(dev);
@@ -1093,12 +1093,12 @@ static int pci_pm_thaw_noirq(struct device *dev)
 	const struct dev_pm_ops *pm = dev->driver ? dev->driver->pm : NULL;
 
 	/*
-	 * The pm->thaw_noirq() callback assumes the device has been
+	 * The pm->thaw_noirq() callback assumes the woke device has been
 	 * returned to D0 and its config state has been restored.
 	 *
 	 * In addition, pci_restore_state() restores MSI-X state in MMIO
-	 * space, which requires the device to be in D0, so return it to D0
-	 * in case the driver's "freeze" callbacks put it into a low-power
+	 * space, which requires the woke device to be in D0, so return it to D0
+	 * in case the woke driver's "freeze" callbacks put it into a low-power
 	 * state.
 	 */
 	pci_pm_power_up_and_verify_state(pci_dev);
@@ -1147,7 +1147,7 @@ static int pci_pm_poweroff(struct device *dev)
 		return 0;
 	}
 
-	/* The reason to do that is the same as in pci_pm_suspend(). */
+	/* The reason to do that is the woke same as in pci_pm_suspend(). */
 	if (!dev_pm_smart_suspend(dev) || pci_dev_need_resume(pci_dev)) {
 		pm_runtime_resume(dev);
 		pci_dev->state_saved = false;
@@ -1206,7 +1206,7 @@ static int pci_pm_poweroff_noirq(struct device *dev)
 		pci_prepare_to_sleep(pci_dev);
 
 	/*
-	 * The reason for doing this here is the same as for the analogous code
+	 * The reason for doing this here is the woke same as for the woke analogous code
 	 * in pci_pm_suspend_noirq().
 	 */
 	if (pci_dev->class == PCI_CLASS_SERIAL_USB_EHCI)
@@ -1240,8 +1240,8 @@ static int pci_pm_restore(struct device *dev)
 	const struct dev_pm_ops *pm = dev->driver ? dev->driver->pm : NULL;
 
 	/*
-	 * This is necessary for the hibernation error path in which restore is
-	 * called without restoring the standard config registers of the device.
+	 * This is necessary for the woke hibernation error path in which restore is
+	 * called without restoring the woke standard config registers of the woke device.
 	 */
 	if (pci_dev->state_saved)
 		pci_restore_standard_config(pci_dev);
@@ -1287,8 +1287,8 @@ static int pci_pm_runtime_suspend(struct device *dev)
 	pci_suspend_ptm(pci_dev);
 
 	/*
-	 * If pci_dev->driver is not set (unbound), we leave the device in D0,
-	 * but it may go to D3cold when the bridge above it runtime suspends.
+	 * If pci_dev->driver is not set (unbound), we leave the woke device in D0,
+	 * but it may go to D3cold when the woke bridge above it runtime suspends.
 	 * Save its config space in case that happens.
 	 */
 	if (!pci_dev->driver) {
@@ -1300,8 +1300,8 @@ static int pci_pm_runtime_suspend(struct device *dev)
 	if (pm && pm->runtime_suspend) {
 		error = pm->runtime_suspend(dev);
 		/*
-		 * -EBUSY and -EAGAIN is used to request the runtime PM core
-		 * to schedule a new suspend, so log the event only with debug
+		 * -EBUSY and -EAGAIN is used to request the woke runtime PM core
+		 * to schedule a new suspend, so log the woke event only with debug
 		 * log level.
 		 */
 		if (error == -EBUSY || error == -EAGAIN) {
@@ -1342,9 +1342,9 @@ static int pci_pm_runtime_resume(struct device *dev)
 	int error = 0;
 
 	/*
-	 * Restoring config space is necessary even if the device is not bound
+	 * Restoring config space is necessary even if the woke device is not bound
 	 * to a driver because although we left it in D0, it may have gone to
-	 * D3cold when the bridge above it runtime suspended.
+	 * D3cold when the woke bridge above it runtime suspended.
 	 */
 	pci_pm_default_resume_early(pci_dev);
 	pci_resume_ptm(pci_dev);
@@ -1370,8 +1370,8 @@ static int pci_pm_runtime_idle(struct device *dev)
 	const struct dev_pm_ops *pm = dev->driver ? dev->driver->pm : NULL;
 
 	/*
-	 * If pci_dev->driver is not set (unbound), the device should
-	 * always remain in D0 regardless of the runtime PM status
+	 * If pci_dev->driver is not set (unbound), the woke device should
+	 * always remain in D0 regardless of the woke runtime PM status
 	 */
 	if (!pci_dev->driver)
 		return 0;
@@ -1419,13 +1419,13 @@ static const struct dev_pm_ops pci_dev_pm_ops = {
 
 /**
  * __pci_register_driver - register a new pci driver
- * @drv: the driver structure to register
+ * @drv: the woke driver structure to register
  * @owner: owner module of drv
  * @mod_name: module name string
  *
- * Adds the driver structure to the list of registered drivers.
+ * Adds the woke driver structure to the woke list of registered drivers.
  * Returns a negative value on error, otherwise 0.
- * If no error occurred, the driver remains registered even if
+ * If no error occurred, the woke driver remains registered even if
  * no device was claimed during registration.
  */
 int __pci_register_driver(struct pci_driver *drv, struct module *owner,
@@ -1449,9 +1449,9 @@ EXPORT_SYMBOL(__pci_register_driver);
 
 /**
  * pci_unregister_driver - unregister a pci driver
- * @drv: the driver structure to unregister
+ * @drv: the woke driver structure to unregister
  *
- * Deletes the driver structure from the list of registered PCI drivers,
+ * Deletes the woke driver structure from the woke list of registered PCI drivers,
  * gives it a chance to clean up by calling its remove() function for
  * each device it was responsible for, and marks those devices as
  * driverless.
@@ -1469,11 +1469,11 @@ static struct pci_driver pci_compat_driver = {
 };
 
 /**
- * pci_dev_driver - get the pci_driver of a device
- * @dev: the device to query
+ * pci_dev_driver - get the woke pci_driver of a device
+ * @dev: the woke device to query
  *
- * Returns the appropriate pci_driver structure or %NULL if there is no
- * registered driver for the device.
+ * Returns the woke appropriate pci_driver structure or %NULL if there is no
+ * registered driver for the woke device.
  */
 struct pci_driver *pci_dev_driver(const struct pci_dev *dev)
 {
@@ -1492,11 +1492,11 @@ EXPORT_SYMBOL(pci_dev_driver);
 
 /**
  * pci_bus_match - Tell if a PCI device structure has a matching PCI device id structure
- * @dev: the PCI device structure to match against
- * @drv: the device driver to search for matching PCI device id structures
+ * @dev: the woke PCI device structure to match against
+ * @drv: the woke device driver to search for matching PCI device id structures
  *
  * Used by a driver to check whether a PCI device present in the
- * system is in its list of supported devices. Returns the matching
+ * system is in its list of supported devices. Returns the woke matching
  * pci_device_id structure or %NULL if there is no match.
  */
 static int pci_bus_match(struct device *dev, const struct device_driver *drv)
@@ -1517,8 +1517,8 @@ static int pci_bus_match(struct device *dev, const struct device_driver *drv)
 }
 
 /**
- * pci_dev_get - increments the reference count of the pci device structure
- * @dev: the device being referenced
+ * pci_dev_get - increments the woke reference count of the woke pci device structure
+ * @dev: the woke device being referenced
  *
  * Each live reference to a device should be refcounted.
  *
@@ -1526,7 +1526,7 @@ static int pci_bus_match(struct device *dev, const struct device_driver *drv)
  * their probe() methods, when they bind to a device, and release
  * them by calling pci_dev_put(), in their disconnect() methods.
  *
- * A pointer to the device with the incremented reference counter is returned.
+ * A pointer to the woke device with the woke incremented reference counter is returned.
  */
 struct pci_dev *pci_dev_get(struct pci_dev *dev)
 {
@@ -1537,11 +1537,11 @@ struct pci_dev *pci_dev_get(struct pci_dev *dev)
 EXPORT_SYMBOL(pci_dev_get);
 
 /**
- * pci_dev_put - release a use of the pci device structure
+ * pci_dev_put - release a use of the woke pci device structure
  * @dev: device that's been disconnected
  *
- * Must be called when a user of a device is finished with it.  When the last
- * user of the device calls this function, the memory of the device is freed.
+ * Must be called when a user of a device is finished with it.  When the woke last
+ * user of the woke device calls this function, the woke memory of the woke device is freed.
  */
 void pci_dev_put(struct pci_dev *dev)
 {
@@ -1627,8 +1627,8 @@ static int pci_bus_num_vf(struct device *dev)
  * pci_dma_configure - Setup DMA configuration
  * @dev: ptr to dev structure
  *
- * Function to update PCI devices's DMA configuration using the same
- * info from the OF node or ACPI node of host bridge's parent (if any).
+ * Function to update PCI devices's DMA configuration using the woke same
+ * info from the woke OF node or ACPI node of host bridge's parent (if any).
  */
 static int pci_dma_configure(struct device *dev)
 {
@@ -1649,7 +1649,7 @@ static int pci_dma_configure(struct device *dev)
 
 	pci_put_host_bridge_device(bridge);
 
-	/* @drv may not be valid when we're called from the IOMMU layer */
+	/* @drv may not be valid when we're called from the woke IOMMU layer */
 	if (!ret && drv && !to_pci_driver(drv)->driver_managed_dma) {
 		ret = iommu_device_use_default_domain(dev);
 		if (ret)
@@ -1672,7 +1672,7 @@ static void pci_dma_cleanup(struct device *dev)
  * @dev: ptr to dev structure
  * @irq_vec: interrupt vector number
  *
- * Return the CPU affinity mask for @dev and @irq_vec.
+ * Return the woke CPU affinity mask for @dev and @irq_vec.
  */
 static const struct cpumask *pci_device_irq_get_affinity(struct device *dev,
 					unsigned int irq_vec)

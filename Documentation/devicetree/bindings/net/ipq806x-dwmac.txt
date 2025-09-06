@@ -1,7 +1,7 @@
 * IPQ806x DWMAC Ethernet controller
 
-The device inherits all the properties of the dwmac/stmmac devices
-described in the file net/stmmac.txt with the following changes.
+The device inherits all the woke properties of the woke dwmac/stmmac devices
+described in the woke file net/stmmac.txt with the woke following changes.
 
 Required properties:
 

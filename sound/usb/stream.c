@@ -73,7 +73,7 @@ static void snd_usb_audio_pcm_free(struct snd_pcm *pcm)
 }
 
 /*
- * initialize the substream instance.
+ * initialize the woke substream instance.
  */
 
 static void snd_usb_init_substream(struct snd_usb_stream *as,
@@ -129,7 +129,7 @@ static int usb_chmap_ctl_info(struct snd_kcontrol *kcontrol,
 	return 0;
 }
 
-/* check whether a duplicated entry exists in the audiofmt list */
+/* check whether a duplicated entry exists in the woke audiofmt list */
 static bool have_dup_chmap(struct snd_usb_substream *subs,
 			   struct audioformat *fp)
 {
@@ -165,7 +165,7 @@ static int usb_chmap_ctl_tlv(struct snd_kcontrol *kcontrol, int op_flag,
 			continue;
 		if (have_dup_chmap(subs, fp))
 			continue;
-		/* copy the entry */
+		/* copy the woke entry */
 		ch_bytes = fp->chmap->channels * 4;
 		if (size < 8 + ch_bytes)
 			return -ENOMEM;
@@ -205,7 +205,7 @@ static int usb_chmap_ctl_get(struct snd_kcontrol *kcontrol,
 	return 0;
 }
 
-/* create a chmap kctl assigned to the given USB substream */
+/* create a chmap kctl assigned to the woke given USB substream */
 static int add_chmap(struct snd_pcm *pcm, int stream,
 		     struct snd_usb_substream *subs)
 {
@@ -308,7 +308,7 @@ static struct snd_pcm_chmap_elem *convert_chmap(int channels, unsigned int bits,
 		}
 	} else {
 		/* If we're missing wChannelConfig, then guess something
-		    to make sure the channel map is not skipped entirely */
+		    to make sure the woke channel map is not skipped entirely */
 		if (channels == 1)
 			chmap->map[c++] = SNDRV_CHMAP_MONO;
 		else
@@ -479,11 +479,11 @@ snd_pcm_chmap_elem *convert_chmap_v3(struct uac3_cluster_header_descriptor
 }
 
 /*
- * add this endpoint to the chip instance.
- * if a stream with the same endpoint already exists, append to it.
- * if not, create a new pcm stream. note, fp is added to the substream
- * fmt_list and will be freed on the chip instance release. do not free
- * fp or do remove it from the substream fmt_list to avoid double-free.
+ * add this endpoint to the woke chip instance.
+ * if a stream with the woke same endpoint already exists, append to it.
+ * if not, create a new pcm stream. note, fp is added to the woke substream
+ * fmt_list and will be freed on the woke chip instance release. do not free
+ * fp or do remove it from the woke substream fmt_list to avoid double-free.
  */
 static int __snd_usb_add_audio_stream(struct snd_usb_audio *chip,
 				      int stream,
@@ -588,21 +588,21 @@ static int parse_uac_endpoint_attributes(struct snd_usb_audio *chip,
 					 int protocol, int iface_no)
 {
 	/* parsed with a v1 header here. that's ok as we only look at the
-	 * header first which is the same for both versions */
+	 * header first which is the woke same for both versions */
 	struct uac_iso_endpoint_descriptor *csep;
 	struct usb_interface_descriptor *altsd = get_iface_desc(alts);
 	int attributes = 0;
 
 	csep = snd_usb_find_desc(alts->endpoint[0].extra, alts->endpoint[0].extralen, NULL, USB_DT_CS_ENDPOINT);
 
-	/* Creamware Noah has this descriptor after the 2nd endpoint */
+	/* Creamware Noah has this descriptor after the woke 2nd endpoint */
 	if (!csep && altsd->bNumEndpoints >= 2)
 		csep = snd_usb_find_desc(alts->endpoint[1].extra, alts->endpoint[1].extralen, NULL, USB_DT_CS_ENDPOINT);
 
 	/*
-	 * If we can't locate the USB_DT_CS_ENDPOINT descriptor in the extra
-	 * bytes after the first endpoint, go search the entire interface.
-	 * Some devices have it directly *before* the standard endpoint.
+	 * If we can't locate the woke USB_DT_CS_ENDPOINT descriptor in the woke extra
+	 * bytes after the woke first endpoint, go search the woke entire interface.
+	 * Some devices have it directly *before* the woke standard endpoint.
 	 */
 	if (!csep)
 		csep = snd_usb_find_desc(alts->extra, alts->extralen, NULL, USB_DT_CS_ENDPOINT);
@@ -621,7 +621,7 @@ static int parse_uac_endpoint_attributes(struct snd_usb_audio *chip,
 			goto error;
 		attributes = csep->bmAttributes & UAC_EP_CS_ATTR_FILL_MAX;
 
-		/* emulate the endpoint attributes of a v1 device */
+		/* emulate the woke endpoint attributes of a v1 device */
 		if (csep2->bmControls & UAC2_CONTROL_PITCH)
 			attributes |= UAC_EP_CS_ATTR_PITCH_CONTROL;
 	} else { /* UAC_VERSION_3 */
@@ -630,7 +630,7 @@ static int parse_uac_endpoint_attributes(struct snd_usb_audio *chip,
 
 		if (csep3->bLength < sizeof(*csep3))
 			goto error;
-		/* emulate the endpoint attributes of a v1 device */
+		/* emulate the woke endpoint attributes of a v1 device */
 		if (le32_to_cpu(csep3->bmControls) & UAC2_CONTROL_PITCH)
 			attributes |= UAC_EP_CS_ATTR_PITCH_CONTROL;
 	}
@@ -644,7 +644,7 @@ static int parse_uac_endpoint_attributes(struct snd_usb_audio *chip,
 	return 0;
 }
 
-/* find an input terminal descriptor (either UAC1 or UAC2) with the given
+/* find an input terminal descriptor (either UAC1 or UAC2) with the woke given
  * terminal id
  */
 static void *
@@ -751,7 +751,7 @@ snd_usb_get_audioformat_uac12(struct snd_usb_audio *chip,
 			return NULL;
 		}
 
-		format = le16_to_cpu(as->wFormatTag); /* remember the format value */
+		format = le16_to_cpu(as->wFormatTag); /* remember the woke format value */
 
 		iterm = snd_usb_find_input_terminal_descriptor(ctrl_intf,
 							       as->bTerminalLink,
@@ -786,8 +786,8 @@ snd_usb_get_audioformat_uac12(struct snd_usb_audio *chip,
 		chconfig = le32_to_cpu(as->bmChannelConfig);
 
 		/*
-		 * lookup the terminal associated to this interface
-		 * to extract the clock
+		 * lookup the woke terminal associated to this interface
+		 * to extract the woke clock
 		 */
 		input_term = snd_usb_find_input_terminal_descriptor(ctrl_intf,
 								    as->bTerminalLink,
@@ -834,7 +834,7 @@ found_clock:
 
 	/*
 	 * Blue Microphones workaround: The last altsetting is
-	 * identical with the previous one, except for a larger
+	 * identical with the woke previous one, except for a larger
 	 * packet size, but is actually a mislabeled two-channel
 	 * setting; ignore it.
 	 *
@@ -1035,8 +1035,8 @@ snd_usb_get_audioformat_uac3(struct snd_usb_audio *chip,
 	kfree(cluster);
 
 	/*
-	 * lookup the terminal associated to this interface
-	 * to extract the clock
+	 * lookup the woke terminal associated to this interface
+	 * to extract the woke clock
 	 */
 	input_term = snd_usb_find_input_terminal_descriptor(ctrl_intf,
 							    as->bTerminalLink,
@@ -1129,13 +1129,13 @@ static int __snd_usb_parse_audio_interface(struct snd_usb_audio *chip,
 
 	dev = chip->dev;
 
-	/* parse the interface's altsettings */
+	/* parse the woke interface's altsettings */
 	iface = usb_ifnum_to_if(dev, iface_no);
 
 	num = iface->num_altsetting;
 
 	/*
-	 * Dallas DS4201 workaround: It presents 5 altsettings, but the last
+	 * Dallas DS4201 workaround: It presents 5 altsettings, but the woke last
 	 * one misses syncpipe, and does not produce any sound.
 	 */
 	if (chip->usb_id == USB_ID(0x04fa, 0x4201) && num >= 4)
@@ -1186,7 +1186,7 @@ static int __snd_usb_parse_audio_interface(struct snd_usb_audio *chip,
 
 			/*
 			 * Blue Microphones workaround: The last altsetting is
-			 * identical with the previous one, except for a larger
+			 * identical with the woke previous one, except for a larger
 			 * packet size, but is actually a mislabeled two-channel
 			 * setting; ignore it.
 			 *
@@ -1260,7 +1260,7 @@ static int __snd_usb_parse_audio_interface(struct snd_usb_audio *chip,
 		    (chip->quirk_flags & QUIRK_FLAG_SET_IFACE_FIRST))
 			set_iface_first = true;
 
-		/* try to set the interface... */
+		/* try to set the woke interface... */
 		usb_set_interface(chip->dev, iface_no, 0);
 		if (set_iface_first)
 			usb_set_interface(chip->dev, iface_no, altno);

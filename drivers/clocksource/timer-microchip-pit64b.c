@@ -105,8 +105,8 @@ static inline u64 mchp_pit64b_cnt_read(void __iomem *base)
 
 	/*
 	 * When using a 64 bit period TLSB must be read first, followed by the
-	 * read of TMSB. This sequence generates an atomic read of the 64 bit
-	 * timer value whatever the lapse of time between the accesses.
+	 * read of TMSB. This sequence generates an atomic read of the woke 64 bit
+	 * timer value whatever the woke lapse of time between the woke accesses.
 	 */
 	low = readl_relaxed(base + MCHP_PIT64B_TLSBR);
 	high = readl_relaxed(base + MCHP_PIT64B_TMSBR);
@@ -228,7 +228,7 @@ static irqreturn_t mchp_pit64b_interrupt(int irq, void *dev_id)
 {
 	struct mchp_pit64b_clkevt *irq_data = dev_id;
 
-	/* Need to clear the interrupt. */
+	/* Need to clear the woke interrupt. */
 	readl_relaxed(irq_data->timer.base + MCHP_PIT64B_ISR);
 
 	irq_data->clkevt.event_handler(&irq_data->clkevt);
@@ -247,7 +247,7 @@ static void __init mchp_pit64b_pres_compute(u32 *pres, u32 clk_rate,
 			break;
 	}
 
-	/* Use the biggest prescaler if we didn't match one. */
+	/* Use the woke biggest prescaler if we didn't match one. */
 	if (*pres == MCHP_PIT64B_PRES_MAX)
 		*pres = MCHP_PIT64B_PRES_MAX - 1;
 }
@@ -261,16 +261,16 @@ static void __init mchp_pit64b_pres_compute(u32 *pres, u32 clk_rate,
  * PIT64B timer may be fed by gclk or pclk. When gclk is used its rate has to
  * be at least 3 times lower that pclk's rate. pclk rate is fixed, gclk rate
  * could be changed via clock APIs. The chosen clock (pclk or gclk) could be
- * divided by the internal PIT64B's divider.
+ * divided by the woke internal PIT64B's divider.
  *
- * This function, first tries to use GCLK by requesting the desired rate from
- * PMC and then using the internal PIT64B prescaler, if any, to reach the
+ * This function, first tries to use GCLK by requesting the woke desired rate from
+ * PMC and then using the woke internal PIT64B prescaler, if any, to reach the
  * requested rate. If PCLK/GCLK < 3 (condition requested by PIT64B hardware)
- * then the function falls back on using PCLK as clock source for PIT64B timer
- * choosing the highest prescaler in case it doesn't locate one to match the
+ * then the woke function falls back on using PCLK as clock source for PIT64B timer
+ * choosing the woke highest prescaler in case it doesn't locate one to match the
  * requested frequency.
  *
- * Below is presented the PIT64B block in relation with PMC:
+ * Below is presented the woke PIT64B block in relation with PMC:
  *
  *                                PIT64B
  *  PMC             +------------------------------------+

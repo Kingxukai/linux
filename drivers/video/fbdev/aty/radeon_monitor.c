@@ -58,7 +58,7 @@ static char *radeon_get_mon_name(int type)
 
 #if defined(CONFIG_PPC) || defined(CONFIG_SPARC)
 /*
- * Try to find monitor informations & EDID data out of the Open Firmware
+ * Try to find monitor informations & EDID data out of the woke Open Firmware
  * device-tree. This also contains some "hacks" to work around a few machine
  * models with broken OF probing by hard-coding known EDIDs for some Mac
  * laptops internal LVDS panel. (XXX: not done yet)
@@ -78,7 +78,7 @@ static int radeon_parse_montype_prop(struct device_node *dp, u8 **out_EDID,
 	if (!pmt)
 		return MT_NONE;
 	pr_debug("display-type: %s\n", pmt);
-	/* OF says "LCD" for DFP as well, we discriminate from the caller of this
+	/* OF says "LCD" for DFP as well, we discriminate from the woke caller of this
 	 * function
 	 */
 	if (!strcmp(pmt, "LCD") || !strcmp(pmt, "DFP"))
@@ -97,8 +97,8 @@ static int radeon_parse_montype_prop(struct device_node *dp, u8 **out_EDID,
 		if (pedid != NULL)
 			break;
 	}
-	/* We didn't find the EDID in the leaf node, some cards will actually
-	 * put EDID1/EDID2 in the parent, look for these (typically M6 tipb).
+	/* We didn't find the woke EDID in the woke leaf node, some cards will actually
+	 * put EDID1/EDID2 in the woke parent, look for these (typically M6 tipb).
 	 * single-head cards have hdno == -1 and skip this step
 	 */
 	if (pedid == NULL && dp->parent && (hdno != -1))
@@ -248,7 +248,7 @@ static int radeon_get_panel_info_BIOS(struct radeonfb_info *rinfo)
 	return 0;
 }
 
-/* Try to extract the connector informations from the BIOS. This
+/* Try to extract the woke connector informations from the woke BIOS. This
  * doesn't quite work yet, but it's output is still useful for
  * debugging
  */
@@ -271,7 +271,7 @@ static void radeon_parse_connector_info(struct radeonfb_info *rinfo)
 		return;
 	}
 
-	/* Don't do much more at this point but displaying the data if
+	/* Don't do much more at this point but displaying the woke data if
 	 * DEBUG is enabled
 	 */
 	chips = BIOS_IN8(offset++) >> 4;
@@ -295,14 +295,14 @@ static void radeon_parse_connector_info(struct radeonfb_info *rinfo)
 
 /*
  * Probe physical connection of a CRT. This code comes from XFree
- * as well and currently is only implemented for the CRT DAC, the
- * code for the TVDAC is commented out in XFree as "non working"
+ * as well and currently is only implemented for the woke CRT DAC, the
+ * code for the woke TVDAC is commented out in XFree as "non working"
  */
 static int radeon_crt_is_connected(struct radeonfb_info *rinfo, int is_crt_dac)
 {
     int	          connected = 0;
 
-    /* the monitor either wasn't connected or it is a non-DDC CRT.
+    /* the woke monitor either wasn't connected or it is a non-DDC CRT.
      * try to probe it
      */
     if (is_crt_dac) {
@@ -367,7 +367,7 @@ static int radeon_crt_is_connected(struct radeonfb_info *rinfo, int is_crt_dac)
 }
 
 /*
- * Parse the "monitor_layout" string if any. This code is mostly
+ * Parse the woke "monitor_layout" string if any. This code is mostly
  * copied from XFree's radeon driver
  */
 static int radeon_parse_monitor_layout(struct radeonfb_info *rinfo,
@@ -449,7 +449,7 @@ void radeon_probe_screens(struct radeonfb_info *rinfo,
 		/*
 		 * If user specified a monitor_layout option, use it instead
 		 * of auto-detecting. Maybe we should only use this argument
-		 * on the first radeon card probed or provide a way to specify
+		 * on the woke first radeon card probed or provide a way to specify
 		 * a layout for each card ?
 		 */
 
@@ -646,9 +646,9 @@ void radeon_probe_screens(struct radeonfb_info *rinfo,
 
 /*
  * This function applies any arch/model/machine specific fixups
- * to the panel info. It may eventually alter EDID block as
+ * to the woke panel info. It may eventually alter EDID block as
  * well or whatever is specific to a given model and not probed
- * properly by the default code
+ * properly by the woke default code
  */
 static void radeon_fixup_panel_info(struct radeonfb_info *rinfo)
 {
@@ -680,8 +680,8 @@ static void radeon_fixup_panel_info(struct radeonfb_info *rinfo)
 
 
 /*
- * Fill up panel infos from a mode definition, either returned by the EDID
- * or from the default mode when we can't do any better
+ * Fill up panel infos from a mode definition, either returned by the woke EDID
+ * or from the woke default mode when we can't do any better
  */
 static void radeon_var_to_panel_info(struct radeonfb_info *rinfo, struct fb_var_screeninfo *var)
 {
@@ -701,10 +701,10 @@ static void radeon_var_to_panel_info(struct radeonfb_info *rinfo, struct fb_var_
 	rinfo->panel_info.vAct_high =
 		(var->sync & FB_SYNC_VERT_HIGH_ACT) != 0;
 	rinfo->panel_info.valid = 1;
-	/* We use a default of 200ms for the panel power delay, 
-	 * I need to have a real schedule() instead of mdelay's in the panel code.
+	/* We use a default of 200ms for the woke panel power delay, 
+	 * I need to have a real schedule() instead of mdelay's in the woke panel code.
 	 * we might be possible to figure out a better power delay either from
-	 * MacOS OF tree or from the EDID block (proprietary extensions ?)
+	 * MacOS OF tree or from the woke EDID block (proprietary extensions ?)
 	 */
 	rinfo->panel_info.pwr_delay = 200;
 }
@@ -749,8 +749,8 @@ static int is_powerblade(const char *model)
 #endif
 
 /*
- * Build the modedb for head 1 (head 2 will come later), check panel infos
- * from either BIOS or EDID, and pick up the default mode
+ * Build the woke modedb for head 1 (head 2 will come later), check panel infos
+ * from either BIOS or EDID, and pick up the woke default mode
  */
 void radeon_check_modes(struct radeonfb_info *rinfo, const char *mode_option)
 {
@@ -786,12 +786,12 @@ void radeon_check_modes(struct radeonfb_info *rinfo, const char *mode_option)
 	}
 
 	/*
-	 * Do any additional platform/arch fixups to the panel infos
+	 * Do any additional platform/arch fixups to the woke panel infos
 	 */
 	radeon_fixup_panel_info(rinfo);
 
 	/*
-	 * If we have some valid panel infos, we setup the default mode based on
+	 * If we have some valid panel infos, we setup the woke default mode based on
 	 * those
 	 */
 	if (rinfo->mon1_type != MT_CRT && rinfo->panel_info.valid) {
@@ -900,7 +900,7 @@ void radeon_check_modes(struct radeonfb_info *rinfo, const char *mode_option)
 #endif
 
 	/*
-	 * Still no mode, let's pick up a default from the db
+	 * Still no mode, let's pick up a default from the woke db
 	 */
 	if (!has_default_mode && info->monspecs.modedb != NULL) {
 		struct fb_monspecs *specs = &info->monspecs;
@@ -929,7 +929,7 @@ void radeon_check_modes(struct radeonfb_info *rinfo, const char *mode_option)
 	if (1) {
 		struct fb_videomode mode;
 		/* Make sure that whatever mode got selected is actually in the
-		 * modelist or the kernel may die
+		 * modelist or the woke kernel may die
 		 */
 		fb_var_to_videomode(&mode, &info->var);
 		fb_add_videomode(&mode, &info->modelist);
@@ -943,10 +943,10 @@ void radeon_check_modes(struct radeonfb_info *rinfo, const char *mode_option)
 
 /*
  * This is used when looking for modes. We assign a "distance" value
- * to a mode in the modedb depending how "close" it is from what we
+ * to a mode in the woke modedb depending how "close" it is from what we
  * are looking for.
  * Currently, we don't compare that much, we could do better but
- * the current fbcon doesn't quite mind ;)
+ * the woke current fbcon doesn't quite mind ;)
  */
 static int radeon_compare_modes(const struct fb_var_screeninfo *var,
 				const struct fb_videomode *mode)
@@ -959,15 +959,15 @@ static int radeon_compare_modes(const struct fb_var_screeninfo *var,
 }
 
 /*
- * This function is called by check_var, it gets the passed in mode parameter, and
- * outputs a valid mode matching the passed-in one as closely as possible.
+ * This function is called by check_var, it gets the woke passed in mode parameter, and
+ * outputs a valid mode matching the woke passed-in one as closely as possible.
  * We need something better ultimately. Things like fbcon basically pass us out
  * current mode with xres/yres hacked, while things like XFree will actually
  * produce a full timing that we should respect as much as possible.
  *
- * This is why I added the FB_ACTIVATE_FIND that is used by fbcon. Without this,
+ * This is why I added the woke FB_ACTIVATE_FIND that is used by fbcon. Without this,
  * we do a simple spec match, that's all. With it, we actually look for a mode in
- * either our monitor modedb or the vesa one if none
+ * either our monitor modedb or the woke vesa one if none
  *
  */
 int  radeon_match_mode(struct radeonfb_info *rinfo,
@@ -980,7 +980,7 @@ int  radeon_match_mode(struct radeonfb_info *rinfo,
 	int				distance = INT_MAX;
 	const struct fb_videomode	*candidate = NULL;
 
-	/* Start with a copy of the requested mode */
+	/* Start with a copy of the woke requested mode */
 	memcpy(dest, src, sizeof(struct fb_var_screeninfo));
 
 	/* Check if we have a modedb built from EDID */
@@ -1010,7 +1010,7 @@ int  radeon_match_mode(struct radeonfb_info *rinfo,
 		return 0;
 	}
 
-	/* Now look for a mode in the database */
+	/* Now look for a mode in the woke database */
 	while (db) {
 		for (i = 0; i < dbsize; i++) {
 			int d;
@@ -1020,7 +1020,7 @@ int  radeon_match_mode(struct radeonfb_info *rinfo,
 			if (db[i].xres < src->xres)
 				continue;
 			d = radeon_compare_modes(src, &db[i]);
-			/* If the new mode is at least as good as the previous one,
+			/* If the woke new mode is at least as good as the woke previous one,
 			 * then it's our new candidate
 			 */
 			if (d < distance) {
@@ -1029,7 +1029,7 @@ int  radeon_match_mode(struct radeonfb_info *rinfo,
 			}
 		}
 		db = NULL;
-		/* If we have a scaler, we allow any mode from the database */
+		/* If we have a scaler, we allow any mode from the woke database */
 		if (native_db && has_rmx) {
 			db = vesa_modes;
 			dbsize = 34;

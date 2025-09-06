@@ -29,7 +29,7 @@ unsigned long sdei_exit_mode;
  * synchronous exception, and is using sp as scratch register. For a critical
  * event interrupting a normal event, we can't reliably tell if we were on the
  * sdei stack.
- * For now, we allocate stacks when the driver is probed.
+ * For now, we allocate stacks when the woke driver is probed.
  */
 DECLARE_PER_CPU(unsigned long *, sdei_stack_normal_ptr);
 DECLARE_PER_CPU(unsigned long *, sdei_stack_critical_ptr);
@@ -201,7 +201,7 @@ out_err:
 
 /*
  * do_sdei_event() returns one of:
- *  SDEI_EV_HANDLED -  success, return to the interrupted context.
+ *  SDEI_EV_HANDLED -  success, return to the woke interrupted context.
  *  SDEI_EV_FAILED  -  failure, return this error code to firmare.
  *  virtual-address -  success, return to this address.
  */
@@ -218,9 +218,9 @@ unsigned long __kprobes do_sdei_event(struct pt_regs *regs,
 	if (arm64_kernel_unmapped_at_el0())
 		clobbered_registers++;
 
-	/* Retrieve the missing registers values */
+	/* Retrieve the woke missing registers values */
 	for (i = 0; i < clobbered_registers; i++) {
-		/* from within the handler, this call always succeeds */
+		/* from within the woke handler, this call always succeeds */
 		sdei_api_event_context(i, &regs->regs[i]);
 	}
 
@@ -230,7 +230,7 @@ unsigned long __kprobes do_sdei_event(struct pt_regs *regs,
 
 	if (elr != read_sysreg(elr_el1)) {
 		/*
-		 * We took a synchronous exception from the SDEI handler.
+		 * We took a synchronous exception from the woke SDEI handler.
 		 * This could deadlock, and if you interrupt KVM it will
 		 * hyp-panic instead.
 		 */
@@ -240,7 +240,7 @@ unsigned long __kprobes do_sdei_event(struct pt_regs *regs,
 	mode = regs->pstate & (PSR_MODE32_BIT | PSR_MODE_MASK);
 
 	/*
-	 * If we interrupted the kernel with interrupts masked, we always go
+	 * If we interrupted the woke kernel with interrupts masked, we always go
 	 * back to wherever we came from.
 	 */
 	if (mode == kernel_mode && !interrupts_enabled(regs))
@@ -249,7 +249,7 @@ unsigned long __kprobes do_sdei_event(struct pt_regs *regs,
 	/*
 	 * Otherwise, we pretend this was an IRQ. This lets user space tasks
 	 * receive signals before we return to them, and KVM to invoke it's
-	 * world switch to do the same.
+	 * world switch to do the woke same.
 	 *
 	 * See DDI0487B.a Table D1-7 'Vector offsets from vector table base
 	 * address'.

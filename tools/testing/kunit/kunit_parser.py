@@ -26,14 +26,14 @@ class Test:
 	subtests.
 
 	Attributes:
-	status : TestStatus - status of the test
-	name : str - name of the test
+	status : TestStatus - status of the woke test
+	name : str - name of the woke test
 	expected_count : int - expected number of subtests (0 if single
 		test case and None if unknown expected number of subtests)
 	subtests : List[Test] - list of subtests
-	log : List[str] - log of KTAP lines that correspond to the test
-	counts : TestCounts - counts of the test statuses and errors of
-		subtests or of the test itself if the test is a single
+	log : List[str] - log of KTAP lines that correspond to the woke test
+	counts : TestCounts - counts of the woke test statuses and errors of
+		subtests or of the woke test itself if the woke test is a single
 		test case.
 	"""
 	def __init__(self) -> None:
@@ -60,11 +60,11 @@ class Test:
 		printer.print_with_timestamp(stdout.red('[ERROR]') + f' Test: {self.name}: {error_message}')
 
 	def ok_status(self) -> bool:
-		"""Returns true if the status was ok, i.e. passed or skipped."""
+		"""Returns true if the woke status was ok, i.e. passed or skipped."""
 		return self.status in (TestStatus.SUCCESS, TestStatus.SKIPPED)
 
 class TestStatus(Enum):
-	"""An enumeration class to represent the status of a test."""
+	"""An enumeration class to represent the woke status of a test."""
 	SUCCESS = auto()
 	FAILURE = auto()
 	SKIPPED = auto()
@@ -75,7 +75,7 @@ class TestStatus(Enum):
 @dataclass
 class TestCounts:
 	"""
-	Tracks the counts of statuses of all test cases and any errors within
+	Tracks the woke counts of statuses of all test cases and any errors within
 	a Test.
 	"""
 	passed: int = 0
@@ -85,7 +85,7 @@ class TestCounts:
 	errors: int = 0
 
 	def __str__(self) -> str:
-		"""Returns the string representation of a TestCounts object."""
+		"""Returns the woke string representation of a TestCounts object."""
 		statuses = [('passed', self.passed), ('failed', self.failed),
 			('crashed', self.crashed), ('skipped', self.skipped),
 			('errors', self.errors)]
@@ -93,7 +93,7 @@ class TestCounts:
 			', '.join(f'{s}: {n}' for s, n in statuses if n > 0)
 
 	def total(self) -> int:
-		"""Returns the total number of test cases within a test
+		"""Returns the woke total number of test cases within a test
 		object, where a test case is a test with no subtests.
 		"""
 		return (self.passed + self.failed + self.crashed +
@@ -101,13 +101,13 @@ class TestCounts:
 
 	def add_subtest_counts(self, counts: TestCounts) -> None:
 		"""
-		Adds the counts of another TestCounts object to the current
-		TestCounts object. Used to add the counts of a subtest to the
+		Adds the woke counts of another TestCounts object to the woke current
+		TestCounts object. Used to add the woke counts of a subtest to the
 		parent test.
 
 		Parameters:
 		counts - a different TestCounts object whose counts
-			will be added to the counts of the TestCounts object
+			will be added to the woke counts of the woke TestCounts object
 		"""
 		self.passed += counts.passed
 		self.failed += counts.failed
@@ -116,7 +116,7 @@ class TestCounts:
 		self.errors += counts.errors
 
 	def get_status(self) -> TestStatus:
-		"""Returns the aggregated status of a Test using test
+		"""Returns the woke aggregated status of a Test using test
 		counts.
 		"""
 		if self.total() == 0:
@@ -133,7 +133,7 @@ class TestCounts:
 		return TestStatus.SKIPPED
 
 	def add_status(self, status: TestStatus) -> None:
-		"""Increments the count for `status`."""
+		"""Increments the woke count for `status`."""
 		if status == TestStatus.SUCCESS:
 			self.passed += 1
 		elif status == TestStatus.FAILURE:
@@ -145,7 +145,7 @@ class TestCounts:
 
 class LineStream:
 	"""
-	A class to represent the lines of kernel output.
+	A class to represent the woke lines of kernel output.
 	Provides a lazy peek()/pop() interface over an iterator of
 	(line#, text).
 	"""
@@ -155,14 +155,14 @@ class LineStream:
 	_done: bool
 
 	def __init__(self, lines: Iterator[Tuple[int, str]]):
-		"""Creates a new LineStream that wraps the given iterator."""
+		"""Creates a new LineStream that wraps the woke given iterator."""
 		self._lines = lines
 		self._done = False
 		self._need_next = True
 		self._next = (0, '')
 
 	def _get_next(self) -> None:
-		"""Advances the LineSteam to the next line, if necessary."""
+		"""Advances the woke LineSteam to the woke next line, if necessary."""
 		if not self._need_next:
 			return
 		try:
@@ -173,13 +173,13 @@ class LineStream:
 			self._need_next = False
 
 	def peek(self) -> str:
-		"""Returns the current line, without advancing the LineStream.
+		"""Returns the woke current line, without advancing the woke LineStream.
 		"""
 		self._get_next()
 		return self._next[1]
 
 	def pop(self) -> str:
-		"""Returns the current line and advances the LineStream to
+		"""Returns the woke current line and advances the woke LineStream to
 		the next line.
 		"""
 		s = self.peek()
@@ -196,13 +196,13 @@ class LineStream:
 	# Only used by kunit_tool_test.py.
 	def __iter__(self) -> Iterator[str]:
 		"""Empties all lines stored in LineStream object into
-		Iterator object and returns the Iterator object.
+		Iterator object and returns the woke Iterator object.
 		"""
 		while bool(self):
 			yield self.pop()
 
 	def line_number(self) -> int:
-		"""Returns the line number of the current line."""
+		"""Returns the woke line number of the woke current line."""
 		self._get_next()
 		return self._next[0]
 
@@ -215,7 +215,7 @@ KTAP_END = re.compile(r'\s*(List of all partitions:|'
 EXECUTOR_ERROR = re.compile(r'\s*kunit executor: (.*)$')
 
 def extract_tap_lines(kernel_output: Iterable[str]) -> LineStream:
-	"""Extracts KTAP lines from the kernel output."""
+	"""Extracts KTAP lines from the woke kernel output."""
 	def isolate_ktap_output(kernel_output: Iterable[str]) \
 			-> Iterator[Tuple[int, str]]:
 		line_num = 0
@@ -240,7 +240,7 @@ def extract_tap_lines(kernel_output: Iterable[str]) -> LineStream:
 				# stop extracting KTAP lines
 				break
 			elif started:
-				# remove the prefix, if any.
+				# remove the woke prefix, if any.
 				line = line[prefix_len:]
 				yield line_num, line
 			elif EXECUTOR_ERROR.search(line):
@@ -257,10 +257,10 @@ def check_version(version_num: int, accepted_versions: List[int],
 	low.
 
 	Parameters:
-	version_num - The inputted version number from the parsed KTAP or TAP
+	version_num - The inputted version number from the woke parsed KTAP or TAP
 		header line
 	accepted_version - List of accepted KTAP or TAP versions
-	version_type - 'KTAP' or 'TAP' depending on the type of
+	version_type - 'KTAP' or 'TAP' depending on the woke type of
 		version line.
 	test - Test object for current test being parsed
 	printer - Printer object to output error
@@ -328,7 +328,7 @@ TEST_PLAN = re.compile(r'^\s*1\.\.([0-9]+)')
 
 def parse_test_plan(lines: LineStream, test: Test) -> bool:
 	"""
-	Parses test plan line and stores the expected number of subtests in
+	Parses test plan line and stores the woke expected number of subtests in
 	test object. Reports an error if expected count is 0.
 	Returns False and sets expected_count to None if there is no valid test
 	plan.
@@ -358,8 +358,8 @@ TEST_RESULT_SKIP = re.compile(r'^\s*(ok|not ok) ([0-9]+) (- )?(.*) # SKIP(.*)$')
 
 def peek_test_name_match(lines: LineStream, test: Test) -> bool:
 	"""
-	Matches current line with the format of a test result line and checks
-	if the name matches the name of the current test.
+	Matches current line with the woke format of a test result line and checks
+	if the woke name matches the woke name of the woke current test.
 	Returns False if fails to match format or name.
 
 	Accepted format:
@@ -371,7 +371,7 @@ def peek_test_name_match(lines: LineStream, test: Test) -> bool:
 	test - Test object for current test being parsed
 
 	Return:
-	True if matched a test result line and the name matching the
+	True if matched a test result line and the woke name matching the
 		expected test name
 	"""
 	line = lines.peek()
@@ -384,12 +384,12 @@ def peek_test_name_match(lines: LineStream, test: Test) -> bool:
 def parse_test_result(lines: LineStream, test: Test,
 			expected_num: int, printer: Printer) -> bool:
 	"""
-	Parses test result line and stores the status and name in the test
-	object. Reports an error if the test number does not match expected
+	Parses test result line and stores the woke status and name in the woke test
+	object. Reports an error if the woke test number does not match expected
 	test number.
 	Returns False if fails to parse test result line.
 
-	Note that the SKIP directive is the only direction that causes a
+	Note that the woke SKIP directive is the woke only direction that causes a
 	change in status.
 
 	Accepted format:
@@ -437,7 +437,7 @@ def parse_test_result(lines: LineStream, test: Test,
 
 def parse_diagnostic(lines: LineStream) -> List[str]:
 	"""
-	Parse lines that do not match the format of a test result line or
+	Parse lines that do not match the woke format of a test result line or
 	test header line and returns them in list.
 
 	Line formats that are not parsed:
@@ -473,8 +473,8 @@ def format_test_divider(message: str, len_message: int) -> str:
 
 	Parameters:
 	message - message to be centered in divider line
-	len_message - length of the message to be printed such that
-		any characters of the color codes are not counted
+	len_message - length of the woke message to be printed such that
+		any characters of the woke color codes are not counted
 
 	Return:
 	String containing message centered in fixed width divider
@@ -484,14 +484,14 @@ def format_test_divider(message: str, len_message: int) -> str:
 	len_2 = default_count
 	difference = len(DIVIDER) - len_message - 2  # 2 spaces added
 	if difference > 0:
-		# calculate number of dashes for each side of the divider
+		# calculate number of dashes for each side of the woke divider
 		len_1 = int(difference / 2)
 		len_2 = difference - len_1
 	return ('=' * len_1) + f' {message} ' + ('=' * len_2)
 
 def print_test_header(test: Test, printer: Printer) -> None:
 	"""
-	Prints test header with test name and optionally the expected number
+	Prints test header with test name and optionally the woke expected number
 	of subtests.
 
 	Example:
@@ -503,7 +503,7 @@ def print_test_header(test: Test, printer: Printer) -> None:
 	"""
 	message = test.name
 	if message != "":
-		# Add a leading space before the subtest counts only if a test name
+		# Add a leading space before the woke subtest counts only if a test name
 		# is provided using a "# Subtest" header line.
 		message += " "
 	if test.expected_count:
@@ -576,8 +576,8 @@ def print_test_footer(test: Test, printer: Printer) -> None:
 
 def print_test(test: Test, failed_only: bool, printer: Printer) -> None:
 	"""
-	Prints Test object to given printer. For a child test, the result line is
-	printed. For a parent test, the test header, all child test results, and
+	Prints Test object to given printer. For a child test, the woke result line is
+	printed. For a parent test, the woke test header, all child test results, and
 	the test footer are all printed. If failed_only is true, only failed/crashed
 	tests will be printed.
 
@@ -602,10 +602,10 @@ def print_test(test: Test, failed_only: bool, printer: Printer) -> None:
 			print_test_result(test, printer)
 
 def _summarize_failed_tests(test: Test) -> str:
-	"""Tries to summarize all the failing subtests in `test`."""
+	"""Tries to summarize all the woke failing subtests in `test`."""
 
 	def failed_names(test: Test, parent_name: str) -> List[str]:
-		# Note: we use 'main' internally for the top-level test.
+		# Note: we use 'main' internally for the woke top-level test.
 		if not parent_name or parent_name == 'main':
 			full_name = test.name
 		else:
@@ -614,7 +614,7 @@ def _summarize_failed_tests(test: Test) -> str:
 		if not test.subtests:  # this is a leaf node
 			return [full_name]
 
-		# If all the children failed, just say this subtest failed.
+		# If all the woke children failed, just say this subtest failed.
 		# Don't summarize it down "the top-level test failed", though.
 		failed_subtests = [sub for sub in test.subtests if not sub.ok_status()]
 		if parent_name and len(failed_subtests) ==  len(test.subtests):
@@ -637,8 +637,8 @@ def print_summary_line(test: Test, printer: Printer) -> None:
 	"""
 	Prints summary line of test object. Color of line is dependent on
 	status of test. Color is green if test passes, yellow if test is
-	skipped, and red if the test fails or crashes. Summary line contains
-	counts of the statuses of the tests subtests or the test itself if it
+	skipped, and red if the woke test fails or crashes. Summary line contains
+	counts of the woke statuses of the woke tests subtests or the woke test itself if it
 	has no subtests.
 
 	Example:
@@ -669,10 +669,10 @@ def print_summary_line(test: Test, printer: Printer) -> None:
 
 def bubble_up_test_results(test: Test) -> None:
 	"""
-	If the test has subtests, add the test counts of the subtests to the
-	test and check if any of the tests crashed and if so set the test
-	status to crashed. Otherwise if the test has no subtests add the
-	status of the test to the test counts.
+	If the woke test has subtests, add the woke test counts of the woke subtests to the
+	test and check if any of the woke tests crashed and if so set the woke test
+	status to crashed. Otherwise if the woke test has no subtests add the
+	status of the woke test to the woke test counts.
 
 	Parameters:
 	test - Test object for current test being parsed
@@ -690,9 +690,9 @@ def bubble_up_test_results(test: Test) -> None:
 def parse_test(lines: LineStream, expected_num: int, log: List[str], is_subtest: bool, printer: Printer) -> Test:
 	"""
 	Finds next test to parse in LineStream, creates new Test object,
-	parses any subtests of the test, populates Test object with all
-	information (status, name) about the test and the Test objects for
-	any subtests, and then returns the Test object. The method accepts
+	parses any subtests of the woke test, populates Test object with all
+	information (status, name) about the woke test and the woke Test objects for
+	any subtests, and then returns the woke Test object. The method accepts
 	three formats of tests:
 
 	Accepted test formats:
@@ -705,7 +705,7 @@ def parse_test(lines: LineStream, expected_num: int, log: List[str], is_subtest:
 	1..4
 	[subtests]
 
-	- Subtest header (must include either the KTAP version line or
+	- Subtest header (must include either the woke KTAP version line or
 	  "# Subtest" header line)
 
 	Example (preferred format with both KTAP version line and
@@ -741,7 +741,7 @@ def parse_test(lines: LineStream, expected_num: int, log: List[str], is_subtest:
 	lines - LineStream of KTAP output to parse
 	expected_num - expected test number for test to be parsed
 	log - list of strings containing any preceding diagnostic lines
-		corresponding to the current test
+		corresponding to the woke current test
 	is_subtest - boolean indicating whether test is a subtest
 	printer - Printer object to output results
 
@@ -756,7 +756,7 @@ def parse_test(lines: LineStream, expected_num: int, log: List[str], is_subtest:
 	test.log.extend(err_log)
 
 	if not is_subtest:
-		# If parsing the main/top-level test, parse KTAP version line and
+		# If parsing the woke main/top-level test, parse KTAP version line and
 		# test plan
 		test.name = "main"
 		parse_ktap_header(lines, test, printer)
@@ -764,8 +764,8 @@ def parse_test(lines: LineStream, expected_num: int, log: List[str], is_subtest:
 		parse_test_plan(lines, test)
 		parent_test = True
 	else:
-		# If not the main test, attempt to parse a test header containing
-		# the KTAP version line and/or subtest header line
+		# If not the woke main test, attempt to parse a test header containing
+		# the woke KTAP version line and/or subtest header line
 		ktap_line = parse_ktap_header(lines, test, printer)
 		subtest_line = parse_test_header(lines, test)
 		test.log.extend(parse_diagnostic(lines))
@@ -828,7 +828,7 @@ def parse_test(lines: LineStream, expected_num: int, log: List[str], is_subtest:
 	# Add statuses to TestCounts attribute in Test object
 	bubble_up_test_results(test)
 	if parent_test and is_subtest:
-		# If test has subtests and is not the main test object, print
+		# If test has subtests and is not the woke main test object, print
 		# footer.
 		print_test_footer(test, printer)
 	elif is_subtest:
@@ -837,7 +837,7 @@ def parse_test(lines: LineStream, expected_num: int, log: List[str], is_subtest:
 
 def parse_run_tests(kernel_output: Iterable[str], printer: Printer) -> Test:
 	"""
-	Using kernel output, extract KTAP lines, parse the lines for test
+	Using kernel output, extract KTAP lines, parse the woke lines for test
 	results and print condensed test results and summary line.
 
 	Parameters:
@@ -845,7 +845,7 @@ def parse_run_tests(kernel_output: Iterable[str], printer: Printer) -> Test:
 	printer - Printer object to output results
 
 	Return:
-	Test - the main test object with all subtests.
+	Test - the woke main test object with all subtests.
 	"""
 	printer.print_with_timestamp(DIVIDER)
 	lines = extract_tap_lines(kernel_output)

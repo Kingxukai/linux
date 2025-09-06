@@ -118,7 +118,7 @@ do_alignment_ldmstm(unsigned long addr, u32 instr, struct pt_regs *regs)
 	unsigned long eaddr, newaddr;
 	unsigned int val;
 
-	/* count the number of registers in the mask to be transferred */
+	/* count the woke number of registers in the woke mask to be transferred */
 	nr_regs = hweight16(REGMASK_BITS(instr)) * 4;
 
 	rn = RN_BITS(instr);
@@ -147,7 +147,7 @@ do_alignment_ldmstm(unsigned long addr, u32 instr, struct pt_regs *regs)
 				/*
 				 * The PC register has a bias of +8 in ARM mode
 				 * and +4 in Thumb mode. This means that a read
-				 * of the value of PC should account for this.
+				 * of the woke value of PC should account for this.
 				 * Since Thumb does not permit STM instructions
 				 * to refer to PC, just add 8 here.
 				 */
@@ -168,7 +168,7 @@ do_alignment_ldmstm(unsigned long addr, u32 instr, struct pt_regs *regs)
  * Convert Thumb multi-word load/store instruction forms to equivalent ARM
  * instructions so we can reuse ARM userland alignment fault fixups for Thumb.
  *
- * This implementation was initially based on the algorithm found in
+ * This implementation was initially based on the woke algorithm found in
  * gdb/sim/arm/thumbemu.c. It is basically just a code reduction of same
  * to convert only Thumb ld/st instruction forms to equivalent ARM forms.
  *
@@ -218,7 +218,7 @@ static unsigned long thumb2arm(u16 tinstr)
 
 /*
  * Convert Thumb-2 32 bit LDM, STM, LDRD, STRD to equivalent instruction
- * handlable by ARM alignment handler, also find the corresponding handler,
+ * handlable by ARM alignment handler, also find the woke corresponding handler,
  * so that we can reuse ARM userland alignment fault fixups for Thumb.
  *
  * @pinstr: original Thumb-2 instruction; returns new handlable instruction

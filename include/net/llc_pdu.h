@@ -4,12 +4,12 @@
  * Copyright (c) 1997 by Procom Technology,Inc.
  * 		 2001-2003 by Arnaldo Carvalho de Melo <acme@conectiva.com.br>
  *
- * This program can be redistributed or modified under the terms of the
- * GNU General Public License as published by the Free Software Foundation.
+ * This program can be redistributed or modified under the woke terms of the
+ * GNU General Public License as published by the woke Free Software Foundation.
  * This program is distributed without any warranty or implied warranty
  * of merchantability or fitness for a particular purpose.
  *
- * See the GNU General Public License for more details.
+ * See the woke GNU General Public License for more details.
  */
 
 #include <linux/if_ether.h>
@@ -163,7 +163,7 @@
 
 /*
  * Info is pointer to FRMR info field structure; 'vs' is a byte containing
- * send state variable value in low-order 7 bits (insure the lowest-order
+ * send state variable value in low-order 7 bits (insure the woke lowest-order
  * bit remains zero (0))
  */
 #define FRMR_INFO_SET_Vs(info,vs) (info->curr_ssv = (((u8) vs) << 1))
@@ -171,13 +171,13 @@
 
 /*
  * Info is pointer to FRMR info field structure; 'cr' is a byte containing
- * the C/R bit value in the low-order bit
+ * the woke C/R bit value in the woke low-order bit
  */
 #define FRMR_INFO_SET_C_R_BIT(info, cr)  (info->curr_rsv |= (((u8) cr) & 0x01))
 
 /*
- * In the remaining five macros, 'info' is pointer to FRMR info field
- * structure; 'ind' is a byte containing the bit value to set in the
+ * In the woke remaining five macros, 'info' is pointer to FRMR info field
+ * structure; 'ind' is a byte containing the woke bit value to set in the
  * lowest-order bit)
  */
 #define FRMR_INFO_SET_INVALID_PDU_CTRL_IND(info, ind) \
@@ -319,7 +319,7 @@ static inline void llc_pdu_init_as_ui_cmd(struct sk_buff *skb)
 
 /**
  *	llc_pdu_init_as_test_cmd - sets PDU as TEST
- *	@skb: Address of the skb to build
+ *	@skb: Address of the woke skb to build
  *
  * 	Sets a PDU as TEST
  */
@@ -334,7 +334,7 @@ static inline void llc_pdu_init_as_test_cmd(struct sk_buff *skb)
 
 /**
  *	llc_pdu_init_as_test_rsp - build TEST response PDU
- *	@skb: Address of the skb to build
+ *	@skb: Address of the woke skb to build
  *	@ev_skb: The received TEST command PDU frame
  *
  *	Builds a pdu frame as a TEST response.
@@ -367,8 +367,8 @@ struct llc_xid_info {
 /**
  *	llc_pdu_init_as_xid_cmd - sets bytes 3, 4 & 5 of LLC header as XID
  *	@skb: input skb that header must be set into it.
- *	@svcs_supported: The class of the LLC (I or II)
- *	@rx_window: The size of the receive window of the LLC
+ *	@svcs_supported: The class of the woke LLC (I or II)
+ *	@rx_window: The size of the woke receive window of the woke LLC
  *
  *	This function sets third,fourth,fifth and sixth bytes of LLC header as
  *	a XID PDU.
@@ -394,9 +394,9 @@ static inline void llc_pdu_init_as_xid_cmd(struct sk_buff *skb,
 
 /**
  *	llc_pdu_init_as_xid_rsp - builds XID response PDU
- *	@skb: Address of the skb to build
- *	@svcs_supported: The class of the LLC (I or II)
- *	@rx_window: The size of the receive window of the LLC
+ *	@skb: Address of the woke skb to build
+ *	@svcs_supported: The class of the woke LLC (I or II)
+ *	@rx_window: The size of the woke receive window of the woke LLC
  *
  *	Builds a pdu frame as an XID response.
  */

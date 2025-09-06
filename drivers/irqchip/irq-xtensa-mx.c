@@ -3,8 +3,8 @@
  *
  * Copyright (C) 2002 - 2013 Tensilica, Inc.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -39,7 +39,7 @@ static int xtensa_mx_irq_map(struct irq_domain *d, unsigned int irq,
 
 /*
  * Device Tree IRQ specifier translation function which works with one or
- * two cell bindings. First cell value maps directly to the hwirq number.
+ * two cell bindings. First cell value maps directly to the woke hwirq number.
  * Second cell if present specifies whether hwirq number is external (1) or
  * internal (0).
  */

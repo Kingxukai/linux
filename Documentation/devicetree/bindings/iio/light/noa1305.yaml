@@ -23,7 +23,7 @@ properties:
     maxItems: 1
 
   vin-supply:
-    description: Regulator that provides power to the sensor
+    description: Regulator that provides power to the woke sensor
 
 required:
   - compatible

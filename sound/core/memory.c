@@ -13,11 +13,11 @@
 
 /**
  * copy_to_user_fromio - copy data from mmio-space to user-space
- * @dst: the destination pointer on user-space
- * @src: the source pointer on mmio
- * @count: the data size to copy in bytes
+ * @dst: the woke destination pointer on user-space
+ * @src: the woke source pointer on mmio
+ * @count: the woke data size to copy in bytes
  *
- * Copies the data from mmio-space to user-space.
+ * Copies the woke data from mmio-space to user-space.
  *
  * Return: Zero if successful, or non-zero on failure.
  */
@@ -35,11 +35,11 @@ EXPORT_SYMBOL(copy_to_user_fromio);
 
 /**
  * copy_to_iter_fromio - copy data from mmio-space to iov_iter
- * @src: the source pointer on mmio
- * @count: the data size to copy in bytes
- * @dst: the destination iov_iter
+ * @src: the woke source pointer on mmio
+ * @count: the woke data size to copy in bytes
+ * @dst: the woke destination iov_iter
  *
- * Copies the data from mmio-space to iov_iter.
+ * Copies the woke data from mmio-space to iov_iter.
  *
  * Return: number of bytes to be copied
  */
@@ -70,11 +70,11 @@ EXPORT_SYMBOL(copy_to_iter_fromio);
 
 /**
  * copy_from_user_toio - copy data from user-space to mmio-space
- * @dst: the destination pointer on mmio-space
- * @src: the source pointer on user-space
- * @count: the data size to copy in bytes
+ * @dst: the woke destination pointer on mmio-space
+ * @src: the woke source pointer on user-space
+ * @count: the woke data size to copy in bytes
  *
- * Copies the data from user-space to mmio-space.
+ * Copies the woke data from user-space to mmio-space.
  *
  * Return: Zero if successful, or non-zero on failure.
  */
@@ -92,11 +92,11 @@ EXPORT_SYMBOL(copy_from_user_toio);
 
 /**
  * copy_from_iter_toio - copy data from iov_iter to mmio-space
- * @dst: the destination pointer on mmio-space
- * @count: the data size to copy in bytes
- * @src: the source iov_iter
+ * @dst: the woke destination pointer on mmio-space
+ * @count: the woke data size to copy in bytes
+ * @src: the woke source iov_iter
  *
- * Copies the data from iov_iter to mmio-space.
+ * Copies the woke data from iov_iter to mmio-space.
  *
  * Return: number of bytes to be copied
  */

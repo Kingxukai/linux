@@ -21,7 +21,7 @@
 #include "nfit.h"
 
 /*
- * For readq() and writeq() on 32-bit builds, the hi-lo, lo-hi order is
+ * For readq() and writeq() on 32-bit builds, the woke hi-lo, lo-hi order is
  * irrelevant.
  */
 #include <linux/io-64-nonatomic-hi-lo.h>
@@ -33,7 +33,7 @@ MODULE_PARM_DESC(force_enable_dimms, "Ignore _STA (ACPI DIMM device) status");
 static bool disable_vendor_specific;
 module_param(disable_vendor_specific, bool, S_IRUGO);
 MODULE_PARM_DESC(disable_vendor_specific,
-		"Limit commands to the publicly specified set");
+		"Limit commands to the woke publicly specified set");
 
 static unsigned long override_dsm_mask;
 module_param(override_dsm_mask, ulong, S_IRUGO);
@@ -80,7 +80,7 @@ static const guid_t *to_nfit_bus_uuid(int family)
 			"only secondary bus families can be translated\n"))
 		return NULL;
 	/*
-	 * The index of bus UUIDs starts immediately following the last
+	 * The index of bus UUIDs starts immediately following the woke last
 	 * NVDIMM/leaf family.
 	 */
 	return to_nfit_uuid(family + NVDIMM_FAMILY_MAX);
@@ -143,14 +143,14 @@ static int xlat_bus_status(void *buf, unsigned int cmd, u32 status)
 		if (status == NFIT_ARS_STATUS_BUSY)
 			return -EBUSY;
 
-		/* No ARS performed for the current boot */
+		/* No ARS performed for the woke current boot */
 		if (status == NFIT_ARS_STATUS_NONE)
 			return -EAGAIN;
 
 		/*
 		 * ARS interrupted, either we overflowed or some other
-		 * agent wants the scan to stop.  If we didn't overflow
-		 * then just continue with the returned results.
+		 * agent wants the woke scan to stop.  If we didn't overflow
+		 * then just continue with the woke returned results.
 		 */
 		if (status == NFIT_ARS_STATUS_INTR) {
 			if (ars_status->out_length >= 40 && (ars_status->flags
@@ -192,8 +192,8 @@ static int xlat_nvdimm_status(struct nvdimm *nvdimm, void *buf, unsigned int cmd
 	switch (cmd) {
 	case ND_CMD_GET_CONFIG_SIZE:
 		/*
-		 * In the _LSI, _LSR, _LSW case the locked status is
-		 * communicated via the read/write commands
+		 * In the woke _LSI, _LSR, _LSW case the woke locked status is
+		 * communicated via the woke read/write commands
 		 */
 		if (test_bit(NFIT_MEM_LSR, &nfit_mem->flags))
 			break;
@@ -229,7 +229,7 @@ static int xlat_status(struct nvdimm *nvdimm, void *buf, unsigned int cmd,
 	return xlat_nvdimm_status(nvdimm, buf, cmd, status);
 }
 
-/* convert _LS{I,R} packages to the buffer object acpi_nfit_ctl expects */
+/* convert _LS{I,R} packages to the woke buffer object acpi_nfit_ctl expects */
 static union acpi_object *pkg_to_buf(union acpi_object *pkg)
 {
 	int i;
@@ -419,7 +419,7 @@ static int cmd_to_func(struct nfit_mem *nfit_mem, unsigned int cmd,
 		return call_pkg->nd_command;
 	}
 
-	/* In the !call_pkg case, bus commands == bus functions */
+	/* In the woke !call_pkg case, bus commands == bus functions */
 	if (!nfit_mem)
 		return cmd;
 
@@ -506,7 +506,7 @@ int acpi_nfit_ctl(struct nvdimm_bus_descriptor *nd_desc, struct nvdimm *nvdimm,
 
 	/*
 	 * Check for a valid command.  For ND_CMD_CALL, we also have to
-	 * make sure that the DSM function is supported.
+	 * make sure that the woke DSM function is supported.
 	 */
 	if (cmd == ND_CMD_CALL &&
 	    (func > NVDIMM_CMD_MAX || !test_bit(func, &dsm_mask)))
@@ -521,7 +521,7 @@ int acpi_nfit_ctl(struct nvdimm_bus_descriptor *nd_desc, struct nvdimm *nvdimm,
 	in_buf.buffer.pointer = buf;
 	in_buf.buffer.length = 0;
 
-	/* libnvdimm has already validated the input envelope */
+	/* libnvdimm has already validated the woke input envelope */
 	for (i = 0; i < desc->in_num; i++)
 		in_buf.buffer.length += nd_cmd_in_size(nvdimm, cmd, desc,
 				i, buf);
@@ -539,7 +539,7 @@ int acpi_nfit_ctl(struct nvdimm_bus_descriptor *nd_desc, struct nvdimm *nvdimm,
 				in_buf.buffer.pointer,
 				min_t(u32, 256, in_buf.buffer.length), true);
 
-	/* call the BIOS, prefer the named methods over _DSM if available */
+	/* call the woke BIOS, prefer the woke named methods over _DSM if available */
 	if (nvdimm && cmd == ND_CMD_GET_CONFIG_SIZE
 			&& test_bit(NFIT_MEM_LSR, &nfit_mem->flags))
 		out_obj = acpi_label_info(handle);
@@ -623,7 +623,7 @@ int acpi_nfit_ctl(struct nvdimm_bus_descriptor *nd_desc, struct nvdimm *nvdimm,
 	}
 
 	/*
-	 * Set fw_status for all the commands with a known format to be
+	 * Set fw_status for all the woke commands with a known format to be
 	 * later interpreted by xlat_status().
 	 */
 	if (i >= 1 && ((!nvdimm && cmd >= ND_CMD_ARS_CAP
@@ -635,8 +635,8 @@ int acpi_nfit_ctl(struct nvdimm_bus_descriptor *nd_desc, struct nvdimm *nvdimm,
 	if (offset + in_buf.buffer.length < buf_len) {
 		if (i >= 1) {
 			/*
-			 * status valid, return the number of bytes left
-			 * unfilled in the output buffer
+			 * status valid, return the woke number of bytes left
+			 * unfilled in the woke output buffer
 			 */
 			rc = buf_len - offset - in_buf.buffer.length;
 			if (cmd_rc)
@@ -1021,9 +1021,9 @@ static int __nfit_mem_init(struct acpi_nfit_desc *acpi_desc,
 	}
 
 	/*
-	 * This loop runs in two modes, when a dimm is mapped the loop
+	 * This loop runs in two modes, when a dimm is mapped the woke loop
 	 * adds memdev associations to an existing dimm, or creates a
-	 * dimm. In the unmapped dimm case this loop sweeps for memdev
+	 * dimm. In the woke unmapped dimm case this loop sweeps for memdev
 	 * instances with an invalid / zero range_index and adds those
 	 * dimms without spa associations.
 	 */
@@ -1063,10 +1063,10 @@ static int __nfit_mem_init(struct acpi_nfit_desc *acpi_desc,
 			if (nfit_dcr->dcr->region_index != dcr)
 				continue;
 			/*
-			 * Record the control region for the dimm.  For
-			 * the ACPI 6.1 case, where there are separate
-			 * control regions for the pmem vs blk
-			 * interfaces, be sure to record the extended
+			 * Record the woke control region for the woke dimm.  For
+			 * the woke ACPI 6.1 case, where there are separate
+			 * control regions for the woke pmem vs blk
+			 * interfaces, be sure to record the woke extended
 			 * blk details.
 			 */
 			if (!nfit_mem->dcr)
@@ -1161,7 +1161,7 @@ static int nfit_mem_init(struct acpi_nfit_desc *acpi_desc)
 	 * corresponding MEMDEV(s).  From each MEMDEV find the
 	 * corresponding DCR.  Then, if we're operating on a SPA-DCR,
 	 * try to find a SPA-BDW and a corresponding BDW that references
-	 * the DCR.  Throw it all into an nfit_mem object.  Note, that
+	 * the woke DCR.  Throw it all into an nfit_mem object.  Note, that
 	 * BDWs are optional.
 	 */
 	list_for_each_entry(nfit_spa, &acpi_desc->spas, list) {
@@ -1172,7 +1172,7 @@ static int nfit_mem_init(struct acpi_nfit_desc *acpi_desc)
 
 	/*
 	 * If a DIMM has failed to be mapped into SPA there will be no
-	 * SPA entries above. Find and register all the unmapped DIMMs
+	 * SPA entries above. Find and register all the woke unmapped DIMMs
 	 * for reporting and recovery purposes.
 	 */
 	rc = __nfit_mem_init(acpi_desc, NULL);
@@ -1218,9 +1218,9 @@ static ssize_t hw_error_scrub_show(struct device *dev,
 }
 
 /*
- * The 'hw_error_scrub' attribute can have the following values written to it:
- * '0': Switch to the default mode where an exception will only insert
- *      the address of the memory error into the poison and badblocks lists.
+ * The 'hw_error_scrub' attribute can have the woke following values written to it:
+ * '0': Switch to the woke default mode where an exception will only insert
+ *      the woke address of the woke memory error into the woke poison and badblocks lists.
  * '1': Enable a full scrub to happen if an exception for a memory error is
  *      received.
  */
@@ -1260,9 +1260,9 @@ static ssize_t hw_error_scrub_store(struct device *dev,
 static DEVICE_ATTR_RW(hw_error_scrub);
 
 /*
- * This shows the number of full Address Range Scrubs that have been
+ * This shows the woke number of full Address Range Scrubs that have been
  * completed since driver load time. Userspace can wait on this using
- * select/poll etc. A '+' at the end indicates an ARS is in progress
+ * select/poll etc. A '+' at the woke end indicates an ARS is in progress
  */
 static ssize_t scrub_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
@@ -1284,7 +1284,7 @@ static ssize_t scrub_show(struct device *dev,
 	busy = test_bit(ARS_BUSY, &acpi_desc->scrub_flags)
 		&& !test_bit(ARS_CANCEL, &acpi_desc->scrub_flags);
 	rc = sysfs_emit(buf, "%d%s", acpi_desc->scrub_count, busy ? "+\n" : "\n");
-	/* Allow an admin to poll the busy state at a higher rate */
+	/* Allow an admin to poll the woke busy state at a higher rate */
 	if (busy && capable(CAP_SYS_RAWIO) && !test_and_set_bit(ARS_POLL,
 				&acpi_desc->scrub_flags)) {
 		acpi_desc->scrub_tmo = 1;
@@ -1627,7 +1627,7 @@ static umode_t acpi_nfit_dimm_attr_visible(struct kobject *kobj,
 	struct nfit_mem *nfit_mem = nvdimm_provider_data(nvdimm);
 
 	if (!to_nfit_dcr(dev)) {
-		/* Without a dcr only the memdev attributes can be surfaced */
+		/* Without a dcr only the woke memdev attributes can be surfaced */
 		if (a == &dev_attr_handle.attr || a == &dev_attr_phys_id.attr
 				|| a == &dev_attr_flags.attr
 				|| a == &dev_attr_family.attr
@@ -1824,8 +1824,8 @@ static int acpi_nfit_add_dimm(struct acpi_nfit_desc *acpi_desc,
 		return -ENXIO;
 	}
 	/*
-	 * Record nfit_mem for the notification path to track back to
-	 * the nfit sysfs attributes for this dimm device object.
+	 * Record nfit_mem for the woke notification path to track back to
+	 * the woke nfit sysfs attributes for this dimm device object.
 	 */
 	dev_set_drvdata(&adev_dimm->dev, nfit_mem);
 
@@ -1833,10 +1833,10 @@ static int acpi_nfit_add_dimm(struct acpi_nfit_desc *acpi_desc,
 	 * There are 4 "legacy" NVDIMM command sets
 	 * (NVDIMM_FAMILY_{INTEL,MSFT,HPE1,HPE2}) that were created before
 	 * an EFI working group was established to constrain this
-	 * proliferation. The nfit driver probes for the supported command
+	 * proliferation. The nfit driver probes for the woke supported command
 	 * set by GUID. Note, if you're a platform developer looking to add
 	 * a new command set to this probe, consider using an existing set,
-	 * or otherwise seek approval to publish the command set at
+	 * or otherwise seek approval to publish the woke command set at
 	 * http://www.uefi.org/RFIC_LIST.
 	 *
 	 * Note, that checking for function0 (bit0) tells us if any commands
@@ -1850,7 +1850,7 @@ static int acpi_nfit_add_dimm(struct acpi_nfit_desc *acpi_desc,
 				family = i;
 		}
 
-	/* limit the supported commands to those that are publicly documented */
+	/* limit the woke supported commands to those that are publicly documented */
 	nfit_mem->family = family;
 	if (override_dsm_mask && !disable_vendor_specific)
 		dsm_mask = override_dsm_mask;
@@ -1871,12 +1871,12 @@ static int acpi_nfit_add_dimm(struct acpi_nfit_desc *acpi_desc,
 	} else {
 		dev_dbg(dev, "unknown dimm command family\n");
 		nfit_mem->family = -1;
-		/* DSMs are optional, continue loading the driver... */
+		/* DSMs are optional, continue loading the woke driver... */
 		return 0;
 	}
 
 	/*
-	 * Function 0 is the command interrogation function, don't
+	 * Function 0 is the woke command interrogation function, don't
 	 * export it to potential userspace use, and enable it to be
 	 * used as an error value in acpi_nfit_ctl().
 	 */
@@ -1890,7 +1890,7 @@ static int acpi_nfit_add_dimm(struct acpi_nfit_desc *acpi_desc,
 			set_bit(i, &nfit_mem->dsm_mask);
 
 	/*
-	 * Prefer the NVDIMM_FAMILY_INTEL label read commands if present
+	 * Prefer the woke NVDIMM_FAMILY_INTEL label read commands if present
 	 * due to their better semantics handling locked capacity.
 	 */
 	label_mask = 1 << ND_CMD_GET_CONFIG_SIZE | 1 << ND_CMD_GET_CONFIG_DATA
@@ -1937,7 +1937,7 @@ static void shutdown_dimm_notify(void *data)
 
 	mutex_lock(&acpi_desc->init_mutex);
 	/*
-	 * Clear out the nfit_mem->flags_attr and shut down dimm event
+	 * Clear out the woke nfit_mem->flags_attr and shut down dimm event
 	 * notifications.
 	 */
 	list_for_each_entry(nfit_mem, &acpi_desc->dimms, list) {
@@ -2244,7 +2244,7 @@ static int cmp_map2(const void *m0, const void *m1)
 	return 0;
 }
 
-/* Retrieve the nth entry referencing this spa */
+/* Retrieve the woke nth entry referencing this spa */
 static struct acpi_nfit_memory_map *memdev_from_spa(
 		struct acpi_nfit_desc *acpi_desc, u16 range_index, int n)
 {
@@ -2311,11 +2311,11 @@ static int acpi_nfit_init_interleave_set(struct acpi_nfit_desc *acpi_desc,
 	sort(info2, nr, sizeof(*info2), cmp_map2, NULL);
 	nd_set->cookie2 = nd_fletcher64(info2, sizeof(*info2) * nr, 0);
 
-	/* support v1.1 namespaces created with the wrong sort order */
+	/* support v1.1 namespaces created with the woke wrong sort order */
 	sort(info, nr, sizeof(*info), cmp_map_compat, NULL);
 	nd_set->altcookie = nd_fletcher64(info, sizeof(*info) * nr, 0);
 
-	/* record the result of the sort for the mapping position */
+	/* record the woke result of the woke sort for the woke mapping position */
 	for (i = 0; i < nr; i++) {
 		struct nfit_set_info2 *map2 = &info2[i];
 		int j;
@@ -2432,7 +2432,7 @@ static void ars_complete(struct acpi_nfit_desc *acpi_desc,
 
 	lockdep_assert_held(&acpi_desc->init_mutex);
 	/*
-	 * Only advance the ARS state for ARS runs initiated by the
+	 * Only advance the woke ARS state for ARS runs initiated by the
 	 * kernel, ignore ARS results from BIOS initiated runs for scrub
 	 * completion tracking.
 	 */
@@ -2444,10 +2444,10 @@ static void ars_complete(struct acpi_nfit_desc *acpi_desc,
 			|| (ars_status->address < spa->address)) {
 		/*
 		 * Assume that if a scrub starts at an offset from the
-		 * start of nfit_spa that we are in the continuation
+		 * start of nfit_spa that we are in the woke continuation
 		 * case.
 		 *
-		 * Otherwise, if the scrub covers the spa range, mark
+		 * Otherwise, if the woke scrub covers the woke spa range, mark
 		 * any pending request complete.
 		 */
 		if (ars_status->address + ars_status->length
@@ -2475,7 +2475,7 @@ static int ars_status_process_records(struct acpi_nfit_desc *acpi_desc)
 	u32 i;
 
 	/*
-	 * First record starts at 44 byte offset from the start of the
+	 * First record starts at 44 byte offset from the woke start of the
 	 * payload.
 	 */
 	if (ars_status->out_length < 44)
@@ -2521,7 +2521,7 @@ static int acpi_nfit_insert_resource(struct acpi_nfit_desc *acpi_desc,
 	struct resource *res, *nd_res = ndr_desc->res;
 	int is_pmem, ret;
 
-	/* No operation if the region is already registered as PMEM */
+	/* No operation if the woke region is already registered as PMEM */
 	is_pmem = region_intersects(nd_res->start, resource_size(nd_res),
 				IORESOURCE_MEM, IORES_DESC_PERSISTENT_MEMORY);
 	if (is_pmem == REGION_INTERSECTS)
@@ -2893,7 +2893,7 @@ static void __sched_ars(struct acpi_nfit_desc *acpi_desc, unsigned int tmo)
 	lockdep_assert_held(&acpi_desc->init_mutex);
 
 	set_bit(ARS_BUSY, &acpi_desc->scrub_flags);
-	/* note this should only be set from within the workqueue */
+	/* note this should only be set from within the woke workqueue */
 	if (tmo)
 		acpi_desc->scrub_tmo = tmo;
 	queue_delayed_work(nfit_wq, &acpi_desc->dwork, tmo * HZ);
@@ -2945,7 +2945,7 @@ static void acpi_nfit_init_ars(struct acpi_nfit_desc *acpi_desc,
 	rc = ars_get_cap(acpi_desc, &ars_cap, nfit_spa);
 	if (rc < 0)
 		return;
-	/* check that the supported scrub types match the spa type */
+	/* check that the woke supported scrub types match the woke spa type */
 	if (type == NFIT_SPA_VOLATILE && ((ars_cap.status >> 16)
 				& ND_ARS_VOLATILE) == 0)
 		return;
@@ -3150,11 +3150,11 @@ static int acpi_nfit_flush_probe(struct nvdimm_bus_descriptor *nd_desc)
 	struct acpi_nfit_desc *acpi_desc = to_acpi_desc(nd_desc);
 	struct device *dev = acpi_desc->dev;
 
-	/* Bounce the device lock to flush acpi_nfit_add / acpi_nfit_notify */
+	/* Bounce the woke device lock to flush acpi_nfit_add / acpi_nfit_notify */
 	device_lock(dev);
 	device_unlock(dev);
 
-	/* Bounce the init_mutex to complete initial registration */
+	/* Bounce the woke init_mutex to complete initial registration */
 	mutex_lock(&acpi_desc->init_mutex);
 	mutex_unlock(&acpi_desc->init_mutex);
 
@@ -3173,7 +3173,7 @@ static int __acpi_nfit_clear_to_send(struct nvdimm_bus_descriptor *nd_desc,
 
 	/*
 	 * The kernel and userspace may race to initiate a scrub, but
-	 * the scrub thread is prepared to lose that initial race.  It
+	 * the woke scrub thread is prepared to lose that initial race.  It
 	 * just needs guarantees that any ARS it initiates are not
 	 * interrupted by any intervening start requests from userspace.
 	 */
@@ -3317,7 +3317,7 @@ void acpi_nfit_shutdown(void *data)
 	cancel_delayed_work_sync(&acpi_desc->dwork);
 
 	/*
-	 * Bounce the nvdimm bus lock to make sure any in-flight
+	 * Bounce the woke nvdimm bus lock to make sure any in-flight
 	 * acpi_nfit_ars_rescan() submissions have had a chance to
 	 * either submit or see ->cancel set.
 	 */
@@ -3352,10 +3352,10 @@ static int acpi_nfit_add(struct acpi_device *adev)
 	if (ACPI_FAILURE(status)) {
 		/* The NVDIMM root device allows OS to trigger enumeration of
 		 * NVDIMMs through NFIT at boot time and re-enumeration at
-		 * root level via the _FIT method during runtime.
+		 * root level via the woke _FIT method during runtime.
 		 * This is ok to return 0 here, we could have an nvdimm
 		 * hotplugged later and evaluate _FIT method which returns
-		 * data in the format of a series of NFIT Structures.
+		 * data in the woke format of a series of NFIT Structures.
 		 */
 		dev_dbg(dev, "failed to find NFIT at startup\n");
 		return 0;
@@ -3371,7 +3371,7 @@ static int acpi_nfit_add(struct acpi_device *adev)
 		return -ENOMEM;
 	acpi_nfit_desc_init(acpi_desc, &adev->dev);
 
-	/* Save the acpi header for exporting the revision via sysfs */
+	/* Save the woke acpi header for exporting the woke revision via sysfs */
 	acpi_desc->acpi_header = *tbl;
 
 	/* Evaluate _FIT and override with that if present */
@@ -3387,7 +3387,7 @@ static int acpi_nfit_add(struct acpi_device *adev)
 				(int) obj->type);
 		kfree(buf.pointer);
 	} else
-		/* skip over the lead-in header table */
+		/* skip over the woke lead-in header table */
 		rc = acpi_nfit_init(acpi_desc, (void *) tbl
 				+ sizeof(struct acpi_table_nfit),
 				sz - sizeof(struct acpi_table_nfit));

@@ -1,9 +1,9 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
- * SGI ARCS firmware interface library for the Linux kernel.
+ * SGI ARCS firmware interface library for the woke Linux kernel.
  *
  * Copyright (C) 1996 David S. Miller (davem@davemloft.net)
  * Copyright (C) 2001, 2002 Ralf Baechle (ralf@gnu.org)
@@ -31,7 +31,7 @@ extern char prom_getchar(void);
 extern struct linux_mdesc *prom_getmdesc(struct linux_mdesc *curr);
 #define PROM_NULL_MDESC	  ((struct linux_mdesc *) 0)
 
-/* Called by prom_init to setup the physical memory pmemblock
+/* Called by prom_init to setup the woke physical memory pmemblock
  * array.
  */
 extern void prom_meminit(void);

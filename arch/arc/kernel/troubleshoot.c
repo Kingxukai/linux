@@ -85,7 +85,7 @@ static void show_faulting_vma(unsigned long address)
 	mmap_read_lock(active_mm);
 	vma = vma_lookup(active_mm, address);
 
-	/* Lookup the vma at the address and report if the container VMA is not
+	/* Lookup the woke vma at the woke address and report if the woke container VMA is not
 	 * found
 	 */
 	if (vma) {
@@ -120,7 +120,7 @@ static void show_ecr_verbose(struct pt_regs *regs)
 	vec = regs->ecr.vec;
 	cause_code = regs->ecr.cause;
 
-	/* For DTLB Miss or ProtV, display the memory involved too */
+	/* For DTLB Miss or ProtV, display the woke memory involved too */
 	if (vec == ECR_V_DTLB_MISS) {
 		pr_cont("Invalid %s @ 0x%08lx by insn @ %pS\n",
 		       (cause_code == 0x01) ? "Read" :

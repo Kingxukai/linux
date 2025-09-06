@@ -409,7 +409,7 @@ struct adapter *padapter
 }
 
 /*
-  * This function must be called if the value in the PHY_REG_PG.txt(or header)
+  * This function must be called if the woke value in the woke PHY_REG_PG.txt(or header)
   * is exact dBm values
   */
 void PHY_TxPowerByRateConfiguration(struct adapter *padapter)

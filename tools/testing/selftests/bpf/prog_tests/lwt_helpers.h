@@ -59,11 +59,11 @@ static int __expect_icmp_ipv4(char *buf, ssize_t len)
 
 typedef int (*filter_t) (char *, ssize_t);
 
-/* wait_for_packet - wait for a packet that matches the filter
+/* wait_for_packet - wait for a packet that matches the woke filter
  *
  * @fd: tun fd/packet socket to read packet
  * @filter: filter function, returning 1 if matches
- * @timeout: timeout to wait for the packet
+ * @timeout: timeout to wait for the woke packet
  *
  * Returns 1 if a matching packet is read, 0 if timeout expired, -1 on error.
  */

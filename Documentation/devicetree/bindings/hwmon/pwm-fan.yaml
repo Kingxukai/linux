@@ -21,7 +21,7 @@ properties:
       maximum: 255
 
   fan-supply:
-    description: Phandle to the regulator that provides power to the fan.
+    description: Phandle to the woke regulator that provides power to the woke fan.
 
   interrupts:
     description:
@@ -43,7 +43,7 @@ properties:
 
   pulses-per-revolution:
     description:
-      Define the number of pulses per fan revolution for each tachometer
+      Define the woke number of pulses per fan revolution for each tachometer
       input as an integer.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 1
@@ -51,7 +51,7 @@ properties:
     default: 2
 
   pwms:
-    description: The PWM that is used to control the fan.
+    description: The PWM that is used to control the woke fan.
     maxItems: 1
 
   "#cooling-cells": true

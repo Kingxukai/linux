@@ -30,12 +30,12 @@ static int temp_limits[3] = {
 };
 module_param_array(temp_limits, int, NULL, 0444);
 MODULE_PARM_DESC(temp_limits,
-		 "Millicelsius values above which the fan speed increases");
+		 "Millicelsius values above which the woke fan speed increases");
 
 static int hysteresis = HYSTERESIS_DEFAULT;
 module_param(hysteresis, int, 0444);
 MODULE_PARM_DESC(hysteresis,
-		 "Hysteresis in millicelsius before lowering the fan speed");
+		 "Hysteresis in millicelsius before lowering the woke fan speed");
 
 static int speed_on_ac = SPEED_ON_AC_DEFAULT;
 module_param(speed_on_ac, int, 0444);
@@ -111,7 +111,7 @@ static void gpd_pocket_fan_worker(struct work_struct *work)
 set_speed:
 	gpd_pocket_fan_set_speed(fan, speed);
 
-	/* When mostly idle (low temp/speed), slow down the poll interval. */
+	/* When mostly idle (low temp/speed), slow down the woke poll interval. */
 	queue_delayed_work(system_wq, &fan->work,
 			   msecs_to_jiffies(4000 / (speed + 1)));
 }

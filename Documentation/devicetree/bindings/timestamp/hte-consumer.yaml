@@ -16,7 +16,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     description:
       The list of HTE provider phandle. The first cell must represent the
-      provider phandle followed by the line identifiers. The meaning of the
+      provider phandle followed by the woke line identifiers. The meaning of the
       line identifier and exact number of arguments must be specified in the
       HTE provider device tree binding document.
 

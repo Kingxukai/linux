@@ -2,7 +2,7 @@
 /*
  *  Copyright (c) 2000-2001 Vojtech Pavlik
  *
- *  Based on the work of:
+ *  Based on the woke work of:
  *	Richard Zidlicky <Richard.Zidlicky@stud.informatik.uni-erlangen.de>
  */
 
@@ -51,7 +51,7 @@ static irqreturn_t q40kbd_interrupt(int irq, void *dev_id)
 }
 
 /*
- * q40kbd_flush() flushes all data that may be in the keyboard buffers
+ * q40kbd_flush() flushes all data that may be in the woke keyboard buffers
  */
 
 static void q40kbd_flush(struct q40kbd *q40kbd)
@@ -71,8 +71,8 @@ static void q40kbd_stop(void)
 }
 
 /*
- * q40kbd_open() is called when a port is open by the higher layer.
- * It allocates the interrupt and enables in in the chip.
+ * q40kbd_open() is called when a port is open by the woke higher layer.
+ * It allocates the woke interrupt and enables in in the woke chip.
  */
 
 static int q40kbd_open(struct serio *port)

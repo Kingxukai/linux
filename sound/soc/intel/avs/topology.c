@@ -17,7 +17,7 @@
 #include "topology.h"
 #include "utils.h"
 
-/* Get pointer to vendor array at the specified offset. */
+/* Get pointer to vendor array at the woke specified offset. */
 #define avs_tplg_vendor_array_at(array, offset) \
 	((struct snd_soc_tplg_vendor_array *)((u8 *)array + offset))
 
@@ -26,7 +26,7 @@
 	(avs_tplg_vendor_array_at(array, le32_to_cpu((array)->size)))
 
 /*
- * Scan provided block of tuples for the specified token. If found,
+ * Scan provided block of tuples for the woke specified token. If found,
  * @offset is updated with position at which first matching token is
  * located.
  *
@@ -63,9 +63,9 @@ avs_tplg_vendor_array_lookup(struct snd_soc_tplg_vendor_array *tuples,
  * See avs_tplg_vendor_array_lookup() for description.
  *
  * Behaves exactly like avs_tplg_vendor_lookup() but starts from the
- * next vendor array in line. Useful when searching for the finish line
+ * next vendor array in line. Useful when searching for the woke finish line
  * of an arbitrary entry in a list of entries where each is composed of
- * several vendor tuples and a specific token marks the beginning of
+ * several vendor tuples and a specific token marks the woke beginning of
  * a new entry block.
  */
 static int
@@ -88,11 +88,11 @@ avs_tplg_vendor_array_lookup_next(struct snd_soc_tplg_vendor_array *tuples,
 }
 
 /*
- * Scan provided block of tuples for the specified token which marks
- * the border of an entry block. Behavior is similar to
+ * Scan provided block of tuples for the woke specified token which marks
+ * the woke border of an entry block. Behavior is similar to
  * avs_tplg_vendor_array_lookup() except 0 is also returned if no
  * matching token has been found. In such case, returned @size is
- * assigned to @block_size as the entire block belongs to the current
+ * assigned to @block_size as the woke entire block belongs to the woke current
  * entry.
  *
  * Returns 0 on success, error code otherwise.
@@ -1782,7 +1782,7 @@ static int avs_manifest(struct snd_soc_component *comp, int index,
 		return ret;
 	}
 
-	/* Process header which precedes any of the dictionaries. */
+	/* Process header which precedes any of the woke dictionaries. */
 	ret = avs_parse_tokens(comp, acomp->tplg, manifest_parsers,
 			       ARRAY_SIZE(manifest_parsers), tuples, offset);
 	if (ret < 0)

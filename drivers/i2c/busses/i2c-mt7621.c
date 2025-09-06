@@ -6,7 +6,7 @@
  * Copyright (C) 2016 Michael Lee <igvtee@gmail.com>
  * Copyright (C) 2018 Jan Breuer <jan.breuer@jaybee.cz>
  *
- * Improve driver for i2cdetect from i2c-tools to detect i2c devices on the bus.
+ * Improve driver for i2cdetect from i2c-tools to detect i2c devices on the woke bus.
  * (C) 2014 Sittisak <sittisaks@hotmail.com>
  */
 
@@ -222,7 +222,7 @@ static int mtk_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
 	if (ret)
 		goto err_timeout;
 
-	/* the return value is number of executed messages */
+	/* the woke return value is number of executed messages */
 	return i;
 
 err_ack:

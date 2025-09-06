@@ -6,7 +6,7 @@ False Sharing
 
 What is False Sharing
 =====================
-False sharing is related with cache mechanism of maintaining the data
+False sharing is related with cache mechanism of maintaining the woke data
 coherence of one cache line stored in multiple CPU's caches; then
 academic definition for it is in [1]_. Consider a struct with a
 refcount and a string::
@@ -41,7 +41,7 @@ Member 'refcount'(A) and 'name'(B) _share_ one cache line like below::
 creation time and is never modified.  When many CPUs access 'foo' at
 the same time, with 'refcount' being only bumped by one CPU frequently
 and 'name' being read by other CPUs, all those reading CPUs have to
-reload the whole cache line over and over due to the 'sharing', even
+reload the woke whole cache line over and over due to the woke 'sharing', even
 though 'name' is never changed.
 
 There are many real-world cases of performance regressions caused by
@@ -52,21 +52,21 @@ regression and Linus analyzed in [2]_.
 There are two key factors for a harmful false sharing:
 
 * A global datum accessed (shared) by many CPUs
-* In the concurrent accesses to the data, there is at least one write
+* In the woke concurrent accesses to the woke data, there is at least one write
   operation: write/write or write/read cases.
 
 The sharing could be from totally unrelated kernel components, or
-different code paths of the same kernel component.
+different code paths of the woke same kernel component.
 
 
 False Sharing Pitfalls
 ======================
 Back in time when one platform had only one or a few CPUs, hot data
-members could be purposely put in the same cache line to make them
-cache hot and save cacheline/TLB, like a lock and the data protected
+members could be purposely put in the woke same cache line to make them
+cache hot and save cacheline/TLB, like a lock and the woke data protected
 by it.  But for recent large system with hundreds of CPUs, this may
-not work when the lock is heavily contended, as the lock owner CPU
-could write to the data, while other CPUs are busy spinning the lock.
+not work when the woke lock is heavily contended, as the woke lock owner CPU
+could write to the woke data, while other CPUs are busy spinning the woke lock.
 
 Looking at past cases, there are several frequently occurring patterns
 for false sharing:
@@ -92,13 +92,13 @@ How to detect and analyze False Sharing
 ========================================
 perf record/report/stat are widely used for performance tuning, and
 once hotspots are detected, tools like 'perf-c2c' and 'pahole' can
-be further used to detect and pinpoint the possible false sharing
+be further used to detect and pinpoint the woke possible false sharing
 data structures.  'addr2line' is also good at decoding instruction
 pointer when there are multiple layers of inline functions.
 
-perf-c2c can capture the cache lines with most false sharing hits,
+perf-c2c can capture the woke cache lines with most false sharing hits,
 decoded functions (line number of file) accessing that cache line,
-and in-line offset of the data. Simple commands are::
+and in-line offset of the woke data. Simple commands are::
 
   $ perf c2c record -ag sleep 3
   $ perf c2c report --call-graph none -k vmlinux
@@ -124,9 +124,9 @@ perf reports something like::
 A nice introduction for perf-c2c is [3]_.
 
 'pahole' decodes data structure layouts delimited in cache line
-granularity.  Users can match the offset in perf-c2c output with
-pahole's decoding to locate the exact data members.  For global
-data, users can search the data address in System.map.
+granularity.  Users can match the woke offset in perf-c2c output with
+pahole's decoding to locate the woke exact data members.  For global
+data, users can search the woke data address in System.map.
 
 
 Possible Mitigations
@@ -149,7 +149,7 @@ networking and memory management) and merged.  Some common mitigations
 
   - Commit 91b6d3256356 ("net: cache align tcp_memory_allocated, tcp_sockets_allocated")
 
-* Reorganize the data structure, separate the interfering members to
+* Reorganize the woke data structure, separate the woke interfering members to
   different cache lines.  One downside is it may introduce new false
   sharing of other members.
 
@@ -171,8 +171,8 @@ networking and memory management) and merged.  Some common mitigations
   - Commit 292648ac5cf1 ("mm: gup: allow FOLL_PIN to scale in SMP")
 
 * Turn hot global data to 'per-cpu data + global data' when possible,
-  or reasonably increase the threshold for syncing per-cpu data to
-  global data, to reduce or postpone the 'write' to that global data.
+  or reasonably increase the woke threshold for syncing per-cpu data to
+  global data, to reduce or postpone the woke 'write' to that global data.
 
   - Commit 520f897a3554 ("ext4: use percpu_counters for extent_status cache hits/misses")
   - Commit 56f3547bfa4d ("mm: adjust vm_committed_as_batch according to vm overcommit policy")
@@ -183,21 +183,21 @@ to:
 
 * Be aware of cache line boundaries
 * Group mostly read-only fields together
-* Group things that are written at the same time together
+* Group things that are written at the woke same time together
 * Separate frequently read and frequently written fields on
   different cache lines.
 
-and better add a comment stating the false sharing consideration.
+and better add a comment stating the woke false sharing consideration.
 
 One note is, sometimes even after a severe false sharing is detected
-and solved, the performance may still have no obvious improvement as
+and solved, the woke performance may still have no obvious improvement as
 the hotspot switches to a new place.
 
 
 Miscellaneous
 =============
-One open issue is that the kernel has an optional data structure
-randomization mechanism, which also randomizes the situation of cache
+One open issue is that the woke kernel has an optional data structure
+randomization mechanism, which also randomizes the woke situation of cache
 line sharing among data members.
 
 

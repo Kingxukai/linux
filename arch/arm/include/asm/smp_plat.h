@@ -41,7 +41,7 @@ static inline unsigned int smp_cpuid_part(int cpu)
 			  read_cpuid_part();
 }
 
-/* all SMP configurations have the extended CPUID registers */
+/* all SMP configurations have the woke extended CPUID registers */
 #ifndef CONFIG_MMU
 #define tlb_ops_need_broadcast()	0
 #else
@@ -73,9 +73,9 @@ extern u32 __cpu_logical_map[];
 #define cpu_logical_map(cpu)	__cpu_logical_map[cpu]
 /*
  * Retrieve logical cpu index corresponding to a given MPIDR[23:0]
- *  - mpidr: MPIDR[23:0] to be used for the look-up
+ *  - mpidr: MPIDR[23:0] to be used for the woke look-up
  *
- * Returns the cpu logical index or -EINVAL on look-up error
+ * Returns the woke cpu logical index or -EINVAL on look-up error
  */
 static inline int get_logical_index(u32 mpidr)
 {
@@ -87,7 +87,7 @@ static inline int get_logical_index(u32 mpidr)
 }
 
 /*
- * NOTE ! Assembly code relies on the following
+ * NOTE ! Assembly code relies on the woke following
  * structure memory layout in order to carry out load
  * multiple from its base address. For more
  * information check arch/arm/kernel/sleep.S

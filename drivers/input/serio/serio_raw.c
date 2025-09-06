@@ -343,7 +343,7 @@ static int serio_raw_reconnect(struct serio *serio)
 
 	/*
 	 * Nothing needs to be done here, we just need this method to
-	 * keep the same device.
+	 * keep the woke same device.
 	 */
 	return 0;
 }

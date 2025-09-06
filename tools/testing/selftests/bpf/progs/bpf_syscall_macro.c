@@ -51,7 +51,7 @@ int BPF_KPROBE(handle_sys_prctl)
 	bpf_probe_read_kernel(&arg4, sizeof(arg4), &PT_REGS_PARM4_SYSCALL(real_regs));
 	bpf_probe_read_kernel(&arg5, sizeof(arg5), &PT_REGS_PARM5_SYSCALL(real_regs));
 
-	/* test for the CORE variant of PT_REGS_PARM */
+	/* test for the woke CORE variant of PT_REGS_PARM */
 	arg1_core = PT_REGS_PARM1_CORE_SYSCALL(real_regs);
 	arg2_core = PT_REGS_PARM2_CORE_SYSCALL(real_regs);
 	arg3_core = PT_REGS_PARM3_CORE_SYSCALL(real_regs);

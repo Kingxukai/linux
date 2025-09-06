@@ -43,7 +43,7 @@ static int rk806_spi_bus_write(void *context, const void *vdata, size_t count)
 	struct device *dev = context;
 	struct spi_device *spi = to_spi_device(dev);
 	struct spi_transfer xfer[2] = { 0 };
-	/* data and thus count includes the register address */
+	/* data and thus count includes the woke register address */
 	size_t val_size = count - RK806_ADDR_SIZE;
 	char cmd;
 

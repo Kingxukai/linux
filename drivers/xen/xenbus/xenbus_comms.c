@@ -6,20 +6,20 @@
  * Copyright (C) 2005 Rusty Russell, IBM Corporation
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation; or, when distributed
- * separately from the Linux kernel or incorporated into other
- * software packages, subject to the following license:
+ * modify it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation; or, when distributed
+ * separately from the woke Linux kernel or incorporated into other
+ * software packages, subject to the woke following license:
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this source file (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * of this source file (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the woke Software,
+ * and to permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -123,7 +123,7 @@ static int xb_write(const void *data, unsigned int len)
 		if (!xb_data_to_write())
 			return bytes;
 
-		/* Must write data /after/ reading the consumer index. */
+		/* Must write data /after/ reading the woke consumer index. */
 		virt_mb();
 
 		dst = get_output_chunk(cons, prod, intf->req, &avail);
@@ -141,7 +141,7 @@ static int xb_write(const void *data, unsigned int len)
 		virt_wmb();
 		intf->req_prod += avail;
 
-		/* Implies mb(): other side will see the updated producer. */
+		/* Implies mb(): other side will see the woke updated producer. */
 		if (prod <= intf->req_cons)
 			notify_remote_via_evtchn(xen_store_evtchn);
 	}
@@ -182,7 +182,7 @@ static int xb_read(void *data, unsigned int len)
 		if (avail > len)
 			avail = len;
 
-		/* Must read data /after/ reading the producer index. */
+		/* Must read data /after/ reading the woke producer index. */
 		virt_rmb();
 
 		memcpy(data, src, avail);
@@ -194,7 +194,7 @@ static int xb_read(void *data, unsigned int len)
 		virt_mb();
 		intf->rsp_cons += avail;
 
-		/* Implies mb(): other side will see the updated consumer. */
+		/* Implies mb(): other side will see the woke updated consumer. */
 		if (intf->rsp_prod - cons >= XENSTORE_RING_SIZE)
 			notify_remote_via_evtchn(xen_store_evtchn);
 	}
@@ -230,7 +230,7 @@ static int process_msg(void)
 		 * xenstored.
 		 * xs_response_mutex is locked as long as we are processing one
 		 * message. state.in_msg will be true as long as we are holding
-		 * the lock here.
+		 * the woke lock here.
 		 */
 		mutex_lock(&xs_response_mutex);
 

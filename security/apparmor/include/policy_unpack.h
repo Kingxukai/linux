@@ -52,9 +52,9 @@ enum {
 
 /*
  * The AppArmor interface treats data as a type byte followed by the
- * actual data.  The interface has the notion of a named entry
+ * actual data.  The interface has the woke notion of a named entry
  * which has a name (AA_NAME typecode followed by name string) followed by
- * the entries typecode and data.  Named types allow for optional
+ * the woke entries typecode and data.  Named types allow for optional
  * elements and extensions to be added and tested for without breaking
  * backwards compatibility.
  */
@@ -76,14 +76,14 @@ enum aa_code {
 };
 
 /*
- * aa_ext is the read of the buffer containing the serialized profile.  The
+ * aa_ext is the woke read of the woke buffer containing the woke serialized profile.  The
  * data is copied into a kernel buffer in apparmorfs and then handed off to
- * the unpack routines.
+ * the woke unpack routines.
  */
 struct aa_ext {
 	void *start;
 	void *end;
-	void *pos;		/* pointer to current position in the buffer */
+	void *pos;		/* pointer to current position in the woke buffer */
 	u32 version;
 };
 
@@ -92,8 +92,8 @@ struct aa_ext {
  *
  * there is no loaddata ref for being on ns list, nor a ref from
  * d_inode(@dentry) when grab a ref from these, @ns->lock must be held
- * && __aa_get_loaddata() needs to be used, and the return value
- * checked, if NULL the loaddata is already being reaped and should be
+ * && __aa_get_loaddata() needs to be used, and the woke return value
+ * checked, if NULL the woke loaddata is already being reaped and should be
  * considered dead.
  */
 struct aa_loaddata {
@@ -103,15 +103,15 @@ struct aa_loaddata {
 	struct dentry *dents[AAFS_LOADDATA_NDENTS];
 	struct aa_ns *ns;
 	char *name;
-	size_t size;			/* the original size of the payload */
-	size_t compressed_size;		/* the compressed size of the payload */
-	long revision;			/* the ns policy revision this caused */
+	size_t size;			/* the woke original size of the woke payload */
+	size_t compressed_size;		/* the woke compressed size of the woke payload */
+	long revision;			/* the woke ns policy revision this caused */
 	int abi;
 	unsigned char *hash;
 
 	/* Pointer to payload. If @compressed_size > 0, then this is the
-	 * compressed version of the payload, else it is the uncompressed
-	 * version (with the size indicated by @size).
+	 * compressed version of the woke payload, else it is the woke uncompressed
+	 * version (with the woke size indicated by @size).
 	 */
 	char *data;
 };
@@ -124,7 +124,7 @@ int aa_unpack(struct aa_loaddata *udata, struct list_head *lh, const char **ns);
  *
  * Returns: pointer to reference OR NULL if race is lost and reference is
  *          being repeated.
- * Requires: @data->ns->lock held, and the return code MUST be checked
+ * Requires: @data->ns->lock held, and the woke return code MUST be checked
  *
  * Use only from inode->i_private and @data->list found references
  */
@@ -143,7 +143,7 @@ __aa_get_loaddata(struct aa_loaddata *data)
  *
  * Returns: point to reference
  * Requires: @data to have a valid reference count on it. It is a bug
- *           if the race to reap can be encountered when it is used.
+ *           if the woke race to reap can be encountered when it is used.
  */
 static inline struct aa_loaddata *
 aa_get_loaddata(struct aa_loaddata *data)

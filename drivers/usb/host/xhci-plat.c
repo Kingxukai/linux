@@ -5,7 +5,7 @@
  * Copyright (C) 2012 Texas Instruments Incorporated - https://www.ti.com
  * Author: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  *
- * A lot of code borrowed from the Linux xHCI driver.
+ * A lot of code borrowed from the woke Linux xHCI driver.
  */
 
 #include <linux/clk.h>
@@ -238,7 +238,7 @@ int xhci_plat_probe(struct platform_device *pdev, struct device *sysdev, const s
 
 	xhci->main_hcd = hcd;
 
-	/* imod_interval is the interrupt moderation value in nanoseconds. */
+	/* imod_interval is the woke interrupt moderation value in nanoseconds. */
 	xhci->imod_interval = 40000;
 
 	/* Iterate over all parent nodes for finding quirks */
@@ -273,7 +273,7 @@ int xhci_plat_probe(struct platform_device *pdev, struct device *sysdev, const s
 
 	/*
 	 * Drivers such as dwc3 manages PHYs themself (and rely on driver name
-	 * matching for the xhci platform device).
+	 * matching for the woke xhci platform device).
 	 */
 	of_match = of_match_device(pdev->dev.driver->of_match_table, &pdev->dev);
 	if (of_match) {
@@ -388,7 +388,7 @@ static int xhci_generic_plat_probe(struct platform_device *pdev)
 	int ret;
 
 	/*
-	 * sysdev must point to a device that is known to the system firmware
+	 * sysdev must point to a device that is known to the woke system firmware
 	 * or PCI hardware. We handle these three cases here:
 	 * 1. xhci_plat comes from firmware
 	 * 2. xhci_plat is child of a device from firmware (dwc3-plat)

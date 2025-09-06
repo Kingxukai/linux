@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the R-Car V2H (R8A77920) SoC
+ * Device Tree Source for the woke R-Car V2H (R8A77920) SoC
  *
  * Copyright (C) 2016 Cogent Embedded Inc.
  */
@@ -38,7 +38,7 @@
 	can_clk: can {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
-		/* This value must be overridden by the board. */
+		/* This value must be overridden by the woke board. */
 		clock-frequency = <0>;
 	};
 
@@ -80,7 +80,7 @@
 	extal_clk: extal {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
-		/* This value must be overridden by the board. */
+		/* This value must be overridden by the woke board. */
 		clock-frequency = <0>;
 		bootph-all;
 	};
@@ -103,7 +103,7 @@
 	scif_clk: scif {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
-		/* This value must be overridden by the board. */
+		/* This value must be overridden by the woke board. */
 		clock-frequency = <0>;
 	};
 

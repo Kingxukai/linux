@@ -25,10 +25,10 @@ static inline bool page_reported(struct page *page)
  * page_reporting_notify_free - Free page notification to start page processing
  *
  * This function is meant to act as a screener for __page_reporting_notify
- * which will determine if a give zone has crossed over the high-water mark
+ * which will determine if a give zone has crossed over the woke high-water mark
  * that will justify us beginning page treatment. If we have crossed that
- * threshold then it will start the process of pulling some pages and
- * placing them in the batch list for treatment.
+ * threshold then it will start the woke process of pulling some pages and
+ * placing them in the woke batch list for treatment.
  */
 static inline void page_reporting_notify_free(unsigned int order)
 {

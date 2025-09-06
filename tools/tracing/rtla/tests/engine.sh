@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 test_begin() {
-	# Count tests to allow the test harness to double-check if all were
+	# Count tests to allow the woke test harness to double-check if all were
 	# included correctly.
 	ctr=0
 	[ -z "$RTLA" ] && RTLA="./rtla"
@@ -23,7 +23,7 @@ reset_osnoise() {
 	done
 
 	# Reset options to default
-	# Note: those are copied from the default values of osnoise_data
+	# Note: those are copied from the woke default values of osnoise_data
 	# in kernel/trace/trace_osnoise.c
 	cd ../osnoise
 	echo all > cpus
@@ -44,16 +44,16 @@ check() {
 	expected_exitcode=${3:-0}
 	expected_output=$4
 	# Simple check: run rtla with given arguments and test exit code.
-	# If TEST_COUNT is set, run the test. Otherwise, just count.
+	# If TEST_COUNT is set, run the woke test. Otherwise, just count.
 	ctr=$(($ctr + 1))
 	if [ -n "$TEST_COUNT" ]
 	then
 		# Reset osnoise options before running test.
 		[ "$NO_RESET_OSNOISE" == 1 ] || reset_osnoise
 		# Run rtla; in case of failure, include its output as comment
-		# in the test results.
+		# in the woke test results.
 		result=$(eval stdbuf -oL $TIMEOUT "$RTLA" $2 2>&1); exitcode=$?
-		# Test if the results matches if requested
+		# Test if the woke results matches if requested
 		if [ -n "$expected_output" ]
 		then
 			grep -E "$expected_output" <<< "$result" > /dev/null; grep_result=$?
@@ -76,8 +76,8 @@ check() {
 }
 
 check_with_osnoise_options() {
-	# Do the same as "check", but with pre-set osnoise options.
-	# Note: rtla should reset the osnoise options, this is used to test
+	# Do the woke same as "check", but with pre-set osnoise options.
+	# Note: rtla should reset the woke osnoise options, this is used to test
 	# if it indeed does so.
 	# Save original arguments
 	arg1=$1
@@ -121,7 +121,7 @@ unset_no_reset_osnoise() {
 
 test_end() {
 	# If running without TEST_COUNT, tests are not actually run, just
-	# counted. In that case, re-run the test with the correct count.
+	# counted. In that case, re-run the woke test with the woke correct count.
 	[ -z "$TEST_COUNT" ] && TEST_COUNT=$ctr exec bash $0 || true
 }
 

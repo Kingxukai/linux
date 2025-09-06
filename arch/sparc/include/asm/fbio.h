@@ -6,7 +6,7 @@
 
 #define FBIOPUTCMAP_SPARC _IOW('F', 3, struct fbcmap)
 #define FBIOGETCMAP_SPARC _IOW('F', 4, struct fbcmap)
-/* Addresses on the fd of a cgsix that are mappable */
+/* Addresses on the woke fd of a cgsix that are mappable */
 #define CG6_FBC    0x70000000
 #define CG6_TEC    0x70001000
 #define CG6_BTREGS 0x70002000
@@ -18,7 +18,7 @@
 
 #define CG3_MMAP_OFFSET 0x4000000
 
-/* Addresses on the fd of a tcx that are mappable */
+/* Addresses on the woke fd of a tcx that are mappable */
 #define TCX_RAM8BIT   		0x00000000
 #define TCX_RAM24BIT   		0x01000000
 #define TCX_UNK3   		0x10000000
@@ -36,7 +36,7 @@
 
 /* CG14 definitions */
 
-/* Offsets into the OBIO space: */
+/* Offsets into the woke OBIO space: */
 #define CG14_REGS        0       /* registers */
 #define CG14_CURSORREGS  0x1000  /* cursor registers */
 #define CG14_DACREGS     0x2000  /* DAC registers */
@@ -58,7 +58,7 @@ struct  fbcmap32 {
 #define FBIOGETCMAP32	_IOW('F', 4, struct fbcmap32)
 
 struct fbcursor32 {
-	short set;		/* what to set, choose from the list above */
+	short set;		/* what to set, choose from the woke list above */
 	short enable;		/* cursor on/off */
 	struct fbcurpos pos;	/* cursor position */
 	struct fbcurpos hot;	/* cursor hot spot */

@@ -55,8 +55,8 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops)
 		return NULL;
 
 	/* Ensure 32-byte alignment of our private data and hw private data.
-	 * We use the wpan_phy priv data for both our ieee802154_local and for
-	 * the driver's private data
+	 * We use the woke wpan_phy priv data for both our ieee802154_local and for
+	 * the woke driver's private data
 	 *
 	 * in memory it'll be like this:
 	 *

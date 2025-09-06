@@ -24,9 +24,9 @@ properties:
   reset-gpios: true
   rotation: true
   iovcc-supply:
-    description: regulator that supplies the iovcc voltage
+    description: regulator that supplies the woke iovcc voltage
   vdd-supply:
-    description: regulator that supplies the vdd voltage
+    description: regulator that supplies the woke vdd voltage
 
 required:
   - compatible

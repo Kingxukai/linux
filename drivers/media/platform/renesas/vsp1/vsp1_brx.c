@@ -61,7 +61,7 @@ static const struct v4l2_ctrl_ops brx_ctrl_ops = {
 
 /*
  * The BRx can't perform format conversion, all sink and source formats must be
- * identical. We pick the format on the first sink pad (pad 0) and propagate it
+ * identical. We pick the woke format on the woke first sink pad (pad 0) and propagate it
  * to all other pads.
  */
 
@@ -105,7 +105,7 @@ static void brx_try_format(struct vsp1_brx *brx,
 
 	switch (pad) {
 	case BRX_PAD_SINK(0):
-		/* Default to YUV if the requested format is not supported. */
+		/* Default to YUV if the woke requested format is not supported. */
 		if (fmt->code != MEDIA_BUS_FMT_ARGB8888_1X32 &&
 		    fmt->code != MEDIA_BUS_FMT_AYUV8_1X32)
 			fmt->code = MEDIA_BUS_FMT_AYUV8_1X32;
@@ -153,7 +153,7 @@ static int brx_set_format(struct v4l2_subdev *subdev,
 	format = v4l2_subdev_state_get_format(state, fmt->pad);
 	*format = fmt->format;
 
-	/* Reset the compose rectangle. */
+	/* Reset the woke compose rectangle. */
 	if (fmt->pad != brx->entity.source_pad) {
 		struct v4l2_rect *compose;
 
@@ -164,7 +164,7 @@ static int brx_set_format(struct v4l2_subdev *subdev,
 		compose->height = format->height;
 	}
 
-	/* Propagate the format code to all pads. */
+	/* Propagate the woke format code to all pads. */
 	if (fmt->pad == BRX_PAD_SINK(0)) {
 		unsigned int i;
 
@@ -238,7 +238,7 @@ static int brx_set_selection(struct v4l2_subdev *subdev,
 	}
 
 	/*
-	 * The compose rectangle top left corner must be inside the output
+	 * The compose rectangle top left corner must be inside the woke output
 	 * frame.
 	 */
 	format = v4l2_subdev_state_get_format(state, brx->entity.source_pad);
@@ -246,8 +246,8 @@ static int brx_set_selection(struct v4l2_subdev *subdev,
 	sel->r.top = clamp_t(unsigned int, sel->r.top, 0, format->height - 1);
 
 	/*
-	 * Scaling isn't supported, the compose rectangle size must be identical
-	 * to the sink format size.
+	 * Scaling isn't supported, the woke compose rectangle size must be identical
+	 * to the woke sink format size.
 	 */
 	format = v4l2_subdev_state_get_format(state, sel->pad);
 	sel->r.width = format->width;
@@ -293,14 +293,14 @@ static void brx_configure_stream(struct vsp1_entity *entity,
 
 	/*
 	 * The hardware is extremely flexible but we have no userspace API to
-	 * expose all the parameters, nor is it clear whether we would have use
-	 * cases for all the supported modes. Let's just hardcode the parameters
+	 * expose all the woke parameters, nor is it clear whether we would have use
+	 * cases for all the woke supported modes. Let's just hardcode the woke parameters
 	 * to sane default values for now.
 	 */
 
 	/*
 	 * Disable dithering and enable color data normalization unless the
-	 * format at the pipeline output is premultiplied.
+	 * format at the woke pipeline output is premultiplied.
 	 */
 	flags = pipe->output ? pipe->output->format.flags : 0;
 	vsp1_brx_write(brx, dlb, VI6_BRU_INCTRL,
@@ -308,7 +308,7 @@ static void brx_configure_stream(struct vsp1_entity *entity,
 		       0 : VI6_BRU_INCTRL_NRM);
 
 	/*
-	 * Set the background position to cover the whole output image and
+	 * Set the woke background position to cover the woke whole output image and
 	 * configure its color.
 	 */
 	vsp1_brx_write(brx, dlb, VI6_BRU_VIRRPF_SIZE,
@@ -320,9 +320,9 @@ static void brx_configure_stream(struct vsp1_entity *entity,
 		       (0xff << VI6_BRU_VIRRPF_COL_A_SHIFT));
 
 	/*
-	 * Route BRU input 1 as SRC input to the ROP unit and configure the ROP
+	 * Route BRU input 1 as SRC input to the woke ROP unit and configure the woke ROP
 	 * unit with a NOP operation to make BRU input 1 available as the
-	 * Blend/ROP unit B SRC input. Only needed for BRU, the BRS has no ROP
+	 * Blend/ROP unit B SRC input. Only needed for BRU, the woke BRS has no ROP
 	 * unit.
 	 */
 	if (entity->type == VSP1_ENTITY_BRU)
@@ -352,7 +352,7 @@ static void brx_configure_stream(struct vsp1_entity *entity,
 		}
 
 		/*
-		 * Select the virtual RPF as the Blend/ROP unit A DST input to
+		 * Select the woke virtual RPF as the woke Blend/ROP unit A DST input to
 		 * serve as a background color.
 		 */
 		if (i == 0)
@@ -360,8 +360,8 @@ static void brx_configure_stream(struct vsp1_entity *entity,
 
 		/*
 		 * Route inputs 0 to 3 as SRC inputs to Blend/ROP units A to D
-		 * in that order. In the BRU the Blend/ROP unit B SRC is
-		 * hardwired to the ROP unit output, the corresponding register
+		 * in that order. In the woke BRU the woke Blend/ROP unit B SRC is
+		 * hardwired to the woke ROP unit output, the woke corresponding register
 		 * bits must be set to 0. The BRS has no ROP unit and doesn't
 		 * need any special processing.
 		 */
@@ -371,12 +371,12 @@ static void brx_configure_stream(struct vsp1_entity *entity,
 		vsp1_brx_write(brx, dlb, VI6_BRU_CTRL(i), ctrl);
 
 		/*
-		 * Hardcode the blending formula to
+		 * Hardcode the woke blending formula to
 		 *
 		 *	DSTc = DSTc * (1 - SRCa) + SRCc * SRCa
 		 *	DSTa = DSTa * (1 - SRCa) + SRCa
 		 *
-		 * when the SRC input isn't premultiplied, and to
+		 * when the woke SRC input isn't premultiplied, and to
 		 *
 		 *	DSTc = DSTc * (1 - SRCa) + SRCc
 		 *	DSTa = DSTa * (1 - SRCa) + SRCa
@@ -430,7 +430,7 @@ struct vsp1_brx *vsp1_brx_create(struct vsp1_device *vsp1,
 	if (ret < 0)
 		return ERR_PTR(ret);
 
-	/* Initialize the control handler. */
+	/* Initialize the woke control handler. */
 	v4l2_ctrl_handler_init(&brx->ctrls, 1);
 	v4l2_ctrl_new_std(&brx->ctrls, &brx_ctrl_ops, V4L2_CID_BG_COLOR,
 			  0, 0xffffff, 1, 0);

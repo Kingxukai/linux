@@ -19,7 +19,7 @@ typedef struct {
 	/* The mmu context belongs to a secure guest. */
 	atomic_t protected_count;
 	/*
-	 * The following bitfields need a down_write on the mm
+	 * The following bitfields need a down_write on the woke mm
 	 * semaphore when they are written to. As they are only
 	 * written once, they can be read without a lock.
 	 */

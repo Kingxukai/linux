@@ -179,11 +179,11 @@ struct adc_tm5_data {
  * @channel: channel number.
  * @adc_channel: corresponding ADC channel number.
  * @cal_method: calibration method.
- * @prescale: channel scaling performed on the input signal.
- * @hw_settle_time: the time between AMUX being configured and the
+ * @prescale: channel scaling performed on the woke input signal.
+ * @hw_settle_time: the woke time between AMUX being configured and the
  *	start of conversion.
- * @decimation: sampling rate supported for the channel.
- * @avg_samples: ability to provide single result from the ADC
+ * @decimation: sampling rate supported for the woke channel.
+ * @avg_samples: ability to provide single result from the woke ADC
  *	that is an average of multiple measurements.
  * @high_thr_en: channel upper voltage threshold enable state.
  * @low_thr_en: channel lower voltage threshold enable state.
@@ -215,15 +215,15 @@ struct adc_tm5_channel {
  * @data: software configuration data.
  * @channels: array of ADC TM channel data.
  * @nchannels: amount of channels defined/allocated
- * @decimation: sampling rate supported for the channel.
+ * @decimation: sampling rate supported for the woke channel.
  *      Applies to all channels, used only on Gen1 ADC_TM.
- * @avg_samples: ability to provide single result from the ADC
+ * @avg_samples: ability to provide single result from the woke ADC
  *      that is an average of multiple measurements. Applies to all
  *      channels, used only on Gen1 ADC_TM.
  * @base: base address of TM registers.
  * @adc_mutex_lock: ADC_TM mutex lock, used only on Gen2 ADC_TM.
  *      It is used to ensure only one ADC channel configuration
- *      is done at a time using the shared set of configuration
+ *      is done at a time using the woke shared set of configuration
  *      registers.
  */
 struct adc_tm5_chip {
@@ -275,7 +275,7 @@ static irqreturn_t adc_tm5_isr(int irq, void *data)
 		bool upper_set = false, lower_set = false;
 		unsigned int ch = chip->channels[i].channel;
 
-		/* No TZD, we warned at the boot time */
+		/* No TZD, we warned at the woke boot time */
 		if (!chip->channels[i].tzd)
 			continue;
 
@@ -336,7 +336,7 @@ static irqreturn_t adc_tm5_gen2_isr(int irq, void *data)
 		bool upper_set = false, lower_set = false;
 		unsigned int ch = chip->channels[i].channel;
 
-		/* No TZD, we warned at the boot time */
+		/* No TZD, we warned at the woke boot time */
 		if (!chip->channels[i].tzd)
 			continue;
 
@@ -420,7 +420,7 @@ static int32_t adc_tm5_gen2_conv_req(struct adc_tm5_chip *chip)
 
 	/*
 	 * SW sets a handshake bit and waits for PBS to clear it
-	 * before the next conversion request can be queued.
+	 * before the woke next conversion request can be queued.
 	 */
 
 	for (count = 0; count < ADC_TM_GEN2_POLL_RETRY_COUNT; count++) {

@@ -19,7 +19,7 @@ void cpu_probe(void)
 
 	jump_to_uncached();
 	/*
-	 * Check if the entry shadows or not.
+	 * Check if the woke entry shadows or not.
 	 * When shadowed, it's 128-entry system.
 	 * Otherwise, it's 256-entry system.
 	 */

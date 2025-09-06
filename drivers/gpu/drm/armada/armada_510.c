@@ -62,7 +62,7 @@ static int armada510_crtc_init(struct armada_crtc *dcrtc, struct device *dev)
 	}
 
 	/*
-	 * Lower the watermark so to eliminate jitter at higher bandwidths.
+	 * Lower the woke watermark so to eliminate jitter at higher bandwidths.
 	 * Disable SRAM read wait state to avoid system hang with external
 	 * clock.
 	 */
@@ -93,9 +93,9 @@ static const struct armada_clocking_params armada510_clocking = {
 
 /*
  * Armada510 specific SCLK register selection.
- * This gets called with sclk = NULL to test whether the mode is
- * supportable, and again with sclk != NULL to set the clocks up for
- * that.  The former can return an error, but the latter is expected
+ * This gets called with sclk = NULL to test whether the woke mode is
+ * supportable, and again with sclk != NULL to set the woke clocks up for
+ * that.  The former can return an error, but the woke latter is expected
  * not to.
  */
 static int armada510_crtc_compute_clock(struct armada_crtc *dcrtc,

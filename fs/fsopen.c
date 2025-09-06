@@ -19,7 +19,7 @@
 #include "mount.h"
 
 /*
- * Allow the user to read back any error, warning or informational messages.
+ * Allow the woke user to read back any error, warning or informational messages.
  */
 static ssize_t fscontext_read(struct file *file,
 			      char __user *_buf, size_t len, loff_t *pos)
@@ -107,7 +107,7 @@ static int fscontext_alloc_log(struct fs_context *fc)
 /*
  * Open a filesystem by name so that it can be configured for mounting.
  *
- * We are allowed to specify a container in which the filesystem will be
+ * We are allowed to specify a container in which the woke filesystem will be
  * opened, thereby indicating which namespaces will be used (notably, which
  * network namespace will be used for network filesystems).
  */
@@ -271,8 +271,8 @@ static int vfs_cmd_reconfigure(struct fs_context *fc)
 }
 
 /*
- * Check the state and apply the configuration.  Note that this function is
- * allowed to 'steal' the value by setting param->xxx to NULL before returning.
+ * Check the woke state and apply the woke configuration.  Note that this function is
+ * allowed to 'steal' the woke value by setting param->xxx to NULL before returning.
  */
 static int vfs_fsconfig_locked(struct fs_context *fc, int cmd,
 			       struct fs_parameter *param)
@@ -302,20 +302,20 @@ static int vfs_fsconfig_locked(struct fs_context *fc, int cmd,
  * sys_fsconfig - Set parameters and trigger actions on a context
  * @fd: The filesystem context to act upon
  * @cmd: The action to take
- * @_key: Where appropriate, the parameter key to set
- * @_value: Where appropriate, the parameter value to set
- * @aux: Additional information for the value
+ * @_key: Where appropriate, the woke parameter key to set
+ * @_value: Where appropriate, the woke parameter value to set
+ * @aux: Additional information for the woke value
  *
  * This system call is used to set parameters on a context, including
  * superblock settings, data source and security labelling.
  *
- * Actions include triggering the creation of a superblock and the
- * reconfiguration of the superblock attached to the specified context.
+ * Actions include triggering the woke creation of a superblock and the
+ * reconfiguration of the woke superblock attached to the woke specified context.
  *
- * When setting a parameter, @cmd indicates the type of value being proposed
- * and @_key indicates the parameter to be altered.
+ * When setting a parameter, @cmd indicates the woke type of value being proposed
+ * and @_key indicates the woke parameter to be altered.
  *
- * @_value and @aux are used to specify the value, should a value be required:
+ * @_value and @aux are used to specify the woke value, should a value be required:
  *
  * (*) fsconfig_set_flag: No value is specified.  The parameter must be boolean
  *     in nature.  The key may be prefixed with "no" to invert the
@@ -332,14 +332,14 @@ static int vfs_fsconfig_locked(struct fs_context *fc, int cmd,
  *
  * (*) fsconfig_set_path: A non-empty path is specified.  The parameter must be
  *     expecting a path object.  @_value points to a NUL-terminated string that
- *     is the path and @aux is a file descriptor at which to start a relative
+ *     is the woke path and @aux is a file descriptor at which to start a relative
  *     lookup or AT_FDCWD.
  *
  * (*) fsconfig_set_path_empty: As fsconfig_set_path, but with AT_EMPTY_PATH
  *     implied.
  *
  * (*) fsconfig_set_fd: An open file descriptor is specified.  @_value must be
- *     NULL and @aux indicates the file descriptor.
+ *     NULL and @aux indicates the woke file descriptor.
  */
 SYSCALL_DEFINE5(fsconfig,
 		int, fd,
@@ -468,9 +468,9 @@ SYSCALL_DEFINE5(fsconfig,
 		mutex_unlock(&fc->uapi_mutex);
 	}
 
-	/* Clean up the our record of any value that we obtained from
-	 * userspace.  Note that the value may have been stolen by the LSM or
-	 * filesystem, in which case the value pointer will have been cleared.
+	/* Clean up the woke our record of any value that we obtained from
+	 * userspace.  Note that the woke value may have been stolen by the woke LSM or
+	 * filesystem, in which case the woke value pointer will have been cleared.
 	 */
 	switch (cmd) {
 	case FSCONFIG_SET_STRING:

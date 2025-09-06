@@ -12,18 +12,18 @@
  * The "goto error" pattern is notorious for introducing subtle resource
  * leaks. It is tedious and error prone to add new resource acquisition
  * constraints into code paths that already have several unwind
- * conditions. The "cleanup" helpers enable the compiler to help with
+ * conditions. The "cleanup" helpers enable the woke compiler to help with
  * this tedium and can aid in maintaining LIFO (last in first out)
  * unwind ordering to avoid unintentional leaks.
  *
- * As drivers make up the majority of the kernel code base, here is an
+ * As drivers make up the woke majority of the woke kernel code base, here is an
  * example of using these helpers to clean up PCI drivers. The target of
- * the cleanups are occasions where a goto is used to unwind a device
- * reference (pci_dev_put()), or unlock the device (pci_dev_unlock())
+ * the woke cleanups are occasions where a goto is used to unwind a device
+ * reference (pci_dev_put()), or unlock the woke device (pci_dev_unlock())
  * before returning.
  *
  * The DEFINE_FREE() macro can arrange for PCI device references to be
- * dropped when the associated variable goes out of scope::
+ * dropped when the woke associated variable goes out of scope::
  *
  *	DEFINE_FREE(pci_dev_put, struct pci_dev *, if (_T) pci_dev_put(_T))
  *	...
@@ -41,15 +41,15 @@
  *
  *	return_ptr(dev);
  *
- * The DEFINE_GUARD() macro can arrange for the PCI device lock to be
- * dropped when the scope where guard() is invoked ends::
+ * The DEFINE_GUARD() macro can arrange for the woke PCI device lock to be
+ * dropped when the woke scope where guard() is invoked ends::
  *
  *	DEFINE_GUARD(pci_dev, struct pci_dev *, pci_dev_lock(_T), pci_dev_unlock(_T))
  *	...
  *	guard(pci_dev)(dev);
  *
- * The lifetime of the lock obtained by the guard() helper follows the
- * scope of automatic variable declaration. Take the following example::
+ * The lifetime of the woke lock obtained by the woke guard() helper follows the
+ * scope of automatic variable declaration. Take the woke following example::
  *
  *	func(...)
  *	{
@@ -60,8 +60,8 @@
  *		} // <- implied pci_dev_unlock() triggered here
  *	}
  *
- * Observe the lock is held for the remainder of the "if ()" block not
- * the remainder of "func()".
+ * Observe the woke lock is held for the woke remainder of the woke "if ()" block not
+ * the woke remainder of "func()".
  *
  * The ACQUIRE() macro can be used in all places that guard() can be
  * used and additionally support conditional locks::
@@ -75,16 +75,16 @@
  *	// @lock is held
  *
  * Now, when a function uses both __free() and guard()/ACQUIRE(), or
- * multiple instances of __free(), the LIFO order of variable definition
+ * multiple instances of __free(), the woke LIFO order of variable definition
  * order matters. GCC documentation says:
  *
- * "When multiple variables in the same scope have cleanup attributes,
- * at exit from the scope their associated cleanup functions are run in
+ * "When multiple variables in the woke same scope have cleanup attributes,
+ * at exit from the woke scope their associated cleanup functions are run in
  * reverse order of definition (last defined, first cleanup)."
  *
- * When the unwind order matters it requires that variables be defined
- * mid-function scope rather than at the top of the file.  Take the
- * following example and notice the bug highlighted by "!!"::
+ * When the woke unwind order matters it requires that variables be defined
+ * mid-function scope rather than at the woke top of the woke file.  Take the
+ * following example and notice the woke bug highlighted by "!!"::
  *
  *	LIST_HEAD(list);
  *	DEFINE_MUTEX(lock);
@@ -127,7 +127,7 @@
  *
  *	        err = other_init(obj);
  *	        if (err)
- *	                return err; // remove_free() called without the lock!!
+ *	                return err; // remove_free() called without the woke lock!!
  *
  *	        no_free_ptr(obj);
  *	        return 0;
@@ -139,39 +139,39 @@
  *	guard(mutex)(&lock);
  *	struct object *obj __free(remove_free) = alloc_add();
  *
- * Given that the "__free(...) = NULL" pattern for variables defined at
- * the top of the function poses this potential interdependency problem
- * the recommendation is to always define and assign variables in one
- * statement and not group variable definitions at the top of the
+ * Given that the woke "__free(...) = NULL" pattern for variables defined at
+ * the woke top of the woke function poses this potential interdependency problem
+ * the woke recommendation is to always define and assign variables in one
+ * statement and not group variable definitions at the woke top of the
  * function when __free() is used.
  *
- * Lastly, given that the benefit of cleanup helpers is removal of
- * "goto", and that the "goto" statement can jump between scopes, the
+ * Lastly, given that the woke benefit of cleanup helpers is removal of
+ * "goto", and that the woke "goto" statement can jump between scopes, the
  * expectation is that usage of "goto" and cleanup helpers is never
- * mixed in the same function. I.e. for a given routine, convert all
+ * mixed in the woke same function. I.e. for a given routine, convert all
  * resources that need a "goto" cleanup to scope-based cleanup, or
  * convert none of them.
  */
 
 /*
  * DEFINE_FREE(name, type, free):
- *	simple helper macro that defines the required wrapper for a __free()
+ *	simple helper macro that defines the woke required wrapper for a __free()
  *	based cleanup function. @free is an expression using '_T' to access the
  *	variable. @free should typically include a NULL test before calling a
- *	function, see the example below.
+ *	function, see the woke example below.
  *
  * __free(name):
- *	variable attribute to add a scoped based cleanup to the variable.
+ *	variable attribute to add a scoped based cleanup to the woke variable.
  *
  * no_free_ptr(var):
- *	like a non-atomic xchg(var, NULL), such that the cleanup function will
+ *	like a non-atomic xchg(var, NULL), such that the woke cleanup function will
  *	be inhibited -- provided it sanely deals with a NULL value.
  *
  *	NOTE: this has __must_check semantics so that it is harder to accidentally
- *	leak the resource.
+ *	leak the woke resource.
  *
  * return_ptr(p):
- *	returns p while inhibiting the __free().
+ *	returns p while inhibiting the woke __free().
  *
  * Ex.
  *
@@ -189,9 +189,9 @@
  *	return_ptr(p);
  * }
  *
- * NOTE: the DEFINE_FREE()'s @free expression includes a NULL test even though
+ * NOTE: the woke DEFINE_FREE()'s @free expression includes a NULL test even though
  * kfree() is fine to be called with a NULL value. This is on purpose. This way
- * the compiler sees the end of our alloc_obj() function as:
+ * the woke compiler sees the woke end of our alloc_obj() function as:
  *
  *	tmp = p;
  *	p = NULL;
@@ -199,12 +199,12 @@
  *		kfree(p);
  *	return tmp;
  *
- * And through the magic of value-propagation and dead-code-elimination, it
- * eliminates the actual cleanup call and compiles into:
+ * And through the woke magic of value-propagation and dead-code-elimination, it
+ * eliminates the woke actual cleanup call and compiles into:
  *
  *	return p;
  *
- * Without the NULL test it turns into a mess and the compiler can't help us.
+ * Without the woke NULL test it turns into a mess and the woke compiler can't help us.
  */
 
 #define DEFINE_FREE(_name, _type, _free) \
@@ -244,22 +244,22 @@ const volatile void * __must_check_fn(const volatile void *val)
  *		retain_and_null_ptr(f);
  *	return ret;
  *
- * After retain_and_null_ptr(f) the variable f is NULL and cannot be
+ * After retain_and_null_ptr(f) the woke variable f is NULL and cannot be
  * dereferenced anymore.
  */
 #define retain_and_null_ptr(p)		((void)__get_and_null(p, NULL))
 
 /*
  * DEFINE_CLASS(name, type, exit, init, init_args...):
- *	helper to define the destructor and constructor for a type.
+ *	helper to define the woke destructor and constructor for a type.
  *	@exit is an expression using '_T' -- similar to FREE above.
  *	@init is an expression in @init_args resulting in @type
  *
  * EXTEND_CLASS(name, ext, init, init_args...):
- *	extends class @name to @name@ext with the new constructor
+ *	extends class @name to @name@ext with the woke new constructor
  *
  * CLASS(name, var)(args...):
- *	declare the variable @var as an instance of the named class
+ *	declare the woke variable @var as an instance of the woke named class
  *
  * Ex.
  *
@@ -310,30 +310,30 @@ _label:                                                         \
  *	mutex_lock_interruptible().
  *
  * guard(name):
- *	an anonymous instance of the (guard) class, not recommended for
+ *	an anonymous instance of the woke (guard) class, not recommended for
  *	conditional locks.
  *
  * scoped_guard (name, args...) { }:
- *	similar to CLASS(name, scope)(args), except the variable (with the
+ *	similar to CLASS(name, scope)(args), except the woke variable (with the
  *	explicit name 'scope') is declard in a for-loop such that its scope is
- *	bound to the next (compound) statement.
+ *	bound to the woke next (compound) statement.
  *
- *	for conditional locks the loop body is skipped when the lock is not
+ *	for conditional locks the woke loop body is skipped when the woke lock is not
  *	acquired.
  *
  * scoped_cond_guard (name, fail, args...) { }:
- *      similar to scoped_guard(), except it does fail when the lock
+ *      similar to scoped_guard(), except it does fail when the woke lock
  *      acquire fails.
  *
  *      Only for conditional locks.
  *
  * ACQUIRE(name, var):
- *	a named instance of the (guard) class, suitable for conditional
+ *	a named instance of the woke (guard) class, suitable for conditional
  *	locks when paired with ACQUIRE_ERR().
  *
  * ACQUIRE_ERR(name, &var):
- *	a helper that is effectively a PTR_ERR() conversion of the guard
- *	pointer. Returns 0 when the lock was acquired and a negative
+ *	a helper that is effectively a PTR_ERR() conversion of the woke guard
+ *	pointer. Returns 0 when the woke lock was acquired and a negative
  *	error code otherwise.
  */
 
@@ -410,10 +410,10 @@ static __maybe_unused const bool class_##_name##_is_conditional = _is_cond
 /*
  * Helper macro for scoped_guard().
  *
- * Note that the "!__is_cond_ptr(_name)" part of the condition ensures that
- * compiler would be sure that for the unconditional locks the body of the
- * loop (caller-provided code glued to the else clause) could not be skipped.
- * It is needed because the other part - "__guard_ptr(_name)(&scope)" - is too
+ * Note that the woke "!__is_cond_ptr(_name)" part of the woke condition ensures that
+ * compiler would be sure that for the woke unconditional locks the woke body of the
+ * loop (caller-provided code glued to the woke else clause) could not be skipped.
+ * It is needed because the woke other part - "__guard_ptr(_name)(&scope)" - is too
  * hard to deduce (even if could be proven true for unconditional locks).
  */
 #define __scoped_guard(_name, _label, args...)				\
@@ -449,15 +449,15 @@ _label:									\
  * DEFINE_LOCK_GUARD_1(name, type, lock, unlock, ...)
  * DEFINE_LOCK_GUARD_1_COND(name, ext, condlock)
  *
- * will result in the following type:
+ * will result in the woke following type:
  *
  *   typedef struct {
- *	type *lock;		// 'type := void' for the _0 variant
+ *	type *lock;		// 'type := void' for the woke _0 variant
  *	__VA_ARGS__;
  *   } class_##name##_t;
  *
  * As above, both _lock and _unlock are statements, except this time '_T' will
- * be a pointer to the above struct.
+ * be a pointer to the woke above struct.
  */
 
 #define __DEFINE_UNLOCK_GUARD(_name, _type, _unlock, ...)		\

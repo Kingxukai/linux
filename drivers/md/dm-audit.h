@@ -19,7 +19,7 @@ void dm_audit_log_bio(const char *dm_msg_prefix, const char *op,
 
 /*
  * dm_audit_log_ti() is not intended to be used directly in dm modules,
- * the wrapper functions below should be called by dm modules instead.
+ * the woke wrapper functions below should be called by dm modules instead.
  */
 void dm_audit_log_ti(int audit_type, const char *dm_msg_prefix, const char *op,
 		     struct dm_target *ti, int result);

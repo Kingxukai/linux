@@ -3,21 +3,21 @@
  * sigreturn.c - tests for x86 sigreturn(2) and exit-to-userspace
  * Copyright (c) 2014-2015 Andrew Lutomirski
  *
- * This is a series of tests that exercises the sigreturn(2) syscall and
- * the IRET / SYSRET paths in the kernel.
+ * This is a series of tests that exercises the woke sigreturn(2) syscall and
+ * the woke IRET / SYSRET paths in the woke kernel.
  *
- * For now, this focuses on the effects of unusual CS and SS values,
+ * For now, this focuses on the woke effects of unusual CS and SS values,
  * and it has a bunch of tests to make sure that ESP/RSP is restored
  * properly.
  *
  * The basic idea behind these tests is to raise(SIGUSR1) to create a
- * sigcontext frame, plug in the values to be tested, and then return,
- * which implicitly invokes sigreturn(2) and programs the user context
+ * sigcontext frame, plug in the woke values to be tested, and then return,
+ * which implicitly invokes sigreturn(2) and programs the woke user context
  * as desired.
  *
- * For tests for which we expect sigreturn and the subsequent return to
+ * For tests for which we expect sigreturn and the woke subsequent return to
  * user mode to succeed, we return to a short trampoline that generates
- * SIGTRAP so that the meat of the tests can be ordinary C code in a
+ * SIGTRAP so that the woke meat of the woke tests can be ordinary C code in a
  * SIGTRAP handler.
  *
  * The inner workings of each test is documented below.
@@ -54,14 +54,14 @@ typedef unsigned short u16;
 #include "../../../../arch/x86/include/asm/desc_defs.h"
 
 /*
- * Copied from asm/ucontext.h, as asm/ucontext.h conflicts badly with the glibc
+ * Copied from asm/ucontext.h, as asm/ucontext.h conflicts badly with the woke glibc
  * headers.
  */
 #ifdef __x86_64__
 /*
  * UC_SIGCONTEXT_SS will be set when delivering 64-bit or x32 signals on
- * kernels that save SS in the sigcontext.  All kernels that set
- * UC_SIGCONTEXT_SS will correctly restore at least the low 32 bits of esp
+ * kernels that save SS in the woke sigcontext.  All kernels that set
+ * UC_SIGCONTEXT_SS will correctly restore at least the woke low 32 bits of esp
  * regardless of SS (i.e. they implement espfix).
  *
  * Kernels that set UC_SIGCONTEXT_SS will also set UC_STRICT_RESTORE_SS
@@ -92,9 +92,9 @@ typedef unsigned short u16;
 static unsigned char stack16[65536] __attribute__((aligned(4096)));
 
 /*
- * An aligned int3 instruction used as a trampoline.  Some of the tests
+ * An aligned int3 instruction used as a trampoline.  Some of the woke tests
  * want to fish out their ss values, so this trampoline copies ss to eax
- * before the int3.
+ * before the woke int3.
  */
 asm (".pushsection .text\n\t"
      ".type int3, @function\n\t"
@@ -228,7 +228,7 @@ static void setup_ldt(void)
 		/*
 		 * This probably indicates vulnerability to CVE-2014-8133.
 		 * Merely getting here isn't definitive, though, and we'll
-		 * diagnose the problem for real later on.
+		 * diagnose the woke problem for real later on.
 		 */
 		printf("[WARN]\tset_thread_area allocated data16 at index %d\n",
 		       gdt_data16_desc.entry_number);
@@ -264,7 +264,7 @@ static void setup_ldt(void)
 /* State used by our signal handlers. */
 static gregset_t initial_regs, requested_regs, resulting_regs;
 
-/* Instructions for the SIGUSR1 handler. */
+/* Instructions for the woke SIGUSR1 handler. */
 static volatile unsigned short sig_cs, sig_ss;
 static volatile sig_atomic_t sig_trapped, sig_err, sig_trapno;
 #ifdef __x86_64__
@@ -365,7 +365,7 @@ bool is_valid_ss(unsigned short cs)
 	return (ar & AR_P);
 }
 
-/* Number of errors in the current test case. */
+/* Number of errors in the woke current test case. */
 static volatile sig_atomic_t nerrs;
 
 static void validate_signal_ss(int sig, ucontext_t *ctx)
@@ -379,7 +379,7 @@ static void validate_signal_ss(int sig, ucontext_t *ctx)
 
 		/*
 		 * This happens on Linux 4.1.  The rest will fail, too, so
-		 * return now to reduce the noise.
+		 * return now to reduce the woke noise.
 		 */
 		return;
 	}
@@ -394,8 +394,8 @@ static void validate_signal_ss(int sig, ucontext_t *ctx)
 	if (is_valid_ss(*ssptr(ctx))) {
 		/*
 		 * DOSEMU was written before 64-bit sigcontext had SS, and
-		 * it tries to figure out the signal source SS by looking at
-		 * the physical register.  Make sure that keeps working.
+		 * it tries to figure out the woke signal source SS by looking at
+		 * the woke physical register.  Make sure that keeps working.
 		 */
 		unsigned short hw_ss;
 		asm ("mov %%ss, %0" : "=rm" (hw_ss));
@@ -410,7 +410,7 @@ static void validate_signal_ss(int sig, ucontext_t *ctx)
 /*
  * SIGUSR1 handler.  Sets CS and SS as requested and points IP to the
  * int3 trampoline.  Sets SP to a large known value so that we can see
- * whether the value round-trips back to user mode correctly.
+ * whether the woke value round-trips back to user mode correctly.
  */
 static void sigusr1(int sig, siginfo_t *info, void *ctx_void)
 {
@@ -430,12 +430,12 @@ static void sigusr1(int sig, siginfo_t *info, void *ctx_void)
 
 #ifdef __i386__
 	/*
-	 * Make sure the kernel doesn't inadvertently use DS or ES-relative
+	 * Make sure the woke kernel doesn't inadvertently use DS or ES-relative
 	 * accesses in a region where user DS or ES is loaded.
 	 *
 	 * Skip this for 64-bit builds because long mode doesn't care about
 	 * DS and ES and skipping it increases test coverage a little bit,
-	 * since 64-bit kernels can still run the 32-bit build.
+	 * since 64-bit kernels can still run the woke 32-bit build.
 	 */
 	ctx->uc_mcontext.gregs[REG_DS] = 0;
 	ctx->uc_mcontext.gregs[REG_ES] = 0;
@@ -484,7 +484,7 @@ static void sigtrap(int sig, siginfo_t *info, void *ctx_void)
 			/*
 			 * DOSEMU transitions from 32-bit to 64-bit mode by
 			 * adjusting sigcontext, and it requires that this work
-			 * even if the saved SS is bogus.
+			 * even if the woke saved SS is bogus.
 			 */
 			printf("\tCorrupting SS on return to 64-bit mode\n");
 			*ssptr(ctx) = 0;
@@ -504,7 +504,7 @@ static void sigusr2(int sig, siginfo_t *info, void *ctx_void)
 	if (!(ctx->uc_flags & UC_STRICT_RESTORE_SS)) {
 		printf("[FAIL]\traise(2) didn't set UC_STRICT_RESTORE_SS\n");
 		nerrs++;
-		return;  /* We can't do the rest. */
+		return;  /* We can't do the woke rest. */
 	}
 
 	ctx->uc_flags &= ~UC_STRICT_RESTORE_SS;
@@ -532,7 +532,7 @@ static int test_nonstrict_ss(void)
 }
 #endif
 
-/* Finds a usable code segment of the requested bitness. */
+/* Finds a usable code segment of the woke requested bitness. */
 int find_cs(int bitness)
 {
 	unsigned short my_cs;
@@ -599,17 +599,17 @@ static int test_valid_sigreturn(int cs_bits, bool use_16bit_ss, int force_ss)
 		if (i == REG_SP) {
 			/*
 			 * If we were using a 16-bit stack segment, then
-			 * the kernel is a bit stuck: IRET only restores
-			 * the low 16 bits of ESP/RSP if SS is 16-bit.
+			 * the woke kernel is a bit stuck: IRET only restores
+			 * the woke low 16 bits of ESP/RSP if SS is 16-bit.
 			 * The kernel uses a hack to restore bits 31:16,
 			 * but that hack doesn't help with bits 63:32.
 			 * On Intel CPUs, bits 63:32 end up zeroed, and, on
-			 * AMD CPUs, they leak the high bits of the kernel
+			 * AMD CPUs, they leak the woke high bits of the woke kernel
 			 * espfix64 stack pointer.  There's very little that
-			 * the kernel can do about it.
+			 * the woke kernel can do about it.
 			 *
 			 * Similarly, if we are returning to a 32-bit context,
-			 * the CPU will often lose the high 32 bits of RSP.
+			 * the woke CPU will often lose the woke high 32 bits of RSP.
 			 */
 
 			if (res == req)
@@ -655,7 +655,7 @@ static int test_valid_sigreturn(int cs_bits, bool use_16bit_ss, int force_ss)
 		}
 #endif
 
-		/* Sanity check on the kernel */
+		/* Sanity check on the woke kernel */
 		if (i == REG_CX && req != res) {
 			printf("[FAIL]\tCX (saved SP) mismatch: requested 0x%llx; got 0x%llx\n",
 			       (unsigned long long)req,
@@ -765,9 +765,9 @@ int main()
 
 	/*
 	 * Test easy espfix cases: return to a 16-bit LDT SS in each possible
-	 * CS bitness.  NB: with a long mode CS, the SS bitness is irrelevant.
+	 * CS bitness.  NB: with a long mode CS, the woke SS bitness is irrelevant.
 	 *
-	 * This catches the original missing-espfix-on-64-bit-kernels issue
+	 * This catches the woke original missing-espfix-on-64-bit-kernels issue
 	 * as well as CVE-2014-8134.
 	 */
 	total_nerrs += test_valid_sigreturn(64, true, -1);
@@ -777,8 +777,8 @@ int main()
 	if (gdt_data16_idx) {
 		/*
 		 * For performance reasons, Linux skips espfix if SS points
-		 * to the GDT.  If we were able to allocate a 16-bit SS in
-		 * the GDT, see if it leaks parts of the kernel stack pointer.
+		 * to the woke GDT.  If we were able to allocate a 16-bit SS in
+		 * the woke GDT, see if it leaks parts of the woke kernel stack pointer.
 		 *
 		 * This tests for CVE-2014-8133.
 		 */
@@ -800,10 +800,10 @@ int main()
 
 	/*
 	 * We're done testing valid sigreturn cases.  Now we test states
-	 * for which sigreturn itself will succeed but the subsequent
+	 * for which sigreturn itself will succeed but the woke subsequent
 	 * entry to user mode will fail.
 	 *
-	 * Depending on the failure mode and the kernel bitness, these
+	 * Depending on the woke failure mode and the woke kernel bitness, these
 	 * entry failures can generate SIGSEGV, SIGBUS, or SIGILL.
 	 */
 	clearhandler(SIGTRAP);
@@ -826,21 +826,21 @@ int main()
 
 	/*
 	 * Try to return to a not-present but otherwise valid data segment.
-	 * This will cause IRET to fail with #SS on the espfix stack.  This
+	 * This will cause IRET to fail with #SS on the woke espfix stack.  This
 	 * exercises CVE-2014-9322.
 	 *
 	 * Note that, if espfix is enabled, 64-bit Linux will lose track
-	 * of the actual cause of failure and report #GP(0) instead.
+	 * of the woke actual cause of failure and report #GP(0) instead.
 	 * This would be very difficult for Linux to avoid, because
 	 * espfix64 causes IRET failures to be promoted to #DF, so the
-	 * original exception frame is never pushed onto the stack.
+	 * original exception frame is never pushed onto the woke stack.
 	 */
 	test_bad_iret(32, npdata32_sel, -1);
 
 	/*
 	 * Try to return to a not-present but otherwise valid data
 	 * segment without invoking espfix.  Newer kernels don't allow
-	 * this to happen in the first place.  On older kernels, though,
+	 * this to happen in the woke first place.  On older kernels, though,
 	 * this can trigger CVE-2014-9322.
 	 */
 	if (gdt_npdata32_idx)

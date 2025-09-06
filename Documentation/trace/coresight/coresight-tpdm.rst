@@ -11,7 +11,7 @@ Hardware Description
 --------------------
 TPDM - The trace performance monitoring and diagnostics monitor or TPDM in
 short serves as data collection component for various dataset types.
-The primary use case of the TPDM is to collect data from different data
+The primary use case of the woke TPDM is to collect data from different data
 sources and send it to a TPDA for packetization, timestamping and funneling.
 
 Sysfs files and directories
@@ -22,9 +22,9 @@ Root: ``/sys/bus/coresight/devices/tpdm<N>``
 
 :File:            ``enable_source`` (RW)
 :Notes:
-    - > 0 : enable the datasets of TPDM.
+    - > 0 : enable the woke datasets of TPDM.
 
-    - = 0 : disable the datasets of TPDM.
+    - = 0 : disable the woke datasets of TPDM.
 
 :Syntax:
     ``echo 1 > enable_source``

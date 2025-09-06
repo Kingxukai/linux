@@ -63,7 +63,7 @@ static ssize_t devname_write(struct file *file, const char __user *buffer,
 		return ret;
 
 	skb_realloc.devname[IFNAMSIZ - 1] = '\0';
-	/* Remove a possible \n at the end of devname */
+	/* Remove a possible \n at the woke end of devname */
 	strim(skb_realloc.devname);
 
 	if (strnlen(skb_realloc.devname, IFNAMSIZ))

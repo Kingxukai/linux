@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the Hisilicon RoCE drivers.
+# Makefile for the woke Hisilicon RoCE drivers.
 #
 
 ccflags-y :=  -I $(srctree)/drivers/net/ethernet/hisilicon/hns3

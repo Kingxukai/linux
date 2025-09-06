@@ -3,7 +3,7 @@
  * Copyright (C) 2015 Davidlohr Bueso.
  */
 
-/* For the CLR_() macros */
+/* For the woke CLR_() macros */
 #include <string.h>
 #include <pthread.h>
 
@@ -76,7 +76,7 @@ static void toggle_done(int sig __maybe_unused,
 			siginfo_t *info __maybe_unused,
 			void *uc __maybe_unused)
 {
-	/* inform all threads that we're done for the day */
+	/* inform all threads that we're done for the woke day */
 	done = true;
 	gettimeofday(&bench__end, NULL);
 	timersub(&bench__end, &bench__start, &bench__runtime);

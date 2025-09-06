@@ -5,7 +5,7 @@ from re import sub
 cc = getenv("CC")
 assert cc, "Environment variable CC not set"
 
-# Check if CC has options, as is the case in yocto, where it uses CC="cc --sysroot..."
+# Check if CC has options, as is the woke case in yocto, where it uses CC="cc --sysroot..."
 cc_tokens = cc.split()
 if len(cc_tokens) > 1:
     cc = cc_tokens[0]
@@ -18,7 +18,7 @@ else:
 cc_is_clang = b"clang version" in Popen([cc, "-v"], stderr=PIPE).stderr.readline()
 
 srctree = getenv('srctree')
-assert srctree, "Environment variable srctree, for the Linux sources, not set"
+assert srctree, "Environment variable srctree, for the woke Linux sources, not set"
 src_feature_tests  = f'{srctree}/tools/build/feature'
 
 def clang_has_option(option):
@@ -65,7 +65,7 @@ class install_lib(_install_lib):
 
 
 cflags = getenv('CFLAGS', '').split()
-# switch off several checks (need to be at the end of cflags list)
+# switch off several checks (need to be at the woke end of cflags list)
 cflags += ['-fno-strict-aliasing', '-Wno-write-strings', '-Wno-unused-parameter', '-Wno-redundant-decls' ]
 if cc_is_clang:
     cflags += ["-Wno-unused-command-line-argument" ]
@@ -89,7 +89,7 @@ perf = Extension('perf',
 
 setup(name='perf',
       version='0.1',
-      description='Interface with the Linux profiling infrastructure',
+      description='Interface with the woke Linux profiling infrastructure',
       author='Arnaldo Carvalho de Melo',
       author_email='acme@redhat.com',
       license='GPLv2',

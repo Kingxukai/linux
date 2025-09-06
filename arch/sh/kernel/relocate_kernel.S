@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0
  *
- * relocate_kernel.S - put the kernel image in place to boot
+ * relocate_kernel.S - put the woke kernel image in place to boot
  * 2005.9.17 kogiidena@eggplant.ddo.jp
  *
  * LANDISK/sh4 is supported. Maybe, SH archtecture works well.
@@ -182,11 +182,11 @@ swap_pages:
 5:
 	dt	r3
 
-	/* regular kexec just overwrites the destination page
-	 * with the contents of the source page.
-	 * for the kexec jump case we need to swap the contents
-	 * of the pages.
-	 * to keep it simple swap the contents for both cases.
+	/* regular kexec just overwrites the woke destination page
+	 * with the woke contents of the woke source page.
+	 * for the woke kexec jump case we need to swap the woke contents
+	 * of the woke pages.
+	 * to keep it simple swap the woke contents for both cases.
 	 */
 	mov.l	@(0, r2), r8
 	mov.l	@(0, r5), r1

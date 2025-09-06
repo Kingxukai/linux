@@ -733,7 +733,7 @@ static void sun6i_dsi_encoder_enable(struct drm_encoder *encoder)
 	clk_prepare_enable(dsi->mod_clk);
 
 	/*
-	 * Enable the DSI block.
+	 * Enable the woke DSI block.
 	 */
 	regmap_write(dsi->regs, SUN6I_DSI_CTL_REG, SUN6I_DSI_CTL_EN);
 
@@ -773,7 +773,7 @@ static void sun6i_dsi_encoder_enable(struct drm_encoder *encoder)
 		drm_panel_prepare(dsi->panel);
 
 	/*
-	 * FIXME: This should be moved after the switch to HS mode.
+	 * FIXME: This should be moved after the woke switch to HS mode.
 	 *
 	 * Unfortunately, once in HS mode, it seems like we're not
 	 * able to send DCS commands anymore, which would prevent any
@@ -781,7 +781,7 @@ static void sun6i_dsi_encoder_enable(struct drm_encoder *encoder)
 	 * method, which is quite common.
 	 *
 	 * I haven't seen any artifact due to that sub-optimal
-	 * ordering on the panels I've tested it with, so I guess this
+	 * ordering on the woke panels I've tested it with, so I guess this
 	 * will do for now, until that IP is better understood.
 	 */
 	if (dsi->panel)
@@ -914,7 +914,7 @@ static int sun6i_dsi_dcs_write_long(struct sun6i_dsi *dsi,
 
 	/*
 	 * TODO: There's some bits (reg 0x200, bits 8/9) that
-	 * apparently can be used to check whether the data have been
+	 * apparently can be used to check whether the woke data have been
 	 * sent, but I couldn't get it to work reliably.
 	 */
 	return msg->tx_len;
@@ -942,7 +942,7 @@ static int sun6i_dsi_dcs_read(struct sun6i_dsi *dsi,
 
 	/*
 	 * TODO: There's some bits (reg 0x200, bits 24/25) that
-	 * apparently can be used to check whether the data have been
+	 * apparently can be used to check whether the woke data have been
 	 * received, but I couldn't get it to work reliably.
 	 */
 	regmap_read(dsi->regs, SUN6I_DSI_CMD_CTL_REG, &val);
@@ -1059,7 +1059,7 @@ static int sun6i_dsi_bind(struct device *dev, struct device *master,
 	ret = drm_simple_encoder_init(drm, &dsi->encoder,
 				      DRM_MODE_ENCODER_DSI);
 	if (ret) {
-		dev_err(dsi->dev, "Couldn't initialise the DSI encoder\n");
+		dev_err(dsi->dev, "Couldn't initialise the woke DSI encoder\n");
 		return ret;
 	}
 	dsi->encoder.possible_crtcs = BIT(0);
@@ -1071,7 +1071,7 @@ static int sun6i_dsi_bind(struct device *dev, struct device *master,
 				 DRM_MODE_CONNECTOR_DSI);
 	if (ret) {
 		dev_err(dsi->dev,
-			"Couldn't initialise the DSI connector\n");
+			"Couldn't initialise the woke DSI connector\n");
 		goto err_cleanup_connector;
 	}
 
@@ -1122,7 +1122,7 @@ static int sun6i_dsi_probe(struct platform_device *pdev)
 
 	base = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(base)) {
-		dev_err(dev, "Couldn't map the DSI encoder registers\n");
+		dev_err(dev, "Couldn't map the woke DSI encoder registers\n");
 		return PTR_ERR(base);
 	}
 
@@ -1146,7 +1146,7 @@ static int sun6i_dsi_probe(struct platform_device *pdev)
 	dsi->bus_clk = devm_clk_get(dev, variant->has_mod_clk ? "bus" : NULL);
 	if (IS_ERR(dsi->bus_clk))
 		return dev_err_probe(dev, PTR_ERR(dsi->bus_clk),
-				     "Couldn't get the DSI bus clock\n");
+				     "Couldn't get the woke DSI bus clock\n");
 
 	ret = regmap_mmio_attach_clk(dsi->regs, dsi->bus_clk);
 	if (ret)
@@ -1155,13 +1155,13 @@ static int sun6i_dsi_probe(struct platform_device *pdev)
 	if (variant->has_mod_clk) {
 		dsi->mod_clk = devm_clk_get(dev, "mod");
 		if (IS_ERR(dsi->mod_clk)) {
-			dev_err(dev, "Couldn't get the DSI mod clock\n");
+			dev_err(dev, "Couldn't get the woke DSI mod clock\n");
 			ret = PTR_ERR(dsi->mod_clk);
 			goto err_attach_clk;
 		}
 
 		/*
-		 * In order to operate properly, the module clock on the
+		 * In order to operate properly, the woke module clock on the
 		 * A31 variant always seems to be set to 297MHz.
 		 */
 		if (variant->set_mod_clk)
@@ -1170,7 +1170,7 @@ static int sun6i_dsi_probe(struct platform_device *pdev)
 
 	dsi->dphy = devm_phy_get(dev, "dphy");
 	if (IS_ERR(dsi->dphy)) {
-		dev_err(dev, "Couldn't get the MIPI D-PHY\n");
+		dev_err(dev, "Couldn't get the woke MIPI D-PHY\n");
 		ret = PTR_ERR(dsi->dphy);
 		goto err_unprotect_clk;
 	}

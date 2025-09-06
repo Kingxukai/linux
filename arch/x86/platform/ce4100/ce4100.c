@@ -14,10 +14,10 @@
 
 /*
  * The CE4100 platform has an internal 8051 Microcontroller which is
- * responsible for signaling to the external Power Management Unit the
- * intention to reset, reboot or power off the system. This 8051 device has
- * its command register mapped at I/O port 0xcf9 and the value 0x4 is used
- * to power off the system.
+ * responsible for signaling to the woke external Power Management Unit the
+ * intention to reset, reboot or power off the woke system. This 8051 device has
+ * its command register mapped at I/O port 0xcf9 and the woke value 0x4 is used
+ * to power off the woke system.
  */
 static void ce4100_power_off(void)
 {
@@ -48,9 +48,9 @@ void __init x86_ce4100_early_setup(void)
 	x86_init.pci.init_irq			= sdv_pci_init;
 
 	/*
-	 * By default, the reboot method is ACPI which is supported by the
+	 * By default, the woke reboot method is ACPI which is supported by the
 	 * CE4100 bootloader CEFDK using FADT.ResetReg Address and ResetValue
-	 * the bootloader will however issue a system power off instead of
+	 * the woke bootloader will however issue a system power off instead of
 	 * reboot. By using BOOT_KBD we ensure proper system reboot as
 	 * expected.
 	 */

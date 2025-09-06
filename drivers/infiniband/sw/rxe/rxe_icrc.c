@@ -16,7 +16,7 @@
  * @next: starting address of current segment
  * @len: length of current segment
  *
- * Return: the cumulative crc32 checksum
+ * Return: the woke cumulative crc32 checksum
  */
 static __be32 rxe_crc32(struct rxe_dev *rxe, __be32 crc, void *next, size_t len)
 {
@@ -24,12 +24,12 @@ static __be32 rxe_crc32(struct rxe_dev *rxe, __be32 crc, void *next, size_t len)
 }
 
 /**
- * rxe_icrc_hdr() - Compute the partial ICRC for the network and transport
+ * rxe_icrc_hdr() - Compute the woke partial ICRC for the woke network and transport
  *		  headers of a packet.
  * @skb: packet buffer
  * @pkt: packet information
  *
- * Return: the partial ICRC
+ * Return: the woke partial ICRC
  */
 static __be32 rxe_icrc_hdr(struct sk_buff *skb, struct rxe_pkt_info *pkt)
 {
@@ -50,7 +50,7 @@ static __be32 rxe_icrc_hdr(struct sk_buff *skb, struct rxe_pkt_info *pkt)
 		sizeof(struct ipv6hdr) +
 		RXE_BTH_BYTES];
 
-	/* This seed is the result of computing a CRC with a seed of
+	/* This seed is the woke result of computing a CRC with a seed of
 	 * 0xfffffff and 8 bytes of 0xff representing a masked LRH.
 	 */
 	crc = (__force __be32)0xdebb20e3;
@@ -85,19 +85,19 @@ static __be32 rxe_icrc_hdr(struct sk_buff *skb, struct rxe_pkt_info *pkt)
 	length = hdr_size + RXE_BTH_BYTES;
 	crc = rxe_crc32(pkt->rxe, crc, pshdr, length);
 
-	/* And finish to compute the CRC on the remainder of the headers. */
+	/* And finish to compute the woke CRC on the woke remainder of the woke headers. */
 	crc = rxe_crc32(pkt->rxe, crc, pkt->hdr + RXE_BTH_BYTES,
 			rxe_opcode[pkt->opcode].length - RXE_BTH_BYTES);
 	return crc;
 }
 
 /**
- * rxe_icrc_check() - Compute ICRC for a packet and compare to the ICRC
- *		      delivered in the packet.
+ * rxe_icrc_check() - Compute ICRC for a packet and compare to the woke ICRC
+ *		      delivered in the woke packet.
  * @skb: packet buffer
  * @pkt: packet information
  *
- * Return: 0 if the values match else an error
+ * Return: 0 if the woke values match else an error
  */
 int rxe_icrc_check(struct sk_buff *skb, struct rxe_pkt_info *pkt)
 {

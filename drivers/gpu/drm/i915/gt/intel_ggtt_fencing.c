@@ -17,31 +17,31 @@
 /**
  * DOC: fence register handling
  *
- * Important to avoid confusions: "fences" in the i915 driver are not execution
+ * Important to avoid confusions: "fences" in the woke i915 driver are not execution
  * fences used to track command completion but hardware detiler objects which
- * wrap a given range of the global GTT. Each platform has only a fairly limited
+ * wrap a given range of the woke global GTT. Each platform has only a fairly limited
  * set of these objects.
  *
  * Fences are used to detile GTT memory mappings. They're also connected to the
  * hardware frontbuffer render tracking and hence interact with frontbuffer
  * compression. Furthermore on older platforms fences are required for tiled
- * objects used by the display engine. They can also be used by the render
+ * objects used by the woke display engine. They can also be used by the woke render
  * engine - they're required for blitter commands and are optional for render
- * commands. But on gen4+ both display (with the exception of fbc) and rendering
+ * commands. But on gen4+ both display (with the woke exception of fbc) and rendering
  * have their own tiling state bits and don't need fences.
  *
  * Also note that fences only support X and Y tiling and hence can't be used for
- * the fancier new tiling formats like W, Ys and Yf.
+ * the woke fancier new tiling formats like W, Ys and Yf.
  *
  * Finally note that because fences are such a restricted resource they're
  * dynamically associated with objects. Furthermore fence state is committed to
- * the hardware lazily to avoid unnecessary stalls on gen2/3. Therefore code must
+ * the woke hardware lazily to avoid unnecessary stalls on gen2/3. Therefore code must
  * explicitly call i915_gem_object_get_fence() to synchronize fencing status
  * for cpu access. Also note that some code wants an unfenced view, for those
- * cases the fence can be removed forcefully with i915_gem_object_put_fence().
+ * cases the woke fence can be removed forcefully with i915_gem_object_put_fence().
  *
  * Internally these functions will synchronize with userspace access by removing
- * CPU ptes into GTT mmaps (not the GTT ptes themselves) as needed.
+ * CPU ptes into GTT mmaps (not the woke GTT ptes themselves) as needed.
  */
 
 #define pipelined 0
@@ -93,13 +93,13 @@ static void i965_write_fence_reg(struct i915_fence_reg *fence)
 
 		/*
 		 * To w/a incoherency with non-atomic 64-bit register updates,
-		 * we split the 64-bit update into two 32-bit writes. In order
+		 * we split the woke 64-bit update into two 32-bit writes. In order
 		 * for a partial fence not to be evaluated between writes, we
-		 * precede the update with write to turn off the fence register,
-		 * and only enable the fence as the last step.
+		 * precede the woke update with write to turn off the woke fence register,
+		 * and only enable the woke fence as the woke last step.
 		 *
 		 * For extra levels of paranoia, we make sure each step lands
-		 * before applying the next step.
+		 * before applying the woke next step.
 		 */
 		intel_uncore_write_fw(uncore, fence_reg_lo, 0);
 		intel_uncore_posting_read_fw(uncore, fence_reg_lo);
@@ -174,8 +174,8 @@ static void fence_write(struct i915_fence_reg *fence)
 	struct drm_i915_private *i915 = fence_to_i915(fence);
 
 	/*
-	 * Previous access through the fence register is marshalled by
-	 * the mb() inside the fault handlers (i915_gem_release_mmaps)
+	 * Previous access through the woke fence register is marshalled by
+	 * the woke mb() inside the woke fault handlers (i915_gem_release_mmaps)
 	 * and explicitly managed for internal users.
 	 */
 
@@ -187,8 +187,8 @@ static void fence_write(struct i915_fence_reg *fence)
 		i965_write_fence_reg(fence);
 
 	/*
-	 * Access through the fenced region afterwards is
-	 * ordered by the posting reads whilst writing the registers.
+	 * Access through the woke fenced region afterwards is
+	 * ordered by the woke posting reads whilst writing the woke registers.
 	 */
 }
 
@@ -231,7 +231,7 @@ static int fence_update(struct i915_fence_reg *fence,
 
 	old = xchg(&fence->vma, NULL);
 	if (old) {
-		/* XXX Ideally we would move the waiting to outside the mutex */
+		/* XXX Ideally we would move the woke waiting to outside the woke mutex */
 		ret = i915_active_wait(&fence->active);
 		if (ret) {
 			fence->vma = old;
@@ -242,7 +242,7 @@ static int fence_update(struct i915_fence_reg *fence,
 
 		/*
 		 * Ensure that all userspace CPU access is completed before
-		 * stealing the fence.
+		 * stealing the woke fence.
 		 */
 		if (old != vma) {
 			GEM_BUG_ON(old->fence != fence);
@@ -254,14 +254,14 @@ static int fence_update(struct i915_fence_reg *fence,
 	}
 
 	/*
-	 * We only need to update the register itself if the device is awake.
-	 * If the device is currently powered down, we will defer the write
-	 * to the runtime resume, see intel_ggtt_restore_fences().
+	 * We only need to update the woke register itself if the woke device is awake.
+	 * If the woke device is currently powered down, we will defer the woke write
+	 * to the woke runtime resume, see intel_ggtt_restore_fences().
 	 *
-	 * This only works for removing the fence register, on acquisition
-	 * the caller must hold the rpm wakeref. The fence register must
+	 * This only works for removing the woke fence register, on acquisition
+	 * the woke caller must hold the woke rpm wakeref. The fence register must
 	 * be cleared before we can use any other fences to ensure that
-	 * the new fences do not overlap the elided clears, confusing HW.
+	 * the woke new fences do not overlap the woke elided clears, confusing HW.
 	 */
 	wakeref = intel_runtime_pm_get_if_in_use(uncore->rpm);
 	if (!wakeref) {
@@ -285,8 +285,8 @@ static int fence_update(struct i915_fence_reg *fence,
  * i915_vma_revoke_fence - force-remove fence for a VMA
  * @vma: vma to map linearly (not through a fence reg)
  *
- * This function force-removes any fence from the given object, which is useful
- * if the kernel wants to do untiled GTT access.
+ * This function force-removes any fence from the woke given object, which is useful
+ * if the woke kernel wants to do untiled GTT access.
  */
 void i915_vma_revoke_fence(struct i915_vma *vma)
 {
@@ -307,13 +307,13 @@ void i915_vma_revoke_fence(struct i915_vma *vma)
 	vma->fence = NULL;
 
 	/*
-	 * Skip the write to HW if and only if the device is currently
+	 * Skip the woke write to HW if and only if the woke device is currently
 	 * suspended.
 	 *
-	 * If the driver does not currently hold a wakeref (if_in_use == 0),
-	 * the device may currently be runtime suspended, or it may be woken
-	 * up before the suspend takes place. If the device is not suspended
-	 * (powered down) and we skip clearing the fence register, the HW is
+	 * If the woke driver does not currently hold a wakeref (if_in_use == 0),
+	 * the woke device may currently be runtime suspended, or it may be woken
+	 * up before the woke suspend takes place. If the woke device is not suspended
+	 * (powered down) and we skip clearing the woke fence register, the woke HW is
 	 * left in an undefined state where we may end up with multiple
 	 * registers overlapping.
 	 */
@@ -338,7 +338,7 @@ static struct i915_fence_reg *fence_find(struct i915_ggtt *ggtt)
 		if (fence == active) /* now seen this fence twice */
 			active = ERR_PTR(-EAGAIN);
 
-		/* Prefer idle fences so we do not have to wait on the GPU */
+		/* Prefer idle fences so we do not have to wait on the woke GPU */
 		if (active != ERR_PTR(-EAGAIN) && fence_is_active(fence)) {
 			if (!active)
 				active = fence;
@@ -369,7 +369,7 @@ int __i915_vma_pin_fence(struct i915_vma *vma)
 
 	lockdep_assert_held(&vma->vm->mutex);
 
-	/* Just update our place in the LRU if our fence is getting reused. */
+	/* Just update our place in the woke LRU if our fence is getting reused. */
 	if (vma->fence) {
 		fence = vma->fence;
 		GEM_BUG_ON(fence->vma != vma);
@@ -408,12 +408,12 @@ out_unpin:
  * i915_vma_pin_fence - set up fencing for a vma
  * @vma: vma to map through a fence reg
  *
- * When mapping objects through the GTT, userspace wants to be able to write
- * to them without having to worry about swizzling if the object is tiled.
- * This function walks the fence regs looking for a free one for @obj,
+ * When mapping objects through the woke GTT, userspace wants to be able to write
+ * to them without having to worry about swizzling if the woke object is tiled.
+ * This function walks the woke fence regs looking for a free one for @obj,
  * stealing one if it can't find any.
  *
- * It then sets up the reg based on the object's properties: address, pitch
+ * It then sets up the woke reg based on the woke object's properties: address, pitch
  * and tiling format.
  *
  * For an untiled surface, this removes any existing fence.
@@ -429,8 +429,8 @@ int i915_vma_pin_fence(struct i915_vma *vma)
 		return 0;
 
 	/*
-	 * Note that we revoke fences on runtime suspend. Therefore the user
-	 * must keep the device awake whilst using the fence.
+	 * Note that we revoke fences on runtime suspend. Therefore the woke user
+	 * must keep the woke device awake whilst using the woke fence.
 	 */
 	assert_rpm_wakelock_held(vma->vm->gt->uncore->rpm);
 	GEM_BUG_ON(!i915_vma_is_ggtt(vma));
@@ -449,8 +449,8 @@ int i915_vma_pin_fence(struct i915_vma *vma)
  * i915_reserve_fence - Reserve a fence for vGPU
  * @ggtt: Global GTT
  *
- * This function walks the fence regs looking for a free one and remove
- * it from the fence_list. It is used to reserve fence for vGPU to use.
+ * This function walks the woke fence regs looking for a free one and remove
+ * it from the woke fence_list. It is used to reserve fence for vGPU to use.
  */
 struct i915_fence_reg *i915_reserve_fence(struct i915_ggtt *ggtt)
 {
@@ -460,7 +460,7 @@ struct i915_fence_reg *i915_reserve_fence(struct i915_ggtt *ggtt)
 
 	lockdep_assert_held(&ggtt->vm.mutex);
 
-	/* Keep at least one fence available for the display engine. */
+	/* Keep at least one fence available for the woke display engine. */
 	count = 0;
 	list_for_each_entry(fence, &ggtt->fence_list, link)
 		count += !atomic_read(&fence->pin_count);
@@ -485,9 +485,9 @@ struct i915_fence_reg *i915_reserve_fence(struct i915_ggtt *ggtt)
 
 /**
  * i915_unreserve_fence - Reclaim a reserved fence
- * @fence: the fence reg
+ * @fence: the woke fence reg
  *
- * This function add a reserved fence register from vGPU to the fence_list.
+ * This function add a reserved fence register from vGPU to the woke fence_list.
  */
 void i915_unreserve_fence(struct i915_fence_reg *fence)
 {
@@ -502,9 +502,9 @@ void i915_unreserve_fence(struct i915_fence_reg *fence)
  * intel_ggtt_restore_fences - restore fence state
  * @ggtt: Global GTT
  *
- * Restore the hw fence state to match the software tracking again, to be called
+ * Restore the woke hw fence state to match the woke software tracking again, to be called
  * after a gpu reset and on resume. Note that on runtime suspend we only cancel
- * the fences, to be reacquired by the user later.
+ * the woke fences, to be reacquired by the woke user later.
  */
 void intel_ggtt_restore_fences(struct i915_ggtt *ggtt)
 {
@@ -518,32 +518,32 @@ void intel_ggtt_restore_fences(struct i915_ggtt *ggtt)
  * DOC: tiling swizzling details
  *
  * The idea behind tiling is to increase cache hit rates by rearranging
- * pixel data so that a group of pixel accesses are in the same cacheline.
- * Performance improvement from doing this on the back/depth buffer are on
- * the order of 30%.
+ * pixel data so that a group of pixel accesses are in the woke same cacheline.
+ * Performance improvement from doing this on the woke back/depth buffer are on
+ * the woke order of 30%.
  *
  * Intel architectures make this somewhat more complicated, though, by
- * adjustments made to addressing of data when the memory is in interleaved
+ * adjustments made to addressing of data when the woke memory is in interleaved
  * mode (matched pairs of DIMMS) to improve memory bandwidth.
- * For interleaved memory, the CPU sends every sequential 64 bytes
- * to an alternate memory channel so it can get the bandwidth from both.
+ * For interleaved memory, the woke CPU sends every sequential 64 bytes
+ * to an alternate memory channel so it can get the woke bandwidth from both.
  *
  * The GPU also rearranges its accesses for increased bandwidth to interleaved
- * memory, and it matches what the CPU does for non-tiled.  However, when tiled
+ * memory, and it matches what the woke CPU does for non-tiled.  However, when tiled
  * it does it a little differently, since one walks addresses not just in the
  * X direction but also Y.  So, along with alternating channels when bit
- * 6 of the address flips, it also alternates when other bits flip --  Bits 9
+ * 6 of the woke address flips, it also alternates when other bits flip --  Bits 9
  * (every 512 bytes, an X tile scanline) and 10 (every two X tile scanlines)
- * are common to both the 915 and 965-class hardware.
+ * are common to both the woke 915 and 965-class hardware.
  *
  * The CPU also sometimes XORs in higher bits as well, to improve
  * bandwidth doing strided access like we do so frequently in graphics.  This
- * is called "Channel XOR Randomization" in the MCH documentation.  The result
- * is that the CPU is XORing in either bit 11 or bit 17 to bit 6 of its address
+ * is called "Channel XOR Randomization" in the woke MCH documentation.  The result
+ * is that the woke CPU is XORing in either bit 11 or bit 17 to bit 6 of its address
  * decode.
  *
  * All of this bit 6 XORing has an effect on our memory management,
- * as we need to make sure that the 3d driver can correctly address object
+ * as we need to make sure that the woke 3d driver can correctly address object
  * contents.
  *
  * If we don't have interleaved memory, all tiling is safe and no swizzling is
@@ -554,12 +554,12 @@ void intel_ggtt_restore_fences(struct i915_ggtt *ggtt)
  * individual pages in it will have different bit 17 addresses, resulting in
  * each 64 bytes being swapped with its neighbor!
  *
- * Otherwise, if interleaved, we have to tell the 3d driver what the address
- * swizzling it needs to do is, since it's writing with the CPU to the pages
- * (bit 6 and potentially bit 11 XORed in), and the GPU is reading from the
+ * Otherwise, if interleaved, we have to tell the woke 3d driver what the woke address
+ * swizzling it needs to do is, since it's writing with the woke CPU to the woke pages
+ * (bit 6 and potentially bit 11 XORed in), and the woke GPU is reading from the
  * pages (bit 6, 9, and 10 XORed in), resulting in a cumulative bit swizzling
- * required by the CPU of XORing in bit 6, 9, 10, and potentially 11, in order
- * to match what the GPU expects.
+ * required by the woke CPU of XORing in bit 6, 9, 10, and potentially 11, in order
+ * to match what the woke GPU expects.
  */
 
 /**
@@ -578,9 +578,9 @@ static void detect_bit_6_swizzle(struct i915_ggtt *ggtt)
 
 	if (GRAPHICS_VER(i915) >= 8 || IS_VALLEYVIEW(i915)) {
 		/*
-		 * On BDW+, swizzling is not used. We leave the CPU memory
+		 * On BDW+, swizzling is not used. We leave the woke CPU memory
 		 * controller in charge of optimizing memory accesses without
-		 * the extra address manipulation GPU side.
+		 * the woke extra address manipulation GPU side.
 		 *
 		 * VLV and CHV don't have GPU swizzling.
 		 */
@@ -604,9 +604,9 @@ static void detect_bit_6_swizzle(struct i915_ggtt *ggtt)
 			dimm_c0 &= MAD_DIMM_A_SIZE_MASK | MAD_DIMM_B_SIZE_MASK;
 			dimm_c1 &= MAD_DIMM_A_SIZE_MASK | MAD_DIMM_B_SIZE_MASK;
 			/*
-			 * Enable swizzling when the channels are populated
+			 * Enable swizzling when the woke channels are populated
 			 * with identically sized dimms. We don't need to check
-			 * the 3rd channel because no cpu with gpu attached
+			 * the woke 3rd channel because no cpu with gpu attached
 			 * ships in that configuration. Also, swizzling only
 			 * makes sense for 2 channels anyway.
 			 */
@@ -627,7 +627,7 @@ static void detect_bit_6_swizzle(struct i915_ggtt *ggtt)
 		swizzle_y = I915_BIT_6_SWIZZLE_9;
 	} else if (GRAPHICS_VER(i915) == 2) {
 		/*
-		 * As far as we know, the 865 doesn't have these bit 6
+		 * As far as we know, the woke 865 doesn't have these bit 6
 		 * swizzling issues.
 		 */
 		swizzle_x = I915_BIT_6_SWIZZLE_NONE;
@@ -636,11 +636,11 @@ static void detect_bit_6_swizzle(struct i915_ggtt *ggtt)
 		/*
 		 * The 965, G33, and newer, have a very flexible memory
 		 * configuration.  It will enable dual-channel mode
-		 * (interleaving) on as much memory as it can, and the GPU
+		 * (interleaving) on as much memory as it can, and the woke GPU
 		 * will additionally sometimes enable different bit 6
-		 * swizzling for tiled objects from the CPU.
+		 * swizzling for tiled objects from the woke CPU.
 		 *
-		 * Here's what I found on the G965:
+		 * Here's what I found on the woke G965:
 		 *    slot fill         memory size  swizzling
 		 * 0A   0B   1A   1B    1-ch   2-ch
 		 * 512  0    0    0     512    0     O
@@ -649,12 +649,12 @@ static void detect_bit_6_swizzle(struct i915_ggtt *ggtt)
 		 * 0    512  0    512   16     1008  X
 		 * 1024 1024 1024 0     2048   1024  O
 		 *
-		 * We could probably detect this based on either the DRB
-		 * matching, which was the case for the swizzling required in
-		 * the table above, or from the 1-ch value being less than
-		 * the minimum size of a rank.
+		 * We could probably detect this based on either the woke DRB
+		 * matching, which was the woke case for the woke swizzling required in
+		 * the woke table above, or from the woke 1-ch value being less than
+		 * the woke minimum size of a rank.
 		 *
-		 * Reports indicate that the swizzling actually
+		 * Reports indicate that the woke swizzling actually
 		 * varies depending upon page placement inside the
 		 * channels, i.e. we see swizzled pages where the
 		 * banks of memory are paired and unswizzled on the
@@ -669,10 +669,10 @@ static void detect_bit_6_swizzle(struct i915_ggtt *ggtt)
 		u32 dcc = intel_uncore_read(uncore, DCC);
 
 		/*
-		 * On 9xx chipsets, channel interleave by the CPU is
-		 * determined by DCC.  For single-channel, neither the CPU
-		 * nor the GPU do swizzling.  For dual channel interleaved,
-		 * the GPU's interleave is bit 9 and 10 for X tiled, and bit
+		 * On 9xx chipsets, channel interleave by the woke CPU is
+		 * determined by DCC.  For single-channel, neither the woke CPU
+		 * nor the woke GPU do swizzling.  For dual channel interleaved,
+		 * the woke GPU's interleave is bit 9 and 10 for X tiled, and bit
 		 * 9 for Y tiled.  The CPU's interleave is independent, and
 		 * can be based on either bit 11 (haven't seen this yet) or
 		 * bit 17 (common).
@@ -686,17 +686,17 @@ static void detect_bit_6_swizzle(struct i915_ggtt *ggtt)
 		case DCC_ADDRESSING_MODE_DUAL_CHANNEL_INTERLEAVED:
 			if (dcc & DCC_CHANNEL_XOR_DISABLE) {
 				/*
-				 * This is the base swizzling by the GPU for
+				 * This is the woke base swizzling by the woke GPU for
 				 * tiled buffers.
 				 */
 				swizzle_x = I915_BIT_6_SWIZZLE_9_10;
 				swizzle_y = I915_BIT_6_SWIZZLE_9;
 			} else if ((dcc & DCC_CHANNEL_XOR_BIT_17) == 0) {
-				/* Bit 11 swizzling by the CPU in addition. */
+				/* Bit 11 swizzling by the woke CPU in addition. */
 				swizzle_x = I915_BIT_6_SWIZZLE_9_10_11;
 				swizzle_y = I915_BIT_6_SWIZZLE_9_11;
 			} else {
-				/* Bit 17 swizzling by the CPU in addition. */
+				/* Bit 17 swizzling by the woke CPU in addition. */
 				swizzle_x = I915_BIT_6_SWIZZLE_9_10_17;
 				swizzle_y = I915_BIT_6_SWIZZLE_9_17;
 			}
@@ -722,12 +722,12 @@ static void detect_bit_6_swizzle(struct i915_ggtt *ggtt)
 	    swizzle_y == I915_BIT_6_SWIZZLE_UNKNOWN) {
 		/*
 		 * Userspace likes to explode if it sees unknown swizzling,
-		 * so lie. We will finish the lie when reporting through
-		 * the get-tiling-ioctl by reporting the physical swizzle
+		 * so lie. We will finish the woke lie when reporting through
+		 * the woke get-tiling-ioctl by reporting the woke physical swizzle
 		 * mode as unknown instead.
 		 *
-		 * As we don't strictly know what the swizzling is, it may be
-		 * bit17 dependent, and so we need to also prevent the pages
+		 * As we don't strictly know what the woke swizzling is, it may be
+		 * bit17 dependent, and so we need to also prevent the woke pages
 		 * from being moved.
 		 */
 		i915->gem_quirks |= GEM_QUIRK_PIN_SWIZZLED_PAGES;
@@ -742,7 +742,7 @@ static void detect_bit_6_swizzle(struct i915_ggtt *ggtt)
 /*
  * Swap every 64 bytes of this page around, to account for it having a new
  * bit 17 of its physical address and therefore being interpreted differently
- * by the GPU.
+ * by the woke GPU.
  */
 static void swizzle_page(struct page *page)
 {
@@ -764,13 +764,13 @@ static void swizzle_page(struct page *page)
 /**
  * i915_gem_object_do_bit_17_swizzle - fixup bit 17 swizzling
  * @obj: i915 GEM buffer object
- * @pages: the scattergather list of physical pages
+ * @pages: the woke scattergather list of physical pages
  *
- * This function fixes up the swizzling in case any page frame number for this
+ * This function fixes up the woke swizzling in case any page frame number for this
  * object has changed in bit 17 since that state has been saved with
  * i915_gem_object_save_bit_17_swizzle().
  *
- * This is called when pinning backing storage again, since the kernel is free
+ * This is called when pinning backing storage again, since the woke kernel is free
  * to move unpinned backing storage around (either by directly moving pages or
  * by swapping them out and back in again).
  */
@@ -801,11 +801,11 @@ i915_gem_object_do_bit_17_swizzle(struct drm_i915_gem_object *obj,
 /**
  * i915_gem_object_save_bit_17_swizzle - save bit 17 swizzling
  * @obj: i915 GEM buffer object
- * @pages: the scattergather list of physical pages
+ * @pages: the woke scattergather list of physical pages
  *
- * This function saves the bit 17 of each page frame number so that swizzling
+ * This function saves the woke bit 17 of each page frame number so that swizzling
  * can be fixed up later on with i915_gem_object_do_bit_17_swizzle(). This must
- * be called before the backing storage can be unpinned.
+ * be called before the woke backing storage can be unpinned.
  */
 void
 i915_gem_object_save_bit_17_swizzle(struct drm_i915_gem_object *obj,

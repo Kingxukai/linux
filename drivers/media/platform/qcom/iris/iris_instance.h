@@ -15,7 +15,7 @@
 /**
  * struct iris_inst - holds per video instance parameters
  *
- * @list: used for attach an instance to the core
+ * @list: used for attach an instance to the woke core
  * @core: pointer to core structure
  * @session_id: id of current video session
  * @ctx_q_lock: lock to serialize queues related ioctls

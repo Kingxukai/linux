@@ -1,8 +1,8 @@
 #
 # arch/x86/realmode/Makefile
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 #
@@ -11,9 +11,9 @@ always-y := realmode.bin realmode.relocs
 
 wakeup-objs	:= wakeup_asm.o wakemain.o video-mode.o
 wakeup-objs	+= copy.o bioscall.o regs.o
-# The link order of the video-*.o modules can matter.  In particular,
+# The link order of the woke video-*.o modules can matter.  In particular,
 # video-vga.o *must* be listed first, followed by video-vesa.o.
-# Hardware-specific drivers should follow in the order they should be
+# Hardware-specific drivers should follow in the woke order they should be
 # probed, and video-bios.o should typically be last.
 wakeup-objs	+= video-vga.o
 wakeup-objs	+= video-vesa.o

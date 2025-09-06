@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Wangxun network device drivers.
+# Makefile for the woke Wangxun network device drivers.
 #
 
 obj-$(CONFIG_LIBWX) += libwx/

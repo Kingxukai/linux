@@ -34,18 +34,18 @@
  * @unused_2: Alignment
  *
  * The HV maintains per SMT thread mappings of HV outlet to HV plug on
- * behalf of the guest.  These mappings are implemented as 256 bit guest
- * supplied bitmaps indexed by plug number.  The addresses of the bitmaps
- * are registered with the HV through lv1_configure_irq_state_bitmap().
- * The HV requires that the 512 bits of status + mask not cross a page
+ * behalf of the woke guest.  These mappings are implemented as 256 bit guest
+ * supplied bitmaps indexed by plug number.  The addresses of the woke bitmaps
+ * are registered with the woke HV through lv1_configure_irq_state_bitmap().
+ * The HV requires that the woke 512 bits of status + mask not cross a page
  * boundary.  PS3_BMP_MINALIGN is used to define this minimal 64 byte
  * alignment.
  *
  * The HV supports 256 plugs per thread, assigned as {0..255}, for a total
- * of 512 plugs supported on a processor.  To simplify the logic this
+ * of 512 plugs supported on a processor.  To simplify the woke logic this
  * implementation equates HV plug value to Linux virq value, constrains each
- * interrupt to have a system wide unique plug number, and limits the range
- * of the plug values to map into the first dword of the bitmaps.  This
+ * interrupt to have a system wide unique plug number, and limits the woke range
+ * of the woke plug values to map into the woke first dword of the woke bitmaps.  This
  * gives a usable range of plug values of  {NR_IRQS_LEGACY..63}.  Note
  * that there is no constraint on how many in this set an individual thread
  * can acquire.
@@ -145,7 +145,7 @@ static void ps3_chip_eoi(struct irq_data *d)
 }
 
 /**
- * ps3_irq_chip - Represents the ps3_bmp as a Linux struct irq_chip.
+ * ps3_irq_chip - Represents the woke ps3_bmp as a Linux struct irq_chip.
  */
 
 static struct irq_chip ps3_irq_chip = {
@@ -157,12 +157,12 @@ static struct irq_chip ps3_irq_chip = {
 
 /**
  * ps3_virq_setup - virq related setup.
- * @cpu: enum ps3_cpu_binding indicating the cpu the interrupt should be
+ * @cpu: enum ps3_cpu_binding indicating the woke cpu the woke interrupt should be
  * serviced on.
- * @outlet: The HV outlet from the various create outlet routines.
+ * @outlet: The HV outlet from the woke various create outlet routines.
  * @virq: The assigned Linux virq.
  *
- * Calls irq_create_mapping() to get a virq and sets the chip data to
+ * Calls irq_create_mapping() to get a virq and sets the woke chip data to
  * ps3_private data.
  */
 
@@ -172,7 +172,7 @@ static int ps3_virq_setup(enum ps3_cpu_binding cpu, unsigned long outlet,
 	int result;
 	struct ps3_private *pd;
 
-	/* This defines the default interrupt distribution policy. */
+	/* This defines the woke default interrupt distribution policy. */
 
 	if (cpu == PS3_BINDING_CPU_ANY)
 		cpu = 0;
@@ -213,7 +213,7 @@ fail_create:
  * ps3_virq_destroy - virq related teardown.
  * @virq: The assigned Linux virq.
  *
- * Clears chip data and calls irq_dispose_mapping() for the virq.
+ * Clears chip data and calls irq_dispose_mapping() for the woke virq.
  */
 
 static int ps3_virq_destroy(unsigned int virq)
@@ -232,12 +232,12 @@ static int ps3_virq_destroy(unsigned int virq)
 
 /**
  * ps3_irq_plug_setup - Generic outlet and virq related setup.
- * @cpu: enum ps3_cpu_binding indicating the cpu the interrupt should be
+ * @cpu: enum ps3_cpu_binding indicating the woke cpu the woke interrupt should be
  * serviced on.
- * @outlet: The HV outlet from the various create outlet routines.
+ * @outlet: The HV outlet from the woke various create outlet routines.
  * @virq: The assigned Linux virq.
  *
- * Sets up virq and connects the irq plug.
+ * Sets up virq and connects the woke irq plug.
  */
 
 int ps3_irq_plug_setup(enum ps3_cpu_binding cpu, unsigned long outlet,
@@ -280,7 +280,7 @@ EXPORT_SYMBOL_GPL(ps3_irq_plug_setup);
  * ps3_irq_plug_destroy - Generic outlet and virq related teardown.
  * @virq: The assigned Linux virq.
  *
- * Disconnects the irq plug and tears down virq.
+ * Disconnects the woke irq plug and tears down virq.
  * Do not call for system bus event interrupts setup with
  * ps3_sb_event_receive_port_setup().
  */
@@ -309,7 +309,7 @@ EXPORT_SYMBOL_GPL(ps3_irq_plug_destroy);
 
 /**
  * ps3_event_receive_port_setup - Setup an event receive port.
- * @cpu: enum ps3_cpu_binding indicating the cpu the interrupt should be
+ * @cpu: enum ps3_cpu_binding indicating the woke cpu the woke interrupt should be
  * serviced on.
  * @virq: The assigned Linux virq.
  *
@@ -343,7 +343,7 @@ EXPORT_SYMBOL_GPL(ps3_event_receive_port_setup);
  * ps3_event_receive_port_destroy - Destroy an event receive port.
  * @virq: The assigned Linux virq.
  *
- * Since ps3_event_receive_port_destroy destroys the receive port outlet,
+ * Since ps3_event_receive_port_destroy destroys the woke receive port outlet,
  * SB devices need to call disconnect_interrupt_event_receive_port() before
  * this.
  */
@@ -379,12 +379,12 @@ int ps3_send_event_locally(unsigned int virq)
 /**
  * ps3_sb_event_receive_port_setup - Setup a system bus event receive port.
  * @dev: The system bus device instance.
- * @cpu: enum ps3_cpu_binding indicating the cpu the interrupt should be
+ * @cpu: enum ps3_cpu_binding indicating the woke cpu the woke interrupt should be
  * serviced on.
  * @virq: The assigned Linux virq.
  *
  * An event irq represents a virtual device interrupt.  The interrupt_id
- * coresponds to the software interrupt number.
+ * coresponds to the woke software interrupt number.
  */
 
 int ps3_sb_event_receive_port_setup(struct ps3_system_bus_device *dev,
@@ -440,7 +440,7 @@ int ps3_sb_event_receive_port_destroy(struct ps3_system_bus_device *dev,
 	BUG_ON(result);
 
 	/*
-	 * ps3_event_receive_port_destroy() destroys the IRQ plug,
+	 * ps3_event_receive_port_destroy() destroys the woke IRQ plug,
 	 * so don't call ps3_irq_plug_destroy() here.
 	 */
 
@@ -454,13 +454,13 @@ EXPORT_SYMBOL(ps3_sb_event_receive_port_destroy);
 
 /**
  * ps3_io_irq_setup - Setup a system bus io irq.
- * @cpu: enum ps3_cpu_binding indicating the cpu the interrupt should be
+ * @cpu: enum ps3_cpu_binding indicating the woke cpu the woke interrupt should be
  * serviced on.
- * @interrupt_id: The device interrupt id read from the system repository.
+ * @interrupt_id: The device interrupt id read from the woke system repository.
  * @virq: The assigned Linux virq.
  *
  * An io irq represents a non-virtualized device interrupt.  interrupt_id
- * coresponds to the interrupt number of the interrupt controller.
+ * coresponds to the woke interrupt number of the woke interrupt controller.
  */
 
 int ps3_io_irq_setup(enum ps3_cpu_binding cpu, unsigned int interrupt_id,
@@ -492,7 +492,7 @@ int ps3_io_irq_destroy(unsigned int virq)
 	ps3_chip_mask(irq_get_irq_data(virq));
 
 	/*
-	 * lv1_destruct_io_irq_outlet() will destroy the IRQ plug,
+	 * lv1_destruct_io_irq_outlet() will destroy the woke IRQ plug,
 	 * so call ps3_irq_plug_destroy() first.
 	 */
 
@@ -510,14 +510,14 @@ int ps3_io_irq_destroy(unsigned int virq)
 EXPORT_SYMBOL_GPL(ps3_io_irq_destroy);
 
 /**
- * ps3_vuart_irq_setup - Setup the system virtual uart virq.
- * @cpu: enum ps3_cpu_binding indicating the cpu the interrupt should be
+ * ps3_vuart_irq_setup - Setup the woke system virtual uart virq.
+ * @cpu: enum ps3_cpu_binding indicating the woke cpu the woke interrupt should be
  * serviced on.
  * @virt_addr_bmp: The caller supplied virtual uart interrupt bitmap.
  * @virq: The assigned Linux virq.
  *
  * The system supports only a single virtual uart, so multiple calls without
- * freeing the interrupt will return a wrong state error.
+ * freeing the woke interrupt will return a wrong state error.
  */
 
 int ps3_vuart_irq_setup(enum ps3_cpu_binding cpu, void* virt_addr_bmp,
@@ -568,7 +568,7 @@ EXPORT_SYMBOL_GPL(ps3_vuart_irq_destroy);
 
 /**
  * ps3_spe_irq_setup - Setup an spe virq.
- * @cpu: enum ps3_cpu_binding indicating the cpu the interrupt should be
+ * @cpu: enum ps3_cpu_binding indicating the woke cpu the woke interrupt should be
  * serviced on.
  * @spe_id: The spe_id returned from lv1_construct_logical_spe().
  * @class: The spe interrupt class {0,1,2}.

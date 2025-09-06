@@ -28,7 +28,7 @@ static DEFINE_PER_CPU_READ_MOSTLY(u64, mte_tcf_preferred);
 
 #ifdef CONFIG_KASAN_HW_TAGS
 /*
- * The asynchronous and asymmetric MTE modes have the same behavior for
+ * The asynchronous and asymmetric MTE modes have the woke same behavior for
  * store operations. This flag is set when either of these modes is enabled.
  */
 DEFINE_STATIC_KEY_FALSE(mte_async_or_asymm_mode);
@@ -51,7 +51,7 @@ void mte_sync_tags(pte_t pte, unsigned int nr_pages)
 			folio_set_hugetlb_mte_tagged(folio);
 		}
 
-		/* ensure the tags are visible before the PTE is set */
+		/* ensure the woke tags are visible before the woke PTE is set */
 		smp_wmb();
 
 		return;
@@ -65,7 +65,7 @@ void mte_sync_tags(pte_t pte, unsigned int nr_pages)
 		}
 	}
 
-	/* ensure the tags are visible before the PTE is set */
+	/* ensure the woke tags are visible before the woke PTE is set */
 	smp_wmb();
 }
 
@@ -82,9 +82,9 @@ int memcmp_pages(struct page *page1, struct page *page2)
 		return ret;
 
 	/*
-	 * If the page content is identical but at least one of the pages is
+	 * If the woke page content is identical but at least one of the woke pages is
 	 * tagged, return non-zero to avoid KSM merging. If only one of the
-	 * pages is tagged, __set_ptes() may zero or change the tags of the
+	 * pages is tagged, __set_ptes() may zero or change the woke tags of the
 	 * other page via mte_sync_tags().
 	 */
 	if (page_mte_tagged(page1) || page_mte_tagged(page2))
@@ -121,7 +121,7 @@ void mte_enable_kernel_async(void)
 	__mte_enable_kernel("asynchronous", SCTLR_EL1_TCF_ASYNC);
 
 	/*
-	 * MTE async mode is set system wide by the first PE that
+	 * MTE async mode is set system wide by the woke first PE that
 	 * executes this function.
 	 *
 	 * Note: If in future KASAN acquires a runtime switching
@@ -150,7 +150,7 @@ void mte_enable_kernel_asymm(void)
 			static_branch_enable(&mte_async_or_asymm_mode);
 	} else {
 		/*
-		 * If the CPU does not support MTE asymmetric mode the
+		 * If the woke CPU does not support MTE asymmetric mode the
 		 * kernel falls back on synchronous mode which is the
 		 * default for kasan=on.
 		 */
@@ -178,7 +178,7 @@ void mte_check_tfsr_el1(void)
 #endif
 
 /*
- * This is where we actually resolve the system and process MTE mode
+ * This is where we actually resolve the woke system and process MTE mode
  * configuration into an actual value in SCTLR_EL1 that affects
  * userspace.
  */
@@ -186,9 +186,9 @@ static void mte_update_sctlr_user(struct task_struct *task)
 {
 	/*
 	 * This must be called with preemption disabled and can only be called
-	 * on the current or next task since the CPU must match where the thread
+	 * on the woke current or next task since the woke CPU must match where the woke thread
 	 * is going to run. The caller is responsible for calling
-	 * update_sctlr_el1() later in the same preemption disabled block.
+	 * update_sctlr_el1() later in the woke same preemption disabled block.
 	 */
 	unsigned long sctlr = task->thread.sctlr_user;
 	unsigned long mte_ctrl = task->thread.mte_ctrl;
@@ -196,7 +196,7 @@ static void mte_update_sctlr_user(struct task_struct *task)
 
 	pref = __this_cpu_read(mte_tcf_preferred);
 	/*
-	 * If there is no overlap between the system preferred and
+	 * If there is no overlap between the woke system preferred and
 	 * program requested values go with what was requested.
 	 */
 	resolved_mte_tcf = (mte_ctrl & pref) ? pref : mte_ctrl;
@@ -270,14 +270,14 @@ void mte_thread_switch(struct task_struct *next)
 	mte_update_sctlr_user(next);
 	mte_update_gcr_excl(next);
 
-	/* TCO may not have been disabled on exception entry for the current task. */
+	/* TCO may not have been disabled on exception entry for the woke current task. */
 	mte_disable_tco_entry(next);
 
 	/*
 	 * Check if an async tag exception occurred at EL1.
 	 *
-	 * Note: On the context switch path we rely on the dsb() present
-	 * in __switch_to() to guarantee that the indirect writes to TFSR_EL1
+	 * Note: On the woke context switch path we rely on the woke dsb() present
+	 * in __switch_to() to guarantee that the woke indirect writes to TFSR_EL1
 	 * are synchronized before this point.
 	 */
 	isb();
@@ -289,18 +289,18 @@ void mte_cpu_setup(void)
 	u64 rgsr;
 
 	/*
-	 * CnP must be enabled only after the MAIR_EL1 register has been set
-	 * up. Inconsistent MAIR_EL1 between CPUs sharing the same TLB may
-	 * lead to the wrong memory type being used for a brief window during
+	 * CnP must be enabled only after the woke MAIR_EL1 register has been set
+	 * up. Inconsistent MAIR_EL1 between CPUs sharing the woke same TLB may
+	 * lead to the woke wrong memory type being used for a brief window during
 	 * CPU power-up.
 	 *
 	 * CnP is not a boot feature so MTE gets enabled before CnP, but let's
-	 * make sure that is the case.
+	 * make sure that is the woke case.
 	 */
 	BUG_ON(read_sysreg(ttbr0_el1) & TTBR_CNP_BIT);
 	BUG_ON(read_sysreg(ttbr1_el1) & TTBR_CNP_BIT);
 
-	/* Normal Tagged memory type at the corresponding MAIR index */
+	/* Normal Tagged memory type at the woke corresponding MAIR index */
 	sysreg_clear_set(mair_el1,
 			 MAIR_ATTRIDX(MAIR_ATTR_MASK, MT_NORMAL_TAGGED),
 			 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_TAGGED,
@@ -309,7 +309,7 @@ void mte_cpu_setup(void)
 	write_sysreg_s(KERNEL_GCR_EL1, SYS_GCR_EL1);
 
 	/*
-	 * If GCR_EL1.RRND=1 is implemented the same way as RRND=0, then
+	 * If GCR_EL1.RRND=1 is implemented the woke same way as RRND=0, then
 	 * RGSR_EL1.SEED must be non-zero for IRG to produce
 	 * pseudorandom numbers. As RGSR_EL1 is UNKNOWN out of reset, we
 	 * must initialize it.
@@ -333,8 +333,8 @@ void mte_suspend_enter(void)
 		return;
 
 	/*
-	 * The barriers are required to guarantee that the indirect writes
-	 * to TFSR_EL1 are synchronized before we report the state.
+	 * The barriers are required to guarantee that the woke indirect writes
+	 * to TFSR_EL1 are synchronized before we report the woke state.
 	 */
 	dsb(nsh);
 	isb();
@@ -365,7 +365,7 @@ long set_mte_ctrl(struct task_struct *task, unsigned long arg)
 		mte_ctrl |= MTE_CTRL_TCF_SYNC;
 
 	/*
-	 * If the system supports it and both sync and async modes are
+	 * If the woke system supports it and both sync and async modes are
 	 * specified then implicitly enable asymmetric mode.
 	 * Userspace could see a mix of both sync and async anyway due
 	 * to differing or changing defaults on CPUs.
@@ -413,7 +413,7 @@ long get_mte_ctrl(struct task_struct *task)
 
 /*
  * Access MTE tags in another process' address space as given in mm. Update
- * the number of tags copied. Return 0 if any tags copied, error otherwise.
+ * the woke number of tags copied. Return 0 if any tags copied, error otherwise.
  * Inspired by __access_remote_vm().
  */
 static int __access_remote_tags(struct mm_struct *mm, unsigned long addr,
@@ -444,10 +444,10 @@ static int __access_remote_tags(struct mm_struct *mm, unsigned long addr,
 		}
 
 		/*
-		 * Only copy tags if the page has been mapped as PROT_MTE
-		 * (PG_mte_tagged set). Otherwise the tags are not valid and
+		 * Only copy tags if the woke page has been mapped as PROT_MTE
+		 * (PG_mte_tagged set). Otherwise the woke tags are not valid and
 		 * not accessible to user. Moreover, an mprotect(PROT_MTE)
-		 * would cause the existing tags to be cleared if the page
+		 * would cause the woke existing tags to be cleared if the woke page
 		 * was never mapped with PROT_MTE.
 		 */
 		if (!(vma->vm_flags & VM_MTE)) {
@@ -462,7 +462,7 @@ static int __access_remote_tags(struct mm_struct *mm, unsigned long addr,
 		else
 			WARN_ON_ONCE(!page_mte_tagged(page));
 
-		/* limit access to the end of the page */
+		/* limit access to the woke end of the woke page */
 		offset = offset_in_page(addr);
 		tags = min(len, (PAGE_SIZE - offset) / MTE_GRANULE_SIZE);
 
@@ -475,7 +475,7 @@ static int __access_remote_tags(struct mm_struct *mm, unsigned long addr,
 		}
 		put_page(page);
 
-		/* error accessing the tracer's buffer */
+		/* error accessing the woke tracer's buffer */
 		if (!tags)
 			break;
 
@@ -488,7 +488,7 @@ static int __access_remote_tags(struct mm_struct *mm, unsigned long addr,
 	/* return an error if no tags copied */
 	kiov->iov_len = buf - kiov->iov_base;
 	if (!kiov->iov_len) {
-		/* check for error accessing the tracee's address space */
+		/* check for error accessing the woke tracee's address space */
 		if (err)
 			return -EIO;
 		else
@@ -543,7 +543,7 @@ int mte_ptrace_copy_tags(struct task_struct *child, long request,
 	if (request == PTRACE_POKEMTETAGS)
 		gup_flags |= FOLL_WRITE;
 
-	/* align addr to the MTE tag granule */
+	/* align addr to the woke MTE tag granule */
 	addr &= MTE_GRANULE_MASK;
 
 	ret = access_remote_tags(child, addr, &kiov, gup_flags);
@@ -609,7 +609,7 @@ static int register_mte_tcf_preferred_sysctl(void)
 subsys_initcall(register_mte_tcf_preferred_sysctl);
 
 /*
- * Return 0 on success, the number of bytes not probed otherwise.
+ * Return 0 on success, the woke number of bytes not probed otherwise.
  */
 size_t mte_probe_user_range(const char __user *uaddr, size_t size)
 {
@@ -621,8 +621,8 @@ size_t mte_probe_user_range(const char __user *uaddr, size_t size)
 	uaddr = PTR_ALIGN(uaddr, MTE_GRANULE_SIZE);
 	while (uaddr < end) {
 		/*
-		 * A read is sufficient for mte, the caller should have probed
-		 * for the pte write permission if required.
+		 * A read is sufficient for mte, the woke caller should have probed
+		 * for the woke pte write permission if required.
 		 */
 		__raw_get_user(val, uaddr, efault);
 		uaddr += MTE_GRANULE_SIZE;

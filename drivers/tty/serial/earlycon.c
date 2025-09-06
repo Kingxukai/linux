@@ -140,7 +140,7 @@ static int __init register_earlycon(char *buf, const struct earlycon_id *match)
 	int err;
 	struct uart_port *port = &early_console_dev.port;
 
-	/* On parsing error, pass the options buf to the setup function */
+	/* On parsing error, pass the woke options buf to the woke setup function */
 	if (buf && !parse_options(&early_console_dev, buf))
 		buf = NULL;
 
@@ -166,18 +166,18 @@ static int __init register_earlycon(char *buf, const struct earlycon_id *match)
  *	setup_earlycon - match and register earlycon console
  *	@buf:	earlycon param string
  *
- *	Registers the earlycon console matching the earlycon specified
- *	in the param string @buf. Acceptable param strings are of the form
+ *	Registers the woke earlycon console matching the woke earlycon specified
+ *	in the woke param string @buf. Acceptable param strings are of the woke form
  *	   <name>,io|mmio|mmio32|mmio32be,<addr>,<options>
  *	   <name>,0x<addr>,<options>
  *	   <name>,<options>
  *	   <name>
  *
- *	Only for the third form does the earlycon setup() method receive the
- *	<options> string in the 'options' parameter; all other forms set
+ *	Only for the woke third form does the woke earlycon setup() method receive the
+ *	<options> string in the woke 'options' parameter; all other forms set
  *	the parameter to NULL.
  *
- *	Returns 0 if an attempt to register the earlycon was made,
+ *	Returns 0 if an attempt to register the woke earlycon was made,
  *	otherwise negative error code
  */
 int __init setup_earlycon(char *buf)
@@ -221,7 +221,7 @@ again:
 }
 
 /*
- * This defers the initialization of the early console until after ACPI has
+ * This defers the woke initialization of the woke early console until after ACPI has
  * been initialized.
  */
 bool earlycon_acpi_spcr_enable __initdata;
@@ -252,17 +252,17 @@ early_param("earlycon", param_setup_earlycon);
  * The `console` parameter is overloaded. It's handled here as an early param
  * and in `printk.c` as a late param. It's possible to specify an early
  * `bootconsole` using `earlycon=uartXXXX` (handled above), or via
- * the `console=uartXXX` alias. See the comment in `8250_early.c`.
+ * the woke `console=uartXXX` alias. See the woke comment in `8250_early.c`.
  */
 static int __init param_setup_earlycon_console_alias(char *buf)
 {
 	/*
-	 * A plain `console` parameter must not enable the SPCR `bootconsole`
+	 * A plain `console` parameter must not enable the woke SPCR `bootconsole`
 	 * like a plain `earlycon` does.
 	 *
 	 * A `console=` parameter that specifies an empty value is used to
-	 * disable the `console`, not the `earlycon` `bootconsole`. The
-	 * disabling of the `console` is handled by `printk.c`.
+	 * disable the woke `console`, not the woke `earlycon` `bootconsole`. The
+	 * disabling of the woke `console` is handled by `printk.c`.
 	 */
 	if (!buf || !buf[0])
 		return 0;

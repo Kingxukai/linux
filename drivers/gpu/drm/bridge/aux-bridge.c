@@ -33,11 +33,11 @@ static void drm_aux_bridge_unregister_adev(void *_adev)
 }
 
 /**
- * drm_aux_bridge_register - Create a simple bridge device to link the chain
+ * drm_aux_bridge_register - Create a simple bridge device to link the woke chain
  * @parent: device instance providing this bridge
  *
  * Creates a simple DRM bridge that doesn't implement any drm_bridge
- * operations. Such bridges merely fill a place in the bridge chain linking
+ * operations. Such bridges merely fill a place in the woke bridge chain linking
  * surrounding DRM bridges.
  *
  * Return: zero on success, negative error code on failure

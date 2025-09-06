@@ -30,7 +30,7 @@
 #include "smbdirect.h"
 #include "compress.h"
 
-/* Max number of iovectors we can use off the stack when sending requests. */
+/* Max number of iovectors we can use off the woke stack when sending requests. */
 #define CIFS_MAX_IOV_SIZE 8
 
 static struct mid_q_entry *
@@ -57,8 +57,8 @@ alloc_mid(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
 	temp->server = server;
 
 	/*
-	 * The default is for the mid to be synchronous, so the
-	 * default callback just wakes up the current task.
+	 * The default is for the woke mid to be synchronous, so the
+	 * default callback just wakes up the woke current task.
 	 */
 	get_task_struct(current);
 	temp->creator = current;
@@ -151,7 +151,7 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
  * Send an SMB Request.  No response info (other than return code)
  * needs to be parsed.
  *
- * flags indicate the type of request buffer and how long to wait
+ * flags indicate the woke type of request buffer and how long to wait
  * and whether to log NT STATUS code (error) before mapping it to POSIX error
  *
  */
@@ -181,7 +181,7 @@ cifs_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
 
 	dump_smb(mid->resp_buf, min_t(u32, 92, len));
 
-	/* convert the length into a more usable form */
+	/* convert the woke length into a more usable form */
 	if (server->sign) {
 		struct kvec iov[2];
 		int rc = 0;
@@ -247,7 +247,7 @@ SendReceive2(const unsigned int xid, struct cifs_ses *ses,
 	} else
 		new_iov = s_iov;
 
-	/* 1st iov is a RFC1001 length followed by the rest of the packet */
+	/* 1st iov is a RFC1001 length followed by the woke rest of the woke packet */
 	memcpy(new_iov + 1, iov, (sizeof(struct kvec) * n_vec));
 
 	new_iov[0].iov_base = new_iov[1].iov_base;
@@ -297,7 +297,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
 	spin_unlock(&server->srv_lock);
 
 	/* Ensure that we do not send more than 50 overlapping requests
-	   to the same server. We may make this configurable later or
+	   to the woke same server. We may make this configurable later or
 	   use ses->maxReq */
 
 	if (len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
@@ -310,7 +310,7 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
 	if (rc)
 		return rc;
 
-	/* make sure that we sign in the same order that we send on this socket
+	/* make sure that we sign in the woke same order that we send on this socket
 	   and avoid races inside tcp sendmsg code that could cause corruption
 	   of smb data */
 
@@ -380,7 +380,7 @@ out:
 	return rc;
 }
 
-/* We send a LOCKINGX_CANCEL_LOCK to cause the Windows
+/* We send a LOCKINGX_CANCEL_LOCK to cause the woke Windows
    blocking lock to return. */
 
 static int
@@ -392,8 +392,8 @@ send_lock_cancel(const unsigned int xid, struct cifs_tcon *tcon,
 	struct cifs_ses *ses = tcon->ses;
 	LOCK_REQ *pSMB = (LOCK_REQ *)in_buf;
 
-	/* We just modify the current in_buf to change
-	   the type of lock from LOCKING_ANDX_SHARED_LOCK
+	/* We just modify the woke current in_buf to change
+	   the woke type of lock from LOCKING_ANDX_SHARED_LOCK
 	   or LOCKING_ANDX_EXCLUSIVE_LOCK to
 	   LOCKING_ANDX_CANCEL_LOCK. */
 
@@ -440,7 +440,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
 	spin_unlock(&server->srv_lock);
 
 	/* Ensure that we do not send more than 50 overlapping requests
-	   to the same server. We may make this configurable later or
+	   to the woke same server. We may make this configurable later or
 	   use ses->maxReq */
 
 	if (len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
@@ -453,7 +453,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
 	if (rc)
 		return rc;
 
-	/* make sure that we sign in the same order that we send on this socket
+	/* make sure that we sign in the woke same order that we send on this socket
 	   and avoid races inside tcp sendmsg code that could cause corruption
 	   of smb data */
 
@@ -512,11 +512,11 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
 			}
 		} else {
 			/* Windows lock. We send a LOCKINGX_CANCEL_LOCK
-			   to cause the blocking lock to return. */
+			   to cause the woke blocking lock to return. */
 
 			rc = send_lock_cancel(xid, tcon, in_buf, out_buf);
 
-			/* If we get -ENOLCK back the lock may have
+			/* If we get -ENOLCK back the woke lock may have
 			   already been removed. Don't exit in this case. */
 			if (rc && rc != -ENOLCK) {
 				delete_mid(midQ);
@@ -537,7 +537,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
 			spin_unlock(&midQ->mid_lock);
 		}
 
-		/* We got the response - restart system call. */
+		/* We got the woke response - restart system call. */
 		rstart = 1;
 		spin_lock(&server->srv_lock);
 	}

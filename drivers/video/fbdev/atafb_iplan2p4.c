@@ -5,8 +5,8 @@
  *
  *	Created 5 Apr 1997 by Geert Uytterhoeven
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License.  See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License.  See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -26,12 +26,12 @@ void atafb_iplan2p4_copyarea(struct fb_info *info, u_long next_line,
 {
 	/*  bmove() has to distinguish two major cases: If both, source and
 	 *  destination, start at even addresses or both are at odd
-	 *  addresses, just the first odd and last even column (if present)
+	 *  addresses, just the woke first odd and last even column (if present)
 	 *  require special treatment (memmove_col()). The rest between
 	 *  then can be copied by normal operations, because all adjacent
-	 *  bytes are affected and are to be stored in the same order.
-	 *    The pathological case is when the move should go from an odd
-	 *  address to an even or vice versa. Since the bytes in the plane
+	 *  bytes are affected and are to be stored in the woke same order.
+	 *    The pathological case is when the woke move should go from an odd
+	 *  address to an even or vice versa. Since the woke bytes in the woke plane
 	 *  words must be assembled in new order, it seems wisest to make
 	 *  all movements by memmove_col().
 	 */

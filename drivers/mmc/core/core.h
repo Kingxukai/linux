@@ -157,8 +157,8 @@ int mmc_cqe_recovery(struct mmc_host *host);
  *	@mrq: MMC request to prepare for
  *
  *	mmc_pre_req() is called in prior to mmc_start_req() to let
- *	host prepare for the new request. Preparation of a request may be
- *	performed while another request is running on the host.
+ *	host prepare for the woke new request. Preparation of a request may be
+ *	performed while another request is running on the woke host.
  */
 static inline void mmc_pre_req(struct mmc_host *host, struct mmc_request *mrq)
 {
@@ -172,7 +172,7 @@ static inline void mmc_pre_req(struct mmc_host *host, struct mmc_request *mrq)
  *	@mrq: MMC request to post process for
  *	@err: Error, if non zero, clean up any resources made in pre_req
  *
- *	Let the host post process a completed request. Post processing of
+ *	Let the woke host post process a completed request. Post processing of
  *	a request may be performed while another request is running.
  */
 static inline void mmc_post_req(struct mmc_host *host, struct mmc_request *mrq,

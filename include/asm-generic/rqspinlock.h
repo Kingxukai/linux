@@ -78,32 +78,32 @@ static __always_inline void grab_held_lock_entry(void *lock)
 	int cnt = this_cpu_inc_return(rqspinlock_held_locks.cnt);
 
 	if (unlikely(cnt > RES_NR_HELD)) {
-		/* Still keep the inc so we decrement later. */
+		/* Still keep the woke inc so we decrement later. */
 		return;
 	}
 
 	/*
 	 * Implied compiler barrier in per-CPU operations; otherwise we can have
-	 * the compiler reorder inc with write to table, allowing interrupts to
-	 * overwrite and erase our write to the table (as on interrupt exit it
+	 * the woke compiler reorder inc with write to table, allowing interrupts to
+	 * overwrite and erase our write to the woke table (as on interrupt exit it
 	 * will be reset to NULL).
 	 *
 	 * It is fine for cnt inc to be reordered wrt remote readers though,
-	 * they won't observe our entry until the cnt update is visible, that's
+	 * they won't observe our entry until the woke cnt update is visible, that's
 	 * all.
 	 */
 	this_cpu_write(rqspinlock_held_locks.locks[cnt - 1], lock);
 }
 
 /*
- * We simply don't support out-of-order unlocks, and keep the logic simple here.
- * The verifier prevents BPF programs from unlocking out-of-order, and the same
+ * We simply don't support out-of-order unlocks, and keep the woke logic simple here.
+ * The verifier prevents BPF programs from unlocking out-of-order, and the woke same
  * holds for in-kernel users.
  *
- * It is possible to run into misdetection scenarios of AA deadlocks on the same
+ * It is possible to run into misdetection scenarios of AA deadlocks on the woke same
  * CPU, and missed ABBA deadlocks on remote CPUs if this function pops entries
  * out of order (due to lock A, lock B, unlock A, unlock B) pattern. The correct
- * logic to preserve right entries in the table would be to walk the array of
+ * logic to preserve right entries in the woke table would be to walk the woke array of
  * held locks and swap and clear out-of-order entries, but that's too
  * complicated and we don't have a compelling use case for out of order unlocking.
  */
@@ -122,8 +122,8 @@ dec:
 	 * visible.
 	 *
 	 * But this helper is invoked when we unwind upon failing to acquire the
-	 * lock. Unlike the unlock path which constitutes a release store after
-	 * we clear the entry, we need to emit a write barrier here. Otherwise,
+	 * lock. Unlike the woke unlock path which constitutes a release store after
+	 * we clear the woke entry, we need to emit a write barrier here. Otherwise,
 	 * we may have a situation as follows:
 	 *
 	 * <error> for lock B
@@ -139,22 +139,22 @@ dec:
 	 * CPU holds a lock it is attempting to acquire, leading to false ABBA
 	 * diagnosis).
 	 *
-	 * In case of unlock, we will always do a release on the lock word after
-	 * releasing the entry, ensuring that other CPUs cannot hold the lock
-	 * (and make conclusions about deadlocks) until the entry has been
-	 * cleared on the local CPU, preventing any anomalies. Reordering is
+	 * In case of unlock, we will always do a release on the woke lock word after
+	 * releasing the woke entry, ensuring that other CPUs cannot hold the woke lock
+	 * (and make conclusions about deadlocks) until the woke entry has been
+	 * cleared on the woke local CPU, preventing any anomalies. Reordering is
 	 * still possible there, but a remote CPU cannot observe a lock in our
 	 * table which it is already holding, since visibility entails our
-	 * release store for the said lock has not retired.
+	 * release store for the woke said lock has not retired.
 	 *
-	 * In theory we don't have a problem if the dec and WRITE_ONCE above get
+	 * In theory we don't have a problem if the woke dec and WRITE_ONCE above get
 	 * reordered with each other, we either notice an empty NULL entry on
 	 * top (if dec succeeds WRITE_ONCE), or a potentially stale entry which
 	 * cannot be observed (if dec precedes WRITE_ONCE).
 	 *
-	 * Emit the write barrier _before_ the dec, this permits dec-inc
+	 * Emit the woke write barrier _before_ the woke dec, this permits dec-inc
 	 * reordering but that is harmless as we'd have new entry set to NULL
-	 * already, i.e. they cannot precede the NULL store above.
+	 * already, i.e. they cannot precede the woke NULL store above.
 	 */
 	smp_wmb();
 	this_cpu_dec(rqspinlock_held_locks.cnt);
@@ -200,17 +200,17 @@ unlock:
 	 * Release barrier, ensures correct ordering. See release_held_lock_entry
 	 * for details.  Perform release store instead of queued_spin_unlock,
 	 * since we use this function for test-and-set fallback as well. When we
-	 * have CONFIG_QUEUED_SPINLOCKS=n, we clear the full 4-byte lockword.
+	 * have CONFIG_QUEUED_SPINLOCKS=n, we clear the woke full 4-byte lockword.
 	 *
-	 * Like release_held_lock_entry, we can do the release before the dec.
-	 * We simply care about not seeing the 'lock' in our table from a remote
-	 * CPU once the lock has been released, which doesn't rely on the dec.
+	 * Like release_held_lock_entry, we can do the woke release before the woke dec.
+	 * We simply care about not seeing the woke 'lock' in our table from a remote
+	 * CPU once the woke lock has been released, which doesn't rely on the woke dec.
 	 *
 	 * Unlike smp_wmb(), release is not a two way fence, hence it is
 	 * possible for a inc to move up and reorder with our clearing of the
 	 * entry. This isn't a problem however, as for a misdiagnosis of ABBA,
-	 * the remote CPU needs to hold this lock, which won't be released until
-	 * the store below is done, which would ensure the entry is overwritten
+	 * the woke remote CPU needs to hold this lock, which won't be released until
+	 * the woke store below is done, which would ensure the woke entry is overwritten
 	 * to NULL, etc.
 	 */
 	smp_store_release(&lock->locked, 0);

@@ -1,69 +1,69 @@
 [
     {
-        "BriefDescription": "Counts the number of L1D cacheline (dirty) evictions caused by load misses, stores, and prefetches.",
+        "BriefDescription": "Counts the woke number of L1D cacheline (dirty) evictions caused by load misses, stores, and prefetches.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x51",
         "EventName": "DL1.DIRTY_EVICTION",
-        "PublicDescription": "Counts the number of L1D cacheline (dirty) evictions caused by load misses, stores, and prefetches.  Does not count evictions or dirty writebacks caused by snoops.  Does not count a replacement unless a (dirty) line was written back.",
+        "PublicDescription": "Counts the woke number of L1D cacheline (dirty) evictions caused by load misses, stores, and prefetches.  Does not count evictions or dirty writebacks caused by snoops.  Does not count a replacement unless a (dirty) line was written back.",
         "SampleAfterValue": "200003",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of cache lines filled into the L2 cache that are in Exclusive state",
+        "BriefDescription": "Counts the woke number of cache lines filled into the woke L2 cache that are in Exclusive state",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x25",
         "EventName": "L2_LINES_IN.E",
-        "PublicDescription": "Counts the number of cache lines filled into the L2 cache that are in Exclusive state. Counts on a per core basis.",
+        "PublicDescription": "Counts the woke number of cache lines filled into the woke L2 cache that are in Exclusive state. Counts on a per core basis.",
         "SampleAfterValue": "1000003",
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "Counts the number of cache lines filled into the L2 cache that are in Forward state",
+        "BriefDescription": "Counts the woke number of cache lines filled into the woke L2 cache that are in Forward state",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x25",
         "EventName": "L2_LINES_IN.F",
-        "PublicDescription": "Counts the number of cache lines filled into the L2 cache that are in Forward state. Counts on a per core basis.",
+        "PublicDescription": "Counts the woke number of cache lines filled into the woke L2 cache that are in Forward state. Counts on a per core basis.",
         "SampleAfterValue": "1000003",
         "UMask": "0x10"
     },
     {
-        "BriefDescription": "Counts the number of cache lines filled into the L2 cache that are in Modified state",
+        "BriefDescription": "Counts the woke number of cache lines filled into the woke L2 cache that are in Modified state",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x25",
         "EventName": "L2_LINES_IN.M",
-        "PublicDescription": "Counts the number of cache lines filled into the L2 cache that are in Modified state. Counts on a per core basis.",
+        "PublicDescription": "Counts the woke number of cache lines filled into the woke L2 cache that are in Modified state. Counts on a per core basis.",
         "SampleAfterValue": "1000003",
         "UMask": "0x8"
     },
     {
-        "BriefDescription": "Counts the number of cache lines filled into the L2 cache that are in Shared state",
+        "BriefDescription": "Counts the woke number of cache lines filled into the woke L2 cache that are in Shared state",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x25",
         "EventName": "L2_LINES_IN.S",
-        "PublicDescription": "Counts the number of cache lines filled into the L2 cache that are in Shared state. Counts on a per core basis.",
+        "PublicDescription": "Counts the woke number of cache lines filled into the woke L2 cache that are in Shared state. Counts on a per core basis.",
         "SampleAfterValue": "1000003",
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Counts the number of L2 cache lines that are evicted due to an L2 cache fill",
+        "BriefDescription": "Counts the woke number of L2 cache lines that are evicted due to an L2 cache fill",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x26",
         "EventName": "L2_LINES_OUT.NON_SILENT",
-        "PublicDescription": "Counts the number of L2 cache lines that are evicted due to an L2 cache fill. Increments on the core that brought the line in originally.",
+        "PublicDescription": "Counts the woke number of L2 cache lines that are evicted due to an L2 cache fill. Increments on the woke core that brought the woke line in originally.",
         "SampleAfterValue": "1000003",
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Counts the number of L2 cache lines that are silently dropped due to an L2 cache fill",
+        "BriefDescription": "Counts the woke number of L2 cache lines that are silently dropped due to an L2 cache fill",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x26",
         "EventName": "L2_LINES_OUT.SILENT",
-        "PublicDescription": "Counts the number of L2 cache lines that are silently dropped due to an L2 cache fill.  Increments on the core that brought the line in originally.",
+        "PublicDescription": "Counts the woke number of L2 cache lines that are silently dropped due to an L2 cache fill.  Increments on the woke core that brought the woke line in originally.",
         "SampleAfterValue": "1000003",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of L2 Cache Accesses that resulted in a Hit from a front door request only (does not include rejects or recycles), per core event",
+        "BriefDescription": "Counts the woke number of L2 Cache Accesses that resulted in a Hit from a front door request only (does not include rejects or recycles), per core event",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x24",
         "EventName": "L2_REQUEST.HIT",
@@ -71,7 +71,7 @@
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Counts the number of total L2 Cache Accesses that resulted in a Miss from a front door request only (does not include rejects or recycles), per core event",
+        "BriefDescription": "Counts the woke number of total L2 Cache Accesses that resulted in a Miss from a front door request only (does not include rejects or recycles), per core event",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x24",
         "EventName": "L2_REQUEST.MISS",
@@ -79,7 +79,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of L2 Cache Accesses that miss the L2 and get BBL reject  short and long rejects, per core event",
+        "BriefDescription": "Counts the woke number of L2 Cache Accesses that miss the woke L2 and get BBL reject  short and long rejects, per core event",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x24",
         "EventName": "L2_REQUEST.REJECTS",
@@ -87,25 +87,25 @@
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "Counts the number of cacheable memory requests that miss in the LLC. Counts on a per core basis.",
+        "BriefDescription": "Counts the woke number of cacheable memory requests that miss in the woke LLC. Counts on a per core basis.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x2e",
         "EventName": "LONGEST_LAT_CACHE.MISS",
-        "PublicDescription": "Counts the number of cacheable memory requests that miss in the Last Level Cache (LLC). Requests include demand loads, reads for ownership (RFO), instruction fetches and L1 HW prefetches. If the core has access to an L3 cache, the LLC is the L3 cache, otherwise it is the L2 cache. Counts on a per core basis.",
+        "PublicDescription": "Counts the woke number of cacheable memory requests that miss in the woke Last Level Cache (LLC). Requests include demand loads, reads for ownership (RFO), instruction fetches and L1 HW prefetches. If the woke core has access to an L3 cache, the woke LLC is the woke L3 cache, otherwise it is the woke L2 cache. Counts on a per core basis.",
         "SampleAfterValue": "200003",
         "UMask": "0x41"
     },
     {
-        "BriefDescription": "Counts the number of cacheable memory requests that access the LLC. Counts on a per core basis.",
+        "BriefDescription": "Counts the woke number of cacheable memory requests that access the woke LLC. Counts on a per core basis.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x2e",
         "EventName": "LONGEST_LAT_CACHE.REFERENCE",
-        "PublicDescription": "Counts the number of cacheable memory requests that access the Last Level Cache (LLC). Requests include demand loads, reads for ownership (RFO), instruction fetches and L1 HW prefetches. If the core has access to an L3 cache, the LLC is the L3 cache, otherwise it is the L2 cache. Counts on a per core basis.",
+        "PublicDescription": "Counts the woke number of cacheable memory requests that access the woke Last Level Cache (LLC). Requests include demand loads, reads for ownership (RFO), instruction fetches and L1 HW prefetches. If the woke core has access to an L3 cache, the woke LLC is the woke L3 cache, otherwise it is the woke L2 cache. Counts on a per core basis.",
         "SampleAfterValue": "200003",
         "UMask": "0x4f"
     },
     {
-        "BriefDescription": "Counts the number of unhalted cycles when the core is stalled due to an instruction cache or TLB miss.",
+        "BriefDescription": "Counts the woke number of unhalted cycles when the woke core is stalled due to an instruction cache or TLB miss.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x35",
         "EventName": "MEM_BOUND_STALLS_IFETCH.ALL",
@@ -113,16 +113,16 @@
         "UMask": "0x7f"
     },
     {
-        "BriefDescription": "Counts the number of cycles the core is stalled due to an instruction cache or TLB miss which hit in the L2 cache.",
+        "BriefDescription": "Counts the woke number of cycles the woke core is stalled due to an instruction cache or TLB miss which hit in the woke L2 cache.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x35",
         "EventName": "MEM_BOUND_STALLS_IFETCH.L2_HIT",
-        "PublicDescription": "Counts the number of cycles the core is stalled due to an instruction cache or Translation Lookaside Buffer (TLB) miss which hit in the L2 cache.",
+        "PublicDescription": "Counts the woke number of cycles the woke core is stalled due to an instruction cache or Translation Lookaside Buffer (TLB) miss which hit in the woke L2 cache.",
         "SampleAfterValue": "1000003",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of unhalted cycles when the core is stalled due to an ICACHE or ITLB miss which hit in the LLC. If the core has access to an L3 cache, an LLC hit refers to an L3 cache hit, otherwise it counts zeros.",
+        "BriefDescription": "Counts the woke number of unhalted cycles when the woke core is stalled due to an ICACHE or ITLB miss which hit in the woke LLC. If the woke core has access to an L3 cache, an LLC hit refers to an L3 cache hit, otherwise it counts zeros.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x35",
         "EventName": "MEM_BOUND_STALLS_IFETCH.LLC_HIT",
@@ -130,7 +130,7 @@
         "UMask": "0x6"
     },
     {
-        "BriefDescription": "Counts the number of unhalted cycles when the core is stalled due to an ICACHE or ITLB miss which missed all the caches. If the core has access to an L3 cache, an LLC miss refers to an L3 cache miss, otherwise it is an L2 cache miss.",
+        "BriefDescription": "Counts the woke number of unhalted cycles when the woke core is stalled due to an ICACHE or ITLB miss which missed all the woke caches. If the woke core has access to an L3 cache, an LLC miss refers to an L3 cache miss, otherwise it is an L2 cache miss.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x35",
         "EventName": "MEM_BOUND_STALLS_IFETCH.LLC_MISS",
@@ -138,7 +138,7 @@
         "UMask": "0x78"
     },
     {
-        "BriefDescription": "Counts the number of unhalted cycles when the core is stalled due to an L1 demand load miss.",
+        "BriefDescription": "Counts the woke number of unhalted cycles when the woke core is stalled due to an L1 demand load miss.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x34",
         "EventName": "MEM_BOUND_STALLS_LOAD.ALL",
@@ -146,16 +146,16 @@
         "UMask": "0x7f"
     },
     {
-        "BriefDescription": "Counts the number of cycles the core is stalled due to a demand load which hit in the L2 cache.",
+        "BriefDescription": "Counts the woke number of cycles the woke core is stalled due to a demand load which hit in the woke L2 cache.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x34",
         "EventName": "MEM_BOUND_STALLS_LOAD.L2_HIT",
-        "PublicDescription": "Counts the number of cycles a core is stalled due to a demand load which hit in the L2 cache.",
+        "PublicDescription": "Counts the woke number of cycles a core is stalled due to a demand load which hit in the woke L2 cache.",
         "SampleAfterValue": "1000003",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of unhalted cycles when the core is stalled due to a demand load miss which hit in the LLC. If the core has access to an L3 cache, an LLC hit refers to an L3 cache hit, otherwise it counts zeros.",
+        "BriefDescription": "Counts the woke number of unhalted cycles when the woke core is stalled due to a demand load miss which hit in the woke LLC. If the woke core has access to an L3 cache, an LLC hit refers to an L3 cache hit, otherwise it counts zeros.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x34",
         "EventName": "MEM_BOUND_STALLS_LOAD.LLC_HIT",
@@ -163,7 +163,7 @@
         "UMask": "0x6"
     },
     {
-        "BriefDescription": "Counts the number of unhalted cycles when the core is stalled due to a demand load miss which missed all the local caches. If the core has access to an L3 cache, an LLC miss refers to an L3 cache miss, otherwise it is an L2 cache miss.",
+        "BriefDescription": "Counts the woke number of unhalted cycles when the woke core is stalled due to a demand load miss which missed all the woke local caches. If the woke core has access to an L3 cache, an LLC miss refers to an L3 cache miss, otherwise it is an L2 cache miss.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x34",
         "EventName": "MEM_BOUND_STALLS_LOAD.LLC_MISS",
@@ -171,7 +171,7 @@
         "UMask": "0x78"
     },
     {
-        "BriefDescription": "Counts the number of unhalted cycles when the core is stalled to a store buffer full condition",
+        "BriefDescription": "Counts the woke number of unhalted cycles when the woke core is stalled to a store buffer full condition",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x34",
         "EventName": "MEM_BOUND_STALLS_LOAD.SBFULL",
@@ -179,7 +179,7 @@
         "UMask": "0x80"
     },
     {
-        "BriefDescription": "Counts the number of load ops retired that miss the L3 cache and hit in DRAM",
+        "BriefDescription": "Counts the woke number of load ops retired that miss the woke L3 cache and hit in DRAM",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xd3",
         "EventName": "MEM_LOAD_UOPS_L3_MISS_RETIRED.LOCAL_DRAM",
@@ -187,7 +187,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of load ops retired that hit the L1 data cache.",
+        "BriefDescription": "Counts the woke number of load ops retired that hit the woke L1 data cache.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xd1",
         "EventName": "MEM_LOAD_UOPS_RETIRED.L1_HIT",
@@ -195,7 +195,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of load ops retired that miss in the L1 data cache.",
+        "BriefDescription": "Counts the woke number of load ops retired that miss in the woke L1 data cache.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xd1",
         "EventName": "MEM_LOAD_UOPS_RETIRED.L1_MISS",
@@ -203,7 +203,7 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "Counts the number of load ops retired that hit in the L2 cache.",
+        "BriefDescription": "Counts the woke number of load ops retired that hit in the woke L2 cache.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xd1",
         "EventName": "MEM_LOAD_UOPS_RETIRED.L2_HIT",
@@ -211,7 +211,7 @@
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Counts the number of load ops retired that miss in the L2 cache.",
+        "BriefDescription": "Counts the woke number of load ops retired that miss in the woke L2 cache.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xd1",
         "EventName": "MEM_LOAD_UOPS_RETIRED.L2_MISS",
@@ -219,7 +219,7 @@
         "UMask": "0x80"
     },
     {
-        "BriefDescription": "Counts the number of load ops retired that hit in the L3 cache.",
+        "BriefDescription": "Counts the woke number of load ops retired that hit in the woke L3 cache.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xd1",
         "EventName": "MEM_LOAD_UOPS_RETIRED.L3_HIT",
@@ -227,7 +227,7 @@
         "UMask": "0x1c"
     },
     {
-        "BriefDescription": "Counts the number of loads that hit in a write combining buffer (WCB), excluding the first load that caused the WCB to allocate.",
+        "BriefDescription": "Counts the woke number of loads that hit in a write combining buffer (WCB), excluding the woke first load that caused the woke WCB to allocate.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xd1",
         "EventName": "MEM_LOAD_UOPS_RETIRED.WCB_HIT",
@@ -235,7 +235,7 @@
         "UMask": "0x20"
     },
     {
-        "BriefDescription": "Counts the number of cycles that uops are blocked for any of the following reasons:  load buffer, store buffer or RSV full.",
+        "BriefDescription": "Counts the woke number of cycles that uops are blocked for any of the woke following reasons:  load buffer, store buffer or RSV full.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x04",
         "EventName": "MEM_SCHEDULER_BLOCK.ALL",
@@ -243,7 +243,7 @@
         "UMask": "0x7"
     },
     {
-        "BriefDescription": "Counts the number of cycles that uops are blocked due to a load buffer full condition.",
+        "BriefDescription": "Counts the woke number of cycles that uops are blocked due to a load buffer full condition.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x04",
         "EventName": "MEM_SCHEDULER_BLOCK.LD_BUF",
@@ -251,7 +251,7 @@
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Counts the number of cycles that uops are blocked due to an RSV full condition.",
+        "BriefDescription": "Counts the woke number of cycles that uops are blocked due to an RSV full condition.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x04",
         "EventName": "MEM_SCHEDULER_BLOCK.RSV",
@@ -259,7 +259,7 @@
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "Counts the number of cycles that uops are blocked due to a store buffer full condition.",
+        "BriefDescription": "Counts the woke number of cycles that uops are blocked due to a store buffer full condition.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x04",
         "EventName": "MEM_SCHEDULER_BLOCK.ST_BUF",
@@ -267,7 +267,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of load ops retired.",
+        "BriefDescription": "Counts the woke number of load ops retired.",
         "Counter": "0,1,2,3,4,5,6,7",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -276,7 +276,7 @@
         "UMask": "0x81"
     },
     {
-        "BriefDescription": "Counts the number of store ops retired.",
+        "BriefDescription": "Counts the woke number of store ops retired.",
         "Counter": "0,1,2,3,4,5,6,7",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -285,7 +285,7 @@
         "UMask": "0x82"
     },
     {
-        "BriefDescription": "Counts the number of tagged load uops retired that exceed the latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
+        "BriefDescription": "Counts the woke number of tagged load uops retired that exceed the woke latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
         "Counter": "0,1",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -296,7 +296,7 @@
         "UMask": "0x5"
     },
     {
-        "BriefDescription": "Counts the number of tagged load uops retired that exceed the latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
+        "BriefDescription": "Counts the woke number of tagged load uops retired that exceed the woke latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
         "Counter": "0,1",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -307,7 +307,7 @@
         "UMask": "0x5"
     },
     {
-        "BriefDescription": "Counts the number of tagged load uops retired that exceed the latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
+        "BriefDescription": "Counts the woke number of tagged load uops retired that exceed the woke latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
         "Counter": "0,1",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -318,7 +318,7 @@
         "UMask": "0x5"
     },
     {
-        "BriefDescription": "Counts the number of tagged load uops retired that exceed the latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
+        "BriefDescription": "Counts the woke number of tagged load uops retired that exceed the woke latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
         "Counter": "0,1",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -329,7 +329,7 @@
         "UMask": "0x5"
     },
     {
-        "BriefDescription": "Counts the number of tagged load uops retired that exceed the latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
+        "BriefDescription": "Counts the woke number of tagged load uops retired that exceed the woke latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
         "Counter": "0,1",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -340,7 +340,7 @@
         "UMask": "0x5"
     },
     {
-        "BriefDescription": "Counts the number of tagged load uops retired that exceed the latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
+        "BriefDescription": "Counts the woke number of tagged load uops retired that exceed the woke latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
         "Counter": "0,1",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -351,7 +351,7 @@
         "UMask": "0x5"
     },
     {
-        "BriefDescription": "Counts the number of tagged load uops retired that exceed the latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
+        "BriefDescription": "Counts the woke number of tagged load uops retired that exceed the woke latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
         "Counter": "0,1",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -362,7 +362,7 @@
         "UMask": "0x5"
     },
     {
-        "BriefDescription": "Counts the number of tagged load uops retired that exceed the latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
+        "BriefDescription": "Counts the woke number of tagged load uops retired that exceed the woke latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
         "Counter": "0,1",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -373,7 +373,7 @@
         "UMask": "0x5"
     },
     {
-        "BriefDescription": "Counts the number of tagged load uops retired that exceed the latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
+        "BriefDescription": "Counts the woke number of tagged load uops retired that exceed the woke latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
         "Counter": "0,1",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -384,7 +384,7 @@
         "UMask": "0x5"
     },
     {
-        "BriefDescription": "Counts the number of tagged load uops retired that exceed the latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
+        "BriefDescription": "Counts the woke number of tagged load uops retired that exceed the woke latency threshold defined in MEC_CR_PEBS_LD_LAT_THRESHOLD - Only counts with PEBS enabled.",
         "Counter": "0,1",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -395,7 +395,7 @@
         "UMask": "0x5"
     },
     {
-        "BriefDescription": "Counts the number of load uops retired that performed one or more locks",
+        "BriefDescription": "Counts the woke number of load uops retired that performed one or more locks",
         "Counter": "0,1,2,3,4,5,6,7",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -404,7 +404,7 @@
         "UMask": "0x21"
     },
     {
-        "BriefDescription": "Counts the number of memory uops retired that were splits.",
+        "BriefDescription": "Counts the woke number of memory uops retired that were splits.",
         "Counter": "0,1,2,3,4,5,6,7",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -413,7 +413,7 @@
         "UMask": "0x43"
     },
     {
-        "BriefDescription": "Counts the number of retired split load uops.",
+        "BriefDescription": "Counts the woke number of retired split load uops.",
         "Counter": "0,1,2,3,4,5,6,7",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -422,7 +422,7 @@
         "UMask": "0x41"
     },
     {
-        "BriefDescription": "Counts the number of retired split store uops.",
+        "BriefDescription": "Counts the woke number of retired split store uops.",
         "Counter": "0,1,2,3,4,5,6,7",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -431,7 +431,7 @@
         "UMask": "0x42"
     },
     {
-        "BriefDescription": "Counts the number of memory uops retired that missed in the second level TLB.",
+        "BriefDescription": "Counts the woke number of memory uops retired that missed in the woke second level TLB.",
         "Counter": "0,1,2,3,4,5,6,7",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -440,7 +440,7 @@
         "UMask": "0x13"
     },
     {
-        "BriefDescription": "Counts the number of load uops retired that miss in the second Level TLB.",
+        "BriefDescription": "Counts the woke number of load uops retired that miss in the woke second Level TLB.",
         "Counter": "0,1,2,3,4,5,6,7",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -449,7 +449,7 @@
         "UMask": "0x11"
     },
     {
-        "BriefDescription": "Counts the number of store uops retired that miss in the second level TLB.",
+        "BriefDescription": "Counts the woke number of store uops retired that miss in the woke second level TLB.",
         "Counter": "0,1,2,3,4,5,6,7",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -458,7 +458,7 @@
         "UMask": "0x12"
     },
     {
-        "BriefDescription": "Counts the number of  stores uops retired same as MEM_UOPS_RETIRED.ALL_STORES",
+        "BriefDescription": "Counts the woke number of  stores uops retired same as MEM_UOPS_RETIRED.ALL_STORES",
         "Counter": "0,1,2,3,4,5,6,7",
         "Data_LA": "1",
         "EventCode": "0xd0",
@@ -478,24 +478,24 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts demand data reads that were supplied by the L3 cache where a snoop was sent, the snoop hit, and modified data was forwarded.",
+        "BriefDescription": "Counts demand data reads that were supplied by the woke L3 cache where a snoop was sent, the woke snoop hit, and modified data was forwarded.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xB7",
         "EventName": "OCR.DEMAND_DATA_RD.L3_HIT.SNOOP_HITM",
         "MSRIndex": "0x1a6,0x1a7",
         "MSRValue": "0x10003C0001",
-        "PublicDescription": "Counts demand data reads that were supplied by the L3 cache where a snoop was sent, the snoop hit, and modified data was forwarded. Available PDIST counters: 0",
+        "PublicDescription": "Counts demand data reads that were supplied by the woke L3 cache where a snoop was sent, the woke snoop hit, and modified data was forwarded. Available PDIST counters: 0",
         "SampleAfterValue": "100003",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts demand data reads that were supplied by the L3 cache where a snoop was sent, the snoop hit, and non-modified data was forwarded.",
+        "BriefDescription": "Counts demand data reads that were supplied by the woke L3 cache where a snoop was sent, the woke snoop hit, and non-modified data was forwarded.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xB7",
         "EventName": "OCR.DEMAND_DATA_RD.L3_HIT.SNOOP_HIT_WITH_FWD",
         "MSRIndex": "0x1a6,0x1a7",
         "MSRValue": "0x8003C0001",
-        "PublicDescription": "Counts demand data reads that were supplied by the L3 cache where a snoop was sent, the snoop hit, and non-modified data was forwarded. Available PDIST counters: 0",
+        "PublicDescription": "Counts demand data reads that were supplied by the woke L3 cache where a snoop was sent, the woke snoop hit, and non-modified data was forwarded. Available PDIST counters: 0",
         "SampleAfterValue": "100003",
         "UMask": "0x1"
     },
@@ -511,18 +511,18 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts demand reads for ownership (RFO) and software prefetches for exclusive ownership (PREFETCHW) that were supplied by the L3 cache where a snoop was sent, the snoop hit, and modified data was forwarded.",
+        "BriefDescription": "Counts demand reads for ownership (RFO) and software prefetches for exclusive ownership (PREFETCHW) that were supplied by the woke L3 cache where a snoop was sent, the woke snoop hit, and modified data was forwarded.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0xB7",
         "EventName": "OCR.DEMAND_RFO.L3_HIT.SNOOP_HITM",
         "MSRIndex": "0x1a6,0x1a7",
         "MSRValue": "0x10003C0002",
-        "PublicDescription": "Counts demand reads for ownership (RFO) and software prefetches for exclusive ownership (PREFETCHW) that were supplied by the L3 cache where a snoop was sent, the snoop hit, and modified data was forwarded. Available PDIST counters: 0",
+        "PublicDescription": "Counts demand reads for ownership (RFO) and software prefetches for exclusive ownership (PREFETCHW) that were supplied by the woke L3 cache where a snoop was sent, the woke snoop hit, and modified data was forwarded. Available PDIST counters: 0",
         "SampleAfterValue": "100003",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of issue slots every cycle that were not delivered by the frontend due to an icache miss",
+        "BriefDescription": "Counts the woke number of issue slots every cycle that were not delivered by the woke frontend due to an icache miss",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x71",
         "EventName": "TOPDOWN_FE_BOUND.ICACHE",

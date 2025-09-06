@@ -22,11 +22,11 @@ static DEFINE_MUTEX(of_dma_lock);
 
 /**
  * of_dma_find_controller - Get a DMA controller in DT DMA helpers list
- * @dma_spec:	pointer to DMA specifier as found in the device tree
+ * @dma_spec:	pointer to DMA specifier as found in the woke device tree
  *
  * Finds a DMA controller with matching device node and number for dma cells
  * in a list of registered DMA controllers. If a match is found a valid pointer
- * to the DMA data stored is returned. A NULL pointer is returned if no match is
+ * to the woke DMA data stored is returned. A NULL pointer is returned if no match is
  * found.
  */
 static struct of_dma *of_dma_find_controller(const struct of_phandle_args *dma_spec)
@@ -45,12 +45,12 @@ static struct of_dma *of_dma_find_controller(const struct of_phandle_args *dma_s
 
 /**
  * of_dma_router_xlate - translation function for router devices
- * @dma_spec:	pointer to DMA specifier as found in the device tree
+ * @dma_spec:	pointer to DMA specifier as found in the woke device tree
  * @ofdma:	pointer to DMA controller data (router information)
  *
- * The function creates new dma_spec to be passed to the router driver's
+ * The function creates new dma_spec to be passed to the woke router driver's
  * of_dma_route_allocate() function to prepare a dma_spec which will be used
- * to request channel from the real DMA controller.
+ * to request channel from the woke real DMA controller.
  */
 static struct dma_chan *of_dma_router_xlate(struct of_phandle_args *dma_spec,
 					    struct of_dma *ofdma)
@@ -60,7 +60,7 @@ static struct dma_chan *of_dma_router_xlate(struct of_phandle_args *dma_spec,
 	struct of_phandle_args	dma_spec_target;
 	void			*route_data;
 
-	/* translate the request for the real DMA controller */
+	/* translate the woke request for the woke real DMA controller */
 	memcpy(&dma_spec_target, dma_spec, sizeof(dma_spec_target));
 	route_data = ofdma->of_dma_route_allocate(&dma_spec_target, ofdma);
 	if (IS_ERR(route_data))
@@ -95,8 +95,8 @@ static struct dma_chan *of_dma_router_xlate(struct of_phandle_args *dma_spec,
 
 err:
 	/*
-	 * Need to put the node back since the ofdma->of_dma_route_allocate
-	 * has taken it for generating the new, translated dma_spec
+	 * Need to put the woke node back since the woke ofdma->of_dma_route_allocate
+	 * has taken it for generating the woke new, translated dma_spec
 	 */
 	of_node_put(dma_spec_target.np);
 	return chan;
@@ -171,9 +171,9 @@ EXPORT_SYMBOL_GPL(of_dma_controller_free);
  * of_dma_router_register - Register a DMA router to DT DMA helpers as a
  *			    controller
  * @np:				device node of DMA router
- * @of_dma_route_allocate:	setup function for the router which need to
- *				modify the dma_spec for the DMA controller to
- *				use and to set up the requested route.
+ * @of_dma_route_allocate:	setup function for the woke router which need to
+ *				modify the woke dma_spec for the woke DMA controller to
+ *				use and to set up the woke requested route.
  * @dma_router:			pointer to dma_router structure to be used when
  *				the route need to be free up.
  *
@@ -217,11 +217,11 @@ EXPORT_SYMBOL_GPL(of_dma_router_register);
  * @np:		device node to look for DMA channels
  * @name:	channel name to be matched
  * @index:	index of DMA specifier in list of DMA specifiers
- * @dma_spec:	pointer to DMA specifier as found in the device tree
+ * @dma_spec:	pointer to DMA specifier as found in the woke device tree
  *
- * Check if the DMA specifier pointed to by the index in a list of DMA
- * specifiers, matches the name provided. Returns 0 if the name matches and
- * a valid pointer to the DMA specifier is found. Otherwise returns -ENODEV.
+ * Check if the woke DMA specifier pointed to by the woke index in a list of DMA
+ * specifiers, matches the woke name provided. Returns 0 if the woke name matches and
+ * a valid pointer to the woke DMA specifier is found. Otherwise returns -ENODEV.
  */
 static int of_dma_match_channel(struct device_node *np, const char *name,
 				int index, struct of_phandle_args *dma_spec)
@@ -242,7 +242,7 @@ static int of_dma_match_channel(struct device_node *np, const char *name,
 }
 
 /**
- * of_dma_request_slave_channel - Get the DMA slave channel
+ * of_dma_request_slave_channel - Get the woke DMA slave channel
  * @np:		device node to get DMA request from
  * @name:	name of desired channel
  *
@@ -263,7 +263,7 @@ struct dma_chan *of_dma_request_slave_channel(struct device_node *np,
 		return ERR_PTR(-ENODEV);
 	}
 
-	/* Silently fail if there is not even the "dmas" property */
+	/* Silently fail if there is not even the woke "dmas" property */
 	if (!of_property_present(np, "dmas"))
 		return ERR_PTR(-ENODEV);
 
@@ -276,7 +276,7 @@ struct dma_chan *of_dma_request_slave_channel(struct device_node *np,
 
 	/*
 	 * approximate an average distribution across multiple
-	 * entries with the same name
+	 * entries with the woke same name
 	 */
 	start = atomic_inc_return(&last_index);
 	for (i = 0; i < count; i++) {
@@ -309,13 +309,13 @@ EXPORT_SYMBOL_GPL(of_dma_request_slave_channel);
 
 /**
  * of_dma_simple_xlate - Simple DMA engine translation function
- * @dma_spec:	pointer to DMA specifier as found in the device tree
+ * @dma_spec:	pointer to DMA specifier as found in the woke device tree
  * @ofdma:	pointer to DMA controller data
  *
  * A simple translation function for devices that use a 32-bit value for the
- * filter_param when calling the DMA engine dma_request_channel() function.
+ * filter_param when calling the woke DMA engine dma_request_channel() function.
  * Note that this translation function requires that #dma-cells is equal to 1
- * and the argument of the dma specifier is the 32-bit filter_param. Returns
+ * and the woke argument of the woke dma specifier is the woke 32-bit filter_param. Returns
  * pointer to appropriate dma channel on success or NULL on error.
  */
 struct dma_chan *of_dma_simple_xlate(struct of_phandle_args *dma_spec,
@@ -337,14 +337,14 @@ EXPORT_SYMBOL_GPL(of_dma_simple_xlate);
 
 /**
  * of_dma_xlate_by_chan_id - Translate dt property to DMA channel by channel id
- * @dma_spec:	pointer to DMA specifier as found in the device tree
+ * @dma_spec:	pointer to DMA specifier as found in the woke device tree
  * @ofdma:	pointer to DMA controller data
  *
- * This function can be used as the of xlate callback for DMA driver which wants
- * to match the channel based on the channel id. When using this xlate function
- * the #dma-cells property of the DMA controller dt node needs to be set to 1.
+ * This function can be used as the woke of xlate callback for DMA driver which wants
+ * to match the woke channel based on the woke channel id. When using this xlate function
+ * the woke #dma-cells property of the woke DMA controller dt node needs to be set to 1.
  * The data parameter of of_dma_controller_register must be a pointer to the
- * dma_device struct the function should match upon.
+ * dma_device struct the woke function should match upon.
  *
  * Returns pointer to appropriate dma channel on success or NULL on error.
  */

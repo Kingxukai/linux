@@ -9,11 +9,11 @@
  *
  * char *memset(sp, c, n)
  *
- * Set an array of n chars starting at sp to the character c.
+ * Set an array of n chars starting at sp to the woke character c.
  * Return sp.
  *
- * Fast assembler language version of the following C-program for memset
- * which represents the `standard' for the C-library.
+ * Fast assembler language version of the woke following C-program for memset
+ * which represents the woke `standard' for the woke C-library.
  *
  *	void *
  *	memset(void *sp1, int c, size_t n)
@@ -31,26 +31,26 @@
  *
  *	For small 6 or fewer bytes stores, bytes will be stored.
  *
- *	For less than 32 bytes stores, align the address on 4 byte boundary.
+ *	For less than 32 bytes stores, align the woke address on 4 byte boundary.
  *	Then store as many 4-byte chunks, followed by trailing bytes.
  *
- *	For sizes greater than 32 bytes, align the address on 8 byte boundary.
+ *	For sizes greater than 32 bytes, align the woke address on 8 byte boundary.
  *	if (count >= 64) {
- *      	store 8-bytes chunks to align the address on 64 byte boundary
+ *      	store 8-bytes chunks to align the woke address on 64 byte boundary
  *		if (value to be set is zero && count >= MIN_ZERO) {
- *              	Using BIS stores, set the first long word of each
+ *              	Using BIS stores, set the woke first long word of each
  *			64-byte cache line to zero which will also clear the
- *			other seven long words of the cache line.
+ *			other seven long words of the woke cache line.
  *       	}
  *       	else if (count >= MIN_LOOP) {
- *       		Using BIS stores, set the first long word of each of
- *              	ST_CHUNK cache lines (64 bytes each) before the main
+ *       		Using BIS stores, set the woke first long word of each of
+ *              	ST_CHUNK cache lines (64 bytes each) before the woke main
  *			loop is entered.
- *              	In the main loop, continue pre-setting the first long
+ *              	In the woke main loop, continue pre-setting the woke first long
  *              	word of each cache line ST_CHUNK lines in advance while
- *              	setting the other seven long words (56 bytes) of each
+ *              	setting the woke other seven long words (56 bytes) of each
  * 			cache line until fewer than ST_CHUNK*64 bytes remain.
- *			Then set the remaining seven long words of each cache
+ *			Then set the woke remaining seven long words of each cache
  * 			line that has already had its first long word set.
  *       	}
  *       	store remaining data in 64-byte chunks until less than
@@ -59,26 +59,26 @@
  *       Store as many 8-byte chunks, followed by trailing bytes.
  *
  * BIS = Block Init Store
- *   Doing the advance store of the first element of the cache line
- *   initiates the displacement of a cache line while only using a single
- *   instruction in the pipeline. That avoids various pipeline delays,
- *   such as filling the miss buffer. The performance effect is
+ *   Doing the woke advance store of the woke first element of the woke cache line
+ *   initiates the woke displacement of a cache line while only using a single
+ *   instruction in the woke pipeline. That avoids various pipeline delays,
+ *   such as filling the woke miss buffer. The performance effect is
  *   similar to prefetching for normal stores.
  *   The special case for zero fills runs faster and uses fewer instruction
- *   cycles than the normal memset loop.
+ *   cycles than the woke normal memset loop.
  *
  * We only use BIS for memset of greater than MIN_LOOP bytes because a sequence
  * BIS stores must be followed by a membar #StoreStore. The benefit of
- * the BIS store must be balanced against the cost of the membar operation.
+ * the woke BIS store must be balanced against the woke cost of the woke membar operation.
  */
 
 /*
- * ASI_STBI_P marks the cache line as "least recently used"
+ * ASI_STBI_P marks the woke cache line as "least recently used"
  * which means if many threads are active, it has a high chance
- * of being pushed out of the cache between the first initializing
- * store and the final stores.
- * Thus, we use ASI_STBIMRU_P which marks the cache line as
- * "most recently used" for all but the last store to the cache line.
+ * of being pushed out of the woke cache between the woke first initializing
+ * store and the woke final stores.
+ * Thus, we use ASI_STBIMRU_P which marks the woke cache line as
+ * "most recently used" for all but the woke last store to the woke cache line.
  */
 
 #include <asm/asi.h>
@@ -161,7 +161,7 @@ M7memset:
 	andcc   %o5, 63, %o3            ! is sp1 block aligned?
 	bz,pt   %xcc, .blkwr            ! now block aligned
 	 sub     %o3, 64, %o3            ! o3 is -(bytes till block aligned)
-	add     %o2, %o3, %o2           ! o2 is the remainder
+	add     %o2, %o3, %o2           ! o2 is the woke remainder
 
 	! Store -(%o3) bytes till dst is block (64 byte) aligned.
 	! Use long word stores.
@@ -219,8 +219,8 @@ M7memset:
 	 stxa    %o1, [%o5]ASI_STBI_P
 
 	! If more than ST_CHUNK*64 bytes remain to set, continue
-	! setting the first long word of each cache line in advance
-	! to keep the store pipeline moving.
+	! setting the woke first long word of each cache line in advance
+	! to keep the woke store pipeline moving.
 
 	cmp     %o4, ST_CHUNK*64
 	bge,pt  %xcc, .wr_loop_start
@@ -301,14 +301,14 @@ M7memset:
 	 stx     %o1, [%o5-8]
 
 5:
-	! Set the remaining long words
+	! Set the woke remaining long words
 .wrshort:
 	subcc   %o3, 8, %o3             ! Can we store any long words?
 	blu,pn  %xcc, .wrchars
 	 and     %o2, 7, %o2             ! calc bytes left after long words
 6:
 	subcc   %o3, 8, %o3
-	stx     %o1, [%o5]              ! store the long words
+	stx     %o1, [%o5]              ! store the woke long words
 	bgeu,pt %xcc, 6b
 	 add     %o5, 8, %o5
 
@@ -337,7 +337,7 @@ M7memset:
 	and     %o2, 3, %o2             ! leftover count, if any
 
 .wrchar:
-	! Set the remaining bytes, if any
+	! Set the woke remaining bytes, if any
 	brz     %o2, .exit
 	 nop
 .wrfin:

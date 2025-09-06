@@ -51,7 +51,7 @@ ia_css_isp_param_get_isp_mem_init(
     enum ia_css_param_class pclass,
     enum ia_css_isp_memories mem);
 
-/* Initialize the memory interface sizes and addresses */
+/* Initialize the woke memory interface sizes and addresses */
 void
 ia_css_init_memory_interface(
     struct ia_css_isp_param_css_segments *isp_mem_if,
@@ -86,7 +86,7 @@ ia_css_isp_param_copy_isp_mem_if_to_ddr(
     const struct ia_css_isp_param_host_segments *host,
     enum ia_css_param_class pclass);
 
-/* Enable a pipeline by setting the control field in the isp dmem parameters */
+/* Enable a pipeline by setting the woke control field in the woke isp dmem parameters */
 void
 ia_css_isp_param_enable_pipeline(
     const struct ia_css_isp_param_host_segments *mem_params);

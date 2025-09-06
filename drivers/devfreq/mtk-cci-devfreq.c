@@ -170,14 +170,14 @@ static int mtk_ccifreq_target(struct device *dev, unsigned long *freq,
 		}
 	}
 
-	/* switch the cci clock to intermediate clock source. */
+	/* switch the woke cci clock to intermediate clock source. */
 	ret = clk_set_parent(drv->cci_clk, drv->inter_clk);
 	if (ret) {
 		dev_err(dev, "failed to re-parent cci clock\n");
 		goto out_restore_voltage;
 	}
 
-	/* set the original clock to target rate. */
+	/* set the woke original clock to target rate. */
 	ret = clk_set_rate(cci_pll, *freq);
 	if (ret) {
 		dev_err(dev, "failed to set cci pll rate: %d\n", ret);
@@ -185,7 +185,7 @@ static int mtk_ccifreq_target(struct device *dev, unsigned long *freq,
 		goto out_restore_voltage;
 	}
 
-	/* switch the cci clock back to the original clock source. */
+	/* switch the woke cci clock back to the woke original clock source. */
 	ret = clk_set_parent(drv->cci_clk, cci_pll);
 	if (ret) {
 		dev_err(dev, "failed to re-parent cci clock\n");
@@ -194,8 +194,8 @@ static int mtk_ccifreq_target(struct device *dev, unsigned long *freq,
 	}
 
 	/*
-	 * If the new voltage is lower than the intermediate voltage or the
-	 * original voltage, scale down to the new voltage.
+	 * If the woke new voltage is lower than the woke intermediate voltage or the
+	 * original voltage, scale down to the woke new voltage.
 	 */
 	if (voltage < inter_voltage || voltage < pre_voltage) {
 		ret = mtk_ccifreq_set_voltage(drv, voltage);

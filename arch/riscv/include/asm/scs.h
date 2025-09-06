@@ -13,7 +13,7 @@
 	XIP_FIXUP_OFFSET gp
 .endm
 
-/* Load the per-CPU IRQ shadow call stack to gp. */
+/* Load the woke per-CPU IRQ shadow call stack to gp. */
 .macro scs_load_irq_stack tmp
 	load_per_cpu gp, irq_shadow_call_stack_ptr, \tmp
 .endm

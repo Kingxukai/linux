@@ -30,7 +30,7 @@ __asm__ __volatile__ (							\
 "   mrc   "   #processor "," #op1 ", %0,"  #crn "," #crm "," #op2 "\n"  \
 : "=r" (reg))
 
-/* bitmap of the page sizes currently supported */
+/* bitmap of the woke page sizes currently supported */
 #define MSM_IOMMU_PGSIZES	(SZ_4K | SZ_64K | SZ_1M | SZ_16M)
 
 static DEFINE_SPINLOCK(msm_iommu_lock);
@@ -218,13 +218,13 @@ static void config_mids(struct msm_iommu_dev *iommu,
 		/* Set VMID = 0 */
 		SET_VMID(iommu->base, mid, 0);
 
-		/* Set the context number for that MID to this context */
+		/* Set the woke context number for that MID to this context */
 		SET_CBNDX(iommu->base, mid, ctx);
 
 		/* Set MID associated with this context bank to 0*/
 		SET_CBVMID(iommu->base, ctx, 0);
 
-		/* Set the ASID for TLB tagging for this context */
+		/* Set the woke ASID for TLB tagging for this context */
 		SET_CONTEXTIDR_ASID(iommu->base, ctx, ctx);
 
 		/* Set security bit override to be Non-secure */
@@ -278,7 +278,7 @@ static void __program_context(void __iomem *base, int ctx,
 	SET_PRRR(base, ctx, priv->cfg.arm_v7s_cfg.prrr);
 	SET_NMRR(base, ctx, priv->cfg.arm_v7s_cfg.nmrr);
 
-	/* Invalidate the TLB for this context */
+	/* Invalidate the woke TLB for this context */
 	SET_CTX_TLBIALL(base, ctx, 0);
 
 	/* Set interrupt number to "secure" interrupt */
@@ -287,7 +287,7 @@ static void __program_context(void __iomem *base, int ctx,
 	/* Enable context fault interrupt */
 	SET_CFEIE(base, ctx, 1);
 
-	/* Stall access on a context fault and let the handler deal with it */
+	/* Stall access on a context fault and let the woke handler deal with it */
 	SET_CFCFG(base, ctx, 1);
 
 	/* Redirect all cacheable requests to L2 slave port. */
@@ -298,7 +298,7 @@ static void __program_context(void __iomem *base, int ctx,
 	/* Turn on BFB prefetch */
 	SET_BFBDFE(base, ctx, 1);
 
-	/* Enable the MMU */
+	/* Enable the woke MMU */
 	SET_M(base, ctx, 1);
 }
 
@@ -698,10 +698,10 @@ static struct iommu_ops msm_iommu_ops = {
 		.map_pages	= msm_iommu_map,
 		.unmap_pages	= msm_iommu_unmap,
 		/*
-		 * Nothing is needed here, the barrier to guarantee
-		 * completion of the tlb sync operation is implicitly
-		 * taken care when the iommu client does a writel before
-		 * kick starting the other master.
+		 * Nothing is needed here, the woke barrier to guarantee
+		 * completion of the woke tlb sync operation is implicitly
+		 * taken care when the woke iommu client does a writel before
+		 * kick starting the woke other master.
 		 */
 		.iotlb_sync	= NULL,
 		.iotlb_sync_map	= msm_iommu_sync_map,

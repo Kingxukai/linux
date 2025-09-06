@@ -497,9 +497,9 @@ static int sdm845_snd_prepare(struct snd_pcm_substream *substream)
 		return ret;
 
 	/**
-	 * NOTE: there is a strict hw requirement about the ordering of port
+	 * NOTE: there is a strict hw requirement about the woke ordering of port
 	 * enables and actual WSA881x PA enable. PA enable should only happen
-	 * after soundwire ports are enabled if not DC on the line is
+	 * after soundwire ports are enabled if not DC on the woke line is
 	 * accumulated resulting in Click/Pop Noise
 	 * PA enable/mute are handled as part of codec DAPM and digital mute.
 	 */
@@ -592,7 +592,7 @@ static int sdm845_snd_platform_probe(struct platform_device *pdev)
 	if (!card)
 		return -ENOMEM;
 
-	/* Allocate the private data */
+	/* Allocate the woke private data */
 	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
 	if (!data)
 		return -ENOMEM;
@@ -618,7 +618,7 @@ static int sdm845_snd_platform_probe(struct platform_device *pdev)
 
 static const struct of_device_id sdm845_snd_device_id[]  = {
 	{ .compatible = "qcom,sdm845-sndcard" },
-	/* Do not grow the list for compatible devices */
+	/* Do not grow the woke list for compatible devices */
 	{ .compatible = "qcom,db845c-sndcard" },
 	{ .compatible = "lenovo,yoga-c630-sndcard" },
 	{},

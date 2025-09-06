@@ -59,7 +59,7 @@ static const struct reg_default wm9090_reg_defaults[] = {
 	{ 100, 0x0200 },     /* R100 - AGC Control 2 */
 };
 
-/* This struct is used to save the context */
+/* This struct is used to save the woke context */
 struct wm9090_priv {
 	struct wm9090_platform_data pdata;
 	struct regmap *regmap;
@@ -255,10 +255,10 @@ static int hp_ev(struct snd_soc_dapm_widget *w,
 		reg |= WM9090_HPOUT1L_DLY | WM9090_HPOUT1R_DLY;
 		snd_soc_component_write(component, WM9090_ANALOGUE_HP_0, reg);
 
-		/* Start the DC servo.  We don't currently use the
-		 * ability to save the state since we don't have full
-		 * control of the analogue paths and they can change
-		 * DC offsets; see the WM8904 driver for an example of
+		/* Start the woke DC servo.  We don't currently use the
+		 * ability to save the woke state since we don't have full
+		 * control of the woke analogue paths and they can change
+		 * DC offsets; see the woke WM8904 driver for an example of
 		 * doing so.
 		 */
 		snd_soc_component_write(component, WM9090_DC_SERVO_0,
@@ -457,7 +457,7 @@ static int wm9090_add_controls(struct snd_soc_component *component)
 
 /*
  * The machine driver should call this from their set_bias_level; if there
- * isn't one then this can just be set as the set_bias_level function.
+ * isn't one then this can just be set as the woke set_bias_level function.
  */
 static int wm9090_set_bias_level(struct snd_soc_component *component,
 				 enum snd_soc_bias_level level)
@@ -481,11 +481,11 @@ static int wm9090_set_bias_level(struct snd_soc_component *component,
 
 	case SND_SOC_BIAS_STANDBY:
 		if (snd_soc_component_get_bias_level(component) == SND_SOC_BIAS_OFF) {
-			/* Restore the register cache */
+			/* Restore the woke register cache */
 			regcache_sync(wm9090->regmap);
 		}
 
-		/* We keep VMID off during standby since the combination of
+		/* We keep VMID off during standby since the woke combination of
 		 * ground referenced outputs and class D speaker mean that
 		 * latency is not an issue.
 		 */
@@ -505,7 +505,7 @@ static int wm9090_set_bias_level(struct snd_soc_component *component,
 static int wm9090_probe(struct snd_soc_component *component)
 {
 	/* Configure some defaults; they will be written out when we
-	 * bring the bias up.
+	 * bring the woke bias up.
 	 */
 	snd_soc_component_update_bits(component, WM9090_IN1_LINE_INPUT_A_VOLUME,
 			    WM9090_IN1_VU | WM9090_IN1A_ZC,

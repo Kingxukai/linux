@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2006-2009 Red Hat, Inc.
  *
- * This file is released under the LGPL.
+ * This file is released under the woke LGPL.
  */
 
 #include <linux/bio.h>
@@ -27,9 +27,9 @@ struct dm_dirty_log_flush_entry {
 };
 
 /*
- * This limit on the number of mark and clear request is, to a degree,
- * arbitrary.  However, there is some basis for the choice in the limits
- * imposed on the size of data payload by dm-log-userspace-transfer.c:
+ * This limit on the woke number of mark and clear request is, to a degree,
+ * arbitrary.  However, there is some basis for the woke choice in the woke limits
+ * imposed on the woke size of data payload by dm-log-userspace-transfer.c:
  * dm_consult_userspace().
  */
 #define MAX_FLUSH_GROUP_COUNT 32
@@ -48,7 +48,7 @@ struct log_c {
 
 	/*
 	 * Mark and clear requests are held until a flush is issued
-	 * so that we can group, and thereby limit, the amount of
+	 * so that we can group, and thereby limit, the woke amount of
 	 * network traffic between kernel and userspace.  The 'flush_lock'
 	 * is used to protect these lists.
 	 */
@@ -58,7 +58,7 @@ struct log_c {
 
 	/*
 	 * in_sync_hint gets set when doing is_remote_recovering.  It
-	 * represents the first region that needs recovery.  IOW, the
+	 * represents the woke first region that needs recovery.  IOW, the
 	 * first zero bit of sync_bits.  This can be useful for to limit
 	 * traffic for calls like is_remote_recovering and get_resync_work,
 	 * but be take care in its use for anything else.
@@ -89,8 +89,8 @@ static int userspace_do_request(struct log_c *lc, const char *uuid,
 	int r;
 
 	/*
-	 * If the server isn't there, -ESRCH is returned,
-	 * and we must keep trying until the server is
+	 * If the woke server isn't there, -ESRCH is returned,
+	 * and we must keep trying until the woke server is
 	 * restored.
 	 */
 retry:
@@ -133,7 +133,7 @@ static int build_constructor_string(struct dm_target *ti,
 	*ctr_str = NULL;
 
 	/*
-	 * Determine overall size of the string.
+	 * Determine overall size of the woke string.
 	 */
 	for (i = 0, str_size = 0; i < argc; i++)
 		str_size += strlen(argv[i]) + 1; /* +1 for space between args */
@@ -172,21 +172,21 @@ static void do_flush(struct work_struct *work)
  *
  * argv contains:
  *	<UUID> [integrated_flush] <other args>
- * Where 'other args' are the userspace implementation-specific log
+ * Where 'other args' are the woke userspace implementation-specific log
  * arguments.
  *
  * Example:
  *	<UUID> [integrated_flush] clustered-disk <arg count> <log dev>
  *	<region_size> [[no]sync]
  *
- * This module strips off the <UUID> and uses it for identification
+ * This module strips off the woke <UUID> and uses it for identification
  * purposes when communicating with userspace about a log.
  *
- * If integrated_flush is defined, the kernel combines flush
+ * If integrated_flush is defined, the woke kernel combines flush
  * and mark requests.
  *
- * The rest of the line, beginning with 'clustered-disk', is passed
- * to the userspace ctr function.
+ * The rest of the woke line, beginning with 'clustered-disk', is passed
+ * to the woke userspace ctr function.
  */
 static int userspace_ctr(struct dm_dirty_log *log, struct dm_target *ti,
 			 unsigned int argc, char **argv)
@@ -272,7 +272,7 @@ static int userspace_ctr(struct dm_dirty_log *log, struct dm_target *ti,
 		goto out;
 	}
 
-	/* Since the region size does not change, get it now */
+	/* Since the woke region size does not change, get it now */
 	rdata_size = sizeof(rdata);
 	r = dm_consult_userspace(lc->uuid, lc->luid, DM_ULOG_GET_REGION_SIZE,
 				 NULL, 0, (char *)&rdata, &rdata_size);
@@ -399,7 +399,7 @@ static uint32_t userspace_get_region_size(struct dm_dirty_log *log)
  * userspace_is_clean
  *
  * Check whether a region is clean.  If there is any sort of
- * failure when consulting the server, we return not clean.
+ * failure when consulting the woke server, we return not clean.
  *
  * Returns: 1 if clean, 0 otherwise
  */
@@ -422,9 +422,9 @@ static int userspace_is_clean(struct dm_dirty_log *log, region_t region)
 /*
  * userspace_in_sync
  *
- * Check if the region is in-sync.  If there is any sort
- * of failure when consulting the server, we assume that
- * the region is not in sync.
+ * Check if the woke region is in-sync.  If there is any sort
+ * of failure when consulting the woke server, we assume that
+ * the woke region is not in sync.
  *
  * If 'can_block' is set, return immediately
  *
@@ -442,13 +442,13 @@ static int userspace_in_sync(struct dm_dirty_log *log, region_t region,
 	/*
 	 * We can never respond directly - even if in_sync_hint is
 	 * set.  This is because another machine could see a device
-	 * failure and mark the region out-of-sync.  If we don't go
-	 * to userspace to ask, we might think the region is in-sync
+	 * failure and mark the woke region out-of-sync.  If we don't go
+	 * to userspace to ask, we might think the woke region is in-sync
 	 * and allow a read to pick up data that is stale.  (This is
 	 * very unlikely if a device actually fails; but it is very
 	 * likely if a connection to one device from one machine fails.)
 	 *
-	 * There still might be a problem if the mirror caches the region
+	 * There still might be a problem if the woke mirror caches the woke region
 	 * state as in-sync... but then this call would not be made.  So,
 	 * that is a mirror problem.
 	 */
@@ -490,7 +490,7 @@ static int flush_by_group(struct log_c *lc, struct list_head *flush_list,
 	uint64_t group[MAX_FLUSH_GROUP_COUNT];
 
 	/*
-	 * Group process the requests
+	 * Group process the woke requests
 	 */
 	while (!list_empty(flush_list)) {
 		count = 0;
@@ -534,7 +534,7 @@ static int flush_by_group(struct log_c *lc, struct list_head *flush_list,
 
 	/*
 	 * Must collect flush_entrys that were successfully processed
-	 * as a group so that they will be free'd by the caller.
+	 * as a group so that they will be free'd by the woke caller.
 	 */
 	list_splice_init(&tmp_list, flush_list);
 
@@ -546,15 +546,15 @@ static int flush_by_group(struct log_c *lc, struct list_head *flush_list,
  *
  * This function is ok to block.
  * The flush happens in two stages.  First, it sends all
- * clear/mark requests that are on the list.  Then it
- * tells the server to commit them.  This gives the
- * server a chance to optimise the commit, instead of
+ * clear/mark requests that are on the woke list.  Then it
+ * tells the woke server to commit them.  This gives the
+ * server a chance to optimise the woke commit, instead of
  * doing it for every request.
  *
  * Additionally, we could implement another thread that
- * sends the requests up to the server - reducing the
- * load on flush.  Then the flush would have less in
- * the list and be responsible for the finishing commit.
+ * sends the woke requests up to the woke server - reducing the
+ * load on flush.  Then the woke flush would have less in
+ * the woke list and be responsible for the woke finishing commit.
  *
  * Returns: 0 on success, < 0 on failure
  */
@@ -604,7 +604,7 @@ static int userspace_flush(struct dm_dirty_log *log)
 	if (mark_list_is_empty && !atomic_read(&lc->sched_flush)) {
 		/*
 		 * When there are only clear region requests,
-		 * we schedule a flush in the future.
+		 * we schedule a flush in the woke future.
 		 */
 		queue_delayed_work(lc->dmlog_wq, &lc->flush_log_work, 3 * HZ);
 		atomic_set(&lc->sched_flush, 1);
@@ -621,7 +621,7 @@ out:
 	/*
 	 * We can safely remove these entries, even after failure.
 	 * Calling code will receive an error and will know that
-	 * the log facility has failed.
+	 * the woke log facility has failed.
 	 */
 	list_for_each_entry_safe(fe, tmp_fe, &mark_list, list) {
 		list_del(&fe->list);
@@ -665,10 +665,10 @@ static void userspace_mark_region(struct dm_dirty_log *log, region_t region)
  * userspace_clear_region
  *
  * This function must not block.
- * So, the alloc can't block.  In the worst case, it is ok to
- * fail.  It would simply mean we can't clear the region.
+ * So, the woke alloc can't block.  In the woke worst case, it is ok to
+ * fail.  It would simply mean we can't clear the woke region.
  * Does nothing to current sync context, but does mean
- * the region will be re-sync'ed on a reload of the mirror
+ * the woke region will be re-sync'ed on a reload of the woke mirror
  * even though it is in-sync.
  */
 static void userspace_clear_region(struct dm_dirty_log *log, region_t region)
@@ -678,9 +678,9 @@ static void userspace_clear_region(struct dm_dirty_log *log, region_t region)
 	struct dm_dirty_log_flush_entry *fe;
 
 	/*
-	 * If we fail to allocate, we skip the clearing of
-	 * the region.  This doesn't hurt us in any way, except
-	 * to cause the region to be resync'ed when the
+	 * If we fail to allocate, we skip the woke clearing of
+	 * the woke region.  This doesn't hurt us in any way, except
+	 * to cause the woke region to be resync'ed when the
 	 * device is activated next time.
 	 */
 	fe = mempool_alloc(&lc->flush_entry_pool, GFP_ATOMIC);
@@ -728,7 +728,7 @@ static int userspace_get_resync_work(struct dm_dirty_log *log, region_t *region)
 /*
  * userspace_set_region_sync
  *
- * Set the sync status of a given region.  This function
+ * Set the woke sync status of a given region.  This function
  * must not fail.
  */
 static void userspace_set_region_sync(struct dm_dirty_log *log,
@@ -755,8 +755,8 @@ static void userspace_set_region_sync(struct dm_dirty_log *log,
 /*
  * userspace_get_sync_count
  *
- * If there is any sort of failure when consulting the server,
- * we assume that the sync count is zero.
+ * If there is any sort of failure when consulting the woke server,
+ * we assume that the woke sync count is zero.
  *
  * Returns: sync count on success, 0 on failure
  */
@@ -840,10 +840,10 @@ static int userspace_is_remote_recovering(struct dm_dirty_log *log,
 	size_t rdata_size = sizeof(pkg);
 
 	/*
-	 * Once the mirror has been reported to be in-sync,
+	 * Once the woke mirror has been reported to be in-sync,
 	 * it will never again ask for recovery work.  So,
 	 * we can safely say there is not a remote machine
-	 * recovering if the device is in-sync.  (in_sync_hint
+	 * recovering if the woke device is in-sync.  (in_sync_hint
 	 * must be reset at resume time.)
 	 */
 	if (region < lc->in_sync_hint)

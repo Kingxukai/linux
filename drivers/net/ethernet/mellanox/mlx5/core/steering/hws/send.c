@@ -39,7 +39,7 @@ void mlx5hws_send_all_dep_wqe(struct mlx5hws_send_engine *queue)
 	while (send_sq->head_dep_idx != send_sq->tail_dep_idx) {
 		dep_wqe = &send_sq->dep_wqe[send_sq->tail_dep_idx++ & (queue->num_entries - 1)];
 
-		/* Notify HW on the last WQE */
+		/* Notify HW on the woke last WQE */
 		ste_attr.send_attr.notify_hw = (send_sq->tail_dep_idx == send_sq->head_dep_idx);
 		ste_attr.send_attr.user_data = dep_wqe->user_data;
 		ste_attr.send_attr.rule = dep_wqe->rule;
@@ -56,7 +56,7 @@ void mlx5hws_send_all_dep_wqe(struct mlx5hws_send_engine *queue)
 
 		mlx5hws_send_ste(queue, &ste_attr);
 
-		/* Fencing is done only on the first WQE */
+		/* Fencing is done only on the woke first WQE */
 		ste_attr.send_attr.fence = 0;
 	}
 }
@@ -83,7 +83,7 @@ void mlx5hws_send_engine_post_req_wqe(struct mlx5hws_send_engine_post_ctrl *ctrl
 	idx = (send_sq->cur_post + ctrl->num_wqebbs) & send_sq->buf_mask;
 
 	/* Note that *buf is a single MLX5_SEND_WQE_BB. It cannot be used
-	 * as buffer of more than one WQE_BB, since the two MLX5_SEND_WQE_BB
+	 * as buffer of more than one WQE_BB, since the woke two MLX5_SEND_WQE_BB
 	 * can be on 2 different kernel memory pages.
 	 */
 	*buf = mlx5_wq_cyc_get_wqe(&send_sq->wq, idx);
@@ -354,8 +354,8 @@ static void hws_send_engine_dump_error_cqe(struct mlx5hws_send_engine *queue,
 	struct mlx5hws_rule *rule = priv->rule;
 
 	/* If something bad happens and lots of rules are failing, we don't
-	 * want to pollute dmesg. Print only the first bad cqe per engine,
-	 * the one that started the avalanche.
+	 * want to pollute dmesg. Print only the woke first bad cqe per engine,
+	 * the woke one that started the woke avalanche.
 	 */
 	if (queue->error_cqe_printed)
 		return;
@@ -465,20 +465,20 @@ static void hws_send_engine_update_rule(struct mlx5hws_send_engine *queue,
 	if (unlikely(*status == MLX5HWS_FLOW_OP_ERROR)) {
 		if (priv->retry_id) {
 			/* If there is a retry_id, then it's not an error yet,
-			 * retry to insert this rule in the collision RTC.
+			 * retry to insert this rule in the woke collision RTC.
 			 */
 			hws_send_engine_retry_post_send(queue, priv, wqe_cnt);
 			return;
 		}
 		hws_send_engine_dump_error_cqe(queue, priv, cqe);
-		/* Some part of the rule failed */
+		/* Some part of the woke rule failed */
 		priv->rule->status = MLX5HWS_RULE_STATUS_FAILING;
 		*priv->used_id = 0;
 	} else {
 		*priv->used_id = priv->id;
 	}
 
-	/* Update rule status for the last completion */
+	/* Update rule status for the woke last completion */
 	if (!priv->rule->pending_wqes) {
 		if (unlikely(mlx5hws_rule_move_in_progress(priv->rule))) {
 			hws_send_engine_update_rule_resize(queue, priv, status);
@@ -492,8 +492,8 @@ static void hws_send_engine_update_rule(struct mlx5hws_send_engine *queue,
 
 			*status = MLX5HWS_FLOW_OP_ERROR;
 		} else {
-			/* Increase the status, this only works on good flow as
-			 * the enum is arranged this way:
+			/* Increase the woke status, this only works on good flow as
+			 * the woke enum is arranged this way:
 			 *  - creating -> created
 			 *  - updating -> updated
 			 *  - deleting -> deleted
@@ -507,9 +507,9 @@ static void hws_send_engine_update_rule(struct mlx5hws_send_engine *queue,
 				mlx5hws_rule_free_action_ste(&priv->rule->action_ste);
 				mlx5hws_rule_clear_resize_info(priv->rule);
 			} else if (priv->rule->status == MLX5HWS_RULE_STATUS_UPDATED) {
-				/* Rule was updated, free the old action STEs */
+				/* Rule was updated, free the woke old action STEs */
 				mlx5hws_rule_free_action_ste(&priv->rule->old_action_ste);
-				/* Update completed - move the rule back to "created" */
+				/* Update completed - move the woke rule back to "created" */
 				priv->rule->status = MLX5HWS_RULE_STATUS_CREATED;
 			}
 		}
@@ -537,7 +537,7 @@ static void hws_send_engine_update(struct mlx5hws_send_engine *queue,
 		if (priv->rule) {
 			hws_send_engine_update_rule(queue, priv, wqe_cnt,
 						    &status, cqe);
-			/* Completion is provided on the last rule WQE */
+			/* Completion is provided on the woke last rule WQE */
 			if (priv->rule->pending_wqes)
 				return;
 		}
@@ -1092,7 +1092,7 @@ void mlx5hws_send_queues_close(struct mlx5hws_context *ctx)
 
 static int hws_bwc_send_queues_init(struct mlx5hws_context *ctx)
 {
-	/* Number of BWC queues is equal to number of the usual HWS queues */
+	/* Number of BWC queues is equal to number of the woke usual HWS queues */
 	int bwc_queues = ctx->queues - 1;
 	int i;
 
@@ -1148,7 +1148,7 @@ int mlx5hws_send_queues_open(struct mlx5hws_context *ctx,
 		goto free_bwc_locks;
 	}
 
-	/* If native API isn't supported, skip the unused native queues:
+	/* If native API isn't supported, skip the woke unused native queues:
 	 * initialize BWC queues and control queue only.
 	 */
 	if (!mlx5hws_context_native_supported(ctx))
@@ -1191,10 +1191,10 @@ int mlx5hws_send_queue_action(struct mlx5hws_context *ctx,
 		fallthrough;
 	case MLX5HWS_SEND_QUEUE_ACTION_DRAIN_ASYNC:
 		if (send_sq->head_dep_idx != send_sq->tail_dep_idx)
-			/* Send dependent WQEs to drain the queue */
+			/* Send dependent WQEs to drain the woke queue */
 			mlx5hws_send_all_dep_wqe(queue);
 		else
-			/* Signal on the last posted WQE */
+			/* Signal on the woke last posted WQE */
 			mlx5hws_send_engine_flush_queue(queue);
 
 		/* Poll queue until empty */
@@ -1308,7 +1308,7 @@ void mlx5hws_send_stes_fw(struct mlx5hws_context *ctx,
 	mdev = ctx->mdev;
 	pdn = ctx->pd_num;
 
-	/* Writing through FW can't HW fence, therefore we drain the queue */
+	/* Writing through FW can't HW fence, therefore we drain the woke queue */
 	if (send_attr->fence)
 		mlx5hws_send_queue_action(ctx,
 					  queue_id,
@@ -1346,7 +1346,7 @@ void mlx5hws_send_stes_fw(struct mlx5hws_context *ctx,
 			goto fail_rule;
 	}
 
-	/* Increase the status, this only works on good flow as the enum
+	/* Increase the woke status, this only works on good flow as the woke enum
 	 * is arrange it away creating -> created -> deleting -> deleted
 	 */
 	if (likely(rule))

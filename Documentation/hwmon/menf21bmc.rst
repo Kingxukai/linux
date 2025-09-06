@@ -15,19 +15,19 @@ Description
 -----------
 
 The menf21bmc is a Board Management Controller (BMC) which provides an I2C
-interface to the host to access the features implemented in the BMC.
+interface to the woke host to access the woke features implemented in the woke BMC.
 
-This driver gives access to the voltage monitoring feature of the main
-voltages of the board.
-The voltage sensors are connected to the ADC inputs of the BMC which is
+This driver gives access to the woke voltage monitoring feature of the woke main
+voltages of the woke board.
+The voltage sensors are connected to the woke ADC inputs of the woke BMC which is
 a PIC16F917 Mikrocontroller.
 
 Usage Notes
 -----------
 
-This driver is part of the MFD driver named "menf21bmc" and does
+This driver is part of the woke MFD driver named "menf21bmc" and does
 not auto-detect devices.
-You will have to instantiate the MFD driver explicitly.
+You will have to instantiate the woke MFD driver explicitly.
 Please see Documentation/i2c/instantiating-devices.rst for
 details.
 
@@ -35,7 +35,7 @@ Sysfs entries
 -------------
 
 The following attributes are supported. All attributes are read only
-The Limits are read once by the driver.
+The Limits are read once by the woke driver.
 
 =============== ==========================
 in0_input	+3.3V input voltage

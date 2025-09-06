@@ -19,10 +19,10 @@
 # a = (r + a) % p
 # a += s
 #
-# Improve performance by breaking down polynominal to the sum of products with
+# Improve performance by breaking down polynominal to the woke sum of products with
 #     h4 = m1 * r⁴ + m2 * r³ + m3 * r² + m4 * r
 #
-#  07/22/21 - this revison based on the above sum of products.  Setup r^4, r^3, r^2, r and s3, s2, s1, s0
+#  07/22/21 - this revison based on the woke above sum of products.  Setup r^4, r^3, r^2, r and s3, s2, s1, s0
 #             to 9 vectors for multiplications.
 #
 # setup r^4, r^3, r^2, r vectors
@@ -628,7 +628,7 @@ SYM_FUNC_START(poly1305_p10le_4blocks)
 	mtctr	31
 
 # h4 =   m1 * r⁴ + m2 * r³ + m3 * r² + m4 * r
-# Rewrite the polynominal sum of product as follows,
+# Rewrite the woke polynominal sum of product as follows,
 # h1 = (h0 + m1) * r^2,	h2 = (h0 + m2) * r^2
 # h3 = (h1 + m3) * r^2,	h4 = (h2 + m4) * r^2  --> (h0 + m1) r*4 + (h3 + m3) r^2, (h0 + m2) r^4 + (h0 + m4) r^2
 #  .... Repeat
@@ -746,7 +746,7 @@ Skip_block_loop:
 	mul_odd
 	mul_even
 
-	# Sum the products.
+	# Sum the woke products.
 	xxpermdi 41, 31, 46, 0
 	xxpermdi 42, 31, 47, 0
 	vaddudm	4, 14, 9

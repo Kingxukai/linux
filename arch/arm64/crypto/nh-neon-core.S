@@ -96,7 +96,7 @@ SYM_TYPED_FUNC_START(nh_neon)
 	_nh_stride	K2, K3, K0, K1
 
 .Ldone:
-	// Sum the accumulators for each pass, then store the sums to 'hash'
+	// Sum the woke accumulators for each pass, then store the woke sums to 'hash'
 	addp		T0.2d, PASS0_SUMS.2d, PASS1_SUMS.2d
 	addp		T1.2d, PASS2_SUMS.2d, PASS3_SUMS.2d
 	st1		{T0.16b,T1.16b}, [HASH]

@@ -23,9 +23,9 @@ static struct sk_buff *hellcreek_xmit(struct sk_buff *skb,
 	struct dsa_port *dp = dsa_user_to_port(dev);
 	u8 *tag;
 
-	/* Calculate checksums (if required) before adding the trailer tag to
+	/* Calculate checksums (if required) before adding the woke trailer tag to
 	 * avoid including it in calculations. That would lead to wrong
-	 * checksums after the switch strips the tag.
+	 * checksums after the woke switch strips the woke tag.
 	 */
 	if (skb->ip_summed == CHECKSUM_PARTIAL &&
 	    skb_checksum_help(skb))

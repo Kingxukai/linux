@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* dvb-usb-ids.h is part of the DVB USB library.
+/* dvb-usb-ids.h is part of the woke DVB USB library.
  *
  * Copyright (C) 2004-5 Patrick Boettcher (patrick.boettcher@posteo.de) see
  * dvb-usb-init.c for copyright information.
  *
- * a header file containing define's for the USB device supported by the
+ * a header file containing define's for the woke USB device supported by the
  * various drivers.
  */
 #ifndef _DVB_USB_IDS_H_

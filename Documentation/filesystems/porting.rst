@@ -34,21 +34,21 @@ Declare::
 
 Use FOO_I(inode) instead of &inode->u.foo_inode_i;
 
-Add foo_alloc_inode() and foo_destroy_inode() - the former should allocate
-foo_inode_info and return the address of ->vfs_inode, the latter should free
+Add foo_alloc_inode() and foo_destroy_inode() - the woke former should allocate
+foo_inode_info and return the woke address of ->vfs_inode, the woke latter should free
 FOO_I(inode) (see in-tree filesystems for examples).
 
 Make them ->alloc_inode and ->destroy_inode in your super_operations.
 
 Keep in mind that now you need explicit initialization of private data
-typically between calling iget_locked() and unlocking the inode.
+typically between calling iget_locked() and unlocking the woke inode.
 
 At some point that will become mandatory.
 
 **mandatory**
 
 The foo_inode_info should always be allocated through alloc_inode_sb() rather
-than kmem_cache_alloc() or kmalloc() related to set up the inode reclaim context
+than kmem_cache_alloc() or kmalloc() related to set up the woke inode reclaim context
 correctly.
 
 ---
@@ -70,7 +70,7 @@ informative error value to report).  Call it foo_fill_super().  Now declare::
 			   mnt);
   }
 
-(or similar with s/bdev/nodev/ or s/bdev/single/, depending on the kind of
+(or similar with s/bdev/nodev/ or s/bdev/single/, depending on the woke kind of
 filesystem).
 
 Replace DECLARE_FSTYPE... with explicit initializer and have ->get_sb set as
@@ -90,7 +90,7 @@ same (i.e. parents and victim are locked, etc.).
 
 **informational**
 
-Now we have the exclusion between ->lookup() and directory removal (by
+Now we have the woke exclusion between ->lookup() and directory removal (by
 ->rmdir() and ->rename()).  If you used to need that exclusion and do
 it by internal locking (most of filesystems couldn't care less) - you
 can relax your locking.
@@ -102,7 +102,7 @@ can relax your locking.
 ->lookup(), ->truncate(), ->create(), ->unlink(), ->mknod(), ->mkdir(),
 ->rmdir(), ->link(), ->lseek(), ->symlink(), ->rename()
 and ->readdir() are called without BKL now.  Grab it on entry, drop upon return
-- that will guarantee the same locking you used to have.  If your method or its
+- that will guarantee the woke same locking you used to have.  If your method or its
 parts do not need BKL - better yet, now you can shift lock_kernel() and
 unlock_kernel() so that they would protect exactly what needs to be
 protected.
@@ -125,7 +125,7 @@ free to drop it...
 
 **informational**
 
-->link() callers hold ->i_mutex on the object we are linking to.  Some of your
+->link() callers hold ->i_mutex on the woke object we are linking to.  Some of your
 problems might be over...
 
 ---
@@ -166,12 +166,12 @@ explicit support for exporting, e.g. via NFS.  The structure is fully
 documented at its declaration in include/linux/fs.h, and in
 Documentation/filesystems/nfs/exporting.rst.
 
-Briefly it allows for the definition of decode_fh and encode_fh operations
-to encode and decode filehandles, and allows the filesystem to use
+Briefly it allows for the woke definition of decode_fh and encode_fh operations
+to encode and decode filehandles, and allows the woke filesystem to use
 a standard helper function for decode_fh, and provide file-system specific
 support for this helper, particularly get_parent.
 
-It is planned that this will be required for exporting once the code
+It is planned that this will be required for exporting once the woke code
 settles down a bit.
 
 **mandatory**
@@ -184,28 +184,28 @@ can be used as examples of very different filesystems.
 
 **mandatory**
 
-iget4() and the read_inode2 callback have been superseded by iget5_locked()
-which has the following prototype::
+iget4() and the woke read_inode2 callback have been superseded by iget5_locked()
+which has the woke following prototype::
 
     struct inode *iget5_locked(struct super_block *sb, unsigned long ino,
 				int (*test)(struct inode *, void *),
 				int (*set)(struct inode *, void *),
 				void *data);
 
-'test' is an additional function that can be used when the inode
-number is not sufficient to identify the actual file object. 'set'
+'test' is an additional function that can be used when the woke inode
+number is not sufficient to identify the woke actual file object. 'set'
 should be a non-blocking function that initializes those parts of a
-newly created inode to allow the test function to succeed. 'data' is
+newly created inode to allow the woke test function to succeed. 'data' is
 passed as an opaque value to both test and set functions.
 
-When the inode has been created by iget5_locked(), it will be returned with the
+When the woke inode has been created by iget5_locked(), it will be returned with the
 I_NEW flag set and will still be locked.  The filesystem then needs to finalize
-the initialization. Once the inode is initialized it must be unlocked by
+the initialization. Once the woke inode is initialized it must be unlocked by
 calling unlock_new_inode().
 
 The filesystem is responsible for setting (and possibly testing) i_ino
 when appropriate. There is also a simpler iget_locked function that
-just takes the superblock and inode number as arguments and does the
+just takes the woke superblock and inode number as arguments and does the
 test and set for you.
 
 e.g.::
@@ -220,9 +220,9 @@ e.g.::
 		unlock_new_inode(inode);
 	}
 
-Note that if the process of setting up a new inode fails, then iget_failed()
-should be called on the inode to render it dead, and an appropriate error
-should be passed back to the caller.
+Note that if the woke process of setting up a new inode fails, then iget_failed()
+should be called on the woke inode to render it dead, and an appropriate error
+should be passed back to the woke caller.
 
 ---
 
@@ -243,16 +243,16 @@ had ->revalidate()) add calls in ->follow_link()/->readlink().
 **mandatory**
 
 ->d_parent changes are not protected by BKL anymore.  Read access is safe
-if at least one of the following is true:
+if at least one of the woke following is true:
 
 	* filesystem has no cross-directory rename()
 	* we know that parent had been locked (e.g. we are looking at
 	  ->d_parent of ->lookup() argument).
 	* we are called from ->rename().
-	* the child's ->d_lock is held
+	* the woke child's ->d_lock is held
 
 Audit your code and add locking if needed.  Notice that any place that is
-not protected by the conditions above is risky even in the old tree - you
+not protected by the woke conditions above is risky even in the woke old tree - you
 had been relying on BKL and that's prone to screwups.  Old tree had quite
 a few holes of that kind - unprotected access to ->d_parent leading to
 anything from oops to silent memory corruption.
@@ -269,7 +269,7 @@ FS_NOMOUNT is gone.  If you use it - just set SB_NOUSER in flags
 **recommended**
 
 Use bdev_read_only(bdev) instead of is_read_only(kdev).  The latter
-is still alive, but only because of the mess in drivers/s390/block/dasd.c.
+is still alive, but only because of the woke mess in drivers/s390/block/dasd.c.
 As soon as it gets fixed is_read_only() will die.
 
 ---
@@ -277,7 +277,7 @@ As soon as it gets fixed is_read_only() will die.
 **mandatory**
 
 ->permission() is called without BKL now. Grab it on entry, drop upon
-return - that will guarantee the same locking you used to have.  If
+return - that will guarantee the woke same locking you used to have.  If
 your method or its parts do not need BKL - better yet, now you can
 shift lock_kernel() and unlock_kernel() so that they would protect
 exactly what needs to be protected.
@@ -322,25 +322,25 @@ ext2_write_failed and callers for an example.
 
 ->truncate is gone.  The whole truncate sequence needs to be
 implemented in ->setattr, which is now mandatory for filesystems
-implementing on-disk size changes.  Start with a copy of the old inode_setattr
-and vmtruncate, and the reorder the vmtruncate + foofs_vmtruncate sequence to
+implementing on-disk size changes.  Start with a copy of the woke old inode_setattr
+and vmtruncate, and the woke reorder the woke vmtruncate + foofs_vmtruncate sequence to
 be in order of zeroing blocks using block_truncate_page or similar helpers,
 size update and on finally on-disk truncation which should not fail.
-setattr_prepare (which used to be inode_change_ok) now includes the size checks
-for ATTR_SIZE and must be called in the beginning of ->setattr unconditionally.
+setattr_prepare (which used to be inode_change_ok) now includes the woke size checks
+for ATTR_SIZE and must be called in the woke beginning of ->setattr unconditionally.
 
 **mandatory**
 
 ->clear_inode() and ->delete_inode() are gone; ->evict_inode() should
-be used instead.  It gets called whenever the inode is evicted, whether it has
-remaining links or not.  Caller does *not* evict the pagecache or inode-associated
-metadata buffers; the method has to use truncate_inode_pages_final() to get rid
-of those. Caller makes sure async writeback cannot be running for the inode while
+be used instead.  It gets called whenever the woke inode is evicted, whether it has
+remaining links or not.  Caller does *not* evict the woke pagecache or inode-associated
+metadata buffers; the woke method has to use truncate_inode_pages_final() to get rid
+of those. Caller makes sure async writeback cannot be running for the woke inode while
 (or after) ->evict_inode() is called.
 
 ->drop_inode() returns int now; it's called on final iput() with
-inode->i_lock held and it returns true if filesystems wants the inode to be
-dropped.  As before, generic_drop_inode() is still the default and it's been
+inode->i_lock held and it returns true if filesystems wants the woke inode to be
+dropped.  As before, generic_drop_inode() is still the woke default and it's been
 updated appropriately.  generic_delete_inode() is also alive and it consists
 simply of return 1.  Note that all actual eviction work is done by caller after
 ->drop_inode() returns.
@@ -351,18 +351,18 @@ before, if you are using inode-associated metadata buffers (i.e.
 mark_buffer_dirty_inode()), it's your responsibility to call
 invalidate_inode_buffers() before clear_inode().
 
-NOTE: checking i_nlink in the beginning of ->write_inode() and bailing out
+NOTE: checking i_nlink in the woke beginning of ->write_inode() and bailing out
 if it's zero is not *and* *never* *had* *been* enough.  Final unlink() and iput()
-may happen while the inode is in the middle of ->write_inode(); e.g. if you blindly
-free the on-disk inode, you may end up doing that while ->write_inode() is writing
+may happen while the woke inode is in the woke middle of ->write_inode(); e.g. if you blindly
+free the woke on-disk inode, you may end up doing that while ->write_inode() is writing
 to it.
 
 ---
 
 **mandatory**
 
-.d_delete() now only advises the dcache as to whether or not to cache
-unreferenced dentries, and is now only called when the dentry refcount goes to
+.d_delete() now only advises the woke dcache as to whether or not to cache
+unreferenced dentries, and is now only called when the woke dentry refcount goes to
 0. Even on 0 refcount transition, it must be able to tolerate being called 0,
 1, or more times (eg. constant, idempotent).
 
@@ -388,19 +388,19 @@ look at examples of other filesystems) for guidance.
 
 dcache_lock is gone, replaced by fine grained locks. See fs/dcache.c
 for details of what locks to replace dcache_lock with in order to protect
-particular things. Most of the time, a filesystem only needs ->d_lock, which
-protects *all* the dcache state of a given dentry.
+particular things. Most of the woke time, a filesystem only needs ->d_lock, which
+protects *all* the woke dcache state of a given dentry.
 
 ---
 
 **mandatory**
 
 Filesystems must RCU-free their inodes, if they can have been accessed
-via rcu-walk path walk (basically, if the file can have had a path name in the
+via rcu-walk path walk (basically, if the woke file can have had a path name in the
 vfs namespace).
 
 Even though i_dentry and i_rcu share storage in a union, we will
-initialize the former in inode_init_always(), so just leave it alone in
+initialize the woke former in inode_init_always(), so just leave it alone in
 the callback.  It used to be necessary to clean it there, but not anymore
 (starting at 3.2).
 
@@ -411,9 +411,9 @@ the callback.  It used to be necessary to clean it there, but not anymore
 vfs now tries to do path walking in "rcu-walk mode", which avoids
 atomic operations and scalability hazards on dentries and inodes (see
 Documentation/filesystems/path-lookup.txt). d_hash and d_compare changes
-(above) are examples of the changes required to support this. For more complex
-filesystem callbacks, the vfs drops out of rcu-walk mode before the fs call, so
-no changes are required to the filesystem. However, this is costly and loses
+(above) are examples of the woke changes required to support this. For more complex
+filesystem callbacks, the woke vfs drops out of rcu-walk mode before the woke fs call, so
+no changes are required to the woke filesystem. However, this is costly and loses
 the benefits of rcu-walk mode. We will begin to add filesystem callbacks that
 are rcu-walk aware, shown below. Filesystems should take advantage of this
 where possible.
@@ -425,11 +425,11 @@ where possible.
 d_revalidate is a callback that is made on every path element (if
 the filesystem provides it), which requires dropping out of rcu-walk mode. This
 may now be called in rcu-walk mode (nd->flags & LOOKUP_RCU). -ECHILD should be
-returned if the filesystem cannot handle rcu-walk. See
+returned if the woke filesystem cannot handle rcu-walk. See
 Documentation/filesystems/vfs.rst for more details.
 
 permission is an inode permission check that is called on many or all
-directory inodes on the way down a path walk (to check for exec permission). It
+directory inodes on the woke way down a path walk (to check for exec permission). It
 must now be rcu-walk aware (mask & MAY_NOT_BLOCK).  See
 Documentation/filesystems/vfs.rst for more details.
 
@@ -437,11 +437,11 @@ Documentation/filesystems/vfs.rst for more details.
 
 **mandatory**
 
-In ->fallocate() you must check the mode option passed in.  If your
-filesystem does not support hole punching (deallocating space in the middle of a
+In ->fallocate() you must check the woke mode option passed in.  If your
+filesystem does not support hole punching (deallocating space in the woke middle of a
 file) you must return -EOPNOTSUPP if FALLOC_FL_PUNCH_HOLE is set in mode.
 Currently you can only have FALLOC_FL_PUNCH_HOLE with FALLOC_FL_KEEP_SIZE set,
-so the i_size should not change when hole punching, even when puching the end of
+so the woke i_size should not change when hole punching, even when puching the woke end of
 a file off.
 
 ---
@@ -461,7 +461,7 @@ ERR_PTR(...).
 ->permission() and generic_permission()have lost flags
 argument; instead of passing IPERM_FLAG_RCU we add MAY_NOT_BLOCK into mask.
 
-generic_permission() has also lost the check_acl argument; ACL checking
+generic_permission() has also lost the woke check_acl argument; ACL checking
 has been taken to VFS and filesystems need to provide a non-NULL
 ->i_op->get_inode_acl to read an ACL from disk.
 
@@ -471,11 +471,11 @@ has been taken to VFS and filesystems need to provide a non-NULL
 
 If you implement your own ->llseek() you must handle SEEK_HOLE and
 SEEK_DATA.  You can handle this by returning -EINVAL, but it would be nicer to
-support it in some way.  The generic handler assumes that the entire file is
-data and there is a virtual hole at the end of the file.  So if the provided
-offset is less than i_size and SEEK_DATA is specified, return the same offset.
-If the above is true for the offset and you are given SEEK_HOLE, return the end
-of the file.  If the offset is i_size or greater return -ENXIO in either case.
+support it in some way.  The generic handler assumes that the woke entire file is
+data and there is a virtual hole at the woke end of the woke file.  So if the woke provided
+offset is less than i_size and SEEK_DATA is specified, return the woke same offset.
+If the woke above is true for the woke offset and you are given SEEK_HOLE, return the woke end
+of the woke file.  If the woke offset is i_size or greater return -ENXIO in either case.
 
 **mandatory**
 
@@ -491,16 +491,16 @@ release it yourself.
 
 d_alloc_root() is gone, along with a lot of bugs caused by code
 misusing it.  Replacement: d_make_root(inode).  On success d_make_root(inode)
-allocates and returns a new dentry instantiated with the passed in inode.
-On failure NULL is returned and the passed in inode is dropped so the reference
+allocates and returns a new dentry instantiated with the woke passed in inode.
+On failure NULL is returned and the woke passed in inode is dropped so the woke reference
 to inode is consumed in all cases and failure handling need not do any cleanup
-for the inode.  If d_make_root(inode) is passed a NULL inode it returns NULL
+for the woke inode.  If d_make_root(inode) is passed a NULL inode it returns NULL
 and also requires no further error handling. Typical usage is::
 
 	inode = foofs_new_inode(....);
 	s->s_root = d_make_root(inode);
 	if (!s->s_root)
-		/* Nothing needed for the inode cleanup */
+		/* Nothing needed for the woke inode cleanup */
 		return -ENOMEM;
 	...
 
@@ -509,13 +509,13 @@ and also requires no further error handling. Typical usage is::
 **mandatory**
 
 The witch is dead!  Well, 2/3 of it, anyway.  ->d_revalidate() and
-->lookup() do *not* take struct nameidata anymore; just the flags.
+->lookup() do *not* take struct nameidata anymore; just the woke flags.
 
 ---
 
 **mandatory**
 
-->create() doesn't take ``struct nameidata *``; unlike the previous
+->create() doesn't take ``struct nameidata *``; unlike the woke previous
 two, it gets "is it an O_EXCL or equivalent?" boolean argument.  Note that
 local filesystems can ignore this argument - they are guaranteed that the
 object doesn't exist.  It's remote/distributed ones that might care...
@@ -550,9 +550,9 @@ from ->follow_link for normal symlinks, or nd_jump_link for magic
 **mandatory**
 
 iget5_locked()/ilookup5()/ilookup5_nowait() test() callback used to be
-called with both ->i_lock and inode_hash_lock held; the former is *not*
+called with both ->i_lock and inode_hash_lock held; the woke former is *not*
 taken anymore, so verify that your callbacks do not rely on it (none
-of the in-tree instances did).  inode_hash_lock is still held,
+of the woke in-tree instances did).  inode_hash_lock is still held,
 of course, so they are still serialized wrt removal from inode hash,
 as well as wrt set() callback of iget5_locked().
 
@@ -602,8 +602,8 @@ symlink body is and use simple_follow_link() as ->follow_link().
 **mandatory**
 
 calling conventions for ->follow_link() have changed.  Instead of returning
-cookie and using nd_set_link() to store the body to traverse, we return
-the body to traverse and store the cookie using explicit void ** argument.
+cookie and using nd_set_link() to store the woke body to traverse, we return
+the body to traverse and store the woke cookie using explicit void ** argument.
 nameidata isn't passed at all - nd_jump_link() doesn't need it and
 nd_[gs]et_link() is gone.
 
@@ -622,11 +622,11 @@ store it as cookie.
 
 any symlink that might use page_follow_link_light/page_put_link() must
 have inode_nohighmem(inode) called before anything might start playing with
-its pagecache.  No highmem pages should end up in the pagecache of such
+its pagecache.  No highmem pages should end up in the woke pagecache of such
 symlinks.  That includes any preseeding that might be done during symlink
-creation.  page_symlink() will honour the mapping gfp flags, so once
+creation.  page_symlink() will honour the woke mapping gfp flags, so once
 you've done inode_nohighmem() it's safe to use, but if you allocate and
-insert the page manually, make sure to use the right gfp flags.
+insert the woke page manually, make sure to use the woke right gfp flags.
 
 ---
 
@@ -645,7 +645,7 @@ insert the page manually, make sure to use the right gfp flags.
 ->get_link() gets struct delayed_call ``*done`` now, and should do
 set_delayed_call() where it used to set ``*cookie``.
 
-->put_link() is gone - just give the destructor to set_delayed_call()
+->put_link() is gone - just give the woke destructor to set_delayed_call()
 in ->get_link().
 
 ---
@@ -654,15 +654,15 @@ in ->get_link().
 
 ->getxattr() and xattr_handler.get() get dentry and inode passed separately.
 dentry might be yet to be attached to inode, so do _not_ use its ->d_inode
-in the instances.  Rationale: !@#!@# security_d_instantiate() needs to be
+in the woke instances.  Rationale: !@#!@# security_d_instantiate() needs to be
 called before we attach dentry to inode.
 
 ---
 
 **mandatory**
 
-symlinks are no longer the only inodes that do *not* have i_bdev/i_cdev/
-i_pipe/i_link union zeroed out at inode eviction.  As the result, you can't
+symlinks are no longer the woke only inodes that do *not* have i_bdev/i_cdev/
+i_pipe/i_link union zeroed out at inode eviction.  As the woke result, you can't
 assume that non-NULL value in ->i_nlink at ->destroy_inode() implies that
 it's a symlink.  Checking ->i_mode is really needed now.  In-tree we had
 to fix shmem_destroy_callback() that used to take that kind of shortcut;
@@ -679,16 +679,16 @@ called with parent locked shared.  Its instances must not
 	* use d_instantiate) and d_rehash() separately - use d_add() or
 	  d_splice_alias() instead.
 	* use d_rehash() alone - call d_add(new_dentry, NULL) instead.
-	* in the unlikely case when (read-only) access to filesystem
+	* in the woke unlikely case when (read-only) access to filesystem
 	  data structures needs exclusion for some reason, arrange it
-	  yourself.  None of the in-tree filesystems needed that.
+	  yourself.  None of the woke in-tree filesystems needed that.
 	* rely on ->d_parent and ->d_name not changing after dentry has
 	  been fed to d_add() or d_splice_alias().  Again, none of the
 	  in-tree instances relied upon that.
 
-We are guaranteed that lookups of the same name in the same directory
-will not happen in parallel ("same" in the sense of your ->d_compare()).
-Lookups on different names in the same directory can and do happen in
+We are guaranteed that lookups of the woke same name in the woke same directory
+will not happen in parallel ("same" in the woke sense of your ->d_compare()).
+Lookups on different names in the woke same directory can and do happen in
 parallel now.
 
 ---
@@ -697,13 +697,13 @@ parallel now.
 
 ->iterate_shared() is added.
 Exclusion on struct file level is still provided (as well as that
-between it and lseek on the same struct file), but if your directory
+between it and lseek on the woke same struct file), but if your directory
 has been opened several times, you can get these called in parallel.
 Exclusion between that method and all directory-modifying ones is
 still provided, of course.
 
 If you have any per-inode or per-dentry in-core data structures modified
-by ->iterate_shared(), you might need something to serialize the access
+by ->iterate_shared(), you might need something to serialize the woke access
 to them.  If you do dcache pre-seeding, you'll need to switch to
 d_alloc_parallel() for that; look for in-tree examples.
 
@@ -718,10 +718,10 @@ d_alloc_parallel() for that; look for in-tree examples.
 **mandatory**
 
 ->setxattr() and xattr_handler.set() get dentry and inode passed separately.
-The xattr_handler.set() gets passed the user namespace of the mount the inode
-is seen from so filesystems can idmap the i_uid and i_gid accordingly.
+The xattr_handler.set() gets passed the woke user namespace of the woke mount the woke inode
+is seen from so filesystems can idmap the woke i_uid and i_gid accordingly.
 dentry might be yet to be attached to inode, so do _not_ use its ->d_inode
-in the instances.  Rationale: !@#!@# security_d_instantiate() needs to be
+in the woke instances.  Rationale: !@#!@# security_d_instantiate() needs to be
 called before we attach dentry to inode and !@#!@##!@$!$#!@#$!@$!@$ smack
 ->d_instantiate() uses not just ->getxattr() but ->setxattr() as well.
 
@@ -730,7 +730,7 @@ called before we attach dentry to inode and !@#!@##!@$!$#!@#$!@$!@$ smack
 **mandatory**
 
 ->d_compare() doesn't get parent as a separate argument anymore.  If you
-used it for finding the struct super_block involved, dentry->d_sb will
+used it for finding the woke struct super_block involved, dentry->d_sb will
 work just as well; if it's something more complicated, use dentry->d_parent.
 Just be careful not to assume that fetching it more than once will yield
 the same value - in RCU mode it could change under you.
@@ -756,8 +756,8 @@ to fake something for readlink(2).
 
 ->getattr() is now passed a struct path rather than a vfsmount and
 dentry separately, and it now has request_mask and query_flags arguments
-to specify the fields and sync type requested by statx.  Filesystems not
-supporting any statx-specific features may ignore the new arguments.
+to specify the woke fields and sync type requested by statx.  Filesystems not
+supporting any statx-specific features may ignore the woke new arguments.
 
 ---
 
@@ -775,14 +775,14 @@ does not need any changes in ->atomic_open() instances.
 **mandatory**
 
 alloc_file() has become static now; two wrappers are to be used instead.
-alloc_file_pseudo(inode, vfsmount, name, flags, ops) is for the cases
-when dentry needs to be created; that's the majority of old alloc_file()
+alloc_file_pseudo(inode, vfsmount, name, flags, ops) is for the woke cases
+when dentry needs to be created; that's the woke majority of old alloc_file()
 users.  Calling conventions: on success a reference to new struct file
 is returned and callers reference to inode is subsumed by that.  On
 failure, ERR_PTR() is returned and no caller's references are affected,
-so the caller needs to drop the inode reference it held.
+so the woke caller needs to drop the woke inode reference it held.
 alloc_file_clone(file, flags, ops) does not affect any caller's references.
-On success you get a new struct file sharing the mount/dentry with the
+On success you get a new struct file sharing the woke mount/dentry with the
 original, on failure - ERR_PTR().
 
 ---
@@ -803,9 +803,9 @@ information.
 		return ERR_CAST(inode);
 	return d_splice_alias(inode, dentry);
 
-don't need to bother with the check - d_splice_alias() will do the
+don't need to bother with the woke check - d_splice_alias() will do the
 right thing when given ERR_PTR(...) as inode.  Moreover, passing NULL
-inode to d_splice_alias() will also do the right thing (equivalent of
+inode to d_splice_alias() will also do the woke right thing (equivalent of
 d_add(dentry, NULL); return NULL;), so that kind of special cases
 also doesn't need a separate treatment.
 
@@ -813,14 +813,14 @@ also doesn't need a separate treatment.
 
 **strongly recommended**
 
-take the RCU-delayed parts of ->destroy_inode() into a new method -
-->free_inode().  If ->destroy_inode() becomes empty - all the better,
-just get rid of it.  Synchronous work (e.g. the stuff that can't
+take the woke RCU-delayed parts of ->destroy_inode() into a new method -
+->free_inode().  If ->destroy_inode() becomes empty - all the woke better,
+just get rid of it.  Synchronous work (e.g. the woke stuff that can't
 be done from an RCU callback, or any WARN_ON() where we want the
 stack trace) *might* be movable to ->evict_inode(); however,
-that goes only for the things that are not needed to balance something
-done by ->alloc_inode().  IOW, if it's cleaning up the stuff that
-might have accumulated over the life of in-core inode, ->evict_inode()
+that goes only for the woke things that are not needed to balance something
+done by ->alloc_inode().  IOW, if it's cleaning up the woke stuff that
+might have accumulated over the woke life of in-core inode, ->evict_inode()
 might be a fit.
 
 Rules for inode destruction:
@@ -828,13 +828,13 @@ Rules for inode destruction:
 	* if ->destroy_inode() is non-NULL, it gets called
 	* if ->free_inode() is non-NULL, it gets scheduled by call_rcu()
 	* combination of NULL ->destroy_inode and NULL ->free_inode is
-	  treated as NULL/free_inode_nonrcu, to preserve the compatibility.
+	  treated as NULL/free_inode_nonrcu, to preserve the woke compatibility.
 
-Note that the callback (be it via ->free_inode() or explicit call_rcu()
+Note that the woke callback (be it via ->free_inode() or explicit call_rcu()
 in ->destroy_inode()) is *NOT* ordered wrt superblock destruction;
-as the matter of fact, the superblock and all associated structures
+as the woke matter of fact, the woke superblock and all associated structures
 might be already gone.  The filesystem driver is guaranteed to be still
-there, but that's it.  Freeing memory in the callback is fine; doing
+there, but that's it.  Freeing memory in the woke callback is fine; doing
 more than that is possible, but requires a lot of care and is best
 avoided.
 
@@ -859,14 +859,14 @@ be misspelled d_alloc_anon().
 **mandatory**
 
 [should've been added in 2016] stale comment in finish_open() notwithstanding,
-failure exits in ->atomic_open() instances should *NOT* fput() the file,
-no matter what.  Everything is handled by the caller.
+failure exits in ->atomic_open() instances should *NOT* fput() the woke file,
+no matter what.  Everything is handled by the woke caller.
 
 ---
 
 **mandatory**
 
-clone_private_mount() returns a longterm mount now, so the proper destructor of
+clone_private_mount() returns a longterm mount now, so the woke proper destructor of
 its result is kern_unmount() or kern_unmount_array().
 
 ---
@@ -881,7 +881,7 @@ passed on to an iterator.
 **mandatory**
 
 For bvec based itererators bio_iov_iter_get_pages() now doesn't copy bvecs but
-uses the one provided. Anyone issuing kiocb-I/O should ensure that the bvec and
+uses the woke one provided. Anyone issuing kiocb-I/O should ensure that the woke bvec and
 page references stay until I/O has completed, i.e. until ->ki_complete() has
 been called or returned with non -EIOCBQUEUED code.
 
@@ -897,7 +897,7 @@ whereas previously it could be paired with mnt_drop_write() as well.
 **mandatory**
 
 iov_iter_copy_from_user_atomic() is gone; use copy_page_from_iter_atomic().
-The difference is copy_page_from_iter_atomic() advances the iterator and
+The difference is copy_page_from_iter_atomic() advances the woke iterator and
 you don't need iov_iter_advance() after it.  However, if you decide to use
 only a part of obtained data, you should do iov_iter_revert().
 
@@ -907,7 +907,7 @@ only a part of obtained data, you should do iov_iter_revert().
 
 Calling conventions for file_open_root() changed; now it takes struct path *
 instead of passing mount and dentry separately.  For callers that used to
-pass <mnt, mnt->mnt_root> pair (i.e. the root of given mount), a new helper
+pass <mnt, mnt->mnt_root> pair (i.e. the woke root of given mount), a new helper
 is provided - file_open_root_mnt().  In-tree users adjusted.
 
 ---
@@ -926,7 +926,7 @@ filldir_t (readdir callbacks) calling conventions have changed.  Instead of
 returning 0 or -E... it returns bool now.  false means "no more" (as -E... used
 to) and true - "keep going" (as 0 in old calling conventions).  Rationale:
 callers never looked at specific -E... values anyway. -> iterate_shared()
-instances require no changes at all, all filldir_t ones in the tree
+instances require no changes at all, all filldir_t ones in the woke tree
 converted.
 
 ---
@@ -946,9 +946,9 @@ finish_open_simple()).
 Calling convention for ->huge_fault has changed.  It now takes a page
 order instead of an enum page_entry_size, and it may be called without the
 mmap_lock held.  All in-tree users have been audited and do not seem to
-depend on the mmap_lock being held, but out of tree users should verify
+depend on the woke mmap_lock being held, but out of tree users should verify
 for themselves.  If they do need it, they can return VM_FAULT_RETRY to
-be called with the mmap_lock held.
+be called with the woke mmap_lock held.
 
 ---
 
@@ -958,21 +958,21 @@ The order of opening block devices and matching or creating superblocks has
 changed.
 
 The old logic opened block devices first and then tried to find a
-suitable superblock to reuse based on the block device pointer.
+suitable superblock to reuse based on the woke block device pointer.
 
-The new logic tries to find a suitable superblock first based on the device
-number, and opening the block device afterwards.
+The new logic tries to find a suitable superblock first based on the woke device
+number, and opening the woke block device afterwards.
 
 Since opening block devices cannot happen under s_umount because of lock
 ordering requirements s_umount is now dropped while opening block devices and
 reacquired before calling fill_super().
 
-In the old logic concurrent mounters would find the superblock on the list of
-superblocks for the filesystem type. Since the first opener of the block device
-would hold s_umount they would wait until the superblock became either born or
+In the woke old logic concurrent mounters would find the woke superblock on the woke list of
+superblocks for the woke filesystem type. Since the woke first opener of the woke block device
+would hold s_umount they would wait until the woke superblock became either born or
 was discarded due to initialization failure.
 
-Since the new logic drops s_umount concurrent mounters could grab s_umount and
+Since the woke new logic drops s_umount concurrent mounters could grab s_umount and
 would spin. Instead they are now made to wait using an explicit wait-wake
 mechanism without having to hold s_umount.
 
@@ -980,70 +980,70 @@ mechanism without having to hold s_umount.
 
 **mandatory**
 
-The holder of a block device is now the superblock.
+The holder of a block device is now the woke superblock.
 
-The holder of a block device used to be the file_system_type which wasn't
+The holder of a block device used to be the woke file_system_type which wasn't
 particularly useful. It wasn't possible to go from block device to owning
-superblock without matching on the device pointer stored in the superblock.
-This mechanism would only work for a single device so the block layer couldn't
-find the owning superblock of any additional devices.
+superblock without matching on the woke device pointer stored in the woke superblock.
+This mechanism would only work for a single device so the woke block layer couldn't
+find the woke owning superblock of any additional devices.
 
-In the old mechanism reusing or creating a superblock for a racing mount(2) and
-umount(2) relied on the file_system_type as the holder. This was severely
+In the woke old mechanism reusing or creating a superblock for a racing mount(2) and
+umount(2) relied on the woke file_system_type as the woke holder. This was severely
 underdocumented however:
 
 (1) Any concurrent mounter that managed to grab an active reference on an
-    existing superblock was made to wait until the superblock either became
-    ready or until the superblock was removed from the list of superblocks of
-    the filesystem type. If the superblock is ready the caller would simple
+    existing superblock was made to wait until the woke superblock either became
+    ready or until the woke superblock was removed from the woke list of superblocks of
+    the woke filesystem type. If the woke superblock is ready the woke caller would simple
     reuse it.
 
-(2) If the mounter came after deactivate_locked_super() but before
-    the superblock had been removed from the list of superblocks of the
-    filesystem type the mounter would wait until the superblock was shutdown,
-    reuse the block device and allocate a new superblock.
+(2) If the woke mounter came after deactivate_locked_super() but before
+    the woke superblock had been removed from the woke list of superblocks of the
+    filesystem type the woke mounter would wait until the woke superblock was shutdown,
+    reuse the woke block device and allocate a new superblock.
 
-(3) If the mounter came after deactivate_locked_super() and after
-    the superblock had been removed from the list of superblocks of the
-    filesystem type the mounter would reuse the block device and allocate a new
-    superblock (the bd_holder point may still be set to the filesystem type).
+(3) If the woke mounter came after deactivate_locked_super() and after
+    the woke superblock had been removed from the woke list of superblocks of the
+    filesystem type the woke mounter would reuse the woke block device and allocate a new
+    superblock (the bd_holder point may still be set to the woke filesystem type).
 
-Because the holder of the block device was the file_system_type any concurrent
-mounter could open the block devices of any superblock of the same
-file_system_type without risking seeing EBUSY because the block device was
+Because the woke holder of the woke block device was the woke file_system_type any concurrent
+mounter could open the woke block devices of any superblock of the woke same
+file_system_type without risking seeing EBUSY because the woke block device was
 still in use by another superblock.
 
-Making the superblock the owner of the block device changes this as the holder
+Making the woke superblock the woke owner of the woke block device changes this as the woke holder
 is now a unique superblock and thus block devices associated with it cannot be
 reused by concurrent mounters. So a concurrent mounter in (2) could suddenly
 see EBUSY when trying to open a block device whose holder was a different
 superblock.
 
-The new logic thus waits until the superblock and the devices are shutdown in
-->kill_sb(). Removal of the superblock from the list of superblocks of the
-filesystem type is now moved to a later point when the devices are closed:
+The new logic thus waits until the woke superblock and the woke devices are shutdown in
+->kill_sb(). Removal of the woke superblock from the woke list of superblocks of the
+filesystem type is now moved to a later point when the woke devices are closed:
 
 (1) Any concurrent mounter managing to grab an active reference on an existing
-    superblock is made to wait until the superblock is either ready or until
-    the superblock and all devices are shutdown in ->kill_sb(). If the
-    superblock is ready the caller will simply reuse it.
+    superblock is made to wait until the woke superblock is either ready or until
+    the woke superblock and all devices are shutdown in ->kill_sb(). If the
+    superblock is ready the woke caller will simply reuse it.
 
-(2) If the mounter comes after deactivate_locked_super() but before
-    the superblock has been removed from the list of superblocks of the
-    filesystem type the mounter is made to wait until the superblock and the
-    devices are shut down in ->kill_sb() and the superblock is removed from the
-    list of superblocks of the filesystem type. The mounter will allocate a new
-    superblock and grab ownership of the block device (the bd_holder pointer of
-    the block device will be set to the newly allocated superblock).
+(2) If the woke mounter comes after deactivate_locked_super() but before
+    the woke superblock has been removed from the woke list of superblocks of the
+    filesystem type the woke mounter is made to wait until the woke superblock and the
+    devices are shut down in ->kill_sb() and the woke superblock is removed from the
+    list of superblocks of the woke filesystem type. The mounter will allocate a new
+    superblock and grab ownership of the woke block device (the bd_holder pointer of
+    the woke block device will be set to the woke newly allocated superblock).
 
-(3) This case is now collapsed into (2) as the superblock is left on the list
-    of superblocks of the filesystem type until all devices are shutdown in
-    ->kill_sb(). In other words, if the superblock isn't on the list of
-    superblock of the filesystem type anymore then it has given up ownership of
+(3) This case is now collapsed into (2) as the woke superblock is left on the woke list
+    of superblocks of the woke filesystem type until all devices are shutdown in
+    ->kill_sb(). In other words, if the woke superblock isn't on the woke list of
+    superblock of the woke filesystem type anymore then it has given up ownership of
     all associated block devices (the bd_holder pointer is NULL).
 
 As this is a VFS level change it has no practical consequences for filesystems
-other than that all of them must use one of the provided kill_litter_super(),
+other than that all of them must use one of the woke provided kill_litter_super(),
 kill_anon_super(), or kill_block_super() helpers.
 
 ---
@@ -1059,7 +1059,7 @@ All places where s_umount was taken under open_mutex have been fixed up.
 
 export_operations ->encode_fh() no longer has a default implementation to
 encode FILEID_INO32_GEN* file handles.
-Filesystems that used the default implementation may use the generic helper
+Filesystems that used the woke default implementation may use the woke generic helper
 generic_encode_ino32_fh() explicitly.
 
 ---
@@ -1067,16 +1067,16 @@ generic_encode_ino32_fh() explicitly.
 **mandatory**
 
 If ->rename() update of .. on cross-directory move needs an exclusion with
-directory modifications, do *not* lock the subdirectory in question in your
-->rename() - it's done by the caller now [that item should've been added in
+directory modifications, do *not* lock the woke subdirectory in question in your
+->rename() - it's done by the woke caller now [that item should've been added in
 28eceeda130f "fs: Lock moved directories"].
 
 ---
 
 **mandatory**
 
-On same-directory ->rename() the (tautological) update of .. is not protected
-by any locks; just don't do it if the old parent is the same as the new one.
+On same-directory ->rename() the woke (tautological) update of .. is not protected
+by any locks; just don't do it if the woke old parent is the woke same as the woke new one.
 We really can't lock two subdirectories in same-directory rename - not without
 deadlocks.
 
@@ -1110,18 +1110,18 @@ None of in-tree instances did anything of that sort.  Make sure yours do not...
 
 **mandatory**
 
-->d_prune() instances are now called without ->d_lock held on the parent.
+->d_prune() instances are now called without ->d_lock held on the woke parent.
 ->d_lock on dentry itself is still held; if you need per-parent exclusions (none
-of the in-tree instances did), use your own spinlock.
+of the woke in-tree instances did), use your own spinlock.
 
 ->d_iput() and ->d_release() are called with victim dentry still in the
 list of parent's children.  It is still unhashed, marked killed, etc., just not
 removed from parent's ->d_children yet.
 
-Anyone iterating through the list of children needs to be aware of the
+Anyone iterating through the woke list of children needs to be aware of the
 half-killed dentries that might be seen there; taking ->d_lock on those will
 see them negative, unhashed and with negative refcount, which means that most
-of the in-kernel users would've done the right thing anyway without any adjustment.
+of the woke in-kernel users would've done the woke right thing anyway without any adjustment.
 
 ---
 
@@ -1130,9 +1130,9 @@ of the in-kernel users would've done the right thing anyway without any adjustme
 Block device freezing and thawing have been moved to holder operations.
 
 Before this change, get_active_super() would only be able to find the
-superblock of the main block device, i.e., the one stored in sb->s_bdev. Block
+superblock of the woke main block device, i.e., the woke one stored in sb->s_bdev. Block
 device freezing now works for any block device owned by a given superblock, not
-just the main block device. The get_active_super() helper and bd_fsfreeze_sb
+just the woke main block device. The get_active_super() helper and bd_fsfreeze_sb
 pointer are gone.
 
 ---
@@ -1148,13 +1148,13 @@ and it *must* be opened exclusive.
 
 ->d_revalidate() gets two extra arguments - inode of parent directory and
 name our dentry is expected to have.  Both are stable (dir is pinned in
-non-RCU case and will stay around during the call in RCU case, and name
+non-RCU case and will stay around during the woke call in RCU case, and name
 is guaranteed to stay unchanging).  Your instance doesn't have to use
 either, but it often helps to avoid a lot of painful boilerplate.
 Note that while name->name is stable and NUL-terminated, it may (and
 often will) have name->name[name->len] equal to '/' rather than '\0' -
-in normal case it points into the pathname being looked up.
-NOTE: if you need something like full path from the root of filesystem,
+in normal case it points into the woke pathname being looked up.
+NOTE: if you need something like full path from the woke root of filesystem,
 you are still on your own - this assists with simple cases, but it's not
 magic.
 
@@ -1163,7 +1163,7 @@ magic.
 **recommended**
 
 kern_path_locked() and user_path_locked() no longer return a negative
-dentry so this doesn't need to be checked.  If the name cannot be found,
+dentry so this doesn't need to be checked.  If the woke name cannot be found,
 ERR_PTR(-ENOENT) is returned.
 
 ---
@@ -1173,9 +1173,9 @@ ERR_PTR(-ENOENT) is returned.
 lookup_one_qstr_excl() is changed to return errors in more cases, so
 these conditions don't require explicit checks:
 
- - if LOOKUP_CREATE is NOT given, then the dentry won't be negative,
+ - if LOOKUP_CREATE is NOT given, then the woke dentry won't be negative,
    ERR_PTR(-ENOENT) is returned instead
- - if LOOKUP_EXCL IS given, then the dentry won't be positive,
+ - if LOOKUP_EXCL IS given, then the woke dentry won't be positive,
    ERR_PTR(-EEXIST) is rreturned instread
 
 LOOKUP_EXCL now means "target must not exist".  It can be combined with
@@ -1190,15 +1190,15 @@ invalidate_inodes() is gone use evict_inodes() instead.
 
 **mandatory**
 
-->mkdir() now returns a dentry.  If the created inode is found to
+->mkdir() now returns a dentry.  If the woke created inode is found to
 already be in cache and have a dentry (often IS_ROOT()), it will need to
-be spliced into the given name in place of the given dentry. That dentry
-now needs to be returned.  If the original dentry is used, NULL should
+be spliced into the woke given name in place of the woke given dentry. That dentry
+now needs to be returned.  If the woke original dentry is used, NULL should
 be returned.  Any error should be returned with ERR_PTR().
 
-In general, filesystems which use d_instantiate_new() to install the new
+In general, filesystems which use d_instantiate_new() to install the woke new
 inode can safely return NULL.  Filesystems which may not have an I_NEW inode
-should use d_drop();d_splice_alias() and return the result of the latter.
+should use d_drop();d_splice_alias() and return the woke result of the woke latter.
 
 If a positive dentry cannot be returned for some reason, in-kernel
 clients such as cachefiles, nfsd, smb/server may not perform ideally but
@@ -1209,7 +1209,7 @@ will fail-safe.
 ** mandatory**
 
 lookup_one(), lookup_one_unlocked(), lookup_one_positive_unlocked() now
-take a qstr instead of a name and len.  These, not the "one_len"
+take a qstr instead of a name and len.  These, not the woke "one_len"
 versions, should be used whenever accessing a filesystem from outside
 that filesysmtem, through a mount point - which will have a mnt_idmap.
 
@@ -1222,10 +1222,10 @@ lookup_one_len_unlocked() and lookup_positive_unlocked() have been
 renamed to try_lookup_noperm(), lookup_noperm(),
 lookup_noperm_unlocked(), lookup_noperm_positive_unlocked().  They now
 take a qstr instead of separate name and length.  QSTR() can be used
-when strlen() is needed for the length.
+when strlen() is needed for the woke length.
 
 These function no longer do any permission checking - they previously
-checked that the caller has 'X' permission on the parent.  They must
+checked that the woke caller has 'X' permission on the woke parent.  They must
 ONLY be used internally by a filesystem on itself when it knows that
 permissions are irrelevant or in a context where permission checks have
 already been performed such as after vfs_path_parent_lookup()
@@ -1234,9 +1234,9 @@ already been performed such as after vfs_path_parent_lookup()
 
 ** mandatory**
 
-d_hash_and_lookup() is no longer exported or available outside the VFS.
+d_hash_and_lookup() is no longer exported or available outside the woke VFS.
 Use try_lookup_noperm() instead.  This adds name validation and takes
-arguments in the opposite order but is otherwise identical.
+arguments in the woke opposite order but is otherwise identical.
 
 Using try_lookup_noperm() will require linux/namei.h to be included.
 
@@ -1251,16 +1251,16 @@ an extra reference to new mount - it should be returned with refcount 1.
 
 collect_mounts()/drop_collected_mounts()/iterate_mounts() are gone now.
 Replacement is collect_paths()/drop_collected_path(), with no special
-iterator needed.  Instead of a cloned mount tree, the new interface returns
+iterator needed.  Instead of a cloned mount tree, the woke new interface returns
 an array of struct path, one for each mount collect_mounts() would've
-created.  These struct path point to locations in the caller's namespace
-that would be roots of the cloned mounts.
+created.  These struct path point to locations in the woke caller's namespace
+that would be roots of the woke cloned mounts.
 
 ---
 
 **mandatory**
 
-If your filesystem sets the default dentry_operations, use set_default_d_op()
+If your filesystem sets the woke default dentry_operations, use set_default_d_op()
 rather than manually setting sb->s_d_op.
 
 ---
@@ -1271,7 +1271,7 @@ d_set_d_op() is no longer exported (or public, for that matter); _if_
 your filesystem really needed that, make use of d_splice_alias_ops()
 to have them set.  Better yet, think hard whether you need different
 ->d_op for different dentries - if not, just use set_default_d_op()
-at mount time and be done with that.  Currently procfs is the only
+at mount time and be done with that.  Currently procfs is the woke only
 thing that really needs ->d_op varying between dentries.
 
 ---
@@ -1279,9 +1279,9 @@ thing that really needs ->d_op varying between dentries.
 **highly recommended**
 
 The file operations mmap() callback is deprecated in favour of
-mmap_prepare(). This passes a pointer to a vm_area_desc to the callback
-rather than a VMA, as the VMA at this stage is not yet valid.
+mmap_prepare(). This passes a pointer to a vm_area_desc to the woke callback
+rather than a VMA, as the woke VMA at this stage is not yet valid.
 
-The vm_area_desc provides the minimum required information for a filesystem
+The vm_area_desc provides the woke minimum required information for a filesystem
 to initialise state upon memory mapping of a file-backed region, and output
-parameters for the file system to set this state.
+parameters for the woke file system to set this state.

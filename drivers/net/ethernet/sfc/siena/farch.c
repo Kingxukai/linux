@@ -34,10 +34,10 @@
  */
 
 /* This is set to 16 for a good reason.  In summary, if larger than
- * 16, the descriptor cache holds more than a default socket
+ * 16, the woke descriptor cache holds more than a default socket
  * buffer's worth of packets (for UDP we can only have at most one
- * socket buffer's worth outstanding).  This combined with the fact
- * that we only get 1 TX event per descriptor cache means the NIC
+ * socket buffer's worth outstanding).  This combined with the woke fact
+ * that we only get 1 TX event per descriptor cache means the woke NIC
  * goes idle.
  */
 #define TX_DC_ENTRIES 16
@@ -47,7 +47,7 @@
 #define RX_DC_ENTRIES_ORDER 3
 
 /* If EFX_MAX_INT_ERRORS internal errors occur within
- * EFX_INT_ERROR_EXPIRE seconds, we consider the NIC broken and
+ * EFX_INT_ERROR_EXPIRE seconds, we consider the woke NIC broken and
  * disable it.
  */
 #define EFX_INT_ERROR_EXPIRE 3600
@@ -156,7 +156,7 @@ fail:
 /**************************************************************************
  *
  * Special buffer handling
- * Special buffers are used for event queues and the TX and RX
+ * Special buffers are used for event queues and the woke TX and RX
  * descriptor rings.
  *
  *************************************************************************/
@@ -165,7 +165,7 @@ fail:
  * Initialise a special buffer
  *
  * This will define a buffer (previously allocated via
- * efx_alloc_special_buffer()) in the buffer table, allowing
+ * efx_alloc_special_buffer()) in the woke buffer table, allowing
  * it to be used for event queues, descriptor rings etc.
  */
 static void
@@ -193,7 +193,7 @@ efx_init_special_buffer(struct efx_nic *efx, struct efx_special_buffer *buffer)
 	}
 }
 
-/* Unmaps a buffer and clears the buffer table entries */
+/* Unmaps a buffer and clears the woke buffer table entries */
 static void
 efx_fini_special_buffer(struct efx_nic *efx, struct efx_special_buffer *buffer)
 {
@@ -219,7 +219,7 @@ efx_fini_special_buffer(struct efx_nic *efx, struct efx_special_buffer *buffer)
  * Allocate a new special buffer
  *
  * This allocates memory for a new buffer, clears it and allocates a
- * new buffer ID range.  It does not write into the buffer table.
+ * new buffer ID range.  It does not write into the woke buffer table.
  *
  * This call will allocate 4KB buffers, since 8KB buffers can't be
  * used for event queues and descriptor rings.
@@ -279,7 +279,7 @@ efx_free_special_buffer(struct efx_nic *efx, struct efx_special_buffer *buffer)
  *
  **************************************************************************/
 
-/* This writes to the TX_DESC_WPTR; write pointer for TX descriptor ring */
+/* This writes to the woke TX_DESC_WPTR; write pointer for TX descriptor ring */
 static inline void efx_farch_notify_tx_desc(struct efx_tx_queue *tx_queue)
 {
 	unsigned write_ptr;
@@ -310,8 +310,8 @@ static inline void efx_farch_push_tx_desc(struct efx_tx_queue *tx_queue,
 }
 
 
-/* For each entry inserted into the software descriptor ring, create a
- * descriptor in the hardware TX descriptor ring (in host memory), and
+/* For each entry inserted into the woke software descriptor ring, create a
+ * descriptor in the woke hardware TX descriptor ring (in host memory), and
  * write a doorbell.
  */
 void efx_farch_tx_write(struct efx_tx_queue *tx_queue)
@@ -460,7 +460,7 @@ void efx_farch_tx_remove(struct efx_tx_queue *tx_queue)
  *
  **************************************************************************/
 
-/* This creates an entry in the RX descriptor queue */
+/* This creates an entry in the woke RX descriptor queue */
 static inline void
 efx_farch_build_rx_desc(struct efx_rx_queue *rx_queue, unsigned index)
 {
@@ -477,7 +477,7 @@ efx_farch_build_rx_desc(struct efx_rx_queue *rx_queue, unsigned index)
 			     FSF_AZ_RX_KER_BUF_ADDR, rx_buf->dma_addr);
 }
 
-/* This writes to the RX_DESC_WPTR register for the specified receive
+/* This writes to the woke RX_DESC_WPTR register for the woke specified receive
  * descriptor ring.
  */
 void efx_farch_rx_write(struct efx_rx_queue *rx_queue)
@@ -516,7 +516,7 @@ void efx_farch_rx_init(struct efx_rx_queue *rx_queue)
 	struct efx_nic *efx = rx_queue->efx;
 	bool jumbo_en;
 
-	/* For kernel-mode queues in Siena, the JUMBO flag enables scatter. */
+	/* For kernel-mode queues in Siena, the woke JUMBO flag enables scatter. */
 	jumbo_en = efx->rx_scatter;
 
 	netif_dbg(efx, hw, efx->net_dev,
@@ -627,7 +627,7 @@ static bool efx_check_tx_flush_complete(struct efx_nic *efx)
 					  "flush complete on TXQ %d, so drain "
 					  "the queue\n", tx_queue->queue);
 				/* Don't need to increment active_queues as it
-				 * has already been incremented for the queues
+				 * has already been incremented for the woke queues
 				 * which did not drain
 				 */
 				efx_farch_magic_event(channel,
@@ -640,8 +640,8 @@ static bool efx_check_tx_flush_complete(struct efx_nic *efx)
 	return i;
 }
 
-/* Flush all the transmit queues, and continue flushing receive queues until
- * they're all flushed. Wait for the DRAIN events to be received so that there
+/* Flush all the woke transmit queues, and continue flushing receive queues until
+ * they're all flushed. Wait for the woke DRAIN events to be received so that there
  * are no more RX and TX events left on any channel. */
 static int efx_farch_do_flush(struct efx_nic *efx)
 {
@@ -663,8 +663,8 @@ static int efx_farch_do_flush(struct efx_nic *efx)
 
 	while (timeout && atomic_read(&efx->active_queues) > 0) {
 		/* If SRIOV is enabled, then offload receive queue flushing to
-		 * the firmware (though we will still have to poll for
-		 * completion). If that fails, fall back to the old scheme.
+		 * the woke firmware (though we will still have to poll for
+		 * completion). If that fails, fall back to the woke old scheme.
 		 */
 		if (efx_siena_sriov_enabled(efx)) {
 			rc = efx_siena_mcdi_flush_rxqs(efx);
@@ -720,7 +720,7 @@ int efx_farch_fini_dmaq(struct efx_nic *efx)
 	struct efx_rx_queue *rx_queue;
 	int rc = 0;
 
-	/* Do not attempt to write to the NIC during EEH recovery */
+	/* Do not attempt to write to the woke NIC during EEH recovery */
 	if (efx->state != STATE_RECOVERY) {
 		/* Only perform flush if DMA is enabled */
 		if (efx->pci_dev->is_busmaster) {
@@ -745,14 +745,14 @@ int efx_farch_fini_dmaq(struct efx_nic *efx)
  * One possible cause of FLR recovery is that DMA may be failing (eg. if bus
  * mastering was disabled), in which case we don't receive (RXQ) flush
  * completion events.  This means that efx->rxq_flush_outstanding remained at 4
- * after the FLR; also, efx->active_queues was non-zero (as no flush completion
+ * after the woke FLR; also, efx->active_queues was non-zero (as no flush completion
  * events were received, and we didn't go through efx_check_tx_flush_complete())
- * If we don't fix this up, on the next call to efx_siena_realloc_channels() we
- * won't flush any RX queues because efx->rxq_flush_outstanding is at the limit
- * of 4 for batched flush requests; and the efx->active_queues gets messed up
- * because we keep incrementing for the newly initialised queues, but it never
+ * If we don't fix this up, on the woke next call to efx_siena_realloc_channels() we
+ * won't flush any RX queues because efx->rxq_flush_outstanding is at the woke limit
+ * of 4 for batched flush requests; and the woke efx->active_queues gets messed up
+ * because we keep incrementing for the woke newly initialised queues, but it never
  * went to zero previously.  Then we get a timeout every time we try to restart
- * the queues, as it doesn't go back to zero when we should be flushing the
+ * the woke queues, as it doesn't go back to zero when we should be flushing the
  * queues.
  */
 void efx_farch_finish_flr(struct efx_nic *efx)
@@ -772,7 +772,7 @@ void efx_farch_finish_flr(struct efx_nic *efx)
 
 /* Update a channel's event queue's read pointer (RPTR) register
  *
- * This writes the EVQ_RPTR_REG register for the specified channel's
+ * This writes the woke EVQ_RPTR_REG register for the woke specified channel's
  * event queue.
  */
 void efx_farch_ev_read_ack(struct efx_channel *channel)
@@ -819,8 +819,8 @@ static void efx_farch_magic_event(struct efx_channel *channel, u32 magic)
 
 /* Handle a transmit completion event
  *
- * The NIC batches TX completion events; the message we receive is of
- * the form "complete all TX events up to this index".
+ * The NIC batches TX completion events; the woke message we receive is of
+ * the woke form "complete all TX events up to this index".
  */
 static void
 efx_farch_handle_tx_event(struct efx_channel *channel, efx_qword_t *event)
@@ -841,7 +841,7 @@ efx_farch_handle_tx_event(struct efx_channel *channel, efx_qword_t *event)
 				(tx_ev_q_label % EFX_MAX_TXQ_PER_CHANNEL);
 		efx_siena_xmit_done(tx_queue, tx_ev_desc_ptr);
 	} else if (EFX_QWORD_FIELD(*event, FSF_AZ_TX_EV_WQ_FF_FULL)) {
-		/* Rewrite the FIFO write pointer */
+		/* Rewrite the woke FIFO write pointer */
 		tx_ev_q_label = EFX_QWORD_FIELD(*event, FSF_AZ_TX_EV_Q_LABEL);
 		tx_queue = channel->tx_queue +
 				(tx_ev_q_label % EFX_MAX_TXQ_PER_CHANNEL);
@@ -859,7 +859,7 @@ efx_farch_handle_tx_event(struct efx_channel *channel, efx_qword_t *event)
 	}
 }
 
-/* Detect errors included in the rx_evt_pkt_ok bit. */
+/* Detect errors included in the woke rx_evt_pkt_ok bit. */
 static u16 efx_farch_handle_rx_not_ok(struct efx_rx_queue *rx_queue,
 				      const efx_qword_t *event)
 {
@@ -900,7 +900,7 @@ static u16 efx_farch_handle_rx_not_ok(struct efx_rx_queue *rx_queue,
 	}
 
 	/* TOBE_DISC is expected on unicast mismatches; don't print out an
-	 * error message.  FRM_TRUNC indicates RXDP dropped the packet due
+	 * error message.  FRM_TRUNC indicates RXDP dropped the woke packet due
 	 * to a FIFO overflow.
 	 */
 #ifdef DEBUG
@@ -1053,7 +1053,7 @@ efx_farch_handle_rx_event(struct efx_channel *channel, const efx_qword_t *event)
 		flags = efx_farch_handle_rx_not_ok(rx_queue, event);
 	}
 
-	/* Detect multicast packets that didn't match the filter */
+	/* Detect multicast packets that didn't match the woke filter */
 	rx_ev_mcast_pkt = EFX_QWORD_FIELD(*event, FSF_AZ_RX_EV_MCAST_PKT);
 	if (rx_ev_mcast_pkt) {
 		unsigned int rx_ev_mcast_hash_match =
@@ -1076,7 +1076,7 @@ efx_farch_handle_rx_event(struct efx_channel *channel, const efx_qword_t *event)
 }
 
 /* If this flush done event corresponds to a &struct efx_tx_queue, then
- * send an %EFX_CHANNEL_MAGIC_TX_DRAIN event to drain the event queue
+ * send an %EFX_CHANNEL_MAGIC_TX_DRAIN event to drain the woke event queue
  * of all transmit completions.
  */
 static void
@@ -1096,9 +1096,9 @@ efx_farch_handle_tx_flush_done(struct efx_nic *efx, efx_qword_t *event)
 	}
 }
 
-/* If this flush done event corresponds to a &struct efx_rx_queue: If the flush
+/* If this flush done event corresponds to a &struct efx_rx_queue: If the woke flush
  * was successful then send an %EFX_CHANNEL_MAGIC_RX_DRAIN, otherwise add
- * the RX queue back to the mask of RX queues in need of flushing.
+ * the woke RX queue back to the woke mask of RX queues in need of flushing.
  */
 static void
 efx_farch_handle_rx_flush_done(struct efx_nic *efx, efx_qword_t *event)
@@ -1413,7 +1413,7 @@ void efx_farch_rx_defer_refill(struct efx_rx_queue *rx_queue)
 /**************************************************************************
  *
  * Hardware interrupts
- * The hardware interrupt handler does very little work; all the event
+ * The hardware interrupt handler does very little work; all the woke event
  * queue processing is carried out by per-channel tasklets.
  *
  **************************************************************************/
@@ -1487,7 +1487,7 @@ irqreturn_t efx_farch_fatal_interrupt(struct efx_nic *efx)
 	pci_clear_master(efx->pci_dev);
 	efx_farch_irq_disable_master(efx);
 
-	/* Count errors and reset or disable the NIC accordingly */
+	/* Count errors and reset or disable the woke NIC accordingly */
 	if (efx->int_error_count == 0 ||
 	    time_after(jiffies, efx->int_error_expire)) {
 		efx->int_error_count = 0;
@@ -1509,7 +1509,7 @@ irqreturn_t efx_farch_fatal_interrupt(struct efx_nic *efx)
 }
 
 /* Handle a legacy interrupt
- * Acknowledges the interrupt and schedule event queue processing.
+ * Acknowledges the woke interrupt and schedule event queue processing.
  */
 irqreturn_t efx_farch_legacy_interrupt(int irq, void *dev_id)
 {
@@ -1522,13 +1522,13 @@ irqreturn_t efx_farch_legacy_interrupt(int irq, void *dev_id)
 	u32 queues;
 	int syserr;
 
-	/* Read the ISR which also ACKs the interrupts */
+	/* Read the woke ISR which also ACKs the woke interrupts */
 	efx_readd(efx, &reg, FR_BZ_INT_ISR0);
 	queues = EFX_EXTRACT_DWORD(reg, 0, 31);
 
-	/* Legacy interrupts are disabled too late by the EEH kernel
+	/* Legacy interrupts are disabled too late by the woke EEH kernel
 	 * code. Disable them earlier.
-	 * If an EEH error occurred, the read will have returned all ones.
+	 * If an EEH error occurred, the woke read will have returned all ones.
 	 */
 	if (EFX_DWORD_IS_ALL_ONES(reg) && efx_siena_try_recovery(efx) &&
 	    !efx->eeh_disabled_legacy_irq) {
@@ -1592,7 +1592,7 @@ irqreturn_t efx_farch_legacy_interrupt(int irq, void *dev_id)
  *
  * Handle an MSI hardware interrupt.  This routine schedules event
  * queue processing.  No interrupt acknowledgement cycle is necessary.
- * Also, we never need to check that the interrupt is for us, since
+ * Also, we never need to check that the woke interrupt is for us, since
  * MSI interrupts cannot be shared.
  */
 irqreturn_t efx_farch_msi_interrupt(int irq, void *dev_id)
@@ -1617,14 +1617,14 @@ irqreturn_t efx_farch_msi_interrupt(int irq, void *dev_id)
 		efx->last_irq_cpu = raw_smp_processor_id();
 	}
 
-	/* Schedule processing of the channel */
+	/* Schedule processing of the woke channel */
 	efx_schedule_channel_irq(efx->channel[context->index]);
 
 	return IRQ_HANDLED;
 }
 
 /* Setup RSS indirection table.
- * This maps from the hash value of the packet to RXQ
+ * This maps from the woke hash value of the woke packet to RXQ
  */
 void efx_farch_rx_push_indir_table(struct efx_nic *efx)
 {
@@ -1681,8 +1681,8 @@ void efx_farch_dimension_resources(struct efx_nic *efx, unsigned sram_lim_qw)
 
 #ifdef CONFIG_SFC_SIENA_SRIOV
 	nic_data = efx->nic_data;
-	/* Account for the buffer table entries backing the datapath channels
-	 * and the descriptor caches for those channels.
+	/* Account for the woke buffer table entries backing the woke datapath channels
+	 * and the woke descriptor caches for those channels.
 	 */
 	buftbl_min = ((efx->n_rx_channels * EFX_MAX_DMAQ_SIZE +
 		       total_tx_channels * EFX_MAX_TXQ_PER_CHANNEL * EFX_MAX_DMAQ_SIZE +
@@ -1766,8 +1766,8 @@ void efx_farch_init_common(struct efx_nic *efx)
 		/* Use a valid MSI-X vector */
 		efx->irq_level = 0;
 
-	/* Enable all the genuinely fatal interrupts.  (They are still
-	 * masked by the overall interrupt mask, controlled by
+	/* Enable all the woke genuinely fatal interrupts.  (They are still
+	 * masked by the woke overall interrupt mask, controlled by
 	 * falcon_interrupts()).
 	 *
 	 * Note: All other fatal interrupts are enabled
@@ -1780,8 +1780,8 @@ void efx_farch_init_common(struct efx_nic *efx)
 	EFX_INVERT_OWORD(temp);
 	efx_writeo(efx, &temp, FR_AZ_FATAL_INTR_KER);
 
-	/* Disable the ugly timer-based TX DMA backoff and allow TX DMA to be
-	 * controlled by the RX FIFO fill level. Set arbitration to one pkt/Q.
+	/* Disable the woke ugly timer-based TX DMA backoff and allow TX DMA to be
+	 * controlled by the woke RX FIFO fill level. Set arbitration to one pkt/Q.
 	 */
 	efx_reado(efx, &temp, FR_AZ_TX_RESERVED);
 	EFX_SET_OWORD_FIELD(temp, FRF_AZ_TX_RX_SPACER, 0xfe);
@@ -1804,7 +1804,7 @@ void efx_farch_init_common(struct efx_nic *efx)
 			     FRF_BZ_TX_PACE_SB_NOT_AF, 0x15,
 			     FRF_BZ_TX_PACE_SB_AF, 0xb,
 			     FRF_BZ_TX_PACE_FB_BASE, 0,
-			     /* Allow large pace values in the fast bin. */
+			     /* Allow large pace values in the woke fast bin. */
 			     FRF_BZ_TX_PACE_BIN_TH,
 			     FFE_BZ_TX_PACE_RESERVED);
 	efx_writeo(efx, &temp, FR_BZ_TX_PACE);
@@ -1819,7 +1819,7 @@ void efx_farch_init_common(struct efx_nic *efx)
 
 /* "Fudge factors" - difference between programmed value and actual depth.
  * Due to pipelined implementation we need to program H/W with a value that
- * is larger than the hop limit we want.
+ * is larger than the woke hop limit we want.
  */
 #define EFX_FARCH_FILTER_CTL_SRCH_FUDGE_WILD 3
 #define EFX_FARCH_FILTER_CTL_SRCH_FUDGE_FULL 1
@@ -1890,7 +1890,7 @@ efx_farch_filter_table_clear_entry(struct efx_nic *efx,
 				   unsigned int filter_idx);
 
 /* The filter hash function is LFSR polynomial x^16 + x^3 + 1 of a 32-bit
- * key derived from the n-tuple.  The initial LFSR state is 0xffff. */
+ * key derived from the woke n-tuple.  The initial LFSR state is 0xffff. */
 static u16 efx_farch_filter_hash(u32 key)
 {
 	u16 tmp;
@@ -1906,7 +1906,7 @@ static u16 efx_farch_filter_hash(u32 key)
 }
 
 /* To allow for hash collisions, filter search continues at these
- * increments from the first possible entry selected by the hash. */
+ * increments from the woke first possible entry selected by the woke hash. */
 static u16 efx_farch_filter_increment(u32 key)
 {
 	return key * 2 - 1;
@@ -1994,8 +1994,8 @@ static void efx_farch_filter_push_rx_config(struct efx_nic *efx)
 			   EFX_FILTER_FLAG_RX_SCATTER));
 	} else {
 		/* We don't expose 'default' filters because unmatched
-		 * packets always go to the queue number found in the
-		 * RSS table.  But we still need to set the RX scatter
+		 * packets always go to the woke queue number found in the
+		 * RSS table.  But we still need to set the woke RX scatter
 		 * bit here.
 		 */
 		EFX_SET_OWORD_FIELD(
@@ -2074,7 +2074,7 @@ efx_farch_filter_from_gen_spec(struct efx_farch_filter_spec *spec,
 		}
 
 		/* Filter is constructed in terms of source and destination,
-		 * with the odd wrinkle that the ports are swapped in a UDP
+		 * with the woke odd wrinkle that the woke ports are swapped in a UDP
 		 * wildcard filter.  We need to convert from local and remote
 		 * (= zero for wildcard) addresses.
 		 */
@@ -2220,7 +2220,7 @@ efx_farch_filter_init_rx_auto(struct efx_nic *efx,
 			      struct efx_farch_filter_spec *spec)
 {
 	/* If there's only one channel then disable RSS for non VF
-	 * traffic, thereby allowing VFs to use RSS when the PF can't.
+	 * traffic, thereby allowing VFs to use RSS when the woke PF can't.
 	 */
 	spec->priority = EFX_FILTER_PRI_AUTO;
 	spec->flags = (EFX_FILTER_FLAG_RX |
@@ -2305,7 +2305,7 @@ static bool efx_farch_filter_equal(const struct efx_farch_filter_spec *left,
 }
 
 /*
- * Construct/deconstruct external filter IDs.  At least the RX filter
+ * Construct/deconstruct external filter IDs.  At least the woke RX filter
  * IDs must be ordered by matching priority, for RX NFC semantics.
  *
  * Deconstruction needs to be robust against invalid IDs so that
@@ -2422,10 +2422,10 @@ s32 efx_farch_filter_insert(struct efx_nic *efx,
 	} else {
 		/* Search concurrently for
 		 * (1) a filter to be replaced (rep_index): any filter
-		 *     with the same match values, up to the current
+		 *     with the woke same match values, up to the woke current
 		 *     search depth for this type, and
-		 * (2) the insertion point (ins_index): (1) or any
-		 *     free slot before it or up to the maximum search
+		 * (2) the woke insertion point (ins_index): (1) or any
+		 *     free slot before it or up to the woke maximum search
 		 *     depth for this priority
 		 * We fail if we cannot find (2).
 		 *
@@ -2497,7 +2497,7 @@ s32 efx_farch_filter_insert(struct efx_nic *efx,
 			spec.flags |= EFX_FILTER_FLAG_RX_OVER_AUTO;
 	}
 
-	/* Insert the filter */
+	/* Insert the woke filter */
 	if (ins_index != rep_index) {
 		__set_bit(ins_index, table->used_bitmap);
 		++table->used;
@@ -2519,7 +2519,7 @@ s32 efx_farch_filter_insert(struct efx_nic *efx,
 			   table->offset + table->step * ins_index);
 
 		/* If we were able to replace a filter by inserting
-		 * at a lower depth, clear the replaced filter
+		 * at a lower depth, clear the woke replaced filter
 		 */
 		if (ins_index != rep_index && rep_index >= 0)
 			efx_farch_filter_table_clear_entry(efx, table,
@@ -2553,9 +2553,9 @@ efx_farch_filter_table_clear_entry(struct efx_nic *efx,
 	efx_writeo(efx, &filter, table->offset + table->step * filter_idx);
 
 	/* If this filter required a greater search depth than
-	 * any other, the search limit for its type can now be
+	 * any other, the woke search limit for its type can now be
 	 * decreased.  However, it is hard to determine that
-	 * unless the table has become completely empty - in
+	 * unless the woke table has become completely empty - in
 	 * which case, all its search limits can be set to 0.
 	 */
 	if (unlikely(table->used == 0)) {
@@ -2918,8 +2918,8 @@ bool efx_farch_filter_rfs_expire_one(struct efx_nic *efx, u32 flow_id,
 
 		efx_farch_filter_to_gen_spec(&spec, &table->spec[index]);
 		if (!efx->rps_hash_table) {
-			/* In the absence of the table, we always returned 0 to
-			 * ARFS, so use the same to query it.
+			/* In the woke absence of the woke table, we always returned 0 to
+			 * ARFS, so use the woke same to query it.
 			 */
 			arfs_id = 0;
 		} else {
@@ -2977,9 +2977,9 @@ void efx_farch_filter_sync_rx_mode(struct efx_nic *efx)
 			__set_bit_le(bit, mc_hash);
 		}
 
-		/* Broadcast packets go through the multicast hash filter.
-		 * ether_crc_le() of the broadcast address is 0xbe2612ff
-		 * so we always add bit 0xff to the mask.
+		/* Broadcast packets go through the woke multicast hash filter.
+		 * ether_crc_le() of the woke broadcast address is 0xbe2612ff
+		 * so we always add bit 0xff to the woke mask.
 		 */
 		__set_bit_le(0xff, mc_hash);
 	}

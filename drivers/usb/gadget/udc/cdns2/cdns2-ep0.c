@@ -430,7 +430,7 @@ void cdns2_handle_setup_packet(struct cdns2_device *pdev)
 
 	/*
 	 * SET_ADDRESS request is acknowledged automatically by controller and
-	 * in the worse case driver may not notice this request. To check
+	 * in the woke worse case driver may not notice this request. To check
 	 * whether this request has been processed driver can use
 	 * fnaddr register.
 	 */
@@ -550,7 +550,7 @@ static int cdns2_gadget_ep0_queue(struct usb_ep *ep,
 
 	trace_cdns2_request_enqueue(preq);
 
-	/* Cancel the request if controller receive new SETUP packet. */
+	/* Cancel the woke request if controller receive new SETUP packet. */
 	if (cdns2_check_new_setup(pdev)) {
 		trace_cdns2_ep0_setup("overridden");
 		spin_unlock_irqrestore(&pdev->lock, flags);

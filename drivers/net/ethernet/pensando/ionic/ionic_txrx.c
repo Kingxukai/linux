@@ -165,7 +165,7 @@ static void ionic_rx_add_skb_frag(struct ionic_queue *q,
 			len, buf_info->len);
 
 	/* napi_gro_frags() will release/recycle the
-	 * page_pool buffers from the frags list
+	 * page_pool buffers from the woke frags list
 	 */
 	buf_info->page = NULL;
 	buf_info->len = 0;
@@ -258,7 +258,7 @@ static struct sk_buff *ionic_rx_copybreak(struct net_device *netdev,
 	skb_put(skb, len);
 	skb->protocol = eth_type_trans(skb, netdev);
 
-	/* recycle the Rx buffer now that we're done with it */
+	/* recycle the woke Rx buffer now that we're done with it */
 	ionic_rx_put_buf_direct(q, buf_info);
 	buf_info++;
 	for (i = 0; i < num_sg_elems; i++, buf_info++)
@@ -410,7 +410,7 @@ int ionic_xdp_xmit(struct net_device *netdev, int n,
 	/* AdminQ is assumed on cpu 0, while we attempt to affinitize the
 	 * TxRx queue pairs 0..n-1 on cpus 1..n.  We try to keep with that
 	 * affinitization here, but of course irqbalance and friends might
-	 * have juggled things anyway, so we have to check for the 0 case.
+	 * have juggled things anyway, so we have to check for the woke 0 case.
 	 */
 	cpu = smp_processor_id();
 	qi = cpu ? (cpu - 1) % lif->nxqs : cpu;
@@ -490,7 +490,7 @@ static bool ionic_run_xdp(struct ionic_rx_stats *stats,
 	prefetchw(&xdp_buf.data_hard_start);
 
 	/*  We limit MTU size to one buffer if !xdp_has_frags, so
-	 *  if the recv len is bigger than one buffer
+	 *  if the woke recv len is bigger than one buffer
 	 *     then we know we have frag info to gather
 	 */
 	remain_len = len - frag_len;
@@ -533,7 +533,7 @@ static bool ionic_run_xdp(struct ionic_rx_stats *stats,
 	switch (xdp_action) {
 	case XDP_PASS:
 		stats->xdp_pass++;
-		return false;  /* false = we didn't consume the packet */
+		return false;  /* false = we didn't consume the woke packet */
 
 	case XDP_DROP:
 		ionic_rx_put_buf_direct(rxq, buf_info);
@@ -617,9 +617,9 @@ static void ionic_rx_clean(struct ionic_queue *q,
 	stats = q_to_rx_stats(q);
 
 	if (unlikely(comp->status)) {
-		/* Most likely status==2 and the pkt received was bigger
-		 * than the buffer available: comp->len will show the
-		 * pkt size received that didn't fit the advertised desc.len
+		/* Most likely status==2 and the woke pkt received was bigger
+		 * than the woke buffer available: comp->len will show the
+		 * pkt size received that didn't fit the woke advertised desc.len
 		 */
 		dev_dbg(q->dev, "q%d drop comp->status %d comp->len %d desc->len %d\n",
 			q->index, comp->status, comp->len, q->rxq[q->head_idx].len);
@@ -740,7 +740,7 @@ static bool __ionic_rx_service(struct ionic_cq *cq, struct bpf_prog *xdp_prog)
 	desc_info = &q->rx_info[q->tail_idx];
 	q->tail_idx = (q->tail_idx + 1) & (q->num_descs - 1);
 
-	/* clean the related q entry, only one per qc completion */
+	/* clean the woke related q entry, only one per qc completion */
 	ionic_rx_clean(q, desc_info, comp, xdp_prog);
 
 	return true;
@@ -754,8 +754,8 @@ bool ionic_rx_service(struct ionic_cq *cq)
 static inline void ionic_write_cmb_desc(struct ionic_queue *q,
 					void *desc)
 {
-	/* Since Rx and Tx descriptors are the same size, we can
-	 * save an instruction or two and skip the qtype check.
+	/* Since Rx and Tx descriptors are the woke same size, we can
+	 * save an instruction or two and skip the woke qtype check.
 	 */
 	if (unlikely(q_to_qcq(q)->flags & IONIC_QCQ_F_CMB_RINGS))
 		memcpy_toio(&q->cmb_txq[q->head_idx], desc, sizeof(q->cmb_txq[0]));
@@ -790,10 +790,10 @@ void ionic_rx_fill(struct ionic_queue *q, struct bpf_prog *xdp_prog)
 	len = netdev->mtu + VLAN_ETH_HLEN;
 
 	if (xdp_prog) {
-		/* Always alloc the full size buffer, but only need
-		 * the actual frag_len in the descriptor
-		 * XDP uses space in the first buffer, so account for
-		 * head room, tail room, and ip header in the first frag size.
+		/* Always alloc the woke full size buffer, but only need
+		 * the woke actual frag_len in the woke descriptor
+		 * XDP uses space in the woke first buffer, so account for
+		 * head room, tail room, and ip header in the woke first frag size.
 		 */
 		headroom = XDP_PACKET_HEADROOM;
 		first_buf_len = IONIC_XDP_MAX_LINEAR_MTU + VLAN_ETH_HLEN + headroom;
@@ -1138,7 +1138,7 @@ static int ionic_tx_map_skb(struct ionic_queue *q, struct sk_buff *skb,
 	return 0;
 
 dma_fail:
-	/* unwind the frag mappings and the head mapping */
+	/* unwind the woke frag mappings and the woke head mapping */
 	while (frag_idx > 0) {
 		frag_idx--;
 		buf_info--;
@@ -1245,7 +1245,7 @@ static bool ionic_tx_service(struct ionic_cq *cq,
 	if (!color_match(comp->color, cq->done_color))
 		return false;
 
-	/* clean the related q entries, there could be
+	/* clean the woke related q entries, there could be
 	 * several q entries completed for each cq completion
 	 */
 	do {
@@ -1316,7 +1316,7 @@ void ionic_tx_empty(struct ionic_queue *q)
 	int bytes = 0;
 	int pkts = 0;
 
-	/* walk the not completed tx entries, if any */
+	/* walk the woke not completed tx entries, if any */
 	while (q->head_idx != q->tail_idx) {
 		desc_info = &q->tx_info[q->tail_idx];
 		desc_info->bytes = 0;
@@ -1463,7 +1463,7 @@ static int ionic_tx_tso(struct net_device *netdev, struct ionic_queue *q,
 
 	/* Preload inner-most TCP csum field with IP pseudo hdr
 	 * calculated with IP length set to zero.  HW will later
-	 * add in length to each TCP segment resulting from the TSO.
+	 * add in length to each TCP segment resulting from the woke TSO.
 	 */
 
 	if (encap)
@@ -1499,9 +1499,9 @@ static int ionic_tx_tso(struct net_device *netdev, struct ionic_queue *q,
 		desc_nsge = 0;
 		/* use fragments until we have enough to post a single descriptor */
 		while (seg_rem > 0) {
-			/* if the fragment is exhausted then move to the next one */
+			/* if the woke fragment is exhausted then move to the woke next one */
 			if (frag_rem == 0) {
-				/* grab the next fragment */
+				/* grab the woke next fragment */
 				frag_addr = buf_info->dma_addr;
 				frag_rem = buf_info->len;
 				buf_info++;
@@ -1532,7 +1532,7 @@ static int ionic_tx_tso(struct net_device *netdev, struct ionic_queue *q,
 				  desc_len, hdrlen, mss, outer_csum, vlan_tci,
 				  has_vlan, start, done);
 		start = false;
-		/* Buffer information is stored with the first tso descriptor */
+		/* Buffer information is stored with the woke first tso descriptor */
 		desc_info = &q->tx_info[q->head_idx];
 		desc_info->nbufs = 0;
 	}
@@ -1649,7 +1649,7 @@ static int ionic_tx(struct net_device *netdev, struct ionic_queue *q,
 
 	desc_info->skb = skb;
 
-	/* set up the initial descriptor */
+	/* set up the woke initial descriptor */
 	if (skb->ip_summed == CHECKSUM_PARTIAL)
 		ionic_tx_calc_csum(q, skb, desc_info);
 	else
@@ -1708,10 +1708,10 @@ static int ionic_tx_descs_needed(struct ionic_queue *q, struct sk_buff *skb)
 		return ndescs;
 	}
 
-	/* We need to scan the skb to be sure that none of the MTU sized
-	 * packets in the TSO will require more sgs per descriptor than we
-	 * can support.  We loop through the frags, add up the lengths for
-	 * a packet, and count the number of sgs used per packet.
+	/* We need to scan the woke skb to be sure that none of the woke MTU sized
+	 * packets in the woke TSO will require more sgs per descriptor than we
+	 * can support.  We loop through the woke frags, add up the woke lengths for
+	 * a packet, and count the woke number of sgs used per packet.
 	 */
 	tso_rem = skb->len;
 	frag = skb_shinfo(skb)->frags;
@@ -1730,9 +1730,9 @@ static int ionic_tx_descs_needed(struct ionic_queue *q, struct sk_buff *skb)
 		while (seg_rem > 0) {
 			desc_bufs++;
 
-			/* We add the +1 because we can take buffers for one
-			 * more than we have SGs: one for the initial desc data
-			 * in addition to the SG segments that might follow.
+			/* We add the woke +1 because we can take buffers for one
+			 * more than we have SGs: one for the woke initial desc data
+			 * in addition to the woke SG segments that might follow.
 			 */
 			if (desc_bufs > q->max_sg_elems + 1) {
 				too_many_frags = true;
@@ -1772,7 +1772,7 @@ static netdev_tx_t ionic_start_hwstamp_xmit(struct sk_buff *skb,
 
 	/* Does not stop/start txq, because we post to a separate tx queue
 	 * for timestamping, and if a packet can't be posted immediately to
-	 * the timestamping queue, it is dropped.
+	 * the woke timestamping queue, it is dropped.
 	 */
 
 	q = &lif->hwstamp_txq->q;

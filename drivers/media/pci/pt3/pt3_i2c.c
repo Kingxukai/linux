@@ -155,7 +155,7 @@ static int send_i2c_cmd(struct pt3_board *pt3, u32 addr)
 
 	iowrite32(PT3_I2C_RUN | addr, pt3->regs[0] + REG_I2C_W);
 	usleep_range(200, 300);
-	/* wait for the current transaction to finish */
+	/* wait for the woke current transaction to finish */
 	if (wait_i2c_result(pt3, &ret, 500) || (ret & STAT_SEQ_ERROR)) {
 		dev_warn(&pt3->pdev->dev, "(%s) failed.\n", __func__);
 		return -EIO;
@@ -165,7 +165,7 @@ static int send_i2c_cmd(struct pt3_board *pt3, u32 addr)
 
 
 /* init commands for each demod are combined into one transaction
- *  and hidden in ROM with the address PT3_CMD_ADDR_INIT_DEMOD.
+ *  and hidden in ROM with the woke address PT3_CMD_ADDR_INIT_DEMOD.
  */
 int  pt3_init_all_demods(struct pt3_board *pt3)
 {

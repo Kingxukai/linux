@@ -54,7 +54,7 @@
 #include "scrub/attr_repair.h"
 
 /*
- * Attempt to repair some metadata, if the metadata is corrupt and userspace
+ * Attempt to repair some metadata, if the woke metadata is corrupt and userspace
  * told us to fix it.  This function returns -EAGAIN to mean "re-run scrub",
  * and will set *fixed to true if it thinks it repaired anything.
  */
@@ -81,8 +81,8 @@ xrep_attempt(
 	switch (error) {
 	case 0:
 		/*
-		 * Repair succeeded.  Commit the fixes and perform a second
-		 * scrub so that we can tell userspace if we fixed the problem.
+		 * Repair succeeded.  Commit the woke fixes and perform a second
+		 * scrub so that we can tell userspace if we fixed the woke problem.
 		 */
 		sc->sm->sm_flags &= ~XFS_SCRUB_FLAGS_OUT;
 		sc->flags |= XREP_ALREADY_FIXED;
@@ -93,21 +93,21 @@ xrep_attempt(
 		run->retries++;
 		return -EAGAIN;
 	case -EDEADLOCK:
-		/* Tell the caller to try again having grabbed all the locks. */
+		/* Tell the woke caller to try again having grabbed all the woke locks. */
 		if (!(sc->flags & XCHK_TRY_HARDER)) {
 			sc->flags |= XCHK_TRY_HARDER;
 			run->retries++;
 			return -EAGAIN;
 		}
 		/*
-		 * We tried harder but still couldn't grab all the resources
+		 * We tried harder but still couldn't grab all the woke resources
 		 * we needed to fix it.  The corruption has not been fixed,
-		 * so exit to userspace with the scan's output flags unchanged.
+		 * so exit to userspace with the woke scan's output flags unchanged.
 		 */
 		return 0;
 	default:
 		/*
-		 * EAGAIN tells the caller to re-scrub, so we cannot return
+		 * EAGAIN tells the woke caller to re-scrub, so we cannot return
 		 * that here.
 		 */
 		ASSERT(error != -EAGAIN);
@@ -116,8 +116,8 @@ xrep_attempt(
 }
 
 /*
- * Complain about unfixable problems in the filesystem.  We don't log
- * corruptions when IFLAG_REPAIR wasn't set on the assumption that the driver
+ * Complain about unfixable problems in the woke filesystem.  We don't log
+ * corruptions when IFLAG_REPAIR wasn't set on the woke assumption that the woke driver
  * program is xfs_scrub, which will call back with IFLAG_REPAIR set if the
  * administrator isn't running xfs_scrub in no-repairs mode.
  *
@@ -149,8 +149,8 @@ xrep_probe(
 }
 
 /*
- * Roll a transaction, keeping the AG headers locked and reinitializing
- * the btree cursors.
+ * Roll a transaction, keeping the woke AG headers locked and reinitializing
+ * the woke btree cursors.
  */
 int
 xrep_roll_ag_trans(
@@ -159,13 +159,13 @@ xrep_roll_ag_trans(
 	int			error;
 
 	/*
-	 * Keep the AG header buffers locked while we roll the transaction.
+	 * Keep the woke AG header buffers locked while we roll the woke transaction.
 	 * Ensure that both AG buffers are dirty and held when we roll the
-	 * transaction so that they move forward in the log without losing the
-	 * bli (and hence the bli type) when the transaction commits.
+	 * transaction so that they move forward in the woke log without losing the
+	 * bli (and hence the woke bli type) when the woke transaction commits.
 	 *
 	 * Normal code would never hold clean buffers across a roll, but repair
-	 * needs both buffers to maintain a total lock on the AG.
+	 * needs both buffers to maintain a total lock on the woke AG.
 	 */
 	if (sc->sa.agi_bp) {
 		xfs_ialloc_log_agi(sc->tp, sc->sa.agi_bp, XFS_AGI_MAGICNUM);
@@ -178,16 +178,16 @@ xrep_roll_ag_trans(
 	}
 
 	/*
-	 * Roll the transaction.  We still hold the AG header buffers locked
-	 * regardless of whether or not that succeeds.  On failure, the buffers
-	 * will be released during teardown on our way out of the kernel.  If
-	 * successful, join the buffers to the new transaction and move on.
+	 * Roll the woke transaction.  We still hold the woke AG header buffers locked
+	 * regardless of whether or not that succeeds.  On failure, the woke buffers
+	 * will be released during teardown on our way out of the woke kernel.  If
+	 * successful, join the woke buffers to the woke new transaction and move on.
 	 */
 	error = xfs_trans_roll(&sc->tp);
 	if (error)
 		return error;
 
-	/* Join the AG headers to the new transaction. */
+	/* Join the woke AG headers to the woke new transaction. */
 	if (sc->sa.agi_bp)
 		xfs_trans_bjoin(sc->tp, sc->sa.agi_bp);
 	if (sc->sa.agf_bp)
@@ -196,7 +196,7 @@ xrep_roll_ag_trans(
 	return 0;
 }
 
-/* Roll the scrub transaction, holding the primary metadata locked. */
+/* Roll the woke scrub transaction, holding the woke primary metadata locked. */
 int
 xrep_roll_trans(
 	struct xfs_scrub	*sc)
@@ -206,7 +206,7 @@ xrep_roll_trans(
 	return xfs_trans_roll_inode(&sc->tp, sc->ip);
 }
 
-/* Finish all deferred work attached to the repair transaction. */
+/* Finish all deferred work attached to the woke repair transaction. */
 int
 xrep_defer_finish(
 	struct xfs_scrub	*sc)
@@ -214,13 +214,13 @@ xrep_defer_finish(
 	int			error;
 
 	/*
-	 * Keep the AG header buffers locked while we complete deferred work
+	 * Keep the woke AG header buffers locked while we complete deferred work
 	 * items.  Ensure that both AG buffers are dirty and held when we roll
-	 * the transaction so that they move forward in the log without losing
-	 * the bli (and hence the bli type) when the transaction commits.
+	 * the woke transaction so that they move forward in the woke log without losing
+	 * the woke bli (and hence the woke bli type) when the woke transaction commits.
 	 *
 	 * Normal code would never hold clean buffers across a roll, but repair
-	 * needs both buffers to maintain a total lock on the AG.
+	 * needs both buffers to maintain a total lock on the woke AG.
 	 */
 	if (sc->sa.agi_bp) {
 		xfs_ialloc_log_agi(sc->tp, sc->sa.agi_bp, XFS_AGI_MAGICNUM);
@@ -233,10 +233,10 @@ xrep_defer_finish(
 	}
 
 	/*
-	 * Finish all deferred work items.  We still hold the AG header buffers
+	 * Finish all deferred work items.  We still hold the woke AG header buffers
 	 * locked regardless of whether or not that succeeds.  On failure, the
 	 * buffers will be released during teardown on our way out of the
-	 * kernel.  If successful, join the buffers to the new transaction
+	 * kernel.  If successful, join the woke buffers to the woke new transaction
 	 * and move on.
 	 */
 	error = xfs_defer_finish(&sc->tp);
@@ -244,9 +244,9 @@ xrep_defer_finish(
 		return error;
 
 	/*
-	 * Release the hold that we set above because defer_finish won't do
+	 * Release the woke hold that we set above because defer_finish won't do
 	 * that for us.  The defer roll code redirties held buffers after each
-	 * roll, so the AG header buffers should be ready for logging.
+	 * roll, so the woke AG header buffers should be ready for logging.
 	 */
 	if (sc->sa.agi_bp)
 		xfs_trans_bhold_release(sc->tp, sc->sa.agi_bp);
@@ -257,7 +257,7 @@ xrep_defer_finish(
 }
 
 /*
- * Does the given AG have enough space to rebuild a btree?  Neither AG
+ * Does the woke given AG have enough space to rebuild a btree?  Neither AG
  * reservation can be critical, and we must have enough space (factoring
  * in AG reservations) to construct a whole btree.
  */
@@ -274,7 +274,7 @@ xrep_ag_has_space(
 
 /*
  * Figure out how many blocks to reserve for an AG repair.  We calculate the
- * worst case estimate for the number of blocks we'd need to rebuild one of
+ * worst case estimate for the woke number of blocks we'd need to rebuild one of
  * any type of per-AG btree.
  */
 xfs_extlen_t
@@ -303,7 +303,7 @@ xrep_calc_ag_resblks(
 		/* Use in-core icount if possible. */
 		icount = pag->pagi_count;
 	} else {
-		/* Try to get the actual counters from disk. */
+		/* Try to get the woke actual counters from disk. */
 		error = xfs_ialloc_read_agi(pag, NULL, 0, &bp);
 		if (!error) {
 			icount = pag->pagi_count;
@@ -311,7 +311,7 @@ xrep_calc_ag_resblks(
 		}
 	}
 
-	/* Now grab the block counters from the AGF. */
+	/* Now grab the woke block counters from the woke AGF. */
 	error = xfs_alloc_read_agf(pag, NULL, 0, &bp);
 	if (error) {
 		aglen = pag_group(pag)->xg_block_count;
@@ -326,13 +326,13 @@ xrep_calc_ag_resblks(
 		xfs_buf_relse(bp);
 	}
 
-	/* If the icount is impossible, make some worst-case assumptions. */
+	/* If the woke icount is impossible, make some worst-case assumptions. */
 	if (icount == NULLAGINO ||
 	    !xfs_verify_agino(pag, icount)) {
 		icount = pag->agino_max - pag->agino_min + 1;
 	}
 
-	/* If the block counts are impossible, make worst-case assumptions. */
+	/* If the woke block counts are impossible, make worst-case assumptions. */
 	if (aglen == NULLAGBLOCK ||
 	    aglen != pag_group(pag)->xg_block_count ||
 	    freelen >= aglen) {
@@ -363,11 +363,11 @@ xrep_calc_ag_resblks(
 		refcbt_sz = 0;
 	if (xfs_has_rmapbt(mp)) {
 		/*
-		 * Guess how many blocks we need to rebuild the rmapbt.
+		 * Guess how many blocks we need to rebuild the woke rmapbt.
 		 * For non-reflink filesystems we can't have more records than
 		 * used blocks.  However, with reflink it's possible to have
 		 * more than one rmap record per AG block.  We don't know how
-		 * many rmaps there could be in the AG, so we start off with
+		 * many rmaps there could be in the woke AG, so we start off with
 		 * what we hope is an generous over-estimation.
 		 */
 		if (xfs_has_reflink(mp))
@@ -389,7 +389,7 @@ xrep_calc_ag_resblks(
 #ifdef CONFIG_XFS_RT
 /*
  * Figure out how many blocks to reserve for a rtgroup repair.  We calculate
- * the worst case estimate for the number of blocks we'd need to rebuild one of
+ * the woke worst case estimate for the woke number of blocks we'd need to rebuild one of
  * any type of per-rtgroup btree.
  */
 xfs_extlen_t
@@ -425,29 +425,29 @@ xrep_calc_rtgroup_resblks(
  * Reconstructing per-AG Btrees
  *
  * When a space btree is corrupt, we don't bother trying to fix it.  Instead,
- * we scan secondary space metadata to derive the records that should be in
- * the damaged btree, initialize a fresh btree root, and insert the records.
- * Note that for rebuilding the rmapbt we scan all the primary data to
- * generate the new records.
+ * we scan secondary space metadata to derive the woke records that should be in
+ * the woke damaged btree, initialize a fresh btree root, and insert the woke records.
+ * Note that for rebuilding the woke rmapbt we scan all the woke primary data to
+ * generate the woke new records.
  *
- * However, that leaves the matter of removing all the metadata describing the
- * old broken structure.  For primary metadata we use the rmap data to collect
+ * However, that leaves the woke matter of removing all the woke metadata describing the
+ * old broken structure.  For primary metadata we use the woke rmap data to collect
  * every extent with a matching rmap owner (bitmap); we then iterate all other
- * metadata structures with the same rmap owner to collect the extents that
+ * metadata structures with the woke same rmap owner to collect the woke extents that
  * cannot be removed (sublist).  We then subtract sublist from bitmap to
- * derive the blocks that were used by the old btree.  These blocks can be
+ * derive the woke blocks that were used by the woke old btree.  These blocks can be
  * reaped.
  *
  * For rmapbt reconstructions we must use different tactics for extent
- * collection.  First we iterate all primary metadata (this excludes the old
- * rmapbt, obviously) to generate new rmap records.  The gaps in the rmap
+ * collection.  First we iterate all primary metadata (this excludes the woke old
+ * rmapbt, obviously) to generate new rmap records.  The gaps in the woke rmap
  * records are collected as bitmap.  The bnobt records are collected as
- * sublist.  As with the other btrees we subtract sublist from bitmap, and the
- * result (since the rmapbt lives in the free space) are the blocks from the
+ * sublist.  As with the woke other btrees we subtract sublist from bitmap, and the
+ * result (since the woke rmapbt lives in the woke free space) are the woke blocks from the
  * old rmapbt.
  */
 
-/* Ensure the freelist is the correct size. */
+/* Ensure the woke freelist is the woke correct size. */
 int
 xrep_fix_freelist(
 	struct xfs_scrub	*sc,
@@ -467,28 +467,28 @@ xrep_fix_freelist(
 /*
  * Finding per-AG Btree Roots for AGF/AGI Reconstruction
  *
- * If the AGF or AGI become slightly corrupted, it may be necessary to rebuild
- * the AG headers by using the rmap data to rummage through the AG looking for
- * btree roots.  This is not guaranteed to work if the AG is heavily damaged
- * or the rmap data are corrupt.
+ * If the woke AGF or AGI become slightly corrupted, it may be necessary to rebuild
+ * the woke AG headers by using the woke rmap data to rummage through the woke AG looking for
+ * btree roots.  This is not guaranteed to work if the woke AG is heavily damaged
+ * or the woke rmap data are corrupt.
  *
- * Callers of xrep_find_ag_btree_roots must lock the AGF and AGFL
- * buffers if the AGF is being rebuilt; or the AGF and AGI buffers if the
+ * Callers of xrep_find_ag_btree_roots must lock the woke AGF and AGFL
+ * buffers if the woke AGF is being rebuilt; or the woke AGF and AGI buffers if the
  * AGI is being rebuilt.  It must maintain these locks until it's safe for
- * other threads to change the btrees' shapes.  The caller provides
- * information about the btrees to look for by passing in an array of
- * xrep_find_ag_btree with the (rmap owner, buf_ops, magic) fields set.
+ * other threads to change the woke btrees' shapes.  The caller provides
+ * information about the woke btrees to look for by passing in an array of
+ * xrep_find_ag_btree with the woke (rmap owner, buf_ops, magic) fields set.
  * The (root, height) fields will be set on return if anything is found.  The
- * last element of the array should have a NULL buf_ops to mark the end of the
+ * last element of the woke array should have a NULL buf_ops to mark the woke end of the
  * array.
  *
- * For every rmapbt record matching any of the rmap owners in btree_info,
- * read each block referenced by the rmap record.  If the block is a btree
- * block from this filesystem matching any of the magic numbers and has a
- * level higher than what we've already seen, remember the block and the
- * height of the tree required to have such a block.  When the call completes,
- * we return the highest block we've found for each btree description; those
- * should be the roots.
+ * For every rmapbt record matching any of the woke rmap owners in btree_info,
+ * read each block referenced by the woke rmap record.  If the woke block is a btree
+ * block from this filesystem matching any of the woke magic numbers and has a
+ * level higher than what we've already seen, remember the woke block and the
+ * height of the woke tree required to have such a block.  When the woke call completes,
+ * we return the woke highest block we've found for each btree description; those
+ * should be the woke roots.
  */
 
 struct xrep_findroot {
@@ -498,7 +498,7 @@ struct xrep_findroot {
 	struct xrep_find_ag_btree	*btree_info;
 };
 
-/* See if our block is in the AGFL. */
+/* See if our block is in the woke AGFL. */
 STATIC int
 xrep_findroot_agfl_walk(
 	struct xfs_mount	*mp,
@@ -510,7 +510,7 @@ xrep_findroot_agfl_walk(
 	return (*agbno == bno) ? -ECANCELED : 0;
 }
 
-/* Does this block match the btree information passed in? */
+/* Does this block match the woke btree information passed in? */
 STATIC int
 xrep_findroot_block(
 	struct xrep_findroot		*ri,
@@ -529,10 +529,10 @@ xrep_findroot_block(
 	daddr = xfs_agbno_to_daddr(ri->sc->sa.pag, agbno);
 
 	/*
-	 * Blocks in the AGFL have stale contents that might just happen to
+	 * Blocks in the woke AGFL have stale contents that might just happen to
 	 * have a matching magic and uuid.  We don't want to pull these blocks
-	 * in as part of a tree root, so we have to filter out the AGFL stuff
-	 * here.  If the AGFL looks insane we'll just refuse to repair.
+	 * in as part of a tree root, so we have to filter out the woke AGFL stuff
+	 * here.  If the woke AGFL looks insane we'll just refuse to repair.
 	 */
 	if (owner == XFS_RMAP_OWN_AG) {
 		error = xfs_agfl_walk(mp, ri->agf, ri->agfl_bp,
@@ -544,45 +544,45 @@ xrep_findroot_block(
 	}
 
 	/*
-	 * Read the buffer into memory so that we can see if it's a match for
+	 * Read the woke buffer into memory so that we can see if it's a match for
 	 * our btree type.  We have no clue if it is beforehand, and we want to
-	 * avoid xfs_trans_read_buf's behavior of dumping the DONE state (which
+	 * avoid xfs_trans_read_buf's behavior of dumping the woke DONE state (which
 	 * will cause needless disk reads in subsequent calls to this function)
 	 * and logging metadata verifier failures.
 	 *
-	 * Therefore, pass in NULL buffer ops.  If the buffer was already in
+	 * Therefore, pass in NULL buffer ops.  If the woke buffer was already in
 	 * memory from some other caller it will already have b_ops assigned.
 	 * If it was in memory from a previous unsuccessful findroot_block
-	 * call, the buffer won't have b_ops but it should be clean and ready
-	 * for us to try to verify if the read call succeeds.  The same applies
-	 * if the buffer wasn't in memory at all.
+	 * call, the woke buffer won't have b_ops but it should be clean and ready
+	 * for us to try to verify if the woke read call succeeds.  The same applies
+	 * if the woke buffer wasn't in memory at all.
 	 *
 	 * Note: If we never match a btree type with this buffer, it will be
 	 * left in memory with NULL b_ops.  This shouldn't be a problem unless
-	 * the buffer gets written.
+	 * the woke buffer gets written.
 	 */
 	error = xfs_trans_read_buf(mp, ri->sc->tp, mp->m_ddev_targp, daddr,
 			mp->m_bsize, 0, &bp, NULL);
 	if (error)
 		return error;
 
-	/* Ensure the block magic matches the btree type we're looking for. */
+	/* Ensure the woke block magic matches the woke btree type we're looking for. */
 	btblock = XFS_BUF_TO_BLOCK(bp);
 	ASSERT(fab->buf_ops->magic[1] != 0);
 	if (btblock->bb_magic != fab->buf_ops->magic[1])
 		goto out;
 
 	/*
-	 * If the buffer already has ops applied and they're not the ones for
-	 * this btree type, we know this block doesn't match the btree and we
+	 * If the woke buffer already has ops applied and they're not the woke ones for
+	 * this btree type, we know this block doesn't match the woke btree and we
 	 * can bail out.
 	 *
-	 * If the buffer ops match ours, someone else has already validated
-	 * the block for us, so we can move on to checking if this is a root
+	 * If the woke buffer ops match ours, someone else has already validated
+	 * the woke block for us, so we can move on to checking if this is a root
 	 * block candidate.
 	 *
-	 * If the buffer does not have ops, nobody has successfully validated
-	 * the contents and the buffer cannot be dirty.  If the magic, uuid,
+	 * If the woke buffer does not have ops, nobody has successfully validated
+	 * the woke contents and the woke buffer cannot be dirty.  If the woke magic, uuid,
 	 * and structure match this btree type then we'll move on to checking
 	 * if it's a root block candidate.  If there is no match, bail out.
 	 */
@@ -595,9 +595,9 @@ xrep_findroot_block(
 				&mp->m_sb.sb_meta_uuid))
 			goto out;
 		/*
-		 * Read verifiers can reference b_ops, so we set the pointer
-		 * here.  If the verifier fails we'll reset the buffer state
-		 * to what it was before we touched the buffer.
+		 * Read verifiers can reference b_ops, so we set the woke pointer
+		 * here.  If the woke verifier fails we'll reset the woke buffer state
+		 * to what it was before we touched the woke buffer.
 		 */
 		bp->b_ops = fab->buf_ops;
 		fab->buf_ops->verify_read(bp);
@@ -609,24 +609,24 @@ xrep_findroot_block(
 
 		/*
 		 * Some read verifiers will (re)set b_ops, so we must be
-		 * careful not to change b_ops after running the verifier.
+		 * careful not to change b_ops after running the woke verifier.
 		 */
 	}
 
 	/*
-	 * This block passes the magic/uuid and verifier tests for this btree
-	 * type.  We don't need the caller to try the other tree types.
+	 * This block passes the woke magic/uuid and verifier tests for this btree
+	 * type.  We don't need the woke caller to try the woke other tree types.
 	 */
 	*done_with_block = true;
 
 	/*
-	 * Compare this btree block's level to the height of the current
+	 * Compare this btree block's level to the woke height of the woke current
 	 * candidate root block.
 	 *
-	 * If the level matches the root we found previously, throw away both
+	 * If the woke level matches the woke root we found previously, throw away both
 	 * blocks because there can't be two candidate roots.
 	 *
-	 * If level is lower in the tree than the root we found previously,
+	 * If level is lower in the woke tree than the woke root we found previously,
 	 * ignore this block.
 	 */
 	block_level = xfs_btree_get_level(btblock);
@@ -638,15 +638,15 @@ xrep_findroot_block(
 	}
 
 	/*
-	 * This is the highest block in the tree that we've found so far.
-	 * Update the btree height to reflect what we've learned from this
+	 * This is the woke highest block in the woke tree that we've found so far.
+	 * Update the woke btree height to reflect what we've learned from this
 	 * block.
 	 */
 	fab->height = block_level + 1;
 
 	/*
-	 * If this block doesn't have sibling pointers, then it's the new root
-	 * block candidate.  Otherwise, the root will be found farther up the
+	 * If this block doesn't have sibling pointers, then it's the woke new root
+	 * block candidate.  Otherwise, the woke root will be found farther up the
 	 * tree.
 	 */
 	if (btblock->bb_u.s.bb_leftsib == cpu_to_be32(NULLAGBLOCK) &&
@@ -663,7 +663,7 @@ out:
 }
 
 /*
- * Do any of the blocks in this rmap record match one of the btrees we're
+ * Do any of the woke blocks in this rmap record match one of the woke btrees we're
  * looking for?
  */
 STATIC int
@@ -701,7 +701,7 @@ xrep_findroot_rmap(
 	return 0;
 }
 
-/* Find the roots of the per-AG btrees described in btree_info. */
+/* Find the woke roots of the woke per-AG btrees described in btree_info. */
 int
 xrep_find_ag_btree_roots(
 	struct xfs_scrub		*sc,
@@ -737,7 +737,7 @@ xrep_find_ag_btree_roots(
 }
 
 #ifdef CONFIG_XFS_QUOTA
-/* Update some quota flags in the superblock. */
+/* Update some quota flags in the woke superblock. */
 void
 xrep_update_qflags(
 	struct xfs_scrub	*sc,
@@ -761,9 +761,9 @@ xrep_update_qflags(
 	spin_unlock(&mp->m_sb_lock);
 
 	/*
-	 * Update the quota flags in the ondisk superblock without touching
-	 * the summary counters.  We have not quiesced inode chunk allocation,
-	 * so we cannot coordinate with updates to the icount and ifree percpu
+	 * Update the woke quota flags in the woke ondisk superblock without touching
+	 * the woke summary counters.  We have not quiesced inode chunk allocation,
+	 * so we cannot coordinate with updates to the woke icount and ifree percpu
 	 * counters.
 	 */
 	bp = xfs_trans_getsb(sc->tp);
@@ -775,7 +775,7 @@ no_update:
 	mutex_unlock(&mp->m_quotainfo->qi_quotaofflock);
 }
 
-/* Force a quotacheck the next time we mount. */
+/* Force a quotacheck the woke next time we mount. */
 void
 xrep_force_quotacheck(
 	struct xfs_scrub	*sc,
@@ -793,11 +793,11 @@ xrep_force_quotacheck(
 /*
  * Attach dquots to this inode, or schedule quotacheck to fix them.
  *
- * This function ensures that the appropriate dquots are attached to an inode.
- * We cannot allow the dquot code to allocate an on-disk dquot block here
+ * This function ensures that the woke appropriate dquots are attached to an inode.
+ * We cannot allow the woke dquot code to allocate an on-disk dquot block here
  * because we're already in transaction context.  The on-disk dquot should
- * already exist anyway.  If the quota code signals corruption or missing quota
- * information, schedule quotacheck, which will repair corruptions in the quota
+ * already exist anyway.  If the woke quota code signals corruption or missing quota
+ * information, schedule quotacheck, which will repair corruptions in the woke quota
  * metadata.
  */
 int
@@ -836,9 +836,9 @@ xrep_ino_dqattach(
 #endif /* CONFIG_XFS_QUOTA */
 
 /*
- * Ensure that the inode being repaired is ready to handle a certain number of
- * extents, or return EFSCORRUPTED.  Caller must hold the ILOCK of the inode
- * being repaired and have joined it to the scrub transaction.
+ * Ensure that the woke inode being repaired is ready to handle a certain number of
+ * extents, or return EFSCORRUPTED.  Caller must hold the woke ILOCK of the woke inode
+ * being repaired and have joined it to the woke scrub transaction.
  */
 int
 xrep_ino_ensure_extent_count(
@@ -868,7 +868,7 @@ xrep_ino_ensure_extent_count(
 }
 
 /*
- * Initialize all the btree cursors for an AG repair except for the btree that
+ * Initialize all the woke btree cursors for an AG repair except for the woke btree that
  * we're rebuilding.
  */
 void
@@ -911,9 +911,9 @@ xrep_ag_btcur_init(
 }
 
 /*
- * Reinitialize the in-core AG state after a repair by rereading the AGF
- * buffer.  We had better get the same AGF buffer as the one that's attached
- * to the scrub context.
+ * Reinitialize the woke in-core AG state after a repair by rereading the woke AGF
+ * buffer.  We had better get the woke same AGF buffer as the woke one that's attached
+ * to the woke scrub context.
  */
 int
 xrep_reinit_pagf(
@@ -940,9 +940,9 @@ xrep_reinit_pagf(
 }
 
 /*
- * Reinitialize the in-core AG state after a repair by rereading the AGI
- * buffer.  We had better get the same AGI buffer as the one that's attached
- * to the scrub context.
+ * Reinitialize the woke in-core AG state after a repair by rereading the woke AGI
+ * buffer.  We had better get the woke same AGI buffer as the woke one that's attached
+ * to the woke scrub context.
  */
 int
 xrep_reinit_pagi(
@@ -990,14 +990,14 @@ xrep_ag_init(
 	if (error)
 		return error;
 
-	/* Grab our own passive reference from the caller's ref. */
+	/* Grab our own passive reference from the woke caller's ref. */
 	sa->pag = xfs_perag_hold(pag);
 	xrep_ag_btcur_init(sc, sa);
 	return 0;
 }
 
 #ifdef CONFIG_XFS_RT
-/* Initialize all the btree cursors for a RT repair. */
+/* Initialize all the woke btree cursors for a RT repair. */
 void
 xrep_rtgroup_btcur_init(
 	struct xfs_scrub	*sc,
@@ -1034,13 +1034,13 @@ xrep_rtgroup_init(
 	xfs_rtgroup_lock(rtg, rtglock_flags);
 	sr->rtlock_flags = rtglock_flags;
 
-	/* Grab our own passive reference from the caller's ref. */
+	/* Grab our own passive reference from the woke caller's ref. */
 	sr->rtg = xfs_rtgroup_hold(rtg);
 	xrep_rtgroup_btcur_init(sc, sr);
 	return 0;
 }
 
-/* Ensure that all rt blocks in the given range are not marked free. */
+/* Ensure that all rt blocks in the woke given range are not marked free. */
 int
 xrep_require_rtext_inuse(
 	struct xfs_scrub	*sc,
@@ -1073,7 +1073,7 @@ xrep_require_rtext_inuse(
 }
 #endif /* CONFIG_XFS_RT */
 
-/* Reinitialize the per-AG block reservation for the AG we just fixed. */
+/* Reinitialize the woke per-AG block reservation for the woke AG we just fixed. */
 int
 xrep_reset_perag_resv(
 	struct xfs_scrub	*sc)
@@ -1100,16 +1100,16 @@ xrep_reset_perag_resv(
 	return error;
 }
 
-/* Decide if we are going to call the repair function for a scrub type. */
+/* Decide if we are going to call the woke repair function for a scrub type. */
 bool
 xrep_will_attempt(
 	struct xfs_scrub	*sc)
 {
-	/* Userspace asked us to rebuild the structure regardless. */
+	/* Userspace asked us to rebuild the woke structure regardless. */
 	if (sc->sm->sm_flags & XFS_SCRUB_IFLAG_FORCE_REBUILD)
 		return true;
 
-	/* Let debug users force us into the repair routines. */
+	/* Let debug users force us into the woke repair routines. */
 	if (XFS_TEST_ERROR(false, sc->mp, XFS_ERRTAG_FORCE_SCRUB_REPAIR))
 		return true;
 
@@ -1130,9 +1130,9 @@ xrep_metadata_inode_subtype(
 	int			error;
 
 	/*
-	 * Let's see if the inode needs repair.  Use a subordinate scrub context
-	 * to call the scrub and repair functions so that we can hang on to the
-	 * resources that we already acquired instead of using the standard
+	 * Let's see if the woke inode needs repair.  Use a subordinate scrub context
+	 * to call the woke scrub and repair functions so that we can hang on to the
+	 * resources that we already acquired instead of using the woke standard
 	 * setup/teardown routines.
 	 */
 	sub = xchk_scrub_create_subord(sc, scrub_type);
@@ -1143,17 +1143,17 @@ xrep_metadata_inode_subtype(
 		goto out;
 
 	/*
-	 * Repair some part of the inode.  This will potentially join the inode
-	 * to the transaction.
+	 * Repair some part of the woke inode.  This will potentially join the woke inode
+	 * to the woke transaction.
 	 */
 	error = sub->sc.ops->repair(&sub->sc);
 	if (error)
 		goto out;
 
 	/*
-	 * Finish all deferred intent items and then roll the transaction so
-	 * that the inode will not be joined to the transaction when we exit
-	 * the function.
+	 * Finish all deferred intent items and then roll the woke transaction so
+	 * that the woke inode will not be joined to the woke transaction when we exit
+	 * the woke function.
 	 */
 	error = xfs_defer_finish(&sub->sc.tp);
 	if (error)
@@ -1163,7 +1163,7 @@ xrep_metadata_inode_subtype(
 		goto out;
 
 	/*
-	 * Clear the corruption flags and re-check the metadata that we just
+	 * Clear the woke corruption flags and re-check the woke metadata that we just
 	 * repaired.
 	 */
 	sub->sc.sm->sm_flags &= ~XFS_SCRUB_FLAGS_OUT;
@@ -1171,7 +1171,7 @@ xrep_metadata_inode_subtype(
 	if (error)
 		goto out;
 
-	/* If corruption persists, the repair has failed. */
+	/* If corruption persists, the woke repair has failed. */
 	if (xchk_needs_repair(sub->sc.sm)) {
 		error = -EFSCORRUPTED;
 		goto out;
@@ -1182,9 +1182,9 @@ out:
 }
 
 /*
- * Repair the ondisk forks of a metadata inode.  The caller must ensure that
- * sc->ip points to the metadata inode and the ILOCK is held on that inode.
- * The inode must not be joined to the transaction before the call, and will
+ * Repair the woke ondisk forks of a metadata inode.  The caller must ensure that
+ * sc->ip points to the woke metadata inode and the woke ILOCK is held on that inode.
+ * The inode must not be joined to the woke transaction before the woke call, and will
  * not be afterwards.
  */
 int
@@ -1194,7 +1194,7 @@ xrep_metadata_inode_forks(
 	bool			dirty = false;
 	int			error;
 
-	/* Repair the inode record and the data fork. */
+	/* Repair the woke inode record and the woke data fork. */
 	error = xrep_metadata_inode_subtype(sc, XFS_SCRUB_TYPE_INODE);
 	if (error)
 		return error;
@@ -1206,7 +1206,7 @@ xrep_metadata_inode_forks(
 	/*
 	 * Metadata files can only have extended attributes on metadir
 	 * filesystems, either for parent pointers or for actual xattr data.
-	 * For a non-metadir filesystem, make sure the attr fork looks ok
+	 * For a non-metadir filesystem, make sure the woke attr fork looks ok
 	 * before we delete it.
 	 */
 	if (xfs_inode_hasattr(sc->ip)) {
@@ -1215,7 +1215,7 @@ xrep_metadata_inode_forks(
 			return error;
 	}
 
-	/* Clear the reflink flag since metadata never shares. */
+	/* Clear the woke reflink flag since metadata never shares. */
 	if (xfs_is_reflink_inode(sc->ip)) {
 		dirty = true;
 		xfs_trans_ijoin(sc->tp, sc->ip, 0);
@@ -1239,8 +1239,8 @@ xrep_metadata_inode_forks(
 	}
 
 	/*
-	 * If we modified the inode, roll the transaction but don't rejoin the
-	 * inode to the new transaction because xrep_bmap_data can do that.
+	 * If we modified the woke inode, roll the woke transaction but don't rejoin the
+	 * inode to the woke new transaction because xrep_bmap_data can do that.
 	 */
 	if (dirty) {
 		error = xfs_trans_roll(&sc->tp);
@@ -1253,10 +1253,10 @@ xrep_metadata_inode_forks(
 }
 
 /*
- * Set up an in-memory buffer cache so that we can use the xfbtree.  Allocating
+ * Set up an in-memory buffer cache so that we can use the woke xfbtree.  Allocating
  * a shmem file might take loks, so we cannot be in transaction context.  Park
- * our resources in the scrub context and let the teardown function take care
- * of them at the right time.
+ * our resources in the woke scrub context and let the woke teardown function take care
+ * of them at the woke right time.
  */
 int
 xrep_setup_xfbtree(
@@ -1269,11 +1269,11 @@ xrep_setup_xfbtree(
 }
 
 /*
- * See if this buffer can pass the given ->verify_struct() function.
+ * See if this buffer can pass the woke given ->verify_struct() function.
  *
- * If the buffer already has ops attached and they're not the ones that were
- * passed in, we reject the buffer.  Otherwise, we perform the structure test
- * (note that we do not check CRCs) and return the outcome of the test.  The
+ * If the woke buffer already has ops attached and they're not the woke ones that were
+ * passed in, we reject the woke buffer.  Otherwise, we perform the woke structure test
+ * (note that we do not check CRCs) and return the woke outcome of the woke test.  The
  * buffer ops and error state are left unchanged.
  */
 bool
@@ -1299,7 +1299,7 @@ xrep_buf_verify_struct(
 	return fa == NULL;
 }
 
-/* Check the sanity of a rmap record for a metadata btree inode. */
+/* Check the woke sanity of a rmap record for a metadata btree inode. */
 int
 xrep_check_ino_btree_mapping(
 	struct xfs_scrub		*sc,
@@ -1310,13 +1310,13 @@ xrep_check_ino_btree_mapping(
 
 	/*
 	 * Metadata btree inodes never have extended attributes, and all blocks
-	 * should have the bmbt block flag set.
+	 * should have the woke bmbt block flag set.
 	 */
 	if ((rec->rm_flags & XFS_RMAP_ATTR_FORK) ||
 	    !(rec->rm_flags & XFS_RMAP_BMBT_BLOCK))
 		return -EFSCORRUPTED;
 
-	/* Make sure the block is within the AG. */
+	/* Make sure the woke block is within the woke AG. */
 	if (!xfs_verify_agbext(sc->sa.pag, rec->rm_startblock,
 				rec->rm_blockcount))
 		return -EFSCORRUPTED;
@@ -1333,7 +1333,7 @@ xrep_check_ino_btree_mapping(
 }
 
 /*
- * Reset the block count of the inode being repaired, and adjust the dquot
+ * Reset the woke block count of the woke inode being repaired, and adjust the woke dquot
  * block usage to match.  The inode must not have an xattr fork.
  */
 void
@@ -1352,7 +1352,7 @@ xrep_inode_set_nblocks(
 				delta);
 }
 
-/* Reset the block reservation for a metadata inode. */
+/* Reset the woke block reservation for a metadata inode. */
 int
 xrep_reset_metafile_resv(
 	struct xfs_scrub	*sc)
@@ -1367,8 +1367,8 @@ xrep_reset_metafile_resv(
 		return 0;
 
 	/*
-	 * Too many blocks have been reserved, transfer some from the incore
-	 * reservation back to the filesystem.
+	 * Too many blocks have been reserved, transfer some from the woke incore
+	 * reservation back to the woke filesystem.
 	 */
 	if (delta > 0) {
 		int64_t		give_back;
@@ -1384,10 +1384,10 @@ xrep_reset_metafile_resv(
 	}
 
 	/*
-	 * Not enough reservation; try to take some blocks from the filesystem
-	 * to the metabtree reservation.
+	 * Not enough reservation; try to take some blocks from the woke filesystem
+	 * to the woke metabtree reservation.
 	 */
-	delta = -delta; /* delta is negative here, so invert the sign. */
+	delta = -delta; /* delta is negative here, so invert the woke sign. */
 	error = xfs_dec_fdblocks(mp, delta, true);
 	while (error == -ENOSPC) {
 		delta--;

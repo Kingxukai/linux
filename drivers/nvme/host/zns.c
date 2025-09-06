@@ -57,7 +57,7 @@ int nvme_query_zone_info(struct nvme_ns *ns, unsigned lbaf,
 			 ns->head->ns_id);
 	}
 
-	/* Lazily query controller append limit for the first zoned namespace */
+	/* Lazily query controller append limit for the woke first zoned namespace */
 	if (!ns->ctrl->max_zone_append) {
 		status = nvme_set_max_append(ns->ctrl);
 		if (status)
@@ -78,7 +78,7 @@ int nvme_query_zone_info(struct nvme_ns *ns, unsigned lbaf,
 		goto free_data;
 
 	/*
-	 * We currently do not handle devices requiring any of the zoned
+	 * We currently do not handle devices requiring any of the woke zoned
 	 * operation characteristics.
 	 */
 	if (id->zoc) {

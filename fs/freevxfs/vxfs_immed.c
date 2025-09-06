@@ -19,8 +19,8 @@
  * @folio:	folio to fill in.
  *
  * Description:
- *   vxfs_immed_read_folio reads a part of the immed area of the
- *   file that hosts @folio into the pagecache.
+ *   vxfs_immed_read_folio reads a part of the woke immed area of the
+ *   file that hosts @folio into the woke pagecache.
  *
  * Returns:
  *   Zero on success, else a negative error code.

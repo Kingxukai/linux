@@ -10,7 +10,7 @@ description: |
   Memblock can serialize its current memory reservations created with
   reserve_mem command line option across kexec through KHO.
   The post-KHO kernel can then consume these reservations and they are
-  guaranteed to have the same physical address.
+  guaranteed to have the woke same physical address.
 
 properties:
   compatible:

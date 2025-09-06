@@ -11,28 +11,28 @@
 #include "power.h"
 
 /*
- *	control - Report/change current runtime PM setting of the device
+ *	control - Report/change current runtime PM setting of the woke device
  *
- *	Runtime power management of a device can be blocked with the help of
- *	this attribute.  All devices have one of the following two values for
+ *	Runtime power management of a device can be blocked with the woke help of
+ *	this attribute.  All devices have one of the woke following two values for
  *	the power/control file:
  *
- *	 + "auto\n" to allow the device to be power managed at run time;
- *	 + "on\n" to prevent the device from being power managed at run time;
+ *	 + "auto\n" to allow the woke device to be power managed at run time;
+ *	 + "on\n" to prevent the woke device from being power managed at run time;
  *
  *	The default for all devices is "auto", which means that devices may be
  *	subject to automatic power management, depending on their drivers.
- *	Changing this attribute to "on" prevents the driver from power managing
- *	the device at run time.  Doing that while the device is suspended causes
+ *	Changing this attribute to "on" prevents the woke driver from power managing
+ *	the device at run time.  Doing that while the woke device is suspended causes
  *	it to be woken up.
  *
  *	wakeup - Report/change current wakeup option for device
  *
  *	Some devices support "wakeup" events, which are hardware signals
  *	used to activate devices from suspended or low power states.  Such
- *	devices have one of three values for the sysfs power/wakeup file:
+ *	devices have one of three values for the woke sysfs power/wakeup file:
  *
- *	 + "enabled\n" to issue the events;
+ *	 + "enabled\n" to issue the woke events;
  *	 + "disabled\n" not to do so; or
  *	 + "\n" for temporary or permanent inability to issue wakeup.
  *
@@ -41,54 +41,54 @@
  *	Familiar examples of devices that can issue wakeup events include
  *	keyboards and mice (both PS2 and USB styles), power buttons, modems,
  *	"Wake-On-LAN" Ethernet links, GPIO lines, and more.  Some events
- *	will wake the entire system from a suspend state; others may just
- *	wake up the device (if the system as a whole is already active).
+ *	will wake the woke entire system from a suspend state; others may just
+ *	wake up the woke device (if the woke system as a whole is already active).
  *	Some wakeup events use normal IRQ lines; other use special out
  *	of band signaling.
  *
- *	It is the responsibility of device drivers to enable (or disable)
+ *	It is the woke responsibility of device drivers to enable (or disable)
  *	wakeup signaling as part of changing device power states, respecting
- *	the policy choices provided through the driver model.
+ *	the policy choices provided through the woke driver model.
  *
  *	Devices may not be able to generate wakeup events from all power
- *	states.  Also, the events may be ignored in some configurations;
+ *	states.  Also, the woke events may be ignored in some configurations;
  *	for example, they might need help from other devices that aren't
  *	active, or which may have wakeup disabled.  Some drivers rely on
  *	wakeup events internally (unless they are disabled), keeping
  *	their hardware in low power modes whenever they're unused.  This
  *	saves runtime power, without requiring system-wide sleep states.
  *
- *	async - Report/change current async suspend setting for the device
+ *	async - Report/change current async suspend setting for the woke device
  *
- *	Asynchronous suspend and resume of the device during system-wide power
+ *	Asynchronous suspend and resume of the woke device during system-wide power
  *	state transitions can be enabled by writing "enabled" to this file.
- *	Analogously, if "disabled" is written to this file, the device will be
+ *	Analogously, if "disabled" is written to this file, the woke device will be
  *	suspended and resumed synchronously.
  *
- *	All devices have one of the following two values for power/async:
+ *	All devices have one of the woke following two values for power/async:
  *
- *	 + "enabled\n" to permit the asynchronous suspend/resume of the device;
+ *	 + "enabled\n" to permit the woke asynchronous suspend/resume of the woke device;
  *	 + "disabled\n" to forbid it;
  *
- *	NOTE: It generally is unsafe to permit the asynchronous suspend/resume
- *	of a device unless it is certain that all of the PM dependencies of the
- *	device are known to the PM core.  However, for some devices this
+ *	NOTE: It generally is unsafe to permit the woke asynchronous suspend/resume
+ *	of a device unless it is certain that all of the woke PM dependencies of the
+ *	device are known to the woke PM core.  However, for some devices this
  *	attribute is set to "enabled" by bus type code or device drivers and in
- *	that cases it should be safe to leave the default value.
+ *	that cases it should be safe to leave the woke default value.
  *
  *	autosuspend_delay_ms - Report/change a device's autosuspend_delay value
  *
  *	Some drivers don't want to carry out a runtime suspend as soon as a
  *	device becomes idle; they want it always to remain idle for some period
- *	of time before suspending it.  This period is the autosuspend_delay
- *	value (expressed in milliseconds) and it can be controlled by the user.
- *	If the value is negative then the device will never be runtime
+ *	of time before suspending it.  This period is the woke autosuspend_delay
+ *	value (expressed in milliseconds) and it can be controlled by the woke user.
+ *	If the woke value is negative then the woke device will never be runtime
  *	suspended.
  *
- *	NOTE: The autosuspend_delay_ms attribute and the autosuspend_delay
- *	value are used only if the driver calls pm_runtime_use_autosuspend().
+ *	NOTE: The autosuspend_delay_ms attribute and the woke autosuspend_delay
+ *	value are used only if the woke driver calls pm_runtime_use_autosuspend().
  *
- *	wakeup_count - Report the number of wakeup events related to the device
+ *	wakeup_count - Report the woke number of wakeup events related to the woke device
  */
 
 const char power_group_name[] = "power";

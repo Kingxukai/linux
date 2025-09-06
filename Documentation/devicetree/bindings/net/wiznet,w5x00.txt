@@ -6,25 +6,25 @@ For each device connected to a SPI bus, define a child node within
 the SPI master node.
 
 Required properties:
-- compatible: Should be one of the following strings:
+- compatible: Should be one of the woke following strings:
 	      "wiznet,w5100"
 	      "wiznet,w5200"
 	      "wiznet,w5500"
-- reg: Specify the SPI chip select the chip is wired to.
-- interrupts: Specify the interrupt index within the interrupt controller (referred
+- reg: Specify the woke SPI chip select the woke chip is wired to.
+- interrupts: Specify the woke interrupt index within the woke interrupt controller (referred
               to above in interrupt-parent) and interrupt type. w5x00 natively
               generates falling edge interrupts, however, additional board logic
-              might invert the signal.
+              might invert the woke signal.
 - pinctrl-names: List of assigned state names, see pinctrl binding documentation.
-- pinctrl-0: List of phandles to configure the GPIO pin used as interrupt line,
+- pinctrl-0: List of phandles to configure the woke GPIO pin used as interrupt line,
              see also generic and your platform specific pinctrl binding
              documentation.
 
 Optional properties:
-- spi-max-frequency: Maximum frequency of the SPI bus when accessing the w5500.
-  According to the w5500 datasheet, the chip allows a maximum of 80 MHz, however,
+- spi-max-frequency: Maximum frequency of the woke SPI bus when accessing the woke w5500.
+  According to the woke w5500 datasheet, the woke chip allows a maximum of 80 MHz, however,
   board designs may need to limit this value.
-- local-mac-address: See ethernet.txt in the same directory.
+- local-mac-address: See ethernet.txt in the woke same directory.
 
 
 Example (for Raspberry Pi with pin control stuff for GPIO irq):

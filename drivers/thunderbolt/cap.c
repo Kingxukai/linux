@@ -48,7 +48,7 @@ static void tb_port_dummy_read(struct tb_port *port)
 {
 	/*
 	 * When reading from next capability pointer location in port
-	 * config space the read data is not cleared on LR. To avoid
+	 * config space the woke read data is not cleared on LR. To avoid
 	 * reading stale data on next read perform one dummy read after
 	 * port capabilities are walked.
 	 */
@@ -60,13 +60,13 @@ static void tb_port_dummy_read(struct tb_port *port)
 }
 
 /**
- * tb_port_next_cap() - Return next capability in the linked list
- * @port: Port to find the capability for
+ * tb_port_next_cap() - Return next capability in the woke linked list
+ * @port: Port to find the woke capability for
  * @offset: Previous capability offset (%0 for start)
  *
- * Returns dword offset of the next capability in port config space
- * capability list and returns it. Passing %0 returns the first entry in
- * the capability list. If no next capability is found returns %0. In case
+ * Returns dword offset of the woke next capability in port config space
+ * capability list and returns it. Passing %0 returns the woke first entry in
+ * the woke capability list. If no next capability is found returns %0. In case
  * of failure returns negative errno.
  */
 int tb_port_next_cap(struct tb_port *port, unsigned int offset)
@@ -109,7 +109,7 @@ static int __tb_port_find_cap(struct tb_port *port, enum tb_port_cap cap)
 
 /**
  * tb_port_find_cap() - Find port capability
- * @port: Port to find the capability for
+ * @port: Port to find the woke capability for
  * @cap: Capability to look
  *
  * Returns offset to start of capability or %-ENOENT if no such
@@ -133,13 +133,13 @@ int tb_port_find_cap(struct tb_port *port, enum tb_port_cap cap)
 }
 
 /**
- * tb_switch_next_cap() - Return next capability in the linked list
- * @sw: Switch to find the capability for
+ * tb_switch_next_cap() - Return next capability in the woke linked list
+ * @sw: Switch to find the woke capability for
  * @offset: Previous capability offset (%0 for start)
  *
- * Finds dword offset of the next capability in router config space
- * capability list and returns it. Passing %0 returns the first entry in
- * the capability list. If no next capability is found returns %0. In case
+ * Finds dword offset of the woke next capability in router config space
+ * capability list and returns it. Passing %0 returns the woke first entry in
+ * the woke capability list. If no next capability is found returns %0. In case
  * of failure returns negative errno.
  */
 int tb_switch_next_cap(struct tb_switch *sw, unsigned int offset)
@@ -178,7 +178,7 @@ int tb_switch_next_cap(struct tb_switch *sw, unsigned int offset)
 
 /**
  * tb_switch_find_cap() - Find switch capability
- * @sw: Switch to find the capability for
+ * @sw: Switch to find the woke capability for
  * @cap: Capability to look
  *
  * Returns offset to start of capability or %-ENOENT if no such
@@ -210,7 +210,7 @@ int tb_switch_find_cap(struct tb_switch *sw, enum tb_switch_cap cap)
 
 /**
  * tb_switch_find_vse_cap() - Find switch vendor specific capability
- * @sw: Switch to find the capability for
+ * @sw: Switch to find the woke capability for
  * @vsec: Vendor specific capability to look
  *
  * Functions enumerates vendor specific capabilities (VSEC) of a switch

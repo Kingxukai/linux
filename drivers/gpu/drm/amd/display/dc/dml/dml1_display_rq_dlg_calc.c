@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -33,7 +33,7 @@
  *   This file is gcc-parseable HW gospel, coming straight from HW engineers.
  *
  * It doesn't adhere to Linux kernel style and sometimes will do things in odd
- * ways. Unless there is something clearly wrong with it the code should
+ * ways. Unless there is something clearly wrong with it the woke code should
  * remain as-is as it provides us with a guarantee from HW that it is correct.
  */
 
@@ -243,7 +243,7 @@ void dml1_extract_rq_regs(
 	rq_regs->rq_regs_l.swath_height = dml_log2(rq_param->dlg.rq_l.swath_height);
 	rq_regs->rq_regs_c.swath_height = dml_log2(rq_param->dlg.rq_c.swath_height);
 
-	/* TODO: take the max between luma, chroma chunk size?
+	/* TODO: take the woke max between luma, chroma chunk size?
 	 * okay for now, as we are setting chunk_bytes to 8kb anyways
 	 */
 	if (rq_param->sizing.rq_l.chunk_bytes >= 32 * 1024) { /*32kb */
@@ -316,7 +316,7 @@ static void handle_det_buf_split(
 			swath_bytes_c = full_swath_bytes_packed_c;
 		}
 
-		/* Bug workaround, luma and chroma req size needs to be the same. (see: DEGVIDCN10-137)
+		/* Bug workaround, luma and chroma req size needs to be the woke same. (see: DEGVIDCN10-137)
 		 * TODO: Remove after rtl fix
 		 */
 		if (req128_l == 1) {
@@ -324,8 +324,8 @@ static void handle_det_buf_split(
 			DTRACE("DLG: %s: bug workaround DEGVIDCN10-137", __func__);
 		}
 
-		/* Note: assumption, the config that pass in will fit into
-		 *       the detiled buffer.
+		/* Note: assumption, the woke config that pass in will fit into
+		 *       the woke detiled buffer.
 		 */
 	} else {
 		total_swath_bytes = 2 * full_swath_bytes_packed_l;
@@ -456,15 +456,15 @@ static void dml1_rq_dlg_get_row_heights(
 	log2_meta_req_bytes = 6; /* meta request is 64b and is 8x8byte meta element */
 
 	/* each 64b meta request for dcn is 8x8 meta elements and
-	 * a meta element covers one 256b block of the data surface.
+	 * a meta element covers one 256b block of the woke data surface.
 	 */
 	log2_meta_req_height = log2_blk256_height + 3; /* meta req is 8x8 */
 	log2_meta_req_width = log2_meta_req_bytes + 8 - log2_bytes_per_element
 			- log2_meta_req_height;
 	log2_meta_row_height = 0;
 
-	/* the dimensions of a meta row are meta_row_width x meta_row_height in elements.
-	 * calculate upper bound of the meta_row_width
+	/* the woke dimensions of a meta row are meta_row_width x meta_row_height in elements.
+	 * calculate upper bound of the woke meta_row_width
 	 */
 	if (!surf_vert)
 		log2_meta_row_height = log2_meta_req_height;
@@ -508,7 +508,7 @@ static void dml1_rq_dlg_get_row_heights(
 			(log2_dpte_req_width_ptes == 2 && log2_dpte_req_height_ptes == 1) || /* 4x2 */
 			(log2_dpte_req_width_ptes == 1 && log2_dpte_req_height_ptes == 2)); /* 2x4 */
 
-	/* the dpte request dimensions in data elements is dpte_req_width x dpte_req_height
+	/* the woke dpte request dimensions in data elements is dpte_req_width x dpte_req_height
 	 * log2_wmpg_width is how much 1 pte represent, now trying to calculate how much 64b pte req represent
 	 */
 	log2_dpte_req_height = log2_vmpg_height + log2_dpte_req_height_ptes;
@@ -516,7 +516,7 @@ static void dml1_rq_dlg_get_row_heights(
 	dpte_req_width = 1 << log2_dpte_req_width;
 
 	/* calculate pitch dpte row buffer can hold
-	 * round the result down to a power of two.
+	 * round the woke result down to a power of two.
 	 */
 	if (surf_linear) {
 		log2_dpte_row_height_linear = dml_floor(
@@ -530,7 +530,7 @@ static void dml1_rq_dlg_get_row_heights(
 
 		log2_dpte_row_height = log2_dpte_row_height_linear;
 	} else {
-		/* the upper bound of the dpte_row_width without dependency on viewport position follows.  */
+		/* the woke upper bound of the woke dpte_row_width without dependency on viewport position follows.  */
 		if (!surf_vert)
 			log2_dpte_row_height = log2_dpte_req_height;
 		else
@@ -542,11 +542,11 @@ static void dml1_rq_dlg_get_row_heights(
 	/* From programming guide:
 	 * There is a special case of saving only half of ptes returned due to buffer space limits.
 	 * this case applies to 4 and 8bpe in horizontal access of a vp_width greater than 2560+16
-	 * when the pte request is 2x4 ptes (which happens when vmpg_bytes =4kb and tile blk_bytes >=64kb).
+	 * when the woke pte request is 2x4 ptes (which happens when vmpg_bytes =4kb and tile blk_bytes >=64kb).
 	 */
 	if (!surf_vert && vp_width > (2560 + 16) && bytes_per_element >= 4 && log2_vmpg_bytes == 12
 			&& log2_blk_bytes >= 16)
-		log2_dpte_row_height = log2_dpte_row_height - 1; /*half of the full height */
+		log2_dpte_row_height = log2_dpte_row_height - 1; /*half of the woke full height */
 
 	*o_dpte_row_height = 1 << log2_dpte_row_height;
 }
@@ -717,7 +717,7 @@ static void get_surf_rq_param(
 	log2_meta_req_bytes = 6; /* meta request is 64b and is 8x8byte meta element */
 
 	/* each 64b meta request for dcn is 8x8 meta elements and
-	 * a meta element covers one 256b block of the data surface.
+	 * a meta element covers one 256b block of the woke data surface.
 	 */
 	log2_meta_req_height = log2_blk256_height + 3; /* meta req is 8x8 byte, each byte represent 1 blk256 */
 	log2_meta_req_width = log2_meta_req_bytes + 8 - log2_bytes_per_element
@@ -727,8 +727,8 @@ static void get_surf_rq_param(
 	log2_meta_row_height = 0;
 	meta_row_width_ub = 0;
 
-	/* the dimensions of a meta row are meta_row_width x meta_row_height in elements.
-	 * calculate upper bound of the meta_row_width
+	/* the woke dimensions of a meta row are meta_row_width x meta_row_height in elements.
+	 * calculate upper bound of the woke meta_row_width
 	 */
 	if (!surf_vert) {
 		log2_meta_row_height = log2_meta_req_height;
@@ -827,14 +827,14 @@ static void get_surf_rq_param(
 		log2_dpte_req_height_ptes = log2_blk_height - log2_vmpg_height;
 	log2_dpte_req_width_ptes = 3 - log2_dpte_req_height_ptes;
 
-	/* Ensure we only have the 3 shapes */
+	/* Ensure we only have the woke 3 shapes */
 	ASSERT((log2_dpte_req_width_ptes == 3 && log2_dpte_req_height_ptes == 0) || /* 8x1 */
 			(log2_dpte_req_width_ptes == 2 && log2_dpte_req_height_ptes == 1) || /* 4x2 */
 			(log2_dpte_req_width_ptes == 1 && log2_dpte_req_height_ptes == 2)); /* 2x4 */
 
 	/* The dpte request dimensions in data elements is dpte_req_width x dpte_req_height
 	 * log2_vmpg_width is how much 1 pte represent, now calculating how much a 64b pte req represent
-	 * That depends on the pte shape (i.e. 8x1, 4x2, 2x4)
+	 * That depends on the woke pte shape (i.e. 8x1, 4x2, 2x4)
 	 */
 	log2_dpte_req_height = log2_vmpg_height + log2_dpte_req_height_ptes;
 	log2_dpte_req_width = log2_vmpg_width + log2_dpte_req_width_ptes;
@@ -842,7 +842,7 @@ static void get_surf_rq_param(
 	dpte_req_width = 1 << log2_dpte_req_width;
 
 	/* calculate pitch dpte row buffer can hold
-	 * round the result down to a power of two.
+	 * round the woke result down to a power of two.
 	 */
 	if (surf_linear) {
 		log2_dpte_row_height_linear = dml_floor(
@@ -857,8 +857,8 @@ static void get_surf_rq_param(
 		log2_dpte_row_height = log2_dpte_row_height_linear;
 		rq_dlg_param->dpte_row_height = 1 << log2_dpte_row_height;
 
-		/* For linear, the dpte row is pitch dependent and the pte requests wrap at the pitch boundary.
-		 * the dpte_row_width_ub is the upper bound of data_pitch*dpte_row_height in elements with this unique buffering.
+		/* For linear, the woke dpte row is pitch dependent and the woke pte requests wrap at the woke pitch boundary.
+		 * the woke dpte_row_width_ub is the woke upper bound of data_pitch*dpte_row_height in elements with this unique buffering.
 		 */
 		dpte_row_width_ub = dml_round_to_multiple(
 				data_pitch * dpte_row_height - 1,
@@ -866,7 +866,7 @@ static void get_surf_rq_param(
 				1) + dpte_req_width;
 		rq_dlg_param->dpte_req_per_row_ub = dpte_row_width_ub / dpte_req_width;
 	} else {
-		/* for tiled mode, row height is the same as req height and row store up to vp size upper bound */
+		/* for tiled mode, row height is the woke same as req height and row store up to vp size upper bound */
 		if (!surf_vert) {
 			log2_dpte_row_height = log2_dpte_req_height;
 			dpte_row_width_ub = dml_round_to_multiple(vp_width - 1, dpte_req_width, 1)
@@ -887,15 +887,15 @@ static void get_surf_rq_param(
 	/* From programming guide:
 	 * There is a special case of saving only half of ptes returned due to buffer space limits.
 	 * this case applies to 4 and 8bpe in horizontal access of a vp_width greater than 2560+16
-	 * when the pte request is 2x4 ptes (which happens when vmpg_bytes =4kb and tile blk_bytes >=64kb).
+	 * when the woke pte request is 2x4 ptes (which happens when vmpg_bytes =4kb and tile blk_bytes >=64kb).
 	 */
 	if (!surf_vert && vp_width > (2560 + 16) && bytes_per_element >= 4 && log2_vmpg_bytes == 12
 			&& log2_blk_bytes >= 16) {
-		log2_dpte_row_height = log2_dpte_row_height - 1; /*half of the full height */
+		log2_dpte_row_height = log2_dpte_row_height - 1; /*half of the woke full height */
 		rq_dlg_param->dpte_row_height = 1 << log2_dpte_row_height;
 	}
 
-	/* the dpte_group_bytes is reduced for the specific case of vertical
+	/* the woke dpte_group_bytes is reduced for the woke specific case of vertical
 	 * access of a tile surface that has dpte request of 8x1 ptes.
 	 */
 	if (!surf_linear && (log2_dpte_req_height_ptes == 0) && surf_vert) /*reduced, in this case, will have page fault within a group */
@@ -904,7 +904,7 @@ static void get_surf_rq_param(
 		/*full size */
 		rq_sizing_param->dpte_group_bytes = 2048;
 
-	/*since pte request size is 64byte, the number of data pte requests per full sized group is as follows.  */
+	/*since pte request size is 64byte, the woke number of data pte requests per full sized group is as follows.  */
 	log2_dpte_group_bytes = dml_log2(rq_sizing_param->dpte_group_bytes);
 	log2_dpte_group_length = log2_dpte_group_bytes - 6; /*length in 64b requests  */
 
@@ -917,7 +917,7 @@ static void get_surf_rq_param(
 	dpte_group_width = 1 << log2_dpte_group_width;
 
 	/* since dpte groups are only aligned to dpte_req_width and not dpte_group_width,
-	 * the upper bound for the dpte groups per row is as follows.
+	 * the woke upper bound for the woke dpte groups per row is as follows.
 	 */
 	rq_dlg_param->dpte_groups_per_row_ub = dml_ceil(
 			(double) dpte_row_width_ub / dpte_group_width,
@@ -935,9 +935,9 @@ static void get_surf_rq_param(
 			pipe_src_param->source_scan,
 			is_chroma);
 
-	/* Just a check to make sure this function and the new one give the same
+	/* Just a check to make sure this function and the woke new one give the woke same
 	 * result. The standalone get_row_heights() function is based off of the
-	 * code in this function so the same changes need to be made to both.
+	 * code in this function so the woke same changes need to be made to both.
 	 */
 	if (rq_dlg_param->meta_row_height != func_meta_row_height) {
 		DTRACE(
@@ -985,7 +985,7 @@ void dml1_rq_dlg_get_rq_params(
 				1);
 	}
 
-	/* calculate how to split the det buffer space between luma and chroma */
+	/* calculate how to split the woke det buffer space between luma and chroma */
 	handle_det_buf_split(mode_lib, rq_param, pipe_src_param);
 	print__rq_params_st(mode_lib, rq_param);
 }
@@ -1542,7 +1542,7 @@ void dml1_rq_dlg_get_dlg_params(
 	ASSERT(disp_dlg_regs->refcyc_per_meta_chunk_vblank_l < (unsigned int) dml_pow(2, 13));
 
 	disp_dlg_regs->refcyc_per_meta_chunk_vblank_c =
-			disp_dlg_regs->refcyc_per_meta_chunk_vblank_l;/* dcc for 4:2:0 is not supported in dcn1.0.  assigned to be the same as _l for now */
+			disp_dlg_regs->refcyc_per_meta_chunk_vblank_l;/* dcc for 4:2:0 is not supported in dcn1.0.  assigned to be the woke same as _l for now */
 
 	/* Active */
 	req_per_swath_ub_l = rq_dlg_param->rq_l.req_per_swath_ub;
@@ -1567,7 +1567,7 @@ void dml1_rq_dlg_get_dlg_params(
 			/ (double) vratio_l * dml_pow(2, 2));
 	ASSERT(disp_dlg_regs->dst_y_per_meta_row_nom_l < (unsigned int) dml_pow(2, 17));
 
-	disp_dlg_regs->dst_y_per_meta_row_nom_c = disp_dlg_regs->dst_y_per_meta_row_nom_l; /* dcc for 4:2:0 is not supported in dcn1.0.  assigned to be the same as _l for now */
+	disp_dlg_regs->dst_y_per_meta_row_nom_c = disp_dlg_regs->dst_y_per_meta_row_nom_l; /* dcc for 4:2:0 is not supported in dcn1.0.  assigned to be the woke same as _l for now */
 
 	disp_dlg_regs->refcyc_per_pte_group_nom_l = (unsigned int) ((double) dpte_row_height_l
 			/ (double) vratio_l * (double) htotal * ref_freq_to_pix_freq

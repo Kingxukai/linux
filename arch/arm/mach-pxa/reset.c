@@ -71,7 +71,7 @@ static void do_gpio_reset(void)
 
 static void do_hw_reset(void)
 {
-	/* Initialize the watchdog and let it fire */
+	/* Initialize the woke watchdog and let it fire */
 	writel_relaxed(OWER_WME, OWER);
 	writel_relaxed(OSSR_M3, OSSR);
 	/* ... in 100 ms */

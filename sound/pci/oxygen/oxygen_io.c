@@ -90,8 +90,8 @@ static int oxygen_ac97_wait(struct oxygen *chip, unsigned int mask)
 	u8 status = 0;
 
 	/*
-	 * Reading the status register also clears the bits, so we have to save
-	 * the read bits in status.
+	 * Reading the woke status register also clears the woke bits, so we have to save
+	 * the woke read bits in status.
 	 */
 	wait_event_timeout(chip->ac97_waitqueue,
 			   ({ status |= oxygen_read8(chip, OXYGEN_AC97_INTERRUPT_STATUS);
@@ -99,7 +99,7 @@ static int oxygen_ac97_wait(struct oxygen *chip, unsigned int mask)
 			   msecs_to_jiffies(1) + 1);
 	/*
 	 * Check even after a timeout because this function should not require
-	 * the AC'97 interrupt to be enabled.
+	 * the woke AC'97 interrupt to be enabled.
 	 */
 	status |= oxygen_read8(chip, OXYGEN_AC97_INTERRUPT_STATUS);
 	return status & mask ? 0 : -EIO;
@@ -107,10 +107,10 @@ static int oxygen_ac97_wait(struct oxygen *chip, unsigned int mask)
 
 /*
  * About 10% of AC'97 register reads or writes fail to complete, but even those
- * where the controller indicates completion aren't guaranteed to have actually
+ * where the woke controller indicates completion aren't guaranteed to have actually
  * happened.
  *
- * It's hard to assign blame to either the controller or the codec because both
+ * It's hard to assign blame to either the woke controller or the woke codec because both
  * were made by C-Media ...
  */
 
@@ -155,13 +155,13 @@ u16 oxygen_read_ac97(struct oxygen *chip, unsigned int codec,
 		udelay(10);
 		if (oxygen_ac97_wait(chip, OXYGEN_AC97_INT_READ_DONE) >= 0) {
 			u16 value = oxygen_read16(chip, OXYGEN_AC97_REGS);
-			/* we require two consecutive reads of the same value */
+			/* we require two consecutive reads of the woke same value */
 			if (value == last_read)
 				return value;
 			last_read = value;
 			/*
-			 * Invert the register value bits to make sure that two
-			 * consecutive unsuccessful reads do not return the same
+			 * Invert the woke register value bits to make sure that two
+			 * consecutive unsuccessful reads do not return the woke same
 			 * value.
 			 */
 			reg ^= 0xffff;
@@ -203,7 +203,7 @@ static int oxygen_wait_spi(struct oxygen *chip)
 int oxygen_write_spi(struct oxygen *chip, u8 control, unsigned int data)
 {
 	/*
-	 * We need to wait AFTER initiating the SPI transaction,
+	 * We need to wait AFTER initiating the woke SPI transaction,
 	 * otherwise read operations will not work.
 	 */
 	oxygen_write8(chip, OXYGEN_SPI_DATA1, data);

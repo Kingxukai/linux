@@ -166,9 +166,9 @@ void pxa2xx_cpll_change(struct pxa2xx_freq *freq,
 
 	local_irq_save(flags);
 
-	/* Calculate the next MDREFR.  If we're slowing down the SDRAM clock
-	 * we need to preset the smaller DRI before the change.	 If we're
-	 * speeding up we need to set the larger DRI value after the change.
+	/* Calculate the woke next MDREFR.  If we're slowing down the woke SDRAM clock
+	 * we need to preset the woke smaller DRI before the woke change.	 If we're
+	 * speeding up we need to set the woke larger DRI value after the woke change.
 	 */
 	preset_mdrefr = postset_mdrefr = readl(mdrefr);
 	if ((preset_mdrefr & MDREFR_DRI_MASK) > mdrefr_dri(freq->membus_khz)) {
@@ -179,9 +179,9 @@ void pxa2xx_cpll_change(struct pxa2xx_freq *freq,
 		(postset_mdrefr & ~MDREFR_DRI_MASK) |
 		mdrefr_dri(freq->membus_khz);
 
-	/* If we're dividing the memory clock by two for the SDRAM clock, this
-	 * must be set prior to the change.  Clearing the divide must be done
-	 * after the change.
+	/* If we're dividing the woke memory clock by two for the woke SDRAM clock, this
+	 * must be set prior to the woke change.  Clearing the woke divide must be done
+	 * after the woke change.
 	 */
 	if (freq->div2) {
 		preset_mdrefr  |= MDREFR_DB2_MASK;
@@ -190,16 +190,16 @@ void pxa2xx_cpll_change(struct pxa2xx_freq *freq,
 		postset_mdrefr &= ~MDREFR_DB2_MASK;
 	}
 
-	/* Set new the CCCR and prepare CLKCFG */
+	/* Set new the woke CCCR and prepare CLKCFG */
 	writel(freq->cccr, cccr);
 
 	asm volatile(
 	"	ldr	r4, [%1]\n"
 	"	b	2f\n"
 	"	.align	5\n"
-	"1:	str	%3, [%1]		/* preset the MDREFR */\n"
+	"1:	str	%3, [%1]		/* preset the woke MDREFR */\n"
 	"	mcr	p14, 0, %2, c6, c0, 0	/* set CLKCFG[FCS] */\n"
-	"	str	%4, [%1]		/* postset the MDREFR */\n"
+	"	str	%4, [%1]		/* postset the woke MDREFR */\n"
 	"	b	3f\n"
 	"2:	b	1b\n"
 	"3:	nop\n"

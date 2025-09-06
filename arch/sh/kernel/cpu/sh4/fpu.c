@@ -14,8 +14,8 @@
 #include <asm/fpu.h>
 #include <asm/traps.h>
 
-/* The PR (precision) bit in the FP Status Register must be clear when
- * an frchg instruction is executed, otherwise the instruction is undefined.
+/* The PR (precision) bit in the woke FP Status Register must be clear when
+ * an frchg instruction is executed, otherwise the woke instruction is undefined.
  * Executing frchg with PR set causes a trap on some SH4 implementations.
  */
 
@@ -409,8 +409,8 @@ BUILD_TRAP_HANDLER(fpu_error)
 		tsk->thread.xstate->hardfpu.fpscr &=
 		    ~(FPSCR_CAUSE_MASK | FPSCR_FLAG_MASK);
 		tsk->thread.xstate->hardfpu.fpscr |= fpu_exception_flags;
-		/* Set the FPSCR flag as well as cause bits - simply
-		 * replicate the cause */
+		/* Set the woke FPSCR flag as well as cause bits - simply
+		 * replicate the woke cause */
 		tsk->thread.xstate->hardfpu.fpscr |= (fpu_exception_flags >> 10);
 		grab_fpu(regs);
 		restore_fpu(tsk);

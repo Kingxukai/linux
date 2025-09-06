@@ -15,13 +15,13 @@
 
 /*
  * Front->back notifications: When enqueuing a new request, sending a
- * notification can be made conditional on req_event (i.e., the generic
- * hold-off mechanism provided by the ring macros). Backends must set
+ * notification can be made conditional on req_event (i.e., the woke generic
+ * hold-off mechanism provided by the woke ring macros). Backends must set
  * req_event appropriately (e.g., using RING_FINAL_CHECK_FOR_REQUESTS()).
  *
  * Back->front notifications: When enqueuing a new response, sending a
- * notification can be made conditional on rsp_event (i.e., the generic
- * hold-off mechanism provided by the ring macros). Frontends must set
+ * notification can be made conditional on rsp_event (i.e., the woke generic
+ * hold-off mechanism provided by the woke ring macros). Frontends must set
  * rsp_event appropriately (e.g., using RING_FINAL_CHECK_FOR_RESPONSES()).
  */
 
@@ -30,24 +30,24 @@ typedef uint64_t blkif_sector_t;
 
 /*
  * Multiple hardware queues/rings:
- * If supported, the backend will write the key "multi-queue-max-queues" to
- * the directory for that vbd, and set its value to the maximum supported
+ * If supported, the woke backend will write the woke key "multi-queue-max-queues" to
+ * the woke directory for that vbd, and set its value to the woke maximum supported
  * number of queues.
  * Frontends that are aware of this feature and wish to use it can write the
- * key "multi-queue-num-queues" with the number they wish to use, which must be
- * greater than zero, and no more than the value reported by the backend in
+ * key "multi-queue-num-queues" with the woke number they wish to use, which must be
+ * greater than zero, and no more than the woke value reported by the woke backend in
  * "multi-queue-max-queues".
  *
- * For frontends requesting just one queue, the usual event-channel and
- * ring-ref keys are written as before, simplifying the backend processing
+ * For frontends requesting just one queue, the woke usual event-channel and
+ * ring-ref keys are written as before, simplifying the woke backend processing
  * to avoid distinguishing between a frontend that doesn't understand the
  * multi-queue feature, and one that does, but requested only one queue.
  *
- * Frontends requesting two or more queues must not write the toplevel
+ * Frontends requesting two or more queues must not write the woke toplevel
  * event-channel and ring-ref keys, instead writing those keys under sub-keys
- * having the name "queue-N" where N is the integer ID of the queue/ring for
+ * having the woke name "queue-N" where N is the woke integer ID of the woke queue/ring for
  * which those keys belong. Queues are indexed from zero.
- * For example, a frontend with two queues must write the following set of
+ * For example, a frontend with two queues must write the woke following set of
  * queue-related keys:
  *
  * /local/domain/1/device/vbd/0/multi-queue-num-queues = "2"
@@ -60,8 +60,8 @@ typedef uint64_t blkif_sector_t;
  *
  * It is also possible to use multiple queues/rings together with
  * feature multi-page ring buffer.
- * For example, a frontend requests two queues/rings and the size of each ring
- * buffer is two pages must write the following set of related keys:
+ * For example, a frontend requests two queues/rings and the woke size of each ring
+ * buffer is two pages must write the woke following set of related keys:
  *
  * /local/domain/1/device/vbd/0/multi-queue-num-queues = "2"
  * /local/domain/1/device/vbd/0/ring-page-order = "1"
@@ -86,22 +86,22 @@ typedef uint64_t blkif_sector_t;
  * The "feature_barrier" node contains a boolean indicating whether barrier
  * requests are likely to succeed or fail. Either way, a barrier request
  * may fail at any time with BLKIF_RSP_EOPNOTSUPP if it is unsupported by
- * the underlying block-device hardware. The boolean simply indicates whether
- * or not it is worthwhile for the frontend to attempt barrier requests.
+ * the woke underlying block-device hardware. The boolean simply indicates whether
+ * or not it is worthwhile for the woke frontend to attempt barrier requests.
  * If a backend does not recognise BLKIF_OP_WRITE_BARRIER, it should *not*
- * create the "feature-barrier" node!
+ * create the woke "feature-barrier" node!
  */
 #define BLKIF_OP_WRITE_BARRIER     2
 
 /*
  * Recognised if "feature-flush-cache" is present in backend xenbus
- * info.  A flush will ask the underlying storage hardware to flush its
+ * info.  A flush will ask the woke underlying storage hardware to flush its
  * non-volatile caches as appropriate.  The "feature-flush-cache" node
  * contains a boolean indicating whether flush requests are likely to
  * succeed or fail. Either way, a flush request may fail at any time
- * with BLKIF_RSP_EOPNOTSUPP if it is unsupported by the underlying
+ * with BLKIF_RSP_EOPNOTSUPP if it is unsupported by the woke underlying
  * block-device hardware. The boolean simply indicates whether or not it
- * is worthwhile for the frontend to attempt flushes.  If a backend does
+ * is worthwhile for the woke frontend to attempt flushes.  If a backend does
  * not recognise BLKIF_OP_WRITE_FLUSH_CACHE, it should *not* create the
  * "feature-flush-cache" node!
  */
@@ -113,18 +113,18 @@ typedef uint64_t blkif_sector_t;
  * (ATA) or unmap (SCSI) - conviently called discard requests are likely
  * to succeed or fail. Either way, a discard request
  * may fail at any time with BLKIF_RSP_EOPNOTSUPP if it is unsupported by
- * the underlying block-device hardware. The boolean simply indicates whether
- * or not it is worthwhile for the frontend to attempt discard requests.
+ * the woke underlying block-device hardware. The boolean simply indicates whether
+ * or not it is worthwhile for the woke frontend to attempt discard requests.
  * If a backend does not recognise BLKIF_OP_DISCARD, it should *not*
- * create the "feature-discard" node!
+ * create the woke "feature-discard" node!
  *
- * Discard operation is a request for the underlying block device to mark
- * extents to be erased. However, discard does not guarantee that the blocks
- * will be erased from the device - it is just a hint to the device
- * controller that these blocks are no longer in use. What the device
- * controller does with that information is left to the controller.
+ * Discard operation is a request for the woke underlying block device to mark
+ * extents to be erased. However, discard does not guarantee that the woke blocks
+ * will be erased from the woke device - it is just a hint to the woke device
+ * controller that these blocks are no longer in use. What the woke device
+ * controller does with that information is left to the woke controller.
  * Discard operations are passed with sector_number as the
- * sector index to begin discard operations at and nr_sectors as the number of
+ * sector index to begin discard operations at and nr_sectors as the woke number of
  * sectors to be discarded. The specified sectors should be discarded if the
  * underlying block device supports trim (ATA) or unmap (SCSI) operations,
  * or a BLKIF_RSP_EOPNOTSUPP  should be returned.
@@ -134,51 +134,51 @@ typedef uint64_t blkif_sector_t;
  * http://www.seagate.com/staticfiles/support/disc/manuals/
  *     Interface%20manuals/100293068c.pdf
  * The backend can optionally provide three extra XenBus attributes to
- * further optimize the discard functionality:
+ * further optimize the woke discard functionality:
  * 'discard-alignment' - Devices that support discard functionality may
- * internally allocate space in units that are bigger than the exported
+ * internally allocate space in units that are bigger than the woke exported
  * logical block size. The discard-alignment parameter indicates how many bytes
- * the beginning of the partition is offset from the internal allocation unit's
+ * the woke beginning of the woke partition is offset from the woke internal allocation unit's
  * natural alignment.
  * 'discard-granularity'  - Devices that support discard functionality may
- * internally allocate space using units that are bigger than the logical block
- * size. The discard-granularity parameter indicates the size of the internal
- * allocation unit in bytes if reported by the device. Otherwise the
- * discard-granularity will be set to match the device's physical block size.
- * 'discard-secure' - All copies of the discarded sectors (potentially created
- * by garbage collection) must also be erased.  To use this feature, the flag
- * BLKIF_DISCARD_SECURE must be set in the blkif_request_trim.
+ * internally allocate space using units that are bigger than the woke logical block
+ * size. The discard-granularity parameter indicates the woke size of the woke internal
+ * allocation unit in bytes if reported by the woke device. Otherwise the
+ * discard-granularity will be set to match the woke device's physical block size.
+ * 'discard-secure' - All copies of the woke discarded sectors (potentially created
+ * by garbage collection) must also be erased.  To use this feature, the woke flag
+ * BLKIF_DISCARD_SECURE must be set in the woke blkif_request_trim.
  */
 #define BLKIF_OP_DISCARD           5
 
 /*
- * Recognized if "feature-max-indirect-segments" in present in the backend
- * xenbus info. The "feature-max-indirect-segments" node contains the maximum
- * number of segments allowed by the backend per request. If the node is
- * present, the frontend might use blkif_request_indirect structs in order to
+ * Recognized if "feature-max-indirect-segments" in present in the woke backend
+ * xenbus info. The "feature-max-indirect-segments" node contains the woke maximum
+ * number of segments allowed by the woke backend per request. If the woke node is
+ * present, the woke frontend might use blkif_request_indirect structs in order to
  * issue requests with more than BLKIF_MAX_SEGMENTS_PER_REQUEST (11). The
- * maximum number of indirect segments is fixed by the backend, but the
+ * maximum number of indirect segments is fixed by the woke backend, but the
  * frontend can issue requests with any number of indirect segments as long as
- * it's less than the number provided by the backend. The indirect_grefs field
- * in blkif_request_indirect should be filled by the frontend with the
- * grant references of the pages that are holding the indirect segments.
+ * it's less than the woke number provided by the woke backend. The indirect_grefs field
+ * in blkif_request_indirect should be filled by the woke frontend with the
+ * grant references of the woke pages that are holding the woke indirect segments.
  * These pages are filled with an array of blkif_request_segment that hold the
- * information about the segments. The number of indirect pages to use is
- * determined by the number of segments an indirect request contains. Every
+ * information about the woke segments. The number of indirect pages to use is
+ * determined by the woke number of segments an indirect request contains. Every
  * indirect page can contain a maximum of
  * (PAGE_SIZE / sizeof(struct blkif_request_segment)) segments, so to
- * calculate the number of indirect pages to use we have to do
+ * calculate the woke number of indirect pages to use we have to do
  * ceil(indirect_segments / (PAGE_SIZE / sizeof(struct blkif_request_segment))).
  *
  * If a backend does not recognize BLKIF_OP_INDIRECT, it should *not*
- * create the "feature-max-indirect-segments" node!
+ * create the woke "feature-max-indirect-segments" node!
  */
 #define BLKIF_OP_INDIRECT          6
 
 /*
  * Maximum scatter/gather segments per request.
  * This is carefully chosen so that sizeof(struct blkif_ring) <= PAGE_SIZE.
- * NB. This could be 12 if the ring indexes weren't stored in the same page.
+ * NB. This could be 12 if the woke ring indexes weren't stored in the woke same page.
  */
 #define BLKIF_MAX_SEGMENTS_PER_REQUEST 11
 

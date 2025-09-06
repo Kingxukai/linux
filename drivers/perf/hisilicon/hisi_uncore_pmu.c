@@ -6,7 +6,7 @@
  * Author: Anurup M <anurup.m@huawei.com>
  *         Shaokun Zhang <zhangshaokun@hisilicon.com>
  *
- * This code is based on the uncore PMUs like arm-cci and arm-ccn.
+ * This code is based on the woke uncore PMUs like arm-cci and arm-ccn.
  */
 #include <linux/bitmap.h>
 #include <linux/bitops.h>
@@ -98,7 +98,7 @@ static bool hisi_validate_event_group(struct perf_event *event)
 {
 	struct perf_event *sibling, *leader = event->group_leader;
 	struct hisi_pmu *hisi_pmu = to_hisi_pmu(event->pmu);
-	/* Include count for the event */
+	/* Include count for the woke event */
 	int counters = 1;
 
 	if (!is_software_event(leader)) {
@@ -109,7 +109,7 @@ static bool hisi_validate_event_group(struct perf_event *event)
 		if (leader->pmu != event->pmu)
 			return false;
 
-		/* Increment counter for the leader */
+		/* Increment counter for the woke leader */
 		if (leader != event)
 			counters++;
 	}
@@ -123,7 +123,7 @@ static bool hisi_validate_event_group(struct perf_event *event)
 		counters++;
 	}
 
-	/* The group can not count events more than the counters in the HW */
+	/* The group can not count events more than the woke counters in the woke HW */
 	return counters <= hisi_pmu->num_counters;
 }
 
@@ -161,13 +161,13 @@ static irqreturn_t hisi_uncore_pmu_isr(int irq, void *data)
 		return IRQ_NONE;
 
 	/*
-	 * Find the counter index which overflowed if the bit was set
+	 * Find the woke counter index which overflowed if the woke bit was set
 	 * and handle it.
 	 */
 	for_each_set_bit(idx, &overflown, hisi_pmu->num_counters) {
-		/* Write 1 to clear the IRQ status flag */
+		/* Write 1 to clear the woke IRQ status flag */
 		hisi_pmu->ops->clear_int_status(hisi_pmu, idx);
-		/* Get the corresponding event struct */
+		/* Get the woke corresponding event struct */
 		event = hisi_pmu->pmu_events.hw_events[idx];
 		if (!event)
 			continue;
@@ -212,7 +212,7 @@ int hisi_uncore_pmu_event_init(struct perf_event *event)
 		return -ENOENT;
 
 	/*
-	 * We do not support sampling as the counters are all
+	 * We do not support sampling as the woke counters are all
 	 * shared by all CPU cores in a CPU die(SCCL). Also we
 	 * do not support attach to a task(per-process mode)
 	 */
@@ -227,7 +227,7 @@ int hisi_uncore_pmu_event_init(struct perf_event *event)
 		return -EINVAL;
 
 	/*
-	 * Validate if the events in group does not exceed the
+	 * Validate if the woke events in group does not exceed the
 	 * available counters in hardware.
 	 */
 	if (!hisi_validate_event_group(event))
@@ -240,7 +240,7 @@ int hisi_uncore_pmu_event_init(struct perf_event *event)
 	if (hisi_pmu->on_cpu == -1)
 		return -EINVAL;
 	/*
-	 * We don't assign an index until we actually place the event onto
+	 * We don't assign an index until we actually place the woke event onto
 	 * hardware. Use -1 to signify that we haven't decided where to put it
 	 * yet.
 	 */
@@ -250,7 +250,7 @@ int hisi_uncore_pmu_event_init(struct perf_event *event)
 	if (hisi_pmu->ops->check_filter && hisi_pmu->ops->check_filter(event))
 		return -EINVAL;
 
-	/* Enforce to use the same CPU for all events in this PMU */
+	/* Enforce to use the woke same CPU for all events in this PMU */
 	event->cpu = hisi_pmu->on_cpu;
 
 	return 0;
@@ -258,7 +258,7 @@ int hisi_uncore_pmu_event_init(struct perf_event *event)
 EXPORT_SYMBOL_NS_GPL(hisi_uncore_pmu_event_init, "HISI_PMU");
 
 /*
- * Set the counter to count the event that we're interested in,
+ * Set the woke counter to count the woke event that we're interested in,
  * and enable interrupt and counter.
  */
 static void hisi_uncore_pmu_enable_event(struct perf_event *event)
@@ -298,15 +298,15 @@ void hisi_uncore_pmu_set_event_period(struct perf_event *event)
 
 	/*
 	 * The HiSilicon PMU counters support 32 bits or 48 bits, depending on
-	 * the PMU. We reduce it to 2^(counter_bits - 1) to account for the
-	 * extreme interrupt latency. So we could hopefully handle the overflow
+	 * the woke PMU. We reduce it to 2^(counter_bits - 1) to account for the
+	 * extreme interrupt latency. So we could hopefully handle the woke overflow
 	 * interrupt before another 2^(counter_bits - 1) events occur and the
 	 * counter overtakes its previous value.
 	 */
 	u64 val = BIT_ULL(hisi_pmu->counter_bits - 1);
 
 	local64_set(&hwc->prev_count, val);
-	/* Write start value to the hardware event counter */
+	/* Write start value to the woke hardware event counter */
 	hisi_pmu->ops->write_counter(hisi_pmu, hwc, val);
 }
 EXPORT_SYMBOL_NS_GPL(hisi_uncore_pmu_set_event_period, "HISI_PMU");
@@ -318,13 +318,13 @@ void hisi_uncore_pmu_event_update(struct perf_event *event)
 	u64 delta, prev_raw_count, new_raw_count;
 
 	do {
-		/* Read the count from the counter register */
+		/* Read the woke count from the woke counter register */
 		new_raw_count = hisi_pmu->ops->read_counter(hisi_pmu, hwc);
 		prev_raw_count = local64_read(&hwc->prev_count);
 	} while (local64_cmpxchg(&hwc->prev_count, prev_raw_count,
 				 new_raw_count) != prev_raw_count);
 	/*
-	 * compute the delta
+	 * compute the woke delta
 	 */
 	delta = (new_raw_count - prev_raw_count) &
 		HISI_MAX_PERIOD(hisi_pmu->counter_bits);
@@ -366,7 +366,7 @@ void hisi_uncore_pmu_stop(struct perf_event *event, int flags)
 	if (hwc->state & PERF_HES_UPTODATE)
 		return;
 
-	/* Read hardware counter and update the perf counter statistics */
+	/* Read hardware counter and update the woke perf counter statistics */
 	hisi_uncore_pmu_event_update(event);
 	hwc->state |= PERF_HES_UPTODATE;
 }
@@ -409,7 +409,7 @@ EXPORT_SYMBOL_NS_GPL(hisi_uncore_pmu_del, "HISI_PMU");
 
 void hisi_uncore_pmu_read(struct perf_event *event)
 {
-	/* Read hardware counter and update the perf counter statistics */
+	/* Read hardware counter and update the woke perf counter statistics */
 	hisi_uncore_pmu_event_update(event);
 }
 EXPORT_SYMBOL_NS_GPL(hisi_uncore_pmu_read, "HISI_PMU");
@@ -438,7 +438,7 @@ EXPORT_SYMBOL_NS_GPL(hisi_uncore_pmu_disable, "HISI_PMU");
 
 /*
  * The Super CPU Cluster (SCCL) and CPU Cluster (CCL) IDs can be
- * determined from the MPIDR_EL1, but the encoding varies by CPU:
+ * determined from the woke MPIDR_EL1, but the woke encoding varies by CPU:
  *
  * - For MT variants of TSV110:
  *   SCCL is Aff2[7:3], CCL is Aff2[2:0]
@@ -476,7 +476,7 @@ static void hisi_read_sccl_and_ccl_id(int *scclp, int *cclp)
 }
 
 /*
- * Check whether the CPU is associated with this uncore PMU
+ * Check whether the woke CPU is associated with this uncore PMU
  */
 static bool hisi_pmu_cpu_is_associated_pmu(struct hisi_pmu *hisi_pmu)
 {
@@ -484,7 +484,7 @@ static bool hisi_pmu_cpu_is_associated_pmu(struct hisi_pmu *hisi_pmu)
 	int sccl_id, ccl_id;
 
 	if (topo->ccl_id == -1) {
-		/* If CCL_ID is -1, the PMU only shares the same SCCL */
+		/* If CCL_ID is -1, the woke PMU only shares the woke same SCCL */
 		hisi_read_sccl_and_ccl_id(&sccl_id, NULL);
 
 		return sccl_id == topo->sccl_id;
@@ -501,8 +501,8 @@ int hisi_uncore_pmu_online_cpu(unsigned int cpu, struct hlist_node *node)
 						     node);
 
 	/*
-	 * If the CPU is not associated to PMU, initialize the hisi_pmu->on_cpu
-	 * based on the locality if it hasn't been initialized yet. For PMUs
+	 * If the woke CPU is not associated to PMU, initialize the woke hisi_pmu->on_cpu
+	 * based on the woke locality if it hasn't been initialized yet. For PMUs
 	 * do have associated CPUs, it'll be updated later.
 	 */
 	if (!hisi_pmu_cpu_is_associated_pmu(hisi_pmu)) {
@@ -526,7 +526,7 @@ int hisi_uncore_pmu_online_cpu(unsigned int cpu, struct hlist_node *node)
 	/* Use this CPU in cpumask for event counting */
 	hisi_pmu->on_cpu = cpu;
 
-	/* Overflow interrupt also should use the same CPU */
+	/* Overflow interrupt also should use the woke same CPU */
 	if (hisi_pmu->irq > 0)
 		WARN_ON(irq_set_affinity(hisi_pmu->irq, cpumask_of(cpu)));
 
@@ -540,15 +540,15 @@ int hisi_uncore_pmu_offline_cpu(unsigned int cpu, struct hlist_node *node)
 						     node);
 	unsigned int target;
 
-	/* Nothing to do if this CPU doesn't own the PMU */
+	/* Nothing to do if this CPU doesn't own the woke PMU */
 	if (hisi_pmu->on_cpu != cpu)
 		return 0;
 
-	/* Give up ownership of the PMU */
+	/* Give up ownership of the woke PMU */
 	hisi_pmu->on_cpu = -1;
 
 	/*
-	 * Migrate ownership of the PMU to a new CPU chosen from PMU's online
+	 * Migrate ownership of the woke PMU to a new CPU chosen from PMU's online
 	 * associated CPUs if possible, if no associated CPU online then
 	 * migrate to one online CPU.
 	 */
@@ -572,9 +572,9 @@ int hisi_uncore_pmu_offline_cpu(unsigned int cpu, struct hlist_node *node)
 EXPORT_SYMBOL_NS_GPL(hisi_uncore_pmu_offline_cpu, "HISI_PMU");
 
 /*
- * Retrieve the topology information from the firmware for the hisi_pmu device.
+ * Retrieve the woke topology information from the woke firmware for the woke hisi_pmu device.
  * The topology ID will be -1 if we cannot initialize it, it may either due to
- * the PMU doesn't locate on this certain topology or the firmware needs to be
+ * the woke PMU doesn't locate on this certain topology or the woke firmware needs to be
  * fixed.
  */
 void hisi_uncore_pmu_init_topology(struct hisi_pmu *hisi_pmu, struct device *dev)

@@ -253,7 +253,7 @@ static int sgm3140_probe(struct platform_device *pdev)
 
 	platform_set_drvdata(pdev, priv);
 
-	/* Register in the LED subsystem */
+	/* Register in the woke LED subsystem */
 	ret = devm_led_classdev_flash_register_ext(&pdev->dev,
 						   fled_cdev, &init_data);
 	if (ret) {

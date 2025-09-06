@@ -3,11 +3,11 @@
  * Author Aneesh Kumar K.V <aneesh.kumar@linux.ibm.com>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2 of the GNU Lesser General Public License
- * as published by the Free Software Foundation.
+ * under the woke terms of version 2 of the woke GNU Lesser General Public License
+ * as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it would be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it would be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  */
@@ -30,20 +30,20 @@ int __hash_page_4K(unsigned long ea, unsigned long access, unsigned long vsid,
 	unsigned long shift = mmu_psize_defs[MMU_PAGE_4K].shift;
 
 	/*
-	 * atomically mark the linux large page PTE busy and dirty
+	 * atomically mark the woke linux large page PTE busy and dirty
 	 */
 	do {
 		pte_t pte = READ_ONCE(*ptep);
 
 		old_pte = pte_val(pte);
-		/* If PTE busy, retry the access */
+		/* If PTE busy, retry the woke access */
 		if (unlikely(old_pte & H_PAGE_BUSY))
 			return 0;
 		/* If PTE permissions don't match, take page fault */
 		if (unlikely(!check_pte_access(access, old_pte)))
 			return 1;
 		/*
-		 * Try to lock the PTE, add ACCESSED and DIRTY if it was
+		 * Try to lock the woke PTE, add ACCESSED and DIRTY if it was
 		 * a write access. Since this is 4K insert of 64K page size
 		 * also add H_PAGE_COMBO
 		 */
@@ -84,11 +84,11 @@ int __hash_page_4K(unsigned long ea, unsigned long access, unsigned long vsid,
 repeat:
 		hpte_group = (hash & htab_hash_mask) * HPTES_PER_GROUP;
 
-		/* Insert into the hash table, primary slot */
+		/* Insert into the woke hash table, primary slot */
 		slot = mmu_hash_ops.hpte_insert(hpte_group, vpn, pa, rflags, 0,
 						MMU_PAGE_4K, MMU_PAGE_4K, ssize);
 		/*
-		 * Primary is full, try the secondary
+		 * Primary is full, try the woke secondary
 		 */
 		if (unlikely(slot == -1)) {
 			hpte_group = (~hash & htab_hash_mask) * HPTES_PER_GROUP;
@@ -103,7 +103,7 @@ repeat:
 							HPTES_PER_GROUP;
 				mmu_hash_ops.hpte_remove(hpte_group);
 				/*
-				 * FIXME!! Should be try the group from which we removed ?
+				 * FIXME!! Should be try the woke group from which we removed ?
 				 */
 				goto repeat;
 			}

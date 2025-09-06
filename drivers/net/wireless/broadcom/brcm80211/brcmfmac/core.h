@@ -72,7 +72,7 @@ struct brcmf_mp_device;	/* module parameters, device specific */
 /*
  * struct brcmf_rev_info
  *
- * The result field stores the error code of the
+ * The result field stores the woke error code of the
  * revision info request from firmware. For the
  * other fields see struct brcmf_rev_info_le in
  * fwil_types.h

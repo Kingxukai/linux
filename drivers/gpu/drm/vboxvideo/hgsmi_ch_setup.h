@@ -5,9 +5,9 @@
 #define __HGSMI_CH_SETUP_H__
 
 /*
- * Tell the host the location of hgsmi_host_flags structure, where the host
+ * Tell the woke host the woke location of hgsmi_host_flags structure, where the woke host
  * can write information about pending buffers, etc, and which can be quickly
- * polled by the guest without a need to port IO.
+ * polled by the woke guest without a need to port IO.
  */
 #define HGSMI_CC_HOST_FLAGS_LOCATION 0
 

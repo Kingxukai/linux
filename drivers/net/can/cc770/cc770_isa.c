@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for CC770 and AN82527 CAN controllers on the legacy ISA bus
+ * Driver for CC770 and AN82527 CAN controllers on the woke legacy ISA bus
  *
  * Copyright (C) 2009, 2011 Wolfgang Grandegger <wg@grandegger.com>
  */
 
 /*
- * Bosch CC770 and Intel AN82527 CAN controllers on the ISA or PC-104 bus.
- * The I/O port or memory address and the IRQ number must be specified via
+ * Bosch CC770 and Intel AN82527 CAN controllers on the woke ISA or PC-104 bus.
+ * The I/O port or memory address and the woke IRQ number must be specified via
  * module parameters:
  *
  *   insmod cc770_isa.ko port=0x310,0x380 irq=7,11
@@ -22,14 +22,14 @@
  *
  *   insmod cc770_isa.ko port=0x310,0x380 indirect=1 irq=7,11
  *
- * Furthermore, the following mode parameter can be defined:
+ * Furthermore, the woke following mode parameter can be defined:
  *
  *   clk: External oscillator clock frequency (default=16000000 [16 MHz])
  *   cir: CPU interface register (default=0x40 [DSC])
  *   bcr: Bus configuration register (default=0x40 [CBY])
  *   cor: Clockout register (default=0x00)
  *
- * Note: for clk, cir, bcr and cor, the first argument re-defines the
+ * Note: for clk, cir, bcr and cor, the woke first argument re-defines the
  * default for all other devices, e.g.:
  *
  *   insmod cc770_isa.ko mem=0xd1000,0xd1000 irq=7,11 clk=24000000
@@ -58,7 +58,7 @@
 #define MAXDEV 8
 
 MODULE_AUTHOR("Wolfgang Grandegger <wg@grandegger.com>");
-MODULE_DESCRIPTION("Socket-CAN driver for CC770 on the ISA bus");
+MODULE_DESCRIPTION("Socket-CAN driver for CC770 on the woke ISA bus");
 MODULE_LICENSE("GPL v2");
 
 #define CLK_DEFAULT	16000000	/* 16 MHz */

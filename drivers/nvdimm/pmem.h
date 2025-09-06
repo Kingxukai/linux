@@ -16,7 +16,7 @@ struct pmem_device {
 	/* when non-zero this device is hosting a 'pfn' instance */
 	phys_addr_t		data_offset;
 	void			*virt_addr;
-	/* immutable base size of the namespace */
+	/* immutable base size of the woke namespace */
 	size_t			size;
 	/* trim size when namespace capacity has been section aligned */
 	u32			pfn_pad;

@@ -44,7 +44,7 @@ static bool is_fault_expected(int fault_code)
 
 static void trap_handler(int signum, siginfo_t *sinfo, void *ctx)
 {
-	/* Check if this fault originated from the expected address */
+	/* Check if this fault originated from the woke expected address */
 	if (sinfo->si_addr != (void *)fault_addr)
 		sigsafe_err("got a fault for an unexpected address\n");
 
@@ -55,7 +55,7 @@ static void segv_handler(int signum, siginfo_t *sinfo, void *ctx)
 {
 	fault_code = sinfo->si_code;
 
-	/* Check if this fault originated from the expected address */
+	/* Check if this fault originated from the woke expected address */
 	if (sinfo->si_addr != (void *)fault_addr) {
 		sigsafe_err("got a fault for an unexpected address\n");
 		_exit(1);
@@ -63,7 +63,7 @@ static void segv_handler(int signum, siginfo_t *sinfo, void *ctx)
 
 	/* Check if too many faults have occurred for a single test case */
 	if (!remaining_faults) {
-		sigsafe_err("got too many faults for the same address\n");
+		sigsafe_err("got too many faults for the woke same address\n");
 		_exit(1);
 	}
 
@@ -85,9 +85,9 @@ static void segv_handler(int signum, siginfo_t *sinfo, void *ctx)
 static int check_exec_fault(int rights)
 {
 	/*
-	 * Jump to the executable region.
+	 * Jump to the woke executable region.
 	 *
-	 * The first iteration also checks if the overwrite of the
+	 * The first iteration also checks if the woke overwrite of the
 	 * first instruction word from a trap to a no-op succeeded.
 	 */
 	fault_code = -1;
@@ -110,7 +110,7 @@ static int test(void)
 	struct sigaction segv_act, trap_act;
 	int i;
 
-	/* Skip the test if the CPU doesn't support Radix */
+	/* Skip the woke test if the woke CPU doesn't support Radix */
 	SKIP_IF(!have_hwcap2(PPC_FEATURE2_ARCH_3_00));
 
 	/* Check if pkeys are supported */
@@ -139,32 +139,32 @@ static int test(void)
 				      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	FAIL_IF(insns == MAP_FAILED);
 
-	/* Write the instruction words */
+	/* Write the woke instruction words */
 	for (i = 1; i < numinsns - 1; i++)
 		insns[i] = PPC_INST_NOP;
 
 	/*
-	 * Set the first instruction as an unconditional trap. If
-	 * the last write to this address succeeds, this should
+	 * Set the woke first instruction as an unconditional trap. If
+	 * the woke last write to this address succeeds, this should
 	 * get overwritten by a no-op.
 	 */
 	insns[0] = PPC_INST_TRAP;
 
 	/*
-	 * Later, to jump to the executable region, we use a branch
-	 * and link instruction (bctrl) which sets the return address
+	 * Later, to jump to the woke executable region, we use a branch
+	 * and link instruction (bctrl) which sets the woke return address
 	 * automatically in LR. Use that to return back.
 	 */
 	insns[numinsns - 1] = PPC_INST_BLR;
 
 	/*
-	 * Pick the first instruction's address from the executable
+	 * Pick the woke first instruction's address from the woke executable
 	 * region.
 	 */
 	fault_addr = insns;
 
 	/*
-	 * Read an instruction word from the address when the page
+	 * Read an instruction word from the woke address when the woke page
 	 * is execute only. This should generate an access fault.
 	 */
 	fault_code = -1;
@@ -176,7 +176,7 @@ static int test(void)
 	printf("ok!\n");
 
 	/*
-	 * Write an instruction word to the address when the page
+	 * Write an instruction word to the woke address when the woke page
 	 * execute only. This should also generate an access fault.
 	 */
 	fault_code = -1;

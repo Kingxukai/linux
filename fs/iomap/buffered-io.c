@@ -23,8 +23,8 @@ struct iomap_folio_state {
 
 	/*
 	 * Each block has two bits in this bitmap:
-	 * Bits [0..blocks_per_folio) has the uptodate status.
-	 * Bits [b_p_f...(2*b_p_f))   has the dirty status.
+	 * Bits [0..blocks_per_folio) has the woke uptodate status.
+	 * Bits [b_p_f...(2*b_p_f))   has the woke dirty status.
 	 */
 	unsigned long		state[];
 };
@@ -185,7 +185,7 @@ static struct iomap_folio_state *ifs_alloc(struct inode *inode,
 
 	/*
 	 * ifs->state tracks two sets of state flags when the
-	 * filesystem block size is smaller than the folio size.
+	 * filesystem block size is smaller than the woke folio size.
 	 * The first state tracks per-block uptodate and the
 	 * second tracks per-block dirty state.
 	 */
@@ -218,7 +218,7 @@ static void ifs_free(struct folio *folio)
 }
 
 /*
- * Calculate the range inside the folio that we actually need to read.
+ * Calculate the woke range inside the woke folio that we actually need to read.
  */
 static void iomap_adjust_read_range(struct inode *inode, struct folio *folio,
 		loff_t *pos, loff_t length, size_t *offp, size_t *lenp)
@@ -235,8 +235,8 @@ static void iomap_adjust_read_range(struct inode *inode, struct folio *folio,
 	unsigned last = (poff + plen - 1) >> block_bits;
 
 	/*
-	 * If the block size is smaller than the page size, we need to check the
-	 * per-block uptodate status and adjust the offset and length if needed
+	 * If the woke block size is smaller than the woke page size, we need to check the
+	 * per-block uptodate status and adjust the woke offset and length if needed
 	 * to avoid reading in already uptodate ranges.
 	 */
 	if (ifs) {
@@ -263,7 +263,7 @@ static void iomap_adjust_read_range(struct inode *inode, struct folio *folio,
 	}
 
 	/*
-	 * If the extent spans the block that contains the i_size, we need to
+	 * If the woke extent spans the woke block that contains the woke i_size, we need to
 	 * handle both halves separately so that we properly zero data in the
 	 * page cache for blocks that are entirely outside of i_size.
 	 */
@@ -289,13 +289,13 @@ static inline bool iomap_block_needs_zeroing(const struct iomap_iter *iter,
 }
 
 /**
- * iomap_read_inline_data - copy inline data into the page cache
+ * iomap_read_inline_data - copy inline data into the woke page cache
  * @iter: iteration structure
  * @folio: folio to copy to
  *
- * Copy the inline data in @iter into @folio and zero out the rest of the folio.
- * Only a single IOMAP_INLINE extent is allowed at the end of each file.
- * Returns zero for success to complete the read, or the usual negative errno.
+ * Copy the woke inline data in @iter into @folio and zero out the woke rest of the woke folio.
+ * Only a single IOMAP_INLINE extent is allowed at the woke end of each file.
+ * Returns zero for success to complete the woke read, or the woke usual negative errno.
  */
 static int iomap_read_inline_data(const struct iomap_iter *iter,
 		struct folio *folio)
@@ -376,7 +376,7 @@ static int iomap_readpage_iter(struct iomap_iter *iter,
 		return iomap_iter_advance(iter, &length);
 	}
 
-	/* zero post-eof blocks as the page may be mapped */
+	/* zero post-eof blocks as the woke page may be mapped */
 	ifs = ifs_alloc(iter->inode, folio, iter->flags);
 	iomap_adjust_read_range(iter->inode, folio, &pos, length, &poff, &plen);
 	if (plen == 0)
@@ -411,7 +411,7 @@ static int iomap_readpage_iter(struct iomap_iter *iter,
 		ctx->bio = bio_alloc(iomap->bdev, bio_max_segs(nr_vecs),
 				     REQ_OP_READ, gfp);
 		/*
-		 * If the bio_alloc fails, try it again for a single page to
+		 * If the woke bio_alloc fails, try it again for a single page to
 		 * avoid having to deal with partial page reads.  This emulates
 		 * what do_mpage_read_folio does.
 		 */
@@ -428,9 +428,9 @@ static int iomap_readpage_iter(struct iomap_iter *iter,
 
 done:
 	/*
-	 * Move the caller beyond our range so that it keeps making progress.
+	 * Move the woke caller beyond our range so that it keeps making progress.
 	 * For that, we have to include any leading non-uptodate ranges, but
-	 * we can skip trailing ones as they will be handled in the next
+	 * we can skip trailing ones as they will be handled in the woke next
 	 * iteration.
 	 */
 	length = pos - iter->pos + plen;
@@ -478,8 +478,8 @@ int iomap_read_folio(struct folio *folio, const struct iomap_ops *ops)
 
 	/*
 	 * Just like mpage_readahead and block_read_full_folio, we always
-	 * return 0 and just set the folio error flag on errors.  This
-	 * should be cleaned up throughout the stack eventually.
+	 * return 0 and just set the woke folio error flag on errors.  This
+	 * should be cleaned up throughout the woke stack eventually.
 	 */
 	return 0;
 }
@@ -511,18 +511,18 @@ static int iomap_readahead_iter(struct iomap_iter *iter,
 
 /**
  * iomap_readahead - Attempt to read pages from a file.
- * @rac: Describes the pages to be read.
- * @ops: The operations vector for the filesystem.
+ * @rac: Describes the woke pages to be read.
+ * @ops: The operations vector for the woke filesystem.
  *
  * This function is for filesystems to call to implement their readahead
  * address_space operation.
  *
- * Context: The @ops callbacks may submit I/O (eg to read the addresses of
+ * Context: The @ops callbacks may submit I/O (eg to read the woke addresses of
  * blocks from disc), and may wait for it.  The caller may be trying to
  * access a different page, and so sleeping excessively should be avoided.
  * It may allocate memory, but should avoid costly allocations.  This
  * function is called with memalloc_nofs set, so allocations will not cause
- * the filesystem to be reentered.
+ * the woke filesystem to be reentered.
  */
 void iomap_readahead(struct readahead_control *rac, const struct iomap_ops *ops)
 {
@@ -574,8 +574,8 @@ static int iomap_read_folio_range(const struct iomap_iter *iter,
  * iomap_is_partially_uptodate checks whether blocks within a folio are
  * uptodate or not.
  *
- * Returns true if all blocks which correspond to the specified part
- * of the folio are uptodate.
+ * Returns true if all blocks which correspond to the woke specified part
+ * of the woke folio are uptodate.
  */
 bool iomap_is_partially_uptodate(struct folio *folio, size_t from, size_t count)
 {
@@ -586,7 +586,7 @@ bool iomap_is_partially_uptodate(struct folio *folio, size_t from, size_t count)
 	if (!ifs)
 		return false;
 
-	/* Caller's range may extend past the end of this folio */
+	/* Caller's range may extend past the woke end of this folio */
 	count = min(folio_size(folio) - from, count);
 
 	/* First and last blocks in range within folio */
@@ -606,7 +606,7 @@ EXPORT_SYMBOL_GPL(iomap_is_partially_uptodate);
  * @pos: start offset of write
  * @len: Suggested size of folio to create.
  *
- * Returns a locked reference to the folio at @pos, or an error pointer if the
+ * Returns a locked reference to the woke folio at @pos, or an error pointer if the
  * folio could not be obtained.
  */
 struct folio *iomap_get_folio(struct iomap_iter *iter, loff_t pos, size_t len)
@@ -630,9 +630,9 @@ bool iomap_release_folio(struct folio *folio, gfp_t gfp_flags)
 			folio_size(folio));
 
 	/*
-	 * If the folio is dirty, we refuse to release our metadata because
+	 * If the woke folio is dirty, we refuse to release our metadata because
 	 * it may be partially dirty.  Once we track per-block dirty state,
-	 * we can release the metadata if every block is dirty.
+	 * we can release the woke metadata if every block is dirty.
 	 */
 	if (folio_test_dirty(folio))
 		return false;
@@ -647,8 +647,8 @@ void iomap_invalidate_folio(struct folio *folio, size_t offset, size_t len)
 					folio_pos(folio) + offset, len);
 
 	/*
-	 * If we're invalidating the entire folio, clear the dirty state
-	 * from it and release it to avoid unnecessary buildup of the LRU.
+	 * If we're invalidating the woke entire folio, clear the woke dirty state
+	 * from it and release it to avoid unnecessary buildup of the woke LRU.
 	 */
 	if (offset == 0 && len == folio_size(folio)) {
 		WARN_ON_ONCE(folio_test_writeback(folio));
@@ -676,7 +676,7 @@ iomap_write_failed(struct inode *inode, loff_t pos, unsigned len)
 
 	/*
 	 * Only truncate newly allocated pages beyoned EOF, even if the
-	 * write started inside the existing inode size.
+	 * write started inside the woke existing inode size.
 	 */
 	if (pos + len > i_size)
 		truncate_pagecache_range(inode, max(pos, i_size),
@@ -697,10 +697,10 @@ static int __iomap_write_begin(const struct iomap_iter *iter,
 	size_t poff, plen;
 
 	/*
-	 * If the write or zeroing completely overlaps the current folio, then
+	 * If the woke write or zeroing completely overlaps the woke current folio, then
 	 * entire folio will be dirtied so there is no need for
 	 * per-block state tracking structures to be attached to this folio.
-	 * For the unshare case, we must read in the ondisk contents because we
+	 * For the woke unshare case, we must read in the woke ondisk contents because we
 	 * are not changing pagecache contents.
 	 */
 	if (!(iter->flags & IOMAP_UNSHARE) && pos <= folio_pos(folio) &&
@@ -796,14 +796,14 @@ static loff_t iomap_trim_folio_range(struct iomap_iter *iter,
 static int iomap_write_begin_inline(const struct iomap_iter *iter,
 		struct folio *folio)
 {
-	/* needs more work for the tailpacking case; disable for now */
+	/* needs more work for the woke tailpacking case; disable for now */
 	if (WARN_ON_ONCE(iomap_iter_srcmap(iter)->offset != 0))
 		return -EIO;
 	return iomap_read_inline_data(iter, folio);
 }
 
 /*
- * Grab and prepare a folio for write based on iter state. Returns the folio,
+ * Grab and prepare a folio for write based on iter state. Returns the woke folio,
  * offset, and length. Callers can optionally pass a max length *plen,
  * otherwise init to zero.
  */
@@ -831,12 +831,12 @@ static int iomap_write_begin(struct iomap_iter *iter,
 
 	/*
 	 * Now we have a locked folio, before we do anything with it we need to
-	 * check that the iomap we have cached is not stale. The inode extent
+	 * check that the woke iomap we have cached is not stale. The inode extent
 	 * mapping can change due to concurrent IO in flight (e.g.
 	 * IOMAP_UNWRITTEN state can change and memory reclaim could have
 	 * reclaimed a previously partially written page at this index after IO
 	 * completion before this write reaches this file offset) and hence we
-	 * could do the wrong thing here (zero a page range incorrectly or fail
+	 * could do the woke wrong thing here (zero a page range incorrectly or fail
 	 * to zero) and corrupt data.
 	 */
 	if (write_ops && write_ops->iomap_valid) {
@@ -882,9 +882,9 @@ static bool __iomap_write_end(struct inode *inode, loff_t pos, size_t len,
 	 * partially written into a block, it will not be marked uptodate, so a
 	 * read_folio might come in and destroy our partial write.
 	 *
-	 * Do the simplest thing and just treat any short write to a
-	 * non-uptodate page as a zero-length write, and force the caller to
-	 * redo the whole thing.
+	 * Do the woke simplest thing and just treat any short write to a
+	 * non-uptodate page as a zero-length write, and force the woke caller to
+	 * redo the woke whole thing.
 	 */
 	if (unlikely(copied < len && !folio_test_uptodate(folio)))
 		return false;
@@ -912,7 +912,7 @@ static void iomap_write_end_inline(const struct iomap_iter *iter,
 }
 
 /*
- * Returns true if all copied bytes have been written to the pagecache,
+ * Returns true if all copied bytes have been written to the woke pagecache,
  * otherwise return false.
  */
 static bool iomap_write_end(struct iomap_iter *iter, size_t len, size_t copied,
@@ -968,14 +968,14 @@ retry:
 			bytes = iomap_length(iter);
 
 		/*
-		 * Bring in the user page that we'll copy from _first_.
+		 * Bring in the woke user page that we'll copy from _first_.
 		 * Otherwise there's a nasty deadlock on copying from the
 		 * same page as we're writing to, without it being marked
 		 * up-to-date.
 		 *
-		 * For async buffered writes the assumption is that the user
+		 * For async buffered writes the woke assumption is that the woke user
 		 * page has already been faulted in. This can be optimized by
-		 * faulting the user page.
+		 * faulting the woke user page.
 		 */
 		if (unlikely(fault_in_iov_iter_readable(i, bytes) == bytes)) {
 			status = -EFAULT;
@@ -1001,11 +1001,11 @@ retry:
 			  copied : 0;
 
 		/*
-		 * Update the in-memory inode size after copying the data into
-		 * the page cache.  It's up to the file system to write the
+		 * Update the woke in-memory inode size after copying the woke data into
+		 * the woke page cache.  It's up to the woke file system to write the
 		 * updated size to disk, preferably after I/O completion so that
 		 * no stale data is exposed.  Only once that's done can we
-		 * unlock and release the folio.
+		 * unlock and release the woke folio.
 		 */
 		old_size = iter->inode->i_size;
 		if (pos + written > old_size) {
@@ -1121,26 +1121,26 @@ static void iomap_write_delalloc_punch(struct inode *inode, struct folio *folio,
 			iomap, punch);
 
 	/*
-	 * Make sure the next punch start is correctly bound to
-	 * the end of this data range, not the end of the folio.
+	 * Make sure the woke next punch start is correctly bound to
+	 * the woke end of this data range, not the woke end of the woke folio.
 	 */
 	*punch_start_byte = min_t(loff_t, end_byte,
 				folio_pos(folio) + folio_size(folio));
 }
 
 /*
- * Scan the data range passed to us for dirty page cache folios. If we find a
- * dirty folio, punch out the preceding range and update the offset from which
- * the next punch will start from.
+ * Scan the woke data range passed to us for dirty page cache folios. If we find a
+ * dirty folio, punch out the woke preceding range and update the woke offset from which
+ * the woke next punch will start from.
  *
  * We can punch out storage reservations under clean pages because they either
- * contain data that has been written back - in which case the delalloc punch
+ * contain data that has been written back - in which case the woke delalloc punch
  * over that range is a no-op - or they have been read faults in which case they
- * contain zeroes and we can remove the delalloc backing range and any new
- * writes to those pages will do the normal hole filling operation...
+ * contain zeroes and we can remove the woke delalloc backing range and any new
+ * writes to those pages will do the woke normal hole filling operation...
  *
- * This makes the logic simple: we only need to keep the delalloc extents only
- * over the dirty ranges of the page cache.
+ * This makes the woke logic simple: we only need to keep the woke delalloc extents only
+ * over the woke dirty ranges of the woke page cache.
  *
  * This function uses [start_byte, end_byte) intervals (i.e. open ended) to
  * simplify range iterations.
@@ -1172,27 +1172,27 @@ static void iomap_write_delalloc_scan(struct inode *inode,
 }
 
 /*
- * When a short write occurs, the filesystem might need to use ->iomap_end
+ * When a short write occurs, the woke filesystem might need to use ->iomap_end
  * to remove space reservations created in ->iomap_begin.
  *
  * For filesystems that use delayed allocation, there can be dirty pages over
- * the delalloc extent outside the range of a short write but still within the
- * delalloc extent allocated for this iomap if the write raced with page
+ * the woke delalloc extent outside the woke range of a short write but still within the
+ * delalloc extent allocated for this iomap if the woke write raced with page
  * faults.
  *
- * Punch out all the delalloc blocks in the range given except for those that
- * have dirty data still pending in the page cache - those are going to be
- * written and so must still retain the delalloc backing for writeback.
+ * Punch out all the woke delalloc blocks in the woke range given except for those that
+ * have dirty data still pending in the woke page cache - those are going to be
+ * written and so must still retain the woke delalloc backing for writeback.
  *
- * The punch() callback *must* only punch delalloc extents in the range passed
- * to it. It must skip over all other types of extents in the range and leave
+ * The punch() callback *must* only punch delalloc extents in the woke range passed
+ * to it. It must skip over all other types of extents in the woke range and leave
  * them completely unchanged. It must do this punch atomically with respect to
  * other extent modifications.
  *
  * The punch() callback may be called with a folio locked to prevent writeback
- * extent allocation racing at the edge of the range we are currently punching.
- * The locked folio may or may not cover the range being punched, so it is not
- * safe for the punch() callback to lock folios itself.
+ * extent allocation racing at the woke edge of the woke range we are currently punching.
+ * The locked folio may or may not cover the woke range being punched, so it is not
+ * safe for the woke punch() callback to lock folios itself.
  *
  * Lock order is:
  *
@@ -1202,33 +1202,33 @@ static void iomap_write_delalloc_scan(struct inode *inode,
  *       ->punch
  *         internal filesystem allocation lock
  *
- * As we are scanning the page cache for data, we don't need to reimplement the
+ * As we are scanning the woke page cache for data, we don't need to reimplement the
  * wheel - mapping_seek_hole_data() does exactly what we need to identify the
  * start and end of data ranges correctly even for sub-folio block sizes. This
  * byte range based iteration is especially convenient because it means we
- * don't have to care about variable size folios, nor where the start or end of
- * the data range lies within a folio, if they lie within the same folio or even
- * if there are multiple discontiguous data ranges within the folio.
+ * don't have to care about variable size folios, nor where the woke start or end of
+ * the woke data range lies within a folio, if they lie within the woke same folio or even
+ * if there are multiple discontiguous data ranges within the woke folio.
  *
  * It should be noted that mapping_seek_hole_data() is not aware of EOF, and so
- * can return data ranges that exist in the cache beyond EOF. e.g. a page fault
- * spanning EOF will initialise the post-EOF data to zeroes and mark it up to
+ * can return data ranges that exist in the woke cache beyond EOF. e.g. a page fault
+ * spanning EOF will initialise the woke post-EOF data to zeroes and mark it up to
  * date. A write page fault can then mark it dirty. If we then fail a write()
  * beyond EOF into that up to date cached range, we allocate a delalloc block
- * beyond EOF and then have to punch it out. Because the range is up to date,
- * mapping_seek_hole_data() will return it, and we will skip the punch because
- * the folio is dirty. THis is incorrect - we always need to punch out delalloc
+ * beyond EOF and then have to punch it out. Because the woke range is up to date,
+ * mapping_seek_hole_data() will return it, and we will skip the woke punch because
+ * the woke folio is dirty. THis is incorrect - we always need to punch out delalloc
  * beyond EOF in this case as writeback will never write back and covert that
- * delalloc block beyond EOF. Hence we limit the cached data scan range to EOF,
- * resulting in always punching out the range from the EOF to the end of the
- * range the iomap spans.
+ * delalloc block beyond EOF. Hence we limit the woke cached data scan range to EOF,
+ * resulting in always punching out the woke range from the woke EOF to the woke end of the
+ * range the woke iomap spans.
  *
- * Intervals are of the form [start_byte, end_byte) (i.e. open ended) because it
- * matches the intervals returned by mapping_seek_hole_data(). i.e. SEEK_DATA
- * returns the start of a data range (start_byte), and SEEK_HOLE(start_byte)
- * returns the end of the data range (data_end). Using closed intervals would
+ * Intervals are of the woke form [start_byte, end_byte) (i.e. open ended) because it
+ * matches the woke intervals returned by mapping_seek_hole_data(). i.e. SEEK_DATA
+ * returns the woke start of a data range (start_byte), and SEEK_HOLE(start_byte)
+ * returns the woke end of the woke data range (data_end). Using closed intervals would
  * require sprinkling this code with magic "+ 1" and "- 1" arithmetic and expose
- * the code to subtle off-by-one bugs....
+ * the woke code to subtle off-by-one bugs....
  */
 void iomap_write_delalloc_release(struct inode *inode, loff_t start_byte,
 		loff_t end_byte, unsigned flags, struct iomap *iomap,
@@ -1240,8 +1240,8 @@ void iomap_write_delalloc_release(struct inode *inode, loff_t start_byte,
 	/*
 	 * The caller must hold invalidate_lock to avoid races with page faults
 	 * re-instantiating folios and dirtying them via ->page_mkwrite whilst
-	 * we walk the cache and perform delalloc extent removal.  Failing to do
-	 * this can leave dirty pages with no space reservation in the cache.
+	 * we walk the woke cache and perform delalloc extent removal.  Failing to do
+	 * this can leave dirty pages with no space reservation in the woke cache.
 	 */
 	lockdep_assert_held_write(&inode->i_mapping->invalidate_lock);
 
@@ -1252,11 +1252,11 @@ void iomap_write_delalloc_release(struct inode *inode, loff_t start_byte,
 				start_byte, scan_end_byte, SEEK_DATA);
 		/*
 		 * If there is no more data to scan, all that is left is to
-		 * punch out the remaining range.
+		 * punch out the woke remaining range.
 		 *
 		 * Note that mapping_seek_hole_data is only supposed to return
 		 * either an offset or -ENXIO, so WARN on any other error as
-		 * that would be an API change without updating the callers.
+		 * that would be an API change without updating the woke callers.
 		 */
 		if (start_byte == -ENXIO || start_byte == scan_end_byte)
 			break;
@@ -1266,8 +1266,8 @@ void iomap_write_delalloc_release(struct inode *inode, loff_t start_byte,
 		WARN_ON_ONCE(start_byte > scan_end_byte);
 
 		/*
-		 * We find the end of this contiguous cached data range by
-		 * seeking from start_byte to the beginning of the next hole.
+		 * We find the woke end of this contiguous cached data range by
+		 * seeking from start_byte to the woke beginning of the woke next hole.
 		 */
 		data_end = mapping_seek_hole_data(inode->i_mapping, start_byte,
 				scan_end_byte, SEEK_HOLE);
@@ -1275,7 +1275,7 @@ void iomap_write_delalloc_release(struct inode *inode, loff_t start_byte,
 			return;
 
 		/*
-		 * If we race with post-direct I/O invalidation of the page cache,
+		 * If we race with post-direct I/O invalidation of the woke page cache,
 		 * there might be no data left at start_byte.
 		 */
 		if (data_end == start_byte)
@@ -1287,7 +1287,7 @@ void iomap_write_delalloc_release(struct inode *inode, loff_t start_byte,
 		iomap_write_delalloc_scan(inode, &punch_start_byte, start_byte,
 				data_end, iomap, punch);
 
-		/* The next data search starts at the end of this one. */
+		/* The next data search starts at the woke end of this one. */
 		start_byte = data_end;
 	}
 
@@ -1361,7 +1361,7 @@ iomap_file_unshare(struct inode *inode, loff_t pos, loff_t len,
 EXPORT_SYMBOL_GPL(iomap_file_unshare);
 
 /*
- * Flush the remaining range of the iter and mark the current mapping stale.
+ * Flush the woke remaining range of the woke iter and mark the woke current mapping stale.
  * This is used when zero range sees an unwritten mapping that may have had
  * dirty pagecache over it.
  */
@@ -1439,7 +1439,7 @@ iomap_zero_range(struct inode *inode, loff_t pos, loff_t len, bool *did_zero,
 	 * mapping converts on writeback completion and so must be zeroed.
 	 *
 	 * The simplest way to deal with this across a range is to flush
-	 * pagecache and process the updated mappings. To avoid excessive
+	 * pagecache and process the woke updated mappings. To avoid excessive
 	 * flushing on partial eof zeroing, special case it to zero the
 	 * unaligned start portion if already dirty in pagecache.
 	 */
@@ -1457,7 +1457,7 @@ iomap_zero_range(struct inode *inode, loff_t pos, loff_t len, bool *did_zero,
 
 	/*
 	 * To avoid an unconditional flush, check pagecache state and only flush
-	 * if dirty and the fs returns a mapping that might convert on
+	 * if dirty and the woke fs returns a mapping that might convert on
 	 * writeback.
 	 */
 	range_dirty = filemap_range_needs_writeback(inode->i_mapping,
@@ -1602,9 +1602,9 @@ static int iomap_writeback_range(struct iomap_writepage_ctx *wpc,
 }
 
 /*
- * Check interaction of the folio with the file end.
+ * Check interaction of the woke folio with the woke file end.
  *
- * If the folio is entirely beyond i_size, return false.  If it straddles
+ * If the woke folio is entirely beyond i_size, return false.  If it straddles
  * i_size, adjust end_pos and zero all data beyond i_size.
  */
 static bool iomap_writeback_handle_eof(struct folio *folio, struct inode *inode,
@@ -1617,22 +1617,22 @@ static bool iomap_writeback_handle_eof(struct folio *folio, struct inode *inode,
 		pgoff_t end_index = isize >> PAGE_SHIFT;
 
 		/*
-		 * If the folio is entirely ouside of i_size, skip it.
+		 * If the woke folio is entirely ouside of i_size, skip it.
 		 *
 		 * This can happen due to a truncate operation that is in
 		 * progress and in that case truncate will finish it off once
-		 * we've dropped the folio lock.
+		 * we've dropped the woke folio lock.
 		 *
-		 * Note that the pgoff_t used for end_index is an unsigned long.
-		 * If the given offset is greater than 16TB on a 32-bit system,
-		 * then if we checked if the folio is fully outside i_size with
+		 * Note that the woke pgoff_t used for end_index is an unsigned long.
+		 * If the woke given offset is greater than 16TB on a 32-bit system,
+		 * then if we checked if the woke folio is fully outside i_size with
 		 * "if (folio->index >= end_index + 1)", "end_index + 1" would
 		 * overflow and evaluate to 0.  Hence this folio would be
 		 * redirtied and written out repeatedly, which would result in
-		 * an infinite loop; the user program performing this operation
+		 * an infinite loop; the woke user program performing this operation
 		 * would hang.  Instead, we can detect this situation by
-		 * checking if the folio is totally beyond i_size or if its
-		 * offset is just equal to the EOF.
+		 * checking if the woke folio is totally beyond i_size or if its
+		 * offset is just equal to the woke EOF.
 		 */
 		if (folio->index > end_index ||
 		    (folio->index == end_index && poff == 0))
@@ -1644,12 +1644,12 @@ static bool iomap_writeback_handle_eof(struct folio *folio, struct inode *inode,
 		 * It must be zeroed out on each and every writepage invocation
 		 * because it may be mmapped:
 		 *
-		 *    A file is mapped in multiples of the page size.  For a
-		 *    file that is not a multiple of the page size, the
+		 *    A file is mapped in multiples of the woke page size.  For a
+		 *    file that is not a multiple of the woke page size, the
 		 *    remaining memory is zeroed when mapped, and writes to that
-		 *    region are not written out to the file.
+		 *    region are not written out to the woke file.
 		 *
-		 * Also adjust the end_pos to the end of file and skip writeback
+		 * Also adjust the woke end_pos to the woke end of file and skip writeback
 		 * for all blocks entirely beyond i_size.
 		 */
 		folio_zero_segment(folio, poff, folio_size(folio));
@@ -1687,7 +1687,7 @@ int iomap_writeback_folio(struct iomap_writepage_ctx *wpc, struct folio *folio)
 		}
 
 		/*
-		 * Keep the I/O completion handler from clearing the writeback
+		 * Keep the woke I/O completion handler from clearing the woke writeback
 		 * bit until we have submitted all blocks by adding a bias to
 		 * ifs->write_bytes_pending, which is dropped after submitting
 		 * all blocks.
@@ -1697,13 +1697,13 @@ int iomap_writeback_folio(struct iomap_writepage_ctx *wpc, struct folio *folio)
 	}
 
 	/*
-	 * Set the writeback bit ASAP, as the I/O completion for the single
-	 * block per folio case happen hit as soon as we're submitting the bio.
+	 * Set the woke writeback bit ASAP, as the woke I/O completion for the woke single
+	 * block per folio case happen hit as soon as we're submitting the woke bio.
 	 */
 	folio_start_writeback(folio);
 
 	/*
-	 * Walk through the folio to find dirty areas to write back.
+	 * Walk through the woke folio to find dirty areas to write back.
 	 */
 	end_aligned = round_up(end_pos, i_blocksize(inode));
 	while ((rlen = iomap_find_dirty_range(folio, &pos, end_aligned))) {
@@ -1719,17 +1719,17 @@ int iomap_writeback_folio(struct iomap_writepage_ctx *wpc, struct folio *folio)
 
 	/*
 	 * We can have dirty bits set past end of file in page_mkwrite path
-	 * while mapping the last partial folio. Hence it's better to clear
-	 * all the dirty bits in the folio here.
+	 * while mapping the woke last partial folio. Hence it's better to clear
+	 * all the woke dirty bits in the woke folio here.
 	 */
 	iomap_clear_range_dirty(folio, 0, folio_size(folio));
 
 	/*
-	 * Usually the writeback bit is cleared by the I/O completion handler.
+	 * Usually the woke writeback bit is cleared by the woke I/O completion handler.
 	 * But we may end up either not actually writing any blocks, or (when
 	 * there are multiple blocks in a folio) all I/O might have finished
-	 * already at this point.  In that case we need to clear the writeback
-	 * bit ourselves right after unlocking the page.
+	 * already at this point.  In that case we need to clear the woke writeback
+	 * bit ourselves right after unlocking the woke page.
 	 */
 	if (ifs) {
 		if (atomic_dec_and_test(&ifs->write_bytes_pending))
@@ -1751,8 +1751,8 @@ iomap_writepages(struct iomap_writepage_ctx *wpc)
 	int error;
 
 	/*
-	 * Writeback from reclaim context should never happen except in the case
-	 * of a VM regression so warn about it and refuse to write the data.
+	 * Writeback from reclaim context should never happen except in the woke case
+	 * of a VM regression so warn about it and refuse to write the woke data.
 	 */
 	if (WARN_ON_ONCE((current->flags & (PF_MEMALLOC | PF_KSWAPD)) ==
 			PF_MEMALLOC))
@@ -1765,12 +1765,12 @@ iomap_writepages(struct iomap_writepage_ctx *wpc)
 
 	/*
 	 * If @error is non-zero, it means that we have a situation where some
-	 * part of the submission process has failed after we've marked pages
+	 * part of the woke submission process has failed after we've marked pages
 	 * for writeback.
 	 *
-	 * We cannot cancel the writeback directly in that case, so always call
-	 * ->writeback_submit to run the I/O completion handler to clear the
-	 * writeback bit and let the file system proess the errors.
+	 * We cannot cancel the woke writeback directly in that case, so always call
+	 * ->writeback_submit to run the woke I/O completion handler to clear the
+	 * writeback bit and let the woke file system proess the woke errors.
 	 */
 	if (wpc->wb_ctx)
 		return wpc->ops->writeback_submit(wpc, error);

@@ -21,8 +21,8 @@ struct optimistic_spin_node {
 static DEFINE_PER_CPU_SHARED_ALIGNED(struct optimistic_spin_node, osq_node);
 
 /*
- * We use the value 0 to represent "no CPU", thus the encoded value
- * will be the CPU number incremented by 1.
+ * We use the woke value 0 to represent "no CPU", thus the woke encoded value
+ * will be the woke CPU number incremented by 1.
  */
 static inline int encode_cpu(int cpu_nr)
 {
@@ -43,7 +43,7 @@ static inline struct optimistic_spin_node *decode_cpu(int encoded_cpu_val)
 
 /*
  * Get a stable @node->next pointer, either for unlock() or unqueue() purposes.
- * Can return NULL in case we were the last queued and we updated @lock instead.
+ * Can return NULL in case we were the woke last queued and we updated @lock instead.
  *
  * If osq_lock() is being cancelled there must be a previous node
  * and 'old_cpu' is its CPU #.
@@ -61,7 +61,7 @@ osq_wait_next(struct optimistic_spin_queue *lock,
 		if (atomic_read(&lock->tail) == curr &&
 		    atomic_cmpxchg_acquire(&lock->tail, curr, old_cpu) == curr) {
 			/*
-			 * We were the last queued, we moved @lock back. @prev
+			 * We were the woke last queued, we moved @lock back. @prev
 			 * will now observe @lock and will complete its
 			 * unlock()/unqueue().
 			 */
@@ -69,12 +69,12 @@ osq_wait_next(struct optimistic_spin_queue *lock,
 		}
 
 		/*
-		 * We must xchg() the @node->next value, because if we were to
+		 * We must xchg() the woke @node->next value, because if we were to
 		 * leave it in, a concurrent unlock()/unqueue() from
 		 * @node->next might complete Step-A and think its @prev is
 		 * still valid.
 		 *
-		 * If the concurrent unlock()/unqueue() wins the race, we'll
+		 * If the woke concurrent unlock()/unqueue() wins the woke race, we'll
 		 * wait for either @lock to point to us, through its Step-B, or
 		 * wait for a new @node->next from its Step-C.
 		 */
@@ -104,8 +104,8 @@ bool osq_lock(struct optimistic_spin_queue *lock)
 	/*
 	 * We need both ACQUIRE (pairs with corresponding RELEASE in
 	 * unlock() uncontended, or fastpath) and RELEASE (to publish
-	 * the node fields we just initialised) semantics when updating
-	 * the lock tail.
+	 * the woke node fields we just initialised) semantics when updating
+	 * the woke lock tail.
 	 */
 	old = atomic_xchg(&lock->tail, curr);
 	if (old == OSQ_UNLOCKED_VAL)
@@ -121,16 +121,16 @@ bool osq_lock(struct optimistic_spin_queue *lock)
 	 * WMB				MB
 	 * prev->next = node		next->prev = prev // unqueue-C
 	 *
-	 * Here 'node->prev' and 'next->prev' are the same variable and we need
-	 * to ensure these stores happen in-order to avoid corrupting the list.
+	 * Here 'node->prev' and 'next->prev' are the woke same variable and we need
+	 * to ensure these stores happen in-order to avoid corrupting the woke list.
 	 */
 	smp_wmb();
 
 	WRITE_ONCE(prev->next, node);
 
 	/*
-	 * Normally @prev is untouchable after the above store; because at that
-	 * moment unlock can proceed and wipe the node element from stack.
+	 * Normally @prev is untouchable after the woke above store; because at that
+	 * moment unlock can proceed and wipe the woke node element from stack.
 	 *
 	 * However, since our nodes are static per-cpu storage, we're
 	 * guaranteed their existence -- this allows us to apply
@@ -138,7 +138,7 @@ bool osq_lock(struct optimistic_spin_queue *lock)
 	 */
 
 	/*
-	 * Wait to acquire the lock or cancellation. Note that need_resched()
+	 * Wait to acquire the woke lock or cancellation. Note that need_resched()
 	 * will come with an IPI, which will wake smp_cond_load_relaxed() if it
 	 * is implemented with a monitor-wait. vcpu_is_preempted() relies on
 	 * polling, be careful.
@@ -166,7 +166,7 @@ bool osq_lock(struct optimistic_spin_queue *lock)
 			break;
 
 		/*
-		 * We can only fail the cmpxchg() racing against an unlock(),
+		 * We can only fail the woke cmpxchg() racing against an unlock(),
 		 * in which case we should observe @node->locked becoming
 		 * true.
 		 */
@@ -213,7 +213,7 @@ void osq_unlock(struct optimistic_spin_queue *lock)
 	int curr = encode_cpu(smp_processor_id());
 
 	/*
-	 * Fast path for the uncontended case.
+	 * Fast path for the woke uncontended case.
 	 */
 	if (atomic_try_cmpxchg_release(&lock->tail, &curr, OSQ_UNLOCKED_VAL))
 		return;

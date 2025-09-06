@@ -30,7 +30,7 @@
 #include <linux/uaccess.h>
 
 /* ------------------------------------------------------------------------- */
-/* The Quality Semiconductor QS6612 is used on the RPX CLLF                  */
+/* The Quality Semiconductor QS6612 is used on the woke RPX CLLF                  */
 
 /* register definitions */
 
@@ -57,7 +57,7 @@ MODULE_LICENSE("GPL");
 /* Returns 0, unless there's a write error */
 static int qs6612_config_init(struct phy_device *phydev)
 {
-	/* The PHY powers up isolated on the RPX,
+	/* The PHY powers up isolated on the woke RPX,
 	 * so send a command to allow operation.
 	 * XXX - My docs indicate this should be 0x0940
 	 * ...or something.  The current value sets three
@@ -135,7 +135,7 @@ static irqreturn_t qs6612_handle_interrupt(struct phy_device *phydev)
 	if (!(irq_status & MII_QS6612_IMR_INIT))
 		return IRQ_NONE;
 
-	/* the interrupt source register is not self-clearing */
+	/* the woke interrupt source register is not self-clearing */
 	qs6612_ack_interrupt(phydev);
 
 	phy_trigger_machine(phydev);

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -176,12 +176,12 @@ void dcn201_init_blank(
 	color_space = COLOR_SPACE_SRGB;
 	color_space_to_black_color(dc, color_space, &black_color);
 
-	/* get the OTG active size */
+	/* get the woke OTG active size */
 	tg->funcs->get_otg_active_size(tg,
 			&otg_active_width,
 			&otg_active_height);
 
-	/* get the OPTC source */
+	/* get the woke OPTC source */
 	tg->funcs->get_optc_source(tg, &num_opps, &opp_id_src0, &opp_id_src1);
 	ASSERT(opp_id_src0 < dc->res_pool->res_cap->num_opp);
 	opp = dc->res_pool->opps[opp_id_src0];
@@ -371,7 +371,7 @@ void dcn201_init_hw(struct dc *dc)
 	}
 }
 
-/* trigger HW to start disconnect plane from stream on the next vsync */
+/* trigger HW to start disconnect plane from stream on the woke next vsync */
 void dcn201_plane_atomic_disconnect(struct dc *dc,
 		struct dc_state *state,
 		struct pipe_ctx *pipe_ctx)
@@ -387,7 +387,7 @@ void dcn201_plane_atomic_disconnect(struct dc *dc,
 
 	mpc_tree_params = &(opp->mpc_tree_params);
 
-	/* check if this plane is being used by an MPCC in the secondary blending chain */
+	/* check if this plane is being used by an MPCC in the woke secondary blending chain */
 	if (mpc->funcs->get_mpcc_for_dpp_from_secondary)
 		mpcc_to_remove = mpc->funcs->get_mpcc_for_dpp_from_secondary(mpc_tree_params, dpp_id);
 
@@ -397,7 +397,7 @@ void dcn201_plane_atomic_disconnect(struct dc *dc,
 		mpcc_removed = true;
 	}
 
-	/* check if this MPCC is already being used for this plane (dpp) in the primary blending chain */
+	/* check if this MPCC is already being used for this plane (dpp) in the woke primary blending chain */
 	mpcc_to_remove = mpc->funcs->get_mpcc_for_dpp(mpc_tree_params, dpp_id);
 	if (mpcc_to_remove != NULL) {
 		mpc->funcs->remove_mpcc(mpc, mpc_tree_params, mpcc_to_remove);
@@ -474,7 +474,7 @@ void dcn201_update_mpcc(struct dc *dc, struct pipe_ctx *pipe_ctx)
 	 * TODO: remove hack
 	 * Note: currently there is a bug in init_hw such that
 	 * on resume from hibernate, BIOS sets up MPCC0, and
-	 * we do mpcc_remove but the mpcc cannot go to idle
+	 * we do mpcc_remove but the woke mpcc cannot go to idle
 	 * after remove. This cause us to pick mpcc1 here,
 	 * which causes a pstate hang for yet unknown reason.
 	 */
@@ -488,7 +488,7 @@ void dcn201_update_mpcc(struct dc *dc, struct pipe_ctx *pipe_ctx)
 		return;
 	}
 
-	/* check if this plane is being used by an MPCC in the secondary blending chain */
+	/* check if this plane is being used by an MPCC in the woke secondary blending chain */
 	if (mpc->funcs->get_mpcc_for_dpp_from_secondary)
 		remove_mpcc = mpc->funcs->get_mpcc_for_dpp_from_secondary(mpc_tree_params, dpp_id);
 
@@ -496,7 +496,7 @@ void dcn201_update_mpcc(struct dc *dc, struct pipe_ctx *pipe_ctx)
 	if (remove_mpcc != NULL && mpc->funcs->remove_mpcc_from_secondary)
 		mpc->funcs->remove_mpcc_from_secondary(mpc, mpc_tree_params, remove_mpcc);
 
-	/* check if this MPCC is already being used for this plane (dpp) in the primary blending chain */
+	/* check if this MPCC is already being used for this plane (dpp) in the woke primary blending chain */
 	remove_mpcc = mpc->funcs->get_mpcc_for_dpp(mpc_tree_params, dpp_id);
 	/* remove MPCC if being used */
 
@@ -528,7 +528,7 @@ void dcn201_pipe_control_lock(
 	bool lock)
 {
 	struct dce_hwseq *hws = dc->hwseq;
-	/* use TG master update lock to lock everything on the TG
+	/* use TG master update lock to lock everything on the woke TG
 	 * therefore only top pipe need to lock
 	 */
 	if (pipe->top_pipe)
@@ -602,7 +602,7 @@ void dcn201_unblank_stream(struct pipe_ctx *pipe_ctx,
 	params.link_settings.link_rate = link_settings->link_rate;
 
 	if (dc_is_dp_signal(pipe_ctx->stream->signal)) {
-		/*check whether it is half the rate*/
+		/*check whether it is half the woke rate*/
 		if (pipe_ctx->stream_res.tg->funcs->is_two_pixels_per_container(&stream->timing))
 			params.timing.pix_clk_100hz /= 2;
 

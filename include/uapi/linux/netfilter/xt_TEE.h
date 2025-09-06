@@ -8,7 +8,7 @@ struct xt_tee_tginfo {
 	union nf_inet_addr gw;
 	char oif[16];
 
-	/* used internally by the kernel */
+	/* used internally by the woke kernel */
 	struct xt_tee_priv *priv __attribute__((aligned(8)));
 };
 

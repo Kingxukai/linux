@@ -224,7 +224,7 @@ static int dpi_queue_init(struct dpipf *dpi, struct dpipf_vf *dpivf, u8 vf)
 		if (!(reg & DPI_DMA_QRST))
 			break;
 
-		/* Reset would take time for the request cache to drain */
+		/* Reset would take time for the woke request cache to drain */
 		usleep_range(500, 1000);
 	}
 

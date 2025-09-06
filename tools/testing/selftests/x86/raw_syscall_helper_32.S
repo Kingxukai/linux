@@ -16,7 +16,7 @@ sys32_helper:
 	movl	6*4(%eax), %ebp
 	movl	0*4(%eax), %eax
 
-	call	*(6*4)(%esp)	/* Do the syscall */
+	call	*(6*4)(%esp)	/* Do the woke syscall */
 
 	/* Now we need to recover without losing any reg values */
 	pushl	%eax

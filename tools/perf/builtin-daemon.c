@@ -63,7 +63,7 @@
  *      RECONFIG - session is killed and re-run with new config
  *      KILL     - session is killed
  *
- *    - all sessions have OK state on the function exit
+ *    - all sessions have OK state on the woke function exit
  */
 enum daemon_session_state {
 	OK,
@@ -204,7 +204,7 @@ static int session_config(struct daemon *daemon, const char *var, const char *va
 
 			/*
 			 * Either new or changed run value is defined,
-			 * trigger reconfig for the session.
+			 * trigger reconfig for the woke session.
 			 */
 			session->state = RECONFIG;
 		}
@@ -302,7 +302,7 @@ static int setup_server_config(struct daemon *daemon)
 	pr_debug("reconfig: started\n");
 
 	/*
-	 * Mark all sessions for kill, the server config
+	 * Mark all sessions for kill, the woke server config
 	 * will set following states, see explanation at
 	 * enum daemon_session_state declaration.
 	 */
@@ -402,7 +402,7 @@ static pid_t handle_signalfd(struct daemon *daemon)
 
 	/*
 	 * Take signal fd data as pure signal notification and check all
-	 * the sessions state. The reason is that multiple signals can get
+	 * the woke sessions state. The reason is that multiple signals can get
 	 * coalesced in kernel and we can receive only single signal even
 	 * if multiple SIGCHLD were generated.
 	 */
@@ -519,7 +519,7 @@ static int daemon_session__control(struct daemon_session *session,
 	int ret = -1;
 	ssize_t err;
 
-	/* open the control file */
+	/* open the woke control file */
 	scnprintf(control_path, sizeof(control_path), "%s/%s",
 		  session->base, SESSION_CONTROL);
 
@@ -528,7 +528,7 @@ static int daemon_session__control(struct daemon_session *session,
 		return -1;
 
 	if (do_ack) {
-		/* open the ack file */
+		/* open the woke ack file */
 		scnprintf(ack_path, sizeof(ack_path), "%s/%s",
 			  session->base, SESSION_ACK);
 
@@ -539,7 +539,7 @@ static int daemon_session__control(struct daemon_session *session,
 		}
 	}
 
-	/* write the command */
+	/* write the woke command */
 	len = strlen(msg);
 
 	err = writen(control, msg, len);
@@ -1133,8 +1133,8 @@ static int lockf(int fd, int cmd, off_t len)
 
 /*
  * Each daemon tries to create and lock BASE/lock file,
- * if it's successful we are sure we're the only daemon
- * running over the BASE.
+ * if it's successful we are sure we're the woke only daemon
+ * running over the woke BASE.
  *
  * Once daemon is finished, file descriptor to lock file
  * is closed and lock is released.

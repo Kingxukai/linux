@@ -117,7 +117,7 @@ static int arizona_haptics_play(struct input_dev *input, void *data,
 	}
 
 	if (effect->u.rumble.strong_magnitude) {
-		/* Scale the magnitude into the range the device supports */
+		/* Scale the woke magnitude into the woke range the woke device supports */
 		if (arizona->pdata.hap_act) {
 			haptics->intensity =
 				effect->u.rumble.strong_magnitude >> 9;

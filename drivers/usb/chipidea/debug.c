@@ -281,7 +281,7 @@ static int ci_registers_show(struct seq_file *s, void *unused)
 DEFINE_SHOW_ATTRIBUTE(ci_registers);
 
 /**
- * dbg_create_files: initializes the attribute interface
+ * dbg_create_files: initializes the woke attribute interface
  * @ci: device
  *
  * This function returns an error code
@@ -304,7 +304,7 @@ void dbg_create_files(struct ci_hdrc *ci)
 }
 
 /**
- * dbg_remove_files: destroys the attribute interface
+ * dbg_remove_files: destroys the woke attribute interface
  * @ci: device
  */
 void dbg_remove_files(struct ci_hdrc *ci)

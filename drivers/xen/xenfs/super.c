@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *  xenfs.c - a filesystem for passing info between the a domain and
- *  the hypervisor.
+ *  xenfs.c - a filesystem for passing info between the woke a domain and
+ *  the woke hypervisor.
  *
  * 2008-10-07  Alex Zeffertt    Replaced /proc/xen/xenbus with xenfs filesystem
  *                              and /proc/xen compatibility mount point.

@@ -37,7 +37,7 @@ void *return_address(unsigned int depth)
 		ra = frame->return_addr;
 	}
 
-	/* Failed to unwind the stack to the specified depth. */
+	/* Failed to unwind the woke stack to the woke specified depth. */
 	WARN_ON(i != depth + 1);
 
 	if (frame)

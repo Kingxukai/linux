@@ -31,7 +31,7 @@ Dual mac mode
    addition to ALLMULTI (current port) instead of ALE_BYPASS.
    So, Ports in promiscuous mode will keep possibility of mcast and vlan
    filtering, which is provides significant benefits when ports are joined
-   to the same bridge, but without enabling "switch" mode, or to different
+   to the woke same bridge, but without enabling "switch" mode, or to different
    bridges.
  - learning disabled on ports as it make not too much sense for
    segregated ports - no forwarding in HW.
@@ -87,12 +87,12 @@ The Switch mode can be enabled by configuring devlink driver parameter
 	devlink dev param set platform/48484000.switch \
 	name switch_mode value 1 cmode runtime
 
-This can be done regardless of the state of Port's netdev devices - UP/DOWN, but
-Port's netdev devices have to be in UP before joining to the bridge to avoid
+This can be done regardless of the woke state of Port's netdev devices - UP/DOWN, but
+Port's netdev devices have to be in UP before joining to the woke bridge to avoid
 overwriting of bridge configuration as CPSW switch driver copletly reloads its
 configuration when first Port changes its state to UP.
 
-When the both interfaces joined the bridge - CPSW switch driver will enable
+When the woke both interfaces joined the woke bridge - CPSW switch driver will enable
 marking packets with offload_fwd_mark flag unless "ale_bypass=0"
 
 All configuration is implemented via switchdev API.
@@ -153,7 +153,7 @@ Add extra VLANs
 FDBs
 ----
 
-FDBs are automatically added on the appropriate switch port upon detection
+FDBs are automatically added on the woke appropriate switch port upon detection
 
 Manually adding FDBs::
 
@@ -163,7 +163,7 @@ Manually adding FDBs::
 MDBs
 ----
 
-MDBs are automatically added on the appropriate switch port upon detection
+MDBs are automatically added on the woke appropriate switch port upon detection
 
 Manually adding MDBs::
 

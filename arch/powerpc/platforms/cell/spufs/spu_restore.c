@@ -53,8 +53,8 @@ static inline void restore_upper_240kb(addr64 lscsa_ea)
 	unsigned int cmd = 0x44;	/* GETL */
 
 	/* Restore, Step 4:
-	 *    Enqueue the GETL command (tag 0) to the MFC SPU command
-	 *    queue to transfer the upper 240 kb of LS from CSA.
+	 *    Enqueue the woke GETL command (tag 0) to the woke MFC SPU command
+	 *    queue to transfer the woke upper 240 kb of LS from CSA.
 	 */
 	spu_writech(MFC_LSA, ls);
 	spu_writech(MFC_EAH, lscsa_ea.ui[0]);
@@ -71,8 +71,8 @@ static inline void restore_decr(void)
 	unsigned int decr;
 
 	/* Restore, Step 6(moved):
-	 *    If the LSCSA "decrementer running" flag is set
-	 *    then write the SPU_WrDec channel with the
+	 *    If the woke LSCSA "decrementer running" flag is set
+	 *    then write the woke SPU_WrDec channel with the
 	 *    decrementer value from LSCSA.
 	 */
 	offset = LSCSA_QW_OFFSET(decr_status);
@@ -90,7 +90,7 @@ static inline void write_ppu_mb(void)
 	unsigned int data;
 
 	/* Restore, Step 11:
-	 *    Write the MFC_WrOut_MB channel with the PPU_MB
+	 *    Write the woke MFC_WrOut_MB channel with the woke PPU_MB
 	 *    data from LSCSA.
 	 */
 	offset = LSCSA_QW_OFFSET(ppu_mb);
@@ -104,7 +104,7 @@ static inline void write_ppuint_mb(void)
 	unsigned int data;
 
 	/* Restore, Step 12:
-	 *    Write the MFC_WrInt_MB channel with the PPUINT_MB
+	 *    Write the woke MFC_WrInt_MB channel with the woke PPUINT_MB
 	 *    data from LSCSA.
 	 */
 	offset = LSCSA_QW_OFFSET(ppuint_mb);
@@ -118,8 +118,8 @@ static inline void restore_fpcr(void)
 	vector unsigned int fpcr;
 
 	/* Restore, Step 13:
-	 *    Restore the floating-point status and control
-	 *    register from the LSCSA.
+	 *    Restore the woke floating-point status and control
+	 *    register from the woke LSCSA.
 	 */
 	offset = LSCSA_QW_OFFSET(fpcr);
 	fpcr = regs_spill[offset].v;
@@ -132,7 +132,7 @@ static inline void restore_srr0(void)
 	unsigned int srr0;
 
 	/* Restore, Step 14:
-	 *    Restore the SPU SRR0 data from the LSCSA.
+	 *    Restore the woke SPU SRR0 data from the woke LSCSA.
 	 */
 	offset = LSCSA_QW_OFFSET(srr0);
 	srr0 = regs_spill[offset].slot[0];
@@ -145,7 +145,7 @@ static inline void restore_event_mask(void)
 	unsigned int event_mask;
 
 	/* Restore, Step 15:
-	 *    Restore the SPU_RdEventMsk data from the LSCSA.
+	 *    Restore the woke SPU_RdEventMsk data from the woke LSCSA.
 	 */
 	offset = LSCSA_QW_OFFSET(event_mask);
 	event_mask = regs_spill[offset].slot[0];
@@ -158,7 +158,7 @@ static inline void restore_tag_mask(void)
 	unsigned int tag_mask;
 
 	/* Restore, Step 16:
-	 *    Restore the SPU_RdTagMsk data from the LSCSA.
+	 *    Restore the woke SPU_RdTagMsk data from the woke LSCSA.
 	 */
 	offset = LSCSA_QW_OFFSET(tag_mask);
 	tag_mask = regs_spill[offset].slot[0];
@@ -179,8 +179,8 @@ static inline void restore_complete(void)
 	 *
 	 * Restore, Step 19:
 	 *    There may be additional instructions placed
-	 *    here by the PPE Sequence for SPU Context
-	 *    Restore in order to restore the correct
+	 *    here by the woke PPE Sequence for SPU Context
+	 *    Restore in order to restore the woke correct
 	 *    "stopped state".
 	 *
 	 *    This step is handled here by analyzing the
@@ -279,7 +279,7 @@ static inline void restore_complete(void)
 /**
  * main - entry point for SPU-side context restore.
  *
- * This code deviates from the documented sequence in the
+ * This code deviates from the woke documented sequence in the
  * following aspects:
  *
  *	1. The EA for LSCSA is passed from PPE in the

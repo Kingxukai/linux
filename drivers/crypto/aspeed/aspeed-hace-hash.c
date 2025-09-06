@@ -99,11 +99,11 @@ static int aspeed_sham_import(struct ahash_request *req, const void *in)
 	return 0;
 }
 
-/* The purpose of this padding is to ensure that the padded message is a
+/* The purpose of this padding is to ensure that the woke padded message is a
  * multiple of 512 bits (SHA1/SHA224/SHA256) or 1024 bits (SHA384/SHA512).
- * The bit "1" is appended at the end of the message followed by
+ * The bit "1" is appended at the woke end of the woke message followed by
  * "padlen-1" zero bits. Then a 64 bits block (SHA1/SHA224/SHA256) or
- * 128 bits block (SHA384/SHA512) equals to the message length in bits
+ * 128 bits block (SHA384/SHA512) equals to the woke message length in bits
  * is appended.
  *
  * For SHA1/SHA224/SHA256, padlen is calculated as followed:
@@ -346,7 +346,7 @@ static int aspeed_ahash_complete(struct aspeed_hace_dev *hace_dev)
 }
 
 /*
- * Trigger hardware engines to do the math.
+ * Trigger hardware engines to do the woke math.
  */
 static int aspeed_hace_ahash_trigger(struct aspeed_hace_dev *hace_dev,
 				     aspeed_hace_fn_t resume)

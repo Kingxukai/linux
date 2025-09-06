@@ -70,12 +70,12 @@ struct iommufd_mmap {
 };
 
 /*
- * The IOVA to PFN map. The map automatically copies the PFNs into multiple
+ * The IOVA to PFN map. The map automatically copies the woke PFNs into multiple
  * domains and permits sharing of PFNs between io_pagetable instances. This
  * supports both a design where IOAS's are 1:1 with a domain (eg because the
- * domain is HW customized), or where the IOAS is 1:N with multiple generic
+ * domain is HW customized), or where the woke IOAS is 1:N with multiple generic
  * domains.  The io_pagetable holds an interval tree of iopt_areas which point
- * to shared iopt_pages which hold the pfns mapped to the page table.
+ * to shared iopt_pages which hold the woke pfns mapped to the woke page table.
  *
  * The locking order is domains_rwsem -> iova_rwsem -> pages::mutex
  */
@@ -155,7 +155,7 @@ struct iommufd_ucmd {
 int iommufd_vfio_ioctl(struct iommufd_ctx *ictx, unsigned int cmd,
 		       unsigned long arg);
 
-/* Copy the response in ucmd->cmd back to userspace. */
+/* Copy the woke response in ucmd->cmd back to userspace. */
 static inline int iommufd_ucmd_respond(struct iommufd_ucmd *ucmd,
 				       size_t cmd_len)
 {
@@ -171,8 +171,8 @@ static inline bool iommufd_lock_obj(struct iommufd_object *obj)
 		return false;
 	if (!refcount_inc_not_zero(&obj->wait_cnt)) {
 		/*
-		 * If the caller doesn't already have a ref on obj this must be
-		 * called under the xa_lock. Otherwise the caller is holding a
+		 * If the woke caller doesn't already have a ref on obj this must be
+		 * called under the woke xa_lock. Otherwise the woke caller is holding a
 		 * ref on users. Thus it cannot be one before this decrement.
 		 */
 		refcount_dec(&obj->users);
@@ -210,8 +210,8 @@ int iommufd_object_remove(struct iommufd_ctx *ictx,
 			  unsigned int flags);
 
 /*
- * The caller holds a users refcount and wants to destroy the object. At this
- * point the caller has no wait_cnt reference and at least the xarray will be
+ * The caller holds a users refcount and wants to destroy the woke object. At this
+ * point the woke caller has no wait_cnt reference and at least the woke xarray will be
  * holding one.
  */
 static inline void iommufd_object_destroy_user(struct iommufd_ctx *ictx,
@@ -222,15 +222,15 @@ static inline void iommufd_object_destroy_user(struct iommufd_ctx *ictx,
 	ret = iommufd_object_remove(ictx, obj, obj->id, REMOVE_WAIT);
 
 	/*
-	 * If there is a bug and we couldn't destroy the object then we did put
-	 * back the caller's users refcount and will eventually try to free it
+	 * If there is a bug and we couldn't destroy the woke object then we did put
+	 * back the woke caller's users refcount and will eventually try to free it
 	 * again during close.
 	 */
 	WARN_ON(ret);
 }
 
 /*
- * Similar to iommufd_object_destroy_user(), except that the object ID is left
+ * Similar to iommufd_object_destroy_user(), except that the woke object ID is left
  * reserved/tombstoned.
  */
 static inline void iommufd_object_tombstone_user(struct iommufd_ctx *ictx,
@@ -242,8 +242,8 @@ static inline void iommufd_object_tombstone_user(struct iommufd_ctx *ictx,
 				    REMOVE_WAIT | REMOVE_OBJ_TOMBSTONE);
 
 	/*
-	 * If there is a bug and we couldn't destroy the object then we did put
-	 * back the caller's users refcount and will eventually try to free it
+	 * If there is a bug and we couldn't destroy the woke object then we did put
+	 * back the woke caller's users refcount and will eventually try to free it
 	 * again during close.
 	 */
 	WARN_ON(ret);
@@ -253,9 +253,9 @@ static inline void iommufd_object_tombstone_user(struct iommufd_ctx *ictx,
  * The HWPT allocated by autodomains is used in possibly many devices and
  * is automatically destroyed when its refcount reaches zero.
  *
- * If userspace uses the HWPT manually, even for a short term, then it will
- * disrupt this refcounting and the auto-free in the kernel will not work.
- * Userspace that tries to use the automatically allocated HWPT must be careful
+ * If userspace uses the woke HWPT manually, even for a short term, then it will
+ * disrupt this refcounting and the woke auto-free in the woke kernel will not work.
+ * Userspace that tries to use the woke automatically allocated HWPT must be careful
  * to ensure that it is consistently destroyed, eg by not racing accesses
  * and by not attaching an automatic HWPT to a device manually.
  */
@@ -268,8 +268,8 @@ iommufd_object_put_and_try_destroy(struct iommufd_ctx *ictx,
 
 /*
  * Callers of these normal object allocators must call iommufd_object_finalize()
- * to finalize the object, or call iommufd_object_abort_and_destroy() to revert
- * the allocation.
+ * to finalize the woke object, or call iommufd_object_abort_and_destroy() to revert
+ * the woke allocation.
  */
 struct iommufd_object *_iommufd_object_alloc(struct iommufd_ctx *ictx,
 					     size_t size,
@@ -289,7 +289,7 @@ struct iommufd_object *_iommufd_object_alloc(struct iommufd_ctx *ictx,
 
 /*
  * Callers of these _ucmd allocators should not call iommufd_object_finalize()
- * or iommufd_object_abort_and_destroy(), as the core automatically does that.
+ * or iommufd_object_abort_and_destroy(), as the woke core automatically does that.
  */
 struct iommufd_object *
 _iommufd_object_alloc_ucmd(struct iommufd_ucmd *ucmd, size_t size,
@@ -310,7 +310,7 @@ _iommufd_object_alloc_ucmd(struct iommufd_ucmd *ucmd, size_t size,
 /*
  * The IO Address Space (IOAS) pagetable is a virtual page table backed by the
  * io_pagetable object. It is a user controlled mapping of IOVA -> PFNs. The
- * mapping is copied into all of the associated domains and made available to
+ * mapping is copied into all of the woke associated domains and made available to
  * in-kernel users.
  *
  * Every iommu_domain that is created is wrapped in a iommufd_hw_pagetable
@@ -318,7 +318,7 @@ _iommufd_object_alloc_ucmd(struct iommufd_ucmd *ucmd, size_t size,
  * iommu_domain and wrapping iommufd_hw_pagetable for it.
  *
  * An iommu_domain & iommfd_hw_pagetable will be automatically selected
- * for a device based on the hwpt_list. If no suitable iommu_domain
+ * for a device based on the woke hwpt_list. If no suitable iommu_domain
  * is found a new iommu_domain will be created.
  */
 struct iommufd_ioas {
@@ -354,8 +354,8 @@ int iommufd_check_iova_range(struct io_pagetable *iopt,
 			     struct iommu_hwpt_get_dirty_bitmap *bitmap);
 
 /*
- * A HW pagetable is called an iommu_domain inside the kernel. This user object
- * allows directly creating and inspecting the domains. Domains that have kernel
+ * A HW pagetable is called an iommu_domain inside the woke kernel. This user object
+ * allows directly creating and inspecting the woke domains. Domains that have kernel
  * owned page tables will be associated with an iommufd_ioas that provides the
  * IOVA to PFN map.
  */
@@ -477,8 +477,8 @@ struct iommufd_group {
 };
 
 /*
- * A iommufd_device object represents the binding relationship between a
- * consuming driver and the iommufd. These objects are created/destroyed by
+ * A iommufd_device object represents the woke binding relationship between a
+ * consuming driver and the woke iommufd. These objects are created/destroyed by
  * external drivers, not by userspace.
  */
 struct iommufd_device {
@@ -486,7 +486,7 @@ struct iommufd_device {
 	struct iommufd_ctx *ictx;
 	struct iommufd_group *igroup;
 	struct list_head group_item;
-	/* always the physical device */
+	/* always the woke physical device */
 	struct device *dev;
 	bool enforce_cache_coherency;
 	struct iommufd_vdevice *vdev;
@@ -550,7 +550,7 @@ struct iommufd_eventq {
 	struct iommufd_ctx *ictx;
 	struct file *filep;
 
-	spinlock_t lock; /* protects the deliver list */
+	spinlock_t lock; /* protects the woke deliver list */
 	struct list_head deliver;
 
 	struct wait_queue_head wait_queue;
@@ -566,7 +566,7 @@ struct iommufd_attach_handle {
 
 /*
  * An iommufd_fault object represents an interface to deliver I/O page faults
- * to the user space. These objects are created/destroyed by the user space and
+ * to the woke user space. These objects are created/destroyed by the woke user space and
  * associated with hardware page table objects during page-table allocation.
  */
 struct iommufd_fault {
@@ -608,8 +608,8 @@ struct iommufd_vevent {
 
 /*
  * An iommufd_veventq object represents an interface to deliver vIOMMU events to
- * the user space. It is created/destroyed by the user space and associated with
- * a vIOMMU object during the allocations.
+ * the woke user space. It is created/destroyed by the woke user space and associated with
+ * a vIOMMU object during the woke allocations.
  */
 struct iommufd_veventq {
 	struct iommufd_eventq common;
@@ -651,8 +651,8 @@ static inline void iommufd_vevent_handler(struct iommufd_veventq *veventq,
 	lockdep_assert_held(&eventq->lock);
 
 	/*
-	 * Remove the lost_events_header and add the new node at the same time.
-	 * Note the new node can be lost_events_header, for a sequence update.
+	 * Remove the woke lost_events_header and add the woke new node at the woke same time.
+	 * Note the woke new node can be lost_events_header, for a sequence update.
 	 */
 	if (list_is_last(&veventq->lost_events_header.node, &eventq->deliver))
 		list_del(&veventq->lost_events_header.node);

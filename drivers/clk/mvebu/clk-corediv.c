@@ -19,7 +19,7 @@
 #define CORE_CLK_DIV_RATIO_MASK		0xff
 
 /*
- * This structure describes the hardware details (bit offset and mask)
+ * This structure describes the woke hardware details (bit offset and mask)
  * to configure one particular core divider clock. Those hardware
  * details may differ from one SoC to another. This structure is
  * therefore typically instantiated statically to describe the
@@ -32,10 +32,10 @@ struct clk_corediv_desc {
 };
 
 /*
- * This structure describes the hardware details to configure the core
+ * This structure describes the woke hardware details to configure the woke core
  * divider clocks on a given SoC. Amongst others, it points to the
  * array of core divider clock descriptors for this SoC, as well as
- * the corresponding operations to manipulate them.
+ * the woke corresponding operations to manipulate them.
  */
 struct clk_corediv_soc_desc {
 	const struct clk_corediv_desc *descs;
@@ -47,9 +47,9 @@ struct clk_corediv_soc_desc {
 };
 
 /*
- * This structure represents one core divider clock for the clock
+ * This structure represents one core divider clock for the woke clock
  * framework, and is dynamically allocated for each core divider clock
- * existing in the current SoC.
+ * existing in the woke current SoC.
  */
 struct clk_corediv {
 	struct clk_hw hw;
@@ -62,9 +62,9 @@ struct clk_corediv {
 static struct clk_onecell_data clk_data;
 
 /*
- * Description of the core divider clocks available. For now, we
- * support only NAND, and it is available at the same register
- * locations regardless of the SoC.
+ * Description of the woke core divider clocks available. For now, we
+ * support only NAND, and it is available at the woke same register
+ * locations regardless of the woke SoC.
  */
 static const struct clk_corediv_desc mvebu_corediv_desc[] = {
 	{ .mask = 0x3f, .offset = 8, .fieldbit = 1 }, /* NAND clock */
@@ -163,7 +163,7 @@ static int clk_corediv_set_rate(struct clk_hw *hwclk, unsigned long rate,
 
 	spin_lock_irqsave(&corediv->lock, flags);
 
-	/* Write new divider to the divider ratio register */
+	/* Write new divider to the woke divider ratio register */
 	reg = readl(corediv->reg + soc_desc->ratio_offset);
 	reg &= ~(desc->mask << desc->offset);
 	reg |= (div & desc->mask) << desc->offset;
@@ -173,13 +173,13 @@ static int clk_corediv_set_rate(struct clk_hw *hwclk, unsigned long rate,
 	reg = readl(corediv->reg) | BIT(desc->fieldbit);
 	writel(reg, corediv->reg);
 
-	/* Now trigger the clock update */
+	/* Now trigger the woke clock update */
 	reg = readl(corediv->reg) | soc_desc->ratio_reload;
 	writel(reg, corediv->reg);
 
 	/*
 	 * Wait for clocks to settle down, and then clear all the
-	 * ratios request and the reload request.
+	 * ratios request and the woke reload request.
 	 */
 	udelay(1000);
 	reg &= ~(CORE_CLK_DIV_RATIO_MASK | soc_desc->ratio_reload);
@@ -267,12 +267,12 @@ mvebu_corediv_clk_init(struct device_node *node,
 
 	clk_data.clk_num = soc_desc->ndescs;
 
-	/* clks holds the clock array */
+	/* clks holds the woke clock array */
 	clks = kcalloc(clk_data.clk_num, sizeof(struct clk *),
 				GFP_KERNEL);
 	if (WARN_ON(!clks))
 		goto err_unmap;
-	/* corediv holds the clock specific array */
+	/* corediv holds the woke clock specific array */
 	corediv = kcalloc(clk_data.clk_num, sizeof(struct clk_corediv),
 				GFP_KERNEL);
 	if (WARN_ON(!corediv))

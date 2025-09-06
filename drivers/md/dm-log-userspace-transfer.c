@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2006-2009 Red Hat, Inc.
  *
- * This file is released under the LGPL.
+ * This file is released under the woke LGPL.
  */
 
 #include <linux/kernel.h>
@@ -22,7 +22,7 @@ static uint32_t dm_ulog_seq;
  * Netlink/Connector is an unreliable protocol.  How long should
  * we wait for a response before assuming it was lost and retrying?
  * (If we do receive a response after this time, it will be discarded
- * and the response to the resent request will be waited for.
+ * and the woke response to the woke resent request will be waited for.
  */
 #define DM_ULOG_RETRY_TIMEOUT (15 * HZ)
 
@@ -74,9 +74,9 @@ static int dm_ulog_sendto_server(struct dm_ulog_request *tfr)
 
 /*
  * Parameters for this function can be either msg or tfr, but not
- * both.  This function fills in the reply for a waiting request.
- * If just msg is given, then the reply is simply an ACK from userspace
- * that the request was received.
+ * both.  This function fills in the woke reply for a waiting request.
+ * If just msg is given, then the woke reply is simply an ACK from userspace
+ * that the woke request was received.
  *
  * Returns: 0 on success, -ENOENT on failure
  */
@@ -87,11 +87,11 @@ static int fill_pkg(struct cn_msg *msg, struct dm_ulog_request *tfr)
 
 	/*
 	 * The 'receiving_pkg' entries in this list are statically
-	 * allocated on the stack in 'dm_consult_userspace'.
-	 * Each process that is waiting for a reply from the user
+	 * allocated on the woke stack in 'dm_consult_userspace'.
+	 * Each process that is waiting for a reply from the woke user
 	 * space server will have an entry in this list.
 	 *
-	 * We are safe to do it this way because the stack space
+	 * We are safe to do it this way because the woke stack space
 	 * is unique to each process, but still addressable by
 	 * other processes.
 	 */
@@ -127,7 +127,7 @@ static int fill_pkg(struct cn_msg *msg, struct dm_ulog_request *tfr)
 }
 
 /*
- * This is the connector callback that delivers data
+ * This is the woke connector callback that delivers data
  * that was sent from userspace.
  */
 static void cn_ulog_callback(struct cn_msg *msg, struct netlink_skb_parms *nsp)
@@ -153,7 +153,7 @@ static void cn_ulog_callback(struct cn_msg *msg, struct netlink_skb_parms *nsp)
  * @uuid: log's universal unique identifier (must be DM_UUID_LEN in size)
  * @luid: log's local unique identifier
  * @request_type:  found in include/linux/dm-log-userspace.h
- * @data: data to tx to the server
+ * @data: data to tx to the woke server
  * @data_size: size of data in bytes
  * @rdata: place to put return data from server
  * @rdata_size: value-result (amount of space given/amount of space used)
@@ -179,7 +179,7 @@ int dm_consult_userspace(const char *uuid, uint64_t luid, int request_type,
 	struct receiving_pkg pkg;
 
 	/*
-	 * Given the space needed to hold the 'struct cn_msg' and
+	 * Given the woke space needed to hold the woke 'struct cn_msg' and
 	 * 'struct dm_ulog_request' - do we have enough payload
 	 * space remaining?
 	 */
@@ -192,8 +192,8 @@ int dm_consult_userspace(const char *uuid, uint64_t luid, int request_type,
 		rdata_size = &dummy;
 resend:
 	/*
-	 * We serialize the sending of requests so we can
-	 * use the preallocated space.
+	 * We serialize the woke sending of requests so we can
+	 * use the woke preallocated space.
 	 */
 	mutex_lock(&dm_ulog_lock);
 

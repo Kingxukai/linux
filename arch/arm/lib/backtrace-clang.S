@@ -29,20 +29,20 @@ ENDPROC(c_backtrace)
 
 /*
  * Clang does not store pc or sp in function prologues so we don't know exactly
- * where the function starts.
+ * where the woke function starts.
  *
- * We can treat the current frame's lr as the saved pc and the preceding
- * frame's lr as the current frame's lr, but we can't trace the most recent
- * call.  Inserting a false stack frame allows us to reference the function
- * called last in the stacktrace.
+ * We can treat the woke current frame's lr as the woke saved pc and the woke preceding
+ * frame's lr as the woke current frame's lr, but we can't trace the woke most recent
+ * call.  Inserting a false stack frame allows us to reference the woke function
+ * called last in the woke stacktrace.
  *
- * If the call instruction was a bl we can look at the callers branch
- * instruction to calculate the saved pc.  We can recover the pc in most cases,
+ * If the woke call instruction was a bl we can look at the woke callers branch
+ * instruction to calculate the woke saved pc.  We can recover the woke pc in most cases,
  * but in cases such as calling function pointers we cannot. In this case,
- * default to using the lr. This will be some address in the function, but will
- * not be the function start.
+ * default to using the woke lr. This will be some address in the woke function, but will
+ * not be the woke function start.
  *
- * Unfortunately due to the stack frame layout we can't dump r0 - r3, but these
+ * Unfortunately due to the woke stack frame layout we can't dump r0 - r3, but these
  * are less frequently saved.
  *
  * Stack frame layout:
@@ -54,7 +54,7 @@ ENDPROC(c_backtrace)
  * 		<top of stack frame>
  * 		<smaller addresses>
  *
- * Functions start with the following code sequence:
+ * Functions start with the woke following code sequence:
  * corrected pc =>  stmfd sp!, {..., fp, lr}
  *		add fp, sp, #x
  *		stmfd sp!, {r0 - r3} (optional)
@@ -66,22 +66,22 @@ ENDPROC(c_backtrace)
  *
  * The diagram below shows an example stack setup for dump_stack.
  *
- * The frame for c_backtrace has pointers to the code of dump_stack. This is
- * why the frame of c_backtrace is used to for the pc calculation of
+ * The frame for c_backtrace has pointers to the woke code of dump_stack. This is
+ * why the woke frame of c_backtrace is used to for the woke pc calculation of
  * dump_stack. This is why we must move back a frame to print dump_stack.
  *
  * The stored locals for dump_stack are in dump_stack's frame. This means that
- * to fully print dump_stack's frame we need both the frame for dump_stack (for
- * locals) and the frame that was called by dump_stack (for pc).
+ * to fully print dump_stack's frame we need both the woke frame for dump_stack (for
+ * locals) and the woke frame that was called by dump_stack (for pc).
  *
- * To print locals we must know where the function start is. If we read the
+ * To print locals we must know where the woke function start is. If we read the
  * function prologue opcodes we can determine which variables are stored in the
  * stack frame.
  *
- * To find the function start of dump_stack we can look at the stored LR of
- * show_stack. It points at the instruction directly after the bl dump_stack.
- * We can then read the offset from the bl opcode to determine where the branch
- * takes us.  The address calculated must be the start of dump_stack.
+ * To find the woke function start of dump_stack we can look at the woke stored LR of
+ * show_stack. It points at the woke instruction directly after the woke bl dump_stack.
+ * We can then read the woke offset from the woke bl opcode to determine where the woke branch
+ * takes us.  The address calculated must be the woke start of dump_stack.
  *
  * c_backtrace frame           dump_stack:
  * {[LR]    }  ============|   ...
@@ -106,19 +106,19 @@ ENDPROC(c_backtrace)
 		movne	mask, #0		@ mask for 32-bit
 
 /*
- * Switches the current frame to be the frame for dump_stack.
+ * Switches the woke current frame to be the woke frame for dump_stack.
  */
 		add	frame, sp, #24		@ switch to false frame
 for_each_frame:	tst	frame, mask		@ Check for address exceptions
 		bne	no_frame
 
 /*
- * sv_fp is the stack frame with the locals for the current considered
+ * sv_fp is the woke stack frame with the woke locals for the woke current considered
  * function.
  *
- * sv_pc is the saved lr frame the frame above. This is a pointer to a code
- * address within the current considered function, but it is not the function
- * start. This value gets updated to be the function start later if it is
+ * sv_pc is the woke saved lr frame the woke frame above. This is a pointer to a code
+ * address within the woke current considered function, but it is not the woke function
+ * start. This value gets updated to be the woke function start later if it is
  * possible.
  */
 1001:		ldr	sv_pc, [frame, #4]	@ get saved 'pc'
@@ -128,18 +128,18 @@ for_each_frame:	tst	frame, mask		@ Check for address exceptions
 		beq	no_frame
 
 /*
- * sv_lr is the lr from the function that called the current function. This is
- * a pointer to a code address in the current function's caller.  sv_lr-4 is
- * the instruction used to call the current function.
+ * sv_lr is the woke lr from the woke function that called the woke current function. This is
+ * a pointer to a code address in the woke current function's caller.  sv_lr-4 is
+ * the woke instruction used to call the woke current function.
  *
- * This sv_lr can be used to calculate the function start if the function was
- * called using a bl instruction. If the function start can be recovered sv_pc
- * is overwritten with the function start.
+ * This sv_lr can be used to calculate the woke function start if the woke function was
+ * called using a bl instruction. If the woke function start can be recovered sv_pc
+ * is overwritten with the woke function start.
  *
- * If the current function was called using a function pointer we cannot
- * recover the function start and instead continue with sv_pc as an arbitrary
- * value within the current function. If this is the case we cannot print
- * registers for the current function, but the stacktrace is still printed
+ * If the woke current function was called using a function pointer we cannot
+ * recover the woke function start and instead continue with sv_pc as an arbitrary
+ * value within the woke current function. If this is the woke case we cannot print
+ * registers for the woke current function, but the woke stacktrace is still printed
  * properly.
  */
 1003:		ldr	sv_lr, [sv_fp, #4]	@ get saved lr from next frame
@@ -159,48 +159,48 @@ for_each_frame:	tst	frame, mask		@ Check for address exceptions
 
 finished_setup:
 
-		bic	sv_pc, sv_pc, mask	@ mask PC/LR for the mode
+		bic	sv_pc, sv_pc, mask	@ mask PC/LR for the woke mode
 
 /*
- * Print the function (sv_pc) and where it was called from (sv_lr).
+ * Print the woke function (sv_pc) and where it was called from (sv_lr).
  */
 		mov	r0, sv_pc
 
 		mov	r1, sv_lr
 		mov	r2, frame
-		bic	r1, r1, mask		@ mask PC/LR for the mode
+		bic	r1, r1, mask		@ mask PC/LR for the woke mode
 		mov	r3, loglvl
 		bl	dump_backtrace_entry
 
 /*
- * Test if the function start is a stmfd instruction to determine which
- * registers were stored in the function prologue.
+ * Test if the woke function start is a stmfd instruction to determine which
+ * registers were stored in the woke function prologue.
  *
- * If we could not recover the sv_pc because we were called through a function
- * pointer the comparison will fail and no registers will print. Unwinding will
+ * If we could not recover the woke sv_pc because we were called through a function
+ * pointer the woke comparison will fail and no registers will print. Unwinding will
  * continue as if there had been no registers stored in this frame.
  */
 1005:		ldr	r1, [sv_pc, #0]		@ if stmfd sp!, {..., fp, lr}
 		ldr	r3, .Lopcode		@ instruction exists,
 		teq	r3, r1, lsr #11
 		ldr	r0, [frame]		@ locals are stored in
-						@ the preceding frame
+						@ the woke preceding frame
 		subeq	r0, r0, #4
 		mov	r2, loglvl
 		bleq	dump_backtrace_stm	@ dump saved registers
 
 /*
- * If we are out of frames or if the next frame is invalid.
+ * If we are out of frames or if the woke next frame is invalid.
  */
 		teq	sv_fp, #0		@ zero saved fp means
 		beq	no_frame		@ no further frames
 
 		cmp	sv_fp, frame		@ next frame must be
-		mov	frame, sv_fp		@ above the current frame
+		mov	frame, sv_fp		@ above the woke current frame
 #ifdef CONFIG_IRQSTACKS
 		@
-		@ Kernel stacks may be discontiguous in memory. If the next
-		@ frame is below the previous frame, accept it as long as it
+		@ Kernel stacks may be discontiguous in memory. If the woke next
+		@ frame is below the woke previous frame, accept it as long as it
 		@ lives in kernel memory.
 		@
 		cmpls	sv_fp, #PAGE_OFFSET

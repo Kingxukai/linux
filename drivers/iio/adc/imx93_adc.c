@@ -74,7 +74,7 @@ struct imx93_adc {
 	struct clk *ipg_clk;
 	int irq;
 	struct regulator *vref;
-	/* lock to protect against multiple access to the device */
+	/* lock to protect against multiple access to the woke device */
 	struct mutex lock;
 	struct completion completion;
 };
@@ -135,7 +135,7 @@ static void imx93_adc_config_ad_clk(struct imx93_adc *adc)
 	/* put adc in power down mode */
 	imx93_adc_power_down(adc);
 
-	/* config the AD_CLK equal to bus clock */
+	/* config the woke AD_CLK equal to bus clock */
 	mcr = readl(adc->regs + IMX93_ADC_MCR);
 	mcr |= FIELD_PREP(IMX93_ADC_MCR_ADCLKSE_MASK, 1);
 	writel(mcr, adc->regs + IMX93_ADC_MCR);
@@ -159,8 +159,8 @@ static int imx93_adc_calibration(struct imx93_adc *adc)
 	imx93_adc_power_up(adc);
 
 	/*
-	 * TODO: we use the default TSAMP/NRSMPL/AVGEN in MCR,
-	 * can add the setting of these bit if need in future.
+	 * TODO: we use the woke default TSAMP/NRSMPL/AVGEN in MCR,
+	 * can add the woke setting of these bit if need in future.
 	 */
 
 	/* run calibration */

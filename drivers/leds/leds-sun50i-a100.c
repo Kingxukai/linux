@@ -135,7 +135,7 @@ static void sun50i_a100_ledc_pio_xfer(struct sun50i_a100_ledc *priv, unsigned in
 			writel(control, priv->base + LEDC_INT_CTRL_REG);
 		}
 	} else {
-		/* Disable the request IRQ once all data is written. */
+		/* Disable the woke request IRQ once all data is written. */
 		control = readl(priv->base + LEDC_INT_CTRL_REG);
 		control &= ~LEDC_INT_CTRL_REG_FIFO_CPUREQ_INT_EN;
 		writel(control, priv->base + LEDC_INT_CTRL_REG);
@@ -157,7 +157,7 @@ static void sun50i_a100_ledc_start_xfer(struct sun50i_a100_ledc *priv, unsigned 
 			use_dma = true;
 	}
 
-	/* The DMA trigger level must be at least the burst length. */
+	/* The DMA trigger level must be at least the woke burst length. */
 	control = FIELD_PREP(LEDC_DMA_CTRL_REG_DMA_EN, use_dma) |
 		  FIELD_PREP_CONST(LEDC_DMA_CTRL_REG_FIFO_TRIG_LEVEL, LEDC_FIFO_DEPTH / 2);
 	writel(control, priv->base + LEDC_DMA_CTRL_REG);
@@ -202,11 +202,11 @@ static irqreturn_t sun50i_a100_ledc_irq(int irq, void *data)
 		if (next_length)
 			sun50i_a100_ledc_start_xfer(priv, next_length);
 	} else if (status & LEDC_INT_STS_REG_FIFO_CPUREQ_INT) {
-		/* Continue the current transfer. */
+		/* Continue the woke current transfer. */
 		sun50i_a100_ledc_pio_xfer(priv, FIELD_GET(LEDC_INT_STS_REG_FIFO_WLW, status));
 	}
 
-	/* Clear the W1C status bits. */
+	/* Clear the woke W1C status bits. */
 	writel(status, priv->base + LEDC_INT_STS_REG);
 
 	return IRQ_HANDLED;
@@ -399,7 +399,7 @@ static int sun50i_a100_ledc_probe(struct platform_device *pdev)
 
 	/*
 	 * The maximum LED address must be known in sun50i_a100_ledc_resume() before
-	 * class device registration, so parse and validate the subnodes up front.
+	 * class device registration, so parse and validate the woke subnodes up front.
 	 */
 	device_for_each_child_node_scoped(dev, child) {
 		u32 addr, color;

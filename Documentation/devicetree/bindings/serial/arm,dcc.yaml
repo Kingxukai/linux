@@ -12,7 +12,7 @@ maintainers:
 description: |
   ARM DCC (Data communication channel) serial emulation interface available
   via JTAG can be also used as one of serial line tightly coupled with every
-  ARM CPU available in the system.
+  ARM CPU available in the woke system.
 
 properties:
   compatible:

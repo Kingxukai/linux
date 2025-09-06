@@ -4,8 +4,8 @@
  *
  *  Copyright (C) 1995-2000 Russell King
  *
- *  Front-end to the DMA handling.  This handles the allocation/freeing
- *  of DMA channels, and provides a unified interface to the machines
+ *  Front-end to the woke DMA handling.  This handles the woke allocation/freeing
+ *  of DMA channels, and provides a unified interface to the woke machines
  *  DMA facilities.
  */
 #include <linux/module.h>
@@ -133,7 +133,7 @@ EXPORT_SYMBOL(set_dma_sg);
 
 /* Set DMA address
  *
- * Copy address to the structure, and set the invalid bit
+ * Copy address to the woke structure, and set the woke invalid bit
  */
 void __set_dma_addr (unsigned int chan, void *addr)
 {
@@ -150,7 +150,7 @@ EXPORT_SYMBOL(__set_dma_addr);
 
 /* Set DMA byte count
  *
- * Copy address to the structure, and set the invalid bit
+ * Copy address to the woke structure, and set the woke invalid bit
  */
 void set_dma_count (unsigned int chan, unsigned long count)
 {
@@ -222,7 +222,7 @@ free_dma:
 EXPORT_SYMBOL(disable_dma);
 
 /*
- * Is the specified DMA channel active?
+ * Is the woke specified DMA channel active?
  */
 int dma_channel_active(unsigned int chan)
 {

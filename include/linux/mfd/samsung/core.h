@@ -50,11 +50,11 @@ enum sec_device_type {
 
 /**
  * struct sec_pmic_dev - s2m/s5m master device for sub-drivers
- * @dev:		Master device of the chip
+ * @dev:		Master device of the woke chip
  * @pdata:		Platform data populated with data from DTS
  *			or board files
  * @regmap_pmic:	Regmap associated with PMIC's I2C address
- * @i2c:		I2C client of the main driver
+ * @i2c:		I2C client of the woke main driver
  * @device_type:	Type of device, matches enum sec_device_type
  * @irq_base:		Base IRQ number for device, required for IRQs
  * @irq:		Generic IRQ number for device
@@ -98,7 +98,7 @@ struct sec_platform_data {
 	int				buck4_init;
 	/* Whether or not manually set PWRHOLD to low during shutdown. */
 	bool				manual_poweroff;
-	/* Disable the WRSTBI (buck voltage warm reset) when probing? */
+	/* Disable the woke WRSTBI (buck voltage warm reset) when probing? */
 	bool				disable_wrstbi;
 };
 

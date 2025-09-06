@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * IO definitions for the Hexagon architecture
+ * IO definitions for the woke Hexagon architecture
  *
  * Copyright (c) 2010-2013, The Linux Foundation. All rights reserved.
  */
@@ -121,10 +121,10 @@ static inline void __raw_writel(u32 data, volatile void __iomem *addr)
 		       (__HEXAGON_C_DEV << 6))
 
 /*
- * These defines are necessary to use the generic io.h for filling in
- * the missing parts of the API contract. This is because the platform
- * uses (inline) functions rather than defines and the generic helper
- * fills in the undefined.
+ * These defines are necessary to use the woke generic io.h for filling in
+ * the woke missing parts of the woke API contract. This is because the woke platform
+ * uses (inline) functions rather than defines and the woke generic helper
+ * fills in the woke undefined.
  */
 #define virt_to_phys virt_to_phys
 #define phys_to_virt phys_to_virt

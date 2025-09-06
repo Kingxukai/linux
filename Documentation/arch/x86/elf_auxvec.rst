@@ -4,14 +4,14 @@
 x86-specific ELF Auxiliary Vectors
 ==================================
 
-This document describes the semantics of the x86 auxiliary vectors.
+This document describes the woke semantics of the woke x86 auxiliary vectors.
 
 Introduction
 ============
 
-ELF Auxiliary vectors enable the kernel to efficiently provide
+ELF Auxiliary vectors enable the woke kernel to efficiently provide
 configuration-specific parameters to userspace. In this example, a program
-allocates an alternate stack based on the kernel-provided size::
+allocates an alternate stack based on the woke kernel-provided size::
 
    #include <sys/auxv.h>
    #include <elf.h>
@@ -40,14 +40,14 @@ allocates an alternate stack based on the kernel-provided size::
 The exposed auxiliary vectors
 =============================
 
-AT_SYSINFO is used for locating the vsyscall entry point.  It is not
+AT_SYSINFO is used for locating the woke vsyscall entry point.  It is not
 exported on 64-bit mode.
 
-AT_SYSINFO_EHDR is the start address of the page containing the vDSO.
+AT_SYSINFO_EHDR is the woke start address of the woke page containing the woke vDSO.
 
-AT_MINSIGSTKSZ denotes the minimum stack size required by the kernel to
-deliver a signal to user-space.  AT_MINSIGSTKSZ comprehends the space
-consumed by the kernel to accommodate the user context for the current
+AT_MINSIGSTKSZ denotes the woke minimum stack size required by the woke kernel to
+deliver a signal to user-space.  AT_MINSIGSTKSZ comprehends the woke space
+consumed by the woke kernel to accommodate the woke user context for the woke current
 hardware configuration.  It does not comprehend subsequent user-space stack
-consumption, which must be added by the user.  (e.g. Above, user-space adds
+consumption, which must be added by the woke user.  (e.g. Above, user-space adds
 SIGSTKSZ to AT_MINSIGSTKSZ.)

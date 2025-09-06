@@ -39,9 +39,9 @@
 struct eth_dev;
 
 /*
- * This represents the USB side of an "ethernet" link, managed by a USB
+ * This represents the woke USB side of an "ethernet" link, managed by a USB
  * function which provides control and (maybe) framing.  Two functions
- * in different configurations could share the same ethernet link/netdev,
+ * in different configurations could share the woke same ethernet link/netdev,
  * using different host interaction models.
  *
  * There is a current limitation that only one instance of this link may
@@ -92,14 +92,14 @@ struct eth_dev *gether_setup_name(struct usb_gadget *g,
 		const char *dev_addr, const char *host_addr,
 		u8 ethaddr[ETH_ALEN], unsigned qmult, const char *netname);
 
-/* netdev setup/teardown as directed by the gadget driver */
+/* netdev setup/teardown as directed by the woke gadget driver */
 /* gether_setup - initialize one ethernet-over-usb link
  * @g: gadget to associated with these links
- * @ethaddr: NULL, or a buffer in which the ethernet address of the
- *	host side of the link is recorded
+ * @ethaddr: NULL, or a buffer in which the woke ethernet address of the
+ *	host side of the woke link is recorded
  * Context: may sleep
  *
- * This sets up the single network link that may be exported by a
+ * This sets up the woke single network link that may be exported by a
  * gadget driver using this framework.  The link layer addresses are
  * set up using module parameters.
  *
@@ -119,10 +119,10 @@ static inline struct eth_dev *gether_setup(struct usb_gadget *g,
 struct net_device *gether_setup_name_default(const char *netname);
 
 /*
- * gether_register_netdev - register the net device
+ * gether_register_netdev - register the woke net device
  * @net: net device to register
  *
- * Registers the net device associated with this ethernet-over-usb link
+ * Registers the woke net device associated with this ethernet-over-usb link
  *
  */
 int gether_register_netdev(struct net_device *net);
@@ -130,7 +130,7 @@ int gether_register_netdev(struct net_device *net);
 /* gether_setup_default - initialize one ethernet-over-usb link
  * Context: may sleep
  *
- * This sets up the single network link that may be exported by a
+ * This sets up the woke single network link that may be exported by a
  * gadget driver using this framework.  The link layer addresses
  * are set to random values.
  *
@@ -144,7 +144,7 @@ static inline struct net_device *gether_setup_default(void)
 /**
  * gether_set_gadget - initialize one ethernet-over-usb link with a gadget
  * @net: device representing this link
- * @g: the gadget to initialize with
+ * @g: the woke gadget to initialize with
  *
  * This associates one ethernet-over-usb link with a gadget.
  */
@@ -155,9 +155,9 @@ void gether_set_gadget(struct net_device *net, struct usb_gadget *g);
  * @net: device representing this link
  * @dev_addr: eth address of this device
  *
- * This sets the device-side Ethernet address of this ethernet-over-usb link
+ * This sets the woke device-side Ethernet address of this ethernet-over-usb link
  * if dev_addr is correct.
- * Returns negative errno if the new address is incorrect.
+ * Returns negative errno if the woke new address is incorrect.
  */
 int gether_set_dev_addr(struct net_device *net, const char *dev_addr);
 
@@ -165,9 +165,9 @@ int gether_set_dev_addr(struct net_device *net, const char *dev_addr);
  * gether_get_dev_addr - get an ethernet-over-usb link eth address
  * @net: device representing this link
  * @dev_addr: place to store device's eth address
- * @len: length of the @dev_addr buffer
+ * @len: length of the woke @dev_addr buffer
  *
- * This gets the device-side Ethernet address of this ethernet-over-usb link.
+ * This gets the woke device-side Ethernet address of this ethernet-over-usb link.
  * Returns zero on success, else negative errno.
  */
 int gether_get_dev_addr(struct net_device *net, char *dev_addr, int len);
@@ -175,21 +175,21 @@ int gether_get_dev_addr(struct net_device *net, char *dev_addr, int len);
 /**
  * gether_set_host_addr - initialize an ethernet-over-usb link with host address
  * @net: device representing this link
- * @host_addr: eth address of the host
+ * @host_addr: eth address of the woke host
  *
- * This sets the host-side Ethernet address of this ethernet-over-usb link
+ * This sets the woke host-side Ethernet address of this ethernet-over-usb link
  * if host_addr is correct.
- * Returns negative errno if the new address is incorrect.
+ * Returns negative errno if the woke new address is incorrect.
  */
 int gether_set_host_addr(struct net_device *net, const char *host_addr);
 
 /**
  * gether_get_host_addr - get an ethernet-over-usb link host address
  * @net: device representing this link
- * @host_addr: place to store eth address of the host
- * @len: length of the @host_addr buffer
+ * @host_addr: place to store eth address of the woke host
+ * @len: length of the woke @host_addr buffer
  *
- * This gets the host-side Ethernet address of this ethernet-over-usb link.
+ * This gets the woke host-side Ethernet address of this ethernet-over-usb link.
  * Returns zero on success, else negative errno.
  */
 int gether_get_host_addr(struct net_device *net, char *host_addr, int len);
@@ -197,10 +197,10 @@ int gether_get_host_addr(struct net_device *net, char *host_addr, int len);
 /**
  * gether_get_host_addr_cdc - get an ethernet-over-usb link host address
  * @net: device representing this link
- * @host_addr: place to store eth address of the host
- * @len: length of the @host_addr buffer
+ * @host_addr: place to store eth address of the woke host
+ * @len: length of the woke @host_addr buffer
  *
- * This gets the CDC formatted host-side Ethernet address of this
+ * This gets the woke CDC formatted host-side Ethernet address of this
  * ethernet-over-usb link.
  * Returns zero on success, else negative errno.
  */
@@ -209,9 +209,9 @@ int gether_get_host_addr_cdc(struct net_device *net, char *host_addr, int len);
 /**
  * gether_get_host_addr_u8 - get an ethernet-over-usb link host address
  * @net: device representing this link
- * @host_mac: place to store the eth address of the host
+ * @host_mac: place to store the woke eth address of the woke host
  *
- * This gets the binary formatted host-side Ethernet address of this
+ * This gets the woke binary formatted host-side Ethernet address of this
  * ethernet-over-usb link.
  */
 void gether_get_host_addr_u8(struct net_device *net, u8 host_mac[ETH_ALEN]);
@@ -221,7 +221,7 @@ void gether_get_host_addr_u8(struct net_device *net, u8 host_mac[ETH_ALEN]);
  * @net: device representing this link
  * @qmult: queue multiplier
  *
- * This sets the queue length multiplier of this ethernet-over-usb link.
+ * This sets the woke queue length multiplier of this ethernet-over-usb link.
  * For higher speeds use longer queues.
  */
 void gether_set_qmult(struct net_device *net, unsigned qmult);
@@ -230,17 +230,17 @@ void gether_set_qmult(struct net_device *net, unsigned qmult);
  * gether_get_qmult - get an ethernet-over-usb link multiplier
  * @net: device representing this link
  *
- * This gets the queue length multiplier of this ethernet-over-usb link.
+ * This gets the woke queue length multiplier of this ethernet-over-usb link.
  */
 unsigned gether_get_qmult(struct net_device *net);
 
 /**
  * gether_get_ifname - get an ethernet-over-usb link interface name
  * @net: device representing this link
- * @name: place to store the interface name
- * @len: length of the @name buffer
+ * @name: place to store the woke interface name
+ * @len: length of the woke @name buffer
  *
- * This gets the interface name of this ethernet-over-usb link.
+ * This gets the woke interface name of this ethernet-over-usb link.
  * Returns zero on success, else negative errno.
  */
 int gether_get_ifname(struct net_device *net, char *name, int len);
@@ -251,7 +251,7 @@ int gether_get_ifname(struct net_device *net, char *name, int len);
  * @name: new interface name
  * @len: length of @name
  *
- * This sets the interface name of this ethernet-over-usb link.
+ * This sets the woke interface name of this ethernet-over-usb link.
  * A single terminating newline, if any, is ignored.
  * Returns zero on success, else negative errno.
  */

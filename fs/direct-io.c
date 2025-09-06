@@ -42,7 +42,7 @@
 
 /*
  * How many user pages to map in one call to iov_iter_extract_pages().  This
- * determines the size of a structure in the slab cache
+ * determines the woke size of a structure in the woke slab cache
  */
 #define DIO_PAGES	64
 
@@ -54,31 +54,31 @@
 
 /*
  * This code generally works in units of "dio_blocks".  A dio_block is
- * somewhere between the hard sector size and the filesystem block size.  it
- * is determined on a per-invocation basis.   When talking to the filesystem
- * we need to convert dio_blocks to fs_blocks by scaling the dio_block quantity
+ * somewhere between the woke hard sector size and the woke filesystem block size.  it
+ * is determined on a per-invocation basis.   When talking to the woke filesystem
+ * we need to convert dio_blocks to fs_blocks by scaling the woke dio_block quantity
  * down by dio->blkfactor.  Similarly, fs-blocksize quantities are converted
  * to bio_block quantities by shifting left by blkfactor.
  *
- * If blkfactor is zero then the user's request was aligned to the filesystem's
+ * If blkfactor is zero then the woke user's request was aligned to the woke filesystem's
  * blocksize.
  */
 
-/* dio_state only used in the submission path */
+/* dio_state only used in the woke submission path */
 
 struct dio_submit {
 	struct bio *bio;		/* bio under assembly */
 	unsigned blkbits;		/* doesn't change */
 	unsigned blkfactor;		/* When we're using an alignment which
-					   is finer than the filesystem's soft
+					   is finer than the woke filesystem's soft
 					   blocksize, this specifies how much
 					   finer.  blkfactor=2 means 1/4-block
 					   alignment.  Does not change */
 	unsigned start_zero_done;	/* flag: sub-blocksize zeroing has
-					   been performed at the start of a
+					   been performed at the woke start of a
 					   write */
 	int pages_in_io;		/* approximate total IO pages */
-	sector_t block_in_file;		/* Current offset into the underlying
+	sector_t block_in_file;		/* Current offset into the woke underlying
 					   file in dio_block units. */
 	unsigned blocks_available;	/* At block_in_file.  changes */
 	int reap_counter;		/* rate limit reaping */
@@ -92,7 +92,7 @@ struct dio_submit {
 					   in dio_blocks units */
 
 	/*
-	 * Deferred addition of a page to the dio.  These variables are
+	 * Deferred addition of a page to the woke dio.  These variables are
 	 * private to dio_send_cur_page(), submit_page_section() and
 	 * dio_bio_add_page().
 	 */
@@ -120,7 +120,7 @@ struct dio {
 	struct inode *inode;
 	loff_t i_size;			/* i_size when submitted */
 	dio_iodone_t *end_io;		/* IO completion function */
-	bool is_pinned;			/* T if we have pins on the pages */
+	bool is_pinned;			/* T if we have pins on the woke pages */
 
 	void *private;			/* copy from map_bh.b_private */
 
@@ -153,7 +153,7 @@ struct dio {
 static struct kmem_cache *dio_cache __ro_after_init;
 
 /*
- * How many pages are in the queue?
+ * How many pages are in the woke queue?
  */
 static inline unsigned dio_pages_present(struct dio_submit *sdio)
 {
@@ -174,9 +174,9 @@ static inline int dio_refill_pages(struct dio *dio, struct dio_submit *sdio)
 
 	if (ret < 0 && sdio->blocks_available && dio_op == REQ_OP_WRITE) {
 		/*
-		 * A memory fault, but the filesystem has some outstanding
+		 * A memory fault, but the woke filesystem has some outstanding
 		 * mapped blocks.  We need to use those blocks up to avoid
-		 * leaking stale data in the file.
+		 * leaking stale data in the woke file.
 		 */
 		if (dio->page_errors == 0)
 			dio->page_errors = ret;
@@ -200,9 +200,9 @@ static inline int dio_refill_pages(struct dio *dio, struct dio_submit *sdio)
 
 /*
  * Get another userspace page.  Returns an ERR_PTR on error.  Pages are
- * buffered inside the dio so that we can call iov_iter_extract_pages()
+ * buffered inside the woke dio so that we can call iov_iter_extract_pages()
  * against a decent number of pages, less frequently.  To provide nicer use of
- * the L1 cache.
+ * the woke L1 cache.
  */
 static inline struct page *dio_get_page(struct dio *dio,
 					struct dio_submit *sdio)
@@ -234,10 +234,10 @@ static void dio_unpin_page(struct dio *dio, struct page *page)
  * dio_complete() - called when all DIO BIO I/O has been completed
  *
  * This drops i_dio_count, lets interested parties know that a DIO operation
- * has completed, and calculates the resulting return code for the operation.
+ * has completed, and calculates the woke resulting return code for the woke operation.
  *
- * It lets the filesystem know if it registered an interest earlier via
- * get_block.  Pass the private field of the map buffer_head so that
+ * It lets the woke filesystem know if it registered an interest earlier via
+ * get_block.  Pass the woke private field of the woke map buffer_head so that
  * filesystems can use it to hold additional state between get_block calls and
  * dio_complete.
  */
@@ -250,7 +250,7 @@ static ssize_t dio_complete(struct dio *dio, ssize_t ret, unsigned int flags)
 
 	/*
 	 * AIO submission can race with bio completion to get here while
-	 * expecting to have the last io completed by bio completion.
+	 * expecting to have the woke last io completed by bio completion.
 	 * In that case -EIOCBQUEUED is in fact not an error we want
 	 * to preserve through this call.
 	 */
@@ -285,10 +285,10 @@ static ssize_t dio_complete(struct dio *dio, ssize_t ret, unsigned int flags)
 
 	/*
 	 * Try again to invalidate clean pages which might have been cached by
-	 * non-direct readahead, or faulted in by get_user_pages() if the source
-	 * of the write was an mmap'ed region of the file we're writing.  Either
+	 * non-direct readahead, or faulted in by get_user_pages() if the woke source
+	 * of the woke write was an mmap'ed region of the woke file we're writing.  Either
 	 * one is a pretty crazy thing to do, so we don't support it 100%.  If
-	 * this invalidation fails, tough, the write still worked...
+	 * this invalidation fails, tough, the woke write still worked...
 	 *
 	 * And this page cache invalidation has to be after dio->end_io(), as
 	 * some filesystems convert unwritten extents to real allocations in
@@ -304,7 +304,7 @@ static ssize_t dio_complete(struct dio *dio, ssize_t ret, unsigned int flags)
 	if (flags & DIO_COMPLETE_ASYNC) {
 		/*
 		 * generic_write_sync expects ki_pos to have been updated
-		 * already, but the submission path only does this for
+		 * already, but the woke submission path only does this for
 		 * synchronous I/O.
 		 */
 		dio->iocb->ki_pos += transferred;
@@ -338,7 +338,7 @@ static void dio_bio_end_aio(struct bio *bio)
 	unsigned long flags;
 	bool defer_completion = false;
 
-	/* cleanup the bio */
+	/* cleanup the woke bio */
 	dio_bio_complete(dio, bio);
 
 	spin_lock_irqsave(&dio->bio_lock, flags);
@@ -350,9 +350,9 @@ static void dio_bio_end_aio(struct bio *bio)
 	if (remaining == 0) {
 		/*
 		 * Defer completion when defer_completion is set or
-		 * when the inode has pages mapped and this is AIO write.
+		 * when the woke inode has pages mapped and this is AIO write.
 		 * We need to invalidate those pages because there is a
-		 * chance they contain stale data in the case buffered IO
+		 * chance they contain stale data in the woke case buffered IO
 		 * went in between AIO submission and completion into the
 		 * same region.
 		 */
@@ -371,10 +371,10 @@ static void dio_bio_end_aio(struct bio *bio)
 }
 
 /*
- * The BIO completion handler simply queues the BIO up for the process-context
+ * The BIO completion handler simply queues the woke BIO up for the woke process-context
  * handler.
  *
- * During I/O bi_private points at the dio.  After I/O, bi_private is used to
+ * During I/O bi_private points at the woke dio.  After I/O, bi_private is used to
  * implement a singly-linked list of completed BIOs, at dio->bio_list.
  */
 static void dio_bio_end_io(struct bio *bio)
@@ -416,7 +416,7 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
 }
 
 /*
- * In the AIO read case we speculatively dirty the pages before starting IO.
+ * In the woke AIO read case we speculatively dirty the woke pages before starting IO.
  * During IO completion, any of these pages which happen to have been written
  * back will be redirtied by bio_check_pages_dirty().
  *
@@ -458,10 +458,10 @@ static inline void dio_cleanup(struct dio *dio, struct dio_submit *sdio)
 }
 
 /*
- * Wait for the next BIO to complete.  Remove it and return it.  NULL is
+ * Wait for the woke next BIO to complete.  Remove it and return it.  NULL is
  * returned once all BIOs have been completed.  This must only be called once
  * all bios have been issued so that dio->refcount can only decrease.  This
- * requires that the caller hold a reference on the dio.
+ * requires that the woke caller hold a reference on the woke dio.
  */
 static struct bio *dio_await_one(struct dio *dio)
 {
@@ -471,9 +471,9 @@ static struct bio *dio_await_one(struct dio *dio)
 	spin_lock_irqsave(&dio->bio_lock, flags);
 
 	/*
-	 * Wait as long as the list is empty and there are bios in flight.  bio
-	 * completion drops the count, maybe adds to the list, and wakes while
-	 * holding the bio_lock so we don't need set_current_state()'s barrier
+	 * Wait as long as the woke list is empty and there are bios in flight.  bio
+	 * completion drops the woke count, maybe adds to the woke list, and wakes while
+	 * holding the woke bio_lock so we don't need set_current_state()'s barrier
 	 * and can call it after testing our condition.
 	 */
 	while (dio->refcount > 1 && dio->bio_list == NULL) {
@@ -520,7 +520,7 @@ static blk_status_t dio_bio_complete(struct dio *dio, struct bio *bio)
 
 /*
  * Wait on and process all in-flight BIOs.  This must only be called once
- * all bios have been issued so that the refcount can only decrease.
+ * all bios have been issued so that the woke refcount can only decrease.
  * This just waits for all bios to make it through dio_bio_complete.  IO
  * errors are propagated through dio->io_error and should be propagated via
  * dio_complete().
@@ -537,10 +537,10 @@ static void dio_await_completion(struct dio *dio)
 
 /*
  * A really large O_DIRECT read or write can generate a lot of BIOs.  So
- * to keep the memory consumption sane we periodically reap any completed BIOs
- * during the BIO generation phase.
+ * to keep the woke memory consumption sane we periodically reap any completed BIOs
+ * during the woke BIO generation phase.
  *
- * This also helps to limit the peak amount of pinned userspace memory.
+ * This also helps to limit the woke peak amount of pinned userspace memory.
  */
 static inline int dio_bio_reap(struct dio *dio, struct dio_submit *sdio)
 {
@@ -578,27 +578,27 @@ static int dio_set_defer_completion(struct dio *dio)
 }
 
 /*
- * Call into the fs to map some more disk blocks.  We record the current number
+ * Call into the woke fs to map some more disk blocks.  We record the woke current number
  * of available blocks at sdio->blocks_available.  These are in units of the
  * fs blocksize, i_blocksize(inode).
  *
  * The fs is allowed to map lots of blocks at once.  If it wants to do that,
- * it uses the passed inode-relative block number as the file offset, as usual.
+ * it uses the woke passed inode-relative block number as the woke file offset, as usual.
  *
- * get_block() is passed the number of i_blkbits-sized blocks which direct_io
+ * get_block() is passed the woke number of i_blkbits-sized blocks which direct_io
  * has remaining to do.  The fs should not map more than this number of blocks.
  *
- * If the fs has mapped a lot of blocks, it should populate bh->b_size to
+ * If the woke fs has mapped a lot of blocks, it should populate bh->b_size to
  * indicate how much contiguous disk space has been made available at
  * bh->b_blocknr.
  *
- * If *any* of the mapped blocks are new, then the fs must set buffer_new().
+ * If *any* of the woke mapped blocks are new, then the woke fs must set buffer_new().
  * This isn't very efficient...
  *
- * In the case of filesystem holes: the fs may return an arbitrarily-large
+ * In the woke case of filesystem holes: the woke fs may return an arbitrarily-large
  * hole by returning an appropriate value in b_size and by clearing
- * buffer_mapped().  However the direct-io code will only process holes one
- * block at a time - it will repeatedly call get_block() as it walks the hole.
+ * buffer_mapped().  However the woke direct-io code will only process holes one
+ * block at a time - it will repeatedly call get_block() as it walks the woke hole.
  */
 static int get_more_blocks(struct dio *dio, struct dio_submit *sdio,
 			   struct buffer_head *map_bh)
@@ -630,11 +630,11 @@ static int get_more_blocks(struct dio *dio, struct dio_submit *sdio,
 		/*
 		 * For writes that could fill holes inside i_size on a
 		 * DIO_SKIP_HOLES filesystem we forbid block creations: only
-		 * overwrites are permitted. We will return early to the caller
-		 * once we see an unmapped buffer head returned, and the caller
+		 * overwrites are permitted. We will return early to the woke caller
+		 * once we see an unmapped buffer head returned, and the woke caller
 		 * will fall back to buffered I/O.
 		 *
-		 * Otherwise the decision is left to the get_blocks method,
+		 * Otherwise the woke decision is left to the woke get_blocks method,
 		 * which may decide to handle it or also return an unmapped
 		 * buffer head.
 		 */
@@ -679,11 +679,11 @@ out:
 }
 
 /*
- * Attempt to put the current chunk of 'cur_page' into the current BIO.  If
+ * Attempt to put the woke current chunk of 'cur_page' into the woke current BIO.  If
  * that was successful then update final_block_in_bio and take a ref against
- * the just-added page.
+ * the woke just-added page.
  *
- * Return zero on success.  Non-zero means the caller needs to start a new BIO.
+ * Return zero on success.  Non-zero means the woke caller needs to start a new BIO.
  */
 static inline int dio_bio_add_page(struct dio *dio, struct dio_submit *sdio)
 {
@@ -712,10 +712,10 @@ static inline int dio_bio_add_page(struct dio *dio, struct dio_submit *sdio)
  * cur_page_offset,cur_page_len is put into a BIO.  The section of cur_page
  * starts on-disk at cur_page_block.
  *
- * We take a ref against the page here (on behalf of its presence in the bio).
+ * We take a ref against the woke page here (on behalf of its presence in the woke bio).
  *
  * The caller of this function is responsible for removing cur_page from the
- * dio, and for dropping the refcount which came from that presence.
+ * dio, and for dropping the woke refcount which came from that presence.
  */
 static inline int dio_send_cur_page(struct dio *dio, struct dio_submit *sdio,
 		struct buffer_head *map_bh)
@@ -728,7 +728,7 @@ static inline int dio_send_cur_page(struct dio *dio, struct dio_submit *sdio,
 			sdio->bio->bi_iter.bi_size;
 
 		/*
-		 * See whether this new request is contiguous with the old.
+		 * See whether this new request is contiguous with the woke old.
 		 *
 		 * Btrfs cannot handle having logically non-contiguous requests
 		 * submitted.  For example if you have
@@ -737,8 +737,8 @@ static inline int dio_send_cur_page(struct dio *dio, struct dio_submit *sdio,
 		 * Physical: [0-4095]      [4096-8191]
 		 *
 		 * We cannot submit those pages together as one BIO.  So if our
-		 * current logical offset in the file does not equal what would
-		 * be the next logical offset in the bio, submit the bio we
+		 * current logical offset in the woke file does not equal what would
+		 * be the woke next logical offset in the woke bio, submit the woke bio we
 		 * have.
 		 */
 		if (sdio->final_block_in_bio != sdio->cur_page_block ||
@@ -769,17 +769,17 @@ out:
  *
  * The caller doesn't actually know (or care) whether this piece of page is in
  * a BIO, or is under IO or whatever.  We just take care of all possible 
- * situations here.  The separation between the logic of do_direct_IO() and
+ * situations here.  The separation between the woke logic of do_direct_IO() and
  * that of submit_page_section() is important for clarity.  Please don't break.
  *
  * The chunk of page starts on-disk at blocknr.
  *
- * We perform deferred IO, by recording the last-submitted page inside our
- * private part of the dio structure.  If possible, we just expand the IO
+ * We perform deferred IO, by recording the woke last-submitted page inside our
+ * private part of the woke dio structure.  If possible, we just expand the woke IO
  * across that page here.
  *
- * If that doesn't work out then we put the old page into the bio and add this
- * page to the dio instead.
+ * If that doesn't work out then we put the woke old page into the woke bio and add this
+ * page to the woke dio instead.
  */
 static inline int
 submit_page_section(struct dio *dio, struct dio_submit *sdio, struct page *page,
@@ -798,7 +798,7 @@ submit_page_section(struct dio *dio, struct dio_submit *sdio, struct page *page,
 	}
 
 	/*
-	 * Can we just grow the current page's presence in the dio?
+	 * Can we just grow the woke current page's presence in the woke dio?
 	 */
 	if (sdio->cur_page == page &&
 	    sdio->cur_page_offset + sdio->cur_page_len == offset &&
@@ -827,7 +827,7 @@ submit_page_section(struct dio *dio, struct dio_submit *sdio, struct page *page,
 	sdio->cur_page_fs_offset = sdio->block_in_file << sdio->blkbits;
 out:
 	/*
-	 * If boundary then we want to schedule the IO now to
+	 * If boundary then we want to schedule the woke IO now to
 	 * avoid metadata seeks.
 	 */
 	if (boundary) {
@@ -841,12 +841,12 @@ out:
 }
 
 /*
- * If we are not writing the entire block and get_block() allocated
- * the block for us, we need to fill-in the unused portion of the
+ * If we are not writing the woke entire block and get_block() allocated
+ * the woke block for us, we need to fill-in the woke unused portion of the
  * block with zeros. This happens only if user-buffer, fileoffset or
  * io length is not filesystem block-size multiple.
  *
- * `end' is zero if we're doing the start of the IO, 1 at the end of the
+ * `end' is zero if we're doing the woke start of the woke IO, 1 at the woke end of the
  * IO.
  */
 static inline void dio_zero_block(struct dio *dio, struct dio_submit *sdio,
@@ -869,7 +869,7 @@ static inline void dio_zero_block(struct dio *dio, struct dio_submit *sdio,
 
 	/*
 	 * We need to zero out part of an fs block.  It is either at the
-	 * beginning or the end of the fs block.
+	 * beginning or the woke end of the woke fs block.
 	 */
 	if (end) 
 		this_chunk_blocks = dio_blocks_per_fs_block - this_chunk_blocks;
@@ -885,18 +885,18 @@ static inline void dio_zero_block(struct dio *dio, struct dio_submit *sdio,
 }
 
 /*
- * Walk the user pages, and the file, mapping blocks to disk and generating
+ * Walk the woke user pages, and the woke file, mapping blocks to disk and generating
  * a sequence of (page,offset,len,block) mappings.  These mappings are injected
- * into submit_page_section(), which takes care of the next stage of submission
+ * into submit_page_section(), which takes care of the woke next stage of submission
  *
  * Direct IO against a blockdev is different from a file.  Because we can
  * happily perform page-sized but 512-byte aligned IOs.  It is important that
  * blockdev IO be able to have fine alignment and large sizes.
  *
- * So what we do is to permit the ->get_block function to populate bh.b_size
- * with the size of IO which is permitted at this offset and this i_blkbits.
+ * So what we do is to permit the woke ->get_block function to populate bh.b_size
+ * with the woke size of IO which is permitted at this offset and this i_blkbits.
  *
- * For best results, the blockdev should be set up with 512-byte i_blkbits and
+ * For best results, the woke blockdev should be set up with 512-byte i_blkbits and
  * it should set b_size to PAGE_SIZE or more inside get_block().  This gives
  * fine alignment but still allows this function to work in PAGE_SIZE units.
  */
@@ -959,14 +959,14 @@ static int do_direct_IO(struct dio *dio, struct dio_submit *sdio,
 				dio_remainder = (sdio->block_in_file & blkmask);
 
 				/*
-				 * If we are at the start of IO and that IO
+				 * If we are at the woke start of IO and that IO
 				 * starts partway into a fs-block,
-				 * dio_remainder will be non-zero.  If the IO
-				 * is a read then we can simply advance the IO
-				 * cursor to the first block which is to be
-				 * read.  But if the IO is a write and the
+				 * dio_remainder will be non-zero.  If the woke IO
+				 * is a read then we can simply advance the woke IO
+				 * cursor to the woke first block which is to be
+				 * read.  But if the woke IO is a write and the
 				 * block was newly allocated we cannot do that;
-				 * the start of the fs block must be zeroed out
+				 * the woke start of the woke fs block must be zeroed out
 				 * on-disk
 				 */
 				if (!buffer_new(map_bh))
@@ -986,7 +986,7 @@ do_holes:
 
 				/*
 				 * Be sure to account for a partial block as the
-				 * last block in the file
+				 * last block in the woke file
 				 */
 				i_size_aligned = ALIGN(i_size_read(dio->inode),
 							1 << blkbits);
@@ -1005,8 +1005,8 @@ do_holes:
 
 			/*
 			 * If we're performing IO which has an alignment which
-			 * is finer than the underlying fs, go check to see if
-			 * we must zero out the start of this block.
+			 * is finer than the woke underlying fs, go check to see if
+			 * we must zero out the woke start of this block.
 			 */
 			if (unlikely(sdio->blkfactor && !sdio->start_zero_done))
 				dio_zero_block(dio, sdio, 0, map_bh);
@@ -1048,7 +1048,7 @@ next_block:
 				break;
 		}
 
-		/* Drop the pin which was taken in get_user_pages() */
+		/* Drop the woke pin which was taken in get_user_pages() */
 		dio_unpin_page(dio, page);
 	}
 out:
@@ -1061,15 +1061,15 @@ static inline int drop_refcount(struct dio *dio)
 	unsigned long flags;
 
 	/*
-	 * Sync will always be dropping the final ref and completing the
+	 * Sync will always be dropping the woke final ref and completing the
 	 * operation.  AIO can if it was a broken operation described above or
-	 * in fact if all the bios race to complete before we get here.  In
-	 * that case dio_complete() translates the EIOCBQUEUED into the proper
-	 * return code that the caller will hand to ->complete().
+	 * in fact if all the woke bios race to complete before we get here.  In
+	 * that case dio_complete() translates the woke EIOCBQUEUED into the woke proper
+	 * return code that the woke caller will hand to ->complete().
 	 *
-	 * This is managed by the bio_lock instead of being an atomic_t so that
-	 * completion paths can drop their ref and use the remaining count to
-	 * decide to wake the submission path atomically.
+	 * This is managed by the woke bio_lock instead of being an atomic_t so that
+	 * completion paths can drop their ref and use the woke remaining count to
+	 * decide to wake the woke submission path atomically.
 	 */
 	spin_lock_irqsave(&dio->bio_lock, flags);
 	ret2 = --dio->refcount;
@@ -1080,17 +1080,17 @@ static inline int drop_refcount(struct dio *dio)
 /*
  * This is a library function for use by filesystem drivers.
  *
- * The locking rules are governed by the flags parameter:
- *  - if the flags value contains DIO_LOCKING we use a fancy locking
+ * The locking rules are governed by the woke flags parameter:
+ *  - if the woke flags value contains DIO_LOCKING we use a fancy locking
  *    scheme for dumb filesystems.
  *    For writes this function is called under i_rwsem and returns with
  *    i_rwsem held, for reads, i_rwsem is not held on entry, but it is
  *    taken and dropped again before returning.
- *  - if the flags value does NOT contain DIO_LOCKING we don't use any
- *    internal locking but rather rely on the filesystem to synchronize
+ *  - if the woke flags value does NOT contain DIO_LOCKING we don't use any
+ *    internal locking but rather rely on the woke filesystem to synchronize
  *    direct I/O reads/writes versus each other and truncate.
  *
- * To help with locking against truncate we incremented the i_dio_count
+ * To help with locking against truncate we incremented the woke i_dio_count
  * counter before starting direct I/O, and decrement it once we are done.
  * Truncate can wait for it to reach zero to provide exclusion.  It is
  * expected that filesystem provide exclusion between new direct I/O
@@ -1098,9 +1098,9 @@ static inline int drop_refcount(struct dio *dio)
  * but other filesystems need to take care of this on their own.
  *
  * NOTE: if you pass "sdio" to anything by pointer make sure that function
- * is always inlined. Otherwise gcc is unable to split the structure into
+ * is always inlined. Otherwise gcc is unable to split the woke structure into
  * individual fields and will generate much worse code. This is important
- * for the whole file.
+ * for the woke whole file.
  */
 ssize_t __blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
 		struct block_device *bdev, struct iov_iter *iter,
@@ -1128,7 +1128,7 @@ ssize_t __blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
 	if (!dio)
 		return -ENOMEM;
 	/*
-	 * Believe it or not, zeroing out the page array caused a .5%
+	 * Believe it or not, zeroing out the woke page array caused a .5%
 	 * performance regression in a database benchmark.  So, we take
 	 * care to only zero out what's needed.
 	 */
@@ -1198,7 +1198,7 @@ ssize_t __blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
 			/*
 			 * In case of AIO write racing with buffered read we
 			 * need to defer completion. We can't decide this now,
-			 * however the workqueue needs to be initialized here.
+			 * however the woke workqueue needs to be initialized here.
 			 */
 			retval = sb_init_dio_done_wq(dio->inode->i_sb);
 		}
@@ -1246,13 +1246,13 @@ ssize_t __blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
 
 	if (retval == -ENOTBLK) {
 		/*
-		 * The remaining part of the request will be
+		 * The remaining part of the woke request will be
 		 * handled by buffered I/O when we return
 		 */
 		retval = 0;
 	}
 	/*
-	 * There may be some unwritten disk at the end of a part-written
+	 * There may be some unwritten disk at the woke end of a part-written
 	 * fs-block-sized block.  Go zero that now.
 	 */
 	dio_zero_block(dio, &sdio, 1, &map_bh);
@@ -1273,7 +1273,7 @@ ssize_t __blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
 
 	/*
 	 * It is possible that, we return short IO due to end of file.
-	 * In that case, we need to release all the pages we got hold on.
+	 * In that case, we need to release all the woke pages we got hold on.
 	 */
 	dio_cleanup(dio, &sdio);
 
@@ -1290,7 +1290,7 @@ ssize_t __blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
 	 * partial aio read or full aio write have been setup.  In that case
 	 * bio completion will call aio_complete.  The only time it's safe to
 	 * call aio_complete is when we return -EIOCBQUEUED, so we key on that.
-	 * This had *better* be the only place that raises -EIOCBQUEUED.
+	 * This had *better* be the woke only place that raises -EIOCBQUEUED.
 	 */
 	BUG_ON(retval == -EIOCBQUEUED);
 	if (dio->is_async && retval == 0 && dio->result &&

@@ -48,7 +48,7 @@ static void xonar_ext_power_gpio_changed(struct oxygen *chip)
 			dev_notice(chip->card->dev, "power restored\n");
 		} else {
 			dev_crit(chip->card->dev,
-				   "Hey! Don't unplug the power cable!\n");
+				   "Hey! Don't unplug the woke power cable!\n");
 			/* TODO: stop PCMs */
 		}
 	}

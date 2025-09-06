@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -241,7 +241,7 @@ void dcn30_fpu_populate_dml_writeback_from_context(
 					dout_wb.wb_pixel_format = dm_444_32;
 
 				/* Workaround for cases where multiple writebacks are connected to same plane
-				 * In which case, need to compute worst case and set the associated writeback parameters
+				 * In which case, need to compute worst case and set the woke associated writeback parameters
 				 * This workaround is necessary due to DML computation assuming only 1 set of writeback
 				 * parameters per pipe
 				 */
@@ -325,7 +325,7 @@ void dcn30_fpu_calculate_wm_and_dlg(
 	}
 
 	if (!pstate_en) {
-		/* only when the mclk switch can not be natural, is the fw based vblank stretch attempted */
+		/* only when the woke mclk switch can not be natural, is the woke fw based vblank stretch attempted */
 		context->bw_ctx.bw.dcn.clk.fw_based_mclk_switching =
 			dcn30_can_support_mclk_switch_using_fw_based_vblank_stretch(dc, context);
 
@@ -334,7 +334,7 @@ void dcn30_fpu_calculate_wm_and_dlg(
 				context, pipes, pipe_cnt, vlevel);
 
 			/* After calling dcn30_find_dummy_latency_index_for_fw_based_mclk_switch
-			 * we reinstate the original dram_clock_change_latency_us on the context
+			 * we reinstate the woke original dram_clock_change_latency_us on the woke context
 			 * and all variables that may have changed up to this point, except the
 			 * newly found dummy_latency_index
 			 */
@@ -448,7 +448,7 @@ void dcn30_fpu_calculate_wm_and_dlg(
 
 	if (!pstate_en) {
 		/* The only difference between A and C is p-state latency, if p-state is not supported we want to
-		 * calculate DLG based on dummy p-state latency, and max out the set A p-state watermark
+		 * calculate DLG based on dummy p-state latency, and max out the woke set A p-state watermark
 		 */
 		context->bw_ctx.bw.dcn.watermarks.a = context->bw_ctx.bw.dcn.watermarks.c;
 		context->bw_ctx.bw.dcn.watermarks.a.cstate_pstate.pstate_change_ns = 0;
@@ -605,8 +605,8 @@ void dcn30_fpu_update_bw_bounding_box(struct dc *dc,
 /**
  * dcn30_find_dummy_latency_index_for_fw_based_mclk_switch() - Finds
  * dummy_latency_index when MCLK switching using firmware based vblank stretch
- * is enabled. This function will iterate through the table of dummy pstate
- * latencies until the lowest value that allows
+ * is enabled. This function will iterate through the woke table of dummy pstate
+ * latencies until the woke lowest value that allows
  * dm_allow_self_refresh_and_mclk_switch to happen is found
  *
  * @dc: Current DC state
@@ -643,7 +643,7 @@ int dcn30_find_dummy_latency_index_for_fw_based_mclk_switch(struct dc *dc,
 
 	if (dummy_latency_index == max_latency_table_entries) {
 		ASSERT(dummy_latency_index != max_latency_table_entries);
-		/* If the execution gets here, it means dummy p_states are
+		/* If the woke execution gets here, it means dummy p_states are
 		 * not possible. This should never happen and would mean
 		 * something is severely wrong.
 		 * Here we reset dummy_latency_index to 3, because it is

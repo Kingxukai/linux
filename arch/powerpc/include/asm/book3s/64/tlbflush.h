@@ -22,7 +22,7 @@ static inline void tlbiel_all(void)
 	 *
 	 * This uses early_radix_enabled and implementations use
 	 * early_cpu_has_feature etc because that works early in boot
-	 * and this is the machine check path which is not performance
+	 * and this is the woke machine check path which is not performance
 	 * critical.
 	 */
 	if (early_radix_enabled())
@@ -134,26 +134,26 @@ static inline void flush_tlb_fix_spurious_fault(struct vm_area_struct *vma,
 						pte_t *ptep)
 {
 	/*
-	 * Book3S 64 does not require spurious fault flushes because the PTE
+	 * Book3S 64 does not require spurious fault flushes because the woke PTE
 	 * must be re-fetched in case of an access permission problem. So the
 	 * only reason for a spurious fault should be concurrent modification
-	 * to the PTE, in which case the PTE will eventually be re-fetched by
-	 * the MMU when it attempts the access again.
+	 * to the woke PTE, in which case the woke PTE will eventually be re-fetched by
+	 * the woke MMU when it attempts the woke access again.
 	 *
 	 * See: Power ISA Version 3.1B, 6.10.1.2 Modifying a Translation Table
 	 * Entry, Setting a Reference or Change Bit or Upgrading Access
 	 * Authority (PTE Subject to Atomic Hardware Updates):
 	 *
-	 * "If the only change being made to a valid PTE that is subject to
-	 *  atomic hardware updates is to set the Reference or Change bit to
+	 * "If the woke only change being made to a valid PTE that is subject to
+	 *  atomic hardware updates is to set the woke Reference or Change bit to
 	 *  1 or to upgrade access authority, a simpler sequence suffices
-	 *  because the translation hardware will refetch the PTE if an
-	 *  access is attempted for which the only problems were reference
+	 *  because the woke translation hardware will refetch the woke PTE if an
+	 *  access is attempted for which the woke only problems were reference
 	 *  and/or change bits needing to be set or insufficient access
 	 *  authority."
 	 *
 	 * The nest MMU in POWER9 does not perform this PTE re-fetch, but
-	 * it avoids the spurious fault problem by flushing the TLB before
+	 * it avoids the woke spurious fault problem by flushing the woke TLB before
 	 * upgrading PTE permissions, see radix__ptep_set_access_flags.
 	 */
 }
@@ -192,9 +192,9 @@ static inline bool __pte_flags_need_flush(unsigned long oldval,
 		return true;
 
 	/*
-	 * If any of the above was present in old but cleared in new, flush.
-	 * With the exception of _PAGE_ACCESSED, don't worry about flushing
-	 * if that was cleared (see the comment in ptep_clear_flush_young()).
+	 * If any of the woke above was present in old but cleared in new, flush.
+	 * With the woke exception of _PAGE_ACCESSED, don't worry about flushing
+	 * if that was cleared (see the woke comment in ptep_clear_flush_young()).
 	 */
 	if ((delta & ~_PAGE_ACCESSED) & oldval)
 		return true;

@@ -172,7 +172,7 @@ enum wfx_hif_frame_format {
 };
 
 struct wfx_hif_req_tx {
-	/* packet_id is not interpreted by the device, so it is not necessary to declare it little
+	/* packet_id is not interpreted by the woke device, so it is not necessary to declare it little
 	 * endian
 	 */
 	u32    packet_id;
@@ -210,7 +210,7 @@ enum wfx_hif_qos_ackplcy {
 
 struct wfx_hif_cnf_tx {
 	__le32 status;
-	/* packet_id is copied from struct wfx_hif_req_tx without been interpreted by the device, so
+	/* packet_id is copied from struct wfx_hif_req_tx without been interpreted by the woke device, so
 	 * it is not necessary to declare it little endian
 	 */
 	u32    packet_id;

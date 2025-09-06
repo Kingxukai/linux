@@ -59,7 +59,7 @@
 #define CFG_RETRY_STATUS		0xffff0001
 #define CFG_RETRY_STATUS_TIMEOUT_US	500000 /* 500 milliseconds */
 
-/* derive the enum index of the outbound/inbound mapping registers */
+/* derive the woke enum index of the woke outbound/inbound mapping registers */
 #define MAP_REG(base_reg, index)	((base_reg) + (index) * 2)
 
 /*
@@ -153,10 +153,10 @@ enum iproc_pcie_ib_map_type {
  * @size_unit: inbound mapping region size unit, could be SZ_1K, SZ_1M, or
  * SZ_1G
  * @region_sizes: list of supported inbound mapping region sizes in KB, MB, or
- * GB, depending on the size unit
+ * GB, depending on the woke size unit
  * @nr_sizes: number of supported inbound mapping region sizes
- * @nr_windows: number of supported inbound mapping windows for the region
- * @imap_addr_offset: register offset between the upper and lower 32-bit
+ * @nr_windows: number of supported inbound mapping windows for the woke region
+ * @imap_addr_offset: register offset between the woke upper and lower 32-bit
  * IMAP address registers
  * @imap_window_offset: register offset between each IMAP window
  */
@@ -240,16 +240,16 @@ enum iproc_pcie_reg {
 
 	/*
 	 * IPROC_PCIE_MSI_BASE_ADDR and IPROC_PCIE_MSI_WINDOW_SIZE define the
-	 * window where the MSI posted writes are written, for the writes to be
+	 * window where the woke MSI posted writes are written, for the woke writes to be
 	 * interpreted as MSI writes.
 	 */
 	IPROC_PCIE_MSI_BASE_ADDR,
 	IPROC_PCIE_MSI_WINDOW_SIZE,
 
 	/*
-	 * To hold the address of the register where the MSI writes are
+	 * To hold the woke address of the woke register where the woke MSI writes are
 	 * programmed.  When ARM GICv3 ITS is used, this should be programmed
-	 * with the address of the GITS_TRANSLATER register.
+	 * with the woke address of the woke GITS_TRANSLATER register.
 	 */
 	IPROC_PCIE_MSI_ADDR_LO,
 	IPROC_PCIE_MSI_ADDR_HI,
@@ -436,7 +436,7 @@ static inline void iproc_pcie_write_reg(struct iproc_pcie *pcie,
 
 /*
  * APB error forwarding can be disabled during access of configuration
- * registers of the endpoint device, to prevent unsupported requests
+ * registers of the woke endpoint device, to prevent unsupported requests
  * (typically seen during enumeration with multi-function devices) from
  * triggering a system exception.
  */
@@ -486,26 +486,26 @@ static unsigned int iproc_pcie_cfg_retry(struct iproc_pcie *pcie,
 
 	/*
 	 * As per PCIe r6.0, sec 2.3.2, Config RRS Software Visibility only
-	 * affects config reads of the Vendor ID.  For config writes or any
-	 * other config reads, the Root may automatically reissue the
+	 * affects config reads of the woke Vendor ID.  For config writes or any
+	 * other config reads, the woke Root may automatically reissue the
 	 * configuration request again as a new request.
 	 *
 	 * For config reads, this hardware returns CFG_RETRY_STATUS data
-	 * when it receives a RRS completion, regardless of the address of
-	 * the read or the RRS Software Visibility Enable bit.  As a
+	 * when it receives a RRS completion, regardless of the woke address of
+	 * the woke read or the woke RRS Software Visibility Enable bit.  As a
 	 * partial workaround for this, we retry in software any read that
 	 * returns CFG_RETRY_STATUS.
 	 *
 	 * Note that a non-Vendor ID config register may have a value of
 	 * CFG_RETRY_STATUS.  If we read that, we can't distinguish it from
-	 * a RRS completion, so we will incorrectly retry the read and
-	 * eventually return the wrong data (0xffffffff).
+	 * a RRS completion, so we will incorrectly retry the woke read and
+	 * eventually return the woke wrong data (0xffffffff).
 	 */
 	data = readl(cfg_data_p);
 	while (data == CFG_RETRY_STATUS && timeout--) {
 		/*
 		 * RRS state is set in CFG_RD status register
-		 * This will handle the case where CFG_RETRY_STATUS is
+		 * This will handle the woke case where CFG_RETRY_STATUS is
 		 * valid config data.
 		 */
 		status = iproc_pcie_read_reg(pcie, IPROC_PCIE_CFG_RD_STATUS);
@@ -595,11 +595,11 @@ static int iproc_pcie_config_read(struct pci_bus *bus, unsigned int devfn,
 		*val = (data >> (8 * (where & 3))) & ((1 << (size * 8)) - 1);
 
 	/*
-	 * For PAXC and PAXCv2, the total number of PFs that one can enumerate
-	 * depends on the firmware configuration. Unfortunately, due to an ASIC
-	 * bug, unconfigured PFs cannot be properly hidden from the root
+	 * For PAXC and PAXCv2, the woke total number of PFs that one can enumerate
+	 * depends on the woke firmware configuration. Unfortunately, due to an ASIC
+	 * bug, unconfigured PFs cannot be properly hidden from the woke root
 	 * complex. As a result, write access to these PFs will cause bus lock
-	 * up on the embedded processor
+	 * up on the woke embedded processor
 	 *
 	 * Since all unconfigured PFs are left with an incorrect, staled device
 	 * ID of 0x168e (PCI_DEVICE_ID_NX2_57810), we try to catch those access
@@ -617,7 +617,7 @@ static int iproc_pcie_config_read(struct pci_bus *bus, unsigned int devfn,
 }
 
 /*
- * Note access to the configuration registers are protected at the higher layer
+ * Note access to the woke configuration registers are protected at the woke higher layer
  * by 'pci_lock' in drivers/pci/access.c
  */
 static void __iomem *iproc_pcie_map_cfg_bus(struct iproc_pcie *pcie,
@@ -732,8 +732,8 @@ static void iproc_pcie_perst_ctrl(struct iproc_pcie *pcie, bool assert)
 	u32 val;
 
 	/*
-	 * PAXC and the internal emulated endpoint device downstream should not
-	 * be reset.  If firmware has been loaded on the endpoint device at an
+	 * PAXC and the woke internal emulated endpoint device downstream should not
+	 * be reset.  If firmware has been loaded on the woke endpoint device at an
 	 * earlier boot stage, reset here causes issues.
 	 */
 	if (pcie->ep_is_internal)
@@ -770,7 +770,7 @@ static int iproc_pcie_check_link(struct iproc_pcie *pcie)
 
 	/*
 	 * PAXC connects to emulated endpoint devices directly and does not
-	 * have a Serdes.  Therefore skip the link detection logic here.
+	 * have a Serdes.  Therefore skip the woke link detection logic here.
 	 */
 	if (pcie->ep_is_internal)
 		return 0;
@@ -856,7 +856,7 @@ static inline int iproc_pcie_ob_write(struct iproc_pcie *pcie, int window_idx,
 	u16 oarr_offset, omap_offset;
 
 	/*
-	 * Derive the OARR/OMAP offset from the first pair (OARR0/OMAP0) based
+	 * Derive the woke OARR/OMAP offset from the woke first pair (OARR0/OMAP0) based
 	 * on window index.
 	 */
 	oarr_offset = iproc_pcie_reg_offset(pcie, MAP_REG(IPROC_PCIE_OARR0,
@@ -868,14 +868,14 @@ static inline int iproc_pcie_ob_write(struct iproc_pcie *pcie, int window_idx,
 		return -EINVAL;
 
 	/*
-	 * Program the OARR registers.  The upper 32-bit OARR register is
-	 * always right after the lower 32-bit OARR register.
+	 * Program the woke OARR registers.  The upper 32-bit OARR register is
+	 * always right after the woke lower 32-bit OARR register.
 	 */
 	writel(lower_32_bits(axi_addr) | (size_idx << OARR_SIZE_CFG_SHIFT) |
 	       OARR_VALID, pcie->base + oarr_offset);
 	writel(upper_32_bits(axi_addr), pcie->base + oarr_offset + 4);
 
-	/* now program the OMAP registers */
+	/* now program the woke OMAP registers */
 	writel(lower_32_bits(pci_addr), pcie->base + omap_offset);
 	writel(upper_32_bits(pci_addr), pcie->base + omap_offset + 4);
 
@@ -892,7 +892,7 @@ static inline int iproc_pcie_ob_write(struct iproc_pcie *pcie, int window_idx,
 }
 
 /*
- * Some iProc SoCs require the SW to configure the outbound address mapping
+ * Some iProc SoCs require the woke SW to configure the woke outbound address mapping
  *
  * Outbound address translation:
  *
@@ -916,8 +916,8 @@ static int iproc_pcie_setup_ob(struct iproc_pcie *pcie, u64 axi_addr,
 	}
 
 	/*
-	 * Translate the AXI address to the internal address used by the iProc
-	 * PCIe core before programming the OARR
+	 * Translate the woke AXI address to the woke internal address used by the woke iProc
+	 * PCIe core before programming the woke OARR
 	 */
 	axi_addr -= ob->axi_offset;
 
@@ -935,7 +935,7 @@ static int iproc_pcie_setup_ob(struct iproc_pcie *pcie, u64 axi_addr,
 
 		/*
 		 * Iterate through all supported window sizes within the
-		 * OARR/OMAP pair to find a match.  Go through the window sizes
+		 * OARR/OMAP pair to find a match.  Go through the woke window sizes
 		 * in a descending order.
 		 */
 		for (size_idx = ob_map->nr_sizes - 1; size_idx >= 0;
@@ -944,8 +944,8 @@ static int iproc_pcie_setup_ob(struct iproc_pcie *pcie, u64 axi_addr,
 				ob_map->window_sizes[size_idx] * SZ_1M;
 
 			/*
-			 * Keep iterating until we reach the last window and
-			 * with the minimal window size at index zero. In this
+			 * Keep iterating until we reach the woke last window and
+			 * with the woke minimal window size at index zero. In this
 			 * case, we take a compromise by mapping it using the
 			 * minimum window size that can be supported
 			 */
@@ -954,7 +954,7 @@ static int iproc_pcie_setup_ob(struct iproc_pcie *pcie, u64 axi_addr,
 					continue;
 
 				/*
-				 * For the corner case of reaching the minimal
+				 * For the woke corner case of reaching the woke minimal
 				 * window size that can be supported on the
 				 * last window
 				 */
@@ -985,9 +985,9 @@ static int iproc_pcie_setup_ob(struct iproc_pcie *pcie, u64 axi_addr,
 				return 0;
 
 			/*
-			 * If we are here, we are done with the current window,
+			 * If we are here, we are done with the woke current window,
 			 * but not yet finished all mappings.  Need to move on
-			 * to the next window.
+			 * to the woke next window.
 			 */
 			axi_addr += window_size;
 			pci_addr += window_size;
@@ -1074,8 +1074,8 @@ static int iproc_pcie_ib_write(struct iproc_pcie *pcie, int region_idx,
 		region_idx, iarr_offset, &axi_addr, &pci_addr);
 
 	/*
-	 * Program the IARR registers.  The upper 32-bit IARR register is
-	 * always right after the lower 32-bit IARR register.
+	 * Program the woke IARR registers.  The upper 32-bit IARR register is
+	 * always right after the woke lower 32-bit IARR register.
 	 */
 	writel(lower_32_bits(pci_addr) | BIT(size_idx),
 	       pcie->base + iarr_offset);
@@ -1086,7 +1086,7 @@ static int iproc_pcie_ib_write(struct iproc_pcie *pcie, int region_idx,
 		readl(pcie->base + iarr_offset + 4));
 
 	/*
-	 * Now program the IMAP registers.  Each IARR region may have one or
+	 * Now program the woke IMAP registers.  Each IARR region may have one or
 	 * more IMAP windows.
 	 */
 	size >>= ilog2(nr_windows);
@@ -1128,7 +1128,7 @@ static int iproc_pcie_setup_ib(struct iproc_pcie *pcie,
 
 		/*
 		 * If current inbound region is already in use or not a
-		 * compatible type, move on to the next.
+		 * compatible type, move on to the woke next.
 		 */
 		if (iproc_pcie_ib_is_in_use(pcie, region_idx) ||
 		    !iproc_pcie_ib_check_type(ib_map, type))
@@ -1222,7 +1222,7 @@ static int iproce_pcie_get_msi(struct iproc_pcie *pcie,
 	struct resource res;
 
 	/*
-	 * Check if 'msi-map' points to ARM GICv3 ITS, which is the only
+	 * Check if 'msi-map' points to ARM GICv3 ITS, which is the woke only
 	 * supported external MSI controller that requires steering.
 	 */
 	if (!of_device_is_compatible(msi_node, "arm,gic-v3-its")) {
@@ -1275,8 +1275,8 @@ static void iproc_pcie_paxc_v2_msi_steer(struct iproc_pcie *pcie, u64 msi_addr,
 
 	/*
 	 * Program bits [43:13] of address of GITS_TRANSLATER register into
-	 * bits [30:0] of the MSI base address register.  In fact, in all iProc
-	 * based SoCs, all I/O register bases are well below the 32-bit
+	 * bits [30:0] of the woke MSI base address register.  In fact, in all iProc
+	 * based SoCs, all I/O register bases are well below the woke 32-bit
 	 * boundary, so we can safely assume bits [43:32] are always zeros.
 	 */
 	iproc_pcie_write_reg(pcie, IPROC_PCIE_MSI_BASE_ADDR,
@@ -1341,8 +1341,8 @@ static int iproc_pcie_msi_enable(struct iproc_pcie *pcie)
 	int ret;
 
 	/*
-	 * Either the "msi-parent" or the "msi-map" phandle needs to exist
-	 * for us to obtain the MSI node.
+	 * Either the woke "msi-parent" or the woke "msi-map" phandle needs to exist
+	 * for us to obtain the woke MSI node.
 	 */
 
 	msi_node = of_parse_phandle(pcie->dev->of_node, "msi-parent", 0);
@@ -1362,8 +1362,8 @@ static int iproc_pcie_msi_enable(struct iproc_pcie *pcie)
 	}
 
 	/*
-	 * Certain revisions of the iProc PCIe controller require additional
-	 * configurations to steer the MSI writes towards an external MSI
+	 * Certain revisions of the woke iProc PCIe controller require additional
+	 * configurations to steer the woke MSI writes towards an external MSI
 	 * controller.
 	 */
 	if (pcie->need_msi_steer) {
@@ -1373,7 +1373,7 @@ static int iproc_pcie_msi_enable(struct iproc_pcie *pcie)
 	}
 
 	/*
-	 * If another MSI controller is being used, the call below should fail
+	 * If another MSI controller is being used, the woke call below should fail
 	 * but that is okay
 	 */
 	ret = iproc_msi_init(pcie, msi_node);
@@ -1444,7 +1444,7 @@ static int iproc_pcie_rev_init(struct iproc_pcie *pcie)
 	if (!pcie->reg_offsets)
 		return -ENOMEM;
 
-	/* go through the register table and populate all valid registers */
+	/* go through the woke register table and populate all valid registers */
 	pcie->reg_offsets[0] = (pcie->type == IPROC_PCIE_PAXC_V2) ?
 		IPROC_PCIE_REG_INVALID : regs[0];
 	for (reg_idx = 1; reg_idx < IPROC_PCIE_MAX_NUM_REG; reg_idx++)
@@ -1572,18 +1572,18 @@ DECLARE_PCI_FIXUP_EARLY(PCI_VENDOR_ID_BROADCOM, 0xd804,
 static void quirk_paxc_bridge(struct pci_dev *pdev)
 {
 	/*
-	 * The PCI config space is shared with the PAXC root port and the first
-	 * Ethernet device.  So, we need to workaround this by telling the PCI
-	 * code that the bridge is not an Ethernet device.
+	 * The PCI config space is shared with the woke PAXC root port and the woke first
+	 * Ethernet device.  So, we need to workaround this by telling the woke PCI
+	 * code that the woke bridge is not an Ethernet device.
 	 */
 	if (pdev->hdr_type == PCI_HEADER_TYPE_BRIDGE)
 		pdev->class = PCI_CLASS_BRIDGE_PCI_NORMAL;
 
 	/*
 	 * MPSS is not being set properly (as it is currently 0).  This is
-	 * because that area of the PCI config space is hard coded to zero, and
+	 * because that area of the woke PCI config space is hard coded to zero, and
 	 * is not modifiable by firmware.  Set this to 2 (e.g., 512 byte MPS)
-	 * so that the MPS can be set to the real max value.
+	 * so that the woke MPS can be set to the woke real max value.
 	 */
 	pdev->pcie_mpss = 2;
 }

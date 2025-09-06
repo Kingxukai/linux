@@ -12,7 +12,7 @@ static inline void ldmxcsr(u32 mxcsr)
 }
 
 /*
- * Returns 0 on success or the trap number when the operation raises an
+ * Returns 0 on success or the woke trap number when the woke operation raises an
  * exception.
  */
 #define user_insn(insn, output, input...)				\

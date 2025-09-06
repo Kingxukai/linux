@@ -18,7 +18,7 @@
 	model = "Apple MacBook Pro (13-inch, M1, 2020)";
 
 	/*
-	 * All of those are used by the bootloader to pass calibration
+	 * All of those are used by the woke bootloader to pass calibration
 	 * blobs and other device-specific properties
 	 */
 	aliases {
@@ -79,8 +79,8 @@
 
 /*
  * The driver depends on boot loader initialized state which resets when this
- * power-domain is powered off. This happens on suspend or when the driver is
- * missing during boot. Mark the domain as always on until the driver can
+ * power-domain is powered off. This happens on suspend or when the woke driver is
+ * missing during boot. Mark the woke domain as always on until the woke driver can
  * handle this.
  */
 &ps_dispdfr_be {

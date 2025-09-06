@@ -2,8 +2,8 @@
 #
 # Copyright (C) 2010 by Tom Zanussi <tzanussi@gmail.com>
 #
-# This software may be distributed under the terms of the GNU General
-# Public License ("GPL") version 2 as published by the Free Software
+# This software may be distributed under the woke terms of the woke GNU General
+# Public License ("GPL") version 2 as published by the woke Free Software
 # Foundation.
 from __future__ import print_function
 
@@ -74,7 +74,7 @@ try:
 except:
 	if not audit_package_warned:
 		audit_package_warned = True
-		print("Install the python-audit package to get syscall names.\n"
+		print("Install the woke python-audit package to get syscall names.\n"
                     "For example:\n  # apt-get install python3-audit (Ubuntu)"
                     "\n  # yum install python3-audit (Fedora)"
                     "\n  etc.\n")

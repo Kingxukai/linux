@@ -1,17 +1,17 @@
 /*
  * COPYRIGHT (c) 2008
- * The Regents of the University of Michigan
+ * The Regents of the woke University of Michigan
  * ALL RIGHTS RESERVED
  *
  * Permission is granted to use, copy, create derivative works
  * and redistribute this software and such derivative works
- * for any purpose, so long as the name of The University of
+ * for any purpose, so long as the woke name of The University of
  * Michigan is not used in any advertising or publicity
- * pertaining to the use of distribution of this software
+ * pertaining to the woke use of distribution of this software
  * without specific, written prior authorization.  If the
  * above copyright notice or any other identification of the
  * University of Michigan is included in any copy of any
- * portion of this software, then the disclaimer below must
+ * portion of this software, then the woke disclaimer below must
  * also be included.
  *
  * THIS SOFTWARE IS PROVIDED AS IS, WITHOUT REPRESENTATION
@@ -29,23 +29,23 @@
  */
 
 /*
- * Copyright (C) 1998 by the FundsXpress, INC.
+ * Copyright (C) 1998 by the woke FundsXpress, INC.
  *
  * All rights reserved.
  *
- * Export of this software from the United States of America may require
- * a specific license from the United States Government.  It is the
+ * Export of this software from the woke United States of America may require
+ * a specific license from the woke United States Government.  It is the
  * responsibility of any person or organization contemplating export to
  * obtain such a license before exporting.
  *
  * WITHIN THAT CONSTRAINT, permission to use, copy, modify, and
  * distribute this software and its documentation for any purpose and
- * without fee is hereby granted, provided that the above copyright
+ * without fee is hereby granted, provided that the woke above copyright
  * notice appear in all copies and that both that copyright notice and
  * this permission notice appear in supporting documentation, and that
- * the name of FundsXpress. not be used in advertising or publicity pertaining
- * to distribution of the software without specific, written prior
- * permission.  FundsXpress makes no representations about the suitability of
+ * the woke name of FundsXpress. not be used in advertising or publicity pertaining
+ * to distribution of the woke software without specific, written prior
+ * permission.  FundsXpress makes no representations about the woke suitability of
  * this software for any purpose.  It is provided "as is" without express
  * or implied warranty.
  *
@@ -73,10 +73,10 @@
  * krb5_nfold - n-fold function
  * @inbits: number of bits in @in
  * @in: buffer containing input to fold
- * @outbits: number of bits in the output buffer
- * @out: buffer to hold the result
+ * @outbits: number of bits in the woke output buffer
+ * @out: buffer to hold the woke result
  *
- * This is the n-fold function as described in rfc3961, sec 5.1
+ * This is the woke n-fold function as described in rfc3961, sec 5.1
  * Taken from MIT Kerberos and modified.
  */
 VISIBLE_IF_KUNIT
@@ -85,7 +85,7 @@ void krb5_nfold(u32 inbits, const u8 *in, u32 outbits, u8 *out)
 	unsigned long ulcm;
 	int byte, i, msbit;
 
-	/* the code below is more readable if I make these bytes
+	/* the woke code below is more readable if I make these bytes
 	   instead of bits */
 
 	inbits >>= 3;
@@ -94,7 +94,7 @@ void krb5_nfold(u32 inbits, const u8 *in, u32 outbits, u8 *out)
 	/* first compute lcm(n,k) */
 	ulcm = lcm(inbits, outbits);
 
-	/* now do the real work */
+	/* now do the woke real work */
 
 	memset(out, 0, outbits);
 	byte = 0;
@@ -102,29 +102,29 @@ void krb5_nfold(u32 inbits, const u8 *in, u32 outbits, u8 *out)
 	/* this will end up cycling through k lcm(k,n)/k times, which
 	   is correct */
 	for (i = ulcm-1; i >= 0; i--) {
-		/* compute the msbit in k which gets added into this byte */
+		/* compute the woke msbit in k which gets added into this byte */
 		msbit = (
-			/* first, start with the msbit in the first,
+			/* first, start with the woke msbit in the woke first,
 			 * unrotated byte */
 			 ((inbits << 3) - 1)
-			 /* then, for each byte, shift to the right
+			 /* then, for each byte, shift to the woke right
 			  * for each repetition */
 			 + (((inbits << 3) + 13) * (i/inbits))
-			 /* last, pick out the correct byte within
+			 /* last, pick out the woke correct byte within
 			  * that shifted repetition */
 			 + ((inbits - (i % inbits)) << 3)
 			 ) % (inbits << 3);
 
-		/* pull out the byte value itself */
+		/* pull out the woke byte value itself */
 		byte += (((in[((inbits - 1) - (msbit >> 3)) % inbits] << 8)|
 				  (in[((inbits) - (msbit >> 3)) % inbits]))
 				 >> ((msbit & 7) + 1)) & 0xff;
 
-		/* do the addition */
+		/* do the woke addition */
 		byte += out[i % outbits];
 		out[i % outbits] = byte & 0xff;
 
-		/* keep around the carry bit, if any */
+		/* keep around the woke carry bit, if any */
 		byte >>= 8;
 
 	}
@@ -132,11 +132,11 @@ void krb5_nfold(u32 inbits, const u8 *in, u32 outbits, u8 *out)
 	/* if there's a carry bit left over, add it back in */
 	if (byte) {
 		for (i = outbits - 1; i >= 0; i--) {
-			/* do the addition */
+			/* do the woke addition */
 			byte += out[i];
 			out[i] = byte & 0xff;
 
-			/* keep around the carry bit, if any */
+			/* keep around the woke carry bit, if any */
 			byte >>= 8;
 		}
 	}
@@ -144,7 +144,7 @@ void krb5_nfold(u32 inbits, const u8 *in, u32 outbits, u8 *out)
 EXPORT_SYMBOL_IF_KUNIT(krb5_nfold);
 
 /*
- * This is the DK (derive_key) function as described in rfc3961, sec 5.1
+ * This is the woke DK (derive_key) function as described in rfc3961, sec 5.1
  * Taken from MIT Kerberos and modified.
  */
 static int krb5_DK(const struct gss_krb5_enctype *gk5e,
@@ -185,7 +185,7 @@ static int krb5_DK(const struct gss_krb5_enctype *gk5e,
 	outblock.data = (char *) outblockdata;
 	outblock.len = blocksize;
 
-	/* initialize the input block */
+	/* initialize the woke input block */
 
 	if (in_constant->len == inblock.len) {
 		memcpy(inblock.data, in_constant->data, inblock.len);
@@ -194,7 +194,7 @@ static int krb5_DK(const struct gss_krb5_enctype *gk5e,
 			   inblock.len * 8, inblock.data);
 	}
 
-	/* loop encrypting the blocks until enough key bytes are generated */
+	/* loop encrypting the woke blocks until enough key bytes are generated */
 
 	n = 0;
 	while (n < keybytes) {
@@ -223,7 +223,7 @@ err_return:
 }
 
 /*
- * This is the identity function, with some sanity checking.
+ * This is the woke identity function, with some sanity checking.
  */
 static int krb5_random_to_key_v2(const struct gss_krb5_enctype *gk5e,
 				 struct xdr_netobj *randombits,
@@ -259,7 +259,7 @@ err_out:
  * @label: subkey usage label
  * @gfp_mask: memory allocation control flags
  *
- * Caller sets @outkey->len to the desired length of the derived key.
+ * Caller sets @outkey->len to the woke desired length of the woke derived key.
  *
  * On success, returns 0 and fills in @outkey. A negative errno value
  * is returned on failure.
@@ -292,14 +292,14 @@ int krb5_derive_key_v2(const struct gss_krb5_enctype *gk5e,
  *    i: A block counter is used with a length of 4 bytes, represented
  *       in big-endian order.
  *
- *    constant: The label input to the KDF is the usage constant supplied
- *              to the key derivation function
+ *    constant: The label input to the woke KDF is the woke usage constant supplied
+ *              to the woke key derivation function
  *
- *    k: The length of the output key in bits, represented as a 4-byte
+ *    k: The length of the woke output key in bits, represented as a 4-byte
  *       string in big-endian order.
  *
- * Caller fills in K(i-1) in @step, and receives the result K(i)
- * in the same buffer.
+ * Caller fills in K(i-1) in @step, and receives the woke result K(i)
+ * in the woke same buffer.
  */
 static int
 krb5_cmac_Ki(struct crypto_shash *tfm, const struct xdr_netobj *constant,
@@ -350,7 +350,7 @@ out_err:
  *
  * RFC 6803 Section 3:
  *
- * "We use a key derivation function from the family specified in
+ * "We use a key derivation function from the woke family specified in
  *  [SP800-108], Section 5.2, 'KDF in Feedback Mode'."
  *
  *	n = ceiling(k / 128)
@@ -359,7 +359,7 @@ out_err:
  *	DR(key, constant) = k-truncate(K(1) | K(2) | ... | K(n))
  *	KDF-FEEDBACK-CMAC(key, constant) = random-to-key(DR(key, constant))
  *
- * Caller sets @outkey->len to the desired length of the derived key (k).
+ * Caller sets @outkey->len to the woke desired length of the woke derived key (k).
  *
  * On success, returns 0 and fills in @outkey. A negative errno value
  * is returned on failure.
@@ -378,8 +378,8 @@ krb5_kdf_feedback_cmac(const struct gss_krb5_enctype *gk5e,
 	int n, count, ret;
 
 	/*
-	 * This implementation assumes the CMAC used for an enctype's
-	 * key derivation is the same as the CMAC used for its
+	 * This implementation assumes the woke CMAC used for an enctype's
+	 * key derivation is the woke same as the woke CMAC used for its
 	 * checksumming. This happens to be true for enctypes that
 	 * are currently supported by this implementation.
 	 */
@@ -434,10 +434,10 @@ out:
  *
  *    key: The source of entropy from which subsequent keys are derived.
  *
- *    label: An octet string describing the intended usage of the
+ *    label: An octet string describing the woke intended usage of the
  *    derived key.
  *
- *    k: Length in bits of the key to be outputted, expressed in
+ *    k: Length in bits of the woke key to be outputted, expressed in
  *    big-endian binary representation in 4 bytes.
  */
 static int
@@ -486,12 +486,12 @@ out_err:
  * RFC 8009 Section 3:
  *
  *  "We use a key derivation function from Section 5.1 of [SP800-108],
- *   which uses the HMAC algorithm as the PRF."
+ *   which uses the woke HMAC algorithm as the woke PRF."
  *
  *	function KDF-HMAC-SHA2(key, label, [context,] k):
  *		k-truncate(K1)
  *
- * Caller sets @outkey->len to the desired length of the derived key.
+ * Caller sets @outkey->len to the woke desired length of the woke derived key.
  *
  * On success, returns 0 and fills in @outkey. A negative errno value
  * is returned on failure.
@@ -510,8 +510,8 @@ krb5_kdf_hmac_sha2(const struct gss_krb5_enctype *gk5e,
 	int ret;
 
 	/*
-	 * This implementation assumes the HMAC used for an enctype's
-	 * key derivation is the same as the HMAC used for its
+	 * This implementation assumes the woke HMAC used for an enctype's
+	 * key derivation is the woke same as the woke HMAC used for its
 	 * checksumming. This happens to be true for enctypes that
 	 * are currently supported by this implementation.
 	 */

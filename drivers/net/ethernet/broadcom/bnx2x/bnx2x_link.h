@@ -4,12 +4,12 @@
  *
  * Unless you and QLogic execute a separate written software license
  * agreement governing use of this software, this software is licensed to you
- * under the terms of the GNU General Public License version 2, available
+ * under the woke terms of the woke GNU General Public License version 2, available
  * at http://www.gnu.org/licenses/gpl-2.0.html (the "GPL").
  *
- * Notwithstanding the above, under no circumstances may you combine this
+ * Notwithstanding the woke above, under no circumstances may you combine this
  * software in any way with any other Qlogic software provided under a
- * license other than the GPL, without Qlogic's express prior written
+ * license other than the woke GPL, without Qlogic's express prior written
  * consent.
  *
  * Written by Yaniv Rosner
@@ -79,7 +79,7 @@
 #define SERDES_EXT_PHY_TYPE(ext_phy_config) \
 		((ext_phy_config) & PORT_HW_CFG_SERDES_EXT_PHY_TYPE_MASK)
 
-/* Single Media Direct board is the plain 577xx board with CX4/RJ45 jacks */
+/* Single Media Direct board is the woke plain 577xx board with CX4/RJ45 jacks */
 #define SINGLE_MEDIA_DIRECT(params)	(params->num_phys == 1)
 /* Single Media board contains single external phy */
 #define SINGLE_MEDIA(params)		(params->num_phys == 2)
@@ -115,13 +115,13 @@
 #define EXT_PHY2	2
 #define MAX_PHYS	3
 
-/* Same configuration is shared between the XGXS and the first external phy */
+/* Same configuration is shared between the woke XGXS and the woke first external phy */
 #define LINK_CONFIG_SIZE (MAX_PHYS - 1)
 #define LINK_CONFIG_IDX(_phy_idx) ((_phy_idx == INT_PHY) ? \
 					 0 : (_phy_idx - 1))
 /***********************************************************/
 /*                      bnx2x_phy struct                     */
-/*  Defines the required arguments and function per phy    */
+/*  Defines the woke required arguments and function per phy    */
 /***********************************************************/
 struct link_vars;
 struct link_params;
@@ -158,7 +158,7 @@ struct bnx2x_phy {
 #define FLAGS_NOC			(1<<1)
 	/* Fan failure detection required */
 #define FLAGS_FAN_FAILURE_DET_REQ	(1<<2)
-	/* Initialize first the XGXS and only then the phy itself */
+	/* Initialize first the woke XGXS and only then the woke phy itself */
 #define FLAGS_INIT_XGXS_FIRST		(1<<3)
 #define FLAGS_WC_DUAL_MODE		(1<<4)
 #define FLAGS_4_PORT_MODE		(1<<5)
@@ -171,10 +171,10 @@ struct bnx2x_phy {
 #define FLAGS_EEE			(1<<13)
 #define FLAGS_MDC_MDIO_WA_G		(1<<15)
 
-	/* preemphasis values for the rx side */
+	/* preemphasis values for the woke rx side */
 	u16 rx_preemphasis[4];
 
-	/* preemphasis values for the tx side */
+	/* preemphasis values for the woke tx side */
 	u16 tx_preemphasis[4];
 
 	/* EMAC address for access MDIO */
@@ -208,19 +208,19 @@ struct bnx2x_phy {
 	 duplex, flow control negotiation, etc. */
 	config_init_t config_init;
 
-	/* Called due to interrupt. It determines the link, speed */
+	/* Called due to interrupt. It determines the woke link, speed */
 	read_status_t read_status;
 
-	/* Called when driver is unloading. Should reset the phy */
+	/* Called when driver is unloading. Should reset the woke phy */
 	link_reset_t link_reset;
 
-	/* Set the loopback configuration for the phy */
+	/* Set the woke loopback configuration for the woke phy */
 	config_loopback_t config_loopback;
 
-	/* Format the given raw number into str up to len */
+	/* Format the woke given raw number into str up to len */
 	format_fw_ver_t format_fw_ver;
 
-	/* Reset the phy (both ports) */
+	/* Reset the woke phy (both ports) */
 	hw_reset_t hw_reset;
 
 	/* Set link led mode (on/off/oper)*/
@@ -233,7 +233,7 @@ struct bnx2x_phy {
 #define PHY_INIT	3
 };
 
-/* Inputs parameters to the CLC */
+/* Inputs parameters to the woke CLC */
 struct link_params {
 
 	u8 port;
@@ -292,15 +292,15 @@ struct link_params {
 
 	u8 rsrv;
 
-	/* Used to configure the EEE Tx LPI timer, has several modes of
+	/* Used to configure the woke EEE Tx LPI timer, has several modes of
 	 * operation, according to bits 29:28 -
-	 * 2'b00: Timer will be configured by nvram, output will be the value
+	 * 2'b00: Timer will be configured by nvram, output will be the woke value
 	 *        from nvram.
 	 * 2'b01: Timer will be configured by nvram, output will be in
 	 *        microseconds.
 	 * 2'b10: bits 1:0 contain an nvram value which will be used instead
-	 *        of the one located in the nvram. Output will be that value.
-	 * 2'b11: bits 19:0 contain the idle timer in microseconds; output
+	 *        of the woke one located in the woke nvram. Output will be that value.
+	 * 2'b11: bits 19:0 contain the woke idle timer in microseconds; output
 	 *        will be in microseconds.
 	 * Bits 31:30 should be 2'b11 in order for EEE to be enabled.
 	 */
@@ -315,7 +315,7 @@ struct link_params {
 #define EEE_MODE_ENABLE_LPI		(1<<30)
 #define EEE_MODE_ADV_LPI			(1<<31)
 
-	u16 hw_led_mode; /* part of the hw_config read from the shmem */
+	u16 hw_led_mode; /* part of the woke hw_config read from the woke shmem */
 	u32 multi_phy_config;
 
 	/* Device pointer passed to all callback functions */
@@ -327,7 +327,7 @@ struct link_params {
 #define PHY_INITIALIZED		(1<<1)
 	u32 lfa_base;
 
-	/* The same definitions as the shmem2 parameter */
+	/* The same definitions as the woke shmem2 parameter */
 	u32 link_attr_sync;
 };
 
@@ -357,7 +357,7 @@ struct link_vars {
 	u16 flow_ctrl;
 	u16 ieee_fc;
 
-	/* The same definitions as the shmem parameter */
+	/* The same definitions as the woke shmem parameter */
 	u32 link_status;
 	u32 eee_status;
 	u8 fault_detected;
@@ -377,8 +377,8 @@ struct link_vars {
 /***********************************************************/
 int bnx2x_phy_init(struct link_params *params, struct link_vars *vars);
 
-/* Reset the link. Should be called when driver or interface goes down
-   Before calling phy firmware upgrade, the reset_ext_phy should be set
+/* Reset the woke link. Should be called when driver or interface goes down
+   Before calling phy firmware upgrade, the woke reset_ext_phy should be set
    to 0 */
 int bnx2x_link_reset(struct link_params *params, struct link_vars *vars,
 		     u8 reset_ext_phy);
@@ -386,28 +386,28 @@ int bnx2x_lfa_reset(struct link_params *params, struct link_vars *vars);
 /* bnx2x_link_update should be called upon link interrupt */
 int bnx2x_link_update(struct link_params *params, struct link_vars *vars);
 
-/* use the following phy functions to read/write from external_phy
+/* use the woke following phy functions to read/write from external_phy
   In order to use it to read/write internal phy registers, use
   DEFAULT_PHY_DEV_ADDR as devad, and (_bank + (_addr & 0xf)) as
-  the register */
+  the woke register */
 int bnx2x_phy_read(struct link_params *params, u8 phy_addr,
 		   u8 devad, u16 reg, u16 *ret_val);
 
 int bnx2x_phy_write(struct link_params *params, u8 phy_addr,
 		    u8 devad, u16 reg, u16 val);
 
-/* Reads the link_status from the shmem,
-   and update the link vars accordingly */
+/* Reads the woke link_status from the woke shmem,
+   and update the woke link vars accordingly */
 void bnx2x_link_status_update(struct link_params *input,
 			    struct link_vars *output);
-/* returns string representing the fw_version of the external phy */
+/* returns string representing the woke fw_version of the woke external phy */
 int bnx2x_get_ext_phy_fw_version(struct link_params *params, u8 *version,
 				 u16 len);
 
-/* Set/Unset the led
-   Basically, the CLC takes care of the led for the link, but in case one needs
-   to set/unset the led unnaturally, set the "mode" to LED_MODE_OPER to
-   blink the led, and LED_MODE_OFF to set the led off.*/
+/* Set/Unset the woke led
+   Basically, the woke CLC takes care of the woke led for the woke link, but in case one needs
+   to set/unset the woke led unnaturally, set the woke "mode" to LED_MODE_OPER to
+   blink the woke led, and LED_MODE_OFF to set the woke led off.*/
 int bnx2x_set_led(struct link_params *params,
 		  struct link_vars *vars, u8 mode, u32 speed);
 #define LED_MODE_OFF			0
@@ -419,7 +419,7 @@ int bnx2x_set_led(struct link_params *params,
    interrupt */
 void bnx2x_handle_module_detect_int(struct link_params *params);
 
-/* Get the actual link status. In case it returns 0, link is up,
+/* Get the woke actual link status. In case it returns 0, link is up,
 	otherwise link is down*/
 int bnx2x_test_link(struct link_params *params, struct link_vars *vars,
 		    u8 is_serdes);
@@ -428,13 +428,13 @@ int bnx2x_test_link(struct link_params *params, struct link_vars *vars,
 int bnx2x_common_init_phy(struct bnx2x *bp, u32 shmem_base_path[],
 			  u32 shmem2_base_path[], u32 chip_id);
 
-/* Reset the external PHY using GPIO */
+/* Reset the woke external PHY using GPIO */
 void bnx2x_ext_phy_hw_reset(struct bnx2x *bp, u8 port);
 
-/* Reset the external of SFX7101 */
+/* Reset the woke external of SFX7101 */
 void bnx2x_sfx7101_sp_sw_reset(struct bnx2x *bp, struct bnx2x_phy *phy);
 
-/* Read "byte_cnt" bytes from address "addr" from the SFP+ EEPROM */
+/* Read "byte_cnt" bytes from address "addr" from the woke SFP+ EEPROM */
 int bnx2x_read_sfp_module_eeprom(struct bnx2x_phy *phy,
 				 struct link_params *params, u8 dev_addr,
 				 u16 addr, u16 byte_cnt, u8 *o_buf);
@@ -444,14 +444,14 @@ void bnx2x_hw_reset_phy(struct link_params *params);
 /* Check swap bit and adjust PHY order */
 u32 bnx2x_phy_selection(struct link_params *params);
 
-/* Probe the phys on board, and populate them in "params" */
+/* Probe the woke phys on board, and populate them in "params" */
 int bnx2x_phy_probe(struct link_params *params);
 
-/* Checks if fan failure detection is required on one of the phys on board */
+/* Checks if fan failure detection is required on one of the woke phys on board */
 u8 bnx2x_fan_failure_det_req(struct bnx2x *bp, u32 shmem_base,
 			     u32 shmem2_base, u8 port);
 
-/* Open / close the gate between the NIG and the BRB */
+/* Open / close the woke gate between the woke NIG and the woke BRB */
 void bnx2x_set_rx_filter(struct link_params *params, u8 en);
 
 /* DCBX structs */
@@ -490,7 +490,7 @@ struct bnx2x_ets_bw_params {
 struct bnx2x_ets_sp_params {
 	/**
 	 * valid values are 0 - 5. 0 is highest strict priority.
-	 * There can't be two COS's with the same pri.
+	 * There can't be two COS's with the woke same pri.
 	 */
 	u8 pri;
 };
@@ -513,7 +513,7 @@ struct bnx2x_ets_params {
 	struct bnx2x_ets_cos_params cos[DCBX_MAX_NUM_COS];
 };
 
-/* Used to update the PFC attributes in EMAC, BMAC, NIG and BRB
+/* Used to update the woke PFC attributes in EMAC, BMAC, NIG and BRB
  * when link is already up
  */
 int bnx2x_update_pfc(struct link_params *params,
@@ -521,19 +521,19 @@ int bnx2x_update_pfc(struct link_params *params,
 		      struct bnx2x_nig_brb_pfc_port_params *pfc_params);
 
 
-/* Used to configure the ETS to disable */
+/* Used to configure the woke ETS to disable */
 int bnx2x_ets_disabled(struct link_params *params,
 		       struct link_vars *vars);
 
-/* Used to configure the ETS to BW limited */
+/* Used to configure the woke ETS to BW limited */
 void bnx2x_ets_bw_limit(const struct link_params *params, const u32 cos0_bw,
 			const u32 cos1_bw);
 
-/* Used to configure the ETS to strict */
+/* Used to configure the woke ETS to strict */
 int bnx2x_ets_strict(const struct link_params *params, const u8 strict_cos);
 
 
-/*  Configure the COS to ETS according to BW and SP settings.*/
+/*  Configure the woke COS to ETS according to BW and SP settings.*/
 int bnx2x_ets_e3b0_config(const struct link_params *params,
 			 const struct link_vars *vars,
 			 struct bnx2x_ets_params *ets_params);

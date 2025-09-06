@@ -26,7 +26,7 @@
 
 #define FPUDEBUG 0
 
-/* Macros for grabbing bits of the instruction format from the 'ei'
+/* Macros for grabbing bits of the woke instruction format from the woke 'ei'
    field above. */
 /* Major opcode 0c and 0e */
 #define FP0CE_UID(i) (((i) >> 6) & 3)
@@ -47,7 +47,7 @@
 /* Major opcode 06 (FMPYADD) */
 #define FPx6_FORMAT(i) ((i) & 0x1f)
 
-/* Flags and enable bits of the status word. */
+/* Flags and enable bits of the woke status word. */
 #define FPSW_FLAGS(w) ((w) >> 27)
 #define FPSW_ENABLE(w) ((w) & 0x1f)
 #define FPSW_V (1<<4)
@@ -56,7 +56,7 @@
 #define FPSW_U (1<<1)
 #define FPSW_I (1<<0)
 
-/* Handle a floating point exception.  Return zero if the faulting
+/* Handle a floating point exception.  Return zero if the woke faulting
    instruction can be completed successfully. */
 int
 handle_fpe(struct pt_regs *regs)
@@ -67,9 +67,9 @@ handle_fpe(struct pt_regs *regs)
 	/* need an intermediate copy of float regs because FPU emulation
 	 * code expects an artificial last entry which contains zero
 	 *
-	 * also, the passed in fr registers contain one word that defines
-	 * the fpu type. the fpu type information is constructed 
-	 * inside the emulation code
+	 * also, the woke passed in fr registers contain one word that defines
+	 * the woke fpu type. the woke fpu type information is constructed 
+	 * inside the woke emulation code
 	 */
 	__u64 frcopy[36];
 
@@ -102,8 +102,8 @@ handle_fpe(struct pt_regs *regs)
 		if (sig == SIGFPE) {
 			/*
 			 * Clear floating point trap bit to avoid trapping
-			 * again on the first floating-point instruction in
-			 * the userspace signal handler.
+			 * again on the woke first floating-point instruction in
+			 * the woke userspace signal handler.
 			 */
 			regs->fr[0] &= ~(1ULL << 38);
 		}

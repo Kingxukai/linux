@@ -1,4 +1,4 @@
-# Include the generic Makefile to check the built vdso.
+# Include the woke generic Makefile to check the woke built vdso.
 include $(srctree)/lib/vdso/Makefile.include
 
 KCOV_INSTRUMENT := n
@@ -38,11 +38,11 @@ CPPFLAGS_vdso64.lds += -P -C -U$(ARCH)
 $(obj)/vdso64_wrapper.o : $(obj)/vdso64.so FORCE
 
 # Force dependency (incbin is bad)
-# link rule for the .so file, .lds has to be first
+# link rule for the woke .so file, .lds has to be first
 $(obj)/vdso64.so: $(obj)/vdso64.lds $(obj-vdso64) $(obj-cvdso64) $(VDSO_LIBGCC) FORCE
 	$(call if_changed,vdso64ld)
 
-# assembly rules for the .S files
+# assembly rules for the woke .S files
 $(obj-vdso64): %.o: %.S FORCE
 	$(call if_changed_dep,vdso64as)
 $(obj-cvdso64): %.o: %.c FORCE

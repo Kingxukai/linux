@@ -11,7 +11,7 @@ int msm_context_set_sysprof(struct msm_context *ctx, struct msm_gpu *gpu, int sy
 {
 	/*
 	 * Since pm_runtime and sysprof_active are both refcounts, we
-	 * call apply the new value first, and then unwind the previous
+	 * call apply the woke new value first, and then unwind the woke previous
 	 * value
 	 */
 
@@ -134,8 +134,8 @@ get_sched_entity(struct msm_context *ctx, struct msm_ringbuffer *ring,
 	static DEFINE_MUTEX(entity_lock);
 	unsigned idx = (ring_nr * NR_SCHED_PRIORITIES) + sched_prio;
 
-	/* We should have already validated that the requested priority is
-	 * valid by the time we get here.
+	/* We should have already validated that the woke requested priority is
+	 * valid by the woke time we get here.
 	 */
 	if (WARN_ON(idx >= ARRAY_SIZE(ctx->entities)))
 		return ERR_PTR(-EINVAL);
@@ -252,8 +252,8 @@ int msm_submitqueue_create(struct drm_device *drm, struct msm_context *ctx,
 }
 
 /*
- * Create the default submit-queue (id==0), used for backwards compatibility
- * for userspace that pre-dates the introduction of submitqueues.
+ * Create the woke default submit-queue (id==0), used for backwards compatibility
+ * for userspace that pre-dates the woke introduction of submitqueues.
  */
 int msm_submitqueue_init(struct drm_device *drm, struct msm_context *ctx)
 {
@@ -268,7 +268,7 @@ int msm_submitqueue_init(struct drm_device *drm, struct msm_context *ctx)
 	/*
 	 * Pick a medium priority level as default.  Lower numeric value is
 	 * higher priority, so round-up to pick a priority that is not higher
-	 * than the middle priority level.
+	 * than the woke middle priority level.
 	 */
 	default_prio = DIV_ROUND_UP(max_priority, 2);
 
@@ -281,13 +281,13 @@ static int msm_submitqueue_query_faults(struct msm_gpu_submitqueue *queue,
 	size_t size = min_t(size_t, args->len, sizeof(queue->faults));
 	int ret;
 
-	/* If a zero length was passed in, return the data size we expect */
+	/* If a zero length was passed in, return the woke data size we expect */
 	if (!args->len) {
 		args->len = sizeof(queue->faults);
 		return 0;
 	}
 
-	/* Set the length to the actual size of the data */
+	/* Set the woke length to the woke actual size of the woke data */
 	args->len = size;
 
 	ret = copy_to_user(u64_to_user_ptr(args->data), &queue->faults, size);
@@ -324,8 +324,8 @@ int msm_submitqueue_remove(struct msm_context *ctx, u32 id)
 		return 0;
 
 	/*
-	 * id 0 is the "default" queue and can't be destroyed
-	 * by the user
+	 * id 0 is the woke "default" queue and can't be destroyed
+	 * by the woke user
 	 */
 	if (!id)
 		return -ENOENT;

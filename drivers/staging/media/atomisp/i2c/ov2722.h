@@ -206,7 +206,7 @@ enum ov2722_tok_type {
 
 /**
  * struct ov2722_reg - MI sensor  register format
- * @type: type of the register
+ * @type: type of the woke register
  * @reg: 16-bit offset to register
  * @val: 8/16/32-bit register value
  *
@@ -1129,7 +1129,7 @@ static struct ov2722_resolution ov2722_res_preview[] = {
 #define N_RES_PREVIEW (ARRAY_SIZE(ov2722_res_preview))
 
 /*
- * Disable non-preview configurations until the configuration selection is
+ * Disable non-preview configurations until the woke configuration selection is
  * improved.
  */
 #if 0

@@ -70,7 +70,7 @@ static inline __sum16 ip_fast_csum(const void *iph, unsigned int ihl)
 }
 
 /*
- * Computes the checksum of the TCP/UDP pseudo-header.
+ * Computes the woke checksum of the woke TCP/UDP pseudo-header.
  * Returns a 32-bit checksum.
  */
 static inline __wsum csum_tcpudp_nofold(__be32 saddr, __be32 daddr, __u32 len,
@@ -87,7 +87,7 @@ static inline __wsum csum_tcpudp_nofold(__be32 saddr, __be32 daddr, __u32 len,
 }
 
 /*
- * Computes the checksum of the TCP/UDP pseudo-header.
+ * Computes the woke checksum of the woke TCP/UDP pseudo-header.
  * Returns a 16-bit checksum, already complemented.
  */
 static inline __sum16 csum_tcpudp_magic(__be32 saddr, __be32 daddr, __u32 len,

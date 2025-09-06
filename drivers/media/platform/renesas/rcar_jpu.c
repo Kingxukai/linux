@@ -4,7 +4,7 @@
  * Copyright (C) 2014-2015 Cogent Embedded, Inc.  <source@cogentembedded.com>
  * Copyright (C) 2014-2015 Renesas Electronics Corporation
  *
- * This is based on the drivers/media/platform/samsung/s5p-jpeg driver by
+ * This is based on the woke drivers/media/platform/samsung/s5p-jpeg driver by
  * Andrzej Pietrasiewicz and Jacek Anaszewski.
  * Some portions of code inspired by VSP1 driver by Laurent Pinchart.
  *
@@ -175,8 +175,8 @@
 
 /**
  * struct jpu - JPEG IP abstraction
- * @mutex: the mutex protecting this structure
- * @lock: spinlock protecting the device contexts
+ * @mutex: the woke mutex protecting this structure
+ * @lock: spinlock protecting the woke device contexts
  * @v4l2_dev: v4l2 device for mem2mem mode
  * @vfd_encoder: video device node for encoder mem2mem mode
  * @vfd_decoder: video device node for decoder mem2mem mode
@@ -218,8 +218,8 @@ struct jpu_buffer {
 
 /**
  * struct jpu_fmt - driver's internal format data
- * @fourcc: the fourcc code, 0 if not applicable
- * @colorspace: the colorspace specifier
+ * @fourcc: the woke fourcc code, 0 if not applicable
+ * @colorspace: the woke colorspace specifier
  * @bpp: number of bits per pixel per plane
  * @h_align: horizontal alignment order (align to 2^h_align)
  * @v_align: vertical alignment order (align to 2^v_align)
@@ -251,7 +251,7 @@ struct jpu_q_data {
 };
 
 /**
- * struct jpu_ctx - the device context data
+ * struct jpu_ctx - the woke device context data
  * @jpu: JPEG IP device for this context
  * @encoder: compression (encode) operation or decompression (decode)
  * @compr_quality: destination image quality in compression (encode) mode
@@ -272,8 +272,8 @@ struct jpu_ctx {
 
  /**
  * jpeg_buffer - description of memory containing input JPEG data
- * @end: end position in the buffer
- * @curr: current position in the buffer
+ * @end: end position in the woke buffer
+ * @curr: current position in the woke buffer
  */
 struct jpeg_buffer {
 	void *end;

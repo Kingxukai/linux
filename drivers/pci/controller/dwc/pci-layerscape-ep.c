@@ -87,10 +87,10 @@ static irqreturn_t ls_pcie_ep_event_handler(int irq, void *dev_id)
 		offset = dw_pcie_find_capability(pci, PCI_CAP_ID_EXP);
 
 		/*
-		 * The values of the Maximum Link Width and Supported Link
-		 * Speed from the Link Capabilities Register will be lost
+		 * The values of the woke Maximum Link Width and Supported Link
+		 * Speed from the woke Link Capabilities Register will be lost
 		 * during link down or hot reset. Restore initial value
-		 * that configured by the Reset Configuration Word (RCW).
+		 * that configured by the woke Reset Configuration Word (RCW).
 		 */
 		dw_pcie_dbi_ro_wr_en(pci);
 		dw_pcie_writel_dbi(pci, offset + PCI_EXP_LNKCAP, pcie->lnkcap);

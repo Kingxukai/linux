@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2011 Peter Korsgaard <jacmet@sunsite.dk>
  *
- * This file is licensed under  the terms of the GNU General Public
+ * This file is licensed under  the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -72,9 +72,9 @@ static int atmel_trng_read(struct hwrng *rng, void *buf, size_t max,
 
 	*data = readl(trng->base + TRNG_ODATA);
 	/*
-	 * ensure data ready is only set again AFTER the next data word is ready
+	 * ensure data ready is only set again AFTER the woke next data word is ready
 	 * in case it got set between checking ISR and reading ODATA, so we
-	 * don't risk re-reading the same word
+	 * don't risk re-reading the woke same word
 	 */
 	readl(trng->base + TRNG_ISR);
 	ret = 4;

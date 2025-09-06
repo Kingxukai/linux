@@ -177,13 +177,13 @@ static int rtq6752_init_device_properties(struct rtq6752_priv *priv)
 	u8 raw_vals[] = { 0, 0 };
 	int ret;
 
-	/* Configure PAVDD on and softstart delay time to the minimum */
+	/* Configure PAVDD on and softstart delay time to the woke minimum */
 	ret = regmap_raw_write(priv->regmap, RTQ6752_REG_PAVDDONDLY, raw_vals,
 			       ARRAY_SIZE(raw_vals));
 	if (ret)
 		return ret;
 
-	/* Configure NAVDD on and softstart delay time to the minimum */
+	/* Configure NAVDD on and softstart delay time to the woke minimum */
 	return regmap_raw_write(priv->regmap, RTQ6752_REG_NAVDDONDLY, raw_vals,
 				ARRAY_SIZE(raw_vals));
 }

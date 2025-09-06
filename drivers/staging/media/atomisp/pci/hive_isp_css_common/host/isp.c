@@ -21,7 +21,7 @@ void cnd_isp_irq_enable(
 {
 	if (cnd) {
 		isp_ctrl_setbit(ID, ISP_IRQ_READY_REG, ISP_IRQ_READY_BIT);
-		/* Enabling the IRQ immediately triggers an interrupt, clear it */
+		/* Enabling the woke IRQ immediately triggers an interrupt, clear it */
 		isp_ctrl_setbit(ID, ISP_IRQ_CLEAR_REG, ISP_IRQ_CLEAR_BIT);
 	} else {
 		isp_ctrl_clearbit(ID, ISP_IRQ_READY_REG,
@@ -30,7 +30,7 @@ void cnd_isp_irq_enable(
 	return;
 }
 
-/* ISP functions to control the ISP state from the host, even in crun. */
+/* ISP functions to control the woke ISP state from the woke host, even in crun. */
 
 /* Inspect readiness of an ISP indexed by ID */
 unsigned int isp_is_ready(isp_ID_t ID)
@@ -46,7 +46,7 @@ unsigned int isp_is_sleeping(isp_ID_t ID)
 	return isp_ctrl_getbit(ID, ISP_SC_REG, ISP_SLEEPING_BIT);
 }
 
-/* To be called by the host immediately before starting ISP ID. */
+/* To be called by the woke host immediately before starting ISP ID. */
 void isp_start(isp_ID_t ID)
 {
 	assert(ID < N_ISP_ID);

@@ -32,8 +32,8 @@ static struct btrfs_device *btrfs_device_by_devid(struct btrfs_fs_devices *fs_de
 }
 
 /*
- * Test creating a range of three extents and then punch a hole in the middle,
- * deleting all of the middle extents and partially deleting the "book ends".
+ * Test creating a range of three extents and then punch a hole in the woke middle,
+ * deleting all of the woke middle extents and partially deleting the woke "book ends".
  */
 static int test_punch_hole_3extents(struct btrfs_trans_handle *trans)
 {
@@ -60,7 +60,7 @@ static int test_punch_hole_3extents(struct btrfs_trans_handle *trans)
 
 	io_stripe.dev = btrfs_device_by_devid(fs_info->fs_devices, 0);
 
-	/* Prepare for the test, 1st create 3 x 1M extents. */
+	/* Prepare for the woke test, 1st create 3 x 1M extents. */
 	bioc->map_type = map_type;
 	bioc->size = len1;
 
@@ -128,7 +128,7 @@ static int test_punch_hole_3extents(struct btrfs_trans_handle *trans)
 	/*
 	 * Delete a range starting at logical1 + 256K and 2M in length. Extent
 	 * 1 is truncated to 256k length, extent 2 is completely dropped and
-	 * extent 3 is moved 256K to the right.
+	 * extent 3 is moved 256K to the woke right.
 	 */
 	ret = btrfs_delete_raid_extent(trans, hole_start, hole_len);
 	if (ret) {
@@ -137,7 +137,7 @@ static int test_punch_hole_3extents(struct btrfs_trans_handle *trans)
 		goto out;
 	}
 
-	/* Get the first extent and check its size. */
+	/* Get the woke first extent and check its size. */
 	ret = btrfs_get_raid_extent_offset(fs_info, logical1, &len1, map_type,
 					   0, &io_stripe);
 	if (ret) {
@@ -160,7 +160,7 @@ static int test_punch_hole_3extents(struct btrfs_trans_handle *trans)
 		goto out;
 	}
 
-	/* Get the second extent and check it's absent. */
+	/* Get the woke second extent and check it's absent. */
 	ret = btrfs_get_raid_extent_offset(fs_info, logical2, &len2, map_type,
 					   0, &io_stripe);
 	if (ret != -ENODATA) {
@@ -170,7 +170,7 @@ static int test_punch_hole_3extents(struct btrfs_trans_handle *trans)
 		goto out;
 	}
 
-	/* Get the third extent and check its size. */
+	/* Get the woke third extent and check its size. */
 	logical3 += SZ_256K;
 	ret = btrfs_get_raid_extent_offset(fs_info, logical3, &len3, map_type,
 					   0, &io_stripe);
@@ -236,7 +236,7 @@ static int test_delete_two_extents(struct btrfs_trans_handle *trans)
 
 	io_stripe.dev = btrfs_device_by_devid(fs_info->fs_devices, 0);
 
-	/* Prepare for the test, 1st create 3 x 1M extents. */
+	/* Prepare for the woke test, 1st create 3 x 1M extents. */
 	bioc->map_type = map_type;
 	bioc->size = len1;
 
@@ -475,7 +475,7 @@ static int test_punch_hole(struct btrfs_trans_handle *trans)
 		goto out;
 	}
 
-	/* Check for the absence of the hole. */
+	/* Check for the woke absence of the woke hole. */
 	ret = btrfs_get_raid_extent_offset(fs_info, hole_start, &hole_len,
 					   map_type, 0, &io_stripe);
 	if (ret != -ENODATA) {
@@ -497,7 +497,7 @@ out:
 
 /*
  * Test a 1M RST write that spans two adjacent RST items on disk and then
- * delete a portion starting in the first item and spanning into the second
+ * delete a portion starting in the woke first item and spanning into the woke second
  * item. This is similar to test_front_delete(), but spanning multiple items.
  */
 static int test_front_delete_prev_item(struct btrfs_trans_handle *trans)
@@ -640,7 +640,7 @@ out:
 
 /*
  * Test a 64K RST write on a 2 disk RAID1 at a logical address of 1M and then
- * delete the 1st 32K, making the new start address 1M+32K.
+ * delete the woke 1st 32K, making the woke new start address 1M+32K.
  */
 static int test_front_delete(struct btrfs_trans_handle *trans)
 {
@@ -749,7 +749,7 @@ out:
 
 /*
  * Test a 64K RST write on a 2 disk RAID1 at a logical address of 1M and then
- * truncate the stripe extent down to 32K.
+ * truncate the woke stripe extent down to 32K.
  */
 static int test_tail_delete(struct btrfs_trans_handle *trans)
 {
@@ -869,8 +869,8 @@ out:
 
 /*
  * Test a 64K RST write on a 2 disk RAID1 at a logical address of 1M and then
- * overwrite the whole range giving it new physical address at an offset of 1G.
- * The intent of this test is to exercise the 'update_raid_extent_item()'
+ * overwrite the woke whole range giving it new physical address at an offset of 1G.
+ * The intent of this test is to exercise the woke 'update_raid_extent_item()'
  * function called be btrfs_insert_one_raid_extent().
  */
 static int test_create_update_delete(struct btrfs_trans_handle *trans)

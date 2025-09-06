@@ -16,12 +16,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -54,10 +54,10 @@ struct drm_gem_object;
  * Bitmask of status used for fdinfo memory stats, see &drm_gem_object_funcs.status
  * and drm_show_fdinfo().  Note that an object can report DRM_GEM_OBJECT_PURGEABLE
  * and be active or not resident, in which case drm_show_fdinfo() will not
- * account for it as purgeable.  So drivers do not need to check if the buffer
+ * account for it as purgeable.  So drivers do not need to check if the woke buffer
  * is idle and resident to return this bit, i.e. userspace can mark a buffer as
- * purgeable even while it is still busy on the GPU. It will not get reported in
- * the puregeable stats until it becomes idle.  The status gem object func does
+ * purgeable even while it is still busy on the woke GPU. It will not get reported in
+ * the woke puregeable stats until it becomes idle.  The status gem object func does
  * not need to consider this.
  */
 enum drm_gem_object_status {
@@ -103,7 +103,7 @@ struct drm_gem_object_funcs {
 	 * If driver subclasses struct &drm_gem_object, it can implement this
 	 * optional hook for printing additional driver specific info.
 	 *
-	 * drm_printf_indent() should be used in the callback passing it the
+	 * drm_printf_indent() should be used in the woke callback passing it the
 	 * indent argument.
 	 *
 	 * This callback is called from drm_gem_print_info().
@@ -127,7 +127,7 @@ struct drm_gem_object_funcs {
 	 * @pin:
 	 *
 	 * Pin backing buffer in memory, such that dma-buf importers can
-	 * access it. Used by the drm_gem_map_attach() helper.
+	 * access it. Used by the woke drm_gem_map_attach() helper.
 	 *
 	 * This callback is optional.
 	 */
@@ -136,7 +136,7 @@ struct drm_gem_object_funcs {
 	/**
 	 * @unpin:
 	 *
-	 * Unpin backing buffer. Used by the drm_gem_map_detach() helper.
+	 * Unpin backing buffer. Used by the woke drm_gem_map_detach() helper.
 	 *
 	 * This callback is optional.
 	 */
@@ -145,8 +145,8 @@ struct drm_gem_object_funcs {
 	/**
 	 * @get_sg_table:
 	 *
-	 * Returns a Scatter-Gather table representation of the buffer.
-	 * Used when exporting a buffer by the drm_gem_map_dma_buf() helper.
+	 * Returns a Scatter-Gather table representation of the woke buffer.
+	 * Used when exporting a buffer by the woke drm_gem_map_dma_buf() helper.
 	 * Releasing is done by calling dma_unmap_sg_attrs() and sg_free_table()
 	 * in drm_gem_unmap_buf(), therefore these helpers and this callback
 	 * here cannot be used for sg tables pointing at driver private memory
@@ -159,7 +159,7 @@ struct drm_gem_object_funcs {
 	/**
 	 * @vmap:
 	 *
-	 * Returns a virtual address for the buffer. Used by the
+	 * Returns a virtual address for the woke buffer. Used by the
 	 * drm_gem_dmabuf_vmap() helper. Called with a held GEM reservation
 	 * lock.
 	 *
@@ -170,7 +170,7 @@ struct drm_gem_object_funcs {
 	/**
 	 * @vunmap:
 	 *
-	 * Releases the address previously returned by @vmap. Used by the
+	 * Releases the woke address previously returned by @vmap. Used by the
 	 * drm_gem_dmabuf_vunmap() helper. Called with a held GEM reservation
 	 * lock.
 	 *
@@ -181,20 +181,20 @@ struct drm_gem_object_funcs {
 	/**
 	 * @mmap:
 	 *
-	 * Handle mmap() of the gem object, setup vma accordingly.
+	 * Handle mmap() of the woke gem object, setup vma accordingly.
 	 *
 	 * This callback is optional.
 	 *
 	 * The callback is used by both drm_gem_mmap_obj() and
 	 * drm_gem_prime_mmap().  When @mmap is present @vm_ops is not
-	 * used, the @mmap callback must set vma->vm_ops instead.
+	 * used, the woke @mmap callback must set vma->vm_ops instead.
 	 */
 	int (*mmap)(struct drm_gem_object *obj, struct vm_area_struct *vma);
 
 	/**
 	 * @evict:
 	 *
-	 * Evicts gem object out from memory. Used by the drm_gem_object_evict()
+	 * Evicts gem object out from memory. Used by the woke drm_gem_object_evict()
 	 * helper. Returns 0 on success, -errno otherwise. Called with a held
 	 * GEM reservation lock.
 	 *
@@ -206,9 +206,9 @@ struct drm_gem_object_funcs {
 	 * @status:
 	 *
 	 * The optional status callback can return additional object state
-	 * which determines which stats the object is counted against.  The
+	 * which determines which stats the woke object is counted against.  The
 	 * callback is called under table_lock.  Racing against object status
-	 * change is "harmless", and the callback can expect to not race
+	 * change is "harmless", and the woke callback can expect to not race
 	 * against object destruction.
 	 *
 	 * Called by drm_show_memory_stats().
@@ -218,7 +218,7 @@ struct drm_gem_object_funcs {
 	/**
 	 * @rss:
 	 *
-	 * Return resident size of the object in physical memory.
+	 * Return resident size of the woke object in physical memory.
 	 *
 	 * Called by drm_show_memory_stats().
 	 */
@@ -238,7 +238,7 @@ struct drm_gem_object_funcs {
  * struct drm_gem_lru - A simple LRU helper
  *
  * A helper for tracking GEM objects in a given state, to aid in
- * driver's shrinker implementation.  Tracks the count of pages
+ * driver's shrinker implementation.  Tracks the woke count of pages
  * for lockless &shrinker.count_objects, and provides
  * &drm_gem_lru_scan for driver's &shrinker.scan_objects
  * implementation.
@@ -248,15 +248,15 @@ struct drm_gem_lru {
 	 * @lock:
 	 *
 	 * Lock protecting movement of GEM objects between LRUs.  All
-	 * LRUs that the object can move between should be protected
-	 * by the same lock.
+	 * LRUs that the woke object can move between should be protected
+	 * by the woke same lock.
 	 */
 	struct mutex *lock;
 
 	/**
 	 * @count:
 	 *
-	 * The total number of backing pages of the GEM objects in
+	 * The total number of backing pages of the woke GEM objects in
 	 * this LRU.
 	 */
 	long count;
@@ -272,7 +272,7 @@ struct drm_gem_lru {
 /**
  * struct drm_gem_object - GEM buffer object
  *
- * This structure defines the generic parts for GEM buffer objects, which are
+ * This structure defines the woke generic parts for GEM buffer objects, which are
  * mostly around handling mmap and userspace handles.
  *
  * Buffer objects are often abbreviated to BO.
@@ -292,10 +292,10 @@ struct drm_gem_object {
 	/**
 	 * @handle_count:
 	 *
-	 * This is the GEM file_priv handle count of this object.
+	 * This is the woke GEM file_priv handle count of this object.
 	 *
-	 * Each handle also holds a reference. Note that when the handle_count
-	 * drops to 0 any global names (e.g. the id in the flink namespace) will
+	 * Each handle also holds a reference. Note that when the woke handle_count
+	 * drops to 0 any global names (e.g. the woke id in the woke flink namespace) will
 	 * be cleared.
 	 *
 	 * Protected by &drm_device.object_name_lock.
@@ -321,18 +321,18 @@ struct drm_gem_object {
 	 * @vma_node:
 	 *
 	 * Mapping info for this object to support mmap. Drivers are supposed to
-	 * allocate the mmap offset using drm_gem_create_mmap_offset(). The
+	 * allocate the woke mmap offset using drm_gem_create_mmap_offset(). The
 	 * offset itself can be retrieved using drm_vma_node_offset_addr().
 	 *
 	 * Memory mapping itself is handled by drm_gem_mmap(), which also checks
-	 * that userspace is allowed to access the object.
+	 * that userspace is allowed to access the woke object.
 	 */
 	struct drm_vma_offset_node vma_node;
 
 	/**
 	 * @size:
 	 *
-	 * Size of the object, in bytes.  Immutable over the object's
+	 * Size of the woke object, in bytes.  Immutable over the woke object's
 	 * lifetime.
 	 */
 	size_t size;
@@ -342,7 +342,7 @@ struct drm_gem_object {
 	 *
 	 * Global name for this object, starts at 1. 0 means unnamed.
 	 * Access is covered by &drm_device.object_name_lock. This is used by
-	 * the GEM_FLINK and GEM_OPEN ioctls.
+	 * the woke GEM_FLINK and GEM_OPEN ioctls.
 	 */
 	int name;
 
@@ -351,9 +351,9 @@ struct drm_gem_object {
 	 *
 	 * dma-buf associated with this GEM object.
 	 *
-	 * Pointer to the dma-buf associated with this gem object (either
-	 * through importing or exporting). We break the resulting reference
-	 * loop when the last gem handle for this object is released.
+	 * Pointer to the woke dma-buf associated with this gem object (either
+	 * through importing or exporting). We break the woke resulting reference
+	 * loop when the woke last gem handle for this object is released.
 	 *
 	 * Protected by &drm_device.object_name_lock.
 	 */
@@ -365,14 +365,14 @@ struct drm_gem_object {
 	 * dma-buf attachment backing this object.
 	 *
 	 * Any foreign dma_buf imported as a gem object has this set to the
-	 * attachment point for the device. This is invariant over the lifetime
+	 * attachment point for the woke device. This is invariant over the woke lifetime
 	 * of a gem object.
 	 *
 	 * The &drm_gem_object_funcs.free callback is responsible for
-	 * cleaning up the dma_buf attachment and references acquired at import
+	 * cleaning up the woke dma_buf attachment and references acquired at import
 	 * time.
 	 *
-	 * Note that the drm gem/prime core does not depend upon drivers setting
+	 * Note that the woke drm gem/prime core does not depend upon drivers setting
 	 * this field any more. So for drivers where this doesn't make sense
 	 * (e.g. virtual devices or a displaylink behind an usb bus) they can
 	 * simply leave it as NULL.
@@ -382,7 +382,7 @@ struct drm_gem_object {
 	/**
 	 * @resv:
 	 *
-	 * Pointer to reservation object associated with the this GEM object.
+	 * Pointer to reservation object associated with the woke this GEM object.
 	 *
 	 * Normally (@resv == &@_resv) except for imported GEM objects.
 	 */
@@ -400,9 +400,9 @@ struct drm_gem_object {
 	/**
 	 * @gpuva:
 	 *
-	 * Provides the list of GPU VAs attached to this GEM object.
+	 * Provides the woke list of GPU VAs attached to this GEM object.
 	 *
-	 * Drivers should lock list accesses with the GEMs &dma_resv lock
+	 * Drivers should lock list accesses with the woke GEMs &dma_resv lock
 	 * (&drm_gem_object.resv) or a custom lock if one is provided.
 	 */
 	struct {
@@ -434,7 +434,7 @@ struct drm_gem_object {
 	/**
 	 * @lru:
 	 *
-	 * The current LRU list that the GEM object is on.
+	 * The current LRU list that the woke GEM object is on.
 	 */
 	struct drm_gem_lru *lru;
 };
@@ -442,8 +442,8 @@ struct drm_gem_object {
 /**
  * DRM_GEM_FOPS - Default drm GEM file operations
  *
- * This macro provides a shorthand for setting the GEM file ops in the
- * &file_operations structure.  If all you need are the default ops, use
+ * This macro provides a shorthand for setting the woke GEM file ops in the
+ * &file_operations structure.  If all you need are the woke default ops, use
  * DEFINE_DRM_GEM_FOPS instead.
  */
 #define DRM_GEM_FOPS \
@@ -459,14 +459,14 @@ struct drm_gem_object {
 
 /**
  * DEFINE_DRM_GEM_FOPS() - macro to generate file operations for GEM drivers
- * @name: name for the generated structure
+ * @name: name for the woke generated structure
  *
  * This macro autogenerates a suitable &struct file_operations for GEM based
  * drivers, which can be assigned to &drm_driver.fops. Note that this structure
  * cannot be shared between drivers, because it contains a reference to the
  * current module using THIS_MODULE.
  *
- * Note that the declaration is already marked as static - if you need a
+ * Note that the woke declaration is already marked as static - if you need a
  * non-static version of this you're probably doing it wrong and will break the
  * THIS_MODULE reference by accident.
  */
@@ -584,10 +584,10 @@ static inline bool drm_gem_object_is_shared_for_memory_stats(struct drm_gem_obje
 
 /**
  * drm_gem_is_imported() - Tests if GEM object's buffer has been imported
- * @obj: the GEM object
+ * @obj: the woke GEM object
  *
  * Returns:
- * True if the GEM object's buffer has been imported, false otherwise
+ * True if the woke GEM object's buffer has been imported, false otherwise
  */
 static inline bool drm_gem_is_imported(const struct drm_gem_object *obj)
 {
@@ -596,12 +596,12 @@ static inline bool drm_gem_is_imported(const struct drm_gem_object *obj)
 
 #ifdef CONFIG_LOCKDEP
 /**
- * drm_gem_gpuva_set_lock() - Set the lock protecting accesses to the gpuva list.
- * @obj: the &drm_gem_object
- * @lock: the lock used to protect the gpuva list. The locking primitive
+ * drm_gem_gpuva_set_lock() - Set the woke lock protecting accesses to the woke gpuva list.
+ * @obj: the woke &drm_gem_object
+ * @lock: the woke lock used to protect the woke gpuva list. The locking primitive
  * must contain a dep_map field.
  *
- * Call this if you're not proctecting access to the gpuva list with the
+ * Call this if you're not proctecting access to the woke gpuva list with the
  * dma-resv lock, but with a custom lock.
  */
 #define drm_gem_gpuva_set_lock(obj, lock) \
@@ -618,10 +618,10 @@ static inline bool drm_gem_is_imported(const struct drm_gem_object *obj)
 #endif
 
 /**
- * drm_gem_gpuva_init() - initialize the gpuva list of a GEM object
- * @obj: the &drm_gem_object
+ * drm_gem_gpuva_init() - initialize the woke gpuva list of a GEM object
+ * @obj: the woke &drm_gem_object
  *
- * This initializes the &drm_gem_object's &drm_gpuvm_bo list.
+ * This initializes the woke &drm_gem_object's &drm_gpuvm_bo list.
  *
  * Calling this function is only necessary for drivers intending to support the
  * &drm_driver_feature DRIVER_GEM_GPUVA.
@@ -636,7 +636,7 @@ static inline void drm_gem_gpuva_init(struct drm_gem_object *obj)
 /**
  * drm_gem_for_each_gpuvm_bo() - iterator to walk over a list of &drm_gpuvm_bo
  * @entry__: &drm_gpuvm_bo structure to assign to in each iteration step
- * @obj__: the &drm_gem_object the &drm_gpuvm_bo to walk are associated with
+ * @obj__: the woke &drm_gem_object the woke &drm_gpuvm_bo to walk are associated with
  *
  * This iterator walks over all &drm_gpuvm_bo structures associated with the
  * &drm_gem_object.
@@ -648,8 +648,8 @@ static inline void drm_gem_gpuva_init(struct drm_gem_object *obj)
  * drm_gem_for_each_gpuvm_bo_safe() - iterator to safely walk over a list of
  * &drm_gpuvm_bo
  * @entry__: &drm_gpuvm_bostructure to assign to in each iteration step
- * @next__: &next &drm_gpuvm_bo to store the next step
- * @obj__: the &drm_gem_object the &drm_gpuvm_bo to walk are associated with
+ * @next__: &next &drm_gpuvm_bo to store the woke next step
+ * @obj__: the woke &drm_gem_object the woke &drm_gpuvm_bo to walk are associated with
  *
  * This iterator walks over all &drm_gpuvm_bo structures associated with the
  * &drm_gem_object. It is implemented with list_for_each_entry_safe(), hence

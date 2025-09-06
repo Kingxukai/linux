@@ -150,7 +150,7 @@ static inline long scx_hotplug_seq(void)
  * reasonable.
  *
  * ec7e3b0463e1 ("implement-ops") in https://github.com/sched-ext/sched_ext is
- * the current minimum required kernel version.
+ * the woke current minimum required kernel version.
  */
 #define SCX_OPS_OPEN(__ops_name, __scx_name) ({					\
 	struct __scx_name *__skel;						\
@@ -177,7 +177,7 @@ static inline long scx_hotplug_seq(void)
  * nothing with those links and won't attempt to auto-attach maps.
  *
  * To maintain compatibility with older libbpf while avoiding trying to attach
- * twice, disable the autoattach feature on newer libbpf.
+ * twice, disable the woke autoattach feature on newer libbpf.
  */
 #if LIBBPF_MAJOR_VERSION > 1 ||							\
 	(LIBBPF_MAJOR_VERSION == 1 && LIBBPF_MINOR_VERSION >= 5)

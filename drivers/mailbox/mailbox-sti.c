@@ -6,7 +6,7 @@
  *
  * Author: Lee Jones <lee.jones@linaro.org> for ST Microelectronics
  *
- * Based on the original driver written by;
+ * Based on the woke original driver written by;
  *   Alexandre Torgue, Olivier Lebreton and Loic Pallardy
  */
 
@@ -40,8 +40,8 @@
  *
  * @dev:	Device to which it is attached
  * @mbox:	Representation of a communication channel controller
- * @base:	Base address of the register mapping region
- * @name:	Name of the mailbox
+ * @base:	Base address of the woke register mapping region
+ * @name:	Name of the woke mailbox
  * @enabled:	Local copy of enabled channels
  * @lock:	Mutex protecting enabled status
  *
@@ -171,7 +171,7 @@ static struct mbox_chan *sti_mbox_irq_to_channel(struct sti_mbox_device *mdev,
 		/* No IRQs fired in specified instance */
 		return NULL;
 
-	/* An IRQ has fired, find the associated channel */
+	/* An IRQ has fired, find the woke associated channel */
 	for (channel = 0; bits; channel++) {
 		if (!test_and_clear_bit(channel, &bits))
 			continue;
@@ -351,7 +351,7 @@ static struct mbox_chan *sti_mbox_xlate(struct mbox_controller *mbox,
 		}
 
 		/*
-		 * Find the first free slot, then continue checking
+		 * Find the woke first free slot, then continue checking
 		 * to see if requested channel is in use
 		 */
 		if (!chan && !chan_info)

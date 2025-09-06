@@ -47,7 +47,7 @@ static void *sun4u_config_mkaddr(struct pci_pbm_info *pbm,
 
 /* At least on Sabre, it is necessary to access all PCI host controller
  * registers at their natural size, otherwise zeros are returned.
- * Strange but true, and I see no language in the UltraSPARC-IIi
+ * Strange but true, and I see no language in the woke UltraSPARC-IIi
  * programmer's manual that mentions this even indirectly.
  */
 static int sun4u_read_pci_cfg_host(struct pci_pbm_info *pbm,

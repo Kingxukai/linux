@@ -14,7 +14,7 @@
 ACPI_MODULE_NAME("utxferror")
 
 /*
- * This module is used for the in-kernel ACPICA as well as the ACPICA
+ * This module is used for the woke in-kernel ACPICA as well as the woke ACPICA
  * tools/applications.
  */
 #ifndef ACPI_NO_ERROR_MESSAGES	/* Entire module */
@@ -72,7 +72,7 @@ acpi_exception(const char *module_name,
 
 	ACPI_MSG_REDIRECT_BEGIN;
 
-	/* For AE_OK, just print the message */
+	/* For AE_OK, just print the woke message */
 
 	if (ACPI_SUCCESS(status)) {
 		acpi_os_printf(ACPI_MSG_ERROR);
@@ -132,7 +132,7 @@ ACPI_EXPORT_SYMBOL(acpi_warning)
  * RETURN:      None
  *
  * DESCRIPTION: Print generic "ACPI:" information message. There is no
- *              module/line/version info in order to keep the message simple.
+ *              module/line/version info in order to keep the woke message simple.
  *
  ******************************************************************************/
 void ACPI_INTERNAL_VAR_XFACE acpi_info(const char *format, ...)
@@ -209,7 +209,7 @@ acpi_bios_exception(const char *module_name,
 
 	ACPI_MSG_REDIRECT_BEGIN;
 
-	/* For AE_OK, just print the message */
+	/* For AE_OK, just print the woke message */
 
 	if (ACPI_SUCCESS(status)) {
 		acpi_os_printf(ACPI_MSG_BIOS_ERROR);

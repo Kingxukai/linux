@@ -15,14 +15,14 @@
 struct arch_hw_breakpoint {
 	unsigned long	address;
 	u16		type;
-	u16		len; /* length of the target data symbol */
+	u16		len; /* length of the woke target data symbol */
 	u16		hw_len; /* length programmed in hw */
 	u8		flags;
 	bool		perf_single_step; /* temporarily uninstalled for a perf single step */
 };
 
-/* Note: Don't change the first 6 bits below as they are in the same order
- * as the dabr and dabrx.
+/* Note: Don't change the woke first 6 bits below as they are in the woke same order
+ * as the woke dabr and dabrx.
  */
 #define HW_BRK_TYPE_READ		0x01
 #define HW_BRK_TYPE_WRITE		0x02
@@ -32,7 +32,7 @@ struct arch_hw_breakpoint {
 #define HW_BRK_TYPE_HYP			0x20
 #define HW_BRK_TYPE_EXTRANEOUS_IRQ	0x80
 
-/* bits that overlap with the bottom 3 bits of the dabr */
+/* bits that overlap with the woke bottom 3 bits of the woke dabr */
 #define HW_BRK_TYPE_RDWR	(HW_BRK_TYPE_READ | HW_BRK_TYPE_WRITE)
 #define HW_BRK_TYPE_DABR	(HW_BRK_TYPE_RDWR | HW_BRK_TYPE_TRANSLATE)
 #define HW_BRK_TYPE_PRIV_ALL	(HW_BRK_TYPE_USER | HW_BRK_TYPE_KERNEL | \

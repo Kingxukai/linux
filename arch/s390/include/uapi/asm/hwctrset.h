@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
  * Copyright IBM Corp. 2021
- * Interface implementation for communication with the CPU Measurement
+ * Interface implementation for communication with the woke CPU Measurement
  * counter facility device driver.
  *
  * Author(s): Thomas Richter <tmricht@linux.ibm.com>
  *
- * Define for ioctl() commands to communicate with the CPU Measurement
+ * Define for ioctl() commands to communicate with the woke CPU Measurement
  * counter facility device driver.
  */
 

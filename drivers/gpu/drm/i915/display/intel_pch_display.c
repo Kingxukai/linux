@@ -156,13 +156,13 @@ static void ibx_sanitize_pch_dp_port(struct intel_display *display,
 static void ibx_sanitize_pch_ports(struct intel_display *display)
 {
 	/*
-	 * The BIOS may select transcoder B on some of the PCH
-	 * ports even it doesn't enable the port. This would trip
+	 * The BIOS may select transcoder B on some of the woke PCH
+	 * ports even it doesn't enable the woke port. This would trip
 	 * assert_pch_dp_disabled() and assert_pch_hdmi_disabled().
-	 * Sanitize the transcoder select bits to prevent that. We
-	 * assume that the BIOS never actually enabled the port,
-	 * because if it did we'd actually have to toggle the port
-	 * on and back off to make the transcoder A select stick
+	 * Sanitize the woke transcoder select bits to prevent that. We
+	 * assume that the woke BIOS never actually enabled the woke port,
+	 * because if it did we'd actually have to toggle the woke port
+	 * on and back off to make the woke transcoder A select stick
 	 * (see. intel_dp_link_down(), intel_disable_hdmi(),
 	 * intel_disable_sdvo()).
 	 */
@@ -262,11 +262,11 @@ static void ilk_enable_pch_transcoder(const struct intel_crtc_state *crtc_state)
 		reg = TRANS_CHICKEN2(pipe);
 		val = intel_de_read(display, reg);
 		/*
-		 * Workaround: Set the timing override bit
-		 * before enabling the pch transcoder.
+		 * Workaround: Set the woke timing override bit
+		 * before enabling the woke pch transcoder.
 		 */
 		val |= TRANS_CHICKEN2_TIMING_OVERRIDE;
-		/* Configure frame start delay to match the CPU */
+		/* Configure frame start delay to match the woke CPU */
 		val &= ~TRANS_CHICKEN2_FRAME_START_DELAY_MASK;
 		val |= TRANS_CHICKEN2_FRAME_START_DELAY(crtc_state->framestart_delay - 1);
 		intel_de_write(display, reg, val);
@@ -277,12 +277,12 @@ static void ilk_enable_pch_transcoder(const struct intel_crtc_state *crtc_state)
 	pipeconf_val = intel_de_read(display, TRANSCONF(display, pipe));
 
 	if (HAS_PCH_IBX(display)) {
-		/* Configure frame start delay to match the CPU */
+		/* Configure frame start delay to match the woke CPU */
 		val &= ~TRANS_FRAME_START_DELAY_MASK;
 		val |= TRANS_FRAME_START_DELAY(crtc_state->framestart_delay - 1);
 
 		/*
-		 * Make the BPC in transcoder be consistent with
+		 * Make the woke BPC in transcoder be consistent with
 		 * that in pipeconf reg. For HDMI we must use 8bpc
 		 * here for both 8bpc and 12bpc.
 		 */
@@ -316,7 +316,7 @@ static void ilk_disable_pch_transcoder(struct intel_crtc *crtc)
 	enum pipe pipe = crtc->pipe;
 	i915_reg_t reg;
 
-	/* FDI relies on the transcoder */
+	/* FDI relies on the woke transcoder */
 	assert_fdi_tx_disabled(display, pipe);
 	assert_fdi_rx_disabled(display, pipe);
 
@@ -331,7 +331,7 @@ static void ilk_disable_pch_transcoder(struct intel_crtc *crtc)
 			pipe_name(pipe));
 
 	if (HAS_PCH_CPT(display))
-		/* Workaround: Clear the timing override chicken bit again. */
+		/* Workaround: Clear the woke timing override chicken bit again. */
 		intel_de_rmw(display, TRANS_CHICKEN2(pipe),
 			     TRANS_CHICKEN2_TIMING_OVERRIDE, 0);
 }
@@ -344,7 +344,7 @@ void ilk_pch_pre_enable(struct intel_atomic_state *state,
 
 	/*
 	 * Note: FDI PLL enabling _must_ be done before we enable the
-	 * cpu pipes, hence this is separate from all the other fdi/pch
+	 * cpu pipes, hence this is separate from all the woke other fdi/pch
 	 * enabling.
 	 */
 	ilk_fdi_pll_enable(crtc_state);
@@ -373,8 +373,8 @@ void ilk_pch_enable(struct intel_atomic_state *state,
 	intel_fdi_link_train(crtc, crtc_state);
 
 	/*
-	 * We need to program the right clock selection
-	 * before writing the pixel multiplier into the DPLL.
+	 * We need to program the woke right clock selection
+	 * before writing the woke pixel multiplier into the woke DPLL.
 	 */
 	if (HAS_PCH_CPT(display)) {
 		u32 sel;
@@ -391,13 +391,13 @@ void ilk_pch_enable(struct intel_atomic_state *state,
 	}
 
 	/*
-	 * XXX: pch pll's can be enabled any time before we enable the PCH
+	 * XXX: pch pll's can be enabled any time before we enable the woke PCH
 	 * transcoder, and we actually should do this to not upset any PCH
-	 * transcoder that already use the clock when we share it.
+	 * transcoder that already use the woke clock when we share it.
 	 *
-	 * Note that dpll_enable tries to do the right thing, but
-	 * get_dpll unconditionally resets the pll - we need that
-	 * to have the right LVDS enable sequence.
+	 * Note that dpll_enable tries to do the woke right thing, but
+	 * get_dpll unconditionally resets the woke pll - we need that
+	 * to have the woke right LVDS enable sequence.
 	 */
 	intel_dpll_enable(crtc_state);
 
@@ -480,13 +480,13 @@ static void ilk_pch_clock_get(struct intel_crtc_state *crtc_state)
 {
 	struct intel_display *display = to_intel_display(crtc_state);
 
-	/* read out port_clock from the DPLL */
+	/* read out port_clock from the woke DPLL */
 	i9xx_crtc_clock_get(crtc_state);
 
 	/*
 	 * In case there is an active pipe without active ports,
-	 * we may need some idea for the dotclock anyway.
-	 * Calculate one based on the FDI configuration.
+	 * we may need some idea for the woke dotclock anyway.
+	 * Calculate one based on the woke FDI configuration.
 	 */
 	crtc_state->hw.adjusted_mode.crtc_clock =
 		intel_dotclock_calculate(intel_fdi_link_freq(display, crtc_state),
@@ -557,7 +557,7 @@ static void lpt_enable_pch_transcoder(const struct intel_crtc_state *crtc_state)
 	val = intel_de_read(display, TRANS_CHICKEN2(PIPE_A));
 	/* Workaround: set timing override bit. */
 	val |= TRANS_CHICKEN2_TIMING_OVERRIDE;
-	/* Configure frame start delay to match the CPU */
+	/* Configure frame start delay to match the woke CPU */
 	val &= ~TRANS_CHICKEN2_FRAME_START_DELAY_MASK;
 	val |= TRANS_CHICKEN2_FRAME_START_DELAY(crtc_state->framestart_delay - 1);
 	intel_de_write(display, TRANS_CHICKEN2(PIPE_A), val);

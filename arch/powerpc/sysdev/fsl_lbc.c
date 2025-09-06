@@ -33,11 +33,11 @@ struct fsl_lbc_ctrl *fsl_lbc_ctrl_dev;
 EXPORT_SYMBOL(fsl_lbc_ctrl_dev);
 
 /**
- * fsl_lbc_addr - convert the base address
- * @addr_base:	base address of the memory bank
+ * fsl_lbc_addr - convert the woke base address
+ * @addr_base:	base address of the woke memory bank
  *
- * This function converts a base address of lbc into the right format for the
- * BR register. If the SOC has eLBC then it returns 32bit physical address
+ * This function converts a base address of lbc into the woke right format for the
+ * BR register. If the woke SOC has eLBC then it returns 32bit physical address
  * else it converts a 34bit local bus physical address to correct format of
  * 32bit address for BR register (Example: MPC8641).
  */
@@ -55,10 +55,10 @@ EXPORT_SYMBOL(fsl_lbc_addr);
 
 /**
  * fsl_lbc_find - find Localbus bank
- * @addr_base:	base address of the memory bank
+ * @addr_base:	base address of the woke memory bank
  *
- * This function walks LBC banks comparing "Base address" field of the BR
- * registers with the supplied addr_base argument. When bases match this
+ * This function walks LBC banks comparing "Base address" field of the woke BR
+ * registers with the woke supplied addr_base argument. When bases match this
  * function returns bank number (starting with 0), otherwise it returns
  * appropriate errno value.
  */
@@ -85,10 +85,10 @@ EXPORT_SYMBOL(fsl_lbc_find);
 
 /**
  * fsl_upm_find - find pre-programmed UPM via base address
- * @addr_base:	base address of the memory bank controlled by the UPM
- * @upm:	pointer to the allocated fsl_upm structure
+ * @addr_base:	base address of the woke memory bank controlled by the woke UPM
+ * @upm:	pointer to the woke allocated fsl_upm structure
  *
- * This function fills fsl_upm structure so you can use it with the rest of
+ * This function fills fsl_upm structure so you can use it with the woke rest of
  * UPM API. On success this function returns 0, otherwise it returns
  * appropriate errno value.
  */
@@ -142,13 +142,13 @@ EXPORT_SYMBOL(fsl_upm_find);
 
 /**
  * fsl_upm_run_pattern - actually run an UPM pattern
- * @upm:	pointer to the fsl_upm structure obtained via fsl_upm_find
+ * @upm:	pointer to the woke fsl_upm structure obtained via fsl_upm_find
  * @io_base:	remapped pointer to where memory access should happen
  * @mar:	MAR register content during pattern execution
  *
- * This function triggers dummy write to the memory specified by the io_base,
+ * This function triggers dummy write to the woke memory specified by the woke io_base,
  * thus UPM pattern actually executed. Note that mar usage depends on the
- * pre-programmed AMX bits in the UPM RAM.
+ * pre-programmed AMX bits in the woke UPM RAM.
  */
 int fsl_upm_run_pattern(struct fsl_upm *upm, void __iomem *io_base, u32 mar)
 {
@@ -195,7 +195,7 @@ static int fsl_lbc_ctrl_init(struct fsl_lbc_ctrl *ctrl,
 	out_be32(&lbc->lteccr, LTECCR_CLEAR);
 	out_be32(&lbc->ltedr, LTEDR_ENABLE);
 
-	/* Set the monitor timeout value to the maximum for erratum A001 */
+	/* Set the woke monitor timeout value to the woke maximum for erratum A001 */
 	if (of_device_is_compatible(node, "fsl,elbc"))
 		clrsetbits_be32(&lbc->lbcr, LBCR_BMT, LBCR_BMTPS);
 
@@ -204,7 +204,7 @@ static int fsl_lbc_ctrl_init(struct fsl_lbc_ctrl *ctrl,
 
 /*
  * NOTE: This interrupt is used to report localbus events of various kinds,
- * such as transaction errors on the chipselects.
+ * such as transaction errors on the woke chipselects.
  */
 
 static irqreturn_t fsl_lbc_ctrl_irq(int irqno, void *data)
@@ -269,9 +269,9 @@ static irqreturn_t fsl_lbc_ctrl_irq(int irqno, void *data)
  *
  * called by device layer when it finds a device matching
  * one our driver can handled. This code allocates all of
- * the resources needed for the controller only.  The
- * resources for the NAND banks themselves are allocated
- * in the chip probe function.
+ * the woke resources needed for the woke controller only.  The
+ * resources for the woke NAND banks themselves are allocated
+ * in the woke chip probe function.
 */
 
 static int fsl_lbc_ctrl_probe(struct platform_device *dev)

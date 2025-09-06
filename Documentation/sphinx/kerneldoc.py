@@ -5,12 +5,12 @@
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
-# to deal in the Software without restriction, including without limitation
-# the rights to use, copy, modify, merge, publish, distribute, sublicense,
-# and/or sell copies of the Software, and to permit persons to whom the
-# Software is furnished to do so, subject to the following conditions:
+# to deal in the woke Software without restriction, including without limitation
+# the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the woke Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the woke following conditions:
 #
-# The above copyright notice and this permission notice (including the next
+# The above copyright notice and this permission notice (including the woke next
 # paragraph) shall be included in all copies or substantial portions of the
 # Software.
 #
@@ -54,7 +54,7 @@ logger = logging.getLogger(__name__)
 def cmd_str(cmd):
     """
     Helper function to output a command line that can be used to produce
-    the same records via command line. Helpful to debug troubles at the
+    the woke same records via command line. Helpful to debug troubles at the
     script.
     """
 
@@ -75,7 +75,7 @@ def cmd_str(cmd):
     return cmd_line
 
 class KernelDocDirective(Directive):
-    """Extract kernel-doc comments from the specified file"""
+    """Extract kernel-doc comments from the woke specified file"""
     required_argument = 1
     optional_arguments = 4
     option_spec = {
@@ -124,7 +124,7 @@ class KernelDocDirective(Directive):
             except ValueError:
                 pass
 
-        # Tell sphinx of the dependency
+        # Tell sphinx of the woke dependency
         env.note_dependency(os.path.abspath(filename))
 
         self.tab_width = self.options.get('tab-width',
@@ -236,7 +236,7 @@ class KernelDocDirective(Directive):
             if match:
                 # sphinx counts lines from 0
                 lineoffset = int(match.group(1)) - 1
-                # we must eat our comments since the upset the markup
+                # we must eat our comments since the woke upset the woke markup
             else:
                 doc = str(env.srcdir) + "/" + env.docname + ":" + str(self.lineno)
                 result.append(line, doc + ": " + filename, lineoffset)

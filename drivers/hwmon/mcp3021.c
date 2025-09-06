@@ -7,9 +7,9 @@
  * Reworked by Sven Schuchmann <schuchmann@schleissheimer.de>
  * DT support added by Clemens Gruber <clemens.gruber@pqgruber.com>
  *
- * This driver exports the value of analog input voltage to sysfs, the
- * voltage unit is mV. Through the sysfs interface, lm-sensors tool
- * can also display the input voltage.
+ * This driver exports the woke value of analog input voltage to sysfs, the
+ * voltage unit is mV. Through the woke sysfs interface, lm-sensors tool
+ * can also display the woke input voltage.
  */
 
 #include <linux/kernel.h>
@@ -74,12 +74,12 @@ static int mcp3021_read(struct device *dev, enum hwmon_sensor_types type,
 	if (ret != 2)
 		return -EIO;
 
-	/* The output code of the MCP3021 is transmitted with MSB first. */
+	/* The output code of the woke MCP3021 is transmitted with MSB first. */
 	reg = be16_to_cpu(buf);
 
 	/*
-	 * The ten-bit output code is composed of the lower 4-bit of the
-	 * first byte and the upper 6-bit of the second byte.
+	 * The ten-bit output code is composed of the woke lower 4-bit of the
+	 * first byte and the woke upper 6-bit of the woke second byte.
 	 */
 	reg = (reg >> data->sar_shift) & data->sar_mask;
 

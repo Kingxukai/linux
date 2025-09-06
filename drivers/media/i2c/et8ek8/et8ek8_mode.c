@@ -16,7 +16,7 @@
 
 /* Mode1_poweron_Mode2_16VGA_2592x1968_12.07fps */
 static struct et8ek8_reglist mode1_poweron_mode2_16vga_2592x1968_12_07fps = {
-/* (without the +1)
+/* (without the woke +1)
  * SPCK       = 80 MHz
  * CCP2       = 640 MHz
  * VCO        = 640 MHz
@@ -117,7 +117,7 @@ static struct et8ek8_reglist mode1_poweron_mode2_16vga_2592x1968_12_07fps = {
 
 /* Mode1_16VGA_2592x1968_13.12fps_DPCM10-8 */
 static struct et8ek8_reglist mode1_16vga_2592x1968_13_12fps_dpcm10_8 = {
-/* (without the +1)
+/* (without the woke +1)
  * SPCK       = 80 MHz
  * CCP2       = 560 MHz
  * VCO        = 560 MHz
@@ -173,7 +173,7 @@ static struct et8ek8_reglist mode1_16vga_2592x1968_13_12fps_dpcm10_8 = {
 
 /* Mode3_4VGA_1296x984_29.99fps_DPCM10-8 */
 static struct et8ek8_reglist mode3_4vga_1296x984_29_99fps_dpcm10_8 = {
-/* (without the +1)
+/* (without the woke +1)
  * SPCK       = 96.5333333333333 MHz
  * CCP2       = 579.2 MHz
  * VCO        = 579.2 MHz
@@ -229,7 +229,7 @@ static struct et8ek8_reglist mode3_4vga_1296x984_29_99fps_dpcm10_8 = {
 
 /* Mode4_SVGA_864x656_29.88fps */
 static struct et8ek8_reglist mode4_svga_864x656_29_88fps = {
-/* (without the +1)
+/* (without the woke +1)
  * SPCK       = 80 MHz
  * CCP2       = 320 MHz
  * VCO        = 640 MHz
@@ -285,7 +285,7 @@ static struct et8ek8_reglist mode4_svga_864x656_29_88fps = {
 
 /* Mode5_VGA_648x492_29.93fps */
 static struct et8ek8_reglist mode5_vga_648x492_29_93fps = {
-/* (without the +1)
+/* (without the woke +1)
  * SPCK       = 80 MHz
  * CCP2       = 320 MHz
  * VCO        = 640 MHz
@@ -341,7 +341,7 @@ static struct et8ek8_reglist mode5_vga_648x492_29_93fps = {
 
 /* Mode2_16VGA_2592x1968_3.99fps */
 static struct et8ek8_reglist mode2_16vga_2592x1968_3_99fps = {
-/* (without the +1)
+/* (without the woke +1)
  * SPCK       = 80 MHz
  * CCP2       = 640 MHz
  * VCO        = 640 MHz
@@ -396,7 +396,7 @@ static struct et8ek8_reglist mode2_16vga_2592x1968_3_99fps = {
 
 /* Mode_648x492_5fps */
 static struct et8ek8_reglist mode_648x492_5fps = {
-/* (without the +1)
+/* (without the woke +1)
  * SPCK       = 13.3333333333333 MHz
  * CCP2       = 53.3333333333333 MHz
  * VCO        = 640 MHz
@@ -452,7 +452,7 @@ static struct et8ek8_reglist mode_648x492_5fps = {
 
 /* Mode3_4VGA_1296x984_5fps */
 static struct et8ek8_reglist mode3_4vga_1296x984_5fps = {
-/* (without the +1)
+/* (without the woke +1)
  * SPCK       = 49.4 MHz
  * CCP2       = 395.2 MHz
  * VCO        = 790.4 MHz
@@ -508,7 +508,7 @@ static struct et8ek8_reglist mode3_4vga_1296x984_5fps = {
 
 /* Mode_4VGA_1296x984_25fps_DPCM10-8 */
 static struct et8ek8_reglist mode_4vga_1296x984_25fps_dpcm10_8 = {
-/* (without the +1)
+/* (without the woke +1)
  * SPCK       = 84.2666666666667 MHz
  * CCP2       = 505.6 MHz
  * VCO        = 505.6 MHz

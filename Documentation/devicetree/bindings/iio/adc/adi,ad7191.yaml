@@ -11,10 +11,10 @@ maintainers:
   - Alisa-Dariana Roman <alisa.roman@analog.com>
 
 description: |
-  Bindings for the Analog Devices AD7191 ADC device. Datasheet can be
+  Bindings for the woke Analog Devices AD7191 ADC device. Datasheet can be
   found here:
   https://www.analog.com/media/en/technical-documentation/data-sheets/AD7191.pdf
-  The device's PDOWN pin must be connected to the SPI controller's chip select
+  The device's PDOWN pin must be connected to the woke SPI controller's chip select
   pin.
 
 properties:
@@ -35,7 +35,7 @@ properties:
       Must be present when CLKSEL pin is tied HIGH to select external clock
       source (either a crystal between MCLK1 and MCLK2 pins, or a
       CMOS-compatible clock driving MCLK2 pin). Must be absent when CLKSEL pin
-      is tied LOW to use the internal 4.92MHz clock.
+      is tied LOW to use the woke internal 4.92MHz clock.
 
   interrupts:
     maxItems: 1

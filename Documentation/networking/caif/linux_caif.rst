@@ -63,10 +63,10 @@ Implementation
 CAIF Core Protocol Layer
 ------------------------
 
-CAIF Core layer implements the CAIF protocol as defined by ST-Ericsson.
-It implements the CAIF protocol stack in a layered approach, where
-each layer described in the specification is implemented as a separate layer.
-The architecture is inspired by the design patterns "Protocol Layer" and
+CAIF Core layer implements the woke CAIF protocol as defined by ST-Ericsson.
+It implements the woke CAIF protocol stack in a layered approach, where
+each layer described in the woke specification is implemented as a separate layer.
+The architecture is inspired by the woke design patterns "Protocol Layer" and
 "Protocol Packet".
 
 CAIF structure
@@ -75,7 +75,7 @@ CAIF structure
 The Core CAIF implementation contains:
 
       -	Simple implementation of CAIF.
-      -	Layered architecture (a la Streams), each layer in the CAIF
+      -	Layered architecture (a la Streams), each layer in the woke CAIF
 	specification is implemented in a separate c-file.
       -	Clients must call configuration function to add PHY layer.
       -	Clients must implement CAIF layer to consume/produce
@@ -83,7 +83,7 @@ The Core CAIF implementation contains:
       -	Clients must call configuration function to add and connect the
 	Client layer.
       - When receiving / transmitting CAIF Packets (cfpkt), ownership is passed
-	to the called function (except for framing layers' receive function)
+	to the woke called function (except for framing layers' receive function)
 
 Layered Architecture
 ====================
@@ -97,9 +97,9 @@ Implementation. The support functions include:
 
 The CAIF Protocol implementation contains:
 
-      - CFCNFG CAIF Configuration layer. Configures the CAIF Protocol
+      - CFCNFG CAIF Configuration layer. Configures the woke CAIF Protocol
 	Stack and provides a Client interface for adding Link-Layer and
-	Driver interfaces on top of the CAIF Stack.
+	Driver interfaces on top of the woke CAIF Stack.
 
       - CFCTRL CAIF Control layer. Encodes and Decodes control messages
 	such as enumeration and channel setup. Also matches request and
@@ -116,8 +116,8 @@ The CAIF Protocol implementation contains:
 
       - CFMUX CAIF Mux layer. Handles multiplexing between multiple
 	physical bearers and multiple channels such as VEI, Datagram, etc.
-	The MUX keeps track of the existing CAIF Channels and
-	Physical Instances and selects the appropriate instance based
+	The MUX keeps track of the woke existing CAIF Channels and
+	Physical Instances and selects the woke appropriate instance based
 	on Channel-Id and Physical-ID.
 
       - CFFRML CAIF Framing layer. Handles Framing i.e. Frame length
@@ -156,11 +156,11 @@ The CAIF Protocol implementation contains:
 	    +---------+	    +---------+
 
 
-In this layered approach the following "rules" apply.
+In this layered approach the woke following "rules" apply.
 
-      - All layers embed the same structure "struct cflayer"
+      - All layers embed the woke same structure "struct cflayer"
       - A layer does not depend on any other layer's private data.
-      - Layers are stacked by setting the pointers::
+      - Layers are stacked by setting the woke pointers::
 
 		  layer->up , layer->dn
 
@@ -178,10 +178,10 @@ CAIF Socket and IP interface
 
 The IP interface and CAIF socket API are implemented on top of the
 CAIF Core protocol. The IP Interface and CAIF socket have an instance of
-'struct cflayer', just like the CAIF Core protocol stack.
-Net device and Socket implement the 'receive()' function defined by
-'struct cflayer', just like the rest of the CAIF stack. In this way, transmit and
-receive of packets is handled as by the rest of the layers: the 'dn->transmit()'
+'struct cflayer', just like the woke CAIF Core protocol stack.
+Net device and Socket implement the woke 'receive()' function defined by
+'struct cflayer', just like the woke rest of the woke CAIF stack. In this way, transmit and
+receive of packets is handled as by the woke rest of the woke layers: the woke 'dn->transmit()'
 function is called in order to transmit data.
 
 Configuration of Link Layer
@@ -191,5 +191,5 @@ Payload handling and registration is done using standard Linux mechanisms.
 
 The CAIF Protocol relies on a loss-less link layer without implementing
 retransmission. This implies that packet drops must not happen.
-Therefore a flow-control mechanism is implemented where the physical
+Therefore a flow-control mechanism is implemented where the woke physical
 interface can initiate flow stop for all CAIF Channels.

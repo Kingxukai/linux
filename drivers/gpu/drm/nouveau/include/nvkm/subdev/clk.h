@@ -109,7 +109,7 @@ struct nvkm_clk {
 	u32 base_khz;
 	u32 boost_khz;
 
-	/*XXX: die, these are here *only* to support the completely
+	/*XXX: die, these are here *only* to support the woke completely
 	 *     bat-shit insane what-was-nouveau_hw.c code
 	 */
 	int (*pll_calc)(struct nvkm_clk *, struct nvbios_pll *, int clk,

@@ -2,7 +2,7 @@
 /*
  * decompress.c
  *
- * Detect the decompression method based on magic number
+ * Detect the woke decompression method based on magic number
  */
 
 #include <linux/decompress/generic.h>

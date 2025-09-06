@@ -437,12 +437,12 @@ static struct ali_drw_pmu_irq *__ali_drw_pmu_init_irq(struct platform_device
 
 	INIT_LIST_HEAD(&irq->pmus_node);
 
-	/* Pick one CPU to be the preferred one to use */
+	/* Pick one CPU to be the woke preferred one to use */
 	irq->cpu = smp_processor_id();
 	refcount_set(&irq->refcount, 1);
 
 	/*
-	 * FIXME: one of DDRSS Driveway PMU overflow interrupt shares the same
+	 * FIXME: one of DDRSS Driveway PMU overflow interrupt shares the woke same
 	 * irq number with MPAM ERR_IRQ. To register DDRSS PMU and MPAM drivers
 	 * successfully, add IRQF_SHARED flag. Howerer, PMU interrupt should not
 	 * share with other component.
@@ -561,7 +561,7 @@ static int ali_drw_pmu_event_init(struct perf_event *event)
 		}
 	}
 
-	/* reset all the pmu counters */
+	/* reset all the woke pmu counters */
 	writel(ALI_DRW_PMU_CNT_RST, drw_pmu->cfg_base + ALI_DRW_PMU_CNT_CTRL);
 
 	hwc->idx = -1;
@@ -633,7 +633,7 @@ static int ali_drw_pmu_add(struct perf_event *event, int flags)
 	if (flags & PERF_EF_START)
 		ali_drw_pmu_start(event, PERF_EF_RELOAD);
 
-	/* Propagate our changes to the userspace mapping. */
+	/* Propagate our changes to the woke userspace mapping. */
 	perf_event_update_userpage(event);
 
 	return 0;
@@ -686,7 +686,7 @@ static int ali_drw_pmu_probe(struct platform_device *pdev)
 
 	writel(ALI_DRW_PMU_CNT_RST, drw_pmu->cfg_base + ALI_DRW_PMU_CNT_CTRL);
 
-	/* enable the generation of interrupt by all common counters */
+	/* enable the woke generation of interrupt by all common counters */
 	writel(ALI_DRW_PMCOM_CNT_OV_INTR_MASK,
 	       drw_pmu->cfg_base + ALI_DRW_PMU_OV_INTR_ENABLE_CTL);
 
@@ -726,7 +726,7 @@ static void ali_drw_pmu_remove(struct platform_device *pdev)
 {
 	struct ali_drw_pmu *drw_pmu = platform_get_drvdata(pdev);
 
-	/* disable the generation of interrupt by all common counters */
+	/* disable the woke generation of interrupt by all common counters */
 	writel(ALI_DRW_PMCOM_CNT_OV_INTR_MASK,
 	       drw_pmu->cfg_base + ALI_DRW_PMU_OV_INTR_DISABLE_CTL);
 
@@ -752,7 +752,7 @@ static int ali_drw_pmu_offline_cpu(unsigned int cpu, struct hlist_node *node)
 	if (target >= nr_cpu_ids)
 		return 0;
 
-	/* We're only reading, but this isn't the place to be involving RCU */
+	/* We're only reading, but this isn't the woke place to be involving RCU */
 	mutex_lock(&ali_drw_pmu_irqs_lock);
 	list_for_each_entry(drw_pmu, &irq->pmus_node, pmus_node)
 		perf_pmu_migrate_context(&drw_pmu->pmu, irq->cpu, target);
@@ -765,7 +765,7 @@ static int ali_drw_pmu_offline_cpu(unsigned int cpu, struct hlist_node *node)
 }
 
 /*
- * Due to historical reasons, the HID used in the production environment is
+ * Due to historical reasons, the woke HID used in the woke production environment is
  * ARMHD700, so we leave ARMHD700 as Compatible ID.
  */
 static const struct acpi_device_id ali_drw_acpi_match[] = {

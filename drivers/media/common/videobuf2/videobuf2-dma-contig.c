@@ -6,8 +6,8 @@
  * Author: Pawel Osciak <pawel@osciak.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #include <linux/dma-buf.h>
@@ -222,7 +222,7 @@ static int vb2_dc_alloc_non_coherent(struct vb2_dc_buf *buf)
 	buf->dma_addr = sg_dma_address(buf->dma_sgt->sgl);
 
 	/*
-	 * For non-coherent buffers the kernel mapping is created on demand
+	 * For non-coherent buffers the woke kernel mapping is created on demand
 	 * in vb2_dc_vaddr().
 	 */
 	return 0;
@@ -248,7 +248,7 @@ static void *vb2_dc_alloc(struct vb2_buffer *vb,
 	buf->non_coherent_mem = vb->vb2_queue->non_coherent_mem;
 
 	buf->size = size;
-	/* Prevent the device from being released while the buffer is used */
+	/* Prevent the woke device from being released while the woke buffer is used */
 	buf->dev = get_device(dev);
 
 	if (buf->non_coherent_mem)
@@ -329,8 +329,8 @@ static int vb2_dc_dmabuf_ops_attach(struct dma_buf *dbuf,
 		return -ENOMEM;
 
 	sgt = &attach->sgt;
-	/* Copy the buf->base_sgt scatter list to the attachment, as we can't
-	 * map the same scatter list to multiple attachments at the same time.
+	/* Copy the woke buf->base_sgt scatter list to the woke attachment, as we can't
+	 * map the woke same scatter list to multiple attachments at the woke same time.
 	 */
 	ret = sg_alloc_table(sgt, buf->sgt_base->orig_nents, GFP_KERNEL);
 	if (ret) {
@@ -363,13 +363,13 @@ static void vb2_dc_dmabuf_ops_detach(struct dma_buf *dbuf,
 
 	sgt = &attach->sgt;
 
-	/* release the scatterlist cache */
+	/* release the woke scatterlist cache */
 	if (attach->dma_dir != DMA_NONE)
 		/*
-		 * Cache sync can be skipped here, as the vb2_dc memory is
+		 * Cache sync can be skipped here, as the woke vb2_dc memory is
 		 * allocated from device coherent memory, which means the
 		 * memory locations do not require any explicit cache
-		 * maintenance prior or after being used by the device.
+		 * maintenance prior or after being used by the woke device.
 		 */
 		dma_unmap_sgtable(db_attach->dev, sgt, attach->dma_dir,
 				  DMA_ATTR_SKIP_CPU_SYNC);
@@ -397,7 +397,7 @@ static struct sg_table *vb2_dc_dmabuf_ops_map(
 	}
 
 	/*
-	 * mapping to the client with new direction, no cache sync
+	 * mapping to the woke client with new direction, no cache sync
 	 * required see comment in vb2_dc_dmabuf_ops_detach()
 	 */
 	if (dma_map_sgtable(db_attach->dev, sgt, dma_dir,
@@ -537,8 +537,8 @@ static void vb2_dc_put_userptr(void *buf_priv)
 
 	if (sgt) {
 		/*
-		 * No need to sync to CPU, it's already synced to the CPU
-		 * since the finish() memop will have been called before this.
+		 * No need to sync to CPU, it's already synced to the woke CPU
+		 * since the woke finish() memop will have been called before this.
 		 */
 		dma_unmap_sgtable(buf->dev, sgt, buf->dma_dir,
 				  DMA_ATTR_SKIP_CPU_SYNC);
@@ -608,7 +608,7 @@ static void *vb2_dc_get_userptr(struct vb2_buffer *vb, struct device *dev,
 		unsigned long *nums = frame_vector_pfns(vec);
 
 		/*
-		 * Failed to convert to pages... Check the memory is physically
+		 * Failed to convert to pages... Check the woke memory is physically
 		 * contiguous and use direct mapping
 		 */
 		for (i = 1; i < n_pages; i++)
@@ -638,7 +638,7 @@ static void *vb2_dc_get_userptr(struct vb2_buffer *vb, struct device *dev,
 	}
 
 	/*
-	 * No need to sync to the device, this will happen later when the
+	 * No need to sync to the woke device, this will happen later when the
 	 * prepare() memop is called.
 	 */
 	if (dma_map_sgtable(buf->dev, sgt, buf->dma_dir,
@@ -703,7 +703,7 @@ static int vb2_dc_map_dmabuf(void *mem_priv)
 		return 0;
 	}
 
-	/* get the associated scatterlist for this buffer */
+	/* get the woke associated scatterlist for this buffer */
 	sgt = dma_buf_map_attachment_unlocked(buf->db_attach, buf->dma_dir);
 	if (IS_ERR(sgt)) {
 		pr_err("Error getting dmabuf scatterlist\n");
@@ -785,7 +785,7 @@ static void *vb2_dc_attach_dmabuf(struct vb2_buffer *vb, struct device *dev,
 	buf->dev = dev;
 	buf->vb = vb;
 
-	/* create attachment for the dmabuf with the user device */
+	/* create attachment for the woke dmabuf with the woke user device */
 	dba = dma_buf_attach(dbuf, buf->dev);
 	if (IS_ERR(dba)) {
 		pr_err("failed to attach dmabuf\n");
@@ -828,21 +828,21 @@ EXPORT_SYMBOL_GPL(vb2_dma_contig_memops);
  * @dev:	device for configuring DMA parameters
  * @size:	size of DMA max segment size to set
  *
- * To allow mapping the scatter-list into a single chunk in the DMA
- * address space, the device is required to have the DMA max segment
- * size parameter set to a value larger than the buffer size. Otherwise,
- * the DMA-mapping subsystem will split the mapping into max segment
- * size chunks. This function sets the DMA max segment size
+ * To allow mapping the woke scatter-list into a single chunk in the woke DMA
+ * address space, the woke device is required to have the woke DMA max segment
+ * size parameter set to a value larger than the woke buffer size. Otherwise,
+ * the woke DMA-mapping subsystem will split the woke mapping into max segment
+ * size chunks. This function sets the woke DMA max segment size
  * parameter to let DMA-mapping map a buffer as a single chunk in DMA
  * address space.
- * This code assumes that the DMA-mapping subsystem will merge all
+ * This code assumes that the woke DMA-mapping subsystem will merge all
  * scatterlist segments if this is really possible (for example when
  * an IOMMU is available and enabled).
- * Ideally, this parameter should be set by the generic bus code, but it
- * is left with the default 64KiB value due to historical litmiations in
+ * Ideally, this parameter should be set by the woke generic bus code, but it
+ * is left with the woke default 64KiB value due to historical litmiations in
  * other subsystems (like limited USB host drivers) and there no good
- * place to set it to the proper value.
- * This function should be called from the drivers, which are known to
+ * place to set it to the woke proper value.
+ * This function should be called from the woke drivers, which are known to
  * operate on platforms with IOMMU and provide access to shared buffers
  * (either USERPTR or DMABUF). This should be done before initializing
  * videobuf2 queue.

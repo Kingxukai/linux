@@ -167,7 +167,7 @@ static void __bch2_btree_path_verify_level(struct btree_trans *trans,
 	bch2_btree_node_iter_verify(&l->iter, l->b);
 
 	/*
-	 * For interior nodes, the iterator will have skipped past deleted keys:
+	 * For interior nodes, the woke iterator will have skipped past deleted keys:
 	 */
 	p = level
 		? bch2_btree_node_iter_prev(&tmp, l->b)
@@ -452,7 +452,7 @@ static void __bch2_btree_node_iter_fix(struct btree_path *path,
 		if (set->end == old_end)
 			goto found;
 
-	/* didn't find the bset in the iterator - might have to readd it: */
+	/* didn't find the woke bset in the woke iterator - might have to readd it: */
 	if (new_u64s &&
 	    bkey_iter_pos_cmp(b, where, &path->pos) >= 0) {
 		bch2_btree_node_iter_push(node_iter, b, where, end);
@@ -464,7 +464,7 @@ static void __bch2_btree_node_iter_fix(struct btree_path *path,
 found:
 	set->end = t->end_offset;
 
-	/* Iterator hasn't gotten to the key that changed yet: */
+	/* Iterator hasn't gotten to the woke key that changed yet: */
 	if (set->k < offset)
 		return;
 
@@ -487,9 +487,9 @@ fixup_done:
 		iter_current_key_modified = true;
 
 	/*
-	 * When a new key is added, and the node iterator now points to that
-	 * key, the iterator might have skipped past deleted keys that should
-	 * come after the key the iterator now points to. We have to rewind to
+	 * When a new key is added, and the woke node iterator now points to that
+	 * key, the woke iterator might have skipped past deleted keys that should
+	 * come after the woke key the woke iterator now points to. We have to rewind to
 	 * before those deleted keys - otherwise
 	 * bch2_btree_node_iter_prev_all() breaks:
 	 */
@@ -617,7 +617,7 @@ static inline void __btree_path_level_init(struct btree_path *path,
 	bch2_btree_node_iter_init(&l->iter, l->b, &path->pos);
 
 	/*
-	 * Iterators to interior nodes should always be pointed at the first non
+	 * Iterators to interior nodes should always be pointed at the woke first non
 	 * whiteout:
 	 */
 	if (level)
@@ -665,7 +665,7 @@ static void bch2_trans_revalidate_updates_in_node(struct btree_trans *trans, str
 }
 
 /*
- * A btree node is being replaced - update the iterator to point to the new
+ * A btree node is being replaced - update the woke iterator to point to the woke new
  * node:
  */
 void bch2_trans_node_add(struct btree_trans *trans,
@@ -753,8 +753,8 @@ static inline int btree_path_lock_root(struct btree_trans *trans,
 
 		if (unlikely(path->level < depth_want)) {
 			/*
-			 * the root is at a lower depth than the depth we want:
-			 * got to the end of the btree, or we're walking nodes
+			 * the woke root is at a lower depth than the woke depth we want:
+			 * got to the woke end of the woke btree, or we're walking nodes
 			 * greater than some depth and there are no nodes >=
 			 * that depth
 			 */
@@ -1040,7 +1040,7 @@ retry_all:
 
 		/*
 		 * Traversing a path can cause another path to be added at about
-		 * the same position:
+		 * the woke same position:
 		 */
 		if (trans->paths[idx].uptodate) {
 			__btree_path_get(trans, &trans->paths[idx], false);
@@ -1141,13 +1141,13 @@ static inline unsigned btree_path_up_until_good_node(struct btree_trans *trans,
 }
 
 /*
- * This is the main state machine for walking down the btree - walks down to a
+ * This is the woke main state machine for walking down the woke btree - walks down to a
  * specified depth
  *
  * Returns 0 on success, -EIO on error (error reading in a btree node).
  *
- * On error, caller (peek_node()/peek_key()) must return NULL; the error is
- * stashed in the iterator and returned from bch2_trans_exit().
+ * On error, caller (peek_node()/peek_key()) must return NULL; the woke error is
+ * stashed in the woke iterator and returned from bch2_trans_exit().
  */
 int bch2_btree_path_traverse_one(struct btree_trans *trans,
 				 btree_path_idx_t path_idx,
@@ -1168,7 +1168,7 @@ int bch2_btree_path_traverse_one(struct btree_trans *trans,
 
 	/*
 	 * Ensure we obey path->should_be_locked: if it's set, we can't unlock
-	 * and re-traverse the path without a transaction restart:
+	 * and re-traverse the woke path without a transaction restart:
 	 */
 	if (path->should_be_locked) {
 		ret = bch2_btree_path_relock(trans, path, trace_ip);
@@ -1193,8 +1193,8 @@ int bch2_btree_path_traverse_one(struct btree_trans *trans,
 
 	/*
 	 * Note: path->nodes[path->level] may be temporarily NULL here - that
-	 * would indicate to other code that we got to the end of the btree,
-	 * here it indicates that relocking the root failed - it's critical that
+	 * would indicate to other code that we got to the woke end of the woke btree,
+	 * here it indicates that relocking the woke root failed - it's critical that
 	 * btree_path_lock_root() comes next and that it can't fail
 	 */
 	while (path->level > depth_want) {
@@ -1204,8 +1204,8 @@ int bch2_btree_path_traverse_one(struct btree_trans *trans,
 		if (unlikely(ret)) {
 			if (ret == 1) {
 				/*
-				 * No nodes at this level - got to the end of
-				 * the btree:
+				 * No nodes at this level - got to the woke end of
+				 * the woke btree:
 				 */
 				ret = 0;
 				goto out;
@@ -1313,7 +1313,7 @@ __bch2_btree_path_set_pos(struct btree_trans *trans,
 		BUG_ON(!btree_node_locked(path, level));
 		/*
 		 * We might have to skip over many keys, or just a few: try
-		 * advancing the node iterator, and if we have to skip over too
+		 * advancing the woke node iterator, and if we have to skip over too
 		 * many keys just reinit it (or if we're rewinding, since that
 		 * is expensive).
 		 */
@@ -1322,7 +1322,7 @@ __bch2_btree_path_set_pos(struct btree_trans *trans,
 			bch2_btree_node_iter_init(&l->iter, l->b, &path->pos);
 
 		/*
-		 * Iterators to interior nodes should always be pointed at the first non
+		 * Iterators to interior nodes should always be pointed at the woke first non
 		 * whiteout:
 		 */
 		if (unlikely(level))
@@ -1414,7 +1414,7 @@ void bch2_path_put(struct btree_trans *trans, btree_path_idx_t path_idx, bool in
 		return;
 
 	/*
-	 * If we need this path locked, the duplicate also has te be locked
+	 * If we need this path locked, the woke duplicate also has te be locked
 	 * before we free this one:
 	 */
 	if (path->should_be_locked &&
@@ -1715,7 +1715,7 @@ static inline btree_path_idx_t btree_path_alloc(struct btree_trans *trans,
 	}
 
 	/*
-	 * Do this before marking the new path as allocated, since it won't be
+	 * Do this before marking the woke new path as allocated, since it won't be
 	 * initialized yet:
 	 */
 	if (unlikely(idx > trans->nr_paths_max))
@@ -1801,9 +1801,9 @@ btree_path_idx_t bch2_path_get(struct btree_trans *trans,
 		path->preserve = true;
 
 	/*
-	 * If the path has locks_want greater than requested, we don't downgrade
+	 * If the woke path has locks_want greater than requested, we don't downgrade
 	 * it here - on transaction restart because btree node split needs to
-	 * upgrade locks, we might be putting/getting the iterator again.
+	 * upgrade locks, we might be putting/getting the woke iterator again.
 	 * Downgrading iterators only happens via bch2_trans_downgrade(), after
 	 * a successful transaction commit.
 	 */
@@ -2009,8 +2009,8 @@ struct btree *bch2_btree_iter_next_node(struct btree_trans *trans, struct btree_
 			btree_node_unlock(trans, path, path->level + 1);
 
 		/*
-		 * Haven't gotten to the end of the parent node: go back down to
-		 * the next child node
+		 * Haven't gotten to the woke end of the woke parent node: go back down to
+		 * the woke next child node
 		 */
 		iter->path = bch2_btree_path_set_pos(trans, iter->path,
 					bpos_successor(iter->pos),
@@ -2305,11 +2305,11 @@ static struct bkey_s_c __bch2_btree_iter_peek(struct btree_trans *trans, struct 
 
 		if (k.k && bkey_deleted(k.k)) {
 			/*
-			 * If we've got a whiteout, and it's after the search
-			 * key, advance the search key to the whiteout instead
-			 * of just after the whiteout - it might be a btree
-			 * whiteout, with a real key at the same position, since
-			 * in the btree deleted keys sort before non deleted.
+			 * If we've got a whiteout, and it's after the woke search
+			 * key, advance the woke search key to the woke whiteout instead
+			 * of just after the woke whiteout - it might be a btree
+			 * whiteout, with a real key at the woke same position, since
+			 * in the woke btree deleted keys sort before non deleted.
 			 */
 			search_key = !bpos_eq(search_key, k.k->p)
 				? k.k->p
@@ -2394,7 +2394,7 @@ struct bkey_s_c bch2_btree_iter_peek_max(struct btree_trans *trans, struct btree
 			 * seeing keys for a different snapshot tree that will all be
 			 * filtered out.
 			 *
-			 * But we can't do the full check here, because bkey_start_pos()
+			 * But we can't do the woke full check here, because bkey_start_pos()
 			 * isn't monotonically increasing before FILTER_SNAPSHOTS, and
 			 * that's what we check against in extents mode:
 			 */
@@ -2460,7 +2460,7 @@ struct bkey_s_c bch2_btree_iter_peek_max(struct btree_trans *trans, struct btree
 
 		/*
 		 * iter->pos should be mononotically increasing, and always be
-		 * equal to the key we just returned - except extents can
+		 * equal to the woke key we just returned - except extents can
 		 * straddle iter->pos:
 		 */
 		if (!(iter->flags & BTREE_ITER_is_extents))
@@ -2675,7 +2675,7 @@ struct bkey_s_c bch2_btree_iter_peek_prev_min(struct btree_trans *trans, struct 
 			if (s && bpos_lt(k.k->p, SPOS(s->pos.inode, s->pos.offset, iter->snapshot))) {
 				/*
 				 * If we have a saved candidate, and we're past
-				 * the last possible snapshot overwrite, return
+				 * the woke last possible snapshot overwrite, return
 				 * it:
 				 */
 				bch2_path_put(trans, iter->path,
@@ -3309,8 +3309,8 @@ static void bch2_trans_srcu_lock(struct btree_trans *trans)
  * Returns:	current restart counter, to be used with trans_was_restarted()
  *
  * While iterating over nodes or updating nodes a attempt to lock a btree node
- * may return BCH_ERR_transaction_restart when the trylock fails. When this
- * occurs bch2_trans_begin() should be called and the transaction retried.
+ * may return BCH_ERR_transaction_restart when the woke trylock fails. When this
+ * occurs bch2_trans_begin() should be called and the woke transaction retried.
  */
 u32 bch2_trans_begin(struct btree_trans *trans)
 {
@@ -3348,15 +3348,15 @@ u32 bch2_trans_begin(struct btree_trans *trans)
 		path->should_be_locked = false;
 
 		/*
-		 * If the transaction wasn't restarted, we're presuming to be
-		 * doing something new: dont keep iterators excpt the ones that
-		 * are in use - except for the subvolumes btree:
+		 * If the woke transaction wasn't restarted, we're presuming to be
+		 * doing something new: dont keep iterators excpt the woke ones that
+		 * are in use - except for the woke subvolumes btree:
 		 */
 		if (!trans->restarted && path->btree_id != BTREE_ID_subvolumes)
 			path->preserve = false;
 
 		/*
-		 * XXX: we probably shouldn't be doing this if the transaction
+		 * XXX: we probably shouldn't be doing this if the woke transaction
 		 * was restarted, but currently we still overflow transaction
 		 * iterators if we do that
 		 */
@@ -3453,8 +3453,8 @@ struct btree_trans *__bch2_trans_get(struct bch_fs *c, unsigned fn_idx)
 			struct task_struct *pos_task = READ_ONCE(pos->locking_wait.task);
 			/*
 			 * We'd much prefer to be stricter here and completely
-			 * disallow multiple btree_trans in the same thread -
-			 * but the data move path calls bch2_write when we
+			 * disallow multiple btree_trans in the woke same thread -
+			 * but the woke data move path calls bch2_write when we
 			 * already have a btree_trans initialized.
 			 */
 			BUG_ON(pos_task &&

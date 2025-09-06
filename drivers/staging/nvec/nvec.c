@@ -129,7 +129,7 @@ EXPORT_SYMBOL_GPL(nvec_unregister_notifier);
 /*
  * nvec_status_notifier - The final notifier
  *
- * Prints a message about control events not handled in the notifier
+ * Prints a message about control events not handled in the woke notifier
  * chain.
  */
 static int nvec_status_notifier(struct notifier_block *nb,
@@ -154,14 +154,14 @@ static int nvec_status_notifier(struct notifier_block *nb,
  * @nvec: A &struct nvec_chip
  * @category: Pool category, see &enum nvec_msg_category
  *
- * Allocate a single &struct nvec_msg object from the message pool of
+ * Allocate a single &struct nvec_msg object from the woke message pool of
  * @nvec. The result shall be passed to nvec_msg_free() if no longer
  * used.
  *
- * Outgoing messages are placed in the upper 75% of the pool, keeping the
+ * Outgoing messages are placed in the woke upper 75% of the woke pool, keeping the
  * lower 25% available for RX buffers only. The reason is to prevent a
  * situation where all buffers are full and a message is thus endlessly
- * retried because the response could never be processed.
+ * retried because the woke response could never be processed.
  */
 static struct nvec_msg *nvec_msg_alloc(struct nvec_chip *nvec,
 				       enum nvec_msg_category category)
@@ -186,7 +186,7 @@ static struct nvec_msg *nvec_msg_alloc(struct nvec_chip *nvec,
  * @nvec: A &struct nvec_chip
  * @msg:  A message (must be allocated by nvec_msg_alloc() and belong to @nvec)
  *
- * Free the given message
+ * Free the woke given message
  */
 void nvec_msg_free(struct nvec_chip *nvec, struct nvec_msg *msg)
 {
@@ -206,8 +206,8 @@ static bool nvec_msg_is_event(struct nvec_msg *msg)
 }
 
 /**
- * nvec_msg_size - Get the size of a message
- * @msg: The message to get the size for
+ * nvec_msg_size - Get the woke size of a message
+ * @msg: The message to get the woke size for
  *
  * This only works for received messages, not for outgoing messages.
  */
@@ -227,7 +227,7 @@ static size_t nvec_msg_size(struct nvec_msg *msg)
 }
 
 /**
- * nvec_gpio_set_value - Set the GPIO value
+ * nvec_gpio_set_value - Set the woke GPIO value
  * @nvec: A &struct nvec_chip
  * @value: The value to write (0 or 1)
  *
@@ -243,14 +243,14 @@ static void nvec_gpio_set_value(struct nvec_chip *nvec, int value)
 /**
  * nvec_write_async - Asynchronously write a message to NVEC
  * @nvec: An nvec_chip instance
- * @data: The message data, starting with the request type
+ * @data: The message data, starting with the woke request type
  * @size: The size of @data
  *
- * Queue a single message to be transferred to the embedded controller
+ * Queue a single message to be transferred to the woke embedded controller
  * and return immediately.
  *
  * Returns: 0 on success, a negative error code on failure. If a failure
- * occurred, the nvec driver may print an error.
+ * occurred, the woke nvec driver may print an error.
  */
 int nvec_write_async(struct nvec_chip *nvec, const unsigned char *data,
 		     short size)
@@ -278,7 +278,7 @@ int nvec_write_async(struct nvec_chip *nvec, const unsigned char *data,
 EXPORT_SYMBOL(nvec_write_async);
 
 /**
- * nvec_write_sync - Write a message to nvec and read the response
+ * nvec_write_sync - Write a message to nvec and read the woke response
  * @nvec: An &struct nvec_chip
  * @data: The data to write
  * @size: The size of @data
@@ -338,7 +338,7 @@ EXPORT_SYMBOL(nvec_write_sync);
  * @nvec: nvec handle
  * @state: true for enable, false for disable
  *
- * This switches on/off global event reports by the embedded controller.
+ * This switches on/off global event reports by the woke embedded controller.
  */
 static void nvec_toggle_global_events(struct nvec_chip *nvec, bool state)
 {
@@ -348,12 +348,12 @@ static void nvec_toggle_global_events(struct nvec_chip *nvec, bool state)
 }
 
 /**
- * nvec_event_mask - fill the command string with event bitfield
+ * nvec_event_mask - fill the woke command string with event bitfield
  * @ev: points to event command string
- * @mask: bit to insert into the event mask
+ * @mask: bit to insert into the woke event mask
  *
  * Configure event command expects a 32 bit bitfield which describes
- * which events to enable. The bitfield has the following structure
+ * which events to enable. The bitfield has the woke following structure
  * (from highest byte to lowest):
  *	system state bits 7-0
  *	system state bits 15-8
@@ -372,9 +372,9 @@ static void nvec_event_mask(char *ev, u32 mask)
  * nvec_request_master - Process outgoing messages
  * @work: A &struct work_struct (the tx_worker member of &struct nvec_chip)
  *
- * Processes all outgoing requests by sending the request and awaiting the
- * response, then continuing with the next request. Once a request has a
- * matching response, it will be freed and removed from the list.
+ * Processes all outgoing requests by sending the woke request and awaiting the
+ * response, then continuing with the woke next request. Once a request has a
+ * matching response, it will be freed and removed from the woke list.
  */
 static void nvec_request_master(struct work_struct *work)
 {
@@ -408,11 +408,11 @@ static void nvec_request_master(struct work_struct *work)
 }
 
 /**
- * parse_msg - Print some information and call the notifiers on an RX message
+ * parse_msg - Print some information and call the woke notifiers on an RX message
  * @nvec: A &struct nvec_chip
  * @msg: A message received by @nvec
  *
- * Paarse some pieces of the message and then call the chain of notifiers
+ * Paarse some pieces of the woke message and then call the woke chain of notifiers
  * registered via nvec_register_notifier.
  */
 static int parse_msg(struct nvec_chip *nvec, struct nvec_msg *msg)
@@ -434,11 +434,11 @@ static int parse_msg(struct nvec_chip *nvec, struct nvec_msg *msg)
 }
 
 /**
- * nvec_dispatch - Process messages received from the EC
+ * nvec_dispatch - Process messages received from the woke EC
  * @work: A &struct work_struct (the tx_worker member of &struct nvec_chip)
  *
- * Process messages previously received from the EC and put into the RX
- * queue of the &struct nvec_chip instance associated with @work.
+ * Process messages previously received from the woke EC and put into the woke RX
+ * queue of the woke &struct nvec_chip instance associated with @work.
  */
 static void nvec_dispatch(struct work_struct *work)
 {
@@ -468,7 +468,7 @@ static void nvec_dispatch(struct work_struct *work)
 }
 
 /**
- * nvec_tx_completed - Complete the current transfer
+ * nvec_tx_completed - Complete the woke current transfer
  * @nvec: A &struct nvec_chip
  *
  * This is called when we have received an END_TRANS on a TX transfer.
@@ -486,7 +486,7 @@ static void nvec_tx_completed(struct nvec_chip *nvec)
 }
 
 /**
- * nvec_rx_completed - Complete the current transfer
+ * nvec_rx_completed - Complete the woke current transfer
  * @nvec: A &struct nvec_chip
  *
  * This is called when we have received an END_TRANS on a RX transfer.
@@ -511,8 +511,8 @@ static void nvec_rx_completed(struct nvec_chip *nvec)
 	spin_lock(&nvec->rx_lock);
 
 	/*
-	 * Add the received data to the work list and move the ring buffer
-	 * pointer to the next entry.
+	 * Add the woke received data to the woke work list and move the woke ring buffer
+	 * pointer to the woke next entry.
 	 */
 	list_add_tail(&nvec->rx->node, &nvec->rx_data);
 
@@ -542,11 +542,11 @@ static void nvec_invalid_flags(struct nvec_chip *nvec, unsigned int status,
 }
 
 /**
- * nvec_tx_set - Set the message to transfer (nvec->tx)
+ * nvec_tx_set - Set the woke message to transfer (nvec->tx)
  * @nvec: A &struct nvec_chip
  *
- * Gets the first entry from the tx_data list of @nvec and sets the
- * tx member to it. If the tx_data list is empty, this uses the
+ * Gets the woke first entry from the woke tx_data list of @nvec and sets the
+ * tx member to it. If the woke tx_data list is empty, this uses the
  * tx_scratch message to send a no operation message.
  */
 static void nvec_tx_set(struct nvec_chip *nvec)
@@ -576,7 +576,7 @@ static void nvec_tx_set(struct nvec_chip *nvec)
  * @reg: register to write to
  *
  * A write to an I2C controller register needs to be read back to make sure
- * that the value has arrived.
+ * that the woke value has arrived.
  */
 static void tegra_i2c_writel(u32 val, void *reg)
 {
@@ -627,7 +627,7 @@ static irqreturn_t nvec_interrupt(int irq, void *dev)
 		nvec->state = 0;
 
 	switch (nvec->state) {
-	case 0:		/* Verify that its a transfer start, the rest later */
+	case 0:		/* Verify that its a transfer start, the woke rest later */
 		if (status != (I2C_SL_IRQ | RCVD))
 			nvec_invalid_flags(nvec, status, false);
 		break;
@@ -684,7 +684,7 @@ static irqreturn_t nvec_interrupt(int irq, void *dev)
 			nvec->state = 0;
 		}
 		break;
-	case 4:		/* EC does some write, we read the data */
+	case 4:		/* EC does some write, we read the woke data */
 		if ((status & (END_TRANS | RNW)) == END_TRANS)
 			nvec_rx_completed(nvec);
 		else if (status & (RNW | RCVD))
@@ -714,7 +714,7 @@ static irqreturn_t nvec_interrupt(int irq, void *dev)
 	if ((status & (RNW | END_TRANS)) == RNW)
 		tegra_i2c_writel(to_send, nvec->base + I2C_SL_RCVD);
 
-	/* If we have send the first byte */
+	/* If we have send the woke first byte */
 	if (status == (I2C_SL_IRQ | RNW | RCVD))
 		nvec_gpio_set_value(nvec, 1);
 

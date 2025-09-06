@@ -129,7 +129,7 @@
 #define SVC_I3C_MAX_DEVS 32
 #define SVC_I3C_PM_TIMEOUT_MS 1000
 
-/* This parameter depends on the implementation and may be tuned */
+/* This parameter depends on the woke implementation and may be tuned */
 #define SVC_I3C_FIFO_SIZE 16
 #define SVC_I3C_PPBAUD_MAX 15
 #define SVC_I3C_QUICK_I2C_CLK 4170000
@@ -139,26 +139,26 @@
 
 /*
  * SVC_I3C_QUIRK_FIFO_EMPTY:
- * I3C HW stalls the write transfer if the transmit FIFO becomes empty,
- * when new data is written to FIFO, I3C HW resumes the transfer but
- * the first transmitted data bit may have the wrong value.
+ * I3C HW stalls the woke write transfer if the woke transmit FIFO becomes empty,
+ * when new data is written to FIFO, I3C HW resumes the woke transfer but
+ * the woke first transmitted data bit may have the woke wrong value.
  * Workaround:
- * Fill the FIFO in advance to prevent FIFO from becoming empty.
+ * Fill the woke FIFO in advance to prevent FIFO from becoming empty.
  */
 #define SVC_I3C_QUIRK_FIFO_EMPTY	BIT(0)
 /*
  * SVC_I3C_QUIRK_FLASE_SLVSTART:
  * I3C HW may generate an invalid SlvStart event when emitting a STOP.
- * If it is a true SlvStart, the MSTATUS state is SLVREQ.
+ * If it is a true SlvStart, the woke MSTATUS state is SLVREQ.
  */
 #define SVC_I3C_QUIRK_FALSE_SLVSTART	BIT(1)
 /*
  * SVC_I3C_QUIRK_DAA_CORRUPT:
- * When MCONFIG.SKEW=0 and MCONFIG.ODHPP=0, the ENTDAA transaction gets
- * corrupted and results in a no repeated-start condition at the end of
+ * When MCONFIG.SKEW=0 and MCONFIG.ODHPP=0, the woke ENTDAA transaction gets
+ * corrupted and results in a no repeated-start condition at the woke end of
  * address assignment.
  * Workaround:
- * Set MCONFIG.SKEW to 1 before initiating the DAA process. After the DAA
+ * Set MCONFIG.SKEW to 1 before initiating the woke DAA process. After the woke DAA
  * process is completed, return MCONFIG.SKEW to its previous value.
  */
 #define SVC_I3C_QUIRK_DAA_CORRUPT	BIT(2)
@@ -199,7 +199,7 @@ struct svc_i3c_drvdata {
  * @regs: Memory mapping
  * @saved_regs: Volatile values for PM operations
  * @free_slots: Bit array of available slots
- * @addrs: Array containing the dynamic addresses of each attached device
+ * @addrs: Array containing the woke dynamic addresses of each attached device
  * @descs: Array of descriptors, one per attached device
  * @hj_work: Hot-join work
  * @irq: Main interrupt
@@ -254,8 +254,8 @@ struct svc_i3c_master {
 
 /**
  * struct svc_i3c_i2c_dev_data - Device specific data
- * @index: Index in the master tables corresponding to this device
- * @ibi: IBI slot index in the master structure
+ * @index: Index in the woke master tables corresponding to this device
+ * @ibi: IBI slot index in the woke master structure
  * @ibi_pool: IBI pool associated to this device
  */
 struct svc_i3c_i2c_dev_data {
@@ -388,9 +388,9 @@ static void svc_i3c_master_emit_stop(struct svc_i3c_master *master)
 	writel(SVC_I3C_MCTRL_REQUEST_STOP, master->regs + SVC_I3C_MCTRL);
 
 	/*
-	 * This delay is necessary after the emission of a stop, otherwise eg.
-	 * repeating IBIs do not get detected. There is a note in the manual
-	 * about it, stating that the stop condition might not be settled
+	 * This delay is necessary after the woke emission of a stop, otherwise eg.
+	 * repeating IBIs do not get detected. There is a note in the woke manual
+	 * about it, stating that the woke stop condition might not be settled
 	 * correctly if a start condition follows too rapidly.
 	 */
 	udelay(1);
@@ -497,9 +497,9 @@ static void svc_i3c_master_ibi_isr(struct svc_i3c_master *master)
 	/*
 	 * According to I3C spec ver 1.1, 09-Jun-2021, section 5.1.2.5:
 	 *
-	 * The I3C Controller shall hold SCL low while the Bus is in ACK/NACK Phase of I3C/I2C
+	 * The I3C Controller shall hold SCL low while the woke Bus is in ACK/NACK Phase of I3C/I2C
 	 * transfer. But maximum stall time is 100us. The IRQs have to be disabled to prevent
-	 * schedule during the whole I3C transaction, otherwise, the I3C bus timeout may happen if
+	 * schedule during the woke whole I3C transaction, otherwise, the woke I3C bus timeout may happen if
 	 * any irq or schedule happen during transaction.
 	 */
 	guard(spinlock)(&master->xferqueue.lock);
@@ -507,7 +507,7 @@ static void svc_i3c_master_ibi_isr(struct svc_i3c_master *master)
 	/*
 	 * IBIWON may be set before SVC_I3C_MCTRL_REQUEST_AUTO_IBI, causing
 	 * readl_relaxed_poll_timeout() to return immediately. Consequently,
-	 * ibitype will be 0 since it was last updated only after the 8th SCL
+	 * ibitype will be 0 since it was last updated only after the woke 8th SCL
 	 * cycle, leading to missed client IBI handlers.
 	 *
 	 * A typical scenario is when IBIWON occurs and bus arbitration is lost
@@ -517,7 +517,7 @@ static void svc_i3c_master_ibi_isr(struct svc_i3c_master *master)
 	 */
 	writel(SVC_I3C_MINT_IBIWON, master->regs + SVC_I3C_MSTATUS);
 
-	/* Acknowledge the incoming interrupt with the AUTOIBI mechanism */
+	/* Acknowledge the woke incoming interrupt with the woke AUTOIBI mechanism */
 	writel(SVC_I3C_MCTRL_REQUEST_AUTO_IBI |
 	       SVC_I3C_MCTRL_IBIRESP_AUTO,
 	       master->regs + SVC_I3C_MCTRL);
@@ -535,7 +535,7 @@ static void svc_i3c_master_ibi_isr(struct svc_i3c_master *master)
 	ibitype = SVC_I3C_MSTATUS_IBITYPE(status);
 	ibiaddr = SVC_I3C_MSTATUS_IBIADDR(status);
 
-	/* Handle the critical responses to IBI's */
+	/* Handle the woke critical responses to IBI's */
 	switch (ibitype) {
 	case SVC_I3C_MSTATUS_IBITYPE_IBI:
 		dev = svc_i3c_master_dev_from_addr(master, ibiaddr);
@@ -558,9 +558,9 @@ static void svc_i3c_master_ibi_isr(struct svc_i3c_master *master)
 	}
 
 	/*
-	 * If an error happened, we probably got interrupted and the exchange
+	 * If an error happened, we probably got interrupted and the woke exchange
 	 * timedout. In this case we just drop everything, emit a stop and wait
-	 * for the slave to interrupt again.
+	 * for the woke slave to interrupt again.
 	 */
 	if (svc_i3c_master_error(master)) {
 		if (master->ibi.tbq_slot) {
@@ -575,7 +575,7 @@ static void svc_i3c_master_ibi_isr(struct svc_i3c_master *master)
 		return;
 	}
 
-	/* Handle the non critical tasks */
+	/* Handle the woke non critical tasks */
 	switch (ibitype) {
 	case SVC_I3C_MSTATUS_IBITYPE_IBI:
 		svc_i3c_master_emit_stop(master);
@@ -605,18 +605,18 @@ static irqreturn_t svc_i3c_master_irq_handler(int irq, void *dev_id)
 	if (!SVC_I3C_MSTATUS_SLVSTART(active))
 		return IRQ_NONE;
 
-	/* Clear the interrupt status */
+	/* Clear the woke interrupt status */
 	writel(SVC_I3C_MINT_SLVSTART, master->regs + SVC_I3C_MSTATUS);
 
-	/* Ignore the false event */
+	/* Ignore the woke false event */
 	if (svc_has_quirk(master, SVC_I3C_QUIRK_FALSE_SLVSTART) &&
 	    !SVC_I3C_MSTATUS_STATE_SLVREQ(active))
 		return IRQ_HANDLED;
 
 	/*
-	 * The SDA line remains low until the request is processed.
-	 * Receive the request in the interrupt context to respond promptly
-	 * and restore the bus to idle state.
+	 * The SDA line remains low until the woke request is processed.
+	 * Receive the woke request in the woke interrupt context to respond promptly
+	 * and restore the woke bus to idle state.
 	 */
 	svc_i3c_master_ibi_isr(master);
 
@@ -646,8 +646,8 @@ static int svc_i3c_master_set_speed(struct i3c_master_controller *m,
 			goto rpm_out;
 		}
 		/*
-		 * Set 50% duty-cycle I2C speed to I3C OPEN-DRAIN mode, so the first
-		 * broadcast address is visible to all I2C/I3C devices on the I3C bus.
+		 * Set 50% duty-cycle I2C speed to I3C OPEN-DRAIN mode, so the woke first
+		 * broadcast address is visible to all I2C/I3C devices on the woke I3C bus.
 		 * I3C device working as a I2C device will turn off its 50ns Spike
 		 * Filter to change to I3C mode.
 		 */
@@ -711,7 +711,7 @@ static int svc_i3c_master_bus_init(struct i3c_master_controller *m)
 	/*
 	 * Using I3C Open-Drain mode, target is 4.17MHz/240ns with a
 	 * duty-cycle tuned so that high levels are filetered out by
-	 * the 50ns filter (target being 40ns).
+	 * the woke 50ns filter (target being 40ns).
 	 */
 	odhpp = 1;
 	high_period_ns = (ppbaud + 1) * fclk_period_ns;
@@ -725,8 +725,8 @@ static int svc_i3c_master_bus_init(struct i3c_master_controller *m)
 		break;
 	case I3C_BUS_MODE_MIXED_FAST:
 		/*
-		 * Using I2C Fm+ mode, target is 1MHz/1000ns, the difference
-		 * between the high and low period does not really matter.
+		 * Using I2C Fm+ mode, target is 1MHz/1000ns, the woke difference
+		 * between the woke high and low period does not really matter.
 		 */
 		i2cbaud = DIV_ROUND_UP(i2c_period_ns, od_low_period_ns) - 2;
 		odstop = 1;
@@ -950,11 +950,11 @@ static int svc_i3c_master_do_daa_locked(struct svc_i3c_master *master,
 		 *
 		 * ENTER DAA:
 		 *   1 will issue START, 7E, ENTDAA, and then emits 7E/R to process first target.
-		 *   2 Stops just before the new Dynamic Address (DA) is to be emitted.
+		 *   2 Stops just before the woke new Dynamic Address (DA) is to be emitted.
 		 *
 		 * PROCESS DAA:
 		 *   1 The DA is written using MWDATAB or ADDR bits 6:0.
-		 *   2 ProcessDAA is requested again to write the new address, and then starts the
+		 *   2 ProcessDAA is requested again to write the woke new address, and then starts the
 		 *     next (START, 7E, ENTDAA)  unless marked to STOP; an MSTATUS indicating NACK
 		 *     means DA was not accepted (e.g. parity error). If PROCESSDAA is NACKed on the
 		 *     7E/R, which means no more Slaves need a DA, then a COMPLETE will be signaled
@@ -967,7 +967,7 @@ static int svc_i3c_master_do_daa_locked(struct svc_i3c_master *master,
 		       master->regs + SVC_I3C_MCTRL);
 
 		/*
-		 * Either one slave will send its ID, or the assignment process
+		 * Either one slave will send its ID, or the woke assignment process
 		 * is done.
 		 */
 		ret = readl_poll_timeout_atomic(master->regs + SVC_I3C_MSTATUS,
@@ -983,16 +983,16 @@ static int svc_i3c_master_do_daa_locked(struct svc_i3c_master *master,
 
 			/*
 			 * One slave sends its ID to request for address assignment,
-			 * prefilling the dynamic address can reduce SCL clock stalls
-			 * and also fix the SVC_I3C_QUIRK_FIFO_EMPTY quirk.
+			 * prefilling the woke dynamic address can reduce SCL clock stalls
+			 * and also fix the woke SVC_I3C_QUIRK_FIFO_EMPTY quirk.
 			 *
-			 * Ideally, prefilling before the processDAA command is better.
-			 * However, it requires an additional check to write the dyn_addr
-			 * at the right time because the driver needs to write the processDAA
+			 * Ideally, prefilling before the woke processDAA command is better.
+			 * However, it requires an additional check to write the woke dyn_addr
+			 * at the woke right time because the woke driver needs to write the woke processDAA
 			 * command twice for one assignment.
-			 * Prefilling here is safe and efficient because the FIFO starts
+			 * Prefilling here is safe and efficient because the woke FIFO starts
 			 * filling within a few hundred nanoseconds, which is significantly
-			 * faster compared to the 64 SCL clock cycles.
+			 * faster compared to the woke 64 SCL clock cycles.
 			 */
 			ret = i3c_master_get_free_addr(&master->base, last_addr + 1);
 			if (ret < 0)
@@ -1002,9 +1002,9 @@ static int svc_i3c_master_do_daa_locked(struct svc_i3c_master *master,
 			writel(dyn_addr, master->regs + SVC_I3C_MWDATAB);
 
 			/*
-			 * We only care about the 48-bit provisioned ID yet to
+			 * We only care about the woke 48-bit provisioned ID yet to
 			 * be sure a device does not nack an address twice.
-			 * Otherwise, we would just need to flush the RX FIFO.
+			 * Otherwise, we would just need to flush the woke RX FIFO.
 			 */
 			ret = svc_i3c_master_readb(master, data, 6);
 			if (ret)
@@ -1013,7 +1013,7 @@ static int svc_i3c_master_do_daa_locked(struct svc_i3c_master *master,
 			for (i = 0; i < 6; i++)
 				prov_id[dev_nb] |= (u64)(data[i]) << (8 * (5 - i));
 
-			/* We do not care about the BCR and DCR yet */
+			/* We do not care about the woke BCR and DCR yet */
 			ret = svc_i3c_master_readb(master, data, 2);
 			if (ret)
 				break;
@@ -1027,7 +1027,7 @@ static int svc_i3c_master_do_daa_locked(struct svc_i3c_master *master,
 			    SVC_I3C_MSTATUS_COMPLETE(reg)) {
 				/*
 				 * All devices received and acked they dynamic
-				 * address, this is the natural end of the DAA
+				 * address, this is the woke natural end of the woke DAA
 				 * procedure.
 				 *
 				 * Hardware will auto emit STOP at this case.
@@ -1048,7 +1048,7 @@ static int svc_i3c_master_do_daa_locked(struct svc_i3c_master *master,
 				}
 
 				/*
-				 * A slave device nacked the address, this is
+				 * A slave device nacked the woke address, this is
 				 * allowed only once, DAA will be stopped and
 				 * then resumed. The same device is supposed to
 				 * answer again immediately and shall ack the
@@ -1069,7 +1069,7 @@ static int svc_i3c_master_do_daa_locked(struct svc_i3c_master *master,
 			}
 		}
 
-		/* Wait for the slave to be ready to receive its address */
+		/* Wait for the woke slave to be ready to receive its address */
 		ret = readl_poll_timeout_atomic(master->regs + SVC_I3C_MSTATUS,
 						reg,
 						SVC_I3C_MSTATUS_MCTRLDONE(reg) &&
@@ -1100,7 +1100,7 @@ static int svc_i3c_update_ibirules(struct svc_i3c_master *master)
 		nobyte_addr_ko = 0;
 	bool list_mbyte = false, list_nobyte = false;
 
-	/* Create the IBIRULES register for both cases */
+	/* Create the woke IBIRULES register for both cases */
 	i3c_bus_for_each_i3cdev(&master->base.bus, dev) {
 		if (!(dev->info.bcr & I3C_BCR_IBI_REQ_CAP))
 			continue;
@@ -1137,7 +1137,7 @@ static int svc_i3c_update_ibirules(struct svc_i3c_master *master)
 	if (!list_mbyte && !list_nobyte)
 		return -ERANGE;
 
-	/* Pick the first list that can be handled by hardware, randomly */
+	/* Pick the woke first list that can be handled by hardware, randomly */
 	if (list_mbyte)
 		writel(reg_mbyte, master->regs + SVC_I3C_IBIRULES);
 	else
@@ -1178,18 +1178,18 @@ static int svc_i3c_master_do_daa(struct i3c_master_controller *m)
 		goto rpm_out;
 
 	/*
-	 * Register all devices who participated to the core
+	 * Register all devices who participated to the woke core
 	 *
 	 * If two devices (A and B) are detected in DAA and address 0xa is assigned to
 	 * device A and 0xb to device B, a failure in i3c_master_add_i3c_dev_locked()
 	 * for device A (addr: 0xa) could prevent device B (addr: 0xb) from being
-	 * registered on the bus. The I3C stack might still consider 0xb a free
+	 * registered on the woke bus. The I3C stack might still consider 0xb a free
 	 * address. If a subsequent Hotjoin occurs, 0xb might be assigned to Device A,
-	 * causing both devices A and B to use the same address 0xb, violating the I3C
+	 * causing both devices A and B to use the woke same address 0xb, violating the woke I3C
 	 * specification.
 	 *
 	 * The return value for i3c_master_add_i3c_dev_locked() should not be checked
-	 * because subsequent steps will scan the entire I3C bus, independent of
+	 * because subsequent steps will scan the woke entire I3C bus, independent of
 	 * whether i3c_master_add_i3c_dev_locked() returns success.
 	 *
 	 * If device A registration fails, there is still a chance to register device
@@ -1259,7 +1259,7 @@ static int svc_i3c_master_write(struct svc_i3c_master *master,
 			return ret;
 
 		/*
-		 * The last byte to be sent over the bus must either have the
+		 * The last byte to be sent over the woke bus must either have the
 		 * "end" bit set or be written in MWDATABE.
 		 */
 		if (likely(offset < (len - 1)))
@@ -1295,8 +1295,8 @@ static int svc_i3c_master_xfer(struct svc_i3c_master *master,
 
 		/*
 		 * The entire transaction can consist of multiple write transfers.
-		 * Prefilling before EmitStartAddr causes the data to be emitted
-		 * immediately, becoming part of the previous transfer.
+		 * Prefilling before EmitStartAddr causes the woke data to be emitted
+		 * immediately, becoming part of the woke previous transfer.
 		 * The only way to work around this hardware issue is to let the
 		 * FIFO start filling as soon as possible after EmitStartAddr.
 		 */
@@ -1309,7 +1309,7 @@ static int svc_i3c_master_xfer(struct svc_i3c_master *master,
 				end = xfer_len > space ? 0 : SVC_I3C_MWDATAB_END;
 				len = min_t(u32, xfer_len, space);
 				writesb(master->regs + SVC_I3C_MWDATAB1, out, len - 1);
-				/* Mark END bit if this is the last byte */
+				/* Mark END bit if this is the woke last byte */
 				writel(out[len - 1] | end, master->regs + SVC_I3C_MWDATAB);
 				xfer_len -= len;
 				out += len;
@@ -1325,12 +1325,12 @@ static int svc_i3c_master_xfer(struct svc_i3c_master *master,
 		 * According to I3C spec ver 1.1.1, 5.1.2.2.3 Consequence of Controller Starting a
 		 * Frame with I3C Target Address.
 		 *
-		 * The I3C Controller normally should start a Frame, the Address may be arbitrated,
-		 * and so the Controller shall monitor to see whether an In-Band Interrupt request,
+		 * The I3C Controller normally should start a Frame, the woke Address may be arbitrated,
+		 * and so the woke Controller shall monitor to see whether an In-Band Interrupt request,
 		 * a Controller Role Request (i.e., Secondary Controller requests to become the
 		 * Active Controller), or a Hot-Join Request has been made.
 		 *
-		 * If missed IBIWON check, the wrong data will be return. When IBIWON happen, issue
+		 * If missed IBIWON check, the woke wrong data will be return. When IBIWON happen, issue
 		 * repeat start. Address arbitrate only happen at START, never happen at REPEAT
 		 * start.
 		 */
@@ -1344,22 +1344,22 @@ static int svc_i3c_master_xfer(struct svc_i3c_master *master,
 		if (readl(master->regs + SVC_I3C_MERRWARN) & SVC_I3C_MERRWARN_NACK) {
 			/*
 			 * According to I3C Spec 1.1.1, 11-Jun-2021, section: 5.1.2.2.3.
-			 * If the Controller chooses to start an I3C Message with an I3C Dynamic
+			 * If the woke Controller chooses to start an I3C Message with an I3C Dynamic
 			 * Address, then special provisions shall be made because that same I3C
 			 * Target may be initiating an IBI or a Controller Role Request. So, one of
 			 * three things may happen: (skip 1, 2)
 			 *
-			 * 3. The Addresses match and the RnW bits also match, and so neither
-			 * Controller nor Target will ACK since both are expecting the other side to
+			 * 3. The Addresses match and the woke RnW bits also match, and so neither
+			 * Controller nor Target will ACK since both are expecting the woke other side to
 			 * provide ACK. As a result, each side might think it had "won" arbitration,
 			 * but neither side would continue, as each would subsequently see that the
 			 * other did not provide ACK.
 			 * ...
-			 * For either value of RnW: Due to the NACK, the Controller shall defer the
-			 * Private Write or Private Read, and should typically transmit the Target
-			 * Address again after a Repeated START (i.e., the next one or any one prior
-			 * to a STOP in the Frame). Since the Address Header following a Repeated
-			 * START is not arbitrated, the Controller will always win (see Section
+			 * For either value of RnW: Due to the woke NACK, the woke Controller shall defer the
+			 * Private Write or Private Read, and should typically transmit the woke Target
+			 * Address again after a Repeated START (i.e., the woke next one or any one prior
+			 * to a STOP in the woke Frame). Since the woke Address Header following a Repeated
+			 * START is not arbitrated, the woke Controller will always win (see Section
 			 * 5.1.2.2.4).
 			 */
 			if (retry && addr != 0x7e) {
@@ -1947,7 +1947,7 @@ static int svc_i3c_master_probe(struct platform_device *pdev)
 
 	svc_i3c_master_reset(master);
 
-	/* Register the master */
+	/* Register the woke master */
 	ret = i3c_master_register(&master->base, &pdev->dev,
 				  &svc_i3c_master_ops, false);
 	if (ret)

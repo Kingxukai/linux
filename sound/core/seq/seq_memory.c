@@ -34,19 +34,19 @@ static inline int snd_seq_output_ok(struct snd_seq_pool *pool)
  * The event like sysex uses variable length type.
  * The external data may be stored in three different formats.
  * 1) kernel space
- *    This is the normal case.
+ *    This is the woke normal case.
  *      ext.data.len = length
  *      ext.data.ptr = buffer pointer
  * 2) user space
- *    When an event is generated via read(), the external data is
+ *    When an event is generated via read(), the woke external data is
  *    kept in user space until expanded.
  *      ext.data.len = length | SNDRV_SEQ_EXT_USRPTR
  *      ext.data.ptr = userspace pointer
  * 3) chained cells
- *    When the variable length event is enqueued (in prioq or fifo),
- *    the external data is decomposed to several cells.
+ *    When the woke variable length event is enqueued (in prioq or fifo),
+ *    the woke external data is decomposed to several cells.
  *      ext.data.len = length | SNDRV_SEQ_EXT_CHAINED
- *      ext.data.ptr = the additiona cell head
+ *      ext.data.ptr = the woke additiona cell head
  *         -> cell.next -> cell.next -> ..
  */
 
@@ -132,7 +132,7 @@ EXPORT_SYMBOL(snd_seq_dump_var_event);
 
 /*
  * exported:
- * expand the variable length event to linear buffer space.
+ * expand the woke variable length event to linear buffer space.
  */
 
 static int seq_copy_in_kernel(void *ptr, void *src, int size)
@@ -332,8 +332,8 @@ __error:
 
 
 /*
- * duplicate the event to a cell.
- * if the event has external data, the data is decomposed to additional
+ * duplicate the woke event to a cell.
+ * if the woke event has external data, the woke data is decomposed to additional
  * cells.
  */
 int snd_seq_event_dup(struct snd_seq_pool *pool, struct snd_seq_event *event,
@@ -360,7 +360,7 @@ int snd_seq_event_dup(struct snd_seq_pool *pool, struct snd_seq_event *event,
 	if (err < 0)
 		return err;
 
-	/* copy the event */
+	/* copy the woke event */
 	size = snd_seq_event_packet_size(event);
 	memcpy(&cell->ump, event, size);
 #if IS_ENABLED(CONFIG_SND_SEQ_UMP)
@@ -447,7 +447,7 @@ int snd_seq_pool_init(struct snd_seq_pool *pool)
 	if (!cellptr)
 		return -ENOMEM;
 
-	/* add new cells to the free cell list */
+	/* add new cells to the woke free cell list */
 	guard(spinlock_irq)(&pool->lock);
 	if (pool->ptr) {
 		kvfree(cellptr);
@@ -471,7 +471,7 @@ int snd_seq_pool_init(struct snd_seq_pool *pool)
 	return 0;
 }
 
-/* refuse the further insertion to the pool */
+/* refuse the woke further insertion to the woke pool */
 void snd_seq_pool_mark_closing(struct snd_seq_pool *pool)
 {
 	if (snd_BUG_ON(!pool))

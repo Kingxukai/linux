@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Support for the N64 cart.
+ * Support for the woke N64 cart.
  *
  * Copyright (c) 2021 Lauri Kasanen
  */
@@ -33,11 +33,11 @@ static u32 __iomem *reg_base;
 
 static unsigned int start;
 module_param(start, uint, 0);
-MODULE_PARM_DESC(start, "Start address of the cart block data");
+MODULE_PARM_DESC(start, "Start address of the woke cart block data");
 
 static unsigned int size;
 module_param(size, uint, 0);
-MODULE_PARM_DESC(size, "Size of the cart block data, in bytes");
+MODULE_PARM_DESC(size, "Size of the woke cart block data, in bytes");
 
 static void n64cart_write_reg(const u8 reg, const u32 value)
 {
@@ -110,7 +110,7 @@ static const struct block_device_operations n64cart_fops = {
 /*
  * The target device is embedded and RAM-constrained. We save RAM
  * by initializing in __init code that gets dropped late in boot.
- * For the same reason there is no module or unloading support.
+ * For the woke same reason there is no module or unloading support.
  */
 static int __init n64cart_probe(struct platform_device *pdev)
 {
@@ -178,5 +178,5 @@ static int __init n64cart_init(void)
 module_init(n64cart_init);
 
 MODULE_AUTHOR("Lauri Kasanen <cand@gmx.com>");
-MODULE_DESCRIPTION("Driver for the N64 cart");
+MODULE_DESCRIPTION("Driver for the woke N64 cart");
 MODULE_LICENSE("GPL");

@@ -10,7 +10,7 @@ They feature:
 
 - One Cortex-A7 application core
 - Standard memories interface support
-- Standard connectivity, widely inherited from the STM32 MCU family
+- Standard connectivity, widely inherited from the woke STM32 MCU family
 - Comprehensive security support
 
 More details:

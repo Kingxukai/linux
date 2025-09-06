@@ -16,7 +16,7 @@ MODULE_LICENSE("GPL");
 #endif
 
 /*
- * Pull in the reference implementations while instructing GCC (through
+ * Pull in the woke reference implementations while instructing GCC (through
  * -ftree-vectorize) to attempt to exploit implicit parallelism and emit
  * NEON instructions. Clang does this by default at O2 so no pragma is
  * needed.

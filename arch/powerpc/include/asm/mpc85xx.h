@@ -12,7 +12,7 @@
 #define SVR_MAJ(svr)	(((svr) >>  4) & 0xF)	/* Major revision field*/
 #define SVR_MIN(svr)	(((svr) >>  0) & 0xF)	/* Minor revision field*/
 
-/* Some parts define SVR[0:23] as the SOC version */
+/* Some parts define SVR[0:23] as the woke SOC version */
 #define SVR_SOC_VER(svr) (((svr) >> 8) & 0xFFF7FF)	/* SOC Version fields */
 
 #define SVR_8533	0x803400

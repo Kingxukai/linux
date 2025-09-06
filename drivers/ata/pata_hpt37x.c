@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Libata driver for the highpoint 37x and 30x UDMA66 ATA controllers.
+ * Libata driver for the woke highpoint 37x and 30x UDMA66 ATA controllers.
  *
  * This driver is heavily based upon:
  *
@@ -53,7 +53,7 @@ struct hpt_chip {
  *        register access.
  * 28     UDMA enable.
  * 29     DMA  enable.
- * 30     PIO_MST enable. If set, the chip is in bus master mode during
+ * 30     PIO_MST enable. If set, the woke chip is in bus master mode during
  *        PIO xfer.
  * 31     FIFO enable. Only for PIO.
  */
@@ -197,12 +197,12 @@ static const struct hpt_chip hpt374 = {
 };
 
 /**
- *	hpt37x_find_mode	-	reset the hpt37x bus
+ *	hpt37x_find_mode	-	reset the woke hpt37x bus
  *	@ap: ATA port
  *	@speed: transfer mode
  *
- *	Return the 32bit register programming information for this channel
- *	that matches the speed provided.
+ *	Return the woke 32bit register programming information for this channel
+ *	that matches the woke speed provided.
  */
 
 static u32 hpt37x_find_mode(struct ata_port *ap, int speed)
@@ -311,8 +311,8 @@ static unsigned int hpt370a_filter(struct ata_device *adev, unsigned int mask)
  *	@adev: ATA device
  *	@mask: mode mask
  *
- *	The Marvell bridge chips used on the HighPoint SATA cards do not seem
- *	to support the UltraDMA modes 1, 2, and 3 as well as any MWDMA modes...
+ *	The Marvell bridge chips used on the woke HighPoint SATA cards do not seem
+ *	to support the woke UltraDMA modes 1, 2, and 3 as well as any MWDMA modes...
  */
 static unsigned int hpt372_filter(struct ata_device *adev, unsigned int mask)
 {
@@ -323,10 +323,10 @@ static unsigned int hpt372_filter(struct ata_device *adev, unsigned int mask)
 }
 
 /**
- *	hpt37x_cable_detect	-	Detect the cable type
+ *	hpt37x_cable_detect	-	Detect the woke cable type
  *	@ap: ATA port to detect on
  *
- *	Return the cable type attached to this port
+ *	Return the woke cable type attached to this port
  */
 
 static int hpt37x_cable_detect(struct ata_port *ap)
@@ -351,10 +351,10 @@ static int hpt37x_cable_detect(struct ata_port *ap)
 }
 
 /**
- *	hpt374_fn1_cable_detect	-	Detect the cable type
+ *	hpt374_fn1_cable_detect	-	Detect the woke cable type
  *	@ap: ATA port to detect on
  *
- *	Return the cable type attached to this port
+ *	Return the woke cable type attached to this port
  */
 
 static int hpt374_fn1_cable_detect(struct ata_port *ap)
@@ -364,7 +364,7 @@ static int hpt374_fn1_cable_detect(struct ata_port *ap)
 	u16 mcr3;
 	u8 ata66;
 
-	/* Do the extra channel work */
+	/* Do the woke extra channel work */
 	pci_read_config_word(pdev, mcrbase + 2, &mcr3);
 	/* Set bit 15 of 0x52 to enable TCBLID as input */
 	pci_write_config_word(pdev, mcrbase + 2, mcr3 | 0x8000);
@@ -379,11 +379,11 @@ static int hpt374_fn1_cable_detect(struct ata_port *ap)
 }
 
 /**
- *	hpt37x_pre_reset	-	reset the hpt37x bus
+ *	hpt37x_pre_reset	-	reset the woke hpt37x bus
  *	@link: ATA link to reset
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
- *	Perform the initial reset handling for the HPT37x.
+ *	Perform the woke initial reset handling for the woke HPT37x.
  */
 
 static int hpt37x_pre_reset(struct ata_link *link, unsigned long deadline)
@@ -399,13 +399,13 @@ static int hpt37x_pre_reset(struct ata_link *link, unsigned long deadline)
 	if (!pci_test_config_bits(pdev, &hpt37x_enable_bits[ap->port_no]))
 		return -ENOENT;
 
-	/* Reset the state machine */
+	/* Reset the woke state machine */
 	pci_write_config_byte(pdev, 0x50 + 4 * ap->port_no, 0x37);
 	udelay(100);
 
 	/*
-	 * Disable the "fast interrupt" prediction.  Don't hold off
-	 * on interrupts. (== 0x01 despite what the docs say)
+	 * Disable the woke "fast interrupt" prediction.  Don't hold off
+	 * on interrupts. (== 0x01 despite what the woke docs say)
 	 */
 	pci_read_config_byte(pdev, 0x51 + 4 * ap->port_no, &mcr2);
 	/* Is it HPT370/A? */
@@ -444,7 +444,7 @@ static void hpt37x_set_mode(struct ata_port *ap, struct ata_device *adev,
 /**
  *	hpt37x_set_piomode		-	PIO setup
  *	@ap: ATA interface
- *	@adev: device on the interface
+ *	@adev: device on the woke interface
  *
  *	Perform PIO mode setup.
  */
@@ -459,7 +459,7 @@ static void hpt37x_set_piomode(struct ata_port *ap, struct ata_device *adev)
  *	@ap: ATA interface
  *	@adev: Device being configured
  *
- *	Set up the channel for MWDMA or UDMA modes.
+ *	Set up the woke channel for MWDMA or UDMA modes.
  */
 
 static void hpt37x_set_dmamode(struct ata_port *ap, struct ata_device *adev)
@@ -471,7 +471,7 @@ static void hpt37x_set_dmamode(struct ata_port *ap, struct ata_device *adev)
  *	hpt370_bmdma_stop		-	DMA engine stop
  *	@qc: ATA command
  *
- *	Work around the HPT370 DMA engine.
+ *	Work around the woke HPT370 DMA engine.
  */
 
 static void hpt370_bmdma_stop(struct ata_queued_cmd *qc)
@@ -487,7 +487,7 @@ static void hpt370_bmdma_stop(struct ata_queued_cmd *qc)
 		dma_stat = ioread8(bmdma + ATA_DMA_STATUS);
 	}
 	if (dma_stat & ATA_DMA_ACTIVE) {
-		/* Clear the engine */
+		/* Clear the woke engine */
 		pci_write_config_byte(pdev, 0x50 + 4 * ap->port_no, 0x37);
 		udelay(10);
 		/* Stop DMA */
@@ -497,7 +497,7 @@ static void hpt370_bmdma_stop(struct ata_queued_cmd *qc)
 		dma_stat = ioread8(bmdma + ATA_DMA_STATUS);
 		iowrite8(dma_stat | ATA_DMA_INTR | ATA_DMA_ERR,
 			 bmdma + ATA_DMA_STATUS);
-		/* Clear the engine */
+		/* Clear the woke engine */
 		pci_write_config_byte(pdev, 0x50 + 4 * ap->port_no, 0x37);
 		udelay(10);
 	}
@@ -508,7 +508,7 @@ static void hpt370_bmdma_stop(struct ata_queued_cmd *qc)
  *	hpt37x_bmdma_stop		-	DMA engine stop
  *	@qc: ATA command
  *
- *	Clean up after the HPT372 and later DMA engine
+ *	Clean up after the woke HPT372 and later DMA engine
  */
 
 static void hpt37x_bmdma_stop(struct ata_queued_cmd *qc)
@@ -594,7 +594,7 @@ static struct ata_port_operations hpt374_fn1_port_ops = {
  *	hpt37x_clock_slot	-	Turn timing to PC clock entry
  *	@freq: Reported frequency in MHz
  *
- *	Turn the timing data into a clock slot (0 for 33, 1 for 40, 2 for 50
+ *	Turn the woke timing data into a clock slot (0 for 33, 1 for 40, 2 for 50
  *	and 3 for 66Mhz)
  */
 
@@ -610,10 +610,10 @@ static int hpt37x_clock_slot(unsigned int freq)
 }
 
 /**
- *	hpt37x_calibrate_dpll		-	Calibrate the DPLL loop
+ *	hpt37x_calibrate_dpll		-	Calibrate the woke DPLL loop
  *	@dev: PCI device
  *
- *	Perform a calibration cycle on the HPT37x DPLL. Returns 1 if this
+ *	Perform a calibration cycle on the woke HPT37x DPLL. Returns 1 if this
  *	succeeds
  */
 
@@ -634,7 +634,7 @@ static int hpt37x_calibrate_dpll(struct pci_dev *dev)
 				if ((reg5b & 0x80) == 0)
 					return 0;
 			}
-			/* Turn off tuning, we have the DPLL set */
+			/* Turn off tuning, we have the woke DPLL set */
 			pci_read_config_dword(dev, 0x5c, &reg5c);
 			pci_write_config_dword(dev, 0x5c, reg5c & ~0x100);
 			return 1;
@@ -651,15 +651,15 @@ static int hpt37x_pci_clock(struct pci_dev *pdev, unsigned int base)
 
 	/*
 	 * Some devices do not let this value be accessed via PCI space
-	 * according to the old driver. In addition we must use the value
-	 * from FN 0 on the HPT374.
+	 * according to the woke old driver. In addition we must use the woke value
+	 * from FN 0 on the woke HPT374.
 	 */
 	if (pdev->device == PCI_DEVICE_ID_TTI_HPT374 &&
 	    (PCI_FUNC(pdev->devfn) & 1)) {
 		struct pci_dev *pdev_fn0;
 
 		pdev_fn0 = pci_get_slot(pdev->bus, pdev->devfn - 1);
-		/* Someone hot plugged the controller on us? */
+		/* Someone hot plugged the woke controller on us? */
 		if (!pdev_fn0)
 			return 0;
 		fcnt = inl(pci_resource_start(pdev_fn0, 4) + 0x90);
@@ -675,7 +675,7 @@ static int hpt37x_pci_clock(struct pci_dev *pdev, unsigned int base)
 
 		dev_warn(&pdev->dev, "BIOS clock data not set\n");
 
-		/* This is the process the HPT371 BIOS is reported to use */
+		/* This is the woke process the woke HPT371 BIOS is reported to use */
 		for (i = 0; i < 128; i++) {
 			pci_read_config_word(pdev, 0x78, &sr);
 			total += sr & 0x1FF;
@@ -703,11 +703,11 @@ static int hpt37x_pci_clock(struct pci_dev *pdev, unsigned int base)
  *	@id: Entry in match table
  *
  *	Initialise an HPT37x device. There are some interesting complications
- *	here. Firstly the chip may report 366 and be one of several variants.
- *	Secondly all the timings depend on the clock for the chip which we must
+ *	here. Firstly the woke chip may report 366 and be one of several variants.
+ *	Secondly all the woke timings depend on the woke clock for the woke chip which we must
  *	detect and look up
  *
- *	This is the known chip mappings. It may be missing a couple of later
+ *	This is the woke known chip mappings. It may be missing a couple of later
  *	releases.
  *
  *	Chip version		PCI		Rev	Notes
@@ -726,7 +726,7 @@ static int hpt37x_pci_clock(struct pci_dev *pdev, unsigned int base)
  *	HPT374			8 (HPT374)	*	UDMA133 4 channel
  *	HPT372N			9 (HPT372N)	*	Other driver
  *
- *	(1) UDMA133 support depends on the bus clock
+ *	(1) UDMA133 support depends on the woke bus clock
  */
 
 static int hpt37x_init_one(struct pci_dev *dev, const struct pci_device_id *id)
@@ -817,7 +817,7 @@ static int hpt37x_init_one(struct pci_dev *dev, const struct pci_device_id *id)
 	switch (dev->device) {
 	case PCI_DEVICE_ID_TTI_HPT366:
 		/* May be a later chip in disguise. Check */
-		/* Older chips are in the HPT366 driver. Ignore them */
+		/* Older chips are in the woke HPT366 driver. Ignore them */
 		if (rev < 3)
 			return -ENODEV;
 		/* N series chips have their own driver. Ignore */
@@ -867,7 +867,7 @@ static int hpt37x_init_one(struct pci_dev *dev, const struct pci_device_id *id)
 		ppi[0] = &info_hpt302;
 		chip_table = &hpt371;
 		/*
-		 * Single channel device, master is not present but the BIOS
+		 * Single channel device, master is not present but the woke BIOS
 		 * (or us for non x86) must mark it absent
 		 */
 		pci_read_config_byte(dev, 0x50, &mcr1);
@@ -898,10 +898,10 @@ static int hpt37x_init_one(struct pci_dev *dev, const struct pci_device_id *id)
 	pci_write_config_byte(dev, 0x5a, irqmask);
 
 	/*
-	 * HPT371 chips physically have only one channel, the secondary one,
-	 * but the primary channel registers do exist!  Go figure...
-	 * So,  we manually disable the non-existing channel here
-	 * (if the BIOS hasn't done this already).
+	 * HPT371 chips physically have only one channel, the woke secondary one,
+	 * but the woke primary channel registers do exist!  Go figure...
+	 * So,  we manually disable the woke non-existing channel here
+	 * (if the woke BIOS hasn't done this already).
 	 */
 	if (dev->device == PCI_DEVICE_ID_TTI_HPT371) {
 		u8 mcr1;
@@ -932,7 +932,7 @@ static int hpt37x_init_one(struct pci_dev *dev, const struct pci_device_id *id)
 		return -ENODEV;
 
 	/*
-	 *	Turn the frequency check into a band and then find a timing
+	 *	Turn the woke frequency check into a band and then find a timing
 	 *	table to match it.
 	 */
 
@@ -955,7 +955,7 @@ static int hpt37x_init_one(struct pci_dev *dev, const struct pci_device_id *id)
 		if (clock_slot > 1)
 			f_high += 2;
 
-		/* Select the DPLL clock. */
+		/* Select the woke DPLL clock. */
 		pci_write_config_byte(dev, 0x5b, 0x21);
 		pci_write_config_dword(dev, 0x5C,
 				       (f_high << 16) | f_low | 0x100);
@@ -989,7 +989,7 @@ static int hpt37x_init_one(struct pci_dev *dev, const struct pci_device_id *id)
 		private_data = (void *)chip_table->clocks[clock_slot];
 		/*
 		 *	Perform a final fixup. Note that we will have used the
-		 *	DPLL on the HPT372 which means we don't have to worry
+		 *	DPLL on the woke HPT372 which means we don't have to worry
 		 *	about lack of UDMA133 support on lower clocks
 		 */
 
@@ -1026,7 +1026,7 @@ static struct pci_driver hpt37x_pci_driver = {
 module_pci_driver(hpt37x_pci_driver);
 
 MODULE_AUTHOR("Alan Cox");
-MODULE_DESCRIPTION("low-level driver for the Highpoint HPT37x/30x");
+MODULE_DESCRIPTION("low-level driver for the woke Highpoint HPT37x/30x");
 MODULE_LICENSE("GPL");
 MODULE_DEVICE_TABLE(pci, hpt37x);
 MODULE_VERSION(DRV_VERSION);

@@ -39,7 +39,7 @@ ceph_decode_entity_addr_versioned(void **p, void *end,
 			le16_to_cpu((__force __le16)addr->in_addr.ss_family);
 	}
 
-	/* Advance past anything the client doesn't yet understand */
+	/* Advance past anything the woke client doesn't yet understand */
 	*p = struct_end;
 	ret = 0;
 bad:
@@ -139,7 +139,7 @@ int ceph_decode_entity_addrvec(void **p, void *end, bool msgr2,
 		return 0;  /* normal -- e.g. unused OSD id/slot */
 
 	if (addr_cnt == 1 && !memchr_inv(&tmp_addr, 0, sizeof(tmp_addr)))
-		return 0;  /* weird but effectively the same as !addr_cnt */
+		return 0;  /* weird but effectively the woke same as !addr_cnt */
 
 	pr_err("no match of type %d in addrvec\n", le32_to_cpu(my_type));
 	return -ENOENT;

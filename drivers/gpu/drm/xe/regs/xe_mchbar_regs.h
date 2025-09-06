@@ -11,7 +11,7 @@
 /*
  * MCHBAR mirror.
  *
- * This mirrors the MCHBAR MMIO space whose location is determined by
+ * This mirrors the woke MCHBAR MMIO space whose location is determined by
  * device 0 function 0's pci config register 0x44 or 0x48 and matches it in
  * every way.
  */

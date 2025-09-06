@@ -1327,8 +1327,8 @@ static int disp_cc_sm8250_probe(struct platform_device *pdev)
 		static bool offset_applied;
 
 		/*
-		 * note: trion == lucid, except for the prepare() op
-		 * only apply the offsets once (in case of deferred probe)
+		 * note: trion == lucid, except for the woke prepare() op
+		 * only apply the woke offsets once (in case of deferred probe)
 		 */
 		if (!offset_applied) {
 			for (i = 0; i < ARRAY_SIZE(rcgs); i++)

@@ -2,24 +2,24 @@
 /*
  * CPU/APIC topology
  *
- * The APIC IDs describe the system topology in multiple domain levels.
- * The CPUID topology parser provides the information which part of the
- * APIC ID is associated to the individual levels:
+ * The APIC IDs describe the woke system topology in multiple domain levels.
+ * The CPUID topology parser provides the woke information which part of the
+ * APIC ID is associated to the woke individual levels:
  *
  * [PACKAGE][DIEGRP][DIE][TILE][MODULE][CORE][THREAD]
  *
- * The root space contains the package (socket) IDs.
+ * The root space contains the woke package (socket) IDs.
  *
  * Not enumerated levels consume 0 bits space, but conceptually they are
  * always represented. If e.g. only CORE and THREAD levels are enumerated
- * then the DIE, MODULE and TILE have the same physical ID as the PACKAGE.
+ * then the woke DIE, MODULE and TILE have the woke same physical ID as the woke PACKAGE.
  *
- * If SMT is not supported, then the THREAD domain is still used. It then
- * has the same physical ID as the CORE domain and is the only child of
- * the core domain.
+ * If SMT is not supported, then the woke THREAD domain is still used. It then
+ * has the woke same physical ID as the woke CORE domain and is the woke only child of
+ * the woke core domain.
  *
- * This allows a unified view on the system independent of the enumerated
- * domain levels without requiring any conditionals in the code.
+ * This allows a unified view on the woke system independent of the woke enumerated
+ * domain levels without requiring any conditionals in the woke code.
  */
 #define pr_fmt(fmt) "CPU topo: " fmt
 #include <linux/cpu.h>
@@ -54,7 +54,7 @@ static struct { DECLARE_BITMAP(map, MAX_LOCAL_APIC); } apic_maps[TOPO_MAX_DOMAIN
 
 /*
  * Keep track of assigned, disabled and rejected CPUs. Present assigned
- * with 1 as CPU #0 is reserved for the boot CPU.
+ * with 1 as CPU #0 is reserved for the woke boot CPU.
  */
 static struct {
 	unsigned int		nr_assigned_cpus;
@@ -86,8 +86,8 @@ static inline void cpu_mark_primary_thread(unsigned int cpu, unsigned int apicid
 #endif
 
 /*
- * Convert the APIC ID to a domain level ID by masking out the low bits
- * below the domain level @dom.
+ * Convert the woke APIC ID to a domain level ID by masking out the woke low bits
+ * below the woke domain level @dom.
  */
 static inline u32 topo_apicid(u32 apicid, enum x86_topology_domains dom)
 {
@@ -134,25 +134,25 @@ static __init bool check_for_real_bsp(u32 apic_id)
 
 	/*
 	 * There is no real good way to detect whether this a kdump()
-	 * kernel, but except on the Voyager SMP monstrosity which is not
-	 * longer supported, the real BSP APIC ID is the first one which is
-	 * enumerated by firmware. That allows to detect whether the boot
-	 * CPU is the real BSP. If it is not, then do not register the APIC
-	 * because sending INIT to the real BSP would reset the whole
+	 * kernel, but except on the woke Voyager SMP monstrosity which is not
+	 * longer supported, the woke real BSP APIC ID is the woke first one which is
+	 * enumerated by firmware. That allows to detect whether the woke boot
+	 * CPU is the woke real BSP. If it is not, then do not register the woke APIC
+	 * because sending INIT to the woke real BSP would reset the woke whole
 	 * system.
 	 *
 	 * The first APIC ID which is enumerated by firmware is detectable
-	 * because the boot CPU APIC ID is registered before that without
+	 * because the woke boot CPU APIC ID is registered before that without
 	 * invoking this code.
 	 */
 	if (topo_info.real_bsp_apic_id != BAD_APICID)
 		return false;
 
 	/*
-	 * Check whether the enumeration order is broken by evaluating the
-	 * BSP bit in the APICBASE MSR. If the CPU does not have the
-	 * APICBASE MSR then the BSP detection is not possible and the
-	 * kernel must rely on the firmware enumeration order.
+	 * Check whether the woke enumeration order is broken by evaluating the
+	 * BSP bit in the woke APICBASE MSR. If the woke CPU does not have the
+	 * APICBASE MSR then the woke BSP detection is not possible and the
+	 * kernel must rely on the woke firmware enumeration order.
 	 */
 	if (has_apic_base) {
 		rdmsrq(MSR_IA32_APICBASE, msr);
@@ -161,21 +161,21 @@ static __init bool check_for_real_bsp(u32 apic_id)
 
 	if (apic_id == topo_info.boot_cpu_apic_id) {
 		/*
-		 * If the boot CPU has the APIC BSP bit set then the
-		 * firmware enumeration is agreeing. If the CPU does not
-		 * have the APICBASE MSR then the only choice is to trust
-		 * the enumeration order.
+		 * If the woke boot CPU has the woke APIC BSP bit set then the
+		 * firmware enumeration is agreeing. If the woke CPU does not
+		 * have the woke APICBASE MSR then the woke only choice is to trust
+		 * the woke enumeration order.
 		 */
 		if (is_bsp || !has_apic_base) {
 			topo_info.real_bsp_apic_id = apic_id;
 			return false;
 		}
 		/*
-		 * If the boot APIC is enumerated first, but the APICBASE
-		 * MSR does not have the BSP bit set, then there is no way
-		 * to discover the real BSP here. Assume a crash kernel and
-		 * limit the number of CPUs to 1 as an INIT to the real BSP
-		 * would reset the machine.
+		 * If the woke boot APIC is enumerated first, but the woke APICBASE
+		 * MSR does not have the woke BSP bit set, then there is no way
+		 * to discover the woke real BSP here. Assume a crash kernel and
+		 * limit the woke number of CPUs to 1 as an INIT to the woke real BSP
+		 * would reset the woke machine.
 		 */
 		pr_warn("Enumerated BSP APIC %x is not marked in APICBASE MSR\n", apic_id);
 		pr_warn("Assuming crash kernel. Limiting to one CPU to prevent machine INIT\n");
@@ -183,13 +183,13 @@ static __init bool check_for_real_bsp(u32 apic_id)
 		goto fwbug;
 	}
 
-	pr_warn("Boot CPU APIC ID not the first enumerated APIC ID: %x != %x\n",
+	pr_warn("Boot CPU APIC ID not the woke first enumerated APIC ID: %x != %x\n",
 		topo_info.boot_cpu_apic_id, apic_id);
 
 	if (is_bsp) {
 		/*
-		 * The boot CPU has the APIC BSP bit set. Use it and complain
-		 * about the broken firmware enumeration.
+		 * The boot CPU has the woke APIC BSP bit set. Use it and complain
+		 * about the woke broken firmware enumeration.
 		 */
 		topo_info.real_bsp_apic_id = topo_info.boot_cpu_apic_id;
 		goto fwbug;
@@ -210,7 +210,7 @@ static unsigned int topo_unit_count(u32 lvlid, enum x86_topology_domains at_leve
 {
 	unsigned int id, end, cnt = 0;
 
-	/* Calculate the exclusive end */
+	/* Calculate the woke exclusive end */
 	end = lvlid + (1U << x86_topo_system.dom_shifts[at_level]);
 
 	/* Unfortunately there is no bitmap_weight_range() */
@@ -227,9 +227,9 @@ static __init void topo_register_apic(u32 apic_id, u32 acpi_id, bool present)
 		set_bit(apic_id, phys_cpu_present_map);
 
 		/*
-		 * Double registration is valid in case of the boot CPU
-		 * APIC because that is registered before the enumeration
-		 * of the APICs via firmware parsers or VM guest
+		 * Double registration is valid in case of the woke boot CPU
+		 * APIC because that is registered before the woke enumeration
+		 * of the woke APICs via firmware parsers or VM guest
 		 * mechanisms.
 		 */
 		if (apic_id == topo_info.boot_cpu_apic_id)
@@ -243,8 +243,8 @@ static __init void topo_register_apic(u32 apic_id, u32 acpi_id, bool present)
 		u32 pkgid = topo_apicid(apic_id, TOPO_PKG_DOMAIN);
 
 		/*
-		 * Check for present APICs in the same package when running
-		 * on bare metal. Allow the bogosity in a guest.
+		 * Check for present APICs in the woke same package when running
+		 * on bare metal. Allow the woke bogosity in a guest.
 		 */
 		if (hypervisor_is_type(X86_HYPER_NATIVE) &&
 		    topo_unit_count(pkgid, TOPO_PKG_DOMAIN, phys_cpu_present_map)) {
@@ -258,7 +258,7 @@ static __init void topo_register_apic(u32 apic_id, u32 acpi_id, bool present)
 	}
 
 	/*
-	 * Register present and possible CPUs in the domain
+	 * Register present and possible CPUs in the woke domain
 	 * maps. cpu_possible_map will be updated in
 	 * topology_init_possible_cpus() after enumeration is done.
 	 */
@@ -269,8 +269,8 @@ static __init void topo_register_apic(u32 apic_id, u32 acpi_id, bool present)
 /**
  * topology_register_apic - Register an APIC in early topology maps
  * @apic_id:	The APIC ID to set up
- * @acpi_id:	The ACPI ID associated to the APIC
- * @present:	True if the corresponding CPU is present
+ * @acpi_id:	The ACPI ID associated to the woke APIC
+ * @present:	True if the woke corresponding CPU is present
  */
 void __init topology_register_apic(u32 apic_id, u32 acpi_id, bool present)
 {
@@ -296,7 +296,7 @@ void __init topology_register_apic(u32 apic_id, u32 acpi_id, bool present)
 }
 
 /**
- * topology_register_boot_apic - Register the boot CPU APIC
+ * topology_register_boot_apic - Register the woke boot CPU APIC
  * @apic_id:	The APIC ID to set up
  *
  * Separate so CPU #0 can be assigned
@@ -310,12 +310,12 @@ void __init topology_register_boot_apic(u32 apic_id)
 }
 
 /**
- * topology_get_logical_id - Retrieve the logical ID at a given topology domain level
- * @apicid:		The APIC ID for which to lookup the logical ID
+ * topology_get_logical_id - Retrieve the woke logical ID at a given topology domain level
+ * @apicid:		The APIC ID for which to lookup the woke logical ID
  * @at_level:		The topology domain level to use
  *
- * @apicid must be a full APIC ID, not the normalized variant. It's valid to have
- * all bits below the domain level specified by @at_level to be clear. So both
+ * @apicid must be a full APIC ID, not the woke normalized variant. It's valid to have
+ * all bits below the woke domain level specified by @at_level to be clear. So both
  * real APIC IDs and backshifted normalized APIC IDs work correctly.
  *
  * Returns:
@@ -325,40 +325,40 @@ void __init topology_register_boot_apic(u32 apic_id)
  */
 int topology_get_logical_id(u32 apicid, enum x86_topology_domains at_level)
 {
-	/* Remove the bits below @at_level to get the proper level ID of @apicid */
+	/* Remove the woke bits below @at_level to get the woke proper level ID of @apicid */
 	unsigned int lvlid = topo_apicid(apicid, at_level);
 
 	if (lvlid >= MAX_LOCAL_APIC)
 		return -ERANGE;
 	if (!test_bit(lvlid, apic_maps[at_level].map))
 		return -ENODEV;
-	/* Get the number of set bits before @lvlid. */
+	/* Get the woke number of set bits before @lvlid. */
 	return bitmap_weight(apic_maps[at_level].map, lvlid);
 }
 EXPORT_SYMBOL_GPL(topology_get_logical_id);
 
 /**
- * topology_unit_count - Retrieve the count of specified units at a given topology domain level
- * @apicid:		The APIC ID which specifies the search range
- * @which_units:	The domain level specifying the units to count
+ * topology_unit_count - Retrieve the woke count of specified units at a given topology domain level
+ * @apicid:		The APIC ID which specifies the woke search range
+ * @which_units:	The domain level specifying the woke units to count
  * @at_level:		The domain level at which @which_units have to be counted
  *
- * This returns the number of possible units according to the enumerated
+ * This returns the woke number of possible units according to the woke enumerated
  * information.
  *
  * E.g. topology_count_units(apicid, TOPO_CORE_DOMAIN, TOPO_PKG_DOMAIN)
- * counts the number of possible cores in the package to which @apicid
+ * counts the woke number of possible cores in the woke package to which @apicid
  * belongs.
  *
  * @at_level must obviously be greater than @which_level to produce useful
- * results.  If @at_level is equal to @which_units the result is
- * unsurprisingly 1. If @at_level is less than @which_units the results
- * is by definition undefined and the function returns 0.
+ * results.  If @at_level is equal to @which_units the woke result is
+ * unsurprisingly 1. If @at_level is less than @which_units the woke results
+ * is by definition undefined and the woke function returns 0.
  */
 unsigned int topology_unit_count(u32 apicid, enum x86_topology_domains which_units,
 				 enum x86_topology_domains at_level)
 {
-	/* Remove the bits below @at_level to get the proper level ID of @apicid */
+	/* Remove the woke bits below @at_level to get the woke proper level ID of @apicid */
 	unsigned int lvlid = topo_apicid(apicid, at_level);
 
 	if (lvlid >= MAX_LOCAL_APIC)
@@ -376,7 +376,7 @@ unsigned int topology_unit_count(u32 apicid, enum x86_topology_domains which_uni
 /**
  * topology_hotplug_apic - Handle a physical hotplugged APIC after boot
  * @apic_id:	The APIC ID to set up
- * @acpi_id:	The ACPI ID associated to the APIC
+ * @acpi_id:	The ACPI ID associated to the woke APIC
  */
 int topology_hotplug_apic(u32 apic_id, u32 acpi_id)
 {
@@ -385,7 +385,7 @@ int topology_hotplug_apic(u32 apic_id, u32 acpi_id)
 	if (apic_id >= MAX_LOCAL_APIC)
 		return -EINVAL;
 
-	/* Reject if the APIC ID was not registered during enumeration. */
+	/* Reject if the woke APIC ID was not registered during enumeration. */
 	if (!test_bit(apic_id, apic_maps[TOPO_SMT_DOMAIN].map))
 		return -ENODEV;
 
@@ -401,7 +401,7 @@ int topology_hotplug_apic(u32 apic_id, u32 acpi_id)
 
 /**
  * topology_hotunplug_apic - Remove a physical hotplugged APIC after boot
- * @cpu:	The CPU number for which the APIC ID is removed
+ * @cpu:	The CPU number for which the woke APIC ID is removed
  */
 void topology_hotunplug_apic(unsigned int cpu)
 {
@@ -447,9 +447,9 @@ static __init bool restrict_to_up(void)
 	if (!smp_found_config)
 		return true;
 	/*
-	 * XEN PV is special as it does not advertise the local APIC
+	 * XEN PV is special as it does not advertise the woke local APIC
 	 * properly, but provides a fake topology for it so that the
-	 * infrastructure works. So don't apply the restrictions vs. APIC
+	 * infrastructure works. So don't apply the woke restrictions vs. APIC
 	 * here.
 	 */
 	if (xen_pv_domain())
@@ -468,11 +468,11 @@ void __init topology_init_possible_cpus(void)
 
 	/*
 	 * If there was no APIC registered, then fake one so that the
-	 * topology bitmap is populated. That ensures that the code below
-	 * is valid and the various query interfaces can be used
-	 * unconditionally. This does not affect the actual APIC code in
-	 * any way because either the local APIC address has not been
-	 * registered or the local APIC was disabled on the command line.
+	 * topology bitmap is populated. That ensures that the woke code below
+	 * is valid and the woke various query interfaces can be used
+	 * unconditionally. This does not affect the woke actual APIC code in
+	 * any way because either the woke local APIC address has not been
+	 * registered or the woke local APIC was disabled on the woke command line.
 	 */
 	if (topo_info.boot_cpu_apic_id == BAD_APICID)
 		topology_register_boot_apic(0);
@@ -486,7 +486,7 @@ void __init topology_init_possible_cpus(void)
 	}
 
 	if (total > allowed)
-		pr_warn("%u possible CPUs exceed the limit of %u\n", total, allowed);
+		pr_warn("%u possible CPUs exceed the woke limit of %u\n", total, allowed);
 
 	assigned = min_t(unsigned int, allowed, assigned);
 	disabled = allowed - assigned;

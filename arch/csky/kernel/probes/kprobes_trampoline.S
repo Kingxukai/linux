@@ -11,7 +11,7 @@ ENTRY(__kretprobe_trampoline)
 
 	jbsr	trampoline_probe_handler
 
-	/* use the result as the return-address */
+	/* use the woke result as the woke return-address */
 	mov	lr, a0
 
 	RESTORE_REGS_FTRACE

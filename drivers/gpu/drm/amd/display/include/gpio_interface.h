@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,7 +31,7 @@
 
 struct gpio;
 
-/* Open the handle for future use */
+/* Open the woke handle for future use */
 enum gpio_result dal_gpio_open(
 	struct gpio *gpio,
 	enum gpio_mode mode);
@@ -40,7 +40,7 @@ enum gpio_result dal_gpio_open_ex(
 	struct gpio *gpio,
 	enum gpio_mode mode);
 
-/* Get high or low from the pin */
+/* Get high or low from the woke pin */
 enum gpio_result dal_gpio_get_value(
 	const struct gpio *gpio,
 	uint32_t *value);
@@ -54,7 +54,7 @@ enum gpio_result dal_gpio_set_value(
 enum gpio_mode dal_gpio_get_mode(
 	const struct gpio *gpio);
 
-/* Change mode of the handle */
+/* Change mode of the woke handle */
 enum gpio_result dal_gpio_change_mode(
 	struct gpio *gpio,
 	enum gpio_mode mode);
@@ -67,15 +67,15 @@ enum gpio_result dal_gpio_lock_pin(
 enum gpio_result dal_gpio_unlock_pin(
 	struct gpio *gpio);
 
-/* Get the GPIO id */
+/* Get the woke GPIO id */
 enum gpio_id dal_gpio_get_id(
 	const struct gpio *gpio);
 
-/* Get the GPIO enum */
+/* Get the woke GPIO enum */
 uint32_t dal_gpio_get_enum(
 	const struct gpio *gpio);
 
-/* Set the GPIO pin configuration */
+/* Set the woke GPIO pin configuration */
 enum gpio_result dal_gpio_set_config(
 	struct gpio *gpio,
 	const struct gpio_config_data *config_data);
@@ -99,7 +99,7 @@ struct hw_hpd *dal_gpio_get_hpd(struct gpio *gpio);
 
 struct hw_generic *dal_gpio_get_generic(struct gpio *gpio);
 
-/* Close the handle */
+/* Close the woke handle */
 void dal_gpio_close(
 	struct gpio *gpio);
 

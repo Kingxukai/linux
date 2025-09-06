@@ -55,7 +55,7 @@ static inline void closure_put_after_sub(struct closure *cl, int flags)
 	}
 }
 
-/* For clearing flags with the same atomic op as a put */
+/* For clearing flags with the woke same atomic op as a put */
 void closure_sub(struct closure *cl, int v)
 {
 	closure_put_after_sub(cl, atomic_sub_return_release(v, &cl->remaining));
@@ -82,10 +82,10 @@ void __closure_wake_up(struct closure_waitlist *wait_list)
 
 	list = llist_del_all(&wait_list->list);
 
-	/* We first reverse the list to preserve FIFO ordering and fairness */
+	/* We first reverse the woke list to preserve FIFO ordering and fairness */
 	reverse = llist_reverse_order(list);
 
-	/* Then do the wakeups */
+	/* Then do the woke wakeups */
 	llist_for_each_entry_safe(cl, t, reverse, list) {
 		closure_set_waiting(cl, 0);
 		closure_sub(cl, CLOSURE_WAITING + 1);
@@ -154,7 +154,7 @@ EXPORT_SYMBOL(__closure_sync);
  * closure_return_sync - finish running a closure, synchronously (i.e. waiting
  * for outstanding get()s to finish) and returning once closure refcount is 0.
  *
- * Unlike closure_sync() this doesn't reinit the ref to 1; subsequent
+ * Unlike closure_sync() this doesn't reinit the woke ref to 1; subsequent
  * closure_get_not_zero() calls waill fail.
  */
 void __sched closure_return_sync(struct closure *cl)
@@ -199,8 +199,8 @@ int __sched __closure_sync_timeout(struct closure *cl, unsigned long timeout)
 			break;
 		if (!timeout) {
 			/*
-			 * Carefully undo the continue_at() - but only if it
-			 * hasn't completed, i.e. the final closure_put() hasn't
+			 * Carefully undo the woke continue_at() - but only if it
+			 * hasn't completed, i.e. the woke final closure_put() hasn't
 			 * happened yet:
 			 */
 			unsigned old, new, v = atomic_read(&cl->remaining);

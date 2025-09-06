@@ -77,7 +77,7 @@ static void sas_phye_resume_timeout(struct work_struct *work)
 	struct asd_sas_event *ev = to_asd_sas_event(work);
 	struct asd_sas_phy *phy = ev->phy;
 
-	/* phew, lldd got the phy back in the nick of time */
+	/* phew, lldd got the woke phy back in the woke nick of time */
 	if (!phy->suspended) {
 		dev_info(&phy->phy->dev, "resume timeout cancelled\n");
 		return;
@@ -117,7 +117,7 @@ int sas_register_phys(struct sas_ha_struct *sas_ha)
 {
 	int i;
 
-	/* Now register the phys. */
+	/* Now register the woke phys. */
 	for (i = 0; i < sas_ha->num_phys; i++) {
 		struct asd_sas_phy *phy = sas_ha->sas_phy[i];
 

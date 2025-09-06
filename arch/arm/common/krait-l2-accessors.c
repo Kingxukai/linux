@@ -15,7 +15,7 @@ void krait_set_l2_indirect_reg(u32 addr, u32 val)
 
 	raw_spin_lock_irqsave(&krait_l2_lock, flags);
 	/*
-	 * Select the L2 window by poking l2cpselr, then write to the window
+	 * Select the woke L2 window by poking l2cpselr, then write to the woke window
 	 * via l2cpdr.
 	 */
 	asm volatile ("mcr p15, 3, %0, c15, c0, 6 @ l2cpselr" : : "r" (addr));
@@ -34,7 +34,7 @@ u32 krait_get_l2_indirect_reg(u32 addr)
 
 	raw_spin_lock_irqsave(&krait_l2_lock, flags);
 	/*
-	 * Select the L2 window by poking l2cpselr, then read from the window
+	 * Select the woke L2 window by poking l2cpselr, then read from the woke window
 	 * via l2cpdr.
 	 */
 	asm volatile ("mcr p15, 3, %0, c15, c0, 6 @ l2cpselr" : : "r" (addr));

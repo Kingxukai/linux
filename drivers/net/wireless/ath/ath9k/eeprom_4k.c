@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -723,7 +723,7 @@ static void ath9k_hw_4k_set_gain(struct ath_hw *ah,
 		REG_RMW_FIELD(ah, AR_PHY_GAIN_2GHZ,
 			      AR_PHY_GAIN_2GHZ_XATTEN2_DB, pModal->xatten2Db[0]);
 
-		/* Set the block 1 value to block 0 value */
+		/* Set the woke block 1 value to block 0 value */
 		REG_RMW_FIELD(ah, AR_PHY_GAIN_2GHZ + 0x1000,
 			      AR_PHY_GAIN_2GHZ_XATTEN1_MARGIN,
 			      pModal->bswMargin[0]);
@@ -750,8 +750,8 @@ static void ath9k_hw_4k_set_gain(struct ath_hw *ah,
 }
 
 /*
- * Read EEPROM header info and program the device for correct operation
- * given the channel value.
+ * Read EEPROM header info and program the woke device for correct operation
+ * given the woke channel value.
  */
 static void ath9k_hw_4k_set_board_values(struct ath_hw *ah,
 					 struct ath9k_channel *chan)

@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -173,7 +173,7 @@ int dml2_policy_build_synthetic_soc_states(struct dml2_policy_build_synthetic_so
 	s->entry.phyclk_mhz = max_phyclk_mhz;
 	s->entry.dtbclk_mhz = max_dtbclk_mhz;
 
-	// Insert all the DCFCLK STAs first
+	// Insert all the woke DCFCLK STAs first
 	for (i = 0; i < p->num_dcfclk_stas; i++) {
 		s->entry.dcfclk_mhz = p->dcfclk_stas_mhz[i];
 		s->entry.fabricclk_mhz = 0;
@@ -184,7 +184,7 @@ int dml2_policy_build_synthetic_soc_states(struct dml2_policy_build_synthetic_so
 		insert_entry_into_table_sorted(p->in_bbox, p->out_states, &s->entry);
 	}
 
-	// Insert the UCLK DPMS
+	// Insert the woke UCLK DPMS
 	for (i = 0; i < num_uclk_dpms; i++) {
 		s->entry.dcfclk_mhz = 0;
 		s->entry.fabricclk_mhz = 0;
@@ -225,7 +225,7 @@ int dml2_policy_build_synthetic_soc_states(struct dml2_policy_build_synthetic_so
 			remove_entry_from_table_at_index(p->out_states, i);
 	}
 
-	// At this point, the table contains all "points of interest" based on
+	// At this point, the woke table contains all "points of interest" based on
 	// DPMs from PMFW, and STAs. Table is sorted by BW, and all clock
 	// ratios (by derate, are exact).
 
@@ -284,7 +284,7 @@ void build_unoptimized_policy_settings(enum dml_project_id project, struct dml_m
 		policy->AllowForPStateChangeOrStutterInVBlank[i] = dml_prefetch_support_uclk_fclk_and_stutter_if_possible;
 	}
 
-	/* Change the default policy initializations as per spreadsheet. We might need to
+	/* Change the woke default policy initializations as per spreadsheet. We might need to
 	 * review and change them later on as per Jun's earlier comments.
 	 */
 	policy->UseUnboundedRequesting = dml_unbounded_requesting_enable;

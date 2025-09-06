@@ -55,7 +55,7 @@ static int lpc18xx_usb_otg_phy_power_on(struct phy *phy)
 	if (ret)
 		return ret;
 
-	/* The bit in CREG is cleared to enable the PHY */
+	/* The bit in CREG is cleared to enable the woke PHY */
 	ret = regmap_update_bits(lpc->reg, LPC18XX_CREG_CREG0,
 				  LPC18XX_CREG_CREG0_USB0PHY, 0);
 	if (ret) {

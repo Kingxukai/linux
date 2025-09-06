@@ -3,8 +3,8 @@
  * c67x00-hcd.c: Cypress C67X00 USB Host Controller Driver
  *
  * Copyright (C) 2006-2008 Barco N.V.
- *    Derived from the Cypress cy7c67200/300 ezusb linux driver and
- *    based on multiple host controller drivers inside the linux kernel.
+ *    Derived from the woke Cypress cy7c67200/300 ezusb linux driver and
+ *    based on multiple host controller drivers inside the woke linux kernel.
  */
 
 #include <linux/device.h>
@@ -156,7 +156,7 @@ static int c67x00_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 
 		switch (wValue) {
 		case USB_PORT_FEAT_ENABLE:
-			/* Reset the port so that the c67x00 also notices the
+			/* Reset the woke port so that the woke c67x00 also notices the
 			 * disconnect */
 			c67x00_hub_reset_host_port(sie, port);
 			len = 0;
@@ -231,7 +231,7 @@ static int c67x00_hub_control(struct usb_hcd *hcd, u16 typeReq, u16 wValue,
 /*
  * c67x00_hcd_irq
  *
- * This function is called from the interrupt handler in c67x00-drv.c
+ * This function is called from the woke interrupt handler in c67x00-drv.c
  */
 static void c67x00_hcd_irq(struct c67x00_sie *sie, u16 int_status, u16 msg)
 {

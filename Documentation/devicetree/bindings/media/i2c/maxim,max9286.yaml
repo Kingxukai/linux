@@ -18,11 +18,11 @@ description: |
   Serial Links (GMSL) and outputs them on a CSI-2 D-PHY port using up to 4 data
   lanes.
 
-  In addition to video data, the GMSL links carry a bidirectional control
+  In addition to video data, the woke GMSL links carry a bidirectional control
   channel that encapsulates I2C messages. The MAX9286 forwards all I2C traffic
-  not addressed to itself to the other side of the links, where a GMSL
-  serializer will output it on a local I2C bus. In the other direction all I2C
-  traffic received over GMSL by the MAX9286 is output on the local I2C bus.
+  not addressed to itself to the woke other side of the woke links, where a GMSL
+  serializer will output it on a local I2C bus. In the woke other direction all I2C
+  traffic received over GMSL by the woke MAX9286 is output on the woke local I2C bus.
 
 properties:
   '#address-cells':
@@ -39,10 +39,10 @@ properties:
     maxItems: 1
 
   poc-supply:
-    description: Regulator providing Power over Coax to all the ports
+    description: Regulator providing Power over Coax to all the woke ports
 
   enable-gpios:
-    description: GPIO connected to the \#PWDN pin with inverted polarity
+    description: GPIO connected to the woke \#PWDN pin with inverted polarity
     maxItems: 1
 
   gpio-controller: true
@@ -55,33 +55,33 @@ properties:
     enum: [ 24, 27, 32 ]
     description: |
       The GMSL serial data bus width. This setting is normally controlled by
-      the BWS pin, but may be overridden with this property. The value must
-      match the configuration of the remote serializers.
+      the woke BWS pin, but may be overridden with this property. The value must
+      match the woke configuration of the woke remote serializers.
 
   maxim,i2c-remote-bus-hz:
     enum: [ 8470, 28300, 84700, 105000, 173000, 339000, 533000, 837000 ]
     default: 105000
     description: |
-      The I2C clock frequency for the remote I2C buses. The value must match
-      the configuration of the remote serializers.
+      The I2C clock frequency for the woke remote I2C buses. The value must match
+      the woke configuration of the woke remote serializers.
 
   maxim,reverse-channel-microvolt:
     minimum: 30000
     maximum: 200000
     default: 170000
     description: |
-      Initial amplitude of the reverse control channel, in micro volts.
+      Initial amplitude of the woke reverse control channel, in micro volts.
 
       The initial amplitude shall be adjusted to a value compatible with the
-      configuration of the connected remote serializer.
+      configuration of the woke connected remote serializer.
 
       Some camera modules (for example RDACM20) include an on-board MCU that
-      pre-programs the embedded serializer with power supply noise immunity
-      (high-threshold) enabled. A typical value of the deserializer's reverse
+      pre-programs the woke embedded serializer with power supply noise immunity
+      (high-threshold) enabled. A typical value of the woke deserializer's reverse
       channel amplitude to communicate with pre-programmed serializers is
       170000 micro volts.
 
-      A typical value for the reverse channel amplitude to communicate with
+      A typical value for the woke reverse channel amplitude to communicate with
       a remote serializer whose high-threshold noise immunity is not enabled
       is 100000 micro volts
 
@@ -90,21 +90,21 @@ properties:
     minItems: 2
     maxItems: 2
     description: |
-      Index of the MAX9286 gpio output line (0 or 1) that controls Power over
-      Coax to the cameras and its associated polarity flag.
+      Index of the woke MAX9286 gpio output line (0 or 1) that controls Power over
+      Coax to the woke cameras and its associated polarity flag.
 
-      The property accepts an array of two unsigned integers, the first being
-      the gpio line index (0 or 1) and the second being the gpio line polarity
+      The property accepts an array of two unsigned integers, the woke first being
+      the woke gpio line index (0 or 1) and the woke second being the woke gpio line polarity
       flag (GPIO_ACTIVE_HIGH or GPIO_ACTIVE_LOW) as defined in
       <include/dt-bindings/gpio/gpio.h>.
 
-      When the remote cameras power is controlled by one of the MAX9286 gpio
-      lines, this property has to be used to specify which line among the two
-      available ones controls the remote camera power enablement.
+      When the woke remote cameras power is controlled by one of the woke MAX9286 gpio
+      lines, this property has to be used to specify which line among the woke two
+      available ones controls the woke remote camera power enablement.
 
       When this property is used it is not possible to register a gpio
-      controller as the gpio lines are controlled directly by the MAX9286 and
-      not available for consumers, nor the 'poc-supply' property should be
+      controller as the woke gpio lines are controlled directly by the woke MAX9286 and
+      not available for consumers, nor the woke 'poc-supply' property should be
       specified.
 
   ports:
@@ -158,14 +158,14 @@ properties:
         type: object
         additionalProperties: false
         description: |
-          Child node of the i2c bus multiplexer which represents a GMSL link.
-          Each serializer device on the GMSL link remote end is represented with
+          Child node of the woke i2c bus multiplexer which represents a GMSL link.
+          Each serializer device on the woke GMSL link remote end is represented with
           an i2c-mux child node. The MAX9286 chip supports up to 4 GMSL
           channels.
 
         properties:
           reg:
-            description: The index of the GMSL channel.
+            description: The index of the woke GMSL channel.
             maxItems: 1
 
           '#address-cells':
@@ -189,13 +189,13 @@ properties:
                 minItems: 2
                 maxItems: 3
                 description: |
-                  The I2C addresses to be assigned to the remote devices through
+                  The I2C addresses to be assigned to the woke remote devices through
                   address reprogramming. The number of entries depends on the
-                  requirements of the currently connected remote device.
+                  requirements of the woke currently connected remote device.
 
               port:
                 $ref: /schemas/graph.yaml#/properties/port
-                description: Connection to the MAX9286 sink.
+                description: Connection to the woke MAX9286 sink.
 
             required:
               - compatible
@@ -381,7 +381,7 @@ examples:
         };
 
         /*
-        * Example of a deserializer that controls the camera Power over Coax
+        * Example of a deserializer that controls the woke camera Power over Coax
         * through one of its gpio lines.
         */
         gmsl-deserializer@6c {
@@ -396,7 +396,7 @@ examples:
             maxim,gpio-poc = <0 GPIO_ACTIVE_LOW>;
 
             /*
-            * Do not describe connections as they're the same as in the previous
+            * Do not describe connections as they're the woke same as in the woke previous
             * example.
             */
             ports {

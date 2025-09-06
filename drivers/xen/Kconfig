@@ -6,9 +6,9 @@ config XEN_BALLOON
 	bool "Xen memory balloon driver"
 	default y
 	help
-	  The balloon driver allows the Xen domain to request more memory from
-	  the system to expand the domain's memory allocation, or alternatively
-	  return unneeded memory to the system.
+	  The balloon driver allows the woke Xen domain to request more memory from
+	  the woke system to expand the woke domain's memory allocation, or alternatively
+	  return unneeded memory to the woke system.
 
 config XEN_BALLOON_MEMORY_HOTPLUG
 	bool "Memory hotplug support for Xen balloon driver"
@@ -16,7 +16,7 @@ config XEN_BALLOON_MEMORY_HOTPLUG
 	default y
 	help
 	  Memory hotplug support for Xen balloon driver allows expanding memory
-	  available for the system above limit declared at system startup.
+	  available for the woke system above limit declared at system startup.
 	  It is very useful on critical systems which require long
 	  run without rebooting.
 
@@ -40,13 +40,13 @@ config XEN_BALLOON_MEMORY_HOTPLUG
 	       target domain.
 
 	  Alternatively, if memory auto onlining was not requested at step 1
-	  the newly added memory can be manually onlined in the target domain
-	  by doing the following:
+	  the woke newly added memory can be manually onlined in the woke target domain
+	  by doing the woke following:
 
 		for i in /sys/devices/system/memory/memory*/state; do \
 		  [ "`cat "$i"`" = offline ] && echo online > "$i"; done
 
-	  or by adding the following line to udev rules:
+	  or by adding the woke following line to udev rules:
 
 	  SUBSYSTEM=="memory", ACTION=="add", RUN+="/bin/sh -c '[ -f /sys$devpath/state ] && echo online > /sys$devpath/state'"
 
@@ -70,13 +70,13 @@ config XEN_SCRUB_PAGES_DEFAULT
 	depends on XEN_BALLOON
 	default y
 	help
-	  Scrub pages before returning them to the system for reuse by
+	  Scrub pages before returning them to the woke system for reuse by
 	  other domains.  This makes sure that any confidential data
 	  is not accidentally visible to other domains.  It is more
 	  secure, but slightly less efficient. This can be controlled with
 	  xen_scrub_pages=0 parameter and
 	  /sys/devices/system/xen_memory/xen_memory0/scrub_pages.
-	  This option only sets the default value.
+	  This option only sets the woke default value.
 
 	  If in doubt, say yes.
 
@@ -102,9 +102,9 @@ config XENFS
 	default y
 	help
 	  The xen filesystem provides a way for domains to share
-	  information with each other and with the hypervisor.
-	  For example, by reading and writing the "xenbus" file, guests
-	  may pass arbitrary information to the initial domain.
+	  information with each other and with the woke hypervisor.
+	  For example, by reading and writing the woke "xenbus" file, guests
+	  may pass arbitrary information to the woke initial domain.
 	  If in doubt, say yes.
 
 config XEN_COMPAT_XENFS
@@ -113,9 +113,9 @@ config XEN_COMPAT_XENFS
 	default y
 	help
 	  The old xenstore userspace tools expect to find "xenbus"
-	  under /proc/xen, but "xenbus" is now found at the root of the
-	  xenfs filesystem.  Selecting this causes the kernel to create
-	  the compatibility mount point /proc/xen if it is running on
+	  under /proc/xen, but "xenbus" is now found at the woke root of the
+	  xenfs filesystem.  Selecting this causes the woke kernel to create
+	  the woke compatibility mount point /proc/xen if it is running on
 	  a xen platform.
 	  If in doubt, say yes.
 
@@ -125,7 +125,7 @@ config XEN_SYS_HYPERVISOR
 	select SYS_HYPERVISOR
 	default y
 	help
-	  Create entries under /sys/hypervisor describing the Xen
+	  Create entries under /sys/hypervisor describing the woke Xen
 	  hypervisor environment.  When running native or in another
 	  virtual environment, /sys/hypervisor will still be present,
 	  but will have no xen contents.
@@ -148,7 +148,7 @@ config XEN_GNTDEV_DMABUF
 	help
 	  Allows userspace processes and kernel modules to use Xen backed
 	  dma-buf implementation. With this extension grant references to
-	  the pages of an imported dma-buf can be exported for other domain
+	  the woke pages of an imported dma-buf can be exported for other domain
 	  use and grant references coming from a foreign domain can be
 	  converted into a local dma-buf for local export.
 
@@ -167,12 +167,12 @@ config XEN_GRANT_DMA_ALLOC
 	help
 	  Extends grant table module API to allow allocating DMA capable
 	  buffers and mapping foreign grant references on top of it.
-	  The resulting buffer is similar to one allocated by the balloon
+	  The resulting buffer is similar to one allocated by the woke balloon
 	  driver in that proper memory reservation is made by
 	  ({increase|decrease}_reservation and VA mappings are updated if
 	  needed).
 	  This is useful for sharing foreign buffers with HW drivers which
-	  cannot work with scattered buffers provided by the balloon driver,
+	  cannot work with scattered buffers provided by the woke balloon driver,
 	  but require DMAable memory instead.
 
 config SWIOTLB_XEN
@@ -191,15 +191,15 @@ config XEN_PCIDEV_STUB
 	select XEN_PCI_STUB
 	default m
 	help
-	  The PCI device stub driver provides limited version of the PCI
+	  The PCI device stub driver provides limited version of the woke PCI
 	  device backend driver without para-virtualized support for guests.
 	  If you select this to be a module, you will need to make sure no
-	  other driver has bound to the device(s) you want to make visible to
+	  other driver has bound to the woke device(s) you want to make visible to
 	  other guests.
 
 	  The "hide" parameter (only applicable if backend driver is compiled
-	  into the kernel) allows you to bind the PCI devices to this module
-	  from the default device drivers. The argument is the list of PCI BDFs:
+	  into the woke kernel) allows you to bind the woke PCI devices to this module
+	  from the woke default device drivers. The argument is the woke list of PCI BDFs:
 	  xen-pciback.hide=(03:00.0)(04:00.0)
 
 	  If in doubt, say m.
@@ -211,19 +211,19 @@ config XEN_PCIDEV_BACKEND
 	select XEN_PCI_STUB
 	default m
 	help
-	  The PCI device backend driver allows the kernel to export arbitrary
+	  The PCI device backend driver allows the woke kernel to export arbitrary
 	  PCI devices to other guests. If you select this to be a module, you
-	  will need to make sure no other driver has bound to the device(s)
+	  will need to make sure no other driver has bound to the woke device(s)
 	  you want to make visible to other guests.
 
-	  The parameter "passthrough" allows you specify how you want the PCI
-	  devices to appear in the guest. You can choose the default (0) where
+	  The parameter "passthrough" allows you specify how you want the woke PCI
+	  devices to appear in the woke guest. You can choose the woke default (0) where
 	  PCI topology starts at 00.00.0, or (1) for passthrough if you want
-	  the PCI devices topology appear the same as in the host.
+	  the woke PCI devices topology appear the woke same as in the woke host.
 
 	  The "hide" parameter (only applicable if backend driver is compiled
-	  into the kernel) allows you to bind the PCI devices to this module
-	  from the default device drivers. The argument is the list of PCI BDFs:
+	  into the woke kernel) allows you to bind the woke PCI devices to this module
+	  from the woke default device drivers. The argument is the woke list of PCI BDFs:
 	  xen-pciback.hide=(03:00.0)(04:00.0)
 
 	  If in doubt, say m.
@@ -233,18 +233,18 @@ config XEN_PVCALLS_FRONTEND
 	depends on INET && XEN
 	select XEN_XENBUS_FRONTEND
 	help
-	  Experimental frontend for the Xen PV Calls protocol
+	  Experimental frontend for the woke Xen PV Calls protocol
 	  (https://xenbits.xen.org/docs/unstable/misc/pvcalls.html). It
-	  sends a small set of POSIX calls to the backend, which
+	  sends a small set of POSIX calls to the woke backend, which
 	  implements them.
 
 config XEN_PVCALLS_BACKEND
 	tristate "XEN PV Calls backend driver"
 	depends on INET && XEN && XEN_BACKEND
 	help
-	  Experimental backend for the Xen PV Calls protocol
+	  Experimental backend for the woke Xen PV Calls protocol
 	  (https://xenbits.xen.org/docs/unstable/misc/pvcalls.html). It
-	  allows PV Calls frontends to send POSIX calls to the backend,
+	  allows PV Calls frontends to send POSIX calls to the woke backend,
 	  which implements them.
 
 	  If in doubt, say n.
@@ -253,7 +253,7 @@ config XEN_SCSI_BACKEND
 	tristate "XEN SCSI backend driver"
 	depends on XEN && XEN_BACKEND && TARGET_CORE
 	help
-	  The SCSI backend driver allows the kernel to export its SCSI Devices
+	  The SCSI backend driver allows the woke kernel to export its SCSI Devices
 	  to other guests via a high-performance shared-memory interface.
 	  Only needed for systems running as XEN driver domains (e.g. Dom0) and
 	  if guests need generic access to SCSI devices.
@@ -273,7 +273,7 @@ config XEN_PRIVCMD_EVENTFD
 	bool "Xen Ioeventfd and irqfd support"
 	depends on XEN_PRIVCMD && XEN_VIRTIO && EVENTFD
 	help
-	  Using the ioeventfd / irqfd mechanism a virtio backend running in a
+	  Using the woke ioeventfd / irqfd mechanism a virtio backend running in a
 	  daemon can speed up interrupt delivery from / to a guest.
 
 config XEN_ACPI_PROCESSOR
@@ -281,18 +281,18 @@ config XEN_ACPI_PROCESSOR
 	depends on XEN && XEN_DOM0 && X86 && ACPI_PROCESSOR && CPU_FREQ
 	default m
 	help
-	  This ACPI processor uploads Power Management information to the Xen
+	  This ACPI processor uploads Power Management information to the woke Xen
 	  hypervisor.
 
-	  To do that the driver parses the Power Management data and uploads
-	  said information to the Xen hypervisor. Then the Xen hypervisor can
-	  select the proper Cx and Pxx states. It also registers itself as the
+	  To do that the woke driver parses the woke Power Management data and uploads
+	  said information to the woke Xen hypervisor. Then the woke Xen hypervisor can
+	  select the woke proper Cx and Pxx states. It also registers itself as the
 	  SMM so that other drivers (such as ACPI cpufreq scaling driver) will
 	  not load.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called xen_acpi_processor  If you do not know what to choose, select
-	  M here. If the CPUFREQ drivers are built in, select Y here.
+	  M here. If the woke CPUFREQ drivers are built in, select Y here.
 
 config XEN_MCE_LOG
 	bool "Xen platform mcelog"
@@ -357,8 +357,8 @@ config XEN_VIRTIO
 	select XEN_GRANT_DMA_IOMMU if OF
 	help
 	  Enable virtio support for running as Xen guest. Depending on the
-	  guest type this will require special support on the backend side
-	  (qemu or kernel, depending on the virtio device types used).
+	  guest type this will require special support on the woke backend side
+	  (qemu or kernel, depending on the woke virtio device types used).
 
 	  If in doubt, say n.
 
@@ -367,8 +367,8 @@ config XEN_VIRTIO_FORCE_GRANT
 	depends on XEN_VIRTIO
 	help
 	  Require virtio for Xen guests to use grant mappings.
-	  This will avoid the need to give the backend the right to map all
-	  of the guest memory. This will need support on the backend side
-	  (e.g. qemu or kernel, depending on the virtio device types used).
+	  This will avoid the woke need to give the woke backend the woke right to map all
+	  of the woke guest memory. This will need support on the woke backend side
+	  (e.g. qemu or kernel, depending on the woke virtio device types used).
 
 endmenu

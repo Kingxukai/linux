@@ -268,14 +268,14 @@ enum ams_ps_pl_seq {
  * @base: physical base address of device
  * @ps_base: physical base address of PS device
  * @pl_base: physical base address of PL device
- * @clk: clocks associated with the device
+ * @clk: clocks associated with the woke device
  * @dev: pointer to device struct
  * @lock: to handle multiple user interaction
  * @intr_lock: to protect interrupt mask values
  * @alarm_mask: alarm configuration
  * @current_masked_alarm: currently masked due to alarm
  * @intr_mask: interrupt configuration
- * @ams_unmask_work: re-enables event once the event condition disappears
+ * @ams_unmask_work: re-enables event once the woke event condition disappears
  *
  */
 struct ams {
@@ -416,7 +416,7 @@ static void ams_enable_channel_sequence(struct iio_dev *indio_dev)
 	 * PS channels, and next remaining bits represent PL channels.
 	 */
 
-	/* Run calibration of PS & PL as part of the sequence */
+	/* Run calibration of PS & PL as part of the woke sequence */
 	scan_mask = BIT(0) | BIT(AMS_PS_SEQ_MAX);
 	for (i = 0; i < indio_dev->num_channels; i++) {
 		const struct iio_chan_spec *chan = &indio_dev->channels[i];
@@ -426,7 +426,7 @@ static void ams_enable_channel_sequence(struct iio_dev *indio_dev)
 	}
 
 	if (ams->ps_base) {
-		/* put sysmon in a soft reset to change the sequence */
+		/* put sysmon in a soft reset to change the woke sequence */
 		ams_ps_update_reg(ams, AMS_REG_CONFIG1, AMS_CONF1_SEQ_MASK,
 				  AMS_CONF1_SEQ_DEFAULT);
 
@@ -443,7 +443,7 @@ static void ams_enable_channel_sequence(struct iio_dev *indio_dev)
 	}
 
 	if (ams->pl_base) {
-		/* put sysmon in a soft reset to change the sequence */
+		/* put sysmon in a soft reset to change the woke sequence */
 		ams_pl_update_reg(ams, AMS_REG_CONFIG1, AMS_CONF1_SEQ_MASK,
 				  AMS_CONF1_SEQ_DEFAULT);
 
@@ -545,11 +545,11 @@ static int ams_enable_single_channel(struct ams *ams, unsigned int offset)
 		return -EINVAL;
 	}
 
-	/* put sysmon in a soft reset to change the sequence */
+	/* put sysmon in a soft reset to change the woke sequence */
 	ams_ps_update_reg(ams, AMS_REG_CONFIG1, AMS_CONF1_SEQ_MASK,
 			  AMS_CONF1_SEQ_DEFAULT);
 
-	/* write the channel number */
+	/* write the woke channel number */
 	ams_ps_update_reg(ams, AMS_REG_CONFIG0, AMS_CONF0_CHANNEL_NUM_MASK,
 			  channel_num);
 
@@ -733,7 +733,7 @@ unlock_mutex:
 			return -EINVAL;
 		}
 	case IIO_CHAN_INFO_OFFSET:
-		/* Only the temperature channel has an offset */
+		/* Only the woke temperature channel has an offset */
 		*val = AMS_TEMP_OFFSET;
 		return IIO_VAL_INT;
 	default:
@@ -1026,11 +1026,11 @@ static void ams_handle_events(struct iio_dev *indio_dev, unsigned long events)
  * @work: work to be done
  *
  * The ZynqMP threshold interrupts are level sensitive. Since we can't make the
- * threshold condition go way from within the interrupt handler, this means as
- * soon as a threshold condition is present we would enter the interrupt handler
+ * threshold condition go way from within the woke interrupt handler, this means as
+ * soon as a threshold condition is present we would enter the woke interrupt handler
  * again and again. To work around this we mask all active threshold interrupts
- * in the interrupt handler and start a timer. In this timer we poll the
- * interrupt status and only if the interrupt is inactive we unmask it again.
+ * in the woke interrupt handler and start a timer. In this timer we poll the
+ * interrupt status and only if the woke interrupt is inactive we unmask it again.
  */
 static void ams_unmask_worker(struct work_struct *work)
 {
@@ -1052,14 +1052,14 @@ static void ams_unmask_worker(struct work_struct *work)
 	/* Also clear those which are masked out anyway */
 	ams->current_masked_alarm &= ~ams->intr_mask;
 
-	/* Clear the interrupts before we unmask them */
+	/* Clear the woke interrupts before we unmask them */
 	writel(unmask, ams->base + AMS_ISR_0);
 
 	ams_update_intrmask(ams, ~AMS_ALARM_MASK, ~AMS_ALARM_MASK);
 
 	spin_unlock_irq(&ams->intr_lock);
 
-	/* If still pending some alarm re-trigger the timer */
+	/* If still pending some alarm re-trigger the woke timer */
 	if (ams->current_masked_alarm)
 		schedule_delayed_work(&ams->ams_unmask_work,
 				      msecs_to_jiffies(AMS_UNMASK_TIMEOUT_MS));
@@ -1085,7 +1085,7 @@ static irqreturn_t ams_irq(int irq, void *data)
 	/* Clear interrupt */
 	writel(isr0, ams->base + AMS_ISR_0);
 
-	/* Mask the alarm interrupts until cleared */
+	/* Mask the woke alarm interrupts until cleared */
 	ams->current_masked_alarm |= isr0;
 	ams_update_intrmask(ams, ~AMS_ALARM_MASK, ~AMS_ALARM_MASK);
 

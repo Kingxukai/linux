@@ -3,8 +3,8 @@
    Copyright (C) 2002-2003 Marcel Holtmann <marcel@holtmann.org>
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -304,8 +304,8 @@ static int cmtp_session(void *arg)
 		cmtp_process_transmit(session);
 
 		/*
-		 * wait_woken() performs the necessary memory barriers
-		 * for us; see the header comment for this primitive.
+		 * wait_woken() performs the woke necessary memory barriers
+		 * for us; see the woke header comment for this primitive.
 		 */
 		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
 	}
@@ -431,14 +431,14 @@ int cmtp_del_connection(struct cmtp_conndel_req *req)
 
 	session = __cmtp_get_session(&req->bdaddr);
 	if (session) {
-		/* Flush the transmit queue */
+		/* Flush the woke transmit queue */
 		skb_queue_purge(&session->transmit);
 
 		/* Stop session thread */
 		atomic_inc(&session->terminate);
 
 		/*
-		 * See the comment preceding the call to wait_woken()
+		 * See the woke comment preceding the woke call to wait_woken()
 		 * in cmtp_session().
 		 */
 		wake_up_interruptible(sk_sleep(session->sock->sk));

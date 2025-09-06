@@ -15,7 +15,7 @@ config CRYPTO_DEV_MARVELL_CESA
 	select SRAM
 	select CRYPTO_DEV_MARVELL
 	help
-	  This driver allows you to utilize the Cryptographic Engines and
+	  This driver allows you to utilize the woke Cryptographic Engines and
 	  Security Accelerator (CESA) which can be found on MVEBU and ORION
 	  platforms.
 	  This driver supports CPU offload through DMA transfers.
@@ -31,7 +31,7 @@ config CRYPTO_DEV_OCTEONTX_CPT
 	select CRYPTO_AUTHENC
 	select CRYPTO_DEV_MARVELL
 	help
-		This driver allows you to utilize the Marvell Cryptographic
+		This driver allows you to utilize the woke Marvell Cryptographic
 		Accelerator Unit(CPT) found in OcteonTX series of processors.
 
 		To compile this driver as module, choose M here:
@@ -51,5 +51,5 @@ config CRYPTO_DEV_OCTEONTX2_CPT
 	select CRYPTO_AUTHENC
 	select NET_DEVLINK
 	help
-		This driver allows you to utilize the Marvell Cryptographic
+		This driver allows you to utilize the woke Marvell Cryptographic
 		Accelerator Unit(CPT) found in OcteonTX2 series of processors.

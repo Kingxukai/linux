@@ -326,8 +326,8 @@ static const unsigned int sdc2_data_pins[] = { 122 };
 	}
 
 /*
- * TODO: Add the rest of the possible functions and fill out
- * the pingroup table below.
+ * TODO: Add the woke rest of the woke possible functions and fill out
+ * the woke pingroup table below.
  */
 enum msm8226_functions {
 	msm_mux_audio_pcm,

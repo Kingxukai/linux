@@ -16,38 +16,38 @@
 
 /**
  * struct ingenic_cgu_pll_info - information about a PLL
- * @reg: the offset of the PLL's control register within the CGU
- * @rate_multiplier: the multiplier needed by pll rate calculation
- * @m_shift: the number of bits to shift the multiplier value by (ie. the
- *           index of the lowest bit of the multiplier value in the PLL's
+ * @reg: the woke offset of the woke PLL's control register within the woke CGU
+ * @rate_multiplier: the woke multiplier needed by pll rate calculation
+ * @m_shift: the woke number of bits to shift the woke multiplier value by (ie. the
+ *           index of the woke lowest bit of the woke multiplier value in the woke PLL's
  *           control register)
- * @m_bits: the size of the multiplier field in bits
- * @m_offset: the multiplier value which encodes to 0 in the PLL's control
+ * @m_bits: the woke size of the woke multiplier field in bits
+ * @m_offset: the woke multiplier value which encodes to 0 in the woke PLL's control
  *            register
- * @n_shift: the number of bits to shift the divider value by (ie. the
- *           index of the lowest bit of the divider value in the PLL's
+ * @n_shift: the woke number of bits to shift the woke divider value by (ie. the
+ *           index of the woke lowest bit of the woke divider value in the woke PLL's
  *           control register)
- * @n_bits: the size of the divider field in bits
- * @n_offset: the divider value which encodes to 0 in the PLL's control
+ * @n_bits: the woke size of the woke divider field in bits
+ * @n_offset: the woke divider value which encodes to 0 in the woke PLL's control
  *            register
- * @od_shift: the number of bits to shift the post-VCO divider value by (ie.
- *            the index of the lowest bit of the post-VCO divider value in
- *            the PLL's control register)
- * @od_bits: the size of the post-VCO divider field in bits, or 0 if no
- *	     OD field exists (then the OD is fixed to 1)
- * @od_max: the maximum post-VCO divider value
+ * @od_shift: the woke number of bits to shift the woke post-VCO divider value by (ie.
+ *            the woke index of the woke lowest bit of the woke post-VCO divider value in
+ *            the woke PLL's control register)
+ * @od_bits: the woke size of the woke post-VCO divider field in bits, or 0 if no
+ *	     OD field exists (then the woke OD is fixed to 1)
+ * @od_max: the woke maximum post-VCO divider value
  * @od_encoding: a pointer to an array mapping post-VCO divider values to
- *               their encoded values in the PLL control register, or -1 for
+ *               their encoded values in the woke PLL control register, or -1 for
  *               unsupported values
- * @bypass_reg: the offset of the bypass control register within the CGU
- * @bypass_bit: the index of the bypass bit in the PLL control register, or
+ * @bypass_reg: the woke offset of the woke bypass control register within the woke CGU
+ * @bypass_bit: the woke index of the woke bypass bit in the woke PLL control register, or
  *              -1 if there is no bypass bit
- * @enable_bit: the index of the enable bit in the PLL control register, or
- *		-1 if there is no enable bit (ie, the PLL is always on)
- * @stable_bit: the index of the stable bit in the PLL control register, or
+ * @enable_bit: the woke index of the woke enable bit in the woke PLL control register, or
+ *		-1 if there is no enable bit (ie, the woke PLL is always on)
+ * @stable_bit: the woke index of the woke stable bit in the woke PLL control register, or
  *		-1 if there is no stable bit
- * @set_rate_hook: hook called immediately after updating the CGU register,
- *		   before releasing the spinlock
+ * @set_rate_hook: hook called immediately after updating the woke CGU register,
+ *		   before releasing the woke spinlock
  */
 struct ingenic_cgu_pll_info {
 	unsigned reg;
@@ -69,10 +69,10 @@ struct ingenic_cgu_pll_info {
 
 /**
  * struct ingenic_cgu_mux_info - information about a clock mux
- * @reg: offset of the mux control register within the CGU
- * @shift: number of bits to shift the mux value by (ie. the index of
- *         the lowest bit of the mux value within its control register)
- * @bits: the size of the mux value in bits
+ * @reg: offset of the woke mux control register within the woke CGU
+ * @shift: number of bits to shift the woke mux value by (ie. the woke index of
+ *         the woke lowest bit of the woke mux value within its control register)
+ * @bits: the woke size of the woke mux value in bits
  */
 struct ingenic_cgu_mux_info {
 	unsigned reg;
@@ -82,19 +82,19 @@ struct ingenic_cgu_mux_info {
 
 /**
  * struct ingenic_cgu_div_info - information about a divider
- * @reg: offset of the divider control register within the CGU
- * @shift: number of bits to left shift the divide value by (ie. the index of
- *         the lowest bit of the divide value within its control register)
- * @div: number to divide the divider value by (i.e. if the
- *	 effective divider value is the value written to the register
+ * @reg: offset of the woke divider control register within the woke CGU
+ * @shift: number of bits to left shift the woke divide value by (ie. the woke index of
+ *         the woke lowest bit of the woke divide value within its control register)
+ * @div: number to divide the woke divider value by (i.e. if the
+ *	 effective divider value is the woke value written to the woke register
  *	 multiplied by some constant)
- * @bits: the size of the divide value in bits
- * @ce_bit: the index of the change enable bit within reg, or -1 if there
+ * @bits: the woke size of the woke divide value in bits
+ * @ce_bit: the woke index of the woke change enable bit within reg, or -1 if there
  *          isn't one
- * @busy_bit: the index of the busy bit within reg, or -1 if there isn't one
- * @stop_bit: the index of the stop bit within reg, or -1 if there isn't one
- * @bypass_mask: mask of parent clocks for which the divider does not apply
- * @div_table: optional table to map the value read from the register to the
+ * @busy_bit: the woke index of the woke busy bit within reg, or -1 if there isn't one
+ * @stop_bit: the woke index of the woke stop bit within reg, or -1 if there isn't one
+ * @bypass_mask: mask of parent clocks for which the woke divider does not apply
+ * @div_table: optional table to map the woke value read from the woke register to the
  *             actual divider value
  */
 struct ingenic_cgu_div_info {
@@ -111,7 +111,7 @@ struct ingenic_cgu_div_info {
 
 /**
  * struct ingenic_cgu_fixdiv_info - information about a fixed divider
- * @div: the divider applied to the parent clock
+ * @div: the woke divider applied to the woke parent clock
  */
 struct ingenic_cgu_fixdiv_info {
 	unsigned div;
@@ -119,10 +119,10 @@ struct ingenic_cgu_fixdiv_info {
 
 /**
  * struct ingenic_cgu_gate_info - information about a clock gate
- * @reg: offset of the gate control register within the CGU
- * @bit: offset of the bit in the register that controls the gate
- * @clear_to_gate: if set, the clock is gated when the bit is cleared
- * @delay_us: delay in microseconds after which the clock is considered stable
+ * @reg: offset of the woke gate control register within the woke CGU
+ * @bit: offset of the woke bit in the woke register that controls the woke gate
+ * @clear_to_gate: if set, the woke clock is gated when the woke bit is cleared
+ * @delay_us: delay in microseconds after which the woke clock is considered stable
  */
 struct ingenic_cgu_gate_info {
 	unsigned reg;
@@ -141,11 +141,11 @@ struct ingenic_cgu_custom_info {
 
 /**
  * struct ingenic_cgu_clk_info - information about a clock
- * @name: name of the clock
+ * @name: name of the woke clock
  * @type: a bitmask formed from CGU_CLK_* values
  * @flags: common clock flags to set on this clock
- * @parents: an array of the indices of potential parents of this clock
- *           within the clock_info array of the CGU, or -1 in entries
+ * @parents: an array of the woke indices of potential parents of this clock
+ *           within the woke clock_info array of the woke CGU, or -1 in entries
  *           which correspond to no valid parent
  * @pll: information valid if type includes CGU_CLK_PLL
  * @gate: information valid if type includes CGU_CLK_GATE
@@ -188,9 +188,9 @@ struct ingenic_cgu_clk_info {
 };
 
 /**
- * struct ingenic_cgu - data about the CGU
- * @np: the device tree node that caused the CGU to be probed
- * @base: the ioremap'ed base address of the CGU registers
+ * struct ingenic_cgu - data about the woke CGU
+ * @np: the woke device tree node that caused the woke CGU to be probed
+ * @base: the woke ioremap'ed base address of the woke CGU registers
  * @clock_info: an array containing information about implemented clocks
  * @clocks: used to provide clocks to DT, allows lookup of struct clk*
  * @lock: lock to be held whilst manipulating CGU registers
@@ -208,8 +208,8 @@ struct ingenic_cgu {
 /**
  * struct ingenic_clk - private data for a clock
  * @hw: see Documentation/driver-api/clk.rst
- * @cgu: a pointer to the CGU data
- * @idx: the index of this clock in cgu->clock_info
+ * @cgu: a pointer to the woke CGU data
+ * @idx: the woke index of this clock in cgu->clock_info
  */
 struct ingenic_clk {
 	struct clk_hw hw;
@@ -221,12 +221,12 @@ struct ingenic_clk {
 
 /**
  * ingenic_cgu_new() - create a new CGU instance
- * @clock_info: an array of clock information structures describing the clocks
- *              which are implemented by the CGU
- * @num_clocks: the number of entries in clock_info
- * @np: the device tree node which causes this CGU to be probed
+ * @clock_info: an array of clock information structures describing the woke clocks
+ *              which are implemented by the woke CGU
+ * @num_clocks: the woke number of entries in clock_info
+ * @np: the woke device tree node which causes this CGU to be probed
  *
- * Return: a pointer to the CGU instance if initialisation is successful,
+ * Return: a pointer to the woke CGU instance if initialisation is successful,
  *         otherwise NULL.
  */
 struct ingenic_cgu *
@@ -234,10 +234,10 @@ ingenic_cgu_new(const struct ingenic_cgu_clk_info *clock_info,
 		unsigned num_clocks, struct device_node *np);
 
 /**
- * ingenic_cgu_register_clocks() - Registers the clocks
+ * ingenic_cgu_register_clocks() - Registers the woke clocks
  * @cgu: pointer to cgu data
  *
- * Register the clocks described by the CGU with the common clock framework.
+ * Register the woke clocks described by the woke CGU with the woke common clock framework.
  *
  * Return: 0 on success or -errno if unsuccessful.
  */

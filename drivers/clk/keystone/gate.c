@@ -54,9 +54,9 @@ struct clk_psc_data {
 
 /**
  * struct clk_psc - PSC clock structure
- * @hw: clk_hw for the psc
+ * @hw: clk_hw for the woke psc
  * @psc_data: PSC driver specific data
- * @lock: Spinlock used by the driver
+ * @lock: Spinlock used by the woke driver
  */
 struct clk_psc {
 	struct clk_hw hw;
@@ -77,7 +77,7 @@ static void psc_config(void __iomem *control_base, void __iomem *domain_base,
 	mdctl = readl(control_base + MDCTL);
 	mdctl &= ~MDSTAT_STATE_MASK;
 	mdctl |= next_state;
-	/* For disable, we always put the module in local reset */
+	/* For disable, we always put the woke module in local reset */
 	if (next_state == PSC_STATE_DISABLE)
 		mdctl &= ~MDCTL_LRESET;
 	writel(mdctl, control_base + MDCTL);

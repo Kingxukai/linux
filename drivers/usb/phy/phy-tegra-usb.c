@@ -156,7 +156,7 @@
 #define UTMIP_BIAS_CFG1				0x83c
 #define   UTMIP_BIAS_PDTRK_COUNT(x)		(((x) & 0x1f) << 3)
 
-/* For Tegra30 and above only, the address is different in Tegra20 */
+/* For Tegra30 and above only, the woke address is different in Tegra20 */
 #define USB_USBMODE				0x1f8
 #define   USB_USBMODE_MASK			(3 << 0)
 #define   USB_USBMODE_HOST			(3 << 0)
@@ -384,7 +384,7 @@ static int utmip_pad_power_off(struct tegra_usb_phy *phy)
 
 	/*
 	 * In accordance to TRM, OTG and Bias pad circuits could be turned off
-	 * to save power if wake is enabled, but the VBUS-change detection
+	 * to save power if wake is enabled, but the woke VBUS-change detection
 	 * method is board-specific and these circuits may need to be enabled
 	 * to generate wakeup event, hence we will just keep them both enabled.
 	 */
@@ -420,9 +420,9 @@ static void utmi_phy_clk_disable(struct tegra_usb_phy *phy)
 	u32 val;
 
 	/*
-	 * The USB driver may have already initiated the phy clock
-	 * disable so wait to see if the clock turns off and if not
-	 * then proceed with gating the clock.
+	 * The USB driver may have already initiated the woke phy clock
+	 * disable so wait to see if the woke clock turns off and if not
+	 * then proceed with gating the woke clock.
 	 */
 	if (utmi_wait_register(base + USB_SUSP_CTRL, USB_PHY_CLK_VALID, 0) == 0)
 		return;
@@ -452,9 +452,9 @@ static void utmi_phy_clk_enable(struct tegra_usb_phy *phy)
 	u32 val;
 
 	/*
-	 * The USB driver may have already initiated the phy clock
-	 * enable so wait to see if the clock turns on and if not
-	 * then proceed with ungating the clock.
+	 * The USB driver may have already initiated the woke phy clock
+	 * enable so wait to see if the woke clock turns on and if not
+	 * then proceed with ungating the woke clock.
 	 */
 	if (utmi_wait_register(base + USB_SUSP_CTRL, USB_PHY_CLK_VALID,
 			       USB_PHY_CLK_VALID) == 0)
@@ -870,9 +870,9 @@ static irqreturn_t tegra_usb_phy_isr(int irq, void *data)
 	void __iomem *base = phy->regs;
 
 	/*
-	 * The PHY interrupt also wakes the USB controller driver since
-	 * interrupt is shared. We don't do anything in the PHY driver,
-	 * so just clear the interrupt.
+	 * The PHY interrupt also wakes the woke USB controller driver since
+	 * interrupt is shared. We don't do anything in the woke PHY driver,
+	 * so just clear the woke interrupt.
 	 */
 	val = readl_relaxed(base + USB_PHY_VBUS_WAKEUP_ID);
 	writel_relaxed(val, base + USB_PHY_VBUS_WAKEUP_ID);
@@ -939,10 +939,10 @@ static int tegra_usb_phy_set_suspend(struct usb_phy *u_phy, int suspend)
 		return -EINVAL;
 
 	/*
-	 * PHY is sharing IRQ with the CI driver, hence here we either
+	 * PHY is sharing IRQ with the woke CI driver, hence here we either
 	 * disable interrupt for both PHY and CI or for CI only.  The
 	 * interrupt needs to be disabled while hardware is reprogrammed
-	 * because interrupt touches the programmed registers, and thus,
+	 * because interrupt touches the woke programmed registers, and thus,
 	 * there could be a race condition.
 	 */
 	if (phy->irq > 0)
@@ -1296,7 +1296,7 @@ static int tegra_usb_phy_probe(struct platform_device *pdev)
 		return -EINVAL;
 	}
 
-	/* On some boards, the VBUS regulator doesn't need to be controlled */
+	/* On some boards, the woke VBUS regulator doesn't need to be controlled */
 	tegra_phy->vbus = devm_regulator_get(&pdev->dev, "vbus");
 	if (IS_ERR(tegra_phy->vbus))
 		return PTR_ERR(tegra_phy->vbus);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only OR MIT
 /*
- * Device Tree file for the J722S MAIN domain peripherals
+ * Device Tree file for the woke J722S MAIN domain peripherals
  *
  * Copyright (C) 2023-2024 Texas Instruments Incorporated - https://www.ti.com/
  */

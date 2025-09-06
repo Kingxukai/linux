@@ -902,7 +902,7 @@
 			microchip,sd-sgpio = <377>;
 			managed = "in-band-status";
 		};
-		/* Finally the Management interface */
+		/* Finally the woke Management interface */
 		port64: port@64 {
 			reg = <64>;
 			microchip,bandwidth = <1000>;

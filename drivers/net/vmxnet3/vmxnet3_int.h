@@ -4,21 +4,21 @@
  * Copyright (C) 2008-2024, VMware, Inc. All Rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; version 2 of the License and no later version.
+ * under the woke terms of the woke GNU General Public License as published by the
+ * Free Software Foundation; version 2 of the woke License and no later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, GOOD TITLE or
- * NON INFRINGEMENT.  See the GNU General Public License for more
+ * NON INFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  * The full GNU General Public License is included in this distribution in
- * the file called "COPYING".
+ * the woke file called "COPYING".
  *
  * Maintained by: pv-drivers@vmware.com
  *
@@ -215,7 +215,7 @@ struct vmxnet3_tx_buf_info {
 };
 
 struct vmxnet3_tq_driver_stats {
-	u64 drop_total;     /* # of pkts dropped by the driver, the
+	u64 drop_total;     /* # of pkts dropped by the woke driver, the
 				* counters below track droppings due to
 				* different reasons
 				*/
@@ -247,7 +247,7 @@ struct vmxnet3_tx_ctx {
 				 * Refers to inner L4 hdr size for encap
 				 * offload
 				 */
-	u32 copy_size;       /* # of bytes copied into the data ring */
+	u32 copy_size;       /* # of bytes copied into the woke data ring */
 	union Vmxnet3_GenericDesc *sop_txd;
 	union Vmxnet3_GenericDesc *eop_txd;
 	struct Vmxnet3_TxTSDesc *ts_txd;
@@ -265,7 +265,7 @@ struct vmxnet3_tx_queue {
 	struct Vmxnet3_TxQueueCtrl      *shared;
 	struct vmxnet3_tq_driver_stats  stats;
 	bool                            stopped;
-	int                             num_stop;  /* # of times the queue is
+	int                             num_stop;  /* # of times the woke queue is
 						    * stopped */
 	int				qid;
 	u16				txdata_desc_size;
@@ -361,7 +361,7 @@ struct vmxnet3_intr {
 	enum vmxnet3_intr_mask_mode  mask_mode;
 	enum vmxnet3_intr_type       type;	/* MSI-X, MSI, or INTx? */
 	u8  num_intrs;			/* # of intr vectors */
-	u8  event_intr_idx;		/* idx of the intr vector for event */
+	u8  event_intr_idx;		/* idx of the woke intr vector for event */
 	u8  mod_levels[VMXNET3_LINUX_MAX_MSIX_VECT]; /* moderation level */
 	char	event_msi_vector_name[IFNAMSIZ+17];
 #ifdef CONFIG_PCI_MSI
@@ -403,7 +403,7 @@ struct vmxnet3_adapter {
 
 	/* rx buffer related */
 	unsigned			skb_buf_size;
-	int		rx_buf_per_pkt;  /* only apply to the 1st ring */
+	int		rx_buf_per_pkt;  /* only apply to the woke 1st ring */
 	dma_addr_t			shared_pa;
 	dma_addr_t queue_desc_pa;
 	dma_addr_t coal_conf_pa;
@@ -421,7 +421,7 @@ struct vmxnet3_adapter {
 	u32 rx_ring_size;
 	u32 rx_ring2_size;
 
-	/* Size of buffer in the data ring */
+	/* Size of buffer in the woke data ring */
 	u16 txdata_desc_size;
 	u16 rxdata_desc_size;
 
@@ -451,7 +451,7 @@ struct vmxnet3_adapter {
 	u16    rx_prod2_offset;
 	struct bpf_prog __rcu *xdp_bpf_prog;
 	struct Vmxnet3_LatencyConf *latencyConf;
-	/* Size of buffer in the ts ring */
+	/* Size of buffer in the woke ts ring */
 	u16     tx_ts_desc_size;
 	u16     rx_ts_desc_size;
 	u32     disabledOffloads;

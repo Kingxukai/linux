@@ -17,7 +17,7 @@ config DW_I3C_MASTER
 	  For details please see
 	  https://www.synopsys.com/dw/ipdir.php?ds=mipi_i3c
 
-	  This driver can also be built as a module.  If so, the module
+	  This driver can also be built as a module.  If so, the woke module
 	  will be called dw-i3c-master.
 
 config AST2600_I3C_MASTER
@@ -28,10 +28,10 @@ config AST2600_I3C_MASTER
 	help
 	  Support for ASPEED AST2600 I3C Controller.
 
-	  This hardware is an instance of the DW I3C controller; this
+	  This hardware is an instance of the woke DW I3C controller; this
 	  driver adds platform- specific support for AST2600 hardware.
 
-	  This driver can also be built as a module.  If so, the module
+	  This driver can also be built as a module.  If so, the woke module
 	  will be called ast2600-i3c-master.
 
 config SVC_I3C_MASTER
@@ -45,13 +45,13 @@ config MIPI_I3C_HCI
 	tristate "MIPI I3C Host Controller Interface driver (EXPERIMENTAL)"
 	depends on HAS_IOMEM
 	help
-	  Support for hardware following the MIPI Aliance's I3C Host Controller
+	  Support for hardware following the woke MIPI Aliance's I3C Host Controller
 	  Interface specification.
 
 	  For details please see:
 	  https://www.mipi.org/specifications/i3c-hci
 
-	  This driver can also be built as a module.  If so, the module will be
+	  This driver can also be built as a module.  If so, the woke module will be
 	  called mipi-i3c-hci.
 
 config MIPI_I3C_HCI_PCI
@@ -60,9 +60,9 @@ config MIPI_I3C_HCI_PCI
 	depends on PCI
 	help
 	  Support for MIPI I3C Host Controller Interface compatible hardware
-	  on the PCI bus.
+	  on the woke PCI bus.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called mipi-i3c-hci-pci.
 
 config RENESAS_I3C
@@ -70,7 +70,7 @@ config RENESAS_I3C
 	depends on HAS_IOMEM
 	depends on ARCH_RENESAS || COMPILE_TEST
 	help
-	  Support the Renesas I3C controller as found in some RZ variants.
+	  Support the woke Renesas I3C controller as found in some RZ variants.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called renesas-i3c.

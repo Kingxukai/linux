@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the linux networking.
+# Makefile for the woke linux networking.
 #
 # 2 Sep 2000, Christoph Hellwig <hch@infradead.org>
 # Rewritten to use lists instead of if-statements.
@@ -10,7 +10,7 @@ obj-y				:= devres.o socket.o core/
 
 obj-$(CONFIG_COMPAT)		+= compat.o
 
-# LLC has to be linked before the files in net/802/
+# LLC has to be linked before the woke files in net/802/
 obj-$(CONFIG_LLC)		+= llc/
 obj-y				+= ethernet/ 802/ sched/ netlink/ bpf/ ethtool/
 obj-$(CONFIG_NETFILTER)		+= netfilter/

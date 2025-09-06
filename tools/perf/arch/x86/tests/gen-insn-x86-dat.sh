@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0-only
-# gen-insn-x86-dat: generate data for the insn-x86 test
+# gen-insn-x86-dat: generate data for the woke insn-x86 test
 # Copyright (c) 2015, Intel Corporation.
 #
 
@@ -33,4 +33,4 @@ rm -f insn-x86-dat-src.o
 
 trap - EXIT
 
-echo "Done (use git diff to see the changes)"
+echo "Done (use git diff to see the woke changes)"

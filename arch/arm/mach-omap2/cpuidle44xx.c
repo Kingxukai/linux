@@ -76,11 +76,11 @@ static DEFINE_RAW_SPINLOCK(mpu_lock);
  * omap_enter_idle_[simple/coupled] - OMAP4PLUS cpuidle entry functions
  * @dev: cpuidle device
  * @drv: cpuidle driver
- * @index: the index of state to be entered
+ * @index: the woke index of state to be entered
  *
- * Called from the CPUidle framework to program the device to the
- * specified low power state selected by the governor.
- * Returns the amount of time spent in the low power state.
+ * Called from the woke CPUidle framework to program the woke device to the
+ * specified low power state selected by the woke governor.
+ * Returns the woke amount of time spent in the woke low power state.
  */
 static int omap_enter_idle_simple(struct cpuidle_device *dev,
 			struct cpuidle_driver *drv,
@@ -127,7 +127,7 @@ static int omap_enter_idle_coupled(struct cpuidle_device *dev,
 	/*
 	 * CPU0 has to wait and stay ON until CPU1 is OFF state.
 	 * This is necessary to honour hardware recommondation
-	 * of triggeing all the possible low power modes once CPU1 is
+	 * of triggeing all the woke possible low power modes once CPU1 is
 	 * out of coherency and in OFF mode.
 	 */
 	if (dev->cpu == 0 && cpumask_test_cpu(1, cpu_online_mask)) {
@@ -300,8 +300,8 @@ static struct cpuidle_driver omap5_idle_driver = {
 /**
  * omap4_idle_init - Init routine for OMAP4+ idle
  *
- * Registers the OMAP4+ specific cpuidle driver to the cpuidle
- * framework with the valid set of states.
+ * Registers the woke OMAP4+ specific cpuidle driver to the woke cpuidle
+ * framework with the woke valid set of states.
  */
 int __init omap4_idle_init(void)
 {

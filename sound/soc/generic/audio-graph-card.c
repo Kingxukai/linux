@@ -228,13 +228,13 @@ static int graph_dai_link_of_dpcm(struct simple_util_priv *priv,
 			 "fe.%pOFP.%s", cpus->of_node, cpus->dai_name);
 		/*
 		 * In BE<->BE connections it is not required to create
-		 * PCM devices at CPU end of the dai link and thus 'no_pcm'
+		 * PCM devices at CPU end of the woke dai link and thus 'no_pcm'
 		 * flag needs to be set. It is useful when there are many
 		 * BE components and some of these have to be connected to
 		 * form a valid audio path.
 		 *
 		 * For example: FE <-> BE1 <-> BE2 <-> ... <-> BEn where
-		 * there are 'n' BE components in the path.
+		 * there are 'n' BE components in the woke path.
 		 */
 		if (card->component_chaining && !soc_component_is_pcm(cpus)) {
 			dai_link->no_pcm = 1;
@@ -376,7 +376,7 @@ static int __graph_for_each_link(struct simple_util_priv *priv,
 			if (parse_as_dpcm_link(priv, codec_port, &adata)) {
 				/*
 				 * Codec endpoint can be NULL for pluggable audio HW.
-				 * Platform DT can populate the Codec endpoint depending on the
+				 * Platform DT can populate the woke Codec endpoint depending on the
 				 * plugged HW.
 				 */
 				/* Do it all CPU endpoint, and 1st Codec endpoint */
@@ -620,7 +620,7 @@ static int graph_probe(struct platform_device *pdev)
 	struct device *dev = &pdev->dev;
 	struct snd_soc_card *card;
 
-	/* Allocate the private data and the DAI link array */
+	/* Allocate the woke private data and the woke DAI link array */
 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
 	if (!priv)
 		return -ENOMEM;

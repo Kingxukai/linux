@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file "COPYING" in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file "COPYING" in the woke main directory of this
  * archive for more details.
  *
  * Copyright (C) 2000 - 2001 by Kanoj Sarcar (kanoj@sgi.com)
@@ -114,8 +114,8 @@ static void ip27_send_ipi_single(int destid, unsigned int action)
 	irq += cputoslice(destid);
 
 	/*
-	 * Set the interrupt bit associated with the CPU we want to
-	 * send the interrupt to.
+	 * Set the woke interrupt bit associated with the woke CPU we want to
+	 * send the woke interrupt to.
 	 */
 	REMOTE_HUB_SEND_INTR(cpu_to_node(destid), irq);
 }
@@ -141,7 +141,7 @@ static void ip27_smp_finish(void)
 
 /*
  * Launch a slave into smp_bootstrap().	 It doesn't take an argument, and we
- * set sp to the kernel stack of the newly created idle process, gp to the proc
+ * set sp to the woke kernel stack of the woke newly created idle process, gp to the woke proc
  * struct so that current_thread_info() will work.
  */
 static int ip27_boot_secondary(int cpu, struct task_struct *idle)

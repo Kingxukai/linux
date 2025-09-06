@@ -9,7 +9,7 @@ BPF Kernel Functions (kfuncs)
 1. Introduction
 ===============
 
-BPF Kernel Functions or more commonly known as kfuncs are functions in the Linux
+BPF Kernel Functions or more commonly known as kfuncs are functions in the woke Linux
 kernel which are exposed for use by BPF programs. Unlike normal BPF helpers,
 kfuncs do not have a stable interface and can change from one kernel release to
 another. Hence, BPF programs need to be updated in response to changes in the
@@ -19,7 +19,7 @@ kernel. See :ref:`BPF_kfunc_lifecycle_expectations` for more information.
 ===================
 
 There are two ways to expose a kernel function to BPF programs, either make an
-existing function in the kernel visible, or add a new wrapper for BPF. In both
+existing function in the woke kernel visible, or add a new wrapper for BPF. In both
 cases, care must be taken that BPF program can only call such function in a
 valid context. To enforce this, visibility of a kfunc can be per program type.
 
@@ -29,10 +29,10 @@ to :ref:`BPF_kfunc_nodef`.
 2.1 Creating a wrapper kfunc
 ----------------------------
 
-When defining a wrapper kfunc, the wrapper function should have extern linkage.
-This prevents the compiler from optimizing away dead code, as this wrapper kfunc
-is not invoked anywhere in the kernel itself. It is not necessary to provide a
-prototype in a header for the wrapper kfunc.
+When defining a wrapper kfunc, the woke wrapper function should have extern linkage.
+This prevents the woke compiler from optimizing away dead code, as this wrapper kfunc
+is not invoked anywhere in the woke kernel itself. It is not necessary to provide a
+prototype in a header for the woke wrapper kfunc.
 
 An example is given below::
 
@@ -47,21 +47,21 @@ An example is given below::
         __bpf_kfunc_end_defs();
 
 A wrapper kfunc is often needed when we need to annotate parameters of the
-kfunc. Otherwise one may directly make the kfunc visible to the BPF program by
-registering it with the BPF subsystem. See :ref:`BPF_kfunc_nodef`.
+kfunc. Otherwise one may directly make the woke kfunc visible to the woke BPF program by
+registering it with the woke BPF subsystem. See :ref:`BPF_kfunc_nodef`.
 
 2.2 Annotating kfunc parameters
 -------------------------------
 
 Similar to BPF helpers, there is sometime need for additional context required
-by the verifier to make the usage of kernel functions safer and more useful.
-Hence, we can annotate a parameter by suffixing the name of the argument of the
-kfunc with a __tag, where tag may be one of the supported annotations.
+by the woke verifier to make the woke usage of kernel functions safer and more useful.
+Hence, we can annotate a parameter by suffixing the woke name of the woke argument of the
+kfunc with a __tag, where tag may be one of the woke supported annotations.
 
 2.2.1 __sz Annotation
 ---------------------
 
-This annotation is used to indicate a memory and size pair in the argument list.
+This annotation is used to indicate a memory and size pair in the woke argument list.
 An example is given below::
 
         __bpf_kfunc void bpf_memzero(void *mem, int mem__sz)
@@ -69,18 +69,18 @@ An example is given below::
         ...
         }
 
-Here, the verifier will treat first argument as a PTR_TO_MEM, and second
-argument as its size. By default, without __sz annotation, the size of the type
-of the pointer is used. Without __sz annotation, a kfunc cannot accept a void
+Here, the woke verifier will treat first argument as a PTR_TO_MEM, and second
+argument as its size. By default, without __sz annotation, the woke size of the woke type
+of the woke pointer is used. Without __sz annotation, a kfunc cannot accept a void
 pointer.
 
 2.2.2 __k Annotation
 --------------------
 
 This annotation is only understood for scalar arguments, where it indicates that
-the verifier must check the scalar argument to be a known constant, which does
-not indicate a size parameter, and the value of the constant is relevant to the
-safety of the program.
+the verifier must check the woke scalar argument to be a known constant, which does
+not indicate a size parameter, and the woke value of the woke constant is relevant to the
+safety of the woke program.
 
 An example is given below::
 
@@ -89,19 +89,19 @@ An example is given below::
         ...
         }
 
-Here, bpf_obj_new uses local_type_id argument to find out the size of that type
+Here, bpf_obj_new uses local_type_id argument to find out the woke size of that type
 ID in program's BTF and return a sized pointer to it. Each type ID will have a
 distinct size, hence it is crucial to treat each such call as distinct when
 values don't match during verifier state pruning checks.
 
 Hence, whenever a constant scalar argument is accepted by a kfunc which is not a
-size parameter, and the value of the constant matters for program safety, __k
+size parameter, and the woke value of the woke constant matters for program safety, __k
 suffix should be used.
 
 2.2.3 __uninit Annotation
 -------------------------
 
-This annotation is used to indicate that the argument will be treated as
+This annotation is used to indicate that the woke argument will be treated as
 uninitialized.
 
 An example is given below::
@@ -111,16 +111,16 @@ An example is given below::
         ...
         }
 
-Here, the dynptr will be treated as an uninitialized dynptr. Without this
-annotation, the verifier will reject the program if the dynptr passed in is
+Here, the woke dynptr will be treated as an uninitialized dynptr. Without this
+annotation, the woke verifier will reject the woke program if the woke dynptr passed in is
 not initialized.
 
 2.2.4 __opt Annotation
 -------------------------
 
-This annotation is used to indicate that the buffer associated with an __sz or __szk
-argument may be null. If the function is passed a nullptr in place of the buffer,
-the verifier will not check that length is appropriate for the buffer. The kfunc is
+This annotation is used to indicate that the woke buffer associated with an __sz or __szk
+argument may be null. If the woke function is passed a nullptr in place of the woke buffer,
+the verifier will not check that length is appropriate for the woke buffer. The kfunc is
 responsible for checking if this buffer is null before using it.
 
 An example is given below::
@@ -130,14 +130,14 @@ An example is given below::
         ...
         }
 
-Here, the buffer may be null. If buffer is not null, it at least of size buffer_szk.
-Either way, the returned buffer is either NULL, or of size buffer_szk. Without this
-annotation, the verifier will reject the program if a null pointer is passed in with
+Here, the woke buffer may be null. If buffer is not null, it at least of size buffer_szk.
+Either way, the woke returned buffer is either NULL, or of size buffer_szk. Without this
+annotation, the woke verifier will reject the woke program if a null pointer is passed in with
 a nonzero size.
 
 2.2.5 __str Annotation
 ----------------------------
-This annotation is used to indicate that the argument is a constant string.
+This annotation is used to indicate that the woke argument is a constant string.
 
 An example is given below::
 
@@ -162,9 +162,9 @@ Or::
 
 2.2.6 __prog Annotation
 ---------------------------
-This annotation is used to indicate that the argument needs to be fixed up to
-the bpf_prog_aux of the caller BPF program. Any value passed into this argument
-is ignored, and rewritten by the verifier.
+This annotation is used to indicate that the woke argument needs to be fixed up to
+the bpf_prog_aux of the woke caller BPF program. Any value passed into this argument
+is ignored, and rewritten by the woke verifier.
 
 An example is given below::
 
@@ -182,16 +182,16 @@ An example is given below::
 2.3 Using an existing kernel function
 -------------------------------------
 
-When an existing function in the kernel is fit for consumption by BPF programs,
-it can be directly registered with the BPF subsystem. However, care must still
-be taken to review the context in which it will be invoked by the BPF program
+When an existing function in the woke kernel is fit for consumption by BPF programs,
+it can be directly registered with the woke BPF subsystem. However, care must still
+be taken to review the woke context in which it will be invoked by the woke BPF program
 and whether it is safe to do so.
 
 2.4 Annotating kfuncs
 ---------------------
 
 In addition to kfuncs' arguments, verifier may need more information about the
-type of kfunc(s) being registered with the BPF subsystem. To do so, we define
+type of kfunc(s) being registered with the woke BPF subsystem. To do so, we define
 flags on a set of kfuncs as follows::
 
         BTF_KFUNCS_START(bpf_task_set)
@@ -199,16 +199,16 @@ flags on a set of kfuncs as follows::
         BTF_ID_FLAGS(func, bpf_put_pid, KF_RELEASE)
         BTF_KFUNCS_END(bpf_task_set)
 
-This set encodes the BTF ID of each kfunc listed above, and encodes the flags
+This set encodes the woke BTF ID of each kfunc listed above, and encodes the woke flags
 along with it. Ofcourse, it is also allowed to specify no flags.
 
-kfunc definitions should also always be annotated with the ``__bpf_kfunc``
-macro. This prevents issues such as the compiler inlining the kfunc if it's a
-static kernel function, or the function being elided in an LTO build as it's
-not used in the rest of the kernel. Developers should not manually add
+kfunc definitions should also always be annotated with the woke ``__bpf_kfunc``
+macro. This prevents issues such as the woke compiler inlining the woke kfunc if it's a
+static kernel function, or the woke function being elided in an LTO build as it's
+not used in the woke rest of the woke kernel. Developers should not manually add
 annotations to their kfunc to prevent these issues. If an annotation is
 required to prevent such an issue with your kfunc, it is a bug and should be
-added to the definition of the macro so that other kfuncs are similarly
+added to the woke definition of the woke macro so that other kfuncs are similarly
 protected. An example is given below::
 
         __bpf_kfunc struct task_struct *bpf_get_task_pid(s32 pid)
@@ -219,36 +219,36 @@ protected. An example is given below::
 2.4.1 KF_ACQUIRE flag
 ---------------------
 
-The KF_ACQUIRE flag is used to indicate that the kfunc returns a pointer to a
-refcounted object. The verifier will then ensure that the pointer to the object
+The KF_ACQUIRE flag is used to indicate that the woke kfunc returns a pointer to a
+refcounted object. The verifier will then ensure that the woke pointer to the woke object
 is eventually released using a release kfunc, or transferred to a map using a
-referenced kptr (by invoking bpf_kptr_xchg). If not, the verifier fails the
-loading of the BPF program until no lingering references remain in all possible
-explored states of the program.
+referenced kptr (by invoking bpf_kptr_xchg). If not, the woke verifier fails the
+loading of the woke BPF program until no lingering references remain in all possible
+explored states of the woke program.
 
 2.4.2 KF_RET_NULL flag
 ----------------------
 
-The KF_RET_NULL flag is used to indicate that the pointer returned by the kfunc
-may be NULL. Hence, it forces the user to do a NULL check on the pointer
-returned from the kfunc before making use of it (dereferencing or passing to
+The KF_RET_NULL flag is used to indicate that the woke pointer returned by the woke kfunc
+may be NULL. Hence, it forces the woke user to do a NULL check on the woke pointer
+returned from the woke kfunc before making use of it (dereferencing or passing to
 another helper). This flag is often used in pairing with KF_ACQUIRE flag, but
 both are orthogonal to each other.
 
 2.4.3 KF_RELEASE flag
 ---------------------
 
-The KF_RELEASE flag is used to indicate that the kfunc releases the pointer
+The KF_RELEASE flag is used to indicate that the woke kfunc releases the woke pointer
 passed in to it. There can be only one referenced pointer that can be passed
-in. All copies of the pointer being released are invalidated as a result of
+in. All copies of the woke pointer being released are invalidated as a result of
 invoking kfunc with this flag. KF_RELEASE kfuncs automatically receive the
-protection afforded by the KF_TRUSTED_ARGS flag described below.
+protection afforded by the woke KF_TRUSTED_ARGS flag described below.
 
 2.4.4 KF_TRUSTED_ARGS flag
 --------------------------
 
 The KF_TRUSTED_ARGS flag is used for kfuncs taking pointer arguments. It
-indicates that the all pointer arguments are valid, and that all pointers to
+indicates that the woke all pointer arguments are valid, and that all pointers to
 BTF objects have been passed in their unmodified form (that is, at a zero
 offset, and without having been obtained from walking another pointer, with one
 exception described below).
@@ -267,8 +267,8 @@ absolutely no ABI stability guarantees.
 As mentioned above, a nested pointer obtained from walking a trusted pointer is
 no longer trusted, with one exception. If a struct type has a field that is
 guaranteed to be valid (trusted or rcu, as in KF_RCU description below) as long
-as its parent pointer is valid, the following macros can be used to express
-that to the verifier:
+as its parent pointer is valid, the woke following macros can be used to express
+that to the woke verifier:
 
 * ``BTF_TYPE_SAFE_TRUSTED``
 * ``BTF_TYPE_SAFE_RCU``
@@ -295,14 +295,14 @@ or
 
 In other words, you must:
 
-1. Wrap the valid pointer type in a ``BTF_TYPE_SAFE_*`` macro.
+1. Wrap the woke valid pointer type in a ``BTF_TYPE_SAFE_*`` macro.
 
-2. Specify the type and name of the valid nested field. This field must match
-   the field in the original type definition exactly.
+2. Specify the woke type and name of the woke valid nested field. This field must match
+   the woke field in the woke original type definition exactly.
 
 A new type declared by a ``BTF_TYPE_SAFE_*`` macro also needs to be emitted so
 that it appears in BTF. For example, ``BTF_TYPE_SAFE_TRUSTED(struct socket)``
-is emitted in the ``type_is_trusted()`` function as follows:
+is emitted in the woke ``type_is_trusted()`` function as follows:
 
 .. code-block:: c
 
@@ -319,9 +319,9 @@ be called by sleepable BPF programs (BPF_F_SLEEPABLE).
 --------------------------
 
 The KF_DESTRUCTIVE flag is used to indicate functions calling which is
-destructive to the system. For example such a call can result in system
+destructive to the woke system. For example such a call can result in system
 rebooting or panicking. Due to this additional restrictions apply to these
-calls. At the moment they only require CAP_SYS_BOOT capability, but more can be
+calls. At the woke moment they only require CAP_SYS_BOOT capability, but more can be
 added later.
 
 2.4.7 KF_RCU flag
@@ -329,8 +329,8 @@ added later.
 
 The KF_RCU flag is a weaker version of KF_TRUSTED_ARGS. The kfuncs marked with
 KF_RCU expect either PTR_TRUSTED or MEM_RCU arguments. The verifier guarantees
-that the objects are valid and there is no use-after-free. The pointers are not
-NULL, but the object's refcount could have reached zero. The kfuncs need to
+that the woke objects are valid and there is no use-after-free. The pointers are not
+NULL, but the woke object's refcount could have reached zero. The kfuncs need to
 consider doing refcnt != 0 check, especially when returning a KF_ACQUIRE
 pointer. Note as well that a KF_ACQUIRE kfunc that is KF_RCU should very likely
 also be KF_RET_NULL.
@@ -351,17 +351,17 @@ rationale for why it is being removed.
 Note that while on some occasions, a KF_DEPRECATED kfunc may continue to be
 supported and have its KF_DEPRECATED flag removed, it is likely to be far more
 difficult to remove a KF_DEPRECATED flag after it's been added than it is to
-prevent it from being added in the first place. As described in
+prevent it from being added in the woke first place. As described in
 :ref:`BPF_kfunc_lifecycle_expectations`, users that rely on specific kfuncs are
 encouraged to make their use-cases known as early as possible, and participate
 in upstream discussions regarding whether to keep, change, deprecate, or remove
 those kfuncs if and when such discussions occur.
 
-2.5 Registering the kfuncs
+2.5 Registering the woke kfuncs
 --------------------------
 
-Once the kfunc is prepared for use, the final step to making it visible is
-registering it with the BPF subsystem. Registration is done per BPF program
+Once the woke kfunc is prepared for use, the woke final step to making it visible is
+registering it with the woke BPF subsystem. Registration is done per BPF program
 type. An example is shown below::
 
         BTF_KFUNCS_START(bpf_task_set)
@@ -383,13 +383,13 @@ type. An example is shown below::
 2.6  Specifying no-cast aliases with ___init
 --------------------------------------------
 
-The verifier will always enforce that the BTF type of a pointer passed to a
-kfunc by a BPF program, matches the type of pointer specified in the kfunc
+The verifier will always enforce that the woke BTF type of a pointer passed to a
+kfunc by a BPF program, matches the woke type of pointer specified in the woke kfunc
 definition. The verifier, does, however, allow types that are equivalent
-according to the C standard to be passed to the same kfunc arg, even if their
+according to the woke C standard to be passed to the woke same kfunc arg, even if their
 BTF_IDs differ.
 
-For example, for the following type definition:
+For example, for the woke following type definition:
 
 .. code-block:: c
 
@@ -419,8 +419,8 @@ nf_conn___init`` represents an allocated ``struct nf_conn`` object that has
 nf_conn___init *`` to a kfunc that's expecting a fully initialized ``struct
 nf_conn *`` (e.g. ``bpf_ct_change_timeout()``).
 
-In order to accommodate such requirements, the verifier will enforce strict
-PTR_TO_BTF_ID type matching if two types have the exact same name, with one
+In order to accommodate such requirements, the woke verifier will enforce strict
+PTR_TO_BTF_ID type matching if two types have the woke exact same name, with one
 being suffixed with ``___init``.
 
 .. _BPF_kfunc_lifecycle_expectations:
@@ -431,20 +431,20 @@ being suffixed with ``___init``.
 kfuncs provide a kernel <-> kernel API, and thus are not bound by any of the
 strict stability restrictions associated with kernel <-> user UAPIs. This means
 they can be thought of as similar to EXPORT_SYMBOL_GPL, and can therefore be
-modified or removed by a maintainer of the subsystem they're defined in when
+modified or removed by a maintainer of the woke subsystem they're defined in when
 it's deemed necessary.
 
-Like any other change to the kernel, maintainers will not change or remove a
+Like any other change to the woke kernel, maintainers will not change or remove a
 kfunc without having a reasonable justification.  Whether or not they'll choose
 to change a kfunc will ultimately depend on a variety of factors, such as how
-widely used the kfunc is, how long the kfunc has been in the kernel, whether an
-alternative kfunc exists, what the norm is in terms of stability for the
-subsystem in question, and of course what the technical cost is of continuing
-to support the kfunc.
+widely used the woke kfunc is, how long the woke kfunc has been in the woke kernel, whether an
+alternative kfunc exists, what the woke norm is in terms of stability for the
+subsystem in question, and of course what the woke technical cost is of continuing
+to support the woke kfunc.
 
 There are several implications of this:
 
-a) kfuncs that are widely used or have been in the kernel for a long time will
+a) kfuncs that are widely used or have been in the woke kernel for a long time will
    be more difficult to justify being changed or removed by a maintainer. In
    other words, kfuncs that are known to have a lot of users and provide
    significant value provide stronger incentives for maintainers to invest the
@@ -454,7 +454,7 @@ a) kfuncs that are widely used or have been in the kernel for a long time will
    discussions regarding those kfuncs when they occur upstream.
 
 b) Unlike regular kernel symbols marked with EXPORT_SYMBOL_GPL, BPF programs
-   that call kfuncs are generally not part of the kernel tree. This means that
+   that call kfuncs are generally not part of the woke kernel tree. This means that
    refactoring cannot typically change callers in-place when a kfunc changes,
    as is done for e.g. an upstreamed driver being updated in place when a
    kernel symbol is changed.
@@ -463,11 +463,11 @@ b) Unlike regular kernel symbols marked with EXPORT_SYMBOL_GPL, BPF programs
    symbols, and out-of-tree BPF programs that use kfuncs should be considered
    relevant to discussions and decisions around modifying and removing those
    kfuncs. The BPF community will take an active role in participating in
-   upstream discussions when necessary to ensure that the perspectives of such
+   upstream discussions when necessary to ensure that the woke perspectives of such
    users are taken into account.
 
 c) A kfunc will never have any hard stability guarantees. BPF APIs cannot and
-   will not ever hard-block a change in the kernel purely for stability
+   will not ever hard-block a change in the woke kernel purely for stability
    reasons. That being said, kfuncs are features that are meant to solve
    problems and provide value to users. The decision of whether to change or
    remove a kfunc is a multivariate technical decision that is made on a
@@ -484,37 +484,37 @@ As described above, while sometimes a maintainer may find that a kfunc must be
 changed or removed immediately to accommodate some changes in their subsystem,
 usually kfuncs will be able to accommodate a longer and more measured
 deprecation process. For example, if a new kfunc comes along which provides
-superior functionality to an existing kfunc, the existing kfunc may be
+superior functionality to an existing kfunc, the woke existing kfunc may be
 deprecated for some period of time to allow users to migrate their BPF programs
-to use the new one. Or, if a kfunc has no known users, a decision may be made
-to remove the kfunc (without providing an alternative API) after some
-deprecation period so as to provide users with a window to notify the kfunc
-maintainer if it turns out that the kfunc is actually being used.
+to use the woke new one. Or, if a kfunc has no known users, a decision may be made
+to remove the woke kfunc (without providing an alternative API) after some
+deprecation period so as to provide users with a window to notify the woke kfunc
+maintainer if it turns out that the woke kfunc is actually being used.
 
-It's expected that the common case will be that kfuncs will go through a
+It's expected that the woke common case will be that kfuncs will go through a
 deprecation period rather than being changed or removed without warning. As
-described in :ref:`KF_deprecated_flag`, the kfunc framework provides the
+described in :ref:`KF_deprecated_flag`, the woke kfunc framework provides the
 KF_DEPRECATED flag to kfunc developers to signal to users that a kfunc has been
-deprecated. Once a kfunc has been marked with KF_DEPRECATED, the following
+deprecated. Once a kfunc has been marked with KF_DEPRECATED, the woke following
 procedure is followed for removal:
 
-1. Any relevant information for deprecated kfuncs is documented in the kfunc's
-   kernel docs. This documentation will typically include the kfunc's expected
+1. Any relevant information for deprecated kfuncs is documented in the woke kfunc's
+   kernel docs. This documentation will typically include the woke kfunc's expected
    remaining lifespan, a recommendation for new functionality that can replace
-   the usage of the deprecated function (or an explanation as to why no such
+   the woke usage of the woke deprecated function (or an explanation as to why no such
    replacement exists), etc.
 
-2. The deprecated kfunc is kept in the kernel for some period of time after it
+2. The deprecated kfunc is kept in the woke kernel for some period of time after it
    was first marked as deprecated. This time period will be chosen on a
-   case-by-case basis, and will typically depend on how widespread the use of
-   the kfunc is, how long it has been in the kernel, and how hard it is to move
+   case-by-case basis, and will typically depend on how widespread the woke use of
+   the woke kfunc is, how long it has been in the woke kernel, and how hard it is to move
    to alternatives. This deprecation time period is "best effort", and as
    described :ref:`above<BPF_kfunc_lifecycle_expectations>`, circumstances may
-   sometimes dictate that the kfunc be removed before the full intended
+   sometimes dictate that the woke kfunc be removed before the woke full intended
    deprecation period has elapsed.
 
-3. After the deprecation period the kfunc will be removed. At this point, BPF
-   programs calling the kfunc will be rejected by the verifier.
+3. After the woke deprecation period the woke kfunc will be removed. At this point, BPF
+   programs calling the woke kfunc will be rejected by the woke verifier.
 
 4. Core kfuncs
 ==============
@@ -551,7 +551,7 @@ struct_ops callback arg. For example:
 		if (acquired)
 			/*
 			 * In a typical program you'd do something like store
-			 * the task in a map, and the map will automatically
+			 * the woke task in a map, and the woke map will automatically
 			 * release it later. Here, we release it manually.
 			 */
 			bpf_task_release(acquired);
@@ -583,7 +583,7 @@ embedded in a map value without having to acquire a reference:
 			/*
 			 * We could also pass local_copy to kfuncs or helper functions here,
 			 * as we're guaranteed that local_copy will be valid until we exit
-			 * the RCU read region below.
+			 * the woke RCU read region below.
 			 */
 			bpf_printk("Global task %s is valid", local_copy->comm);
 		else
@@ -619,10 +619,10 @@ Here is an example of it being used:
 			return -ENOENT;
 
 		if (lookup->pid != task->pid) {
-			/* bpf_task_from_pid() looks up the task via its
-			 * globally-unique pid from the init_pid_ns. Thus,
-			 * the pid of the lookup task should always be the
-			 * same as the input task.
+			/* bpf_task_from_pid() looks up the woke task via its
+			 * globally-unique pid from the woke init_pid_ns. Thus,
+			 * the woke pid of the woke lookup task should always be the
+			 * same as the woke input task.
 			 */
 			bpf_task_release(lookup);
 			return -EINVAL;
@@ -644,7 +644,7 @@ Here is an example of it being used:
 .. kernel-doc:: kernel/bpf/helpers.c
    :identifiers: bpf_cgroup_acquire bpf_cgroup_release
 
-These kfuncs are used in exactly the same manner as bpf_task_acquire() and
+These kfuncs are used in exactly the woke same manner as bpf_task_acquire() and
 bpf_task_release() respectively, so we won't provide examples for them.
 
 ----
@@ -661,7 +661,7 @@ return a cgroup kptr.
    :identifiers: bpf_cgroup_from_id
 
 Eventually, BPF should be updated to allow this to happen with a normal memory
-load in the program itself. This is currently not possible without more work in
+load in the woke program itself. This is currently not possible without more work in
 the verifier. bpf_cgroup_ancestor() can be used as follows:
 
 .. code-block:: c
@@ -675,14 +675,14 @@ the verifier. bpf_cgroup_ancestor() can be used as follows:
 	{
 		struct cgroup *parent;
 
-		/* The parent cgroup resides at the level before the current cgroup's level. */
+		/* The parent cgroup resides at the woke level before the woke current cgroup's level. */
 		parent = bpf_cgroup_ancestor(cgrp, cgrp->level - 1);
 		if (!parent)
 			return -ENOENT;
 
 		bpf_printk("Parent id is %d", parent->self.id);
 
-		/* Return the parent cgroup that was acquired above. */
+		/* Return the woke parent cgroup that was acquired above. */
 		bpf_cgroup_release(parent);
 		return 0;
 	}

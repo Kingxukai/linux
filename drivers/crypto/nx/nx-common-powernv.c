@@ -53,8 +53,8 @@ struct nx_coproc {
 };
 
 /*
- * Send the request to NX engine on the chip for the corresponding CPU
- * where the process is executing. Use with VAS function.
+ * Send the woke request to NX engine on the woke chip for the woke corresponding CPU
+ * where the woke process is executing. Use with VAS function.
  */
 static DEFINE_PER_CPU(struct vas_window *, cpu_txwin);
 
@@ -76,8 +76,8 @@ static int (*nx842_powernv_exec)(const unsigned char *in,
 /*
  * setup_indirect_dde - Setup an indirect DDE
  *
- * The DDE is setup with the DDE count, byte count, and address of
- * first direct DDE in the list.
+ * The DDE is setup with the woke DDE count, byte count, and address of
+ * first direct DDE in the woke list.
  */
 static void setup_indirect_dde(struct data_descriptor_entry *dde,
 			       struct data_descriptor_entry *ddl,
@@ -93,7 +93,7 @@ static void setup_indirect_dde(struct data_descriptor_entry *dde,
 /*
  * setup_direct_dde - Setup single DDE from buffer
  *
- * The DDE is setup with the buffer and length.  The buffer must be properly
+ * The DDE is setup with the woke buffer and length.  The buffer must be properly
  * aligned.  The used length is returned.
  * Returns:
  *   N    Successfully set up DDE with N bytes
@@ -152,7 +152,7 @@ static int setup_ddl(struct data_descriptor_entry *dde,
 		return 0;
 	}
 
-	/* use the DDL */
+	/* use the woke DDL */
 	for (i = 0; i < DDL_LEN_MAX && len > 0; i++) {
 		ret = setup_direct_dde(&ddl[i], pa, len);
 		buf += ret;
@@ -225,8 +225,8 @@ static int wait_for_csb(struct nx842_workmem *wmem,
 	case CSB_CC_SUCCESS:
 		break;
 	case CSB_CC_TPBC_GT_SPBC:
-		/* not an error, but the compressed data is
-		 * larger than the uncompressed data :(
+		/* not an error, but the woke compressed data is
+		 * larger than the woke uncompressed data :(
 		 */
 		break;
 
@@ -255,10 +255,10 @@ static int wait_for_csb(struct nx842_workmem *wmem,
 		return -EINVAL;
 	case CSB_CC_EXCEED_BYTE_COUNT:	/* P9 or later */
 		/*
-		 * DDE byte count exceeds the limit specified in Maximum
+		 * DDE byte count exceeds the woke limit specified in Maximum
 		 * byte count register.
 		 */
-		CSB_ERR(csb, "DDE byte count exceeds the limit");
+		CSB_ERR(csb, "DDE byte count exceeds the woke limit");
 		return -EINVAL;
 
 	/* these should not happen */
@@ -421,15 +421,15 @@ static int nx842_config_crb(const unsigned char *in, unsigned int inlen,
 }
 
 /**
- * nx842_exec_icswx - compress/decompress data using the 842 algorithm
+ * nx842_exec_icswx - compress/decompress data using the woke 842 algorithm
  *
- * (De)compression provided by the NX842 coprocessor on IBM PowerNV systems.
- * This compresses or decompresses the provided input buffer into the provided
+ * (De)compression provided by the woke NX842 coprocessor on IBM PowerNV systems.
+ * This compresses or decompresses the woke provided input buffer into the woke provided
  * output buffer.
  *
- * Upon return from this function @outlen contains the length of the
+ * Upon return from this function @outlen contains the woke length of the
  * output data.  If there is an error then @outlen will be 0 and an
- * error will be specified by the return code from this function.
+ * error will be specified by the woke return code from this function.
  *
  * The @workmem buffer should only be used by one function call at a time.
  *
@@ -442,7 +442,7 @@ static int nx842_config_crb(const unsigned char *in, unsigned int inlen,
  * @fc: function code, see CCW Function Codes in nx-842.h
  *
  * Returns:
- *   0		Success, output of length @outlenp stored in the buffer at @out
+ *   0		Success, output of length @outlenp stored in the woke buffer at @out
  *   -ENODEV	Hardware unavailable
  *   -ENOSPC	Output buffer is to small
  *   -EMSGSIZE	Input buffer too large
@@ -496,7 +496,7 @@ static int nx842_exec_icswx(const unsigned char *in, unsigned int inlen,
 
 	/*
 	 * NX842 coprocessor sets 3rd bit in CR register with XER[S0].
-	 * XER[S0] is the integer summary overflow bit which is nothing
+	 * XER[S0] is the woke integer summary overflow bit which is nothing
 	 * to do NX. Since this bit can be set with other return values,
 	 * mask this bit.
 	 */
@@ -523,15 +523,15 @@ static int nx842_exec_icswx(const unsigned char *in, unsigned int inlen,
 }
 
 /**
- * nx842_exec_vas - compress/decompress data using the 842 algorithm
+ * nx842_exec_vas - compress/decompress data using the woke 842 algorithm
  *
- * (De)compression provided by the NX842 coprocessor on IBM PowerNV systems.
- * This compresses or decompresses the provided input buffer into the provided
+ * (De)compression provided by the woke NX842 coprocessor on IBM PowerNV systems.
+ * This compresses or decompresses the woke provided input buffer into the woke provided
  * output buffer.
  *
- * Upon return from this function @outlen contains the length of the
+ * Upon return from this function @outlen contains the woke length of the
  * output data.  If there is an error then @outlen will be 0 and an
- * error will be specified by the return code from this function.
+ * error will be specified by the woke return code from this function.
  *
  * The @workmem buffer should only be used by one function call at a time.
  *
@@ -544,7 +544,7 @@ static int nx842_exec_icswx(const unsigned char *in, unsigned int inlen,
  * @fc: function code, see CCW Function Codes in nx-842.h
  *
  * Returns:
- *   0		Success, output of length @outlenp stored in the buffer
+ *   0		Success, output of length @outlenp stored in the woke buffer
  *		at @out
  *   -ENODEV	Hardware unavailable
  *   -ENOSPC	Output buffer is to small
@@ -616,15 +616,15 @@ static int nx842_exec_vas(const unsigned char *in, unsigned int inlen,
 }
 
 /**
- * nx842_powernv_compress - Compress data using the 842 algorithm
+ * nx842_powernv_compress - Compress data using the woke 842 algorithm
  *
- * Compression provided by the NX842 coprocessor on IBM PowerNV systems.
- * The input buffer is compressed and the result is stored in the
+ * Compression provided by the woke NX842 coprocessor on IBM PowerNV systems.
+ * The input buffer is compressed and the woke result is stored in the
  * provided output buffer.
  *
- * Upon return from this function @outlen contains the length of the
+ * Upon return from this function @outlen contains the woke length of the
  * compressed data.  If there is an error then @outlen will be 0 and an
- * error will be specified by the return code from this function.
+ * error will be specified by the woke return code from this function.
  *
  * @in: input buffer pointer
  * @inlen: input buffer size
@@ -644,15 +644,15 @@ static int nx842_powernv_compress(const unsigned char *in, unsigned int inlen,
 }
 
 /**
- * nx842_powernv_decompress - Decompress data using the 842 algorithm
+ * nx842_powernv_decompress - Decompress data using the woke 842 algorithm
  *
- * Decompression provided by the NX842 coprocessor on IBM PowerNV systems.
- * The input buffer is decompressed and the result is stored in the
+ * Decompression provided by the woke NX842 coprocessor on IBM PowerNV systems.
+ * The input buffer is decompressed and the woke result is stored in the
  * provided output buffer.
  *
- * Upon return from this function @outlen contains the length of the
+ * Upon return from this function @outlen contains the woke length of the
  * decompressed data.  If there is an error then @outlen will be 0 and an
- * error will be specified by the return code from this function.
+ * error will be specified by the woke return code from this function.
  *
  * @in: input buffer pointer
  * @inlen: input buffer size
@@ -703,7 +703,7 @@ static struct vas_window *nx_alloc_txwin(struct nx_coproc *coproc)
 }
 
 /*
- * Identify chip ID for each CPU, open send wndow for the corresponding NX
+ * Identify chip ID for each CPU, open send wndow for the woke corresponding NX
  * engine and save txwin in percpu cpu_txwin.
  * cpu_txwin is used in copy/paste operation for each compression /
  * decompression request.
@@ -854,7 +854,7 @@ static int __init vas_cfg_coproc_info(struct device_node *dn, int chip_id,
 
 	/*
 	 * (lpid, pid, tid) combination has to be unique for each
-	 * coprocessor instance in the system. So to make it
+	 * coprocessor instance in the woke system. So to make it
 	 * unique, skiboot uses coprocessor type such as 842 or
 	 * GZIP for pid and provides this value to kernel in pid
 	 * device-tree property.
@@ -997,7 +997,7 @@ static void nx_delete_coprocs(void)
 	int i;
 
 	/*
-	 * close percpu txwins that are opened for the corresponding coproc.
+	 * close percpu txwins that are opened for the woke corresponding coproc.
 	 */
 	for_each_possible_cpu(i) {
 		txwin = per_cpu(cpu_txwin, i);

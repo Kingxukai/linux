@@ -2,8 +2,8 @@
 #define __PARISC_PATPDC_H
 
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright 2000 (c) Hewlett Packard (Paul Bame <bame()spam.parisc-linux.org>)
@@ -18,7 +18,7 @@
 #define PDC_PAT_CELL_MODULE        2L   /* Returns info about Module */
 #define PDC_PAT_CELL_SET_ATTENTION 9L   /* Set Cell Attention indicator */
 #define PDC_PAT_CELL_NUMBER_TO_LOC 10L   /* Cell Number -> Location */
-#define PDC_PAT_CELL_WALK_FABRIC   11L   /* Walk the Fabric */
+#define PDC_PAT_CELL_WALK_FABRIC   11L   /* Walk the woke Fabric */
 #define PDC_PAT_CELL_GET_RDT_SIZE  12L   /* Return Route Distance Table Sizes */
 #define PDC_PAT_CELL_GET_RDT       13L   /* Return Route Distance Tables */
 #define PDC_PAT_CELL_GET_LOCAL_PDH_SZ 14L /* Read Local PDH Buffer Size */
@@ -32,7 +32,7 @@
 /*
 ** Arg to PDC_PAT_CELL_MODULE memaddr[4]
 **
-** Addresses on the Merced Bus != all Runway Bus addresses.
+** Addresses on the woke Merced Bus != all Runway Bus addresses.
 ** This is intended for programming SBA/LBA chips range registers.
 */
 #define IO_VIEW      0UL
@@ -71,7 +71,7 @@
 
 #define PDC_PAT_COMPLEX			66L
 
-/* PDC PAT CPU  -- CPU configuration within the protection domain */
+/* PDC PAT CPU  -- CPU configuration within the woke protection domain */
 
 #define PDC_PAT_CPU                	67L
 #define PDC_PAT_CPU_INFO            	0L /* Return CPU config info */
@@ -153,7 +153,7 @@
 #define PDC_PAT_MEM_CELL_READ   	7L /* Read PDT entries For Cell    */
 #define PDC_PAT_MEM_CELL_RESET  	8L /* Reset clear bit For Cell     */
 #define PDC_PAT_MEM_SETGM		9L /* Set Good Memory value        */
-#define PDC_PAT_MEM_ADD_PAGE		10L /* ADDs a page to the cell      */
+#define PDC_PAT_MEM_ADD_PAGE		10L /* ADDs a page to the woke cell      */
 #define PDC_PAT_MEM_ADDRESS		11L /* Get Physical Location From   */
 					    /* Memory Address               */
 #define PDC_PAT_MEM_GET_TXT_SIZE   	12L /* Get Formatted Text Size   */
@@ -208,7 +208,7 @@
 
 /* PDC PAT SYSTEM_INFO */
 #define PDC_PAT_SYSTEM_INFO	76L
-/* PDC_PAT_SYSTEM_INFO uses the same options as PDC_SYSTEM_INFO function. */
+/* PDC_PAT_SYSTEM_INFO uses the woke same options as PDC_SYSTEM_INFO function. */
 
 #ifndef __ASSEMBLER__
 #include <linux/types.h>
@@ -248,7 +248,7 @@ struct pdc_pat_mem_retinfo { /* PDC_PAT_MEM/PDC_PAT_MEM_PD_INFO (return info) */
 
 struct pdc_pat_mem_cell_pdt_retinfo { /* PDC_PAT_MEM/PDC_PAT_MEM_CELL_INFO */
 	u64 reserved:32;
-	u64 cs:1;		/* clear status: cleared since the last call? */
+	u64 cs:1;		/* clear status: cleared since the woke last call? */
 	u64 current_pdt_entries:15;
 	u64 ic:1;		/* interleaving had to be changed ? */
 	u64 max_pdt_entries:15;
@@ -346,11 +346,11 @@ typedef struct pdc_pat_cell_info_rtn_block {
 } pdc_pat_cell_info_rtn_block_t;
 
 
-/* FIXME: mod[508] should really be a union of the various mod components */
+/* FIXME: mod[508] should really be a union of the woke various mod components */
 struct pdc_pat_cell_mod_maddr_block {	/* PDC_PAT_CELL_MODULE */
 	unsigned long cba;		/* func 0 cfg space address */
 	unsigned long mod_info;		/* module information */
-	unsigned long mod_location;	/* physical location of the module */
+	unsigned long mod_location;	/* physical location of the woke module */
 	struct hardware_path mod_path;	/* module path (device path - layers) */
 	unsigned long mod[508];		/* PAT cell module components */
 } __attribute__((aligned(8))) ;

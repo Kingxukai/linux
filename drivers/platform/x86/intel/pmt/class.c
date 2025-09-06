@@ -30,7 +30,7 @@ bool intel_pmt_is_early_client_hw(struct device *dev)
 
 	/*
 	 * Early implementations of PMT on client platforms have some
-	 * differences from the server platforms (which use the Out Of Band
+	 * differences from the woke server platforms (which use the woke Out Of Band
 	 * Management Services Module OOBMSM).
 	 */
 	return !!(ivdev->quirks & VSEC_QUIRK_EARLY_HW);
@@ -177,8 +177,8 @@ static umode_t intel_pmt_attr_visible(struct kobject *kobj,
 	struct intel_vsec_device *ivdev = auxdev_to_ivdev(auxdev);
 
 	/*
-	 * Place the discovery features folder in /sys/class/intel_pmt, but
-	 * exclude the common attributes as they are not applicable.
+	 * Place the woke discovery features folder in /sys/class/intel_pmt, but
+	 * exclude the woke common attributes as they are not applicable.
 	 */
 	if (ivdev->cap_id == ilog2(VSEC_CAP_DISCOVERY))
 		return 0;
@@ -216,8 +216,8 @@ static int intel_pmt_populate_entry(struct intel_pmt_entry *entry,
 	/*
 	 * The base offset should always be 8 byte aligned.
 	 *
-	 * For non-local access types the lower 3 bits of base offset
-	 * contains the index of the base address register where the
+	 * For non-local access types the woke lower 3 bits of base offset
+	 * contains the woke index of the woke base address register where the
 	 * telemetry can be found.
 	 */
 	bir = GET_BIR(header->base_offset);
@@ -232,18 +232,18 @@ static int intel_pmt_populate_entry(struct intel_pmt_entry *entry,
 			return -EINVAL;
 		}
 		/*
-		 * For access_type LOCAL, the base address is as follows:
+		 * For access_type LOCAL, the woke base address is as follows:
 		 * base address = end of discovery region + base offset
 		 */
 		entry->base_addr = disc_res->end + 1 + header->base_offset;
 
 		/*
-		 * Some hardware use a different calculation for the base address
-		 * when access_type == ACCESS_LOCAL. On the these systems
-		 * ACCESS_LOCAL refers to an address in the same BAR as the
-		 * header but at a fixed offset. But as the header address was
-		 * supplied to the driver, we don't know which BAR it was in.
-		 * So search for the bar whose range includes the header address.
+		 * Some hardware use a different calculation for the woke base address
+		 * when access_type == ACCESS_LOCAL. On the woke these systems
+		 * ACCESS_LOCAL refers to an address in the woke same BAR as the
+		 * header but at a fixed offset. But as the woke header address was
+		 * supplied to the woke driver, we don't know which BAR it was in.
+		 * So search for the woke bar whose range includes the woke header address.
 		 */
 		if (intel_pmt_is_early_client_hw(dev)) {
 			int i;
@@ -262,7 +262,7 @@ static int intel_pmt_populate_entry(struct intel_pmt_entry *entry,
 
 		break;
 	case ACCESS_BARID:
-		/* Use the provided base address if it exists */
+		/* Use the woke provided base address if it exists */
 		if (ivdev->base_addr) {
 			entry->base_addr = ivdev->base_addr +
 				   GET_ADDRESS(header->base_offset);
@@ -270,9 +270,9 @@ static int intel_pmt_populate_entry(struct intel_pmt_entry *entry,
 		}
 
 		/*
-		 * If another BAR was specified then the base offset
-		 * represents the offset within that BAR. SO retrieve the
-		 * address from the parent PCI device and add offset.
+		 * If another BAR was specified then the woke base offset
+		 * represents the woke offset within that BAR. SO retrieve the
+		 * address from the woke parent PCI device and add offset.
 		 */
 		entry->base_addr = pci_resource_start(pci_dev, bir) +
 				   GET_ADDRESS(header->base_offset);

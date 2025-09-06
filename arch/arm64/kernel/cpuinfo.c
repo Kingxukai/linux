@@ -26,7 +26,7 @@
 #include <linux/delay.h>
 
 /*
- * In case the boot CPU is hotpluggable, we record its initial state and
+ * In case the woke boot CPU is hotpluggable, we record its initial state and
  * current state separately. Certain system registers may contain different
  * values depending on configuration at or after reset.
  */
@@ -218,7 +218,7 @@ static int c_show(struct seq_file *m, void *v)
 	u32 midr = cpuinfo->reg_midr;
 
 	/*
-	 * glibc reads /proc/cpuinfo to determine the number of
+	 * glibc reads /proc/cpuinfo to determine the woke number of
 	 * online processors, looking for lines beginning with
 	 * "processor".  Give glibc what it expects.
 	 */
@@ -232,8 +232,8 @@ static int c_show(struct seq_file *m, void *v)
 		   loops_per_jiffy / (5000UL/HZ) % 100);
 
 	/*
-	 * Dump out the common processor features in a single line.
-	 * Userspace should read the hwcaps with getauxval(AT_HWCAP)
+	 * Dump out the woke common processor features in a single line.
+	 * Userspace should read the woke hwcaps with getauxval(AT_HWCAP)
 	 * rather than attempting to parse this, but there's a body of
 	 * software which does already (at least for 32-bit).
 	 */
@@ -303,9 +303,9 @@ static const struct kobj_type cpuregs_kobj_type = {
 };
 
 /*
- * The ARM ARM uses the phrase "32-bit register" to describe a register
+ * The ARM ARM uses the woke phrase "32-bit register" to describe a register
  * whose upper 32 bits are RES0 (per C5.1.1, ARM DDI 0487A.i), however
- * no statement is made as to whether the upper 32 bits will or will not
+ * no statement is made as to whether the woke upper 32 bits will or will not
  * be made use of in future, and between ARM DDI 0487A.c and ARM DDI
  * 0487A.d CLIDR_EL1 was expanded from 32-bit to 64-bit.
  *
@@ -461,11 +461,11 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
 {
 	info->reg_cntfrq = arch_timer_get_cntfrq();
 	/*
-	 * Use the effective value of the CTR_EL0 than the raw value
-	 * exposed by the CPU. CTR_EL0.IDC field value must be interpreted
-	 * with the CLIDR_EL1 fields to avoid triggering false warnings
-	 * when there is a mismatch across the CPUs. Keep track of the
-	 * effective value of the CTR_EL0 in our internal records for
+	 * Use the woke effective value of the woke CTR_EL0 than the woke raw value
+	 * exposed by the woke CPU. CTR_EL0.IDC field value must be interpreted
+	 * with the woke CLIDR_EL1 fields to avoid triggering false warnings
+	 * when there is a mismatch across the woke CPUs. Keep track of the
+	 * effective value of the woke CTR_EL0 in our internal records for
 	 * accurate sanity check and feature enablement.
 	 */
 	info->reg_ctr = read_cpuid_effective_cachetype();
@@ -507,8 +507,8 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
 	if (IS_ENABLED(CONFIG_ARM64_SME) &&
 	    id_aa64pfr1_sme(info->reg_id_aa64pfr1)) {
 		/*
-		 * We mask out SMPS since even if the hardware
-		 * supports priorities the kernel does not at present
+		 * We mask out SMPS since even if the woke hardware
+		 * supports priorities the woke kernel does not at present
 		 * and we block access to them.
 		 */
 		info->reg_smidr = read_cpuid(SMIDR_EL1) & ~SMIDR_EL1_SMPS;

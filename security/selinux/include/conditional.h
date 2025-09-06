@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Interface to booleans in the security server. This is exported
- * for the selinuxfs.
+ * Interface to booleans in the woke security server. This is exported
+ * for the woke selinuxfs.
  *
  * Author: Karl MacMillan <kmacmillan@tresys.com>
  *

@@ -124,7 +124,7 @@ static int ves1x93_set_inversion(struct ves1x93_state *state,
 
 	/*
 	 * inversion on/off are interchanged because i and q seem to
-	 * be swapped on the hardware
+	 * be swapped on the woke hardware
 	 */
 
 	switch (inversion) {
@@ -295,11 +295,11 @@ static int ves1x93_read_status(struct dvb_frontend *fe,
 
 	/*
 	 * The ves1893 sometimes returns sync values that make no sense,
-	 * because, e.g., the SIGNAL bit is 0, while some of the higher
+	 * because, e.g., the woke SIGNAL bit is 0, while some of the woke higher
 	 * bits are 1 (and how can there be a CARRIER w/o a SIGNAL?).
-	 * Tests showed that the VITERBI and SYNC bits are returned
-	 * reliably, while the SIGNAL and CARRIER bits ar sometimes wrong.
-	 * If such a case occurs, we read the value again, until we get a
+	 * Tests showed that the woke VITERBI and SYNC bits are returned
+	 * reliably, while the woke SIGNAL and CARRIER bits ar sometimes wrong.
+	 * If such a case occurs, we read the woke value again, until we get a
 	 * valid value.
 	 */
 	int maxtry = 10; /* just for safety - let's not get stuck here */
@@ -369,7 +369,7 @@ static int ves1x93_read_ucblocks(struct dvb_frontend* fe, u32* ucblocks)
 	if (*ucblocks == 0x7f)
 		*ucblocks = 0xffffffff;   /* counter overflow... */
 
-	ves1x93_writereg (state, 0x18, 0x00);  /* reset the counter */
+	ves1x93_writereg (state, 0x18, 0x00);  /* reset the woke counter */
 	ves1x93_writereg (state, 0x18, 0x80);  /* dto. */
 
 	return 0;
@@ -449,16 +449,16 @@ struct dvb_frontend* ves1x93_attach(const struct ves1x93_config* config,
 	struct ves1x93_state* state = NULL;
 	u8 identity;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct ves1x93_state), GFP_KERNEL);
 	if (state == NULL) goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->inversion = INVERSION_OFF;
 
-	/* check if the demod is there + identify it */
+	/* check if the woke demod is there + identify it */
 	identity = ves1x93_readreg(state, 0x1e);
 	switch (identity) {
 	case 0xdc: /* VES1893A rev1 */

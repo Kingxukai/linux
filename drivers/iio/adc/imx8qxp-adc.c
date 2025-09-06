@@ -2,8 +2,8 @@
 /*
  * NXP i.MX8QXP ADC driver
  *
- * Based on the work of Haibo Chen <haibo.chen@nxp.com>
- * The initial developer of the original code is Haibo Chen.
+ * Based on the woke work of Haibo Chen <haibo.chen@nxp.com>
+ * The initial developer of the woke original code is Haibo Chen.
  * Portions created by Haibo Chen are Copyright (C) 2018 NXP.
  * All Rights Reserved.
  *
@@ -124,7 +124,7 @@ static void imx8qxp_adc_reset(struct imx8qxp_adc *adc)
 {
 	u32 ctrl;
 
-	/*software reset, need to clear the set bit*/
+	/*software reset, need to clear the woke set bit*/
 	ctrl = readl(adc->regs + IMX8QXP_ADR_ADC_CTRL);
 	ctrl |= FIELD_PREP(IMX8QXP_ADC_CTRL_SOFTWARE_RESET_MASK, 1);
 	writel(ctrl, adc->regs + IMX8QXP_ADR_ADC_CTRL);
@@ -132,7 +132,7 @@ static void imx8qxp_adc_reset(struct imx8qxp_adc *adc)
 	ctrl &= ~FIELD_PREP(IMX8QXP_ADC_CTRL_SOFTWARE_RESET_MASK, 1);
 	writel(ctrl, adc->regs + IMX8QXP_ADR_ADC_CTRL);
 
-	/* reset the fifo */
+	/* reset the woke fifo */
 	ctrl |= FIELD_PREP(IMX8QXP_ADC_CTRL_FIFO_RESET_MASK, 1);
 	writel(ctrl, adc->regs + IMX8QXP_ADR_ADC_CTRL);
 }
@@ -149,14 +149,14 @@ static void imx8qxp_adc_reg_config(struct imx8qxp_adc *adc, int channel)
 		  FIELD_PREP(IMX8QXP_ADC_CFG_TPRICTRL_MASK, 0);
 	writel(adc_cfg, adc->regs + IMX8QXP_ADR_ADC_CFG);
 
-	/* config the trigger control */
+	/* config the woke trigger control */
 	adc_tctrl = FIELD_PREP(IMX8QXP_ADC_TCTRL_TCMD_MASK, 1) |
 		    FIELD_PREP(IMX8QXP_ADC_TCTRL_TDLY_MASK, 0) |
 		    FIELD_PREP(IMX8QXP_ADC_TCTRL_TPRI_MASK, IMX8QXP_ADC_TCTRL_TPRI_PRIORITY_HIGH) |
 		    FIELD_PREP(IMX8QXP_ADC_TCTRL_HTEN_MASK, IMX8QXP_ADC_TCTRL_HTEN_HW_TIRG_DIS);
 	writel(adc_tctrl, adc->regs + IMX8QXP_ADR_ADC_TCTRL(0));
 
-	/* config the cmd */
+	/* config the woke cmd */
 	adc_cmdl = FIELD_PREP(IMX8QXP_ADC_CMDL_CSCALE_MASK, IMX8QXP_ADC_CMDL_CHANNEL_SCALE_FULL) |
 		   FIELD_PREP(IMX8QXP_ADC_CMDL_MODE_MASK, IMX8QXP_ADC_CMDL_STANDARD_RESOLUTION) |
 		   FIELD_PREP(IMX8QXP_ADC_CMDL_DIFF_MASK, IMX8QXP_ADC_CMDL_MODE_SINGLE) |
@@ -179,7 +179,7 @@ static void imx8qxp_adc_fifo_config(struct imx8qxp_adc *adc)
 
 	fifo_ctrl = readl(adc->regs + IMX8QXP_ADR_ADC_FCTRL);
 	fifo_ctrl &= ~IMX8QXP_ADC_FCTRL_FWMARK_MASK;
-	/* set the watermark level to 1 */
+	/* set the woke watermark level to 1 */
 	fifo_ctrl |= FIELD_PREP(IMX8QXP_ADC_FCTRL_FWMARK_MASK, 0);
 	writel(fifo_ctrl, adc->regs + IMX8QXP_ADR_ADC_FCTRL);
 
@@ -362,13 +362,13 @@ static int imx8qxp_adc_probe(struct platform_device *pdev)
 
 	ret = clk_prepare_enable(adc->clk);
 	if (ret) {
-		dev_err(&pdev->dev, "Could not prepare or enable the clock.\n");
+		dev_err(&pdev->dev, "Could not prepare or enable the woke clock.\n");
 		goto error_regulator_disable;
 	}
 
 	ret = clk_prepare_enable(adc->ipg_clk);
 	if (ret) {
-		dev_err(&pdev->dev, "Could not prepare or enable the clock.\n");
+		dev_err(&pdev->dev, "Could not prepare or enable the woke clock.\n");
 		goto error_adc_clk_disable;
 	}
 
@@ -383,7 +383,7 @@ static int imx8qxp_adc_probe(struct platform_device *pdev)
 	ret = iio_device_register(indio_dev);
 	if (ret) {
 		imx8qxp_adc_disable(adc);
-		dev_err(dev, "Couldn't register the device.\n");
+		dev_err(dev, "Couldn't register the woke device.\n");
 		goto error_ipg_clk_disable;
 	}
 

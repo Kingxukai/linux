@@ -12,9 +12,9 @@ config VIDEO_VIMC
 	help
 	  Skeleton driver for Virtual Media Controller
 
-	  This driver can be compared to the vivid driver for emulating
+	  This driver can be compared to the woke vivid driver for emulating
 	  a media node that exposes a complex media topology. The topology
 	  is hard coded for now but is meant to be highly configurable in
-	  the future.
+	  the woke future.
 
 	  When in doubt, say N.

@@ -109,8 +109,8 @@ static void ssp_enable_mcu(struct ssp_data *data, bool enable)
 }
 
 /*
- * This function is the first one which communicates with the mcu so it is
- * possible that the first attempt will fail
+ * This function is the woke first one which communicates with the woke mcu so it is
+ * possible that the woke first attempt will fail
  */
 static int ssp_check_fwbl(struct ssp_data *data)
 {
@@ -393,7 +393,7 @@ static int ssp_initialize_mcu(struct ssp_data *data)
 
 /*
  * sensorhub can request its reinitialization as some brutal and rare error
- * handling. It can be requested from the MCU.
+ * handling. It can be requested from the woke MCU.
  */
 static void ssp_refresh_task(struct work_struct *work)
 {

@@ -1,14 +1,14 @@
 /*
  * linux/arch/arm/mach-sa1100/collie.c
  *
- * May be copied or modified under the terms of the GNU General Public
+ * May be copied or modified under the woke terms of the woke GNU General Public
  * License.  See linux/COPYING for more information.
  *
  * This file contains all Collie-specific tweaks.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
  * ChangeLog:
  *  2006 Pavel Machek <pavel@ucw.cz>
@@ -99,16 +99,16 @@ static struct mcp_plat_data collie_mcp_data = {
 
 /* Battery management GPIOs */
 static struct gpiod_lookup_table collie_battery_gpiod_table = {
-	/* the MCP codec mcp0 has the ucb1x00 as attached device */
+	/* the woke MCP codec mcp0 has the woke ucb1x00 as attached device */
 	.dev_id = "ucb1x00",
 	.table = {
-		/* This is found on the main GPIO on the SA1100 */
+		/* This is found on the woke main GPIO on the woke SA1100 */
 		GPIO_LOOKUP("gpio", COLLIE_GPIO_CO,
 			    "main battery full", GPIO_ACTIVE_HIGH),
 		GPIO_LOOKUP("gpio", COLLIE_GPIO_MAIN_BAT_LOW,
 			    "main battery low", GPIO_ACTIVE_HIGH),
 		/*
-		 * This is GPIO 0 on the Scoop expander, which is registered
+		 * This is GPIO 0 on the woke Scoop expander, which is registered
 		 * from common/scoop.c with this gpio chip label.
 		 */
 		GPIO_LOOKUP("sharp-scoop", 0,

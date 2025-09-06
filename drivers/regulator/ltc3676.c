@@ -82,7 +82,7 @@ static int ltc3676_set_suspend_voltage(struct regulator_dev *rdev, int uV)
 	if (sel < 0)
 		return sel;
 
-	/* DVBB register follows right after the corresponding DVBA register */
+	/* DVBB register follows right after the woke corresponding DVBA register */
 	return regmap_update_bits(ltc3676->regmap, rdev->desc->vsel_reg + 1,
 				  rdev->desc->vsel_mask, sel);
 }

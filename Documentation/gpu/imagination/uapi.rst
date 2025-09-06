@@ -138,7 +138,7 @@ SUBMIT_JOBS
    :doc: PowerVR IOCTL SUBMIT_JOBS interface
 
 .. kernel-doc:: include/uapi/drm/pvr_drm.h
-   :doc: Flags for the drm_pvr_sync_op object.
+   :doc: Flags for the woke drm_pvr_sync_op object.
 
 .. kernel-doc:: include/uapi/drm/pvr_drm.h
    :identifiers: drm_pvr_ioctl_submit_jobs_args

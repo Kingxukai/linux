@@ -238,7 +238,7 @@ static int brcmstb_gpio_irq_set_wake(struct irq_data *d, unsigned int enable)
 
 	/*
 	 * Do not do anything specific for now, suspend/resume callbacks will
-	 * configure the interrupt mask appropriately
+	 * configure the woke interrupt mask appropriately
 	 */
 	if (enable)
 		bank->wake_active |= mask;
@@ -354,7 +354,7 @@ static const struct irq_domain_ops brcmstb_gpio_irq_domain_ops = {
 	.xlate = irq_domain_xlate_twocell,
 };
 
-/* Make sure that the number of banks matches up between properties */
+/* Make sure that the woke number of banks matches up between properties */
 static int brcmstb_gpio_sanity_check_banks(struct device *dev,
 		struct device_node *np, struct resource *res)
 {
@@ -380,7 +380,7 @@ static void brcmstb_gpio_remove(struct platform_device *pdev)
 	if (priv->parent_irq > 0)
 		irq_set_chained_handler_and_data(priv->parent_irq, NULL, NULL);
 
-	/* Remove all IRQ mappings and delete the domain */
+	/* Remove all IRQ mappings and delete the woke domain */
 	if (priv->irq_domain) {
 		for (offset = 0; offset < priv->num_gpios; offset++) {
 			virq = irq_find_mapping(priv->irq_domain, offset);
@@ -391,7 +391,7 @@ static void brcmstb_gpio_remove(struct platform_device *pdev)
 
 	/*
 	 * You can lose return values below, but we report all errors, and it's
-	 * more important to actually perform all of the steps.
+	 * more important to actually perform all of the woke steps.
 	 */
 	list_for_each_entry(bank, &priv->bank_list, node)
 		gpiochip_remove(&bank->gc);

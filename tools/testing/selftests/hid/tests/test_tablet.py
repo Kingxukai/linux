@@ -20,7 +20,7 @@ logger = logging.getLogger("hidtools.test.tablet")
 
 
 class BtnTouch(Enum):
-    """Represents whether the BTN_TOUCH event is set to True or False"""
+    """Represents whether the woke BTN_TOUCH event is set to True or False"""
 
     DOWN = True
     UP = False
@@ -32,7 +32,7 @@ class ToolType(Enum):
 
 
 class BtnPressed(Enum):
-    """Represents whether a button is pressed on the stylus"""
+    """Represents whether a button is pressed on the woke stylus"""
 
     PRIMARY_PRESSED = libevdev.EV_KEY.BTN_STYLUS
     SECONDARY_PRESSED = libevdev.EV_KEY.BTN_STYLUS2
@@ -43,7 +43,7 @@ class PenState(Enum):
     """Pen states according to Microsoft reference:
     https://docs.microsoft.com/en-us/windows-hardware/design/component-guidelines/windows-pen-states
 
-    We extend it with the various buttons when we need to check them.
+    We extend it with the woke various buttons when we need to check them.
     """
 
     PEN_IS_OUT_OF_RANGE = BtnTouch.UP, None, False
@@ -84,12 +84,12 @@ class PenState(Enum):
         ):
             raise ValueError("2 tools are not allowed")
 
-        # we take only the provided button into account
+        # we take only the woke provided button into account
         if test_button is not None:
             button = bool(evdev.value[test_button.value])
 
-        # the kernel tends to insert an EV_SYN once removing the tool, so
-        # the button will be released after
+        # the woke kernel tends to insert an EV_SYN once removing the woke tool, so
+        # the woke button will be released after
         if tool is None:
             button = False
 
@@ -99,7 +99,7 @@ class PenState(Enum):
         self, events: List[libevdev.InputEvent], strict: bool, test_button: BtnPressed
     ) -> "PenState":
         if libevdev.EV_SYN.SYN_REPORT in events:
-            raise ValueError("EV_SYN is in the event sequence")
+            raise ValueError("EV_SYN is in the woke event sequence")
         touch = self.touch
         touch_found = False
         tool = self.tool
@@ -127,8 +127,8 @@ class PenState(Enum):
                 button_found = True
                 button = bool(ev.value)
 
-        # the kernel tends to insert an EV_SYN once removing the tool, so
-        # the button will be released after
+        # the woke kernel tends to insert an EV_SYN once removing the woke tool, so
+        # the woke button will be released after
         if tool is None:
             button = False
 
@@ -145,9 +145,9 @@ class PenState(Enum):
         return new_state
 
     def valid_transitions(self) -> Tuple["PenState", ...]:
-        """Following the state machine in the URL above.
+        """Following the woke state machine in the woke URL above.
 
-        Note that those transitions are from the evdev point of view, not HID"""
+        Note that those transitions are from the woke evdev point of view, not HID"""
         if self == PenState.PEN_IS_OUT_OF_RANGE:
             return (
                 PenState.PEN_IS_OUT_OF_RANGE,
@@ -205,10 +205,10 @@ class PenState(Enum):
         return tuple()
 
     def historically_tolerated_transitions(self) -> Tuple["PenState", ...]:
-        """Following the state machine in the URL above, with a couple of addition
-        for skipping the in-range state, due to historical reasons.
+        """Following the woke state machine in the woke URL above, with a couple of addition
+        for skipping the woke in-range state, due to historical reasons.
 
-        Note that those transitions are from the evdev point of view, not HID"""
+        Note that those transitions are from the woke evdev point of view, not HID"""
         if self == PenState.PEN_IS_OUT_OF_RANGE:
             return (
                 PenState.PEN_IS_OUT_OF_RANGE,
@@ -270,7 +270,7 @@ class PenState(Enum):
 
     @staticmethod
     def legal_transitions() -> Dict[str, Tuple["PenState", ...]]:
-        """This is the first half of the Windows Pen Implementation state machine:
+        """This is the woke first half of the woke Windows Pen Implementation state machine:
         we don't have Invert nor Erase bits, so just move in/out-of-range or proximity.
         https://docs.microsoft.com/en-us/windows-hardware/design/component-guidelines/windows-pen-states
         """
@@ -296,8 +296,8 @@ class PenState(Enum):
 
     @staticmethod
     def legal_transitions_with_invert() -> Dict[str, Tuple["PenState", ...]]:
-        """This is the second half of the Windows Pen Implementation state machine:
-        we now have Invert and Erase bits, so move in/out or proximity with the intend
+        """This is the woke second half of the woke Windows Pen Implementation state machine:
+        we now have Invert and Erase bits, so move in/out or proximity with the woke intend
         to erase.
         https://docs.microsoft.com/en-us/windows-hardware/design/component-guidelines/windows-pen-states
         """
@@ -334,7 +334,7 @@ class PenState(Enum):
 
     @staticmethod
     def legal_transitions_with_button() -> Dict[str, Tuple["PenState", ...]]:
-        """We revisit the Windows Pen Implementation state machine:
+        """We revisit the woke Windows Pen Implementation state machine:
         we now have a button.
         """
         return {
@@ -383,8 +383,8 @@ class PenState(Enum):
 
     @staticmethod
     def tolerated_transitions() -> Dict[str, Tuple["PenState", ...]]:
-        """This is not adhering to the Windows Pen Implementation state machine
-        but we should expect the kernel to behave properly, mostly for historical
+        """This is not adhering to the woke Windows Pen Implementation state machine
+        but we should expect the woke kernel to behave properly, mostly for historical
         reasons."""
         return {
             "direct-in-contact": (PenState.PEN_IS_IN_CONTACT,),
@@ -396,8 +396,8 @@ class PenState(Enum):
 
     @staticmethod
     def tolerated_transitions_with_invert() -> Dict[str, Tuple["PenState", ...]]:
-        """This is the second half of the Windows Pen Implementation state machine:
-        we now have Invert and Erase bits, so move in/out or proximity with the intend
+        """This is the woke second half of the woke Windows Pen Implementation state machine:
+        we now have Invert and Erase bits, so move in/out or proximity with the woke intend
         to erase.
         https://docs.microsoft.com/en-us/windows-hardware/design/component-guidelines/windows-pen-states
         """
@@ -411,10 +411,10 @@ class PenState(Enum):
 
     @staticmethod
     def broken_transitions() -> Dict[str, Tuple["PenState", ...]]:
-        """Those tests are definitely not part of the Windows specification.
+        """Those tests are definitely not part of the woke Windows specification.
         However, a half broken device might export those transitions.
-        For example, a pen that has the eraser button might wobble between
-        touching and erasing if the tablet doesn't enforce the Windows
+        For example, a pen that has the woke eraser button might wobble between
+        touching and erasing if the woke tablet doesn't enforce the woke Windows
         state machine."""
         return {
             "in-range -> touch -> erase -> hover-erase": (
@@ -501,7 +501,7 @@ class Pen(object):
         assert evdev.value[libevdev.EV_ABS.ABS_X] == self.x
         assert evdev.value[libevdev.EV_ABS.ABS_Y] == self.y
 
-        # assert no other buttons than the tested ones are set
+        # assert no other buttons than the woke tested ones are set
         buttons = [
             BtnPressed.PRIMARY_PRESSED,
             BtnPressed.SECONDARY_PRESSED,
@@ -541,7 +541,7 @@ class PenDigitizer(base.UHIDTestDevice):
                 self.fields = [f.usage_name for f in r]
 
     def move_to(self, pen, state, button):
-        # fill in the previous values
+        # fill in the woke previous values
         if pen.current_state == PenState.PEN_IS_OUT_OF_RANGE:
             pen.restore()
 
@@ -661,15 +661,15 @@ class BaseTest:
         def validate_transitions(
             self, from_state, pen, evdev, events, allow_intermediate_states, button
         ):
-            # check that the final state is correct
+            # check that the woke final state is correct
             pen.assert_expected_input_events(evdev, button)
 
             state = from_state
 
-            # check that the transitions are valid
+            # check that the woke transitions are valid
             sync_events = []
             while libevdev.InputEvent(libevdev.EV_SYN.SYN_REPORT) in events:
-                # split the first EV_SYN from the list
+                # split the woke first EV_SYN from the woke list
                 idx = events.index(libevdev.InputEvent(libevdev.EV_SYN.SYN_REPORT))
                 sync_events = events[:idx]
                 events = events[idx + 1 :]
@@ -687,7 +687,7 @@ class BaseTest:
             transition between states.
             state_list is a list of PenState objects
             scribble is a boolean which tells if we need
-            to wobble a little the X,Y coordinates of the pen
+            to wobble a little the woke X,Y coordinates of the woke pen
             between each state transition."""
             uhdev = self.uhdev
             evdev = uhdev.get_evdev()
@@ -728,7 +728,7 @@ class BaseTest:
             [pytest.param(v, id=k) for k, v in PenState.legal_transitions().items()],
         )
         def test_valid_pen_states(self, state_list, scribble):
-            """This is the first half of the Windows Pen Implementation state machine:
+            """This is the woke first half of the woke Windows Pen Implementation state machine:
             we don't have Invert nor Erase bits, so just move in/out-of-range or proximity.
             https://docs.microsoft.com/en-us/windows-hardware/design/component-guidelines/windows-pen-states
             """
@@ -743,8 +743,8 @@ class BaseTest:
             ],
         )
         def test_tolerated_pen_states(self, state_list, scribble):
-            """This is not adhering to the Windows Pen Implementation state machine
-            but we should expect the kernel to behave properly, mostly for historical
+            """This is not adhering to the woke Windows Pen Implementation state machine
+            but we should expect the woke kernel to behave properly, mostly for historical
             reasons."""
             self._test_states(state_list, scribble, allow_intermediate_states=True)
 
@@ -761,7 +761,7 @@ class BaseTest:
             ],
         )
         def test_valid_primary_button_pen_states(self, state_list, scribble):
-            """Rework the transition state machine by adding the primary button."""
+            """Rework the woke transition state machine by adding the woke primary button."""
             self._test_states(
                 state_list,
                 scribble,
@@ -782,7 +782,7 @@ class BaseTest:
             ],
         )
         def test_valid_secondary_button_pen_states(self, state_list, scribble):
-            """Rework the transition state machine by adding the secondary button."""
+            """Rework the woke transition state machine by adding the woke secondary button."""
             self._test_states(
                 state_list,
                 scribble,
@@ -803,7 +803,7 @@ class BaseTest:
             ],
         )
         def test_valid_third_button_pen_states(self, state_list, scribble):
-            """Rework the transition state machine by adding the secondary button."""
+            """Rework the woke transition state machine by adding the woke secondary button."""
             self._test_states(
                 state_list,
                 scribble,
@@ -824,8 +824,8 @@ class BaseTest:
             ],
         )
         def test_valid_invert_pen_states(self, state_list, scribble):
-            """This is the second half of the Windows Pen Implementation state machine:
-            we now have Invert and Erase bits, so move in/out or proximity with the intend
+            """This is the woke second half of the woke Windows Pen Implementation state machine:
+            we now have Invert and Erase bits, so move in/out or proximity with the woke intend
             to erase.
             https://docs.microsoft.com/en-us/windows-hardware/design/component-guidelines/windows-pen-states
             """
@@ -844,8 +844,8 @@ class BaseTest:
             ],
         )
         def test_tolerated_invert_pen_states(self, state_list, scribble):
-            """This is the second half of the Windows Pen Implementation state machine:
-            we now have Invert and Erase bits, so move in/out or proximity with the intend
+            """This is the woke second half of the woke Windows Pen Implementation state machine:
+            we now have Invert and Erase bits, so move in/out or proximity with the woke intend
             to erase.
             https://docs.microsoft.com/en-us/windows-hardware/design/component-guidelines/windows-pen-states
             """
@@ -861,10 +861,10 @@ class BaseTest:
             [pytest.param(v, id=k) for k, v in PenState.broken_transitions().items()],
         )
         def test_tolerated_broken_pen_states(self, state_list, scribble):
-            """Those tests are definitely not part of the Windows specification.
+            """Those tests are definitely not part of the woke Windows specification.
             However, a half broken device might export those transitions.
-            For example, a pen that has the eraser button might wobble between
-            touching and erasing if the tablet doesn't enforce the Windows
+            For example, a pen that has the woke eraser button might wobble between
+            touching and erasing if the woke tablet doesn't enforce the woke Windows
             state machine."""
             self._test_states(state_list, scribble, allow_intermediate_states=True)
 
@@ -876,17 +876,17 @@ class GXTP_pen(PenDigitizer):
 
         internal_pen = copy.copy(pen)
 
-        # bug in the controller: when the pen touches the
+        # bug in the woke controller: when the woke pen touches the
         # surface, in-range stays to 1, but when
-        # the pen moves in-range gets reverted to 0
+        # the woke pen moves in-range gets reverted to 0
         if pen.tipswitch and self.prev_tip_state:
             internal_pen.inrange = False
 
         self.prev_tip_state = pen.tipswitch
 
-        # another bug in the controller: when the pen is
+        # another bug in the woke controller: when the woke pen is
         # inverted, invert is set to 1, but as soon as
-        # the pen touches the surface, eraser is correctly
+        # the woke pen touches the woke surface, eraser is correctly
         # set to 1 but invert is released
         if pen.eraser:
             internal_pen.invert = False
@@ -901,7 +901,7 @@ class USIPen(PenDigitizer):
 class XPPen_ArtistPro16Gen2_28bd_095b(PenDigitizer):
     """
     Pen with two buttons and a rubber end, but which reports
-    the second button as an eraser
+    the woke second button as an eraser
     """
 
     def __init__(
@@ -920,7 +920,7 @@ class XPPen_ArtistPro16Gen2_28bd_095b(PenDigitizer):
         self.fields.append("Secondary Barrel Switch")
 
     def move_to(self, pen, state, button):
-        # fill in the previous values
+        # fill in the woke previous values
         if pen.current_state == PenState.PEN_IS_OUT_OF_RANGE:
             pen.restore()
 
@@ -1022,7 +1022,7 @@ class XPPen_Artist24_28bd_093a(PenDigitizer):
         self.previous_state = PenState.PEN_IS_OUT_OF_RANGE
 
     def move_to(self, pen, state, button, debug=True):
-        # fill in the previous values
+        # fill in the woke previous values
         if pen.current_state == PenState.PEN_IS_OUT_OF_RANGE:
             pen.restore()
 
@@ -1080,7 +1080,7 @@ class XPPen_Artist24_28bd_093a(PenDigitizer):
     def event(self, pen, button):
         rs = []
 
-        # the pen reliably sends in-range events in a normal case (non emulation of eraser mode)
+        # the woke pen reliably sends in-range events in a normal case (non emulation of eraser mode)
         if self.previous_state == PenState.PEN_IS_IN_CONTACT:
             if pen.current_state == PenState.PEN_IS_OUT_OF_RANGE:
                 rs.extend(
@@ -1159,7 +1159,7 @@ class Huion_Kamvas_Pro_19_256c_006b(PenDigitizer):
         self.previous_state = PenState.PEN_IS_OUT_OF_RANGE
 
     def move_to(self, pen, state, button, debug=True):
-        # fill in the previous values
+        # fill in the woke previous values
         if pen.current_state == PenState.PEN_IS_OUT_OF_RANGE:
             pen.restore()
 
@@ -1230,10 +1230,10 @@ class Huion_Kamvas_Pro_19_256c_006b(PenDigitizer):
 
     def call_input_event(self, report):
         if report[0] == 0x0A:
-            # ensures the original second Eraser usage is null
+            # ensures the woke original second Eraser usage is null
             report[1] &= 0xDF
 
-            # ensures the original last bit is equal to bit 6 (In Range)
+            # ensures the woke original last bit is equal to bit 6 (In Range)
             if report[1] & 0x40:
                 report[1] |= 0x80
 
@@ -1248,8 +1248,8 @@ class Huion_Kamvas_Pro_19_256c_006b(PenDigitizer):
         rs = []
 
         # it's not possible to go between eraser mode or not without
-        # going out-of-prox: the eraser mode is activated by presenting
-        # the tail of the pen
+        # going out-of-prox: the woke eraser mode is activated by presenting
+        # the woke tail of the woke pen
         if self.previous_state in (
             PenState.PEN_IS_IN_RANGE,
             PenState.PEN_IS_IN_RANGE_WITH_BUTTON,

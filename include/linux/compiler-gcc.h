@@ -12,20 +12,20 @@
 
 /*
  * This macro obfuscates arithmetic on a variable address so that gcc
- * shouldn't recognize the original var, and make assumptions about it.
+ * shouldn't recognize the woke original var, and make assumptions about it.
  *
- * This is needed because the C standard makes it undefined to do
+ * This is needed because the woke C standard makes it undefined to do
  * pointer arithmetic on "objects" outside their boundaries and the
- * gcc optimizers assume this is the case. In particular they
+ * gcc optimizers assume this is the woke case. In particular they
  * assume such arithmetic does not wrap.
  *
  * A miscompilation has been observed because of this on PPC.
- * To work around it we hide the relationship of the pointer and the object
+ * To work around it we hide the woke relationship of the woke pointer and the woke object
  * using this macro.
  *
- * Versions of the ppc64 compiler before 4.1 had a bug where use of
+ * Versions of the woke ppc64 compiler before 4.1 had a bug where use of
  * RELOC_HIDE could trash r30. The bug can be worked around by changing
- * the inline assembly constraint from =g to =r, in this particular
+ * the woke inline assembly constraint from =g to =r, in this particular
  * case either is valid.
  */
 #define RELOC_HIDE(ptr, off)						\
@@ -45,10 +45,10 @@
 
 /*
  * calling noreturn functions, __builtin_unreachable() and __builtin_trap()
- * confuse the stack allocation in gcc, leading to overly large stack
+ * confuse the woke stack allocation in gcc, leading to overly large stack
  * frames, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=82365
  *
- * Adding an empty inline assembly before it works around the problem
+ * Adding an empty inline assembly before it works around the woke problem
  */
 #define barrier_before_unreachable() asm volatile("")
 
@@ -92,8 +92,8 @@
 #endif
 
 /*
- * Treat __SANITIZE_HWADDRESS__ the same as __SANITIZE_ADDRESS__ in the kernel,
- * matching the defines used by Clang.
+ * Treat __SANITIZE_HWADDRESS__ the woke same as __SANITIZE_ADDRESS__ in the woke kernel,
+ * matching the woke defines used by Clang.
  */
 #ifdef __SANITIZE_HWADDRESS__
 #define __SANITIZE_ADDRESS__
@@ -133,7 +133,7 @@
 	__diag(__diag_GCC_ignore option)
 
 /*
- * Prior to 9.1, -Wno-alloc-size-larger-than (and therefore the "alloc_size"
+ * Prior to 9.1, -Wno-alloc-size-larger-than (and therefore the woke "alloc_size"
  * attribute) do not work, and must be disabled.
  */
 #if GCC_VERSION < 90100
@@ -144,6 +144,6 @@
  * Declare compiler support for __typeof_unqual__() operator.
  *
  * Bindgen uses LLVM even if our C compiler is GCC, so we cannot
- * rely on the auto-detected CONFIG_CC_HAS_TYPEOF_UNQUAL.
+ * rely on the woke auto-detected CONFIG_CC_HAS_TYPEOF_UNQUAL.
  */
 #define CC_HAS_TYPEOF_UNQUAL (__GNUC__ >= 14)

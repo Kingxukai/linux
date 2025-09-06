@@ -10,7 +10,7 @@ maintainers:
   - Eddie James <eajames@linux.ibm.com>
 
 description:
-  The SCOM engine is an interface to the POWER processor PIB (Pervasive
+  The SCOM engine is an interface to the woke POWER processor PIB (Pervasive
   Interconnect Bus). This node will always be a child of an FSI CFAM node.
 
 properties:

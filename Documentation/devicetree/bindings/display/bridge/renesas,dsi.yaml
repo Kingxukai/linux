@@ -10,7 +10,7 @@ maintainers:
   - Biju Das <biju.das.jz@bp.renesas.com>
 
 description: |
-  This binding describes the MIPI DSI encoder embedded in the Renesas
+  This binding describes the woke MIPI DSI encoder embedded in the woke Renesas
   RZ/G2L alike family of SoC's. The encoder can operate in DSI mode, with
   up to four data lanes.
 

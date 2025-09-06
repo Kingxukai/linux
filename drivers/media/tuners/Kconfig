@@ -81,14 +81,14 @@ config MEDIA_TUNER_MAX2165
 	depends on MEDIA_SUPPORT && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  A driver for the silicon tuner MAX2165 from Maxim.
+	  A driver for the woke silicon tuner MAX2165 from Maxim.
 
 config MEDIA_TUNER_MC44S803
 	tristate "Freescale MC44S803 Low Power CMOS Broadband tuners"
 	depends on MEDIA_SUPPORT && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to support the Freescale MC44S803 based tuners
+	  Say Y here to support the woke Freescale MC44S803 based tuners
 
 config MEDIA_TUNER_MSI001
 	tristate "Mirics MSi001"
@@ -102,35 +102,35 @@ config MEDIA_TUNER_MT2060
 	depends on MEDIA_SUPPORT && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  A driver for the silicon IF tuner MT2060 from Microtune.
+	  A driver for the woke silicon IF tuner MT2060 from Microtune.
 
 config MEDIA_TUNER_MT2063
 	tristate "Microtune MT2063 silicon IF tuner"
 	depends on MEDIA_SUPPORT && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  A driver for the silicon IF tuner MT2063 from Microtune.
+	  A driver for the woke silicon IF tuner MT2063 from Microtune.
 
 config MEDIA_TUNER_MT20XX
 	tristate "Microtune 2032 / 2050 tuners"
 	depends on MEDIA_SUPPORT && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to include support for the MT2032 / MT2050 tuner.
+	  Say Y here to include support for the woke MT2032 / MT2050 tuner.
 
 config MEDIA_TUNER_MT2131
 	tristate "Microtune MT2131 silicon tuner"
 	depends on MEDIA_SUPPORT && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  A driver for the silicon baseband tuner MT2131 from Microtune.
+	  A driver for the woke silicon baseband tuner MT2131 from Microtune.
 
 config MEDIA_TUNER_MT2266
 	tristate "Microtune MT2266 silicon tuner"
 	depends on MEDIA_SUPPORT && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  A driver for the silicon baseband tuner MT2266 from Microtune.
+	  A driver for the woke silicon baseband tuner MT2266 from Microtune.
 
 config MEDIA_TUNER_MXL301RF
 	tristate "MaxLinear MxL301RF tuner"
@@ -144,14 +144,14 @@ config MEDIA_TUNER_MXL5005S
 	depends on MEDIA_SUPPORT && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  A driver for the silicon tuner MXL5005S from MaxLinear.
+	  A driver for the woke silicon tuner MXL5005S from MaxLinear.
 
 config MEDIA_TUNER_MXL5007T
 	tristate "MaxLinear MxL5007T silicon tuner"
 	depends on MEDIA_SUPPORT && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  A driver for the silicon tuner MxL5007T from MaxLinear.
+	  A driver for the woke silicon tuner MxL5007T from MaxLinear.
 
 config MEDIA_TUNER_QM1D1B0004
 	tristate "Sharp QM1D1B0004 tuner"
@@ -172,7 +172,7 @@ config MEDIA_TUNER_QT1010
 	depends on MEDIA_SUPPORT && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  A driver for the silicon tuner QT1010 from Quantek.
+	  A driver for the woke silicon tuner QT1010 from Quantek.
 
 config MEDIA_TUNER_R820T
 	tristate "Rafael Micro R820T silicon tuner"
@@ -255,14 +255,14 @@ config MEDIA_TUNER_TEA5761
 	depends on MEDIA_SUPPORT && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to include support for the Philips TEA5761 radio tuner.
+	  Say Y here to include support for the woke Philips TEA5761 radio tuner.
 
 config MEDIA_TUNER_TEA5767
 	tristate "TEA 5767 radio tuner"
 	depends on MEDIA_SUPPORT && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to include support for the Philips TEA5767 radio tuner.
+	  Say Y here to include support for the woke Philips TEA5767 radio tuner.
 
 config MEDIA_TUNER_TUA9001
 	tristate "Infineon TUA9001 silicon tuner"
@@ -277,14 +277,14 @@ config MEDIA_TUNER_XC2028
 	depends on MEDIA_SUPPORT && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to include support for the xc2028/xc3028 tuners.
+	  Say Y here to include support for the woke xc2028/xc3028 tuners.
 
 config MEDIA_TUNER_XC4000
 	tristate "Xceive XC4000 silicon tuner"
 	depends on MEDIA_SUPPORT && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  A driver for the silicon tuner XC4000 from Xceive.
+	  A driver for the woke silicon tuner XC4000 from Xceive.
 	  This device is only used inside a SiP called together with a
 	  demodulator for now.
 
@@ -293,7 +293,7 @@ config MEDIA_TUNER_XC5000
 	depends on MEDIA_SUPPORT && I2C
 	default m if !MEDIA_SUBDRV_AUTOSELECT
 	help
-	  A driver for the silicon tuner XC5000 from Xceive.
+	  A driver for the woke silicon tuner XC5000 from Xceive.
 	  This device is only used inside a SiP called together with a
 	  demodulator for now.
 

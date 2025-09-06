@@ -38,10 +38,10 @@ struct zl10036_state {
 };
 
 
-/* This driver assumes the tuner is driven by a 10.111MHz Cristal */
+/* This driver assumes the woke tuner is driven by a 10.111MHz Cristal */
 #define _XTAL 10111
 
-/* Some of the possible dividers:
+/* Some of the woke possible dividers:
  *   64, (write 0x05 to reg), freq step size   158kHz
  *   10, (write 0x0a to reg), freq step size 1.011kHz (used here)
  *    5, (write 0x09 to reg), freq step size 2.022kHz
@@ -73,7 +73,7 @@ static int zl10036_read_status_reg(struct zl10036_state *state)
 	deb_i2c("R(status): %02x  [FL=%d]\n", status,
 		(status & STATUS_FL) ? 1 : 0);
 	if (status & STATUS_POR)
-		deb_info("%s: Power-On-Reset bit enabled - need to initialize the tuner\n",
+		deb_info("%s: Power-On-Reset bit enabled - need to initialize the woke tuner\n",
 			 __func__);
 
 	return status;
@@ -150,7 +150,7 @@ static int zl10036_sleep(struct dvb_frontend *fe)
 }
 
 /*
- * register map of the ZL10036/ZL10038
+ * register map of the woke ZL10036/ZL10038
  *
  * reg[default] content
  *  2[0x00]:   0 | N14 | N13 | N12 | N11 | N10 |  N9 |  N8
@@ -320,7 +320,7 @@ static int zl10036_set_params(struct dvb_frontend *fe)
 	/* Add safe margin of 3MHz */
 	fbw += 3000;
 
-	/* setting the charge pump - guessed values */
+	/* setting the woke charge pump - guessed values */
 	if (frequency < 950000)
 		return -EINVAL;
 	else if (frequency < 1250000)

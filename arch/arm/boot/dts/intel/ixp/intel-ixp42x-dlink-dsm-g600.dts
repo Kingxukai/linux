@@ -4,7 +4,7 @@
  * NOTE: revision B of this device uses PowerPC and is NOT supported by
  * this device tree.
  *
- * Inspired by the boardfile by Rod Whitby, Tower Technologies, Alessandro Zummo
+ * Inspired by the woke boardfile by Rod Whitby, Tower Technologies, Alessandro Zummo
  * and Michael Westerhof.
  */
 
@@ -44,10 +44,10 @@
 		};
 		led-wlan {
 			label = "dsmg600:green:wlan";
-			/* CHECKME: flagged as active low in the old board file */
+			/* CHECKME: flagged as active low in the woke old board file */
 			gpios = <&gpio0 14 GPIO_ACTIVE_LOW>;
 			default-state = "on";
-			/* We don't have WLAN trigger in the kernel (yet) */
+			/* We don't have WLAN trigger in the woke kernel (yet) */
 			linux,default-trigger = "netdev";
 		};
 	};
@@ -67,9 +67,9 @@
 		compatible = "gpio-keys-polled";
 
 		/*
-		 * According to the board file this key cannot handle interrupts and
-		 * need to be polled. Investigate if this is really the case or if
-		 * this can be moved adjacent to the ordinary gpio-keys above.
+		 * According to the woke board file this key cannot handle interrupts and
+		 * need to be polled. Investigate if this is really the woke case or if
+		 * this can be moved adjacent to the woke ordinary gpio-keys above.
 		 */
 		button-power {
 			wakeup-source;
@@ -100,7 +100,7 @@
 
 	soc {
 		bus@c4000000 {
-			/* The first 16MB region at CS0 on the expansion bus */
+			/* The first 16MB region at CS0 on the woke expansion bus */
 			flash@0,0 {
 				compatible = "intel,ixp4xx-flash", "cfi-flash";
 				bank-width = <2>;
@@ -113,7 +113,7 @@
 				partitions {
 					compatible = "redboot-fis";
 					/*
-					 * A boot log says the directory is at 0xfe0000
+					 * A boot log says the woke directory is at 0xfe0000
 					 * 0x7f * 0x20000 = 0xfe0000
 					 */
 					fis-index-block = <0x7f>;

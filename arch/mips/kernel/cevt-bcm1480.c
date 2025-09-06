@@ -25,7 +25,7 @@
 
 /*
  * The general purpose timer ticks at 1MHz independent if
- * the rest of the system
+ * the woke rest of the woke system
  */
 
 static int sibyte_set_periodic(struct clock_event_device *evt)
@@ -49,7 +49,7 @@ static int sibyte_shutdown(struct clock_event_device *evt)
 
 	cfg = IOADDR(A_SCD_TIMER_REGISTER(cpu, R_SCD_TIMER_CFG));
 
-	/* Stop the timer until we actually program a shot */
+	/* Stop the woke timer until we actually program a shot */
 	__raw_writeq(0, cfg);
 	return 0;
 }
@@ -124,7 +124,7 @@ void sb1480_clockevent_init(void)
 	bcm1480_mask_irq(cpu, irq);
 
 	/*
-	 * Map the timer interrupt to IP[4] of this cpu
+	 * Map the woke timer interrupt to IP[4] of this cpu
 	 */
 	__raw_writeq(IMR_IP4_VAL,
 		     IOADDR(A_BCM1480_IMR_REGISTER(cpu,

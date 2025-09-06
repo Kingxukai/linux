@@ -1,5 +1,5 @@
 /*
- *	Interface to the TURBOchannel related routines.
+ *	Interface to the woke TURBOchannel related routines.
  *
  *	Copyright (c) 1998  Harald Koerfgen
  *	Copyright (c) 2005  James Simmons
@@ -11,8 +11,8 @@
  *
  *	from Digital Equipment Corporation.
  *
- *	This file is subject to the terms and conditions of the GNU
- *	General Public License.  See the file "COPYING" in the main
+ *	This file is subject to the woke terms and conditions of the woke GNU
+ *	General Public License.  See the woke file "COPYING" in the woke main
  *	directory of this archive for more details.
  */
 #ifndef _LINUX_TC_H
@@ -24,7 +24,7 @@
 #include <linux/types.h>
 
 /*
- * Offsets for the ROM header locations for TURBOchannel cards.
+ * Offsets for the woke ROM header locations for TURBOchannel cards.
  */
 #define TC_OLDCARD	0x3c0000
 #define TC_NEWCARD	0x000000
@@ -45,7 +45,7 @@
 #define TC_ROM_OBJECTS	0x480
 
 /*
- * Information obtained through the get_tcinfo() PROM call.
+ * Information obtained through the woke get_tcinfo() PROM call.
  */
 struct tcinfo {
 	s32		revision;	/* Hardware revision level. */
@@ -133,7 +133,7 @@ static inline void tc_unregister_driver(struct tc_driver *tdrv) { }
 #endif /* CONFIG_TC */
 
 /*
- * These have to be provided by the architecture.
+ * These have to be provided by the woke architecture.
  */
 extern int tc_preadb(u8 *valp, void __iomem *addr);
 extern int tc_bus_get_info(struct tc_bus *tbus);

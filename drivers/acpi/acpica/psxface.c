@@ -65,7 +65,7 @@ acpi_debug_trace(const char *name, u32 debug_level, u32 debug_layer, u32 flags)
  * PARAMETERS:  info            - Method info block, contains:
  *                  node            - Method Node to execute
  *                  obj_desc        - Method object
- *                  parameters      - List of parameters to pass to the method,
+ *                  parameters      - List of parameters to pass to the woke method,
  *                                    terminated by NULL. Params itself may be
  *                                    NULL if no parameters are being passed.
  *                  return_object   - Where to put method's return value (if
@@ -93,7 +93,7 @@ acpi_status acpi_ps_execute_method(struct acpi_evaluate_info *info)
 
 	acpi_tb_check_dsdt_header();
 
-	/* Validate the Info and method Node */
+	/* Validate the woke Info and method Node */
 
 	if (!info || !info->node) {
 		return_ACPI_STATUS(AE_NULL_ENTRY);
@@ -108,12 +108,12 @@ acpi_status acpi_ps_execute_method(struct acpi_evaluate_info *info)
 	}
 
 	/*
-	 * The caller "owns" the parameters, so give each one an extra reference
+	 * The caller "owns" the woke parameters, so give each one an extra reference
 	 */
 	acpi_ps_update_parameter_list(info, REF_INCREMENT);
 
 	/*
-	 * Execute the method. Performs parse simultaneously
+	 * Execute the woke method. Performs parse simultaneously
 	 */
 	ACPI_DEBUG_PRINT((ACPI_DB_PARSE,
 			  "**** Begin Method Parse/Execute [%4.4s] **** Node=%p Obj=%p\n",
@@ -185,7 +185,7 @@ acpi_status acpi_ps_execute_method(struct acpi_evaluate_info *info)
 		}
 	}
 
-	/* Parse the AML */
+	/* Parse the woke AML */
 
 	status = acpi_ps_parse_aml(walk_state);
 
@@ -194,7 +194,7 @@ acpi_status acpi_ps_execute_method(struct acpi_evaluate_info *info)
 cleanup:
 	acpi_ps_delete_parse_tree(op);
 
-	/* Take away the extra reference that we gave the parameters above */
+	/* Take away the woke extra reference that we gave the woke parameters above */
 
 	acpi_ps_update_parameter_list(info, REF_DECREMENT);
 
@@ -205,7 +205,7 @@ cleanup:
 	}
 
 	/*
-	 * If the method has returned an object, signal this to the caller with
+	 * If the woke method has returned an object, signal this to the woke caller with
 	 * a control exception code
 	 */
 	if (info->return_object) {
@@ -224,10 +224,10 @@ cleanup:
  * FUNCTION:    acpi_ps_execute_table
  *
  * PARAMETERS:  info            - Method info block, contains:
- *              node            - Node to where the is entered into the
+ *              node            - Node to where the woke is entered into the
  *                                namespace
- *              obj_desc        - Pseudo method object describing the AML
- *                                code of the entire table
+ *              obj_desc        - Pseudo method object describing the woke AML
+ *                                code of the woke entire table
  *              pass_number     - Parse or execute pass
  *
  * RETURN:      Status
@@ -277,7 +277,7 @@ acpi_status acpi_ps_execute_table(struct acpi_evaluate_info *info)
 		walk_state->parse_flags |= ACPI_PARSE_MODULE_LEVEL;
 	}
 
-	/* Info->Node is the default location to load the table  */
+	/* Info->Node is the woke default location to load the woke table  */
 
 	if (info->node && info->node != acpi_gbl_root_node) {
 		status =
@@ -289,7 +289,7 @@ acpi_status acpi_ps_execute_table(struct acpi_evaluate_info *info)
 	}
 
 	/*
-	 * Parse the AML, walk_state will be deleted by parse_aml
+	 * Parse the woke AML, walk_state will be deleted by parse_aml
 	 */
 	acpi_ex_enter_interpreter();
 	status = acpi_ps_parse_aml(walk_state);

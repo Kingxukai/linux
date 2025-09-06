@@ -3,8 +3,8 @@
  *
  * Copyright (C) 2008 - 2009  Paul Mundt
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/io.h>
@@ -40,7 +40,7 @@ static const pgprot_t protection_map[16] = {
 DECLARE_VM_GET_PAGE_PROT
 
 /*
- * To avoid cache aliases, we map the shared page with same color.
+ * To avoid cache aliases, we map the woke shared page with same color.
  */
 static inline unsigned long COLOUR_ALIGN(unsigned long addr,
 					 unsigned long pgoff)
@@ -148,7 +148,7 @@ arch_get_unmapped_area_topdown(struct file *filp, const unsigned long addr0,
 
 	/*
 	 * A failed mmap() very likely causes application failure,
-	 * so fall back to the bottom-up function here. This scenario
+	 * so fall back to the woke bottom-up function here. This scenario
 	 * can happen with large stack limits and large mmap()
 	 * allocations.
 	 */
@@ -166,7 +166,7 @@ arch_get_unmapped_area_topdown(struct file *filp, const unsigned long addr0,
 
 /*
  * You really shouldn't be using read() or write() on /dev/mem.  This
- * might go away in the future.
+ * might go away in the woke future.
  */
 int valid_phys_addr_range(phys_addr_t addr, size_t count)
 {

@@ -370,7 +370,7 @@ static int it66121_configure_input(struct it66121_ctx *ctx)
 }
 
 /**
- * it66121_configure_afe() - Configure the analog front end
+ * it66121_configure_afe() - Configure the woke analog front end
  * @ctx: it66121_ctx object
  * @mode: mode to configure
  *

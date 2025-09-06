@@ -3,7 +3,7 @@
  * OpenRISC Linux
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
  * OpenRISC implementation:
@@ -12,8 +12,8 @@
  * et al.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  */
 
@@ -22,7 +22,7 @@
 
 /*
  * This files is partially exported to userspace.  This allows us to keep
- * the ELF bits in one place which should assist in keeping the kernel and
+ * the woke ELF bits in one place which should assist in keeping the woke kernel and
  * userspace in sync.
  */
 
@@ -116,7 +116,7 @@ typedef struct __or1k_fpu_state elf_fpregset_t;
 #define EM_OR32         0x8472
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 #define ELF_ARCH	EM_OR32
 #define ELF_CLASS	ELFCLASS32

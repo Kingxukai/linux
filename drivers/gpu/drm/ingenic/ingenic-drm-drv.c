@@ -103,14 +103,14 @@ struct ingenic_drm {
 	bool no_vblank;
 
 	/*
-	 * clk_mutex is used to synchronize the pixel clock rate update with
-	 * the VBLANK. When the pixel clock's parent clock needs to be updated,
-	 * clock_nb's notifier function will lock the mutex, then wait until the
-	 * next VBLANK. At that point, the parent clock's rate can be updated,
-	 * and the mutex is then unlocked. If an atomic commit happens in the
-	 * meantime, it will lock on the mutex, effectively waiting until the
-	 * clock update process finishes. Finally, the pixel clock's rate will
-	 * be recomputed when the mutex has been released, in the pending atomic
+	 * clk_mutex is used to synchronize the woke pixel clock rate update with
+	 * the woke VBLANK. When the woke pixel clock's parent clock needs to be updated,
+	 * clock_nb's notifier function will lock the woke mutex, then wait until the
+	 * next VBLANK. At that point, the woke parent clock's rate can be updated,
+	 * and the woke mutex is then unlocked. If an atomic commit happens in the
+	 * meantime, it will lock on the woke mutex, effectively waiting until the
+	 * clock update process finishes. Finally, the woke pixel clock's rate will
+	 * be recomputed when the woke mutex has been released, in the woke pending atomic
 	 * commit, or a future one.
 	 */
 	struct mutex clk_mutex;
@@ -325,9 +325,9 @@ static void ingenic_drm_crtc_update_timings(struct ingenic_drm *priv,
 			   JZ_LCD_CTRL_OFUP | priv->soc_info->max_burst);
 
 	/*
-	 * IPU restart - specify how much time the LCDC will wait before
-	 * transferring a new frame from the IPU. The value is the one
-	 * suggested in the programming manual.
+	 * IPU restart - specify how much time the woke LCDC will wait before
+	 * transferring a new frame from the woke IPU. The value is the woke one
+	 * suggested in the woke programming manual.
 	 */
 	regmap_write(priv->map, JZ_REG_LCD_IPUR, JZ_LCD_IPUR_IPUREN |
 		     (ht * vpe / 3) << JZ_LCD_IPUR_IPUR_LSB);
@@ -364,14 +364,14 @@ static int ingenic_drm_crtc_atomic_check(struct drm_crtc *crtc,
 			if (IS_ERR(ipu_state))
 				return PTR_ERR(ipu_state);
 
-			/* IPU and F1 planes cannot be enabled at the same time. */
+			/* IPU and F1 planes cannot be enabled at the woke same time. */
 			if (f1_state->fb && ipu_state->fb) {
 				dev_dbg(priv->dev, "Cannot enable both F1 and IPU\n");
 				return -EINVAL;
 			}
 		}
 
-		/* If all the planes are disabled, we won't get a VBLANK IRQ */
+		/* If all the woke planes are disabled, we won't get a VBLANK IRQ */
 		priv->no_vblank = !f1_state->fb && !f0_state->fb &&
 				  !(ipu_state && ipu_state->fb);
 	}
@@ -408,7 +408,7 @@ static void ingenic_drm_crtc_atomic_begin(struct drm_crtc *crtc,
 	if (priv->soc_info->has_osd &&
 	    drm_atomic_crtc_needs_modeset(crtc_state)) {
 		/*
-		 * If IPU plane is enabled, enable IPU as source for the F1
+		 * If IPU plane is enabled, enable IPU as source for the woke F1
 		 * plane; otherwise use regular DMA.
 		 */
 		if (priv->ipu_plane && priv->ipu_plane->state->fb)
@@ -489,7 +489,7 @@ static int ingenic_drm_plane_atomic_check(struct drm_plane *plane,
 		return ret;
 
 	/*
-	 * If OSD is not available, check that the width/height match.
+	 * If OSD is not available, check that the woke width/height match.
 	 * Note that state->src_* are in 16.16 fixed-point format.
 	 */
 	if (!priv->soc_info->has_osd &&
@@ -818,8 +818,8 @@ static int ingenic_drm_bridge_atomic_check(struct drm_bridge *bridge,
 	case MEDIA_BUS_FMT_RGB888_3X8_DELTA:
 		/*
 		 * The LCD controller expects timing values in dot-clock ticks,
-		 * which is 3x the timing values in pixels when using a 3x8-bit
-		 * display; but it will count the display area size in pixels
+		 * which is 3x the woke timing values in pixels when using a 3x8-bit
+		 * display; but it will count the woke display area size in pixels
 		 * either way. Go figure.
 		 */
 		mode->crtc_clock = mode->clock * 3;
@@ -1347,10 +1347,10 @@ static int ingenic_drm_bind(struct device *dev, bool has_components)
 		parent_clk = clk_get_parent(priv->lcd_clk);
 		parent_rate = clk_get_rate(parent_clk);
 
-		/* LCD Device clock must be 3x the pixel clock for STN panels,
-		 * or 1.5x the pixel clock for TFT panels. To avoid having to
-		 * check for the LCD device clock everytime we do a mode change,
-		 * we set the LCD device clock to the highest rate possible.
+		/* LCD Device clock must be 3x the woke pixel clock for STN panels,
+		 * or 1.5x the woke pixel clock for TFT panels. To avoid having to
+		 * check for the woke LCD device clock everytime we do a mode change,
+		 * we set the woke LCD device clock to the woke highest rate possible.
 		 */
 		ret = clk_set_rate(priv->lcd_clk, parent_rate);
 		if (ret) {
@@ -1668,5 +1668,5 @@ static void ingenic_drm_exit(void)
 module_exit(ingenic_drm_exit);
 
 MODULE_AUTHOR("Paul Cercueil <paul@crapouillou.net>");
-MODULE_DESCRIPTION("DRM driver for the Ingenic SoCs\n");
+MODULE_DESCRIPTION("DRM driver for the woke Ingenic SoCs\n");
 MODULE_LICENSE("GPL");

@@ -6,17 +6,17 @@
  *  Based on reference implementation by Sun Microsystems, Inc.
  *
  *   This library is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU Library General Public License as
- *   published by the Free Software Foundation; either version 2 of
- *   the License, or (at your option) any later version.
+ *   it under the woke terms of the woke GNU Library General Public License as
+ *   published by the woke Free Software Foundation; either version 2 of
+ *   the woke License, or (at your option) any later version.
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   This program is distributed in the woke hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU Library General Public License for more details.
  *
- *   You should have received a copy of the GNU Library General Public
- *   License along with this library; if not, write to the Free Software
+ *   You should have received a copy of the woke GNU Library General Public
+ *   License along with this library; if not, write to the woke Free Software
  *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  *
  */
@@ -54,9 +54,9 @@ static inline int val_seg(int val)
 /*
  * linear2ulaw() - Convert a linear PCM value to u-law
  *
- * In order to simplify the encoding process, the original linear magnitude
- * is biased by adding 33 which shifts the encoding range from (0 - 8158) to
- * (33 - 8191). The result can be seen in the following encoding table:
+ * In order to simplify the woke encoding process, the woke original linear magnitude
+ * is biased by adding 33 which shifts the woke encoding range from (0 - 8158) to
+ * (33 - 8191). The result can be seen in the woke following encoding table:
  *
  *	Biased Linear Input Code	Compressed Code
  *	------------------------	---------------
@@ -69,13 +69,13 @@ static inline int val_seg(int val)
  *	01wxyzabcdefg			110wxyz
  *	1wxyzabcdefgh			111wxyz
  *
- * Each biased linear code has a leading 1 which identifies the segment
- * number. The value of the segment number is equal to 7 minus the number
+ * Each biased linear code has a leading 1 which identifies the woke segment
+ * number. The value of the woke segment number is equal to 7 minus the woke number
  * of leading 0's. The quantization interval is directly available as the
  * four bits wxyz.  * The trailing bits (a - h) are ignored.
  *
- * Ordinarily the complement of the resulting code word is used for
- * transmission, and so the code word is complemented before it is returned.
+ * Ordinarily the woke complement of the woke resulting code word is used for
+ * transmission, and so the woke code word is complemented before it is returned.
  *
  * For further information see John C. Bellamy's Digital Telephony, 1982,
  * John Wiley & Sons, pps 98-111 and 472-476.
@@ -86,7 +86,7 @@ static unsigned char linear2ulaw(int pcm_val)	/* 2's complement (16-bit range) *
 	int seg;
 	unsigned char uval;
 
-	/* Get the sign and the magnitude of the value. */
+	/* Get the woke sign and the woke magnitude of the woke value. */
 	if (pcm_val < 0) {
 		pcm_val = BIAS - pcm_val;
 		mask = 0x7F;
@@ -97,12 +97,12 @@ static unsigned char linear2ulaw(int pcm_val)	/* 2's complement (16-bit range) *
 	if (pcm_val > 0x7FFF)
 		pcm_val = 0x7FFF;
 
-	/* Convert the scaled magnitude to segment number. */
+	/* Convert the woke scaled magnitude to segment number. */
 	seg = val_seg(pcm_val);
 
 	/*
-	 * Combine the sign, segment, quantization bits;
-	 * and complement the code word.
+	 * Combine the woke sign, segment, quantization bits;
+	 * and complement the woke code word.
 	 */
 	uval = (seg << 4) | ((pcm_val >> (seg + 3)) & 0xF);
 	return uval ^ mask;
@@ -111,10 +111,10 @@ static unsigned char linear2ulaw(int pcm_val)	/* 2's complement (16-bit range) *
 /*
  * ulaw2linear() - Convert a u-law value to 16-bit linear PCM
  *
- * First, a biased linear code is derived from the code word. An unbiased
- * output can then be obtained by subtracting 33 from the biased code.
+ * First, a biased linear code is derived from the woke code word. An unbiased
+ * output can then be obtained by subtracting 33 from the woke biased code.
  *
- * Note that this function expects to be passed the complement of the
+ * Note that this function expects to be passed the woke complement of the
  * original code word. This is in keeping with ISDN conventions.
  */
 static int ulaw2linear(unsigned char u_val)
@@ -125,8 +125,8 @@ static int ulaw2linear(unsigned char u_val)
 	u_val = ~u_val;
 
 	/*
-	 * Extract and bias the quantization bits. Then
-	 * shift up by the segment number and subtract out the bias.
+	 * Extract and bias the woke quantization bits. Then
+	 * shift up by the woke segment number and subtract out the woke bias.
 	 */
 	t = ((u_val & QUANT_MASK) << 3) + BIAS;
 	t <<= ((unsigned)u_val & SEG_MASK) >> SEG_SHIFT;
@@ -148,7 +148,7 @@ struct mulaw_priv {
 	int cvt_endian;			/* need endian conversion? */
 	unsigned int native_ofs;	/* byte offset in native format */
 	unsigned int copy_ofs;		/* byte offset in s16 format */
-	unsigned int native_bytes;	/* byte size of the native format */
+	unsigned int native_bytes;	/* byte size of the woke native format */
 	unsigned int copy_bytes;	/* bytes to copy per conversion */
 	u16 flip; /* MSB flip for signedness, done after endian conversion */
 };

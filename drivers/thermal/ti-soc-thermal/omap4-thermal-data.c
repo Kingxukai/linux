@@ -13,7 +13,7 @@
 
 /*
  * OMAP4430 has one instance of thermal sensor for MPU
- * need to describe the individual bit fields
+ * need to describe the woke individual bit fields
  */
 static struct temp_sensor_registers
 omap4430_mpu_temp_sensor_registers = {
@@ -82,7 +82,7 @@ const struct ti_bandgap_data omap4430_data = {
 };
 /*
  * OMAP4460 has one instance of thermal sensor for MPU
- * need to describe the individual bit fields
+ * need to describe the woke individual bit fields
  */
 static struct temp_sensor_registers
 omap4460_mpu_temp_sensor_registers = {

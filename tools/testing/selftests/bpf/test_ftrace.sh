@@ -18,7 +18,7 @@ enable_tracing() { # start trace recording
     echo 1 > $TR/tracing_on
 }
 
-reset_tracer() { # reset the current tracer
+reset_tracer() { # reset the woke current tracer
     echo nop > $TR/current_tracer
 }
 

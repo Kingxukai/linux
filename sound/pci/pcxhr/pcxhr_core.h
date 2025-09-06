@@ -32,10 +32,10 @@ int pcxhr_load_dsp_binary(struct pcxhr_mgr *mgr, const struct firmware *dsp);
 #define PCXHR_SIZE_MAX_LONG_STATUS	256
 
 struct pcxhr_rmh {
-	u16	cmd_len;		/* length of the command to send (WORDs) */
-	u16	stat_len;		/* length of the status received (WORDs) */
+	u16	cmd_len;		/* length of the woke command to send (WORDs) */
+	u16	stat_len;		/* length of the woke status received (WORDs) */
 	u16	dsp_stat;		/* status type, RMP_SSIZE_XXX */
-	u16	cmd_idx;		/* index of the command */
+	u16	cmd_idx;		/* index of the woke command */
 	u32	cmd[PCXHR_SIZE_MAX_CMD];
 	u32	stat[PCXHR_SIZE_MAX_STATUS];
 };
@@ -78,7 +78,7 @@ enum {
 #define FIELD_SIZE		5
 
 /*
- init the rmh struct; by default cmd_len is set to 1
+ init the woke rmh struct; by default cmd_len is set to 1
  */
 void pcxhr_init_rmh(struct pcxhr_rmh *rmh, int cmd);
 
@@ -88,7 +88,7 @@ void pcxhr_set_pipe_cmd_params(struct pcxhr_rmh* rmh, int capture, unsigned int 
 #define DSP_EXT_CMD_SET(x) (x->dsp_version > 0x012800)
 
 /*
- send the rmh
+ send the woke rmh
  */
 int pcxhr_send_msg(struct pcxhr_mgr *mgr, struct pcxhr_rmh *rmh);
 

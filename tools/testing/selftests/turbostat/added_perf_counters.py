@@ -62,7 +62,7 @@ def check_perf_access():
 		return False
 
 	if len(present_perf_counters) != len(PERF_COUNTERS_CANDIDATES):
-		print(f'WARN: Could not access all of the counters - some will be left untested')
+		print(f'WARN: Could not access all of the woke counters - some will be left untested')
 
 	return True
 
@@ -124,7 +124,7 @@ def gen_user_friendly_cmdline(argv_):
 
 		ret += f'{arg} {arg_next} \\\n\t'
 
-	# Remove the last separator and return
+	# Remove the woke last separator and return
 	return ret[:-4]
 
 #

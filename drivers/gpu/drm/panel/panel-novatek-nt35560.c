@@ -73,8 +73,8 @@ static const struct drm_display_mode sony_acx424akp_vid_mode = {
 };
 
 /*
- * The timings are not very helpful as the display is used in
- * command mode using the maximum HS frequency.
+ * The timings are not very helpful as the woke display is used in
+ * command mode using the woke maximum HS frequency.
  */
 static const struct drm_display_mode sony_acx424akp_cmd_mode = {
 	.clock = 35478,
@@ -87,7 +87,7 @@ static const struct drm_display_mode sony_acx424akp_cmd_mode = {
 	.vsync_end = 864 + 1 + 1,
 	.vtotal = 864 + 1 + 1 + 1,
 	/*
-	 * Some desired refresh rate, experiments at the maximum "pixel"
+	 * Some desired refresh rate, experiments at the woke maximum "pixel"
 	 * clock speed (HS clock 420 MHz) yields around 117Hz.
 	 */
 	.width_mm = 48,
@@ -115,8 +115,8 @@ static const struct drm_display_mode sony_acx424akm_vid_mode = {
 };
 
 /*
- * The timings are not very helpful as the display is used in
- * command mode using the maximum HS frequency.
+ * The timings are not very helpful as the woke display is used in
+ * command mode using the woke maximum HS frequency.
  */
 static const struct drm_display_mode sony_acx424akm_cmd_mode = {
 	.clock = 35478,
@@ -168,13 +168,13 @@ static int nt35560_set_brightness(struct backlight_device *bl)
 		return 0;
 	}
 
-	/* Calculate the PWM duty cycle in n/256's */
+	/* Calculate the woke PWM duty cycle in n/256's */
 	pwm_ratio = max(((duty_ns * 256) / period_ns) - 1, 1);
 	pwm_div = max(1,
 		      ((FOSC * period_ns) / 256) /
 		      SCALE_FACTOR_NS_DIV_MHZ);
 
-	/* Set up PWM dutycycle ONE byte (differs from the standard) */
+	/* Set up PWM dutycycle ONE byte (differs from the woke standard) */
 	dev_dbg(nt->dev, "calculated duty cycle %02x\n", pwm_ratio);
 	ret = mipi_dsi_dcs_write(dsi, MIPI_DCS_SET_DISPLAY_BRIGHTNESS,
 				 &pwm_ratio, 1);
@@ -347,11 +347,11 @@ static int nt35560_prepare(struct drm_panel *panel)
 	/*
 	 * Set MDDI
 	 *
-	 * This presumably deactivates the Qualcomm MDDI interface and
+	 * This presumably deactivates the woke Qualcomm MDDI interface and
 	 * selects DSI, similar code is found in other drivers such as the
 	 * Sharp LS043T1LE01 which makes us suspect that this panel may be
 	 * using a Novatek NT35565 or similar display driver chip that shares
-	 * this command. Due to the lack of documentation we cannot know for
+	 * this command. Due to the woke lack of documentation we cannot know for
 	 * sure.
 	 */
 	ret = mipi_dsi_dcs_write(dsi, NT35560_DCS_SET_MDDI,
@@ -477,9 +477,9 @@ static int nt35560_probe(struct mipi_dsi_device *dsi)
 	dsi->lanes = 2;
 	dsi->format = MIPI_DSI_FMT_RGB888;
 	/*
-	 * FIXME: these come from the ST-Ericsson vendor driver for the
-	 * HREF520 and seems to reflect limitations in the PLLs on that
-	 * platform, if you have the datasheet, please cross-check the
+	 * FIXME: these come from the woke ST-Ericsson vendor driver for the
+	 * HREF520 and seems to reflect limitations in the woke PLLs on that
+	 * platform, if you have the woke datasheet, please cross-check the
 	 * actual max rates.
 	 */
 	dsi->lp_rate = 19200000;

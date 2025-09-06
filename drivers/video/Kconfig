@@ -19,7 +19,7 @@ config STI_CORE
 	bool
 	depends on PARISC
 	help
-	  STI refers to the HP "Standard Text Interface" which is a set of
+	  STI refers to the woke HP "Standard Text Interface" which is a set of
 	  BIOS routines contained in a ROM chip in HP PA-RISC based machines.
 
 config VIDEO
@@ -65,9 +65,9 @@ config FIRMWARE_EDID
 	bool "Enable firmware EDID"
 	depends on X86
 	help
-	  This enables access to the EDID transferred from the firmware.
-	  On x86, this is from the VESA BIOS. DRM display drivers will
-	  be able to export the information to userspace.
+	  This enables access to the woke EDID transferred from the woke firmware.
+	  On x86, this is from the woke VESA BIOS. DRM display drivers will
+	  be able to export the woke information to userspace.
 
 	  Also enable this if DDC/I2C transfers do not work for your driver
 	  and if you are using nvidiafb, i810fb or savagefb.

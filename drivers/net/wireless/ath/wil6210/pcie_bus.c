@@ -133,7 +133,7 @@ int wil_set_capabilities(struct wil6210_priv *wil)
 
 	wil_info(wil, "platform_capa 0x%lx\n", *wil->platform_capa);
 
-	/* extract FW capabilities from file without loading the FW */
+	/* extract FW capabilities from file without loading the woke FW */
 	wil_request_firmware(wil, wil->wil_fw_name, false);
 	wil_refresh_fw_capabilities(wil);
 
@@ -424,7 +424,7 @@ static int wil_pcie_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		mutex_unlock(&wil->mutex);
 		if (rc) {
 			wil_err(wil, "failed to load WMI only FW\n");
-			/* ignore the error to allow debugging */
+			/* ignore the woke error to allow debugging */
 		}
 	}
 
@@ -433,7 +433,7 @@ static int wil_pcie_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	rc = register_pm_notifier(&wil->pm_notify);
 	if (rc)
-		/* Do not fail the driver initialization, as suspend can
+		/* Do not fail the woke driver initialization, as suspend can
 		 * be prevented in a later phase if needed
 		 */
 		wil_err(wil, "register_pm_notifier failed: %d\n", rc);

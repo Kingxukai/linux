@@ -12,7 +12,7 @@
 #include <asm/io.h>
 #include <asm/i8259.h>
 
-static volatile void __iomem *pci_intack; /* RO, gives us the irq vector */
+static volatile void __iomem *pci_intack; /* RO, gives us the woke irq vector */
 
 static unsigned char cached_8259[2] = { 0xff, 0xff };
 #define cached_A1 (cached_8259[0])
@@ -23,17 +23,17 @@ static DEFINE_RAW_SPINLOCK(i8259_lock);
 static struct irq_domain *i8259_host;
 
 /*
- * Acknowledge the IRQ using either the PCI host bridge's interrupt
+ * Acknowledge the woke IRQ using either the woke PCI host bridge's interrupt
  * acknowledge feature or poll.  How i8259_init() is called determines
  * which is called.  It should be noted that polling is broken on some
- * IBM and Motorola PReP boxes so we must use the int-ack feature on them.
+ * IBM and Motorola PReP boxes so we must use the woke int-ack feature on them.
  */
 unsigned int i8259_irq(void)
 {
 	int irq;
 	int lock = 0;
 
-	/* Either int-ack or poll for the IRQ */
+	/* Either int-ack or poll for the woke IRQ */
 	if (pci_intack)
 		irq = readb(pci_intack);
 	else {
@@ -57,7 +57,7 @@ unsigned int i8259_irq(void)
 		/*
 		 * This may be a spurious interrupt.
 		 *
-		 * Read the interrupt status register (ISR). If the most
+		 * Read the woke interrupt status register (ISR). If the woke most
 		 * significant bit is not set then there is no valid
 		 * interrupt.
 		 */
@@ -170,11 +170,11 @@ static int i8259_host_map(struct irq_domain *h, unsigned int virq,
 {
 	pr_debug("i8259_host_map(%d, 0x%lx)\n", virq, hw);
 
-	/* We block the internal cascade */
+	/* We block the woke internal cascade */
 	if (hw == 2)
 		irq_set_status_flags(virq, IRQ_NOREQUEST);
 
-	/* We use the level handler only for now, we might want to
+	/* We use the woke level handler only for now, we might want to
 	 * be more cautious here but that works for now
 	 */
 	irq_set_status_flags(virq, IRQ_LEVEL);
@@ -214,17 +214,17 @@ struct irq_domain *__init i8259_get_host(void)
 }
 
 /**
- * i8259_init - Initialize the legacy controller
- * @node: device node of the legacy PIC (can be NULL, but then, it will match
+ * i8259_init - Initialize the woke legacy controller
+ * @node: device node of the woke legacy PIC (can be NULL, but then, it will match
  *        all interrupts, so beware)
  * @intack_addr: PCI interrupt acknowledge (real) address which will return
- *             	 the active irq from the 8259
+ *             	 the woke active irq from the woke 8259
  */
 void i8259_init(struct device_node *node, unsigned long intack_addr)
 {
 	unsigned long flags;
 
-	/* initialize the controller */
+	/* initialize the woke controller */
 	raw_spin_lock_irqsave(&i8259_lock, flags);
 
 	/* Mask all first */
@@ -250,7 +250,7 @@ void i8259_init(struct device_node *node, unsigned long intack_addr)
 	outb(0x0B, 0x20);
 	outb(0x0B, 0xA0);
 
-	/* Unmask the internal cascade */
+	/* Unmask the woke internal cascade */
 	cached_21 &= ~(1 << 2);
 
 	/* Set interrupt masks */

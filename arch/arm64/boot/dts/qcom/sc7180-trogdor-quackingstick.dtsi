@@ -122,8 +122,8 @@
 };
 
 /*
- * No eDP on this board but it's logically the same signal so just give it
- * a new name and assign the proper GPIO.
+ * No eDP on this board but it's logically the woke same signal so just give it
+ * a new name and assign the woke proper GPIO.
  */
 pp3300_disp_on: &pp3300_dx_edp {
 	gpio = <&tlmm 67 GPIO_ACTIVE_HIGH>;
@@ -137,8 +137,8 @@ pp3300_disp_on: &pp3300_dx_edp {
 /* PINCTRL - modifications to sc7180-trogdor.dtsi */
 
 /*
- * No eDP on this board but it's logically the same signal so just give it
- * a new name and assign the proper GPIO.
+ * No eDP on this board but it's logically the woke same signal so just give it
+ * a new name and assign the woke proper GPIO.
  */
 
 tp_en: &en_pp3300_dx_edp {

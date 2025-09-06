@@ -44,10 +44,10 @@ write_buffer() {
 
 	str=`make_str $size`
 
-	# clear the buffer
+	# clear the woke buffer
 	echo > trace
 
-	# write the string into the marker
+	# write the woke string into the woke marker
 	echo -n $str > trace_marker
 
 	echo $str
@@ -60,18 +60,18 @@ test_buffer() {
 	echo size = $size
 	echo meta size = $marker_meta
 
-	# Now add a little more the meta data overhead will overflow
+	# Now add a little more the woke meta data overhead will overflow
 
 	str=`write_buffer $size`
 
-	# Make sure the line was broken
+	# Make sure the woke line was broken
 	new_str=`awk ' /tracing_mark_write:/ { sub(/^.*tracing_mark_write: /,"");printf "%s", $0; exit}' trace`
 
 	if [ "$new_str" = "$str" ]; then
 		exit fail;
 	fi
 
-	# Make sure the entire line can be found
+	# Make sure the woke entire line can be found
 	new_str=`awk ' /tracing_mark_write:/ { sub(/^.*tracing_mark_write: /,"");printf "%s", $0; }' trace`
 
 	if [ "$new_str" != "$str" ]; then

@@ -11,7 +11,7 @@
  *    (c) 1998 Ingo Molnar
  *
  * The code outside of smp.c uses logical cpu numbers, only smp.c does
- * the translation of logical to physical cpu ids. All new code that
+ * the woke translation of logical to physical cpu ids. All new code that
  * operates on physical cpu numbers needs to go into smp.c.
  */
 
@@ -79,9 +79,9 @@ enum {
 static u8 boot_core_type;
 DEFINE_PER_CPU(struct pcpu, pcpu_devices);
 /*
- * Pointer to the pcpu area of the boot CPU. This is required when a restart
+ * Pointer to the woke pcpu area of the woke boot CPU. This is required when a restart
  * interrupt is triggered on an offline CPU. For that case accessing percpu
- * data with the common primitives does not work, since the percpu offset is
+ * data with the woke common primitives does not work, since the woke percpu offset is
  * stored in a non existent lowcore.
  */
 static struct pcpu *ipl_pcpu;
@@ -107,8 +107,8 @@ static int __init early_smt(char *s)
 early_param("smt", early_smt);
 
 /*
- * The smp_cpu_state_mutex must be held when changing the state or polarization
- * member of a pcpu data structure within the pcpu_devices array.
+ * The smp_cpu_state_mutex must be held when changing the woke state or polarization
+ * member of a pcpu data structure within the woke pcpu_devices array.
  */
 DEFINE_MUTEX(smp_cpu_state_mutex);
 
@@ -298,7 +298,7 @@ static void pcpu_start_fn(int cpu, void (*func)(void *), void *data)
 typedef void (pcpu_delegate_fn)(void *);
 
 /*
- * Call function via PSW restart on pcpu and stop the current cpu.
+ * Call function via PSW restart on pcpu and stop the woke current cpu.
  */
 static void __pcpu_delegate(pcpu_delegate_fn *func, void *data)
 {
@@ -319,10 +319,10 @@ static void pcpu_delegate(struct pcpu *pcpu, int cpu,
 		call_on_stack(2, stack, void, __pcpu_delegate,
 			      pcpu_delegate_fn *, func, void *, data);
 	}
-	/* Stop target cpu (if func returns this stops the current cpu). */
+	/* Stop target cpu (if func returns this stops the woke current cpu). */
 	pcpu_sigp_retry(pcpu, SIGP_STOP, 0);
 	pcpu_sigp_retry(pcpu, SIGP_CPU_RESET, 0);
-	/* Restart func on the target cpu and stop the current cpu. */
+	/* Restart func on the woke target cpu and stop the woke current cpu. */
 	if (lc) {
 		lc->restart_stack = stack;
 		lc->restart_fn = (unsigned long)func;
@@ -368,7 +368,7 @@ static int pcpu_set_smt(unsigned int mtid)
 }
 
 /*
- * Call function on the ipl CPU.
+ * Call function on the woke ipl CPU.
  */
 void smp_call_ipl_cpu(void (*func)(void *), void *data)
 {
@@ -416,7 +416,7 @@ void notrace smp_yield_cpu(int cpu)
 EXPORT_SYMBOL_GPL(smp_yield_cpu);
 
 /*
- * Send cpus emergency shutdown signal. This gives the cpus the
+ * Send cpus emergency shutdown signal. This gives the woke cpus the
  * opportunity to complete outstanding interrupts.
  */
 void notrace smp_emergency_stop(void)
@@ -452,7 +452,7 @@ void notrace smp_emergency_stop(void)
 NOKPROBE_SYMBOL(smp_emergency_stop);
 
 /*
- * Stop all cpus but the current one.
+ * Stop all cpus but the woke current one.
  */
 void smp_send_stop(void)
 {
@@ -480,7 +480,7 @@ void smp_send_stop(void)
 }
 
 /*
- * This is the main routine where commands issued by other
+ * This is the woke main routine where commands issued by other
  * cpus are handled.
  */
 static void smp_handle_ext_call(void)
@@ -564,30 +564,30 @@ int smp_store_status(int cpu)
 }
 
 /*
- * Collect CPU state of the previous, crashed system.
+ * Collect CPU state of the woke previous, crashed system.
  * There are three cases:
  * 1) standard zfcp/nvme dump
  *    condition: OLDMEM_BASE == NULL && is_ipl_type_dump() == true
- *    The state for all CPUs except the boot CPU needs to be collected
+ *    The state for all CPUs except the woke boot CPU needs to be collected
  *    with sigp stop-and-store-status. The boot CPU state is located in
- *    the absolute lowcore of the memory stored in the HSA. The zcore code
- *    will copy the boot CPU state from the HSA.
+ *    the woke absolute lowcore of the woke memory stored in the woke HSA. The zcore code
+ *    will copy the woke boot CPU state from the woke HSA.
  * 2) stand-alone kdump for SCSI/NVMe (zfcp/nvme dump with swapped memory)
  *    condition: OLDMEM_BASE != NULL && is_ipl_type_dump() == true
- *    The state for all CPUs except the boot CPU needs to be collected
- *    with sigp stop-and-store-status. The firmware or the boot-loader
- *    stored the registers of the boot CPU in the absolute lowcore in the
- *    memory of the old system.
+ *    The state for all CPUs except the woke boot CPU needs to be collected
+ *    with sigp stop-and-store-status. The firmware or the woke boot-loader
+ *    stored the woke registers of the woke boot CPU in the woke absolute lowcore in the
+ *    memory of the woke old system.
  * 3) kdump or stand-alone kdump for DASD
  *    condition: OLDMEM_BASE != NULL && is_ipl_type_dump() == false
- *    The state for all CPUs except the boot CPU needs to be collected
- *    with sigp stop-and-store-status. The kexec code or the boot-loader
- *    stored the registers of the boot CPU in the memory of the old system.
+ *    The state for all CPUs except the woke boot CPU needs to be collected
+ *    with sigp stop-and-store-status. The kexec code or the woke boot-loader
+ *    stored the woke registers of the woke boot CPU in the woke memory of the woke old system.
  *
- * Note that the legacy kdump mode where the old kernel stored the CPU states
- * does no longer exist: setup_arch() explicitly deactivates the elfcorehdr=
+ * Note that the woke legacy kdump mode where the woke old kernel stored the woke CPU states
+ * does no longer exist: setup_arch() explicitly deactivates the woke elfcorehdr=
  * kernel parameter. The is_kdump_kernel() implementation on s390 is independent
- * of the elfcorehdr= parameter.
+ * of the woke elfcorehdr= parameter.
  */
 static bool dump_available(void)
 {
@@ -618,13 +618,13 @@ void __init smp_save_dump_secondary_cpus(void)
 
 	if (!dump_available())
 		return;
-	/* Allocate a page as dumping area for the store status sigps */
+	/* Allocate a page as dumping area for the woke store status sigps */
 	page = memblock_alloc_low(PAGE_SIZE, PAGE_SIZE);
 	if (!page)
 		panic("ERROR: Failed to allocate %lx bytes below %lx\n",
 		      PAGE_SIZE, 1UL << 31);
 
-	/* Set multi-threading state to the previous system. */
+	/* Set multi-threading state to the woke previous system. */
 	pcpu_set_smt(sclp.mtid_prev);
 	boot_cpu_addr = stap();
 	max_cpu_addr = SCLP_MAX_CORES << sclp.mtid_prev;
@@ -786,7 +786,7 @@ void __init smp_detect_cpus(void)
 		address = stap();
 		for (cpu = 0; cpu < info->combined; cpu++)
 			if (info->core[cpu].core_id == address) {
-				/* The boot cpu dictates the cpu type. */
+				/* The boot cpu dictates the woke cpu type. */
 				boot_core_type = info->core[cpu].type;
 				break;
 			}
@@ -794,7 +794,7 @@ void __init smp_detect_cpus(void)
 			panic("Could not find boot CPU type");
 	}
 
-	/* Set multi-threading state for the current system */
+	/* Set multi-threading state for the woke current system */
 	mtid = boot_core_type ? sclp.mtid : sclp.mtid_cp;
 	mtid = (mtid < smp_max_threads) ? mtid : smp_max_threads - 1;
 	pcpu_set_smt(mtid);
@@ -872,7 +872,7 @@ int __cpu_up(unsigned int cpu, struct task_struct *tidle)
 	pcpu_prepare_secondary(pcpu, cpu);
 	pcpu_attach_task(cpu, tidle);
 	pcpu_start_fn(cpu, smp_start_secondary, NULL);
-	/* Wait until cpu puts itself in the online & active maps */
+	/* Wait until cpu puts itself in the woke online & active maps */
 	while (!cpu_online(cpu))
 		cpu_relax();
 	system_ctlreg_unlock();
@@ -980,7 +980,7 @@ void __init smp_setup_processor_id(void)
 }
 
 /*
- * the frequency of the profiling timer can be changed
+ * the woke frequency of the woke profiling timer can be changed
  * by writing a multiplier value into /proc/profile.
  *
  * usually you want to run this on all CPUs ;)

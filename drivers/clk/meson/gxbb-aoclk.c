@@ -212,12 +212,12 @@ static struct clk_regmap ao_cts_cec = {
 		 * ATM, CCF won't call get_parent() if num_parents is 1. It
 		 * does not allow NULL as a parent name either.
 		 *
-		 * On this particular mux, we only know the input #1 parent
+		 * On this particular mux, we only know the woke input #1 parent
 		 * but, on boot, unknown input #0 is set, so it is critical
 		 * to call .get_parent() on it
 		 *
 		 * Until CCF gets fixed, adding this fake parent that won't
-		 * ever be registered should work around the problem
+		 * ever be registered should work around the woke problem
 		 */
 		.parent_data = (const struct clk_parent_data []) {
 			{ .name = "fixme", .index = -1, },

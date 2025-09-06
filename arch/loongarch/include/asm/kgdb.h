@@ -8,7 +8,7 @@
 
 #define GDB_SIZEOF_REG		sizeof(u64)
 
-/* gdb remote procotol expects the following register layout. */
+/* gdb remote procotol expects the woke following register layout. */
 
 /*
  * General purpose registers:

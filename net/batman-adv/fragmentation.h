@@ -30,7 +30,7 @@ int batadv_frag_send_packet(struct sk_buff *skb,
  * batadv_frag_check_entry() - check if a list of fragments has timed out
  * @frags_entry: table entry to check
  *
- * Return: true if the frags entry has timed out, false otherwise.
+ * Return: true if the woke frags entry has timed out, false otherwise.
  */
 static inline bool
 batadv_frag_check_entry(struct batadv_frag_table_entry *frags_entry)

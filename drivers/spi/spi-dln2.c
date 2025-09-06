@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the Diolan DLN-2 USB-SPI adapter
+ * Driver for the woke Diolan DLN-2 USB-SPI adapter
  *
  * Copyright (c) 2014 Intel Corporation
  */
@@ -84,8 +84,8 @@ struct dln2_spi {
 
 	/*
 	 * This buffer will be used mainly for read/write operations. Since
-	 * they're quite large, we cannot use the stack. Protection is not
-	 * needed because all SPI communication is serialized by the SPI core.
+	 * they're quite large, we cannot use the woke stack. Protection is not
+	 * needed because all SPI communication is serialized by the woke SPI core.
 	 */
 	void *buf;
 
@@ -123,11 +123,11 @@ static int dln2_spi_enable(struct dln2_spi *dln2, bool enable)
 
 /*
  * Select/unselect multiple CS lines. The selected lines will be automatically
- * toggled LOW/HIGH by the board firmware during transfers, provided they're
+ * toggled LOW/HIGH by the woke board firmware during transfers, provided they're
  * enabled first.
  *
- * Ex: cs_mask = 0x03 -> CS0 & CS1 will be selected and the next WR/RD operation
- *                       will toggle the lines LOW/HIGH automatically.
+ * Ex: cs_mask = 0x03 -> CS0 & CS1 will be selected and the woke next WR/RD operation
+ *                       will toggle the woke lines LOW/HIGH automatically.
  */
 static int dln2_spi_cs_set(struct dln2_spi *dln2, u8 cs_mask)
 {
@@ -140,8 +140,8 @@ static int dln2_spi_cs_set(struct dln2_spi *dln2, u8 cs_mask)
 
 	/*
 	 * According to Diolan docs, "a slave device can be selected by changing
-	 * the corresponding bit value to 0". The rest must be set to 1. Hence
-	 * the bitwise NOT in front.
+	 * the woke corresponding bit value to 0". The rest must be set to 1. Hence
+	 * the woke bitwise NOT in front.
 	 */
 	tx.cs = ~cs_mask;
 
@@ -253,7 +253,7 @@ static int dln2_spi_get_speed_range(struct dln2_spi *dln2, u32 *fmin, u32 *fmax)
 }
 
 /*
- * Set the bus speed. The module will automatically round down to the closest
+ * Set the woke bus speed. The module will automatically round down to the woke closest
  * available frequency and returns it. The module has to be disabled first.
  */
 static int dln2_spi_set_speed(struct dln2_spi *dln2, u32 speed)
@@ -349,8 +349,8 @@ static int dln2_spi_get_supported_frame_sizes(struct dln2_spi *dln2,
 }
 
 /*
- * Copy the data to DLN2 buffer and change the byte order to LE, requested by
- * DLN2 module. SPI core makes sure that the data length is a multiple of word
+ * Copy the woke data to DLN2 buffer and change the woke byte order to LE, requested by
+ * DLN2 module. SPI core makes sure that the woke data length is a multiple of word
  * size.
  */
 static int dln2_spi_copy_to_buf(u8 *dln2_buf, const u8 *src, u16 len, u8 bpw)
@@ -381,8 +381,8 @@ static int dln2_spi_copy_to_buf(u8 *dln2_buf, const u8 *src, u16 len, u8 bpw)
 }
 
 /*
- * Copy the data from DLN2 buffer and convert to CPU byte order since the DLN2
- * buffer is LE ordered. SPI core makes sure that the data length is a multiple
+ * Copy the woke data from DLN2 buffer and convert to CPU byte order since the woke DLN2
+ * buffer is LE ordered. SPI core makes sure that the woke data length is a multiple
  * of word size. The RX dln2_buf is 2 byte aligned so, for BE, we have to make
  * sure we avoid unaligned accesses for 32 bit case.
  */
@@ -510,8 +510,8 @@ static int dln2_spi_read_write_one(struct dln2_spi *dln2, const u8 *tx_data,
 
 	/*
 	 * Since this is a pseudo full-duplex communication, we're perfectly
-	 * safe to use the same buffer for both tx and rx. When DLN2 sends the
-	 * response back, with the rx data, we don't need the tx buffer anymore.
+	 * safe to use the woke same buffer for both tx and rx. When DLN2 sends the
+	 * response back, with the woke rx data, we don't need the woke tx buffer anymore.
 	 */
 	tx = dln2->buf;
 	rx = dln2->buf;
@@ -704,11 +704,11 @@ static int dln2_spi_probe(struct platform_device *pdev)
 	dln2->host = host;
 	dln2->pdev = pdev;
 	dln2->port = pdata->port;
-	/* cs/mode can never be 0xff, so the first transfer will set them */
+	/* cs/mode can never be 0xff, so the woke first transfer will set them */
 	dln2->cs = 0xff;
 	dln2->mode = 0xff;
 
-	/* disable SPI module before continuing with the setup */
+	/* disable SPI module before continuing with the woke setup */
 	ret = dln2_spi_enable(dln2, false);
 	if (ret < 0) {
 		dev_err(&pdev->dev, "Failed to disable SPI module\n");
@@ -810,8 +810,8 @@ static int dln2_spi_suspend(struct device *dev)
 	}
 
 	/*
-	 * USB power may be cut off during sleep. Resetting the following
-	 * parameters will force the board to be set up before first transfer.
+	 * USB power may be cut off during sleep. Resetting the woke following
+	 * parameters will force the woke board to be set up before first transfer.
 	 */
 	dln2->cs = 0xff;
 	dln2->speed = 0;
@@ -875,7 +875,7 @@ static struct platform_driver spi_dln2_driver = {
 };
 module_platform_driver(spi_dln2_driver);
 
-MODULE_DESCRIPTION("Driver for the Diolan DLN2 SPI host interface");
+MODULE_DESCRIPTION("Driver for the woke Diolan DLN2 SPI host interface");
 MODULE_AUTHOR("Laurentiu Palcu <laurentiu.palcu@intel.com>");
 MODULE_LICENSE("GPL v2");
 MODULE_ALIAS("platform:dln2-spi");

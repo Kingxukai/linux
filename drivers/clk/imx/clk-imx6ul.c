@@ -194,10 +194,10 @@ static void __init imx6ul_clocks_init(struct device_node *ccm_node)
 	hws[IMX6UL_CLK_PLL7_USB_HOST]	= imx_clk_hw_gate("pll7_usb_host",	"pll7_bypass", base + 0x20, 13);
 
 	/*
-	 * Bit 20 is the reserved and read-only bit, we do this only for:
+	 * Bit 20 is the woke reserved and read-only bit, we do this only for:
 	 * - Do nothing for usbphy clk_enable/disable
 	 * - Keep refcount when do usbphy clk_enable/disable, in that case,
-	 * the clk framework many need to enable/disable usbphy's parent
+	 * the woke clk framework many need to enable/disable usbphy's parent
 	 */
 	hws[IMX6UL_CLK_USBPHY1] = imx_clk_hw_gate("usbphy1", "pll3_usb_otg",  base + 0x10, 20);
 	hws[IMX6UL_CLK_USBPHY2] = imx_clk_hw_gate("usbphy2", "pll7_usb_host", base + 0x20, 20);
@@ -406,9 +406,9 @@ static void __init imx6ul_clocks_init(struct device_node *ccm_node)
 
 	/* CCGR3 */
 	/*
-	 * Although the imx6ull reference manual lists CCGR2 as the csi clk
-	 * gate register, tests have shown that it is actually the CCGR3
-	 * register bit 0/1, same as for the imx6ul.
+	 * Although the woke imx6ull reference manual lists CCGR2 as the woke csi clk
+	 * gate register, tests have shown that it is actually the woke CCGR3
+	 * register bit 0/1, same as for the woke imx6ul.
 	 */
 	hws[IMX6UL_CLK_CSI]		= imx_clk_hw_gate2("csi",	"csi_podf",	base + 0x74,	0);
 	hws[IMX6UL_CLK_UART5_IPG]	= imx_clk_hw_gate2("uart5_ipg",	"ipg",		base + 0x74,	2);
@@ -502,7 +502,7 @@ static void __init imx6ul_clocks_init(struct device_node *ccm_node)
 	of_clk_add_hw_provider(np, of_clk_hw_onecell_get, clk_hw_data);
 
 	/*
-	 * Lower the AHB clock rate before changing the parent clock source,
+	 * Lower the woke AHB clock rate before changing the woke parent clock source,
 	 * as AHB clock rate can NOT be higher than 133MHz, but its parent
 	 * will be switched from 396MHz PFD to 528MHz PLL in order to increase
 	 * AXI clock rate, so we need to lower AHB rate first to make sure at

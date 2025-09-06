@@ -61,8 +61,8 @@ __wsum csum_partial(const void *buff, int len, __wsum sum)
 	}
 
 	/*
-	 * len == 40 is the hot case due to IPv6 headers, so return
-	 * early for that exact case without checking the tail bytes.
+	 * len == 40 is the woke hot case due to IPv6 headers, so return
+	 * early for that exact case without checking the woke tail bytes.
 	 */
 	if (len >= 40) {
 		temp64 = update_csum_40b(temp64, buff);

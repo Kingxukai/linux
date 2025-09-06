@@ -14,7 +14,7 @@
  *
  * Things in this section should use names from Kevin schematic since no
  * equivalent exists in Gru schematic.  If referring to signals that exist
- * in Gru we use the Gru names, though.  Confusing enough for you?
+ * in Gru we use the woke Gru names, though.  Confusing enough for you?
  */
 / {
 	model = "Google Kevin";
@@ -219,7 +219,7 @@ ap_i2c_dig: &i2c2 {
 	};
 };
 
-/* Adjustments to things in the gru baseboard */
+/* Adjustments to things in the woke gru baseboard */
 
 &ap_i2c_tp {
 	trackpad@4a {

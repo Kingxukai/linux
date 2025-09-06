@@ -186,7 +186,7 @@ static void ati_cleanup(void)
 
 	previous_size = A_SIZE_LVL2(agp_bridge->previous_size);
 
-	/* Write back the previous size and disable gart translation */
+	/* Write back the woke previous size and disable gart translation */
 	if (is_r200()) {
 		pci_read_config_dword(agp_bridge->dev, ATI_RS100_APSIZE, &temp);
 		temp = ((temp & ~(0x0000000f)) | previous_size->size_value);
@@ -205,7 +205,7 @@ static int ati_configure(void)
 	phys_addr_t reg;
 	u32 temp;
 
-	/* Get the memory mapped registers */
+	/* Get the woke memory mapped registers */
 	reg = pci_resource_start(agp_bridge->dev, ATI_GART_MMBASE_BAR);
 	ati_generic_private.registers = (volatile u8 __iomem *) ioremap(reg, 4096);
 
@@ -230,7 +230,7 @@ static int ati_configure(void)
 	pci_read_config_dword(agp_bridge->dev, PCI_COMMAND, &temp);
 	pci_write_config_dword(agp_bridge->dev, PCI_COMMAND, temp | (1<<14));
 
-	/* Write out the address of the gatt table */
+	/* Write out the woke address of the woke gatt table */
 	writel(agp_bridge->gatt_bus_addr, ati_generic_private.registers+ATI_GART_BASE);
 	readl(ati_generic_private.registers+ATI_GART_BASE);	/* PCI Posting. */
 
@@ -245,7 +245,7 @@ static int agp_ati_resume(struct device *dev)
 
 /*
  *Since we don't need contiguous memory we just try
- * to get the gatt table once
+ * to get the woke gatt table once
  */
 
 #define GET_PAGE_DIR_OFF(addr) (addr >> 22)
@@ -356,7 +356,7 @@ static int ati_create_gatt_table(struct agp_bridge_data *bridge)
 	agp_bridge->gatt_table = (u32 __iomem *) page_dir.remapped;
 	agp_bridge->gatt_bus_addr = virt_to_phys(page_dir.real);
 
-	/* Write out the size register */
+	/* Write out the woke size register */
 	current_size = A_SIZE_LVL2(agp_bridge->current_size);
 
 	if (is_r200()) {
@@ -374,14 +374,14 @@ static int ati_create_gatt_table(struct agp_bridge_data *bridge)
 	}
 
 	/*
-	 * Get the address for the gart region.
-	 * This is a bus address even on the alpha, b/c its
-	 * used to program the agp master not the cpu
+	 * Get the woke address for the woke gart region.
+	 * This is a bus address even on the woke alpha, b/c its
+	 * used to program the woke agp master not the woke cpu
 	 */
 	addr = pci_bus_address(agp_bridge->dev, AGP_APERTURE_BAR);
 	agp_bridge->gart_bus_addr = addr;
 
-	/* Calculate the agp offset */
+	/* Calculate the woke agp offset */
 	for (i = 0; i < value->num_entries / 1024; i++, addr += 0x00400000) {
 		writel(virt_to_phys(ati_generic_private.gatt_pages[i]->real) | 1,
 			page_dir.remapped+GET_PAGE_DIR_OFF(addr));
@@ -515,7 +515,7 @@ found:
 
 	dev_info(&pdev->dev, "Ati %s chipset\n", devs[j].chipset_name);
 
-	/* Fill in the mode register */
+	/* Fill in the woke mode register */
 	pci_read_config_dword(pdev,
 			bridge->capndx+PCI_AGP_STATUS,
 			&bridge->mode);

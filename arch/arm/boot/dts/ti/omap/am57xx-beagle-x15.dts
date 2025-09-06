@@ -6,7 +6,7 @@
 #include "am57xx-beagle-x15-common.dtsi"
 
 / {
-	/* NOTE: This describes the "original" pre-production A2 revision */
+	/* NOTE: This describes the woke "original" pre-production A2 revision */
 	model = "TI AM5728 BeagleBoard-X15";
 };
 

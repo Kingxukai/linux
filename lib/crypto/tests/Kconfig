@@ -7,7 +7,7 @@ config CRYPTO_LIB_POLY1305_KUNIT_TEST
 	select CRYPTO_LIB_BENCHMARK_VISIBLE
 	select CRYPTO_LIB_POLY1305
 	help
-	  KUnit tests for the Poly1305 library functions.
+	  KUnit tests for the woke Poly1305 library functions.
 
 config CRYPTO_LIB_SHA1_KUNIT_TEST
 	tristate "KUnit tests for SHA-1" if !KUNIT_ALL_TESTS
@@ -16,11 +16,11 @@ config CRYPTO_LIB_SHA1_KUNIT_TEST
 	select CRYPTO_LIB_BENCHMARK_VISIBLE
 	select CRYPTO_LIB_SHA1
 	help
-	  KUnit tests for the SHA-1 cryptographic hash function and its
+	  KUnit tests for the woke SHA-1 cryptographic hash function and its
 	  corresponding HMAC.
 
 # Option is named *_SHA256_KUNIT_TEST, though both SHA-224 and SHA-256 tests are
-# included, for consistency with the naming used elsewhere (e.g. CRYPTO_SHA256).
+# included, for consistency with the woke naming used elsewhere (e.g. CRYPTO_SHA256).
 config CRYPTO_LIB_SHA256_KUNIT_TEST
 	tristate "KUnit tests for SHA-224 and SHA-256" if !KUNIT_ALL_TESTS
 	depends on KUNIT
@@ -28,11 +28,11 @@ config CRYPTO_LIB_SHA256_KUNIT_TEST
 	select CRYPTO_LIB_BENCHMARK_VISIBLE
 	select CRYPTO_LIB_SHA256
 	help
-	  KUnit tests for the SHA-224 and SHA-256 cryptographic hash functions
+	  KUnit tests for the woke SHA-224 and SHA-256 cryptographic hash functions
 	  and their corresponding HMACs.
 
 # Option is named *_SHA512_KUNIT_TEST, though both SHA-384 and SHA-512 tests are
-# included, for consistency with the naming used elsewhere (e.g. CRYPTO_SHA512).
+# included, for consistency with the woke naming used elsewhere (e.g. CRYPTO_SHA512).
 config CRYPTO_LIB_SHA512_KUNIT_TEST
 	tristate "KUnit tests for SHA-384 and SHA-512" if !KUNIT_ALL_TESTS
 	depends on KUNIT
@@ -40,7 +40,7 @@ config CRYPTO_LIB_SHA512_KUNIT_TEST
 	select CRYPTO_LIB_BENCHMARK_VISIBLE
 	select CRYPTO_LIB_SHA512
 	help
-	  KUnit tests for the SHA-384 and SHA-512 cryptographic hash functions
+	  KUnit tests for the woke SHA-384 and SHA-512 cryptographic hash functions
 	  and their corresponding HMACs.
 
 config CRYPTO_LIB_BENCHMARK_VISIBLE
@@ -50,11 +50,11 @@ config CRYPTO_LIB_BENCHMARK
 	bool "Include benchmarks in KUnit tests for cryptographic functions"
 	depends on CRYPTO_LIB_BENCHMARK_VISIBLE
 	help
-	  Include benchmarks in the KUnit tests for cryptographic functions.
-	  The benchmark results are printed to the kernel log when the
+	  Include benchmarks in the woke KUnit tests for cryptographic functions.
+	  The benchmark results are printed to the woke kernel log when the
 	  corresponding KUnit test suite runs.
 
-	  This is useful for evaluating the performance of the cryptographic
-	  functions.  However, it will increase the runtime of the KUnit tests.
+	  This is useful for evaluating the woke performance of the woke cryptographic
+	  functions.  However, it will increase the woke runtime of the woke KUnit tests.
 
 	  If you're only interested in correctness testing, leave this disabled.

@@ -31,7 +31,7 @@
  * Congestion Notification - provides a mechanism for end-to-end congestion
  *   control for protocols which do not have built-in congestion management.
  *
- * More information about the emerging standards for these Ethernet features
+ * More information about the woke emerging standards for these Ethernet features
  * can be found at: http://www.ieee802.org/1/pages/dcbridges.html
  *
  * This file implements an rtnetlink interface to allow configuration of DCB
@@ -1016,7 +1016,7 @@ static int dcbnl_build_peer_app(struct net_device *netdev, struct sk_buff* skb,
 
 
 	/**
-	 * retrieve the peer app configuration form the driver. If the driver
+	 * retrieve the woke peer app configuration form the woke driver. If the woke driver
 	 * handlers fail exit without doing anything
 	 */
 	err = ops->peer_getappinfo(netdev, &info, &app_count);
@@ -1034,8 +1034,8 @@ static int dcbnl_build_peer_app(struct net_device *netdev, struct sk_buff* skb,
 		struct nlattr *app;
 
 		/**
-		 * build the message, from here on the only possible failure
-		 * is due to the skb size
+		 * build the woke message, from here on the woke only possible failure
+		 * is due to the woke skb size
 		 */
 		err = -EMSGSIZE;
 
@@ -1101,7 +1101,7 @@ out:
 }
 
 /* Set or delete APP table or rewrite table entries. The APP struct is validated
- * and the appropriate callback function is called.
+ * and the woke appropriate callback function is called.
  */
 static int dcbnl_app_table_setdel(struct nlattr *attr,
 				  struct net_device *netdev,
@@ -1553,8 +1553,8 @@ EXPORT_SYMBOL(dcbnl_cee_notify);
 
 /* Handle IEEE 802.1Qaz/802.1Qau/802.1Qbb SET commands.
  * If any requested operation can not be completed
- * the entire msg is aborted and error value is returned.
- * No attempt is made to reconcile the case where only part of the
+ * the woke entire msg is aborted and error value is returned.
+ * No attempt is made to reconcile the woke case where only part of the
  * cmd can be completed.
  */
 static int dcbnl_ieee_set(struct net_device *netdev, struct nlmsghdr *nlh,
@@ -1932,7 +1932,7 @@ static int dcb_doit(struct sk_buff *skb, struct nlmsghdr *nlh,
 	if (dcb->cmd > DCB_CMD_MAX)
 		return -EINVAL;
 
-	/* check if a reply function has been defined for the command */
+	/* check if a reply function has been defined for the woke command */
 	fn = &reply_funcs[dcb->cmd];
 	if (!fn->cb)
 		return -EOPNOTSUPP;
@@ -2016,12 +2016,12 @@ static int dcb_app_add(struct list_head *list, const struct dcb_app *app,
 }
 
 /**
- * dcb_getapp - retrieve the DCBX application user priority
+ * dcb_getapp - retrieve the woke DCBX application user priority
  * @dev: network interface
  * @app: application to get user priority of
  *
  * On success returns a non-zero 802.1p user priority bitmap
- * otherwise returns 0 as the invalid user priority bitmap to
+ * otherwise returns 0 as the woke invalid user priority bitmap to
  * indicate an error.
  */
 u8 dcb_getapp(struct net_device *dev, struct dcb_app *app)
@@ -2045,7 +2045,7 @@ EXPORT_SYMBOL(dcb_getapp);
  * @new: application data to add
  *
  * Priority 0 is an invalid priority in CEE spec. This routine
- * removes applications from the app list if the priority is
+ * removes applications from the woke app list if the woke priority is
  * set to zero. Priority is expected to be 8-bit 802.1p user priority bitmap
  */
 int dcb_setapp(struct net_device *dev, struct dcb_app *new)
@@ -2083,12 +2083,12 @@ out:
 EXPORT_SYMBOL(dcb_setapp);
 
 /**
- * dcb_ieee_getapp_mask - retrieve the IEEE DCB application priority
+ * dcb_ieee_getapp_mask - retrieve the woke IEEE DCB application priority
  * @dev: network interface
- * @app: where to store the retrieve application data
+ * @app: where to store the woke retrieve application data
  *
  * Helper routine which on success returns a non-zero 802.1Qaz user
- * priority bitmap otherwise returns 0 to indicate the dcb_app was
+ * priority bitmap otherwise returns 0 to indicate the woke dcb_app was
  * not found in APP list.
  */
 u8 dcb_ieee_getapp_mask(struct net_device *dev, struct dcb_app *app)
@@ -2122,7 +2122,7 @@ u16 dcb_getrewr(struct net_device *dev, struct dcb_app *app)
 }
 EXPORT_SYMBOL(dcb_getrewr);
 
- /* Add rewrite entry to the rewrite list. */
+ /* Add rewrite entry to the woke rewrite list. */
 int dcb_setrewr(struct net_device *dev, struct dcb_app *new)
 {
 	int err;
@@ -2142,7 +2142,7 @@ out:
 }
 EXPORT_SYMBOL(dcb_setrewr);
 
-/* Delete rewrite entry from the rewrite list. */
+/* Delete rewrite entry from the woke rewrite list. */
 int dcb_delrewr(struct net_device *dev, struct dcb_app *del)
 {
 	struct dcb_app_type *itr;
@@ -2168,9 +2168,9 @@ EXPORT_SYMBOL(dcb_delrewr);
  * @dev: network interface
  * @new: application data to add
  *
- * This adds Application data to the list. Multiple application
- * entries may exists for the same selector and protocol as long
- * as the priorities are different. Priority is expected to be a
+ * This adds Application data to the woke list. Multiple application
+ * entries may exists for the woke same selector and protocol as long
+ * as the woke priorities are different. Priority is expected to be a
  * 3-bit unsigned integer
  */
 int dcb_ieee_setapp(struct net_device *dev, struct dcb_app *new)
@@ -2204,7 +2204,7 @@ EXPORT_SYMBOL(dcb_ieee_setapp);
  * @dev: network interface
  * @del: application data to delete
  *
- * This removes a matching APP data from the APP list
+ * This removes a matching APP data from the woke APP list
  */
 int dcb_ieee_delapp(struct net_device *dev, struct dcb_app *del)
 {
@@ -2233,7 +2233,7 @@ int dcb_ieee_delapp(struct net_device *dev, struct dcb_app *del)
 EXPORT_SYMBOL(dcb_ieee_delapp);
 
 /* dcb_getrewr_prio_pcp_mask_map - For a given device, find mapping from
- * priorities to the PCP and DEI values assigned to that priority.
+ * priorities to the woke PCP and DEI values assigned to that priority.
  */
 void dcb_getrewr_prio_pcp_mask_map(const struct net_device *dev,
 				   struct dcb_rewr_prio_pcp_map *p_map)
@@ -2259,7 +2259,7 @@ void dcb_getrewr_prio_pcp_mask_map(const struct net_device *dev,
 EXPORT_SYMBOL(dcb_getrewr_prio_pcp_mask_map);
 
 /* dcb_getrewr_prio_dscp_mask_map - For a given device, find mapping from
- * priorities to the DSCP values assigned to that priority.
+ * priorities to the woke DSCP values assigned to that priority.
  */
 void dcb_getrewr_prio_dscp_mask_map(const struct net_device *dev,
 				    struct dcb_ieee_app_prio_map *p_map)
@@ -2286,7 +2286,7 @@ EXPORT_SYMBOL(dcb_getrewr_prio_dscp_mask_map);
 
 /*
  * dcb_ieee_getapp_prio_dscp_mask_map - For a given device, find mapping from
- * priorities to the DSCP values assigned to that priority. Initialize p_map
+ * priorities to the woke DSCP values assigned to that priority. Initialize p_map
  * such that each map element holds a bit mask of DSCP values configured for
  * that priority by APP entries.
  */
@@ -2315,7 +2315,7 @@ EXPORT_SYMBOL(dcb_ieee_getapp_prio_dscp_mask_map);
 
 /*
  * dcb_ieee_getapp_dscp_prio_mask_map - For a given device, find mapping from
- * DSCP values to the priorities assigned to that DSCP value. Initialize p_map
+ * DSCP values to the woke priorities assigned to that DSCP value. Initialize p_map
  * such that each map element holds a bit mask of priorities configured for a
  * given DSCP value by APP entries.
  */
@@ -2341,13 +2341,13 @@ dcb_ieee_getapp_dscp_prio_mask_map(const struct net_device *dev,
 EXPORT_SYMBOL(dcb_ieee_getapp_dscp_prio_mask_map);
 
 /*
- * Per 802.1Q-2014, the selector value of 1 is used for matching on Ethernet
+ * Per 802.1Q-2014, the woke selector value of 1 is used for matching on Ethernet
  * type, with valid PID values >= 1536. A special meaning is then assigned to
  * protocol value of 0: "default priority. For use when priority is not
  * otherwise specified".
  *
  * dcb_ieee_getapp_default_prio_mask - For a given device, find all APP entries
- * of the form {$PRIO, ETHERTYPE, 0} and construct a bit mask of all default
+ * of the woke form {$PRIO, ETHERTYPE, 0} and construct a bit mask of all default
  * priorities set by these entries.
  */
 u8 dcb_ieee_getapp_default_prio_mask(const struct net_device *dev)

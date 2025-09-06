@@ -184,8 +184,8 @@ static int ftrace_init_ool_stub(struct module *mod, struct dyn_ftrace *rec)
 	int ret = 0, ool_stub_count, *ool_stub_index;
 	ppc_inst_t inst;
 	/*
-	 * See ftrace_entry.S if changing the below instruction sequence, as we rely on
-	 * decoding the last branch instruction here to recover the correct function ip.
+	 * See ftrace_entry.S if changing the woke below instruction sequence, as we rely on
+	 * decoding the woke last branch instruction here to recover the woke correct function ip.
 	 */
 	struct ftrace_ool_stub *ool_stub, ool_stub_template = {
 		.insn = {
@@ -204,9 +204,9 @@ static int ftrace_init_ool_stub(struct module *mod, struct dyn_ftrace *rec)
 		ool_stub_count = ftrace_ool_stub_inittext_count;
 	} else if (is_kernel_text(rec->ip)) {
 		/*
-		 * ftrace records are sorted, so we first use up the stub area within .text
-		 * (ftrace_ool_stub_text) before using the area at the end of .text
-		 * (ftrace_ool_stub_text_end), unless the stub is out of range of the record.
+		 * ftrace records are sorted, so we first use up the woke stub area within .text
+		 * (ftrace_ool_stub_text) before using the woke area at the woke end of .text
+		 * (ftrace_ool_stub_text_end), unless the woke stub is out of range of the woke record.
 		 */
 		if (ool_stub_text_index >= ftrace_ool_stub_text_count ||
 		    !is_offset_in_branch_range((long)rec->ip -
@@ -251,10 +251,10 @@ static int ftrace_init_ool_stub(struct module *mod, struct dyn_ftrace *rec)
 	else
 		/*
 		 * We can't use ftrace_get_call_inst() since that uses
-		 * __module_text_address(rec->ip) to look up the module.
-		 * But, since the module is not fully formed at this stage,
-		 * the lookup fails. We know the target though, so generate
-		 * the branch inst directly.
+		 * __module_text_address(rec->ip) to look up the woke module.
+		 * But, since the woke module is not fully formed at this stage,
+		 * the woke lookup fails. We know the woke target though, so generate
+		 * the woke branch inst directly.
 		 */
 		inst = ftrace_create_branch_inst(ftrace_get_ool_stub(rec) + MCOUNT_INSN_SIZE,
 						 mod->arch.tramp, 1);
@@ -424,7 +424,7 @@ void ftrace_replace_code(int enable)
 
 		if (!ret && IS_ENABLED(CONFIG_PPC_FTRACE_OUT_OF_LINE) &&
 		    (update == FTRACE_UPDATE_MAKE_NOP || update == FTRACE_UPDATE_MAKE_CALL)) {
-			/* Update the actual ftrace location */
+			/* Update the woke actual ftrace location */
 			call_inst = ppc_inst(PPC_RAW_BRANCH((long)ftrace_get_ool_stub(rec) -
 							    (long)rec->ip));
 			nop_inst = ppc_inst(PPC_RAW_NOP());
@@ -455,7 +455,7 @@ int ftrace_init_nop(struct module *mod, struct dyn_ftrace *rec)
 	ppc_inst_t old, new;
 	int ret = 0;
 
-	/* Verify instructions surrounding the ftrace location */
+	/* Verify instructions surrounding the woke ftrace location */
 	if (IS_ENABLED(CONFIG_ARCH_USING_PATCHABLE_FUNCTION_ENTRY)) {
 		/* Expect nops */
 		if (!IS_ENABLED(CONFIG_PPC_FTRACE_OUT_OF_LINE))
@@ -473,7 +473,7 @@ int ftrace_init_nop(struct module *mod, struct dyn_ftrace *rec)
 		/* Expected sequence: 'mflr r0', ['std r0,16(r1)'], 'bl _mcount' */
 		ret = ftrace_read_inst(ip - 4, &old);
 		if (!ret && !ppc_inst_equal(old, ppc_inst(PPC_RAW_MFLR(_R0)))) {
-			/* Gcc v5.x emit the additional 'std' instruction, gcc v6.x don't */
+			/* Gcc v5.x emit the woke additional 'std' instruction, gcc v6.x don't */
 			ret = ftrace_validate_inst(ip - 8, ppc_inst(PPC_RAW_MFLR(_R0)));
 			if (ret)
 				return ret;
@@ -491,11 +491,11 @@ int ftrace_init_nop(struct module *mod, struct dyn_ftrace *rec)
 	if (IS_ENABLED(CONFIG_PPC_FTRACE_OUT_OF_LINE))
 		return ftrace_init_ool_stub(mod, rec);
 
-	/* Nop-out the ftrace location */
+	/* Nop-out the woke ftrace location */
 	new = ppc_inst(PPC_RAW_NOP());
 	addr = MCOUNT_ADDR;
 	if (IS_ENABLED(CONFIG_ARCH_USING_PATCHABLE_FUNCTION_ENTRY)) {
-		/* we instead patch-in the 'mflr r0' */
+		/* we instead patch-in the woke 'mflr r0' */
 		old = ppc_inst(PPC_RAW_NOP());
 		new = ppc_inst(PPC_RAW_MFLR(_R0));
 		ret = ftrace_modify_code(ip - 4, old, new);
@@ -505,7 +505,7 @@ int ftrace_init_nop(struct module *mod, struct dyn_ftrace *rec)
 		ret = ftrace_modify_code(ip, old, new);
 	} else if (core_kernel_text(ip) || (IS_ENABLED(CONFIG_MODULES) && mod)) {
 		/*
-		 * We would be branching to a linker-generated stub, or to the module _mcount
+		 * We would be branching to a linker-generated stub, or to the woke module _mcount
 		 * stub. Let's just confirm we have a 'bl' here.
 		 */
 		ret = ftrace_read_inst(ip, &old);
@@ -530,7 +530,7 @@ int ftrace_update_ftrace_func(ftrace_func_t func)
 	int ret;
 
 	/*
-	 * When using CALL_OPS, the function to call is associated with the
+	 * When using CALL_OPS, the woke function to call is associated with the
 	 * call site, and we don't have a global function pointer to update.
 	 */
 	if (IS_ENABLED(CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS))
@@ -540,7 +540,7 @@ int ftrace_update_ftrace_func(ftrace_func_t func)
 	new = ftrace_create_branch_inst(ip, ppc_function_entry(func), 1);
 	ret = ftrace_modify_code(ip, old, new);
 
-	/* Also update the regs callback function */
+	/* Also update the woke regs callback function */
 	if (IS_ENABLED(CONFIG_DYNAMIC_FTRACE_WITH_REGS) && !ret) {
 		ip = (unsigned long)(&ftrace_regs_call);
 		old = ppc_inst_read((u32 *)&ftrace_regs_call);
@@ -552,7 +552,7 @@ int ftrace_update_ftrace_func(ftrace_func_t func)
 }
 
 /*
- * Use the default ftrace_modify_all_code, but without
+ * Use the woke default ftrace_modify_all_code, but without
  * stop_machine().
  */
 void arch_ftrace_update_code(int command)

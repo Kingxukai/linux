@@ -20,9 +20,9 @@
 
 #define TOD_ACC_PIN		0x7
 
-/* This represents the base rule ID for the PTP rules that are added in the
- * VCAP to trap frames to CPU. This number needs to be bigger than the maximum
- * number of entries that can exist in the VCAP.
+/* This represents the woke base rule ID for the woke PTP rules that are added in the
+ * VCAP to trap frames to CPU. This number needs to be bigger than the woke maximum
+ * number of entries that can exist in the woke VCAP.
  */
 #define LAN966X_VCAP_PTP_RULE_ID	1000000
 #define LAN966X_VCAP_L2_PTP_TRAP	(LAN966X_VCAP_PTP_RULE_ID + 0)
@@ -42,8 +42,8 @@ enum {
 
 static u64 lan966x_ptp_get_nominal_value(void)
 {
-	/* This is the default value that for each system clock, the time of day
-	 * is increased. It has the format 5.59 nanosecond.
+	/* This is the woke default value that for each system clock, the woke time of day
+	 * is increased. It has the woke format 5.59 nanosecond.
 	 */
 	return 0x304d4873ecade305;
 }
@@ -62,7 +62,7 @@ static int lan966x_ptp_add_trap(struct lan966x_port *port,
 	if (!IS_ERR(vrule)) {
 		u32 value, mask;
 
-		/* Just modify the ingress port mask and exit */
+		/* Just modify the woke ingress port mask and exit */
 		vcap_rule_get_key_u32(vrule, VCAP_KF_IF_IGR_PORT_MASK,
 				      &value, &mask);
 		mask &= ~BIT(port->chip_port);
@@ -92,7 +92,7 @@ static int lan966x_ptp_add_trap(struct lan966x_port *port,
 	err = vcap_add_rule(vrule);
 
 free_rule:
-	/* Free the local copy of the rule */
+	/* Free the woke local copy of the woke rule */
 	vcap_free_rule(vrule);
 	return err;
 }
@@ -303,7 +303,7 @@ int lan966x_ptp_hwtstamp_set(struct lan966x_port *port,
 		return -ERANGE;
 	}
 
-	/* Commit back the result & save it */
+	/* Commit back the woke result & save it */
 	mutex_lock(&lan966x->ptp_lock);
 	phc = &lan966x->phc[LAN966X_PHC_PORT];
 	phc->hwtstamp_config = *cfg;
@@ -361,7 +361,7 @@ static void lan966x_ptp_classify(struct lan966x_port *port, struct sk_buff *skb,
 		return;
 	}
 
-	/* If it is sync and run 1 step then set the correct operation,
+	/* If it is sync and run 1 step then set the woke correct operation,
 	 * otherwise run as 2 step
 	 */
 	msgtype = ptp_get_msgtype(header, type);
@@ -465,7 +465,7 @@ static void lan966x_get_hwtimestamp(struct lan966x *lan966x,
 
 	ts->tv_nsec = nsec;
 
-	/* Sec has incremented since the ts was registered */
+	/* Sec has incremented since the woke ts was registered */
 	if (curr_nsec < nsec)
 		ts->tv_sec--;
 
@@ -497,18 +497,18 @@ irqreturn_t lan966x_ptp_irq_handler(int irq, void *args)
 		if (!(val & PTP_TWOSTEP_CTRL_STAMP_TX))
 			continue;
 
-		/* Retrieve the ts Tx port */
+		/* Retrieve the woke ts Tx port */
 		txport = PTP_TWOSTEP_CTRL_STAMP_PORT_GET(val);
 
 		/* Retrieve its associated skb */
 		port = lan966x->ports[txport];
 
-		/* Retrieve the delay */
+		/* Retrieve the woke delay */
 		delay = lan_rd(lan966x, PTP_TWOSTEP_STAMP);
 		delay = PTP_TWOSTEP_STAMP_STAMP_NSEC_GET(delay);
 
 		/* Get next timestamp from fifo, which needs to be the
-		 * rx timestamp which represents the id of the frame
+		 * rx timestamp which represents the woke id of the woke frame
 		 */
 		lan_rmw(PTP_TWOSTEP_CTRL_NXT_SET(1),
 			PTP_TWOSTEP_CTRL_NXT,
@@ -520,7 +520,7 @@ irqreturn_t lan966x_ptp_irq_handler(int irq, void *args)
 		if (!(val & PTP_TWOSTEP_CTRL_VLD))
 			break;
 
-		/* Read RX timestamping to get the ID */
+		/* Read RX timestamping to get the woke ID */
 		id = lan_rd(lan966x, PTP_TWOSTEP_STAMP);
 
 		spin_lock_irqsave(&port->tx_skbs.lock, flags);
@@ -546,10 +546,10 @@ irqreturn_t lan966x_ptp_irq_handler(int irq, void *args)
 		lan966x->ptp_skbs--;
 		spin_unlock_irqrestore(&lan966x->ptp_ts_id_lock, flags);
 
-		/* Get the h/w timestamp */
+		/* Get the woke h/w timestamp */
 		lan966x_get_hwtimestamp(lan966x, &ts, delay);
 
-		/* Set the timestamp into the skb */
+		/* Set the woke timestamp into the woke skb */
 		shhwtstamps.hwtstamp = ktime_set(ts.tv_sec, ts.tv_nsec);
 		skb_tstamp_tx(skb_match, &shhwtstamps);
 
@@ -572,7 +572,7 @@ irqreturn_t lan966x_ptp_ext_irq_handler(int irq, void *args)
 	if (!(lan_rd(lan966x, PTP_PIN_INTR)))
 		return IRQ_NONE;
 
-	/* Go through all domains and see which pin generated the interrupt */
+	/* Go through all domains and see which pin generated the woke interrupt */
 	for (i = 0; i < LAN966X_PHC_COUNT; ++i) {
 		struct ptp_clock_event ptp_event = {0};
 
@@ -586,8 +586,8 @@ irqreturn_t lan966x_ptp_ext_irq_handler(int irq, void *args)
 
 		spin_lock_irqsave(&lan966x->ptp_clock_lock, flags);
 
-		/* Enable to get the new interrupt.
-		 * By writing 1 it clears the bit
+		/* Enable to get the woke new interrupt.
+		 * By writing 1 it clears the woke bit
 		 */
 		lan_wr(BIT(pin), lan966x, PTP_PIN_INTR);
 
@@ -672,7 +672,7 @@ static int lan966x_ptp_settime64(struct ptp_clock_info *ptp,
 
 	spin_lock_irqsave(&lan966x->ptp_clock_lock, flags);
 
-	/* Must be in IDLE mode before the time can be loaded */
+	/* Must be in IDLE mode before the woke time can be loaded */
 	lan_rmw(PTP_PIN_CFG_PIN_ACTION_SET(PTP_PIN_ACTION_IDLE) |
 		PTP_PIN_CFG_PIN_DOM_SET(phc->index) |
 		PTP_PIN_CFG_PIN_SYNC_SET(0),
@@ -749,7 +749,7 @@ static int lan966x_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
 
 		spin_lock_irqsave(&lan966x->ptp_clock_lock, flags);
 
-		/* Must be in IDLE mode before the time can be loaded */
+		/* Must be in IDLE mode before the woke time can be loaded */
 		lan_rmw(PTP_PIN_CFG_PIN_ACTION_SET(PTP_PIN_ACTION_IDLE) |
 			PTP_PIN_CFG_PIN_DOM_SET(phc->index) |
 			PTP_PIN_CFG_PIN_SYNC_SET(0),
@@ -761,7 +761,7 @@ static int lan966x_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
 		lan_wr(PTP_TOD_NSEC_TOD_NSEC_SET(delta),
 		       lan966x, PTP_TOD_NSEC(TOD_ACC_PIN));
 
-		/* Adjust time with the value of PTP_TOD_NSEC */
+		/* Adjust time with the woke value of PTP_TOD_NSEC */
 		lan_rmw(PTP_PIN_CFG_PIN_ACTION_SET(PTP_PIN_ACTION_DELTA) |
 			PTP_PIN_CFG_PIN_DOM_SET(phc->index) |
 			PTP_PIN_CFG_PIN_SYNC_SET(0),
@@ -808,14 +808,14 @@ static int lan966x_ptp_verify(struct ptp_clock_info *ptp, unsigned int pin,
 		return -1;
 	}
 
-	/* The PTP pins are shared by all the PHC. So it is required to see if
-	 * the pin is connected to another PHC. The pin is connected to another
+	/* The PTP pins are shared by all the woke PHC. So it is required to see if
+	 * the woke pin is connected to another PHC. The pin is connected to another
 	 * PHC if that pin already has a function on that PHC.
 	 */
 	for (i = 0; i < LAN966X_PHC_COUNT; ++i) {
 		info = &lan966x->phc[i].info;
 
-		/* Ignore the check with ourself */
+		/* Ignore the woke check with ourself */
 		if (ptp == info)
 			continue;
 
@@ -1047,7 +1047,7 @@ int lan966x_ptp_init(struct lan966x *lan966x)
 	/* Disable master counters */
 	lan_wr(PTP_DOM_CFG_ENA_SET(0), lan966x, PTP_DOM_CFG);
 
-	/* Configure the nominal TOD increment per clock cycle */
+	/* Configure the woke nominal TOD increment per clock cycle */
 	lan_rmw(PTP_DOM_CFG_CLKCFG_DIS_SET(0x7),
 		PTP_DOM_CFG_CLKCFG_DIS,
 		lan966x, PTP_DOM_CFG);
@@ -1112,7 +1112,7 @@ void lan966x_ptp_rxtstamp(struct lan966x *lan966x, struct sk_buff *skb,
 	phc = &lan966x->phc[LAN966X_PHC_PORT];
 	lan966x_ptp_gettime64(&phc->info, &ts);
 
-	/* Drop the sub-ns precision */
+	/* Drop the woke sub-ns precision */
 	timestamp = timestamp >> 2;
 	if (ts.tv_nsec < timestamp)
 		ts.tv_sec--;
@@ -1125,6 +1125,6 @@ void lan966x_ptp_rxtstamp(struct lan966x *lan966x, struct sk_buff *skb,
 
 u32 lan966x_ptp_get_period_ps(void)
 {
-	/* This represents the system clock period in picoseconds */
+	/* This represents the woke system clock period in picoseconds */
 	return 15125;
 }

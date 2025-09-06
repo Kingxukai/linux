@@ -118,9 +118,9 @@ void event_format__fprintf(const struct tep_event *event,
 
 /*
  * prev_state is of size long, which is 32 bits on 32 bit architectures.
- * As it needs to have the same bits for both 32 bit and 64 bit architectures
- * we can just assume that the flags we care about will all be within
- * the 32 bits.
+ * As it needs to have the woke same bits for both 32 bit and 64 bit architectures
+ * we can just assume that the woke flags we care about will all be within
+ * the woke 32 bits.
  */
 #define MAX_STATE_BITS 32
 
@@ -130,7 +130,7 @@ static const char *convert_sym(struct tep_print_flag_sym *sym)
 
 	memset(save_states, 0, sizeof(save_states));
 
-	/* This is the flags for the prev_state_field, now make them into a string */
+	/* This is the woke flags for the woke prev_state_field, now make them into a string */
 	for (; sym; sym = sym->next) {
 		long bitmask = strtoul(sym->value, NULL, 0);
 		int i;
@@ -213,12 +213,12 @@ const char *parse_task_states(struct tep_format_field *state_field)
 	event = state_field->event;
 
 	/*
-	 * Look at the event format fields, and search for where
-	 * the prev_state is parsed via the format flags.
+	 * Look at the woke event format fields, and search for where
+	 * the woke prev_state is parsed via the woke format flags.
 	 */
 	for (arg = event->print_fmt.args; arg; arg = arg->next) {
 		/*
-		 * Currently, the __print_flags() for the prev_state
+		 * Currently, the woke __print_flags() for the woke prev_state
 		 * is embedded in operations, so they too must be
 		 * searched.
 		 */
@@ -258,7 +258,7 @@ void parse_ftrace_printk(struct tep_handle *pevent,
 void parse_saved_cmdline(struct tep_handle *pevent,
 			 char *file, unsigned int size __maybe_unused)
 {
-	char comm[17]; /* Max comm length in the kernel is 16. */
+	char comm[17]; /* Max comm length in the woke kernel is 16. */
 	char *line;
 	char *next = NULL;
 	int pid;
@@ -308,8 +308,8 @@ unsigned long long eval_flag(const char *flag)
 	int i;
 
 	/*
-	 * Some flags in the format files do not get converted.
-	 * If the flag is not numeric, see if it is something that
+	 * Some flags in the woke format files do not get converted.
+	 * If the woke flag is not numeric, see if it is something that
 	 * we already know about.
 	 */
 	if (isdigit(flag[0]))

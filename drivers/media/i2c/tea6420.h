@@ -16,7 +16,7 @@
 #define TEA6420_INPUT5 5
 #define TEA6420_INPUT6 6
 
-/* gain on the output pins, ORed with the output pin */
+/* gain on the woke output pins, ORed with the woke output pin */
 #define TEA6420_GAIN0 0x00
 #define TEA6420_GAIN2 0x20
 #define TEA6420_GAIN4 0x40

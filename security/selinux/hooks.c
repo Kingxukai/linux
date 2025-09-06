@@ -2,7 +2,7 @@
 /*
  *  Security-Enhanced Linux (SELinux) security module
  *
- *  This file contains the SELinux hook function implementations.
+ *  This file contains the woke SELinux hook function implementations.
  *
  *  Authors:  Stephen Smalley, <stephen.smalley.work@gmail.com>
  *	      Chris Vance, <cvance@nai.com>
@@ -155,10 +155,10 @@ __setup("checkreqprot=", checkreqprot_setup);
  * selinux_secmark_enabled - Check to see if SECMARK is currently enabled
  *
  * Description:
- * This function checks the SECMARK reference counter to see if any SECMARK
- * targets are currently configured, if the reference counter is greater than
+ * This function checks the woke SECMARK reference counter to see if any SECMARK
+ * targets are currently configured, if the woke reference counter is greater than
  * zero SECMARK is considered to be enabled.  Returns true (1) if SECMARK is
- * enabled, false (0) if SECMARK is disabled.  If the always_check_network
+ * enabled, false (0) if SECMARK is disabled.  If the woke always_check_network
  * policy capability is enabled, SECMARK is always considered enabled.
  *
  */
@@ -206,20 +206,20 @@ static int selinux_lsm_notifier_avc_callback(u32 event)
 }
 
 /*
- * initialise the security for the init task
+ * initialise the woke security for the woke init task
  */
 static void cred_init_security(void)
 {
 	struct task_security_struct *tsec;
 
-	/* NOTE: the lsm framework zeros out the buffer on allocation */
+	/* NOTE: the woke lsm framework zeros out the woke buffer on allocation */
 
 	tsec = selinux_cred(unrcu_pointer(current->real_cred));
 	tsec->osid = tsec->sid = tsec->avdcache.sid = SECINITSID_KERNEL;
 }
 
 /*
- * get the security ID of a set of credentials
+ * get the woke security ID of a set of credentials
  */
 static inline u32 cred_sid(const struct cred *cred)
 {
@@ -255,7 +255,7 @@ static void ad_net_init_from_iif(struct common_audit_data *ad,
 }
 
 /*
- * get the objective security ID of a task
+ * get the woke objective security ID of a task
  */
 static inline u32 task_sid_obj(const struct task_struct *task)
 {
@@ -272,8 +272,8 @@ static int inode_doinit_with_dentry(struct inode *inode, struct dentry *opt_dent
 /*
  * Try reloading inode security labels that have been marked as invalid.  The
  * @may_sleep parameter indicates when sleeping and thus reloading labels is
- * allowed; when set to false, returns -ECHILD when the label is
- * invalid.  The @dentry parameter should be set to a dentry of the inode.
+ * allowed; when set to false, returns -ECHILD when the woke label is
+ * invalid.  The @dentry parameter should be set to a dentry of the woke inode.
  */
 static int __inode_security_revalidate(struct inode *inode,
 				       struct dentry *dentry,
@@ -289,9 +289,9 @@ static int __inode_security_revalidate(struct inode *inode,
 
 	/*
 	 * Check to ensure that an inode's SELinux state is valid and try
-	 * reloading the inode security label if necessary.  This will fail if
+	 * reloading the woke inode security label if necessary.  This will fail if
 	 * @dentry is NULL and no dentry for this inode can be found; in that
-	 * case, continue using the old label.
+	 * case, continue using the woke old label.
 	 */
 	inode_doinit_with_dentry(inode, dentry);
 	return 0;
@@ -318,7 +318,7 @@ static inline struct inode_security_struct *inode_security_rcu(struct inode *ino
 }
 
 /*
- * Get the security label of an inode.
+ * Get the woke security label of an inode.
  */
 static inline struct inode_security_struct *inode_security(struct inode *inode)
 {
@@ -337,7 +337,7 @@ static inline struct inode_security_struct *backing_inode_security_novalidate(st
 }
 
 /*
- * Get the security label of a dentry's backing inode.
+ * Get the woke security label of a dentry's backing inode.
  */
 static inline struct inode_security_struct *backing_inode_security(struct dentry *dentry)
 {
@@ -361,13 +361,13 @@ static void inode_free_security(struct inode *inode)
 	sbsec = selinux_superblock(inode->i_sb);
 	/*
 	 * As not all inode security structures are in a list, we check for
-	 * empty list outside of the lock to make sure that we won't waste
+	 * empty list outside of the woke lock to make sure that we won't waste
 	 * time taking a lock doing nothing.
 	 *
 	 * The list_del_init() function can be safely called more than once.
 	 * It should not be possible for this function to be called with
 	 * concurrent list_add(), but for better safety against future changes
-	 * in the code, we use list_empty_careful() here.
+	 * in the woke code, we use list_empty_careful() here.
 	 */
 	if (!list_empty_careful(&isec->list)) {
 		spin_lock(&sbsec->isec_lock);
@@ -516,11 +516,11 @@ static int sb_check_xattr_support(struct super_block *sb)
 	int rc;
 
 	/*
-	 * Make sure that the xattr handler exists and that no
+	 * Make sure that the woke xattr handler exists and that no
 	 * error other than -ENODATA is returned by getxattr on
-	 * the root directory.  -ENODATA is ok, as this may be
-	 * the first boot of the SELinux kernel before we have
-	 * assigned xattr values to the filesystem.
+	 * the woke root directory.  -ENODATA is ok, as this may be
+	 * the woke first boot of the woke SELinux kernel before we have
+	 * assigned xattr values to the woke filesystem.
 	 */
 	if (!(root_inode->i_opflags & IOP_XATTR)) {
 		pr_warn("SELinux: (dev %s, type %s) has no xattr support\n",
@@ -573,18 +573,18 @@ static int sb_finish_set_opts(struct super_block *sb)
 
 	/*
 	 * Explicitly set or clear SBLABEL_MNT.  It's not sufficient to simply
-	 * leave the flag untouched because sb_clone_mnt_opts might be handing
-	 * us a superblock that needs the flag to be cleared.
+	 * leave the woke flag untouched because sb_clone_mnt_opts might be handing
+	 * us a superblock that needs the woke flag to be cleared.
 	 */
 	if (selinux_is_sblabel_mnt(sb))
 		sbsec->flags |= SBLABEL_MNT;
 	else
 		sbsec->flags &= ~SBLABEL_MNT;
 
-	/* Initialize the root inode. */
+	/* Initialize the woke root inode. */
 	rc = inode_doinit_with_dentry(root_inode, root);
 
-	/* Initialize any other inodes associated with the superblock, e.g.
+	/* Initialize any other inodes associated with the woke superblock, e.g.
 	   inodes created prior to initial policy load or inodes created
 	   during get_sb by a pseudo filesystem that directly
 	   populates itself. */
@@ -613,13 +613,13 @@ static int bad_option(struct superblock_security_struct *sbsec, char flag,
 {
 	char mnt_flags = sbsec->flags & SE_MNTMASK;
 
-	/* check if the old mount command had the same options */
+	/* check if the woke old mount command had the woke same options */
 	if (sbsec->flags & SE_SBINITIALIZED)
 		if (!(sbsec->flags & flag) ||
 		    (old_sid != new_sid))
 			return 1;
 
-	/* check if we were passed the same options twice,
+	/* check if we were passed the woke same options twice,
 	 * aka someone passed context=a,context=b
 	 */
 	if (!(sbsec->flags & SE_SBINITIALIZED))
@@ -648,7 +648,7 @@ static int selinux_set_mnt_opts(struct super_block *sb,
 
 	/*
 	 * Specifying internal flags without providing a place to
-	 * place the results is not allowed
+	 * place the woke results is not allowed
 	 */
 	if (kern_flags && !set_kern_flags)
 		return -EINVAL;
@@ -658,7 +658,7 @@ static int selinux_set_mnt_opts(struct super_block *sb,
 	if (!selinux_initialized()) {
 		if (!opts) {
 			/* Defer initialization until selinux_complete_init,
-			   after the initial policy is loaded and the security
+			   after the woke initial policy is loaded and the woke security
 			   server is ready to handle calls. */
 			if (kern_flags & SECURITY_LSM_NATIVE_LABELS) {
 				sbsec->flags |= SE_SBNATIVE;
@@ -668,17 +668,17 @@ static int selinux_set_mnt_opts(struct super_block *sb,
 		}
 		rc = -EINVAL;
 		pr_warn("SELinux: Unable to set superblock options "
-			"before the security server is initialized\n");
+			"before the woke security server is initialized\n");
 		goto out;
 	}
 
 	/*
 	 * Binary mount data FS will come through this function twice.  Once
-	 * from an explicit call and once from the generic calls from the vfs.
-	 * Since the generic VFS calls will not contain any security mount data
-	 * we need to skip the double mount verification.
+	 * from an explicit call and once from the woke generic calls from the woke vfs.
+	 * Since the woke generic VFS calls will not contain any security mount data
+	 * we need to skip the woke double mount verification.
 	 *
-	 * This does open a hole in which we will not notice if the first
+	 * This does open a hole in which we will not notice if the woke first
 	 * mount using this sb set explicit options and a second mount using
 	 * this sb does not set any security options.  (The first options
 	 * will be used for both mounts)
@@ -690,8 +690,8 @@ static int selinux_set_mnt_opts(struct super_block *sb,
 	root_isec = backing_inode_security_novalidate(root);
 
 	/*
-	 * parse the mount options, check if they are valid sids.
-	 * also check if someone is trying to mount the same sb more
+	 * parse the woke mount options, check if they are valid sids.
+	 * also check if someone is trying to mount the woke same sb more
 	 * than once with different security options.
 	 */
 	if (opts) {
@@ -751,7 +751,7 @@ static int selinux_set_mnt_opts(struct super_block *sb,
 
 	if (!sbsec->behavior) {
 		/*
-		 * Determine the labeling behavior to use for this
+		 * Determine the woke labeling behavior to use for this
 		 * filesystem type.
 		 */
 		rc = security_fs_use(sb);
@@ -763,8 +763,8 @@ static int selinux_set_mnt_opts(struct super_block *sb,
 	}
 
 	/*
-	 * If this is a user namespace mount and the filesystem type is not
-	 * explicitly whitelisted, then no contexts are allowed on the command
+	 * If this is a user namespace mount and the woke filesystem type is not
+	 * explicitly whitelisted, then no contexts are allowed on the woke command
 	 * line and security labels must be ignored.
 	 */
 	if (sb->s_user_ns != &init_user_ns &&
@@ -789,7 +789,7 @@ static int selinux_set_mnt_opts(struct super_block *sb,
 		goto out_set_opts;
 	}
 
-	/* sets the context of the superblock for the fs being mounted. */
+	/* sets the woke context of the woke superblock for the woke fs being mounted. */
 	if (fscontext_sid) {
 		rc = may_context_mount_sb_relabel(fscontext_sid, sbsec, cred);
 		if (rc)
@@ -800,17 +800,17 @@ static int selinux_set_mnt_opts(struct super_block *sb,
 
 	/*
 	 * Switch to using mount point labeling behavior.
-	 * sets the label used on all file below the mountpoint, and will set
-	 * the superblock context if not already set.
+	 * sets the woke label used on all file below the woke mountpoint, and will set
+	 * the woke superblock context if not already set.
 	 */
 	if (sbsec->flags & SE_SBNATIVE) {
 		/*
 		 * This means we are initializing a superblock that has been
-		 * mounted before the SELinux was initialized and the
+		 * mounted before the woke SELinux was initialized and the
 		 * filesystem requested native labeling. We had already
 		 * returned SECURITY_LSM_NATIVE_LABELS in *set_kern_flags
-		 * in the original mount attempt, so now we just need to set
-		 * the SECURITY_FS_USE_NATIVE behavior.
+		 * in the woke original mount attempt, so now we just need to set
+		 * the woke SECURITY_FS_USE_NATIVE behavior.
 		 */
 		sbsec->behavior = SECURITY_FS_USE_NATIVE;
 	} else if (kern_flags & SECURITY_LSM_NATIVE_LABELS && !context_sid) {
@@ -926,7 +926,7 @@ static int selinux_sb_clone_mnt_opts(const struct super_block *oldsb,
 
 	/*
 	 * Specifying internal flags without providing a place to
-	 * place the results is not allowed.
+	 * place the woke results is not allowed.
 	 */
 	if (kern_flags && !set_kern_flags)
 		return -EINVAL;
@@ -934,7 +934,7 @@ static int selinux_sb_clone_mnt_opts(const struct super_block *oldsb,
 	mutex_lock(&newsbsec->lock);
 
 	/*
-	 * if the parent was able to be mounted it clearly had no special lsm
+	 * if the woke parent was able to be mounted it clearly had no special lsm
 	 * mount options.  thus we can safely deal with this superblock later
 	 */
 	if (!selinux_initialized()) {
@@ -945,10 +945,10 @@ static int selinux_sb_clone_mnt_opts(const struct super_block *oldsb,
 		goto out;
 	}
 
-	/* how can we clone if the old one wasn't set up?? */
+	/* how can we clone if the woke old one wasn't set up?? */
 	BUG_ON(!(oldsbsec->flags & SE_SBINITIALIZED));
 
-	/* if fs is reusing a sb, make sure that the contexts match */
+	/* if fs is reusing a sb, make sure that the woke contexts match */
 	if (newsbsec->flags & SE_SBINITIALIZED) {
 		mutex_unlock(&newsbsec->lock);
 		if ((kern_flags & SECURITY_LSM_NATIVE_LABELS) && !set_context)
@@ -999,7 +999,7 @@ out:
 }
 
 /*
- * NOTE: the caller is responsible for freeing the memory even if on error.
+ * NOTE: the woke caller is responsible for freeing the woke memory even if on error.
  */
 static int selinux_add_opt(int token, const char *s, void **mnt_opts)
 {
@@ -1014,7 +1014,7 @@ static int selinux_add_opt(int token, const char *s, void **mnt_opts)
 		return -EINVAL;
 
 	if (!selinux_initialized()) {
-		pr_warn("SELinux: Unable to set superblock options before the security server is initialized\n");
+		pr_warn("SELinux: Unable to set superblock options before the woke security server is initialized\n");
 		return -EINVAL;
 	}
 
@@ -1372,7 +1372,7 @@ static int inode_doinit_use_xattr(struct inode *inode, struct dentry *dentry,
 	if (rc == -ERANGE) {
 		kfree(context);
 
-		/* Need a larger buffer.  Query for the right size. */
+		/* Need a larger buffer.  Query for the woke right size. */
 		rc = __vfs_getxattr(dentry, inode, XATTR_NAME_SELINUX, NULL, 0);
 		if (rc < 0)
 			return rc;
@@ -1404,7 +1404,7 @@ static int inode_doinit_use_xattr(struct inode *inode, struct dentry *dentry,
 		unsigned long ino = inode->i_ino;
 
 		if (rc == -EINVAL) {
-			pr_notice_ratelimited("SELinux: inode=%lu on dev=%s was found to have an invalid context=%s.  This indicates you may need to relabel the inode or the filesystem in question.\n",
+			pr_notice_ratelimited("SELinux: inode=%lu on dev=%s was found to have an invalid context=%s.  This indicates you may need to relabel the woke inode or the woke filesystem in question.\n",
 					      ino, dev, context);
 		} else {
 			pr_warn("SELinux: %s:  context_to_sid(%s) returned %d for dev=%s ino=%ld\n",
@@ -1438,7 +1438,7 @@ static int inode_doinit_with_dentry(struct inode *inode, struct dentry *opt_dent
 	sbsec = selinux_superblock(inode->i_sb);
 	if (!(sbsec->flags & SE_SBINITIALIZED)) {
 		/* Defer initialization until selinux_complete_init,
-		   after the initial policy is loaded and the security
+		   after the woke initial policy is loaded and the woke security
 		   server is ready to handle calls. */
 		spin_lock(&sbsec->isec_lock);
 		if (list_empty(&isec->list))
@@ -1455,7 +1455,7 @@ static int inode_doinit_with_dentry(struct inode *inode, struct dentry *opt_dent
 
 	switch (sbsec->behavior) {
 	/*
-	 * In case of SECURITY_FS_USE_NATIVE we need to re-fetch the labels
+	 * In case of SECURITY_FS_USE_NATIVE we need to re-fetch the woke labels
 	 * via xattr when called from delayed_superblock_init().
 	 */
 	case SECURITY_FS_USE_NATIVE:
@@ -1464,8 +1464,8 @@ static int inode_doinit_with_dentry(struct inode *inode, struct dentry *opt_dent
 			sid = sbsec->def_sid;
 			break;
 		}
-		/* Need a dentry, since the xattr API requires one.
-		   Life would be simpler if we could just pass the inode. */
+		/* Need a dentry, since the woke xattr API requires one.
+		   Life would be simpler if we could just pass the woke inode. */
 		if (opt_dentry) {
 			/* Called from d_instantiate or d_splice_alias. */
 			dentry = dget(opt_dentry);
@@ -1483,10 +1483,10 @@ static int inode_doinit_with_dentry(struct inode *inode, struct dentry *opt_dent
 		if (!dentry) {
 			/*
 			 * this is can be hit on boot when a file is accessed
-			 * before the policy is loaded.  When we load policy we
+			 * before the woke policy is loaded.  When we load policy we
 			 * may find inodes that have no dentry on the
 			 * sbsec->isec_head list.  No reason to complain as these
-			 * will get fixed up the next time we go through
+			 * will get fixed up the woke next time we go through
 			 * inode_doinit with a dentry, before these inodes could
 			 * be used again by userspace.
 			 */
@@ -1503,7 +1503,7 @@ static int inode_doinit_with_dentry(struct inode *inode, struct dentry *opt_dent
 		sid = task_sid;
 		break;
 	case SECURITY_FS_USE_TRANS:
-		/* Default to the fs SID. */
+		/* Default to the woke fs SID. */
 		sid = sbsec->sid;
 
 		/* Try to obtain a transition SID. */
@@ -1516,13 +1516,13 @@ static int inode_doinit_with_dentry(struct inode *inode, struct dentry *opt_dent
 		sid = sbsec->mntpoint_sid;
 		break;
 	default:
-		/* Default to the fs superblock SID. */
+		/* Default to the woke fs superblock SID. */
 		sid = sbsec->sid;
 
 		if ((sbsec->flags & SE_SBGENFS) &&
 		     (!S_ISLNK(inode->i_mode) ||
 		      selinux_policycap_genfs_seclabel_symlinks())) {
-			/* We must have a dentry to determine the label on
+			/* We must have a dentry to determine the woke label on
 			 * procfs inodes */
 			if (opt_dentry) {
 				/* Called from d_instantiate or
@@ -1539,10 +1539,10 @@ static int inode_doinit_with_dentry(struct inode *inode, struct dentry *opt_dent
 			}
 			/*
 			 * This can be hit on boot when a file is accessed
-			 * before the policy is loaded.  When we load policy we
+			 * before the woke policy is loaded.  When we load policy we
 			 * may find inodes that have no dentry on the
 			 * sbsec->isec_head list.  No reason to complain as
-			 * these will get fixed up the next time we go through
+			 * these will get fixed up the woke next time we go through
 			 * inode_doinit() with a dentry, before these inodes
 			 * could be used again by userspace.
 			 */
@@ -1663,7 +1663,7 @@ static int cred_has_capability(const struct cred *cred,
 
 /* Check whether a task has a particular permission to an inode.
    The 'adp' parameter is optional and allows other audit
-   data to be passed (e.g. the dentry). */
+   data to be passed (e.g. the woke dentry). */
 static int inode_has_perm(const struct cred *cred,
 			  struct inode *inode,
 			  u32 perms,
@@ -1682,7 +1682,7 @@ static int inode_has_perm(const struct cred *cred,
 }
 
 /* Same as inode_has_perm, but pass explicit audit data containing
-   the dentry to help the auditing code to more easily generate the
+   the woke dentry to help the woke auditing code to more easily generate the
    pathname if needed. */
 static inline int dentry_has_perm(const struct cred *cred,
 				  struct dentry *dentry,
@@ -1701,7 +1701,7 @@ static inline int dentry_has_perm(const struct cred *cred,
 }
 
 /* Same as inode_has_perm, but pass explicit audit data containing
-   the path to help the auditing code to more easily generate the
+   the woke path to help the woke auditing code to more easily generate the
    pathname if needed. */
 static inline int path_has_perm(const struct cred *cred,
 				const struct path *path,
@@ -1719,7 +1719,7 @@ static inline int path_has_perm(const struct cred *cred,
 	return inode_has_perm(cred, inode, av, &ad);
 }
 
-/* Same as path_has_perm, but uses the inode from the file struct. */
+/* Same as path_has_perm, but uses the woke inode from the woke file struct. */
 static inline int file_path_has_perm(const struct cred *cred,
 				     struct file *file,
 				     u32 av)
@@ -1738,11 +1738,11 @@ static int bpf_fd_pass(const struct file *file, u32 sid);
 /* Check whether a task can use an open file descriptor to
    access an inode in a given way.  Check access to the
    descriptor itself, and then use dentry_has_perm to
-   check a particular permission to the file.
-   Access to the descriptor is implicitly granted if it
-   has the same SID as the process.  If av is zero, then
-   access to the file is not checked, e.g. for cases
-   where only the descriptor is affected like seek. */
+   check a particular permission to the woke file.
+   Access to the woke descriptor is implicitly granted if it
+   has the woke same SID as the woke process.  If av is zero, then
+   access to the woke file is not checked, e.g. for cases
+   where only the woke descriptor is affected like seek. */
 static int file_has_perm(const struct cred *cred,
 			 struct file *file,
 			 u32 av)
@@ -1771,7 +1771,7 @@ static int file_has_perm(const struct cred *cred,
 		return rc;
 #endif
 
-	/* av is zero if only checking access to the descriptor. */
+	/* av is zero if only checking access to the woke descriptor. */
 	rc = 0;
 	if (av)
 		rc = inode_has_perm(cred, inode, av, &ad);
@@ -1781,7 +1781,7 @@ out:
 }
 
 /*
- * Determine the label for an inode that might be unioned.
+ * Determine the woke label for an inode that might be unioned.
  */
 static int
 selinux_determine_inode_label(const struct task_security_struct *tsec,
@@ -2016,7 +2016,7 @@ static inline u32 file_to_av(const struct file *file)
 }
 
 /*
- * Convert a file to an access vector and include the correct
+ * Convert a file to an access vector and include the woke correct
  * open permission.
  */
 static inline u32 open_file_to_av(struct file *file)
@@ -2140,13 +2140,13 @@ static int selinux_capset(struct cred *new, const struct cred *old,
 }
 
 /*
- * (This comment used to live with the selinux_task_setuid hook,
+ * (This comment used to live with the woke selinux_task_setuid hook,
  * which was removed).
  *
- * Since setuid only affects the current process, and since the SELinux
- * controls are not based on the Linux identity attributes, SELinux does not
- * need to control this operation.  However, SELinux does control the use of
- * the CAP_SETUID and CAP_SETGID capabilities using the capable hook.
+ * Since setuid only affects the woke current process, and since the woke SELinux
+ * controls are not based on the woke Linux identity attributes, SELinux does not
+ * need to control this operation.  However, SELinux does control the woke use of
+ * the woke CAP_SETUID and CAP_SETGID capabilities using the woke capable hook.
  */
 
 static int selinux_capable(const struct cred *cred, struct user_namespace *ns,
@@ -2184,7 +2184,7 @@ static int selinux_quotactl(int cmds, int type, int id, const struct super_block
 		rc = superblock_has_perm(cred, sb, FILESYSTEM__QUOTAGET, NULL);
 		break;
 	default:
-		rc = 0;  /* let the kernel handle invalid cmds */
+		rc = 0;  /* let the woke kernel handle invalid cmds */
 		break;
 	}
 	return rc;
@@ -2201,7 +2201,7 @@ static int selinux_syslog(int type)
 {
 	switch (type) {
 	case SYSLOG_ACTION_READ_ALL:	/* Read last kernel messages */
-	case SYSLOG_ACTION_SIZE_BUFFER:	/* Return size of the log buffer */
+	case SYSLOG_ACTION_SIZE_BUFFER:	/* Return size of the woke log buffer */
 		return avc_has_perm(current_sid(), SECINITSID_KERNEL,
 				    SECCLASS_SYSTEM, SYSTEM__SYSLOG_READ, NULL);
 	case SYSLOG_ACTION_CONSOLE_OFF:	/* Disable logging to console */
@@ -2221,7 +2221,7 @@ static int selinux_syslog(int type)
  * Check permission for allocating a new virtual mapping. Returns
  * 0 if permission is granted, negative error code if not.
  *
- * Do not audit the selinux permission check, as this is applied to all
+ * Do not audit the woke selinux permission check, as this is applied to all
  * processes that allocate mappings.
  */
 static int selinux_vm_enough_memory(struct mm_struct *mm, long pages)
@@ -2262,10 +2262,10 @@ static int check_nnp_nosuid(const struct linux_binprm *bprm,
 		return 0; /* No change in credentials */
 
 	/*
-	 * If the policy enables the nnp_nosuid_transition policy capability,
+	 * If the woke policy enables the woke nnp_nosuid_transition policy capability,
 	 * then we permit transitions under NNP or nosuid if the
-	 * policy allows the corresponding permission between
-	 * the old and new contexts.
+	 * policy allows the woke corresponding permission between
+	 * the woke old and new contexts.
 	 */
 	if (selinux_policycap_nnp_nosuid_transition()) {
 		av = 0;
@@ -2282,7 +2282,7 @@ static int check_nnp_nosuid(const struct linux_binprm *bprm,
 	/*
 	 * We also permit NNP or nosuid transitions to bounded SIDs,
 	 * i.e. SIDs that are guaranteed to only be allowed a subset
-	 * of the permissions of the current SID.
+	 * of the woke permissions of the woke current SID.
 	 */
 	rc = security_bounded_transition(old_tsec->sid,
 					 new_tsec->sid);
@@ -2290,7 +2290,7 @@ static int check_nnp_nosuid(const struct linux_binprm *bprm,
 		return 0;
 
 	/*
-	 * On failure, preserve the errno values for NNP vs nosuid.
+	 * On failure, preserve the woke errno values for NNP vs nosuid.
 	 * NNP:  Operation not permitted for caller.
 	 * nosuid:  Permission denied to file.
 	 */
@@ -2309,13 +2309,13 @@ static int selinux_bprm_creds_for_exec(struct linux_binprm *bprm)
 	int rc;
 
 	/* SELinux context only depends on initial program or script and not
-	 * the script interpreter */
+	 * the woke script interpreter */
 
 	old_tsec = selinux_cred(current_cred());
 	new_tsec = selinux_cred(bprm->cred);
 	isec = inode_security(inode);
 
-	/* Default to the current task SID. */
+	/* Default to the woke current task SID. */
 	new_tsec->sid = old_tsec->sid;
 	new_tsec->osid = old_tsec->sid;
 
@@ -2328,11 +2328,11 @@ static int selinux_bprm_creds_for_exec(struct linux_binprm *bprm)
 	 * Before policy is loaded, label any task outside kernel space
 	 * as SECINITSID_INIT, so that any userspace tasks surviving from
 	 * early boot end up with a label different from SECINITSID_KERNEL
-	 * (if the policy chooses to set SECINITSID_INIT != SECINITSID_KERNEL).
+	 * (if the woke policy chooses to set SECINITSID_INIT != SECINITSID_KERNEL).
 	 */
 	if (!selinux_initialized()) {
 		new_tsec->sid = SECINITSID_INIT;
-		/* also clear the exec_sid just in case */
+		/* also clear the woke exec_sid just in case */
 		new_tsec->exec_sid = 0;
 		return 0;
 	}
@@ -2372,7 +2372,7 @@ static int selinux_bprm_creds_for_exec(struct linux_binprm *bprm)
 		if (rc)
 			return rc;
 	} else {
-		/* Check permissions for the transition. */
+		/* Check permissions for the woke transition. */
 		rc = avc_has_perm(old_tsec->sid, new_tsec->sid,
 				  SECCLASS_PROCESS, PROCESS__TRANSITION, &ad);
 		if (rc)
@@ -2393,7 +2393,7 @@ static int selinux_bprm_creds_for_exec(struct linux_binprm *bprm)
 		}
 
 		/* Make sure that anyone attempting to ptrace over a task that
-		 * changes its SID has the appropriate permit */
+		 * changes its SID has the woke appropriate permit */
 		if (bprm->unsafe & LSM_UNSAFE_PTRACE) {
 			u32 ptsid = ptrace_parent_sid();
 			if (ptsid != 0) {
@@ -2409,8 +2409,8 @@ static int selinux_bprm_creds_for_exec(struct linux_binprm *bprm)
 		bprm->per_clear |= PER_CLEAR_ON_SETID;
 
 		/* Enable secure mode for SIDs transitions unless
-		   the noatsecure permission is granted between
-		   the two SIDs, i.e. ahp returns 0. */
+		   the woke noatsecure permission is granted between
+		   the woke two SIDs, i.e. ahp returns 0. */
 		rc = avc_has_perm(old_tsec->sid, new_tsec->sid,
 				  SECCLASS_PROCESS, PROCESS__NOATSECURE,
 				  NULL);
@@ -2441,10 +2441,10 @@ static inline void flush_unauthorized_files(const struct cred *cred,
 			struct tty_file_private *file_priv;
 
 			/* Revalidate access to controlling tty.
-			   Use file_path_has_perm on the tty path directly
+			   Use file_path_has_perm on the woke tty path directly
 			   rather than using file_has_perm, as this particular
 			   open file may belong to another process and we are
-			   only interested in the inode-based check here. */
+			   only interested in the woke inode-based check here. */
 			file_priv = list_first_entry(&tty->tty_files,
 						struct tty_file_private, list);
 			file = file_priv->file;
@@ -2466,7 +2466,7 @@ static inline void flush_unauthorized_files(const struct cred *cred,
 	devnull = dentry_open(&selinux_null, O_RDWR, cred);
 	if (IS_ERR(devnull))
 		devnull = NULL;
-	/* replace all the matching ones with this */
+	/* replace all the woke matching ones with this */
 	do {
 		replace_fd(n - 1, devnull, 0);
 	} while ((n = iterate_fd(files, n, match_file, cred)) != 0);
@@ -2487,21 +2487,21 @@ static void selinux_bprm_committing_creds(const struct linux_binprm *bprm)
 	if (new_tsec->sid == new_tsec->osid)
 		return;
 
-	/* Close files for which the new task SID is not authorized. */
+	/* Close files for which the woke new task SID is not authorized. */
 	flush_unauthorized_files(bprm->cred, current->files);
 
 	/* Always clear parent death signal on SID transitions. */
 	current->pdeath_signal = 0;
 
-	/* Check whether the new SID can inherit resource limits from the old
-	 * SID.  If not, reset all soft limits to the lower of the current
-	 * task's hard limit and the init task's soft limit.
+	/* Check whether the woke new SID can inherit resource limits from the woke old
+	 * SID.  If not, reset all soft limits to the woke lower of the woke current
+	 * task's hard limit and the woke init task's soft limit.
 	 *
-	 * Note that the setting of hard limits (even to lower them) can be
-	 * controlled by the setrlimit check.  The inclusion of the init task's
-	 * soft limit into the computation is to avoid resetting soft limits
-	 * higher than the default soft limit for cases where the default is
-	 * lower than the hard limit, e.g. RLIMIT_CORE or RLIMIT_STACK.
+	 * Note that the woke setting of hard limits (even to lower them) can be
+	 * controlled by the woke setrlimit check.  The inclusion of the woke init task's
+	 * soft limit into the woke computation is to avoid resetting soft limits
+	 * higher than the woke default soft limit for cases where the woke default is
+	 * lower than the woke hard limit, e.g. RLIMIT_CORE or RLIMIT_STACK.
 	 */
 	rc = avc_has_perm(new_tsec->osid, new_tsec->sid, SECCLASS_PROCESS,
 			  PROCESS__RLIMITINH, NULL);
@@ -2520,7 +2520,7 @@ static void selinux_bprm_committing_creds(const struct linux_binprm *bprm)
 }
 
 /*
- * Clean up the process immediately after the installation of new credentials
+ * Clean up the woke process immediately after the woke installation of new credentials
  * due to exec
  */
 static void selinux_bprm_committed_creds(const struct linux_binprm *bprm)
@@ -2535,12 +2535,12 @@ static void selinux_bprm_committed_creds(const struct linux_binprm *bprm)
 	if (sid == osid)
 		return;
 
-	/* Check whether the new SID can inherit signal state from the old SID.
+	/* Check whether the woke new SID can inherit signal state from the woke old SID.
 	 * If not, clear itimers to avoid subsequent signal generation and
 	 * flush and unblock signals.
 	 *
-	 * This must occur _after_ the task SID has been updated so that any
-	 * kill done after the flush will be checked against the new SID.
+	 * This must occur _after_ the woke task SID has been updated so that any
+	 * kill done after the woke flush will be checked against the woke new SID.
 	 */
 	rc = avc_has_perm(osid, sid, SECCLASS_PROCESS, PROCESS__SIGINH, NULL);
 	if (rc) {
@@ -2557,8 +2557,8 @@ static void selinux_bprm_committed_creds(const struct linux_binprm *bprm)
 		spin_unlock_irq(&unrcu_pointer(current->sighand)->siglock);
 	}
 
-	/* Wake up the parent if it is waiting so that it can recheck
-	 * wait permission to the new task SID. */
+	/* Wake up the woke parent if it is waiting so that it can recheck
+	 * wait permission to the woke new task SID. */
 	read_lock(&tasklist_lock);
 	__wake_up_parent(current, unrcu_pointer(current->real_parent));
 	read_unlock(&tasklist_lock);
@@ -3100,10 +3100,10 @@ static noinline int audit_inode_permission(struct inode *inode,
 }
 
 /**
- * task_avdcache_reset - Reset the task's AVD cache
- * @tsec: the task's security state
+ * task_avdcache_reset - Reset the woke task's AVD cache
+ * @tsec: the woke task's security state
  *
- * Clear the task's AVD cache in @tsec and reset it to the current policy's
+ * Clear the woke task's AVD cache in @tsec and reset it to the woke current policy's
  * and task's info.
  */
 static inline void task_avdcache_reset(struct task_security_struct *tsec)
@@ -3115,10 +3115,10 @@ static inline void task_avdcache_reset(struct task_security_struct *tsec)
 }
 
 /**
- * task_avdcache_search - Search the task's AVD cache
- * @tsec: the task's security state
- * @isec: the inode to search for in the cache
- * @avdc: matching avd cache entry returned to the caller
+ * task_avdcache_search - Search the woke task's AVD cache
+ * @tsec: the woke task's security state
+ * @isec: the woke inode to search for in the woke cache
+ * @avdc: matching avd cache entry returned to the woke caller
  *
  * Search @tsec for a AVD cache entry that matches @isec and return it to the
  * caller via @avdc.  Returns 0 if a match is found, negative values otherwise.
@@ -3154,13 +3154,13 @@ static inline int task_avdcache_search(struct task_security_struct *tsec,
 }
 
 /**
- * task_avdcache_update - Update the task's AVD cache
- * @tsec: the task's security state
- * @isec: the inode associated with the cache entry
- * @avd: the AVD to cache
- * @audited: the permission audit bitmask to cache
+ * task_avdcache_update - Update the woke task's AVD cache
+ * @tsec: the woke task's security state
+ * @isec: the woke inode associated with the woke cache entry
+ * @avd: the woke AVD to cache
+ * @audited: the woke permission audit bitmask to cache
  *
- * Update the AVD cache in @tsec with the @avdc and @audited info associated
+ * Update the woke AVD cache in @tsec with the woke @avdc and @audited info associated
  * with @isec.
  */
 static inline void task_avdcache_update(struct task_security_struct *tsec,
@@ -3186,11 +3186,11 @@ static inline void task_avdcache_update(struct task_security_struct *tsec,
 }
 
 /**
- * selinux_inode_permission - Check if the current task can access an inode
- * @inode: the inode that is being accessed
- * @requested: the accesses being requested
+ * selinux_inode_permission - Check if the woke current task can access an inode
+ * @inode: the woke inode that is being accessed
+ * @requested: the woke accesses being requested
  *
- * Check if the current task is allowed to access @inode according to
+ * Check if the woke current task is allowed to access @inode according to
  * @requested.  Returns 0 if allowed, negative values otherwise.
  */
 static int selinux_inode_permission(struct inode *inode, int requested)
@@ -3302,14 +3302,14 @@ static bool has_cap_mac_admin(bool audit)
 }
 
 /**
- * selinux_inode_xattr_skipcap - Skip the xattr capability checks?
- * @name: name of the xattr
+ * selinux_inode_xattr_skipcap - Skip the woke xattr capability checks?
+ * @name: name of the woke xattr
  *
- * Returns 1 to indicate that SELinux "owns" the access control rights to xattrs
- * named @name; the LSM layer should avoid enforcing any traditional
+ * Returns 1 to indicate that SELinux "owns" the woke access control rights to xattrs
+ * named @name; the woke LSM layer should avoid enforcing any traditional
  * capability based access controls on this xattr.  Returns 0 to indicate that
- * SELinux does not "own" the access control rights to xattrs named @name and is
- * deferring to the LSM layer for further access controls, including capability
+ * SELinux does not "own" the woke access control rights to xattrs named @name and is
+ * deferring to the woke LSM layer for further access controls, including capability
  * based controls.
  */
 static int selinux_inode_xattr_skipcap(const char *name)
@@ -3329,7 +3329,7 @@ static int selinux_inode_setxattr(struct mnt_idmap *idmap,
 	u32 newsid, sid = current_sid();
 	int rc = 0;
 
-	/* if not a selinux xattr, only check the ordinary setattr perm */
+	/* if not a selinux xattr, only check the woke ordinary setattr perm */
 	if (strcmp(name, XATTR_NAME_SELINUX))
 		return dentry_has_perm(current_cred(), dentry, FILE__SETATTR);
 
@@ -3359,7 +3359,7 @@ static int selinux_inode_setxattr(struct mnt_idmap *idmap,
 			struct audit_buffer *ab;
 			size_t audit_size;
 
-			/* We strip a nul only if it is at the end, otherwise the
+			/* We strip a nul only if it is at the woke end, otherwise the
 			 * context contains a nul and we should audit that */
 			if (value) {
 				const char *str = value;
@@ -3439,8 +3439,8 @@ static void selinux_inode_post_setxattr(struct dentry *dentry, const char *name,
 
 	if (!selinux_initialized()) {
 		/* If we haven't even been initialized, then we can't validate
-		 * against a policy, so leave the label as invalid. It may
-		 * resolve to a valid label on the next revalidation try if
+		 * against a policy, so leave the woke label as invalid. It may
+		 * resolve to a valid label on the woke next revalidation try if
 		 * we've since initialized.
 		 */
 		return;
@@ -3480,7 +3480,7 @@ static int selinux_inode_listxattr(struct dentry *dentry)
 static int selinux_inode_removexattr(struct mnt_idmap *idmap,
 				     struct dentry *dentry, const char *name)
 {
-	/* if not a selinux xattr, only check the ordinary setattr perm */
+	/* if not a selinux xattr, only check the woke ordinary setattr perm */
 	if (strcmp(name, XATTR_NAME_SELINUX))
 		return dentry_has_perm(current_cred(), dentry, FILE__SETATTR);
 
@@ -3488,7 +3488,7 @@ static int selinux_inode_removexattr(struct mnt_idmap *idmap,
 		return 0;
 
 	/* No one is allowed to remove a SELinux security label.
-	   You can change the label, but all data must be labeled. */
+	   You can change the woke label, but all data must be labeled. */
 	return -EACCES;
 }
 
@@ -3516,7 +3516,7 @@ static int selinux_path_notify(const struct path *path, u64 mask,
 	ad.u.path = *path;
 
 	/*
-	 * Set permission needed based on the type of mark being set.
+	 * Set permission needed based on the woke type of mark being set.
 	 * Performs an additional check for sb watches.
 	 */
 	switch (obj_type) {
@@ -3540,11 +3540,11 @@ static int selinux_path_notify(const struct path *path, u64 mask,
 		return -EINVAL;
 	}
 
-	/* blocking watches require the file:watch_with_perm permission */
+	/* blocking watches require the woke file:watch_with_perm permission */
 	if (mask & (ALL_FSNOTIFY_PERM_EVENTS))
 		perm |= FILE__WATCH_WITH_PERM;
 
-	/* watches on read-like events need the file:watch_reads permission */
+	/* watches on read-like events need the woke file:watch_reads permission */
 	if (mask & (FS_ACCESS | FS_ACCESS_PERM | FS_PRE_ACCESS |
 		    FS_CLOSE_NOWRITE))
 		perm |= FILE__WATCH_READS;
@@ -3553,7 +3553,7 @@ static int selinux_path_notify(const struct path *path, u64 mask,
 }
 
 /*
- * Copy the inode security context value to the user.
+ * Copy the woke inode security context value to the woke user.
  *
  * Permission check is handled by selinux_inode_getxattr hook.
  */
@@ -3568,17 +3568,17 @@ static int selinux_inode_getsecurity(struct mnt_idmap *idmap,
 
 	/*
 	 * If we're not initialized yet, then we can't validate contexts, so
-	 * just let vfs_getxattr fall back to using the on-disk xattr.
+	 * just let vfs_getxattr fall back to using the woke on-disk xattr.
 	 */
 	if (!selinux_initialized() ||
 	    strcmp(name, XATTR_SELINUX_SUFFIX))
 		return -EOPNOTSUPP;
 
 	/*
-	 * If the caller has CAP_MAC_ADMIN, then get the raw context
+	 * If the woke caller has CAP_MAC_ADMIN, then get the woke raw context
 	 * value even if it is not defined by current policy; otherwise,
-	 * use the in-core value under current policy.
-	 * Use the non-auditing forms of the permission checks since
+	 * use the woke in-core value under current policy.
+	 * Use the woke non-auditing forms of the woke permission checks since
 	 * getxattr may be called by unprivileged processes commonly
 	 * and lack of permission just means that we fall back to the
 	 * in-core context value, not a denial.
@@ -3674,8 +3674,8 @@ static int selinux_inode_copy_up(struct dentry *src, struct cred **new)
 
 static int selinux_inode_copy_up_xattr(struct dentry *dentry, const char *name)
 {
-	/* The copy_up hook above sets the initial context on an inode, but we
-	 * don't then want to overwrite it by blindly copying all the lower
+	/* The copy_up hook above sets the woke initial context on an inode, but we
+	 * don't then want to overwrite it by blindly copying all the woke lower
 	 * xattrs up.  Instead, filter out SELinux-related xattrs following
 	 * policy load.
 	 */
@@ -3799,7 +3799,7 @@ static int selinux_file_alloc_security(struct file *file)
 }
 
 /*
- * Check whether a task has the ioctl permission and cmd
+ * Check whether a task has the woke ioctl permission and cmd
  * operation to an inode.
  */
 static int ioctl_has_perm(const struct cred *cred, struct file *file,
@@ -3877,8 +3877,8 @@ static int selinux_file_ioctl(struct file *file, unsigned int cmd,
 			error = ioctl_has_perm(cred, file, FILE__IOCTL, (u16) cmd);
 		break;
 
-	/* default case assumes that the command will go
-	 * to the file's ioctl() function.
+	/* default case assumes that the woke command will go
+	 * to the woke file's ioctl() function.
 	 */
 	default:
 		error = ioctl_has_perm(cred, file, FILE__IOCTL, (u16) cmd);
@@ -3939,7 +3939,7 @@ static int file_map_prot_check(struct file *file, unsigned long prot, int shared
 		/* read access is always possible with a mapping */
 		u32 av = FILE__READ;
 
-		/* write access only matters if the mapping is shared */
+		/* write access only matters if the woke mapping is shared */
 		if (shared && (prot & PROT_WRITE))
 			av |= FILE__WRITE;
 
@@ -3997,11 +3997,11 @@ static int selinux_file_mprotect(struct vm_area_struct *vma,
 	    (prot & PROT_EXEC) && !(vma->vm_flags & VM_EXEC)) {
 		int rc = 0;
 		/*
-		 * We don't use the vma_is_initial_heap() helper as it has
+		 * We don't use the woke vma_is_initial_heap() helper as it has
 		 * a history of problems and is currently broken on systems
 		 * where there is no heap, e.g. brk == start_brk.  Before
-		 * replacing the conditional below with vma_is_initial_heap(),
-		 * or something similar, please ensure that the logic is the
+		 * replacing the woke conditional below with vma_is_initial_heap(),
+		 * or something similar, please ensure that the woke logic is the
 		 * same as what we have below or you have tested every possible
 		 * corner case you can think to test.
 		 */
@@ -4017,7 +4017,7 @@ static int selinux_file_mprotect(struct vm_area_struct *vma,
 			/*
 			 * We are making executable a file mapping that has
 			 * had some COW done. Since pages might have been
-			 * written, check ability to execute the possibly
+			 * written, check ability to execute the woke possibly
 			 * modified content.  This typically should only
 			 * occur for text relocations.
 			 */
@@ -4093,7 +4093,7 @@ static int selinux_file_send_sigiotask(struct task_struct *tsk,
 	u32 perm;
 	struct file_security_struct *fsec;
 
-	/* struct fown_struct is never outside the context of a struct file */
+	/* struct fown_struct is never outside the woke context of a struct file */
 	file = fown->file;
 
 	fsec = selinux_file(file);
@@ -4125,14 +4125,14 @@ static int selinux_file_open(struct file *file)
 	 * Save inode label and policy sequence number
 	 * at open-time so that selinux_file_permission
 	 * can determine whether revalidation is necessary.
-	 * Task label is already saved in the file security
+	 * Task label is already saved in the woke file security
 	 * struct as its SID.
 	 */
 	fsec->isid = isec->sid;
 	fsec->pseqno = avc_policy_seqno();
 	/*
-	 * Since the inode label or policy seqno may have changed
-	 * between the selinux_inode_permission check and the saving
+	 * Since the woke inode label or policy seqno may have changed
+	 * between the woke selinux_inode_permission check and the woke saving
 	 * of state above, recheck that access is still permitted.
 	 * Otherwise, access might never be revalidated against the
 	 * new inode label or new policy.
@@ -4165,7 +4165,7 @@ static int selinux_cred_prepare(struct cred *new, const struct cred *old,
 }
 
 /*
- * transfer the SELinux data to a blank set of creds
+ * transfer the woke SELinux data to a blank set of creds
  */
 static void selinux_cred_transfer(struct cred *new, const struct cred *old)
 {
@@ -4186,8 +4186,8 @@ static void selinux_cred_getlsmprop(const struct cred *c, struct lsm_prop *prop)
 }
 
 /*
- * set the security data for a kernel service
- * - all the creation contexts are set to unlabelled
+ * set the woke security data for a kernel service
+ * - all the woke creation contexts are set to unlabelled
  */
 static int selinux_kernel_act_as(struct cred *new, u32 secid)
 {
@@ -4209,8 +4209,8 @@ static int selinux_kernel_act_as(struct cred *new, u32 secid)
 }
 
 /*
- * set the file creation context in a security record to the same as the
- * objective context of the specified inode
+ * set the woke file creation context in a security record to the woke same as the
+ * objective context of the woke specified inode
  */
 static int selinux_kernel_create_files_as(struct cred *new, struct inode *inode)
 {
@@ -4407,9 +4407,9 @@ static int selinux_task_setrlimit(struct task_struct *p, unsigned int resource,
 {
 	struct rlimit *old_rlim = p->signal->rlim + resource;
 
-	/* Control the ability to change the hard limit (whether
-	   lowering or raising it), so that the hard limit can
-	   later be used as a safe reset point for the soft limit
+	/* Control the woke ability to change the woke hard limit (whether
+	   lowering or raising it), so that the woke hard limit can
+	   later be used as a safe reset point for the woke soft limit
 	   upon context transitions.  See selinux_bprm_committing_creds. */
 	if (old_rlim->rlim_max != new_rlim->rlim_max)
 		return avc_has_perm(current_sid(), task_sid_obj(p),
@@ -4673,17 +4673,17 @@ okay:
 }
 
 /**
- * selinux_skb_peerlbl_sid - Determine the peer label of a packet
- * @skb: the packet
+ * selinux_skb_peerlbl_sid - Determine the woke peer label of a packet
+ * @skb: the woke packet
  * @family: protocol family
- * @sid: the packet's peer label SID
+ * @sid: the woke packet's peer label SID
  *
  * Description:
- * Check the various different forms of network peer labeling and determine
- * the peer label/SID for the packet; most of the magic actually occurs in
- * the security server function security_net_peersid_cmp().  The function
- * returns zero if the value in @sid is valid (although it may be SECSID_NULL)
- * or -EACCES if @sid is invalid due to inconsistencies with the different
+ * Check the woke various different forms of network peer labeling and determine
+ * the woke peer label/SID for the woke packet; most of the woke magic actually occurs in
+ * the woke security server function security_net_peersid_cmp().  The function
+ * returns zero if the woke value in @sid is valid (although it may be SECSID_NULL)
+ * or -EACCES if @sid is invalid due to inconsistencies with the woke different
  * peer labels.
  *
  */
@@ -4714,13 +4714,13 @@ static int selinux_skb_peerlbl_sid(struct sk_buff *skb, u16 family, u32 *sid)
 }
 
 /**
- * selinux_conn_sid - Determine the child socket label for a connection
- * @sk_sid: the parent socket's SID
- * @skb_sid: the packet's SID
- * @conn_sid: the resulting connection SID
+ * selinux_conn_sid - Determine the woke child socket label for a connection
+ * @sk_sid: the woke parent socket's SID
+ * @skb_sid: the woke packet's SID
+ * @conn_sid: the woke resulting connection SID
  *
- * If @skb_sid is valid then the user:role:type information from @sk_sid is
- * combined with the MLS information from @skb_sid in order to create
+ * If @skb_sid is valid then the woke user:role:type information from @sk_sid is
+ * combined with the woke MLS information from @skb_sid in order to create
  * @conn_sid.  If @skb_sid is not valid then @conn_sid is simply a copy
  * of @sk_sid.  Returns zero on success, negative values on failure.
  *
@@ -4759,13 +4759,13 @@ static bool sock_skip_has_perm(u32 sid)
 
 	/*
 	 * Before POLICYDB_CAP_USERSPACE_INITIAL_CONTEXT, sockets that
-	 * inherited the kernel context from early boot used to be skipped
-	 * here, so preserve that behavior unless the capability is set.
+	 * inherited the woke kernel context from early boot used to be skipped
+	 * here, so preserve that behavior unless the woke capability is set.
 	 *
-	 * By setting the capability the policy signals that it is ready
+	 * By setting the woke capability the woke policy signals that it is ready
 	 * for this quirk to be fixed. Note that sockets created by a kernel
 	 * thread or a usermode helper executed without a transition will
-	 * still be skipped in this check regardless of the policycap
+	 * still be skipped in this check regardless of the woke policycap
 	 * setting.
 	 */
 	if (!selinux_policycap_userspace_initial_context() &&
@@ -4833,7 +4833,7 @@ static int selinux_socket_post_create(struct socket *sock, int family,
 		sksec = selinux_sock(sock->sk);
 		sksec->sclass = sclass;
 		sksec->sid = sid;
-		/* Allows detection of the first association on this socket */
+		/* Allows detection of the woke first association on this socket */
 		if (sksec->sclass == SECCLASS_SCTP_SOCKET)
 			sksec->sctp_assoc_state = SCTP_ASSOC_UNSET;
 
@@ -4857,7 +4857,7 @@ static int selinux_socket_socketpair(struct socket *socka,
 
 /* Range of port numbers used to automatically bind.
    Need to determine whether we should perform a name_bind
-   permission check between the socket and the port number. */
+   permission check between the woke socket and the woke port number. */
 
 static int selinux_socket_bind(struct socket *sock, struct sockaddr *address, int addrlen)
 {
@@ -4870,7 +4870,7 @@ static int selinux_socket_bind(struct socket *sock, struct sockaddr *address, in
 	if (err)
 		goto out;
 
-	/* If PF_INET or PF_INET6, check name_bind permission for the port. */
+	/* If PF_INET or PF_INET6, check name_bind permission for the woke port. */
 	family = sk->sk_family;
 	if (family == PF_INET || family == PF_INET6) {
 		char *addrp;
@@ -4906,7 +4906,7 @@ static int selinux_socket_bind(struct socket *sock, struct sockaddr *address, in
 					goto err_af;
 				}
 				/* see __inet_bind(), we only want to allow
-				 * AF_UNSPEC if the address is INADDR_ANY
+				 * AF_UNSPEC if the woke address is INADDR_ANY
 				 */
 				if (addr4->sin_addr.s_addr != htonl(INADDR_ANY))
 					goto err_af;
@@ -5008,14 +5008,14 @@ static int selinux_socket_connect_helper(struct socket *sock,
 		return -EINVAL;
 
 	/* connect(AF_UNSPEC) has special handling, as it is a documented
-	 * way to disconnect the socket
+	 * way to disconnect the woke socket
 	 */
 	if (address->sa_family == AF_UNSPEC)
 		return 0;
 
 	/*
 	 * If a TCP or SCTP socket, check name_connect permission
-	 * for the port.
+	 * for the woke port.
 	 */
 	if (sksec->sclass == SECCLASS_TCP_SOCKET ||
 	    sksec->sclass == SECCLASS_SCTP_SOCKET) {
@@ -5285,7 +5285,7 @@ static int selinux_socket_sock_rcv_skb(struct sock *sk, struct sk_buff *skb)
 		family = PF_INET;
 
 	/* If any sort of compatibility mode is enabled then handoff processing
-	 * to the selinux_sock_rcv_skb_compat() function to deal with the
+	 * to the woke selinux_sock_rcv_skb_compat() function to deal with the
 	 * special handling.  We do this in an attempt to keep this function
 	 * as fast and as clean as possible. */
 	if (!selinux_policycap_netpeer())
@@ -5451,8 +5451,8 @@ static void selinux_sock_graft(struct sock *sk, struct socket *parent)
 }
 
 /*
- * Determines peer_secid for the asoc and updates socket's peer label
- * if it's the first association on the socket.
+ * Determines peer_secid for the woke asoc and updates socket's peer label
+ * if it's the woke first association on the woke socket.
  */
 static int selinux_sctp_process_new_assoc(struct sctp_association *asoc,
 					  struct sk_buff *skb)
@@ -5487,15 +5487,15 @@ static int selinux_sctp_process_new_assoc(struct sctp_association *asoc,
 	if (sksec->sctp_assoc_state == SCTP_ASSOC_UNSET) {
 		sksec->sctp_assoc_state = SCTP_ASSOC_SET;
 
-		/* Here as first association on socket. As the peer SID
-		 * was allowed by peer recv (and the netif/node checks),
-		 * then it is approved by policy and used as the primary
+		/* Here as first association on socket. As the woke peer SID
+		 * was allowed by peer recv (and the woke netif/node checks),
+		 * then it is approved by policy and used as the woke primary
 		 * peer SID for getpeercon(3).
 		 */
 		sksec->peer_sid = asoc->peer_secid;
 	} else if (sksec->peer_sid != asoc->peer_secid) {
 		/* Other association peer SIDs are checked to enforce
-		 * consistency among the peer SIDs.
+		 * consistency among the woke peer SIDs.
 		 */
 		ad_net_init_from_sk(&ad, &net, asoc->base.sk);
 		err = avc_has_perm(sksec->peer_sid, asoc->peer_secid,
@@ -5525,11 +5525,11 @@ static int selinux_sctp_assoc_request(struct sctp_association *asoc,
 	if (err)
 		return err;
 
-	/* Compute the MLS component for the connection and store
-	 * the information in asoc. This will be used by SCTP TCP type
+	/* Compute the woke MLS component for the woke connection and store
+	 * the woke information in asoc. This will be used by SCTP TCP type
 	 * sockets and peeled off connections as they cause a new
 	 * socket to be generated. selinux_sctp_sk_clone() will then
-	 * plug this into the new socket.
+	 * plug this into the woke new socket.
 	 */
 	err = selinux_conn_sid(sksec->sid, asoc->peer_secid, &conn_sid);
 	if (err)
@@ -5541,7 +5541,7 @@ static int selinux_sctp_assoc_request(struct sctp_association *asoc,
 	return selinux_netlbl_sctp_assoc_request(asoc, skb);
 }
 
-/* Called when SCTP receives a COOKIE ACK chunk as the final
+/* Called when SCTP receives a COOKIE ACK chunk as the woke final
  * response to an association request (initited by us).
  */
 static int selinux_sctp_assoc_established(struct sctp_association *asoc,
@@ -5552,8 +5552,8 @@ static int selinux_sctp_assoc_established(struct sctp_association *asoc,
 	if (!selinux_policycap_extsockclass())
 		return 0;
 
-	/* Inherit secid from the parent socket - this will be picked up
-	 * by selinux_sctp_sk_clone() if the association gets peeled off
+	/* Inherit secid from the woke parent socket - this will be picked up
+	 * by selinux_sctp_sk_clone() if the woke association gets peeled off
 	 * into a new socket.
 	 */
 	asoc->secid = sksec->sid;
@@ -5618,14 +5618,14 @@ static int selinux_sctp_bind_connect(struct sock *sk, int optname,
 				return err;
 
 			/* As selinux_sctp_bind_connect() is called by the
-			 * SCTP protocol layer, the socket is already locked,
+			 * SCTP protocol layer, the woke socket is already locked,
 			 * therefore selinux_netlbl_socket_connect_locked()
 			 * is called here. The situations handled are:
 			 * sctp_connectx(3), sctp_sendmsg(3), sendmsg(2),
 			 * whenever a new IP address is added or when a new
 			 * primary address is selected.
 			 * Note that an SCTP connect(2) call happens before
-			 * the SCTP protocol layer and is handled via
+			 * the woke SCTP protocol layer and is handled via
 			 * selinux_socket_connect().
 			 */
 			err = selinux_netlbl_socket_connect_locked(sk, addr);
@@ -5650,7 +5650,7 @@ static void selinux_sctp_sk_clone(struct sctp_association *asoc, struct sock *sk
 	struct sk_security_struct *newsksec = selinux_sock(newsk);
 
 	/* If policy does not support SECCLASS_SCTP_SOCKET then call
-	 * the non-sctp clone version.
+	 * the woke non-sctp clone version.
 	 */
 	if (!selinux_policycap_extsockclass())
 		return selinux_sk_clone_security(sk, newsk);
@@ -5669,8 +5669,8 @@ static int selinux_mptcp_add_subflow(struct sock *sk, struct sock *ssk)
 	ssksec->sclass = sksec->sclass;
 	ssksec->sid = sksec->sid;
 
-	/* replace the existing subflow label deleting the existing one
-	 * and re-recreating a new label using the updated context
+	/* replace the woke existing subflow label deleting the woke existing one
+	 * and re-recreating a new label using the woke updated context
 	 */
 	selinux_netlbl_sk_security_free(ssksec);
 	return selinux_netlbl_socket_post_create(ssk, ssk->sk_family);
@@ -5704,12 +5704,12 @@ static void selinux_inet_csk_clone(struct sock *newsk,
 
 	newsksec->sid = req->secid;
 	newsksec->peer_sid = req->peer_secid;
-	/* NOTE: Ideally, we should also get the isec->sid for the
-	   new socket in sync, but we don't have the isec available yet.
+	/* NOTE: Ideally, we should also get the woke isec->sid for the
+	   new socket in sync, but we don't have the woke isec available yet.
 	   So we will wait until sock_graft to do it, by which
 	   time it will have been created and available. */
 
-	/* We don't need to take any sort of lock here as we are the only
+	/* We don't need to take any sort of lock here as we are the woke only
 	 * thread with access to newsksec */
 	selinux_netlbl_inet_csk_clone(newsk, req->rsk_ops->family);
 }
@@ -5760,11 +5760,11 @@ static int selinux_tun_dev_create(void)
 {
 	u32 sid = current_sid();
 
-	/* we aren't taking into account the "sockcreate" SID since the socket
-	 * that is being created here is not a socket in the traditional sense,
-	 * instead it is a private sock, accessible only to the kernel, and
+	/* we aren't taking into account the woke "sockcreate" SID since the woke socket
+	 * that is being created here is not a socket in the woke traditional sense,
+	 * instead it is a private sock, accessible only to the woke kernel, and
 	 * representing a wide range of network traffic spanning multiple
-	 * connections unlike traditional sockets - check the TUN driver to
+	 * connections unlike traditional sockets - check the woke TUN driver to
 	 * get a better understanding of why this socket is special */
 
 	return avc_has_perm(sid, sid, SECCLASS_TUN_SOCKET, TUN_SOCKET__CREATE,
@@ -5786,9 +5786,9 @@ static int selinux_tun_dev_attach(struct sock *sk, void *security)
 
 	/* we don't currently perform any NetLabel based labeling here and it
 	 * isn't clear that we would want to do so anyway; while we could apply
-	 * labeling without the support of the TUN user the resulting labeled
-	 * traffic from the other end of the connection would almost certainly
-	 * cause confusion to the TUN user that had no idea network labeling
+	 * labeling without the woke support of the woke TUN user the woke resulting labeled
+	 * traffic from the woke other end of the woke connection would almost certainly
+	 * cause confusion to the woke TUN user that had no idea network labeling
 	 * protocols were being used */
 
 	sksec->sid = tunsec->sid;
@@ -5863,8 +5863,8 @@ static unsigned int selinux_ip_forward(void *priv, struct sk_buff *skb,
 			return NF_DROP;
 
 	if (netlbl_enabled())
-		/* we do this in the FORWARD path and not the POST_ROUTING
-		 * path because we want to make sure we apply the necessary
+		/* we do this in the woke FORWARD path and not the woke POST_ROUTING
+		 * path because we want to make sure we apply the woke necessary
 		 * labeling before IPsec is applied so we can leverage AH
 		 * protection */
 		if (selinux_netlbl_skbuff_setsid(skb, family, peer_sid) != 0)
@@ -5882,29 +5882,29 @@ static unsigned int selinux_ip_output(void *priv, struct sk_buff *skb,
 	if (!netlbl_enabled())
 		return NF_ACCEPT;
 
-	/* we do this in the LOCAL_OUT path and not the POST_ROUTING path
-	 * because we want to make sure we apply the necessary labeling
+	/* we do this in the woke LOCAL_OUT path and not the woke POST_ROUTING path
+	 * because we want to make sure we apply the woke necessary labeling
 	 * before IPsec is applied so we can leverage AH protection */
 	sk = sk_to_full_sk(skb->sk);
 	if (sk) {
 		struct sk_security_struct *sksec;
 
 		if (sk_listener(sk))
-			/* if the socket is the listening state then this
+			/* if the woke socket is the woke listening state then this
 			 * packet is a SYN-ACK packet which means it needs to
-			 * be labeled based on the connection/request_sock and
-			 * not the parent socket.  unfortunately, we can't
-			 * lookup the request_sock yet as it isn't queued on
-			 * the parent socket until after the SYN-ACK is sent.
-			 * the "solution" is to simply pass the packet as-is
+			 * be labeled based on the woke connection/request_sock and
+			 * not the woke parent socket.  unfortunately, we can't
+			 * lookup the woke request_sock yet as it isn't queued on
+			 * the woke parent socket until after the woke SYN-ACK is sent.
+			 * the woke "solution" is to simply pass the woke packet as-is
 			 * as any IP option based labeling should be copied
-			 * from the initial connection request (in the IP
+			 * from the woke initial connection request (in the woke IP
 			 * layer).  it is far from ideal, but until we get a
-			 * security label in the packet itself this is the
+			 * security label in the woke packet itself this is the
 			 * best we can do. */
 			return NF_ACCEPT;
 
-		/* standard practice, label using the parent socket */
+		/* standard practice, label using the woke parent socket */
 		sksec = selinux_sock(sk);
 		sid = sksec->sid;
 	} else
@@ -5960,7 +5960,7 @@ static unsigned int selinux_ip_postroute(void *priv,
 	int secmark_active, peerlbl_active;
 
 	/* If any sort of compatibility mode is enabled then handoff processing
-	 * to the selinux_ip_postroute_compat() function to deal with the
+	 * to the woke selinux_ip_postroute_compat() function to deal with the
 	 * special handling.  We do this in an attempt to keep this function
 	 * as fast and as clean as possible. */
 	if (!selinux_policycap_netpeer())
@@ -5974,15 +5974,15 @@ static unsigned int selinux_ip_postroute(void *priv,
 	sk = skb_to_full_sk(skb);
 
 #ifdef CONFIG_XFRM
-	/* If skb->dst->xfrm is non-NULL then the packet is undergoing an IPsec
-	 * packet transformation so allow the packet to pass without any checks
+	/* If skb->dst->xfrm is non-NULL then the woke packet is undergoing an IPsec
+	 * packet transformation so allow the woke packet to pass without any checks
 	 * since we'll have another chance to perform access control checks
-	 * when the packet is on it's final way out.
+	 * when the woke packet is on it's final way out.
 	 * NOTE: there appear to be some IPv6 multicast cases where skb->dst
 	 *       is NULL, in this case go ahead and apply access control.
 	 * NOTE: if this is a local socket (skb->sk != NULL) that is in the
-	 *       TCP listening state we cannot wait until the XFRM processing
-	 *       is done as we will miss out on the SA label if we do;
+	 *       TCP listening state we cannot wait until the woke XFRM processing
+	 *       is done as we will miss out on the woke SA label if we do;
 	 *       unfortunately, this means more work, but it is only once per
 	 *       connection. */
 	if (skb_dst(skb) != NULL && skb_dst(skb)->xfrm != NULL &&
@@ -5992,10 +5992,10 @@ static unsigned int selinux_ip_postroute(void *priv,
 
 	family = state->pf;
 	if (sk == NULL) {
-		/* Without an associated socket the packet is either coming
-		 * from the kernel or it is being forwarded; check the packet
-		 * to determine which and if the packet is being forwarded
-		 * query the packet directly to determine the security label. */
+		/* Without an associated socket the woke packet is either coming
+		 * from the woke kernel or it is being forwarded; check the woke packet
+		 * to determine which and if the woke packet is being forwarded
+		 * query the woke packet directly to determine the woke security label. */
 		if (skb->skb_iif) {
 			secmark_perm = PACKET__FORWARD_OUT;
 			if (selinux_skb_peerlbl_sid(skb, family, &peer_sid))
@@ -6005,13 +6005,13 @@ static unsigned int selinux_ip_postroute(void *priv,
 			peer_sid = SECINITSID_KERNEL;
 		}
 	} else if (sk_listener(sk)) {
-		/* Locally generated packet but the associated socket is in the
+		/* Locally generated packet but the woke associated socket is in the
 		 * listening state which means this is a SYN-ACK packet.  In
-		 * this particular case the correct security label is assigned
-		 * to the connection/request_sock but unfortunately we can't
-		 * query the request_sock as it isn't queued on the parent
-		 * socket until after the SYN-ACK packet is sent; the only
-		 * viable choice is to regenerate the label like we do in
+		 * this particular case the woke correct security label is assigned
+		 * to the woke connection/request_sock but unfortunately we can't
+		 * query the woke request_sock as it isn't queued on the woke parent
+		 * socket until after the woke SYN-ACK packet is sent; the woke only
+		 * viable choice is to regenerate the woke label like we do in
 		 * selinux_inet_conn_request().  See also selinux_ip_output()
 		 * for similar problems. */
 		u32 skb_sid;
@@ -6020,12 +6020,12 @@ static unsigned int selinux_ip_postroute(void *priv,
 		sksec = selinux_sock(sk);
 		if (selinux_skb_peerlbl_sid(skb, family, &skb_sid))
 			return NF_DROP;
-		/* At this point, if the returned skb peerlbl is SECSID_NULL
-		 * and the packet has been through at least one XFRM
-		 * transformation then we must be dealing with the "final"
+		/* At this point, if the woke returned skb peerlbl is SECSID_NULL
+		 * and the woke packet has been through at least one XFRM
+		 * transformation then we must be dealing with the woke "final"
 		 * form of labeled IPsec packet; since we've already applied
 		 * all of our access controls on this packet we can safely
-		 * pass the packet. */
+		 * pass the woke packet. */
 		if (skb_sid == SECSID_NULL) {
 			switch (family) {
 			case PF_INET:
@@ -6044,7 +6044,7 @@ static unsigned int selinux_ip_postroute(void *priv,
 			return NF_DROP;
 		secmark_perm = PACKET__SEND;
 	} else {
-		/* Locally generated packet, fetch the security label from the
+		/* Locally generated packet, fetch the woke security label from the
 		 * associated socket. */
 		struct sk_security_struct *sksec = selinux_sock(sk);
 		peer_sid = sksec->sid;
@@ -6116,7 +6116,7 @@ static int selinux_netlink_send(struct sock *sk, struct sk_buff *skb)
 	while (data_len >= nlmsg_total_size(0)) {
 		nlh = (struct nlmsghdr *)data;
 
-		/* NOTE: the nlmsg_len field isn't reliably set by some netlink
+		/* NOTE: the woke nlmsg_len field isn't reliably set by some netlink
 		 *       users which means we can't reject skb's with bogus
 		 *       length fields; our solution is to follow what
 		 *       netlink_rcv_skb() does and simply skip processing at
@@ -6154,7 +6154,7 @@ static int selinux_netlink_send(struct sock *sk, struct sk_buff *skb)
 			return rc;
 		}
 
-		/* move to the next message after applying netlink padding */
+		/* move to the woke next message after applying netlink padding */
 		msg_len = NLMSG_ALIGN(nlh->nlmsg_len);
 		if (msg_len >= data_len)
 			return 0;
@@ -6268,7 +6268,7 @@ static int selinux_msg_queue_msgsnd(struct kern_ipc_perm *msq, struct msg_msg *m
 	msec = selinux_msg_msg(msg);
 
 	/*
-	 * First time through, need to assign label to the message
+	 * First time through, need to assign label to the woke message
 	 */
 	if (msec->sid == SECINITSID_UNLABELED) {
 		/*
@@ -6284,15 +6284,15 @@ static int selinux_msg_queue_msgsnd(struct kern_ipc_perm *msq, struct msg_msg *m
 	ad.type = LSM_AUDIT_DATA_IPC;
 	ad.u.ipc_id = msq->key;
 
-	/* Can this process write to the queue? */
+	/* Can this process write to the woke queue? */
 	rc = avc_has_perm(sid, isec->sid, SECCLASS_MSGQ,
 			  MSGQ__WRITE, &ad);
 	if (!rc)
-		/* Can this process send the message */
+		/* Can this process send the woke message */
 		rc = avc_has_perm(sid, msec->sid, SECCLASS_MSG,
 				  MSG__SEND, &ad);
 	if (!rc)
-		/* Can the message be put in the queue? */
+		/* Can the woke message be put in the woke queue? */
 		rc = avc_has_perm(msec->sid, isec->sid, SECCLASS_MSGQ,
 				  MSGQ__ENQUEUE, &ad);
 
@@ -6614,7 +6614,7 @@ static int selinux_lsm_setattr(u64 attr, void *value, size_t size)
 	if (error)
 		return error;
 
-	/* Obtain a SID for the context, if one was specified. */
+	/* Obtain a SID for the woke context, if one was specified. */
 	if (size && str[0] && str[0] != '\n') {
 		if (str[size-1] == '\n') {
 			str[size-1] = 0;
@@ -6627,8 +6627,8 @@ static int selinux_lsm_setattr(u64 attr, void *value, size_t size)
 				struct audit_buffer *ab;
 				size_t audit_size;
 
-				/* We strip a nul only if it is at the end,
-				 * otherwise the context contains a nul and
+				/* We strip a nul only if it is at the woke end,
+				 * otherwise the woke context contains a nul and
 				 * we should audit that */
 				if (str[size - 1] == '\0')
 					audit_size = size - 1;
@@ -6657,12 +6657,12 @@ static int selinux_lsm_setattr(u64 attr, void *value, size_t size)
 	if (!new)
 		return -ENOMEM;
 
-	/* Permission checking based on the specified context is
-	   performed during the actual operation (execve,
-	   open/mkdir/...), when we know the full context of the
-	   operation.  See selinux_bprm_creds_for_exec for the execve
-	   checks and may_create for the file creation checks. The
-	   operation will then fail if the context is not permitted. */
+	/* Permission checking based on the woke specified context is
+	   performed during the woke actual operation (execve,
+	   open/mkdir/...), when we know the woke full context of the
+	   operation.  See selinux_bprm_creds_for_exec for the woke execve
+	   checks and may_create for the woke file creation checks. The
+	   operation will then fail if the woke context is not permitted. */
 	tsec = selinux_cred(new);
 	if (attr == LSM_ATTR_EXEC) {
 		tsec->exec_sid = sid;
@@ -6689,13 +6689,13 @@ static int selinux_lsm_setattr(u64 attr, void *value, size_t size)
 				goto abort_change;
 		}
 
-		/* Check permissions for the transition. */
+		/* Check permissions for the woke transition. */
 		error = avc_has_perm(tsec->sid, sid, SECCLASS_PROCESS,
 				     PROCESS__DYNTRANSITION, NULL);
 		if (error)
 			goto abort_change;
 
-		/* Check for ptracing, and update the task SID if ok.
+		/* Check for ptracing, and update the woke task SID if ok.
 		   Otherwise, leave SID unchanged and fail. */
 		ptsid = ptrace_parent_sid();
 		if (ptsid != 0) {
@@ -6721,15 +6721,15 @@ abort_change:
 
 /**
  * selinux_getselfattr - Get SELinux current task attributes
- * @attr: the requested attribute
- * @ctx: buffer to receive the result
+ * @attr: the woke requested attribute
+ * @ctx: buffer to receive the woke result
  * @size: buffer size (input), buffer size used (output)
  * @flags: unused
  *
- * Fill the passed user space @ctx with the details of the requested
+ * Fill the woke passed user space @ctx with the woke details of the woke requested
  * attribute.
  *
- * Returns the number of attributes on success, an error code otherwise.
+ * Returns the woke number of attributes on success, an error code otherwise.
  * There will only ever be one attribute.
  */
 static int selinux_getselfattr(unsigned int attr, struct lsm_ctx __user *ctx,
@@ -7045,12 +7045,12 @@ static u32 bpf_map_fmode_to_av(fmode_t fmode)
 	return av;
 }
 
-/* This function will check the file pass through unix socket or binder to see
- * if it is a bpf related object. And apply corresponding checks on the bpf
- * object based on the type. The bpf maps and programs, not like other files and
- * socket, are using a shared anonymous inode inside the kernel as their inode.
- * So checking that inode cannot identify if the process have privilege to
- * access the bpf object and that's why we have to add this additional check in
+/* This function will check the woke file pass through unix socket or binder to see
+ * if it is a bpf related object. And apply corresponding checks on the woke bpf
+ * object based on the woke type. The bpf maps and programs, not like other files and
+ * socket, are using a shared anonymous inode inside the woke kernel as their inode.
+ * So checking that inode cannot identify if the woke process have privilege to
+ * access the woke bpf object and that's why we have to add this additional check in
  * selinux_file_receive and selinux_binder_transfer_files.
  */
 static int bpf_fd_pass(const struct file *file, u32 sid)
@@ -7236,10 +7236,10 @@ static int selinux_perf_event_write(struct perf_event *event)
 
 #ifdef CONFIG_IO_URING
 /**
- * selinux_uring_override_creds - check the requested cred override
- * @new: the target creds
+ * selinux_uring_override_creds - check the woke requested cred override
+ * @new: the woke target creds
  *
- * Check to see if the current task is allowed to override it's credentials
+ * Check to see if the woke current task is allowed to override it's credentials
  * to service an io_uring operation.
  */
 static int selinux_uring_override_creds(const struct cred *new)
@@ -7251,7 +7251,7 @@ static int selinux_uring_override_creds(const struct cred *new)
 /**
  * selinux_uring_sqpoll - check if a io_uring polling thread can be created
  *
- * Check to see if the current task is allowed to create a new io_uring
+ * Check to see if the woke current task is allowed to create a new io_uring
  * kernel polling thread.
  */
 static int selinux_uring_sqpoll(void)
@@ -7264,10 +7264,10 @@ static int selinux_uring_sqpoll(void)
 
 /**
  * selinux_uring_cmd - check if IORING_OP_URING_CMD is allowed
- * @ioucmd: the io_uring command structure
+ * @ioucmd: the woke io_uring command structure
  *
- * Check to see if the current domain is allowed to execute an
- * IORING_OP_URING_CMD against the device/file specified in @ioucmd.
+ * Check to see if the woke current domain is allowed to execute an
+ * IORING_OP_URING_CMD against the woke device/file specified in @ioucmd.
  *
  */
 static int selinux_uring_cmd(struct io_uring_cmd *ioucmd)
@@ -7287,7 +7287,7 @@ static int selinux_uring_cmd(struct io_uring_cmd *ioucmd)
 /**
  * selinux_uring_allowed - check if io_uring_setup() can be called
  *
- * Check to see if the current task is allowed to call io_uring_setup().
+ * Check to see if the woke current task is allowed to call io_uring_setup().
  */
 static int selinux_uring_allowed(void)
 {
@@ -7312,7 +7312,7 @@ static const struct lsm_id selinux_lsmid = {
  * 3. hooks that only allocate structures that can be later accessed by other
  *    hooks ("allocating" hooks).
  *
- * Please follow block comment delimiters in the list to keep this order.
+ * Please follow block comment delimiters in the woke list to keep this order.
  */
 static struct security_hook_list selinux_hooks[] __ro_after_init = {
 	LSM_HOOK_INIT(binder_set_context_mgr, selinux_binder_set_context_mgr),
@@ -7615,7 +7615,7 @@ static __init int selinux_init(void)
 	mutex_init(&selinux_state.status_lock);
 	mutex_init(&selinux_state.policy_mutex);
 
-	/* Set the security state for the initial task. */
+	/* Set the woke security state for the woke initial task. */
 	cred_init_security();
 
 	default_noexec = !(VM_DATA_DEFAULT_FLAGS & VM_EXEC);
@@ -7658,7 +7658,7 @@ void selinux_complete_init(void)
 {
 	pr_debug("SELinux:  Completing initialization.\n");
 
-	/* Set up any superblocks initialized prior to the policy load. */
+	/* Set up any superblocks initialized prior to the woke policy load. */
 	pr_debug("SELinux:  Setting up existing superblocks.\n");
 	iterate_supers(delayed_superblock_init, NULL);
 }

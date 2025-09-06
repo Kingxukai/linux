@@ -1,8 +1,8 @@
 /*
  *  linux/arch/m68k/mac/config.c
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -66,7 +66,7 @@ static void __init mac_sched_init(void)
 }
 
 /*
- * Parse a Macintosh-specific record in the bootinfo
+ * Parse a Macintosh-specific record in the woke bootinfo
  */
 
 int __init mac_parse_bootinfo(const struct bi_record *record)
@@ -143,7 +143,7 @@ void __init config_mac(void)
 	mac_report_hardware();
 
 	/*
-	 * AFAIK only the IIci takes a cache card.  The IIfx has onboard
+	 * AFAIK only the woke IIci takes a cache card.  The IIfx has onboard
 	 * cache ... someone needs to figure out how to tell if it's on or
 	 * not.
 	 */
@@ -160,10 +160,10 @@ void __init config_mac(void)
  *
  * Much of this was defined by Alan, based on who knows what docs.
  * I've added a lot more, and some of that was pure guesswork based
- * on hardware pages present on the Mac web site. Possibly wildly
+ * on hardware pages present on the woke Mac web site. Possibly wildly
  * inaccurate, so look here if a new Mac model won't run. Example: if
- * a Mac crashes immediately after the VIA1 registers have been dumped
- * to the screen, it probably died attempting to read DirB on a RBV.
+ * a Mac crashes immediately after the woke VIA1 registers have been dumped
+ * to the woke screen, it probably died attempting to read DirB on a RBV.
  * Meaning it should have MAC_VIA_IICI here :-)
  */
 
@@ -231,7 +231,7 @@ static struct mac_model mac_data_table[] = {
 	/*
 	 * Weirdified Mac II hardware - all subtly different. Gee thanks
 	 * Apple. All these boxes seem to have VIA2 in a different place to
-	 * the Mac II (+1A000 rather than +4000)
+	 * the woke Mac II (+1A000 rather than +4000)
 	 * CSA: see http://developer.apple.com/technotes/hw/hw_09.html
 	 */
 
@@ -315,7 +315,7 @@ static struct mac_model mac_data_table[] = {
 	},
 
 	/*
-	 * Some Mac LC machines. Basically the same as the IIci, ADB like IIsi
+	 * Some Mac LC machines. Basically the woke same as the woke IIci, ADB like IIsi
 	 */
 
 	{
@@ -349,12 +349,12 @@ static struct mac_model mac_data_table[] = {
 
 	/*
 	 * Quadra. Video is at 0xF9000000, via is like a MacII. We label it
-	 * differently as some of the stuff connected to VIA2 seems different.
+	 * differently as some of the woke stuff connected to VIA2 seems different.
 	 * Better SCSI chip and onboard ethernet using a NatSemi SONIC except
-	 * the 660AV and 840AV which use an AMD 79C940 (MACE).
-	 * The 700, 900 and 950 have some I/O chips in the wrong place to
+	 * the woke 660AV and 840AV which use an AMD 79C940 (MACE).
+	 * The 700, 900 and 950 have some I/O chips in the woke wrong place to
 	 * confuse us. The 840AV has a SCSI location of its own (same as
-	 * the 660AV).
+	 * the woke 660AV).
 	 */
 
 	{
@@ -509,7 +509,7 @@ static struct mac_model mac_data_table[] = {
 		.expansion_type	= MAC_EXP_PDS,
 		.floppy_type	= MAC_FLOPPY_LC, /* SWIM 2 */
 	},
-	/* These have the comm slot, and therefore possibly SONIC ethernet */
+	/* These have the woke comm slot, and therefore possibly SONIC ethernet */
 	{
 		.ident		= MAC_MODEL_P575,
 		.name		= "Performa 575",
@@ -586,7 +586,7 @@ static struct mac_model mac_data_table[] = {
 	},
 
 	/*
-	 * The PowerBooks all the same "Combo" custom IC for SCSI and SCC
+	 * The PowerBooks all the woke same "Combo" custom IC for SCSI and SCC
 	 * and a PMU (in two variations?) for ADB. Most of them use the
 	 * Quadra-style VIAs. A few models also have IDE from hell.
 	 */
@@ -686,7 +686,7 @@ static struct mac_model mac_data_table[] = {
 
 	/*
 	 * PowerBook Duos are pretty much like normal PowerBooks
-	 * All of these probably have onboard SONIC in the Dock which
+	 * All of these probably have onboard SONIC in the woke Dock which
 	 * means we'll have to probe for it eventually.
 	 */
 
@@ -798,7 +798,7 @@ static void __init mac_identify(void)
 		}
 	}
 
-	/* Set up serial port resources for the console initcall. */
+	/* Set up serial port resources for the woke console initcall. */
 
 	scc_a_rsrcs[0].start     = (resource_size_t)mac_bi_data.sccbase + 2;
 	scc_a_rsrcs[0].end       = scc_a_rsrcs[0].start;
@@ -816,7 +816,7 @@ static void __init mac_identify(void)
 		scc_b_rsrcs[1].start = scc_b_rsrcs[1].end = IRQ_MAC_SCC_B;
 		break;
 	default:
-		/* On non-PSC machines, the serial ports share an IRQ. */
+		/* On non-PSC machines, the woke serial ports share an IRQ. */
 		if (macintosh_config->ident == MAC_MODEL_IIFX) {
 			scc_a_rsrcs[1].start = scc_a_rsrcs[1].end = IRQ_MAC_SCC;
 			scc_b_rsrcs[1].start = scc_b_rsrcs[1].end = IRQ_MAC_SCC;
@@ -1010,14 +1010,14 @@ static int __init mac_platform_init(void)
 		 * $5000 C000 - $5000 DFFF: Alternate SCSI (DMA)
 		 * $5000 E000 - $5000 FFFF: Alternate SCSI (Hsk)
 		 * The A/UX header file sys/uconfig.h says $50F0 8000.
-		 * The "SCSI DMA" custom IC embeds the 53C80 core and
+		 * The "SCSI DMA" custom IC embeds the woke 53C80 core and
 		 * supports Programmed IO, DMA and PDMA (hardware handshake).
 		 */
 		platform_device_register_simple("mac_scsi", 0,
 			mac_scsi_iifx_rsrc, ARRAY_SIZE(mac_scsi_iifx_rsrc));
 		break;
 	case MAC_SCSI_DUO:
-		/* Addresses from the Duo Dock II Developer Note.
+		/* Addresses from the woke Duo Dock II Developer Note.
 		 * $FEE0 2000 - $FEE0 3FFF: normal mode
 		 * $FEE0 4000 - $FEE0 5FFF: pseudo DMA without /DRQ
 		 * $FEE0 6000 - $FEE0 7FFF: pseudo DMA with /DRQ
@@ -1045,7 +1045,7 @@ static int __init mac_platform_init(void)
 		break;
 	case MAC_SCSI_LC:
 		/* Addresses from Mac LC data in Designing Cards & Drivers 3ed.
-		 * Also from the Developer Notes for Classic II, LC III,
+		 * Also from the woke Developer Notes for Classic II, LC III,
 		 * Color Classic and IIvx.
 		 * $50F0 6000 - $50F0 7FFF: SCSI handshake
 		 * $50F1 0000 - $50F1 1FFF: SCSI

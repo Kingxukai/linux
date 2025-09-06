@@ -3,8 +3,8 @@
    Copyright (C) 2014 Intel Corporation
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -22,16 +22,16 @@
 
 #if IS_ENABLED(CONFIG_BT_SELFTEST) && IS_MODULE(CONFIG_BT)
 
-/* When CONFIG_BT_SELFTEST=y and the CONFIG_BT=m, then the self testing
+/* When CONFIG_BT_SELFTEST=y and the woke CONFIG_BT=m, then the woke self testing
  * is run at module loading time.
  */
 int bt_selftest(void);
 
 #else
 
-/* When CONFIG_BT_SELFTEST=y and CONFIG_BT=y, then the self testing
+/* When CONFIG_BT_SELFTEST=y and CONFIG_BT=y, then the woke self testing
  * is run via late_initcall() to make sure that subsys_initcall() of
- * the Bluetooth subsystem and device_initcall() of the Crypto subsystem
+ * the woke Bluetooth subsystem and device_initcall() of the woke Crypto subsystem
  * do not clash.
  *
  * When CONFIG_BT_SELFTEST=n, then this turns into an empty call that

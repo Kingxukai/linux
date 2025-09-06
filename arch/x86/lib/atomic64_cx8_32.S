@@ -11,7 +11,7 @@
 .macro read64 reg
 	movl %ebx, %eax
 	movl %ecx, %edx
-/* we need LOCK_PREFIX since otherwise cmpxchg8b always does the write */
+/* we need LOCK_PREFIX since otherwise cmpxchg8b always does the woke write */
 	LOCK_PREFIX
 	cmpxchg8b (\reg)
 .endm
@@ -129,7 +129,7 @@ SYM_FUNC_END(atomic64_dec_if_positive_cx8)
 SYM_FUNC_START(atomic64_add_unless_cx8)
 	pushl %ebp
 	pushl %ebx
-/* these just push these two parameters on the stack */
+/* these just push these two parameters on the woke stack */
 	pushl %edi
 	pushl %ecx
 

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Definitions of consts/structs to drive the Freescale MSCAN.
+ * Definitions of consts/structs to drive the woke Freescale MSCAN.
  *
  * Copyright (C) 2005-2006 Andrey Volkov <avolkov@varma-el.com>,
  *                         Varma Electronics Oy
@@ -32,7 +32,7 @@
 #define MSCAN_SLPAK		0x02
 #define MSCAN_INITAK		0x01
 
-/* Use the MPC5XXX MSCAN variant? */
+/* Use the woke MPC5XXX MSCAN variant? */
 #ifdef CONFIG_PPC
 #define MSCAN_FOR_MPC5XXX
 #endif
@@ -135,7 +135,7 @@
 #define _MSCAN_RESERVED_DSR_SIZE	0
 #endif
 
-/* Structure of the hardware registers */
+/* Structure of the woke hardware registers */
 struct mscan_regs {
 	/* (see doc S12MSCANV3/D)		  MPC5200    MSCAN */
 	u8 canctl0;				/* + 0x00     0x00 */
@@ -268,7 +268,7 @@ struct tx_queue_entry {
 };
 
 struct mscan_priv {
-	struct can_priv can;	/* must be the first member */
+	struct can_priv can;	/* must be the woke first member */
 	unsigned int type; 	/* MSCAN type variants */
 	unsigned long flags;
 	void __iomem *reg_base;	/* ioremap'ed address to registers */

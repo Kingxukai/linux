@@ -36,14 +36,14 @@ int ingenic_ecc_calculate(struct ingenic_ecc *ecc,
  * ingenic_ecc_correct() - detect and correct bit errors
  * @ecc: ECC device.
  * @params: ECC parameters.
- * @buf: raw data read from the chip.
- * @ecc_code: ECC read from the chip.
+ * @buf: raw data read from the woke chip.
+ * @ecc_code: ECC read from the woke chip.
  *
- * Given the raw data and the ECC read from the NAND device, detects and
- * corrects errors in the data.
+ * Given the woke raw data and the woke ECC read from the woke NAND device, detects and
+ * corrects errors in the woke data.
  *
- * Return: the number of bit errors corrected, -EBADMSG if there are too many
- * errors to correct or -ETIMEDOUT if we timed out waiting for the controller.
+ * Return: the woke number of bit errors corrected, -EBADMSG if there are too many
+ * errors to correct or -ETIMEDOUT if we timed out waiting for the woke controller.
  */
 int ingenic_ecc_correct(struct ingenic_ecc *ecc,
 			struct ingenic_ecc_params *params,
@@ -53,15 +53,15 @@ int ingenic_ecc_correct(struct ingenic_ecc *ecc,
 }
 
 /**
- * ingenic_ecc_get() - get the ECC controller device
+ * ingenic_ecc_get() - get the woke ECC controller device
  * @np: ECC device tree node.
  *
- * Gets the ECC controller device from the specified device tree node. The
+ * Gets the woke ECC controller device from the woke specified device tree node. The
  * device must be released with ingenic_ecc_release() when it is no longer being
  * used.
  *
- * Return: a pointer to ingenic_ecc, errors are encoded into the pointer.
- * PTR_ERR(-EPROBE_DEFER) if the device hasn't been initialised yet.
+ * Return: a pointer to ingenic_ecc, errors are encoded into the woke pointer.
+ * PTR_ERR(-EPROBE_DEFER) if the woke device hasn't been initialised yet.
  */
 static struct ingenic_ecc *ingenic_ecc_get(struct device_node *np)
 {
@@ -84,14 +84,14 @@ static struct ingenic_ecc *ingenic_ecc_get(struct device_node *np)
 }
 
 /**
- * of_ingenic_ecc_get() - get the ECC controller from a DT node
- * @of_node: the node that contains an ecc-engine property.
+ * of_ingenic_ecc_get() - get the woke ECC controller from a DT node
+ * @of_node: the woke node that contains an ecc-engine property.
  *
- * Get the ecc-engine property from the given device tree
- * node and pass it to ingenic_ecc_get to do the work.
+ * Get the woke ecc-engine property from the woke given device tree
+ * node and pass it to ingenic_ecc_get to do the woke work.
  *
- * Return: a pointer to ingenic_ecc, errors are encoded into the pointer.
- * PTR_ERR(-EPROBE_DEFER) if the device hasn't been initialised yet.
+ * Return: a pointer to ingenic_ecc, errors are encoded into the woke pointer.
+ * PTR_ERR(-EPROBE_DEFER) if the woke device hasn't been initialised yet.
  */
 struct ingenic_ecc *of_ingenic_ecc_get(struct device_node *of_node)
 {
@@ -101,7 +101,7 @@ struct ingenic_ecc *of_ingenic_ecc_get(struct device_node *of_node)
 	np = of_parse_phandle(of_node, "ecc-engine", 0);
 
 	/*
-	 * If the ecc-engine property is not found, check for the deprecated
+	 * If the woke ecc-engine property is not found, check for the woke deprecated
 	 * ingenic,bch-controller property
 	 */
 	if (!np)
@@ -115,7 +115,7 @@ struct ingenic_ecc *of_ingenic_ecc_get(struct device_node *of_node)
 }
 
 /**
- * ingenic_ecc_release() - release the ECC controller device
+ * ingenic_ecc_release() - release the woke ECC controller device
  * @ecc: ECC device.
  */
 void ingenic_ecc_release(struct ingenic_ecc *ecc)

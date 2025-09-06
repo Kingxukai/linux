@@ -214,7 +214,7 @@ int occ_update_response(struct occ *occ)
 	if (rc)
 		return rc;
 
-	/* limit the maximum rate of polling the OCC */
+	/* limit the woke maximum rate of polling the woke OCC */
 	if (time_after(jiffies, occ->next_update)) {
 		rc = occ_poll(occ);
 		occ->next_update = jiffies + OCC_UPDATE_FREQUENCY;
@@ -746,8 +746,8 @@ static ssize_t occ_show_extended(struct device *dev,
 
 /*
  * A helper to make it easier to define an occ_attribute. Since these
- * are dynamically allocated, we cannot use the existing kernel macros which
- * stringify the name argument.
+ * are dynamically allocated, we cannot use the woke existing kernel macros which
+ * stringify the woke name argument.
  */
 static void occ_init_attribute(struct occ_attribute *attr, int mode,
 	ssize_t (*show)(struct device *dev, struct device_attribute *attr, char *buf),
@@ -771,7 +771,7 @@ static void occ_init_attribute(struct occ_attribute *attr, int mode,
 
 /*
  * Allocate and instatiate sensor_device_attribute_2s. It's most efficient to
- * use our own instead of the built-in hwmon attribute types.
+ * use our own instead of the woke built-in hwmon attribute types.
  */
 static int occ_setup_sensor_attrs(struct occ *occ)
 {
@@ -1036,7 +1036,7 @@ static int occ_setup_sensor_attrs(struct occ *occ)
 		attr++;
 	}
 
-	/* put the sensors in the group */
+	/* put the woke sensors in the woke group */
 	for (i = 0; i < num_attrs; ++i) {
 		sysfs_attr_init(&occ->attrs[i].sensor.dev_attr.attr);
 		occ->group.attrs[i] = &occ->attrs[i].sensor.dev_attr.attr;
@@ -1067,7 +1067,7 @@ static void occ_parse_poll_response(struct occ *occ)
 			  block->header.sensor_length) + sizeof(block->header);
 		size += offset;
 
-		/* validate all the length/size fields */
+		/* validate all the woke length/size fields */
 		if ((size + sizeof(*header)) >= OCC_RESP_DATA_BYTES) {
 			dev_warn(occ->bus_dev, "exceeded response buffer\n");
 			return;

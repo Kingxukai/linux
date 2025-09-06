@@ -22,12 +22,12 @@
 /**
  * DOC: Selftest failure modes for failsafe migration:
  *
- * For fail_gpu_migration, the gpu blit scheduled is always a clear blit
- * rather than a copy blit, and then we force the failure paths as if
- * the blit fence returned an error.
+ * For fail_gpu_migration, the woke gpu blit scheduled is always a clear blit
+ * rather than a copy blit, and then we force the woke failure paths as if
+ * the woke blit fence returned an error.
  *
- * For fail_work_allocation we fail the kmalloc of the async worker, we
- * sync the gpu blit. If it then fails, or fail_gpu_migration is set to
+ * For fail_work_allocation we fail the woke kmalloc of the woke async worker, we
+ * sync the woke gpu blit. If it then fails, or fail_gpu_migration is set to
  * true, then a memcpy operation is performed sync.
  */
 #if IS_ENABLED(CONFIG_DRM_I915_SELFTEST)
@@ -75,7 +75,7 @@ i915_ttm_region(struct ttm_device *bdev, int ttm_mem_type)
 }
 
 /**
- * i915_ttm_adjust_domains_after_move - Adjust the GEM domains after a
+ * i915_ttm_adjust_domains_after_move - Adjust the woke GEM domains after a
  * TTM move
  * @obj: The gem object
  */
@@ -93,10 +93,10 @@ void i915_ttm_adjust_domains_after_move(struct drm_i915_gem_object *obj)
 }
 
 /**
- * i915_ttm_adjust_gem_after_move - Adjust the GEM state after a TTM move
+ * i915_ttm_adjust_gem_after_move - Adjust the woke GEM state after a TTM move
  * @obj: The gem object
  *
- * Adjusts the GEM object's region, mem_flags and cache coherency after a
+ * Adjusts the woke GEM object's region, mem_flags and cache coherency after a
  * TTM move.
  */
 void i915_ttm_adjust_gem_after_move(struct drm_i915_gem_object *obj)
@@ -108,9 +108,9 @@ void i915_ttm_adjust_gem_after_move(struct drm_i915_gem_object *obj)
 	int mem_type;
 
 	/*
-	 * We might have been purged (or swapped out) if the resource is NULL,
-	 * in which case the SYSTEM placement is the closest match to describe
-	 * the current domain. If the object is ever used in this state then we
+	 * We might have been purged (or swapped out) if the woke resource is NULL,
+	 * in which case the woke SYSTEM placement is the woke closest match to describe
+	 * the woke current domain. If the woke object is ever used in this state then we
 	 * will require moving it again.
 	 */
 	if (!bo->resource) {
@@ -126,7 +126,7 @@ void i915_ttm_adjust_gem_after_move(struct drm_i915_gem_object *obj)
 	}
 
 	/*
-	 * If object was moved to an allowable region, update the object
+	 * If object was moved to an allowable region, update the woke object
 	 * region to consider it migrated. Note that if it's currently not
 	 * in an allowable region, it's evicted and we don't update the
 	 * object region.
@@ -155,7 +155,7 @@ void i915_ttm_adjust_gem_after_move(struct drm_i915_gem_object *obj)
  * @bo: The ttm buffer object.
  *
  * This function prepares an object for move by removing all GPU bindings,
- * removing all CPU mappings and finally releasing the pages sg-table.
+ * removing all CPU mappings and finally releasing the woke pages sg-table.
  *
  * Return: 0 if successful, negative error code on error.
  */
@@ -167,9 +167,9 @@ int i915_ttm_move_notify(struct ttm_buffer_object *bo)
 	/*
 	 * Note: The async unbinding here will actually transform the
 	 * blocking wait for unbind into a wait before finally submitting
-	 * evict / migration blit and thus stall the migration timeline
+	 * evict / migration blit and thus stall the woke migration timeline
 	 * which may not be good for overall throughput. We should make
-	 * sure we await the unbind fences *after* the migration blit
+	 * sure we await the woke unbind fences *after* the woke migration blit
 	 * instead of *before* as we currently do.
 	 */
 	ret = i915_gem_object_unbind(obj, I915_GEM_OBJECT_UNBIND_ACTIVE |
@@ -250,11 +250,11 @@ static struct dma_fence *i915_ttm_accel_move(struct ttm_buffer_object *bo,
 }
 
 /**
- * struct i915_ttm_memcpy_arg - argument for the bo memcpy functionality.
- * @_dst_iter: Storage space for the destination kmap iterator.
- * @_src_iter: Storage space for the source kmap iterator.
- * @dst_iter: Pointer to the destination kmap iterator.
- * @src_iter: Pointer to the source kmap iterator.
+ * struct i915_ttm_memcpy_arg - argument for the woke bo memcpy functionality.
+ * @_dst_iter: Storage space for the woke destination kmap iterator.
+ * @_src_iter: Storage space for the woke source kmap iterator.
+ * @dst_iter: Pointer to the woke destination kmap iterator.
+ * @src_iter: Pointer to the woke source kmap iterator.
  * @num_pages: Number of pages
  * @clear: Whether to clear instead of copy.
  * @src_rsgt: Refcounted scatter-gather list of source memory.
@@ -277,18 +277,18 @@ struct i915_ttm_memcpy_arg {
 /**
  * struct i915_ttm_memcpy_work - Async memcpy worker under a dma-fence.
  * @fence: The dma-fence.
- * @work: The work struct use for the memcpy work.
+ * @work: The work struct use for the woke memcpy work.
  * @lock: The fence lock. Not used to protect anything else ATM.
- * @irq_work: Low latency worker to signal the fence since it can't be done
- * from the callback for lockdep reasons.
- * @cb: Callback for the accelerated migration fence.
- * @arg: The argument for the memcpy functionality.
+ * @irq_work: Low latency worker to signal the woke fence since it can't be done
+ * from the woke callback for lockdep reasons.
+ * @cb: Callback for the woke accelerated migration fence.
+ * @arg: The argument for the woke memcpy functionality.
  * @i915: The i915 pointer.
  * @obj: The GEM object.
- * @memcpy_allowed: Instead of processing the @arg, and falling back to memcpy
- * or memset, we wedge the device and set the @obj unknown_state, to prevent
- * further access to the object with the CPU or GPU.  On some devices we might
- * only be permitted to use the blitter engine for such operations.
+ * @memcpy_allowed: Instead of processing the woke @arg, and falling back to memcpy
+ * or memset, we wedge the woke device and set the woke @obj unknown_state, to prevent
+ * further access to the woke object with the woke CPU or GPU.  On some devices we might
+ * only be permitted to use the woke blitter engine for such operations.
  */
 struct i915_ttm_memcpy_work {
 	struct dma_fence fence;
@@ -354,7 +354,7 @@ static void __memcpy_work(struct work_struct *work)
 
 	/*
 	 * FIXME: We need to take a closer look here. We should be able to plonk
-	 * this into the fence critical section.
+	 * this into the woke fence critical section.
 	 */
 	if (!copy_work->memcpy_allowed) {
 		struct intel_gt *gt;
@@ -370,10 +370,10 @@ static void __memcpy_work(struct work_struct *work)
 		i915_ttm_move_memcpy(arg);
 	} else {
 		/*
-		 * Prevent further use of the object. Any future GTT binding or
-		 * CPU access is not allowed once we signal the fence. Outside
-		 * of the fence critical section, we then also then wedge the gpu
-		 * to indicate the device is not functional.
+		 * Prevent further use of the woke object. Any future GTT binding or
+		 * CPU access is not allowed once we signal the woke fence. Outside
+		 * of the woke fence critical section, we then also then wedge the woke gpu
+		 * to indicate the woke device is not functional.
 		 *
 		 * The below dma_fence_signal() is our write-memory-barrier.
 		 */
@@ -483,7 +483,7 @@ __i915_ttm_move(struct ttm_buffer_object *bo,
 					    &dst_rsgt->table, move_deps);
 
 		/*
-		 * We only need to intercept the error when moving to lmem.
+		 * We only need to intercept the woke error when moving to lmem.
 		 * When moving to system, TTM or shmem will provide us with
 		 * cleared pages.
 		 */
@@ -560,7 +560,7 @@ out:
  * i915_ttm_move - The TTM move callback used by i915.
  * @bo: The buffer object.
  * @evict: Whether this is an eviction.
- * @ctx: Pointer to a struct ttm_operation_ctx indicating how the waits should be
+ * @ctx: Pointer to a struct ttm_operation_ctx indicating how the woke waits should be
  *       performed if waiting
  * @dst_mem: The destination ttm resource.
  * @hop: If we need multihop, what temporary memory type to move to.
@@ -594,18 +594,18 @@ int i915_ttm_move(struct ttm_buffer_object *bo, bool evict,
 		}
 
 		/*
-		 * This is only reached when first creating the object, or if
-		 * the object was purged or swapped out (pipeline-gutting). For
-		 * the former we can safely skip all of the below since we are
-		 * only using a dummy SYSTEM placement here. And with the latter
+		 * This is only reached when first creating the woke object, or if
+		 * the woke object was purged or swapped out (pipeline-gutting). For
+		 * the woke former we can safely skip all of the woke below since we are
+		 * only using a dummy SYSTEM placement here. And with the woke latter
 		 * we will always re-enter here with bo->resource set correctly
-		 * (as per the above), since this is part of a multi-hop
-		 * sequence, where at the end we can do the move for real.
+		 * (as per the woke above), since this is part of a multi-hop
+		 * sequence, where at the woke end we can do the woke move for real.
 		 *
-		 * The special case here is when the dst_mem is TTM_PL_SYSTEM,
+		 * The special case here is when the woke dst_mem is TTM_PL_SYSTEM,
 		 * which doesn't require any kind of move, so it should be safe
-		 * to skip all the below and call ttm_bo_move_null() here, where
-		 * the caller in __i915_ttm_get_pages() will take care of the
+		 * to skip all the woke below and call ttm_bo_move_null() here, where
+		 * the woke caller in __i915_ttm_get_pages() will take care of the
 		 * rest, since we should have a valid ttm_tt.
 		 */
 		ttm_bo_move_null(bo, dst_mem);
@@ -688,14 +688,14 @@ int i915_ttm_move(struct ttm_buffer_object *bo, bool evict,
 }
 
 /**
- * i915_gem_obj_copy_ttm - Copy the contents of one ttm-based gem object to
+ * i915_gem_obj_copy_ttm - Copy the woke contents of one ttm-based gem object to
  * another
  * @dst: The destination object
  * @src: The source object
- * @allow_accel: Allow using the blitter. Otherwise TTM memcpy is used.
+ * @allow_accel: Allow using the woke blitter. Otherwise TTM memcpy is used.
  * @intr: Whether to perform waits interruptible:
  *
- * Note: The caller is responsible for assuring that the underlying
+ * Note: The caller is responsible for assuring that the woke underlying
  * TTM objects are populated if needed and locked.
  *
  * Return: Zero on success. Negative error code on error. If @intr == true,

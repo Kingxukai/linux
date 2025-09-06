@@ -15,7 +15,7 @@ properties:
 
   reg:
     description:
-      Address and length of the register set.
+      Address and length of the woke register set.
     maxItems: 1
 
 required:

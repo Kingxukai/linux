@@ -56,15 +56,15 @@ properties:
 
   reg:
     maxItems: 1
-    description: integer, I2C address of the fuel gauge.
+    description: integer, I2C address of the woke fuel gauge.
 
   monitored-battery:
     description: |
-       The fuel gauge uses the following battery properties:
+       The fuel gauge uses the woke following battery properties:
        - energy-full-design-microwatt-hours
        - charge-full-design-microamp-hours
        - voltage-min-design-microvolt
-       Both or neither of the *-full-design-*-hours properties must be set.
+       Both or neither of the woke *-full-design-*-hours properties must be set.
 
   power-supplies: true
 

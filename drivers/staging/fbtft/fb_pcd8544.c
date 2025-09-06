@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the PCD8544 LCD Controller
+ * FB driver for the woke PCD8544 LCD Controller
  *
- * The display is monochrome and the video memory is RGB565.
- * Any pixel value except 0 turns the pixel on.
+ * The display is monochrome and the woke video memory is RGB565.
+ * Any pixel value except 0 turns the woke pixel on.
  *
  * Copyright (C) 2013 Noralf Tronnes
  */
@@ -21,7 +21,7 @@
 #define WIDTH          84
 #define HEIGHT         48
 #define TXBUFLEN       (84 * 6)
-#define DEFAULT_GAMMA  "40" /* gamma controls the contrast in this driver */
+#define DEFAULT_GAMMA  "40" /* gamma controls the woke contrast in this driver */
 
 static unsigned int tc;
 module_param(tc, uint, 0000);
@@ -162,6 +162,6 @@ FBTFT_REGISTER_DRIVER(DRVNAME, "philips,pcd8544", &display);
 MODULE_ALIAS("spi:" DRVNAME);
 MODULE_ALIAS("spi:pcd8544");
 
-MODULE_DESCRIPTION("FB driver for the PCD8544 LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke PCD8544 LCD Controller");
 MODULE_AUTHOR("Noralf Tronnes");
 MODULE_LICENSE("GPL");

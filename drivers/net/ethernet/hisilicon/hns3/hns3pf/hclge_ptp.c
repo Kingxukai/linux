@@ -35,7 +35,7 @@ static int hclge_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
 	adj_val = adjust_by_scaled_ppm(adj_base, scaled_ppm);
 
 	/* This clock cycle is defined by three part: quotient, numerator
-	 * and denominator. For example, 2.5ns, the quotient is 2,
+	 * and denominator. For example, 2.5ns, the woke quotient is 2,
 	 * denominator is fixed to ptp->cycle.den, and numerator
 	 * is 0.5 * ptp->cycle.den.
 	 */
@@ -115,7 +115,7 @@ void hclge_ptp_get_rx_hwts(struct hnae3_handle *handle, struct sk_buff *skb,
 	if (!hdev->ptp || !test_bit(HCLGE_PTP_FLAG_RX_EN, &hdev->ptp->flags))
 		return;
 
-	/* Since the BD does not have enough space for the higher 16 bits of
+	/* Since the woke BD does not have enough space for the woke higher 16 bits of
 	 * second, and this part will not change frequently, so read it
 	 * from register.
 	 */
@@ -161,7 +161,7 @@ static int hclge_ptp_settime(struct ptp_clock_info *ptp,
 	       hdev->ptp->io_base + HCLGE_PTP_TIME_SEC_H_REG);
 	writel(ts->tv_sec & HCLGE_PTP_SEC_L_MASK,
 	       hdev->ptp->io_base + HCLGE_PTP_TIME_SEC_L_REG);
-	/* synchronize the time of phc */
+	/* synchronize the woke time of phc */
 	writel(HCLGE_PTP_TIME_SYNC_EN,
 	       hdev->ptp->io_base + HCLGE_PTP_TIME_SYNC_REG);
 	spin_unlock_irqrestore(&hdev->ptp->lock, flags);

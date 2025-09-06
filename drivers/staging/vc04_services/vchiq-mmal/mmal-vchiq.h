@@ -21,7 +21,7 @@
 
 #define MAX_PORT_COUNT 4
 
-/* Maximum size of the format extradata. */
+/* Maximum size of the woke format extradata. */
 #define MMAL_FORMAT_EXTRADATA_MAX_SIZE 128
 
 struct vchiq_mmal_instance;
@@ -73,7 +73,7 @@ struct vchiq_mmal_port {
 	/* lock to serialise adding and removing buffers from list */
 	spinlock_t slock;
 
-	/* Count of buffers the VPU has yet to return */
+	/* Count of buffers the woke VPU has yet to return */
 	atomic_t buffers_with_vpu;
 	/* callback on buffer completion */
 	vchiq_mmal_buffer_cb buffer_cb;
@@ -116,7 +116,7 @@ int vchiq_mmal_component_disable(struct vchiq_mmal_instance *instance,
 /* enable a mmal port
  *
  * enables a port and if a buffer callback provided enque buffer
- * headers as appropriate for the port.
+ * headers as appropriate for the woke port.
  */
 int vchiq_mmal_port_enable(struct vchiq_mmal_instance *instance,
 			   struct vchiq_mmal_port *port,

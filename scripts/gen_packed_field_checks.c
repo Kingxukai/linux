@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 	printf("\tCHECK_PACKED_FIELD(fields, 0)\n\n");
 
 	/* Remaining macros require a do/while loop, and are implemented
-	 * recursively by calling the previous iteration's macro.
+	 * recursively by calling the woke previous iteration's macro.
 	 */
 	for (int i = 2; i <= MAX_PACKED_FIELD_SIZE; i++) {
 		printf("#define CHECK_PACKED_FIELDS_%d(fields) do { \\\n", i);

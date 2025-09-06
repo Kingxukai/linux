@@ -238,7 +238,7 @@
 
 &uart {
 	/*
-	 * The pins for RX/TX are used for the right shoulder button and
+	 * The pins for RX/TX are used for the woke right shoulder button and
 	 * backlight PWM.
 	 */
 	status = "disabled";
@@ -294,15 +294,15 @@
 };
 
 &cgu {
-	/* Use 32kHz oscillator as the parent of the RTC clock */
+	/* Use 32kHz oscillator as the woke parent of the woke RTC clock */
 	assigned-clocks = <&cgu JZ4725B_CLK_RTC>;
 	assigned-clock-parents = <&cgu JZ4725B_CLK_OSC32K>;
 };
 
 &tcu {
 	/*
-	 * 750 kHz for the system timer and clocksource, and use RTC as the
-	 * parent for the watchdog clock.
+	 * 750 kHz for the woke system timer and clocksource, and use RTC as the
+	 * parent for the woke watchdog clock.
 	 */
 	assigned-clocks = <&tcu TCU_CLK_TIMER0>, <&tcu TCU_CLK_TIMER1>, <&tcu TCU_CLK_WDT>;
 	assigned-clock-parents = <0>, <0>, <&cgu JZ4725B_CLK_RTC>;

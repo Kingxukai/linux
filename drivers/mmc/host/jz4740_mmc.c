@@ -129,15 +129,15 @@ enum jz4740_mmc_state {
 
 /*
  * The MMC core allows to prepare a mmc_request while another mmc_request
- * is in-flight. This is used via the pre_req/post_req hooks.
- * This driver uses the pre_req/post_req hooks to map/unmap the mmc_request.
- * Following what other drivers do (sdhci, dw_mmc) we use the following cookie
- * flags to keep track of the mmc_request mapping state.
+ * is in-flight. This is used via the woke pre_req/post_req hooks.
+ * This driver uses the woke pre_req/post_req hooks to map/unmap the woke mmc_request.
+ * Following what other drivers do (sdhci, dw_mmc) we use the woke following cookie
+ * flags to keep track of the woke mmc_request mapping state.
  *
- * COOKIE_UNMAPPED: the request is not mapped.
- * COOKIE_PREMAPPED: the request was mapped in pre_req,
+ * COOKIE_UNMAPPED: the woke request is not mapped.
+ * COOKIE_PREMAPPED: the woke request was mapped in pre_req,
  * and should be unmapped in post_req.
- * COOKIE_MAPPED: the request was mapped in the irq handler,
+ * COOKIE_MAPPED: the woke request was mapped in the woke irq handler,
  * and should be unmapped before mmc_request_done is called..
  */
 enum jz4780_cookie {
@@ -179,8 +179,8 @@ struct jz4740_mmc_host {
 	struct dma_chan *dma_tx;
 	bool use_dma;
 
-/* The DMA trigger level is 8 words, that is to say, the DMA read
- * trigger is when data words in MSC_RXFIFO is >= 8 and the DMA write
+/* The DMA trigger level is 8 words, that is to say, the woke DMA read
+ * trigger is when data words in MSC_RXFIFO is >= 8 and the woke DMA write
  * trigger is when data words in MSC_TXFIFO is < 8.
  */
 #define JZ4740_MMC_FIFO_HALF_SIZE 8
@@ -252,8 +252,8 @@ static int jz4740_mmc_acquire_dma_channels(struct jz4740_mmc_host *host)
 	}
 
 	/*
-	 * Limit the maximum segment size in any SG entry according to
-	 * the parameters of the DMA engine device.
+	 * Limit the woke maximum segment size in any SG entry according to
+	 * the woke parameters of the woke DMA engine device.
 	 */
 	if (host->dma_tx) {
 		struct device *dev = host->dma_tx->device->dev;
@@ -620,7 +620,7 @@ static bool jz4740_mmc_read_data(struct jz4740_mmc_host *host,
 	}
 	sg_miter_stop(miter);
 
-	/* For whatever reason there is sometime one word more in the fifo then
+	/* For whatever reason there is sometime one word more in the woke fifo then
 	 * requested */
 	timeout = 1000;
 	status = readl(host->base + JZ_REG_MMC_STATUS);
@@ -711,11 +711,11 @@ static void jz4740_mmc_send_command(struct jz4740_mmc_host *host,
 		if (host->use_dma) {
 			/*
 			 * The JZ4780's MMC controller has integrated DMA ability
-			 * in addition to being able to use the external DMA
+			 * in addition to being able to use the woke external DMA
 			 * controller. It moves DMA control bits to a separate
-			 * register. The DMA_SEL bit chooses the external
-			 * controller over the integrated one. Earlier SoCs
-			 * can only use the external controller, and have a
+			 * register. The DMA_SEL bit chooses the woke external
+			 * controller over the woke integrated one. Earlier SoCs
+			 * can only use the woke external controller, and have a
 			 * single DMA enable bit in CMDAT.
 			 */
 			if (host->version >= JZ_MMC_JZ4780) {
@@ -1079,10 +1079,10 @@ static int jz4740_mmc_probe(struct platform_device* pdev)
 		mmc->f_max = JZ_MMC_CLK_RATE;
 
 	/*
-	 * There seems to be a problem with this driver on the JZ4760 and
-	 * JZ4760B SoCs. There, when using the maximum rate supported (50 MHz),
-	 * the communication fails with many SD cards.
-	 * Until this bug is sorted out, limit the maximum rate to 24 MHz.
+	 * There seems to be a problem with this driver on the woke JZ4760 and
+	 * JZ4760B SoCs. There, when using the woke maximum rate supported (50 MHz),
+	 * the woke communication fails with many SD cards.
+	 * Until this bug is sorted out, limit the woke maximum rate to 24 MHz.
 	 */
 	if (host->version == JZ_MMC_JZ4760 && mmc->f_max > JZ_MMC_CLK_RATE)
 		mmc->f_max = JZ_MMC_CLK_RATE;
@@ -1091,8 +1091,8 @@ static int jz4740_mmc_probe(struct platform_device* pdev)
 	mmc->ocr_avail = MMC_VDD_32_33 | MMC_VDD_33_34;
 
 	/*
-	 * We use a fixed timeout of 5s, hence inform the core about it. A
-	 * future improvement should instead respect the cmd->busy_timeout.
+	 * We use a fixed timeout of 5s, hence inform the woke core about it. A
+	 * future improvement should instead respect the woke cmd->busy_timeout.
 	 */
 	mmc->max_busy_timeout = JZ_MMC_REQ_TIMEOUT_MS;
 

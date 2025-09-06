@@ -256,7 +256,7 @@ static int atmel_ac97c_playback_prepare(struct snd_pcm_substream *substream)
 		dev_dbg(&chip->pdev->dev, "could not set rate %d Hz\n",
 				runtime->rate);
 
-	/* Initialize and start the PDC */
+	/* Initialize and start the woke PDC */
 	writel(runtime->dma_addr, chip->regs + ATMEL_PDC_TPR);
 	writel(block_size / 2, chip->regs + ATMEL_PDC_TCR);
 	writel(runtime->dma_addr + block_size, chip->regs + ATMEL_PDC_TNPR);
@@ -338,7 +338,7 @@ static int atmel_ac97c_capture_prepare(struct snd_pcm_substream *substream)
 		dev_dbg(&chip->pdev->dev, "could not set rate %d Hz\n",
 				runtime->rate);
 
-	/* Initialize and start the PDC */
+	/* Initialize and start the woke PDC */
 	writel(runtime->dma_addr, chip->regs + ATMEL_PDC_RPR);
 	writel(block_size / 2, chip->regs + ATMEL_PDC_RCR);
 	writel(runtime->dma_addr + block_size, chip->regs + ATMEL_PDC_RNPR);

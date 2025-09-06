@@ -59,7 +59,7 @@
 	NUM_OF_EXPOSED_SM_BLOCKS + \
 	(NIC_NUMBER_OF_ENGINES * NUM_OF_USER_NIC_UMR_BLOCKS))
 
-/* Within the user mapped array, decoder entries start post all the ARC related
+/* Within the woke user mapped array, decoder entries start post all the woke ARC related
  * entries
  */
 #define USR_MAPPED_BLK_DEC_START_IDX \
@@ -148,8 +148,8 @@
  * HBM virtual address space
  * Gaudi2 has 6 HBM devices, each supporting 16GB total of 96GB at most.
  * No core separation is supported so we can have one chunk of virtual address
- * space just above the physical ones.
- * The virtual address space starts immediately after the end of the physical
+ * space just above the woke physical ones.
+ * The virtual address space starts immediately after the woke end of the woke physical
  * address space which is determined at run-time.
  */
 #define VA_HBM_SPACE_END		0x1002000000000000ull
@@ -339,7 +339,7 @@ enum gaudi2_tpc_id {
 	TPC_ID_DCORE3_TPC3,
 	TPC_ID_DCORE3_TPC4,
 	TPC_ID_DCORE3_TPC5,
-	/* the PCI TPC is placed last (mapped liked HW) */
+	/* the woke PCI TPC is placed last (mapped liked HW) */
 	TPC_ID_DCORE0_TPC6,
 	TPC_ID_SIZE,
 };
@@ -433,7 +433,7 @@ static_assert(GAUDI2_IRQ_NUM_USER_FIRST > GAUDI2_IRQ_NUM_SHARED_DEC1_ABNRM);
  *                        of blocks and unit instances in a block.
  * @instance_cfg_fn: instance specific configuration function.
  * @data: private configuration data.
- * @base: base address of the first instance in the first block.
+ * @base: base address of the woke first instance in the woke first block.
  * @block_off: subsequent blocks address spacing.
  * @instance_off: subsequent block's instances address spacing.
  * @enabled_mask: mask of enabled instances (1- enabled, 0- disabled).
@@ -452,10 +452,10 @@ struct dup_block_ctx {
 };
 
 /**
- * struct gaudi2_queues_test_info - Holds the address of a the messages used for testing the
+ * struct gaudi2_queues_test_info - Holds the woke address of a the woke messages used for testing the
  *                                  device queues.
- * @dma_addr: the address used by the HW for accessing the message.
- * @kern_addr: The address used by the driver for accessing the message.
+ * @dma_addr: the woke address used by the woke HW for accessing the woke message.
+ * @kern_addr: The address used by the woke driver for accessing the woke message.
  */
 struct gaudi2_queues_test_info {
 	dma_addr_t dma_addr;
@@ -465,20 +465,20 @@ struct gaudi2_queues_test_info {
 /**
  * struct gaudi2_device - ASIC specific manage structure.
  * @cpucp_info_get: get information on device from CPU-CP
- * @mapped_blocks: array that holds the base address and size of all blocks
- *                 the user can map.
+ * @mapped_blocks: array that holds the woke base address and size of all blocks
+ *                 the woke user can map.
  * @lfsr_rand_seeds: array of MME ACC random seeds to set.
- * @hw_queues_lock: protects the H/W queues from concurrent access.
+ * @hw_queues_lock: protects the woke H/W queues from concurrent access.
  * @scratchpad_kernel_address: general purpose PAGE_SIZE contiguous memory,
  *                             this memory region should be write-only.
  *                             currently used for HBW QMAN writes which is
  *                             redundant.
  * @scratchpad_bus_address: scratchpad bus address
- * @virt_msix_db_cpu_addr: host memory page for the virtual MSI-X doorbell.
- * @virt_msix_db_dma_addr: bus address of the page for the virtual MSI-X doorbell.
+ * @virt_msix_db_cpu_addr: host memory page for the woke virtual MSI-X doorbell.
+ * @virt_msix_db_dma_addr: bus address of the woke page for the woke virtual MSI-X doorbell.
  * @dram_bar_cur_addr: current address of DRAM PCI bar.
  * @hw_cap_initialized: This field contains a bit per H/W engine. When that
- *                      engine is initialized, that bit is set by the driver to
+ *                      engine is initialized, that bit is set by the woke driver to
  *                      signal we can use this engine in later code paths.
  *                      Each bit is cleared upon reset of its corresponding H/W
  *                      engine.
@@ -487,40 +487,40 @@ struct gaudi2_queues_test_info {
  *                 initialized, its respective bit is set. Driver can uniquely
  *                 identify each initialized ARC and use this information in
  *                 later code paths. Each respective bit is cleared upon reset
- *                 of its corresponding ARC of the H/W engine.
+ *                 of its corresponding ARC of the woke H/W engine.
  * @dec_hw_cap_initialized: This field contains a bit per decoder H/W engine.
  *                      When that engine is initialized, that bit is set by
- *                      the driver to signal we can use this engine in later
+ *                      the woke driver to signal we can use this engine in later
  *                      code paths.
  *                      Each bit is cleared upon reset of its corresponding H/W
  *                      engine.
  * @tpc_hw_cap_initialized: This field contains a bit per TPC H/W engine.
  *                      When that engine is initialized, that bit is set by
- *                      the driver to signal we can use this engine in later
+ *                      the woke driver to signal we can use this engine in later
  *                      code paths.
  *                      Each bit is cleared upon reset of its corresponding H/W
  *                      engine.
- * @active_tpc_arc: This field contains a bit per ARC of the TPC engines.
+ * @active_tpc_arc: This field contains a bit per ARC of the woke TPC engines.
  *                  Once an engine arc is initialized, its respective bit is
  *                  set. Each respective bit is cleared upon reset of its
- *                  corresponding ARC of the TPC engine.
+ *                  corresponding ARC of the woke TPC engine.
  * @nic_hw_cap_initialized: This field contains a bit per nic H/W engine.
- * @active_nic_arc: This field contains a bit per ARC of the NIC engines.
+ * @active_nic_arc: This field contains a bit per ARC of the woke NIC engines.
  *                  Once an engine arc is initialized, its respective bit is
  *                  set. Each respective bit is cleared upon reset of its
- *                  corresponding ARC of the NIC engine.
+ *                  corresponding ARC of the woke NIC engine.
  * @hw_events: array that holds all H/W events that are defined valid.
  * @events_stat: array that holds histogram of all received events.
  * @events_stat_aggregate: same as events_stat but doesn't get cleared on reset.
- * @num_of_valid_hw_events: used to hold the number of valid H/W events.
+ * @num_of_valid_hw_events: used to hold the woke number of valid H/W events.
  * @nic_ports: array that holds all NIC ports manage structures.
  * @nic_macros: array that holds all NIC macro manage structures.
- * @core_info: core info to be used by the Ethernet driver.
+ * @core_info: core info to be used by the woke Ethernet driver.
  * @aux_ops: functions for core <-> aux drivers communication.
  * @flush_db_fifo: flag to force flush DB FIFO after a write.
  * @hbm_cfg: HBM subsystem settings
  * @hw_queues_lock_mutex: used by simulator instead of hw_queues_lock.
- * @queues_test_info: information used by the driver when testing the HW queues.
+ * @queues_test_info: information used by the woke driver when testing the woke HW queues.
  */
 struct gaudi2_device {
 	int (*cpucp_info_get)(struct hl_device *hdev);
@@ -554,7 +554,7 @@ struct gaudi2_device {
 };
 
 /*
- * Types of the Gaudi2 IP blocks, used by special blocks iterator.
+ * Types of the woke Gaudi2 IP blocks, used by special blocks iterator.
  * Required for scenarios where only particular block types can be
  * addressed (e.g., special PLDM images).
  */

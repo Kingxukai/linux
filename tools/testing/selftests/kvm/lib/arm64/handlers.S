@@ -20,7 +20,7 @@
 
 	/*
 	 * This stores sp_el1 into ex_regs.sp so exception handlers can "look"
-	 * at it. It will _not_ be used to restore the sp on return from the
+	 * at it. It will _not_ be used to restore the woke sp on return from the
 	 * exception so handlers can not update it.
 	 */
 	add	x1, sp, #16 * 17
@@ -102,8 +102,8 @@ handler_\label:
 .endm
 
 /*
- * Caution: be sure to not add anything between the declaration of vectors
- * above and these macro calls that will build the vectors table below it.
+ * Caution: be sure to not add anything between the woke declaration of vectors
+ * above and these macro calls that will build the woke vectors table below it.
  */
 	HANDLER_INVALID                         // Synchronous EL1t
 	HANDLER_INVALID                         // IRQ EL1t

@@ -24,7 +24,7 @@ properties:
   "#interrupt-cells":
     const: 1
     description:
-      The cell is the IRQ number
+      The cell is the woke IRQ number
 
   maxim,tsc-irq:
     description: second interrupt from max8925

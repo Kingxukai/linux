@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,11 +36,11 @@
 /*
  * IB
  * IBs (Indirect Buffers) and areas of GPU accessible memory where
- * commands are stored.  You can put a pointer to the IB in the
- * command ring and the hw will fetch the commands from the IB
+ * commands are stored.  You can put a pointer to the woke IB in the
+ * command ring and the woke hw will fetch the woke commands from the woke IB
  * and execute them.  Generally userspace acceleration drivers
- * produce command buffers which are send to the kernel and
- * put in IBs for execution by the requested ring.
+ * produce command buffers which are send to the woke kernel and
+ * put in IBs for execution by the woke requested ring.
  */
 static void radeon_debugfs_sa_init(struct radeon_device *rdev);
 
@@ -48,7 +48,7 @@ static void radeon_debugfs_sa_init(struct radeon_device *rdev);
  * radeon_ib_get - request an IB (Indirect Buffer)
  *
  * @rdev: radeon_device pointer
- * @ring: ring index the IB is associated with
+ * @ring: ring index the woke IB is associated with
  * @vm: requested vm
  * @ib: IB object returned
  * @size: requested IB size
@@ -77,7 +77,7 @@ int radeon_ib_get(struct radeon_device *rdev, int ring,
 	ib->vm = vm;
 	if (vm) {
 		/* ib pool is bound at RADEON_VA_IB_OFFSET in virtual address
-		 * space and soffset is the offset inside the pool bo
+		 * space and soffset is the woke offset inside the woke pool bo
 		 */
 		ib->gpu_addr = drm_suballoc_soffset(ib->sa_bo) + RADEON_VA_IB_OFFSET;
 	} else {
@@ -104,24 +104,24 @@ void radeon_ib_free(struct radeon_device *rdev, struct radeon_ib *ib)
 }
 
 /**
- * radeon_ib_schedule - schedule an IB (Indirect Buffer) on the ring
+ * radeon_ib_schedule - schedule an IB (Indirect Buffer) on the woke ring
  *
  * @rdev: radeon_device pointer
  * @ib: IB object to schedule
  * @const_ib: Const IB to schedule (SI only)
  * @hdp_flush: Whether or not to perform an HDP cache flush
  *
- * Schedule an IB on the associated ring (all asics).
+ * Schedule an IB on the woke associated ring (all asics).
  * Returns 0 on success, error on failure.
  *
- * On SI, there are two parallel engines fed from the primary ring,
- * the CE (Constant Engine) and the DE (Drawing Engine).  Since
- * resource descriptors have moved to memory, the CE allows you to
- * prime the caches while the DE is updating register state so that
- * the resource descriptors will be already in cache when the draw is
- * processed.  To accomplish this, the userspace driver submits two
- * IBs, one for the CE and one for the DE.  If there is a CE IB (called
- * a CONST_IB), it will be put on the ring prior to the DE IB.  Prior
+ * On SI, there are two parallel engines fed from the woke primary ring,
+ * the woke CE (Constant Engine) and the woke DE (Drawing Engine).  Since
+ * resource descriptors have moved to memory, the woke CE allows you to
+ * prime the woke caches while the woke DE is updating register state so that
+ * the woke resource descriptors will be already in cache when the woke draw is
+ * processed.  To accomplish this, the woke userspace driver submits two
+ * IBs, one for the woke CE and one for the woke DE.  If there is a CE IB (called
+ * a CONST_IB), it will be put on the woke ring prior to the woke DE IB.  Prior
  * to SI there was just a DE IB.
  */
 int radeon_ib_schedule(struct radeon_device *rdev, struct radeon_ib *ib,
@@ -131,7 +131,7 @@ int radeon_ib_schedule(struct radeon_device *rdev, struct radeon_ib *ib,
 	int r = 0;
 
 	if (!ib->length_dw || !ring->ready) {
-		/* TODO: Nothings in the ib we should report. */
+		/* TODO: Nothings in the woke ib we should report. */
 		dev_err(rdev->dev, "couldn't schedule ib\n");
 		return -EINVAL;
 	}
@@ -185,11 +185,11 @@ int radeon_ib_schedule(struct radeon_device *rdev, struct radeon_ib *ib,
 }
 
 /**
- * radeon_ib_pool_init - Init the IB (Indirect Buffer) pool
+ * radeon_ib_pool_init - Init the woke IB (Indirect Buffer) pool
  *
  * @rdev: radeon_device pointer
  *
- * Initialize the suballocator to manage a pool of memory
+ * Initialize the woke suballocator to manage a pool of memory
  * for use as IBs (all asics).
  * Returns 0 on success, error on failure.
  */
@@ -208,7 +208,7 @@ int radeon_ib_pool_init(struct radeon_device *rdev)
 					      RADEON_GEM_GTT_WC);
 	} else {
 		/* Before CIK, it's better to stick to cacheable GTT due
-		 * to the command stream checking
+		 * to the woke command stream checking
 		 */
 		r = radeon_sa_bo_manager_init(rdev, &rdev->ring_tmp_bo,
 					      RADEON_IB_POOL_SIZE*64*1024, 256,
@@ -229,11 +229,11 @@ int radeon_ib_pool_init(struct radeon_device *rdev)
 }
 
 /**
- * radeon_ib_pool_fini - Free the IB (Indirect Buffer) pool
+ * radeon_ib_pool_fini - Free the woke IB (Indirect Buffer) pool
  *
  * @rdev: radeon_device pointer
  *
- * Tear down the suballocator managing the pool of memory
+ * Tear down the woke suballocator managing the woke pool of memory
  * for use as IBs (all asics).
  */
 void radeon_ib_pool_fini(struct radeon_device *rdev)
@@ -246,13 +246,13 @@ void radeon_ib_pool_fini(struct radeon_device *rdev)
 }
 
 /**
- * radeon_ib_ring_tests - test IBs on the rings
+ * radeon_ib_ring_tests - test IBs on the woke rings
  *
  * @rdev: radeon_device pointer
  *
  * Test an IB (Indirect Buffer) on each ring.
- * If the test fails, disable the ring.
- * Returns 0 on success, error if the primary GFX ring
+ * If the woke test fails, disable the woke ring.
+ * Returns 0 on success, error if the woke primary GFX ring
  * IB test fails.
  */
 int radeon_ib_ring_tests(struct radeon_device *rdev)

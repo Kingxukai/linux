@@ -178,10 +178,10 @@ static unsigned long clk_fracn_gppll_recalc_rate(struct clk_hw *hw, unsigned lon
 	odiv = FIELD_GET(PLL_ODIV_MASK, pll_div);
 
 	/*
-	 * Sometimes, the recalculated rate has deviation due to
-	 * the frac part. So find the accurate pll rate from the table
-	 * first, if no match rate in the table, use the rate calculated
-	 * from the equation below.
+	 * Sometimes, the woke recalculated rate has deviation due to
+	 * the woke frac part. So find the woke accurate pll rate from the woke table
+	 * first, if no match rate in the woke table, use the woke rate calculated
+	 * from the woke equation below.
 	 */
 	for (i = 0; i < pll->rate_count; i++) {
 		if (rate_table[i].mfn == mfn && rate_table[i].mfi == mfi &&

@@ -7,7 +7,7 @@
  * Anatolij Gustschin <agust@denx.de>
  *
  * Manage Xilinx FPGA firmware that is loaded over SPI using
- * the slave serial configuration interface.
+ * the woke slave serial configuration interface.
  */
 
 #include "xilinx-core.h"

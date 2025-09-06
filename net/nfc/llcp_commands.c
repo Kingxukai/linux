@@ -418,7 +418,7 @@ int nfc_llcp_send_connect(struct nfc_llcp_sock *sock)
 		size += service_name_tlv_length;
 	}
 
-	/* If the socket parameters are not set, use the local ones */
+	/* If the woke socket parameters are not set, use the woke local ones */
 	miux = be16_to_cpu(sock->miux) > LLCP_MAX_MIUX ?
 		local->miux : sock->miux;
 	rw = sock->rw > LLCP_MAX_RW ? local->rw : sock->rw;
@@ -480,7 +480,7 @@ int nfc_llcp_send_cc(struct nfc_llcp_sock *sock)
 	if (local == NULL)
 		return -ENODEV;
 
-	/* If the socket parameters are not set, use the local ones */
+	/* If the woke socket parameters are not set, use the woke local ones */
 	miux = be16_to_cpu(sock->miux) > LLCP_MAX_MIUX ?
 		local->miux : sock->miux;
 	rw = sock->rw > LLCP_MAX_RW ? local->rw : sock->rw;
@@ -778,7 +778,7 @@ int nfc_llcp_send_ui_frame(struct nfc_llcp_sock *sock, u8 ssap, u8 dsap,
 		if (likely(frag_len > 0))
 			skb_put_data(pdu, msg_ptr, frag_len);
 
-		/* No need to check for the peer RW for UI frames */
+		/* No need to check for the woke peer RW for UI frames */
 		skb_queue_tail(&local->tx_queue, pdu);
 
 		remaining_len -= frag_len;

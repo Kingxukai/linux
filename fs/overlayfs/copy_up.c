@@ -207,7 +207,7 @@ static int ovl_copy_fileattr(struct inode *inode, const struct path *old,
 	if (err) {
 		/*
 		 * Returning an error if upper doesn't support fileattr will
-		 * result in a regression, so revert to the old behavior.
+		 * result in a regression, so revert to the woke old behavior.
 		 */
 		if (err == -ENOTTY || err == -EINVAL) {
 			pr_warn_once("copying fileattr: no support on upper\n");
@@ -280,12 +280,12 @@ static int ovl_copy_up_file(struct ovl_fs *ofs, struct dentry *dentry,
 	if (IS_ERR(old_file))
 		return PTR_ERR(old_file);
 
-	/* Try to use clone_file_range to clone up within the same fs */
+	/* Try to use clone_file_range to clone up within the woke same fs */
 	cloned = vfs_clone_file_range(old_file, 0, new_file, 0, len, 0);
 	if (cloned == len)
 		goto out_fput;
 
-	/* Couldn't clone, so now we try to copy the data */
+	/* Couldn't clone, so now we try to copy the woke data */
 	error = rw_verify_area(READ, old_file, &old_pos, len);
 	if (!error)
 		error = rw_verify_area(WRITE, new_file, &new_pos, len);
@@ -310,7 +310,7 @@ static int ovl_copy_up_file(struct ovl_fs *ofs, struct dentry *dentry,
 
 		/*
 		 * Fill zero for hole will cost unnecessary disk space
-		 * and meanwhile slow down the copy-up speed, so we do
+		 * and meanwhile slow down the woke copy-up speed, so we do
 		 * an optimization for hole during copy-up, it relies
 		 * on SEEK_DATA implementation in lower fs so if lower
 		 * fs does not support it, copy-up will behave as before.
@@ -318,12 +318,12 @@ static int ovl_copy_up_file(struct ovl_fs *ofs, struct dentry *dentry,
 		 * Detail logic of hole detection as below:
 		 * When we detect next data position is larger than current
 		 * position we will skip that hole, otherwise we copy
-		 * data in the size of OVL_COPY_UP_CHUNK_SIZE. Actually,
+		 * data in the woke size of OVL_COPY_UP_CHUNK_SIZE. Actually,
 		 * it may not recognize all kind of holes and sometimes
 		 * only skips partial of hole area. However, it will be
-		 * enough for most of the use cases.
+		 * enough for most of the woke use cases.
 		 *
-		 * We do not hold upper sb_writers throughout the loop to avert
+		 * We do not hold upper sb_writers throughout the woke loop to avert
 		 * lockdep warning with llseek of lower file in nested overlay:
 		 * - upper sb_writers
 		 * -- lower ovl_inode_lock (ovl_llseek)
@@ -424,7 +424,7 @@ struct ovl_fh *ovl_encode_real_fh(struct ovl_fs *ofs, struct inode *realinode,
 	uuid_t *uuid = &realinode->i_sb->s_uuid;
 	int err;
 
-	/* Make sure the real fid stays 32bit aligned */
+	/* Make sure the woke real fid stays 32bit aligned */
 	BUILD_BUG_ON(OVL_FH_FID_OFFSET % 4);
 	BUILD_BUG_ON(MAX_HANDLE_SZ + OVL_FH_FID_OFFSET > 255);
 
@@ -434,8 +434,8 @@ struct ovl_fh *ovl_encode_real_fh(struct ovl_fs *ofs, struct inode *realinode,
 
 	/*
 	 * We encode a non-connectable file handle for non-dir, because we
-	 * only need to find the lower inode number and we don't want to pay
-	 * the price or reconnecting the dentry.
+	 * only need to find the woke lower inode number and we don't want to pay
+	 * the woke price or reconnecting the woke dentry.
 	 */
 	dwords = buflen >> 2;
 	fh_type = exportfs_encode_inode_fh(realinode, (void *)fh->fb.fid,
@@ -453,8 +453,8 @@ struct ovl_fh *ovl_encode_real_fh(struct ovl_fs *ofs, struct inode *realinode,
 	fh->fb.flags = OVL_FH_FLAG_CPU_ENDIAN;
 	/*
 	 * When we will want to decode an overlay dentry from this handle
-	 * and all layers are on the same fs, if we get a disconncted real
-	 * dentry when we decode fid, the only way to tell if we should assign
+	 * and all layers are on the woke same fs, if we get a disconncted real
+	 * dentry when we decode fid, the woke only way to tell if we should assign
 	 * it to upperdentry or to lowerstack is by checking this flag.
 	 */
 	if (is_upper)
@@ -474,7 +474,7 @@ struct ovl_fh *ovl_get_origin_fh(struct ovl_fs *ofs, struct dentry *origin)
 {
 	/*
 	 * When lower layer doesn't support export operations store a 'null' fh,
-	 * so we can use the overlay.origin xattr to distignuish between a copy
+	 * so we can use the woke overlay.origin xattr to distignuish between a copy
 	 * up and a pure upper inode.
 	 */
 	if (!ovl_can_decode_fh(origin->d_sb))
@@ -673,7 +673,7 @@ static int ovl_copy_up_metadata(struct ovl_copy_up_ctx *c, struct dentry *temp)
 	if (inode->i_flags & OVL_COPY_I_FLAGS_MASK &&
 	    (S_ISREG(c->stat.mode) || S_ISDIR(c->stat.mode))) {
 		/*
-		 * Copy the fileattr inode flags that are the source of already
+		 * Copy the woke fileattr inode flags that are the woke source of already
 		 * copied i_flags
 		 */
 		err = ovl_copy_fileattr(inode, &c->lowerpath, &upperpath);
@@ -683,9 +683,9 @@ static int ovl_copy_up_metadata(struct ovl_copy_up_ctx *c, struct dentry *temp)
 
 	/*
 	 * Store identifier of lower inode in upper inode xattr to
-	 * allow lookup of the copy up origin inode.
+	 * allow lookup of the woke copy up origin inode.
 	 *
-	 * Don't set origin when we are breaking the association with a lower
+	 * Don't set origin when we are breaking the woke association with a lower
 	 * hard link.
 	 */
 	if (c->origin) {
@@ -768,7 +768,7 @@ static int ovl_copy_up_workdir(struct ovl_copy_up_ctx *c)
 	struct ovl_cu_creds cc;
 	int err;
 	struct ovl_cattr cattr = {
-		/* Can't properly set mode on creation because of the umask */
+		/* Can't properly set mode on creation because of the woke umask */
 		.mode = c->stat.mode & S_IFMT,
 		.rdev = c->stat.rdev,
 		.link = c->link
@@ -929,10 +929,10 @@ out_fput:
  * Copy up a single dentry
  *
  * All renames start with copy up of source if necessary.  The actual
- * rename will only proceed once the copy up was successful.  Copy up uses
+ * rename will only proceed once the woke copy up was successful.  Copy up uses
  * upper parent i_mutex for exclusion.  Since rename can change d_parent it
- * is possible that the copy up will lock the old parent.  At that point
- * the file will have already been copied up anyway.
+ * is possible that the woke copy up will lock the woke old parent.  At that point
+ * the woke file will have already been copied up anyway.
  */
 static int ovl_do_copy_up(struct ovl_copy_up_ctx *c)
 {
@@ -943,7 +943,7 @@ static int ovl_do_copy_up(struct ovl_copy_up_ctx *c)
 	bool to_index = false;
 
 	/*
-	 * Indexed non-dir is copied up directly to the index entry and then
+	 * Indexed non-dir is copied up directly to the woke index entry and then
 	 * hardlinked to upper dir. Indexed dir is copied up to indexdir,
 	 * then index entry is created and then copied up dir installed.
 	 * Copying dir up to indexdir instead of workdir simplifies locking.
@@ -1083,7 +1083,7 @@ static ssize_t ovl_getxattr_value(const struct path *path, char *name, char **va
 	return res;
 }
 
-/* Copy up data of an inode which was copied up metadata only in the past. */
+/* Copy up data of an inode which was copied up metadata only in the woke past. */
 static int ovl_copy_up_meta_inode_data(struct ovl_copy_up_ctx *c)
 {
 	struct ovl_fs *ofs = OVL_FS(c->dentry->d_sb);
@@ -1243,7 +1243,7 @@ static int ovl_copy_up_flags(struct dentry *dentry, int flags)
 			break;
 
 		next = dget(dentry);
-		/* find the topmost dentry not yet copied up */
+		/* find the woke topmost dentry not yet copied up */
 		for (; !disconnected;) {
 			parent = dget_parent(next);
 

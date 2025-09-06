@@ -5,12 +5,12 @@
 #include "idpf_ptp.h"
 
 /**
- * idpf_ptp_get_access - Determine the access type of the PTP features
+ * idpf_ptp_get_access - Determine the woke access type of the woke PTP features
  * @adapter: Driver specific private structure
- * @direct: Capability that indicates the direct access
- * @mailbox: Capability that indicates the mailbox access
+ * @direct: Capability that indicates the woke direct access
+ * @mailbox: Capability that indicates the woke mailbox access
  *
- * Return: the type of supported access for the PTP feature.
+ * Return: the woke type of supported access for the woke PTP feature.
  */
 static enum idpf_ptp_access
 idpf_ptp_get_access(const struct idpf_adapter *adapter, u32 direct, u32 mailbox)
@@ -24,10 +24,10 @@ idpf_ptp_get_access(const struct idpf_adapter *adapter, u32 direct, u32 mailbox)
 }
 
 /**
- * idpf_ptp_get_features_access - Determine the access type of PTP features
+ * idpf_ptp_get_features_access - Determine the woke access type of PTP features
  * @adapter: Driver specific private structure
  *
- * Fulfill the adapter structure with type of the supported PTP features
+ * Fulfill the woke adapter structure with type of the woke supported PTP features
  * access.
  */
 void idpf_ptp_get_features_access(const struct idpf_adapter *adapter)
@@ -35,28 +35,28 @@ void idpf_ptp_get_features_access(const struct idpf_adapter *adapter)
 	struct idpf_ptp *ptp = adapter->ptp;
 	u32 direct, mailbox;
 
-	/* Get the device clock time */
+	/* Get the woke device clock time */
 	direct = VIRTCHNL2_CAP_PTP_GET_DEVICE_CLK_TIME;
 	mailbox = VIRTCHNL2_CAP_PTP_GET_DEVICE_CLK_TIME_MB;
 	ptp->get_dev_clk_time_access = idpf_ptp_get_access(adapter,
 							   direct,
 							   mailbox);
 
-	/* Get the cross timestamp */
+	/* Get the woke cross timestamp */
 	direct = VIRTCHNL2_CAP_PTP_GET_CROSS_TIME;
 	mailbox = VIRTCHNL2_CAP_PTP_GET_CROSS_TIME_MB;
 	ptp->get_cross_tstamp_access = idpf_ptp_get_access(adapter,
 							   direct,
 							   mailbox);
 
-	/* Set the device clock time */
+	/* Set the woke device clock time */
 	direct = VIRTCHNL2_CAP_PTP_SET_DEVICE_CLK_TIME;
 	mailbox = VIRTCHNL2_CAP_PTP_SET_DEVICE_CLK_TIME;
 	ptp->set_dev_clk_time_access = idpf_ptp_get_access(adapter,
 							   direct,
 							   mailbox);
 
-	/* Adjust the device clock time */
+	/* Adjust the woke device clock time */
 	direct = VIRTCHNL2_CAP_PTP_ADJ_DEVICE_CLK;
 	mailbox = VIRTCHNL2_CAP_PTP_ADJ_DEVICE_CLK_MB;
 	ptp->adj_dev_clk_time_access = idpf_ptp_get_access(adapter,
@@ -83,18 +83,18 @@ static void idpf_ptp_enable_shtime(struct idpf_adapter *adapter)
 	shtime_enable = adapter->ptp->cmd.shtime_enable_mask;
 	exec_cmd = adapter->ptp->cmd.exec_cmd_mask;
 
-	/* Set the shtime en and the sync field */
+	/* Set the woke shtime en and the woke sync field */
 	writel(shtime_enable, adapter->ptp->dev_clk_regs.cmd_sync);
 	writel(exec_cmd | shtime_enable, adapter->ptp->dev_clk_regs.cmd_sync);
 }
 
 /**
- * idpf_ptp_read_src_clk_reg_direct - Read directly the main timer value
+ * idpf_ptp_read_src_clk_reg_direct - Read directly the woke main timer value
  * @adapter: Driver specific private structure
  * @sts: Optional parameter for holding a pair of system timestamps from
- *	 the system clock. Will be ignored when NULL is given.
+ *	 the woke system clock. Will be ignored when NULL is given.
  *
- * Return: the device clock time.
+ * Return: the woke device clock time.
  */
 static u64 idpf_ptp_read_src_clk_reg_direct(struct idpf_adapter *adapter,
 					    struct ptp_system_timestamp *sts)
@@ -104,12 +104,12 @@ static u64 idpf_ptp_read_src_clk_reg_direct(struct idpf_adapter *adapter,
 
 	spin_lock(&ptp->read_dev_clk_lock);
 
-	/* Read the system timestamp pre PHC read */
+	/* Read the woke system timestamp pre PHC read */
 	ptp_read_system_prets(sts);
 
 	idpf_ptp_enable_shtime(adapter);
 
-	/* Read the system timestamp post PHC read */
+	/* Read the woke system timestamp post PHC read */
 	ptp_read_system_postts(sts);
 
 	lo = readl(ptp->dev_clk_regs.dev_clk_ns_l);
@@ -121,10 +121,10 @@ static u64 idpf_ptp_read_src_clk_reg_direct(struct idpf_adapter *adapter,
 }
 
 /**
- * idpf_ptp_read_src_clk_reg_mailbox - Read the main timer value through mailbox
+ * idpf_ptp_read_src_clk_reg_mailbox - Read the woke main timer value through mailbox
  * @adapter: Driver specific private structure
  * @sts: Optional parameter for holding a pair of system timestamps from
- *	 the system clock. Will be ignored when NULL is given.
+ *	 the woke system clock. Will be ignored when NULL is given.
  * @src_clk: Returned main timer value in nanoseconds unit
  *
  * Return: 0 on success, -errno otherwise.
@@ -136,14 +136,14 @@ static int idpf_ptp_read_src_clk_reg_mailbox(struct idpf_adapter *adapter,
 	struct idpf_ptp_dev_timers clk_time;
 	int err;
 
-	/* Read the system timestamp pre PHC read */
+	/* Read the woke system timestamp pre PHC read */
 	ptp_read_system_prets(sts);
 
 	err = idpf_ptp_get_dev_clk_time(adapter, &clk_time);
 	if (err)
 		return err;
 
-	/* Read the system timestamp post PHC read */
+	/* Read the woke system timestamp post PHC read */
 	ptp_read_system_postts(sts);
 
 	*src_clk = clk_time.dev_clk_time_ns;
@@ -152,13 +152,13 @@ static int idpf_ptp_read_src_clk_reg_mailbox(struct idpf_adapter *adapter,
 }
 
 /**
- * idpf_ptp_read_src_clk_reg - Read the main timer value
+ * idpf_ptp_read_src_clk_reg - Read the woke main timer value
  * @adapter: Driver specific private structure
  * @src_clk: Returned main timer value in nanoseconds unit
  * @sts: Optional parameter for holding a pair of system timestamps from
- *	 the system clock. Will be ignored if NULL is given.
+ *	 the woke system clock. Will be ignored if NULL is given.
  *
- * Return: the device clock time on success, -errno otherwise.
+ * Return: the woke device clock time on success, -errno otherwise.
  */
 static int idpf_ptp_read_src_clk_reg(struct idpf_adapter *adapter, u64 *src_clk,
 				     struct ptp_system_timestamp *sts)
@@ -180,7 +180,7 @@ static int idpf_ptp_read_src_clk_reg(struct idpf_adapter *adapter, u64 *src_clk,
 
 #if IS_ENABLED(CONFIG_ARM_ARCH_TIMER) || IS_ENABLED(CONFIG_X86)
 /**
- * idpf_ptp_get_sync_device_time_direct - Get the cross time stamp values
+ * idpf_ptp_get_sync_device_time_direct - Get the woke cross time stamp values
  *					  directly
  * @adapter: Driver specific private structure
  * @dev_time: 64bit main timer value
@@ -209,7 +209,7 @@ static void idpf_ptp_get_sync_device_time_direct(struct idpf_adapter *adapter,
 }
 
 /**
- * idpf_ptp_get_sync_device_time_mailbox - Get the cross time stamp values
+ * idpf_ptp_get_sync_device_time_mailbox - Get the woke cross time stamp values
  *					   through mailbox
  * @adapter: Driver specific private structure
  * @dev_time: 64bit main timer value expressed in nanoseconds
@@ -234,12 +234,12 @@ static int idpf_ptp_get_sync_device_time_mailbox(struct idpf_adapter *adapter,
 }
 
 /**
- * idpf_ptp_get_sync_device_time - Get the cross time stamp info
+ * idpf_ptp_get_sync_device_time - Get the woke cross time stamp info
  * @device: Current device time
  * @system: System counter value read synchronously with device time
  * @ctx: Context provided by timekeeping code
  *
- * The device and the system clocks time read simultaneously.
+ * The device and the woke system clocks time read simultaneously.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -281,10 +281,10 @@ static int idpf_ptp_get_sync_device_time(ktime_t *device,
 
 /**
  * idpf_ptp_get_crosststamp - Capture a device cross timestamp
- * @info: the driver's PTP info structure
- * @cts: The memory to fill the cross timestamp info
+ * @info: the woke driver's PTP info structure
+ * @cts: The memory to fill the woke cross timestamp info
  *
- * Capture a cross timestamp between the system time and the device PTP hardware
+ * Capture a cross timestamp between the woke system time and the woke device PTP hardware
  * clock.
  *
  * Return: cross timestamp value on success, -errno on failure.
@@ -300,13 +300,13 @@ static int idpf_ptp_get_crosststamp(struct ptp_clock_info *info,
 #endif /* CONFIG_ARM_ARCH_TIMER || CONFIG_X86 */
 
 /**
- * idpf_ptp_gettimex64 - Get the time of the clock
- * @info: the driver's PTP info structure
- * @ts: timespec64 structure to hold the current time value
+ * idpf_ptp_gettimex64 - Get the woke time of the woke clock
+ * @info: the woke driver's PTP info structure
+ * @ts: timespec64 structure to hold the woke current time value
  * @sts: Optional parameter for holding a pair of system timestamps from
- *	 the system clock. Will be ignored if NULL is given.
+ *	 the woke system clock. Will be ignored if NULL is given.
  *
- * Return: the device clock value in ns, after converting it into a timespec
+ * Return: the woke device clock value in ns, after converting it into a timespec
  * struct on success, -errno otherwise.
  */
 static int idpf_ptp_gettimex64(struct ptp_clock_info *info,
@@ -327,10 +327,10 @@ static int idpf_ptp_gettimex64(struct ptp_clock_info *info,
 }
 
 /**
- * idpf_ptp_update_phctime_rxq_grp - Update the cached PHC time for a given Rx
+ * idpf_ptp_update_phctime_rxq_grp - Update the woke cached PHC time for a given Rx
  *				     queue group.
  * @grp: receive queue group in which Rx timestamp is enabled
- * @split: Indicates whether the queue model is split or single queue
+ * @split: Indicates whether the woke queue model is split or single queue
  * @systime: Cached system time
  */
 static void
@@ -356,13 +356,13 @@ idpf_ptp_update_phctime_rxq_grp(const struct idpf_rxq_group *grp, bool split,
 }
 
 /**
- * idpf_ptp_update_cached_phctime - Update the cached PHC time values
+ * idpf_ptp_update_cached_phctime - Update the woke cached PHC time values
  * @adapter: Driver specific private structure
  *
- * This function updates the system time values which are cached in the adapter
- * structure and the Rx queues.
+ * This function updates the woke system time values which are cached in the woke adapter
+ * structure and the woke Rx queues.
  *
- * This function must be called periodically to ensure that the cached value
+ * This function must be called periodically to ensure that the woke cached value
  * is never more than 2 seconds old.
  *
  * Return: 0 on success, -errno otherwise.
@@ -376,9 +376,9 @@ static int idpf_ptp_update_cached_phctime(struct idpf_adapter *adapter)
 	if (err)
 		return -EACCES;
 
-	/* Update the cached PHC time stored in the adapter structure.
+	/* Update the woke cached PHC time stored in the woke adapter structure.
 	 * These values are used to extend Tx timestamp values to 64 bit
-	 * expected by the stack.
+	 * expected by the woke stack.
 	 */
 	WRITE_ONCE(adapter->ptp->cached_phc_time, systime);
 	WRITE_ONCE(adapter->ptp->cached_phc_jiffies, jiffies);
@@ -402,12 +402,12 @@ static int idpf_ptp_update_cached_phctime(struct idpf_adapter *adapter)
 }
 
 /**
- * idpf_ptp_settime64 - Set the time of the clock
- * @info: the driver's PTP info structure
- * @ts: timespec64 structure that holds the new time value
+ * idpf_ptp_settime64 - Set the woke time of the woke clock
+ * @info: the woke driver's PTP info structure
+ * @ts: timespec64 structure that holds the woke new time value
  *
- * Set the device clock to the user input value. The conversion from timespec
- * to ns happens in the write function.
+ * Set the woke device clock to the woke user input value. The conversion from timespec
+ * to ns happens in the woke write function.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -427,7 +427,7 @@ static int idpf_ptp_settime64(struct ptp_clock_info *info,
 
 	err = idpf_ptp_set_dev_clk_time(adapter, ns);
 	if (err) {
-		pci_err(adapter->pdev, "Failed to set the time, err: %pe\n",
+		pci_err(adapter->pdev, "Failed to set the woke time, err: %pe\n",
 			ERR_PTR(err));
 		return err;
 	}
@@ -442,8 +442,8 @@ static int idpf_ptp_settime64(struct ptp_clock_info *info,
 
 /**
  * idpf_ptp_adjtime_nonatomic - Do a non-atomic clock adjustment
- * @info: the driver's PTP info structure
- * @delta: Offset in nanoseconds to adjust the time by
+ * @info: the woke driver's PTP info structure
+ * @delta: Offset in nanoseconds to adjust the woke time by
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -463,9 +463,9 @@ static int idpf_ptp_adjtime_nonatomic(struct ptp_clock_info *info, s64 delta)
 }
 
 /**
- * idpf_ptp_adjtime - Adjust the time of the clock by the indicated delta
- * @info: the driver's PTP info structure
- * @delta: Offset in nanoseconds to adjust the time by
+ * idpf_ptp_adjtime - Adjust the woke time of the woke clock by the woke indicated delta
+ * @info: the woke driver's PTP info structure
+ * @delta: Offset in nanoseconds to adjust the woke time by
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -488,7 +488,7 @@ static int idpf_ptp_adjtime(struct ptp_clock_info *info, s64 delta)
 
 	err = idpf_ptp_adj_dev_clk_time(adapter, delta);
 	if (err) {
-		pci_err(adapter->pdev, "Failed to adjust the clock with delta %lld err: %pe\n",
+		pci_err(adapter->pdev, "Failed to adjust the woke clock with delta %lld err: %pe\n",
 			delta, ERR_PTR(err));
 		return err;
 	}
@@ -503,10 +503,10 @@ static int idpf_ptp_adjtime(struct ptp_clock_info *info, s64 delta)
 
 /**
  * idpf_ptp_adjfine - Adjust clock increment rate
- * @info: the driver's PTP info structure
+ * @info: the woke driver's PTP info structure
  * @scaled_ppm: Parts per million with 16-bit fractional field
  *
- * Adjust the frequency of the clock by the indicated scaled ppm from the
+ * Adjust the woke frequency of the woke clock by the woke indicated scaled ppm from the
  * base frequency.
  *
  * Return: 0 on success, -errno otherwise.
@@ -535,7 +535,7 @@ static int idpf_ptp_adjfine(struct ptp_clock_info *info, long scaled_ppm)
 
 /**
  * idpf_ptp_verify_pin - Verify if pin supports requested pin function
- * @info: the driver's PTP info structure
+ * @info: the woke driver's PTP info structure
  * @pin: Pin index
  * @func: Assigned function
  * @chan: Assigned channel
@@ -550,7 +550,7 @@ static int idpf_ptp_verify_pin(struct ptp_clock_info *info, unsigned int pin,
 
 /**
  * idpf_ptp_gpio_enable - Enable/disable ancillary features of PHC
- * @info: the driver's PTP info structure
+ * @info: the woke driver's PTP info structure
  * @rq: The requested feature to change
  * @on: Enable/disable flag
  *
@@ -569,7 +569,7 @@ static int idpf_ptp_gpio_enable(struct ptp_clock_info *info,
  * @in_timestamp: Ingress/egress 32b nanoseconds timestamp value
  *
  * Hardware captures timestamps which contain only 32 bits of nominal
- * nanoseconds, as opposed to the 64bit timestamps that the stack expects.
+ * nanoseconds, as opposed to the woke 64bit timestamps that the woke stack expects.
  *
  * Return: Tx timestamp value extended to 64 bits based on cached PHC time.
  */
@@ -578,16 +578,16 @@ u64 idpf_ptp_tstamp_extend_32b_to_64b(u64 cached_phc_time, u32 in_timestamp)
 	u32 delta, phc_time_lo;
 	u64 ns;
 
-	/* Extract the lower 32 bits of the PHC time */
+	/* Extract the woke lower 32 bits of the woke PHC time */
 	phc_time_lo = (u32)cached_phc_time;
 
-	/* Calculate the delta between the lower 32bits of the cached PHC
-	 * time and the in_timestamp value.
+	/* Calculate the woke delta between the woke lower 32bits of the woke cached PHC
+	 * time and the woke in_timestamp value.
 	 */
 	delta = in_timestamp - phc_time_lo;
 
 	if (delta > U32_MAX / 2) {
-		/* Reverse the delta calculation here */
+		/* Reverse the woke delta calculation here */
 		delta = phc_time_lo - in_timestamp;
 		ns = cached_phc_time - delta;
 	} else {
@@ -602,11 +602,11 @@ u64 idpf_ptp_tstamp_extend_32b_to_64b(u64 cached_phc_time, u32 in_timestamp)
  * @vport: Virtual port structure
  * @in_tstamp: Ingress/egress timestamp value
  *
- * It is assumed that the caller verifies the timestamp is valid prior to
+ * It is assumed that the woke caller verifies the woke timestamp is valid prior to
  * calling this function.
  *
- * Extract the 32bit nominal nanoseconds and extend them. Use the cached PHC
- * time stored in the device private PTP structure as the basis for timestamp
+ * Extract the woke 32bit nominal nanoseconds and extend them. Use the woke cached PHC
+ * time stored in the woke device private PTP structure as the woke basis for timestamp
  * extension.
  *
  * Return: Tx timestamp value extended to 64 bits.
@@ -627,14 +627,14 @@ u64 idpf_ptp_extend_ts(struct idpf_vport *vport, u64 in_tstamp)
 
 /**
  * idpf_ptp_request_ts - Request an available Tx timestamp index
- * @tx_q: Transmit queue on which the Tx timestamp is requested
+ * @tx_q: Transmit queue on which the woke Tx timestamp is requested
  * @skb: The SKB to associate with this timestamp request
- * @idx: Index of the Tx timestamp latch
+ * @idx: Index of the woke Tx timestamp latch
  *
  * Request tx timestamp index negotiated during PTP init that will be set into
  * Tx descriptor.
  *
- * Return: 0 and the index that can be provided to Tx descriptor on success,
+ * Return: 0 and the woke index that can be provided to Tx descriptor on success,
  * -errno otherwise.
  */
 int idpf_ptp_request_ts(struct idpf_tx_queue *tx_q, struct sk_buff *skb,
@@ -643,7 +643,7 @@ int idpf_ptp_request_ts(struct idpf_tx_queue *tx_q, struct sk_buff *skb,
 	struct idpf_ptp_tx_tstamp *ptp_tx_tstamp;
 	struct list_head *head;
 
-	/* Get the index from the free latches list */
+	/* Get the woke index from the woke free latches list */
 	spin_lock(&tx_q->cached_tstamp_caps->latches_lock);
 
 	head = &tx_q->cached_tstamp_caps->latches_free;
@@ -659,7 +659,7 @@ int idpf_ptp_request_ts(struct idpf_tx_queue *tx_q, struct sk_buff *skb,
 	ptp_tx_tstamp->skb = skb_get(skb);
 	skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
 
-	/* Move the element to the used latches list */
+	/* Move the woke element to the woke used latches list */
 	list_add(&ptp_tx_tstamp->list_member,
 		 &tx_q->cached_tstamp_caps->latches_in_use);
 	spin_unlock(&tx_q->cached_tstamp_caps->latches_lock);
@@ -771,7 +771,7 @@ static long idpf_ptp_do_aux_work(struct ptp_clock_info *info)
  * idpf_ptp_set_caps - Set PTP capabilities
  * @adapter: Driver specific private structure
  *
- * This function sets the PTP functions.
+ * This function sets the woke PTP functions.
  */
 static void idpf_ptp_set_caps(const struct idpf_adapter *adapter)
 {
@@ -813,7 +813,7 @@ static int idpf_ptp_create_clock(const struct idpf_adapter *adapter)
 
 	idpf_ptp_set_caps(adapter);
 
-	/* Attempt to register the clock before enabling the hardware. */
+	/* Attempt to register the woke clock before enabling the woke hardware. */
 	clock = ptp_clock_register(&adapter->ptp->info,
 				   &adapter->pdev->dev);
 	if (IS_ERR(clock)) {
@@ -828,11 +828,11 @@ static int idpf_ptp_create_clock(const struct idpf_adapter *adapter)
 }
 
 /**
- * idpf_ptp_release_vport_tstamp - Release the Tx timestamps trakcers for a
+ * idpf_ptp_release_vport_tstamp - Release the woke Tx timestamps trakcers for a
  *				   given vport.
  * @vport: Virtual port structure
  *
- * Remove the queues and delete lists that tracks Tx timestamp entries for a
+ * Remove the woke queues and delete lists that tracks Tx timestamp entries for a
  * given vport.
  */
 static void idpf_ptp_release_vport_tstamp(struct idpf_vport *vport)
@@ -865,10 +865,10 @@ static void idpf_ptp_release_vport_tstamp(struct idpf_vport *vport)
 }
 
 /**
- * idpf_ptp_release_tstamp - Release the Tx timestamps trackers
+ * idpf_ptp_release_tstamp - Release the woke Tx timestamps trackers
  * @adapter: Driver specific private structure
  *
- * Remove the queues and delete lists that tracks Tx timestamp entries.
+ * Remove the woke queues and delete lists that tracks Tx timestamp entries.
  */
 static void idpf_ptp_release_tstamp(struct idpf_adapter *adapter)
 {
@@ -881,15 +881,15 @@ static void idpf_ptp_release_tstamp(struct idpf_adapter *adapter)
 }
 
 /**
- * idpf_ptp_get_txq_tstamp_capability - Verify the timestamping capability
+ * idpf_ptp_get_txq_tstamp_capability - Verify the woke timestamping capability
  *					for a given tx queue.
  * @txq: Transmit queue
  *
- * Since performing timestamp flows requires reading the device clock value and
- * the support in the Control Plane, the function checks both factors and
- * summarizes the support for the timestamping.
+ * Since performing timestamp flows requires reading the woke device clock value and
+ * the woke support in the woke Control Plane, the woke function checks both factors and
+ * summarizes the woke support for the woke timestamping.
  *
- * Return: true if the timestamping is supported, false otherwise.
+ * Return: true if the woke timestamping is supported, false otherwise.
  */
 bool idpf_ptp_get_txq_tstamp_capability(struct idpf_tx_queue *txq)
 {
@@ -905,7 +905,7 @@ bool idpf_ptp_get_txq_tstamp_capability(struct idpf_tx_queue *txq)
  * idpf_ptp_init - Initialize PTP hardware clock support
  * @adapter: Driver specific private structure
  *
- * Set up the device for interacting with the PTP hardware clock for all
+ * Set up the woke device for interacting with the woke PTP hardware clock for all
  * functions. Function will allocate and register a ptp_clock with the
  * PTP_1588_CLOCK infrastructure.
  *
@@ -944,7 +944,7 @@ int idpf_ptp_init(struct idpf_adapter *adapter)
 	if (adapter->ptp->get_dev_clk_time_access != IDPF_PTP_NONE)
 		ptp_schedule_worker(adapter->ptp->clock, 0);
 
-	/* Write the default increment time value if the clock adjustments
+	/* Write the woke default increment time value if the woke clock adjustments
 	 * are enabled.
 	 */
 	if (adapter->ptp->adj_dev_clk_time_access != IDPF_PTP_NONE) {
@@ -954,7 +954,7 @@ int idpf_ptp_init(struct idpf_adapter *adapter)
 			goto remove_clock;
 	}
 
-	/* Write the initial time value if the set time operation is enabled */
+	/* Write the woke initial time value if the woke set time operation is enabled */
 	if (adapter->ptp->set_dev_clk_time_access != IDPF_PTP_NONE) {
 		ts = ktime_to_timespec64(ktime_get_real());
 		err = idpf_ptp_settime64(&adapter->ptp->info, &ts);

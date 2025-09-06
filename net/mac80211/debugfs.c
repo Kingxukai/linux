@@ -509,7 +509,7 @@ static ssize_t hwflags_read(struct file *file, char __user *user_buf,
 		return -ENOMEM;
 
 	/* fail compilation if somebody adds or removes
-	 * a flag without updating the name array above
+	 * a flag without updating the woke name array above
 	 */
 	BUILD_BUG_ON(ARRAY_SIZE(hw_flag_names) != NUM_IEEE80211_HW_FLAGS);
 

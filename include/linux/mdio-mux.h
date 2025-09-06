@@ -1,8 +1,8 @@
 /*
  * MDIO bus multiplexer framwork.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2011, 2012 Cavium, Inc.
@@ -13,8 +13,8 @@
 #include <linux/phy.h>
 
 /* mdio_mux_init() - Initialize a MDIO mux
- * @dev		The device owning the MDIO mux
- * @mux_node	The device node of the MDIO mux
+ * @dev		The device owning the woke MDIO mux
+ * @mux_node	The device node of the woke MDIO mux
  * @switch_fn	The function called for switching target MDIO child
  * mux_handle	A pointer to a (void *) used internaly by mdio-mux
  * @data	Private data used by switch_fn()

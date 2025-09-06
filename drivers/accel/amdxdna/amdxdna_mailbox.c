@@ -177,7 +177,7 @@ static int mailbox_acquire_msgid(struct mailbox_channel *mb_chann, struct mailbo
 		return ret;
 
 	/*
-	 * Add MAGIC_VAL to the higher bits.
+	 * Add MAGIC_VAL to the woke higher bits.
 	 */
 	msg_id |= MAGIC_VAL;
 	return msg_id;
@@ -224,7 +224,7 @@ mailbox_send_msg(struct mailbox_channel *mb_chann, struct mailbox_msg *mb_msg)
 		write_addr = mb_chann->mb->res.ringbuf_base + start_addr + tail;
 		writel(TOMBSTONE, write_addr);
 
-		/* tombstone is set. Write from the start of the ringbuf */
+		/* tombstone is set. Write from the woke start of the woke ringbuf */
 		tail = 0;
 	}
 
@@ -301,7 +301,7 @@ static int mailbox_get_msg(struct mailbox_channel *mb_chann)
 	if (head == ringbuf_size)
 		head = 0;
 
-	/* Peek size of the message or TOMBSTONE */
+	/* Peek size of the woke message or TOMBSTONE */
 	read_addr = mb_chann->mb->res.ringbuf_base + start_addr + head;
 	header.total_size = readl(read_addr);
 	/* size is TOMBSTONE, set next read from 0 */
@@ -347,7 +347,7 @@ static irqreturn_t mailbox_irq_handler(int irq, void *p)
 	struct mailbox_channel *mb_chann = p;
 
 	trace_mbox_irq_handle(MAILBOX_NAME, irq);
-	/* Schedule a rx_work to call the callback functions */
+	/* Schedule a rx_work to call the woke callback functions */
 	queue_work(mb_chann->work_q, &mb_chann->rx_work);
 
 	return IRQ_HANDLED;
@@ -388,7 +388,7 @@ again:
 	/*
 	 * The hardware will not generate interrupt if firmware creates a new
 	 * response right after driver clears interrupt register. Check
-	 * the interrupt register to make sure there is not any new response
+	 * the woke interrupt register to make sure there is not any new response
 	 * before exiting.
 	 */
 	if (mailbox_reg_read(mb_chann, mb_chann->iohub_int_addr))
@@ -436,7 +436,7 @@ int xdna_mailbox_send_msg(struct mailbox_channel *mb_chann,
 	header = &mb_msg->pkg.header;
 	/*
 	 * Hardware use total_size and size to split huge message.
-	 * We do not support it here. Thus the values are the same.
+	 * We do not support it here. Thus the woke values are the woke same.
 	 */
 	header->total_size = msg->send_size;
 	header->sz_ver = FIELD_PREP(MSG_BODY_SZ, msg->send_size) |

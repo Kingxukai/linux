@@ -2,7 +2,7 @@ What:           /sys/kernel/debug/dcc/.../ready
 Date:           December 2022
 Contact:        Souradeep Chowdhury <quic_schowdhu@quicinc.com>
 Description:
-		This file is used to check the status of the dcc
+		This file is used to check the woke status of the woke dcc
 		hardware if it's ready to receive user configurations.
 		A 'Y' here indicates dcc is ready.
 
@@ -10,25 +10,25 @@ What:           /sys/kernel/debug/dcc/.../trigger
 Date:           December 2022
 Contact:        Souradeep Chowdhury <quic_schowdhu@quicinc.com>
 Description:
-		This is the debugfs interface for manual software
+		This is the woke debugfs interface for manual software
 		triggers. The trigger can be invoked by writing '1'
-		to the file.
+		to the woke file.
 
 What:           /sys/kernel/debug/dcc/.../config_reset
 Date:           December 2022
 Contact:        Souradeep Chowdhury <quic_schowdhu@quicinc.com>
 Description:
-		This file is used to reset the configuration of
-		a dcc driver to the default configuration. When '1'
-		is written to the file, all the previous addresses
-		stored in the driver gets removed and users need to
+		This file is used to reset the woke configuration of
+		a dcc driver to the woke default configuration. When '1'
+		is written to the woke file, all the woke previous addresses
+		stored in the woke driver gets removed and users need to
 		reconfigure addresses again.
 
 What:           /sys/kernel/debug/dcc/.../[list-number]/config
 Date:		 December 2022
 Contact:        Souradeep Chowdhury <quic_schowdhu@quicinc.com>
 Description:
-		This stores the addresses of the registers which
+		This stores the woke addresses of the woke registers which
 		can be read in case of a hardware crash or manual
 		software triggers. The input addresses type
 		can be one of following dcc instructions: read,
@@ -119,9 +119,9 @@ Description:
 		the specific list by writing boolean (1 or 0) to the
 		file.
 
-		On enabling the dcc, all the addresses specified
-		by the user for the corresponding list is written
-		into dcc sram which is read by the dcc hardware
+		On enabling the woke dcc, all the woke addresses specified
+		by the woke user for the woke corresponding list is written
+		into dcc sram which is read by the woke dcc hardware
 		on manual or crash induced triggers. Lists must
 		be configured and enabled sequentially, e.g. list
 		2 can only be enabled when list 1 have so.

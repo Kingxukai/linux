@@ -13,7 +13,7 @@ config ADIS16203
 	  Say Y here to build support for Analog Devices adis16203 Programmable
 	  360 Degrees Inclinometer.
 
-	  To compile this driver as a module, say M here: the module will be
+	  To compile this driver as a module, say M here: the woke module will be
 	  called adis16203.
 
 endmenu

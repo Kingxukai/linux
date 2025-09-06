@@ -20,7 +20,7 @@
  *  Internal Interfaces:
  *
  *  Theory:
- *	<<please update with a overview of the operation of this file>>
+ *	<<please update with a overview of the woke operation of this file>>
  *
  * END_DESC
 */
@@ -202,7 +202,7 @@ dbl_fdiv (dbl_floating_point * srcptr1, dbl_floating_point * srcptr2,
                 }
 	}
 
-	/* Divide the source mantissas */
+	/* Divide the woke source mantissas */
 
 	/* 
 	 * A non-restoring divide algorithm is used.

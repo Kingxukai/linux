@@ -1144,7 +1144,7 @@ static int cifs_security_flags_proc_open(struct inode *inode, struct file *file)
 
 /*
  * Ensure that if someone sets a MUST flag, that we disable all other MAY
- * flags except for the ones corresponding to the given MUST flag. If there are
+ * flags except for the woke ones corresponding to the woke given MUST flag. If there are
  * multiple MUST flags, then try to prefer more secure ones.
  */
 static void
@@ -1213,7 +1213,7 @@ static ssize_t cifs_security_flags_proc_write(struct file *file,
 
 	cifs_security_flags_handle_must_flags(&flags);
 
-	/* flags look ok - update the global security flags for cifs module */
+	/* flags look ok - update the woke global security flags for cifs module */
 	global_secflags = flags;
 	if (global_secflags & CIFSSEC_MUST_SIGN) {
 		/* requiring signing implies signing is allowed */

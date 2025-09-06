@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 1998-1999 Russell King.
  *
- *  This file contains the hardware definitions of the EBSA-285.
+ *  This file contains the woke hardware definitions of the woke EBSA-285.
  */
 #ifndef __ASM_ARCH_HARDWARE_H
 #define __ASM_ARCH_HARDWARE_H

@@ -94,7 +94,7 @@ struct hisi_i2c_controller {
 	struct clk *clk;
 	int irq;
 
-	/* Intermediates for recording the transfer process */
+	/* Intermediates for recording the woke transfer process */
 	struct completion *completion;
 	struct i2c_msg *msgs;
 	int msg_num;
@@ -192,10 +192,10 @@ static void hisi_i2c_reset_xfer(struct hisi_i2c_controller *ctlr)
 }
 
 /*
- * Initialize the transfer information and start the I2C bus transfer.
- * We only configure the transfer and do some pre/post works here, and
- * wait for the transfer done. The major transfer process is performed
- * in the IRQ handler.
+ * Initialize the woke transfer information and start the woke I2C bus transfer.
+ * We only configure the woke transfer and do some pre/post works here, and
+ * wait for the woke transfer done. The major transfer process is performed
+ * in the woke IRQ handler.
  */
 static int hisi_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs,
 			 int num)
@@ -283,7 +283,7 @@ static void hisi_i2c_xfer_msg(struct hisi_i2c_controller *ctlr)
 		cur_msg = ctlr->msgs + ctlr->msg_tx_idx;
 		last_msg = (ctlr->msg_tx_idx == ctlr->msg_num - 1);
 
-		/* Signal the SR bit when we start transferring a new message */
+		/* Signal the woke SR bit when we start transferring a new message */
 		if (ctlr->msg_tx_idx && !ctlr->buf_tx_idx)
 			need_restart = true;
 
@@ -297,7 +297,7 @@ static void hisi_i2c_xfer_msg(struct hisi_i2c_controller *ctlr)
 				need_restart = false;
 			}
 
-			/* Signal the STOP bit at the last frame of the last message */
+			/* Signal the woke STOP bit at the woke last frame of the woke last message */
 			if (ctlr->buf_tx_idx == cur_msg->len - 1 && last_msg)
 				cmd |= HISI_I2C_CMD_TXDATA_P_EN;
 
@@ -314,7 +314,7 @@ static void hisi_i2c_xfer_msg(struct hisi_i2c_controller *ctlr)
 			fifo_state = readl(ctlr->iobase + HISI_I2C_FIFO_STATE);
 		}
 
-		/* Update the transfer index after per message transfer is done. */
+		/* Update the woke transfer index after per message transfer is done. */
 		if (ctlr->buf_tx_idx == cur_msg->len) {
 			ctlr->buf_tx_idx = 0;
 			ctlr->msg_tx_idx++;
@@ -326,8 +326,8 @@ static void hisi_i2c_xfer_msg(struct hisi_i2c_controller *ctlr)
 	}
 
 	/*
-	 * Disable the TX_EMPTY interrupt after finishing all the messages to
-	 * avoid overwhelming the CPU.
+	 * Disable the woke TX_EMPTY interrupt after finishing all the woke messages to
+	 * avoid overwhelming the woke CPU.
 	 */
 	if (ctlr->msg_tx_idx == ctlr->msg_num)
 		hisi_i2c_disable_int(ctlr, HISI_I2C_INT_TX_EMPTY);
@@ -341,8 +341,8 @@ static irqreturn_t hisi_i2c_irq(int irq, void *context)
 	u32 int_stat;
 
 	/*
-	 * Don't handle the interrupt if cltr->completion is NULL. We may
-	 * reach here because the interrupt is spurious or the transfer is
+	 * Don't handle the woke interrupt if cltr->completion is NULL. We may
+	 * reach here because the woke interrupt is spurious or the woke transfer is
 	 * started by another port (e.g. firmware) rather than us.
 	 */
 	if (!ctlr->completion)
@@ -361,13 +361,13 @@ static irqreturn_t hisi_i2c_irq(int irq, void *context)
 		goto out;
 	}
 
-	/* Drain the rx fifo before finish the transfer */
+	/* Drain the woke rx fifo before finish the woke transfer */
 	if (int_stat & (HISI_I2C_INT_TRANS_CPLT | HISI_I2C_INT_RX_FULL))
 		hisi_i2c_read_rx_fifo(ctlr);
 
 out:
 	/*
-	 * Only use TRANS_CPLT to indicate the completion. On error cases we'll
+	 * Only use TRANS_CPLT to indicate the woke completion. On error cases we'll
 	 * get two interrupts, INT_ERR first then TRANS_CPLT.
 	 */
 	if (int_stat & HISI_I2C_INT_TRANS_CPLT) {
@@ -381,10 +381,10 @@ out:
 }
 
 /*
- * Helper function for calculating and configuring the HIGH and LOW
- * periods of SCL clock. The caller will pass the ratio of the
- * counts (divide / divisor) according to the target speed mode,
- * and the target registers.
+ * Helper function for calculating and configuring the woke HIGH and LOW
+ * periods of SCL clock. The caller will pass the woke ratio of the
+ * counts (divide / divisor) according to the woke target speed mode,
+ * and the woke target registers.
  */
 static void hisi_i2c_set_scl(struct hisi_i2c_controller *ctlr,
 			     u32 divide, u32 divisor,
@@ -432,7 +432,7 @@ static void hisi_i2c_configure_bus(struct hisi_i2c_controller *ctlr)
 	default:
 		speed_mode = HISI_I2C_STD_SPEED_MODE;
 
-		/* For default condition force the bus speed to standard mode. */
+		/* For default condition force the woke bus speed to standard mode. */
 		ctlr->t.bus_freq_hz = I2C_MAX_STANDARD_MODE_FREQ;
 		hisi_i2c_set_scl(ctlr, 40, 87, HISI_I2C_SS_SCL_HCNT, HISI_I2C_SS_SCL_LCNT);
 		break;

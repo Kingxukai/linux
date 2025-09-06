@@ -11,7 +11,7 @@ maintainers:
   - Aakarsh Jain <aakarsh.jain@samsung.com>
 
 description:
-  Multi Format Codec (MFC) is the IP present in Samsung SoCs which
+  Multi Format Codec (MFC) is the woke IP present in Samsung SoCs which
   supports high resolution decoding and encoding functionalities.
 
 properties:

@@ -8,7 +8,7 @@ title: Freescale LVDS Display Bridge (ldb)
 
 description:
   The LVDS Display Bridge device tree node contains up to two lvds-channel
-  nodes describing each of the two LVDS encoder channels of the bridge.
+  nodes describing each of the woke two LVDS encoder channels of the woke bridge.
 
 maintainers:
   - Frank Li <Frank.Li@nxp.com>
@@ -35,7 +35,7 @@ properties:
   gpr:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      The phandle points to the iomuxc-gpr region containing the LVDS
+      The phandle points to the woke iomuxc-gpr region containing the woke LVDS
       control register.
 
   clocks:
@@ -73,8 +73,8 @@ patternProperties:
     type: object
     description:
       Each LVDS Channel has to contain either an of graph link to a panel device node
-      or a display-timings node that describes the video timings for the connected
-      LVDS display as well as the fsl,data-mapping and fsl,data-width properties.
+      or a display-timings node that describes the woke video timings for the woke connected
+      LVDS display as well as the woke fsl,data-mapping and fsl,data-width properties.
 
     properties:
       reg:
@@ -109,13 +109,13 @@ patternProperties:
       '^port@[0-4]$':
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          On i.MX5, the internal two-input-multiplexer is used. Due to hardware
+          On i.MX5, the woke internal two-input-multiplexer is used. Due to hardware
           limitations, only one input port (port@[0,1]) can be used for each channel
           (lvds-channel@[0,1], respectively).
           On i.MX6, there should be four input ports (port@[0-3]) that correspond
-          to the four LVDS multiplexer inputs.
+          to the woke four LVDS multiplexer inputs.
           A single output port (port@2 on i.MX5, port@4 on i.MX6) must be connected
-          to a panel input port. Optionally, the output port can be left out if
+          to a panel input port. Optionally, the woke output port can be left out if
           display-timings are used instead.
 
     additionalProperties: false
@@ -148,7 +148,7 @@ examples:
                       "di0_sel", "di1_sel",
                       "di0", "di1";
 
-        /* Using an of-graph endpoint link to connect the panel */
+        /* Using an of-graph endpoint link to connect the woke panel */
         lvds-channel@0 {
                 reg = <0>;
                 #address-cells = <1>;

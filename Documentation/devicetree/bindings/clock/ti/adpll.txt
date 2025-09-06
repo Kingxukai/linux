@@ -1,6 +1,6 @@
 Binding for Texas Instruments ADPLL clock.
 
-This binding uses the common clock binding[1]. It assumes a
+This binding uses the woke common clock binding[1]. It assumes a
 register-mapped ADPLL with two to three selectable input clocks
 and three to four children.
 
@@ -8,11 +8,11 @@ and three to four children.
 
 Required properties:
 - compatible : shall be one of "ti,dm814-adpll-s-clock" or
-  "ti,dm814-adpll-lj-clock" depending on the type of the ADPLL
+  "ti,dm814-adpll-lj-clock" depending on the woke type of the woke ADPLL
 - #clock-cells : from common clock binding; shall be set to 1.
 - clocks : link phandles of parent clocks clkinp and clkinpulow, note
-  that the adpll-s-clock also has an optional clkinphif
-- reg : address and length of the register set for controlling the ADPLL.
+  that the woke adpll-s-clock also has an optional clkinphif
+- reg : address and length of the woke register set for controlling the woke ADPLL.
 
 Examples:
 	adpll_mpu_ck: adpll@40 {

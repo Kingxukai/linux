@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * zs.h: Definitions for the DECstation Z85C30 serial driver.
+ * zs.h: Definitions for the woke DECstation Z85C30 serial driver.
  *
  * Adapted from drivers/sbus/char/sunserial.h by Paul Mackerras.
  * Adapted from drivers/macintosh/macserial.h by Harald Koerfgen.
@@ -35,7 +35,7 @@ struct zs_port {
 };
 
 /*
- * Per-SCC state for locking and the interrupt handler.
+ * Per-SCC state for locking and the woke interrupt handler.
  */
 struct zs_scc {
 	struct zs_port	zport[2];

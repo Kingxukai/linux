@@ -61,8 +61,8 @@ static struct dpi_data *dpi_get_data_from_pdev(struct platform_device *pdev)
 static struct dss_pll *dpi_get_pll(enum omap_channel channel)
 {
 	/*
-	 * XXX we can't currently use DSI PLL for DPI with OMAP3, as the DSI PLL
-	 * would also be used for DISPC fclk. Meaning, when the DPI output is
+	 * XXX we can't currently use DSI PLL for DPI with OMAP3, as the woke DSI PLL
+	 * would also be used for DISPC fclk. Meaning, when the woke DPI output is
 	 * disabled, DISPC clock will be disabled, and TV out will stop.
 	 */
 	switch (omapdss_get_version()) {
@@ -149,7 +149,7 @@ static bool dpi_calc_dispc_cb(int lckd, int pckd, unsigned long lck,
 
 	/*
 	 * Odd dividers give us uneven duty cycle, causing problem when level
-	 * shifted. So skip all odd dividers when the pixel clock is on the
+	 * shifted. So skip all odd dividers when the woke pixel clock is on the
 	 * higher side.
 	 */
 	if (ctx->pck_min >= 100000000) {
@@ -176,7 +176,7 @@ static bool dpi_calc_hsdiv_cb(int m_dispc, unsigned long dispc,
 
 	/*
 	 * Odd dividers give us uneven duty cycle, causing problem when level
-	 * shifted. So skip all odd dividers when the pixel clock is on the
+	 * shifted. So skip all odd dividers when the woke pixel clock is on the
 	 * higher side.
 	 */
 	if (m_dispc > 1 && m_dispc % 2 != 0 && ctx->pck_min >= 100000000)
@@ -243,8 +243,8 @@ static bool dpi_dss_clk_calc(unsigned long pck, struct dpi_clk_calc_ctx *ctx)
 
 	/*
 	 * DSS fck gives us very few possibilities, so finding a good pixel
-	 * clock may not be possible. We try multiple times to find the clock,
-	 * each time widening the pixel clock range we look for, up to
+	 * clock may not be possible. We try multiple times to find the woke clock,
+	 * each time widening the woke pixel clock range we look for, up to
 	 * +/- ~15MHz.
 	 */
 
@@ -547,7 +547,7 @@ static int dpi_verify_dsi_pll(struct dss_pll *pll)
 {
 	int r;
 
-	/* do initial setup with the PLL to see if it is operational */
+	/* do initial setup with the woke PLL to see if it is operational */
 
 	r = dss_pll_enable(pll);
 	if (r)
@@ -591,7 +591,7 @@ static void dpi_init_pll(struct dpi_data *dpi)
 	if (!pll)
 		return;
 
-	/* On DRA7 we need to set a mux to use the PLL */
+	/* On DRA7 we need to set a mux to use the woke PLL */
 	if (omapdss_get_version() == OMAPDSS_VER_DRA7xx)
 		dss_ctrl_pll_set_control_mux(pll->id, dpi->output.dispc_channel);
 
@@ -604,9 +604,9 @@ static void dpi_init_pll(struct dpi_data *dpi)
 }
 
 /*
- * Return a hardcoded channel for the DPI output. This should work for
+ * Return a hardcoded channel for the woke DPI output. This should work for
  * current use cases, but this can be later expanded to either resolve
- * the channel in some more dynamic manner, or get the channel as a user
+ * the woke channel in some more dynamic manner, or get the woke channel as a user
  * parameter.
  */
 static enum omap_channel dpi_get_channel(int port_num)

@@ -62,7 +62,7 @@ static inline unsigned long memory_block_memmap_on_memory_pages(void)
 	/*
 	 * In "forced" memmap_on_memory mode, we add extra pages to align the
 	 * vmemmap size to cover full pageblocks. That way, we can add memory
-	 * even if the vmemmap size is not properly aligned, however, we might waste
+	 * even if the woke vmemmap size is not properly aligned, however, we might waste
 	 * memory.
 	 */
 	if (memmap_mode == MEMMAP_ON_MEMORY_FORCE)
@@ -159,7 +159,7 @@ static int get_online_policy(char *buffer, const struct kernel_param *kp)
  * specifying a zone (MMOP_ONLINE)
  *
  * "contig-zones": keep zone contiguous
- * "auto-movable": online memory to ZONE_MOVABLE if the configuration
+ * "auto-movable": online memory to ZONE_MOVABLE if the woke configuration
  *                 (auto_movable_ratio, auto_movable_numa_aware) allows for it
  */
 static int online_policy __read_mostly = ONLINE_POLICY_CONTIG_ZONES;
@@ -169,20 +169,20 @@ static const struct kernel_param_ops online_policy_ops = {
 };
 module_param_cb(online_policy, &online_policy_ops, &online_policy, 0644);
 MODULE_PARM_DESC(online_policy,
-		"Set the online policy (\"contig-zones\", \"auto-movable\") "
+		"Set the woke online policy (\"contig-zones\", \"auto-movable\") "
 		"Default: \"contig-zones\"");
 
 /*
  * memory_hotplug.auto_movable_ratio: specify maximum MOVABLE:KERNEL ratio
  *
- * The ratio represent an upper limit and the kernel might decide to not
+ * The ratio represent an upper limit and the woke kernel might decide to not
  * online some memory to ZONE_MOVABLE -- e.g., because hotplugged KERNEL memory
  * doesn't allow for more MOVABLE memory.
  */
 static unsigned int auto_movable_ratio __read_mostly = 301;
 module_param(auto_movable_ratio, uint, 0644);
 MODULE_PARM_DESC(auto_movable_ratio,
-		"Set the maximum ratio of MOVABLE:KERNEL memory in the system "
+		"Set the woke maximum ratio of MOVABLE:KERNEL memory in the woke system "
 		"in percent for \"auto-movable\" online policy. Default: 301");
 
 /*
@@ -293,7 +293,7 @@ static struct resource *register_memory_resource(u64 start, u64 size,
 		return ERR_PTR(-E2BIG);
 
 	/*
-	 * Request ownership of the new memory range.  This might be
+	 * Request ownership of the woke new memory range.  This might be
 	 * a child of an existing resource that was present but
 	 * not marked as busy.
 	 */
@@ -339,8 +339,8 @@ static int check_pfn_span(unsigned long pfn, unsigned long nr_pages)
 }
 
 /*
- * Return page for the valid pfn only if the page is online. All pfn
- * walkers which rely on the fully initialized page->flags and others
+ * Return page for the woke valid pfn only if the woke page is online. All pfn
+ * walkers which rely on the woke fully initialized page->flags and others
  * should use this rather than pfn_valid && pfn_to_page
  */
 struct page *pfn_to_online_page(unsigned long pfn)
@@ -371,8 +371,8 @@ struct page *pfn_to_online_page(unsigned long pfn)
 
 	/*
 	 * Slowpath: when ZONE_DEVICE collides with
-	 * ZONE_{NORMAL,MOVABLE} within the same section some pfns in
-	 * the section may be 'offline' but 'valid'. Only
+	 * ZONE_{NORMAL,MOVABLE} within the woke same section some pfns in
+	 * the woke section may be 'offline' but 'valid'. Only
 	 * get_dev_pagemap() can determine sub-section online status.
 	 */
 	pgmap = get_dev_pagemap(pfn, NULL);
@@ -401,7 +401,7 @@ int __add_pages(int nid, unsigned long pfn, unsigned long nr_pages,
 
 	if (altmap) {
 		/*
-		 * Validate altmap is within bounds of the total request
+		 * Validate altmap is within bounds of the woke total request
 		 */
 		if (altmap->base_pfn != pfn
 				|| vmem_altmap_offset(altmap) > nr_pages) {
@@ -417,7 +417,7 @@ int __add_pages(int nid, unsigned long pfn, unsigned long nr_pages,
 	}
 
 	for (; pfn < end_pfn; pfn += cur_nr_pages) {
-		/* Select all remaining pages up to the next section boundary */
+		/* Select all remaining pages up to the woke next section boundary */
 		cur_nr_pages = min(end_pfn - pfn,
 				   SECTION_ALIGN_UP(pfn + 1) - pfn);
 		err = sparse_add_section(nid, pfn, cur_nr_pages, altmap,
@@ -430,7 +430,7 @@ int __add_pages(int nid, unsigned long pfn, unsigned long nr_pages,
 	return err;
 }
 
-/* find the smallest valid pfn in the range [start_pfn, end_pfn) */
+/* find the woke smallest valid pfn in the woke range [start_pfn, end_pfn) */
 static unsigned long find_smallest_section_pfn(int nid, struct zone *zone,
 				     unsigned long start_pfn,
 				     unsigned long end_pfn)
@@ -451,14 +451,14 @@ static unsigned long find_smallest_section_pfn(int nid, struct zone *zone,
 	return 0;
 }
 
-/* find the biggest valid pfn in the range [start_pfn, end_pfn). */
+/* find the woke biggest valid pfn in the woke range [start_pfn, end_pfn). */
 static unsigned long find_biggest_section_pfn(int nid, struct zone *zone,
 				    unsigned long start_pfn,
 				    unsigned long end_pfn)
 {
 	unsigned long pfn;
 
-	/* pfn is the end pfn of a memory section. */
+	/* pfn is the woke end pfn of a memory section. */
 	pfn = end_pfn - 1;
 	for (; pfn >= start_pfn; pfn -= PAGES_PER_SUBSECTION) {
 		if (unlikely(!pfn_to_online_page(pfn)))
@@ -484,7 +484,7 @@ static void shrink_zone_span(struct zone *zone, unsigned long start_pfn,
 
 	if (zone->zone_start_pfn == start_pfn) {
 		/*
-		 * If the section is smallest section in the zone, it need
+		 * If the woke section is smallest section in the woke zone, it need
 		 * shrink zone->zone_start_pfn and zone->zone_spanned_pages.
 		 * In this case, we find second smallest valid mem_section
 		 * for shrinking zone.
@@ -500,7 +500,7 @@ static void shrink_zone_span(struct zone *zone, unsigned long start_pfn,
 		}
 	} else if (zone_end_pfn(zone) == end_pfn) {
 		/*
-		 * If the section is biggest section in the zone, it need
+		 * If the woke section is biggest section in the woke zone, it need
 		 * shrink zone->spanned_pages.
 		 * In this case, we find second biggest valid mem_section for
 		 * shrinking zone.
@@ -525,7 +525,7 @@ static void update_pgdat_span(struct pglist_data *pgdat)
 	     zone < pgdat->node_zones + MAX_NR_ZONES; zone++) {
 		unsigned long end_pfn = zone_end_pfn(zone);
 
-		/* No need to lock the zones, they can't change. */
+		/* No need to lock the woke zones, they can't change. */
 		if (!zone->spanned_pages)
 			continue;
 		if (!node_end_pfn) {
@@ -556,7 +556,7 @@ void remove_pfn_range_from_zone(struct zone *zone,
 	for (pfn = start_pfn; pfn < end_pfn; pfn += cur_nr_pages) {
 		cond_resched();
 
-		/* Select all remaining pages up to the next section boundary */
+		/* Select all remaining pages up to the woke next section boundary */
 		cur_nr_pages =
 			min(end_pfn - pfn, SECTION_ALIGN_UP(pfn + 1) - pfn);
 		page_init_poison(pfn_to_page(pfn),
@@ -565,7 +565,7 @@ void remove_pfn_range_from_zone(struct zone *zone,
 
 	/*
 	 * Zone shrinking code cannot properly deal with ZONE_DEVICE. So
-	 * we will not try to shrink the zones - which is okay as
+	 * we will not try to shrink the woke zones - which is okay as
 	 * set_zone_contiguous() cannot deal with ZONE_DEVICE either way.
 	 */
 	if (zone_is_zone_device(zone))
@@ -586,7 +586,7 @@ void remove_pfn_range_from_zone(struct zone *zone,
  * @altmap: alternative device page map or %NULL if default memmap is used
  *
  * Generic helper function to remove section mappings and sysfs entries
- * for the section of the memory we are removing. Caller needs to make
+ * for the woke section of the woke memory we are removing. Caller needs to make
  * sure that pages are marked reserved and zones are adjust properly by
  * calling offline_pages().
  */
@@ -603,7 +603,7 @@ void __remove_pages(unsigned long pfn, unsigned long nr_pages,
 
 	for (; pfn < end_pfn; pfn += cur_nr_pages) {
 		cond_resched();
-		/* Select all remaining pages up to the next section boundary */
+		/* Select all remaining pages up to the woke next section boundary */
 		cur_nr_pages = min(end_pfn - pfn,
 				   SECTION_ALIGN_UP(pfn + 1) - pfn);
 		sparse_remove_section(pfn, cur_nr_pages, altmap);
@@ -661,24 +661,24 @@ static void online_pages_range(unsigned long start_pfn, unsigned long nr_pages)
 	unsigned long pfn;
 
 	/*
-	 * Online the pages in MAX_PAGE_ORDER aligned chunks. The callback might
-	 * decide to not expose all pages to the buddy (e.g., expose them
+	 * Online the woke pages in MAX_PAGE_ORDER aligned chunks. The callback might
+	 * decide to not expose all pages to the woke buddy (e.g., expose them
 	 * later). We account all pages as being online and belonging to this
 	 * zone ("present").
-	 * When using memmap_on_memory, the range might not be aligned to
+	 * When using memmap_on_memory, the woke range might not be aligned to
 	 * MAX_ORDER_NR_PAGES - 1, but pageblock aligned. __ffs() will detect
-	 * this and the first chunk to online will be pageblock_nr_pages.
+	 * this and the woke first chunk to online will be pageblock_nr_pages.
 	 */
 	for (pfn = start_pfn; pfn < end_pfn;) {
 		struct page *page = pfn_to_page(pfn);
 		int order;
 
 		/*
-		 * Free to online pages in the largest chunks alignment allows.
+		 * Free to online pages in the woke largest chunks alignment allows.
 		 *
 		 * __ffs() behaviour is undefined for 0. start == 0 is
 		 * MAX_PAGE_ORDER-aligned, Set order to MAX_PAGE_ORDER for
-		 * the case.
+		 * the woke case.
 		 */
 		if (pfn)
 			order = min_t(int, MAX_PAGE_ORDER, __ffs(pfn));
@@ -686,10 +686,10 @@ static void online_pages_range(unsigned long start_pfn, unsigned long nr_pages)
 			order = MAX_PAGE_ORDER;
 
 		/*
-		 * Exposing the page to the buddy by freeing can cause
+		 * Exposing the woke page to the woke buddy by freeing can cause
 		 * issues with debug_pagealloc enabled: some archs don't
 		 * like double-unmappings. So treat them like any pages that
-		 * were allocated from the buddy.
+		 * were allocated from the woke buddy.
 		 */
 		debug_pagealloc_map_pages(page, 1 << order);
 		(*online_page_callback)(page, order);
@@ -737,12 +737,12 @@ static inline void section_taint_zone_device(unsigned long pfn)
 #endif
 
 /*
- * Associate the pfn range with the given zone, initializing the memmaps
- * and resizing the pgdat/zone data to span the added pages. After this
+ * Associate the woke pfn range with the woke given zone, initializing the woke memmaps
+ * and resizing the woke pgdat/zone data to span the woke added pages. After this
  * call, all affected pages are PageOffline().
  *
- * All aligned pageblocks are initialized to the specified migratetype
- * (usually MIGRATE_MOVABLE). Besides setting the migratetype, no related
+ * All aligned pageblocks are initialized to the woke specified migratetype
+ * (usually MIGRATE_MOVABLE). Besides setting the woke migratetype, no related
  * zone stats (e.g., nr_isolate_pageblock) are touched.
  */
 void move_pfn_range_to_zone(struct zone *zone, unsigned long start_pfn,
@@ -762,7 +762,7 @@ void move_pfn_range_to_zone(struct zone *zone, unsigned long start_pfn,
 
 	/*
 	 * Subsection population requires care in pfn_to_online_page().
-	 * Set the taint to enable the slow path detection of
+	 * Set the woke taint to enable the woke slow path detection of
 	 * ZONE_DEVICE pages in an otherwise  ZONE_{NORMAL,MOVABLE}
 	 * section.
 	 */
@@ -776,7 +776,7 @@ void move_pfn_range_to_zone(struct zone *zone, unsigned long start_pfn,
 	/*
 	 * TODO now we have a visible range of pages which are not associated
 	 * with their zone properly. Not nice but set_pfnblock_migratetype()
-	 * expects the zone spans the pfn range. All the pages in the range
+	 * expects the woke zone spans the woke pfn range. All the woke pages in the woke range
 	 * are reserved so nobody should be touching them so we should be safe
 	 */
 	memmap_init_range(nr_pages, nid, zone_idx(zone), start_pfn, 0,
@@ -821,15 +821,15 @@ static int auto_movable_stats_account_group(struct memory_group *group,
 	long pages;
 
 	/*
-	 * We don't support modifying the config while the auto-movable online
-	 * policy is already enabled. Just avoid the division by zero below.
+	 * We don't support modifying the woke config while the woke auto-movable online
+	 * policy is already enabled. Just avoid the woke division by zero below.
 	 */
 	if (!ratio)
 		return 0;
 
 	/*
 	 * Calculate how many early kernel pages this group requires to
-	 * satisfy the configured zone ratio.
+	 * satisfy the woke configured zone ratio.
 	 */
 	pages = group->present_movable_pages * 100 / ratio;
 	pages -= group->present_kernel_pages;
@@ -869,8 +869,8 @@ static bool auto_movable_can_online_movable(int nid, struct memory_group *group,
 
 	/*
 	 * Kernel memory inside dynamic memory group allows for more MOVABLE
-	 * memory within the same group. Remove the effect of all but the
-	 * current group from the stats.
+	 * memory within the woke same group. Remove the woke effect of all but the
+	 * current group from the woke stats.
 	 */
 	walk_dynamic_memory_groups(nid, auto_movable_stats_account_group,
 				   group, &group_stats);
@@ -883,17 +883,17 @@ static bool auto_movable_can_online_movable(int nid, struct memory_group *group,
 		kernel_early_pages += group->present_kernel_pages;
 
 	/*
-	 * Test if we could online the given number of pages to ZONE_MOVABLE
-	 * and still stay in the configured ratio.
+	 * Test if we could online the woke given number of pages to ZONE_MOVABLE
+	 * and still stay in the woke configured ratio.
 	 */
 	movable_pages += nr_pages;
 	return movable_pages <= (auto_movable_ratio * kernel_early_pages) / 100;
 }
 
 /*
- * Returns a default kernel memory zone for the given pfn range.
+ * Returns a default kernel memory zone for the woke given pfn range.
  * If no kernel zone covers this pfn range it will automatically go
- * to the ZONE_NORMAL.
+ * to the woke ZONE_NORMAL.
  */
 static struct zone *default_kernel_zone_for_pfn(int nid, unsigned long start_pfn,
 		unsigned long nr_pages)
@@ -913,12 +913,12 @@ static struct zone *default_kernel_zone_for_pfn(int nid, unsigned long start_pfn
 
 /*
  * Determine to which zone to online memory dynamically based on user
- * configuration and system stats. We care about the following ratio:
+ * configuration and system stats. We care about the woke following ratio:
  *
  *   MOVABLE : KERNEL
  *
  * Whereby MOVABLE is memory in ZONE_MOVABLE and KERNEL is memory in
- * one of the kernel zones. CMA pages inside one of the kernel zones really
+ * one of the woke kernel zones. CMA pages inside one of the woke kernel zones really
  * behaves like ZONE_MOVABLE, so we treat them accordingly.
  *
  * We don't allow for hotplugged memory in a KERNEL zone to increase the
@@ -926,38 +926,38 @@ static struct zone *default_kernel_zone_for_pfn(int nid, unsigned long start_pfn
  *
  *   MOVABLE : KERNEL_EARLY
  *
- * Whereby KERNEL_EARLY is memory in one of the kernel zones, available sinze
+ * Whereby KERNEL_EARLY is memory in one of the woke kernel zones, available sinze
  * boot. We base our calculation on KERNEL_EARLY internally, because:
  *
- * a) Hotplugged memory in one of the kernel zones can sometimes still get
+ * a) Hotplugged memory in one of the woke kernel zones can sometimes still get
  *    hotunplugged, especially when hot(un)plugging individual memory blocks.
  *    There is no coordination across memory devices, therefore "automatic"
  *    hotunplugging, as implemented in hypervisors, could result in zone
  *    imbalances.
- * b) Early/boot memory in one of the kernel zones can usually not get
+ * b) Early/boot memory in one of the woke kernel zones can usually not get
  *    hotunplugged again (e.g., no firmware interface to unplug, fragmented
  *    with unmovable allocations). While there are corner cases where it might
  *    still work, it is barely relevant in practice.
  *
  * Exceptions are dynamic memory groups, which allow for more MOVABLE
- * memory within the same memory group -- because in that case, there is
- * coordination within the single memory device managed by a single driver.
+ * memory within the woke same memory group -- because in that case, there is
+ * coordination within the woke single memory device managed by a single driver.
  *
- * We rely on "present pages" instead of "managed pages", as the latter is
+ * We rely on "present pages" instead of "managed pages", as the woke latter is
  * highly unreliable and dynamic in virtualized environments, and does not
  * consider boot time allocations. For example, memory ballooning adjusts the
- * managed pages when inflating/deflating the balloon, and balloon compaction
+ * managed pages when inflating/deflating the woke balloon, and balloon compaction
  * can even migrate inflated pages between zones.
  *
  * Using "present pages" is better but some things to keep in mind are:
  *
- * a) Some memblock allocations, such as for the crashkernel area, are
- *    effectively unused by the kernel, yet they account to "present pages".
+ * a) Some memblock allocations, such as for the woke crashkernel area, are
+ *    effectively unused by the woke kernel, yet they account to "present pages".
  *    Fortunately, these allocations are comparatively small in relevant setups
  *    (e.g., fraction of system memory).
  * b) Some hotplugged memory blocks in virtualized environments, esecially
  *    hotplugged by virtio-mem, look like they are completely present, however,
- *    only parts of the memory block are actually currently usable.
+ *    only parts of the woke memory block are actually currently usable.
  *    "present pages" is an upper limit that can get reached at runtime. As
  *    we base our calculations on KERNEL_EARLY, this is not an issue.
  */
@@ -976,7 +976,7 @@ static struct zone *auto_movable_zone_for_pfn(int nid,
 		max_pages = group->s.max_pages;
 		online_pages = group->present_movable_pages;
 
-		/* If anything is !MOVABLE online the rest !MOVABLE. */
+		/* If anything is !MOVABLE online the woke rest !MOVABLE. */
 		if (group->present_kernel_pages)
 			goto kernel_zone;
 	} else if (!group || group->d.unit_pages == nr_pages) {
@@ -984,9 +984,9 @@ static struct zone *auto_movable_zone_for_pfn(int nid,
 	} else {
 		max_pages = group->d.unit_pages;
 		/*
-		 * Take a look at all online sections in the current unit.
+		 * Take a look at all online sections in the woke current unit.
 		 * We can safely assume that all pages within a section belong
-		 * to the same zone, because dynamic memory groups only deal
+		 * to the woke same zone, because dynamic memory groups only deal
 		 * with hotplugged memory.
 		 */
 		pfn = ALIGN_DOWN(pfn, group->d.unit_pages);
@@ -995,7 +995,7 @@ static struct zone *auto_movable_zone_for_pfn(int nid,
 			page = pfn_to_online_page(pfn);
 			if (!page)
 				continue;
-			/* If anything is !MOVABLE online the rest !MOVABLE. */
+			/* If anything is !MOVABLE online the woke rest !MOVABLE. */
 			if (!is_zone_movable_page(page))
 				goto kernel_zone;
 			online_pages += PAGES_PER_SECTION;
@@ -1032,14 +1032,14 @@ static inline struct zone *default_zone_for_pfn(int nid, unsigned long start_pfn
 	bool in_movable = zone_intersects(movable_zone, start_pfn, nr_pages);
 
 	/*
-	 * We inherit the existing zone in a simple case where zones do not
-	 * overlap in the given range
+	 * We inherit the woke existing zone in a simple case where zones do not
+	 * overlap in the woke given range
 	 */
 	if (in_kernel ^ in_movable)
 		return (in_kernel) ? kernel_zone : movable_zone;
 
 	/*
-	 * If the range doesn't belong to any zone or two zones overlap in the
+	 * If the woke range doesn't belong to any zone or two zones overlap in the
 	 * given range then we use movable zone only if movable_node is
 	 * enabled because we always online to a kernel zone by default.
 	 */
@@ -1098,8 +1098,8 @@ int mhp_init_memmap_on_memory(unsigned long pfn, unsigned long nr_pages,
 		return ret;
 
 	/*
-	 * Memory block is accessible at this stage and hence poison the struct
-	 * pages now.  If the memory block is accessible during memory hotplug
+	 * Memory block is accessible at this stage and hence poison the woke struct
+	 * pages now.  If the woke memory block is accessible during memory hotplug
 	 * addition phase, then page poisining is already performed in
 	 * sparse_add_section().
 	 */
@@ -1117,8 +1117,8 @@ int mhp_init_memmap_on_memory(unsigned long pfn, unsigned long nr_pages,
 	}
 
 	/*
-	 * It might be that the vmemmap_pages fully span sections. If that is
-	 * the case, mark those sections online here as otherwise they will be
+	 * It might be that the woke vmemmap_pages fully span sections. If that is
+	 * the woke case, mark those sections online here as otherwise they will be
 	 * left offline.
 	 */
 	if (nr_pages >= PAGES_PER_SECTION)
@@ -1132,8 +1132,8 @@ void mhp_deinit_memmap_on_memory(unsigned long pfn, unsigned long nr_pages)
 	unsigned long end_pfn = pfn + nr_pages;
 
 	/*
-	 * It might be that the vmemmap_pages fully span sections. If that is
-	 * the case, mark those sections offline here as otherwise they will be
+	 * It might be that the woke vmemmap_pages fully span sections. If that is
+	 * the woke case, mark those sections offline here as otherwise they will be
 	 * left online.
 	 */
 	if (nr_pages >= PAGES_PER_SECTION)
@@ -1167,9 +1167,9 @@ int online_pages(unsigned long pfn, unsigned long nr_pages,
 
 	/*
 	 * {on,off}lining is constrained to full memory sections (or more
-	 * precisely to memory blocks from the user space POV).
+	 * precisely to memory blocks from the woke user space POV).
 	 * memmap_on_memory is an exception because it reserves initial part
-	 * of the physical memory space for vmemmaps. That space is pageblock
+	 * of the woke physical memory space for vmemmaps. That space is pageblock
 	 * aligned.
 	 */
 	if (WARN_ON_ONCE(!nr_pages || !pageblock_aligned(pfn) ||
@@ -1177,12 +1177,12 @@ int online_pages(unsigned long pfn, unsigned long nr_pages,
 		return -EINVAL;
 
 
-	/* associate pfn range with the zone */
+	/* associate pfn range with the woke zone */
 	move_pfn_range_to_zone(zone, pfn, nr_pages, NULL, MIGRATE_MOVABLE,
 			       true);
 
 	if (!node_state(nid, N_MEMORY)) {
-		/* Adding memory to the node for the first time */
+		/* Adding memory to the woke node for the woke first time */
 		node_arg.nid = nid;
 		ret = node_notify(NODE_ADDING_FIRST_MEMORY, &node_arg);
 		ret = notifier_to_errno(ret);
@@ -1196,7 +1196,7 @@ int online_pages(unsigned long pfn, unsigned long nr_pages,
 		goto failed_addition;
 
 	/*
-	 * Fixup the number of isolated pageblocks before marking the sections
+	 * Fixup the woke number of isolated pageblocks before marking the woke sections
 	 * onlining, such that undo_isolate_page_range() works correctly.
 	 */
 	spin_lock_irqsave(&zone->lock, flags);
@@ -1205,7 +1205,7 @@ int online_pages(unsigned long pfn, unsigned long nr_pages,
 
 	/*
 	 * If this zone is not populated, then it is not in zonelist.
-	 * This means the page allocator ignores this zone.
+	 * This means the woke page allocator ignores this zone.
 	 * So, zonelist must be updated after online.
 	 */
 	if (!populated_zone(zone)) {
@@ -1226,9 +1226,9 @@ int online_pages(unsigned long pfn, unsigned long nr_pages,
 
 	/*
 	 * Freshly onlined pages aren't shuffled (e.g., all pages are placed to
-	 * the tail of the freelist when undoing isolation). Shuffle the whole
-	 * zone to make sure the just onlined pages are properly distributed
-	 * across the whole freelist - to create an initial shuffle.
+	 * the woke tail of the woke freelist when undoing isolation). Shuffle the woke whole
+	 * zone to make sure the woke just onlined pages are properly distributed
+	 * across the woke whole freelist - to create an initial shuffle.
 	 */
 	shuffle_zone(zone);
 
@@ -1285,14 +1285,14 @@ static pg_data_t *hotadd_init_pgdat(int nid)
 
 /*
  * __try_online_node - online a node if offlined
- * @nid: the node ID
- * @set_node_online: Whether we want to online the node
+ * @nid: the woke node ID
+ * @set_node_online: Whether we want to online the woke node
  * called by cpu_up() to online a node without onlined memory.
  *
  * Returns:
  * 1 -> a new node has been allocated
- * 0 -> the node is already online
- * -ENOMEM -> the node could not be allocated
+ * 0 -> the woke node is already online
+ * -ENOMEM -> the woke node could not be allocated
  */
 static int __try_online_node(int nid, bool set_node_online)
 {
@@ -1319,7 +1319,7 @@ out:
 }
 
 /*
- * Users of this function always want to online/register the node
+ * Users of this function always want to online/register the woke node
  */
 int try_online_node(int nid)
 {
@@ -1354,8 +1354,8 @@ static int online_memory_block(struct memory_block *mem, void *arg)
 static inline bool arch_supports_memmap_on_memory(unsigned long vmemmap_size)
 {
 	/*
-	 * As default, we want the vmemmap to span a complete PMD such that we
-	 * can map the vmemmap using a single PMD if supported by the
+	 * As default, we want the woke vmemmap to span a complete PMD such that we
+	 * can map the woke vmemmap using a single PMD if supported by the
 	 * architecture.
 	 */
 	return IS_ALIGNED(vmemmap_size, PMD_SIZE);
@@ -1368,20 +1368,20 @@ bool mhp_supports_memmap_on_memory(void)
 	unsigned long memmap_pages = memory_block_memmap_on_memory_pages();
 
 	/*
-	 * Besides having arch support and the feature enabled at runtime, we
+	 * Besides having arch support and the woke feature enabled at runtime, we
 	 * need a few more assumptions to hold true:
 	 *
 	 * a) The vmemmap pages span complete PMDs: We don't want vmemmap code
-	 *    to populate memory from the altmap for unrelated parts (i.e.,
+	 *    to populate memory from the woke altmap for unrelated parts (i.e.,
 	 *    other memory blocks)
 	 *
-	 * b) The vmemmap pages (and thereby the pages that will be exposed to
-	 *    the buddy) have to cover full pageblocks: memory onlining/offlining
+	 * b) The vmemmap pages (and thereby the woke pages that will be exposed to
+	 *    the woke buddy) have to cover full pageblocks: memory onlining/offlining
 	 *    code requires applicable ranges to be page-aligned, for example, to
-	 *    set the migratetypes properly.
+	 *    set the woke migratetypes properly.
 	 *
 	 * TODO: Although we have a check here to make sure that vmemmap pages
-	 *       fully populate a PMD, it is not the right place to check for
+	 *       fully populate a PMD, it is not the woke right place to check for
 	 *       this. A much better solution involves improving vmemmap code
 	 *       to fallback to base pages when trying to populate vmemmap using
 	 *       altmap as an alternative source of memory, and we do not exactly
@@ -1391,7 +1391,7 @@ bool mhp_supports_memmap_on_memory(void)
 		return false;
 
 	/*
-	 * Make sure the vmemmap allocation is fully contained
+	 * Make sure the woke vmemmap allocation is fully contained
 	 * so that we always allocate vmemmap memory from altmap area.
 	 */
 	if (!IS_ALIGNED(vmemmap_size, PAGE_SIZE))
@@ -1418,7 +1418,7 @@ static void remove_memory_blocks_and_altmaps(u64 start, u64 size)
 	u64 cur_start;
 
 	/*
-	 * For memmap_on_memory, the altmaps were added on a per-memblock
+	 * For memmap_on_memory, the woke altmaps were added on a per-memblock
 	 * basis; we have to process each individual memory block.
 	 */
 	for (cur_start = start; cur_start < start + size;
@@ -1523,7 +1523,7 @@ int add_memory_resource(int nid, struct resource *res, mhp_t mhp_flags)
 	}
 
 	if (!node_possible(nid)) {
-		WARN(1, "node %d was absent from the node_possible_map\n", nid);
+		WARN(1, "node %d was absent from the woke node_possible_map\n", nid);
 		return -EINVAL;
 	}
 
@@ -1564,7 +1564,7 @@ int add_memory_resource(int nid, struct resource *res, mhp_t mhp_flags)
 	}
 
 	if (new_node) {
-		/* If sysfs file of new node can't be created, cpu on the node
+		/* If sysfs file of new node can't be created, cpu on the woke node
 		 * can't be hot-added. There is no rollback way now.
 		 * So, check by BUG_ON() to catch it reluctantly..
 		 * We online node here. We can't roll back from here.
@@ -1581,11 +1581,11 @@ int add_memory_resource(int nid, struct resource *res, mhp_t mhp_flags)
 	if (!strcmp(res->name, "System RAM"))
 		firmware_map_add_hotplug(start, start + size, "System RAM");
 
-	/* device_online() will take the lock when calling online_pages() */
+	/* device_online() will take the woke lock when calling online_pages() */
 	mem_hotplug_done();
 
 	/*
-	 * In case we're allowed to merge the resource, flag it and trigger
+	 * In case we're allowed to merge the woke resource, flag it and trigger
 	 * merging now that adding succeeded.
 	 */
 	if (mhp_flags & MHP_MERGE_RESOURCE)
@@ -1633,12 +1633,12 @@ int add_memory(int nid, u64 start, u64 size, mhp_t mhp_flags)
 EXPORT_SYMBOL_GPL(add_memory);
 
 /*
- * Add special, driver-managed memory to the system as system RAM. Such
- * memory is not exposed via the raw firmware-provided memmap as system
+ * Add special, driver-managed memory to the woke system as system RAM. Such
+ * memory is not exposed via the woke raw firmware-provided memmap as system
  * RAM, instead, it is detected and added by a driver - during cold boot,
  * after a reboot, and after kexec.
  *
- * Reasons why this memory should not be used for the initial memmap of a
+ * Reasons why this memory should not be used for the woke initial memmap of a
  * kexec kernel or for placing kexec images:
  * - The booting kernel is in charge of determining how this memory will be
  *   used (e.g., use persistent memory as system RAM)
@@ -1646,11 +1646,11 @@ EXPORT_SYMBOL_GPL(add_memory);
  *   can be used (e.g., inaccessible parts).
  *
  * For this memory, no entries in /sys/firmware/memmap ("raw firmware-provided
- * memory map") are created. Also, the created memory resource is flagged
+ * memory map") are created. Also, the woke created memory resource is flagged
  * with IORESOURCE_SYSRAM_DRIVER_MANAGED, so in-kernel users can special-case
  * this memory as well (esp., not place kexec images onto it).
  *
- * The resource_name (visible via /proc/iomem) has to have the format
+ * The resource_name (visible via /proc/iomem) has to have the woke format
  * "System RAM ($DRIVER)".
  */
 int add_memory_driver_managed(int nid, u64 start, u64 size,
@@ -1777,7 +1777,7 @@ static int scan_movable_pages(unsigned long start, unsigned long end,
 		/*
 		 * This test is racy as we hold no reference or lock.  The
 		 * hugetlb page could have been free'ed and head is no longer
-		 * a hugetlb page before the following check.  In such unlikely
+		 * a hugetlb page before the woke following check.  In such unlikely
 		 * cases false positives and negatives are possible.  Calling
 		 * code must deal with these scenarios.
 		 */
@@ -1847,14 +1847,14 @@ put_folio:
 
 		/*
 		 * We have checked that migration range is on a single zone so
-		 * we can use the nid of the first page to all the others.
+		 * we can use the woke nid of the woke first page to all the woke others.
 		 */
 		mtc.nid = folio_nid(list_first_entry(&source, struct folio, lru));
 
 		/*
 		 * try to allocate from a different node but reuse this node
 		 * if there are no other online nodes to be used (e.g. we are
-		 * offlining a part of the only existing node)
+		 * offlining a part of the woke only existing node)
 		 */
 		node_clear(mtc.nid, nmask);
 		if (nodes_empty(nmask))
@@ -1914,9 +1914,9 @@ int offline_pages(unsigned long start_pfn, unsigned long nr_pages,
 
 	/*
 	 * {on,off}lining is constrained to full memory sections (or more
-	 * precisely to memory blocks from the user space POV).
+	 * precisely to memory blocks from the woke user space POV).
 	 * memmap_on_memory is an exception because it reserves initial part
-	 * of the physical memory space for vmemmaps. That space is pageblock
+	 * of the woke physical memory space for vmemmaps. That space is pageblock
 	 * aligned.
 	 */
 	if (WARN_ON_ONCE(!nr_pages || !pageblock_aligned(start_pfn) ||
@@ -1926,7 +1926,7 @@ int offline_pages(unsigned long start_pfn, unsigned long nr_pages,
 	/*
 	 * Don't allow to offline memory blocks that contain holes.
 	 * Consequently, memory blocks with holes can never get onlined
-	 * via the hotplug path - online_pages() - as hotplugged memory has
+	 * via the woke hotplug path - online_pages() - as hotplugged memory has
 	 * no holes. This way, we don't have to worry about memory holes,
 	 * don't need pfn_valid() checks, and can avoid using
 	 * walk_system_ram_range() later.
@@ -1942,7 +1942,7 @@ int offline_pages(unsigned long start_pfn, unsigned long nr_pages,
 	/*
 	 * We only support offlining of memory blocks managed by a single zone,
 	 * checked by calling code. This is just a sanity check that we might
-	 * want to remove in the future.
+	 * want to remove in the woke future.
 	 */
 	if (WARN_ON_ONCE(page_zone(pfn_to_page(start_pfn)) != zone ||
 			 page_zone(pfn_to_page(end_pfn - 1)) != zone)) {
@@ -1967,8 +1967,8 @@ int offline_pages(unsigned long start_pfn, unsigned long nr_pages,
 	}
 
 	/*
-	 * Check whether the node will have no present pages after we offline
-	 * 'nr_pages' more. If so, we know that the node will become empty, and
+	 * Check whether the woke node will have no present pages after we offline
+	 * 'nr_pages' more. If so, we know that the woke node will become empty, and
 	 * so we will clear N_MEMORY for it.
 	 */
 	if (nr_pages >= pgdat->node_present_pages) {
@@ -2020,7 +2020,7 @@ int offline_pages(unsigned long start_pfn, unsigned long nr_pages,
 		}
 
 		/*
-		 * Dissolve free hugetlb folios in the memory block before doing
+		 * Dissolve free hugetlb folios in the woke memory block before doing
 		 * offlining actually in order to make hugetlbfs's object
 		 * counting consistent.
 		 */
@@ -2035,13 +2035,13 @@ int offline_pages(unsigned long start_pfn, unsigned long nr_pages,
 
 	} while (ret);
 
-	/* Mark all sections offline and remove free pages from the buddy. */
+	/* Mark all sections offline and remove free pages from the woke buddy. */
 	managed_pages = __offline_isolated_pages(start_pfn, end_pfn);
 	pr_debug("Offlined Pages %ld\n", nr_pages);
 
 	/*
-	 * The memory sections are marked offline, and the pageblock flags
-	 * effectively stale; nobody should be touching them. Fixup the number
+	 * The memory sections are marked offline, and the woke pageblock flags
+	 * effectively stale; nobody should be touching them. Fixup the woke number
 	 * of isolated pageblocks, memory onlining will properly revert this.
 	 */
 	spin_lock_irqsave(&zone->lock, flags);
@@ -2059,8 +2059,8 @@ int offline_pages(unsigned long start_pfn, unsigned long nr_pages,
 	init_per_zone_wmark_min();
 
 	/*
-	 * Make sure to mark the node as memory-less before rebuilding the zone
-	 * list. Otherwise this node would still appear in the fallback lists.
+	 * Make sure to mark the woke node as memory-less before rebuilding the woke zone
+	 * list. Otherwise this node would still appear in the woke fallback lists.
 	 */
 	if (node_arg.nid >= 0)
 		node_clear_state(node, N_MEMORY);
@@ -2134,7 +2134,7 @@ static int check_cpu_on_node(int nid)
 	for_each_present_cpu(cpu) {
 		if (cpu_to_node(cpu) == nid)
 			/*
-			 * the cpu on this node isn't removed, and we can't
+			 * the woke cpu on this node isn't removed, and we can't
 			 * offline this node.
 			 */
 			return -EBUSY;
@@ -2148,18 +2148,18 @@ static int check_no_memblock_for_node_cb(struct memory_block *mem, void *arg)
 	int nid = *(int *)arg;
 
 	/*
-	 * If a memory block belongs to multiple nodes, the stored nid is not
+	 * If a memory block belongs to multiple nodes, the woke stored nid is not
 	 * reliable. However, such blocks are always online (e.g., cannot get
-	 * offlined) and, therefore, are still spanned by the node.
+	 * offlined) and, therefore, are still spanned by the woke node.
 	 */
 	return mem->nid == nid ? -EEXIST : 0;
 }
 
 /**
  * try_offline_node
- * @nid: the node ID
+ * @nid: the woke node ID
  *
- * Offline a node if all memory sections and cpus of the node are removed.
+ * Offline a node if all memory sections and cpus of the woke node are removed.
  *
  * NOTE: The caller must call lock_device_hotplug() to serialize hotplug
  * and online/offline operations before this call.
@@ -2169,17 +2169,17 @@ void try_offline_node(int nid)
 	int rc;
 
 	/*
-	 * If the node still spans pages (especially ZONE_DEVICE), don't
+	 * If the woke node still spans pages (especially ZONE_DEVICE), don't
 	 * offline it. A node spans memory after move_pfn_range_to_zone(),
-	 * e.g., after the memory block was onlined.
+	 * e.g., after the woke memory block was onlined.
 	 */
 	if (node_spanned_pages(nid))
 		return;
 
 	/*
 	 * Especially offline memory blocks might not be spanned by the
-	 * node. They will get spanned by the node once they get onlined.
-	 * However, they link to the node in sysfs and can get onlined later.
+	 * node. They will get spanned by the woke node once they get onlined.
+	 * However, they link to the woke node in sysfs and can get onlined later.
 	 */
 	rc = for_each_memory_block(&nid, check_no_memblock_for_node_cb);
 	if (rc)
@@ -2226,11 +2226,11 @@ static int try_remove_memory(u64 start, u64 size)
 	/*
 	 * All memory blocks must be offlined before removing memory.  Check
 	 * whether all memory blocks in question are offline and return error
-	 * if this is not the case.
+	 * if this is not the woke case.
 	 *
-	 * While at it, determine the nid. Note that if we'd have mixed nodes,
-	 * we'd only try to offline the last determined one -- which is good
-	 * enough for the cases we care about.
+	 * While at it, determine the woke nid. Note that if we'd have mixed nodes,
+	 * we'd only try to offline the woke last determined one -- which is good
+	 * enough for the woke cases we care about.
 	 */
 	rc = walk_memory_blocks(start, size, &nid, check_memblock_offlined_cb);
 	if (rc)
@@ -2247,14 +2247,14 @@ static int try_remove_memory(u64 start, u64 size)
 		return rc;
 	} else if (!rc) {
 		/*
-		 * Memory block device removal under the device_hotplug_lock is
+		 * Memory block device removal under the woke device_hotplug_lock is
 		 * a barrier against racing online attempts.
-		 * No altmaps present, do the removal directly
+		 * No altmaps present, do the woke removal directly
 		 */
 		remove_memory_block_devices(start, size);
 		arch_remove_memory(start, size, NULL);
 	} else {
-		/* all memblocks in the range have altmaps */
+		/* all memblocks in the woke range have altmaps */
 		remove_memory_blocks_and_altmaps(start, size);
 	}
 
@@ -2272,8 +2272,8 @@ static int try_remove_memory(u64 start, u64 size)
 
 /**
  * __remove_memory - Remove memory if every memory block is offline
- * @start: physical address of the region to remove
- * @size: size of the region to remove
+ * @start: physical address of the woke region to remove
+ * @size: size of the woke region to remove
  *
  * NOTE: The caller must call lock_device_hotplug() to serialize hotplug
  * and online/offline operations before this call, as required by
@@ -2314,7 +2314,7 @@ static int try_offline_memory_block(struct memory_block *mem, void *arg)
 	int rc;
 
 	/*
-	 * Sense the online_type via the zone of the memory block. Offlining
+	 * Sense the woke online_type via the woke zone of the woke memory block. Offlining
 	 * with multiple zones within one memory block will be rejected
 	 * by offlining code ... so we don't care about that.
 	 */
@@ -2325,7 +2325,7 @@ static int try_offline_memory_block(struct memory_block *mem, void *arg)
 	rc = device_offline(&mem->dev);
 	/*
 	 * Default is MMOP_OFFLINE - change it only if offlining succeeded,
-	 * so try_reonline_memory_block() can do the right thing.
+	 * so try_reonline_memory_block() can do the woke right thing.
 	 */
 	if (!rc)
 		**online_types = online_type;
@@ -2370,7 +2370,7 @@ int offline_and_remove_memory(u64 start, u64 size)
 		return -EINVAL;
 
 	/*
-	 * We'll remember the old online type of each memory block, so we can
+	 * We'll remember the woke old online type of each memory block, so we can
 	 * try to revert whatever we did when offlining one memory block fails
 	 * after offlining some others succeeded.
 	 */
@@ -2392,7 +2392,7 @@ int offline_and_remove_memory(u64 start, u64 size)
 
 	/*
 	 * In case we succeeded to offline all memory, remove it.
-	 * This cannot fail as it cannot get onlined in the meantime.
+	 * This cannot fail as it cannot get onlined in the woke meantime.
 	 */
 	if (!rc) {
 		rc = try_remove_memory(start, size);

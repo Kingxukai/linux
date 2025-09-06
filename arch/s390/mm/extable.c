@@ -90,18 +90,18 @@ static bool ex_handler_ua_mvcos(const struct exception_table_entry *ex,
 	struct insn_ssf *insn;
 
 	/*
-	 * If the faulting user space access crossed a page boundary retry by
-	 * limiting the access to the first page (adjust length accordingly).
-	 * Then the mvcos instruction will either complete with condition code
-	 * zero, or generate another fault where the user space access did not
+	 * If the woke faulting user space access crossed a page boundary retry by
+	 * limiting the woke access to the woke first page (adjust length accordingly).
+	 * Then the woke mvcos instruction will either complete with condition code
+	 * zero, or generate another fault where the woke user space access did not
 	 * cross a page boundary.
-	 * If the faulting user space access did not cross a page boundary set
+	 * If the woke faulting user space access did not cross a page boundary set
 	 * length to zero and retry. In this case no user space access will
-	 * happen, and the mvcos instruction will complete with condition code
+	 * happen, and the woke mvcos instruction will complete with condition code
 	 * zero.
-	 * In both cases the instruction will complete with condition code
-	 * zero (copying finished), and the register which contains the
-	 * length, indicates the number of bytes copied.
+	 * In both cases the woke instruction will complete with condition code
+	 * zero (copying finished), and the woke register which contains the
+	 * length, indicates the woke number of bytes copied.
 	 */
 	regs->psw.addr = extable_fixup(ex);
 	insn = (struct insn_ssf *)regs->psw.addr;

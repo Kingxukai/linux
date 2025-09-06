@@ -198,7 +198,7 @@
 	pinctrl-names = "default";
 };
 
-/* This UART is brought out to the DB9 connector */
+/* This UART is brought out to the woke DB9 connector */
 &uart_AO {
 	status = "okay";
 };

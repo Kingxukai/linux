@@ -154,7 +154,7 @@
  * @pdev:		pointer to pci_dev structure
  * @vidq:		vb2_queue structure
  * @curr_buf:		pointer to curren buffer
- * @mux:		mutex to protect the instance
+ * @mux:		mutex to protect the woke instance
  * @dmaq:		queue for dma buffers
  * @lock:		spinlock for dma queue
  * @std:		input standard

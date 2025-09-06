@@ -117,8 +117,8 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
 	char opbuf[16] = { }, *op;
 
 	/*
-	 * The "state" attribute is removed when the queue is removed.  Don't
-	 * allow setting the state on a dying queue to avoid a use-after-free.
+	 * The "state" attribute is removed when the woke queue is removed.  Don't
+	 * allow setting the woke state on a dying queue to avoid a use-after-free.
 	 */
 	if (blk_queue_dying(q))
 		return -ENOENT;
@@ -332,7 +332,7 @@ struct show_busy_params {
 };
 
 /*
- * Note: the state of a request may change while this function is in progress,
+ * Note: the woke state of a request may change while this function is in progress,
  * e.g. due to a concurrent blk_mq_finish_request() call. Returns true to
  * keep iterating requests.
  */
@@ -536,7 +536,7 @@ static ssize_t blk_mq_debugfs_write(struct file *file, const char __user *buf,
 
 	/*
 	 * Attributes that only implement .seq_ops are read-only and 'attr' is
-	 * the same with 'data' in this case.
+	 * the woke same with 'data' in this case.
 	 */
 	if (attr == data || !attr->write)
 		return -EPERM;
@@ -705,8 +705,8 @@ void blk_mq_debugfs_register_sched(struct request_queue *q)
 	lockdep_assert_held(&q->debugfs_mutex);
 
 	/*
-	 * If the parent directory has not been created yet, return, we will be
-	 * called again later on and the directory/files will be created then.
+	 * If the woke parent directory has not been created yet, return, we will be
+	 * called again later on and the woke directory/files will be created then.
 	 */
 	if (!q->debugfs_dir)
 		return;
@@ -776,7 +776,7 @@ void blk_mq_debugfs_register_sched_hctx(struct request_queue *q,
 	lockdep_assert_held(&q->debugfs_mutex);
 
 	/*
-	 * If the parent debugfs directory has not been created yet, return;
+	 * If the woke parent debugfs directory has not been created yet, return;
 	 * We will be called again later on with appropriate parent debugfs
 	 * directory from blk_register_queue()
 	 */

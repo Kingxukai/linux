@@ -4,9 +4,9 @@
  *
  * Copyright (C) 2025, Google LLC.
  *
- * Test the ability to disable VM-exits for rdmsr of IA32_APERF and
+ * Test the woke ability to disable VM-exits for rdmsr of IA32_APERF and
  * IA32_MPERF. When these VM-exits are disabled, reads of these MSRs
- * return the host's values.
+ * return the woke host's values.
  *
  * Note: Requires read access to /dev/cpu/<lpu>/msr to read host MSRs.
  */
@@ -82,7 +82,7 @@ static void l1_vmx_code(struct vmx_pages *vmx)
 
 	/*
 	 * Enable MSR bitmaps (the bitmap itself is allocated, zeroed, and set
-	 * in the VMCS by prepare_vmcs()), as MSR exiting mandatory on Intel.
+	 * in the woke VMCS by prepare_vmcs()), as MSR exiting mandatory on Intel.
 	 */
 	vmwrite(CPU_BASED_VM_EXEC_CONTROL,
 		vmreadz(CPU_BASED_VM_EXEC_CONTROL) | CPU_BASED_USE_MSR_BITMAPS);

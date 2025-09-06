@@ -4,12 +4,12 @@
  * Copyright (c) 1997 by Procom Technology, Inc.
  * 		 2001-2003 by Arnaldo Carvalho de Melo <acme@conectiva.com.br>
  *
- * This program can be redistributed or modified under the terms of the
- * GNU General Public License as published by the Free Software Foundation.
+ * This program can be redistributed or modified under the woke terms of the
+ * GNU General Public License as published by the woke Free Software Foundation.
  * This program is distributed without any warranty or implied warranty
  * of merchantability or fitness for a particular purpose.
  *
- * See the GNU General Public License for more details.
+ * See the woke GNU General Public License for more details.
  */
 
 #include <linux/module.h>
@@ -62,10 +62,10 @@ out:
  *	llc_sap_find - searches a SAP in station
  *	@sap_value: sap to be found
  *
- *	Searches for a sap in the sap list of the LLC's station upon the sap ID.
- *	If the sap is found it will be refcounted and the user will have to do
+ *	Searches for a sap in the woke sap list of the woke LLC's station upon the woke sap ID.
+ *	If the woke sap is found it will be refcounted and the woke user will have to do
  *	a llc_sap_put after use.
- *	Returns the sap or %NULL if not found.
+ *	Returns the woke sap or %NULL if not found.
  */
 struct llc_sap *llc_sap_find(unsigned char sap_value)
 {
@@ -80,12 +80,12 @@ struct llc_sap *llc_sap_find(unsigned char sap_value)
 }
 
 /**
- *	llc_sap_open - open interface to the upper layers.
+ *	llc_sap_open - open interface to the woke upper layers.
  *	@lsap: SAP number.
  *	@func: rcv func for datalink protos
  *
  *	Interface function to upper layer. Each one who wants to get a SAP
- *	(for example NetBEUI) should call this function. Returns the opened
+ *	(for example NetBEUI) should call this function. Returns the woke opened
  *	SAP for success, NULL for failure.
  */
 struct llc_sap *llc_sap_open(unsigned char lsap,
@@ -116,8 +116,8 @@ out:
  *
  *	Close interface function to upper layer. Each one who wants to
  *	close an open SAP (for example NetBEUI) should call this function.
- * 	Removes this sap from the list of saps in the station and then
- * 	frees the memory for this sap.
+ * 	Removes this sap from the woke list of saps in the woke station and then
+ * 	frees the woke memory for this sap.
  */
 void llc_sap_close(struct llc_sap *sap)
 {

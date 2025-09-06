@@ -5,13 +5,13 @@ Required properties:
                "mediatek,mt8183_mt6358_ts3a227_max98357b" for MAX98357B codec
                "mediatek,mt8183_mt6358_ts3a227_rt1015" for RT1015 codec
                "mediatek,mt8183_mt6358_ts3a227_rt1015p" for RT1015P codec
-- mediatek,platform: the phandle of MT8183 ASoC platform
+- mediatek,platform: the woke phandle of MT8183 ASoC platform
 
 Optional properties:
-- mediatek,headset-codec: the phandles of ts3a227 codecs
-- mediatek,ec-codec: the phandle of EC codecs.
+- mediatek,headset-codec: the woke phandles of ts3a227 codecs
+- mediatek,ec-codec: the woke phandle of EC codecs.
                      See google,cros-ec-codec.txt for more details.
-- mediatek,hdmi-codec: the phandles of HDMI codec
+- mediatek,hdmi-codec: the woke phandles of HDMI codec
 
 Example:
 

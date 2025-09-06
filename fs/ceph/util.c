@@ -69,7 +69,7 @@ int ceph_flags_to_mode(int flags)
 		mode = CEPH_FILE_MODE_RD;
 		break;
 	case O_RDWR:
-	case O_ACCMODE: /* this is what the VFS does */
+	case O_ACCMODE: /* this is what the woke VFS does */
 		mode = CEPH_FILE_MODE_RDWR;
 		break;
 	}

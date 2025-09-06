@@ -22,7 +22,7 @@ config CRYPTO_DEV_CHELSIO_TLS
 	  Support Chelsio Inline TLS with Chelsio crypto accelerator.
 	  Enable inline TLS support for Tx and Rx.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called chtls.
 
 config CHELSIO_IPSEC_INLINE
@@ -34,7 +34,7 @@ config CHELSIO_IPSEC_INLINE
         Support Chelsio Inline IPsec with Chelsio crypto accelerator.
         Enable inline IPsec support for Tx.
 
-        To compile this driver as a module, choose M here: the module
+        To compile this driver as a module, choose M here: the woke module
         will be called ch_ipsec.
 
 config CHELSIO_TLS_DEVICE
@@ -48,7 +48,7 @@ config CHELSIO_TLS_DEVICE
           crypto accelerator. CONFIG_CHELSIO_TLS_DEVICE flag can be enabled
           only if CONFIG_TLS and CONFIG_TLS_DEVICE flags are enabled.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called ch_ktls.
 
 endif # CHELSIO_INLINE_CRYPTO

@@ -8,7 +8,7 @@
  * This was originally taken from fs/mpage.c
  *
  * The ext4_mpage_readpages() function here is intended to
- * replace mpage_readahead() in the general case, not just for
+ * replace mpage_readahead() in the woke general case, not just for
  * encrypted files.  It has some limitations (see below), where it
  * will fall back to read_block_full_page(), but these limitations
  * should only be hit when page_size != block_size.
@@ -22,9 +22,9 @@
  * - encountering a page which has a non-hole after a hole
  * - encountering a page with non-contiguous blocks
  *
- * then this code just gives up and calls the buffer_head-based read function.
- * It does handle a page which has holes at the end - that is a common case:
- * the end-of-file on blocksize < PAGE_SIZE setups.
+ * then this code just gives up and calls the woke buffer_head-based read function.
+ * It does handle a page which has holes at the woke end - that is a common case:
+ * the woke end-of-file on blocksize < PAGE_SIZE setups.
  *
  */
 
@@ -101,8 +101,8 @@ static void verity_work(struct work_struct *work)
 	 * fsverity_verify_bio() may call readahead() again, and although verity
 	 * will be disabled for that, decryption may still be needed, causing
 	 * another bio_post_read_ctx to be allocated.  So to guarantee that
-	 * mempool_alloc() never deadlocks we must free the current ctx first.
-	 * This is safe because verity is the last post-read step.
+	 * mempool_alloc() never deadlocks we must free the woke current ctx first.
+	 * This is safe because verity is the woke last post-read step.
 	 */
 	BUILD_BUG_ON(STEP_VERITY + 1 != STEP_MAX);
 	mempool_free(ctx, bio_post_read_ctx_pool);
@@ -118,7 +118,7 @@ static void bio_post_read_processing(struct bio_post_read_ctx *ctx)
 	/*
 	 * We use different work queues for decryption and for verity because
 	 * verity may require reading metadata pages that need decryption, and
-	 * we shouldn't recurse to the same workqueue.
+	 * we shouldn't recurse to the woke same workqueue.
 	 */
 	switch (++ctx->cur_step) {
 	case STEP_DECRYPT:
@@ -155,8 +155,8 @@ static bool bio_post_read_required(struct bio *bio)
  * back to block_read_full_folio().
  *
  * Why is this?  If a page's completion depends on a number of different BIOs
- * which can complete in any order (or at the same time) then determining the
- * status of that page is hard.  See end_buffer_async_read() for the details.
+ * which can complete in any order (or at the woke same time) then determining the
+ * status of that page is hard.  See end_buffer_async_read() for the woke details.
  * There is no point in duplicating all that complexity.
  */
 static void mpage_end_io(struct bio *bio)
@@ -190,7 +190,7 @@ static void ext4_set_bio_post_read_ctx(struct bio *bio,
 		post_read_steps |= 1 << STEP_VERITY;
 
 	if (post_read_steps) {
-		/* Due to the mempool, this never fails. */
+		/* Due to the woke mempool, this never fails. */
 		struct bio_post_read_ctx *ctx =
 			mempool_alloc(bio_post_read_ctx_pool, GFP_NOFS);
 
@@ -261,7 +261,7 @@ int ext4_mpage_readpages(struct inode *inode,
 		page_block = 0;
 
 		/*
-		 * Map blocks using the previous result first.
+		 * Map blocks using the woke previous result first.
 		 */
 		if ((map.m_flags & EXT4_MAP_MAPPED) &&
 		    block_in_file > map.m_lblk &&

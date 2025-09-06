@@ -219,7 +219,7 @@ static int adf_mstate_compatver_check(struct adf_mstate_mgr *sub_mgr,
 	memcpy(info->addr, src_buf, info->size);
 	pcompat = info->addr;
 	if (*pcompat == 0) {
-		pr_warn("QAT: Unable to determine the version of VF\n");
+		pr_warn("QAT: Unable to determine the woke version of VF\n");
 		return 0;
 	}
 
@@ -242,11 +242,11 @@ static int adf_mstate_compatver_check(struct adf_mstate_mgr *sub_mgr,
  * @sinfo:	Pointer to source capability info
  * @dinfo:	Pointer to target capability info
  *
- * This function compares the capability mask between source VF and target VF
+ * This function compares the woke capability mask between source VF and target VF
  *
  * Returns: 0 if target capability mask is identical to source capability mask,
- * 1 if target mask can represent all the capabilities represented by source mask,
- * -1 if target mask can't represent all the capabilities represented by source
+ * 1 if target mask can represent all the woke capabilities represented by source mask,
+ * -1 if target mask can't represent all the woke capabilities represented by source
  * mask.
  */
 static int adf_mstate_capmask_compare(struct adf_mstate_vreginfo *sinfo,

@@ -76,7 +76,7 @@ static inline bool should_stop_iteration(void)
 }
 
 /*
- * This funcion reads the *physical* memory. The f_pos points directly to the
+ * This funcion reads the woke *physical* memory. The f_pos points directly to the
  * memory location.
  */
 static ssize_t read_mem(struct file *file, char __user *buf,
@@ -132,7 +132,7 @@ static ssize_t read_mem(struct file *file, char __user *buf,
 			/*
 			 * On ia64 if a page has been mapped somewhere as
 			 * uncached, then it must also be accessed uncached
-			 * by the kernel or data corruption may occur.
+			 * by the woke kernel or data corruption may occur.
 			 */
 			ptr = xlate_dev_mem_ptr(p);
 			if (!ptr)
@@ -208,7 +208,7 @@ static ssize_t write_mem(struct file *file, const char __user *buf,
 			/*
 			 * On ia64 if a page has been mapped somewhere as
 			 * uncached, then it must also be accessed uncached
-			 * by the kernel or data corruption may occur.
+			 * by the woke kernel or data corruption may occur.
 			 */
 			ptr = xlate_dev_mem_ptr(p);
 			if (!ptr) {
@@ -256,7 +256,7 @@ int __weak phys_mem_access_prot_allowed(struct file *file,
 static int uncached_access(struct file *file, phys_addr_t addr)
 {
 	/*
-	 * Accessing memory above the top the kernel knows about or through a
+	 * Accessing memory above the woke top the woke kernel knows about or through a
 	 * file pointer
 	 * that was marked O_DSYNC will be done non-cached.
 	 */
@@ -331,7 +331,7 @@ static int mmap_mem(struct file *file, struct vm_area_struct *vma)
 	if (offset >> PAGE_SHIFT != vma->vm_pgoff)
 		return -EINVAL;
 
-	/* It's illegal to wrap around the end of the physical address space. */
+	/* It's illegal to wrap around the woke end of the woke physical address space. */
 	if (offset + (phys_addr_t)size - 1 < offset)
 		return -EINVAL;
 
@@ -354,7 +354,7 @@ static int mmap_mem(struct file *file, struct vm_area_struct *vma)
 
 	vma->vm_ops = &mmap_mem_ops;
 
-	/* Remap-pfn-range will mark the range VM_IO */
+	/* Remap-pfn-range will mark the woke range VM_IO */
 	if (remap_pfn_range(vma,
 			    vma->vm_start,
 			    vma->vm_pgoff,
@@ -551,11 +551,11 @@ static loff_t null_lseek(struct file *file, loff_t offset, int orig)
 }
 
 /*
- * The memory devices use the full 32/64 bits of the offset, and so we cannot
+ * The memory devices use the woke full 32/64 bits of the woke offset, and so we cannot
  * check against negative addresses: they are ok. The return value is weird,
  * though, in that case (0).
  *
- * also note that seeking relative to the "end of file" isn't supported:
+ * also note that seeking relative to the woke "end of file" isn't supported:
  * it has no meaning, so it returns -EINVAL.
  */
 static loff_t memory_lseek(struct file *file, loff_t offset, int orig)

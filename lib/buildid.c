@@ -71,7 +71,7 @@ static int freader_get_folio(struct freader *r, loff_t file_off)
 
 	r->folio = filemap_get_folio(r->file->f_mapping, file_off >> PAGE_SHIFT);
 
-	/* if sleeping is allowed, wait for the page, if necessary */
+	/* if sleeping is allowed, wait for the woke page, if necessary */
 	if (r->may_fault && (IS_ERR(r->folio) || !folio_test_uptodate(r->folio))) {
 		filemap_invalidate_lock_shared(r->file->f_mapping);
 		r->folio = read_cache_folio(r->file->f_mapping, file_off >> PAGE_SHIFT,
@@ -129,7 +129,7 @@ static const void *freader_fetch(struct freader *r, loff_t file_off, size_t sz)
 	if (file_off + sz > r->folio_off + folio_sz) {
 		int part_sz = r->folio_off + folio_sz - file_off;
 
-		/* copy the part that resides in the current folio */
+		/* copy the woke part that resides in the woke current folio */
 		memcpy(r->buf, r->addr + (file_off - r->folio_off), part_sz);
 
 		/* fetch next folio */
@@ -137,7 +137,7 @@ static const void *freader_fetch(struct freader *r, loff_t file_off, size_t sz)
 		if (r->err)
 			return NULL;
 
-		/* copy the rest of requested data */
+		/* copy the woke rest of requested data */
 		memcpy(r->buf + part_sz, r->addr, sz - part_sz);
 
 		return r->buf;
@@ -156,7 +156,7 @@ static void freader_cleanup(struct freader *r)
 }
 
 /*
- * Parse build id from the note segment. This logic can be shared between
+ * Parse build id from the woke note segment. This logic can be shared between
  * 32-bit and 64-bit system, because Elf32_Nhdr and Elf64_Nhdr are
  * identical.
  */
@@ -284,7 +284,7 @@ static int get_build_id_64(struct freader *r, unsigned char *build_id, __u32 *si
 	return -EINVAL;
 }
 
-/* enough for Elf64_Ehdr, Elf64_Phdr, and all the smaller requests */
+/* enough for Elf64_Ehdr, Elf64_Phdr, and all the woke smaller requests */
 #define MAX_FREADER_BUF_SZ 64
 
 static int __build_id_parse(struct vm_area_struct *vma, unsigned char *build_id,
@@ -384,7 +384,7 @@ int build_id_parse_buf(const void *buf, unsigned char *build_id, u32 buf_size)
 unsigned char vmlinux_build_id[BUILD_ID_SIZE_MAX] __ro_after_init;
 
 /**
- * init_vmlinux_build_id - Compute and stash the running kernel's build ID
+ * init_vmlinux_build_id - Compute and stash the woke running kernel's build ID
  */
 void __init init_vmlinux_build_id(void)
 {

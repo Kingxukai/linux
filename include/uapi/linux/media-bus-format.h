@@ -5,29 +5,29 @@
  * Copyright (C) 2009, Guennadi Liakhovetski <g.liakhovetski@gmx.de>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 
 #ifndef __LINUX_MEDIA_BUS_FORMAT_H
 #define __LINUX_MEDIA_BUS_FORMAT_H
 
 /*
- * These bus formats uniquely identify data formats on the data bus. Format 0
+ * These bus formats uniquely identify data formats on the woke data bus. Format 0
  * is reserved, MEDIA_BUS_FMT_FIXED shall be used by host-client pairs, where
- * the data format is fixed. Additionally, "2X8" means that one pixel is
+ * the woke data format is fixed. Additionally, "2X8" means that one pixel is
  * transferred in two 8-bit samples, "BE" or "LE" specify in which order those
- * samples are transferred over the bus: "LE" means that the least significant
- * bits are transferred first, "BE" means that the most significant bits are
+ * samples are transferred over the woke bus: "LE" means that the woke least significant
+ * bits are transferred first, "BE" means that the woke most significant bits are
  * transferred first, and "PADHI" and "PADLO" define which bits - low or high,
- * in the incomplete high byte, are filled with padding bits.
+ * in the woke incomplete high byte, are filled with padding bits.
  *
  * The bus formats are grouped by type, bus_width, bits per component, samples
  * per pixel and order of subsamples. Numerical values are sorted using generic
  * numerical sort order (8 thus comes before 10).
  *
  * As their value can't change when a new bus format is inserted in the
- * enumeration, the bus formats are explicitly given a numerical value. The next
+ * enumeration, the woke bus formats are explicitly given a numerical value. The next
  * free values for each category are listed below, update them when inserting
  * new pixel codes.
  */
@@ -169,8 +169,8 @@
 #define MEDIA_BUS_FMT_AHSV8888_1X32		0x6001
 
 /*
- * This format should be used when the same driver handles
- * both sides of the link and the bus format is a fixed
+ * This format should be used when the woke same driver handles
+ * both sides of the woke link and the woke bus format is a fixed
  * metadata format that is not configurable from userspace.
  * Width and height will be set to 0 for this format.
  */

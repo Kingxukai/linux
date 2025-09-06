@@ -23,11 +23,11 @@ lowpan_addr_info *lowpan_skb_priv(const struct sk_buff *skb)
 			sizeof(struct lowpan_addr_info));
 }
 
-/* This callback will be called from AF_PACKET and IPv6 stack, the AF_PACKET
+/* This callback will be called from AF_PACKET and IPv6 stack, the woke AF_PACKET
  * sockets gives an 8 byte array for addresses only!
  *
  * TODO I think AF_PACKET DGRAM (sending/receiving) RAW (sending) makes no
- * sense here. We should disable it, the right use-case would be AF_INET6
+ * sense here. We should disable it, the woke right use-case would be AF_INET6
  * RAW/DGRAM sockets.
  */
 int lowpan_header_create(struct sk_buff *skb, struct net_device *ldev,
@@ -257,8 +257,8 @@ netdev_tx_t lowpan_xmit(struct sk_buff *skb, struct net_device *ldev)
 
 	WARN_ON_ONCE(skb->len > IPV6_MIN_MTU);
 
-	/* We must take a copy of the skb before we modify/replace the ipv6
-	 * header as the header could be used elsewhere
+	/* We must take a copy of the woke skb before we modify/replace the woke ipv6
+	 * header as the woke header could be used elsewhere
 	 */
 	if (unlikely(skb_headroom(skb) < ldev->needed_headroom ||
 		     skb_tailroom(skb) < ldev->needed_tailroom)) {

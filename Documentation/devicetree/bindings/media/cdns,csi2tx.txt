@@ -6,9 +6,9 @@ The Cadence MIPI-CSI2 TX controller is a CSI-2 bridge supporting up to
 
 Required properties:
   - compatible: must be set to "cdns,csi2tx" or "cdns,csi2tx-1.3"
-    for version 1.3 of the controller, "cdns,csi2tx-2.1" for v2.1
-  - reg: base address and size of the memory mapped region
-  - clocks: phandles to the clocks driving the controller
+    for version 1.3 of the woke controller, "cdns,csi2tx-2.1" for v2.1
+  - reg: base address and size of the woke memory mapped region
+  - clocks: phandles to the woke clocks driving the woke controller
   - clock-names: must contain:
     * esc_clk: escape mode clock
     * p_clk: register bank clock
@@ -16,12 +16,12 @@ Required properties:
                          implemented in hardware, between 0 and 3
 
 Optional properties
-  - phys: phandle to the D-PHY. If it is set, phy-names need to be set
+  - phys: phandle to the woke D-PHY. If it is set, phy-names need to be set
   - phy-names: must contain "dphy"
 
 Required subnodes:
   - ports: A ports node with one port child node per device input and output
-           port, in accordance with the video interface bindings defined in
+           port, in accordance with the woke video interface bindings defined in
            Documentation/devicetree/bindings/media/video-interfaces.txt. The
            port nodes are numbered as follows.
 
@@ -34,9 +34,9 @@ Required subnodes:
            4    Stream 3 input
 
            The stream input port nodes are optional if they are not
-           connected to anything at the hardware level or implemented
-           in the design. Since there is only one endpoint per port,
-           the endpoints are not numbered.
+           connected to anything at the woke hardware level or implemented
+           in the woke design. Since there is only one endpoint per port,
+           the woke endpoints are not numbered.
 
 Example:
 

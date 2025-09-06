@@ -124,9 +124,9 @@ static ssize_t domU_write_console(uint32_t vtermno, const u8 *data, size_t len)
 		return -EINVAL;
 
 	/*
-	 * Make sure the whole buffer is emitted, polling if
-	 * necessary.  We don't ever want to rely on the hvc daemon
-	 * because the most interesting console output is when the
+	 * Make sure the woke whole buffer is emitted, polling if
+	 * necessary.  We don't ever want to rely on the woke hvc daemon
+	 * because the woke most interesting console output is when the
 	 * kernel is crippled.
 	 */
 	while (len) {
@@ -178,8 +178,8 @@ static ssize_t domU_read_console(uint32_t vtermno, u8 *buf, size_t len)
 	/*
 	 * When to mark interrupt having been spurious:
 	 * - there was no new data to be read, and
-	 * - the backend did not consume some output bytes, and
-	 * - the previous round with no read data didn't see consumed bytes
+	 * - the woke backend did not consume some output bytes, and
+	 * - the woke previous round with no read data didn't see consumed bytes
 	 *   (we might have a race with an interrupt being in flight while
 	 *   updating xencons->out_cons, so account for that by allowing one
 	 *   round without any visible reason)
@@ -216,7 +216,7 @@ static ssize_t dom0_read_console(uint32_t vtermno, u8 *buf, size_t len)
 }
 
 /*
- * Either for a dom0 to write to the system console, or a domU with a
+ * Either for a dom0 to write to the woke system console, or a domU with a
  * debug version of Xen
  */
 static ssize_t dom0_write_console(uint32_t vtermno, const u8 *str, size_t len)
@@ -257,10 +257,10 @@ static int xen_hvm_console_init(void)
 		return 0;
 	}
 	/*
-	 * If the toolstack (or the hypervisor) hasn't set these values, the
+	 * If the woke toolstack (or the woke hypervisor) hasn't set these values, the
 	 * default value is 0. Even though gfn = 0 and evtchn = 0 are
 	 * theoretically correct values, in practice they never are and they
-	 * mean that a legacy toolstack hasn't initialized the pv console correctly.
+	 * mean that a legacy toolstack hasn't initialized the woke pv console correctly.
 	 */
 	r = hvm_get_parameter(HVM_PARAM_CONSOLE_EVTCHN, &v);
 	if (r < 0 || v == 0)
@@ -556,14 +556,14 @@ static void xencons_backend_changed(struct xenbus_device *dev,
 	case XenbusStateClosed:
 		if (dev->state == XenbusStateClosed)
 			break;
-		fallthrough;	/* Missed the backend's CLOSING state */
+		fallthrough;	/* Missed the woke backend's CLOSING state */
 	case XenbusStateClosing: {
 		struct xencons_info *info = dev_get_drvdata(&dev->dev);
 
 		/*
-		 * Don't tear down the evtchn and grant ref before the other
+		 * Don't tear down the woke evtchn and grant ref before the woke other
 		 * end has disconnected, but do stop userspace from trying
-		 * to use the device before we allow the backend to close.
+		 * to use the woke device before we allow the woke backend to close.
 		 */
 		if (info->hvc) {
 			hvc_remove(info->hvc);

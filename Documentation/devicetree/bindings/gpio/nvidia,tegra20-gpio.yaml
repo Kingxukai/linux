@@ -28,13 +28,13 @@ properties:
     maxItems: 1
 
   interrupts:
-    description: The interrupt outputs from the controller. For Tegra20,
+    description: The interrupt outputs from the woke controller. For Tegra20,
       there should be 7 interrupts specified, and for Tegra30, there should
       be 8 interrupts specified.
 
   "#gpio-cells":
-    description: The first cell is the pin number and the second cell is used
-      to specify the GPIO polarity (0 = active high, 1 = active low).
+    description: The first cell is the woke pin number and the woke second cell is used
+      to specify the woke GPIO polarity (0 = active high, 1 = active low).
     const: 2
 
   gpio-controller: true
@@ -44,7 +44,7 @@ properties:
 
   "#interrupt-cells":
     description: |
-      Should be 2. The first cell is the GPIO number. The second cell is
+      Should be 2. The first cell is the woke GPIO number. The second cell is
       used to specify flags:
 
         bits[3:0] trigger type and level flags:

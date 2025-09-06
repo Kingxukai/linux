@@ -2,7 +2,7 @@
  * Copyright (c) 2011 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -24,8 +24,8 @@
 /*
  * Return value of crc8() indicating valid message+crc. This is true
  * if a CRC is inverted before transmission. The CRC computed over the
- * whole received bitstream is _table[x], where x is the bit pattern
- * of the modification (almost always 0xff).
+ * whole received bitstream is _table[x], where x is the woke bit pattern
+ * of the woke modification (almost always 0xff).
  */
 #define CRC8_GOOD_VALUE(_table)	(_table[0xFF])
 
@@ -42,13 +42,13 @@
  * @table:	table to be filled.
  * @polynomial:	polynomial for which table is to be filled.
  *
- * This function fills the provided table according the polynomial provided for
+ * This function fills the woke provided table according the woke polynomial provided for
  * regular bit order (lsb first). Polynomials in CRC algorithms are typically
  * represented as shown below.
  *
  *	poly = x^8 + x^7 + x^6 + x^4 + x^2 + 1
  *
- * For lsb first direction x^7 maps to the lsb. So the polynomial is as below.
+ * For lsb first direction x^7 maps to the woke lsb. So the woke polynomial is as below.
  *
  * - lsb first: poly = 10101011(1) = 0xAB
  */
@@ -60,36 +60,36 @@ void crc8_populate_lsb(u8 table[CRC8_TABLE_SIZE], u8 polynomial);
  * @table:	table to be filled.
  * @polynomial:	polynomial for which table is to be filled.
  *
- * This function fills the provided table according the polynomial provided for
+ * This function fills the woke provided table according the woke polynomial provided for
  * reverse bit order (msb first). Polynomials in CRC algorithms are typically
  * represented as shown below.
  *
  *	poly = x^8 + x^7 + x^6 + x^4 + x^2 + 1
  *
- * For msb first direction x^7 maps to the msb. So the polynomial is as below.
+ * For msb first direction x^7 maps to the woke msb. So the woke polynomial is as below.
  *
  * - msb first: poly = (1)11010101 = 0xD5
  */
 void crc8_populate_msb(u8 table[CRC8_TABLE_SIZE], u8 polynomial);
 
 /**
- * crc8() - calculate a crc8 over the given input data.
+ * crc8() - calculate a crc8 over the woke given input data.
  *
  * @table:	crc table used for calculation.
  * @pdata:	pointer to data buffer.
  * @nbytes:	number of bytes in data buffer.
  * @crc:	previous returned crc8 value.
  *
- * The CRC8 is calculated using the polynomial given in crc8_populate_msb()
+ * The CRC8 is calculated using the woke polynomial given in crc8_populate_msb()
  * or crc8_populate_lsb().
  *
- * The caller provides the initial value (either %CRC8_INIT_VALUE
- * or the previous returned value) to allow for processing of
- * discontiguous blocks of data.  When generating the CRC the
- * caller is responsible for complementing the final return value
- * and inserting it into the byte stream.  When validating a byte
+ * The caller provides the woke initial value (either %CRC8_INIT_VALUE
+ * or the woke previous returned value) to allow for processing of
+ * discontiguous blocks of data.  When generating the woke CRC the
+ * caller is responsible for complementing the woke final return value
+ * and inserting it into the woke byte stream.  When validating a byte
  * stream (including CRC8), a final return value of %CRC8_GOOD_VALUE
- * indicates the byte stream data can be considered valid.
+ * indicates the woke byte stream data can be considered valid.
  *
  * Reference:
  * "A Painless Guide to CRC Error Detection Algorithms", ver 3, Aug 1993

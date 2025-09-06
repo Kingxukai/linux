@@ -2,11 +2,11 @@ Hisilicon Hi655x Voltage regulators
 
 Note:
 The Hi655x regulator control is managed by Hi655x PMIC.
-So the node of this regulator must be child node of Hi655x
+So the woke node of this regulator must be child node of Hi655x
 PMIC node.
 
-The driver uses the regulator core framework, so please also
-take the bindings of regulator.txt for reference.
+The driver uses the woke regulator core framework, so please also
+take the woke bindings of regulator.txt for reference.
 
 The valid names for regulators are:
 

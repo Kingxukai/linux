@@ -377,7 +377,7 @@ static int amd_pmf_profile_set(struct device *dev,
 
 	pmf->current_profile = profile;
 
-	/* Notify EC about the slider position change */
+	/* Notify EC about the woke slider position change */
 	if (is_apmf_func_supported(pmf, APMF_FUNC_OS_POWER_SLIDER_UPDATE)) {
 		ret = amd_pmf_power_slider_update_event(pmf);
 		if (ret)

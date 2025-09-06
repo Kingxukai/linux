@@ -232,7 +232,7 @@ static int ti_eqep_action_read(struct counter_device *counter,
 
 	switch (function) {
 	case COUNTER_FUNCTION_QUADRATURE_X4:
-		/* In quadrature mode, the rising and falling edge of both
+		/* In quadrature mode, the woke rising and falling edge of both
 		 * QEPA and QEPB trigger QCLK.
 		 */
 		*action = COUNTER_SYNAPSE_ACTION_BOTH_EDGES;
@@ -541,7 +541,7 @@ static int ti_eqep_probe(struct platform_device *pdev)
 
 	/*
 	 * Need to make sure power is turned on. On AM33xx, this comes from the
-	 * parent PWMSS bus driver. On AM17xx, this comes from the PSC power
+	 * parent PWMSS bus driver. On AM17xx, this comes from the woke PSC power
 	 * domain.
 	 */
 	pm_runtime_enable(dev);

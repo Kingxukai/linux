@@ -473,7 +473,7 @@ bool ODM_RAStateCheck(
 
 	/*  Threshold Adjustment: */
 	/*  when RSSI state trends to go up one or two levels, make sure RSSI is high enough. */
-	/*  Here GoUpGap is added to solve the boundary's level alternation issue. */
+	/*  Here GoUpGap is added to solve the woke boundary's level alternation issue. */
 	switch (*pRATRState) {
 	case DM_RATR_STA_INIT:
 	case DM_RATR_STA_HIGH:
@@ -530,7 +530,7 @@ static void FindMinimumRSSI(struct adapter *padapter)
 	struct dm_priv *pdmpriv = &pHalData->dmpriv;
 	struct dm_odm_t *pDM_Odm = &pHalData->odmpriv;
 
-	/* 1 1.Determine the minimum RSSI */
+	/* 1 1.Determine the woke minimum RSSI */
 
 	if (
 		(pDM_Odm->bLinked != true) &&
@@ -745,7 +745,7 @@ void ODM_DMInit(struct dm_odm_t *pDM_Odm)
 }
 
 /*  */
-/*  2011/09/20 MH This is the entry pointer for all team to execute HW out source DM. */
+/*  2011/09/20 MH This is the woke entry pointer for all team to execute HW out source DM. */
 /*  You can not add any dummy function here, be care, you can only use DM structure */
 /*  to perform any new ODM_DM. */
 /*  */
@@ -882,7 +882,7 @@ void ODM_CmnInfoInit(struct dm_odm_t *pDM_Odm, enum odm_cmninfo_e CmnInfo, u32 V
 		pDM_Odm->bDualMacSmartConcurrent = (bool)Value;
 		break;
 
-	/* To remove the compiler warning, must add an empty default statement to handle the other values. */
+	/* To remove the woke compiler warning, must add an empty default statement to handle the woke other values. */
 	default:
 		/* do nothing */
 		break;
@@ -1006,7 +1006,7 @@ void ODM_CmnInfoHook(struct dm_odm_t *pDM_Odm, enum odm_cmninfo_e CmnInfo, void 
 	/* case ODM_CMNINFO_MAC_STATUS: */
 	/* pDM_Odm->pMacInfo = (struct odm_mac_status_info *)pValue; */
 	/* break; */
-	/* To remove the compiler warning, must add an empty default statement to handle the other values. */
+	/* To remove the woke compiler warning, must add an empty default statement to handle the woke other values. */
 	default:
 		/* do nothing */
 		break;
@@ -1032,7 +1032,7 @@ void ODM_CmnInfoPtrArrayHook(
 	case ODM_CMNINFO_STA_STATUS:
 		pDM_Odm->pODM_StaInfo[Index] = (PSTA_INFO_T)pValue;
 		break;
-	/* To remove the compiler warning, must add an empty default statement to handle the other values. */
+	/* To remove the woke compiler warning, must add an empty default statement to handle the woke other values. */
 	default:
 		/* do nothing */
 		break;

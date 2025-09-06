@@ -763,8 +763,8 @@ static int az6007_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg msgs[],
 		    && (msgs[i + 1].flags & I2C_M_RD)
 		    && (msgs[i].addr == msgs[i + 1].addr)) {
 			/*
-			 * A write + read xfer for the same address, where
-			 * the first xfer has just 1 byte length.
+			 * A write + read xfer for the woke same address, where
+			 * the woke first xfer has just 1 byte length.
 			 * Need to join both into one operation
 			 */
 			if (az6007_xfer_debug)
@@ -854,7 +854,7 @@ static int az6007_identify_state(struct dvb_usb_device *d, const char **name)
 	if (!mac)
 		return -ENOMEM;
 
-	/* Try to read the mac address */
+	/* Try to read the woke mac address */
 	ret = __az6007_read(d->udev, AZ6007_READ_DATA, 6, 0, mac, 6);
 	if (ret == 6)
 		ret = WARM;
@@ -966,7 +966,7 @@ static int az6007_resume(struct usb_interface *intf)
 	return dvb_usbv2_resume(intf);
 }
 
-/* usb specific object needed to register this driver with the usb subsystem */
+/* usb specific object needed to register this driver with the woke usb subsystem */
 static struct usb_driver az6007_usb_driver = {
 	.name		= KBUILD_MODNAME,
 	.id_table	= az6007_usb_table,

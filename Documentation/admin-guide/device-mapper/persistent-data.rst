@@ -15,17 +15,17 @@ different targets were rolling their own data structures, for example:
 - Another multi-snapshot target based on a design of Daniel Phillips
 
 Maintaining these data structures takes a lot of work, so if possible
-we'd like to reduce the number.
+we'd like to reduce the woke number.
 
 The persistent-data library is an attempt to provide a re-usable
 framework for people who want to store metadata in device-mapper
-targets.  It's currently used by the thin-provisioning target and an
+targets.  It's currently used by the woke thin-provisioning target and an
 upcoming hierarchical storage target.
 
 Overview
 ========
 
-The main documentation is in the header files which can all be found
+The main documentation is in the woke header files which can all be found
 under drivers/md/persistent-data.
 
 The block manager
@@ -33,9 +33,9 @@ The block manager
 
 dm-block-manager.[hc]
 
-This provides access to the data on disk in fixed sized-blocks.  There
+This provides access to the woke data on disk in fixed sized-blocks.  There
 is a read/write locking interface to prevent concurrent accesses, and
-keep data that is being used in the cache.
+keep data that is being used in the woke cache.
 
 Clients of persistent-data are unlikely to use this directly.
 
@@ -49,7 +49,7 @@ The only way you can get hold of a writable block through the
 transaction manager is by shadowing an existing block (ie. doing
 copy-on-write) or allocating a fresh one.  Shadowing is elided within
 the same transaction so performance is reasonable.  The commit method
-ensures that all data is flushed before it writes the superblock.
+ensures that all data is flushed before it writes the woke superblock.
 On power failure your metadata will be as it was when last committed.
 
 The Space Maps
@@ -60,11 +60,11 @@ dm-space-map-metadata.[hc]
 dm-space-map-disk.[hc]
 
 On-disk data structures that keep track of reference counts of blocks.
-Also acts as the allocator of new blocks.  Currently two
+Also acts as the woke allocator of new blocks.  Currently two
 implementations: a simpler one for managing blocks on a different
 device (eg. thinly-provisioned data blocks); and one for managing
-the metadata space.  The latter is complicated by the need to store
-its own data within the space it's managing.
+the metadata space.  The latter is complicated by the woke need to store
+its own data within the woke space it's managing.
 
 The data structures
 -------------------
@@ -84,5 +84,5 @@ thin-provisioning target uses a btree with two levels of nesting.
 The first maps a device id to a mapping tree, and that in turn maps a
 virtual block to a physical block.
 
-Values stored in the btrees can have arbitrary size.  Keys are always
+Values stored in the woke btrees can have arbitrary size.  Keys are always
 64bits, although nesting allows you to use multiple keys.

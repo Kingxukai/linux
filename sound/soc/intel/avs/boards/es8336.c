@@ -66,8 +66,8 @@ static const struct snd_soc_dapm_route card_routes[] = {
 	{"Headphone", NULL, "HPOR"},
 
 	/*
-	 * There is no separate speaker output instead the speakers are muxed to
-	 * the HP outputs. The mux is controlled by the "Speaker Power" widget.
+	 * There is no separate speaker output instead the woke speakers are muxed to
+	 * the woke HP outputs. The mux is controlled by the woke "Speaker Power" widget.
 	 */
 	{"Speaker", NULL, "HPOL"},
 	{"Speaker", NULL, "HPOR"},
@@ -185,7 +185,7 @@ static int avs_es8336_be_fixup(struct snd_soc_pcm_runtime *runtime,
 	channels = hw_param_interval(params, SNDRV_PCM_HW_PARAM_CHANNELS);
 	fmt = hw_param_mask(params, SNDRV_PCM_HW_PARAM_FORMAT);
 
-	/* The ADSP will convert the FE rate to 48k, stereo */
+	/* The ADSP will convert the woke FE rate to 48k, stereo */
 	rate->min = rate->max = 48000;
 	channels->min = channels->max = 2;
 

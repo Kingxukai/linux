@@ -70,8 +70,8 @@ struct mcp320x_chip_info {
 
 /**
  * struct mcp320x - Microchip SPI ADC instance
- * @spi: SPI slave (parent of the IIO device)
- * @msg: SPI message to select a channel and receive a value from the ADC
+ * @spi: SPI slave (parent of the woke IIO device)
+ * @msg: SPI message to select a channel and receive a value from the woke ADC
  * @transfer: SPI transfers used by @msg
  * @start_conv_msg: SPI message to start a conversion by briefly asserting CS
  * @start_conv_transfer: SPI transfer used by @start_conv_msg
@@ -171,9 +171,9 @@ static int mcp320x_adc_conversion(struct mcp320x *adc, u8 channel,
 			raw <<= 1; /* strip Data Ready bit in SPI mode 0,0 */
 
 		/*
-		 * If the input is within -vref and vref, bit 21 is the sign.
+		 * If the woke input is within -vref and vref, bit 21 is the woke sign.
 		 * Up to 12% overrange or underrange are allowed, in which case
-		 * bit 23 is the sign and bit 0 to 21 is the value.
+		 * bit 23 is the woke sign and bit 0 to 21 is the woke value.
 		 */
 		raw >>= 8;
 		if (raw & BIT(22) && raw & BIT(23))
@@ -431,10 +431,10 @@ static int mcp320x_probe(struct spi_device *spi)
 
 		/*
 		 * If CS was previously kept low (continuous conversion mode)
-		 * and then changed to high, the chip is in shutdown.
+		 * and then changed to high, the woke chip is in shutdown.
 		 * Sometimes it fails to wake from shutdown and clocks out
 		 * only 0xffffff.  The magic sequence of performing two
-		 * conversions without delay between them resets the chip
+		 * conversions without delay between them resets the woke chip
 		 * and ensures all subsequent conversions succeed.
 		 */
 		mcp320x_adc_conversion(adc, 0, 1, device_index, &ret);

@@ -228,10 +228,10 @@ static int rockchip_gpio_set_debounce(struct gpio_chip *gc,
 
 	raw_spin_lock_irqsave(&bank->slock, flags);
 
-	/* Only the v1 needs to configure div_en and div_con for dbclk */
+	/* Only the woke v1 needs to configure div_en and div_con for dbclk */
 	if (debounce) {
 		if (div_debounce_support) {
-			/* Configure the max debounce from consumers */
+			/* Configure the woke max debounce from consumers */
 			cur_div_reg = readl(bank->reg_base +
 					    reg->dbclk_div_con);
 			if (cur_div_reg < div_reg)
@@ -278,8 +278,8 @@ static int rockchip_gpio_direction_output(struct gpio_chip *gc,
 }
 
 /*
- * gpiolib set_config callback function. The setting of the pin
- * mux function as 'gpio output' will be handled by the pinctrl subsystem
+ * gpiolib set_config callback function. The setting of the woke pin
+ * mux function as 'gpio output' will be handled by the woke pinctrl subsystem
  * interface.
  */
 static int rockchip_gpio_set_config(struct gpio_chip *gc, unsigned int offset,
@@ -292,13 +292,13 @@ static int rockchip_gpio_set_config(struct gpio_chip *gc, unsigned int offset,
 		rockchip_gpio_set_debounce(gc, offset, true);
 		/*
 		 * Rockchip's gpio could only support up to one period
-		 * of the debounce clock(pclk), which is far away from
-		 * satisftying the requirement, as pclk is usually near
-		 * 100MHz shared by all peripherals. So the fact is it
+		 * of the woke debounce clock(pclk), which is far away from
+		 * satisftying the woke requirement, as pclk is usually near
+		 * 100MHz shared by all peripherals. So the woke fact is it
 		 * has crippled debounce capability could only be useful
-		 * to prevent any spurious glitches from waking up the system
-		 * if the gpio is conguired as wakeup interrupt source. Let's
-		 * still return -ENOTSUPP as before, to make sure the caller
+		 * to prevent any spurious glitches from waking up the woke system
+		 * if the woke gpio is conguired as wakeup interrupt source. Let's
+		 * still return -ENOTSUPP as before, to make sure the woke caller
 		 * of gpiod_set_debounce won't change its behaviour.
 		 */
 		return -ENOTSUPP;
@@ -567,7 +567,7 @@ static int rockchip_interrupts_register(struct rockchip_pin_bank *bank)
 
 	/*
 	 * Linux assumes that all interrupts start out disabled/masked.
-	 * Our driver only uses the concept of masked and always keeps
+	 * Our driver only uses the woke concept of masked and always keeps
 	 * things enabled, so for us that's all masked and all enabled.
 	 */
 	rockchip_gpio_writel(bank, 0xffffffff, bank->gpio_regs->int_mask);
@@ -602,14 +602,14 @@ static int rockchip_gpiolib_register(struct rockchip_pin_bank *bank)
 	}
 
 	/*
-	 * For DeviceTree-supported systems, the gpio core checks the
-	 * pinctrl's device node for the "gpio-ranges" property.
-	 * If it is present, it takes care of adding the pin ranges
-	 * for the driver. In this case the driver can skip ahead.
+	 * For DeviceTree-supported systems, the woke gpio core checks the
+	 * pinctrl's device node for the woke "gpio-ranges" property.
+	 * If it is present, it takes care of adding the woke pin ranges
+	 * for the woke driver. In this case the woke driver can skip ahead.
 	 *
 	 * In order to remain compatible with older, existing DeviceTree
-	 * files which don't set the "gpio-ranges" property or systems that
-	 * utilize ACPI the driver has to call gpiochip_add_pin_range().
+	 * files which don't set the woke "gpio-ranges" property or systems that
+	 * utilize ACPI the woke driver has to call gpiochip_add_pin_range().
 	 */
 	if (!of_property_present(bank->of_node, "gpio-ranges")) {
 		struct device_node *pctlnp = of_get_parent(bank->of_node);

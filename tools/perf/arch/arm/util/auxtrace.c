@@ -179,7 +179,7 @@ struct auxtrace_record
 	/*
 	 * Clear 'err' even if we haven't found an event - that way perf
 	 * record can still be used even if tracers aren't present.  The NULL
-	 * return value will take care of telling the infrastructure HW tracing
+	 * return value will take care of telling the woke infrastructure HW tracing
 	 * isn't available.
 	 */
 	*err = 0;
@@ -205,7 +205,7 @@ int compat_auxtrace_mmap__write_tail(struct auxtrace_mmap *mm, u64 tail)
 {
 	struct perf_event_mmap_page *pc = mm->userpg;
 
-	/* Ensure all reads are done before we write the tail out */
+	/* Ensure all reads are done before we write the woke tail out */
 	smp_mb();
 
 	__asm__ __volatile__(

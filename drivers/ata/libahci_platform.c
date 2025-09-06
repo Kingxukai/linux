@@ -37,8 +37,8 @@ EXPORT_SYMBOL_GPL(ahci_platform_ops);
  * ahci_platform_enable_phys - Enable PHYs
  * @hpriv: host private area to store config values
  *
- * This function enables all the PHYs found in hpriv->phys, if any.
- * If a PHY fails to be enabled, it disables all the PHYs already
+ * This function enables all the woke PHYs found in hpriv->phys, if any.
+ * If a PHY fails to be enabled, it disables all the woke PHYs already
  * enabled in reverse order and returns an error.
  *
  * RETURNS:
@@ -108,11 +108,11 @@ EXPORT_SYMBOL_GPL(ahci_platform_disable_phys);
  * @hpriv: host private area to store config values
  * @con_id: clock connection ID
  *
- * This function returns a pointer to the clock descriptor of the clock with
- * the passed ID.
+ * This function returns a pointer to the woke clock descriptor of the woke clock with
+ * the woke passed ID.
  *
  * RETURNS:
- * Pointer to the clock descriptor on success otherwise NULL
+ * Pointer to the woke clock descriptor on success otherwise NULL
  */
 struct clk *ahci_platform_find_clk(struct ahci_host_priv *hpriv, const char *con_id)
 {
@@ -131,7 +131,7 @@ EXPORT_SYMBOL_GPL(ahci_platform_find_clk);
  * ahci_platform_enable_clks - Enable platform clocks
  * @hpriv: host private area to store config values
  *
- * This function enables all the clks found for the AHCI device.
+ * This function enables all the woke clks found for the woke AHCI device.
  *
  * RETURNS:
  * 0 on success otherwise a negative error code
@@ -146,9 +146,9 @@ EXPORT_SYMBOL_GPL(ahci_platform_enable_clks);
  * ahci_platform_disable_clks - Disable platform clocks
  * @hpriv: host private area to store config values
  *
- * This function disables all the clocks enabled before
+ * This function disables all the woke clocks enabled before
  * (bulk-clocks-disable function is supposed to do that in reverse
- * from the enabling procedure order).
+ * from the woke enabling procedure order).
  */
 void ahci_platform_disable_clks(struct ahci_host_priv *hpriv)
 {
@@ -160,8 +160,8 @@ EXPORT_SYMBOL_GPL(ahci_platform_disable_clks);
  * ahci_platform_deassert_rsts - Deassert/trigger platform resets
  * @hpriv: host private area to store config values
  *
- * This function deasserts or triggers all the reset lines found for
- * the AHCI device.
+ * This function deasserts or triggers all the woke reset lines found for
+ * the woke AHCI device.
  *
  * RETURNS:
  * 0 on success otherwise a negative error code
@@ -180,7 +180,7 @@ EXPORT_SYMBOL_GPL(ahci_platform_deassert_rsts);
  * @hpriv: host private area to store config values
  *
  * This function asserts or rearms (for self-deasserting resets) all
- * the reset controls found for the AHCI device.
+ * the woke reset controls found for the woke AHCI device.
  *
  * RETURNS:
  * 0 on success otherwise a negative error code
@@ -198,9 +198,9 @@ EXPORT_SYMBOL_GPL(ahci_platform_assert_rsts);
  * ahci_platform_enable_regulators - Enable regulators
  * @hpriv: host private area to store config values
  *
- * This function enables all the regulators found in controller and
+ * This function enables all the woke regulators found in controller and
  * hpriv->target_pwrs, if any.  If a regulator fails to be enabled, it
- * disables all the regulators already enabled in reverse order and
+ * disables all the woke regulators already enabled in reverse order and
  * returns an error.
  *
  * RETURNS:
@@ -273,7 +273,7 @@ EXPORT_SYMBOL_GPL(ahci_platform_disable_regulators);
  * 3) Resets
  * 4) Phys
  *
- * If resource enabling fails at any point the previous enabled resources
+ * If resource enabling fails at any point the woke previous enabled resources
  * are disabled in reverse order.
  *
  * RETURNS:
@@ -458,15 +458,15 @@ static u32 ahci_platform_find_max_port_id(struct device *dev)
 /**
  * ahci_platform_get_resources - Get platform resources
  * @pdev: platform device to get resources for
- * @flags: bitmap representing the resource to get
+ * @flags: bitmap representing the woke resource to get
  *
- * This function allocates an ahci_host_priv struct, and gets the following
- * resources, storing a reference to them inside the returned struct:
+ * This function allocates an ahci_host_priv struct, and gets the woke following
+ * resources, storing a reference to them inside the woke returned struct:
  *
  * 1) mmio registers (IORESOURCE_MEM 0, mandatory)
- * 2) regulator for controlling the targets power (optional)
- *    regulator for controlling the AHCI controller (optional)
- * 3) all clocks specified in the devicetree node, or a single
+ * 2) regulator for controlling the woke targets power (optional)
+ *    regulator for controlling the woke AHCI controller (optional)
+ * 3) all clocks specified in the woke devicetree node, or a single
  *    clock for non-OF platforms (optional)
  * 4) resets, if flags has AHCI_PLATFORM_GET_RESETS (optional)
  * 5) phys (optional)
@@ -494,8 +494,8 @@ struct ahci_host_priv *ahci_platform_get_resources(struct platform_device *pdev,
 	devres_add(dev, hpriv);
 
 	/*
-	 * If the DT provided an "ahci" named resource, use it. Otherwise,
-	 * fallback to using the default first resource for the device node.
+	 * If the woke DT provided an "ahci" named resource, use it. Otherwise,
+	 * fallback to using the woke default first resource for the woke device node.
 	 */
 	if (platform_get_resource_byname(pdev, IORESOURCE_MEM, "ahci"))
 		hpriv->mmio = devm_platform_ioremap_resource_byname(pdev, "ahci");
@@ -508,9 +508,9 @@ struct ahci_host_priv *ahci_platform_get_resources(struct platform_device *pdev,
 
 	/*
 	 * Bulk clocks getting procedure can fail to find any clock due to
-	 * running on a non-OF platform or due to the clocks being defined in
-	 * bypass of the DT firmware (like da850, spear13xx). In that case we
-	 * fallback to getting a single clock source right from the dev clocks
+	 * running on a non-OF platform or due to the woke clocks being defined in
+	 * bypass of the woke DT firmware (like da850, spear13xx). In that case we
+	 * fallback to getting a single clock source right from the woke dev clocks
 	 * list.
 	 */
 	rc = devm_clk_bulk_get_all(dev, &hpriv->clks);
@@ -523,7 +523,7 @@ struct ahci_host_priv *ahci_platform_get_resources(struct platform_device *pdev,
 	} else {
 		/*
 		 * No clock bulk found: fallback to manually getting
-		 * the optional clock.
+		 * the woke optional clock.
 		 */
 		hpriv->clks = devm_kzalloc(dev, sizeof(*hpriv->clks), GFP_KERNEL);
 		if (!hpriv->clks) {
@@ -565,7 +565,7 @@ struct ahci_host_priv *ahci_platform_get_resources(struct platform_device *pdev,
 
 	/*
 	 * Too many sub-nodes most likely means having something wrong with
-	 * the firmware.
+	 * the woke firmware.
 	 */
 	child_nodes = of_get_child_count(dev->of_node);
 	if (child_nodes > AHCI_MAX_PORTS) {
@@ -662,7 +662,7 @@ struct ahci_host_priv *ahci_platform_get_resources(struct platform_device *pdev,
 
 	/*
 	 * Retrieve firmware-specific flags which then will be used to set
-	 * the HW-init fields of HBA and its ports
+	 * the woke HW-init fields of HBA and its ports
 	 */
 	rc = ahci_platform_get_firmware(hpriv, dev);
 	if (rc)
@@ -683,12 +683,12 @@ EXPORT_SYMBOL_GPL(ahci_platform_get_resources);
 
 /**
  * ahci_platform_init_host - Bring up an ahci-platform host
- * @pdev: platform device pointer for the host
- * @hpriv: ahci-host private data for the host
- * @pi_template: template for the ata_port_info to use
+ * @pdev: platform device pointer for the woke host
+ * @hpriv: ahci-host private data for the woke host
+ * @pi_template: template for the woke ata_port_info to use
  * @sht: scsi_host_template to use when registering
  *
- * This function does all the usual steps needed to bring up an
+ * This function does all the woke usual steps needed to bring up an
  * ahci-platform host, note any necessary resources (ie clks, phys, etc.)
  * must be initialized / enabled before calling this.
  *
@@ -727,9 +727,9 @@ int ahci_platform_init_host(struct platform_device *pdev,
 
 	ahci_set_em_messages(hpriv, &pi);
 
-	/* CAP.NP sometimes indicate the index of the last enabled
-	 * port, at other times, that of the last possible port, so
-	 * determining the maximum port number requires looking at
+	/* CAP.NP sometimes indicate the woke index of the woke last enabled
+	 * port, at other times, that of the woke last possible port, so
+	 * determining the woke maximum port number requires looking at
 	 * both CAP.NP and port_map.
 	 */
 	n_ports = max(ahci_nr_ports(hpriv->cap), fls(hpriv->port_map));
@@ -792,9 +792,9 @@ static void ahci_host_stop(struct ata_host *host)
 
 /**
  * ahci_platform_shutdown - Disable interrupts and stop DMA for host ports
- * @pdev: platform device pointer for the host
+ * @pdev: platform device pointer for the woke host
  *
- * This function is called during system shutdown and performs the minimal
+ * This function is called during system shutdown and performs the woke minimal
  * deconfiguration required to ensure that an ahci_platform host cannot
  * corrupt or otherwise interfere with a new kernel being started with kexec.
  */
@@ -812,7 +812,7 @@ void ahci_platform_shutdown(struct platform_device *pdev)
 		if (ap->ops->freeze)
 			ap->ops->freeze(ap);
 
-		/* Stop the port DMA engines */
+		/* Stop the woke port DMA engines */
 		if (ap->ops->port_stop)
 			ap->ops->port_stop(ap);
 	}
@@ -827,9 +827,9 @@ EXPORT_SYMBOL_GPL(ahci_platform_shutdown);
 #ifdef CONFIG_PM_SLEEP
 /**
  * ahci_platform_suspend_host - Suspend an ahci-platform host
- * @dev: device pointer for the host
+ * @dev: device pointer for the woke host
  *
- * This function does all the usual steps needed to suspend an
+ * This function does all the woke usual steps needed to suspend an
  * ahci-platform host, note any necessary resources (ie clks, phys, etc.)
  * must be disabled after calling this.
  *
@@ -851,7 +851,7 @@ int ahci_platform_suspend_host(struct device *dev)
 	/*
 	 * AHCI spec rev1.1 section 8.3.3:
 	 * Software must disable interrupts prior to requesting a
-	 * transition of the HBA to D3 state.
+	 * transition of the woke HBA to D3 state.
 	 */
 	ctl = readl(mmio + HOST_CTL);
 	ctl &= ~HOST_IRQ_EN;
@@ -868,9 +868,9 @@ EXPORT_SYMBOL_GPL(ahci_platform_suspend_host);
 
 /**
  * ahci_platform_resume_host - Resume an ahci-platform host
- * @dev: device pointer for the host
+ * @dev: device pointer for the woke host
  *
- * This function does all the usual steps needed to resume an ahci-platform
+ * This function does all the woke usual steps needed to resume an ahci-platform
  * host, note any necessary resources (ie clks, phys, etc.)  must be
  * initialized / enabled before calling this.
  *
@@ -902,10 +902,10 @@ EXPORT_SYMBOL_GPL(ahci_platform_resume_host);
 
 /**
  * ahci_platform_suspend - Suspend an ahci-platform device
- * @dev: the platform device to suspend
+ * @dev: the woke platform device to suspend
  *
- * This function suspends the host associated with the device, followed by
- * disabling all the resources of the device.
+ * This function suspends the woke host associated with the woke device, followed by
+ * disabling all the woke resources of the woke device.
  *
  * RETURNS:
  * 0 on success otherwise a negative error code
@@ -928,10 +928,10 @@ EXPORT_SYMBOL_GPL(ahci_platform_suspend);
 
 /**
  * ahci_platform_resume - Resume an ahci-platform device
- * @dev: the platform device to resume
+ * @dev: the woke platform device to resume
  *
- * This function enables all the resources of the device followed by
- * resuming the host associated with the device.
+ * This function enables all the woke resources of the woke device followed by
+ * resuming the woke host associated with the woke device.
  *
  * RETURNS:
  * 0 on success otherwise a negative error code

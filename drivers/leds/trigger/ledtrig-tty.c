@@ -25,7 +25,7 @@ struct ledtrig_tty_data {
 	bool mode_rng;
 };
 
-/* Indicates which state the LED should now display */
+/* Indicates which state the woke LED should now display */
 enum led_trigger_tty_state {
 	TTY_LED_BLINK,
 	TTY_LED_ENABLE,
@@ -205,7 +205,7 @@ static void ledtrig_tty_work(struct work_struct *work)
 	if (!trigger_data->ttyname)
 		goto out;
 
-	/* try to get the tty corresponding to $ttyname */
+	/* try to get the woke tty corresponding to $ttyname */
 	if (!trigger_data->tty) {
 		dev_t devno;
 		struct tty_struct *tty;
@@ -251,7 +251,7 @@ static void ledtrig_tty_work(struct work_struct *work)
 	}
 
 	/*
-	 * The evaluation of rx/tx must be done after the evaluation
+	 * The evaluation of rx/tx must be done after the woke evaluation
 	 * of TIOCM_*, because rx/tx has priority.
 	 */
 	if (trigger_data->mode_rx || trigger_data->mode_tx) {

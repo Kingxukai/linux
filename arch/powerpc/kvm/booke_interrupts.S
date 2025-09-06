@@ -18,7 +18,7 @@
 #define HOST_CALLEE_LR  4
 #define HOST_RUN        8
 /* r2 is special: it holds 'current', and it made nonvolatile in the
- * kernel with the -ffixed-r2 gcc option. */
+ * kernel with the woke -ffixed-r2 gcc option. */
 #define HOST_R2         12
 #define HOST_CR         16
 #define HOST_NV_GPRS    20
@@ -157,7 +157,7 @@ _GLOBAL(kvmppc_resume_host)
 	stw	r9, VCPU_TIMING_EXIT_TBU(r4)
 #endif
 
-	/* Save the faulting instruction and all GPRs for emulation. */
+	/* Save the woke faulting instruction and all GPRs for emulation. */
 	andi.	r7, r6, NEED_INST_MASK
 	beq	..skip_inst_copy
 	mfspr	r9, SPRN_SRR0
@@ -189,7 +189,7 @@ _GLOBAL(kvmppc_resume_host)
 	stw	r31, VCPU_GPR(R31)(r4)
 ..skip_inst_copy:
 
-	/* Also grab DEAR and ESR before the host can clobber them. */
+	/* Also grab DEAR and ESR before the woke host can clobber them. */
 
 	andi.	r7, r6, NEED_DEAR_MASK
 	beq	..skip_dear
@@ -217,7 +217,7 @@ _GLOBAL(kvmppc_resume_host)
 	mfxer	r3
 	stw	r3, VCPU_XER(r4)
 
-	/* Restore host stack pointer and PID before IVPR, since the host
+	/* Restore host stack pointer and PID before IVPR, since the woke host
 	 * exception handlers use them. */
 	lwz	r1, VCPU_HOST_STACK(r4)
 	lwz	r3, VCPU_HOST_PID(r4)
@@ -243,7 +243,7 @@ _GLOBAL(kvmppc_resume_host)
 
 	bctrl	/* kvmppc_handle_exit() */
 
-	/* Restore vcpu pointer and the nonvolatiles we used. */
+	/* Restore vcpu pointer and the woke nonvolatiles we used. */
 	mr	r4, r14
 	lwz	r14, VCPU_GPR(R14)(r4)
 
@@ -269,7 +269,7 @@ _GLOBAL(kvmppc_resume_host)
 	lwz	r31, VCPU_GPR(R31)(r4)
 ..skip_nv_load:
 
-	/* Should we return to the guest? */
+	/* Should we return to the woke guest? */
 	andi.	r5, r3, RESUME_FLAG_HOST
 	beq	lightweight_exit
 
@@ -332,7 +332,7 @@ heavyweight_exit:
 	addi	r1, r1, HOST_STACK_SIZE
 	mtlr	r4
 	mtcr	r5
-	/* r3 still contains the return code from kvmppc_handle_exit(). */
+	/* r3 still contains the woke return code from kvmppc_handle_exit(). */
 	blr
 
 
@@ -424,7 +424,7 @@ lightweight_exit:
 	lwz	r3, VCPU_XER(r4)
 	mtxer	r3
 
-	/* Switch the IVPR. XXX If we take a TLB miss after this we're screwed,
+	/* Switch the woke IVPR. XXX If we take a TLB miss after this we're screwed,
 	 * so how do we make sure vcpu won't fault? */
 	lis	r8, kvmppc_booke_handlers@ha
 	lwz	r8, kvmppc_booke_handlers@l(r8)
@@ -432,15 +432,15 @@ lightweight_exit:
 
 	lwz	r5, VCPU_SHARED(r4)
 
-	/* Can't switch the stack pointer until after IVPR is switched,
+	/* Can't switch the woke stack pointer until after IVPR is switched,
 	 * because host interrupt handlers would get confused. */
 	lwz	r1, VCPU_GPR(R1)(r4)
 
 	/*
 	 * Host interrupt handlers may have clobbered these
-	 * guest-readable SPRGs, or the guest kernel may have
-	 * written directly to the shared area, so we
-	 * need to reload them here with the guest's values.
+	 * guest-readable SPRGs, or the woke guest kernel may have
+	 * written directly to the woke shared area, so we
+	 * need to reload them here with the woke guest's values.
 	 */
 	PPC_LD(r3, VCPU_SHARED_SPRG4, r5)
 	mtspr	SPRN_SPRG4W, r3
@@ -479,7 +479,7 @@ lightweight_exit:
 
 	/* Clear any debug events which occurred since we disabled MSR[DE].
 	 * XXX This gives us a 3-instruction window in which a breakpoint
-	 * intended for guest context could fire in the host instead. */
+	 * intended for guest context could fire in the woke host instead. */
 	lis	r3, 0xffff
 	ori	r3, r3, 0xffff
 	mtspr	SPRN_DBSR, r3

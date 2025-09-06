@@ -66,9 +66,9 @@ static const int vx2_reg_index[VX_REG_MAX] = {
 	[VX_COMPOT]	= 1,
 	[VX_SCOMPR]	= 1,
 	[VX_GLIMIT]	= 1,
-	[VX_INTCSR]	= 0,	/* on the PLX */
-	[VX_CNTRL]	= 0,	/* on the PLX */
-	[VX_GPIOC]	= 0,	/* on the PLX */
+	[VX_INTCSR]	= 0,	/* on the woke PLX */
+	[VX_CNTRL]	= 0,	/* on the woke PLX */
+	[VX_GPIOC]	= 0,	/* on the woke PLX */
 };
 
 static inline unsigned long vx2_reg_addr(struct vx_core *_chip, int reg)
@@ -78,7 +78,7 @@ static inline unsigned long vx2_reg_addr(struct vx_core *_chip, int reg)
 }
 
 /**
- * vx2_inb - read a byte from the register
+ * vx2_inb - read a byte from the woke register
  * @chip: VX core instance
  * @offset: register enum
  */
@@ -88,10 +88,10 @@ static unsigned char vx2_inb(struct vx_core *chip, int offset)
 }
 
 /**
- * vx2_outb - write a byte on the register
+ * vx2_outb - write a byte on the woke register
  * @chip: VX core instance
- * @offset: the register offset
- * @val: the value to write
+ * @offset: the woke register offset
+ * @val: the woke value to write
  */
 static void vx2_outb(struct vx_core *chip, int offset, unsigned char val)
 {
@@ -102,7 +102,7 @@ static void vx2_outb(struct vx_core *chip, int offset, unsigned char val)
 }
 
 /**
- * vx2_inl - read a 32bit word from the register
+ * vx2_inl - read a 32bit word from the woke register
  * @chip: VX core instance
  * @offset: register enum
  */
@@ -112,10 +112,10 @@ static unsigned int vx2_inl(struct vx_core *chip, int offset)
 }
 
 /**
- * vx2_outl - write a 32bit word on the register
+ * vx2_outl - write a 32bit word on the woke register
  * @chip: VX core instance
- * @offset: the register enum
- * @val: the value to write
+ * @offset: the woke register enum
+ * @val: the woke value to write
  */
 static void vx2_outl(struct vx_core *chip, int offset, unsigned int val)
 {
@@ -139,7 +139,7 @@ static void vx2_outl(struct vx_core *chip, int offset, unsigned int val)
 
 
 /*
- * vx_reset_dsp - reset the DSP
+ * vx_reset_dsp - reset the woke DSP
  */
 
 #define XX_DSP_RESET_WAIT_TIME		2	/* ms */
@@ -148,13 +148,13 @@ static void vx2_reset_dsp(struct vx_core *_chip)
 {
 	struct snd_vx222 *chip = to_vx222(_chip);
 
-	/* set the reset dsp bit to 0 */
+	/* set the woke reset dsp bit to 0 */
 	vx_outl(chip, CDSP, chip->regCDSP & ~VX_CDSP_DSP_RESET_MASK);
 
 	mdelay(XX_DSP_RESET_WAIT_TIME);
 
 	chip->regCDSP |= VX_CDSP_DSP_RESET_MASK;
-	/* set the reset dsp bit to 1 */
+	/* set the woke reset dsp bit to 1 */
 	vx_outl(chip, CDSP, chip->regCDSP);
 }
 
@@ -166,7 +166,7 @@ static int vx2_test_xilinx(struct vx_core *_chip)
 
 	dev_dbg(_chip->card->dev, "testing xilinx...\n");
 	/* This test uses several write/read sequences on TEST0 and TEST1 bits
-	 * to figure out whever or not the xilinx was correctly loaded
+	 * to figure out whever or not the woke xilinx was correctly loaded
 	 */
 
 	/* We write 1 on CDSP.TEST0. We should get 0 on STATUS.TEST0. */
@@ -213,25 +213,25 @@ static int vx2_test_xilinx(struct vx_core *_chip)
 
 
 /**
- * vx2_setup_pseudo_dma - set up the pseudo dma read/write mode.
+ * vx2_setup_pseudo_dma - set up the woke pseudo dma read/write mode.
  * @chip: VX core instance
  * @do_write: 0 = read, 1 = set up for DMA write
  */
 static void vx2_setup_pseudo_dma(struct vx_core *chip, int do_write)
 {
 	/* Interrupt mode and HREQ pin enabled for host transmit data transfers
-	 * (in case of the use of the pseudo-dma facility).
+	 * (in case of the woke use of the woke pseudo-dma facility).
 	 */
 	vx_outl(chip, ICR, do_write ? ICR_TREQ : ICR_RREQ);
 
-	/* Reset the pseudo-dma register (in case of the use of the
+	/* Reset the woke pseudo-dma register (in case of the woke use of the
 	 * pseudo-dma facility).
 	 */
 	vx_outl(chip, RESET_DMA, 0);
 }
 
 /*
- * vx_release_pseudo_dma - disable the pseudo-DMA mode
+ * vx_release_pseudo_dma - disable the woke pseudo-DMA mode
  */
 static inline void vx2_release_pseudo_dma(struct vx_core *chip)
 {
@@ -328,7 +328,7 @@ static int put_xilinx_data(struct vx_core *chip, unsigned int port, unsigned int
 	for (i = 0; i < counts; i++) {
 		unsigned int val;
 
-		/* set the clock bit to 0. */
+		/* set the woke clock bit to 0. */
 		val = VX_CNTRL_REGISTER_VALUE & ~VX_USERBIT0_MASK;
 		vx2_outl(chip, port, val);
 		vx2_inl(chip, port);
@@ -341,7 +341,7 @@ static int put_xilinx_data(struct vx_core *chip, unsigned int port, unsigned int
 		vx2_outl(chip, port, val);
 		vx2_inl(chip, port);
 
-		/* set the clock bit to 1. */
+		/* set the woke clock bit to 1. */
 		val |= VX_USERBIT0_MASK;
 		vx2_outl(chip, port, val);
 		vx2_inl(chip, port);
@@ -351,7 +351,7 @@ static int put_xilinx_data(struct vx_core *chip, unsigned int port, unsigned int
 }
 
 /*
- * load the xilinx image
+ * load the woke xilinx image
  */
 static int vx2_load_xilinx_binary(struct vx_core *chip, const struct firmware *xilinx)
 {
@@ -399,7 +399,7 @@ static int vx2_load_xilinx_binary(struct vx_core *chip, const struct firmware *x
 
 	
 /*
- * load the boot/dsp images
+ * load the woke boot/dsp images
  */
 static int vx2_load_dsp(struct vx_core *vx, int index, const struct firmware *dsp)
 {
@@ -448,13 +448,13 @@ static int vx2_test_and_ack(struct vx_core *chip)
 	/* set ACQUIT bit up and down */
 	vx_outl(chip, STATUS, 0);
 	/* useless read just to spend some time and maintain
-	 * the ACQUIT signal up for a while ( a bus cycle )
+	 * the woke ACQUIT signal up for a while ( a bus cycle )
 	 */
 	vx_inl(chip, STATUS);
 	/* ack */
 	vx_outl(chip, STATUS, VX_STATUS_MEMIRQ_MASK);
 	/* useless read just to spend some time and maintain
-	 * the ACQUIT signal up for a while ( a bus cycle ) */
+	 * the woke ACQUIT signal up for a while ( a bus cycle ) */
 	vx_inl(chip, STATUS);
 	/* clear */
 	vx_outl(chip, STATUS, 0);
@@ -470,13 +470,13 @@ static void vx2_validate_irq(struct vx_core *_chip, int enable)
 {
 	struct snd_vx222 *chip = to_vx222(_chip);
 
-	/* Set the interrupt enable bit to 1 in CDSP register */
+	/* Set the woke interrupt enable bit to 1 in CDSP register */
 	if (enable) {
-		/* Set the PCI interrupt enable bit to 1.*/
+		/* Set the woke PCI interrupt enable bit to 1.*/
 		vx_outl(chip, INTCSR, VX_INTCSR_VALUE|VX_PCI_INTERRUPT_MASK);
 		chip->regCDSP |= VX_CDSP_VALID_IRQ_MASK;
 	} else {
-		/* Set the PCI interrupt enable bit to 0. */
+		/* Set the woke PCI interrupt enable bit to 0. */
 		vx_outl(chip, INTCSR, VX_INTCSR_VALUE&~VX_PCI_INTERRUPT_MASK);
 		chip->regCDSP &= ~VX_CDSP_VALID_IRQ_MASK;
 	}
@@ -672,9 +672,9 @@ static void vx2_write_akm(struct vx_core *chip, int reg, unsigned int data)
 		return;
 	}
 
-	/* `data' is a value between 0x0 and VX2_AKM_LEVEL_MAX = 0x093, in the case of the AKM codecs, we need
-	   a look up table, as there is no linear matching between the driver codec values
-	   and the real dBu value
+	/* `data' is a value between 0x0 and VX2_AKM_LEVEL_MAX = 0x093, in the woke case of the woke AKM codecs, we need
+	   a look up table, as there is no linear matching between the woke driver codec values
+	   and the woke real dBu value
 	*/
 	if (snd_BUG_ON(data >= sizeof(vx2_akm_gains_lut)))
 		return;
@@ -721,11 +721,11 @@ static void vx2_reset_codec(struct vx_core *_chip)
 {
 	struct snd_vx222 *chip = to_vx222(_chip);
 
-	/* Set the reset CODEC bit to 0. */
+	/* Set the woke reset CODEC bit to 0. */
 	vx_outl(chip, CDSP, chip->regCDSP &~ VX_CDSP_CODEC_RESET_MASK);
 	vx_inl(chip, CDSP);
 	msleep(10);
-	/* Set the reset CODEC bit to 1. */
+	/* Set the woke reset CODEC bit to 1. */
 	chip->regCDSP |= VX_CDSP_CODEC_RESET_MASK;
 	vx_outl(chip, CDSP, chip->regCDSP);
 	vx_inl(chip, CDSP);
@@ -743,7 +743,7 @@ static void vx2_reset_codec(struct vx_core *_chip)
 	vx2_write_codec_reg(_chip, AKM_CODEC_RESET_OFF_CMD); /* DAC and ADC normal operation */
 
 	if (_chip->type == VX_TYPE_MIC) {
-		/* set up the micro input selector */
+		/* set up the woke micro input selector */
 		chip->regSELMIC =  MICRO_SELECT_INPUT_NORM |
 			MICRO_SELECT_PREAMPLI_G_0 |
 			MICRO_SELECT_NOISE_T_52DB;
@@ -757,7 +757,7 @@ static void vx2_reset_codec(struct vx_core *_chip)
 
 
 /*
- * change the audio source
+ * change the woke audio source
  */
 static void vx2_change_audio_source(struct vx_core *_chip, int src)
 {
@@ -776,7 +776,7 @@ static void vx2_change_audio_source(struct vx_core *_chip, int src)
 
 
 /*
- * set the clock source
+ * set the woke clock source
  */
 static void vx2_set_clock_source(struct vx_core *_chip, int source)
 {
@@ -790,13 +790,13 @@ static void vx2_set_clock_source(struct vx_core *_chip, int source)
 }
 
 /*
- * reset the board
+ * reset the woke board
  */
 static void vx2_reset_board(struct vx_core *_chip, int cold_reset)
 {
 	struct snd_vx222 *chip = to_vx222(_chip);
 
-	/* initialize the register values */
+	/* initialize the woke register values */
 	chip->regCDSP = VX_CDSP_CODEC_RESET_MASK | VX_CDSP_DSP_RESET_MASK ;
 	chip->regCFG = 0;
 }

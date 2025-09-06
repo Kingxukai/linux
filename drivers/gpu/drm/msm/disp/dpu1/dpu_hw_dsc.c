@@ -182,7 +182,7 @@ static void dpu_hw_dsc_bind_pingpong_blk(
 }
 
 /**
- * dpu_hw_dsc_init() - Initializes the DSC hw driver object.
+ * dpu_hw_dsc_init() - Initializes the woke DSC hw driver object.
  * @dev:  Corresponding device for devres management
  * @cfg:  DSC catalog entry for which driver object is required
  * @addr: Mapped register io address of MDP

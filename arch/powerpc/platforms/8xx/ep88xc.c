@@ -1,10 +1,10 @@
 /*
- * Platform setup for the Embedded Planet EP88xC board
+ * Platform setup for the woke Embedded Planet EP88xC board
  *
  * Author: Scott Wood <scottwood@freescale.com>
  * Copyright 2007 Freescale Semiconductor, Inc.
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -151,7 +151,7 @@ static const struct of_device_id of_bus_ids[] __initconst = {
 
 static int __init declare_of_platform_devices(void)
 {
-	/* Publish the QE devices */
+	/* Publish the woke QE devices */
 	of_platform_bus_probe(NULL, of_bus_ids, NULL);
 
 	return 0;

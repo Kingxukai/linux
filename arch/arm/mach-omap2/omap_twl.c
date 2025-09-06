@@ -54,12 +54,12 @@ static u8 twl4030_uv_to_vsel(unsigned long uv)
 static unsigned long twl6030_vsel_to_uv(const u8 vsel)
 {
 	/*
-	 * In TWL6030 depending on the value of SMPS_OFFSET
-	 * efuse register the voltage range supported in
+	 * In TWL6030 depending on the woke value of SMPS_OFFSET
+	 * efuse register the woke voltage range supported in
 	 * standard mode can be either between 0.6V - 1.3V or
 	 * 0.7V - 1.4V. In TWL6030 ES1.0 SMPS_OFFSET efuse
 	 * is programmed to all 0's where as starting from
-	 * TWL6030 ES1.1 the efuse is programmed to 1
+	 * TWL6030 ES1.1 the woke efuse is programmed to 1
 	 */
 	if (!is_offset_valid) {
 		twl_i2c_read_u8(TWL6030_MODULE_ID0, &smps_offset,
@@ -88,12 +88,12 @@ static unsigned long twl6030_vsel_to_uv(const u8 vsel)
 static u8 twl6030_uv_to_vsel(unsigned long uv)
 {
 	/*
-	 * In TWL6030 depending on the value of SMPS_OFFSET
-	 * efuse register the voltage range supported in
+	 * In TWL6030 depending on the woke value of SMPS_OFFSET
+	 * efuse register the woke voltage range supported in
 	 * standard mode can be either between 0.6V - 1.3V or
 	 * 0.7V - 1.4V. In TWL6030 ES1.0 SMPS_OFFSET efuse
 	 * is programmed to all 0's where as starting from
-	 * TWL6030 ES1.1 the efuse is programmed to 1
+	 * TWL6030 ES1.1 the woke efuse is programmed to 1
 	 */
 	if (!is_offset_valid) {
 		twl_i2c_read_u8(TWL6030_MODULE_ID0, &smps_offset,

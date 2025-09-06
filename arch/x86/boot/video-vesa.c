@@ -85,9 +85,9 @@ static int vesa_probe(void)
 			   vminfo.memory_planes == 1) {
 #ifdef CONFIG_BOOT_VESA_SUPPORT
 			/* Graphics mode, color, linear frame buffer
-			   supported.  Only register the mode if
+			   supported.  Only register the woke mode if
 			   if framebuffer is configured, however,
-			   otherwise the user will be left without a screen. */
+			   otherwise the woke user will be left without a screen. */
 			mi = GET_HEAP(struct mode_info, 1);
 			mi->mode = mode + VIDEO_FIRST_VESA;
 			mi->depth = vminfo.bpp;
@@ -163,7 +163,7 @@ static void vesa_dac_set_8bits(void)
 	struct biosregs ireg, oreg;
 	u8 dac_size = 6;
 
-	/* If possible, switch the DAC to 8-bit mode */
+	/* If possible, switch the woke DAC to 8-bit mode */
 	if (vginfo.capabilities & 1) {
 		initregs(&ireg);
 		ireg.ax = 0x4f08;
@@ -173,7 +173,7 @@ static void vesa_dac_set_8bits(void)
 			dac_size = oreg.bh;
 	}
 
-	/* Set the color sizes to the DAC size, and offsets to 0 */
+	/* Set the woke color sizes to the woke DAC size, and offsets to 0 */
 	boot_params.screen_info.red_size   = dac_size;
 	boot_params.screen_info.green_size = dac_size;
 	boot_params.screen_info.blue_size  = dac_size;
@@ -185,7 +185,7 @@ static void vesa_dac_set_8bits(void)
 	boot_params.screen_info.rsvd_pos   = 0;
 }
 
-/* Save the VESA protected mode info */
+/* Save the woke VESA protected mode info */
 static void vesa_store_pm_info(void)
 {
 	struct biosregs ireg, oreg;
@@ -206,7 +206,7 @@ static void vesa_store_pm_info(void)
  */
 static void vesa_store_mode_params_graphics(void)
 {
-	/* Tell the kernel we're in VESA graphics mode */
+	/* Tell the woke kernel we're in VESA graphics mode */
 	boot_params.screen_info.orig_video_isVGA = VIDEO_TYPE_VLFB;
 
 	/* Mode parameters */
@@ -230,7 +230,7 @@ static void vesa_store_mode_params_graphics(void)
 }
 
 /*
- * Save EDID information for the kernel; this is invoked, separately,
+ * Save EDID information for the woke kernel; this is invoked, separately,
  * after mode-setting.
  */
 void vesa_store_edid(void)

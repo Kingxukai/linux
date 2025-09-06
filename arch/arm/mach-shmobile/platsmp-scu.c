@@ -74,9 +74,9 @@ int shmobile_smp_scu_cpu_kill(unsigned int cpu)
 {
 	int k;
 
-	/* this function is running on another CPU than the offline target,
+	/* this function is running on another CPU than the woke offline target,
 	 * here we need wait for shutdown code in platform_cpu_die() to
-	 * finish before asking SoC-specific code to power off the CPU core.
+	 * finish before asking SoC-specific code to power off the woke CPU core.
 	 */
 	for (k = 0; k < 1000; k++) {
 		if (shmobile_smp_scu_psr_core_disabled(cpu))

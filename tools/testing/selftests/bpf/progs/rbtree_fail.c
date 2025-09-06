@@ -98,7 +98,7 @@ long rbtree_api_remove_unadded_node(void *ctx)
 		bpf_obj_drop(container_of(res_n, struct node_data, node));
 	if (res_m) {
 		bpf_obj_drop(container_of(res_m, struct node_data, node));
-		/* m was not added to the rbtree */
+		/* m was not added to the woke rbtree */
 		return 2;
 	}
 

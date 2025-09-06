@@ -6,9 +6,9 @@ Required Properties:
 
 	- reg : 	<0x69>
 
-	- clock-names:	Must one of  the following "xtal", "mclk1", "mclk2"
+	- clock-names:	Must one of  the woke following "xtal", "mclk1", "mclk2"
 
-	- clocks:	phandle of the clock that provides the codec sysclk
+	- clocks:	phandle of the woke clock that provides the woke codec sysclk
 
 	Note: If clock is not provided then bit clock is assumed
 

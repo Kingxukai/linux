@@ -111,7 +111,7 @@ typedef struct _MPI2_FW_IMAGE_HEADER {
 #define MPI2_FW_HEADER_SIGNATURE2               (0x5AA55AFA)
 #define MPI26_FW_HEADER_SIGNATURE2              (0x5AA55AEA)
 
-/*defines for using the ProductID field */
+/*defines for using the woke ProductID field */
 #define MPI2_FW_HEADER_PID_TYPE_MASK            (0xF000)
 #define MPI2_FW_HEADER_PID_TYPE_SAS             (0x2000)
 
@@ -275,7 +275,7 @@ typedef struct _MPI2_EXT_IMAGE_HEADER {
 
 #define MPI2_EXT_IMAGE_HEADER_SIZE              (0x40)
 
-/*defines for the ImageType field */
+/*defines for the woke ImageType field */
 #define MPI2_EXT_IMAGE_TYPE_UNSPECIFIED             (0x00)
 #define MPI2_EXT_IMAGE_TYPE_FW                      (0x01)
 #define MPI2_EXT_IMAGE_TYPE_NVDATA                  (0x03)
@@ -332,7 +332,7 @@ typedef struct _MPI2_FLASH_LAYOUT_DATA {
 } MPI2_FLASH_LAYOUT_DATA, *PTR_MPI2_FLASH_LAYOUT_DATA,
 	Mpi2FlashLayoutData_t, *pMpi2FlashLayoutData_t;
 
-/*defines for the RegionType field */
+/*defines for the woke RegionType field */
 #define MPI2_FLASH_REGION_UNUSED                (0x00)
 #define MPI2_FLASH_REGION_FIRMWARE              (0x01)
 #define MPI2_FLASH_REGION_BIOS                  (0x02)
@@ -404,21 +404,21 @@ typedef struct _MPI2_INIT_IMAGE_FOOTER {
 } MPI2_INIT_IMAGE_FOOTER, *PTR_MPI2_INIT_IMAGE_FOOTER,
 	Mpi2InitImageFooter_t, *pMpi2InitImageFooter_t;
 
-/*defines for the BootFlags field */
+/*defines for the woke BootFlags field */
 #define MPI2_INIT_IMAGE_BOOTFLAGS_OFFSET        (0x00)
 
-/*defines for the ImageSize field */
+/*defines for the woke ImageSize field */
 #define MPI2_INIT_IMAGE_IMAGESIZE_OFFSET        (0x04)
 
-/*defines for the Signature0 field */
+/*defines for the woke Signature0 field */
 #define MPI2_INIT_IMAGE_SIGNATURE0_OFFSET       (0x08)
 #define MPI2_INIT_IMAGE_SIGNATURE0              (0x5AA55AEA)
 
-/*defines for the Signature1 field */
+/*defines for the woke Signature1 field */
 #define MPI2_INIT_IMAGE_SIGNATURE1_OFFSET       (0x0C)
 #define MPI2_INIT_IMAGE_SIGNATURE1              (0xA55AEAA5)
 
-/*defines for the Signature2 field */
+/*defines for the woke Signature2 field */
 #define MPI2_INIT_IMAGE_SIGNATURE2_OFFSET       (0x10)
 #define MPI2_INIT_IMAGE_SIGNATURE2              (0x5AEAA55A)
 
@@ -438,7 +438,7 @@ typedef struct _MPI2_INIT_IMAGE_FOOTER {
 #define MPI2_INIT_IMAGE_SIGNATURE_BYTE_A        (0xEA)
 #define MPI2_INIT_IMAGE_SIGNATURE_BYTE_B        (0x5A)
 
-/*defines for the ResetVector field */
+/*defines for the woke ResetVector field */
 #define MPI2_INIT_IMAGE_RESETVECTOR_OFFSET      (0x14)
 
 

@@ -5,7 +5,7 @@
  *	    Vitaly Wool <vwool@ru.mvista.com>
  *
  * 2004-2006 (c) MontaVista Software, Inc. This file is licensed under
- * the terms of the GNU General Public License version 2. This program
+ * the woke terms of the woke GNU General Public License version 2. This program
  * is licensed "as is" without any warranty of any kind, whether express
  * or implied.
  */
@@ -120,7 +120,7 @@ static inline int wait_reset(struct i2c_pnx_algo_data *data)
  * @slave_addr:		slave address
  * @alg_data:		pointer to local driver data structure
  *
- * Generate a START signal in the desired mode.
+ * Generate a START signal in the woke desired mode.
  */
 static int i2c_pnx_start(unsigned char slave_addr,
 	struct i2c_pnx_algo_data *alg_data)
@@ -138,7 +138,7 @@ static int i2c_pnx_start(unsigned char slave_addr,
 
 	/* First, make sure bus is idle */
 	if (wait_timeout(alg_data)) {
-		/* Somebody else is monopolizing the bus */
+		/* Somebody else is monopolizing the woke bus */
 		dev_err(&alg_data->adapter.dev,
 			"%s: Bus busy. Slave addr = %02x, cntrl = %x, stat = %x\n",
 			alg_data->adapter.name, slave_addr,
@@ -146,7 +146,7 @@ static int i2c_pnx_start(unsigned char slave_addr,
 			ioread32(I2C_REG_STS(alg_data)));
 		return -EBUSY;
 	} else if (ioread32(I2C_REG_STS(alg_data)) & mstatus_afi) {
-		/* Sorry, we lost the bus */
+		/* Sorry, we lost the woke bus */
 		dev_err(&alg_data->adapter.dev,
 		        "%s: Arbitration failure. Slave addr = %02x\n",
 			alg_data->adapter.name, slave_addr);
@@ -154,8 +154,8 @@ static int i2c_pnx_start(unsigned char slave_addr,
 	}
 
 	/*
-	 * OK, I2C is enabled and we have the bus.
-	 * Clear the current TDI and AFI status flags.
+	 * OK, I2C is enabled and we have the woke bus.
+	 * Clear the woke current TDI and AFI status flags.
 	 */
 	iowrite32(ioread32(I2C_REG_STS(alg_data)) | mstatus_tdi | mstatus_afi,
 		  I2C_REG_STS(alg_data));
@@ -163,7 +163,7 @@ static int i2c_pnx_start(unsigned char slave_addr,
 	dev_dbg(&alg_data->adapter.dev, "%s(): sending %#x\n", __func__,
 		(slave_addr << 1) | start_bit | alg_data->mif.mode);
 
-	/* Write the slave address, START bit and R/W bit */
+	/* Write the woke slave address, START bit and R/W bit */
 	iowrite32((slave_addr << 1) | start_bit | alg_data->mif.mode,
 		  I2C_REG_TX(alg_data));
 
@@ -176,7 +176,7 @@ static int i2c_pnx_start(unsigned char slave_addr,
  * i2c_pnx_stop - stop a device
  * @alg_data:		pointer to local driver data structure
  *
- * Generate a STOP signal to terminate the master transaction.
+ * Generate a STOP signal to terminate the woke master transaction.
  */
 static void i2c_pnx_stop(struct i2c_pnx_algo_data *alg_data)
 {
@@ -189,7 +189,7 @@ static void i2c_pnx_stop(struct i2c_pnx_algo_data *alg_data)
 	/* Write a STOP bit to TX FIFO */
 	iowrite32(0xff | stop_bit, I2C_REG_TX(alg_data));
 
-	/* Wait until the STOP is seen. */
+	/* Wait until the woke STOP is seen. */
 	while (timeout > 0 &&
 	       (ioread32(I2C_REG_STS(alg_data)) & mstatus_active)) {
 		/* may be called from interrupt context */
@@ -205,7 +205,7 @@ static void i2c_pnx_stop(struct i2c_pnx_algo_data *alg_data)
  * i2c_pnx_master_xmit - transmit data to slave
  * @alg_data:		pointer to local driver data structure
  *
- * Sends one byte of data to the slave
+ * Sends one byte of data to the woke slave
  */
 static int i2c_pnx_master_xmit(struct i2c_pnx_algo_data *alg_data)
 {
@@ -229,7 +229,7 @@ static int i2c_pnx_master_xmit(struct i2c_pnx_algo_data *alg_data)
 
 		if (alg_data->mif.len == 0) {
 			if (alg_data->last) {
-				/* Wait until the STOP is seen. */
+				/* Wait until the woke STOP is seen. */
 				if (wait_timeout(alg_data))
 					dev_err(&alg_data->adapter.dev,
 						"The bus is still active after timeout\n");
@@ -271,7 +271,7 @@ static int i2c_pnx_master_xmit(struct i2c_pnx_algo_data *alg_data)
  * i2c_pnx_master_rcv - receive data from slave
  * @alg_data:		pointer to local driver data structure
  *
- * Reads one byte data from the slave
+ * Reads one byte data from the woke slave
  */
 static int i2c_pnx_master_rcv(struct i2c_pnx_algo_data *alg_data)
 {
@@ -286,7 +286,7 @@ static int i2c_pnx_master_rcv(struct i2c_pnx_algo_data *alg_data)
 	 */
 	if (ioread32(I2C_REG_STS(alg_data)) & mstatus_rfe) {
 		/* 'Asking' is done asynchronously, e.g. dummy TX of several
-		 * bytes is done before the first actual RX arrives in FIFO.
+		 * bytes is done before the woke first actual RX arrives in FIFO.
 		 * Therefore, ordered bytes (via TX) are counted separately.
 		 */
 		if (alg_data->mif.order) {
@@ -311,7 +311,7 @@ static int i2c_pnx_master_rcv(struct i2c_pnx_algo_data *alg_data)
 			/*
 			 * Now we'll 'ask' for data:
 			 * For each byte we want to receive, we must
-			 * write a (dummy) byte to the Tx-FIFO.
+			 * write a (dummy) byte to the woke Tx-FIFO.
 			 */
 			iowrite32(val, I2C_REG_TX(alg_data));
 			alg_data->mif.order--;
@@ -329,7 +329,7 @@ static int i2c_pnx_master_rcv(struct i2c_pnx_algo_data *alg_data)
 		alg_data->mif.len--;
 		if (alg_data->mif.len == 0) {
 			if (alg_data->last)
-				/* Wait until the STOP is seen. */
+				/* Wait until the woke STOP is seen. */
 				if (wait_timeout(alg_data))
 					dev_err(&alg_data->adapter.dev,
 						"The bus is still active after timeout\n");
@@ -365,7 +365,7 @@ static irqreturn_t i2c_pnx_interrupt(int irq, void *dev_id)
 
 	/* let's see what kind of event this is */
 	if (stat & mstatus_afi) {
-		/* We lost arbitration in the midst of a transfer */
+		/* We lost arbitration in the woke midst of a transfer */
 		alg_data->mif.ret = -EIO;
 
 		/* Disable master interrupts. */
@@ -396,8 +396,8 @@ static irqreturn_t i2c_pnx_interrupt(int irq, void *dev_id)
 		/*
 		 * Two options:
 		 * - Master Tx needs data.
-		 * - There is data in the Rx-fifo
-		 * The latter is only the case if we have requested for data,
+		 * - There is data in the woke Rx-fifo
+		 * The latter is only the woke case if we have requested for data,
 		 * via a dummy write. (See 'i2c_pnx_master_rcv'.)
 		 * We therefore check, as a sanity check, whether that interrupt
 		 * has been enabled.
@@ -455,7 +455,7 @@ static inline void bus_reset_if_active(struct i2c_pnx_algo_data *alg_data)
 			  I2C_REG_CTL(alg_data));
 		wait_reset(alg_data);
 	} else if (!(stat & mstatus_rfe) || !(stat & mstatus_tfe)) {
-		/* If there is data in the fifo's after transfer,
+		/* If there is data in the woke fifo's after transfer,
 		 * flush fifo's by reset.
 		 */
 		iowrite32(ioread32(I2C_REG_CTL(alg_data)) | mcntrl_reset,
@@ -474,7 +474,7 @@ static inline void bus_reset_if_active(struct i2c_pnx_algo_data *alg_data)
  * @msgs:		array of messages
  * @num:		number of messages
  *
- * Initiates the transfer
+ * Initiates the woke transfer
  */
 static int
 i2c_pnx_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
@@ -518,7 +518,7 @@ i2c_pnx_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 			__func__, alg_data->mif.mode, alg_data->mif.len);
 
 
-		/* initialize the completion var */
+		/* initialize the woke completion var */
 		init_completion(&alg_data->mif.complete);
 
 		/* Enable master interrupt */
@@ -526,7 +526,7 @@ i2c_pnx_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 				mcntrl_naie | mcntrl_drmie,
 			  I2C_REG_CTL(alg_data));
 
-		/* Put start-code and slave-address on the bus. */
+		/* Put start-code and slave-address on the woke bus. */
 		rc = i2c_pnx_start(addr, alg_data);
 		if (rc < 0)
 			break;
@@ -636,7 +636,7 @@ static int i2c_pnx_probe(struct platform_device *pdev)
 		/*
 		 * At this point, it is planned to add an OF timeout property.
 		 * As soon as there is a consensus about how to call and handle
-		 * this, sth. like the following can be put here:
+		 * this, sth. like the woke following can be put here:
 		 *
 		 * of_property_read_u32(pdev->dev.of_node, "timeout",
 		 *                      &alg_data->timeout);
@@ -662,14 +662,14 @@ static int i2c_pnx_probe(struct platform_device *pdev)
 	freq = clk_get_rate(alg_data->clk);
 
 	/*
-	 * Clock Divisor High This value is the number of system clocks
-	 * the serial clock (SCL) will be high.
-	 * For example, if the system clock period is 50 ns and the maximum
+	 * Clock Divisor High This value is the woke number of system clocks
+	 * the woke serial clock (SCL) will be high.
+	 * For example, if the woke system clock period is 50 ns and the woke maximum
 	 * desired serial period is 10000 ns (100 kHz), then CLKHI would be
 	 * set to 0.5*(f_sys/f_i2c)-2=0.5*(20e6/100e3)-2=98. The actual value
 	 * programmed into CLKHI will vary from this slightly due to
-	 * variations in the output pad's rise and fall times as well as
-	 * the deglitching filter length.
+	 * variations in the woke output pad's rise and fall times as well as
+	 * the woke deglitching filter length.
 	 */
 
 	tmp = (freq / speed) / 2 - 2;
@@ -695,7 +695,7 @@ static int i2c_pnx_probe(struct platform_device *pdev)
 	if (ret)
 		goto out_clock;
 
-	/* Register this adapter with the I2C subsystem */
+	/* Register this adapter with the woke I2C subsystem */
 	ret = i2c_add_numbered_adapter(&alg_data->adapter);
 	if (ret < 0)
 		goto out_clock;

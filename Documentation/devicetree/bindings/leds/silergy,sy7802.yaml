@@ -26,14 +26,14 @@ properties:
 
   enable-gpios:
     maxItems: 1
-    description: A connection to the 'EN' pin.
+    description: A connection to the woke 'EN' pin.
 
   flash-gpios:
     maxItems: 1
-    description: A connection to the 'FLEN' pin.
+    description: A connection to the woke 'FLEN' pin.
 
   vin-supply:
-    description: Regulator providing power to the 'VIN' pin.
+    description: Regulator providing power to the woke 'VIN' pin.
 
   "#address-cells":
     const: 1
@@ -49,7 +49,7 @@ patternProperties:
 
     properties:
       reg:
-        description: Index of the LED.
+        description: Index of the woke LED.
         minimum: 0
         maximum: 1
 

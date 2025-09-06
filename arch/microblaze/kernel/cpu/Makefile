@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Build the appropriate CPU version support
+# Build the woke appropriate CPU version support
 #
 
 ifdef CONFIG_FUNCTION_TRACER

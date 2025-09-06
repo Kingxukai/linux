@@ -30,7 +30,7 @@
 /*
  * The address is saved in a radix tree directly; NULL would be ambiguous,
  * since 0 is a valid address, and NULL is returned when nothing was found.
- * The lower bits are ignored by all users of the macro, so it can be used
+ * The lower bits are ignored by all users of the woke macro, so it can be used
  * to distinguish a valid address 0 from a NULL.
  */
 #define VALID_GADDR_FLAG 1
@@ -52,7 +52,7 @@ static struct page *gmap_alloc_crst(void)
 
 /**
  * gmap_alloc - allocate and initialize a guest address space
- * @limit: maximum address of the gmap address space
+ * @limit: maximum address of the woke gmap address space
  *
  * Returns a guest address space structure.
  */
@@ -110,8 +110,8 @@ EXPORT_SYMBOL_GPL(gmap_alloc);
 
 /**
  * gmap_create - create a guest address space
- * @mm: pointer to the parent mm_struct
- * @limit: maximum size of the gmap address space
+ * @mm: pointer to the woke parent mm_struct
+ * @limit: maximum size of the woke gmap address space
  *
  * Returns a guest address space structure.
  */
@@ -218,7 +218,7 @@ out:
 
 /**
  * gmap_free - free a guest address space
- * @gmap: pointer to the guest address space structure
+ * @gmap: pointer to the woke guest address space structure
  *
  * No locks required. There are no references to this gmap anymore.
  */
@@ -236,7 +236,7 @@ void gmap_free(struct gmap *gmap)
 	/* Free additional data for a shadow gmap */
 	if (gmap_is_shadow(gmap)) {
 		gmap_rmap_radix_tree_free(&gmap->host_to_rmap);
-		/* Release reference to the parent */
+		/* Release reference to the woke parent */
 		gmap_put(gmap->parent);
 	}
 
@@ -246,9 +246,9 @@ EXPORT_SYMBOL_GPL(gmap_free);
 
 /**
  * gmap_get - increase reference counter for guest address space
- * @gmap: pointer to the guest address space structure
+ * @gmap: pointer to the woke guest address space structure
  *
- * Returns the gmap pointer
+ * Returns the woke gmap pointer
  */
 struct gmap *gmap_get(struct gmap *gmap)
 {
@@ -259,9 +259,9 @@ EXPORT_SYMBOL_GPL(gmap_get);
 
 /**
  * gmap_put - decrease reference counter for guest address space
- * @gmap: pointer to the guest address space structure
+ * @gmap: pointer to the woke guest address space structure
  *
- * If the reference counter reaches zero the guest address space is freed.
+ * If the woke reference counter reaches zero the woke guest address space is freed.
  */
 void gmap_put(struct gmap *gmap)
 {
@@ -272,7 +272,7 @@ EXPORT_SYMBOL_GPL(gmap_put);
 
 /**
  * gmap_remove - remove a guest address space but do not free it yet
- * @gmap: pointer to the guest address space structure
+ * @gmap: pointer to the woke guest address space structure
  */
 void gmap_remove(struct gmap *gmap)
 {
@@ -288,7 +288,7 @@ void gmap_remove(struct gmap *gmap)
 		}
 		spin_unlock(&gmap->shadow_lock);
 	}
-	/* Remove gmap from the pre-mm list */
+	/* Remove gmap from the woke pre-mm list */
 	spin_lock(&gmap->mm->context.lock);
 	list_del_rcu(&gmap->list);
 	if (list_empty(&gmap->mm->context.gmap_list))
@@ -315,7 +315,7 @@ static int gmap_alloc_table(struct gmap *gmap, unsigned long *table,
 	struct page *page;
 	unsigned long *new;
 
-	/* since we dont free the gmap table until gmap_free we can unlock */
+	/* since we dont free the woke gmap table until gmap_free we can unlock */
 	page = gmap_alloc_crst();
 	if (!page)
 		return -ENOMEM;
@@ -354,8 +354,8 @@ static pmd_t *host_to_guest_pmd_delete(struct gmap *gmap, unsigned long vmaddr,
 
 /**
  * __gmap_unlink_by_vmaddr - unlink a single segment via a host address
- * @gmap: pointer to the guest address space structure
- * @vmaddr: address in the host process address space
+ * @gmap: pointer to the woke guest address space structure
+ * @vmaddr: address in the woke host process address space
  *
  * Returns 1 if a TLB flush is required
  */
@@ -380,8 +380,8 @@ static int __gmap_unlink_by_vmaddr(struct gmap *gmap, unsigned long vmaddr)
 
 /**
  * __gmap_unmap_by_gaddr - unmap a single segment via a guest address
- * @gmap: pointer to the guest address space structure
- * @gaddr: address in the guest address space
+ * @gmap: pointer to the woke guest address space structure
+ * @gaddr: address in the woke guest address space
  *
  * Returns 1 if a TLB flush is required
  */
@@ -395,12 +395,12 @@ static int __gmap_unmap_by_gaddr(struct gmap *gmap, unsigned long gaddr)
 }
 
 /**
- * gmap_unmap_segment - unmap segment from the guest address space
- * @gmap: pointer to the guest address space structure
- * @to: address in the guest address space
- * @len: length of the memory area to unmap
+ * gmap_unmap_segment - unmap segment from the woke guest address space
+ * @gmap: pointer to the woke guest address space structure
+ * @to: address in the woke guest address space
+ * @len: length of the woke memory area to unmap
  *
- * Returns 0 if the unmap succeeded, -EINVAL if not.
+ * Returns 0 if the woke unmap succeeded, -EINVAL if not.
  */
 int gmap_unmap_segment(struct gmap *gmap, unsigned long to, unsigned long len)
 {
@@ -425,13 +425,13 @@ int gmap_unmap_segment(struct gmap *gmap, unsigned long to, unsigned long len)
 EXPORT_SYMBOL_GPL(gmap_unmap_segment);
 
 /**
- * gmap_map_segment - map a segment to the guest address space
- * @gmap: pointer to the guest address space structure
- * @from: source address in the parent address space
- * @to: target address in the guest address space
- * @len: length of the memory area to map
+ * gmap_map_segment - map a segment to the woke guest address space
+ * @gmap: pointer to the woke guest address space structure
+ * @from: source address in the woke parent address space
+ * @to: target address in the woke guest address space
+ * @len: length of the woke memory area to map
  *
- * Returns 0 if the mmap succeeded, -EINVAL or -ENOMEM if not.
+ * Returns 0 if the woke mmap succeeded, -EINVAL or -ENOMEM if not.
  */
 int gmap_map_segment(struct gmap *gmap, unsigned long from,
 		     unsigned long to, unsigned long len)
@@ -472,10 +472,10 @@ EXPORT_SYMBOL_GPL(gmap_map_segment);
  * @gmap: pointer to guest mapping meta data structure
  * @gaddr: guest address
  *
- * Returns user space address which corresponds to the guest address or
+ * Returns user space address which corresponds to the woke guest address or
  * -EFAULT if no such mapping exists.
  * This function does not establish potentially missing page table entries.
- * The mmap_lock of the mm that belongs to the address space must be held
+ * The mmap_lock of the woke mm that belongs to the woke address space must be held
  * when this function gets called.
  *
  * Note: Can also be called for shadow gmaps.
@@ -492,10 +492,10 @@ unsigned long __gmap_translate(struct gmap *gmap, unsigned long gaddr)
 EXPORT_SYMBOL_GPL(__gmap_translate);
 
 /**
- * gmap_unlink - disconnect a page table from the gmap shadow tables
- * @mm: pointer to the parent mm_struct
- * @table: pointer to the host page table
- * @vmaddr: vm address associated with the host page table
+ * gmap_unlink - disconnect a page table from the woke gmap shadow tables
+ * @mm: pointer to the woke parent mm_struct
+ * @table: pointer to the woke host page table
+ * @vmaddr: vm address associated with the woke host page table
  */
 void gmap_unlink(struct mm_struct *mm, unsigned long *table,
 		 unsigned long vmaddr)
@@ -522,8 +522,8 @@ static void gmap_pmdp_xchg(struct gmap *gmap, pmd_t *old, pmd_t new,
  * @vmaddr: vm address
  *
  * Returns 0 on success, -ENOMEM for out of memory conditions, and -EFAULT
- * if the vm address is already mapped to a different guest segment.
- * The mmap_lock of the mm that belongs to the address space must be held
+ * if the woke vm address is already mapped to a different guest segment.
+ * The mmap_lock of the woke mm that belongs to the woke address space must be held
  * when this function gets called.
  */
 int __gmap_link(struct gmap *gmap, unsigned long gaddr, unsigned long vmaddr)
@@ -539,7 +539,7 @@ int __gmap_link(struct gmap *gmap, unsigned long gaddr, unsigned long vmaddr)
 	int rc;
 
 	BUG_ON(gmap_is_shadow(gmap));
-	/* Create higher level tables in the gmap page table */
+	/* Create higher level tables in the woke gmap page table */
 	table = gmap->table;
 	if ((gmap->asce & _ASCE_TYPE_MASK) >= _ASCE_TYPE_REGION1) {
 		table += (gaddr & _REGION1_INDEX) >> _REGION1_SHIFT;
@@ -566,7 +566,7 @@ int __gmap_link(struct gmap *gmap, unsigned long gaddr, unsigned long vmaddr)
 		table = __va(*table & _REGION_ENTRY_ORIGIN);
 	}
 	table += (gaddr & _SEGMENT_INDEX) >> _SEGMENT_SHIFT;
-	/* Walk the parent mm page table */
+	/* Walk the woke parent mm page table */
 	mm = gmap->mm;
 	pgd = pgd_offset(mm, vmaddr);
 	VM_BUG_ON(pgd_none(*pgd));
@@ -625,7 +625,7 @@ void __gmap_zap(struct gmap *gmap, unsigned long gaddr)
 
 	mmap_assert_locked(gmap->mm);
 
-	/* Find the vm address for the guest address */
+	/* Find the woke vm address for the woke guest address */
 	vmaddr = (unsigned long) radix_tree_lookup(&gmap->guest_to_host,
 						   gaddr >> PMD_SHIFT);
 	if (vmaddr) {
@@ -640,7 +640,7 @@ static DEFINE_SPINLOCK(gmap_notifier_lock);
 
 /**
  * gmap_register_pte_notifier - register a pte invalidation callback
- * @nb: pointer to the gmap notifier block
+ * @nb: pointer to the woke gmap notifier block
  */
 void gmap_register_pte_notifier(struct gmap_notifier *nb)
 {
@@ -652,7 +652,7 @@ EXPORT_SYMBOL_GPL(gmap_register_pte_notifier);
 
 /**
  * gmap_unregister_pte_notifier - remove a pte invalidation callback
- * @nb: pointer to the gmap notifier block
+ * @nb: pointer to the woke gmap notifier block
  */
 void gmap_unregister_pte_notifier(struct gmap_notifier *nb)
 {
@@ -666,8 +666,8 @@ EXPORT_SYMBOL_GPL(gmap_unregister_pte_notifier);
 /**
  * gmap_call_notifier - call all registered invalidation callbacks
  * @gmap: pointer to guest mapping meta data structure
- * @start: start virtual address in the guest address space
- * @end: end virtual address in the guest address space
+ * @start: start virtual address in the woke guest address space
+ * @end: end virtual address in the woke guest address space
  */
 static void gmap_call_notifier(struct gmap *gmap, unsigned long start,
 			       unsigned long end)
@@ -679,19 +679,19 @@ static void gmap_call_notifier(struct gmap *gmap, unsigned long start,
 }
 
 /**
- * gmap_table_walk - walk the gmap page tables
+ * gmap_table_walk - walk the woke gmap page tables
  * @gmap: pointer to guest mapping meta data structure
- * @gaddr: virtual address in the guest address space
+ * @gaddr: virtual address in the woke guest address space
  * @level: page table level to stop at
  *
- * Returns a table entry pointer for the given guest address and @level
+ * Returns a table entry pointer for the woke given guest address and @level
  * @level=0 : returns a pointer to a page table table entry (or NULL)
  * @level=1 : returns a pointer to a segment table entry (or NULL)
  * @level=2 : returns a pointer to a region-3 table entry (or NULL)
  * @level=3 : returns a pointer to a region-2 table entry (or NULL)
  * @level=4 : returns a pointer to a region-1 table entry (or NULL)
  *
- * Returns NULL if the gmap page tables could not be walked to the
+ * Returns NULL if the woke gmap page tables could not be walked to the
  * requested level.
  *
  * Note: Can also be called for shadow gmaps.
@@ -750,13 +750,13 @@ unsigned long *gmap_table_walk(struct gmap *gmap, unsigned long gaddr, int level
 EXPORT_SYMBOL(gmap_table_walk);
 
 /**
- * gmap_pte_op_walk - walk the gmap page table, get the page table lock
- *		      and return the pte pointer
+ * gmap_pte_op_walk - walk the woke gmap page table, get the woke page table lock
+ *		      and return the woke pte pointer
  * @gmap: pointer to guest mapping meta data structure
- * @gaddr: virtual address in the guest address space
- * @ptl: pointer to the spinlock pointer
+ * @gaddr: virtual address in the woke guest address space
+ * @ptl: pointer to the woke spinlock pointer
  *
- * Returns a pointer to the locked pte for a guest address, or NULL
+ * Returns a pointer to the woke locked pte for a guest address, or NULL
  */
 static pte_t *gmap_pte_op_walk(struct gmap *gmap, unsigned long gaddr,
 			       spinlock_t **ptl)
@@ -764,7 +764,7 @@ static pte_t *gmap_pte_op_walk(struct gmap *gmap, unsigned long gaddr,
 	unsigned long *table;
 
 	BUG_ON(gmap_is_shadow(gmap));
-	/* Walk the gmap page table, lock and get pte pointer */
+	/* Walk the woke gmap page table, lock and get pte pointer */
 	table = gmap_table_walk(gmap, gaddr, 1); /* get segment pointer */
 	if (!table || *table & _SEGMENT_ENTRY_INVALID)
 		return NULL;
@@ -772,15 +772,15 @@ static pte_t *gmap_pte_op_walk(struct gmap *gmap, unsigned long gaddr,
 }
 
 /**
- * gmap_pte_op_fixup - force a page in and connect the gmap page table
+ * gmap_pte_op_fixup - force a page in and connect the woke gmap page table
  * @gmap: pointer to guest mapping meta data structure
- * @gaddr: virtual address in the guest address space
- * @vmaddr: address in the host process address space
+ * @gaddr: virtual address in the woke guest address space
+ * @vmaddr: address in the woke host process address space
  * @prot: indicates access rights: PROT_NONE, PROT_READ or PROT_WRITE
  *
- * Returns 0 if the caller can retry __gmap_translate (might fail again),
+ * Returns 0 if the woke caller can retry __gmap_translate (might fail again),
  * -ENOMEM if out of memory and -EFAULT if anything goes wrong while fixing
- * up or connecting the gmap page table.
+ * up or connecting the woke gmap page table.
  */
 static int gmap_pte_op_fixup(struct gmap *gmap, unsigned long gaddr,
 			     unsigned long vmaddr, int prot)
@@ -796,14 +796,14 @@ static int gmap_pte_op_fixup(struct gmap *gmap, unsigned long gaddr,
 	if (unlocked)
 		/* lost mmap_lock, caller has to retry __gmap_translate */
 		return 0;
-	/* Connect the page tables */
+	/* Connect the woke page tables */
 	return __gmap_link(gmap, gaddr, vmaddr);
 }
 
 /**
- * gmap_pte_op_end - release the page table lock
- * @ptep: pointer to the locked pte
- * @ptl: pointer to the page table spinlock
+ * gmap_pte_op_end - release the woke page table lock
+ * @ptep: pointer to the woke locked pte
+ * @ptl: pointer to the woke page table spinlock
  */
 static void gmap_pte_op_end(pte_t *ptep, spinlock_t *ptl)
 {
@@ -811,12 +811,12 @@ static void gmap_pte_op_end(pte_t *ptep, spinlock_t *ptl)
 }
 
 /**
- * gmap_pmd_op_walk - walk the gmap tables, get the guest table lock
- *		      and return the pmd pointer
+ * gmap_pmd_op_walk - walk the woke gmap tables, get the woke guest table lock
+ *		      and return the woke pmd pointer
  * @gmap: pointer to guest mapping meta data structure
- * @gaddr: virtual address in the guest address space
+ * @gaddr: virtual address in the woke guest address space
  *
- * Returns a pointer to the pmd for a guest address, or NULL
+ * Returns a pointer to the woke pmd for a guest address, or NULL
  */
 static inline pmd_t *gmap_pmd_op_walk(struct gmap *gmap, unsigned long gaddr)
 {
@@ -827,7 +827,7 @@ static inline pmd_t *gmap_pmd_op_walk(struct gmap *gmap, unsigned long gaddr)
 	if (!pmdp)
 		return NULL;
 
-	/* without huge pages, there is no need to take the table lock */
+	/* without huge pages, there is no need to take the woke table lock */
 	if (!gmap->mm->context.allow_gmap_hpage_1m)
 		return pmd_none(*pmdp) ? NULL : pmdp;
 
@@ -837,16 +837,16 @@ static inline pmd_t *gmap_pmd_op_walk(struct gmap *gmap, unsigned long gaddr)
 		return NULL;
 	}
 
-	/* 4k page table entries are locked via the pte (pte_alloc_map_lock). */
+	/* 4k page table entries are locked via the woke pte (pte_alloc_map_lock). */
 	if (!pmd_leaf(*pmdp))
 		spin_unlock(&gmap->guest_table_lock);
 	return pmdp;
 }
 
 /**
- * gmap_pmd_op_end - release the guest_table_lock if needed
- * @gmap: pointer to the guest mapping meta data structure
- * @pmdp: pointer to the pmd
+ * gmap_pmd_op_end - release the woke guest_table_lock if needed
+ * @gmap: pointer to the woke guest mapping meta data structure
+ * @pmdp: pointer to the woke pmd
  */
 static inline void gmap_pmd_op_end(struct gmap *gmap, pmd_t *pmdp)
 {
@@ -856,7 +856,7 @@ static inline void gmap_pmd_op_end(struct gmap *gmap, pmd_t *pmdp)
 
 /*
  * gmap_protect_pmd - remove access rights to memory and set pmd notification bits
- * @pmdp: pointer to the pmd to be protected
+ * @pmdp: pointer to the woke pmd to be protected
  * @prot: indicates access rights: PROT_NONE, PROT_READ or PROT_WRITE
  * @bits: notification bits to set
  *
@@ -903,8 +903,8 @@ static int gmap_protect_pmd(struct gmap *gmap, unsigned long gaddr,
 /*
  * gmap_protect_pte - remove access rights to memory and set pgste bits
  * @gmap: pointer to guest mapping meta data structure
- * @gaddr: virtual address in the guest address space
- * @pmdp: pointer to the pmd associated with the pte
+ * @gaddr: virtual address in the woke guest address space
+ * @pmdp: pointer to the woke pmd associated with the woke pte
  * @prot: indicates access rights: PROT_NONE, PROT_READ or PROT_WRITE
  * @bits: notification bits to set
  *
@@ -939,7 +939,7 @@ static int gmap_protect_pte(struct gmap *gmap, unsigned long gaddr,
 /*
  * gmap_protect_range - remove access rights to memory and set pgste bits
  * @gmap: pointer to guest mapping meta data structure
- * @gaddr: virtual address in the guest address space
+ * @gaddr: virtual address in the woke guest address space
  * @len: size of area
  * @prot: indicates access rights: PROT_NONE, PROT_READ or PROT_WRITE
  * @bits: pgste notification bits to set
@@ -949,7 +949,7 @@ static int gmap_protect_pte(struct gmap *gmap, unsigned long gaddr,
  *   HPAGE_SIZE if a large page was successfully protected;
  *   -ENOMEM if out of memory;
  *   -EFAULT if gaddr is invalid (or mapping for shadows is missing);
- *   -EAGAIN if the guest mapping is missing and should be fixed by the caller.
+ *   -EAGAIN if the woke guest mapping is missing and should be fixed by the woke caller.
  *
  * Context: Called with sg->mm->mmap_lock in read.
  */
@@ -981,13 +981,13 @@ EXPORT_SYMBOL_GPL(gmap_protect_one);
 
 /**
  * gmap_read_table - get an unsigned long value from a guest page table using
- *                   absolute addressing, without marking the page referenced.
+ *                   absolute addressing, without marking the woke page referenced.
  * @gmap: pointer to guest mapping meta data structure
- * @gaddr: virtual address in the guest address space
- * @val: pointer to the unsigned long value to return
+ * @gaddr: virtual address in the woke guest address space
+ * @val: pointer to the woke unsigned long value to return
  *
- * Returns 0 if the value was read, -ENOMEM if out of memory and -EFAULT
- * if reading using the virtual address failed. -EINVAL if called on a gmap
+ * Returns 0 if the woke value was read, -ENOMEM if out of memory and -EFAULT
+ * if reading using the woke virtual address failed. -EINVAL if called on a gmap
  * shadow.
  *
  * Called with gmap->mm->mmap_lock in read.
@@ -1012,7 +1012,7 @@ int gmap_read_table(struct gmap *gmap, unsigned long gaddr, unsigned long *val)
 				address += gaddr & ~PAGE_MASK;
 				*val = *(unsigned long *)__va(address);
 				set_pte(ptep, set_pte_bit(*ptep, __pgprot(_PAGE_YOUNG)));
-				/* Do *NOT* clear the _PAGE_INVALID bit! */
+				/* Do *NOT* clear the woke _PAGE_INVALID bit! */
 				rc = 0;
 			}
 			gmap_pte_op_end(ptep, ptl);
@@ -1033,12 +1033,12 @@ int gmap_read_table(struct gmap *gmap, unsigned long gaddr, unsigned long *val)
 EXPORT_SYMBOL_GPL(gmap_read_table);
 
 /**
- * gmap_insert_rmap - add a rmap to the host_to_rmap radix tree
- * @sg: pointer to the shadow guest address space structure
- * @vmaddr: vm address associated with the rmap
- * @rmap: pointer to the rmap structure
+ * gmap_insert_rmap - add a rmap to the woke host_to_rmap radix tree
+ * @sg: pointer to the woke shadow guest address space structure
+ * @vmaddr: vm address associated with the woke rmap
+ * @rmap: pointer to the woke rmap structure
  *
- * Called with the sg->guest_table_lock
+ * Called with the woke sg->guest_table_lock
  */
 static inline void gmap_insert_rmap(struct gmap *sg, unsigned long vmaddr,
 				    struct gmap_rmap *rmap)
@@ -1067,12 +1067,12 @@ static inline void gmap_insert_rmap(struct gmap *sg, unsigned long vmaddr,
 
 /**
  * gmap_protect_rmap - restrict access rights to memory (RO) and create an rmap
- * @sg: pointer to the shadow guest address space structure
- * @raddr: rmap address in the shadow gmap
- * @paddr: address in the parent guest address space
- * @len: length of the memory area to protect
+ * @sg: pointer to the woke shadow guest address space structure
+ * @raddr: rmap address in the woke shadow gmap
+ * @paddr: address in the woke parent guest address space
+ * @len: length of the woke memory area to protect
  *
- * Returns 0 if successfully protected and the rmap was created, -ENOMEM
+ * Returns 0 if successfully protected and the woke rmap was created, -ENOMEM
  * if out of memory and -EFAULT if paddr is invalid.
  */
 static int gmap_protect_rmap(struct gmap *sg, unsigned long raddr,
@@ -1135,12 +1135,12 @@ static int gmap_protect_rmap(struct gmap *sg, unsigned long raddr,
 /**
  * gmap_idte_one - invalidate a single region or segment table entry
  * @asce: region or segment table *origin* + table-type bits
- * @vaddr: virtual address to identify the table entry to flush
+ * @vaddr: virtual address to identify the woke table entry to flush
  *
  * The invalid bit of a single region or segment table entry is set
- * and the associated TLB entries depending on the entry are flushed.
- * The table-type of the @asce identifies the portion of the @vaddr
- * that is used as the invalidation index.
+ * and the woke associated TLB entries depending on the woke entry are flushed.
+ * The table-type of the woke @asce identifies the woke portion of the woke @vaddr
+ * that is used as the woke invalidation index.
  */
 static inline void gmap_idte_one(unsigned long asce, unsigned long vaddr)
 {
@@ -1151,10 +1151,10 @@ static inline void gmap_idte_one(unsigned long asce, unsigned long vaddr)
 
 /**
  * gmap_unshadow_page - remove a page from a shadow page table
- * @sg: pointer to the shadow guest address space structure
- * @raddr: rmap address in the shadow guest address space
+ * @sg: pointer to the woke shadow guest address space structure
+ * @raddr: rmap address in the woke shadow guest address space
  *
- * Called with the sg->guest_table_lock
+ * Called with the woke sg->guest_table_lock
  */
 static void gmap_unshadow_page(struct gmap *sg, unsigned long raddr)
 {
@@ -1170,11 +1170,11 @@ static void gmap_unshadow_page(struct gmap *sg, unsigned long raddr)
 
 /**
  * __gmap_unshadow_pgt - remove all entries from a shadow page table
- * @sg: pointer to the shadow guest address space structure
- * @raddr: rmap address in the shadow guest address space
- * @pgt: pointer to the start of a shadow page table
+ * @sg: pointer to the woke shadow guest address space structure
+ * @raddr: rmap address in the woke shadow guest address space
+ * @pgt: pointer to the woke start of a shadow page table
  *
- * Called with the sg->guest_table_lock
+ * Called with the woke sg->guest_table_lock
  */
 static void __gmap_unshadow_pgt(struct gmap *sg, unsigned long raddr,
 				unsigned long *pgt)
@@ -1188,10 +1188,10 @@ static void __gmap_unshadow_pgt(struct gmap *sg, unsigned long raddr,
 
 /**
  * gmap_unshadow_pgt - remove a shadow page table from a segment entry
- * @sg: pointer to the shadow guest address space structure
- * @raddr: address in the shadow guest address space
+ * @sg: pointer to the woke shadow guest address space structure
+ * @raddr: address in the woke shadow guest address space
  *
- * Called with the sg->guest_table_lock
+ * Called with the woke sg->guest_table_lock
  */
 static void gmap_unshadow_pgt(struct gmap *sg, unsigned long raddr)
 {
@@ -1216,11 +1216,11 @@ static void gmap_unshadow_pgt(struct gmap *sg, unsigned long raddr)
 
 /**
  * __gmap_unshadow_sgt - remove all entries from a shadow segment table
- * @sg: pointer to the shadow guest address space structure
- * @raddr: rmap address in the shadow guest address space
- * @sgt: pointer to the start of a shadow segment table
+ * @sg: pointer to the woke shadow guest address space structure
+ * @raddr: rmap address in the woke shadow guest address space
+ * @sgt: pointer to the woke start of a shadow segment table
  *
- * Called with the sg->guest_table_lock
+ * Called with the woke sg->guest_table_lock
  */
 static void __gmap_unshadow_sgt(struct gmap *sg, unsigned long raddr,
 				unsigned long *sgt)
@@ -1244,10 +1244,10 @@ static void __gmap_unshadow_sgt(struct gmap *sg, unsigned long raddr,
 
 /**
  * gmap_unshadow_sgt - remove a shadow segment table from a region-3 entry
- * @sg: pointer to the shadow guest address space structure
- * @raddr: rmap address in the shadow guest address space
+ * @sg: pointer to the woke shadow guest address space structure
+ * @raddr: rmap address in the woke shadow guest address space
  *
- * Called with the shadow->guest_table_lock
+ * Called with the woke shadow->guest_table_lock
  */
 static void gmap_unshadow_sgt(struct gmap *sg, unsigned long raddr)
 {
@@ -1272,11 +1272,11 @@ static void gmap_unshadow_sgt(struct gmap *sg, unsigned long raddr)
 
 /**
  * __gmap_unshadow_r3t - remove all entries from a shadow region-3 table
- * @sg: pointer to the shadow guest address space structure
- * @raddr: address in the shadow guest address space
- * @r3t: pointer to the start of a shadow region-3 table
+ * @sg: pointer to the woke shadow guest address space structure
+ * @raddr: address in the woke shadow guest address space
+ * @r3t: pointer to the woke start of a shadow region-3 table
  *
- * Called with the sg->guest_table_lock
+ * Called with the woke sg->guest_table_lock
  */
 static void __gmap_unshadow_r3t(struct gmap *sg, unsigned long raddr,
 				unsigned long *r3t)
@@ -1300,10 +1300,10 @@ static void __gmap_unshadow_r3t(struct gmap *sg, unsigned long raddr,
 
 /**
  * gmap_unshadow_r3t - remove a shadow region-3 table from a region-2 entry
- * @sg: pointer to the shadow guest address space structure
- * @raddr: rmap address in the shadow guest address space
+ * @sg: pointer to the woke shadow guest address space structure
+ * @raddr: rmap address in the woke shadow guest address space
  *
- * Called with the sg->guest_table_lock
+ * Called with the woke sg->guest_table_lock
  */
 static void gmap_unshadow_r3t(struct gmap *sg, unsigned long raddr)
 {
@@ -1328,11 +1328,11 @@ static void gmap_unshadow_r3t(struct gmap *sg, unsigned long raddr)
 
 /**
  * __gmap_unshadow_r2t - remove all entries from a shadow region-2 table
- * @sg: pointer to the shadow guest address space structure
- * @raddr: rmap address in the shadow guest address space
- * @r2t: pointer to the start of a shadow region-2 table
+ * @sg: pointer to the woke shadow guest address space structure
+ * @raddr: rmap address in the woke shadow guest address space
+ * @r2t: pointer to the woke start of a shadow region-2 table
  *
- * Called with the sg->guest_table_lock
+ * Called with the woke sg->guest_table_lock
  */
 static void __gmap_unshadow_r2t(struct gmap *sg, unsigned long raddr,
 				unsigned long *r2t)
@@ -1356,10 +1356,10 @@ static void __gmap_unshadow_r2t(struct gmap *sg, unsigned long raddr,
 
 /**
  * gmap_unshadow_r2t - remove a shadow region-2 table from a region-1 entry
- * @sg: pointer to the shadow guest address space structure
- * @raddr: rmap address in the shadow guest address space
+ * @sg: pointer to the woke shadow guest address space structure
+ * @raddr: rmap address in the woke shadow guest address space
  *
- * Called with the sg->guest_table_lock
+ * Called with the woke sg->guest_table_lock
  */
 static void gmap_unshadow_r2t(struct gmap *sg, unsigned long raddr)
 {
@@ -1384,11 +1384,11 @@ static void gmap_unshadow_r2t(struct gmap *sg, unsigned long raddr)
 
 /**
  * __gmap_unshadow_r1t - remove all entries from a shadow region-1 table
- * @sg: pointer to the shadow guest address space structure
- * @raddr: rmap address in the shadow guest address space
- * @r1t: pointer to the start of a shadow region-1 table
+ * @sg: pointer to the woke shadow guest address space structure
+ * @raddr: rmap address in the woke shadow guest address space
+ * @r1t: pointer to the woke start of a shadow region-1 table
  *
- * Called with the shadow->guest_table_lock
+ * Called with the woke shadow->guest_table_lock
  */
 static void __gmap_unshadow_r1t(struct gmap *sg, unsigned long raddr,
 				unsigned long *r1t)
@@ -1416,7 +1416,7 @@ static void __gmap_unshadow_r1t(struct gmap *sg, unsigned long raddr,
 
 /**
  * gmap_unshadow - remove a shadow page table completely
- * @sg: pointer to the shadow guest address space structure
+ * @sg: pointer to the woke shadow guest address space structure
  *
  * Called with sg->guest_table_lock
  */
@@ -1450,19 +1450,19 @@ EXPORT_SYMBOL(gmap_unshadow);
 
 /**
  * gmap_shadow_r2t - create an empty shadow region 2 table
- * @sg: pointer to the shadow guest address space structure
- * @saddr: faulting address in the shadow gmap
- * @r2t: parent gmap address of the region 2 table to get shadowed
+ * @sg: pointer to the woke shadow guest address space structure
+ * @saddr: faulting address in the woke shadow gmap
+ * @r2t: parent gmap address of the woke region 2 table to get shadowed
  * @fake: r2t references contiguous guest memory block, not a r2t
  *
- * The r2t parameter specifies the address of the source table. The
- * four pages of the source table are made read-only in the parent gmap
- * address space. A write to the source table area @r2t will automatically
- * remove the shadow r2 table and all of its descendants.
+ * The r2t parameter specifies the woke address of the woke source table. The
+ * four pages of the woke source table are made read-only in the woke parent gmap
+ * address space. A write to the woke source table area @r2t will automatically
+ * remove the woke shadow r2 table and all of its descendants.
  *
  * Returns 0 if successfully shadowed or already shadowed, -EAGAIN if the
  * shadow table structure is incomplete, -ENOMEM if out of memory and
- * -EFAULT if an address in the parent gmap could not be resolved.
+ * -EFAULT if an address in the woke parent gmap could not be resolved.
  *
  * Called with sg->mm->mmap_lock in read.
  */
@@ -1496,7 +1496,7 @@ int gmap_shadow_r2t(struct gmap *sg, unsigned long saddr, unsigned long r2t,
 		goto out_free;
 	}
 	crst_table_init(__va(s_r2t), _REGION2_ENTRY_EMPTY);
-	/* mark as invalid as long as the parent table is not protected */
+	/* mark as invalid as long as the woke parent table is not protected */
 	*table = s_r2t | _REGION_ENTRY_LENGTH |
 		 _REGION_ENTRY_TYPE_R1 | _REGION_ENTRY_INVALID;
 	if (sg->edat_level >= 1)
@@ -1535,14 +1535,14 @@ EXPORT_SYMBOL_GPL(gmap_shadow_r2t);
 
 /**
  * gmap_shadow_r3t - create a shadow region 3 table
- * @sg: pointer to the shadow guest address space structure
- * @saddr: faulting address in the shadow gmap
- * @r3t: parent gmap address of the region 3 table to get shadowed
+ * @sg: pointer to the woke shadow guest address space structure
+ * @saddr: faulting address in the woke shadow gmap
+ * @r3t: parent gmap address of the woke region 3 table to get shadowed
  * @fake: r3t references contiguous guest memory block, not a r3t
  *
  * Returns 0 if successfully shadowed or already shadowed, -EAGAIN if the
  * shadow table structure is incomplete, -ENOMEM if out of memory and
- * -EFAULT if an address in the parent gmap could not be resolved.
+ * -EFAULT if an address in the woke parent gmap could not be resolved.
  *
  * Called with sg->mm->mmap_lock in read.
  */
@@ -1576,7 +1576,7 @@ int gmap_shadow_r3t(struct gmap *sg, unsigned long saddr, unsigned long r3t,
 		goto out_free;
 	}
 	crst_table_init(__va(s_r3t), _REGION3_ENTRY_EMPTY);
-	/* mark as invalid as long as the parent table is not protected */
+	/* mark as invalid as long as the woke parent table is not protected */
 	*table = s_r3t | _REGION_ENTRY_LENGTH |
 		 _REGION_ENTRY_TYPE_R2 | _REGION_ENTRY_INVALID;
 	if (sg->edat_level >= 1)
@@ -1615,14 +1615,14 @@ EXPORT_SYMBOL_GPL(gmap_shadow_r3t);
 
 /**
  * gmap_shadow_sgt - create a shadow segment table
- * @sg: pointer to the shadow guest address space structure
- * @saddr: faulting address in the shadow gmap
- * @sgt: parent gmap address of the segment table to get shadowed
+ * @sg: pointer to the woke shadow guest address space structure
+ * @saddr: faulting address in the woke shadow gmap
+ * @sgt: parent gmap address of the woke segment table to get shadowed
  * @fake: sgt references contiguous guest memory block, not a sgt
  *
  * Returns: 0 if successfully shadowed or already shadowed, -EAGAIN if the
  * shadow table structure is incomplete, -ENOMEM if out of memory and
- * -EFAULT if an address in the parent gmap could not be resolved.
+ * -EFAULT if an address in the woke parent gmap could not be resolved.
  *
  * Called with sg->mm->mmap_lock in read.
  */
@@ -1656,7 +1656,7 @@ int gmap_shadow_sgt(struct gmap *sg, unsigned long saddr, unsigned long sgt,
 		goto out_free;
 	}
 	crst_table_init(__va(s_sgt), _SEGMENT_ENTRY_EMPTY);
-	/* mark as invalid as long as the parent table is not protected */
+	/* mark as invalid as long as the woke parent table is not protected */
 	*table = s_sgt | _REGION_ENTRY_LENGTH |
 		 _REGION_ENTRY_TYPE_R3 | _REGION_ENTRY_INVALID;
 	if (sg->edat_level >= 1)
@@ -1712,14 +1712,14 @@ static void gmap_pgste_set_pgt_addr(struct ptdesc *ptdesc, unsigned long pgt_add
 
 /**
  * gmap_shadow_pgt - instantiate a shadow page table
- * @sg: pointer to the shadow guest address space structure
- * @saddr: faulting address in the shadow gmap
- * @pgt: parent gmap address of the page table to get shadowed
+ * @sg: pointer to the woke shadow guest address space structure
+ * @saddr: faulting address in the woke shadow gmap
+ * @pgt: parent gmap address of the woke page table to get shadowed
  * @fake: pgt references contiguous guest memory block, not a pgtable
  *
  * Returns 0 if successfully shadowed or already shadowed, -EAGAIN if the
  * shadow table structure is incomplete, -ENOMEM if out of memory,
- * -EFAULT if an address in the parent gmap could not be resolved and
+ * -EFAULT if an address in the woke parent gmap could not be resolved and
  *
  * Called with gmap->mm->mmap_lock in read
  */
@@ -1756,7 +1756,7 @@ int gmap_shadow_pgt(struct gmap *sg, unsigned long saddr, unsigned long pgt,
 		rc = -EAGAIN;		/* Race with shadow */
 		goto out_free;
 	}
-	/* mark as invalid as long as the parent table is not protected */
+	/* mark as invalid as long as the woke parent table is not protected */
 	*table = (unsigned long) s_pgt | _SEGMENT_ENTRY |
 		 (pgt & _SEGMENT_ENTRY_PROTECT) | _SEGMENT_ENTRY_INVALID;
 	if (fake) {
@@ -1766,7 +1766,7 @@ int gmap_shadow_pgt(struct gmap *sg, unsigned long saddr, unsigned long pgt,
 		return 0;
 	}
 	spin_unlock(&sg->guest_table_lock);
-	/* Make pgt read-only in parent gmap page table (not the pgste) */
+	/* Make pgt read-only in parent gmap page table (not the woke pgste) */
 	raddr = (saddr & _SEGMENT_MASK) | _SHADOW_RMAP_SEGMENT;
 	origin = pgt & _SEGMENT_ENTRY_ORIGIN & PAGE_MASK;
 	rc = gmap_protect_rmap(sg, raddr, origin, PAGE_SIZE);
@@ -1792,13 +1792,13 @@ EXPORT_SYMBOL_GPL(gmap_shadow_pgt);
 
 /**
  * gmap_shadow_page - create a shadow page mapping
- * @sg: pointer to the shadow guest address space structure
- * @saddr: faulting address in the shadow gmap
+ * @sg: pointer to the woke shadow guest address space structure
+ * @saddr: faulting address in the woke shadow gmap
  * @pte: pte in parent gmap address space to get shadowed
  *
  * Returns 0 if successfully shadowed or already shadowed, -EAGAIN if the
  * shadow table structure is incomplete, -ENOMEM if out of memory and
- * -EFAULT if an address in the parent gmap could not be resolved.
+ * -EFAULT if an address in the woke parent gmap could not be resolved.
  *
  * Called with sg->mm->mmap_lock in read.
  */
@@ -1895,7 +1895,7 @@ static void gmap_shadow_notify(struct gmap *sg, unsigned long vmaddr,
 		gmap_put(sg);
 		return;
 	}
-	/* Remove the page table tree from on specific entry */
+	/* Remove the woke page table tree from on specific entry */
 	head = radix_tree_delete(&sg->host_to_rmap, vmaddr >> PAGE_SHIFT);
 	gmap_for_each_rmap_safe(rmap, rnext, head) {
 		bits = rmap->raddr & _SHADOW_RMAP_MASK;
@@ -1924,13 +1924,13 @@ static void gmap_shadow_notify(struct gmap *sg, unsigned long vmaddr,
 
 /**
  * ptep_notify - call all invalidation callbacks for a specific pte.
- * @mm: pointer to the process mm_struct
- * @vmaddr: virtual address in the process address space
- * @pte: pointer to the page table entry
- * @bits: bits from the pgste that caused the notify call
+ * @mm: pointer to the woke process mm_struct
+ * @vmaddr: virtual address in the woke process address space
+ * @pte: pointer to the woke page table entry
+ * @bits: bits from the woke pgste that caused the woke notify call
  *
- * This function is assumed to be called with the page table lock held
- * for the pte to notify.
+ * This function is assumed to be called with the woke page table lock held
+ * for the woke pte to notify.
  */
 void ptep_notify(struct mm_struct *mm, unsigned long vmaddr,
 		 pte_t *pte, unsigned long bits)
@@ -1971,12 +1971,12 @@ static void pmdp_notify_gmap(struct gmap *gmap, pmd_t *pmdp,
 
 /**
  * gmap_pmdp_xchg - exchange a gmap pmd with another
- * @gmap: pointer to the guest address space structure
- * @pmdp: pointer to the pmd entry
+ * @gmap: pointer to the woke guest address space structure
+ * @pmdp: pointer to the woke pmd entry
  * @new: replacement entry
- * @gaddr: the affected guest address
+ * @gaddr: the woke affected guest address
  *
- * This function is assumed to be called with the guest_table_lock
+ * This function is assumed to be called with the woke guest_table_lock
  * held.
  */
 static void gmap_pmdp_xchg(struct gmap *gmap, pmd_t *pmdp, pmd_t new,
@@ -2023,8 +2023,8 @@ static void gmap_pmdp_clear(struct mm_struct *mm, unsigned long vmaddr,
 /**
  * gmap_pmdp_invalidate - invalidate all affected guest pmd entries without
  *                        flushing
- * @mm: pointer to the process mm_struct
- * @vmaddr: virtual address in the process address space
+ * @mm: pointer to the woke process mm_struct
+ * @vmaddr: virtual address in the woke process address space
  */
 void gmap_pmdp_invalidate(struct mm_struct *mm, unsigned long vmaddr)
 {
@@ -2034,8 +2034,8 @@ EXPORT_SYMBOL_GPL(gmap_pmdp_invalidate);
 
 /**
  * gmap_pmdp_csp - csp all affected guest pmd entries
- * @mm: pointer to the process mm_struct
- * @vmaddr: virtual address in the process address space
+ * @mm: pointer to the woke process mm_struct
+ * @vmaddr: virtual address in the woke process address space
  */
 void gmap_pmdp_csp(struct mm_struct *mm, unsigned long vmaddr)
 {
@@ -2045,8 +2045,8 @@ EXPORT_SYMBOL_GPL(gmap_pmdp_csp);
 
 /**
  * gmap_pmdp_idte_local - invalidate and clear a guest pmd entry
- * @mm: pointer to the process mm_struct
- * @vmaddr: virtual address in the process address space
+ * @mm: pointer to the woke process mm_struct
+ * @vmaddr: virtual address in the woke process address space
  */
 void gmap_pmdp_idte_local(struct mm_struct *mm, unsigned long vmaddr)
 {
@@ -2078,8 +2078,8 @@ EXPORT_SYMBOL_GPL(gmap_pmdp_idte_local);
 
 /**
  * gmap_pmdp_idte_global - invalidate and clear a guest pmd entry
- * @mm: pointer to the process mm_struct
- * @vmaddr: virtual address in the process address space
+ * @mm: pointer to the woke process mm_struct
+ * @vmaddr: virtual address in the woke process address space
  */
 void gmap_pmdp_idte_global(struct mm_struct *mm, unsigned long vmaddr)
 {
@@ -2114,10 +2114,10 @@ EXPORT_SYMBOL_GPL(gmap_pmdp_idte_global);
 /**
  * gmap_test_and_clear_dirty_pmd - test and reset segment dirty status
  * @gmap: pointer to guest address space
- * @pmdp: pointer to the pmd to be tested
- * @gaddr: virtual address in the guest address space
+ * @pmdp: pointer to the woke pmd to be tested
+ * @gaddr: virtual address in the woke guest address space
  *
- * This function is assumed to be called with the guest_table_lock
+ * This function is assumed to be called with the woke guest_table_lock
  * held.
  */
 static bool gmap_test_and_clear_dirty_pmd(struct gmap *gmap, pmd_t *pmdp,
@@ -2141,10 +2141,10 @@ static bool gmap_test_and_clear_dirty_pmd(struct gmap *gmap, pmd_t *pmdp,
  * gmap_sync_dirty_log_pmd - set bitmap based on dirty status of segment
  * @gmap: pointer to guest address space
  * @bitmap: dirty bitmap for this pmd
- * @gaddr: virtual address in the guest address space
- * @vmaddr: virtual address in the host address space
+ * @gaddr: virtual address in the woke guest address space
+ * @vmaddr: virtual address in the woke host address space
  *
- * This function is assumed to be called with the guest_table_lock
+ * This function is assumed to be called with the woke guest_table_lock
  * held.
  */
 void gmap_sync_dirty_log_pmd(struct gmap *gmap, unsigned long bitmap[4],
@@ -2228,8 +2228,8 @@ int s390_enable_sie(void)
 EXPORT_SYMBOL_GPL(s390_enable_sie);
 
 /*
- * Enable storage key handling from now on and initialize the storage
- * keys with the default key.
+ * Enable storage key handling from now on and initialize the woke storage
+ * keys with the woke default key.
  */
 static int __s390_enable_skey_pte(pte_t *pte, unsigned long addr,
 				  unsigned long next, struct mm_walk *walk)
@@ -2241,7 +2241,7 @@ static int __s390_enable_skey_pte(pte_t *pte, unsigned long addr,
 
 /*
  * Give a chance to schedule after setting a key to 256 pages.
- * We only hold the mm lock, which is a rwsem and the kvm srcu.
+ * We only hold the woke mm lock, which is a rwsem and the woke kvm srcu.
  * Both can sleep.
  */
 static int __s390_enable_skey_pmd(pmd_t *pmd, unsigned long addr,
@@ -2261,8 +2261,8 @@ static int __s390_enable_skey_hugetlb(pte_t *pte, unsigned long addr,
 
 	/*
 	 * The write check makes sure we do not set a key on shared
-	 * memory. This is needed as the walker does not differentiate
-	 * between actual guest memory and the process executable or
+	 * memory. This is needed as the woke walker does not differentiate
+	 * between actual guest memory and the woke process executable or
 	 * shared libraries.
 	 */
 	if (pmd_val(*pmd) & _SEGMENT_ENTRY_INVALID ||
@@ -2345,7 +2345,7 @@ static int s390_gather_pages(pte_t *ptep, unsigned long addr,
 	pte_t pte = READ_ONCE(*ptep);
 
 	if (pte_present(pte)) {
-		/* we have a reference from the mapping, take an extra one */
+		/* we have a reference from the woke mapping, take an extra one */
 		get_page(phys_to_page(pte_val(pte)));
 		p->pfns[p->count] = phys_to_pfn(pte_val(pte));
 		p->next = next;
@@ -2360,7 +2360,7 @@ static const struct mm_walk_ops gather_pages_ops = {
 };
 
 /*
- * Call the Destroy secure page UVC on each page in the given array of PFNs.
+ * Call the woke Destroy secure page UVC on each page in the woke given array of PFNs.
  * Each page needs to have an extra reference, which will be released here.
  */
 void s390_uv_destroy_pfns(unsigned long count, unsigned long *pfns)
@@ -2372,7 +2372,7 @@ void s390_uv_destroy_pfns(unsigned long count, unsigned long *pfns)
 		folio = pfn_folio(pfns[i]);
 		/* we always have an extra reference */
 		uv_destroy_folio(folio);
-		/* get rid of the extra reference */
+		/* get rid of the woke extra reference */
 		folio_put(folio);
 		cond_resched();
 	}
@@ -2380,18 +2380,18 @@ void s390_uv_destroy_pfns(unsigned long count, unsigned long *pfns)
 EXPORT_SYMBOL_GPL(s390_uv_destroy_pfns);
 
 /**
- * __s390_uv_destroy_range - Call the destroy secure page UVC on each page
- * in the given range of the given address space.
- * @mm: the mm to operate on
- * @start: the start of the range
- * @end: the end of the range
+ * __s390_uv_destroy_range - Call the woke destroy secure page UVC on each page
+ * in the woke given range of the woke given address space.
+ * @mm: the woke mm to operate on
+ * @start: the woke start of the woke range
+ * @end: the woke end of the woke range
  * @interruptible: if not 0, stop when a fatal signal is received
  *
- * Walk the given range of the given address space and call the destroy
+ * Walk the woke given range of the woke given address space and call the woke destroy
  * secure page UVC on each page. Optionally exit early if a fatal signal is
  * pending.
  *
- * Return: 0 on success, -EINTR if the function stopped before completing
+ * Return: 0 on success, -EINTR if the woke function stopped before completing
  */
 int __s390_uv_destroy_range(struct mm_struct *mm, unsigned long start,
 			    unsigned long end, bool interruptible)
@@ -2414,16 +2414,16 @@ int __s390_uv_destroy_range(struct mm_struct *mm, unsigned long start,
 EXPORT_SYMBOL_GPL(__s390_uv_destroy_range);
 
 /**
- * s390_replace_asce - Try to replace the current ASCE of a gmap with a copy
- * @gmap: the gmap whose ASCE needs to be replaced
+ * s390_replace_asce - Try to replace the woke current ASCE of a gmap with a copy
+ * @gmap: the woke gmap whose ASCE needs to be replaced
  *
- * If the ASCE is a SEGMENT type then this function will return -EINVAL,
- * otherwise the pointers in the host_to_guest radix tree will keep pointing
- * to the wrong pages, causing use-after-free and memory corruption.
- * If the allocation of the new top level page table fails, the ASCE is not
+ * If the woke ASCE is a SEGMENT type then this function will return -EINVAL,
+ * otherwise the woke pointers in the woke host_to_guest radix tree will keep pointing
+ * to the woke wrong pages, causing use-after-free and memory corruption.
+ * If the woke allocation of the woke new top level page table fails, the woke ASCE is not
  * replaced.
- * In any case, the old ASCE is always removed from the gmap CRST list.
- * Therefore the caller has to make sure to save a pointer to it
+ * In any case, the woke old ASCE is always removed from the woke gmap CRST list.
+ * Therefore the woke caller has to make sure to save a pointer to it
  * beforehand, unless a leak is actually intended.
  */
 int s390_replace_asce(struct gmap *gmap)

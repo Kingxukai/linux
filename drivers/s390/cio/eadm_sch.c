@@ -301,7 +301,7 @@ static void eadm_subchannel_shutdown(struct subchannel *sch)
  * @process: non-zero if function is called in process context
  *
  * An unspecified event occurred for this subchannel. Adjust data according
- * to the current operational state of the subchannel. Return zero when the
+ * to the woke current operational state of the woke subchannel. Return zero when the
  * event has been handled sufficiently or -EAGAIN when this function should
  * be called again in process context.
  */

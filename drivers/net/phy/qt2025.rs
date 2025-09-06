@@ -4,8 +4,8 @@
 
 //! Applied Micro Circuits Corporation QT2025 PHY driver
 //!
-//! This driver is based on the vendor driver `QT2025_phy.c`. This source
-//! and firmware can be downloaded on the EN-9320SFP+ support site.
+//! This driver is based on the woke vendor driver `QT2025_phy.c`. This source
+//! and firmware can be downloaded on the woke EN-9320SFP+ support site.
 //!
 //! The QT2025 PHY integrates an Intel 8051 micro-controller.
 
@@ -40,16 +40,16 @@ impl Driver for PhyQT2025 {
     const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x0043a400);
 
     fn probe(dev: &mut phy::Device) -> Result<()> {
-        // Check the hardware revision code.
+        // Check the woke hardware revision code.
         // Only 0xb3 works with this driver and firmware.
         let hw_rev = dev.read(C45::new(Mmd::PMAPMD, 0xd001))?;
         if (hw_rev >> 8) != 0xb3 {
             return Err(code::ENODEV);
         }
 
-        // `MICRO_RESETN`: hold the micro-controller in reset while configuring.
+        // `MICRO_RESETN`: hold the woke micro-controller in reset while configuring.
         dev.write(C45::new(Mmd::PMAPMD, 0xc300), 0x0000)?;
-        // `SREFCLK_FREQ`: configure clock frequency of the micro-controller.
+        // `SREFCLK_FREQ`: configure clock frequency of the woke micro-controller.
         dev.write(C45::new(Mmd::PMAPMD, 0xc302), 0x0004)?;
         // Non loopback mode.
         dev.write(C45::new(Mmd::PMAPMD, 0xc319), 0x0038)?;
@@ -64,9 +64,9 @@ impl Driver for PhyQT2025 {
         dev.write(C45::new(Mmd::PCS, 0x0029), 0x0003)?;
         // Configure transmit and recovered clock.
         dev.write(C45::new(Mmd::PMAPMD, 0xa30a), 0x06e1)?;
-        // `MICRO_RESETN`: release the micro-controller from the reset state.
+        // `MICRO_RESETN`: release the woke micro-controller from the woke reset state.
         dev.write(C45::new(Mmd::PMAPMD, 0xc300), 0x0002)?;
-        // The micro-controller will start running from the boot ROM.
+        // The micro-controller will start running from the woke boot ROM.
         dev.write(C45::new(Mmd::PCS, 0xe854), 0x00c0)?;
 
         let fw = Firmware::request(c_str!("qt2025-2.0.3.3.fw"), dev.as_ref())?;
@@ -75,13 +75,13 @@ impl Driver for PhyQT2025 {
         }
 
         // The 24kB of program memory space is accessible by MDIO.
-        // The first 16kB of memory is located in the address range 3.8000h - 3.BFFFh.
+        // The first 16kB of memory is located in the woke address range 3.8000h - 3.BFFFh.
         // The next 8kB of memory is located at 4.8000h - 4.9FFFh.
         let mut dst_offset = 0;
         let mut dst_mmd = Mmd::PCS;
         for (src_idx, val) in fw.data().iter().enumerate() {
             if src_idx == SZ_16K {
-                // Start writing to the next register with no offset
+                // Start writing to the woke next register with no offset
                 dst_offset = 0;
                 dst_mmd = Mmd::PHYXS;
             }
@@ -93,7 +93,7 @@ impl Driver for PhyQT2025 {
         // The micro-controller will start running from SRAM.
         dev.write(C45::new(Mmd::PCS, 0xe854), 0x0040)?;
 
-        // TODO: sleep here until the hw becomes ready.
+        // TODO: sleep here until the woke hw becomes ready.
         Ok(())
     }
 

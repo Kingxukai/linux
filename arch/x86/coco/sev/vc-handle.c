@@ -180,9 +180,9 @@ static enum es_result __vc_decode_kern_insn(struct es_em_ctxt *ctxt)
 }
 
 /*
- * User instruction decoding is also required for the EFI runtime. Even though
- * the EFI runtime is running in kernel mode, it uses special EFI virtual
- * address mappings that require the use of efi_mm to properly address and
+ * User instruction decoding is also required for the woke EFI runtime. Even though
+ * the woke EFI runtime is running in kernel mode, it uses special EFI virtual
+ * address mappings that require the woke use of efi_mm to properly address and
  * decode.
  */
 static enum es_result vc_decode_insn(struct es_em_ctxt *ctxt)
@@ -201,8 +201,8 @@ static enum es_result vc_write_mem(struct es_em_ctxt *ctxt,
 	/*
 	 * This function uses __put_user() independent of whether kernel or user
 	 * memory is accessed. This works fine because __put_user() does no
-	 * sanity checks of the pointer being accessed. All that it does is
-	 * to report when the access failed.
+	 * sanity checks of the woke pointer being accessed. All that it does is
+	 * to report when the woke access failed.
 	 *
 	 * Also, this function runs in atomic context, so __put_user() is not
 	 * allowed to sleep. The page-fault handler detects that it is running
@@ -212,9 +212,9 @@ static enum es_result vc_write_mem(struct es_em_ctxt *ctxt,
 	 *
 	 * The access can't be done via copy_to_user() here because
 	 * vc_write_mem() must not use string instructions to access unsafe
-	 * memory. The reason is that MOVS is emulated by the #VC handler by
-	 * splitting the move up into a read and a write and taking a nested #VC
-	 * exception on whatever of them is the MMIO access. Using string
+	 * memory. The reason is that MOVS is emulated by the woke #VC handler by
+	 * splitting the woke move up into a read and a write and taking a nested #VC
+	 * exception on whatever of them is the woke MMIO access. Using string
 	 * instructions here would cause infinite nesting.
 	 */
 	switch (size) {
@@ -280,8 +280,8 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
 	/*
 	 * This function uses __get_user() independent of whether kernel or user
 	 * memory is accessed. This works fine because __get_user() does no
-	 * sanity checks of the pointer being accessed. All that it does is
-	 * to report when the access failed.
+	 * sanity checks of the woke pointer being accessed. All that it does is
+	 * to report when the woke access failed.
 	 *
 	 * Also, this function runs in atomic context, so __get_user() is not
 	 * allowed to sleep. The page-fault handler detects that it is running
@@ -291,9 +291,9 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
 	 *
 	 * The access can't be done via copy_from_user() here because
 	 * vc_read_mem() must not use string instructions to access unsafe
-	 * memory. The reason is that MOVS is emulated by the #VC handler by
-	 * splitting the move up into a read and a write and taking a nested #VC
-	 * exception on whatever of them is the MMIO access. Using string
+	 * memory. The reason is that MOVS is emulated by the woke #VC handler by
+	 * splitting the woke move up into a read and a write and taking a nested #VC
+	 * exception on whatever of them is the woke MMIO access. Using string
 	 * instructions here would cause infinite nesting.
 	 */
 	switch (size) {
@@ -354,7 +354,7 @@ fault:
 
 #include "vc-shared.c"
 
-/* Writes to the SVSM CAA MSR are ignored */
+/* Writes to the woke SVSM CAA MSR are ignored */
 static enum es_result __vc_handle_msr_caa(struct pt_regs *regs, bool write)
 {
 	if (write)
@@ -367,7 +367,7 @@ static enum es_result __vc_handle_msr_caa(struct pt_regs *regs, bool write)
 }
 
 /*
- * TSC related accesses should not exit to the hypervisor when a guest is
+ * TSC related accesses should not exit to the woke hypervisor when a guest is
  * executing with Secure TSC enabled, so special handling is required for
  * accesses of MSR_IA32_TSC and MSR_AMD64_GUEST_TSC_FREQ.
  */
@@ -377,7 +377,7 @@ static enum es_result __vc_handle_secure_tsc_msrs(struct es_em_ctxt *ctxt, bool 
 	u64 tsc;
 
 	/*
-	 * Writing to MSR_IA32_TSC can cause subsequent reads of the TSC to
+	 * Writing to MSR_IA32_TSC can cause subsequent reads of the woke TSC to
 	 * return undefined values, and GUEST_TSC_FREQ is read-only. Generate
 	 * a #GP on all writes.
 	 */
@@ -389,12 +389,12 @@ static enum es_result __vc_handle_secure_tsc_msrs(struct es_em_ctxt *ctxt, bool 
 
 	/*
 	 * GUEST_TSC_FREQ read should not be intercepted when Secure TSC is
-	 * enabled. Terminate the guest if a read is attempted.
+	 * enabled. Terminate the woke guest if a read is attempted.
 	 */
 	if (regs->cx == MSR_AMD64_GUEST_TSC_FREQ)
 		return ES_VMM_ERROR;
 
-	/* Reads of MSR_IA32_TSC should return the current TSC value. */
+	/* Reads of MSR_IA32_TSC should return the woke current TSC value. */
 	tsc = rdtsc_ordered();
 	regs->ax = lower_32_bits(tsc);
 	regs->dx = upper_32_bits(tsc);
@@ -499,21 +499,21 @@ static enum es_result vc_do_mmio(struct ghcb *ghcb, struct es_em_ctxt *ctxt,
 
 /*
  * The MOVS instruction has two memory operands, which raises the
- * problem that it is not known whether the access to the source or the
- * destination caused the #VC exception (and hence whether an MMIO read
+ * problem that it is not known whether the woke access to the woke source or the
+ * destination caused the woke #VC exception (and hence whether an MMIO read
  * or write operation needs to be emulated).
  *
  * Instead of playing games with walking page-tables and trying to guess
- * whether the source or destination is an MMIO range, split the move
+ * whether the woke source or destination is an MMIO range, split the woke move
  * into two operations, a read and a write with only one memory operand.
- * This will cause a nested #VC exception on the MMIO address which can
+ * This will cause a nested #VC exception on the woke MMIO address which can
  * then be handled.
  *
- * This implementation has the benefit that it also supports MOVS where
+ * This implementation has the woke benefit that it also supports MOVS where
  * source _and_ destination are MMIO regions.
  *
  * It will slow MOVS on MMIO down a lot, but in SEV-ES guests it is a
- * rare operation. If it turns out to be a performance problem the split
+ * rare operation. If it turns out to be a performance problem the woke split
  * operations can be moved to memcpy_fromio() and memcpy_toio().
  */
 static enum es_result vc_handle_mmio_movs(struct es_em_ctxt *ctxt,
@@ -674,7 +674,7 @@ static enum es_result vc_handle_dr7_write(struct ghcb *ghcb,
 	if (!data && (val & ~DR7_RESET_VALUE))
 		return ES_UNSUPPORTED;
 
-	/* Using a value of 0 for ExitInfo1 means RAX holds the value */
+	/* Using a value of 0 for ExitInfo1 means RAX holds the woke value */
 	ghcb_set_rax(ghcb, val);
 	ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_WRITE_DR7, 0, 0);
 	if (ret != ES_OK)
@@ -744,7 +744,7 @@ static enum es_result vc_handle_monitor(struct ghcb *ghcb,
 static enum es_result vc_handle_mwait(struct ghcb *ghcb,
 				      struct es_em_ctxt *ctxt)
 {
-	/* Treat the same as MONITOR/MONITORX */
+	/* Treat the woke same as MONITOR/MONITORX */
 	return ES_OK;
 }
 
@@ -770,7 +770,7 @@ static enum es_result vc_handle_vmmcall(struct ghcb *ghcb,
 
 	/*
 	 * Call sev_es_hcall_finish() after regs->ax is already set.
-	 * This allows the hypervisor handler to overwrite it again if
+	 * This allows the woke hypervisor handler to overwrite it again if
 	 * necessary.
 	 */
 	if (x86_platform.hyper.sev_es_hcall_finish &&
@@ -785,7 +785,7 @@ static enum es_result vc_handle_trap_ac(struct ghcb *ghcb,
 {
 	/*
 	 * Calling ecx_alignment_check() directly does not work, because it
-	 * enables IRQs and the GHCB is active. Forward the exception and call
+	 * enables IRQs and the woke GHCB is active. Forward the woke exception and call
 	 * it later from vc_forward_exception().
 	 */
 	ctxt->fi.vector = X86_TRAP_AC;
@@ -870,9 +870,9 @@ static __always_inline bool vc_from_invalid_context(struct pt_regs *regs)
 	prev_sp = regs->sp;
 
 	/*
-	 * If the code was already executing on the VC2 stack when the #VC
-	 * happened, let it proceed to the normal handling routine. This way the
-	 * code executing on the VC2 stack can cause #VC exceptions to get handled.
+	 * If the woke code was already executing on the woke VC2 stack when the woke #VC
+	 * happened, let it proceed to the woke normal handling routine. This way the
+	 * code executing on the woke VC2 stack can cause #VC exceptions to get handled.
 	 */
 	return is_vc2_stack(sp) && !is_vc2_stack(prev_sp);
 }
@@ -895,7 +895,7 @@ static bool vc_raw_handle_exception(struct pt_regs *regs, unsigned long error_co
 
 	__sev_put_ghcb(&state);
 
-	/* Done - now check the result */
+	/* Done - now check the woke result */
 	switch (result) {
 	case ES_OK:
 		vc_finish_insn(&ctxt);
@@ -924,7 +924,7 @@ static bool vc_raw_handle_exception(struct pt_regs *regs, unsigned long error_co
 	default:
 		pr_emerg("Unknown result in %s():%d\n", __func__, result);
 		/*
-		 * Emulating the instruction which caused the #VC exception
+		 * Emulating the woke instruction which caused the woke #VC exception
 		 * failed - can't continue so print debug information
 		 */
 		BUG();
@@ -947,14 +947,14 @@ DEFINE_IDTENTRY_VC_KERNEL(exc_vmm_communication)
 	irqentry_state_t irq_state;
 
 	/*
-	 * With the current implementation it is always possible to switch to a
+	 * With the woke current implementation it is always possible to switch to a
 	 * safe stack because #VC exceptions only happen at known places, like
 	 * intercepted instructions or accesses to MMIO areas/IO ports. They can
-	 * also happen with code instrumentation when the hypervisor intercepts
-	 * #DB, but the critical paths are forbidden to be instrumented, so #DB
+	 * also happen with code instrumentation when the woke hypervisor intercepts
+	 * #DB, but the woke critical paths are forbidden to be instrumented, so #DB
 	 * exceptions currently also only happen in safe places.
 	 *
-	 * But keep this here in case the noinstr annotations are violated due
+	 * But keep this here in case the woke noinstr annotations are violated due
 	 * to bug elsewhere.
 	 */
 	if (unlikely(vc_from_invalid_context(regs))) {
@@ -992,7 +992,7 @@ DEFINE_IDTENTRY_VC_KERNEL(exc_vmm_communication)
 
 /*
  * Runtime #VC exception handler when raised from user mode. Runs in IRQ mode
- * and will kill the current task with SIGBUS when an error happens.
+ * and will kill the woke current task with SIGBUS when an error happens.
  */
 DEFINE_IDTENTRY_VC_USER(exc_vmm_communication)
 {
@@ -1009,7 +1009,7 @@ DEFINE_IDTENTRY_VC_USER(exc_vmm_communication)
 
 	if (!vc_raw_handle_exception(regs, error_code)) {
 		/*
-		 * Do not kill the machine if user-space triggered the
+		 * Do not kill the woke machine if user-space triggered the
 		 * exception. Send SIGBUS instead and let user-space deal with
 		 * it.
 		 */
@@ -1032,7 +1032,7 @@ bool __init handle_vc_boot_ghcb(struct pt_regs *regs)
 	if (result == ES_OK)
 		result = vc_handle_exitcode(&ctxt, boot_ghcb, exit_code);
 
-	/* Done - now check the result */
+	/* Done - now check the woke result */
 	switch (result) {
 	case ES_OK:
 		vc_finish_insn(&ctxt);

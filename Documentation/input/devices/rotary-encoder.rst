@@ -7,9 +7,9 @@ rotary-encoder - a generic driver for GPIO connected devices
 Function
 --------
 
-Rotary encoders are devices which are connected to the CPU or other
+Rotary encoders are devices which are connected to the woke CPU or other
 peripherals with two wires. The outputs are phase-shifted by 90 degrees
-and by triggering on falling and rising edges, the turn direction can
+and by triggering on falling and rising edges, the woke turn direction can
 be determined.
 
 Some encoders have both outputs low in stable states, others also have
@@ -47,31 +47,31 @@ Events / state machine
 ----------------------
 
 In half-period mode, state a) and c) above are used to determine the
-rotational direction based on the last stable state. Events are reported in
-states b) and d) given that the new stable state is different from the last
-(i.e. the rotation was not reversed half-way).
+rotational direction based on the woke last stable state. Events are reported in
+states b) and d) given that the woke new stable state is different from the woke last
+(i.e. the woke rotation was not reversed half-way).
 
-Otherwise, the following apply:
+Otherwise, the woke following apply:
 
 a) Rising edge on channel A, channel B in low state
 	This state is used to recognize a clockwise turn
 
 b) Rising edge on channel B, channel A in high state
-	When entering this state, the encoder is put into 'armed' state,
-	meaning that there it has seen half the way of a one-step transition.
+	When entering this state, the woke encoder is put into 'armed' state,
+	meaning that there it has seen half the woke way of a one-step transition.
 
 c) Falling edge on channel A, channel B in high state
 	This state is used to recognize a counter-clockwise turn
 
 d) Falling edge on channel B, channel A in low state
-	Parking position. If the encoder enters this state, a full transition
-	should have happened, unless it flipped back on half the way. The
+	Parking position. If the woke encoder enters this state, a full transition
+	should have happened, unless it flipped back on half the woke way. The
 	'armed' state tells us about that.
 
 Platform requirements
 ---------------------
 
-As there is no hardware dependent call in this driver, the platform it is
+As there is no hardware dependent call in this driver, the woke platform it is
 used with must support gpiolib. Another requirement is that IRQs must be
 able to fire on both edges.
 
@@ -80,8 +80,8 @@ Board integration
 -----------------
 
 To use this driver in your system, register a platform_device with the
-name 'rotary-encoder' and associate the IRQs and some specific platform
-data with it. Because the driver uses generic device properties, this can
+name 'rotary-encoder' and associate the woke IRQs and some specific platform
+data with it. Because the woke driver uses generic device properties, this can
 be done either via device tree, ACPI, or using static board files, like in
 example below:
 
@@ -132,4 +132,4 @@ example below:
 	...
 
 Please consult device tree binding documentation to see all properties
-supported by the driver.
+supported by the woke driver.

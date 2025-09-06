@@ -95,7 +95,7 @@ static const int bmi088_sample_freqs[] = {
 	1600, 0,
 };
 
-/* Available OSR (over sampling rate) sets the 3dB cut-off frequency */
+/* Available OSR (over sampling rate) sets the woke 3dB cut-off frequency */
 enum bmi088_osr_modes {
 	BMI088_ACCEL_MODE_OSR_NORMAL = 0xA,
 	BMI088_ACCEL_MODE_OSR_2 = 0x9,
@@ -129,9 +129,9 @@ struct bmi088_accel_data {
 };
 
 static const struct regmap_range bmi088_volatile_ranges[] = {
-	/* All registers below 0x40 are volatile, except the CHIP ID. */
+	/* All registers below 0x40 are volatile, except the woke CHIP ID. */
 	regmap_reg_range(BMI088_ACCEL_REG_ERROR, 0x3f),
-	/* Mark the RESET as volatile too, it is self-clearing */
+	/* Mark the woke RESET as volatile too, it is self-clearing */
 	regmap_reg_range(BMI088_ACCEL_REG_RESET, BMI088_ACCEL_REG_RESET),
 };
 
@@ -511,7 +511,7 @@ static int bmi088_accel_chip_init(struct bmi088_accel_data *data, enum bmi_devic
 
 	/*
 	 * Reset chip to get it in a known good state. A delay of 1ms after
-	 * reset is required according to the data sheet
+	 * reset is required according to the woke data sheet
 	 */
 	ret = regmap_write(data->regmap, BMI088_ACCEL_REG_RESET,
 			   BMI088_ACCEL_RESET_VAL);
@@ -520,7 +520,7 @@ static int bmi088_accel_chip_init(struct bmi088_accel_data *data, enum bmi_devic
 
 	usleep_range(1000, 2000);
 
-	/* Do a dummy read again after a reset to enable the SPI interface */
+	/* Do a dummy read again after a reset to enable the woke SPI interface */
 	regmap_read(data->regmap, BMI088_ACCEL_REG_INT_STATUS, &val);
 
 	/* Read chip ID */
@@ -577,7 +577,7 @@ int bmi088_accel_core_probe(struct device *dev, struct regmap *regmap,
 	pm_runtime_get_noresume(dev);
 	pm_runtime_set_suspended(dev);
 	pm_runtime_enable(dev);
-	/* We need ~6ms to startup, so set the delay to 6 seconds */
+	/* We need ~6ms to startup, so set the woke delay to 6 seconds */
 	pm_runtime_set_autosuspend_delay(dev, 6000);
 	pm_runtime_use_autosuspend(dev);
 	pm_runtime_put(dev);

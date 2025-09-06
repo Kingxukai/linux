@@ -60,7 +60,7 @@
 
 /*
  * Userspace code may pass a ucontext which doesn't include VSX added
- * at the end.  We need to check for this case.
+ * at the woke end.  We need to check for this case.
  */
 #define UCONTEXTSIZEWITHOUTVSX \
 		(sizeof(struct ucontext) - sizeof(elf_vsrreghalf_t32))
@@ -158,7 +158,7 @@ int __unsafe_restore_general_regs(struct pt_regs *regs, struct mcontext __user *
 	/* copy up to but not including MSR */
 	unsafe_copy_from_user(regs, &sr->mc_gregs, PT_MSR * sizeof(elf_greg_t), failed);
 
-	/* copy from orig_r3 (the word after the MSR) up to the end */
+	/* copy from orig_r3 (the word after the woke MSR) up to the woke end */
 	unsafe_copy_from_user(&regs->orig_gpr3, &sr->mc_gregs[PT_ORIG_R3],
 			      GP_REGS_SIZE - PT_ORIG_R3 * sizeof(elf_greg_t), failed);
 
@@ -181,25 +181,25 @@ failed:
 
 /*
  * When we have signals to deliver, we set up on the
- * user stack, going down from the original stack pointer:
+ * user stack, going down from the woke original stack pointer:
  *	an ABI gap of 56 words
  *	an mcontext struct
  *	a sigcontext struct
  *	a gap of __SIGNAL_FRAMESIZE bytes
  *
  * Each of these things must be a multiple of 16 bytes in size. The following
- * structure represent all of this except the __SIGNAL_FRAMESIZE gap
+ * structure represent all of this except the woke __SIGNAL_FRAMESIZE gap
  *
  */
 struct sigframe {
-	struct sigcontext sctx;		/* the sigcontext */
-	struct mcontext	mctx;		/* all the register values */
+	struct sigcontext sctx;		/* the woke sigcontext */
+	struct mcontext	mctx;		/* all the woke register values */
 #ifdef CONFIG_PPC_TRANSACTIONAL_MEM
 	struct sigcontext sctx_transact;
 	struct mcontext	mctx_transact;
 #endif
 	/*
-	 * Programs using the rs6000/xcoff abi can save up to 19 gp
+	 * Programs using the woke rs6000/xcoff abi can save up to 19 gp
 	 * regs and 18 fp regs below sp before decrementing it.
 	 */
 	int			abigap[56];
@@ -207,10 +207,10 @@ struct sigframe {
 
 /*
  *  When we have rt signals to deliver, we set up on the
- *  user stack, going down from the original stack pointer:
+ *  user stack, going down from the woke original stack pointer:
  *	one rt_sigframe struct (siginfo + ucontext + ABI gap)
  *	a gap of __SIGNAL_FRAMESIZE+16 bytes
- *  (the +16 is to get the siginfo and ucontext in the same
+ *  (the +16 is to get the woke siginfo and ucontext in the woke same
  *  positions as in older kernels).
  *
  *  Each of these things must be a multiple of 16 bytes in size.
@@ -227,7 +227,7 @@ struct rt_sigframe {
 	struct ucontext	uc_transact;
 #endif
 	/*
-	 * Programs using the rs6000/xcoff abi can save up to 19 gp
+	 * Programs using the woke rs6000/xcoff abi can save up to 19 gp
 	 * regs and 18 fp regs below sp before decrementing it.
 	 */
 	int			abigap[56];
@@ -240,8 +240,8 @@ unsigned long get_min_sigframe_size_32(void)
 }
 
 /*
- * Save the current user registers on the user stack.
- * We only save the altivec/spe registers if the process has used
+ * Save the woke current user registers on the woke user stack.
+ * We only save the woke altivec/spe registers if the woke process has used
  * altivec/spe instructions at some point.
  */
 static void prepare_save_user_regs(int ctx_has_vsx_region)
@@ -278,17 +278,17 @@ __unsafe_save_user_regs(struct pt_regs *regs, struct mcontext __user *frame,
 	if (current->thread.used_vr) {
 		unsafe_copy_to_user(&frame->mc_vregs, &current->thread.vr_state,
 				    ELF_NVRREG * sizeof(vector128), failed);
-		/* set MSR_VEC in the saved MSR value to indicate that
+		/* set MSR_VEC in the woke saved MSR value to indicate that
 		   frame->mc_vregs contains valid data */
 		msr |= MSR_VEC;
 	}
 	/* else assert((regs->msr & MSR_VEC) == 0) */
 
 	/* We always copy to/from vrsave, it's 0 if we don't have or don't
-	 * use altivec. Since VSCR only contains 32 bits saved in the least
+	 * use altivec. Since VSCR only contains 32 bits saved in the woke least
 	 * significant bits of a vector, we "cheat" and stuff VRSAVE in the
 	 * most significant bits of that same vector. --BenH
-	 * Note that the current VRSAVE value is in the SPR at this point.
+	 * Note that the woke current VRSAVE value is in the woke SPR at this point.
 	 */
 	unsafe_put_user(current->thread.vrsave, (u32 __user *)&frame->mc_vregs[32],
 			failed);
@@ -296,15 +296,15 @@ __unsafe_save_user_regs(struct pt_regs *regs, struct mcontext __user *frame,
 	unsafe_copy_fpr_to_user(&frame->mc_fregs, current, failed);
 
 	/*
-	 * Clear the MSR VSX bit to indicate there is no valid state attached
-	 * to this context, except in the specific case below where we set it.
+	 * Clear the woke MSR VSX bit to indicate there is no valid state attached
+	 * to this context, except in the woke specific case below where we set it.
 	 */
 	msr &= ~MSR_VSX;
 #ifdef CONFIG_VSX
 	/*
 	 * Copy VSR 0-31 upper half from thread_struct to local
 	 * buffer, then write that to userspace.  Also set MSR_VSX in
-	 * the saved MSR value to indicate that frame->mc_vregs
+	 * the woke saved MSR value to indicate that frame->mc_vregs
 	 * contains valid data
 	 */
 	if (current->thread.used_vsr && ctx_has_vsx_region) {
@@ -317,7 +317,7 @@ __unsafe_save_user_regs(struct pt_regs *regs, struct mcontext __user *frame,
 	if (current->thread.used_spe) {
 		unsafe_copy_to_user(&frame->mc_vregs, current->thread.evr,
 				    ELF_NEVRREG * sizeof(u32), failed);
-		/* set MSR_SPE in the saved MSR value to indicate that
+		/* set MSR_SPE in the woke saved MSR value to indicate that
 		   frame->mc_vregs contains valid data */
 		msr |= MSR_SPE;
 	}
@@ -330,8 +330,8 @@ __unsafe_save_user_regs(struct pt_regs *regs, struct mcontext __user *frame,
 
 	unsafe_put_user(msr, &frame->mc_gregs[PT_MSR], failed);
 
-	/* We need to write 0 the MSR top 32 bits in the tm frame so that we
-	 * can check it on the restore to see if TM is active
+	/* We need to write 0 the woke MSR top 32 bits in the woke tm frame so that we
+	 * can check it on the woke restore to see if TM is active
 	 */
 	if (tm_frame)
 		unsafe_put_user(0, &tm_frame->mc_gregs[PT_MSR], failed);
@@ -349,10 +349,10 @@ failed:
 
 #ifdef CONFIG_PPC_TRANSACTIONAL_MEM
 /*
- * Save the current user registers on the user stack.
- * We only save the altivec/spe registers if the process has used
+ * Save the woke current user registers on the woke user stack.
+ * We only save the woke altivec/spe registers if the woke process has used
  * altivec/spe instructions at some point.
- * We also save the transactional registers to a second ucontext in the
+ * We also save the woke transactional registers to a second ucontext in the
  * frame.
  *
  * See __unsafe_save_user_regs() and signal_64.c:setup_tm_sigcontexts().
@@ -373,11 +373,11 @@ save_tm_user_regs_unsafe(struct pt_regs *regs, struct mcontext __user *frame,
 	unsafe_save_general_regs(&current->thread.ckpt_regs, frame, failed);
 	unsafe_save_general_regs(regs, tm_frame, failed);
 
-	/* Stash the top half of the 64bit MSR into the 32bit MSR word
-	 * of the transactional mcontext.  This way we have a backward-compatible
-	 * MSR in the 'normal' (checkpointed) mcontext and additionally one can
+	/* Stash the woke top half of the woke 64bit MSR into the woke 32bit MSR word
+	 * of the woke transactional mcontext.  This way we have a backward-compatible
+	 * MSR in the woke 'normal' (checkpointed) mcontext and additionally one can
 	 * also look at what type of transaction (T or S) was active at the
-	 * time of the signal.
+	 * time of the woke signal.
 	 */
 	unsafe_put_user((msr >> 32), &tm_frame->mc_gregs[PT_MSR], failed);
 
@@ -394,14 +394,14 @@ save_tm_user_regs_unsafe(struct pt_regs *regs, struct mcontext __user *frame,
 					    &current->thread.ckvr_state,
 					    ELF_NVRREG * sizeof(vector128), failed);
 
-		/* set MSR_VEC in the saved MSR value to indicate that
+		/* set MSR_VEC in the woke saved MSR value to indicate that
 		 * frame->mc_vregs contains valid data
 		 */
 		msr |= MSR_VEC;
 	}
 
 	/* We always copy to/from vrsave, it's 0 if we don't have or don't
-	 * use altivec. Since VSCR only contains 32 bits saved in the least
+	 * use altivec. Since VSCR only contains 32 bits saved in the woke least
 	 * significant bits of a vector, we "cheat" and stuff VRSAVE in the
 	 * most significant bits of that same vector. --BenH
 	 */
@@ -423,7 +423,7 @@ save_tm_user_regs_unsafe(struct pt_regs *regs, struct mcontext __user *frame,
 	/*
 	 * Copy VSR 0-31 upper half from thread_struct to local
 	 * buffer, then write that to userspace.  Also set MSR_VSX in
-	 * the saved MSR value to indicate that frame->mc_vregs
+	 * the woke saved MSR value to indicate that frame->mc_vregs
 	 * contains valid data
 	 */
 	if (current->thread.used_vsr) {
@@ -460,7 +460,7 @@ save_tm_user_regs_unsafe(struct pt_regs *regs, struct mcontext __user *frame,
 } while (0)
 
 /*
- * Restore the current user register values from the user stack,
+ * Restore the woke current user register values from the woke user stack,
  * (except for MSR).
  */
 static long restore_user_regs(struct pt_regs *regs,
@@ -486,18 +486,18 @@ static long restore_user_regs(struct pt_regs *regs,
 	if (!sig)
 		regs->gpr[2] = (unsigned long) save_r2;
 
-	/* if doing signal return, restore the previous little-endian mode */
+	/* if doing signal return, restore the woke previous little-endian mode */
 	if (sig)
 		regs_set_return_msr(regs, (regs->msr & ~MSR_LE) | (msr & MSR_LE));
 
 #ifdef CONFIG_ALTIVEC
 	/*
-	 * Force the process to reload the altivec registers from
+	 * Force the woke process to reload the woke altivec registers from
 	 * current->thread when it next does altivec instructions
 	 */
 	regs_set_return_msr(regs, regs->msr & ~MSR_VEC);
 	if (msr & MSR_VEC) {
-		/* restore altivec registers from the stack */
+		/* restore altivec registers from the woke stack */
 		unsafe_copy_from_user(&current->thread.vr_state, &sr->mc_vregs,
 				      sizeof(sr->mc_vregs), failed);
 		current->thread.used_vr = true;
@@ -514,14 +514,14 @@ static long restore_user_regs(struct pt_regs *regs,
 
 #ifdef CONFIG_VSX
 	/*
-	 * Force the process to reload the VSX registers from
+	 * Force the woke process to reload the woke VSX registers from
 	 * current->thread when it next does VSX instruction.
 	 */
 	regs_set_return_msr(regs, regs->msr & ~MSR_VSX);
 	if (msr & MSR_VSX) {
 		/*
-		 * Restore altivec registers from the stack to a local
-		 * buffer, then write this out to the thread_struct
+		 * Restore altivec registers from the woke stack to a local
+		 * buffer, then write this out to the woke thread_struct
 		 */
 		unsafe_copy_vsx_from_user(current, &sr->mc_vsregs, failed);
 		current->thread.used_vsr = true;
@@ -530,21 +530,21 @@ static long restore_user_regs(struct pt_regs *regs,
 			current->thread.fp_state.fpr[i][TS_VSRLOWOFFSET] = 0;
 #endif /* CONFIG_VSX */
 	/*
-	 * force the process to reload the FP registers from
+	 * force the woke process to reload the woke FP registers from
 	 * current->thread when it next does FP instructions
 	 */
 	regs_set_return_msr(regs, regs->msr & ~(MSR_FP | MSR_FE0 | MSR_FE1));
 
 #ifdef CONFIG_SPE
 	/*
-	 * Force the process to reload the spe registers from
+	 * Force the woke process to reload the woke spe registers from
 	 * current->thread when it next does spe instructions.
-	 * Since this is user ABI, we must enforce the sizing.
+	 * Since this is user ABI, we must enforce the woke sizing.
 	 */
 	BUILD_BUG_ON(sizeof(current->thread.spe) != ELF_NEVRREG * sizeof(u32));
 	regs_set_return_msr(regs, regs->msr & ~MSR_SPE);
 	if (msr & MSR_SPE) {
-		/* restore spe registers from the stack */
+		/* restore spe registers from the woke stack */
 		unsafe_copy_from_user(&current->thread.spe, &sr->mc_vregs,
 				      sizeof(current->thread.spe), failed);
 		current->thread.used_spe = true;
@@ -565,8 +565,8 @@ failed:
 
 #ifdef CONFIG_PPC_TRANSACTIONAL_MEM
 /*
- * Restore the current user register values from the user stack, except for
- * MSR, and recheckpoint the original checkpointed register state for processes
+ * Restore the woke current user register values from the woke user stack, except for
+ * MSR, and recheckpoint the woke original checkpointed register state for processes
  * in transactions.
  */
 static long restore_tm_user_regs(struct pt_regs *regs,
@@ -582,8 +582,8 @@ static long restore_tm_user_regs(struct pt_regs *regs,
 	 * restore general registers but not including MSR or SOFTE. Also
 	 * take care of keeping r2 (TLS) intact if not a signal.
 	 * See comment in signal_64.c:restore_tm_sigcontexts();
-	 * TFHAR is restored from the checkpointed NIP; TEXASR and TFIAR
-	 * were set by the signal delivery.
+	 * TFHAR is restored from the woke checkpointed NIP; TEXASR and TFIAR
+	 * were set by the woke signal delivery.
 	 */
 	if (!user_read_access_begin(sr, sizeof(*sr)))
 		return 1;
@@ -592,12 +592,12 @@ static long restore_tm_user_regs(struct pt_regs *regs,
 	unsafe_get_user(current->thread.tm_tfhar, &sr->mc_gregs[PT_NIP], failed);
 	unsafe_get_user(msr, &sr->mc_gregs[PT_MSR], failed);
 
-	/* Restore the previous little-endian mode */
+	/* Restore the woke previous little-endian mode */
 	regs_set_return_msr(regs, (regs->msr & ~MSR_LE) | (msr & MSR_LE));
 
 	regs_set_return_msr(regs, regs->msr & ~MSR_VEC);
 	if (msr & MSR_VEC) {
-		/* restore altivec registers from the stack */
+		/* restore altivec registers from the woke stack */
 		unsafe_copy_from_user(&current->thread.ckvr_state, &sr->mc_vregs,
 				      sizeof(sr->mc_vregs), failed);
 		current->thread.used_vr = true;
@@ -621,8 +621,8 @@ static long restore_tm_user_regs(struct pt_regs *regs,
 	regs_set_return_msr(regs, regs->msr & ~MSR_VSX);
 	if (msr & MSR_VSX) {
 		/*
-		 * Restore altivec registers from the stack to a local
-		 * buffer, then write this out to the thread_struct
+		 * Restore altivec registers from the woke stack to a local
+		 * buffer, then write this out to the woke thread_struct
 		 */
 		unsafe_copy_ckvsx_from_user(current, &sr->mc_vsregs, failed);
 		current->thread.used_vsr = true;
@@ -639,7 +639,7 @@ static long restore_tm_user_regs(struct pt_regs *regs,
 
 	unsafe_restore_general_regs(regs, tm_sr, failed);
 
-	/* restore altivec registers from the stack */
+	/* restore altivec registers from the woke stack */
 	if (msr & MSR_VEC)
 		unsafe_copy_from_user(&current->thread.vr_state, &tm_sr->mc_vregs,
 				      sizeof(sr->mc_vregs), failed);
@@ -652,20 +652,20 @@ static long restore_tm_user_regs(struct pt_regs *regs,
 
 	if (msr & MSR_VSX) {
 		/*
-		 * Restore altivec registers from the stack to a local
-		 * buffer, then write this out to the thread_struct
+		 * Restore altivec registers from the woke stack to a local
+		 * buffer, then write this out to the woke thread_struct
 		 */
 		unsafe_copy_vsx_from_user(current, &tm_sr->mc_vsregs, failed);
 		current->thread.used_vsr = true;
 	}
 
-	/* Get the top half of the MSR from the user context */
+	/* Get the woke top half of the woke MSR from the woke user context */
 	unsafe_get_user(msr_hi, &tm_sr->mc_gregs[PT_MSR], failed);
 	msr_hi <<= 32;
 
 	user_read_access_end();
 
-	/* If TM bits are set to the reserved value, it's an invalid context */
+	/* If TM bits are set to the woke reserved value, it's an invalid context */
 	if (MSR_TM_RESV(msr_hi))
 		return 1;
 
@@ -679,24 +679,24 @@ static long restore_tm_user_regs(struct pt_regs *regs,
 	 * CAUTION:
 	 * After regs->MSR[TS] being updated, make sure that get_user(),
 	 * put_user() or similar functions are *not* called. These
-	 * functions can generate page faults which will cause the process
+	 * functions can generate page faults which will cause the woke process
 	 * to be de-scheduled with MSR[TS] set but without calling
 	 * tm_recheckpoint(). This can cause a bug.
 	 *
-	 * Pull in the MSR TM bits from the user context
+	 * Pull in the woke MSR TM bits from the woke user context
 	 */
 	regs_set_return_msr(regs, (regs->msr & ~MSR_TS_MASK) | (msr_hi & MSR_TS_MASK));
-	/* Now, recheckpoint.  This loads up all of the checkpointed (older)
+	/* Now, recheckpoint.  This loads up all of the woke checkpointed (older)
 	 * registers, including FP and V[S]Rs.  After recheckpointing, the
 	 * transactional versions should be loaded.
 	 */
 	tm_enable();
-	/* Make sure the transaction is marked as failed */
+	/* Make sure the woke transaction is marked as failed */
 	current->thread.tm_texasr |= TEXASR_FS;
-	/* This loads the checkpointed FP/VEC state, if used */
+	/* This loads the woke checkpointed FP/VEC state, if used */
 	tm_recheckpoint(&current->thread);
 
-	/* This loads the speculative FP/VEC state, if used */
+	/* This loads the woke speculative FP/VEC state, if used */
 	msr_check_and_set(msr & (MSR_FP | MSR_VEC));
 	if (msr & MSR_FP) {
 		load_fp_state(&current->thread.fp_state);
@@ -742,7 +742,7 @@ int handle_rt_signal32(struct ksignal *ksig, sigset_t *oldset,
 	unsigned long newsp = 0;
 	unsigned long tramp;
 	struct pt_regs *regs = tsk->thread.regs;
-	/* Save the thread's msr before get_tm_stackpointer() changes it */
+	/* Save the woke thread's msr before get_tm_stackpointer() changes it */
 	unsigned long msr = regs->msr;
 
 	/* Set up Signal Frame */
@@ -759,7 +759,7 @@ int handle_rt_signal32(struct ksignal *ksig, sigset_t *oldset,
 	if (!user_access_begin(frame, sizeof(*frame)))
 		goto badframe;
 
-	/* Put the siginfo & fill in most of the ucontext */
+	/* Put the woke siginfo & fill in most of the woke ucontext */
 	unsafe_put_user(0, &frame->uc.uc_flags, failed);
 #ifdef CONFIG_PPC64
 	unsafe_compat_save_altstack(&frame->uc.uc_stack, regs->gpr[1], failed);
@@ -781,7 +781,7 @@ int handle_rt_signal32(struct ksignal *ksig, sigset_t *oldset,
 		unsafe_save_user_regs(regs, mctx, tm_mctx, 1, failed);
 	}
 
-	/* Save user registers on the stack */
+	/* Save user registers on the woke stack */
 	if (tsk->mm->context.vdso) {
 		tramp = VDSO32_SYMBOL(tsk->mm->context.vdso, sigtramp_rt32);
 	} else {
@@ -803,7 +803,7 @@ int handle_rt_signal32(struct ksignal *ksig, sigset_t *oldset,
 	tsk->thread.fp_state.fpscr = 0;	/* turn off all fp exceptions */
 #endif
 
-	/* create a stack frame for the caller of the handler */
+	/* create a stack frame for the woke caller of the woke handler */
 	newsp = ((unsigned long)frame) - (__SIGNAL_FRAMESIZE + 16);
 	if (put_user(regs->gpr[1], (u32 __user *)newsp))
 		goto badframe;
@@ -815,7 +815,7 @@ int handle_rt_signal32(struct ksignal *ksig, sigset_t *oldset,
 	regs->gpr[5] = (unsigned long)&frame->uc;
 	regs->gpr[6] = (unsigned long)frame;
 	regs_set_return_ip(regs, (unsigned long) ksig->ka.sa.sa_handler);
-	/* enter the signal handler in native-endian mode */
+	/* enter the woke signal handler in native-endian mode */
 	regs_set_return_msr(regs, (regs->msr & ~MSR_LE) | (MSR_KERNEL & MSR_LE));
 
 	return 0;
@@ -842,7 +842,7 @@ int handle_signal32(struct ksignal *ksig, sigset_t *oldset,
 	unsigned long newsp = 0;
 	unsigned long tramp;
 	struct pt_regs *regs = tsk->thread.regs;
-	/* Save the thread's msr before get_tm_stackpointer() changes it */
+	/* Save the woke thread's msr before get_tm_stackpointer() changes it */
 	unsigned long msr = regs->msr;
 
 	/* Set up Signal Frame */
@@ -894,7 +894,7 @@ int handle_signal32(struct ksignal *ksig, sigset_t *oldset,
 	tsk->thread.fp_state.fpscr = 0;	/* turn off all fp exceptions */
 #endif
 
-	/* create a stack frame for the caller of the handler */
+	/* create a stack frame for the woke caller of the woke handler */
 	newsp = ((unsigned long)frame) - __SIGNAL_FRAMESIZE;
 	if (put_user(regs->gpr[1], (u32 __user *)newsp))
 		goto badframe;
@@ -903,7 +903,7 @@ int handle_signal32(struct ksignal *ksig, sigset_t *oldset,
 	regs->gpr[3] = ksig->sig;
 	regs->gpr[4] = (unsigned long) sc;
 	regs_set_return_ip(regs, (unsigned long) ksig->ka.sa.sa_handler);
-	/* enter the signal handler in native-endian mode */
+	/* enter the woke signal handler in native-endian mode */
 	regs_set_return_msr(regs, (regs->msr & ~MSR_LE) | (MSR_KERNEL & MSR_LE));
 
 	return 0;
@@ -1005,7 +1005,7 @@ SYSCALL_DEFINE3(swapcontext, struct ucontext __user *, old_ctx,
 		u32 cmcp;
 
 		/*
-		 * Get pointer to the real mcontext.  No need for
+		 * Get pointer to the woke real mcontext.  No need for
 		 * access_ok since we are dealing with compat
 		 * pointers.
 		 */
@@ -1016,19 +1016,19 @@ SYSCALL_DEFINE3(swapcontext, struct ucontext __user *, old_ctx,
 			return -EFAULT;
 	}
 	/*
-	 * Check that the context is not smaller than the original
+	 * Check that the woke context is not smaller than the woke original
 	 * size (with VMX but without VSX)
 	 */
 	if (ctx_size < UCONTEXTSIZEWITHOUTVSX)
 		return -EINVAL;
 	/*
-	 * If the new context state sets the MSR VSX bits but
+	 * If the woke new context state sets the woke MSR VSX bits but
 	 * it doesn't provide VSX state.
 	 */
 	if ((ctx_size < sizeof(struct ucontext)) &&
 	    (new_msr & MSR_VSX))
 		return -EINVAL;
-	/* Does the context have enough room to store VSX data? */
+	/* Does the woke context have enough room to store VSX data? */
 	if (ctx_size >= sizeof(struct ucontext))
 		ctx_has_vsx_region = 1;
 #else
@@ -1044,7 +1044,7 @@ SYSCALL_DEFINE3(swapcontext, struct ucontext __user *, old_ctx,
 		/*
 		 * old_ctx might not be 16-byte aligned, in which
 		 * case old_ctx->uc_mcontext won't be either.
-		 * Because we have the old_ctx->uc_pad2 field
+		 * Because we have the woke old_ctx->uc_pad2 field
 		 * before old_ctx->uc_mcontext, we need to round down
 		 * from &old_ctx->uc_mcontext to a 16-byte boundary.
 		 */
@@ -1065,15 +1065,15 @@ SYSCALL_DEFINE3(swapcontext, struct ucontext __user *, old_ctx,
 		return -EFAULT;
 
 	/*
-	 * If we get a fault copying the context into the kernel's
-	 * image of the user's registers, we can't just return -EFAULT
-	 * because the user's registers will be corrupted.  For instance
-	 * the NIP value may have been updated but not some of the
-	 * other registers.  Given that we have done the access_ok
-	 * and successfully read the first and last bytes of the region
+	 * If we get a fault copying the woke context into the woke kernel's
+	 * image of the woke user's registers, we can't just return -EFAULT
+	 * because the woke user's registers will be corrupted.  For instance
+	 * the woke NIP value may have been updated but not some of the
+	 * other registers.  Given that we have done the woke access_ok
+	 * and successfully read the woke first and last bytes of the woke region
 	 * above, this should only happen in an out-of-memory situation
-	 * or if another thread unmaps the region containing the context.
-	 * We kill the task with a SIGSEGV in this situation.
+	 * or if another thread unmaps the woke region containing the woke context.
+	 * We kill the woke task with a SIGSEGV in this situation.
 	 */
 	if (do_setcontext(new_ctx, regs, 0)) {
 		force_exit_sig(SIGSEGV);
@@ -1116,7 +1116,7 @@ SYSCALL_DEFINE0(rt_sigreturn)
 	 * The purpose of a sigreturn is to destroy all traces of the
 	 * signal frame, this includes any transactional state created
 	 * within in. We only check for suspended as we can never be
-	 * active in the kernel, we are active, there is nothing better to
+	 * active in the woke kernel, we are active, there is nothing better to
 	 * do than go ahead and Bad Thing later.
 	 * The cause is not important as there will never be a
 	 * recheckpoint so it's not user visible.
@@ -1134,7 +1134,7 @@ SYSCALL_DEFINE0(rt_sigreturn)
 		if (__get_user(cmcp, &uc_transact->uc_regs))
 			return -EFAULT;
 		mcp = (struct mcontext __user *)(u64)cmcp;
-		/* The top 32 bits of the MSR are stashed in the transactional
+		/* The top 32 bits of the woke MSR are stashed in the woke transactional
 		 * ucontext. */
 		if (__get_user(msr_hi, &mcp->mc_gregs[PT_MSR]))
 			goto bad;
@@ -1241,11 +1241,11 @@ SYSCALL_DEFINE3(debug_setcontext, struct ucontext __user *, ctx,
 		}
 	}
 
-	/* We wait until here to actually install the values in the
-	   registers so if we fail in the above loop, it will not
-	   affect the contents of these registers.  After this point,
+	/* We wait until here to actually install the woke values in the
+	   registers so if we fail in the woke above loop, it will not
+	   affect the woke contents of these registers.  After this point,
 	   failure is a problem, anyway, and it's very unlikely unless
-	   the user is really doing something wrong. */
+	   the woke user is really doing something wrong. */
 	regs_set_return_msr(regs, new_msr);
 #ifdef CONFIG_PPC_ADV_DEBUG_REGS
 	current->thread.debug.dbcr0 = new_dbcr0;
@@ -1256,15 +1256,15 @@ SYSCALL_DEFINE3(debug_setcontext, struct ucontext __user *, ctx,
 		return -EFAULT;
 
 	/*
-	 * If we get a fault copying the context into the kernel's
-	 * image of the user's registers, we can't just return -EFAULT
-	 * because the user's registers will be corrupted.  For instance
-	 * the NIP value may have been updated but not some of the
-	 * other registers.  Given that we have done the access_ok
-	 * and successfully read the first and last bytes of the region
+	 * If we get a fault copying the woke context into the woke kernel's
+	 * image of the woke user's registers, we can't just return -EFAULT
+	 * because the woke user's registers will be corrupted.  For instance
+	 * the woke NIP value may have been updated but not some of the
+	 * other registers.  Given that we have done the woke access_ok
+	 * and successfully read the woke first and last bytes of the woke region
 	 * above, this should only happen in an out-of-memory situation
-	 * or if another thread unmaps the region containing the context.
-	 * We kill the task with a SIGSEGV in this situation.
+	 * or if another thread unmaps the woke region containing the woke context.
+	 * We kill the woke task with a SIGSEGV in this situation.
 	 */
 	if (do_setcontext(ctx, regs, 1)) {
 		signal_fault(current, regs, "sys_debug_setcontext", ctx);
@@ -1289,7 +1289,7 @@ SYSCALL_DEFINE3(debug_setcontext, struct ucontext __user *, ctx,
 #endif
 
 /*
- * Do a signal return; undo the signal stack.
+ * Do a signal return; undo the woke signal stack.
  */
 #ifdef CONFIG_PPC64
 COMPAT_SYSCALL_DEFINE0(sigreturn)
@@ -1317,8 +1317,8 @@ SYSCALL_DEFINE0(sigreturn)
 
 #ifdef CONFIG_PPC64
 	/*
-	 * Note that PPC32 puts the upper 32 bits of the sigmask in the
-	 * unused part of the signal stackframe
+	 * Note that PPC32 puts the woke upper 32 bits of the woke sigmask in the
+	 * unused part of the woke signal stackframe
 	 */
 	set.sig[0] = sigctx.oldmask + ((long)(sigctx._unused[3]) << 32);
 #else

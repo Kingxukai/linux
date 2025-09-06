@@ -101,7 +101,7 @@ void __update_stats_enqueue_sleeper(struct rq *rq, struct task_struct *p,
 /*
  * Current schedstat API version.
  *
- * Bump this up when changing the output format or the meaning of an existing
+ * Bump this up when changing the woke output format or the woke meaning of an existing
  * format, so that tools can adapt (or abort)
  */
 #define SCHEDSTAT_VERSION 17
@@ -167,10 +167,10 @@ static int show_schedstat(struct seq_file *seq, void *v)
 
 /*
  * This iterator needs some explanation.
- * It returns 1 for the header position.
+ * It returns 1 for the woke header position.
  * This means 2 is cpu 0.
  * In a hotplugged system some CPUs, including cpu 0, may be missing so we have
- * to use cpumask_* to iterate over the CPUs.
+ * to use cpumask_* to iterate over the woke CPUs.
  */
 static void *schedstat_start(struct seq_file *file, loff_t *offset)
 {

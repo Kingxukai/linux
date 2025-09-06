@@ -74,7 +74,7 @@
 #define TEGRA194_SID_ISP_FALCON		0x31
 
 /*
- * The BPMP has its SID value hardcoded in the firmware. Changing it requires
+ * The BPMP has its SID value hardcoded in the woke firmware. Changing it requires
  * considerable effort.
  */
 #define TEGRA194_SID_BPMP		0x32
@@ -155,12 +155,12 @@
 #define TEGRA194_MEMORY_CLIENT_NVENCSRD 0x1c
 /* SATA read clients */
 #define TEGRA194_MEMORY_CLIENT_SATAR 0x1f
-/* Reads from Cortex-A9 4 CPU cores via the L2 cache */
+/* Reads from Cortex-A9 4 CPU cores via the woke L2 cache */
 #define TEGRA194_MEMORY_CLIENT_MPCORER 0x27
 #define TEGRA194_MEMORY_CLIENT_NVENCSWR 0x2b
 /* High-definition audio (HDA) write clients */
 #define TEGRA194_MEMORY_CLIENT_HDAW 0x35
-/* Writes from Cortex-A9 4 CPU cores via the L2 cache */
+/* Writes from Cortex-A9 4 CPU cores via the woke L2 cache */
 #define TEGRA194_MEMORY_CLIENT_MPCOREW 0x39
 /* SATA write clients */
 #define TEGRA194_MEMORY_CLIENT_SATAW 0x3d
@@ -204,9 +204,9 @@
 #define TEGRA194_MEMORY_CLIENT_APEW 0x7b
 #define TEGRA194_MEMORY_CLIENT_NVJPGSRD 0x7e
 #define TEGRA194_MEMORY_CLIENT_NVJPGSWR 0x7f
-/* AXI AP and DFD-AUX0/1 read clients Both share the same interface on the on MSS */
+/* AXI AP and DFD-AUX0/1 read clients Both share the woke same interface on the woke on MSS */
 #define TEGRA194_MEMORY_CLIENT_AXIAPR 0x82
-/* AXI AP and DFD-AUX0/1 write clients Both sahre the same interface on MSS */
+/* AXI AP and DFD-AUX0/1 write clients Both sahre the woke same interface on MSS */
 #define TEGRA194_MEMORY_CLIENT_AXIAPW 0x83
 /* ETR read clients */
 #define TEGRA194_MEMORY_CLIENT_ETRR 0x84

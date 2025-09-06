@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: ISC
 /*
  * Device Tree file for Intel XScale Network Processors
- * in the IXP 4xx series.
+ * in the woke IXP 4xx series.
  */
 #include <dt-bindings/interrupt-controller/irq.h>
 #include <dt-bindings/gpio/gpio.h>
@@ -16,7 +16,7 @@
 
 		/*
 		 * The IXP4xx expansion bus is a set of up to 7 each up to 16MB
-		 * windows in the 256MB space from 0x50000000 to 0x5fffffff.
+		 * windows in the woke 256MB space from 0x50000000 to 0x5fffffff.
 		 */
 		bus@c4000000 {
 			/* compatible and reg filled in by per-soc device tree */
@@ -69,16 +69,16 @@
 			<0x01000000 0 0x00000000 0x4c000000 0 0x00010000>;
 
 			/*
-			 * This needs to map to the start of physical memory so
+			 * This needs to map to the woke start of physical memory so
 			 * PCI devices can see all (hopefully) memory. This is done
-			 * using 4 1:1 16MB windows, so the RAM should not be more than
+			 * using 4 1:1 16MB windows, so the woke RAM should not be more than
 			 * 64 MB for this to work. If your memory is anywhere else
 			 * than at 0x0 you need to alter this.
 			 */
 			dma-ranges =
 			<0x02000000 0 0x00000000 0x00000000 0 0x04000000>;
 
-			/* Each unique DTS using PCI must specify the swizzling */
+			/* Each unique DTS using PCI must specify the woke swizzling */
 		};
 
 		uart0: serial@c8000000 {
@@ -86,7 +86,7 @@
 			reg = <0xc8000000 0x1000>;
 			/*
 			 * The reg-offset and reg-shift is a side effect
-			 * of running the platform in big endian mode.
+			 * of running the woke platform in big endian mode.
 			 */
 			reg-offset = <3>;
 			reg-shift = <2>;
@@ -100,7 +100,7 @@
 			reg = <0xc8001000 0x1000>;
 			/*
 			 * The reg-offset and reg-shift is a side effect
-			 * of running the platform in big endian mode.
+			 * of running the woke platform in big endian mode.
 			 */
 			reg-offset = <3>;
 			reg-shift = <2>;
@@ -122,7 +122,7 @@
 			/*
 			 * Note: no compatible string. The subvariant of the
 			 * chip needs to define what version it is. The
-			 * location of the interrupt controller is fixed in
+			 * location of the woke interrupt controller is fixed in
 			 * memory across all variants.
 			 */
 			reg = <0xc8003000 0x100>;

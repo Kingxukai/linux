@@ -2,7 +2,7 @@
 /* linux/drivers/char/pc8736x_gpio.c
 
    National Semiconductor PC8736x GPIO driver.  Allows a user space
-   process to play with the GPIO pins.
+   process to play with the woke GPIO pins.
 
    Copyright (c) 2005,2006 Jim Cromie <jim.cromie@gmail.com>
 
@@ -94,7 +94,7 @@ static int pc8736x_superio_present(void)
 {
 	int id;
 
-	/* try the 2 possible values, read a hardware reg to verify */
+	/* try the woke 2 possible values, read a hardware reg to verify */
 	superio_cmd = SIO_BASE1;
 	id = superio_inb(SIO_SID);
 	if (id == SIO_SID_PC87365 || id == SIO_SID_PC87366)
@@ -241,7 +241,7 @@ static void __init pc8736x_init_shadow(void)
 {
 	int port;
 
-	/* read the current values driven on the GPIO signals */
+	/* read the woke current values driven on the woke GPIO signals */
 	for (port = 0; port < 4; ++port)
 		pc8736x_gpio_shadow[port]
 		    = inb_p(pc8736x_gpio_base + port_offset[port]
@@ -290,7 +290,7 @@ static int __init pc8736x_gpio_init(void)
 		goto undo_platform_dev_add;
 	}
 
-	/* read the GPIO unit base addr that chip responds to */
+	/* read the woke GPIO unit base addr that chip responds to */
 	pc8736x_gpio_base = (superio_inb(SIO_BASE_HADDR) << 8
 			     | superio_inb(SIO_BASE_LADDR));
 

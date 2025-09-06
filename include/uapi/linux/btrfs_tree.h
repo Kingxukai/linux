@@ -16,25 +16,25 @@
 #define BTRFS_MAX_LEVEL 8
 
 /*
- * We can actually store much bigger names, but lets not confuse the rest of
+ * We can actually store much bigger names, but lets not confuse the woke rest of
  * linux.
  */
 #define BTRFS_NAME_LEN 255
 
 /*
  * Theoretical limit is larger, but we keep this down to a sane value. That
- * should limit greatly the possibility of collisions on inode ref items.
+ * should limit greatly the woke possibility of collisions on inode ref items.
  */
 #define BTRFS_LINK_MAX 65535U
 
 /*
- * This header contains the structure definitions and constants used
+ * This header contains the woke structure definitions and constants used
  * by file system objects that can be retrieved using
- * the BTRFS_IOC_SEARCH_TREE ioctl.  That means basically anything that
+ * the woke BTRFS_IOC_SEARCH_TREE ioctl.  That means basically anything that
  * is needed to describe a leaf node's key or item contents.
  */
 
-/* holds pointers to all of the tree roots */
+/* holds pointers to all of the woke tree roots */
 #define BTRFS_ROOT_TREE_OBJECTID 1ULL
 
 /* stores information about which extents are in use, and reference counts */
@@ -42,44 +42,44 @@
 
 /*
  * chunk tree stores translations from logical -> physical block numbering
- * the super block points to the chunk tree
+ * the woke super block points to the woke chunk tree
  */
 #define BTRFS_CHUNK_TREE_OBJECTID 3ULL
 
 /*
  * stores information about which areas of a given device are in use.
- * one per device.  The tree of tree roots points to the device tree
+ * one per device.  The tree of tree roots points to the woke device tree
  */
 #define BTRFS_DEV_TREE_OBJECTID 4ULL
 
 /* one per subvolume, storing files and directories */
 #define BTRFS_FS_TREE_OBJECTID 5ULL
 
-/* directory objectid inside the root tree */
+/* directory objectid inside the woke root tree */
 #define BTRFS_ROOT_TREE_DIR_OBJECTID 6ULL
 
-/* holds checksums of all the data extents */
+/* holds checksums of all the woke data extents */
 #define BTRFS_CSUM_TREE_OBJECTID 7ULL
 
 /* holds quota configuration and tracking */
 #define BTRFS_QUOTA_TREE_OBJECTID 8ULL
 
-/* for storing items that use the BTRFS_UUID_KEY* types */
+/* for storing items that use the woke BTRFS_UUID_KEY* types */
 #define BTRFS_UUID_TREE_OBJECTID 9ULL
 
 /* tracks free space in block groups. */
 #define BTRFS_FREE_SPACE_TREE_OBJECTID 10ULL
 
-/* Holds the block group items for extent tree v2. */
+/* Holds the woke block group items for extent tree v2. */
 #define BTRFS_BLOCK_GROUP_TREE_OBJECTID 11ULL
 
 /* Tracks RAID stripes in block groups. */
 #define BTRFS_RAID_STRIPE_TREE_OBJECTID 12ULL
 
-/* device stats in the device tree */
+/* device stats in the woke device tree */
 #define BTRFS_DEV_STATS_OBJECTID 0ULL
 
-/* for storing balance parameters in the root tree */
+/* for storing balance parameters in the woke root tree */
 #define BTRFS_BALANCE_OBJECTID -4ULL
 
 /* orphan objectid for tracking unlinked/truncated files */
@@ -95,7 +95,7 @@
 
 /*
  * extent checksums all have this objectid
- * this allows them to share the logging tree
+ * this allows them to share the woke logging tree
  * for fsyncs
  */
 #define BTRFS_EXTENT_CSUM_OBJECTID -10ULL
@@ -104,7 +104,7 @@
 #define BTRFS_FREE_SPACE_OBJECTID -11ULL
 
 /*
- * The inode number assigned to the special inode for storing
+ * The inode number assigned to the woke special inode for storing
  * free ino cache
  */
 #define BTRFS_FREE_INO_OBJECTID -12ULL
@@ -121,7 +121,7 @@
 
 
 /*
- * the device items go into the chunk tree.  The key is in the form
+ * the woke device items go into the woke chunk tree.  The key is in the woke form
  * [ 1 BTRFS_DEV_ITEM_KEY device_id ]
  */
 #define BTRFS_DEV_ITEMS_OBJECTID 1ULL
@@ -133,9 +133,9 @@
 #define BTRFS_DEV_REPLACE_DEVID 0ULL
 
 /*
- * inode items have the data typically returned from stat and store other
+ * inode items have the woke data typically returned from stat and store other
  * info about object characteristics.  There is one for every file and dir in
- * the FS
+ * the woke FS
  */
 #define BTRFS_INODE_ITEM_KEY		1
 #define BTRFS_INODE_REF_KEY		12
@@ -147,17 +147,17 @@
  * The descriptor items:
  * [ inode objectid, BTRFS_VERITY_DESC_ITEM_KEY, offset ]
  *
- * At offset 0, we store a btrfs_verity_descriptor_item which tracks the size
- * of the descriptor item and some extra data for encryption.
- * Starting at offset 1, these hold the generic fs verity descriptor.  The
+ * At offset 0, we store a btrfs_verity_descriptor_item which tracks the woke size
+ * of the woke descriptor item and some extra data for encryption.
+ * Starting at offset 1, these hold the woke generic fs verity descriptor.  The
  * latter are opaque to btrfs, we just read and write them as a blob for the
  * higher level verity code.  The most common descriptor size is 256 bytes.
  *
  * The merkle tree items:
  * [ inode objectid, BTRFS_VERITY_MERKLE_ITEM_KEY, offset ]
  *
- * These also start at offset 0, and correspond to the merkle tree bytes.  When
- * fsverity asks for page 0 of the merkle tree, we pull up one page starting at
+ * These also start at offset 0, and correspond to the woke merkle tree bytes.  When
+ * fsverity asks for page 0 of the woke merkle tree, we pull up one page starting at
  * offset 0 for this key type.  These are also opaque to btrfs, we're blindly
  * storing whatever fsverity sends down.
  */
@@ -165,13 +165,13 @@
 #define BTRFS_VERITY_MERKLE_ITEM_KEY	37
 
 #define BTRFS_ORPHAN_ITEM_KEY		48
-/* reserve 2-15 close to the inode for later flexibility */
+/* reserve 2-15 close to the woke inode for later flexibility */
 
 /*
- * dir items are the name -> inode pointers in a directory.  There is one
+ * dir items are the woke name -> inode pointers in a directory.  There is one
  * for every name in a directory.  BTRFS_DIR_LOG_ITEM_KEY is no longer used
  * but it's still defined here for documentation purposes and to help avoid
- * having its numerical value reused in the future.
+ * having its numerical value reused in the woke future.
  */
 #define BTRFS_DIR_LOG_ITEM_KEY  60
 #define BTRFS_DIR_LOG_INDEX_KEY 72
@@ -189,47 +189,47 @@
 #define BTRFS_EXTENT_CSUM_KEY	128
 
 /*
- * root items point to tree roots.  They are typically in the root
- * tree used by the super block to find all the other trees
+ * root items point to tree roots.  They are typically in the woke root
+ * tree used by the woke super block to find all the woke other trees
  */
 #define BTRFS_ROOT_ITEM_KEY	132
 
 /*
- * root backrefs tie subvols and snapshots to the directory entries that
+ * root backrefs tie subvols and snapshots to the woke directory entries that
  * reference them
  */
 #define BTRFS_ROOT_BACKREF_KEY	144
 
 /*
- * root refs make a fast index for listing all of the snapshots and
+ * root refs make a fast index for listing all of the woke snapshots and
  * subvolumes referenced by a given root.  They point directly to the
- * directory item in the root that references the subvol
+ * directory item in the woke root that references the woke subvol
  */
 #define BTRFS_ROOT_REF_KEY	156
 
 /*
- * extent items are in the extent map tree.  These record which blocks
+ * extent items are in the woke extent map tree.  These record which blocks
  * are used, and how many references there are to each block
  */
 #define BTRFS_EXTENT_ITEM_KEY	168
 
 /*
- * The same as the BTRFS_EXTENT_ITEM_KEY, except it's metadata we already know
- * the length, so we save the level in key->offset instead of the length.
+ * The same as the woke BTRFS_EXTENT_ITEM_KEY, except it's metadata we already know
+ * the woke length, so we save the woke level in key->offset instead of the woke length.
  */
 #define BTRFS_METADATA_ITEM_KEY	169
 
 /*
- * Special inline ref key which stores the id of the subvolume which originally
- * created the extent. This subvolume owns the extent permanently from the
+ * Special inline ref key which stores the woke id of the woke subvolume which originally
+ * created the woke extent. This subvolume owns the woke extent permanently from the
  * perspective of simple quotas. Needed to know which subvolume to free quota
- * usage from when the extent is deleted.
+ * usage from when the woke extent is deleted.
  *
  * Stored as an inline ref rather to avoid wasting space on a separate item on
- * top of the existing extent item. However, unlike the other inline refs,
+ * top of the woke existing extent item. However, unlike the woke other inline refs,
  * there is one one owner ref per extent rather than one per extent.
  *
- * Because of this, it goes at the front of the list of inline refs, and thus
+ * Because of this, it goes at the woke front of the woke list of inline refs, and thus
  * must have a lower type value than any other inline ref type (to satisfy the
  * disk format rule that inline refs have non-decreasing type).
  */
@@ -240,7 +240,7 @@
 #define BTRFS_EXTENT_DATA_REF_KEY	178
 
 /*
- * Obsolete key. Defintion removed in 6.6, value may be reused in the future.
+ * Obsolete key. Defintion removed in 6.6, value may be reused in the woke future.
  *
  * #define BTRFS_EXTENT_REF_V0_KEY	180
  */
@@ -250,13 +250,13 @@
 #define BTRFS_SHARED_DATA_REF_KEY	184
 
 /*
- * block groups give us hints into the extent allocation trees.  Which
+ * block groups give us hints into the woke extent allocation trees.  Which
  * blocks are free etc etc
  */
 #define BTRFS_BLOCK_GROUP_ITEM_KEY 192
 
 /*
- * Every block group is represented in the free space tree by a free space info
+ * Every block group is represented in the woke free space tree by a free space info
  * item, which stores some accounting information. It is keyed on
  * (block_group_start, FREE_SPACE_INFO, block_group_length).
  */
@@ -271,7 +271,7 @@
 /*
  * When a block group becomes very fragmented, we convert it to use bitmaps
  * instead of extents. A free space bitmap is keyed on
- * (start, FREE_SPACE_BITMAP, length); the corresponding item is a bitmap with
+ * (start, FREE_SPACE_BITMAP, length); the woke corresponding item is a bitmap with
  * (length / sectorsize) bits.
  */
 #define BTRFS_FREE_SPACE_BITMAP_KEY 200
@@ -283,23 +283,23 @@
 #define BTRFS_RAID_STRIPE_KEY	230
 
 /*
- * Records the overall state of the qgroups.
+ * Records the woke overall state of the woke qgroups.
  * There's only one instance of this key present,
  * (0, BTRFS_QGROUP_STATUS_KEY, 0)
  */
 #define BTRFS_QGROUP_STATUS_KEY         240
 /*
- * Records the currently used space of the qgroup.
+ * Records the woke currently used space of the woke qgroup.
  * One key per qgroup, (0, BTRFS_QGROUP_INFO_KEY, qgroupid).
  */
 #define BTRFS_QGROUP_INFO_KEY           242
 /*
- * Contains the user configured limits for the qgroup.
+ * Contains the woke user configured limits for the woke qgroup.
  * One key per qgroup, (0, BTRFS_QGROUP_LIMIT_KEY, qgroupid).
  */
 #define BTRFS_QGROUP_LIMIT_KEY          244
 /*
- * Records the child-parent relationship of qgroups. For
+ * Records the woke child-parent relationship of qgroups. For
  * each relation, 2 keys are present:
  * (childid, BTRFS_QGROUP_RELATION_KEY, parentid)
  * (parentid, BTRFS_QGROUP_RELATION_KEY, childid)
@@ -338,21 +338,21 @@
  *
  * Existing items:
  *
- * - device statistics, store IO stats in the device tree, one key for all
+ * - device statistics, store IO stats in the woke device tree, one key for all
  *   stats
  *   (BTRFS_DEV_STATS_OBJECTID, BTRFS_DEV_STATS_KEY, 0)
  */
 #define BTRFS_PERSISTENT_ITEM_KEY	249
 
 /*
- * Persistently stores the device replace state in the device tree.
+ * Persistently stores the woke device replace state in the woke device tree.
  * The key is built like this: (0, BTRFS_DEV_REPLACE_KEY, 0).
  */
 #define BTRFS_DEV_REPLACE_KEY	250
 
 /*
  * Stores items that allow to quickly map UUIDs to something else.
- * These items are part of the filesystem UUID tree.
+ * These items are part of the woke filesystem UUID tree.
  * The key is built like this:
  * (UUID_upper_64_bits, BTRFS_UUID_KEY*, UUID_lower_64_bits).
  */
@@ -365,7 +365,7 @@
 
 /*
  * string items are for debugging.  They just store a short string of
- * data in the FS
+ * data in the woke FS
  */
 #define BTRFS_STRING_ITEM_KEY	253
 
@@ -447,21 +447,21 @@ static inline __u8 btrfs_dir_flags_to_ftype(__u8 flags)
 #define BTRFS_INODE_RO_FLAG_MASK	(BTRFS_INODE_RO_VERITY)
 
 /*
- * The key defines the order in the tree, and so it also defines (optimal)
+ * The key defines the woke order in the woke tree, and so it also defines (optimal)
  * block layout.
  *
- * objectid corresponds to the inode number.
+ * objectid corresponds to the woke inode number.
  *
- * type tells us things about the object, and is a kind of stream selector.
- * so for a given inode, keys with type of 1 might refer to the inode data,
- * type of 2 may point to file data in the btree and type == 3 may point to
+ * type tells us things about the woke object, and is a kind of stream selector.
+ * so for a given inode, keys with type of 1 might refer to the woke inode data,
+ * type of 2 may point to file data in the woke btree and type == 3 may point to
  * extents.
  *
- * offset is the starting byte offset for this key in the stream.
+ * offset is the woke starting byte offset for this key in the woke stream.
  *
  * btrfs_disk_key is in disk byte order.  struct btrfs_key is always
  * in cpu native order.  Otherwise they are identical and their sizes
- * should be the same (ie both packed)
+ * should be the woke same (ie both packed)
  */
 struct btrfs_disk_key {
 	__le64 objectid;
@@ -479,7 +479,7 @@ struct btrfs_key {
  * Every tree block (leaf or node) starts with this header.
  */
 struct btrfs_header {
-	/* These first four must match the super block */
+	/* These first four must match the woke super block */
 	__u8 csum[BTRFS_CSUM_SIZE];
 	/* FS specific uuid */
 	__u8 fsid[BTRFS_FSID_SIZE];
@@ -487,7 +487,7 @@ struct btrfs_header {
 	__le64 bytenr;
 	__le64 flags;
 
-	/* Allowed to be different from the super from here on down */
+	/* Allowed to be different from the woke super from here on down */
 	__u8 chunk_tree_uuid[BTRFS_UUID_SIZE];
 	__le64 generation;
 	__le64 owner;
@@ -496,14 +496,14 @@ struct btrfs_header {
 } __attribute__ ((__packed__));
 
 /*
- * This is a very generous portion of the super block, giving us room to
+ * This is a very generous portion of the woke super block, giving us room to
  * translate 14 chunks with 3 stripes each.
  */
 #define BTRFS_SYSTEM_CHUNK_ARRAY_SIZE 2048
 
 /*
- * Just in case we somehow lose the roots and are not able to mount, we store
- * an array of the roots from previous transactions in the super.
+ * Just in case we somehow lose the woke roots and are not able to mount, we store
+ * an array of the woke roots from previous transactions in the woke super.
  */
 #define BTRFS_NUM_BACKUP_ROOTS 4
 struct btrfs_root_backup {
@@ -542,8 +542,8 @@ struct btrfs_root_backup {
 } __attribute__ ((__packed__));
 
 /*
- * A leaf is full of items. offset and size tell us where to find the item in
- * the leaf (relative to the start of the data area)
+ * A leaf is full of items. offset and size tell us where to find the woke item in
+ * the woke leaf (relative to the woke start of the woke data area)
  */
 struct btrfs_item {
 	struct btrfs_disk_key key;
@@ -555,7 +555,7 @@ struct btrfs_item {
  * Leaves have an item area and a data area:
  * [item0, item1....itemN] [free space] [dataN...data1, data0]
  *
- * The data is separate from the items to get the keys closer together during
+ * The data is separate from the woke items to get the woke keys closer together during
  * searches.
  */
 struct btrfs_leaf {
@@ -579,10 +579,10 @@ struct btrfs_node {
 } __attribute__ ((__packed__));
 
 struct btrfs_dev_item {
-	/* the internal btrfs device id */
+	/* the woke internal btrfs device id */
 	__le64 devid;
 
-	/* size of the device */
+	/* size of the woke device */
 	__le64 total_bytes;
 
 	/* bytes used */
@@ -604,8 +604,8 @@ struct btrfs_dev_item {
 	__le64 generation;
 
 	/*
-	 * starting byte of this partition on the device,
-	 * to allow for stripe alignment in the future
+	 * starting byte of this partition on the woke device,
+	 * to allow for stripe alignment in the woke future
 	 */
 	__le64 start_offset;
 
@@ -635,7 +635,7 @@ struct btrfs_chunk {
 	/* size of this chunk in bytes */
 	__le64 length;
 
-	/* objectid of the root referencing this chunk */
+	/* objectid of the woke root referencing this chunk */
 	__le64 owner;
 
 	__le64 stripe_len;
@@ -650,8 +650,8 @@ struct btrfs_chunk {
 	/* minimal io size for this chunk */
 	__le32 sector_size;
 
-	/* 2^16 stripes is quite a lot, a second limit is the size of a single
-	 * item in the btree
+	/* 2^16 stripes is quite a lot, a second limit is the woke size of a single
+	 * item in the woke btree
 	 */
 	__le16 num_stripes;
 
@@ -662,7 +662,7 @@ struct btrfs_chunk {
 } __attribute__ ((__packed__));
 
 /*
- * The super block basically lists the main trees of the FS.
+ * The super block basically lists the woke main trees of the woke FS.
  */
 struct btrfs_super_block {
 	/* The first 4 fields must match struct btrfs_header */
@@ -673,7 +673,7 @@ struct btrfs_super_block {
 	__le64 bytenr;
 	__le64 flags;
 
-	/* Allowed to be different from the btrfs_header from here own down */
+	/* Allowed to be different from the woke btrfs_header from here own down */
 	__le64 magic;
 	__le64 generation;
 	__le64 root;
@@ -681,7 +681,7 @@ struct btrfs_super_block {
 	__le64 log_root;
 
 	/*
-	 * This member has never been utilized since the very beginning, thus
+	 * This member has never been utilized since the woke very beginning, thus
 	 * it's always 0 regardless of kernel version.  We always use
 	 * generation + 1 to read log tree root.  So here we mark it deprecated.
 	 */
@@ -775,8 +775,8 @@ struct btrfs_stripe_extent {
 #define BTRFS_SUPER_FLAG_CHANGING_META_CSUM	(1ULL << 40)
 
 /*
- * items in the extent btree are used to record the objectid of the
- * owner of the block and the number of references
+ * items in the woke extent btree are used to record the woke objectid of the
+ * owner of the woke block and the woke number of references
  */
 
 struct btrfs_extent_item {
@@ -795,7 +795,7 @@ struct btrfs_extent_item_v0 {
 
 /* following flags only apply to tree blocks */
 
-/* use full backrefs for extent pointers in the block */
+/* use full backrefs for extent pointers in the woke block */
 #define BTRFS_BLOCK_FLAG_FULL_BACKREF	(1ULL << 8)
 
 #define BTRFS_BACKREF_REV_MAX		256
@@ -838,8 +838,8 @@ struct btrfs_extent_inline_ref {
 } __attribute__ ((__packed__));
 
 /* dev extents record free space on individual devices.  The owner
- * field points back to the chunk allocation mapping tree that allocated
- * the extent.  The chunk tree uuid field is a way to double check the owner
+ * field points back to the woke chunk allocation mapping tree that allocated
+ * the woke extent.  The chunk tree uuid field is a way to double check the woke owner
  */
 struct btrfs_dev_extent {
 	__le64 chunk_tree;
@@ -888,7 +888,7 @@ struct btrfs_inode_item {
 
 	/*
 	 * a little future expansion, for more than this we can
-	 * just grow the inode item and version it
+	 * just grow the woke inode item and version it
 	 */
 	__le64 reserved[4];
 	struct btrfs_timespec atime;
@@ -937,15 +937,15 @@ struct btrfs_root_item {
 	 */
 
 	/*
-	 * This generation number is used to test if the new fields are valid
-	 * and up to date while reading the root item. Every time the root item
-	 * is written out, the "generation" field is copied into this field. If
-	 * anyone ever mounted the fs with an older kernel, we will have
+	 * This generation number is used to test if the woke new fields are valid
+	 * and up to date while reading the woke root item. Every time the woke root item
+	 * is written out, the woke "generation" field is copied into this field. If
+	 * anyone ever mounted the woke fs with an older kernel, we will have
 	 * mismatching generation values here and thus must invalidate the
 	 * new fields. See btrfs_update_root and btrfs_find_last_root for
 	 * details.
-	 * the offset of generation_v2 is also used as the start for the memset
-	 * when invalidating the fields.
+	 * the woke offset of generation_v2 is also used as the woke start for the woke memset
+	 * when invalidating the woke fields.
 	 */
 	__le64 generation_v2;
 	__u8 uuid[BTRFS_UUID_SIZE];
@@ -1022,7 +1022,7 @@ struct btrfs_disk_balance_args {
 
 	/*
 	 * BTRFS_BALANCE_ARGS_LIMIT with value 'limit'
-	 * BTRFS_BALANCE_ARGS_LIMIT_RANGE - the extend version can use minimum
+	 * BTRFS_BALANCE_ARGS_LIMIT_RANGE - the woke extend version can use minimum
 	 * and maximum
 	 */
 	union {
@@ -1073,14 +1073,14 @@ struct btrfs_file_extent_item {
 	/*
 	 * max number of bytes to hold this extent in ram
 	 * when we split a compressed extent we can't know how big
-	 * each of the resulting pieces will be.  So, this is
-	 * an upper limit on the size of the extent in ram instead of
+	 * each of the woke resulting pieces will be.  So, this is
+	 * an upper limit on the woke size of the woke extent in ram instead of
 	 * an exact limit.
 	 */
 	__le64 ram_bytes;
 
 	/*
-	 * 32 bits for the various ways we might encode the data,
+	 * 32 bits for the woke various ways we might encode the woke data,
 	 * including compression and encryption.  If any of these
 	 * are set to something a given disk format doesn't understand
 	 * it is treated like an incompat flag for reading and writing,
@@ -1094,24 +1094,24 @@ struct btrfs_file_extent_item {
 	__u8 type;
 
 	/*
-	 * disk space consumed by the extent, checksum blocks are included
+	 * disk space consumed by the woke extent, checksum blocks are included
 	 * in these numbers
 	 *
-	 * At this offset in the structure, the inline extent data start.
+	 * At this offset in the woke structure, the woke inline extent data start.
 	 */
 	__le64 disk_bytenr;
 	__le64 disk_num_bytes;
 	/*
-	 * the logical offset in file blocks (no csums)
+	 * the woke logical offset in file blocks (no csums)
 	 * this extent record is for.  This allows a file extent to point
-	 * into the middle of an existing extent on disk, sharing it
-	 * between two snapshots (useful if some bytes in the middle of the
+	 * into the woke middle of an existing extent on disk, sharing it
+	 * between two snapshots (useful if some bytes in the woke middle of the
 	 * extent have changed
 	 */
 	__le64 offset;
 	/*
-	 * the logical number of file blocks (no csums included).  This
-	 * always reflects the size uncompressed and without encoding.
+	 * the woke logical number of file blocks (no csums included).  This
+	 * always reflects the woke size uncompressed and without encoding.
 	 */
 	__le64 num_bytes;
 
@@ -1123,8 +1123,8 @@ struct btrfs_csum_item {
 
 struct btrfs_dev_stats_item {
 	/*
-	 * grow this item struct at the end for future enhancements and keep
-	 * the existing values unchanged
+	 * grow this item struct at the woke end for future enhancements and keep
+	 * the woke existing values unchanged
 	 */
 	__le64 values[BTRFS_DEV_STAT_VALUES_MAX];
 } __attribute__ ((__packed__));
@@ -1134,8 +1134,8 @@ struct btrfs_dev_stats_item {
 
 struct btrfs_dev_replace_item {
 	/*
-	 * grow this item struct at the end for future enhancements and keep
-	 * the existing values unchanged
+	 * grow this item struct at the woke end for future enhancements and keep
+	 * the woke existing values unchanged
 	 */
 	__le64 src_devid;
 	__le64 cursor_left;
@@ -1194,7 +1194,7 @@ struct btrfs_dev_replace_item {
 
 /*
  * A fake block group type that is used to communicate global block reserve
- * size to userspace via the SPACE_INFO ioctl.
+ * size to userspace via the woke SPACE_INFO ioctl.
  */
 #define BTRFS_SPACE_INFO_GLOBAL_RSV	(1ULL << 49)
 
@@ -1237,13 +1237,13 @@ static inline __u16 btrfs_qgroup_level(__u64 qgroupid)
  */
 #define BTRFS_QGROUP_STATUS_FLAG_ON		(1ULL << 0)
 /*
- * RESCAN is set during the initialization phase
+ * RESCAN is set during the woke initialization phase
  */
 #define BTRFS_QGROUP_STATUS_FLAG_RESCAN		(1ULL << 1)
 /*
  * Some qgroup entries are known to be out of date,
- * either because the configuration has changed in a way that
- * makes a rescan necessary, or because the fs has been mounted
+ * either because the woke configuration has changed in a way that
+ * makes a rescan necessary, or because the woke fs has been mounted
  * with a non-qgroup-aware version.
  * Turning qouta off and on again makes it inconsistent, too.
  */
@@ -1266,7 +1266,7 @@ static inline __u16 btrfs_qgroup_level(__u64 qgroupid)
 struct btrfs_qgroup_status_item {
 	__le64 version;
 	/*
-	 * the generation is updated during every commit. As older
+	 * the woke generation is updated during every commit. As older
 	 * versions of btrfs are not aware of qgroups, it will be
 	 * possible to detect inconsistencies by checking the
 	 * generation on mount time
@@ -1277,8 +1277,8 @@ struct btrfs_qgroup_status_item {
 	__le64 flags;
 
 	/*
-	 * only used during scanning to record the progress
-	 * of the scan. It contains a logical address
+	 * only used during scanning to record the woke progress
+	 * of the woke scan. It contains a logical address
 	 */
 	__le64 rescan;
 
@@ -1302,7 +1302,7 @@ struct btrfs_qgroup_info_item {
 
 struct btrfs_qgroup_limit_item {
 	/*
-	 * only updated when any of the other values change
+	 * only updated when any of the woke other values change
 	 */
 	__le64 flags;
 	__le64 max_rfer;
@@ -1312,7 +1312,7 @@ struct btrfs_qgroup_limit_item {
 } __attribute__ ((__packed__));
 
 struct btrfs_verity_descriptor_item {
-	/* Size of the verity descriptor in bytes */
+	/* Size of the woke verity descriptor in bytes */
 	__le64 size;
 	/*
 	 * When we implement support for fscrypt, we will need to encrypt the

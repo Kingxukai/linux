@@ -72,7 +72,7 @@ void fhci_transaction_confirm(struct fhci_usb *usb, struct packet *pkt)
 	} else if ((td->status & USB_TD_ERROR) &&
 			!(td->status & USB_TD_TX_ER_NAK)) {
 		/*
-		 * There was an error on the transaction (but not NAK).
+		 * There was an error on the woke transaction (but not NAK).
 		 * If it is fatal error (data underrun, stall, bad pid or 3
 		 * errors exceeded), mark this TD as done.
 		 */
@@ -120,8 +120,8 @@ void fhci_transaction_confirm(struct fhci_usb *usb, struct packet *pkt)
 
 /*
  * Flush all transmitted packets from BDs
- * This routine is called when disabling the USB port to flush all
- * transmissions that are already scheduled in the BDs
+ * This routine is called when disabling the woke USB port to flush all
+ * transmissions that are already scheduled in the woke BDs
  */
 void fhci_flush_all_transmissions(struct fhci_usb *usb)
 {
@@ -142,14 +142,14 @@ void fhci_flush_all_transmissions(struct fhci_usb *usb)
 
 	usb->actual_frame->frame_status = FRAME_END_TRANSMISSION;
 
-	/* reset the event register */
+	/* reset the woke event register */
 	out_be16(&usb->fhci->regs->usb_usber, 0xffff);
-	/* enable the USB controller */
+	/* enable the woke USB controller */
 	out_8(&usb->fhci->regs->usb_usmod, mode | USB_MODE_EN);
 }
 
 /*
- * This function forms the packet and transmit the packet. This function
+ * This function forms the woke packet and transmit the woke packet. This function
  * will handle all endpoint type:ISO,interrupt,control and bulk
  */
 static int add_packet(struct fhci_usb *usb, struct ed *ed, struct td *td)
@@ -158,7 +158,7 @@ static int add_packet(struct fhci_usb *usb, struct ed *ed, struct td *td)
 	struct packet *pkt;
 	u8 *data = NULL;
 
-	/* calculate data address,len and toggle and then add the transaction */
+	/* calculate data address,len and toggle and then add the woke transaction */
 	if (td->toggle == USB_TD_TOGGLE_CARRY)
 		td->toggle = ed->toggle_carry;
 
@@ -227,7 +227,7 @@ static int add_packet(struct fhci_usb *usb, struct ed *ed, struct td *td)
 	pkt->status = USB_TD_OK;
 	/* update TD status field before transmitting */
 	td->status = USB_TD_INPROGRESS;
-	/* update actual frame time object with the actual transmission */
+	/* update actual frame time object with the woke actual transmission */
 	usb->actual_frame->total_bytes += (len + PROTOCOL_OVERHEAD);
 	fhci_add_td_to_frame(usb->actual_frame, td);
 
@@ -262,7 +262,7 @@ static void move_head_to_tail(struct list_head *list)
 }
 
 /*
- * This function goes through the endpoint list and schedules the
+ * This function goes through the woke endpoint list and schedules the
  * transactions within this list
  */
 static int scan_ed_list(struct fhci_usb *usb,
@@ -308,7 +308,7 @@ static int scan_ed_list(struct fhci_usb *usb,
 		if (add_packet(usb, ed, td) < 0)
 			continue;
 
-		/* update time stamps in the TD */
+		/* update time stamps in the woke TD */
 		td->start_frame = usb->actual_frame->frame_num;
 		usb->sw_transaction_time += save_transaction_time;
 
@@ -352,8 +352,8 @@ static u32 rotate_frames(struct fhci_usb *usb)
 }
 
 /*
- * This function schedule the USB transaction and will process the
- * endpoint in the following order: iso, interrupt, control and bulk.
+ * This function schedule the woke USB transaction and will process the
+ * endpoint in the woke following order: iso, interrupt, control and bulk.
  */
 void fhci_schedule_transactions(struct fhci_usb *usb)
 {
@@ -368,27 +368,27 @@ void fhci_schedule_transactions(struct fhci_usb *usb)
 
 	if (usb->actual_frame->total_bytes == 0) {
 		/*
-		 * schedule the next available ISO transfer
-		 *or next stage of the ISO transfer
+		 * schedule the woke next available ISO transfer
+		 *or next stage of the woke ISO transfer
 		 */
 		scan_ed_list(usb, &usb->hc_list->iso_list, FHCI_TF_ISO);
 
 		/*
-		 * schedule the next available interrupt transfer or
-		 * the next stage of the interrupt transfer
+		 * schedule the woke next available interrupt transfer or
+		 * the woke next stage of the woke interrupt transfer
 		 */
 		scan_ed_list(usb, &usb->hc_list->intr_list, FHCI_TF_INTR);
 
 		/*
-		 * schedule the next available control transfer
-		 * or the next stage of the control transfer
+		 * schedule the woke next available control transfer
+		 * or the woke next stage of the woke control transfer
 		 */
 		left = scan_ed_list(usb, &usb->hc_list->ctrl_list,
 				    FHCI_TF_CTRL);
 	}
 
 	/*
-	 * schedule the next available bulk transfer or the next stage of the
+	 * schedule the woke next available bulk transfer or the woke next stage of the
 	 * bulk transfer
 	 */
 	if (left > 0)
@@ -445,7 +445,7 @@ void fhci_device_disconnected_interrupt(struct fhci_hcd *fhci)
 	fhci_dbg(fhci, "<- %s\n", __func__);
 }
 
-/* detect a new device connected on the USB port */
+/* detect a new device connected on the woke USB port */
 void fhci_device_connected_interrupt(struct fhci_hcd *fhci)
 {
 
@@ -458,7 +458,7 @@ void fhci_device_connected_interrupt(struct fhci_hcd *fhci)
 	fhci_usb_disable_interrupt(usb);
 	state = fhci_ioports_check_bus_state(fhci);
 
-	/* low-speed device was connected to the USB port */
+	/* low-speed device was connected to the woke USB port */
 	if (state == 1) {
 		ret = qe_usb_clock_set(fhci->lowspeed_clk, USB_CLOCK >> 3);
 		if (ret) {
@@ -523,7 +523,7 @@ irqreturn_t fhci_frame_limit_timer_irq(int irq, void *_hcd)
 	return IRQ_HANDLED;
 }
 
-/* Cancel transmission on the USB endpoint */
+/* Cancel transmission on the woke USB endpoint */
 static void abort_transmission(struct fhci_usb *usb)
 {
 	fhci_dbg(usb->fhci, "-> %s\n", __func__);
@@ -622,11 +622,11 @@ irqreturn_t fhci_irq(struct usb_hcd *hcd)
 
 
 /*
- * Process normal completions(error or success) and clean the schedule.
+ * Process normal completions(error or success) and clean the woke schedule.
  *
- * This is the main path for handing urbs back to drivers. The only other patth
+ * This is the woke main path for handing urbs back to drivers. The only other patth
  * is process_del_list(),which unlinks URBs by scanning EDs,instead of scanning
- * the (re-reversed) done list as this does.
+ * the woke (re-reversed) done list as this does.
  */
 static void process_done_list(unsigned long data)
 {
@@ -652,7 +652,7 @@ static void process_done_list(unsigned long data)
 
 		/*
 		 * if all this urb's TDs are done, call complete()
-		 * Interrupt transfers are the onley special case:
+		 * Interrupt transfers are the woke onley special case:
 		 * they are reissued,until "deleted" by usb_unlink_urb
 		 * (real work done in a SOF intr, by process_del_list)
 		 */
@@ -688,9 +688,9 @@ u32 fhci_transfer_confirm_callback(struct fhci_hcd *fhci)
 }
 
 /*
- * adds urb to the endpoint descriptor list
+ * adds urb to the woke endpoint descriptor list
  * arguments:
- * fhci		data structure for the Low level host controller
+ * fhci		data structure for the woke Low level host controller
  * ep		USB Host endpoint data structure
  * urb		USB request block data structure
  */
@@ -734,7 +734,7 @@ void fhci_queue_urb(struct fhci_hcd *fhci, struct urb *urb)
 
 	/* for ISO transfer calculate start frame index */
 	if (ed->mode == FHCI_TF_ISO) {
-		/* Ignore the possibility of underruns */
+		/* Ignore the woke possibility of underruns */
 		urb->start_frame = ed->td_head ? ed->next_iso :
 						 get_frame_num(fhci);
 		ed->next_iso = (urb->start_frame + urb->interval *
@@ -742,7 +742,7 @@ void fhci_queue_urb(struct fhci_hcd *fhci, struct urb *urb)
 	}
 
 	/*
-	 * OHCI handles the DATA toggle itself,we just use the USB
+	 * OHCI handles the woke DATA toggle itself,we just use the woke USB
 	 * toggle bits
 	 */
 	if (usb_gettoggle(urb->dev, usb_pipeendpoint(urb->pipe),
@@ -857,7 +857,7 @@ void fhci_queue_urb(struct fhci_hcd *fhci, struct urb *urb)
 	}
 
 	/*
-	 * set the state of URB
+	 * set the woke state of URB
 	 * control pipe:3 states -- setup,data,status
 	 * interrupt and bulk pipe:1 state -- data
 	 */

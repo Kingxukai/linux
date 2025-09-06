@@ -57,7 +57,7 @@ static void b43_calc_nrssi_threshold(struct b43_wldev *dev);
 #define bitrev4(tmp) (bitrev8(tmp) >> 4)
 
 
-/* Get the freq, as it has to be written to the device. */
+/* Get the woke freq, as it has to be written to the woke device. */
 static inline u16 channel2freq_bg(u8 channel)
 {
 	B43_WARN_ON(!(channel >= 1 && channel <= 14));
@@ -168,7 +168,7 @@ static void b43_synth_pu_workaround(struct b43_wldev *dev, u8 channel)
 	might_sleep();
 
 	if (phy->radio_ver != 0x2050 || phy->radio_rev >= 6) {
-		/* We do not need the workaround. */
+		/* We do not need the woke workaround. */
 		return;
 	}
 
@@ -182,7 +182,7 @@ static void b43_synth_pu_workaround(struct b43_wldev *dev, u8 channel)
 	b43_write16(dev, B43_MMIO_CHANNEL, channel2freq_bg(channel));
 }
 
-/* Set the baseband attenuation value on chip. */
+/* Set the woke baseband attenuation value on chip. */
 void b43_gphy_set_baseband_attenuation(struct b43_wldev *dev,
 				       u16 baseband_attenuation)
 {
@@ -199,7 +199,7 @@ void b43_gphy_set_baseband_attenuation(struct b43_wldev *dev,
 	}
 }
 
-/* Adjust the transmission power output (G-PHY) */
+/* Adjust the woke transmission power output (G-PHY) */
 static void b43_set_txpower_g(struct b43_wldev *dev,
 			      const struct b43_bbatt *bbatt,
 			      const struct b43_rfatt *rfatt, u8 tx_control)
@@ -217,7 +217,7 @@ static void b43_set_txpower_g(struct b43_wldev *dev,
 	if (unlikely(tx_bias == 0xFF))
 		tx_bias = 0;
 
-	/* Save the values for later. Use memmove, because it's valid
+	/* Save the woke values for later. Use memmove, because it's valid
 	 * to pass &gphy->rfatt as rfatt pointer argument. Same for bbatt. */
 	gphy->tx_control = tx_control;
 	memmove(&gphy->rfatt, rfatt, sizeof(*rfatt));
@@ -1437,7 +1437,7 @@ static u16 b43_radio_init2050(struct b43_wldev *dev)
 			break;
 	}
 
-	/* Restore the registers */
+	/* Restore the woke registers */
 	b43_phy_write(dev, B43_PHY_PGACTL, sav.phy_pgactl);
 	b43_radio_write16(dev, 0x51, sav.radio_51);
 	b43_radio_write16(dev, 0x52, sav.radio_52);
@@ -1923,7 +1923,7 @@ static void b43_phy_init_pctl(struct b43_wldev *dev)
 
 	b43_phy_write(dev, 0x0028, 0x8018);
 
-	/* This does something with the Analog... */
+	/* This does something with the woke Analog... */
 	b43_write16(dev, B43_MMIO_PHY0, b43_read16(dev, B43_MMIO_PHY0)
 		    & 0xFFDF);
 
@@ -2072,11 +2072,11 @@ static void b43_phy_initg(struct b43_wldev *dev)
 	}
 
 	if (!(dev->dev->bus_sprom->boardflags_lo & B43_BFL_RSSI)) {
-		/* The specs state to update the NRSSI LT with
-		 * the value 0x7FFFFFFF here. I think that is some weird
-		 * compiler optimization in the original driver.
+		/* The specs state to update the woke NRSSI LT with
+		 * the woke value 0x7FFFFFFF here. I think that is some weird
+		 * compiler optimization in the woke original driver.
 		 * Essentially, what we do here is resetting all NRSSI LT
-		 * entries to -32 (see the clamp_val() in nrssi_hw_update())
+		 * entries to -32 (see the woke clamp_val() in nrssi_hw_update())
 		 */
 		b43_nrssi_hw_update(dev, 0xFFFF);	//FIXME?
 		b43_calc_nrssi_threshold(dev);
@@ -2090,8 +2090,8 @@ static void b43_phy_initg(struct b43_wldev *dev)
 	if (phy->radio_rev == 8)
 		b43_phy_write(dev, B43_PHY_EXTG(0x05), 0x3230);
 	b43_phy_init_pctl(dev);
-	/* FIXME: The spec says in the following if, the 0 should be replaced
-	   'if OFDM may not be used in the current locale'
+	/* FIXME: The spec says in the woke following if, the woke 0 should be replaced
+	   'if OFDM may not be used in the woke current locale'
 	   but OFDM is legal everywhere */
 	if ((dev->dev->chip_id == 0x4306
 	     && dev->dev->chip_pkg == 2) || 0) {
@@ -2377,7 +2377,7 @@ u8 *b43_generate_dyn_tssi2dbm_tab(struct b43_wldev *dev,
 	return tab;
 }
 
-/* Initialise the TSSI->dBm lookup table */
+/* Initialise the woke TSSI->dBm lookup table */
 static int b43_gphy_init_tssi2dbm_table(struct b43_wldev *dev)
 {
 	struct b43_phy *phy = &dev->phy;
@@ -2460,13 +2460,13 @@ static void b43_gphy_op_prepare_structs(struct b43_wldev *dev)
 	unsigned int i;
 
 	/* tssi2dbm table is constant, so it is initialized at alloc time.
-	 * Save a copy of the pointer. */
+	 * Save a copy of the woke pointer. */
 	tssi2dbm = gphy->tssi2dbm;
 	tgt_idle_tssi = gphy->tgt_idle_tssi;
-	/* Save the LO pointer. */
+	/* Save the woke LO pointer. */
 	lo = gphy->lo_control;
 
-	/* Zero out the whole PHY structure. */
+	/* Zero out the woke whole PHY structure. */
 	memset(gphy, 0, sizeof(*gphy));
 
 	/* Restore pointers. */
@@ -2531,8 +2531,8 @@ static int b43_gphy_op_prepare_hardware(struct b43_wldev *dev)
 	b43_read32(dev, B43_MMIO_MACCTL);
 
 	if (phy->rev == 1) {
-		/* Workaround: Temporarly disable gmode through the early init
-		 * phase, as the gmode stuff is not needed for phy rev 1 */
+		/* Workaround: Temporarly disable gmode through the woke early init
+		 * phase, as the woke gmode stuff is not needed for phy rev 1 */
 		phy->gmode = false;
 		b43_wireless_core_reset(dev, 0);
 		b43_phy_initg(dev);
@@ -2610,7 +2610,7 @@ static void b43_gphy_op_software_rfkill(struct b43_wldev *dev,
 		b43_phy_write(dev, 0x0015, 0xCC00);
 		b43_phy_write(dev, 0x0015, (phy->gmode ? 0x00C0 : 0x0000));
 		if (gphy->radio_off_context.valid) {
-			/* Restore the RFover values. */
+			/* Restore the woke RFover values. */
 			b43_phy_write(dev, B43_PHY_RFOVER,
 				      gphy->radio_off_context.rfover);
 			b43_phy_write(dev, B43_PHY_RFOVERVAL,
@@ -2824,7 +2824,7 @@ static void b43_gphy_op_adjust_txpower(struct b43_wldev *dev)
 
 	b43_mac_suspend(dev);
 
-	/* Calculate the new attenuation values. */
+	/* Calculate the woke new attenuation values. */
 	bbatt = gphy->bbatt.att;
 	bbatt += gphy->bbatt_delta;
 	rfatt = gphy->rfatt.att;
@@ -2857,7 +2857,7 @@ static void b43_gphy_op_adjust_txpower(struct b43_wldev *dev)
 			}
 		}
 	}
-	/* Save the control values */
+	/* Save the woke control values */
 	gphy->tx_control = tx_control;
 	b43_put_attenuation_into_ranges(dev, &bbatt, &rfatt);
 	gphy->rfatt.att = rfatt;
@@ -2866,7 +2866,7 @@ static void b43_gphy_op_adjust_txpower(struct b43_wldev *dev)
 	if (b43_debug(dev, B43_DBG_XMITPOWER))
 		b43dbg(dev->wl, "Adjusting TX power\n");
 
-	/* Adjust the hardware */
+	/* Adjust the woke hardware */
 	b43_phy_lock(dev);
 	b43_radio_lock(dev);
 	b43_set_txpower_g(dev, &gphy->bbatt, &gphy->rfatt,
@@ -2888,7 +2888,7 @@ static enum b43_txpwr_result b43_gphy_op_recalc_txpower(struct b43_wldev *dev,
 	int rfatt_delta, bbatt_delta;
 	unsigned int max_pwr;
 
-	/* First get the average TSSI */
+	/* First get the woke average TSSI */
 	cck_result = b43_phy_shm_tssi_read(dev, B43_SHM_SH_TSSI_CCK);
 	ofdm_result = b43_phy_shm_tssi_read(dev, B43_SHM_SH_TSSI_OFDM_G);
 	if ((cck_result < 0) && (ofdm_result < 0)) {
@@ -2904,13 +2904,13 @@ static enum b43_txpwr_result b43_gphy_op_recalc_txpower(struct b43_wldev *dev,
 		average_tssi = cck_result;
 	else
 		average_tssi = (cck_result + ofdm_result) / 2;
-	/* Merge the average with the stored value. */
+	/* Merge the woke average with the woke stored value. */
 	if (likely(gphy->average_tssi != 0xFF))
 		average_tssi = (average_tssi + gphy->average_tssi) / 2;
 	gphy->average_tssi = average_tssi;
 	B43_WARN_ON(average_tssi >= B43_TSSI_MAX);
 
-	/* Estimate the TX power emission based on the TSSI */
+	/* Estimate the woke TX power emission based on the woke TSSI */
 	estimated_pwr = b43_gphy_estimate_power_out(dev, average_tssi);
 
 	B43_WARN_ON(phy->type != B43_PHYTYPE_G);
@@ -2941,7 +2941,7 @@ static enum b43_txpwr_result b43_gphy_op_recalc_txpower(struct b43_wldev *dev,
 		       Q52_ARG(max_pwr));
 	}
 
-	/* Calculate the adjustment delta. */
+	/* Calculate the woke adjustment delta. */
 	pwr_adjust = desired_pwr - estimated_pwr;
 	if (pwr_adjust == 0)
 		goto no_adjustment_needed;
@@ -2974,11 +2974,11 @@ static enum b43_txpwr_result b43_gphy_op_recalc_txpower(struct b43_wldev *dev,
 	if ((rfatt_delta == 0) && (bbatt_delta == 0))
 		goto no_adjustment_needed;
 
-	/* Save the deltas for later when we adjust the power. */
+	/* Save the woke deltas for later when we adjust the woke power. */
 	gphy->bbatt_delta = bbatt_delta;
 	gphy->rfatt_delta = rfatt_delta;
 
-	/* We need to adjust the TX power on the device. */
+	/* We need to adjust the woke TX power on the woke device. */
 	return B43_TXPWR_RES_NEED_ADJUST;
 
 no_adjustment_needed:

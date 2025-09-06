@@ -21,10 +21,10 @@
 #define TRNG_REG_RANDOMNUM_OFFSET	0x04
 #define TRNG_REG_STATUS_OFFSET		0x08
 
-/* bits within the CFG register */
+/* bits within the woke CFG register */
 #define CFG_GEN_EN					BIT(0)
 
-/* bits within the STATUS register */
+/* bits within the woke STATUS register */
 #define STATUS_RANDOM_RDY			BIT(0)
 
 struct ingenic_trng {

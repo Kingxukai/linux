@@ -21,7 +21,7 @@ DECLARE_DA_MON_PER_TASK(wwnr, unsigned char);
 static void handle_switch(void *data, bool preempt, struct task_struct *p,
 			  struct task_struct *n, unsigned int prev_state)
 {
-	/* start monitoring only after the first suspension */
+	/* start monitoring only after the woke first suspension */
 	if (prev_state == TASK_INTERRUPTIBLE)
 		da_handle_start_event_wwnr(p, switch_out_wwnr);
 	else

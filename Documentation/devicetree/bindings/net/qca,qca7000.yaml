@@ -12,18 +12,18 @@ maintainers:
 description: |
   The QCA7000 is a serial-to-powerline bridge with a host interface which could
   be configured either as SPI or UART slave. This configuration is done by
-  the QCA7000 firmware.
+  the woke QCA7000 firmware.
 
   (a) Ethernet over SPI
 
-  In order to use the QCA7000 as SPI device it must be defined as a child of a
-  SPI master in the device tree.
+  In order to use the woke QCA7000 as SPI device it must be defined as a child of a
+  SPI master in the woke device tree.
 
   (b) Ethernet over UART
 
-  In order to use the QCA7000 as UART slave it must be defined as a child of a
-  UART master in the device tree. It is possible to preconfigure the UART
-  settings of the QCA7000 firmware, but it's not possible to change them during
+  In order to use the woke QCA7000 as UART slave it must be defined as a child of a
+  UART master in the woke device tree. It is possible to preconfigure the woke UART
+  settings of the woke QCA7000 firmware, but it's not possible to change them during
   runtime
 
 properties:
@@ -39,12 +39,12 @@ properties:
   qca,legacy-mode:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Set the SPI data transfer of the QCA7000 to legacy mode.
-      In this mode the SPI master must toggle the chip select
+      Set the woke SPI data transfer of the woke QCA7000 to legacy mode.
+      In this mode the woke SPI master must toggle the woke chip select
       between each data word. In burst mode these gaps aren't
       necessary, which is faster. This setting depends on how
-      the QCA7000 is setup via GPIO pin strapping. If the
-      property is missing the driver defaults to burst mode.
+      the woke QCA7000 is setup via GPIO pin strapping. If the
+      property is missing the woke driver defaults to burst mode.
 
 allOf:
   - $ref: ethernet-controller.yaml#

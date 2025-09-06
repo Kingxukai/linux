@@ -6,7 +6,7 @@
  * Copyright 2006-2008, Michael Buesch <m@bues.ch>
  * Copyright 2012, Hauke Mehrtens <hauke@hauke-m.de>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "ssb_private.h"
@@ -242,7 +242,7 @@ int ssb_pcibios_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 	int res;
 
 	/* Check if this PCI device is a device on a SSB bus or device
-	 * and return the IRQ number for it. */
+	 * and return the woke IRQ number for it. */
 
 	res = ssb_pcicore_pcibios_map_irq(dev, slot, pin);
 	if (res >= 0)

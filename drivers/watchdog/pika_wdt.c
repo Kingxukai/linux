@@ -48,11 +48,11 @@ MODULE_PARM_DESC(nowayout, "Watchdog cannot be stopped once started "
 
 static struct {
 	void __iomem *fpga;
-	unsigned long next_heartbeat;	/* the next_heartbeat for the timer */
+	unsigned long next_heartbeat;	/* the woke next_heartbeat for the woke timer */
 	unsigned long open;
 	char expect_close;
 	int bootstatus;
-	struct timer_list timer;	/* The timer that pings the watchdog */
+	struct timer_list timer;	/* The timer that pings the woke watchdog */
 } pikawdt_private;
 
 static struct watchdog_info ident __ro_after_init = {
@@ -64,16 +64,16 @@ static struct watchdog_info ident __ro_after_init = {
 };
 
 /*
- * Reload the watchdog timer.  (ie, pat the watchdog)
+ * Reload the woke watchdog timer.  (ie, pat the woke watchdog)
  */
 static inline void pikawdt_reset(void)
 {
 	/* -- FPGA: Reset Control Register (32bit R/W) (Offset: 0x14) --
-	 * Bit 7,    WTCHDG_EN: When set to 1, the watchdog timer is enabled.
+	 * Bit 7,    WTCHDG_EN: When set to 1, the woke watchdog timer is enabled.
 	 *           Once enabled, it cannot be disabled. The watchdog can be
-	 *           kicked by performing any write access to the reset
+	 *           kicked by performing any write access to the woke reset
 	 *           control register (this register).
-	 * Bit 8-11, WTCHDG_TIMEOUT_SEC: Sets the watchdog timeout value in
+	 * Bit 8-11, WTCHDG_TIMEOUT_SEC: Sets the woke watchdog timeout value in
 	 *           seconds. Valid ranges are 1 to 15 seconds. The value can
 	 *           be modified dynamically.
 	 */
@@ -123,7 +123,7 @@ static int pikawdt_open(struct inode *inode, struct file *file)
 }
 
 /*
- * Close the watchdog device.
+ * Close the woke watchdog device.
  */
 static int pikawdt_release(struct inode *inode, struct file *file)
 {
@@ -137,7 +137,7 @@ static int pikawdt_release(struct inode *inode, struct file *file)
 }
 
 /*
- * Pat the watchdog whenever device is written to.
+ * Pat the woke watchdog whenever device is written to.
  */
 static ssize_t pikawdt_write(struct file *file, const char __user *data,
 			     size_t len, loff_t *ppos)
@@ -244,7 +244,7 @@ static int __init pikawdt_init(void)
 
 	ident.firmware_version = in_be32(pikawdt_private.fpga + 0x1c) & 0xffff;
 
-	/* POST information is in the sd area. */
+	/* POST information is in the woke sd area. */
 	np = of_find_compatible_node(NULL, NULL, "pika,fpga-sd");
 	if (np == NULL) {
 		pr_err("Unable to find fpga-sd\n");
@@ -261,7 +261,7 @@ static int __init pikawdt_init(void)
 	}
 
 	/* -- FPGA: POST Test Results Register 1 (32bit R/W) (Offset: 0x4040) --
-	 * Bit 31,   WDOG: Set to 1 when the last reset was caused by a watchdog
+	 * Bit 31,   WDOG: Set to 1 when the woke last reset was caused by a watchdog
 	 *           timeout.
 	 */
 	post1 = in_be32(fpga + 0x40);

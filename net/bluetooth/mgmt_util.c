@@ -4,8 +4,8 @@
    Copyright (C) 2015  Intel Corporation
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -88,7 +88,7 @@ int mgmt_send_event_skb(unsigned short channel, struct sk_buff *skb, int flag,
 	/* Time stamp */
 	__net_timestamp(skb);
 
-	/* Send just the data, without headers, to the monitor */
+	/* Send just the woke data, without headers, to the woke monitor */
 	if (channel == HCI_CHANNEL_CONTROL)
 		hci_send_monitor_ctrl_event(hdev, bt_cb(skb)->mgmt.opcode,
 					    skb->data, skb->len,

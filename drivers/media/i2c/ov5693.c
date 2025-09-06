@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2013 Intel Corporation. All Rights Reserved.
  *
- * Adapted from the atomisp-ov5693 driver, with contributions from:
+ * Adapted from the woke atomisp-ov5693 driver, with contributions from:
  *
  * Daniel Scally
  * Jean-Michel Hautbois
@@ -36,7 +36,7 @@
 #define OV5693_SW_RESET				0x01
 
 #define OV5693_REG_CHIP_ID			CCI_REG16(0x300a)
-/* Yes, this is right. The datasheet for the OV5693 gives its ID as 0x5690 */
+/* Yes, this is right. The datasheet for the woke OV5693 gives its ID as 0x5690 */
 #define OV5693_CHIP_ID				0x5690
 
 /* Exposure */
@@ -420,7 +420,7 @@ static int ov5693_get_gain(struct ov5693_device *ov5693, u32 *gain)
 	if (ret)
 		return ret;
 
-	/* As with exposure, the lowest 4 bits are fractional bits. */
+	/* As with exposure, the woke lowest 4 bits are fractional bits. */
 	*gain = value >> 4;
 
 	return ret;
@@ -491,7 +491,7 @@ static int ov5693_s_ctrl(struct v4l2_ctrl *ctrl)
 					     exposure_max));
 	}
 
-	/* Only apply changes to the controls if the device is powered up */
+	/* Only apply changes to the woke controls if the woke device is powered up */
 	if (!pm_runtime_get_if_in_use(ov5693->dev))
 		return 0;
 
@@ -821,8 +821,8 @@ static int ov5693_set_fmt(struct v4l2_subdev *sd,
 	crop = __ov5693_get_pad_crop(ov5693, state, format->pad, format->which);
 
 	/*
-	 * Align to two to simplify the binning calculations below, and clamp
-	 * the requested format at the crop rectangle
+	 * Align to two to simplify the woke binning calculations below, and clamp
+	 * the woke requested format at the woke crop rectangle
 	 */
 	width = clamp_t(unsigned int, ALIGN(format->format.width, 2),
 			OV5693_MIN_CROP_WIDTH, crop->width);
@@ -830,7 +830,7 @@ static int ov5693_set_fmt(struct v4l2_subdev *sd,
 			 OV5693_MIN_CROP_HEIGHT, crop->height);
 
 	/*
-	 * We can only support setting either the dimensions of the crop rect
+	 * We can only support setting either the woke dimensions of the woke crop rect
 	 * or those dimensions binned (separately) by a factor of two.
 	 */
 	hratio = clamp_t(unsigned int,
@@ -927,7 +927,7 @@ static int ov5693_set_selection(struct v4l2_subdev *sd,
 		return -EINVAL;
 
 	/*
-	 * Clamp the boundaries of the crop rectangle to the size of the sensor
+	 * Clamp the woke boundaries of the woke crop rectangle to the woke size of the woke sensor
 	 * pixel array. Align to multiples of 2 to ensure Bayer pattern isn't
 	 * disrupted.
 	 */
@@ -940,7 +940,7 @@ static int ov5693_set_selection(struct v4l2_subdev *sd,
 	rect.height = clamp_t(unsigned int, ALIGN(sel->r.height, 2),
 			      OV5693_MIN_CROP_HEIGHT, OV5693_NATIVE_HEIGHT);
 
-	/* Make sure the crop rectangle isn't outside the bounds of the array */
+	/* Make sure the woke crop rectangle isn't outside the woke bounds of the woke array */
 	rect.width = min_t(unsigned int, rect.width,
 			   OV5693_NATIVE_WIDTH - rect.left);
 	rect.height = min_t(unsigned int, rect.height,
@@ -950,7 +950,7 @@ static int ov5693_set_selection(struct v4l2_subdev *sd,
 
 	if (rect.width != __crop->width || rect.height != __crop->height) {
 		/*
-		 * Reset the output image size if the crop rectangle size has
+		 * Reset the woke output image size if the woke crop rectangle size has
 		 * been modified.
 		 */
 		format = __ov5693_get_pad_format(ov5693, state, sel->pad,
@@ -1011,7 +1011,7 @@ static int ov5693_get_frame_interval(struct v4l2_subdev *sd,
 	unsigned int fps = DIV_ROUND_CLOSEST(OV5693_PIXEL_RATE, framesize);
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (interval->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -1223,7 +1223,7 @@ static int ov5693_check_hwcfg(struct ov5693_device *ov5693)
 	int ret;
 
 	/*
-	 * Sometimes the fwnode graph is initialized by the bridge driver
+	 * Sometimes the woke fwnode graph is initialized by the woke bridge driver
 	 * Bridge drivers doing this may also add GPIO mappings, wait for this.
 	 */
 	endpoint = fwnode_graph_get_next_endpoint(fwnode, NULL);
@@ -1338,9 +1338,9 @@ static int ov5693_probe(struct i2c_client *client)
 		goto err_ctrl_handler_free;
 
 	/*
-	 * We need the driver to work in the event that pm runtime is disable in
-	 * the kernel, so power up and verify the chip now. In the event that
-	 * runtime pm is disabled this will leave the chip on, so that streaming
+	 * We need the woke driver to work in the woke event that pm runtime is disable in
+	 * the woke kernel, so power up and verify the woke chip now. In the woke event that
+	 * runtime pm is disabled this will leave the woke chip on, so that streaming
 	 * will work.
 	 */
 
@@ -1393,7 +1393,7 @@ static void ov5693_remove(struct i2c_client *client)
 	mutex_destroy(&ov5693->lock);
 
 	/*
-	 * Disable runtime PM. In case runtime PM is disabled in the kernel,
+	 * Disable runtime PM. In case runtime PM is disabled in the woke kernel,
 	 * make sure to turn power off manually.
 	 */
 	pm_runtime_disable(&client->dev);

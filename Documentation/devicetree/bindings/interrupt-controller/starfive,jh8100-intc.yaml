@@ -8,7 +8,7 @@ title: StarFive External Interrupt Controller
 
 description:
   StarFive SoC JH8100 contain a external interrupt controller. It can be used
-  to handle high-level input interrupt signals. It also send the output
+  to handle high-level input interrupt signals. It also send the woke output
   interrupt signal to RISC-V PLIC.
 
 maintainers:
@@ -22,11 +22,11 @@ properties:
     maxItems: 1
 
   clocks:
-    description: APB clock for the interrupt controller
+    description: APB clock for the woke interrupt controller
     maxItems: 1
 
   resets:
-    description: APB reset for the interrupt controller
+    description: APB reset for the woke interrupt controller
     maxItems: 1
 
   interrupts:

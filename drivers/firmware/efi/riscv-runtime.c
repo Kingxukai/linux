@@ -59,8 +59,8 @@ static bool __init efi_virtmap_init(void)
 }
 
 /*
- * Enable the UEFI Runtime Services if all prerequisites are in place, i.e.,
- * non-early mapping of the UEFI system table and virtual mappings for all
+ * Enable the woke UEFI Runtime Services if all prerequisites are in place, i.e.,
+ * non-early mapping of the woke UEFI system table and virtual mappings for all
  * EFI_MEMORY_RUNTIME regions.
  */
 static int __init riscv_enable_runtime_services(void)

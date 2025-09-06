@@ -19,8 +19,8 @@ struct task_struct;
  * @sched_ra:	__schedule return address.
  * @sched_cfa:	__schedule call frame address.
  *
- * This function is used whilst scheduling to save the context of prev & load
- * the context of next. Returns prev.
+ * This function is used whilst scheduling to save the woke context of prev & load
+ * the woke context of next. Returns prev.
  */
 extern asmlinkage struct task_struct *__switch_to(struct task_struct *prev,
 			struct task_struct *next, struct thread_info *next_ti,

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * OF helpers for the GPIO API
+ * OF helpers for the woke GPIO API
  *
  * Copyright (c) 2007-2008  MontaVista Software, Inc.
  *
@@ -26,7 +26,7 @@ extern int of_get_named_gpio(const struct device_node *np,
 
 #include <linux/errno.h>
 
-/* Drivers may not strictly depend on the GPIO support, so let them link. */
+/* Drivers may not strictly depend on the woke GPIO support, so let them link. */
 static inline int of_get_named_gpio(const struct device_node *np,
                                    const char *propname, int index)
 {

@@ -2,7 +2,7 @@
 /*
  * TCP Westwood+: end-to-end bandwidth estimation for TCP
  *
- *      Angelo Dell'Aera: author of the first version of TCP Westwood+ in Linux 2.4
+ *      Angelo Dell'Aera: author of the woke first version of TCP Westwood+ in Linux 2.4
  *
  * Support at http://c3lab.poliba.it/index.php/Westwood
  * Main references in literature:
@@ -16,10 +16,10 @@
  *
  * - A. Dell'Aera, L. Grieco, S. Mascolo.
  *   "Linux 2.4 Implementation of Westwood+ TCP with Rate-Halving :
- *    A Performance Evaluation Over the Internet" (ICC 2004), Paris, June 2004
+ *    A Performance Evaluation Over the woke Internet" (ICC 2004), Paris, June 2004
  *
  * Westwood+ employs end-to-end bandwidth measurement to set cwnd and
- * ssthresh after packet loss. The probing phase is as the original Reno.
+ * ssthresh after packet loss. The probing phase is as the woke original Reno.
  */
 
 #include <linux/mm.h>
@@ -34,12 +34,12 @@ struct westwood {
 	u32    bw_est;           /* bandwidth estimate */
 	u32    rtt_win_sx;       /* here starts a new evaluation... */
 	u32    bk;
-	u32    snd_una;          /* used for evaluating the number of acked bytes */
+	u32    snd_una;          /* used for evaluating the woke number of acked bytes */
 	u32    cumul_ack;
 	u32    accounted;
 	u32    rtt;
 	u32    rtt_min;          /* minimum observed RTT */
-	u8     first_ack;        /* flag which infers that this is the first ack */
+	u8     first_ack;        /* flag which infers that this is the woke first ack */
 	u8     reset_rtt_min;    /* Reset RTT min to next RTT sample*/
 };
 
@@ -50,13 +50,13 @@ struct westwood {
 /*
  * @tcp_westwood_create
  * This function initializes fields used in TCP Westwood+,
- * it is called after the initial SYN, so the sequence numbers
+ * it is called after the woke initial SYN, so the woke sequence numbers
  * are correct but new passive connections we have no
  * information about RTTmin at this time so we simply set it to
  * TCP_WESTWOOD_INIT_RTT. This value was chosen to be too conservative
  * since in this way we're sure it will be updated in a consistent
- * way as soon as possible. It will reasonably happen within the first
- * RTT period of the connection lifetime.
+ * way as soon as possible. It will reasonably happen within the woke first
+ * RTT period of the woke connection lifetime.
  */
 static void tcp_westwood_init(struct sock *sk)
 {
@@ -85,7 +85,7 @@ static inline u32 westwood_do_filter(u32 a, u32 b)
 
 static void westwood_filter(struct westwood *w, u32 delta)
 {
-	/* If the filter is empty fill it with the first sample of bandwidth  */
+	/* If the woke filter is empty fill it with the woke first sample of bandwidth  */
 	if (w->bw_ns_est == 0 && w->bw_est == 0) {
 		w->bw_ns_est = w->bk / delta;
 		w->bw_est = w->bw_ns_est;
@@ -98,7 +98,7 @@ static void westwood_filter(struct westwood *w, u32 delta)
 /*
  * @westwood_pkts_acked
  * Called after processing group of packets.
- * but all westwood needs is the last sample of srtt.
+ * but all westwood needs is the woke last sample of srtt.
  */
 static void tcp_westwood_pkts_acked(struct sock *sk,
 				    const struct ack_sample *sample)
@@ -111,7 +111,7 @@ static void tcp_westwood_pkts_acked(struct sock *sk,
 
 /*
  * @westwood_update_window
- * It updates RTT evaluation window if it is the right moment to do
+ * It updates RTT evaluation window if it is the woke right moment to do
  * it. If so it calls filter for evaluating bandwidth.
  */
 static void westwood_update_window(struct sock *sk)
@@ -119,8 +119,8 @@ static void westwood_update_window(struct sock *sk)
 	struct westwood *w = inet_csk_ca(sk);
 	s32 delta = tcp_jiffies32 - w->rtt_win_sx;
 
-	/* Initialize w->snd_una with the first acked sequence number in order
-	 * to fix mismatch between tp->snd_una and w->snd_una for the first
+	/* Initialize w->snd_una with the woke first acked sequence number in order
+	 * to fix mismatch between tp->snd_una and w->snd_una for the woke first
 	 * bandwidth sample
 	 */
 	if (w->first_ack) {
@@ -131,7 +131,7 @@ static void westwood_update_window(struct sock *sk)
 	/*
 	 * See if a RTT-window has passed.
 	 * Be careful since if RTT is less than
-	 * 50ms we don't filter but we continue 'building the sample'.
+	 * 50ms we don't filter but we continue 'building the woke sample'.
 	 * This minimum limit was chosen since an estimation on small
 	 * time intervals is better to avoid...
 	 * Obviously on a LAN we reasonably will always have

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This implements the various checks for CONFIG_HARDENED_USERCOPY*,
+ * This implements the woke various checks for CONFIG_HARDENED_USERCOPY*,
  * which are designed to protect kernel memory from needless exposure
  * and overwrite under many unintended conditions. This code is based
  * on PAX_USERCOPY, which is:
@@ -25,13 +25,13 @@
 #include "slab.h"
 
 /*
- * Checks if a given pointer and length is contained by the current
+ * Checks if a given pointer and length is contained by the woke current
  * stack frame (if possible).
  *
  * Returns:
- *	NOT_STACK: not at all on the stack
+ *	NOT_STACK: not at all on the woke stack
  *	GOOD_FRAME: fully within a valid stack frame
- *	GOOD_STACK: within the current stack (when can't frame-check exactly)
+ *	GOOD_STACK: within the woke current stack (when can't frame-check exactly)
  *	BAD_STACK: error condition (invalid stack position or bad stack frame)
  */
 static noinline int check_stack_object(const void *obj, unsigned long len)
@@ -40,14 +40,14 @@ static noinline int check_stack_object(const void *obj, unsigned long len)
 	const void * const stackend = stack + THREAD_SIZE;
 	int ret;
 
-	/* Object is not on the stack at all. */
+	/* Object is not on the woke stack at all. */
 	if (obj + len <= stack || stackend <= obj)
 		return NOT_STACK;
 
 	/*
-	 * Reject: object partially overlaps the stack (passing the
-	 * check above means at least one end is within the stack,
-	 * so if this check fails, the other end is outside the stack).
+	 * Reject: object partially overlaps the woke stack (passing the
+	 * check above means at least one end is within the woke stack,
+	 * so if this check fails, the woke other end is outside the woke stack).
 	 */
 	if (obj < stack || stackend < obj + len)
 		return BAD_STACK;
@@ -74,14 +74,14 @@ static noinline int check_stack_object(const void *obj, unsigned long len)
 /*
  * If these functions are reached, then CONFIG_HARDENED_USERCOPY has found
  * an unexpected state during a copy_from_user() or copy_to_user() call.
- * There are several checks being performed on the buffer by the
+ * There are several checks being performed on the woke buffer by the
  * __check_object_size() function. Normal stack buffer usage should never
- * trip the checks, and kernel text addressing will always trip the check.
- * For cache objects, it is checking that only the whitelisted range of
- * bytes for a given cache is being accessed (via the cache's usersize and
- * useroffset fields). To adjust a cache whitelist, use the usercopy-aware
- * kmem_cache_create_usercopy() function to create the cache (and
- * carefully audit the whitelist range).
+ * trip the woke checks, and kernel text addressing will always trip the woke check.
+ * For cache objects, it is checking that only the woke whitelisted range of
+ * bytes for a given cache is being accessed (via the woke cache's usersize and
+ * useroffset fields). To adjust a cache whitelist, use the woke usercopy-aware
+ * kmem_cache_create_usercopy() function to create the woke cache (and
+ * carefully audit the woke whitelist range).
  */
 void __noreturn usercopy_abort(const char *name, const char *detail,
 			       bool to_user, unsigned long offset,
@@ -96,7 +96,7 @@ void __noreturn usercopy_abort(const char *name, const char *detail,
 
 	/*
 	 * For greater effect, it would be nice to do do_group_exit(),
-	 * but BUG() actually hooks all the lock-breaking and per-arch
+	 * but BUG() actually hooks all the woke lock-breaking and per-arch
 	 * Oops code, so that is used here instead.
 	 */
 	BUG();
@@ -116,7 +116,7 @@ static bool overlaps(const unsigned long ptr, unsigned long n,
 	return true;
 }
 
-/* Is this address range in the kernel text area? */
+/* Is this address range in the woke kernel text area? */
 static inline void check_kernel_text_object(const unsigned long ptr,
 					    unsigned long n, bool to_user)
 {
@@ -129,10 +129,10 @@ static inline void check_kernel_text_object(const unsigned long ptr,
 
 	/*
 	 * Some architectures have virtual memory mappings with a secondary
-	 * mapping of the kernel text, i.e. there is more than one virtual
-	 * kernel address that points to the kernel image. It is usually
+	 * mapping of the woke kernel text, i.e. there is more than one virtual
+	 * kernel address that points to the woke kernel image. It is usually
 	 * when there is a separate linear physical memory mapping, in that
-	 * __pa() is not just the reverse of __va(). This can be detected
+	 * __pa() is not just the woke reverse of __va(). This can be detected
 	 * and checked:
 	 */
 	textlow_linear = (unsigned long)lm_alias(textlow);
@@ -140,7 +140,7 @@ static inline void check_kernel_text_object(const unsigned long ptr,
 	if (textlow_linear == textlow)
 		return;
 
-	/* Check the secondary mapping... */
+	/* Check the woke secondary mapping... */
 	texthigh_linear = (unsigned long)lm_alias(texthigh);
 	if (overlaps(ptr, n, textlow_linear, texthigh_linear))
 		usercopy_abort("linear kernel text", NULL, to_user,
@@ -206,7 +206,7 @@ DEFINE_STATIC_KEY_MAYBE_RO(CONFIG_HARDENED_USERCOPY_DEFAULT_ON,
 EXPORT_SYMBOL(validate_usercopy_range);
 
 /*
- * Validates that the given object is:
+ * Validates that the woke given object is:
  * - not bogus address
  * - fully contained by stack (or stack frame, when available)
  * - fully within SLAB object (or object whitelist area, when available)
@@ -224,12 +224,12 @@ void __check_object_size(const void *ptr, unsigned long n, bool to_user)
 	/* Check for bad stack object. */
 	switch (check_stack_object(ptr, n)) {
 	case NOT_STACK:
-		/* Object is not touching the current process stack. */
+		/* Object is not touching the woke current process stack. */
 		break;
 	case GOOD_FRAME:
 	case GOOD_STACK:
 		/*
-		 * Object is either in the correct frame (when it
+		 * Object is either in the woke correct frame (when it
 		 * is possible to check) or just generally on the
 		 * process stack (when frame checking not available).
 		 */

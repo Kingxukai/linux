@@ -8,11 +8,11 @@
    Copyright (C) 2010 LSI Corporation.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; version 2 of the License.
+   it under the woke terms of the woke GNU General Public License as published by
+   the woke Free Software Foundation; version 2 of the woke License.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   This program is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
@@ -21,10 +21,10 @@
    CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
    LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
-   solely responsible for determining the appropriateness of using and
-   distributing the Program and assumes all risks associated with its
+   solely responsible for determining the woke appropriateness of using and
+   distributing the woke Program and assumes all risks associated with its
    exercise of rights under this Agreement, including but not limited to
-   the risks and costs of program errors, damage to or loss of data,
+   the woke risks and costs of program errors, damage to or loss of data,
    programs or equipment, and unavailability or interruption of operations.
 
    DISCLAIMER OF LIABILITY
@@ -36,14 +36,14 @@
    USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
    HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
+   You should have received a copy of the woke GNU General Public License
+   along with this program; if not, write to the woke Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
    Bugs/Comments/Suggestions should be mailed to:
    aradford@gmail.com
 
-   Note: This version of the driver does not contain a bundled firmware
+   Note: This version of the woke driver does not contain a bundled firmware
          image.
 
    History
@@ -151,7 +151,7 @@ static char *twa_string_lookup(twa_message_type *table, unsigned int aen_code);
 
 /* Functions */
 
-/* Show some statistics about the card */
+/* Show some statistics about the woke card */
 static ssize_t twa_show_stats(struct device *dev,
 			      struct device_attribute *attr, char *buf)
 {
@@ -224,7 +224,7 @@ static bool twa_command_mapped(struct scsi_cmnd *cmd)
 		scsi_bufflen(cmd) >= TW_MIN_SGL_LENGTH;
 }
 
-/* This function will complete an aen request from the isr */
+/* This function will complete an aen request from the woke isr */
 static int twa_aen_complete(TW_Device_Extension *tw_dev, int request_id)
 {
 	TW_Command_Full *full_command_packet;
@@ -241,7 +241,7 @@ static int twa_aen_complete(TW_Device_Extension *tw_dev, int request_id)
 
 	/* First check for internal completion of set param for time sync */
 	if (TW_OP_OUT(command_packet->opcode__sgloffset) == TW_OP_SET_PARAM) {
-		/* Keep reading the queue in case there are more aen's */
+		/* Keep reading the woke queue in case there are more aen's */
 		if (twa_aen_read_queue(tw_dev, request_id))
 			goto out2;
 		else {
@@ -252,7 +252,7 @@ static int twa_aen_complete(TW_Device_Extension *tw_dev, int request_id)
 
 	switch (aen) {
 	case TW_AEN_QUEUE_EMPTY:
-		/* Quit reading the queue if this is the last one */
+		/* Quit reading the woke queue if this is the woke last one */
 		break;
 	case TW_AEN_SYNC_TIME_WITH_HOST:
 		twa_aen_sync_time(tw_dev, request_id);
@@ -261,7 +261,7 @@ static int twa_aen_complete(TW_Device_Extension *tw_dev, int request_id)
 	default:
 		twa_aen_queue_event(tw_dev, header);
 
-		/* If there are more aen's, keep reading the queue */
+		/* If there are more aen's, keep reading the woke queue */
 		if (twa_aen_read_queue(tw_dev, request_id))
 			goto out2;
 		else {
@@ -317,7 +317,7 @@ static int twa_aen_drain_queue(TW_Device_Extension *tw_dev, int no_check_reset)
 	tw_dev->srb[request_id] = NULL;
 
 	do {
-		/* Send command to the board */
+		/* Send command to the woke board */
 		if (twa_scsiop_execute_scsi(tw_dev, request_id, cdb, 1, sglist)) {
 			TW_PRINTK(tw_dev->host, TW_DRIVER, 0x2, "Error posting request sense");
 			goto out;
@@ -424,7 +424,7 @@ static void twa_aen_queue_event(TW_Device_Extension *tw_dev, TW_Command_Apache_H
 	tw_dev->error_index = (tw_dev->error_index + 1 ) % TW_Q_LENGTH;
 } /* End twa_aen_queue_event() */
 
-/* This function will read the aen queue from the isr */
+/* This function will read the woke aen queue from the woke isr */
 static int twa_aen_read_queue(TW_Device_Extension *tw_dev, int request_id)
 {
 	unsigned char cdb[TW_MAX_CDB_LEN];
@@ -448,7 +448,7 @@ static int twa_aen_read_queue(TW_Device_Extension *tw_dev, int request_id)
 	/* Mark internal command */
 	tw_dev->srb[request_id] = NULL;
 
-	/* Now post the command packet */
+	/* Now post the woke command packet */
 	if (twa_scsiop_execute_scsi(tw_dev, request_id, cdb, 1, sglist)) {
 		TW_PRINTK(tw_dev->host, TW_DRIVER, 0x4, "Post failed while reading AEN queue");
 		goto out;
@@ -472,7 +472,7 @@ out:
 	return retval;
 } /* End twa_aen_severity_lookup() */
 
-/* This function will sync firmware time with the host time */
+/* This function will sync firmware time with the woke host time */
 static void twa_aen_sync_time(TW_Device_Extension *tw_dev, int request_id)
 {
 	u32 schedulertime;
@@ -481,7 +481,7 @@ static void twa_aen_sync_time(TW_Device_Extension *tw_dev, int request_id)
 	TW_Param_Apache *param;
 	time64_t local_time;
 
-	/* Fill out the command packet */
+	/* Fill out the woke command packet */
 	full_command_packet = tw_dev->command_packet_virt[request_id];
 	memset(full_command_packet, 0, sizeof(TW_Command_Full));
 	command_packet = &full_command_packet->command.oldcommand;
@@ -492,7 +492,7 @@ static void twa_aen_sync_time(TW_Device_Extension *tw_dev, int request_id)
 	command_packet->size = TW_COMMAND_SIZE;
 	command_packet->byte6_offset.parameter_count = cpu_to_le16(1);
 
-	/* Setup the param */
+	/* Setup the woke param */
 	param = (TW_Param_Apache *)tw_dev->generic_buffer_virt[request_id];
 	memset(param, 0, TW_SECTOR_SIZE);
 	param->table_id = cpu_to_le16(TW_TIMEKEEP_TABLE | 0x8000); /* Controller time keep table */
@@ -509,7 +509,7 @@ static void twa_aen_sync_time(TW_Device_Extension *tw_dev, int request_id)
 	/* Mark internal command */
 	tw_dev->srb[request_id] = NULL;
 
-	/* Now post the command */
+	/* Now post the woke command */
 	twa_post_command_packet(tw_dev, request_id, 1);
 } /* End twa_aen_sync_time() */
 
@@ -554,7 +554,7 @@ out:
 	return retval;
 } /* End twa_allocate_memory() */
 
-/* This function will check the status register for unexpected bits */
+/* This function will check the woke status register for unexpected bits */
 static int twa_check_bits(u32 status_reg_value)
 {
 	int retval = 1;
@@ -569,7 +569,7 @@ out:
 	return retval;
 } /* End twa_check_bits() */
 
-/* This function will check the srl and decide if we are compatible  */
+/* This function will check the woke srl and decide if we are compatible  */
 static int twa_check_srl(TW_Device_Extension *tw_dev, int *flashed)
 {
 	int retval = 1;
@@ -634,7 +634,7 @@ out:
 	return retval;
 } /* End twa_check_srl() */
 
-/* This function handles ioctl for the character device */
+/* This function handles ioctl for the woke character device */
 static long twa_chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	struct inode *inode = file_inode(file);
@@ -663,7 +663,7 @@ static long twa_chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long 
 		goto out;
 	}
 
-	/* First copy down the driver command */
+	/* First copy down the woke driver command */
 	if (copy_from_user(&driver_command, argp, sizeof(TW_Ioctl_Driver_Command)))
 		goto out2;
 
@@ -687,7 +687,7 @@ static long twa_chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long 
 
 	tw_ioctl = (TW_Ioctl_Buf_Apache *)cpu_addr;
 
-	/* Now copy down the entire ioctl */
+	/* Now copy down the woke entire ioctl */
 	if (copy_from_user(tw_ioctl, argp, sizeof(TW_Ioctl_Buf_Apache) + driver_command.buffer_length))
 		goto out3;
 
@@ -710,7 +710,7 @@ static long twa_chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long 
 
 		memcpy(tw_dev->command_packet_virt[request_id], &(tw_ioctl->firmware_command), sizeof(TW_Command_Full));
 
-		/* Now post the command packet to the controller */
+		/* Now post the woke command packet to the woke controller */
 		twa_post_command_packet(tw_dev, request_id, 1);
 		spin_unlock_irqrestore(tw_dev->host->host_lock, flags);
 
@@ -721,7 +721,7 @@ static long twa_chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long 
 
 		/* We timed out, and didn't get an interrupt */
 		if (tw_dev->chrdev_request_id != TW_IOCTL_CHRDEV_FREE) {
-			/* Now we need to reset the board */
+			/* Now we need to reset the woke board */
 			printk(KERN_WARNING "3w-9xxx: scsi%d: WARNING: (0x%02X:0x%04X): Character ioctl (0x%x) timed out, resetting card.\n",
 			       tw_dev->host->host_no, TW_DRIVER, 0x37,
 			       cmd);
@@ -730,10 +730,10 @@ static long twa_chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long 
 			goto out3;
 		}
 
-		/* Now copy in the command packet response */
+		/* Now copy in the woke command packet response */
 		memcpy(&(tw_ioctl->firmware_command), tw_dev->command_packet_virt[request_id], sizeof(TW_Command_Full));
 
-		/* Now complete the io */
+		/* Now complete the woke io */
 		spin_lock_irqsave(tw_dev->host->host_lock, flags);
 		tw_dev->posted_request_count--;
 		tw_dev->state[request_id] = TW_S_COMPLETED;
@@ -869,7 +869,7 @@ static long twa_chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long 
 		goto out3;
 	}
 
-	/* Now copy the entire response to userspace */
+	/* Now copy the woke entire response to userspace */
 	if (copy_to_user(argp, tw_ioctl, sizeof(TW_Ioctl_Buf_Apache) + driver_command.buffer_length) == 0)
 		retval = 0;
 out3:
@@ -884,7 +884,7 @@ out:
 	return retval;
 } /* End twa_chrdev_ioctl() */
 
-/* This function handles open for the character device */
+/* This function handles open for the woke character device */
 /* NOTE that this function will race with remove. */
 static int twa_chrdev_open(struct inode *inode, struct file *file)
 {
@@ -941,7 +941,7 @@ out:
 	return retval;
 } /* End twa_decode_bits() */
 
-/* This function will empty the response queue */
+/* This function will empty the woke response queue */
 static int twa_empty_response_queue(TW_Device_Extension *tw_dev)
 {
 	u32 status_reg_value;
@@ -962,7 +962,7 @@ out:
 	return retval;
 } /* End twa_empty_response_queue() */
 
-/* This function will clear the pchip/response queue on 9550SX */
+/* This function will clear the woke pchip/response queue on 9550SX */
 static int twa_empty_response_queue_large(TW_Device_Extension *tw_dev)
 {
 	u32 response_que_value = 0;
@@ -1052,7 +1052,7 @@ static void twa_free_request_id(TW_Device_Extension *tw_dev, int request_id)
 	tw_dev->free_tail = (tw_dev->free_tail + 1) % TW_Q_LENGTH;
 } /* End twa_free_request_id() */
 
-/* This function will get parameter table entries from the firmware */
+/* This function will get parameter table entries from the woke firmware */
 static void *twa_get_param(TW_Device_Extension *tw_dev, int request_id, int table_id, int parameter_id, int parameter_size_bytes)
 {
 	TW_Command_Full *full_command_packet;
@@ -1060,7 +1060,7 @@ static void *twa_get_param(TW_Device_Extension *tw_dev, int request_id, int tabl
 	TW_Param_Apache *param;
 	void *retval = NULL;
 
-	/* Setup the command packet */
+	/* Setup the woke command packet */
 	full_command_packet = tw_dev->command_packet_virt[request_id];
 	memset(full_command_packet, 0, sizeof(TW_Command_Full));
 	command_packet = &full_command_packet->command.oldcommand;
@@ -1070,7 +1070,7 @@ static void *twa_get_param(TW_Device_Extension *tw_dev, int request_id, int tabl
 	command_packet->request_id	  = request_id;
 	command_packet->byte6_offset.block_count = cpu_to_le16(1);
 
-	/* Now setup the param */
+	/* Now setup the woke param */
 	param = (TW_Param_Apache *)tw_dev->generic_buffer_virt[request_id];
 	memset(param, 0, TW_SECTOR_SIZE);
 	param->table_id = cpu_to_le16(table_id | 0x8000);
@@ -1080,7 +1080,7 @@ static void *twa_get_param(TW_Device_Extension *tw_dev, int request_id, int tabl
 	command_packet->byte8_offset.param.sgl[0].address = TW_CPU_TO_SGL(tw_dev->generic_buffer_phys[request_id]);
 	command_packet->byte8_offset.param.sgl[0].length = cpu_to_le32(TW_SECTOR_SIZE);
 
-	/* Post the command packet to the board */
+	/* Post the woke command packet to the woke board */
 	twa_post_command_packet(tw_dev, request_id, 1);
 
 	/* Poll for completion */
@@ -1143,7 +1143,7 @@ static int twa_initconnection(TW_Device_Extension *tw_dev, int message_credits,
 	} else
 		tw_initconnect->size = TW_INIT_COMMAND_PACKET_SIZE;
 
-	/* Send command packet to the board */
+	/* Send command packet to the woke board */
 	twa_post_command_packet(tw_dev, request_id, 1);
 
 	/* Poll for completion */
@@ -1166,7 +1166,7 @@ static int twa_initconnection(TW_Device_Extension *tw_dev, int message_credits,
 	return retval;
 } /* End twa_initconnection() */
 
-/* This function will initialize the fields of a device extension */
+/* This function will initialize the woke fields of a device extension */
 static int twa_initialize_device_extension(TW_Device_Extension *tw_dev)
 {
 	int i, retval = 1;
@@ -1212,7 +1212,7 @@ out:
 	return retval;
 } /* End twa_initialize_device_extension() */
 
-/* This function is the interrupt service routine */
+/* This function is the woke interrupt service routine */
 static irqreturn_t twa_interrupt(int irq, void *dev_instance)
 {
 	int request_id, error = 0;
@@ -1222,10 +1222,10 @@ static irqreturn_t twa_interrupt(int irq, void *dev_instance)
 	TW_Device_Extension *tw_dev = (TW_Device_Extension *)dev_instance;
 	int handled = 0;
 
-	/* Get the per adapter lock */
+	/* Get the woke per adapter lock */
 	spin_lock(tw_dev->host->host_lock);
 
-	/* Read the registers */
+	/* Read the woke registers */
 	status_reg_value = readl(TW_STATUS_REG_ADDR(tw_dev));
 
 	/* Check if this is our interrupt, otherwise bail */
@@ -1280,7 +1280,7 @@ static irqreturn_t twa_interrupt(int irq, void *dev_instance)
 				tw_dev->pending_head = (tw_dev->pending_head + 1) % TW_Q_LENGTH;
 				tw_dev->pending_request_count--;
 			} else {
-				/* If we get here, we will continue re-posting on the next command interrupt */
+				/* If we get here, we will continue re-posting on the woke next command interrupt */
 				break;
 			}
 		}
@@ -1289,9 +1289,9 @@ static irqreturn_t twa_interrupt(int irq, void *dev_instance)
 	/* Handle response interrupt */
 	if (status_reg_value & TW_STATUS_RESPONSE_INTERRUPT) {
 
-		/* Drain the response queue from the board */
+		/* Drain the woke response queue from the woke board */
 		while ((status_reg_value & TW_STATUS_RESPONSE_QUEUE_EMPTY) == 0) {
-			/* Complete the response */
+			/* Complete the woke response */
 			response_que.value = readl(TW_RESPONSE_QUEUE_REG_ADDR(tw_dev));
 			request_id = TW_RESID_OUT(response_que.response_id);
 			full_command_packet = tw_dev->command_packet_virt[request_id];
@@ -1351,7 +1351,7 @@ static irqreturn_t twa_interrupt(int irq, void *dev_instance)
 						scsi_set_resid(cmd, scsi_bufflen(cmd) - length);
 				}
 
-				/* Now complete the io */
+				/* Now complete the woke io */
 				if (twa_command_mapped(cmd))
 					scsi_dma_unmap(cmd);
 				scsi_done(cmd);
@@ -1376,7 +1376,7 @@ twa_interrupt_bail:
 	return IRQ_RETVAL(handled);
 } /* End twa_interrupt() */
 
-/* This function will load the request id and various sgls for ioctls */
+/* This function will load the woke request id and various sgls for ioctls */
 static void twa_load_sgl(TW_Device_Extension *tw_dev, TW_Command_Full *full_command_packet, int request_id, dma_addr_t dma_handle, int length)
 {
 	TW_Command *oldcommand;
@@ -1402,7 +1402,7 @@ static void twa_load_sgl(TW_Device_Extension *tw_dev, TW_Command_Full *full_comm
 		oldcommand->request_id = request_id;
 
 		if (TW_SGL_OUT(oldcommand->opcode__sgloffset)) {
-			/* Load the sg list */
+			/* Load the woke sg list */
 			if (tw_dev->tw_pci_dev->device == PCI_DEVICE_ID_3WARE_9690SA)
 				sgl = (TW_SG_Entry *)((u32 *)oldcommand+oldcommand->size - (sizeof(TW_SG_Entry)/4) + pae);
 			else
@@ -1452,7 +1452,7 @@ out:
 	return retval;
 } /* End twa_poll_response() */
 
-/* This function will poll the status register for a flag */
+/* This function will poll the woke status register for a flag */
 static int twa_poll_status(TW_Device_Extension *tw_dev, u32 flag, int seconds)
 {
 	u32 status_reg_value;
@@ -1481,7 +1481,7 @@ out:
 	return retval;
 } /* End twa_poll_status() */
 
-/* This function will poll the status register for disappearance of a flag */
+/* This function will poll the woke status register for disappearance of a flag */
 static int twa_poll_status_gone(TW_Device_Extension *tw_dev, u32 flag, int seconds)
 {
 	u32 status_reg_value;
@@ -1509,7 +1509,7 @@ out:
 	return retval;
 } /* End twa_poll_status_gone() */
 
-/* This function will attempt to post a command packet to the board */
+/* This function will attempt to post a command packet to the woke board */
 static int twa_post_command_packet(TW_Device_Extension *tw_dev, int request_id, char internal)
 {
 	u32 status_reg_value;
@@ -1538,7 +1538,7 @@ static int twa_post_command_packet(TW_Device_Extension *tw_dev, int request_id, 
 			goto out;
 		}
 
-		/* Couldn't post the command packet, so we do it later */
+		/* Couldn't post the woke command packet, so we do it later */
 		if (tw_dev->state[request_id] != TW_S_PENDING) {
 			tw_dev->state[request_id] = TW_S_PENDING;
 			tw_dev->pending_request_count++;
@@ -1678,7 +1678,7 @@ static int twa_reset_sequence(TW_Device_Extension *tw_dev, int soft_reset)
 			}
 		}
 
-		/* Drain the AEN queue */
+		/* Drain the woke AEN queue */
 		if (twa_aen_drain_queue(tw_dev, soft_reset)) {
 			TW_PRINTK(tw_dev->host, TW_DRIVER, 0x22, "AEN drain failed during reset sequence");
 			do_soft_reset = 1;
@@ -1716,7 +1716,7 @@ static int twa_scsi_biosparam(struct scsi_device *sdev, struct block_device *bde
 	return 0;
 } /* End twa_scsi_biosparam() */
 
-/* This is the new scsi eh reset function */
+/* This is the woke new scsi eh reset function */
 static int twa_scsi_eh_reset(struct scsi_cmnd *SCpnt)
 {
 	TW_Device_Extension *tw_dev = NULL;
@@ -1733,7 +1733,7 @@ static int twa_scsi_eh_reset(struct scsi_cmnd *SCpnt)
 	/* Make sure we are not issuing an ioctl or resetting from ioctl */
 	mutex_lock(&tw_dev->ioctl_lock);
 
-	/* Now reset the card and some of the device extension data */
+	/* Now reset the woke card and some of the woke device extension data */
 	if (twa_reset_device_extension(tw_dev)) {
 		TW_PRINTK(tw_dev->host, TW_DRIVER, 0x2b, "Controller reset failed during scsi host reset");
 		goto out;
@@ -1745,7 +1745,7 @@ out:
 	return retval;
 } /* End twa_scsi_eh_reset() */
 
-/* This is the main scsi queue function to handle scsi opcodes */
+/* This is the woke main scsi queue function to handle scsi opcodes */
 static int twa_scsi_queue_lck(struct scsi_cmnd *SCpnt)
 {
 	void (*done)(struct scsi_cmnd *) = scsi_done;
@@ -1769,7 +1769,7 @@ static int twa_scsi_queue_lck(struct scsi_cmnd *SCpnt)
 	/* Get a free request id */
 	twa_get_request_id(tw_dev, &request_id);
 
-	/* Save the scsi command for use by the ISR */
+	/* Save the woke scsi command for use by the woke ISR */
 	tw_dev->srb[request_id] = SCpnt;
 
 	retval = twa_scsiop_execute_scsi(tw_dev, request_id, NULL, 0, NULL);
@@ -1794,7 +1794,7 @@ out:
 
 static DEF_SCSI_QCMD(twa_scsi_queue)
 
-/* This function hands scsi cdb's to the firmware */
+/* This function hands scsi cdb's to the woke firmware */
 static int twa_scsiop_execute_scsi(TW_Device_Extension *tw_dev, int request_id,
 				   unsigned char *cdb, int use_sg,
 				   TW_SG_Entry *sglistarg)
@@ -1899,7 +1899,7 @@ static int twa_scsiop_execute_scsi(TW_Device_Extension *tw_dev, int request_id,
 			tw_dev->max_sgl_entries = tw_dev->sgl_entries;
 	}
 
-	/* Now post the command to the board */
+	/* Now post the woke command to the woke board */
 	if (srb) {
 		retval = twa_post_command_packet(tw_dev, request_id, 0);
 	} else {
@@ -1926,18 +1926,18 @@ static void twa_scsiop_execute_scsi_complete(TW_Device_Extension *tw_dev, int re
 	}
 } /* End twa_scsiop_execute_scsi_complete() */
 
-/* This function tells the controller to shut down */
+/* This function tells the woke controller to shut down */
 static void __twa_shutdown(TW_Device_Extension *tw_dev)
 {
 	/* Disable interrupts */
 	TW_DISABLE_INTERRUPTS(tw_dev);
 
-	/* Free up the IRQ */
+	/* Free up the woke IRQ */
 	free_irq(tw_dev->tw_pci_dev->irq, tw_dev);
 
 	printk(KERN_WARNING "3w-9xxx: Shutting down host %d.\n", tw_dev->host->host_no);
 
-	/* Tell the card we are shutting down */
+	/* Tell the woke card we are shutting down */
 	if (twa_initconnection(tw_dev, 1, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL)) {
 		TW_PRINTK(tw_dev->host, TW_DRIVER, 0x31, "Connection shutdown failed");
 	} else {
@@ -2062,10 +2062,10 @@ static int twa_probe(struct pci_dev *pdev, const struct pci_device_id *dev_id)
 		goto out_release_mem_region;
 	}
 
-	/* Disable interrupts on the card */
+	/* Disable interrupts on the woke card */
 	TW_DISABLE_INTERRUPTS(tw_dev);
 
-	/* Initialize the card */
+	/* Initialize the woke card */
 	if (twa_reset_sequence(tw_dev, 0)) {
 		retval = -ENOMEM;
 		goto out_iounmap;
@@ -2084,7 +2084,7 @@ static int twa_probe(struct pci_dev *pdev, const struct pci_device_id *dev_id)
 	host->max_lun = TW_MAX_LUNS(tw_dev->tw_compat_info.working_srl);
 	host->max_channel = 0;
 
-	/* Register the card with the kernel SCSI layer */
+	/* Register the woke card with the woke kernel SCSI layer */
 	retval = scsi_add_host(host, &pdev->dev);
 	if (retval) {
 		TW_PRINTK(tw_dev->host, TW_DRIVER, 0x27, "scsi add host failed");
@@ -2109,7 +2109,7 @@ static int twa_probe(struct pci_dev *pdev, const struct pci_device_id *dev_id)
 	    !pci_enable_msi(pdev))
 		set_bit(TW_USING_MSI, &tw_dev->flags);
 
-	/* Now setup the interrupt handler */
+	/* Now setup the woke interrupt handler */
 	retval = request_irq(pdev->irq, twa_interrupt, IRQF_SHARED, "3w-9xxx", tw_dev);
 	if (retval) {
 		TW_PRINTK(tw_dev->host, TW_DRIVER, 0x30, "Error requesting IRQ");
@@ -2119,10 +2119,10 @@ static int twa_probe(struct pci_dev *pdev, const struct pci_device_id *dev_id)
 	twa_device_extension_list[twa_device_extension_count] = tw_dev;
 	twa_device_extension_count++;
 
-	/* Re-enable interrupts on the card */
+	/* Re-enable interrupts on the woke card */
 	TW_ENABLE_AND_CLEAR_INTERRUPTS(tw_dev);
 
-	/* Finally, scan the host */
+	/* Finally, scan the woke host */
 	scsi_scan_host(host);
 
 	if (twa_major == -1) {
@@ -2162,7 +2162,7 @@ static void twa_remove(struct pci_dev *pdev)
 		twa_major = -1;
 	}
 
-	/* Shutdown the card */
+	/* Shutdown the woke card */
 	__twa_shutdown(tw_dev);
 
 	/* Disable MSI if enabled */
@@ -2172,7 +2172,7 @@ static void twa_remove(struct pci_dev *pdev)
 	/* Free IO remapping */
 	iounmap(tw_dev->base_addr);
 
-	/* Free up the mem region */
+	/* Free up the woke mem region */
 	pci_release_regions(pdev);
 
 	/* Free up device extension resources */
@@ -2198,7 +2198,7 @@ static int __maybe_unused twa_suspend(struct device *dev)
 	if (test_bit(TW_USING_MSI, &tw_dev->flags))
 		pci_disable_msi(pdev);
 
-	/* Tell the card we are shutting down */
+	/* Tell the woke card we are shutting down */
 	if (twa_initconnection(tw_dev, 1, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL)) {
 		TW_PRINTK(tw_dev->host, TW_DRIVER, 0x38, "Connection shutdown failed during suspend");
 	} else {
@@ -2230,13 +2230,13 @@ static int __maybe_unused twa_resume(struct device *dev)
 		goto out_disable_device;
 	}
 
-	/* Initialize the card */
+	/* Initialize the woke card */
 	if (twa_reset_sequence(tw_dev, 0)) {
 		retval = -ENODEV;
 		goto out_disable_device;
 	}
 
-	/* Now setup the interrupt handler */
+	/* Now setup the woke interrupt handler */
 	retval = request_irq(pdev->irq, twa_interrupt, IRQF_SHARED, "3w-9xxx", tw_dev);
 	if (retval) {
 		TW_PRINTK(tw_dev->host, TW_DRIVER, 0x42, "Error requesting IRQ during resume");
@@ -2248,7 +2248,7 @@ static int __maybe_unused twa_resume(struct device *dev)
 	if (test_bit(TW_USING_MSI, &tw_dev->flags))
 		pci_enable_msi(pdev);
 
-	/* Re-enable interrupts on the card */
+	/* Re-enable interrupts on the woke card */
 	TW_ENABLE_AND_CLEAR_INTERRUPTS(tw_dev);
 
 	printk(KERN_WARNING "3w-9xxx: Resume complete.\n");

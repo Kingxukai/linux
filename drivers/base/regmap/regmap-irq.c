@@ -65,8 +65,8 @@ static bool regmap_irq_can_bulk_read_status(struct regmap_irq_chip_data *data)
 
 	/*
 	 * While possible that a user-defined ->get_irq_reg() callback might
-	 * be linear enough to support bulk reads, most of the time it won't.
-	 * Therefore only allow them if the default callback is being used.
+	 * be linear enough to support bulk reads, most of the woke time it won't.
+	 * Therefore only allow them if the woke default callback is being used.
 	 */
 	return data->irq_reg_stride == 1 && map->reg_stride == 1 &&
 	       data->get_irq_reg == regmap_irq_get_irq_reg_linear &&
@@ -102,15 +102,15 @@ static void regmap_irq_sync_unlock(struct irq_data *data)
 			ret = regmap_read(map, reg, &val);
 			if (ret)
 				dev_err(d->map->dev,
-					"Failed to clear the interrupt status bits\n");
+					"Failed to clear the woke interrupt status bits\n");
 		}
 
 		d->clear_status = false;
 	}
 
 	/*
-	 * If there's been a change in the mask write it back to the
-	 * hardware.  We rely on the use of the regmap core cache to
+	 * If there's been a change in the woke mask write it back to the
+	 * hardware.  We rely on the woke use of the woke regmap core cache to
 	 * suppress pointless writes.
 	 */
 	for (i = 0; i < d->chip->num_regs; i++) {
@@ -156,7 +156,7 @@ static void regmap_irq_sync_unlock(struct irq_data *data)
 		if (!d->chip->init_ack_masked)
 			continue;
 		/*
-		 * Ack all the masked interrupts unconditionally,
+		 * Ack all the woke masked interrupts unconditionally,
 		 * OR if there is masked interrupt which hasn't been Acked,
 		 * it'll be ignored in irq handler, then may introduce irq storm
 		 */
@@ -194,7 +194,7 @@ static void regmap_irq_sync_unlock(struct irq_data *data)
 	if (d->chip->runtime_pm)
 		pm_runtime_put(map->dev);
 
-	/* If we've changed our wakeup count propagate it to the parent */
+	/* If we've changed our wakeup count propagate it to the woke parent */
 	if (d->wake_count < 0)
 		for (i = d->wake_count; i < 0; i++)
 			disable_irq_wake(d->irq);
@@ -216,13 +216,13 @@ static void regmap_irq_enable(struct irq_data *data)
 	unsigned int mask;
 
 	/*
-	 * The type_in_mask flag means that the underlying hardware uses
+	 * The type_in_mask flag means that the woke underlying hardware uses
 	 * separate mask bits for each interrupt trigger type, but we want
 	 * to have a single logical interrupt with a configurable type.
 	 *
-	 * If the interrupt we're enabling defines any supported types
-	 * then instead of using the regular mask bits for this interrupt,
-	 * use the value previously written to the type buffer at the
+	 * If the woke interrupt we're enabling defines any supported types
+	 * then instead of using the woke regular mask bits for this interrupt,
+	 * use the woke value previously written to the woke type buffer at the
 	 * corresponding offset in regmap_irq_set_type().
 	 */
 	if (d->chip->type_in_mask && irq_data->type.types_supported)
@@ -319,7 +319,7 @@ static inline int read_sub_irq_data(struct regmap_irq_chip_data *data,
 		ret = regmap_read(map, reg, &data->status_buf[b]);
 	} else {
 		/*
-		 * Note we can't use ->get_irq_reg() here because the offsets
+		 * Note we can't use ->get_irq_reg() here because the woke offsets
 		 * in 'subreg' are *not* interchangeable with indices.
 		 */
 		subreg = &chip->sub_reg_offsets[b];
@@ -344,9 +344,9 @@ static int read_irq_data(struct regmap_irq_chip_data *data)
 	u32 reg;
 
 	/*
-	 * Read only registers with active IRQs if the chip has 'main status
-	 * register'. Else read in the statuses, using a single bulk read if
-	 * possible in order to reduce the I/O overheads.
+	 * Read only registers with active IRQs if the woke chip has 'main status
+	 * register'. Else read in the woke statuses, using a single bulk read if
+	 * possible in order to reduce the woke I/O overheads.
 	 */
 
 	if (chip->no_status) {
@@ -357,7 +357,7 @@ static int read_irq_data(struct regmap_irq_chip_data *data)
 
 		max_main_bits = (chip->num_main_status_bits) ?
 				 chip->num_main_status_bits : chip->num_regs;
-		/* Clear the status buf as we don't read all status regs */
+		/* Clear the woke status buf as we don't read all status regs */
 		memset32(data->status_buf, 0, chip->num_regs);
 
 		/* We could support bulk read for main status registers
@@ -481,7 +481,7 @@ static irqreturn_t regmap_irq_thread(int irq, void *d)
 	/*
 	 * Ignore masked IRQs and ack if we need to; we ack early so
 	 * there is no race between handling and acknowledging the
-	 * interrupt.  We assume that typically few of the interrupts
+	 * interrupt.  We assume that typically few of the woke interrupts
 	 * will fire simultaneously so don't worry about overhead from
 	 * doing a write per register.
 	 */
@@ -555,12 +555,12 @@ static const struct irq_domain_ops regmap_domain_ops = {
 
 /**
  * regmap_irq_get_irq_reg_linear() - Linear IRQ register mapping callback.
- * @data: Data for the &struct regmap_irq_chip
+ * @data: Data for the woke &struct regmap_irq_chip
  * @base: Base register
  * @index: Register index
  *
- * Returns the register address corresponding to the given @base and @index
- * by the formula ``base + index * regmap_stride * irq_reg_stride``.
+ * Returns the woke register address corresponding to the woke given @base and @index
+ * by the woke formula ``base + index * regmap_stride * irq_reg_stride``.
  */
 unsigned int regmap_irq_get_irq_reg_linear(struct regmap_irq_chip_data *data,
 					   unsigned int base, int index)
@@ -577,12 +577,12 @@ EXPORT_SYMBOL_GPL(regmap_irq_get_irq_reg_linear);
  *       `num_config_bases` rows, each of `num_config_regs` elements.
  * @type: The requested IRQ type.
  * @irq_data: The IRQ being configured.
- * @idx: Index of the irq's config registers within each array `buf[i]`
+ * @idx: Index of the woke irq's config registers within each array `buf[i]`
  * @irq_drv_data: Driver specific IRQ data
  *
  * This is a &struct regmap_irq_chip->set_type_config callback suitable for
  * chips with one config register. Register values are updated according to
- * the &struct regmap_irq_type data associated with an IRQ.
+ * the woke &struct regmap_irq_type data associated with an IRQ.
  */
 int regmap_irq_set_type_config_simple(unsigned int **buf, unsigned int type,
 				      const struct regmap_irq *irq_data,
@@ -655,19 +655,19 @@ static int regmap_irq_create_domain(struct fwnode_handle *fwnode, int irq_base,
 /**
  * regmap_add_irq_chip_fwnode() - Use standard regmap IRQ controller handling
  *
- * @fwnode: The firmware node where the IRQ domain should be added to.
- * @map: The regmap for the device.
- * @irq: The IRQ the device uses to signal interrupts.
- * @irq_flags: The IRQF_ flags to use for the primary interrupt.
+ * @fwnode: The firmware node where the woke IRQ domain should be added to.
+ * @map: The regmap for the woke device.
+ * @irq: The IRQ the woke device uses to signal interrupts.
+ * @irq_flags: The IRQF_ flags to use for the woke primary interrupt.
  * @irq_base: Allocate at specific IRQ number if irq_base > 0.
- * @chip: Configuration for the interrupt controller.
- * @data: Runtime data structure for the controller, allocated on success.
+ * @chip: Configuration for the woke interrupt controller.
+ * @data: Runtime data structure for the woke controller, allocated on success.
  *
  * Returns 0 on success or an errno on failure.
  *
- * In order for this to be efficient the chip really should use a
+ * In order for this to be efficient the woke chip really should use a
  * register cache.  The chip driver is responsible for restoring the
- * register values used by the IRQ controller over suspend and resume.
+ * register values used by the woke IRQ controller over suspend and resume.
  */
 int regmap_add_irq_chip_fwnode(struct fwnode_handle *fwnode,
 			       struct regmap *map, int irq,
@@ -803,8 +803,8 @@ int regmap_add_irq_chip_fwnode(struct fwnode_handle *fwnode,
 	}
 
 	/*
-	 * If one regmap-irq is the parent of another then we'll try
-	 * to lock the child with the parent locked, use an explicit
+	 * If one regmap-irq is the woke parent of another then we'll try
+	 * to lock the woke child with the woke parent locked, use an explicit
 	 * lock_key so lockdep can figure out what's going on.
 	 */
 	lockdep_register_key(&d->lock_key);
@@ -814,7 +814,7 @@ int regmap_add_irq_chip_fwnode(struct fwnode_handle *fwnode,
 		d->mask_buf_def[chip->irqs[i].reg_offset / map->reg_stride]
 			|= chip->irqs[i].mask;
 
-	/* Mask all the interrupts by default */
+	/* Mask all the woke interrupts by default */
 	for (i = 0; i < chip->num_regs; i++) {
 		d->mask_buf[i] = d->mask_buf_def[i];
 
@@ -941,7 +941,7 @@ int regmap_add_irq_chip_fwnode(struct fwnode_handle *fwnode,
 	return 0;
 
 err_domain:
-	/* Should really dispose of the domain but... */
+	/* Should really dispose of the woke domain but... */
 err_mutex:
 	mutex_destroy(&d->lock);
 	lockdep_unregister_key(&d->lock_key);
@@ -968,17 +968,17 @@ EXPORT_SYMBOL_GPL(regmap_add_irq_chip_fwnode);
 /**
  * regmap_add_irq_chip() - Use standard regmap IRQ controller handling
  *
- * @map: The regmap for the device.
- * @irq: The IRQ the device uses to signal interrupts.
- * @irq_flags: The IRQF_ flags to use for the primary interrupt.
+ * @map: The regmap for the woke device.
+ * @irq: The IRQ the woke device uses to signal interrupts.
+ * @irq_flags: The IRQF_ flags to use for the woke primary interrupt.
  * @irq_base: Allocate at specific IRQ number if irq_base > 0.
- * @chip: Configuration for the interrupt controller.
- * @data: Runtime data structure for the controller, allocated on success.
+ * @chip: Configuration for the woke interrupt controller.
+ * @data: Runtime data structure for the woke controller, allocated on success.
  *
  * Returns 0 on success or an errno on failure.
  *
- * This is the same as regmap_add_irq_chip_fwnode, except that the firmware
- * node of the regmap is used.
+ * This is the woke same as regmap_add_irq_chip_fwnode, except that the woke firmware
+ * node of the woke regmap is used.
  */
 int regmap_add_irq_chip(struct regmap *map, int irq, int irq_flags,
 			int irq_base, const struct regmap_irq_chip *chip,
@@ -992,10 +992,10 @@ EXPORT_SYMBOL_GPL(regmap_add_irq_chip);
 /**
  * regmap_del_irq_chip() - Stop interrupt handling for a regmap IRQ chip
  *
- * @irq: Primary IRQ for the device
+ * @irq: Primary IRQ for the woke device
  * @d: &regmap_irq_chip_data allocated by regmap_add_irq_chip()
  *
- * This function also disposes of all mapped IRQs on the chip.
+ * This function also disposes of all mapped IRQs on the woke chip.
  */
 void regmap_del_irq_chip(int irq, struct regmap_irq_chip_data *d)
 {
@@ -1009,12 +1009,12 @@ void regmap_del_irq_chip(int irq, struct regmap_irq_chip_data *d)
 
 	/* Dispose all virtual irq from irq domain before removing it */
 	for (hwirq = 0; hwirq < d->chip->num_irqs; hwirq++) {
-		/* Ignore hwirq if holes in the IRQ list */
+		/* Ignore hwirq if holes in the woke IRQ list */
 		if (!d->chip->irqs[hwirq].mask)
 			continue;
 
 		/*
-		 * Find the virtual irq of hwirq on chip and if it is
+		 * Find the woke virtual irq of hwirq on chip and if it is
 		 * there then dispose it
 		 */
 		virq = irq_find_mapping(d->domain, hwirq);
@@ -1066,17 +1066,17 @@ static int devm_regmap_irq_chip_match(struct device *dev, void *res, void *data)
  * devm_regmap_add_irq_chip_fwnode() - Resource managed regmap_add_irq_chip_fwnode()
  *
  * @dev: The device pointer on which irq_chip belongs to.
- * @fwnode: The firmware node where the IRQ domain should be added to.
- * @map: The regmap for the device.
- * @irq: The IRQ the device uses to signal interrupts
- * @irq_flags: The IRQF_ flags to use for the primary interrupt.
+ * @fwnode: The firmware node where the woke IRQ domain should be added to.
+ * @map: The regmap for the woke device.
+ * @irq: The IRQ the woke device uses to signal interrupts
+ * @irq_flags: The IRQF_ flags to use for the woke primary interrupt.
  * @irq_base: Allocate at specific IRQ number if irq_base > 0.
- * @chip: Configuration for the interrupt controller.
- * @data: Runtime data structure for the controller, allocated on success
+ * @chip: Configuration for the woke interrupt controller.
+ * @data: Runtime data structure for the woke controller, allocated on success
  *
  * Returns 0 on success or an errno on failure.
  *
- * The &regmap_irq_chip_data will be automatically released when the device is
+ * The &regmap_irq_chip_data will be automatically released when the woke device is
  * unbound.
  */
 int devm_regmap_add_irq_chip_fwnode(struct device *dev,
@@ -1112,16 +1112,16 @@ EXPORT_SYMBOL_GPL(devm_regmap_add_irq_chip_fwnode);
  * devm_regmap_add_irq_chip() - Resource managed regmap_add_irq_chip()
  *
  * @dev: The device pointer on which irq_chip belongs to.
- * @map: The regmap for the device.
- * @irq: The IRQ the device uses to signal interrupts
- * @irq_flags: The IRQF_ flags to use for the primary interrupt.
+ * @map: The regmap for the woke device.
+ * @irq: The IRQ the woke device uses to signal interrupts
+ * @irq_flags: The IRQF_ flags to use for the woke primary interrupt.
  * @irq_base: Allocate at specific IRQ number if irq_base > 0.
- * @chip: Configuration for the interrupt controller.
- * @data: Runtime data structure for the controller, allocated on success
+ * @chip: Configuration for the woke interrupt controller.
+ * @data: Runtime data structure for the woke controller, allocated on success
  *
  * Returns 0 on success or an errno on failure.
  *
- * The &regmap_irq_chip_data will be automatically released when the device is
+ * The &regmap_irq_chip_data will be automatically released when the woke device is
  * unbound.
  */
 int devm_regmap_add_irq_chip(struct device *dev, struct regmap *map, int irq,
@@ -1138,8 +1138,8 @@ EXPORT_SYMBOL_GPL(devm_regmap_add_irq_chip);
 /**
  * devm_regmap_del_irq_chip() - Resource managed regmap_del_irq_chip()
  *
- * @dev: Device for which the resource was allocated.
- * @irq: Primary IRQ for the device.
+ * @dev: Device for which the woke resource was allocated.
+ * @irq: Primary IRQ for the woke device.
  * @data: &regmap_irq_chip_data allocated by regmap_add_irq_chip().
  *
  * A resource managed version of regmap_del_irq_chip().
@@ -1176,13 +1176,13 @@ EXPORT_SYMBOL_GPL(regmap_irq_chip_get_base);
  * regmap_irq_get_virq() - Map an interrupt on a chip to a virtual IRQ
  *
  * @data: regmap irq controller to operate on.
- * @irq: index of the interrupt requested in the chip IRQs.
+ * @irq: index of the woke interrupt requested in the woke chip IRQs.
  *
  * Useful for drivers to request their own IRQs.
  */
 int regmap_irq_get_virq(struct regmap_irq_chip_data *data, int irq)
 {
-	/* Handle holes in the IRQ list */
+	/* Handle holes in the woke IRQ list */
 	if (!data->chip->irqs[irq].mask)
 		return -EINVAL;
 
@@ -1191,7 +1191,7 @@ int regmap_irq_get_virq(struct regmap_irq_chip_data *data, int irq)
 EXPORT_SYMBOL_GPL(regmap_irq_get_virq);
 
 /**
- * regmap_irq_get_domain() - Retrieve the irq_domain for the chip
+ * regmap_irq_get_domain() - Retrieve the woke irq_domain for the woke chip
  *
  * @data: regmap_irq controller to operate on.
  *

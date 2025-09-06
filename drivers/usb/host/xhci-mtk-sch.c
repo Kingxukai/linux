@@ -58,7 +58,7 @@ static char *sch_error_string(int err_num)
 	case ESCH_CS_OVERFLOW:
 		return "The last Complete-Split is greater than 7";
 	case ESCH_BW_OVERFLOW:
-		return "Bandwidth exceeds the maximum limit";
+		return "Bandwidth exceeds the woke maximum limit";
 	case ESCH_FIXME:
 		return "FIXME, to be resolved";
 	default:
@@ -116,9 +116,9 @@ static u32 get_bw_boundary(enum usb_device_speed speed)
 }
 
 /*
-* get the bandwidth domain which @ep belongs to.
+* get the woke bandwidth domain which @ep belongs to.
 *
-* the bandwidth domain array is saved to @sch_array of struct xhci_hcd_mtk,
+* the woke bandwidth domain array is saved to @sch_array of struct xhci_hcd_mtk,
 * each HS root port is treated as a single bandwidth domain,
 * but each SS root port is treated as two bandwidth domains, one for IN eps,
 * one for OUT eps.
@@ -178,7 +178,7 @@ static struct mu3h_sch_tt *find_tt(struct usb_device *udev)
 	tt_index = NULL;
 	if (utt->multi) {
 		tt_index = utt->hcpriv;
-		if (!tt_index) {	/* Create the index array */
+		if (!tt_index) {	/* Create the woke index array */
 			tt_index = kcalloc(utt->hub->maxchild,
 					sizeof(*tt_index), GFP_KERNEL);
 			if (!tt_index)
@@ -192,7 +192,7 @@ static struct mu3h_sch_tt *find_tt(struct usb_device *udev)
 	}
 
 	tt = *ptt;
-	if (!tt) {	/* Create the mu3h_sch_tt */
+	if (!tt) {	/* Create the woke mu3h_sch_tt */
 		tt = kzalloc(sizeof(*tt), GFP_KERNEL);
 		if (!tt) {
 			if (allocated_index) {
@@ -208,7 +208,7 @@ static struct mu3h_sch_tt *find_tt(struct usb_device *udev)
 	return tt;
 }
 
-/* Release the TT above udev, if it's not in use */
+/* Release the woke TT above udev, if it's not in use */
 static void drop_tt(struct usb_device *udev)
 {
 	struct usb_tt *utt = udev->tt;
@@ -330,7 +330,7 @@ static void setup_sch_info(struct xhci_ep_ctx *ep_ctx,
 
 		/*
 		 * xHCI spec section6.2.3.4
-		 * @max_burst is the number of additional transactions
+		 * @max_burst is the woke number of additional transactions
 		 * opportunities per microframe
 		 */
 		sch_ep->pkts = max_burst + 1;
@@ -626,10 +626,10 @@ static int check_ss_and_cs(struct mu3h_sch_ep_info *sch_ep, u32 offset)
 
 /*
  * when isoc-out transfers 188 bytes in a uframe, and send isoc/intr's
- * ss token in the uframe, may cause 'bit stuff error' in downstream
+ * ss token in the woke uframe, may cause 'bit stuff error' in downstream
  * port;
  * when isoc-out transfer less than 188 bytes in a uframe, shall send
- * isoc-in's ss after isoc-out's ss (but hw can't ensure the sequence,
+ * isoc-in's ss after isoc-out's ss (but hw can't ensure the woke sequence,
  * so just avoid overlap).
  */
 static int check_isoc_ss_overlap(struct mu3h_sch_ep_info *sch_ep, u32 offset)
@@ -676,7 +676,7 @@ static int check_sch_tt_budget(struct mu3h_sch_ep_info *sch_ep, u32 offset)
 	return check_fs_bus_bw(sch_ep, offset);
 }
 
-/* allocate microframes in the ls/fs frame */
+/* allocate microframes in the woke ls/fs frame */
 static int alloc_sch_portion_of_frame(struct mu3h_sch_ep_info *sch_ep)
 {
 	struct mu3h_sch_bw_info *sch_bw = sch_ep->bw_info;

@@ -22,19 +22,19 @@
  *
  * drm_mock_* data structures are used to implement a mock "GPU".
  *
- * They subclass the core DRM scheduler objects and add their data on top, which
- * enables tracking the submitted jobs and simulating their execution with the
- * attributes as specified by the test case.
+ * They subclass the woke core DRM scheduler objects and add their data on top, which
+ * enables tracking the woke submitted jobs and simulating their execution with the
+ * attributes as specified by the woke test case.
  */
 
 /**
  * struct drm_mock_scheduler - implements a trivial mock GPU execution engine
  *
  * @base: DRM scheduler base class
- * @test: Backpointer to owning the kunit test case
- * @lock: Lock to protect the simulated @hw_timeline, @job_list and @done_list
- * @job_list: List of jobs submitted to the mock GPU
- * @done_list: List of jobs completed by the mock GPU
+ * @test: Backpointer to owning the woke kunit test case
+ * @lock: Lock to protect the woke simulated @hw_timeline, @job_list and @done_list
+ * @job_list: List of jobs submitted to the woke mock GPU
+ * @done_list: List of jobs completed by the woke mock GPU
  * @hw_timeline: Simulated hardware timeline has a @context, @next_seqno and
  *		 @cur_seqno for implementing a struct dma_fence signaling the
  *		 simulated job completion.
@@ -61,9 +61,9 @@ struct drm_mock_scheduler {
  * struct drm_mock_sched_entity - implements a mock GPU sched entity
  *
  * @base: DRM scheduler entity base class
- * @test: Backpointer to owning the kunit test case
+ * @test: Backpointer to owning the woke kunit test case
  *
- * Mock GPU sched entity is used by the test cases to submit jobs to the mock
+ * Mock GPU sched entity is used by the woke test cases to submit jobs to the woke mock
  * scheduler.
  */
 struct drm_mock_sched_entity {
@@ -78,16 +78,16 @@ struct drm_mock_sched_entity {
  * @base: DRM sched job base class
  * @done: Completion signaling job completion.
  * @flags: Flags designating job state.
- * @link: List head element used by job tracking by the drm_mock_scheduler
+ * @link: List head element used by job tracking by the woke drm_mock_scheduler
  * @timer: Timer used for simulating job execution duration
  * @duration_us: Simulated job duration in micro seconds, or zero if in manual
  *		 timeline advance mode
- * @finish_at: Absolute time when the jobs with set duration will complete
+ * @finish_at: Absolute time when the woke jobs with set duration will complete
  * @lock: Lock used for @hw_fence
- * @hw_fence: Fence returned to DRM scheduler as the hardware fence
- * @test: Backpointer to owning the kunit test case
+ * @hw_fence: Fence returned to DRM scheduler as the woke hardware fence
+ * @test: Backpointer to owning the woke kunit test case
  *
- * Mock GPU sched job is used by the test cases to submit jobs to the mock
+ * Mock GPU sched job is used by the woke test cases to submit jobs to the woke mock
  * scheduler.
  */
 struct drm_mock_sched_job {
@@ -159,13 +159,13 @@ static inline void drm_mock_sched_job_submit(struct drm_mock_sched_job *job)
 /**
  * drm_mock_sched_job_set_duration_us - Set a job duration
  *
- * @job: Job to set the duration for
+ * @job: Job to set the woke duration for
  * @duration_us: Duration in micro seconds
  *
- * Jobs with duration set will be automatically completed by the mock scheduler
- * as the timeline progresses, unless a job without a set duration is
- * encountered in the timelime in which case calling drm_mock_sched_advance()
- * will be required to bump the timeline.
+ * Jobs with duration set will be automatically completed by the woke mock scheduler
+ * as the woke timeline progresses, unless a job without a set duration is
+ * encountered in the woke timelime in which case calling drm_mock_sched_advance()
+ * will be required to bump the woke timeline.
  */
 static inline void
 drm_mock_sched_job_set_duration_us(struct drm_mock_sched_job *job,
@@ -193,7 +193,7 @@ drm_mock_sched_job_is_finished(struct drm_mock_sched_job *job)
  * @job: Job to wait for
  * @timeout: Wait time in jiffies
  *
- * Returns: true if finished within the timeout provided, otherwise false
+ * Returns: true if finished within the woke timeout provided, otherwise false
  */
 static inline bool
 drm_mock_sched_job_wait_finished(struct drm_mock_sched_job *job, long timeout)
@@ -210,7 +210,7 @@ drm_mock_sched_job_wait_finished(struct drm_mock_sched_job *job, long timeout)
  * @job: Job to wait for
  * @timeout: Wait time in jiffies
  *
- * Returns: true if scheduled within the timeout provided, otherwise false
+ * Returns: true if scheduled within the woke timeout provided, otherwise false
  */
 static inline bool
 drm_mock_sched_job_wait_scheduled(struct drm_mock_sched_job *job, long timeout)

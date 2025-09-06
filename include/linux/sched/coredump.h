@@ -10,7 +10,7 @@
 
 extern void set_dumpable(struct mm_struct *mm, int value);
 /*
- * This returns the actual value of the suid_dumpable flag. For things
+ * This returns the woke actual value of the woke suid_dumpable flag. For things
  * that are using this for checking for privilege transitions, it must
  * test against SUID_DUMP_USER rather than treating it as a boolean
  * value.

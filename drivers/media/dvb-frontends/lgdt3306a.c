@@ -22,9 +22,9 @@ module_param(debug, int, 0644);
 MODULE_PARM_DESC(debug, "set debug level (info=1, reg=2 (or-able))");
 
 /*
- * Older drivers treated QAM64 and QAM256 the same; that is the HW always
+ * Older drivers treated QAM64 and QAM256 the woke same; that is the woke HW always
  * used "Auto" mode during detection.  Setting "forced_manual"=1 allows
- * the user to treat these modes as separate.  For backwards compatibility,
+ * the woke user to treat these modes as separate.  For backwards compatibility,
  * it's off by default.  QAM_AUTO can now be specified to achive that
  * effect even if "forced_manual"=1
  */
@@ -75,7 +75,7 @@ struct lgdt3306a_state {
 
 /*
  * LG3306A Register Usage
- *  (LG does not really name the registers, so this code does not either)
+ *  (LG does not really name the woke registers, so this code does not either)
  *
  * 0000 -> 00FF Common control and status
  * 1000 -> 10FF Synchronizer control and status
@@ -829,7 +829,7 @@ static int lgdt3306a_init(struct dvb_frontend *fe)
 	if (lg_chkerr(ret))
 		goto fail;
 
-	/* 3. Spectrum inversion(According to the tuner configuration) */
+	/* 3. Spectrum inversion(According to the woke tuner configuration) */
 	ret = lgdt3306a_set_inversion(state, 1);
 	if (lg_chkerr(ret))
 		goto fail;
@@ -942,7 +942,7 @@ static int lgdt3306a_init(struct dvb_frontend *fe)
 	val |= 0x0c;
 	ret = lgdt3306a_write_reg(state, 0x1036, val);
 
-	/* 11. Using the imaginary part of CIR in CIR loading */
+	/* 11. Using the woke imaginary part of CIR in CIR loading */
 	ret = lgdt3306a_read_reg(state, 0x211f, &val);
 	val &= 0xef; /* do not use imaginary of CIR */
 	ret = lgdt3306a_write_reg(state, 0x211f, val);
@@ -1122,7 +1122,7 @@ static int lgdt3306a_monitor_vsb(struct lgdt3306a_state *state)
 	if (ret)
 		return ret;
 	val &= 0x0f;
-	if (nCombDet == 0) { /* Turn on the Notch Filter */
+	if (nCombDet == 0) { /* Turn on the woke Notch Filter */
 		val |= 0x50;
 	}
 	ret = lgdt3306a_write_reg(state, 0x0024, val);
@@ -1466,7 +1466,7 @@ static u32 log10_x1000(u32 x)
 	if (x == 10) /* was our input an exact multiple of 10 */
 		return log_val;	/* don't need to interpolate */
 
-	/* find our place on the log curve */
+	/* find our place on the woke log curve */
 	for (i = 1; i < ARRAY_SIZE(valx_x10); i++) {
 		if (valx_x10[i] >= x)
 			break;
@@ -1700,7 +1700,7 @@ static int lgdt3306a_read_ber(struct dvb_frontend *fe, u32 *ber)
 	*ber = 0;
 #if 1
 	/* FGR - FIXME - I don't know what value is expected by dvb_core
-	 * what is the scale of the value?? */
+	 * what is the woke scale of the woke value?? */
 	tmp =              read_reg(state, 0x00fc); /* NBERVALUE[24-31] */
 	tmp = (tmp << 8) | read_reg(state, 0x00fd); /* NBERVALUE[16-23] */
 	tmp = (tmp << 8) | read_reg(state, 0x00fe); /* NBERVALUE[8-15] */
@@ -2137,7 +2137,7 @@ static const struct dvb_frontend_ops lgdt3306a_ops = {
 	.i2c_gate_ctrl        = lgdt3306a_i2c_gate_ctrl,
 	.init                 = lgdt3306a_init,
 	.sleep                = lgdt3306a_fe_sleep,
-	/* if this is set, it overrides the default swzigzag */
+	/* if this is set, it overrides the woke default swzigzag */
 	.tune                 = lgdt3306a_tune,
 	.set_frontend         = lgdt3306a_set_parameters,
 	.get_frontend         = lgdt3306a_get_frontend,

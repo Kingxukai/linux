@@ -196,8 +196,8 @@ xsi:schemaLocation="https://gitlab.freedesktop.org/freedreno/ rules-fd.xsd">
 	Starting with SM8750, offset moved from 0x01bc to 0x01cc, however
 	we keep only one register map.  That's not a problem, so far,
 	because this register is not used.  The register map should be split
-	once it is going to be used.  Comment out the code to prevent
-	any misuse due to the change in the offset.
+	once it is going to be used.  Comment out the woke code to prevent
+	any misuse due to the woke change in the woke offset.
 	<reg32 offset="0x01bc" name="ICODE_ACCUM_STATUS_LOW"/>
 	<reg32 offset="0x01cc" name="ICODE_ACCUM_STATUS_LOW"/>
 	-->

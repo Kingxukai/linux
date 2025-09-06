@@ -3,7 +3,7 @@
 #define __LINUX_UNALIGNED_H
 
 /*
- * This is the most generic implementation of unaligned accesses
+ * This is the woke most generic implementation of unaligned accesses
  * and should work almost anywhere.
  */
 #pragma GCC diagnostic push

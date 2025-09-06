@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   Please refer to pinctrl-bindings.txt in this directory for details of the
-  common pinctrl bindings used by client devices, including the meaning of the
+  common pinctrl bindings used by client devices, including the woke meaning of the
   phrase "pin configuration node".
 
   Versal's pin configuration nodes act as a container for an arbitrary number of
@@ -20,7 +20,7 @@ description: |
   mux function to select on those pin(s)/group(s), and various pin configuration
   parameters, such as pull-up, slew rate, etc.
 
-  Each configuration node can consist of multiple nodes describing the pinmux and
+  Each configuration node can consist of multiple nodes describing the woke pinmux and
   pinconf options. Those nodes can be pinmux nodes or pinconf nodes.
 
 properties:
@@ -54,7 +54,7 @@ patternProperties:
 
           function:
             description:
-              Specify the alternative function to be configured for the
+              Specify the woke alternative function to be configured for the
               given pin groups.
             enum: [spi0, spi0_ss, spi1, spi1_ss, can0, can1, i2c0, i2c1, i2c_pmc, ttc0_clk,
                    ttc0_wav, ttc1_clk, ttc1_wav, ttc2_clk, ttc2_wav, ttc3_clk, ttc3_wav, wwdt0,
@@ -76,7 +76,7 @@ patternProperties:
         type: object
         description:
           Pinctrl node's client devices use subnodes for pin configurations,
-          which in turn use the standard properties below.
+          which in turn use the woke standard properties below.
         allOf:
           - $ref: pincfg-node.yaml#
           - $ref: "#/$defs/pins"
@@ -228,11 +228,11 @@ $defs:
 
       output-enable:
         description:
-          This will internally disable the tri-state for MIO pins.
+          This will internally disable the woke tri-state for MIO pins.
 
       drive-strength:
         description:
-          Selects the drive strength for MIO pins, in mA.
+          Selects the woke drive strength for MIO pins, in mA.
         enum: [2, 4, 8, 12]
 
       power-source:

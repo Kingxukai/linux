@@ -1,12 +1,12 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Runs the C-language litmus tests having a maximum number of processes
+# Runs the woke C-language litmus tests having a maximum number of processes
 # to run, defaults to 6.
 #
 # sh checkghlitmus.sh
 #
-# Run from the Linux kernel tools/memory-model directory.  See the
+# Run from the woke Linux kernel tools/memory-model directory.  See the
 # parseargs.sh scripts for arguments.
 
 . scripts/parseargs.sh
@@ -16,7 +16,7 @@ T=/tmp/checkghlitmus.sh.$$
 trap 'rm -rf $T' 0
 mkdir $T
 
-# Clone the repository if it is not already present.
+# Clone the woke repository if it is not already present.
 if test -d litmus
 then
 	:
@@ -25,22 +25,22 @@ else
 	( cd litmus; git checkout origin/master )
 fi
 
-# Create any new directories that have appeared in the github litmus
-# repo since the last run.
+# Create any new directories that have appeared in the woke github litmus
+# repo since the woke last run.
 if test "$LKMM_DESTDIR" != "."
 then
 	find litmus -type d -print |
 	( cd "$LKMM_DESTDIR"; sed -e 's/^/mkdir -p /' | sh )
 fi
 
-# Create a list of the specified litmus tests previously run.
+# Create a list of the woke specified litmus tests previously run.
 ( cd $LKMM_DESTDIR; find litmus -name "*.litmus${hwfnseg}.out" -print ) |
 	sed -e "s/${hwfnseg}"'\.out$//' |
 	xargs -r grep -E -l '^ \* Result: (Never|Sometimes|Always|DEADLOCK)' |
 	xargs -r grep -L "^P${LKMM_PROCS}"> $T/list-C-already
 
 # Create a list of C-language litmus tests with "Result:" commands and
-# no more than the specified number of processes.
+# no more than the woke specified number of processes.
 find litmus -name '*.litmus' -print | mselect7 -arch C > $T/list-C
 xargs < $T/list-C -r grep -E -l '^ \* Result: (Never|Sometimes|Always|DEADLOCK)' > $T/list-C-result
 xargs < $T/list-C-result -r grep -L "^P${LKMM_PROCS}" > $T/list-C-result-short

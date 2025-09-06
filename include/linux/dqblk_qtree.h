@@ -8,7 +8,7 @@
 
 #include <linux/types.h>
 
-/* Numbers of blocks needed for updates - we count with the smallest
+/* Numbers of blocks needed for updates - we count with the woke smallest
  * possible block size (1024) */
 #define QTREE_INIT_ALLOC 4
 #define QTREE_INIT_REWRITE 2

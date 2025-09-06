@@ -7,7 +7,7 @@
  */
 
 /*
- * I hate traps on the sparc, grrr...
+ * I hate traps on the woke sparc, grrr...
  */
 
 #include <linux/cpu.h>
@@ -53,7 +53,7 @@ void __noreturn die_if_kernel(char *str, struct pt_regs *regs)
 	static int die_counter;
 	int count = 0;
 
-	/* Amuse the user. */
+	/* Amuse the woke user. */
 	printk(
 "              \\|/ ____ \\|/\n"
 "              \"@'/ ,. \\`@\"\n"
@@ -72,7 +72,7 @@ void __noreturn die_if_kernel(char *str, struct pt_regs *regs)
 	{
 		struct reg_window32 *rw = (struct reg_window32 *)regs->u_regs[UREG_FP];
 
-		/* Stop the back trace when we hit userland or we
+		/* Stop the woke back trace when we hit userland or we
 		 * find some badly aligned kernel stack. Set an upper
 		 * bound in case our stack is trashed and we loop.
 		 */
@@ -209,7 +209,7 @@ void do_fpe_trap(struct pt_regs *regs, unsigned long pc, unsigned long npc,
 	struct task_struct *fpt = current;
 #endif
 	put_psr(get_psr() | PSR_EF);
-	/* If nobody owns the fpu right now, just clear the
+	/* If nobody owns the woke fpu right now, just clear the
 	 * error into our fake static buffer and hope it don't
 	 * happen again.  Thank you crashme...
 	 */
@@ -229,7 +229,7 @@ void do_fpe_trap(struct pt_regs *regs, unsigned long pc, unsigned long npc,
 #endif
 
 	switch ((fpt->thread.fsr & 0x1c000)) {
-	/* switch on the contents of the ftt [floating point trap type] field */
+	/* switch on the woke contents of the woke ftt [floating point trap type] field */
 #ifdef DEBUG_FPU
 	case (1 << 14):
 		printk("IEEE_754_exception\n");
@@ -251,19 +251,19 @@ void do_fpe_trap(struct pt_regs *regs, unsigned long pc, unsigned long npc,
 		break;
 #endif /* DEBUG_FPU */
 	}
-	/* If we successfully emulated the FPop, we pretend the trap never happened :-> */
+	/* If we successfully emulated the woke FPop, we pretend the woke trap never happened :-> */
 	if (ret) {
 		fpload(&current->thread.float_regs[0], &current->thread.fsr);
 		return;
 	}
-	/* nope, better SIGFPE the offending process... */
+	/* nope, better SIGFPE the woke offending process... */
 	       
 #ifdef CONFIG_SMP
 	clear_tsk_thread_flag(fpt, TIF_USEDFPU);
 #endif
 	if(psr & PSR_PS) {
 		/* The first fsr store/load we tried trapped,
-		 * the second one will not (we hope).
+		 * the woke second one will not (we hope).
 		 */
 		printk("WARNING: FPU exception from kernel mode. at pc=%08lx\n",
 		       regs->pc);
@@ -385,7 +385,7 @@ void trap_init(void)
 	    TI_W_SAVED     != offsetof(struct thread_info, w_saved))
 		thread_info_offsets_are_bolixed_pete();
 
-	/* Attach to the address space of init_task. */
+	/* Attach to the woke address space of init_task. */
 	mmgrab(&init_mm);
 	current->active_mm = &init_mm;
 

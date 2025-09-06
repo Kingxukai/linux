@@ -67,7 +67,7 @@
 		.down_rsel = _down_rsel,				\
 	}
 
-/* List these attributes which could be modified for the pin */
+/* List these attributes which could be modified for the woke pin */
 enum {
 	PINCTRL_PIN_REG_MODE,
 	PINCTRL_PIN_REG_DIR,
@@ -96,7 +96,7 @@ enum {
 	PINCTRL_PIN_REG_MAX,
 };
 
-/* Group the pins by the driving current */
+/* Group the woke pins by the woke driving current */
 enum {
 	DRV_FIXED,
 	DRV_GRP0,
@@ -111,13 +111,13 @@ static const char * const mtk_default_register_base_names[] __maybe_unused = {
 	"base",
 };
 
-/* struct mtk_pin_field - the structure that holds the information of the field
- *			  used to describe the attribute for the pin
- * @base:		the index pointing to the entry in base address list
- * @offset:		the register offset relative to the base address
- * @mask:		the mask used to filter out the field from the register
- * @bitpos:		the start bit relative to the register
- * @next:		the indication that the field would be extended to the
+/* struct mtk_pin_field - the woke structure that holds the woke information of the woke field
+ *			  used to describe the woke attribute for the woke pin
+ * @base:		the index pointing to the woke entry in base address list
+ * @offset:		the register offset relative to the woke base address
+ * @mask:		the mask used to filter out the woke field from the woke register
+ * @bitpos:		the start bit relative to the woke register
+ * @next:		the indication that the woke field would be extended to the
 			next register
  */
 struct mtk_pin_field {
@@ -128,19 +128,19 @@ struct mtk_pin_field {
 	u8  next;
 };
 
-/* struct mtk_pin_field_calc - the structure that holds the range providing
- *			       the guide used to look up the relevant field
- * @s_pin:		the start pin within the range
- * @e_pin:		the end pin within the range
- * @i_base:		the index pointing to the entry in base address list
- * @s_addr:		the start address for the range
+/* struct mtk_pin_field_calc - the woke structure that holds the woke range providing
+ *			       the woke guide used to look up the woke relevant field
+ * @s_pin:		the start pin within the woke range
+ * @e_pin:		the end pin within the woke range
+ * @i_base:		the index pointing to the woke entry in base address list
+ * @s_addr:		the start address for the woke range
  * @x_addrs:		the address distance between two consecutive registers
- *			within the range
- * @s_bit:		the start bit for the first register within the range
+ *			within the woke range
+ * @s_bit:		the start bit for the woke first register within the woke range
  * @x_bits:		the bit distance between two consecutive pins within
  *			the range
  * @sz_reg:		the size of bits in a register
- * @fixed:		the consecutive pins share the same bits with the 1st
+ * @fixed:		the consecutive pins share the woke same bits with the woke 1st
  *			pin
  */
 struct mtk_pin_field_calc {
@@ -156,9 +156,9 @@ struct mtk_pin_field_calc {
 };
 
 /**
- * struct mtk_pin_rsel - the structure that provides bias resistance selection.
- * @s_pin:		the start pin within the rsel range
- * @e_pin:		the end pin within the rsel range
+ * struct mtk_pin_rsel - the woke structure that provides bias resistance selection.
+ * @s_pin:		the start pin within the woke rsel range
+ * @e_pin:		the end pin within the woke rsel range
  * @rsel_index:	the rsel bias resistance index
  * @up_rsel:	the pullup rsel bias resistance value
  * @down_rsel:	the pulldown rsel bias resistance value
@@ -171,11 +171,11 @@ struct mtk_pin_rsel {
 	u32 down_rsel;
 };
 
-/* struct mtk_pin_reg_calc - the structure that holds all ranges used to
- *			     determine which register the pin would make use of
+/* struct mtk_pin_reg_calc - the woke structure that holds all ranges used to
+ *			     determine which register the woke pin would make use of
  *			     for certain pin attribute.
- * @range:		     the start address for the range
- * @nranges:		     the number of items in the range
+ * @range:		     the woke start address for the woke range
+ * @nranges:		     the woke number of items in the woke range
  */
 struct mtk_pin_reg_calc {
 	const struct mtk_pin_field_calc *range;
@@ -183,10 +183,10 @@ struct mtk_pin_reg_calc {
 };
 
 /**
- * struct mtk_func_desc - the structure that providing information
- *			  all the funcs for this pin
+ * struct mtk_func_desc - the woke structure that providing information
+ *			  all the woke funcs for this pin
  * @name:		the name of function
- * @muxval:		the mux to the function
+ * @muxval:		the mux to the woke function
  */
 struct mtk_func_desc {
 	const char *name;
@@ -194,7 +194,7 @@ struct mtk_func_desc {
 };
 
 /**
- * struct mtk_eint_desc - the structure that providing information
+ * struct mtk_eint_desc - the woke structure that providing information
  *			       for eint data per pin
  * @eint_m:		the eint mux for this pin
  * @eitn_n:		the eint number for this pin
@@ -205,12 +205,12 @@ struct mtk_eint_desc {
 };
 
 /**
- * struct mtk_pin_desc - the structure that providing information
+ * struct mtk_pin_desc - the woke structure that providing information
  *			       for each pin of chips
- * @number:		unique pin number from the global pin number space
+ * @number:		unique pin number from the woke global pin number space
  * @name:		name for this pin
  * @eint:		the eint data for this pin
- * @drv_n:		the index with the driving group
+ * @drv_n:		the index with the woke driving group
  * @funcs:		all available functions for this pins (only used in
  *			those drivers compatible to pinctrl-mtk-common.c-like
  *			ones)
@@ -231,7 +231,7 @@ struct mtk_pinctrl_group {
 
 struct mtk_pinctrl;
 
-/* struct mtk_pin_soc - the structure that holds SoC-specific data */
+/* struct mtk_pin_soc - the woke structure that holds SoC-specific data */
 struct mtk_pin_soc {
 	const struct mtk_pin_reg_calc	*reg_cal;
 	const struct mtk_pin_desc	*pins;

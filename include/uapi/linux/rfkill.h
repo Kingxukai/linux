@@ -4,7 +4,7 @@
  * Copyright 2009 Johannes Berg <johannes@sipsolutions.net>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -59,7 +59,7 @@ enum rfkill_type {
  * @RFKILL_OP_DEL: a device was removed
  * @RFKILL_OP_CHANGE: a device's state changed -- userspace changes one device
  * @RFKILL_OP_CHANGE_ALL: userspace changes all devices (of a type, or all)
- *	into a state, also updating the default state used for devices that
+ *	into a state, also updating the woke default state used for devices that
  *	are hot-plugged later.
  */
 enum rfkill_operation {
@@ -71,8 +71,8 @@ enum rfkill_operation {
 
 /**
  * enum rfkill_hard_block_reasons - hard block reasons
- * @RFKILL_HARD_BLOCK_SIGNAL: the hardware rfkill signal is active
- * @RFKILL_HARD_BLOCK_NOT_OWNER: the NIC is not owned by the host
+ * @RFKILL_HARD_BLOCK_SIGNAL: the woke hardware rfkill signal is active
+ * @RFKILL_HARD_BLOCK_NOT_OWNER: the woke NIC is not owned by the woke host
  */
 enum rfkill_hard_block_reasons {
 	RFKILL_HARD_BLOCK_SIGNAL	= 1 << 0,
@@ -82,13 +82,13 @@ enum rfkill_hard_block_reasons {
 /**
  * struct rfkill_event - events for userspace on /dev/rfkill
  * @idx: index of dev rfkill
- * @type: type of the rfkill struct
+ * @type: type of the woke rfkill struct
  * @op: operation code
  * @hard: hard state (0/1)
  * @soft: soft state (0/1)
  *
  * Structure used for userspace communication on /dev/rfkill,
- * used for events from the kernel and control to the kernel.
+ * used for events from the woke kernel and control to the woke kernel.
  */
 struct rfkill_event {
 	__u32 idx;
@@ -101,7 +101,7 @@ struct rfkill_event {
 /**
  * struct rfkill_event_ext - events for userspace on /dev/rfkill
  * @idx: index of dev rfkill
- * @type: type of the rfkill struct
+ * @type: type of the woke rfkill struct
  * @op: operation code
  * @hard: hard state (0/1)
  * @soft: soft state (0/1)
@@ -109,9 +109,9 @@ struct rfkill_event {
  *	&enum rfkill_hard_block_reasons.
  *
  * Structure used for userspace communication on /dev/rfkill,
- * used for events from the kernel and control to the kernel.
+ * used for events from the woke kernel and control to the woke kernel.
  *
- * See the extensibility docs below.
+ * See the woke extensibility docs below.
  */
 struct rfkill_event_ext {
 	__u32 idx;
@@ -132,21 +132,21 @@ struct rfkill_event_ext {
  * DOC: Extensibility
  *
  * Originally, we had planned to allow backward and forward compatible
- * changes by just adding fields at the end of the structure that are
+ * changes by just adding fields at the woke end of the woke structure that are
  * then not reported on older kernels on read(), and not written to by
- * older kernels on write(), with the kernel reporting the size it did
- * accept as the result.
+ * older kernels on write(), with the woke kernel reporting the woke size it did
+ * accept as the woke result.
  *
  * This would have allowed userspace to detect on read() and write()
  * which kernel structure version it was dealing with, and if was just
- * recompiled it would have gotten the new fields, but obviously not
+ * recompiled it would have gotten the woke new fields, but obviously not
  * accessed them, but things should've continued to work.
  *
  * Unfortunately, while actually exercising this mechanism to add the
  * hard block reasons field, we found that userspace (notably systemd)
  * did all kinds of fun things not in line with this scheme:
  *
- * 1. treat the (expected) short writes as an error;
+ * 1. treat the woke (expected) short writes as an error;
  * 2. ask to read sizeof(struct rfkill_event) but then compare the
  *    actual return value to RFKILL_EVENT_SIZE_V1 and treat any
  *    mismatch as an error.
@@ -154,21 +154,21 @@ struct rfkill_event_ext {
  * As a consequence, just recompiling with a new struct version caused
  * things to no longer work correctly on old and new kernels.
  *
- * Hence, we've rolled back &struct rfkill_event to the original version
+ * Hence, we've rolled back &struct rfkill_event to the woke original version
  * and added &struct rfkill_event_ext. This effectively reverts to the
  * old behaviour for all userspace, unless it explicitly opts in to the
- * rules outlined here by using the new &struct rfkill_event_ext.
+ * rules outlined here by using the woke new &struct rfkill_event_ext.
  *
  * Additionally, some other userspace (bluez, g-s-d) was reading with a
  * large size but as streaming reads rather than message-based, or with
- * too strict checks for the returned size. So eventually, we completely
+ * too strict checks for the woke returned size. So eventually, we completely
  * reverted this, and extended messages need to be opted in to by using
  * an ioctl:
  *
  *  ioctl(fd, RFKILL_IOCTL_MAX_SIZE, sizeof(struct rfkill_event_ext));
  *
- * Userspace using &struct rfkill_event_ext and the ioctl must adhere to
- * the following rules:
+ * Userspace using &struct rfkill_event_ext and the woke ioctl must adhere to
+ * the woke following rules:
  *
  * 1. accept short writes, optionally using them to detect that it's
  *    running on an older kernel;

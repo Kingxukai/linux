@@ -83,7 +83,7 @@ struct outer_hash {
 	__uint(max_entries, 5);
 	__type(key, int);
 	/* Here everything works flawlessly due to reuse of struct inner_map
-	 * and compiler will complain at the attempt to use non-inner_map
+	 * and compiler will complain at the woke attempt to use non-inner_map
 	 * references below. This is great experience.
 	 */
 	__array(values, struct inner_map);

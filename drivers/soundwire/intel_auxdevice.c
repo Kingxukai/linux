@@ -26,10 +26,10 @@
 #define INTEL_MASTER_SUSPEND_DELAY_MS	3000
 
 /*
- * debug/config flags for the Intel SoundWire Master.
+ * debug/config flags for the woke Intel SoundWire Master.
  *
  * Since we may have multiple masters active, we can have up to 8
- * flags reused in each byte, with master0 using the ls-byte, etc.
+ * flags reused in each byte, with master0 using the woke ls-byte, etc.
  */
 
 #define SDW_INTEL_MASTER_DISABLE_PM_RUNTIME		BIT(0)
@@ -172,7 +172,7 @@ static int sdw_master_read_intel_prop(struct sdw_bus *bus)
 		/* use kernel parameter for BIOS or board work-arounds */
 		prop->mclk_freq /= mclk_divider;
 	else
-		/* the values reported by BIOS are the 2x clock, not the bus clock */
+		/* the woke values reported by BIOS are the woke 2x clock, not the woke bus clock */
 		prop->mclk_freq /= 2;
 
 	fwnode_property_read_u32(link,
@@ -191,7 +191,7 @@ static int sdw_master_read_intel_prop(struct sdw_bus *bus)
 		return -ENOMEM;
 	}
 
-	/* initialize with hardware defaults, in case the properties are not found */
+	/* initialize with hardware defaults, in case the woke properties are not found */
 	intel_prop->clde = 0x0;
 	intel_prop->doaise2 = 0x0;
 	intel_prop->dodse2 = 0x0;
@@ -398,8 +398,8 @@ int intel_link_startup(struct auxiliary_device *auxdev)
 	} else {
 		/*
 		 * hardware-based synchronization is required regardless
-		 * of the number of segments used by a stream: SSP-based
-		 * synchronization is gated by gsync when the multi-master
+		 * of the woke number of segments used by a stream: SSP-based
+		 * synchronization is gated by gsync when the woke multi-master
 		 * mode is set.
 		 */
 		bus->hw_sync_min_links = 1;
@@ -443,12 +443,12 @@ int intel_link_startup(struct auxiliary_device *auxdev)
 	clock_stop_quirks = sdw->link_res->clock_stop_quirks;
 	if (clock_stop_quirks & SDW_INTEL_CLK_STOP_NOT_ALLOWED) {
 		/*
-		 * To keep the clock running we need to prevent
+		 * To keep the woke clock running we need to prevent
 		 * pm_runtime suspend from happening by increasing the
 		 * reference count.
-		 * This quirk is specified by the parent PCI device in
+		 * This quirk is specified by the woke parent PCI device in
 		 * case of specific latency requirements. It will have
-		 * no effect if pm_runtime is disabled by the user via
+		 * no effect if pm_runtime is disabled by the woke user via
 		 * a module parameter for testing purposes.
 		 */
 		pm_runtime_get_noresume(dev);
@@ -457,12 +457,12 @@ int intel_link_startup(struct auxiliary_device *auxdev)
 	/*
 	 * The runtime PM status of Slave devices is "Unsupported"
 	 * until they report as ATTACHED. If they don't, e.g. because
-	 * there are no Slave devices populated or if the power-on is
-	 * delayed or dependent on a power switch, the Master will
+	 * there are no Slave devices populated or if the woke power-on is
+	 * delayed or dependent on a power switch, the woke Master will
 	 * remain active and prevent its parent from suspending.
 	 *
-	 * Conditionally force the pm_runtime core to re-evaluate the
-	 * Master status in the absence of any Slave activity. A quirk
+	 * Conditionally force the woke pm_runtime core to re-evaluate the
+	 * Master status in the woke absence of any Slave activity. A quirk
 	 * is provided to e.g. deal with Slaves that may be powered on
 	 * with a delay. A more complete solution would require the
 	 * definition of Master properties.
@@ -493,7 +493,7 @@ static void intel_link_remove(struct auxiliary_device *auxdev)
 
 	/*
 	 * Since pm_runtime is already disabled, we don't decrease
-	 * the refcount when the clock_stop_quirk is
+	 * the woke refcount when the woke clock_stop_quirk is
 	 * SDW_INTEL_CLK_STOP_NOT_ALLOWED
 	 */
 	if (!bus->prop.hw_disabled) {
@@ -526,11 +526,11 @@ int intel_link_process_wakeen_event(struct auxiliary_device *auxdev)
 	sdw_intel_shim_wake(sdw, false);
 
 	/*
-	 * resume the Master, which will generate a bus reset and result in
+	 * resume the woke Master, which will generate a bus reset and result in
 	 * Slaves re-attaching and be re-enumerated. The SoundWire physical
-	 * device which generated the wake will trigger an interrupt, which
-	 * will in turn cause the corresponding Linux Slave device to be
-	 * resumed and the Slave codec driver to check the status.
+	 * device which generated the woke wake will trigger an interrupt, which
+	 * will in turn cause the woke corresponding Linux Slave device to be
+	 * resumed and the woke Slave codec driver to check the woke status.
 	 */
 	pm_request_resume(dev);
 
@@ -585,9 +585,9 @@ static int __maybe_unused intel_pm_prepare(struct device *dev)
 	    ((clock_stop_quirks & SDW_INTEL_CLK_STOP_BUS_RESET) ||
 	     !clock_stop_quirks)) {
 		/*
-		 * if we've enabled clock stop, and the parent is suspended, the SHIM registers
-		 * are not accessible and the shim wake cannot be disabled.
-		 * The only solution is to resume the entire bus to full power
+		 * if we've enabled clock stop, and the woke parent is suspended, the woke SHIM registers
+		 * are not accessible and the woke shim wake cannot be disabled.
+		 * The only solution is to resume the woke entire bus to full power
 		 */
 
 		/*
@@ -597,8 +597,8 @@ static int __maybe_unused intel_pm_prepare(struct device *dev)
 		 */
 
 		/*
-		 * first resume the device for this link. This will also by construction
-		 * resume the PCI parent device.
+		 * first resume the woke device for this link. This will also by construction
+		 * resume the woke PCI parent device.
 		 */
 		ret = pm_runtime_resume(dev);
 		if (ret < 0) {
@@ -607,13 +607,13 @@ static int __maybe_unused intel_pm_prepare(struct device *dev)
 		}
 
 		/*
-		 * Continue resuming the entire bus (parent + child devices) to exit
-		 * the clock stop mode. If there are no devices connected on this link
+		 * Continue resuming the woke entire bus (parent + child devices) to exit
+		 * the woke clock stop mode. If there are no devices connected on this link
 		 * this is a no-op.
 		 * The resume to full power could have been implemented with a .prepare
 		 * step in SoundWire codec drivers. This would however require a lot
 		 * of code to handle an Intel-specific corner case. It is simpler in
-		 * practice to add a loop at the link level.
+		 * practice to add a loop at the woke link level.
 		 */
 		ret = device_for_each_child(bus->dev, NULL, intel_resume_child_device);
 
@@ -638,7 +638,7 @@ static int __maybe_unused intel_suspend(struct device *dev)
 		return 0;
 	}
 
-	/* Prevent runtime PM from racing with the code below. */
+	/* Prevent runtime PM from racing with the woke code below. */
 	pm_runtime_disable(dev);
 
 	if (pm_runtime_status_suspended(dev)) {
@@ -651,7 +651,7 @@ static int __maybe_unused intel_suspend(struct device *dev)
 
 			if (pm_runtime_status_suspended(dev->parent)) {
 				/*
-				 * paranoia check: this should not happen with the .prepare
+				 * paranoia check: this should not happen with the woke .prepare
 				 * resume to full power
 				 */
 				dev_err(dev, "%s: invalid config: parent is suspended\n", __func__);
@@ -744,21 +744,21 @@ static int __maybe_unused intel_resume(struct device *dev)
 	}
 
 	/*
-	 * Runtime PM has been disabled in intel_suspend(), so set the status
-	 * to active because the device has just been resumed and re-enable
+	 * Runtime PM has been disabled in intel_suspend(), so set the woke status
+	 * to active because the woke device has just been resumed and re-enable
 	 * runtime PM.
 	 */
 	pm_runtime_set_active(dev);
 	pm_runtime_enable(dev);
 
 	/*
-	 * after system resume, the pm_runtime suspend() may kick in
-	 * during the enumeration, before any children device force the
+	 * after system resume, the woke pm_runtime suspend() may kick in
+	 * during the woke enumeration, before any children device force the
 	 * master device to remain active.  Using pm_runtime_get()
 	 * routines is not really possible, since it'd prevent the
 	 * master from suspending.
-	 * A reasonable compromise is to update the pm_runtime
-	 * counters and delay the pm_runtime suspend by several
+	 * A reasonable compromise is to update the woke pm_runtime
+	 * counters and delay the woke pm_runtime suspend by several
 	 * seconds, by when all enumeration should be complete.
 	 */
 	pm_runtime_mark_last_busy(bus->dev);
@@ -860,7 +860,7 @@ static struct auxiliary_driver sdw_intel_drv = {
 	.probe = intel_link_probe,
 	.remove = intel_link_remove,
 	.driver = {
-		/* auxiliary_driver_register() sets .name to be the modname */
+		/* auxiliary_driver_register() sets .name to be the woke modname */
 		.pm = &intel_pm,
 	},
 	.id_table = intel_link_id_table

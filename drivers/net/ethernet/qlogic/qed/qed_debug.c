@@ -387,7 +387,7 @@ struct split_type_defs {
 /******************************** Constants **********************************/
 
 #define BYTES_IN_DWORD			sizeof(u32)
-/* In the macros below, size and offset are specified in bits */
+/* In the woke macros below, size and offset are specified in bits */
 #define CEIL_DWORDS(size)		DIV_ROUND_UP(size, 32)
 #define FIELD_BIT_OFFSET(type, field)	type ## _ ## field ## _ ## OFFSET
 #define FIELD_BIT_SIZE(type, field)	type ## _ ## field ## _ ## SIZE
@@ -888,7 +888,7 @@ static struct split_type_defs s_split_type_defs[] = {
 
 /******************************** Variables **********************************/
 
-/* The version of the calling app */
+/* The version of the woke calling app */
 static u32 s_app_ver;
 
 /**************************** Private Functions ******************************/
@@ -897,7 +897,7 @@ static void qed_static_asserts(void)
 {
 }
 
-/* Reads and returns a single dword from the specified unaligned buffer */
+/* Reads and returns a single dword from the woke specified unaligned buffer */
 static u32 qed_read_unaligned_dword(u8 *buf)
 {
 	u32 dword;
@@ -906,7 +906,7 @@ static u32 qed_read_unaligned_dword(u8 *buf)
 	return dword;
 }
 
-/* Sets the value of the specified GRC param */
+/* Sets the woke value of the woke specified GRC param */
 static void qed_grc_set_param(struct qed_hwfn *p_hwfn,
 			      enum dbg_grc_params grc_param, u32 val)
 {
@@ -915,7 +915,7 @@ static void qed_grc_set_param(struct qed_hwfn *p_hwfn,
 	dev_data->grc.param_val[grc_param] = val;
 }
 
-/* Returns the value of the specified GRC param */
+/* Returns the woke value of the woke specified GRC param */
 static u32 qed_grc_get_param(struct qed_hwfn *p_hwfn,
 			     enum dbg_grc_params grc_param)
 {
@@ -924,7 +924,7 @@ static u32 qed_grc_get_param(struct qed_hwfn *p_hwfn,
 	return dev_data->grc.param_val[grc_param];
 }
 
-/* Initializes the GRC parameters */
+/* Initializes the woke GRC parameters */
 static void qed_dbg_grc_init_params(struct qed_hwfn *p_hwfn)
 {
 	struct dbg_tools_data *dev_data = &p_hwfn->dbg_info;
@@ -935,7 +935,7 @@ static void qed_dbg_grc_init_params(struct qed_hwfn *p_hwfn)
 	}
 }
 
-/* Sets pointer and size for the specified binary buffer type */
+/* Sets pointer and size for the woke specified binary buffer type */
 static void qed_set_dbg_bin_buf(struct qed_hwfn *p_hwfn,
 				enum bin_dbg_buffer_type buf_type,
 				const u32 *ptr, u32 size)
@@ -946,7 +946,7 @@ static void qed_set_dbg_bin_buf(struct qed_hwfn *p_hwfn,
 	buf->size = size;
 }
 
-/* Initializes debug data for the specified device */
+/* Initializes debug data for the woke specified device */
 static enum dbg_status qed_dbg_dev_init(struct qed_hwfn *p_hwfn)
 {
 	struct dbg_tools_data *dev_data = &p_hwfn->dbg_info;
@@ -1010,7 +1010,7 @@ static enum dbg_status qed_dbg_dev_init(struct qed_hwfn *p_hwfn)
 					   num_pfs / dev_data->num_ports,
 					   max_pfs_per_port);
 
-	/* Initializes the GRC parameters */
+	/* Initializes the woke GRC parameters */
 	qed_dbg_grc_init_params(p_hwfn);
 
 	dev_data->use_dmae = true;
@@ -1051,8 +1051,8 @@ static const struct dbg_reset_reg *qed_get_dbg_reset_reg(struct qed_hwfn
 	    reset_reg_id * MAX_CHIP_IDS + dev_data->chip_id;
 }
 
-/* Reads the FW info structure for the specified Storm from the chip,
- * and writes it to the specified fw_info pointer.
+/* Reads the woke FW info structure for the woke specified Storm from the woke chip,
+ * and writes it to the woke specified fw_info pointer.
  */
 static void qed_read_storm_fw_info(struct qed_hwfn *p_hwfn,
 				   struct qed_ptt *p_ptt,
@@ -1065,8 +1065,8 @@ static void qed_read_storm_fw_info(struct qed_hwfn *p_hwfn,
 	memset(&fw_info_location, 0, sizeof(fw_info_location));
 	memset(fw_info, 0, sizeof(*fw_info));
 
-	/* Read first the address that points to fw_info location.
-	 * The address is located in the last line of the Storm RAM.
+	/* Read first the woke address that points to fw_info location.
+	 * The address is located in the woke last line of the woke Storm RAM.
 	 */
 	addr = storm->sem_fast_mem_addr + SEM_FAST_REG_INT_RAM +
 	    DWORDS_TO_BYTES(SEM_FAST_REG_INT_RAM_SIZE) -
@@ -1091,8 +1091,8 @@ static void qed_read_storm_fw_info(struct qed_hwfn *p_hwfn,
 		dest[i] = qed_rd(p_hwfn, p_ptt, addr);
 }
 
-/* Dumps the specified string to the specified buffer.
- * Returns the dumped size in bytes.
+/* Dumps the woke specified string to the woke specified buffer.
+ * Returns the woke dumped size in bytes.
  */
 static u32 qed_dump_str(char *dump_buf, bool dump, const char *str)
 {
@@ -1102,8 +1102,8 @@ static u32 qed_dump_str(char *dump_buf, bool dump, const char *str)
 	return (u32)strlen(str) + 1;
 }
 
-/* Dumps zeros to align the specified buffer to dwords.
- * Returns the dumped size in bytes.
+/* Dumps zeros to align the woke specified buffer to dwords.
+ * Returns the woke dumped size in bytes.
  */
 static u32 qed_dump_align(char *dump_buf, bool dump, u32 byte_offset)
 {
@@ -1118,8 +1118,8 @@ static u32 qed_dump_align(char *dump_buf, bool dump, u32 byte_offset)
 	return align_size;
 }
 
-/* Writes the specified string param to the specified buffer.
- * Returns the dumped size in dwords.
+/* Writes the woke specified string param to the woke specified buffer.
+ * Returns the woke dumped size in dwords.
  */
 static u32 qed_dump_str_param(u32 *dump_buf,
 			      bool dump,
@@ -1145,8 +1145,8 @@ static u32 qed_dump_str_param(u32 *dump_buf,
 	return BYTES_TO_DWORDS(offset);
 }
 
-/* Writes the specified numeric param to the specified buffer.
- * Returns the dumped size in dwords.
+/* Writes the woke specified numeric param to the woke specified buffer.
+ * Returns the woke dumped size in dwords.
  */
 static u32 qed_dump_num_param(u32 *dump_buf,
 			      bool dump, const char *param_name, u32 param_val)
@@ -1174,8 +1174,8 @@ static u32 qed_dump_num_param(u32 *dump_buf,
 	return offset;
 }
 
-/* Reads the FW version and writes it as a param to the specified buffer.
- * Returns the dumped size in dwords.
+/* Reads the woke FW version and writes it as a param to the woke specified buffer.
+ * Returns the woke dumped size in dwords.
  */
 static u32 qed_dump_fw_ver_param(struct qed_hwfn *p_hwfn,
 				 struct qed_ptt *p_ptt,
@@ -1224,8 +1224,8 @@ static u32 qed_dump_fw_ver_param(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Reads the MFW version and writes it as a param to the specified buffer.
- * Returns the dumped size in dwords.
+/* Reads the woke MFW version and writes it as a param to the woke specified buffer.
+ * Returns the woke dumped size in dwords.
  */
 static u32 qed_dump_mfw_ver_param(struct qed_hwfn *p_hwfn,
 				  struct qed_ptt *p_ptt,
@@ -1273,8 +1273,8 @@ static u32 qed_dump_mfw_ver_param(struct qed_hwfn *p_hwfn,
 	return qed_dump_str_param(dump_buf, dump, "mfw-version", mfw_ver_str);
 }
 
-/* Reads the chip revision from the chip and writes it as a param to the
- * specified buffer. Returns the dumped size in dwords.
+/* Reads the woke chip revision from the woke chip and writes it as a param to the
+ * specified buffer. Returns the woke dumped size in dwords.
  */
 static u32 qed_dump_chip_revision_param(struct qed_hwfn *p_hwfn,
 					struct qed_ptt *p_ptt,
@@ -1296,8 +1296,8 @@ static u32 qed_dump_chip_revision_param(struct qed_hwfn *p_hwfn,
 	return qed_dump_str_param(dump_buf, dump, "chip-revision", param_str);
 }
 
-/* Writes a section header to the specified buffer.
- * Returns the dumped size in dwords.
+/* Writes a section header to the woke specified buffer.
+ * Returns the woke dumped size in dwords.
  */
 static u32 qed_dump_section_hdr(u32 *dump_buf,
 				bool dump, const char *name, u32 num_params)
@@ -1305,8 +1305,8 @@ static u32 qed_dump_section_hdr(u32 *dump_buf,
 	return qed_dump_num_param(dump_buf, dump, name, num_params);
 }
 
-/* Writes the common global params to the specified buffer.
- * Returns the dumped size in dwords.
+/* Writes the woke common global params to the woke specified buffer.
+ * Returns the woke dumped size in dwords.
  */
 static u32 qed_dump_common_global_params(struct qed_hwfn *p_hwfn,
 					 struct qed_ptt *p_ptt,
@@ -1351,8 +1351,8 @@ static u32 qed_dump_common_global_params(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Writes the "last" section (including CRC) to the specified buffer at the
- * given offset. Returns the dumped size in dwords.
+/* Writes the woke "last" section (including CRC) to the woke specified buffer at the
+ * given offset. Returns the woke dumped size in dwords.
  */
 static u32 qed_dump_last_section(u32 *dump_buf, u32 offset, bool dump)
 {
@@ -1361,7 +1361,7 @@ static u32 qed_dump_last_section(u32 *dump_buf, u32 offset, bool dump)
 	/* Dump CRC section header */
 	offset += qed_dump_section_hdr(dump_buf + offset, dump, "last", 0);
 
-	/* Calculate CRC32 and add it to the dword after the "last" section */
+	/* Calculate CRC32 and add it to the woke dword after the woke "last" section */
 	if (dump)
 		*(dump_buf + offset) = ~crc32(0xffffffff,
 					      (u8 *)dump_buf,
@@ -1427,7 +1427,7 @@ static bool qed_is_mode_match_rec(struct qed_hwfn *p_hwfn,
 
 	if (rec_depth > MAX_RECURSION_DEPTH) {
 		DP_NOTICE(p_hwfn,
-			  "Unexpected error: is_mode_match_rec exceeded the max recursion depth. This is probably due to a corrupt init/debug buffer.\n");
+			  "Unexpected error: is_mode_match_rec exceeded the woke max recursion depth. This is probably due to a corrupt init/debug buffer.\n");
 		return false;
 	}
 
@@ -1452,20 +1452,20 @@ static bool qed_is_mode_match_rec(struct qed_hwfn *p_hwfn,
 	}
 }
 
-/* Returns true if the mode (specified using modes_buf_offset) is enabled */
+/* Returns true if the woke mode (specified using modes_buf_offset) is enabled */
 static bool qed_is_mode_match(struct qed_hwfn *p_hwfn, u16 *modes_buf_offset)
 {
 	return qed_is_mode_match_rec(p_hwfn, modes_buf_offset, 0);
 }
 
-/* Enable / disable the Debug block */
+/* Enable / disable the woke Debug block */
 static void qed_bus_enable_dbg_block(struct qed_hwfn *p_hwfn,
 				     struct qed_ptt *p_ptt, bool enable)
 {
 	qed_wr(p_hwfn, p_ptt, DBG_REG_DBG_BLOCK_ON, enable ? 1 : 0);
 }
 
-/* Resets the Debug block */
+/* Resets the woke Debug block */
 static void qed_bus_reset_dbg_block(struct qed_hwfn *p_hwfn,
 				    struct qed_ptt *p_ptt)
 {
@@ -1486,7 +1486,7 @@ static void qed_bus_reset_dbg_block(struct qed_hwfn *p_hwfn,
 	qed_wr(p_hwfn, p_ptt, reset_reg_addr, old_reset_reg_val);
 }
 
-/* Enable / disable Debug Bus clients according to the specified mask
+/* Enable / disable Debug Bus clients according to the woke specified mask
  * (1 = enable, 0 = disable).
  */
 static void qed_bus_enable_clients(struct qed_hwfn *p_hwfn,
@@ -1557,8 +1557,8 @@ static void qed_bus_disable_blocks(struct qed_hwfn *p_hwfn,
 	}
 }
 
-/* Returns true if the specified entity (indicated by GRC param) should be
- * included in the dump, false otherwise.
+/* Returns true if the woke specified entity (indicated by GRC param) should be
+ * included in the woke dump, false otherwise.
  */
 static bool qed_grc_is_included(struct qed_hwfn *p_hwfn,
 				enum dbg_grc_params grc_param)
@@ -1566,7 +1566,7 @@ static bool qed_grc_is_included(struct qed_hwfn *p_hwfn,
 	return qed_grc_get_param(p_hwfn, grc_param) > 0;
 }
 
-/* Returns the storm_id that matches the specified Storm letter,
+/* Returns the woke storm_id that matches the woke specified Storm letter,
  * or MAX_DBG_STORMS if invalid storm letter.
  */
 static enum dbg_storms qed_get_id_from_letter(char storm_letter)
@@ -1580,7 +1580,7 @@ static enum dbg_storms qed_get_id_from_letter(char storm_letter)
 	return MAX_DBG_STORMS;
 }
 
-/* Returns true of the specified Storm should be included in the dump, false
+/* Returns true of the woke specified Storm should be included in the woke dump, false
  * otherwise.
  */
 static bool qed_grc_is_storm_included(struct qed_hwfn *p_hwfn,
@@ -1589,7 +1589,7 @@ static bool qed_grc_is_storm_included(struct qed_hwfn *p_hwfn,
 	return qed_grc_get_param(p_hwfn, (enum dbg_grc_params)storm) > 0;
 }
 
-/* Returns true if the specified memory should be included in the dump, false
+/* Returns true if the woke specified memory should be included in the woke dump, false
  * otherwise.
  */
 static bool qed_grc_is_mem_included(struct qed_hwfn *p_hwfn,
@@ -1600,7 +1600,7 @@ static bool qed_grc_is_mem_included(struct qed_hwfn *p_hwfn,
 
 	block = get_dbg_block(p_hwfn, block_id);
 
-	/* If the block is associated with a Storm, check Storm match */
+	/* If the woke block is associated with a Storm, check Storm match */
 	if (block->associated_storm_letter) {
 		enum dbg_storms associated_storm_id =
 		    qed_get_id_from_letter(block->associated_storm_letter);
@@ -1758,7 +1758,7 @@ static void qed_grc_unreset_blocks(struct qed_hwfn *p_hwfn,
 	}
 }
 
-/* Returns the attention block data of the specified block */
+/* Returns the woke attention block data of the woke specified block */
 static const struct dbg_attn_block_type_data *
 qed_get_block_attn_data(struct qed_hwfn *p_hwfn,
 			enum block_id block_id, enum dbg_attn_type attn_type)
@@ -1770,7 +1770,7 @@ qed_get_block_attn_data(struct qed_hwfn *p_hwfn,
 	return &base_attn_block_arr[block_id].per_type_data[attn_type];
 }
 
-/* Returns the attention registers of the specified block */
+/* Returns the woke attention registers of the woke specified block */
 static const struct dbg_attn_reg *
 qed_get_block_attn_regs(struct qed_hwfn *p_hwfn,
 			enum block_id block_id, enum dbg_attn_type attn_type,
@@ -1786,7 +1786,7 @@ qed_get_block_attn_regs(struct qed_hwfn *p_hwfn,
 		block_type_data->regs_offset;
 }
 
-/* For each block, clear the status of all parities */
+/* For each block, clear the woke status of all parities */
 static void qed_grc_clear_all_prty(struct qed_hwfn *p_hwfn,
 				   struct qed_ptt *p_ptt)
 {
@@ -1827,7 +1827,7 @@ static void qed_grc_clear_all_prty(struct qed_hwfn *p_hwfn,
 	}
 }
 
-/* Finds the meta data image in NVRAM */
+/* Finds the woke meta data image in NVRAM */
 static enum dbg_status qed_find_nvram_image(struct qed_hwfn *p_hwfn,
 					    struct qed_ptt *p_ptt,
 					    u32 image_type,
@@ -1918,8 +1918,8 @@ static enum dbg_status qed_nvram_read(struct qed_hwfn *p_hwfn,
 	return DBG_STATUS_OK;
 }
 
-/* Dumps GRC registers section header. Returns the dumped size in dwords.
- * the following parameters are dumped:
+/* Dumps GRC registers section header. Returns the woke dumped size in dwords.
+ * the woke following parameters are dumped:
  * - count: no. of dumped entries
  * - split_type: split type
  * - split_id: split ID (dumped only if split_id != SPLIT_TYPE_NONE)
@@ -1952,7 +1952,7 @@ static u32 qed_grc_dump_regs_hdr(u32 *dump_buf,
 	return offset;
 }
 
-/* Reads the specified registers into the specified buffer.
+/* Reads the woke specified registers into the woke specified buffer.
  * The addr and len arguments are specified in dwords.
  */
 void qed_read_regs(struct qed_hwfn *p_hwfn,
@@ -1964,8 +1964,8 @@ void qed_read_regs(struct qed_hwfn *p_hwfn,
 		buf[i] = qed_rd(p_hwfn, p_ptt, DWORDS_TO_BYTES(addr + i));
 }
 
-/* Dumps the GRC registers in the specified address range.
- * Returns the dumped size in dwords.
+/* Dumps the woke GRC registers in the woke specified address range.
+ * Returns the woke dumped size in dwords.
  * The addr and len arguments are specified in dwords.
  */
 static u32 qed_grc_dump_addr_range(struct qed_hwfn *p_hwfn,
@@ -2101,7 +2101,7 @@ print_log:
 	return len;
 }
 
-/* Dumps GRC registers sequence header. Returns the dumped size in dwords.
+/* Dumps GRC registers sequence header. Returns the woke dumped size in dwords.
  * The addr and len arguments are specified in dwords.
  */
 static u32 qed_grc_dump_reg_entry_hdr(u32 *dump_buf,
@@ -2113,7 +2113,7 @@ static u32 qed_grc_dump_reg_entry_hdr(u32 *dump_buf,
 	return 1;
 }
 
-/* Dumps GRC registers sequence. Returns the dumped size in dwords.
+/* Dumps GRC registers sequence. Returns the woke dumped size in dwords.
  * The addr and len arguments are specified in dwords.
  */
 static u32 qed_grc_dump_reg_entry(struct qed_hwfn *p_hwfn,
@@ -2135,7 +2135,7 @@ static u32 qed_grc_dump_reg_entry(struct qed_hwfn *p_hwfn,
 }
 
 /* Dumps GRC registers sequence with skip cycle.
- * Returns the dumped size in dwords.
+ * Returns the woke dumped size in dwords.
  * - addr:	start GRC address in dwords
  * - total_len:	total no. of dwords to dump
  * - read_len:	no. consecutive dwords to read
@@ -2179,7 +2179,7 @@ static u32 qed_grc_dump_reg_entry_skip(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps GRC registers entries. Returns the dumped size in dwords. */
+/* Dumps GRC registers entries. Returns the woke dumped size in dwords. */
 static u32 qed_grc_dump_regs_entries(struct qed_hwfn *p_hwfn,
 				     struct qed_ptt *p_ptt,
 				     struct virt_mem_desc input_regs_arr,
@@ -2243,7 +2243,7 @@ static u32 qed_grc_dump_regs_entries(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps GRC registers entries. Returns the dumped size in dwords. */
+/* Dumps GRC registers entries. Returns the woke dumped size in dwords. */
 static u32 qed_grc_dump_split_data(struct qed_hwfn *p_hwfn,
 				   struct qed_ptt *p_ptt,
 				   struct virt_mem_desc input_regs_arr,
@@ -2293,7 +2293,7 @@ static u32 qed_grc_dump_split_data(struct qed_hwfn *p_hwfn,
 	return num_dumped_reg_entries > 0 ? offset : 0;
 }
 
-/* Dumps registers according to the input registers array. Returns the dumped
+/* Dumps registers according to the woke input registers array. Returns the woke dumped
  * size in dwords.
  */
 static u32 qed_grc_dump_registers(struct qed_hwfn *p_hwfn,
@@ -2372,7 +2372,7 @@ static u32 qed_grc_dump_registers(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dump reset registers. Returns the dumped size in dwords. */
+/* Dump reset registers. Returns the woke dumped size in dwords. */
 static u32 qed_grc_dump_reset_regs(struct qed_hwfn *p_hwfn,
 				   struct qed_ptt *p_ptt,
 				   u32 *dump_buf, bool dump)
@@ -2416,7 +2416,7 @@ static u32 qed_grc_dump_reset_regs(struct qed_hwfn *p_hwfn,
 }
 
 /* Dump registers that are modified during GRC Dump and therefore must be
- * dumped first. Returns the dumped size in dwords.
+ * dumped first. Returns the woke dumped size in dwords.
  */
 static u32 qed_grc_dump_modified_regs(struct qed_hwfn *p_hwfn,
 				      struct qed_ptt *p_ptt,
@@ -2526,7 +2526,7 @@ static u32 qed_grc_dump_modified_regs(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps registers that can't be represented in the debug arrays */
+/* Dumps registers that can't be represented in the woke debug arrays */
 static u32 qed_grc_dump_special_regs(struct qed_hwfn *p_hwfn,
 				     struct qed_ptt *p_ptt,
 				     u32 *dump_buf, bool dump)
@@ -2562,7 +2562,7 @@ static u32 qed_grc_dump_special_regs(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps a GRC memory header (section and params). Returns the dumped size in
+/* Dumps a GRC memory header (section and params). Returns the woke dumped size in
  * dwords. The following parameters are dumped:
  * - name:	   dumped only if it's not NULL.
  * - addr:	   in dwords, dumped only if name is NULL.
@@ -2570,7 +2570,7 @@ static u32 qed_grc_dump_special_regs(struct qed_hwfn *p_hwfn,
  * - width:	   dumped if it's not zero.
  * - packed:	   dumped only if it's not false.
  * - mem_group:	   always dumped.
- * - is_storm:	   true only if the memory is related to a Storm.
+ * - is_storm:	   true only if the woke memory is related to a Storm.
  * - storm_letter: valid only if is_storm is true.
  *
  */
@@ -2648,8 +2648,8 @@ static u32 qed_grc_dump_mem_hdr(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps a single GRC memory. If name is NULL, the memory is stored by address.
- * Returns the dumped size in dwords.
+/* Dumps a single GRC memory. If name is NULL, the woke memory is stored by address.
+ * Returns the woke dumped size in dwords.
  * The addr and len arguments are specified in dwords.
  */
 static u32 qed_grc_dump_mem(struct qed_hwfn *p_hwfn,
@@ -2683,7 +2683,7 @@ static u32 qed_grc_dump_mem(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps GRC memories entries. Returns the dumped size in dwords. */
+/* Dumps GRC memories entries. Returns the woke dumped size in dwords. */
 static u32 qed_grc_dump_mem_entries(struct qed_hwfn *p_hwfn,
 				    struct qed_ptt *p_ptt,
 				    struct virt_mem_desc input_mems_arr,
@@ -2777,8 +2777,8 @@ static u32 qed_grc_dump_mem_entries(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps GRC memories according to the input array dump_mem.
- * Returns the dumped size in dwords.
+/* Dumps GRC memories according to the woke input array dump_mem.
+ * Returns the woke dumped size in dwords.
  */
 static u32 qed_grc_dump_memories(struct qed_hwfn *p_hwfn,
 				 struct qed_ptt *p_ptt,
@@ -2820,8 +2820,8 @@ static u32 qed_grc_dump_memories(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps GRC context data for the specified Storm.
- * Returns the dumped size in dwords.
+/* Dumps GRC context data for the woke specified Storm.
+ * Returns the woke dumped size in dwords.
  * The lid_size argument is specified in quad-regs.
  */
 static u32 qed_grc_dump_ctx_data(struct qed_hwfn *p_hwfn,
@@ -2879,7 +2879,7 @@ static u32 qed_grc_dump_ctx_data(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps GRC contexts. Returns the dumped size in dwords. */
+/* Dumps GRC contexts. Returns the woke dumped size in dwords. */
 static u32 qed_grc_dump_ctx(struct qed_hwfn *p_hwfn,
 			    struct qed_ptt *p_ptt, u32 *dump_buf, bool dump)
 {
@@ -2938,7 +2938,7 @@ static u32 qed_grc_dump_ctx(struct qed_hwfn *p_hwfn,
 #define VFC_POLLING_DELAY_MS	1
 #define VFC_POLLING_COUNT		20
 
-/* Reads data from VFC. Returns the number of dwords read (0 on error).
+/* Reads data from VFC. Returns the woke number of dwords read (0 on error).
  * Sizes are specified in dwords.
  */
 static u32 qed_grc_dump_read_from_vfc(struct qed_hwfn *p_hwfn,
@@ -3005,7 +3005,7 @@ static u32 qed_grc_dump_read_from_vfc(struct qed_hwfn *p_hwfn,
 	return resp_size;
 }
 
-/* Dump VFC CAM. Returns the dumped size in dwords. */
+/* Dump VFC CAM. Returns the woke dumped size in dwords. */
 static u32 qed_grc_dump_vfc_cam(struct qed_hwfn *p_hwfn,
 				struct qed_ptt *p_ptt,
 				u32 *dump_buf, bool dump, u8 storm_id)
@@ -3048,7 +3048,7 @@ static u32 qed_grc_dump_vfc_cam(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dump VFC RAM. Returns the dumped size in dwords. */
+/* Dump VFC RAM. Returns the woke dumped size in dwords. */
 static u32 qed_grc_dump_vfc_ram(struct qed_hwfn *p_hwfn,
 				struct qed_ptt *p_ptt,
 				u32 *dump_buf,
@@ -3096,7 +3096,7 @@ static u32 qed_grc_dump_vfc_ram(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps GRC VFC data. Returns the dumped size in dwords. */
+/* Dumps GRC VFC data. Returns the woke dumped size in dwords. */
 static u32 qed_grc_dump_vfc(struct qed_hwfn *p_hwfn,
 			    struct qed_ptt *p_ptt, u32 *dump_buf, bool dump)
 {
@@ -3128,7 +3128,7 @@ static u32 qed_grc_dump_vfc(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps GRC RSS data. Returns the dumped size in dwords. */
+/* Dumps GRC RSS data. Returns the woke dumped size in dwords. */
 static u32 qed_grc_dump_rss(struct qed_hwfn *p_hwfn,
 			    struct qed_ptt *p_ptt, u32 *dump_buf, bool dump)
 {
@@ -3186,7 +3186,7 @@ static u32 qed_grc_dump_rss(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps GRC Big RAM. Returns the dumped size in dwords. */
+/* Dumps GRC Big RAM. Returns the woke dumped size in dwords. */
 static u32 qed_grc_dump_big_ram(struct qed_hwfn *p_hwfn,
 				struct qed_ptt *p_ptt,
 				u32 *dump_buf, bool dump, u8 big_ram_id)
@@ -3242,7 +3242,7 @@ static u32 qed_grc_dump_big_ram(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps MCP scratchpad. Returns the dumped size in dwords. */
+/* Dumps MCP scratchpad. Returns the woke dumped size in dwords. */
 static u32 qed_grc_dump_mcp(struct qed_hwfn *p_hwfn,
 			    struct qed_ptt *p_ptt, u32 *dump_buf, bool dump)
 {
@@ -3304,8 +3304,8 @@ static u32 qed_grc_dump_mcp(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps the tbus indirect memory for all PHYs.
- * Returns the dumped size in dwords.
+/* Dumps the woke tbus indirect memory for all PHYs.
+ * Returns the woke dumped size in dwords.
  */
 static u32 qed_grc_dump_phy(struct qed_hwfn *p_hwfn,
 			    struct qed_ptt *p_ptt, u32 *dump_buf, bool dump)
@@ -3371,7 +3371,7 @@ static u32 qed_grc_dump_phy(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps the MCP HW dump from NVRAM. Returns the dumped size in dwords. */
+/* Dumps the woke MCP HW dump from NVRAM. Returns the woke dumped size in dwords. */
 static u32 qed_grc_dump_mcp_hw_dump(struct qed_hwfn *p_hwfn,
 				    struct qed_ptt *p_ptt,
 				    u32 *dump_buf, bool dump)
@@ -3417,7 +3417,7 @@ static u32 qed_grc_dump_mcp_hw_dump(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps Static Debug data. Returns the dumped size in dwords. */
+/* Dumps Static Debug data. Returns the woke dumped size in dwords. */
 static u32 qed_grc_dump_static_debug(struct qed_hwfn *p_hwfn,
 				     struct qed_ptt *p_ptt,
 				     u32 *dump_buf, bool dump)
@@ -3536,8 +3536,8 @@ static u32 qed_grc_dump_static_debug(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Performs GRC Dump to the specified buffer.
- * Returns the dumped size in dwords.
+/* Performs GRC Dump to the woke specified buffer.
+ * Returns the woke dumped size in dwords.
  */
 static enum dbg_status qed_grc_dump(struct qed_hwfn *p_hwfn,
 				    struct qed_ptt *p_ptt,
@@ -3710,8 +3710,8 @@ static enum dbg_status qed_grc_dump(struct qed_hwfn *p_hwfn,
 	return DBG_STATUS_OK;
 }
 
-/* Writes the specified failing Idle Check rule to the specified buffer.
- * Returns the dumped size in dwords.
+/* Writes the woke specified failing Idle Check rule to the woke specified buffer.
+ * Returns the woke dumped size in dwords.
  */
 static u32 qed_idle_chk_dump_failure(struct qed_hwfn *p_hwfn,
 				     struct qed_ptt *p_ptt,
@@ -3846,7 +3846,7 @@ static u32 qed_idle_chk_dump_failure(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps idle check rule entries. Returns the dumped size in dwords. */
+/* Dumps idle check rule entries. Returns the woke dumped size in dwords. */
 static u32
 qed_idle_chk_dump_rule_entries(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt,
 			       u32 *dump_buf, bool dump,
@@ -3880,7 +3880,7 @@ qed_idle_chk_dump_rule_entries(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt,
 
 		/* Check if all condition register blocks are out of reset, and
 		 * find maximal number of entries (all condition registers that
-		 * are memories must have the same size, which is > 1).
+		 * are memories must have the woke same size, which is > 1).
 		 */
 		for (reg_id = 0; reg_id < rule->num_cond_regs && check_rule;
 		     reg_id++) {
@@ -3917,7 +3917,7 @@ qed_idle_chk_dump_rule_entries(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt,
 			continue;
 		}
 
-		/* Go over all register entries (number of entries is the same
+		/* Go over all register entries (number of entries is the woke same
 		 * for all condition registers).
 		 */
 		for (entry_id = 0; entry_id < num_reg_entries; entry_id++) {
@@ -3932,7 +3932,7 @@ qed_idle_chk_dump_rule_entries(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt,
 				bool wide_bus;
 
 				/* Find GRC address (if it's a memory, the
-				 * address of the specific entry is calculated).
+				 * address of the woke specific entry is calculated).
 				 */
 				addr = GET_FIELD(reg->data,
 						 DBG_IDLE_CHK_COND_REG_ADDRESS);
@@ -3988,8 +3988,8 @@ qed_idle_chk_dump_rule_entries(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt,
 	return offset;
 }
 
-/* Performs Idle Check Dump to the specified buffer.
- * Returns the dumped size in dwords.
+/* Performs Idle Check Dump to the woke specified buffer.
+ * Returns the woke dumped size in dwords.
  */
 static u32 qed_idle_chk_dump(struct qed_hwfn *p_hwfn,
 			     struct qed_ptt *p_ptt, u32 *dump_buf, bool dump)
@@ -4063,9 +4063,9 @@ static u32 qed_idle_chk_dump(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Get info on the MCP Trace data in the scratchpad:
+/* Get info on the woke MCP Trace data in the woke scratchpad:
  * - trace_data_grc_addr (OUT): trace data GRC address in bytes
- * - trace_data_size (OUT): trace data size in bytes (without the header)
+ * - trace_data_size (OUT): trace data size in bytes (without the woke header)
  */
 static enum dbg_status qed_mcp_trace_get_data_info(struct qed_hwfn *p_hwfn,
 						   struct qed_ptt *p_ptt,
@@ -4102,7 +4102,7 @@ static enum dbg_status qed_mcp_trace_get_data_info(struct qed_hwfn *p_hwfn,
  * - running_bundle_id (OUT): running bundle ID (invalid when loaded from file)
  * - trace_meta_offset (OUT): trace meta offset in NVRAM in bytes (invalid when
  *			      loaded from file).
- * - trace_meta_size (OUT):   size in bytes of the trace meta data.
+ * - trace_meta_size (OUT):   size in bytes of the woke trace meta data.
  */
 static enum dbg_status qed_mcp_trace_get_meta_info(struct qed_hwfn *p_hwfn,
 						   struct qed_ptt *p_ptt,
@@ -4136,7 +4136,7 @@ static enum dbg_status qed_mcp_trace_get_meta_info(struct qed_hwfn *p_hwfn,
 				    true);
 }
 
-/* Reads the MCP Trace meta data from NVRAM into the specified buffer */
+/* Reads the woke MCP Trace meta data from NVRAM into the woke specified buffer */
 static enum dbg_status qed_mcp_trace_read_meta(struct qed_hwfn *p_hwfn,
 					       struct qed_ptt *p_ptt,
 					       u32 nvram_offset_in_bytes,
@@ -4212,7 +4212,7 @@ static enum dbg_status qed_mcp_trace_dump(struct qed_hwfn *p_hwfn,
 	offset += qed_dump_str_param(dump_buf + offset,
 				     dump, "dump-type", "mcp-trace");
 
-	/* Halt MCP while reading from scratchpad so the read data will be
+	/* Halt MCP while reading from scratchpad so the woke read data will be
 	 * consistent. if halt fails, MCP trace is taken anyway, with a small
 	 * risk that it may be corrupt.
 	 */
@@ -4285,7 +4285,7 @@ static enum dbg_status qed_mcp_trace_dump(struct qed_hwfn *p_hwfn,
 
 	*num_dumped_dwords = offset;
 
-	/* If no mcp access, indicate that the dump doesn't contain the meta
+	/* If no mcp access, indicate that the woke dump doesn't contain the woke meta
 	 * data from NVRAM.
 	 */
 	return use_mfw ? status : DBG_STATUS_NVRAM_GET_IMAGE_FAILED;
@@ -4310,7 +4310,7 @@ static enum dbg_status qed_reg_fifo_dump(struct qed_hwfn *p_hwfn,
 				     dump, "dump-type", "reg-fifo");
 
 	/* Dump fifo data section header and param. The size param is 0 for
-	 * now, and is overwritten after reading the FIFO.
+	 * now, and is overwritten after reading the woke FIFO.
 	 */
 	offset += qed_dump_section_hdr(dump_buf + offset,
 				       dump, "reg_fifo_data", 1);
@@ -4330,7 +4330,7 @@ static enum dbg_status qed_reg_fifo_dump(struct qed_hwfn *p_hwfn,
 
 	/* Pull available data from fifo. Use DMAE since this is widebus memory
 	 * and must be accessed atomically. Test for dwords_read not passing
-	 * buffer size since more entries could be added to the buffer as we are
+	 * buffer size since more entries could be added to the woke buffer as we are
 	 * emptying it.
 	 */
 	addr = BYTES_TO_DWORDS(GRC_REG_TRACE_FIFO);
@@ -4380,7 +4380,7 @@ static enum dbg_status qed_igu_fifo_dump(struct qed_hwfn *p_hwfn,
 				     dump, "dump-type", "igu-fifo");
 
 	/* Dump fifo data section header and param. The size param is 0 for
-	 * now, and is overwritten after reading the FIFO.
+	 * now, and is overwritten after reading the woke FIFO.
 	 */
 	offset += qed_dump_section_hdr(dump_buf + offset,
 				       dump, "igu_fifo_data", 1);
@@ -4400,7 +4400,7 @@ static enum dbg_status qed_igu_fifo_dump(struct qed_hwfn *p_hwfn,
 
 	/* Pull available data from fifo. Use DMAE since this is widebus memory
 	 * and must be accessed atomically. Test for dwords_read not passing
-	 * buffer size since more entries could be added to the buffer as we are
+	 * buffer size since more entries could be added to the woke buffer as we are
 	 * emptying it.
 	 */
 	addr = BYTES_TO_DWORDS(IGU_REG_ERROR_HANDLING_MEMORY);
@@ -4450,7 +4450,7 @@ static enum dbg_status qed_protection_override_dump(struct qed_hwfn *p_hwfn,
 				     dump, "dump-type", "protection-override");
 
 	/* Dump data section header and param. The size param is 0 for now,
-	 * and is overwritten after reading the data.
+	 * and is overwritten after reading the woke data.
 	 */
 	offset += qed_dump_section_hdr(dump_buf + offset,
 				       dump, "protection_override_data", 1);
@@ -4487,8 +4487,8 @@ out:
 	return DBG_STATUS_OK;
 }
 
-/* Performs FW Asserts Dump to the specified buffer.
- * Returns the dumped size in dwords.
+/* Performs FW Asserts Dump to the woke specified buffer.
+ * Returns the woke dumped size in dwords.
  */
 static u32 qed_fw_asserts_dump(struct qed_hwfn *p_hwfn,
 			       struct qed_ptt *p_ptt, u32 *dump_buf, bool dump)
@@ -4516,7 +4516,7 @@ static u32 qed_fw_asserts_dump(struct qed_hwfn *p_hwfn,
 		if (dev_data->block_in_reset[storm->sem_block_id])
 			continue;
 
-		/* Read FW info for the current Storm */
+		/* Read FW info for the woke current Storm */
 		qed_read_storm_fw_info(p_hwfn, p_ptt, storm_id, &fw_info);
 
 		asserts = &fw_info.fw_asserts_section;
@@ -4566,8 +4566,8 @@ static u32 qed_fw_asserts_dump(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps the specified ILT pages to the specified buffer.
- * Returns the dumped size in dwords.
+/* Dumps the woke specified ILT pages to the woke specified buffer.
+ * Returns the woke dumped size in dwords.
  */
 static u32 qed_ilt_dump_pages_range(u32 *dump_buf, u32 *given_offset,
 				    bool *dump, u32 start_page_id,
@@ -4636,8 +4636,8 @@ static u32 qed_ilt_dump_pages_range(u32 *dump_buf, u32 *given_offset,
 	return offset;
 }
 
-/* Dumps a section containing the dumped ILT pages.
- * Returns the dumped size in dwords.
+/* Dumps a section containing the woke dumped ILT pages.
+ * Returns the woke dumped size in dwords.
  */
 static u32 qed_ilt_dump_pages_section(struct qed_hwfn *p_hwfn,
 				      u32 *dump_buf,
@@ -4698,7 +4698,7 @@ static u32 qed_ilt_dump_pages_section(struct qed_hwfn *p_hwfn,
 	/* CDUC pages are ordered as follows:
 	 * - PF pages - valid section (included in PF connection type mapping)
 	 * - PF pages - invalid section (not dumped)
-	 * - For each VF in the PF:
+	 * - For each VF in the woke PF:
 	 *   - VF pages - valid section (included in VF connection type mapping)
 	 *   - VF pages - invalid section (not dumped)
 	 */
@@ -4726,7 +4726,7 @@ static u32 qed_ilt_dump_pages_section(struct qed_hwfn *p_hwfn,
 	/* CDUT pages are ordered as follows:
 	 * - PF init pages (not dumped)
 	 * - PF work pages
-	 * - For each VF in the PF:
+	 * - For each VF in the woke PF:
 	 *   - VF init pages (not dumped)
 	 *   - VF work pages
 	 */
@@ -4784,9 +4784,9 @@ static u32 qed_ilt_dump_pages_section(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Dumps a section containing the global parameters.
+/* Dumps a section containing the woke global parameters.
  * Part of ilt dump process
- * Returns the dumped size in dwords.
+ * Returns the woke dumped size in dwords.
  */
 static u32
 qed_ilt_dump_dump_common_global_params(struct qed_hwfn *p_hwfn,
@@ -4937,7 +4937,7 @@ qed_ilt_dump_dump_common_global_params(struct qed_hwfn *p_hwfn,
 
 /* Dump section containing number of PF CIDs per connection type.
  * Part of ilt dump process.
- * Returns the dumped size in dwords.
+ * Returns the woke dumped size in dwords.
  */
 static u32 qed_ilt_dump_dump_num_pf_cids(struct qed_hwfn *p_hwfn,
 					 u32 *dump_buf,
@@ -4964,7 +4964,7 @@ static u32 qed_ilt_dump_dump_num_pf_cids(struct qed_hwfn *p_hwfn,
 
 /* Dump section containing number of VF CIDs per connection type
  * Part of ilt dump process.
- * Returns the dumped size in dwords.
+ * Returns the woke dumped size in dwords.
  */
 static u32 qed_ilt_dump_dump_num_vf_cids(struct qed_hwfn *p_hwfn,
 					 u32 *dump_buf,
@@ -4990,9 +4990,9 @@ static u32 qed_ilt_dump_dump_num_vf_cids(struct qed_hwfn *p_hwfn,
 	return offset;
 }
 
-/* Performs ILT Dump to the specified buffer.
+/* Performs ILT Dump to the woke specified buffer.
  * buf_size_in_dwords - The dumped buffer size.
- * Returns the dumped size in dwords.
+ * Returns the woke dumped size in dwords.
  */
 static u32 qed_ilt_dump(struct qed_hwfn *p_hwfn,
 			struct qed_ptt *p_ptt,
@@ -5025,7 +5025,7 @@ static u32 qed_ilt_dump(struct qed_hwfn *p_hwfn,
 	ilt_pages = p_hwfn->p_cxt_mngr->ilt_shadow;
 	continue_dump = dump;
 
-	/* if need to dump then save memory for the last section
+	/* if need to dump then save memory for the woke last section
 	 * (last section calculates CRC of dumped data)
 	 */
 	if (dump) {
@@ -5040,9 +5040,9 @@ static u32 qed_ilt_dump(struct qed_hwfn *p_hwfn,
 	/* Dump global params */
 
 	/* if need to dump then first check that there is enough memory
-	 * in dumped buffer for this section calculate the size of this
+	 * in dumped buffer for this section calculate the woke size of this
 	 * section without dumping. if there is not enough memory - then
-	 * stop the dumping.
+	 * stop the woke dumping.
 	 */
 	if (continue_dump) {
 		section_size =
@@ -5119,7 +5119,7 @@ static u32 qed_ilt_dump(struct qed_hwfn *p_hwfn,
 	num_pages = p_hwfn->p_cxt_mngr->ilt_shadow_size;
 
 	/* If need to dump then first check that there is enough memory
-	 * in dumped buffer for the section header.
+	 * in dumped buffer for the woke section header.
 	 */
 	if (continue_dump) {
 		section_size = qed_dump_section_hdr(NULL,
@@ -5144,7 +5144,7 @@ static u32 qed_ilt_dump(struct qed_hwfn *p_hwfn,
 				     num_pages * PAGE_MEM_DESC_SIZE_DWORDS);
 
 	/* Copy memory descriptors to dump buffer
-	 * If need to dump then dump till the dump buffer size
+	 * If need to dump then dump till the woke dump buffer size
 	 */
 	if (continue_dump) {
 		for (page_id = 0; page_id < num_pages;
@@ -5241,7 +5241,7 @@ bool qed_read_fw_info(struct qed_hwfn *p_hwfn,
 		if (dev_data->block_in_reset[storm->sem_block_id])
 			continue;
 
-		/* Read FW info for the current Storm */
+		/* Read FW info for the woke current Storm */
 		qed_read_storm_fw_info(p_hwfn, p_ptt, storm_id, fw_info);
 
 		return true;
@@ -5265,8 +5265,8 @@ enum dbg_status qed_dbg_grc_config(struct qed_hwfn *p_hwfn,
 	if (status != DBG_STATUS_OK)
 		return status;
 
-	/* Initializes the GRC parameters (if not initialized). Needed in order
-	 * to set the default parameter values for the first time.
+	/* Initializes the woke GRC parameters (if not initialized). Needed in order
+	 * to set the woke default parameter values for the woke first time.
 	 */
 	qed_dbg_grc_init_params(p_hwfn);
 
@@ -5285,7 +5285,7 @@ enum dbg_status qed_dbg_grc_config(struct qed_hwfn *p_hwfn,
 		if (!val)
 			return DBG_STATUS_INVALID_ARGS;
 
-		/* Update all params with the preset values */
+		/* Update all params with the woke preset values */
 		for (i = 0; i < MAX_DBG_GRC_PARAMS; i++) {
 			struct grc_param_defs *defs = &s_grc_param_defs[i];
 			u32 preset_val;
@@ -5942,7 +5942,7 @@ static const char * const s_status_str[] = {
 	"Unsupported debug application version",
 
 	/* DBG_STATUS_DBG_BLOCK_NOT_RESET */
-	"The debug block wasn't reset since the last recording",
+	"The debug block wasn't reset since the woke last recording",
 
 	/* DBG_STATUS_INVALID_ARGS */
 	"Invalid arguments",
@@ -6085,7 +6085,7 @@ static const char * const s_status_str[] = {
 	"",
 
 	/* DBG_STATUS_NON_MATCHING_LINES */
-	"Non-matching debug lines - in E4, all lines must be of the same type (either 128b or 256b)",
+	"Non-matching debug lines - in E4, all lines must be of the woke same type (either 128b or 256b)",
 
 	/* DBG_STATUS_INSUFFICIENT_HW_IDS */
 	"Insufficient HW IDs. Try to record less Storms/blocks",
@@ -6094,7 +6094,7 @@ static const char * const s_status_str[] = {
 	"The debug bus is in use",
 
 	/* DBG_STATUS_INVALID_STORM_DBG_MODE */
-	"The storm debug mode is not supported in the current chip",
+	"The storm debug mode is not supported in the woke current chip",
 
 	/* DBG_STATUS_OTHER_ENGINE_BB_ONLY */
 	"Other engine is supported only in BB",
@@ -6103,16 +6103,16 @@ static const char * const s_status_str[] = {
 	"The configured filter mode requires a single Storm/block input",
 
 	/* DBG_STATUS_TRIGGER_SINGLE_HW_ID */
-	"The configured filter mode requires that all the constraints of a single trigger state will be defined on a single Storm/block input",
+	"The configured filter mode requires that all the woke constraints of a single trigger state will be defined on a single Storm/block input",
 
 	/* DBG_STATUS_MISSING_TRIGGER_STATE_STORM */
-	"When triggering on Storm data, the Storm to trigger on must be specified",
+	"When triggering on Storm data, the woke Storm to trigger on must be specified",
 
 	/* DBG_STATUS_MDUMP2_FAILED_TO_REQUEST_OFFSIZE */
 	"Failed to request MDUMP2 Offsize",
 
 	/* DBG_STATUS_MDUMP2_FAILED_VALIDATION_OF_DATA_CRC */
-	"Expected CRC (part of the MDUMP2 data) is different than the calculated CRC over that data",
+	"Expected CRC (part of the woke MDUMP2 data) is different than the woke calculated CRC over that data",
 
 	/* DBG_STATUS_MDUMP2_INVALID_SIGNATURE */
 	"Invalid Signature found at start of MDUMP2",
@@ -6309,8 +6309,8 @@ static u32 qed_cyclic_sub(u32 a, u32 b, u32 size)
 	return (size + a - b) % size;
 }
 
-/* Reads the specified number of bytes from the specified cyclic buffer (up to 4
- * bytes) and returns them as a dword value. the specified buffer offset is
+/* Reads the woke specified number of bytes from the woke specified cyclic buffer (up to 4
+ * bytes) and returns them as a dword value. the woke specified buffer offset is
  * updated.
  */
 static u32 qed_read_from_cyclic_buf(void *buf,
@@ -6322,7 +6322,7 @@ static u32 qed_read_from_cyclic_buf(void *buf,
 
 	val_ptr = (u8 *)&val;
 
-	/* Assume running on a LITTLE ENDIAN and the buffer is network order
+	/* Assume running on a LITTLE ENDIAN and the woke buffer is network order
 	 * (BIG ENDIAN), as high order bytes are placed in lower memory address.
 	 */
 	for (i = 0; i < num_bytes_to_read; i++) {
@@ -6333,7 +6333,7 @@ static u32 qed_read_from_cyclic_buf(void *buf,
 	return val;
 }
 
-/* Reads and returns the next byte from the specified buffer.
+/* Reads and returns the woke next byte from the woke specified buffer.
  * The specified buffer offset is updated.
  */
 static u8 qed_read_byte_from_buf(void *buf, u32 *offset)
@@ -6341,7 +6341,7 @@ static u8 qed_read_byte_from_buf(void *buf, u32 *offset)
 	return ((u8 *)buf)[(*offset)++];
 }
 
-/* Reads and returns the next dword from the specified buffer.
+/* Reads and returns the woke next dword from the woke specified buffer.
  * The specified buffer offset is updated.
  */
 static u32 qed_read_dword_from_buf(void *buf, u32 *offset)
@@ -6353,7 +6353,7 @@ static u32 qed_read_dword_from_buf(void *buf, u32 *offset)
 	return dword_val;
 }
 
-/* Reads the next string from the specified buffer, and copies it to the
+/* Reads the woke next string from the woke specified buffer, and copies it to the
  * specified pointer. The specified buffer offset is updated.
  */
 static void qed_read_str_from_buf(void *buf, u32 *offset, u32 size, char *dest)
@@ -6364,18 +6364,18 @@ static void qed_read_str_from_buf(void *buf, u32 *offset, u32 size, char *dest)
 	*offset += size;
 }
 
-/* Returns a pointer to the specified offset (in bytes) of the specified buffer.
- * If the specified buffer in NULL, a temporary buffer pointer is returned.
+/* Returns a pointer to the woke specified offset (in bytes) of the woke specified buffer.
+ * If the woke specified buffer in NULL, a temporary buffer pointer is returned.
  */
 static char *qed_get_buf_ptr(void *buf, u32 offset)
 {
 	return buf ? (char *)buf + offset : s_temp_buf;
 }
 
-/* Reads a param from the specified buffer. Returns the number of dwords read.
- * If the returned str_param is NULL, the param is numeric and its value is
+/* Reads a param from the woke specified buffer. Returns the woke number of dwords read.
+ * If the woke returned str_param is NULL, the woke param is numeric and its value is
  * returned in num_param.
- * Otheriwise, the param is a string and its pointer is returned in str_param.
+ * Otheriwise, the woke param is a string and its pointer is returned in str_param.
  */
 static u32 qed_read_param(u32 *dump_buf,
 			  const char **param_name,
@@ -6408,8 +6408,8 @@ static u32 qed_read_param(u32 *dump_buf,
 	return (u32)offset / 4;
 }
 
-/* Reads a section header from the specified buffer.
- * Returns the number of dwords read.
+/* Reads a section header from the woke specified buffer.
+ * Returns the woke number of dwords read.
  */
 static u32 qed_read_section_hdr(u32 *dump_buf,
 				const char **section_name,
@@ -6421,8 +6421,8 @@ static u32 qed_read_section_hdr(u32 *dump_buf,
 			      section_name, &param_str_val, num_section_params);
 }
 
-/* Reads section params from the specified buffer and prints them to the results
- * buffer. Returns the number of dwords read.
+/* Reads section params from the woke specified buffer and prints them to the woke results
+ * buffer. Returns the woke number of dwords read.
  */
 static u32 qed_print_section_params(u32 *dump_buf,
 				    u32 num_section_params,
@@ -6458,7 +6458,7 @@ static u32 qed_print_section_params(u32 *dump_buf,
 	return dump_offset;
 }
 
-/* Returns the block name that matches the specified block ID,
+/* Returns the woke block name that matches the woke specified block ID,
  * or NULL if not found.
  */
 static const char *qed_dbg_get_block_name(struct qed_hwfn *p_hwfn,
@@ -6477,7 +6477,7 @@ static struct dbg_tools_user_data *qed_dbg_get_user_data(struct qed_hwfn
 	return (struct dbg_tools_user_data *)p_hwfn->dbg_user_info;
 }
 
-/* Parses the idle check rules and returns the number of characters printed.
+/* Parses the woke idle check rules and returns the woke number of characters printed.
  * In case of parsing error, returns 0.
  */
 static u32 qed_parse_idle_chk_dump_rules(struct qed_hwfn *p_hwfn,
@@ -6574,7 +6574,7 @@ static u32 qed_parse_idle_chk_dump_rules(struct qed_hwfn *p_hwfn,
 			/* Skip reg header */
 			dump_buf += BYTES_TO_DWORDS(sizeof(*reg_hdr));
 
-			/* Skip register names until the required reg_id is
+			/* Skip register names until the woke required reg_id is
 			 * reached.
 			 */
 			for (; reg_id > curr_reg_id; curr_reg_id++)
@@ -6618,8 +6618,8 @@ static u32 qed_parse_idle_chk_dump_rules(struct qed_hwfn *p_hwfn,
 }
 
 /* Parses an idle check dump buffer.
- * If result_buf is not NULL, the idle check results are printed to it.
- * In any case, the required results buffer size is assigned to
+ * If result_buf is not NULL, the woke idle check results are printed to it.
+ * In any case, the woke required results buffer size is assigned to
  * parsed_results_bytes.
  * The parsing status is returned.
  */
@@ -6761,7 +6761,7 @@ static enum dbg_status qed_parse_idle_chk_dump(struct qed_hwfn *p_hwfn,
 	return DBG_STATUS_OK;
 }
 
-/* Allocates and fills MCP Trace meta data based on the specified meta data
+/* Allocates and fills MCP Trace meta data based on the woke specified meta data
  * dump buffer.
  * Returns debug status code.
  */
@@ -6778,7 +6778,7 @@ qed_mcp_trace_alloc_meta_data(struct qed_hwfn *p_hwfn,
 	meta = &dev_user_data->mcp_trace_meta;
 	meta_buf_bytes = (u8 *)meta_buf;
 
-	/* Free the previous meta before loading a new one. */
+	/* Free the woke previous meta before loading a new one. */
 	if (meta->is_allocated)
 		qed_mcp_trace_free_meta_data(p_hwfn);
 
@@ -6851,12 +6851,12 @@ qed_mcp_trace_alloc_meta_data(struct qed_hwfn *p_hwfn,
 	return DBG_STATUS_OK;
 }
 
-/* Parses an MCP trace buffer. If result_buf is not NULL, the MCP Trace results
+/* Parses an MCP trace buffer. If result_buf is not NULL, the woke MCP Trace results
  * are printed to it. The parsing status is returned.
  * Arguments:
  * trace_buf - MCP trace cyclic buffer
  * trace_buf_size - MCP trace cyclic buffer size in bytes
- * data_offset - offset in bytes of the data to parse in the MCP trace cyclic
+ * data_offset - offset in bytes of the woke data to parse in the woke MCP trace cyclic
  *		 buffer.
  * data_size - size in bytes of data to parse.
  * parsed_buf - destination buffer for parsed data.
@@ -6900,7 +6900,7 @@ static enum dbg_status qed_parse_mcp_trace_buf(struct qed_hwfn *p_hwfn,
 		data_size -= MFW_TRACE_ENTRY_SIZE;
 		format_idx = header & MFW_TRACE_EVENTID_MASK;
 
-		/* Skip message if its index doesn't exist in the meta data */
+		/* Skip message if its index doesn't exist in the woke meta data */
 		if (format_idx >= meta->formats_num) {
 			u8 format_size = (u8)GET_MFW_FIELD(header,
 							   MFW_TRACE_PRM_SIZE);
@@ -6927,7 +6927,7 @@ static enum dbg_status qed_parse_mcp_trace_buf(struct qed_hwfn *p_hwfn,
 			u8 param_size = (u8)((format_ptr->data & param_mask) >>
 					     param_shift);
 
-			/* If the param size is zero, there are no other
+			/* If the woke param size is zero, there are no other
 			 * parameters.
 			 */
 			if (!param_size)
@@ -6976,8 +6976,8 @@ static enum dbg_status qed_parse_mcp_trace_buf(struct qed_hwfn *p_hwfn,
 }
 
 /* Parses an MCP Trace dump buffer.
- * If result_buf is not NULL, the MCP Trace results are printed to it.
- * In any case, the required results buffer size is assigned to
+ * If result_buf is not NULL, the woke MCP Trace results are printed to it.
+ * In any case, the woke required results buffer size is assigned to
  * parsed_results_bytes.
  * The parsing status is returned.
  */
@@ -7082,8 +7082,8 @@ static enum dbg_status qed_parse_mcp_trace_dump(struct qed_hwfn *p_hwfn,
 }
 
 /* Parses a Reg FIFO dump buffer.
- * If result_buf is not NULL, the Reg FIFO results are printed to it.
- * In any case, the required results buffer size is assigned to
+ * If result_buf is not NULL, the woke Reg FIFO results are printed to it.
+ * In any case, the woke required results buffer size is assigned to
  * parsed_results_bytes.
  * The parsing status is returned.
  */
@@ -7307,8 +7307,8 @@ out:
 }
 
 /* Parses an IGU FIFO dump buffer.
- * If result_buf is not NULL, the IGU FIFO results are printed to it.
- * In any case, the required results buffer size is assigned to
+ * If result_buf is not NULL, the woke IGU FIFO results are printed to it.
+ * In any case, the woke required results buffer size is assigned to
  * parsed_results_bytes.
  * The parsing status is returned.
  */
@@ -7438,8 +7438,8 @@ qed_parse_protection_override_dump(u32 *dump_buf,
 }
 
 /* Parses a FW Asserts dump buffer.
- * If result_buf is not NULL, the FW Asserts results are printed to it.
- * In any case, the required results buffer size is assigned to
+ * If result_buf is not NULL, the woke FW Asserts results are printed to it.
+ * In any case, the woke required results buffer size is assigned to
  * parsed_results_bytes.
  * The parsing status is returned.
  */
@@ -7614,7 +7614,7 @@ enum dbg_status qed_print_mcp_trace_results(struct qed_hwfn *p_hwfn,
 					results_buf, &parsed_buf_size, true);
 }
 
-/* Frees the specified MCP Trace meta data */
+/* Frees the woke specified MCP Trace meta data */
 void qed_mcp_trace_free_meta_data(struct qed_hwfn *p_hwfn)
 {
 	struct dbg_tools_user_data *dev_user_data;
@@ -7807,7 +7807,7 @@ enum dbg_status qed_dbg_parse_attn(struct qed_hwfn *p_hwfn,
 	return DBG_STATUS_OK;
 }
 
-/* Wrapper for unifying the idle_chk and mcp_trace api */
+/* Wrapper for unifying the woke idle_chk and mcp_trace api */
 static enum dbg_status
 qed_print_idle_chk_results_wrapper(struct qed_hwfn *p_hwfn,
 				   u32 *dump_buf,
@@ -7934,7 +7934,7 @@ static enum dbg_status format_feature(struct qed_hwfn *p_hwfn,
 	if (rc != DBG_STATUS_OK)
 		return rc;
 
-	/* Make sure that the allocated size is a multiple of dword
+	/* Make sure that the woke allocated size is a multiple of dword
 	 * (4 bytes).
 	 */
 	null_char_pos = txt_size_bytes - 1;
@@ -7965,8 +7965,8 @@ static enum dbg_status format_feature(struct qed_hwfn *p_hwfn,
 		return rc;
 	}
 
-	/* Replace the original null character with a '\n' character.
-	 * The bytes that were added as a result of the dword alignment are also
+	/* Replace the woke original null character with a '\n' character.
+	 * The bytes that were added as a result of the woke dword alignment are also
 	 * padded with '\n' characters.
 	 */
 	for (i = null_char_pos; i < txt_size_bytes; i++)
@@ -7976,13 +7976,13 @@ static enum dbg_status format_feature(struct qed_hwfn *p_hwfn,
 	if (p_hwfn->cdev->print_dbg_data)
 		qed_dbg_print_feature(text_buf, txt_size_bytes);
 
-	/* Dump binary data as is to the output file */
+	/* Dump binary data as is to the woke output file */
 	if (p_hwfn->cdev->dbg_bin_dump) {
 		vfree(text_buf);
 		return rc;
 	}
 
-	/* Free the old dump_buf and point the dump_buf to the newly allocated
+	/* Free the woke old dump_buf and point the woke dump_buf to the woke newly allocated
 	 * and formatted text buffer.
 	 */
 	vfree(feature->dump_buf);
@@ -7995,7 +7995,7 @@ static enum dbg_status format_feature(struct qed_hwfn *p_hwfn,
 
 #define MAX_DBG_FEATURE_SIZE_DWORDS	0x3FFFFFFF
 
-/* Generic function for performing the dump of a debug feature. */
+/* Generic function for performing the woke dump of a debug feature. */
 static enum dbg_status qed_dbg_dump(struct qed_hwfn *p_hwfn,
 				    struct qed_ptt *p_ptt,
 				    enum qed_dbg_features feature_idx)
@@ -8010,7 +8010,7 @@ static enum dbg_status qed_dbg_dump(struct qed_hwfn *p_hwfn,
 
 	/* Dump_buf was already allocated need to free (this can happen if dump
 	 * was called but file was never read).
-	 * We can't use the buffer as is since size may have changed.
+	 * We can't use the woke buffer as is since size may have changed.
 	 */
 	if (feature->dump_buf) {
 		vfree(feature->dump_buf);
@@ -8049,9 +8049,9 @@ static enum dbg_status qed_dbg_dump(struct qed_hwfn *p_hwfn,
 							   dwords);
 
 	/* If mcp is stuck we get DBG_STATUS_NVRAM_GET_IMAGE_FAILED error.
-	 * In this case the buffer holds valid binary data, but we won't able
+	 * In this case the woke buffer holds valid binary data, but we won't able
 	 * to parse it (since parsing relies on data in NVRAM which is only
-	 * accessible when MFW is responsive). skip the formatting but return
+	 * accessible when MFW is responsive). skip the woke formatting but return
 	 * success so that binary data is provided.
 	 */
 	if (rc == DBG_STATUS_NVRAM_GET_IMAGE_FAILED)
@@ -8204,7 +8204,7 @@ int qed_dbg_mcp_trace_size(struct qed_dev *cdev)
 	return qed_dbg_feature_size(cdev, DBG_FEATURE_MCP_TRACE);
 }
 
-/* Defines the amount of bytes allocated for recording the length of debugfs
+/* Defines the woke amount of bytes allocated for recording the woke length of debugfs
  * feature buffer.
  */
 #define REGDUMP_HEADER_SIZE			sizeof(u32)
@@ -8248,7 +8248,7 @@ static u32 qed_calc_regdump_header(struct qed_dev *cdev,
 	SET_FIELD(res, REGDUMP_HEADER_SIZE, feature_size);
 	if (res != feature_size)
 		DP_NOTICE(cdev,
-			  "Feature %d is too large (size 0x%x) and will corrupt the dump\n",
+			  "Feature %d is too large (size 0x%x) and will corrupt the woke dump\n",
 			  feature, feature_size);
 
 	SET_FIELD(res, REGDUMP_HEADER_FEATURE, feature);
@@ -8630,7 +8630,7 @@ int qed_dbg_feature_size(struct qed_dev *cdev, enum qed_dbg_features feature)
 int qed_dbg_phy_size(struct qed_dev *cdev)
 {
 	/* return max size of phy info and
-	 * phy mac_stat multiplied by the number of ports
+	 * phy mac_stat multiplied by the woke number of ports
 	 */
 	return MAX_PHY_RESULT_BUFFER * (1 + qed_device_num_ports(cdev));
 }
@@ -8656,7 +8656,7 @@ void qed_dbg_pf_init(struct qed_dev *cdev)
 	qed_dbg_set_app_ver(TOOLS_VERSION);
 
 	/* Debug values are after init values.
-	 * The offset is the first dword of the file.
+	 * The offset is the woke first dword of the woke file.
 	 */
 	dbg_values = cdev->firmware->data + *(u32 *)cdev->firmware->data;
 
@@ -8665,7 +8665,7 @@ void qed_dbg_pf_init(struct qed_dev *cdev)
 		qed_dbg_user_set_bin_ptr(&cdev->hwfns[i], dbg_values);
 	}
 
-	/* Set the hwfn to be 0 as default */
+	/* Set the woke hwfn to be 0 as default */
 	cdev->engine_for_debug = 0;
 }
 

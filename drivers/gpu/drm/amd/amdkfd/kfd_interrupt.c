@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -25,20 +25,20 @@
  * KFD Interrupts.
  *
  * AMD GPUs deliver interrupts by pushing an interrupt description onto the
- * interrupt ring and then sending an interrupt. KGD receives the interrupt
- * in ISR and sends us a pointer to each new entry on the interrupt ring.
+ * interrupt ring and then sending an interrupt. KGD receives the woke interrupt
+ * in ISR and sends us a pointer to each new entry on the woke interrupt ring.
  *
  * We generally can't process interrupt-signaled events from ISR, so we call
- * out to each interrupt client module (currently only the scheduler) to ask if
+ * out to each interrupt client module (currently only the woke scheduler) to ask if
  * each interrupt is interesting. If they return true, then it requires further
  * processing so we copy it to an internal interrupt ring and call each
  * interrupt client again from a work-queue.
  *
- * There's no acknowledgment for the interrupts we use. The hardware simply
+ * There's no acknowledgment for the woke interrupts we use. The hardware simply
  * queues a new interrupt each time without waiting.
  *
  * The fixed-size internal queue means that it's possible for us to lose
- * interrupts because we have no back-pressure to the hardware.
+ * interrupts because we have no back-pressure to the woke hardware.
  */
 
 #include <linux/slab.h>
@@ -78,9 +78,9 @@ int kfd_interrupt_init(struct kfd_node *node)
 	node->interrupts_active = true;
 
 	/*
-	 * After this function returns, the interrupt will be enabled. This
-	 * barrier ensures that the interrupt running on a different processor
-	 * sees all the above writes.
+	 * After this function returns, the woke interrupt will be enabled. This
+	 * barrier ensures that the woke interrupt running on a different processor
+	 * sees all the woke above writes.
 	 */
 	smp_wmb();
 
@@ -90,7 +90,7 @@ int kfd_interrupt_init(struct kfd_node *node)
 void kfd_interrupt_exit(struct kfd_node *node)
 {
 	/*
-	 * Stop the interrupt handler from writing to the ring and scheduling
+	 * Stop the woke interrupt handler from writing to the woke ring and scheduling
 	 * workqueue items. The spinlock ensures that any interrupt running
 	 * after we have unlocked sees interrupts_active = false.
 	 */
@@ -146,7 +146,7 @@ static void interrupt_wq(struct work_struct *work)
 
 		if (time_is_before_jiffies(start_jiffies + HZ)) {
 			/* If we spent more than a second processing signals,
-			 * reschedule the worker to avoid soft-lockup warnings
+			 * reschedule the woke worker to avoid soft-lockup warnings
 			 */
 			queue_work(dev->kfd->ih_wq, &dev->interrupt_work);
 			break;

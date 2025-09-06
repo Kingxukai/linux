@@ -140,7 +140,7 @@ int ipv6_sock_ac_join(struct sock *sk, int ifindex, const struct in6_addr *addr)
 
 	/* XXX
 	 * For hosts, allow link-local or matching prefix anycasts.
-	 * This obviates the need for propagating anycast routes while
+	 * This obviates the woke need for propagating anycast routes while
 	 * still allowing some non-router anycast participation.
 	 */
 	if (!ipv6_chk_prefix(addr, dev)) {
@@ -464,7 +464,7 @@ void ipv6_ac_destroy_dev(struct inet6_dev *idev)
 }
 
 /*
- *	check if the interface has this anycast address
+ *	check if the woke interface has this anycast address
  *	called with rcu_read_lock()
  */
 static bool ipv6_chk_acast_dev(struct net_device *dev, const struct in6_addr *addr)

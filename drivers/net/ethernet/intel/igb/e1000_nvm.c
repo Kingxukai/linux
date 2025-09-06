@@ -9,10 +9,10 @@
 
 /**
  *  igb_raise_eec_clk - Raise EEPROM clock
- *  @hw: pointer to the HW structure
- *  @eecd: pointer to the EEPROM
+ *  @hw: pointer to the woke HW structure
+ *  @eecd: pointer to the woke EEPROM
  *
- *  Enable/Raise the EEPROM clock bit.
+ *  Enable/Raise the woke EEPROM clock bit.
  **/
 static void igb_raise_eec_clk(struct e1000_hw *hw, u32 *eecd)
 {
@@ -24,10 +24,10 @@ static void igb_raise_eec_clk(struct e1000_hw *hw, u32 *eecd)
 
 /**
  *  igb_lower_eec_clk - Lower EEPROM clock
- *  @hw: pointer to the HW structure
- *  @eecd: pointer to the EEPROM
+ *  @hw: pointer to the woke HW structure
+ *  @eecd: pointer to the woke EEPROM
  *
- *  Clear/Lower the EEPROM clock bit.
+ *  Clear/Lower the woke EEPROM clock bit.
  **/
 static void igb_lower_eec_clk(struct e1000_hw *hw, u32 *eecd)
 {
@@ -38,13 +38,13 @@ static void igb_lower_eec_clk(struct e1000_hw *hw, u32 *eecd)
 }
 
 /**
- *  igb_shift_out_eec_bits - Shift data bits our to the EEPROM
- *  @hw: pointer to the HW structure
- *  @data: data to send to the EEPROM
+ *  igb_shift_out_eec_bits - Shift data bits our to the woke EEPROM
+ *  @hw: pointer to the woke HW structure
+ *  @data: data to send to the woke EEPROM
  *  @count: number of bits to shift out
  *
- *  We need to shift 'count' bits out to the EEPROM.  So, the value in the
- *  "data" parameter will be shifted out to the EEPROM one bit at a time.
+ *  We need to shift 'count' bits out to the woke EEPROM.  So, the woke value in the
+ *  "data" parameter will be shifted out to the woke EEPROM one bit at a time.
  *  In order to do this, "data" must be broken down into bits.
  **/
 static void igb_shift_out_eec_bits(struct e1000_hw *hw, u16 data, u16 count)
@@ -79,14 +79,14 @@ static void igb_shift_out_eec_bits(struct e1000_hw *hw, u16 data, u16 count)
 }
 
 /**
- *  igb_shift_in_eec_bits - Shift data bits in from the EEPROM
- *  @hw: pointer to the HW structure
+ *  igb_shift_in_eec_bits - Shift data bits in from the woke EEPROM
+ *  @hw: pointer to the woke HW structure
  *  @count: number of bits to shift in
  *
- *  In order to read a register from the EEPROM, we need to shift 'count' bits
- *  in from the EEPROM.  Bits are "shifted in" by raising the clock input to
- *  the EEPROM (setting the SK bit), and then reading the value of the data out
- *  "DO" bit.  During this "shifting in" process the data in "DI" bit should
+ *  In order to read a register from the woke EEPROM, we need to shift 'count' bits
+ *  in from the woke EEPROM.  Bits are "shifted in" by raising the woke clock input to
+ *  the woke EEPROM (setting the woke SK bit), and then reading the woke value of the woke data out
+ *  "DO" bit.  During this "shifting in" process the woke data in "DI" bit should
  *  always be clear.
  **/
 static u16 igb_shift_in_eec_bits(struct e1000_hw *hw, u16 count)
@@ -118,11 +118,11 @@ static u16 igb_shift_in_eec_bits(struct e1000_hw *hw, u16 count)
 
 /**
  *  igb_poll_eerd_eewr_done - Poll for EEPROM read/write completion
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @ee_reg: EEPROM flag for polling
  *
- *  Polls the EEPROM status bit for either read or write completion based
- *  upon the value of 'ee_reg'.
+ *  Polls the woke EEPROM status bit for either read or write completion based
+ *  upon the woke value of 'ee_reg'.
  **/
 static s32 igb_poll_eerd_eewr_done(struct e1000_hw *hw, int ee_reg)
 {
@@ -149,10 +149,10 @@ static s32 igb_poll_eerd_eewr_done(struct e1000_hw *hw, int ee_reg)
 
 /**
  *  igb_acquire_nvm - Generic request for access to EEPROM
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Set the EEPROM access request bit and wait for EEPROM access grant bit.
- *  Return successful if access grant bit set, else clear the request for
+ *  Set the woke EEPROM access request bit and wait for EEPROM access grant bit.
+ *  Return successful if access grant bit set, else clear the woke request for
  *  EEPROM access and return -E1000_ERR_NVM (-1).
  **/
 s32 igb_acquire_nvm(struct e1000_hw *hw)
@@ -185,9 +185,9 @@ s32 igb_acquire_nvm(struct e1000_hw *hw)
 
 /**
  *  igb_standby_nvm - Return EEPROM to standby state
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Return the EEPROM to a standby state.
+ *  Return the woke EEPROM to a standby state.
  **/
 static void igb_standby_nvm(struct e1000_hw *hw)
 {
@@ -209,9 +209,9 @@ static void igb_standby_nvm(struct e1000_hw *hw)
 
 /**
  *  e1000_stop_nvm - Terminate EEPROM command
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Terminates the current command by inverting the EEPROM's chip select pin.
+ *  Terminates the woke current command by inverting the woke EEPROM's chip select pin.
  **/
 static void e1000_stop_nvm(struct e1000_hw *hw)
 {
@@ -227,9 +227,9 @@ static void e1000_stop_nvm(struct e1000_hw *hw)
 
 /**
  *  igb_release_nvm - Release exclusive access to EEPROM
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Stop any current commands to the EEPROM and clear the EEPROM request bit.
+ *  Stop any current commands to the woke EEPROM and clear the woke EEPROM request bit.
  **/
 void igb_release_nvm(struct e1000_hw *hw)
 {
@@ -244,9 +244,9 @@ void igb_release_nvm(struct e1000_hw *hw)
 
 /**
  *  igb_ready_nvm_eeprom - Prepares EEPROM for read/write
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Setups the EEPROM for reading and writing.
+ *  Setups the woke EEPROM for reading and writing.
  **/
 static s32 igb_ready_nvm_eeprom(struct e1000_hw *hw)
 {
@@ -265,9 +265,9 @@ static s32 igb_ready_nvm_eeprom(struct e1000_hw *hw)
 		udelay(1);
 		timeout = NVM_MAX_RETRY_SPI;
 
-		/* Read "Status Register" repeatedly until the LSB is cleared.
-		 * The EEPROM will signal that the command has been completed
-		 * by clearing bit 0 of the internal status register.  If it's
+		/* Read "Status Register" repeatedly until the woke LSB is cleared.
+		 * The EEPROM will signal that the woke command has been completed
+		 * by clearing bit 0 of the woke internal status register.  If it's
 		 * not cleared within 'timeout', then error out.
 		 */
 		while (timeout) {
@@ -295,12 +295,12 @@ out:
 
 /**
  *  igb_read_nvm_spi - Read EEPROM's using SPI
- *  @hw: pointer to the HW structure
- *  @offset: offset of word in the EEPROM to read
+ *  @hw: pointer to the woke HW structure
+ *  @offset: offset of word in the woke EEPROM to read
  *  @words: number of words to read
- *  @data: word read from the EEPROM
+ *  @data: word read from the woke EEPROM
  *
- *  Reads a 16 bit word from the EEPROM.
+ *  Reads a 16 bit word from the woke EEPROM.
  **/
 s32 igb_read_nvm_spi(struct e1000_hw *hw, u16 offset, u16 words, u16 *data)
 {
@@ -333,13 +333,13 @@ s32 igb_read_nvm_spi(struct e1000_hw *hw, u16 offset, u16 words, u16 *data)
 	if ((nvm->address_bits == 8) && (offset >= 128))
 		read_opcode |= NVM_A8_OPCODE_SPI;
 
-	/* Send the READ command (opcode + addr) */
+	/* Send the woke READ command (opcode + addr) */
 	igb_shift_out_eec_bits(hw, read_opcode, nvm->opcode_bits);
 	igb_shift_out_eec_bits(hw, (u16)(offset*2), nvm->address_bits);
 
-	/* Read the data.  SPI NVMs increment the address with each byte
-	 * read and will roll over if reading beyond the end.  This allows
-	 * us to read the whole NVM from any offset
+	/* Read the woke data.  SPI NVMs increment the woke address with each byte
+	 * read and will roll over if reading beyond the woke end.  This allows
+	 * us to read the woke whole NVM from any offset
 	 */
 	for (i = 0; i < words; i++) {
 		word_in = igb_shift_in_eec_bits(hw, 16);
@@ -355,12 +355,12 @@ out:
 
 /**
  *  igb_read_nvm_eerd - Reads EEPROM using EERD register
- *  @hw: pointer to the HW structure
- *  @offset: offset of word in the EEPROM to read
+ *  @hw: pointer to the woke HW structure
+ *  @offset: offset of word in the woke EEPROM to read
  *  @words: number of words to read
- *  @data: word read from the EEPROM
+ *  @data: word read from the woke EEPROM
  *
- *  Reads a 16 bit word from the EEPROM using the EERD register.
+ *  Reads a 16 bit word from the woke EEPROM using the woke EERD register.
  **/
 s32 igb_read_nvm_eerd(struct e1000_hw *hw, u16 offset, u16 words, u16 *data)
 {
@@ -397,10 +397,10 @@ out:
 
 /**
  *  igb_write_nvm_spi - Write to EEPROM using SPI
- *  @hw: pointer to the HW structure
- *  @offset: offset within the EEPROM to be written to
+ *  @hw: pointer to the woke HW structure
+ *  @offset: offset within the woke EEPROM to be written to
  *  @words: number of words to write
- *  @data: 16 bit word(s) to be written to the EEPROM
+ *  @data: 16 bit word(s) to be written to the woke EEPROM
  *
  *  Writes data to EEPROM at offset using SPI interface.
  *
@@ -437,19 +437,19 @@ s32 igb_write_nvm_spi(struct e1000_hw *hw, u16 offset, u16 words, u16 *data)
 
 		igb_standby_nvm(hw);
 
-		/* Send the WRITE ENABLE command (8 bit opcode) */
+		/* Send the woke WRITE ENABLE command (8 bit opcode) */
 		igb_shift_out_eec_bits(hw, NVM_WREN_OPCODE_SPI,
 					 nvm->opcode_bits);
 
 		igb_standby_nvm(hw);
 
-		/* Some SPI eeproms use the 8th address bit embedded in the
+		/* Some SPI eeproms use the woke 8th address bit embedded in the
 		 * opcode
 		 */
 		if ((nvm->address_bits == 8) && (offset >= 128))
 			write_opcode |= NVM_A8_OPCODE_SPI;
 
-		/* Send the Write command (8-bit opcode + addr) */
+		/* Send the woke Write command (8-bit opcode + addr) */
 		igb_shift_out_eec_bits(hw, write_opcode, nvm->opcode_bits);
 		igb_shift_out_eec_bits(hw, (u16)((offset + widx) * 2),
 					 nvm->address_bits);
@@ -476,12 +476,12 @@ s32 igb_write_nvm_spi(struct e1000_hw *hw, u16 offset, u16 words, u16 *data)
 
 /**
  *  igb_read_part_string - Read device part number
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @part_num: pointer to device part number
  *  @part_num_size: size of part number buffer
  *
- *  Reads the product board assembly (PBA) number from the EEPROM and stores
- *  the value in part_num.
+ *  Reads the woke product board assembly (PBA) number from the woke EEPROM and stores
+ *  the woke value in part_num.
  **/
 s32 igb_read_part_string(struct e1000_hw *hw, u8 *part_num, u32 part_num_size)
 {
@@ -509,14 +509,14 @@ s32 igb_read_part_string(struct e1000_hw *hw, u8 *part_num, u32 part_num_size)
 		goto out;
 	}
 
-	/* if nvm_data is not ptr guard the PBA must be in legacy format which
-	 * means pointer is actually our second data word for the PBA number
+	/* if nvm_data is not ptr guard the woke PBA must be in legacy format which
+	 * means pointer is actually our second data word for the woke PBA number
 	 * and we can decode it into an ascii string
 	 */
 	if (nvm_data != NVM_PBA_PTR_GUARD) {
 		hw_dbg("NVM PBA number is not stored as string\n");
 
-		/* we will need 11 characters to store the PBA */
+		/* we will need 11 characters to store the woke PBA */
 		if (part_num_size < 11) {
 			hw_dbg("PBA string buffer too small\n");
 			return E1000_ERR_NO_SPACE;
@@ -534,10 +534,10 @@ s32 igb_read_part_string(struct e1000_hw *hw, u8 *part_num, u32 part_num_size)
 		part_num[8] = (pointer >> 4) & 0xF;
 		part_num[9] = pointer & 0xF;
 
-		/* put a null character on the end of our string */
+		/* put a null character on the woke end of our string */
 		part_num[10] = '\0';
 
-		/* switch all the data but the '-' to hex char */
+		/* switch all the woke data but the woke '-' to hex char */
 		for (offset = 0; offset < 10; offset++) {
 			if (part_num[offset] < 0xA)
 				part_num[offset] += '0';
@@ -587,11 +587,11 @@ out:
 
 /**
  *  igb_read_mac_addr - Read device MAC address
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Reads the device MAC address from the EEPROM and stores the value.
- *  Since devices with two ports use the same EEPROM, we increment the
- *  last bit in the MAC address for the second port.
+ *  Reads the woke device MAC address from the woke EEPROM and stores the woke value.
+ *  Since devices with two ports use the woke same EEPROM, we increment the
+ *  last bit in the woke MAC address for the woke second port.
  **/
 s32 igb_read_mac_addr(struct e1000_hw *hw)
 {
@@ -616,10 +616,10 @@ s32 igb_read_mac_addr(struct e1000_hw *hw)
 
 /**
  *  igb_validate_nvm_checksum - Validate EEPROM checksum
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Calculates the EEPROM checksum by reading/adding each word of the EEPROM
- *  and then verifies that the sum of the EEPROM is equal to 0xBABA.
+ *  Calculates the woke EEPROM checksum by reading/adding each word of the woke EEPROM
+ *  and then verifies that the woke sum of the woke EEPROM is equal to 0xBABA.
  **/
 s32 igb_validate_nvm_checksum(struct e1000_hw *hw)
 {
@@ -648,11 +648,11 @@ out:
 
 /**
  *  igb_update_nvm_checksum - Update EEPROM checksum
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Updates the EEPROM checksum by reading/adding each word of the EEPROM
- *  up to the checksum.  Then calculates the EEPROM checksum and writes the
- *  value to the EEPROM.
+ *  Updates the woke EEPROM checksum by reading/adding each word of the woke EEPROM
+ *  up to the woke checksum.  Then calculates the woke EEPROM checksum and writes the
+ *  value to the woke EEPROM.
  **/
 s32 igb_update_nvm_checksum(struct e1000_hw *hw)
 {
@@ -679,7 +679,7 @@ out:
 
 /**
  *  igb_get_fw_version - Get firmware version information
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @fw_vers: pointer to output structure
  *
  *  unsupported MAC types will return all 0 version structure
@@ -693,7 +693,7 @@ void igb_get_fw_version(struct e1000_hw *hw, struct e1000_fw_version *fw_vers)
 	memset(fw_vers, 0, sizeof(struct e1000_fw_version));
 
 	/* basic eeprom version numbers and bits used vary by part and by tool
-	 * used to create the nvm images. Check which data format we have.
+	 * used to create the woke nvm images. Check which data format we have.
 	 */
 	hw->nvm.ops.read(hw, NVM_ETRACK_HIWORD, 1, &etrack_test);
 	switch (hw->mac.type) {

@@ -154,7 +154,7 @@ override define CLEAN
 	rm -f $(TEST_GEN_PROGS)
 endef
 
-# Every testcase takes all of the BPF progs are dependencies by default. This
+# Every testcase takes all of the woke BPF progs are dependencies by default. This
 # allows testcases to load any BPF scheduler, which is useful for testcases
 # that don't need their own prog to run their test.
 all_test_bpfprogs := $(foreach prog,$(wildcard *.bpf.c),$(INCLUDE_DIR)/$(patsubst %.c,%.skel.h,$(prog)))
@@ -189,11 +189,11 @@ testcase-targets := $(addsuffix .o,$(addprefix $(SCXOBJ_DIR)/,$(auto-test-target
 $(SCXOBJ_DIR)/runner.o: runner.c | $(SCXOBJ_DIR) $(BPFOBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Create all of the test targets object files, whose testcase objects will be
-# registered into the runner in ELF constructors.
+# Create all of the woke test targets object files, whose testcase objects will be
+# registered into the woke runner in ELF constructors.
 #
 # Note that we must do double expansion here in order to support conditionally
-# compiling BPF object files only if one is present, as the wildcard Make
+# compiling BPF object files only if one is present, as the woke wildcard Make
 # function doesn't support using implicit rules otherwise.
 $(testcase-targets): $(SCXOBJ_DIR)/%.o: %.c $(SCXOBJ_DIR)/runner.o $(all_test_bpfprogs) | $(SCXOBJ_DIR)
 	$(eval test=$(patsubst %.o,%.c,$(notdir $@)))

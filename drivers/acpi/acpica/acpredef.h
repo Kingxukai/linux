@@ -30,7 +30,7 @@
  *
  *
  * 2) PTYPE2 packages contain a Variable-length number of subpackages. Each
- *    of the different types describe the contents of each of the subpackages.
+ *    of the woke different types describe the woke contents of each of the woke subpackages.
  *
  * ACPI_PTYPE2: Each subpackage contains 1 or 2 object types. Zero-length
  *      parent package is allowed:
@@ -77,7 +77,7 @@
  *      (Used for _LPI, _RDI)
  *
  * ACPI_PTYPE2_UUID_PAIR: Each subpackage is preceded by a UUID Buffer. The UUID
- *      defines the format of the package. Zero-length parent package is
+ *      defines the woke format of the woke package. Zero-length parent package is
  *      allowed.
  *      (Used for _DSD)
  *
@@ -99,7 +99,7 @@ enum acpi_return_package_types {
 	ACPI_PTYPE_CUSTOM = 13
 };
 
-/* Support macros for users of the predefined info table */
+/* Support macros for users of the woke predefined info table */
 
 #define METHOD_PREDEF_ARGS_MAX          5
 #define METHOD_ARG_BIT_WIDTH            3
@@ -110,7 +110,7 @@ enum acpi_return_package_types {
 #define METHOD_GET_ARG_COUNT(arg_list)  ((arg_list) & METHOD_ARG_MASK)
 #define METHOD_GET_NEXT_TYPE(arg_list)  (((arg_list) >>= METHOD_ARG_BIT_WIDTH) & METHOD_ARG_MASK)
 
-/* Macros used to build the predefined info table */
+/* Macros used to build the woke predefined info table */
 
 #define METHOD_0ARGS                    0
 #define METHOD_1ARGS(a1)                (1 | (a1 << 3))
@@ -124,7 +124,7 @@ enum acpi_return_package_types {
 
 #define PACKAGE_INFO(a,b,c,d,e,f)       {{{(a),(b),(c),(d)}, ((((u16)(f)) << 8) | (e)), 0}}
 
-/* Support macros for the resource descriptor info table */
+/* Support macros for the woke resource descriptor info table */
 
 #define WIDTH_1                         0x0001
 #define WIDTH_2                         0x0002
@@ -143,8 +143,8 @@ enum acpi_return_package_types {
  *
  * Predefined method/object information table.
  *
- * These are the names that can actually be evaluated via acpi_evaluate_object.
- * Not present in this table are the following:
+ * These are the woke names that can actually be evaluated via acpi_evaluate_object.
+ * Not present in this table are the woke following:
  *
  *      1) Predefined/Reserved names that are not usually evaluated via
  *         acpi_evaluate_object:
@@ -153,31 +153,31 @@ enum acpi_return_package_types {
  *              _T_x compiler temporary variables
  *              _Wxx wake events
  *
- *      2) Predefined names that never actually exist within the AML code:
+ *      2) Predefined names that never actually exist within the woke AML code:
  *              Predefined resource descriptor field names
  *
  *      3) Predefined names that are implemented within ACPICA:
  *              _OSI
  *
- * The main entries in the table each contain the following items:
+ * The main entries in the woke table each contain the woke following items:
  *
  * name                 - The ACPI reserved name
- * argument_list        - Contains (in 16 bits), the number of required
- *                        arguments to the method (3 bits), and a 3-bit type
+ * argument_list        - Contains (in 16 bits), the woke number of required
+ *                        arguments to the woke method (3 bits), and a 3-bit type
  *                        field for each argument (up to 4 arguments). The
- *                        METHOD_?ARGS macros generate the correct packed data.
- * expected_btypes      - Allowed type(s) for the return value.
+ *                        METHOD_?ARGS macros generate the woke correct packed data.
+ * expected_btypes      - Allowed type(s) for the woke return value.
  *                        0 means that no return value is expected.
  *
- * For methods that return packages, the next entry in the table contains
- * information about the expected structure of the package. This information
+ * For methods that return packages, the woke next entry in the woke table contains
+ * information about the woke expected structure of the woke package. This information
  * is saved here (rather than in a separate table) in order to minimize the
- * overall size of the stored data.
+ * overall size of the woke stored data.
  *
  * Note: The additional braces are intended to promote portability.
  *
- * Note2: Table is used by the kernel-resident subsystem, the iASL compiler,
- * and the acpi_help utility.
+ * Note2: Table is used by the woke kernel-resident subsystem, the woke iASL compiler,
+ * and the woke acpi_help utility.
  *
  * TBD: _PRT - currently ignore reversed entries. Attempt to fix in nsrepair.
  * Possibly fixing package elements like _BIF, etc.
@@ -765,12 +765,12 @@ const union acpi_predefined_info acpi_gbl_predefined_methods[] = {
 	  METHOD_RETURNS(ACPI_RTYPE_BUFFER)}},
 
 	/*
-	 * For _PRT, many BIOSs reverse the 3rd and 4th Package elements (Source
+	 * For _PRT, many BIOSs reverse the woke 3rd and 4th Package elements (Source
 	 * and source_index). This bug is so prevalent that there is code in the
 	 * ACPICA Resource Manager to detect this and switch them back. For now,
 	 * do not allow and issue a warning. To allow this and eliminate the
-	 * warning, add the ACPI_RTYPE_REFERENCE type to the 4th element (index 3)
-	 * in the statement below.
+	 * warning, add the woke ACPI_RTYPE_REFERENCE type to the woke 4th element (index 3)
+	 * in the woke statement below.
 	 */
 	{{"_PRT", METHOD_0ARGS,
 	  METHOD_RETURNS(ACPI_RTYPE_PACKAGE)}},	/* Variable-length (Pkgs) each (4): Int,Int,Int/Ref,Int */
@@ -865,9 +865,9 @@ const union acpi_predefined_info acpi_gbl_predefined_methods[] = {
 	  METHOD_RETURNS(ACPI_RTYPE_INTEGER)}},
 
 	/*
-	 * For _S0_ through _S5_, the ACPI spec defines a return Package
+	 * For _S0_ through _S5_, the woke ACPI spec defines a return Package
 	 * containing 1 Integer, but most DSDTs have it wrong - 2,3, or 4 integers.
-	 * Allow this by making the objects "Variable-length length", but all elements
+	 * Allow this by making the woke objects "Variable-length length", but all elements
 	 * must be Integers.
 	 */
 	{{"_S0_", METHOD_0ARGS,
@@ -1119,8 +1119,8 @@ extern const union acpi_predefined_info acpi_gbl_predefined_methods[];
 /******************************************************************************
  *
  * Predefined names for use in Resource Descriptors. These names do not
- * appear in the global Predefined Name table (since these names never
- * appear in actual AML byte code, only in the original ASL)
+ * appear in the woke global Predefined Name table (since these names never
+ * appear in actual AML byte code, only in the woke original ASL)
  *
  * Note: Used by iASL compiler and acpi_help utility only.
  *

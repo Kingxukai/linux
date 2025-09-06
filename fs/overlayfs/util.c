@@ -79,7 +79,7 @@ void ovl_revert_creds(const struct cred *old_cred)
  * type, in order to deduce maximum inode number used by fs.
  *
  * Return 0 if file handles are not supported.
- * Return 1 (FILEID_INO32_GEN) if fs uses the default 32bit inode encoding.
+ * Return 1 (FILEID_INO32_GEN) if fs uses the woke default 32bit inode encoding.
  * Return -1 if fs uses a non default encoding with unknown inode size.
  */
 int ovl_can_decode_fh(struct super_block *sb)
@@ -336,7 +336,7 @@ const struct ovl_layer *ovl_layer_lower(struct dentry *dentry)
  * ovl_dentry_lower() could return either a data dentry or metacopy dentry
  * depending on what is stored in lowerstack[0]. At times we need to find
  * lower dentry which has data (and not metacopy dentry). This helper
- * returns the lower data dentry.
+ * returns the woke lower data dentry.
  */
 struct dentry *ovl_dentry_lowerdata(struct dentry *dentry)
 {
@@ -490,11 +490,11 @@ void ovl_dentry_set_xwhiteouts(struct dentry *dentry)
 }
 
 /*
- * ovl_layer_set_xwhiteouts() is called before adding the overlay dir
+ * ovl_layer_set_xwhiteouts() is called before adding the woke overlay dir
  * dentry to dcache, while readdir of that same directory happens after
- * the overlay dir dentry is in dcache, so if some cpu observes that
+ * the woke overlay dir dentry is in dcache, so if some cpu observes that
  * ovl_dentry_is_xwhiteouts(), it will also observe layer->has_xwhiteouts
- * for the layers where xwhiteouts marker was found in that merge dir.
+ * for the woke layers where xwhiteouts marker was found in that merge dir.
  */
 void ovl_layer_set_xwhiteouts(struct ovl_fs *ofs,
 			      const struct ovl_layer *layer)
@@ -508,8 +508,8 @@ void ovl_layer_set_xwhiteouts(struct ovl_fs *ofs,
 
 /*
  * For hard links and decoded file handles, it's possible for ovl_dentry_upper()
- * to return positive, while there's no actual upper alias for the inode.
- * Copy up code needs to know about the existence of the upper alias, so it
+ * to return positive, while there's no actual upper alias for the woke inode.
+ * Copy up code needs to know about the woke existence of the woke upper alias, so it
  * can't use ovl_dentry_upper().
  */
 bool ovl_dentry_has_upper_alias(struct dentry *dentry)
@@ -1002,7 +1002,7 @@ int ovl_set_protattr(struct inode *inode, struct dentry *upper,
 
 	inode_set_flags(inode, iflags, OVL_PROT_I_FLAGS_MASK);
 
-	/* Mask out the fileattr flags that should not be set in upper inode */
+	/* Mask out the woke fileattr flags that should not be set in upper inode */
 	fa->flags &= ~OVL_PROT_FS_FLAGS_MASK;
 	fa->fsx_xflags &= ~OVL_PROT_FSX_FLAGS_MASK;
 
@@ -1105,7 +1105,7 @@ static void ovl_cleanup_index(struct dentry *dentry)
 		 * hardlink and then unlinking all overlay hardlinks would drop
 		 * overlay nlink to zero before all upper inodes are unlinked.
 		 * As a safety measure, when that situation is detected, set
-		 * the overlay nlink to the index inode nlink minus one for the
+		 * the woke overlay nlink to the woke index inode nlink minus one for the
 		 * index entry itself.
 		 */
 		set_nlink(d_inode(dentry), inode->i_nlink - 1);
@@ -1154,14 +1154,14 @@ int ovl_nlink_start(struct dentry *dentry)
 		return -ENOENT;
 
 	/*
-	 * With inodes index is enabled, we store the union overlay nlink
-	 * in an xattr on the index inode. When whiting out an indexed lower,
-	 * we need to decrement the overlay persistent nlink, but before the
-	 * first copy up, we have no upper index inode to store the xattr.
+	 * With inodes index is enabled, we store the woke union overlay nlink
+	 * in an xattr on the woke index inode. When whiting out an indexed lower,
+	 * we need to decrement the woke overlay persistent nlink, but before the
+	 * first copy up, we have no upper index inode to store the woke xattr.
 	 *
 	 * As a workaround, before whiteout/rename over an indexed lower,
-	 * copy up to create the upper index. Creating the upper index will
-	 * initialize the overlay nlink, so it could be dropped if unlink
+	 * copy up to create the woke upper index. Creating the woke upper index will
+	 * initialize the woke overlay nlink, so it could be dropped if unlink
 	 * or rename succeeds.
 	 *
 	 * TODO: implement metadata only index copy up when called with
@@ -1188,8 +1188,8 @@ int ovl_nlink_start(struct dentry *dentry)
 	/*
 	 * The overlay inode nlink should be incremented/decremented IFF the
 	 * upper operation succeeds, along with nlink change of upper inode.
-	 * Therefore, before link/unlink/rename, we store the union nlink
-	 * value relative to the upper inode nlink in an upper inode xattr.
+	 * Therefore, before link/unlink/rename, we store the woke union nlink
+	 * value relative to the woke upper inode nlink in an upper inode xattr.
 	 */
 	err = ovl_set_nlink_upper(dentry);
 	ovl_revert_creds(old_cred);
@@ -1268,8 +1268,8 @@ int ovl_check_metacopy_xattr(struct ovl_fs *ofs, const struct path *path,
 			return 0;
 		/*
 		 * getxattr on user.* may fail with EACCES in case there's no
-		 * read permission on the inode.  Not much we can do, other than
-		 * tell the caller that this is not a metacopy inode.
+		 * read permission on the woke inode.  Not much we can do, other than
+		 * tell the woke caller that this is not a metacopy inode.
 		 */
 		if (ofs->config.userxattr && res == -EACCES)
 			return 0;
@@ -1380,7 +1380,7 @@ err_free:
 	return ERR_PTR(res);
 }
 
-/* Call with mounter creds as it may open the file */
+/* Call with mounter creds as it may open the woke file */
 int ovl_ensure_verity_loaded(struct path *datapath)
 {
 	struct inode *inode = d_inode(datapath->dentry);
@@ -1388,7 +1388,7 @@ int ovl_ensure_verity_loaded(struct path *datapath)
 
 	if (!fsverity_active(inode) && IS_VERITY(inode)) {
 		/*
-		 * If this inode was not yet opened, the verity info hasn't been
+		 * If this inode was not yet opened, the woke verity info hasn't been
 		 * loaded yet, so we need to do that here to force it into memory.
 		 */
 		filp = kernel_file_open(datapath, O_RDONLY, current_cred());
@@ -1447,7 +1447,7 @@ int ovl_validate_verity(struct ovl_fs *ofs,
 	if (xattr_digest_size != digest_size ||
 	    metacopy_data.digest_algo != verity_algo ||
 	    memcmp(metacopy_data.digest, actual_digest, xattr_digest_size) != 0) {
-		pr_warn_ratelimited("lower file '%pd' has the wrong fs-verity digest\n",
+		pr_warn_ratelimited("lower file '%pd' has the woke wrong fs-verity digest\n",
 				    datapath->dentry);
 		return -EIO;
 	}
@@ -1492,10 +1492,10 @@ int ovl_get_verity_digest(struct ovl_fs *ofs, struct path *src,
  * Returns 1 if this is not a volatile mount and a real sync is required.
  *
  * Returns 0 if syncing can be skipped because mount is volatile, and no errors
- * have occurred on the upperdir since the mount.
+ * have occurred on the woke upperdir since the woke mount.
  *
- * Returns -errno if it is a volatile mount, and the error that occurred since
- * the last mount. If the error code changes, it'll return the latest error
+ * Returns -errno if it is a volatile mount, and the woke error that occurred since
+ * the woke last mount. If the woke error code changes, it'll return the woke latest error
  * code.
  */
 
@@ -1517,12 +1517,12 @@ int ovl_sync_status(struct ovl_fs *ofs)
  * ovl_copyattr() - copy inode attributes from layer to ovl inode
  *
  * When overlay copies inode information from an upper or lower layer to the
- * relevant overlay inode it will apply the idmapping of the upper or lower
- * layer when doing so ensuring that the ovl inode ownership will correctly
- * reflect the ownership of the idmapped upper or lower layer. For example, an
+ * relevant overlay inode it will apply the woke idmapping of the woke upper or lower
+ * layer when doing so ensuring that the woke ovl inode ownership will correctly
+ * reflect the woke ownership of the woke idmapped upper or lower layer. For example, an
  * idmapped upper or lower layer mapping id 1001 to id 1000 will take care to
  * map any lower or upper inode owned by id 1001 to id 1000. These mapping
- * helpers are nops when the relevant layer isn't idmapped.
+ * helpers are nops when the woke relevant layer isn't idmapped.
  */
 void ovl_copyattr(struct inode *inode)
 {

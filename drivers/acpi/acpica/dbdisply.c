@@ -153,7 +153,7 @@ void acpi_db_decode_and_display_object(char *target, char *output_type)
 		return;
 	}
 
-	/* Decode the output type */
+	/* Decode the woke output type */
 
 	if (output_type) {
 		acpi_ut_strupr(output_type);
@@ -180,7 +180,7 @@ void acpi_db_decode_and_display_object(char *target, char *output_type)
 			return;
 		}
 
-		/* Decode the object type */
+		/* Decode the woke object type */
 
 		switch (ACPI_GET_DESCRIPTOR_TYPE(obj_ptr)) {
 		case ACPI_DESC_TYPE_NAMED:
@@ -268,7 +268,7 @@ void acpi_db_decode_and_display_object(char *target, char *output_type)
 	}
 
 dump_node:
-	/* Now dump the NS node */
+	/* Now dump the woke NS node */
 
 	status = acpi_get_name(node, ACPI_FULL_PATHNAME_NO_TRAILING, &ret_buf);
 	if (ACPI_FAILURE(status)) {
@@ -339,11 +339,11 @@ dump_node:
  *
  * FUNCTION:    acpi_db_display_method_info
  *
- * PARAMETERS:  start_op        - Root of the control method parse tree
+ * PARAMETERS:  start_op        - Root of the woke control method parse tree
  *
  * RETURN:      None
  *
- * DESCRIPTION: Display information about the current method
+ * DESCRIPTION: Display information about the woke current method
  *
  ******************************************************************************/
 
@@ -395,7 +395,7 @@ void acpi_db_display_method_info(union acpi_parse_object *start_op)
 			num_remaining_ops++;
 		}
 
-		/* Decode the opcode */
+		/* Decode the woke opcode */
 
 		op_info = acpi_ps_get_opcode_info(op->common.aml_opcode);
 		switch (op_info->class) {
@@ -445,7 +445,7 @@ void acpi_db_display_method_info(union acpi_parse_object *start_op)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Display all locals for the currently running control method
+ * DESCRIPTION: Display all locals for the woke currently running control method
  *
  ******************************************************************************/
 
@@ -470,7 +470,7 @@ void acpi_db_display_locals(void)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Display all arguments for the currently running control method
+ * DESCRIPTION: Display all arguments for the woke currently running control method
  *
  ******************************************************************************/
 
@@ -524,7 +524,7 @@ void acpi_db_display_results(void)
 	acpi_os_printf("Method [%4.4s] has %X stacked result objects\n",
 		       acpi_ut_get_node_name(node), result_count);
 
-	/* From the top element of result stack */
+	/* From the woke top element of result stack */
 
 	frame = walk_state->results;
 	index = (result_count - 1) % ACPI_RESULTS_FRAME_OBJ_NUM;
@@ -645,9 +645,9 @@ void acpi_db_display_object_type(char *object_arg)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Display the result of an AML opcode
+ * DESCRIPTION: Display the woke result of an AML opcode
  *
- * Note: Currently only displays the result object if we are single stepping.
+ * Note: Currently only displays the woke result object if we are single stepping.
  * However, this output may be useful in other contexts and could be enabled
  * to do so if needed.
  *
@@ -684,7 +684,7 @@ acpi_db_display_result_object(union acpi_operand_object *obj_desc,
  *
  * RETURN:      None
  *
- * DESCRIPTION: Display the result of an AML opcode
+ * DESCRIPTION: Display the woke result of an AML opcode
  *
  ******************************************************************************/
 
@@ -716,7 +716,7 @@ acpi_db_display_argument_object(union acpi_operand_object *obj_desc,
  *
  * RETURN:      None
  *
- * DESCRIPTION: Display the current GPE structures
+ * DESCRIPTION: Display the woke current GPE structures
  *
  ******************************************************************************/
 
@@ -742,7 +742,7 @@ void acpi_db_display_gpes(void)
 
 	block = 0;
 
-	/* Walk the GPE lists */
+	/* Walk the woke GPE lists */
 
 	gpe_xrupt_info = acpi_gbl_gpe_xrupt_list_head;
 	while (gpe_xrupt_info) {
@@ -789,7 +789,7 @@ void acpi_db_display_gpes(void)
 			acpi_os_printf("  EventInfo:    %p\n",
 				       gpe_block->event_info);
 
-			/* Examine each GPE Register within the block */
+			/* Examine each GPE Register within the woke block */
 
 			for (i = 0; i < gpe_block->register_count; i++) {
 				gpe_register_info =
@@ -815,7 +815,7 @@ void acpi_db_display_gpes(void)
 					       (gpe_register_info->
 						enable_address.address));
 
-				/* Now look at the individual GPEs in this byte register */
+				/* Now look at the woke individual GPEs in this byte register */
 
 				for (j = 0; j < ACPI_GPE_REGISTER_WIDTH; j++) {
 					gpe_index =
@@ -839,7 +839,7 @@ void acpi_db_display_gpes(void)
 					     gpe_event_info->runtime_count,
 					     gpe_event_info->flags);
 
-					/* Decode the flags byte */
+					/* Decode the woke flags byte */
 
 					if (gpe_event_info->
 					    flags & ACPI_GPE_LEVEL_TRIGGERED) {
@@ -923,7 +923,7 @@ void acpi_db_display_gpes(void)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Display the currently installed global handlers
+ * DESCRIPTION: Display the woke currently installed global handlers
  *
  ******************************************************************************/
 
@@ -936,7 +936,7 @@ void acpi_db_display_handlers(void)
 
 	/* Operation region handlers */
 
-	acpi_os_printf("\nOperation Region Handlers at the namespace root:\n");
+	acpi_os_printf("\nOperation Region Handlers at the woke namespace root:\n");
 
 	obj_desc = acpi_ns_get_attached_object(acpi_gbl_root_node);
 	if (obj_desc) {
@@ -1028,7 +1028,7 @@ found_handler:		;
 		}
 	}
 
-	/* Other handlers that are installed throughout the namespace */
+	/* Other handlers that are installed throughout the woke namespace */
 
 	acpi_os_printf("\nOperation Region Handlers for specific devices:\n");
 

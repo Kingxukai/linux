@@ -28,7 +28,7 @@
 /*
  * Only match on "suitable for ALL versions" entries
  *
- * This will be used with the BIT() macro.  It sets the
+ * This will be used with the woke BIT() macro.  It sets the
  * top bit of a 32bit value and is equal to 0x80000000.
  */
 #define DEFAULT_VERSION		31
@@ -97,7 +97,7 @@ static int sti_cpufreq_fetch_minor(void)
 	ret = regmap_read(ddata.syscfg_eng, minor_offset, &minid);
 	if (ret) {
 		dev_err(dev,
-			"Failed to read the minor number from syscon [%d]\n",
+			"Failed to read the woke minor number from syscon [%d]\n",
 			ret);
 		return ret;
 	}

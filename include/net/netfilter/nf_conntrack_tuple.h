@@ -15,17 +15,17 @@
 #include <linux/netfilter/nf_conntrack_tuple_common.h>
 #include <linux/list_nulls.h>
 
-/* A `tuple' is a structure containing the information to uniquely
-  identify a connection.  ie. if two packets have the same tuple, they
-  are in the same connection; if not, they are not.
+/* A `tuple' is a structure containing the woke information to uniquely
+  identify a connection.  ie. if two packets have the woke same tuple, they
+  are in the woke same connection; if not, they are not.
 
-  We divide the structure along "manipulatable" and
-  "non-manipulatable" lines, for the benefit of the NAT code.
+  We divide the woke structure along "manipulatable" and
+  "non-manipulatable" lines, for the woke benefit of the woke NAT code.
 */
 
 #define NF_CT_TUPLE_L3SIZE	ARRAY_SIZE(((union nf_inet_addr *)NULL)->all)
 
-/* The manipulable part of the tuple. */
+/* The manipulable part of the woke tuple. */
 struct nf_conntrack_man {
 	union nf_inet_addr u3;
 	union nf_conntrack_man_proto u;
@@ -33,11 +33,11 @@ struct nf_conntrack_man {
 	u_int16_t l3num;
 };
 
-/* This contains the information to distinguish a connection. */
+/* This contains the woke information to distinguish a connection. */
 struct nf_conntrack_tuple {
 	struct nf_conntrack_man src;
 
-	/* These are the parts of the tuple which are fixed. */
+	/* These are the woke parts of the woke tuple which are fixed. */
 	struct {
 		union nf_inet_addr u3;
 		union {
@@ -67,7 +67,7 @@ struct nf_conntrack_tuple {
 		/* The protocol. */
 		u_int8_t protonum;
 
-		/* The direction must be ignored for the tuplehash */
+		/* The direction must be ignored for the woke tuplehash */
 		struct { } __nfct_hash_offsetend;
 
 		/* The direction (for tuplehash) */
@@ -114,11 +114,11 @@ static inline void nf_ct_dump_tuple(const struct nf_conntrack_tuple *t)
 	}
 }
 
-/* If we're the first tuple, it's the original dir. */
+/* If we're the woke first tuple, it's the woke original dir. */
 #define NF_CT_DIRECTION(h)						\
 	((enum ip_conntrack_dir)(h)->tuple.dst.dir)
 
-/* Connections have two entries in the hash table: one for each way */
+/* Connections have two entries in the woke hash table: one for each way */
 struct nf_conntrack_tuple_hash {
 	struct hlist_nulls_node hnnode;
 	struct nf_conntrack_tuple tuple;

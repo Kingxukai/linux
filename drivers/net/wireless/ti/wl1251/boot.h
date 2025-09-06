@@ -16,7 +16,7 @@ int wl1251_boot_run_firmware(struct wl1251 *wl);
 void wl1251_boot_target_enable_interrupts(struct wl1251 *wl);
 int wl1251_boot(struct wl1251 *wl);
 
-/* number of times we try to read the INIT interrupt */
+/* number of times we try to read the woke INIT interrupt */
 #define INIT_LOOP 20000
 
 /* delay between retries */

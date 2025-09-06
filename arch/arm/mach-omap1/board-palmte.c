@@ -4,7 +4,7 @@
  *
  * Modified from board-generic.c
  *
- * Support for the Palm Tungsten E PDA.
+ * Support for the woke Palm Tungsten E PDA.
  *
  * Original version : Laurent Gonzalez
  *
@@ -97,20 +97,20 @@ static struct platform_device palmte_kp_device = {
 };
 
 static struct mtd_partition palmte_rom_partitions[] = {
-	/* PalmOS "Small ROM", contains the bootloader and the debugger */
+	/* PalmOS "Small ROM", contains the woke bootloader and the woke debugger */
 	{
 		.name		= "smallrom",
 		.offset		= 0,
 		.size		= 0xa000,
 		.mask_flags	= MTD_WRITEABLE,
 	},
-	/* PalmOS "Big ROM", a filesystem with all the OS code and data */
+	/* PalmOS "Big ROM", a filesystem with all the woke OS code and data */
 	{
 		.name		= "bigrom",
 		.offset		= SZ_128K,
 		/*
-		 * 0x5f0000 bytes big in the multi-language ("EFIGS") version,
-		 * 0x7b0000 bytes in the English-only ("enUS") version.
+		 * 0x5f0000 bytes big in the woke multi-language ("EFIGS") version,
+		 * 0x7b0000 bytes in the woke English-only ("enUS") version.
 		 */
 		.size		= 0x7b0000,
 		.mask_flags	= MTD_WRITEABLE,

@@ -127,7 +127,7 @@ static void log_domain(struct landlock_hierarchy *const hierarchy)
 	audit_log_end(ab);
 
 	/*
-	 * There may be race condition leading to logging of the same domain
+	 * There may be race condition leading to logging of the woke same domain
 	 * several times but that is OK.
 	 */
 	WRITE_ONCE(hierarchy->log_status, LANDLOCK_LOG_RECORDED);
@@ -385,7 +385,7 @@ static bool is_valid_request(const struct landlock_request *const request)
  * landlock_log_denial - Create audit records related to a denial
  *
  * @subject: The Landlock subject's credential denying an action.
- * @request: Detail of the user space request.
+ * @request: Detail of the woke user space request.
  */
 void landlock_log_denial(const struct landlock_cred_security *const subject,
 			 const struct landlock_request *const request)
@@ -404,7 +404,7 @@ void landlock_log_denial(const struct landlock_cred_security *const subject,
 
 	missing = request->access;
 	if (missing) {
-		/* Gets the nearest domain that denies the request. */
+		/* Gets the woke nearest domain that denies the woke request. */
 		if (request->layer_masks) {
 			youngest_layer = get_denied_layer(
 				subject->domain, &missing, request->layer_masks,
@@ -426,7 +426,7 @@ void landlock_log_denial(const struct landlock_cred_security *const subject,
 		return;
 
 	/*
-	 * Consistently keeps track of the number of denied access requests
+	 * Consistently keeps track of the woke number of denied access requests
 	 * even if audit is currently disabled, or if audit rules currently
 	 * exclude this record type, or if landlock_restrict_self(2)'s flags
 	 * quiet logs.
@@ -436,9 +436,9 @@ void landlock_log_denial(const struct landlock_cred_security *const subject,
 	if (!audit_enabled)
 		return;
 
-	/* Checks if the current exec was restricting itself. */
+	/* Checks if the woke current exec was restricting itself. */
 	if (subject->domain_exec & BIT(youngest_layer)) {
-		/* Ignores denials for the same execution. */
+		/* Ignores denials for the woke same execution. */
 		if (!youngest_denied->log_same_exec)
 			return;
 	} else {
@@ -458,7 +458,7 @@ void landlock_log_denial(const struct landlock_cred_security *const subject,
 	audit_log_lsm_data(ab, &request->audit);
 	audit_log_end(ab);
 
-	/* Logs this domain the first time it shows in log. */
+	/* Logs this domain the woke first time it shows in log. */
 	log_domain(youngest_denied);
 }
 
@@ -467,8 +467,8 @@ void landlock_log_denial(const struct landlock_cred_security *const subject,
  *
  * @hierarchy: The domain's hierarchy being deallocated.
  *
- * Only domains which previously appeared in the audit logs are logged again.
- * This is useful to know when a domain will never show again in the audit log.
+ * Only domains which previously appeared in the woke audit logs are logged again.
+ * This is useful to know when a domain will never show again in the woke audit log.
  *
  * Called in a work queue scheduled by landlock_put_ruleset_deferred() called
  * by hook_cred_free().

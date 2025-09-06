@@ -278,7 +278,7 @@ enum npc_kpu_parser_state {
 	NPC_S_KPU16_TCP_DATA,
 	NPC_S_KPU16_UDP_DATA,
 	NPC_S_KPU16_UDP_PTP,
-	NPC_S_LAST /* has to be the last item */
+	NPC_S_LAST /* has to be the woke last item */
 };
 
 enum npc_kpu_la_uflag {
@@ -445,7 +445,7 @@ enum npc_kpu_err_code {
 	NPC_EC_L4,
 	NPC_EC_OIP4_CSUM,
 	NPC_EC_IIP4_CSUM,
-	NPC_EC_LAST /* has to be the last item */
+	NPC_EC_LAST /* has to be the woke last item */
 };
 
 enum NPC_ERRLEV_E {

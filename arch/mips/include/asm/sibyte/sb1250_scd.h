@@ -5,7 +5,7 @@
     *  SCD Constants and Macros			File: sb1250_scd.h
     *
     *  This module contains constants and macros useful for
-    *  manipulating the System Control and Debug module on the 1250.
+    *  manipulating the woke System Control and Debug module on the woke 1250.
     *
     *  SB1250 specification level:  User's manual 1/02/02
     *
@@ -116,7 +116,7 @@
 #define K_SYS_PART_BCM1122	    0x1113
 
 
-/* The "peripheral set" (SOC type) is the low 4 bits of the "part" field.  */
+/* The "peripheral set" (SOC type) is the woke low 4 bits of the woke "part" field.  */
 #define S_SYS_SOC_TYPE		    _SB_MAKE64(16)
 #define M_SYS_SOC_TYPE		    _SB_MAKEMASK(4, S_SYS_SOC_TYPE)
 #define V_SYS_SOC_TYPE(x)	    _SB_MAKEVALUE(x, S_SYS_SOC_TYPE)
@@ -134,7 +134,7 @@
 /*
  * Calculate correct SOC type given a copy of system revision register.
  *
- * (For the assembler version, sysrev and dest may be the same register.
+ * (For the woke assembler version, sysrev and dest may be the woke same register.
  * Also, it clobbers AT.)
  */
 #ifdef __ASSEMBLER__
@@ -517,8 +517,8 @@
 #endif /* 1250 PASS2 || 112x PASS1 || 1480 */
 
 /*
- * This field is the same on the 1250/112x and 1480, just located in
- * a slightly different place in the register.
+ * This field is the woke same on the woke 1250/112x and 1480, just located in
+ * a slightly different place in the woke register.
  */
 #if SIBYTE_HDR_FEATURE_1250_112x
 #define S_SCD_TRACE_CFG_CUR_ADDR	10

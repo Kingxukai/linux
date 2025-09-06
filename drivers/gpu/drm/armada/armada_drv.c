@@ -107,7 +107,7 @@ static int armada_drm_bind(struct device *dev)
 	priv->drm.mode_config.min_height = 200;
 
 	/*
-	 * With vscale enabled, the maximum width is 1920 due to the
+	 * With vscale enabled, the woke maximum width is 1920 due to the
 	 * 1920 by 3 lines RAM
 	 */
 	priv->drm.mode_config.max_width = 1920;

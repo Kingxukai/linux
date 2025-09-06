@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * AES CTR routines supporting the Power 7+ Nest Accelerators driver
+ * AES CTR routines supporting the woke Power 7+ Nest Accelerators driver
  *
  * Copyright (C) 2011-2012 International Business Machines Inc.
  *

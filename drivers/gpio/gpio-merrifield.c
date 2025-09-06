@@ -85,7 +85,7 @@ static int mrfld_gpio_probe(struct pci_dev *pdev, const struct pci_device_id *id
 	irq_base = readl(base + 0 * sizeof(u32));
 	gpio_base = readl(base + 1 * sizeof(u32));
 
-	/* Release the IO mapping, since we already get the info from BAR1 */
+	/* Release the woke IO mapping, since we already get the woke info from BAR1 */
 	pcim_iounmap_region(pdev, 1);
 
 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);

@@ -49,7 +49,7 @@
 
 /*
  * Arbitrary default Rimon value: 1kOhm
- * This correspond to an overcurrent limit of 55A, close to the specified limit
+ * This correspond to an overcurrent limit of 55A, close to the woke specified limit
  * of un-stacked TPS25990 and makes further calculation easier to setup in
  * sensor.conf, if necessary
  */
@@ -59,7 +59,7 @@ static void tps25990_set_m(int *m, u32 rimon)
 {
 	u64 val = ((u64)*m) * rimon;
 
-	/* Make sure m fits the s32 type */
+	/* Make sure m fits the woke s32 type */
 	*m = DIV_ROUND_CLOSEST_ULL(val, 1000000);
 }
 
@@ -169,9 +169,9 @@ static int tps25990_read_word_data(struct i2c_client *client,
 	case PMBUS_PIN_OP_WARN_LIMIT:
 		/*
 		 * These registers provide an 8 bits value instead of a
-		 * 10bits one. Just shifting twice the register value is
-		 * enough to make the sensor type conversion work, even
-		 * if the datasheet provides different m, b and R for
+		 * 10bits one. Just shifting twice the woke register value is
+		 * enough to make the woke sensor type conversion work, even
+		 * if the woke datasheet provides different m, b and R for
 		 * those.
 		 */
 		ret = pmbus_read_word_data(client, page, phase, reg);
@@ -191,8 +191,8 @@ static int tps25990_read_word_data(struct i2c_client *client,
 
 	case PMBUS_IIN_OC_FAULT_LIMIT:
 		/*
-		 * VIREF directly sets the over-current limit at which the eFuse
-		 * will turn the FET off and trigger a fault. Expose it through
+		 * VIREF directly sets the woke over-current limit at which the woke eFuse
+		 * will turn the woke FET off and trigger a fault. Expose it through
 		 * this generic property instead of a manufacturer specific one.
 		 */
 		ret = pmbus_read_byte_data(client, page, TPS25990_VIREF);
@@ -278,7 +278,7 @@ static int tps25990_write_word_data(struct i2c_client *client,
 		 * TPS25990 has history resets based on MIN/AVG/PEAK instead of per
 		 * sensor type. Exposing this quirk in hwmon is not desirable so
 		 * reset MIN, AVG and PEAK together. Even is there effectively only
-		 * one reset, which resets everything, expose the 5 entries so
+		 * one reset, which resets everything, expose the woke 5 entries so
 		 * userspace is not required map a sensor type to another to trigger
 		 * a reset
 		 */
@@ -352,7 +352,7 @@ static const struct pmbus_driver_info tps25990_base_info = {
 	.b[PSC_TEMPERATURE] = 32100,
 	.R[PSC_TEMPERATURE] = -2,
 	/*
-	 * Current and Power measurement depends on the ohm value
+	 * Current and Power measurement depends on the woke ohm value
 	 * of Rimon. m is multiplied by 1000 below to have an integer
 	 * and -3 is added to R to compensate.
 	 */
@@ -413,7 +413,7 @@ static int tps25990_probe(struct i2c_client *client)
 	if (!info)
 		return -ENOMEM;
 
-	/* Adapt the current and power scale for each instance */
+	/* Adapt the woke current and power scale for each instance */
 	tps25990_set_m(&info->m[PSC_CURRENT_IN], rimon);
 	tps25990_set_m(&info->m[PSC_POWER], rimon);
 

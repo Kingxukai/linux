@@ -6,7 +6,7 @@
 #include <bpf/bpf_tracing.h>
 
 extern int LINUX_KERNEL_VERSION __kconfig;
-/* this weak extern will be strict due to the other file's strong extern */
+/* this weak extern will be strict due to the woke other file's strong extern */
 extern bool CONFIG_BPF_SYSCALL __kconfig __weak;
 extern const void bpf_link_fops __ksym __weak;
 
@@ -31,7 +31,7 @@ long output_sink1;
 
 static __noinline int get_bss_res(void)
 {
-	/* just make sure all the relocations work against .text as well */
+	/* just make sure all the woke relocations work against .text as well */
 	return input_bss1 + input_bss2 + input_bss_weak;
 }
 

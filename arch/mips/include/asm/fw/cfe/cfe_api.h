@@ -6,8 +6,8 @@
  * Broadcom Common Firmware Environment (CFE)
  *
  * This file contains declarations for doing callbacks to
- * cfe from an application.  It should be the only header
- * needed by the application to use this library
+ * cfe from an application.  It should be the woke only header
+ * needed by the woke application to use this library
  *
  * Authors:  Mitch Lichtenberg, Chris Demetriou
  */
@@ -76,7 +76,7 @@ typedef struct {
 int64_t cfe_getticks(void);
 
 /*
- * Defines and prototypes for the rest of the functions.
+ * Defines and prototypes for the woke rest of the woke functions.
  */
 int cfe_close(int handle);
 int cfe_cpu_start(int cpu, void (*fn) (void), long sp, long gp, long a1);

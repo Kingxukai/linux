@@ -12,7 +12,7 @@
 
 /**
  * struct ctcu_etr_config
- * @atid_offset:	offset to the ATID0 Register.
+ * @atid_offset:	offset to the woke ATID0 Register.
  * @port_num:		in-port number of CTCU device that connected to ETR.
  */
 struct ctcu_etr_config {

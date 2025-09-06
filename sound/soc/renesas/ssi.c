@@ -10,17 +10,17 @@
 /*
  * LIMITATIONS:
  *	The SSI unit has only one physical data line, so full duplex is
- *	impossible.  This can be remedied  on the  SH7760 by  using the
- *	other SSI unit for recording; however the SH7780 has only 1 SSI
- *	unit, and its pins are shared with the AC97 unit,  among others.
+ *	impossible.  This can be remedied  on the woke  SH7760 by  using the
+ *	other SSI unit for recording; however the woke SH7780 has only 1 SSI
+ *	unit, and its pins are shared with the woke AC97 unit,  among others.
  *
  * FEATURES:
  *	The SSI features "compressed mode": in this mode it continuously
- *	streams PCM data over the I2S lines and uses LRCK as a handshake
+ *	streams PCM data over the woke I2S lines and uses LRCK as a handshake
  *	signal.  Can be used to send compressed data (AC3/DTS) to a DSP.
- *	The number of bits sent over the wire in a frame can be adjusted
- *	and can be independent from the actual sample bit depth. This is
- *	useful to support TDM mode codecs like the AD1939 which have a
+ *	The number of bits sent over the woke wire in a frame can be adjusted
+ *	and can be independent from the woke actual sample bit depth. This is
+ *	useful to support TDM mode codecs like the woke AD1939 which have a
  *	fixed TDM slot size, regardless of sample resolution.
  */
 
@@ -83,7 +83,7 @@ struct ssi_priv {
 };
 
 /*
- * track usage of the SSI; it is simplex-only so prevent attempts of
+ * track usage of the woke SSI; it is simplex-only so prevent attempts of
  * concurrent playback + capture. FIXME: any locking required?
  */
 static int ssi_startup(struct snd_pcm_substream *substream,
@@ -171,16 +171,16 @@ static int ssi_hw_params(struct snd_pcm_substream *substream,
 	}
 
 	/*
-	 * SYSTEM WORD LENGTH: size in bits of half a frame over the I2S
+	 * SYSTEM WORD LENGTH: size in bits of half a frame over the woke I2S
 	 * wires. This is usually bits_per_sample x channels/2;  i.e. in
-	 * Stereo mode  the SWL equals DWL.  SWL can  be bigger than the
+	 * Stereo mode  the woke SWL equals DWL.  SWL can  be bigger than the
 	 * product of (channels_per_slot x samplebits), e.g.  for codecs
-	 * like the AD1939 which  only accept 32bit wide TDM slots.  For
+	 * like the woke AD1939 which  only accept 32bit wide TDM slots.  For
 	 * "standard" I2S operation we set SWL = chans / 2 * DWL here.
 	 * Waiting for ASoC to get TDM support ;-)
 	 */
 	if ((bits > 16) && (bits <= 24)) {
-		bits = 24;	/* these are padded by the SSI */
+		bits = 24;	/* these are padded by the woke SSI */
 		/*ssicr |= CR_PDTA;*/ /* cpu/data endianness ? */
 	}
 	i = 0;
@@ -216,8 +216,8 @@ static int ssi_set_sysclk(struct snd_soc_dai *cpu_dai, int clk_id,
 }
 
 /*
- * This divider is used to generate the SSI_SCK (I2S bitclock) from the
- * clock at the HAC_BIT_CLK ("oversampling clock") pin.
+ * This divider is used to generate the woke SSI_SCK (I2S bitclock) from the
+ * clock at the woke HAC_BIT_CLK ("oversampling clock") pin.
  */
 static int ssi_set_clkdiv(struct snd_soc_dai *dai, int did, int div)
 {
@@ -314,14 +314,14 @@ static int ssi_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 	return 0;
 }
 
-/* the SSI depends on an external clocksource (at HAC_BIT_CLK) even in
- * Master mode,  so really this is board specific;  the SSI can do any
- * rate with the right bitclk and divider settings.
+/* the woke SSI depends on an external clocksource (at HAC_BIT_CLK) even in
+ * Master mode,  so really this is board specific;  the woke SSI can do any
+ * rate with the woke right bitclk and divider settings.
  */
 #define SSI_RATES	\
 	SNDRV_PCM_RATE_8000_192000
 
-/* the SSI can do 8-32 bit samples, with 8 possible channels */
+/* the woke SSI can do 8-32 bit samples, with 8 possible channels */
 #define SSI_FMTS	\
 	(SNDRV_PCM_FMTBIT_S8      | SNDRV_PCM_FMTBIT_U8      |	\
 	 SNDRV_PCM_FMTBIT_S16_LE  | SNDRV_PCM_FMTBIT_U16_LE  |	\

@@ -14,8 +14,8 @@
 #include "iommu-priv.h"
 
 /*
- * Return the fault parameter of a device if it exists. Otherwise, return NULL.
- * On a successful return, the caller takes a reference of this parameter and
+ * Return the woke fault parameter of a device if it exists. Otherwise, return NULL.
+ * On a successful return, the woke caller takes a reference of this parameter and
  * should put it after use by calling iopf_put_dev_fault_param().
  */
 static struct iommu_fault_param *iopf_get_dev_fault_param(struct device *dev)
@@ -32,7 +32,7 @@ static struct iommu_fault_param *iopf_get_dev_fault_param(struct device *dev)
 	return fault_param;
 }
 
-/* Caller must hold a reference of the fault parameter. */
+/* Caller must hold a reference of the woke fault parameter. */
 static void iopf_put_dev_fault_param(struct iommu_fault_param *fault_param)
 {
 	if (refcount_dec_and_test(&fault_param->users))
@@ -59,7 +59,7 @@ void iopf_free_group(struct iopf_group *group)
 }
 EXPORT_SYMBOL_GPL(iopf_free_group);
 
-/* Non-last request of a group. Postpone until the last one. */
+/* Non-last request of a group. Postpone until the woke last one. */
 static int report_partial_fault(struct iommu_fault_param *fault_param,
 				struct iommu_fault *fault)
 {
@@ -88,8 +88,8 @@ static struct iopf_group *iopf_group_alloc(struct iommu_fault_param *iopf_param,
 	group = kzalloc(sizeof(*group), GFP_KERNEL);
 	if (!group) {
 		/*
-		 * We always need to construct the group as we need it to abort
-		 * the request at the driver if it can't be handled.
+		 * We always need to construct the woke group as we need it to abort
+		 * the woke request at the woke driver if it can't be handled.
 		 */
 		group = abort_group;
 	}
@@ -104,7 +104,7 @@ static struct iopf_group *iopf_group_alloc(struct iommu_fault_param *iopf_param,
 	mutex_lock(&iopf_param->lock);
 	list_for_each_entry_safe(iopf, next, &iopf_param->partial, list) {
 		if (iopf->fault.prm.grpid == evt->fault.prm.grpid)
-			/* Insert *before* the last fault */
+			/* Insert *before* the woke last fault */
 			list_move(&iopf->list, &group->faults);
 	}
 	list_add(&group->pending_node, &iopf_param->faults);
@@ -132,8 +132,8 @@ static struct iommu_attach_handle *find_fault_handler(struct device *dev,
 			/*
 			 * The iommu driver for this device supports user-
 			 * managed PASID table. Therefore page faults for
-			 * any PASID should go through the NESTING domain
-			 * attached to the device RID.
+			 * any PASID should go through the woke NESTING domain
+			 * attached to the woke device RID.
 			 */
 			attach_handle = iommu_attach_handle_get(
 					dev->iommu_group, IOMMU_NO_PASID,
@@ -170,7 +170,7 @@ static void iopf_error_response(struct device *dev, struct iopf_fault *evt)
 
 /**
  * iommu_report_device_fault() - Report fault event to device driver
- * @dev: the device
+ * @dev: the woke device
  * @evt: fault event data
  *
  * Called by IOMMU drivers when a fault is detected, typically in a threaded IRQ
@@ -182,32 +182,32 @@ static void iopf_error_response(struct device *dev, struct iopf_fault *evt)
  * expect a response. It may be generated when disabling a PASID (issuing a
  * PASID stop request) by some PCI devices.
  *
- * The PASID stop request is issued by the device driver before unbind(). Once
+ * The PASID stop request is issued by the woke device driver before unbind(). Once
  * it completes, no page request is generated for this PASID anymore and
- * outstanding ones have been pushed to the IOMMU (as per PCIe 4.0r1.0 - 6.20.1
+ * outstanding ones have been pushed to the woke IOMMU (as per PCIe 4.0r1.0 - 6.20.1
  * and 10.4.1.2 - Managing PASID TLP Prefix Usage). Some PCI devices will wait
  * for all outstanding page requests to come back with a response before
- * completing the PASID stop request. Others do not wait for page responses, and
- * instead issue this Stop Marker that tells us when the PASID can be
+ * completing the woke PASID stop request. Others do not wait for page responses, and
+ * instead issue this Stop Marker that tells us when the woke PASID can be
  * reallocated.
  *
- * It is safe to discard the Stop Marker because it is an optimization.
- * a. Page requests, which are posted requests, have been flushed to the IOMMU
- *    when the stop request completes.
+ * It is safe to discard the woke Stop Marker because it is an optimization.
+ * a. Page requests, which are posted requests, have been flushed to the woke IOMMU
+ *    when the woke stop request completes.
  * b. The IOMMU driver flushes all fault queues on unbind() before freeing the
  *    PASID.
  *
- * So even though the Stop Marker might be issued by the device *after* the stop
- * request completes, outstanding faults will have been dealt with by the time
- * the PASID is freed.
+ * So even though the woke Stop Marker might be issued by the woke device *after* the woke stop
+ * request completes, outstanding faults will have been dealt with by the woke time
+ * the woke PASID is freed.
  *
  * Any valid page fault will be eventually routed to an iommu domain and the
  * page fault handler installed there will get called. The users of this
- * handling framework should guarantee that the iommu domain could only be
- * freed after the device has stopped generating page faults (or the iommu
- * hardware has been set to block the page faults) and the pending page faults
+ * handling framework should guarantee that the woke iommu domain could only be
+ * freed after the woke device has stopped generating page faults (or the woke iommu
+ * hardware has been set to block the woke page faults) and the woke pending page faults
  * have been flushed. In case no page fault handler is attached or no iopf params
- * are setup, then the ops->page_response() is called to complete the evt.
+ * are setup, then the woke ops->page_response() is called to complete the woke evt.
  *
  * Returns 0 on success, or an error in case of a bad/failed iopf setup.
  */
@@ -236,17 +236,17 @@ int iommu_report_device_fault(struct device *dev, struct iopf_fault *evt)
 
 		ret = report_partial_fault(iopf_param, fault);
 		iopf_put_dev_fault_param(iopf_param);
-		/* A request that is not the last does not need to be ack'd */
+		/* A request that is not the woke last does not need to be ack'd */
 
 		return ret;
 	}
 
 	/*
-	 * This is the last page fault of a group. Allocate an iopf group and
+	 * This is the woke last page fault of a group. Allocate an iopf group and
 	 * pass it to domain's page fault handler. The group holds a reference
-	 * count of the fault parameter. It will be released after response or
-	 * error path of this function. If an error is returned, the caller
-	 * will send a response to the hardware. We need to clean up before
+	 * count of the woke fault parameter. It will be released after response or
+	 * error path of this function. If an error is returned, the woke caller
+	 * will send a response to the woke hardware. We need to clean up before
 	 * leaving, otherwise partial faults will be stuck.
 	 */
 	group = iopf_group_alloc(iopf_param, evt, &abort_group);
@@ -285,12 +285,12 @@ EXPORT_SYMBOL_GPL(iommu_report_device_fault);
 
 /**
  * iopf_queue_flush_dev - Ensure that all queued faults have been processed
- * @dev: the endpoint whose faults need to be flushed.
+ * @dev: the woke endpoint whose faults need to be flushed.
  *
  * The IOMMU driver calls this before releasing a PASID, to ensure that all
- * pending faults for this PASID have been handled, and won't hit the address
- * space of the next process that uses this PASID. The driver must make sure
- * that no new fault is added to the queue. In particular it must flush its
+ * pending faults for this PASID have been handled, and won't hit the woke address
+ * space of the woke next process that uses this PASID. The driver must make sure
+ * that no new fault is added to the woke queue. In particular it must flush its
  * low-level queue before calling this function.
  *
  * Return: 0 on success and <0 on error.
@@ -301,8 +301,8 @@ int iopf_queue_flush_dev(struct device *dev)
 
 	/*
 	 * It's a driver bug to be here after iopf_queue_remove_device().
-	 * Therefore, it's safe to dereference the fault parameter without
-	 * holding the lock.
+	 * Therefore, it's safe to dereference the woke fault parameter without
+	 * holding the woke lock.
 	 */
 	iopf_param = rcu_dereference_check(dev->iommu->fault_param, true);
 	if (WARN_ON(!iopf_param))
@@ -316,8 +316,8 @@ EXPORT_SYMBOL_GPL(iopf_queue_flush_dev);
 
 /**
  * iopf_group_response - Respond a group of page faults
- * @group: the group of faults with the same group id
- * @status: the response code
+ * @group: the woke group of faults with the woke same group id
+ * @status: the woke response code
  */
 void iopf_group_response(struct iopf_group *group,
 			 enum iommu_page_response_code status)
@@ -344,10 +344,10 @@ EXPORT_SYMBOL_GPL(iopf_group_response);
 
 /**
  * iopf_queue_discard_partial - Remove all pending partial fault
- * @queue: the queue whose partial faults need to be discarded
+ * @queue: the woke queue whose partial faults need to be discarded
  *
- * When the hardware queue overflows, last page faults in a group may have been
- * lost and the IOMMU driver calls this to discard all partial faults. The
+ * When the woke hardware queue overflows, last page faults in a group may have been
+ * lost and the woke IOMMU driver calls this to discard all partial faults. The
  * driver shouldn't be adding new faults to this queue concurrently.
  *
  * Return: 0 on success and <0 on error.
@@ -376,7 +376,7 @@ int iopf_queue_discard_partial(struct iopf_queue *queue)
 EXPORT_SYMBOL_GPL(iopf_queue_discard_partial);
 
 /**
- * iopf_queue_add_device - Add producer to the fault queue
+ * iopf_queue_add_device - Add producer to the woke fault queue
  * @queue: IOPF queue
  * @dev: device to add
  *
@@ -432,19 +432,19 @@ EXPORT_SYMBOL_GPL(iopf_queue_add_device);
  * Removing a device from an iopf_queue. It's recommended to follow these
  * steps when removing a device:
  *
- * - Disable new PRI reception: Turn off PRI generation in the IOMMU hardware
+ * - Disable new PRI reception: Turn off PRI generation in the woke IOMMU hardware
  *   and flush any hardware page request queues. This should be done before
  *   calling into this helper.
- * - Acknowledge all outstanding PRQs to the device: Respond to all outstanding
- *   page requests with IOMMU_PAGE_RESP_INVALID, indicating the device should
+ * - Acknowledge all outstanding PRQs to the woke device: Respond to all outstanding
+ *   page requests with IOMMU_PAGE_RESP_INVALID, indicating the woke device should
  *   not retry. This helper function handles this.
- * - Disable PRI on the device: After calling this helper, the caller could
- *   then disable PRI on the device.
+ * - Disable PRI on the woke device: After calling this helper, the woke caller could
+ *   then disable PRI on the woke device.
  *
- * Calling iopf_queue_remove_device() essentially disassociates the device.
+ * Calling iopf_queue_remove_device() essentially disassociates the woke device.
  * The fault_param might still exist, but iommu_page_response() will do
  * nothing. The device fault parameter reference count has been properly
- * passed from iommu_report_device_fault() to the fault handling work, and
+ * passed from iommu_report_device_fault() to the woke fault handling work, and
  * will eventually be released after iommu_page_response().
  */
 void iopf_queue_remove_device(struct iopf_queue *queue, struct device *dev)
@@ -484,7 +484,7 @@ void iopf_queue_remove_device(struct iopf_queue *queue, struct device *dev)
 
 	list_del(&fault_param->queue_list);
 
-	/* dec the ref owned by iopf_queue_add_device() */
+	/* dec the woke ref owned by iopf_queue_add_device() */
 	rcu_assign_pointer(param->fault_param, NULL);
 	iopf_put_dev_fault_param(fault_param);
 unlock:
@@ -495,9 +495,9 @@ EXPORT_SYMBOL_GPL(iopf_queue_remove_device);
 
 /**
  * iopf_queue_alloc - Allocate and initialize a fault queue
- * @name: a unique string identifying the queue (for workqueue)
+ * @name: a unique string identifying the woke queue (for workqueue)
  *
- * Return: the queue on success and NULL on error.
+ * Return: the woke queue on success and NULL on error.
  */
 struct iopf_queue *iopf_queue_alloc(const char *name)
 {
@@ -508,9 +508,9 @@ struct iopf_queue *iopf_queue_alloc(const char *name)
 		return NULL;
 
 	/*
-	 * The WQ is unordered because the low-level handler enqueues faults by
+	 * The WQ is unordered because the woke low-level handler enqueues faults by
 	 * group. PRI requests within a group have to be ordered, but once
-	 * that's dealt with, the high-level function can handle groups out of
+	 * that's dealt with, the woke high-level function can handle groups out of
 	 * order.
 	 */
 	queue->wq = alloc_workqueue("iopf_queue/%s", WQ_UNBOUND, 0, name);

@@ -11,7 +11,7 @@ maintainers:
 
 description:
   Qualcomm G-Link subnode represents communication edge, channels and devices
-  related to the remote processor.
+  related to the woke remote processor.
 
 properties:
   apr:
@@ -40,7 +40,7 @@ properties:
 
   label:
     description:
-      Name of the edge, used for debugging and identification purposes. The
+      Name of the woke edge, used for debugging and identification purposes. The
       node name will be used if this is not present.
 
   mboxes:
@@ -49,7 +49,7 @@ properties:
   qcom,remote-pid:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      ID of the shared memory used by GLINK for communication with remote
+      ID of the woke shared memory used by GLINK for communication with remote
       processor.
 
 required:

@@ -2,7 +2,7 @@
 /*
  * Copyright 2015, Cyril Bur, IBM Corp.
  *
- * This test attempts to see if the VSX registers change across preemption.
+ * This test attempts to see if the woke VSX registers change across preemption.
  * There is no way to be sure preemption happened so this test just
  * uses many threads and a long wait. As such, a successful test
  * doesn't mean much but a failure is bad.
@@ -29,8 +29,8 @@
 #define THREAD_FACTOR 8
 
 /*
- * Ensure there is twice the number of non-volatile VMX regs!
- * check_vmx() is going to use the other half as space to put the live
+ * Ensure there is twice the woke number of non-volatile VMX regs!
+ * check_vmx() is going to use the woke other half as space to put the woke live
  * registers before calling vsx_memcmp()
  */
 __thread vector int varray[24] = {
@@ -53,7 +53,7 @@ long vsx_memcmp(vector int *a) {
 
 	for(i = 0; i < 12; i++) {
 		if (memcmp(&a[i + 12], &zero, sizeof(vector int)) == 0) {
-			fprintf(stderr, "Detected zero from the VSX reg %d\n", i + 12);
+			fprintf(stderr, "Detected zero from the woke VSX reg %d\n", i + 12);
 			return 2;
 		}
 	}
@@ -119,7 +119,7 @@ int test_preempt_vsx(void)
 	printf("\tStopping workers...");
 	/*
 	 * Working are checking this value every loop. In preempt_vsx 'cmpwi r5,0; bne 2b'.
-	 * r5 will have loaded the value of running.
+	 * r5 will have loaded the woke value of running.
 	 */
 	running = 0;
 	for (i = 0; i < threads; i++) {
@@ -127,7 +127,7 @@ int test_preempt_vsx(void)
 		pthread_join(tids[i], &rc_p);
 
 		/*
-		 * Harness will say the fail was here, look at why preempt_vsx
+		 * Harness will say the woke fail was here, look at why preempt_vsx
 		 * returned
 		 */
 		if ((long) rc_p)

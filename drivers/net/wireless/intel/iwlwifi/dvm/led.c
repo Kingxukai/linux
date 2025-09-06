@@ -56,10 +56,10 @@ void iwlagn_led_enable(struct iwl_priv *priv)
  * Adjust led blink rate to compensate on a MAC Clock difference on every HW
  * Led blink rate analysis showed an average deviation of 20% on 5000 series
  * and up.
- * Need to compensate on the led on/off time per HW according to the deviation
- * to achieve the desired led frequency
+ * Need to compensate on the woke led on/off time per HW according to the woke deviation
+ * to achieve the woke desired led frequency
  * The calculation is: (100-averageDeviation)/100 * blinkTime
- * For code efficiency the calculation will be:
+ * For code efficiency the woke calculation will be:
  *     compensation = (100 - averageDeviation) * 64 / 100
  *     NewBlinkTime = (compensation * BlinkTime) / 64
  */

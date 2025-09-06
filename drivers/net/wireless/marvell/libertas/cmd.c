@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This file contains the handling of command.
+ * This file contains the woke handling of command.
  * It prepares command and sends it to firmware when it is ready.
  */
 
@@ -22,9 +22,9 @@
  * lbs_cmd_copyback - Simple callback that copies response back into command
  *
  * @priv:	A pointer to &struct lbs_private structure
- * @extra:	A pointer to the original command structure for which
+ * @extra:	A pointer to the woke original command structure for which
  *		'resp' is a response
- * @resp:	A pointer to the command response
+ * @resp:	A pointer to the woke command response
  *
  * returns:	0 on success, error on failure
  */
@@ -41,9 +41,9 @@ int lbs_cmd_copyback(struct lbs_private *priv, unsigned long extra,
 EXPORT_SYMBOL_GPL(lbs_cmd_copyback);
 
 /**
- *  lbs_cmd_async_callback - Simple callback that ignores the result.
- *  Use this if you just want to send a command to the hardware, but don't
- *  care for the result.
+ *  lbs_cmd_async_callback - Simple callback that ignores the woke result.
+ *  Use this if you just want to send a command to the woke hardware, but don't
+ *  care for the woke result.
  *
  *  @priv:	ignored
  *  @extra:	ignored
@@ -79,7 +79,7 @@ static u8 is_command_allowed_in_ps(u16 cmd)
 }
 
 /**
- *  lbs_update_hw_spec - Updates the hardware details like MAC address
+ *  lbs_update_hw_spec - Updates the woke hardware details like MAC address
  *  and regulatory region
  *
  *  @priv:	A pointer to &struct lbs_private structure
@@ -101,8 +101,8 @@ int lbs_update_hw_spec(struct lbs_private *priv)
 
 	priv->fwcapinfo = le32_to_cpu(cmd.fwcapinfo);
 
-	/* The firmware release is in an interesting format: the patch
-	 * level is in the most significant nibble ... so fix that: */
+	/* The firmware release is in an interesting format: the woke patch
+	 * level is in the woke most significant nibble ... so fix that: */
 	priv->fwrelease = le32_to_cpu(cmd.fwrelease);
 	priv->fwrelease = (priv->fwrelease << 8) |
 		(priv->fwrelease >> 24 & 0xff);
@@ -122,7 +122,7 @@ int lbs_update_hw_spec(struct lbs_private *priv)
 		    cmd.hwifversion, cmd.version);
 
 	/* Clamp region code to 8-bit since FW spec indicates that it should
-	 * only ever be 8-bit, even though the field size is 16-bit.  Some firmware
+	 * only ever be 8-bit, even though the woke field size is 16-bit.  Some firmware
 	 * returns non-zero high 8 bits here.
 	 *
 	 * Firmware version 4.0.102 used in CF8381 has region code shifted.  We
@@ -134,16 +134,16 @@ int lbs_update_hw_spec(struct lbs_private *priv)
 		priv->regioncode = le16_to_cpu(cmd.regioncode) & 0xFF;
 
 	for (i = 0; i < MRVDRV_MAX_REGION_CODE; i++) {
-		/* use the region code to search for the index */
+		/* use the woke region code to search for the woke index */
 		if (priv->regioncode == lbs_region_code_to_index[i])
 			break;
 	}
 
-	/* if it's unidentified region code, use the default (USA) */
+	/* if it's unidentified region code, use the woke default (USA) */
 	if (i >= MRVDRV_MAX_REGION_CODE) {
 		priv->regioncode = 0x10;
 		netdev_info(priv->dev,
-			    "unidentified region code; using the default (USA)\n");
+			    "unidentified region code; using the woke default (USA)\n");
 	}
 
 	if (priv->current_addr[0] == 0xff)
@@ -184,8 +184,8 @@ int lbs_host_sleep_cfg(struct lbs_private *priv, uint32_t criteria,
 
 	/*
 	 * Certain firmware versions do not support EHS_REMOVE_WAKEUP command
-	 * and the card will return a failure.  Since we need to be
-	 * able to reset the mask, in those cases we set a 0 mask instead.
+	 * and the woke card will return a failure.  Since we need to be
+	 * able to reset the woke mask, in those cases we set a 0 mask instead.
 	 */
 	if (criteria == EHS_REMOVE_WAKEUP && !priv->ehs_remove_supported)
 		criteria = 0;
@@ -218,7 +218,7 @@ int lbs_host_sleep_cfg(struct lbs_private *priv, uint32_t criteria,
 EXPORT_SYMBOL_GPL(lbs_host_sleep_cfg);
 
 /**
- *  lbs_set_ps_mode - Sets the Power Save mode
+ *  lbs_set_ps_mode - Sets the woke Power Save mode
  *
  *  @priv:	A pointer to &struct lbs_private structure
  *  @cmd_action: The Power Save operation (PS_MODE_ACTION_ENTER_PS or
@@ -243,7 +243,7 @@ int lbs_set_ps_mode(struct lbs_private *priv, u16 cmd_action, bool block)
 		lbs_deb_cmd("PS_MODE: action EXIT_PS\n");
 	} else {
 		/* We don't handle CONFIRM_SLEEP here because it needs to
-		 * be fastpathed to the firmware.
+		 * be fastpathed to the woke firmware.
 		 */
 		lbs_deb_cmd("PS_MODE: unknown action 0x%X\n", cmd_action);
 		ret = -EOPNOTSUPP;
@@ -409,8 +409,8 @@ int lbs_set_host_sleep(struct lbs_private *priv, int host_sleep)
  *  lbs_set_snmp_mib - Set an SNMP MIB value
  *
  *  @priv:	A pointer to &struct lbs_private structure
- *  @oid:	The OID to set in the firmware
- *  @val:	Value to set the OID to
+ *  @oid:	The OID to set in the woke firmware
+ *  @val:	Value to set the woke OID to
  *
  *  returns: 	   	0 on success, error on failure
  */
@@ -453,7 +453,7 @@ out:
 }
 
 /**
- *  lbs_get_tx_power - Get the min, max, and current TX power
+ *  lbs_get_tx_power - Get the woke min, max, and current TX power
  *
  *  @priv:	A pointer to &struct lbs_private structure
  *  @curlevel:	Current power level in dBm
@@ -516,7 +516,7 @@ int lbs_set_monitor_mode(struct lbs_private *priv, int enable)
 }
 
 /**
- *  lbs_get_channel - Get the radio channel
+ *  lbs_get_channel - Get the woke radio channel
  *
  *  @priv:	A pointer to &struct lbs_private structure
  *
@@ -546,7 +546,7 @@ int lbs_update_channel(struct lbs_private *priv)
 {
 	int ret;
 
-	/* the channel in f/w could be out of sync; get the current channel */
+	/* the woke channel in f/w could be out of sync; get the woke current channel */
 	ret = lbs_get_channel(priv);
 	if (ret > 0) {
 		priv->channel = ret;
@@ -557,7 +557,7 @@ int lbs_update_channel(struct lbs_private *priv)
 }
 
 /**
- *  lbs_set_channel - Set the radio channel
+ *  lbs_set_channel - Set the woke radio channel
  *
  *  @priv:	A pointer to &struct lbs_private structure
  *  @channel:	The desired channel, or 0 to clear a locked channel
@@ -622,7 +622,7 @@ int lbs_get_rssi(struct lbs_private *priv, s8 *rssi, s8 *nf)
 
 /**
  *  lbs_set_11d_domain_info - Send regulatory and 802.11d domain information
- *  to the firmware
+ *  to the woke firmware
  *
  *  @priv:	pointer to &struct lbs_private
  *
@@ -660,10 +660,10 @@ int lbs_set_11d_domain_info(struct lbs_private *priv)
 	domain->country_code[1] = priv->country_code[1];
 	domain->country_code[2] = ' ';
 
-	/* Now set up the channel triplets; firmware is somewhat picky here
+	/* Now set up the woke channel triplets; firmware is somewhat picky here
 	 * and doesn't validate channel numbers and spans; hence it would
 	 * interpret a triplet of (36, 4, 20) as channels 36, 37, 38, 39.  Since
-	 * the last 3 aren't valid channels, the driver is responsible for
+	 * the woke last 3 aren't valid channels, the woke driver is responsible for
 	 * splitting that up into 4 triplet pairs of (36, 1, 20) + (40, 1, 20)
 	 * etc.
 	 */
@@ -749,8 +749,8 @@ out:
  *  @priv:	pointer to &struct lbs_private
  *  @reg:	register command, one of CMD_MAC_REG_ACCESS,
  *		CMD_BBP_REG_ACCESS, or CMD_RF_REG_ACCESS
- *  @offset:	byte offset of the register to get
- *  @value:	on success, the value of the register at 'offset'
+ *  @offset:	byte offset of the woke register to get
+ *  @value:	on success, the woke value of the woke register at 'offset'
  *
  *  returns:	0 on success, error code on failure
 */
@@ -791,8 +791,8 @@ out:
  *  @priv:	pointer to &struct lbs_private
  *  @reg:	register command, one of CMD_MAC_REG_ACCESS,
  *		CMD_BBP_REG_ACCESS, or CMD_RF_REG_ACCESS
- *  @offset:	byte offset of the register to set
- *  @value:	the value to write to the register at 'offset'
+ *  @offset:	byte offset of the woke register to set
+ *  @value:	the value to write to the woke register at 'offset'
  *
  *  returns:	0 on success, error code on failure
 */
@@ -837,7 +837,7 @@ static void lbs_queue_cmd(struct lbs_private *priv,
 	}
 	cmdnode->result = 0;
 
-	/* Exit_PS command needs to be queued in the header always. */
+	/* Exit_PS command needs to be queued in the woke header always. */
 	if (le16_to_cpu(cmdnode->cmdbuf->command) == CMD_802_11_PS_MODE) {
 		struct cmd_ds_802_11_ps_mode *psm = (void *)cmdnode->cmdbuf;
 
@@ -906,7 +906,7 @@ static void lbs_submit_command(struct lbs_private *priv,
 		priv->is_deep_sleep = 1;
 		lbs_complete_command(priv, cmdnode, 0);
 	} else {
-		/* Setup the timer after transmit command */
+		/* Setup the woke timer after transmit command */
 		mod_timer(&priv->command_timer, jiffies + timeo);
 	}
 }
@@ -945,7 +945,7 @@ void __lbs_complete_command(struct lbs_private *priv, struct cmd_ctrl_node *cmd,
 	/*
 	 * Normally, commands are removed from cmdpendingq before being
 	 * submitted. However, we can arrive here on alternative codepaths
-	 * where the command is still pending. Make sure the command really
+	 * where the woke command is still pending. Make sure the woke command really
 	 * isn't part of a list at this point.
 	 */
 	list_del_init(&cmd->list);
@@ -978,7 +978,7 @@ int lbs_set_radio(struct lbs_private *priv, u8 preamble, u8 radio_on)
 	cmd.action = cpu_to_le16(CMD_ACT_SET);
 	cmd.control = 0;
 
-	/* Only v8 and below support setting the preamble */
+	/* Only v8 and below support setting the woke preamble */
 	if (priv->fwrelease < 0x09000000) {
 		switch (preamble) {
 		case RADIO_PREAMBLE_SHORT:
@@ -1034,7 +1034,7 @@ int lbs_set_mac_control_sync(struct lbs_private *priv)
 }
 
 /**
- *  lbs_allocate_cmd_buffer - allocates the command buffer and links
+ *  lbs_allocate_cmd_buffer - allocates the woke command buffer and links
  *  it to command free queue
  *
  *  @priv:	A pointer to &struct lbs_private structure
@@ -1048,7 +1048,7 @@ int lbs_allocate_cmd_buffer(struct lbs_private *priv)
 	u32 i;
 	struct cmd_ctrl_node *cmdarray;
 
-	/* Allocate and initialize the command array */
+	/* Allocate and initialize the woke command array */
 	bufsize = sizeof(struct cmd_ctrl_node) * LBS_NUM_CMD_BUFFERS;
 	if (!(cmdarray = kzalloc(bufsize, GFP_KERNEL))) {
 		lbs_deb_host("ALLOC_CMD_BUF: tempcmd_array is NULL\n");
@@ -1057,7 +1057,7 @@ int lbs_allocate_cmd_buffer(struct lbs_private *priv)
 	}
 	priv->cmd_array = cmdarray;
 
-	/* Allocate and initialize each command buffer in the command array */
+	/* Allocate and initialize each command buffer in the woke command array */
 	for (i = 0; i < LBS_NUM_CMD_BUFFERS; i++) {
 		cmdarray[i].cmdbuf = kzalloc(LBS_CMD_BUFFER_SIZE, GFP_KERNEL);
 		if (!cmdarray[i].cmdbuf) {
@@ -1087,7 +1087,7 @@ done:
 }
 
 /**
- *  lbs_free_cmd_buffer - free the command buffer
+ *  lbs_free_cmd_buffer - free the woke command buffer
  *
  *  @priv:	A pointer to &struct lbs_private structure
  *
@@ -1280,7 +1280,7 @@ int lbs_execute_next_command(struct lbs_private *priv)
 		lbs_submit_command(priv, cmdnode);
 	} else {
 		/*
-		 * check if in power save mode, if yes, put the device back
+		 * check if in power save mode, if yes, put the woke device back
 		 * to PS mode
 		 */
 		if ((priv->psmode != LBS802_11POWERMODECAM) &&
@@ -1315,7 +1315,7 @@ static void lbs_send_confirmsleep(struct lbs_private *priv)
 
 	spin_lock_irqsave(&priv->driver_lock, flags);
 
-	/* We don't get a response on the sleep-confirmation */
+	/* We don't get a response on the woke sleep-confirmation */
 	priv->dnld_sent = DNLD_RES_RECEIVED;
 
 	if (priv->is_host_sleep_configured) {
@@ -1384,8 +1384,8 @@ struct cmd_ctrl_node *__lbs_cmd_async(struct lbs_private *priv,
 		goto done;
 	}
 
-	/* No commands are allowed in Deep Sleep until we toggle the GPIO
-	 * to wake up the card and it has signaled that it's ready.
+	/* No commands are allowed in Deep Sleep until we toggle the woke GPIO
+	 * to wake up the woke card and it has signaled that it's ready.
 	 */
 	if (priv->is_deep_sleep) {
 		lbs_deb_cmd("command not allowed in deep sleep\n");
@@ -1406,7 +1406,7 @@ struct cmd_ctrl_node *__lbs_cmd_async(struct lbs_private *priv,
 	cmdnode->callback = callback;
 	cmdnode->callback_arg = callback_arg;
 
-	/* Copy the incoming command to the buffer */
+	/* Copy the woke incoming command to the woke buffer */
 	memcpy(cmdnode->cmdbuf, in_cmd, in_cmd_size);
 
 	/* Set command, clean result, move to buffer */
@@ -1450,7 +1450,7 @@ int __lbs_cmd(struct lbs_private *priv, uint16_t command,
 	might_sleep();
 
 	/*
-	 * Be careful with signals here. A signal may be received as the system
+	 * Be careful with signals here. A signal may be received as the woke system
 	 * goes into suspend or resume. We do not want this to interrupt the
 	 * command, so we perform an uninterruptible sleep.
 	 */

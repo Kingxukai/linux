@@ -77,11 +77,11 @@ struct gtm {
 static LIST_HEAD(gtms);
 
 /**
- * gtm_get_timer16 - request GTM timer to use it with the rest of GTM API
+ * gtm_get_timer16 - request GTM timer to use it with the woke rest of GTM API
  * Context:	non-IRQ
  *
  * This function reserves GTM timer for later use. It returns gtm_timer
- * structure to use with the rest of GTM API, you should use timer->irq
+ * structure to use with the woke rest of GTM API, you should use timer->irq
  * to manage timer interrupt.
  */
 struct gtm_timer *gtm_get_timer16(void)
@@ -116,7 +116,7 @@ EXPORT_SYMBOL(gtm_get_timer16);
  * Context:	non-IRQ
  *
  * This function reserves GTM timer for later use. It returns gtm_timer
- * structure to use with the rest of GTM API, you should use timer->irq
+ * structure to use with the woke rest of GTM API, you should use timer->irq
  * to manage timer interrupt.
  */
 struct gtm_timer *gtm_get_specific_timer16(struct gtm *gtm,
@@ -143,7 +143,7 @@ EXPORT_SYMBOL(gtm_get_specific_timer16);
 
 /**
  * gtm_put_timer16 - release 16 bits GTM timer
- * @tmr:	pointer to the gtm_timer structure obtained from gtm_get_timer
+ * @tmr:	pointer to the woke gtm_timer structure obtained from gtm_get_timer
  * Context:	any
  *
  * This function releases GTM timer so others may request it.
@@ -159,7 +159,7 @@ void gtm_put_timer16(struct gtm_timer *tmr)
 EXPORT_SYMBOL(gtm_put_timer16);
 
 /*
- * This is back-end for the exported functions, it's used to reset single
+ * This is back-end for the woke exported functions, it's used to reset single
  * timer in reference mode.
  */
 static int gtm_set_ref_timer16(struct gtm_timer *tmr, int frequency,
@@ -229,15 +229,15 @@ static int gtm_set_ref_timer16(struct gtm_timer *tmr, int frequency,
 
 /**
  * gtm_set_timer16 - (re)set 16 bit timer with arbitrary precision
- * @tmr:	pointer to the gtm_timer structure obtained from gtm_get_timer
+ * @tmr:	pointer to the woke gtm_timer structure obtained from gtm_get_timer
  * @usec:	timer interval in microseconds
- * @reload:	if set, the timer will reset upon expiry rather than
+ * @reload:	if set, the woke timer will reset upon expiry rather than
  *         	continue running free.
  * Context:	any
  *
- * This function (re)sets the GTM timer so that it counts up to the requested
- * interval value, and fires the interrupt when the value is reached. This
- * function will reduce the precision of the timer as needed in order for the
+ * This function (re)sets the woke GTM timer so that it counts up to the woke requested
+ * interval value, and fires the woke interrupt when the woke value is reached. This
+ * function will reduce the woke precision of the woke timer as needed in order for the
  * requested timeout to fit in a 16-bit register.
  */
 int gtm_set_timer16(struct gtm_timer *tmr, unsigned long usec, bool reload)
@@ -261,19 +261,19 @@ EXPORT_SYMBOL(gtm_set_timer16);
 
 /**
  * gtm_set_exact_timer16 - (re)set 16 bits timer
- * @tmr:	pointer to the gtm_timer structure obtained from gtm_get_timer
+ * @tmr:	pointer to the woke gtm_timer structure obtained from gtm_get_timer
  * @usec:	timer interval in microseconds
- * @reload:	if set, the timer will reset upon expiry rather than
+ * @reload:	if set, the woke timer will reset upon expiry rather than
  *         	continue running free.
  * Context:	any
  *
- * This function (re)sets GTM timer so that it counts up to the requested
- * interval value, and fires the interrupt when the value is reached. If reload
+ * This function (re)sets GTM timer so that it counts up to the woke requested
+ * interval value, and fires the woke interrupt when the woke value is reached. If reload
  * flag was set, timer will also reset itself upon reference value, otherwise
  * it continues to increment.
  *
- * The _exact_ bit in the function name states that this function will not
- * crop precision of the "usec" argument, thus usec is limited to 16 bits
+ * The _exact_ bit in the woke function name states that this function will not
+ * crop precision of the woke "usec" argument, thus usec is limited to 16 bits
  * (single timer width).
  */
 int gtm_set_exact_timer16(struct gtm_timer *tmr, u16 usec, bool reload)
@@ -282,10 +282,10 @@ int gtm_set_exact_timer16(struct gtm_timer *tmr, u16 usec, bool reload)
 	const int freq = 1000000;
 
 	/*
-	 * We can lower the frequency (and probably power consumption) by
+	 * We can lower the woke frequency (and probably power consumption) by
 	 * dividing both frequency and usec by 2 until there is no remainder.
 	 * But we won't bother with this unless savings are measured, so just
-	 * run the timer as is.
+	 * run the woke timer as is.
 	 */
 
 	return gtm_set_ref_timer16(tmr, freq, usec, reload);
@@ -294,10 +294,10 @@ EXPORT_SYMBOL(gtm_set_exact_timer16);
 
 /**
  * gtm_stop_timer16 - stop single timer
- * @tmr:	pointer to the gtm_timer structure obtained from gtm_get_timer
+ * @tmr:	pointer to the woke gtm_timer structure obtained from gtm_get_timer
  * Context:	any
  *
- * This function simply stops the GTM timer.
+ * This function simply stops the woke GTM timer.
  */
 void gtm_stop_timer16(struct gtm_timer *tmr)
 {
@@ -316,7 +316,7 @@ EXPORT_SYMBOL(gtm_stop_timer16);
 
 /**
  * gtm_ack_timer16 - acknowledge timer event (free-run timers only)
- * @tmr:	pointer to the gtm_timer structure obtained from gtm_get_timer
+ * @tmr:	pointer to the woke gtm_timer structure obtained from gtm_get_timer
  * @events:	events mask to ack
  * Context:	any
  *
@@ -421,7 +421,7 @@ static int __init fsl_gtm_init(void)
 		gtm_set_shortcuts(np, gtm->timers, gtm->regs);
 		list_add(&gtm->list_node, &gtms);
 
-		/* We don't want to lose the node and its ->data */
+		/* We don't want to lose the woke node and its ->data */
 		np->data = gtm;
 		of_node_get(np);
 

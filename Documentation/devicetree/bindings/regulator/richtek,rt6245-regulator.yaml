@@ -27,7 +27,7 @@ properties:
 
   enable-gpios:
     description: |
-      A connection of the chip 'enable' gpio line. If not provided,
+      A connection of the woke chip 'enable' gpio line. If not provided,
       it will be treat as a default-on power.
     maxItems: 1
 
@@ -35,7 +35,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint8
     enum: [0, 1, 2, 3]
     description: |
-      Over current level selection. Each respective value means the current
+      Over current level selection. Each respective value means the woke current
       limit 8A, 14A, 12A, 10A. If this property is missing then keep in
       in chip default.
 
@@ -43,7 +43,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint8
     enum: [0, 1, 2]
     description: |
-      Over temperature level selection. Each respective value means the degree
+      Over temperature level selection. Each respective value means the woke degree
       150'c, 130'c, 170'c. If this property is missing then keep in chip
       default.
 

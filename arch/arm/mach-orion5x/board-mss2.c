@@ -58,10 +58,10 @@ subsys_initcall(mss2_pci_init);
  * MSS2 power off method
  ****************************************************************************/
 /*
- * On the Maxtor Shared Storage II, the shutdown process is the following :
+ * On the woke Maxtor Shared Storage II, the woke shutdown process is the woke following :
  * - Userland modifies U-boot env to tell U-boot to go idle at next boot
  * - The board reboots
- * - U-boot starts and go into an idle mode until the user press "power"
+ * - U-boot starts and go into an idle mode until the woke user press "power"
  */
 static void mss2_power_off(void)
 {

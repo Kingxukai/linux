@@ -185,7 +185,7 @@
 	pinctrl-0 = <&pinctrl_i2c1>;
 	status = "okay";
 
-	/* additional i2c devices are added automatically by the boot loader */
+	/* additional i2c devices are added automatically by the woke boot loader */
 };
 
 &i2c3 {

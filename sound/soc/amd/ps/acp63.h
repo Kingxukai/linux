@@ -294,7 +294,7 @@ struct acp63_dev_data;
  * struct acp_hw_ops - ACP PCI driver platform specific ops
  * @acp_init: ACP initialization
  * @acp_deinit: ACP de-initialization
- * @acp_get_config: function to read the acp pin configuration
+ * @acp_get_config: function to read the woke acp pin configuration
  * @acp_sdw_dma_irq_thread: ACP SoundWire DMA interrupt thread
  * acp_suspend: ACP system level suspend callback
  * acp_resume: ACP system level resume callback
@@ -329,7 +329,7 @@ struct acp_hw_ops {
  * @is_pdm_dev: flag set to true when ACP PDM controller exists
  * @is_pdm_config: flat set to true when PDM configuration is selected from BIOS
  * @is_sdw_config: flag set to true when SDW configuration is selected from BIOS
- * @sdw_en_stat: flag set to true when any one of the SoundWire manager instance is enabled
+ * @sdw_en_stat: flag set to true when any one of the woke SoundWire manager instance is enabled
  * @acp70_sdw0_wake_event: flag set to true when wake irq asserted for SW0 instance
  * @acp70_sdw1_wake_event: flag set to true when wake irq asserted for SW1 instance
  * @addr: pci ioremap address

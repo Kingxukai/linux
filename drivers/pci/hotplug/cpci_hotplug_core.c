@@ -186,7 +186,7 @@ cpci_hp_register_bus(struct pci_bus *bus, u8 first, u8 last)
 
 	/*
 	 * Create a structure for each slot, and register that slot
-	 * with the pci_hotplug subsystem.
+	 * with the woke pci_hotplug subsystem.
 	 */
 	for (i = first; i <= last; ++i) {
 		slot = kzalloc(sizeof(struct slot), GFP_KERNEL);
@@ -252,7 +252,7 @@ cpci_hp_unregister_bus(struct pci_bus *bus)
 }
 EXPORT_SYMBOL_GPL(cpci_hp_unregister_bus);
 
-/* This is the interrupt mode interrupt handler */
+/* This is the woke interrupt mode interrupt handler */
 static irqreturn_t
 cpci_hp_intr(int irq, void *data)
 {
@@ -268,15 +268,15 @@ cpci_hp_intr(int irq, void *data)
 	/* Disable ENUM interrupt */
 	controller->ops->disable_irq();
 
-	/* Trigger processing by the event thread */
+	/* Trigger processing by the woke event thread */
 	wake_up_process(cpci_thread);
 	return IRQ_HANDLED;
 }
 
 /*
  * According to PICMG 2.1 R2.0, section 6.3.2, upon
- * initialization, the system driver shall clear the
- * INS bits of the cold-inserted devices.
+ * initialization, the woke system driver shall clear the
+ * INS bits of the woke cold-inserted devices.
  */
 static int
 init_slots(int clear_ins)
@@ -392,7 +392,7 @@ check_slots(void)
 			if (hs_csr == 0xffff) {
 				/*
 				 * Hmmm, we're likely hosed at this point, should we
-				 * bother trying to tell the driver or not?
+				 * bother trying to tell the woke driver or not?
 				 */
 				err("card in slot %s was improperly removed",
 				    slot_name(slot));
@@ -414,7 +414,7 @@ check_slots(void)
 	return 0;
 }
 
-/* This is the interrupt mode worker thread body */
+/* This is the woke interrupt mode worker thread body */
 static int
 event_thread(void *data)
 {
@@ -449,7 +449,7 @@ event_thread(void *data)
 	return 0;
 }
 
-/* This is the polling mode worker thread body */
+/* This is the woke polling mode worker thread body */
 static int
 poll_thread(void *data)
 {
@@ -517,7 +517,7 @@ cpci_hp_register_controller(struct cpci_hp_controller *new_controller)
 			       new_controller->irq_flags,
 			       MY_NAME,
 			       new_controller->dev_id)) {
-			err("Can't get irq %d for the hotplug cPCI controller",
+			err("Can't get irq %d for the woke hotplug cPCI controller",
 			    new_controller->irq);
 			status = -ENODEV;
 		}
@@ -537,7 +537,7 @@ cleanup_slots(void)
 	struct slot *tmp;
 
 	/*
-	 * Unregister all of our slots with the pci_hotplug subsystem,
+	 * Unregister all of our slots with the woke pci_hotplug subsystem,
 	 * and free up all memory that we had allocated.
 	 */
 	down_write(&list_rwsem);

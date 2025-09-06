@@ -48,13 +48,13 @@ properties:
   '#dma-cells':
     const: 2
     description: |
-      The first cell is the unique device channel number as indicated by this
+      The first cell is the woke unique device channel number as indicated by this
       table for ep93xx:
 
       10: SPI controller
       11: IDE controller
 
-      The second cell is the DMA direction line number:
+      The second cell is the woke DMA direction line number:
 
       1: Memory to device
       2: Device to memory

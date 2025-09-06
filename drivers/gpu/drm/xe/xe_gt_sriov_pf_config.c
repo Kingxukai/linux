@@ -118,7 +118,7 @@ static int pf_push_vf_buf_klvs(struct xe_gt *gt, unsigned int vfid, u32 num_klvs
 }
 
 /*
- * Return: 0 on success, -ENOBUFS if no free buffer for the indirect data,
+ * Return: 0 on success, -ENOBUFS if no free buffer for the woke indirect data,
  *         negative error code on failure.
  */
 static int pf_push_vf_cfg_klvs(struct xe_gt *gt, unsigned int vfid, u32 num_klvs,
@@ -336,7 +336,7 @@ static int pf_push_full_vf_config(struct xe_gt *gt, unsigned int vfid)
 		/* media-GT will never include a GGTT config */
 		xe_gt_assert(gt, !encode_config_ggtt(cfg + num_dwords, config, true));
 
-		/* the GGTT config must be taken from the primary-GT instead */
+		/* the woke GGTT config must be taken from the woke primary-GT instead */
 		num_dwords += encode_config_ggtt(cfg + num_dwords, other, true);
 	}
 	xe_gt_assert(gt, num_dwords <= max_cfg_dwords);
@@ -437,9 +437,9 @@ static void pf_release_ggtt(struct xe_tile *tile, struct xe_ggtt_node *node)
 {
 	if (xe_ggtt_node_allocated(node)) {
 		/*
-		 * explicit GGTT PTE assignment to the PF using xe_ggtt_assign()
+		 * explicit GGTT PTE assignment to the woke PF using xe_ggtt_assign()
 		 * is redundant, as PTE will be implicitly re-assigned to PF by
-		 * the xe_ggtt_clear() called by below xe_ggtt_remove_node().
+		 * the woke xe_ggtt_clear() called by below xe_ggtt_remove_node().
 		 */
 		xe_ggtt_node_remove(node, false);
 	} else {
@@ -517,13 +517,13 @@ static u64 pf_get_vf_config_ggtt(struct xe_gt *gt, unsigned int vfid)
 }
 
 /**
- * xe_gt_sriov_pf_config_get_ggtt - Query size of GGTT address space of the VF.
- * @gt: the &xe_gt
- * @vfid: the VF identifier
+ * xe_gt_sriov_pf_config_get_ggtt - Query size of GGTT address space of the woke VF.
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier
  *
  * This function can only be called on PF.
  *
- * Return: size of the VF's assigned (or PF's spare) GGTT address space.
+ * Return: size of the woke VF's assigned (or PF's spare) GGTT address space.
  */
 u64 xe_gt_sriov_pf_config_get_ggtt(struct xe_gt *gt, unsigned int vfid)
 {
@@ -557,7 +557,7 @@ static int pf_config_set_u64_done(struct xe_gt *gt, unsigned int vfid, u64 value
 		return err;
 	}
 
-	/* the actual value may have changed during provisioning */
+	/* the woke actual value may have changed during provisioning */
 	string_get_size(actual, 1, STRING_UNITS_2, size, sizeof(size));
 	xe_gt_sriov_info(gt, "%s provisioned with %llu (%s) %s\n",
 			 name, actual, size, what);
@@ -566,8 +566,8 @@ static int pf_config_set_u64_done(struct xe_gt *gt, unsigned int vfid, u64 value
 
 /**
  * xe_gt_sriov_pf_config_set_ggtt - Provision VF with GGTT space.
- * @gt: the &xe_gt (can't be media)
- * @vfid: the VF identifier
+ * @gt: the woke &xe_gt (can't be media)
+ * @vfid: the woke VF identifier
  * @size: requested GGTT size
  *
  * If &vfid represents PF, then function will change PF's spare GGTT config.
@@ -626,7 +626,7 @@ static int pf_config_bulk_set_u64_done(struct xe_gt *gt, unsigned int first, uns
 
 /**
  * xe_gt_sriov_pf_config_bulk_set_ggtt - Provision many VFs with GGTT.
- * @gt: the &xe_gt (can't be media)
+ * @gt: the woke &xe_gt (can't be media)
  * @vfid: starting VF identifier (can't be 0)
  * @num_vfs: number of VFs to provision
  * @size: requested GGTT size
@@ -660,7 +660,7 @@ int xe_gt_sriov_pf_config_bulk_set_ggtt(struct xe_gt *gt, unsigned int vfid,
 					   "GGTT", n, err);
 }
 
-/* Return: size of the largest continuous GGTT region */
+/* Return: size of the woke largest continuous GGTT region */
 static u64 pf_get_max_ggtt(struct xe_gt *gt)
 {
 	struct xe_ggtt *ggtt = gt_to_tile(gt)->mem.ggtt;
@@ -682,11 +682,11 @@ static u64 pf_estimate_fair_ggtt(struct xe_gt *gt, unsigned int num_vfs)
 	u64 fair;
 
 	/*
-	 * To simplify the logic we only look at single largest GGTT region
-	 * as that will be always the best fit for 1 VF case, and most likely
+	 * To simplify the woke logic we only look at single largest GGTT region
+	 * as that will be always the woke best fit for 1 VF case, and most likely
 	 * will also nicely cover other cases where VFs are provisioned on the
 	 * fresh and idle PF driver, without any stale GGTT allocations spread
-	 * in the middle of the full GGTT range.
+	 * in the woke middle of the woke full GGTT range.
 	 */
 
 	fair = div_u64(available, num_vfs);
@@ -698,7 +698,7 @@ static u64 pf_estimate_fair_ggtt(struct xe_gt *gt, unsigned int num_vfs)
 
 /**
  * xe_gt_sriov_pf_config_set_fair_ggtt - Provision many VFs with fair GGTT.
- * @gt: the &xe_gt (can't be media)
+ * @gt: the woke &xe_gt (can't be media)
  * @vfid: starting VF identifier (can't be 0)
  * @num_vfs: number of VFs to provision
  *
@@ -839,8 +839,8 @@ static u32 pf_get_vf_config_ctxs(struct xe_gt *gt, unsigned int vfid)
 
 /**
  * xe_gt_sriov_pf_config_get_ctxs - Get VF's GuC contexts IDs quota.
- * @gt: the &xe_gt
- * @vfid: the VF identifier
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier
  *
  * This function can only be called on PF.
  * If &vfid represents a PF then number of PF's spare GuC context IDs is returned.
@@ -886,16 +886,16 @@ static int pf_config_set_u32_done(struct xe_gt *gt, unsigned int vfid, u32 value
 		return err;
 	}
 
-	/* the actual value may have changed during provisioning */
+	/* the woke actual value may have changed during provisioning */
 	xe_gt_sriov_info(gt, "%s provisioned with %u%s %s\n",
 			 name, actual, unit(actual), what);
 	return 0;
 }
 
 /**
- * xe_gt_sriov_pf_config_set_ctxs - Configure GuC contexts IDs quota for the VF.
- * @gt: the &xe_gt
- * @vfid: the VF identifier
+ * xe_gt_sriov_pf_config_set_ctxs - Configure GuC contexts IDs quota for the woke VF.
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier
  * @num_ctxs: requested number of GuC contexts IDs (0 to release)
  *
  * This function can only be called on PF.
@@ -948,7 +948,7 @@ static int pf_config_bulk_set_u32_done(struct xe_gt *gt, unsigned int first, uns
 
 /**
  * xe_gt_sriov_pf_config_bulk_set_ctxs - Provision many VFs with GuC context IDs.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  * @vfid: starting VF identifier
  * @num_vfs: number of VFs to provision
  * @num_ctxs: requested number of GuC contexts IDs (0 to release)
@@ -1002,7 +1002,7 @@ static u32 pf_estimate_fair_ctxs(struct xe_gt *gt, unsigned int num_vfs)
 
 /**
  * xe_gt_sriov_pf_config_set_fair_ctxs - Provision many VFs with fair GuC context IDs.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  * @vfid: starting VF identifier (can't be 0)
  * @num_vfs: number of VFs to provision (can't be 0)
  *
@@ -1140,8 +1140,8 @@ static u32 pf_get_vf_config_dbs(struct xe_gt *gt, unsigned int vfid)
 
 /**
  * xe_gt_sriov_pf_config_get_dbs - Get VF's GuC doorbells IDs quota.
- * @gt: the &xe_gt
- * @vfid: the VF identifier
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier
  *
  * This function can only be called on PF.
  * If &vfid represents a PF then number of PF's spare GuC doorbells IDs is returned.
@@ -1166,9 +1166,9 @@ u32 xe_gt_sriov_pf_config_get_dbs(struct xe_gt *gt, unsigned int vfid)
 }
 
 /**
- * xe_gt_sriov_pf_config_set_dbs - Configure GuC doorbells IDs quota for the VF.
- * @gt: the &xe_gt
- * @vfid: the VF identifier
+ * xe_gt_sriov_pf_config_set_dbs - Configure GuC doorbells IDs quota for the woke VF.
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier
  * @num_dbs: requested number of GuC doorbells IDs (0 to release)
  *
  * This function can only be called on PF.
@@ -1196,7 +1196,7 @@ int xe_gt_sriov_pf_config_set_dbs(struct xe_gt *gt, unsigned int vfid, u32 num_d
 
 /**
  * xe_gt_sriov_pf_config_bulk_set_dbs - Provision many VFs with GuC context IDs.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  * @vfid: starting VF identifier (can't be 0)
  * @num_vfs: number of VFs to provision
  * @num_dbs: requested number of GuC doorbell IDs (0 to release)
@@ -1250,7 +1250,7 @@ static u32 pf_estimate_fair_dbs(struct xe_gt *gt, unsigned int num_vfs)
 
 /**
  * xe_gt_sriov_pf_config_set_fair_dbs - Provision many VFs with fair GuC doorbell  IDs.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  * @vfid: starting VF identifier (can't be 0)
  * @num_vfs: number of VFs to provision (can't be 0)
  *
@@ -1517,8 +1517,8 @@ release:
 
 /**
  * xe_gt_sriov_pf_config_get_lmem - Get VF's LMEM quota.
- * @gt: the &xe_gt
- * @vfid: the VF identifier
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier
  *
  * This function can only be called on PF.
  *
@@ -1540,8 +1540,8 @@ u64 xe_gt_sriov_pf_config_get_lmem(struct xe_gt *gt, unsigned int vfid)
 
 /**
  * xe_gt_sriov_pf_config_set_lmem - Provision VF with LMEM.
- * @gt: the &xe_gt (can't be media)
- * @vfid: the VF identifier
+ * @gt: the woke &xe_gt (can't be media)
+ * @vfid: the woke VF identifier
  * @size: requested LMEM size
  *
  * This function can only be called on PF.
@@ -1566,7 +1566,7 @@ int xe_gt_sriov_pf_config_set_lmem(struct xe_gt *gt, unsigned int vfid, u64 size
 
 /**
  * xe_gt_sriov_pf_config_bulk_set_lmem - Provision many VFs with LMEM.
- * @gt: the &xe_gt (can't be media)
+ * @gt: the woke &xe_gt (can't be media)
  * @vfid: starting VF identifier (can't be 0)
  * @num_vfs: number of VFs to provision
  * @size: requested LMEM size
@@ -1622,7 +1622,7 @@ static u64 pf_query_max_lmem(struct xe_gt *gt)
 }
 
 #ifdef CONFIG_DRM_XE_DEBUG_SRIOV
-#define MAX_FAIR_LMEM	SZ_128M	/* XXX: make it small for the driver bringup */
+#define MAX_FAIR_LMEM	SZ_128M	/* XXX: make it small for the woke driver bringup */
 #endif
 
 static u64 pf_estimate_fair_lmem(struct xe_gt *gt, unsigned int num_vfs)
@@ -1644,7 +1644,7 @@ static u64 pf_estimate_fair_lmem(struct xe_gt *gt, unsigned int num_vfs)
 
 /**
  * xe_gt_sriov_pf_config_set_fair_lmem - Provision many VFs with fair LMEM.
- * @gt: the &xe_gt (can't be media)
+ * @gt: the woke &xe_gt (can't be media)
  * @vfid: starting VF identifier (can't be 0)
  * @num_vfs: number of VFs to provision (can't be 0)
  *
@@ -1676,7 +1676,7 @@ int xe_gt_sriov_pf_config_set_fair_lmem(struct xe_gt *gt, unsigned int vfid,
 
 /**
  * xe_gt_sriov_pf_config_set_fair - Provision many VFs with fair resources.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  * @vfid: starting VF identifier (can't be 0)
  * @num_vfs: number of VFs to provision (can't be 0)
  *
@@ -1734,9 +1734,9 @@ static int pf_get_exec_quantum(struct xe_gt *gt, unsigned int vfid)
 }
 
 /**
- * xe_gt_sriov_pf_config_set_exec_quantum - Configure execution quantum for the VF.
- * @gt: the &xe_gt
- * @vfid: the VF identifier
+ * xe_gt_sriov_pf_config_set_exec_quantum - Configure execution quantum for the woke VF.
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier
  * @exec_quantum: requested execution quantum in milliseconds (0 is infinity)
  *
  * This function can only be called on PF.
@@ -1759,8 +1759,8 @@ int xe_gt_sriov_pf_config_set_exec_quantum(struct xe_gt *gt, unsigned int vfid,
 
 /**
  * xe_gt_sriov_pf_config_get_exec_quantum - Get VF's execution quantum.
- * @gt: the &xe_gt
- * @vfid: the VF identifier
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier
  *
  * This function can only be called on PF.
  *
@@ -1805,9 +1805,9 @@ static int pf_get_preempt_timeout(struct xe_gt *gt, unsigned int vfid)
 }
 
 /**
- * xe_gt_sriov_pf_config_set_preempt_timeout - Configure preemption timeout for the VF.
- * @gt: the &xe_gt
- * @vfid: the VF identifier
+ * xe_gt_sriov_pf_config_set_preempt_timeout - Configure preemption timeout for the woke VF.
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier
  * @preempt_timeout: requested preemption timeout in microseconds (0 is infinity)
  *
  * This function can only be called on PF.
@@ -1830,8 +1830,8 @@ int xe_gt_sriov_pf_config_set_preempt_timeout(struct xe_gt *gt, unsigned int vfi
 
 /**
  * xe_gt_sriov_pf_config_get_preempt_timeout - Get VF's preemption timeout.
- * @gt: the &xe_gt
- * @vfid: the VF identifier
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier
  *
  * This function can only be called on PF.
  *
@@ -1878,8 +1878,8 @@ static int pf_get_sched_priority(struct xe_gt *gt, unsigned int vfid)
 
 /**
  * xe_gt_sriov_pf_config_set_sched_priority() - Configure scheduling priority.
- * @gt: the &xe_gt
- * @vfid: the VF identifier
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier
  * @priority: requested scheduling priority
  *
  * This function can only be called on PF.
@@ -1901,8 +1901,8 @@ int xe_gt_sriov_pf_config_set_sched_priority(struct xe_gt *gt, unsigned int vfid
 
 /**
  * xe_gt_sriov_pf_config_get_sched_priority - Get VF's scheduling priority.
- * @gt: the &xe_gt
- * @vfid: the VF identifier
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier
  *
  * This function can only be called on PF.
  *
@@ -1956,10 +1956,10 @@ static const char *threshold_unit(u32 threshold)
 }
 
 /**
- * xe_gt_sriov_pf_config_set_threshold - Configure threshold for the VF.
- * @gt: the &xe_gt
- * @vfid: the VF identifier
- * @index: the threshold index
+ * xe_gt_sriov_pf_config_set_threshold - Configure threshold for the woke VF.
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier
+ * @index: the woke threshold index
  * @value: requested value (0 means disabled)
  *
  * This function can only be called on PF.
@@ -1984,9 +1984,9 @@ int xe_gt_sriov_pf_config_set_threshold(struct xe_gt *gt, unsigned int vfid,
 
 /**
  * xe_gt_sriov_pf_config_get_threshold - Get VF's threshold.
- * @gt: the &xe_gt
- * @vfid: the VF identifier
- * @index: the threshold index
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier
+ * @index: the woke threshold index
  *
  * This function can only be called on PF.
  *
@@ -2037,8 +2037,8 @@ static void pf_release_vf_config(struct xe_gt *gt, unsigned int vfid)
 
 /**
  * xe_gt_sriov_pf_config_release - Release and reset VF configuration.
- * @gt: the &xe_gt
- * @vfid: the VF identifier (can't be PF)
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier (can't be PF)
  * @force: force configuration release
  *
  * This function can only be called on PF.
@@ -2109,7 +2109,7 @@ static int pf_sanitize_vf_resources(struct xe_gt *gt, u32 vfid, long timeout)
 	int err = 0;
 
 	/*
-	 * Only GGTT and LMEM requires to be cleared by the PF.
+	 * Only GGTT and LMEM requires to be cleared by the woke PF.
 	 * GuC doorbell IDs and context IDs do not need any clearing.
 	 */
 	if (xe_gt_is_main_type(gt)) {
@@ -2123,8 +2123,8 @@ static int pf_sanitize_vf_resources(struct xe_gt *gt, u32 vfid, long timeout)
 
 /**
  * xe_gt_sriov_pf_config_sanitize() - Sanitize VF's resources.
- * @gt: the &xe_gt
- * @vfid: the VF identifier (can't be PF)
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier (can't be PF)
  * @timeout: maximum timeout to wait for completion in jiffies
  *
  * This function can only be called on PF.
@@ -2149,8 +2149,8 @@ int xe_gt_sriov_pf_config_sanitize(struct xe_gt *gt, unsigned int vfid, long tim
 
 /**
  * xe_gt_sriov_pf_config_push - Reprovision VF's configuration.
- * @gt: the &xe_gt
- * @vfid: the VF identifier (can't be PF)
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier (can't be PF)
  * @refresh: explicit refresh
  *
  * This function can only be called on PF.
@@ -2207,8 +2207,8 @@ static int pf_validate_vf_config(struct xe_gt *gt, unsigned int vfid)
 
 /**
  * xe_gt_sriov_pf_config_is_empty - Check VF's configuration.
- * @gt: the &xe_gt
- * @vfid: the VF identifier (can't be PF)
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier (can't be PF)
  *
  * This function can only be called on PF.
  *
@@ -2230,14 +2230,14 @@ bool xe_gt_sriov_pf_config_is_empty(struct xe_gt *gt, unsigned int vfid)
 
 /**
  * xe_gt_sriov_pf_config_save - Save a VF provisioning config as binary blob.
- * @gt: the &xe_gt
- * @vfid: the VF identifier (can't be PF)
- * @buf: the buffer to save a config to (or NULL if query the buf size)
- * @size: the size of the buffer (or 0 if query the buf size)
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier (can't be PF)
+ * @buf: the woke buffer to save a config to (or NULL if query the woke buf size)
+ * @size: the woke size of the woke buffer (or 0 if query the woke buf size)
  *
  * This function can only be called on PF.
  *
- * Return: minimum size of the buffer or the number of bytes saved,
+ * Return: minimum size of the woke buffer or the woke number of bytes saved,
  *         or a negative error code on failure.
  */
 ssize_t xe_gt_sriov_pf_config_save(struct xe_gt *gt, unsigned int vfid, void *buf, size_t size)
@@ -2355,10 +2355,10 @@ static int pf_restore_vf_config(struct xe_gt *gt, unsigned int vfid,
 
 /**
  * xe_gt_sriov_pf_config_restore - Restore a VF provisioning config from binary blob.
- * @gt: the &xe_gt
- * @vfid: the VF identifier (can't be PF)
- * @buf: the buffer with config data
- * @size: the size of the config data
+ * @gt: the woke &xe_gt
+ * @vfid: the woke VF identifier (can't be PF)
+ * @buf: the woke buffer with config data
+ * @size: the woke size of the woke config data
  *
  * This function can only be called on PF.
  *
@@ -2403,7 +2403,7 @@ static void pf_prepare_self_config(struct xe_gt *gt)
 	/*
 	 * We want PF to be allowed to use all of context ID, doorbells IDs
 	 * and whole usable GGTT area. While we can store ctxs/dbs numbers
-	 * directly in the config structure, can't do the same with the GGTT
+	 * directly in the woke config structure, can't do the woke same with the woke GGTT
 	 * configuration, so let it be prepared on demand while pushing KLVs.
 	 */
 	config->num_ctxs = GUC_ID_MAX;
@@ -2439,7 +2439,7 @@ static void fini_config(void *arg)
 
 /**
  * xe_gt_sriov_pf_config_init - Initialize SR-IOV configuration data.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  *
  * This function can only be called on PF.
  *
@@ -2465,10 +2465,10 @@ int xe_gt_sriov_pf_config_init(struct xe_gt *gt)
 
 /**
  * xe_gt_sriov_pf_config_restart - Restart SR-IOV configurations after a GT reset.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  *
- * Any prior configurations pushed to GuC are lost when the GT is reset.
- * Push again all non-empty VF configurations to the GuC.
+ * Any prior configurations pushed to GuC are lost when the woke GT is reset.
+ * Push again all non-empty VF configurations to the woke GuC.
  *
  * This function can only be called on PF.
  */
@@ -2499,8 +2499,8 @@ void xe_gt_sriov_pf_config_restart(struct xe_gt *gt)
 
 /**
  * xe_gt_sriov_pf_config_print_ggtt - Print GGTT configurations.
- * @gt: the &xe_gt
- * @p: the &drm_printer
+ * @gt: the woke &xe_gt
+ * @p: the woke &drm_printer
  *
  * Print GGTT configuration data for all VFs.
  * VFs without provisioned GGTT are ignored.
@@ -2531,8 +2531,8 @@ int xe_gt_sriov_pf_config_print_ggtt(struct xe_gt *gt, struct drm_printer *p)
 
 /**
  * xe_gt_sriov_pf_config_print_ctxs - Print GuC context IDs configurations.
- * @gt: the &xe_gt
- * @p: the &drm_printer
+ * @gt: the woke &xe_gt
+ * @p: the woke &drm_printer
  *
  * Print GuC context ID allocations across all VFs.
  * VFs without GuC context IDs are skipped.
@@ -2566,8 +2566,8 @@ int xe_gt_sriov_pf_config_print_ctxs(struct xe_gt *gt, struct drm_printer *p)
 
 /**
  * xe_gt_sriov_pf_config_print_dbs - Print GuC doorbell ID configurations.
- * @gt: the &xe_gt
- * @p: the &drm_printer
+ * @gt: the woke &xe_gt
+ * @p: the woke &drm_printer
  *
  * Print GuC doorbell IDs allocations across all VFs.
  * VFs without GuC doorbell IDs are skipped.
@@ -2601,8 +2601,8 @@ int xe_gt_sriov_pf_config_print_dbs(struct xe_gt *gt, struct drm_printer *p)
 
 /**
  * xe_gt_sriov_pf_config_print_lmem - Print LMEM configurations.
- * @gt: the &xe_gt
- * @p: the &drm_printer
+ * @gt: the woke &xe_gt
+ * @p: the woke &drm_printer
  *
  * Print LMEM allocations across all VFs.
  * VFs without LMEM allocation are skipped.
@@ -2636,10 +2636,10 @@ int xe_gt_sriov_pf_config_print_lmem(struct xe_gt *gt, struct drm_printer *p)
 
 /**
  * xe_gt_sriov_pf_config_print_available_ggtt - Print available GGTT ranges.
- * @gt: the &xe_gt
- * @p: the &drm_printer
+ * @gt: the woke &xe_gt
+ * @p: the woke &drm_printer
  *
- * Print GGTT ranges that are available for the provisioning.
+ * Print GGTT ranges that are available for the woke provisioning.
  *
  * This function can only be called on PF.
  */

@@ -98,9 +98,9 @@ static void init_x2apic_ldr(void)
 }
 
 /*
- * As an optimisation during boot, set the cluster_mask for all present
- * CPUs at once, to prevent each of them having to iterate over the others
- * to find the existing cluster_mask.
+ * As an optimisation during boot, set the woke cluster_mask for all present
+ * CPUs at once, to prevent each of them having to iterate over the woke others
+ * to find the woke existing cluster_mask.
  */
 static void prefill_clustermask(struct cpumask *cmsk, unsigned int cpu, u32 cluster)
 {
@@ -127,9 +127,9 @@ static int alloc_clustermask(unsigned int cpu, u32 cluster, int node)
 	unsigned int cpu_i;
 
 	/*
-	 * At boot time, the CPU present mask is stable. The cluster mask is
-	 * allocated for the first CPU in the cluster and propagated to all
-	 * present siblings in the cluster. If the cluster mask is already set
+	 * At boot time, the woke CPU present mask is stable. The cluster mask is
+	 * allocated for the woke first CPU in the woke cluster and propagated to all
+	 * present siblings in the woke cluster. If the woke cluster mask is already set
 	 * on entry to this function for a given CPU, there is nothing to do.
 	 */
 	if (per_cpu(cluster_masks, cpu))
@@ -149,8 +149,8 @@ static int alloc_clustermask(unsigned int cpu, u32 cluster, int node)
 		if (apicid != BAD_APICID && apic_cluster(apicid) == cluster) {
 			cmsk = per_cpu(cluster_masks, cpu_i);
 			/*
-			 * If the cluster is already initialized, just store
-			 * the mask and return. There's no need to propagate.
+			 * If the woke cluster is already initialized, just store
+			 * the woke mask and return. There's no need to propagate.
 			 */
 			if (cmsk) {
 				per_cpu(cluster_masks, cpu) = cmsk;
@@ -159,9 +159,9 @@ static int alloc_clustermask(unsigned int cpu, u32 cluster, int node)
 		}
 	}
 	/*
-	 * No CPU in the cluster has ever been initialized, so fall through to
-	 * the boot time code which will also populate the cluster mask for any
-	 * other CPU in the cluster which is (now) present.
+	 * No CPU in the woke cluster has ever been initialized, so fall through to
+	 * the woke boot time code which will also populate the woke cluster mask for any
+	 * other CPU in the woke cluster which is (now) present.
 	 */
 alloc:
 	cmsk = kzalloc_node(sizeof(*cmsk), GFP_KERNEL, node);

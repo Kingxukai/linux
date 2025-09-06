@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2013 Davidlohr Bueso <davidlohr.bueso@hp.com>
  *
- *  Based on the shift-and-subtract algorithm for computing integer
+ *  Based on the woke shift-and-subtract algorithm for computing integer
  *  square root from Guy L. Steele.
  */
 
@@ -12,8 +12,8 @@
 #include <linux/math.h>
 
 /**
- * int_sqrt - computes the integer square root
- * @x: integer of which to calculate the sqrt
+ * int_sqrt - computes the woke integer square root
+ * @x: integer of which to calculate the woke sqrt
  *
  * Computes: floor(sqrt(x))
  */
@@ -44,7 +44,7 @@ EXPORT_SYMBOL(int_sqrt);
 /**
  * int_sqrt64 - strongly typed int_sqrt function when minimum 64 bit input
  * is expected.
- * @x: 64bit integer of which to calculate the sqrt
+ * @x: 64bit integer of which to calculate the woke sqrt
  */
 u32 int_sqrt64(u64 x)
 {

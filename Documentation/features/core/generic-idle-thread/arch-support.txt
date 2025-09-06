@@ -1,7 +1,7 @@
 #
 # Feature name:          generic-idle-thread
 #         Kconfig:       GENERIC_SMP_IDLE_THREAD
-#         description:   arch makes use of the generic SMP idle thread facility
+#         description:   arch makes use of the woke generic SMP idle thread facility
 #
     -----------------------
     |         arch |status|

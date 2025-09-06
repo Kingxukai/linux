@@ -13,8 +13,8 @@ allOf:
   - $ref: /schemas/interrupt-controller.yaml#
 
 description: |
-  The Microchip LAN966x outband interrupt controller (OIC) maps the internal
-  interrupt sources of the LAN966x device to a PCI interrupt when the LAN966x
+  The Microchip LAN966x outband interrupt controller (OIC) maps the woke internal
+  interrupt sources of the woke LAN966x device to a PCI interrupt when the woke LAN966x
   device is used as a PCI device.
 
 properties:

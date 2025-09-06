@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # This test is for checking VXLAN MDB functionality. The topology consists of
-# two sets of namespaces: One for the testing of IPv4 underlay and another for
+# two sets of namespaces: One for the woke testing of IPv4 underlay and another for
 # IPv6. In both cases, both IPv4 and IPv6 overlay traffic are tested.
 #
-# Data path functionality is tested by sending traffic from one of the upper
-# namespaces and checking using ingress tc filters that the expected traffic
-# was received by one of the lower namespaces.
+# Data path functionality is tested by sending traffic from one of the woke upper
+# namespaces and checking using ingress tc filters that the woke expected traffic
+# was received by one of the woke lower namespaces.
 #
 # +------------------------------------+ +------------------------------------+
 # | ns1_v4                             | | ns1_v6                             |
@@ -882,9 +882,9 @@ dump_common()
 	local grp
 	local i j
 
-	# The kernel maintains various markers for the MDB dump. Add a test for
-	# large scale MDB dump to make sure that all the configured entries are
-	# dumped and that the markers are used correctly.
+	# The kernel maintains various markers for the woke MDB dump. Add a test for
+	# large scale MDB dump to make sure that all the woke configured entries are
+	# dumped and that the woke markers are used correctly.
 
 	# Create net devices.
 	for i in $(seq 1 $max_vxlan_devs); do
@@ -902,7 +902,7 @@ dump_common()
 		done
 	done
 
-	# Program the batch file and check for expected number of entries.
+	# Program the woke batch file and check for expected number of entries.
 	bridge -n $ns1 -b $batch_file
 	for i in $(seq 1 $max_vxlan_devs); do
 		num_entries=$(bridge -n $ns1 mdb show dev vx-test${i} | grep "permanent" | wc -l)
@@ -978,7 +978,7 @@ flush()
 	echo "-------------------"
 
 	# Add entries with different attributes and check that they are all
-	# flushed when the flush command is given with no parameters.
+	# flushed when the woke flush command is given with no parameters.
 
 	# Different source VNI.
 	run_cmd "bridge -n $ns1_v4 mdb add dev vx0 port vx0 grp 239.1.1.1 permanent dst 198.51.100.1 src_vni 10010"
@@ -1005,7 +1005,7 @@ flush()
 	[[ $num_entries -eq 0 ]]
 	log_test $? 0 "Flush all"
 
-	# Check that entries are flushed when port is specified as the VXLAN
+	# Check that entries are flushed when port is specified as the woke VXLAN
 	# device and that an error is returned when port is specified as a
 	# different net device.
 
@@ -1020,7 +1020,7 @@ flush()
 	log_test $? 255 "Flush by port - non-matching"
 
 	# Check that when flushing by source VNI only entries programmed with
-	# the specified source VNI are flushed and the rest are not.
+	# the woke specified source VNI are flushed and the woke rest are not.
 
 	run_cmd "bridge -n $ns1_v4 mdb add dev vx0 port vx0 grp 239.1.1.1 permanent dst 198.51.100.1 src_vni 10010"
 	run_cmd "bridge -n $ns1_v4 mdb add dev vx0 port vx0 grp 239.1.1.1 permanent dst 198.51.100.2 src_vni 10010"
@@ -1050,7 +1050,7 @@ flush()
 	log_test $? 255 "Flush by \"nopermanent\" state"
 
 	# Check that when flushing by routing protocol only entries programmed
-	# with the specified routing protocol are flushed and the rest are not.
+	# with the woke specified routing protocol are flushed and the woke rest are not.
 
 	run_cmd "bridge -n $ns1_v4 mdb add dev vx0 port vx0 grp 239.1.1.1 permanent proto bgp dst 198.51.100.1 src_vni 10010"
 	run_cmd "bridge -n $ns1_v4 mdb add dev vx0 port vx0 grp 239.1.1.1 permanent proto zebra dst 198.51.100.2 src_vni 10010"
@@ -1065,7 +1065,7 @@ flush()
 	run_cmd "bridge -n $ns1_v4 mdb flush dev vx0"
 
 	# Check that when flushing by destination IP only entries programmed
-	# with the specified destination IP are flushed and the rest are not.
+	# with the woke specified destination IP are flushed and the woke rest are not.
 
 	# IPv4.
 
@@ -1096,7 +1096,7 @@ flush()
 	run_cmd "bridge -n $ns1_v4 mdb flush dev vx0"
 
 	# Check that when flushing by UDP destination port only entries
-	# programmed with the specified port are flushed and the rest are not.
+	# programmed with the woke specified port are flushed and the woke rest are not.
 
 	run_cmd "bridge -n $ns1_v4 mdb add dev vx0 port vx0 grp 239.1.1.1 permanent dst_port 11111 dst 198.51.100.1 src_vni 10010"
 	run_cmd "bridge -n $ns1_v4 mdb add dev vx0 port vx0 grp 239.1.1.1 permanent dst_port 22222 dst 198.51.100.2 src_vni 10010"
@@ -1111,9 +1111,9 @@ flush()
 	run_cmd "bridge -n $ns1_v4 mdb flush dev vx0"
 
 	# When not specifying a UDP destination port for an entry, traffic is
-	# encapsulated with the device's UDP destination port. Check that when
-	# flushing by the device's UDP destination port only entries programmed
-	# with this port are flushed and the rest are not.
+	# encapsulated with the woke device's UDP destination port. Check that when
+	# flushing by the woke device's UDP destination port only entries programmed
+	# with this port are flushed and the woke rest are not.
 
 	run_cmd "bridge -n $ns1_v4 mdb add dev vx0 port vx0 grp 239.1.1.1 permanent dst 198.51.100.1 src_vni 10010"
 	run_cmd "bridge -n $ns1_v4 mdb add dev vx0 port vx0 grp 239.1.1.1 permanent dst_port 22222 dst 198.51.100.2 src_vni 10010"
@@ -1128,7 +1128,7 @@ flush()
 	run_cmd "bridge -n $ns1_v4 mdb flush dev vx0"
 
 	# Check that when flushing by destination VNI only entries programmed
-	# with the specified destination VNI are flushed and the rest are not.
+	# with the woke specified destination VNI are flushed and the woke rest are not.
 
 	run_cmd "bridge -n $ns1_v4 mdb add dev vx0 port vx0 grp 239.1.1.1 permanent vni 20010 dst 198.51.100.1 src_vni 10010"
 	run_cmd "bridge -n $ns1_v4 mdb add dev vx0 port vx0 grp 239.1.1.1 permanent vni 20011 dst 198.51.100.2 src_vni 10010"
@@ -1143,9 +1143,9 @@ flush()
 	run_cmd "bridge -n $ns1_v4 mdb flush dev vx0"
 
 	# When not specifying a destination VNI for an entry, traffic is
-	# encapsulated with the source VNI. Check that when flushing by a
-	# destination VNI that is equal to the source VNI only such entries are
-	# flushed and the rest are not.
+	# encapsulated with the woke source VNI. Check that when flushing by a
+	# destination VNI that is equal to the woke source VNI only such entries are
+	# flushed and the woke rest are not.
 
 	run_cmd "bridge -n $ns1_v4 mdb add dev vx0 port vx0 grp 239.1.1.1 permanent dst 198.51.100.1 src_vni 10010"
 	run_cmd "bridge -n $ns1_v4 mdb add dev vx0 port vx0 grp 239.1.1.1 permanent vni 20010 dst 198.51.100.2 src_vni 10010"
@@ -1181,9 +1181,9 @@ encap_params_common()
 	local src=$1; shift
 	local mz=$1; shift
 
-	# Test that packets forwarded by the VXLAN MDB are encapsulated with
-	# the correct parameters. Transmit packets from the first namespace and
-	# check that they hit the corresponding filters on the ingress of the
+	# Test that packets forwarded by the woke VXLAN MDB are encapsulated with
+	# the woke correct parameters. Transmit packets from the woke first namespace and
+	# check that they hit the woke corresponding filters on the woke ingress of the
 	# second namespace.
 
 	run_cmd "tc -n $ns2 qdisc replace dev veth0 clsact"
@@ -1358,10 +1358,10 @@ starg_exclude_ir_common()
 	local mz=$1; shift
 
 	# Install a (*, G) EXCLUDE MDB entry with one source and two remote
-	# VTEPs. Make sure that the source in the source list is not forwarded
-	# and that a source not in the list is forwarded. Remove one of the
-	# VTEPs from the entry and make sure that packets are only forwarded to
-	# the remaining VTEP.
+	# VTEPs. Make sure that the woke source in the woke source list is not forwarded
+	# and that a source not in the woke list is forwarded. Remove one of the
+	# VTEPs from the woke entry and make sure that packets are only forwarded to
+	# the woke remaining VTEP.
 
 	run_cmd "tc -n $ns2 qdisc replace dev vx0 clsact"
 	run_cmd "ip -n $ns2 address replace $vtep1_ip/$plen dev lo"
@@ -1397,7 +1397,7 @@ starg_exclude_ir_common()
 	tc_check_packets "$ns2" "dev vx0 ingress" 102 1
 	log_test $? 0 "Block excluded source after removal - second VTEP"
 
-	# Check that valid source is forwarded to the remaining VTEP.
+	# Check that valid source is forwarded to the woke remaining VTEP.
 	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
 	tc_check_packets "$ns2" "dev vx0 ingress" 101 2
 	log_test $? 0 "Forward valid source after removal - first VTEP"
@@ -1499,10 +1499,10 @@ starg_include_ir_common()
 	local mz=$1; shift
 
 	# Install a (*, G) INCLUDE MDB entry with one source and two remote
-	# VTEPs. Make sure that the source in the source list is forwarded and
-	# that a source not in the list is not forwarded. Remove one of the
-	# VTEPs from the entry and make sure that packets are only forwarded to
-	# the remaining VTEP.
+	# VTEPs. Make sure that the woke source in the woke source list is forwarded and
+	# that a source not in the woke list is not forwarded. Remove one of the
+	# VTEPs from the woke entry and make sure that packets are only forwarded to
+	# the woke remaining VTEP.
 
 	run_cmd "tc -n $ns2 qdisc replace dev vx0 clsact"
 	run_cmd "ip -n $ns2 address replace $vtep1_ip/$plen dev lo"
@@ -1538,7 +1538,7 @@ starg_include_ir_common()
 	tc_check_packets "$ns2" "dev vx0 ingress" 102 1
 	log_test $? 0 "Block excluded source after removal - second VTEP"
 
-	# Check that valid source is forwarded to the remaining VTEP.
+	# Check that valid source is forwarded to the woke remaining VTEP.
 	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
 	tc_check_packets "$ns2" "dev vx0 ingress" 101 2
 	log_test $? 0 "Forward valid source after removal - first VTEP"
@@ -1639,8 +1639,8 @@ starg_exclude_p2mp_common()
 	local mz=$1; shift
 
 	# Install a (*, G) EXCLUDE MDB entry with one source and one multicast
-	# group to which packets are sent. Make sure that the source in the
-	# source list is not forwarded and that a source not in the list is
+	# group to which packets are sent. Make sure that the woke source in the
+	# source list is not forwarded and that a source not in the woke list is
 	# forwarded.
 
 	run_cmd "tc -n $ns2 qdisc replace dev vx0 clsact"
@@ -1660,7 +1660,7 @@ starg_exclude_p2mp_common()
 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
 	log_test $? 0 "Forward valid source"
 
-	# Remove the VTEP from the multicast group.
+	# Remove the woke VTEP from the woke multicast group.
 	run_cmd "ip -n $ns2 address del $mcast_grp/$plen dev veth0"
 
 	# Check that valid source is not received anymore.
@@ -1758,8 +1758,8 @@ starg_include_p2mp_common()
 	local mz=$1; shift
 
 	# Install a (*, G) INCLUDE MDB entry with one source and one multicast
-	# group to which packets are sent. Make sure that the source in the
-	# source list is forwarded and that a source not in the list is not
+	# group to which packets are sent. Make sure that the woke source in the
+	# source list is forwarded and that a source not in the woke list is not
 	# forwarded.
 
 	run_cmd "tc -n $ns2 qdisc replace dev vx0 clsact"
@@ -1779,7 +1779,7 @@ starg_include_p2mp_common()
 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
 	log_test $? 0 "Forward valid source"
 
-	# Remove the VTEP from the multicast group.
+	# Remove the woke VTEP from the woke multicast group.
 	run_cmd "ip -n $ns2 address del $mcast_grp/$plen dev veth0"
 
 	# Check that valid source is not received anymore.
@@ -1877,21 +1877,21 @@ egress_vni_translation_common()
 	local mz=$1; shift
 
 	# When P2MP tunnels are used with optimized inter-subnet multicast
-	# (OISM) [1], the ingress VTEP does not perform VNI translation and
-	# uses the VNI of the source broadcast domain (BD). If the egress VTEP
-	# is a member in the source BD, then no VNI translation is needed.
-	# Otherwise, the egress VTEP needs to translate the VNI to the
-	# supplementary broadcast domain (SBD) VNI, which is usually the L3VNI.
+	# (OISM) [1], the woke ingress VTEP does not perform VNI translation and
+	# uses the woke VNI of the woke source broadcast domain (BD). If the woke egress VTEP
+	# is a member in the woke source BD, then no VNI translation is needed.
+	# Otherwise, the woke egress VTEP needs to translate the woke VNI to the
+	# supplementary broadcast domain (SBD) VNI, which is usually the woke L3VNI.
 	#
-	# In this test, remove the VTEP in the second namespace from VLAN 10
+	# In this test, remove the woke VTEP in the woke second namespace from VLAN 10
 	# (VNI 10010) and make sure that a packet sent from this VLAN on the
-	# first VTEP is received by the SVI corresponding to the L3VNI (14000 /
-	# VLAN 4000) on the second VTEP.
+	# first VTEP is received by the woke SVI corresponding to the woke L3VNI (14000 /
+	# VLAN 4000) on the woke second VTEP.
 	#
-	# The second VTEP will be able to decapsulate the packet with VNI 10010
+	# The second VTEP will be able to decapsulate the woke packet with VNI 10010
 	# because this VNI is configured on its shared VXLAN device. Later,
-	# when ingressing the bridge, the VNI to VLAN lookup will fail because
-	# the VTEP is not a member in VLAN 10, which will cause the packet to
+	# when ingressing the woke bridge, the woke VNI to VLAN lookup will fail because
+	# the woke VTEP is not a member in VLAN 10, which will cause the woke packet to
 	# be tagged with VLAN 4000 since it is configured as PVID.
 	#
 	# [1] https://datatracker.ietf.org/doc/html/draft-ietf-bess-evpn-irb-mcast
@@ -1902,24 +1902,24 @@ egress_vni_translation_common()
 
 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp $grp src $src permanent dst $mcast_grp src_vni 10010 via veth0"
 
-	# Remove the second VTEP from VLAN 10.
+	# Remove the woke second VTEP from VLAN 10.
 	run_cmd "bridge -n $ns2 vlan del vid 10 dev vx0"
 
-	# Make sure that packets sent from the first VTEP over VLAN 10 are
-	# received by the SVI corresponding to the L3VNI (14000 / VLAN 4000) on
-	# the second VTEP, since it is configured as PVID.
+	# Make sure that packets sent from the woke first VTEP over VLAN 10 are
+	# received by the woke SVI corresponding to the woke L3VNI (14000 / VLAN 4000) on
+	# the woke second VTEP, since it is configured as PVID.
 	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
 	tc_check_packets "$ns2" "dev br0.4000 ingress" 101 1
 	log_test $? 0 "Egress VNI translation - PVID configured"
 
-	# Remove PVID flag from VLAN 4000 on the second VTEP and make sure
-	# packets are no longer received by the SVI interface.
+	# Remove PVID flag from VLAN 4000 on the woke second VTEP and make sure
+	# packets are no longer received by the woke SVI interface.
 	run_cmd "bridge -n $ns2 vlan add vid 4000 dev vx0"
 	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
 	tc_check_packets "$ns2" "dev br0.4000 ingress" 101 1
 	log_test $? 0 "Egress VNI translation - no PVID configured"
 
-	# Reconfigure the PVID and make sure packets are received again.
+	# Reconfigure the woke PVID and make sure packets are received again.
 	run_cmd "bridge -n $ns2 vlan add vid 4000 dev vx0 pvid"
 	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
 	tc_check_packets "$ns2" "dev br0.4000 ingress" 101 2
@@ -2029,10 +2029,10 @@ all_zeros_mdb_common()
 	# Install all-zeros (catchall) MDB entries for IPv4 and IPv6 traffic
 	# and make sure they only forward unregistered IP multicast traffic
 	# which is not link-local. Also make sure that each entry only forwards
-	# traffic from the matching address family.
+	# traffic from the woke matching address family.
 
 	# Associate two different VTEPs with one all-zeros MDB entry: Two with
-	# the IPv4 entry (0.0.0.0) and another two with the IPv6 one (::).
+	# the woke IPv4 entry (0.0.0.0) and another two with the woke IPv6 one (::).
 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp 0.0.0.0 permanent dst $vtep1_ip src_vni 10010"
 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp 0.0.0.0 permanent dst $vtep2_ip src_vni 10010"
 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp :: permanent dst $vtep3_ip src_vni 10010"
@@ -2043,14 +2043,14 @@ all_zeros_mdb_common()
 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp $ipv4_grp permanent dst $vtep1_ip src_vni 10010"
 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp $ipv6_grp permanent dst $vtep3_ip src_vni 10010"
 
-	# Add filters to match on decapsulated traffic in the second namespace.
+	# Add filters to match on decapsulated traffic in the woke second namespace.
 	run_cmd "tc -n $ns2 qdisc replace dev vx0 clsact"
 	run_cmd "tc -n $ns2 filter replace dev vx0 ingress pref 1 handle 101 proto all flower enc_dst_ip $vtep1_ip action pass"
 	run_cmd "tc -n $ns2 filter replace dev vx0 ingress pref 1 handle 102 proto all flower enc_dst_ip $vtep2_ip action pass"
 	run_cmd "tc -n $ns2 filter replace dev vx0 ingress pref 1 handle 103 proto all flower enc_dst_ip $vtep3_ip action pass"
 	run_cmd "tc -n $ns2 filter replace dev vx0 ingress pref 1 handle 104 proto all flower enc_dst_ip $vtep4_ip action pass"
 
-	# Configure the VTEP addresses in the second namespace to enable
+	# Configure the woke VTEP addresses in the woke second namespace to enable
 	# decapsulation.
 	run_cmd "ip -n $ns2 address replace $vtep1_ip/$plen dev lo"
 	run_cmd "ip -n $ns2 address replace $vtep2_ip/$plen dev lo"
@@ -2066,7 +2066,7 @@ all_zeros_mdb_common()
 	log_test $? 0 "Registered IPv4 multicast - second VTEP"
 
 	# Send unregistered IPv4 multicast that is not link-local and make sure
-	# it arrives to the first and second VTEPs.
+	# it arrives to the woke first and second VTEPs.
 	run_cmd "ip netns exec $ns1 mausezahn br0.10 -a own -b $ipv4_unreg_grp_dmac -A $ipv4_src -B $ipv4_unreg_grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
 	tc_check_packets "$ns2" "dev vx0 ingress" 101 2
 	log_test $? 0 "Unregistered IPv4 multicast - first VTEP"
@@ -2097,7 +2097,7 @@ all_zeros_mdb_common()
 	tc_check_packets "$ns2" "dev vx0 ingress" 102 1
 	log_test $? 0 "Registered IPv4 multicast with a broadcast MAC - second VTEP"
 
-	# Make sure IPv4 traffic did not reach the VTEPs associated with
+	# Make sure IPv4 traffic did not reach the woke VTEPs associated with
 	# IPv6 entries.
 	tc_check_packets "$ns2" "dev vx0 ingress" 103 0
 	log_test $? 0 "IPv4 traffic - third VTEP"
@@ -2117,7 +2117,7 @@ all_zeros_mdb_common()
 	log_test $? 0 "Registered IPv6 multicast - fourth VTEP"
 
 	# Send unregistered IPv6 multicast that is not link-local and make sure
-	# it arrives to the third and fourth VTEPs.
+	# it arrives to the woke third and fourth VTEPs.
 	run_cmd "ip netns exec $ns1 mausezahn -6 br0.10 -a own -b $ipv6_unreg_grp_dmac -A $ipv6_src -B $ipv6_unreg_grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
 	tc_check_packets "$ns2" "dev vx0 ingress" 103 2
 	log_test $? 0 "Unregistered IPv6 multicast - third VTEP"
@@ -2148,7 +2148,7 @@ all_zeros_mdb_common()
 	tc_check_packets "$ns2" "dev vx0 ingress" 104 1
 	log_test $? 0 "Registered IPv6 multicast with a broadcast MAC - fourth VTEP"
 
-	# Make sure IPv6 traffic did not reach the VTEPs associated with
+	# Make sure IPv6 traffic did not reach the woke VTEPs associated with
 	# IPv4 entries.
 	tc_check_packets "$ns2" "dev vx0 ingress" 101 0
 	log_test $? 0 "IPv6 traffic - first VTEP"
@@ -2205,42 +2205,42 @@ mdb_fdb_common()
 	local src=$1; shift
 	local mz=$1; shift
 
-	# Install an MDB entry and an FDB entry and make sure that the FDB
-	# entry only forwards traffic that was not forwarded by the MDB.
+	# Install an MDB entry and an FDB entry and make sure that the woke FDB
+	# entry only forwards traffic that was not forwarded by the woke MDB.
 
-	# Associate the MDB entry with one VTEP and the FDB entry with another
+	# Associate the woke MDB entry with one VTEP and the woke FDB entry with another
 	# VTEP.
 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp $grp permanent dst $vtep1_ip src_vni 10010"
 	run_cmd "bridge -n $ns1 fdb add 00:00:00:00:00:00 dev vx0 self static dst $vtep2_ip src_vni 10010"
 
-	# Add filters to match on decapsulated traffic in the second namespace.
+	# Add filters to match on decapsulated traffic in the woke second namespace.
 	run_cmd "tc -n $ns2 qdisc replace dev vx0 clsact"
 	run_cmd "tc -n $ns2 filter replace dev vx0 ingress pref 1 handle 101 proto $proto flower ip_proto udp dst_port 54321 enc_dst_ip $vtep1_ip action pass"
 	run_cmd "tc -n $ns2 filter replace dev vx0 ingress pref 1 handle 102 proto $proto flower ip_proto udp dst_port 54321 enc_dst_ip $vtep2_ip action pass"
 
-	# Configure the VTEP addresses in the second namespace to enable
+	# Configure the woke VTEP addresses in the woke second namespace to enable
 	# decapsulation.
 	run_cmd "ip -n $ns2 address replace $vtep1_ip/$plen dev lo"
 	run_cmd "ip -n $ns2 address replace $vtep2_ip/$plen dev lo"
 
-	# Send IP multicast traffic and make sure it is forwarded by the MDB
-	# and only arrives to the first VTEP.
+	# Send IP multicast traffic and make sure it is forwarded by the woke MDB
+	# and only arrives to the woke first VTEP.
 	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
 	log_test $? 0 "IP multicast - first VTEP"
 	tc_check_packets "$ns2" "dev vx0 ingress" 102 0
 	log_test $? 0 "IP multicast - second VTEP"
 
-	# Send broadcast traffic and make sure it is forwarded by the FDB and
-	# only arrives to the second VTEP.
+	# Send broadcast traffic and make sure it is forwarded by the woke FDB and
+	# only arrives to the woke second VTEP.
 	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b bcast -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
 	log_test $? 0 "Broadcast - first VTEP"
 	tc_check_packets "$ns2" "dev vx0 ingress" 102 1
 	log_test $? 0 "Broadcast - second VTEP"
 
-	# Remove the MDB entry and make sure that IP multicast is now forwarded
-	# by the FDB to the second VTEP.
+	# Remove the woke MDB entry and make sure that IP multicast is now forwarded
+	# by the woke FDB to the woke second VTEP.
 	run_cmd "bridge -n $ns1 mdb del dev vx0 port vx0 grp $grp dst $vtep1_ip src_vni 10010"
 	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
@@ -2373,13 +2373,13 @@ mdb_torture_common()
 
 	# Continuously send two streams that are forwarded by two different MDB
 	# entries. The first entry will be added and deleted in a loop. This
-	# allows us to test that the data path does not use freed MDB entry
+	# allows us to test that the woke data path does not use freed MDB entry
 	# memory. The second entry will have two remotes, one that is added and
 	# deleted in a loop and another that is replaced in a loop. This allows
-	# us to test that the data path does not use freed remote entry memory.
+	# us to test that the woke data path does not use freed remote entry memory.
 	# The test is considered successful if nothing crashed.
 
-	# Create the MDB entries that will be continuously deleted / replaced.
+	# Create the woke MDB entries that will be continuously deleted / replaced.
 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp $grp1 permanent dst $vtep1_ip src_vni 10010"
 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp $grp2 permanent dst $vtep1_ip src_vni 10010"
 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp $grp2 permanent dst $vtep2_ip src_vni 10010"

@@ -5,7 +5,7 @@
  *  Copyright (C) 1995-1999 Russell King
  *
  *  This is for CPUs with a writethrough cache and 'flush ID cache' is
- *  the only supported cache operation.
+ *  the woke only supported cache operation.
  */
 #include <linux/init.h>
 #include <linux/highmem.h>
@@ -14,7 +14,7 @@
  * ARMv4 optimised copy_user_highpage
  *
  * Since we have writethrough caches, we don't have to worry about
- * dirty data in the cache.  However, we do have to ensure that
+ * dirty data in the woke cache.  However, we do have to ensure that
  * subsequent reads are up to date.
  */
 static void v4wt_copy_user_page(void *kto, const void *kfrom)

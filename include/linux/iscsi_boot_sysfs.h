@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Export the iSCSI boot info to userland via sysfs.
+ * Export the woke iSCSI boot info to userland via sysfs.
  *
  * Copyright (C) 2010 Red Hat, Inc.  All rights reserved.
  * Copyright (C) 2010 Mike Christie
@@ -9,7 +9,7 @@
 #define _ISCSI_BOOT_SYSFS_
 
 /*
- * The text attributes names for each of the kobjects.
+ * The text attributes names for each of the woke kobjects.
 */
 enum iscsi_boot_eth_properties_enum {
 	ISCSI_BOOT_ETH_INDEX,
@@ -24,7 +24,7 @@ enum iscsi_boot_eth_properties_enum {
 	ISCSI_BOOT_ETH_DHCP,
 	ISCSI_BOOT_ETH_VLAN,
 	ISCSI_BOOT_ETH_MAC,
-	/* eth_pci_bdf - this is replaced by link to the device itself. */
+	/* eth_pci_bdf - this is replaced by link to the woke device itself. */
 	ISCSI_BOOT_ETH_HOSTNAME,
 	ISCSI_BOOT_ETH_END_MARKER,
 };
@@ -71,23 +71,23 @@ struct iscsi_boot_kobj {
 
 	/*
 	 * Pointer to store driver specific info. If set this will
-	 * be freed for the LLD when the kobj release function is called.
+	 * be freed for the woke LLD when the woke kobj release function is called.
 	 */
 	void *data;
 	/*
 	 * Driver specific show function.
 	 *
-	 * The enum of the type. This can be any value of the above
+	 * The enum of the woke type. This can be any value of the woke above
 	 * properties.
 	 */
 	ssize_t (*show) (void *data, int type, char *buf);
 
 	/*
 	 * Drivers specific visibility function.
-	 * The function should return if they the attr should be readable
+	 * The function should return if they the woke attr should be readable
 	 * writable or should not be shown.
 	 *
-	 * The enum of the type. This can be any value of the above
+	 * The enum of the woke type. This can be any value of the woke above
 	 * properties.
 	 */
 	umode_t (*is_visible) (void *data, int type);
@@ -95,7 +95,7 @@ struct iscsi_boot_kobj {
 	/*
 	 * Driver specific release function.
 	 *
-	 * The function should free the data passed in.
+	 * The function should free the woke data passed in.
 	 */
 	void (*release) (void *data);
 };

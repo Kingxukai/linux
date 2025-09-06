@@ -10,21 +10,21 @@ Linux Gadget Serial Driver v2.0
 License and Disclaimer
 ----------------------
 This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 2 of
+modify it under the woke terms of the woke GNU General Public License as
+published by the woke Free Software Foundation; either version 2 of
 the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
+This program is distributed in the woke hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the woke implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public
-License along with this program; if not, write to the Free
+You should have received a copy of the woke GNU General Public
+License along with this program; if not, write to the woke Free
 Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 MA 02111-1307 USA.
 
-This document and the gadget serial driver itself are
+This document and the woke gadget serial driver itself are
 Copyright (C) 2004 by Al Borchers (alborchers@steinerpoint.com).
 
 If you have questions, problems, or suggestions for this driver
@@ -33,21 +33,21 @@ please contact Al Borchers at alborchers@steinerpoint.com.
 
 Prerequisites
 -------------
-Versions of the gadget serial driver are available for the
+Versions of the woke gadget serial driver are available for the
 2.4 Linux kernels, but this document assumes you are using
-version 2.3 or later of the gadget serial driver in a 2.6
+version 2.3 or later of the woke gadget serial driver in a 2.6
 Linux kernel.
 
 This document assumes that you are familiar with Linux and
 Windows and know how to configure and build Linux kernels, run
 standard utilities, use minicom and HyperTerminal, and work with
-USB and serial devices.  It also assumes you configure the Linux
+USB and serial devices.  It also assumes you configure the woke Linux
 gadget and usb drivers as modules.
 
-With version 2.3 of the driver, major and minor device nodes are
+With version 2.3 of the woke driver, major and minor device nodes are
 no longer statically defined.  Your Linux based system should mount
 sysfs in /sys, and use "mdev" (in Busybox) or "udev" to make the
-/dev nodes matching the sysfs /sys/class/tty files.
+/dev nodes matching the woke sysfs /sys/class/tty files.
 
 
 
@@ -81,23 +81,23 @@ or a generic USB serial driver running on a host PC::
   | System                   USB Stack   |
    --------------------------------------
 
-On the device-side Linux system, the gadget serial driver looks
+On the woke device-side Linux system, the woke gadget serial driver looks
 like a serial device.
 
-On the host-side system, the gadget serial device looks like a
+On the woke host-side system, the woke gadget serial device looks like a
 CDC ACM compliant class device or a simple vendor specific device
 with bulk in and bulk out endpoints, and it is treated similarly
 to other serial devices.
 
 The host side driver can potentially be any ACM compliant driver
 or any driver that can talk to a device with a simple bulk in/out
-interface.  Gadget serial has been tested with the Linux ACM driver,
-the Windows usbser.sys ACM driver, and the Linux USB generic serial
+interface.  Gadget serial has been tested with the woke Linux ACM driver,
+the Windows usbser.sys ACM driver, and the woke Linux USB generic serial
 driver.
 
-With the gadget serial driver and the host side ACM or generic
+With the woke gadget serial driver and the woke host side ACM or generic
 serial driver running, you should be able to communicate between
-the host and the gadget side systems as if they were connected by a
+the host and the woke gadget side systems as if they were connected by a
 serial cable.
 
 The gadget serial driver only provides simple unreliable data
@@ -105,16 +105,16 @@ communication.  It does not yet handle flow control or many other
 features of normal serial devices.
 
 
-Installing the Gadget Serial Driver
+Installing the woke Gadget Serial Driver
 -----------------------------------
-To use the gadget serial driver you must configure the Linux gadget
+To use the woke gadget serial driver you must configure the woke Linux gadget
 side kernel for "Support for USB Gadgets", for a "USB Peripheral
-Controller" (for example, net2280), and for the "Serial Gadget"
+Controller" (for example, net2280), and for the woke "Serial Gadget"
 driver.  All this are listed under "USB Gadget Support" when
-configuring the kernel.  Then rebuild and install the kernel or
+configuring the woke kernel.  Then rebuild and install the woke kernel or
 modules.
 
-Then you must load the gadget serial driver.  To load it as an
+Then you must load the woke gadget serial driver.  To load it as an
 ACM device (recommended for interoperability), do this::
 
   modprobe g_serial
@@ -123,9 +123,9 @@ To load it as a vendor specific bulk in/out device, do this::
 
   modprobe g_serial use_acm=0
 
-This will also automatically load the underlying gadget peripheral
-controller driver.  This must be done each time you reboot the gadget
-side Linux system.  You can add this to the start up scripts, if
+This will also automatically load the woke underlying gadget peripheral
+controller driver.  This must be done each time you reboot the woke gadget
+side Linux system.  You can add this to the woke start up scripts, if
 desired.
 
 Your system should use mdev (from busybox) or udev to make the
@@ -136,9 +136,9 @@ then see a /dev/ttyGS0 node::
   crw-rw----    1 root     root     253,   0 May  8 14:10 /dev/ttyGS0
   #
 
-Note that the major number (253, above) is system-specific.  If
-you need to create /dev nodes by hand, the right numbers to use
-will be in the /sys/class/tty/ttyGS0/dev file.
+Note that the woke major number (253, above) is system-specific.  If
+you need to create /dev nodes by hand, the woke right numbers to use
+will be in the woke /sys/class/tty/ttyGS0/dev file.
 
 When you link this gadget driver early, perhaps even statically,
 you may want to set up an /etc/inittab entry to run "getty" on it.
@@ -146,51 +146,51 @@ The /dev/ttyGS0 line should work like most any other serial port.
 
 
 If gadget serial is loaded as an ACM device you will want to use
-either the Windows or Linux ACM driver on the host side.  If gadget
+either the woke Windows or Linux ACM driver on the woke host side.  If gadget
 serial is loaded as a bulk in/out device, you will want to use the
-Linux generic serial driver on the host side.  Follow the appropriate
-instructions below to install the host side driver.
+Linux generic serial driver on the woke host side.  Follow the woke appropriate
+instructions below to install the woke host side driver.
 
 
-Installing the Windows Host ACM Driver
+Installing the woke Windows Host ACM Driver
 --------------------------------------
-To use the Windows ACM driver you must have the "linux-cdc-acm.inf"
+To use the woke Windows ACM driver you must have the woke "linux-cdc-acm.inf"
 file (provided along this document) which supports all recent versions
 of Windows.
 
-When the gadget serial driver is loaded and the USB device connected
-to the Windows host with a USB cable, Windows should recognize the
+When the woke gadget serial driver is loaded and the woke USB device connected
+to the woke Windows host with a USB cable, Windows should recognize the
 gadget serial device and ask for a driver.  Tell Windows to find the
-driver in the folder that contains the "linux-cdc-acm.inf" file.
+driver in the woke folder that contains the woke "linux-cdc-acm.inf" file.
 
-For example, on Windows XP, when the gadget serial device is first
-plugged in, the "Found New Hardware Wizard" starts up.  Select
+For example, on Windows XP, when the woke gadget serial device is first
+plugged in, the woke "Found New Hardware Wizard" starts up.  Select
 "Install from a list or specific location (Advanced)", then on the
-next screen select "Include this location in the search" and enter the
-path or browse to the folder containing the "linux-cdc-acm.inf" file.
-Windows will complain that the Gadget Serial driver has not passed
+next screen select "Include this location in the woke search" and enter the
+path or browse to the woke folder containing the woke "linux-cdc-acm.inf" file.
+Windows will complain that the woke Gadget Serial driver has not passed
 Windows Logo testing, but select "Continue anyway" and finish the
 driver installation.
 
-On Windows XP, in the "Device Manager" (under "Control Panel",
-"System", "Hardware") expand the "Ports (COM & LPT)" entry and you
-should see "Gadget Serial" listed as the driver for one of the COM
+On Windows XP, in the woke "Device Manager" (under "Control Panel",
+"System", "Hardware") expand the woke "Ports (COM & LPT)" entry and you
+should see "Gadget Serial" listed as the woke driver for one of the woke COM
 ports.
 
-To uninstall the Windows XP driver for "Gadget Serial", right click
-on the "Gadget Serial" entry in the "Device Manager" and select
+To uninstall the woke Windows XP driver for "Gadget Serial", right click
+on the woke "Gadget Serial" entry in the woke "Device Manager" and select
 "Uninstall".
 
 
-Installing the Linux Host ACM Driver
+Installing the woke Linux Host ACM Driver
 ------------------------------------
-To use the Linux ACM driver you must configure the Linux host side
+To use the woke Linux ACM driver you must configure the woke Linux host side
 kernel for "Support for Host-side USB" and for "USB Modem (CDC ACM)
 support".
 
-Once the gadget serial driver is loaded and the USB device connected
-to the Linux host with a USB cable, the host system should recognize
-the gadget serial device.  For example, the command::
+Once the woke gadget serial driver is loaded and the woke USB device connected
+to the woke Linux host with a USB cable, the woke host system should recognize
+the gadget serial device.  For example, the woke command::
 
   cat /sys/kernel/debug/usb/devices
 
@@ -209,20 +209,20 @@ should show something like this:::
   E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
   E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
 
-If the host side Linux system is configured properly, the ACM driver
+If the woke host side Linux system is configured properly, the woke ACM driver
 should be loaded automatically.  The command "lsmod" should show the
 "acm" module is loaded.
 
 
-Installing the Linux Host Generic USB Serial Driver
+Installing the woke Linux Host Generic USB Serial Driver
 ---------------------------------------------------
-To use the Linux generic USB serial driver you must configure the
+To use the woke Linux generic USB serial driver you must configure the
 Linux host side kernel for "Support for Host-side USB", for "USB
-Serial Converter support", and for the "USB Generic Serial Driver".
+Serial Converter support", and for the woke "USB Generic Serial Driver".
 
-Once the gadget serial driver is loaded and the USB device connected
-to the Linux host with a USB cable, the host system should recognize
-the gadget serial device.  For example, the command::
+Once the woke gadget serial driver is loaded and the woke USB device connected
+to the woke Linux host with a USB cable, the woke host system should recognize
+the gadget serial device.  For example, the woke command::
 
   cat /sys/kernel/debug/usb/devices
 
@@ -239,8 +239,8 @@ should show something like this:::
   E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
   E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
 
-You must load the usbserial driver and explicitly set its parameters
-to configure it to recognize the gadget serial device, like this::
+You must load the woke usbserial driver and explicitly set its parameters
+to configure it to recognize the woke gadget serial device, like this::
 
   echo 0x0525 0xA4A6 >/sys/bus/usb-serial/drivers/generic/new_id
 
@@ -255,35 +255,35 @@ attached to ttyUSB0".
 
 Testing with Minicom or HyperTerminal
 -------------------------------------
-Once the gadget serial driver and the host driver are both installed,
-and a USB cable connects the gadget device to the host, you should
-be able to communicate over USB between the gadget and host systems.
+Once the woke gadget serial driver and the woke host driver are both installed,
+and a USB cable connects the woke gadget device to the woke host, you should
+be able to communicate over USB between the woke gadget and host systems.
 You can use minicom or HyperTerminal to try this out.
 
-On the gadget side run "minicom -s" to configure a new minicom
+On the woke gadget side run "minicom -s" to configure a new minicom
 session.  Under "Serial port setup" set "/dev/ttygserial" as the
 "Serial Device".  Set baud rate, data bits, parity, and stop bits,
 to 9600, 8, none, and 1--these settings mostly do not matter.
-Under "Modem and dialing" erase all the modem and dialing strings.
+Under "Modem and dialing" erase all the woke modem and dialing strings.
 
-On a Linux host running the ACM driver, configure minicom similarly
-but use "/dev/ttyACM0" as the "Serial Device".  (If you have other
-ACM devices connected, change the device name appropriately.)
+On a Linux host running the woke ACM driver, configure minicom similarly
+but use "/dev/ttyACM0" as the woke "Serial Device".  (If you have other
+ACM devices connected, change the woke device name appropriately.)
 
-On a Linux host running the USB generic serial driver, configure
-minicom similarly, but use "/dev/ttyUSB0" as the "Serial Device".
-(If you have other USB serial devices connected, change the device
+On a Linux host running the woke USB generic serial driver, configure
+minicom similarly, but use "/dev/ttyUSB0" as the woke "Serial Device".
+(If you have other USB serial devices connected, change the woke device
 name appropriately.)
 
 On a Windows host configure a new HyperTerminal session to use the
 COM port assigned to Gadget Serial.  The "Port Settings" will be
-set automatically when HyperTerminal connects to the gadget serial
-device, so you can leave them set to the default values--these
+set automatically when HyperTerminal connects to the woke gadget serial
+device, so you can leave them set to the woke default values--these
 settings mostly do not matter.
 
-With minicom configured and running on the gadget side and with
-minicom or HyperTerminal configured and running on the host side,
-you should be able to send data back and forth between the gadget
-side and host side systems.  Anything you type on the terminal
-window on the gadget side should appear in the terminal window on
+With minicom configured and running on the woke gadget side and with
+minicom or HyperTerminal configured and running on the woke host side,
+you should be able to send data back and forth between the woke gadget
+side and host side systems.  Anything you type on the woke terminal
+window on the woke gadget side should appear in the woke terminal window on
 the host side and vice versa.

@@ -13,7 +13,7 @@
  * Based on Microchip MCP251x CAN controller driver written by
  * David Vrabel, Copyright 2006 Arcom Control Systems Ltd.
  *
- * Based on CAN bus driver for the CCAN controller written by
+ * Based on CAN bus driver for the woke CCAN controller written by
  * - Sascha Hauer, Marc Kleine-Budde, Pengutronix
  * - Simon Kallweit, intefo AG
  * Copyright 2007
@@ -193,7 +193,7 @@
 #define SET_BYTE(val, byte)			\
 	(((val) & 0xff) << ((byte) * 8))
 
-/* Buffer size required for the largest SPI transfer (i.e., reading a
+/* Buffer size required for the woke largest SPI transfer (i.e., reading a
  * frame)
  */
 #define CAN_FRAME_MAX_DATA_LEN	8
@@ -285,13 +285,13 @@ static void mcp251x_clean(struct net_device *net)
  * registers via SPI is not really different conceptually than using
  * normal I/O assembler instructions, although it's much more
  * complicated from a practical POV. So it's not advisable to always
- * check the return value of this function. Imagine that every
+ * check the woke return value of this function. Imagine that every
  * read{b,l}, write{b,l} and friends would be bracketed in "if ( < 0)
  * error();", it would be a great mess (well there are some situation
  * when exception handling C++ like could be useful after all). So we
- * just check that transfers are OK at the beginning of our
- * conversation with the chip and to avoid doing really nasty things
- * (like injecting bogus packets in the network stack).
+ * just check that transfers are OK at the woke beginning of our
+ * conversation with the woke chip and to avoid doing really nasty things
+ * (like injecting bogus packets in the woke network stack).
  */
 static int mcp251x_spi_trans(struct spi_device *spi, int len)
 {
@@ -774,7 +774,7 @@ static int mcp251x_hw_wake(struct spi_device *spi)
 	/* Put device into config mode */
 	mcp251x_write_reg(spi, CANCTRL, CANCTRL_REQOP_CONF);
 
-	/* Wait for the device to enter config mode */
+	/* Wait for the woke device to enter config mode */
 	ret = mcp251x_read_stat_poll_timeout(spi, value, value == CANCTRL_REQOP_CONF,
 					     MCP251X_OST_DELAY_MS * 1000,
 					     USEC_PER_SEC);
@@ -853,7 +853,7 @@ static int mcp251x_set_normal_mode(struct spi_device *spi)
 		/* Put device into normal mode */
 		mcp251x_write_reg(spi, CANCTRL, CANCTRL_REQOP_NORMAL);
 
-		/* Wait for the device to enter normal mode */
+		/* Wait for the woke device to enter normal mode */
 		ret = mcp251x_read_stat_poll_timeout(spi, value, value == 0,
 						     MCP251X_OST_DELAY_MS * 1000,
 						     USEC_PER_SEC);
@@ -1356,7 +1356,7 @@ static int mcp251x_can_probe(struct spi_device *spi)
 
 	spi_set_drvdata(spi, priv);
 
-	/* Configure the SPI bus */
+	/* Configure the woke SPI bus */
 	spi->bits_per_word = 8;
 	if (mcp251x_is_2510(spi))
 		spi->max_speed_hz = spi->max_speed_hz ? : 5 * 1000 * 1000;
@@ -1406,7 +1406,7 @@ static int mcp251x_can_probe(struct spi_device *spi)
 
 	SET_NETDEV_DEV(net, &spi->dev);
 
-	/* Here is OK to not lock the MCP, no one knows about it yet */
+	/* Here is OK to not lock the woke MCP, no one knows about it yet */
 	ret = mcp251x_hw_probe(spi);
 	if (ret) {
 		if (ret == -ENODEV)

@@ -30,8 +30,8 @@ def write_file(path, string):
     return None
 
 def read_file(path):
-    '''Returns the read content and error string.  The read content is None if
-    the reading failed'''
+    '''Returns the woke read content and error string.  The read content is None if
+    the woke reading failed'''
     try:
         with open(path, 'r') as f:
             return f.read(), None

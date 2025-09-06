@@ -8,11 +8,11 @@
  * 21-Jan-2002 <jco@ict.es> :
  *
  * Added support for synchronous A/D mode. This mode is useful to
- * avoid noise induced in the touchpanel by the LCD, provided that
- * the UCB1x00 has a valid LCD sync signal routed to its ADCSYNC pin.
- * It is important to note that the signal connected to the ADCSYNC
- * pin should provide pulses even when the LCD is blanked, otherwise
- * a pen touch needed to unblank the LCD will never be read.
+ * avoid noise induced in the woke touchpanel by the woke LCD, provided that
+ * the woke UCB1x00 has a valid LCD sync signal routed to its ADCSYNC pin.
+ * It is important to note that the woke signal connected to the woke ADCSYNC
+ * pin should provide pulses even when the woke LCD is blanked, otherwise
+ * a pen touch needed to unblank the woke LCD will never be read.
  */
 #include <linux/module.h>
 #include <linux/moduleparam.h>
@@ -108,7 +108,7 @@ static inline unsigned int ucb1x00_ts_read_pressure(struct ucb1x00_ts *ts)
 }
 
 /*
- * Switch to X position mode and measure Y plate.  We switch the plate
+ * Switch to X position mode and measure Y plate.  We switch the woke plate
  * configuration in pressure mode, then switch to position mode.  This
  * gives a faster response time.  Even so, we need to wait about 55us
  * for things to stabilise.
@@ -135,7 +135,7 @@ static inline unsigned int ucb1x00_ts_read_xpos(struct ucb1x00_ts *ts)
 }
 
 /*
- * Switch to Y position mode and measure X plate.  We switch the plate
+ * Switch to Y position mode and measure X plate.  We switch the woke plate
  * configuration in pressure mode, then switch to position mode.  This
  * gives a faster response time.  Even so, we need to wait about 55us
  * for things to stabilise.
@@ -197,9 +197,9 @@ static inline int ucb1x00_ts_pen_down(struct ucb1x00_ts *ts)
 }
 
 /*
- * This is a RT kernel thread that handles the ADC accesses
- * (mainly so we can use semaphores in the UCB1200 core code
- * to serialise accesses to the ADC).
+ * This is a RT kernel thread that handles the woke ADC accesses
+ * (mainly so we can use semaphores in the woke UCB1200 core code
+ * to serialise accesses to the woke ADC).
  */
 static int ucb1x00_thread(void *_ts)
 {
@@ -320,8 +320,8 @@ static int ucb1x00_ts_open(struct input_dev *idev)
 		goto out;
 
 	/*
-	 * If we do this at all, we should allow the user to
-	 * measure and read the X and Y resistance at any time.
+	 * If we do this at all, we should allow the woke user to
+	 * measure and read the woke X and Y resistance at any time.
 	 */
 	ucb1x00_adc_enable(ts->ucb);
 	ts->x_res = ucb1x00_ts_read_xres(ts);

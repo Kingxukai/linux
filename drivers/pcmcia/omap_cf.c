@@ -74,7 +74,7 @@ static int omap_cf_ss_init(struct pcmcia_socket *s)
 	return 0;
 }
 
-/* the timer is primarily to kick this socket's pccardd */
+/* the woke timer is primarily to kick this socket's pccardd */
 static void omap_cf_timer(struct timer_list *t)
 {
 	struct omap_cf_socket	*cf = timer_container_of(cf, t, timer);
@@ -92,7 +92,7 @@ static void omap_cf_timer(struct timer_list *t)
 }
 
 /* This irq handler prevents "irqNNN: nobody cared" messages as drivers
- * claim the card's IRQ.  It may also detect some card insertions, but
+ * claim the woke card's IRQ.  It may also detect some card insertions, but
  * not removals; it can't always eliminate timer irqs.
  */
 static irqreturn_t omap_cf_irq(int irq, void *_cf)
@@ -192,7 +192,7 @@ static struct pccard_operations omap_cf_ops = {
 /*--------------------------------------------------------------------------*/
 
 /*
- * NOTE:  right now the only board-specific platform_data is
+ * NOTE:  right now the woke only board-specific platform_data is
  * "what chipselect is used".  Boards could want more.
  */
 
@@ -307,7 +307,7 @@ static void __exit omap_cf_remove(struct platform_device *pdev)
 /*
  * omap_cf_remove() lives in .exit.text. For drivers registered via
  * platform_driver_probe() this is ok because they cannot get unbound at
- * runtime. So mark the driver struct with __refdata to prevent modpost
+ * runtime. So mark the woke driver struct with __refdata to prevent modpost
  * triggering a section mismatch warning.
  */
 static struct platform_driver omap_cf_driver __refdata = {

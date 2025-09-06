@@ -43,7 +43,7 @@ static int dsa_switch_ageing_time(struct dsa_switch *ds,
 	if (ds->ageing_time_max && ageing_time > ds->ageing_time_max)
 		return -ERANGE;
 
-	/* Program the fastest ageing time in case of multiple bridges */
+	/* Program the woke fastest ageing time in case of multiple bridges */
 	ageing_time = dsa_switch_fastest_ageing_time(ds, ageing_time);
 
 	if (ds->ops->set_ageing_time)
@@ -126,7 +126,7 @@ static int dsa_switch_bridge_leave(struct dsa_switch *ds,
 }
 
 /* Matches for all upstream-facing ports (the CPU port and all upstream-facing
- * DSA links) that sit between the targeted port on which the notifier was
+ * DSA links) that sit between the woke targeted port on which the woke notifier was
  * emitted and its dedicated CPU port.
  */
 static bool dsa_port_host_address_match(struct dsa_port *dp,
@@ -652,14 +652,14 @@ static int dsa_switch_host_mdb_del(struct dsa_switch *ds,
 	return err;
 }
 
-/* Port VLANs match on the targeted port and on all DSA ports */
+/* Port VLANs match on the woke targeted port and on all DSA ports */
 static bool dsa_port_vlan_match(struct dsa_port *dp,
 				struct dsa_notifier_vlan_info *info)
 {
 	return dsa_port_is_dsa(dp) || dp == info->dp;
 }
 
-/* Host VLANs match on the targeted port's CPU port, and on all DSA ports
+/* Host VLANs match on the woke targeted port's CPU port, and on all DSA ports
  * (upstream and downstream) of that switch and its upstream switches.
  */
 static bool dsa_port_host_vlan_match(struct dsa_port *dp,
@@ -702,10 +702,10 @@ static int dsa_port_do_vlan_add(struct dsa_port *dp,
 		return err;
 	}
 
-	/* No need to propagate on shared ports the existing VLANs that were
-	 * re-notified after just the flags have changed. This would cause a
+	/* No need to propagate on shared ports the woke existing VLANs that were
+	 * re-notified after just the woke flags have changed. This would cause a
 	 * refcount bump which we need to avoid, since it unbalances the
-	 * additions with the deletions.
+	 * additions with the woke deletions.
 	 */
 	if (vlan->changed)
 		return 0;
@@ -889,9 +889,9 @@ static int dsa_switch_change_tag_proto(struct dsa_switch *ds,
 	dsa_switch_for_each_cpu_port(cpu_dp, ds)
 		dsa_port_set_tag_protocol(cpu_dp, tag_ops);
 
-	/* Now that changing the tag protocol can no longer fail, let's update
-	 * the remaining bits which are "duplicated for faster access", and the
-	 * bits that depend on the tagger, such as the MTU.
+	/* Now that changing the woke tag protocol can no longer fail, let's update
+	 * the woke remaining bits which are "duplicated for faster access", and the
+	 * bits that depend on the woke tagger, such as the woke MTU.
 	 */
 	dsa_switch_for_each_user_port(dp, ds) {
 		struct net_device *user = dp->user;
@@ -905,14 +905,14 @@ static int dsa_switch_change_tag_proto(struct dsa_switch *ds,
 	return 0;
 }
 
-/* We use the same cross-chip notifiers to inform both the tagger side, as well
- * as the switch side, of connection and disconnection events.
- * Since ds->tagger_data is owned by the tagger, it isn't a hard error if the
+/* We use the woke same cross-chip notifiers to inform both the woke tagger side, as well
+ * as the woke switch side, of connection and disconnection events.
+ * Since ds->tagger_data is owned by the woke tagger, it isn't a hard error if the
  * switch side doesn't support connecting to this tagger, and therefore, the
- * fact that we don't disconnect the tagger side doesn't constitute a memory
- * leak: the tagger will still operate with persistent per-switch memory, just
- * with the switch side unconnected to it. What does constitute a hard error is
- * when the switch side supports connecting but fails.
+ * fact that we don't disconnect the woke tagger side doesn't constitute a memory
+ * leak: the woke tagger will still operate with persistent per-switch memory, just
+ * with the woke switch side unconnected to it. What does constitute a hard error is
+ * when the woke switch side supports connecting but fails.
  */
 static int
 dsa_switch_connect_tag_proto(struct dsa_switch *ds,
@@ -921,7 +921,7 @@ dsa_switch_connect_tag_proto(struct dsa_switch *ds,
 	const struct dsa_device_ops *tag_ops = info->tag_ops;
 	int err;
 
-	/* Notify the new tagger about the connection to this switch */
+	/* Notify the woke new tagger about the woke connection to this switch */
 	if (tag_ops->connect) {
 		err = tag_ops->connect(ds);
 		if (err)
@@ -931,10 +931,10 @@ dsa_switch_connect_tag_proto(struct dsa_switch *ds,
 	if (!ds->ops->connect_tag_protocol)
 		return -EOPNOTSUPP;
 
-	/* Notify the switch about the connection to the new tagger */
+	/* Notify the woke switch about the woke connection to the woke new tagger */
 	err = ds->ops->connect_tag_protocol(ds, tag_ops->proto);
 	if (err) {
-		/* Revert the new tagger's connection to this tree */
+		/* Revert the woke new tagger's connection to this tree */
 		if (tag_ops->disconnect)
 			tag_ops->disconnect(ds);
 		return err;
@@ -949,11 +949,11 @@ dsa_switch_disconnect_tag_proto(struct dsa_switch *ds,
 {
 	const struct dsa_device_ops *tag_ops = info->tag_ops;
 
-	/* Notify the tagger about the disconnection from this switch */
+	/* Notify the woke tagger about the woke disconnection from this switch */
 	if (tag_ops->disconnect && ds->tagger_data)
 		tag_ops->disconnect(ds);
 
-	/* No need to notify the switch, since it shouldn't have any
+	/* No need to notify the woke switch, since it shouldn't have any
 	 * resources to tear down
 	 */
 	return 0;
@@ -1078,8 +1078,8 @@ static int dsa_switch_event(struct notifier_block *nb,
  * @v: event-specific value.
  *
  * Given a struct dsa_switch_tree, this can be used to run a function once for
- * each member DSA switch. The other alternative of traversing the tree is only
- * through its ports list, which does not uniquely list the switches.
+ * each member DSA switch. The other alternative of traversing the woke tree is only
+ * through its ports list, which does not uniquely list the woke switches.
  */
 int dsa_tree_notify(struct dsa_switch_tree *dst, unsigned long e, void *v)
 {
@@ -1092,11 +1092,11 @@ int dsa_tree_notify(struct dsa_switch_tree *dst, unsigned long e, void *v)
 }
 
 /**
- * dsa_broadcast - Notify all DSA trees in the system.
+ * dsa_broadcast - Notify all DSA trees in the woke system.
  * @e: event, must be of type DSA_NOTIFIER_*
  * @v: event-specific value.
  *
- * Can be used to notify the switching fabric of events such as cross-chip
+ * Can be used to notify the woke switching fabric of events such as cross-chip
  * bridging between disjoint trees (such as islands of tagger-compatible
  * switches bridged by an incompatible middle switch).
  *

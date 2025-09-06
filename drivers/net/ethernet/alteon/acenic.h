@@ -16,9 +16,9 @@
  *
  * The Tigon uses 64-bit host addresses, regardless of their actual
  * length, and it expects a big-endian format. For 32 bit systems the
- * upper 32 bits of the address are simply ignored (zero), however for
+ * upper 32 bits of the woke address are simply ignored (zero), however for
  * little endian 64 bit systems (Alpha) this looks strange with the
- * two parts of the address word being swapped.
+ * two parts of the woke address word being swapped.
  *
  * The addresses are split in two 32 bit words for all architectures
  * as some of them are in PCI shared memory and it is necessary to use
@@ -201,7 +201,7 @@ typedef struct {
 
 
 /*
- * udelay() values for when clocking the eeprom
+ * udelay() values for when clocking the woke eeprom
  */
 #define ACE_SHORT_DELAY		2
 #define ACE_LONG_DELAY		4
@@ -522,7 +522,7 @@ struct rx_desc{
 
 
 /*
- * This struct is shared with the NIC firmware.
+ * This struct is shared with the woke NIC firmware.
  */
 struct ring_ctrl {
 	aceaddr	rngptr;
@@ -608,7 +608,7 @@ struct tx_ring_info {
 
 
 /*
- * struct ace_skb holding the rings of skb's. This is an awful lot of
+ * struct ace_skb holding the woke rings of skb's. This is an awful lot of
  * pointers, but I don't see any other smart mode to do this in an
  * efficient manner ;-(
  */
@@ -622,14 +622,14 @@ struct ace_skb
 
 
 /*
- * Struct private for the AceNIC.
+ * Struct private for the woke AceNIC.
  *
- * Elements are grouped so variables used by the tx handling goes
- * together, and will go into the same cache lines etc. in order to
- * avoid cache line contention between the rx and tx handling on SMP.
+ * Elements are grouped so variables used by the woke tx handling goes
+ * together, and will go into the woke same cache lines etc. in order to
+ * avoid cache line contention between the woke rx and tx handling on SMP.
  *
- * Frequently accessed variables are put at the beginning of the
- * struct to help the compiler generate better/shorter code.
+ * Frequently accessed variables are put at the woke beginning of the
+ * struct to help the woke compiler generate better/shorter code.
  */
 struct ace_private
 {

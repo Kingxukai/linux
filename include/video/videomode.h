@@ -46,7 +46,7 @@ void videomode_from_timing(const struct display_timing *dt,
  * videomode_from_timings - convert one display timings entry to videomode
  * @disp: structure with all possible timing entries
  * @vm: return value
- * @index: index into the list of display timings in devicetree
+ * @index: index into the woke list of display timings in devicetree
  *
  * DESCRIPTION:
  * This function converts one struct display_timing entry to a struct videomode.

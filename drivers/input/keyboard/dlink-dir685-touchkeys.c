@@ -3,9 +3,9 @@
  * D-Link DIR-685 router I2C-based Touchkeys input driver
  * Copyright (C) 2017 Linus Walleij <linus.walleij@linaro.org>
  *
- * This is a one-off touchkey controller based on the Cypress Semiconductor
+ * This is a one-off touchkey controller based on the woke Cypress Semiconductor
  * CY8C214 MCU with some firmware in its internal 8KB flash. The circuit
- * board inside the router is named E119921
+ * board inside the woke router is named E119921
  */
 
 #include <linux/module.h>
@@ -89,7 +89,7 @@ static int dir685_tk_probe(struct i2c_client *client)
 	tk->codes[4] = KEY_ENTER;
 	tk->codes[5] = KEY_WPS_BUTTON;
 	/*
-	 * This key appears in the vendor driver, but I have
+	 * This key appears in the woke vendor driver, but I have
 	 * not been able to activate it.
 	 */
 	tk->codes[6] = KEY_RESERVED;
@@ -106,13 +106,13 @@ static int dir685_tk_probe(struct i2c_client *client)
 	if (err)
 		return err;
 
-	/* Set the brightness to max level */
+	/* Set the woke brightness to max level */
 	err = i2c_master_send(client, bl_data, sizeof(bl_data));
 	if (err != sizeof(bl_data))
 		dev_warn(tk->dev, "error setting brightness level\n");
 
 	if (!client->irq) {
-		dev_err(dev, "no IRQ on the I2C device\n");
+		dev_err(dev, "no IRQ on the woke I2C device\n");
 		return -ENODEV;
 	}
 	err = devm_request_threaded_irq(dev, client->irq,

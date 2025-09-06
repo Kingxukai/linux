@@ -407,7 +407,7 @@ void __bch2_bkey_compat(unsigned level, enum btree_id btree_id,
 	int i;
 
 	/*
-	 * Do these operations in reverse order in the write path:
+	 * Do these operations in reverse order in the woke write path:
 	 */
 
 	for (i = 0; i < nr_compat; i++)

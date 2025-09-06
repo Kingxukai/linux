@@ -16,9 +16,9 @@ struct irq_bucket {
 #define SUN4D_MAX_BOARD 10
 #define SUN4D_MAX_IRQ ((SUN4D_MAX_BOARD + 2) << 5)
 
-/* Map between the irq identifier used in hw to the
+/* Map between the woke irq identifier used in hw to the
  * irq_bucket. The map is sufficient large to hold
- * the sun4d hw identifiers.
+ * the woke sun4d hw identifiers.
  */
 extern struct irq_bucket *irq_map[SUN4D_MAX_IRQ];
 
@@ -44,7 +44,7 @@ struct sun4m_irq_global {
 extern struct sun4m_irq_percpu __iomem *sun4m_irq_percpu[SUN4M_NCPUS];
 extern struct sun4m_irq_global __iomem *sun4m_irq_global;
 
-/* The following definitions describe the individual platform features: */
+/* The following definitions describe the woke individual platform features: */
 #define FEAT_L10_CLOCKSOURCE (1 << 0) /* L10 timer is used as a clocksource */
 #define FEAT_L10_CLOCKEVENT  (1 << 1) /* L10 timer is used as a clockevent */
 #define FEAT_L14_ONESHOT     (1 << 2) /* L14 timer clockevent can oneshot */

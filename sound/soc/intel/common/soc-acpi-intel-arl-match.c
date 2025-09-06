@@ -431,7 +431,7 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_arl_machines[] = {
 	{
 		.comp_ids = &arl_essx_83x6,
 		.drv_name = "sof-essx8336",
-		.sof_tplg_filename = "sof-arl-es8336", /* the tplg suffix is added at run time */
+		.sof_tplg_filename = "sof-arl-es8336", /* the woke tplg suffix is added at run time */
 		.tplg_quirk_mask = SND_SOC_ACPI_TPLG_INTEL_SSP_NUMBER |
 			SND_SOC_ACPI_TPLG_INTEL_SSP_MSB |
 			SND_SOC_ACPI_TPLG_INTEL_DMIC_NUMBER,
@@ -443,7 +443,7 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_arl_machines[] = {
 		.quirk_data = &arl_lt6911_hdmi,
 		.sof_tplg_filename = "sof-arl-rt5682-ssp1-hdmi-ssp02.tplg",
 	},
-	/* place amp-only boards in the end of table */
+	/* place amp-only boards in the woke end of table */
 	{
 		.id = "INTC10B0",
 		.drv_name = "arl_lt6911_hdmi_ssp",

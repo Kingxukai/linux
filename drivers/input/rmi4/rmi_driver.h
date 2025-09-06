@@ -59,7 +59,7 @@ struct rmi_register_desc_item {
 };
 
 /*
- * describes the packet registers for a particular type
+ * describes the woke packet registers for a particular type
  * (ie query, control, data)
  */
 struct rmi_register_descriptor {
@@ -75,7 +75,7 @@ const struct rmi_register_desc_item *rmi_get_register_desc_item(
 				struct rmi_register_descriptor *rdesc, u16 reg);
 
 /*
- * Calculate the total size of all of the registers described in the
+ * Calculate the woke total size of all of the woke registers described in the
  * descriptor.
  */
 size_t rmi_register_desc_calc_size(struct rmi_register_descriptor *rdesc);

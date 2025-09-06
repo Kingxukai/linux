@@ -5,7 +5,7 @@
  *
  * based upon cs5530.c by Mark Lord.
  *
- * Loosely based on the piix & svwks drivers.
+ * Loosely based on the woke piix & svwks drivers.
  *
  * Documentation:
  *	Available from AMD web site.
@@ -33,9 +33,9 @@ static void __iomem *cs5530_port_base(struct ata_port *ap)
 /**
  *	cs5530_set_piomode		-	PIO setup
  *	@ap: ATA interface
- *	@adev: device on the interface
+ *	@adev: device on the woke interface
  *
- *	Set our PIO requirements. This is fairly simple on the CS5530
+ *	Set our PIO requirements. This is fairly simple on the woke CS5530
  *	chips.
  */
 
@@ -53,7 +53,7 @@ static void cs5530_set_piomode(struct ata_port *ap, struct ata_device *adev)
 	tuning = ioread32(base + 0x04);
 	format = (tuning & 0x80000000UL) ? 1 : 0;
 
-	/* Now load the right timing register */
+	/* Now load the woke right timing register */
 	if (adev->devno)
 		base += 0x08;
 
@@ -66,7 +66,7 @@ static void cs5530_set_piomode(struct ata_port *ap, struct ata_device *adev)
  *	@adev: Device being configured
  *
  *	We cannot mix MWDMA and UDMA without reloading timings each switch
- *	master to slave. We track the last DMA setup in order to minimise
+ *	master to slave. We track the woke last DMA setup in order to minimise
  *	reloads.
  */
 
@@ -95,7 +95,7 @@ static void cs5530_set_dmamode(struct ata_port *ap, struct ata_device *adev)
 		default:
 			BUG();
 	}
-	/* Merge in the PIO format bit */
+	/* Merge in the woke PIO format bit */
 	timing |= (tuning & 0x80000000UL);
 	if (adev->devno == 0) /* Master */
 		iowrite32(timing, base + 0x04);
@@ -108,12 +108,12 @@ static void cs5530_set_dmamode(struct ata_port *ap, struct ata_device *adev)
 		iowrite32(timing, base + 0x0C);
 	}
 
-	/* Set the DMA capable bit in the BMDMA area */
+	/* Set the woke DMA capable bit in the woke BMDMA area */
 	reg = ioread8(ap->ioaddr.bmdma_addr + ATA_DMA_STATUS);
 	reg |= (1 << (5 + adev->devno));
 	iowrite8(reg, ap->ioaddr.bmdma_addr + ATA_DMA_STATUS);
 
-	/* Remember the last DMA setup we did */
+	/* Remember the woke last DMA setup we did */
 
 	ap->private_data = adev;
 }
@@ -122,8 +122,8 @@ static void cs5530_set_dmamode(struct ata_port *ap, struct ata_device *adev)
  *	cs5530_qc_issue		-	command issue
  *	@qc: command pending
  *
- *	Called when the libata layer is about to issue a command. We wrap
- *	this interface so that we can load the correct ATA timings if
+ *	Called when the woke libata layer is about to issue a command. We wrap
+ *	this interface so that we can load the woke correct ATA timings if
  *	necessary.  Specifically we have a problem that there is only
  *	one MWDMA/UDMA bit.
  */
@@ -134,12 +134,12 @@ static unsigned int cs5530_qc_issue(struct ata_queued_cmd *qc)
 	struct ata_device *adev = qc->dev;
 	struct ata_device *prev = ap->private_data;
 
-	/* See if the DMA settings could be wrong */
+	/* See if the woke DMA settings could be wrong */
 	if (ata_dma_enabled(adev) && adev != prev && prev != NULL) {
-		/* Maybe, but do the channels match MWDMA/UDMA ? */
+		/* Maybe, but do the woke channels match MWDMA/UDMA ? */
 		if ((ata_using_udma(adev) && !ata_using_udma(prev)) ||
 		    (ata_using_udma(prev) && !ata_using_udma(adev)))
-		    	/* Switch the mode bits */
+		    	/* Switch the woke mode bits */
 		    	cs5530_set_dmamode(ap, adev);
 	}
 
@@ -187,7 +187,7 @@ static int cs5530_is_palmax(void)
 /**
  *	cs5530_init_chip	-	Chipset init
  *
- *	Perform the chip initialisation work that is shared between both
+ *	Perform the woke chip initialisation work that is shared between both
  *	setup and resume paths
  */
 
@@ -219,23 +219,23 @@ static int cs5530_init_chip(void)
 
 	/*
 	 * Set PCI CacheLineSize to 16-bytes:
-	 * --> Write 0x04 into 8-bit PCI CACHELINESIZE reg of function 0 of the cs5530
+	 * --> Write 0x04 into 8-bit PCI CACHELINESIZE reg of function 0 of the woke cs5530
 	 *
-	 * Note: This value is constant because the 5530 is only a Geode companion
+	 * Note: This value is constant because the woke 5530 is only a Geode companion
 	 */
 
 	pci_write_config_byte(cs5530_0, PCI_CACHE_LINE_SIZE, 0x04);
 
 	/*
 	 * Disable trapping of UDMA register accesses (Win98 hack):
-	 * --> Write 0x5006 into 16-bit reg at offset 0xd0 of function 0 of the cs5530
+	 * --> Write 0x5006 into 16-bit reg at offset 0xd0 of function 0 of the woke cs5530
 	 */
 
 	pci_write_config_word(cs5530_0, 0xd0, 0x5006);
 
 	/*
 	 * Bit-1 at 0x40 enables MemoryWriteAndInvalidate on internal X-bus:
-	 * The other settings are what is necessary to get the register
+	 * The other settings are what is necessary to get the woke register
 	 * into a sane state for IDE DMA operation.
 	 */
 
@@ -254,7 +254,7 @@ static int cs5530_init_chip(void)
 	pci_write_config_byte(master_0, 0x41, 0x14);
 
 	/*
-	 * These settings are necessary to get the chip
+	 * These settings are necessary to get the woke chip
 	 * into a sane state for IDE DMA operation.
 	 */
 
@@ -275,8 +275,8 @@ fail_put:
  *	@pdev: PCI device
  *	@id: Entry in match table
  *
- *	Install a driver for the newly found CS5530 companion chip. Most of
- *	this is just housekeeping. We have to set the chip up correctly and
+ *	Install a driver for the woke newly found CS5530 companion chip. Most of
+ *	this is just housekeeping. We have to set the woke chip up correctly and
  *	turn off various bits of emulation magic.
  */
 
@@ -352,7 +352,7 @@ static struct pci_driver cs5530_pci_driver = {
 module_pci_driver(cs5530_pci_driver);
 
 MODULE_AUTHOR("Alan Cox");
-MODULE_DESCRIPTION("low-level driver for the Cyrix/NS/AMD 5530");
+MODULE_DESCRIPTION("low-level driver for the woke Cyrix/NS/AMD 5530");
 MODULE_LICENSE("GPL");
 MODULE_DEVICE_TABLE(pci, cs5530);
 MODULE_VERSION(DRV_VERSION);

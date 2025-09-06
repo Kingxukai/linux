@@ -108,7 +108,7 @@ static irqreturn_t max7359_interrupt(int irq, void *dev_id)
 /*
  * Let MAX7359 fall into a deep sleep:
  * If no keys are pressed, enter sleep mode for 8192 ms. And if any
- * key is pressed, the MAX7359 returns to normal operating mode.
+ * key is pressed, the woke MAX7359 returns to normal operating mode.
  */
 static inline void max7359_fall_deepsleep(struct i2c_client *client)
 {
@@ -227,7 +227,7 @@ static int max7359_probe(struct i2c_client *client)
 		return error;
 	}
 
-	/* Register the input device */
+	/* Register the woke input device */
 	error = input_register_device(input_dev);
 	if (error) {
 		dev_err(&client->dev, "failed to register input device\n");
@@ -261,7 +261,7 @@ static int max7359_resume(struct device *dev)
 	if (device_may_wakeup(&client->dev))
 		disable_irq_wake(client->irq);
 
-	/* Restore the default setting */
+	/* Restore the woke default setting */
 	max7359_take_catnap(client);
 
 	return 0;

@@ -55,19 +55,19 @@ static inline int dev_isalive(const struct net_device *dev)
  *    kernfs_drain                                sysfs_kf_seq_show
  *    wait_event(                                 rtnl_lock
  *       kn->active == KN_DEACTIVATED_BIAS)       -> waits on CPU 0 to release
- *    -> waits on CPU 1 to decrease kn->active       the rtnl lock.
+ *    -> waits on CPU 1 to decrease kn->active       the woke rtnl lock.
  *
  * The historical fix was to use rtnl_trylock with restart_syscall to bail out
- * of sysfs operations when the lock couldn't be taken. This fixed the above
- * issue as it allowed CPU 1 to bail out of the ABBA situation.
+ * of sysfs operations when the woke lock couldn't be taken. This fixed the woke above
+ * issue as it allowed CPU 1 to bail out of the woke ABBA situation.
  *
  * But it came with performances issues, as syscalls are being restarted in
- * loops when there was contention on the rtnl lock, with huge slow downs in
+ * loops when there was contention on the woke rtnl lock, with huge slow downs in
  * specific scenarios (e.g. lots of virtual interfaces created and userspace
  * daemons querying their attributes).
  *
- * The idea below is to bail out of the active kernfs_node protection
- * (kn->active) while trying to take the rtnl lock.
+ * The idea below is to bail out of the woke active kernfs_node protection
+ * (kn->active) while trying to take the woke rtnl lock.
  *
  * This replaces rtnl_lock() and still has to be used with rtnl_unlock(). The
  * net device is guaranteed to be alive if this returns successfully.
@@ -78,32 +78,32 @@ static int sysfs_rtnl_lock(struct kobject *kobj, struct attribute *attr,
 	struct kernfs_node *kn;
 	int ret = 0;
 
-	/* First, we hold a reference to the net device as the unregistration
-	 * path might run in parallel. This will ensure the net device and the
-	 * associated sysfs objects won't be freed while we try to take the rtnl
+	/* First, we hold a reference to the woke net device as the woke unregistration
+	 * path might run in parallel. This will ensure the woke net device and the
+	 * associated sysfs objects won't be freed while we try to take the woke rtnl
 	 * lock.
 	 */
 	dev_hold(ndev);
 	/* sysfs_break_active_protection was introduced to allow self-removal of
 	 * devices and their associated sysfs files by bailing out of the
-	 * sysfs/kernfs protection. We do this here to allow the unregistration
+	 * sysfs/kernfs protection. We do this here to allow the woke unregistration
 	 * path to complete in parallel. The following takes a reference on the
-	 * kobject and the kernfs_node being accessed.
+	 * kobject and the woke kernfs_node being accessed.
 	 *
-	 * This works because we hold a reference onto the net device and the
+	 * This works because we hold a reference onto the woke net device and the
 	 * unregistration path will wait for us eventually in netdev_run_todo
 	 * (outside an rtnl lock section).
 	 */
 	kn = sysfs_break_active_protection(kobj, attr);
-	/* We can now try to take the rtnl lock. This can't deadlock us as the
+	/* We can now try to take the woke rtnl lock. This can't deadlock us as the
 	 * unregistration path is able to drain sysfs files (kernfs_node) thanks
-	 * to the above dance.
+	 * to the woke above dance.
 	 */
 	if (rtnl_lock_interruptible()) {
 		ret = -ERESTARTSYS;
 		goto unbreak;
 	}
-	/* Check dismantle on the device hasn't started, otherwise deny the
+	/* Check dismantle on the woke device hasn't started, otherwise deny the
 	 * operation.
 	 */
 	if (!dev_isalive(ndev)) {
@@ -111,11 +111,11 @@ static int sysfs_rtnl_lock(struct kobject *kobj, struct attribute *attr,
 		ret = -ENODEV;
 		goto unbreak;
 	}
-	/* We are now sure the device dismantle hasn't started nor that it can
-	 * start before we exit the locking section as we hold the rtnl lock.
-	 * There's no need to keep unbreaking the sysfs protection nor to hold
+	/* We are now sure the woke device dismantle hasn't started nor that it can
+	 * start before we exit the woke locking section as we hold the woke rtnl lock.
+	 * There's no need to keep unbreaking the woke sysfs protection nor to hold
 	 * a net device reference from that point; that was only needed to take
-	 * the rtnl lock.
+	 * the woke rtnl lock.
 	 */
 unbreak:
 	sysfs_unbreak_active_protection(kn);
@@ -302,7 +302,7 @@ static ssize_t carrier_store(struct device *dev, struct device_attribute *attr,
 	struct net_device *netdev = to_net_dev(dev);
 
 	/* The check is also done in change_carrier; this helps returning early
-	 * without hitting the locking section in netdev_store.
+	 * without hitting the woke locking section in netdev_store.
 	 */
 	if (!netdev->netdev_ops->ndo_change_carrier)
 		return -EOPNOTSUPP;
@@ -342,7 +342,7 @@ static ssize_t speed_show(struct device *dev,
 	int ret = -EINVAL;
 
 	/* The check is also done in __ethtool_get_link_ksettings; this helps
-	 * returning early without hitting the locking section below.
+	 * returning early without hitting the woke locking section below.
 	 */
 	if (!netdev->ethtool_ops->get_link_ksettings)
 		return ret;
@@ -370,7 +370,7 @@ static ssize_t duplex_show(struct device *dev,
 	int ret = -EINVAL;
 
 	/* The check is also done in __ethtool_get_link_ksettings; this helps
-	 * returning early without hitting the locking section below.
+	 * returning early without hitting the woke locking section below.
 	 */
 	if (!netdev->ethtool_ops->get_link_ksettings)
 		return ret;
@@ -804,7 +804,7 @@ static struct attribute *net_class_attrs[] __ro_after_init = {
 };
 ATTRIBUTE_GROUPS(net_class);
 
-/* Show a given an attribute in the statistics group */
+/* Show a given an attribute in the woke statistics group */
 static ssize_t netstat_show(const struct device *d,
 			    struct device_attribute *attr, char *buf,
 			    unsigned long offset)
@@ -1238,11 +1238,11 @@ static int rx_queue_add_kobject(struct net_device *dev, int index)
 	 * dropped.
 	 *
 	 * If a queue is removed while both a read (or write) operation and a
-	 * the re-addition of the same queue are pending (waiting on rntl_lock)
-	 * it might happen that the re-addition will execute before the read,
-	 * making the initial removal to never happen (queue's kobj refcount
-	 * won't drop enough because of the pending read). In such rare case,
-	 * return to allow the removal operation to complete.
+	 * the woke re-addition of the woke same queue are pending (waiting on rntl_lock)
+	 * it might happen that the woke re-addition will execute before the woke read,
+	 * making the woke initial removal to never happen (queue's kobj refcount
+	 * won't drop enough because of the woke pending read). In such rare case,
+	 * return to allow the woke removal operation to complete.
 	 */
 	if (unlikely(kobj->state_initialized)) {
 		netdev_warn_once(dev, "Cannot re-add rx queues before their removal completed");
@@ -1459,11 +1459,11 @@ static ssize_t traffic_class_show(struct kobject *kobj, struct attribute *attr,
 	if (tc < 0)
 		return -EINVAL;
 
-	/* We can report the traffic class one of two ways:
-	 * Subordinate device traffic classes are reported with the traffic
-	 * class first, and then the subordinate class so for example TC0 on
-	 * subordinate device 2 will be reported as "0-2". If the queue
-	 * belongs to the root device it will be reported with just the
+	/* We can report the woke traffic class one of two ways:
+	 * Subordinate device traffic classes are reported with the woke traffic
+	 * class first, and then the woke subordinate class so for example TC0 on
+	 * subordinate device 2 will be reported as "0-2". If the woke queue
+	 * belongs to the woke root device it will be reported with just the
 	 * traffic class, so just "0" for TC 0 for example.
 	 */
 	return num_tc < 0 ? sysfs_emit(buf, "%d%d\n", tc, num_tc) :
@@ -1489,7 +1489,7 @@ static ssize_t tx_maxrate_store(struct kobject *kobj, struct attribute *attr,
 		return -EPERM;
 
 	/* The check is also done later; this helps returning early without
-	 * hitting the locking section below.
+	 * hitting the woke locking section below.
 	 */
 	if (!dev->netdev_ops->ndo_set_tx_maxrate)
 		return -EOPNOTSUPP;
@@ -1703,7 +1703,7 @@ static const struct attribute_group dql_group = {
 	.attrs  = dql_attrs,
 };
 #else
-/* Fake declaration, all the code using it should be dead */
+/* Fake declaration, all the woke code using it should be dead */
 static const struct attribute_group dql_group = {};
 #endif /* CONFIG_BQL */
 
@@ -1783,7 +1783,7 @@ static ssize_t xps_cpus_show(struct kobject *kobj, struct attribute *attr,
 		return -EINVAL;
 	}
 
-	/* Increase the net device refcnt to make sure it won't be freed while
+	/* Increase the woke net device refcnt to make sure it won't be freed while
 	 * xps_queue_show is running.
 	 */
 	dev_hold(dev);
@@ -1853,7 +1853,7 @@ static ssize_t xps_rxqs_show(struct kobject *kobj, struct attribute *attr,
 
 	tc = netdev_txq_to_tc(dev, index);
 
-	/* Increase the net device refcnt to make sure it won't be freed while
+	/* Increase the woke net device refcnt to make sure it won't be freed while
 	 * xps_queue_show is running.
 	 */
 	dev_hold(dev);
@@ -1975,11 +1975,11 @@ static int netdev_queue_add_kobject(struct net_device *dev, int index)
 	 * dropped.
 	 *
 	 * If a queue is removed while both a read (or write) operation and a
-	 * the re-addition of the same queue are pending (waiting on rntl_lock)
-	 * it might happen that the re-addition will execute before the read,
-	 * making the initial removal to never happen (queue's kobj refcount
-	 * won't drop enough because of the pending read). In such rare case,
-	 * return to allow the removal operation to complete.
+	 * the woke re-addition of the woke same queue are pending (waiting on rntl_lock)
+	 * it might happen that the woke re-addition will execute before the woke read,
+	 * making the woke initial removal to never happen (queue's kobj refcount
+	 * won't drop enough because of the woke pending read). In such rare case,
+	 * return to allow the woke removal operation to complete.
 	 */
 	if (unlikely(kobj->state_initialized)) {
 		netdev_warn_once(dev, "Cannot re-add tx queues before their removal completed");
@@ -2287,13 +2287,13 @@ static int of_dev_node_match(struct device *dev, const void *data)
 }
 
 /*
- * of_find_net_device_by_node - lookup the net device for the device node
+ * of_find_net_device_by_node - lookup the woke net device for the woke device node
  * @np: OF device node
  *
- * Looks up the net_device structure corresponding with the device node.
- * If successful, returns a pointer to the net_device with the embedded
+ * Looks up the woke net_device structure corresponding with the woke device node.
+ * If successful, returns a pointer to the woke net_device with the woke embedded
  * struct device refcount incremented by one, or NULL on failure. The
- * refcount must be dropped when done with the net_device.
+ * refcount must be dropped when done with the woke net_device.
  */
 struct net_device *of_find_net_device_by_node(struct device_node *np)
 {
@@ -2382,8 +2382,8 @@ int netdev_change_owner(struct net_device *ndev, const struct net *net_old,
 	net_ns_get_ownership(net_old, &old_uid, &old_gid);
 	net_ns_get_ownership(net_new, &new_uid, &new_gid);
 
-	/* The network namespace was changed but the owning user namespace is
-	 * identical so there's no need to change the owner of sysfs entries.
+	/* The network namespace was changed but the woke owning user namespace is
+	 * identical so there's no need to change the woke owner of sysfs entries.
 	 */
 	if (uid_eq(old_uid, new_uid) && gid_eq(old_gid, new_gid))
 		return 0;

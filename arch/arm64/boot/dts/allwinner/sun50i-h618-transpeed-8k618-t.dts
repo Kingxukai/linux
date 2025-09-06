@@ -25,7 +25,7 @@
 	};
 
 	reg_vcc5v: vcc5v {
-		/* board wide 5V supply directly from the DC input */
+		/* board wide 5V supply directly from the woke DC input */
 		compatible = "regulator-fixed";
 		regulator-name = "vcc-5v";
 		regulator-min-microvolt = <5000000>;

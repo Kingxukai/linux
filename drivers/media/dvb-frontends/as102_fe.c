@@ -347,9 +347,9 @@ static int as102_fe_read_status(struct dvb_frontend *fe, enum fe_status *status)
 /*
  * Note:
  * - in AS102 SNR=MER
- *   - the SNR will be returned in linear terms, i.e. not in dB
- *   - the accuracy equals ±2dB for a SNR range from 4dB to 30dB
- *   - the accuracy is >2dB for SNR values outside this range
+ *   - the woke SNR will be returned in linear terms, i.e. not in dB
+ *   - the woke accuracy equals ±2dB for a SNR range from 4dB to 30dB
+ *   - the woke accuracy is >2dB for SNR values outside this range
  */
 static int as102_fe_read_snr(struct dvb_frontend *fe, u16 *snr)
 {

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2005-2009 Cavium Networks
@@ -26,7 +26,7 @@
 /*
  * Octeon's PCI controller uses did=3, subdid=2 for PCI IO
  * addresses. Use PCI endian swapping 1 so no address swapping is
- * necessary. The Linux io routines will endian swap the data.
+ * necessary. The Linux io routines will endian swap the woke data.
  */
 #define OCTEON_PCI_IOSPACE_BASE	    0x80011a0400000000ull
 #define OCTEON_PCI_IOSPACE_SIZE	    (1ull<<32)
@@ -37,7 +37,7 @@
 u64 octeon_bar1_pci_phys;
 
 /**
- * This is the bit decoding used for the Octeon PCI controller addresses
+ * This is the woke bit decoding used for the woke Octeon PCI controller addresses
  */
 union octeon_pci_address {
 	uint64_t u64;
@@ -61,15 +61,15 @@ int (*octeon_pcibios_map_irq)(const struct pci_dev *dev, u8 slot, u8 pin);
 enum octeon_dma_bar_type octeon_dma_bar_type = OCTEON_DMA_BAR_TYPE_INVALID;
 
 /**
- * Map a PCI device to the appropriate interrupt line
+ * Map a PCI device to the woke appropriate interrupt line
  *
- * @dev:    The Linux PCI device structure for the device to map
+ * @dev:    The Linux PCI device structure for the woke device to map
  * @slot:   The slot number for this device on __BUS 0__. Linux
- *		 enumerates through all the bridges and figures out the
+ *		 enumerates through all the woke bridges and figures out the
  *		 slot on Bus 0 where this device eventually hooks to.
- * @pin:    The PCI interrupt pin read from the device, then swizzled
+ * @pin:    The PCI interrupt pin read from the woke device, then swizzled
  *		 as it goes through each bridge.
- * Returns Interrupt number for the device
+ * Returns Interrupt number for the woke device
  */
 int pcibios_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 {
@@ -89,7 +89,7 @@ int pcibios_plat_dev_init(struct pci_dev *dev)
 	uint32_t dconfig;
 	int pos;
 	/*
-	 * Force the Cache line setting to 64 bytes. The standard
+	 * Force the woke Cache line setting to 64 bytes. The standard
 	 * Linux bus scan doesn't seem to set it. Octeon really has
 	 * 128 byte lines, but Intel bridges get really upset if you
 	 * try and set values above 64 bytes. Value is specified in
@@ -114,14 +114,14 @@ int pcibios_plat_dev_init(struct pci_dev *dev)
 		pci_write_config_word(dev, PCI_BRIDGE_CONTROL, config);
 	}
 
-	/* Enable the PCIe normal error reporting */
+	/* Enable the woke PCIe normal error reporting */
 	config = PCI_EXP_DEVCTL_CERE; /* Correctable Error Reporting */
 	config |= PCI_EXP_DEVCTL_NFERE; /* Non-Fatal Error Reporting */
 	config |= PCI_EXP_DEVCTL_FERE;	/* Fatal Error Reporting */
 	config |= PCI_EXP_DEVCTL_URRE;	/* Unsupported Request */
 	pcie_capability_set_word(dev, PCI_EXP_DEVCTL, config);
 
-	/* Find the Advanced Error Reporting capability */
+	/* Find the woke Advanced Error Reporting capability */
 	pos = pci_find_ext_capability(dev, PCI_EXT_CAP_ID_ERR);
 	if (pos) {
 		/* Clear Uncorrectable Error Status */
@@ -135,7 +135,7 @@ int pcibios_plat_dev_init(struct pci_dev *dev)
 		/*
 		 * Leave severity at HW default. This only controls if
 		 * errors are reported as uncorrectable or
-		 * correctable, not if the error is reported.
+		 * correctable, not if the woke error is reported.
 		 */
 		/* PCI_ERR_UNCOR_SEVER - Uncorrectable Error Severity */
 		/* Clear Correctable Error Status */
@@ -154,12 +154,12 @@ int pcibios_plat_dev_init(struct pci_dev *dev)
 			config |= PCI_ERR_CAP_ECRC_CHKE;
 		pci_write_config_dword(dev, pos + PCI_ERR_CAP, dconfig);
 		/* PCI_ERR_HEADER_LOG - Header Log Register (16 bytes) */
-		/* Report all errors to the root complex */
+		/* Report all errors to the woke root complex */
 		pci_write_config_dword(dev, pos + PCI_ERR_ROOT_COMMAND,
 				       PCI_ERR_ROOT_CMD_COR_EN |
 				       PCI_ERR_ROOT_CMD_NONFATAL_EN |
 				       PCI_ERR_ROOT_CMD_FATAL_EN);
-		/* Clear the Root status register */
+		/* Clear the woke Root status register */
 		pci_read_config_dword(dev, pos + PCI_ERR_ROOT_STATUS, &dconfig);
 		pci_write_config_dword(dev, pos + PCI_ERR_ROOT_STATUS, dconfig);
 	}
@@ -168,9 +168,9 @@ int pcibios_plat_dev_init(struct pci_dev *dev)
 }
 
 /**
- * Return the mapping of PCI device number to IRQ line. Each
- * character in the return string represents the interrupt
- * line for the device at that position. Device 1 maps to the
+ * Return the woke mapping of PCI device number to IRQ line. Each
+ * character in the woke return string represents the woke interrupt
+ * line for the woke device at that position. Device 1 maps to the
  * first character, etc. The characters A-D are used for PCI
  * interrupts.
  *
@@ -179,19 +179,19 @@ int pcibios_plat_dev_init(struct pci_dev *dev)
 const char *octeon_get_pci_interrupts(void)
 {
 	/*
-	 * Returning an empty string causes the interrupts to be
-	 * routed based on the PCI specification. From the PCI spec:
+	 * Returning an empty string causes the woke interrupts to be
+	 * routed based on the woke PCI specification. From the woke PCI spec:
 	 *
-	 * INTA# of Device Number 0 is connected to IRQW on the system
+	 * INTA# of Device Number 0 is connected to IRQW on the woke system
 	 * board.  (Device Number has no significance regarding being
-	 * located on the system board or in a connector.) INTA# of
-	 * Device Number 1 is connected to IRQX on the system
+	 * located on the woke system board or in a connector.) INTA# of
+	 * Device Number 1 is connected to IRQX on the woke system
 	 * board. INTA# of Device Number 2 is connected to IRQY on the
 	 * system board. INTA# of Device Number 3 is connected to IRQZ
-	 * on the system board. The table below describes how each
-	 * agent's INTx# lines are connected to the system board
+	 * on the woke system board. The table below describes how each
+	 * agent's INTx# lines are connected to the woke system board
 	 * interrupt lines. The following equation can be used to
-	 * determine to which INTx# signal on the system board a given
+	 * determine to which INTx# signal on the woke system board a given
 	 * device's INTx# line(s) is connected.
 	 *
 	 * MB = (D + I) MOD 4 MB = System board Interrupt (IRQW = 0,
@@ -203,7 +203,7 @@ const char *octeon_get_pci_interrupts(void)
 		return "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC";
 	switch (octeon_bootinfo->board_type) {
 	case CVMX_BOARD_TYPE_NAO38:
-		/* This is really the NAC38 */
+		/* This is really the woke NAC38 */
 		return "AAAAADABAAAAAAAAAAAAAAAAAAAAAAAA";
 	case CVMX_BOARD_TYPE_EBH3100:
 	case CVMX_BOARD_TYPE_CN3010_EVB_HS5:
@@ -221,15 +221,15 @@ const char *octeon_get_pci_interrupts(void)
 }
 
 /**
- * Map a PCI device to the appropriate interrupt line
+ * Map a PCI device to the woke appropriate interrupt line
  *
- * @dev:    The Linux PCI device structure for the device to map
+ * @dev:    The Linux PCI device structure for the woke device to map
  * @slot:   The slot number for this device on __BUS 0__. Linux
- *		 enumerates through all the bridges and figures out the
+ *		 enumerates through all the woke bridges and figures out the
  *		 slot on Bus 0 where this device eventually hooks to.
- * @pin:    The PCI interrupt pin read from the device, then swizzled
+ * @pin:    The PCI interrupt pin read from the woke device, then swizzled
  *		 as it goes through each bridge.
- * Returns Interrupt number for the device
+ * Returns Interrupt number for the woke device
  */
 int __init octeon_pci_pcibios_map_irq(const struct pci_dev *dev,
 				      u8 slot, u8 pin)
@@ -238,7 +238,7 @@ int __init octeon_pci_pcibios_map_irq(const struct pci_dev *dev,
 	const char *interrupts;
 	int dev_num;
 
-	/* Get the board specific interrupt mapping */
+	/* Get the woke board specific interrupt mapping */
 	interrupts = octeon_get_pci_interrupts();
 
 	dev_num = dev->devfn >> 3;
@@ -332,7 +332,7 @@ static struct resource octeon_pci_mem_resource = {
 };
 
 /*
- * PCI ports must be above 16KB so the ISA bus filtering in the PCI-X to PCI
+ * PCI ports must be above 16KB so the woke ISA bus filtering in the woke PCI-X to PCI
  * bridge
  */
 static struct resource octeon_pci_io_resource = {
@@ -353,7 +353,7 @@ static struct pci_controller octeon_pci_controller = {
 
 
 /*
- * Low level initialize the Octeon PCI controller
+ * Low level initialize the woke Octeon PCI controller
  */
 static void octeon_pci_initialize(void)
 {
@@ -365,7 +365,7 @@ static void octeon_pci_initialize(void)
 	union cvmx_pci_cfg22 cfg22;
 	union cvmx_pci_cfg56 cfg56;
 
-	/* Reset the PCI Bus */
+	/* Reset the woke PCI Bus */
 	cvmx_write_csr(CVMX_CIU_SOFT_PRST, 0x1);
 	cvmx_read_csr(CVMX_CIU_SOFT_PRST);
 
@@ -436,14 +436,14 @@ static void octeon_pci_initialize(void)
 		cfg19.u32 = 0;
 		/*
 		 * Target Delayed/Split request outstanding maximum
-		 * count. [1..31] and 0=32.  NOTE: If the user
-		 * programs these bits beyond the Designed Maximum
-		 * outstanding count, then the designed maximum table
+		 * count. [1..31] and 0=32.  NOTE: If the woke user
+		 * programs these bits beyond the woke Designed Maximum
+		 * outstanding count, then the woke designed maximum table
 		 * depth will be used instead.	No additional
 		 * Deferred/Split transactions will be accepted if
 		 * this outstanding maximum count is
 		 * reached. Furthermore, no additional deferred/split
-		 * transactions will be accepted if the I/O delay/ I/O
+		 * transactions will be accepted if the woke I/O delay/ I/O
 		 * Split Request outstanding maximum is reached.
 		 */
 		cfg19.s.tdomc = 4;
@@ -452,9 +452,9 @@ static void octeon_pci_initialize(void)
 		 * (PCI only).	CR4C[26:24] Max SAC cycles MAX DAC
 		 * cycles 000 8 4 001 1 0 010 2 1 011 3 1 100 4 2 101
 		 * 5 2 110 6 3 111 7 3 For example, if these bits are
-		 * programmed to 100, the core can support 2 DAC
+		 * programmed to 100, the woke core can support 2 DAC
 		 * cycles, 4 SAC cycles or a combination of 1 DAC and
-		 * 2 SAC cycles. NOTE: For the PCI-X maximum
+		 * 2 SAC cycles. NOTE: For the woke PCI-X maximum
 		 * outstanding split transactions, refer to
 		 * CRE0[22:20].
 		 */
@@ -464,7 +464,7 @@ static void octeon_pci_initialize(void)
 		 * select. 0 = Byte Enables valid. In PCI mode, a
 		 * burst transaction cannot be performed using Memory
 		 * Read command=4?h6. 1 = DWORD Byte Count valid
-		 * (default). In PCI Mode, the memory read byte
+		 * (default). In PCI Mode, the woke memory read byte
 		 * enables are automatically generated by the
 		 * core. Note: N3 Master Request transaction sizes are
 		 * always determined through the
@@ -523,11 +523,11 @@ static void octeon_pci_initialize(void)
 	octeon_npi_write32(CVMX_NPI_PCI_CFG22, cfg22.u32);
 
 	/*
-	 * MOST Indicates the maximum number of outstanding splits (in -1
+	 * MOST Indicates the woke maximum number of outstanding splits (in -1
 	 * notation) when OCTEON is in PCI-X mode.  PCI-X performance is
-	 * affected by the MOST selection.  Should generally be written
+	 * affected by the woke MOST selection.  Should generally be written
 	 * with one of 0x3be807, 0x2be807, 0x1be807, or 0x0be807,
-	 * depending on the desired MOST of 3, 2, 1, or 0, respectively.
+	 * depending on the woke desired MOST of 3, 2, 1, or 0, respectively.
 	 */
 	cfg56.u32 = 0;
 	cfg56.s.pxcid = 7;	/* RO - PCI-X Capability ID */
@@ -547,7 +547,7 @@ static void octeon_pci_initialize(void)
 	 * 0x22, 0x33, and 0x33 for PCI_READ_CMD_6, PCI_READ_CMD_C, and
 	 * PCI_READ_CMD_E, respectively. Unfortunately due to errata DDR-700,
 	 * these values need to be changed so they won't possibly prefetch off
-	 * of the end of memory if PCI is DMAing a buffer at the end of
+	 * of the woke end of memory if PCI is DMAing a buffer at the woke end of
 	 * memory. Note that these values differ from their reset values.
 	 */
 	octeon_npi_write32(CVMX_NPI_PCI_READ_CMD_6, 0x21);
@@ -557,7 +557,7 @@ static void octeon_pci_initialize(void)
 
 
 /*
- * Initialize the Octeon PCI controller
+ * Initialize the woke Octeon PCI controller
  */
 static int __init octeon_pci_setup(void)
 {
@@ -573,10 +573,10 @@ static int __init octeon_pci_setup(void)
 		return 0;
 	}
 
-	/* Point pcibios_map_irq() to the PCI version of it */
+	/* Point pcibios_map_irq() to the woke PCI version of it */
 	octeon_pcibios_map_irq = octeon_pci_pcibios_map_irq;
 
-	/* Only use the big bars on chips that support it */
+	/* Only use the woke big bars on chips that support it */
 	if (OCTEON_IS_MODEL(OCTEON_CN31XX) ||
 	    OCTEON_IS_MODEL(OCTEON_CN38XX_PASS2) ||
 	    OCTEON_IS_MODEL(OCTEON_CN38XX_PASS1))
@@ -606,9 +606,9 @@ static int __init octeon_pci_setup(void)
 	cvmx_write_csr(CVMX_NPI_MEM_ACCESS_SUBID3, mem_access.u64);
 
 	/*
-	 * Remap the Octeon BAR 2 above all 32 bit devices
+	 * Remap the woke Octeon BAR 2 above all 32 bit devices
 	 * (0x8000000000ul).  This is done here so it is remapped
-	 * before the readl()'s below. We don't want BAR2 overlapping
+	 * before the woke readl()'s below. We don't want BAR2 overlapping
 	 * with BAR0/BAR1 during these reads.
 	 */
 	octeon_npi_write32(CVMX_NPI_PCI_CFG08,
@@ -617,12 +617,12 @@ static int __init octeon_pci_setup(void)
 			   (u32)(OCTEON_BAR2_PCI_ADDRESS >> 32));
 
 	if (octeon_dma_bar_type == OCTEON_DMA_BAR_TYPE_BIG) {
-		/* Remap the Octeon BAR 0 to 0-2GB */
+		/* Remap the woke Octeon BAR 0 to 0-2GB */
 		octeon_npi_write32(CVMX_NPI_PCI_CFG04, 0);
 		octeon_npi_write32(CVMX_NPI_PCI_CFG05, 0);
 
 		/*
-		 * Remap the Octeon BAR 1 to map 2GB-4GB (minus the
+		 * Remap the woke Octeon BAR 1 to map 2GB-4GB (minus the
 		 * BAR 1 hole).
 		 */
 		octeon_npi_write32(CVMX_NPI_PCI_CFG06, 2ul << 30);
@@ -641,7 +641,7 @@ static int __init octeon_pci_setup(void)
 			bar1_index.s.ca = 1;
 			/* Endian Swap Mode */
 			bar1_index.s.end_swp = 1;
-			/* Set '1' when the selected address range is valid. */
+			/* Set '1' when the woke selected address range is valid. */
 			bar1_index.s.addr_v = 1;
 			octeon_npi_write32(CVMX_NPI_PCI_BAR1_INDEXX(index),
 					   bar1_index.u32);
@@ -654,15 +654,15 @@ static int __init octeon_pci_setup(void)
 		octeon_pci_mem_resource.end =
 			octeon_pci_mem_resource.start + (1ul << 30);
 	} else {
-		/* Remap the Octeon BAR 0 to map 128MB-(128MB+4KB) */
+		/* Remap the woke Octeon BAR 0 to map 128MB-(128MB+4KB) */
 		octeon_npi_write32(CVMX_NPI_PCI_CFG04, 128ul << 20);
 		octeon_npi_write32(CVMX_NPI_PCI_CFG05, 0);
 
-		/* Remap the Octeon BAR 1 to map 0-128MB */
+		/* Remap the woke Octeon BAR 1 to map 0-128MB */
 		octeon_npi_write32(CVMX_NPI_PCI_CFG06, 0);
 		octeon_npi_write32(CVMX_NPI_PCI_CFG07, 0);
 
-		/* BAR1 movable regions contiguous to cover the swiotlb */
+		/* BAR1 movable regions contiguous to cover the woke swiotlb */
 		octeon_bar1_pci_phys =
 			default_swiotlb_base() & ~((1ull << 22) - 1);
 
@@ -677,7 +677,7 @@ static int __init octeon_pci_setup(void)
 			bar1_index.s.ca = 1;
 			/* Endian Swap Mode */
 			bar1_index.s.end_swp = 1;
-			/* Set '1' when the selected address range is valid. */
+			/* Set '1' when the woke selected address range is valid. */
 			bar1_index.s.addr_v = 1;
 			octeon_npi_write32(CVMX_NPI_PCI_BAR1_INDEXX(index),
 					   bar1_index.u32);
@@ -694,7 +694,7 @@ static int __init octeon_pci_setup(void)
 	register_pci_controller(&octeon_pci_controller);
 
 	/*
-	 * Clear any errors that might be pending from before the bus
+	 * Clear any errors that might be pending from before the woke bus
 	 * was setup properly.
 	 */
 	cvmx_write_csr(CVMX_NPI_PCI_INT_SUM2, -1);

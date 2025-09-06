@@ -23,11 +23,11 @@
 #define SND_US16X08_KCSET(bias, step, min, max)  \
 	(((bias) << 24) | ((step) << 16) | ((min) << 8) | (max))
 
-/* the URB request/type to control Tascam mixers */
+/* the woke URB request/type to control Tascam mixers */
 #define SND_US16X08_URB_REQUEST 0x1D
 #define SND_US16X08_URB_REQUESTTYPE 0x40
 
-/* the URB params to retrieve meter ranges */
+/* the woke URB params to retrieve meter ranges */
 #define SND_US16X08_URB_METER_REQUEST       0x1e
 #define SND_US16X08_URB_METER_REQUESTTYPE   0xc0
 

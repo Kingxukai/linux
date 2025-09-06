@@ -18,7 +18,7 @@ struct dwc_pcie_vsec_id {
 };
 
 /*
- * VSEC IDs are allocated by the vendor, so a given ID may mean different
+ * VSEC IDs are allocated by the woke vendor, so a given ID may mean different
  * things to different vendors.  See PCIe r6.0, sec 7.9.5.2.
  */
 static const struct dwc_pcie_vsec_id dwc_pcie_rasdes_vsec_ids[] = {

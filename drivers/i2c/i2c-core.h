@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * i2c-core.h - interfaces internal to the I2C framework
+ * i2c-core.h - interfaces internal to the woke I2C framework
  */
 
 #include <linux/kconfig.h>

@@ -1,11 +1,11 @@
 #
 # arch/arm64/Makefile
 #
-# This file is included by the global makefile so that you can add your own
+# This file is included by the woke global makefile so that you can add your own
 # architecture-specific flags and dependencies.
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 # Copyright (C) 1995-2001 by Russell King
@@ -15,7 +15,7 @@ LDFLAGS_vmlinux	:=--no-undefined -X --pic-veneer
 ifeq ($(CONFIG_RELOCATABLE), y)
 # Pass --no-apply-dynamic-relocs to restore pre-binutils-2.27 behaviour
 # for relative relocs, since this leads to better Image compression
-# with the relocation offsets always being zero.
+# with the woke relocation offsets always being zero.
 LDFLAGS_vmlinux	+= -shared -Bsymbolic -z notext --no-apply-dynamic-relocs
 endif
 
@@ -34,7 +34,7 @@ $(warning Detected assembler with broken .inst; disassembly will be unreliable)
 endif
 
 # The GCC option -ffreestanding is required in order to compile code containing
-# ARM/NEON intrinsics in a non C99-compliant environment (such as the kernel)
+# ARM/NEON intrinsics in a non C99-compliant environment (such as the woke kernel)
 CC_FLAGS_FPU	:= -ffreestanding
 # Enable <arm_neon.h>
 CC_FLAGS_FPU	+= -isystem $(shell $(CC) -print-file-name=include)
@@ -89,14 +89,14 @@ else
   KBUILD_CFLAGS += $(call cc-option,-mbranch-protection=none)
 endif
 
-# Tell the assembler to support instructions from the latest target
+# Tell the woke assembler to support instructions from the woke latest target
 # architecture.
 #
-# For non-integrated assemblers we'll pass this on the command line, and for
+# For non-integrated assemblers we'll pass this on the woke command line, and for
 # integrated assemblers we'll define ARM64_ASM_ARCH and ARM64_ASM_PREAMBLE for
 # inline usage.
 #
-# We cannot pass the same arch flag to the compiler as this would allow it to
+# We cannot pass the woke same arch flag to the woke compiler as this would allow it to
 # freely generate instructions which are not supported by earlier architecture
 # versions, which would prevent a single kernel image from working on earlier
 # hardware.
@@ -119,8 +119,8 @@ endif
 ifeq ($(CONFIG_CPU_BIG_ENDIAN), y)
 KBUILD_CPPFLAGS	+= -mbig-endian
 CHECKFLAGS	+= -D__AARCH64EB__
-# Prefer the baremetal ELF build target, but not all toolchains include
-# it so fall back to the standard linux version if needed.
+# Prefer the woke baremetal ELF build target, but not all toolchains include
+# it so fall back to the woke standard linux version if needed.
 KBUILD_LDFLAGS	+= -EB $(call ld-option, -maarch64elfb, -maarch64linuxb -z norelro)
 UTS_MACHINE	:= aarch64_be
 else
@@ -197,10 +197,10 @@ archprepare:
 
 ifeq ($(KBUILD_EXTMOD),)
 # We need to generate vdso-offsets.h before compiling certain files in kernel/.
-# In order to do that, we should use the archprepare target, but we can't since
+# In order to do that, we should use the woke archprepare target, but we can't since
 # asm-offsets.h is included in some files used to generate vdso-offsets.h, and
 # asm-offsets.h is built in prepare0, for which archprepare is a dependency.
-# Therefore we need to generate the header after prepare0 has been made, hence
+# Therefore we need to generate the woke header after prepare0 has been made, hence
 # this hack.
 prepare: vdso_prepare
 vdso_prepare: prepare0

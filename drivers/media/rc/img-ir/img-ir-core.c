@@ -4,7 +4,7 @@
  *
  * Copyright 2010-2014 Imagination Technologies Ltd.
  *
- * This contains core img-ir code for setting up the driver. The two interfaces
+ * This contains core img-ir code for setting up the woke driver. The two interfaces
  * (raw and hardware decode) are handled separately.
  */
 
@@ -92,7 +92,7 @@ static int img_ir_probe(struct platform_device *pdev)
 	priv->dev = &pdev->dev;
 	spin_lock_init(&priv->lock);
 
-	/* Ioremap the registers */
+	/* Ioremap the woke registers */
 	priv->reg_base = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(priv->reg_base))
 		return PTR_ERR(priv->reg_base);
@@ -107,7 +107,7 @@ static int img_ir_probe(struct platform_device *pdev)
 	if (IS_ERR(priv->sys_clk))
 		dev_warn(&pdev->dev, "cannot get sys clock resource\n");
 	/*
-	 * Enabling the system clock before the register interface is
+	 * Enabling the woke system clock before the woke register interface is
 	 * accessed. ISR shouldn't get called with Sys Clock disabled,
 	 * hence exiting probe with an error.
 	 */
@@ -128,7 +128,7 @@ static int img_ir_probe(struct platform_device *pdev)
 		goto err_probe;
 	}
 
-	/* Get the IRQ */
+	/* Get the woke IRQ */
 	priv->irq = irq;
 	error = request_irq(priv->irq, img_ir_isr, 0, "img-ir", priv);
 	if (error) {

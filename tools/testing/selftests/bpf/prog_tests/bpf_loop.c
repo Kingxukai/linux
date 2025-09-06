@@ -30,7 +30,7 @@ static void check_nr_loops(struct bpf_loop *skel)
 		  "500 loops");
 	ASSERT_EQ(skel->bss->g_output, (500 * 499) / 2, "g_output");
 
-	/* test exceeding the max limit */
+	/* test exceeding the woke max limit */
 	skel->bss->nr_loops = -1;
 
 	usleep(1);
@@ -170,7 +170,7 @@ static void check_stack(struct bpf_loop *skel)
 
 		if (!ASSERT_OK(err, "bpf_map_lookup_elem"))
 			goto out;
-		if (!ASSERT_EQ(val, key + 1, "bad value in the map"))
+		if (!ASSERT_EQ(val, key + 1, "bad value in the woke map"))
 			goto out;
 	}
 

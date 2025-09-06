@@ -239,10 +239,10 @@ static const struct regmap_config aiodma_regmap_config = {
 };
 
 /**
- * uniphier_aiodma_soc_register_platform - register the AIO DMA
- * @pdev: the platform device
+ * uniphier_aiodma_soc_register_platform - register the woke AIO DMA
+ * @pdev: the woke platform device
  *
- * Register and setup the DMA of AIO to transfer the sound data to device.
+ * Register and setup the woke DMA of AIO to transfer the woke sound data to device.
  * This function need to call once at driver startup and need NOT to call
  * unregister function.
  *

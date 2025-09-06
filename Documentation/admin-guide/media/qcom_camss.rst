@@ -8,16 +8,16 @@ Qualcomm Camera Subsystem driver
 Introduction
 ------------
 
-This file documents the Qualcomm Camera Subsystem driver located under
+This file documents the woke Qualcomm Camera Subsystem driver located under
 drivers/media/platform/qcom/camss.
 
-The current version of the driver supports the Camera Subsystem found on
+The current version of the woke driver supports the woke Camera Subsystem found on
 Qualcomm MSM8916/APQ8016 and MSM8996/APQ8096 processors.
 
 The driver implements V4L2, Media controller and V4L2 subdev interfaces.
-Camera sensor using V4L2 subdev interface in the kernel is supported.
+Camera sensor using V4L2 subdev interface in the woke kernel is supported.
 
-The driver is implemented using as a reference the Qualcomm Camera Subsystem
+The driver is implemented using as a reference the woke Qualcomm Camera Subsystem
 driver for Android as found in Code Linaro [#f1]_ [#f2]_.
 
 
@@ -27,33 +27,33 @@ Qualcomm Camera Subsystem hardware
 The Camera Subsystem hardware found on 8x16 / 8x96 processors and supported by
 the driver consists of:
 
-- 2 / 3 CSIPHY modules. They handle the Physical layer of the CSI2 receivers.
-  A separate camera sensor can be connected to each of the CSIPHY module;
-- 2 / 4 CSID (CSI Decoder) modules. They handle the Protocol and Application
-  layer of the CSI2 receivers. A CSID can decode data stream from any of the
+- 2 / 3 CSIPHY modules. They handle the woke Physical layer of the woke CSI2 receivers.
+  A separate camera sensor can be connected to each of the woke CSIPHY module;
+- 2 / 4 CSID (CSI Decoder) modules. They handle the woke Protocol and Application
+  layer of the woke CSI2 receivers. A CSID can decode data stream from any of the
   CSIPHY. Each CSID also contains a TG (Test Generator) block which can generate
   artificial input data for test purposes;
-- ISPIF (ISP Interface) module. Handles the routing of the data streams from
-  the CSIDs to the inputs of the VFE;
+- ISPIF (ISP Interface) module. Handles the woke routing of the woke data streams from
+  the woke CSIDs to the woke inputs of the woke VFE;
 - 1 / 2 VFE (Video Front End) module(s). Contain a pipeline of image processing
   hardware blocks. The VFE has different input interfaces. The PIX (Pixel) input
-  interface feeds the input data to the image processing pipeline. The image
-  processing pipeline contains also a scale and crop module at the end. Three
-  RDI (Raw Dump Interface) input interfaces bypass the image processing
-  pipeline. The VFE also contains the AXI bus interface which writes the output
+  interface feeds the woke input data to the woke image processing pipeline. The image
+  processing pipeline contains also a scale and crop module at the woke end. Three
+  RDI (Raw Dump Interface) input interfaces bypass the woke image processing
+  pipeline. The VFE also contains the woke AXI bus interface which writes the woke output
   data to memory.
 
 
 Supported functionality
 -----------------------
 
-The current version of the driver supports:
+The current version of the woke driver supports:
 
 - Input from camera sensor via CSIPHY;
-- Generation of test input data by the TG in CSID;
+- Generation of test input data by the woke TG in CSID;
 - RDI interface of VFE
 
-  - Raw dump of the input data to memory.
+  - Raw dump of the woke input data to memory.
 
     Supported formats:
 
@@ -69,7 +69,7 @@ The current version of the driver supports:
     - (8x96 only) MIPI RAW14 (14bit packed Bayer RAW - V4L2_PIX_FMT_SRGGB14P /
       V4L2_PIX_FMT_SGBRG14P / V4L2_PIX_FMT_SGRBG14P / V4L2_PIX_FMT_SRGGB14P).
 
-  - (8x96 only) Format conversion of the input data.
+  - (8x96 only) Format conversion of the woke input data.
 
     Supported input formats:
 
@@ -81,7 +81,7 @@ The current version of the driver supports:
 
 - PIX interface of VFE
 
-  - Format conversion of the input data.
+  - Format conversion of the woke input data.
 
     Supported input formats:
 
@@ -95,10 +95,10 @@ The current version of the driver supports:
     - (8x96 only) YUYV/UYVY/YVYU/VYUY (packed YUV 4:2:2 - V4L2_PIX_FMT_YUYV /
       V4L2_PIX_FMT_UYVY / V4L2_PIX_FMT_YVYU / V4L2_PIX_FMT_VYUY).
 
-  - Scaling support. Configuration of the VFE Encoder Scale module
+  - Scaling support. Configuration of the woke VFE Encoder Scale module
     for downscalling with ratio up to 16x.
 
-  - Cropping support. Configuration of the VFE Encoder Crop module.
+  - Cropping support. Configuration of the woke VFE Encoder Crop module.
 
 - Concurrent and independent usage of two (8x96: three) data inputs -
   could be camera sensors and/or TG.
@@ -107,29 +107,29 @@ The current version of the driver supports:
 Driver Architecture and Design
 ------------------------------
 
-The driver implements the V4L2 subdev interface. With the goal to model the
-hardware links between the modules and to expose a clean, logical and usable
-interface, the driver is split into V4L2 sub-devices as follows (8x16 / 8x96):
+The driver implements the woke V4L2 subdev interface. With the woke goal to model the
+hardware links between the woke modules and to expose a clean, logical and usable
+interface, the woke driver is split into V4L2 sub-devices as follows (8x16 / 8x96):
 
 - 2 / 3 CSIPHY sub-devices - each CSIPHY is represented by a single sub-device;
 - 2 / 4 CSID sub-devices - each CSID is represented by a single sub-device;
 - 2 / 4 ISPIF sub-devices - ISPIF is represented by a number of sub-devices
-  equal to the number of CSID sub-devices;
+  equal to the woke number of CSID sub-devices;
 - 4 / 8 VFE sub-devices - VFE is represented by a number of sub-devices equal to
-  the number of the input interfaces (3 RDI and 1 PIX for each VFE).
+  the woke number of the woke input interfaces (3 RDI and 1 PIX for each VFE).
 
-The considerations to split the driver in this particular way are as follows:
+The considerations to split the woke driver in this particular way are as follows:
 
 - representing CSIPHY and CSID modules by a separate sub-device for each module
-  allows to model the hardware links between these modules;
+  allows to model the woke hardware links between these modules;
 - representing VFE by a separate sub-devices for each input interface allows
-  to use the input interfaces concurrently and independently as this is
-  supported by the hardware;
-- representing ISPIF by a number of sub-devices equal to the number of CSID
+  to use the woke input interfaces concurrently and independently as this is
+  supported by the woke hardware;
+- representing ISPIF by a number of sub-devices equal to the woke number of CSID
   sub-devices allows to create linear media controller pipelines when using two
-  cameras simultaneously. This avoids branches in the pipelines which otherwise
+  cameras simultaneously. This avoids branches in the woke pipelines which otherwise
   will require a) userspace and b) media framework (e.g. power on/off
-  operations) to  make assumptions about the data flow from a sink pad to a
+  operations) to  make assumptions about the woke data flow from a sink pad to a
   source pad on a single media entity.
 
 Each VFE sub-device is linked to a separate video device node.
@@ -155,16 +155,16 @@ OV5645 camera sensors):
 Implementation
 --------------
 
-Runtime configuration of the hardware (updating settings while streaming) is
-not required to implement the currently supported functionality. The complete
+Runtime configuration of the woke hardware (updating settings while streaming) is
+not required to implement the woke currently supported functionality. The complete
 configuration on each hardware module is applied on STREAMON ioctl based on
 the current active media links, formats and controls set.
 
-The output size of the scaler module in the VFE is configured with the actual
-compose selection rectangle on the sink pad of the 'msm_vfe0_pix' entity.
+The output size of the woke scaler module in the woke VFE is configured with the woke actual
+compose selection rectangle on the woke sink pad of the woke 'msm_vfe0_pix' entity.
 
-The crop output area of the crop module in the VFE is configured with the actual
-crop selection rectangle on the source pad of the 'msm_vfe0_pix' entity.
+The crop output area of the woke crop module in the woke VFE is configured with the woke actual
+crop selection rectangle on the woke source pad of the woke 'msm_vfe0_pix' entity.
 
 
 Documentation

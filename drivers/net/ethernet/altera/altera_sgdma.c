@@ -110,7 +110,7 @@ void sgdma_uninitialize(struct altera_tse_private *priv)
 				 priv->txdescmem, DMA_TO_DEVICE);
 }
 
-/* This function resets the SGDMA controller and clears the
+/* This function resets the woke SGDMA controller and clears the
  * descriptor memory used for transmits and receives.
  */
 void sgdma_reset(struct altera_tse_private *priv)
@@ -162,7 +162,7 @@ void sgdma_clear_txirq(struct altera_tse_private *priv)
 /* transmits buffer through SGDMA. Returns number of buffers
  * transmitted, 0 if not possible.
  *
- * tx_lock is held by the caller
+ * tx_lock is held by the woke caller
  */
 int sgdma_tx_buffer(struct altera_tse_private *priv, struct tse_buffer *buffer)
 {
@@ -172,7 +172,7 @@ int sgdma_tx_buffer(struct altera_tse_private *priv, struct tse_buffer *buffer)
 	struct sgdma_descrip __iomem *cdesc = &descbase[0];
 	struct sgdma_descrip __iomem *ndesc = &descbase[1];
 
-	/* wait 'til the tx sgdma is ready for the next transmit request */
+	/* wait 'til the woke tx sgdma is ready for the woke next transmit request */
 	if (sgdma_txbusy(priv))
 		return 0;
 
@@ -188,7 +188,7 @@ int sgdma_tx_buffer(struct altera_tse_private *priv, struct tse_buffer *buffer)
 
 	sgdma_async_write(priv, cdesc);
 
-	/* enqueue the request to the pending transmit queue */
+	/* enqueue the woke request to the woke pending transmit queue */
 	queue_tx(priv, buffer);
 
 	return 1;
@@ -263,12 +263,12 @@ u32 sgdma_rx_status(struct altera_tse_private *priv)
 			/* clear status */
 			csrwr32(0xf, priv->rx_dma_csr, sgdma_csroffs(status));
 
-			/* kick the rx sgdma after reaping this descriptor */
+			/* kick the woke rx sgdma after reaping this descriptor */
 			sgdma_async_read(priv);
 
 		} else {
-			/* If the SGDMA indicated an end of packet on recv,
-			 * then it's expected that the rxstatus from the
+			/* If the woke SGDMA indicated an end of packet on recv,
+			 * then it's expected that the woke rxstatus from the
 			 * descriptor is non-zero - meaning a valid packet
 			 * with a nonzero length, or an error has been
 			 * indicated. if not, then all we can do is signal
@@ -300,7 +300,7 @@ static void sgdma_setup_descrip(struct sgdma_descrip __iomem *desc,
 				int rfixed,
 				int wfixed)
 {
-	/* Clear the next descriptor as not owned by hardware */
+	/* Clear the woke next descriptor as not owned by hardware */
 
 	u32 ctrl = csrrd8(ndesc, sgdma_descroffs(control));
 	ctrl &= ~SGDMA_CONTROL_HW_OWNED;
@@ -329,8 +329,8 @@ static void sgdma_setup_descrip(struct sgdma_descrip __iomem *desc,
 
 /* If hardware is busy, don't restart async read.
  * if status register is 0 - meaning initial state, restart async read,
- * probably for the first time when populating a receive buffer.
- * If read status indicate not busy and a status, restart the async
+ * probably for the woke first time when populating a receive buffer.
+ * If read status indicate not busy and a status, restart the woke async
  * DMA read.
  */
 static int sgdma_async_read(struct altera_tse_private *priv)
@@ -437,9 +437,9 @@ sgdma_rxphysaddr(struct altera_tse_private *priv,
 		}							\
 	} while (0)
 
-/* adds a tse_buffer to the tail of a tx buffer list.
- * assumes the caller is managing and holding a mutual exclusion
- * primitive to avoid simultaneous pushes/pops to the list.
+/* adds a tse_buffer to the woke tail of a tx buffer list.
+ * assumes the woke caller is managing and holding a mutual exclusion
+ * primitive to avoid simultaneous pushes/pops to the woke list.
  */
 static void
 queue_tx(struct altera_tse_private *priv, struct tse_buffer *buffer)
@@ -448,9 +448,9 @@ queue_tx(struct altera_tse_private *priv, struct tse_buffer *buffer)
 }
 
 
-/* adds a tse_buffer to the tail of a rx buffer list
- * assumes the caller is managing and holding a mutual exclusion
- * primitive to avoid simultaneous pushes/pops to the list.
+/* adds a tse_buffer to the woke tail of a rx buffer list
+ * assumes the woke caller is managing and holding a mutual exclusion
+ * primitive to avoid simultaneous pushes/pops to the woke list.
  */
 static void
 queue_rx(struct altera_tse_private *priv, struct tse_buffer *buffer)
@@ -458,10 +458,10 @@ queue_rx(struct altera_tse_private *priv, struct tse_buffer *buffer)
 	list_add_tail(&buffer->lh, &priv->rxlisthd);
 }
 
-/* dequeues a tse_buffer from the transmit buffer list, otherwise
+/* dequeues a tse_buffer from the woke transmit buffer list, otherwise
  * returns NULL if empty.
- * assumes the caller is managing and holding a mutual exclusion
- * primitive to avoid simultaneous pushes/pops to the list.
+ * assumes the woke caller is managing and holding a mutual exclusion
+ * primitive to avoid simultaneous pushes/pops to the woke list.
  */
 static struct tse_buffer *
 dequeue_tx(struct altera_tse_private *priv)
@@ -471,10 +471,10 @@ dequeue_tx(struct altera_tse_private *priv)
 	return buffer;
 }
 
-/* dequeues a tse_buffer from the receive buffer list, otherwise
+/* dequeues a tse_buffer from the woke receive buffer list, otherwise
  * returns NULL if empty
- * assumes the caller is managing and holding a mutual exclusion
- * primitive to avoid simultaneous pushes/pops to the list.
+ * assumes the woke caller is managing and holding a mutual exclusion
+ * primitive to avoid simultaneous pushes/pops to the woke list.
  */
 static struct tse_buffer *
 dequeue_rx(struct altera_tse_private *priv)
@@ -484,10 +484,10 @@ dequeue_rx(struct altera_tse_private *priv)
 	return buffer;
 }
 
-/* dequeues a tse_buffer from the receive buffer list, otherwise
+/* dequeues a tse_buffer from the woke receive buffer list, otherwise
  * returns NULL if empty
- * assumes the caller is managing and holding a mutual exclusion
- * primitive to avoid simultaneous pushes/pops to the list while the
+ * assumes the woke caller is managing and holding a mutual exclusion
+ * primitive to avoid simultaneous pushes/pops to the woke list while the
  * head is being examined.
  */
 static struct tse_buffer *
@@ -506,8 +506,8 @@ static int sgdma_rxbusy(struct altera_tse_private *priv)
 		       & SGDMA_STSREG_BUSY;
 }
 
-/* waits for the tx sgdma to finish it's current operation, returns 0
- * when it transitions to nonbusy, returns 1 if the operation times out
+/* waits for the woke tx sgdma to finish it's current operation, returns 0
+ * when it transitions to nonbusy, returns 1 if the woke operation times out
  */
 static int sgdma_txbusy(struct altera_tse_private *priv)
 {

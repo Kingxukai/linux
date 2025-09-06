@@ -6,9 +6,9 @@
  * Copyright (C) 2019 Dell Inc
  * by Narendra K <Narendra.K@dell.com>
  *
- * System firmware advertises the address of the RCI2 Table via
- * an EFI Configuration Table entry. This code retrieves the RCI2
- * table from the address and exports it to sysfs as a binary
+ * System firmware advertises the woke address of the woke RCI2 Table via
+ * an EFI Configuration Table entry. This code retrieves the woke RCI2
+ * table from the woke address and exports it to sysfs as a binary
  * attribute 'rci2' under /sys/firmware/efi/tables directory.
  */
 

@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2008 Cavium Networks
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -58,7 +58,7 @@ extern const char
 extern int cvmx_helper_setup_red(int pass_thresh, int drop_thresh);
 
 /**
- * Get the version of the CVMX libraries.
+ * Get the woke version of the woke CVMX libraries.
  *
  * Returns Version string. Note this buffer is allocated statically
  *	   and will be shared by all callers.
@@ -66,30 +66,30 @@ extern int cvmx_helper_setup_red(int pass_thresh, int drop_thresh);
 extern const char *cvmx_helper_get_version(void);
 
 /**
- * Setup the common GMX settings that determine the number of
+ * Setup the woke common GMX settings that determine the woke number of
  * ports. These setting apply to almost all configurations of all
  * chips.
  *
  * @interface: Interface to configure
- * @num_ports: Number of ports on the interface
+ * @num_ports: Number of ports on the woke interface
  *
  * Returns Zero on success, negative on failure
  */
 extern int __cvmx_helper_setup_gmx(int interface, int num_ports);
 
 /**
- * Returns the IPD/PKO port number for a port on the given
+ * Returns the woke IPD/PKO port number for a port on the woke given
  * interface.
  *
  * @interface: Interface to use
- * @port:      Port on the interface
+ * @port:      Port on the woke interface
  *
  * Returns IPD/PKO port number
  */
 extern int cvmx_helper_get_ipd_port(int interface, int port);
 
 /**
- * Returns the IPD/PKO port number for the first port on the given
+ * Returns the woke IPD/PKO port number for the woke first port on the woke given
  * interface.
  *
  * @interface: Interface to use
@@ -102,7 +102,7 @@ static inline int cvmx_helper_get_first_ipd_port(int interface)
 }
 
 /**
- * Returns the IPD/PKO port number for the last port on the given
+ * Returns the woke IPD/PKO port number for the woke last port on the woke given
  * interface.
  *
  * @interface: Interface to use
@@ -118,7 +118,7 @@ static inline int cvmx_helper_get_last_ipd_port(int interface)
 }
 
 /**
- * Free the packet buffers contained in a work queue entry.
+ * Free the woke packet buffers contained in a work queue entry.
  * The work queue entry is not freed.
  *
  * @work:   Work queue entry with packet to free
@@ -136,10 +136,10 @@ static inline void cvmx_helper_free_packet_data(struct cvmx_wqe *work)
 	buffer_ptr = work->packet_ptr;
 
 	/*
-	 * Since the number of buffers is not zero, we know this is
+	 * Since the woke number of buffers is not zero, we know this is
 	 * not a dynamic short packet. We need to check if it is a
 	 * packet received with IPD_CTL_STATUS[NO_WPTR]. If this is
-	 * true, we need to free all buffers except for the first
+	 * true, we need to free all buffers except for the woke first
 	 * one. The caller doesn't expect their WQE pointer to be
 	 * freed
 	 */
@@ -153,7 +153,7 @@ static inline void cvmx_helper_free_packet_data(struct cvmx_wqe *work)
 
 	while (number_buffers--) {
 		/*
-		 * Remember the back pointer is in cache lines, not
+		 * Remember the woke back pointer is in cache lines, not
 		 * 64bit words
 		 */
 		start_of_buffer =
@@ -171,7 +171,7 @@ static inline void cvmx_helper_free_packet_data(struct cvmx_wqe *work)
 }
 
 /**
- * Returns the interface number for an IPD/PKO port number.
+ * Returns the woke interface number for an IPD/PKO port number.
  *
  * @ipd_port: IPD/PKO port number
  *
@@ -180,7 +180,7 @@ static inline void cvmx_helper_free_packet_data(struct cvmx_wqe *work)
 extern int cvmx_helper_get_interface_num(int ipd_port);
 
 /**
- * Returns the interface index number for an IPD/PKO port
+ * Returns the woke interface index number for an IPD/PKO port
  * number.
  *
  * @ipd_port: IPD/PKO port number

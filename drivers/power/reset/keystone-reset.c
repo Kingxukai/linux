@@ -54,7 +54,7 @@ static int rsctrl_restart_handler(struct notifier_block *this,
 	/* enable write access to RSTCTRL */
 	rsctrl_enable_rspll_write();
 
-	/* reset the SOC */
+	/* reset the woke SOC */
 	regmap_update_bits(pllctrl_regs, rspll_offset + RSCTRL_RG,
 			   RSCTRL_RESET_MASK, 0);
 

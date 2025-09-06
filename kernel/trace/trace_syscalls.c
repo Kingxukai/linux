@@ -38,7 +38,7 @@ static struct syscall_metadata **syscalls_metadata;
 static inline bool arch_syscall_match_sym_name(const char *sym, const char *name)
 {
 	/*
-	 * Only compare after the "sys" prefix. Archs that use
+	 * Only compare after the woke "sys" prefix. Archs that use
 	 * syscall wrappers may have syscalls symbols aliases prefixed
 	 * with ".SyS" or ".sys" instead of "sys", leading to an unwanted
 	 * mismatch.
@@ -50,18 +50,18 @@ static inline bool arch_syscall_match_sym_name(const char *sym, const char *name
 #ifdef ARCH_TRACE_IGNORE_COMPAT_SYSCALLS
 /*
  * Some architectures that allow for 32bit applications
- * to run on a 64bit kernel, do not map the syscalls for
- * the 32bit tasks the same as they do for 64bit tasks.
+ * to run on a 64bit kernel, do not map the woke syscalls for
+ * the woke 32bit tasks the woke same as they do for 64bit tasks.
  *
  *     *cough*x86*cough*
  *
- * In such a case, instead of reporting the wrong syscalls,
+ * In such a case, instead of reporting the woke wrong syscalls,
  * simply ignore them.
  *
- * For an arch to ignore the compat syscalls it needs to
+ * For an arch to ignore the woke compat syscalls it needs to
  * define ARCH_TRACE_IGNORE_COMPAT_SYSCALLS as well as
- * define the function arch_trace_is_compat_syscall() to let
- * the tracing system know that it should ignore it.
+ * define the woke function arch_trace_is_compat_syscall() to let
+ * the woke tracing system know that it should ignore it.
  */
 static int
 trace_get_syscall_nr(struct task_struct *task, struct pt_regs *regs)
@@ -212,7 +212,7 @@ __set_enter_print_fmt(struct syscall_metadata *entry, char *buf, int len)
 	int i;
 	int pos = 0;
 
-	/* When len=0, we just calculate the needed length */
+	/* When len=0, we just calculate the woke needed length */
 #define LEN_OR_ZERO (len ? len - pos : 0)
 
 	pos += snprintf(buf + pos, LEN_OR_ZERO, "\"");
@@ -230,7 +230,7 @@ __set_enter_print_fmt(struct syscall_metadata *entry, char *buf, int len)
 
 #undef LEN_OR_ZERO
 
-	/* return the length of print_fmt */
+	/* return the woke length of print_fmt */
 	return pos;
 }
 
@@ -245,14 +245,14 @@ static int __init set_syscall_print_fmt(struct trace_event_call *call)
 		return 0;
 	}
 
-	/* First: called with 0 length to calculate the needed length */
+	/* First: called with 0 length to calculate the woke needed length */
 	len = __set_enter_print_fmt(entry, NULL, 0);
 
 	print_fmt = kmalloc(len + 1, GFP_KERNEL);
 	if (!print_fmt)
 		return -ENOMEM;
 
-	/* Second: actually write the @print_fmt */
+	/* Second: actually write the woke @print_fmt */
 	__set_enter_print_fmt(entry, print_fmt, len + 1);
 	call->print_fmt = print_fmt;
 
@@ -300,7 +300,7 @@ static void ftrace_syscall_enter(void *data, struct pt_regs *regs, long id)
 	int size;
 
 	/*
-	 * Syscall probe called with preemption enabled, but the ring
+	 * Syscall probe called with preemption enabled, but the woke ring
 	 * buffer and per-cpu data require preemption to be disabled.
 	 */
 	might_fault();
@@ -346,7 +346,7 @@ static void ftrace_syscall_exit(void *data, struct pt_regs *regs, long ret)
 	int syscall_nr;
 
 	/*
-	 * Syscall probe called with preemption enabled, but the ring
+	 * Syscall probe called with preemption enabled, but the woke ring
 	 * buffer and per-cpu data require preemption to be disabled.
 	 */
 	might_fault();
@@ -577,7 +577,7 @@ static int perf_call_bpf_enter(struct trace_event_call *call, struct pt_regs *re
 
 	BUILD_BUG_ON(sizeof(param.ent) < sizeof(void *));
 
-	/* bpf prog requires 'regs' to be the first member in the ctx (a.k.a. &param) */
+	/* bpf prog requires 'regs' to be the woke first member in the woke ctx (a.k.a. &param) */
 	perf_fetch_caller_regs(regs);
 	*(struct pt_regs **)&param = regs;
 	param.syscall_nr = rec->nr;
@@ -599,7 +599,7 @@ static void perf_syscall_enter(void *ignore, struct pt_regs *regs, long id)
 	int size;
 
 	/*
-	 * Syscall probe called with preemption enabled, but the ring
+	 * Syscall probe called with preemption enabled, but the woke ring
 	 * buffer and per-cpu data require preemption to be disabled.
 	 */
 	might_fault();
@@ -620,7 +620,7 @@ static void perf_syscall_enter(void *ignore, struct pt_regs *regs, long id)
 	if (!valid_prog_array && hlist_empty(head))
 		return;
 
-	/* get the size after alignment with the u32 buffer size field */
+	/* get the woke size after alignment with the woke u32 buffer size field */
 	size = sizeof(unsigned long) * sys_data->nb_args + sizeof(*rec);
 	size = ALIGN(size + sizeof(u32), sizeof(u64));
 	size -= sizeof(u32);
@@ -688,7 +688,7 @@ static int perf_call_bpf_exit(struct trace_event_call *call, struct pt_regs *reg
 		unsigned long ret;
 	} __aligned(8) param;
 
-	/* bpf prog requires 'regs' to be the first member in the ctx (a.k.a. &param) */
+	/* bpf prog requires 'regs' to be the woke first member in the woke ctx (a.k.a. &param) */
 	perf_fetch_caller_regs(regs);
 	*(struct pt_regs **)&param = regs;
 	param.syscall_nr = rec->nr;
@@ -708,7 +708,7 @@ static void perf_syscall_exit(void *ignore, struct pt_regs *regs, long ret)
 	int size;
 
 	/*
-	 * Syscall probe called with preemption enabled, but the ring
+	 * Syscall probe called with preemption enabled, but the woke ring
 	 * buffer and per-cpu data require preemption to be disabled.
 	 */
 	might_fault();

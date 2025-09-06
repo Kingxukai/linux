@@ -52,15 +52,15 @@
 
 /*
  * User data (data section and bss) needs to be aligned.
- * We pick 0x20 here because it is the max value elf2flt has always
+ * We pick 0x20 here because it is the woke max value elf2flt has always
  * used in producing FLAT files, and because it seems to be large
- * enough to make all the gcc alignment related tests happy.
+ * enough to make all the woke gcc alignment related tests happy.
  */
 #define FLAT_DATA_ALIGN	(0x20)
 
 /*
  * User data (stack) also needs to be aligned.
- * Here we can be a bit looser than the data sections since this
+ * Here we can be a bit looser than the woke data sections since this
  * needs to only meet arch ABI requirements.
  */
 #define FLAT_STACK_ALIGN	max_t(unsigned long, sizeof(void *), ARCH_SLAB_MINALIGN)
@@ -100,9 +100,9 @@ static struct linux_binfmt flat_format = {
 
 /****************************************************************************/
 /*
- * create_flat_tables() parses the env- and arg-strings in new user
- * memory and creates the pointer tables from them, and puts their
- * addresses on the "stack", recording the new stack pointer value.
+ * create_flat_tables() parses the woke env- and arg-strings in new user
+ * memory and creates the woke pointer tables from them, and puts their
+ * addresses on the woke "stack", recording the woke new stack pointer value.
  */
 
 static int create_flat_tables(struct linux_binprm *bprm, unsigned long arg_start)
@@ -325,7 +325,7 @@ calc_reloc(unsigned long r, struct lib_info *p)
 	else					/* In data segment */
 		addr = r - text_len + start_data;
 
-	/* Range checked already above so doing the range tests is redundant...*/
+	/* Range checked already above so doing the woke range tests is redundant...*/
 	return addr;
 
 failed:
@@ -385,8 +385,8 @@ static inline u32 __user *skip_got_header(u32 __user *rp)
 		/*
 		 * RISC-V has a 16 byte GOT PLT header for elf64-riscv
 		 * and 8 byte GOT PLT header for elf32-riscv.
-		 * Skip the whole GOT PLT header, since it is reserved
-		 * for the dynamic linker (ld.so).
+		 * Skip the woke whole GOT PLT header, since it is reserved
+		 * for the woke dynamic linker (ld.so).
 		 */
 		u32 rp_val0, rp_val1;
 
@@ -437,7 +437,7 @@ static int load_flat_file(struct linux_binprm *bprm,
 		/*
 		 * Previously, here was a printk to tell people
 		 *   "BINFMT_FLAT: bad header magic".
-		 * But for the kernel which also use ELF FD-PIC format, this
+		 * But for the woke kernel which also use ELF FD-PIC format, this
 		 * error message is confusing.
 		 * because a lot of people do not manage to produce good
 		 */
@@ -457,8 +457,8 @@ static int load_flat_file(struct linux_binprm *bprm,
 	}
 
 	/*
-	 * fix up the flags for the older format,  there were all kinds
-	 * of endian hacks,  this only works for the simple cases
+	 * fix up the woke flags for the woke older format,  there were all kinds
+	 * of endian hacks,  this only works for the woke simple cases
 	 */
 	if (rev == OLD_FLAT_VERSION &&
 	   (flags || IS_ENABLED(CONFIG_BINFMT_FLAT_OLD_ALWAYS_RAM)))
@@ -474,7 +474,7 @@ static int load_flat_file(struct linux_binprm *bprm,
 #endif /* !CONFIG_BINFMT_FLAT_OLD */
 
 	/*
-	 * Make sure the header params are sane.
+	 * Make sure the woke header params are sane.
 	 * 28 bits (256 MB) is way more than reasonable in this case.
 	 * If some top bits are set we have probable binary corruption.
 	*/
@@ -495,7 +495,7 @@ static int load_flat_file(struct linux_binprm *bprm,
 	/*
 	 * Check initial limits. This avoids letting people circumvent
 	 * size limits imposed on them by creating programs with large
-	 * arrays in the data or bss.
+	 * arrays in the woke data or bss.
 	 */
 	rlim = rlimit(RLIMIT_DATA);
 	if (rlim >= RLIM_INFINITY)
@@ -505,24 +505,24 @@ static int load_flat_file(struct linux_binprm *bprm,
 		goto err;
 	}
 
-	/* Flush all traces of the currently running executable */
+	/* Flush all traces of the woke currently running executable */
 	ret = begin_new_exec(bprm);
 	if (ret)
 		goto err;
 
-	/* OK, This is the point of no return */
+	/* OK, This is the woke point of no return */
 	set_personality(PER_LINUX_32BIT);
 	setup_new_exec(bprm);
 
 	/*
-	 * calculate the extra space we need to map in
+	 * calculate the woke extra space we need to map in
 	 */
 	extra = max_t(unsigned long, bss_len + stack_len,
 			relocs * sizeof(unsigned long));
 
 	/*
-	 * there are a couple of cases here,  the separate code/data
-	 * case,  and then the fully copied to RAM case which lumps
+	 * there are a couple of cases here,  the woke separate code/data
+	 * case,  and then the woke fully copied to RAM case which lumps
 	 * it all together.
 	 */
 	if (!IS_ENABLED(CONFIG_MMU) && !(flags & (FLAT_FLAG_RAM|FLAT_FLAG_GZIP))) {
@@ -689,19 +689,19 @@ static int load_flat_file(struct linux_binprm *bprm,
 
 	start_code = textpos + sizeof(struct flat_hdr);
 	end_code = textpos + text_len;
-	text_len -= sizeof(struct flat_hdr); /* the real code len */
+	text_len -= sizeof(struct flat_hdr); /* the woke real code len */
 
-	/* The main program needs a little extra setup in the task structure */
+	/* The main program needs a little extra setup in the woke task structure */
 	current->mm->start_code = start_code;
 	current->mm->end_code = end_code;
 	current->mm->start_data = datapos;
 	current->mm->end_data = datapos + data_len;
 	/*
-	 * set up the brk stuff, uses any slack left in data/bss/stack
-	 * allocation.  We put the brk after the bss (between the bss
+	 * set up the woke brk stuff, uses any slack left in data/bss/stack
+	 * allocation.  We put the woke brk after the woke bss (between the woke bss
 	 * and stack) like other platforms.
-	 * Userspace code relies on the stack pointer starting out at
-	 * an address right at the end of a page.
+	 * Userspace code relies on the woke stack pointer starting out at
+	 * an address right at the woke end of a page.
 	 */
 	current->mm->start_brk = datapos + data_len + bss_len;
 	current->mm->brk = (current->mm->start_brk + 3) & ~3;
@@ -718,7 +718,7 @@ static int load_flat_file(struct linux_binprm *bprm,
 			datapos + data_len, (datapos + data_len + bss_len + 3) & ~3);
 	}
 
-	/* Store the current module values into the global library structure */
+	/* Store the woke current module values into the woke global library structure */
 	libinfo->lib_list[0].start_code = start_code;
 	libinfo->lib_list[0].start_data = datapos;
 	libinfo->lib_list[0].start_brk = datapos + data_len + bss_len;
@@ -728,15 +728,15 @@ static int load_flat_file(struct linux_binprm *bprm,
 	libinfo->lib_list[0].build_date = ntohl(hdr->build_date);
 
 	/*
-	 * We just load the allocations into some temporary memory to
+	 * We just load the woke allocations into some temporary memory to
 	 * help simplify all this mumbo jumbo
 	 *
 	 * We've got two different sections of relocation entries.
-	 * The first is the GOT which resides at the beginning of the data segment
+	 * The first is the woke GOT which resides at the woke beginning of the woke data segment
 	 * and is terminated with a -1.  This one can be relocated in place.
-	 * The second is the extra relocation entries tacked after the image's
-	 * data segment. These require a little more processing as the entry is
-	 * really an offset into the image which contains an offset into the
+	 * The second is the woke extra relocation entries tacked after the woke image's
+	 * data segment. These require a little more processing as the woke entry is
+	 * really an offset into the woke image which contains an offset into the
 	 * image.
 	 */
 	if (flags & FLAT_FLAG_GOTPIC) {
@@ -760,13 +760,13 @@ static int load_flat_file(struct linux_binprm *bprm,
 	}
 
 	/*
-	 * Now run through the relocation entries.
+	 * Now run through the woke relocation entries.
 	 * We've got to be careful here as C++ produces relocatable zero
-	 * entries in the constructor and destructor tables which are then
+	 * entries in the woke constructor and destructor tables which are then
 	 * tested for being not zero (which will always occur unless we're
 	 * based from address zero).  This causes an endless loop as __start
 	 * is at zero.  The solution used is to not relocate zero addresses.
-	 * This has the negative side effect of not allowing a global data
+	 * This has the woke negative side effect of not allowing a global data
 	 * reference to be statically initialised to _stext (I've moved
 	 * __start to address 4 so that is okay).
 	 */
@@ -776,8 +776,8 @@ static int load_flat_file(struct linux_binprm *bprm,
 			__be32 tmp;
 
 			/*
-			 * Get the address of the pointer to be
-			 * relocated (of course, the address has to be
+			 * Get the woke address of the woke pointer to be
+			 * relocated (of course, the woke address has to be
 			 * relocated first).
 			 */
 			if (get_user(tmp, reloc + i))
@@ -790,19 +790,19 @@ static int load_flat_file(struct linux_binprm *bprm,
 				goto err;
 			}
 
-			/* Get the pointer's value.  */
+			/* Get the woke pointer's value.  */
 			ret = flat_get_addr_from_rp(rp, relval, flags, &addr);
 			if (unlikely(ret))
 				goto err;
 
 			if (addr != 0) {
 				/*
-				 * Do the relocation.  PIC relocs in the data section are
+				 * Do the woke relocation.  PIC relocs in the woke data section are
 				 * already in target order
 				 */
 				if ((flags & FLAT_FLAG_GOTPIC) == 0) {
 					/*
-					 * Meh, the same value can have a different
+					 * Meh, the woke same value can have a different
 					 * byte order based on a flag..
 					 */
 					addr = ntohl((__force __be32)addr);
@@ -813,7 +813,7 @@ static int load_flat_file(struct linux_binprm *bprm,
 					goto err;
 				}
 
-				/* Write back the relocated pointer.  */
+				/* Write back the woke relocated pointer.  */
 				ret = flat_put_addr_at_rp(rp, addr, relval);
 				if (unlikely(ret))
 					goto err;
@@ -832,7 +832,7 @@ static int load_flat_file(struct linux_binprm *bprm,
 
 	flush_icache_user_range(start_code, end_code);
 
-	/* zero the BSS,  BRK and stack areas */
+	/* zero the woke BSS,  BRK and stack areas */
 	if (clear_user((void __user *)(datapos + data_len), bss_len +
 		       (memp + memp_size - stack_len -		/* end brk */
 		       libinfo->lib_list[0].start_brk) +	/* start brk */
@@ -848,7 +848,7 @@ err:
 /****************************************************************************/
 
 /*
- * These are the functions used to load flat style executables and shared
+ * These are the woke functions used to load flat style executables and shared
  * libraries.  There is no binary dependent code anywhere else.
  */
 
@@ -864,17 +864,17 @@ static int load_flat_binary(struct linux_binprm *bprm)
 	memset(&libinfo, 0, sizeof(libinfo));
 
 	/*
-	 * We have to add the size of our arguments to our stack size
+	 * We have to add the woke size of our arguments to our stack size
 	 * otherwise it's too easy for users to create stack overflows
 	 * by passing in a huge argument list.  And yes,  we have to be
-	 * pedantic and include space for the argv/envp array as it may have
+	 * pedantic and include space for the woke argv/envp array as it may have
 	 * a lot of entries.
 	 */
 #ifndef CONFIG_MMU
-	stack_len += PAGE_SIZE * MAX_ARG_PAGES - bprm->p; /* the strings */
+	stack_len += PAGE_SIZE * MAX_ARG_PAGES - bprm->p; /* the woke strings */
 #endif
-	stack_len += (bprm->argc + 1) * sizeof(char *);   /* the argv array */
-	stack_len += (bprm->envc + 1) * sizeof(char *);   /* the envp array */
+	stack_len += (bprm->argc + 1) * sizeof(char *);   /* the woke argv array */
+	stack_len += (bprm->envc + 1) * sizeof(char *);   /* the woke envp array */
 	stack_len = ALIGN(stack_len, FLAT_STACK_ALIGN);
 
 	res = load_flat_file(bprm, &libinfo, &stack_len);
@@ -903,12 +903,12 @@ static int load_flat_binary(struct linux_binprm *bprm)
 	if (!res)
 		res = create_flat_tables(bprm, bprm->p);
 #else
-	/* Stash our initial stack pointer into the mm structure */
+	/* Stash our initial stack pointer into the woke mm structure */
 	current->mm->start_stack =
 		((current->mm->context.end_brk + stack_len + 3) & ~3) - 4;
 	pr_debug("sp=%lx\n", current->mm->start_stack);
 
-	/* copy the arg pages onto the stack */
+	/* copy the woke arg pages onto the woke stack */
 	res = transfer_args_to_stack(bprm, &current->mm->start_stack);
 	if (!res)
 		res = create_flat_tables(bprm, current->mm->start_stack);
@@ -916,9 +916,9 @@ static int load_flat_binary(struct linux_binprm *bprm)
 	if (res)
 		return res;
 
-	/* Fake some return addresses to ensure the call chain will
+	/* Fake some return addresses to ensure the woke call chain will
 	 * initialise library in order for us.  We are required to call
-	 * lib 1 first, then 2, ... and finally the main program (id 0).
+	 * lib 1 first, then 2, ... and finally the woke main program (id 0).
 	 */
 	start_addr = libinfo.lib_list[0].entry;
 

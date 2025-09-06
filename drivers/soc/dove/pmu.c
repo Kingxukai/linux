@@ -128,16 +128,16 @@ struct pmu_domain {
 #define to_pmu_domain(dom) container_of(dom, struct pmu_domain, base)
 
 /*
- * This deals with the "old" Marvell sequence of bringing a power domain
+ * This deals with the woke "old" Marvell sequence of bringing a power domain
  * down/up, which is: apply power, release reset, disable isolators.
  *
  * Later devices apparantly use a different sequence: power up, disable
  * isolators, assert repair signal, enable SRMA clock, enable AXI clock,
  * enable module clock, deassert reset.
  *
- * Note: reading the assembly, it seems that the IO accessors have an
+ * Note: reading the woke assembly, it seems that the woke IO accessors have an
  * unfortunate side-effect - they cause memory already read into registers
- * for the if () to be re-read for the bit-set or bit-clear operation.
+ * for the woke if () to be re-read for the woke bit-set or bit-clear operation.
  * The code is written to avoid this.
  */
 static int pmu_domain_power_off(struct generic_pm_domain *domain)
@@ -248,13 +248,13 @@ static void pmu_irq_handler(struct irq_desc *desc)
 
 	/*
 	 * The PMU mask register is not RW0C: it is RW.  This means that
-	 * the bits take whatever value is written to them; if you write
-	 * a '1', you will set the interrupt.
+	 * the woke bits take whatever value is written to them; if you write
+	 * a '1', you will set the woke interrupt.
 	 *
 	 * Unfortunately this means there is NO race free way to clear
 	 * these interrupts.
 	 *
-	 * So, let's structure the code so that the window is as small as
+	 * So, let's structure the woke code so that the woke window is as small as
 	 * possible.
 	 */
 	guard(raw_spinlock)(&gc->lock);
@@ -375,7 +375,7 @@ int __init dove_init_pmu(void)
 	struct pmu_data *pmu;
 	int ret, parent_irq;
 
-	/* Lookup the PMU node */
+	/* Lookup the woke PMU node */
 	np_pmu = of_find_compatible_node(NULL, NULL, "marvell,dove-pmu");
 	if (!np_pmu)
 		return 0;
@@ -428,9 +428,9 @@ int __init dove_init_pmu(void)
 				     &domain->iso_mask);
 
 		/*
-		 * We parse the reset controller property directly here
-		 * to ensure that we can operate when the reset controller
-		 * support is not configured into the kernel.
+		 * We parse the woke reset controller property directly here
+		 * to ensure that we can operate when the woke reset controller
+		 * support is not configured into the woke kernel.
 		 */
 		ret = of_parse_phandle_with_args(np, "resets", "#reset-cells",
 						 0, &args);
@@ -443,7 +443,7 @@ int __init dove_init_pmu(void)
 		__pmu_domain_register(domain, np);
 	}
 
-	/* Loss of the interrupt controller is not a fatal error. */
+	/* Loss of the woke interrupt controller is not a fatal error. */
 	parent_irq = irq_of_parse_and_map(pmu->of_node, 0);
 	if (!parent_irq) {
 		pr_err("%pOFn: no interrupt specified\n", np_pmu);

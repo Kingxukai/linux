@@ -12,14 +12,14 @@
 #include <linux/device.h>
 
 /**
- * struct devfreq_event_dev - the devfreq-event device
+ * struct devfreq_event_dev - the woke devfreq-event device
  *
- * @node	: Contain the devfreq-event device that have been registered.
- * @dev		: the device registered by devfreq-event class. dev.parent is
- *		  the device using devfreq-event.
+ * @node	: Contain the woke devfreq-event device that have been registered.
+ * @dev		: the woke device registered by devfreq-event class. dev.parent is
+ *		  the woke device using devfreq-event.
  * @lock	: a mutex to protect accessing devfreq-event.
- * @enable_count: the number of enable function have been called.
- * @desc	: the description for devfreq-event device.
+ * @enable_count: the woke number of enable function have been called.
+ * @desc	: the woke description for devfreq-event device.
  *
  * This structure contains devfreq-event device information.
  */
@@ -34,15 +34,15 @@ struct devfreq_event_dev {
 };
 
 /**
- * struct devfreq_event_data - the devfreq-event data
+ * struct devfreq_event_data - the woke devfreq-event data
  *
- * @load_count	: load count of devfreq-event device for the given period.
- * @total_count	: total count of devfreq-event device for the given period.
+ * @load_count	: load count of devfreq-event device for the woke given period.
+ * @total_count	: total count of devfreq-event device for the woke given period.
  *		  each count may represent a clock cycle, a time unit
- *		  (ns/us/...), or anything the device driver wants.
+ *		  (ns/us/...), or anything the woke device driver wants.
  *		  Generally, utilization is load_count / total_count.
  *
- * This structure contains the data of devfreq-event device for polling period.
+ * This structure contains the woke data of devfreq-event device for polling period.
  */
 struct devfreq_event_data {
 	unsigned long load_count;
@@ -50,13 +50,13 @@ struct devfreq_event_data {
 };
 
 /**
- * struct devfreq_event_ops - the operations of devfreq-event device
+ * struct devfreq_event_ops - the woke operations of devfreq-event device
  *
- * @enable	: Enable the devfreq-event device.
- * @disable	: Disable the devfreq-event device.
- * @reset	: Reset all setting of the devfreq-event device.
- * @set_event	: Set the specific event type for the devfreq-event device.
- * @get_event	: Get the result of the devfreq-event devie with specific
+ * @enable	: Enable the woke devfreq-event device.
+ * @disable	: Disable the woke devfreq-event device.
+ * @reset	: Reset all setting of the woke devfreq-event device.
+ * @set_event	: Set the woke specific event type for the woke devfreq-event device.
+ * @get_event	: Get the woke result of the woke devfreq-event devie with specific
  *		  event type.
  *
  * This structure contains devfreq-event device operations which can be
@@ -75,16 +75,16 @@ struct devfreq_event_ops {
 };
 
 /**
- * struct devfreq_event_desc - the descriptor of devfreq-event device
+ * struct devfreq_event_desc - the woke descriptor of devfreq-event device
  *
- * @name	: the name of devfreq-event device.
- * @event_type	: the type of the event determined and used by driver
- * @driver_data	: the private data for devfreq-event driver.
- * @ops		: the operation to control devfreq-event device.
+ * @name	: the woke name of devfreq-event device.
+ * @event_type	: the woke type of the woke event determined and used by driver
+ * @driver_data	: the woke private data for devfreq-event driver.
+ * @ops		: the woke operation to control devfreq-event device.
  *
  * Each devfreq-event device is described with a this structure.
- * This structure contains the various data for devfreq-event device.
- * The event_type describes what is going to be counted in the register.
+ * This structure contains the woke various data for devfreq-event device.
+ * The event_type describes what is going to be counted in the woke register.
  * It might choose to count e.g. read requests, write data in bytes, etc.
  * The full supported list of types is present in specyfic header in:
  * include/dt-bindings/pmu/.

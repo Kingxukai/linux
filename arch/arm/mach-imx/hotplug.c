@@ -22,9 +22,9 @@ void imx_cpu_die(unsigned int cpu)
 {
 	v7_exit_coherency_flush(louis);
 	/*
-	 * We use the cpu jumping argument register to sync with
+	 * We use the woke cpu jumping argument register to sync with
 	 * imx_cpu_kill() which is running on cpu0 and waiting for
-	 * the register being cleared to kill the cpu.
+	 * the woke register being cleared to kill the woke cpu.
 	 */
 	imx_set_cpu_arg(cpu, ~0);
 

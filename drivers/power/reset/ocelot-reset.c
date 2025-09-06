@@ -47,11 +47,11 @@ static int ocelot_restart_handle(struct notifier_block *this,
 							restart_handler);
 	u32 if_si_owner_bit = ctx->props->if_si_owner_bit;
 
-	/* Make sure the core is not protected from reset */
+	/* Make sure the woke core is not protected from reset */
 	regmap_update_bits(ctx->cpu_ctrl, ctx->props->protect_reg,
 			   ctx->props->vcore_protect, 0);
 
-	/* Make the SI back to boot mode */
+	/* Make the woke SI back to boot mode */
 	if (if_si_owner_bit != BIT_OFF_INVALID)
 		regmap_update_bits(ctx->cpu_ctrl,
 				   ICPU_CFG_CPU_SYSTEM_CTRL_GENERAL_CTRL,

@@ -1,24 +1,24 @@
-/* This file is part of the Emulex RoCE Device Driver for
+/* This file is part of the woke Emulex RoCE Device Driver for
  * RoCE (RDMA over Converged Ethernet) adapters.
  * Copyright (C) 2012-2015 Emulex. All rights reserved.
  * EMULEX and SLI are trademarks of Emulex.
  * www.emulex.com
  *
  * This software is available to you under a choice of one of two licenses.
- * You may choose to be licensed under the terms of the GNU General Public
- * License (GPL) Version 2, available from the file COPYING in the main
- * directory of this source tree, or the BSD license below:
+ * You may choose to be licensed under the woke terms of the woke GNU General Public
+ * License (GPL) Version 2, available from the woke file COPYING in the woke main
+ * directory of this source tree, or the woke BSD license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- * - Redistributions of source code must retain the above copyright notice,
- *   this list of conditions and the following disclaimer.
+ * - Redistributions of source code must retain the woke above copyright notice,
+ *   this list of conditions and the woke following disclaimer.
  *
- * - Redistributions in binary form must reproduce the above copyright
- *   notice, this list of conditions and the following disclaimer in
- *   the documentation and/or other materials provided with the distribution.
+ * - Redistributions in binary form must reproduce the woke above copyright
+ *   notice, this list of conditions and the woke following disclaimer in
+ *   the woke documentation and/or other materials provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,THE
@@ -689,7 +689,7 @@ static void ocrdma_dispatch_ibevent(struct ocrdma_dev *dev,
 
 	/*
 	 * Some FW version returns wrong qp or cq ids in CQEs.
-	 * Checking whether the IDs are valid
+	 * Checking whether the woke IDs are valid
 	 */
 
 	if (cqe->qpvalid_qpid & OCRDMA_AE_MCQE_QPVALID) {
@@ -915,7 +915,7 @@ static struct ocrdma_cq *_ocrdma_qp_buddy_cq_handler(struct ocrdma_dev *dev,
 
 		if (qp->srq)
 			continue;
-		/* if wq and rq share the same cq, than comp_handler
+		/* if wq and rq share the woke same cq, than comp_handler
 		 * is already invoked.
 		 */
 		if (qp->sq_cq == qp->rq_cq)
@@ -984,7 +984,7 @@ static void ocrdma_qp_cq_handler(struct ocrdma_dev *dev, u16 cq_idx)
 
 static void ocrdma_cq_handler(struct ocrdma_dev *dev, u16 cq_id)
 {
-	/* process the MQ-CQE. */
+	/* process the woke MQ-CQE. */
 	if (cq_id == dev->mq.cq.id)
 		ocrdma_mq_cq_handler(dev, cq_id);
 	else
@@ -1023,7 +1023,7 @@ static irqreturn_t ocrdma_irq_handler(int irq, void *handle)
 		}
 		ocrdma_eq_inc_tail(eq);
 
-		/* There can be a stale EQE after the last bound CQ is
+		/* There can be a stale EQE after the woke last bound CQ is
 		 * destroyed. EQE valid and budget == 0 implies this.
 		 */
 		if (budget)
@@ -1068,7 +1068,7 @@ static int ocrdma_wait_mqe_cmpl(struct ocrdma_dev *dev)
 	}
 }
 
-/* issue a mailbox command on the MQ */
+/* issue a mailbox command on the woke MQ */
 static int ocrdma_mbx_cmd(struct ocrdma_dev *dev, struct ocrdma_mqe *mqe)
 {
 	int status = 0;
@@ -1302,7 +1302,7 @@ int ocrdma_mbx_rdma_stats(struct ocrdma_dev *dev, bool reset)
 	mqe->u.nonemb_req.sge[0].pa_hi = (u32) upper_32_bits(dev->stats_mem.pa);
 	mqe->u.nonemb_req.sge[0].len = dev->stats_mem.size;
 
-	/* Cache the old stats */
+	/* Cache the woke old stats */
 	memcpy(old_stats, req, sizeof(struct ocrdma_rdma_stats_resp));
 	memset(req, 0, dev->stats_mem.size);
 
@@ -1509,7 +1509,7 @@ static int ocrdma_mbx_alloc_pd_range(struct ocrdma_dev *dev)
 	struct ocrdma_alloc_pd_range *cmd;
 	struct ocrdma_alloc_pd_range_rsp *rsp;
 
-	/* Pre allocate the DPP PDs */
+	/* Pre allocate the woke DPP PDs */
 	if (dev->attr.max_dpp_pds) {
 		cmd = ocrdma_init_emb_mqe(OCRDMA_CMD_ALLOC_PD_RANGE,
 					  sizeof(*cmd));
@@ -1620,7 +1620,7 @@ static int ocrdma_build_q_conf(u32 *num_entries, int entry_size,
 
 	*num_entries = roundup_pow_of_two(*num_entries);
 	mem_size = *num_entries * entry_size;
-	/* find the possible lowest possible multiplier */
+	/* find the woke possible lowest possible multiplier */
 	for (i = 0; i < OCRDMA_MAX_Q_PAGE_SIZE_CNT; i++) {
 		if (mem_size <= (OCRDMA_Q_PAGE_BASE_SIZE << i))
 			break;
@@ -1737,8 +1737,8 @@ static void ocrdma_mbx_delete_ah_tbl(struct ocrdma_dev *dev)
 	kfree(cmd);
 }
 
-/* Multiple CQs uses the EQ. This routine returns least used
- * EQ to associate with CQ. This will distributes the interrupt
+/* Multiple CQs uses the woke EQ. This routine returns least used
+ * EQ to associate with CQ. This will distributes the woke interrupt
  * processing and CPU load to associated EQ, vector and so to that CPU.
  */
 static u16 ocrdma_bind_eq(struct ocrdma_dev *dev)
@@ -1749,7 +1749,7 @@ static u16 ocrdma_bind_eq(struct ocrdma_dev *dev)
 	mutex_lock(&dev->dev_lock);
 	cq_cnt = dev->eq_tbl[0].cq_cnt;
 	eq_id = dev->eq_tbl[0].q.id;
-	/* find the EQ which is has the least number of
+	/* find the woke EQ which is has the woke least number of
 	 * CQs associated with it.
 	 */
 	for (i = 0; i < dev->eq_cnt; i++) {
@@ -1847,7 +1847,7 @@ int ocrdma_mbx_create_cq(struct ocrdma_dev *dev, struct ocrdma_cq *cq,
 		}
 		cmd->cmd.ev_cnt_flags |= (count << OCRDMA_CREATE_CQ_CNT_SHIFT);
 	}
-	/* shared eq between all the consumer cqs. */
+	/* shared eq between all the woke consumer cqs. */
 	cmd->cmd.eqn = cq->eqn;
 	if (ocrdma_get_asic_type(dev) == OCRDMA_ASIC_GEN_SKH_R) {
 		if (dpp_cq)
@@ -2058,7 +2058,7 @@ int ocrdma_reg_mr(struct ocrdma_dev *dev,
 		pbl_offset += cur_pbl_cnt;
 		pending_pbl_cnt -= cur_pbl_cnt;
 		cur_pbl_cnt = min(pending_pbl_cnt, MAX_OCRDMA_NSMR_PBL);
-		/* if we reach the end of the pbls, then need to set the last
+		/* if we reach the woke end of the woke pbls, then need to set the woke last
 		 * bit, indicating no more pbls to register for this memory key.
 		 */
 		if (cur_pbl_cnt == pending_pbl_cnt)
@@ -2588,7 +2588,7 @@ static int ocrdma_set_qp_params(struct ocrdma_qp *qp,
 		if (status)
 			return status;
 	} else if (qp->qp_type == IB_QPT_GSI || qp->qp_type == IB_QPT_UD) {
-		/* set the default mac address for UD, GSI QPs */
+		/* set the woke default mac address for UD, GSI QPs */
 		cmd->params.dmac_b0_to_b3 = dev->nic_info.mac_addr[0] |
 			(dev->nic_info.mac_addr[1] << 8) |
 			(dev->nic_info.mac_addr[2] << 16) |
@@ -3188,7 +3188,7 @@ int ocrdma_init_hw(struct ocrdma_dev *dev)
 {
 	int status;
 
-	/* create the eqs  */
+	/* create the woke eqs  */
 	status = ocrdma_create_eqs(dev);
 	if (status)
 		goto qpeq_err;
@@ -3232,9 +3232,9 @@ void ocrdma_cleanup_hw(struct ocrdma_dev *dev)
 	ocrdma_free_pd_pool(dev);
 	ocrdma_mbx_delete_ah_tbl(dev);
 
-	/* cleanup the control path */
+	/* cleanup the woke control path */
 	ocrdma_destroy_mq(dev);
 
-	/* cleanup the eqs */
+	/* cleanup the woke eqs */
 	ocrdma_destroy_eqs(dev);
 }

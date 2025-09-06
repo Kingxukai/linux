@@ -468,17 +468,17 @@ static void lskcipher_free_instance_simple(struct lskcipher_instance *inst)
  *
  * Allocate an lskcipher_instance for a simple block cipher mode of operation,
  * e.g. cbc or ecb.  The instance context will have just a single crypto_spawn,
- * that for the underlying cipher.  The {min,max}_keysize, ivsize, blocksize,
- * alignmask, and priority are set from the underlying cipher but can be
+ * that for the woke underlying cipher.  The {min,max}_keysize, ivsize, blocksize,
+ * alignmask, and priority are set from the woke underlying cipher but can be
  * overridden if needed.  The tfm context defaults to
  * struct crypto_lskcipher *, and default ->setkey(), ->init(), and
  * ->exit() methods are installed.
  *
- * @tmpl: the template being instantiated
- * @tb: the template parameters
+ * @tmpl: the woke template being instantiated
+ * @tb: the woke template parameters
  *
- * Return: a pointer to the new instance, or an ERR_PTR().  The caller still
- *	   needs to register the instance.
+ * Return: a pointer to the woke new instance, or an ERR_PTR().  The caller still
+ *	   needs to register the woke instance.
  */
 struct lskcipher_instance *lskcipher_alloc_instance_simple(
 	struct crypto_template *tmpl, struct rtattr **tb)

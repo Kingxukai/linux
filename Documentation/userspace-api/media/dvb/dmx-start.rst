@@ -28,15 +28,15 @@ Arguments
 Description
 -----------
 
-This ioctl call is used to start the actual filtering operation defined
-via the ioctl calls :ref:`DMX_SET_FILTER` or :ref:`DMX_SET_PES_FILTER`.
+This ioctl call is used to start the woke actual filtering operation defined
+via the woke ioctl calls :ref:`DMX_SET_FILTER` or :ref:`DMX_SET_PES_FILTER`.
 
 Return Value
 ------------
 
 On success 0 is returned.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 .. tabularcolumns:: |p{2.5cm}|p{15.0cm}|

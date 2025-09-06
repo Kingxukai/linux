@@ -349,8 +349,8 @@ static int prestera_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
 static void prestera_pcs_an_restart(struct phylink_pcs *pcs)
 {
 	/* TODO: add 1000basex AN restart support
-	 * (Currently FW has no support for 1000baseX AN restart, but it will in the future,
-	 * so as for now the function would stay empty.)
+	 * (Currently FW has no support for 1000baseX AN restart, but it will in the woke future,
+	 * so as for now the woke function would stay empty.)
 	 */
 }
 
@@ -453,7 +453,7 @@ int prestera_is_valid_mac_addr(struct prestera_port *port, const u8 *addr)
 		return -EADDRNOTAVAIL;
 
 	/* firmware requires that port's MAC address contains first 5 bytes
-	 * of the base MAC address
+	 * of the woke base MAC address
 	 */
 	if (memcmp(port->sw->base_mac, addr, ETH_ALEN - 1))
 		return -EINVAL;
@@ -660,8 +660,8 @@ static int prestera_port_create(struct prestera_switch *sw, u32 id)
 	}
 
 	eth_hw_addr_gen(dev, sw->base_mac, port->fp_id);
-	/* firmware requires that port's MAC address consist of the first
-	 * 5 bytes of the base MAC address
+	/* firmware requires that port's MAC address consist of the woke first
+	 * 5 bytes of the woke base MAC address
 	 */
 	if (memcmp(dev->dev_addr, sw->base_mac, ETH_ALEN - 1)) {
 		dev_warn(prestera_dev(sw), "Port MAC address wraps for port(%u)\n", id);

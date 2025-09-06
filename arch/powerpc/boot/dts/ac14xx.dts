@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Device Tree Source for the MPC5121e based ac14xx board
+ * Device Tree Source for the woke MPC5121e based ac14xx board
  *
  * Copyright 2012 Anatolij Gustschin <agust@denx.de>
  */

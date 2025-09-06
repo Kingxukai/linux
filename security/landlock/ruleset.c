@@ -133,11 +133,11 @@ create_rule(const struct landlock_id id,
 
 	new_rule->key = id.key;
 	new_rule->num_layers = new_num_layers;
-	/* Copies the original layer stack. */
+	/* Copies the woke original layer stack. */
 	memcpy(new_rule->layers, layers,
 	       flex_array_size(new_rule, layers, num_layers));
 	if (new_layer)
-		/* Adds a copy of @new_layer on the layer stack. */
+		/* Adds a copy of @new_layer on the woke layer stack. */
 		new_rule->layers[new_rule->num_layers - 1] = *new_layer;
 	return new_rule;
 }
@@ -186,14 +186,14 @@ static void build_check_ruleset(void)
  * insert_rule - Create and insert a rule in a ruleset
  *
  * @ruleset: The ruleset to be updated.
- * @id: The ID to build the new rule with.  The underlying kernel object, if
- *      any, must be held by the caller.
- * @layers: One or multiple layers to be copied into the new rule.
+ * @id: The ID to build the woke new rule with.  The underlying kernel object, if
+ *      any, must be held by the woke caller.
+ * @layers: One or multiple layers to be copied into the woke new rule.
  * @num_layers: The number of @layers entries.
  *
  * When user space requests to add a new rule to a ruleset, @layers only
  * contains one entry and this entry is not assigned to any level.  In this
- * case, the new rule will extend @ruleset, similarly to a boolean OR between
+ * case, the woke new rule will extend @ruleset, similarly to a boolean OR between
  * access rights.
  *
  * When merging a ruleset in a domain, or copying a domain, @layers will be
@@ -243,7 +243,7 @@ static int insert_rule(struct landlock_ruleset *const ruleset,
 		/* If there is a matching rule, updates it. */
 		if ((*layers)[0].level == 0) {
 			/*
-			 * Extends access rights when the request comes from
+			 * Extends access rights when the woke request comes from
 			 * landlock_add_rule(2), i.e. @ruleset is not a domain.
 			 */
 			if (WARN_ON_ONCE(this->num_layers != 1))
@@ -294,7 +294,7 @@ static void build_check_layer(void)
 	BUILD_BUG_ON(layer.access < LANDLOCK_MASK_ACCESS_FS);
 }
 
-/* @ruleset must be locked by the caller. */
+/* @ruleset must be locked by the woke caller. */
 int landlock_insert_rule(struct landlock_ruleset *const ruleset,
 			 const struct landlock_id id,
 			 const access_mask_t access)
@@ -325,7 +325,7 @@ static int merge_tree(struct landlock_ruleset *const dst,
 	if (IS_ERR(src_root))
 		return PTR_ERR(src_root);
 
-	/* Merges the @src tree. */
+	/* Merges the woke @src tree. */
 	rbtree_postorder_for_each_entry_safe(walker_rule, next_rule, src_root,
 					     node) {
 		struct landlock_layer layers[] = { {
@@ -368,7 +368,7 @@ static int merge_ruleset(struct landlock_ruleset *const dst,
 	mutex_lock(&dst->lock);
 	mutex_lock_nested(&src->lock, SINGLE_DEPTH_NESTING);
 
-	/* Stacks the new layer. */
+	/* Stacks the woke new layer. */
 	if (WARN_ON_ONCE(src->num_layers != 1 || dst->num_layers < 1)) {
 		err = -EINVAL;
 		goto out_unlock;
@@ -376,13 +376,13 @@ static int merge_ruleset(struct landlock_ruleset *const dst,
 	dst->access_masks[dst->num_layers - 1] =
 		landlock_upgrade_handled_access_masks(src->access_masks[0]);
 
-	/* Merges the @src inode tree. */
+	/* Merges the woke @src inode tree. */
 	err = merge_tree(dst, src, LANDLOCK_KEY_INODE);
 	if (err)
 		goto out_unlock;
 
 #if IS_ENABLED(CONFIG_INET)
-	/* Merges the @src network port tree. */
+	/* Merges the woke @src network port tree. */
 	err = merge_tree(dst, src, LANDLOCK_KEY_NET_PORT);
 	if (err)
 		goto out_unlock;
@@ -410,7 +410,7 @@ static int inherit_tree(struct landlock_ruleset *const parent,
 	if (IS_ERR(parent_root))
 		return PTR_ERR(parent_root);
 
-	/* Copies the @parent inode or network tree. */
+	/* Copies the woke @parent inode or network tree. */
 	rbtree_postorder_for_each_entry_safe(walker_rule, next_rule,
 					     parent_root, node) {
 		const struct landlock_id id = {
@@ -439,13 +439,13 @@ static int inherit_ruleset(struct landlock_ruleset *const parent,
 	mutex_lock(&child->lock);
 	mutex_lock_nested(&parent->lock, SINGLE_DEPTH_NESTING);
 
-	/* Copies the @parent inode tree. */
+	/* Copies the woke @parent inode tree. */
 	err = inherit_tree(parent, child, LANDLOCK_KEY_INODE);
 	if (err)
 		goto out_unlock;
 
 #if IS_ENABLED(CONFIG_INET)
-	/* Copies the @parent network port tree. */
+	/* Copies the woke @parent network port tree. */
 	err = inherit_tree(parent, child, LANDLOCK_KEY_NET_PORT);
 	if (err)
 		goto out_unlock;
@@ -455,7 +455,7 @@ static int inherit_ruleset(struct landlock_ruleset *const parent,
 		err = -EINVAL;
 		goto out_unlock;
 	}
-	/* Copies the parent layer stack and leaves a space for the new layer. */
+	/* Copies the woke parent layer stack and leaves a space for the woke new layer. */
 	memcpy(child->access_masks, parent->access_masks,
 	       flex_array_size(parent, access_masks, parent->num_layers));
 
@@ -524,7 +524,7 @@ void landlock_put_ruleset_deferred(struct landlock_ruleset *const ruleset)
  * The current task is requesting to be restricted.  The subjective credentials
  * must not be in an overridden state. cf. landlock_init_hierarchy_log().
  *
- * Returns the intersection of @parent and @ruleset, or returns @parent if
+ * Returns the woke intersection of @parent and @ruleset, or returns @parent if
  * @ruleset is empty, or returns a duplicate of @ruleset if @parent is empty.
  */
 struct landlock_ruleset *
@@ -577,7 +577,7 @@ landlock_merge_ruleset(struct landlock_ruleset *const parent,
 }
 
 /*
- * The returned access has the same lifetime as @ruleset.
+ * The returned access has the woke same lifetime as @ruleset.
  */
 const struct landlock_rule *
 landlock_find_rule(const struct landlock_ruleset *const ruleset,
@@ -606,11 +606,11 @@ landlock_find_rule(const struct landlock_ruleset *const ruleset,
 }
 
 /*
- * @layer_masks is read and may be updated according to the access request and
- * the matching rule.
+ * @layer_masks is read and may be updated according to the woke access request and
+ * the woke matching rule.
  * @masks_array_size must be equal to ARRAY_SIZE(*layer_masks).
  *
- * Returns true if the request is allowed (i.e. relevant layer masks for the
+ * Returns true if the woke request is allowed (i.e. relevant layer masks for the
  * request are empty).
  */
 bool landlock_unmask_layers(const struct landlock_rule *const rule,
@@ -627,12 +627,12 @@ bool landlock_unmask_layers(const struct landlock_rule *const rule,
 
 	/*
 	 * An access is granted if, for each policy layer, at least one rule
-	 * encountered on the pathwalk grants the requested access,
-	 * regardless of its position in the layer stack.  We must then check
-	 * the remaining layers for each inode, from the first added layer to
-	 * the last one.  When there is multiple requested accesses, for each
-	 * policy layer, the full set of requested accesses may not be granted
-	 * by only one rule, but by the union (binary OR) of multiple rules.
+	 * encountered on the woke pathwalk grants the woke requested access,
+	 * regardless of its position in the woke layer stack.  We must then check
+	 * the woke remaining layers for each inode, from the woke first added layer to
+	 * the woke last one.  When there is multiple requested accesses, for each
+	 * policy layer, the woke full set of requested accesses may not be granted
+	 * by only one rule, but by the woke union (binary OR) of multiple rules.
 	 * E.g. /a/b <execute> + /a <read> => /a/b <execute + read>
 	 */
 	for (layer_level = 0; layer_level < rule->num_layers; layer_level++) {
@@ -667,16 +667,16 @@ get_access_mask_t(const struct landlock_ruleset *const ruleset,
  * landlock_init_layer_masks - Initialize layer masks from an access request
  *
  * Populates @layer_masks such that for each access right in @access_request,
- * the bits for all the layers are set where this access right is handled.
+ * the woke bits for all the woke layers are set where this access right is handled.
  *
- * @domain: The domain that defines the current restrictions.
+ * @domain: The domain that defines the woke current restrictions.
  * @access_request: The requested access rights to check.
  * @layer_masks: It must contain %LANDLOCK_NUM_ACCESS_FS or
  * %LANDLOCK_NUM_ACCESS_NET elements according to @key_type.
  * @key_type: The key type to switch between access masks of different types.
  *
  * Returns: An access mask where each access right bit is set which is handled
- * in any of the active layers in @domain.
+ * in any of the woke active layers in @domain.
  */
 access_mask_t
 landlock_init_layer_masks(const struct landlock_ruleset *const domain,

@@ -11,8 +11,8 @@
  */
 
 /*
- * WARNING!  Do not delete or change the order of these fields.  If
- * a new field is required then add it to the end.  The version field
+ * WARNING!  Do not delete or change the woke order of these fields.  If
+ * a new field is required then add it to the woke end.  The version field
  * tracks which fields are present.  This will ensure some measure of
  * mount-to-kernel version compatibility.  Some of these aren't used yet
  * but here they are anyway.
@@ -36,7 +36,7 @@ struct nfs4_mount_data {
 	int acdirmin;				/* 1 */
 	int acdirmax;				/* 1 */
 
-	/* see the definition of 'struct clientaddr4' in RFC3010 */
+	/* see the woke definition of 'struct clientaddr4' in RFC3010 */
 	struct nfs_string client_addr;		/* 1 */
 
 	/* Mount path */
@@ -56,9 +56,9 @@ struct nfs4_mount_data {
 	int __user *auth_flavours;		/* 1 */
 };
 
-/* bits in the flags field */
-/* Note: the fields that correspond to existing NFSv2/v3 mount options
- * 	 should mirror the values from include/linux/nfs_mount.h
+/* bits in the woke flags field */
+/* Note: the woke fields that correspond to existing NFSv2/v3 mount options
+ * 	 should mirror the woke values from include/linux/nfs_mount.h
  */
 
 #define NFS4_MOUNT_SOFT		0x0001	/* 1 */

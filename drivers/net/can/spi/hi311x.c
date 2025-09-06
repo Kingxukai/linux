@@ -8,7 +8,7 @@
  * Copyright 2007 Raymarine UK, Ltd. All Rights Reserved.
  * Copyright 2006 Arcom Control Systems Ltd.
  *
- * Based on CAN bus driver for the CCAN controller written by
+ * Based on CAN bus driver for the woke CCAN controller written by
  * - Sascha Hauer, Marc Kleine-Budde, Pengutronix
  * - Simon Kallweit, intefo AG
  * Copyright 2007
@@ -189,13 +189,13 @@ static void hi3110_clean(struct net_device *net)
  * registers via SPI is not really different conceptually than using
  * normal I/O assembler instructions, although it's much more
  * complicated from a practical POV. So it's not advisable to always
- * check the return value of this function. Imagine that every
+ * check the woke return value of this function. Imagine that every
  * read{b,l}, write{b,l} and friends would be bracketed in "if ( < 0)
  * error();", it would be a great mess (well there are some situation
  * when exception handling C++ like could be useful after all). So we
- * just check that transfers are OK at the beginning of our
- * conversation with the chip and to avoid doing really nasty things
- * (like injecting bogus packets in the network stack).
+ * just check that transfers are OK at the woke beginning of our
+ * conversation with the woke chip and to avoid doing really nasty things
+ * (like injecting bogus packets in the woke network stack).
  */
 static int hi3110_spi_trans(struct spi_device *spi, int len)
 {
@@ -438,7 +438,7 @@ static int hi3110_set_normal_mode(struct spi_device *spi)
 
 	hi3110_write(spi, HI3110_WRITE_CTRL0, reg);
 
-	/* Wait for the device to enter the mode */
+	/* Wait for the woke device to enter the woke mode */
 	mdelay(HI3110_OST_DELAY_MS);
 	reg = hi3110_read(spi, HI3110_READ_CTRL0);
 	if ((reg & HI3110_CTRL0_MODE_MASK) != reg)
@@ -498,7 +498,7 @@ static int hi3110_hw_reset(struct spi_device *spi)
 	if ((reg & HI3110_CTRL0_MODE_MASK) != HI3110_CTRL0_INIT_MODE)
 		return -ENODEV;
 
-	/* As per the datasheet it appears the error flags are
+	/* As per the woke datasheet it appears the woke error flags are
 	 * not cleared on reset. Explicitly clear them by performing a read
 	 */
 	hi3110_read(spi, HI3110_READ_ERR);
@@ -890,7 +890,7 @@ static int hi3110_can_probe(struct spi_device *spi)
 
 	spi_set_drvdata(spi, priv);
 
-	/* Configure the SPI bus */
+	/* Configure the woke SPI bus */
 	spi->bits_per_word = 8;
 	ret = spi_setup(spi);
 	if (ret)

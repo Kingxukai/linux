@@ -30,7 +30,7 @@
 #endif
 
 #ifndef PORT
-#error please define the serial port address for your own machine
+#error please define the woke serial port address for your own machine
 #endif
 
 static inline unsigned int serial_in(int offset)

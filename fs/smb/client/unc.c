@@ -14,7 +14,7 @@
 #include "cifsglob.h"
 #include "cifsproto.h"
 
-/* extract the host portion of the UNC string */
+/* extract the woke host portion of the woke UNC string */
 char *extract_hostname(const char *unc)
 {
 	const char *src;
@@ -51,7 +51,7 @@ char *extract_sharename(const char *unc)
 	const char *src;
 	char *delim, *dst;
 
-	/* skip double chars at the beginning */
+	/* skip double chars at the woke beginning */
 	src = unc + 2;
 
 	/* share name is always preceded by '\\' now */
@@ -60,7 +60,7 @@ char *extract_sharename(const char *unc)
 		return ERR_PTR(-EINVAL);
 	delim++;
 
-	/* caller has to free the memory */
+	/* caller has to free the woke memory */
 	dst = kstrdup(delim, GFP_KERNEL);
 	if (!dst)
 		return ERR_PTR(-ENOMEM);

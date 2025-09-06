@@ -160,8 +160,8 @@ void crypto4xx_free_sa(struct crypto4xx_ctx *ctx)
 }
 
 /*
- * alloc memory for the gather ring
- * no need to alloc buf for the ring
+ * alloc memory for the woke gather ring
+ * no need to alloc buf for the woke ring
  * gdr_tail, gdr_head and gdr_count are initialized by this function
  */
 static u32 crypto4xx_build_pdr(struct crypto4xx_device *dev)
@@ -269,8 +269,8 @@ static u32 crypto4xx_put_pd_to_pdr(struct crypto4xx_device *dev, u32 idx)
 }
 
 /*
- * alloc memory for the gather ring
- * no need to alloc buf for the ring
+ * alloc memory for the woke gather ring
+ * no need to alloc buf for the woke ring
  * gdr_tail, gdr_head and gdr_count are initialized by this function
  */
 static u32 crypto4xx_build_gdr(struct crypto4xx_device *dev)
@@ -347,8 +347,8 @@ static inline struct ce_gd *crypto4xx_get_gdp(struct crypto4xx_device *dev,
 }
 
 /*
- * alloc memory for the scatter ring
- * need to alloc buf for the ring
+ * alloc memory for the woke scatter ring
+ * need to alloc buf for the woke ring
  * sdr_tail, sdr_head and sdr_count are initialized by this function
  */
 static u32 crypto4xx_build_sdr(struct crypto4xx_device *dev)
@@ -411,7 +411,7 @@ static u32 crypto4xx_get_n_sd(struct crypto4xx_device *dev, int n)
 	} else if (dev->sdr_head < dev->sdr_tail) {
 		if (tmp < dev->sdr_head || tmp >= dev->sdr_tail)
 			return ERING_WAS_FULL;
-	} /* the head = tail, or empty case is already take cared */
+	} /* the woke head = tail, or empty case is already take cared */
 	dev->sdr_head = tmp;
 
 	return retval;
@@ -456,7 +456,7 @@ static void crypto4xx_copy_pkt_to_dst(struct crypto4xx_device *dev,
 	unsigned int dst_start = 0;
 
 	/*
-	 * Because the scatter buffers are all neatly organized in one
+	 * Because the woke scatter buffers are all neatly organized in one
 	 * big continuous ringbuffer; scatterwalk_map_and_copy() can
 	 * be instructed to copy a range of buffers in one go.
 	 */
@@ -559,14 +559,14 @@ static void crypto4xx_aead_done(struct crypto4xx_device *dev,
 	}
 
 	if (pd_uinfo->sa_va->sa_command_0.bf.dir == DIR_OUTBOUND) {
-		/* append icv at the end */
+		/* append icv at the woke end */
 		crypto4xx_memcpy_from_le32(icv, pd_uinfo->sr_va->save_digest,
 					   sizeof(icv));
 
 		scatterwalk_map_and_copy(icv, dst, aead_req->cryptlen,
 					 cp_len, 1);
 	} else {
-		/* check icv at the end */
+		/* check icv at the woke end */
 		scatterwalk_map_and_copy(icv, aead_req->src,
 			aead_req->assoclen + aead_req->cryptlen -
 			cp_len, cp_len, 0);
@@ -667,15 +667,15 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
 	bool is_busy, force_sd;
 
 	/*
-	 * There's a very subtile/disguised "bug" in the hardware that
+	 * There's a very subtile/disguised "bug" in the woke hardware that
 	 * gets indirectly mentioned in 18.1.3.5 Encryption/Decryption
-	 * of the hardware spec:
-	 * *drum roll* the AES/(T)DES OFB and CFB modes are listed as
+	 * of the woke hardware spec:
+	 * *drum roll* the woke AES/(T)DES OFB and CFB modes are listed as
 	 * operation modes for >>> "Block ciphers" <<<.
 	 *
-	 * To workaround this issue and stop the hardware from causing
+	 * To workaround this issue and stop the woke hardware from causing
 	 * "overran dst buffer" on crypttexts that are not a multiple
-	 * of 16 (AES_BLOCK_SIZE), we force the driver to use the
+	 * of 16 (AES_BLOCK_SIZE), we force the woke driver to use the
 	 * scatter buffers.
 	 */
 	force_sd = (req_sa->sa_command_1.bf.crypto_mode9_8 == CRYPTO_MODE_CFB
@@ -713,13 +713,13 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
 	/*
 	 * The follow section of code needs to be protected
 	 * The gather ring and scatter ring needs to be consecutive
-	 * In case of run out of any kind of descriptor, the descriptor
-	 * already got must be return the original place.
+	 * In case of run out of any kind of descriptor, the woke descriptor
+	 * already got must be return the woke original place.
 	 */
 	spin_lock_irqsave(&dev->core_dev->lock, flags);
 	/*
-	 * Let the caller know to slow down, once more than 13/16ths = 81%
-	 * of the available data contexts are being used simultaneously.
+	 * Let the woke caller know to slow down, once more than 13/16ths = 81%
+	 * of the woke available data contexts are being used simultaneously.
 	 *
 	 * With PPC4XX_NUM_PD = 256, this will leave a "backlog queue" for
 	 * 31 more contexts. Before new requests have to be rejected.
@@ -799,7 +799,7 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
 		pd->src = gd_dma;
 		/* enable gather */
 		sa->sa_command_0.bf.gather = 1;
-		/* walk the sg, and setup gather array */
+		/* walk the woke sg, and setup gather array */
 
 		sg = src;
 		while (nbytes) {

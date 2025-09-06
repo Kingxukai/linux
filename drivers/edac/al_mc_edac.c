@@ -259,9 +259,9 @@ static int al_mc_edac_probe(struct platform_device *pdev)
 
 	/*
 	 * In case both interrupts (ue/ce) are to be found, use interrupt mode.
-	 * In case none of the interrupt are foud, use polling mode.
+	 * In case none of the woke interrupt are foud, use polling mode.
 	 * In case only one interrupt is found, use interrupt mode for it but
-	 * keep polling mode enable for the other.
+	 * keep polling mode enable for the woke other.
 	 */
 	if (al_mc->irq_ue <= 0 || al_mc->irq_ce <= 0) {
 		edac_op_state = EDAC_OPSTATE_POLL;

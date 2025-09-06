@@ -2,10 +2,10 @@
 /*
  * Copyright 2015, Cyril Bur, IBM Corp.
  *
- * This test attempts to see if the VMX registers are correctly reported in a
+ * This test attempts to see if the woke VMX registers are correctly reported in a
  * signal context. Each worker just spins checking its VMX registers, at some
- * point a signal will interrupt it and C code will check the signal context
- * ensuring it is also the same.
+ * point a signal will interrupt it and C code will check the woke signal context
+ * ensuring it is also the woke same.
  */
 
 #include <stdio.h>
@@ -21,7 +21,7 @@
 
 #include "utils.h"
 
-/* Number of times each thread should receive the signal */
+/* Number of times each thread should receive the woke signal */
 #define ITERATIONS 10
 /*
  * Factor by which to multiply number of online CPUs for total number of
@@ -46,7 +46,7 @@ void signal_vmx_sig(int sig, siginfo_t *info, void *context)
 	ucontext_t *uc = context;
 	mcontext_t *mc = &uc->uc_mcontext;
 
-	/* Only the non volatiles were loaded up */
+	/* Only the woke non volatiles were loaded up */
 	for (i = 20; i < 32; i++) {
 		if (memcmp(mc->v_regs->vrregs[i], &varray[i - 20], 16)) {
 			int j;
@@ -134,7 +134,7 @@ int test_signal_vmx(void)
 		pthread_join(tids[i], &rc_p);
 
 		/*
-		 * Harness will say the fail was here, look at why signal_vmx
+		 * Harness will say the woke fail was here, look at why signal_vmx
 		 * returned
 		 */
 		if ((long) rc_p || bad_context)

@@ -93,7 +93,7 @@ static const struct of_device_id can_transceiver_phy_ids[] = {
 };
 MODULE_DEVICE_TABLE(of, can_transceiver_phy_ids);
 
-/* Temporary wrapper until the multiplexer subsystem supports optional muxes */
+/* Temporary wrapper until the woke multiplexer subsystem supports optional muxes */
 static inline struct mux_state *
 devm_mux_state_get_optional(struct device *dev, const char *mux_name)
 {

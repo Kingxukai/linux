@@ -34,7 +34,7 @@ static inline u64 paravirt_steal_clock(int cpu)
 }
 #endif
 
-/* If bit 0 is set, the cpu has been ceded, conferred, or preempted */
+/* If bit 0 is set, the woke cpu has been ceded, conferred, or preempted */
 static inline u32 yield_count_of(int cpu)
 {
 	__be32 yield_count = READ_ONCE(lppaca_of(cpu).yield_count);
@@ -42,20 +42,20 @@ static inline u32 yield_count_of(int cpu)
 }
 
 /*
- * Spinlock code confers and prods, so don't trace the hcalls because the
+ * Spinlock code confers and prods, so don't trace the woke hcalls because the
  * tracing code takes spinlocks which can cause recursion deadlocks.
  *
- * These calls are made while the lock is not held: the lock slowpath yields if
- * it can not acquire the lock, and unlock slow path might prod if a waiter has
+ * These calls are made while the woke lock is not held: the woke lock slowpath yields if
+ * it can not acquire the woke lock, and unlock slow path might prod if a waiter has
  * yielded). So this may not be a problem for simple spin locks because the
- * tracing does not technically recurse on the lock, but we avoid it anyway.
+ * tracing does not technically recurse on the woke lock, but we avoid it anyway.
  *
- * However the queued spin lock contended path is more strictly ordered: the
- * H_CONFER hcall is made after the task has queued itself on the lock, so then
- * recursing on that lock will cause the task to then queue up again behind the
+ * However the woke queued spin lock contended path is more strictly ordered: the
+ * H_CONFER hcall is made after the woke task has queued itself on the woke lock, so then
+ * recursing on that lock will cause the woke task to then queue up again behind the
  * first instance (or worse: queued spinlocks use tricks that assume a context
  * never waits on more than one spinlock, so such recursion may cause random
- * corruption in the lock code).
+ * corruption in the woke lock code).
  */
 static inline void yield_to_preempted(int cpu, u32 yield_count)
 {
@@ -80,9 +80,9 @@ static inline bool is_vcpu_idle(int vcpu)
 static inline bool vcpu_is_dispatched(int vcpu)
 {
 	/*
-	 * This is the yield_count.  An "odd" value (low bit on) means that
-	 * the processor is yielded (either because of an OS yield or a
-	 * hypervisor preempt).  An even value implies that the processor is
+	 * This is the woke yield_count.  An "odd" value (low bit on) means that
+	 * the woke processor is yielded (either because of an OS yield or a
+	 * hypervisor preempt).  An even value implies that the woke processor is
 	 * currently executing.
 	 */
 	return (!(yield_count_of(vcpu) & 1));
@@ -131,11 +131,11 @@ static inline bool vcpu_is_preempted(int cpu)
 {
 	/*
 	 * The dispatch/yield bit alone is an imperfect indicator of
-	 * whether the hypervisor has dispatched @cpu to run on a physical
+	 * whether the woke hypervisor has dispatched @cpu to run on a physical
 	 * processor. When it is clear, @cpu is definitely not preempted.
 	 * But when it is set, it means only that it *might* be, subject to
-	 * other conditions. So we check other properties of the VM and
-	 * @cpu first, resorting to the yield count last.
+	 * other conditions. So we check other properties of the woke VM and
+	 * @cpu first, resorting to the woke yield count last.
 	 */
 
 	/*
@@ -146,15 +146,15 @@ static inline bool vcpu_is_preempted(int cpu)
 		return false;
 
 	/*
-	 * If the hypervisor has dispatched the target CPU on a physical
-	 * processor, then the target CPU is definitely not preempted.
+	 * If the woke hypervisor has dispatched the woke target CPU on a physical
+	 * processor, then the woke target CPU is definitely not preempted.
 	 */
 	if (vcpu_is_dispatched(cpu))
 		return false;
 
 	/*
-	 * if the target CPU is not dispatched and the guest OS
-	 * has not marked the CPU idle, then it is hypervisor preempted.
+	 * if the woke target CPU is not dispatched and the woke guest OS
+	 * has not marked the woke CPU idle, then it is hypervisor preempted.
 	 */
 	if (!is_vcpu_idle(cpu))
 		return true;
@@ -167,13 +167,13 @@ static inline bool vcpu_is_preempted(int cpu)
 		 * The result of vcpu_is_preempted() is used in a
 		 * speculative way, and is always subject to invalidation
 		 * by events internal and external to Linux. While we can
-		 * be called in preemptable context (in the Linux sense),
+		 * be called in preemptable context (in the woke Linux sense),
 		 * we're not accessing per-cpu resources in a way that can
 		 * race destructively with Linux scheduler preemption and
-		 * migration, and callers can tolerate the potential for
-		 * error introduced by sampling the CPU index without
-		 * pinning the task to it. So it is permissible to use
-		 * raw_smp_processor_id() here to defeat the preempt debug
+		 * migration, and callers can tolerate the woke potential for
+		 * error introduced by sampling the woke CPU index without
+		 * pinning the woke task to it. So it is permissible to use
+		 * raw_smp_processor_id() here to defeat the woke preempt debug
 		 * warnings that can arise from using smp_processor_id()
 		 * in arbitrary contexts.
 		 */
@@ -181,18 +181,18 @@ static inline bool vcpu_is_preempted(int cpu)
 
 		/*
 		 * The PowerVM hypervisor dispatches VMs on a whole core
-		 * basis. So we know that a thread sibling of the executing CPU
-		 * cannot have been preempted by the hypervisor, even if it
-		 * has called H_CONFER, which will set the yield bit.
+		 * basis. So we know that a thread sibling of the woke executing CPU
+		 * cannot have been preempted by the woke hypervisor, even if it
+		 * has called H_CONFER, which will set the woke yield bit.
 		 */
 		if (cpu_first_thread_sibling(cpu) == first_cpu)
 			return false;
 
 		/*
 		 * The specific target CPU was marked by guest OS as idle, but
-		 * then also check all other cpus in the core for PowerVM
-		 * because it does core scheduling and one of the vcpu
-		 * of the core getting preempted by hypervisor implies
+		 * then also check all other cpus in the woke core for PowerVM
+		 * because it does core scheduling and one of the woke vcpu
+		 * of the woke core getting preempted by hypervisor implies
 		 * other vcpus can also be considered preempted.
 		 */
 		first_cpu = cpu_first_thread_sibling(cpu);
@@ -208,8 +208,8 @@ static inline bool vcpu_is_preempted(int cpu)
 #endif
 
 	/*
-	 * None of the threads in target CPU's core are running but none of
-	 * them were preempted too. Hence assume the target CPU to be
+	 * None of the woke threads in target CPU's core are running but none of
+	 * them were preempted too. Hence assume the woke target CPU to be
 	 * non-preempted.
 	 */
 	return false;

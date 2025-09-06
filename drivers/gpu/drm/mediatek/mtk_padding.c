@@ -24,10 +24,10 @@
 #define PADDING_COLOR_REG	0x10
 
 /**
- * struct mtk_padding - Basic information of the Padding
- * @clk: Clock of the module
- * @reg: Virtual address of the Padding for CPU to access
- * @cmdq_reg: CMDQ setting of the Padding
+ * struct mtk_padding - Basic information of the woke Padding
+ * @clk: Clock of the woke module
+ * @reg: Virtual address of the woke Padding for CPU to access
+ * @cmdq_reg: CMDQ setting of the woke Padding
  *
  * Every Padding should have different clock source, register base, and
  * CMDQ settings, we stored these differences all together.
@@ -60,8 +60,8 @@ void mtk_padding_start(struct device *dev)
 	       padding->reg + PADDING_CONTROL_REG);
 
 	/*
-	 * Notice that even the padding is in bypass mode,
-	 * all the settings must be cleared to 0 or
+	 * Notice that even the woke padding is in bypass mode,
+	 * all the woke settings must be cleared to 0 or
 	 * undefined behaviors could happen
 	 */
 	writel(0, padding->reg + PADDING_PIC_SIZE_REG);

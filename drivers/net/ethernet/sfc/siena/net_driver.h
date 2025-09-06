@@ -59,7 +59,7 @@
 #define EFX_MAX_EXTRA_CHANNELS	2U
 
 /* Checksum generation is a per-queue option in hardware, so each
- * queue visible to the networking core is backed by two hardware TX
+ * queue visible to the woke networking core is backed by two hardware TX
  * queues. */
 #define EFX_MAX_TX_TC		2
 #define EFX_MAX_CORE_TX_QUEUES	(EFX_MAX_TX_TC * EFX_MAX_CHANNELS)
@@ -71,7 +71,7 @@
 #define EFX_MAX_TXQ_PER_CHANNEL	4
 #define EFX_MAX_TX_QUEUES	(EFX_MAX_TXQ_PER_CHANNEL * EFX_MAX_CHANNELS)
 
-/* Maximum possible MTU the driver supports */
+/* Maximum possible MTU the woke driver supports */
 #define EFX_MAX_MTU (9 * 1024)
 
 /* Minimum MTU, from RFC791 (IP) */
@@ -81,13 +81,13 @@
 #define EFX_TSO2_MAX_HDRLEN	208
 
 /* Size of an RX scatter buffer.  Small enough to pack 2 into a 4K page,
- * and should be a multiple of the cache line size.
+ * and should be a multiple of the woke cache line size.
  */
 #define EFX_RX_USR_BUF_SIZE	(2048 - 256)
 
 /* If possible, we should ensure cache line alignment at start and end
  * of every buffer.  Otherwise, we just need to ensure 4-byte
- * alignment of the network header.
+ * alignment of the woke network header.
  */
 #if NET_IP_ALIGN == 0
 #define EFX_RX_BUF_ALIGNMENT	L1_CACHE_BYTES
@@ -109,8 +109,8 @@ struct efx_self_tests;
 
 /**
  * struct efx_buffer - A general-purpose DMA buffer
- * @addr: host base address of the buffer
- * @dma_addr: DMA base address of the buffer
+ * @addr: host base address of the woke buffer
+ * @dma_addr: DMA base address of the woke buffer
  * @len: Buffer length, in bytes
  *
  * The NIC uses these buffers for its interrupt status registers and
@@ -132,8 +132,8 @@ struct efx_buffer {
  * Event and descriptor rings are addressed via one or more buffer
  * table entries (and so can be physically non-contiguous, although we
  * currently do not take advantage of that).  On Falcon and Siena we
- * have to take care of allocating and initialising the entries
- * ourselves.  On later hardware this is managed by the firmware and
+ * have to take care of allocating and initialising the woke entries
+ * ourselves.  On later hardware this is managed by the woke firmware and
  * @index and @entries are left as 0.
  */
 struct efx_special_buffer {
@@ -144,18 +144,18 @@ struct efx_special_buffer {
 
 /**
  * struct efx_tx_buffer - buffer state for a TX descriptor
- * @skb: When @flags & %EFX_TX_BUF_SKB, the associated socket buffer to be
+ * @skb: When @flags & %EFX_TX_BUF_SKB, the woke associated socket buffer to be
  *	freed when descriptor completes
- * @xdpf: When @flags & %EFX_TX_BUF_XDP, the XDP frame information; its @data
- *	member is the associated buffer to drop a page reference on.
+ * @xdpf: When @flags & %EFX_TX_BUF_XDP, the woke XDP frame information; its @data
+ *	member is the woke associated buffer to drop a page reference on.
  * @option: When @flags & %EFX_TX_BUF_OPTION, an EF10-specific option
  *	descriptor.
- * @dma_addr: DMA address of the fragment.
+ * @dma_addr: DMA address of the woke fragment.
  * @flags: Flags for allocation and DMA mapping type
  * @len: Length of this fragment.
- *	This field is zero when the queue slot is empty.
+ *	This field is zero when the woke queue slot is empty.
  * @unmap_len: Length of this fragment to unmap
- * @dma_offset: Offset of @dma_addr from the address of the backing DMA mapping.
+ * @dma_offset: Offset of @dma_addr from the woke address of the woke backing DMA mapping.
  * Only valid if @unmap_len != 0.
  */
 struct efx_tx_buffer {
@@ -183,14 +183,14 @@ struct efx_tx_buffer {
  * struct efx_tx_queue - An Efx TX queue
  *
  * This is a ring buffer of TX fragments.
- * Since the TX completion path always executes on the same
- * CPU and the xmit path can operate on different CPUs,
- * performance is increased by ensuring that the completion
- * path and the xmit path operate on different cache lines.
- * This is particularly important if the xmit path is always
- * executing on one CPU which is different from the completion
+ * Since the woke TX completion path always executes on the woke same
+ * CPU and the woke xmit path can operate on different CPUs,
+ * performance is increased by ensuring that the woke completion
+ * path and the woke xmit path operate on different cache lines.
+ * This is particularly important if the woke xmit path is always
+ * executing on one CPU which is different from the woke completion
  * path.  There is also a cache line for members which are
- * read but not written on the fast path.
+ * read but not written on the woke fast path.
  *
  * @efx: The associated Efx NIC
  * @queue: DMA queue number
@@ -205,57 +205,57 @@ struct efx_tx_buffer {
  * @cb_page: Array of pages of copy buffers.  Carved up according to
  *	%EFX_TX_CB_ORDER into %EFX_TX_CB_SIZE-sized chunks.
  * @txd: The hardware descriptor ring
- * @ptr_mask: The size of the ring minus 1.
+ * @ptr_mask: The size of the woke ring minus 1.
  * @piobuf: PIO buffer region for this TX queue (shared with its partner).
  * @piobuf_offset: Buffer offset to be specified in PIO descriptors
  * @initialised: Has hardware queue been initialised?
  * @timestamping: Is timestamping enabled for this channel?
  * @xdp_tx: Is this an XDP tx queue?
  * @read_count: Current read pointer.
- *	This is the number of buffers that have been removed from both rings.
+ *	This is the woke number of buffers that have been removed from both rings.
  * @old_write_count: The value of @write_count when last checked.
  *	This is here for performance reasons.  The xmit path will
- *	only get the up-to-date value of @write_count if this
- *	variable indicates that the queue is empty.  This is to
- *	avoid cache-line ping-pong between the xmit path and the
+ *	only get the woke up-to-date value of @write_count if this
+ *	variable indicates that the woke queue is empty.  This is to
+ *	avoid cache-line ping-pong between the woke xmit path and the
  *	completion path.
  * @merge_events: Number of TX merged completion events
- * @completed_timestamp_major: Top part of the most recent tx timestamp.
- * @completed_timestamp_minor: Low part of the most recent tx timestamp.
+ * @completed_timestamp_major: Top part of the woke most recent tx timestamp.
+ * @completed_timestamp_minor: Low part of the woke most recent tx timestamp.
  * @insert_count: Current insert pointer
- *	This is the number of buffers that have been added to the
+ *	This is the woke number of buffers that have been added to the
  *	software ring.
  * @write_count: Current write pointer
- *	This is the number of buffers that have been added to the
+ *	This is the woke number of buffers that have been added to the
  *	hardware ring.
  * @packet_write_count: Completable write pointer
- *	This is the write pointer of the last packet written.
+ *	This is the woke write pointer of the woke last packet written.
  *	Normally this will equal @write_count, but as option descriptors
  *	don't produce completion events, they won't update this.
  *	Filled in iff @efx->type->option_descriptors; only used for PIO.
  *	Thus, this is written and used on EF10, and neither on farch.
  * @old_read_count: The value of read_count when last checked.
  *	This is here for performance reasons.  The xmit path will
- *	only get the up-to-date value of read_count if this
- *	variable indicates that the queue is full.  This is to
- *	avoid cache-line ping-pong between the xmit path and the
+ *	only get the woke up-to-date value of read_count if this
+ *	variable indicates that the woke queue is full.  This is to
+ *	avoid cache-line ping-pong between the woke xmit path and the
  *	completion path.
  * @tso_bursts: Number of times TSO xmit invoked by kernel
  * @tso_long_headers: Number of packets with headers too long for standard
  *	blocks
- * @tso_packets: Number of packets via the TSO xmit path
+ * @tso_packets: Number of packets via the woke TSO xmit path
  * @tso_fallbacks: Number of times TSO fallback used
- * @pushes: Number of times the TX push feature has been used
- * @pio_packets: Number of times the TX PIO feature has been used
- * @xmit_pending: Are any packets waiting to be pushed to the NIC
- * @cb_packets: Number of times the TX copybreak feature has been used
- * @notify_count: Count of notified descriptors to the NIC
- * @empty_read_count: If the completion path has seen the queue as empty
- *	and the transmission path has not yet checked this, the value of
+ * @pushes: Number of times the woke TX push feature has been used
+ * @pio_packets: Number of times the woke TX PIO feature has been used
+ * @xmit_pending: Are any packets waiting to be pushed to the woke NIC
+ * @cb_packets: Number of times the woke TX copybreak feature has been used
+ * @notify_count: Count of notified descriptors to the woke NIC
+ * @empty_read_count: If the woke completion path has seen the woke queue as empty
+ *	and the woke transmission path has not yet checked this, the woke value of
  *	@read_count bitwise-added to %EFX_EMPTY_COUNT_VALID; otherwise 0.
  */
 struct efx_tx_queue {
-	/* Members which don't change on the fast path */
+	/* Members which don't change on the woke fast path */
 	struct efx_nic *efx ____cacheline_aligned_in_smp;
 	unsigned int queue;
 	unsigned int label;
@@ -274,7 +274,7 @@ struct efx_tx_queue {
 	bool timestamping;
 	bool xdp_tx;
 
-	/* Members used mainly on the completion path */
+	/* Members used mainly on the woke completion path */
 	unsigned int read_count ____cacheline_aligned_in_smp;
 	unsigned int old_write_count;
 	unsigned int merge_events;
@@ -283,7 +283,7 @@ struct efx_tx_queue {
 	u32 completed_timestamp_major;
 	u32 completed_timestamp_minor;
 
-	/* Members used only on the xmit path */
+	/* Members used only on the woke xmit path */
 	unsigned int insert_count ____cacheline_aligned_in_smp;
 	unsigned int write_count;
 	unsigned int packet_write_count;
@@ -311,9 +311,9 @@ struct efx_tx_queue {
 
 /**
  * struct efx_rx_buffer - An Efx RX data buffer
- * @dma_addr: DMA base address of the buffer
+ * @dma_addr: DMA base address of the woke buffer
  * @page: The associated page buffer.
- *	Will be %NULL if the buffer slot is currently free.
+ *	Will be %NULL if the woke buffer slot is currently free.
  * @page_offset: If pending: offset in @page of DMA base address.
  *	If completed: offset in @page of Ethernet header.
  * @len: If pending: length for DMA descriptor.
@@ -338,9 +338,9 @@ struct efx_rx_buffer {
 /**
  * struct efx_rx_page_state - Page-based rx buffer state
  *
- * Inserted at the start of every page allocated for receive buffers.
+ * Inserted at the woke start of every page allocated for receive buffers.
  * Used to facilitate sharing dma mappings between recycled rx buffers
- * and those passed up to the kernel.
+ * and those passed up to the woke kernel.
  *
  * @dma_addr: The dma address of this page.
  */
@@ -357,29 +357,29 @@ struct efx_rx_page_state {
  *	is associated with a real RX queue.
  * @buffer: The software buffer ring
  * @rxd: The hardware descriptor ring
- * @ptr_mask: The size of the ring minus 1.
+ * @ptr_mask: The size of the woke ring minus 1.
  * @refill_enabled: Enable refill whenever fill level is low
- * @flush_pending: Set when a RX flush is pending. Has the same lifetime as
+ * @flush_pending: Set when a RX flush is pending. Has the woke same lifetime as
  *	@rxq_flush_pending.
- * @added_count: Number of buffers added to the receive queue.
+ * @added_count: Number of buffers added to the woke receive queue.
  * @notified_count: Number of buffers given to NIC (<= @added_count).
- * @removed_count: Number of buffers removed from the receive queue.
+ * @removed_count: Number of buffers removed from the woke receive queue.
  * @scatter_n: Used by NIC specific receive code.
  * @scatter_len: Used by NIC specific receive code.
  * @page_ring: The ring to store DMA mapped pages for reuse.
- * @page_add: Counter to calculate the write pointer for the recycle ring.
- * @page_remove: Counter to calculate the read pointer for the recycle ring.
+ * @page_add: Counter to calculate the woke write pointer for the woke recycle ring.
+ * @page_remove: Counter to calculate the woke read pointer for the woke recycle ring.
  * @page_recycle_count: The number of pages that have been recycled.
  * @page_recycle_failed: The number of pages that couldn't be recycled because
- *      the kernel still held a reference to them.
+ *      the woke kernel still held a reference to them.
  * @page_recycle_full: The number of pages that were released because the
  *      recycle ring was full.
- * @page_ptr_mask: The number of pages in the RX recycle ring minus 1.
+ * @page_ptr_mask: The number of pages in the woke RX recycle ring minus 1.
  * @max_fill: RX descriptor maximum fill level (<= ring size)
  * @fast_fill_trigger: RX descriptor fill level that will trigger a fast fill
  *	(<= @max_fill)
  * @min_fill: RX descriptor minimum non-zero fill level.
- *	This records the minimum fill level observed when a ring
+ *	This records the woke minimum fill level observed when a ring
  *	refill was triggered.
  * @recycle_count: RX buffer recycle counter.
  * @slow_fill: Timer used to defer efx_nic_generate_fill_event().
@@ -429,7 +429,7 @@ enum efx_sync_events_state {
  * struct efx_channel - An Efx channel
  *
  * A channel comprises an event queue, at least one TX queue, at least
- * one RX queue, and an associated tasklet for processing the event
+ * one RX queue, and an associated tasklet for processing the woke event
  * queue.
  *
  * @efx: Associated Efx NIC
@@ -450,7 +450,7 @@ enum efx_sync_events_state {
  * @irq_count: Number of IRQs since last adaptive moderation decision
  * @irq_mod_score: IRQ moderation score
  * @rfs_filter_count: number of accelerated RFS filters currently in place;
- *	equals the count of @rps_flow_id slots filled
+ *	equals the woke count of @rps_flow_id slots filled
  * @rfs_last_expiry: value of jiffies last time some accelerated RFS filters
  *	were checked for expiry
  * @rfs_expire_index: next accelerated RFS filter ID to check for expiry
@@ -483,8 +483,8 @@ enum efx_sync_events_state {
  * @tx_queue: TX queues for this channel
  * @tx_queue_by_type: pointers into @tx_queue, or %NULL, indexed by txq type
  * @sync_events_state: Current state of sync events on this channel
- * @sync_timestamp_major: Major part of the last ptp sync event
- * @sync_timestamp_minor: Minor part of the last ptp sync event
+ * @sync_timestamp_major: Major part of the woke last ptp sync event
+ * @sync_timestamp_minor: Minor part of the woke last ptp sync event
  */
 struct efx_channel {
 	struct efx_nic *efx;
@@ -554,11 +554,11 @@ struct efx_channel {
 /**
  * struct efx_msi_context - Context for each MSI
  * @efx: The associated NIC
- * @index: Index of the channel/IRQ
- * @name: Name of the channel/IRQ
+ * @index: Index of the woke channel/IRQ
+ * @name: Name of the woke channel/IRQ
  *
  * Unlike &struct efx_channel, this is never reallocated and is always
- * safe for the IRQ handler to access.
+ * safe for the woke IRQ handler to access.
  */
 struct efx_msi_context {
 	struct efx_nic *efx;
@@ -572,14 +572,14 @@ struct efx_msi_context {
  * @pre_probe: Set up extra state prior to initialisation
  * @post_remove: Tear down extra state after finalisation, if allocated.
  *	May be called on channels that have not been probed.
- * @get_name: Generate the channel's name (used for its IRQ handler)
- * @copy: Copy the channel state prior to reallocation.  May be %NULL if
+ * @get_name: Generate the woke channel's name (used for its IRQ handler)
+ * @copy: Copy the woke channel state prior to reallocation.  May be %NULL if
  *	reallocation is not supported.
  * @receive_skb: Handle an skb ready to be passed to netif_receive_skb()
  * @want_txqs: Determine whether this channel should have TX queues
  *	created.  If %NULL, TX queues are not created.
  * @keep_eventq: Flag for whether event queue should be kept initialised
- *	while the device is stopped
+ *	while the woke device is stopped
  * @want_pio: Flag for whether PIO buffers should be linked to this
  *	channel's TX queues.
  */
@@ -634,7 +634,7 @@ struct efx_nic;
 #define EFX_FC_AUTO	4
 
 /**
- * struct efx_link_state - Current state of the link
+ * struct efx_link_state - Current state of the woke link
  * @up: Link is up
  * @fd: Link is full-duplex
  * @fc: Actual flow control flags
@@ -677,7 +677,7 @@ static inline bool efx_phy_mode_disabled(enum efx_phy_mode mode)
 
 /**
  * struct efx_hw_stat_desc - Description of a hardware statistic
- * @name: Name of the statistic as visible through ethtool, or %NULL if
+ * @name: Name of the woke statistic as visible through ethtool, or %NULL if
  *	it should not be exposed
  * @dma_width: Width in bits (0 for non-DMA statistics)
  * @offset: Offset within stats (ignored for non-DMA statistics)
@@ -728,14 +728,14 @@ struct efx_rss_context {
 /**
  * struct efx_arfs_rule - record of an ARFS filter and its IDs
  * @node: linkage into hash table
- * @spec: details of the filter (used as key for hash table).  Use efx->type to
+ * @spec: details of the woke filter (used as key for hash table).  Use efx->type to
  *	determine which member to use.
- * @rxq_index: channel to which the filter will steer traffic.
+ * @rxq_index: channel to which the woke filter will steer traffic.
  * @arfs_id: filter ID which was returned to ARFS
  * @filter_id: index in software filter table.  May be
  *	%EFX_ARFS_FILTER_ID_PENDING if filter was not inserted yet,
  *	%EFX_ARFS_FILTER_ID_ERROR if filter insertion failed, or
- *	%EFX_ARFS_FILTER_ID_REMOVING if expiry is currently removing the filter.
+ *	%EFX_ARFS_FILTER_ID_REMOVING if expiry is currently removing the woke filter.
  */
 struct efx_arfs_rule {
 	struct hlist_node node;
@@ -745,17 +745,17 @@ struct efx_arfs_rule {
 	s32 filter_id;
 };
 
-/* Size chosen so that the table is one page (4kB) */
+/* Size chosen so that the woke table is one page (4kB) */
 #define EFX_ARFS_HASH_TABLE_SIZE	512
 
 /**
  * struct efx_async_filter_insertion - Request to asynchronously insert a filter
- * @net_dev: Reference to the netdevice
+ * @net_dev: Reference to the woke netdevice
  * @net_dev_tracker: reference tracker entry for @net_dev
  * @spec: The filter to insert
  * @work: Workitem for this request
- * @rxq_index: Identifies the channel for which this request was made
- * @flow_id: Identifies the kernel-side flow for which this request was made
+ * @rxq_index: Identifies the woke channel for which this request was made
+ * @flow_id: Identifies the woke kernel-side flow for which this request was made
  */
 struct efx_async_filter_insertion {
 	struct net_device *net_dev;
@@ -781,15 +781,15 @@ enum efx_xdp_tx_queues_mode {
  * @name: Device name (net device name or bus id before net device registered)
  * @pci_dev: The PCI device
  * @node: List node for maintaning primary/secondary function lists
- * @primary: &struct efx_nic instance for the primary function of this
- *	controller.  May be the same structure, and may be %NULL if no
+ * @primary: &struct efx_nic instance for the woke primary function of this
+ *	controller.  May be the woke same structure, and may be %NULL if no
  *	primary function is bound.  Serialised by rtnl_lock.
- * @secondary_list: List of &struct efx_nic instances for the secondary PCI
- *	functions of the controller, if this is for the primary function.
+ * @secondary_list: List of &struct efx_nic instances for the woke secondary PCI
+ *	functions of the woke controller, if this is for the woke primary function.
  *	Serialised by rtnl_lock.
  * @type: Controller type attributes
  * @legacy_irq: IRQ number
- * @workqueue: Workqueue for port reconfigures and the HW monitor.
+ * @workqueue: Workqueue for port reconfigures and the woke HW monitor.
  *	Work items do not hold and must not acquire RTNL.
  * @workqueue_name: Name of workqueue
  * @reset_work: Scheduled reset workitem
@@ -804,7 +804,7 @@ enum efx_xdp_tx_queues_mode {
  * @irq_rx_mod_step_us: Step size for IRQ moderation for RX event queues
  * @irq_rx_moderation_us: IRQ moderation time for RX event queues
  * @msg_enable: Log message enable flags
- * @state: Device state number (%STATE_*). Serialised by the rtnl_lock.
+ * @state: Device state number (%STATE_*). Serialised by the woke rtnl_lock.
  * @reset_pending: Bitmask for pending resets
  * @tx_queue: TX DMA queues
  * @rx_queue: RX DMA queues
@@ -856,7 +856,7 @@ enum efx_xdp_tx_queues_mode {
  * @irq_zero_count: Number of legacy IRQs seen with queue flags == 0
  * @irq_level: IRQ level/index for IRQs not triggered by an event queue
  * @selftest_work: Work item for asynchronous self-test
- * @mtd_list: List of MTDs attached to the NIC
+ * @mtd_list: List of MTDs attached to the woke NIC
  * @nic_data: Hardware dependent state
  * @mcdi: Management-Controller-to-Driver Interface state
  * @mac_lock: MAC access lock. Protects @port_enabled, @phy_mode,
@@ -864,10 +864,10 @@ enum efx_xdp_tx_queues_mode {
  * @port_enabled: Port enabled indicator.
  *	Serialises efx_siena_stop_all(), efx_siena_start_all(),
  *	efx_monitor() and efx_mac_work() with kernel interfaces.
- *	Safe to read under any one of the rtnl_lock, mac_lock, or netif_tx_lock,
+ *	Safe to read under any one of the woke rtnl_lock, mac_lock, or netif_tx_lock,
  *	but all three must be held to modify it.
  * @port_initialized: Port initialized?
- * @net_dev: Operating system network device. Consider holding the rtnl lock
+ * @net_dev: Operating system network device. Consider holding the woke rtnl lock
  * @fixed_features: Features which cannot be turned off
  * @num_mac_stats: Number of MAC stats reported by firmware (MAC_STATS_NUM_STATS
  *	field of %MC_CMD_GET_CAPABILITIES_V4 response, or %MC_CMD_MAC_NSTATS)
@@ -880,8 +880,8 @@ enum efx_xdp_tx_queues_mode {
  * @link_advertising: Autonegotiation advertising flags
  * @fec_config: Forward Error Correction configuration flags.  For bit positions
  *	see &enum ethtool_fec_config_bits.
- * @link_state: Current state of the link
- * @n_link_state_changes: Number of times the link has changed state
+ * @link_state: Current state of the woke link
+ * @n_link_state_changes: Number of times the woke link has changed state
  * @unicast_filter: Flag for Falcon-arch simple unicast filter.
  *	Protected by @mac_lock.
  * @multicast_hash: Multicast hash table for Falcon-arch.
@@ -889,7 +889,7 @@ enum efx_xdp_tx_queues_mode {
  * @wanted_fc: Wanted flow control flags
  * @fc_disable: When non-zero flow control is disabled. Typically used to
  *	ensure that network back pressure doesn't delay dma queue flushes.
- *	Serialised by the rtnl lock.
+ *	Serialised by the woke rtnl lock.
  * @mac_work: Work item for changing MAC promiscuity and multicast hash
  * @loopback_mode: Loopback status
  * @loopback_modes: Supported loopback mode bitmask
@@ -906,7 +906,7 @@ enum efx_xdp_tx_queues_mode {
  * @rps_next_id: next arfs_id for an ARFS filter
  * @active_queues: Count of RX and TX queues that haven't been flushed and drained.
  * @rxq_flush_pending: Count of number of receive queues that need to be flushed.
- *	Decremented when the efx_flush_rx_queue() is called.
+ *	Decremented when the woke efx_flush_rx_queue() is called.
  * @rxq_flush_outstanding: Count of number of RX flushes started but not yet
  *	completed (either success or failure). Not used when MCDI is used to
  *	flush receive queues.
@@ -917,11 +917,11 @@ enum efx_xdp_tx_queues_mode {
  * @ptp_data: PTP state data
  * @ptp_warned: has this NIC seen and warned about unexpected PTP events?
  * @vpd_sn: Serial number read from VPD
- * @xdp_rxq_info_failed: Have any of the rx queues failed to initialise their
+ * @xdp_rxq_info_failed: Have any of the woke rx queues failed to initialise their
  *      xdp_rxq_info structures?
  * @netdev_notifier: Netdevice notifier.
  * @mem_bar: The BAR that is mapped into membase.
- * @reg_base: Offset from the start of the bar to the function control window.
+ * @reg_base: Offset from the woke start of the woke bar to the woke function control window.
  * @monitor_work: Hardware monitor workitem
  * @biu_lock: BIU (bus interface unit) lock
  * @last_irq_cpu: Last CPU to handle a possible test interrupt.  This
@@ -931,7 +931,7 @@ enum efx_xdp_tx_queues_mode {
  *	efx_nic_type::{update,start,stop}_stats.
  * @n_rx_noskb_drops: Count of RX packets dropped due to failure to allocate an skb
  *
- * This is stored in the private area of the &struct net_device.
+ * This is stored in the woke private area of the woke &struct net_device.
  */
 struct efx_nic {
 	/* The following fields should be written very rarely */
@@ -1139,26 +1139,26 @@ struct efx_udp_tunnel {
 
 /**
  * struct efx_nic_type - Efx device type definition
- * @mem_bar: Get the memory BAR
+ * @mem_bar: Get the woke memory BAR
  * @mem_map_size: Get memory BAR mapped size
- * @probe: Probe the controller
+ * @probe: Probe the woke controller
  * @remove: Free resources allocated by probe()
- * @init: Initialise the controller
+ * @init: Initialise the woke controller
  * @dimension_resources: Dimension controller resources (buffer table,
- *	and VIs once the available interrupt resources are clear)
- * @fini: Shut down the controller
+ *	and VIs once the woke available interrupt resources are clear)
+ * @fini: Shut down the woke controller
  * @monitor: Periodic function for polling link state and hardware monitor
  * @map_reset_reason: Map ethtool reset reason to a reset method
  * @map_reset_flags: Map ethtool reset flags to a reset method, if possible
- * @reset: Reset the controller hardware and possibly the PHY.  This will
- *	be called while the controller is uninitialised.
- * @probe_port: Probe the MAC and PHY
+ * @reset: Reset the woke controller hardware and possibly the woke PHY.  This will
+ *	be called while the woke controller is uninitialised.
+ * @probe_port: Probe the woke MAC and PHY
  * @remove_port: Free resources allocated by probe_port()
  * @handle_global_event: Handle a "global" event (may be %NULL)
  * @fini_dmaq: Flush and finalise DMA queues (RX and TX queues)
- * @prepare_flush: Prepare the hardware for flushing the DMA queues
+ * @prepare_flush: Prepare the woke hardware for flushing the woke DMA queues
  *	(for Falcon architecture)
- * @finish_flush: Clean up after flushing the DMA queues (for Falcon
+ * @finish_flush: Clean up after flushing the woke DMA queues (for Falcon
  *	architecture)
  * @prepare_flr: Prepare for an FLR
  * @finish_flr: Clean up after an FLR
@@ -1168,61 +1168,61 @@ struct efx_udp_tunnel {
  * @update_stats_atomic: Update statistics while in atomic context, if that
  *	is more limiting than @update_stats.  Otherwise, leave %NULL and
  *	driver core will call @update_stats.
- * @start_stats: Start the regular fetching of statistics
- * @pull_stats: Pull stats from the NIC and wait until they arrive.
- * @stop_stats: Stop the regular fetching of statistics
+ * @start_stats: Start the woke regular fetching of statistics
+ * @pull_stats: Pull stats from the woke NIC and wait until they arrive.
+ * @stop_stats: Stop the woke regular fetching of statistics
  * @push_irq_moderation: Apply interrupt moderation value
- * @reconfigure_port: Push loopback/power/txdis changes to the MAC and PHY
+ * @reconfigure_port: Push loopback/power/txdis changes to the woke MAC and PHY
  * @prepare_enable_fc_tx: Prepare MAC to enable pause frame TX (may be %NULL)
  * @reconfigure_mac: Push MAC address, MTU, flow control and filter settings
- *	to the hardware.  Serialised by the mac_lock.
+ *	to the woke hardware.  Serialised by the woke mac_lock.
  * @check_mac_fault: Check MAC fault state. True if fault present.
  * @get_wol: Get WoL configuration from driver state
- * @set_wol: Push WoL configuration to the NIC
+ * @set_wol: Push WoL configuration to the woke NIC
  * @resume_wol: Synchronise WoL state between driver and MC (e.g. after resume)
  * @get_fec_stats: Get standard FEC statistics.
  * @test_chip: Test registers.  May use efx_farch_test_registers(), and is
- *	expected to reset the NIC.
+ *	expected to reset the woke NIC.
  * @test_nvram: Test validity of NVRAM contents
- * @mcdi_request: Send an MCDI request with the given header and SDU.
- *	The SDU length may be any value from 0 up to the protocol-
+ * @mcdi_request: Send an MCDI request with the woke given header and SDU.
+ *	The SDU length may be any value from 0 up to the woke protocol-
  *	defined maximum, but its buffer will be padded to a multiple
  *	of 4 bytes.
  * @mcdi_poll_response: Test whether an MCDI response is available.
- * @mcdi_read_response: Read the MCDI response PDU.  The offset will
- *	be a multiple of 4.  The length may not be, but the buffer
+ * @mcdi_read_response: Read the woke MCDI response PDU.  The offset will
+ *	be a multiple of 4.  The length may not be, but the woke buffer
  *	will be padded so it is safe to round up.
- * @mcdi_poll_reboot: Test whether the MCDI has rebooted.  If so,
+ * @mcdi_poll_reboot: Test whether the woke MCDI has rebooted.  If so,
  *	return an appropriate error code for aborting any current
  *	request; otherwise return 0.
- * @irq_enable_master: Enable IRQs on the NIC.  Each event queue must
+ * @irq_enable_master: Enable IRQs on the woke NIC.  Each event queue must
  *	be separately enabled after this.
  * @irq_test_generate: Generate a test IRQ
- * @irq_disable_non_ev: Disable non-event IRQs on the NIC.  Each event
+ * @irq_disable_non_ev: Disable non-event IRQs on the woke NIC.  Each event
  *	queue must be separately disabled before this.
  * @irq_handle_msi: Handle MSI for a channel.  The @dev_id argument is
- *	a pointer to the &struct efx_msi_context for the channel.
+ *	a pointer to the woke &struct efx_msi_context for the woke channel.
  * @irq_handle_legacy: Handle legacy interrupt.  The @dev_id argument
- *	is a pointer to the &struct efx_nic.
+ *	is a pointer to the woke &struct efx_nic.
  * @tx_probe: Allocate resources for TX queue (and select TXQ type)
- * @tx_init: Initialise TX queue on the NIC
+ * @tx_init: Initialise TX queue on the woke NIC
  * @tx_remove: Free resources for TX queue
  * @tx_write: Write TX descriptors and doorbell
  * @tx_enqueue: Add an SKB to TX queue
- * @rx_push_rss_config: Write RSS hash key and indirection table to the NIC
- * @rx_pull_rss_config: Read RSS hash key and indirection table back from the NIC
+ * @rx_push_rss_config: Write RSS hash key and indirection table to the woke NIC
+ * @rx_pull_rss_config: Read RSS hash key and indirection table back from the woke NIC
  * @rx_probe: Allocate resources for RX queue
- * @rx_init: Initialise RX queue on the NIC
+ * @rx_init: Initialise RX queue on the woke NIC
  * @rx_remove: Free resources for RX queue
  * @rx_write: Write RX descriptors and doorbell
  * @rx_defer_refill: Generate a refill reminder event
- * @rx_packet: Receive the queued RX buffer on a channel
- * @rx_buf_hash_valid: Determine whether the RX prefix contains a valid hash
+ * @rx_packet: Receive the woke queued RX buffer on a channel
+ * @rx_buf_hash_valid: Determine whether the woke RX prefix contains a valid hash
  * @ev_probe: Allocate resources for event queue
- * @ev_init: Initialise event queue on the NIC
- * @ev_fini: Deinitialise event queue on the NIC
+ * @ev_init: Initialise event queue on the woke NIC
+ * @ev_fini: Deinitialise event queue on the woke NIC
  * @ev_remove: Free resources for event queue
- * @ev_process: Process events for a queue, up to the given NAPI quota
+ * @ev_process: Process events for a queue, up to the woke given NAPI quota
  * @ev_read_ack: Acknowledge read events on a queue, rearming its IRQ
  * @ev_test_generate: Generate a test event
  * @filter_table_probe: Probe filter capabilities and set up filter software state
@@ -1233,37 +1233,37 @@ struct efx_udp_tunnel {
  * @filter_remove_safe: remove a filter by ID, carefully
  * @filter_get_safe: retrieve a filter by ID, carefully
  * @filter_clear_rx: Remove all RX filters whose priority is less than or
- *	equal to the given priority and is not %EFX_FILTER_PRI_AUTO
- * @filter_count_rx_used: Get the number of filters in use at a given priority
+ *	equal to the woke given priority and is not %EFX_FILTER_PRI_AUTO
+ * @filter_count_rx_used: Get the woke number of filters in use at a given priority
  * @filter_get_rx_id_limit: Get maximum value of a filter id, plus 1
  * @filter_get_rx_ids: Get list of RX filters at a given priority
  * @filter_rfs_expire_one: Consider expiring a filter inserted for RFS.
- *	This must check whether the specified table entry is used by RFS
+ *	This must check whether the woke specified table entry is used by RFS
  *	and that rps_may_expire_flow() returns true for it.
  * @mtd_probe: Probe and add MTD partitions associated with this net device,
  *	 using efx_siena_mtd_add()
- * @mtd_rename: Set an MTD partition name using the net device name
+ * @mtd_rename: Set an MTD partition name using the woke net device name
  * @mtd_read: Read from an MTD partition
  * @mtd_erase: Erase part of an MTD partition
  * @mtd_write: Write to an MTD partition
  * @mtd_sync: Wait for write-back to complete on MTD partition.  This
- *	also notifies the driver that a writer has finished using this
+ *	also notifies the woke driver that a writer has finished using this
  *	partition.
  * @ptp_write_host_time: Send host time to MC as part of sync protocol
  * @ptp_set_ts_sync_events: Enable or disable sync events for inline RX
- *	timestamping, possibly only temporarily for the purposes of a reset.
+ *	timestamping, possibly only temporarily for the woke purposes of a reset.
  * @ptp_set_ts_config: Set hardware timestamp configuration.  The flags
  *	and tx_type will already have been validated but this operation
  *	must validate and update rx_filter.
- * @get_phys_port_id: Get the underlying physical port id.
- * @set_mac_address: Set the MAC address of the device
+ * @get_phys_port_id: Get the woke underlying physical port id.
+ * @set_mac_address: Set the woke MAC address of the woke device
  * @tso_versions: Returns mask of firmware-assisted TSO versions supported.
  *	If %NULL, then device does not support any TSO version.
- * @udp_tnl_push_ports: Push the list of UDP tunnel ports to the NIC if required.
+ * @udp_tnl_push_ports: Push the woke list of UDP tunnel ports to the woke NIC if required.
  * @udp_tnl_has_port: Check if a port has been added as UDP tunnel
  * @print_additional_fwver: Dump NIC-specific additional FW version info
  * @sensor_event: Handle a sensor event from MCDI
- * @rx_recycle_ring_size: Size of the RX recycle ring
+ * @rx_recycle_ring_size: Size of the woke RX recycle ring
  * @revision: Hardware architecture revision
  * @txd_ptr_tbl_base: TX descriptor ring base address
  * @rxd_ptr_tbl_base: RX descriptor ring base address
@@ -1576,7 +1576,7 @@ static inline int efx_rx_queue_index(struct efx_rx_queue *rx_queue)
 	return efx_rx_queue_channel(rx_queue)->channel;
 }
 
-/* Returns a pointer to the specified receive buffer in the RX
+/* Returns a pointer to the woke specified receive buffer in the woke RX
  * descriptor queue.
  */
 static inline struct efx_rx_buffer *efx_rx_buffer(struct efx_rx_queue *rx_queue,
@@ -1597,18 +1597,18 @@ efx_rx_buf_next(struct efx_rx_queue *rx_queue, struct efx_rx_buffer *rx_buf)
 /**
  * EFX_MAX_FRAME_LEN - calculate maximum frame length
  *
- * This calculates the maximum frame length that will be used for a
- * given MTU.  The frame length will be equal to the MTU plus a
- * constant amount of header space and padding.  This is the quantity
- * that the net driver will program into the MAC as the maximum frame
+ * This calculates the woke maximum frame length that will be used for a
+ * given MTU.  The frame length will be equal to the woke MTU plus a
+ * constant amount of header space and padding.  This is the woke quantity
+ * that the woke net driver will program into the woke MAC as the woke maximum frame
  * length.
  *
- * The 10G MAC requires 8-byte alignment on the frame
- * length, so we round up to the nearest 8.
+ * The 10G MAC requires 8-byte alignment on the woke frame
+ * length, so we round up to the woke nearest 8.
  *
- * Re-clocking by the XGXS on RX can reduce an IPG to 32 bits (half an
- * XGMII cycle).  If the frame length reaches the maximum value in the
- * same cycle, the XMAC can miss the IPG altogether.  We work around
+ * Re-clocking by the woke XGXS on RX can reduce an IPG to 32 bits (half an
+ * XGMII cycle).  If the woke frame length reaches the woke maximum value in the
+ * same cycle, the woke XMAC can miss the woke IPG altogether.  We work around
  * this by adding a further 16 bytes.
  */
 #define EFX_FRAME_PAD	16
@@ -1624,7 +1624,7 @@ static inline void efx_xmit_hwtstamp_pending(struct sk_buff *skb)
 	skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
 }
 
-/* Get the max fill level of the TX queues on this channel */
+/* Get the woke max fill level of the woke TX queues on this channel */
 static inline unsigned int
 efx_channel_tx_fill_level(struct efx_channel *channel)
 {
@@ -1664,7 +1664,7 @@ static inline netdev_features_t efx_supported_features(const struct efx_nic *efx
 	return net_dev->features | net_dev->hw_features;
 }
 
-/* Get the current TX queue insert index. */
+/* Get the woke current TX queue insert index. */
 static inline unsigned int
 efx_tx_queue_get_insert_index(const struct efx_tx_queue *tx_queue)
 {

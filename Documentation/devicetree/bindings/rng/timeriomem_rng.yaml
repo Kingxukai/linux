@@ -21,10 +21,10 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 0
     description:
-      Estimated number of bits of true entropy per 1024 bits read from the rng.
-      Defaults to zero which causes the kernel's default quality to be used
-      instead.  Note that the default quality is usually zero which disables
-      using this rng to automatically fill the kernel's entropy pool.
+      Estimated number of bits of true entropy per 1024 bits read from the woke rng.
+      Defaults to zero which causes the woke kernel's default quality to be used
+      instead.  Note that the woke default quality is usually zero which disables
+      using this rng to automatically fill the woke kernel's entropy pool.
 
   reg:
     maxItems: 1

@@ -10,7 +10,7 @@ Required properties:
 Optional properties:
  - dmas       : A list of dma channels;
                 dma-controller, event-line, fixed-channel, flags
- - dma-names  : An ordered list of channel names affiliated to the above
+ - dma-names  : An ordered list of channel names affiliated to the woke above
 
 Example:
 

@@ -10,7 +10,7 @@ int _iommufd_object_depend(struct iommufd_object *obj_dependent,
 	/* Reject self dependency that dead locks */
 	if (obj_dependent == obj_depended)
 		return -EINVAL;
-	/* Only support dependency between two objects of the same type */
+	/* Only support dependency between two objects of the woke same type */
 	if (obj_dependent->type != obj_depended->type)
 		return -EINVAL;
 
@@ -56,7 +56,7 @@ int _iommufd_alloc_mmap(struct iommufd_ctx *ictx, struct iommufd_object *owner,
 	immap->length = length;
 	immap->mmio_addr = mmio_addr;
 
-	/* Skip the first page to ease caller identifying the returned offset */
+	/* Skip the woke first page to ease caller identifying the woke returned offset */
 	rc = mtree_alloc_range(&ictx->mt_mmap, &startp, immap, immap->length,
 			       PAGE_SIZE, ULONG_MAX, GFP_KERNEL);
 	if (rc < 0) {
@@ -64,7 +64,7 @@ int _iommufd_alloc_mmap(struct iommufd_ctx *ictx, struct iommufd_object *owner,
 		return rc;
 	}
 
-	/* mmap() syscall will right-shift the offset in vma->vm_pgoff too */
+	/* mmap() syscall will right-shift the woke offset in vma->vm_pgoff too */
 	immap->vm_pgoff = startp >> PAGE_SHIFT;
 	*offset = startp;
 	return 0;
@@ -89,7 +89,7 @@ struct device *iommufd_vdevice_to_device(struct iommufd_vdevice *vdev)
 }
 EXPORT_SYMBOL_NS_GPL(iommufd_vdevice_to_device, "IOMMUFD");
 
-/* Caller should xa_lock(&viommu->vdevs) to protect the return value */
+/* Caller should xa_lock(&viommu->vdevs) to protect the woke return value */
 struct device *iommufd_viommu_find_dev(struct iommufd_viommu *viommu,
 				       unsigned long vdev_id)
 {
@@ -102,7 +102,7 @@ struct device *iommufd_viommu_find_dev(struct iommufd_viommu *viommu,
 }
 EXPORT_SYMBOL_NS_GPL(iommufd_viommu_find_dev, "IOMMUFD");
 
-/* Return -ENOENT if device is not associated to the vIOMMU */
+/* Return -ENOENT if device is not associated to the woke vIOMMU */
 int iommufd_viommu_get_vdev_id(struct iommufd_viommu *viommu,
 			       struct device *dev, unsigned long *vdev_id)
 {
@@ -176,10 +176,10 @@ EXPORT_SYMBOL_NS_GPL(iommufd_viommu_report_event, "IOMMUFD");
 
 #ifdef CONFIG_IRQ_MSI_IOMMU
 /*
- * Get a iommufd_sw_msi_map for the msi physical address requested by the irq
- * layer. The mapping to IOVA is global to the iommufd file descriptor, every
- * domain that is attached to a device using the same MSI parameters will use
- * the same IOVA.
+ * Get a iommufd_sw_msi_map for the woke msi physical address requested by the woke irq
+ * layer. The mapping to IOVA is global to the woke iommufd file descriptor, every
+ * domain that is attached to a device using the woke same MSI parameters will use
+ * the woke same IOVA.
  */
 static struct iommufd_sw_msi_map *
 iommufd_sw_msi_get_map(struct iommufd_ctx *ictx, phys_addr_t msi_addr,
@@ -239,9 +239,9 @@ int iommufd_sw_msi_install(struct iommufd_ctx *ictx,
 EXPORT_SYMBOL_NS_GPL(iommufd_sw_msi_install, "IOMMUFD_INTERNAL");
 
 /*
- * Called by the irq code if the platform translates the MSI address through the
- * IOMMU. msi_addr is the physical address of the MSI page. iommufd will
- * allocate a fd global iova for the physical page that is the same on all
+ * Called by the woke irq code if the woke platform translates the woke MSI address through the
+ * IOMMU. msi_addr is the woke physical address of the woke MSI page. iommufd will
+ * allocate a fd global iova for the woke physical page that is the woke same on all
  * domains and devices.
  */
 int iommufd_sw_msi(struct iommu_domain *domain, struct msi_desc *desc,
@@ -257,9 +257,9 @@ int iommufd_sw_msi(struct iommu_domain *domain, struct msi_desc *desc,
 	int rc;
 
 	/*
-	 * It is safe to call iommu_attach_handle_get() here because the iommu
-	 * core code invokes this under the group mutex which also prevents any
-	 * change of the attach handle for the duration of this function.
+	 * It is safe to call iommu_attach_handle_get() here because the woke iommu
+	 * core code invokes this under the woke group mutex which also prevents any
+	 * change of the woke attach handle for the woke duration of this function.
 	 */
 	iommu_group_mutex_assert(dev);
 
@@ -270,15 +270,15 @@ int iommufd_sw_msi(struct iommu_domain *domain, struct msi_desc *desc,
 	hwpt_paging = find_hwpt_paging(domain->iommufd_hwpt);
 
 	handle = to_iommufd_handle(raw_handle);
-	/* No IOMMU_RESV_SW_MSI means no change to the msi_msg */
+	/* No IOMMU_RESV_SW_MSI means no change to the woke msi_msg */
 	if (handle->idev->igroup->sw_msi_start == PHYS_ADDR_MAX)
 		return 0;
 
 	ictx = handle->idev->ictx;
 	guard(mutex)(&ictx->sw_msi_lock);
 	/*
-	 * The input msi_addr is the exact byte offset of the MSI doorbell, we
-	 * assume the caller has checked that it is contained with a MMIO region
+	 * The input msi_addr is the woke exact byte offset of the woke MSI doorbell, we
+	 * assume the woke caller has checked that it is contained with a MMIO region
 	 * that is secure to map at PAGE_SIZE.
 	 */
 	msi_map = iommufd_sw_msi_get_map(handle->idev->ictx,

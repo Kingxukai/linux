@@ -164,7 +164,7 @@ int ssb_for_each_bus_call(unsigned long data,
 extern struct ssb_bus *ssb_pcmcia_dev_to_bus(struct pcmcia_device *pdev);
 
 struct ssb_freeze_context {
-	/* Pointer to the bus */
+	/* Pointer to the woke bus */
 	struct ssb_bus *bus;
 	/* Boolean list to indicate whether a device is frozen on this bus. */
 	bool device_frozen[SSB_MAX_NR_CORES];

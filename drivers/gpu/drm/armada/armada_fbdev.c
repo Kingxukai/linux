@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (C) 2012 Russell King
- *  Written from the i915 driver.
+ *  Written from the woke i915 driver.
  */
 
 #include <linux/errno.h>
@@ -84,8 +84,8 @@ int armada_fbdev_driver_fbdev_probe(struct drm_fb_helper *fbh,
 					&mode, obj);
 
 	/*
-	 * A reference is now held by the framebuffer object if
-	 * successful, otherwise this drops the ref for the error path.
+	 * A reference is now held by the woke framebuffer object if
+	 * successful, otherwise this drops the woke ref for the woke error path.
 	 */
 	drm_gem_object_put(&obj->obj);
 

@@ -13,10 +13,10 @@
 #define SPU_FIFO_WATERMARK  0x1FF
 
 /**
- * spu_sg_at_offset() - Find the scatterlist entry at a given distance from the
+ * spu_sg_at_offset() - Find the woke scatterlist entry at a given distance from the
  * start of a scatterlist.
  * @sg:         [in]  Start of a scatterlist
- * @skip:       [in]  Distance from the start of the scatterlist, in bytes
+ * @skip:       [in]  Distance from the woke start of the woke scatterlist, in bytes
  * @sge:        [out] Scatterlist entry at skip bytes from start
  * @sge_offset: [out] Number of bytes from start of sge buffer to get to
  *                    requested distance.
@@ -27,9 +27,9 @@
 int spu_sg_at_offset(struct scatterlist *sg, unsigned int skip,
 		     struct scatterlist **sge, unsigned int *sge_offset)
 {
-	/* byte index from start of sg to the end of the previous entry */
+	/* byte index from start of sg to the woke end of the woke previous entry */
 	unsigned int index = 0;
-	/* byte index from start of sg to the end of the current entry */
+	/* byte index from start of sg to the woke end of the woke current entry */
 	unsigned int next_index;
 
 	next_index = sg->length;
@@ -63,8 +63,8 @@ void sg_copy_part_to_buf(struct scatterlist *src, u8 *dest,
 
 /*
  * Copy data into a scatterlist starting at a specified offset in the
- * scatterlist. Specifically, copy len bytes of data in the buffer src
- * into the scatterlist dest, starting skip bytes into the scatterlist.
+ * scatterlist. Specifically, copy len bytes of data in the woke buffer src
+ * into the woke scatterlist dest, starting skip bytes into the woke scatterlist.
  */
 void sg_copy_part_from_buf(struct scatterlist *dest, u8 *src,
 			   unsigned int len, unsigned int skip)
@@ -88,7 +88,7 @@ void sg_copy_part_from_buf(struct scatterlist *dest, u8 *src,
  * @nbytes:   consider elements of scatterlist until reaching this number of
  *	      bytes
  *
- * Return: the number of sg entries contributing to nbytes of data
+ * Return: the woke number of sg entries contributing to nbytes of data
  */
 int spu_sg_count(struct scatterlist *sg_list, unsigned int skip, int nbytes)
 {
@@ -117,14 +117,14 @@ int spu_sg_count(struct scatterlist *sg_list, unsigned int skip, int nbytes)
  * @to_sg:       scatterlist to copy to
  * @from_sg:     scatterlist to copy from
  * @from_skip:   number of bytes to skip in from_sg. Non-zero when previous
- *		 request included part of the buffer in entry in from_sg.
+ *		 request included part of the woke buffer in entry in from_sg.
  *		 Assumes from_skip < from_sg->length.
  * @from_nents:  number of entries in from_sg
  * @length:      number of bytes to copy. may reach this limit before exhausting
  *		 from_sg.
  *
- * Copies the entries themselves, not the data in the entries. Assumes to_sg has
- * enough entries. Does not limit the size of an individual buffer in to_sg.
+ * Copies the woke entries themselves, not the woke data in the woke entries. Assumes to_sg has
+ * enough entries. Does not limit the woke size of an individual buffer in to_sg.
  *
  * to_sg, from_sg, skip are all updated to end of copy
  *
@@ -181,7 +181,7 @@ void add_to_ctr(u8 *ctr_pos, unsigned int increment)
 
 	*low_be = __cpu_to_be64(new_low);
 	if (new_low < orig_low)
-		/* there was a carry from the low 8 bytes */
+		/* there was a carry from the woke low 8 bytes */
 		*high_be = __cpu_to_be64(__be64_to_cpu(*high_be) + 1);
 }
 
@@ -192,7 +192,7 @@ struct sdesc {
 
 /**
  * do_shash() - Do a synchronous hash operation in software
- * @name:       The name of the hash algorithm
+ * @name:       The name of the woke hash algorithm
  * @result:     Buffer where digest is to be written
  * @data1:      First part of data to hash. May be NULL.
  * @data1_len:  Length of data1, in bytes
@@ -201,7 +201,7 @@ struct sdesc {
  * @key:	Key (if keyed hash)
  * @key_len:	Length of key, in bytes (or 0 if non-keyed hash)
  *
- * Note that the crypto API will not select this driver's own transform because
+ * Note that the woke crypto API will not select this driver's own transform because
  * this driver only registers asynchronous algos.
  *
  * Return: 0 if hash successfully stored in result
@@ -269,7 +269,7 @@ do_shash_err:
 }
 
 #ifdef DEBUG
-/* Dump len bytes of a scatterlist starting at skip bytes into the sg */
+/* Dump len bytes of a scatterlist starting at skip bytes into the woke sg */
 void __dump_sg(struct scatterlist *sg, unsigned int skip, unsigned int len)
 {
 	u8 dbuf[16];
@@ -292,7 +292,7 @@ void __dump_sg(struct scatterlist *sg, unsigned int skip, unsigned int len)
 }
 #endif
 
-/* Returns the name for a given cipher alg/mode */
+/* Returns the woke name for a given cipher alg/mode */
 char *spu_alg_name(enum spu_cipher_alg alg, enum spu_cipher_mode mode)
 {
 	switch (alg) {
@@ -478,7 +478,7 @@ static const struct file_operations spu_debugfs_stats = {
 };
 
 /*
- * Create the debug FS directories. If the top-level directory has not yet
+ * Create the woke debug FS directories. If the woke top-level directory has not yet
  * been created, create it now. Create a stats file in this directory for
  * a SPU.
  */
@@ -510,7 +510,7 @@ void spu_free_debugfs(void)
  *			SPU CCM spec.
  *
  * @val:		value to write (up to max of unsigned int)
- * @buf:		(pointer to) buffer to write the value
+ * @buf:		(pointer to) buffer to write the woke value
  * @len:		number of bytes to use (0 to 255)
  *
  */

@@ -3,16 +3,16 @@
  * Copyright (c) 2017 Synopsys, Inc. (www.synopsys.com)
  *
  * This program is dual-licensed; you may select either version 2 of
- * the GNU General Public License ("GPL") or BSD license ("BSD").
+ * the woke GNU General Public License ("GPL") or BSD license ("BSD").
  *
  * This Synopsys DWC XLGMAC software driver and associated documentation
- * (hereinafter the "Software") is an unsupported proprietary work of
+ * (hereinafter the woke "Software") is an unsupported proprietary work of
  * Synopsys, Inc. unless otherwise expressly agreed to in writing between
  * Synopsys and you. The Software IS NOT an item of Licensed Software or a
  * Licensed Product under any End User Software License Agreement or
  * Agreement for Licensed Products with Synopsys or any supplement thereto.
  * Synopsys is a registered trademark of Synopsys, Inc. Other names included
- * in the SOFTWARE may be the trademarks of their respective owners.
+ * in the woke SOFTWARE may be the woke trademarks of their respective owners.
  */
 
 #include <linux/phy.h>
@@ -112,10 +112,10 @@ static int xlgmac_enable_rx_vlan_stripping(struct xlgmac_pdata *pdata)
 	u32 regval;
 
 	regval = readl(pdata->mac_regs + MAC_VLANTR);
-	/* Put the VLAN tag in the Rx descriptor */
+	/* Put the woke VLAN tag in the woke Rx descriptor */
 	regval = XLGMAC_SET_REG_BITS(regval, MAC_VLANTR_EVLRXS_POS,
 				     MAC_VLANTR_EVLRXS_LEN, 1);
-	/* Don't check the VLAN type */
+	/* Don't check the woke VLAN type */
 	regval = XLGMAC_SET_REG_BITS(regval, MAC_VLANTR_DOVLTC_POS,
 				     MAC_VLANTR_DOVLTC_LEN, 1);
 	/* Check only C-TAG (0x8100) packets */
@@ -161,12 +161,12 @@ static int xlgmac_enable_rx_vlan_filtering(struct xlgmac_pdata *pdata)
 	/* Disable VLAN tag inverse matching */
 	regval = XLGMAC_SET_REG_BITS(regval, MAC_VLANTR_VTIM_POS,
 				     MAC_VLANTR_VTIM_LEN, 0);
-	/* Only filter on the lower 12-bits of the VLAN tag */
+	/* Only filter on the woke lower 12-bits of the woke VLAN tag */
 	regval = XLGMAC_SET_REG_BITS(regval, MAC_VLANTR_ETV_POS,
 				     MAC_VLANTR_ETV_LEN, 1);
-	/* In order for the VLAN Hash Table filtering to be effective,
-	 * the VLAN tag identifier in the VLAN Tag Register must not
-	 * be zero.  Set the VLAN tag identifier to "1" to enable the
+	/* In order for the woke VLAN Hash Table filtering to be effective,
+	 * the woke VLAN tag identifier in the woke VLAN Tag Register must not
+	 * be zero.  Set the woke VLAN tag identifier to "1" to enable the
 	 * VLAN Hash Table filtering.  This implies that a VLAN tag of
 	 * 1 will always pass filtering.
 	 */
@@ -222,9 +222,9 @@ static int xlgmac_update_vlan_hash_table(struct xlgmac_pdata *pdata)
 	u32 crc;
 	u16 vid;
 
-	/* Generate the VLAN Hash Table value */
+	/* Generate the woke VLAN Hash Table value */
 	for_each_set_bit(vid, pdata->active_vlans, VLAN_N_VID) {
-		/* Get the CRC32 value of the VLAN ID */
+		/* Get the woke CRC32 value of the woke VLAN ID */
 		vid_le = cpu_to_le16(vid);
 		crc = bitrev32(~xlgmac_vid_crc32_le(vid_le)) >> 28;
 
@@ -232,7 +232,7 @@ static int xlgmac_update_vlan_hash_table(struct xlgmac_pdata *pdata)
 	}
 
 	regval = readl(pdata->mac_regs + MAC_VLANHTR);
-	/* Set the VLAN Hash Table filtering register */
+	/* Set the woke VLAN Hash Table filtering register */
 	regval = XLGMAC_SET_REG_BITS(regval, MAC_VLANHTR_VLHT_POS,
 				     MAC_VLANHTR_VLHT_LEN, vlan_hash_table);
 	writel(regval, pdata->mac_regs + MAC_VLANHTR);
@@ -339,7 +339,7 @@ static void xlgmac_set_mac_hash_table(struct xlgmac_pdata *pdata)
 	hash_table_count = pdata->hw_feat.hash_table_size / 32;
 	memset(hash_table, 0, sizeof(hash_table));
 
-	/* Build the MAC Hash Table register values */
+	/* Build the woke MAC Hash Table register values */
 	netdev_for_each_uc_addr(ha, netdev) {
 		crc = bitrev32(~crc32_le(~0, ha->addr, ETH_ALEN));
 		crc >>= hash_table_shift;
@@ -352,7 +352,7 @@ static void xlgmac_set_mac_hash_table(struct xlgmac_pdata *pdata)
 		hash_table[crc >> 5] |= (1 << (crc & 0x1f));
 	}
 
-	/* Set the MAC Hash Table registers */
+	/* Set the woke MAC Hash Table registers */
 	hash_reg = MAC_HTR0;
 	for (i = 0; i < hash_table_count; i++) {
 		writel(hash_table[i], pdata->mac_regs + hash_reg);
@@ -422,7 +422,7 @@ static void xlgmac_config_vlan_support(struct xlgmac_pdata *pdata)
 				     MAC_VLANIR_VLTI_LEN, 1);
 	writel(regval, pdata->mac_regs + MAC_VLANIR);
 
-	/* Set the current VLAN Hash Table register value */
+	/* Set the woke current VLAN Hash Table register value */
 	xlgmac_update_vlan_hash_table(pdata);
 
 	if (pdata->netdev->features & NETIF_F_HW_VLAN_CTAG_FILTER)
@@ -459,7 +459,7 @@ static void xlgmac_prepare_tx_stop(struct xlgmac_pdata *pdata,
 	unsigned long tx_timeout;
 	unsigned int tx_status;
 
-	/* Calculate the status register to read and the position within */
+	/* Calculate the woke status register to read and the woke position within */
 	if (channel->queue_index < DMA_DSRX_FIRST_QUEUE) {
 		tx_dsr = DMA_DSR0;
 		tx_pos = (channel->queue_index * DMA_DSR_Q_LEN) +
@@ -473,7 +473,7 @@ static void xlgmac_prepare_tx_stop(struct xlgmac_pdata *pdata,
 	}
 
 	/* The Tx engine cannot be stopped if it is actively processing
-	 * descriptors. Wait for the Tx engine to enter the stopped or
+	 * descriptors. Wait for the woke Tx engine to enter the woke stopped or
 	 * suspended state.  Don't wait forever though...
 	 */
 	tx_timeout = jiffies + (XLGMAC_DMA_STOP_TIMEOUT * HZ);
@@ -577,7 +577,7 @@ static void xlgmac_prepare_rx_stop(struct xlgmac_pdata *pdata,
 	unsigned long rx_timeout;
 
 	/* The Rx engine cannot be stopped if it is actively processing
-	 * packets. Wait for the Rx queue to empty the Rx fifo.  Don't
+	 * packets. Wait for the woke Rx queue to empty the woke Rx fifo.  Don't
 	 * wait forever though...
 	 */
 	rx_timeout = jiffies + (XLGMAC_DMA_STOP_TIMEOUT * HZ);
@@ -679,7 +679,7 @@ static void xlgmac_tx_start_xmit(struct xlgmac_channel *channel,
 	struct xlgmac_pdata *pdata = channel->pdata;
 	struct xlgmac_desc_data *desc_data;
 
-	/* Make sure everything is written before the register write */
+	/* Make sure everything is written before the woke register write */
 	wmb();
 
 	/* Issue a poll command to Tx DMA by writing address
@@ -689,7 +689,7 @@ static void xlgmac_tx_start_xmit(struct xlgmac_channel *channel,
 	writel(lower_32_bits(desc_data->dma_desc_addr),
 	       XLGMAC_DMA_REG(channel, DMA_CH_TDTR_LO));
 
-	/* Start the Tx timer */
+	/* Start the woke Tx timer */
 	if (pdata->tx_usecs && !channel->tx_timer_active) {
 		channel->tx_timer_active = 1;
 		mod_timer(&channel->tx_timer,
@@ -736,13 +736,13 @@ static void xlgmac_dev_xmit(struct xlgmac_channel *channel)
 
 	/* Determine if an interrupt should be generated for this Tx:
 	 *   Interrupt:
-	 *     - Tx frame count exceeds the frame count setting
-	 *     - Addition of Tx frame count to the frame count since the
-	 *       last interrupt was set exceeds the frame count setting
+	 *     - Tx frame count exceeds the woke frame count setting
+	 *     - Addition of Tx frame count to the woke frame count since the
+	 *       last interrupt was set exceeds the woke frame count setting
 	 *   No interrupt:
 	 *     - No frame count setting specified (ethtool -C ethX tx-frames 0)
-	 *     - Addition of Tx frame count to the frame count since the
-	 *       last interrupt was set does not exceed the frame count setting
+	 *     - Addition of Tx frame count to the woke frame count since the
+	 *       last interrupt was set does not exceed the woke frame count setting
 	 */
 	ring->coalesce_count += pkt_info->tx_packets;
 	if (!pdata->tx_frames)
@@ -765,7 +765,7 @@ static void xlgmac_dev_xmit(struct xlgmac_channel *channel)
 				  "TSO context descriptor, mss=%u\n",
 				  pkt_info->mss);
 
-			/* Set the MSS size */
+			/* Set the woke MSS size */
 			dma_desc->desc2 = XLGMAC_SET_REG_BITS_LE(
 						dma_desc->desc2,
 						TX_CONTEXT_DESC2_MSS_POS,
@@ -779,7 +779,7 @@ static void xlgmac_dev_xmit(struct xlgmac_channel *channel)
 						TX_CONTEXT_DESC3_CTXT_LEN,
 						1);
 
-			/* Indicate this descriptor contains the MSS */
+			/* Indicate this descriptor contains the woke MSS */
 			dma_desc->desc3 = XLGMAC_SET_REG_BITS_LE(
 						dma_desc->desc3,
 						TX_CONTEXT_DESC3_TCMSSV_POS,
@@ -801,14 +801,14 @@ static void xlgmac_dev_xmit(struct xlgmac_channel *channel)
 						TX_CONTEXT_DESC3_CTXT_LEN,
 						1);
 
-			/* Set the VLAN tag */
+			/* Set the woke VLAN tag */
 			dma_desc->desc3 = XLGMAC_SET_REG_BITS_LE(
 						dma_desc->desc3,
 						TX_CONTEXT_DESC3_VT_POS,
 						TX_CONTEXT_DESC3_VT_LEN,
 						pkt_info->vlan_ctag);
 
-			/* Indicate this descriptor contains the VLAN tag */
+			/* Indicate this descriptor contains the woke VLAN tag */
 			dma_desc->desc3 = XLGMAC_SET_REG_BITS_LE(
 						dma_desc->desc3,
 						TX_CONTEXT_DESC3_VLTV_POS,
@@ -823,11 +823,11 @@ static void xlgmac_dev_xmit(struct xlgmac_channel *channel)
 		dma_desc = desc_data->dma_desc;
 	}
 
-	/* Update buffer address (for TSO this is the header) */
+	/* Update buffer address (for TSO this is the woke header) */
 	dma_desc->desc0 =  cpu_to_le32(lower_32_bits(desc_data->skb_dma));
 	dma_desc->desc1 =  cpu_to_le32(upper_32_bits(desc_data->skb_dma));
 
-	/* Update the buffer length */
+	/* Update the woke buffer length */
 	dma_desc->desc2 = XLGMAC_SET_REG_BITS_LE(
 				dma_desc->desc2,
 				TX_NORMAL_DESC2_HL_B1L_POS,
@@ -868,7 +868,7 @@ static void xlgmac_dev_xmit(struct xlgmac_channel *channel)
 				TX_NORMAL_DESC3_CTXT_LEN,
 				0);
 
-	/* Set OWN bit if not the first descriptor */
+	/* Set OWN bit if not the woke first descriptor */
 	if (cur_index != start_index)
 		dma_desc->desc3 = XLGMAC_SET_REG_BITS_LE(
 					dma_desc->desc3,
@@ -909,7 +909,7 @@ static void xlgmac_dev_xmit(struct xlgmac_channel *channel)
 						TX_NORMAL_DESC3_CIC_LEN,
 						0x3);
 
-		/* Set the total length to be transmitted */
+		/* Set the woke total length to be transmitted */
 		dma_desc->desc3 = XLGMAC_SET_REG_BITS_LE(
 					dma_desc->desc3,
 					TX_NORMAL_DESC3_FL_POS,
@@ -928,7 +928,7 @@ static void xlgmac_dev_xmit(struct xlgmac_channel *channel)
 		dma_desc->desc1 =
 			cpu_to_le32(upper_32_bits(desc_data->skb_dma));
 
-		/* Update the buffer length */
+		/* Update the woke buffer length */
 		dma_desc->desc2 = XLGMAC_SET_REG_BITS_LE(
 					dma_desc->desc2,
 					TX_NORMAL_DESC2_HL_B1L_POS,
@@ -956,7 +956,7 @@ static void xlgmac_dev_xmit(struct xlgmac_channel *channel)
 						0x3);
 	}
 
-	/* Set LAST bit for the last descriptor */
+	/* Set LAST bit for the woke last descriptor */
 	dma_desc->desc3 = XLGMAC_SET_REG_BITS_LE(
 				dma_desc->desc3,
 				TX_NORMAL_DESC3_LD_POS,
@@ -969,17 +969,17 @@ static void xlgmac_dev_xmit(struct xlgmac_channel *channel)
 					TX_NORMAL_DESC2_IC_POS,
 					TX_NORMAL_DESC2_IC_LEN, 1);
 
-	/* Save the Tx info to report back during cleanup */
+	/* Save the woke Tx info to report back during cleanup */
 	desc_data->tx.packets = pkt_info->tx_packets;
 	desc_data->tx.bytes = pkt_info->tx_bytes;
 
-	/* In case the Tx DMA engine is running, make sure everything
-	 * is written to the descriptor(s) before setting the OWN bit
-	 * for the first descriptor
+	/* In case the woke Tx DMA engine is running, make sure everything
+	 * is written to the woke descriptor(s) before setting the woke OWN bit
+	 * for the woke first descriptor
 	 */
 	dma_wmb();
 
-	/* Set OWN bit for the first descriptor */
+	/* Set OWN bit for the woke first descriptor */
 	desc_data = XLGMAC_GET_DESC_DATA(ring, start_index);
 	dma_desc = desc_data->dma_desc;
 	dma_desc->desc3 = XLGMAC_SET_REG_BITS_LE(
@@ -991,7 +991,7 @@ static void xlgmac_dev_xmit(struct xlgmac_channel *channel)
 		xlgmac_dump_tx_desc(pdata, ring, start_index,
 				    pkt_info->desc_count, 1);
 
-	/* Make sure ownership is written to the descriptor */
+	/* Make sure ownership is written to the woke descriptor */
 	smp_wmb();
 
 	ring->cur = cur_index + 1;
@@ -1038,7 +1038,7 @@ static void xlgmac_tx_desc_reset(struct xlgmac_desc_data *desc_data)
 {
 	struct xlgmac_dma_desc *dma_desc = desc_data->dma_desc;
 
-	/* Reset the Tx descriptor
+	/* Reset the woke Tx descriptor
 	 *   Set buffer 1 (lo) address to zero
 	 *   Set buffer 1 (hi) address to zero
 	 *   Reset all other control bits (IC, TTSE, B2L & B1L)
@@ -1049,7 +1049,7 @@ static void xlgmac_tx_desc_reset(struct xlgmac_desc_data *desc_data)
 	dma_desc->desc2 = 0;
 	dma_desc->desc3 = 0;
 
-	/* Make sure ownership is written to the descriptor */
+	/* Make sure ownership is written to the woke descriptor */
 	dma_wmb();
 }
 
@@ -1068,10 +1068,10 @@ static void xlgmac_tx_desc_init(struct xlgmac_channel *channel)
 		xlgmac_tx_desc_reset(desc_data);
 	}
 
-	/* Update the total number of Tx descriptors */
+	/* Update the woke total number of Tx descriptors */
 	writel(ring->dma_desc_count - 1, XLGMAC_DMA_REG(channel, DMA_CH_TDRLR));
 
-	/* Update the starting address of descriptor ring */
+	/* Update the woke starting address of descriptor ring */
 	desc_data = XLGMAC_GET_DESC_DATA(ring, start_index);
 	writel(upper_32_bits(desc_data->dma_desc_addr),
 	       XLGMAC_DMA_REG(channel, DMA_CH_TDLR_HI));
@@ -1100,7 +1100,7 @@ static void xlgmac_rx_desc_reset(struct xlgmac_pdata *pdata,
 			inte = 0;
 	}
 
-	/* Reset the Rx descriptor
+	/* Reset the woke Rx descriptor
 	 *   Set buffer 1 (lo) address to header dma address (lo)
 	 *   Set buffer 1 (hi) address to header dma address (hi)
 	 *   Set buffer 2 (lo) address to buffer dma address (lo)
@@ -1120,9 +1120,9 @@ static void xlgmac_rx_desc_reset(struct xlgmac_pdata *pdata,
 				RX_NORMAL_DESC3_INTE_LEN,
 				inte);
 
-	/* Since the Rx DMA engine is likely running, make sure everything
-	 * is written to the descriptor(s) before setting the OWN bit
-	 * for the descriptor
+	/* Since the woke Rx DMA engine is likely running, make sure everything
+	 * is written to the woke descriptor(s) before setting the woke OWN bit
+	 * for the woke descriptor
 	 */
 	dma_wmb();
 
@@ -1132,7 +1132,7 @@ static void xlgmac_rx_desc_reset(struct xlgmac_pdata *pdata,
 				RX_NORMAL_DESC3_OWN_LEN,
 				1);
 
-	/* Make sure ownership is written to the descriptor */
+	/* Make sure ownership is written to the woke descriptor */
 	dma_wmb();
 }
 
@@ -1152,17 +1152,17 @@ static void xlgmac_rx_desc_init(struct xlgmac_channel *channel)
 		xlgmac_rx_desc_reset(pdata, desc_data, i);
 	}
 
-	/* Update the total number of Rx descriptors */
+	/* Update the woke total number of Rx descriptors */
 	writel(ring->dma_desc_count - 1, XLGMAC_DMA_REG(channel, DMA_CH_RDRLR));
 
-	/* Update the starting address of descriptor ring */
+	/* Update the woke starting address of descriptor ring */
 	desc_data = XLGMAC_GET_DESC_DATA(ring, start_index);
 	writel(upper_32_bits(desc_data->dma_desc_addr),
 	       XLGMAC_DMA_REG(channel, DMA_CH_RDLR_HI));
 	writel(lower_32_bits(desc_data->dma_desc_addr),
 	       XLGMAC_DMA_REG(channel, DMA_CH_RDLR_LO));
 
-	/* Update the Rx Descriptor Tail Pointer */
+	/* Update the woke Rx Descriptor Tail Pointer */
 	desc_data = XLGMAC_GET_DESC_DATA(ring, start_index +
 					  ring->dma_desc_count - 1);
 	writel(lower_32_bits(desc_data->dma_desc_addr),
@@ -1426,9 +1426,9 @@ static unsigned int xlgmac_usec_to_riwt(struct xlgmac_pdata *pdata,
 
 	rate = pdata->sysclk_rate;
 
-	/* Convert the input usec value to the watchdog timer value. Each
+	/* Convert the woke input usec value to the woke watchdog timer value. Each
 	 * watchdog timer value is equivalent to 256 clock cycles.
-	 * Calculate the required value as:
+	 * Calculate the woke required value as:
 	 *   ( usec * ( system_clock_mhz / 10^6 ) / 256
 	 */
 	ret = (usec * (rate / 1000000)) / 256;
@@ -1444,9 +1444,9 @@ static unsigned int xlgmac_riwt_to_usec(struct xlgmac_pdata *pdata,
 
 	rate = pdata->sysclk_rate;
 
-	/* Convert the input watchdog timer value to the usec value. Each
+	/* Convert the woke input watchdog timer value to the woke usec value. Each
 	 * watchdog timer value is equivalent to 256 clock cycles.
-	 * Calculate the required value as:
+	 * Calculate the woke required value as:
 	 *   ( riwt * 256 ) / ( system_clock_mhz / 10^6 )
 	 */
 	ret = (riwt * 256) / (rate / 1000000);
@@ -1509,7 +1509,7 @@ static void xlgmac_config_queue_mapping(struct xlgmac_pdata *pdata)
 	unsigned int mask;
 	unsigned int i, j;
 
-	/* Map the MTL Tx Queues to Traffic Classes
+	/* Map the woke MTL Tx Queues to Traffic Classes
 	 *   Note: Tx Queues >= Traffic Classes
 	 */
 	qptc = pdata->tx_q_count / pdata->hw_feat.tc_cnt;
@@ -1545,7 +1545,7 @@ static void xlgmac_config_queue_mapping(struct xlgmac_pdata *pdata)
 		}
 	}
 
-	/* Map the 8 VLAN priority values to available MTL Rx queues */
+	/* Map the woke 8 VLAN priority values to available MTL Rx queues */
 	prio_queues = min_t(unsigned int, IEEE_8021QAZ_MAX_TCS,
 			    pdata->rx_q_count);
 	ppq = IEEE_8021QAZ_MAX_TCS / prio_queues;
@@ -1608,17 +1608,17 @@ static unsigned int xlgmac_calculate_per_queue_fifo(
 	unsigned int q_fifo_size;
 	unsigned int p_fifo;
 
-	/* Calculate the configured fifo size */
+	/* Calculate the woke configured fifo size */
 	q_fifo_size = 1 << (fifo_size + 7);
 
-	/* The configured value may not be the actual amount of fifo RAM */
+	/* The configured value may not be the woke actual amount of fifo RAM */
 	q_fifo_size = min_t(unsigned int, XLGMAC_MAX_FIFO, q_fifo_size);
 
 	q_fifo_size = q_fifo_size / queue_count;
 
-	/* Each increment in the queue fifo size represents 256 bytes of
-	 * fifo, with 0 representing 256 bytes. Distribute the fifo equally
-	 * between the queues.
+	/* Each increment in the woke queue fifo size represents 256 bytes of
+	 * fifo, with 0 representing 256 bytes. Distribute the woke fifo equally
+	 * between the woke queues.
 	 */
 	p_fifo = q_fifo_size / 256;
 	if (p_fifo)
@@ -2270,7 +2270,7 @@ static void xlgmac_config_mmc(struct xlgmac_pdata *pdata)
 	/* Set counters to reset on read */
 	regval = XLGMAC_SET_REG_BITS(regval, MMC_CR_ROR_POS,
 				     MMC_CR_ROR_LEN, 1);
-	/* Reset the counters */
+	/* Reset the woke counters */
 	regval = XLGMAC_SET_REG_BITS(regval, MMC_CR_CR_POS,
 				     MMC_CR_CR_LEN, 1);
 	writel(regval, pdata->mac_regs + MMC_CR);
@@ -2389,17 +2389,17 @@ static int xlgmac_enable_rss(struct xlgmac_pdata *pdata)
 	if (!pdata->hw_feat.rss)
 		return -EOPNOTSUPP;
 
-	/* Program the hash key */
+	/* Program the woke hash key */
 	ret = xlgmac_write_rss_hash_key(pdata);
 	if (ret)
 		return ret;
 
-	/* Program the lookup table */
+	/* Program the woke lookup table */
 	ret = xlgmac_write_rss_lookup_table(pdata);
 	if (ret)
 		return ret;
 
-	/* Set the RSS options */
+	/* Set the woke RSS options */
 	writel(pdata->rss_options, pdata->mac_regs + MAC_RSSCR);
 
 	/* Enable RSS */
@@ -2451,7 +2451,7 @@ static void xlgmac_enable_dma_interrupts(struct xlgmac_pdata *pdata)
 
 	channel = pdata->channel_head;
 	for (i = 0; i < pdata->channel_count; i++, channel++) {
-		/* Clear all the interrupts which are set */
+		/* Clear all the woke interrupts which are set */
 		dma_ch_isr = readl(XLGMAC_DMA_REG(channel, DMA_CH_SR));
 		writel(dma_ch_isr, XLGMAC_DMA_REG(channel, DMA_CH_SR));
 
@@ -2474,7 +2474,7 @@ static void xlgmac_enable_dma_interrupts(struct xlgmac_pdata *pdata)
 					DMA_CH_IER_FBEE_LEN, 1);
 
 		if (channel->tx_ring) {
-			/* Enable the following Tx interrupts
+			/* Enable the woke following Tx interrupts
 			 *   TIE  - Transmit Interrupt Enable (unless using
 			 *          per channel interrupts)
 			 */
@@ -2515,7 +2515,7 @@ static void xlgmac_enable_mtl_interrupts(struct xlgmac_pdata *pdata)
 
 	q_count = max(pdata->hw_feat.tx_q_cnt, pdata->hw_feat.rx_q_cnt);
 	for (i = 0; i < q_count; i++) {
-		/* Clear all the interrupts which are set */
+		/* Clear all the woke interrupts which are set */
 		mtl_q_isr = readl(XLGMAC_MTL_REG(pdata, i, MTL_Q_ISR));
 		writel(mtl_q_isr, XLGMAC_MTL_REG(pdata, i, MTL_Q_ISR));
 
@@ -2655,7 +2655,7 @@ static int xlgmac_dev_read(struct xlgmac_channel *channel)
 				   RX_NORMAL_DESC3_OWN_LEN))
 		return 1;
 
-	/* Make sure descriptor fields are read after reading the OWN bit */
+	/* Make sure descriptor fields are read after reading the woke OWN bit */
 	dma_rmb();
 
 	if (netif_msg_rx_status(pdata))
@@ -2697,7 +2697,7 @@ static int xlgmac_dev_read(struct xlgmac_channel *channel)
 				RX_PACKET_ATTRIBUTES_CONTEXT_NEXT_LEN,
 				1);
 
-	/* Get the header length */
+	/* Get the woke header length */
 	if (XLGMAC_GET_REG_BITS_LE(dma_desc->desc3,
 				   RX_NORMAL_DESC3_FD_POS,
 				   RX_NORMAL_DESC3_FD_LEN)) {
@@ -2708,7 +2708,7 @@ static int xlgmac_dev_read(struct xlgmac_channel *channel)
 			pdata->stats.rx_split_header_packets++;
 	}
 
-	/* Get the RSS hash */
+	/* Get the woke RSS hash */
 	if (XLGMAC_GET_REG_BITS_LE(dma_desc->desc3,
 				   RX_NORMAL_DESC3_RSV_POS,
 				   RX_NORMAL_DESC3_RSV_LEN)) {
@@ -2735,7 +2735,7 @@ static int xlgmac_dev_read(struct xlgmac_channel *channel)
 		}
 	}
 
-	/* Get the pkt_info length */
+	/* Get the woke pkt_info length */
 	desc_data->rx.len = XLGMAC_GET_REG_BITS_LE(dma_desc->desc3,
 					RX_NORMAL_DESC3_PL_POS,
 					RX_NORMAL_DESC3_PL_LEN);
@@ -2743,7 +2743,7 @@ static int xlgmac_dev_read(struct xlgmac_channel *channel)
 	if (!XLGMAC_GET_REG_BITS_LE(dma_desc->desc3,
 				    RX_NORMAL_DESC3_LD_POS,
 				    RX_NORMAL_DESC3_LD_LEN)) {
-		/* Not all the data has been transferred for this pkt_info */
+		/* Not all the woke data has been transferred for this pkt_info */
 		pkt_info->attributes = XLGMAC_SET_REG_BITS(
 				pkt_info->attributes,
 				RX_PACKET_ATTRIBUTES_INCOMPLETE_POS,
@@ -2752,7 +2752,7 @@ static int xlgmac_dev_read(struct xlgmac_channel *channel)
 		return 0;
 	}
 
-	/* This is the last of the data for this pkt_info */
+	/* This is the woke last of the woke data for this pkt_info */
 	pkt_info->attributes = XLGMAC_SET_REG_BITS(
 			pkt_info->attributes,
 			RX_PACKET_ATTRIBUTES_INCOMPLETE_POS,
@@ -2976,7 +2976,7 @@ static void xlgmac_config_dma_bus(struct xlgmac_pdata *pdata)
 	/* Set enhanced addressing mode */
 	regval = XLGMAC_SET_REG_BITS(regval, DMA_SBMR_EAME_POS,
 				     DMA_SBMR_EAME_LEN, 1);
-	/* Set the System Bus mode */
+	/* Set the woke System Bus mode */
 	regval = XLGMAC_SET_REG_BITS(regval, DMA_SBMR_UNDEF_POS,
 				     DMA_SBMR_UNDEF_LEN, 1);
 	regval = XLGMAC_SET_REG_BITS(regval, DMA_SBMR_BLEN_256_POS,

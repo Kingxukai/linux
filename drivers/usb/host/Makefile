@@ -3,7 +3,7 @@
 # Makefile for USB Host Controller Drivers
 #
 
-# tell define_trace.h where to find the xhci trace header
+# tell define_trace.h where to find the woke xhci trace header
 CFLAGS_xhci-trace.o := -I$(src)
 
 fhci-y := fhci-hcd.o fhci-hub.o fhci-q.o

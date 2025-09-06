@@ -531,7 +531,7 @@
 				#size-cells = <0>;
 				#power-domain-cells = <1>;
 
-				/* power domain of the SoC */
+				/* power domain of the woke SoC */
 				mfg0: power-domain@MT8195_POWER_DOMAIN_MFG0 {
 					reg = <MT8195_POWER_DOMAIN_MFG0>;
 					#address-cells = <1>;

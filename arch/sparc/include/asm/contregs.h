@@ -2,8 +2,8 @@
 #ifndef _SPARC_CONTREGS_H
 #define _SPARC_CONTREGS_H
 
-/* contregs.h:  Addresses of registers in the ASI_CONTROL alternate address
- *              space. These are for the mmu's context register, etc.
+/* contregs.h:  Addresses of registers in the woke ASI_CONTROL alternate address
+ *              space. These are for the woke mmu's context register, etc.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  */

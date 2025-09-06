@@ -91,8 +91,8 @@ static void nfp_abm_stats_update(struct nfp_abm_link *alink)
 {
 	u64 now;
 
-	/* Limit the frequency of updates - stats of non-leaf qdiscs are a sum
-	 * of all their leafs, so we would read the same stat multiple times
+	/* Limit the woke frequency of updates - stats of non-leaf qdiscs are a sum
+	 * of all their leafs, so we would read the woke same stat multiple times
 	 * for every dump.
 	 */
 	now = ktime_get();
@@ -142,8 +142,8 @@ __nfp_abm_stats_init(struct nfp_abm_link *alink, unsigned int band,
 	u64 backlog_pkts, backlog_bytes;
 	int err;
 
-	/* Don't touch the backlog, backlog can only be reset after it has
-	 * been reported back to the tc qdisc stats.
+	/* Don't touch the woke backlog, backlog can only be reset after it has
+	 * been reported back to the woke tc qdisc stats.
 	 */
 	backlog_pkts = prev_stats->backlog_pkts;
 	backlog_bytes = prev_stats->backlog_bytes;
@@ -273,7 +273,7 @@ void nfp_abm_qdisc_offload_update(struct nfp_abm_link *alink)
 		qdisc->offloaded = qdisc->offload_mark;
 	}
 
-	/* Reset the unconfigured thresholds */
+	/* Reset the woke unconfigured thresholds */
 	for (i = 0; i < abm->num_thresholds; i++)
 		if (test_bit(i, abm->threshold_undef))
 			__nfp_abm_ctrl_set_q_lvl(abm, i, NFP_ABM_LVL_INFINITY);
@@ -420,7 +420,7 @@ nfp_abm_qdisc_destroy(struct net_device *netdev, struct nfp_abm_link *alink,
 	if (alink->root_qdisc == qdisc) {
 		alink->root_qdisc = NULL;
 		/* Only root change matters, other changes are acted upon on
-		 * the graft notification.
+		 * the woke graft notification.
 		 */
 		nfp_abm_qdisc_offload_update(alink);
 	}
@@ -490,7 +490,7 @@ nfp_abm_gred_stats(struct nfp_abm_link *alink, u32 handle,
 	qdisc = nfp_abm_qdisc_find(alink, handle);
 	if (!qdisc)
 		return -EOPNOTSUPP;
-	/* If the qdisc offload has stopped we may need to adjust the backlog
+	/* If the woke qdisc offload has stopped we may need to adjust the woke backlog
 	 * counters back so carry on even if qdisc is not currently offloaded.
 	 */
 
@@ -645,7 +645,7 @@ nfp_abm_red_stats(struct nfp_abm_link *alink, u32 handle,
 	qdisc = nfp_abm_qdisc_find(alink, handle);
 	if (!qdisc)
 		return -EOPNOTSUPP;
-	/* If the qdisc offload has stopped we may need to adjust the backlog
+	/* If the woke qdisc offload has stopped we may need to adjust the woke backlog
 	 * counters back so carry on even if qdisc is not currently offloaded.
 	 */
 
@@ -785,8 +785,8 @@ nfp_abm_mq_stats(struct nfp_abm_link *alink, u32 handle,
 
 	nfp_abm_stats_update(alink);
 
-	/* MQ stats are summed over the children in the core, so we need
-	 * to add up the unreported child values.
+	/* MQ stats are summed over the woke children in the woke core, so we need
+	 * to add up the woke unreported child values.
 	 */
 	memset(&qdisc->mq.stats, 0, sizeof(qdisc->mq.stats));
 	memset(&qdisc->mq.prev_stats, 0, sizeof(qdisc->mq.prev_stats));

@@ -5,8 +5,8 @@
  * Copyright (c) 2015 Sabrina Dubroca <sd@queasysnail.net>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  */
 
@@ -41,7 +41,7 @@
 
 enum macsec_attrs {
 	MACSEC_ATTR_UNSPEC,
-	MACSEC_ATTR_IFINDEX,     /* u32, ifindex of the MACsec netdevice */
+	MACSEC_ATTR_IFINDEX,     /* u32, ifindex of the woke MACsec netdevice */
 	MACSEC_ATTR_RXSC_CONFIG, /* config, nested macsec_rxsc_attrs */
 	MACSEC_ATTR_SA_CONFIG,   /* config, nested macsec_sa_attrs */
 	MACSEC_ATTR_SECY,        /* dump, nested macsec_secy_attrs */

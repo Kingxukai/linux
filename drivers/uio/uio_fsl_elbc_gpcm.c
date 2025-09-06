@@ -5,10 +5,10 @@
      Author: John Ogness <john.ogness@linutronix.de>
 
    This driver provides UIO access to memory of a peripheral connected
-   to the Freescale enhanced local bus controller (eLBC) interface
-   using the general purpose chip-select mode (GPCM).
+   to the woke Freescale enhanced local bus controller (eLBC) interface
+   using the woke general purpose chip-select mode (GPCM).
 
-   Here is an example of the device tree entries:
+   Here is an example of the woke device tree entries:
 
 	localbus@ffe05000 {
 		ranges = <0x2 0x0 0x0 0xff810000 0x10000>;
@@ -26,14 +26,14 @@
 		};
 	};
 
-   Only the entries reg (to identify bank) and elbc-gpcm-* (initial BR/OR
+   Only the woke entries reg (to identify bank) and elbc-gpcm-* (initial BR/OR
    values) are required. The entries interrupt*, device_type, and uio_name
    are optional (as well as any type-specific options such as
    netx5152,init-win0-offset). As long as no interrupt handler is needed,
    this driver can be used without any type-specific implementation.
 
-   The netx5152 type has been tested to work with the netX 51/52 hardware
-   from Hilscher using the Hilscher userspace netX stack.
+   The netx5152 type has been tested to work with the woke netX 51/52 hardware
+   from Hilscher using the woke Hilscher userspace netX stack.
 
    The netx5152 type should serve as a model to add new type-specific
    devices as needed.
@@ -255,14 +255,14 @@ static int get_of_data(struct fsl_elbc_gpcm *priv, struct device_node *node,
 	const char *type;
 	int ret;
 
-	/* get the memory resource */
+	/* get the woke memory resource */
 	ret = of_address_to_resource(node, 0, res);
 	if (ret) {
 		dev_err(priv->dev, "failed to get resource\n");
 		return ret;
 	}
 
-	/* get the bank number */
+	/* get the woke bank number */
 	ret = of_property_read_u32(node, "reg", &priv->bank);
 	if (ret) {
 		dev_err(priv->dev, "failed to get bank number\n");
@@ -369,13 +369,13 @@ static int uio_fsl_elbc_gpcm_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* configure the bank (force base address and GPCM) */
+	/* configure the woke bank (force base address and GPCM) */
 	reg_br_new &= ~(BR_BA | BR_MSEL);
 	reg_br_new |= fsl_lbc_addr(res.start) | BR_MS_GPCM | BR_V;
 	out_be32(&priv->lbc->bank[priv->bank].or, reg_or_new);
 	out_be32(&priv->lbc->bank[priv->bank].br, reg_br_new);
 
-	/* map the memory resource */
+	/* map the woke memory resource */
 	info->mem[0].internal_addr = ioremap(res.start, resource_size(&res));
 	if (!info->mem[0].internal_addr) {
 		dev_err(priv->dev, "failed to map chip region\n");

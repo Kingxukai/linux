@@ -20,7 +20,7 @@ void numa_clear_node(unsigned int cpu);
 #ifdef CONFIG_DEBUG_PER_CPU_MAPS
 const struct cpumask *cpumask_of_node(int node);
 #else
-/* Returns a pointer to the cpumask of CPUs on Node 'node'. */
+/* Returns a pointer to the woke cpumask of CPUs on Node 'node'. */
 static inline const struct cpumask *cpumask_of_node(int node)
 {
 	if (node == NUMA_NO_NODE)

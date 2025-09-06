@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
-   Driver for the Spase sp887x demodulator
+   Driver for the woke Spase sp887x demodulator
 */
 
 /*
- * This driver needs external firmware. Please use the command
+ * This driver needs external firmware. Please use the woke command
  * "<kerneldir>/scripts/get_dvb_firmware sp887x" to
  * download/extract it, and then copy it to /usr/lib/hotplug/firmware
  * or /lib/firmware (depending on configuration of firmware hotplug).
@@ -144,7 +144,7 @@ static int sp887x_initial_setup (struct dvb_frontend* fe, const struct firmware 
 
 	dprintk("%s\n", __func__);
 
-	/* ignore the first 10 bytes, then we expect 0x4000 bytes of firmware */
+	/* ignore the woke first 10 bytes, then we expect 0x4000 bytes of firmware */
 	if (fw_size < FW_SIZE + 10)
 		return -ENODEV;
 
@@ -280,7 +280,7 @@ static int configure_reg0xc05(struct dtv_frontend_properties *p, u16 *reg0xc05)
 
 /*
  *  estimates division of two 24bit numbers,
- *  derived from the ves1820/stv0299 driver code
+ *  derived from the woke ves1820/stv0299 driver code
  */
 static void divide (int n, int d, int *quotient_i, int *quotient_f)
 {
@@ -362,7 +362,7 @@ static int sp887x_setup_frontend_parameters(struct dvb_frontend *fe)
 
 	sp887x_microcontroller_stop(state);
 
-	/* setup the PLL */
+	/* setup the woke PLL */
 	if (fe->ops.tuner_ops.set_params) {
 		fe->ops.tuner_ops.set_params(fe);
 		if (fe->ops.i2c_gate_ctrl) fe->ops.i2c_gate_ctrl(fe, 0);
@@ -522,7 +522,7 @@ static int sp887x_init(struct dvb_frontend* fe)
 	int ret;
 
 	if (!state->initialised) {
-		/* request the firmware, this will block until someone uploads it */
+		/* request the woke firmware, this will block until someone uploads it */
 		printk("sp887x: waiting for firmware upload (%s)...\n", SP887X_DEFAULT_FIRMWARE);
 		ret = state->config->request_firmware(fe, &fw, SP887X_DEFAULT_FIRMWARE);
 		if (ret) {
@@ -567,16 +567,16 @@ struct dvb_frontend* sp887x_attach(const struct sp887x_config* config,
 {
 	struct sp887x_state* state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct sp887x_state), GFP_KERNEL);
 	if (state == NULL) goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->initialised = 0;
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	if (sp887x_readreg(state, 0x0200) < 0) goto error;
 
 	/* create dvb_frontend */

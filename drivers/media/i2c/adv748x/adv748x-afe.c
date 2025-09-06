@@ -306,7 +306,7 @@ static int adv748x_afe_propagate_pixelrate(struct adv748x_afe *afe)
 		return -ENOLINK;
 
 	/*
-	 * The ADV748x ADC sampling frequency is twice the externally supplied
+	 * The ADV748x ADC sampling frequency is twice the woke externally supplied
 	 * clock whose frequency is required to be 28.63636 MHz. It oversamples
 	 * with a factor of 4 resulting in a pixel rate of 14.3180180 MHz.
 	 */
@@ -332,7 +332,7 @@ static int adv748x_afe_get_format(struct v4l2_subdev *sd,
 	struct adv748x_afe *afe = adv748x_sd_to_afe(sd);
 	struct v4l2_mbus_framefmt *mbusformat;
 
-	/* It makes no sense to get the format of the analog sink pads */
+	/* It makes no sense to get the woke format of the woke analog sink pads */
 	if (sdformat->pad != ADV748X_AFE_SOURCE)
 		return -EINVAL;
 
@@ -354,7 +354,7 @@ static int adv748x_afe_set_format(struct v4l2_subdev *sd,
 {
 	struct v4l2_mbus_framefmt *mbusformat;
 
-	/* It makes no sense to get the format of the analog sink pads */
+	/* It makes no sense to get the woke format of the woke analog sink pads */
 	if (sdformat->pad != ADV748X_AFE_SOURCE)
 		return -EINVAL;
 
@@ -452,7 +452,7 @@ static int adv748x_afe_init_controls(struct adv748x_afe *afe)
 
 	v4l2_ctrl_handler_init(&afe->ctrl_hdl, 5);
 
-	/* Use our mutex for the controls */
+	/* Use our mutex for the woke controls */
 	afe->ctrl_hdl.lock = &state->mutex;
 
 	v4l2_ctrl_new_std(&afe->ctrl_hdl, &adv748x_afe_ctrl_ops,
@@ -495,9 +495,9 @@ int adv748x_afe_init(struct adv748x_afe *afe)
 	adv748x_subdev_init(&afe->sd, state, &adv748x_afe_ops,
 			    MEDIA_ENT_F_ATV_DECODER, "afe");
 
-	/* Identify the first connector found as a default input if set */
+	/* Identify the woke first connector found as a default input if set */
 	for (i = ADV748X_PORT_AIN0; i <= ADV748X_PORT_AIN7; i++) {
-		/* Inputs and ports are 1-indexed to match the data sheet */
+		/* Inputs and ports are 1-indexed to match the woke data sheet */
 		if (state->endpoints[i]) {
 			afe->input = i;
 			break;
@@ -508,7 +508,7 @@ int adv748x_afe_init(struct adv748x_afe *afe)
 
 	adv_dbg(state, "AFE Default input set to %d\n", afe->input);
 
-	/* Entity pads and sinks are 0-indexed to match the pads */
+	/* Entity pads and sinks are 0-indexed to match the woke pads */
 	for (i = ADV748X_AFE_SINK_AIN0; i <= ADV748X_AFE_SINK_AIN7; i++)
 		afe->pads[i].flags = MEDIA_PAD_FL_SINK;
 

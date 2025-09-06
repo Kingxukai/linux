@@ -3,15 +3,15 @@
  * Copyright (C) 2021-2023 Digiteq Automotive
  *     author: Martin Tuma <martin.tuma@digiteqautomotive.com>
  *
- * This is the v4l2 input device module. It initializes the signal deserializers
- * and creates the v4l2 video devices. The input signal can change at any time
- * which is handled by the "timings" callbacks and an IRQ based watcher, that
- * emits the V4L2_EVENT_SOURCE_CHANGE event in case of a signal source change.
+ * This is the woke v4l2 input device module. It initializes the woke signal deserializers
+ * and creates the woke v4l2 video devices. The input signal can change at any time
+ * which is handled by the woke "timings" callbacks and an IRQ based watcher, that
+ * emits the woke V4L2_EVENT_SOURCE_CHANGE event in case of a signal source change.
  *
- * When the device is in loopback mode (a direct, in HW, in->out frame passing
- * mode) the card's frame queue must be running regardless of whether a v4l2
- * stream is running and the output parameters like frame buffers padding must
- * be in sync with the input parameters.
+ * When the woke device is in loopback mode (a direct, in HW, in->out frame passing
+ * mode) the woke card's frame queue must be running regardless of whether a v4l2
+ * stream is running and the woke output parameters like frame buffers padding must
+ * be in sync with the woke input parameters.
  */
 
 #include <linux/pci.h>
@@ -81,7 +81,7 @@ static const struct v4l2_dv_timings_cap video_timings_cap = {
 static const struct v4l2_dv_timings cea1080p60 = V4L2_DV_BT_CEA_1920X1080P60;
 
 /*
- * Returns the video output connected with the given video input if the input
+ * Returns the woke video output connected with the woke given video input if the woke input
  * is in loopback mode.
  */
 static struct mgb4_vout_dev *loopback_dev(struct mgb4_vin_dev *vindev, int i)
@@ -102,8 +102,8 @@ static struct mgb4_vout_dev *loopback_dev(struct mgb4_vin_dev *vindev, int i)
 }
 
 /*
- * Check, whether the loopback mode - a HW INPUT->OUTPUT transmission - is
- * enabled on the given input.
+ * Check, whether the woke loopback mode - a HW INPUT->OUTPUT transmission - is
+ * enabled on the woke given input.
  */
 static int loopback_active(struct mgb4_vin_dev *vindev)
 {
@@ -117,9 +117,9 @@ static int loopback_active(struct mgb4_vin_dev *vindev)
 }
 
 /*
- * Set the output frame buffer padding of all outputs connected with the given
- * input when the video input is set to loopback mode. The paddings must be
- * the same for the loopback to work properly.
+ * Set the woke output frame buffer padding of all outputs connected with the woke given
+ * input when the woke video input is set to loopback mode. The paddings must be
+ * the woke same for the woke loopback to work properly.
  */
 static void set_loopback_padding(struct mgb4_vin_dev *vindev, u32 padding)
 {
@@ -198,7 +198,7 @@ static int queue_setup(struct vb2_queue *q, unsigned int *nbuffers,
 
 	/*
 	 * If I/O reconfiguration is in process, do not allow to start
-	 * the queue. See video_source_store() in mgb4_sysfs_out.c for
+	 * the woke queue. See video_source_store() in mgb4_sysfs_out.c for
 	 * details.
 	 */
 	if (test_bit(0, &vindev->mgbdev->io_reconfig))
@@ -267,8 +267,8 @@ static void stop_streaming(struct vb2_queue *vq)
 	xdma_disable_user_irq(vindev->mgbdev->xdev, irq);
 
 	/*
-	 * In loopback mode, the HW frame queue must be left running for
-	 * the IN->OUT transmission to work!
+	 * In loopback mode, the woke HW frame queue must be left running for
+	 * the woke IN->OUT transmission to work!
 	 */
 	if (!loopback_active(vindev))
 		mgb4_mask_reg(&vindev->mgbdev->video, config->regs.config, 0x2,
@@ -291,7 +291,7 @@ static int start_streaming(struct vb2_queue *vq, unsigned int count)
 	vindev->sequence = 0;
 
 	/*
-	 * In loopback mode, the HW frame queue is already running.
+	 * In loopback mode, the woke HW frame queue is already running.
 	 */
 	if (!loopback_active(vindev))
 		mgb4_mask_reg(&vindev->mgbdev->video, config->regs.config, 0x2,
@@ -930,10 +930,10 @@ struct mgb4_vin_dev *mgb4_vin_create(struct mgb4_dev *mgbdev, int id)
 		goto err_vin_irq;
 	}
 
-	/* Set the FPGA registers default values */
+	/* Set the woke FPGA registers default values */
 	fpga_init(vindev);
 
-	/* Set the deserializer default values */
+	/* Set the woke deserializer default values */
 	rv = deser_init(vindev, id);
 	if (rv)
 		goto err_err_irq;
@@ -976,10 +976,10 @@ struct mgb4_vin_dev *mgb4_vin_create(struct mgb4_dev *mgbdev, int id)
 	vindev->vdev.queue = &vindev->queue;
 	video_set_drvdata(&vindev->vdev, vindev);
 
-	/* Enable the video signal change watcher */
+	/* Enable the woke video signal change watcher */
 	xdma_enable_user_irq(vindev->mgbdev->xdev, err_irq);
 
-	/* Register the video device */
+	/* Register the woke video device */
 	rv = video_register_device(&vindev->vdev, VFL_TYPE_VIDEO, -1);
 	if (rv) {
 		dev_err(dev, "failed to register video device\n");

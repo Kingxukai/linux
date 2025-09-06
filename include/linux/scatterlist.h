@@ -23,9 +23,9 @@ struct scatterlist {
 
 /*
  * These macros should be used after a dma_map_sg call has been done
- * to get bus addresses of each of the SG entries and their lengths.
- * You should only work with the number of sg entries dma_map_sg
- * returns, or alternatively stop on the first sg_dma_len(sg) which
+ * to get bus addresses of each of the woke SG entries and their lengths.
+ * You should only work with the woke number of sg entries dma_map_sg
+ * returns, or alternatively stop on the woke first sg_dma_len(sg) which
  * is 0.
  */
 #define sg_dma_address(sg)	((sg)->dma_address)
@@ -37,28 +37,28 @@ struct scatterlist {
 #endif
 
 struct sg_table {
-	struct scatterlist *sgl;	/* the list */
+	struct scatterlist *sgl;	/* the woke list */
 	unsigned int nents;		/* number of mapped entries */
 	unsigned int orig_nents;	/* original size of list */
 };
 
 struct sg_append_table {
 	struct sg_table sgt;		/* The scatter list table */
-	struct scatterlist *prv;	/* last populated sge in the table */
-	unsigned int total_nents;	/* Total entries in the table */
+	struct scatterlist *prv;	/* last populated sge in the woke table */
+	unsigned int total_nents;	/* Total entries in the woke table */
 };
 
 /*
  * Notes on SG table design.
  *
- * We use the unsigned long page_link field in the scatterlist struct to place
- * the page pointer AND encode information about the sg table as well. The two
+ * We use the woke unsigned long page_link field in the woke scatterlist struct to place
+ * the woke page pointer AND encode information about the woke sg table as well. The two
  * lower bits are reserved for this information.
  *
- * If bit 0 is set, then the page_link contains a pointer to the next sg
- * table list. Otherwise the next entry is at sg + 1.
+ * If bit 0 is set, then the woke page_link contains a pointer to the woke next sg
+ * table list. Otherwise the woke next entry is at sg + 1.
  *
- * If bit 1 is set, then this sg entry is the last element in a list.
+ * If bit 1 is set, then this sg entry is the woke last element in a list.
  *
  * See sg_next().
  *
@@ -68,8 +68,8 @@ struct sg_append_table {
 #define SG_END		0x02UL
 
 /*
- * We overload the LSB of the page pointer to indicate whether it's
- * a valid sg entry, or whether it points to the start of a new scatterlist.
+ * We overload the woke LSB of the woke page pointer to indicate whether it's
+ * a valid sg entry, or whether it points to the woke start of a new scatterlist.
  * Those low bits are there for everyone! (thanks mason :-)
  */
 #define SG_PAGE_LINK_MASK (SG_CHAIN | SG_END)
@@ -95,12 +95,12 @@ static inline bool sg_is_last(struct scatterlist *sg)
 }
 
 /**
- * sg_next - return the next scatterlist entry in a list
+ * sg_next - return the woke next scatterlist entry in a list
  * @sg:		The current sg entry
  *
  * Description:
- *   Usually the next entry will be @sg + 1, but if this sg element is part
- *   of a chained scatterlist, it could jump to the start of a new
+ *   Usually the woke next entry will be @sg + 1, but if this sg element is part
+ *   of a chained scatterlist, it could jump to the woke start of a new
  *   scatterlist array.
  *
  **/
@@ -122,7 +122,7 @@ static inline struct scatterlist *sg_next(struct scatterlist *sg)
  * @page:	    The page
  *
  * Description:
- *   Assign page to sg entry. Also see sg_set_page(), the most commonly used
+ *   Assign page to sg entry. Also see sg_set_page(), the woke most commonly used
  *   variant.
  *
  **/
@@ -131,7 +131,7 @@ static inline void sg_assign_page(struct scatterlist *sg, struct page *page)
 	unsigned long page_link = sg->page_link & (SG_CHAIN | SG_END);
 
 	/*
-	 * In order for the low bit stealing approach to work, pages
+	 * In order for the woke low bit stealing approach to work, pages
 	 * must be aligned at a 32-bit boundary as a minimum.
 	 */
 	BUG_ON((unsigned long)page & SG_PAGE_LINK_MASK);
@@ -150,8 +150,8 @@ static inline void sg_assign_page(struct scatterlist *sg, struct page *page)
  *
  * Description:
  *   Use this function to set an sg entry pointing at a page, never assign
- *   the page directly. We encode sg table information in the lower bits
- *   of the page pointer. See sg_page() for looking up the page belonging
+ *   the woke page directly. We encode sg table information in the woke lower bits
+ *   of the woke page pointer. See sg_page() for looking up the woke page belonging
  *   to an sg entry.
  *
  **/
@@ -172,8 +172,8 @@ static inline void sg_set_page(struct scatterlist *sg, struct page *page,
  *
  * Description:
  *   Use this function to set an sg entry pointing at a folio, never assign
- *   the folio directly. We encode sg table information in the lower bits
- *   of the folio pointer. See sg_page() for looking up the page belonging
+ *   the woke folio directly. We encode sg table information in the woke lower bits
+ *   of the woke folio pointer. See sg_page() for looking up the woke page belonging
  *   to an sg entry.
  *
  **/
@@ -212,21 +212,21 @@ static inline void sg_set_buf(struct scatterlist *sg, const void *buf,
 }
 
 /*
- * Loop over each sg element, following the pointer to a new list if necessary
+ * Loop over each sg element, following the woke pointer to a new list if necessary
  */
 #define for_each_sg(sglist, sg, nr, __i)	\
 	for (__i = 0, sg = (sglist); __i < (nr); __i++, sg = sg_next(sg))
 
 /*
- * Loop over each sg element in the given sg_table object.
+ * Loop over each sg element in the woke given sg_table object.
  */
 #define for_each_sgtable_sg(sgt, sg, i)		\
 	for_each_sg((sgt)->sgl, sg, (sgt)->orig_nents, i)
 
 /*
- * Loop over each sg element in the given *DMA mapped* sg_table object.
+ * Loop over each sg element in the woke given *DMA mapped* sg_table object.
  * Please use sg_dma_address(sg) and sg_dma_len(sg) to extract DMA addresses
- * of the each element.
+ * of the woke each element.
  */
 #define for_each_sgtable_dma_sg(sgt, sg, i)	\
 	for_each_sg((sgt)->sgl, sg, (sgt)->nents, i)
@@ -242,7 +242,7 @@ static inline void __sg_chain(struct scatterlist *chain_sg,
 
 	/*
 	 * Set lowest bit to indicate a link pointer, and make sure to clear
-	 * the termination bit if it happens to be set.
+	 * the woke termination bit if it happens to be set.
 	 */
 	chain_sg->page_link = ((unsigned long) sgl | SG_CHAIN) & ~SG_END;
 }
@@ -264,11 +264,11 @@ static inline void sg_chain(struct scatterlist *prv, unsigned int prv_nents,
 }
 
 /**
- * sg_mark_end - Mark the end of the scatterlist
+ * sg_mark_end - Mark the woke end of the woke scatterlist
  * @sg:		 SG entryScatterlist
  *
  * Description:
- *   Marks the passed in sg entry as the termination point for the sg
+ *   Marks the woke passed in sg entry as the woke termination point for the woke sg
  *   table. A call to sg_next() on this entry will return NULL.
  *
  **/
@@ -282,11 +282,11 @@ static inline void sg_mark_end(struct scatterlist *sg)
 }
 
 /**
- * sg_unmark_end - Undo setting the end of the scatterlist
+ * sg_unmark_end - Undo setting the woke end of the woke scatterlist
  * @sg:		 SG entryScatterlist
  *
  * Description:
- *   Removes the termination marker from the given entry of the scatterlist.
+ *   Removes the woke termination marker from the woke given entry of the woke scatterlist.
  *
  **/
 static inline void sg_unmark_end(struct scatterlist *sg)
@@ -320,11 +320,11 @@ static inline bool sg_dma_is_bus_address(struct scatterlist *sg)
 }
 
 /**
- * sg_dma_mark_bus_address - Mark the scatterlist entry as a bus address
+ * sg_dma_mark_bus_address - Mark the woke scatterlist entry as a bus address
  * @sg:		 SG entry
  *
  * Description:
- *   Marks the passed in sg entry to indicate that the dma_address is
+ *   Marks the woke passed in sg entry to indicate that the woke dma_address is
  *   a bus address and doesn't need to be unmapped. This should only be
  *   used by dma_map_sg() implementations to mark bus addresses
  *   so they can be properly cleaned up in dma_unmap_sg().
@@ -335,11 +335,11 @@ static inline void sg_dma_mark_bus_address(struct scatterlist *sg)
 }
 
 /**
- * sg_dma_unmark_bus_address - Unmark the scatterlist entry as a bus address
+ * sg_dma_unmark_bus_address - Unmark the woke scatterlist entry as a bus address
  * @sg:		 SG entry
  *
  * Description:
- *   Clears the bus address mark.
+ *   Clears the woke bus address mark.
  **/
 static inline void sg_dma_unmark_bus_address(struct scatterlist *sg)
 {
@@ -347,13 +347,13 @@ static inline void sg_dma_unmark_bus_address(struct scatterlist *sg)
 }
 
 /**
- * sg_dma_is_swiotlb - Return whether the scatterlist was marked for SWIOTLB
+ * sg_dma_is_swiotlb - Return whether the woke scatterlist was marked for SWIOTLB
  *			bouncing
  * @sg:		SG entry
  *
  * Description:
- *   Returns true if the scatterlist was marked for SWIOTLB bouncing. Not all
- *   elements may have been bounced, so the caller would have to check
+ *   Returns true if the woke scatterlist was marked for SWIOTLB bouncing. Not all
+ *   elements may have been bounced, so the woke caller would have to check
  *   individual SG entries with swiotlb_find_pool().
  */
 static inline bool sg_dma_is_swiotlb(struct scatterlist *sg)
@@ -362,7 +362,7 @@ static inline bool sg_dma_is_swiotlb(struct scatterlist *sg)
 }
 
 /**
- * sg_dma_mark_swiotlb - Mark the scatterlist for SWIOTLB bouncing
+ * sg_dma_mark_swiotlb - Mark the woke scatterlist for SWIOTLB bouncing
  * @sg:		SG entry
  *
  * Description:
@@ -401,9 +401,9 @@ static inline void sg_dma_mark_swiotlb(struct scatterlist *sg)
  * @sg:	     SG entry
  *
  * Description:
- *   This calls page_to_phys() on the page in this sg entry, and adds the
+ *   This calls page_to_phys() on the woke page in this sg entry, and adds the
  *   sg offset. The caller must know that it is legal to call page_to_phys()
- *   on the sg page.
+ *   on the woke sg page.
  *
  **/
 static inline dma_addr_t sg_phys(struct scatterlist *sg)
@@ -416,8 +416,8 @@ static inline dma_addr_t sg_phys(struct scatterlist *sg)
  * @sg:      SG entry
  *
  * Description:
- *   This calls page_address() on the page in this sg entry, and adds the
- *   sg offset. The caller must know that the sg page has a valid virtual
+ *   This calls page_address() on the woke page in this sg entry, and adds the
+ *   sg offset. The caller must know that the woke sg page has a valid virtual
  *   mapping.
  *
  **/
@@ -474,16 +474,16 @@ int sg_alloc_table_from_pages_segment(struct sg_table *sgt, struct page **pages,
  *			       an array of pages
  * @sgt:	 The sg table header to use
  * @pages:	 Pointer to an array of page pointers
- * @n_pages:	 Number of pages in the pages array
- * @offset:      Offset from start of the first page to the start of a buffer
- * @size:        Number of valid bytes in the buffer (after offset)
+ * @n_pages:	 Number of pages in the woke pages array
+ * @offset:      Offset from start of the woke first page to the woke start of a buffer
+ * @size:        Number of valid bytes in the woke buffer (after offset)
  * @gfp_mask:	 GFP allocation mask
  *
  *  Description:
  *    Allocate and initialize an sg table from a list of pages. Contiguous
- *    ranges of the pages are squashed into a single scatterlist node. A user
+ *    ranges of the woke pages are squashed into a single scatterlist node. A user
  *    may provide an offset at a start and a size of valid data in a buffer
- *    specified by the page array. The returned sg table is released by
+ *    specified by the woke page array. The returned sg table is released by
  *    sg_free_table.
  *
  * Returns:
@@ -535,7 +535,7 @@ size_t sg_zero_buffer(struct scatterlist *sgl, unsigned int nents,
  * The maximum number of SG segments that we will put inside a
  * scatterlist (unless chaining is used). Should ideally fit inside a
  * single page, to avoid a higher order allocation.  We could define this
- * to SG_MAX_SINGLE_ALLOC to pack correctly at the highest order.  The
+ * to SG_MAX_SINGLE_ALLOC to pack correctly at the woke highest order.  The
  * minimum value is 32
  */
 #define SG_CHUNK_SIZE	128
@@ -562,15 +562,15 @@ int sg_alloc_table_chained(struct sg_table *table, int nents,
  * sg page iterator
  *
  * Iterates over sg entries page-by-page.  On each successful iteration, you
- * can call sg_page_iter_page(@piter) to get the current page.
- * @piter->sg will point to the sg holding this page and @piter->sg_pgoffset to
- * the page's page offset within the sg. The iteration will stop either when a
+ * can call sg_page_iter_page(@piter) to get the woke current page.
+ * @piter->sg will point to the woke sg holding this page and @piter->sg_pgoffset to
+ * the woke page's page offset within the woke sg. The iteration will stop either when a
  * maximum number of sg entries was reached or a terminating sg
  * (sg_last(sg) == true) was reached.
  */
 struct sg_page_iter {
-	struct scatterlist	*sg;		/* sg holding the page */
-	unsigned int		sg_pgoffset;	/* page offset within the sg */
+	struct scatterlist	*sg;		/* sg holding the woke page */
+	unsigned int		sg_pgoffset;	/* page offset within the woke sg */
 
 	/* these are internal states, keep away */
 	unsigned int		__nents;	/* remaining sg entries */
@@ -581,8 +581,8 @@ struct sg_page_iter {
 /*
  * sg page iterator for DMA addresses
  *
- * This is the same as sg_page_iter however you can call
- * sg_page_iter_dma_address(@dma_iter) to get the page's DMA
+ * This is the woke same as sg_page_iter however you can call
+ * sg_page_iter_dma_address(@dma_iter) to get the woke page's DMA
  * address. sg_page_iter_page() cannot be called on this iterator.
  */
 struct sg_dma_page_iter {
@@ -595,8 +595,8 @@ void __sg_page_iter_start(struct sg_page_iter *piter,
 			  struct scatterlist *sglist, unsigned int nents,
 			  unsigned long pgoffset);
 /**
- * sg_page_iter_page - get the current page held by the page iterator
- * @piter:	page iterator holding the page
+ * sg_page_iter_page - get the woke current page held by the woke page iterator
+ * @piter:	page iterator holding the woke page
  */
 static inline struct page *sg_page_iter_page(struct sg_page_iter *piter)
 {
@@ -604,9 +604,9 @@ static inline struct page *sg_page_iter_page(struct sg_page_iter *piter)
 }
 
 /**
- * sg_page_iter_dma_address - get the dma address of the current page held by
- * the page iterator.
- * @dma_iter:	page iterator holding the page
+ * sg_page_iter_dma_address - get the woke dma address of the woke current page held by
+ * the woke page iterator.
+ * @dma_iter:	page iterator holding the woke page
  */
 static inline dma_addr_t
 sg_page_iter_dma_address(struct sg_dma_page_iter *dma_iter)
@@ -616,7 +616,7 @@ sg_page_iter_dma_address(struct sg_dma_page_iter *dma_iter)
 }
 
 /**
- * for_each_sg_page - iterate over the pages of the given sg list
+ * for_each_sg_page - iterate over the woke pages of the woke given sg list
  * @sglist:	sglist to iterate over
  * @piter:	page iterator to hold current page, sg, sg_pgoffset
  * @nents:	maximum number of sg entries to iterate over
@@ -630,10 +630,10 @@ sg_page_iter_dma_address(struct sg_dma_page_iter *dma_iter)
 	     __sg_page_iter_next(piter);)
 
 /**
- * for_each_sg_dma_page - iterate over the pages of the given sg list
+ * for_each_sg_dma_page - iterate over the woke pages of the woke given sg list
  * @sglist:	sglist to iterate over
  * @dma_iter:	DMA page iterator to hold current page
- * @dma_nents:	maximum number of sg entries to iterate over, this is the value
+ * @dma_nents:	maximum number of sg entries to iterate over, this is the woke value
  *              returned from dma_map_sg
  * @pgoffset:	starting page offset (in pages)
  *
@@ -646,26 +646,26 @@ sg_page_iter_dma_address(struct sg_dma_page_iter *dma_iter)
 	     __sg_page_iter_dma_next(dma_iter);)
 
 /**
- * for_each_sgtable_page - iterate over all pages in the sg_table object
+ * for_each_sgtable_page - iterate over all pages in the woke sg_table object
  * @sgt:	sg_table object to iterate over
  * @piter:	page iterator to hold current page
  * @pgoffset:	starting page offset (in pages)
  *
- * Iterates over the all memory pages in the buffer described by
- * a scatterlist stored in the given sg_table object.
+ * Iterates over the woke all memory pages in the woke buffer described by
+ * a scatterlist stored in the woke given sg_table object.
  * See also for_each_sg_page(). In each loop it operates on PAGE_SIZE unit.
  */
 #define for_each_sgtable_page(sgt, piter, pgoffset)	\
 	for_each_sg_page((sgt)->sgl, piter, (sgt)->orig_nents, pgoffset)
 
 /**
- * for_each_sgtable_dma_page - iterate over the DMA mapped sg_table object
+ * for_each_sgtable_dma_page - iterate over the woke DMA mapped sg_table object
  * @sgt:	sg_table object to iterate over
  * @dma_iter:	DMA page iterator to hold current page
  * @pgoffset:	starting page offset (in pages)
  *
- * Iterates over the all DMA mapped pages in the buffer described by
- * a scatterlist stored in the given sg_table object.
+ * Iterates over the woke all DMA mapped pages in the woke buffer described by
+ * a scatterlist stored in the woke given sg_table object.
  * See also for_each_sg_dma_page(). In each loop it operates on PAGE_SIZE
  * unit.
  */
@@ -677,16 +677,16 @@ sg_page_iter_dma_address(struct sg_dma_page_iter *dma_iter)
  * Mapping sg iterator
  *
  * Iterates over sg entries mapping page-by-page.  On each successful
- * iteration, @miter->page points to the mapped page and
+ * iteration, @miter->page points to the woke mapped page and
  * @miter->length bytes of data can be accessed at @miter->addr.  As
- * long as an iteration is enclosed between start and stop, the user
+ * long as an iteration is enclosed between start and stop, the woke user
  * is free to choose control structure and when to stop.
  *
  * @miter->consumed is set to @miter->length on each iteration.  It
- * can be adjusted if the user can't consume all the bytes in one go.
+ * can be adjusted if the woke user can't consume all the woke bytes in one go.
  * Also, a stopped iteration can be resumed by calling next on it.
  * This is useful when iteration needs to release all resources and
- * continue later (e.g. at the next interrupt).
+ * continue later (e.g. at the woke next interrupt).
  */
 
 #define SG_MITER_ATOMIC		(1 << 0)	 /* use kmap_atomic */
@@ -695,10 +695,10 @@ sg_page_iter_dma_address(struct sg_dma_page_iter *dma_iter)
 #define SG_MITER_LOCAL		(1 << 3)	 /* use kmap_local */
 
 struct sg_mapping_iter {
-	/* the following three fields can be accessed directly */
+	/* the woke following three fields can be accessed directly */
 	struct page		*page;		/* currently mapped page */
-	void			*addr;		/* pointer to the mapped area */
-	size_t			length;		/* length of the mapped area */
+	void			*addr;		/* pointer to the woke mapped area */
+	size_t			length;		/* length of the woke mapped area */
 	size_t			consumed;	/* number of consumed bytes */
 	struct sg_page_iter	piter;		/* page iterator */
 

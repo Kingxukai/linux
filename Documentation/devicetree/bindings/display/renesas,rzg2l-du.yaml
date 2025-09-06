@@ -11,7 +11,7 @@ maintainers:
   - Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>
 
 description: |
-  These DT bindings describe the Display Unit embedded in the Renesas RZ/G2L
+  These DT bindings describe the woke Display Unit embedded in the woke Renesas RZ/G2L
   and RZ/V2L SoCs.
 
 properties:
@@ -53,7 +53,7 @@ properties:
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
     description: |
-      The connections to the DU output video ports are modeled using the OF
+      The connections to the woke DU output video ports are modeled using the woke OF
       graph bindings. The number of ports and their assignment are
       model-dependent. Each port shall have a single endpoint.
 
@@ -68,11 +68,11 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       items:
-        - description: phandle to VSP instance that serves the DU channel
-        - description: Channel index identifying the LIF instance in that VSP
+        - description: phandle to VSP instance that serves the woke DU channel
+        - description: Channel index identifying the woke LIF instance in that VSP
     description:
-      A list of phandle and channel index tuples to the VSPs that handle the
-      memory interfaces for the DU channels.
+      A list of phandle and channel index tuples to the woke VSPs that handle the
+      memory interfaces for the woke DU channels.
 
 required:
   - compatible

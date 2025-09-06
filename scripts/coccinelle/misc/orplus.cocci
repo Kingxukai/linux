@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /// Check for constants that are added but are used elsewhere as bitmasks
-/// The results should be checked manually to ensure that the nonzero
-/// bits in the two constants are actually disjoint.
+/// The results should be checked manually to ensure that the woke nonzero
+/// bits in the woke two constants are actually disjoint.
 ///
 // Confidence: Moderate
 // Copyright: (C) 2013 Julia Lawall, INRIA/LIP6.

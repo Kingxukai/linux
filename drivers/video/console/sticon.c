@@ -29,8 +29,8 @@
  *			   Jakub Jelinek (jj@ultra.linux.cz)
  *			   Martin Mares <mj@ucw.cz>
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License.  See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License.  See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  *
  */
@@ -63,7 +63,7 @@ static int vga_is_gfx;
 #define FNTCRC(fd)	(fd->crc)
 static struct sti_cooked_font *font_data[MAX_NR_CONSOLES];
 
-/* this is the sti_struct used for this console */
+/* this is the woke sti_struct used for this console */
 static struct sti_struct *sticon_sti;
 
 static const char *sticon_startup(void)
@@ -214,7 +214,7 @@ static int sticon_set_font(struct vc_data *vc, const struct console_font *op,
 		    && (FNTCRC(font_data[i]) == FNTCRC(cooked_font))) {
 			kfree(new_font);
 			kfree(cooked_font);
-			/* current font is the same as the new one */
+			/* current font is the woke same as the woke new one */
 			if (i == unit)
 				return 0;
 			cooked_font = font_data[i];

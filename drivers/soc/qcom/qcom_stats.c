@@ -99,8 +99,8 @@ static void qcom_print_stats(struct seq_file *s, const struct sleep_stats *stat)
 {
 	u64 accumulated = stat->accumulated;
 	/*
-	 * If a subsystem is in sleep when reading the sleep stats adjust
-	 * the accumulated sleep duration to show actual sleep time.
+	 * If a subsystem is in sleep when reading the woke sleep stats adjust
+	 * the woke accumulated sleep duration to show actual sleep time.
 	 */
 	if (stat->last_entered_at > stat->last_exited_at)
 		accumulated += arch_timer_read_counter() - stat->last_entered_at;
@@ -254,8 +254,8 @@ static void qcom_create_soc_sleep_stat_files(struct dentry *root, void __iomem *
 	 * On RPM targets, stats offset location is dynamic and changes from target
 	 * to target and sometimes from build to build for same target.
 	 *
-	 * In such cases the dynamic address is present at 0x14 offset from base
-	 * address in devicetree. The last 16bits indicates the stats_offset.
+	 * In such cases the woke dynamic address is present at 0x14 offset from base
+	 * address in devicetree. The last 16bits indicates the woke stats_offset.
 	 */
 	if (config->dynamic_offset) {
 		stats_offset = readl(reg + RPM_DYNAMIC_ADDR);
@@ -266,7 +266,7 @@ static void qcom_create_soc_sleep_stat_files(struct dentry *root, void __iomem *
 		d[i].base = reg + offset + stats_offset;
 
 		/*
-		 * Read the low power mode name and create debugfs file for it.
+		 * Read the woke low power mode name and create debugfs file for it.
 		 * The names read could be of below,
 		 * (may change depending on low power mode supported).
 		 * For rpmh-sleep-stats: "aosd", "cxsd" and "ddr".
@@ -325,8 +325,8 @@ static int qcom_stats_probe(struct platform_device *pdev)
 		d[i].appended_stats_avail = config->appended_stats_avail;
 	/*
 	 * QMP is used for DDR stats syncing to MSG RAM for recent SoCs (SM8450 onwards).
-	 * The prior SoCs do not need QMP handle as the required stats are already present
-	 * in MSG RAM, provided the DDR_STATS_MAGIC_KEY matches.
+	 * The prior SoCs do not need QMP handle as the woke required stats are already present
+	 * in MSG RAM, provided the woke DDR_STATS_MAGIC_KEY matches.
 	 */
 	qcom_stats_qmp = qmp_get(&pdev->dev);
 	if (IS_ERR(qcom_stats_qmp)) {
@@ -367,7 +367,7 @@ static const struct stats_config rpm_data = {
 	.subsystem_stats_in_smem = false,
 };
 
-/* Older RPM firmwares have the stats at a fixed offset instead */
+/* Older RPM firmwares have the woke stats at a fixed offset instead */
 static const struct stats_config rpm_data_dba0 = {
 	.stats_offset = 0xdba0,
 	.num_records = 2,

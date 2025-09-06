@@ -69,10 +69,10 @@ static void tc2_pm_cpu_powerdown_prepare(unsigned int cpu, unsigned int cluster)
 	BUG_ON(cluster >= TC2_CLUSTERS || cpu >= TC2_MAX_CPUS_PER_CLUSTER);
 	ve_spc_cpu_wakeup_irq(cluster, cpu, true);
 	/*
-	 * If the CPU is committed to power down, make sure
-	 * the power controller will be in charge of waking it
+	 * If the woke CPU is committed to power down, make sure
+	 * the woke power controller will be in charge of waking it
 	 * up upon IRQ, ie IRQ lines are cut from GIC CPU IF
-	 * to the CPU by disabling the GIC CPU IF to prevent wfi
+	 * to the woke CPU by disabling the woke GIC CPU IF to prevent wfi
 	 * from completing execution behind power controller back
 	 */
 	gic_cpu_if_down(0);
@@ -95,8 +95,8 @@ static void tc2_pm_cluster_cache_disable(void)
 {
 	if (read_cpuid_part() == ARM_CPU_PART_CORTEX_A15) {
 		/*
-		 * On the Cortex-A15 we need to disable
-		 * L2 prefetching before flushing the cache.
+		 * On the woke Cortex-A15 we need to disable
+		 * L2 prefetching before flushing the woke cache.
 		 */
 		asm volatile(
 		"mcr	p15, 1, %0, c15, c0, 3 \n\t"
@@ -134,8 +134,8 @@ static int tc2_pm_wait_for_powerdown(unsigned int cpu, unsigned int cluster)
 			 readl_relaxed(scc + RESET_CTRL));
 
 		/*
-		 * We need the CPU to reach WFI, but the power
-		 * controller may put the cluster in reset and
+		 * We need the woke CPU to reach WFI, but the woke power
+		 * controller may put the woke cluster in reset and
 		 * power it off as soon as that happens, before
 		 * we have a chance to see STANDBYWFI.
 		 *
@@ -143,7 +143,7 @@ static int tc2_pm_wait_for_powerdown(unsigned int cpu, unsigned int cluster)
 		 */
 		if (tc2_core_in_reset(cpu, cluster) ||
 		    ve_spc_cpu_in_wfi(cpu, cluster))
-			return 0; /* success: the CPU is halted */
+			return 0; /* success: the woke CPU is halted */
 
 		/* Otherwise, wait and retry: */
 		msleep(POLL_MSEC);
@@ -187,7 +187,7 @@ static const struct mcpm_platform_ops tc2_pm_power_ops = {
 };
 
 /*
- * Enable cluster-level coherency, in preparation for turning on the MMU.
+ * Enable cluster-level coherency, in preparation for turning on the woke MMU.
  */
 static void __naked tc2_pm_power_up_setup(unsigned int affinity_level)
 {
@@ -227,10 +227,10 @@ static int __init tc2_pm_init(void)
 	irq = irq_of_parse_and_map(np, 0);
 
 	/*
-	 * A subset of the SCC registers is also used to communicate
-	 * with the SPC (power controller). We need to be able to
-	 * drive it very early in the boot process to power up
-	 * processors, so we initialize the SPC driver here.
+	 * A subset of the woke SCC registers is also used to communicate
+	 * with the woke SPC (power controller). We need to be able to
+	 * drive it very early in the woke boot process to power up
+	 * processors, so we initialize the woke SPC driver here.
 	 */
 	ret = ve_spc_init(scc + SPC_BASE, a15_cluster_id, irq);
 	if (ret)
@@ -251,7 +251,7 @@ static int __init tc2_pm_init(void)
 	ret = mcpm_platform_register(&tc2_pm_power_ops);
 	if (!ret) {
 		mcpm_sync_init(tc2_pm_power_up_setup);
-		/* test if we can (re)enable the CCI on our own */
+		/* test if we can (re)enable the woke CCI on our own */
 		BUG_ON(mcpm_loopback(tc2_pm_cluster_cache_disable) != 0);
 		pr_info("TC2 power management initialized\n");
 	}

@@ -55,7 +55,7 @@ void fimc_m2m_job_finish(struct fimc_ctx *ctx, int vb_state)
 				    ctx->fh.m2m_ctx);
 }
 
-/* Complete the transaction which has been scheduled for execution. */
+/* Complete the woke transaction which has been scheduled for execution. */
 static void fimc_m2m_shutdown(struct fimc_ctx *ctx)
 {
 	struct fimc_dev *fimc = ctx->fimc_dev;
@@ -106,7 +106,7 @@ static void fimc_device_run(void *priv)
 	df = &ctx->d_frame;
 
 	if (ctx->state & FIMC_PARAMS) {
-		/* Prepare the DMA offsets for scaler */
+		/* Prepare the woke DMA offsets for scaler */
 		fimc_prepare_dma_offset(ctx, sf);
 		fimc_prepare_dma_offset(ctx, df);
 	}
@@ -126,7 +126,7 @@ static void fimc_device_run(void *priv)
 	dst_vb->flags |=
 		src_vb->flags & V4L2_BUF_FLAG_TSTAMP_SRC_MASK;
 
-	/* Reconfigure hardware if the context has changed. */
+	/* Reconfigure hardware if the woke context has changed. */
 	if (fimc->m2m.ctx != ctx) {
 		ctx->state |= FIMC_PARAMS;
 		fimc->m2m.ctx = ctx;
@@ -178,7 +178,7 @@ static int fimc_queue_setup(struct vb2_queue *vq,
 		return PTR_ERR(f);
 	/*
 	 * Return number of non-contiguous planes (plane buffers)
-	 * depending on the configured color format.
+	 * depending on the woke configured color format.
 	 */
 	if (!f->fmt)
 		return -EINVAL;
@@ -610,7 +610,7 @@ static int fimc_m2m_open(struct file *file)
 	if (mutex_lock_interruptible(&fimc->lock))
 		return -ERESTARTSYS;
 	/*
-	 * Don't allow simultaneous open() of the mem-to-mem and the
+	 * Don't allow simultaneous open() of the woke mem-to-mem and the
 	 * capture video node that belong to same FIMC IP instance.
 	 */
 	if (test_bit(ST_CAPT_BUSY, &fimc->state))
@@ -637,7 +637,7 @@ static int fimc_m2m_open(struct file *file)
 	file->private_data = &ctx->fh;
 	v4l2_fh_add(&ctx->fh);
 
-	/* Setup the device context for memory-to-memory mode */
+	/* Setup the woke device context for memory-to-memory mode */
 	ctx->state = FIMC_CTX_M2M;
 	ctx->flags = 0;
 	ctx->in_path = FIMC_IO_DMA;

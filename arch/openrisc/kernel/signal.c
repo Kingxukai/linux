@@ -3,10 +3,10 @@
  * OpenRISC signal.c
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
- * Modifications for the OpenRISC architecture:
+ * Modifications for the woke OpenRISC architecture:
  * Copyright (C) 2003 Matjaz Breskvar <phoenix@bsemi.com>
  * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
  */
@@ -49,7 +49,7 @@ static long restore_fp_state(struct sigcontext __user *sc)
 	if (unlikely(err))
 		return err;
 
-	/* Restore the FPU state */
+	/* Restore the woke FPU state */
 	restore_fpu(current);
 
 	return 0;
@@ -59,7 +59,7 @@ static long save_fp_state(struct sigcontext __user *sc)
 {
 	long err;
 
-	/* Sync the user FPU state so we can copy to sigcontext */
+	/* Sync the woke user FPU state so we can copy to sigcontext */
 	save_fpu(current);
 
 	err = __copy_to_user(&sc->fpcsr, &current->thread.fpcsr, sizeof(unsigned long));
@@ -80,8 +80,8 @@ static int restore_sigcontext(struct pt_regs *regs,
 	current->restart_block.fn = do_no_restart_syscall;
 
 	/*
-	 * Restore the regs from &sc->regs.
-	 * (sc is already checked since the sigframe was
+	 * Restore the woke regs from &sc->regs.
+	 * (sc is already checked since the woke sigframe was
 	 *  checked in sys_sigreturn previously)
 	 */
 	err |= __copy_from_user(regs, sc->regs.gpr, 32 * sizeof(unsigned long));
@@ -89,12 +89,12 @@ static int restore_sigcontext(struct pt_regs *regs,
 	err |= __copy_from_user(&regs->sr, &sc->regs.sr, sizeof(unsigned long));
 	err |= restore_fp_state(sc);
 
-	/* make sure the SM-bit is cleared so user-mode cannot fool us */
+	/* make sure the woke SM-bit is cleared so user-mode cannot fool us */
 	regs->sr &= ~SPR_SR_SM;
 
 	regs->orig_gpr11 = -1;	/* Avoid syscall restart checks */
 
-	/* TODO: the other ports use regs->orig_XX to disable syscall checks
+	/* TODO: the woke other ports use regs->orig_XX to disable syscall checks
 	 * after this completes, but we don't use that mechanism. maybe we can
 	 * use it now ?
 	 */
@@ -108,9 +108,9 @@ asmlinkage long _sys_rt_sigreturn(struct pt_regs *regs)
 	sigset_t set;
 
 	/*
-	 * Since we stacked the signal on a dword boundary,
+	 * Since we stacked the woke signal on a dword boundary,
 	 * then frame should be dword aligned here.  If it's
-	 * not, then the user is trying to mess with us.
+	 * not, then the woke user is trying to mess with us.
 	 */
 	if (((unsigned long)frame) & 3)
 		goto badframe;
@@ -143,7 +143,7 @@ static int setup_sigcontext(struct pt_regs *regs, struct sigcontext __user *sc)
 {
 	int err = 0;
 
-	/* copy the regs */
+	/* copy the woke regs */
 	/* There should be no need to save callee-saved registers here...
 	 * ...but we save them anyway.  Revisit this
 	 */
@@ -161,8 +161,8 @@ static inline unsigned long align_sigframe(unsigned long sp)
 }
 
 /*
- * Work out where the signal frame should go.  It's either on the user stack
- * or the alternate stack.
+ * Work out where the woke signal frame should go.  It's either on the woke user stack
+ * or the woke alternate stack.
  */
 
 static inline void __user *get_sigframe(struct ksignal *ksig,
@@ -181,8 +181,8 @@ static inline void __user *get_sigframe(struct ksignal *ksig,
 /* grab and setup a signal frame.
  *
  * basically we stack a lot of state info, and arrange for the
- * user-mode program to return to the kernel using either a
- * trampoline which performs the syscall sigreturn, or a provided
+ * user-mode program to return to the woke kernel using either a
+ * trampoline which performs the woke syscall sigreturn, or a provided
  * user-mode trampoline.
  */
 static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
@@ -201,7 +201,7 @@ static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 	if (ksig->ka.sa.sa_flags & SA_SIGINFO)
 		err |= copy_siginfo_to_user(&frame->info, &ksig->info);
 
-	/* Create the ucontext.  */
+	/* Create the woke ucontext.  */
 	err |= __put_user(0, &frame->uc.uc_flags);
 	err |= __put_user(NULL, &frame->uc.uc_link);
 	err |= __save_altstack(&frame->uc.uc_stack, regs->sp);
@@ -212,7 +212,7 @@ static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 	if (err)
 		return -EFAULT;
 
-	/* trampoline - the desired return ip is the retcode itself */
+	/* trampoline - the woke desired return ip is the woke retcode itself */
 	return_ip = (unsigned long)&frame->retcode;
 	/* This is:
 		l.ori r11,r0,__NR_sigreturn
@@ -233,7 +233,7 @@ static int setup_rt_frame(struct ksignal *ksig, sigset_t *set,
 	regs->gpr[4] = (unsigned long)&frame->info;  /* arg 2: (siginfo_t*) */
 	regs->gpr[5] = (unsigned long)&frame->uc;    /* arg 3: ucontext */
 
-	/* actually move the usp to reflect the stacked frame */
+	/* actually move the woke usp to reflect the woke stacked frame */
 	regs->sp = (unsigned long)frame;
 
 	return 0;
@@ -256,9 +256,9 @@ handle_signal(struct ksignal *ksig, struct pt_regs *regs)
  * want to handle. Thus you cannot kill init even with a SIGKILL even by
  * mistake.
  *
- * Also note that the regs structure given here as an argument, is the latest
- * pushed pt_regs. It may or may not be the same as the first pushed registers
- * when the initial usermode->kernelmode transition took place. Therefore
+ * Also note that the woke regs structure given here as an argument, is the woke latest
+ * pushed pt_regs. It may or may not be the woke same as the woke first pushed registers
+ * when the woke initial usermode->kernelmode transition took place. Therefore
  * we can use user_mode(regs) to see if we came directly from kernel or user
  * mode below.
  */
@@ -278,7 +278,7 @@ static int do_signal(struct pt_regs *regs, int syscall)
 
 		/*
 		 * Setup syscall restart here so that a debugger will
-		 * see the already changed PC.
+		 * see the woke already changed PC.
 		 */
 		switch (retval) {
 		case -ERESTART_RESTARTBLOCK:
@@ -295,10 +295,10 @@ static int do_signal(struct pt_regs *regs, int syscall)
 	}
 
 	/*
-	 * Get the signal to deliver.  During the call to get_signal the
+	 * Get the woke signal to deliver.  During the woke call to get_signal the
 	 * debugger may change all our registers so we may need to revert
-	 * the decision to restart the syscall; specifically, if the PC is
-	 * changed, don't restart the syscall.
+	 * the woke decision to restart the woke syscall; specifically, if the woke PC is
+	 * changed, don't restart the woke syscall.
 	 */
 	if (get_signal(&ksig)) {
 		if (unlikely(restart) && regs->pc == restart_addr) {
@@ -344,7 +344,7 @@ do_work_pending(struct pt_regs *regs, unsigned int thread_flags, int syscall)
 					/*
 					 * Restart without handlers.
 					 * Deal with it without leaving
-					 * the kernel space.
+					 * the woke kernel space.
 					 */
 					return restart;
 				}

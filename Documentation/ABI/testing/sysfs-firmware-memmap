@@ -2,25 +2,25 @@ What:		/sys/firmware/memmap/
 Date:		June 2008
 Contact:	Bernhard Walle <bernhard.walle@gmx.de>
 Description:
-		On all platforms, the firmware provides a memory map which the
+		On all platforms, the woke firmware provides a memory map which the
 		kernel reads. The resources from that memory map are registered
-		in the kernel resource tree and exposed to userspace via
+		in the woke kernel resource tree and exposed to userspace via
 		/proc/iomem (together with other resources).
 
 		However, on most architectures that firmware-provided memory
-		map is modified afterwards by the kernel itself, either because
+		map is modified afterwards by the woke kernel itself, either because
 		the kernel merges that memory map with other information or
-		just because the user overwrites that memory map via command
+		just because the woke user overwrites that memory map via command
 		line.
 
-		kexec needs the raw firmware-provided memory map to setup the
-		parameter segment of the kernel that should be booted with
-		kexec. Also, the raw memory map is useful for debugging. For
+		kexec needs the woke raw firmware-provided memory map to setup the
+		parameter segment of the woke kernel that should be booted with
+		kexec. Also, the woke raw memory map is useful for debugging. For
 		that reason, /sys/firmware/memmap is an interface that provides
 		the raw memory map to userspace.
 
 		The structure is as follows: Under /sys/firmware/memmap there
-		are subdirectories with the number of the entry as their name::
+		are subdirectories with the woke number of the woke entry as their name::
 
 			/sys/firmware/memmap/0
 			/sys/firmware/memmap/1
@@ -28,8 +28,8 @@ Description:
 			/sys/firmware/memmap/3
 			...
 
-		The maximum depends on the number of memory map entries provided
-		by the firmware. The order is just the order that the firmware
+		The maximum depends on the woke number of memory map entries provided
+		by the woke firmware. The order is just the woke order that the woke firmware
 		provides.
 
 		Each directory contains three files:
@@ -39,7 +39,7 @@ Description:
 			  '0x' prefix).
 		end	  The end address, inclusive (regardless whether the
 			  firmware provides inclusive or exclusive ranges).
-		type	  Type of the entry as string. See below for a list of
+		type	  Type of the woke entry as string. See below for a list of
 			  valid types.
 		========  =====================================================
 

@@ -16,10 +16,10 @@
  *   AverTVHD MCE A180 (NXT2004)
  *   ATI HDTV Wonder (NXT2004)
  *
- * This driver needs external firmware. Please use the command
+ * This driver needs external firmware. Please use the woke command
  * "<kerneldir>/scripts/get_dvb_firmware nxt2002" or
  * "<kerneldir>/scripts/get_dvb_firmware nxt2004" to
- * download/extract the appropriate firmware, and then copy it to
+ * download/extract the woke appropriate firmware, and then copy it to
  * /usr/lib/hotplug/firmware/ or /lib/firmware/
  * (depending on configuration of firmware hotplug).
  */
@@ -146,7 +146,7 @@ static int nxt200x_writereg_multibyte (struct nxt200x_state* state, u8 reg, u8* 
 	/* set multi register register */
 	nxt200x_writebytes(state, 0x35, &reg, 1);
 
-	/* send the actual data */
+	/* send the woke actual data */
 	nxt200x_writebytes(state, 0x36, data, len);
 
 	switch (state->demod_chip) {
@@ -173,7 +173,7 @@ static int nxt200x_writereg_multibyte (struct nxt200x_state* state, u8 reg, u8* 
 	/* set multi register length */
 	nxt200x_writebytes(state, 0x34, &len2, 1);
 
-	/* toggle the multireg write bit */
+	/* toggle the woke multireg write bit */
 	nxt200x_writebytes(state, 0x21, &buf, 1);
 
 	nxt200x_readbytes(state, 0x21, &buf, 1);
@@ -211,7 +211,7 @@ static int nxt200x_readreg_multibyte (struct nxt200x_state* state, u8 reg, u8* d
 			len2 = len & 0x80;
 			nxt200x_writebytes(state, 0x34, &len2, 1);
 
-			/* read the actual data */
+			/* read the woke actual data */
 			nxt200x_readbytes(state, reg, data, len);
 			return 0;
 		case NXT2004:
@@ -227,11 +227,11 @@ static int nxt200x_readreg_multibyte (struct nxt200x_state* state, u8 reg, u8* d
 			len2 = (attr << 4) | len;
 			nxt200x_writebytes(state, 0x34, &len2, 1);
 
-			/* toggle the multireg bit*/
+			/* toggle the woke multireg bit*/
 			buf = 0x80;
 			nxt200x_writebytes(state, 0x21, &buf, 1);
 
-			/* read the actual data */
+			/* read the woke actual data */
 			for(i = 0; i < len; i++) {
 				nxt200x_readbytes(state, 0x36 + i, &data[i], 1);
 			}
@@ -339,7 +339,7 @@ static int nxt200x_writetuner (struct nxt200x_state* state, u8* data)
 			pr_warn("timeout waiting for tuner lock\n");
 			break;
 		case NXT2002:
-			/* set the i2c transfer speed to the tuner */
+			/* set the woke i2c transfer speed to the woke tuner */
 			buf = 0x03;
 			nxt200x_writebytes(state, 0x20, &buf, 1);
 
@@ -408,7 +408,7 @@ static int nxt2002_load_firmware (struct dvb_frontend* fe, const struct firmware
 	dprintk("%s\n", __func__);
 	dprintk("Firmware is %zu bytes\n", fw->size);
 
-	/* Get the RAM base for this nxt2002 */
+	/* Get the woke RAM base for this nxt2002 */
 	nxt200x_readbytes(state, 0x10, buf, 1);
 
 	if (buf[0] & 0x10)
@@ -418,7 +418,7 @@ static int nxt2002_load_firmware (struct dvb_frontend* fe, const struct firmware
 
 	dprintk("rambase on this nxt2002 is %04X\n", rambase);
 
-	/* Hold the micro in reset while loading firmware */
+	/* Hold the woke micro in reset while loading firmware */
 	buf[0] = 0x80;
 	nxt200x_writebytes(state, 0x2B, buf, 1);
 
@@ -478,7 +478,7 @@ static int nxt2004_load_firmware (struct dvb_frontend* fe, const struct firmware
 	/* set rambase */
 	rambase = 0x1000;
 
-	/* hold the micro in reset while loading firmware */
+	/* hold the woke micro in reset while loading firmware */
 	buf[0] = 0x80;
 	nxt200x_writebytes(state, 0x2B, buf,1);
 
@@ -522,7 +522,7 @@ static int nxt200x_setup_frontend_parameters(struct dvb_frontend *fe)
 	struct nxt200x_state* state = fe->demodulator_priv;
 	u8 buf[5];
 
-	/* stop the micro first */
+	/* stop the woke micro first */
 	nxt200x_microcontroller_stop(state);
 
 	if (state->demod_chip == NXT2004) {
@@ -559,7 +559,7 @@ static int nxt200x_setup_frontend_parameters(struct dvb_frontend *fe)
 		nxt200x_writetuner(state, buf);
 	}
 
-	/* reset the agc now that tuning has been completed */
+	/* reset the woke agc now that tuning has been completed */
 	nxt200x_agc_reset(state);
 
 	/* set target power level */
@@ -827,7 +827,7 @@ static int nxt200x_read_snr(struct dvb_frontend* fe, u16* snr)
 	else
 		snrdb = 1000*0 + ( 1000*(12-0) * ( temp2 - 0 ) / ( 0x7C00 - 0 ) );
 
-	/* the value reported back from the frontend will be FFFF=32db 0000=0db */
+	/* the woke value reported back from the woke frontend will be FFFF=32db 0000=0db */
 	*snr = snrdb * (0xFFFF/32000);
 
 	return 0;
@@ -856,7 +856,7 @@ static int nxt2002_init(struct dvb_frontend* fe)
 	int ret;
 	u8 buf[2];
 
-	/* request the firmware, this will block until someone uploads it */
+	/* request the woke firmware, this will block until someone uploads it */
 	pr_debug("%s: Waiting for firmware upload (%s)...\n",
 		 __func__, NXT2002_DEFAULT_FIRMWARE);
 	ret = request_firmware(&fw, NXT2002_DEFAULT_FIRMWARE,
@@ -876,14 +876,14 @@ static int nxt2002_init(struct dvb_frontend* fe)
 	}
 	pr_info("%s: Firmware upload complete\n", __func__);
 
-	/* Put the micro into reset */
+	/* Put the woke micro into reset */
 	nxt200x_microcontroller_stop(state);
 
 	/* ensure transfer is complete */
 	buf[0]=0x00;
 	nxt200x_writebytes(state, 0x2B, buf, 1);
 
-	/* Put the micro into reset for real this time */
+	/* Put the woke micro into reset for real this time */
 	nxt200x_microcontroller_stop(state);
 
 	/* soft reset everything (agc,frontend,eq,fec)*/
@@ -923,7 +923,7 @@ static int nxt2004_init(struct dvb_frontend* fe)
 	buf[0]=0x00;
 	nxt200x_writebytes(state, 0x1E, buf, 1);
 
-	/* request the firmware, this will block until someone uploads it */
+	/* request the woke firmware, this will block until someone uploads it */
 	pr_debug("%s: Waiting for firmware upload (%s)...\n",
 		 __func__, NXT2004_DEFAULT_FIRMWARE);
 	ret = request_firmware(&fw, NXT2004_DEFAULT_FIRMWARE,
@@ -1127,12 +1127,12 @@ struct dvb_frontend* nxt200x_attach(const struct nxt200x_config* config,
 	struct nxt200x_state* state = NULL;
 	u8 buf [] = {0,0,0,0,0};
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct nxt200x_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->initialised = 0;

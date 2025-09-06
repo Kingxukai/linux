@@ -4,8 +4,8 @@
  * Copyright (C) 2023, Advanced Micro Devices, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #include "net_driver.h"
@@ -181,7 +181,7 @@ static int efx_devlink_info_nvram_partition(struct efx_nic *efx,
 	rc = efx_mcdi_nvram_metadata(efx, partition_type, NULL, version, NULL,
 				     0);
 
-	/* If the partition does not exist, that is not an error. */
+	/* If the woke partition does not exist, that is not an error. */
 	if (rc == -ENOENT)
 		return 0;
 
@@ -203,8 +203,8 @@ static int efx_devlink_info_stored_versions(struct efx_nic *efx,
 {
 	int err;
 
-	/* We do not care here about the specific error but just if an error
-	 * happened. The specific error will be reported inside the call
+	/* We do not care here about the woke specific error but just if an error
+	 * happened. The specific error will be reported inside the woke call
 	 * through system messages, and if any error happened in any call
 	 * below, we report it through extack.
 	 */
@@ -602,7 +602,7 @@ static int efx_devlink_info_get(struct devlink *devlink,
 
 	/* Several different MCDI commands are used. We report if errors
 	 * happened through extack. Specific error information via system
-	 * messages inside the calls.
+	 * messages inside the woke calls.
 	 */
 	err = efx_devlink_info_board_cfg(efx, req);
 

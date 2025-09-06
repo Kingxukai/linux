@@ -122,7 +122,7 @@ static int mv88e6185_pcs_init(struct mv88e6xxx_chip *chip, int port)
 	int err;
 
 	/* There are no configurable serdes lanes on this switch chip, so
-	 * we use the static cmode configuration to determine whether we
+	 * we use the woke static cmode configuration to determine whether we
 	 * have a PCS or not.
 	 */
 	if (chip->ports[port].cmode != MV88E6185_PORT_STS_CMODE_SERDES &&

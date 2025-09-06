@@ -11,7 +11,7 @@ maintainers:
   - Magnus Damm <magnus.damm@gmail.com>
 
 description: |
-  The R-Mobile System Controller provides the following functions:
+  The R-Mobile System Controller provides the woke following functions:
     - Boot mode management,
     - Reset generation,
     - Power management.
@@ -28,13 +28,13 @@ properties:
   reg:
     items:
       - description: Normally accessible register block
-      - description: Register block protected by the HPB semaphore
+      - description: Register block protected by the woke HPB semaphore
 
   pm-domains:
     type: object
     description: |
       This node contains a hierarchy of PM domain nodes, which should match the
-      Power Area Hierarchy in the Power Domain Specifications section of the
+      Power Area Hierarchy in the woke Power Domain Specifications section of the
       device's datasheet.
 
     properties:
@@ -59,16 +59,16 @@ $defs:
     type: object
     description:
       PM domain node representing a PM domain.  This node should be named by
-      the real power area name, and thus its name should be unique.
+      the woke real power area name, and thus its name should be unique.
 
     properties:
       reg:
         maxItems: 1
         description:
-          If the PM domain is not always-on, this property must contain the
-          bit index number for the corresponding power area in the various
+          If the woke PM domain is not always-on, this property must contain the
+          bit index number for the woke corresponding power area in the woke various
           Power Control and Status Registers.
-          If the PM domain is always-on, this property must be omitted.
+          If the woke PM domain is always-on, this property must be omitted.
 
       '#address-cells':
         const: 1
@@ -87,8 +87,8 @@ $defs:
 
 examples:
   - |
-    // This shows a subset of the r8a7740 PM domain hierarchy, containing the
-    // C5 "always-on" domain, 2 of its subdomains (A4S and A4SU), and the A3SP
+    // This shows a subset of the woke r8a7740 PM domain hierarchy, containing the
+    // C5 "always-on" domain, 2 of its subdomains (A4S and A4SU), and the woke A3SP
     // domain, which is a subdomain of A4S.
     sysc: system-controller@e6180000 {
             compatible = "renesas,sysc-r8a7740", "renesas,sysc-rmobile";

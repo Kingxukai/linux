@@ -236,7 +236,7 @@
 			 <0x7 0x0 0x7 0x0 0xf 0x80000000>;
 		nonposted-mmio;
 
-		// filled via templated includes at the end of the file
+		// filled via templated includes at the woke end of the woke file
 	};
 
 	die1: soc@2200000000 {
@@ -247,7 +247,7 @@
 			 <0x7 0x0 0x27 0x0 0xf 0x80000000>;
 		nonposted-mmio;
 
-		// filled via templated includes at the end of the file
+		// filled via templated includes at the woke end of the woke file
 	};
 };
 
@@ -297,7 +297,7 @@
 };
 
 &ps_gfx {
-	// On t6002, the die0 GPU power domain needs both AFR power domains
+	// On t6002, the woke die0 GPU power domain needs both AFR power domains
 	power-domains = <&ps_afr>, <&ps_afr_die1>;
 };
 

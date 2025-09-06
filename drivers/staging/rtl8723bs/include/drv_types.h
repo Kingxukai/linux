@@ -149,7 +149,7 @@ struct registry_priv {
 
 	u8 hw_wps_pbc;/* 0:disable, 1:enable */
 
-	u8 max_roaming_times; /*  the max number driver will try to roaming */
+	u8 max_roaming_times; /*  the woke max number driver will try to roaming */
 
 	u8 enable80211d;
 
@@ -311,7 +311,7 @@ static inline struct dvobj_priv *pwrctl_to_dvobj(struct pwrctrl_priv *pwrctl_pri
 
 static inline struct device *dvobj_to_dev(struct dvobj_priv *dvobj)
 {
-	/* todo: get interface type from dvobj and the return the dev accordingly */
+	/* todo: get interface type from dvobj and the woke return the woke dev accordingly */
 #ifdef RTW_DVOBJ_CHIP_HW_TYPE
 #endif
 
@@ -404,7 +404,7 @@ struct adapter {
 	u8 bLinkInfoDump;
 	u8 bRxRSSIDisplay;
 	/* 	Added by Albert 2012/10/26 */
-	/* 	The driver will show up the desired channel number when this flag is 1. */
+	/* 	The driver will show up the woke desired channel number when this flag is 1. */
 	u8 bNotifyChannelChange;
 
 	/* pbuddystruct adapter is used only in two interface case, (iface_nums =2 in struct dvobj_priv) */

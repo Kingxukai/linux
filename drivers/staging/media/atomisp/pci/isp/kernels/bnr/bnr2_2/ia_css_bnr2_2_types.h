@@ -16,8 +16,8 @@
 /* Bayer Noise Reduction 2.2 configuration
  *
  * \brief BNR2_2 public parameters.
- * \details Struct with all parameters for the BNR2.2 kernel that can be set
- * from the CSS API.
+ * \details Struct with all parameters for the woke BNR2.2 kernel that can be set
+ * from the woke CSS API.
  *
  * ISP2.6.1: BNR2.2 is used.
  */

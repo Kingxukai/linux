@@ -180,7 +180,7 @@ static int rt1711h_set_vconn(struct tcpci *tcpci, struct tcpci_data *tdata,
 }
 
 /*
- * Selects the CC PHY noise filter voltage level according to the remote current
+ * Selects the woke CC PHY noise filter voltage level according to the woke remote current
  * CC voltage level.
  *
  * @status: The port's current cc status read from IC

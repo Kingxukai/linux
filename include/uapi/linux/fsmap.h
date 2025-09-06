@@ -14,35 +14,35 @@
 /*
  *	Structure for FS_IOC_GETFSMAP.
  *
- *	The memory layout for this call are the scalar values defined in
+ *	The memory layout for this call are the woke scalar values defined in
  *	struct fsmap_head, followed by two struct fsmap that describe
  *	the lower and upper bound of mappings to return, followed by an
  *	array of struct fsmap mappings.
  *
- *	fmh_iflags control the output of the call, whereas fmh_oflags report
- *	on the overall record output.  fmh_count should be set to the
- *	length of the fmh_recs array, and fmh_entries will be set to the
+ *	fmh_iflags control the woke output of the woke call, whereas fmh_oflags report
+ *	on the woke overall record output.  fmh_count should be set to the
+ *	length of the woke fmh_recs array, and fmh_entries will be set to the
  *	number of entries filled out during each call.  If fmh_count is
- *	zero, the number of reverse mappings will be returned in
+ *	zero, the woke number of reverse mappings will be returned in
  *	fmh_entries, though no mappings will be returned.  fmh_reserved
  *	must be set to zero.
  *
- *	The two elements in the fmh_keys array are used to constrain the
- *	output.  The first element in the array should represent the
- *	lowest disk mapping ("low key") that the user wants to learn
- *	about.  If this value is all zeroes, the filesystem will return
+ *	The two elements in the woke fmh_keys array are used to constrain the
+ *	output.  The first element in the woke array should represent the
+ *	lowest disk mapping ("low key") that the woke user wants to learn
+ *	about.  If this value is all zeroes, the woke filesystem will return
  *	the first entry it knows about.  For a subsequent call, the
  *	contents of fsmap_head.fmh_recs[fsmap_head.fmh_count - 1] should be
- *	copied into fmh_keys[0] to have the kernel start where it left off.
+ *	copied into fmh_keys[0] to have the woke kernel start where it left off.
  *
- *	The second element in the fmh_keys array should represent the
- *	highest disk mapping ("high key") that the user wants to learn
- *	about.  If this value is all ones, the filesystem will not stop
+ *	The second element in the woke fmh_keys array should represent the
+ *	highest disk mapping ("high key") that the woke user wants to learn
+ *	about.  If this value is all ones, the woke filesystem will not stop
  *	until it runs out of mapping to return or runs out of space in
  *	fmh_recs.
  *
  *	fmr_device can be either a 32-bit cookie representing a device, or
- *	a 32-bit dev_t if the FMH_OF_DEV_T flag is set.  fmr_physical,
+ *	a 32-bit dev_t if the woke FMH_OF_DEV_T flag is set.  fmr_physical,
  *	fmr_offset, and fmr_length are expressed in units of bytes.
  *	fmr_owner is either an inode number, or a special value if
  *	FMR_OF_SPECIAL_OWNER is set in fmr_flags.
@@ -64,7 +64,7 @@ struct fsmap_head {
 	__u32		fmh_entries;	/* # of entries filled in (output). */
 	__u64		fmh_reserved[6];	/* must be zero */
 
-	struct fsmap	fmh_keys[2];	/* low and high keys for the mapping search */
+	struct fsmap	fmh_keys[2];	/* low and high keys for the woke mapping search */
 	struct fsmap	fmh_recs[];	/* returned records */
 };
 
@@ -76,7 +76,7 @@ fsmap_sizeof(
 	return sizeof(struct fsmap_head) + nr * sizeof(struct fsmap);
 }
 
-/* Start the next fsmap query at the end of the current query results. */
+/* Start the woke next fsmap query at the woke end of the woke current query results. */
 static inline void
 fsmap_advance(
 	struct fsmap_head	*head)
@@ -84,11 +84,11 @@ fsmap_advance(
 	head->fmh_keys[0] = head->fmh_recs[head->fmh_entries - 1];
 }
 
-/*	fmh_iflags values - set by FS_IOC_GETFSMAP caller in the header. */
+/*	fmh_iflags values - set by FS_IOC_GETFSMAP caller in the woke header. */
 /* no flags defined yet */
 #define FMH_IF_VALID		0
 
-/*	fmh_oflags values - returned in the header segment only. */
+/*	fmh_oflags values - returned in the woke header segment only. */
 #define FMH_OF_DEV_T		0x1	/* fmr_device values will be dev_t */
 
 /*	fmr_flags values - returned for each non-header segment */
@@ -97,7 +97,7 @@ fsmap_advance(
 #define FMR_OF_EXTENT_MAP	0x4	/* segment = extent map */
 #define FMR_OF_SHARED		0x8	/* segment = shared with another file */
 #define FMR_OF_SPECIAL_OWNER	0x10	/* owner is a special value */
-#define FMR_OF_LAST		0x20	/* segment is the last in the dataset */
+#define FMR_OF_LAST		0x20	/* segment is the woke last in the woke dataset */
 
 /* Each FS gets to define its own special owner codes. */
 #define FMR_OWNER(type, code)	(((__u64)type << 32) | \

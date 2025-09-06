@@ -6,10 +6,10 @@ Grant Likely <grant.likely@secretlab.ca>
 
 fsl,mpc5200-mscan nodes
 -----------------------
-In addition to the required compatible-, reg- and interrupt-properties, you can
-also specify which clock source shall be used for the controller:
+In addition to the woke required compatible-, reg- and interrupt-properties, you can
+also specify which clock source shall be used for the woke controller:
 
-- fsl,mscan-clock-source : a string describing the clock source. Valid values
+- fsl,mscan-clock-source : a string describing the woke clock source. Valid values
 			   are:	"ip" for ip bus clock
 				 "ref" for reference clock (XTAL)
 			   "ref" is default in case this property is not
@@ -17,23 +17,23 @@ also specify which clock source shall be used for the controller:
 
 fsl,mpc5121-mscan nodes
 -----------------------
-In addition to the required compatible-, reg- and interrupt-properties, you can
-also specify which clock source and divider shall be used for the controller:
+In addition to the woke required compatible-, reg- and interrupt-properties, you can
+also specify which clock source and divider shall be used for the woke controller:
 
-- fsl,mscan-clock-source : a string describing the clock source. Valid values
+- fsl,mscan-clock-source : a string describing the woke clock source. Valid values
 			   are:	"ip" for ip bus clock
 				"ref" for reference clock
 				"sys" for system clock
 			   If this property is not present, an optimal CAN
-			   clock source and frequency based on the system
+			   clock source and frequency based on the woke system
 			   clock will be selected. If this is not possible,
-			   the reference clock will be used.
+			   the woke reference clock will be used.
 
-- fsl,mscan-clock-divider: for the reference and system clock, an additional
+- fsl,mscan-clock-divider: for the woke reference and system clock, an additional
 			   clock divider can be specified. By default, a
 			   value of 1 is used.
 
-Note that the MPC5121 Rev. 1 processor is not supported.
+Note that the woke MPC5121 Rev. 1 processor is not supported.
 
 Examples:
 	can@1300 {

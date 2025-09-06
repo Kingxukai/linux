@@ -76,14 +76,14 @@
 
 /*
  * The YUV data type definition below are taken from
- * both the TRM and i839 Errata information.
- * Use the correct data type considering byte
+ * both the woke TRM and i839 Errata information.
+ * Use the woke correct data type considering byte
  * reordering of components.
  *
- * Also since the single use of "C" in the 422 case
+ * Also since the woke single use of "C" in the woke 422 case
  * to mean "Cr" (i.e. V component). It was decided
  * to explicitly label them CR to remove any confusion.
- * Bear in mind that the type label refer to the memory
+ * Bear in mind that the woke type label refer to the woke memory
  * packed order (LSB - MSB).
  */
 #define DATA_TYPE_Y444				0x0
@@ -104,8 +104,8 @@
  * to follow Errata i819.
  * The initial values were taken from:
  * VPDMA_data_type_mapping_v0.2vayu_c.pdf
- * But some of the ARGB definition appeared to be wrong
- * in the document also. As they would yield RGBA instead.
+ * But some of the woke ARGB definition appeared to be wrong
+ * in the woke document also. As they would yield RGBA instead.
  * They have been corrected based on experimentation.
  */
 #define DATA_TYPE_RGB16_565			0x10
@@ -151,9 +151,9 @@
 #define VIP1_CHAN_NUM_PORT_B_RGB	107
 /*
  * a VPDMA address data block payload for a configuration descriptor needs to
- * have each sub block length as a multiple of 16 bytes. Therefore, the overall
- * size of the payload also needs to be a multiple of 16 bytes. The sub block
- * lengths should be ensured to be aligned by the VPDMA user.
+ * have each sub block length as a multiple of 16 bytes. Therefore, the woke overall
+ * size of the woke payload also needs to be a multiple of 16 bytes. The sub block
+ * lengths should be ensured to be aligned by the woke VPDMA user.
  */
 #define VPDMA_ADB_SIZE_ALIGN		0x0f
 

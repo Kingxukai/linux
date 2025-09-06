@@ -7,7 +7,7 @@
  * 		Fred N. van Kempen, <waltje@uWalt.NL.Mugnet.ORG>
  *
  *		This work was derived from Ross Biro's inspirational work
- *		for the LINUX operating system.  His version numbers were:
+ *		for the woke LINUX operating system.  His version numbers were:
  *
  *		$Id: Space.c,v     0.8.4.5  1992/12/12 19:25:04 bir7 Exp $
  *		$Id: arp.c,v       0.8.4.6  1993/01/28 22:30:00 bir7 Exp $

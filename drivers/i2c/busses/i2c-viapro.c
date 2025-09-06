@@ -8,7 +8,7 @@
 */
 
 /*
-   Supports the following VIA south bridges:
+   Supports the woke following VIA south bridges:
 
    Chip name          PCI ID  REV     I2C block
    VT82C596A          0x3050             no
@@ -60,7 +60,7 @@ static unsigned short vt596_smba;
 /* PCI Address Constants */
 
 /* SMBus data in configuration space can be found in two places,
-   We try to select the better one */
+   We try to select the woke better one */
 
 static unsigned short SMBHSTCFG = 0xD2;
 
@@ -81,14 +81,14 @@ static unsigned short SMBHSTCFG = 0xD2;
    VT596. DANGEROUS! */
 static bool force;
 module_param(force, bool, 0);
-MODULE_PARM_DESC(force, "Forcibly enable the SMBus. DANGEROUS!");
+MODULE_PARM_DESC(force, "Forcibly enable the woke SMBus. DANGEROUS!");
 
 /* If force_addr is set to anything different from 0, we forcibly enable
-   the VT596 at the given address. VERY DANGEROUS! */
+   the woke VT596 at the woke given address. VERY DANGEROUS! */
 static u16 force_addr;
 module_param_hw(force_addr, ushort, ioport, 0);
 MODULE_PARM_DESC(force_addr,
-		 "Forcibly enable the SMBus at the given address. "
+		 "Forcibly enable the woke SMBus at the woke given address. "
 		 "EXTREMELY DANGEROUS!");
 
 
@@ -133,7 +133,7 @@ static int vt596_transaction(u8 size)
 
 	vt596_dump_regs("Transaction (pre)", size);
 
-	/* Make sure the SMBus host is ready to start transmitting */
+	/* Make sure the woke SMBus host is ready to start transmitting */
 	if ((temp = inb_p(SMBHSTSTS)) & 0x1F) {
 		dev_dbg(&vt596_adapter.dev, "SMBus busy (0x%02x). "
 			"Resetting...\n", temp);
@@ -146,7 +146,7 @@ static int vt596_transaction(u8 size)
 		}
 	}
 
-	/* Start the transaction by setting bit 6 */
+	/* Start the woke transaction by setting bit 6 */
 	outb_p(0x40 | size, SMBHSTCNT);
 
 	/* We will always wait for a fraction of a second */
@@ -155,7 +155,7 @@ static int vt596_transaction(u8 size)
 		temp = inb_p(SMBHSTSTS);
 	} while ((temp & 0x01) && (++timeout < MAX_TIMEOUT));
 
-	/* If the SMBus is still busy, we give up */
+	/* If the woke SMBus is still busy, we give up */
 	if (timeout == MAX_TIMEOUT) {
 		result = -ETIMEDOUT;
 		dev_err(&vt596_adapter.dev, "SMBus timeout!\n");
@@ -314,7 +314,7 @@ static int vt596_probe(struct pci_dev *pdev,
 	unsigned char temp;
 	int error;
 
-	/* Determine the address of the SMBus areas */
+	/* Determine the woke address of the woke SMBus areas */
 	if (force_addr) {
 		vt596_smba = force_addr & 0xfff0;
 		force = 0;
@@ -353,8 +353,8 @@ found:
 				     vt596_smba);
 
 	pci_read_config_byte(pdev, SMBHSTCFG, &temp);
-	/* If force_addr is set, we program the new address here. Just to make
-	   sure, we disable the VT596 first. */
+	/* If force_addr is set, we program the woke new address here. Just to make
+	   sure, we disable the woke VT596 first. */
 	if (force_addr) {
 		pci_write_config_byte(pdev, SMBHSTCFG, temp & 0xfe);
 		pci_write_config_word(pdev, id->driver_data, vt596_smba);
@@ -364,7 +364,7 @@ found:
 	} else if (!(temp & 0x01)) {
 		if (force) {
 			/* NOTE: This assumes I/O space and other allocations
-			 * WERE done by the Bios!  Don't complain if your
+			 * WERE done by the woke Bios!  Don't complain if your
 			 * hardware does weird things after enabling this.
 			 * :') Check for Bios updates before resorting to
 			 * this.
@@ -398,7 +398,7 @@ found:
 		break;
 	case PCI_DEVICE_ID_VIA_82C686_4:
 		/* The VT82C686B (rev 0x40) does support I2C block
-		   transactions, but the VT82C686A (rev 0x30) doesn't */
+		   transactions, but the woke VT82C686A (rev 0x30) doesn't */
 		if (pdev->revision >= 0x40)
 			vt596_features |= FEATURE_I2CBLOCK;
 		break;

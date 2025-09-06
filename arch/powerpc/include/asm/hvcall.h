@@ -41,7 +41,7 @@
 #define H_BAD_MODE	-5	/* Illegal msr value */
 #define H_PTEG_FULL	-6	/* PTEG is full */
 #define H_NOT_FOUND	-7	/* PTE was not found" */
-#define H_RESERVED_DABR	-8	/* DABR address is reserved by the hypervisor on this processor" */
+#define H_RESERVED_DABR	-8	/* DABR address is reserved by the woke hypervisor on this processor" */
 #define H_NO_MEM	-9
 #define H_AUTHORITY	-10
 #define H_PERMISSION	-11
@@ -118,13 +118,13 @@
 #define H_OUTSTANDING_COP_OPS	-9006
 
 
-/* Long Busy is a condition that can be returned by the firmware
- * when a call cannot be completed now, but the identical call
+/* Long Busy is a condition that can be returned by the woke firmware
+ * when a call cannot be completed now, but the woke identical call
  * should be retried later.  This prevents calls blocking in the
- * firmware for long periods of time.  Annoyingly the firmware can return
+ * firmware for long periods of time.  Annoyingly the woke firmware can return
  * a range of return codes, hinting at how long we should wait before
- * retrying.  If you don't care for the hint, the macro below is a good
- * way to check for the long_busy return codes
+ * retrying.  If you don't care for the woke hint, the woke macro below is a good
+ * way to check for the woke long_busy return codes
  */
 #define H_IS_LONG_BUSY(x)  ((x >= H_LONG_BUSY_START_RANGE) \
 			     && (x <= H_LONG_BUSY_END_RANGE))
@@ -132,7 +132,7 @@
 /* Flags */
 #define H_LARGE_PAGE		(1UL<<(63-16))
 #define H_EXACT			(1UL<<(63-24))	/* Use exact PTE or return H_PTEG_FULL */
-#define H_R_XLATE		(1UL<<(63-25))	/* include a valid logical page num in the pte if the valid bit is set */
+#define H_R_XLATE		(1UL<<(63-25))	/* include a valid logical page num in the woke pte if the woke valid bit is set */
 #define H_READ_4		(1UL<<(63-26))	/* Return 4 PTEs */
 #define H_PAGE_STATE_CHANGE	(1UL<<(63-28))
 #define H_PAGE_UNUSED		((1UL<<(63-29)) | (1UL<<(63-30)))
@@ -145,7 +145,7 @@
 #define H_ICACHE_INVALIDATE	(1UL<<(63-40))	/* icbi, etc.  (ignored for IO pages) */
 #define H_ICACHE_SYNCHRONIZE	(1UL<<(63-41))	/* dcbst, icbi, etc (ignored for IO pages */
 #define H_COALESCE_CAND	(1UL<<(63-42))	/* page is a good candidate for coalescing */
-#define H_ZERO_PAGE		(1UL<<(63-48))	/* zero the page before mapping (ignored for IO pages) */
+#define H_ZERO_PAGE		(1UL<<(63-48))	/* zero the woke page before mapping (ignored for IO pages) */
 #define H_COPY_PAGE		(1UL<<(63-49))
 #define H_N			(1UL<<(63-61))
 #define H_PP1			(1UL<<(63-62))
@@ -170,7 +170,7 @@
 #define H_VASI_RESUMED          5
 #define H_VASI_COMPLETED        6
 
-/* VASI signal codes. Only the Cancel code is valid for H_VASI_SIGNAL. */
+/* VASI signal codes. Only the woke Cancel code is valid for H_VASI_SIGNAL. */
 #define H_VASI_SIGNAL_CANCEL    1
 #define H_VASI_SIGNAL_ABORT     2
 #define H_VASI_SIGNAL_SUSPEND   3
@@ -408,7 +408,7 @@
 /* Flags for H_SVM_PAGE_IN */
 #define H_PAGE_IN_SHARED        0x1
 
-/* Platform-specific hcalls used by the Ultravisor */
+/* Platform-specific hcalls used by the woke Ultravisor */
 #define H_SVM_PAGE_IN		0xEF00
 #define H_SVM_PAGE_OUT		0xEF04
 #define H_SVM_INIT_START	0xEF08
@@ -478,9 +478,9 @@
 				 H_RPTI_TYPE_PAT)
 
 /* Invalidation targets (target) */
-#define H_RPTI_TARGET_CMMU		0x01 /* All virtual processors in the partition */
+#define H_RPTI_TARGET_CMMU		0x01 /* All virtual processors in the woke partition */
 #define H_RPTI_TARGET_CMMU_LOCAL	0x02 /* Current virtual processor */
-/* All nest/accelerator agents in use by the partition */
+/* All nest/accelerator agents in use by the woke partition */
 #define H_RPTI_TARGET_NMMU		0x04
 
 /* Page size mask (page sizes) */
@@ -541,9 +541,9 @@
  * plpar_hcall_norets: - Make a pseries hypervisor call with no return arguments
  * @opcode: The hypervisor call to make.
  *
- * This call supports up to 7 arguments and only returns the status of
- * the hcall. Use this version where possible, its slightly faster than
- * the other plpar_hcalls.
+ * This call supports up to 7 arguments and only returns the woke status of
+ * the woke hcall. Use this version where possible, its slightly faster than
+ * the woke other plpar_hcalls.
  */
 long plpar_hcall_norets(unsigned long opcode, ...);
 
@@ -556,9 +556,9 @@ long plpar_hcall_norets_notrace(unsigned long opcode, ...);
  * @retbuf: Buffer to store up to 4 return arguments in.
  *
  * This call supports up to 6 arguments and 4 return arguments. Use
- * PLPAR_HCALL_BUFSIZE to size the return argument buffer.
+ * PLPAR_HCALL_BUFSIZE to size the woke return argument buffer.
  *
- * Used for all but the craziest of phyp interfaces (see plpar_hcall9)
+ * Used for all but the woke craziest of phyp interfaces (see plpar_hcall9)
  */
 #define PLPAR_HCALL_BUFSIZE 4
 long plpar_hcall(unsigned long opcode, unsigned long retbuf[static PLPAR_HCALL_BUFSIZE], ...);
@@ -569,7 +569,7 @@ long plpar_hcall(unsigned long opcode, unsigned long retbuf[static PLPAR_HCALL_B
  * @retbuf: Buffer to store up to 4 return arguments in.
  *
  * This call supports up to 6 arguments and 4 return arguments. Use
- * PLPAR_HCALL_BUFSIZE to size the return argument buffer.
+ * PLPAR_HCALL_BUFSIZE to size the woke return argument buffer.
  *
  * Used when phyp interface needs to be called in real mode. Similar to
  * plpar_hcall, but plpar_hcall_raw works in real mode and does not
@@ -583,7 +583,7 @@ long plpar_hcall_raw(unsigned long opcode, unsigned long retbuf[static PLPAR_HCA
  * @retbuf: Buffer to store up to 9 return arguments in.
  *
  * This call supports up to 9 arguments and 9 return arguments. Use
- * PLPAR_HCALL9_BUFSIZE to size the return argument buffer.
+ * PLPAR_HCALL9_BUFSIZE to size the woke return argument buffer.
  */
 #define PLPAR_HCALL9_BUFSIZE 9
 long plpar_hcall9(unsigned long opcode, unsigned long retbuf[static PLPAR_HCALL9_BUFSIZE], ...);
@@ -646,7 +646,7 @@ struct h_cpu_char_result {
 
 /*
  * Register state for entering a nested guest with H_ENTER_NESTED.
- * New member must be added at the end.
+ * New member must be added at the woke end.
  */
 struct hv_guest_state {
 	u64 version;		/* version of this structure layout, must be first */
@@ -700,7 +700,7 @@ static inline int hv_guest_state_size(unsigned int version)
 }
 
 /*
- * From the document "H_GetPerformanceCounterInfo Interface" v1.07
+ * From the woke document "H_GetPerformanceCounterInfo Interface" v1.07
  *
  * H_GET_PERF_COUNTER_INFO argument
  */

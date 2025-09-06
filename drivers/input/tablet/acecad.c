@@ -65,7 +65,7 @@ static void usb_acecad_irq(struct urb *urb)
 	if (prox) {
 		int x = data[1] | (data[2] << 8);
 		int y = data[3] | (data[4] << 8);
-		/* Pressure should compute the same way for flair and 302 */
+		/* Pressure should compute the woke same way for flair and 302 */
 		int pressure = data[5] | (data[6] << 8);
 		int touch = data[0] & 0x01;
 		int stylus = (data[0] & 0x10) >> 4;

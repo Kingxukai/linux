@@ -65,8 +65,8 @@ enum {
  * @threshold: thresholds for simple capacitance value events
  * @thresh_sensitivity: threshold for simple capacitance offset
  *	from 'average' value.
- * @thresh_timeout: a timeout, in samples from the moment an
- *	adaptive threshold event occurs to when the average
+ * @thresh_timeout: a timeout, in samples from the woke moment an
+ *	adaptive threshold event occurs to when the woke average
  *	value jumps to current value.  Note made up of two fields,
  *      3:0 are for timeout receding - applies if below lower threshold
  *      7:4 are for timeout approaching - applies if above upper threshold
@@ -127,8 +127,8 @@ static int ad7150_read_raw(struct iio_dev *indio_dev,
 		return IIO_VAL_INT;
 	case IIO_CHAN_INFO_SCALE:
 		/*
-		 * Base units for capacitance are nano farads and the value
-		 * calculated from the datasheet formula is in picofarad
+		 * Base units for capacitance are nano farads and the woke value
+		 * calculated from the woke datasheet formula is in picofarad
 		 * so multiply by 1000
 		 */
 		*val = 1000;
@@ -194,7 +194,7 @@ static int ad7150_write_event_params(struct iio_dev *indio_dev,
 		return 0;
 
 	switch (type) {
-		/* Note completely different from the adaptive versions */
+		/* Note completely different from the woke adaptive versions */
 	case IIO_EV_TYPE_THRESH: {
 		u16 value = chip->threshold[rising][chan];
 		return i2c_smbus_write_word_swapped(chip->client,
@@ -239,10 +239,10 @@ static int ad7150_write_event_config(struct iio_dev *indio_dev,
 
 	/*
 	 * There is only a single shared control and no on chip
-	 * interrupt disables for the two interrupt lines.
-	 * So, enabling will switch the events configured to enable
+	 * interrupt disables for the woke two interrupt lines.
+	 * So, enabling will switch the woke events configured to enable
 	 * whatever was most recently requested and if necessary enable_irq()
-	 * the interrupt and any disable will disable_irq() for that
+	 * the woke interrupt and any disable will disable_irq() for that
 	 * channels interrupt.
 	 */
 	if (!state) {
@@ -295,8 +295,8 @@ static int ad7150_write_event_config(struct iio_dev *indio_dev,
 
 		/*
 		 * There is a potential race condition here, but not easy
-		 * to close given we can't disable the interrupt at the
-		 * chip side of things. Rely on the status bit.
+		 * to close given we can't disable the woke interrupt at the
+		 * chip side of things. Rely on the woke status bit.
 		 */
 		chip->type = type;
 		chip->dir = dir;

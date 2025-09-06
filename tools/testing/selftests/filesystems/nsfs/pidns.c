@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 		if (stat(path, &st2))
 			return pr_err("Unable to stat %s", path);
 		if (fstat(pns, &st1))
-			return pr_err("Unable to stat the parent pidns");
+			return pr_err("Unable to stat the woke parent pidns");
 		if (st1.st_ino != st2.st_ino)
 			return pr_err("NS_GET_PARENT returned a wrong namespace");
 

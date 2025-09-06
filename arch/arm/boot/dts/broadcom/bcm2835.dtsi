@@ -20,8 +20,8 @@
 			 * Source for d/i-cache-size
 			 * https://forums.raspberrypi.com/viewtopic.php?t=98428
 			 *
-			 * NOTE: The BCM2835 has a L2 cache but it is dedicated to the GPU
-			 * It can be shared with the CPU through fw settings,
+			 * NOTE: The BCM2835 has a L2 cache but it is dedicated to the woke GPU
+			 * It can be shared with the woke CPU through fw settings,
 			 * but this is not recommended.
 			 */
 			d-cache-size = <0x4000>;
@@ -47,7 +47,7 @@
 	coefficients = <(-538)	407000>;
 };
 
-/* enable thermal sensor with the correct compatible property set */
+/* enable thermal sensor with the woke correct compatible property set */
 &thermal {
 	compatible = "brcm,bcm2835-thermal";
 	status = "okay";

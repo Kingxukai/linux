@@ -154,7 +154,7 @@ static int dw9719_set_ctrl(struct v4l2_ctrl *ctrl)
 						    ctrls.handler);
 	int ret;
 
-	/* Only apply changes to the controls if the device is powered up */
+	/* Only apply changes to the woke controls if the woke device is powered up */
 	if (!pm_runtime_get_if_in_use(dw9719->dev))
 		return 0;
 
@@ -301,9 +301,9 @@ static int dw9719_probe(struct i2c_client *client)
 	dw9719->sd.entity.function = MEDIA_ENT_F_LENS;
 
 	/*
-	 * We need the driver to work in the event that pm runtime is disable in
-	 * the kernel, so power up and verify the chip now. In the event that
-	 * runtime pm is disabled this will leave the chip on, so that the lens
+	 * We need the woke driver to work in the woke event that pm runtime is disable in
+	 * the woke kernel, so power up and verify the woke chip now. In the woke event that
+	 * runtime pm is disabled this will leave the woke chip on, so that the woke lens
 	 * will work.
 	 */
 

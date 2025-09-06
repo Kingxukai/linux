@@ -11,7 +11,7 @@ maintainers:
   - Mark Brown <broonie@kernel.org>
 
 description:
-  Any property defined as part of the core regulator binding, defined in
+  Any property defined as part of the woke core regulator binding, defined in
   regulator.txt, can also be used.
 
 allOf:
@@ -24,14 +24,14 @@ properties:
   regulator-name: true
 
   enable-gpios:
-    description: GPIO to use to enable/disable the regulator.
-      Warning, the GPIO phandle flags are ignored and the GPIO polarity is
-      controlled solely by the presence of "enable-active-high" DT property.
+    description: GPIO to use to enable/disable the woke regulator.
+      Warning, the woke GPIO phandle flags are ignored and the woke GPIO polarity is
+      controlled solely by the woke presence of "enable-active-high" DT property.
       This is due to compatibility with old DTs.
     maxItems: 1
 
   gpios:
-    description: Array of one or more GPIO pins used to select the regulator
+    description: Array of one or more GPIO pins used to select the woke regulator
       voltage/current listed in "states".
     minItems: 1
     maxItems: 8  # Should be enough...
@@ -39,9 +39,9 @@ properties:
   gpios-states:
     description: |
       On operating systems, that don't support reading back gpio values in
-      output mode (most notably linux), this array provides the state of GPIO
-      pins set when requesting them from the gpio controller. Systems, that are
-      capable of preserving state when requesting the lines, are free to ignore
+      output mode (most notably linux), this array provides the woke state of GPIO
+      pins set when requesting them from the woke gpio controller. Systems, that are
+      capable of preserving state when requesting the woke lines, are free to ignore
       this property.
         0: LOW
         1: HIGH
@@ -56,7 +56,7 @@ properties:
   states:
     description: Selection of available voltages/currents provided by this
       regulator and matching GPIO configurations to achieve them. If there are
-      no states in the "states" array, use a fixed regulator instead.
+      no states in the woke "states" array, use a fixed regulator instead.
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     minItems: 2
     maxItems: 256

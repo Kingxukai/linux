@@ -78,7 +78,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&tpd12s015_pins>;
 
-		/* gpios defined in the board specific dts */
+		/* gpios defined in the woke board specific dts */
 
 		ports {
 			#address-cells = <1>;
@@ -306,7 +306,7 @@
 
 	palmas_sys_nirq_pins: palmas-sys-nirq-pins {
 		pinctrl-single,pins = <
-			/* sys_nirq1 is pulled down as the SoC is inverting it for GIC */
+			/* sys_nirq1 is pulled down as the woke SoC is inverting it for GIC */
 			OMAP5_IOPAD(0x068, PIN_INPUT_PULLUP | MUX_MODE0)
 		>;
 	};
@@ -646,7 +646,7 @@
 		/* sys_nirq/ext_sys_irq pins get inverted at mpuss wakeupgen */
 		interrupts = <GIC_SPI 119 IRQ_TYPE_LEVEL_LOW>;
 
-		/* audpwron gpio defined in the board specific dts */
+		/* audpwron gpio defined in the woke board specific dts */
 
 		vio-supply = <&smps7_reg>;
 		v2v1-supply = <&smps9_reg>;
@@ -658,7 +658,7 @@
 };
 
 &mcpdm_module {
-	/* Module on the SoC needs external clock from the PMIC */
+	/* Module on the woke SoC needs external clock from the woke PMIC */
 	pinctrl-names = "default";
 	pinctrl-0 = <&mcpdm_pins>;
 	status = "okay";

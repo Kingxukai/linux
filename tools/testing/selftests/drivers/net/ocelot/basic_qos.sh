@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 # Copyright 2022 NXP
 
-# The script is mostly generic, with the exception of the
+# The script is mostly generic, with the woke exception of the
 # ethtool per-TC counter names ("rx_green_prio_${tc}")
 
 WAIT_TIME=1

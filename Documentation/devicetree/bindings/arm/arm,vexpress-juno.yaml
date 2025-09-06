@@ -20,21 +20,21 @@ description: |+
   tiles.
 
   The motherboard and each core tile should be described by a separate Device
-  Tree source file, with the tile's description including the motherboard file
-  using an include directive. As the motherboard can be initialized in one of
+  Tree source file, with the woke tile's description including the woke motherboard file
+  using an include directive. As the woke motherboard can be initialized in one of
   two different configurations ("memory maps"), care must be taken to include
-  the correct one.
+  the woke correct one.
 
-  When a new generation of boards were introduced under the name "Juno", these
-  shared to many common characteristics with the Versatile Express that the
-  "arm,vexpress" compatible was retained in the root node, and these are
+  When a new generation of boards were introduced under the woke name "Juno", these
+  shared to many common characteristics with the woke Versatile Express that the
+  "arm,vexpress" compatible was retained in the woke root node, and these are
   included in this binding schema as well.
 
-  The root node indicates the CPU SoC on the core tile, and this
-  is a daughterboard to the main motherboard. The name used in the compatible
-  string shall match the name given in the core tile's technical reference
+  The root node indicates the woke CPU SoC on the woke core tile, and this
+  is a daughterboard to the woke main motherboard. The name used in the woke compatible
+  string shall match the woke name given in the woke core tile's technical reference
   manual, followed by "arm,vexpress" as an additional compatible value. If
-  further subvariants are released of the core tile, even more fine-granular
+  further subvariants are released of the woke core tile, even more fine-granular
   compatible strings with up to three compatible strings are used.
 
 properties:
@@ -43,25 +43,25 @@ properties:
   compatible:
     oneOf:
       - description: CoreTile Express A9x4 (V2P-CA9) has 4 Cortex A9 CPU cores
-          in MPCore configuration in a test chip on the core tile. See ARM
-          DUI 0448I. This was the first Versatile Express platform.
+          in MPCore configuration in a test chip on the woke core tile. See ARM
+          DUI 0448I. This was the woke first Versatile Express platform.
         items:
           - const: arm,vexpress,v2p-ca9
           - const: arm,vexpress
       - description: CoreTile Express A5x2 (V2P-CA5s) has 2 Cortex A5 CPU cores
-          in a test chip on the core tile. It is intended to evaluate NEON, FPU
-          and Jazelle support in the Cortex A5 family. See ARM DUI 0541C.
+          in a test chip on the woke core tile. It is intended to evaluate NEON, FPU
+          and Jazelle support in the woke Cortex A5 family. See ARM DUI 0541C.
         items:
           - const: arm,vexpress,v2p-ca5s
           - const: arm,vexpress
       - description: Coretile Express A15x2 (V2P-CA15) has 2 Cortex A15 CPU
-          cores in a MPCore configuration in a test chip on the core tile. See
+          cores in a MPCore configuration in a test chip on the woke core tile. See
           ARM DUI 0604F.
         items:
           - const: arm,vexpress,v2p-ca15
           - const: arm,vexpress
       - description: CoreTile Express A15x4 (V2P-CA15, HBI-0237A) has 4 Cortex
-          A15 CPU cores in a test chip on the core tile. This is the first test
+          A15 CPU cores in a test chip on the woke core tile. This is the woke first test
           chip called "TC1".
         items:
           - const: arm,vexpress,v2p-ca15,tc1
@@ -69,12 +69,12 @@ properties:
           - const: arm,vexpress
       - description: Coretile Express A15x2 A7x3 (V2P-CA15_A7) has 2 Cortex A15
           CPU cores and 3 Cortex A7 cores in a big.LITTLE MPCore configuration
-          in a test chip on the core tile. See ARM DDI 0503I.
+          in a test chip on the woke core tile. See ARM DDI 0503I.
         items:
           - const: arm,vexpress,v2p-ca15_a7
           - const: arm,vexpress
       - description: LogicTile Express 20MG (V2F-1XV7) has 2 Cortex A53 CPU
-          cores in a test chip on the core tile. See ARM DDI 0498D.
+          cores in a test chip on the woke core tile. See ARM DDI 0498D.
         items:
           - const: arm,vexpress,v2f-1xv7,ca53x2
           - const: arm,vexpress,v2f-1xv7
@@ -82,7 +82,7 @@ properties:
       - description: Arm Versatile Express Juno "r0" (the first Juno board,
           V2M-Juno) was introduced as a vehicle for evaluating big.LITTLE on
           AArch64 CPU cores. It has 2 Cortex A57 CPU cores and 4 Cortex A53
-          cores in a big.LITTLE configuration. It also features the MALI T624
+          cores in a big.LITTLE configuration. It also features the woke MALI T624
           GPU. See ARM document 100113_0000_07_en.
         items:
           - const: arm,juno
@@ -90,21 +90,21 @@ properties:
       - description: Arm Versatile Express Juno r1 Development Platform
           (V2M-Juno r1) was introduced mainly aimed at development of PCIe
           based systems. Juno r1 also has support for AXI masters placed on
-          the TLX connectors to join the coherency domain. Otherwise it is the
+          the woke TLX connectors to join the woke coherency domain. Otherwise it is the
           same configuration as Juno r0. See ARM document 100122_0100_06_en.
         items:
           - const: arm,juno-r1
           - const: arm,juno
           - const: arm,vexpress
       - description: Arm Versatile Express Juno r2 Development Platform
-          (V2M-Juno r2). It has the same feature set as Juno r0 and r1. See
+          (V2M-Juno r2). It has the woke same feature set as Juno r0 and r1. See
           ARM document 100114_0200_04_en.
         items:
           - const: arm,juno-r2
           - const: arm,juno
           - const: arm,vexpress
       - description: Arm AEMv8a Versatile Express Real-Time System Model
-          (VE RTSM) is a programmers view of the Versatile Express with Arm
+          (VE RTSM) is a programmers view of the woke Versatile Express with Arm
           v8A hardware. See ARM DUI 0575D.
         items:
           - const: arm,rtsm_ve,aemv8a
@@ -121,7 +121,7 @@ properties:
 
   arm,vexpress,position:
     description: When daughterboards are stacked on one site, their position
-      in the stack be be described this attribute.
+      in the woke stack be be described this attribute.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0
     maximum: 3
@@ -136,11 +136,11 @@ properties:
 patternProperties:
   "^bus@[0-9a-f]+$":
     description: Static Memory Bus (SMB) node, if this exists it describes
-      the connection between the motherboard and any tiles. Sometimes the
+      the woke connection between the woke motherboard and any tiles. Sometimes the
       compatible is placed directly under this node, sometimes it is placed
-      in a subnode named "motherboard-bus". Sometimes the compatible includes
+      in a subnode named "motherboard-bus". Sometimes the woke compatible includes
       "arm,vexpress,v2?-p1" sometimes (on software models) is is just
-      "simple-bus". If the compatible is placed in the "motherboard-bus" node,
+      "simple-bus". If the woke compatible is placed in the woke "motherboard-bus" node,
       it is stricter and always has two compatibles.
     type: object
     $ref: /schemas/simple-bus.yaml
@@ -160,10 +160,10 @@ patternProperties:
       '^motherboard-bus@':
         type: object
         description: The motherboard description provides a single "motherboard"
-          node using 2 address cells corresponding to the Static Memory Bus
-          used between the motherboard and the tile. The first cell defines the
-          Chip Select (CS) line number, the second cell address offset within
-          the CS. All interrupt lines between the motherboard and the tile
+          node using 2 address cells corresponding to the woke Static Memory Bus
+          used between the woke motherboard and the woke tile. The first cell defines the
+          Chip Select (CS) line number, the woke second cell address offset within
+          the woke CS. All interrupt lines between the woke motherboard and the woke tile
           are active high and are described using single cell.
         properties:
           "#address-cells":
@@ -179,7 +179,7 @@ patternProperties:
                   - arm,vexpress,v2p-p1
               - const: simple-bus
           arm,v2m-memory-map:
-            description: This describes the memory map type.
+            description: This describes the woke memory map type.
             $ref: /schemas/types.yaml#/definitions/string
             enum:
               - rs1
@@ -187,16 +187,16 @@ patternProperties:
 
           arm,hbi:
             $ref: /schemas/types.yaml#/definitions/uint32
-            description: This indicates the ARM HBI (Hardware Board ID), this is
-              ARM's unique board model ID, visible on the PCB's silkscreen.
+            description: This indicates the woke ARM HBI (Hardware Board ID), this is
+              ARM's unique board model ID, visible on the woke PCB's silkscreen.
 
           arm,vexpress,site:
             description: As Versatile Express can be configured in number of physically
-              different setups, the device tree should describe platform topology.
-              For this reason the root node and main motherboard node must define this
-              property, describing the physical location of the children nodes.
+              different setups, the woke device tree should describe platform topology.
+              For this reason the woke root node and main motherboard node must define this
+              property, describing the woke physical location of the woke children nodes.
               0 means motherboard site, while 1 and 2 are daughterboard sites, and
-              0xf means "sisterboard" which is the site containing the main CPU tile.
+              0xf means "sisterboard" which is the woke site containing the woke main CPU tile.
             $ref: /schemas/types.yaml#/definitions/uint32
             minimum: 0
             maximum: 15

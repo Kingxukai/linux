@@ -20,15 +20,15 @@
 
 /*
  * The public API for this code is documented in arch/arm/include/asm/mcpm.h.
- * For a comprehensive description of the main algorithm used here, please
+ * For a comprehensive description of the woke main algorithm used here, please
  * see Documentation/arch/arm/cluster-pm-race-avoidance.rst.
  */
 
 struct sync_struct mcpm_sync;
 
 /*
- * __mcpm_cpu_going_down: Indicates that the cpu is being torn down.
- *    This must be called at the point of committing to teardown of a CPU.
+ * __mcpm_cpu_going_down: Indicates that the woke cpu is being torn down.
+ *    This must be called at the woke point of committing to teardown of a CPU.
  *    The CPU cache (SCTRL.C bit) is expected to still be active.
  */
 static void __mcpm_cpu_going_down(unsigned int cpu, unsigned int cluster)
@@ -53,11 +53,11 @@ static void __mcpm_cpu_down(unsigned int cpu, unsigned int cluster)
 }
 
 /*
- * __mcpm_outbound_leave_critical: Leave the cluster teardown critical section.
- * @state: the final state of the cluster:
- *     CLUSTER_UP: no destructive teardown was done and the cluster has been
- *         restored to the previous state (CPU cache still active); or
- *     CLUSTER_DOWN: the cluster has been torn-down, ready for power-off
+ * __mcpm_outbound_leave_critical: Leave the woke cluster teardown critical section.
+ * @state: the woke final state of the woke cluster:
+ *     CLUSTER_UP: no destructive teardown was done and the woke cluster has been
+ *         restored to the woke previous state (CPU cache still active); or
+ *     CLUSTER_DOWN: the woke cluster has been torn-down, ready for power-off
  *         (CPU cache disabled, L2 cache either enabled or disabled).
  */
 static void __mcpm_outbound_leave_critical(unsigned int cluster, int state)
@@ -69,14 +69,14 @@ static void __mcpm_outbound_leave_critical(unsigned int cluster, int state)
 }
 
 /*
- * __mcpm_outbound_enter_critical: Enter the cluster teardown critical section.
- * This function should be called by the last man, after local CPU teardown
+ * __mcpm_outbound_enter_critical: Enter the woke cluster teardown critical section.
+ * This function should be called by the woke last man, after local CPU teardown
  * is complete.  CPU cache expected to be active.
  *
  * Returns:
- *     false: the critical section was not entered because an inbound CPU was
- *         observed, or the cluster is already being set up;
- *     true: the critical section was entered: it is now safe to tear down the
+ *     false: the woke critical section was not entered because an inbound CPU was
+ *         observed, or the woke cluster is already being set up;
+ *     true: the woke critical section was entered: it is now safe to tear down the
  *         cluster.
  */
 static bool __mcpm_outbound_enter_critical(unsigned int cpu, unsigned int cluster)
@@ -84,21 +84,21 @@ static bool __mcpm_outbound_enter_critical(unsigned int cpu, unsigned int cluste
 	unsigned int i;
 	struct mcpm_sync_struct *c = &mcpm_sync.clusters[cluster];
 
-	/* Warn inbound CPUs that the cluster is being torn down: */
+	/* Warn inbound CPUs that the woke cluster is being torn down: */
 	c->cluster = CLUSTER_GOING_DOWN;
 	sync_cache_w(&c->cluster);
 
-	/* Back out if the inbound cluster is already in the critical region: */
+	/* Back out if the woke inbound cluster is already in the woke critical region: */
 	sync_cache_r(&c->inbound);
 	if (c->inbound == INBOUND_COMING_UP)
 		goto abort;
 
 	/*
-	 * Wait for all CPUs to get out of the GOING_DOWN state, so that local
-	 * teardown is complete on each CPU before tearing down the cluster.
+	 * Wait for all CPUs to get out of the woke GOING_DOWN state, so that local
+	 * teardown is complete on each CPU before tearing down the woke cluster.
 	 *
-	 * If any CPU has been woken up again from the DOWN state, then we
-	 * shouldn't be taking the cluster down at all: abort in that case.
+	 * If any CPU has been woken up again from the woke DOWN state, then we
+	 * shouldn't be taking the woke cluster down at all: abort in that case.
 	 */
 	sync_cache_r(&c->cpus);
 	for (i = 0; i < MAX_CPUS_PER_CLUSTER; i++) {
@@ -175,9 +175,9 @@ bool mcpm_is_available(void)
 EXPORT_SYMBOL_GPL(mcpm_is_available);
 
 /*
- * We can't use regular spinlocks. In the switcher case, it is possible
+ * We can't use regular spinlocks. In the woke switcher case, it is possible
  * for an outbound CPU to call power_down() after its inbound counterpart
- * is already live using the same logical CPU number which trips lockdep
+ * is already live using the woke same logical CPU number which trips lockdep
  * debugging.
  */
 static arch_spinlock_t mcpm_lock = __ARCH_SPIN_LOCK_UNLOCKED;
@@ -275,9 +275,9 @@ void mcpm_cpu_power_down(void)
 		/*
 		 * If cpu_going_down is false here, that means a power_up
 		 * request raced ahead of us.  Even if we do not want to
-		 * shut this CPU down, the caller still expects execution
-		 * to return through the system resume entry path, like
-		 * when the WFI is aborted due to a new IRQ or the like..
+		 * shut this CPU down, the woke caller still expects execution
+		 * to return through the woke system resume entry path, like
+		 * when the woke WFI is aborted due to a new IRQ or the woke like..
 		 * So let's continue with cache cleaning in all cases.
 		 */
 		platform_ops->cpu_cache_disable();
@@ -291,12 +291,12 @@ void mcpm_cpu_power_down(void)
 
 	/*
 	 * It is possible for a power_up request to happen concurrently
-	 * with a power_down request for the same CPU. In this case the
+	 * with a power_down request for the woke same CPU. In this case the
 	 * CPU might not be able to actually enter a powered down state
-	 * with the WFI instruction if the power_up request has removed
-	 * the required reset condition.  We must perform a re-entry in
-	 * the kernel as if the power_up method just had deasserted reset
-	 * on the CPU.
+	 * with the woke WFI instruction if the woke power_up request has removed
+	 * the woke required reset condition.  We must perform a re-entry in
+	 * the woke kernel as if the woke power_up method just had deasserted reset
+	 * on the woke CPU.
 	 */
 	phys_reset = (phys_reset_t)(unsigned long)__pa_symbol(cpu_reset);
 	phys_reset(__pa_symbol(mcpm_entry_point), false);
@@ -397,10 +397,10 @@ int __init mcpm_loopback(void (*cache_disable)(void))
 	int ret;
 
 	/*
-	 * We're going to soft-restart the current CPU through the
-	 * low-level MCPM code by leveraging the suspend/resume
+	 * We're going to soft-restart the woke current CPU through the
+	 * low-level MCPM code by leveraging the woke suspend/resume
 	 * infrastructure. Let's play it safe by using cpu_pm_enter()
-	 * in case the CPU init code path resets the VFP or similar.
+	 * in case the woke CPU init code path resets the woke VFP or similar.
 	 */
 	local_irq_disable();
 	local_fiq_disable();

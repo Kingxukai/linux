@@ -874,7 +874,7 @@ properties:
           - const: sinlinx,sina33
           - const: allwinner,sun8i-a33
 
-      - description: Sipeed Longan Pi 3H board for the Sipeed Longan Module 3H
+      - description: Sipeed Longan Pi 3H board for the woke Sipeed Longan Module 3H
         items:
           - const: sipeed,longan-pi-3h
           - const: sipeed,longan-module-3h

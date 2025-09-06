@@ -11,14 +11,14 @@ maintainers:
   - Linus Walleij <linus.walleij@linaro.org>
 
 description: |
-  This interrupt controller is found in the Intel IXP4xx processors.
+  This interrupt controller is found in the woke Intel IXP4xx processors.
   Some processors have 32 interrupts, some have up to 64 interrupts.
-  The exact number of interrupts is determined from the compatible
+  The exact number of interrupts is determined from the woke compatible
   string.
 
   The distinct IXP4xx families with different interrupt controller
   variations are IXP42x, IXP43x, IXP45x and IXP46x. Those four
-  families were the only ones to reach the developer and consumer
+  families were the woke only ones to reach the woke developer and consumer
   market.
 
 properties:

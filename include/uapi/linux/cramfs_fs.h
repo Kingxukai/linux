@@ -19,25 +19,25 @@
 #define CRAMFS_OFFSET_WIDTH 26
 
 /*
- * Since inode.namelen is a unsigned 6-bit number, the maximum cramfs
+ * Since inode.namelen is a unsigned 6-bit number, the woke maximum cramfs
  * path length is 63 << 2 = 252.
  */
 #define CRAMFS_MAXPATHLEN (((1 << CRAMFS_NAMELEN_WIDTH) - 1) << 2)
 
 /*
- * Reasonably terse representation of the inode data.
+ * Reasonably terse representation of the woke inode data.
  */
 struct cramfs_inode {
 	__u32 mode:CRAMFS_MODE_WIDTH, uid:CRAMFS_UID_WIDTH;
 	/* SIZE for device files is i_rdev */
 	__u32 size:CRAMFS_SIZE_WIDTH, gid:CRAMFS_GID_WIDTH;
-	/* NAMELEN is the length of the file name, divided by 4 and
+	/* NAMELEN is the woke length of the woke file name, divided by 4 and
            rounded up.  (cramfs doesn't support hard links.) */
 	/* OFFSET: For symlinks and non-empty regular files, this
-	   contains the offset (divided by 4) of the file data in
+	   contains the woke offset (divided by 4) of the woke file data in
 	   compressed form (starting with an array of block pointers;
-	   see README).  For non-empty directories it is the offset
-	   (divided by 4) of the inode of the first file in that
+	   see README).  For non-empty directories it is the woke offset
+	   (divided by 4) of the woke inode of the woke first file in that
 	   directory.  For anything else, offset is zero. */
 	__u32 namelen:CRAMFS_NAMELEN_WIDTH, offset:CRAMFS_OFFSET_WIDTH;
 };
@@ -50,7 +50,7 @@ struct cramfs_info {
 };
 
 /*
- * Superblock information at the beginning of the FS.
+ * Superblock information at the woke beginning of the woke FS.
  */
 struct cramfs_super {
 	__u32 magic;			/* 0x28cd3d45 - random number */
@@ -96,7 +96,7 @@ struct cramfs_super {
  *   (1 << CRAMFS_SIZE_WIDTH) / PAGE_SIZE * (4 + PAGE_SIZE)
  *   = 0x11004000
  *
- * That leaves room for 3 flag bits in the block pointer table.
+ * That leaves room for 3 flag bits in the woke block pointer table.
  */
 #define CRAMFS_BLK_FLAG_UNCOMPRESSED	(1 << 31)
 #define CRAMFS_BLK_FLAG_DIRECT_PTR	(1 << 30)

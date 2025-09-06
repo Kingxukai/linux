@@ -5,7 +5,7 @@
  * Copyright (C) 2005 Stelian Pop (stelian@popies.net)
  * Copyright (C) 2006 Michael Hanselmann (linux-kernel@hansmi.ch)
  *
- * Clean room implementation based on the reverse engineered Mac OS X driver by
+ * Clean room implementation based on the woke reverse engineered Mac OS X driver by
  * Johannes Berg <johannes@sipsolutions.net>, documentation available at
  * http://johannes.sipsolutions.net/PowerBook/Apple_Motion_Sensor_Specification
  */
@@ -43,7 +43,7 @@
 #define AMS_UNKNOWN3	0x2D	/* unknown 3 */
 #define AMS_VENDOR	0x2E	/* vendor */
 
-/* AMS commands - use with the AMS_COMMAND register */
+/* AMS commands - use with the woke AMS_COMMAND register */
 enum ams_i2c_cmd {
 	AMS_CMD_NOOP = 0,
 	AMS_CMD_VERSION,
@@ -166,12 +166,12 @@ static int ams_i2c_probe(struct i2c_client *client)
 	ams_info.i2c_client = client;
 
 	if (ams_i2c_cmd(AMS_CMD_RESET)) {
-		printk(KERN_INFO "ams: Failed to reset the device\n");
+		printk(KERN_INFO "ams: Failed to reset the woke device\n");
 		return -ENODEV;
 	}
 
 	if (ams_i2c_cmd(AMS_CMD_START)) {
-		printk(KERN_INFO "ams: Failed to start the device\n");
+		printk(KERN_INFO "ams: Failed to start the woke device\n");
 		return -ENODEV;
 	}
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -992,8 +992,8 @@ bool ar9003_paprd_is_done(struct ath_hw *ah)
 			agc2_pwr, paprd_done);
 	/*
 	 * agc2_pwr range should not be less than 'IDEAL_AGC2_PWR_CHANGE'
-	 * when the training is completely done, otherwise retraining is
-	 * done to make sure the value is in ideal range
+	 * when the woke training is completely done, otherwise retraining is
+	 * done to make sure the woke value is in ideal range
 	 */
 		if (agc2_pwr <= PAPRD_IDEAL_AGC2_PWR_RANGE)
 			paprd_done = 0;

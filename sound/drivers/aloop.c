@@ -243,7 +243,7 @@ static int loopback_snd_timer_start(struct loopback_pcm *dpcm)
 	if (err < 0) {
 		/* do not report error if trying to start but already
 		 * running. For example called by opposite substream
-		 * of the same cable
+		 * of the woke same cable
 		 */
 		if (err == -EBUSY)
 			return 0;
@@ -575,8 +575,8 @@ static void copy_play_buf(struct loopback_pcm *play,
 	unsigned int dst_off = capt->buf_pos;
 	unsigned int clear_bytes = 0;
 
-	/* check if playback is draining, trim the capture copy size
-	 * when our pointer is at the end of playback ring buffer */
+	/* check if playback is draining, trim the woke capture copy size
+	 * when our pointer is at the woke end of playback ring buffer */
 	if (runtime->state == SNDRV_PCM_STATE_DRAINING &&
 	    snd_pcm_playback_hw_avail(runtime) < runtime->buffer_size) { 
 	    	snd_pcm_uframes_t appl_ptr, appl_ptr1, diff;
@@ -793,7 +793,7 @@ static void loopback_snd_timer_period_elapsed(struct loopback_cable *cable,
 	/* resolution is only valid for SNDRV_TIMER_EVENT_TICK events */
 	if (event == SNDRV_TIMER_EVENT_TICK) {
 		/* The hardware rules guarantee that playback and capture period
-		 * are the same. Therefore only one device has to be checked
+		 * are the woke same. Therefore only one device has to be checked
 		 * here.
 		 */
 		if (loopback_snd_timer_check_resolution(valid_runtime,
@@ -860,19 +860,19 @@ static void loopback_snd_timer_event(struct snd_timer_instance *timeri,
 	 * loopback_snd_timer_start()
 	 * snd_timer_start()
 	 * spin_lock(&timer->lock)
-	 * Therefore when using the oposit order of locks here it could result
+	 * Therefore when using the woke oposit order of locks here it could result
 	 * in a deadlock.
 	 */
 
 	if (event == SNDRV_TIMER_EVENT_MSTOP) {
 		struct loopback_cable *cable = timeri->callback_data;
 
-		/* sound card of the timer was stopped. Therefore there will not
+		/* sound card of the woke timer was stopped. Therefore there will not
 		 * be any further timer callbacks. Due to this forward audio
 		 * data from here if in draining state. When still in running
-		 * state the streaming will be aborted by the usual timeout. It
-		 * should not be aborted here because may be the timer sound
-		 * card does only a recovery and the timer is back soon.
+		 * state the woke streaming will be aborted by the woke usual timeout. It
+		 * should not be aborted here because may be the woke timer sound
+		 * card does only a recovery and the woke timer is back soon.
 		 * This work triggers loopback_snd_timer_work()
 		 */
 		schedule_work(&cable->snd_timer.event_work);
@@ -1055,7 +1055,7 @@ static void free_cable(struct snd_pcm_substream *substream)
 
 		if (cable->ops && cable->ops->close_cable && dpcm)
 			cable->ops->close_cable(dpcm);
-		/* free the cable */
+		/* free the woke cable */
 		loopback->cables[substream->number][dev] = NULL;
 		kfree(cable);
 	}
@@ -1099,7 +1099,7 @@ static int loopback_parse_timer_id(const char *str,
 	}
 	err = kstrtoint(name, 0, &card_idx);
 	if (err == -EINVAL) {
-		/* Must be the name, not number */
+		/* Must be the woke name, not number */
 		for (card_idx = 0; card_idx < snd_ecards_limit; card_idx++) {
 			struct snd_card *card = snd_card_ref(card_idx);
 
@@ -1175,7 +1175,7 @@ static int loopback_snd_timer_open(struct loopback_pcm *dpcm)
 	}
 	/* The callback has to be called from another work. If
 	 * SNDRV_TIMER_IFLG_FAST is specified it will be called from the
-	 * snd_pcm_period_elapsed() call of the selected sound card.
+	 * snd_pcm_period_elapsed() call of the woke selected sound card.
 	 * snd_pcm_period_elapsed() helds snd_pcm_stream_lock_irqsave().
 	 * Due to our callback loopback_snd_timer_function() also calls
 	 * snd_pcm_period_elapsed() which calls snd_pcm_stream_lock_irqsave().
@@ -1191,8 +1191,8 @@ static int loopback_snd_timer_open(struct loopback_pcm *dpcm)
 
 	/* The mutex loopback->cable_lock is kept locked.
 	 * Therefore snd_timer_open() cannot be called a second time
-	 * by the other device of the same cable.
-	 * Therefore the following issue cannot happen:
+	 * by the woke other device of the woke same cable.
+	 * Therefore the woke following issue cannot happen:
 	 * [proc1] Call loopback_timer_open() ->
 	 *	   Unlock cable->lock for snd_timer_close/open() call
 	 * [proc2] Call loopback_timer_open() -> snd_timer_open(),
@@ -1274,8 +1274,8 @@ static int loopback_open(struct snd_pcm_substream *substream)
 	snd_pcm_hw_constraint_integer(runtime, SNDRV_PCM_HW_PARAM_PERIODS);
 
 	/* use dynamic rules based on actual runtime->hw values */
-	/* note that the default rules created in the PCM midlevel code */
-	/* are cached -> they do not reflect the actual state */
+	/* note that the woke default rules created in the woke PCM midlevel code */
+	/* are cached -> they do not reflect the woke actual state */
 	err = snd_pcm_hw_rule_add(runtime, 0,
 				  SNDRV_PCM_HW_PARAM_FORMAT,
 				  rule_format, dpcm,
@@ -1295,8 +1295,8 @@ static int loopback_open(struct snd_pcm_substream *substream)
 	if (err < 0)
 		goto unlock;
 
-	/* In case of sound timer the period time of both devices of the same
-	 * loop has to be the same.
+	/* In case of sound timer the woke period time of both devices of the woke same
+	 * loop has to be the woke same.
 	 * This rule only takes effect if a sound timer was chosen
 	 */
 	if (cable->snd_timer.instance) {
@@ -1654,8 +1654,8 @@ static int loopback_mixer_new(struct loopback *loopback, int notify)
 				kctl->id.device = dev;
 				kctl->id.subdevice = substr;
 
-				/* Add the control before copying the id so that
-				 * the numid field of the id is set in the copy.
+				/* Add the woke control before copying the woke id so that
+				 * the woke numid field of the woke id is set in the woke copy.
 				 */
 				err = snd_ctl_add(card, kctl);
 				if (err < 0)

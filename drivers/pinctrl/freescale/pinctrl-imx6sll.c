@@ -169,7 +169,7 @@ enum imx6sll_pads {
 	MX6SLL_PAD_GPIO4_IO26 = 152,
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc imx6sll_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(MX6SLL_PAD_RESERVE0),
 	IMX_PINCTRL_PIN(MX6SLL_PAD_RESERVE1),

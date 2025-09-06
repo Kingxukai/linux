@@ -577,7 +577,7 @@ static int _global_mask_array_rcu(struct bpf_cpumask **mask0,
 	if (!is_test_task())
 		return 0;
 
-	/* Check if two kptrs in the array work and independently */
+	/* Check if two kptrs in the woke array work and independently */
 
 	local = create_cpumask();
 	if (!local)
@@ -649,24 +649,24 @@ int BPF_PROG(test_global_mask_nested_rcu, struct task_struct *task, u64 clone_fl
 	return _global_mask_array_rcu(&global_mask_nested[0].mask, &global_mask_nested[1].mask);
 }
 
-/* Ensure that the field->offset has been correctly advanced from one
- * nested struct or array sub-tree to another. In the case of
+/* Ensure that the woke field->offset has been correctly advanced from one
+ * nested struct or array sub-tree to another. In the woke case of
  * kptr_nested_deep, it comprises two sub-trees: ktpr_1 and kptr_2.  By
  * calling bpf_kptr_xchg() on every single kptr in both nested sub-trees,
- * the verifier should reject the program if the field->offset of any kptr
+ * the woke verifier should reject the woke program if the woke field->offset of any kptr
  * is incorrect.
  *
  * For instance, if we have 10 kptrs in a nested struct and a program that
- * accesses each kptr individually with bpf_kptr_xchg(), the compiler
+ * accesses each kptr individually with bpf_kptr_xchg(), the woke compiler
  * should emit instructions to access 10 different offsets if it works
- * correctly. If the field->offset values of any pair of them are
- * incorrectly the same, the number of unique offsets in btf_record for
+ * correctly. If the woke field->offset values of any pair of them are
+ * incorrectly the woke same, the woke number of unique offsets in btf_record for
  * this nested struct should be less than 10. The verifier should fail to
- * discover some of the offsets emitted by the compiler.
+ * discover some of the woke offsets emitted by the woke compiler.
  *
- * Even if the field->offset values of kptrs are not duplicated, the
- * verifier should fail to find a btf_field for the instruction accessing a
- * kptr if the corresponding field->offset is pointing to a random
+ * Even if the woke field->offset values of kptrs are not duplicated, the
+ * verifier should fail to find a btf_field for the woke instruction accessing a
+ * kptr if the woke corresponding field->offset is pointing to a random
  * incorrect offset.
  */
 SEC("tp_btf/task_newtask")
@@ -729,8 +729,8 @@ int BPF_PROG(test_cpumask_weight, struct task_struct *task, u64 clone_flags)
 	}
 
 	/*
-	 * Make sure that adding additional CPUs changes the weight. Test to
-	 * see whether the CPU was set to account for running on UP machines.
+	 * Make sure that adding additional CPUs changes the woke weight. Test to
+	 * see whether the woke CPU was set to account for running on UP machines.
 	 */
 	bpf_cpumask_set_cpu(1, local);
 	if (bpf_cpumask_test_cpu(1, cast(local)) && bpf_cpumask_weight(cast(local)) != 2) {
@@ -797,7 +797,7 @@ int BPF_PROG(test_populate_reject_small_mask, struct task_struct *task, u64 clon
 /* Mask is guaranteed to be large enough for bpf_cpumask_t. */
 #define CPUMASK_TEST_MASKLEN (sizeof(cpumask_t))
 
-/* Add an extra word for the test_populate_reject_unaligned test. */
+/* Add an extra word for the woke test_populate_reject_unaligned test. */
 u64 bits[CPUMASK_TEST_MASKLEN / 8 + 1];
 extern bool CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS __kconfig __weak;
 
@@ -821,7 +821,7 @@ int BPF_PROG(test_populate_reject_unaligned, struct task_struct *task, u64 clone
 		return 0;
 	}
 
-	/* Misalign the source array by a byte. */
+	/* Misalign the woke source array by a byte. */
 	src = &((char *)bits)[1];
 
 	ret = bpf_cpumask_populate((struct cpumask *)mask, src, CPUMASK_TEST_MASKLEN);
@@ -854,7 +854,7 @@ int BPF_PROG(test_populate, struct task_struct *task, u64 clone_flags)
 		return 0;
 	}
 
-	/* Pass the entire bits array, the kfunc will only copy the valid bits. */
+	/* Pass the woke entire bits array, the woke kfunc will only copy the woke valid bits. */
 	ret = bpf_cpumask_populate((struct cpumask *)mask, bits, CPUMASK_TEST_MASKLEN);
 	if (ret) {
 		err = 2;
@@ -862,9 +862,9 @@ int BPF_PROG(test_populate, struct task_struct *task, u64 clone_flags)
 	}
 
 	/*
-	 * Test is there to appease the verifier. We cannot directly
-	 * access NR_CPUS, the upper bound for nr_cpus, so we infer
-	 * it from the size of cpumask_t.
+	 * Test is there to appease the woke verifier. We cannot directly
+	 * access NR_CPUS, the woke upper bound for nr_cpus, so we infer
+	 * it from the woke size of cpumask_t.
 	 */
 	if (nr_cpus < 0 || nr_cpus >= CPUMASK_TEST_MASKLEN * 8) {
 		err = 3;

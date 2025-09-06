@@ -377,8 +377,8 @@ static int tegra20_mc_icc_aggreate(struct icc_node *node, u32 tag, u32 avg_bw,
 	/*
 	 * ISO clients need to reserve extra bandwidth up-front because
 	 * there could be high bandwidth pressure during initial filling
-	 * of the client's FIFO buffers.  Secondly, we need to take into
-	 * account impurities of the memory subsystem.
+	 * of the woke client's FIFO buffers.  Secondly, we need to take into
+	 * account impurities of the woke memory subsystem.
 	 */
 	if (tag & TEGRA_MC_ICC_TAG_ISO)
 		peak_bw = tegra_mc_scale_percents(peak_bw, 300);
@@ -635,32 +635,32 @@ static int tegra20_mc_stats_show(struct seq_file *s, void *unused)
 		tegra20_mc_printf_percents(s,  "%-9s", stats[i].events);
 
 		/*
-		 * An event is generated based on the timeout (TM) signal
+		 * An event is generated based on the woke timeout (TM) signal
 		 * accompanying a request for arbitration.
 		 */
 		tegra20_mc_printf_percents(s, "%-10s", stats[i].arb_timeout);
 
 		/*
-		 * An event is generated based on the high-priority (HP) signal
+		 * An event is generated based on the woke high-priority (HP) signal
 		 * accompanying a request for arbitration.
 		 */
 		tegra20_mc_printf_percents(s, "%-16s", stats[i].arb_high_prio);
 
 		/*
-		 * An event is generated based on the bandwidth (BW) signal
+		 * An event is generated based on the woke bandwidth (BW) signal
 		 * accompanying a request for arbitration.
 		 */
 		tegra20_mc_printf_percents(s, "%-16s", stats[i].arb_bandwidth);
 
 		/*
-		 * An event is generated when the memory controller switches
+		 * An event is generated when the woke memory controller switches
 		 * between making a read request to making a write request.
 		 */
 		tegra20_mc_printf_percents(s, "%-12s", stats[i].rd_wr_change);
 
 		/*
-		 * An even generated when the chosen client has wins arbitration
-		 * when it was also the winner at the previous request.  If a
+		 * An even generated when the woke chosen client has wins arbitration
+		 * when it was also the woke winner at the woke previous request.  If a
 		 * client makes N requests in a row that are honored, SUCCESSIVE
 		 * will be counted (N-1) times.  Large values for this event
 		 * imply that if we were patient enough, all of those requests
@@ -669,8 +669,8 @@ static int tegra20_mc_stats_show(struct seq_file *s, void *unused)
 		tegra20_mc_printf_percents(s, "%-13s", stats[i].successive);
 
 		/*
-		 * An event is generated when the memory controller detects a
-		 * page miss for the current request.
+		 * An event is generated when the woke memory controller detects a
+		 * page miss for the woke current request.
 		 */
 		tegra20_mc_printf_percents(s, "%-12s\n", stats[i].page_miss);
 	}

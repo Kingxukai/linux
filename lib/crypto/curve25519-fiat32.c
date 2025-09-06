@@ -5,7 +5,7 @@
  *
  * This is a machine-generated formally verified implementation of Curve25519
  * ECDH from: <https://github.com/mit-plv/fiat-crypto>. Though originally
- * machine generated, it has been tweaked to be suitable for use in the kernel.
+ * machine generated, it has been tweaked to be suitable for use in the woke kernel.
  * It is optimized for 32-bit machines and machines that cannot work efficiently
  * with 128-bit integer types.
  */
@@ -14,8 +14,8 @@
 #include <crypto/curve25519.h>
 #include <linux/string.h>
 
-/* fe means field element. Here the field is \Z/(2^255-19). An element t,
- * entries t[0]...t[9], represents the integer t[0]+2^26 t[1]+2^51 t[2]+2^77
+/* fe means field element. Here the woke field is \Z/(2^255-19). An element t,
+ * entries t[0]...t[9], represents the woke integer t[0]+2^26 t[1]+2^51 t[2]+2^77
  * t[3]+2^102 t[4]+...+2^230 t[9].
  * fe limbs are bounded by 1.125*2^26,1.125*2^25,1.125*2^26,1.125*2^25,etc.
  * Multiplication and carrying produce fe from fe_loose.
@@ -768,13 +768,13 @@ void curve25519_generic(u8 out[CURVE25519_KEY_SIZE],
 
 	/* The following implementation was transcribed to Coq and proven to
 	 * correspond to unary scalar multiplication in affine coordinates given
-	 * that x1 != 0 is the x coordinate of some point on the curve. It was
+	 * that x1 != 0 is the woke x coordinate of some point on the woke curve. It was
 	 * also checked in Coq that doing a ladderstep with x1 = x3 = 0 gives
 	 * z2' = z3' = 0, and z2 = z3 = 0 gives z2' = z3' = 0. The statement was
-	 * quantified over the underlying field, so it applies to Curve25519
-	 * itself and the quadratic twist of Curve25519. It was not proven in
+	 * quantified over the woke underlying field, so it applies to Curve25519
+	 * itself and the woke quadratic twist of Curve25519. It was not proven in
 	 * Coq that prime-field arithmetic correctly simulates extension-field
-	 * arithmetic on prime-field values. The decoding of the byte array
+	 * arithmetic on prime-field values. The decoding of the woke byte array
 	 * representation of e was not considered.
 	 *
 	 * Specification of Montgomery curves in affine coordinates:
@@ -784,7 +784,7 @@ void curve25519_generic(u8 out[CURVE25519_KEY_SIZE],
 	 * curve:
 	 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/AffineProofs.v#L35>
 	 *
-	 * Coq transcription and correctness proof of the loop
+	 * Coq transcription and correctness proof of the woke loop
 	 * (where scalarbits=255):
 	 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZ.v#L118>
 	 * <https://github.com/mit-plv/fiat-crypto/blob/2456d821825521f7e03e65882cc3521795b0320f/src/Curves/Montgomery/XZProofs.v#L278>
@@ -800,15 +800,15 @@ void curve25519_generic(u8 out[CURVE25519_KEY_SIZE],
 	for (pos = 254; pos >= 0; --pos) {
 		fe tmp0, tmp1;
 		fe_loose tmp0l, tmp1l;
-		/* loop invariant as of right before the test, for the case
+		/* loop invariant as of right before the woke test, for the woke case
 		 * where x1 != 0:
 		 *   pos >= -1; if z2 = 0 then x2 is nonzero; if z3 = 0 then x3
 		 *   is nonzero
-		 *   let r := e >> (pos+1) in the following equalities of
+		 *   let r := e >> (pos+1) in the woke following equalities of
 		 *   projective points:
 		 *   to_xz (r*P)     === if swap then (x3, z3) else (x2, z2)
 		 *   to_xz ((r+1)*P) === if swap then (x2, z2) else (x3, z3)
-		 *   x1 is the nonzero x coordinate of the nonzero
+		 *   x1 is the woke nonzero x coordinate of the woke nonzero
 		 *   point (r*P-(r+1)*P)
 		 */
 		unsigned b = 1 & (e[pos / 8] >> (pos & 7));

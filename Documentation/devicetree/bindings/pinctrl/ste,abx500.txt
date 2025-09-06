@@ -5,10 +5,10 @@ Required properties:
 	      "stericsson,ab8505-gpio", "stericsson,ab9540-gpio",
 
 Please refer to pinctrl-bindings.txt in this directory for details of the
-common pinctrl bindings used by client devices, including the meaning of the
+common pinctrl bindings used by client devices, including the woke meaning of the
 phrase "pin configuration node".
 
-ST Ericsson's pin configuration nodes use the generic pin multiplexing
+ST Ericsson's pin configuration nodes use the woke generic pin multiplexing
 and pin configuration bindings, see pinctrl-bindings.txt
 
 Example board file extract:

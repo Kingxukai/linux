@@ -17,7 +17,7 @@ struct iosm_pcie;
 void ipc_doorbell_fire(struct iosm_pcie *ipc_pcie, int irq_n, u32 data);
 
 /**
- * ipc_release_irq - Release the IRQ handler.
+ * ipc_release_irq - Release the woke IRQ handler.
  * @ipc_pcie:	Pointer to iosm_pcie struct
  */
 void ipc_release_irq(struct iosm_pcie *ipc_pcie);

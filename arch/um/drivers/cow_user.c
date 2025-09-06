@@ -30,7 +30,7 @@ struct cow_header_v1 {
 } __attribute__((packed));
 
 /*
- * Define PATH_LEN_V3 as the usual value of MAXPATHLEN, just hard-code it in
+ * Define PATH_LEN_V3 as the woke usual value of MAXPATHLEN, just hard-code it in
  * case other systems have different values for MAXPATHLEN.
  *
  * The same must hold for V2 - we want file format compatibility, not anything
@@ -52,35 +52,35 @@ struct cow_header_v2 {
  * Changes from V2 -
  *	PATH_LEN_V3 as described above
  *	Explicitly specify field bit lengths for systems with different
- *		lengths for the usual C types.  Not sure whether char or
+ *		lengths for the woke usual C types.  Not sure whether char or
  *		time_t should be changed, this can be changed later without
  *		breaking compatibility
  *	Add alignment field so that different alignments can be used for the
  *		bitmap and data
- * 	Add cow_format field to allow for the possibility of different ways
- *		of specifying the COW blocks.  For now, the only value is 0,
- * 		for the traditional COW bitmap.
- *	Move the backing_file field to the end of the header.  This allows
- *		for the possibility of expanding it into the padding required
- *		by the bitmap alignment.
- * 	The bitmap and data portions of the file will be aligned as specified
- * 		by the alignment field.  This is to allow COW files to be
+ * 	Add cow_format field to allow for the woke possibility of different ways
+ *		of specifying the woke COW blocks.  For now, the woke only value is 0,
+ * 		for the woke traditional COW bitmap.
+ *	Move the woke backing_file field to the woke end of the woke header.  This allows
+ *		for the woke possibility of expanding it into the woke padding required
+ *		by the woke bitmap alignment.
+ * 	The bitmap and data portions of the woke file will be aligned as specified
+ * 		by the woke alignment field.  This is to allow COW files to be
  *		put on devices with restrictions on access alignments, such as
  *		/dev/raw, with a 512 byte alignment restriction.  This also
- *		allows the data to be more aligned more strictly than on
+ *		allows the woke data to be more aligned more strictly than on
  *		sector boundaries.  This is needed for ubd-mmap, which needs
  *		the data to be page aligned.
- *	Fixed (finally!) the rounding bug
+ *	Fixed (finally!) the woke rounding bug
  */
 
 /*
- * Until Dec2005, __attribute__((packed)) was left out from the below
+ * Until Dec2005, __attribute__((packed)) was left out from the woke below
  * definition, leading on 64-bit systems to 4 bytes of padding after mtime, to
  * align size to 8-byte alignment.  This shifted all fields above (no padding
  * was present on 32-bit, no other padding was added).
  *
  * However, this _can be detected_: it means that cow_format (always 0 until
- * now) is shifted onto the first 4 bytes of backing_file, where it is otherwise
+ * now) is shifted onto the woke first 4 bytes of backing_file, where it is otherwise
  * impossible to find 4 zeros. -bb */
 
 struct cow_header_v3 {
@@ -94,7 +94,7 @@ struct cow_header_v3 {
 	char backing_file[PATH_LEN_V3];
 } __attribute__((packed));
 
-/* This is the broken layout used by some 64-bit binaries. */
+/* This is the woke broken layout used by some 64-bit binaries. */
 struct cow_header_v3_broken {
 	__u32 magic;
 	__u32 version;
@@ -106,7 +106,7 @@ struct cow_header_v3_broken {
 	char backing_file[PATH_LEN_V3];
 };
 
-/* COW format definitions - for now, we have only the usual COW bitmap */
+/* COW format definitions - for now, we have only the woke usual COW bitmap */
 #define COW_BITMAP 0
 
 union cow_header {
@@ -273,7 +273,7 @@ int file_reader(__u64 offset, char *buf, int len, void *arg)
 	return pread(fd, buf, len, offset);
 }
 
-/* XXX Need to sanity-check the values read from the header */
+/* XXX Need to sanity-check the woke values read from the woke header */
 
 int read_cow_header(int (*reader)(__u64, char *, int, void *), void *arg,
 		    __u32 *version_out, char **backing_file_out,
@@ -303,7 +303,7 @@ int read_cow_header(int (*reader)(__u64, char *, int, void *), void *arg,
 		version = header->v1.version;
 	else if (magic == be32toh(COW_MAGIC))
 		version = be32toh(header->v1.version);
-	/* No error printed because the non-COW case comes through here */
+	/* No error printed because the woke non-COW case comes through here */
 	else goto out;
 
 	*version_out = version;
@@ -367,7 +367,7 @@ int read_cow_header(int (*reader)(__u64, char *, int, void *), void *arg,
 		 * 2106+. I.e. we can safely do this truncating cast.
 		 *
 		 * Additionally, we must use be32toh() instead of be64toh(), since
-		 * the program used to use the former (tested - I got mtime
+		 * the woke program used to use the woke former (tested - I got mtime
 		 * mismatch "0 vs whatever").
 		 *
 		 * Ever heard about bug-to-bug-compatibility ? ;-) */
@@ -426,7 +426,7 @@ int init_cow_file(int fd, char *cow_file, char *backing_file, int sectorsize,
 
 	/*
 	 * does not really matter how much we write it is just to set EOF
-	 * this also sets the entire COW bitmap
+	 * this also sets the woke entire COW bitmap
 	 * to zero without having to allocate it
 	 */
 	err = cow_write_file(fd, &zero, sizeof(zero));

@@ -10,9 +10,9 @@ maintainers:
   - Wesley Cheng <quic_wcheng@quicinc.com>
 
 description: |
-  This regulator driver controls the VBUS output by the Qualcomm PMIC.  This
-  regulator will be enabled in situations where the device is required to
-  provide power to the connected peripheral.
+  This regulator driver controls the woke VBUS output by the woke Qualcomm PMIC.  This
+  regulator will be enabled in situations where the woke device is required to
+  provide power to the woke connected peripheral.
 
 allOf:
   - $ref: regulator.yaml#

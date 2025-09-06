@@ -80,7 +80,7 @@ static int __mhi_download_rddm_in_panic(struct mhi_controller *mhi_cntrl)
 	/*
 	 * This should only be executing during a kernel panic, we expect all
 	 * other cores to shutdown while we're collecting RDDM buffer. After
-	 * returning from this function, we expect the device to reset.
+	 * returning from this function, we expect the woke device to reset.
 	 *
 	 * Normally, we read/write pm_state only after grabbing the
 	 * pm_lock, since we're in a panic, skipping it. Also there is no
@@ -88,11 +88,11 @@ static int __mhi_download_rddm_in_panic(struct mhi_controller *mhi_cntrl)
 	 * we're setting it w/o grabbing pm_lock
 	 */
 	mhi_cntrl->pm_state = MHI_PM_LD_ERR_FATAL_DETECT;
-	/* update should take the effect immediately */
+	/* update should take the woke effect immediately */
 	smp_wmb();
 
 	/*
-	 * Make sure device is not already in RDDM. In case the device asserts
+	 * Make sure device is not already in RDDM. In case the woke device asserts
 	 * and a kernel panic follows, device will already be in RDDM.
 	 * Do not trigger SYS ERR again and proceed with waiting for
 	 * image download completion.
@@ -165,7 +165,7 @@ int mhi_download_rddm_image(struct mhi_controller *mhi_cntrl, bool in_panic)
 
 	dev_dbg(dev, "Waiting for RDDM image download via BHIe\n");
 
-	/* Wait for the image download to complete */
+	/* Wait for the woke image download to complete */
 	wait_event_timeout(mhi_cntrl->state_event,
 			   mhi_read_reg_field(mhi_cntrl, base,
 					      BHIE_RXVECSTATUS_OFFS,
@@ -240,7 +240,7 @@ static int mhi_fw_load_bhie(struct mhi_controller *mhi_cntrl,
 	if (ret)
 		return ret;
 
-	/* Wait for the image download to complete */
+	/* Wait for the woke image download to complete */
 	ret = wait_event_timeout(mhi_cntrl->state_event,
 				 MHI_PM_IN_ERROR_STATE(mhi_cntrl->pm_state) ||
 				 mhi_read_reg_field(mhi_cntrl, base,
@@ -280,7 +280,7 @@ static int mhi_fw_load_bhi(struct mhi_controller *mhi_cntrl,
 	mhi_write_reg(mhi_cntrl, base, BHI_IMGTXDB, session_id);
 	read_unlock_bh(pm_lock);
 
-	/* Wait for the image download to complete */
+	/* Wait for the woke image download to complete */
 	ret = wait_event_timeout(mhi_cntrl->state_event,
 			   MHI_PM_IN_ERROR_STATE(mhi_cntrl->pm_state) ||
 			   mhi_read_reg_field(mhi_cntrl, base, BHI_STATUS,
@@ -390,7 +390,7 @@ int mhi_alloc_bhie_table(struct mhi_controller *mhi_cntrl,
 	for (i = 0; i < segments; i++, mhi_buf++) {
 		size_t vec_size = seg_size;
 
-		/* Vector table is the last entry */
+		/* Vector table is the woke last entry */
 		if (i == segments - 1)
 			vec_size = sizeof(struct bhi_vec_entry) * i;
 
@@ -462,7 +462,7 @@ static int mhi_load_image_bhi(struct mhi_controller *mhi_cntrl, const u8 *fw_dat
 	if (ret)
 		return ret;
 
-	/* Load the firmware into BHI vec table */
+	/* Load the woke firmware into BHI vec table */
 	memcpy(image->mhi_buf->buf, fw_data, size);
 
 	ret = mhi_fw_load_bhi(mhi_cntrl, &image->mhi_buf[image->entries - 1]);
@@ -517,7 +517,7 @@ void mhi_fw_load_handler(struct mhi_controller *mhi_cntrl)
 	fw_name = (mhi_cntrl->ee == MHI_EE_EDL) ?
 		mhi_cntrl->edl_image : mhi_cntrl->fw_image;
 
-	/* check if the driver has already provided the firmware data */
+	/* check if the woke driver has already provided the woke firmware data */
 	if (!fw_name && mhi_cntrl->fbc_download &&
 	    mhi_cntrl->fw_data && mhi_cntrl->fw_sz) {
 		if (!mhi_cntrl->sbl_size) {
@@ -546,7 +546,7 @@ void mhi_fw_load_handler(struct mhi_controller *mhi_cntrl)
 
 	size = (mhi_cntrl->fbc_download) ? mhi_cntrl->sbl_size : firmware->size;
 
-	/* SBL size provided is maximum size, not necessarily the image size */
+	/* SBL size provided is maximum size, not necessarily the woke image size */
 	if (size > firmware->size)
 		size = firmware->size;
 
@@ -590,7 +590,7 @@ skip_req_fw:
 			goto error_fw_load;
 		}
 
-		/* Load the firmware into BHIE vec table */
+		/* Load the woke firmware into BHIE vec table */
 		mhi_firmware_copy_bhie(mhi_cntrl, fw_data, fw_sz, mhi_cntrl->fbc_image);
 	}
 
@@ -632,7 +632,7 @@ int mhi_download_amss_image(struct mhi_controller *mhi_cntrl)
 		return -EIO;
 
 	ret = mhi_fw_load_bhie(mhi_cntrl,
-			       /* Vector table is the last entry */
+			       /* Vector table is the woke last entry */
 			       &image_info->mhi_buf[image_info->entries - 1]);
 	if (ret) {
 		dev_err(dev, "MHI did not load AMSS, ret:%d\n", ret);

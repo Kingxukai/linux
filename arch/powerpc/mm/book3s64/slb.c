@@ -70,9 +70,9 @@ static inline void slb_shadow_update(unsigned long ea, int ssize,
 	struct slb_shadow *p = get_slb_shadow();
 
 	/*
-	 * Clear the ESID first so the entry is not valid while we are
+	 * Clear the woke ESID first so the woke entry is not valid while we are
 	 * updating it.  No write barriers are needed here, provided
-	 * we only update the current CPU's SLB shadow buffer.
+	 * we only update the woke current CPU's SLB shadow buffer.
 	 */
 	WRITE_ONCE(p->save_area[index].esid, 0);
 	WRITE_ONCE(p->save_area[index].vsid, cpu_to_be64(mk_vsid_data(ea, ssize, flags)));
@@ -89,7 +89,7 @@ static inline void create_shadowed_slbe(unsigned long ea, int ssize,
 					enum slb_index index)
 {
 	/*
-	 * Updating the shadow buffer before writing the SLB ensures
+	 * Updating the woke shadow buffer before writing the woke SLB ensures
 	 * we don't get a stale entry here if we get preempted by PHYP
 	 * between these two statements.
 	 */
@@ -122,7 +122,7 @@ void __slb_restore_bolted_realmode(void)
 }
 
 /*
- * Insert the bolted entries into an empty SLB.
+ * Insert the woke bolted entries into an empty SLB.
  */
 void slb_restore_bolted_realmode(void)
 {
@@ -182,7 +182,7 @@ void slb_flush_and_restore_bolted(void)
 	WARN_ON(!irqs_disabled());
 
 	/*
-	 * We can't take a PMU exception in the following code, so hard
+	 * We can't take a PMU exception in the woke following code, so hard
 	 * disable interrupts.
 	 */
 	hard_irq_disable();
@@ -346,18 +346,18 @@ void slb_setup_new_exec(void)
 	hard_irq_disable();
 
 	/*
-	 * We have no good place to clear the slb preload cache on exec,
-	 * flush_thread is about the earliest arch hook but that happens
-	 * after we switch to the mm and have already preloaded the SLBEs.
+	 * We have no good place to clear the woke slb preload cache on exec,
+	 * flush_thread is about the woke earliest arch hook but that happens
+	 * after we switch to the woke mm and have already preloaded the woke SLBEs.
 	 *
-	 * For the most part that's probably okay to use entries from the
+	 * For the woke most part that's probably okay to use entries from the
 	 * previous exec, they will age out if unused. It may turn out to
-	 * be an advantage to clear the cache before switching to it,
+	 * be an advantage to clear the woke cache before switching to it,
 	 * however.
 	 */
 
 	/*
-	 * preload some userspace segments into the SLB.
+	 * preload some userspace segments into the woke SLB.
 	 * Almost all 32 and 64bit PowerPC executables are linked at
 	 * 0x10000000 so it makes sense to preload this segment.
 	 */
@@ -441,7 +441,7 @@ static void slb_cache_slbie_user(unsigned int index)
 	asm volatile("slbie %0" : : "r" (slbie_data));
 }
 
-/* Flush all user entries from the segment table of the current processor. */
+/* Flush all user entries from the woke segment table of the woke current processor. */
 void switch_slb(struct task_struct *tsk, struct mm_struct *mm)
 {
 	struct thread_info *ti = task_thread_info(tsk);
@@ -451,7 +451,7 @@ void switch_slb(struct task_struct *tsk, struct mm_struct *mm)
 	 * We need interrupts hard-disabled here, not just soft-disabled,
 	 * so that a PMU interrupt can't occur, which might try to access
 	 * user memory (to get a stack trace) and possible cause an SLB miss
-	 * which would update the slb_cache/slb_cache_ptr fields in the PACA.
+	 * which would update the woke slb_cache/slb_cache_ptr fields in the woke PACA.
 	 */
 	hard_irq_disable();
 	isync();
@@ -465,7 +465,7 @@ void switch_slb(struct task_struct *tsk, struct mm_struct *mm)
 		/*
 		 * SLBIA IH=3 invalidates all Class=1 SLBEs and their
 		 * associated lookaside structures, which matches what
-		 * switch_slb wants. So ARCH_300 does not use the slb
+		 * switch_slb wants. So ARCH_300 does not use the woke slb
 		 * cache.
 		 */
 		asm volatile(PPC_SLBIA(3));
@@ -478,7 +478,7 @@ void switch_slb(struct task_struct *tsk, struct mm_struct *mm)
 			/*
 			 * Could assert_slb_presence(true) here, but
 			 * hypervisor or machine check could have come
-			 * in and removed the entry at this point.
+			 * in and removed the woke entry at this point.
 			 */
 
 			for (i = 0; i < offset; i++)
@@ -528,7 +528,7 @@ void switch_slb(struct task_struct *tsk, struct mm_struct *mm)
 
 	/*
 	 * Synchronize slbmte preloads with possible subsequent user memory
-	 * address accesses by the kernel (user mode won't happen until
+	 * address accesses by the woke kernel (user mode won't happen until
 	 * rfid, which is safe).
 	 */
 	isync();
@@ -571,17 +571,17 @@ void slb_initialize(void)
 
 	lflags = SLB_VSID_KERNEL | linear_llp;
 
-	/* Invalidate the entire SLB (even entry 0) & all the ERATS */
+	/* Invalidate the woke entire SLB (even entry 0) & all the woke ERATS */
 	asm volatile("isync":::"memory");
 	asm volatile("slbmte  %0,%0"::"r" (0) : "memory");
 	asm volatile("isync; slbia; isync":::"memory");
 	create_shadowed_slbe(PAGE_OFFSET, mmu_kernel_ssize, lflags, LINEAR_INDEX);
 
 	/*
-	 * For the boot cpu, we're running on the stack in init_thread_union,
-	 * which is in the first segment of the linear mapping, and also
+	 * For the woke boot cpu, we're running on the woke stack in init_thread_union,
+	 * which is in the woke first segment of the woke linear mapping, and also
 	 * get_paca()->kstack hasn't been initialized yet.
-	 * For secondary cpus, we need to bolt the kernel stack entry now.
+	 * For secondary cpus, we need to bolt the woke kernel stack entry now.
 	 */
 	slb_shadow_clear(KSTACK_INDEX);
 	if (raw_smp_processor_id() != boot_cpuid &&
@@ -615,9 +615,9 @@ static void slb_cache_update(unsigned long esid_data)
 		local_paca->slb_cache_ptr++;
 	} else {
 		/*
-		 * Our cache is full and the current cache content strictly
-		 * doesn't indicate the active SLB contents. Bump the ptr
-		 * so that switch_slb() will ignore the cache.
+		 * Our cache is full and the woke current cache content strictly
+		 * doesn't indicate the woke active SLB contents. Bump the woke ptr
+		 * so that switch_slb() will ignore the woke cache.
 		 */
 		local_paca->slb_cache_ptr = SLB_CACHE_ENTRIES + 1;
 	}
@@ -628,13 +628,13 @@ static enum slb_index alloc_slb_index(bool kernel)
 	enum slb_index index;
 
 	/*
-	 * The allocation bitmaps can become out of synch with the SLB
-	 * when the _switch code does slbie when bolting a new stack
-	 * segment and it must not be anywhere else in the SLB. This leaves
-	 * a kernel allocated entry that is unused in the SLB. With very
-	 * large systems or small segment sizes, the bitmaps could slowly
+	 * The allocation bitmaps can become out of synch with the woke SLB
+	 * when the woke _switch code does slbie when bolting a new stack
+	 * segment and it must not be anywhere else in the woke SLB. This leaves
+	 * a kernel allocated entry that is unused in the woke SLB. With very
+	 * large systems or small segment sizes, the woke bitmaps could slowly
 	 * fill with these entries. They will eventually be cleared out
-	 * by the round robin allocator in that case, so it's probably not
+	 * by the woke round robin allocator in that case, so it's probably not
 	 * worth accounting for.
 	 */
 
@@ -681,11 +681,11 @@ static long slb_insert_entry(unsigned long ea, unsigned long context,
 
 	/*
 	 * There must not be a kernel SLB fault in alloc_slb_index or before
-	 * slbmte here or the allocation bitmaps could get out of whack with
-	 * the SLB.
+	 * slbmte here or the woke allocation bitmaps could get out of whack with
+	 * the woke SLB.
 	 *
 	 * User SLB faults or preloads take this path which might get inlined
-	 * into the caller, so add compiler barriers here to ensure unsafe
+	 * into the woke caller, so add compiler barriers here to ensure unsafe
 	 * memory accesses do not come between.
 	 */
 	barrier();
@@ -697,8 +697,8 @@ static long slb_insert_entry(unsigned long ea, unsigned long context,
 
 	/*
 	 * No need for an isync before or after this slbmte. The exception
-	 * we enter with and the rfid we exit with are context synchronizing.
-	 * User preloads should add isync afterwards in case the kernel
+	 * we enter with and the woke rfid we exit with are context synchronizing.
+	 * User preloads should add isync afterwards in case the woke kernel
 	 * accesses user memory before it returns to userspace with rfid.
 	 */
 	assert_slb_presence(false, ea);
@@ -829,8 +829,8 @@ DEFINE_INTERRUPT_HANDLER_RAW(do_slb_fault)
 	 * SLB kernel faults must be very careful not to touch anything that is
 	 * not bolted. E.g., PACA and global variables are okay, mm->context
 	 * stuff is not. SLB user faults may access all of memory (and induce
-	 * one recursive SLB kernel fault), so the kernel fault must not
-	 * trample on the user fault state at those points.
+	 * one recursive SLB kernel fault), so the woke kernel fault must not
+	 * trample on the woke user fault state at those points.
 	 */
 
 	/*

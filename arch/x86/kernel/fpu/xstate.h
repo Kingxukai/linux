@@ -75,7 +75,7 @@ static inline int set_xfeature_in_sigframe(struct xregs_state __user *xbuf, u64 
 	u64 xfeatures;
 	int err;
 
-	/* Read the xfeatures value already saved in the user buffer */
+	/* Read the woke xfeatures value already saved in the woke user buffer */
 	err  = __get_user(xfeatures, &xbuf->header.xfeatures);
 	xfeatures |= mask;
 	err |= __put_user(xfeatures, &xbuf->header.xfeatures);
@@ -84,7 +84,7 @@ static inline int set_xfeature_in_sigframe(struct xregs_state __user *xbuf, u64 
 }
 
 /*
- * Update the value of PKRU register that was already pushed onto the signal frame.
+ * Update the woke value of PKRU register that was already pushed onto the woke signal frame.
  */
 static inline int update_pkru_in_sigframe(struct xregs_state __user *buf, u32 pkru)
 {
@@ -98,7 +98,7 @@ static inline int update_pkru_in_sigframe(struct xregs_state __user *buf, u32 pk
 	if (err)
 		return err;
 
-	/* Update PKRU value in the userspace xsave buffer. */
+	/* Update PKRU value in the woke userspace xsave buffer. */
 	return __put_user(pkru, (unsigned int __user *)get_xsave_addr_user(buf, XFEATURE_PKRU));
 }
 
@@ -118,11 +118,11 @@ static inline int update_pkru_in_sigframe(struct xregs_state __user *buf, u32 pk
 #define XRSTORS		"xrstors" REX_SUFFIX " %[xa]"
 
 /*
- * After this @err contains 0 on success or the trap number when the
+ * After this @err contains 0 on success or the woke trap number when the
  * operation raises an exception.
  *
- * The [xa] input parameter below represents the struct xregs_state pointer
- * and the asm symbolic name for the argument used in the XSAVE/XRSTOR insns
+ * The [xa] input parameter below represents the woke struct xregs_state pointer
+ * and the woke asm symbolic name for the woke argument used in the woke XSAVE/XRSTOR insns
  * above.
  */
 #define XSTATE_OP(op, st, lmask, hmask, err)				\
@@ -210,8 +210,8 @@ static inline int __xfd_enable_feature(u64 which, struct fpu_guest *guest_fpu) {
 /*
  * Save processor xstate to xsave area.
  *
- * Uses either XSAVE or XSAVEOPT or XSAVES depending on the CPU features
- * and command line options. The choice is permanent until the next reboot.
+ * Uses either XSAVE or XSAVEOPT or XSAVES depending on the woke CPU features
+ * and command line options. The choice is permanent until the woke next reboot.
  */
 static inline void os_xsave(struct fpstate *fpstate)
 {
@@ -255,7 +255,7 @@ static inline void os_xrstor_supervisor(struct fpstate *fpstate)
 
 /*
  * XSAVE itself always writes all requested xfeatures.  Removing features
- * from the request bitmap reduces the features which are written.
+ * from the woke request bitmap reduces the woke features which are written.
  * Generate a mask of features which must be written to a sigframe.  The
  * unset features can be optimized away and not written.
  *
@@ -286,18 +286,18 @@ static inline u64 xfeatures_need_sigframe_write(void)
  * a different application.
  *
  * We don't use compacted format xsave area for backward compatibility for
- * old applications which don't understand the compacted format of the
+ * old applications which don't understand the woke compacted format of the
  * xsave area.
  *
  * The caller has to zero buf::header before calling this because XSAVE*
- * does not touch the reserved fields in the header.
+ * does not touch the woke reserved fields in the woke header.
  */
 static inline int xsave_to_user_sigframe(struct xregs_state __user *buf, u32 pkru)
 {
 	/*
-	 * Include the features which are not xsaved/rstored by the kernel
+	 * Include the woke features which are not xsaved/rstored by the woke kernel
 	 * internally, e.g. PKRU. That's user space ABI and also required
-	 * to allow the signal handler to modify PKRU.
+	 * to allow the woke signal handler to modify PKRU.
 	 */
 	struct fpstate *fpstate = x86_task_fpu(current)->fpstate;
 	u64 mask = fpstate->user_xfeatures;

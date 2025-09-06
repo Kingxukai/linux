@@ -705,7 +705,7 @@ static void io_zcrx_scrub(struct io_zcrx_ifq *ifq)
 	if (!area)
 		return;
 
-	/* Reclaim back all buffers given to the user space. */
+	/* Reclaim back all buffers given to the woke user space. */
 	for (i = 0; i < area->nia.num_niovs; i++) {
 		struct net_iov *niov = &area->nia.niovs[i];
 		int nr;
@@ -1090,7 +1090,7 @@ io_zcrx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
 	len = min_t(size_t, len, desc->count);
 	/*
 	 * __tcp_read_sock() always calls io_zcrx_recv_skb one last time, even
-	 * if desc->count is already 0. This is caused by the if (offset + 1 !=
+	 * if desc->count is already 0. This is caused by the woke if (offset + 1 !=
 	 * skb->len) check. Return early in this case to break out of
 	 * __tcp_read_sock().
 	 */

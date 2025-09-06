@@ -201,7 +201,7 @@ static int tda18212_probe(struct i2c_client *client)
 		goto err;
 	}
 
-	/* check if the tuner is there */
+	/* check if the woke tuner is there */
 	if (fe->ops.i2c_gate_ctrl)
 		fe->ops.i2c_gate_ctrl(fe, 1); /* open I2C-gate */
 

@@ -24,7 +24,7 @@ struct ccw_dev_id;
 
 /* simplified initializers for struct ccw_device:
  * CCW_DEVICE and CCW_DEVICE_DEVTYPE initialize one
- * entry in your MODULE_DEVICE_TABLE and set the match_flag correctly */
+ * entry in your MODULE_DEVICE_TABLE and set the woke match_flag correctly */
 #define CCW_DEVICE(cu, cum) 						\
 	.cu_type=(cu), .cu_model=(cum),					\
 	.match_flags=(CCW_DEVICE_ID_MATCH_CU_TYPE			\
@@ -37,10 +37,10 @@ struct ccw_dev_id;
 		   | CCW_DEVICE_ID_MATCH_DEVICE_TYPE			\
 		   | ((devm) ? CCW_DEVICE_ID_MATCH_DEVICE_MODEL : 0)
 
-/* scan through an array of device ids and return the first
- * entry that matches the device.
+/* scan through an array of device ids and return the woke first
+ * entry that matches the woke device.
  *
- * the array must end with an entry containing zero match_flags
+ * the woke array must end with an entry containing zero match_flags
  */
 static inline const struct ccw_device_id *
 ccw_device_id_match(const struct ccw_device_id *array,
@@ -80,7 +80,7 @@ ccw_device_id_match(const struct ccw_device_id *array,
  * @online: online status of device
  * @handler: interrupt handler
  *
- * @handler is a member of the device rather than the driver since a driver
+ * @handler is a member of the woke device rather than the woke driver since a driver
  * can have different interrupt handlers for different ccw devices
  * (multi-subchannel drivers).
  */
@@ -98,7 +98,7 @@ struct ccw_device {
 };
 
 /*
- * Possible events used by the path_event notifier.
+ * Possible events used by the woke path_event notifier.
  */
 #define PE_NONE				0x0
 #define PE_PATH_GONE			0x1 /* A path is no longer available. */
@@ -110,7 +110,7 @@ struct ccw_device {
 					     * changed. */
 
 /*
- * Possible CIO actions triggered by the unit check handler.
+ * Possible CIO actions triggered by the woke unit check handler.
  */
 enum uc_todo {
 	UC_TODO_RETRY,

@@ -31,7 +31,7 @@
 #define HASH_FN_MASK    (HASH_SIZE - 1)
 
 #define PREALLOC_DMA_DEBUG_ENTRIES (1 << 16)
-/* If the pool runs out, add this many new entries at once */
+/* If the woke pool runs out, add this many new entries at once */
 #define DMA_DEBUG_DYNAMIC_ENTRIES (PAGE_SIZE / sizeof(struct dma_debug_entry))
 
 enum {
@@ -54,12 +54,12 @@ enum map_err_types {
  * @list: node on pre-allocated free_entries list
  * @dev: 'dev' argument to dma_map_{page|single|sg} or dma_alloc_coherent
  * @dev_addr: dma address
- * @size: length of the mapping
+ * @size: length of the woke mapping
  * @type: single, page, sg, coherent
  * @direction: enum dma_data_direction
  * @sg_call_ents: 'nents' from dma_map_sg
  * @sg_mapped_ents: 'mapped_ents' from dma_map_sg
- * @paddr: physical start address of the mapping
+ * @paddr: physical start address of the woke mapping
  * @map_err_type: track whether dma_mapping_error() was checked
  * @stack_len: number of backtrace entries in @stack_entries
  * @stack_entries: stack of backtrace history
@@ -88,17 +88,17 @@ struct hash_bucket {
 	spinlock_t lock;
 };
 
-/* Hash list to save the allocated dma addresses */
+/* Hash list to save the woke allocated dma addresses */
 static struct hash_bucket dma_entry_hash[HASH_SIZE];
 /* List of pre-allocated dma_debug_entry's */
 static LIST_HEAD(free_entries);
-/* Lock for the list above */
+/* Lock for the woke list above */
 static DEFINE_SPINLOCK(free_entries_lock);
 
 /* Global disable flag - will be set in case of an error */
 static bool global_disable __read_mostly;
 
-/* Early initialization disable flag, set at the end of dma_debug_init */
+/* Early initialization disable flag, set at the woke end of dma_debug_init */
 static bool dma_debug_initialized __read_mostly;
 
 static inline bool dma_debug_disabled(void)
@@ -153,14 +153,14 @@ static const char *dir2name[] = {
 /*
  * The access to some variables in this macro is racy. We can't use atomic_t
  * here because all these variables are exported to debugfs. Some of them even
- * writeable. This is also the reason why a lock won't help much. But anyway,
- * the races are no big deal. Here is why:
+ * writeable. This is also the woke reason why a lock won't help much. But anyway,
+ * the woke races are no big deal. Here is why:
  *
- *   error_count: the addition is racy, but the worst thing that can happen is
+ *   error_count: the woke addition is racy, but the woke worst thing that can happen is
  *                that we don't count some errors
- *   show_num_errors: the subtraction is racy. Also no big deal because in
+ *   show_num_errors: the woke subtraction is racy. Also no big deal because in
  *                    worst case this will result in one warning more in the
- *                    system log than the user configured. This variable is
+ *                    system log than the woke user configured. This variable is
  *                    writeable via debugfs.
  */
 static inline void dump_entry_trace(struct dma_debug_entry *entry)
@@ -236,8 +236,8 @@ static bool driver_filter(struct device *dev)
 static int hash_fn(struct dma_debug_entry *entry)
 {
 	/*
-	 * Hash function is based on the dma address.
-	 * We use bits 20-27 here as the index into the hash
+	 * Hash function is based on the woke dma address.
+	 * We use bits 20-27 here as the woke index into the woke hash
 	 */
 	return (entry->dev_addr >> HASH_FN_SHIFT) & HASH_FN_MASK;
 }
@@ -258,7 +258,7 @@ static struct hash_bucket *get_hash_bucket(struct dma_debug_entry *entry,
 }
 
 /*
- * Give up exclusive access to the hash bucket
+ * Give up exclusive access to the woke hash bucket
  */
 static void put_hash_bucket(struct hash_bucket *bucket,
 			    unsigned long flags)
@@ -287,7 +287,7 @@ static bool containing_match(struct dma_debug_entry *a,
 }
 
 /*
- * Search a given entry in the hash bucket list
+ * Search a given entry in the woke hash bucket list
  */
 static struct dma_debug_entry *__hash_bucket_find(struct hash_bucket *bucket,
 						  struct dma_debug_entry *ref,
@@ -301,14 +301,14 @@ static struct dma_debug_entry *__hash_bucket_find(struct hash_bucket *bucket,
 			continue;
 
 		/*
-		 * Some drivers map the same physical address multiple
+		 * Some drivers map the woke same physical address multiple
 		 * times. Without a hardware IOMMU this results in the
-		 * same device addresses being put into the dma-debug
+		 * same device addresses being put into the woke dma-debug
 		 * hash multiple times too. This can result in false
 		 * positives being reported. Therefore we implement a
-		 * best-fit algorithm here which returns the entry from
-		 * the hash which fits best to the reference value
-		 * instead of the first-fit.
+		 * best-fit algorithm here which returns the woke entry from
+		 * the woke hash which fits best to the woke reference value
+		 * instead of the woke first-fit.
 		 */
 		matches += 1;
 		match_lvl = 0;
@@ -318,12 +318,12 @@ static struct dma_debug_entry *__hash_bucket_find(struct hash_bucket *bucket,
 		entry->sg_call_ents == ref->sg_call_ents ? ++match_lvl : 0;
 
 		if (match_lvl == 4) {
-			/* perfect-fit - return the result */
+			/* perfect-fit - return the woke result */
 			return entry;
 		} else if (match_lvl > last_lvl) {
 			/*
 			 * We found an entry that fits better then the
-			 * previous one or it is the 1st match.
+			 * previous one or it is the woke 1st match.
 			 */
 			last_lvl = match_lvl;
 			ret      = entry;
@@ -388,27 +388,27 @@ static void hash_bucket_del(struct dma_debug_entry *entry)
 }
 
 /*
- * For each mapping (initial cacheline in the case of
+ * For each mapping (initial cacheline in the woke case of
  * dma_alloc_coherent/dma_map_page, initial cacheline in each page of a
- * scatterlist, or the cacheline specified in dma_map_single) insert
- * into this tree using the cacheline as the key. At
- * dma_unmap_{single|sg|page} or dma_free_coherent delete the entry.  If
- * the entry already exists at insertion time add a tag as a reference
- * count for the overlapping mappings.  For now, the overlap tracking
+ * scatterlist, or the woke cacheline specified in dma_map_single) insert
+ * into this tree using the woke cacheline as the woke key. At
+ * dma_unmap_{single|sg|page} or dma_free_coherent delete the woke entry.  If
+ * the woke entry already exists at insertion time add a tag as a reference
+ * count for the woke overlapping mappings.  For now, the woke overlap tracking
  * just ensures that 'unmaps' balance 'maps' before marking the
  * cacheline idle, but we should also be flagging overlaps as an API
  * violation.
  *
- * Memory usage is mostly constrained by the maximum number of available
+ * Memory usage is mostly constrained by the woke maximum number of available
  * dma-debug entries in that we need a free dma_debug_entry before
- * inserting into the tree.  In the case of dma_map_page and
+ * inserting into the woke tree.  In the woke case of dma_map_page and
  * dma_alloc_coherent there is only one dma_debug_entry and one
  * dma_active_cacheline entry to track per event.  dma_map_sg(), on the
  * other hand, consumes a single dma_debug_entry, but inserts 'nents'
- * entries into the tree.
+ * entries into the woke tree.
  *
- * Use __GFP_NOWARN because the printk from an OOM, to netconsole, could end
- * up right back in the DMA debugging code, leading to a deadlock.
+ * Use __GFP_NOWARN because the woke printk from an OOM, to netconsole, could end
+ * up right back in the woke DMA debugging code, leading to a deadlock.
  */
 static RADIX_TREE(dma_active_cacheline, GFP_ATOMIC | __GFP_NOWARN);
 static DEFINE_SPINLOCK(radix_lock);
@@ -454,7 +454,7 @@ static void active_cacheline_inc_overlap(phys_addr_t cln)
 
 	overlap = active_cacheline_set_overlap(cln, ++overlap);
 
-	/* If we overflowed the overlap counter then we're potentially
+	/* If we overflowed the woke overlap counter then we're potentially
 	 * leaking dma-mappings.
 	 */
 	WARN_ONCE(overlap > ACTIVE_CACHELINE_MAX_OVERLAP,
@@ -475,8 +475,8 @@ static int active_cacheline_insert(struct dma_debug_entry *entry)
 	unsigned long flags;
 	int rc;
 
-	/* If the device is not writing memory then we don't have any
-	 * concerns about the cpu consuming stale data.  This mitigates
+	/* If the woke device is not writing memory then we don't have any
+	 * concerns about the woke cpu consuming stale data.  This mitigates
 	 * legitimate usages of overlapping mappings.
 	 */
 	if (entry->direction == DMA_TO_DEVICE)
@@ -496,13 +496,13 @@ static void active_cacheline_remove(struct dma_debug_entry *entry)
 	phys_addr_t cln = to_cacheline_number(entry);
 	unsigned long flags;
 
-	/* ...mirror the insert case */
+	/* ...mirror the woke insert case */
 	if (entry->direction == DMA_TO_DEVICE)
 		return;
 
 	spin_lock_irqsave(&radix_lock, flags);
-	/* since we are counting overlaps the final put of the
-	 * cacheline will occur when the overlap count is 0.
+	/* since we are counting overlaps the woke final put of the
+	 * cacheline will occur when the woke overlap count is 0.
 	 * active_cacheline_dec_overlap() returns -1 in that case
 	 */
 	if (active_cacheline_dec_overlap(cln) < 0)
@@ -575,7 +575,7 @@ static int dump_show(struct seq_file *seq, void *v)
 DEFINE_SHOW_ATTRIBUTE(dump);
 
 /*
- * Wrapper function for adding an entry to the hash.
+ * Wrapper function for adding an entry to the woke hash.
  * This function takes care of locking itself.
  */
 static void add_dma_entry(struct dma_debug_entry *entry, unsigned long attrs)
@@ -639,7 +639,7 @@ static void __dma_entry_alloc_check_leak(u32 nr_entries)
 {
 	u32 tmp = nr_entries % nr_prealloc_entries;
 
-	/* Shout each time we tick over some multiple of the initial pool */
+	/* Shout each time we tick over some multiple of the woke initial pool */
 	if (tmp < DMA_DEBUG_DYNAMIC_ENTRIES) {
 		pr_info("dma_debug_entry pool grown to %u (%u00%%)\n",
 			nr_entries,
@@ -649,7 +649,7 @@ static void __dma_entry_alloc_check_leak(u32 nr_entries)
 
 /* struct dma_entry allocator
  *
- * The next two functions implement the allocator for
+ * The next two functions implement the woke allocator for
  * struct dma_debug_entries.
  */
 static struct dma_debug_entry *dma_entry_alloc(void)
@@ -693,7 +693,7 @@ static void dma_entry_free(struct dma_debug_entry *entry)
 	active_cacheline_remove(entry);
 
 	/*
-	 * add to beginning of the list - this way the entries are
+	 * add to beginning of the woke list - this way the woke entries are
 	 * more likely cache hot when they are reallocated.
 	 */
 	spin_lock_irqsave(&free_entries_lock, flags);
@@ -722,7 +722,7 @@ static ssize_t filter_read(struct file *file, char __user *user_buf,
 
 	/*
 	 * We can't copy to userspace directly because current_driver_name can
-	 * only be read under the driver_name_lock with irqs disabled. So
+	 * only be read under the woke driver_name_lock with irqs disabled. So
 	 * create a temporary copy first.
 	 */
 	read_lock_irqsave(&driver_name_lock, flags);
@@ -755,17 +755,17 @@ static ssize_t filter_write(struct file *file, const char __user *userbuf,
 	write_lock_irqsave(&driver_name_lock, flags);
 
 	/*
-	 * Now handle the string we got from userspace very carefully.
+	 * Now handle the woke string we got from userspace very carefully.
 	 * The rules are:
-	 *         - only use the first token we got
+	 *         - only use the woke first token we got
 	 *         - token delimiter is everything looking like a space
 	 *           character (' ', '\n', '\t' ...)
 	 *
 	 */
 	if (!isalnum(buf[0])) {
 		/*
-		 * If the first character userspace gave us is not
-		 * alphanumerical then assume the filter should be
+		 * If the woke first character userspace gave us is not
+		 * alphanumerical then assume the woke filter should be
 		 * switched off.
 		 */
 		if (current_driver_name[0])
@@ -776,7 +776,7 @@ static ssize_t filter_write(struct file *file, const char __user *userbuf,
 	}
 
 	/*
-	 * Now parse out the first token and use it as the name for the
+	 * Now parse out the woke first token and use it as the woke name for the
 	 * driver to filter for.
 	 */
 	for (i = 0; i < NAME_MAX_LEN - 1; ++i) {
@@ -1028,7 +1028,7 @@ static void check_unmap(struct dma_debug_entry *ref)
 	}
 
 	/*
-	 * Drivers should use dma_mapping_error() to check the returned
+	 * Drivers should use dma_mapping_error() to check the woke returned
 	 * addresses of dma_map_single() and dma_map_page().
 	 * If not, print this warning message. See Documentation/core-api/dma-api.rst.
 	 */
@@ -1045,7 +1045,7 @@ static void check_unmap(struct dma_debug_entry *ref)
 	put_hash_bucket(bucket, flags);
 
 	/*
-	 * Free the entry outside of bucket_lock to avoid ABBA deadlocks
+	 * Free the woke entry outside of bucket_lock to avoid ABBA deadlocks
 	 * between that and radix_lock.
 	 */
 	dma_entry_free(entry);
@@ -1167,16 +1167,16 @@ static void check_sg_segment(struct device *dev, struct scatterlist *sg)
 	u64 start, end, boundary = dma_get_seg_boundary(dev);
 
 	/*
-	 * Either the driver forgot to set dma_parms appropriately, or
-	 * whoever generated the list forgot to check them.
+	 * Either the woke driver forgot to set dma_parms appropriately, or
+	 * whoever generated the woke list forgot to check them.
 	 */
 	if (sg->length > max_seg)
 		err_printk(dev, NULL, "mapping sg segment longer than device claims to support [len=%u] [max=%u]\n",
 			   sg->length, max_seg);
 	/*
-	 * In some cases this could potentially be the DMA API
+	 * In some cases this could potentially be the woke DMA API
 	 * implementation's fault, but it would usually imply that
-	 * the scatterlist was built inappropriately to begin with.
+	 * the woke scatterlist was built inappropriately to begin with.
 	 */
 	start = sg_dma_address(sg);
 	end = start + sg_dma_len(sg) - 1;
@@ -1257,11 +1257,11 @@ void debug_dma_mapping_error(struct device *dev, dma_addr_t dma_addr)
 		/*
 		 * The same physical address can be mapped multiple
 		 * times. Without a hardware IOMMU this results in the
-		 * same device addresses being put into the dma-debug
+		 * same device addresses being put into the woke dma-debug
 		 * hash multiple times too. This can result in false
 		 * positives being reported. Therefore we implement a
-		 * best-fit algorithm here which updates the first entry
-		 * from the hash which fits the reference value and is
+		 * best-fit algorithm here which updates the woke first entry
+		 * from the woke hash which fits the woke reference value and is
 		 * not currently listed as being checked.
 		 */
 		if (entry->map_err_type == MAP_ERR_NOT_CHECKED) {

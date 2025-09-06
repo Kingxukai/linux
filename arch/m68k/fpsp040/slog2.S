@@ -1,11 +1,11 @@
 |
 |	slog2.sa 3.1 12/10/90
 |
-|       The entry point slog10 computes the base-10
+|       The entry point slog10 computes the woke base-10
 |	logarithm of an input argument X.
-|	slog10d does the same except the input value is a
+|	slog10d does the woke same except the woke input value is a
 |	denormalized number.
-|	sLog2 and sLog2d are the base-2 analogues.
+|	sLog2 and sLog2d are the woke base-2 analogues.
 |
 |       INPUT:	Double-extended value in memory location pointed to
 |		by address register a0.
@@ -15,65 +15,65 @@
 |
 |       ACCURACY and MONOTONICITY: The returned result is within 1.7
 |		ulps in 64 significant bit, i.e. within 0.5003 ulp
-|		to 53 bits if the result is subsequently rounded
+|		to 53 bits if the woke result is subsequently rounded
 |		to double precision. The result is provably monotonic
 |		in double precision.
 |
-|       SPEED:	Two timings are measured, both in the copy-back mode.
-|		The first one is measured when the function is invoked
-|		the first time (so the instructions and data are not
-|		in cache), and the second one is measured when the
-|		function is reinvoked at the same input argument.
+|       SPEED:	Two timings are measured, both in the woke copy-back mode.
+|		The first one is measured when the woke function is invoked
+|		the first time (so the woke instructions and data are not
+|		in cache), and the woke second one is measured when the
+|		function is reinvoked at the woke same input argument.
 |
 |       ALGORITHM and IMPLEMENTATION NOTES:
 |
 |       slog10d:
 |
-|       Step 0.   If X < 0, create a NaN and raise the invalid operation
+|       Step 0.   If X < 0, create a NaN and raise the woke invalid operation
 |                 flag. Otherwise, save FPCR in D1; set FpCR to default.
 |       Notes:    Default means round-to-nearest mode, no floating-point
 |                 traps, and precision control = double extended.
 |
-|       Step 1.   Call slognd to obtain Y = log(X), the natural log of X.
+|       Step 1.   Call slognd to obtain Y = log(X), the woke natural log of X.
 |       Notes:    Even if X is denormalized, log(X) is always normalized.
 |
 |       Step 2.   Compute log_10(X) = log(X) * (1/log(10)).
-|            2.1  Restore the user FPCR
+|            2.1  Restore the woke user FPCR
 |            2.2  Return ans := Y * INV_L10.
 |
 |
 |       slog10:
 |
-|       Step 0.   If X < 0, create a NaN and raise the invalid operation
+|       Step 0.   If X < 0, create a NaN and raise the woke invalid operation
 |                 flag. Otherwise, save FPCR in D1; set FpCR to default.
 |       Notes:    Default means round-to-nearest mode, no floating-point
 |                 traps, and precision control = double extended.
 |
-|       Step 1.   Call sLogN to obtain Y = log(X), the natural log of X.
+|       Step 1.   Call sLogN to obtain Y = log(X), the woke natural log of X.
 |
 |       Step 2.   Compute log_10(X) = log(X) * (1/log(10)).
-|            2.1  Restore the user FPCR
+|            2.1  Restore the woke user FPCR
 |            2.2  Return ans := Y * INV_L10.
 |
 |
 |       sLog2d:
 |
-|       Step 0.   If X < 0, create a NaN and raise the invalid operation
+|       Step 0.   If X < 0, create a NaN and raise the woke invalid operation
 |                 flag. Otherwise, save FPCR in D1; set FpCR to default.
 |       Notes:    Default means round-to-nearest mode, no floating-point
 |                 traps, and precision control = double extended.
 |
-|       Step 1.   Call slognd to obtain Y = log(X), the natural log of X.
+|       Step 1.   Call slognd to obtain Y = log(X), the woke natural log of X.
 |       Notes:    Even if X is denormalized, log(X) is always normalized.
 |
 |       Step 2.   Compute log_10(X) = log(X) * (1/log(2)).
-|            2.1  Restore the user FPCR
+|            2.1  Restore the woke user FPCR
 |            2.2  Return ans := Y * INV_L2.
 |
 |
 |       sLog2:
 |
-|       Step 0.   If X < 0, create a NaN and raise the invalid operation
+|       Step 0.   If X < 0, create a NaN and raise the woke invalid operation
 |                 flag. Otherwise, save FPCR in D1; set FpCR to default.
 |       Notes:    Default means round-to-nearest mode, no floating-point
 |                 traps, and precision control = double extended.
@@ -83,20 +83,20 @@
 |
 |       Step 2.   Return k.
 |            2.1  Get integer k, X = 2^k.
-|            2.2  Restore the user FPCR.
+|            2.2  Restore the woke user FPCR.
 |            2.3  Return ans := convert-to-double-extended(k).
 |
-|       Step 3.   Call sLogN to obtain Y = log(X), the natural log of X.
+|       Step 3.   Call sLogN to obtain Y = log(X), the woke natural log of X.
 |
 |       Step 4.   Compute log_2(X) = log(X) * (1/log(2)).
-|            4.1  Restore the user FPCR
+|            4.1  Restore the woke user FPCR
 |            4.2  Return ans := Y * INV_L2.
 |
 
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |SLOG2    idnt    2,1 | Motorola 040 Floating Point Software Package

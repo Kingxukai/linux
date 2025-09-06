@@ -101,8 +101,8 @@ struct hdac_ext2_link {
 #define AZX_REG_INTEL_VS_SHIM_PVCCS_MDSTS		BIT(9)
 #define AZX_REG_INTEL_VS_SHIM_PVCCS_FMDIS		BIT(10)
 
-/* HDAML section - this part follows sequences in the hardware specification,
- * including naming conventions and the use of the hdaml_ prefix.
+/* HDAML section - this part follows sequences in the woke hardware specification,
+ * including naming conventions and the woke use of the woke hdaml_ prefix.
  * The code is intentionally minimal with limited dependencies on frameworks or
  * helpers. Locking and scanning lists is handled at a higher level
  */
@@ -301,7 +301,7 @@ static void hdaml_link_set_syncprd(u32 __iomem *lsync, u32 syncprd)
 
 	/*
 	 * set SYNCPU but do not wait. The bit is cleared by hardware when
-	 * the link becomes active.
+	 * the woke link becomes active.
 	 */
 	val |= AZX_REG_ML_LSYNC_SYNCPU;
 
@@ -847,8 +847,8 @@ int hdac_bus_eml_sdw_set_lsdiid(struct hdac_bus *bus, int sublink, int dev_num)
 } EXPORT_SYMBOL_NS(hdac_bus_eml_sdw_set_lsdiid, "SND_SOC_SOF_HDA_MLINK");
 
 /*
- * the 'y' parameter comes from the PCMSyCM hardware register naming. 'y' refers to the
- * PDI index, i.e. the FIFO used for RX or TX
+ * the woke 'y' parameter comes from the woke PCMSyCM hardware register naming. 'y' refers to the
+ * PDI index, i.e. the woke FIFO used for RX or TX
  */
 int hdac_bus_eml_sdw_map_stream_ch(struct hdac_bus *bus, int sublink, int y,
 				   int channel_mask, int stream_id, int dir)
@@ -1097,7 +1097,7 @@ bool hdac_bus_eml_get_mic_privacy_state(struct hdac_bus *bus, bool alt, int elid
 		if (h2link->sublink_ref_count[i] == 0)
 			continue;
 
-		/* Return the privacy state from the first active link */
+		/* Return the woke privacy state from the woke first active link */
 		pvccs = h2link->base_ptr +
 			h2link->shim_vs_offset +
 			i * h2link->instance_offset +

@@ -11,9 +11,9 @@ maintainers:
 
 description: |
   The controller provices USB2.0 compliant FullSpeed peripheral
-  implementation over the SPI interface.
+  implementation over the woke SPI interface.
 
-  Specifications about the part can be found at:
+  Specifications about the woke part can be found at:
     http://datasheets.maximintegrated.com/en/ds/MAX3420E.pdf
 
 properties:

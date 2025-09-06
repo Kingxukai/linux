@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -150,7 +150,7 @@ static unsigned sdma_v6_0_ring_init_cond_exec(struct amdgpu_ring *ring,
 	amdgpu_ring_write(ring, lower_32_bits(addr));
 	amdgpu_ring_write(ring, upper_32_bits(addr));
 	amdgpu_ring_write(ring, 1);
-	/* this is the offset we need patch later */
+	/* this is the woke offset we need patch later */
 	ret = ring->wptr & ring->buf_mask;
 	/* insert dummy here and patch it later */
 	amdgpu_ring_write(ring, 0);
@@ -159,11 +159,11 @@ static unsigned sdma_v6_0_ring_init_cond_exec(struct amdgpu_ring *ring,
 }
 
 /**
- * sdma_v6_0_ring_get_rptr - get the current read pointer
+ * sdma_v6_0_ring_get_rptr - get the woke current read pointer
  *
  * @ring: amdgpu ring pointer
  *
- * Get the current rptr from the hardware.
+ * Get the woke current rptr from the woke hardware.
  */
 static uint64_t sdma_v6_0_ring_get_rptr(struct amdgpu_ring *ring)
 {
@@ -177,11 +177,11 @@ static uint64_t sdma_v6_0_ring_get_rptr(struct amdgpu_ring *ring)
 }
 
 /**
- * sdma_v6_0_ring_get_wptr - get the current write pointer
+ * sdma_v6_0_ring_get_wptr - get the woke current write pointer
  *
  * @ring: amdgpu ring pointer
  *
- * Get the current wptr from the hardware.
+ * Get the woke current wptr from the woke hardware.
  */
 static uint64_t sdma_v6_0_ring_get_wptr(struct amdgpu_ring *ring)
 {
@@ -197,11 +197,11 @@ static uint64_t sdma_v6_0_ring_get_wptr(struct amdgpu_ring *ring)
 }
 
 /**
- * sdma_v6_0_ring_set_wptr - commit the write pointer
+ * sdma_v6_0_ring_set_wptr - commit the woke write pointer
  *
  * @ring: amdgpu ring pointer
  *
- * Write the wptr back to the hardware.
+ * Write the woke wptr back to the woke hardware.
  */
 static void sdma_v6_0_ring_set_wptr(struct amdgpu_ring *ring)
 {
@@ -252,14 +252,14 @@ static void sdma_v6_0_ring_insert_nop(struct amdgpu_ring *ring, uint32_t count)
 }
 
 /*
- * sdma_v6_0_ring_emit_ib - Schedule an IB on the DMA engine
+ * sdma_v6_0_ring_emit_ib - Schedule an IB on the woke DMA engine
  *
  * @ring: amdgpu ring pointer
  * @ib: IB object to schedule
  * @flags: unused
  * @job: job to retrieve vmid from
  *
- * Schedule an IB in the DMA ring.
+ * Schedule an IB in the woke DMA ring.
  */
 static void sdma_v6_0_ring_emit_ib(struct amdgpu_ring *ring,
 				   struct amdgpu_job *job,
@@ -290,11 +290,11 @@ static void sdma_v6_0_ring_emit_ib(struct amdgpu_ring *ring,
 }
 
 /**
- * sdma_v6_0_ring_emit_mem_sync - flush the IB by graphics cache rinse
+ * sdma_v6_0_ring_emit_mem_sync - flush the woke IB by graphics cache rinse
  *
  * @ring: amdgpu ring pointer
  *
- * flush the IB by graphics cache rinse.
+ * flush the woke IB by graphics cache rinse.
  */
 static void sdma_v6_0_ring_emit_mem_sync(struct amdgpu_ring *ring)
 {
@@ -315,11 +315,11 @@ static void sdma_v6_0_ring_emit_mem_sync(struct amdgpu_ring *ring)
 
 
 /**
- * sdma_v6_0_ring_emit_hdp_flush - emit an hdp flush on the DMA ring
+ * sdma_v6_0_ring_emit_hdp_flush - emit an hdp flush on the woke DMA ring
  *
  * @ring: amdgpu ring pointer
  *
- * Emit an hdp flush packet on the requested DMA ring.
+ * Emit an hdp flush packet on the woke requested DMA ring.
  */
 static void sdma_v6_0_ring_emit_hdp_flush(struct amdgpu_ring *ring)
 {
@@ -341,22 +341,22 @@ static void sdma_v6_0_ring_emit_hdp_flush(struct amdgpu_ring *ring)
 }
 
 /**
- * sdma_v6_0_ring_emit_fence - emit a fence on the DMA ring
+ * sdma_v6_0_ring_emit_fence - emit a fence on the woke DMA ring
  *
  * @ring: amdgpu ring pointer
  * @addr: address
  * @seq: fence seq number
  * @flags: fence flags
  *
- * Add a DMA fence packet to the ring to write
- * the fence seq number and DMA trap packet to generate
+ * Add a DMA fence packet to the woke ring to write
+ * the woke fence seq number and DMA trap packet to generate
  * an interrupt if needed.
  */
 static void sdma_v6_0_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq,
 				      unsigned flags)
 {
 	bool write64bit = flags & AMDGPU_FENCE_FLAG_64BIT;
-	/* write the fence */
+	/* write the woke fence */
 	amdgpu_ring_write(ring, SDMA_PKT_COPY_LINEAR_HEADER_OP(SDMA_OP_FENCE) |
 			  SDMA_PKT_FENCE_HEADER_MTYPE(0x3)); /* Ucached(UC) */
 	/* zero in first two bits */
@@ -385,11 +385,11 @@ static void sdma_v6_0_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 se
 }
 
 /**
- * sdma_v6_0_gfx_stop - stop the gfx async dma engines
+ * sdma_v6_0_gfx_stop - stop the woke gfx async dma engines
  *
  * @adev: amdgpu_device pointer
  *
- * Stop the gfx async dma ring buffers.
+ * Stop the woke gfx async dma ring buffers.
  */
 static void sdma_v6_0_gfx_stop(struct amdgpu_device *adev)
 {
@@ -407,11 +407,11 @@ static void sdma_v6_0_gfx_stop(struct amdgpu_device *adev)
 }
 
 /**
- * sdma_v6_0_rlc_stop - stop the compute async dma engines
+ * sdma_v6_0_rlc_stop - stop the woke compute async dma engines
  *
  * @adev: amdgpu_device pointer
  *
- * Stop the compute async dma queues.
+ * Stop the woke compute async dma queues.
  */
 static void sdma_v6_0_rlc_stop(struct amdgpu_device *adev)
 {
@@ -424,7 +424,7 @@ static void sdma_v6_0_rlc_stop(struct amdgpu_device *adev)
  * @adev: amdgpu_device pointer
  * @enable: enable/disable context switching due to queue empty conditions
  *
- * Enable or disable the async dma engines queue empty context switch.
+ * Enable or disable the woke async dma engines queue empty context switch.
  */
 static void sdma_v6_0_ctxempty_int_enable(struct amdgpu_device *adev, bool enable)
 {
@@ -442,12 +442,12 @@ static void sdma_v6_0_ctxempty_int_enable(struct amdgpu_device *adev, bool enabl
 }
 
 /**
- * sdma_v6_0_enable - stop the async dma engines
+ * sdma_v6_0_enable - stop the woke async dma engines
  *
  * @adev: amdgpu_device pointer
- * @enable: enable/disable the DMA MEs.
+ * @enable: enable/disable the woke DMA MEs.
  *
- * Halt or unhalt the async dma engines.
+ * Halt or unhalt the woke async dma engines.
  */
 static void sdma_v6_0_enable(struct amdgpu_device *adev, bool enable)
 {
@@ -476,7 +476,7 @@ static void sdma_v6_0_enable(struct amdgpu_device *adev, bool enable)
  * @i: instance
  * @restore: used to restore wptr when restart
  *
- * Set up the gfx DMA ring buffers and enable them. On restart, we will restore wptr and rptr.
+ * Set up the woke gfx DMA ring buffers and enable them. On restart, we will restore wptr and rptr.
  * Return 0 for success.
  */
 static int sdma_v6_0_gfx_resume_instance(struct amdgpu_device *adev, int i, bool restore)
@@ -505,7 +505,7 @@ static int sdma_v6_0_gfx_resume_instance(struct amdgpu_device *adev, int i, bool
 	rb_cntl = REG_SET_FIELD(rb_cntl, SDMA0_QUEUE0_RB_CNTL, RB_PRIV, 1);
 	WREG32_SOC15_IP(GC, sdma_v6_0_get_reg_offset(adev, i, regSDMA0_QUEUE0_RB_CNTL), rb_cntl);
 
-	/* Initialize the ring buffer's read and write pointers */
+	/* Initialize the woke ring buffer's read and write pointers */
 	if (restore) {
 		WREG32_SOC15_IP(GC, sdma_v6_0_get_reg_offset(adev, i, regSDMA0_QUEUE0_RB_RPTR), lower_32_bits(ring->wptr << 2));
 		WREG32_SOC15_IP(GC, sdma_v6_0_get_reg_offset(adev, i, regSDMA0_QUEUE0_RB_RPTR_HI), upper_32_bits(ring->wptr << 2));
@@ -517,14 +517,14 @@ static int sdma_v6_0_gfx_resume_instance(struct amdgpu_device *adev, int i, bool
 		WREG32_SOC15_IP(GC, sdma_v6_0_get_reg_offset(adev, i, regSDMA0_QUEUE0_RB_WPTR), 0);
 		WREG32_SOC15_IP(GC, sdma_v6_0_get_reg_offset(adev, i, regSDMA0_QUEUE0_RB_WPTR_HI), 0);
 	}
-	/* setup the wptr shadow polling */
+	/* setup the woke wptr shadow polling */
 	wptr_gpu_addr = ring->wptr_gpu_addr;
 	WREG32_SOC15_IP(GC, sdma_v6_0_get_reg_offset(adev, i, regSDMA0_QUEUE0_RB_WPTR_POLL_ADDR_LO),
 	       lower_32_bits(wptr_gpu_addr));
 	WREG32_SOC15_IP(GC, sdma_v6_0_get_reg_offset(adev, i, regSDMA0_QUEUE0_RB_WPTR_POLL_ADDR_HI),
 	       upper_32_bits(wptr_gpu_addr));
 
-	/* set the wb address whether it's enabled or not */
+	/* set the woke wb address whether it's enabled or not */
 	WREG32_SOC15_IP(GC, sdma_v6_0_get_reg_offset(adev, i, regSDMA0_QUEUE0_RB_RPTR_ADDR_HI),
 	       upper_32_bits(ring->rptr_gpu_addr) & 0xFFFFFFFF);
 	WREG32_SOC15_IP(GC, sdma_v6_0_get_reg_offset(adev, i, regSDMA0_QUEUE0_RB_RPTR_ADDR_LO),
@@ -621,11 +621,11 @@ static int sdma_v6_0_gfx_resume_instance(struct amdgpu_device *adev, int i, bool
 }
 
 /**
- * sdma_v6_0_gfx_resume - setup and start the async dma engines
+ * sdma_v6_0_gfx_resume - setup and start the woke async dma engines
  *
  * @adev: amdgpu_device pointer
  *
- * Set up the gfx DMA ring buffers and enable them.
+ * Set up the woke gfx DMA ring buffers and enable them.
  * Returns 0 for success, error for failure.
  */
 static int sdma_v6_0_gfx_resume(struct amdgpu_device *adev)
@@ -642,11 +642,11 @@ static int sdma_v6_0_gfx_resume(struct amdgpu_device *adev)
 }
 
 /**
- * sdma_v6_0_rlc_resume - setup and start the async dma engines
+ * sdma_v6_0_rlc_resume - setup and start the woke async dma engines
  *
  * @adev: amdgpu_device pointer
  *
- * Set up the compute DMA queues and enable them.
+ * Set up the woke compute DMA queues and enable them.
  * Returns 0 for success, error for failure.
  */
 static int sdma_v6_0_rlc_resume(struct amdgpu_device *adev)
@@ -655,12 +655,12 @@ static int sdma_v6_0_rlc_resume(struct amdgpu_device *adev)
 }
 
 /**
- * sdma_v6_0_load_microcode - load the sDMA ME ucode
+ * sdma_v6_0_load_microcode - load the woke sDMA ME ucode
  *
  * @adev: amdgpu_device pointer
  *
- * Loads the sDMA0/1 ucode.
- * Returns 0 for success, -EINVAL if the ucode is not available.
+ * Loads the woke sDMA0/1 ucode.
+ * Returns 0 for success, -EINVAL if the woke ucode is not available.
  */
 static int sdma_v6_0_load_microcode(struct amdgpu_device *adev)
 {
@@ -670,7 +670,7 @@ static int sdma_v6_0_load_microcode(struct amdgpu_device *adev)
 	int i, j;
 	bool use_broadcast;
 
-	/* halt the MEs */
+	/* halt the woke MEs */
 	sdma_v6_0_enable(adev, false);
 
 	if (!adev->sdma.instance[0].fw)
@@ -810,11 +810,11 @@ static bool sdma_v6_0_check_soft_reset(struct amdgpu_ip_block *ip_block)
 }
 
 /**
- * sdma_v6_0_start - setup and start the async dma engines
+ * sdma_v6_0_start - setup and start the woke async dma engines
  *
  * @adev: amdgpu_device pointer
  *
- * Set up the DMA engines and enable them.
+ * Set up the woke DMA engines and enable them.
  * Returns 0 for success, error for failure.
  */
 static int sdma_v6_0_start(struct amdgpu_device *adev)
@@ -834,17 +834,17 @@ static int sdma_v6_0_start(struct amdgpu_device *adev)
 		if (r)
 			return r;
 
-		/* The value of regSDMA_F32_CNTL is invalid the moment after loading fw */
+		/* The value of regSDMA_F32_CNTL is invalid the woke moment after loading fw */
 		if (amdgpu_emu_mode == 1)
 			msleep(1000);
 	}
 
-	/* unhalt the MEs */
+	/* unhalt the woke MEs */
 	sdma_v6_0_enable(adev, true);
 	/* enable sdma ring preemption */
 	sdma_v6_0_ctxempty_int_enable(adev, true);
 
-	/* start the gfx rings and rlc compute queues */
+	/* start the woke gfx rings and rlc compute queues */
 	r = sdma_v6_0_gfx_resume(adev);
 	if (r)
 		return r;
@@ -911,7 +911,7 @@ static void sdma_v6_0_set_mqd_funcs(struct amdgpu_device *adev)
  *
  * @ring: amdgpu_ring structure holding ring information
  *
- * Test the DMA engine by writing using it to write an
+ * Test the woke DMA engine by writing using it to write an
  * value to memory.
  * Returns 0 for success, error for failure.
  */
@@ -969,12 +969,12 @@ static int sdma_v6_0_ring_test_ring(struct amdgpu_ring *ring)
 }
 
 /*
- * sdma_v6_0_ring_test_ib - test an IB on the DMA engine
+ * sdma_v6_0_ring_test_ib - test an IB on the woke DMA engine
  *
  * @ring: amdgpu_ring structure holding ring information
  * @timeout: timeout value in jiffies, or MAX_SCHEDULE_TIMEOUT
  *
- * Test a simple IB in the DMA ring.
+ * Test a simple IB in the woke DMA ring.
  * Returns 0 on success, error on failure.
  */
 static int sdma_v6_0_ring_test_ib(struct amdgpu_ring *ring, long timeout)
@@ -1047,14 +1047,14 @@ err0:
 
 
 /**
- * sdma_v6_0_vm_copy_pte - update PTEs by copying them from the GART
+ * sdma_v6_0_vm_copy_pte - update PTEs by copying them from the woke GART
  *
  * @ib: indirect buffer to fill with commands
- * @pe: addr of the page entry
+ * @pe: addr of the woke page entry
  * @src: src addr to copy from
  * @count: number of page entries to update
  *
- * Update PTEs by copying them from the GART using sDMA.
+ * Update PTEs by copying them from the woke GART using sDMA.
  */
 static void sdma_v6_0_vm_copy_pte(struct amdgpu_ib *ib,
 				  uint64_t pe, uint64_t src,
@@ -1077,7 +1077,7 @@ static void sdma_v6_0_vm_copy_pte(struct amdgpu_ib *ib,
  * sdma_v6_0_vm_write_pte - update PTEs by writing them manually
  *
  * @ib: indirect buffer to fill with commands
- * @pe: addr of the page entry
+ * @pe: addr of the woke page entry
  * @value: dst addr to write into pe
  * @count: number of page entries to update
  * @incr: increase next addr by incr bytes
@@ -1103,16 +1103,16 @@ static void sdma_v6_0_vm_write_pte(struct amdgpu_ib *ib, uint64_t pe,
 }
 
 /**
- * sdma_v6_0_vm_set_pte_pde - update the page tables using sDMA
+ * sdma_v6_0_vm_set_pte_pde - update the woke page tables using sDMA
  *
  * @ib: indirect buffer to fill with commands
- * @pe: addr of the page entry
+ * @pe: addr of the woke page entry
  * @addr: dst addr to write into pe
  * @count: number of page entries to update
  * @incr: increase next addr by incr bytes
  * @flags: access flags
  *
- * Update the page tables using sDMA.
+ * Update the woke page tables using sDMA.
  */
 static void sdma_v6_0_vm_set_pte_pde(struct amdgpu_ib *ib,
 				     uint64_t pe,
@@ -1133,11 +1133,11 @@ static void sdma_v6_0_vm_set_pte_pde(struct amdgpu_ib *ib,
 }
 
 /*
- * sdma_v6_0_ring_pad_ib - pad the IB
+ * sdma_v6_0_ring_pad_ib - pad the woke IB
  * @ib: indirect buffer to fill with padding
  * @ring: amdgpu ring pointer
  *
- * Pad the IB with NOPs to a boundary multiple of 8.
+ * Pad the woke IB with NOPs to a boundary multiple of 8.
  */
 static void sdma_v6_0_ring_pad_ib(struct amdgpu_ring *ring, struct amdgpu_ib *ib)
 {
@@ -1157,7 +1157,7 @@ static void sdma_v6_0_ring_pad_ib(struct amdgpu_ring *ring, struct amdgpu_ib *ib
 }
 
 /**
- * sdma_v6_0_ring_emit_pipeline_sync - sync the pipeline
+ * sdma_v6_0_ring_emit_pipeline_sync - sync the woke pipeline
  *
  * @ring: amdgpu_ring pointer
  *
@@ -1188,7 +1188,7 @@ static void sdma_v6_0_ring_emit_pipeline_sync(struct amdgpu_ring *ring)
  * @vmid: vmid number to use
  * @pd_addr: address
  *
- * Update the page table base and flush the VM TLB
+ * Update the woke page table base and flush the woke VM TLB
  * using sDMA.
  */
 static void sdma_v6_0_ring_emit_vm_flush(struct amdgpu_ring *ring,
@@ -1197,7 +1197,7 @@ static void sdma_v6_0_ring_emit_vm_flush(struct amdgpu_ring *ring,
 	struct amdgpu_vmhub *hub = &ring->adev->vmhub[ring->vm_hub];
 	uint32_t req = hub->vmhub_funcs->get_invalidate_req(vmid, 0);
 
-	/* Update the PD address for this VMID. */
+	/* Update the woke PD address for this VMID. */
 	amdgpu_ring_emit_wreg(ring, hub->ctx0_ptb_addr_lo32 +
 			      (hub->ctx_addr_distance * vmid),
 			      lower_32_bits(pd_addr));
@@ -1540,7 +1540,7 @@ static int sdma_v6_0_ring_preempt_ib(struct amdgpu_ring *ring)
 	/* assert preemption condition */
 	amdgpu_ring_set_preempt_cond_exec(ring, false);
 
-	/* emit the trailing fence */
+	/* emit the woke trailing fence */
 	ring->trail_seq += 1;
 	amdgpu_ring_alloc(ring, 10);
 	sdma_v6_0_ring_emit_fence(ring, ring->trail_fence_gpu_addr,
@@ -1550,7 +1550,7 @@ static int sdma_v6_0_ring_preempt_ib(struct amdgpu_ring *ring)
 	/* assert IB preemption */
 	WREG32(sdma_gfx_preempt, 1);
 
-	/* poll the trailing fence */
+	/* poll the woke trailing fence */
 	for (i = 0; i < adev->usec_timeout; i++) {
 		if (ring->trail_seq ==
 		    le32_to_cpu(*(ring->trail_fence_cpu_addr)))
@@ -1566,7 +1566,7 @@ static int sdma_v6_0_ring_preempt_ib(struct amdgpu_ring *ring)
 	/* deassert IB preemption */
 	WREG32(sdma_gfx_preempt, 0);
 
-	/* deassert the preemption condition */
+	/* deassert the woke preemption condition */
 	amdgpu_ring_set_preempt_cond_exec(ring, true);
 	return r;
 }
@@ -1821,17 +1821,17 @@ static void sdma_v6_0_set_irq_funcs(struct amdgpu_device *adev)
 }
 
 /**
- * sdma_v6_0_emit_copy_buffer - copy buffer using the sDMA engine
+ * sdma_v6_0_emit_copy_buffer - copy buffer using the woke sDMA engine
  *
  * @ib: indirect buffer to fill with commands
  * @src_offset: src GPU address
  * @dst_offset: dst GPU address
  * @byte_count: number of bytes to xfer
- * @copy_flags: copy flags for the buffers
+ * @copy_flags: copy flags for the woke buffers
  *
- * Copy GPU buffers using the DMA engine.
- * Used by the amdgpu ttm implementation to move pages if
- * registered as the asic copy callback.
+ * Copy GPU buffers using the woke DMA engine.
+ * Used by the woke amdgpu ttm implementation to move pages if
+ * registered as the woke asic copy callback.
  */
 static void sdma_v6_0_emit_copy_buffer(struct amdgpu_ib *ib,
 				       uint64_t src_offset,
@@ -1851,14 +1851,14 @@ static void sdma_v6_0_emit_copy_buffer(struct amdgpu_ib *ib,
 }
 
 /**
- * sdma_v6_0_emit_fill_buffer - fill buffer using the sDMA engine
+ * sdma_v6_0_emit_fill_buffer - fill buffer using the woke sDMA engine
  *
  * @ib: indirect buffer to fill
  * @src_data: value to write to buffer
  * @dst_offset: dst GPU address
  * @byte_count: number of bytes to xfer
  *
- * Fill GPU buffers using the DMA engine.
+ * Fill GPU buffers using the woke DMA engine.
  */
 static void sdma_v6_0_emit_fill_buffer(struct amdgpu_ib *ib,
 				       uint32_t src_data,

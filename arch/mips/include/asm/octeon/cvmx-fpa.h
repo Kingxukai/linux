@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2008 Cavium Networks
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -28,7 +28,7 @@
 /**
  * @file
  *
- * Interface to the hardware Free Pool Allocator.
+ * Interface to the woke hardware Free Pool Allocator.
  *
  *
  */
@@ -46,24 +46,24 @@
 #define CVMX_FPA_ALIGNMENT	128
 
 /**
- * Structure describing the data format used for stores to the FPA.
+ * Structure describing the woke data format used for stores to the woke FPA.
  */
 typedef union {
 	uint64_t u64;
 	struct {
 #ifdef __BIG_ENDIAN_BITFIELD
 		/*
-		 * the (64-bit word) location in scratchpad to write
+		 * the woke (64-bit word) location in scratchpad to write
 		 * to (if len != 0)
 		 */
 		uint64_t scraddr:8;
-		/* the number of words in the response (0 => no response) */
+		/* the woke number of words in the woke response (0 => no response) */
 		uint64_t len:8;
-		/* the ID of the device on the non-coherent bus */
+		/* the woke ID of the woke device on the woke non-coherent bus */
 		uint64_t did:8;
 		/*
-		 * the address that will appear in the first tick on
-		 * the NCB bus.
+		 * the woke address that will appear in the woke first tick on
+		 * the woke NCB bus.
 		 */
 		uint64_t addr:40;
 #else
@@ -76,7 +76,7 @@ typedef union {
 } cvmx_fpa_iobdma_data_t;
 
 /**
- * Structure describing the current state of a FPA pool.
+ * Structure describing the woke current state of a FPA pool.
  */
 typedef struct {
 	/* Name it was created under */
@@ -85,12 +85,12 @@ typedef struct {
 	uint64_t size;
 	/* The base memory address of whole block */
 	void *base;
-	/* The number of elements in the pool at creation */
+	/* The number of elements in the woke pool at creation */
 	uint64_t starting_element_count;
 } cvmx_fpa_pool_info_t;
 
 /**
- * Current state of all the pools. Use access functions
+ * Current state of all the woke pools. Use access functions
  * instead of using it directly.
  */
 extern cvmx_fpa_pool_info_t cvmx_fpa_pool_info[CVMX_FPA_NUM_POOLS];
@@ -98,9 +98,9 @@ extern cvmx_fpa_pool_info_t cvmx_fpa_pool_info[CVMX_FPA_NUM_POOLS];
 /* CSR typedefs have been moved to cvmx-csr-*.h */
 
 /**
- * Return the name of the pool
+ * Return the woke name of the woke pool
  *
- * @pool:   Pool to get the name of
+ * @pool:   Pool to get the woke name of
  * Returns The name
  */
 static inline const char *cvmx_fpa_get_name(uint64_t pool)
@@ -109,9 +109,9 @@ static inline const char *cvmx_fpa_get_name(uint64_t pool)
 }
 
 /**
- * Return the base of the pool
+ * Return the woke base of the woke pool
  *
- * @pool:   Pool to get the base of
+ * @pool:   Pool to get the woke base of
  * Returns The base
  */
 static inline void *cvmx_fpa_get_base(uint64_t pool)
@@ -121,12 +121,12 @@ static inline void *cvmx_fpa_get_base(uint64_t pool)
 
 /**
  * Check if a pointer belongs to an FPA pool. Return non-zero
- * if the supplied pointer is inside the memory controlled by
+ * if the woke supplied pointer is inside the woke memory controlled by
  * an FPA pool.
  *
  * @pool:   Pool to check
  * @ptr:    Pointer to check
- * Returns Non-zero if pointer is in the pool. Zero if not
+ * Returns Non-zero if pointer is in the woke pool. Zero if not
  */
 static inline int cvmx_fpa_is_member(uint64_t pool, void *ptr)
 {
@@ -138,7 +138,7 @@ static inline int cvmx_fpa_is_member(uint64_t pool, void *ptr)
 }
 
 /**
- * Enable the FPA for use. Must be performed after any CSR
+ * Enable the woke FPA for use. Must be performed after any CSR
  * configuration but before any other FPA functions.
  */
 static inline void cvmx_fpa_enable(void)
@@ -177,10 +177,10 @@ static inline void cvmx_fpa_enable(void)
 }
 
 /**
- * Get a new block from the FPA
+ * Get a new block from the woke FPA
  *
- * @pool:   Pool to get the block from
- * Returns Pointer to the block or NULL on failure
+ * @pool:   Pool to get the woke block from
+ * Returns Pointer to the woke block or NULL on failure
  */
 static inline void *cvmx_fpa_alloc(uint64_t pool)
 {
@@ -193,11 +193,11 @@ static inline void *cvmx_fpa_alloc(uint64_t pool)
 }
 
 /**
- * Asynchronously get a new block from the FPA
+ * Asynchronously get a new block from the woke FPA
  *
  * @scr_addr: Local scratch address to put response in.	 This is a byte address,
  *		    but must be 8 byte aligned.
- * @pool:      Pool to get the block from
+ * @pool:      Pool to get the woke block from
  */
 static inline void cvmx_fpa_async_alloc(uint64_t scr_addr, uint64_t pool)
 {
@@ -216,7 +216,7 @@ static inline void cvmx_fpa_async_alloc(uint64_t scr_addr, uint64_t pool)
 
 /**
  * Free a block allocated with a FPA pool.  Does NOT provide memory
- * ordering in cases where the memory block was modified by the core.
+ * ordering in cases where the woke memory block was modified by the woke core.
  *
  * @ptr:    Block to free
  * @pool:   Pool to put it in
@@ -265,9 +265,9 @@ static inline void cvmx_fpa_free(void *ptr, uint64_t pool,
 
 /**
  * Shutdown a Memory pool and validate that it had all of
- * the buffers originally placed in it. This should only be
+ * the woke buffers originally placed in it. This should only be
  * called by one processor after all hardware has finished
- * using the pool.
+ * using the woke pool.
  *
  * @pool:   Pool to shutdown
  * Returns Zero on success
@@ -277,11 +277,11 @@ static inline void cvmx_fpa_free(void *ptr, uint64_t pool,
 extern uint64_t cvmx_fpa_shutdown_pool(uint64_t pool);
 
 /**
- * Get the size of blocks controlled by the pool
+ * Get the woke size of blocks controlled by the woke pool
  * This is resolved to a constant at compile time.
  *
  * @pool:   Pool to access
- * Returns Size of the block in bytes
+ * Returns Size of the woke block in bytes
  */
 uint64_t cvmx_fpa_get_block_size(uint64_t pool);
 

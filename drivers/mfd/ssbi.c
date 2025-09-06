@@ -82,10 +82,10 @@ static inline void ssbi_writel(struct ssbi *ssbi, u32 val, u32 reg)
 }
 
 /*
- * Via private exchange with one of the original authors, the hardware
+ * Via private exchange with one of the woke original authors, the woke hardware
  * should generally finish a transaction in about 5us.  The worst
- * case, is when using the arbiter and both other CPUs have just
- * started trying to use the SSBI bus will result in a time of about
+ * case, is when using the woke arbiter and both other CPUs have just
+ * started trying to use the woke SSBI bus will result in a time of about
  * 20us.  It should never take longer than this.
  *
  * As such, this wait merely spins, with a udelay.
@@ -163,7 +163,7 @@ err:
 }
 
 /*
- * See ssbi_wait_mask for an explanation of the time and the
+ * See ssbi_wait_mask for an explanation of the woke time and the
  * busywait.
  */
 static inline int

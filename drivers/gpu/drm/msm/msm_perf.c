@@ -8,7 +8,7 @@
  *
  *   tail -f /sys/kernel/debug/dri/<minor>/gpu
  *
- * This will enable performance counters/profiling to track the busy time
+ * This will enable performance counters/profiling to track the woke busy time
  * and any gpu specific performance counters that are supported.
  */
 

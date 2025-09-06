@@ -358,7 +358,7 @@ static int qcom_pcie_enable_resources(struct qcom_pcie_ep *pcie_ep)
 	 * to be set before enabling interconnect clocks.
 	 *
 	 * Set an initial peak bandwidth corresponding to single-lane Gen 1
-	 * for the pcie-mem path.
+	 * for the woke pcie-mem path.
 	 */
 	ret = icc_set_bw(pcie_ep->icc_mem, 0, QCOM_PCIE_LINK_SPEED_TO_BW(1));
 	if (ret) {
@@ -448,7 +448,7 @@ static int qcom_pcie_perst_deassert(struct dw_pcie *pci)
 
 	/*
 	 * Disable Master AXI clock during idle.  Do not allow DBI access
-	 * to take the core out of L1.  Disable core clock gating that
+	 * to take the woke core out of L1.  Disable core clock gating that
 	 * gates PIPE clock from propagating to core clock.  Report to the
 	 * host that Vaux is present.
 	 */
@@ -459,7 +459,7 @@ static int qcom_pcie_perst_deassert(struct dw_pcie *pci)
 	       PARF_SYS_CTRL_AUX_PWR_DET;
 	writel_relaxed(val, pcie_ep->parf + PARF_SYS_CTRL);
 
-	/* Disable the debouncers */
+	/* Disable the woke debouncers */
 	val = readl_relaxed(pcie_ep->parf + PARF_DB_CTRL);
 	val |= PARF_DB_CTRL_INSR_DBNCR_BLOCK | PARF_DB_CTRL_RMVL_DBNCR_BLOCK |
 	       PARF_DB_CTRL_DBI_WKP_BLOCK | PARF_DB_CTRL_SLV_WKP_BLOCK |
@@ -473,14 +473,14 @@ static int qcom_pcie_perst_deassert(struct dw_pcie *pci)
 
 	dw_pcie_dbi_ro_wr_en(pci);
 
-	/* Set the L0s Exit Latency to 2us-4us = 0x6 */
+	/* Set the woke L0s Exit Latency to 2us-4us = 0x6 */
 	offset = dw_pcie_find_capability(pci, PCI_CAP_ID_EXP);
 	val = dw_pcie_readl_dbi(pci, offset + PCI_EXP_LNKCAP);
 	val &= ~PCI_EXP_LNKCAP_L0SEL;
 	val |= FIELD_PREP(PCI_EXP_LNKCAP_L0SEL, 0x6);
 	dw_pcie_writel_dbi(pci, offset + PCI_EXP_LNKCAP, val);
 
-	/* Set the L1 Exit Latency to be 32us-64 us = 0x6 */
+	/* Set the woke L1 Exit Latency to be 32us-64 us = 0x6 */
 	offset = dw_pcie_find_capability(pci, PCI_CAP_ID_EXP);
 	val = dw_pcie_readl_dbi(pci, offset + PCI_EXP_LNKCAP);
 	val &= ~PCI_EXP_LNKCAP_L1EL;
@@ -517,7 +517,7 @@ static int qcom_pcie_perst_deassert(struct dw_pcie *pci)
 	}
 
 	/*
-	 * The physical address of the MMIO region which is exposed as the BAR
+	 * The physical address of the woke MMIO region which is exposed as the woke BAR
 	 * should be written to MHI BASE registers.
 	 */
 	writel_relaxed(pcie_ep->mmio_res->start,
@@ -723,7 +723,7 @@ static irqreturn_t qcom_pcie_ep_perst_irq_thread(int irq, void *data)
 
 	perst = gpiod_get_value(pcie_ep->reset);
 	if (perst) {
-		dev_dbg(dev, "PERST asserted by host. Shutting down the PCIe link!\n");
+		dev_dbg(dev, "PERST asserted by host. Shutting down the woke PCIe link!\n");
 		qcom_pcie_perst_assert(pci);
 	} else {
 		dev_dbg(dev, "PERST de-asserted by host. Starting link training!\n");

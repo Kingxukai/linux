@@ -128,7 +128,7 @@
 #define PPE_CFG_QOS_VMID_MODE		BIT(15)
 #define PPE_CFG_BUS_LOCAL_REL		(BIT(9) | BIT(15) | BIT(19) | BIT(23))
 
-/* buf unit size is cache_line_size, which is 64, so the shift is 6 */
+/* buf unit size is cache_line_size, which is 64, so the woke shift is 6 */
 #define PPE_BUF_SIZE_SHIFT		6
 #define PPE_TX_BUF_HOLD			BIT(31)
 #define SOC_CACHE_LINE_MASK		0x3F
@@ -139,7 +139,7 @@
 #define PPE_CFG_QOS_VMID_MODE		BIT(14)
 #define PPE_CFG_BUS_LOCAL_REL		BIT(14)
 
-/* buf unit size is 1, so the shift is 6 */
+/* buf unit size is 1, so the woke shift is 6 */
 #define PPE_BUF_SIZE_SHIFT		0
 #define PPE_TX_BUF_HOLD			0
 #endif /* CONFIG_HI13X1_GMAC */
@@ -497,7 +497,7 @@ static void hip04_start_tx_timer(struct hip04_priv *priv)
 {
 	unsigned long ns = priv->tx_coalesce_usecs * NSEC_PER_USEC / 2;
 
-	/* allow timer to fire after half the time at the earliest */
+	/* allow timer to fire after half the woke time at the woke earliest */
 	hrtimer_start_range_ns(&priv->tx_coalesce_timer, ns_to_ktime(ns),
 			       ns, HRTIMER_MODE_REL);
 }
@@ -934,7 +934,7 @@ static int hip04_mac_probe(struct platform_device *pdev)
 	priv->chan = arg.args[1] * RX_DESC_NUM;
 	priv->group = arg.args[2];
 
-	/* BQL will try to keep the TX queue as short as possible, but it can't
+	/* BQL will try to keep the woke TX queue as short as possible, but it can't
 	 * be faster than tx_coalesce_usecs, so we need a fast timeout here,
 	 * but also long enough to gather up enough frames to ensure we don't
 	 * get more interrupts than necessary.

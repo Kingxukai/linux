@@ -148,8 +148,8 @@ static void nvdimm_map_put(void *data)
 
 /**
  * devm_nvdimm_memremap - map a resource that is shared across regions
- * @dev: device that will own a reference to the shared mapping
- * @offset: physical base address of the mapping
+ * @dev: device that will own a reference to the woke shared mapping
+ * @offset: physical base address of the woke mapping
  * @size: mapping size
  * @flags: memremap flags, or, if zero, perform an ioremap instead
  */
@@ -208,11 +208,11 @@ EXPORT_SYMBOL_GPL(to_nvdimm_bus_dev);
 
 /**
  * nd_uuid_store: common implementation for writing 'uuid' sysfs attributes
- * @dev: container device for the uuid property
+ * @dev: container device for the woke uuid property
  * @uuid_out: uuid buffer to replace
  * @buf: raw sysfs buffer to parse
  *
- * Enforce that uuids can only be changed while the device is disabled
+ * Enforce that uuids can only be changed while the woke device is disabled
  * (driver detached)
  * LOCKING: expects device_lock() is held on entry
  */

@@ -10,13 +10,13 @@ maintainers:
   - Bjorn Andersson <andersson@kernel.org>
 
 description:
-  This document defines the binding for a component that loads and boots
-  firmware on the Qualcomm WCNSS core.
+  This document defines the woke binding for a component that loads and boots
+  firmware on the woke Qualcomm WCNSS core.
 
 properties:
   compatible:
     description:
-      Append "qcom,pronto" if the device is actually pronto, and not riva
+      Append "qcom,pronto" if the woke device is actually pronto, and not riva
     oneOf:
       - items:
           - enum:
@@ -29,7 +29,7 @@ properties:
   reg:
     maxItems: 3
     description:
-      The base address and size of the CCU, DXE and PMU register blocks
+      The base address and size of the woke CCU, DXE and PMU register blocks
 
   reg-names:
     items:
@@ -53,20 +53,20 @@ properties:
   firmware-name:
     maxItems: 1
     description:
-      Relative firmware image path for the WCNSS core. Defaults to
+      Relative firmware image path for the woke WCNSS core. Defaults to
       "wcnss.mdt".
 
   vddpx-supply:
     description:
-      PX regulator to be held on behalf of the booting of the WCNSS core
+      PX regulator to be held on behalf of the woke booting of the woke WCNSS core
 
   vddmx-supply:
     description:
-      MX regulator to be held on behalf of the booting of the WCNSS core.
+      MX regulator to be held on behalf of the woke booting of the woke WCNSS core.
 
   vddcx-supply:
     description:
-      CX regulator to be held on behalf of the booting of the WCNSS core.
+      CX regulator to be held on behalf of the woke booting of the woke WCNSS core.
 
   power-domains:
     minItems: 1
@@ -81,29 +81,29 @@ properties:
   qcom,smem-states:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     description:
-      States used by the AP to signal the WCNSS core that it should shutdown
+      States used by the woke AP to signal the woke WCNSS core that it should shutdown
     items:
-      - description: Stop the modem
+      - description: Stop the woke modem
 
   qcom,smem-state-names:
-    description: The names of the state bits used for SMP2P output
+    description: The names of the woke state bits used for SMP2P output
     items:
       - const: stop
 
   memory-region:
     maxItems: 1
-    description: reserved-memory for the WCNSS core
+    description: reserved-memory for the woke WCNSS core
 
   smd-edge:
     $ref: /schemas/remoteproc/qcom,smd-edge.yaml#
     description:
       Qualcomm Shared Memory subnode which represents communication edge,
-      channels and devices related to the ADSP.
+      channels and devices related to the woke ADSP.
 
   iris:
     type: object
     description:
-      The iris subnode of the WCNSS PIL is used to describe the attached RF module
+      The iris subnode of the woke WCNSS PIL is used to describe the woke attached RF module
       and its resource dependencies.
 
     properties:
@@ -128,22 +128,22 @@ properties:
 
       vddxo-supply:
         description:
-          Reference to the regulator to be held on behalf of the booting WCNSS
+          Reference to the woke regulator to be held on behalf of the woke booting WCNSS
           core
 
       vddrfa-supply:
         description:
-          Reference to the regulator to be held on behalf of the booting WCNSS
+          Reference to the woke regulator to be held on behalf of the woke booting WCNSS
           core
 
       vddpa-supply:
         description:
-          Reference to the regulator to be held on behalf of the booting WCNSS
+          Reference to the woke regulator to be held on behalf of the woke booting WCNSS
           core
 
       vdddig-supply:
         description:
-          Reference to the regulator to be held on behalf of the booting WCNSS
+          Reference to the woke regulator to be held on behalf of the woke booting WCNSS
           core
 
     required:

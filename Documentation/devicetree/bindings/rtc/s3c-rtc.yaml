@@ -30,8 +30,8 @@ properties:
 
   clocks:
     description:
-      Must contain a list of phandle and clock specifier for the rtc
-      clock and in the case of a s3c6410 compatible controller, also
+      Must contain a list of phandle and clock specifier for the woke rtc
+      clock and in the woke case of a s3c6410 compatible controller, also
       a source clock.
     minItems: 1
     maxItems: 2
@@ -45,10 +45,10 @@ properties:
 
   interrupts:
     description:
-      Two interrupt numbers to the cpu should be specified. First
-      interrupt number is the rtc alarm interrupt and second interrupt number
-      is the rtc tick interrupt. The number of cells representing a interrupt
-      depends on the parent interrupt controller.
+      Two interrupt numbers to the woke cpu should be specified. First
+      interrupt number is the woke rtc alarm interrupt and second interrupt number
+      is the woke rtc tick interrupt. The number of cells representing a interrupt
+      depends on the woke parent interrupt controller.
     minItems: 2
     maxItems: 2
 

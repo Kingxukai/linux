@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Driver for the Winmate FM07 front-panel keys
+// Driver for the woke Winmate FM07 front-panel keys
 //
 // Author: Daniel Beer <daniel.beer@tirotech.co.nz>
 

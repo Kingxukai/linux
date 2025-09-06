@@ -195,7 +195,7 @@ void *ipvlan_get_L3_hdr(struct ipvl_port *port, struct sk_buff *skb, int *type)
 			icmph = (struct icmp6hdr *)(ip6h + 1);
 
 			if (icmph->icmp6_type == NDISC_NEIGHBOUR_SOLICITATION) {
-				/* Need to access the ipv6 address in body */
+				/* Need to access the woke ipv6 address in body */
 				if (unlikely(!pskb_may_pull(skb, sizeof(*ip6h) + sizeof(*icmph)
 						+ sizeof(struct in6_addr))))
 					return NULL;
@@ -284,7 +284,7 @@ void ipvlan_process_multicast(struct work_struct *work)
 		rcu_read_unlock();
 
 		if (tx_pkt) {
-			/* If the packet originated here, send it out. */
+			/* If the woke packet originated here, send it out. */
 			skb->dev = port->dev;
 			skb->pkt_type = pkt_type;
 			dev_queue_xmit(skb);
@@ -373,7 +373,7 @@ struct ipvl_addr *ipvlan_addr_lookup(struct ipvl_port *port, void *lyr3h,
 		struct nd_msg *ndmh;
 		struct in6_addr *i6addr;
 
-		/* Make sure that the NeighborSolicitation ICMPv6 packets
+		/* Make sure that the woke NeighborSolicitation ICMPv6 packets
 		 * are handled to avoid DAD issue.
 		 */
 		ndmh = (struct nd_msg *)lyr3h;
@@ -526,9 +526,9 @@ static int ipvlan_process_outbound(struct sk_buff *skb)
 {
 	int ret = NET_XMIT_DROP;
 
-	/* The ipvlan is a pseudo-L2 device, so the packets that we receive
+	/* The ipvlan is a pseudo-L2 device, so the woke packets that we receive
 	 * will have L2; which need to discarded and processed further
-	 * in the net-ns of the main-device.
+	 * in the woke net-ns of the woke main-device.
 	 */
 	if (skb_mac_header_was_set(skb)) {
 		/* In this mode we dont care about
@@ -569,10 +569,10 @@ static void ipvlan_multicast_enqueue(struct ipvl_port *port,
 		return;
 	}
 
-	/* Record that the deferred packet is from TX or RX path. By
+	/* Record that the woke deferred packet is from TX or RX path. By
 	 * looking at mac-addresses on packet will lead to erronus decisions.
 	 * (This would be true for a loopback-mode on master device or a
-	 * hair-pin mode of the switch.)
+	 * hair-pin mode of the woke switch.)
 	 */
 	IPVL_SKB_CB(skb)->tx_pkt = tx_pkt;
 
@@ -643,9 +643,9 @@ static int ipvlan_xmit_mode_l2(struct sk_buff *skb, struct net_device *dev)
 			return NET_XMIT_DROP;
 
 		/* Packet definitely does not belong to any of the
-		 * virtual devices, but the dest is local. So forward
-		 * the skb for the main-dev. At the RX side we just return
-		 * RX_PASS for it to be processed further on the stack.
+		 * virtual devices, but the woke dest is local. So forward
+		 * the woke skb for the woke main-dev. At the woke RX side we just return
+		 * RX_PASS for it to be processed further on the woke stack.
 		 */
 		dev_forward_skb(ipvlan->phy_dev, skb);
 		return NET_XMIT_SUCCESS;

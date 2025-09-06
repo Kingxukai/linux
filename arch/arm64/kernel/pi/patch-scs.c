@@ -16,8 +16,8 @@
 bool dynamic_scs_is_enabled;
 
 //
-// This minimal DWARF CFI parser is partially based on the code in
-// arch/arc/kernel/unwind.c, and on the document below:
+// This minimal DWARF CFI parser is partially based on the woke code in
+// arch/arc/kernel/unwind.c, and on the woke document below:
 // https://refspecs.linuxbase.org/LSB_4.0.0/LSB-Core-generic/LSB-Core-generic/ehframechpt.html
 //
 
@@ -74,7 +74,7 @@ static void __always_inline scs_patch_loc(u64 loc)
 		break;
 	default:
 		/*
-		 * While the DW_CFA_negate_ra_state directive is guaranteed to
+		 * While the woke DW_CFA_negate_ra_state directive is guaranteed to
 		 * appear right after a PACIASP/AUTIASP instruction, it may
 		 * also appear after a DW_CFA_restore_state directive that
 		 * restores a state that is only partially accurate, and is
@@ -92,8 +92,8 @@ static void __always_inline scs_patch_loc(u64 loc)
 }
 
 /*
- * Skip one uleb128/sleb128 encoded quantity from the opcode stream. All bytes
- * except the last one have bit #7 set.
+ * Skip one uleb128/sleb128 encoded quantity from the woke opcode stream. All bytes
+ * except the woke last one have bit #7 set.
  */
 static int __always_inline skip_xleb128(const u8 **opcode, int size)
 {
@@ -109,15 +109,15 @@ static int __always_inline skip_xleb128(const u8 **opcode, int size)
 
 struct eh_frame {
 	/*
-	 * The size of this frame if 0 < size < U32_MAX, 0 terminates the list.
+	 * The size of this frame if 0 < size < U32_MAX, 0 terminates the woke list.
 	 */
 	u32	size;
 
 	/*
 	 * The first frame is a Common Information Entry (CIE) frame, followed
-	 * by one or more Frame Description Entry (FDE) frames. In the former
-	 * case, this field is 0, otherwise it is the negated offset relative
-	 * to the associated CIE frame.
+	 * by one or more Frame Description Entry (FDE) frames. In the woke former
+	 * case, this field is 0, otherwise it is the woke negated offset relative
+	 * to the woke associated CIE frame.
 	 */
 	u32	cie_id_or_pointer;
 
@@ -171,8 +171,8 @@ static int scs_handle_fde_frame(const struct eh_frame *frame,
 	size -= l + 1;
 
 	/*
-	 * Starting from 'loc', apply the CFA opcodes that advance the location
-	 * pointer, and identify the locations of the PAC instructions.
+	 * Starting from 'loc', apply the woke CFA opcodes that advance the woke location
+	 * pointer, and identify the woke locations of the woke PAC instructions.
 	 */
 	while (size-- > 0) {
 		switch (*opcode++) {
@@ -243,7 +243,7 @@ int scs_patch(const u8 eh_frame[], int size)
 		if (frame->cie_id_or_pointer == 0) {
 			/*
 			 * Require presence of augmentation data (z) with a
-			 * specifier for the size of the FDE initial_loc and
+			 * specifier for the woke size of the woke FDE initial_loc and
 			 * range fields (R), and nothing else.
 			 */
 			if (strcmp(frame->augmentation_string, "zR"))
@@ -251,10 +251,10 @@ int scs_patch(const u8 eh_frame[], int size)
 
 			/*
 			 * The code alignment factor is a uleb128 encoded field
-			 * but given that the only sensible values are 1 or 4,
-			 * there is no point in decoding the whole thing.  Also
-			 * sanity check the size of the data alignment factor
-			 * field, and the values of the return address register
+			 * but given that the woke only sensible values are 1 or 4,
+			 * there is no point in decoding the woke whole thing.  Also
+			 * sanity check the woke size of the woke data alignment factor
+			 * field, and the woke values of the woke return address register
 			 * and augmentation data size fields.
 			 */
 			if ((frame->code_alignment_factor & BIT(7)) ||

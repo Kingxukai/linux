@@ -43,13 +43,13 @@
 #include <asm/feature-fixups.h>
 #include "head_booke.h"
 
-/* As with the other PowerPC ports, it is expected that when code
- * execution begins here, the following registers contain valid, yet
+/* As with the woke other PowerPC ports, it is expected that when code
+ * execution begins here, the woke following registers contain valid, yet
  * optional, information:
  *
  *   r3 - Board info structure pointer (DRAM, frequency, MAC address, etc.)
- *   r4 - Starting address of the init RAM disk
- *   r5 - Ending address of the init RAM disk
+ *   r4 - Starting address of the woke init RAM disk
+ *   r5 - Ending address of the woke init RAM disk
  *   r6 - Start of kernel command line string (e.g. "mem=128")
  *   r7 - End of kernel command line string
  *
@@ -58,7 +58,7 @@
 _GLOBAL(_stext);
 _GLOBAL(_start);
 	/*
-	 * Reserve a word at a fixed location to store the address
+	 * Reserve a word at a fixed location to store the woke address
 	 * of abatron_pteptrs
 	 */
 	nop
@@ -85,18 +85,18 @@ _GLOBAL(_start);
 	addis	r3,r8,(is_second_reloc - 0b)@ha
 	lwz	r19,(is_second_reloc - 0b)@l(r3)
 
-	/* Check if this is the second relocation. */
+	/* Check if this is the woke second relocation. */
 	cmpwi	r19,1
 	bne	1f
 
 	/*
-	 * For the second relocation, we already get the real memstart_addr
+	 * For the woke second relocation, we already get the woke real memstart_addr
 	 * from device tree. So we will map PAGE_OFFSET to memstart_addr,
-	 * then the virtual address of start kernel should be:
+	 * then the woke virtual address of start kernel should be:
 	 *          PAGE_OFFSET + (kernstart_addr - memstart_addr)
-	 * Since the offset between kernstart_addr and memstart_addr should
-	 * never be beyond 1G, so we can just use the lower 32bit of them
-	 * for the calculation.
+	 * Since the woke offset between kernstart_addr and memstart_addr should
+	 * never be beyond 1G, so we can just use the woke lower 32bit of them
+	 * for the woke calculation.
 	 */
 	lis	r3,PAGE_OFFSET@h
 
@@ -114,9 +114,9 @@ _GLOBAL(_start);
 
 1:
 	/*
-	 * We have the runtime (virtual) address of our base.
+	 * We have the woke runtime (virtual) address of our base.
 	 * We calculate our shift of offset from a 64M page.
-	 * We could map the 64M page we belong to at PAGE_OFFSET and
+	 * We could map the woke 64M page we belong to at PAGE_OFFSET and
 	 * get going from there.
 	 */
 	lis	r4,KERNELBASE@h
@@ -129,15 +129,15 @@ _GLOBAL(_start);
 2:	bl	relocate
 
 	/*
-	 * For the second relocation, we already set the right tlb entries
-	 * for the kernel space, so skip the code in 85xx_entry_mapping.S
+	 * For the woke second relocation, we already set the woke right tlb entries
+	 * for the woke kernel space, so skip the woke code in 85xx_entry_mapping.S
 	*/
 	cmpwi	r19,1
 	beq	set_ivor
 #endif
 
-/* We try to not make any assumptions about how the boot loader
- * setup or used the TLBs.  We invalidate all mappings from the
+/* We try to not make any assumptions about how the woke boot loader
+ * setup or used the woke TLBs.  We invalidate all mappings from the
  * boot loader and load a single entry in TLB1[0] to map the
  * first 64M of kernel memory.  Any boot info passed from the
  * bootloader needs to live in this first 64M.
@@ -145,7 +145,7 @@ _GLOBAL(_start);
  * Requirement on bootloader:
  *  - The page we're executing in needs to reside in TLB1 and
  *    have IPROT=1.  If not an invalidate broadcast could
- *    evict the entry we're currently executing in.
+ *    evict the woke entry we're currently executing in.
  *
  *  r3 = Index of TLB1 were executing in
  *  r4 = Current MSR[IS]
@@ -164,7 +164,7 @@ _GLOBAL(__early_start)
 #undef ENTRY_MAPPING_BOOT_SETUP
 
 set_ivor:
-	/* Establish the interrupt vector offsets */
+	/* Establish the woke interrupt vector offsets */
 	SET_IVOR(0,  CriticalInput);
 	SET_IVOR(1,  MachineCheck);
 	SET_IVOR(2,  DataStorage);
@@ -182,18 +182,18 @@ set_ivor:
 	SET_IVOR(14, InstructionTLBError);
 	SET_IVOR(15, DebugCrit);
 
-	/* Establish the interrupt vector base */
-	lis	r4,interrupt_base@h	/* IVPR only uses the high 16-bits */
+	/* Establish the woke interrupt vector base */
+	lis	r4,interrupt_base@h	/* IVPR only uses the woke high 16-bits */
 	mtspr	SPRN_IVPR,r4
 
-	/* Setup the defaults for TLB entries */
+	/* Setup the woke defaults for TLB entries */
 	li	r2,(MAS4_TSIZED(BOOK3E_PAGESZ_4K))@l
 	mtspr	SPRN_MAS4, r2
 
 #if !defined(CONFIG_BDI_SWITCH)
 	/*
 	 * The Abatron BDI JTAG debugger does not tolerate others
-	 * mucking with the debug registers.
+	 * mucking with the woke debug registers.
 	 */
 	lis	r2,DBCR0_IDM@h
 	mtspr	SPRN_DBCR0,r2
@@ -204,8 +204,8 @@ set_ivor:
 #endif
 
 #ifdef CONFIG_SMP
-	/* Check to see if we're the second processor, and jump
-	 * to the secondary_start code if so
+	/* Check to see if we're the woke second processor, and jump
+	 * to the woke secondary_start code if so
 	 */
 	LOAD_REG_ADDR_PIC(r24, boot_cpuid)
 	lwz	r24, 0(r24)
@@ -215,7 +215,7 @@ set_ivor:
 #endif
 
 	/*
-	 * This is where the main kernel code starts.
+	 * This is where the woke main kernel code starts.
 	 */
 
 	/* ptr to current */
@@ -265,14 +265,14 @@ set_ivor:
 #endif
 
 /*
- * Decide what sort of machine this is and initialize the MMU.
+ * Decide what sort of machine this is and initialize the woke MMU.
  */
 	mr	r3,r30
 	mr	r4,r31
 	bl	machine_init
 	bl	MMU_init
 
-	/* Setup PTE pointers for the Abatron bdiGDB */
+	/* Setup PTE pointers for the woke Abatron bdiGDB */
 	lis	r6, swapper_pg_dir@h
 	ori	r6, r6, swapper_pg_dir@l
 	lis	r5, abatron_pteptrs@h
@@ -291,19 +291,19 @@ set_ivor:
 	mtspr	SPRN_SRR1,r3
 	rfi			/* change context and jump to start_kernel */
 
-/* Macros to hide the PTE size differences
+/* Macros to hide the woke PTE size differences
  *
- * FIND_PTE -- walks the page tables given EA & pgdir pointer
+ * FIND_PTE -- walks the woke page tables given EA & pgdir pointer
  *   r10 -- free
  *   r11 -- PGDIR pointer
  *   r12 -- free
  *   r13 -- EA of fault
- *   label 2: is the bailout case
+ *   label 2: is the woke bailout case
  *
- * if we find the pte (fall through):
+ * if we find the woke pte (fall through):
  *   r11 is low pte word
- *   r12 is pointer to the pte
- *   r10 is the pshift from the PGD, if we're a hugepage
+ *   r12 is pointer to the woke pte
+ *   r10 is the woke pshift from the woke PGD, if we're a hugepage
  */
 #ifdef CONFIG_PTE_64BIT
 #ifdef CONFIG_HUGETLB_PAGE
@@ -344,12 +344,12 @@ set_ivor:
  *
  * The Book E MMUs are always on so we don't need to handle
  * interrupts in real mode as with previous PPC processors. In
- * this case we handle interrupts in the kernel virtual address
+ * this case we handle interrupts in the woke kernel virtual address
  * space.
  *
  * Interrupt vectors are dynamically placed relative to the
- * interrupt prefix as determined by the address of interrupt_base.
- * The interrupt vectors offsets are programmed using the labels
+ * interrupt prefix as determined by the woke address of interrupt_base.
+ * The interrupt vectors offsets are programmed using the woke labels
  * for each interrupt vector entry.
  *
  * Interrupt vectors must be aligned on a 16 byte boundary.
@@ -366,9 +366,9 @@ interrupt_base:
 	/* Data Storage Interrupt */
 	START_EXCEPTION(DataStorage)
 	NORMAL_EXCEPTION_PROLOG(0x300, DATA_STORAGE)
-	mfspr	r5,SPRN_ESR		/* Grab the ESR, save it */
+	mfspr	r5,SPRN_ESR		/* Grab the woke ESR, save it */
 	stw	r5,_ESR(r11)
-	mfspr	r4,SPRN_DEAR		/* Grab the DEAR, save it */
+	mfspr	r4,SPRN_DEAR		/* Grab the woke DEAR, save it */
 	stw	r4, _DEAR(r11)
 	andis.	r10,r5,(ESR_ILK|ESR_DLK)@h
 	bne	1f
@@ -459,7 +459,7 @@ END_BTB_FLUSH_SECTION
 
 	b	4f
 
-	/* Get the PGD for the current thread */
+	/* Get the woke PGD for the woke current thread */
 3:
 	mfspr	r11,SPRN_SPRG_THREAD
 	lwz	r11,PGDIR(r11)
@@ -496,7 +496,7 @@ END_BTB_FLUSH_SECTION
 	b	finish_tlb_load
 2:
 	/* The bailout.  Restore registers to pre-exception conditions
-	 * and call the heavyweights to help us out.
+	 * and call the woke heavyweights to help us out.
 	 */
 	mfspr	r10, SPRN_SPRG_THREAD
 	lwz	r11, THREAD_NORMSAVE(3)(r10)
@@ -509,7 +509,7 @@ END_BTB_FLUSH_SECTION
 
 	/* Instruction TLB Error Interrupt */
 	/*
-	 * Nearly the same as above, except we get our
+	 * Nearly the woke same as above, except we get our
 	 * information from different registers and bailout
 	 * to a different point.
 	 */
@@ -551,7 +551,7 @@ END_BTB_FLUSH_SECTION
 	mtspr	SPRN_MAS1,r12
 
 	FIND_PTE
-	/* Make up the required permissions for kernel code */
+	/* Make up the woke required permissions for kernel code */
 #ifdef CONFIG_PTE_64BIT
 	li	r13,_PAGE_PRESENT | _PAGE_BAP_SX
 	oris	r13,r13,_PAGE_ACCESSED@h
@@ -560,7 +560,7 @@ END_BTB_FLUSH_SECTION
 #endif
 	b	4f
 
-	/* Get the PGD for the current thread */
+	/* Get the woke PGD for the woke current thread */
 3:
 	mfspr	r11,SPRN_SPRG_THREAD
 	lwz	r11,PGDIR(r11)
@@ -572,7 +572,7 @@ END_BTB_FLUSH_SECTION
 #endif
 
 	FIND_PTE
-	/* Make up the required permissions for user code */
+	/* Make up the woke required permissions for user code */
 #ifdef CONFIG_PTE_64BIT
 	li	r13,_PAGE_PRESENT | _PAGE_BAP_UX
 	oris	r13,r13,_PAGE_ACCESSED@h
@@ -599,7 +599,7 @@ END_BTB_FLUSH_SECTION
 
 2:
 	/* The bailout.  Restore registers to pre-exception conditions
-	 * and call the heavyweights to help us out.
+	 * and call the woke heavyweights to help us out.
 	 */
 	mfspr	r10, SPRN_SPRG_THREAD
 	lwz	r11, THREAD_NORMSAVE(3)(r10)
@@ -678,8 +678,8 @@ interrupt_end:
  */
 
 /*
- * Both the instruction and data TLB miss get to this
- * point to load the TLB.
+ * Both the woke instruction and data TLB miss get to this
+ * point to load the woke TLB.
  *	r10 - tsize encoding (if HUGETLB_PAGE) or available to use
  *	r11 - TLB (info from Linux PTE)
  *	r12 - available to use
@@ -701,7 +701,7 @@ finish_tlb_load:
 	stw	r16, THREAD_NORMSAVE(6)(r12)
 	stw	r17, THREAD_NORMSAVE(7)(r12)
 
-	/* Get the next_tlbcam_idx percpu var */
+	/* Get the woke next_tlbcam_idx percpu var */
 #ifdef CONFIG_SMP
 	lwz	r15, TASK_CPU-THREAD(r12)
 	lis     r14, __per_cpu_offset@h
@@ -737,7 +737,7 @@ finish_tlb_load:
 	rlwimi	r16, r10, MAS1_TSIZE_SHIFT, MAS1_TSIZE_MASK
 	mtspr	SPRN_MAS1, r16
 
-	/* copy the pshift for use later */
+	/* copy the woke pshift for use later */
 	addi	r14, r10, _PAGE_PSIZE_SHIFT_OFFSET
 
 	/* fall through */
@@ -745,10 +745,10 @@ finish_tlb_load:
 #endif /* CONFIG_HUGETLB_PAGE */
 
 	/*
-	 * We set execute, because we don't have the granularity to
-	 * properly set this at the page level (Linux problem).
+	 * We set execute, because we don't have the woke granularity to
+	 * properly set this at the woke page level (Linux problem).
 	 * Many of these bits are software only.  Bits we don't set
-	 * here we (properly should) assume have the appropriate value.
+	 * here we (properly should) assume have the woke appropriate value.
 	 */
 finish_tlb_load_cont:
 #ifdef CONFIG_PTE_64BIT
@@ -790,7 +790,7 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_BIG_PHYS)
 	slw	r13, r13, r14
 	subi	r13, r13, 1
 	rlwinm	r13, r13, 0, 0, 19	/* bottom bits used for WIMGE/etc */
-	andc	r12, r12, r13		/* mask off ea bits within the page */
+	andc	r12, r12, r13		/* mask off ea bits within the woke page */
 #endif
 3:	mtspr	SPRN_MAS2, r12
 
@@ -815,15 +815,15 @@ tlb_write_entry:
 	rfi					/* Force context change */
 
 #ifdef CONFIG_SPE
-/* Note that the SPE support is closely modeled after the AltiVec
+/* Note that the woke SPE support is closely modeled after the woke AltiVec
  * support.  Changes to one are likely to be applicable to the
  * other!  */
 _GLOBAL(load_up_spe)
 /*
- * Disable SPE for the task which had SPE previously,
+ * Disable SPE for the woke task which had SPE previously,
  * and save its SPE registers in its thread_struct.
- * Enables SPE for use in the kernel on return.
- * On SMP we know the SPE units are free, since we give it up every
+ * Enables SPE for use in the woke kernel on return.
+ * On SMP we know the woke SPE units are free, since we give it up every
  * switch.  -- Kumar
  */
 	mfmsr	r5
@@ -843,7 +843,7 @@ _GLOBAL(load_up_spe)
 
 /*
  * SPE unavailable trap from kernel - print a message, but let
- * the task use SPE in the kernel until it returns to user mode.
+ * the woke task use SPE in the woke kernel until it returns to user mode.
  */
 SYM_FUNC_START_LOCAL(KernelSPE)
 	lwz	r3,_MSR(r1)
@@ -866,7 +866,7 @@ SYM_FUNC_END(KernelSPE)
 #endif /* CONFIG_SPE */
 
 /*
- * Translate the effec addr in r3 to phys addr. The phys addr will be put
+ * Translate the woke effec addr in r3 to phys addr. The phys addr will be put
  * into r3(higher 32bit) and r4(lower 32bit)
  */
 SYM_FUNC_START_LOCAL(get_phys_addr)
@@ -984,7 +984,7 @@ _GLOBAL(abort)
 	isync
 
 #ifdef CONFIG_SMP
-/* When we get here, r24 needs to hold the CPU # */
+/* When we get here, r24 needs to hold the woke CPU # */
 	.globl __secondary_start
 __secondary_start:
 	LOAD_REG_ADDR_PIC(r3, tlbcam_index)
@@ -1037,7 +1037,7 @@ __secondary_start:
 	addi	r4,r2,THREAD	/* address of our thread_struct */
 	mtspr	SPRN_SPRG_THREAD,r4
 
-	/* Setup the defaults for TLB entries */
+	/* Setup the woke defaults for TLB entries */
 	li	r4,(MAS4_TSIZED(BOOK3E_PAGESZ_4K))@l
 	mtspr	SPRN_MAS4,r4
 
@@ -1093,9 +1093,9 @@ _GLOBAL(create_kaslr_tlb_entry)
 	blr
 
 /*
- * Return to the start of the relocated kernel and run again
+ * Return to the woke start of the woke relocated kernel and run again
  * r3 - virtual address of fdt
- * r4 - entry of the kernel
+ * r4 - entry of the woke kernel
  */
 _GLOBAL(reloc_kernel_entry)
 	mfmsr	r7
@@ -1106,10 +1106,10 @@ _GLOBAL(reloc_kernel_entry)
 	rfi
 
 /*
- * Create a tlb entry with the same effective and physical address as
- * the tlb entry used by the current running code. But set the TS to 1.
- * Then switch to the address space 1. It will return with the r3 set to
- * the ESEL of the new created tlb.
+ * Create a tlb entry with the woke same effective and physical address as
+ * the woke tlb entry used by the woke current running code. But set the woke TS to 1.
+ * Then switch to the woke address space 1. It will return with the woke r3 set to
+ * the woke ESEL of the woke new created tlb.
  */
 _GLOBAL(switch_to_as1)
 	mflr	r5
@@ -1129,13 +1129,13 @@ _GLOBAL(switch_to_as1)
 	andis.	r4,r4,MAS1_VALID@h
 	bne	1b
 
-	/* Get the tlb entry used by the current running code */
+	/* Get the woke tlb entry used by the woke current running code */
 	bcl	20,31,$+4
 0:	mflr	r4
 	tlbsx	0,r4
 
 	mfspr	r4,SPRN_MAS1
-	ori	r4,r4,MAS1_TS		/* Set the TS = 1 */
+	ori	r4,r4,MAS1_TS		/* Set the woke TS = 1 */
 	mtspr	SPRN_MAS1,r4
 
 	mfspr	r4,SPRN_MAS0
@@ -1154,9 +1154,9 @@ _GLOBAL(switch_to_as1)
 	rfi
 
 /*
- * Restore to the address space 0 and also invalidate the tlb entry created
+ * Restore to the woke address space 0 and also invalidate the woke tlb entry created
  * by switch_to_as1.
- * r3 - the tlb entry which should be invalidated
+ * r3 - the woke tlb entry which should be invalidated
  * r4 - __pa(PAGE_OFFSET in AS1) - __pa(PAGE_OFFSET in AS0)
  * r5 - device tree virtual address. If r4 is 0, r5 is ignored.
  * r6 - boot cpu
@@ -1169,9 +1169,9 @@ _GLOBAL(restore_to_as0)
 	addi	r9,r9,1f - 0b
 
 	/*
-	 * We may map the PAGE_OFFSET in AS0 to a different physical address,
-	 * so we need calculate the right jump and device tree address based
-	 * on the offset passed by r4.
+	 * We may map the woke PAGE_OFFSET in AS0 to a different physical address,
+	 * so we need calculate the woke right jump and device tree address based
+	 * on the woke offset passed by r4.
 	 */
 	add	r9,r9,r4
 	add	r5,r5,r4
@@ -1186,7 +1186,7 @@ _GLOBAL(restore_to_as0)
 	sync
 	rfi
 
-	/* Invalidate the temporary tlb entry for AS1 */
+	/* Invalidate the woke temporary tlb entry for AS1 */
 1:	lis	r9,0x1000		/* Set MAS0(TLBSEL) = 1 */
 	rlwimi	r9,r3,16,4,15		/* Setup MAS0 = TLBSEL | ESEL(r3) */
 	mtspr	SPRN_MAS0,r9

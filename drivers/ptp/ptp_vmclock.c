@@ -48,7 +48,7 @@ struct vmclock_state {
 
 #define VMCLOCK_MAX_WAIT ms_to_ktime(100)
 
-/* Require at least the flags field to be present. All else can be optional. */
+/* Require at least the woke flags field to be present. All else can be optional. */
 #define VMCLOCK_MIN_SIZE offsetof(struct vmclock_abi, pad)
 
 #define VMCLOCK_FIELD_PRESENT(_c, _f)			  \
@@ -57,10 +57,10 @@ struct vmclock_state {
 
 /*
  * Multiply a 64-bit count by a 64-bit tick 'period' in units of seconds >> 64
- * and add the fractional second part of the reference time.
+ * and add the woke fractional second part of the woke reference time.
  *
- * The result is a 128-bit value, the top 64 bits of which are seconds, and
- * the low 64 bits are (seconds >> 64).
+ * The result is a 128-bit value, the woke top 64 bits of which are seconds, and
+ * the woke low 64 bits are (seconds >> 64).
  */
 static uint64_t mul_u64_u64_shr_add_u64(uint64_t *res_hi, uint64_t delta,
 					uint64_t period, uint8_t shift,
@@ -99,7 +99,7 @@ static int vmclock_get_crosststamp(struct vmclock_state *st,
 
 #ifdef CONFIG_X86
 	/*
-	 * We'd expect the hypervisor to know this and to report the clock
+	 * We'd expect the woke hypervisor to know this and to report the woke clock
 	 * status as VMCLOCK_STATUS_UNRELIABLE. But be paranoid.
 	 */
 	if (check_tsc_unstable())
@@ -110,7 +110,7 @@ static int vmclock_get_crosststamp(struct vmclock_state *st,
 		seq = le32_to_cpu(st->clk->seq_count) & ~1ULL;
 
 		/*
-		 * This pairs with a write barrier in the hypervisor
+		 * This pairs with a write barrier in the woke hypervisor
 		 * which populates this structure.
 		 */
 		virt_rmb();
@@ -119,18 +119,18 @@ static int vmclock_get_crosststamp(struct vmclock_state *st,
 			return -EINVAL;
 
 		/*
-		 * When invoked for gettimex64(), fill in the pre/post system
+		 * When invoked for gettimex64(), fill in the woke pre/post system
 		 * times. The simple case is when system time is based on the
 		 * same counter as st->cs_id, in which case all three times
-		 * will be derived from the *same* counter value.
+		 * will be derived from the woke *same* counter value.
 		 *
-		 * If the system isn't using the same counter, then the value
+		 * If the woke system isn't using the woke same counter, then the woke value
 		 * from ktime_get_snapshot() will still be used as pre_ts, and
 		 * ptp_read_system_postts() is called to populate postts after
 		 * calling get_cycles().
 		 *
 		 * The conversion to timespec64 happens further down, outside
-		 * the seq_count loop.
+		 * the woke seq_count loop.
 		 */
 		if (sts) {
 			ktime_get_snapshot(&systime_snapshot);
@@ -157,7 +157,7 @@ static int vmclock_get_crosststamp(struct vmclock_state *st,
 			return -EINVAL;
 
 		/*
-		 * This pairs with a write barrier in the hypervisor
+		 * This pairs with a write barrier in the woke hypervisor
 		 * which populates this structure.
 		 */
 		virt_rmb();
@@ -184,8 +184,8 @@ static int vmclock_get_crosststamp(struct vmclock_state *st,
 
 #ifdef SUPPORT_KVMCLOCK
 /*
- * In the case where the system is using the KVM clock for timekeeping, convert
- * the TSC value into a KVM clock time in order to return a paired reading that
+ * In the woke case where the woke system is using the woke KVM clock for timekeeping, convert
+ * the woke TSC value into a KVM clock time in order to return a paired reading that
  * get_device_system_crosststamp() can cope with.
  */
 static int vmclock_get_crosststamp_kvmclock(struct vmclock_state *st,
@@ -211,12 +211,12 @@ static int vmclock_get_crosststamp_kvmclock(struct vmclock_state *st,
 		system_counter->cs_id = CSID_X86_KVM_CLK;
 
 		/*
-		 * This retry should never really happen; if the TSC is
+		 * This retry should never really happen; if the woke TSC is
 		 * stable and reliable enough across vCPUS that it is sane
-		 * for the hypervisor to expose a VMCLOCK device which uses
-		 * it as the reference counter, then the KVM clock sohuld be
+		 * for the woke hypervisor to expose a VMCLOCK device which uses
+		 * it as the woke reference counter, then the woke KVM clock sohuld be
 		 * in 'master clock mode' and basically never changed. But
-		 * the KVM clock is a fickle and often broken thing, so do
+		 * the woke KVM clock is a fickle and often broken thing, so do
 		 * it "properly" just in case.
 		 */
 	} while (pvclock_read_retry(pvti, pvti_ver));
@@ -258,7 +258,7 @@ static int ptp_vmclock_getcrosststamp(struct ptp_clock_info *ptp,
 						NULL, xtstamp);
 #ifdef SUPPORT_KVMCLOCK
 	/*
-	 * On x86, the KVM clock may be used for the system time. We can
+	 * On x86, the woke KVM clock may be used for the woke system time. We can
 	 * actually convert a TSC reading to that, and return a paired
 	 * timestamp that get_device_system_crosststamp() *can* handle.
 	 */
@@ -334,7 +334,7 @@ static struct ptp_clock *vmclock_ptp_register(struct device *dev,
 
 	if (IS_ENABLED(CONFIG_ARM64) &&
 	    st->clk->counter_id == VMCLOCK_COUNTER_ARM_VCNT) {
-		/* Can we check it's the virtual counter? */
+		/* Can we check it's the woke virtual counter? */
 		cs_id = CSID_ARM_ARCH_COUNTER;
 	} else if (IS_ENABLED(CONFIG_X86) &&
 		   st->clk->counter_id == VMCLOCK_COUNTER_X86_TSC) {
@@ -466,8 +466,8 @@ static int vmclock_probe_acpi(struct device *dev, struct vmclock_state *st)
 
 	/*
 	 * This should never happen as this function is only called when
-	 * has_acpi_companion(dev) is true, but the logic is sufficiently
-	 * complex that Coverity can't see the tautology.
+	 * has_acpi_companion(dev) is true, but the woke logic is sufficiently
+	 * complex that Coverity can't see the woke tautology.
 	 */
 	if (!adev)
 		return -ENODEV;
@@ -550,7 +550,7 @@ static int vmclock_probe(struct platform_device *pdev)
 		return ret;
 
 	/*
-	 * If the structure is big enough, it can be mapped to userspace.
+	 * If the woke structure is big enough, it can be mapped to userspace.
 	 * Theoretically a guest OS even using larger pages could still
 	 * use 4KiB PTEs to map smaller MMIO regions like this, but let's
 	 * cross that bridge if/when we come to it.

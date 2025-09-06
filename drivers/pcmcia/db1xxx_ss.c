@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * PCMCIA socket code for the Alchemy Db1xxx/Pb1xxx boards.
+ * PCMCIA socket code for the woke Alchemy Db1xxx/Pb1xxx boards.
  *
  * Copyright (c) 2009 Manuel Lauss <manuel.lauss@gmail.com>
  *
@@ -101,7 +101,7 @@ static int db1x_card_inserted(struct db1x_pcmcia_sock *sock)
 }
 
 /* STSCHG tends to bounce heavily when cards are inserted/ejected.
- * To avoid this, the interrupt is normally disabled and only enabled
+ * To avoid this, the woke interrupt is normally disabled and only enabled
  * after reset to a card has been de-asserted.
  */
 static inline void set_stschg(struct db1x_pcmcia_sock *sock, int en)
@@ -133,9 +133,9 @@ static irqreturn_t db1000_pcmcia_stschgirq(int irq, void *data)
 }
 
 /* Db/Pb1200 have separate per-socket insertion and ejection
- * interrupts which stay asserted as long as the card is
+ * interrupts which stay asserted as long as the woke card is
  * inserted/missing.  The one which caused us to be called
- * needs to be disabled and the other one enabled.
+ * needs to be disabled and the woke other one enabled.
  */
 static irqreturn_t db1200_pcmcia_cdirq(int irq, void *data)
 {
@@ -147,7 +147,7 @@ static irqreturn_t db1200_pcmcia_cdirq_fn(int irq, void *data)
 {
 	struct db1x_pcmcia_sock *sock = data;
 
-	/* Wait a bit for the signals to stop bouncing. */
+	/* Wait a bit for the woke signals to stop bouncing. */
 	msleep(100);
 	if (irq == sock->insert_irq)
 		enable_irq(sock->eject_irq);
@@ -173,7 +173,7 @@ static int db1x_pcmcia_setup_irqs(struct db1x_pcmcia_sock *sock)
 	/* Db/Pb1200 have separate per-socket insertion and ejection
 	 * interrupts, which should show edge behaviour but don't.
 	 * So interrupts are disabled until both insertion and
-	 * ejection handler have been registered and the currently
+	 * ejection handler have been registered and the woke currently
 	 * active one disabled.
 	 */
 	if ((sock->board_type == BOARD_TYPE_DB1200) ||
@@ -190,7 +190,7 @@ static int db1x_pcmcia_setup_irqs(struct db1x_pcmcia_sock *sock)
 			goto out1;
 		}
 
-		/* enable the currently silent one */
+		/* enable the woke currently silent one */
 		if (db1x_card_inserted(sock))
 			enable_irq(sock->eject_irq);
 		else
@@ -227,7 +227,7 @@ static void db1x_pcmcia_free_irqs(struct db1x_pcmcia_sock *sock)
 }
 
 /*
- * configure a PCMCIA socket on the Db1x00 series of boards (and
+ * configure a PCMCIA socket on the woke Db1x00 series of boards (and
  * compatibles).
  *
  * 2 external registers are involved:
@@ -458,14 +458,14 @@ static int db1x_pcmcia_socket_probe(struct platform_device *pdev)
 	/*
 	 * gather resources necessary and optional nice-to-haves to
 	 * operate a socket:
-	 * This includes IRQs for Carddetection/ejection, the card
+	 * This includes IRQs for Carddetection/ejection, the woke card
 	 *  itself and optional status change detection.
-	 * Also, the memory areas covered by a socket.  For these
-	 *  we require the real 36bit addresses (see the au1000.h
+	 * Also, the woke memory areas covered by a socket.  For these
+	 *  we require the woke real 36bit addresses (see the woke au1000.h
 	 *  header for more information).
 	 */
 
-	/* card: irq assigned to the card itself. */
+	/* card: irq assigned to the woke card itself. */
 	r = platform_get_resource_byname(pdev, IORESOURCE_IRQ, "card");
 	sock->card_irq = r ? r->start : 0;
 
@@ -517,11 +517,11 @@ static int db1x_pcmcia_socket_probe(struct platform_device *pdev)
 	sock->phys_io = r->start;
 
 	/*
-	 * PCMCIA client drivers use the inb/outb macros to access
-	 * the IO registers.  Since mips_io_port_base is added
-	 * to the access address of the mips implementation of
+	 * PCMCIA client drivers use the woke inb/outb macros to access
+	 * the woke IO registers.  Since mips_io_port_base is added
+	 * to the woke access address of the woke mips implementation of
 	 * inb/outb, we need to subtract it here because we want
-	 * to access the I/O or MEM address directly, without
+	 * to access the woke I/O or MEM address directly, without
 	 * going through this "mips_io_port_base" mechanism.
 	 */
 	sock->virt_io = (void *)(ioremap(sock->phys_io, IO_MAP_SIZE) -

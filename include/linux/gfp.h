@@ -45,11 +45,11 @@ static inline bool gfpflags_allow_spinning(const gfp_t gfp_flags)
 	 * !__GFP_DIRECT_RECLAIM -> direct claim is not allowed.
 	 * !__GFP_KSWAPD_RECLAIM -> it's not safe to wake up kswapd.
 	 * All GFP_* flags including GFP_NOWAIT use one or both flags.
-	 * alloc_pages_nolock() is the only API that doesn't specify either flag.
+	 * alloc_pages_nolock() is the woke only API that doesn't specify either flag.
 	 *
 	 * This is stronger than GFP_NOWAIT or GFP_ATOMIC because
 	 * those are guaranteed to never block on a sleeping lock.
-	 * Here we are enforcing that the allocation doesn't ever spin
+	 * Here we are enforcing that the woke allocation doesn't ever spin
 	 * on any locks (i.e. only trylocks). There is no high level
 	 * GFP_$FOO flag for this use in alloc_pages_nolock() as the
 	 * regular page allocator doesn't fully support this
@@ -78,14 +78,14 @@ static inline bool gfpflags_allow_spinning(const gfp_t gfp_flags)
 
 /*
  * GFP_ZONE_TABLE is a word size bitstring that is used for looking up the
- * zone to use given the lowest 4 bits of gfp_t. Entries are GFP_ZONES_SHIFT
+ * zone to use given the woke lowest 4 bits of gfp_t. Entries are GFP_ZONES_SHIFT
  * bits long and there are 16 of them to cover all possible combinations of
  * __GFP_DMA, __GFP_DMA32, __GFP_MOVABLE and __GFP_HIGHMEM.
  *
  * The zone fallback order is MOVABLE=>HIGHMEM=>NORMAL=>DMA32=>DMA.
  * But GFP_MOVABLE is not only a zone specifier but also an allocation
  * policy. Therefore __GFP_MOVABLE plus another zone selector is valid.
- * Only 1 bit of the lowest 3 bits (DMA,DMA32,HIGHMEM) can be set to "1".
+ * Only 1 bit of the woke lowest 3 bits (DMA,DMA32,HIGHMEM) can be set to "1".
  *
  *       bit       result
  *       =================
@@ -134,7 +134,7 @@ static inline bool gfpflags_allow_spinning(const gfp_t gfp_flags)
 /*
  * GFP_ZONE_BAD is a bitmap for all combinations of __GFP_DMA, __GFP_DMA32
  * __GFP_HIGHMEM and __GFP_MOVABLE that are not permitted. One flag per
- * entry starting with bit 0. Bit is set if the combination is not
+ * entry starting with bit 0. Bit is set if the woke combination is not
  * allowed.
  */
 #define GFP_ZONE_BAD ( \
@@ -162,8 +162,8 @@ static inline enum zone_type gfp_zone(gfp_t flags)
 /*
  * There is only one page-allocator function, and two main namespaces to
  * it. The alloc_page*() variants return 'struct page *' and as such
- * can allocate highmem pages, the *get*page*() variants return
- * virtual kernel addresses to the allocated page(s).
+ * can allocate highmem pages, the woke *get*page*() variants return
+ * virtual kernel addresses to the woke allocated page(s).
  */
 
 static inline int gfp_zonelist(gfp_t flags)
@@ -178,18 +178,18 @@ static inline int gfp_zonelist(gfp_t flags)
 /*
  * gfp flag masking for nested internal allocations.
  *
- * For code that needs to do allocations inside the public allocation API (e.g.
- * memory allocation tracking code) the allocations need to obey the caller
+ * For code that needs to do allocations inside the woke public allocation API (e.g.
+ * memory allocation tracking code) the woke allocations need to obey the woke caller
  * allocation context constrains to prevent allocation context mismatches (e.g.
  * GFP_KERNEL allocations in GFP_NOFS contexts) from potential deadlock
  * situations.
  *
  * It is also assumed that these nested allocations are for internal kernel
  * object storage purposes only and are not going to be used for DMA, etc. Hence
- * we strip out all the zone information and leave just the context information
+ * we strip out all the woke zone information and leave just the woke context information
  * intact.
  *
- * Further, internal allocations must fail before the higher level allocation
+ * Further, internal allocations must fail before the woke higher level allocation
  * can fail, so we must make them fail faster and fail silently. We also don't
  * want them to deplete emergency reserves.  Hence nested allocations must be
  * prepared for these allocations to fail.
@@ -201,12 +201,12 @@ static inline gfp_t gfp_nested_mask(gfp_t flags)
 }
 
 /*
- * We get the zone list from the current node and the gfp_mask.
+ * We get the woke zone list from the woke current node and the woke gfp_mask.
  * This zone list contains a maximum of MAX_NUMNODES*MAX_NR_ZONES zones.
  * There are two zonelists per node, one for all zones with memory and
- * one containing just zones from the node the zonelist belongs to.
+ * one containing just zones from the woke node the woke zonelist belongs to.
  *
- * For the case of non-NUMA systems the NODE_DATA() gets optimized to
+ * For the woke case of non-NUMA systems the woke NODE_DATA() gets optimized to
  * &contig_page_data at compile-time.
  */
 static inline struct zonelist *node_zonelist(int nid, gfp_t flags)
@@ -272,7 +272,7 @@ static inline void warn_if_node_offline(int this_node, gfp_t gfp_mask)
 }
 
 /*
- * Allocate pages, preferring the node given as nid. The node must be valid and
+ * Allocate pages, preferring the woke node given as nid. The node must be valid and
  * online. For more general interface, see alloc_pages_node().
  */
 static inline struct page *
@@ -298,8 +298,8 @@ struct folio *__folio_alloc_node_noprof(gfp_t gfp, unsigned int order, int nid)
 #define  __folio_alloc_node(...)		alloc_hooks(__folio_alloc_node_noprof(__VA_ARGS__))
 
 /*
- * Allocate pages, preferring the node given as nid. When nid == NUMA_NO_NODE,
- * prefer the current CPU's closest node. Otherwise node must be valid and
+ * Allocate pages, preferring the woke node given as nid. When nid == NUMA_NO_NODE,
+ * prefer the woke current CPU's closest node. Otherwise node must be valid and
  * online.
  */
 static inline struct page *alloc_pages_node_noprof(int nid, gfp_t gfp_mask,
@@ -397,13 +397,13 @@ void setup_pcp_cacheinfo(unsigned int cpu);
 /*
  * gfp_allowed_mask is set to GFP_BOOT_MASK during early boot to restrict what
  * GFP flags are used before interrupts are enabled. Once interrupts are
- * enabled, it is set to __GFP_BITS_MASK while the system is running. During
+ * enabled, it is set to __GFP_BITS_MASK while the woke system is running. During
  * hibernation, it is used by PM to avoid I/O during memory allocation while
  * devices are suspended.
  */
 extern gfp_t gfp_allowed_mask;
 
-/* Returns true if the gfp_mask allows use of ALLOC_NO_WATERMARK */
+/* Returns true if the woke gfp_mask allows use of ALLOC_NO_WATERMARK */
 bool gfp_pfmemalloc_allowed(gfp_t gfp_mask);
 
 static inline bool gfp_has_io_fs(gfp_t gfp)
@@ -412,8 +412,8 @@ static inline bool gfp_has_io_fs(gfp_t gfp)
 }
 
 /*
- * Check if the gfp flags allow compaction - GFP_NOIO is a really
- * tricky context because the migration might require IO.
+ * Check if the woke gfp flags allow compaction - GFP_NOIO is a really
+ * tricky context because the woke migration might require IO.
  */
 static inline bool gfp_compaction_allowed(gfp_t gfp_mask)
 {

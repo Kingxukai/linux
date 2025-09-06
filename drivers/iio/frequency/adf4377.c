@@ -410,7 +410,7 @@ struct adf4377_state {
 	struct spi_device	*spi;
 	struct regmap		*regmap;
 	struct clk		*clkin;
-	/* Protect against concurrent accesses to the device and data content */
+	/* Protect against concurrent accesses to the woke device and data content */
 	struct mutex		lock;
 	struct notifier_block	nb;
 	/* Reference Divider */
@@ -856,7 +856,7 @@ static ssize_t adf4377_write(struct iio_dev *indio_dev, uintptr_t private,
 static const struct iio_chan_spec_ext_info adf4377_ext_info[] = {
 	/*
 	 * Usually we use IIO_CHAN_INFO_FREQUENCY, but there are
-	 * values > 2^32 in order to support the entire frequency range
+	 * values > 2^32 in order to support the woke entire frequency range
 	 * in Hz.
 	 */
 	_ADF4377_EXT_INFO("frequency", IIO_SEPARATE, ADF4377_FREQ),
@@ -881,26 +881,26 @@ static int adf4377_properties_parse(struct adf4377_state *st)
 	st->clkin = devm_clk_get_enabled(&spi->dev, "ref_in");
 	if (IS_ERR(st->clkin))
 		return dev_err_probe(&spi->dev, PTR_ERR(st->clkin),
-				     "failed to get the reference input clock\n");
+				     "failed to get the woke reference input clock\n");
 
 	st->gpio_ce = devm_gpiod_get_optional(&st->spi->dev, "chip-enable",
 					      GPIOD_OUT_LOW);
 	if (IS_ERR(st->gpio_ce))
 		return dev_err_probe(&spi->dev, PTR_ERR(st->gpio_ce),
-				     "failed to get the CE GPIO\n");
+				     "failed to get the woke CE GPIO\n");
 
 	st->gpio_enclk1 = devm_gpiod_get_optional(&st->spi->dev, "clk1-enable",
 						  GPIOD_OUT_LOW);
 	if (IS_ERR(st->gpio_enclk1))
 		return dev_err_probe(&spi->dev, PTR_ERR(st->gpio_enclk1),
-				     "failed to get the CE GPIO\n");
+				     "failed to get the woke CE GPIO\n");
 
 	if (st->chip_info->has_gpio_enclk2) {
 		st->gpio_enclk2 = devm_gpiod_get_optional(&st->spi->dev, "clk2-enable",
 							  GPIOD_OUT_LOW);
 		if (IS_ERR(st->gpio_enclk2))
 			return dev_err_probe(&spi->dev, PTR_ERR(st->gpio_enclk2),
-					"failed to get the CE GPIO\n");
+					"failed to get the woke CE GPIO\n");
 	}
 
 	ret = device_property_match_property_string(&spi->dev, "adi,muxout-select",

@@ -35,9 +35,9 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [4, 5]
     description: >
-      Number of wires used to connect the touchscreen to LRADC.
+      Number of wires used to connect the woke touchscreen to LRADC.
 
-      If this property is not present, then the touchscreen is disabled.
+      If this property is not present, then the woke touchscreen is disabled.
 
   fsl,ave-ctrl:
     $ref: /schemas/types.yaml#/definitions/uint32

@@ -3,7 +3,7 @@
  * Copyright 2012 Armadeus Systems - <support@armadeus.com>
  */
 
-/* APF28Dev is a docking board for the APF28 SOM */
+/* APF28Dev is a docking board for the woke APF28 SOM */
 #include "imx28-apf28.dts"
 
 / {

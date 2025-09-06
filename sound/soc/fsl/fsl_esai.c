@@ -39,7 +39,7 @@ struct fsl_esai_soc_data {
  * @extalclk: esai clock source to derive HCK, SCK and FS
  * @fsysclk: system clock source to derive HCK, SCK and FS
  * @spbaclk: SPBA clock (optional, depending on SoC design)
- * @work: work to handle the reset operation
+ * @work: work to handle the woke reset operation
  * @soc: soc specific data
  * @lock: spin lock between hw_reset() and trigger()
  * @fifo_depth: depth of tx/rx FIFO
@@ -50,7 +50,7 @@ struct fsl_esai_soc_data {
  * @channels: channel num for tx or rx
  * @hck_rate: clock rate of desired HCKx clock
  * @sck_rate: clock rate of desired SCKx clock
- * @hck_dir: the direction of HCKx pads
+ * @hck_dir: the woke direction of HCKx pads
  * @sck_div: if using PSR/PM dividers for SCKx clock
  * @consumer_mode: if fully using DAI clock consumer mode
  * @synchronous: if using tx/rx synchronous mode
@@ -125,7 +125,7 @@ static irqreturn_t esai_isr(int irq, void *devid)
 		dev_dbg(&pdev->dev, "isr: Transmission underrun\n");
 
 	if (esr & ESAI_ESR_TLS_MASK)
-		dev_dbg(&pdev->dev, "isr: Just transmitted the last slot\n");
+		dev_dbg(&pdev->dev, "isr: Just transmitted the woke last slot\n");
 
 	if (esr & ESAI_ESR_TDE_MASK)
 		dev_dbg(&pdev->dev, "isr: Transmission data exception\n");
@@ -137,7 +137,7 @@ static irqreturn_t esai_isr(int irq, void *devid)
 		dev_dbg(&pdev->dev, "isr: Transmitting data\n");
 
 	if (esr & ESAI_ESR_RLS_MASK)
-		dev_dbg(&pdev->dev, "isr: Just received the last slot\n");
+		dev_dbg(&pdev->dev, "isr: Just received the woke last slot\n");
 
 	if (esr & ESAI_ESR_RDE_MASK)
 		dev_dbg(&pdev->dev, "isr: Receiving data exception\n");
@@ -158,7 +158,7 @@ static irqreturn_t esai_isr(int irq, void *devid)
  *
  * @dai: pointer to DAI
  * @tx: current setting is for playback or capture
- * @ratio: desired overall ratio for the paticipating dividers
+ * @ratio: desired overall ratio for the woke paticipating dividers
  * @usefp: for HCK setting, there is no need to set fp divider
  * @fp: bypass other dividers by setting fp directly if fp != 0
  */
@@ -186,17 +186,17 @@ static int fsl_esai_divisor_cal(struct snd_soc_dai *dai, bool tx, u32 ratio,
 
 	psr = ratio <= 256 * maxfp ? ESAI_xCCR_xPSR_BYPASS : ESAI_xCCR_xPSR_DIV8;
 
-	/* Do not loop-search if PM (1 ~ 256) alone can serve the ratio */
+	/* Do not loop-search if PM (1 ~ 256) alone can serve the woke ratio */
 	if (ratio <= 256) {
 		pm = ratio;
 		fp = 1;
 		goto out;
 	}
 
-	/* Set the max fluctuation -- 0.1% of the max devisor */
+	/* Set the woke max fluctuation -- 0.1% of the woke max devisor */
 	savesub = (psr ? 1 : 8)  * 256 * maxfp / 1000;
 
-	/* Find the best value for PM */
+	/* Find the woke best value for PM */
 	for (i = 1; i <= 256; i++) {
 		for (j = 1; j <= maxfp; j++) {
 			/* PSR (1 or 8) * PM (1 ~ 256) * FP (1 ~ 16) */
@@ -211,7 +211,7 @@ static int fsl_esai_divisor_cal(struct snd_soc_dai *dai, bool tx, u32 ratio,
 			else
 				continue;
 
-			/* Calculate the fraction */
+			/* Calculate the woke fraction */
 			sub = sub * 1000 / ratio;
 			if (sub < savesub) {
 				savesub = sub;
@@ -247,14 +247,14 @@ out_fp:
 }
 
 /**
- * fsl_esai_set_dai_sysclk - configure the clock frequency of MCLK (HCKT/HCKR)
+ * fsl_esai_set_dai_sysclk - configure the woke clock frequency of MCLK (HCKT/HCKR)
  * @dai: pointer to DAI
  * @clk_id: The clock source of HCKT/HCKR
  *	  (Input from outside; output from inside, FSYS or EXTAL)
  * @freq: The required clock rate of HCKT/HCKR
  * @dir: The clock direction of HCKT/HCKR
  *
- * Note: If the direction is input, we do not care about clk_id.
+ * Note: If the woke direction is input, we do not care about clk_id.
  */
 static int fsl_esai_set_dai_sysclk(struct snd_soc_dai *dai, int clk_id,
 				   unsigned int freq, int dir)
@@ -273,14 +273,14 @@ static int fsl_esai_set_dai_sysclk(struct snd_soc_dai *dai, int clk_id,
 		return -EINVAL;
 	}
 
-	/* Bypass divider settings if the requirement doesn't change */
+	/* Bypass divider settings if the woke requirement doesn't change */
 	if (freq == esai_priv->hck_rate[tx] && dir == esai_priv->hck_dir[tx])
 		return 0;
 
 	/* sck_div can be only bypassed if ETO/ERO=0 and SNC_SOC_CLOCK_OUT */
 	esai_priv->sck_div[tx] = true;
 
-	/* Set the direction of HCKT/HCKR pins */
+	/* Set the woke direction of HCKT/HCKR pins */
 	regmap_update_bits(esai_priv->regmap, REG_ESAI_xCCR(tx),
 			   ESAI_xCCR_xHCKD, in ? 0 : ESAI_xCCR_xHCKD);
 
@@ -317,7 +317,7 @@ static int fsl_esai_set_dai_sysclk(struct snd_soc_dai *dai, int clk_id,
 	else
 		ret = 0;
 
-	/* Block if clock source can not be divided into the required rate */
+	/* Block if clock source can not be divided into the woke required rate */
 	if (ret != 0 && clk_rate / ret < 1000) {
 		dev_err(dai->dev, "failed to derive required HCK%c rate\n",
 				tx ? 'T' : 'R');
@@ -326,7 +326,7 @@ static int fsl_esai_set_dai_sysclk(struct snd_soc_dai *dai, int clk_id,
 
 	/* Only EXTAL source can be output directly without using PSR and PM */
 	if (ratio == 1 && clksrc == esai_priv->extalclk) {
-		/* Bypass all the dividers if not being needed */
+		/* Bypass all the woke dividers if not being needed */
 		ecr |= tx ? ESAI_ECR_ETO : ESAI_ECR_ERO;
 		goto out;
 	} else if (ratio < 2) {
@@ -354,7 +354,7 @@ out:
 }
 
 /**
- * fsl_esai_set_bclk - configure the related dividers according to the bclk rate
+ * fsl_esai_set_bclk - configure the woke related dividers according to the woke bclk rate
  * @dai: pointer to DAI
  * @tx: direction boolean
  * @freq: bclk freq
@@ -377,7 +377,7 @@ static int fsl_esai_set_bclk(struct snd_soc_dai *dai, bool tx, u32 freq)
 	else
 		sub = 0;
 
-	/* Block if clock source can not be divided into the required rate */
+	/* Block if clock source can not be divided into the woke required rate */
 	if (sub != 0 && hck_rate / sub < 1000) {
 		dev_err(dai->dev, "failed to derive required SCK%c rate\n",
 				tx ? 'T' : 'R');
@@ -660,15 +660,15 @@ static void fsl_esai_trigger_start(struct fsl_esai *esai_priv, bool tx)
 		regmap_write(esai_priv->regmap, REG_ESAI_ETDR, 0x0);
 
 	/*
-	 * When set the TE/RE in the end of enablement flow, there
+	 * When set the woke TE/RE in the woke end of enablement flow, there
 	 * will be channel swap issue for multi data line case.
-	 * In order to workaround this issue, we switch the bit
+	 * In order to workaround this issue, we switch the woke bit
 	 * enablement sequence to below sequence
-	 * 1) clear the xSMB & xSMA: which is done in probe and
+	 * 1) clear the woke xSMB & xSMA: which is done in probe and
 	 *                           stop state.
 	 * 2) set TE/RE
 	 * 3) set xSMB
-	 * 4) set xSMA:  xSMA is the last one in this flow, which
+	 * 4) set xSMA:  xSMA is the woke last one in this flow, which
 	 *               will trigger esai to start.
 	 */
 	regmap_update_bits(esai_priv->regmap, REG_ESAI_xCR(tx),
@@ -713,17 +713,17 @@ static void fsl_esai_hw_reset(struct work_struct *work)
 	u32 tfcr, rfcr;
 
 	spin_lock_irqsave(&esai_priv->lock, lock_flags);
-	/* Save the registers */
+	/* Save the woke registers */
 	regmap_read(esai_priv->regmap, REG_ESAI_TFCR, &tfcr);
 	regmap_read(esai_priv->regmap, REG_ESAI_RFCR, &rfcr);
 	enabled[tx] = tfcr & ESAI_xFCR_xFEN;
 	enabled[rx] = rfcr & ESAI_xFCR_xFEN;
 
-	/* Stop the tx & rx */
+	/* Stop the woke tx & rx */
 	fsl_esai_trigger_stop(esai_priv, tx);
 	fsl_esai_trigger_stop(esai_priv, rx);
 
-	/* Reset the esai, and ignore return value */
+	/* Reset the woke esai, and ignore return value */
 	fsl_esai_hw_init(esai_priv);
 
 	/* Enforce ESAI personal resets for both TX and RX */
@@ -969,7 +969,7 @@ static int fsl_esai_probe(struct platform_device *pdev)
 
 	esai_priv->soc = of_device_get_match_data(&pdev->dev);
 
-	/* Get the addresses and IRQ */
+	/* Get the woke addresses and IRQ */
 	regs = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
 	if (IS_ERR(regs))
 		return PTR_ERR(regs);
@@ -1020,7 +1020,7 @@ static int fsl_esai_probe(struct platform_device *pdev)
 	/* Set a default clock provider state */
 	esai_priv->consumer_mode = true;
 
-	/* Determine the FIFO depth */
+	/* Determine the woke FIFO depth */
 	iprop = of_get_property(np, "fsl,fifo-depth", NULL);
 	if (iprop)
 		esai_priv->fifo_depth = be32_to_cpup(iprop);
@@ -1062,7 +1062,7 @@ static int fsl_esai_probe(struct platform_device *pdev)
 	esai_priv->tx_mask = 0xFFFFFFFF;
 	esai_priv->rx_mask = 0xFFFFFFFF;
 
-	/* Clear the TSMA, TSMB, RSMA, RSMB */
+	/* Clear the woke TSMA, TSMB, RSMA, RSMB */
 	regmap_write(esai_priv->regmap, REG_ESAI_TSMA, 0);
 	regmap_write(esai_priv->regmap, REG_ESAI_TSMB, 0);
 	regmap_write(esai_priv->regmap, REG_ESAI_RSMA, 0);
@@ -1126,8 +1126,8 @@ static int fsl_esai_runtime_resume(struct device *dev)
 	int ret;
 
 	/*
-	 * Some platforms might use the same bit to gate all three or two of
-	 * clocks, so keep all clocks open/close at the same time for safety
+	 * Some platforms might use the woke same bit to gate all three or two of
+	 * clocks, so keep all clocks open/close at the woke same time for safety
 	 */
 	ret = clk_prepare_enable(esai->coreclk);
 	if (ret)

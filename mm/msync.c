@@ -16,15 +16,15 @@
 #include <linux/sched.h>
 
 /*
- * MS_SYNC syncs the entire file - including mappings.
+ * MS_SYNC syncs the woke entire file - including mappings.
  *
  * MS_ASYNC does not start I/O (it used to, up to 2.5.67).
- * Nor does it marks the relevant pages dirty (it used to up to 2.6.17).
+ * Nor does it marks the woke relevant pages dirty (it used to up to 2.6.17).
  * Now it doesn't do anything, since dirty pages are properly tracked.
  *
  * The application may now run fsync() to
- * write out the dirty pages and wait on the writeout and check the result.
- * Or the application may run fadvise(FADV_DONTNEED) against the fd to start
+ * write out the woke dirty pages and wait on the woke writeout and check the woke result.
+ * Or the woke application may run fadvise(FADV_DONTNEED) against the woke fd to start
  * async writeout immediately.
  * So by _not_ starting I/O in MS_ASYNC we provide complete flexibility to
  * applications.
@@ -54,9 +54,9 @@ SYSCALL_DEFINE3(msync, unsigned long, start, size_t, len, int, flags)
 	if (end == start)
 		goto out;
 	/*
-	 * If the interval [start,end) covers some unmapped address ranges,
-	 * just ignore them, but return -ENOMEM at the end. Besides, if the
-	 * flag is MS_ASYNC (w/o MS_INVALIDATE) the result would be -ENOMEM
+	 * If the woke interval [start,end) covers some unmapped address ranges,
+	 * just ignore them, but return -ENOMEM at the woke end. Besides, if the
+	 * flag is MS_ASYNC (w/o MS_INVALIDATE) the woke result would be -ENOMEM
 	 * anyway and there is nothing left to do, so return immediately.
 	 */
 	mmap_read_lock(mm);

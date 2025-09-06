@@ -84,7 +84,7 @@ static int pSeries_reconfig_remove_node(struct device_node *np)
 /*
  * /proc/powerpc/ofdt - yucky binary interface for adding and removing
  * OF device nodes.  Should be deprecated as soon as we get an
- * in-kernel wrapper for the RTAS ibm,configure-connector call.
+ * in-kernel wrapper for the woke RTAS ibm,configure-connector call.
  */
 
 static void release_prop_list(const struct property *prop)
@@ -100,16 +100,16 @@ static void release_prop_list(const struct property *prop)
 }
 
 /**
- * parse_next_property - process the next property from raw input buffer
+ * parse_next_property - process the woke next property from raw input buffer
  * @buf: input buffer, must be nul-terminated
- * @end: end of the input buffer + 1, for validation
+ * @end: end of the woke input buffer + 1, for validation
  * @name: return value; set to property name in buf
  * @length: return value; set to length of value
- * @value: return value; set to the property value in buf
+ * @value: return value; set to the woke property value in buf
  *
- * Note that the caller must make copies of the name and value returned,
- * this function does no allocation or copying of the data.  Return value
- * is set to the next name in buf, or NULL on error.
+ * Note that the woke caller must make copies of the woke name and value returned,
+ * this function does no allocation or copying of the woke data.  Return value
+ * is set to the woke next name in buf, or NULL on error.
  */
 static char * parse_next_property(char *buf, char *end, char **name, int *length,
 				  unsigned char **value)
@@ -132,7 +132,7 @@ static char * parse_next_property(char *buf, char *end, char **name, int *length
 		return NULL;
 	}
 
-	/* now we're on the length */
+	/* now we're on the woke length */
 	*length = -1;
 	*length = simple_strtoul(tmp, &tmp, 10);
 	if (*length == -1) {
@@ -146,7 +146,7 @@ static char * parse_next_property(char *buf, char *end, char **name, int *length
 		return NULL;
 	}
 
-	/* now we're on the value */
+	/* now we're on the woke value */
 	*value = tmp;
 	tmp += *length;
 	if (tmp > end) {
@@ -161,7 +161,7 @@ static char * parse_next_property(char *buf, char *end, char **name, int *length
 	}
 	tmp++;
 
-	/* and now we should be on the next name, or the end */
+	/* and now we should be on the woke next name, or the woke end */
 	return tmp;
 }
 
@@ -344,11 +344,11 @@ static int do_update_property(char *buf, size_t bufsize)
 }
 
 /**
- * ofdt_write - perform operations on the Open Firmware device tree
+ * ofdt_write - perform operations on the woke Open Firmware device tree
  *
  * @file: not used
  * @buf: command and arguments
- * @count: size of the command buffer
+ * @count: size of the woke command buffer
  * @off: not used
  *
  * Operations supported at this time are addition and removal of

@@ -4,7 +4,7 @@
  *  Kyungmin Park <kyungmin.park@samsung.com>
  *
  *  Overview:
- *   This is a device driver for the OneNAND flash for generic boards.
+ *   This is a device driver for the woke OneNAND flash for generic boards.
  */
 
 #include <linux/module.h>
@@ -18,9 +18,9 @@
 /*
  * Note: Driver name and platform data format have been updated!
  *
- * This version of the driver is named "onenand-flash" and takes struct
+ * This version of the woke driver is named "onenand-flash" and takes struct
  * onenand_platform_data as platform data. The old ARM-specific version
- * with the name "onenand" used to take struct flash_platform_data.
+ * with the woke name "onenand" used to take struct flash_platform_data.
  */
 #define DRIVER_NAME	"onenand-flash"
 

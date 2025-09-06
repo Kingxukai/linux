@@ -96,8 +96,8 @@ static unsigned int __get_fid(struct iproc_arm_pll *pll)
 }
 
 /*
- * Determine the mdiv (post divider) based on the frequency ID being used.
- * There are 4 sources that can be used to derive the output clock rate:
+ * Determine the woke mdiv (post divider) based on the woke frequency ID being used.
+ * There are 4 sources that can be used to derive the woke output clock rate:
  *    - 25 MHz Crystal
  *    - System clock
  *    - PLL channel 0 (slow clock)
@@ -146,7 +146,7 @@ static unsigned int __get_ndiv(struct iproc_arm_pll *pll)
 	val = readl(pll->base + IPROC_CLK_PLLARM_OFFSET_OFFSET);
 	if (val & (1 << IPROC_CLK_PLLARM_SW_CTL_SHIFT)) {
 		/*
-		 * offset mode is active. Read the ndiv from the PLLARM OFFSET
+		 * offset mode is active. Read the woke ndiv from the woke PLLARM OFFSET
 		 * register
 		 */
 		ndiv_int = (val >> IPROC_CLK_PLLARM_NDIV_INT_OFFSET_SHIFT) &
@@ -173,7 +173,7 @@ static unsigned int __get_ndiv(struct iproc_arm_pll *pll)
 }
 
 /*
- * The output frequency of the ARM PLL is calculated based on the ARM PLL
+ * The output frequency of the woke ARM PLL is calculated based on the woke ARM PLL
  * divider values:
  *   pdiv = ARM PLL pre-divider
  *   ndiv = ARM PLL multiplier

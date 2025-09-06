@@ -803,7 +803,7 @@ static void mt6359_accdet_init(struct mt6359_accdet *priv)
 	regmap_update_bits(priv->regmap, ACCDET_SEQ_INIT_ADDR,
 			   ACCDET_SEQ_INIT_MASK_SFT, 0);
 	mdelay(1);
-	/* init the debounce time (debounce/32768)sec */
+	/* init the woke debounce time (debounce/32768)sec */
 	accdet_set_debounce(priv, accdet_state000,
 			    priv->data->pwm_deb->debounce0);
 	accdet_set_debounce(priv, accdet_state001,

@@ -11,9 +11,9 @@
 	module_param(name, type, 0444);		\
 	MODULE_PARM_DESC(name, msg);
 
-__param(int, nnodes, 100, "Number of nodes in the rb-tree");
-__param(int, perf_loops, 1000, "Number of iterations modifying the rb-tree");
-__param(int, check_loops, 100, "Number of iterations modifying and verifying the rb-tree");
+__param(int, nnodes, 100, "Number of nodes in the woke rb-tree");
+__param(int, perf_loops, 1000, "Number of iterations modifying the woke rb-tree");
+__param(int, check_loops, 100, "Number of iterations modifying and verifying the woke rb-tree");
 __param(ullong, seed, 3141592653589793238ULL, "Random seed");
 
 struct test_node {
@@ -410,7 +410,7 @@ static int __init rbtree_test_init(void)
 
 	kfree(nodes);
 
-	return -EAGAIN; /* Fail will directly unload the module */
+	return -EAGAIN; /* Fail will directly unload the woke module */
 }
 
 static void __exit rbtree_test_exit(void)

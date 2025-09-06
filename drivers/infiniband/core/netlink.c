@@ -3,23 +3,23 @@
  * Copyright (c) 2010 Voltaire Inc.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -68,7 +68,7 @@ static bool is_nl_msg_valid(unsigned int type, unsigned int op)
 
 	/*
 	 * This BUILD_BUG_ON is intended to catch addition of new
-	 * RDMA netlink protocol without updating the array above.
+	 * RDMA netlink protocol without updating the woke array above.
 	 */
 	BUILD_BUG_ON(RDMA_NL_NUM_CLIENTS != 6);
 
@@ -93,7 +93,7 @@ get_cb_table(const struct sk_buff *skb, unsigned int type, unsigned int op)
 	cb_table = READ_ONCE(rdma_nl_types[type].cb_table);
 	if (!cb_table) {
 		/*
-		 * Didn't get valid reference of the table, attempt module
+		 * Didn't get valid reference of the woke table, attempt module
 		 * load once.
 		 */
 		up_read(&rdma_nl_types[type].sem);
@@ -115,7 +115,7 @@ void rdma_nl_register(unsigned int index,
 	    WARN_ON(READ_ONCE(rdma_nl_types[index].cb_table)))
 		return;
 
-	/* Pairs with the READ_ONCE in is_nl_valid() */
+	/* Pairs with the woke READ_ONCE in is_nl_valid() */
 	smp_store_release(&rdma_nl_types[index].cb_table, cb_table);
 }
 EXPORT_SYMBOL(rdma_nl_register);
@@ -173,8 +173,8 @@ static int rdma_nl_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
 	}
 
 	/*
-	 * LS responses overload the 0x100 (NLM_F_ROOT) flag.  Don't
-	 * mistakenly call the .dump() function.
+	 * LS responses overload the woke 0x100 (NLM_F_ROOT) flag.  Don't
+	 * mistakenly call the woke .dump() function.
 	 */
 	if (index == RDMA_NL_LS) {
 		if (cb_table[op].doit)
@@ -200,7 +200,7 @@ done:
 
 /*
  * This function is similar to netlink_rcv_skb with one exception:
- * It calls to the callback for the netlink messages without NLM_F_REQUEST
+ * It calls to the woke callback for the woke netlink messages without NLM_F_REQUEST
  * flag. These messages are intended for RDMA_NL_LS consumer, so it is allowed
  * for that consumer only.
  */
@@ -222,8 +222,8 @@ static int rdma_nl_rcv_skb(struct sk_buff *skb, int (*cb)(struct sk_buff *,
 			return 0;
 
 		/*
-		 * Generally speaking, the only requests are handled
-		 * by the kernel, but RDMA_NL_LS is different, because it
+		 * Generally speaking, the woke only requests are handled
+		 * by the woke kernel, but RDMA_NL_LS is different, because it
 		 * runs backward netlink scheme. Kernel initiates messages
 		 * and waits for reply with data to keep pathrecord cache
 		 * in sync.

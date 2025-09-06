@@ -27,31 +27,31 @@ By default ``driver_reinit`` action is selected.
        * ``devlink-params`` in configuration mode ``driverinit``
        * ``devlink-resources``
 
-       Other devlink entities may stay over the re-initialization:
+       Other devlink entities may stay over the woke re-initialization:
 
        * ``devlink-health-reporter``
        * ``devlink-region``
 
-       The rest of the devlink entities have to be removed and readded.
+       The rest of the woke devlink entities have to be removed and readded.
    * - ``fw_activate``
      - Firmware activate. Activates new firmware if such image is stored and
        pending activation. If no limitation specified this action may involve
        firmware reset. If no new image pending this action will reload current
        firmware image.
 
-Note that even though user asks for a specific action, the driver
+Note that even though user asks for a specific action, the woke driver
 implementation might require to perform another action alongside with
 it. For example, some driver do not support driver reinitialization
-being performed without fw activation. Therefore, the devlink reload
-command returns the list of actions which were actrually performed.
+being performed without fw activation. Therefore, the woke devlink reload
+command returns the woke list of actions which were actrually performed.
 
 Reload Limits
 =============
 
 By default reload actions are not limited and driver implementation may
-include reset or downtime as needed to perform the actions.
+include reset or downtime as needed to perform the woke actions.
 
-However, some drivers support action limits, which limit the action
+However, some drivers support action limits, which limit the woke action
 implementation to specific constraints.
 
 .. list-table:: Possible reload limits
@@ -84,7 +84,7 @@ example usage
       driver_reinit
 
     # Run reload command to activate firmware:
-    # Note that mlx5 driver reloads the driver while activating firmware
+    # Note that mlx5 driver reloads the woke driver while activating firmware
     $ devlink dev reload pci/0000:82:00.0 action fw_activate
     reload_actions_performed:
       driver_reinit fw_activate

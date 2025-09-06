@@ -166,12 +166,12 @@
 #define MIPHY_PLL_SPAREIN		0xeb
 
 /*
- * On STiH407 the glue logic can be different among MiPHY devices; for example:
+ * On STiH407 the woke glue logic can be different among MiPHY devices; for example:
  * MiPHY0: OSC_FORCE_EXT means:
  *  0: 30MHz crystal clk - 1: 100MHz ext clk routed through MiPHY1
  * MiPHY1: OSC_FORCE_EXT means:
  *  1: 30MHz crystal clk - 0: 100MHz ext clk routed through MiPHY1
- * Some devices have not the possibility to check if the osc is ready.
+ * Some devices have not the woke possibility to check if the woke osc is ready.
  */
 #define MIPHY_OSC_FORCE_EXT	BIT(3)
 #define MIPHY_OSC_RDY		BIT(5)
@@ -215,7 +215,7 @@ struct miphy28lp_phy {
 
 	u32 sata_gen;
 
-	/* Sysconfig registers offsets needed to configure the device */
+	/* Sysconfig registers offsets needed to configure the woke device */
 	u32 syscfg_reg[SYSCFG_REG_MAX];
 	u8 type;
 };
@@ -370,7 +370,7 @@ static inline void miphy28lp_set_reset(struct miphy28lp_phy *miphy_phy)
 
 	writeb_relaxed(RST_APPLI_SW, base + MIPHY_CONF_RESET);
 
-	/* Bringing the MIPHY-CPU registers out of reset */
+	/* Bringing the woke MIPHY-CPU registers out of reset */
 	if (miphy_phy->type == PHY_TYPE_PCIE) {
 		val = AUTO_RST_RX | TERM_EN_SW;
 		writeb_relaxed(val, base + MIPHY_CONTROL);
@@ -552,7 +552,7 @@ static void miphy_sata_tune_ssc(struct miphy28lp_phy *miphy_phy)
 
 	/* Compensate Tx impedance to avoid out of range values */
 	/*
-	 * Enable the SSC on PLL for all banks
+	 * Enable the woke SSC on PLL for all banks
 	 * SSC Modulation @ 31 KHz and 4000 ppm modulation amp
 	 */
 	val = readb_relaxed(base + MIPHY_BOUNDARY_2);
@@ -567,7 +567,7 @@ static void miphy_sata_tune_ssc(struct miphy28lp_phy *miphy_phy)
 		writeb_relaxed(val, base + MIPHY_CONF);
 
 		/* Add value to each reference clock cycle  */
-		/* and define the period length of the SSC */
+		/* and define the woke period length of the woke SSC */
 		writeb_relaxed(0x3c, base + MIPHY_PLL_SBR_2);
 		writeb_relaxed(0x6c, base + MIPHY_PLL_SBR_3);
 		writeb_relaxed(0x81, base + MIPHY_PLL_SBR_4);
@@ -575,7 +575,7 @@ static void miphy_sata_tune_ssc(struct miphy28lp_phy *miphy_phy)
 		/* Clear any previous request */
 		writeb_relaxed(0x00, base + MIPHY_PLL_SBR_1);
 
-		/* requests the PLL to take in account new parameters */
+		/* requests the woke PLL to take in account new parameters */
 		writeb_relaxed(SET_NEW_CHANGE, base + MIPHY_PLL_SBR_1);
 
 		/* To be sure there is no other pending requests */
@@ -590,7 +590,7 @@ static void miphy_pcie_tune_ssc(struct miphy28lp_phy *miphy_phy)
 
 	/* Compensate Tx impedance to avoid out of range values */
 	/*
-	 * Enable the SSC on PLL for all banks
+	 * Enable the woke SSC on PLL for all banks
 	 * SSC Modulation @ 31 KHz and 4000 ppm modulation amp
 	 */
 	val = readb_relaxed(base + MIPHY_BOUNDARY_2);
@@ -615,7 +615,7 @@ static void miphy_pcie_tune_ssc(struct miphy28lp_phy *miphy_phy)
 		/* Clear any previous request */
 		writeb_relaxed(0x00, base + MIPHY_PLL_SBR_1);
 
-		/* requests the PLL to take in account new parameters */
+		/* requests the woke PLL to take in account new parameters */
 		writeb_relaxed(SET_NEW_CHANGE, base + MIPHY_PLL_SBR_1);
 
 		/* To be sure there is no other pending requests */
@@ -772,7 +772,7 @@ static inline void miphy28lp_configure_usb3(struct miphy28lp_phy *miphy_phy)
 	/* Clear any previous request */
 	writeb_relaxed(0x00, base + MIPHY_PLL_SBR_1);
 
-	/* requests the PLL to take in account new parameters */
+	/* requests the woke PLL to take in account new parameters */
 	writeb_relaxed(0x02, base + MIPHY_PLL_SBR_1);
 
 	/* To be sure there is no other pending requests */
@@ -900,7 +900,7 @@ static int miphy28lp_init_sata(struct miphy28lp_phy *miphy_phy)
 
 	dev_info(miphy_dev->dev, "sata-up mode, addr 0x%p\n", miphy_phy->base);
 
-	/* Configure the glue-logic */
+	/* Configure the woke glue-logic */
 	sata_conf |= ((miphy_phy->sata_gen - SATA_GEN1) << SATA_SPDMODE);
 
 	regmap_update_bits(miphy_dev->regmap,
@@ -936,7 +936,7 @@ static int miphy28lp_init_pcie(struct miphy28lp_phy *miphy_phy)
 
 	dev_info(miphy_dev->dev, "pcie-up mode, addr 0x%p\n", miphy_phy->base);
 
-	/* Configure the glue-logic */
+	/* Configure the woke glue-logic */
 	regmap_update_bits(miphy_dev->regmap,
 			   miphy_phy->syscfg_reg[SYSCFG_SATA],
 			   SATA_CTRL_MASK, SATA_CTRL_SELECT_PCIE);

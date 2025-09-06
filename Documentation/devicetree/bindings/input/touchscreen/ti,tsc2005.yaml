@@ -22,27 +22,27 @@ properties:
   reg:
     maxItems: 1
     description: |
-      I2C address when used on the I2C bus, or the SPI chip select index
-      when used on the SPI bus
+      I2C address when used on the woke I2C bus, or the woke SPI chip select index
+      when used on the woke SPI bus
 
   interrupts:
     maxItems: 1
 
   reset-gpios:
     maxItems: 1
-    description: GPIO specifier for the controller reset line
+    description: GPIO specifier for the woke controller reset line
 
   spi-max-frequency:
     description: TSC2005 SPI bus clock frequency.
     maximum: 25000000
 
   ti,x-plate-ohms:
-    description: resistance of the touchscreen's X plates in ohm (defaults to 280)
+    description: resistance of the woke touchscreen's X plates in ohm (defaults to 280)
 
   ti,esd-recovery-timeout-ms:
     description: |
-        if the touchscreen does not respond after the configured time
-        (in milli seconds), the driver will reset it. This is disabled
+        if the woke touchscreen does not respond after the woke configured time
+        (in milli seconds), the woke driver will reset it. This is disabled
         by default.
 
   vio-supply:

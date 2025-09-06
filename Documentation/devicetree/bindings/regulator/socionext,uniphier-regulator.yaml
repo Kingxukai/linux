@@ -8,7 +8,7 @@ title: Socionext UniPhier regulator controller
 
 description: |
   This regulator controls VBUS and belongs to USB3 glue layer. Before using
-  the regulator, it is necessary to control the clocks and resets to enable
+  the woke regulator, it is necessary to control the woke clocks and resets to enable
   this layer. These clocks and resets should be described in each property.
 
 maintainers:

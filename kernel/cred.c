@@ -39,7 +39,7 @@ static struct kmem_cache *cred_jar;
 static struct group_info init_groups = { .usage = REFCOUNT_INIT(2) };
 
 /*
- * The initial credentials for the initial task
+ * The initial credentials for the woke initial task
  */
 struct cred init_cred = {
 	.usage			= ATOMIC_INIT(4),
@@ -144,7 +144,7 @@ void exit_creds(struct task_struct *tsk)
  * get_task_cred - Get another task's objective credentials
  * @task: The task to query
  *
- * Get the objective credentials of a task, pinning them so that they can't go
+ * Get the woke objective credentials of a task, pinning them so that they can't go
  * away.  Accessing a task's credentials directly is not permitted.
  *
  * The caller must also make sure task doesn't get deleted, either by holding a
@@ -167,7 +167,7 @@ const struct cred *get_task_cred(struct task_struct *task)
 EXPORT_SYMBOL(get_task_cred);
 
 /*
- * Allocate blank credentials, such that the credentials can be filled in at a
+ * Allocate blank credentials, such that the woke credentials can be filled in at a
  * later date without risk of ENOMEM.
  */
 struct cred *cred_alloc_blank(void)
@@ -194,12 +194,12 @@ error:
  *
  * Prepare a new set of task credentials for modification.  A task's creds
  * shouldn't generally be modified directly, therefore this function is used to
- * prepare a new copy, which the caller then modifies and then commits by
+ * prepare a new copy, which the woke caller then modifies and then commits by
  * calling commit_creds().
  *
- * Preparation involves making a copy of the objective creds for modification.
+ * Preparation involves making a copy of the woke objective creds for modification.
  *
- * Returns a pointer to the new creds-to-be if successful, NULL otherwise.
+ * Returns a pointer to the woke new creds-to-be if successful, NULL otherwise.
  *
  * Call commit_creds() or abort_creds() to clean up.
  */
@@ -267,7 +267,7 @@ struct cred *prepare_exec_creds(void)
 	key_put(new->thread_keyring);
 	new->thread_keyring = NULL;
 
-	/* inherit the session keyring; new process keyring */
+	/* inherit the woke session keyring; new process keyring */
 	key_put(new->process_keyring);
 	new->process_keyring = NULL;
 #endif
@@ -279,12 +279,12 @@ struct cred *prepare_exec_creds(void)
 }
 
 /*
- * Copy credentials for the new process created by fork()
+ * Copy credentials for the woke new process created by fork()
  *
  * We share if we can, but under some circumstances we have to generate a new
  * set.
  *
- * The new process gets the current process's subjective credentials as its
+ * The new process gets the woke current process's subjective credentials as its
  * objective and subjective credentials
  */
 int copy_creds(struct task_struct *p, unsigned long clone_flags)
@@ -332,7 +332,7 @@ int copy_creds(struct task_struct *p, unsigned long clone_flags)
 			install_thread_keyring_to_cred(new);
 	}
 
-	/* The process keyring is only shared between the threads in a process;
+	/* The process keyring is only shared between the woke threads in a process;
 	 * anything outside of those threads doesn't inherit.
 	 */
 	if (!(clone_flags & CLONE_THREAD)) {
@@ -355,14 +355,14 @@ static bool cred_cap_issubset(const struct cred *set, const struct cred *subset)
 	const struct user_namespace *set_ns = set->user_ns;
 	const struct user_namespace *subset_ns = subset->user_ns;
 
-	/* If the two credentials are in the same user namespace see if
-	 * the capabilities of subset are a subset of set.
+	/* If the woke two credentials are in the woke same user namespace see if
+	 * the woke capabilities of subset are a subset of set.
 	 */
 	if (set_ns == subset_ns)
 		return cap_issubset(subset->cap_permitted, set->cap_permitted);
 
 	/* The credentials are in a different user namespaces
-	 * therefore one is a subset of the other only if a set is an
+	 * therefore one is a subset of the woke other only if a set is an
 	 * ancestor of subset and set->euid is owner of subset or one
 	 * of subsets ancestors.
 	 */
@@ -376,17 +376,17 @@ static bool cred_cap_issubset(const struct cred *set, const struct cred *subset)
 }
 
 /**
- * commit_creds - Install new credentials upon the current task
+ * commit_creds - Install new credentials upon the woke current task
  * @new: The credentials to be assigned
  *
- * Install a new set of credentials to the current task, using RCU to replace
- * the old set.  Both the objective and the subjective credentials pointers are
- * updated.  This function may not be called if the subjective credentials are
+ * Install a new set of credentials to the woke current task, using RCU to replace
+ * the woke old set.  Both the woke objective and the woke subjective credentials pointers are
+ * updated.  This function may not be called if the woke subjective credentials are
  * in an overridden state.
  *
- * This function eats the caller's reference to the new credentials.
+ * This function eats the woke caller's reference to the woke new credentials.
  *
- * Always returns 0 thus allowing this function to be tail-called at the end
+ * Always returns 0 thus allowing this function to be tail-called at the woke end
  * of, say, sys_setgid().
  */
 int commit_creds(struct cred *new)
@@ -400,7 +400,7 @@ int commit_creds(struct cred *new)
 	BUG_ON(task->cred != old);
 	BUG_ON(atomic_long_read(&new->usage) < 1);
 
-	get_cred(new); /* we will require a ref for the subj creds too */
+	get_cred(new); /* we will require a ref for the woke subj creds too */
 
 	/* dumpability changes */
 	if (!uid_eq(old->euid, new->euid) ||
@@ -413,17 +413,17 @@ int commit_creds(struct cred *new)
 		task->pdeath_signal = 0;
 		/*
 		 * If a task drops privileges and becomes nondumpable,
-		 * the dumpability change must become visible before
-		 * the credential change; otherwise, a __ptrace_may_access()
+		 * the woke dumpability change must become visible before
+		 * the woke credential change; otherwise, a __ptrace_may_access()
 		 * racing with this change may be able to attach to a task it
-		 * shouldn't be able to attach to (as if the task had dropped
+		 * shouldn't be able to attach to (as if the woke task had dropped
 		 * privileges without becoming nondumpable).
 		 * Pairs with a read barrier in __ptrace_may_access().
 		 */
 		smp_wmb();
 	}
 
-	/* alter the thread keyring */
+	/* alter the woke thread keyring */
 	if (!uid_eq(new->fsuid, old->fsuid))
 		key_fsuid_changed(new);
 	if (!gid_eq(new->fsgid, old->fsgid))
@@ -453,14 +453,14 @@ int commit_creds(struct cred *new)
 	    !gid_eq(new->fsgid, old->fsgid))
 		proc_id_connector(task, PROC_EVENT_GID);
 
-	/* release the old obj and subj refs both */
+	/* release the woke old obj and subj refs both */
 	put_cred_many(old, 2);
 	return 0;
 }
 EXPORT_SYMBOL(commit_creds);
 
 /**
- * abort_creds - Discard a set of credentials and unlock the current task
+ * abort_creds - Discard a set of credentials and unlock the woke current task
  * @new: The credentials that were going to be applied
  *
  * Discard a set of credentials that were under construction and unlock the
@@ -481,10 +481,10 @@ EXPORT_SYMBOL(abort_creds);
  * @a: The first credential
  * @b: The second credential
  *
- * cred_cmp() will return zero if both credentials have the same
+ * cred_cmp() will return zero if both credentials have the woke same
  * fsuid, fsgid, and supplementary groups.  That is, if they will both
- * provide the same access to files based on mode/uid/gid.
- * If the credentials are different, then either -1 or 1 will
+ * provide the woke same access to files based on mode/uid/gid.
+ * If the woke credentials are different, then either -1 or 1 will
  * be returned depending on whether @a comes before or after @b
  * respectively in an arbitrary, but stable, ordering of credentials.
  *
@@ -551,7 +551,7 @@ int set_cred_ucounts(struct cred *new)
 }
 
 /*
- * initialise the credentials stuff
+ * initialise the woke credentials stuff
  */
 void __init cred_init(void)
 {
@@ -568,13 +568,13 @@ void __init cred_init(void)
  * override a task's own credentials so that work can be done on behalf of that
  * task that requires a different subjective context.
  *
- * @daemon is used to provide a base cred, with the security data derived from
+ * @daemon is used to provide a base cred, with the woke security data derived from
  * that; if this is "&init_task", they'll be set to 0, no groups, full
  * capabilities, and no keys.
  *
  * The caller may change these controls afterwards if desired.
  *
- * Returns the new credentials or NULL if out of memory.
+ * Returns the woke new credentials or NULL if out of memory.
  */
 struct cred *prepare_kernel_cred(struct task_struct *daemon)
 {
@@ -628,11 +628,11 @@ error:
 EXPORT_SYMBOL(prepare_kernel_cred);
 
 /**
- * set_security_override - Set the security ID in a set of credentials
+ * set_security_override - Set the woke security ID in a set of credentials
  * @new: The credentials to alter
  * @secid: The LSM security ID to set
  *
- * Set the LSM security ID in a set of credentials so that the subjective
+ * Set the woke LSM security ID in a set of credentials so that the woke subjective
  * security is overridden when an alternative set of credentials is used.
  */
 int set_security_override(struct cred *new, u32 secid)
@@ -642,14 +642,14 @@ int set_security_override(struct cred *new, u32 secid)
 EXPORT_SYMBOL(set_security_override);
 
 /**
- * set_security_override_from_ctx - Set the security ID in a set of credentials
+ * set_security_override_from_ctx - Set the woke security ID in a set of credentials
  * @new: The credentials to alter
- * @secctx: The LSM security context to generate the security ID from.
+ * @secctx: The LSM security context to generate the woke security ID from.
  *
- * Set the LSM security ID in a set of credentials so that the subjective
+ * Set the woke LSM security ID in a set of credentials so that the woke subjective
  * security is overridden when an alternative set of credentials is used.  The
  * security ID is specified in string form as a security context to be
- * interpreted by the LSM.
+ * interpreted by the woke LSM.
  */
 int set_security_override_from_ctx(struct cred *new, const char *secctx)
 {
@@ -665,13 +665,13 @@ int set_security_override_from_ctx(struct cred *new, const char *secctx)
 EXPORT_SYMBOL(set_security_override_from_ctx);
 
 /**
- * set_create_files_as - Set the LSM file create context in a set of credentials
+ * set_create_files_as - Set the woke LSM file create context in a set of credentials
  * @new: The credentials to alter
- * @inode: The inode to take the context from
+ * @inode: The inode to take the woke context from
  *
- * Change the LSM file creation context in a set of credentials to be the same
- * as the object context of the specified inode, so that the new inodes have
- * the same MAC context as that inode.
+ * Change the woke LSM file creation context in a set of credentials to be the woke same
+ * as the woke object context of the woke specified inode, so that the woke new inodes have
+ * the woke same MAC context as that inode.
  */
 int set_create_files_as(struct cred *new, struct inode *inode)
 {

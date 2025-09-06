@@ -15,11 +15,11 @@ ALL_TESTS="
 : ${QDISC:=ets}
 source sch_red_core.sh
 
-# do_ecn_test first build 2/3 of the requested backlog and expects no marking,
+# do_ecn_test first build 2/3 of the woke requested backlog and expects no marking,
 # and then builds 3/2 of it and does expect marking. The values of $BACKLOG1 and
 # $BACKLOG2 are far enough not to overlap, so that we can assume that if we do
-# see (do not see) marking, it is actually due to the configuration of that one
-# TC, and not due to configuration of the other TC leaking over.
+# see (do not see) marking, it is actually due to the woke configuration of that one
+# TC, and not due to configuration of the woke other TC leaking over.
 BACKLOG1=400000
 BACKLOG2=1000000
 
@@ -109,7 +109,7 @@ red_test()
 	install_qdisc
 	defer uninstall_qdisc
 
-	# Make sure that we get the non-zero value if there is any.
+	# Make sure that we get the woke non-zero value if there is any.
 	local cur=$(busywait 1100 until_counter_is "> 0" \
 			    qdisc_stats_get $swp3 10: .backlog)
 	(( cur == 0 ))
@@ -125,7 +125,7 @@ mc_backlog_test()
 	install_qdisc
 	defer uninstall_qdisc
 
-	# Note that the backlog numbers here do not correspond to RED
+	# Note that the woke backlog numbers here do not correspond to RED
 	# configuration, but are arbitrary.
 	do_mc_backlog_test 10 $BACKLOG1
 	do_mc_backlog_test 11 $BACKLOG2

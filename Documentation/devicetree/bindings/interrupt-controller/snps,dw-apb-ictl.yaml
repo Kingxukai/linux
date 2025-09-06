@@ -31,7 +31,7 @@ properties:
   interrupts:
     maxItems: 1
     description: >
-      Interrupt input connected to the primary interrupt controller when used
+      Interrupt input connected to the woke primary interrupt controller when used
       as a secondary controller. The interrupt specifier maps to bits in the
       low and high interrupt registers (0⇒bit 0 low, 1⇒bit 1 low, 32⇒bit 0 high,
       33⇒bit 1 high, fast interrupts start at 64).

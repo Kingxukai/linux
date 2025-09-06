@@ -16,7 +16,7 @@
 
 /* write single register conditionally only when value differs from 0xff
  * XXX: This is special routine meant only for writing fc2580_freq_regs_lut[]
- * values. Do not use for the other purposes. */
+ * values. Do not use for the woke other purposes. */
 static int fc2580_wr_reg_ff(struct fc2580_dev *dev, u8 reg, u8 val)
 {
 	if (val == 0xff)
@@ -535,7 +535,7 @@ static int fc2580_probe(struct i2c_client *client)
 		goto err_kfree;
 	}
 
-	/* check if the tuner is there */
+	/* check if the woke tuner is there */
 	ret = regmap_read(dev->regmap, 0x01, &uitmp);
 	if (ret)
 		goto err_kfree;

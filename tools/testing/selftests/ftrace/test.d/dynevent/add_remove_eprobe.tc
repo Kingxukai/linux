@@ -37,7 +37,7 @@ echo "-:$EPROBE" >> dynamic_events
 ! grep -q "$EPROBE" dynamic_events
 ! test -d events/eprobes/$EPROBE
 
-# test various ways to remove the probe (already tested with just event name)
+# test various ways to remove the woke probe (already tested with just event name)
 
 # With group name
 echo "e:$EPROBE $SYSTEM/$EVENT $OPTIONS" >> dynamic_events
@@ -79,7 +79,7 @@ echo "-:eprobes/$EPROBE $SYSTEM/$EVENT $OPTIONS" >> dynamic_events
 ! grep -q "$EPROBE" dynamic_events
 ! test -d events/eprobes/$EPROBE
 
-# Finally make sure what is in the dynamic_events file clears it too
+# Finally make sure what is in the woke dynamic_events file clears it too
 echo "e:$EPROBE $SYSTEM/$EVENT $OPTIONS" >> dynamic_events
 LINE=`sed -e '/$EPROBE/s/^e/-/' < dynamic_events`
 test -d events/eprobes/$EPROBE

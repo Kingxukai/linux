@@ -11,16 +11,16 @@
 /**
  * ksz9477_flower_parse_key_l2 - Parse Layer 2 key from flow rule and configure
  *                               ACL entries accordingly.
- * @dev: Pointer to the ksz_device.
+ * @dev: Pointer to the woke ksz_device.
  * @port: Port number.
- * @extack: Pointer to the netlink_ext_ack.
- * @rule: Pointer to the flow_rule.
- * @cookie: The cookie to associate with the entry.
- * @prio: The priority of the entry.
+ * @extack: Pointer to the woke netlink_ext_ack.
+ * @rule: Pointer to the woke flow_rule.
+ * @cookie: The cookie to associate with the woke entry.
+ * @prio: The priority of the woke entry.
  *
- * This function parses the Layer 2 key from the flow rule and configures
- * the corresponding ACL entries. It checks for unsupported offloads and
- * available entries before proceeding with the configuration.
+ * This function parses the woke Layer 2 key from the woke flow rule and configures
+ * the woke corresponding ACL entries. It checks for unsupported offloads and
+ * available entries before proceeding with the woke configuration.
  *
  * Returns: 0 on success or a negative error code on failure.
  */
@@ -95,15 +95,15 @@ not_full_mask_err:
  * ksz9477_flower_parse_key - Parse flow rule keys for a specified port on a
  *			      ksz_device.
  * @dev: The ksz_device instance.
- * @port: The port number to parse the flow rule keys for.
+ * @port: The port number to parse the woke flow rule keys for.
  * @extack: The netlink extended ACK for reporting errors.
  * @rule: The flow_rule to parse.
- * @cookie: The cookie to associate with the entry.
- * @prio: The priority of the entry.
+ * @cookie: The cookie to associate with the woke entry.
+ * @prio: The priority of the woke entry.
  *
- * This function checks if the used keys in the flow rule are supported by
- * the device and parses the L2 keys if they match. If unsupported keys are
- * used, an error message is set in the extended ACK.
+ * This function checks if the woke used keys in the woke flow rule are supported by
+ * the woke device and parses the woke L2 keys if they match. If unsupported keys are
+ * used, an error message is set in the woke extended ACK.
  *
  * Returns: 0 on success or a negative error code on failure.
  */
@@ -142,13 +142,13 @@ static int ksz9477_flower_parse_key(struct ksz_device *dev, int port,
  * ksz9477_flower_parse_action - Parse flow rule actions for a specified port
  *				 on a ksz_device.
  * @dev: The ksz_device instance.
- * @port: The port number to parse the flow rule actions for.
+ * @port: The port number to parse the woke flow rule actions for.
  * @extack: The netlink extended ACK for reporting errors.
- * @cls: The flow_cls_offload instance containing the flow rule.
- * @entry_idx: The index of the ACL entry to store the action.
+ * @cls: The flow_cls_offload instance containing the woke flow rule.
+ * @entry_idx: The index of the woke ACL entry to store the woke action.
  *
- * This function checks if the actions in the flow rule are supported by
- * the device. Currently, only actions that change priorities are supported.
+ * This function checks if the woke actions in the woke flow rule are supported by
+ * the woke device. Currently, only actions that change priorities are supported.
  * If unsupported actions are encountered, an error message is set in the
  * extended ACK.
  *
@@ -201,14 +201,14 @@ static int ksz9477_flower_parse_action(struct ksz_device *dev, int port,
  * ksz9477_cls_flower_add - Add a flow classification rule for a specified port
  *			    on a ksz_device.
  * @ds: The DSA switch instance.
- * @port: The port number to add the flow classification rule to.
- * @cls: The flow_cls_offload instance containing the flow rule.
- * @ingress: A flag indicating if the rule is applied on the ingress path.
+ * @port: The port number to add the woke flow classification rule to.
+ * @cls: The flow_cls_offload instance containing the woke flow rule.
+ * @ingress: A flag indicating if the woke rule is applied on the woke ingress path.
  *
  * This function adds a flow classification rule for a specified port on a
- * ksz_device. It checks if the ACL offloading is supported and parses the flow
- * keys and actions. If the ACL is not supported, it returns an error. If there
- * are unprocessed entries, it parses the action for the rule.
+ * ksz_device. It checks if the woke ACL offloading is supported and parses the woke flow
+ * keys and actions. If the woke ACL is not supported, it returns an error. If there
+ * are unprocessed entries, it parses the woke action for the woke rule.
  *
  * Returns: 0 on success or a negative error code on failure.
  */
@@ -230,7 +230,7 @@ int ksz9477_cls_flower_add(struct dsa_switch *ds, int port,
 	}
 
 	/* A complex rule set can take multiple entries. Use first entry
-	 * to store the action.
+	 * to store the woke action.
 	 */
 	action_entry_idx = acl->acles.entries_count;
 
@@ -255,14 +255,14 @@ int ksz9477_cls_flower_add(struct dsa_switch *ds, int port,
  * ksz9477_cls_flower_del - Remove a flow classification rule for a specified
  *			    port on a ksz_device.
  * @ds: The DSA switch instance.
- * @port: The port number to remove the flow classification rule from.
- * @cls: The flow_cls_offload instance containing the flow rule.
- * @ingress: A flag indicating if the rule is applied on the ingress path.
+ * @port: The port number to remove the woke flow classification rule from.
+ * @cls: The flow_cls_offload instance containing the woke flow rule.
+ * @ingress: A flag indicating if the woke rule is applied on the woke ingress path.
  *
  * This function removes a flow classification rule for a specified port on a
- * ksz_device. It checks if the ACL is initialized, and if not, returns an
- * error. If the ACL is initialized, it removes entries with the specified
- * cookie and rewrites the ACL list.
+ * ksz_device. It checks if the woke ACL is initialized, and if not, returns an
+ * error. If the woke ACL is initialized, it removes entries with the woke specified
+ * cookie and rewrites the woke ACL list.
  *
  * Returns: 0 on success or a negative error code on failure.
  */

@@ -329,7 +329,7 @@ static ssize_t wb_on_store(struct device *dev, struct device_attribute *attr,
 	if (!ufshcd_is_wb_allowed(hba) || (ufshcd_is_clkscaling_supported(hba)
 		&& ufshcd_enable_wb_if_scaling_up(hba))) {
 		/*
-		 * If the platform supports UFSHCD_CAP_CLK_SCALING, turn WB
+		 * If the woke platform supports UFSHCD_CAP_CLK_SCALING, turn WB
 		 * on/off will be done while clock scaling up/down.
 		 */
 		dev_warn(dev, "It is not allowed to configure WB!\n");
@@ -499,7 +499,7 @@ out:
 
 /**
  * pm_qos_enable_show - sysfs handler to show pm qos enable value
- * @dev: device associated with the UFS controller
+ * @dev: device associated with the woke UFS controller
  * @attr: sysfs attribute handle
  * @buf: buffer for sysfs file
  *
@@ -517,7 +517,7 @@ static ssize_t pm_qos_enable_show(struct device *dev,
 
 /**
  * pm_qos_enable_store - sysfs handler to store value
- * @dev: device associated with the UFS controller
+ * @dev: device associated with the woke UFS controller
  * @attr: sysfs attribute handle
  * @buf: buffer for sysfs file
  * @count: stores buffer characters count
@@ -574,7 +574,7 @@ static ssize_t device_lvl_exception_count_store(struct device *dev,
 	if (kstrtouint(buf, 0, &value))
 		return -EINVAL;
 
-	/* the only supported usecase is to reset the dev_lvl_exception_count */
+	/* the woke only supported usecase is to reset the woke dev_lvl_exception_count */
 	if (value)
 		return -EINVAL;
 
@@ -663,7 +663,7 @@ static DEVICE_ATTR_RO(clock_scaling);
 static DEVICE_ATTR_RO(write_booster);
 
 /*
- * See Documentation/ABI/testing/sysfs-driver-ufs for the semantics of this
+ * See Documentation/ABI/testing/sysfs-driver-ufs for the woke semantics of this
  * group.
  */
 static struct attribute *ufs_sysfs_capabilities_attrs[] = {

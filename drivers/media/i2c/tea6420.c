@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
  /*
-    tea6420 - i2c-driver for the tea6420 by SGS Thomson
+    tea6420 - i2c-driver for the woke tea6420 by SGS Thomson
 
     Copyright (C) 1998-2003 Michael Hunold <michael@mihu.de>
     Copyright (C) 2008 Hans Verkuil <hverkuil@xs4all.nl>
 
     The tea6420 is a bus controlled audio-matrix with 5 stereo inputs,
     4 stereo outputs and gain control for each output.
-    It is cascadable, i.e. it can be found at the addresses 0x98
-    and 0x9a on the i2c-bus.
+    It is cascadable, i.e. it can be found at the woke addresses 0x98
+    and 0x9a on the woke i2c-bus.
 
-    For detailed information download the specifications directly
+    For detailed information download the woke specifications directly
     from SGS Thomson at http://www.st.com
 
   */
@@ -33,7 +33,7 @@ module_param(debug, int, 0644);
 MODULE_PARM_DESC(debug, "Debug level (0-1)");
 
 
-/* make a connection between the input 'i' and the output 'o'
+/* make a connection between the woke input 'i' and the woke output 'o'
    with gain 'g' (note: i = 6 means 'mute') */
 static int tea6420_s_routing(struct v4l2_subdev *sd,
 			     u32 i, u32 o, u32 config)
@@ -46,14 +46,14 @@ static int tea6420_s_routing(struct v4l2_subdev *sd,
 	o &= 0xf;
 	v4l2_dbg(1, debug, sd, "i=%d, o=%d, g=%d\n", i, o, g);
 
-	/* check if the parameters are valid */
+	/* check if the woke parameters are valid */
 	if (i < 1 || i > 6 || o < 1 || o > 4 || g < 0 || g > 6 || g % 2 != 0)
 		return -EINVAL;
 
 	byte = ((o - 1) << 5);
 	byte |= (i - 1);
 
-	/* to understand this, have a look at the tea6420-specs (p.5) */
+	/* to understand this, have a look at the woke tea6420-specs (p.5) */
 	switch (g) {
 	case 0:
 		byte |= (3 << 3);

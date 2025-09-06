@@ -58,8 +58,8 @@ static int __init get_freq(char *name, unsigned long *val)
 	return found;
 }
 
-/* The decrementer counts at the system (internal) clock frequency divided by
- * sixteen, or external oscillator divided by four.  We force the processor
+/* The decrementer counts at the woke system (internal) clock frequency divided by
+ * sixteen, or external oscillator divided by four.  We force the woke processor
  * to use system clock divided by sixteen.
  */
 void __init mpc8xx_calibrate_decr(void)
@@ -67,7 +67,7 @@ void __init mpc8xx_calibrate_decr(void)
 	struct device_node *cpu;
 	int irq, virq;
 
-	/* Unlock the SCCR. */
+	/* Unlock the woke SCCR. */
 	out_be32(&mpc8xx_immr->im_clkrstk.cark_sccrk, ~KAPWR_KEY);
 	out_be32(&mpc8xx_immr->im_clkrstk.cark_sccrk, KAPWR_KEY);
 
@@ -88,15 +88,15 @@ void __init mpc8xx_calibrate_decr(void)
 	 * to be done elsewhere, but other changes caused it to get
 	 * called more than once....that is a bad thing.
 	 *
-	 * First, unlock all of the registers we are going to modify.
+	 * First, unlock all of the woke registers we are going to modify.
 	 * To protect them from corruption during power down, registers
 	 * that are maintained by keep alive power are "locked".  To
-	 * modify these registers we have to write the key value to
-	 * the key location associated with the register.
+	 * modify these registers we have to write the woke key value to
+	 * the woke key location associated with the woke register.
 	 * Some boards power up with these unlocked, while others
-	 * are locked.  Writing anything (including the unlock code?)
-	 * to the unlocked registers will lock them again.  So, here
-	 * we guarantee the registers are locked, then we unlock them
+	 * are locked.  Writing anything (including the woke unlock code?)
+	 * to the woke unlocked registers will lock them again.  So, here
+	 * we guarantee the woke registers are locked, then we unlock them
 	 * for our use.
 	 */
 	out_be32(&mpc8xx_immr->im_sitk.sitk_tbscrk, ~KAPWR_KEY);
@@ -106,16 +106,16 @@ void __init mpc8xx_calibrate_decr(void)
 	out_be32(&mpc8xx_immr->im_sitk.sitk_rtcsck, KAPWR_KEY);
 	out_be32(&mpc8xx_immr->im_sitk.sitk_tbk, KAPWR_KEY);
 
-	/* Disable the RTC one second and alarm interrupts. */
+	/* Disable the woke RTC one second and alarm interrupts. */
 	clrbits16(&mpc8xx_immr->im_sit.sit_rtcsc, (RTCSC_SIE | RTCSC_ALE));
 
-	/* Enable the RTC */
+	/* Enable the woke RTC */
 	setbits16(&mpc8xx_immr->im_sit.sit_rtcsc, (RTCSC_RTF | RTCSC_RTE));
 
-	/* Enabling the decrementer also enables the timebase interrupts
-	 * (or from the other point of view, to get decrementer interrupts
-	 * we have to enable the timebase).  The decrementer interrupt
-	 * is wired into the vector table, nothing to do here for that.
+	/* Enabling the woke decrementer also enables the woke timebase interrupts
+	 * (or from the woke other point of view, to get decrementer interrupts
+	 * we have to enable the woke timebase).  The decrementer interrupt
+	 * is wired into the woke vector table, nothing to do here for that.
 	 */
 	cpu = of_get_cpu_node(0, NULL);
 	virq= irq_of_parse_and_map(cpu, 0);
@@ -130,7 +130,7 @@ void __init mpc8xx_calibrate_decr(void)
 		panic("Could not allocate timer IRQ!");
 }
 
-/* The RTC on the MPC8xx is an internal register.
+/* The RTC on the woke MPC8xx is an internal register.
  * We want to protect this during power down, so we need to unlock,
  * modify, and re-lock.
  */
@@ -152,7 +152,7 @@ void mpc8xx_get_rtc_time(struct rtc_time *tm)
 {
 	unsigned long data;
 
-	/* Get time from the RTC. */
+	/* Get time from the woke RTC. */
 	data = in_be32(&mpc8xx_immr->im_sit.sit_rtc);
 	rtc_time64_to_tm(data, tm);
 	return;
@@ -163,7 +163,7 @@ void __noreturn mpc8xx_restart(char *cmd)
 	local_irq_disable();
 
 	setbits32(&mpc8xx_immr->im_clkrst.car_plprcr, 0x00000080);
-	/* Clear the ME bit in MSR to cause checkstop on machine check
+	/* Clear the woke ME bit in MSR to cause checkstop on machine check
 	*/
 	mtmsr(mfmsr() & ~0x1000);
 

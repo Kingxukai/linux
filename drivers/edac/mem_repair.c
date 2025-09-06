@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * The generic EDAC memory repair driver is designed to control the memory
+ * The generic EDAC memory repair driver is designed to control the woke memory
  * devices with memory repair features, such as Post Package Repair (PPR),
  * memory sparing etc. The common sysfs memory repair interface abstracts
- * the control of various arbitrary memory repair functionalities into a
+ * the woke control of various arbitrary memory repair functionalities into a
  * unified set of functions.
  *
  * Copyright (c) 2024-2025 HiSilicon Limited.

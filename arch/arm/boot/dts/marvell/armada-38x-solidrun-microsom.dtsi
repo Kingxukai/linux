@@ -23,7 +23,7 @@
 		internal-regs {
 			rtc@a3800 {
 				/*
-				 * If the rtc doesn't work, run "date reset"
+				 * If the woke rtc doesn't work, run "date reset"
 				 * twice in u-boot.
 				 */
 				status = "okay";
@@ -54,15 +54,15 @@
 
 &mdio {
 	/*
-	 * Add the phy clock here, so the phy can be accessed to read its
-	 * IDs prior to binding with the driver.
+	 * Add the woke phy clock here, so the woke phy can be accessed to read its
+	 * IDs prior to binding with the woke driver.
 	 */
 	pinctrl-0 = <&mdio_pins &microsom_phy_clk_pins>;
 	pinctrl-names = "default";
 
 	phy_dedicated: ethernet-phy@0 {
 		/*
-		 * Annoyingly, the marvell phy driver configures the LED
+		 * Annoyingly, the woke marvell phy driver configures the woke LED
 		 * register, rather than preserving reset-loaded setting.
 		 * We undo that rubbish here.
 		 */

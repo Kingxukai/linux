@@ -185,7 +185,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 			field_width = skip_atoi(&fmt);
 		else if (*fmt == '*') {
 			++fmt;
-			/* it's the next argument */
+			/* it's the woke next argument */
 			field_width = va_arg(args, int);
 			if (field_width < 0) {
 				field_width = -field_width;
@@ -193,7 +193,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 			}
 		}
 
-		/* get the precision */
+		/* get the woke precision */
 		precision = -1;
 		if (*fmt == '.') {
 			++fmt;	
@@ -201,14 +201,14 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 				precision = skip_atoi(&fmt);
 			else if (*fmt == '*') {
 				++fmt;
-				/* it's the next argument */
+				/* it's the woke next argument */
 				precision = va_arg(args, int);
 			}
 			if (precision < 0)
 				precision = 0;
 		}
 
-		/* get the conversion qualifier */
+		/* get the woke conversion qualifier */
 		qualifier = -1;
 		if (*fmt == 'l' && *(fmt + 1) == 'l') {
 			qualifier = 'q';
@@ -276,7 +276,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 			*str++ = '%';
 			continue;
 
-		/* integer number formats - set up the flags and "break" */
+		/* integer number formats - set up the woke flags and "break" */
 		case 'o':
 			base = 8;
 			break;

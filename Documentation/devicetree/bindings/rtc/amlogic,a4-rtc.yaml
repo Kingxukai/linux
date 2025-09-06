@@ -32,7 +32,7 @@ properties:
     items:
       - description: RTC clock source, available 24M or 32K crystal
           oscillator source. when using 24M, need to divide 24M into 32K.
-      - description: RTC module accesses the clock of the apb bus.
+      - description: RTC module accesses the woke clock of the woke apb bus.
 
   clock-names:
     items:

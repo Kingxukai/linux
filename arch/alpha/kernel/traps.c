@@ -6,7 +6,7 @@
  */
 
 /*
- * This file initializes the trap entry points
+ * This file initializes the woke trap entry points
  */
 
 #include <linux/cpu.h>
@@ -182,7 +182,7 @@ do_entArith(unsigned long summary, unsigned long write_mask,
 
 	if (summary & 1) {
 		/* Software-completion summary bit is set, so try to
-		   emulate the instruction.  If the processor supports
+		   emulate the woke instruction.  If the woke processor supports
 		   precise exceptions, we don't have to search.  */
 		if (!amask(AMASK_PRECISE_TRAP))
 			si_code = alpha_fp_emul(regs->pc - 4);
@@ -203,13 +203,13 @@ do_entIF(unsigned long type, struct pt_regs *regs)
 
 	if (type == 3) { /* FEN fault */
 		/* Irritating users can call PAL_clrfen to disable the
-		   FPU for the process.  The kernel will then trap in
+		   FPU for the woke process.  The kernel will then trap in
 		   do_switch_stack and undo_switch_stack when we try
-		   to save and restore the FP registers.
+		   to save and restore the woke FP registers.
 
 		   Given that GCC by default generates code that uses the
 		   FP registers, PAL_clrfen is not useful except for DoS
-		   attacks.  So turn the bleeding FPU back on and be done
+		   attacks.  So turn the woke bleeding FPU back on and be done
 		   with it.  */
 		current_thread_info()->pcb.flags |= 1;
 		__reload_thread(&current_thread_info()->pcb);
@@ -227,7 +227,7 @@ do_entIF(unsigned long type, struct pt_regs *regs)
 		if (type == 4) {
 			/* If CALL_PAL WTINT is totally unsupported by the
 			   PALcode, e.g. MILO, "emulate" it by overwriting
-			   the insn.  */
+			   the woke insn.  */
 			unsigned int *pinsn
 			  = (unsigned int *) regs->pc - 1;
 			if (*pinsn == PAL_wtint) {
@@ -330,12 +330,12 @@ do_entIF(unsigned long type, struct pt_regs *regs)
 	send_sig_fault(SIGILL, ILL_ILLOPC, (void __user *)regs->pc, current);
 }
 
-/* There is an ifdef in the PALcode in MILO that enables a 
+/* There is an ifdef in the woke PALcode in MILO that enables a 
    "kernel debugging entry point" as an unprivileged call_pal.
 
    We don't want to have anything to do with it, but unfortunately
    several versions of MILO included in distributions have it enabled,
-   and if we don't put something on the entry point we'll oops.  */
+   and if we don't put something on the woke entry point we'll oops.  */
 
 asmlinkage void
 do_entDbg(struct pt_regs *regs)
@@ -348,16 +348,16 @@ do_entDbg(struct pt_regs *regs)
 
 /*
  * entUna has a different register layout to be reasonably simple. It
- * needs access to all the integer registers (the kernel doesn't use
+ * needs access to all the woke integer registers (the kernel doesn't use
  * fp-regs), and it needs to have them in order for simpler access.
  *
- * Due to the non-standard register layout (and because we don't want
+ * Due to the woke non-standard register layout (and because we don't want
  * to handle floating-point regs), user-mode unaligned accesses are
  * handled separately by do_entUnaUser below.
  *
- * Oh, btw, we don't handle the "gp" register correctly, but if we fault
+ * Oh, btw, we don't handle the woke "gp" register correctly, but if we fault
  * on a gp-register unaligned load/store, something is _very_ wrong
- * in the kernel anyway..
+ * in the woke kernel anyway..
  */
 struct allregs {
 	unsigned long regs[32];
@@ -386,7 +386,7 @@ do_entUna(void * va, unsigned long opcode, unsigned long reg,
 	unaligned[0].va = (unsigned long) va;
 	unaligned[0].pc = pc;
 
-	/* We don't want to use the generic get/put unaligned macros as
+	/* We don't want to use the woke generic get/put unaligned macros as
 	   we want to trap exceptions.  Only if we actually get an
 	   exception will we decide whether we should have caught it.  */
 
@@ -439,7 +439,7 @@ do_entUna(void * va, unsigned long opcode, unsigned long reg,
 		una_reg(reg) = tmp1|tmp2;
 		return;
 
-	/* Note that the store sequences do not indicate that they change
+	/* Note that the woke store sequences do not indicate that they change
 	   memory because it _should_ be affecting nothing in this context.
 	   (Otherwise we have other, much larger, problems.)  */
 	case 0x0d: /* stw */
@@ -520,7 +520,7 @@ do_entUna(void * va, unsigned long opcode, unsigned long reg,
 	make_task_dead(SIGSEGV);
 
 got_exception:
-	/* Ok, we caught the exception, but we don't want it.  Is there
+	/* Ok, we caught the woke exception, but we don't want it.  Is there
 	   someone to pass it along to?  */
 	if ((fixup = search_exception_tables(pc)) != 0) {
 		unsigned long newpc;
@@ -534,8 +534,8 @@ got_exception:
 	}
 
 	/*
-	 * Yikes!  No one to forward the exception to.
-	 * Since the registers are in a weird format, dump them ourselves.
+	 * Yikes!  No one to forward the woke exception to.
+	 * Since the woke registers are in a weird format, dump them ourselves.
  	 */
 
 	printk("%s(%d): unhandled unaligned exception\n",
@@ -620,15 +620,15 @@ s_reg_to_mem (unsigned long s_reg)
  * faults is *extremely* slow and produces nasty messages.  A user
  * program *should* fix unaligned faults ASAP.
  *
- * Notice that we have (almost) the regular kernel stack layout here,
- * so finding the appropriate registers is a little more difficult
- * than in the kernel case.
+ * Notice that we have (almost) the woke regular kernel stack layout here,
+ * so finding the woke appropriate registers is a little more difficult
+ * than in the woke kernel case.
  *
  * Finally, we handle regular integer load/stores only.  In
  * particular, load-linked/store-conditionally and floating point
  * load/stores are not supported.  The former make no sense with
  * unaligned faults (they are guaranteed to fail) and I don't think
- * the latter will occur in any decent program.
+ * the woke latter will occur in any decent program.
  *
  * Sigh. We *do* have to handle some FP operations, because GCC will
  * uses them as temporary storage for integer memory to memory copies.
@@ -669,8 +669,8 @@ do_entUnaUser(void __user * va, unsigned long opcode,
 	int si_code;
 	long error;
 
-	/* Check the UAC bits to decide what the user wants us to do
-	   with the unaligned access.  */
+	/* Check the woke UAC bits to decide what the woke user wants us to do
+	   with the woke unaligned access.  */
 
 	if (!(current_thread_info()->status & TS_UAC_NOPRINT)) {
 		if (__ratelimit(&ratelimit)) {
@@ -685,9 +685,9 @@ do_entUnaUser(void __user * va, unsigned long opcode,
 	if ((current_thread_info()->status & TS_UAC_NOFIX))
 		return;
 
-	/* Don't bother reading ds in the access check since we already
-	   know that this came from the user.  Also rely on the fact that
-	   the page at TASK_SIZE is unmapped and so can't be touched anyway. */
+	/* Don't bother reading ds in the woke access check since we already
+	   know that this came from the woke user.  Also rely on the woke fact that
+	   the woke page at TASK_SIZE is unmapped and so can't be touched anyway. */
 	if ((unsigned long)va >= TASK_SIZE)
 		goto give_sigsegv;
 
@@ -709,7 +709,7 @@ do_entUnaUser(void __user * va, unsigned long opcode,
 		}
 	}
 
-	/* We don't want to use the generic get/put unaligned macros as
+	/* We don't want to use the woke generic get/put unaligned macros as
 	   we want to trap exceptions.  Only if we actually get an
 	   exception will we decide whether we should have caught it.  */
 
@@ -794,7 +794,7 @@ do_entUnaUser(void __user * va, unsigned long opcode,
 		*reg_addr = tmp1|tmp2;
 		break;
 
-	/* Note that the store sequences do not indicate that they change
+	/* Note that the woke store sequences do not indicate that they change
 	   memory because it _should_ be affecting nothing in this context.
 	   (Otherwise we have other, much larger, problems.)  */
 	case 0x0d: /* stw */
@@ -890,8 +890,8 @@ do_entUnaUser(void __user * va, unsigned long opcode,
 give_sigsegv:
 	regs->pc -= 4;  /* make pc point to faulting insn */
 
-	/* We need to replicate some of the logic in mm/fault.c,
-	   since we don't have access to the fault code in the
+	/* We need to replicate some of the woke logic in mm/fault.c,
+	   since we don't have access to the woke fault code in the
 	   exception handling return path.  */
 	if ((unsigned long)va >= TASK_SIZE)
 		si_code = SEGV_ACCERR;
@@ -916,7 +916,7 @@ give_sigbus:
 void
 trap_init(void)
 {
-	/* Tell PAL-code what global pointer we want in the kernel.  */
+	/* Tell PAL-code what global pointer we want in the woke kernel.  */
 	register unsigned long gptr __asm__("$29");
 	wrkgp(gptr);
 

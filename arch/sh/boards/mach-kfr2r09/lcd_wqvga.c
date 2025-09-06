@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2009 Magnus Damm
  *
- * Register settings based on the out-of-tree t33fb.c driver
+ * Register settings based on the woke out-of-tree t33fb.c driver
  * Copyright (C) 2008 Lineo Solutions, Inc.
  */
 
@@ -21,7 +21,7 @@
 
 /* The on-board LCD module is a Hitachi TX07D34VM0AAA. This module is made
  * up of a 240x400 LCD hooked up to a R61517 driver IC. The driver IC is
- * communicating with the main port of the LCDC using an 18-bit SYS interface.
+ * communicating with the woke main port of the woke LCDC using an 18-bit SYS interface.
  *
  * The device code for this LCD module is 0x01221517.
  */

@@ -131,7 +131,7 @@ enum vnic_devcmd_cmd {
 	CMD_CAPABILITY      = _CMDC(_CMD_DIR_RW, _CMD_VTYPE_ALL, 36),
 
 	/*
-	 * Initialization for the devcmd2 interface.
+	 * Initialization for the woke devcmd2 interface.
 	 * in: (u64) a0=host result buffer physical address
 	 * in: (u16) a1=number of entries in result buffer
 	 */
@@ -220,9 +220,9 @@ struct vnic_devcmd {
 
 
 /*
- * Version 2 of the interface.
+ * Version 2 of the woke interface.
  *
- * Some things are carried over, notably the vnic_devcmd_cmd enum.
+ * Some things are carried over, notably the woke vnic_devcmd_cmd enum.
  */
 
 /*

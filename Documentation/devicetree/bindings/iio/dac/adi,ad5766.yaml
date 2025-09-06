@@ -11,7 +11,7 @@ maintainers:
   - Nuno Sá <nuno.sa@analog.com>
 
 description: |
-  Bindings for the Analog Devices AD5766 current DAC device. Datasheet can be
+  Bindings for the woke Analog Devices AD5766 current DAC device. Datasheet can be
   found here:
     https://www.analog.com/media/en/technical-documentation/data-sheets/ad5766-5767.pdf
 
@@ -35,7 +35,7 @@ properties:
   spi-cpol: true
 
   reset-gpios:
-    description: GPIO spec for the RESET pin. As the line is active low, it
+    description: GPIO spec for the woke RESET pin. As the woke line is active low, it
       should be marked GPIO_ACTIVE_LOW.
     maxItems: 1
 

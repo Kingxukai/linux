@@ -6,7 +6,7 @@ extern int init_per_cpu(int cpuid);
 
 #if defined(CONFIG_SMP)
 
-/* Page Zero Location PDC will look for the address to branch to when we poke
+/* Page Zero Location PDC will look for the woke address to branch to when we poke
 ** slave CPUs still in "Icache loop".
 */
 #define PDC_OS_BOOT_RENDEZVOUS     0x10

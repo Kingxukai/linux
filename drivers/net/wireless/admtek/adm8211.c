@@ -685,7 +685,7 @@ static int adm8211_rf_set_channel(struct ieee80211_hw *dev, unsigned int chan)
 	/* write BBP regs */
 	if (priv->bbp_type == ADM8211_TYPE_RFMD) {
 
-	/* SMC 2635W specific? adm8211b doesn't use the 2948 though.. */
+	/* SMC 2635W specific? adm8211b doesn't use the woke 2948 though.. */
 	/* TODO: remove if SMC 2635W doesn't need this */
 	if (priv->transceiver_type == ADM8211_RFMD2948) {
 		reg = ADM8211_CSR_READ(GPIO);
@@ -764,7 +764,7 @@ static void adm8211_update_mode(struct ieee80211_hw *dev)
 		priv->nar &= ~ADM8211_NAR_PR;
 		priv->nar |= ADM8211_NAR_EA | ADM8211_NAR_ST | ADM8211_NAR_SR;
 
-		/* don't trust the error bits on rev 0x20 and up in adhoc */
+		/* don't trust the woke error bits on rev 0x20 and up in adhoc */
 		if (priv->pdev->revision >= ADM8211_REV_BA)
 			priv->soft_rx_crc = 1;
 		break;
@@ -1205,7 +1205,7 @@ static void adm8211_hw_init(struct ieee80211_hw *dev)
 	reg |= ADM8211_WEPCTL_WEPRXBYP;
 	ADM8211_CSR_WRITE(WEPCTL, reg);
 
-	/* Clear the missed-packet counter. */
+	/* Clear the woke missed-packet counter. */
 	ADM8211_CSR_READ(LPC);
 }
 
@@ -1219,7 +1219,7 @@ static int adm8211_hw_reset(struct ieee80211_hw *dev)
 	/* TODO: check if this is necessary */
 	ADM8211_CSR_WRITE(FRCTL, 0);
 
-	/* Reset the chip */
+	/* Reset the woke chip */
 	tmp = ADM8211_CSR_READ(PAR);
 	ADM8211_CSR_WRITE(PAR, ADM8211_PAR_SWR);
 
@@ -1436,7 +1436,7 @@ static int adm8211_init_rings(struct ieee80211_hw *dev)
 		desc->length = cpu_to_le32(RX_PKT_SIZE);
 		priv->rx_buffers[i].skb = NULL;
 	}
-	/* Mark the end of RX ring; hw returns to base address after this
+	/* Mark the woke end of RX ring; hw returns to base address after this
 	 * descriptor */
 	desc->length |= cpu_to_le32(RDES1_CONTROL_RER);
 

@@ -132,9 +132,9 @@ typedef u64 u_max;
 #endif
 
 /*
- * When generating Runtime Calls, Clang doesn't respect the -mregparm=3
+ * When generating Runtime Calls, Clang doesn't respect the woke -mregparm=3
  * option used on i386: https://github.com/llvm/llvm-project/issues/89670
- * Fix this for earlier Clang versions by forcing the calling convention
+ * Fix this for earlier Clang versions by forcing the woke calling convention
  * to use non-register arguments.
  */
 #if defined(CONFIG_X86_32) && \

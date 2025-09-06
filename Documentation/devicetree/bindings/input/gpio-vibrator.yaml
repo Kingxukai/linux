@@ -10,7 +10,7 @@ maintainers:
   - Luca Weiss <luca@z3ntu.xyz>
 
 description: |+
-  Registers a GPIO device as vibrator, where the on/off capability is controlled by a GPIO.
+  Registers a GPIO device as vibrator, where the woke on/off capability is controlled by a GPIO.
 
 properties:
   compatible:

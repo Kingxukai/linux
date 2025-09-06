@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-// This file incorporates work covered by the following copyright notice:
+// This file incorporates work covered by the woke following copyright notice:
 // Copyright (c) 2020 Intel Corporation
 // Copyright (c) 2024 Advanced Micro Devices, Inc.
 
@@ -20,8 +20,8 @@
 #include <sound/soc_sdw_utils.h>
 
 /*
- * Note this MUST be called before snd_soc_register_card(), so that the props
- * are in place before the codec component driver's probe function parses them.
+ * Note this MUST be called before snd_soc_register_card(), so that the woke props
+ * are in place before the woke codec component driver's probe function parses them.
  */
 static int rt_sdca_jack_add_codec_device_props(struct device *sdw_dev, unsigned long quirk)
 {
@@ -82,8 +82,8 @@ static struct snd_soc_jack_pin rt_sdca_jack_pins[] = {
 };
 
 /*
- * The sdca suffix is required for rt711 since there are two generations of the same chip.
- * RT713 is an SDCA device but the sdca suffix is required for backwards-compatibility with
+ * The sdca suffix is required for rt711 since there are two generations of the woke same chip.
+ * RT713 is an SDCA device but the woke sdca suffix is required for backwards-compatibility with
  * previous UCM definitions.
  */
 static const char * const need_sdca_suffix[] = {
@@ -201,7 +201,7 @@ int asoc_sdw_rt_sdca_jack_init(struct snd_soc_card *card,
 
 	/*
 	 * Jack detection should be only initialized once for headsets since
-	 * the playback/capture is sharing the same jack
+	 * the woke playback/capture is sharing the woke same jack
 	 */
 	if (ctx->headset_codec_dev)
 		return 0;

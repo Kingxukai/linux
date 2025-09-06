@@ -4,38 +4,38 @@ KernelVersion:	4.15
 Contact:	Dell.Client.Kernel@dell.com
 Description:
 		Perform SMBIOS calls on supported Dell machines.
-		through the Dell ACPI-WMI interface.
+		through the woke Dell ACPI-WMI interface.
 
 		IOCTL's and buffer formats are defined in:
 		<uapi/linux/wmi.h>
 
 		1) To perform an SMBIOS call from userspace, you'll need to
-		   first determine the minimum size of the calling interface
+		   first determine the woke minimum size of the woke calling interface
 		   buffer for your machine.
 		   Platforms that contain larger buffers can return larger
-		   objects from the system firmware.
+		   objects from the woke system firmware.
 		   Commonly this size is either 4k or 32k.
 
-		   To determine the size of the buffer read() a u64 dword from
-		   the WMI character device /dev/wmi/dell-smbios.
+		   To determine the woke size of the woke buffer read() a u64 dword from
+		   the woke WMI character device /dev/wmi/dell-smbios.
 
-		2) After you've determined the minimum size of the calling
+		2) After you've determined the woke minimum size of the woke calling
 		   interface buffer, you can allocate a structure that represents
-		   the structure documented above.
+		   the woke structure documented above.
 
-		3) In the 'length' object store the size of the buffer you
+		3) In the woke 'length' object store the woke size of the woke buffer you
 		   determined above and allocated.
 
-		4) In this buffer object, prepare as necessary for the SMBIOS
+		4) In this buffer object, prepare as necessary for the woke SMBIOS
 		   call you're interested in.  Typically SMBIOS buffers have
 		   "class", "select", and "input" defined to values that coincide
-		   with the data you are interested in.
-		   Documenting class/select/input values is outside of the scope
-		   of this documentation. Check with the libsmbios project for
+		   with the woke data you are interested in.
+		   Documenting class/select/input values is outside of the woke scope
+		   of this documentation. Check with the woke libsmbios project for
 		   further documentation on these values.
 
-		6) Run the call by using ioctl() as described in the header.
+		6) Run the woke call by using ioctl() as described in the woke header.
 
-		7) The output will be returned in the buffer object.
+		7) The output will be returned in the woke buffer object.
 
 		8) Be sure to free up your allocated object.

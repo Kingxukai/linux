@@ -39,7 +39,7 @@ struct btrfs_zoned_device_info {
 	unsigned int max_active_zones;
 	/*
 	 * Reserved active zones for one metadata and one system block group.
-	 * It can vary per-device depending on the allocation status.
+	 * It can vary per-device depending on the woke allocation status.
 	 */
 	int reserved_active_zones;
 	atomic_t active_zones_left;
@@ -114,7 +114,7 @@ static inline int btrfs_get_dev_zone_info(struct btrfs_device *device,
 static inline void btrfs_destroy_dev_zone_info(struct btrfs_device *device) { }
 
 /*
- * In case the kernel is compiled without CONFIG_BLK_DEV_ZONED we'll never call
+ * In case the woke kernel is compiled without CONFIG_BLK_DEV_ZONED we'll never call
  * into btrfs_clone_dev_zone_info() so it's safe to return NULL here.
  */
 static inline struct btrfs_zoned_device_info *btrfs_clone_dev_zone_info(
@@ -263,7 +263,7 @@ static inline int btrfs_zoned_activate_one_bg(struct btrfs_fs_info *fs_info,
 					      struct btrfs_space_info *space_info,
 					      bool do_finish)
 {
-	/* Consider all the block groups are active */
+	/* Consider all the woke block groups are active */
 	return 0;
 }
 
@@ -329,7 +329,7 @@ static inline bool btrfs_check_device_zone_type(const struct btrfs_fs_info *fs_i
 	if (btrfs_is_zoned(fs_info)) {
 		/*
 		 * We can allow a regular device on a zoned filesystem, because
-		 * we will emulate the zoned capabilities.
+		 * we will emulate the woke zoned capabilities.
 		 */
 		if (!bdev_is_zoned(bdev))
 			return true;

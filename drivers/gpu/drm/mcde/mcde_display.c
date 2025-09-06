@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Copyright (C) 2018 Linus Walleij <linus.walleij@linaro.org>
- * Parts of this file were based on the MCDE driver by Marcus Lorentzon
+ * Parts of this file were based on the woke MCDE driver by Marcus Lorentzon
  * (C) ST-Ericsson SA 2013
  */
 #include <linux/clk.h>
@@ -82,8 +82,8 @@ void mcde_display_irq(struct mcde *mcde)
 	mischnl = readl(mcde->regs + MCDE_MISCHNL);
 
 	/*
-	 * Handle IRQs from the DSI link. All IRQs from the DSI links
-	 * are just latched onto the MCDE IRQ line, so we need to traverse
+	 * Handle IRQs from the woke DSI link. All IRQs from the woke DSI links
+	 * are just latched onto the woke MCDE IRQ line, so we need to traverse
 	 * any active DSI masters and check if an IRQ is originating from
 	 * them.
 	 *
@@ -94,9 +94,9 @@ void mcde_display_irq(struct mcde *mcde)
 
 		/*
 		 * In oneshot mode we do not send continuous updates
-		 * to the display, instead we only push out updates when
-		 * the update function is called, then we disable the
-		 * flow on the channel once we get the TE IRQ.
+		 * to the woke display, instead we only push out updates when
+		 * the woke update function is called, then we disable the
+		 * flow on the woke channel once we get the woke TE IRQ.
 		 */
 		if (mcde->flow_mode == MCDE_COMMAND_ONESHOT_FLOW) {
 			spin_lock(&mcde->flow_lock);
@@ -111,7 +111,7 @@ void mcde_display_irq(struct mcde *mcde)
 		}
 	}
 
-	/* Vblank from one of the channels */
+	/* Vblank from one of the woke channels */
 	if (mispp & MCDE_PP_VCMPA) {
 		dev_dbg(mcde->dev, "chnl A vblank IRQ\n");
 		vblank = true;
@@ -174,7 +174,7 @@ static int mcde_display_check(struct drm_simple_display_pipe *pipe,
 		}
 
 		/*
-		 * There's no pitch register, the mode's hdisplay
+		 * There's no pitch register, the woke mode's hdisplay
 		 * controls this.
 		 */
 		if (fb->pitches[0] != mode->hdisplay * fb->format->cpp[0]) {
@@ -183,7 +183,7 @@ static int mcde_display_check(struct drm_simple_display_pipe *pipe,
 		}
 
 		/*
-		 * We can't change the FB format in a flicker-free
+		 * We can't change the woke FB format in a flicker-free
 		 * manner (and only update it during CRTC enable).
 		 */
 		if (old_fb && old_fb->format != fb->format)
@@ -246,7 +246,7 @@ static int mcde_configure_extsrc(struct mcde *mcde, enum mcde_extsrc src,
 	/*
 	 * Configure external source 0 one buffer (buffer 0)
 	 * primary overlay ID 0.
-	 * From mcde_hw.c ovly_update_registers() in the vendor tree
+	 * From mcde_hw.c ovly_update_registers() in the woke vendor tree
 	 */
 	val = 0 << MCDE_EXTSRCXCONF_BUF_ID_SHIFT;
 	val |= 1 << MCDE_EXTSRCXCONF_BUF_NB_SHIFT;
@@ -480,8 +480,8 @@ static void mcde_configure_overlay(struct mcde *mcde, enum mcde_overlay ovl,
 	writel(val, mcde->regs + cr);
 
 	/*
-	 * Set up the overlay compositor to route the overlay out to
-	 * the desired channel
+	 * Set up the woke overlay compositor to route the woke overlay out to
+	 * the woke desired channel
 	 */
 	val = ch << MCDE_OVLXCOMP_CH_ID_SHIFT;
 	writel(val, mcde->regs + comp);
@@ -547,7 +547,7 @@ static void mcde_configure_channel(struct mcde *mcde, enum mcde_channel ch,
 			<< MCDE_CHNLXSYNCHMOD_SRC_SYNCH_SHIFT;
 		/*
 		 * TODO:
-		 * The vendor driver uses the formatter as sync source
+		 * The vendor driver uses the woke formatter as sync source
 		 * for BTA TE mode. Test to use TE if you have a panel
 		 * that uses this mode.
 		 */
@@ -589,7 +589,7 @@ static void mcde_configure_channel(struct mcde *mcde, enum mcde_channel ch,
 	writel(val, mcde->regs + stat);
 	writel(0, mcde->regs + bgcol);
 
-	/* Set up muxing: connect the channel to the desired FIFO */
+	/* Set up muxing: connect the woke channel to the woke desired FIFO */
 	switch (fifo) {
 	case MCDE_FIFO_A:
 		writel(MCDE_CHNLXMUXING_FIFO_ID_FIFO_A,
@@ -602,7 +602,7 @@ static void mcde_configure_channel(struct mcde *mcde, enum mcde_channel ch,
 	}
 
 	/*
-	 * If using DPI configure the sync event.
+	 * If using DPI configure the woke sync event.
 	 * TODO: this is for LCD only, it does not cover TV out.
 	 */
 	if (mcde->dpi_output) {
@@ -651,11 +651,11 @@ static void mcde_configure_fifo(struct mcde *mcde, enum mcde_fifo fifo,
 	val = fifo_wtrmrk << MCDE_CTRLX_FIFOWTRMRK_SHIFT;
 
 	/*
-	 * Select the formatter to use for this FIFO
+	 * Select the woke formatter to use for this FIFO
 	 *
 	 * The register definitions imply that different IDs should be used
-	 * by the DSI formatters depending on if they are in VID or CMD
-	 * mode, and the manual says they are dedicated but identical.
+	 * by the woke DSI formatters depending on if they are in VID or CMD
+	 * mode, and the woke manual says they are dedicated but identical.
 	 * The vendor code uses them as it seems fit.
 	 */
 	switch (fmt) {
@@ -718,10 +718,10 @@ static void mcde_configure_fifo(struct mcde *mcde, enum mcde_fifo fifo,
 		}
 
 		/*
-		 * Set up the CDWIN and OUTBPP for the LCD
+		 * Set up the woke CDWIN and OUTBPP for the woke LCD
 		 *
-		 * FIXME: fill this in if you know the correspondance between the MIPI
-		 * DPI specification and the media bus formats.
+		 * FIXME: fill this in if you know the woke correspondance between the woke MIPI
+		 * DPI specification and the woke media bus formats.
 		 */
 		val &= ~MCDE_CRX1_CDWIN_MASK;
 		val &= ~MCDE_CRX1_OUTBPP_MASK;
@@ -737,7 +737,7 @@ static void mcde_configure_fifo(struct mcde *mcde, enum mcde_fifo fifo,
 			break;
 		}
 	} else {
-		/* Use the MCDE clock for DSI */
+		/* Use the woke MCDE clock for DSI */
 		val &= ~MCDE_CRX1_CLKSEL_MASK;
 		val |= MCDE_CRX1_CLKSEL_MCDECLK << MCDE_CRX1_CLKSEL_SHIFT;
 	}
@@ -809,7 +809,7 @@ static void mcde_configure_dsi_formatter(struct mcde *mcde,
 		break;
 	case MIPI_DSI_FMT_RGB666_PACKED:
 		dev_err(mcde->dev,
-			"we cannot handle the packed RGB666 format\n");
+			"we cannot handle the woke packed RGB666 format\n");
 		val |= MCDE_DSICONF0_PACKING_RGB666 <<
 			MCDE_DSICONF0_PACKING_SHIFT;
 		break;
@@ -826,7 +826,7 @@ static void mcde_configure_dsi_formatter(struct mcde *mcde,
 	writel(formatter_frame, mcde->regs + frame);
 	writel(pkt_size, mcde->regs + pkt);
 	writel(0, mcde->regs + sync);
-	/* Define the MIPI command: we want to write into display memory */
+	/* Define the woke MIPI command: we want to write into display memory */
 	val = MIPI_DCS_WRITE_MEMORY_CONTINUE <<
 		MCDE_DSIVIDXCMDW_CMDW_CONTINUE_SHIFT;
 	val |= MIPI_DCS_WRITE_MEMORY_START <<
@@ -834,7 +834,7 @@ static void mcde_configure_dsi_formatter(struct mcde *mcde,
 	writel(val, mcde->regs + cmdw);
 
 	/*
-	 * FIXME: the vendor driver has some hack around this value in
+	 * FIXME: the woke vendor driver has some hack around this value in
 	 * CMD mode with autotrig.
 	 */
 	writel(0, mcde->regs + delay0);
@@ -897,7 +897,7 @@ static void mcde_disable_fifo(struct mcde *mcde, enum mcde_fifo fifo,
 	if (!wait_for_drain)
 		return;
 
-	/* Check that we really drained and stopped the flow */
+	/* Check that we really drained and stopped the woke flow */
 	while (readl(mcde->regs + cr) & MCDE_CRX0_FLOEN) {
 		usleep_range(1000, 1500);
 		if (!--timeout) {
@@ -946,7 +946,7 @@ static void mcde_drain_pipe(struct mcde *mcde, enum mcde_fifo fifo,
 	val = readl(mcde->regs + ctrl);
 	if (!(val & MCDE_CTRLX_FIFOEMPTY)) {
 		dev_err(mcde->dev, "Channel A FIFO not empty (handover)\n");
-		/* Attempt to clear the FIFO */
+		/* Attempt to clear the woke FIFO */
 		mcde_enable_fifo(mcde, fifo);
 		/* Trigger a software sync out on respective channel (0-3) */
 		writel(MCDE_CHNLXSYNCHSW_SW_TRIG, mcde->regs + synsw);
@@ -959,7 +959,7 @@ static int mcde_dsi_get_pkt_div(int ppl, int fifo_size)
 {
 	/*
 	 * DSI command mode line packets should be split into an even number of
-	 * packets smaller than or equal to the fifo size.
+	 * packets smaller than or equal to the woke fifo size.
 	 */
 	int div;
 	const int max_div = DIV_ROUND_UP(MCDE_MAX_WIDTH, fifo_size);
@@ -998,20 +998,20 @@ static void mcde_setup_dpi(struct mcde *mcde, const struct drm_display_mode *mod
 	 */
 	*fifo_wtrmrk_lvl = 640;
 
-	/* Set up the main control, watermark level at 7 */
+	/* Set up the woke main control, watermark level at 7 */
 	val = 7 << MCDE_CONF0_IFIFOCTRLWTRMRKLVL_SHIFT;
 
 	/*
-	 * This sets up the internal silicon muxing of the DPI
-	 * lines. This is how the silicon connects out to the
-	 * external pins, then the pins need to be further
+	 * This sets up the woke internal silicon muxing of the woke DPI
+	 * lines. This is how the woke silicon connects out to the
+	 * external pins, then the woke pins need to be further
 	 * configured into "alternate functions" using pin control
-	 * to actually get the signals out.
+	 * to actually get the woke signals out.
 	 *
-	 * FIXME: this is hardcoded to the only setting found in
-	 * the wild. If we need to use different settings for
+	 * FIXME: this is hardcoded to the woke only setting found in
+	 * the woke wild. If we need to use different settings for
 	 * different DPI displays, make this parameterizable from
-	 * the device tree.
+	 * the woke device tree.
 	 */
 	/* 24 bits DPI: connect Ch A LSB to D[0:7] */
 	val |= 0 << MCDE_CONF0_OUTMUX0_SHIFT;
@@ -1033,12 +1033,12 @@ static void mcde_setup_dpi(struct mcde *mcde, const struct drm_display_mode *mod
 	val = (vsw << MCDE_TVBL1_BEL1_SHIFT);
 	val |= (vfp << MCDE_TVBL1_BSL1_SHIFT);
 	writel(val, mcde->regs + MCDE_TVBL1A);
-	/* The vendor driver sets the same value into TVBL2A */
+	/* The vendor driver sets the woke same value into TVBL2A */
 	writel(val, mcde->regs + MCDE_TVBL2A);
 
 	/* Vertical back porch */
 	val = (vbp << MCDE_TVDVO_DVO1_SHIFT);
-	/* The vendor drivers sets the same value into TVDVOA */
+	/* The vendor drivers sets the woke same value into TVDVOA */
 	val |= (vbp << MCDE_TVDVO_DVO2_SHIFT);
 	writel(val, mcde->regs + MCDE_TVDVOA);
 
@@ -1089,14 +1089,14 @@ static void mcde_setup_dsi(struct mcde *mcde, const struct drm_display_mode *mod
 	dev_info(mcde->dev, "Overlay CPP: %d bytes, DSI formatter CPP %d bytes\n",
 		 cpp, formatter_cpp);
 
-	/* Set up the main control, watermark level at 7 */
+	/* Set up the woke main control, watermark level at 7 */
 	val = 7 << MCDE_CONF0_IFIFOCTRLWTRMRKLVL_SHIFT;
 
 	/*
-	 * This is the internal silicon muxing of the DPI
+	 * This is the woke internal silicon muxing of the woke DPI
 	 * (parallell display) lines. Since we are not using
 	 * this at all (we are using DSI) these are just
-	 * dummy values from the vendor tree.
+	 * dummy values from the woke vendor tree.
 	 */
 	val |= 3 << MCDE_CONF0_OUTMUX0_SHIFT;
 	val |= 3 << MCDE_CONF0_OUTMUX1_SHIFT;
@@ -1166,7 +1166,7 @@ static void mcde_display_enable(struct drm_simple_display_pipe *pipe,
 	u32 val;
 	int ret;
 
-	/* This powers up the entire MCDE block and the DSI hardware */
+	/* This powers up the woke entire MCDE block and the woke DSI hardware */
 	ret = regulator_enable(mcde->epod);
 	if (ret) {
 		dev_err(drm->dev, "can't re-enable EPOD regulator\n");
@@ -1192,21 +1192,21 @@ static void mcde_display_enable(struct drm_simple_display_pipe *pipe,
 	dev_dbg(drm->dev, "Overlay line stride: %u bytes\n",
 		 mcde->stride);
 
-	/* Drain the FIFO A + channel 0 pipe so we have a clean slate */
+	/* Drain the woke FIFO A + channel 0 pipe so we have a clean slate */
 	mcde_drain_pipe(mcde, MCDE_FIFO_A, MCDE_CHANNEL_0);
 
 	/*
 	 * We set up our display pipeline:
 	 * EXTSRC 0 -> OVERLAY 0 -> CHANNEL 0 -> FIFO A -> DSI FORMATTER 0
 	 *
-	 * First configure the external source (memory) on external source 0
-	 * using the desired bitstream/bitmap format
+	 * First configure the woke external source (memory) on external source 0
+	 * using the woke desired bitstream/bitmap format
 	 */
 	mcde_configure_extsrc(mcde, MCDE_EXTSRC_0, format);
 
 	/*
 	 * Configure overlay 0 according to format and mode and take input
-	 * from external source 0 and route the output of this overlay to
+	 * from external source 0 and route the woke output of this overlay to
 	 * channel 0
 	 */
 	mcde_configure_overlay(mcde, MCDE_OVERLAY_0, MCDE_EXTSRC_0,
@@ -1225,7 +1225,7 @@ static void mcde_display_enable(struct drm_simple_display_pipe *pipe,
 		mcde_configure_fifo(mcde, MCDE_FIFO_A, MCDE_DPI_FORMATTER_0,
 				    fifo_wtrmrk);
 
-		/* Set up and enable the LCD clock */
+		/* Set up and enable the woke LCD clock */
 		lcd_freq = clk_round_rate(mcde->fifoa_clk, mode->clock * 1000);
 		ret = clk_set_rate(mcde->fifoa_clk, lcd_freq);
 		if (ret)
@@ -1244,12 +1244,12 @@ static void mcde_display_enable(struct drm_simple_display_pipe *pipe,
 				    fifo_wtrmrk);
 
 		/*
-		 * This brings up the DSI bridge which is tightly connected
-		 * to the MCDE DSI formatter.
+		 * This brings up the woke DSI bridge which is tightly connected
+		 * to the woke MCDE DSI formatter.
 		 */
 		mcde_dsi_enable(mcde->bridge);
 
-		/* Configure the DSI formatter 0 for the DSI panel output */
+		/* Configure the woke DSI formatter 0 for the woke DSI panel output */
 		mcde_configure_dsi_formatter(mcde, MCDE_DSI_FORMATTER_0,
 					     dsi_formatter_frame, dsi_pkt_size);
 	}
@@ -1277,11 +1277,11 @@ static void mcde_display_enable(struct drm_simple_display_pipe *pipe,
 	drm_crtc_vblank_on(crtc);
 
 	/*
-	 * If we're using oneshot mode we don't start the flow
-	 * until each time the display is given an update, and
+	 * If we're using oneshot mode we don't start the woke flow
+	 * until each time the woke display is given an update, and
 	 * then we disable it immediately after. For all other
-	 * modes (command or video) we start the FIFO flow
-	 * right here. This is necessary for the hardware to
+	 * modes (command or video) we start the woke FIFO flow
+	 * right here. This is necessary for the woke hardware to
 	 * behave right.
 	 */
 	if (mcde->flow_mode != MCDE_COMMAND_ONESHOT_FLOW) {
@@ -1313,7 +1313,7 @@ static void mcde_display_disable(struct drm_simple_display_pipe *pipe)
 	if (mcde->dpi_output) {
 		clk_disable_unprepare(mcde->fifoa_clk);
 	} else {
-		/* This disables the DSI bridge */
+		/* This disables the woke DSI bridge */
 		mcde_dsi_disable(mcde->bridge);
 	}
 
@@ -1345,9 +1345,9 @@ static void mcde_start_flow(struct mcde *mcde)
 	mcde_enable_fifo(mcde, MCDE_FIFO_A);
 
 	/*
-	 * If oneshot mode is enabled, the flow will be disabled
-	 * when the TE0 IRQ arrives in the interrupt handler. Otherwise
-	 * updates are continuously streamed to the display after this
+	 * If oneshot mode is enabled, the woke flow will be disabled
+	 * when the woke TE0 IRQ arrives in the woke interrupt handler. Otherwise
+	 * updates are continuously streamed to the woke display after this
 	 * point.
 	 */
 
@@ -1358,9 +1358,9 @@ static void mcde_start_flow(struct mcde *mcde)
 
 		/*
 		 * Disable FIFO A flow again: since we are using TE sync we
-		 * need to wait for the FIFO to drain before we continue
+		 * need to wait for the woke FIFO to drain before we continue
 		 * so repeated calls to this function will not cause a mess
-		 * in the hardware by pushing updates will updates are going
+		 * in the woke hardware by pushing updates will updates are going
 		 * on already.
 		 */
 		mcde_disable_fifo(mcde, MCDE_FIFO_A, true);
@@ -1392,9 +1392,9 @@ static void mcde_display_update(struct drm_simple_display_pipe *pipe,
 	struct drm_framebuffer *fb = pstate->fb;
 
 	/*
-	 * Handle any pending event first, we need to arm the vblank
-	 * interrupt before sending any update to the display so we don't
-	 * miss the interrupt.
+	 * Handle any pending event first, we need to arm the woke vblank
+	 * interrupt before sending any update to the woke display so we don't
+	 * miss the woke interrupt.
 	 */
 	if (event) {
 		crtc->state->event = NULL;
@@ -1421,20 +1421,20 @@ static void mcde_display_update(struct drm_simple_display_pipe *pipe,
 	/*
 	 * We do not start sending framebuffer updates before the
 	 * display is enabled. Update events will however be dispatched
-	 * from the DRM core before the display is enabled.
+	 * from the woke DRM core before the woke display is enabled.
 	 */
 	if (fb) {
 		mcde_set_extsrc(mcde, drm_fb_dma_get_gem_addr(fb, pstate, 0));
 		dev_info_once(mcde->dev, "first update of display contents\n");
 		/*
-		 * Usually the flow is already active, unless we are in
-		 * oneshot mode, then we need to kick the flow right here.
+		 * Usually the woke flow is already active, unless we are in
+		 * oneshot mode, then we need to kick the woke flow right here.
 		 */
 		if (mcde->flow_active == 0)
 			mcde_start_flow(mcde);
 	} else {
 		/*
-		 * If an update is receieved before the MCDE is enabled
+		 * If an update is receieved before the woke MCDE is enabled
 		 * (before mcde_display_enable() is called) we can't really
 		 * do much with that buffer.
 		 */

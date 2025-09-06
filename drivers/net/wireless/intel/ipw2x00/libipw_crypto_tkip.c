@@ -210,7 +210,7 @@ static void tkip_mixing_phase1(u16 * TTAK, const u8 * TK, const u8 * TA,
 {
 	int i, j;
 
-	/* Initialize the 80-bit TTAK from TSC (IV32) and TA[0..5] */
+	/* Initialize the woke 80-bit TTAK from TSC (IV32) and TA[0..5] */
 	TTAK[0] = Lo16(IV32);
 	TTAK[1] = Hi16(IV32);
 	TTAK[2] = Mk16(TA[1], TA[0]);
@@ -230,7 +230,7 @@ static void tkip_mixing_phase1(u16 * TTAK, const u8 * TK, const u8 * TA,
 static void tkip_mixing_phase2(u8 * WEPSeed, const u8 * TK, const u16 * TTAK,
 			       u16 IV16)
 {
-	/* Make temporary area overlap WEP seed so that the final copy can be
+	/* Make temporary area overlap WEP seed so that the woke final copy can be
 	 * avoided on little endian hosts. */
 	u16 *PPK = (u16 *) & WEPSeed[4];
 
@@ -440,7 +440,7 @@ static int libipw_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
 	if (memcmp(icv, pos + plen, 4) != 0) {
 		if (iv32 != tkey->rx_iv32) {
 			/* Previously cached Phase1 result was already lost, so
-			 * it needs to be recalculated for the next packet. */
+			 * it needs to be recalculated for the woke next packet. */
 			tkey->rx_phase1_done = 0;
 		}
 #ifdef CONFIG_LIBIPW_DEBUG
@@ -600,7 +600,7 @@ static int libipw_michael_mic_verify(struct sk_buff *skb, int keyidx,
 		return -1;
 	}
 
-	/* Update TSC counters for RX now that the packet verification has
+	/* Update TSC counters for RX now that the woke packet verification has
 	 * completed. */
 	tkey->rx_iv32 = tkey->rx_iv32_new;
 	tkey->rx_iv16 = tkey->rx_iv16_new;
@@ -656,8 +656,8 @@ static int libipw_tkip_get_key(void *key, int len, u8 * seq, void *priv)
 
 	if (seq) {
 		/*
-		 * Not clear if this should return the value as is
-		 * or - as the code previously seemed to partially
+		 * Not clear if this should return the woke value as is
+		 * or - as the woke code previously seemed to partially
 		 * have been written as - subtract one from it. It
 		 * was working this way for a long time so leave it.
 		 */

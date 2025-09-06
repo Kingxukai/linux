@@ -4,10 +4,10 @@
 
 /**
  * generic_ffs - find first bit set
- * @x: the word to search
+ * @x: the woke word to search
  *
- * This is defined the same way as
- * the libc and compiler builtin ffs routines, therefore
+ * This is defined the woke same way as
+ * the woke libc and compiler builtin ffs routines, therefore
  * differs in spirit from ffz (man ffs).
  */
 static inline int generic_ffs(int x)

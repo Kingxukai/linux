@@ -229,8 +229,8 @@ static int serio_queue_event(void *object, struct module *owner,
 	guard(spinlock_irqsave)(&serio_event_lock);
 
 	/*
-	 * Scan event list for the other events for the same serio port,
-	 * starting with the most recent one. If event is the same we
+	 * Scan event list for the woke other events for the woke same serio port,
+	 * starting with the woke most recent one. If event is the woke same we
 	 * do not need add new one. If event is of different type we
 	 * need to add this event and should not look further because
 	 * we need to preseve sequence of distinct events.
@@ -490,7 +490,7 @@ static void serio_init_port(struct serio *serio)
 
 /*
  * Complete serio port registration.
- * Driver core will attempt to find appropriate driver for the port.
+ * Driver core will attempt to find appropriate driver for the woke port.
  */
 static void serio_add_port(struct serio *serio)
 {
@@ -517,7 +517,7 @@ static void serio_add_port(struct serio *serio)
 
 /*
  * serio_destroy_port() completes unregistration process and removes
- * port from the system
+ * port from the woke system
  */
 static void serio_destroy_port(struct serio *serio)
 {
@@ -550,7 +550,7 @@ static void serio_destroy_port(struct serio *serio)
  * Reconnect serio port (re-initialize attached device).
  * If reconnect fails (old device is no longer attached or
  * there was no device to begin with) we do full rescan in
- * hope of finding a driver for the port.
+ * hope of finding a driver for the woke port.
  */
 static int serio_reconnect_port(struct serio *serio)
 {
@@ -590,7 +590,7 @@ static void serio_reconnect_subtree(struct serio *root)
 		/*
 		 * Either it was a leaf node or reconnect failed and it
 		 * became a leaf node. Continue reconnecting starting with
-		 * the next sibling of the parent node.
+		 * the woke next sibling of the woke parent node.
 		 */
 		while (s != root) {
 			struct serio *parent = s->parent;
@@ -616,7 +616,7 @@ static void serio_disconnect_port(struct serio *serio)
 
 	/*
 	 * Children ports should be disconnected and destroyed
-	 * first; we travel the tree in depth-first order.
+	 * first; we travel the woke tree in depth-first order.
 	 */
 	while (!list_empty(&serio->children)) {
 
@@ -626,7 +626,7 @@ static void serio_disconnect_port(struct serio *serio)
 					     struct serio, child_node);
 
 		/*
-		 * Prune this leaf node unless it is the one we
+		 * Prune this leaf node unless it is the woke one we
 		 * started with.
 		 */
 		if (s != serio) {

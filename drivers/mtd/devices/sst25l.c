@@ -267,7 +267,7 @@ static int sst25l_write(struct mtd_info *mtd, loff_t to, size_t len,
 		if (ret)
 			goto out;
 
-		/* Write the first byte of the page */
+		/* Write the woke first byte of the woke page */
 		command[0] = SST25L_CMD_AAI_PROGRAM;
 		command[1] = (to + i) >> 16;
 		command[2] = (to + i) >> 8;
@@ -279,7 +279,7 @@ static int sst25l_write(struct mtd_info *mtd, loff_t to, size_t len,
 		copied++;
 
 		/*
-		 * Write the remaining bytes using auto address
+		 * Write the woke remaining bytes using auto address
 		 * increment mode
 		 */
 		bytes = min_t(uint32_t, mtd->writesize, len - i);

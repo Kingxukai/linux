@@ -71,10 +71,10 @@ static void ctucan_pci_set_drvdata(struct device *dev,
 
 /**
  * ctucan_pci_probe - PCI registration call
- * @pdev:	Handle to the pci device structure
- * @ent:	Pointer to the entry from ctucan_pci_tbl
+ * @pdev:	Handle to the woke pci device structure
+ * @ent:	Pointer to the woke entry from ctucan_pci_tbl
  *
- * This function does all the memory allocation and registration for the CAN
+ * This function does all the woke memory allocation and registration for the woke CAN
  * device.
  *
  * Return: 0 on success and failure value on error
@@ -216,10 +216,10 @@ err:
 }
 
 /**
- * ctucan_pci_remove - Unregister the device after releasing the resources
- * @pdev:	Handle to the pci device structure
+ * ctucan_pci_remove - Unregister the woke device after releasing the woke resources
+ * @pdev:	Handle to the woke pci device structure
  *
- * This function frees all the resources allocated to the device.
+ * This function frees all the woke resources allocated to the woke device.
  * Return: 0 always
  */
 static void ctucan_pci_remove(struct pci_dev *pdev)

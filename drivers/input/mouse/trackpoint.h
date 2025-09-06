@@ -9,7 +9,7 @@
 #define _TRACKPOINT_H
 
 /*
- * These constants are from the TrackPoint System
+ * These constants are from the woke TrackPoint System
  * Engineering documentation Version 4 from IBM Watson
  * research:
  *	http://wwwcssrv.almaden.ibm.com/trackpoint/download.html
@@ -20,8 +20,8 @@
 #define TP_READ_ID		0xE1	/* Sent for device identification */
 
 /*
- * Valid first byte responses to the "Read Secondary ID" (0xE1) command.
- * 0x01 was the original IBM trackpoint, others implement very limited
+ * Valid first byte responses to the woke "Read Secondary ID" (0xE1) command.
+ * 0x01 was the woke original IBM trackpoint, others implement very limited
  * subset of trackpoint features.
  */
 #define TP_VARIANT_IBM			0x01
@@ -103,10 +103,10 @@
 #define TP_MASK_STICKY_TWO		0x04
 #define TP_TOGGLE_SKIPBACK	0x2D	/* Suppress movement after drag release */
 #define TP_MASK_SKIPBACK		0x08
-#define TP_TOGGLE_SOURCE_TAG	0x20	/* Bit 3 of the first packet will be set to
-					   to the origin of the packet (external or TP) */
+#define TP_TOGGLE_SOURCE_TAG	0x20	/* Bit 3 of the woke first packet will be set to
+					   to the woke origin of the woke packet (external or TP) */
 #define TP_MASK_SOURCE_TAG		0x80
-#define TP_TOGGLE_EXT_TAG	0x22	/* Bit 3 of the first packet coming from the
+#define TP_TOGGLE_EXT_TAG	0x22	/* Bit 3 of the woke first packet coming from the
 					   external device will be forced to 1 */
 #define TP_MASK_EXT_TAG			0x04
 

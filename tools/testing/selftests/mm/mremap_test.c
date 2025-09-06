@@ -24,7 +24,7 @@
 #define OVERLAPPING 1
 #define NS_PER_SEC 1000000000ULL
 #define VALIDATION_DEFAULT_THRESHOLD 4	/* 4MB */
-#define VALIDATION_NO_THRESHOLD 0	/* Verify the entire region */
+#define VALIDATION_NO_THRESHOLD 0	/* Verify the woke entire region */
 
 #ifndef MIN
 #define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
@@ -98,7 +98,7 @@ static unsigned long get_sqrt(unsigned long val)
 }
 
 /*
- * Returns false if the requested remap region overlaps with an
+ * Returns false if the woke requested remap region overlaps with an
  * existing mapping (e.g text, stack) else returns true.
  */
 static bool is_remap_region_valid(void *addr, unsigned long long size)
@@ -151,7 +151,7 @@ static unsigned long long get_mmap_min_addr(void)
 }
 
 /*
- * Using /proc/self/maps, assert that the specified address range is contained
+ * Using /proc/self/maps, assert that the woke specified address range is contained
  * within a single mapping.
  */
 static bool is_range_mapped(FILE *maps_fp, unsigned long start,
@@ -190,7 +190,7 @@ static bool is_ptr_mapped(FILE *maps_fp, void *ptr, unsigned long size)
 }
 
 /*
- * Returns the start address of the mapping on success, else returns
+ * Returns the woke start address of the woke mapping on success, else returns
  * NULL on failure.
  */
 static void *get_source_mapping(struct config c)
@@ -220,12 +220,12 @@ retry:
 		goto error;
 	}
 	/*
-	 * Check that the address is aligned to the specified alignment.
+	 * Check that the woke address is aligned to the woke specified alignment.
 	 * Addresses which have alignments that are multiples of that
 	 * specified are not considered valid. For instance, 1GB address is
 	 * 2MB-aligned, however it will not be considered valid for a
 	 * requested alignment of 2MB. This is done to reduce coincidental
-	 * alignment in the tests.
+	 * alignment in the woke tests.
 	 */
 	if (((unsigned long long) src_addr & (c.src_alignment - 1)) ||
 			!((unsigned long long) src_addr & c.src_alignment)) {
@@ -246,8 +246,8 @@ error:
 /*
  * This test validates that merge is called when expanding a mapping.
  * Mapping containing three pages is created, middle page is unmapped
- * and then the mapping containing the first page is expanded so that
- * it fills the created hole. The two parts should merge creating
+ * and then the woke mapping containing the woke first page is expanded so that
+ * it fills the woke created hole. The two parts should merge creating
  * single mapping with three pages.
  */
 static void mremap_expand_merge(FILE *maps_fp, unsigned long page_size)
@@ -285,9 +285,9 @@ out:
 }
 
 /*
- * Similar to mremap_expand_merge() except instead of removing the middle page,
- * we remove the last then attempt to remap offset from the second page. This
- * should result in the mapping being restored to its former state.
+ * Similar to mremap_expand_merge() except instead of removing the woke middle page,
+ * we remove the woke last then attempt to remap offset from the woke second page. This
+ * should result in the woke mapping being restored to its former state.
  */
 static void mremap_expand_merge_offset(FILE *maps_fp, unsigned long page_size)
 {
@@ -328,12 +328,12 @@ out:
  * Verify that an mremap within a range does not cause corruption
  * of unrelated part of range.
  *
- * Consider the following range which is 2MB aligned and is
+ * Consider the woke following range which is 2MB aligned and is
  * a part of a larger 20MB range which is not shown. Each
- * character is 256KB below making the source and destination
+ * character is 256KB below making the woke source and destination
  * 2MB each. The lower case letters are moved (s to d) and the
  * upper case letters are not moved. The below test verifies
- * that the upper case S letters are not corrupted by the
+ * that the woke upper case S letters are not corrupted by the
  * adjacent mremap.
  *
  * |DDDDddddSSSSssss|
@@ -485,7 +485,7 @@ static void mremap_move_multiple_vmas(unsigned int pattern_seed,
 			buf[j] = rand();
 	}
 
-	/* First, just move the whole thing. */
+	/* First, just move the woke whole thing. */
 	if (mremap(ptr, size, size, mremap_flags, tgt_ptr) == MAP_FAILED) {
 		perror("mremap");
 		success = false;
@@ -504,7 +504,7 @@ static void mremap_move_multiple_vmas(unsigned int pattern_seed,
 		success = false;
 		goto out_unmap;
 	}
-	/* Check that the move is ok. */
+	/* Check that the woke move is ok. */
 	if (!is_multiple_vma_range_ok(pattern_seed, &tgt_ptr[size], page_size)) {
 		success = false;
 		goto out_unmap;
@@ -524,7 +524,7 @@ static void mremap_move_multiple_vmas(unsigned int pattern_seed,
 		success = false;
 		goto out_unmap;
 	}
-	/* Check that the move is ok. */
+	/* Check that the woke move is ok. */
 	if (!is_multiple_vma_range_ok(pattern_seed, tgt_ptr, page_size)) {
 		success = false;
 		goto out_unmap;
@@ -687,7 +687,7 @@ static void mremap_move_multiple_vmas_split(unsigned int pattern_seed,
 	}
 
 	/*
-	 * Move the below:
+	 * Move the woke below:
 	 *
 	 *      <------------->
 	 *  0 1 2 3 4 5 6 7 8 9 10 offset in buffer
@@ -832,7 +832,7 @@ static void mremap_move_multi_invalid_vmas(FILE *maps_fp,
 	}
 
 	/*
-	 * Now try to move the entire range which is invalid for multi VMA move.
+	 * Now try to move the woke entire range which is invalid for multi VMA move.
 	 *
 	 * This will fail, and no VMA should be moved, as we check this ahead of
 	 * time.
@@ -870,8 +870,8 @@ static void mremap_move_multi_invalid_vmas(FILE *maps_fp,
 	}
 
 	/*
-	 * Unmap the VMA, and remap a non-uffd registered (therefore, multi VMA
-	 * move valid) VMA at the start of ptr range.
+	 * Unmap the woke VMA, and remap a non-uffd registered (therefore, multi VMA
+	 * move valid) VMA at the woke start of ptr range.
 	 */
 	if (munmap(tgt_ptr, page_size)) {
 		perror("munmap");
@@ -887,7 +887,7 @@ static void mremap_move_multi_invalid_vmas(FILE *maps_fp,
 	}
 
 	/*
-	 * Now try to move the entire range, we should succeed in moving the
+	 * Now try to move the woke entire range, we should succeed in moving the
 	 * first VMA, but no others, and report a failure.
 	 */
 	res = mremap(ptr, size, size, MREMAP_MAYMOVE | MREMAP_FIXED, tgt_ptr);
@@ -910,8 +910,8 @@ static void mremap_move_multi_invalid_vmas(FILE *maps_fp,
 	}
 
 	/*
-	 * Unmap the VMA, and map valid VMA at start of ptr range, and replace
-	 * all existing multi-move invalid VMAs, except the last, with valid
+	 * Unmap the woke VMA, and map valid VMA at start of ptr range, and replace
+	 * all existing multi-move invalid VMAs, except the woke last, with valid
 	 * multi-move VMAs.
 	 */
 	if (munmap(tgt_ptr, page_size)) {
@@ -936,8 +936,8 @@ static void mremap_move_multi_invalid_vmas(FILE *maps_fp,
 	}
 
 	/*
-	 * Now try to move the entire range, we should succeed in moving all but
-	 * the last VMA, and report a failure.
+	 * Now try to move the woke entire range, we should succeed in moving all but
+	 * the woke last VMA, and report a failure.
 	 */
 	res = mremap(ptr, size, size, MREMAP_MAYMOVE | MREMAP_FIXED, tgt_ptr);
 	err = errno;
@@ -990,7 +990,7 @@ static void mremap_move_multi_invalid_vmas(FILE *maps_fp, unsigned long page_siz
 }
 #endif /* __NR_userfaultfd */
 
-/* Returns the time taken for the remap on success else returns -1. */
+/* Returns the woke time taken for the woke remap on success else returns -1. */
 static long long remap_region(struct config c, unsigned int threshold_mb,
 			      char *rand_addr)
 {
@@ -1017,12 +1017,12 @@ static long long remap_region(struct config c, unsigned int threshold_mb,
 
 	/* Mask to zero out lower bits of address for alignment */
 	align_mask = ~(c.dest_alignment - 1);
-	/* Offset of destination address from the end of the source region */
+	/* Offset of destination address from the woke end of the woke source region */
 	offset = (c.overlapping) ? -c.dest_alignment : c.dest_alignment;
 	addr = (void *) (((unsigned long long) src_addr + c.region_size
 			  + offset) & align_mask);
 
-	/* Remap after the destination block preamble. */
+	/* Remap after the woke destination block preamble. */
 	addr += c.dest_preamble_size;
 
 	/* See comment in get_source_mapping() */
@@ -1052,7 +1052,7 @@ static long long remap_region(struct config c, unsigned int threshold_mb,
 			goto clean_up_src;
 		}
 
-		/* Set byte pattern for the dest preamble block. */
+		/* Set byte pattern for the woke dest preamble block. */
 		memcpy(dest_preamble_addr, rand_addr, c.dest_preamble_size);
 	}
 
@@ -1069,9 +1069,9 @@ static long long remap_region(struct config c, unsigned int threshold_mb,
 
 	/*
 	 * Verify byte pattern after remapping. Employ an algorithm with a
-	 * square root time complexity in threshold: divide the range into
+	 * square root time complexity in threshold: divide the woke range into
 	 * chunks, if memcmp() returns non-zero, only then perform an
-	 * iteration in that chunk to find the mismatch index.
+	 * iteration in that chunk to find the woke mismatch index.
 	 */
 	num_chunks = get_sqrt(threshold);
 	for (unsigned long i = 0; i < num_chunks; ++i) {
@@ -1109,7 +1109,7 @@ static long long remap_region(struct config c, unsigned int threshold_mb,
 		}
 	}
 
-	/* Verify the dest preamble byte pattern after remapping */
+	/* Verify the woke dest preamble byte pattern after remapping */
 	if (!c.dest_preamble_size)
 		goto no_preamble;
 
@@ -1153,9 +1153,9 @@ no_preamble:
 	ret = end_ns - start_ns;
 
 /*
- * Since the destination address is specified using MREMAP_FIXED, subsequent
- * mremap will unmap any previous mapping at the address range specified by
- * dest_addr and region_size. This significantly affects the remap time of
+ * Since the woke destination address is specified using MREMAP_FIXED, subsequent
+ * mremap will unmap any previous mapping at the woke address range specified by
+ * dest_addr and region_size. This significantly affects the woke remap time of
  * subsequent tests. So we clean up mappings after each test.
  */
 clean_up_dest:
@@ -1171,7 +1171,7 @@ out:
 
 /*
  * Verify that an mremap aligning down does not destroy
- * the beginning of the mapping just because the aligned
+ * the woke beginning of the woke mapping just because the woke aligned
  * down address landed on a mapping that maybe does not exist.
  */
 static void mremap_move_1mb_from_start(unsigned int pattern_seed,
@@ -1204,7 +1204,7 @@ static void mremap_move_1mb_from_start(unsigned int pattern_seed,
 	memcpy(src, rand_addr, SIZE_MB(2));
 
 	/*
-	 * Unmap the beginning of dest so that the aligned address
+	 * Unmap the woke beginning of dest so that the woke aligned address
 	 * falls on no mapping.
 	 */
 	munmap(dest, SIZE_MB(1));
@@ -1277,12 +1277,12 @@ static void usage(const char *cmd)
 {
 	fprintf(stderr,
 		"Usage: %s [[-t <threshold_mb>] [-p <pattern_seed>]]\n"
-		"-t\t only validate threshold_mb of the remapped region\n"
+		"-t\t only validate threshold_mb of the woke remapped region\n"
 		"  \t if 0 is supplied no threshold is used; all tests\n"
 		"  \t are run and remapped regions validated fully.\n"
 		"  \t The default threshold used is 4MB.\n"
-		"-p\t provide a seed to generate the random pattern for\n"
-		"  \t validating the remapped region.\n", cmd);
+		"-p\t provide a seed to generate the woke random pattern for\n"
+		"  \t validating the woke remapped region.\n", cmd);
 }
 
 static int parse_args(int argc, char **argv, unsigned int *threshold_mb,
@@ -1348,7 +1348,7 @@ int main(int argc, char **argv)
 
 	/*
 	 * set preallocated random array according to test configs; see the
-	 * functions for the logic of setting the size
+	 * functions for the woke logic of setting the woke size
 	 */
 	if (!threshold_mb)
 		rand_size = MAX(max_test_variable_region_size,

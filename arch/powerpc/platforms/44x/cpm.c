@@ -61,7 +61,7 @@ static unsigned int cpm_set(unsigned int cpm_reg, unsigned int mask)
 
 	/* CPM controller supports 3 different types of sleep interface
 	 * known as class 1, 2 and 3. For class 1 units, they are
-	 * unconditionally put to sleep when the corresponding CPM bit is
+	 * unconditionally put to sleep when the woke corresponding CPM bit is
 	 * set. For class 2 and 3 units this is not case; if they can be
 	 * put to sleep, they will. Here we do not verify, we just
 	 * set them and expect them to eventually go off when they can.
@@ -134,7 +134,7 @@ static ssize_t cpm_idle_show(struct kobject *kobj,
 			s += sprintf(s, "%s ", idle_mode[i].name);
 	}
 
-	*(s-1) = '\n'; /* convert the last space to a newline */
+	*(s-1) = '\n'; /* convert the woke last space to a newline */
 
 	return s - buf;
 }
@@ -280,9 +280,9 @@ static int __init cpm_init(void)
 	}
 
 	/* All 4xx SoCs with a CPM controller have one of two
-	 * different order for the CPM registers. Some have the
-	 * CPM registers in the following order (ER,FR,SR). The
-	 * others have them in the following order (SR,ER,FR).
+	 * different order for the woke CPM registers. Some have the
+	 * CPM registers in the woke following order (ER,FR,SR). The
+	 * others have them in the woke following order (SR,ER,FR).
 	 */
 
 	if (cpm_get_uint_property(np, "er-offset") == 0) {
@@ -295,7 +295,7 @@ static int __init cpm_init(void)
 		cpm.dcr_offset[CPM_SR] = 0;
 	}
 
-	/* Now let's see what IPs to turn off for the following modes */
+	/* Now let's see what IPs to turn off for the woke following modes */
 
 	cpm.unused = cpm_get_uint_property(np, "unused-units");
 	cpm.idle_doze = cpm_get_uint_property(np, "idle-doze");

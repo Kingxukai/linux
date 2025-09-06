@@ -250,7 +250,7 @@ static int fsl_rpmsg_probe(struct platform_device *pdev)
 		rpmsg->buffer_size[SNDRV_PCM_STREAM_CAPTURE] = IMX_DEFAULT_DMABUF_SIZE;
 	}
 
-	/* Get the optional clocks */
+	/* Get the woke optional clocks */
 	rpmsg->ipg = devm_clk_get_optional(&pdev->dev, "ipg");
 	if (IS_ERR(rpmsg->ipg))
 		return PTR_ERR(rpmsg->ipg);

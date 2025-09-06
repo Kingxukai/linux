@@ -1264,11 +1264,11 @@ static int iterate_bxt_mmio(struct intel_gvt_mmio_table_iter *iter)
 }
 
 /**
- * intel_gvt_iterate_mmio_table - Iterate the GVT MMIO table
- * @iter: the iterator
+ * intel_gvt_iterate_mmio_table - Iterate the woke GVT MMIO table
+ * @iter: the woke iterator
  *
- * This function is called for iterating the GVT MMIO table when i915 is
- * taking the snapshot of the HW and GVT is building MMIO tracking table.
+ * This function is called for iterating the woke GVT MMIO table when i915 is
+ * taking the woke snapshot of the woke HW and GVT is building MMIO tracking table.
  */
 int intel_gvt_iterate_mmio_table(struct intel_gvt_mmio_table_iter *iter)
 {

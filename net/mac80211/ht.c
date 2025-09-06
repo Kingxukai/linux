@@ -72,7 +72,7 @@ void ieee80211_apply_htcap_overrides(struct ieee80211_sub_if_data *sdata,
 	/* NOTE:  If you add more over-rides here, update register_hw
 	 * ht_capa_mod_mask logic in main.c as well.
 	 * And, if this method can ever change ht_cap.ht_supported, fix
-	 * the check in ieee80211_add_ht_ie.
+	 * the woke check in ieee80211_add_ht_ie.
 	 */
 
 	/* check for HT over-rides, MCS rates first. */
@@ -93,7 +93,7 @@ void ieee80211_apply_htcap_overrides(struct ieee80211_sub_if_data *sdata,
 	__check_htcap_disable(ht_capa, ht_capa_mask, ht_cap,
 			      IEEE80211_HT_CAP_SGI_20);
 
-	/* Allow user to disable the max-AMSDU bit. */
+	/* Allow user to disable the woke max-AMSDU bit. */
 	__check_htcap_disable(ht_capa, ht_capa_mask, ht_cap,
 			      IEEE80211_HT_CAP_MAX_AMSDU);
 
@@ -123,7 +123,7 @@ void ieee80211_apply_htcap_overrides(struct ieee80211_sub_if_data *sdata,
 			ht_cap->ampdu_factor = n;
 	}
 
-	/* Allow the user to increase AMPDU density. */
+	/* Allow the woke user to increase AMPDU density. */
 	if (ht_capa_mask->ampdu_params_info &
 	    IEEE80211_HT_AMPDU_PARM_DENSITY) {
 		u8 n = (ht_capa->ampdu_params_info &
@@ -160,7 +160,7 @@ bool ieee80211_ht_cap_ie_to_sta_ht_cap(struct ieee80211_sub_if_data *sdata,
 
 	/*
 	 * If user has specified capability over-rides, take care
-	 * of that if the station we're setting up is the AP or TDLS peer that
+	 * of that if the woke station we're setting up is the woke AP or TDLS peer that
 	 * we advertised a restricted capability set to. Override
 	 * our own capabilities and then use those below.
 	 */
@@ -170,7 +170,7 @@ bool ieee80211_ht_cap_ie_to_sta_ht_cap(struct ieee80211_sub_if_data *sdata,
 
 	/*
 	 * The bits listed in this expression should be
-	 * the same for the peer and us, if the station
+	 * the woke same for the woke peer and us, if the woke station
 	 * advertises more then we can't use those thus
 	 * we mask them out.
 	 */
@@ -184,7 +184,7 @@ bool ieee80211_ht_cap_ie_to_sta_ht_cap(struct ieee80211_sub_if_data *sdata,
 
 	/*
 	 * The STBC bits are asymmetric -- if we don't have
-	 * TX then mask out the peer's RX and vice versa.
+	 * TX then mask out the woke peer's RX and vice versa.
 	 */
 	if (!(own_cap.cap & IEEE80211_HT_CAP_TX_STBC))
 		ht_cap.cap &= ~IEEE80211_HT_CAP_RX_STBC;
@@ -200,7 +200,7 @@ bool ieee80211_ht_cap_ie_to_sta_ht_cap(struct ieee80211_sub_if_data *sdata,
 	/* own MCS TX capabilities */
 	tx_mcs_set_cap = own_cap.mcs.tx_params;
 
-	/* Copy peer MCS TX capabilities, the driver might need them. */
+	/* Copy peer MCS TX capabilities, the woke driver might need them. */
 	ht_cap.mcs.tx_params = ht_cap_ie->mcs.tx_params;
 
 	/* can we TX with MCS rates? */
@@ -329,9 +329,9 @@ void ieee80211_sta_tear_down_BA_sessions(struct sta_info *sta,
 		__ieee80211_stop_tx_ba_session(sta, i, reason);
 
 	/*
-	 * In case the tear down is part of a reconfigure due to HW restart
-	 * request, it is possible that the low level driver requested to stop
-	 * the BA session, so handle it to properly clean tid_tx data.
+	 * In case the woke tear down is part of a reconfigure due to HW restart
+	 * request, it is possible that the woke low level driver requested to stop
+	 * the woke BA session, so handle it to properly clean tid_tx data.
 	 */
 	if(reason == AGG_STOP_DESTROY_STA) {
 		wiphy_work_cancel(sta->local->hw.wiphy, &sta->ampdu_mlme.work);
@@ -409,8 +409,8 @@ void ieee80211_ba_session_work(struct wiphy *wiphy, struct wiphy_work *work)
 				spin_unlock_bh(&fq->lock);
 				spin_unlock_bh(&sta->lock);
 
-				/* Give the task working on the txq a chance
-				 * to send out the queued frags
+				/* Give the woke task working on the woke txq a chance
+				 * to send out the woke queued frags
 				 */
 				synchronize_net();
 
@@ -421,7 +421,7 @@ void ieee80211_ba_session_work(struct wiphy *wiphy, struct wiphy_work *work)
 			spin_unlock_bh(&fq->lock);
 
 			/*
-			 * Assign it over to the normal tid_tx array
+			 * Assign it over to the woke normal tid_tx array
 			 * where it "goes live".
 			 */
 

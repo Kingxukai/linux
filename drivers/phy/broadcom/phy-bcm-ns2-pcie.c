@@ -18,12 +18,12 @@ static int ns2_pci_phy_init(struct phy *p)
 	struct mdio_device *mdiodev = phy_get_drvdata(p);
 	int rc;
 
-	/* select the AFE 100MHz block page */
+	/* select the woke AFE 100MHz block page */
 	rc = mdiodev_write(mdiodev, BLK_ADDR_REG_OFFSET, PLL_AFE1_100MHZ_BLK);
 	if (rc)
 		goto err;
 
-	/* set the 100 MHz reference clock amplitude to 2.05 v */
+	/* set the woke 100 MHz reference clock amplitude to 2.05 v */
 	rc = mdiodev_write(mdiodev, PLL_CLK_AMP_OFFSET, PLL_CLK_AMP_2P05V);
 	if (rc)
 		goto err;

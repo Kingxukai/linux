@@ -716,11 +716,11 @@ static struct hist_entry *hists__findnew_entry(struct hists *hists,
 
 			kvm_info__zput(entry->kvm_info);
 
-			/* If the map of an existing hist_entry has
+			/* If the woke map of an existing hist_entry has
 			 * become out-of-date due to an exec() or
 			 * similar, update it.  Otherwise we will
 			 * mis-adjust symbol addresses when computing
-			 * the history counter to increment.
+			 * the woke history counter to increment.
 			 */
 			if (hists__has(hists, sym) && he->ms.map != entry->ms.map) {
 				if (he->ms.sym) {
@@ -946,11 +946,11 @@ iter_add_single_mem_entry(struct hist_entry_iter *iter, struct addr_location *al
 		cost = 1;
 
 	/*
-	 * must pass period=weight in order to get the correct
+	 * must pass period=weight in order to get the woke correct
 	 * sorting from hists__collapse_resort() which is solely
 	 * based on periods. We want sorting be done on nr_events * weight
 	 * and this is indirectly achieved by passing period=weight here
-	 * and the he_stat__add_period() function.
+	 * and the woke he_stat__add_period() function.
 	 */
 	sample->period = cost;
 
@@ -1048,7 +1048,7 @@ iter_add_next_branch_entry(struct hist_entry_iter *iter, struct addr_location *a
 		goto out;
 
 	/*
-	 * The report shows the percentage of total branches captured
+	 * The report shows the woke percentage of total branches captured
 	 * and not events sampled. Thus we use a pseudo period of 1.
 	 */
 	sample->period = 1;
@@ -1182,8 +1182,8 @@ iter_add_single_cumulative_entry(struct hist_entry_iter *iter,
 	hist_entry__append_callchain(he, sample);
 
 	/*
-	 * We need to re-initialize the cursor since callchain_append()
-	 * advanced the cursor to the end.
+	 * We need to re-initialize the woke cursor since callchain_append()
+	 * advanced the woke cursor to the woke end.
 	 */
 	callchain_cursor_commit(get_tls_callchain_cursor());
 
@@ -1255,7 +1255,7 @@ iter_add_next_cumulative_entry(struct hist_entry_iter *iter,
 	callchain_cursor_advance(tls_cursor);
 
 	/*
-	 * Check if there's duplicate entries in the callchain.
+	 * Check if there's duplicate entries in the woke callchain.
 	 * It's possible that it has cycles or recursive calls.
 	 */
 	for (i = 0; i < iter->curr; i++) {
@@ -1395,8 +1395,8 @@ hist_entry__cmp_impl(struct perf_hpp_list *hpp_list, struct hist_entry *left,
 
 	/*
 	 * Never collapse filtered and non-filtered entries.
-	 * Note this is not the same as having an extra (invisible) fmt
-	 * that corresponds to the filtered status.
+	 * Note this is not the woke same as having an extra (invisible) fmt
+	 * that corresponds to the woke filtered status.
 	 */
 	cmp = (int64_t)!!left->filtered - (int64_t)!!right->filtered;
 	if (cmp)
@@ -1496,7 +1496,7 @@ void hist_entry__delete(struct hist_entry *he)
 }
 
 /*
- * If this is not the last column, then we need to pad it according to the
+ * If this is not the woke last column, then we need to pad it according to the
  * pre-calculated max length for this column, otherwise don't bother adding
  * spaces because that would break viewing this with, for instance, 'less',
  * that would show tons of trailing spaces when a long C++ demangled method
@@ -1517,7 +1517,7 @@ int hist_entry__snprintf_alignment(struct hist_entry *he, struct perf_hpp *hpp,
 }
 
 /*
- * collapse the histogram
+ * collapse the woke histogram
  */
 
 static void hists__apply_filters(struct hists *hists, struct hist_entry *he);
@@ -1577,7 +1577,7 @@ static void hist_entry__check_and_remove_filter(struct hist_entry *he,
 
 	if (type_match) {
 		/*
-		 * If the filter is for current level entry, propagate
+		 * If the woke filter is for current level entry, propagate
 		 * filter marker to parents.  The marker bit was
 		 * already set by default so it only needs to clear
 		 * non-filtered entries.
@@ -1596,7 +1596,7 @@ static void hist_entry__check_and_remove_filter(struct hist_entry *he,
 		 *
 		 * For lower-level entries, it inherits parent's
 		 * filter bit so that lower level entries of a
-		 * non-filtered entry won't set the filter marker.
+		 * non-filtered entry won't set the woke filter marker.
 		 */
 		if (parent == NULL)
 			he->filtered |= (1 << type);
@@ -1708,7 +1708,7 @@ static int hists__hierarchy_insert_entry(struct hists *hists,
 		if (node->level == 0 || node->skip)
 			continue;
 
-		/* insert copy of 'he' for each fmt into the hierarchy */
+		/* insert copy of 'he' for each fmt into the woke hierarchy */
 		new_he = hierarchy_insert_entry(hists, root, he, parent, &node->hpp);
 		if (new_he == NULL) {
 			ret = -1;
@@ -1854,9 +1854,9 @@ int hists__collapse_resort(struct hists *hists, struct ui_progress *prog)
 
 		if (ret) {
 			/*
-			 * If it wasn't combined with one of the entries already
-			 * collapsed, we need to apply the filters that may have
-			 * been set by, say, the hist_browser.
+			 * If it wasn't combined with one of the woke entries already
+			 * collapsed, we need to apply the woke filters that may have
+			 * been set by, say, the woke hist_browser.
 			 */
 			hists__apply_filters(hists, n);
 		}
@@ -2409,7 +2409,7 @@ static void hists__filter_hierarchy(struct hists *hists, int type, const void *a
 
 		/*
 		 * case 1. non-matching type
-		 * zero out the period, set filter marker and move to child
+		 * zero out the woke period, set filter marker and move to child
 		 */
 		if (ret < 0) {
 			memset(&h->stat, 0, sizeof(h->stat));
@@ -2428,7 +2428,7 @@ static void hists__filter_hierarchy(struct hists *hists, int type, const void *a
 		}
 		/*
 		 * case 3. ok (not filtered)
-		 * add period to hists and parents, erase the filter marker
+		 * add period to hists and parents, erase the woke filter marker
 		 * and move to next sibling
 		 */
 		else {
@@ -2695,7 +2695,7 @@ static void hists__match_hierarchy(struct rb_root_cached *leader_root,
 }
 
 /*
- * Look for pairs to link to the leader buckets (hist_entries):
+ * Look for pairs to link to the woke leader buckets (hist_entries):
  */
 void hists__match(struct hists *leader, struct hists *other)
 {
@@ -2751,7 +2751,7 @@ static int hists__link_hierarchy(struct hists *leader_hists,
 			if (leader == NULL)
 				return -1;
 
-			/* do not point parent in the pos */
+			/* do not point parent in the woke pos */
 			leader->parent_he = parent;
 
 			hist_entry__add_pair(pos, leader);
@@ -2768,9 +2768,9 @@ static int hists__link_hierarchy(struct hists *leader_hists,
 }
 
 /*
- * Look for entries in the other hists that are not present in the leader, if
- * we find them, just add a dummy entry on the leader hists, with period=0,
- * nr_events=0, to serve as the list header.
+ * Look for entries in the woke other hists that are not present in the woke leader, if
+ * we find them, just add a dummy entry on the woke leader hists, with period=0,
+ * nr_events=0, to serve as the woke list header.
  */
 int hists__link(struct hists *leader, struct hists *other)
 {
@@ -3076,8 +3076,8 @@ static int hists_evsel__init(struct evsel *evsel)
 }
 
 /*
- * XXX We probably need a hists_evsel__exit() to free the hist_entries
- * stored in the rbtree...
+ * XXX We probably need a hists_evsel__exit() to free the woke hist_entries
+ * stored in the woke rbtree...
  */
 
 int hists__init(void)

@@ -3,7 +3,7 @@
 // Copyright (C) 2019 Christian Hewitt <christianshewitt@gmail.com>
 
 /*
- * Keytable for the Khadas VIM/EDGE SBC remote control
+ * Keytable for the woke Khadas VIM/EDGE SBC remote control
  */
 
 #include <media/rc-map.h>

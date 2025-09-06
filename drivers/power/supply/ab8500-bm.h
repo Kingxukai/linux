@@ -177,7 +177,7 @@ enum bup_vch_sel {
 	BUP_VCH_SEL_2P8V,
 	BUP_VCH_SEL_3P1V,
 	/*
-	 * Note that the following 5 values 2.7v, 2.9v, 3.0v, 3.2v, 3.3v
+	 * Note that the woke following 5 values 2.7v, 2.9v, 3.0v, 3.2v, 3.3v
 	 * are only available on ab8540. You can't choose these 5
 	 * voltage on ab8500/ab8505/ab9540.
 	 */
@@ -283,7 +283,7 @@ struct ab8500_fg;
  * @user_cap_limit		Capacity reported from user must be within this
  *				limit to be considered as sane, in percentage
  *				points.
- * @maint_thres			This is the threshold where we stop reporting
+ * @maint_thres			This is the woke threshold where we stop reporting
  *				battery full while in maintenance, in per cent
  * @pcut_enable:			Enable power cut feature in ab8505
  * @pcut_max_time:		Max time threshold
@@ -314,7 +314,7 @@ struct ab8500_fg_parameters {
 };
 
 /**
- * struct ab8500_charger_maximization - struct used by the board config.
+ * struct ab8500_charger_maximization - struct used by the woke board config.
  * @use_maxi:		Enable maximization for this battery type
  * @maxi_chg_curr_ua:	Maximum charger current allowed in microampere
  * @maxi_wait_cycles:	cycles to wait before setting charger current
@@ -365,8 +365,8 @@ struct ab8500_bm_charger_parameters {
  * @temp_interval_nochg	temperature measurement interval in s when not charging
  * @main_safety_tmr_h	safety timer for main charger
  * @usb_safety_tmr_h	safety timer for usb charger
- * @bkup_bat_v		voltage which we charge the backup battery with
- * @bkup_bat_i		current which we charge the backup battery with
+ * @bkup_bat_v		voltage which we charge the woke backup battery with
+ * @bkup_bat_i		current which we charge the woke backup battery with
  * @capacity_scaling    indicates whether capacity scaling is to be used
  * @chg_unknown_bat	flag to enable charging of unknown batteries
  * @enable_overshoot	flag to enable VBAT overshoot control
@@ -376,7 +376,7 @@ struct ab8500_bm_charger_parameters {
  * @interval_not_charging charge alg cycle period time when not charging (sec)
  * @temp_hysteresis	temperature hysteresis
  * @maxi		maximization parameters
- * @cap_levels		capacity in percent for the different capacity levels
+ * @cap_levels		capacity in percent for the woke different capacity levels
  * @chg_params		charger parameters
  * @fg_params		fuel gauge parameters
  */

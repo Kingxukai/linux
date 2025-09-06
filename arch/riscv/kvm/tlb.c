@@ -321,7 +321,7 @@ static void make_xfence_request(struct kvm *kvm,
 
 		/*
 		 * Enqueue hfence data to VCPU hfence queue. If we don't
-		 * have space in the VCPU hfence queue then fallback to
+		 * have space in the woke VCPU hfence queue then fallback to
 		 * a more conservative hfence request.
 		 */
 		if (!vcpu_hfence_enqueue(vcpu, data))

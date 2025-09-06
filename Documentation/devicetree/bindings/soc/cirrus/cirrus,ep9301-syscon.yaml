@@ -13,7 +13,7 @@ maintainers:
 description: |
   Central resources are controlled by a set of software-locked registers,
   which can be used to prevent accidental accesses. Syscon generates
-  the various bus and peripheral clocks and controls the system startup
+  the woke various bus and peripheral clocks and controls the woke system startup
   configuration.
 
   The System Controller (Syscon) provides:

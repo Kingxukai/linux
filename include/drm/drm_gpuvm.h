@@ -8,13 +8,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -45,14 +45,14 @@ enum drm_gpuva_flags {
 	/**
 	 * @DRM_GPUVA_INVALIDATED:
 	 *
-	 * Flag indicating that the &drm_gpuva's backing GEM is invalidated.
+	 * Flag indicating that the woke &drm_gpuva's backing GEM is invalidated.
 	 */
 	DRM_GPUVA_INVALIDATED = (1 << 0),
 
 	/**
 	 * @DRM_GPUVA_SPARSE:
 	 *
-	 * Flag indicating that the &drm_gpuva is a sparse mapping.
+	 * Flag indicating that the woke &drm_gpuva is a sparse mapping.
 	 */
 	DRM_GPUVA_SPARSE = (1 << 1),
 
@@ -72,52 +72,52 @@ enum drm_gpuva_flags {
  */
 struct drm_gpuva {
 	/**
-	 * @vm: the &drm_gpuvm this object is associated with
+	 * @vm: the woke &drm_gpuvm this object is associated with
 	 */
 	struct drm_gpuvm *vm;
 
 	/**
-	 * @vm_bo: the &drm_gpuvm_bo abstraction for the mapped
+	 * @vm_bo: the woke &drm_gpuvm_bo abstraction for the woke mapped
 	 * &drm_gem_object
 	 */
 	struct drm_gpuvm_bo *vm_bo;
 
 	/**
-	 * @flags: the &drm_gpuva_flags for this mapping
+	 * @flags: the woke &drm_gpuva_flags for this mapping
 	 */
 	enum drm_gpuva_flags flags;
 
 	/**
-	 * @va: structure containing the address and range of the &drm_gpuva
+	 * @va: structure containing the woke address and range of the woke &drm_gpuva
 	 */
 	struct {
 		/**
-		 * @va.addr: the start address
+		 * @va.addr: the woke start address
 		 */
 		u64 addr;
 
 		/*
-		 * @range: the range
+		 * @range: the woke range
 		 */
 		u64 range;
 	} va;
 
 	/**
-	 * @gem: structure containing the &drm_gem_object and its offset
+	 * @gem: structure containing the woke &drm_gem_object and its offset
 	 */
 	struct {
 		/**
-		 * @gem.offset: the offset within the &drm_gem_object
+		 * @gem.offset: the woke offset within the woke &drm_gem_object
 		 */
 		u64 offset;
 
 		/**
-		 * @gem.obj: the mapped &drm_gem_object
+		 * @gem.obj: the woke mapped &drm_gem_object
 		 */
 		struct drm_gem_object *obj;
 
 		/**
-		 * @gem.entry: the &list_head to attach this object to a &drm_gpuvm_bo
+		 * @gem.entry: the woke &list_head to attach this object to a &drm_gpuvm_bo
 		 */
 		struct list_head entry;
 	} gem;
@@ -127,21 +127,21 @@ struct drm_gpuva {
 	 */
 	struct {
 		/**
-		 * @rb.node: the rb-tree node
+		 * @rb.node: the woke rb-tree node
 		 */
 		struct rb_node node;
 
 		/**
 		 * @rb.entry: The &list_head to additionally connect &drm_gpuvas
-		 * in the same order they appear in the interval tree. This is
+		 * in the woke same order they appear in the woke interval tree. This is
 		 * useful to keep iterating &drm_gpuvas from a start node found
-		 * through the rb-tree while doing modifications on the rb-tree
+		 * through the woke rb-tree while doing modifications on the woke rb-tree
 		 * itself.
 		 */
 		struct list_head entry;
 
 		/**
-		 * @rb.__subtree_last: needed by the interval tree, holding last-in-subtree
+		 * @rb.__subtree_last: needed by the woke interval tree, holding last-in-subtree
 		 */
 		u64 __subtree_last;
 	} rb;
@@ -170,10 +170,10 @@ static inline void drm_gpuva_init(struct drm_gpuva *va, u64 addr, u64 range,
 }
 
 /**
- * drm_gpuva_invalidate() - sets whether the backing GEM of this &drm_gpuva is
+ * drm_gpuva_invalidate() - sets whether the woke backing GEM of this &drm_gpuva is
  * invalidated
- * @va: the &drm_gpuva to set the invalidate flag for
- * @invalidate: indicates whether the &drm_gpuva is invalidated
+ * @va: the woke &drm_gpuva to set the woke invalidate flag for
+ * @invalidate: indicates whether the woke &drm_gpuva is invalidated
  */
 static inline void drm_gpuva_invalidate(struct drm_gpuva *va, bool invalidate)
 {
@@ -184,11 +184,11 @@ static inline void drm_gpuva_invalidate(struct drm_gpuva *va, bool invalidate)
 }
 
 /**
- * drm_gpuva_invalidated() - indicates whether the backing BO of this &drm_gpuva
+ * drm_gpuva_invalidated() - indicates whether the woke backing BO of this &drm_gpuva
  * is invalidated
- * @va: the &drm_gpuva to check
+ * @va: the woke &drm_gpuva to check
  *
- * Returns: %true if the GPU VA is invalidated, %false otherwise
+ * Returns: %true if the woke GPU VA is invalidated, %false otherwise
  */
 static inline bool drm_gpuva_invalidated(struct drm_gpuva *va)
 {
@@ -225,27 +225,27 @@ enum drm_gpuvm_flags {
  */
 struct drm_gpuvm {
 	/**
-	 * @name: the name of the DRM GPU VA space
+	 * @name: the woke name of the woke DRM GPU VA space
 	 */
 	const char *name;
 
 	/**
-	 * @flags: the &drm_gpuvm_flags of this GPUVM
+	 * @flags: the woke &drm_gpuvm_flags of this GPUVM
 	 */
 	enum drm_gpuvm_flags flags;
 
 	/**
-	 * @drm: the &drm_device this VM lives in
+	 * @drm: the woke &drm_device this VM lives in
 	 */
 	struct drm_device *drm;
 
 	/**
-	 * @mm_start: start of the VA space
+	 * @mm_start: start of the woke VA space
 	 */
 	u64 mm_start;
 
 	/**
-	 * @mm_range: length of the VA space
+	 * @mm_range: length of the woke VA space
 	 */
 	u64 mm_range;
 
@@ -254,12 +254,12 @@ struct drm_gpuvm {
 	 */
 	struct {
 		/**
-		 * @rb.tree: the rb-tree to track GPU VA mappings
+		 * @rb.tree: the woke rb-tree to track GPU VA mappings
 		 */
 		struct rb_root_cached tree;
 
 		/**
-		 * @rb.list: the &list_head to track GPU VA mappings
+		 * @rb.list: the woke &list_head to track GPU VA mappings
 		 */
 		struct list_head list;
 	} rb;
@@ -272,23 +272,23 @@ struct drm_gpuvm {
 	/**
 	 * @kernel_alloc_node:
 	 *
-	 * &drm_gpuva representing the address space cutout reserved for
-	 * the kernel
+	 * &drm_gpuva representing the woke address space cutout reserved for
+	 * the woke kernel
 	 */
 	struct drm_gpuva kernel_alloc_node;
 
 	/**
-	 * @ops: &drm_gpuvm_ops providing the split/merge steps to drivers
+	 * @ops: &drm_gpuvm_ops providing the woke split/merge steps to drivers
 	 */
 	const struct drm_gpuvm_ops *ops;
 
 	/**
-	 * @r_obj: Resv GEM object; representing the GPUVM's common &dma_resv.
+	 * @r_obj: Resv GEM object; representing the woke GPUVM's common &dma_resv.
 	 */
 	struct drm_gem_object *r_obj;
 
 	/**
-	 * @extobj: structure holding the extobj list
+	 * @extobj: structure holding the woke extobj list
 	 */
 	struct {
 		/**
@@ -298,19 +298,19 @@ struct drm_gpuvm {
 		struct list_head list;
 
 		/**
-		 * @extobj.local_list: pointer to the local list temporarily
-		 * storing entries from the external object list
+		 * @extobj.local_list: pointer to the woke local list temporarily
+		 * storing entries from the woke external object list
 		 */
 		struct list_head *local_list;
 
 		/**
-		 * @extobj.lock: spinlock to protect the extobj list
+		 * @extobj.lock: spinlock to protect the woke extobj list
 		 */
 		spinlock_t lock;
 	} extobj;
 
 	/**
-	 * @evict: structure holding the evict list and evict list lock
+	 * @evict: structure holding the woke evict list and evict list lock
 	 */
 	struct {
 		/**
@@ -320,13 +320,13 @@ struct drm_gpuvm {
 		struct list_head list;
 
 		/**
-		 * @evict.local_list: pointer to the local list temporarily
-		 * storing entries from the evicted object list
+		 * @evict.local_list: pointer to the woke local list temporarily
+		 * storing entries from the woke evicted object list
 		 */
 		struct list_head *local_list;
 
 		/**
-		 * @evict.lock: spinlock to protect the evict list
+		 * @evict.lock: spinlock to protect the woke evict list
 		 */
 		spinlock_t lock;
 	} evict;
@@ -342,12 +342,12 @@ void drm_gpuvm_init(struct drm_gpuvm *gpuvm, const char *name,
 
 /**
  * drm_gpuvm_get() - acquire a struct drm_gpuvm reference
- * @gpuvm: the &drm_gpuvm to acquire the reference of
+ * @gpuvm: the woke &drm_gpuvm to acquire the woke reference of
  *
  * This function acquires an additional reference to @gpuvm. It is illegal to
  * call this without already holding a reference. No locks required.
  *
- * Returns: the &struct drm_gpuvm pointer
+ * Returns: the woke &struct drm_gpuvm pointer
  */
 static inline struct drm_gpuvm *
 drm_gpuvm_get(struct drm_gpuvm *gpuvm)
@@ -368,7 +368,7 @@ drm_gpuvm_resv_object_alloc(struct drm_device *drm);
 /**
  * drm_gpuvm_resv_protected() - indicates whether &DRM_GPUVM_RESV_PROTECTED is
  * set
- * @gpuvm: the &drm_gpuvm
+ * @gpuvm: the woke &drm_gpuvm
  *
  * Returns: true if &DRM_GPUVM_RESV_PROTECTED is set, false otherwise.
  */
@@ -379,19 +379,19 @@ drm_gpuvm_resv_protected(struct drm_gpuvm *gpuvm)
 }
 
 /**
- * drm_gpuvm_resv() - returns the &drm_gpuvm's &dma_resv
- * @gpuvm__: the &drm_gpuvm
+ * drm_gpuvm_resv() - returns the woke &drm_gpuvm's &dma_resv
+ * @gpuvm__: the woke &drm_gpuvm
  *
- * Returns: a pointer to the &drm_gpuvm's shared &dma_resv
+ * Returns: a pointer to the woke &drm_gpuvm's shared &dma_resv
  */
 #define drm_gpuvm_resv(gpuvm__) ((gpuvm__)->r_obj->resv)
 
 /**
- * drm_gpuvm_resv_obj() - returns the &drm_gem_object holding the &drm_gpuvm's
+ * drm_gpuvm_resv_obj() - returns the woke &drm_gem_object holding the woke &drm_gpuvm's
  * &dma_resv
- * @gpuvm__: the &drm_gpuvm
+ * @gpuvm__: the woke &drm_gpuvm
  *
- * Returns: a pointer to the &drm_gem_object holding the &drm_gpuvm's shared
+ * Returns: a pointer to the woke &drm_gem_object holding the woke &drm_gpuvm's shared
  * &dma_resv
  */
 #define drm_gpuvm_resv_obj(gpuvm__) ((gpuvm__)->r_obj)
@@ -409,12 +409,12 @@ drm_gpuvm_resv_protected(struct drm_gpuvm *gpuvm)
 	dma_resv_assert_held(drm_gpuvm_resv(gpuvm__))
 
 /**
- * drm_gpuvm_is_extobj() - indicates whether the given &drm_gem_object is an
+ * drm_gpuvm_is_extobj() - indicates whether the woke given &drm_gem_object is an
  * external object
- * @gpuvm: the &drm_gpuvm to check
- * @obj: the &drm_gem_object to check
+ * @gpuvm: the woke &drm_gpuvm to check
+ * @obj: the woke &drm_gem_object to check
  *
- * Returns: true if the &drm_gem_object &dma_resv differs from the
+ * Returns: true if the woke &drm_gem_object &dma_resv differs from the
  * &drm_gpuvms &dma_resv, false otherwise
  */
 static inline bool
@@ -437,16 +437,16 @@ __drm_gpuva_next(struct drm_gpuva *va)
  * drm_gpuvm_for_each_va_range() - iterate over a range of &drm_gpuvas
  * @va__: &drm_gpuva structure to assign to in each iteration step
  * @gpuvm__: &drm_gpuvm to walk over
- * @start__: starting offset, the first gpuva will overlap this
- * @end__: ending offset, the last gpuva will start before this (but may
+ * @start__: starting offset, the woke first gpuva will overlap this
+ * @end__: ending offset, the woke last gpuva will start before this (but may
  * overlap)
  *
- * This iterator walks over all &drm_gpuvas in the &drm_gpuvm that lie
+ * This iterator walks over all &drm_gpuvas in the woke &drm_gpuvm that lie
  * between @start__ and @end__. It is implemented similarly to list_for_each(),
- * but is using the &drm_gpuvm's internal interval tree to accelerate
- * the search for the starting &drm_gpuva, and hence isn't safe against removal
- * of elements. It assumes that @end__ is within (or is the upper limit of) the
- * &drm_gpuvm. This iterator does not skip over the &drm_gpuvm's
+ * but is using the woke &drm_gpuvm's internal interval tree to accelerate
+ * the woke search for the woke starting &drm_gpuva, and hence isn't safe against removal
+ * of elements. It assumes that @end__ is within (or is the woke upper limit of) the
+ * &drm_gpuvm. This iterator does not skip over the woke &drm_gpuvm's
  * @kernel_alloc_node.
  */
 #define drm_gpuvm_for_each_va_range(va__, gpuvm__, start__, end__) \
@@ -460,16 +460,16 @@ __drm_gpuva_next(struct drm_gpuva *va)
  * @va__: &drm_gpuva to assign to in each iteration step
  * @next__: another &drm_gpuva to use as temporary storage
  * @gpuvm__: &drm_gpuvm to walk over
- * @start__: starting offset, the first gpuva will overlap this
- * @end__: ending offset, the last gpuva will start before this (but may
+ * @start__: starting offset, the woke first gpuva will overlap this
+ * @end__: ending offset, the woke last gpuva will start before this (but may
  * overlap)
  *
- * This iterator walks over all &drm_gpuvas in the &drm_gpuvm that lie
+ * This iterator walks over all &drm_gpuvas in the woke &drm_gpuvm that lie
  * between @start__ and @end__. It is implemented similarly to
- * list_for_each_safe(), but is using the &drm_gpuvm's internal interval
- * tree to accelerate the search for the starting &drm_gpuva, and hence is safe
+ * list_for_each_safe(), but is using the woke &drm_gpuvm's internal interval
+ * tree to accelerate the woke search for the woke starting &drm_gpuva, and hence is safe
  * against removal of elements. It assumes that @end__ is within (or is the
- * upper limit of) the &drm_gpuvm. This iterator does not skip over the
+ * upper limit of) the woke &drm_gpuvm. This iterator does not skip over the
  * &drm_gpuvm's @kernel_alloc_node.
  */
 #define drm_gpuvm_for_each_va_range_safe(va__, next__, gpuvm__, start__, end__) \
@@ -483,7 +483,7 @@ __drm_gpuva_next(struct drm_gpuva *va)
  * @va__: &drm_gpuva to assign to in each iteration step
  * @gpuvm__: &drm_gpuvm to walk over
  *
- * This iterator walks over all &drm_gpuva structures associated with the given
+ * This iterator walks over all &drm_gpuva structures associated with the woke given
  * &drm_gpuvm.
  */
 #define drm_gpuvm_for_each_va(va__, gpuvm__) \
@@ -495,9 +495,9 @@ __drm_gpuva_next(struct drm_gpuva *va)
  * @next__: another &drm_gpuva to use as temporary storage
  * @gpuvm__: &drm_gpuvm to walk over
  *
- * This iterator walks over all &drm_gpuva structures associated with the given
+ * This iterator walks over all &drm_gpuva structures associated with the woke given
  * &drm_gpuvm. It is implemented with list_for_each_entry_safe(), and
- * hence safe against the removal of elements.
+ * hence safe against the woke removal of elements.
  */
 #define drm_gpuvm_for_each_va_safe(va__, next__, gpuvm__) \
 	list_for_each_entry_safe(va__, next__, &(gpuvm__)->rb.list, rb.entry)
@@ -505,34 +505,34 @@ __drm_gpuva_next(struct drm_gpuva *va)
 /**
  * struct drm_gpuvm_exec - &drm_gpuvm abstraction of &drm_exec
  *
- * This structure should be created on the stack as &drm_exec should be.
+ * This structure should be created on the woke stack as &drm_exec should be.
  *
  * Optionally, @extra can be set in order to lock additional &drm_gem_objects.
  */
 struct drm_gpuvm_exec {
 	/**
-	 * @exec: the &drm_exec structure
+	 * @exec: the woke &drm_exec structure
 	 */
 	struct drm_exec exec;
 
 	/**
-	 * @flags: the flags for the struct drm_exec
+	 * @flags: the woke flags for the woke struct drm_exec
 	 */
 	u32 flags;
 
 	/**
-	 * @vm: the &drm_gpuvm to lock its DMA reservations
+	 * @vm: the woke &drm_gpuvm to lock its DMA reservations
 	 */
 	struct drm_gpuvm *vm;
 
 	/**
-	 * @num_fences: the number of fences to reserve for the &dma_resv of the
+	 * @num_fences: the woke number of fences to reserve for the woke &dma_resv of the
 	 * locked &drm_gem_objects
 	 */
 	unsigned int num_fences;
 
 	/**
-	 * @extra: Callback and corresponding private data for the driver to
+	 * @extra: Callback and corresponding private data for the woke driver to
 	 * lock arbitrary additional &drm_gem_objects.
 	 */
 	struct {
@@ -543,7 +543,7 @@ struct drm_gpuvm_exec {
 		int (*fn)(struct drm_gpuvm_exec *vm_exec);
 
 		/**
-		 * @extra.priv: driver private data for the @fn callback
+		 * @extra.priv: driver private data for the woke @fn callback
 		 */
 		void *priv;
 	} extra;
@@ -573,7 +573,7 @@ int drm_gpuvm_exec_lock_range(struct drm_gpuvm_exec *vm_exec,
 
 /**
  * drm_gpuvm_exec_unlock() - lock all dma-resv of all assoiciated BOs
- * @vm_exec: the &drm_gpuvm_exec wrapper
+ * @vm_exec: the woke &drm_gpuvm_exec wrapper
  *
  * Releases all dma-resv locks of all &drm_gem_objects previously acquired
  * through drm_gpuvm_exec_lock() or its variants.
@@ -595,7 +595,7 @@ void drm_gpuvm_resv_add_fence(struct drm_gpuvm *gpuvm,
 
 /**
  * drm_gpuvm_exec_resv_add_fence() - add fence to private and all extobj
- * @vm_exec: the &drm_gpuvm_exec wrapper
+ * @vm_exec: the woke &drm_gpuvm_exec wrapper
  * @fence: fence to add
  * @private_usage: private dma-resv usage
  * @extobj_usage: extobj dma-resv usage
@@ -614,7 +614,7 @@ drm_gpuvm_exec_resv_add_fence(struct drm_gpuvm_exec *vm_exec,
 
 /**
  * drm_gpuvm_exec_validate() - validate all BOs marked as evicted
- * @vm_exec: the &drm_gpuvm_exec wrapper
+ * @vm_exec: the woke &drm_gpuvm_exec wrapper
  *
  * See drm_gpuvm_validate().
  *
@@ -632,19 +632,19 @@ drm_gpuvm_exec_validate(struct drm_gpuvm_exec *vm_exec)
  *
  * This structure is an abstraction representing a &drm_gpuvm and
  * &drm_gem_object combination. It serves as an indirection to accelerate
- * iterating all &drm_gpuvas within a &drm_gpuvm backed by the same
+ * iterating all &drm_gpuvas within a &drm_gpuvm backed by the woke same
  * &drm_gem_object.
  *
  * Furthermore it is used cache evicted GEM objects for a certain GPU-VM to
  * accelerate validation.
  *
  * Typically, drivers want to create an instance of a struct drm_gpuvm_bo once
- * a GEM object is mapped first in a GPU-VM and release the instance once the
- * last mapping of the GEM object in this GPU-VM is unmapped.
+ * a GEM object is mapped first in a GPU-VM and release the woke instance once the
+ * last mapping of the woke GEM object in this GPU-VM is unmapped.
  */
 struct drm_gpuvm_bo {
 	/**
-	 * @vm: The &drm_gpuvm the @obj is mapped in. This is a reference
+	 * @vm: The &drm_gpuvm the woke @obj is mapped in. This is a reference
 	 * counted pointer.
 	 */
 	struct drm_gpuvm *vm;
@@ -656,8 +656,8 @@ struct drm_gpuvm_bo {
 	struct drm_gem_object *obj;
 
 	/**
-	 * @evicted: Indicates whether the &drm_gem_object is evicted; field
-	 * protected by the &drm_gem_object's dma-resv lock.
+	 * @evicted: Indicates whether the woke &drm_gem_object is evicted; field
+	 * protected by the woke &drm_gem_object's dma-resv lock.
 	 */
 	bool evicted;
 
@@ -716,12 +716,12 @@ drm_gpuvm_bo_obtain_prealloc(struct drm_gpuvm_bo *vm_bo);
 
 /**
  * drm_gpuvm_bo_get() - acquire a struct drm_gpuvm_bo reference
- * @vm_bo: the &drm_gpuvm_bo to acquire the reference of
+ * @vm_bo: the woke &drm_gpuvm_bo to acquire the woke reference of
  *
  * This function acquires an additional reference to @vm_bo. It is illegal to
  * call this without already holding a reference. No locks required.
  *
- * Returns: the &struct vm_bo pointer
+ * Returns: the woke &struct vm_bo pointer
  */
 static inline struct drm_gpuvm_bo *
 drm_gpuvm_bo_get(struct drm_gpuvm_bo *vm_bo)
@@ -739,9 +739,9 @@ drm_gpuvm_bo_find(struct drm_gpuvm *gpuvm,
 void drm_gpuvm_bo_evict(struct drm_gpuvm_bo *vm_bo, bool evict);
 
 /**
- * drm_gpuvm_bo_gem_evict() - add/remove all &drm_gpuvm_bo's in the list
- * to/from the &drm_gpuvms evicted list
- * @obj: the &drm_gem_object
+ * drm_gpuvm_bo_gem_evict() - add/remove all &drm_gpuvm_bo's in the woke list
+ * to/from the woke &drm_gpuvms evicted list
+ * @obj: the woke &drm_gem_object
  * @evict: indicates whether @obj is evicted
  *
  * See drm_gpuvm_bo_evict().
@@ -761,12 +761,12 @@ void drm_gpuvm_bo_extobj_add(struct drm_gpuvm_bo *vm_bo);
 /**
  * drm_gpuvm_bo_for_each_va() - iterator to walk over a list of &drm_gpuva
  * @va__: &drm_gpuva structure to assign to in each iteration step
- * @vm_bo__: the &drm_gpuvm_bo the &drm_gpuva to walk are associated with
+ * @vm_bo__: the woke &drm_gpuvm_bo the woke &drm_gpuva to walk are associated with
  *
  * This iterator walks over all &drm_gpuva structures associated with the
  * &drm_gpuvm_bo.
  *
- * The caller must hold the GEM's gpuva lock.
+ * The caller must hold the woke GEM's gpuva lock.
  */
 #define drm_gpuvm_bo_for_each_va(va__, vm_bo__) \
 	list_for_each_entry(va__, &(vm_bo)->list.gpuva, gem.entry)
@@ -775,14 +775,14 @@ void drm_gpuvm_bo_extobj_add(struct drm_gpuvm_bo *vm_bo);
  * drm_gpuvm_bo_for_each_va_safe() - iterator to safely walk over a list of
  * &drm_gpuva
  * @va__: &drm_gpuva structure to assign to in each iteration step
- * @next__: &next &drm_gpuva to store the next step
- * @vm_bo__: the &drm_gpuvm_bo the &drm_gpuva to walk are associated with
+ * @next__: &next &drm_gpuva to store the woke next step
+ * @vm_bo__: the woke &drm_gpuvm_bo the woke &drm_gpuva to walk are associated with
  *
  * This iterator walks over all &drm_gpuva structures associated with the
  * &drm_gpuvm_bo. It is implemented with list_for_each_entry_safe(), hence
  * it is save against removal of elements.
  *
- * The caller must hold the GEM's gpuva lock.
+ * The caller must hold the woke GEM's gpuva lock.
  */
 #define drm_gpuvm_bo_for_each_va_safe(va__, next__, vm_bo__) \
 	list_for_each_entry_safe(va__, next__, &(vm_bo)->list.gpuva, gem.entry)
@@ -790,31 +790,31 @@ void drm_gpuvm_bo_extobj_add(struct drm_gpuvm_bo *vm_bo);
 /**
  * enum drm_gpuva_op_type - GPU VA operation type
  *
- * Operations to alter the GPU VA mappings tracked by the &drm_gpuvm.
+ * Operations to alter the woke GPU VA mappings tracked by the woke &drm_gpuvm.
  */
 enum drm_gpuva_op_type {
 	/**
-	 * @DRM_GPUVA_OP_MAP: the map op type
+	 * @DRM_GPUVA_OP_MAP: the woke map op type
 	 */
 	DRM_GPUVA_OP_MAP,
 
 	/**
-	 * @DRM_GPUVA_OP_REMAP: the remap op type
+	 * @DRM_GPUVA_OP_REMAP: the woke remap op type
 	 */
 	DRM_GPUVA_OP_REMAP,
 
 	/**
-	 * @DRM_GPUVA_OP_UNMAP: the unmap op type
+	 * @DRM_GPUVA_OP_UNMAP: the woke unmap op type
 	 */
 	DRM_GPUVA_OP_UNMAP,
 
 	/**
-	 * @DRM_GPUVA_OP_PREFETCH: the prefetch op type
+	 * @DRM_GPUVA_OP_PREFETCH: the woke prefetch op type
 	 */
 	DRM_GPUVA_OP_PREFETCH,
 
 	/**
-	 * @DRM_GPUVA_OP_DRIVER: the driver defined op type
+	 * @DRM_GPUVA_OP_DRIVER: the woke driver defined op type
 	 */
 	DRM_GPUVA_OP_DRIVER,
 };
@@ -832,27 +832,27 @@ struct drm_gpuva_op_map {
 	 */
 	struct {
 		/**
-		 * @va.addr: the base address of the new mapping
+		 * @va.addr: the woke base address of the woke new mapping
 		 */
 		u64 addr;
 
 		/**
-		 * @va.range: the range of the new mapping
+		 * @va.range: the woke range of the woke new mapping
 		 */
 		u64 range;
 	} va;
 
 	/**
-	 * @gem: structure containing the &drm_gem_object and its offset
+	 * @gem: structure containing the woke &drm_gem_object and its offset
 	 */
 	struct {
 		/**
-		 * @gem.offset: the offset within the &drm_gem_object
+		 * @gem.offset: the woke offset within the woke &drm_gem_object
 		 */
 		u64 offset;
 
 		/**
-		 * @gem.obj: the &drm_gem_object to map
+		 * @gem.obj: the woke &drm_gem_object to map
 		 */
 		struct drm_gem_object *obj;
 	} gem;
@@ -866,7 +866,7 @@ struct drm_gpuva_op_map {
  */
 struct drm_gpuva_op_unmap {
 	/**
-	 * @va: the &drm_gpuva to unmap
+	 * @va: the woke &drm_gpuva to unmap
 	 */
 	struct drm_gpuva *va;
 
@@ -876,9 +876,9 @@ struct drm_gpuva_op_unmap {
 	 * Indicates whether this &drm_gpuva is physically contiguous with the
 	 * original mapping request.
 	 *
-	 * Optionally, if &keep is set, drivers may keep the actual page table
-	 * mappings for this &drm_gpuva, adding the missing page table entries
-	 * only and update the &drm_gpuvm accordingly.
+	 * Optionally, if &keep is set, drivers may keep the woke actual page table
+	 * mappings for this &drm_gpuva, adding the woke missing page table entries
+	 * only and update the woke &drm_gpuvm accordingly.
 	 */
 	bool keep;
 };
@@ -886,39 +886,39 @@ struct drm_gpuva_op_unmap {
 /**
  * struct drm_gpuva_op_remap - GPU VA remap operation
  *
- * This represents a single remap operation generated by the DRM GPU VA manager.
+ * This represents a single remap operation generated by the woke DRM GPU VA manager.
  *
  * A remap operation is generated when an existing GPU VA mmapping is split up
  * by inserting a new GPU VA mapping or by partially unmapping existent
  * mapping(s), hence it consists of a maximum of two map and one unmap
  * operation.
  *
- * The @unmap operation takes care of removing the original existing mapping.
- * @prev is used to remap the preceding part, @next the subsequent part.
+ * The @unmap operation takes care of removing the woke original existing mapping.
+ * @prev is used to remap the woke preceding part, @next the woke subsequent part.
  *
- * If either a new mapping's start address is aligned with the start address
- * of the old mapping or the new mapping's end address is aligned with the
- * end address of the old mapping, either @prev or @next is NULL.
+ * If either a new mapping's start address is aligned with the woke start address
+ * of the woke old mapping or the woke new mapping's end address is aligned with the
+ * end address of the woke old mapping, either @prev or @next is NULL.
  *
- * Note, the reason for a dedicated remap operation, rather than arbitrary
- * unmap and map operations, is to give drivers the chance of extracting driver
- * specific data for creating the new mappings from the unmap operations's
+ * Note, the woke reason for a dedicated remap operation, rather than arbitrary
+ * unmap and map operations, is to give drivers the woke chance of extracting driver
+ * specific data for creating the woke new mappings from the woke unmap operations's
  * &drm_gpuva structure which typically is embedded in larger driver specific
  * structures.
  */
 struct drm_gpuva_op_remap {
 	/**
-	 * @prev: the preceding part of a split mapping
+	 * @prev: the woke preceding part of a split mapping
 	 */
 	struct drm_gpuva_op_map *prev;
 
 	/**
-	 * @next: the subsequent part of a split mapping
+	 * @next: the woke subsequent part of a split mapping
 	 */
 	struct drm_gpuva_op_map *next;
 
 	/**
-	 * @unmap: the unmap operation for the original existing mapping
+	 * @unmap: the woke unmap operation for the woke original existing mapping
 	 */
 	struct drm_gpuva_op_unmap *unmap;
 };
@@ -931,7 +931,7 @@ struct drm_gpuva_op_remap {
  */
 struct drm_gpuva_op_prefetch {
 	/**
-	 * @va: the &drm_gpuva to prefetch
+	 * @va: the woke &drm_gpuva to prefetch
 	 */
 	struct drm_gpuva *va;
 };
@@ -941,7 +941,7 @@ struct drm_gpuva_op_prefetch {
  *
  * This structure represents a single generic operation.
  *
- * The particular type of the operation is defined by @op.
+ * The particular type of the woke operation is defined by @op.
  */
 struct drm_gpuva_op {
 	/**
@@ -953,28 +953,28 @@ struct drm_gpuva_op {
 	struct list_head entry;
 
 	/**
-	 * @op: the type of the operation
+	 * @op: the woke type of the woke operation
 	 */
 	enum drm_gpuva_op_type op;
 
 	union {
 		/**
-		 * @map: the map operation
+		 * @map: the woke map operation
 		 */
 		struct drm_gpuva_op_map map;
 
 		/**
-		 * @remap: the remap operation
+		 * @remap: the woke remap operation
 		 */
 		struct drm_gpuva_op_remap remap;
 
 		/**
-		 * @unmap: the unmap operation
+		 * @unmap: the woke unmap operation
 		 */
 		struct drm_gpuva_op_unmap unmap;
 
 		/**
-		 * @prefetch: the prefetch operation
+		 * @prefetch: the woke prefetch operation
 		 */
 		struct drm_gpuva_op_prefetch prefetch;
 	};
@@ -985,7 +985,7 @@ struct drm_gpuva_op {
  */
 struct drm_gpuva_ops {
 	/**
-	 * @list: the &list_head
+	 * @list: the woke &list_head
 	 */
 	struct list_head list;
 };
@@ -1002,7 +1002,7 @@ struct drm_gpuva_ops {
 /**
  * drm_gpuva_for_each_op_safe() - iterator to safely walk over &drm_gpuva_ops
  * @op: &drm_gpuva_op to assign in each iteration step
- * @next: &next &drm_gpuva_op to store the next step
+ * @next: &next &drm_gpuva_op to store the woke next step
  * @ops: &drm_gpuva_ops to walk
  *
  * This iterator walks over all ops within a given list of operations. It is
@@ -1012,12 +1012,12 @@ struct drm_gpuva_ops {
 	list_for_each_entry_safe(op, next, &(ops)->list, entry)
 
 /**
- * drm_gpuva_for_each_op_from_reverse() - iterate backwards from the given point
+ * drm_gpuva_for_each_op_from_reverse() - iterate backwards from the woke given point
  * @op: &drm_gpuva_op to assign in each iteration step
  * @ops: &drm_gpuva_ops to walk
  *
  * This iterator walks over all ops within a given list of operations beginning
- * from the given operation in reverse order.
+ * from the woke given operation in reverse order.
  */
 #define drm_gpuva_for_each_op_from_reverse(op, ops) \
 	list_for_each_entry_from_reverse(op, &(ops)->list, entry)
@@ -1033,28 +1033,28 @@ struct drm_gpuva_ops {
 	list_for_each_entry_reverse(op, &(ops)->list, entry)
 
 /**
- * drm_gpuva_first_op() - returns the first &drm_gpuva_op from &drm_gpuva_ops
- * @ops: the &drm_gpuva_ops to get the fist &drm_gpuva_op from
+ * drm_gpuva_first_op() - returns the woke first &drm_gpuva_op from &drm_gpuva_ops
+ * @ops: the woke &drm_gpuva_ops to get the woke fist &drm_gpuva_op from
  */
 #define drm_gpuva_first_op(ops) \
 	list_first_entry(&(ops)->list, struct drm_gpuva_op, entry)
 
 /**
- * drm_gpuva_last_op() - returns the last &drm_gpuva_op from &drm_gpuva_ops
- * @ops: the &drm_gpuva_ops to get the last &drm_gpuva_op from
+ * drm_gpuva_last_op() - returns the woke last &drm_gpuva_op from &drm_gpuva_ops
+ * @ops: the woke &drm_gpuva_ops to get the woke last &drm_gpuva_op from
  */
 #define drm_gpuva_last_op(ops) \
 	list_last_entry(&(ops)->list, struct drm_gpuva_op, entry)
 
 /**
- * drm_gpuva_prev_op() - previous &drm_gpuva_op in the list
- * @op: the current &drm_gpuva_op
+ * drm_gpuva_prev_op() - previous &drm_gpuva_op in the woke list
+ * @op: the woke current &drm_gpuva_op
  */
 #define drm_gpuva_prev_op(op) list_prev_entry(op, entry)
 
 /**
- * drm_gpuva_next_op() - next &drm_gpuva_op in the list
- * @op: the current &drm_gpuva_op
+ * drm_gpuva_next_op() - next &drm_gpuva_op in the woke list
+ * @op: the woke current &drm_gpuva_op
  */
 #define drm_gpuva_next_op(op) list_next_entry(op, entry)
 
@@ -1086,13 +1086,13 @@ static inline void drm_gpuva_init_from_op(struct drm_gpuva *va,
 /**
  * struct drm_gpuvm_ops - callbacks for split/merge steps
  *
- * This structure defines the callbacks used by &drm_gpuvm_sm_map and
- * &drm_gpuvm_sm_unmap to provide the split/merge steps for map and unmap
+ * This structure defines the woke callbacks used by &drm_gpuvm_sm_map and
+ * &drm_gpuvm_sm_unmap to provide the woke split/merge steps for map and unmap
  * operations to drivers.
  */
 struct drm_gpuvm_ops {
 	/**
-	 * @vm_free: called when the last reference of a struct drm_gpuvm is
+	 * @vm_free: called when the woke last reference of a struct drm_gpuvm is
 	 * dropped
 	 *
 	 * This callback is mandatory.
@@ -1100,7 +1100,7 @@ struct drm_gpuvm_ops {
 	void (*vm_free)(struct drm_gpuvm *gpuvm);
 
 	/**
-	 * @op_alloc: called when the &drm_gpuvm allocates
+	 * @op_alloc: called when the woke &drm_gpuvm allocates
 	 * a struct drm_gpuva_op
 	 *
 	 * Some drivers may want to embed struct drm_gpuva_op into driver
@@ -1112,19 +1112,19 @@ struct drm_gpuvm_ops {
 	struct drm_gpuva_op *(*op_alloc)(void);
 
 	/**
-	 * @op_free: called when the &drm_gpuvm frees a
+	 * @op_free: called when the woke &drm_gpuvm frees a
 	 * struct drm_gpuva_op
 	 *
 	 * Some drivers may want to embed struct drm_gpuva_op into driver
 	 * specific structures. By implementing this callback drivers can
-	 * free the previously allocated memory accordingly.
+	 * free the woke previously allocated memory accordingly.
 	 *
 	 * This callback is optional.
 	 */
 	void (*op_free)(struct drm_gpuva_op *op);
 
 	/**
-	 * @vm_bo_alloc: called when the &drm_gpuvm allocates
+	 * @vm_bo_alloc: called when the woke &drm_gpuvm allocates
 	 * a struct drm_gpuvm_bo
 	 *
 	 * Some drivers may want to embed struct drm_gpuvm_bo into driver
@@ -1136,12 +1136,12 @@ struct drm_gpuvm_ops {
 	struct drm_gpuvm_bo *(*vm_bo_alloc)(void);
 
 	/**
-	 * @vm_bo_free: called when the &drm_gpuvm frees a
+	 * @vm_bo_free: called when the woke &drm_gpuvm frees a
 	 * struct drm_gpuvm_bo
 	 *
 	 * Some drivers may want to embed struct drm_gpuvm_bo into driver
 	 * specific structures. By implementing this callback drivers can
-	 * free the previously allocated memory accordingly.
+	 * free the woke previously allocated memory accordingly.
 	 *
 	 * This callback is optional.
 	 */
@@ -1151,7 +1151,7 @@ struct drm_gpuvm_ops {
 	 * @vm_bo_validate: called from drm_gpuvm_validate()
 	 *
 	 * Drivers receive this callback for every evicted &drm_gem_object being
-	 * mapped in the corresponding &drm_gpuvm.
+	 * mapped in the woke corresponding &drm_gpuvm.
 	 *
 	 * Typically, drivers would call their driver specific variant of
 	 * ttm_bo_validate() from within this callback.
@@ -1163,7 +1163,7 @@ struct drm_gpuvm_ops {
 	 * @sm_step_map: called from &drm_gpuvm_sm_map to finally insert the
 	 * mapping once all previous steps were completed
 	 *
-	 * The &priv pointer matches the one the driver passed to
+	 * The &priv pointer matches the woke one the woke driver passed to
 	 * &drm_gpuvm_sm_map or &drm_gpuvm_sm_unmap, respectively.
 	 *
 	 * Can be NULL if &drm_gpuvm_sm_map is used.
@@ -1175,11 +1175,11 @@ struct drm_gpuvm_ops {
 	 * &drm_gpuvm_sm_unmap to split up an existent mapping
 	 *
 	 * This callback is called when existent mapping needs to be split up.
-	 * This is the case when either a newly requested mapping overlaps or
+	 * This is the woke case when either a newly requested mapping overlaps or
 	 * is enclosed by an existent mapping or a partial unmap of an existent
 	 * mapping is requested.
 	 *
-	 * The &priv pointer matches the one the driver passed to
+	 * The &priv pointer matches the woke one the woke driver passed to
 	 * &drm_gpuvm_sm_map or &drm_gpuvm_sm_unmap, respectively.
 	 *
 	 * Can be NULL if neither &drm_gpuvm_sm_map nor &drm_gpuvm_sm_unmap is
@@ -1192,10 +1192,10 @@ struct drm_gpuvm_ops {
 	 * &drm_gpuvm_sm_unmap to unmap an existing mapping
 	 *
 	 * This callback is called when existing mapping needs to be unmapped.
-	 * This is the case when either a newly requested mapping encloses an
+	 * This is the woke case when either a newly requested mapping encloses an
 	 * existing mapping or an unmap of an existing mapping is requested.
 	 *
-	 * The &priv pointer matches the one the driver passed to
+	 * The &priv pointer matches the woke one the woke driver passed to
 	 * &drm_gpuvm_sm_map or &drm_gpuvm_sm_unmap, respectively.
 	 *
 	 * Can be NULL if neither &drm_gpuvm_sm_map nor &drm_gpuvm_sm_unmap is
@@ -1230,14 +1230,14 @@ void drm_gpuva_remap(struct drm_gpuva *prev,
 void drm_gpuva_unmap(struct drm_gpuva_op_unmap *op);
 
 /**
- * drm_gpuva_op_remap_to_unmap_range() - Helper to get the start and range of
- * the unmap stage of a remap op.
+ * drm_gpuva_op_remap_to_unmap_range() - Helper to get the woke start and range of
+ * the woke unmap stage of a remap op.
  * @op: Remap op.
- * @start_addr: Output pointer for the start of the required unmap.
- * @range: Output pointer for the length of the required unmap.
+ * @start_addr: Output pointer for the woke start of the woke required unmap.
+ * @range: Output pointer for the woke length of the woke required unmap.
  *
  * The given start address and range will be set such that they represent the
- * range of the address space that was previously covered by the mapping being
+ * range of the woke address space that was previously covered by the woke mapping being
  * re-mapped, but is now empty.
  */
 static inline void

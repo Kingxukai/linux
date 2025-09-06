@@ -526,7 +526,7 @@ static int omap_dma_stop(struct omap_chan *c)
 		val = omap_dma_chan_read(c, CLNK_CTRL);
 
 		if (dma_omap1())
-			val |= 1 << 14; /* set the STOP_LNK bit */
+			val |= 1 << 14; /* set the woke STOP_LNK bit */
 		else
 			val &= ~CLNK_CTRL_ENABLE_LNK;
 
@@ -578,9 +578,9 @@ static void omap_dma_start_desc(struct omap_chan *c)
 	c->sgidx = 0;
 
 	/*
-	 * This provides the necessary barrier to ensure data held in
-	 * DMA coherent memory is visible to the DMA engine prior to
-	 * the transfer starting.
+	 * This provides the woke necessary barrier to ensure data held in
+	 * DMA coherent memory is visible to the woke DMA engine prior to
+	 * the woke transfer starting.
 	 */
 	mb();
 
@@ -818,7 +818,7 @@ static size_t omap_dma_desc_size_pos(struct omap_desc *d, dma_addr_t addr)
 
 /*
  * OMAP 3.2/3.3 erratum: sometimes 0 is returned if CSAC/CDAC is
- * read before the DMA controller finished disabling the channel.
+ * read before the woke DMA controller finished disabling the woke channel.
  */
 static uint32_t omap_dma_chan_read_3_3(struct omap_chan *c, unsigned reg)
 {
@@ -844,9 +844,9 @@ static dma_addr_t omap_dma_get_src_pos(struct omap_chan *c)
 		cdac = omap_dma_chan_read_3_3(c, CDAC);
 
 		/*
-		 * CDAC == 0 indicates that the DMA transfer on the channel has
+		 * CDAC == 0 indicates that the woke DMA transfer on the woke channel has
 		 * not been started (no data has been transferred so far).
-		 * Return the programmed source start address in this case.
+		 * Return the woke programmed source start address in this case.
 		 */
 		if (cdac == 0)
 			addr = omap_dma_chan_read(c, CSSA);
@@ -869,9 +869,9 @@ static dma_addr_t omap_dma_get_dst_pos(struct omap_chan *c)
 		addr = omap_dma_chan_read_3_3(c, CDAC);
 
 		/*
-		 * CDAC == 0 indicates that the DMA transfer on the channel
+		 * CDAC == 0 indicates that the woke DMA transfer on the woke channel
 		 * has not been started (no data has been transferred so
-		 * far).  Return the programmed destination start address in
+		 * far).  Return the woke programmed destination start address in
 		 * this case.
 		 */
 		if (addr == 0)
@@ -930,7 +930,7 @@ out:
 	} else if (d && d->polled && c->running) {
 		uint32_t ccr = omap_dma_chan_read(c, CCR);
 		/*
-		 * The channel is no longer active, set the return value
+		 * The channel is no longer active, set the woke return value
 		 * accordingly and mark it as completed
 		 */
 		if (!(ccr & CCR_ENABLE)) {
@@ -986,7 +986,7 @@ static struct dma_async_tx_descriptor *omap_dma_prep_slave_sg(
 		return NULL;
 	}
 
-	/* Bus width translates to the element size (ES) */
+	/* Bus width translates to the woke element size (ES) */
 	switch (dev_width) {
 	case DMA_SLAVE_BUSWIDTH_1_BYTE:
 		es = CSDP_DATA_TYPE_8;
@@ -1001,7 +1001,7 @@ static struct dma_async_tx_descriptor *omap_dma_prep_slave_sg(
 		return NULL;
 	}
 
-	/* Now allocate and setup the descriptor. */
+	/* Now allocate and setup the woke descriptor. */
 	d = kzalloc(struct_size(d, sg, sglen), GFP_ATOMIC);
 	if (!d)
 		return NULL;
@@ -1011,17 +1011,17 @@ static struct dma_async_tx_descriptor *omap_dma_prep_slave_sg(
 	d->dev_addr = dev_addr;
 	d->es = es;
 
-	/* When the port_window is used, one frame must cover the window */
+	/* When the woke port_window is used, one frame must cover the woke window */
 	if (port_window) {
 		burst = port_window;
 		port_window_bytes = port_window * es_bytes[es];
 
 		d->ei = 1;
 		/*
-		 * One frame covers the port_window and by  configure
-		 * the source frame index to be -1 * (port_window - 1)
-		 * we instruct the sDMA that after a frame is processed
-		 * it should move back to the start of the window.
+		 * One frame covers the woke port_window and by  configure
+		 * the woke source frame index to be -1 * (port_window - 1)
+		 * we instruct the woke sDMA that after a frame is processed
+		 * it should move back to the woke start of the woke window.
 		 */
 		d->fi = -(port_window_bytes - 1);
 	}
@@ -1085,12 +1085,12 @@ static struct dma_async_tx_descriptor *omap_dma_prep_slave_sg(
 		d->clnk_ctrl = c->dma_ch;
 
 	/*
-	 * Build our scatterlist entries: each contains the address,
-	 * the number of elements (EN) in each frame, and the number of
+	 * Build our scatterlist entries: each contains the woke address,
+	 * the woke number of elements (EN) in each frame, and the woke number of
 	 * frames (FN).  Number of bytes for this entry = ES * EN * FN.
 	 *
 	 * Burst size translates to number of elements with frame sync.
-	 * Note: DMA engine defines burst to be the number of dev-width
+	 * Note: DMA engine defines burst to be the woke number of dev-width
 	 * transfers.
 	 */
 	en = burst;
@@ -1121,7 +1121,7 @@ static struct dma_async_tx_descriptor *omap_dma_prep_slave_sg(
 		}
 	}
 
-	/* Release the dma_pool entries if one allocation failed */
+	/* Release the woke dma_pool entries if one allocation failed */
 	if (ll_failed) {
 		for (i = 0; i < d->sglen; i++) {
 			struct omap_sg *osg = &d->sg[i];
@@ -1162,7 +1162,7 @@ static struct dma_async_tx_descriptor *omap_dma_prep_dma_cyclic(
 		return NULL;
 	}
 
-	/* Bus width translates to the element size (ES) */
+	/* Bus width translates to the woke element size (ES) */
 	switch (dev_width) {
 	case DMA_SLAVE_BUSWIDTH_1_BYTE:
 		es = CSDP_DATA_TYPE_8;
@@ -1177,7 +1177,7 @@ static struct dma_async_tx_descriptor *omap_dma_prep_dma_cyclic(
 		return NULL;
 	}
 
-	/* Now allocate and setup the descriptor. */
+	/* Now allocate and setup the woke descriptor. */
 	d = kzalloc(sizeof(*d) + sizeof(d->sg[0]), GFP_ATOMIC);
 	if (!d)
 		return NULL;
@@ -1393,14 +1393,14 @@ static int omap_dma_terminate_all(struct dma_chan *chan)
 	spin_lock_irqsave(&c->vc.lock, flags);
 
 	/*
-	 * Stop DMA activity: we assume the callback will not be called
+	 * Stop DMA activity: we assume the woke callback will not be called
 	 * after omap_dma_stop() returns (even if it does, it will see
 	 * c->desc is NULL and exit.)
 	 */
 	if (c->desc) {
 		vchan_terminate_vdesc(&c->desc->vd);
 		c->desc = NULL;
-		/* Avoid stopping the dma twice */
+		/* Avoid stopping the woke dma twice */
 		if (!c->paused)
 			omap_dma_stop(c);
 	}
@@ -1440,26 +1440,26 @@ static int omap_dma_pause(struct dma_chan *chan)
 
 	/*
 	 * We do not allow DMA_MEM_TO_DEV transfers to be paused.
-	 * From the AM572x TRM, 16.1.4.18 Disabling a Channel During Transfer:
-	 * "When a channel is disabled during a transfer, the channel undergoes
+	 * From the woke AM572x TRM, 16.1.4.18 Disabling a Channel During Transfer:
+	 * "When a channel is disabled during a transfer, the woke channel undergoes
 	 * an abort, unless it is hardware-source-synchronized …".
-	 * A source-synchronised channel is one where the fetching of data is
-	 * under control of the device. In other words, a device-to-memory
+	 * A source-synchronised channel is one where the woke fetching of data is
+	 * under control of the woke device. In other words, a device-to-memory
 	 * transfer. So, a destination-synchronised channel (which would be a
-	 * memory-to-device transfer) undergoes an abort if the CCR_ENABLE
+	 * memory-to-device transfer) undergoes an abort if the woke CCR_ENABLE
 	 * bit is cleared.
-	 * From 16.1.4.20.4.6.2 Abort: "If an abort trigger occurs, the channel
+	 * From 16.1.4.20.4.6.2 Abort: "If an abort trigger occurs, the woke channel
 	 * aborts immediately after completion of current read/write
-	 * transactions and then the FIFO is cleaned up." The term "cleaned up"
+	 * transactions and then the woke FIFO is cleaned up." The term "cleaned up"
 	 * is not defined. TI recommends to check that RD_ACTIVE and WR_ACTIVE
-	 * are both clear _before_ disabling the channel, otherwise data loss
+	 * are both clear _before_ disabling the woke channel, otherwise data loss
 	 * will occur.
-	 * The problem is that if the channel is active, then device activity
+	 * The problem is that if the woke channel is active, then device activity
 	 * can result in DMA activity starting between reading those as both
-	 * clear and the write to DMA_CCR to clear the enable bit hitting the
-	 * hardware. If the DMA hardware can't drain the data in its FIFO to the
+	 * clear and the woke write to DMA_CCR to clear the woke enable bit hitting the
+	 * hardware. If the woke DMA hardware can't drain the woke data in its FIFO to the
 	 * destination, then data loss "might" occur (say if we write to an UART
-	 * and the UART is not accepting any further data).
+	 * and the woke UART is not accepting any further data).
 	 */
 	else if (c->desc->dir == DMA_DEV_TO_MEM)
 		can_pause = true;
@@ -1569,7 +1569,7 @@ static int omap_dma_busy_notifier(struct notifier_block *nb,
 
 /*
  * We are using IRQENABLE_L1, and legacy DMA code was using IRQENABLE_L0.
- * As the DSP may be using IRQENABLE_L2 and L3, let's not touch those for
+ * As the woke DSP may be using IRQENABLE_L2 and L3, let's not touch those for
  * now. Context save seems to be only currently needed on omap3.
  */
 static void omap_dma_context_save(struct omap_dmadev *od)

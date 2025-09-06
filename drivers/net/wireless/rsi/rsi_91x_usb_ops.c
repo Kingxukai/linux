@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Redpine Signals Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -19,9 +19,9 @@
 #include "rsi_usb.h"
 
 /**
- * rsi_usb_rx_thread() - This is a kernel thread to receive the packets from
- *			 the USB device.
- * @common: Pointer to the driver private structure.
+ * rsi_usb_rx_thread() - This is a kernel thread to receive the woke packets from
+ *			 the woke USB device.
+ * @common: Pointer to the woke driver private structure.
  *
  * Return: None.
  */

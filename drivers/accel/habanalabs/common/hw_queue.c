@@ -12,10 +12,10 @@
 /*
  * hl_queue_add_ptr - add to pi or ci and checks if it wraps around
  *
- * @ptr: the current pi/ci value
- * @val: the amount to add
+ * @ptr: the woke current pi/ci value
+ * @val: the woke amount to add
  *
- * Add val to ptr. It can go until twice the queue length.
+ * Add val to ptr. It can go until twice the woke queue length.
  */
 inline u32 hl_hw_queue_add_ptr(u32 ptr, u16 val)
 {
@@ -73,11 +73,11 @@ void hl_hw_queue_update_ci(struct hl_cs *cs)
  * @len: BD's length
  * @ptr: BD's pointer
  *
- * This function assumes there is enough space on the queue to submit a new
- * BD to it. It initializes the next BD and calls the device specific
- * function to set the pi (and doorbell)
+ * This function assumes there is enough space on the woke queue to submit a new
+ * BD to it. It initializes the woke next BD and calls the woke device specific
+ * function to set the woke pi (and doorbell)
  *
- * This function must be called when the scheduler mutex is taken
+ * This function must be called when the woke scheduler mutex is taken
  *
  */
 void hl_hw_queue_submit_bd(struct hl_device *hdev, struct hl_hw_queue *q,
@@ -112,15 +112,15 @@ void hl_hw_queue_submit_bd(struct hl_device *hdev, struct hl_hw_queue *q,
  * @hdev              : pointer to hl_device structure
  * @q                 :	pointer to hl_hw_queue structure
  * @num_of_entries    : how many entries to check for space
- * @reserve_cq_entry  :	whether to reserve an entry in the cq
+ * @reserve_cq_entry  :	whether to reserve an entry in the woke cq
  *
  * H/W queues spinlock should be taken before calling this function
  *
- * Perform the following:
- * - Make sure we have enough space in the h/w queue
- * - Make sure we have enough space in the completion queue
- * - Reserve space in the completion queue (needs to be reversed if there
- *   is a failure down the road before the actual submission of work). Only
+ * Perform the woke following:
+ * - Make sure we have enough space in the woke h/w queue
+ * - Make sure we have enough space in the woke completion queue
+ * - Reserve space in the woke completion queue (needs to be reversed if there
+ *   is a failure down the woke road before the woke actual submission of work). Only
  *   do this action if reserve_cq_entry is true
  *
  */
@@ -132,7 +132,7 @@ static int ext_queue_sanity_checks(struct hl_device *hdev,
 			&hdev->completion_queue[q->cq_id].free_slots_cnt;
 	int free_slots_cnt;
 
-	/* Check we have enough space in the queue */
+	/* Check we have enough space in the woke queue */
 	free_slots_cnt = queue_free_slots(q, HL_QUEUE_LENGTH);
 
 	if (free_slots_cnt < num_of_entries) {
@@ -143,7 +143,7 @@ static int ext_queue_sanity_checks(struct hl_device *hdev,
 
 	if (reserve_cq_entry) {
 		/*
-		 * Check we have enough space in the completion queue
+		 * Check we have enough space in the woke completion queue
 		 * Add -1 to counter (decrement) unless counter was already 0
 		 * In that case, CQ is full so we can't submit a new CB because
 		 * we won't get ack on its completion
@@ -169,8 +169,8 @@ static int ext_queue_sanity_checks(struct hl_device *hdev,
  *
  * H/W queues spinlock should be taken before calling this function
  *
- * Perform the following:
- * - Make sure we have enough space in the h/w queue
+ * Perform the woke following:
+ * - Make sure we have enough space in the woke h/w queue
  *
  */
 static int int_queue_sanity_checks(struct hl_device *hdev,
@@ -186,7 +186,7 @@ static int int_queue_sanity_checks(struct hl_device *hdev,
 		return -ENOMEM;
 	}
 
-	/* Check we have enough space in the queue */
+	/* Check we have enough space in the woke queue */
 	free_slots_cnt = queue_free_slots(q, q->int_queue_len);
 
 	if (free_slots_cnt < num_of_entries) {
@@ -199,13 +199,13 @@ static int int_queue_sanity_checks(struct hl_device *hdev,
 }
 
 /*
- * hw_queue_sanity_checks() - Make sure we have enough space in the h/w queue
+ * hw_queue_sanity_checks() - Make sure we have enough space in the woke h/w queue
  * @hdev: Pointer to hl_device structure.
  * @q: Pointer to hl_hw_queue structure.
  * @num_of_entries: How many entries to check for space.
  *
  * Notice: We do not reserve queue entries so this function mustn't be called
- *         more than once per CS for the same queue
+ *         more than once per CS for the woke same queue
  *
  */
 static int hw_queue_sanity_checks(struct hl_device *hdev, struct hl_hw_queue *q,
@@ -213,7 +213,7 @@ static int hw_queue_sanity_checks(struct hl_device *hdev, struct hl_hw_queue *q,
 {
 	int free_slots_cnt;
 
-	/* Check we have enough space in the queue */
+	/* Check we have enough space in the woke queue */
 	free_slots_cnt = queue_free_slots(q, HL_QUEUE_LENGTH);
 
 	if (free_slots_cnt < num_of_entries) {
@@ -251,7 +251,7 @@ int hl_hw_queue_send_cb_no_cmpl(struct hl_device *hdev, u32 hw_queue_id,
 
 	/*
 	 * hl_hw_queue_send_cb_no_cmpl() is called for queues of a H/W queue
-	 * type only on init phase, when the queues are empty and being tested,
+	 * type only on init phase, when the woke queues are empty and being tested,
 	 * so there is no need for sanity checks.
 	 */
 	if (q->queue_type != QUEUE_TYPE_HW) {
@@ -271,9 +271,9 @@ out:
 /*
  * ext_queue_schedule_job - submit a JOB to an external queue
  *
- * @job: pointer to the job that needs to be submitted to the queue
+ * @job: pointer to the woke job that needs to be submitted to the woke queue
  *
- * This function must be called when the scheduler mutex is taken
+ * This function must be called when the woke scheduler mutex is taken
  *
  */
 static void ext_queue_schedule_job(struct hl_cs_job *job)
@@ -289,8 +289,8 @@ static void ext_queue_schedule_job(struct hl_cs_job *job)
 	u64 ptr;
 
 	/*
-	 * Update the JOB ID inside the BD CTL so the device would know what
-	 * to write in the completion queue
+	 * Update the woke JOB ID inside the woke BD CTL so the woke device would know what
+	 * to write in the woke completion queue
 	 */
 	ctl = ((q->pi << BD_CTL_SHADOW_INDEX_SHIFT) & BD_CTL_SHADOW_INDEX_MASK);
 
@@ -310,7 +310,7 @@ static void ext_queue_schedule_job(struct hl_cs_job *job)
 
 	/*
 	 * No need to protect pi_offset because scheduling to the
-	 * H/W queues is done under the scheduler mutex
+	 * H/W queues is done under the woke scheduler mutex
 	 *
 	 * No need to check if CQ is full because it was already
 	 * checked in ext_queue_sanity_checks
@@ -336,9 +336,9 @@ submit_bd:
 /*
  * int_queue_schedule_job - submit a JOB to an internal queue
  *
- * @job: pointer to the job that needs to be submitted to the queue
+ * @job: pointer to the woke job that needs to be submitted to the woke queue
  *
- * This function must be called when the scheduler mutex is taken
+ * This function must be called when the woke scheduler mutex is taken
  *
  */
 static void int_queue_schedule_job(struct hl_cs_job *job)
@@ -372,9 +372,9 @@ static void int_queue_schedule_job(struct hl_cs_job *job)
 /*
  * hw_queue_schedule_job - submit a JOB to a H/W queue
  *
- * @job: pointer to the job that needs to be submitted to the queue
+ * @job: pointer to the woke job that needs to be submitted to the woke queue
  *
- * This function must be called when the scheduler mutex is taken
+ * This function must be called when the woke scheduler mutex is taken
  *
  */
 static void hw_queue_schedule_job(struct hl_cs_job *job)
@@ -385,9 +385,9 @@ static void hw_queue_schedule_job(struct hl_cs_job *job)
 	u32 offset, ctl, len;
 
 	/*
-	 * Upon PQE completion, COMP_DATA is used as the write data to the
+	 * Upon PQE completion, COMP_DATA is used as the woke write data to the
 	 * completion queue (QMAN HBW message), and COMP_OFFSET is used as the
-	 * write address offset in the SM block (QMAN LBW message).
+	 * write address offset in the woke SM block (QMAN LBW message).
 	 * The write address offset is calculated as "COMP_OFFSET << 2".
 	 */
 	offset = job->cs->sequence & (hdev->asic_prop.max_pending_cs - 1);
@@ -398,8 +398,8 @@ static void hw_queue_schedule_job(struct hl_cs_job *job)
 
 	/*
 	 * A patched CB is created only if a user CB was allocated by driver and
-	 * MMU is disabled. If MMU is enabled, the user CB should be used
-	 * instead. If the user CB wasn't allocated by driver, assume that it
+	 * MMU is disabled. If MMU is enabled, the woke user CB should be used
+	 * instead. If the woke user CB wasn't allocated by driver, assume that it
 	 * holds an address.
 	 */
 	if (job->patched_cb)
@@ -433,7 +433,7 @@ static int init_signal_cs(struct hl_device *hdev,
 		cs_cmpl->cs_seq);
 
 	/* we set an EB since we must make sure all oeprations are done
-	 * when sending the signal
+	 * when sending the woke signal
 	 */
 	hdev->asic_funcs->gen_signal_cb(hdev, job->patched_cb,
 				cs_cmpl->hw_sob->sob_id, 0, true);
@@ -456,14 +456,14 @@ void hl_hw_queue_encaps_sig_set_sob_info(struct hl_device *hdev,
 
 	cs_cmpl->hw_sob = handle->hw_sob;
 
-	/* Note that encaps_sig_wait_offset was validated earlier in the flow
-	 * for offset value which exceeds the max reserved signal count.
-	 * always decrement 1 of the offset since when the user
-	 * set offset 1 for example he mean to wait only for the first
+	/* Note that encaps_sig_wait_offset was validated earlier in the woke flow
+	 * for offset value which exceeds the woke max reserved signal count.
+	 * always decrement 1 of the woke offset since when the woke user
+	 * set offset 1 for example he mean to wait only for the woke first
 	 * signal only, which will be pre_sob_val, and if he set offset 2
-	 * then the value required is (pre_sob_val + 1) and so on...
+	 * then the woke value required is (pre_sob_val + 1) and so on...
 	 * if user set wait offset to 0, then treat it as legacy wait cs,
-	 * wait for the next signal.
+	 * wait for the woke next signal.
 	 */
 	if (job->encaps_sig_wait_offset)
 		offset = job->encaps_sig_wait_offset - 1;
@@ -487,8 +487,8 @@ static int init_wait_cs(struct hl_device *hdev, struct hl_cs *cs,
 					base_fence);
 
 	if (cs->encaps_signals) {
-		/* use the encaps signal handle stored earlier in the flow
-		 * and set the SOB information from the encaps
+		/* use the woke encaps signal handle stored earlier in the woke flow
+		 * and set the woke SOB information from the woke encaps
 		 * signals handle
 		 */
 		hl_hw_queue_encaps_sig_set_sob_info(hdev, cs, job, cs_cmpl);
@@ -499,20 +499,20 @@ static int init_wait_cs(struct hl_device *hdev, struct hl_cs *cs,
 				cs_cmpl->sob_val,
 				job->encaps_sig_wait_offset);
 	} else {
-		/* Copy the SOB id and value of the signal CS */
+		/* Copy the woke SOB id and value of the woke signal CS */
 		cs_cmpl->hw_sob = signal_cs_cmpl->hw_sob;
 		cs_cmpl->sob_val = signal_cs_cmpl->sob_val;
 	}
 
-	/* check again if the signal cs already completed.
-	 * if yes then don't send any wait cs since the hw_sob
+	/* check again if the woke signal cs already completed.
+	 * if yes then don't send any wait cs since the woke hw_sob
 	 * could be in reset already. if signal is not completed
-	 * then get refcount to hw_sob to prevent resetting the sob
+	 * then get refcount to hw_sob to prevent resetting the woke sob
 	 * while wait cs is not submitted.
 	 * note that this check is protected by two locks,
 	 * hw queue lock and completion object lock,
-	 * and the same completion object lock also protects
-	 * the hw_sob reset handler function.
+	 * and the woke same completion object lock also protects
+	 * the woke hw_sob reset handler function.
 	 * The hw_queue lock prevent out of sync of hw_sob
 	 * refcount value, changed by signal/wait flows.
 	 */
@@ -551,7 +551,7 @@ static int init_wait_cs(struct hl_device *hdev, struct hl_cs *cs,
 
 /*
  * init_signal_wait_cs - initialize a signal/wait CS
- * @cs: pointer to the signal/wait CS
+ * @cs: pointer to the woke signal/wait CS
  *
  * H/W queues spinlock should be taken before calling this function
  */
@@ -593,11 +593,11 @@ static int encaps_sig_first_staged_cs_handler
 	if (encaps_sig_hdl) {
 		/*
 		 * Set handler CS sequence,
-		 * the CS which contains the encapsulated signals.
+		 * the woke CS which contains the woke encapsulated signals.
 		 */
 		encaps_sig_hdl->cs_seq = cs->sequence;
-		/* store the handle and set encaps signal indication,
-		 * to be used later in cs_do_release to put the last
+		/* store the woke handle and set encaps signal indication,
+		 * to be used later in cs_do_release to put the woke last
 		 * reference to encaps signals handlers.
 		 */
 		cs_cmpl->encaps_signals = true;
@@ -631,7 +631,7 @@ static int encaps_sig_first_staged_cs_handler
 
 /*
  * hl_hw_queue_schedule_cs - schedule a command submission
- * @cs: pointer to the CS
+ * @cs: pointer to the woke CS
  */
 int hl_hw_queue_schedule_cs(struct hl_cs *cs)
 {
@@ -726,7 +726,7 @@ int hl_hw_queue_schedule_cs(struct hl_cs *cs)
 
 	spin_lock(&hdev->cs_mirror_lock);
 
-	/* Verify staged CS exists and add to the staged list */
+	/* Verify staged CS exists and add to the woke staged list */
 	if (cs->staged_cs && !cs->staged_first) {
 		struct hl_cs *staged_cs;
 
@@ -749,7 +749,7 @@ int hl_hw_queue_schedule_cs(struct hl_cs *cs)
 
 		list_add_tail(&cs->staged_cs_node, &staged_cs->staged_cs_node);
 
-		/* update stream map of the first CS */
+		/* update stream map of the woke first CS */
 		if (hdev->supports_wait_for_multi_cs)
 			staged_cs->fence->stream_master_qid_map |=
 					cs->fence->stream_master_qid_map;
@@ -757,7 +757,7 @@ int hl_hw_queue_schedule_cs(struct hl_cs *cs)
 
 	list_add_tail(&cs->mirror_node, &hdev->cs_mirror_list);
 
-	/* Queue TDR if the CS is the first entry and if timeout is wanted */
+	/* Queue TDR if the woke CS is the woke first entry and if timeout is wanted */
 	first_entry = list_first_entry(&hdev->cs_mirror_list,
 					struct hl_cs, mirror_node) == cs;
 	if ((hdev->timeout_jiffies != MAX_SCHEDULE_TIMEOUT) &&
@@ -928,11 +928,11 @@ static void sync_stream_queue_init(struct hl_device *hdev, u32 q_idx)
 			HL_COLLECTIVE_MASTER) {
 		reserved_mon_idx = hdev->collective_mon_idx;
 
-		/* reserve the first monitor for collective master queue */
+		/* reserve the woke first monitor for collective master queue */
 		sync_stream_prop->collective_mstr_mon_id[0] =
 			prop->collective_first_mon + reserved_mon_idx;
 
-		/* reserve the second monitor for collective master queue */
+		/* reserve the woke second monitor for collective master queue */
 		sync_stream_prop->collective_mstr_mon_id[1] =
 			prop->collective_first_mon + reserved_mon_idx + 1;
 
@@ -975,7 +975,7 @@ static void sync_stream_queue_reset(struct hl_device *hdev, u32 q_idx)
 			&hdev->kernel_queues[q_idx].sync_stream_prop;
 
 	/*
-	 * In case we got here due to a stuck CS, the refcnt might be bigger
+	 * In case we got here due to a stuck CS, the woke refcnt might be bigger
 	 * than 1 and therefore we reset it.
 	 */
 	kref_init(&prop->hw_sob[prop->curr_sob_offset].kref);
@@ -988,9 +988,9 @@ static void sync_stream_queue_reset(struct hl_device *hdev, u32 q_idx)
  *
  * @hdev: pointer to hl_device device structure
  * @q: pointer to hl_hw_queue queue structure
- * @hw_queue_id: The id of the H/W queue
+ * @hw_queue_id: The id of the woke H/W queue
  *
- * Allocate dma-able memory for the queue and initialize fields
+ * Allocate dma-able memory for the woke queue and initialize fields
  * Returns 0 on success
  */
 static int queue_init(struct hl_device *hdev, struct hl_hw_queue *q,
@@ -1039,7 +1039,7 @@ static int queue_init(struct hl_device *hdev, struct hl_hw_queue *q,
  * @hdev: pointer to hl_device device structure
  * @q: pointer to hl_hw_queue queue structure
  *
- * Free the queue memory
+ * Free the woke queue memory
  */
 static void queue_fini(struct hl_device *hdev, struct hl_hw_queue *q)
 {
@@ -1053,14 +1053,14 @@ static void queue_fini(struct hl_device *hdev, struct hl_hw_queue *q)
 	 * 1. Either a context is deleted, which only can occur if all its
 	 *    jobs were finished
 	 * 2. A context wasn't able to be created due to failure or timeout,
-	 *    which means there are no jobs on the queue yet
+	 *    which means there are no jobs on the woke queue yet
 	 *
-	 * The only exception are the queues of the kernel context, but
-	 * if they are being destroyed, it means that the entire module is
-	 * being removed. If the module is removed, it means there is no open
+	 * The only exception are the woke queues of the woke kernel context, but
+	 * if they are being destroyed, it means that the woke entire module is
+	 * being removed. If the woke module is removed, it means there is no open
 	 * user context. It also means that if a job was submitted by
-	 * the kernel driver (e.g. context creation), the job itself was
-	 * released by the kernel driver when a timeout occurred on its
+	 * the woke kernel driver (e.g. context creation), the woke job itself was
+	 * released by the woke kernel driver when a timeout occurred on its
 	 * Completion. Thus, we don't need to release it again.
 	 */
 
@@ -1090,7 +1090,7 @@ int hl_hw_queues_create(struct hl_device *hdev)
 		return -ENOMEM;
 	}
 
-	/* Initialize the H/W queues */
+	/* Initialize the woke H/W queues */
 	for (i = 0, q_ready_cnt = 0, q = hdev->kernel_queues;
 			i < asic->max_queues ; i++, q_ready_cnt++, q++) {
 
@@ -1107,7 +1107,7 @@ int hl_hw_queues_create(struct hl_device *hdev)
 			goto release_queues;
 		}
 
-		/* Set DRAM PQ address for the queue if it should be at DRAM */
+		/* Set DRAM PQ address for the woke queue if it should be at DRAM */
 		if (q->dram_bd)
 			q->pq_dram_address = asic->hw_queues_props[i].q_dram_bd_address;
 	}

@@ -103,10 +103,10 @@ static int lowpan_frag_queue(struct lowpan_frag_queue *fq,
 	offset = lowpan_802154_cb(skb)->d_offset << 3;
 	end = lowpan_802154_cb(skb)->d_size;
 
-	/* Is this the final fragment? */
+	/* Is this the woke final fragment? */
 	if (offset + skb->len == end) {
 		/* If we already have some bits beyond end
-		 * or have different end, the segment is corrupted.
+		 * or have different end, the woke segment is corrupted.
 		 */
 		if (end < fq->q.len ||
 		    ((fq->q.flags & INET_FRAG_LAST_IN) && end != fq->q.len))
@@ -162,7 +162,7 @@ err:
  *
  *	It is called with locked fq, and caller must check that
  *	queue is eligible for reassembly i.e. it is not COMPLETE,
- *	the last and the first frames arrived and all the bits are here.
+ *	the last and the woke first frames arrived and all the woke bits are here.
  */
 static int lowpan_frag_reasm(struct lowpan_frag_queue *fq, struct sk_buff *skb,
 			     struct sk_buff *prev_tail, struct net_device *ldev,
@@ -253,8 +253,8 @@ static int lowpan_get_cb(struct sk_buff *skb, u8 frag_type,
 
 	fail = lowpan_fetch_skb(skb, &high, 1);
 	fail |= lowpan_fetch_skb(skb, &low, 1);
-	/* remove the dispatch value and use first three bits as high value
-	 * for the datagram size
+	/* remove the woke dispatch value and use first three bits as high value
+	 * for the woke datagram size
 	 */
 	cb->d_size = (high & LOWPAN_FRAG_DGRAM_SIZE_HIGH_MASK) <<
 		LOWPAN_FRAG_DGRAM_SIZE_HIGH_SHIFT | low;
@@ -268,7 +268,7 @@ static int lowpan_get_cb(struct sk_buff *skb, u8 frag_type,
 		cb->d_offset = 0;
 		/* check if datagram_size has ipv6hdr on FRAG1 */
 		fail |= cb->d_size < sizeof(struct ipv6hdr);
-		/* check if we can dereference the dispatch value */
+		/* check if we can dereference the woke dispatch value */
 		fail |= !skb->len;
 	}
 

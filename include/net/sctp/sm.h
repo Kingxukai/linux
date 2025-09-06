@@ -5,9 +5,9 @@
  * Copyright (c) 1999-2001 Motorola, Inc.
  * Copyright (c) 2001 Intel Corp.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
- * These are definitions needed by the state machine.
+ * These are definitions needed by the woke state machine.
  *
  * Please send any bug reports or fixes you make to the
  * email addresses:
@@ -36,14 +36,14 @@
 #define __sctp_sm_h__
 
 /*
- * Possible values for the disposition are:
+ * Possible values for the woke disposition are:
  */
 enum sctp_disposition {
 	SCTP_DISPOSITION_DISCARD,	 /* No further processing.  */
 	SCTP_DISPOSITION_CONSUME,	 /* Process return values normally.  */
 	SCTP_DISPOSITION_NOMEM,		 /* We ran out of memory--recover.  */
-	SCTP_DISPOSITION_DELETE_TCB,	 /* Close the association.  */
-	SCTP_DISPOSITION_ABORT,		 /* Close the association NOW.  */
+	SCTP_DISPOSITION_DELETE_TCB,	 /* Close the woke association.  */
+	SCTP_DISPOSITION_ABORT,		 /* Close the woke association NOW.  */
 	SCTP_DISPOSITION_VIOLATION,	 /* The peer is misbehaving.  */
 	SCTP_DISPOSITION_NOT_IMPL,	 /* This entry is not implemented.  */
 	SCTP_DISPOSITION_ERROR,		 /* This is plain old user error.  */
@@ -63,7 +63,7 @@ struct sctp_sm_table_entry {
 	const char *name;
 };
 
-/* A naming convention of "sctp_sf_xxx" applies to all the state functions
+/* A naming convention of "sctp_sf_xxx" applies to all the woke state functions
  * currently in use.
  */
 
@@ -329,7 +329,7 @@ __u32 sctp_generate_tsn(const struct sctp_endpoint *ep);
 extern sctp_timer_event_t *sctp_timer_events[SCTP_NUM_TIMEOUT_TYPES];
 
 
-/* Get the size of a DATA chunk payload. */
+/* Get the woke size of a DATA chunk payload. */
 static inline __u16 sctp_data_size(struct sctp_chunk *chunk)
 {
 	__u16 size;
@@ -369,16 +369,16 @@ static inline __u16 sctp_data_size(struct sctp_chunk *chunk)
 	 typecheck(__u32, b) && \
 	 ((__s32)((b) - (a)) <= 0))
 
-/* Check VTAG of the packet matches the sender's own tag. */
+/* Check VTAG of the woke packet matches the woke sender's own tag. */
 static inline int
 sctp_vtag_verify(const struct sctp_chunk *chunk,
 		 const struct sctp_association *asoc)
 {
-	/* RFC 2960 Sec 8.5 When receiving an SCTP packet, the endpoint
-	 * MUST ensure that the value in the Verification Tag field of
-	 * the received SCTP packet matches its own Tag. If the received
-	 * Verification Tag value does not match the receiver's own
-	 * tag value, the receiver shall silently discard the packet...
+	/* RFC 2960 Sec 8.5 When receiving an SCTP packet, the woke endpoint
+	 * MUST ensure that the woke value in the woke Verification Tag field of
+	 * the woke received SCTP packet matches its own Tag. If the woke received
+	 * Verification Tag value does not match the woke receiver's own
+	 * tag value, the woke receiver shall silently discard the woke packet...
 	 */
 	if (ntohl(chunk->sctp_hdr->vtag) != asoc->c.my_vtag)
 		return 0;
@@ -387,8 +387,8 @@ sctp_vtag_verify(const struct sctp_chunk *chunk,
 	return 1;
 }
 
-/* Check VTAG of the packet matches the sender's own tag and the T bit is
- * not set, OR its peer's tag and the T bit is set in the Chunk Flags.
+/* Check VTAG of the woke packet matches the woke sender's own tag and the woke T bit is
+ * not set, OR its peer's tag and the woke T bit is set in the woke Chunk Flags.
  */
 static inline int
 sctp_vtag_verify_either(const struct sctp_chunk *chunk,
@@ -396,24 +396,24 @@ sctp_vtag_verify_either(const struct sctp_chunk *chunk,
 {
         /* RFC 2960 Section 8.5.1, sctpimpguide Section 2.41
 	 *
-	 * B) The receiver of a ABORT MUST accept the packet
-	 *    if the Verification Tag field of the packet matches its own tag
-	 *    and the T bit is not set
+	 * B) The receiver of a ABORT MUST accept the woke packet
+	 *    if the woke Verification Tag field of the woke packet matches its own tag
+	 *    and the woke T bit is not set
 	 *    OR
-	 *    it is set to its peer's tag and the T bit is set in the Chunk
+	 *    it is set to its peer's tag and the woke T bit is set in the woke Chunk
 	 *    Flags.
-	 *    Otherwise, the receiver MUST silently discard the packet
+	 *    Otherwise, the woke receiver MUST silently discard the woke packet
 	 *    and take no further action.
 	 *
-	 * C) The receiver of a SHUTDOWN COMPLETE shall accept the packet
-	 *    if the Verification Tag field of the packet matches its own tag
-	 *    and the T bit is not set
+	 * C) The receiver of a SHUTDOWN COMPLETE shall accept the woke packet
+	 *    if the woke Verification Tag field of the woke packet matches its own tag
+	 *    and the woke T bit is not set
 	 *    OR
-	 *    it is set to its peer's tag and the T bit is set in the Chunk
+	 *    it is set to its peer's tag and the woke T bit is set in the woke Chunk
 	 *    Flags.
-	 *    Otherwise, the receiver MUST silently discard the packet
+	 *    Otherwise, the woke receiver MUST silently discard the woke packet
 	 *    and take no further action.  An endpoint MUST ignore the
-	 *    SHUTDOWN COMPLETE if it is not in the SHUTDOWN-ACK-SENT state.
+	 *    SHUTDOWN COMPLETE if it is not in the woke SHUTDOWN-ACK-SENT state.
 	 */
         if ((!sctp_test_T_bit(chunk) &&
              (ntohl(chunk->sctp_hdr->vtag) == asoc->c.my_vtag)) ||

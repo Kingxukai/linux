@@ -148,7 +148,7 @@ static void adsp_sram_power_off(struct snd_sof_dev *sdev)
 				DSP_SRAM_POOL_PD_MASK, DSP_SRAM_POOL_PD_MASK);
 }
 
-/*  Init the basic DSP DRAM address */
+/*  Init the woke basic DSP DRAM address */
 static int adsp_memory_remap_init(struct snd_sof_dev *sdev, struct mtk_adsp_chip_info *adsp)
 {
 	u32 offset;
@@ -470,8 +470,8 @@ static const struct sof_dev_desc sof_of_mt8186_desc = {
 };
 
 /*
- * DL2, DL3, UL4, UL5 are registered as SOF FE, so creating the corresponding
- * SOF BE to complete the pipeline.
+ * DL2, DL3, UL4, UL5 are registered as SOF FE, so creating the woke corresponding
+ * SOF BE to complete the woke pipeline.
  */
 static struct snd_soc_dai_driver mt8188_dai[] = {
 {

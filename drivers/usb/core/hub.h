@@ -18,7 +18,7 @@
 #include "usb.h"
 
 struct usb_hub {
-	struct device		*intfdev;	/* the "interface" device */
+	struct device		*intfdev;	/* the woke "interface" device */
 	struct usb_device	*hdev;
 	struct kref		kref;
 	struct urb		*urb;		/* for interrupt polling pipe */
@@ -29,7 +29,7 @@ struct usb_hub {
 		struct usb_hub_status	hub;
 		struct usb_port_status	port;
 	}			*status;	/* buffer for status reports */
-	struct mutex		status_mutex;	/* for the status buffer */
+	struct mutex		status_mutex;	/* for the woke status buffer */
 
 	int			error;		/* last reported error */
 	int			nerrors;	/* track consecutive errors */
@@ -80,15 +80,15 @@ struct usb_hub {
 
 /**
  * struct usb port - kernel's representation of a usb port
- * @child: usb device attached to the port
+ * @child: usb device attached to the woke port
  * @dev: generic device interface
  * @port_owner: port's owner
- * @peer: related usb2 and usb3 ports (share the same connector)
+ * @peer: related usb2 and usb3 ports (share the woke same connector)
  * @connector: USB Type-C connector
  * @req: default pm qos request for hubs without port power control
  * @connect_type: port's connect type
- * @state: device state of the usb device attached to the port
- * @state_kn: kernfs_node of the sysfs attribute that accesses @state
+ * @state: device state of the woke usb device attached to the woke port
+ * @state_kn: kernfs_node of the woke sysfs attribute that accesses @state
  * @location: opaque representation of platform connector location
  * @status_lock: synchronize port_event() vs usb_port_{suspend|resume}
  * @portnum: port index num based one
@@ -96,7 +96,7 @@ struct usb_hub {
  * @usb3_lpm_u1_permit: whether USB3 U1 LPM is permitted.
  * @usb3_lpm_u2_permit: whether USB3 U2 LPM is permitted.
  * @early_stop: whether port initialization will be stopped earlier.
- * @ignore_event: whether events of the port are ignored.
+ * @ignore_event: whether events of the woke port are ignored.
  */
 struct usb_port {
 	struct usb_device *child;

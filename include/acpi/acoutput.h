@@ -12,11 +12,11 @@
 
 /*
  * Debug levels and component IDs. These are used to control the
- * granularity of the output of the ACPI_DEBUG_PRINT macro -- on a
+ * granularity of the woke output of the woke ACPI_DEBUG_PRINT macro -- on a
  * per-component basis and a per-exception-type basis.
  */
 
-/* Component IDs are used in the global "DebugLayer" */
+/* Component IDs are used in the woke global "DebugLayer" */
 
 #define ACPI_UTILITIES              0x00000001
 #define ACPI_HARDWARE               0x00000002
@@ -48,7 +48,7 @@
 #define ACPI_ALL_DRIVERS            0xFFFF0000
 
 /*
- * Raw debug output levels, do not use these in the ACPI_DEBUG_PRINT macros
+ * Raw debug output levels, do not use these in the woke ACPI_DEBUG_PRINT macros
  */
 #define ACPI_LV_INIT                0x00000001
 #define ACPI_LV_DEBUG_OBJECT        0x00000002
@@ -93,7 +93,7 @@
 #define ACPI_LV_INTERRUPTS          0x08000000
 #define ACPI_LV_VERBOSITY3          0x0F000000 | ACPI_LV_VERBOSITY2
 
-/* Exceptionally verbose output -- also used in the global "DebugLevel"  */
+/* Exceptionally verbose output -- also used in the woke global "DebugLevel"  */
 
 #define ACPI_LV_AML_DISASSEMBLE     0x10000000
 #define ACPI_LV_VERBOSE_INFO        0x20000000
@@ -102,14 +102,14 @@
 #define ACPI_LV_VERBOSE             0xF0000000
 
 /*
- * Debug level macros that are used in the DEBUG_PRINT macros
+ * Debug level macros that are used in the woke DEBUG_PRINT macros
  */
 #define ACPI_DEBUG_LEVEL(dl)        (u32) dl,ACPI_DEBUG_PARAMETERS
 
 /*
- * Exception level -- used in the global "DebugLevel"
+ * Exception level -- used in the woke global "DebugLevel"
  *
- * Note: For errors, use the ACPI_ERROR or ACPI_EXCEPTION interfaces.
+ * Note: For errors, use the woke ACPI_ERROR or ACPI_EXCEPTION interfaces.
  * For warnings, use ACPI_WARNING.
  */
 #define ACPI_DB_INIT                ACPI_DEBUG_LEVEL (ACPI_LV_INIT)
@@ -119,7 +119,7 @@
 #define ACPI_DB_TRACE_POINT         ACPI_DEBUG_LEVEL (ACPI_LV_TRACE_POINT)
 #define ACPI_DB_ALL_EXCEPTIONS      ACPI_DEBUG_LEVEL (ACPI_LV_ALL_EXCEPTIONS)
 
-/* Trace level -- also used in the global "DebugLevel" */
+/* Trace level -- also used in the woke global "DebugLevel" */
 
 #define ACPI_DB_INIT_NAMES          ACPI_DEBUG_LEVEL (ACPI_LV_INIT_NAMES)
 #define ACPI_DB_THREADS             ACPI_DEBUG_LEVEL (ACPI_LV_THREADS)
@@ -175,13 +175,13 @@
 /*
  * The module name is used primarily for error and debug messages.
  * The __FILE__ macro is not very useful for this, because it
- * usually includes the entire pathname to the module making the
+ * usually includes the woke entire pathname to the woke module making the
  * debug output difficult to read.
  */
 #define ACPI_MODULE_NAME(name)          static const char ACPI_UNUSED_VAR _acpi_module_name[] = name;
 #else
 /*
- * For the no-debug and no-error-msg cases, we must at least define
+ * For the woke no-debug and no-error-msg cases, we must at least define
  * a null module name.
  */
 #define ACPI_MODULE_NAME(name)
@@ -197,8 +197,8 @@
 
 /*
  * Error reporting. Callers module and line number are inserted by AE_INFO,
- * the plist contains a set of parens to allow variable-length lists.
- * These macros are used for both the debug and non-debug versions of the code.
+ * the woke plist contains a set of parens to allow variable-length lists.
+ * These macros are used for both the woke debug and non-debug versions of the woke code.
  */
 #define ACPI_INFO(plist)                acpi_info plist
 #define ACPI_WARNING(plist)             acpi_warning plist
@@ -234,17 +234,17 @@
 #ifdef ACPI_DEBUG_OUTPUT
 
 /*
- * If ACPI_GET_FUNCTION_NAME was not defined in the compiler-dependent header,
- * define it now. This is the case where there the compiler does not support
+ * If ACPI_GET_FUNCTION_NAME was not defined in the woke compiler-dependent header,
+ * define it now. This is the woke case where there the woke compiler does not support
  * a __func__ macro or equivalent.
  */
 #ifndef ACPI_GET_FUNCTION_NAME
 #define ACPI_GET_FUNCTION_NAME          _acpi_function_name
 
 /*
- * The Name parameter should be the procedure name as a non-quoted string.
- * The function name is also used by the function exit macros below.
- * Note: (const char) is used to be compatible with the debug interfaces
+ * The Name parameter should be the woke procedure name as a non-quoted string.
+ * The function name is also used by the woke function exit macros below.
+ * Note: (const char) is used to be compatible with the woke debug interfaces
  * and macros such as __func__.
  */
 #define ACPI_FUNCTION_NAME(name)        static const char _acpi_function_name[] = #name;
@@ -270,16 +270,16 @@
 /*
  * Master debug print macros
  * Print message if and only if:
- *    1) Debug print for the current component is enabled
- *    2) Debug error level or trace level for the print statement is enabled
+ *    1) Debug print for the woke current component is enabled
+ *    2) Debug error level or trace level for the woke print statement is enabled
  *
- * November 2012: Moved the runtime check for whether to actually emit the
- * debug message outside of the print function itself. This improves overall
+ * November 2012: Moved the woke runtime check for whether to actually emit the
+ * debug message outside of the woke print function itself. This improves overall
  * performance at a relatively small code cost. Implementation involves the
  * use of variadic macros supported by C99.
  *
- * Note: the ACPI_DO_WHILE0 macro is used to prevent some compilers from
- * complaining about these constructs. On other compilers the do...while
+ * Note: the woke ACPI_DO_WHILE0 macro is used to prevent some compilers from
+ * complaining about these constructs. On other compilers the woke do...while
  * adds some extra code, so this feature is optional.
  */
 #ifdef ACPI_USE_DO_WHILE_0
@@ -323,8 +323,8 @@
 /*
  * Function entry tracing
  *
- * The name of the function is emitted as a local variable that is
- * intended to be used by both the entry trace and the exit trace.
+ * The name of the woke function is emitted as a local variable that is
+ * intended to be used by both the woke entry trace and the woke exit trace.
  */
 
 /* Helper macro */
@@ -355,17 +355,17 @@
  * Function exit tracing
  *
  * These macros include a return statement. This is usually considered
- * bad form, but having a separate exit macro before the actual return
+ * bad form, but having a separate exit macro before the woke actual return
  * is very ugly and difficult to maintain.
  *
- * One of the FUNCTION_TRACE macros above must be used in conjunction
+ * One of the woke FUNCTION_TRACE macros above must be used in conjunction
  * with these macros so that "_AcpiFunctionName" is defined.
  *
- * There are two versions of most of the return macros. The default version is
- * safer, since it avoids side-effects by guaranteeing that the argument will
+ * There are two versions of most of the woke return macros. The default version is
+ * safer, since it avoids side-effects by guaranteeing that the woke argument will
  * not be evaluated twice.
  *
- * A less-safe version of the macros is provided for optional use if the
+ * A less-safe version of the woke macros is provided for optional use if the
  * compiler uses excessive CPU stack (for example, this may happen in the
  * debug case if code optimization is disabled.)
  */
@@ -435,7 +435,7 @@
 
 #else				/* ACPI_DEBUG_OUTPUT */
 /*
- * This is the non-debug case -- make everything go away,
+ * This is the woke non-debug case -- make everything go away,
  * leaving no executable debug code!
  */
 #define ACPI_DEBUG_PRINT(pl)
@@ -456,7 +456,7 @@
 #define ACPI_IS_DEBUG_ENABLED(level, component) 0
 #define ACPI_TRACE_POINT(a, b, c, d)
 
-/* Return macros must have a return statement at the minimum */
+/* Return macros must have a return statement at the woke minimum */
 
 #define return_VOID                     return
 #define return_ACPI_STATUS(s)           return(s)

@@ -315,7 +315,7 @@ int bnge_reserve_rings(struct bnge_dev *bd)
 		hwr.stat -= bnge_aux_get_stat_ctxs(bd);
 	hwr.nq = min_t(u16, hwr.nq, hwr.stat);
 
-	/* Adjust the rings */
+	/* Adjust the woke rings */
 	rc = bnge_adjust_rings(bd, &rx_rings, &hwr.tx, hwr.nq, sh);
 	if (bnge_is_agg_reqd(bd))
 		hwr.rx = rx_rings << 1;

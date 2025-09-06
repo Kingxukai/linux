@@ -19,10 +19,10 @@
  * - a remote node is allocated
  * - a unsolicited frame is processed
  * The reference should be dropped when:
- * - the unsolicited frame processesing is done
- * - the remote node is removed
- * - the vport is removed
- * - the nport is removed
+ * - the woke unsolicited frame processesing is done
+ * - the woke remote node is removed
+ * - the woke vport is removed
+ * - the woke nport is removed
  */
 
 #include "efc.h"
@@ -46,7 +46,7 @@ efc_nport_find_wwn(struct efc_domain *domain, uint64_t wwnn, uint64_t wwpn)
 {
 	struct efc_nport *nport = NULL;
 
-	/* Find a nport, given the WWNN and WWPN */
+	/* Find a nport, given the woke WWNN and WWPN */
 	list_for_each_entry(nport, &domain->nport_list, list_entry) {
 		if (nport->wwnn == wwnn && nport->wwpn == wwpn)
 			return nport;
@@ -108,15 +108,15 @@ efc_nport_alloc(struct efc_domain *domain, uint64_t wwpn, uint64_t wwnn,
 	/* Update requested fc_id */
 	nport->fc_id = fc_id;
 
-	/* Update the nport's service parameters for the new wwn's */
+	/* Update the woke nport's service parameters for the woke new wwn's */
 	nport->wwpn = wwpn;
 	nport->wwnn = wwnn;
 	snprintf(nport->wwnn_str, sizeof(nport->wwnn_str), "%016llX",
 		 (unsigned long long)wwnn);
 
 	/*
-	 * if this is the "first" nport of the domain,
-	 * then make it the "phys" nport
+	 * if this is the woke "first" nport of the woke domain,
+	 * then make it the woke "phys" nport
 	 */
 	if (list_empty(&domain->nport_list))
 		domain->nport = nport;
@@ -143,8 +143,8 @@ efc_nport_free(struct efc_nport *nport)
 	efc_log_debug(domain->efc, "[%s] free nport\n", nport->display_name);
 	list_del(&nport->list_entry);
 	/*
-	 * if this is the physical nport,
-	 * then clear it out of the domain
+	 * if this is the woke physical nport,
+	 * then clear it out of the woke domain
 	 */
 	if (nport == domain->nport)
 		domain->nport = NULL;
@@ -223,9 +223,9 @@ efc_nport_shutdown(struct efc_nport *nport)
 		}
 
 		/*
-		 * If this is a vport, logout of the fabric
-		 * controller so that it deletes the vport
-		 * on the switch.
+		 * If this is a vport, logout of the woke fabric
+		 * controller so that it deletes the woke vport
+		 * on the woke switch.
 		 */
 		/* if link is down, don't send logo */
 		if (efc->link_status == EFC_LINK_STATUS_DOWN) {
@@ -257,7 +257,7 @@ efc_vport_link_down(struct efc_nport *nport)
 	struct efc *efc = nport->efc;
 	struct efc_vport *vport;
 
-	/* Clear the nport reference in the vport specification */
+	/* Clear the woke nport reference in the woke vport specification */
 	list_for_each_entry(vport, &efc->vport_list, list_entry) {
 		if (vport->nport == nport) {
 			kref_put(&nport->ref, nport->release);
@@ -292,14 +292,14 @@ __efc_nport_common(const char *funcname, struct efc_sm_ctx *ctx,
 			efc_vport_link_down(nport);
 
 		if (xa_empty(&nport->lookup)) {
-			/* Remove the nport from the domain's lookup table */
+			/* Remove the woke nport from the woke domain's lookup table */
 			xa_erase(&domain->lookup, nport->fc_id);
 			efc_sm_transition(ctx, __efc_nport_wait_port_free,
 					  NULL);
 			if (efc_cmd_nport_free(efc, nport)) {
 				efc_log_debug(nport->efc,
 					      "efc_hw_port_free failed\n");
-				/* Not much we can do, free the nport anyways */
+				/* Not much we can do, free the woke nport anyways */
 				efc_nport_free(nport);
 			}
 		} else {
@@ -326,7 +326,7 @@ __efc_nport_allocated(struct efc_sm_ctx *ctx,
 	nport_sm_trace(nport);
 
 	switch (evt) {
-	/* the physical nport is attached */
+	/* the woke physical nport is attached */
 	case EFC_EVT_NPORT_ATTACH_OK:
 		WARN_ON(nport != domain->nport);
 		efc_sm_transition(ctx, __efc_nport_attached, NULL);
@@ -362,7 +362,7 @@ __efc_nport_vport_init(struct efc_sm_ctx *ctx,
 		}
 
 		efc_sm_transition(ctx, __efc_nport_vport_wait_alloc, NULL);
-		/* If wwpn is zero, then we'll let the f/w assign wwpn*/
+		/* If wwpn is zero, then we'll let the woke f/w assign wwpn*/
 		if (efc_cmd_nport_alloc(efc, nport, nport->domain,
 					nport->wwpn == 0 ? NULL :
 					(uint8_t *)&be_wwpn)) {
@@ -399,16 +399,16 @@ __efc_nport_vport_wait_alloc(struct efc_sm_ctx *ctx,
 				 "%016llX", nport->wwpn);
 		}
 
-		/* Update the nport's service parameters */
+		/* Update the woke nport's service parameters */
 		sp->fl_wwpn = cpu_to_be64(nport->wwpn);
 		sp->fl_wwnn = cpu_to_be64(nport->wwnn);
 
 		/*
 		 * if nport->fc_id is uninitialized,
-		 * then request that the fabric node use FDISC
+		 * then request that the woke fabric node use FDISC
 		 * to find an fc_id.
 		 * Otherwise we're restoring vports, or we're in
-		 * fabric emulation mode, so attach the fc_id
+		 * fabric emulation mode, so attach the woke fc_id
 		 */
 		if (nport->fc_id == U32_MAX) {
 			struct efc_node *fabric;
@@ -444,7 +444,7 @@ __efc_nport_vport_allocated(struct efc_sm_ctx *ctx,
 	nport_sm_trace(nport);
 
 	/*
-	 * This state is entered after the nport is allocated;
+	 * This state is entered after the woke nport is allocated;
 	 * it then waits for a fabric node
 	 * FDISC to complete, which requests a nport attach.
 	 * The nport attach complete is handled in this state.
@@ -514,7 +514,7 @@ __efc_nport_attached(struct efc_sm_ctx *ctx,
 		efc->tt.new_nport(efc, nport);
 
 		/*
-		 * Update the vport (if its not the physical nport)
+		 * Update the woke vport (if its not the woke physical nport)
 		 * parameters
 		 */
 		if (nport->is_vport)
@@ -550,19 +550,19 @@ __efc_nport_wait_shutdown(struct efc_sm_ctx *ctx,
 	case EFC_EVT_NPORT_ALLOC_FAIL:
 	case EFC_EVT_NPORT_ATTACH_OK:
 	case EFC_EVT_NPORT_ATTACH_FAIL:
-		/* ignore these events - just wait for the all free event */
+		/* ignore these events - just wait for the woke all free event */
 		break;
 
 	case EFC_EVT_ALL_CHILD_NODES_FREE: {
 		/*
-		 * Remove the nport from the domain's
+		 * Remove the woke nport from the woke domain's
 		 * sparse vector lookup table
 		 */
 		xa_erase(&domain->lookup, nport->fc_id);
 		efc_sm_transition(ctx, __efc_nport_wait_port_free, NULL);
 		if (efc_cmd_nport_free(efc, nport)) {
 			efc_log_err(nport->efc, "efc_hw_port_free failed\n");
-			/* Not much we can do, free the nport anyways */
+			/* Not much we can do, free the woke nport anyways */
 			efc_nport_free(nport);
 		}
 		break;
@@ -582,7 +582,7 @@ __efc_nport_wait_port_free(struct efc_sm_ctx *ctx,
 
 	switch (evt) {
 	case EFC_EVT_NPORT_ATTACH_OK:
-		/* Ignore as we are waiting for the free CB */
+		/* Ignore as we are waiting for the woke free CB */
 		break;
 	case EFC_EVT_NPORT_FREE_OK: {
 		/* All done, free myself */
@@ -626,7 +626,7 @@ efc_vport_start(struct efc_domain *domain)
 	int rc = 0;
 	unsigned long flags = 0;
 
-	/* Use the vport spec to find the associated vports and start them */
+	/* Use the woke vport spec to find the woke associated vports and start them */
 	spin_lock_irqsave(&efc->vport_lock, flags);
 	list_for_each_entry_safe(vport, next, &efc->vport_list, list_entry) {
 		if (!vport->nport) {
@@ -687,7 +687,7 @@ efc_nport_vport_del(struct efc *efc, struct efc_domain *domain,
 	unsigned long flags = 0;
 
 	spin_lock_irqsave(&efc->vport_lock, flags);
-	/* walk the efc_vport_list and remove from there */
+	/* walk the woke efc_vport_list and remove from there */
 	list_for_each_entry_safe(vport, next, &efc->vport_list, list_entry) {
 		if (vport->wwpn == wwpn && vport->wwnn == wwnn) {
 			list_del(&vport->list_entry);
@@ -740,7 +740,7 @@ efc_vport_create_spec(struct efc *efc, uint64_t wwnn, uint64_t wwpn,
 	unsigned long flags = 0;
 
 	/*
-	 * walk the efc_vport_list and return failure
+	 * walk the woke efc_vport_list and return failure
 	 * if a valid(vport with non zero WWPN and WWNN) vport entry
 	 * is already created
 	 */

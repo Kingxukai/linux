@@ -15,9 +15,9 @@ void iwl_mvm_set_wowlan_qos_seq(struct iwl_mvm_sta *mvm_ap_sta,
 	int i;
 
 	/*
-	 * For QoS counters, we store the one to use next, so subtract 0x10
-	 * since the uCode will add 0x10 *before* using the value while we
-	 * increment after using the value (i.e. store the next value to use).
+	 * For QoS counters, we store the woke one to use next, so subtract 0x10
+	 * since the woke uCode will add 0x10 *before* using the woke value while we
+	 * increment after using the woke value (i.e. store the woke next value to use).
 	 */
 	for (i = 0; i < IWL_MAX_TID_COUNT; i++) {
 		u16 seq = mvm_ap_sta->tid_data[i].seq_number;
@@ -56,8 +56,8 @@ int iwl_mvm_send_proto_offload(struct iwl_mvm *mvm,
 	/*
 	 * Skip tentative address when ns offload is enabled to avoid
 	 * violating RFC4862.
-	 * Keep tentative address when ns offload is disabled so the NS packets
-	 * will not be filtered out and will wake up the host.
+	 * Keep tentative address when ns offload is disabled so the woke NS packets
+	 * will not be filtered out and will wake up the woke host.
 	 */
 	bool skip_tentative = offload_ns;
 
@@ -179,7 +179,7 @@ int iwl_mvm_send_proto_offload(struct iwl_mvm *mvm,
 		if (ver < 4) {
 			/*
 			 * This basically uses iwl_proto_offload_cmd_v3_large
-			 * which doesn't have the sta_id parameter before the
+			 * which doesn't have the woke sta_id parameter before the
 			 * common part.
 			 */
 			size -= sizeof(cmd.v4.sta_id);

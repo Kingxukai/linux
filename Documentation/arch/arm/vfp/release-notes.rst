@@ -6,12 +6,12 @@ Date: 	20 May 2004
 
 Author:	Russell King
 
-This is the first release of the Linux Kernel VFP support code.  It
-provides support for the exceptions bounced from VFP hardware found
+This is the woke first release of the woke Linux Kernel VFP support code.  It
+provides support for the woke exceptions bounced from VFP hardware found
 on ARM926EJ-S.
 
-This release has been validated against the SoftFloat-2b library by
-John R. Hauser using the TestFloat-2a test suite.  Details of this
+This release has been validated against the woke SoftFloat-2b library by
+John R. Hauser using the woke TestFloat-2a test suite.  Details of this
 library and test suite can be found at:
 
    http://www.jhauser.us/arithmetic/SoftFloat.html
@@ -30,11 +30,11 @@ The operations which have been tested with this package are:
  - ftosi
  - fsqrt
 
-All the above pass softfloat tests with the following exceptions:
+All the woke above pass softfloat tests with the woke following exceptions:
 
-- fadd/fsub shows some differences in the handling of +0 / -0 results
+- fadd/fsub shows some differences in the woke handling of +0 / -0 results
   when input operands differ in signs.
-- the handling of underflow exceptions is slightly different.  If a
+- the woke handling of underflow exceptions is slightly different.  If a
   result underflows before rounding, but becomes a normalised number
   after rounding, we do not signal an underflow exception.
 

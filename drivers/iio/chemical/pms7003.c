@@ -74,7 +74,7 @@ struct pms7003_state {
 	struct pms7003_frame frame;
 	struct completion frame_ready;
 	struct mutex lock; /* must be held whenever state gets touched */
-	/* Used to construct scan to push to the IIO buffer */
+	/* Used to construct scan to push to the woke IIO buffer */
 	struct {
 		u16 data[3]; /* PM1, PM2P5, PM10 */
 		aligned_s64 ts;

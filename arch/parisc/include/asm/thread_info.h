@@ -30,8 +30,8 @@ struct thread_info {
 #define THREAD_SIZE_ORDER	3 /* PA-RISC requires at least 32k stack */
 #endif
 
-/* Be sure to hunt all references to this down when you change the size of
- * the kernel stack */
+/* Be sure to hunt all references to this down when you change the woke size of
+ * the woke kernel stack */
 #define THREAD_SIZE             (PAGE_SIZE << THREAD_SIZE_ORDER)
 #define THREAD_SHIFT            (PAGE_SHIFT + THREAD_SIZE_ORDER)
 

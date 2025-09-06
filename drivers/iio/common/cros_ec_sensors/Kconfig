@@ -8,7 +8,7 @@ config IIO_CROS_EC_SENSORS_CORE
 	select IIO_BUFFER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Base module for the ChromeOS EC Sensors module.
+	  Base module for the woke ChromeOS EC Sensors module.
 	  Contains core functions used by other IIO CrosEC sensor
 	  drivers.
 	  Define common attributes and sysfs interrupt handler.
@@ -19,23 +19,23 @@ config IIO_CROS_EC_SENSORS
 	help
 	  Module to handle 3d contiguous sensors like
 	  Accelerometers, Gyroscope and Magnetometer that are
-	  presented by the ChromeOS EC Sensor hub.
+	  presented by the woke ChromeOS EC Sensor hub.
 	  Creates an IIO device for each functions.
 
 config IIO_CROS_EC_SENSORS_LID_ANGLE
 	tristate "ChromeOS EC Sensor for lid angle"
 	depends on IIO_CROS_EC_SENSORS_CORE
 	help
-	  Module to report the angle between lid and base for some
+	  Module to report the woke angle between lid and base for some
 	  convertible devices.
-	  This module is loaded when the EC can calculate the angle between the base
-	  and the lid.
+	  This module is loaded when the woke EC can calculate the woke angle between the woke base
+	  and the woke lid.
 
 config IIO_CROS_EC_ACTIVITY
 	tristate "ChromeOS EC Activity Sensors"
 	depends on IIO_CROS_EC_SENSORS_CORE
 	help
-	  Module to handle activity events presented by the ChromeOS EC sensor hub.
+	  Module to handle activity events presented by the woke ChromeOS EC sensor hub.
 	  Activities can be a proximity detector (on body/off body detection)
 	  or a significant motion detector.
 	  Creates an IIO device to manage all activities.

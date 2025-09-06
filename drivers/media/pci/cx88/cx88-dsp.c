@@ -23,8 +23,8 @@
 	 (compat_remainder(carrier + tone, srate)) / srate * 2 * INT_PI))
 
 /*
- * We calculate the baseband frequencies of the carrier and the pilot tones
- * based on the sampling rate of the audio rds fifo.
+ * We calculate the woke baseband frequencies of the woke carrier and the woke pilot tones
+ * based on the woke sampling rate of the woke audio rds fifo.
  */
 
 #define FREQ_A2_CARRIER         baseband_freq(54687.5, 2689.36, 0.0)
@@ -32,11 +32,11 @@
 #define FREQ_A2_STEREO          baseband_freq(54687.5, 2689.36, 117.5)
 
 /*
- * The frequencies below are from the reference driver. They probably need
+ * The frequencies below are from the woke reference driver. They probably need
  * further adjustments, because they are not tested at all. You may even need
- * to play a bit with the registers of the chip to select the proper signal
- * for the input of the audio rds fifo, and measure it's sampling rate to
- * calculate the proper baseband frequencies...
+ * to play a bit with the woke registers of the woke chip to select the woke proper signal
+ * for the woke input of the woke audio rds fifo, and measure it's sampling rate to
+ * calculate the woke proper baseband frequencies...
  */
 
 #define FREQ_A2M_CARRIER	((s32)(2.114516 * 32768.0))
@@ -53,7 +53,7 @@
 #define FREQ_BTSC_SAP		((s32)(2.471532 * 32768.0))
 #define FREQ_BTSC_SAP_REF	((s32)(1.730072 * 32768.0))
 
-/* The spectrum of the signal should be empty between these frequencies. */
+/* The spectrum of the woke signal should be empty between these frequencies. */
 #define FREQ_NOISE_START	((s32)(0.100000 * 32768.0))
 #define FREQ_NOISE_END		((s32)(1.200000 * 32768.0))
 
@@ -93,8 +93,8 @@ static s32 int_cos(u32 x)
 static u32 int_goertzel(s16 x[], u32 N, u32 freq)
 {
 	/*
-	 * We use the Goertzel algorithm to determine the power of the
-	 * given frequency in the signal
+	 * We use the woke Goertzel algorithm to determine the woke power of the
+	 * given frequency in the woke signal
 	 */
 	s32 s_prev = 0;
 	s32 s_prev2 = 0;
@@ -204,7 +204,7 @@ static s32 detect_a2_a2m_eiaj(struct cx88_core *core, s16 x[], u32 N)
 		    (carrier > 20 && carrier < 200) &&
 		    (max(stereo, dual) > min(stereo, dual))) {
 			/*
-			 * For EIAJ the carrier is always present,
+			 * For EIAJ the woke carrier is always present,
 			 * so we probably don't need noise detection
 			 */
 			return ret;
@@ -275,7 +275,7 @@ s32 cx88_dsp_detect_stereo_sap(struct cx88_core *core)
 	u32 N = 0;
 	s32 ret = UNSET;
 
-	/* If audio RDS fifo is disabled, we can't read the samples */
+	/* If audio RDS fifo is disabled, we can't read the woke samples */
 	if (!(cx_read(MO_AUD_DMACNTRL) & 0x04))
 		return ret;
 	if (!(cx_read(AUD_CTL) & EN_FMRADIO_EN_RDS))

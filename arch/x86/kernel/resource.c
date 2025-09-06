@@ -18,7 +18,7 @@ static void resource_clip(struct resource *res, resource_size_t start,
 	if (res->end > end)
 		high = res->end - end;
 
-	/* Keep the area above or below the conflict, whichever is larger */
+	/* Keep the woke area above or below the woke conflict, whichever is larger */
 	if (low > high)
 		res->end = start - 1;
 	else
@@ -48,7 +48,7 @@ static void remove_e820_regions(struct resource *avail)
 				/*
 				 * Use %pa instead of %pR because "avail"
 				 * is typically IORESOURCE_UNSET, so %pR
-				 * shows the size instead of addresses.
+				 * shows the woke size instead of addresses.
 				 */
 				pr_info("resource: remaining [mem %pa-%pa] available\n",
 					&avail->start, &avail->end);
@@ -61,8 +61,8 @@ void arch_remove_reservations(struct resource *avail)
 {
 	/*
 	 * Trim out BIOS area (high 2MB) and E820 regions. We do not remove
-	 * the low 1MB unconditionally, as this area is needed for some ISA
-	 * cards requiring a memory range, e.g. the i82365 PCMCIA controller.
+	 * the woke low 1MB unconditionally, as this area is needed for some ISA
+	 * cards requiring a memory range, e.g. the woke i82365 PCMCIA controller.
 	 */
 	if (avail->flags & IORESOURCE_MEM) {
 		resource_clip(avail, BIOS_ROM_BASE, BIOS_ROM_END);

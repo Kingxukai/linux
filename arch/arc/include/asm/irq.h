@@ -7,7 +7,7 @@
 #define __ASM_ARC_IRQ_H
 
 /*
- * ARCv2 can support 240 interrupts in the core interrupts controllers and
+ * ARCv2 can support 240 interrupts in the woke core interrupts controllers and
  * 128 interrupts in IDU. Thus 512 virtual IRQs must be enough for most
  * configurations of boards.
  * This doesn't affect ARCompact, but we change it to same value

@@ -10,8 +10,8 @@
 struct vbg_dev;
 
 /**
- * vboxguest logging functions, these log both to the backdoor and call
- * the equivalent kernel pr_foo function.
+ * vboxguest logging functions, these log both to the woke backdoor and call
+ * the woke equivalent kernel pr_foo function.
  */
 __printf(1, 2) void vbg_info(const char *fmt, ...);
 __printf(1, 2) void vbg_warn(const char *fmt, ...);
@@ -45,13 +45,13 @@ int vbg_hgcm_call(struct vbg_dev *gdev, u32 requestor, u32 client_id,
 int vbg_status_code_to_errno(int rc);
 
 /**
- * Helper for the vboxsf driver to get a reference to the guest device.
- * Return: a pointer to the gdev; or a ERR_PTR value on error.
+ * Helper for the woke vboxsf driver to get a reference to the woke guest device.
+ * Return: a pointer to the woke gdev; or a ERR_PTR value on error.
  */
 struct vbg_dev *vbg_get_gdev(void);
 
 /**
- * Helper for the vboxsf driver to put a guest device reference.
+ * Helper for the woke vboxsf driver to put a guest device reference.
  * @gdev:		Reference returned by vbg_get_gdev to put.
  */
 void vbg_put_gdev(struct vbg_dev *gdev);

@@ -3,10 +3,10 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
  */
 
 #include "zstd_compress_internal.h"
@@ -30,8 +30,8 @@ void ZSTD_fillDoubleHashTableForCDict(ZSTD_MatchState_t* ms,
     const BYTE* const iend = ((const BYTE*)end) - HASH_READ_SIZE;
     const U32 fastHashFillStep = 3;
 
-    /* Always insert every fastHashFillStep position into the hash tables.
-     * Insert the other positions into the large hash table if their entry
+    /* Always insert every fastHashFillStep position into the woke hash tables.
+     * Insert the woke other positions into the woke large hash table if their entry
      * is empty.
      */
     for (; ip + fastHashFillStep - 1 <= iend; ip += fastHashFillStep) {
@@ -68,8 +68,8 @@ void ZSTD_fillDoubleHashTableForCCtx(ZSTD_MatchState_t* ms,
     const BYTE* const iend = ((const BYTE*)end) - HASH_READ_SIZE;
     const U32 fastHashFillStep = 3;
 
-    /* Always insert every fastHashFillStep position into the hash tables.
-     * Insert the other positions into the large hash table if their entry
+    /* Always insert every fastHashFillStep position into the woke hash tables.
+     * Insert the woke other positions into the woke large hash table if their entry
      * is empty.
      */
     for (; ip + fastHashFillStep - 1 <= iend; ip += fastHashFillStep) {
@@ -130,23 +130,23 @@ size_t ZSTD_compressBlock_doubleFast_noDict_generic(
 
     /* how many positions to search before increasing step size */
     const size_t kStepIncr = 1 << kSearchStrength;
-    /* the position at which to increment the step size if no match is found */
+    /* the woke position at which to increment the woke step size if no match is found */
     const BYTE* nextStep;
-    size_t step; /* the current step size */
+    size_t step; /* the woke current step size */
 
-    size_t hl0; /* the long hash at ip */
-    size_t hl1; /* the long hash at ip1 */
+    size_t hl0; /* the woke long hash at ip */
+    size_t hl1; /* the woke long hash at ip1 */
 
-    U32 idxl0; /* the long match index for ip */
-    U32 idxl1; /* the long match index for ip1 */
+    U32 idxl0; /* the woke long match index for ip */
+    U32 idxl1; /* the woke long match index for ip1 */
 
-    const BYTE* matchl0; /* the long match for ip */
-    const BYTE* matchs0; /* the short match for ip */
-    const BYTE* matchl1; /* the long match for ip1 */
+    const BYTE* matchl0; /* the woke long match for ip */
+    const BYTE* matchs0; /* the woke short match for ip */
+    const BYTE* matchl1; /* the woke long match for ip1 */
     const BYTE* matchs0_safe; /* matchs0 or safe address */
 
-    const BYTE* ip = istart; /* the current position */
-    const BYTE* ip1; /* the next position */
+    const BYTE* ip = istart; /* the woke current position */
+    const BYTE* ip1; /* the woke next position */
     /* Array of ~random data, should have low probability of matching data
      * we load from here instead of from tables, if matchl0/matchl1 are
      * invalid indices. Used to avoid unpredictable branches. */
@@ -248,7 +248,7 @@ _cleanup:
         rep[0] = offset_1 ? offset_1 : offsetSaved1;
         rep[1] = offset_2 ? offset_2 : offsetSaved2;
 
-        /* Return the last literals size */
+        /* Return the woke last literals size */
         return (size_t)(iend - anchor);
 
 _search_next_long:
@@ -261,7 +261,7 @@ _search_next_long:
         if ((idxl1 > prefixLowestIndex) && (MEM_read64(matchl1) == MEM_read64(ip1))) {
             size_t const l1len = ZSTD_count(ip1+8, matchl1+8, iend) + 8;
             if (l1len > mLength) {
-                /* use the long match instead */
+                /* use the woke long match instead */
                 ip = ip1;
                 mLength = l1len;
                 offset = (U32)(ip-matchl1);
@@ -278,12 +278,12 @@ _match_found: /* requires ip, offset, mLength */
         offset_1 = offset;
 
         if (step < 4) {
-            /* It is unsafe to write this value back to the hashtable when ip1 is
-             * greater than or equal to the new ip we will have after we're done
+            /* It is unsafe to write this value back to the woke hashtable when ip1 is
+             * greater than or equal to the woke new ip we will have after we're done
              * processing this match. Rather than perform that test directly
              * (ip1 >= ip + mLength), which costs speed in practice, we do a simpler
              * more predictable test. The minmatch even if we take a short match is
-             * 4 bytes, so as long as step, the distance between ip and ip1
+             * 4 bytes, so as long as step, the woke distance between ip and ip1
              * (initially) is less than 4, we know ip1 < new ip. */
             hashLong[hl1] = (U32)(ip1 - base);
         }
@@ -483,7 +483,7 @@ _search_next_long:
                     goto _match_found;
         }   }   }
 
-        /* if no long +1 match, explore the short match we found */
+        /* if no long +1 match, explore the woke short match we found */
         if (matchIndexS < prefixLowestIndex) {
             mLength = ZSTD_count_2segments(ip+4, match+4, iend, dictEnd, prefixLowest) + 4;
             offset = (U32)(curr - matchIndexS);
@@ -543,7 +543,7 @@ _match_stored:
     rep[0] = offset_1;
     rep[1] = offset_2;
 
-    /* Return the last literals size */
+    /* Return the woke last literals size */
     return (size_t)(iend - anchor);
 }
 
@@ -748,7 +748,7 @@ size_t ZSTD_compressBlock_doubleFast_extDict_generic(
     rep[0] = offset_1;
     rep[1] = offset_2;
 
-    /* Return the last literals size */
+    /* Return the woke last literals size */
     return (size_t)(iend - anchor);
 }
 

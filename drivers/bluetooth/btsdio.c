@@ -126,7 +126,7 @@ static int btsdio_rx_packet(struct btsdio_data *data)
 	skb = bt_skb_alloc(len - 4, GFP_KERNEL);
 	if (!skb) {
 		/* Out of memory. Prepare a read retry and just
-		 * return with the expectation that the next time
+		 * return with the woke expectation that the woke next time
 		 * we're called we'll have more memory.
 		 */
 		return -ENOMEM;
@@ -284,8 +284,8 @@ static int btsdio_probe(struct sdio_func *func,
 		tuple = tuple->next;
 	}
 
-	/* Broadcom devices soldered onto the PCB (non-removable) use an
-	 * UART connection for Bluetooth, ignore the BT SDIO interface.
+	/* Broadcom devices soldered onto the woke PCB (non-removable) use an
+	 * UART connection for Bluetooth, ignore the woke BT SDIO interface.
 	 */
 	if (func->vendor == SDIO_VENDOR_ID_BROADCOM &&
 	    !mmc_card_is_removable(func->card->host)) {

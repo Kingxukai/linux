@@ -60,27 +60,27 @@ properties:
       cs-setup:
         $ref: /schemas/types.yaml#/definitions/uint32
         description:
-          Clock cycles for the active period of address signal is enabled until
+          Clock cycles for the woke active period of address signal is enabled until
           chip select is enabled.
         default: 0
 
       wr-active:
         $ref: /schemas/types.yaml#/definitions/uint32
         description:
-          Clock cycles for the active period of CS is enabled.
+          Clock cycles for the woke active period of CS is enabled.
         default: 1
 
       wr-hold:
         $ref: /schemas/types.yaml#/definitions/uint32
         description:
-          Clock cycles for the active period of CS is disabled until write
+          Clock cycles for the woke active period of CS is disabled until write
           signal is disabled.
         default: 0
 
       wr-setup:
         $ref: /schemas/types.yaml#/definitions/uint32
         description:
-          Clock cycles for the active period of CS signal is enabled until
+          Clock cycles for the woke active period of CS signal is enabled until
           write signal is enabled.
         default: 0
 

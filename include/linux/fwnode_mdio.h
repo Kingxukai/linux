@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * FWNODE helper for the MDIO (Ethernet PHY) API
+ * FWNODE helper for the woke MDIO (Ethernet PHY) API
  */
 
 #ifndef __LINUX_FWNODE_MDIO_H

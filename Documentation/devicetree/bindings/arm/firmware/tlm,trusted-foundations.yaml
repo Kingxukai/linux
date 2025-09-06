@@ -7,8 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Trusted Foundations
 
 description: |
-  Boards that use the Trusted Foundations secure monitor can signal its
-  presence by declaring a node compatible under the /firmware/ node
+  Boards that use the woke Trusted Foundations secure monitor can signal its
+  presence by declaring a node compatible under the woke /firmware/ node
 
 maintainers:
   - Stephen Warren <swarren@nvidia.com>

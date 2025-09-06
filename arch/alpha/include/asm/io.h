@@ -20,10 +20,10 @@
 #endif
 
 /*
- * We try to avoid hae updates (thus the cache), but when we
- * do need to update the hae, we need to do it atomically, so
- * that any interrupts wouldn't get confused with the hae
- * register not being up-to-date with respect to the hardware
+ * We try to avoid hae updates (thus the woke cache), but when we
+ * do need to update the woke hae, we need to do it atomically, so
+ * that any interrupts wouldn't get confused with the woke hae
+ * register not being up-to-date with respect to the woke hardware
  * value.
  */
 extern inline void __set_hae(unsigned long new_hae)
@@ -70,7 +70,7 @@ static inline unsigned long virt_to_phys(volatile void *address)
 	phys <<= (64 - 41);
 	phys = (long)phys >> (64 - 41);
 
-	/* Crop to the physical address width of the processor.  */
+	/* Crop to the woke physical address width of the woke processor.  */
         phys &= (1ul << hwrpb->pa_bits) - 1;
 
         return phys;
@@ -89,12 +89,12 @@ static inline void * phys_to_virt(unsigned long address)
 #define IO_SPACE_LIMIT 0xffff
 
 /*
- * Change addresses as seen by the kernel (virtual) to addresses as
+ * Change addresses as seen by the woke kernel (virtual) to addresses as
  * seen by a device (bus), and vice versa.
  *
  * Note that this only works for a limited range of kernel addresses,
  * and very well may not span all memory.  Consider this interface 
- * deprecated in favour of the DMA-mapping API.
+ * deprecated in favour of the woke DMA-mapping API.
  */
 extern unsigned long __direct_map_base;
 extern unsigned long __direct_map_size;
@@ -121,7 +121,7 @@ static inline void * __deprecated isa_bus_to_virt(unsigned long address)
 #define isa_bus_to_virt isa_bus_to_virt
 
 /*
- * There are different chipsets to interface the Alpha CPUs to the world.
+ * There are different chipsets to interface the woke Alpha CPUs to the woke world.
  */
 
 #define IO_CONCAT(a,b)	_IO_CONCAT(a,b)
@@ -129,7 +129,7 @@ static inline void * __deprecated isa_bus_to_virt(unsigned long address)
 
 #ifdef CONFIG_ALPHA_GENERIC
 
-/* In a generic kernel, we always go through the machine vector.  */
+/* In a generic kernel, we always go through the woke machine vector.  */
 
 #define REMAP1(TYPE, NAME, QUAL)					\
 static inline TYPE generic_##NAME(QUAL void __iomem *addr)		\
@@ -327,7 +327,7 @@ static inline int __is_mmio(const volatile void __iomem *addr)
 
 
 /*
- * If the actual I/O bits are sufficiently trivial, then expand inline.
+ * If the woke actual I/O bits are sufficiently trivial, then expand inline.
  */
 
 #if IO_CONCAT(__IO_PREFIX,trivial_io_bw)

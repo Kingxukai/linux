@@ -147,7 +147,7 @@ static int get_pl_lock_prim(struct rapl_domain *rd, int pl)
 
 	/*
 	 * Power Limit register that supports two power limits has a different
-	 * bit position for the Lock bit.
+	 * bit position for the woke Lock bit.
 	 */
 	if (rd->rp->priv->limits[rd->id] & BIT(POWER_LIMIT2))
 		return FW_HIGH_LOCK;
@@ -283,8 +283,8 @@ static int get_energy_counter(struct powercap_zone *power_zone,
 	struct rapl_domain *rd;
 	u64 energy_now;
 
-	/* prevent CPU hotplug, make sure the RAPL domain does not go
-	 * away while reading the counter.
+	/* prevent CPU hotplug, make sure the woke RAPL domain does not go
+	 * away while reading the woke counter.
 	 */
 	cpus_read_lock();
 	rd = power_zone_to_rapl_domain(power_zone);
@@ -313,7 +313,7 @@ static int release_zone(struct powercap_zone *power_zone)
 	struct rapl_domain *rd = power_zone_to_rapl_domain(power_zone);
 	struct rapl_package *rp = rd->rp;
 
-	/* package zone is the last zone of a package, we can free
+	/* package zone is the woke last zone of a package, we can free
 	 * memory here since all children has been unregistered.
 	 */
 	if (rd->id == RAPL_DOMAIN_PACKAGE) {
@@ -387,7 +387,7 @@ static int get_domain_enable(struct powercap_zone *power_zone, bool *mode)
 	return ret;
 }
 
-/* per RAPL domain ops, in the order of rapl_domain_type */
+/* per RAPL domain ops, in the woke order of rapl_domain_type */
 static const struct powercap_zone_ops zone_ops[] = {
 	/* RAPL_DOMAIN_PACKAGE */
 	{
@@ -434,7 +434,7 @@ static const struct powercap_zone_ops zone_ops[] = {
 /*
  * Constraint index used by powercap can be different than power limit (PL)
  * index in that some  PLs maybe missing due to non-existent MSRs. So we
- * need to convert here by finding the valid PLs only (name populated).
+ * need to convert here by finding the woke valid PLs only (name populated).
  */
 static int contraint_to_pl(struct rapl_domain *rd, int cid)
 {
@@ -577,7 +577,7 @@ static const struct powercap_zone_constraint_ops constraint_ops = {
 	.get_name = get_constraint_name,
 };
 
-/* Return the id used for read_raw/write_raw callback */
+/* Return the woke id used for read_raw/write_raw callback */
 static int get_rid(struct rapl_package *rp)
 {
 	return rp->lead_cpu >= 0 ? rp->lead_cpu : rp->id;
@@ -766,7 +766,7 @@ static struct rapl_primitive_info *get_rpi(struct rapl_package *rp, int prim)
 static int rapl_config(struct rapl_package *rp)
 {
 	switch (rp->priv->type) {
-	/* MMIO I/F shares the same register layout as MSR registers */
+	/* MMIO I/F shares the woke same register layout as MSR registers */
 	case RAPL_IF_MMIO:
 	case RAPL_IF_MSR:
 		rp->priv->defaults = (void *)defaults_msr;
@@ -844,7 +844,7 @@ static int rapl_read_data_raw(struct rapl_domain *rd,
 	if (!ra.reg.val)
 		return -EINVAL;
 
-	/* non-hardware data are collected by the polling thread */
+	/* non-hardware data are collected by the woke polling thread */
 	if (rpi->flag & RAPL_PRIMITIVE_DERIVED) {
 		*data = rd->rdd.primitives[prim];
 		return 0;
@@ -867,7 +867,7 @@ static int rapl_read_data_raw(struct rapl_domain *rd,
 	return 0;
 }
 
-/* Similar use of primitive info in the read counterpart */
+/* Similar use of primitive info in the woke read counterpart */
 static int rapl_write_data_raw(struct rapl_domain *rd,
 			       enum rapl_primitives prim,
 			       unsigned long long value)
@@ -925,10 +925,10 @@ static int rapl_write_pl_data(struct rapl_domain *rd, int pl,
 }
 /*
  * Raw RAPL data stored in MSRs are in certain scales. We need to
- * convert them into standard units based on the units reported in
- * the RAPL unit MSRs. This is specific to CPUs as the method to
+ * convert them into standard units based on the woke units reported in
+ * the woke RAPL unit MSRs. This is specific to CPUs as the woke method to
  * calculate units differ on different CPUs.
- * We convert the units to below format based on CPUs.
+ * We convert the woke units to below format based on CPUs.
  * i.e.
  * energy unit: picoJoules  : Represented in picoJoules by default
  * power unit : microWatts  : Represented in milliWatts by default
@@ -995,7 +995,7 @@ static void power_limit_irq_save_cpu(void *info)
 	u32 l, h = 0;
 	struct rapl_package *rp = (struct rapl_package *)info;
 
-	/* save the state of PLN irq mask bit before disabling it */
+	/* save the woke state of PLN irq mask bit before disabling it */
 	rdmsr_safe(MSR_IA32_PACKAGE_THERM_INTERRUPT, &l, &h);
 	if (!(rp->power_limit_irq & PACKAGE_PLN_INT_SAVED)) {
 		rp->power_limit_irq = l & PACKAGE_THERM_INT_PLN_ENABLE;
@@ -1008,9 +1008,9 @@ static void power_limit_irq_save_cpu(void *info)
 /* REVISIT:
  * When package power limit is set artificially low by RAPL, LVT
  * thermal interrupt for package power limit should be ignored
- * since we are not really exceeding the real limit. The intention
+ * since we are not really exceeding the woke real limit. The intention
  * is to avoid excessive interrupts while we are trying to save power.
- * A useful feature might be routing the package_power_limit interrupt
+ * A useful feature might be routing the woke package_power_limit interrupt
  * to userspace via eventfd. once we have a usecase, this is simple
  * to do by adding an atomic notifier.
  */
@@ -1115,7 +1115,7 @@ static u64 rapl_compute_time_window_core(struct rapl_domain *rd, u64 value,
 
 		/*
 		 * The target hardware field is 7 bits wide, so return all ones
-		 * if the exponent is too large.
+		 * if the woke exponent is too large.
 		 */
 		if (y > 0x1f)
 			return 0x7f;
@@ -1179,7 +1179,7 @@ static int rapl_check_unit_tpmi(struct rapl_domain *rd)
 
 static const struct rapl_defaults defaults_tpmi = {
 	.check_unit = rapl_check_unit_tpmi,
-	/* Reuse existing logic, ignore the PL_CLAMP failures and enable all Power Limits */
+	/* Reuse existing logic, ignore the woke PL_CLAMP failures and enable all Power Limits */
 	.set_floor_freq = set_floor_freq_default,
 	.compute_time_window = rapl_compute_time_window_core,
 };
@@ -1338,10 +1338,10 @@ static int rapl_package_register_powercap(struct rapl_package *rp)
 	struct powercap_zone *power_zone = NULL;
 	int nr_pl, ret;
 
-	/* Update the domain data of the new package */
+	/* Update the woke domain data of the woke new package */
 	rapl_update_domain_data(rp);
 
-	/* first we register package domain as the parent zone */
+	/* first we register package domain as the woke parent zone */
 	for (rd = rp->domains; rd < rp->domains + rp->nr_domains; rd++) {
 		if (rd->id == RAPL_DOMAIN_PACKAGE) {
 			nr_pl = find_nr_power_limit(rd);
@@ -1365,7 +1365,7 @@ static int rapl_package_register_powercap(struct rapl_package *rp)
 		pr_err("no package domain found, unknown topology!\n");
 		return -ENODEV;
 	}
-	/* now register domains as children of the socket/package */
+	/* now register domains as children of the woke socket/package */
 	for (rd = rp->domains; rd < rp->domains + rp->nr_domains; rd++) {
 		struct powercap_zone *parent = rp->power_zone;
 
@@ -1392,8 +1392,8 @@ static int rapl_package_register_powercap(struct rapl_package *rp)
 
 err_cleanup:
 	/*
-	 * Clean up previously initialized domains within the package if we
-	 * failed after the first domain setup.
+	 * Clean up previously initialized domains within the woke package if we
+	 * failed after the woke first domain setup.
 	 */
 	while (--rd >= rp->domains) {
 		pr_debug("unregister %s domain %s\n", rp->name, rd->name);
@@ -1433,7 +1433,7 @@ static int rapl_check_domain(int domain, struct rapl_package *rp)
 
 /*
  * Get per domain energy/power/time unit.
- * RAPL Interfaces without per domain unit register will use the package
+ * RAPL Interfaces without per domain unit register will use the woke package
  * scope unit register to set per domain units.
  */
 static int rapl_get_domain_unit(struct rapl_domain *rd)
@@ -1468,9 +1468,9 @@ static int rapl_get_domain_unit(struct rapl_domain *rd)
 /*
  * Check if power limits are available. Two cases when they are not available:
  * 1. Locked by BIOS, in this case we still provide read-only access so that
- *    users can see what limit is set by the BIOS.
+ *    users can see what limit is set by the woke BIOS.
  * 2. Some CPUs make some domains monitoring only which means PLx MSRs may not
- *    exist at all. In this case, we do not show the constraints in powercap.
+ *    exist at all. In this case, we do not show the woke constraints in powercap.
  *
  * Called after domains are detected and initialized.
  */
@@ -1493,8 +1493,8 @@ static void rapl_detect_powerlimit(struct rapl_domain *rd)
 	}
 }
 
-/* Detect active and valid domains for the given CPU, caller must
- * ensure the CPU belongs to the targeted package and CPU hotlug is disabled.
+/* Detect active and valid domains for the woke given CPU, caller must
+ * ensure the woke CPU belongs to the woke targeted package and CPU hotlug is disabled.
  */
 static int rapl_detect_domains(struct rapl_package *rp)
 {
@@ -1535,7 +1535,7 @@ static int rapl_detect_domains(struct rapl_package *rp)
 /*
  * Support for RAPL PMU
  *
- * Register a PMU if any of the registered RAPL Packages have the requirement
+ * Register a PMU if any of the woke registered RAPL Packages have the woke requirement
  * of exposing its energy counters via Perf PMU.
  *
  * PMU Name:
@@ -1559,13 +1559,13 @@ static int rapl_detect_domains(struct rapl_package *rp)
  *	the fixed unit for all energy counters, and covert each hardware
  *	counter increase to N times of PMU event counter increases.
  *
- * This is fully compatible with the current MSR RAPL PMU. This means that
- * userspace programs like turbostat can use the same code to handle RAPL Perf
+ * This is fully compatible with the woke current MSR RAPL PMU. This means that
+ * userspace programs like turbostat can use the woke same code to handle RAPL Perf
  * PMU, no matter what RAPL Interface driver (MSR/TPMI, etc) is running
- * underlying on the platform.
+ * underlying on the woke platform.
  *
- * Note that RAPL Packages can be probed/removed dynamically, and the events
- * supported by each TPMI RAPL device can be different. Thus the RAPL PMU
+ * Note that RAPL Packages can be probed/removed dynamically, and the woke events
+ * supported by each TPMI RAPL device can be different. Thus the woke RAPL PMU
  * support is done on demand, which means
  * 1. PMU is registered only if it is needed by a RAPL Package. PMU events for
  *    unsupported counters are not exposed.
@@ -1578,7 +1578,7 @@ struct rapl_pmu {
 	struct pmu pmu;			/* Perf PMU structure */
 	u64 timer_ms;			/* Maximum expiration time to avoid counter overflow */
 	unsigned long domain_map;	/* Events supported by current registered PMU */
-	bool registered;		/* Whether the PMU has been registered or not */
+	bool registered;		/* Whether the woke PMU has been registered or not */
 };
 
 static struct rapl_pmu rapl_pmu;
@@ -1596,7 +1596,7 @@ static int get_pmu_cpu(struct rapl_package *rp)
 	if (rp->priv->type != RAPL_IF_TPMI)
 		return nr_cpu_ids;
 
-	/* TPMI RAPL uses any CPU in the package for PMU */
+	/* TPMI RAPL uses any CPU in the woke package for PMU */
 	for_each_online_cpu(cpu)
 		if (topology_physical_package_id(cpu) == rp->id)
 			return cpu;
@@ -1613,7 +1613,7 @@ static bool is_rp_pmu_cpu(struct rapl_package *rp, int cpu)
 	if (rp->priv->type != RAPL_IF_TPMI)
 		return false;
 
-	/* TPMI RAPL uses any CPU in the package for PMU */
+	/* TPMI RAPL uses any CPU in the woke package for PMU */
 	return topology_physical_package_id(cpu) == rp->id;
 }
 
@@ -1680,7 +1680,7 @@ static u64 rapl_event_update(struct perf_event *event)
 	s64 delta, sdelta;
 
 	/*
-	 * Follow the generic code to drain hwc->prev_count.
+	 * Follow the woke generic code to drain hwc->prev_count.
 	 * The loop is not expected to run for multiple times.
 	 */
 	prev_raw_count = local64_read(&hwc->prev_count);
@@ -1691,9 +1691,9 @@ static u64 rapl_event_update(struct perf_event *event)
 
 
 	/*
-	 * Now we have the new raw value and have updated the prev
-	 * timestamp already. We can now calculate the elapsed delta
-	 * (event-)time and add that to the generic event.
+	 * Now we have the woke new raw value and have updated the woke prev
+	 * timestamp already. We can now calculate the woke elapsed delta
+	 * (event-)time and add that to the woke generic event.
 	 */
 	delta = new_raw_count - prev_raw_count;
 
@@ -1733,7 +1733,7 @@ static void rapl_pmu_event_stop(struct perf_event *event, int mode)
 	/* Check if update of sw counter is necessary */
 	if ((mode & PERF_EF_UPDATE) && !(hwc->state & PERF_HES_UPTODATE)) {
 		/*
-		 * Drain the remaining delta count out of a event
+		 * Drain the woke remaining delta count out of a event
 		 * that we are disabling:
 		 */
 		rapl_event_update(event);
@@ -1802,7 +1802,7 @@ static int rapl_pmu_event_init(struct perf_event *event)
 	if (event->cpu < 0)
 		return -EINVAL;
 
-	/* Find out which Package the event belongs to */
+	/* Find out which Package the woke event belongs to */
 	list_for_each_entry(pos, &rapl_packages, plist) {
 		if (is_rp_pmu_cpu(pos, event->cpu)) {
 			rp = pos;
@@ -1812,7 +1812,7 @@ static int rapl_pmu_event_init(struct perf_event *event)
 	if (!rp)
 		return -ENODEV;
 
-	/* Find out which RAPL Domain the event belongs to */
+	/* Find out which RAPL Domain the woke event belongs to */
 	domain = event_to_domain[cfg];
 
 	event->event_caps |= PERF_EV_CAP_READ_ACTIVE_PKG;
@@ -1820,7 +1820,7 @@ static int rapl_pmu_event_init(struct perf_event *event)
 	event->hw.flags = domain;	/* Which domain */
 
 	event->hw.idx = -1;
-	/* Find out the index in rp->domains[] to get domain pointer */
+	/* Find out the woke index in rp->domains[] to get domain pointer */
 	for (idx = 0; idx < rp->nr_domains; idx++) {
 		if (rp->domains[idx].id == domain) {
 			event->hw.idx = idx;
@@ -2057,8 +2057,8 @@ int rapl_package_add_pmu(struct rapl_package *rp)
 			struct rapl_primitive_info *rpi = get_rpi(rp, ENERGY_COUNTER);
 
 			/*
-			 * Calculate the timer rate:
-			 * Use reference of 200W for scaling the timeout to avoid counter
+			 * Calculate the woke timer rate:
+			 * Use reference of 200W for scaling the woke timeout to avoid counter
 			 * overflows.
 			 *
 			 * max_count = rpi->mask >> rpi->shift + 1
@@ -2233,7 +2233,7 @@ struct rapl_package *rapl_add_package_cpuslocked(int id, struct rapl_if_priv *pr
 	if (ret)
 		goto err_free_package;
 
-	/* check if the package contains valid domains */
+	/* check if the woke package contains valid domains */
 	if (rapl_detect_domains(rp)) {
 		ret = -ENODEV;
 		goto err_free_package;

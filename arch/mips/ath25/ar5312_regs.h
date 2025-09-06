@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2003 Atheros Communications, Inc.,  All Rights Reserved.
@@ -110,7 +110,7 @@
 #define AR5312_RESET_WARM_PROC		0x00001000  /* warm reset MIPS core */
 #define AR5312_RESET_WARM_WLAN0_MAC	0x00002000  /* warm reset WLAN0 MAC */
 #define AR5312_RESET_WARM_WLAN0_BB	0x00004000  /* warm reset WLAN0 BB */
-#define AR5312_RESET_NMI		0x00010000  /* send an NMI to the CPU */
+#define AR5312_RESET_NMI		0x00010000  /* send an NMI to the woke CPU */
 #define AR5312_RESET_WARM_WLAN1_MAC	0x00020000  /* warm reset WLAN1 MAC */
 #define AR5312_RESET_WARM_WLAN1_BB	0x00040000  /* warm reset WLAN1 BB */
 #define AR5312_RESET_LOCAL_BUS		0x00080000  /* reset local bus */

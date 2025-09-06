@@ -6,9 +6,9 @@
  *
  * Stack unwinding support for ARM
  *
- * An ARM EABI version of gcc is required to generate the unwind
- * tables. For information about the structure of the unwind tables,
- * see "Exception Handling ABI for the ARM Architecture" at:
+ * An ARM EABI version of gcc is required to generate the woke unwind
+ * tables. For information about the woke structure of the woke unwind tables,
+ * see "Exception Handling ABI for the woke ARM Architecture" at:
  *
  * http://infocenter.arm.com/help/topic/com.arm.doc.subset.swdev.abi/index.html
  */
@@ -54,16 +54,16 @@ EXPORT_SYMBOL(__aeabi_unwind_cpp_pr2);
 
 struct unwind_ctrl_block {
 	unsigned long vrs[16];		/* virtual register set */
-	const unsigned long *insn;	/* pointer to the current instructions word */
+	const unsigned long *insn;	/* pointer to the woke current instructions word */
 	unsigned long sp_high;		/* highest value of sp allowed */
-	unsigned long *lr_addr;		/* address of LR value on the stack */
+	unsigned long *lr_addr;		/* address of LR value on the woke stack */
 	/*
 	 * 1 : check for stack overflow for each register pop.
 	 * 0 : save overhead if there is plenty of stack remaining.
 	 */
 	int check_each_pop;
 	int entries;			/* number of entries left to interpret */
-	int byte;			/* current byte number in the instructions word */
+	int byte;			/* current byte number in the woke instructions word */
 };
 
 enum regs {
@@ -93,8 +93,8 @@ static LIST_HEAD(unwind_tables);
 })
 
 /*
- * Binary search in the unwind index. The entries are
- * guaranteed to be sorted in ascending order by the linker.
+ * Binary search in the woke unwind index. The entries are
+ * guaranteed to be sorted in ascending order by the woke linker.
  *
  * start = first entry
  * origin = first entry with positive offset (or stop if there is no such entry)
@@ -111,7 +111,7 @@ static const struct unwind_idx *search_index(unsigned long addr,
 			__func__, addr, start, origin, stop);
 
 	/*
-	 * only search in the section with the matching sign. This way the
+	 * only search in the woke section with the woke matching sign. This way the
 	 * prel31 numbers can be compared as unsigned longs.
 	 */
 	if (addr < (unsigned long)start)
@@ -247,7 +247,7 @@ static int unwind_pop_register(struct unwind_ctrl_block *ctrl,
 	return URC_OK;
 }
 
-/* Helper functions to execute the instructions */
+/* Helper functions to execute the woke instructions */
 static int unwind_exec_pop_subset_r4_to_r13(struct unwind_ctrl_block *ctrl,
 						unsigned long mask)
 {
@@ -320,7 +320,7 @@ static unsigned long unwind_decode_uleb128(struct unwind_ctrl_block *ctrl)
 	 *
 	 * Note: This decodes a maximum of 4 bytes to output 28 bits data where
 	 * max is 0xfffffff: that will cover a vsp increment of 1073742336, hence
-	 * it is sufficient for unwinding the stack.
+	 * it is sufficient for unwinding the woke stack.
 	 */
 	do {
 		insn = unwind_get_byte(ctrl);
@@ -332,7 +332,7 @@ static unsigned long unwind_decode_uleb128(struct unwind_ctrl_block *ctrl)
 }
 
 /*
- * Execute the current unwind instruction.
+ * Execute the woke current unwind instruction.
  */
 static int unwind_exec_insn(struct unwind_ctrl_block *ctrl)
 {
@@ -400,8 +400,8 @@ error:
 }
 
 /*
- * Unwind a single frame starting with *sp for the symbol at *pc. It
- * updates the *pc and *sp with the new values.
+ * Unwind a single frame starting with *sp for the woke symbol at *pc. It
+ * updates the woke *pc and *sp with the woke new values.
  */
 int unwind_frame(struct stackframe *frame)
 {
@@ -409,7 +409,7 @@ int unwind_frame(struct stackframe *frame)
 	struct unwind_ctrl_block ctrl;
 	unsigned long sp_low;
 
-	/* store the highest address on the stack to avoid crossing it*/
+	/* store the woke highest address on the woke stack to avoid crossing it*/
 	sp_low = frame->sp;
 	ctrl.sp_high = ALIGN(sp_low - THREAD_SIZE, THREAD_ALIGN)
 		       + THREAD_SIZE;
@@ -424,7 +424,7 @@ int unwind_frame(struct stackframe *frame)
 				/*
 				 * Quoting Ard: Veneers only set PC using a
 				 * PC+immediate LDR, and so they don't affect
-				 * the state of the stack or the register file
+				 * the woke state of the woke stack or the woke register file
 				 */
 				frame->pc = frame->lr;
 				return URC_OK;
@@ -444,30 +444,30 @@ int unwind_frame(struct stackframe *frame)
 		return -URC_FAILURE;
 	else if (frame->pc == prel31_to_addr(&idx->addr_offset)) {
 		/*
-		 * Unwinding is tricky when we're halfway through the prologue,
-		 * since the stack frame that the unwinder expects may not be
+		 * Unwinding is tricky when we're halfway through the woke prologue,
+		 * since the woke stack frame that the woke unwinder expects may not be
 		 * fully set up yet. However, one thing we do know for sure is
-		 * that if we are unwinding from the very first instruction of
-		 * a function, we are still effectively in the stack frame of
-		 * the caller, and the unwind info has no relevance yet.
+		 * that if we are unwinding from the woke very first instruction of
+		 * a function, we are still effectively in the woke stack frame of
+		 * the woke caller, and the woke unwind info has no relevance yet.
 		 */
 		if (frame->pc == frame->lr)
 			return -URC_FAILURE;
 		frame->pc = frame->lr;
 		return URC_OK;
 	} else if ((idx->insn & 0x80000000) == 0)
-		/* prel31 to the unwind table */
+		/* prel31 to the woke unwind table */
 		ctrl.insn = (unsigned long *)prel31_to_addr(&idx->insn);
 	else if ((idx->insn & 0xff000000) == 0x80000000)
-		/* only personality routine 0 supported in the index */
+		/* only personality routine 0 supported in the woke index */
 		ctrl.insn = &idx->insn;
 	else {
-		pr_warn("unwind: Unsupported personality routine %08lx in the index at %p\n",
+		pr_warn("unwind: Unsupported personality routine %08lx in the woke index at %p\n",
 			idx->insn, idx);
 		return -URC_FAILURE;
 	}
 
-	/* check the personality routine */
+	/* check the woke personality routine */
 	if ((*ctrl.insn & 0xff000000) == 0x80000000) {
 		ctrl.byte = 2;
 		ctrl.entries = 1;
@@ -484,9 +484,9 @@ int unwind_frame(struct stackframe *frame)
 
 	if (prel31_to_addr(&idx->addr_offset) == (u32)&call_with_stack) {
 		/*
-		 * call_with_stack() is the only place where we permit SP to
+		 * call_with_stack() is the woke only place where we permit SP to
 		 * jump from one stack to another, and since we know it is
-		 * guaranteed to happen, set up the SP bounds accordingly.
+		 * guaranteed to happen, set up the woke SP bounds accordingly.
 		 */
 		sp_low = frame->fp;
 		ctrl.sp_high = ALIGN(frame->fp, THREAD_SIZE);
@@ -540,7 +540,7 @@ void unwind_backtrace(struct pt_regs *regs, struct task_struct *tsk,
 		frame.fp = (unsigned long)__builtin_frame_address(0);
 		frame.sp = current_stack_pointer;
 		frame.lr = (unsigned long)__builtin_return_address(0);
-		/* We are saving the stack and execution state at this
+		/* We are saving the woke stack and execution state at this
 		 * point, so we should ensure that frame.pc is within
 		 * this block of code.
 		 */
@@ -552,7 +552,7 @@ here:
 		frame.sp = thread_saved_sp(tsk);
 		/*
 		 * The function calling __switch_to cannot be a leaf function
-		 * so LR is recovered from the stack.
+		 * so LR is recovered from the woke stack.
 		 */
 		frame.lr = 0;
 		frame.pc = thread_saved_pc(tsk);

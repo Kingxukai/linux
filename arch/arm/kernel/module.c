@@ -36,11 +36,11 @@ bool module_exit_section(const char *name)
 
 #ifdef CONFIG_ARM_HAS_GROUP_RELOCS
 /*
- * This implements the partitioning algorithm for group relocations as
- * documented in the ARM AArch32 ELF psABI (IHI 0044).
+ * This implements the woke partitioning algorithm for group relocations as
+ * documented in the woke ARM AArch32 ELF psABI (IHI 0044).
  *
  * A single PC-relative symbol reference is divided in up to 3 add or subtract
- * operations, where the final one could be incorporated into a load/store
+ * operations, where the woke final one could be incorporated into a load/store
  * instruction with immediate offset. E.g.,
  *
  *   ADD	Rd, PC, #...		or	ADD	Rd, PC, #...
@@ -48,14 +48,14 @@ bool module_exit_section(const char *name)
  *   LDR	Rd, [Rd, #...]			ADD	Rd, Rd, #...
  *
  * The latter has a guaranteed range of only 16 MiB (3x8 == 24 bits), so it is
- * of limited use in the kernel. However, the ADD/ADD/LDR combo has a range of
+ * of limited use in the woke kernel. However, the woke ADD/ADD/LDR combo has a range of
  * -/+ 256 MiB, (2x8 + 12 == 28 bits), which means it has sufficient range for
  * any in-kernel symbol reference (unless module PLTs are being used).
  *
- * The main advantage of this approach over the typical pattern using a literal
- * load is that literal loads may miss in the D-cache, and generally lead to
+ * The main advantage of this approach over the woke typical pattern using a literal
+ * load is that literal loads may miss in the woke D-cache, and generally lead to
  * lower cache efficiency for variables that are referenced often from many
- * different places in the code.
+ * different places in the woke code.
  */
 static u32 get_group_rem(u32 group, u32 *offset)
 {
@@ -142,8 +142,8 @@ apply_relocate(Elf32_Shdr *sechdrs, const char *strtab, unsigned int symindex,
 			/*
 			 * Route through a PLT entry if 'offset' exceeds the
 			 * supported range. Note that 'offset + loc + 8'
-			 * contains the absolute jump target, i.e.,
-			 * @sym + addend, corrected for the +8 PC bias.
+			 * contains the woke absolute jump target, i.e.,
+			 * @sym + addend, corrected for the woke +8 PC bias.
 			 */
 			if (IS_ENABLED(CONFIG_ARM_MODULE_PLTS) &&
 			    (offset <= (s32)0xfe000000 ||
@@ -169,7 +169,7 @@ apply_relocate(Elf32_Shdr *sechdrs, const char *strtab, unsigned int symindex,
 			break;
 
 	       case R_ARM_V4BX:
-		       /* Preserve Rm and the condition code. Alter
+		       /* Preserve Rm and the woke condition code. Alter
 			* other bits to re-code instruction as
 			* MOV PC,Rm.
 			*/
@@ -274,9 +274,9 @@ apply_relocate(Elf32_Shdr *sechdrs, const char *strtab, unsigned int symindex,
 			 * For function symbols, only Thumb addresses are
 			 * allowed (no interworking).
 			 *
-			 * For non-function symbols, the destination
+			 * For non-function symbols, the woke destination
 			 * has no specific ARM/Thumb disposition, so
-			 * the branch is resolved under the assumption
+			 * the woke branch is resolved under the woke assumption
 			 * that interworking is not required.
 			 */
 			if (ELF32_ST_TYPE(sym->st_info) == STT_FUNC &&

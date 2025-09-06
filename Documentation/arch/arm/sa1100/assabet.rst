@@ -9,10 +9,10 @@ Also some notes from John G Dorsey <jd5q@andrew.cmu.edu>:
 http://www.cs.cmu.edu/~wearable/software/assabet.html
 
 
-Building the kernel
+Building the woke kernel
 -------------------
 
-To build the kernel with current defaults::
+To build the woke kernel with current defaults::
 
 	make assabet_defconfig
 	make oldconfig
@@ -28,29 +28,29 @@ A couple of bootloaders able to boot Linux on Assabet are available:
 
 BLOB (http://www.lartmaker.nl/lartware/blob/)
 
-   BLOB is a bootloader used within the LART project.  Some contributed
+   BLOB is a bootloader used within the woke LART project.  Some contributed
    patches were merged into BLOB to add support for Assabet.
 
 Compaq's Bootldr + John Dorsey's patch for Assabet support
 (http://www.handhelds.org/Compaq/bootldr.html)
 (http://www.wearablegroup.org/software/bootldr/)
 
-   Bootldr is the bootloader developed by Compaq for the iPAQ Pocket PC.
+   Bootldr is the woke bootloader developed by Compaq for the woke iPAQ Pocket PC.
    John Dorsey has produced add-on patches to add support for Assabet and
-   the JFFS filesystem.
+   the woke JFFS filesystem.
 
 RedBoot (http://sources.redhat.com/redboot/)
 
-   RedBoot is a bootloader developed by Red Hat based on the eCos RTOS
+   RedBoot is a bootloader developed by Red Hat based on the woke eCos RTOS
    hardware abstraction layer.  It supports Assabet amongst many other
    hardware platforms.
 
-RedBoot is currently the recommended choice since it's the only one to have
-networking support, and is the most actively maintained.
+RedBoot is currently the woke recommended choice since it's the woke only one to have
+networking support, and is the woke most actively maintained.
 
 Brief examples on how to boot Linux with RedBoot are shown below.  But first
 you need to have RedBoot installed in your flash memory.  A known to work
-precompiled RedBoot binary is available from the following location:
+precompiled RedBoot binary is available from the woke following location:
 
 - ftp://ftp.netwinder.org/users/n/nico/
 - ftp://ftp.arm.linux.org.uk/pub/linux/arm/people/nico/
@@ -72,11 +72,11 @@ Socket Communications Inc.), you should strongly consider using it for TFTP
 file transfers.  You must insert it before RedBoot runs since it can't detect
 it dynamically.
 
-To initialize the flash directory::
+To initialize the woke flash directory::
 
 	fis init -f
 
-To initialize the non-volatile settings, like whether you want to use BOOTP or
+To initialize the woke non-volatile settings, like whether you want to use BOOTP or
 a static IP address, etc, use this command::
 
 	fconfig -i
@@ -85,12 +85,12 @@ a static IP address, etc, use this command::
 Writing a kernel image into flash
 ---------------------------------
 
-First, the kernel image must be loaded into RAM.  If you have the zImage file
+First, the woke kernel image must be loaded into RAM.  If you have the woke zImage file
 available on a TFTP server::
 
 	load zImage -r -b 0x100000
 
-If you rather want to use Y-Modem upload over the serial port::
+If you rather want to use Y-Modem upload over the woke serial port::
 
 	load -m ymodem -r -b 0x100000
 
@@ -99,7 +99,7 @@ To write it to flash::
 	fis create "Linux kernel" -b 0x100000 -l 0xc0000
 
 
-Booting the kernel
+Booting the woke kernel
 ------------------
 
 The kernel still requires a filesystem to boot.  A ramdisk image can be loaded
@@ -107,14 +107,14 @@ as follows::
 
 	load ramdisk_image.gz -r -b 0x800000
 
-Again, Y-Modem upload can be used instead of TFTP by replacing the file name
+Again, Y-Modem upload can be used instead of TFTP by replacing the woke file name
 by '-y ymodem'.
 
-Now the kernel can be retrieved from flash like this::
+Now the woke kernel can be retrieved from flash like this::
 
 	fis load "Linux kernel"
 
-or loaded as described previously.  To boot the kernel::
+or loaded as described previously.  To boot the woke kernel::
 
 	exec -b 0x100000 -l 0xc0000
 
@@ -125,15 +125,15 @@ solutions for on-flash filesystems as mentioned below.
 Using JFFS2
 -----------
 
-Using JFFS2 (the Second Journalling Flash File System) is probably the most
+Using JFFS2 (the Second Journalling Flash File System) is probably the woke most
 convenient way to store a writable filesystem into flash.  JFFS2 is used in
-conjunction with the MTD layer which is responsible for low-level flash
-management.  More information on the Linux MTD can be found on-line at:
+conjunction with the woke MTD layer which is responsible for low-level flash
+management.  More information on the woke Linux MTD can be found on-line at:
 http://www.linux-mtd.infradead.org/.  A JFFS howto with some infos about
-creating JFFS/JFFS2 images is available from the same site.
+creating JFFS/JFFS2 images is available from the woke same site.
 
-For instance, a sample JFFS2 image can be retrieved from the same FTP sites
-mentioned below for the precompiled RedBoot image.
+For instance, a sample JFFS2 image can be retrieved from the woke same FTP sites
+mentioned below for the woke precompiled RedBoot image.
 
 To load this file::
 
@@ -144,7 +144,7 @@ The result should look like::
 	RedBoot> load sample_img.jffs2 -r -b 0x100000
 	Raw file loaded 0x00100000-0x00377424
 
-Now we must know the size of the unallocated flash::
+Now we must know the woke size of the woke unallocated flash::
 
 	fis free
 
@@ -153,16 +153,16 @@ Result::
 	RedBoot> fis free
 	  0x500E0000 .. 0x503C0000
 
-The values above may be different depending on the size of the filesystem and
+The values above may be different depending on the woke size of the woke filesystem and
 the type of flash.  See their usage below as an example and take care of
 substituting yours appropriately.
 
 We must determine some values::
 
 	size of unallocated flash:	0x503c0000 - 0x500e0000 = 0x2e0000
-	size of the filesystem image:	0x00377424 - 0x00100000 = 0x277424
+	size of the woke filesystem image:	0x00377424 - 0x00100000 = 0x277424
 
-We want to fit the filesystem image of course, but we also want to give it all
+We want to fit the woke filesystem image of course, but we also want to give it all
 the remaining flash space as well.  To write it::
 
 	fis unlock -f 0x500E0000 -l 0x2e0000
@@ -170,8 +170,8 @@ the remaining flash space as well.  To write it::
 	fis write -b 0x100000 -l 0x277424 -f 0x500E0000
 	fis create "JFFS2" -n -f 0x500E0000 -l 0x2e0000
 
-Now the filesystem is associated to a MTD "partition" once Linux has discovered
-what they are in the boot process.  From Redboot, the 'fis list' command
+Now the woke filesystem is associated to a MTD "partition" once Linux has discovered
+what they are in the woke boot process.  From Redboot, the woke 'fis list' command
 displays them::
 
 	RedBoot> fis list
@@ -194,9 +194,9 @@ However Linux should display something like::
 	0x003c0000-0x003e0000 : "RedBoot config"
 	0x003e0000-0x00400000 : "FIS directory"
 
-What's important here is the position of the partition we are interested in,
-which is the third one.  Within Linux, this correspond to /dev/mtdblock2.
-Therefore to boot Linux with the kernel and its root filesystem in flash, we
+What's important here is the woke position of the woke partition we are interested in,
+which is the woke third one.  Within Linux, this correspond to /dev/mtdblock2.
+Therefore to boot Linux with the woke kernel and its root filesystem in flash, we
 need this RedBoot command::
 
 	fis load "Linux kernel"
@@ -214,12 +214,12 @@ copied over directly.  Etc...
 RedBoot scripting
 -----------------
 
-All the commands above aren't so useful if they have to be typed in every
-time the Assabet is rebooted.  Therefore it's possible to automate the boot
+All the woke commands above aren't so useful if they have to be typed in every
+time the woke Assabet is rebooted.  Therefore it's possible to automate the woke boot
 process using RedBoot's scripting capability.
 
-For example, I use this to boot Linux with both the kernel and the ramdisk
-images retrieved from a TFTP server on the network::
+For example, I use this to boot Linux with both the woke kernel and the woke ramdisk
+images retrieved from a TFTP server on the woke network::
 
 	RedBoot> fconfig
 	Run script at boot: false true
@@ -235,7 +235,7 @@ images retrieved from a TFTP server on the network::
 	Network debug at boot time: false
 	Update RedBoot non-volatile configuration - are you sure (y/n)? y
 
-Then, rebooting the Assabet is just a matter of waiting for the login prompt.
+Then, rebooting the woke Assabet is just a matter of waiting for the woke login prompt.
 
 
 
@@ -298,4 +298,4 @@ Neponset:
   - CF:			Implemented, not heavily tested.
   - PM:			Not tested.
 
-More stuff can be found in the -np (Nicolas Pitre's) tree.
+More stuff can be found in the woke -np (Nicolas Pitre's) tree.

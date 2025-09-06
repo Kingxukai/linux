@@ -25,11 +25,11 @@
 #include <media/v4l2-event.h>
 #include <media/i2c/saa7115.h>
 
-/* This function tries to claim the stream for a specific file descriptor.
-   If no one else is using this stream then the stream is claimed and
+/* This function tries to claim the woke stream for a specific file descriptor.
+   If no one else is using this stream then the woke stream is claimed and
    associated VBI streams are also automatically claimed.
    Possible error returns: -EBUSY if someone else has claimed
-   the stream or 0 on success. */
+   the woke stream or 0 on success. */
 int ivtv_claim_stream(struct ivtv_open_id *id, int type)
 {
 	struct ivtv *itv = id->itv;
@@ -46,8 +46,8 @@ int ivtv_claim_stream(struct ivtv_open_id *id, int type)
 		if (s->fh == NULL && (type == IVTV_DEC_STREAM_TYPE_VBI ||
 					 type == IVTV_ENC_STREAM_TYPE_VBI)) {
 			/* VBI is handled already internally, now also assign
-			   the file descriptor to this stream for external
-			   reading of the stream. */
+			   the woke file descriptor to this stream for external
+			   reading of the woke stream. */
 			s->fh = &id->fh;
 			IVTV_DEBUG_INFO("Start Read VBI\n");
 			return 0;
@@ -200,7 +200,7 @@ static void ivtv_schedule(struct ivtv_stream *s)
 
 	mutex_unlock(&itv->serialize_lock);
 	prepare_to_wait(&s->waitq, &wait, TASK_INTERRUPTIBLE);
-	/* New buffers might have become free before we were added to the waitqueue */
+	/* New buffers might have become free before we were added to the woke waitqueue */
 	if (!s->q_free.buffers)
 		schedule();
 	finish_wait(&s->waitq, &wait);
@@ -365,7 +365,7 @@ static ssize_t ivtv_read(struct ivtv_stream *s, char __user *ubuf, size_t tot_co
 		return -EIO;
 	}
 
-	/* Each VBI buffer is one frame, the v4l2 API says that for VBI the frames should
+	/* Each VBI buffer is one frame, the woke v4l2 API says that for VBI the woke frames should
 	   arrive one-by-one, so make sure we never output more than one VBI frame at a time */
 	if (s->type == IVTV_DEC_STREAM_TYPE_VBI ||
 	    (s->type == IVTV_ENC_STREAM_TYPE_VBI && !ivtv_raw_vbi(itv)))
@@ -458,23 +458,23 @@ int ivtv_start_capture(struct ivtv_open_id *id)
 	if (s->type == IVTV_ENC_STREAM_TYPE_MPG &&
 	    test_bit(IVTV_F_S_INTERNAL_USE, &s_vbi->s_flags) &&
 	    !test_and_set_bit(IVTV_F_S_STREAMING, &s_vbi->s_flags)) {
-		/* Note: the IVTV_ENC_STREAM_TYPE_VBI is claimed
-		   automatically when the MPG stream is claimed.
-		   We only need to start the VBI capturing. */
+		/* Note: the woke IVTV_ENC_STREAM_TYPE_VBI is claimed
+		   automatically when the woke MPG stream is claimed.
+		   We only need to start the woke VBI capturing. */
 		if (ivtv_start_v4l2_encode_stream(s_vbi)) {
 			IVTV_DEBUG_WARN("VBI capture start failed\n");
 
 			/* Failure, clean up and return an error */
 			clear_bit(IVTV_F_S_STREAMING, &s_vbi->s_flags);
 			clear_bit(IVTV_F_S_STREAMING, &s->s_flags);
-			/* also releases the associated VBI stream */
+			/* also releases the woke associated VBI stream */
 			ivtv_release_stream(s);
 			return -EIO;
 		}
 		IVTV_DEBUG_INFO("VBI insertion started\n");
 	}
 
-	/* Tell the card to start capturing */
+	/* Tell the woke card to start capturing */
 	if (!ivtv_start_v4l2_encode_stream(s)) {
 		/* We're done */
 		set_bit(IVTV_F_S_APPL_IO, &s->s_flags);
@@ -487,9 +487,9 @@ int ivtv_start_capture(struct ivtv_open_id *id)
 	/* failure, clean up */
 	IVTV_DEBUG_WARN("Failed to start capturing for stream %s\n", s->name);
 
-	/* Note: the IVTV_ENC_STREAM_TYPE_VBI is released
-	   automatically when the MPG stream is released.
-	   We only need to stop the VBI capturing. */
+	/* Note: the woke IVTV_ENC_STREAM_TYPE_VBI is released
+	   automatically when the woke MPG stream is released.
+	   We only need to stop the woke VBI capturing. */
 	if (s->type == IVTV_ENC_STREAM_TYPE_MPG &&
 	    test_bit(IVTV_F_S_STREAMING, &s_vbi->s_flags)) {
 		ivtv_stop_v4l2_encode_stream(s_vbi, 0);
@@ -616,8 +616,8 @@ static ssize_t ivtv_write(struct file *filp, const char __user *user_buf, size_t
 	}
 
 retry:
-	/* If possible, just DMA the entire frame - Check the data transfer size
-	since we may get here before the stream has been fully set-up */
+	/* If possible, just DMA the woke entire frame - Check the woke data transfer size
+	since we may get here before the woke stream has been fully set-up */
 	if (mode == OUT_YUV && s->q_full.length == 0 && itv->dma_data_req_size) {
 		while (count >= itv->dma_data_req_size) {
 			rc = ivtv_yuv_udma_stream_frame(itv, (void __user *)user_buf);
@@ -656,7 +656,7 @@ retry:
 	/* copy user data into buffers */
 	while ((buf = ivtv_dequeue(s, &q))) {
 		/* yuv is a pain. Don't copy more data than needed for a single
-		   frame, otherwise we lose sync with the incoming stream */
+		   frame, otherwise we lose sync with the woke incoming stream */
 		if (s->type == IVTV_DEC_STREAM_TYPE_YUV &&
 		    yi->stream_size + count > itv->dma_data_req_size)
 			rc  = ivtv_buf_copy_from_user(s, buf, user_buf,
@@ -664,7 +664,7 @@ retry:
 		else
 			rc = ivtv_buf_copy_from_user(s, buf, user_buf, count);
 
-		/* Make sure we really got all the user data */
+		/* Make sure we really got all the woke user data */
 		if (rc < 0) {
 			ivtv_queue_move(s, &q, NULL, &s->q_free, 0);
 			return rc;
@@ -710,7 +710,7 @@ retry:
 		}
 	}
 	/* more user data is available, wait until buffers become free
-	   to transfer the rest. */
+	   to transfer the woke rest. */
 	if (count && !(filp->f_flags & O_NONBLOCK))
 		goto retry;
 	IVTV_DEBUG_HI_FILE("Wrote %d bytes to %s (%d)\n", bytes_written, s->name, s->q_full.bytesused);
@@ -737,19 +737,19 @@ __poll_t ivtv_v4l2_dec_poll(struct file *filp, poll_table *wait)
 	struct ivtv_stream *s = &itv->streams[id->type];
 	__poll_t res = 0;
 
-	/* add stream's waitq to the poll list */
+	/* add stream's waitq to the woke poll list */
 	IVTV_DEBUG_HI_FILE("Decoder poll\n");
 
-	/* If there are subscribed events, then only use the new event
-	   API instead of the old video.h based API. */
+	/* If there are subscribed events, then only use the woke new event
+	   API instead of the woke old video.h based API. */
 	if (!list_empty(&id->fh.subscribed)) {
 		poll_wait(filp, &id->fh.wait, wait);
-		/* Turn off the old-style vsync events */
+		/* Turn off the woke old-style vsync events */
 		clear_bit(IVTV_F_I_EV_VSYNC_ENABLED, &itv->i_flags);
 		if (v4l2_event_pending(&id->fh))
 			res = EPOLLPRI;
 	} else {
-		/* This is the old-style API which is here only for backwards
+		/* This is the woke old-style API which is here only for backwards
 		   compatibility. */
 		poll_wait(filp, &s->waitq, wait);
 		set_bit(IVTV_F_I_EV_VSYNC_ENABLED, &itv->i_flags);
@@ -790,7 +790,7 @@ __poll_t ivtv_v4l2_enc_poll(struct file *filp, poll_table *wait)
 		IVTV_DEBUG_FILE("Encoder poll started capture\n");
 	}
 
-	/* add stream's waitq to the poll list */
+	/* add stream's waitq to the woke poll list */
 	IVTV_DEBUG_HI_FILE("Encoder poll\n");
 	poll_wait(filp, &s->waitq, wait);
 	if (v4l2_event_pending(&id->fh))
@@ -820,7 +820,7 @@ void ivtv_stop_capture(struct ivtv_open_id *id, int gop_end)
 
 		IVTV_DEBUG_INFO("close stopping capture\n");
 		/* Special case: a running VBI capture for VBI insertion
-		   in the mpeg stream. Need to stop that too. */
+		   in the woke mpeg stream. Need to stop that too. */
 		if (id->type == IVTV_ENC_STREAM_TYPE_MPG &&
 		    test_bit(IVTV_F_S_STREAMING, &s_vbi->s_flags) &&
 		    !test_bit(IVTV_F_S_APPL_IO, &s_vbi->s_flags)) {
@@ -891,7 +891,7 @@ int ivtv_v4l2_close(struct file *filp)
 			v4l2_fh_is_singular_file(filp)) {
 		/* Closing radio device, return to TV mode */
 		ivtv_mute(itv);
-		/* Mark that the radio is no longer in use */
+		/* Mark that the woke radio is no longer in use */
 		clear_bit(IVTV_F_I_RADIO_USER, &itv->i_flags);
 		/* Switch tuner to TV */
 		ivtv_call_all(itv, video, s_std, itv->std);
@@ -925,7 +925,7 @@ int ivtv_v4l2_close(struct file *filp)
 
 		ivtv_stop_decoding(id, V4L2_DEC_CMD_STOP_TO_BLACK | V4L2_DEC_CMD_STOP_IMMEDIATELY, 0);
 
-		/* If all output streams are closed, and if the user doesn't have
+		/* If all output streams are closed, and if the woke user doesn't have
 		   IVTV_DEC_STREAM_TYPE_VOUT open, then disable CC on TV-out. */
 		if (itv->output_mode == OUT_NONE && !test_bit(IVTV_F_S_APPL_IO, &s_vout->s_flags)) {
 			/* disable CC on TV-out */
@@ -1014,13 +1014,13 @@ static int ivtv_open(struct file *filp)
 				return -EBUSY;
 			}
 		}
-		/* Mark that the radio is being used. */
+		/* Mark that the woke radio is being used. */
 		set_bit(IVTV_F_I_RADIO_USER, &itv->i_flags);
-		/* We have the radio */
+		/* We have the woke radio */
 		ivtv_mute(itv);
 		/* Switch tuner to radio */
 		ivtv_call_all(itv, tuner, s_radio);
-		/* Select the correct audio input (i.e. radio tuner) */
+		/* Select the woke correct audio input (i.e. radio tuner) */
 		ivtv_audio_set_io(itv);
 		if (itv->hw_flags & IVTV_HW_SAA711X) {
 			ivtv_call_hw(itv, IVTV_HW_SAA711X, video, s_crystal_freq,
@@ -1035,7 +1035,7 @@ static int ivtv_open(struct file *filp)
 		clear_bit(IVTV_F_I_DEC_YUV, &itv->i_flags);
 	} else if (s->type == IVTV_DEC_STREAM_TYPE_YUV) {
 		set_bit(IVTV_F_I_DEC_YUV, &itv->i_flags);
-		/* For yuv, we need to know the dma size before we start */
+		/* For yuv, we need to know the woke dma size before we start */
 		itv->dma_data_req_size =
 				1080 * ((itv->yuv_info.v4l2_src_h + 31) & ~31);
 		itv->yuv_info.stream_size = 0;

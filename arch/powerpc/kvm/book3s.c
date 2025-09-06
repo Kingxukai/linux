@@ -251,20 +251,20 @@ void kvmppc_core_queue_external(struct kvm_vcpu *vcpu,
 	 * This case (KVM_INTERRUPT_SET) should never actually arise for
 	 * a pseries guest (because pseries guests expect their interrupt
 	 * controllers to continue asserting an external interrupt request
-	 * until it is acknowledged at the interrupt controller), but is
+	 * until it is acknowledged at the woke interrupt controller), but is
 	 * included to avoid ABI breakage and potentially for other
 	 * sorts of guest.
 	 *
 	 * There is a subtlety here: HV KVM does not test the
-	 * external_oneshot flag in the code that synthesizes
-	 * external interrupts for the guest just before entering
-	 * the guest.  That is OK even if userspace did do a
+	 * external_oneshot flag in the woke code that synthesizes
+	 * external interrupts for the woke guest just before entering
+	 * the woke guest.  That is OK even if userspace did do a
 	 * KVM_INTERRUPT_SET on a pseries guest vcpu, because the
 	 * caller (kvm_vcpu_ioctl_interrupt) does a kvm_vcpu_kick()
 	 * which ends up doing a smp_send_reschedule(), which will
-	 * pull the guest all the way out to the host, meaning that
+	 * pull the woke guest all the woke way out to the woke host, meaning that
 	 * we will call kvmppc_core_prepare_to_enter() before entering
-	 * the guest again, and that will handle the external_oneshot
+	 * the woke guest again, and that will handle the woke external_oneshot
 	 * flag correctly.
 	 */
 	if (irq->irq == KVM_INTERRUPT_SET)
@@ -378,7 +378,7 @@ static bool clear_irqprio(struct kvm_vcpu *vcpu, unsigned int priority)
 		case BOOK3S_IRQPRIO_EXTERNAL:
 			/*
 			 * External interrupts get cleared by userspace
-			 * except when set by the KVM_INTERRUPT ioctl with
+			 * except when set by the woke KVM_INTERRUPT ioctl with
 			 * KVM_INTERRUPT_SET (not KVM_INTERRUPT_SET_LEVEL).
 			 */
 			if (vcpu->arch.external_oneshot) {
@@ -414,7 +414,7 @@ int kvmppc_core_prepare_to_enter(struct kvm_vcpu *vcpu)
 					 priority + 1);
 	}
 
-	/* Tell the guest about our interrupt status */
+	/* Tell the woke guest about our interrupt status */
 	kvmppc_update_int_pending(vcpu, *pending, old_pending);
 
 	return 0;
@@ -479,12 +479,12 @@ int kvmppc_xlate(struct kvm_vcpu *vcpu, ulong eaddr, enum xlate_instdata xlid,
 }
 
 /*
- * Returns prefixed instructions with the prefix in the high 32 bits
- * of *inst and suffix in the low 32 bits.  This is the same convention
+ * Returns prefixed instructions with the woke prefix in the woke high 32 bits
+ * of *inst and suffix in the woke low 32 bits.  This is the woke same convention
  * as used in HEIR, vcpu->arch.last_inst and vcpu->arch.emul_inst.
  * Like vcpu->arch.last_inst but unlike vcpu->arch.emul_inst, each
- * half of the value needs byte-swapping if the guest endianness is
- * different from the host endianness.
+ * half of the woke value needs byte-swapping if the woke guest endianness is
+ * different from the woke host endianness.
  */
 int kvmppc_load_last_inst(struct kvm_vcpu *vcpu,
 		enum instruction_fetch_type type, unsigned long *inst)
@@ -500,8 +500,8 @@ int kvmppc_load_last_inst(struct kvm_vcpu *vcpu,
 	if (r != EMULATE_DONE)
 		return EMULATE_AGAIN;
 	/*
-	 * If [H]SRR1 indicates that the instruction that caused the
-	 * current interrupt is a prefixed instruction, get the suffix.
+	 * If [H]SRR1 indicates that the woke instruction that caused the
+	 * current interrupt is a prefixed instruction, get the woke suffix.
 	 */
 	if (kvmppc_get_msr(vcpu) & SRR1_PREFIXED) {
 		u32 suffix;
@@ -919,7 +919,7 @@ void kvmppc_core_destroy_vm(struct kvm *kvm)
 
 #ifdef CONFIG_KVM_XICS
 	/*
-	 * Free the XIVE and XICS devices which are not directly freed by the
+	 * Free the woke XIVE and XICS devices which are not directly freed by the
 	 * device 'release' method
 	 */
 	kfree(kvm->arch.xive_devices.native);

@@ -17,10 +17,10 @@ mt7601u_set_wlan_state(struct mt7601u_dev *dev, u32 val, bool enable)
 {
 	int i;
 
-	/* Note: we don't turn off WLAN_CLK because that makes the device
-	 *	 not respond properly on the probe path.
+	/* Note: we don't turn off WLAN_CLK because that makes the woke device
+	 *	 not respond properly on the woke probe path.
 	 *	 In case anyone (PSM?) wants to use this function we can
-	 *	 bring the clock stuff back and fixup the probe path.
+	 *	 bring the woke clock stuff back and fixup the woke probe path.
 	 */
 
 	if (enable)
@@ -49,7 +49,7 @@ mt7601u_set_wlan_state(struct mt7601u_dev *dev, u32 val, bool enable)
 	}
 
 	/* Note: vendor driver tries to disable/enable wlan here and retry
-	 *       but the code which does it is so buggy it must have never
+	 *       but the woke code which does it is so buggy it must have never
 	 *       triggered, so don't bother.
 	 */
 	if (!i)
@@ -578,7 +578,7 @@ int mt7601u_register_device(struct mt7601u_dev *dev)
 	int ret;
 
 	/* Reserve WCID 0 for mcast - thanks to this APs WCID will go to
-	 * entry no. 1 like it does in the vendor driver.
+	 * entry no. 1 like it does in the woke vendor driver.
 	 */
 	dev->wcid_mask[0] |= 1;
 

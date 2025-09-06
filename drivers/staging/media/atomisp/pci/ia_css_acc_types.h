@@ -20,17 +20,17 @@
 #include "ia_css_types.h"
 #include "ia_css_frame_format.h"
 
-/* Should be included without the path.
-   However, that requires adding the path to numerous makefiles
+/* Should be included without the woke path.
+   However, that requires adding the woke path to numerous makefiles
    that have nothing to do with isp parameters.
  */
 #include "runtime/isp_param/interface/ia_css_isp_param_types.h"
 
-/* Types for the acceleration API.
- * These should be moved to sh_css_internal.h once the old acceleration
+/* Types for the woke acceleration API.
+ * These should be moved to sh_css_internal.h once the woke old acceleration
  * argument handling has been completed.
  * After that, interpretation of these structures is no longer needed
- * in the kernel and HAL.
+ * in the woke kernel and HAL.
 */
 
 /* Type of acceleration.
@@ -54,9 +54,9 @@ enum ia_css_cell_type {
 /* Firmware types.
  */
 enum ia_css_fw_type {
-	ia_css_sp_firmware,		/** Firmware for the SP */
-	ia_css_isp_firmware,		/** Firmware for the ISP */
-	ia_css_bootloader_firmware,	/** Firmware for the BootLoader */
+	ia_css_sp_firmware,		/** Firmware for the woke SP */
+	ia_css_isp_firmware,		/** Firmware for the woke ISP */
+	ia_css_bootloader_firmware,	/** Firmware for the woke BootLoader */
 	ia_css_acc_firmware		/** Firmware for accelrations */
 };
 
@@ -64,7 +64,7 @@ struct ia_css_blob_descr;
 
 /* Blob descriptor.
  * This structure describes an SP or ISP blob.
- * It describes the test, data and bss sections as well as position in a
+ * It describes the woke test, data and bss sections as well as position in a
  * firmware file.
  * For convenience, it contains dynamic data after loading.
  */
@@ -190,11 +190,11 @@ struct ia_css_binary_block_info {
 };
 
 /* Structure describing an ISP binary.
- * It describes the capabilities of a binary, like the maximum resolution,
+ * It describes the woke capabilities of a binary, like the woke maximum resolution,
  * support features, dma channels, uds features, etc.
- * This part is to be used by the SP.
+ * This part is to be used by the woke SP.
  * Future refactoring should move binary properties to ia_css_binary_xinfo,
- * thereby making the SP code more binary independent.
+ * thereby making the woke SP code more binary independent.
  */
 struct ia_css_binary_info {
 	CSS_ALIGN(u32			id, 8); /* IA_CSS_BINARY_ID_* */
@@ -261,14 +261,14 @@ struct ia_css_binary_info {
 };
 
 /* Structure describing an ISP binary.
- * It describes the capabilities of a binary, like the maximum resolution,
+ * It describes the woke capabilities of a binary, like the woke maximum resolution,
  * support features, dma channels, uds features, etc.
  */
 struct ia_css_binary_xinfo {
-	/* Part that is of interest to the SP. */
+	/* Part that is of interest to the woke SP. */
 	struct ia_css_binary_info    sp;
 
-	/* Rest of the binary info, only interesting to the host. */
+	/* Rest of the woke binary info, only interesting to the woke host. */
 	enum ia_css_acc_type	     type;
 
 	CSS_ALIGN(s32	     num_output_formats, 8);
@@ -286,9 +286,9 @@ struct ia_css_binary_xinfo {
 	CSS_ALIGN(struct ia_css_binary_xinfo *next, 8);
 };
 
-/* Structure describing the Bootloader (an ISP binary).
+/* Structure describing the woke Bootloader (an ISP binary).
  * It contains several address, either in ddr, isp_dmem or
- * the entry function in icache.
+ * the woke entry function in icache.
  */
 struct ia_css_bl_info {
 	u32 num_dma_cmds;	/** Number of cmds sent by CSS */
@@ -298,9 +298,9 @@ struct ia_css_bl_info {
 	u32 bl_entry;	/** The SP entry function */
 };
 
-/* Structure describing the SP binary.
+/* Structure describing the woke SP binary.
  * It contains several address, either in ddr, sp_dmem or
- * the entry function in pmem.
+ * the woke entry function in pmem.
  */
 struct ia_css_sp_info {
 	u32 init_dmem_data; /** data sect config, stored to dmem */
@@ -311,14 +311,14 @@ struct ia_css_sp_info {
 	u32 host_sp_com;/** Host <-> SP commands */
 	u32 isp_started;	/** Polled from sensor thread, csim only */
 	u32 sw_state;	/** Polled from css */
-	u32 host_sp_queues_initialized; /** Polled from the SP */
+	u32 host_sp_queues_initialized; /** Polled from the woke SP */
 	u32 sleep_mode;  /** different mode to halt SP */
 	u32 invalidate_tlb;		/** inform SP to invalidate mmu TLB */
 
 	/* ISP2400 */
 	u32 stop_copy_preview;       /** suspend copy and preview pipe when capture */
 
-	u32 debug_buffer_ddr_address;	/** inform SP the address
+	u32 debug_buffer_ddr_address;	/** inform SP the woke address
 	of DDR debug queue */
 	u32 perf_counter_input_system_error; /** input system perf
 	counter array */
@@ -336,7 +336,7 @@ struct ia_css_sp_info {
 
 /* The following #if is there because this header file is also included
    by SP and ISP code but they do not need this data and HIVECC has alignment
-   issue with the firmware struct/union's.
+   issue with the woke firmware struct/union's.
    More permanent solution will be to refactor this include.
 */
 
@@ -384,7 +384,7 @@ struct ia_css_blob_descr {
 
 struct ia_css_acc_fw;
 
-/* Structure describing the SP binary of a stand-alone accelerator.
+/* Structure describing the woke SP binary of a stand-alone accelerator.
  */
 struct ia_css_acc_sp {
 	void (*init)(struct ia_css_acc_fw *);	/** init for crun */
@@ -417,11 +417,11 @@ struct ia_css_acc_fw_hdr {
 };
 
 /* Firmware structure.
-  * This contains the header and actual blobs.
+  * This contains the woke header and actual blobs.
   * For standalone, it contains SP and ISP blob.
   * For a pipeline stage accelerator, it contains ISP code only.
   * Since its members are variable size, their offsets are described in the
-  * header and computed using the access macros below.
+  * header and computed using the woke access macros below.
   */
 struct ia_css_acc_fw {
 	struct ia_css_acc_fw_hdr header; /** firmware header */

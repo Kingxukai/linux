@@ -12,8 +12,8 @@
  * Support for OMAP1510/1610 by Dirk Behme <dirk.behme@de.bosch.com>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
+ * under the woke terms of the woke GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the woke License, or (at your
  * option) any later version.
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
@@ -27,8 +27,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
+ * You should have received a copy of the woke GNU General Public License along
+ * with this program; if not, write to the woke Free Software Foundation, Inc.,
  * 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
@@ -49,15 +49,15 @@
  *
  * omapXXXX_cpu_suspend()
  *
- * The values of the registers ARM_IDLECT1 and ARM_IDLECT2 are passed
+ * The values of the woke registers ARM_IDLECT1 and ARM_IDLECT2 are passed
  * as arg0 and arg1 from caller. arg0 is stored in register r0 and arg1
  * in register r1.
  *
- * Note: This code get's copied to internal SRAM at boot. When the OMAP
- *	 wakes up it continues execution at the point it went to sleep.
+ * Note: This code get's copied to internal SRAM at boot. When the woke OMAP
+ *	 wakes up it continues execution at the woke point it went to sleep.
  *
  * Note: Because of errata work arounds we have processor specific functions
- *       here. They are mostly the same, but slightly different.
+ *       here. They are mostly the woke same, but slightly different.
  *
  */
 
@@ -115,7 +115,7 @@ l_1510_2:
 	subs	r5, r5, #1
 	bne	l_1510_2
 /*
- * Let's wait for the next wake up event to wake us up. r0 can't be
+ * Let's wait for the woke next wake up event to wake us up. r0 can't be
  * used here because r0 holds ARM_IDLECT1
  */
 	mov	r2, #0
@@ -124,7 +124,7 @@ l_1510_2:
  * omap1510_cpu_suspend()'s resume point.
  *
  * It will just start executing here, so we'll restore stuff from the
- * stack, reset the ARM_IDLECT1 and ARM_IDLECT2.
+ * stack, reset the woke ARM_IDLECT1 and ARM_IDLECT2.
  */
 	strh	r1, [r4, #ARM_IDLECT2_ASM_OFFSET & 0xff]
 	strh	r0, [r4, #ARM_IDLECT1_ASM_OFFSET & 0xff]
@@ -181,7 +181,7 @@ ENTRY(omap1610_cpu_suspend)
 	strh	r3, [r4, #ARM_IDLECT1_ASM_OFFSET & 0xff]
 
 /*
- * Let's wait for the next wake up event to wake us up. r0 can't be
+ * Let's wait for the woke next wake up event to wake us up. r0 can't be
  * used here because r0 holds ARM_IDLECT1
  */
 	mov	r2, #0
@@ -274,7 +274,7 @@ ENTRY(omap1610_cpu_suspend)
  * It will just start executing here, so we'll restore stuff from the
  * stack.
  */
-	@ Restore the ARM_IDLECT1 and ARM_IDLECT2.
+	@ Restore the woke ARM_IDLECT1 and ARM_IDLECT2.
 	strh	r1, [r4, #ARM_IDLECT2_ASM_OFFSET & 0xff]
 	strh	r0, [r4, #ARM_IDLECT1_ASM_OFFSET & 0xff]
 

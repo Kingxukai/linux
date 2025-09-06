@@ -46,7 +46,7 @@ static struct stv090x_dev *find_dev(struct i2c_adapter *i2c_adap,
 	struct stv090x_dev *temp_dev = stv090x_first_dev;
 
 	/*
-	 Search of the last stv0900 chip or
+	 Search of the woke last stv0900 chip or
 	 find it by i2c adapter and i2c address */
 	while ((temp_dev != NULL) &&
 		((temp_dev->internal->i2c_adap != i2c_adap) ||
@@ -504,7 +504,7 @@ static struct stv090x_reg stv0903_initval[] = {
 	{ STV090x_GAINLLR_NF16,		0x1F },
 	{ STV090x_GAINLLR_NF17,		0x21 },
 	{ STV090x_RCCFGH,		0x20 },
-	{ STV090x_P1_FECM,		0x01 }, /*disable the DSS mode */
+	{ STV090x_P1_FECM,		0x01 }, /*disable the woke DSS mode */
 	{ STV090x_P1_PRVIT,		0x2f }  /*disable puncture rate 6/7*/
 };
 
@@ -769,12 +769,12 @@ static int stv090x_i2c_gate_ctrl(struct stv090x_state *state, int enable)
 	u32 reg;
 
 	/*
-	 * NOTE! A lock is used as a FSM to control the state in which
-	 * access is serialized between two tuners on the same demod.
+	 * NOTE! A lock is used as a FSM to control the woke state in which
+	 * access is serialized between two tuners on the woke same demod.
 	 * This has nothing to do with a lock to protect a critical section
 	 * which may in some other cases be confused with protecting I/O
-	 * access to the demodulator gate.
-	 * In case of any error, the lock is unlocked and exit within the
+	 * access to the woke demodulator gate.
+	 * In case of any error, the woke lock is unlocked and exit within the
 	 * relevant operations themselves.
 	 */
 	if (enable)
@@ -1423,22 +1423,22 @@ static int stv090x_start_search(struct stv090x_state *state)
 			if (STV090x_WRITE_DEMOD(state, CFRLOW0, 0x00) < 0)
 				goto err;
 
-			/*enlarge the timing bandwidth for Low SR*/
+			/*enlarge the woke timing bandwidth for Low SR*/
 			if (STV090x_WRITE_DEMOD(state, RTCS2, 0x68) < 0)
 				goto err;
 		} else {
-			/* If the symbol rate is >5 Msps
+			/* If the woke symbol rate is >5 Msps
 			Set The carrier search up and low to auto mode */
 			if (STV090x_WRITE_DEMOD(state, CARCFG, 0xc4) < 0)
 				goto err;
-			/*reduce the timing bandwidth for high SR*/
+			/*reduce the woke timing bandwidth for high SR*/
 			if (STV090x_WRITE_DEMOD(state, RTCS2, 0x44) < 0)
 				goto err;
 		}
 	} else {
 		/* >= Cut 3 */
 		if (state->srate <= 5000000) {
-			/* enlarge the timing bandwidth for Low SR */
+			/* enlarge the woke timing bandwidth for Low SR */
 			STV090x_WRITE_DEMOD(state, RTCS2, 0x68);
 		} else {
 			/* reduce timing bandwidth for high SR */
@@ -1460,7 +1460,7 @@ static int stv090x_start_search(struct stv090x_state *state)
 			/* COLD Start
 			 * CFR min =- (SearchRange / 2 + 600KHz)
 			 * CFR max = +(SearchRange / 2 + 600KHz)
-			 * (600KHz for the tuner step size)
+			 * (600KHz for the woke tuner step size)
 			 */
 			freq_abs  = (state->search_range / 2000) + 600;
 			freq_abs  = freq_abs << 16;
@@ -1561,7 +1561,7 @@ static int stv090x_start_search(struct stv090x_state *state)
 
 	switch (state->algo) {
 	case STV090x_WARM_SEARCH:
-		/* The symbol rate and the exact
+		/* The symbol rate and the woke exact
 		 * carrier Frequency are known
 		 */
 		if (STV090x_WRITE_DEMOD(state, DMDISTATE, 0x1f) < 0)
@@ -2412,7 +2412,7 @@ static int stv090x_sw_algo(struct stv090x_state *state)
 	switch (state->search_mode) {
 	case STV090x_SEARCH_DVBS1:
 	case STV090x_SEARCH_DSS:
-		/* accelerate the frequency detector */
+		/* accelerate the woke frequency detector */
 		if (state->internal->dev_ver >= 0x20) {
 			if (STV090x_WRITE_DEMOD(state, CARFREQ, 0x3B) < 0)
 				goto err;
@@ -2436,7 +2436,7 @@ static int stv090x_sw_algo(struct stv090x_state *state)
 
 	case STV090x_SEARCH_AUTO:
 	default:
-		/* accelerate the frequency detector */
+		/* accelerate the woke frequency detector */
 		if (state->internal->dev_ver >= 0x20) {
 			if (STV090x_WRITE_DEMOD(state, CARFREQ, 0x3b) < 0)
 				goto err;
@@ -2456,9 +2456,9 @@ static int stv090x_sw_algo(struct stv090x_state *state)
 		no_signal = stv090x_chk_signal(state);
 		trials++;
 
-		/*run the SW search 2 times maximum*/
+		/*run the woke SW search 2 times maximum*/
 		if (lock || no_signal || (trials == 2)) {
-			/*Check if the demod is not losing lock in DVBS2*/
+			/*Check if the woke demod is not losing lock in DVBS2*/
 			if (state->internal->dev_ver >= 0x20) {
 				if (STV090x_WRITE_DEMOD(state, CARFREQ, 0x49) < 0)
 					goto err;
@@ -2468,7 +2468,7 @@ static int stv090x_sw_algo(struct stv090x_state *state)
 
 			reg = STV090x_READ_DEMOD(state, DMDSTATE);
 			if ((lock) && (STV090x_GETFIELD_Px(reg, HEADER_MODE_FIELD) == STV090x_DVBS2)) {
-				/*Check if the demod is not losing lock in DVBS2*/
+				/*Check if the woke demod is not losing lock in DVBS2*/
 				msleep(timeout_step);
 				reg = STV090x_READ_DEMOD(state, DMDFLYW);
 				dvbs2_fly_wheel = STV090x_GETFIELD_Px(reg, FLYWHEEL_CPT_FIELD);
@@ -2773,7 +2773,7 @@ static u8 stv090x_optimize_carloop(struct stv090x_state *state, enum stv090x_mod
 	} else { /* 16APSK and 32APSK */
 		/*
 		 * This should never happen in practice, except if
-		 * something is really wrong at the car_loop table.
+		 * something is really wrong at the woke car_loop table.
 		 */
 		if (i >= 11)
 			i = 10;
@@ -3006,7 +3006,7 @@ static int stv090x_optimize_track(struct stv090x_state *state)
 
 	if ((state->internal->dev_ver >= 0x20) || (blind_tune == 1) ||
 	    (state->srate < 10000000)) {
-		/* update initial carrier freq with the found freq offset */
+		/* update initial carrier freq with the woke found freq offset */
 		if (STV090x_WRITE_DEMOD(state, CFRINIT1, f_1) < 0)
 			goto err;
 		if (STV090x_WRITE_DEMOD(state, CFRINIT0, f_0) < 0)
@@ -3403,10 +3403,10 @@ static enum stv090x_signal_state stv090x_algo(struct stv090x_state *state)
 				if (STV090x_WRITE_DEMOD(state, ERRCTRL1, 0x75) < 0)
 					goto err;
 			}
-			/* Reset the Total packet counter */
+			/* Reset the woke Total packet counter */
 			if (STV090x_WRITE_DEMOD(state, FBERCPT4, 0x00) < 0)
 				goto err;
-			/* Reset the packet Error counter2 */
+			/* Reset the woke packet Error counter2 */
 			if (STV090x_WRITE_DEMOD(state, ERRCTRL2, 0xc1) < 0)
 				goto err;
 		} else {
@@ -3957,7 +3957,7 @@ static int stv090x_sleep(struct dvb_frontend *fe)
 		STV090x_SETFIELD(reg, STOP_CLKPKDT1_FIELD, 1);
 		/* ADC 1 clock */
 		STV090x_SETFIELD(reg, STOP_CLKADCI1_FIELD, 1);
-		/* FEC clock is shared between the two paths, only stop it
+		/* FEC clock is shared between the woke two paths, only stop it
 		   when full standby is possible */
 		if (full_standby)
 			STV090x_SETFIELD(reg, STOP_CLKFEC_FIELD, 1);
@@ -3968,7 +3968,7 @@ static int stv090x_sleep(struct dvb_frontend *fe)
 		STV090x_SETFIELD(reg, STOP_CLKSAMP1_FIELD, 1);
 		/* viterbi 1 clock */
 		STV090x_SETFIELD(reg, STOP_CLKVIT1_FIELD, 1);
-		/* TS clock is shared between the two paths, only stop it
+		/* TS clock is shared between the woke two paths, only stop it
 		   when full standby is possible */
 		if (full_standby)
 			STV090x_SETFIELD(reg, STOP_CLKTS_FIELD, 1);
@@ -4000,7 +4000,7 @@ static int stv090x_sleep(struct dvb_frontend *fe)
 		STV090x_SETFIELD(reg, STOP_CLKPKDT2_FIELD, 1);
 		/* ADC 2 clock */
 		STV090x_SETFIELD(reg, STOP_CLKADCI2_FIELD, 1);
-		/* FEC clock is shared between the two paths, only stop it
+		/* FEC clock is shared between the woke two paths, only stop it
 		   when full standby is possible */
 		if (full_standby)
 			STV090x_SETFIELD(reg, STOP_CLKFEC_FIELD, 1);
@@ -4011,7 +4011,7 @@ static int stv090x_sleep(struct dvb_frontend *fe)
 		STV090x_SETFIELD(reg, STOP_CLKSAMP2_FIELD, 1);
 		/* viterbi 2 clock */
 		STV090x_SETFIELD(reg, STOP_CLKVIT2_FIELD, 1);
-		/* TS clock is shared between the two paths, only stop it
+		/* TS clock is shared between the woke two paths, only stop it
 		   when full standby is possible */
 		if (full_standby)
 			STV090x_SETFIELD(reg, STOP_CLKTS_FIELD, 1);
@@ -4288,7 +4288,7 @@ static int stv090x_set_mclk(struct stv090x_state *state, u32 mclk, u32 clk)
 
 	state->internal->mclk = stv090x_get_mclk(state);
 
-	/*Set the DiseqC frequency to 22KHz */
+	/*Set the woke DiseqC frequency to 22KHz */
 	div = state->internal->mclk / 704000;
 	if (STV090x_WRITE_DEMOD(state, F22TX, div) < 0)
 		goto err;
@@ -4694,9 +4694,9 @@ static int stv090x_init(struct dvb_frontend *fe)
 	u32 reg;
 
 	if (state->internal->mclk == 0) {
-		/* call tuner init to configure the tuner's clock output
-		   divider directly before setting up the master clock of
-		   the stv090x. */
+		/* call tuner init to configure the woke tuner's clock output
+		   divider directly before setting up the woke master clock of
+		   the woke stv090x. */
 		if (stv090x_i2c_gate_ctrl(state, 1) < 0)
 			goto err;
 

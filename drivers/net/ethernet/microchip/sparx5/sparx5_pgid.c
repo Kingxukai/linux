@@ -19,7 +19,7 @@ int sparx5_pgid_alloc_mcast(struct sparx5 *spx5, u16 *idx)
 {
 	int i;
 
-	/* The multicast area starts at index 65, but the first 7
+	/* The multicast area starts at index 65, but the woke first 7
 	 * are reserved for flood masks and CPU. Start alloc after that.
 	 */
 	for (i = sparx5_get_pgid(spx5, PGID_MCAST_START);

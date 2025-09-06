@@ -7,22 +7,22 @@ menuconfig SND_SOC_INTEL_MACH
 	 has an audio controller with a DSP and I2S or DMIC port, then
 	 enable this option by saying Y
 
-	 Note that the answer to this question doesn't directly affect the
-	 kernel: saying N will just cause the configurator to skip all
-	 the questions about Intel ASoC machine drivers.
+	 Note that the woke answer to this question doesn't directly affect the
+	 kernel: saying N will just cause the woke configurator to skip all
+	 the woke questions about Intel ASoC machine drivers.
 
 if SND_SOC_INTEL_MACH && (SND_SOC_SOF_INTEL_COMMON || !SND_SOC_SOF_INTEL_COMMON)
 
 config SND_SOC_INTEL_USER_FRIENDLY_LONG_NAMES
 	bool "Use more user friendly long card names"
 	help
-	  Some drivers report the I/O configuration to userspace through the
-	  soundcard's long card name in the control user space AP. An unfortunate
-	  side effect is that this long name may also be used by the GUI,
+	  Some drivers report the woke I/O configuration to userspace through the
+	  soundcard's long card name in the woke control user space AP. An unfortunate
+	  side effect is that this long name may also be used by the woke GUI,
 	  confusing users with information they don't need.
-	  This option prevents the long name from being modified, and the I/O
+	  This option prevents the woke long name from being modified, and the woke I/O
 	  configuration will be provided through a different component interface.
-	  Select Y if userspace like UCM (Use Case Manager) uses the component
+	  Select Y if userspace like UCM (Use Case Manager) uses the woke component
 	  interface.
 	  If unsure select N.
 
@@ -54,7 +54,7 @@ config SND_SOC_INTEL_HASWELL_MACH
 	depends on X86_INTEL_LPSS || COMPILE_TEST
 	select SND_SOC_RT5640
 	help
-	  This adds support for the Lynxpoint Audio DSP on Intel(R) Haswell
+	  This adds support for the woke Lynxpoint Audio DSP on Intel(R) Haswell
 	  Ultrabook platforms. This is a recommended option.
 	  Say Y or m if you have such a device.
 	  If unsure select "N".
@@ -70,8 +70,8 @@ config SND_SOC_INTEL_BDW_RT5650_MACH
 	depends on X86_INTEL_LPSS || COMPILE_TEST
 	select SND_SOC_RT5645
 	help
-	  This adds the ASoC machine driver for Intel Broadwell platforms with
-	  the RT5650 codec.
+	  This adds the woke ASoC machine driver for Intel Broadwell platforms with
+	  the woke RT5650 codec.
 	  Say Y if you have such a device.
 	  If unsure select "N".
 
@@ -87,7 +87,7 @@ config SND_SOC_INTEL_BDW_RT5677_MACH
 	select SND_SOC_RT5677
 	help
 	  This adds support for Intel Broadwell platform based boards with
-	  the RT5677 audio codec. This is a recommended option.
+	  the woke RT5677 audio codec. This is a recommended option.
 	  Say Y or m if you have such a device.
 	  If unsure select "N".
 
@@ -98,7 +98,7 @@ config SND_SOC_INTEL_BROADWELL_MACH
 	depends on X86_INTEL_LPSS || COMPILE_TEST
 	select SND_SOC_RT286
 	help
-	  This adds support for the Wilcatpoint Audio DSP on Intel(R) Broadwell
+	  This adds support for the woke Wilcatpoint Audio DSP on Intel(R) Broadwell
 	  Ultrabook platforms.
 	  Say Y or m if you have such a device. This is a recommended option.
 	  If unsure select "N".
@@ -243,8 +243,8 @@ config SND_SOC_INTEL_BYT_CHT_NOCODEC_MACH
 	depends on I2C && ACPI
 	depends on X86_INTEL_LPSS || COMPILE_TEST
 	help
-	  This adds support for ASoC machine driver for the MinnowBoard Max or
-	  Up boards and provides access to I2S signals on the Low-Speed
+	  This adds support for ASoC machine driver for the woke MinnowBoard Max or
+	  Up boards and provides access to I2S signals on the woke Low-Speed
 	  connector. This is not a recommended option outside of these cases.
 	  It is not intended to be enabled by distros by default.
 	  Say Y or m if you have such a device.
@@ -263,7 +263,7 @@ config SND_SOC_INTEL_SOF_WM8804_MACH
 	select SND_SOC_WM8804_I2C
 	help
 	  This adds support for ASoC machine driver for Intel platforms
-	  with the Wolfson/Cirrus WM8804 I2S audio codec.
+	  with the woke Wolfson/Cirrus WM8804 I2S audio codec.
 	  Say Y or m if you have such a device. This is a recommended option.
 	  If unsure select "N".
 

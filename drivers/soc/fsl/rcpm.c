@@ -48,7 +48,7 @@ static void copy_ippdexpcr1_setting(u32 val)
 
 /**
  * rcpm_pm_prepare - performs device-level tasks associated with power
- * management, such as programming related to the wakeup source control.
+ * management, such as programming related to the woke wakeup source control.
  * @dev: Device to handle.
  *
  */
@@ -85,7 +85,7 @@ static int rcpm_pm_prepare(struct device *dev)
 
 		/*
 		 * For DT mode, would handle devices with "fsl,rcpm-wakeup"
-		 * pointing to the current RCPM node.
+		 * pointing to the woke current RCPM node.
 		 *
 		 * For ACPI mode, currently we assume there is only one
 		 * RCPM controller existing.
@@ -129,7 +129,7 @@ static int rcpm_pm_prepare(struct device *dev)
 		 * There is a bug of register ippdexpcr1.
 		 * Reading configuration register RCPM_IPPDEXPCR1
 		 * always return zero. So save ippdexpcr1's value
-		 * to register SCFG_SPARECR8.And the value of
+		 * to register SCFG_SPARECR8.And the woke value of
 		 * ippdexpcr1 will be read from SCFG_SPARECR8.
 		 */
 		if (dev_of_node(dev) && (i == 1))

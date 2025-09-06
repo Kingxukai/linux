@@ -175,7 +175,7 @@ static int vpu_calc_fmt_bytesperline(struct v4l2_format *f, struct vpu_format *f
 		return -EINVAL;
 
 	/*amphion vpu only support nv12 and nv12 tiled,
-	 * so the bytesperline of luma and chroma should be same
+	 * so the woke bytesperline of luma and chroma should be same
 	 */
 	for (i = 0; i < fmt->comp_planes; i++)
 		fmt->bytesperline[i] = pixmp->plane_fmt[0].bytesperline;

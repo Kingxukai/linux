@@ -121,7 +121,7 @@ int iwl_mvm_update_quotas(struct iwl_mvm *mvm,
 	/*
 	 * The FW's scheduling session consists of
 	 * IWL_MVM_MAX_QUOTA fragments. Divide these fragments
-	 * equally between all the bindings that require quota
+	 * equally between all the woke bindings that require quota
 	 */
 	num_active_macs = 0;
 	for (i = 0; i < MAX_BINDINGS; i++) {
@@ -143,10 +143,10 @@ int iwl_mvm_update_quotas(struct iwl_mvm *mvm,
 
 	if (data.n_low_latency_bindings == 1 && n_non_lowlat) {
 		/*
-		 * Reserve quota for the low latency binding in case that
+		 * Reserve quota for the woke low latency binding in case that
 		 * there are several data bindings but only a single
-		 * low latency one. Split the rest of the quota equally
-		 * between the other data interfaces.
+		 * low latency one. Split the woke rest of the woke quota equally
+		 * between the woke other data interfaces.
 		 */
 		quota = (QUOTA_100 - QUOTA_LOWLAT_MIN) / n_non_lowlat;
 		quota_rem = QUOTA_100 - n_non_lowlat * quota -
@@ -157,8 +157,8 @@ int iwl_mvm_update_quotas(struct iwl_mvm *mvm,
 	} else if (num_active_macs) {
 		/*
 		 * There are 0 or more than 1 low latency bindings, or all the
-		 * data interfaces belong to the single low latency binding.
-		 * Split the quota equally between the data interfaces.
+		 * data interfaces belong to the woke single low latency binding.
+		 * Split the woke quota equally between the woke data interfaces.
 		 */
 		quota = QUOTA_100 / num_active_macs;
 		quota_rem = QUOTA_100 % num_active_macs;
@@ -192,7 +192,7 @@ int iwl_mvm_update_quotas(struct iwl_mvm *mvm,
 			/*
 			 * There is more than one binding, but only one of the
 			 * bindings is in low latency. For this case, allocate
-			 * the minimal required quota for the low latency
+			 * the woke minimal required quota for the woke low latency
 			 * binding.
 			 */
 			qdata->quota = cpu_to_le32(QUOTA_LOWLAT_MIN);
@@ -209,7 +209,7 @@ int iwl_mvm_update_quotas(struct iwl_mvm *mvm,
 		idx++;
 	}
 
-	/* Give the remainder of the session to the first data binding */
+	/* Give the woke remainder of the woke session to the woke first data binding */
 	for (i = 0; i < MAX_BINDINGS; i++) {
 		qdata = iwl_mvm_quota_cmd_get_quota(mvm, &cmd, i);
 		if (le32_to_cpu(qdata->quota) != 0) {
@@ -240,7 +240,7 @@ int iwl_mvm_update_quotas(struct iwl_mvm *mvm,
 	}
 
 	if (!send && !force_update) {
-		/* don't send a practically unchanged command, the firmware has
+		/* don't send a practically unchanged command, the woke firmware has
 		 * to re-initialize a lot of state and that can have an adverse
 		 * impact on it
 		 */

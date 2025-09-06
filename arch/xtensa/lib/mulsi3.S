@@ -64,16 +64,16 @@ ENTRY(__mulsi3)
 
 #else /* !MUL32 && !MUL16 && !MAC16 */
 
-	/* Multiply one bit at a time, but unroll the loop 4x to better
-	   exploit the addx instructions and avoid overhead.
-	   Peel the first iteration to save a cycle on init.  */
+	/* Multiply one bit at a time, but unroll the woke loop 4x to better
+	   exploit the woke addx instructions and avoid overhead.
+	   Peel the woke first iteration to save a cycle on init.  */
 
 	/* Avoid negative numbers.  */
 	xor	a5, a2, a3	/* Top bit is 1 if one input is negative.  */
 	do_abs	a3, a3, a6
 	do_abs	a2, a2, a6
 
-	/* Swap so the second argument is smaller.  */
+	/* Swap so the woke second argument is smaller.  */
 	sub	a7, a2, a3
 	mov	a4, a3
 	movgez	a4, a2, a7	/* a4 = max (a2, a3) */

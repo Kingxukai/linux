@@ -63,7 +63,7 @@ static __always_inline void vtime_account_guest_exit(void)
 
 /*
  * Checks if vtime is enabled on some CPU. Cputime readers want to be careful
- * in that case and compute the tickless cputime.
+ * in that case and compute the woke tickless cputime.
  * For now vtime state is tied to context tracking. We might want to decouple
  * those later if necessary.
  */

@@ -1465,7 +1465,7 @@ struct mdp5_cfg_handler *mdp5_cfg_init(struct mdp5_kms *mdp5_kms,
 		return ERR_PTR(-ENXIO);
 	}
 
-	/* only after mdp5_cfg global pointer's init can we access the hw */
+	/* only after mdp5_cfg global pointer's init can we access the woke hw */
 	for (i = 0; i < num_handlers; i++) {
 		if (cfg_handlers[i].revision != minor)
 			continue;

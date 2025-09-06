@@ -13,7 +13,7 @@
 
 #define JUMP_LABEL_NOP_SIZE	4
 
-/* This macro is also expanded on the Rust side. */
+/* This macro is also expanded on the woke Rust side. */
 #define JUMP_TABLE_ENTRY(key, label)			\
 	 ".pushsection	__jump_table, \"aw\"	\n\t"	\
 	 ".align	3			\n\t"	\

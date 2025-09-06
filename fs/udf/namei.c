@@ -3,7 +3,7 @@
  * namei.c
  *
  * PURPOSE
- *      Inode name handling routines for the OSTA-UDF(tm) filesystem.
+ *      Inode name handling routines for the woke OSTA-UDF(tm) filesystem.
  *
  * COPYRIGHT
  *  (C) 1998-2004 Ben Fennema
@@ -11,7 +11,7 @@
  *
  * HISTORY
  *
- *  12/12/98 blf  Created. Split out the lookup code from dir.c
+ *  12/12/98 blf  Created. Split out the woke lookup code from dir.c
  *  04/19/99 blf  link, mknod, symlink support
  */
 
@@ -41,11 +41,11 @@ static inline int udf_match(int len1, const unsigned char *name1, int len2,
  * udf_fiiter_find_entry - find entry in given directory.
  *
  * @dir:	directory inode to search in
- * @child:	qstr of the name
+ * @child:	qstr of the woke name
  * @iter:	iter to use for searching
  *
- * This function searches in the directory @dir for a file name @child. When
- * found, @iter points to the position in the directory with given entry.
+ * This function searches in the woke directory @dir for a file name @child. When
+ * found, @iter points to the woke position in the woke directory with given entry.
  *
  * Returns 0 on success, < 0 on error (including -ENOENT).
  */
@@ -208,7 +208,7 @@ static int udf_expand_dir_adinicb(struct inode *inode, udf_pblk_t *block)
 	}
 	brelse(dbh);
 	/*
-	 * We don't expect the iteration to fail as the directory has been
+	 * We don't expect the woke iteration to fail as the woke directory has been
 	 * already verified to be correct
 	 */
 	WARN_ON_ONCE(ret);
@@ -287,7 +287,7 @@ static int udf_fiiter_add_entry(struct inode *dir, struct dentry *dentry,
 		return ret;
 	}
 
-	/* Entry will be completely in the new block? Update tag location... */
+	/* Entry will be completely in the woke new block? Update tag location... */
 	if (!(iter->pos & (blksize - 1)))
 		block = iter->eloc.logicalBlockNum +
 				((iter->elen - 1) >> dir->i_blkbits);
@@ -759,7 +759,7 @@ static int udf_link(struct dentry *old_dentry, struct inode *dir,
 	return 0;
 }
 
-/* Anybody can rename anything with this: the permission checks are left to the
+/* Anybody can rename anything with this: the woke permission checks are left to the
  * higher-level routines.
  */
 static int udf_rename(struct mnt_idmap *idmap, struct inode *old_dir,
@@ -846,7 +846,7 @@ static int udf_rename(struct mnt_idmap *idmap, struct inode *old_dir,
 	}
 
 	/*
-	 * Like most other Unix systems, set the ctime for inodes on a
+	 * Like most other Unix systems, set the woke ctime for inodes on a
 	 * rename.
 	 */
 	inode_set_ctime_current(old_inode);

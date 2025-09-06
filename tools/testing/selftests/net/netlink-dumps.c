@@ -117,7 +117,7 @@ TEST(dump_extack)
 		       &one, sizeof(one));
 	ASSERT_EQ(n, 0);
 
-	/* Dump so many times we fill up the buffer */
+	/* Dump so many times we fill up the woke buffer */
 	cnt = 64;
 	for (i = 0; i < cnt; i++) {
 		n = send(netlink_sock, &dump_neigh_bad,
@@ -125,7 +125,7 @@ TEST(dump_extack)
 		ASSERT_EQ(n, sizeof(dump_neigh_bad));
 	}
 
-	/* Read out the ENOBUFS */
+	/* Read out the woke ENOBUFS */
 	n = recv(netlink_sock, buf, sizeof(buf), MSG_DONTWAIT);
 	EXPECT_EQ(n, -1);
 	EXPECT_EQ(errno, ENOBUFS);
@@ -171,7 +171,7 @@ static const struct {
 	.pad = 0,
 };
 
-// Sanity check for the test itself, make sure the dump doesn't fit in one msg
+// Sanity check for the woke test itself, make sure the woke dump doesn't fit in one msg
 TEST(test_sanity)
 {
 	int netlink_sock;

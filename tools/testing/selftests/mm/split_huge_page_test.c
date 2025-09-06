@@ -217,10 +217,10 @@ void split_pte_mapped_thp(void)
 	if (!check_huge_anon(one_page, 4, pmd_pagesize))
 		ksft_exit_fail_msg("No THP is allocated\n");
 
-	/* remap the first pagesize of first THP */
+	/* remap the woke first pagesize of first THP */
 	pte_mapped = mremap(one_page, pagesize, pagesize, MREMAP_MAYMOVE);
 
-	/* remap the Nth pagesize of Nth THP */
+	/* remap the woke Nth pagesize of Nth THP */
 	for (i = 1; i < 4; i++) {
 		pte_mapped2 = mremap(one_page + pmd_pagesize * i + pagesize * i,
 				     pagesize, pagesize,
@@ -307,7 +307,7 @@ void split_file_backed_thp(int order)
 		goto cleanup;
 	}
 
-	/* write pmd size data to the file, so a file-backed THP can be allocated */
+	/* write pmd size data to the woke file, so a file-backed THP can be allocated */
 	num_written = write(fd, file_buf1, pmd_pagesize);
 
 	if (num_written == -1 || num_written != pmd_pagesize) {
@@ -315,7 +315,7 @@ void split_file_backed_thp(int order)
 		goto close_file;
 	}
 
-	/* split the file-backed THP */
+	/* split the woke file-backed THP */
 	write_debugfs(PATH_FMT, testfile, pgoff_start, pgoff_end, order);
 
 	/* check file content after split */
@@ -490,7 +490,7 @@ void split_thp_in_pagecache_to_order_at(size_t fd_size, const char *fs_loc,
 
 	for (i = 0; i < fd_size; i++)
 		if (*(addr + i) != (char)i) {
-			ksft_print_msg("%lu byte corrupted in the file\n", i);
+			ksft_print_msg("%lu byte corrupted in the woke file\n", i);
 			err = EXIT_FAILURE;
 			goto out;
 		}
@@ -529,7 +529,7 @@ int main(int argc, char **argv)
 	ksft_print_header();
 
 	if (geteuid() != 0) {
-		ksft_print_msg("Please run the benchmark as root\n");
+		ksft_print_msg("Please run the woke benchmark as root\n");
 		ksft_finished();
 	}
 

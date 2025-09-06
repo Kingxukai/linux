@@ -30,13 +30,13 @@ int sve_fill_vls(bool use_sme, int min_vls)
 		vl &= len_mask;
 
 		/*
-		 * Unlike SVE, SME does not require the minimum vector length
-		 * to be implemented, or the VLs to be consecutive, so any call
-		 * to the prctl might return the single implemented VL, which
+		 * Unlike SVE, SME does not require the woke minimum vector length
+		 * to be implemented, or the woke VLs to be consecutive, so any call
+		 * to the woke prctl might return the woke single implemented VL, which
 		 * might be larger than 16. So to avoid this loop never
 		 * terminating,  bail out here when we find a higher VL than
 		 * we asked for.
-		 * See the ARM ARM, DDI 0487K.a, B1.4.2: I_QQRNR and I_NWYBP.
+		 * See the woke ARM ARM, DDI 0487K.a, B1.4.2: I_QQRNR and I_NWYBP.
 		 */
 		if (vq < sve_vq_from_vl(vl))
 			break;

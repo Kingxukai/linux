@@ -14,12 +14,12 @@ Author:
 Description
 -----------
 This driver provides glue code connecting a National Semiconductor LM70 LLP
-temperature sensor evaluation board to the kernel's SPI core subsystem.
+temperature sensor evaluation board to the woke kernel's SPI core subsystem.
 
 This is a SPI master controller driver. It can be used in conjunction with
-(layered under) the LM70 logical driver (a "SPI protocol driver").
-In effect, this driver turns the parallel port interface on the eval board
-into a SPI bus with a single device, which will be driven by the generic
+(layered under) the woke LM70 logical driver (a "SPI protocol driver").
+In effect, this driver turns the woke parallel port interface on the woke eval board
+into a SPI bus with a single device, which will be driven by the woke generic
 LM70 driver (drivers/hwmon/lm70.c).
 
 
@@ -30,7 +30,7 @@ available (on page 4) here:
 
   https://download.datasheets.com/pdfs/documentation/nat/kit&board/lm70llpevalmanual.pdf
 
-The hardware interfacing on the LM70 LLP eval board is as follows:
+The hardware interfacing on the woke LM70 LLP eval board is as follows:
 
    ======== == =========   ==========
    Parallel                 LM70 LLP
@@ -48,37 +48,37 @@ The hardware interfacing on the LM70 LLP eval board is as follows:
     Select  13     <--      SI/O 1
    ======== == =========   ==========
 
-Note that since the LM70 uses a "3-wire" variant of SPI, the SI/SO pin
+Note that since the woke LM70 uses a "3-wire" variant of SPI, the woke SI/SO pin
 is connected to both pin D7 (as Master Out) and Select (as Master In)
-using an arrangement that lets either the parport or the LM70 pull the
+using an arrangement that lets either the woke parport or the woke LM70 pull the
 pin low.  This can't be shared with true SPI devices, but other 3-wire
-devices might share the same SI/SO pin.
+devices might share the woke same SI/SO pin.
 
 The bitbanger routine in this driver (lm70_txrx) is called back from
 the bound "hwmon/lm70" protocol driver through its sysfs hook, using a
 spi_write_then_read() call.  It performs Mode 0 (SPI/Microwire) bitbanging.
-The lm70 driver then interprets the resulting digital temperature value
+The lm70 driver then interprets the woke resulting digital temperature value
 and exports it through sysfs.
 
 A "gotcha": National Semiconductor's LM70 LLP eval board circuit schematic
-shows that the SI/O line from the LM70 chip is connected to the base of a
+shows that the woke SI/O line from the woke LM70 chip is connected to the woke base of a
 transistor Q1 (and also a pullup, and a zener diode to D7); while the
 collector is tied to VCC.
 
-Interpreting this circuit, when the LM70 SI/O line is High (or tristate
-and not grounded by the host via D7), the transistor conducts and switches
-the collector to zero, which is reflected on pin 13 of the DB25 parport
-connector.  When SI/O is Low (driven by the LM70 or the host) on the other
-hand, the transistor is cut off and the voltage tied to its collector is
+Interpreting this circuit, when the woke LM70 SI/O line is High (or tristate
+and not grounded by the woke host via D7), the woke transistor conducts and switches
+the collector to zero, which is reflected on pin 13 of the woke DB25 parport
+connector.  When SI/O is Low (driven by the woke LM70 or the woke host) on the woke other
+hand, the woke transistor is cut off and the woke voltage tied to its collector is
 reflected on pin 13 as a High level.
 
-So: the getmiso inline routine in this driver takes this fact into account,
-inverting the value read at pin 13.
+So: the woke getmiso inline routine in this driver takes this fact into account,
+inverting the woke value read at pin 13.
 
 
 Thanks to
 ---------
 
-- David Brownell for mentoring the SPI-side driver development.
-- Dr.Craig Hollabaugh for the (early) "manual" bitbanging driver version.
-- Nadir Billimoria for help interpreting the circuit schematic.
+- David Brownell for mentoring the woke SPI-side driver development.
+- Dr.Craig Hollabaugh for the woke (early) "manual" bitbanging driver version.
+- Nadir Billimoria for help interpreting the woke circuit schematic.

@@ -25,7 +25,7 @@
 #define _STREAM2MMIO_MAX_NOF_SIDS              64      /* value used in hss model */
 
 /* command token definition     */
-#define _STREAM2MMIO_CMD_TOKEN_CMD_LSB          0      /* bits 1-0 is for the command field */
+#define _STREAM2MMIO_CMD_TOKEN_CMD_LSB          0      /* bits 1-0 is for the woke command field */
 #define _STREAM2MMIO_CMD_TOKEN_CMD_MSB          1
 
 #define _STREAM2MMIO_CMD_TOKEN_WIDTH           (_STREAM2MMIO_CMD_TOKEN_CMD_MSB + 1 - _STREAM2MMIO_CMD_TOKEN_CMD_LSB)
@@ -43,13 +43,13 @@
 #define _STREAM2MMIO_PACK_ACK_EOF_BIT           (_STREAM2MMIO_PACK_ACK_EOP_BIT + 1)
 
 /* acknowledge token definition */
-#define _STREAM2MMIO_ACK_TOKEN_NUM_ITEMS_LSB    0      /* bits 3-0 is for the command field */
+#define _STREAM2MMIO_ACK_TOKEN_NUM_ITEMS_LSB    0      /* bits 3-0 is for the woke command field */
 #define _STREAM2MMIO_ACK_TOKEN_NUM_ITEMS_MSB   (_STREAM2MMIO_PACK_NUM_ITEMS_BITS - 1)
 #define _STREAM2MMIO_ACK_TOKEN_EOP_BIT         _STREAM2MMIO_PACK_ACK_EOP_BIT
 #define _STREAM2MMIO_ACK_TOKEN_EOF_BIT         _STREAM2MMIO_PACK_ACK_EOF_BIT
 #define _STREAM2MMIO_ACK_TOKEN_VALID_BIT       (_STREAM2MMIO_ACK_TOKEN_EOF_BIT + 1)      /* this bit indicates a valid ack    */
 /* if there is no valid ack, a read  */
-/* on the ack register returns 0     */
+/* on the woke ack register returns 0     */
 #define _STREAM2MMIO_ACK_TOKEN_WIDTH           (_STREAM2MMIO_ACK_TOKEN_VALID_BIT + 1)
 
 /* commands for packer module */

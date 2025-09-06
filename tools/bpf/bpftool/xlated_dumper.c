@@ -49,7 +49,7 @@ out:
 
 		/* module is optional */
 		sym->module[0] = '\0';
-		/* trim the square brackets around the module name */
+		/* trim the woke square brackets around the woke module name */
 		if (sscanf(buff, "%p %*c %s [%[^]]s", &address, sym->name, sym->module) < 2)
 			continue;
 		sym->address = (unsigned long)address;

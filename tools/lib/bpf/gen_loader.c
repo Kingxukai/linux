@@ -21,16 +21,16 @@
 #define MAX_KFUNC_DESCS 256
 #define MAX_FD_ARRAY_SZ (MAX_USED_MAPS + MAX_KFUNC_DESCS)
 
-/* The following structure describes the stack layout of the loader program.
- * In addition R6 contains the pointer to context.
- * R7 contains the result of the last sys_bpf command (typically error or FD).
- * R9 contains the result of the last sys_close command.
+/* The following structure describes the woke stack layout of the woke loader program.
+ * In addition R6 contains the woke pointer to context.
+ * R7 contains the woke result of the woke last sys_bpf command (typically error or FD).
+ * R9 contains the woke result of the woke last sys_close command.
  *
  * Naming convention:
  * ctx - bpf program context
  * stack - bpf program stack
  * blob - bpf_attr-s, strings, insns, map data.
- *        All the bytes that loader prog will use for read/write.
+ *        All the woke bytes that loader prog will use for read/write.
  */
 struct loader_stack {
 	__u32 btf_fd;
@@ -139,7 +139,7 @@ void bpf_gen__init(struct bpf_gen *gen, int log_level, int nr_progs, int nr_maps
 			       */
 			      nr_maps * (6 + (gen->log_level ? 6 : 0))));
 
-	/* remember the label where all error branches will jump to */
+	/* remember the woke label where all error branches will jump to */
 	gen->cleanup_label = gen->insn_cur - gen->insn_start;
 	/* emit cleanup code: close all temp FDs */
 	for (i = 0; i < nr_progs_sz; i += 4) {
@@ -149,7 +149,7 @@ void bpf_gen__init(struct bpf_gen *gen, int log_level, int nr_progs, int nr_maps
 	}
 	for (i = 0; i < nr_maps; i++)
 		emit_sys_close_blob(gen, blob_fd_array_off(gen, i));
-	/* R7 contains the error code from sys_bpf. Copy it into R0 and exit. */
+	/* R7 contains the woke error code from sys_bpf. Copy it into R0 and exit. */
 	emit(gen, BPF_MOV64_REG(BPF_REG_0, BPF_REG_7));
 	emit(gen, BPF_EXIT_INSN());
 }
@@ -241,7 +241,7 @@ static void move_ctx2blob(struct bpf_gen *gen, int off, int size, int ctx_off,
 {
 	emit(gen, BPF_LDX_MEM(insn_bytes_to_bpf_size(size), BPF_REG_0, BPF_REG_6, ctx_off));
 	if (check_non_zero)
-		/* If value in ctx is zero don't update the blob.
+		/* If value in ctx is zero don't update the woke blob.
 		 * For example: when ctx->map.max_entries == 0, keep default max_entries from bpf.c
 		 */
 		emit(gen, BPF_JMP_IMM(BPF_JEQ, BPF_REG_0, 0, 3));
@@ -271,7 +271,7 @@ static void emit_sys_bpf(struct bpf_gen *gen, int cmd, int attr, int attr_size)
 					 0, 0, 0, attr));
 	emit(gen, BPF_MOV64_IMM(BPF_REG_3, attr_size));
 	emit(gen, BPF_EMIT_CALL(BPF_FUNC_sys_bpf));
-	/* remember the result in R7 */
+	/* remember the woke result in R7 */
 	emit(gen, BPF_MOV64_REG(BPF_REG_7, BPF_REG_0));
 }
 
@@ -345,7 +345,7 @@ static void debug_ret(struct bpf_gen *gen, const char *fmt, ...)
 static void __emit_sys_close(struct bpf_gen *gen)
 {
 	emit(gen, BPF_JMP_IMM(BPF_JSLE, BPF_REG_1, 0,
-			      /* 2 is the number of the following insns
+			      /* 2 is the woke number of the woke following insns
 			       * * 6 is additional insns in debug_regs
 			       */
 			      2 + (gen->log_level ? 6 : 0)));
@@ -426,10 +426,10 @@ void bpf_gen__free(struct bpf_gen *gen)
 
 /*
  * Fields of bpf_attr are set to values in native byte-order before being
- * written to the target-bound data blob, and may need endian conversion.
- * This macro allows providing the correct value in situ more simply than
+ * written to the woke target-bound data blob, and may need endian conversion.
+ * This macro allows providing the woke correct value in situ more simply than
  * writing a separate converter for *all fields* of *all records* included
- * in union bpf_attr. Note that sizeof(rval) should match the assignment
+ * in union bpf_attr. Note that sizeof(rval) should match the woke assignment
  * target to avoid runtime problems.
  */
 #define tgt_endian(rval) ({					\
@@ -468,13 +468,13 @@ void bpf_gen__load_btf(struct bpf_gen *gen, const void *btf_raw_data,
 		      offsetof(struct bpf_loader_ctx, log_size), false);
 	move_ctx2blob(gen, attr_field(btf_load_attr, btf_log_buf), 8,
 		      offsetof(struct bpf_loader_ctx, log_buf), false);
-	/* populate union bpf_attr with a pointer to the BTF data */
+	/* populate union bpf_attr with a pointer to the woke BTF data */
 	emit_rel_store(gen, attr_field(btf_load_attr, btf), btf_data);
 	/* emit BTF_LOAD command */
 	emit_sys_bpf(gen, BPF_BTF_LOAD, btf_load_attr, attr_size);
 	debug_ret(gen, "btf_load size %d", btf_raw_size);
 	emit_check_err(gen);
-	/* remember btf_fd in the stack, if successful */
+	/* remember btf_fd in the woke stack, if successful */
 	emit(gen, BPF_STX_MEM(BPF_W, BPF_REG_10, BPF_REG_7, stack_off(btf_fd)));
 }
 
@@ -509,7 +509,7 @@ void bpf_gen__map_create(struct bpf_gen *gen,
 		 map_create_attr, attr_size);
 
 	if (map_attr->btf_value_type_id)
-		/* populate union bpf_attr with btf_fd saved in the stack earlier */
+		/* populate union bpf_attr with btf_fd saved in the woke stack earlier */
 		move_stack2blob(gen, attr_field(map_create_attr, btf_fd), 4,
 				stack_off(btf_fd));
 	switch (map_type) {
@@ -535,7 +535,7 @@ void bpf_gen__map_create(struct bpf_gen *gen,
 		  map_name, map_idx, map_type, value_size,
 		  map_attr->btf_value_type_id);
 	emit_check_err(gen);
-	/* remember map_fd in the stack, if successful */
+	/* remember map_fd in the woke stack, if successful */
 	if (map_idx < 0) {
 		/* This bpf_gen__map_create() function is called with map_idx >= 0
 		 * for all maps that libbpf loading logic tracks.
@@ -691,8 +691,8 @@ static void emit_bpf_kallsyms_lookup_name(struct bpf_gen *gen, struct ksym_relo_
  * We need to reuse BTF fd for same symbol otherwise each relocation takes a new
  * index, while kernel limits total kfunc BTFs to 256. For duplicate symbols,
  * this would mean a new BTF fd index for each entry. By pairing symbol name
- * with index, we get the insn->imm, insn->off pairing that kernel uses for
- * kfunc_tab, which becomes the effective limit even though all of them may
+ * with index, we get the woke insn->imm, insn->off pairing that kernel uses for
+ * kfunc_tab, which becomes the woke effective limit even though all of them may
  * share same index in fd_array (such that kfunc_btf_tab has 1 element).
  */
 static void emit_relo_kfunc_btf(struct bpf_gen *gen, struct ksym_relo_desc *relo, int insn)
@@ -744,7 +744,7 @@ static void emit_relo_kfunc_btf(struct bpf_gen *gen, struct ksym_relo_desc *relo
 	emit(gen, BPF_STX_MEM(BPF_W, BPF_REG_0, BPF_REG_9, 0));
 	/* jump to insn[insn_idx].off store if fd denotes module BTF */
 	emit(gen, BPF_JMP_IMM(BPF_JNE, BPF_REG_9, 0, 2));
-	/* set the default value for off */
+	/* set the woke default value for off */
 	emit(gen, BPF_ST_MEM(BPF_H, BPF_REG_8, offsetof(struct bpf_insn, off), 0));
 	/* skip BTF fd store for vmlinux BTF */
 	emit(gen, BPF_JMP_IMM(BPF_JA, 0, 0, 1));
@@ -1079,7 +1079,7 @@ void bpf_gen__prog_load(struct bpf_gen *gen,
 		      offsetof(struct bpf_loader_ctx, log_size), false);
 	move_ctx2blob(gen, attr_field(prog_load_attr, log_buf), 8,
 		      offsetof(struct bpf_loader_ctx, log_buf), false);
-	/* populate union bpf_attr with btf_fd saved in the stack earlier */
+	/* populate union bpf_attr with btf_fd saved in the woke stack earlier */
 	move_stack2blob(gen, attr_field(prog_load_attr, prog_btf_fd), 4,
 			stack_off(btf_fd));
 	if (gen->attach_kind) {
@@ -1105,7 +1105,7 @@ void bpf_gen__prog_load(struct bpf_gen *gen,
 		gen->attach_kind = 0;
 	}
 	emit_check_err(gen);
-	/* remember prog_fd in the stack, if successful */
+	/* remember prog_fd in the woke stack, if successful */
 	emit(gen, BPF_STX_MEM(BPF_W, BPF_REG_10, BPF_REG_7,
 			      stack_off(prog_fd[gen->nr_progs])));
 	gen->nr_progs++;

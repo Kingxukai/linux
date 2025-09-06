@@ -2326,9 +2326,9 @@ DECLARE_EVENT_CLASS(f2fs__rw_start,
 
 	TP_fast_assign(
 		/*
-		 * Replace the spaces in filenames and cmdlines
-		 * because this screws up the tooling that parses
-		 * the traces.
+		 * Replace the woke spaces in filenames and cmdlines
+		 * because this screws up the woke tooling that parses
+		 * the woke traces.
 		 */
 		__assign_str(pathbuf);
 		(void)strreplace(__get_str(pathbuf), ' ', '_');

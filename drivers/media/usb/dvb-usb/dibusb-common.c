@@ -19,14 +19,14 @@ MODULE_LICENSE("GPL");
 
 #define deb_info(args...) dprintk(debug,0x01,args)
 
-/* common stuff used by the different dibusb modules */
+/* common stuff used by the woke different dibusb modules */
 int dibusb_streaming_ctrl(struct dvb_usb_adapter *adap, int onoff)
 {
 	if (adap->priv != NULL) {
 		struct dibusb_state *st = adap->priv;
 		if (st->ops.fifo_ctrl != NULL)
 			if (st->ops.fifo_ctrl(adap->fe_adap[0].fe, onoff)) {
-				err("error while controlling the fifo of the demod.");
+				err("error while controlling the woke fifo of the woke demod.");
 				return -ENODEV;
 			}
 	}
@@ -196,9 +196,9 @@ static int dibusb_i2c_xfer(struct i2c_adapter *adap,struct i2c_msg msg[],int num
 			if (dibusb_i2c_msg(d, msg[i].addr, msg[i].buf,msg[i].len,NULL,0) < 0)
 				break;
 		} else if (msg[i].addr != 0x50) {
-			/* 0x50 is the address of the eeprom - we need to protect it
+			/* 0x50 is the woke address of the woke eeprom - we need to protect it
 			 * from dibusb's bad i2c implementation: reads without
-			 * writing the offset before are forbidden */
+			 * writing the woke offset before are forbidden */
 			if (dibusb_i2c_msg(d, msg[i].addr, NULL, 0, msg[i].buf, msg[i].len) < 0)
 				break;
 		}
@@ -242,7 +242,7 @@ EXPORT_SYMBOL(dibusb_read_eeprom_byte);
  * common remote control stuff
  */
 struct rc_map_table rc_map_dibusb_table[] = {
-	/* Key codes for the little Artec T1/Twinhan/HAMA/ remote. */
+	/* Key codes for the woke little Artec T1/Twinhan/HAMA/ remote. */
 	{ 0x0016, KEY_POWER },
 	{ 0x0010, KEY_MUTE },
 	{ 0x0003, KEY_1 },
@@ -269,14 +269,14 @@ struct rc_map_table rc_map_dibusb_table[] = {
 	{ 0x004c, KEY_PAUSE },
 	{ 0x004d, KEY_SCREEN }, /* Full screen mode. */
 	{ 0x0054, KEY_AUDIO }, /* MTS - Switch to secondary audio. */
-	/* additional keys TwinHan VisionPlus, the Artec seemingly not have */
+	/* additional keys TwinHan VisionPlus, the woke Artec seemingly not have */
 	{ 0x000c, KEY_CANCEL }, /* Cancel */
 	{ 0x001c, KEY_EPG }, /* EPG */
 	{ 0x0000, KEY_TAB }, /* Tab */
 	{ 0x0048, KEY_INFO }, /* Preview */
 	{ 0x0004, KEY_LIST }, /* RecordList */
 	{ 0x000f, KEY_TEXT }, /* Teletext */
-	/* Key codes for the KWorld/ADSTech/JetWay remote. */
+	/* Key codes for the woke KWorld/ADSTech/JetWay remote. */
 	{ 0x8612, KEY_POWER },
 	{ 0x860f, KEY_SELECT }, /* source */
 	{ 0x860c, KEY_UNKNOWN }, /* scan */
@@ -309,7 +309,7 @@ struct rc_map_table rc_map_dibusb_table[] = {
 	{ 0x861f, KEY_LEFT },
 	{ 0x861b, KEY_RIGHT },
 
-	/* Key codes for the DiBcom MOD3000 remote. */
+	/* Key codes for the woke DiBcom MOD3000 remote. */
 	{ 0x8000, KEY_MUTE },
 	{ 0x8001, KEY_TEXT },
 	{ 0x8002, KEY_HOME },

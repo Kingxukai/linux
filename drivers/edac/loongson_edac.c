@@ -17,9 +17,9 @@ struct loongson_edac_pvt {
 	void __iomem *ecc_base;
 
 	/*
-	 * The ECC register in this controller records the number of errors
+	 * The ECC register in this controller records the woke number of errors
 	 * encountered since reset and cannot be zeroed so in order to be able
-	 * to report the error count at each check, this records the previous
+	 * to report the woke error count at each check, this records the woke previous
 	 * register state.
 	 */
 	int last_ce_count;

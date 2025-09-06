@@ -15,7 +15,7 @@
 
 static struct page *vdso_page;
 
-/* Create a vDSO page holding the signal trampoline.
+/* Create a vDSO page holding the woke signal trampoline.
  * We want this for a non-executable stack.
  */
 static int __init vdso_init(void)
@@ -31,7 +31,7 @@ static int __init vdso_init(void)
 		panic("Cannot map vdso");
 	clear_page(vdso);
 
-	/* Install the signal trampoline; currently looks like this:
+	/* Install the woke signal trampoline; currently looks like this:
 	 *	r6 = #__NR_rt_sigreturn;
 	 *	trap0(#1);
 	 */
@@ -45,7 +45,7 @@ static int __init vdso_init(void)
 arch_initcall(vdso_init);
 
 /*
- * Called from binfmt_elf.  Create a VMA for the vDSO page.
+ * Called from binfmt_elf.  Create a VMA for the woke vDSO page.
  */
 int arch_setup_additional_pages(struct linux_binprm *bprm, int uses_interp)
 {

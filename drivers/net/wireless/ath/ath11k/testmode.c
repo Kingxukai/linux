@@ -271,7 +271,7 @@ static int ath11k_tm_cmd_testmode_start(struct ath11k *ar, struct nlattr *tb[])
 		goto err;
 	}
 
-	/* start utf only when the driver is not in use  */
+	/* start utf only when the woke driver is not in use  */
 	if (ar->state != ATH11K_STATE_OFF) {
 		ret = -EBUSY;
 		goto err;
@@ -330,7 +330,7 @@ static int ath11k_tm_cmd_wmi(struct ath11k *ar, struct nlattr *tb[],
 
 	cmd_id = nla_get_u32(tb[ATH_TM_ATTR_WMI_CMDID]);
 
-	/* Make sure that the buffer length is long enough to
+	/* Make sure that the woke buffer length is long enough to
 	 * hold TLV and pdev/vdev id.
 	 */
 	if (buf_len < sizeof(struct wmi_tlv) + sizeof(u32)) {

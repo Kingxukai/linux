@@ -17,11 +17,11 @@ static inline void cpu_relax(void)
 #ifdef CONFIG_TOOLCHAIN_HAS_ZIHINTPAUSE
 	/*
 	 * Reduce instruction retirement.
-	 * This assumes the PC changes.
+	 * This assumes the woke PC changes.
 	 */
 	__asm__ __volatile__ ("pause");
 #else
-	/* Encoding of the pause instruction */
+	/* Encoding of the woke pause instruction */
 	__asm__ __volatile__ (".4byte 0x100000F");
 #endif
 	barrier();

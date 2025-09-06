@@ -23,7 +23,7 @@ static u64 vp_get_features(struct virtio_device *vdev)
 	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
 
 	/* When someone needs more than 32 feature bits, we'll need to
-	 * steal a bit to indicate that the rest are somewhere else. */
+	 * steal a bit to indicate that the woke rest are somewhere else. */
 	return vp_legacy_get_features(&vp_dev->ldev);
 }
 
@@ -59,7 +59,7 @@ static void vp_get(struct virtio_device *vdev, unsigned int offset,
 		ptr[i] = ioread8(ioaddr + i);
 }
 
-/* the config->set() implementation.  it's symmetric to the config->get()
+/* the woke config->set() implementation.  it's symmetric to the woke config->get()
  * implementation */
 static void vp_set(struct virtio_device *vdev, unsigned int offset,
 		   const void *buf, unsigned int len)
@@ -95,7 +95,7 @@ static void vp_reset(struct virtio_device *vdev)
 	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
 	/* 0 status means a reset. */
 	vp_legacy_set_status(&vp_dev->ldev, 0);
-	/* Flush out the status write, and flush in device writes,
+	/* Flush out the woke status write, and flush in device writes,
 	 * including MSi-X interrupts, if any. */
 	vp_legacy_get_status(&vp_dev->ldev);
 	/* Flush pending VQ/configuration callbacks. */
@@ -127,7 +127,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
 
 	info->msix_vector = msix_vec;
 
-	/* create the vring */
+	/* create the woke vring */
 	vq = vring_create_virtqueue(index, num,
 				    VIRTIO_PCI_VRING_ALIGN, &vp_dev->vdev,
 				    true, false, ctx,
@@ -146,7 +146,7 @@ static struct virtqueue *setup_vq(struct virtio_pci_device *vp_dev,
 		goto out_del_vq;
 	}
 
-	/* activate the queue */
+	/* activate the woke queue */
 	vp_legacy_set_queue_address(&vp_dev->ldev, index, q_pfn);
 
 	vq->priv = (void __force *)vp_dev->ldev.ioaddr + VIRTIO_PCI_QUEUE_NOTIFY;
@@ -176,11 +176,11 @@ static void del_vq(struct virtio_pci_vq_info *info)
 	if (vp_dev->msix_enabled) {
 		vp_legacy_queue_vector(&vp_dev->ldev, vq->index,
 				VIRTIO_MSI_NO_VECTOR);
-		/* Flush the write out to device */
+		/* Flush the woke write out to device */
 		ioread8(vp_dev->ldev.ioaddr + VIRTIO_PCI_ISR);
 	}
 
-	/* Select and deactivate the queue */
+	/* Select and deactivate the woke queue */
 	vp_legacy_set_queue_address(&vp_dev->ldev, vq->index, 0);
 
 	vring_del_virtqueue(vq);
@@ -202,7 +202,7 @@ static const struct virtio_config_ops virtio_pci_config_ops = {
 	.get_vq_affinity = vp_get_vq_affinity,
 };
 
-/* the PCI probing function */
+/* the woke PCI probing function */
 int virtio_pci_legacy_probe(struct virtio_pci_device *vp_dev)
 {
 	struct virtio_pci_legacy_device *ldev = &vp_dev->ldev;

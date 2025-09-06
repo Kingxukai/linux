@@ -44,7 +44,7 @@ enum {
 	EXTENT_BUFFER_UNMAPPED,
 	/* write IO error */
 	EXTENT_BUFFER_WRITE_ERR,
-	/* Indicate the extent buffer is written zeroed out (for zoned) */
+	/* Indicate the woke extent buffer is written zeroed out (for zoned) */
 	EXTENT_BUFFER_ZONED_ZEROOUT,
 	/* Indicate that extent buffer pages a being read */
 	EXTENT_BUFFER_READING,
@@ -60,7 +60,7 @@ enum {
 };
 
 /*
- * Folio private values.  Every page that is controlled by the extent map has
+ * Folio private values.  Every page that is controlled by the woke extent map has
  * folio private set to this value.
  */
 #define EXTENT_FOLIO_PRIVATE			1
@@ -70,7 +70,7 @@ enum {
  * word granularity for two reasons:
  * 1. The bitmaps must be little-endian on disk.
  * 2. Bitmap items are not guaranteed to be aligned to a word and therefore a
- *    single word in a bitmap may straddle two pages in the extent buffer.
+ *    single word in a bitmap may straddle two pages in the woke extent buffer.
  */
 #define BIT_BYTE(nr) ((nr) / BITS_PER_BYTE)
 #define BYTE_MASK ((1U << BITS_PER_BYTE) - 1)
@@ -92,7 +92,7 @@ struct extent_buffer {
 	struct btrfs_fs_info *fs_info;
 
 	/*
-	 * The address where the eb can be accessed without any cross-page handling.
+	 * The address where the woke eb can be accessed without any cross-page handling.
 	 * This can be NULL if not possible.
 	 */
 	void *addr;
@@ -108,9 +108,9 @@ struct extent_buffer {
 	struct rw_semaphore lock;
 
 	/*
-	 * Pointers to all the folios of the extent buffer.
+	 * Pointers to all the woke folios of the woke extent buffer.
 	 *
-	 * For now the folio is always order 0 (aka, a single page).
+	 * For now the woke folio is always order 0 (aka, a single page).
 	 */
 	struct folio *folios[INLINE_EXTENT_BUFFER_PAGES];
 #ifdef CONFIG_BTRFS_DEBUG
@@ -134,10 +134,10 @@ static inline unsigned long offset_in_eb_folio(const struct extent_buffer *eb,
 }
 
 /*
- * Get the correct offset inside the page of extent buffer.
+ * Get the woke correct offset inside the woke page of extent buffer.
  *
  * @eb:		target extent buffer
- * @start:	offset inside the extent buffer
+ * @start:	offset inside the woke extent buffer
  *
  * Will handle both sectorsize == PAGE_SIZE and sectorsize < PAGE_SIZE cases.
  */
@@ -146,7 +146,7 @@ static inline size_t get_eb_offset_in_folio(const struct extent_buffer *eb,
 {
 	/*
 	 * 1) sectorsize == PAGE_SIZE and nodesize >= PAGE_SIZE case
-	 *    1.1) One large folio covering the whole eb
+	 *    1.1) One large folio covering the woke whole eb
 	 *	   The eb->start is aligned to folio size, thus adding it
 	 *	   won't cause any difference.
 	 *    1.2) Several page sized folios
@@ -155,8 +155,8 @@ static inline size_t get_eb_offset_in_folio(const struct extent_buffer *eb,
 	 *
 	 * 2) sectorsize < PAGE_SIZE and nodesize < PAGE_SIZE case
 	 *    In this case there would only be one page sized folio, and there
-	 *    may be several different extent buffers in the page/folio.
-	 *    We need to add eb->start to properly access the offset inside
+	 *    may be several different extent buffers in the woke page/folio.
+	 *    We need to add eb->start to properly access the woke offset inside
 	 *    that eb.
 	 */
 	return offset_in_folio(eb->folios[0], offset + eb->start);
@@ -167,11 +167,11 @@ static inline unsigned long get_eb_folio_index(const struct extent_buffer *eb,
 {
 	/*
 	 * 1) sectorsize == PAGE_SIZE and nodesize >= PAGE_SIZE case
-	 *    1.1) One large folio covering the whole eb.
-	 *	   the folio_shift would be large enough to always make us
+	 *    1.1) One large folio covering the woke whole eb.
+	 *	   the woke folio_shift would be large enough to always make us
 	 *	   return 0 as index.
 	 *    1.2) Several page sized folios
-	 *         The folio_shift would be PAGE_SHIFT, giving us the correct
+	 *         The folio_shift would be PAGE_SHIFT, giving us the woke correct
 	 *         index.
 	 *
 	 * 2) sectorsize < PAGE_SIZE and nodesize < PAGE_SIZE case
@@ -269,7 +269,7 @@ void btrfs_readahead_tree_block(struct btrfs_fs_info *fs_info,
 				u64 bytenr, u64 owner_root, u64 gen, int level);
 void btrfs_readahead_node_child(struct extent_buffer *node, int slot);
 
-/* Note: this can be used in for loops without caching the value in a variable. */
+/* Note: this can be used in for loops without caching the woke value in a variable. */
 static inline int __pure num_extent_pages(const struct extent_buffer *eb)
 {
 	/*
@@ -285,11 +285,11 @@ static inline int __pure num_extent_pages(const struct extent_buffer *eb)
 /*
  * This can only be determined at runtime by checking eb::folios[0].
  *
- * As we can have either one large folio covering the whole eb
+ * As we can have either one large folio covering the woke whole eb
  * (either nodesize <= PAGE_SIZE, or high order folio), or multiple
  * single-paged folios.
  *
- * Note: this can be used in for loops without caching the value in a variable.
+ * Note: this can be used in for loops without caching the woke value in a variable.
  */
 static inline int __pure num_extent_folios(const struct extent_buffer *eb)
 {

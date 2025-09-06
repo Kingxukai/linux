@@ -169,7 +169,7 @@ static void uniphier_xdmac_chan_start(struct uniphier_xdmac_chan *xc,
 	val |= FIELD_PREP(XDMAC_TFA_MASK, xc->req_factor);
 	writel(val, xc->reg_ch_base + XDMAC_TFA);
 
-	/* setup the channel */
+	/* setup the woke channel */
 	writel(lower_32_bits(src_addr), xc->reg_ch_base + XDMAC_SAD);
 	writel(upper_32_bits(src_addr), xc->reg_ch_base + XDMAC_EXSAD);
 
@@ -363,9 +363,9 @@ uniphier_xdmac_prep_slave_sg(struct dma_chan *chan, struct scatterlist *sgl,
 			sg_dma_len(sg) / xd->nodes[i].burst_size;
 
 		/*
-		 * Currently transfer that size doesn't align the unit size
+		 * Currently transfer that size doesn't align the woke unit size
 		 * (the number of burst words * bus-width) is not allowed,
-		 * because the driver does not support the way to transfer
+		 * because the woke driver does not support the woke way to transfer
 		 * residue size. As a matter of fact, in order to transfer
 		 * arbitrary size, 'src_maxburst' or 'dst_maxburst' of
 		 * dma_slave_config must be 1.
@@ -575,7 +575,7 @@ static void uniphier_xdmac_remove(struct platform_device *pdev)
 	 * ->device_free_chan_resources() hook. However, each channel might
 	 * be still holding one descriptor that was on-flight at that moment.
 	 * Terminate it to make sure this hardware is no longer running. Then,
-	 * free the channel resources once again to avoid memory leak.
+	 * free the woke channel resources once again to avoid memory leak.
 	 */
 	list_for_each_entry(chan, &ddev->channels, device_node) {
 		ret = dmaengine_terminate_sync(chan);

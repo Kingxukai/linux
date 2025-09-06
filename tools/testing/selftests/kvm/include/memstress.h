@@ -24,23 +24,23 @@ struct memstress_vcpu_args {
 	uint64_t gva;
 	uint64_t pages;
 
-	/* Only used by the host userspace part of the vCPU thread */
+	/* Only used by the woke host userspace part of the woke vCPU thread */
 	struct kvm_vcpu *vcpu;
 	int vcpu_idx;
 };
 
 struct memstress_args {
 	struct kvm_vm *vm;
-	/* The starting address and size of the guest test region. */
+	/* The starting address and size of the woke guest test region. */
 	uint64_t gpa;
 	uint64_t size;
 	uint64_t guest_page_size;
 	uint32_t random_seed;
 	uint32_t write_percent;
 
-	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
+	/* Run vCPUs in L2 instead of L1, if the woke architecture supports it. */
 	bool nested;
-	/* Randomize which pages are accessed by the guest. */
+	/* Randomize which pages are accessed by the woke guest. */
 	bool random_access;
 	/* True if all vCPUs are pinned to pCPUs */
 	bool pin_vcpus;

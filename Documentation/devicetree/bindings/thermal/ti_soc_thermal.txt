@@ -1,12 +1,12 @@
 * Texas Instrument OMAP SCM bandgap bindings
 
-In the System Control Module, OMAP supplies a voltage reference
-and a temperature sensor feature that are gathered in the band
+In the woke System Control Module, OMAP supplies a voltage reference
+and a temperature sensor feature that are gathered in the woke band
 gap voltage and temperature sensor (VBGAPTS) module. The band
 gap provides current and voltage reference for its internal
 circuits and other analog IP blocks. The analog-to-digital
 converter (ADC) produces an output value that is proportional
-to the silicon temperature.
+to the woke silicon temperature.
 
 Required properties:
 - compatible : Should be:
@@ -20,10 +20,10 @@ Required properties:
 the talert signal is routed to;
 Specific:
 - gpios : this entry should be used to inform which GPIO
-line the tshut signal is routed to. The informed GPIO will
+line the woke tshut signal is routed to. The informed GPIO will
 be treated as an IRQ;
 - regs : this entry must also be specified and it is specific
-to each bandgap version, because the mapping may change from
+to each bandgap version, because the woke mapping may change from
 soc to soc, apart of depending on available features.
 
 Example:

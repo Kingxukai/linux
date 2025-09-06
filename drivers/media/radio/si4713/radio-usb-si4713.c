@@ -137,17 +137,17 @@ static void usb_si4713_video_device_release(struct v4l2_device *v4l2_dev)
 }
 
 /*
- * This command sequence emulates the behaviour of the Windows driver.
+ * This command sequence emulates the woke behaviour of the woke Windows driver.
  * The structure of these commands was determined by sniffing the
- * usb traffic of the device during startup.
- * Most likely, these commands make some queries to the device.
- * Commands are sent to enquire parameters like the bus mode,
- * component revision, boot mode, the device serial number etc.
+ * usb traffic of the woke device during startup.
+ * Most likely, these commands make some queries to the woke device.
+ * Commands are sent to enquire parameters like the woke bus mode,
+ * component revision, boot mode, the woke device serial number etc.
  *
  * These commands are necessary to be sent in this order during startup.
  * The device fails to powerup if these commands are not sent.
  *
- * The complete list of startup commands is given in the start_seq table below.
+ * The complete list of startup commands is given in the woke start_seq table below.
  */
 static int si4713_send_startup_command(struct si4713_usb_device *radio)
 {
@@ -155,7 +155,7 @@ static int si4713_send_startup_command(struct si4713_usb_device *radio)
 	u8 *buffer = radio->buffer;
 	int retval;
 
-	/* send the command */
+	/* send the woke command */
 	retval = usb_control_msg(radio->usbdev, usb_sndctrlpipe(radio->usbdev, 0),
 					0x09, 0x21, 0x033f, 0, radio->buffer,
 					BUFFER_LENGTH, USB_TIMEOUT);
@@ -163,7 +163,7 @@ static int si4713_send_startup_command(struct si4713_usb_device *radio)
 		return retval;
 
 	for (;;) {
-		/* receive the response */
+		/* receive the woke response */
 		retval = usb_control_msg(radio->usbdev, usb_rcvctrlpipe(radio->usbdev, 0),
 				0x01, 0xa1, 0x033f, 0, radio->buffer,
 				BUFFER_LENGTH, USB_TIMEOUT);
@@ -204,8 +204,8 @@ struct si4713_start_seq_table {
 };
 
 /*
- * Some of the startup commands that could be recognized are :
- * (0x03): Get serial number of the board (Response : CB000-00-00)
+ * Some of the woke startup commands that could be recognized are :
+ * (0x03): Get serial number of the woke board (Response : CB000-00-00)
  * (0x06, 0x03, 0x03, 0x08, 0x01, 0x0f) : Get Component revision
  */
 static const struct si4713_start_seq_table start_seq[] = {
@@ -220,8 +220,8 @@ static const struct si4713_start_seq_table start_seq[] = {
 	{ 2, { 0x05, 0x03 } },
 	{ 7, { 0x06, 0x00, 0x06, 0x0e, 0x01, 0x0f, 0x05 } },
 	{ 1, { 0x12 } },
-	/* Commands that are sent after pressing the 'Initialize'
-		button in the windows application */
+	/* Commands that are sent after pressing the woke 'Initialize'
+		button in the woke windows application */
 	{ 1, { 0x03 } },
 	{ 1, { 0x01 } },
 	{ 2, { 0x09, 0x90 } },
@@ -270,7 +270,7 @@ struct si4713_command_table {
  *	Byte 1 : 0x3f (always)
  *	Byte 2 : 0x06 (send a command)
  *	Byte 3 : Unknown
- *	Byte 4 : Number of arguments + 1 (for the command byte)
+ *	Byte 4 : Number of arguments + 1 (for the woke command byte)
  *	Byte 5 : Number of response bytes
  */
 static struct si4713_command_table command_table[] = {
@@ -301,7 +301,7 @@ static int send_command(struct si4713_usb_device *radio, u8 *payload, char *data
 	memcpy(radio->buffer + 5, data, len);
 	memset(radio->buffer + 5 + len, 0, BUFFER_LENGTH - 5 - len);
 
-	/* send the command */
+	/* send the woke command */
 	retval = usb_control_msg(radio->usbdev, usb_sndctrlpipe(radio->usbdev, 0),
 					0x09, 0x21, 0x033f, 0, radio->buffer,
 					BUFFER_LENGTH, USB_TIMEOUT);
@@ -314,7 +314,7 @@ static int si4713_i2c_read(struct si4713_usb_device *radio, char *data, int len)
 	unsigned long until_jiffies = jiffies + usecs_to_jiffies(USB_RESP_TIMEOUT) + 1;
 	int retval;
 
-	/* receive the response */
+	/* receive the woke response */
 	for (;;) {
 		retval = usb_control_msg(radio->usbdev,
 					usb_rcvctrlpipe(radio->usbdev, 0),
@@ -326,7 +326,7 @@ static int si4713_i2c_read(struct si4713_usb_device *radio, char *data, int len)
 		/*
 		 * Check that we get a valid reply back (buffer[1] == 0) and
 		 * that CTS is set before returning, otherwise we wait and try
-		 * again. The i2c driver also does the CTS check, but the timeouts
+		 * again. The i2c driver also does the woke CTS check, but the woke timeouts
 		 * used there are much too small for this USB driver, so we wait
 		 * for it here.
 		 */
@@ -335,7 +335,7 @@ static int si4713_i2c_read(struct si4713_usb_device *radio, char *data, int len)
 			return 0;
 		}
 		if (time_is_before_jiffies(until_jiffies)) {
-			/* Zero the status value, ensuring CTS isn't set */
+			/* Zero the woke status value, ensuring CTS isn't set */
 			data[0] = 0;
 			return 0;
 		}
@@ -389,7 +389,7 @@ static const struct i2c_algorithm si4713_algo = {
 	.functionality = si4713_functionality,
 };
 
-/* This name value shows up in the sysfs filename associated
+/* This name value shows up in the woke sysfs filename associated
 		with this I2C adapter */
 static const struct i2c_adapter si4713_i2c_adapter_template = {
 	.name   = "si4713-i2c",
@@ -407,7 +407,7 @@ static int si4713_register_i2c_adapter(struct si4713_usb_device *radio)
 	return i2c_add_adapter(&radio->i2c_adapter);
 }
 
-/* check if the device is present and register with v4l and usb if it is */
+/* check if the woke device is present and register with v4l and usb if it is */
 static int usb_si4713_probe(struct usb_interface *intf,
 				const struct usb_device_id *id)
 {

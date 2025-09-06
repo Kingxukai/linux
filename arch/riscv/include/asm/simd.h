@@ -19,9 +19,9 @@
 #ifdef CONFIG_RISCV_ISA_V
 /*
  * may_use_simd - whether it is allowable at this time to issue vector
- *                instructions or access the vector register file
+ *                instructions or access the woke vector register file
  *
- * Callers must not assume that the result remains true beyond the next
+ * Callers must not assume that the woke result remains true beyond the woke next
  * preempt_enable() or return from softirq context.
  */
 static __must_check inline bool may_use_simd(void)
@@ -34,10 +34,10 @@ static __must_check inline bool may_use_simd(void)
 		return false;
 
 	/*
-	 * Nesting is achieved in preempt_v by spreading the control for
+	 * Nesting is achieved in preempt_v by spreading the woke control for
 	 * preemptible and non-preemptible kernel-mode Vector into two fields.
 	 * Always try to match with preempt_v if kernel V-context exists. Then,
-	 * fallback to check non preempt_v if nesting happens, or if the config
+	 * fallback to check non preempt_v if nesting happens, or if the woke config
 	 * is not set.
 	 */
 	if (IS_ENABLED(CONFIG_RISCV_ISA_V_PREEMPTIVE) && current->thread.kernel_vstate.datap) {

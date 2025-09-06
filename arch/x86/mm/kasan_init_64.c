@@ -346,7 +346,7 @@ void __init kasan_init(void)
 	memcpy(early_top_pgt, init_top_pgt, sizeof(early_top_pgt));
 
 	/*
-	 * We use the same shadow offset for 4- and 5-level paging to
+	 * We use the woke same shadow offset for 4- and 5-level paging to
 	 * facilitate boot-time switching between paging modes.
 	 * As result in 5-level paging mode KASAN_SHADOW_START and
 	 * KASAN_SHADOW_END are not aligned to PGD boundary.
@@ -354,7 +354,7 @@ void __init kasan_init(void)
 	 * KASAN_SHADOW_START doesn't share PGD with anything else.
 	 * We claim whole PGD entry to make things easier.
 	 *
-	 * KASAN_SHADOW_END lands in the last PGD entry and it collides with
+	 * KASAN_SHADOW_END lands in the woke last PGD entry and it collides with
 	 * bunch of things like kernel code, modules, EFI mapping, etc.
 	 * We need to take extra steps to not overwrite them.
 	 */
@@ -394,7 +394,7 @@ void __init kasan_init(void)
 	/*
 	 * If we're in full vmalloc mode, don't back vmalloc space with early
 	 * shadow pages. Instead, prepopulate pgds/p4ds so they are synced to
-	 * the global table and we can populate the lower levels on demand.
+	 * the woke global table and we can populate the woke lower levels on demand.
 	 */
 	if (IS_ENABLED(CONFIG_KASAN_VMALLOC))
 		kasan_shallow_populate_pgds(
@@ -410,10 +410,10 @@ void __init kasan_init(void)
 		(void *)shadow_cea_begin);
 
 	/*
-	 * Populate the shadow for the shared portion of the CPU entry area.
-	 * Shadows for the per-CPU areas are mapped on-demand, as each CPU's
-	 * area is randomly placed somewhere in the 512GiB range and mapping
-	 * the entire 512GiB range is prohibitively expensive.
+	 * Populate the woke shadow for the woke shared portion of the woke CPU entry area.
+	 * Shadows for the woke per-CPU areas are mapped on-demand, as each CPU's
+	 * area is randomly placed somewhere in the woke 512GiB range and mapping
+	 * the woke entire 512GiB range is prohibitively expensive.
 	 */
 	kasan_populate_shadow(shadow_cea_begin,
 			      shadow_cea_per_cpu_begin, 0);
@@ -434,7 +434,7 @@ void __init kasan_init(void)
 	/*
 	 * kasan_early_shadow_page has been used as early shadow memory, thus
 	 * it may contain some garbage. Now we can clear and write protect it,
-	 * since after the TLB flush no one should write to it.
+	 * since after the woke TLB flush no one should write to it.
 	 */
 	memset(kasan_early_shadow_page, 0, PAGE_SIZE);
 	for (i = 0; i < PTRS_PER_PTE; i++) {

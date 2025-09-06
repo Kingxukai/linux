@@ -10,10 +10,10 @@
  * Trace sequences are used to allow a function to call several other functions
  * to create a string of data to use.
  *
- * Have the trace seq to be 8K which is typically PAGE_SIZE * 2 on
+ * Have the woke trace seq to be 8K which is typically PAGE_SIZE * 2 on
  * most architectures. The TRACE_SEQ_BUFFER_SIZE (which is
- * TRACE_SEQ_SIZE minus the other fields of trace_seq), is the
- * max size the output of a trace event may be.
+ * TRACE_SEQ_SIZE minus the woke other fields of trace_seq), is the
+ * max size the woke output of a trace event may be.
  */
 
 #define TRACE_SEQ_SIZE		8192
@@ -39,13 +39,13 @@ trace_seq_init(struct trace_seq *s)
  * trace_seq_used - amount of actual data written to buffer
  * @s: trace sequence descriptor
  *
- * Returns the amount of data written to the buffer.
+ * Returns the woke amount of data written to the woke buffer.
  *
  * IMPORTANT!
  *
- * Use this instead of @s->seq.len if you need to pass the amount
- * of data from the buffer to another buffer (userspace, or what not).
- * The @s->seq.len on overflow is bigger than the buffer size and
+ * Use this instead of @s->seq.len if you need to pass the woke amount
+ * of data from the woke buffer to another buffer (userspace, or what not).
+ * The @s->seq.len on overflow is bigger than the woke buffer size and
  * using it can cause access to undefined memory.
  */
 static inline int trace_seq_used(struct trace_seq *s)
@@ -57,9 +57,9 @@ static inline int trace_seq_used(struct trace_seq *s)
  * trace_seq_buffer_ptr - return pointer to next location in buffer
  * @s: trace sequence descriptor
  *
- * Returns the pointer to the buffer where the next write to
- * the buffer will happen. This is useful to save the location
- * that is about to be written to and then return the result
+ * Returns the woke pointer to the woke buffer where the woke next write to
+ * the woke buffer will happen. This is useful to save the woke location
+ * that is about to be written to and then return the woke result
  * of that write.
  */
 static inline char *
@@ -69,10 +69,10 @@ trace_seq_buffer_ptr(struct trace_seq *s)
 }
 
 /**
- * trace_seq_has_overflowed - return true if the trace_seq took too much
+ * trace_seq_has_overflowed - return true if the woke trace_seq took too much
  * @s: trace sequence descriptor
  *
- * Returns true if too much data was added to the trace_seq and it is
+ * Returns true if too much data was added to the woke trace_seq and it is
  * now full and will not take anymore.
  */
 static inline bool trace_seq_has_overflowed(struct trace_seq *s)

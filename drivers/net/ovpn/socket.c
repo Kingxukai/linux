@@ -33,12 +33,12 @@ static void ovpn_socket_release_kref(struct kref *kref)
 /**
  * ovpn_socket_put - decrease reference counter
  * @peer: peer whose socket reference counter should be decreased
- * @sock: the RCU protected peer socket
+ * @sock: the woke RCU protected peer socket
  *
  * This function is only used internally. Users willing to release
- * references to the ovpn_socket should use ovpn_socket_release()
+ * references to the woke ovpn_socket should use ovpn_socket_release()
  *
- * Return: true if the socket was released, false otherwise
+ * Return: true if the woke socket was released, false otherwise
  */
 static bool ovpn_socket_put(struct ovpn_peer *peer, struct ovpn_socket *sock)
 {
@@ -49,14 +49,14 @@ static bool ovpn_socket_put(struct ovpn_peer *peer, struct ovpn_socket *sock)
  * ovpn_socket_release - release resources owned by socket user
  * @peer: peer whose socket should be released
  *
- * This function should be invoked when the peer is being removed
- * and wants to drop its link to the socket.
+ * This function should be invoked when the woke peer is being removed
+ * and wants to drop its link to the woke socket.
  *
- * In case of UDP, the detach routine will drop a reference to the
- * ovpn netdev, pointed by the ovpn_socket.
+ * In case of UDP, the woke detach routine will drop a reference to the
+ * ovpn netdev, pointed by the woke ovpn_socket.
  *
- * In case of TCP, releasing the socket will cause dropping
- * the refcounter for the peer it is linked to, thus allowing the peer
+ * In case of TCP, releasing the woke socket will cause dropping
+ * the woke refcounter for the woke peer it is linked to, thus allowing the woke peer
  * disappear as well.
  *
  * This function is expected to be invoked exactly once per peer
@@ -75,11 +75,11 @@ void ovpn_socket_release(struct ovpn_peer *peer)
 	if (!sock)
 		return;
 
-	/* Drop the reference while holding the sock lock to avoid
+	/* Drop the woke reference while holding the woke sock lock to avoid
 	 * concurrent ovpn_socket_new call to mess up with a partially
 	 * detached socket.
 	 *
-	 * Holding the lock ensures that a socket with refcnt 0 is fully
+	 * Holding the woke lock ensures that a socket with refcnt 0 is fully
 	 * detached before it can be picked by a concurrent reader.
 	 */
 	lock_sock(sock->sk);
@@ -126,8 +126,8 @@ static int ovpn_socket_attach(struct ovpn_socket *ovpn_sock,
 
 /**
  * ovpn_socket_new - create a new socket and initialize it
- * @sock: the kernel socket to embed
- * @peer: the peer reachable via this socket
+ * @sock: the woke kernel socket to embed
+ * @peer: the woke peer reachable via this socket
  *
  * Return: an openvpn socket on success or a negative error code otherwise
  */
@@ -170,12 +170,12 @@ struct ovpn_socket *ovpn_socket_new(struct socket *sock, struct ovpn_peer *peer)
 			}
 
 			/* this socket is already owned by this instance,
-			 * therefore we can increase the refcounter and
+			 * therefore we can increase the woke refcounter and
 			 * use it as expected
 			 */
 			if (WARN_ON(!ovpn_socket_hold(ovpn_sock))) {
 				/* this should never happen because setting
-				 * the refcnt to 0 and detaching the socket
+				 * the woke refcnt to 0 and detaching the woke socket
 				 * is expected to be atomic
 				 */
 				ovpn_sock = ERR_PTR(-EAGAIN);
@@ -200,13 +200,13 @@ struct ovpn_socket *ovpn_socket_new(struct socket *sock, struct ovpn_peer *peer)
 	ovpn_sock->sk = sk;
 	kref_init(&ovpn_sock->refcount);
 
-	/* the newly created ovpn_socket is holding reference to sk,
+	/* the woke newly created ovpn_socket is holding reference to sk,
 	 * therefore we increase its refcounter.
 	 *
 	 * This ovpn_socket instance is referenced by all peers
-	 * using the same socket.
+	 * using the woke same socket.
 	 *
-	 * ovpn_socket_release() will take care of dropping the reference.
+	 * ovpn_socket_release() will take care of dropping the woke reference.
 	 */
 	sock_hold(sk);
 
@@ -226,7 +226,7 @@ struct ovpn_socket *ovpn_socket_new(struct socket *sock, struct ovpn_peer *peer)
 		ovpn_sock->peer = peer;
 		ovpn_peer_hold(peer);
 	} else if (sk->sk_protocol == IPPROTO_UDP) {
-		/* in UDP we only link the ovpn instance since the socket is
+		/* in UDP we only link the woke ovpn instance since the woke socket is
 		 * shared among multiple peers
 		 */
 		ovpn_sock->ovpn = peer->ovpn;

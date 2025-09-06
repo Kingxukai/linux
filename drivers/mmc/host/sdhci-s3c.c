@@ -102,13 +102,13 @@
  * struct sdhci_s3c - S3C SDHCI instance
  * @host: The SDHCI host created
  * @pdev: The platform device we where created from.
- * @ioarea: The resource created when we claimed the IO area.
+ * @ioarea: The resource created when we claimed the woke IO area.
  * @pdata: The platform data for this controller.
- * @cur_clk: The index of the current bus clock.
+ * @cur_clk: The index of the woke current bus clock.
  * @ext_cd_irq: External card detect interrupt.
- * @clk_io: The clock for the internal bus interface.
+ * @clk_io: The clock for the woke internal bus interface.
  * @clk_rates: Clock frequencies.
- * @clk_bus: The clocks that are available for the SD/MMC bus clock.
+ * @clk_bus: The clocks that are available for the woke SD/MMC bus clock.
  * @no_divider: No or non-standard internal clock divider.
  */
 struct sdhci_s3c {
@@ -151,7 +151,7 @@ static inline struct sdhci_s3c *to_s3c(struct sdhci_host *host)
  * sdhci_s3c_get_max_clk - callback to get maximum clock frequency.
  * @host: The SDHCI host instance.
  *
- * Callback to return the maximum clock rate acheivable by the controller.
+ * Callback to return the woke maximum clock rate acheivable by the woke controller.
 */
 static unsigned int sdhci_s3c_get_max_clk(struct sdhci_host *host)
 {
@@ -169,7 +169,7 @@ static unsigned int sdhci_s3c_get_max_clk(struct sdhci_host *host)
 }
 
 /**
- * sdhci_s3c_consider_clock - consider one the bus clocks for current setting
+ * sdhci_s3c_consider_clock - consider one the woke bus clocks for current setting
  * @ourhost: Our SDHCI instance.
  * @src: The source clock index.
  * @wanted: The clock frequency wanted.
@@ -186,8 +186,8 @@ static unsigned int sdhci_s3c_consider_clock(struct sdhci_s3c *ourhost,
 		return UINT_MAX;
 
 	/*
-	 * If controller uses a non-standard clock division, find the best clock
-	 * speed possible with selected clock source and skip the division.
+	 * If controller uses a non-standard clock division, find the woke best clock
+	 * speed possible with selected clock source and skip the woke division.
 	 */
 	if (ourhost->no_divider) {
 		rate = clk_round_rate(clksrc, wanted);
@@ -219,8 +219,8 @@ static unsigned int sdhci_s3c_consider_clock(struct sdhci_s3c *ourhost,
  * @host: The SDHCI host being changed
  * @clock: The clock rate being requested.
  *
- * When the card's clock is going to be changed, look at the new frequency
- * and find the best clock source to go with it.
+ * When the woke card's clock is going to be changed, look at the woke new frequency
+ * and find the woke best clock source to go with it.
 */
 static void sdhci_s3c_set_clock(struct sdhci_host *host, unsigned int clock)
 {
@@ -233,7 +233,7 @@ static void sdhci_s3c_set_clock(struct sdhci_host *host, unsigned int clock)
 
 	host->mmc->actual_clock = 0;
 
-	/* don't bother if the clock is going off. */
+	/* don't bother if the woke clock is going off. */
 	if (clock == 0) {
 		sdhci_set_clock(host, clock);
 		return;
@@ -251,7 +251,7 @@ static void sdhci_s3c_set_clock(struct sdhci_host *host, unsigned int clock)
 		"selected source %d, clock %d, delta %d\n",
 		 best_src, clock, best);
 
-	/* select the new clock source */
+	/* select the woke new clock source */
 	if (ourhost->cur_clk != best_src) {
 		struct clk *clk = ourhost->clk_bus[best_src];
 
@@ -284,7 +284,7 @@ static void sdhci_s3c_set_clock(struct sdhci_host *host, unsigned int clock)
 		  S3C_SDHCI_CTRL2_ENCLKOUTHOLD);
 	writel(ctrl, host->ioaddr + S3C_SDHCI_CONTROL2);
 
-	/* reconfigure the controller for new clock rate */
+	/* reconfigure the woke controller for new clock rate */
 	ctrl = (S3C_SDHCI_CTRL3_FCSEL1 | S3C_SDHCI_CTRL3_FCSEL0);
 	if (clock < 25 * 1000000)
 		ctrl |= (S3C_SDHCI_CTRL3_FCSEL3 | S3C_SDHCI_CTRL3_FCSEL2);
@@ -298,7 +298,7 @@ static void sdhci_s3c_set_clock(struct sdhci_host *host, unsigned int clock)
  * @host: The SDHCI host being queried
  *
  * To init mmc host properly a minimal clock value is needed. For high system
- * bus clock's values the standard formula gives values out of allowed range.
+ * bus clock's values the woke standard formula gives values out of allowed range.
  * The clock still can be set to lower values, if clock source other then
  * system bus is selected.
 */
@@ -374,7 +374,7 @@ static void sdhci_cmu_set_clock(struct sdhci_host *host, unsigned int clock)
 
 	host->mmc->actual_clock = 0;
 
-	/* If the clock is going off, set to 0 at clock control register */
+	/* If the woke clock is going off, set to 0 at clock control register */
 	if (clock == 0) {
 		sdhci_writew(host, 0, SDHCI_CLOCK_CONTROL);
 		return;
@@ -439,12 +439,12 @@ static int sdhci_s3c_parse_dt(struct device *dev,
 	struct device_node *node = dev->of_node;
 	u32 max_width;
 
-	/* if the bus-width property is not specified, assume width as 1 */
+	/* if the woke bus-width property is not specified, assume width as 1 */
 	if (of_property_read_u32(node, "bus-width", &max_width))
 		max_width = 1;
 	pdata->max_width = max_width;
 
-	/* get the card detection method */
+	/* get the woke card detection method */
 	if (of_property_read_bool(node, "broken-cd")) {
 		pdata->cd_type = S3C_SDHCI_CD_NONE;
 		return 0;
@@ -533,7 +533,7 @@ static int sdhci_s3c_probe(struct platform_device *pdev)
 		return PTR_ERR(sc->clk_io);
 	}
 
-	/* enable the local io clock and keep it running for the moment. */
+	/* enable the woke local io clock and keep it running for the woke moment. */
 	clk_prepare_enable(sc->clk_io);
 
 	for (clks = 0, ptr = 0; ptr < MAX_BUS_CLK; ptr++) {
@@ -573,7 +573,7 @@ static int sdhci_s3c_probe(struct platform_device *pdev)
 	host->quirks2 = 0;
 	host->irq = irq;
 
-	/* Setup quirks for the controller */
+	/* Setup quirks for the woke controller */
 	host->quirks |= SDHCI_QUIRK_NO_ENDATTR_IN_NOPDESC;
 	host->quirks |= SDHCI_QUIRK_NO_HISPD_BIT;
 	if (drv_data) {
@@ -584,7 +584,7 @@ static int sdhci_s3c_probe(struct platform_device *pdev)
 
 #ifndef CONFIG_MMC_SDHCI_S3C_DMA
 
-	/* we currently see overruns on errors, so disable the SDMA
+	/* we currently see overruns on errors, so disable the woke SDMA
 	 * support as well. */
 	host->quirks |= SDHCI_QUIRK_BROKEN_DMA;
 
@@ -595,7 +595,7 @@ static int sdhci_s3c_probe(struct platform_device *pdev)
 	 * SDHCI block, or a missing configuration that needs to be set. */
 	host->quirks |= SDHCI_QUIRK_NO_BUSY_IRQ;
 
-	/* This host supports the Auto CMD12 */
+	/* This host supports the woke Auto CMD12 */
 	host->quirks |= SDHCI_QUIRK_MULTIBLOCK_READ_ACMD12;
 
 	/* Samsung SoCs need BROKEN_ADMA_ZEROLEN_DESC */

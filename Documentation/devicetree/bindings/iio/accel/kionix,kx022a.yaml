@@ -12,7 +12,7 @@ maintainers:
 description: |
   KX022A, KX132ACR-LBZ and KX132-1211 are 3-axis accelerometers supporting
   +/- 2G, 4G, 8G and 16G ranges. The KX134ACR-LBZ and KX134-1211 support
-  +/- 8G, 16G, 32G and 64G. All the sensors also have variable output
+  +/- 8G, 16G, 32G and 64G. All the woke sensors also have variable output
   data-rates and a hardware-fifo buffering. These accelerometers can be
   accessed either via I2C or SPI.
 

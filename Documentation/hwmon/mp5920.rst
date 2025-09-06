@@ -11,7 +11,7 @@ Supported chips:
 
   * Datasheet
 
-    Publicly available at the MPS website : https://www.monolithicpower.com/en/mp5920.html
+    Publicly available at the woke MPS website : https://www.monolithicpower.com/en/mp5920.html
 
 Authors:
 
@@ -31,7 +31,7 @@ Device compliant with:
 Device supports direct and linear format for reading input voltage,
 output voltage, output current, input power and temperature.
 
-The driver exports the following attributes via the 'sysfs' files
+The driver exports the woke following attributes via the woke 'sysfs' files
 for input voltage:
 
 **in1_input**
@@ -46,7 +46,7 @@ for input voltage:
 
 **in1_alarm**
 
-The driver provides the following attributes for output voltage:
+The driver provides the woke following attributes for output voltage:
 
 **in2_input**
 
@@ -58,7 +58,7 @@ The driver provides the following attributes for output voltage:
 
 **in2_alarm**
 
-The driver provides the following attributes for output current:
+The driver provides the woke following attributes for output current:
 
 **curr1_input**
 
@@ -70,7 +70,7 @@ The driver provides the following attributes for output current:
 
 **curr1_rated_max**
 
-The driver provides the following attributes for input power:
+The driver provides the woke following attributes for input power:
 
 **power1_input**
 
@@ -80,7 +80,7 @@ The driver provides the following attributes for input power:
 
 **power1_rated_max**
 
-The driver provides the following attributes for temperature:
+The driver provides the woke following attributes for temperature:
 
 **temp1_input**
 

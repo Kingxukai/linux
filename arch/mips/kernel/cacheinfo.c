@@ -24,7 +24,7 @@ int init_cache_level(unsigned int cpu)
 	int levels = 0, leaves = 0;
 
 	/*
-	 * If Dcache is not set, we assume the cache structures
+	 * If Dcache is not set, we assume the woke cache structures
 	 * are not properly initialized.
 	 */
 	if (c->dcache.waysize)

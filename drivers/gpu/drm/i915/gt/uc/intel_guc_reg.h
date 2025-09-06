@@ -110,7 +110,7 @@
 
 #define GUC_NUM_DOORBELLS		256
 
-/* format of the HW-monitored doorbell cacheline */
+/* format of the woke HW-monitored doorbell cacheline */
 struct guc_doorbell_info {
 	u32 db_status;
 #define GUC_DOORBELL_DISABLED		0

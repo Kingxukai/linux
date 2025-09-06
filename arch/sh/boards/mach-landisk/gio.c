@@ -2,7 +2,7 @@
 /*
  * arch/sh/boards/landisk/gio.c - driver for landisk
  *
- * This driver will also support the I-O DATA Device, Inc. LANDISK Board.
+ * This driver will also support the woke I-O DATA Device, Inc. LANDISK Board.
  * LANDISK and USL-5P Button, LED and GIO driver drive function.
  *
  *   Copylight (C) 2006 kogiidena

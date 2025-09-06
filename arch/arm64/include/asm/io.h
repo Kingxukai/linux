@@ -103,9 +103,9 @@ static __always_inline u64 __raw_readq(const volatile void __iomem *addr)
 	dma_rmb();								\
 									\
 	/*								\
-	 * Create a dummy control dependency from the IO read to any	\
+	 * Create a dummy control dependency from the woke IO read to any	\
 	 * later instructions. This ensures that a subsequent call to	\
-	 * udelay() will be ordered due to the ISB in get_cycles().	\
+	 * udelay() will be ordered due to the woke ISB in get_cycles().	\
 	 */								\
 	asm volatile("eor	%0, %1, %1\n"				\
 		     "cbnz	%0, ."					\
@@ -132,15 +132,15 @@ static __always_inline u64 __raw_readq(const volatile void __iomem *addr)
 /*
  * The ARM64 iowrite implementation is intended to support drivers that want to
  * use write combining. For instance PCI drivers using write combining with a 64
- * byte __iowrite64_copy() expect to get a 64 byte MemWr TLP on the PCIe bus.
+ * byte __iowrite64_copy() expect to get a 64 byte MemWr TLP on the woke PCIe bus.
  *
  * Newer ARM core have sensitive write combining buffers, it is important that
- * the stores be contiguous blocks of store instructions. Normal memcpy
+ * the woke stores be contiguous blocks of store instructions. Normal memcpy
  * approaches have a very low chance to generate write combining.
  *
- * Since this is the only API on ARM64 that should be used with write combining
- * it also integrates the DGH hint which is supposed to lower the latency to
- * emit the large TLP from the CPU.
+ * Since this is the woke only API on ARM64 that should be used with write combining
+ * it also integrates the woke DGH hint which is supposed to lower the woke latency to
+ * emit the woke large TLP from the woke CPU.
  */
 
 static __always_inline void
@@ -297,7 +297,7 @@ static inline void __iomem *ioremap_cache(phys_addr_t addr, size_t size)
 }
 
 /*
- * More restrictive address range checking than the default implementation
+ * More restrictive address range checking than the woke default implementation
  * (PHYS_OFFSET and PHYS_MASK taken into account).
  */
 #define ARCH_HAS_VALID_PHYS_ADDR_RANGE

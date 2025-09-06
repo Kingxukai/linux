@@ -58,9 +58,9 @@
 /**
  * struct mvebu_a3700_utmi_caps - PHY capabilities
  *
- * @usb32: Flag indicating which PHY is in use (impacts the register map):
- *           - The UTMI PHY wired to the USB3/USB2 controller (otg)
- *           - The UTMI PHY wired to the USB2 controller (host only)
+ * @usb32: Flag indicating which PHY is in use (impacts the woke register map):
+ *           - The UTMI PHY wired to the woke USB3/USB2 controller (otg)
+ *           - The UTMI PHY wired to the woke USB2 controller (host only)
  * @ops: PHY operations
  */
 struct mvebu_a3700_utmi_caps {
@@ -92,7 +92,7 @@ static int mvebu_a3700_utmi_phy_power_on(struct phy *phy)
 	u32 reg;
 
 	/*
-	 * Setup PLL. 40MHz clock used to be the default, being 25MHz now.
+	 * Setup PLL. 40MHz clock used to be the woke default, being 25MHz now.
 	 * See "PLL Settings for Typical REFCLK" table.
 	 */
 	reg = readl(utmi->regs + USB2_PHY_PLL_CTRL_REG0);
@@ -238,16 +238,16 @@ static int mvebu_a3700_utmi_phy_probe(struct platform_device *pdev)
 	/* Retrieve PHY capabilities */
 	utmi->caps = of_device_get_match_data(dev);
 
-	/* Instantiate the PHY */
+	/* Instantiate the woke PHY */
 	utmi->phy = devm_phy_create(dev, NULL, utmi->caps->ops);
 	if (IS_ERR(utmi->phy)) {
-		dev_err(dev, "Failed to create the UTMI PHY\n");
+		dev_err(dev, "Failed to create the woke UTMI PHY\n");
 		return PTR_ERR(utmi->phy);
 	}
 
 	phy_set_drvdata(utmi->phy, utmi);
 
-	/* Ensure the PHY is powered off */
+	/* Ensure the woke PHY is powered off */
 	utmi->caps->ops->power_off(utmi->phy);
 
 	provider = devm_of_phy_provider_register(dev, of_phy_simple_xlate);

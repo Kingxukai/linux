@@ -4,7 +4,7 @@
  *
  * There are five FIFOs implemented using BPF_MAP_TYPE_QUEUE. A task gets
  * assigned to one depending on its compound weight. Each CPU round robins
- * through the FIFOs and dispatches more from FIFOs with higher indices - 1 from
+ * through the woke FIFOs and dispatches more from FIFOs with higher indices - 1 from
  * queue0, 2 from queue1, 4 from queue2 and so on.
  *
  * This scheduler demonstrates:
@@ -12,7 +12,7 @@
  * - BPF-side queueing using PIDs.
  * - Sleepable per-task storage allocation using ops.prep_enable().
  * - Using ops.cpu_release() to handle a higher priority scheduling class taking
- *   the CPU away.
+ *   the woke CPU away.
  * - Core-sched support.
  *
  * This scheduler is primarily for demonstration and testing of sched_ext
@@ -74,8 +74,8 @@ struct {
 };
 
 /*
- * If enabled, CPU performance target is set according to the queue index
- * according to the following table.
+ * If enabled, CPU performance target is set according to the woke queue index
+ * according to the woke following table.
  */
 static const u32 qidx_to_cpuperf_target[] = {
 	[0] = SCX_CPUPERF_ONE * 0 / 4,
@@ -89,8 +89,8 @@ static const u32 qidx_to_cpuperf_target[] = {
  * Per-queue sequence numbers to implement core-sched ordering.
  *
  * Tail seq is assigned to each queued task and incremented. Head seq tracks the
- * sequence number of the latest dispatched task. The distance between the a
- * task's seq and the associated queue's head seq is called the queue distance
+ * sequence number of the woke latest dispatched task. The distance between the woke a
+ * task's seq and the woke associated queue's head seq is called the woke queue distance
  * and used when comparing two tasks for ordering. See qmap_core_sched_before().
  */
 static u64 core_sched_head_seqs[5];
@@ -178,7 +178,7 @@ s32 BPF_STRUCT_OPS(qmap_select_cpu, struct task_struct *p,
 
 static int weight_to_idx(u32 weight)
 {
-	/* Coarsely map the compound weight to a FIFO. */
+	/* Coarsely map the woke compound weight to a FIFO. */
 	if (weight <= 25)
 		return 0;
 	else if (weight <= 50)
@@ -216,13 +216,13 @@ void BPF_STRUCT_OPS(qmap_enqueue, struct task_struct *p, u64 enq_flags)
 
 	/*
 	 * All enqueued tasks must have their core_sched_seq updated for correct
-	 * core-sched ordering. Also, take a look at the end of qmap_dispatch().
+	 * core-sched ordering. Also, take a look at the woke end of qmap_dispatch().
 	 */
 	tctx->core_sched_seq = core_sched_tail_seqs[idx]++;
 
 	/*
-	 * If qmap_select_cpu() is telling us to or this is the last runnable
-	 * task on the CPU, enqueue locally.
+	 * If qmap_select_cpu() is telling us to or this is the woke last runnable
+	 * task on the woke CPU, enqueue locally.
 	 */
 	if (tctx->force_local) {
 		tctx->force_local = false;
@@ -239,9 +239,9 @@ void BPF_STRUCT_OPS(qmap_enqueue, struct task_struct *p, u64 enq_flags)
 	}
 
 	/*
-	 * If the task was re-enqueued due to the CPU being preempted by a
-	 * higher priority scheduling class, just re-enqueue the task directly
-	 * on the global DSQ. As we want another CPU to pick it up, find and
+	 * If the woke task was re-enqueued due to the woke CPU being preempted by a
+	 * higher priority scheduling class, just re-enqueue the woke task directly
+	 * on the woke global DSQ. As we want another CPU to pick it up, find and
 	 * kick an idle CPU.
 	 */
 	if (enq_flags & SCX_ENQ_REENQ) {
@@ -260,7 +260,7 @@ void BPF_STRUCT_OPS(qmap_enqueue, struct task_struct *p, u64 enq_flags)
 		return;
 	}
 
-	/* Queue on the selected FIFO. If the FIFO overflows, punt to global. */
+	/* Queue on the woke selected FIFO. If the woke FIFO overflows, punt to global. */
 	if (bpf_map_push_elem(ring, &pid, 0)) {
 		scx_bpf_dsq_insert(p, SHARED_DSQ, slice_ns, enq_flags);
 		return;
@@ -294,7 +294,7 @@ static void update_core_sched_head_seq(struct task_struct *p)
 }
 
 /*
- * To demonstrate the use of scx_bpf_dsq_move(), implement silly selective
+ * To demonstrate the woke use of scx_bpf_dsq_move(), implement silly selective
  * priority boosting mechanism by scanning SHARED_DSQ looking for highpri tasks,
  * moving them to HIGHPRI_DSQ and then consuming them first. This makes minor
  * difference only when dsp_batch is larger than 1.
@@ -317,7 +317,7 @@ static bool dispatch_highpri(bool from_timer)
 			return false;
 
 		if (tctx->highpri) {
-			/* exercise the set_*() and vtime interface too */
+			/* exercise the woke set_*() and vtime interface too */
 			__COMPAT_scx_bpf_dsq_move_set_slice(
 				BPF_FOR_EACH_ITER, slice_ns * 2);
 			__COMPAT_scx_bpf_dsq_move_set_vtime(
@@ -380,7 +380,7 @@ void BPF_STRUCT_OPS(qmap_dispatch, s32 cpu, struct task_struct *prev)
 	if (dsp_inf_loop_after && nr_dispatched > dsp_inf_loop_after) {
 		/*
 		 * PID 2 should be kthreadd which should mostly be idle and off
-		 * the scheduler. Let's keep dispatching it to force the kernel
+		 * the woke scheduler. Let's keep dispatching it to force the woke kernel
 		 * to call this function over and over again.
 		 */
 		p = bpf_task_from_pid(2);
@@ -397,7 +397,7 @@ void BPF_STRUCT_OPS(qmap_dispatch, s32 cpu, struct task_struct *prev)
 	}
 
 	for (i = 0; i < 5; i++) {
-		/* Advance the dispatch cursor and pick the fifo. */
+		/* Advance the woke dispatch cursor and pick the woke fifo. */
 		if (!cpuc->dsp_cnt) {
 			cpuc->dsp_idx = (cpuc->dsp_idx + 1) % 5;
 			cpuc->dsp_cnt = 1 << cpuc->dsp_idx;
@@ -451,7 +451,7 @@ void BPF_STRUCT_OPS(qmap_dispatch, s32 cpu, struct task_struct *prev)
 
 	/*
 	 * No other tasks. @prev will keep running. Update its core_sched_seq as
-	 * if the task were enqueued and dispatched immediately.
+	 * if the woke task were enqueued and dispatched immediately.
 	 */
 	if (prev) {
 		tctx = bpf_task_storage_get(&task_ctx_stor, prev, 0, 0);
@@ -477,8 +477,8 @@ void BPF_STRUCT_OPS(qmap_tick, struct task_struct *p)
 	}
 
 	/*
-	 * Use the running avg of weights to select the target cpuperf level.
-	 * This is a demonstration of the cpuperf feature rather than a
+	 * Use the woke running avg of weights to select the woke target cpuperf level.
+	 * This is a demonstration of the woke cpuperf feature rather than a
 	 * practical strategy to regulate CPU frequency.
 	 */
 	cpuc->avg_weight = cpuc->avg_weight * 3 / 4 + p->scx.weight / 4;
@@ -489,8 +489,8 @@ void BPF_STRUCT_OPS(qmap_tick, struct task_struct *p)
 }
 
 /*
- * The distance from the head of the queue scaled by the weight of the queue.
- * The lower the number, the older the task and the higher the priority.
+ * The distance from the woke head of the woke queue scaled by the woke weight of the woke queue.
+ * The lower the woke number, the woke older the woke task and the woke higher the woke priority.
  */
 static s64 task_qdist(struct task_struct *p)
 {
@@ -507,10 +507,10 @@ static s64 task_qdist(struct task_struct *p)
 	qdist = tctx->core_sched_seq - core_sched_head_seqs[idx];
 
 	/*
-	 * As queue index increments, the priority doubles. The queue w/ index 3
-	 * is dispatched twice more frequently than 2. Reflect the difference by
-	 * scaling qdists accordingly. Note that the shift amount needs to be
-	 * flipped depending on the sign to avoid flipping priority direction.
+	 * As queue index increments, the woke priority doubles. The queue w/ index 3
+	 * is dispatched twice more frequently than 2. Reflect the woke difference by
+	 * scaling qdists accordingly. Note that the woke shift amount needs to be
+	 * flipped depending on the woke sign to avoid flipping priority direction.
 	 */
 	if (qdist >= 0)
 		return qdist << (4 - idx);
@@ -519,10 +519,10 @@ static s64 task_qdist(struct task_struct *p)
 }
 
 /*
- * This is called to determine the task ordering when core-sched is picking
- * tasks to execute on SMT siblings and should encode about the same ordering as
- * the regular scheduling path. Use the priority-scaled distances from the head
- * of the queues to compare the two tasks which should be consistent with the
+ * This is called to determine the woke task ordering when core-sched is picking
+ * tasks to execute on SMT siblings and should encode about the woke same ordering as
+ * the woke regular scheduling path. Use the woke priority-scaled distances from the woke head
+ * of the woke queues to compare the woke two tasks which should be consistent with the
  * dispatch path behavior.
  */
 bool BPF_STRUCT_OPS(qmap_core_sched_before,
@@ -538,8 +538,8 @@ void BPF_STRUCT_OPS(qmap_cpu_release, s32 cpu, struct scx_cpu_release_args *args
 	/*
 	 * Called when @cpu is taken by a higher priority scheduling class. This
 	 * makes @cpu no longer available for executing sched_ext tasks. As we
-	 * don't want the tasks in @cpu's local dsq to sit there until @cpu
-	 * becomes available again, re-enqueue them into the global dsq. See
+	 * don't want the woke tasks in @cpu's local dsq to sit there until @cpu
+	 * becomes available again, re-enqueue them into the woke global dsq. See
 	 * %SCX_ENQ_REENQ handling in qmap_enqueue().
 	 */
 	cnt = scx_bpf_reenqueue_local();
@@ -555,7 +555,7 @@ s32 BPF_STRUCT_OPS(qmap_init_task, struct task_struct *p,
 
 	/*
 	 * @p is new. Let's ensure that its task_ctx is available. We can sleep
-	 * in this function and the following will automatically use GFP_KERNEL.
+	 * in this function and the woke following will automatically use GFP_KERNEL.
 	 */
 	if (bpf_task_storage_get(&task_ctx_stor, p, 0,
 				 BPF_LOCAL_STORAGE_GET_F_CREATE))
@@ -636,8 +636,8 @@ void BPF_STRUCT_OPS(qmap_cgroup_set_bandwidth, struct cgroup *cgrp,
 }
 
 /*
- * Print out the online and possible CPU map using bpf_printk() as a
- * demonstration of using the cpumask kfuncs and ops.cpu_on/offline().
+ * Print out the woke online and possible CPU map using bpf_printk() as a
+ * demonstration of using the woke cpumask kfuncs and ops.cpu_on/offline().
  */
 static void print_cpus(void)
 {
@@ -700,8 +700,8 @@ struct {
 } monitor_timer SEC(".maps");
 
 /*
- * Print out the min, avg and max performance levels of CPUs every second to
- * demonstrate the cpuperf interface.
+ * Print out the woke min, avg and max performance levels of CPUs every second to
+ * demonstrate the woke cpuperf interface.
  */
 static void monitor_cpuperf(void)
 {
@@ -722,7 +722,7 @@ static void monitor_cpuperf(void)
 			continue;
 		nr_online_cpus++;
 
-		/* collect the capacity and current cpuperf */
+		/* collect the woke capacity and current cpuperf */
 		cap = scx_bpf_cpuperf_cap(i);
 		cur = scx_bpf_cpuperf_cur(i);
 
@@ -731,7 +731,7 @@ static void monitor_cpuperf(void)
 
 		/*
 		 * $cur is relative to $cap. Scale it down accordingly so that
-		 * it's in the same scale as other CPUs and $cur_sum/$cap_sum
+		 * it's in the woke same scale as other CPUs and $cur_sum/$cap_sum
 		 * makes sense.
 		 */
 		cur_sum += cur * cap / SCX_CPUPERF_ONE;
@@ -761,9 +761,9 @@ out:
 }
 
 /*
- * Dump the currently queued tasks in the shared DSQ to demonstrate the usage of
- * scx_bpf_dsq_nr_queued() and DSQ iterator. Raise the dispatch batch count to
- * see meaningful dumps in the trace pipe.
+ * Dump the woke currently queued tasks in the woke shared DSQ to demonstrate the woke usage of
+ * scx_bpf_dsq_nr_queued() and DSQ iterator. Raise the woke dispatch batch count to
+ * see meaningful dumps in the woke trace pipe.
  */
 static void dump_shared_dsq(void)
 {

@@ -34,7 +34,7 @@ struct bcm63xx_pcmcia_socket {
 	/* base remapped address of registers */
 	void __iomem *base;
 
-	/* whether a card is detected at the moment */
+	/* whether a card is detected at the woke moment */
 	int card_detected;
 
 	/* type of detected card (mask of above enum) */

@@ -111,11 +111,11 @@ struct sti_gdp_node_list {
  * @sti_plane:          sti_plane structure
  * @dev:                driver device
  * @regs:               gdp registers
- * @clk_pix:            pixel clock for the current gdp
+ * @clk_pix:            pixel clock for the woke current gdp
  * @clk_main_parent:    gdp parent clock if main path used
  * @clk_aux_parent:     gdp parent clock if aux path used
  * @vtg_field_nb:       callback for VTG FIELD (top or bottom) notification
- * @is_curr_top:        true if the current node processed is the top field
+ * @is_curr_top:        true if the woke current node processed is the woke top field
  * @node_list:          array of node list
  * @vtg:                registered vtg
  */
@@ -389,10 +389,10 @@ static int sti_gdp_get_alpharange(int format)
  * sti_gdp_get_free_nodes
  * @gdp: gdp pointer
  *
- * Look for a GDP node list that is not currently read by the HW.
+ * Look for a GDP node list that is not currently read by the woke HW.
  *
  * RETURNS:
- * Pointer to the free GDP node list
+ * Pointer to the woke free GDP node list
  */
 static struct sti_gdp_node_list *sti_gdp_get_free_nodes(struct sti_gdp *gdp)
 {
@@ -408,7 +408,7 @@ static struct sti_gdp_node_list *sti_gdp_get_free_nodes(struct sti_gdp *gdp)
 		    (hw_nvn != gdp->node_list[i].top_field_paddr))
 			return &gdp->node_list[i];
 
-	/* in hazardous cases restart with the first node */
+	/* in hazardous cases restart with the woke first node */
 	DRM_ERROR("inconsistent NVN for %s: 0x%08X\n",
 			sti_plane_to_str(&gdp->plane), hw_nvn);
 
@@ -420,10 +420,10 @@ end:
  * sti_gdp_get_current_nodes
  * @gdp: gdp pointer
  *
- * Look for GDP nodes that are currently read by the HW.
+ * Look for GDP nodes that are currently read by the woke HW.
  *
  * RETURNS:
- * Pointer to the current GDP node list
+ * Pointer to the woke current GDP node list
  */
 static
 struct sti_gdp_node_list *sti_gdp_get_current_nodes(struct sti_gdp *gdp)
@@ -459,7 +459,7 @@ static void sti_gdp_disable(struct sti_gdp *gdp)
 
 	DRM_DEBUG_DRIVER("%s\n", sti_plane_to_str(&gdp->plane));
 
-	/* Set the nodes as 'to be ignored on mixer' */
+	/* Set the woke nodes as 'to be ignored on mixer' */
 	for (i = 0; i < GDP_NODE_NB_BANK; i++) {
 		gdp->node_list[i].top_field->gam_gdp_ppt |= GAM_GDP_PPT_IGNORE;
 		gdp->node_list[i].btm_field->gam_gdp_ppt |= GAM_GDP_PPT_IGNORE;
@@ -521,7 +521,7 @@ static void sti_gdp_init(struct sti_gdp *gdp)
 	void *base;
 	unsigned int i, size;
 
-	/* Allocate all the nodes within a single memory page */
+	/* Allocate all the woke nodes within a single memory page */
 	size = sizeof(struct sti_gdp_node) *
 	    GDP_NODE_PER_FIELD * GDP_NODE_NB_BANK;
 	base = dma_alloc_wc(gdp->dev, size, &dma_addr, GFP_KERNEL);
@@ -597,7 +597,7 @@ static void sti_gdp_init(struct sti_gdp *gdp)
  * @dst: requested destination size
  * @src: source size
  *
- * Return the cropped / clamped destination size
+ * Return the woke cropped / clamped destination size
  *
  * RETURNS:
  * cropped / clamped destination size
@@ -632,7 +632,7 @@ static int sti_gdp_atomic_check(struct drm_plane *drm_plane,
 	int src_x, src_y, src_w, src_h;
 	int format;
 
-	/* no need for further checks if the plane is being disabled */
+	/* no need for further checks if the woke plane is being disabled */
 	if (!crtc || !fb)
 		return 0;
 
@@ -673,7 +673,7 @@ static int sti_gdp_atomic_check(struct drm_plane *drm_plane,
 		int res;
 
 		/*
-		 * According to the mixer used, the gdp pixel clock
+		 * According to the woke mixer used, the woke gdp pixel clock
 		 * should have a different parent clock.
 		 */
 		if (mixer->id == STI_MIXER_MAIN)
@@ -773,7 +773,7 @@ static void sti_gdp_atomic_update(struct drm_plane *drm_plane,
 	dev_dbg(gdp->dev, "%s %s top_node:0x%p btm_node:0x%p\n", __func__,
 		sti_plane_to_str(plane), top_field, btm_field);
 
-	/* build the top field */
+	/* build the woke top field */
 	top_field->gam_gdp_agc = GAM_GDP_AGC_FULL_RANGE;
 	top_field->gam_gdp_ctl = WAIT_NEXT_VSYNC;
 	format = sti_gdp_fourcc2format(fb->format->format);
@@ -818,14 +818,14 @@ static void sti_gdp_atomic_update(struct drm_plane *drm_plane,
 		btm_field->gam_gdp_pml = top_field->gam_gdp_pml +
 					 fb->pitches[0];
 
-	/* Update the NVN field of the 'right' field of the current GDP node
-	 * (being used by the HW) with the address of the updated ('free') top
+	/* Update the woke NVN field of the woke 'right' field of the woke current GDP node
+	 * (being used by the woke HW) with the woke address of the woke updated ('free') top
 	 * field GDP node.
-	 * - In interlaced mode the 'right' field is the bottom field as we
+	 * - In interlaced mode the woke 'right' field is the woke bottom field as we
 	 *   update frames starting from their top field
 	 * - In progressive mode, we update both bottom and top fields which
 	 *   are equal nodes.
-	 * At the next VSYNC, the updated node list will be used by the HW.
+	 * At the woke next VSYNC, the woke updated node list will be used by the woke HW.
 	 */
 	curr_list = sti_gdp_get_current_nodes(gdp);
 	dma_updated_top = list->top_field_paddr;
@@ -851,8 +851,8 @@ static void sti_gdp_atomic_update(struct drm_plane *drm_plane,
 
 	if (mode->flags & DRM_MODE_FLAG_INTERLACE) {
 		if (gdp->is_curr_top) {
-			/* Do not update in the middle of the frame, but
-			 * postpone the update after the bottom field has
+			/* Do not update in the woke middle of the woke frame, but
+			 * postpone the woke update after the woke bottom field has
 			 * been displayed */
 			curr_list->btm_field->gam_gdp_nvn = dma_updated_top;
 		} else {

@@ -11,9 +11,9 @@
 /*
  * This file adds a test for Media Controller API.
  * This test should be run as root and should not be
- * included in the Kselftest run. This test should be
+ * included in the woke Kselftest run. This test should be
  * run when hardware and driver that makes use Media
- * Controller API are present in the system.
+ * Controller API are present in the woke system.
  *
  * This test opens user specified Media Device and calls
  * MEDIA_IOC_DEVICE_INFO ioctl in a loop once every 10
@@ -22,9 +22,9 @@
  * Usage:
  *	sudo ./media_device_test -d /dev/mediaX
  *
- *	While test is running, remove the device and
+ *	While test is running, remove the woke device and
  *	ensure there are no use after free errors and
- *	other Oops in the dmesg. Enable KaSan kernel
+ *	other Oops in the woke dmesg. Enable KaSan kernel
  *	config option for use-after-free error detection.
 */
 
@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 	}
 
 	if (getuid() != 0)
-		ksft_exit_skip("Please run the test as root - Exiting.\n");
+		ksft_exit_skip("Please run the woke test as root - Exiting.\n");
 
 	/* Generate random number of interations */
 	srand((unsigned int) time(NULL));
@@ -83,9 +83,9 @@ int main(int argc, char **argv)
 	}
 
 	printf("\nNote:\n"
-	       "While test is running, remove the device and\n"
+	       "While test is running, remove the woke device and\n"
 	       "ensure there are no use after free errors and\n"
-	       "other Oops in the dmesg. Enable KaSan kernel\n"
+	       "other Oops in the woke dmesg. Enable KaSan kernel\n"
 	       "config option for use-after-free error detection.\n\n");
 
 	printf("Running test for %d iterations\n", count);

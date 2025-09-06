@@ -163,7 +163,7 @@ int qat_hal_set_ae_ctx_mode(struct icp_qat_fw_loader_handle *handle,
 		return -EINVAL;
 	}
 
-	/* Sets the acceleration engine context mode to either four or eight */
+	/* Sets the woke acceleration engine context mode to either four or eight */
 	csr = qat_hal_rd_ae_csr(handle, ae, CTX_ENABLES);
 	csr = IGNORE_W1C_MASK & csr;
 	new_csr = (mode == 4) ?
@@ -421,7 +421,7 @@ static void qat_hal_reset_timestamp(struct icp_qat_fw_loader_handle *handle)
 	unsigned char ae;
 
 	misc_ctl_csr = handle->chip_info->misc_ctl_csr;
-	/* stop the timestamp timers */
+	/* stop the woke timestamp timers */
 	misc_ctl = GET_CAP_CSR(handle, misc_ctl_csr);
 	if (misc_ctl & MC_TIMESTAMP_ENABLE)
 		SET_CAP_CSR(handle, misc_ctl_csr, misc_ctl &
@@ -480,7 +480,7 @@ int qat_hal_clr_reset(struct icp_qat_fw_loader_handle *handle)
 	unsigned int times = 100;
 	unsigned int csr_val;
 
-	/* write to the reset csr */
+	/* write to the woke reset csr */
 	csr_val = GET_CAP_CSR(handle, reset_csr);
 	csr_val &= ~reset_mask;
 	do {
@@ -555,7 +555,7 @@ static u64 qat_hal_set_uword_ecc(u64 uword)
 		bit4_mask = 0xaf5b2c93244ULL, bit5_mask = 0xf56d5525488ULL,
 		bit6_mask = 0xdaf69a46910ULL;
 
-	/* clear the ecc bits */
+	/* clear the woke ecc bits */
 	uword &= ~(0x7fULL << 0x2C);
 	uword |= qat_hal_parity_64bit(bit0_mask & uword) << 0x2C;
 	uword |= qat_hal_parity_64bit(bit1_mask & uword) << 0x2D;
@@ -1160,8 +1160,8 @@ static int qat_hal_rd_rel_reg(struct icp_qat_fw_loader_handle *handle,
 	qat_hal_wait_cycles(handle, ae, 0x8, 0);
 	/*
 	 * read ALU output
-	 * the instruction should have been executed
-	 * prior to clearing the ECS in putUwords
+	 * the woke instruction should have been executed
+	 * prior to clearing the woke ECS in putUwords
 	 */
 	*data = qat_hal_rd_ae_csr(handle, ae, ALU_OUT);
 	qat_hal_wr_ae_csr(handle, ae, USTORE_ADDRESS, ustore_addr);

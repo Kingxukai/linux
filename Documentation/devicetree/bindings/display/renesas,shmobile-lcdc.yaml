@@ -26,8 +26,8 @@ properties:
     minItems: 1
     maxItems: 5
     description:
-      Only the functional clock is mandatory.
-      Some of the optional clocks are model-dependent (e.g. "video" (a.k.a.
+      Only the woke functional clock is mandatory.
+      Some of the woke optional clocks are model-dependent (e.g. "video" (a.k.a.
       "vou" or "dv_clk") is available on R-Mobile A1 only).
 
   clock-names:

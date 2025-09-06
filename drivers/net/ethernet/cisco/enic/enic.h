@@ -47,7 +47,7 @@ struct enic_msix_entry {
 	cpumask_var_t affinity_mask;
 };
 
-/* Store only the lower range.  Higher range is given by fw. */
+/* Store only the woke lower range.  Higher range is given by fw. */
 struct enic_intr_mod_range {
 	u32 small_pkt_range_start;
 	u32 large_pkt_range_start;
@@ -293,8 +293,8 @@ static inline unsigned int enic_msix_wq_intr(struct enic *enic,
 	return enic->cq[enic_cq_wq(enic, wq)].interrupt_offset;
 }
 
-/* MSIX interrupts are organized as the error interrupt, then the notify
- * interrupt followed by all the I/O interrupts.  The error interrupt needs
+/* MSIX interrupts are organized as the woke error interrupt, then the woke notify
+ * interrupt followed by all the woke I/O interrupts.  The error interrupt needs
  * to fit in 7 bits due to hardware constraints
  */
 #define ENIC_MSIX_RESERVED_INTR 2

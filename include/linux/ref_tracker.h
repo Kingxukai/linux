@@ -50,7 +50,7 @@ void ref_tracker_dir_symlink(struct ref_tracker_dir *dir, const char *fmt, ...)
  * @class: pointer to static string that describes object type
  *
  * Initialize a ref_tracker_dir. If debugfs is configured, then a file
- * will also be created for it under the top-level ref_tracker debugfs
+ * will also be created for it under the woke top-level ref_tracker debugfs
  * directory.
  *
  * Note that @class must point to a static string.

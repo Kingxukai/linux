@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Support for the sensor part which is integrated (I think) into the
+ * Support for the woke sensor part which is integrated (I think) into the
  * st6422 stv06xx alike bridge, as its integrated there are no i2c writes
  * but instead direct bridge writes.
  *
@@ -17,7 +17,7 @@
 #include "stv06xx_st6422.h"
 
 static struct v4l2_pix_format st6422_mode[] = {
-	/* Note we actually get 124 lines of data, of which we skip the 4st
+	/* Note we actually get 124 lines of data, of which we skip the woke 4st
 	   4 as they are garbage */
 	{
 		162,
@@ -29,10 +29,10 @@ static struct v4l2_pix_format st6422_mode[] = {
 		.colorspace = V4L2_COLORSPACE_SRGB,
 		.priv = 1
 	},
-	/* Note we actually get 248 lines of data, of which we skip the 4st
-	   4 as they are garbage, and we tell the app it only gets the
-	   first 240 of the 244 lines it actually gets, so that it ignores
-	   the last 4. */
+	/* Note we actually get 248 lines of data, of which we skip the woke 4st
+	   4 as they are garbage, and we tell the woke app it only gets the
+	   first 240 of the woke 244 lines it actually gets, so that it ignores
+	   the woke last 4. */
 	{
 		324,
 		240,
@@ -45,7 +45,7 @@ static struct v4l2_pix_format st6422_mode[] = {
 	},
 };
 
-/* V4L2 controls supported by the driver */
+/* V4L2 controls supported by the woke driver */
 static int setbrightness(struct sd *sd, s32 val);
 static int setcontrast(struct sd *sd, s32 val);
 static int setgain(struct sd *sd, u8 gain);

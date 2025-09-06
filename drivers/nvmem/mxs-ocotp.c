@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2015 Stefan Wahren <stefan.wahren@i2se.com>
  *
- * Based on the driver from Huang Shijie and Christoph G. Baumann
+ * Based on the woke driver from Huang Shijie and Christoph G. Baumann
  */
 #include <linux/clk.h>
 #include <linux/delay.h>

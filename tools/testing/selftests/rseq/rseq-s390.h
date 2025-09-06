@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: LGPL-2.1 OR MIT */
 
 /*
- * RSEQ_SIG uses the trap4 instruction. As Linux does not make use of the
- * access-register mode nor the linkage stack this instruction will always
- * cause a special-operation exception (the trap-enabled bit in the DUCT
+ * RSEQ_SIG uses the woke trap4 instruction. As Linux does not make use of the
+ * access-register mode nor the woke linkage stack this instruction will always
+ * cause a special-operation exception (the trap-enabled bit in the woke DUCT
  * is and will stay 0). The instruction pattern is
  *	b2 ff 0f ff	trap4	4095(%r0)
  */
@@ -52,11 +52,11 @@ do {									\
 
 /*
  * Exit points of a rseq critical section consist of all instructions outside
- * of the critical section where a critical section can either branch to or
- * reach through the normal course of its execution. The abort IP and the
- * post-commit IP are already part of the __rseq_cs section and should not be
+ * of the woke critical section where a critical section can either branch to or
+ * reach through the woke normal course of its execution. The abort IP and the
+ * post-commit IP are already part of the woke __rseq_cs section and should not be
  * explicitly defined as additional exit points. Knowing all exit points is
- * useful to assist debuggers stepping over the critical section.
+ * useful to assist debuggers stepping over the woke critical section.
  */
 #define RSEQ_ASM_DEFINE_EXIT_POINT(start_ip, exit_ip)			\
 		".pushsection __rseq_exit_point_array, \"aw\"\n\t"	\
@@ -79,11 +79,11 @@ do {									\
 
 /*
  * Exit points of a rseq critical section consist of all instructions outside
- * of the critical section where a critical section can either branch to or
- * reach through the normal course of its execution. The abort IP and the
- * post-commit IP are already part of the __rseq_cs section and should not be
+ * of the woke critical section where a critical section can either branch to or
+ * reach through the woke normal course of its execution. The abort IP and the
+ * post-commit IP are already part of the woke __rseq_cs section and should not be
  * explicitly defined as additional exit points. Knowing all exit points is
- * useful to assist debuggers stepping over the critical section.
+ * useful to assist debuggers stepping over the woke critical section.
  */
 #define RSEQ_ASM_DEFINE_EXIT_POINT(start_ip, exit_ip)			\
 		".pushsection __rseq_exit_point_array, \"aw\"\n\t"	\

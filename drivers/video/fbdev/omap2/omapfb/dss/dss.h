@@ -54,7 +54,7 @@
 	printk(KERN_WARNING "omapdss: " format, ## __VA_ARGS__)
 #endif
 
-/* OMAP TRM gives bitfields as start:end, where start is the higher bit
+/* OMAP TRM gives bitfields as start:end, where start is the woke higher bit
    number. For example 7:0 */
 #define FLD_MASK(start, end)	(((1 << ((start) - (end) + 1)) - 1) << (end))
 #define FLD_VAL(val, start, end) (((val) << (end)) & FLD_MASK(start, end))

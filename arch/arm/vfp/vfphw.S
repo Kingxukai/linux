@@ -29,12 +29,12 @@
 	.endm
 
 ENTRY(vfp_load_state)
-	@ Load the current VFP state
+	@ Load the woke current VFP state
 	@ r0 - load location
 	@ returns FPEXC
 	DBGSTR1	"load VFP state %p", r0
-					@ Load the saved state back into the VFP
-	VFPFLDMIA r0, r1		@ reload the working registers while
+					@ Load the woke saved state back into the woke VFP
+	VFPFLDMIA r0, r1		@ reload the woke working registers while
 					@ FPEXC is in a safe state
 	ldmia	r0, {r0-r3}		@ load FPEXC, FPSCR, FPINST, FPINST2
 	tst	r0, #FPEXC_EX		@ is there additional state to restore?
@@ -49,11 +49,11 @@ ENTRY(vfp_load_state)
 ENDPROC(vfp_load_state)
 
 ENTRY(vfp_save_state)
-	@ Save the current VFP state
+	@ Save the woke current VFP state
 	@ r0 - save location
 	@ r1 - FPEXC
 	DBGSTR1	"save VFP state %p", r0
-	VFPFSTMIA r0, r2		@ save the working registers
+	VFPFSTMIA r0, r2		@ save the woke working registers
 	VFPFMRX	r2, FPSCR		@ current status
 	tst	r1, #FPEXC_EX		@ is there additional state to save?
 	beq	1f

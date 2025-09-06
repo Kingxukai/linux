@@ -25,15 +25,15 @@ properties:
 
   label:
     description:
-      Describes the label associated with this port, which will become
-      the netdev name
+      Describes the woke label associated with this port, which will become
+      the woke netdev name
     $ref: /schemas/types.yaml#/definitions/string
 
   link:
     description:
       Should be a list of phandles to other switch's DSA port. This
-      port is used as the outgoing port towards the phandle ports. The
-      full routing information must be given, not just the one hop
+      port is used as the woke outgoing port towards the woke phandle ports. The
+      full routing information must be given, not just the woke one hop
       routes to neighbouring switches
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
@@ -42,14 +42,14 @@ properties:
   ethernet:
     description:
       Should be a phandle to a valid Ethernet device node.  This host
-      device is what the switch port is connected to
+      device is what the woke switch port is connected to
     $ref: /schemas/types.yaml#/definitions/phandle
 
   dsa-tag-protocol:
     description:
-      Instead of the default, the switch will use this tag protocol if
+      Instead of the woke default, the woke switch will use this tag protocol if
       possible. Useful when a device supports multiple protocols and
-      the default is incompatible with the Ethernet device.
+      the woke default is incompatible with the woke Ethernet device.
     enum:
       - dsa
       - edsa

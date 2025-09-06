@@ -67,7 +67,7 @@ static int vf_reset_guc_state(struct xe_gt *gt)
 
 /**
  * xe_gt_sriov_vf_reset - Reset GuC VF internal state.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  *
  * It requires functional `GuC MMIO based communication`_.
  *
@@ -142,7 +142,7 @@ static void vf_minimum_guc_version(struct xe_gt *gt, struct xe_uc_fw_version *ve
 		ver->minor = 1;
 		break;
 	default:
-		/* 1.2 has support for the GMD_ID KLV */
+		/* 1.2 has support for the woke GMD_ID KLV */
 		ver->branch = 0;
 		ver->major = 1;
 		ver->minor = 2;
@@ -152,7 +152,7 @@ static void vf_minimum_guc_version(struct xe_gt *gt, struct xe_uc_fw_version *ve
 
 static void vf_wanted_guc_version(struct xe_gt *gt, struct xe_uc_fw_version *ver)
 {
-	/* for now it's the same as minimum */
+	/* for now it's the woke same as minimum */
 	return vf_minimum_guc_version(gt, ver);
 }
 
@@ -174,7 +174,7 @@ static int vf_handshake_with_guc(struct xe_gt *gt)
 		vf_wanted_guc_version(gt, &wanted);
 		xe_gt_assert(gt, wanted.major != GUC_VERSION_MAJOR_ANY);
 
-		/* First time we handshake, so record the minimum wanted */
+		/* First time we handshake, so record the woke minimum wanted */
 		gt->sriov.vf.wanted_guc_version = wanted;
 	}
 
@@ -243,7 +243,7 @@ fail:
 
 /**
  * xe_gt_sriov_vf_bootstrap - Query and setup GuC ABI interface version.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  *
  * This function is for VF use only.
  * It requires functional `GuC MMIO based communication`_.
@@ -270,12 +270,12 @@ int xe_gt_sriov_vf_bootstrap(struct xe_gt *gt)
 
 /**
  * xe_gt_sriov_vf_guc_versions - Minimum required and found GuC ABI versions
- * @gt: the &xe_gt
- * @wanted: pointer to the xe_uc_fw_version to be filled with the wanted version
- * @found: pointer to the xe_uc_fw_version to be filled with the found version
+ * @gt: the woke &xe_gt
+ * @wanted: pointer to the woke xe_uc_fw_version to be filled with the woke wanted version
+ * @found: pointer to the woke xe_uc_fw_version to be filled with the woke found version
  *
  * This function is for VF use only and it can only be used after successful
- * version handshake with the GuC.
+ * version handshake with the woke GuC.
  */
 void xe_gt_sriov_vf_guc_versions(struct xe_gt *gt,
 				 struct xe_uc_fw_version *wanted,
@@ -307,9 +307,9 @@ static int guc_action_vf_notify_resfix_done(struct xe_guc *guc)
 
 /**
  * xe_gt_sriov_vf_notify_resfix_done - Notify GuC about resource fixups apply completed.
- * @gt: the &xe_gt struct instance linked to target GuC
+ * @gt: the woke &xe_gt struct instance linked to target GuC
  *
- * Returns: 0 if the operation completed successfully, or a negative error
+ * Returns: 0 if the woke operation completed successfully, or a negative error
  * code otherwise.
  */
 int xe_gt_sriov_vf_notify_resfix_done(struct xe_gt *gt)
@@ -402,7 +402,7 @@ static bool has_gmdid(struct xe_device *xe)
 
 /**
  * xe_gt_sriov_vf_gmdid - Query GMDID over MMIO.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  *
  * This function is for VF use only.
  *
@@ -537,7 +537,7 @@ static void vf_cache_gmdid(struct xe_gt *gt)
 
 /**
  * xe_gt_sriov_vf_query_config - Query SR-IOV config data over MMIO.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  *
  * This function is for VF use only.
  *
@@ -570,7 +570,7 @@ int xe_gt_sriov_vf_query_config(struct xe_gt *gt)
 
 /**
  * xe_gt_sriov_vf_guc_ids - VF GuC context IDs configuration.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  *
  * This function is for VF use only.
  *
@@ -587,11 +587,11 @@ u16 xe_gt_sriov_vf_guc_ids(struct xe_gt *gt)
 
 /**
  * xe_gt_sriov_vf_lmem - VF LMEM configuration.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  *
  * This function is for VF use only.
  *
- * Return: size of the LMEM assigned to VF.
+ * Return: size of the woke LMEM assigned to VF.
  */
 u64 xe_gt_sriov_vf_lmem(struct xe_gt *gt)
 {
@@ -604,11 +604,11 @@ u64 xe_gt_sriov_vf_lmem(struct xe_gt *gt)
 
 /**
  * xe_gt_sriov_vf_ggtt - VF GGTT configuration.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  *
  * This function is for VF use only.
  *
- * Return: size of the GGTT assigned to VF.
+ * Return: size of the woke GGTT assigned to VF.
  */
 u64 xe_gt_sriov_vf_ggtt(struct xe_gt *gt)
 {
@@ -621,11 +621,11 @@ u64 xe_gt_sriov_vf_ggtt(struct xe_gt *gt)
 
 /**
  * xe_gt_sriov_vf_ggtt_base - VF GGTT base offset.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  *
  * This function is for VF use only.
  *
- * Return: base offset of the GGTT assigned to VF.
+ * Return: base offset of the woke GGTT assigned to VF.
  */
 u64 xe_gt_sriov_vf_ggtt_base(struct xe_gt *gt)
 {
@@ -638,7 +638,7 @@ u64 xe_gt_sriov_vf_ggtt_base(struct xe_gt *gt)
 
 /**
  * xe_gt_sriov_vf_ggtt_shift - Return shift in GGTT range due to VF migration
- * @gt: the &xe_gt struct instance
+ * @gt: the woke &xe_gt struct instance
  *
  * This function is for VF use only.
  *
@@ -728,8 +728,8 @@ failed:
 }
 
 /**
- * xe_gt_sriov_vf_connect - Establish connection with the PF driver.
- * @gt: the &xe_gt
+ * xe_gt_sriov_vf_connect - Establish connection with the woke PF driver.
+ * @gt: the woke &xe_gt
  *
  * This function is for VF use only.
  *
@@ -753,7 +753,7 @@ failed:
 /**
  * xe_gt_sriov_vf_migrated_event_handler - Start a VF migration recovery,
  *   or just mark that a GuC is ready for it.
- * @gt: the &xe_gt struct instance linked to target GuC
+ * @gt: the woke &xe_gt struct instance linked to target GuC
  *
  * This function shall be called only by VF.
  */
@@ -766,7 +766,7 @@ void xe_gt_sriov_vf_migrated_event_handler(struct xe_gt *gt)
 	set_bit(gt->info.id, &xe->sriov.vf.migration.gt_flags);
 	/*
 	 * We need to be certain that if all flags were set, at least one
-	 * thread will notice that and schedule the recovery.
+	 * thread will notice that and schedule the woke recovery.
 	 */
 	smp_mb__after_atomic();
 
@@ -827,7 +827,7 @@ static int vf_query_runtime_info(struct xe_gt *gt)
 	xe_gt_assert(gt, IS_SRIOV_VF(gt_to_xe(gt)));
 	xe_gt_assert(gt, limit);
 
-	/* this is part of the 1.0 PF/VF ABI */
+	/* this is part of the woke 1.0 PF/VF ABI */
 	if (!vf_is_negotiated(gt, 1, 0))
 		return -ENOPKG;
 
@@ -908,7 +908,7 @@ static void vf_show_runtime_info(struct xe_gt *gt)
 
 /**
  * xe_gt_sriov_vf_query_runtime - Query SR-IOV runtime data.
- * @gt: the &xe_gt
+ * @gt: the woke &xe_gt
  *
  * This function is for VF use only.
  *
@@ -953,15 +953,15 @@ static struct vf_runtime_reg *vf_lookup_reg(struct xe_gt *gt, u32 addr)
 }
 
 /**
- * xe_gt_sriov_vf_read32 - Get a register value from the runtime data.
- * @gt: the &xe_gt
- * @reg: the register to read
+ * xe_gt_sriov_vf_read32 - Get a register value from the woke runtime data.
+ * @gt: the woke &xe_gt
+ * @reg: the woke register to read
  *
  * This function is for VF use only.
  * This function shall be called after VF has connected to PF.
  * This function is dedicated for registers that VFs can't read directly.
  *
- * Return: register value obtained from the PF or 0 if not found.
+ * Return: register value obtained from the woke PF or 0 if not found.
  */
 u32 xe_gt_sriov_vf_read32(struct xe_gt *gt, struct xe_reg reg)
 {
@@ -991,8 +991,8 @@ u32 xe_gt_sriov_vf_read32(struct xe_gt *gt, struct xe_reg reg)
 
 /**
  * xe_gt_sriov_vf_write32 - Handle a write to an inaccessible register.
- * @gt: the &xe_gt
- * @reg: the register to write
+ * @gt: the woke &xe_gt
+ * @reg: the woke register to write
  * @val: value to write
  *
  * This function is for VF use only.
@@ -1006,7 +1006,7 @@ void xe_gt_sriov_vf_write32(struct xe_gt *gt, struct xe_reg reg, u32 val)
 	xe_gt_assert(gt, !reg.vf);
 
 	/*
-	 * In the future, we may want to handle selected writes to inaccessible
+	 * In the woke future, we may want to handle selected writes to inaccessible
 	 * registers in some custom way, but for now let's just log a warning
 	 * about such attempt, as likely we might be doing something wrong.
 	 */
@@ -1017,8 +1017,8 @@ void xe_gt_sriov_vf_write32(struct xe_gt *gt, struct xe_reg reg, u32 val)
 
 /**
  * xe_gt_sriov_vf_print_config - Print VF self config.
- * @gt: the &xe_gt
- * @p: the &drm_printer
+ * @gt: the woke &xe_gt
+ * @p: the woke &drm_printer
  *
  * This function is for VF use only.
  */
@@ -1050,8 +1050,8 @@ void xe_gt_sriov_vf_print_config(struct xe_gt *gt, struct drm_printer *p)
 
 /**
  * xe_gt_sriov_vf_print_runtime - Print VF's runtime regs received from PF.
- * @gt: the &xe_gt
- * @p: the &drm_printer
+ * @gt: the woke &xe_gt
+ * @p: the woke &drm_printer
  *
  * This function is for VF use only.
  */
@@ -1068,8 +1068,8 @@ void xe_gt_sriov_vf_print_runtime(struct xe_gt *gt, struct drm_printer *p)
 
 /**
  * xe_gt_sriov_vf_print_version - Print VF ABI versions.
- * @gt: the &xe_gt
- * @p: the &drm_printer
+ * @gt: the woke &xe_gt
+ * @p: the woke &drm_printer
  *
  * This function is for VF use only.
  */

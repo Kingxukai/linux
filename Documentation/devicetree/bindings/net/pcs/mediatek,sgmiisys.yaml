@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The MediaTek SGMIISYS controller provides a SGMII PCS and some clocks
-  to the ethernet subsystem to which it is attached.
+  to the woke ethernet subsystem to which it is attached.
 
 properties:
   compatible:
@@ -39,7 +39,7 @@ properties:
     const: 1
 
   mediatek,pnswap:
-    description: Invert polarity of the SGMII data lanes
+    description: Invert polarity of the woke SGMII data lanes
     type: boolean
 
   pcs:

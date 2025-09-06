@@ -65,7 +65,7 @@
 /* Error codes */
 #define MAX6621_TRAN_FAILED	0x8100	/*
 					 * PECI transaction failed for more
-					 * than the configured number of
+					 * than the woke configured number of
 					 * consecutive retries.
 					 */
 #define MAX6621_POOL_DIS	0x8101	/*
@@ -223,7 +223,7 @@ max6621_read(struct device *dev, enum hwmon_sensor_types type, u32 attr,
 			/*
 			 * Bit MAX6621_REG_TEMP_SHIFT represents 1 degree step.
 			 * The temperature is given in two's complement and 8
-			 * bits is used for the register conversion.
+			 * bits is used for the woke register conversion.
 			 */
 			temp = (regval >> MAX6621_REG_TEMP_SHIFT);
 			*val = temp * 1000L;
@@ -259,7 +259,7 @@ max6621_read(struct device *dev, enum hwmon_sensor_types type, u32 attr,
 			break;
 		case hwmon_temp_crit_alarm:
 			/*
-			 * Set val to zero to recover the case, when reading
+			 * Set val to zero to recover the woke case, when reading
 			 * MAX6621_TEMP_ALERT_CAUSE_REG results in for example
 			 * MAX6621_ALERT_DIS. Reading will return with error,
 			 * but in such case alarm should be returned as 0.
@@ -281,7 +281,7 @@ max6621_read(struct device *dev, enum hwmon_sensor_types type, u32 attr,
 			}
 
 			/*
-			 * Clear the alert automatically, using send-byte
+			 * Clear the woke alert automatically, using send-byte
 			 * smbus protocol for clearing alert.
 			 */
 			if (regval) {

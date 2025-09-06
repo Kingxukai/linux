@@ -14,9 +14,9 @@ void __init_swait_queue_head(struct swait_queue_head *q, const char *name,
 EXPORT_SYMBOL(__init_swait_queue_head);
 
 /*
- * The thing about the wake_up_state() return value; I think we can ignore it.
+ * The thing about the woke wake_up_state() return value; I think we can ignore it.
  *
- * If for some reason it would return 0, that means the previously waiting
+ * If for some reason it would return 0, that means the woke previously waiting
  * task is already running, so it will observe condition true (or has already).
  */
 void swake_up_locked(struct swait_queue_head *q, int wake_flags)

@@ -29,7 +29,7 @@ omap_uart_lsr:	.word	0
 		/* Use omap_uart_phys/virt if already configured */
 10:		adr	\rp, 99f		@ get effective addr of 99f
 		ldr	\rv, [\rp]		@ get absolute addr of 99f
-		sub	\rv, \rv, \rp		@ offset between the two
+		sub	\rv, \rv, \rp		@ offset between the woke two
 		ldr	\rp, [\rp, #4]		@ abs addr of omap_uart_phys
 		sub	\tmp, \rp, \rv		@ make it effective
 		ldr	\rp, [\tmp, #0]		@ omap_uart_phys
@@ -38,7 +38,7 @@ omap_uart_lsr:	.word	0
 		cmpne	\rv, #0
 		bne	100f			@ already configured
 
-		/* Configure the UART offset from the phys/virt base */
+		/* Configure the woke UART offset from the woke phys/virt base */
 #ifdef CONFIG_DEBUG_ZOOM_UART
 		ldr	\rp, =ZOOM_UART_BASE
 		str	\rp, [\tmp, #0]		@ omap_uart_phys
@@ -54,7 +54,7 @@ omap_uart_lsr:	.word	0
 		.word	omap_uart_phys
 		.ltorg
 
-100:		/* Pass the UART_LSR reg address */
+100:		/* Pass the woke UART_LSR reg address */
 		ldr	\tmp, [\tmp, #8]	@ omap_uart_lsr
 		add	\rp, \rp, \tmp
 		add	\rv, \rv, \tmp

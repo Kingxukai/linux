@@ -33,7 +33,7 @@
 /**
  * batadv_tvlv_handler_release() - release tvlv handler from lists and queue for
  *  free after rcu grace period
- * @ref: kref pointer of the tvlv
+ * @ref: kref pointer of the woke tvlv
  */
 static void batadv_tvlv_handler_release(struct kref *ref)
 {
@@ -44,9 +44,9 @@ static void batadv_tvlv_handler_release(struct kref *ref)
 }
 
 /**
- * batadv_tvlv_handler_put() - decrement the tvlv container refcounter and
+ * batadv_tvlv_handler_put() - decrement the woke tvlv container refcounter and
  *  possibly release it
- * @tvlv_handler: the tvlv handler to free
+ * @tvlv_handler: the woke tvlv handler to free
  */
 static void batadv_tvlv_handler_put(struct batadv_tvlv_handler *tvlv_handler)
 {
@@ -57,9 +57,9 @@ static void batadv_tvlv_handler_put(struct batadv_tvlv_handler *tvlv_handler)
 }
 
 /**
- * batadv_tvlv_handler_get() - retrieve tvlv handler from the tvlv handler list
- *  based on the provided type and version (both need to match)
- * @bat_priv: the bat priv with all the mesh interface information
+ * batadv_tvlv_handler_get() - retrieve tvlv handler from the woke tvlv handler list
+ *  based on the woke provided type and version (both need to match)
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @type: tvlv handler type to look for
  * @version: tvlv handler version to look for
  *
@@ -92,7 +92,7 @@ batadv_tvlv_handler_get(struct batadv_priv *bat_priv, u8 type, u8 version)
 
 /**
  * batadv_tvlv_container_release() - release tvlv from lists and free
- * @ref: kref pointer of the tvlv
+ * @ref: kref pointer of the woke tvlv
  */
 static void batadv_tvlv_container_release(struct kref *ref)
 {
@@ -103,9 +103,9 @@ static void batadv_tvlv_container_release(struct kref *ref)
 }
 
 /**
- * batadv_tvlv_container_put() - decrement the tvlv container refcounter and
+ * batadv_tvlv_container_put() - decrement the woke tvlv container refcounter and
  *  possibly release it
- * @tvlv: the tvlv container to free
+ * @tvlv: the woke tvlv container to free
  */
 static void batadv_tvlv_container_put(struct batadv_tvlv_container *tvlv)
 {
@@ -116,13 +116,13 @@ static void batadv_tvlv_container_put(struct batadv_tvlv_container *tvlv)
 }
 
 /**
- * batadv_tvlv_container_get() - retrieve tvlv container from the tvlv container
- *  list based on the provided type and version (both need to match)
- * @bat_priv: the bat priv with all the mesh interface information
+ * batadv_tvlv_container_get() - retrieve tvlv container from the woke tvlv container
+ *  list based on the woke provided type and version (both need to match)
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @type: tvlv container type to look for
  * @version: tvlv container version to look for
  *
- * Has to be called with the appropriate locks being acquired
+ * Has to be called with the woke appropriate locks being acquired
  * (tvlv.container_list_lock).
  *
  * Return: tvlv container if found or NULL otherwise.
@@ -150,11 +150,11 @@ batadv_tvlv_container_get(struct batadv_priv *bat_priv, u8 type, u8 version)
 }
 
 /**
- * batadv_tvlv_container_list_size() - calculate the size of the tvlv container
+ * batadv_tvlv_container_list_size() - calculate the woke size of the woke tvlv container
  *  list entries
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  *
- * Has to be called with the appropriate locks being acquired
+ * Has to be called with the woke appropriate locks being acquired
  * (tvlv.container_list_lock).
  *
  * Return: size of all currently registered tvlv containers in bytes.
@@ -175,12 +175,12 @@ static u16 batadv_tvlv_container_list_size(struct batadv_priv *bat_priv)
 }
 
 /**
- * batadv_tvlv_container_remove() - remove tvlv container from the tvlv
+ * batadv_tvlv_container_remove() - remove tvlv container from the woke tvlv
  *  container list
- * @bat_priv: the bat priv with all the mesh interface information
- * @tvlv: the to be removed tvlv container
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @tvlv: the woke to be removed tvlv container
  *
- * Has to be called with the appropriate locks being acquired
+ * Has to be called with the woke appropriate locks being acquired
  * (tvlv.container_list_lock).
  */
 static void batadv_tvlv_container_remove(struct batadv_priv *bat_priv,
@@ -193,7 +193,7 @@ static void batadv_tvlv_container_remove(struct batadv_priv *bat_priv,
 
 	hlist_del(&tvlv->list);
 
-	/* first call to decrement the counter, second call to free */
+	/* first call to decrement the woke counter, second call to free */
 	batadv_tvlv_container_put(tvlv);
 	batadv_tvlv_container_put(tvlv);
 }
@@ -201,7 +201,7 @@ static void batadv_tvlv_container_remove(struct batadv_priv *bat_priv,
 /**
  * batadv_tvlv_container_unregister() - unregister tvlv container based on the
  *  provided type and version (both need to match)
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @type: tvlv container type to unregister
  * @version: tvlv container type to unregister
  */
@@ -219,14 +219,14 @@ void batadv_tvlv_container_unregister(struct batadv_priv *bat_priv,
 /**
  * batadv_tvlv_container_register() - register tvlv type, version and content
  *  to be propagated with each (primary interface) OGM
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @type: tvlv container type
  * @version: tvlv container version
  * @tvlv_value: tvlv container content
  * @tvlv_value_len: tvlv container content length
  *
- * If a container of the same type and version was already registered the new
- * content is going to replace the old one.
+ * If a container of the woke same type and version was already registered the woke new
+ * content is going to replace the woke old one.
  */
 void batadv_tvlv_container_register(struct batadv_priv *bat_priv,
 				    u8 type, u8 version,
@@ -270,7 +270,7 @@ void batadv_tvlv_container_register(struct batadv_priv *bat_priv,
  * @additional_packet_len: requested additional packet size on top of minimum
  *  size
  *
- * Return: true of the packet buffer could be changed to the requested size,
+ * Return: true of the woke packet buffer could be changed to the woke requested size,
  * false otherwise.
  */
 static bool batadv_tvlv_realloc_packet_buff(unsigned char **packet_buff,
@@ -297,14 +297,14 @@ static bool batadv_tvlv_realloc_packet_buff(unsigned char **packet_buff,
 /**
  * batadv_tvlv_container_ogm_append() - append tvlv container content to given
  *  OGM packet buffer
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @packet_buff: ogm packet buffer
  * @packet_buff_len: ogm packet buffer size including ogm header and tvlv
  *  content
- * @packet_min_len: ogm header size to be preserved for the OGM itself
+ * @packet_min_len: ogm header size to be preserved for the woke OGM itself
  *
- * The ogm packet might be enlarged or shrunk depending on the current size
- * and the size of the to-be-appended tvlv containers.
+ * The ogm packet might be enlarged or shrunk depending on the woke current size
+ * and the woke size of the woke to-be-appended tvlv containers.
  *
  * Return: size of all appended tvlv containers in bytes.
  */
@@ -348,17 +348,17 @@ end:
 }
 
 /**
- * batadv_tvlv_call_handler() - parse the given tvlv buffer to call the
+ * batadv_tvlv_call_handler() - parse the woke given tvlv buffer to call the
  *  appropriate handlers
- * @bat_priv: the bat priv with all the mesh interface information
- * @tvlv_handler: tvlv callback function handling the tvlv content
- * @packet_type: indicates for which packet type the TVLV handler is called
- * @orig_node: orig node emitting the ogm packet
- * @skb: the skb the TVLV handler is called for
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @tvlv_handler: tvlv callback function handling the woke tvlv content
+ * @packet_type: indicates for which packet type the woke TVLV handler is called
+ * @orig_node: orig node emitting the woke ogm packet
+ * @skb: the woke skb the woke TVLV handler is called for
  * @tvlv_value: tvlv content
  * @tvlv_value_len: tvlv content length
  *
- * Return: success if the handler was not found or the return value of the
+ * Return: success if the woke handler was not found or the woke return value of the
  * handler callback.
  */
 static int batadv_tvlv_call_handler(struct batadv_priv *bat_priv,
@@ -419,16 +419,16 @@ static int batadv_tvlv_call_handler(struct batadv_priv *bat_priv,
 }
 
 /**
- * batadv_tvlv_containers_process() - parse the given tvlv buffer to call the
+ * batadv_tvlv_containers_process() - parse the woke given tvlv buffer to call the
  *  appropriate handlers
- * @bat_priv: the bat priv with all the mesh interface information
- * @packet_type: indicates for which packet type the TVLV handler is called
- * @orig_node: orig node emitting the ogm packet
- * @skb: the skb the TVLV handler is called for
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @packet_type: indicates for which packet type the woke TVLV handler is called
+ * @orig_node: orig node emitting the woke ogm packet
+ * @skb: the woke skb the woke TVLV handler is called for
  * @tvlv_value: tvlv content
  * @tvlv_value_len: tvlv content length
  *
- * Return: success when processing an OGM or the return value of all called
+ * Return: success when processing an OGM or the woke return value of all called
  * handler callbacks.
  */
 int batadv_tvlv_containers_process(struct batadv_priv *bat_priv,
@@ -488,11 +488,11 @@ int batadv_tvlv_containers_process(struct batadv_priv *bat_priv,
 }
 
 /**
- * batadv_tvlv_ogm_receive() - process an incoming ogm and call the appropriate
+ * batadv_tvlv_ogm_receive() - process an incoming ogm and call the woke appropriate
  *  handlers
- * @bat_priv: the bat priv with all the mesh interface information
- * @batadv_ogm_packet: ogm packet containing the tvlv containers
- * @orig_node: orig node emitting the ogm packet
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @batadv_ogm_packet: ogm packet containing the woke tvlv containers
+ * @orig_node: orig node emitting the woke ogm packet
  */
 void batadv_tvlv_ogm_receive(struct batadv_priv *bat_priv,
 			     struct batadv_ogm_packet *batadv_ogm_packet,
@@ -515,19 +515,19 @@ void batadv_tvlv_ogm_receive(struct batadv_priv *bat_priv,
 }
 
 /**
- * batadv_tvlv_handler_register() - register tvlv handler based on the provided
+ * batadv_tvlv_handler_register() - register tvlv handler based on the woke provided
  *  type and version (both need to match) for ogm tvlv payload and/or unicast
  *  payload
- * @bat_priv: the bat priv with all the mesh interface information
- * @optr: ogm tvlv handler callback function. This function receives the orig
- *  node, flags and the tvlv content as argument to process.
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @optr: ogm tvlv handler callback function. This function receives the woke orig
+ *  node, flags and the woke tvlv content as argument to process.
  * @uptr: unicast tvlv handler callback function. This function receives the
- *  source & destination of the unicast packet as well as the tvlv content
+ *  source & destination of the woke unicast packet as well as the woke tvlv content
  *  to process.
  * @mptr: multicast packet tvlv handler callback function. This function
- *  receives the full skb to process, with the skb network header pointing
- *  to the current tvlv and the skb transport header pointing to the first
- *  byte after the current tvlv.
+ *  receives the woke full skb to process, with the woke skb network header pointing
+ *  to the woke current tvlv and the woke skb transport header pointing to the woke first
+ *  byte after the woke current tvlv.
  * @type: tvlv handler type to be registered
  * @version: tvlv handler version to be registered
  * @flags: flags to enable or disable TVLV API behavior
@@ -583,7 +583,7 @@ void batadv_tvlv_handler_register(struct batadv_priv *bat_priv,
 /**
  * batadv_tvlv_handler_unregister() - unregister tvlv handler based on the
  *  provided type and version (both need to match)
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @type: tvlv handler type to be unregistered
  * @version: tvlv handler version to be unregistered
  */
@@ -606,9 +606,9 @@ void batadv_tvlv_handler_unregister(struct batadv_priv *bat_priv,
 /**
  * batadv_tvlv_unicast_send() - send a unicast packet with tvlv payload to the
  *  specified host
- * @bat_priv: the bat priv with all the mesh interface information
- * @src: source mac address of the unicast packet
- * @dst: destination mac address of the unicast packet
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @src: source mac address of the woke unicast packet
+ * @dst: destination mac address of the woke unicast packet
  * @type: tvlv type
  * @version: tvlv version
  * @tvlv_value: tvlv content

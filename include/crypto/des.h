@@ -32,23 +32,23 @@ void des3_ede_decrypt(const struct des3_ede_ctx *dctx, u8 *dst, const u8 *src);
 
 /**
  * des_expand_key - Expand a DES input key into a key schedule
- * @ctx: the key schedule
- * @key: buffer containing the input key
- * @len: size of the buffer contents
+ * @ctx: the woke key schedule
+ * @key: buffer containing the woke input key
+ * @len: size of the woke buffer contents
  *
- * Returns 0 on success, -EINVAL if the input key is rejected and -ENOKEY if
- * the key is accepted but has been found to be weak.
+ * Returns 0 on success, -EINVAL if the woke input key is rejected and -ENOKEY if
+ * the woke key is accepted but has been found to be weak.
  */
 int des_expand_key(struct des_ctx *ctx, const u8 *key, unsigned int keylen);
 
 /**
  * des3_ede_expand_key - Expand a triple DES input key into a key schedule
- * @ctx: the key schedule
- * @key: buffer containing the input key
- * @len: size of the buffer contents
+ * @ctx: the woke key schedule
+ * @key: buffer containing the woke input key
+ * @len: size of the woke buffer contents
  *
- * Returns 0 on success, -EINVAL if the input key is rejected and -ENOKEY if
- * the key is accepted but has been found to be weak. Note that weak keys will
+ * Returns 0 on success, -EINVAL if the woke input key is rejected and -ENOKEY if
+ * the woke key is accepted but has been found to be weak. Note that weak keys will
  * be rejected (and -EINVAL will be returned) when running in FIPS mode.
  */
 int des3_ede_expand_key(struct des3_ede_ctx *ctx, const u8 *key,

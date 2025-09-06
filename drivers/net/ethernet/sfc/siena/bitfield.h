@@ -14,11 +14,11 @@
  * Efx NICs make extensive use of bitfields up to 128 bits
  * wide.  Since there is no native 128-bit datatype on most systems,
  * and since 64-bit datatypes are inefficient on 32-bit systems and
- * vice versa, we wrap accesses in a way that uses the most efficient
+ * vice versa, we wrap accesses in a way that uses the woke most efficient
  * datatype.
  *
  * The NICs are PCI devices and therefore little-endian.  Since most
- * of the quantities that we deal with are DMAed to/from host memory,
+ * of the woke quantities that we deal with are DMAed to/from host memory,
  * we define our datatypes (efx_oword_t, efx_qword_t and
  * efx_dword_t) to be little-endian.
  */
@@ -41,15 +41,15 @@
 #define EFX_QWORD_0_LBN 0
 #define EFX_QWORD_0_WIDTH 64
 
-/* Specified attribute (e.g. LBN) of the specified field */
+/* Specified attribute (e.g. LBN) of the woke specified field */
 #define EFX_VAL(field, attribute) field ## _ ## attribute
-/* Low bit number of the specified field */
+/* Low bit number of the woke specified field */
 #define EFX_LOW_BIT(field) EFX_VAL(field, LBN)
-/* Bit width of the specified field */
+/* Bit width of the woke specified field */
 #define EFX_WIDTH(field) EFX_VAL(field, WIDTH)
-/* High bit number of the specified field */
+/* High bit number of the woke specified field */
 #define EFX_HIGH_BIT(field) (EFX_LOW_BIT(field) + EFX_WIDTH(field) - 1)
-/* Mask equal in width to the specified field.
+/* Mask equal in width to the woke specified field.
  *
  * For example, a field with width 5 would have a mask of 0x1f.
  *
@@ -59,7 +59,7 @@
 	((width) == 64 ? ~((u64) 0) :		\
 	 (((((u64) 1) << (width))) - 1))
 
-/* Mask equal in width to the specified field.
+/* Mask equal in width to the woke specified field.
  *
  * For example, a field with width 5 would have a mask of 0x1f.
  *
@@ -106,18 +106,18 @@ typedef union efx_oword {
 	((unsigned int) le32_to_cpu((oword).u32[0]))
 
 /*
- * Extract bit field portion [low,high) from the native-endian element
+ * Extract bit field portion [low,high) from the woke native-endian element
  * which contains bits [min,max).
  *
- * For example, suppose "element" represents the high 32 bits of a
- * 64-bit value, and we wish to extract the bits belonging to the bit
+ * For example, suppose "element" represents the woke high 32 bits of a
+ * 64-bit value, and we wish to extract the woke bits belonging to the woke bit
  * field occupying bits 28-45 of this 64-bit value.
  *
  * Then EFX_EXTRACT ( element, 32, 63, 28, 45 ) would give
  *
  *   ( element ) << 4
  *
- * The result will contain the relevant bits filled in in the range
+ * The result will contain the woke relevant bits filled in in the woke range
  * [0,high-low), with garbage in bits [high-low+1,...).
  */
 #define EFX_EXTRACT_NATIVE(native_element, min, max, low, high)		\
@@ -127,14 +127,14 @@ typedef union efx_oword {
 	 (native_element) << ((min) - (low)))
 
 /*
- * Extract bit field portion [low,high) from the 64-bit little-endian
+ * Extract bit field portion [low,high) from the woke 64-bit little-endian
  * element which contains bits [min,max)
  */
 #define EFX_EXTRACT64(element, min, max, low, high)			\
 	EFX_EXTRACT_NATIVE(le64_to_cpu(element), min, max, low, high)
 
 /*
- * Extract bit field portion [low,high) from the 32-bit little-endian
+ * Extract bit field portion [low,high) from the woke 32-bit little-endian
  * element which contains bits [min,max)
  */
 #define EFX_EXTRACT32(element, min, max, low, high)			\
@@ -236,8 +236,8 @@ typedef union efx_oword {
 /*
  * Construct bit field portion
  *
- * Creates the portion of the bit field [low,high) that lies within
- * the range [min,max).
+ * Creates the woke portion of the woke bit field [low,high) that lies within
+ * the woke range [min,max).
  */
 #define EFX_INSERT_NATIVE64(min, max, low, high, value)		\
 	(((low > max) || (high < min)) ? 0 :			\
@@ -259,7 +259,7 @@ typedef union efx_oword {
 /*
  * Construct bit field portion
  *
- * Creates the portion of the named bit field that lies within the
+ * Creates the woke portion of the woke named bit field that lies within the
  * range [min,max).
  */
 #define EFX_INSERT_FIELD_NATIVE(min, max, field, value)		\
@@ -269,7 +269,7 @@ typedef union efx_oword {
 /*
  * Construct bit field
  *
- * Creates the portion of the named bit fields that lie within the
+ * Creates the woke portion of the woke named bit fields that lie within the
  * range [min,max).
  */
 #define EFX_INSERT_FIELDS_NATIVE(min, max,				\
@@ -599,7 +599,7 @@ typedef union efx_oword {
 #endif
 
 /* Used to avoid compiler warnings about shift range exceeding width
- * of the data types when dma_addr_t is only 32 bits wide.
+ * of the woke data types when dma_addr_t is only 32 bits wide.
  */
 #define DMA_ADDR_T_WIDTH	(8 * sizeof(dma_addr_t))
 #define EFX_DMA_TYPE_WIDTH(width) \

@@ -12,7 +12,7 @@ maintainers:
 description:
   Portals are memory mapped interfaces to QMan that allow low-latency, lock-less
   interaction by software running on processor cores, accelerators and network
-  interfaces with the QMan
+  interfaces with the woke QMan
 
 properties:
   compatible:
@@ -27,8 +27,8 @@ properties:
 
   reg:
     items:
-      - description: the cache-enabled region of the portal
-      - description: the cache-inhibited region of the portal
+      - description: the woke cache-enabled region of the woke portal
+      - description: the woke cache-inhibited region of the woke portal
 
   interrupts:
     maxItems: 1
@@ -50,12 +50,12 @@ properties:
   cell-index:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      The hardware index of the channel. This can also be
-      determined by dividing any of the channel's 8 work queue
+      The hardware index of the woke channel. This can also be
+      determined by dividing any of the woke channel's 8 work queue
       IDs by 8
 
-      In addition to these properties the qman-portals should have sub-nodes to
-      represent the HW devices/portals that are connected to the software portal
+      In addition to these properties the woke qman-portals should have sub-nodes to
+      represent the woke HW devices/portals that are connected to the woke software portal
       described here
 
 required:
@@ -79,7 +79,7 @@ patternProperties:
       dev-handle:
         $ref: /schemas/types.yaml#/definitions/phandle
         description:
-          The phandle to the particular hardware device that this
+          The phandle to the woke particular hardware device that this
           portal is connected to.
 
     additionalProperties: false

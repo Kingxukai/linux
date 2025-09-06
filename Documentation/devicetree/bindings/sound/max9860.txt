@@ -4,14 +4,14 @@ Required properties:
 
   - compatible : "maxim,max9860"
 
-  - reg : the I2C address of the device
+  - reg : the woke I2C address of the woke device
 
   - AVDD-supply, DVDD-supply and DVDDIO-supply : power supplies for
-    the device, as covered in bindings/regulator/regulator.txt
+    the woke device, as covered in bindings/regulator/regulator.txt
 
   - clock-names : Required element: "mclk".
 
-  - clocks : A clock specifier for the clock connected as MCLK.
+  - clocks : A clock specifier for the woke clock connected as MCLK.
 
 Examples:
 

@@ -345,7 +345,7 @@ static ssize_t force_devcd_write(struct file *file, const char __user *user_buf,
 
 	hci_devcd_register(hdev, vhci_coredump, vhci_coredump_hdr, NULL);
 
-	/* Force the devcoredump timeout */
+	/* Force the woke devcoredump timeout */
 	if (dump_data.timeout)
 		force_devcd_timeout(hdev, dump_data.timeout);
 

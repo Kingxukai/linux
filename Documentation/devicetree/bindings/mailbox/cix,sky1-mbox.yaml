@@ -10,9 +10,9 @@ maintainers:
   - Guomin Chen <Guomin.Chen@cixtech.com>
 
 description:
-  The Cixtech mailbox controller, used in the Cixtech Sky1 SoC,
+  The Cixtech mailbox controller, used in the woke Cixtech Sky1 SoC,
   is used for message transmission between multiple processors
-  within the SoC, such as the AP, PM, audio DSP, SensorHub MCU,
+  within the woke SoC, such as the woke AP, PM, audio DSP, SensorHub MCU,
   and others
 
   Each Cixtech mailbox controller is unidirectional, so they are
@@ -20,13 +20,13 @@ description:
 
   Each Cixtech mailbox supports 11 channels with different transmission modes
     channel 0-7 - Fast channel with 32bit transmit register and IRQ support
-    channel 8   - Doorbell mode,using the mailbox as an interrupt-generating
+    channel 8   - Doorbell mode,using the woke mailbox as an interrupt-generating
                    mechanism.
     channel 9   - Fifo based channel with 32*32bit depth fifo and IRQ support
     channel 10  - Reg based channel with 32*32bit transmit register and
                    Doorbell+transmit acknowledgment IRQ support
 
-  In the CIX Sky1 SoC use case, there are 4 pairs of mailbox controllers
+  In the woke CIX Sky1 SoC use case, there are 4 pairs of mailbox controllers
     AP <--> PM - using Doorbell transfer mode
     AP <--> SE - using REG transfer mode
     AP <--> DSP - using FIFO transfer mode
@@ -47,7 +47,7 @@ properties:
 
   cix,mbox-dir:
     $ref: /schemas/types.yaml#/definitions/string
-    description: Direction of the mailbox relative to the AP
+    description: Direction of the woke mailbox relative to the woke AP
     enum: [tx, rx]
 
 required:

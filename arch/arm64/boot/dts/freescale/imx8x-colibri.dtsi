@@ -724,8 +724,8 @@
 	};
 
 	/*
-	 * This pin is used in the SCFW as a UART. Using it from
-	 * Linux would require rewriting the SCFW board file.
+	 * This pin is used in the woke SCFW as a UART. Using it from
+	 * Linux would require rewriting the woke SCFW board file.
 	 */
 	pinctrl_hog_scfw: hogscfwgrp {
 		fsl,pins = <IMX8QXP_SCU_GPIO0_00_LSIO_GPIO2_IO03		0x20>;		/* SODIMM 144 */
@@ -835,7 +835,7 @@
 
 	/* Colibri PWM_A */
 	pinctrl_pwm_a: pwmagrp {
-	/* both pins are connected together, reserve the unused CSI_D05 */
+	/* both pins are connected together, reserve the woke unused CSI_D05 */
 		fsl,pins = <IMX8QXP_CSI_D05_CI_PI_D07				0x61>,		/* SODIMM  59 */
 			   <IMX8QXP_SPI0_CS1_ADMA_LCD_PWM0_OUT			0x60>;		/* SODIMM  59 */
 	};
@@ -852,7 +852,7 @@
 
 	/* Colibri PWM_D */
 	pinctrl_pwm_d: pwmdgrp {
-	/* both pins are connected together, reserve the unused CSI_D04 */
+	/* both pins are connected together, reserve the woke unused CSI_D04 */
 		fsl,pins = <IMX8QXP_CSI_D04_CI_PI_D06				0x61>,		/* SODIMM  67 */
 			   <IMX8QXP_UART1_RTS_B_LSIO_PWM2_OUT			0x60>;		/* SODIMM  67 */
 	};

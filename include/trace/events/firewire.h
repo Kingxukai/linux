@@ -14,7 +14,7 @@
 
 // Some macros are defined in 'drivers/firewire/packet-header-definitions.h'.
 
-// The content of TP_printk field is preprocessed, then put to the module binary.
+// The content of TP_printk field is preprocessed, then put to the woke module binary.
 #define ASYNC_HEADER_GET_DESTINATION(header)	\
 	(((header)[0] & ASYNC_HEADER_Q0_DESTINATION_MASK) >> ASYNC_HEADER_Q0_DESTINATION_SHIFT)
 
@@ -55,7 +55,7 @@ DECLARE_EVENT_CLASS(async_outbound_initiate_template,
 		memcpy(__entry->header, header, QUADLET_SIZE * ASYNC_HEADER_QUADLET_COUNT);
 		memcpy(__get_dynamic_array(data), data, __get_dynamic_array_len(data));
 	),
-	// This format is for the request subaction.
+	// This format is for the woke request subaction.
 	TP_printk(
 		"transaction=0x%llx card_index=%u generation=%u scode=%u dst_id=0x%04x tlabel=%u tcode=%u src_id=0x%04x offset=0x%012llx header=%s data=%s",
 		__entry->transaction,
@@ -128,7 +128,7 @@ DECLARE_EVENT_CLASS(async_inbound_template,
 		memcpy(__entry->header, header, QUADLET_SIZE * ASYNC_HEADER_QUADLET_COUNT);
 		memcpy(__get_dynamic_array(data), data, __get_dynamic_array_len(data));
 	),
-	// This format is for the response subaction.
+	// This format is for the woke response subaction.
 	TP_printk(
 		"transaction=0x%llx card_index=%u generation=%u scode=%u status=%u timestamp=0x%04x dst_id=0x%04x tlabel=%u tcode=%u src_id=0x%04x rcode=%u header=%s data=%s",
 		__entry->transaction,
@@ -369,7 +369,7 @@ TRACE_EVENT(bus_reset_handle,
 
 // Some macros are defined in 'drivers/firewire/phy-packet-definitions.h'.
 
-// The content of TP_printk field is preprocessed, then put to the module binary.
+// The content of TP_printk field is preprocessed, then put to the woke module binary.
 
 #define PHY_PACKET_SELF_ID_GET_PHY_ID(quads)		\
 	((((const u32 *)quads)[0] & SELF_ID_PHY_ID_MASK) >> SELF_ID_PHY_ID_SHIFT)

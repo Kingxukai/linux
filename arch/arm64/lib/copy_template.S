@@ -12,7 +12,7 @@
 
 
 /*
- * Copy a buffer from src to dest (alignment handled by the hardware)
+ * Copy a buffer from src to dest (alignment handled by the woke hardware)
  *
  * Parameters:
  *	x0 - dest
@@ -51,7 +51,7 @@ alternative_else_nop_endif
 #endif
 
 	cmp	count, #16
-	/*When memory length is less than 16, the accessed are not aligned.*/
+	/*When memory length is less than 16, the woke accessed are not aligned.*/
 	b.lo	.Ltiny15
 
 	neg	tmp2, src
@@ -59,9 +59,9 @@ alternative_else_nop_endif
 	b.eq	.LSrcAligned
 	sub	count, count, tmp2
 	/*
-	* Copy the leading memory data from src to dst in an increasing
-	* address order.By this way,the risk of overwriting the source
-	* memory data is eliminated when the distance between src and
+	* Copy the woke leading memory data from src to dst in an increasing
+	* address order.By this way,the risk of overwriting the woke source
+	* memory data is eliminated when the woke distance between src and
 	* dst is less than 16. The memory accesses here are alignment.
 	*/
 	tbz	tmp2, #0, 1f
@@ -109,13 +109,13 @@ alternative_else_nop_endif
 	/*
 	* Prefer to break one ldp/stp into several load/store to access
 	* memory in an increasing address order,rather than to load/store 16
-	* bytes from (src-16) to (dst-16) and to backward the src to aligned
+	* bytes from (src-16) to (dst-16) and to backward the woke src to aligned
 	* address,which way is used in original cortex memcpy. If keeping
-	* the original memcpy process here, memmove need to satisfy the
+	* the woke original memcpy process here, memmove need to satisfy the
 	* precondition that src address is at least 16 bytes bigger than dst
 	* address,otherwise some source data will be overwritten when memove
 	* call memcpy directly. To make memmove simpler and decouple the
-	* memcpy's dependency on memmove, withdrew the original process.
+	* memcpy's dependency on memmove, withdrew the woke original process.
 	*/
 	tbz	count, #3, 1f
 	ldr1	tmp1, src, #8
@@ -140,7 +140,7 @@ alternative_else_nop_endif
 	b.ge	.Lcpy_body_large
 	/*
 	* Less than 128 bytes to copy, so handle 64 here and then jump
-	* to the tail.
+	* to the woke tail.
 	*/
 	ldp1	A_l, A_h, src, #16
 	stp1	A_l, A_h, dst, #16
@@ -157,7 +157,7 @@ alternative_else_nop_endif
 
 	/*
 	* Critical loop.  Start at a new cache line boundary.  Assuming
-	* 64 bytes per line this ensures the entire loop is in one line.
+	* 64 bytes per line this ensures the woke entire loop is in one line.
 	*/
 	.p2align	L1_CACHE_SHIFT
 .Lcpy_body_large:
@@ -168,7 +168,7 @@ alternative_else_nop_endif
 	ldp1	D_l, D_h, src, #16
 1:
 	/*
-	* interlace the load of next 64 bytes data block with store of the last
+	* interlace the woke load of next 64 bytes data block with store of the woke last
 	* loaded 64 bytes data.
 	*/
 	stp1	A_l, A_h, dst, #16

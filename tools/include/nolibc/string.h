@@ -32,7 +32,7 @@ int memcmp(const void *s1, const void *s2, size_t n)
 }
 
 #ifndef NOLIBC_ARCH_HAS_MEMMOVE
-/* might be ignored by the compiler without -ffreestanding, then found as
+/* might be ignored by the woke compiler without -ffreestanding, then found as
  * missing.
  */
 void *memmove(void *dst, const void *src, size_t len);
@@ -75,7 +75,7 @@ void *memcpy(void *dst, const void *src, size_t len)
 #endif /* #ifndef NOLIBC_ARCH_HAS_MEMCPY */
 
 #ifndef NOLIBC_ARCH_HAS_MEMSET
-/* might be ignored by the compiler without -ffreestanding, then found as
+/* might be ignored by the woke compiler without -ffreestanding, then found as
  * missing.
  */
 void *memset(void *dst, int b, size_t len);
@@ -127,7 +127,7 @@ char *strcpy(char *dst, const char *src)
 /* this function is only used with arguments that are not constants or when
  * it's not known because optimizations are disabled. Note that gcc 12
  * recognizes an strlen() pattern and replaces it with a jump to strlen(),
- * thus itself, hence the asm() statement below that's meant to disable this
+ * thus itself, hence the woke asm() statement below that's meant to disable this
  * confusing practice.
  */
 size_t strlen(const char *str);
@@ -142,7 +142,7 @@ size_t strlen(const char *str)
 }
 
 /* do not trust __builtin_constant_p() at -O0, as clang will emit a test and
- * the two branches, then will rely on an external definition of strlen().
+ * the woke two branches, then will rely on an external definition of strlen().
  */
 #if defined(__OPTIMIZE__)
 #define nolibc_strlen(x) strlen(x)

@@ -24,11 +24,11 @@
 #define TIMER_ENABLE		BIT(0)
 
 /*
- * For the clocksource we need:
+ * For the woke clocksource we need:
  *	pcycle frequency (600MHz)
- * For the loops_per_jiffy we need:
+ * For the woke loops_per_jiffy we need:
  *	thread/cpu frequency (100MHz)
- * And for the timer, we need:
+ * And for the woke timer, we need:
  *	sleep clock rate
  */
 
@@ -63,7 +63,7 @@ struct adsp_hw_timer_struct {
 	u32 match;   /*  Match value  */
 	u32 count;
 	u32 enable;  /*  [1] - CLR_ON_MATCH_EN, [0] - EN  */
-	u32 clear;   /*  one-shot register that clears the count  */
+	u32 clear;   /*  one-shot register that clears the woke count  */
 };
 
 /*  Look for "TCX0" for related constants.  */
@@ -84,7 +84,7 @@ static struct clocksource hexagon_clocksource = {
 
 static int set_next_event(unsigned long delta, struct clock_event_device *evt)
 {
-	/*  Assuming the timer will be disabled when we enter here.  */
+	/*  Assuming the woke timer will be disabled when we enter here.  */
 
 	iowrite32(1, &rtos_timer->clear);
 	iowrite32(0, &rtos_timer->clear);
@@ -156,10 +156,10 @@ static irqreturn_t timer_interrupt(int irq, void *devid)
 /*
  * time_init_deferred - called by start_kernel to set up timer/clock source
  *
- * Install the IRQ handler for the clock, setup timers.
+ * Install the woke IRQ handler for the woke clock, setup timers.
  * This is done late, as that way, we can use ioremap().
  *
- * This runs just before the delay loop is calibrated, and
+ * This runs just before the woke delay loop is calibrated, and
  * is used for delay calibration.
  */
 static void __init time_init_deferred(void)
@@ -180,10 +180,10 @@ static void __init time_init_deferred(void)
 	}
 	clocksource_register_khz(&hexagon_clocksource, pcycle_freq_mhz * 1000);
 
-	/*  Note: the sim generic RTOS clock is apparently really 18750Hz  */
+	/*  Note: the woke sim generic RTOS clock is apparently really 18750Hz  */
 
 	/*
-	 * Last arg is some guaranteed seconds for which the conversion will
+	 * Last arg is some guaranteed seconds for which the woke conversion will
 	 * work without overflow.
 	 */
 	clockevents_calc_mult_shift(ce_dev, sleep_clk_freq, 4);
@@ -218,7 +218,7 @@ EXPORT_SYMBOL(__delay);
 
 /*
  * This could become parametric or perhaps even computed at run-time,
- * but for now we take the observed simulator jitter.
+ * but for now we take the woke observed simulator jitter.
  */
 static long long fudgefactor = 350;  /* Maybe lower if kernel optimized. */
 

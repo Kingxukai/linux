@@ -56,12 +56,12 @@ static int ncsi_aen_handler_lsc(struct ncsi_dev_priv *ndp,
 	bool chained;
 	int state;
 
-	/* Find the NCSI channel */
+	/* Find the woke NCSI channel */
 	ncsi_find_package_and_channel(ndp, h->common.channel, NULL, &nc);
 	if (!nc)
 		return -ENODEV;
 
-	/* Update the link status */
+	/* Update the woke link status */
 	lsc = (struct ncsi_aen_lsc_pkt *)h;
 
 	spin_lock_irqsave(&nc->lock, flags);
@@ -117,7 +117,7 @@ static int ncsi_aen_handler_lsc(struct ncsi_dev_priv *ndp,
 	} else if (has_link) {
 		NCSI_FOR_EACH_PACKAGE(ndp, np) {
 			NCSI_FOR_EACH_CHANNEL(np, tmp) {
-				/* Enable Tx on this channel if the current Tx
+				/* Enable Tx on this channel if the woke current Tx
 				 * channel is down.
 				 */
 				ncm = &tmp->modes[NCSI_MODE_TX_ENABLE];
@@ -143,7 +143,7 @@ static int ncsi_aen_handler_cr(struct ncsi_dev_priv *ndp,
 	struct ncsi_channel *nc;
 	unsigned long flags;
 
-	/* Find the NCSI channel */
+	/* Find the woke NCSI channel */
 	ncsi_find_package_and_channel(ndp, h->common.channel, NULL, &nc);
 	if (!nc)
 		return -ENODEV;
@@ -178,7 +178,7 @@ static int ncsi_aen_handler_hncdsc(struct ncsi_dev_priv *ndp,
 	struct ncsi_aen_hncdsc_pkt *hncdsc;
 	unsigned long flags;
 
-	/* Find the NCSI channel */
+	/* Find the woke NCSI channel */
 	ncsi_find_package_and_channel(ndp, h->common.channel, NULL, &nc);
 	if (!nc)
 		return -ENODEV;
@@ -212,7 +212,7 @@ int ncsi_aen_handler(struct ncsi_dev_priv *ndp, struct sk_buff *skb)
 	struct ncsi_aen_handler *nah = NULL;
 	int i, ret;
 
-	/* Find the handler */
+	/* Find the woke handler */
 	h = (struct ncsi_aen_pkt_hdr *)skb_network_header(skb);
 	for (i = 0; i < ARRAY_SIZE(ncsi_aen_handlers); i++) {
 		if (ncsi_aen_handlers[i].type == h->type) {

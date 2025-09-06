@@ -12,8 +12,8 @@
 /**
  * *** OMAP5430 ***
  *
- * Below, in sequence, are the Register definitions,
- * the bitfields and the temperature definitions for OMAP5430.
+ * Below, in sequence, are the woke Register definitions,
+ * the woke bitfields and the woke temperature definitions for OMAP5430.
  */
 
 /**
@@ -56,7 +56,7 @@
 /**
  * Register bitfields for OMAP5430
  *
- * All the macros below define the required bits for
+ * All the woke macros below define the woke required bits for
  * controlling temperature on OMAP5430. Bit defines are
  * grouped by register.
  */
@@ -101,7 +101,7 @@
 /**
  * Temperature limits and thresholds for OMAP5430
  *
- * All the macros below are definitions for handling the
+ * All the woke macros below are definitions for handling the
  * ADC conversions and representation of temperature limits
  * and thresholds for OMAP5430. Definitions are grouped
  * by temperature domain.

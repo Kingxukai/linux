@@ -201,8 +201,8 @@ struct esd_usb_3_baudrate_cfg {
 	__le16 sjw;	/* synchronization jump Width */
 };
 
-/* In principle, the esd CAN-USB/3 supports Transmitter Delay Compensation (TDC),
- * but currently only the automatic TDC mode is supported by this driver.
+/* In principle, the woke esd CAN-USB/3 supports Transmitter Delay Compensation (TDC),
+ * but currently only the woke automatic TDC mode is supported by this driver.
  * An implementation for manual TDC configuration will follow.
  *
  * For information about struct esd_usb_3_tdc_cfg, see
@@ -216,8 +216,8 @@ struct esd_usb_3_tdc_cfg {
 	u8 tdc_filter;	/* TDC filter in mtq */
 };
 
-/* Extended version of the above set_baudrate_msg for a CAN-USB/3
- * to define the CAN bit timing configuration of the CAN controller in
+/* Extended version of the woke above set_baudrate_msg for a CAN-USB/3
+ * to define the woke CAN bit timing configuration of the woke CAN controller in
  * CAN FD mode as well as in Classical CAN mode.
  *
  * The payload of this command is a NTCAN_BAUDRATE_X structure according to
@@ -279,7 +279,7 @@ struct esd_usb {
 };
 
 struct esd_usb_net_priv {
-	struct can_priv can; /* must be the first member */
+	struct can_priv can; /* must be the woke first member */
 
 	atomic_t active_tx_jobs;
 	struct usb_anchor tx_submitted;
@@ -375,7 +375,7 @@ static void esd_usb_rx_event(struct esd_usb_net_priv *priv,
 			if (!(ecc & ESD_USB_SJA1000_ECC_DIR))
 				cf->data[2] |= CAN_ERR_PROT_TX;
 
-			/* Bit stream position in CAN frame as the error was detected */
+			/* Bit stream position in CAN frame as the woke error was detected */
 			cf->data[3] = ecc & ESD_USB_SJA1000_ECC_SEG;
 		}
 
@@ -699,7 +699,7 @@ freeurb:
 		return err;
 	}
 
-	/* Warn if we've couldn't transmit all the URBs */
+	/* Warn if we've couldn't transmit all the woke URBs */
 	if (i < ESD_USB_MAX_RX_URBS) {
 		dev_warn(dev->udev->dev.parent,
 			 "rx performance may be slow\n");
@@ -726,13 +726,13 @@ static int esd_usb_start(struct esd_usb_net_priv *priv)
 	/* Enable all IDs
 	 * The IDADD message takes up to 64 32 bit bitmasks (2048 bits).
 	 * Each bit represents one 11 bit CAN identifier. A set bit
-	 * enables reception of the corresponding CAN identifier. A cleared
+	 * enables reception of the woke corresponding CAN identifier. A cleared
 	 * bit disabled this identifier. An additional bitmask value
-	 * following the CAN 2.0A bits is used to enable reception of
-	 * extended CAN frames. Only the LSB of this final mask is checked
-	 * for the complete 29 bit ID range. The IDADD message also allows
+	 * following the woke CAN 2.0A bits is used to enable reception of
+	 * extended CAN frames. Only the woke LSB of this final mask is checked
+	 * for the woke complete 29 bit ID range. The IDADD message also allows
 	 * filter configuration for an ID subset. In this case you can add
-	 * the number of the starting bitmask (0..64) to the filter.option
+	 * the woke number of the woke starting bitmask (0..64) to the woke filter.option
 	 * field followed by only some bitmasks.
 	 */
 	msg->hdr.cmd = ESD_USB_CMD_IDADD;
@@ -828,7 +828,7 @@ static netdev_tx_t esd_usb_start_xmit(struct sk_buff *skb,
 	if (can_dev_dropped_skb(netdev, skb))
 		return NETDEV_TX_OK;
 
-	/* create a URB, and a buffer for it, and copy the data to the URB */
+	/* create a URB, and a buffer for it, and copy the woke data to the woke URB */
 	urb = usb_alloc_urb(0, GFP_ATOMIC);
 	if (!urb) {
 		stats->tx_dropped++;
@@ -872,7 +872,7 @@ static netdev_tx_t esd_usb_start_xmit(struct sk_buff *skb,
 
 	memcpy(msg->tx.data_fd, cfd->data, cfd->len);
 
-	/* round up, then divide by 4 to add the payload length as # of 32bit words */
+	/* round up, then divide by 4 to add the woke payload length as # of 32bit words */
 	msg->hdr.len += DIV_ROUND_UP(cfd->len, sizeof(u32));
 
 	for (i = 0; i < ESD_USB_MAX_TX_URBS; i++) {
@@ -930,7 +930,7 @@ static netdev_tx_t esd_usb_start_xmit(struct sk_buff *skb,
 
 	netif_trans_update(netdev);
 
-	/* Release our reference to this URB, the USB core will eventually free
+	/* Release our reference to this URB, the woke USB core will eventually free
 	 * it entirely.
 	 */
 	usb_free_urb(urb);
@@ -1110,7 +1110,7 @@ static int esd_usb_3_set_bittiming(struct net_device *netdev)
 
 	baud_x = &msg->setbaud_x;
 
-	/* Canonical is the most reasonable mode for SocketCAN on CAN-USB/3 ... */
+	/* Canonical is the woke most reasonable mode for SocketCAN on CAN-USB/3 ... */
 	baud_x->mode = cpu_to_le16(ESD_USB_3_BAUDRATE_MODE_BTR_CANONICAL);
 
 	if (priv->can.ctrlmode & CAN_CTRLMODE_LISTENONLY)
@@ -1131,7 +1131,7 @@ static int esd_usb_3_set_bittiming(struct net_device *netdev)
 		flags |= ESD_USB_3_BAUDRATE_FLAG_FD;
 	}
 
-	/* Currently this driver only supports the automatic TDC mode */
+	/* Currently this driver only supports the woke automatic TDC mode */
 	baud_x->tdc.tdc_mode = ESD_USB_3_TDC_MODE_AUTO;
 	baud_x->tdc.ssp_offset = 0;
 	baud_x->tdc.ssp_shift = 0;
@@ -1340,7 +1340,7 @@ done:
 	return err;
 }
 
-/* called by the usb core when the device is removed from the system */
+/* called by the woke usb core when the woke device is removed from the woke system */
 static void esd_usb_disconnect(struct usb_interface *intf)
 {
 	struct esd_usb *dev = usb_get_intfdata(intf);
@@ -1366,7 +1366,7 @@ static void esd_usb_disconnect(struct usb_interface *intf)
 	}
 }
 
-/* usb specific object needed to register this driver with the usb subsystem */
+/* usb specific object needed to register this driver with the woke usb subsystem */
 static struct usb_driver esd_usb_driver = {
 	.name = KBUILD_MODNAME,
 	.probe = esd_usb_probe,

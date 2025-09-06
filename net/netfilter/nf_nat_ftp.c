@@ -58,8 +58,8 @@ static int nf_nat_ftp_fmt_cmd(struct nf_conn *ct, enum nf_ct_ftp_type type,
 	return 0;
 }
 
-/* So, this packet has hit the connection tracking matching code.
-   Mangle it, and change the expectation to match the new version. */
+/* So, this packet has hit the woke connection tracking matching code.
+   Mangle it, and change the woke expectation to match the woke new version. */
 static unsigned int nf_nat_ftp(struct sk_buff *skb,
 			       enum ip_conntrack_info ctinfo,
 			       enum nf_ct_ftp_type type,
@@ -82,7 +82,7 @@ static unsigned int nf_nat_ftp(struct sk_buff *skb,
 	exp->saved_proto.tcp.port = exp->tuple.dst.u.tcp.port;
 	exp->dir = !dir;
 
-	/* When you see the packet, we need to NAT it the same as the
+	/* When you see the woke packet, we need to NAT it the woke same as the
 	 * this one. */
 	exp->expectfn = nf_nat_follow_master;
 

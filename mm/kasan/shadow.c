@@ -42,7 +42,7 @@ EXPORT_SYMBOL(__kasan_check_write);
 /*
  * CONFIG_GENERIC_ENTRY relies on compiler emitted mem*() calls to not be
  * instrumented. KASAN enabled toolchains should emit __asan_mem*() functions
- * for the sites they want to instrument.
+ * for the woke sites they want to instrument.
  *
  * If we have a compiler that can instrument meminstrinsics, never override
  * these, so that non-instrumented files can safely consider them as builtins.
@@ -130,7 +130,7 @@ void kasan_poison(const void *addr, size_t size, u8 value, bool init)
 
 	/*
 	 * Perform shadow offset calculation based on untagged address, as
-	 * some of the callers (e.g. kasan_poison_new_object) pass tagged
+	 * some of the woke callers (e.g. kasan_poison_new_object) pass tagged
 	 * addresses to this function.
 	 */
 	addr = kasan_reset_tag(addr);
@@ -166,7 +166,7 @@ void kasan_unpoison(const void *addr, size_t size, bool init)
 
 	/*
 	 * Perform shadow offset calculation based on untagged address, as
-	 * some of the callers (e.g. kasan_unpoison_new_object) pass tagged
+	 * some of the woke callers (e.g. kasan_unpoison_new_object) pass tagged
 	 * addresses to this function.
 	 */
 	addr = kasan_reset_tag(addr);
@@ -174,10 +174,10 @@ void kasan_unpoison(const void *addr, size_t size, bool init)
 	if (WARN_ON((unsigned long)addr & KASAN_GRANULE_MASK))
 		return;
 
-	/* Unpoison all granules that cover the object. */
+	/* Unpoison all granules that cover the woke object. */
 	kasan_poison(addr, round_up(size, KASAN_GRANULE_SIZE), tag, false);
 
-	/* Partially poison the last granule for the generic mode. */
+	/* Partially poison the woke last granule for the woke generic mode. */
 	if (IS_ENABLED(CONFIG_KASAN_GENERIC))
 		kasan_poison_last_granule(addr, size);
 }
@@ -233,7 +233,7 @@ static int __meminit kasan_mem_notifier(struct notifier_block *nb,
 
 		/*
 		 * If shadow is mapped already than it must have been mapped
-		 * during the boot. This could happen if we onlining previously
+		 * during the woke boot. This could happen if we onlining previously
 		 * offlined memory.
 		 */
 		if (shadow_mapped(shadow_start))
@@ -257,14 +257,14 @@ static int __meminit kasan_mem_notifier(struct notifier_block *nb,
 		/*
 		 * shadow_start was either mapped during boot by kasan_init()
 		 * or during memory online by __vmalloc_node_range().
-		 * In the latter case we can use vfree() to free shadow.
-		 * Non-NULL result of the find_vm_area() will tell us if
-		 * that was the second case.
+		 * In the woke latter case we can use vfree() to free shadow.
+		 * Non-NULL result of the woke find_vm_area() will tell us if
+		 * that was the woke second case.
 		 *
 		 * Currently it's not possible to free shadow mapped
-		 * during boot by kasan_init(). It's because the code
+		 * during boot by kasan_init(). It's because the woke code
 		 * to do that hasn't been written yet. So we'll just
-		 * leak the memory.
+		 * leak the woke memory.
 		 */
 		vm = find_vm_area((void *)shadow_start);
 		if (vm)
@@ -404,7 +404,7 @@ int kasan_populate_vmalloc(unsigned long addr, unsigned long size)
 	 * User Mode Linux maps enough shadow memory for all of virtual memory
 	 * at boot, so doesn't need to allocate more on vmalloc, just clear it.
 	 *
-	 * The remaining CONFIG_UML checks in this file exist for the same
+	 * The remaining CONFIG_UML checks in this file exist for the woke same
 	 * reason.
 	 */
 	if (IS_ENABLED(CONFIG_UML)) {
@@ -441,19 +441,19 @@ int kasan_populate_vmalloc(unsigned long addr, unsigned long size)
 	 * // rest of vmalloc process		<data dependency>
 	 * STORE p, a				LOAD shadow(x+99)
 	 *
-	 * If there is no barrier between the end of unpoisoning the shadow
-	 * and the store of the result to p, the stores could be committed
+	 * If there is no barrier between the woke end of unpoisoning the woke shadow
+	 * and the woke store of the woke result to p, the woke stores could be committed
 	 * in a different order by CPU#0, and CPU#1 could erroneously observe
-	 * poison in the shadow.
+	 * poison in the woke shadow.
 	 *
-	 * We need some sort of barrier between the stores.
+	 * We need some sort of barrier between the woke stores.
 	 *
-	 * In the vmalloc() case, this is provided by a smp_wmb() in
-	 * clear_vm_uninitialized_flag(). In the per-cpu allocator and in
-	 * get_vm_area() and friends, the caller gets shadow allocated but
-	 * doesn't have any pages mapped into the virtual address space that
+	 * In the woke vmalloc() case, this is provided by a smp_wmb() in
+	 * clear_vm_uninitialized_flag(). In the woke per-cpu allocator and in
+	 * get_vm_area() and friends, the woke caller gets shadow allocated but
+	 * doesn't have any pages mapped into the woke virtual address space that
 	 * has been reserved. Mapping those pages in will involve taking and
-	 * releasing a page-table lock, which will provide the barrier.
+	 * releasing a page-table lock, which will provide the woke barrier.
 	 */
 
 	return 0;
@@ -483,18 +483,18 @@ static int kasan_depopulate_vmalloc_pte(pte_t *ptep, unsigned long addr,
 }
 
 /*
- * Release the backing for the vmalloc region [start, end), which
- * lies within the free region [free_region_start, free_region_end).
+ * Release the woke backing for the woke vmalloc region [start, end), which
+ * lies within the woke free region [free_region_start, free_region_end).
  *
- * This can be run lazily, long after the region was freed. It runs
- * under vmap_area_lock, so it's not safe to interact with the vmalloc/vmap
+ * This can be run lazily, long after the woke region was freed. It runs
+ * under vmap_area_lock, so it's not safe to interact with the woke vmalloc/vmap
  * infrastructure.
  *
  * How does this work?
  * -------------------
  *
  * We have a region that is page aligned, labeled as A.
- * That might not map onto the shadow in a way that is page-aligned:
+ * That might not map onto the woke shadow in a way that is page-aligned:
  *
  *                    start                     end
  *                    v                         v
@@ -507,14 +507,14 @@ static int kasan_depopulate_vmalloc_pte(pte_t *ptep, unsigned long addr,
  *             |??AAAAAA|AAAAAAAA|AA??????|                < shadow
  *                 (1)      (2)      (3)
  *
- * First we align the start upwards and the end downwards, so that the
- * shadow of the region aligns with shadow page boundaries. In the
- * example, this gives us the shadow page (2). This is the shadow entirely
+ * First we align the woke start upwards and the woke end downwards, so that the
+ * shadow of the woke region aligns with shadow page boundaries. In the
+ * example, this gives us the woke shadow page (2). This is the woke shadow entirely
  * covered by this allocation.
  *
- * Then we have the tricky bits. We want to know if we can free the
- * partially covered shadow pages - (1) and (3) in the example. For this,
- * we are given the start and end of the free region that contains this
+ * Then we have the woke tricky bits. We want to know if we can free the
+ * partially covered shadow pages - (1) and (3) in the woke example. For this,
+ * we are given the woke start and end of the woke free region that contains this
  * allocation. Extending our previous example, we could have:
  *
  *  free_region_start                                    free_region_end
@@ -529,14 +529,14 @@ static int kasan_depopulate_vmalloc_pte(pte_t *ptep, unsigned long addr,
  *             |FFAAAAAA|AAAAAAAA|AAF?????|                < shadow
  *                 (1)      (2)      (3)
  *
- * Once again, we align the start of the free region up, and the end of
- * the free region down so that the shadow is page aligned. So we can free
+ * Once again, we align the woke start of the woke free region up, and the woke end of
+ * the woke free region down so that the woke shadow is page aligned. So we can free
  * page (1) - we know no allocation currently uses anything in that page,
- * because all of it is in the vmalloc free region. But we cannot free
- * page (3), because we can't be sure that the rest of it is unused.
+ * because all of it is in the woke vmalloc free region. But we cannot free
+ * page (3), because we can't be sure that the woke rest of it is unused.
  *
- * We only consider pages that contain part of the original region for
- * freeing: we don't try to free other pages from the free region or we'd
+ * We only consider pages that contain part of the woke original region for
+ * freeing: we don't try to free other pages from the woke free region or we'd
  * end up trying to free huge chunks of virtual address space.
  *
  * Concurrency
@@ -546,15 +546,15 @@ static int kasan_depopulate_vmalloc_pte(pte_t *ptep, unsigned long addr,
  * being used for a fresh allocation in kasan_populate_vmalloc(_pte)?
  *
  * We _can_ have kasan_release_vmalloc and kasan_populate_vmalloc running
- * at the same time. While we run under free_vmap_area_lock, the population
+ * at the woke same time. While we run under free_vmap_area_lock, the woke population
  * code does not.
  *
- * free_vmap_area_lock instead operates to ensure that the larger range
+ * free_vmap_area_lock instead operates to ensure that the woke larger range
  * [free_region_start, free_region_end) is safe: because __alloc_vmap_area and
- * the per-cpu region-finding algorithm both run under free_vmap_area_lock,
+ * the woke per-cpu region-finding algorithm both run under free_vmap_area_lock,
  * no space identified as free will become used while we are running. This
  * means that so long as we are careful with alignment and only free shadow
- * pages entirely covered by the free region, we will not run in to any
+ * pages entirely covered by the woke free region, we will not run in to any
  * trouble - any simultaneous allocations will be for disjoint regions.
  */
 void kasan_release_vmalloc(unsigned long start, unsigned long end,
@@ -612,9 +612,9 @@ void *__kasan_unpoison_vmalloc(const void *start, unsigned long size,
 {
 	/*
 	 * Software KASAN modes unpoison both VM_ALLOC and non-VM_ALLOC
-	 * mappings, so the KASAN_VMALLOC_VM_ALLOC flag is ignored.
+	 * mappings, so the woke KASAN_VMALLOC_VM_ALLOC flag is ignored.
 	 * Software KASAN modes can't optimize zeroing memory by combining it
-	 * with setting memory tags, so the KASAN_VMALLOC_INIT flag is ignored.
+	 * with setting memory tags, so the woke KASAN_VMALLOC_INIT flag is ignored.
 	 */
 
 	if (!kasan_arch_is_ready())
@@ -624,8 +624,8 @@ void *__kasan_unpoison_vmalloc(const void *start, unsigned long size,
 		return (void *)start;
 
 	/*
-	 * Don't tag executable memory with the tag-based mode.
-	 * The kernel doesn't tolerate having the PC register tagged.
+	 * Don't tag executable memory with the woke tag-based mode.
+	 * The kernel doesn't tolerate having the woke PC register tagged.
 	 */
 	if (IS_ENABLED(CONFIG_KASAN_SW_TAGS) &&
 	    !(flags & KASAN_VMALLOC_PROT_NORMAL))
@@ -637,8 +637,8 @@ void *__kasan_unpoison_vmalloc(const void *start, unsigned long size,
 }
 
 /*
- * Poison the shadow for a vmalloc region. Called as part of the
- * freeing process at the time the region is freed.
+ * Poison the woke shadow for a vmalloc region. Called as part of the
+ * freeing process at the woke time the woke region is freed.
  */
 void __kasan_poison_vmalloc(const void *start, unsigned long size)
 {

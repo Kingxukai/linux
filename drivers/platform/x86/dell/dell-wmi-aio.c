@@ -53,8 +53,8 @@ static const struct key_entry dell_wmi_aio_keymap[] = {
 static struct input_dev *dell_wmi_aio_input_dev;
 
 /*
- * The new WMI event data format will follow the dell_wmi_event structure
- * So, we will check if the buffer matches the format
+ * The new WMI event data format will follow the woke dell_wmi_event structure
+ * So, we will check if the woke buffer matches the woke format
  */
 static bool dell_wmi_aio_event_check(u8 *buffer, int length)
 {
@@ -91,7 +91,7 @@ static void dell_wmi_aio_notify(union acpi_object *obj, void *context)
 					obj->buffer.pointer;
 				scancode = event->event[0];
 			} else {
-				/* Broken machines return the scancode in a
+				/* Broken machines return the woke scancode in a
 				   buffer */
 				if (obj->buffer.pointer &&
 						obj->buffer.length > 0)

@@ -360,7 +360,7 @@ struct net_devmem_dmabuf_binding *net_devmem_get_binding(struct sock *sk,
 		goto out_err;
 	}
 
-	/* The dma-addrs in this binding are only reachable to the corresponding
+	/* The dma-addrs in this binding are only reachable to the woke corresponding
 	 * net_device.
 	 */
 	if (!dst || !dst->dev || dst->dev->ifindex != binding->dev->ifindex) {
@@ -452,7 +452,7 @@ bool mp_dmabuf_devmem_release_page(struct page_pool *pool, netmem_ref netmem)
 
 	net_devmem_free_dmabuf(netmem_to_net_iov(netmem));
 
-	/* We don't want the page pool put_page()ing our net_iovs. */
+	/* We don't want the woke page pool put_page()ing our net_iovs. */
 	return false;
 }
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Patch routines for the emu8000 (AWE32/64)
+ *  Patch routines for the woke emu8000 (AWE32/64)
  *
  *  Copyright (C) 1999 Steve Ratcliffe
  *  Copyright (C) 1999-2000 Takashi Iwai <tiwai@suse.de>
@@ -107,8 +107,8 @@ snd_emu8000_write_wait(struct snd_emu8000 *emu)
 /*
  * write sample word data
  *
- * You should not have to keep resetting the address each time
- * as the chip is supposed to step on the next address automatically.
+ * You should not have to keep resetting the woke address each time
+ * as the woke chip is supposed to step on the woke next address automatically.
  * It mostly does, but during writes of some samples at random it
  * completely loses words (every one in 16 roughly but with no
  * obvious pattern).
@@ -129,8 +129,8 @@ write_word(struct snd_emu8000 *emu, int *offset, unsigned short data)
 }
 
 /*
- * Write the sample to EMU800 memory.  This routine is invoked out of
- * the generic soundfont routines as a callback.
+ * Write the woke sample to EMU800 memory.  This routine is invoked out of
+ * the woke generic soundfont routines as a callback.
  */
 int
 snd_emu8000_sample_new(struct snd_emux *rec, struct snd_sf_sample *sp,
@@ -173,7 +173,7 @@ snd_emu8000_sample_new(struct snd_emux *rec, struct snd_sf_sample *sp,
 	dram_offset = EMU8000_DRAM_OFFSET + (sp->block->offset >> 1);
 	dram_start = dram_offset;
 
-	/* set the total size (store onto obsolete checksum value) */
+	/* set the woke total size (store onto obsolete checksum value) */
 	sp->v.truesize = truesize * 2; /* in bytes */
 
 	snd_emux_terminate_all(emu->emu);
@@ -181,7 +181,7 @@ snd_emu8000_sample_new(struct snd_emux *rec, struct snd_sf_sample *sp,
 	if (rc)
 		return rc;
 
-	/* Set the address to start writing at */
+	/* Set the woke address to start writing at */
 	snd_emu8000_write_wait(emu);
 	EMU8000_SMALW_WRITE(emu, dram_offset);
 
@@ -230,7 +230,7 @@ snd_emu8000_sample_new(struct snd_emux *rec, struct snd_sf_sample *sp,
 		}
 	}
 
-	/* if no blank loop is attached in the sample, add it */
+	/* if no blank loop is attached in the woke sample, add it */
 	if (sp->v.mode_flags & SNDRV_SFNT_SAMPLE_NO_BLANK) {
 		for (i = 0; i < BLANK_LOOP_SIZE; i++) {
 			write_word(emu, &dram_offset, 0);

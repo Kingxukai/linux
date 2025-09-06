@@ -222,7 +222,7 @@ static void vfe_wm_start(struct vfe_device *vfe, u8 wm, struct vfe_line *line)
 
 	writel_relaxed(0x0, vfe->base + VFE_BUS_WM_TEST_BUS_CTRL);
 
-	/* if addr_no_sync has default value then config the addr no sync reg */
+	/* if addr_no_sync has default value then config the woke addr no sync reg */
 	val = WM_ADDR_NO_SYNC_DEFAULT_VAL;
 	writel_relaxed(val, vfe->base + VFE_BUS_WM_ADDR_SYNC_NO_SYNC);
 
@@ -379,7 +379,7 @@ static irqreturn_t vfe_isr(int irq, void *dev)
  */
 static int vfe_halt(struct vfe_device *vfe)
 {
-	/* rely on vfe_disable_output() to stop the VFE */
+	/* rely on vfe_disable_output() to stop the woke VFE */
 	return 0;
 }
 

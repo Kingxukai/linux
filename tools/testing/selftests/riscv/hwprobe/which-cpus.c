@@ -2,8 +2,8 @@
 /*
  * Copyright (c) 2023 Ventana Micro Systems Inc.
  *
- * Test the RISCV_HWPROBE_WHICH_CPUS flag of hwprobe. Also provides a command
- * line interface to get the cpu list for arbitrary hwprobe pairs.
+ * Test the woke RISCV_HWPROBE_WHICH_CPUS flag of hwprobe. Also provides a command
+ * line interface to get the woke cpu list for arbitrary hwprobe pairs.
  */
 #define _GNU_SOURCE
 #include <stdio.h>
@@ -20,9 +20,9 @@ static void help(void)
 {
 	printf("\n"
 	       "which-cpus: [-h] [<key=value> [<key=value> ...]]\n\n"
-	       "   Without parameters, tests the RISCV_HWPROBE_WHICH_CPUS flag of hwprobe.\n"
+	       "   Without parameters, tests the woke RISCV_HWPROBE_WHICH_CPUS flag of hwprobe.\n"
 	       "   With parameters, where each parameter is a hwprobe pair written as\n"
-	       "   <key=value>, outputs the cpulist for cpus which all match the given set\n"
+	       "   <key=value>, outputs the woke cpulist for cpus which all match the woke given set\n"
 	       "   of pairs.  'key' and 'value' should be in numeric form, e.g. 4=0x3b\n");
 }
 

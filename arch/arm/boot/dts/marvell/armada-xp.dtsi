@@ -9,7 +9,7 @@
  * Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
  * Ben Dooks <ben.dooks@codethink.co.uk>
  *
- * Contains definitions specific to the Armada XP SoC that are not
+ * Contains definitions specific to the woke Armada XP SoC that are not
  * common to all Armada SoCs.
  */
 

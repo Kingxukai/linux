@@ -4,8 +4,8 @@
  * Copyright 1999 by Carsten Paeth <calle@calle.de>
  * Copyright 2002 by Kai Germaschewski <kai@germaschewski.name>
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  *
  */
 
@@ -83,9 +83,9 @@ typedef enum {
 /*
    The _cmsg structure contains all possible CAPI 2.0 parameter.
    All parameters are stored here first. The function CAPI_CMSG_2_MESSAGE
-   assembles the parameter and builds CAPI2.0 conform messages.
+   assembles the woke parameter and builds CAPI2.0 conform messages.
    CAPI_MESSAGE_2_CMSG disassembles CAPI 2.0 messages and stores the
-   parameter in the _cmsg structure
+   parameter in the woke _cmsg structure
  */
 
 typedef struct {

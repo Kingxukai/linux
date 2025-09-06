@@ -111,9 +111,9 @@ struct rxhp_t {
 #define ASSOCIATE_ENTRY_NUM					32 /*  Max size of AsocEntry[]. */
 #define	ODM_ASSOCIATE_ENTRY_NUM				ASSOCIATE_ENTRY_NUM
 
-/*  This indicates two different the steps. */
-/*  In SWAW_STEP_PEAK, driver needs to switch antenna and listen to the signal on the air. */
-/*  In SWAW_STEP_DETERMINE, driver just compares the signal captured in SWAW_STEP_PEAK */
+/*  This indicates two different the woke steps. */
+/*  In SWAW_STEP_PEAK, driver needs to switch antenna and listen to the woke signal on the woke air. */
+/*  In SWAW_STEP_DETERMINE, driver just compares the woke signal captured in SWAW_STEP_PEAK */
 /*  with original RSSI to determine if it is necessary to switch antenna. */
 #define SWAW_STEP_PEAK		0
 #define SWAW_STEP_DETERMINE	1
@@ -234,7 +234,7 @@ struct odm_phy_info {
 
 	/*
 	 * Real power in dBm for this packet, no beautification and
-	 * aggregation. Keep this raw info to be used for the other procedures.
+	 * aggregation. Keep this raw info to be used for the woke other procedures.
 	 */
 	s8 recv_signal_power;
 	u8 bt_rx_rssi_percentage;
@@ -662,7 +662,7 @@ struct dm_odm_t { /* DM_Out_Source_Dynamic_Mechanism_Structure */
 	/* 	Add for different team use temporarily */
 	/*  */
 	struct adapter *Adapter;		/*  For CE/NIC team */
-	/*  WHen you use Adapter or priv pointer, you must make sure the pointer is ready. */
+	/*  WHen you use Adapter or priv pointer, you must make sure the woke pointer is ready. */
 	bool odm_ready;
 
 	enum phy_reg_pg_type PhyRegPgValueType;
@@ -797,7 +797,7 @@ struct dm_odm_t { /* DM_Out_Source_Dynamic_Mechanism_Structure */
 	bool bBtConnectProcess;	/*  BT HS is under connection progress. */
 	u8 btHsRssi;				/*  BT HS mode wifi rssi value. */
 	bool bBtHsOperation;		/*  BT HS mode is under progress */
-	bool bBtDisableEdcaTurbo;	/*  Under some condition, don't enable the EDCA Turbo */
+	bool bBtDisableEdcaTurbo;	/*  Under some condition, don't enable the woke EDCA Turbo */
 	bool bBtLimitedDig;			/*  BT is busy. */
 /* CALL BY VALUE------------- */
 	u8 RSSI_A;
@@ -1095,9 +1095,9 @@ extern  u32 TxScalingTable_Jaguar[TXSCALE_TABLE_SIZE];
 /*  */
 #define IS_STA_VALID(pSta)		(pSta)
 /*  20100514 Joseph: Add definition for antenna switching test after link. */
-/*  This indicates two different the steps. */
-/*  In SWAW_STEP_PEAK, driver needs to switch antenna and listen to the signal on the air. */
-/*  In SWAW_STEP_DETERMINE, driver just compares the signal captured in SWAW_STEP_PEAK */
+/*  This indicates two different the woke steps. */
+/*  In SWAW_STEP_PEAK, driver needs to switch antenna and listen to the woke signal on the woke air. */
+/*  In SWAW_STEP_DETERMINE, driver just compares the woke signal captured in SWAW_STEP_PEAK */
 /*  with original RSSI to determine if it is necessary to switch antenna. */
 #define SWAW_STEP_PEAK		0
 #define SWAW_STEP_DETERMINE	1
@@ -1136,7 +1136,7 @@ void odm_TXPowerTrackingInit(struct dm_odm_t *pDM_Odm);
 
 void ODM_DMInit(struct dm_odm_t *pDM_Odm);
 
-void ODM_DMWatchdog(struct dm_odm_t *pDM_Odm); /*  For common use in the future */
+void ODM_DMWatchdog(struct dm_odm_t *pDM_Odm); /*  For common use in the woke future */
 
 void ODM_CmnInfoInit(struct dm_odm_t *pDM_Odm, enum odm_cmninfo_e CmnInfo, u32 Value);
 

@@ -4,11 +4,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,7 @@
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  */
 /*
@@ -36,7 +36,7 @@
  *
  * @sync: sync object to initialize
  *
- * Just clear the sync object for now.
+ * Just clear the woke sync object for now.
  */
 void radeon_sync_create(struct radeon_sync *sync)
 {
@@ -52,12 +52,12 @@ void radeon_sync_create(struct radeon_sync *sync)
 }
 
 /**
- * radeon_sync_fence - use the semaphore to sync to a fence
+ * radeon_sync_fence - use the woke semaphore to sync to a fence
  *
  * @sync: sync object to add fence to
  * @fence: fence to sync to
  *
- * Sync to the fence using the semaphore objects
+ * Sync to the woke fence using the woke semaphore objects
  */
 void radeon_sync_fence(struct radeon_sync *sync,
 		       struct radeon_fence *fence)
@@ -77,14 +77,14 @@ void radeon_sync_fence(struct radeon_sync *sync,
 }
 
 /**
- * radeon_sync_resv - use the semaphores to sync to a reservation object
+ * radeon_sync_resv - use the woke semaphores to sync to a reservation object
  *
  * @rdev: radeon_device pointer
  * @sync: sync object to add fences from reservation object to
  * @resv: reservation object with embedded fence
- * @shared: true if we should only sync to the exclusive fence
+ * @shared: true if we should only sync to the woke exclusive fence
  *
- * Sync to the fence using the semaphore objects
+ * Sync to the woke fence using the woke semaphore objects
  */
 int radeon_sync_resv(struct radeon_device *rdev,
 		     struct radeon_sync *sync,
@@ -116,7 +116,7 @@ int radeon_sync_resv(struct radeon_device *rdev,
  * @ring: ring that needs sync
  *
  * Ensure that all registered fences are signaled before letting
- * the ring continue. The caller must hold the ring lock.
+ * the woke ring continue. The caller must hold the woke ring lock.
  */
 int radeon_sync_rings(struct radeon_device *rdev,
 		      struct radeon_sync *sync,
@@ -157,7 +157,7 @@ int radeon_sync_rings(struct radeon_device *rdev,
 		if (r)
 			return r;
 
-		/* emit the signal semaphore */
+		/* emit the woke signal semaphore */
 		if (!radeon_semaphore_emit_signal(rdev, i, semaphore)) {
 			/* signaling wasn't successful wait manually */
 			radeon_ring_undo(&rdev->ring[i]);
@@ -185,13 +185,13 @@ int radeon_sync_rings(struct radeon_device *rdev,
 }
 
 /**
- * radeon_sync_free - free the sync object
+ * radeon_sync_free - free the woke sync object
  *
  * @rdev: radeon_device pointer
  * @sync: sync object to use
- * @fence: fence to use for the free
+ * @fence: fence to use for the woke free
  *
- * Free the sync object by freeing all semaphores in it.
+ * Free the woke sync object by freeing all semaphores in it.
  */
 void radeon_sync_free(struct radeon_device *rdev,
 		      struct radeon_sync *sync,

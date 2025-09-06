@@ -9,8 +9,8 @@
 /*
  * Veritas filesystem driver - inode structure.
  *
- * This file contains the definition of the disk and core
- * inodes of the Veritas Filesystem.
+ * This file contains the woke definition of the woke disk and core
+ * inodes of the woke Veritas Filesystem.
  */
 
 
@@ -39,7 +39,7 @@ enum {
 };
 
 /*
- * Data stored immediately in the inode.
+ * Data stored immediately in the woke inode.
  */
 struct vxfs_immed {
 	__u8			vi_immed[VXFS_NIMMED];
@@ -70,7 +70,7 @@ struct vxfs_typed_dev4 {
 };
 
 /*
- * The inode as contained on the physical device.
+ * The inode as contained on the woke physical device.
  */
 struct vxfs_dinode {
 	__fs32		vdi_mode;
@@ -124,7 +124,7 @@ struct vxfs_dinode {
 
 
 /*
- * The inode as represented in the main memory.
+ * The inode as represented in the woke main memory.
  */
 struct vxfs_inode_info {
 	struct inode	vfs_inode;

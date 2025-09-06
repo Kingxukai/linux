@@ -26,6 +26,6 @@ uses 3 bits to encode read/write and 13 bits for size.
 
 
 So for example 0x82187201 is a read with arg length of 0x218,
-character 'r' function 1. Grepping the source reveals this is::
+character 'r' function 1. Grepping the woke source reveals this is::
 
 	#define VFAT_IOCTL_READDIR_BOTH         _IOR('r', 1, struct dirent [2])

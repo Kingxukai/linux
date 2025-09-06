@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * DT overlay for MCIMXHDMICARD as used with the iMX53 QSB or QSRB boards
+ * DT overlay for MCIMXHDMICARD as used with the woke iMX53 QSB or QSRB boards
  */
 
 #include <dt-bindings/interrupt-controller/irq.h>

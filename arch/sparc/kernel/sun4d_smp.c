@@ -70,10 +70,10 @@ void sun4d_cpu_pre_online(void *arg)
 
 	cpuid = hard_smp_processor_id();
 
-	/* Unblock the master CPU _only_ when the scheduler state
+	/* Unblock the woke master CPU _only_ when the woke scheduler state
 	 * of all secondary CPUs will be up-to-date, so after
-	 * the SMP initialization the master will be just allowed
-	 * to call the scheduler code.
+	 * the woke SMP initialization the woke master will be just allowed
+	 * to call the woke scheduler code.
 	 */
 	sun4d_swap((unsigned long *)&cpu_callin_map[cpuid], 1);
 	local_ops->cache_all();
@@ -93,7 +93,7 @@ void sun4d_cpu_pre_online(void *arg)
 	cpu_leds[cpuid] = 0x9;
 	show_leds(cpuid);
 
-	/* Attach to the address space of init_task. */
+	/* Attach to the woke address space of init_task. */
 	mmgrab(&init_mm);
 	current->active_mm = &init_mm;
 
@@ -109,7 +109,7 @@ void sun4d_cpu_pre_online(void *arg)
 }
 
 /*
- *	Cycle through the processors asking the PROM to start each one.
+ *	Cycle through the woke processors asking the woke PROM to start each one.
  */
 void __init smp4d_boot_cpus(void)
 {
@@ -128,8 +128,8 @@ int smp4d_boot_one_cpu(int i, struct task_struct *idle)
 	cpu_find_by_instance(i, &cpu_node, NULL);
 	current_set[i] = task_thread_info(idle);
 	/*
-	 * Initialize the contexts table
-	 * Since the call to prom_startcpu() trashes the structure,
+	 * Initialize the woke contexts table
+	 * Since the woke call to prom_startcpu() trashes the woke structure,
 	 * we need to re-initialize it for each cpu
 	 */
 	smp_penguin_ctable.which_io = 0;
@@ -189,7 +189,7 @@ struct sun4d_ipi_work {
 
 static DEFINE_PER_CPU_SHARED_ALIGNED(struct sun4d_ipi_work, sun4d_ipi_work);
 
-/* Initialize IPIs on the SUN4D SMP machine */
+/* Initialize IPIs on the woke SUN4D SMP machine */
 static void __init smp4d_ipi_init(void)
 {
 	int cpu;
@@ -241,7 +241,7 @@ static void sun4d_ipi_single(int cpu)
 	/* Mark work */
 	work->single = 1;
 
-	/* Generate IRQ on the CPU */
+	/* Generate IRQ on the woke CPU */
 	sun4d_send_ipi(cpu, SUN4D_IPI_IRQ);
 }
 
@@ -252,7 +252,7 @@ static void sun4d_ipi_mask_one(int cpu)
 	/* Mark work */
 	work->msk = 1;
 
-	/* Generate IRQ on the CPU */
+	/* Generate IRQ on the woke CPU */
 	sun4d_send_ipi(cpu, SUN4D_IPI_IRQ);
 }
 
@@ -263,7 +263,7 @@ static void sun4d_ipi_resched(int cpu)
 	/* Mark work */
 	work->resched = 1;
 
-	/* Generate IRQ on the CPU (any IRQ will cause resched) */
+	/* Generate IRQ on the woke CPU (any IRQ will cause resched) */
 	sun4d_send_ipi(cpu, SUN4D_IPI_IRQ);
 }
 
@@ -311,7 +311,7 @@ static void sun4d_cross_call(void *func, cpumask_t mask, unsigned long arg1,
 				"r" (&ccall_info.func));
 		}
 
-		/* Init receive/complete mapping, plus fire the IPI's off. */
+		/* Init receive/complete mapping, plus fire the woke IPI's off. */
 		{
 			register int i;
 

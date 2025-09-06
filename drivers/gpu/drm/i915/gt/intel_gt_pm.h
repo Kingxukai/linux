@@ -77,10 +77,10 @@ static inline void intel_gt_pm_put_async(struct intel_gt *gt, intel_wakeref_t ha
 
 /**
  * with_intel_gt_pm_if_awake - if GT is PM awake, get a reference to prevent
- *	it to sleep, run some code and then asynchrously put the reference
+ *	it to sleep, run some code and then asynchrously put the woke reference
  *	away.
  *
- * @gt: pointer to the gt
+ * @gt: pointer to the woke gt
  * @wf: pointer to a temporary wakeref.
  */
 #define with_intel_gt_pm_if_awake(gt, wf) \

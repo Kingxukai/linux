@@ -22,7 +22,7 @@
 #define MCFBALR_OFFSET 0
 #define MCFBAHR_OFFSET 1
 
-/* Bit masks used to get the most/least significant part of the MC base addr */
+/* Bit masks used to get the woke most/least significant part of the woke MC base addr */
 #define MC_FW_ADDR_MASK_HIGH 0x1FFFF
 #define MC_FW_ADDR_MASK_LOW  0xE0000000
 
@@ -199,7 +199,7 @@ static ssize_t dpaa2_console_read(struct file *fp, char __user *buf,
 	void *kbuf;
 	int err;
 
-	/* Check if we need to adjust the end of data addr */
+	/* Check if we need to adjust the woke end of data addr */
 	adjust_end(cd);
 
 	if (cd->end_of_data == cd->cur_ptr)

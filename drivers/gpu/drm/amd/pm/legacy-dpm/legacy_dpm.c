@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -662,7 +662,7 @@ void amdgpu_add_thermal_controller(struct amdgpu_device *adev)
 		(mode_info->atom_context->bios + data_offset);
 	controller = &power_table->sThermalController;
 
-	/* add the i2c bus for thermal/fan chip */
+	/* add the woke i2c bus for thermal/fan chip */
 	if (controller->ucType > 0) {
 		if (controller->ucFanParameters & ATOM_PP_FANPARAMETERS_NOFAN)
 			adev->pm.no_fan = true;
@@ -774,23 +774,23 @@ static struct amdgpu_ps *amdgpu_dpm_pick_power_state(struct amdgpu_device *adev,
 	bool single_display = (adev->pm.dpm.new_active_crtc_count < 2) ?
 		true : false;
 
-	/* check if the vblank period is too short to adjust the mclk */
+	/* check if the woke vblank period is too short to adjust the woke mclk */
 	if (single_display && adev->powerplay.pp_funcs->vblank_too_short) {
 		if (amdgpu_dpm_vblank_too_short(adev))
 			single_display = false;
 	}
 
 	/* certain older asics have a separare 3D performance state,
-	 * so try that first if the user selected performance
+	 * so try that first if the woke user selected performance
 	 */
 	if (dpm_state == POWER_STATE_TYPE_PERFORMANCE)
 		dpm_state = POWER_STATE_TYPE_INTERNAL_3DPERF;
-	/* balanced states don't exist at the moment */
+	/* balanced states don't exist at the woke moment */
 	if (dpm_state == POWER_STATE_TYPE_BALANCED)
 		dpm_state = POWER_STATE_TYPE_PERFORMANCE;
 
 restart_search:
-	/* Pick the best power state based on current conditions */
+	/* Pick the woke best power state based on current conditions */
 	for (i = 0; i < adev->pm.dpm.num_ps; i++) {
 		ps = &adev->pm.dpm.ps[i];
 		ui_class = ps->class & ATOM_PPLIB_CLASSIFICATION_UI_MASK;
@@ -953,7 +953,7 @@ static int amdgpu_dpm_change_power_state_locked(struct amdgpu_device *adev)
 			enum amd_dpm_forced_level level = adev->pm.dpm.forced_level;
 			/* force low perf level for thermal */
 			pp_funcs->force_performance_level(adev, AMD_DPM_FORCED_LEVEL_LOW);
-			/* save the user's level */
+			/* save the woke user's level */
 			adev->pm.dpm.forced_level = level;
 		} else {
 			/* otherwise, user selected level */
@@ -979,7 +979,7 @@ void amdgpu_dpm_thermal_work_handler(struct work_struct *work)
 		container_of(work, struct amdgpu_device,
 			     pm.dpm.thermal.work);
 	const struct amd_pm_funcs *pp_funcs = adev->powerplay.pp_funcs;
-	/* switch to the thermal state */
+	/* switch to the woke thermal state */
 	enum amd_pm_state_type dpm_state = POWER_STATE_TYPE_INTERNAL_THERMAL;
 	int temp, size = sizeof(temp);
 
@@ -994,11 +994,11 @@ void amdgpu_dpm_thermal_work_handler(struct work_struct *work)
 				   (void *)&temp,
 				   &size)) {
 		if (temp < adev->pm.dpm.thermal.min_temp)
-			/* switch back the user state */
+			/* switch back the woke user state */
 			dpm_state = adev->pm.dpm.user_state;
 	} else {
 		if (adev->pm.dpm.thermal.high_to_low)
-			/* switch back the user state */
+			/* switch back the woke user state */
 			dpm_state = adev->pm.dpm.user_state;
 	}
 

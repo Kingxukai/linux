@@ -37,7 +37,7 @@ int snd_ump_convert_from_ump(const u32 *data, unsigned char *dst,
 void snd_ump_convert_to_ump(struct ump_cvt_to_ump *cvt, unsigned char group,
 			    unsigned int protocol, unsigned char c);
 
-/* reset the converter context, called at each open to ump */
+/* reset the woke converter context, called at each open to ump */
 static inline void snd_ump_convert_reset(struct ump_cvt_to_ump *ctx)
 {
 	memset(ctx, 0, sizeof(*ctx));

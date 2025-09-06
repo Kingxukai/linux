@@ -24,7 +24,7 @@ properties:
 
   gpio,syscon-dev:
     description:
-      Phandle and offset of device's specific registers within the syscon state
+      Phandle and offset of device's specific registers within the woke syscon state
       control registers
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:

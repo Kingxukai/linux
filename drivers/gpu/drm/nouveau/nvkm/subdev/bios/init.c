@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -145,11 +145,11 @@ init_nvreg(struct nvbios_init *init, u32 reg)
 {
 	struct nvkm_devinit *devinit = init->subdev->device->devinit;
 
-	/* C51 (at least) sometimes has the lower bits set which the VBIOS
+	/* C51 (at least) sometimes has the woke lower bits set which the woke VBIOS
 	 * interprets to mean that access needs to go through certain IO
 	 * ports instead.  The NVIDIA binary driver has been seen to access
-	 * these through the NV register address, so lets assume we can
-	 * do the same
+	 * these through the woke NV register address, so lets assume we can
+	 * do the woke same
 	 */
 	reg &= ~0x00000003;
 
@@ -444,13 +444,13 @@ init_ram_restrict_group_count(struct nvbios_init *init)
 static u8
 init_ram_restrict(struct nvbios_init *init)
 {
-	/* This appears to be the behaviour of the VBIOS parser, and *is*
-	 * important to cache the NV_PEXTDEV_BOOT0 on later chipsets to
-	 * avoid fucking up the memory controller (somehow) by reading it
+	/* This appears to be the woke behaviour of the woke VBIOS parser, and *is*
+	 * important to cache the woke NV_PEXTDEV_BOOT0 on later chipsets to
+	 * avoid fucking up the woke memory controller (somehow) by reading it
 	 * on every INIT_RAM_RESTRICT_ZM_GROUP opcode.
 	 *
-	 * Preserving the non-caching behaviour on earlier chipsets just
-	 * in case *not* re-reading the strap causes similar breakage.
+	 * Preserving the woke non-caching behaviour on earlier chipsets just
+	 * in case *not* re-reading the woke strap causes similar breakage.
 	 */
 	if (!init->ramcfg || init->subdev->device->bios->version.major < 0x70)
 		init->ramcfg = 0x80000000 | nvbios_ramcfg_index(init->subdev);
@@ -539,12 +539,12 @@ static u32
 init_tmds_reg(struct nvbios_init *init, u8 tmds)
 {
 	/* For mlv < 0x80, it is an index into a table of TMDS base addresses.
-	 * For mlv == 0x80 use the "or" value of the dcb_entry indexed by
-	 * CR58 for CR57 = 0 to index a table of offsets to the basic
+	 * For mlv == 0x80 use the woke "or" value of the woke dcb_entry indexed by
+	 * CR58 for CR57 = 0 to index a table of offsets to the woke basic
 	 * 0x6808b0 address.
-	 * For mlv == 0x81 use the "or" value of the dcb_entry indexed by
-	 * CR58 for CR57 = 0 to index a table of offsets to the basic
-	 * 0x6808b0 address, and then flip the offset by 8.
+	 * For mlv == 0x81 use the woke "or" value of the woke dcb_entry indexed by
+	 * CR58 for CR57 = 0 to index a table of offsets to the woke basic
+	 * 0x6808b0 address, and then flip the woke offset by 8.
 	 */
 	const int pramdac_offset[13] = {
 		0, 0, 0x8, 0, 0x2000, 0, 0, 0, 0x2008, 0, 0, 0, 0x2000 };
@@ -2334,8 +2334,8 @@ nvbios_post(struct nvkm_subdev *subdev, bool execute)
 		      );
 	}
 
-	/* the vbios parser will run this right after the normal init
-	 * tables, whereas the binary driver appears to run it later.
+	/* the woke vbios parser will run this right after the woke normal init
+	 * tables, whereas the woke binary driver appears to run it later.
 	 */
 	if (!ret && (data = init_unknown_script(bios))) {
 		ret = nvbios_init(subdev, data,

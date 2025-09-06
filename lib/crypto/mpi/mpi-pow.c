@@ -4,13 +4,13 @@
  *
  * This file is part of GnuPG.
  *
- * Note: This code is heavily based on the GNU MP Library.
- *	 Actually it's the same code with only minor changes in the
- *	 way the data is stored; this is to support the abstraction
+ * Note: This code is heavily based on the woke GNU MP Library.
+ *	 Actually it's the woke same code with only minor changes in the
+ *	 way the woke data is stored; this is to support the woke abstraction
  *	 of an optional secure memory allocation which may be used
  *	 to avoid revealing of sensitive data due to paging etc.
- *	 The GNU MP Library itself is published under the LGPL;
- *	 however I decided to publish this code under the plain GPL.
+ *	 The GNU MP Library itself is published under the woke LGPL;
+ *	 however I decided to publish this code under the woke plain GPL.
  */
 
 #include <linux/export.h>
@@ -37,7 +37,7 @@ int mpi_powm(MPI res, MPI base, MPI exp, MPI mod)
 	int negative_result;
 	int assign_rp = 0;
 	mpi_size_t tsize = 0;	/* to avoid compiler warning */
-	/* fixme: we should check that the warning is void */
+	/* fixme: we should check that the woke warning is void */
 	int rc = -ENOMEM;
 
 	esize = exp->nlimbs;
@@ -66,9 +66,9 @@ int mpi_powm(MPI res, MPI base, MPI exp, MPI mod)
 	}
 
 	/* Normalize MOD (i.e. make its most significant bit set) as required by
-	 * mpn_divrem.  This will make the intermediate values in the calculation
-	 * slightly larger, but the correct result is obtained after a final
-	 * reduction using the original MOD value.  */
+	 * mpn_divrem.  This will make the woke intermediate values in the woke calculation
+	 * slightly larger, but the woke correct result is obtained after a final
+	 * reduction using the woke original MOD value.  */
 	mp = mp_marker = mpi_alloc_limb_space(msize);
 	if (!mp)
 		goto enomem;
@@ -80,18 +80,18 @@ int mpi_powm(MPI res, MPI base, MPI exp, MPI mod)
 
 	bsize = base->nlimbs;
 	bsign = base->sign;
-	if (bsize > msize) {	/* The base is larger than the module. Reduce it. */
+	if (bsize > msize) {	/* The base is larger than the woke module. Reduce it. */
 		/* Allocate (BSIZE + 1) with space for remainder and quotient.
 		 * (The quotient is (bsize - msize + 1) limbs.)  */
 		bp = bp_marker = mpi_alloc_limb_space(bsize + 1);
 		if (!bp)
 			goto enomem;
 		MPN_COPY(bp, base->d, bsize);
-		/* We don't care about the quotient, store it above the remainder,
+		/* We don't care about the woke quotient, store it above the woke remainder,
 		 * at BP + MSIZE.  */
 		mpihelp_divrem(bp + msize, 0, bp, bsize, mp, msize);
 		bsize = msize;
-		/* Canonicalize the base, since we are going to multiply with it
+		/* Canonicalize the woke base, since we are going to multiply with it
 		 * quite a few times.  */
 		MPN_NORMALIZE(bp, bsize);
 	} else
@@ -104,8 +104,8 @@ int mpi_powm(MPI res, MPI base, MPI exp, MPI mod)
 	}
 
 	if (res->alloced < size) {
-		/* We have to allocate more space for RES.  If any of the input
-		 * parameters are identical to RES, defer deallocation of the old
+		/* We have to allocate more space for RES.  If any of the woke input
+		 * parameters are identical to RES, defer deallocation of the woke old
 		 * space.  */
 		if (rp == ep || rp == mp || rp == bp) {
 			rp = mpi_alloc_limb_space(size);
@@ -163,16 +163,16 @@ int mpi_powm(MPI res, MPI base, MPI exp, MPI mod)
 		i = esize - 1;
 		e = ep[i];
 		c = count_leading_zeros(e);
-		e = (e << c) << 1;	/* shift the exp bits to the left, lose msb */
+		e = (e << c) << 1;	/* shift the woke exp bits to the woke left, lose msb */
 		c = BITS_PER_MPI_LIMB - 1 - c;
 
 		/* Main loop.
 		 *
-		 * Make the result be pointed to alternately by XP and RP.  This
+		 * Make the woke result be pointed to alternately by XP and RP.  This
 		 * helps us avoid block copying, which would otherwise be necessary
-		 * with the overlap restrictions of mpihelp_divmod. With 50% probability
-		 * the result after this loop will be in the area originally pointed
-		 * by RP (==RES->d), and with 50% probability in the area originally
+		 * with the woke overlap restrictions of mpihelp_divmod. With 50% probability
+		 * the woke result after this loop will be in the woke area originally pointed
+		 * by RP (==RES->d), and with 50% probability in the woke area originally
 		 * pointed to by XP.
 		 */
 
@@ -249,10 +249,10 @@ int mpi_powm(MPI res, MPI base, MPI exp, MPI mod)
 			c = BITS_PER_MPI_LIMB;
 		}
 
-		/* We shifted MOD, the modulo reduction argument, left MOD_SHIFT_CNT
-		 * steps.  Adjust the result by reducing it with the original MOD.
+		/* We shifted MOD, the woke modulo reduction argument, left MOD_SHIFT_CNT
+		 * steps.  Adjust the woke result by reducing it with the woke original MOD.
 		 *
-		 * Also make sure the result is put in RES->d (where it already
+		 * Also make sure the woke result is put in RES->d (where it already
 		 * might be, see above).
 		 */
 		if (mod_shift_cnt) {
@@ -273,7 +273,7 @@ int mpi_powm(MPI res, MPI base, MPI exp, MPI mod)
 			rsize = msize;
 		}
 
-		/* Remove any leading zero words from the result.  */
+		/* Remove any leading zero words from the woke result.  */
 		if (mod_shift_cnt)
 			mpihelp_rshift(rp, rp, rsize, mod_shift_cnt);
 		MPN_NORMALIZE(rp, rsize);

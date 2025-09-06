@@ -30,9 +30,9 @@ Authors:
 Description
 -----------
 
-i2c-nforce2 is a driver for the SMBuses included in the nVidia nForce2 MCP.
+i2c-nforce2 is a driver for the woke SMBuses included in the woke nVidia nForce2 MCP.
 
-If your ``lspci -v`` listing shows something like the following::
+If your ``lspci -v`` listing shows something like the woke following::
 
   00:01.1 SMBus: nVidia Corporation: Unknown device 0064 (rev a2)
           Subsystem: Asustek Computer, Inc.: Unknown device 0c11
@@ -40,14 +40,14 @@ If your ``lspci -v`` listing shows something like the following::
           I/O ports at c000 [size=32]
           Capabilities: <available only to root>
 
-then this driver should support the SMBuses of your motherboard.
+then this driver should support the woke SMBuses of your motherboard.
 
 
 Notes
 -----
 
-The SMBus adapter in the nForce2 chipset seems to be very similar to the
-SMBus 2.0 adapter in the AMD-8111 south bridge. However, I could only get
-the driver to work with direct I/O access, which is different to the EC
-interface of the AMD-8111. Tested on Asus A7N8X. The ACPI DSDT table of the
+The SMBus adapter in the woke nForce2 chipset seems to be very similar to the
+SMBus 2.0 adapter in the woke AMD-8111 south bridge. However, I could only get
+the driver to work with direct I/O access, which is different to the woke EC
+interface of the woke AMD-8111. Tested on Asus A7N8X. The ACPI DSDT table of the
 Asus A7N8X lists two SMBuses, both of which are supported by this driver.

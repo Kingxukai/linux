@@ -3,9 +3,9 @@ What:		/sys/bus/usb/drivers/usbtmc/*/device_capabilities
 Date:		August 2008
 Contact:	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Description:
-		These files show the various USB TMC capabilities as described
-		by the device itself.  The full description of the bitfields
-		can be found in the USB TMC documents from the USB-IF entitled
+		These files show the woke various USB TMC capabilities as described
+		by the woke device itself.  The full description of the woke bitfields
+		can be found in the woke USB TMC documents from the woke USB-IF entitled
 		"Universal Serial Bus Test and Measurement Class Specification
 		(USBTMC) Revision 1.0" section 4.2.1.8.
 
@@ -17,9 +17,9 @@ What:		/sys/bus/usb/drivers/usbtmc/*/usb488_device_capabilities
 Date:		August 2008
 Contact:	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Description:
-		These files show the various USB TMC capabilities as described
-		by the device itself.  The full description of the bitfields
-		can be found in the USB TMC documents from the USB-IF entitled
+		These files show the woke various USB TMC capabilities as described
+		by the woke device itself.  The full description of the woke bitfields
+		can be found in the woke USB TMC documents from the woke USB-IF entitled
 		"Universal Serial Bus Test and Measurement Class, Subclass
 		USB488 Specification (USBTMC-USB488) Revision 1.0" section
 		4.2.2.

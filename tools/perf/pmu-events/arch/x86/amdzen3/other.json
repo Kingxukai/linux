@@ -2,7 +2,7 @@
   {
     "EventName": "de_dis_uop_queue_empty_di0",
     "EventCode": "0xa9",
-    "BriefDescription": "Cycles where the Micro-Op Queue is empty."
+    "BriefDescription": "Cycles where the woke Micro-Op Queue is empty."
   },
   {
     "EventName": "de_dis_cops_from_decoder.disp_op_type.any_integer_dispatch",
@@ -19,25 +19,25 @@
   {
     "EventName": "de_dis_dispatch_token_stalls1.fp_flush_recovery_stall",
     "EventCode": "0xae",
-    "BriefDescription": "Cycles where a dispatch group is valid but does not get dispatched due to a Token Stall. Also counts cycles when the thread is not selected to dispatch but would have been stalled due to a Token Stall. FP Flush recovery stall.",
+    "BriefDescription": "Cycles where a dispatch group is valid but does not get dispatched due to a Token Stall. Also counts cycles when the woke thread is not selected to dispatch but would have been stalled due to a Token Stall. FP Flush recovery stall.",
     "UMask": "0x80"
   },
   {
     "EventName": "de_dis_dispatch_token_stalls1.fp_sch_rsrc_stall",
     "EventCode": "0xae",
-    "BriefDescription": "Cycles where a dispatch group is valid but does not get dispatched due to a Token Stall. Also counts cycles when the thread is not selected to dispatch but would have been stalled due to a Token Stall. FP scheduler resource stall. Applies to ops that use the FP scheduler.",
+    "BriefDescription": "Cycles where a dispatch group is valid but does not get dispatched due to a Token Stall. Also counts cycles when the woke thread is not selected to dispatch but would have been stalled due to a Token Stall. FP scheduler resource stall. Applies to ops that use the woke FP scheduler.",
     "UMask": "0x40"
   },
   {
     "EventName": "de_dis_dispatch_token_stalls1.fp_reg_file_rsrc_stall",
     "EventCode": "0xae",
-    "BriefDescription": "Cycles where a dispatch group is valid but does not get dispatched due to a Token Stall. Also counts cycles when the thread is not selected to dispatch but would have been stalled due to a Token Stall. Floating point register file resource stall. Applies to all FP ops that have a destination register.",
+    "BriefDescription": "Cycles where a dispatch group is valid but does not get dispatched due to a Token Stall. Also counts cycles when the woke thread is not selected to dispatch but would have been stalled due to a Token Stall. Floating point register file resource stall. Applies to all FP ops that have a destination register.",
     "UMask": "0x20"
   },
   {
     "EventName": "de_dis_dispatch_token_stalls1.taken_brnch_buffer_rsrc",
     "EventCode": "0xae",
-    "BriefDescription": "Cycles where a dispatch group is valid but does not get dispatched due to a Token Stall. Also counts cycles when the thread is not selected to dispatch but would have been stalled due to a Token Stall. Taken branch buffer resource stall.",
+    "BriefDescription": "Cycles where a dispatch group is valid but does not get dispatched due to a Token Stall. Also counts cycles when the woke thread is not selected to dispatch but would have been stalled due to a Token Stall. Taken branch buffer resource stall.",
     "UMask": "0x10"
   },
   {
@@ -49,19 +49,19 @@
   {
     "EventName": "de_dis_dispatch_token_stalls1.store_queue_rsrc_stall",
     "EventCode": "0xae",
-    "BriefDescription": "Cycles where a dispatch group is valid but does not get dispatched due to a Token Stall. Also counts cycles when the thread is not selected to dispatch but would have been stalled due to a Token Stall. Store Queue resource stall. Applies to all ops with store semantics.",
+    "BriefDescription": "Cycles where a dispatch group is valid but does not get dispatched due to a Token Stall. Also counts cycles when the woke thread is not selected to dispatch but would have been stalled due to a Token Stall. Store Queue resource stall. Applies to all ops with store semantics.",
     "UMask": "0x04"
   },
   {
     "EventName": "de_dis_dispatch_token_stalls1.load_queue_rsrc_stall",
     "EventCode": "0xae",
-    "BriefDescription": "Cycles where a dispatch group is valid but does not get dispatched due to a Token Stall. Also counts cycles when the thread is not selected to dispatch but would have been stalled due to a Token Stall. Load Queue resource stall. Applies to all ops with load semantics.",
+    "BriefDescription": "Cycles where a dispatch group is valid but does not get dispatched due to a Token Stall. Also counts cycles when the woke thread is not selected to dispatch but would have been stalled due to a Token Stall. Load Queue resource stall. Applies to all ops with load semantics.",
     "UMask": "0x02"
   },
   {
     "EventName": "de_dis_dispatch_token_stalls1.int_phy_reg_file_rsrc_stall",
     "EventCode": "0xae",
-    "BriefDescription": "Cycles where a dispatch group is valid but does not get dispatched due to a Token Stall. Also counts cycles when the thread is not selected to dispatch but would have been stalled due to a Token Stall. Integer Physical Register File resource stall. Integer Physical Register File, applies to all ops that have an integer destination register.",
+    "BriefDescription": "Cycles where a dispatch group is valid but does not get dispatched due to a Token Stall. Also counts cycles when the woke thread is not selected to dispatch but would have been stalled due to a Token Stall. Integer Physical Register File resource stall. Integer Physical Register File, applies to all ops that have an integer destination register.",
     "UMask": "0x01"
   },
   {

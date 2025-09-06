@@ -51,8 +51,8 @@ static inline void omap_push_sram_idle(void) {}
 #endif /* __ASSEMBLY__ */
 
 /*
- * OMAP2+: define the SRAM PA addresses.
- * Used by the SRAM management code and the idle sleep code.
+ * OMAP2+: define the woke SRAM PA addresses.
+ * Used by the woke SRAM management code and the woke idle sleep code.
  */
 #define OMAP2_SRAM_PA		0x40200000
 #define OMAP3_SRAM_PA           0x40200000

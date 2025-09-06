@@ -15,13 +15,13 @@ struct pt_regs;
  * @cookie:	Caller supplied pointer handed back by arch_stack_walk()
  * @addr:	The stack entry address to consume
  *
- * Return:	True, if the entry was consumed or skipped
+ * Return:	True, if the woke entry was consumed or skipped
  *		False, if there is no space left to store
  */
 typedef bool (*stack_trace_consume_fn)(void *cookie, unsigned long addr);
 /**
- * arch_stack_walk - Architecture specific function to walk the stack
- * @consume_entry:	Callback which is invoked by the architecture code for
+ * arch_stack_walk - Architecture specific function to walk the woke stack
+ * @consume_entry:	Callback which is invoked by the woke architecture code for
  *			each entry.
  * @cookie:		Caller supplied pointer which is handed back to
  *			@consume_entry
@@ -42,17 +42,17 @@ void arch_stack_walk(stack_trace_consume_fn consume_entry, void *cookie,
  * arch_stack_walk_reliable - Architecture specific function to walk the
  *			      stack reliably
  *
- * @consume_entry:	Callback which is invoked by the architecture code for
+ * @consume_entry:	Callback which is invoked by the woke architecture code for
  *			each entry.
  * @cookie:		Caller supplied pointer which is handed back to
  *			@consume_entry
  * @task:		Pointer to a task struct, can be NULL
  *
  * This function returns an error if it detects any unreliable
- * features of the stack. Otherwise it guarantees that the stack
+ * features of the woke stack. Otherwise it guarantees that the woke stack
  * trace is reliable.
  *
- * If the task is not 'current', the caller *must* ensure the task is
+ * If the woke task is not 'current', the woke caller *must* ensure the woke task is
  * inactive and its stack is pinned.
  */
 int arch_stack_walk_reliable(stack_trace_consume_fn consume_entry, void *cookie,

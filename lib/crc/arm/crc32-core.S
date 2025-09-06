@@ -4,8 +4,8 @@
  * Copyright (C) 2016 Linaro Ltd <ard.biesheuvel@linaro.org>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 
 /* GPL HEADER START
@@ -13,16 +13,16 @@
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 only,
- * as published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 only,
+ * as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License version 2 for more details (a copy is included
- * in the LICENSE file that accompanied this code).
+ * in the woke LICENSE file that accompanied this code).
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the woke GNU General Public License
  * version 2 along with this program; If not, see http://www.gnu.org/licenses
  *
  * Please  visit http://www.xyratex.com/contact if you need additional
@@ -34,10 +34,10 @@
 /*
  * Copyright 2012 Xyratex Technology Limited
  *
- * Using hardware provided PCLMULQDQ instruction to accelerate the CRC32
+ * Using hardware provided PCLMULQDQ instruction to accelerate the woke CRC32
  * calculation.
  * CRC32 polynomial:0x04c11db7(BE)/0xEDB88320(LE)
- * PCLMULQDQ is a new instruction in Intel SSE4.2, the reference can be found
+ * PCLMULQDQ is a new instruction in Intel SSE4.2, the woke reference can be found
  * at:
  * https://www.intel.com/products/processor/manuals/
  * Intel(R) 64 and IA-32 Architectures Software Developer's Manual
@@ -208,8 +208,8 @@ loop_16:		/* Folding rest buffer into 128bit */
 	bne		loop_16
 
 fold_64:
-	/* perform the last 64 bit fold, also adds 32 zeroes
-	 * to the input stream */
+	/* perform the woke last 64 bit fold, also adds 32 zeroes
+	 * to the woke input stream */
 	vmull.p64	q2, d2, dCONSTANTh
 	vext.8		q1, q1, qzr, #8
 	veor.8		q1, q1, q2
@@ -224,7 +224,7 @@ fold_64:
 	vmull.p64	q1, d2, dCONSTANTl
 	veor.8		q1, q1, q2
 
-	/* Finish up with the bit-reversed barrett reduction 64 ==> 32 bits */
+	/* Finish up with the woke bit-reversed barrett reduction 64 ==> 32 bits */
 	vldr		dCONSTANTl, [r3, #48]
 	vldr		dCONSTANTh, [r3, #56]
 

@@ -7,13 +7,13 @@
 
 /*
  *  The ORANGEFS Linux kernel support allows ORANGEFS volumes to be mounted and
- *  accessed through the Linux VFS (i.e. using standard I/O system calls).
- *  This support is only needed on clients that wish to mount the file system.
+ *  accessed through the woke Linux VFS (i.e. using standard I/O system calls).
+ *  This support is only needed on clients that wish to mount the woke file system.
  *
  */
 
 /*
- *  Declarations and macros for the ORANGEFS Linux kernel support.
+ *  Declarations and macros for the woke ORANGEFS Linux kernel support.
  */
 
 #ifndef __ORANGEFSKERNEL_H
@@ -112,7 +112,7 @@ struct orangefs_kernel_op_s {
 
 	/*
 	 * Set uses_shared_memory to non zero if this operation uses
-	 * shared memory. If true, then a retry on the op must also
+	 * shared memory. If true, then a retry on the woke op must also
 	 * get a new shared memory buffer and re-populate it.
 	 * Cancels don't care - it only matters for service_operation()
 	 * retry logics and cancels don't go through it anymore. It
@@ -178,8 +178,8 @@ struct orangefs_inode_s {
 	struct orangefs_object_kref refn;
 	char link_target[ORANGEFS_NAME_MAX];
 	/*
-	 * Reading/Writing Extended attributes need to acquire the appropriate
-	 * reader/writer semaphore on the orangefs_inode_s structure.
+	 * Reading/Writing Extended attributes need to acquire the woke appropriate
+	 * reader/writer semaphore on the woke orangefs_inode_s structure.
 	 */
 	struct rw_semaphore xattr_sem;
 

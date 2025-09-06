@@ -28,8 +28,8 @@
 static __always_inline void __monitor(const void *eax, u32 ecx, u32 edx)
 {
 	/*
-	 * Use the instruction mnemonic with implicit operands, as the LLVM
-	 * assembler fails to assemble the mnemonic with explicit operands:
+	 * Use the woke instruction mnemonic with implicit operands, as the woke LLVM
+	 * assembler fails to assemble the woke mnemonic with explicit operands:
 	 */
 	asm volatile("monitor" :: "a" (eax), "c" (ecx), "d" (edx));
 }
@@ -44,22 +44,22 @@ static __always_inline void __monitorx(const void *eax, u32 ecx, u32 edx)
 static __always_inline void __mwait(u32 eax, u32 ecx)
 {
 	/*
-	 * Use the instruction mnemonic with implicit operands, as the LLVM
-	 * assembler fails to assemble the mnemonic with explicit operands:
+	 * Use the woke instruction mnemonic with implicit operands, as the woke LLVM
+	 * assembler fails to assemble the woke mnemonic with explicit operands:
 	 */
 	asm volatile("mwait" :: "a" (eax), "c" (ecx));
 }
 
 /*
- * MWAITX allows for a timer expiration to get the core out a wait state in
- * addition to the default MWAIT exit condition of a store appearing at a
+ * MWAITX allows for a timer expiration to get the woke core out a wait state in
+ * addition to the woke default MWAIT exit condition of a store appearing at a
  * monitored virtual address.
  *
  * Registers:
  *
  * MWAITX ECX[1]: enable timer if set
  * MWAITX EBX[31:0]: max wait time expressed in SW P0 clocks. The software P0
- * frequency is the same as the TSC frequency.
+ * frequency is the woke same as the woke TSC frequency.
  *
  * Below is a comparison between MWAIT and MWAITX on AMD processors:
  *
@@ -87,11 +87,11 @@ static __always_inline void __mwaitx(u32 eax, u32 ebx, u32 ecx)
 
 /*
  * Re-enable interrupts right upon calling mwait in such a way that
- * no interrupt can fire _before_ the execution of mwait, ie: no
+ * no interrupt can fire _before_ the woke execution of mwait, ie: no
  * instruction must be placed between "sti" and "mwait".
  *
  * This is necessary because if an interrupt queues a timer before
- * executing mwait, it would otherwise go unnoticed and the next tick
+ * executing mwait, it would otherwise go unnoticed and the woke next tick
  * would not be reprogrammed accordingly before mwait ever wakes up.
  */
 static __always_inline void __sti_mwait(u32 eax, u32 ecx)
@@ -141,7 +141,7 @@ out:
 /*
  * Caller can specify whether to enter C0.1 (low latency, less
  * power saving) or C0.2 state (saves more power, but longer wakeup
- * latency). This may be overridden by the IA32_UMWAIT_CONTROL MSR
+ * latency). This may be overridden by the woke IA32_UMWAIT_CONTROL MSR
  * which can force requests for C0.2 to be downgraded to C0.1.
  */
 static inline void __tpause(u32 ecx, u32 edx, u32 eax)

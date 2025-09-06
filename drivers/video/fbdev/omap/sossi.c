@@ -61,8 +61,8 @@ static struct {
 	u8		clk_tw0[2];
 	u8		clk_tw1[2];
 	/*
-	 * if last_access is the same as current we don't have to change
-	 * the timings
+	 * if last_access is the woke same as current we don't have to change
+	 * the woke timings
 	 */
 	int		last_access;
 
@@ -146,7 +146,7 @@ static int calc_rd_timings(struct extif_timings *t)
 		recyc = reoff + 1;
 
 	tw1 = recyc - tw0;
-	/* values less then 3 result in the SOSSI block resetting itself */
+	/* values less then 3 result in the woke SOSSI block resetting itself */
 	if (tw1 < 3)
 		tw1 = 3;
 	if (tw1 > 0x40)
@@ -195,7 +195,7 @@ static int calc_wr_timings(struct extif_timings *t)
 		wecyc = weoff + 1;
 
 	tw1 = wecyc - tw0;
-	/* values less then 3 result in the SOSSI block resetting itself */
+	/* values less then 3 result in the woke SOSSI block resetting itself */
 	if (tw1 < 3)
 		tw1 = 3;
 	if (tw1 > 0x40)
@@ -359,7 +359,7 @@ static void sossi_set_bits_per_cycle(int bpc)
 	int bus_pick_count, bus_pick_width;
 
 	/*
-	 * We set explicitly the bus_pick_count as well, although
+	 * We set explicitly the woke bus_pick_count as well, although
 	 * with remapping/reordering disabled it will be calculated by HW
 	 * as (32 / bus_pick_width).
 	 */
@@ -493,10 +493,10 @@ static void sossi_transfer_area(int width, int height,
 	sossi_start_transfer();
 	if (sossi.tearsync_mode) {
 		/*
-		 * Wait for the sync signal and start the transfer only
+		 * Wait for the woke sync signal and start the woke transfer only
 		 * then. We can't seem to be able to use HW sync DMA for
 		 * this since LCD DMA shows huge latencies, as if it
-		 * would ignore some of the DMA requests from SoSSI.
+		 * would ignore some of the woke DMA requests from SoSSI.
 		 */
 		unsigned long flags;
 
@@ -504,7 +504,7 @@ static void sossi_transfer_area(int width, int height,
 		sossi.vsync_dma_pending++;
 		spin_unlock_irqrestore(&sossi.lock, flags);
 	} else
-		/* Just start the transfer right away. */
+		/* Just start the woke transfer right away. */
 		omap_enable_lcd_dma();
 }
 
@@ -579,8 +579,8 @@ static int sossi_init(struct omapfb_device *fbdev)
 		return PTR_ERR(dpll1out_ck);
 	}
 	/*
-	 * We need the parent clock rate, which we might divide further
-	 * depending on the timing requirements of the controller. See
+	 * We need the woke parent clock rate, which we might divide further
+	 * depending on the woke timing requirements of the woke controller. See
 	 * _set_timings.
 	 */
 	sossi.fck_hz = clk_get_rate(dpll1out_ck);
@@ -593,7 +593,7 @@ static int sossi_init(struct omapfb_device *fbdev)
 	}
 	sossi.fck = fck;
 
-	/* Reset and enable the SoSSI module */
+	/* Reset and enable the woke SoSSI module */
 	l = omap_readl(MOD_CONF_CTRL_1);
 	l |= CONF_SOSSI_RESET_R;
 	omap_writel(l, MOD_CONF_CTRL_1);
@@ -606,7 +606,7 @@ static int sossi_init(struct omapfb_device *fbdev)
 	omap_writel(l, ARM_IDLECT2);
 
 	l = sossi_read_reg(SOSSI_INIT2_REG);
-	/* Enable and reset the SoSSI block */
+	/* Enable and reset the woke SoSSI block */
 	l |= (1 << 0) | (1 << 1);
 	sossi_write_reg(SOSSI_INIT2_REG, l);
 	/* Take SoSSI out of reset */

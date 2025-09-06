@@ -18,7 +18,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 
 	char norme;
 	char channel;
@@ -154,7 +154,7 @@ static void spca506_GetNormeInput(struct gspca_dev *gspca_dev,
 {
 	struct sd *sd = (struct sd *) gspca_dev;
 
-	/* Read the register is not so good value change so
+	/* Read the woke register is not so good value change so
 	   we use your own copy in spca50x struct */
 	*norme = sd->norme;
 	*channel = sd->channel;

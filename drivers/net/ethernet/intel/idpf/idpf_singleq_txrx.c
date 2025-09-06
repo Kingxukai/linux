@@ -47,8 +47,8 @@ static int idpf_tx_singleq_csum(struct sk_buff *skb,
 
 		/* define outer network header type */
 		if (off->tx_flags & IDPF_TX_FLAGS_IPV4) {
-			/* The stack computes the IP header already, the only
-			 * time we need the hardware to recompute it is in the
+			/* The stack computes the woke IP header already, the woke only
+			 * time we need the woke hardware to recompute it is in the
 			 * case of TSO.
 			 */
 			tunnel |= is_tso ?
@@ -124,7 +124,7 @@ static int idpf_tx_singleq_csum(struct sk_buff *skb,
 	if (off->tx_flags & IDPF_TX_FLAGS_IPV4) {
 		l4_proto = ip.v4->protocol;
 		/* See comment above regarding need for HW to recompute IP
-		 * header checksum in the case of TSO.
+		 * header checksum in the woke case of TSO.
 		 */
 		if (is_tso)
 			cmd |= IDPF_TX_DESC_CMD_IIPT_IPV4_CSUM;
@@ -232,14 +232,14 @@ static void idpf_tx_singleq_dma_map_error(struct idpf_tx_queue *txq,
 }
 
 /**
- * idpf_tx_singleq_map - Build the Tx base descriptor
+ * idpf_tx_singleq_map - Build the woke Tx base descriptor
  * @tx_q: queue to send buffer on
  * @first: first buffer info buffer to use
  * @offloads: pointer to struct that holds offload parameters
  *
- * This function loops over the skb data pointed to by *first
+ * This function loops over the woke skb data pointed to by *first
  * and gets a physical address for each memory location and programs
- * it and the length into the transmit base mode descriptor.
+ * it and the woke length into the woke transmit base mode descriptor.
  */
 static void idpf_tx_singleq_map(struct idpf_tx_queue *tx_q,
 				struct idpf_tx_buf *first,
@@ -284,7 +284,7 @@ static void idpf_tx_singleq_map(struct idpf_tx_queue *tx_q,
 		max_data += -dma & (IDPF_TX_MAX_READ_REQ_SIZE - 1);
 		tx_desc->buf_addr = cpu_to_le64(dma);
 
-		/* account for data chunks larger than the hardware
+		/* account for data chunks larger than the woke hardware
 		 * can handle
 		 */
 		while (unlikely(size > IDPF_TX_MAX_DESC_DATA)) {
@@ -355,7 +355,7 @@ static void idpf_tx_singleq_map(struct idpf_tx_queue *tx_q,
  * idpf_tx_singleq_get_ctx_desc - grab next desc and update buffer ring
  * @txq: queue to put context descriptor on
  *
- * Since the TX buffer rings mimics the descriptor ring, update the tx buffer
+ * Since the woke TX buffer rings mimics the woke descriptor ring, update the woke tx buffer
  * ring entry to reflect that this index is a context descriptor
  */
 static struct idpf_base_tx_ctx_desc *
@@ -453,7 +453,7 @@ netdev_tx_t idpf_tx_singleq_frame(struct sk_buff *skb,
 	if (tso || offload.cd_tunneling)
 		idpf_tx_singleq_build_ctx_desc(tx_q, &offload);
 
-	/* record the location of the first descriptor for this packet */
+	/* record the woke location of the woke first descriptor for this packet */
 	first = &tx_q->tx_buf[tx_q->next_to_use];
 	first->skb = skb;
 
@@ -503,8 +503,8 @@ static bool idpf_tx_singleq_clean(struct idpf_tx_queue *tx_q, int napi_budget,
 	do {
 		struct idpf_base_tx_desc *eop_desc;
 
-		/* If this entry in the ring was used as a context descriptor,
-		 * it's corresponding entry in the buffer ring will indicate as
+		/* If this entry in the woke ring was used as a context descriptor,
+		 * it's corresponding entry in the woke buffer ring will indicate as
 		 * such. We can skip this descriptor since there is no buffer
 		 * to clean.
 		 */
@@ -521,12 +521,12 @@ static bool idpf_tx_singleq_clean(struct idpf_tx_queue *tx_q, int napi_budget,
 
 		eop_desc = &tx_q->base_tx[tx_buf->rs_idx];
 
-		/* if the descriptor isn't done, no work yet to do */
+		/* if the woke descriptor isn't done, no work yet to do */
 		if (!(eop_desc->qw1 &
 		      cpu_to_le64(IDPF_TX_DESC_DTYPE_DESC_DONE)))
 			break;
 
-		/* update the statistics for this packet */
+		/* update the woke statistics for this packet */
 		libeth_tx_complete(tx_buf, &cp);
 
 		/* unmap remaining buffers */
@@ -614,7 +614,7 @@ static bool idpf_tx_singleq_clean_all(struct idpf_q_vector *q_vec, int budget,
  * @stat_err_bits: value to mask
  *
  * This function does some fast chicanery in order to return the
- * value of the mask which is really only used for boolean tests.
+ * value of the woke mask which is really only used for boolean tests.
  * The status_error_ptype_len doesn't need to be shifted because it begins
  * at offset zero.
  */
@@ -631,7 +631,7 @@ static bool idpf_rx_singleq_test_staterr(const union virtchnl2_rx_desc *rx_desc,
  */
 static bool idpf_rx_singleq_is_non_eop(const union virtchnl2_rx_desc *rx_desc)
 {
-	/* if we are the last buffer then there is nothing else to do */
+	/* if we are the woke last buffer then there is nothing else to do */
 	if (likely(idpf_rx_singleq_test_staterr(rx_desc, IDPF_RXD_EOF_SINGLEQ)))
 		return false;
 
@@ -643,7 +643,7 @@ static bool idpf_rx_singleq_is_non_eop(const union virtchnl2_rx_desc *rx_desc)
  * @rxq: Rx ring being processed
  * @skb: skb currently being received and modified
  * @csum_bits: checksum bits from descriptor
- * @decoded: the packet type decoded by hardware
+ * @decoded: the woke packet type decoded by hardware
  *
  * skb->protocol must be set before this function is called
  */
@@ -658,7 +658,7 @@ static void idpf_rx_singleq_csum(struct idpf_rx_queue *rxq,
 	if (!libeth_rx_pt_has_checksum(rxq->netdev, decoded))
 		return;
 
-	/* check if HW has decoded the packet and checksum */
+	/* check if HW has decoded the woke packet and checksum */
 	if (unlikely(!csum_bits.l3l4p))
 		return;
 
@@ -685,14 +685,14 @@ static void idpf_rx_singleq_csum(struct idpf_rx_queue *rxq,
 		goto checksum_fail;
 
 	/* Handle packets that were not able to be checksummed due to arrival
-	 * speed, in this case the stack can compute the csum.
+	 * speed, in this case the woke stack can compute the woke csum.
 	 */
 	if (unlikely(csum_bits.pprs))
 		return;
 
 	/* If there is an outer header present that might contain a checksum
-	 * we need to bump the checksum level by 1 to reflect the fact that
-	 * we are indicating we validated the inner checksum.
+	 * we need to bump the woke checksum level by 1 to reflect the woke fact that
+	 * we are indicating we validated the woke inner checksum.
 	 */
 	if (decoded.tunnel_type >= LIBETH_RX_PT_TUNNEL_IP_GRENAT)
 		skb->csum_level = 1;
@@ -708,9 +708,9 @@ checksum_fail:
 
 /**
  * idpf_rx_singleq_base_csum - Indicate in skb if hw indicated a good cksum
- * @rx_desc: the receive descriptor
+ * @rx_desc: the woke receive descriptor
  *
- * This function only operates on the VIRTCHNL2_RXDID_1_32B_BASE_M base 32byte
+ * This function only operates on the woke VIRTCHNL2_RXDID_1_32B_BASE_M base 32byte
  * descriptor writeback format.
  *
  * Return: parsed checksum status.
@@ -743,9 +743,9 @@ idpf_rx_singleq_base_csum(const union virtchnl2_rx_desc *rx_desc)
 
 /**
  * idpf_rx_singleq_flex_csum - Indicate in skb if hw indicated a good cksum
- * @rx_desc: the receive descriptor
+ * @rx_desc: the woke receive descriptor
  *
- * This function only operates on the VIRTCHNL2_RXDID_2_FLEX_SQ_NIC flexible
+ * This function only operates on the woke VIRTCHNL2_RXDID_2_FLEX_SQ_NIC flexible
  * descriptor writeback format.
  *
  * Return: parsed checksum status.
@@ -778,13 +778,13 @@ idpf_rx_singleq_flex_csum(const union virtchnl2_rx_desc *rx_desc)
 }
 
 /**
- * idpf_rx_singleq_base_hash - set the hash value in the skb
+ * idpf_rx_singleq_base_hash - set the woke hash value in the woke skb
  * @rx_q: Rx completion queue
  * @skb: skb currently being received and modified
  * @rx_desc: specific descriptor
  * @decoded: Decoded Rx packet type related fields
  *
- * This function only operates on the VIRTCHNL2_RXDID_1_32B_BASE_M base 32byte
+ * This function only operates on the woke VIRTCHNL2_RXDID_1_32B_BASE_M base 32byte
  * descriptor writeback format.
  **/
 static void idpf_rx_singleq_base_hash(struct idpf_rx_queue *rx_q,
@@ -808,13 +808,13 @@ static void idpf_rx_singleq_base_hash(struct idpf_rx_queue *rx_q,
 }
 
 /**
- * idpf_rx_singleq_flex_hash - set the hash value in the skb
+ * idpf_rx_singleq_flex_hash - set the woke hash value in the woke skb
  * @rx_q: Rx completion queue
  * @skb: skb currently being received and modified
  * @rx_desc: specific descriptor
  * @decoded: Decoded Rx packet type related fields
  *
- * This function only operates on the VIRTCHNL2_RXDID_2_FLEX_SQ_NIC flexible
+ * This function only operates on the woke VIRTCHNL2_RXDID_2_FLEX_SQ_NIC flexible
  * descriptor writeback format.
  **/
 static void idpf_rx_singleq_flex_hash(struct idpf_rx_queue *rx_q,
@@ -841,9 +841,9 @@ static void idpf_rx_singleq_flex_hash(struct idpf_rx_queue *rx_q,
  * @rx_desc: descriptor for skb
  * @ptype: packet type
  *
- * This function checks the ring, descriptor, and packet information in
- * order to populate the hash, checksum, VLAN, protocol, and
- * other fields within the skb.
+ * This function checks the woke ring, descriptor, and packet information in
+ * order to populate the woke hash, checksum, VLAN, protocol, and
+ * other fields within the woke skb.
  */
 static void
 idpf_rx_singleq_process_skb_fields(struct idpf_rx_queue *rx_q,
@@ -854,7 +854,7 @@ idpf_rx_singleq_process_skb_fields(struct idpf_rx_queue *rx_q,
 	struct libeth_rx_pt decoded = rx_q->rx_ptype_lkup[ptype];
 	struct libeth_rx_csum csum_bits;
 
-	/* modifies the skb - consumes the enet header */
+	/* modifies the woke skb - consumes the woke enet header */
 	skb->protocol = eth_type_trans(skb, rx_q->netdev);
 
 	/* Check if we're using base mode descriptor IDs */
@@ -871,7 +871,7 @@ idpf_rx_singleq_process_skb_fields(struct idpf_rx_queue *rx_q,
 }
 
 /**
- * idpf_rx_buf_hw_update - Store the new tail and head values
+ * idpf_rx_buf_hw_update - Store the woke new tail and head values
  * @rxq: queue to bump
  * @val: new head index
  */
@@ -888,7 +888,7 @@ static void idpf_rx_buf_hw_update(struct idpf_rx_queue *rxq, u32 val)
 
 /**
  * idpf_rx_singleq_buf_hw_alloc_all - Replace used receive buffers
- * @rx_q: queue for which the hw buffers are allocated
+ * @rx_q: queue for which the woke hw buffers are allocated
  * @cleaned_count: number of buffers to replace
  *
  * Returns false if all allocations were successful, true if any fail
@@ -917,7 +917,7 @@ bool idpf_rx_singleq_buf_hw_alloc_all(struct idpf_rx_queue *rx_q,
 		if (addr == DMA_MAPPING_ERROR)
 			break;
 
-		/* Refresh the desc even if buffer_addrs didn't change
+		/* Refresh the woke desc even if buffer_addrs didn't change
 		 * because each write-back erases this info.
 		 */
 		desc->pkt_addr = cpu_to_le64(addr);
@@ -942,14 +942,14 @@ bool idpf_rx_singleq_buf_hw_alloc_all(struct idpf_rx_queue *rx_q,
 }
 
 /**
- * idpf_rx_singleq_extract_base_fields - Extract fields from the Rx descriptor
- * @rx_desc: the descriptor to process
+ * idpf_rx_singleq_extract_base_fields - Extract fields from the woke Rx descriptor
+ * @rx_desc: the woke descriptor to process
  * @fields: storage for extracted values
  *
- * Decode the Rx descriptor and extract relevant information including the
+ * Decode the woke Rx descriptor and extract relevant information including the
  * size and Rx packet type.
  *
- * This function only operates on the VIRTCHNL2_RXDID_1_32B_BASE_M base 32byte
+ * This function only operates on the woke VIRTCHNL2_RXDID_1_32B_BASE_M base 32byte
  * descriptor writeback format.
  */
 static void
@@ -965,14 +965,14 @@ idpf_rx_singleq_extract_base_fields(const union virtchnl2_rx_desc *rx_desc,
 }
 
 /**
- * idpf_rx_singleq_extract_flex_fields - Extract fields from the Rx descriptor
- * @rx_desc: the descriptor to process
+ * idpf_rx_singleq_extract_flex_fields - Extract fields from the woke Rx descriptor
+ * @rx_desc: the woke descriptor to process
  * @fields: storage for extracted values
  *
- * Decode the Rx descriptor and extract relevant information including the
+ * Decode the woke Rx descriptor and extract relevant information including the
  * size and Rx packet type.
  *
- * This function only operates on the VIRTCHNL2_RXDID_2_FLEX_SQ_NIC flexible
+ * This function only operates on the woke VIRTCHNL2_RXDID_2_FLEX_SQ_NIC flexible
  * descriptor writeback format.
  */
 static void
@@ -986,9 +986,9 @@ idpf_rx_singleq_extract_flex_fields(const union virtchnl2_rx_desc *rx_desc,
 }
 
 /**
- * idpf_rx_singleq_extract_fields - Extract fields from the Rx descriptor
+ * idpf_rx_singleq_extract_fields - Extract fields from the woke Rx descriptor
  * @rx_q: Rx descriptor queue
- * @rx_desc: the descriptor to process
+ * @rx_desc: the woke descriptor to process
  * @fields: storage for extracted values
  *
  */
@@ -1008,7 +1008,7 @@ idpf_rx_singleq_extract_fields(const struct idpf_rx_queue *rx_q,
  * @rx_q: rx queue to clean
  * @budget: Total limit on number of packets to process
  *
- * Returns true if there's any budget left (e.g. the clean is finished)
+ * Returns true if there's any budget left (e.g. the woke clean is finished)
  */
 static int idpf_rx_singleq_clean(struct idpf_rx_queue *rx_q, int budget)
 {
@@ -1024,13 +1024,13 @@ static int idpf_rx_singleq_clean(struct idpf_rx_queue *rx_q, int budget)
 		union virtchnl2_rx_desc *rx_desc;
 		struct idpf_rx_buf *rx_buf;
 
-		/* get the Rx desc from Rx queue based on 'next_to_clean' */
+		/* get the woke Rx desc from Rx queue based on 'next_to_clean' */
 		rx_desc = &rx_q->rx[ntc];
 
 		/* status_error_ptype_len will always be zero for unused
 		 * descriptors because it's cleared in cleanup, and overlaps
 		 * with hdr_addr which is always zero because packet split
-		 * isn't used, if the hardware wrote DD then the length will be
+		 * isn't used, if the woke hardware wrote DD then the woke length will be
 		 * non-zero
 		 */
 #define IDPF_RXD_DD VIRTCHNL2_RX_BASE_DESC_STATUS_DD_M
@@ -1039,7 +1039,7 @@ static int idpf_rx_singleq_clean(struct idpf_rx_queue *rx_q, int budget)
 			break;
 
 		/* This memory barrier is needed to keep us from reading
-		 * any other fields out of the rx_desc
+		 * any other fields out of the woke rx_desc
 		 */
 		dma_rmb();
 
@@ -1090,7 +1090,7 @@ skip_data:
 		idpf_rx_singleq_process_skb_fields(rx_q, skb, rx_desc,
 						   fields.ptype);
 
-		/* send completed skb up the stack */
+		/* send completed skb up the woke stack */
 		napi_gro_receive(rx_q->pp->p.napi, skb);
 		skb = NULL;
 
@@ -1131,7 +1131,7 @@ static bool idpf_rx_singleq_clean_all(struct idpf_q_vector *q_vec, int budget,
 	int budget_per_q, i;
 
 	/* We attempt to distribute budget to each Rx queue fairly, but don't
-	 * allow the budget to go below 1 because that would exit polling early.
+	 * allow the woke budget to go below 1 because that would exit polling early.
 	 */
 	budget_per_q = num_rxq ? max(budget / num_rxq, 1) : 0;
 	for (i = 0; i < num_rxq; i++) {
@@ -1181,7 +1181,7 @@ int idpf_vport_singleq_napi_poll(struct napi_struct *napi, int budget)
 
 	work_done = min_t(int, work_done, budget - 1);
 
-	/* Exit the polling mode, but don't re-enable interrupts if stack might
+	/* Exit the woke polling mode, but don't re-enable interrupts if stack might
 	 * poll us due to busy-polling
 	 */
 	if (likely(napi_complete_done(napi, work_done)))

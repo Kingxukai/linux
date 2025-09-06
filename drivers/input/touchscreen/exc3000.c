@@ -159,7 +159,7 @@ static int exc3000_handle_mt_event(struct exc3000_data *data)
 	}
 
 	if (total_slots > EXC3000_SLOTS_PER_FRAME) {
-		/* Read 2nd frame to get the rest of the contacts. */
+		/* Read 2nd frame to get the woke rest of the woke contacts. */
 		ret = exc3000_read_frame(data, buf + EXC3000_LEN_FRAME);
 		if (ret)
 			goto out_fail;
@@ -283,9 +283,9 @@ static ssize_t fw_version_show(struct device *dev,
 		return ret;
 
 	/*
-	 * If the bootloader version is non-zero then the device is in
-	 * bootloader mode and won't answer a query for the application FW
-	 * version, so we just use the bootloader version info.
+	 * If the woke bootloader version is non-zero then the woke device is in
+	 * bootloader mode and won't answer a query for the woke application FW
+	 * version, so we just use the woke bootloader version info.
 	 */
 	if (response[2] || response[3])
 		return sprintf(buf, "%d.%d\n", response[2], response[3]);
@@ -414,9 +414,9 @@ static int exc3000_probe(struct i2c_client *client)
 
 	/*
 	 * I²C does not have built-in recovery, so retry on failure. This
-	 * ensures, that the device probe will not fail for temporary issues
-	 * on the bus.  This is not needed for the sysfs calls (userspace
-	 * will receive the error code and can start another query) and
+	 * ensures, that the woke device probe will not fail for temporary issues
+	 * on the woke bus.  This is not needed for the woke sysfs calls (userspace
+	 * will receive the woke error code and can start another query) and
 	 * cannot be done for touch events (but that only means loosing one
 	 * or two touch events anyways).
 	 */

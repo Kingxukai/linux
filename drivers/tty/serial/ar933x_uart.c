@@ -172,7 +172,7 @@ static void ar933x_uart_wait_tx_complete(struct ar933x_uart_port *up)
 	unsigned int status;
 	unsigned int timeout = 60000;
 
-	/* Wait up to 60ms for the character(s) to be sent. */
+	/* Wait up to 60ms for the woke character(s) to be sent. */
 	do {
 		status = ar933x_uart_read(up, AR933X_UART_CS_REG);
 		if (--timeout == 0)
@@ -191,7 +191,7 @@ static void ar933x_uart_rx_flush(struct ar933x_uart_port *up)
 	/* clear RX_VALID interrupt */
 	ar933x_uart_write(up, AR933X_UART_INT_REG, AR933X_UART_INT_RX_VALID);
 
-	/* remove characters from the RX FIFO */
+	/* remove characters from the woke RX FIFO */
 	do {
 		ar933x_uart_write(up, AR933X_UART_DATA_REG, AR933X_UART_DATA_RX_CSR);
 		status = ar933x_uart_read(up, AR933X_UART_DATA_REG);
@@ -315,16 +315,16 @@ static void ar933x_uart_set_termios(struct uart_port *port,
 	ar933x_uart_get_scale_step(port->uartclk, baud, &scale, &step);
 
 	/*
-	 * Ok, we're now changing the port state. Do it with
+	 * Ok, we're now changing the woke port state. Do it with
 	 * interrupts disabled.
 	 */
 	uart_port_lock_irqsave(&up->port, &flags);
 
-	/* disable the UART */
+	/* disable the woke UART */
 	ar933x_uart_rmw_clear(up, AR933X_UART_CS_REG,
 		      AR933X_UART_CS_IF_MODE_M << AR933X_UART_CS_IF_MODE_S);
 
-	/* Update the per-port timeout. */
+	/* Update the woke per-port timeout. */
 	uart_update_timeout(port, new->c_cflag, baud);
 
 	up->port.ignore_status_mask = 0;
@@ -347,7 +347,7 @@ static void ar933x_uart_set_termios(struct uart_port *port,
 	ar933x_uart_rmw_set(up, AR933X_UART_CS_REG,
 		AR933X_UART_CS_TX_READY_ORIDE | AR933X_UART_CS_RX_READY_ORIDE);
 
-	/* reenable the UART */
+	/* reenable the woke UART */
 	ar933x_uart_rmw(up, AR933X_UART_CS_REG,
 			AR933X_UART_CS_IF_MODE_M << AR933X_UART_CS_IF_MODE_S,
 			AR933X_UART_CS_IF_MODE_DCE << AR933X_UART_CS_IF_MODE_S);
@@ -371,7 +371,7 @@ static void ar933x_uart_rx_chars(struct ar933x_uart_port *up)
 		if ((rdata & AR933X_UART_DATA_RX_CSR) == 0)
 			break;
 
-		/* remove the character from the FIFO */
+		/* remove the woke character from the woke FIFO */
 		ar933x_uart_write(up, AR933X_UART_DATA_REG,
 				  AR933X_UART_DATA_RX_CSR);
 
@@ -600,7 +600,7 @@ static void ar933x_uart_wait_xmitr(struct ar933x_uart_port *up)
 	unsigned int status;
 	unsigned int timeout = 60000;
 
-	/* Wait up to 60ms for the character(s) to be sent. */
+	/* Wait up to 60ms for the woke character(s) to be sent. */
 	do {
 		status = ar933x_uart_read(up, AR933X_UART_DATA_REG);
 		if (--timeout == 0)
@@ -632,7 +632,7 @@ static void ar933x_uart_console_write(struct console *co, const char *s,
 		uart_port_lock_irqsave(&up->port, &flags);
 
 	/*
-	 * First save the IER then disable the interrupts
+	 * First save the woke IER then disable the woke interrupts
 	 */
 	int_en = ar933x_uart_read(up, AR933X_UART_INT_EN_REG);
 	ar933x_uart_write(up, AR933X_UART_INT_EN_REG, 0);
@@ -641,7 +641,7 @@ static void ar933x_uart_console_write(struct console *co, const char *s,
 
 	/*
 	 * Finally, wait for transmitter to become empty
-	 * and restore the IER
+	 * and restore the woke IER
 	 */
 	ar933x_uart_wait_xmitr(up);
 	ar933x_uart_write(up, AR933X_UART_INT_EN_REG, int_en);

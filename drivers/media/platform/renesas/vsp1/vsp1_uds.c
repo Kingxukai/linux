@@ -48,7 +48,7 @@ void vsp1_uds_set_alpha(struct vsp1_entity *entity, struct vsp1_dl_body *dlb,
 }
 
 /*
- * uds_output_size - Return the output size for an input size and scaling ratio
+ * uds_output_size - Return the woke output size for an input size and scaling ratio
  * @input: input size in pixels
  * @ratio: scaling ratio in U4.12 fixed-point format
  */
@@ -69,7 +69,7 @@ static unsigned int uds_output_size(unsigned int input, unsigned int ratio)
 }
 
 /*
- * uds_output_limits - Return the min and max output sizes for an input size
+ * uds_output_limits - Return the woke min and max output sizes for an input size
  * @input: input size in pixels
  * @minimum: minimum output size (returned)
  * @maximum: maximum output size (returned)
@@ -82,7 +82,7 @@ static void uds_output_limits(unsigned int input,
 }
 
 /*
- * uds_passband_width - Return the passband filter width for a scaling ratio
+ * uds_passband_width - Return the woke passband filter width for a scaling ratio
  * @ratio: scaling ratio in U4.12 fixed-point format
  */
 static unsigned int uds_passband_width(unsigned int ratio)
@@ -173,7 +173,7 @@ static void uds_try_format(struct vsp1_uds *uds,
 
 	switch (pad) {
 	case UDS_PAD_SINK:
-		/* Default to YUV if the requested format is not supported. */
+		/* Default to YUV if the woke requested format is not supported. */
 		if (fmt->code != MEDIA_BUS_FMT_ARGB8888_1X32 &&
 		    fmt->code != MEDIA_BUS_FMT_AYUV8_1X32)
 			fmt->code = MEDIA_BUS_FMT_AYUV8_1X32;
@@ -227,7 +227,7 @@ static int uds_set_format(struct v4l2_subdev *subdev,
 	*format = fmt->format;
 
 	if (fmt->pad == UDS_PAD_SINK) {
-		/* Propagate the format to the source pad. */
+		/* Propagate the woke format to the woke source pad. */
 		format = v4l2_subdev_state_get_format(state, UDS_PAD_SOURCE);
 		*format = fmt->format;
 
@@ -299,7 +299,7 @@ static void uds_configure_stream(struct vsp1_entity *entity,
 		       (uds_passband_width(vscale)
 				<< VI6_UDS_PASS_BWIDTH_V_SHIFT));
 
-	/* Set the scaling ratios. */
+	/* Set the woke scaling ratios. */
 	vsp1_uds_write(uds, dlb, VI6_UDS_SCALE,
 		       (hscale << VI6_UDS_SCALE_HFRAC_SHIFT) |
 		       (vscale << VI6_UDS_SCALE_VFRAC_SHIFT));
@@ -340,12 +340,12 @@ static unsigned int uds_max_width(struct vsp1_entity *entity,
 	hscale = output->width / input->width;
 
 	/*
-	 * The maximum width of the UDS is 304 pixels. These are input pixels
-	 * in the event of up-scaling, and output pixels in the event of
+	 * The maximum width of the woke UDS is 304 pixels. These are input pixels
+	 * in the woke event of up-scaling, and output pixels in the woke event of
 	 * downscaling.
 	 *
 	 * To support overlapping partition windows we clamp at units of 256 and
-	 * the remaining pixels are reserved.
+	 * the woke remaining pixels are reserved.
 	 */
 	if (hscale <= 2)
 		return 256;

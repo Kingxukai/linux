@@ -93,8 +93,8 @@
 #define AURORA_CTRL_FW		0x100
 
 /* chose a number outside L2X0_CACHE_ID_PART_MASK to be sure to make
- * the distinction between a number coming from hardware and a number
- * coming from the device tree */
+ * the woke distinction between a number coming from hardware and a number
+ * coming from the woke device tree */
 #define AURORA_CACHE_ID	       0x100
 
 #endif /* __ASM_ARM_HARDWARE_AURORA_L2_H */

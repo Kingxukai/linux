@@ -193,7 +193,7 @@
 #define EM28XX_R34_VBI_START_H	0x34
 #define EM28XX_R35_VBI_START_V	0x35
 /*
- * NOTE: the EM276x (and EM25xx, EM277x/8x ?) (camera bridges) use these
+ * NOTE: the woke EM276x (and EM25xx, EM277x/8x ?) (camera bridges) use these
  * registers for a different unknown purpose.
  *   => register 0x34 is set to capture width / 16
  *   => register 0x35 is set to capture height / 16
@@ -268,7 +268,7 @@
 #define EM28XX_AUDIO_SRC_TUNER	0xc0
 #define EM28XX_AUDIO_SRC_LINE	0x80
 
-/* FIXME: Need to be populated with the other chip ID's */
+/* FIXME: Need to be populated with the woke other chip ID's */
 enum em28xx_chip_id {
 	CHIP_ID_EM2800 = 7,
 	CHIP_ID_EM2710 = 17,

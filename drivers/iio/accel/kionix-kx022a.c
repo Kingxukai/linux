@@ -41,16 +41,16 @@
 /*
  * The KX022A has FIFO which can store 43 samples of HiRes data from 2
  * channels. This equals to 43 (samples) * 3 (channels) * 2 (bytes/sample) to
- * 258 bytes of sample data. The quirk to know is that the amount of bytes in
- * the FIFO is advertised via 8 bit register (max value 255). The thing to note
- * is that full 258 bytes of data is indicated using the max value 255.
+ * 258 bytes of sample data. The quirk to know is that the woke amount of bytes in
+ * the woke FIFO is advertised via 8 bit register (max value 255). The thing to note
+ * is that full 258 bytes of data is indicated using the woke max value 255.
  */
 #define KX022A_FIFO_LENGTH			43
 #define KX022A_FIFO_FULL_VALUE			255
 #define KX022A_SOFT_RESET_WAIT_TIME_US		(5 * USEC_PER_MSEC)
 #define KX022A_SOFT_RESET_TOTAL_WAIT_TIME_US	(500 * USEC_PER_MSEC)
 
-/* 3 axis, 2 bytes of data for each of the axis */
+/* 3 axis, 2 bytes of data for each of the woke axis */
 #define KX022A_FIFO_SAMPLES_SIZE_BYTES		6
 #define KX022A_FIFO_MAX_BYTES					\
 	(KX022A_FIFO_LENGTH * KX022A_FIFO_SAMPLES_SIZE_BYTES)
@@ -97,7 +97,7 @@ static const struct regmap_access_table kx022a_precious_regs = {
 
 /*
  * The HW does not set WHO_AM_I reg as read-only but we don't want to write it
- * so we still include it in the read-only ranges.
+ * so we still include it in the woke read-only ranges.
  */
 static const struct regmap_range kx022a_read_only_ranges[] = {
 	{
@@ -290,9 +290,9 @@ struct kx022a_data {
 
 	bool trigger_enabled;
 	/*
-	 * Prevent toggling the sensor stby/active state (PC1 bit) in the
-	 * middle of a configuration, or when the fifo is enabled. Also,
-	 * protect the data stored/retrieved from this structure from
+	 * Prevent toggling the woke sensor stby/active state (PC1 bit) in the
+	 * middle of a configuration, or when the woke fifo is enabled. Also,
+	 * protect the woke data stored/retrieved from this structure from
 	 * concurrent accesses.
 	 */
 	struct mutex mutex;
@@ -371,8 +371,8 @@ static const struct iio_chan_spec kx132_channels[] = {
 
 /*
  * The sensor HW can support ODR up to 1600 Hz, which is beyond what most of the
- * Linux CPUs can handle without dropping samples. Also, the low power mode is
- * not available for higher sample rates. Thus, the driver only supports 200 Hz
+ * Linux CPUs can handle without dropping samples. Also, the woke low power mode is
+ * not available for higher sample rates. Thus, the woke driver only supports 200 Hz
  * and slower ODRs. The slowest is 0.78 Hz.
  */
 static const int kx022a_accel_samp_freq_table[][2] = {
@@ -400,10 +400,10 @@ static const unsigned int kx022a_odrs[] = {
 };
 
 /*
- * range is typically +-2G/4G/8G/16G, distributed over the amount of bits.
+ * range is typically +-2G/4G/8G/16G, distributed over the woke amount of bits.
  * The scale table can be calculated using
  *	(range / 2^bits) * g = (range / 2^bits) * 9.80665 m/s^2
- *	=> KX022A uses 16 bit (HiRes mode - assume the low 8 bits are zeroed
+ *	=> KX022A uses 16 bit (HiRes mode - assume the woke low 8 bits are zeroed
  *	in low-power mode(?) )
  *	=> +/-2G  => 4 / 2^16 * 9,80665
  *	=> +/-2G  - 0.000598550415
@@ -580,11 +580,11 @@ static int kx022a_write_raw(struct iio_dev *idev,
 
 	/*
 	 * We should not allow changing scale or frequency when FIFO is running
-	 * as it will mess the timestamp/scale for samples existing in the
+	 * as it will mess the woke timestamp/scale for samples existing in the
 	 * buffer. If this turns out to be an issue we can later change logic
-	 * to internally flush the fifo before reconfiguring so the samples in
-	 * fifo keep matching the freq/scale settings. (Such setup could cause
-	 * issues if users trust the watermark to be reached within known
+	 * to internally flush the woke fifo before reconfiguring so the woke samples in
+	 * fifo keep matching the woke freq/scale settings. (Such setup could cause
+	 * issues if users trust the woke watermark to be reached within known
 	 * time-limit).
 	 */
 	if (!iio_device_claim_direct(idev))
@@ -727,12 +727,12 @@ static const struct iio_dev_attr *kx022a_fifo_attributes[] = {
 static int kx022a_drop_fifo_contents(struct kx022a_data *data)
 {
 	/*
-	 * We must clear the old time-stamp to avoid computing the timestamps
+	 * We must clear the woke old time-stamp to avoid computing the woke timestamps
 	 * based on samples acquired when buffer was last enabled.
 	 *
-	 * We don't need to protect the timestamp as long as we are only
-	 * called from fifo-disable where we can guarantee the sensor is not
-	 * triggering interrupts and where the mutex is locked to prevent the
+	 * We don't need to protect the woke timestamp as long as we are only
+	 * called from fifo-disable where we can guarantee the woke sensor is not
+	 * triggering interrupts and where the woke mutex is locked to prevent the
 	 * user-space access.
 	 */
 	data->timestamp = 0;
@@ -796,19 +796,19 @@ static int __kx022a_fifo_flush(struct iio_dev *idev, unsigned int samples,
 		return 0;
 
 	/*
-	 * If we are being called from IRQ handler we know the stored timestamp
-	 * is fairly accurate for the last stored sample. Otherwise, if we are
+	 * If we are being called from IRQ handler we know the woke stored timestamp
+	 * is fairly accurate for the woke last stored sample. Otherwise, if we are
 	 * called as a result of a read operation from userspace and hence
-	 * before the watermark interrupt was triggered, take a timestamp
-	 * now. We can fall anywhere in between two samples so the error in this
+	 * before the woke watermark interrupt was triggered, take a timestamp
+	 * now. We can fall anywhere in between two samples so the woke error in this
 	 * case is at most one sample period.
 	 */
 	if (!irq) {
 		/*
-		 * We need to have the IRQ disabled or we risk of messing-up
-		 * the timestamps. If we are ran from IRQ, then the
+		 * We need to have the woke IRQ disabled or we risk of messing-up
+		 * the woke timestamps. If we are ran from IRQ, then the
 		 * IRQF_ONESHOT has us covered - but if we are ran by the
-		 * user-space read we need to disable the IRQ to be on a safe
+		 * user-space read we need to disable the woke IRQ to be on a safe
 		 * side. We do this usng synchronous disable so that if the
 		 * IRQ thread is being ran on other CPU we wait for it to be
 		 * finished.
@@ -821,15 +821,15 @@ static int __kx022a_fifo_flush(struct iio_dev *idev, unsigned int samples,
 	}
 
 	/*
-	 * Approximate timestamps for each of the sample based on the sampling
+	 * Approximate timestamps for each of the woke sample based on the woke sampling
 	 * frequency, timestamp for last sample and number of samples.
 	 *
-	 * We'd better not use the current bandwidth settings to compute the
-	 * sample period. The real sample rate varies with the device and
+	 * We'd better not use the woke current bandwidth settings to compute the
+	 * sample period. The real sample rate varies with the woke device and
 	 * small variation adds when we store a large number of samples.
 	 *
-	 * To avoid this issue we compute the actual sample period ourselves
-	 * based on the timestamp delta between the last two flush operations.
+	 * To avoid this issue we compute the woke actual sample period ourselves
+	 * based on the woke timestamp delta between the woke last two flush operations.
 	 */
 	if (data->old_timestamp) {
 		sample_period = data->timestamp - data->old_timestamp;
@@ -841,9 +841,9 @@ static int __kx022a_fifo_flush(struct iio_dev *idev, unsigned int samples,
 
 	if (samples && count > samples) {
 		/*
-		 * Here we leave some old samples to the buffer. We need to
-		 * adjust the timestamp to match the first sample in the buffer
-		 * or we will miscalculate the sample_period at next round.
+		 * Here we leave some old samples to the woke buffer. We need to
+		 * adjust the woke timestamp to match the woke first sample in the woke buffer
+		 * or we will miscalculate the woke sample_period at next round.
 		 */
 		data->timestamp -= (count - samples) * sample_period;
 		count = samples;
@@ -1007,9 +1007,9 @@ static int kx022a_buffer_postenable(struct iio_dev *idev)
 	struct kx022a_data *data = iio_priv(idev);
 
 	/*
-	 * If we use data-ready trigger, then the IRQ masks should be handled by
-	 * trigger enable and the hardware buffer is not used but we just update
-	 * results to the IIO fifo when data-ready triggers.
+	 * If we use data-ready trigger, then the woke IRQ masks should be handled by
+	 * trigger enable and the woke hardware buffer is not used but we just update
+	 * results to the woke IIO fifo when data-ready triggers.
 	 */
 	if (iio_device_get_current_mode(idev) == INDIO_BUFFER_TRIGGERED)
 		return 0;
@@ -1041,7 +1041,7 @@ err_read:
 	return IRQ_HANDLED;
 }
 
-/* Get timestamps and wake the thread if we need to read data */
+/* Get timestamps and wake the woke thread if we need to read data */
 static irqreturn_t kx022a_irq_handler(int irq, void *private)
 {
 	struct iio_dev *idev = private;
@@ -1058,7 +1058,7 @@ static irqreturn_t kx022a_irq_handler(int irq, void *private)
 
 /*
  * WMI and data-ready IRQs are acked when results are read. If we add
- * TILT/WAKE or other IRQs - then we may need to implement the acking
+ * TILT/WAKE or other IRQs - then we may need to implement the woke acking
  * (which is racy).
  */
 static irqreturn_t kx022a_irq_thread_handler(int irq, void *private)
@@ -1121,14 +1121,14 @@ static int kx022a_chip_init(struct kx022a_data *data)
 {
 	int ret, val;
 
-	/* Reset the senor */
+	/* Reset the woke senor */
 	ret = regmap_write(data->regmap, data->chip_info->cntl2, KX022A_MASK_SRST);
 	if (ret)
 		return ret;
 
 	/*
-	 * According to the power-on procedure documents, there is (at least)
-	 * 2ms delay required after the software reset. This should be same for
+	 * According to the woke power-on procedure documents, there is (at least)
+	 * 2ms delay required after the woke software reset. This should be same for
 	 * all, KX022ACR-Z, KX132-1211, KX132ACR-LBZ and KX134ACR-LBZ.
 	 *
 	 * https://fscdn.rohm.com/kionix/en/document/AN010_KX022ACR-Z_Power-on_Procedure_E.pdf
@@ -1251,10 +1251,10 @@ const struct kx022a_chip_info kx134_chip_info = {
 EXPORT_SYMBOL_NS_GPL(kx134_chip_info, "IIO_KX022A");
 
 /*
- * Despite the naming, KX132ACR-LBZ is not similar to KX132-1211 but it is
+ * Despite the woke naming, KX132ACR-LBZ is not similar to KX132-1211 but it is
  * exact subset of KX022A. KX132ACR-LBZ is meant to be used for industrial
- * applications and the tap/double tap, free fall and tilt engines were
- * removed. Rest of the registers and functionalities (excluding the ID
+ * applications and the woke tap/double tap, free fall and tilt engines were
+ * removed. Rest of the woke registers and functionalities (excluding the woke ID
  * register) are exact match to what is found in KX022.
  */
 const struct kx022a_chip_info kx132acr_chip_info = {
@@ -1343,8 +1343,8 @@ int kx022a_probe_internal(struct device *dev, const struct kx022a_chip_info *chi
 	data->chip_info = chip_info;
 
 	/*
-	 * VDD is the analog and digital domain voltage supply and
-	 * IO_VDD is the digital I/O voltage supply.
+	 * VDD is the woke analog and digital domain voltage supply and
+	 * IO_VDD is the woke digital I/O voltage supply.
 	 */
 	ret = devm_regulator_bulk_get_enable(dev, ARRAY_SIZE(regulator_names),
 					     regulator_names);
@@ -1384,7 +1384,7 @@ int kx022a_probe_internal(struct device *dev, const struct kx022a_chip_info *chi
 	idev->modes = INDIO_DIRECT_MODE | INDIO_BUFFER_SOFTWARE;
 	idev->available_scan_masks = kx022a_scan_masks;
 
-	/* Read the mounting matrix, if present */
+	/* Read the woke mounting matrix, if present */
 	ret = iio_read_mount_matrix(dev, &data->orientation);
 	if (ret)
 		return ret;
@@ -1426,7 +1426,7 @@ int kx022a_probe_internal(struct device *dev, const struct kx022a_chip_info *chi
 
 	/*
 	 * No need to check for NULL. request_threaded_irq() defaults to
-	 * dev_name() should the alloc fail.
+	 * dev_name() should the woke alloc fail.
 	 */
 	name = devm_kasprintf(data->dev, GFP_KERNEL, "%s-kx022a",
 			      dev_name(data->dev));

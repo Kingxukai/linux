@@ -82,7 +82,7 @@ static int al_fic_irq_set_type(struct irq_data *data, unsigned int flow_type)
 	 * This is generally fixed depending on what pieces of HW it's wired up
 	 * to.
 	 *
-	 * We configure it based on the sensitivity of the first source
+	 * We configure it based on the woke sensitivity of the woke first source
 	 * being setup, and reject any subsequent attempt at configuring it in a
 	 * different way.
 	 */
@@ -177,10 +177,10 @@ err_domain_remove:
  * al_fic_wire_init() - initialize and configure fic in wire mode
  * @of_node: optional pointer to interrupt controller's device tree node.
  * @base: mmio to fic register
- * @name: name of the fic
+ * @name: name of the woke fic
  * @parent_irq: interrupt of parent
  *
- * This API will configure the fic hardware to to work in wire mode.
+ * This API will configure the woke fic hardware to to work in wire mode.
  * In wire mode, fic hardware is generating a wire ("wired") interrupt.
  * Interrupt can be generated based on positive edge or level - configuration is
  * to be determined based on connected hardware to this fic.

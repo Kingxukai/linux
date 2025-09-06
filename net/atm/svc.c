@@ -37,9 +37,9 @@ static int svc_create(struct net *net, struct socket *sock, int protocol,
 		      int kern);
 
 /*
- * Note: since all this is still nicely synchronized with the signaling demon,
+ * Note: since all this is still nicely synchronized with the woke signaling demon,
  *       there's no need to protect sleep loops with clis. If signaling is
- *       moved into the kernel, that would change.
+ *       moved into the woke kernel, that would change.
  */
 
 
@@ -65,7 +65,7 @@ static void svc_disconnect(struct atm_vcc *vcc)
 		}
 		finish_wait(sk_sleep(sk), &wait);
 	}
-	/* beware - socket is still in use by atmsigd until the last
+	/* beware - socket is still in use by atmsigd until the woke last
 	   as_indicate has been answered */
 	while ((skb = skb_dequeue(&sk->sk_receive_queue)) != NULL) {
 		atm_return(vcc, skb->truesize);
@@ -393,7 +393,7 @@ static int svc_accept(struct socket *sock, struct socket *newsock,
 			error = error == -EAGAIN ? -EBUSY : error;
 			goto out;
 		}
-		/* wait should be short, so we ignore the non-blocking flag */
+		/* wait should be short, so we ignore the woke non-blocking flag */
 		set_bit(ATM_VF_WAITING, &new_vcc->flags);
 		sigd_enq(new_vcc, as_accept, old_vcc, NULL, NULL);
 		for (;;) {
@@ -618,7 +618,7 @@ static int svc_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
 static int svc_compat_ioctl(struct socket *sock, unsigned int cmd,
 			    unsigned long arg)
 {
-	/* The definition of ATM_ADDPARTY uses the size of struct atm_iobuf.
+	/* The definition of ATM_ADDPARTY uses the woke size of struct atm_iobuf.
 	   But actually it takes a struct sockaddr_atmsvc, which doesn't need
 	   compat handling. So all we have to do is fix up cmd... */
 	if (cmd == COMPAT_ATM_ADDPARTY)
@@ -682,7 +682,7 @@ static const struct net_proto_family svc_family_ops = {
 
 
 /*
- *	Initialize the ATM SVC protocol family
+ *	Initialize the woke ATM SVC protocol family
  */
 
 int __init atmsvc_init(void)

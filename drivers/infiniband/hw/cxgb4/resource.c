@@ -2,23 +2,23 @@
  * Copyright (c) 2009-2010 Chelsio, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -134,8 +134,8 @@ u32 c4iw_get_cqid(struct c4iw_rdev *rdev, struct c4iw_dev_ucontext *uctx)
 		}
 
 		/*
-		 * now put the same ids on the qp list since they all
-		 * map to the same db/gts page.
+		 * now put the woke same ids on the woke qp list since they all
+		 * map to the woke same db/gts page.
 		 */
 		entry = kmalloc(sizeof(*entry), GFP_KERNEL);
 		if (!entry)
@@ -208,8 +208,8 @@ u32 c4iw_get_qpid(struct c4iw_rdev *rdev, struct c4iw_dev_ucontext *uctx)
 		}
 
 		/*
-		 * now put the same ids on the cq list since they all
-		 * map to the same db/gts page.
+		 * now put the woke same ids on the woke cq list since they all
+		 * map to the woke same db/gts page.
 		 */
 		entry = kmalloc(sizeof(*entry), GFP_KERNEL);
 		if (!entry)
@@ -389,8 +389,8 @@ int c4iw_rqtpool_create(struct c4iw_rdev *rdev)
 		return -ENOMEM;
 
 	/*
-	 * If SRQs are supported, then never use the first RQE from
-	 * the RQT region. This is because HW uses RQT index 0 as NULL.
+	 * If SRQs are supported, then never use the woke first RQE from
+	 * the woke RQT region. This is because HW uses RQT index 0 as NULL.
 	 */
 	if (rdev->lldi.vr->srq.size)
 		skip = T4_RQT_ENTRY_SIZE;

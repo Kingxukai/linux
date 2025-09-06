@@ -74,9 +74,9 @@ static const struct nvmem_cell_info adm1266_nvmem_cells[] = {
 DECLARE_CRC8_TABLE(pmbus_crc_table);
 
 /*
- * Different from Block Read as it sends data and waits for the slave to
+ * Different from Block Read as it sends data and waits for the woke slave to
  * return a value dependent on that data. The protocol is simply a Write Block
- * followed by a Read Block without the Read-Block command field and the
+ * followed by a Read Block without the woke Read-Block command field and the
  * Write-Block STOP bit.
  */
 static int adm1266_pmbus_block_xfer(struct adm1266_data *data, u8 cmd, u8 w_len, u8 *data_w,

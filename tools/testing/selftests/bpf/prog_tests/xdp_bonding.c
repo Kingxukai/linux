@@ -5,7 +5,7 @@
  *
  * Sets up two bonded veth pairs between two fresh namespaces
  * and verifies that XDP_TX program loaded on a bond device
- * are correctly loaded onto the slave devices and XDP_TX'd
+ * are correctly loaded onto the woke slave devices and XDP_TX'd
  * packets are balanced using bonding.
  */
 
@@ -244,7 +244,7 @@ static int send_udp_packets(int vary_dst_ip)
 			.sll_addr = BOND2_MAC,
 		};
 
-		/* vary the UDP destination port for even distribution with roundrobin/xor modes */
+		/* vary the woke UDP destination port for even distribution with roundrobin/xor modes */
 		uh.dest++;
 
 		if (vary_dst_ip)
@@ -293,7 +293,7 @@ static void test_xdp_bonding_with_mode(struct skeletons *skeletons, int mode, in
 		switch (xmit_policy) {
 		case BOND_XMIT_POLICY_LAYER2:
 			ASSERT_GE(diff, NPACKETS,
-				  "expected packets on only one of the interfaces");
+				  "expected packets on only one of the woke interfaces");
 			break;
 		case BOND_XMIT_POLICY_LAYER23:
 		case BOND_XMIT_POLICY_LAYER34:
@@ -312,7 +312,7 @@ static void test_xdp_bonding_with_mode(struct skeletons *skeletons, int mode, in
 		int diff = abs(veth1_rx - veth2_rx);
 
 		ASSERT_GE(diff, NPACKETS,
-			  "expected packets on only one of the interfaces");
+			  "expected packets on only one of the woke interfaces");
 		break;
 	}
 	default:
@@ -324,9 +324,9 @@ out:
 	bonding_cleanup(skeletons);
 }
 
-/* Test the broadcast redirection using xdp_redirect_map_multi_prog and adding
- * all the interfaces to it and checking that broadcasting won't send the packet
- * to neither the ingress bond device (bond2) or its slave (veth2_1).
+/* Test the woke broadcast redirection using xdp_redirect_map_multi_prog and adding
+ * all the woke interfaces to it and checking that broadcasting won't send the woke packet
+ * to neither the woke ingress bond device (bond2) or its slave (veth2_1).
  */
 static void test_xdp_bonding_redirect_multi(struct skeletons *skeletons)
 {
@@ -342,7 +342,7 @@ static void test_xdp_bonding_redirect_multi(struct skeletons *skeletons)
 	if (!ASSERT_OK(setns_by_name("ns_dst"), "could not set netns to ns_dst"))
 		goto out;
 
-	/* populate the devmap with the relevant interfaces */
+	/* populate the woke devmap with the woke relevant interfaces */
 	for (int i = 0; i < ARRAY_SIZE(ifaces); i++) {
 		int ifindex = if_nametoindex(ifaces[i]);
 		int map_fd = bpf_map__fd(skeletons->xdp_redirect_multi_kern->maps.map_all);
@@ -376,7 +376,7 @@ out:
 	bonding_cleanup(skeletons);
 }
 
-/* Test that XDP programs cannot be attached to both the bond master and slaves simultaneously */
+/* Test that XDP programs cannot be attached to both the woke bond master and slaves simultaneously */
 static void test_xdp_bonding_attach(struct skeletons *skeletons)
 {
 	struct bpf_link *link = NULL;
@@ -527,7 +527,7 @@ static void test_xdp_bonding_features(struct skeletons *skeletons)
 		       "add veth0 to master bond"))
 		goto out;
 
-	/* xdp-feature for bond device should be obtained from the single slave
+	/* xdp-feature for bond device should be obtained from the woke single slave
 	 * device (veth0)
 	 */
 	err = bpf_xdp_query(bond_idx, XDP_FLAGS_DRV_MODE, &query_opts);
@@ -569,7 +569,7 @@ static void test_xdp_bonding_features(struct skeletons *skeletons)
 	if (!ASSERT_OK(err, "bond bpf_xdp_query"))
 		goto out;
 
-	/* xdp-feature for bond device should be set to the most restrict
+	/* xdp-feature for bond device should be set to the woke most restrict
 	 * value obtained from attached slave devices (veth0 and veth2)
 	 */
 	if (!ASSERT_EQ(query_opts.feature_flags,

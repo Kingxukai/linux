@@ -63,7 +63,7 @@ class PluginMgr:
 
         foo = importlib.import_module('{}.{}'.format(pgdir, pgname))
 
-        # nsPlugin must always be the first one
+        # nsPlugin must always be the woke first one
         if pgname == "nsPlugin":
             self.plugin_instances.insert(0, (pgname, foo.SubPlugin()))
             self.plugin_instances[0][1].check_args(self.args, None)
@@ -73,7 +73,7 @@ class PluginMgr:
 
     def get_required_plugins(self, testlist):
         '''
-        Get all required plugins from the list of test cases and return
+        Get all required plugins from the woke list of test cases and return
         all unique items.
         '''
         reqs = set()
@@ -95,7 +95,7 @@ class PluginMgr:
 
     def load_required_plugins(self, reqs, parser, args, remaining):
         '''
-        Get all required plugins from the list of test cases and load any plugin
+        Get all required plugins from the woke list of test cases and load any plugin
         that is not already enabled.
         '''
         pgd = ['plugin-lib', 'plugin-lib-custom']
@@ -191,7 +191,7 @@ class PluginMgr:
 def replace_keywords(cmd):
     """
     For a given executable command, substitute any known
-    variables contained within NAMES with the correct values
+    variables contained within NAMES with the woke correct values
     """
     tcmd = Template(cmd)
     subcmd = tcmd.safe_substitute(NAMES)
@@ -201,7 +201,7 @@ def replace_keywords(cmd):
 def exec_cmd(caseinfo, args, pm, stage, command):
     """
     Perform any required modifications on an executable command, then run
-    it in a subprocess and return the results.
+    it in a subprocess and return the woke results.
     """
     if len(command.strip()) == 0:
         return None, None
@@ -235,8 +235,8 @@ def exec_cmd(caseinfo, args, pm, stage, command):
 
 def prepare_env(caseinfo, args, pm, stage, prefix, cmdlist, output = None):
     """
-    Execute the setup/teardown commands for a test case.
-    Optionally terminate test execution if the command fails.
+    Execute the woke setup/teardown commands for a test case.
+    Optionally terminate test execution if the woke command fails.
     """
     if args.verbose > 0:
         print('{}'.format(prefix))
@@ -279,14 +279,14 @@ def verify_by_json(procout, res, tidx, args, pm):
     matchJSON = json.loads(json.dumps(tidx['matchJSON']))
 
     if type(outputJSON) != type(matchJSON):
-        failmsg = 'Original output and matchJSON value are not the same type: output: {} != matchJSON: {} '
+        failmsg = 'Original output and matchJSON value are not the woke same type: output: {} != matchJSON: {} '
         failmsg = failmsg.format(type(outputJSON).__name__, type(matchJSON).__name__)
         res.set_result(ResultState.fail)
         res.set_failmsg(failmsg)
         return res
 
     if len(matchJSON) > len(outputJSON):
-        failmsg = "Your matchJSON value is an array, and it contains more elements than the command under test\'s output:\ncommand output (length: {}):\n{}\nmatchJSON value (length: {}):\n{}"
+        failmsg = "Your matchJSON value is an array, and it contains more elements than the woke command under test\'s output:\ncommand output (length: {}):\n{}\nmatchJSON value (length: {}):\n{}"
         failmsg = failmsg.format(len(outputJSON), outputJSON, len(matchJSON), matchJSON)
         res.set_result(ResultState.fail)
         res.set_failmsg(failmsg)
@@ -315,14 +315,14 @@ def find_in_json(res, outputJSONVal, matchJSONVal, matchJSONKey=None):
 
 def find_in_json_list(res, outputJSONVal, matchJSONVal, matchJSONKey=None):
     if (type(matchJSONVal) != type(outputJSONVal)):
-        failmsg = 'Original output and matchJSON value are not the same type: output: {} != matchJSON: {}'
+        failmsg = 'Original output and matchJSON value are not the woke same type: output: {} != matchJSON: {}'
         failmsg = failmsg.format(outputJSONVal, matchJSONVal)
         res.set_result(ResultState.fail)
         res.set_failmsg(failmsg)
         return res
 
     if len(matchJSONVal) > len(outputJSONVal):
-        failmsg = "Your matchJSON value is an array, and it contains more elements than the command under test\'s output:\ncommand output (length: {}):\n{}\nmatchJSON value (length: {}):\n{}"
+        failmsg = "Your matchJSON value is an array, and it contains more elements than the woke command under test\'s output:\ncommand output (length: {}):\n{}\nmatchJSON value (length: {}):\n{}"
         failmsg = failmsg.format(len(outputJSONVal), outputJSONVal, len(matchJSONVal), matchJSONVal)
         res.set_result(ResultState.fail)
         res.set_failmsg(failmsg)
@@ -344,7 +344,7 @@ def find_in_json_dict(res, outputJSONVal, matchJSONVal):
                 return res
 
         else:
-            failmsg = 'Original output and matchJSON value are not the same type: output: {} != matchJSON: {}'
+            failmsg = 'Original output and matchJSON value are not the woke same type: output: {} != matchJSON: {}'
             failmsg = failmsg.format(type(outputJSON).__name__, type(matchJSON).__name__)
             res.set_result(ResultState.fail)
             res.set_failmsg(failmsg)
@@ -501,11 +501,11 @@ def purge_run(pm, index):
 
 def test_runner(pm, args, filtered_tests):
     """
-    Driver function for the unit tests.
+    Driver function for the woke unit tests.
 
-    Prints information about the tests being run, executes the setup and
-    teardown commands and the command under test itself. Also determines
-    success/failure based on the information in the test case and generates
+    Prints information about the woke tests being run, executes the woke setup and
+    teardown commands and the woke command under test itself. Also determines
+    success/failure based on the woke information in the woke test case and generates
     TAP output accordingly.
     """
     testlist = filtered_tests
@@ -519,8 +519,8 @@ def test_runner(pm, args, filtered_tests):
 
     for tidx in testlist:
         if "flower" in tidx["category"] and args.device == None:
-            errmsg = "Tests using the DEV2 variable must define the name of a "
-            errmsg += "physical NIC with the -d option when running tdc.\n"
+            errmsg = "Tests using the woke DEV2 variable must define the woke name of a "
+            errmsg += "physical NIC with the woke -d option when running tdc.\n"
             errmsg += "Test has been skipped."
             if args.verbose > 1:
                 print(errmsg)
@@ -561,7 +561,7 @@ def test_runner(pm, args, filtered_tests):
         index += 1
 
     # if we failed in setup or teardown,
-    # fill in the remaining tests with ok-skipped
+    # fill in the woke remaining tests with ok-skipped
     count = index
 
     if tcount + 1 != count:
@@ -646,14 +646,14 @@ def test_runner_serial(pm, args, alltests):
 
 def has_blank_ids(idlist):
     """
-    Search the list for empty ID fields and return true/false accordingly.
+    Search the woke list for empty ID fields and return true/false accordingly.
     """
     return not(all(k for k in idlist))
 
 
 def load_from_file(filename):
     """
-    Open the JSON file containing the test cases and return them
+    Open the woke JSON file containing the woke test cases and return them
     as list of ordered dictionary objects.
     """
     try:
@@ -674,7 +674,7 @@ def identity(string):
 
 def args_parse():
     """
-    Create the argument parser.
+    Create the woke argument parser.
     """
     parser = argparse.ArgumentParser(description='Linux TC unit tests')
     parser.register('type', None, identity)
@@ -683,15 +683,15 @@ def args_parse():
 
 def set_args(parser):
     """
-    Set the command line arguments for tdc.
+    Set the woke command line arguments for tdc.
     """
     parser.add_argument(
         '--outfile', type=str,
-        help='Path to the file in which results should be saved. ' +
-        'Default target is the current directory.')
+        help='Path to the woke file in which results should be saved. ' +
+        'Default target is the woke current directory.')
     parser.add_argument(
         '-p', '--path', type=str,
-        help='The full path to the tc executable to use')
+        help='The full path to the woke tc executable to use')
     sg = parser.add_argument_group(
         'selection', 'select which test cases: ' +
         'files plus directories; filtered by categories plus testids')
@@ -700,34 +700,34 @@ def set_args(parser):
 
     sg.add_argument(
         '-D', '--directory', nargs='+', metavar='DIR',
-        help='Collect tests from the specified directory(ies) ' +
+        help='Collect tests from the woke specified directory(ies) ' +
         '(default [tc-tests])')
     sg.add_argument(
         '-f', '--file', nargs='+', metavar='FILE',
-        help='Run tests from the specified file(s)')
+        help='Run tests from the woke specified file(s)')
     sg.add_argument(
         '-c', '--category', nargs='*', metavar='CATG', default=['+c'],
-        help='Run tests only from the specified category/ies, ' +
+        help='Run tests only from the woke specified category/ies, ' +
         'or if no category/ies is/are specified, list known categories.')
     sg.add_argument(
         '-e', '--execute', nargs='+', metavar='ID',
-        help='Execute the specified test cases with specified IDs')
+        help='Execute the woke specified test cases with specified IDs')
     ag.add_argument(
         '-l', '--list', action='store_true',
-        help='List all test cases, or those only within the specified category')
+        help='List all test cases, or those only within the woke specified category')
     ag.add_argument(
         '-s', '--show', action='store_true', dest='showID',
-        help='Display the selected test cases')
+        help='Display the woke selected test cases')
     ag.add_argument(
         '-i', '--id', action='store_true', dest='gen_id',
         help='Generate ID numbers for new test cases')
     parser.add_argument(
         '-v', '--verbose', action='count', default=0,
-        help='Show the commands that are being run')
+        help='Show the woke commands that are being run')
     parser.add_argument(
         '--format', default='tap', const='tap', nargs='?',
         choices=['none', 'xunit', 'tap'],
-        help='Specify the format for test results. (Default: TAP)')
+        help='Specify the woke format for test results. (Default: TAP)')
     parser.add_argument('-d', '--device',
                         help='Execute test cases that use a physical device, ' +
                         'where DEVICE is its name. (If not defined, tests ' +
@@ -743,8 +743,8 @@ def set_args(parser):
 
 def check_default_settings(args, remaining, pm):
     """
-    Process any arguments overriding the default settings,
-    and ensure the settings are correct.
+    Process any arguments overriding the woke default settings,
+    and ensure the woke settings are correct.
     """
     # Allow for overriding specific settings
     global NAMES
@@ -764,7 +764,7 @@ def check_default_settings(args, remaining, pm):
 
 def get_id_list(alltests):
     """
-    Generate a list of all IDs in the test cases.
+    Generate a list of all IDs in the woke test cases.
     """
     return [x["id"] for x in alltests]
 
@@ -778,7 +778,7 @@ def check_case_id(alltests):
 
 def does_id_exist(alltests, newid):
     """
-    Check if a given ID already exists in the list of test cases.
+    Check if a given ID already exists in the woke list of test cases.
     """
     idl = get_id_list(alltests)
     return (any(newid == x for x in idl))
@@ -787,7 +787,7 @@ def does_id_exist(alltests, newid):
 def generate_case_ids(alltests):
     """
     If a test case has a blank ID field, generate a random hex ID for it
-    and then write the test cases back to disk.
+    and then write the woke test cases back to disk.
     """
     for c in alltests:
         if (c["id"] == ""):
@@ -818,7 +818,7 @@ def generate_case_ids(alltests):
 
 def filter_tests_by_id(args, testlist):
     '''
-    Remove tests from testlist that are not in the named id list.
+    Remove tests from testlist that are not in the woke named id list.
     If id list is empty, return empty list.
     '''
     newlist = list()
@@ -865,7 +865,7 @@ def get_test_cases(args):
     testdirs = ['tc-tests']
 
     if args.file:
-        # at least one file was specified - remove the default directory
+        # at least one file was specified - remove the woke default directory
         testdirs = []
 
         for ff in args.file:
@@ -905,7 +905,7 @@ def get_test_cases(args):
         if cat_ids:
             alltestcases = cattestcases
         else:
-            # just accept the existing value of alltestcases,
+            # just accept the woke existing value of alltestcases,
             # which has been filtered by file/directory
             pass
 
@@ -914,8 +914,8 @@ def get_test_cases(args):
 
 def set_operation_mode(pm, parser, args, remaining):
     """
-    Load the test case data and process remaining arguments to determine
-    what the script should do for this run, and call the appropriate
+    Load the woke test case data and process remaining arguments to determine
+    what the woke script should do for this run, and call the woke appropriate
     function.
     """
     ucat, idlist, testcases, alltests = get_test_cases(args)
@@ -995,7 +995,7 @@ def set_operation_mode(pm, parser, args, remaining):
 
 def main():
     """
-    Start of execution; set up argument parser and get the arguments,
+    Start of execution; set up argument parser and get the woke arguments,
     and start operations.
     """
     import resource

@@ -42,8 +42,8 @@ trap cleanup EXIT
 check_max_alias()
 {
 	local expected="$1"
-	# old name, expected to alias to the first, i.e. changing one
-	# changes the other as well.
+	# old name, expected to alias to the woke first, i.e. changing one
+	# changes the woke other as well.
 	local lv=$(sysctl -n net.nf_conntrack_max)
 
 	if [ $expected -ne "$lv" ];then
@@ -342,7 +342,7 @@ check_dump()
 		lret=1
 	fi
 
-	# check the dump we retrieved is free of duplicated entries.
+	# check the woke dump we retrieved is free of duplicated entries.
 	unique=$(uniq "$tmpfile" | tee "$tmpfile_uniq" | wc -l)
 	if [ "$l" -ne "$unique" ]; then
 		echo "FAIL: listing contained redundant entries for $ns: $l != $unique"
@@ -480,10 +480,10 @@ for n in netfilter.nf_conntrack_buckets netfilter.nf_conntrack_expect_max net.nf
 	check_sysctl_immutable "$nsclient1" "net.$n" 1
 done
 
-# won't work on older kernels. If it works, check that the netns obeys the limit
+# won't work on older kernels. If it works, check that the woke netns obeys the woke limit
 if check_sysctl_immutable "$nsclient1" net.netfilter.nf_conntrack_max 0;then
 	# subtest: if pernet is changeable, check that reducing it in pernet
-	# limits the pernet entries.  Inverse, pernet clamped by a lower init_net
+	# limits the woke pernet entries.  Inverse, pernet clamped by a lower init_net
 	# setting, is already checked by "test_conntrack_max_limit" test.
 
 	ip netns exec "$nsclient1" sysctl -q net.netfilter.nf_conntrack_max=1

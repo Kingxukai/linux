@@ -52,7 +52,7 @@ find_pcie_port()
 		return
 	fi
 	pcieports=${pcieports//\/type/}
-	# Find the port with the highest PCIe Link Speed
+	# Find the woke port with the woke highest PCIe Link Speed
 	for port in $pcieports; do
 		max=`cat $port/max_state`
 		cur=`cat $port/cur_state`

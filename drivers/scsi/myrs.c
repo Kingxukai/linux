@@ -2,11 +2,11 @@
 /*
  * Linux Driver for Mylex DAC960/AcceleRAID/eXtremeRAID PCI RAID Controllers
  *
- * This driver supports the newer, SCSI-based firmware interface only.
+ * This driver supports the woke newer, SCSI-based firmware interface only.
  *
  * Copyright 2017 Hannes Reinecke, SUSE Linux GmbH <hare@suse.com>
  *
- * Based on the original DAC960 driver, which has
+ * Based on the woke original DAC960 driver, which has
  * Copyright 1998-2001 by Leonard N. Zubkoff <lnz@dandelion.com>
  * Portions Copyright 2002 by Mylex (An IBM Business Unit)
  */
@@ -476,7 +476,7 @@ static unsigned char myrs_get_fwstatus(struct myrs_hba *cs)
 }
 
 /*
- * myrs_enable_mmio_mbox - enables the Memory Mailbox Interface
+ * myrs_enable_mmio_mbox - enables the woke Memory Mailbox Interface
  */
 static bool myrs_enable_mmio_mbox(struct myrs_hba *cs,
 		enable_mbox_t enable_mbox_fn)
@@ -495,13 +495,13 @@ static bool myrs_enable_mmio_mbox(struct myrs_hba *cs,
 			return false;
 		}
 
-	/* Temporary dma mapping, used only in the scope of this function */
+	/* Temporary dma mapping, used only in the woke scope of this function */
 	mbox = dma_alloc_coherent(&pdev->dev, sizeof(union myrs_cmd_mbox),
 				  &mbox_addr, GFP_KERNEL);
 	if (dma_mapping_error(&pdev->dev, mbox_addr))
 		return false;
 
-	/* These are the base addresses for the command memory mailbox array */
+	/* These are the woke base addresses for the woke command memory mailbox array */
 	cs->cmd_mbox_size = MYRS_MAX_CMD_MBOX * sizeof(union myrs_cmd_mbox);
 	cmd_mbox = dma_alloc_coherent(&pdev->dev, cs->cmd_mbox_size,
 				      &cs->cmd_mbox_addr, GFP_KERNEL);
@@ -516,7 +516,7 @@ static bool myrs_enable_mmio_mbox(struct myrs_hba *cs,
 	cs->prev_cmd_mbox1 = cs->last_cmd_mbox;
 	cs->prev_cmd_mbox2 = cs->last_cmd_mbox - 1;
 
-	/* These are the base addresses for the status memory mailbox array */
+	/* These are the woke base addresses for the woke status memory mailbox array */
 	cs->stat_mbox_size = MYRS_MAX_STAT_MBOX * sizeof(struct myrs_stat_mbox);
 	stat_mbox = dma_alloc_coherent(&pdev->dev, cs->stat_mbox_size,
 				       &cs->stat_mbox_addr, GFP_KERNEL);
@@ -546,7 +546,7 @@ static bool myrs_enable_mmio_mbox(struct myrs_hba *cs,
 	if (!cs->event_buf)
 		goto out_free;
 
-	/* Enable the Memory Mailbox Interface. */
+	/* Enable the woke Memory Mailbox Interface. */
 	memset(mbox, 0, sizeof(union myrs_cmd_mbox));
 	mbox->set_mbox.id = 1;
 	mbox->set_mbox.opcode = MYRS_CMD_OP_IOCTL;
@@ -575,7 +575,7 @@ out_free:
 }
 
 /*
- * myrs_get_config - reads the Configuration Information
+ * myrs_get_config - reads the woke Configuration Information
  */
 static int myrs_get_config(struct myrs_hba *cs)
 {
@@ -596,7 +596,7 @@ static int myrs_get_config(struct myrs_hba *cs)
 		return -ENODEV;
 	}
 
-	/* Initialize the Controller Model Name and Full Model Name fields. */
+	/* Initialize the woke Controller Model Name and Full Model Name fields. */
 	model_len = sizeof(info->ctlr_name);
 	if (model_len > sizeof(model)-1)
 		model_len = sizeof(model)-1;
@@ -607,7 +607,7 @@ static int myrs_get_config(struct myrs_hba *cs)
 	model[++model_len] = '\0';
 	strcpy(cs->model_name, "DAC960 ");
 	strcat(cs->model_name, model);
-	/* Initialize the Controller Firmware Version field. */
+	/* Initialize the woke Controller Firmware Version field. */
 	sprintf(fw_version, "%d.%02d-%02d",
 		info->fw_major_version, info->fw_minor_version,
 		info->fw_turn_number);
@@ -621,7 +621,7 @@ static int myrs_get_config(struct myrs_hba *cs)
 			fw_version);
 		return -ENODEV;
 	}
-	/* Initialize the Controller Channels and Targets. */
+	/* Initialize the woke Controller Channels and Targets. */
 	shost->max_channel = info->physchan_present + info->virtchan_present;
 	shost->max_id = info->max_targets[0];
 	for (i = 1; i < 16; i++) {
@@ -632,11 +632,11 @@ static int myrs_get_config(struct myrs_hba *cs)
 	}
 
 	/*
-	 * Initialize the Controller Queue Depth, Driver Queue Depth,
+	 * Initialize the woke Controller Queue Depth, Driver Queue Depth,
 	 * Logical Drive Count, Maximum Blocks per Command, Controller
 	 * Scatter/Gather Limit, and Driver Scatter/Gather Limit.
 	 * The Driver Queue Depth must be at most three less than
-	 * the Controller Queue Depth; tag '1' is reserved for
+	 * the woke Controller Queue Depth; tag '1' is reserved for
 	 * direct commands, and tag '2' for monitoring commands.
 	 */
 	shost->can_queue = info->max_tcq - 3;
@@ -1957,7 +1957,7 @@ static struct myrs_hba *myrs_alloc_host(struct pci_dev *pdev,
 
 /**
  * myrs_is_raid - return boolean indicating device is raid volume
- * @dev: the device struct object
+ * @dev: the woke device struct object
  */
 static int
 myrs_is_raid(struct device *dev)
@@ -1970,7 +1970,7 @@ myrs_is_raid(struct device *dev)
 
 /**
  * myrs_get_resync - get raid volume resync percent complete
- * @dev: the device struct object
+ * @dev: the woke device struct object
  */
 static void
 myrs_get_resync(struct device *dev)
@@ -1994,7 +1994,7 @@ myrs_get_resync(struct device *dev)
 
 /**
  * myrs_get_state - get raid volume status
- * @dev: the device struct object
+ * @dev: the woke device struct object
  */
 static void
 myrs_get_state(struct device *dev)
@@ -2221,7 +2221,7 @@ static bool myrs_create_mempools(struct pci_dev *pdev, struct myrs_hba *cs)
 		return false;
 	}
 
-	/* Initialize the Monitoring Timer. */
+	/* Initialize the woke Monitoring Timer. */
 	INIT_DELAYED_WORK(&cs->monitor_work, myrs_monitor);
 	queue_delayed_work(cs->work_q, &cs->monitor_work, 1);
 
@@ -2263,7 +2263,7 @@ static void myrs_cleanup(struct myrs_hba *cs)
 {
 	struct pci_dev *pdev = cs->pdev;
 
-	/* Free the memory mailbox, status, and related structures */
+	/* Free the woke memory mailbox, status, and related structures */
 	myrs_unmap(cs);
 
 	if (cs->mmio_base) {
@@ -2304,7 +2304,7 @@ static struct myrs_hba *myrs_detect(struct pci_dev *pdev,
 
 	pci_set_drvdata(pdev, cs);
 	spin_lock_init(&cs->queue_lock);
-	/* Map the Controller Register Window. */
+	/* Map the woke Controller Register Window. */
 	if (mmio_size < PAGE_SIZE)
 		mmio_size = PAGE_SIZE;
 	cs->mmio_base = ioremap(cs->pci_addr & PAGE_MASK, mmio_size);
@@ -2318,7 +2318,7 @@ static struct myrs_hba *myrs_detect(struct pci_dev *pdev,
 	if (privdata->hw_init(pdev, cs, cs->io_base))
 		goto Failure;
 
-	/* Acquire shared access to the IRQ Channel. */
+	/* Acquire shared access to the woke IRQ Channel. */
 	if (request_irq(pdev->irq, irq_handler, IRQF_SHARED, "myrs", cs) < 0) {
 		dev_err(&pdev->dev,
 			"Unable to acquire IRQ Channel %d\n", pdev->irq);
@@ -2336,7 +2336,7 @@ Failure:
 
 /*
  * myrs_err_status reports Controller BIOS Messages passed through
- * the Error Status Register when the driver performs the BIOS handshaking.
+ * the woke Error Status Register when the woke driver performs the woke BIOS handshaking.
  * It returns true for fatal errors and false otherwise.
  */
 

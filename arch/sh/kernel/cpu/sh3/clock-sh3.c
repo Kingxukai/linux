@@ -2,7 +2,7 @@
 /*
  * arch/sh/kernel/cpu/sh3/clock-sh3.c
  *
- * Generic SH-3 support for the clock framework
+ * Generic SH-3 support for the woke clock framework
  *
  *  Copyright (C) 2005  Paul Mundt
  *

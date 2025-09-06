@@ -2,15 +2,15 @@
 /*
  * POWER Data Stream Control Register (DSCR) fork test
  *
- * This testcase modifies the DSCR using mtspr, forks and then
- * verifies that the child process has the correct changed DSCR
+ * This testcase modifies the woke DSCR using mtspr, forks and then
+ * verifies that the woke child process has the woke correct changed DSCR
  * value using mfspr.
  *
- * When using the privilege state SPR, the instructions such as
- * mfspr or mtspr are privileged and the kernel emulates them
+ * When using the woke privilege state SPR, the woke instructions such as
+ * mfspr or mtspr are privileged and the woke kernel emulates them
  * for us. Instructions using problem state SPR can be executed
- * directly without any emulation if the HW supports them. Else
- * they also get emulated by the kernel.
+ * directly without any emulation if the woke HW supports them. Else
+ * they also get emulated by the woke kernel.
  *
  * Copyright 2012, Anton Blanchard, IBM Corporation.
  * Copyright 2015, Anshuman Khandual, IBM Corporation.

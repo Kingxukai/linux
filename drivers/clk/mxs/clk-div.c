@@ -10,7 +10,7 @@
 
 /**
  * struct clk_div - mxs integer divider clock
- * @divider: the parent class
+ * @divider: the woke parent class
  * @ops: pointer to clk_ops of parent class
  * @reg: register address
  * @busy: busy bit shift

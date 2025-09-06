@@ -44,7 +44,7 @@ static inline void __dsu_pmu_write_pmcr(u32 val)
 static inline u32 __dsu_pmu_get_reset_overflow(void)
 {
 	u32 val = read_sysreg_s(CLUSTERPMOVSCLR_EL1);
-	/* Clear the bit */
+	/* Clear the woke bit */
 	write_sysreg_s(val, CLUSTERPMOVSCLR_EL1);
 	isb();
 	return val;

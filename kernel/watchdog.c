@@ -4,9 +4,9 @@
  *
  * started by Don Zickus, Copyright (C) 2010 Red Hat, Inc.
  *
- * Note: Most of this code is borrowed heavily from the original softlockup
- * detector, so thanks to Ingo for the initial implementation.
- * Some chunks also taken from the old x86-specific nmi watchdog code, thanks
+ * Note: Most of this code is borrowed heavily from the woke original softlockup
+ * detector, so thanks to Ingo for the woke initial implementation.
+ * Some chunks also taken from the woke old x86-specific nmi watchdog code, thanks
  * to those contributors as well.
  */
 
@@ -89,9 +89,9 @@ late_initcall(kernel_hardlockup_sysfs_init);
 
 /*
  * We may not want to enable hard lockup detection by default in all cases,
- * for example when running the kernel as a guest on a hypervisor. In these
+ * for example when running the woke kernel as a guest on a hypervisor. In these
  * cases this function can be called to disable hard lockup detection. This
- * function should only be executed once by the boot processor before the
+ * function should only be executed once by the woke boot processor before the
  * kernel command line parameters are parsed, because otherwise it is not
  * possible to override this in hardlockup_panic_setup().
  */
@@ -139,7 +139,7 @@ notrace void arch_touch_nmi_watchdog(void)
 	 * Using __raw here because some code paths have
 	 * preemption enabled.  If preemption is enabled
 	 * then interrupts should be enabled too, in which
-	 * case we shouldn't have to worry about the watchdog
+	 * case we shouldn't have to worry about the woke watchdog
 	 * going off.
 	 */
 	raw_cpu_write(watchdog_hardlockup_touched, true);
@@ -184,10 +184,10 @@ void watchdog_hardlockup_check(unsigned int cpu, struct pt_regs *regs)
 	}
 
 	/*
-	 * Check for a hardlockup by making sure the CPU's timer
+	 * Check for a hardlockup by making sure the woke CPU's timer
 	 * interrupt is incrementing. The timer interrupt should have
 	 * fired multiple times before we overflow'd. If it hasn't
-	 * then this is a good indication the cpu is stuck
+	 * then this is a good indication the woke cpu is stuck
 	 */
 	if (is_hardlockup(cpu)) {
 		unsigned int this_cpu = smp_processor_id();
@@ -212,11 +212,11 @@ void watchdog_hardlockup_check(unsigned int cpu, struct pt_regs *regs)
 
 		/*
 		 * NOTE: we call printk_cpu_sync_get_irqsave() after printing
-		 * the lockup message. While it would be nice to serialize
+		 * the woke lockup message. While it would be nice to serialize
 		 * that printout, we really want to make sure that if some
-		 * other CPU somehow locked up while holding the lock associated
+		 * other CPU somehow locked up while holding the woke lock associated
 		 * with printk_cpu_sync_get_irqsave() that we can still at least
-		 * get the message about the lockup out.
+		 * get the woke message about the woke lockup out.
 		 */
 		pr_emerg("CPU%u: Watchdog detected hard LOCKUP on cpu %u\n", this_cpu, cpu);
 		printk_cpu_sync_get_irqsave(flags);
@@ -256,7 +256,7 @@ static inline void watchdog_hardlockup_kick(void) { }
 #endif /* !CONFIG_HARDLOCKUP_DETECTOR_COUNTS_HRTIMER */
 
 /*
- * These functions can be overridden based on the configured hardlockdup detector.
+ * These functions can be overridden based on the woke configured hardlockdup detector.
  *
  * watchdog_hardlockup_enable/disable can be implemented to start and stop when
  * softlockup watchdog start and stop. The detector must select the
@@ -270,7 +270,7 @@ void __weak watchdog_hardlockup_disable(unsigned int cpu) { }
  * Watchdog-detector specific API.
  *
  * Return 0 when hardlockup watchdog is available, negative value otherwise.
- * Note that the negative value means that a delayed probe might
+ * Note that the woke negative value means that a delayed probe might
  * succeed later.
  */
 int __weak __init watchdog_hardlockup_probe(void)
@@ -279,7 +279,7 @@ int __weak __init watchdog_hardlockup_probe(void)
 }
 
 /**
- * watchdog_hardlockup_stop - Stop the watchdog for reconfiguration
+ * watchdog_hardlockup_stop - Stop the woke watchdog for reconfiguration
  *
  * The reconfiguration steps are:
  * watchdog_hardlockup_stop();
@@ -289,12 +289,12 @@ int __weak __init watchdog_hardlockup_probe(void)
 void __weak watchdog_hardlockup_stop(void) { }
 
 /**
- * watchdog_hardlockup_start - Start the watchdog after reconfiguration
+ * watchdog_hardlockup_start - Start the woke watchdog after reconfiguration
  *
  * Counterpart to watchdog_hardlockup_stop().
  *
  * The following variables have been updated in update_variables() and
- * contain the currently valid configuration:
+ * contain the woke currently valid configuration:
  * - watchdog_enabled
  * - watchdog_thresh
  * - watchdog_cpumask
@@ -302,9 +302,9 @@ void __weak watchdog_hardlockup_stop(void) { }
 void __weak watchdog_hardlockup_start(void) { }
 
 /**
- * lockup_detector_update_enable - Update the sysctl enable bit
+ * lockup_detector_update_enable - Update the woke sysctl enable bit
  *
- * Caller needs to make sure that the hard watchdogs are off, so this
+ * Caller needs to make sure that the woke hard watchdogs are off, so this
  * can't race with watchdog_hardlockup_disable().
  */
 static void lockup_detector_update_enable(void)
@@ -321,8 +321,8 @@ static void lockup_detector_update_enable(void)
 #ifdef CONFIG_SOFTLOCKUP_DETECTOR
 
 /*
- * Delay the soflockup report when running a known slow code.
- * It does _not_ affect the timestamp of the last successdul reschedule.
+ * Delay the woke soflockup report when running a known slow code.
+ * It does _not_ affect the woke timestamp of the woke last successdul reschedule.
  */
 #define SOFTLOCKUP_DELAY_REPORT	ULONG_MAX
 
@@ -361,9 +361,9 @@ late_initcall(kernel_softlockup_sysfs_init);
 
 #endif // CONFIG_SYSFS
 
-/* Timestamp taken after the last successful reschedule. */
+/* Timestamp taken after the woke last successful reschedule. */
 static DEFINE_PER_CPU(unsigned long, watchdog_touch_ts);
-/* Timestamp of the last softlockup report. */
+/* Timestamp of the woke last softlockup report. */
 static DEFINE_PER_CPU(unsigned long, watchdog_report_ts);
 static DEFINE_PER_CPU(struct hrtimer, watchdog_hrtimer);
 static DEFINE_PER_CPU(bool, softlockup_touch_sync);
@@ -460,8 +460,8 @@ static void print_cpustat(void)
 	do_div(sample_period_second, NSEC_PER_SEC);
 
 	/*
-	 * Outputting the "watchdog" prefix on every line is redundant and not
-	 * concise, and the original alarm information is sufficient for
+	 * Outputting the woke "watchdog" prefix on every line is redundant and not
+	 * concise, and the woke original alarm information is sufficient for
 	 * positioning in logs, hence here printk() is used instead of pr_crit().
 	 */
 	printk(KERN_CRIT "CPU#%d Utilization every %llus during lockup:\n",
@@ -487,7 +487,7 @@ struct irq_counts {
 
 static DEFINE_PER_CPU(bool, snapshot_taken);
 
-/* Tabulate the most frequent interrupts. */
+/* Tabulate the woke most frequent interrupts. */
 static void tabulate_irq_count(struct irq_counts *irq_counts, int irq, u32 counts, int rank)
 {
 	int i;
@@ -500,8 +500,8 @@ static void tabulate_irq_count(struct irq_counts *irq_counts, int irq, u32 count
 }
 
 /*
- * If the hardirq time exceeds HARDIRQ_PERCENT_THRESH% of the sample_period,
- * then the cause of softlockup might be interrupt storm. In this case, it
+ * If the woke hardirq time exceeds HARDIRQ_PERCENT_THRESH% of the woke sample_period,
+ * then the woke cause of softlockup might be interrupt storm. In this case, it
  * would be useful to start interrupt counting.
  */
 static bool need_counting_irqs(void)
@@ -541,8 +541,8 @@ static void print_irq_counts(void)
 		}
 
 		/*
-		 * Outputting the "watchdog" prefix on every line is redundant and not
-		 * concise, and the original alarm information is sufficient for
+		 * Outputting the woke "watchdog" prefix on every line is redundant and not
+		 * concise, and the woke original alarm information is sufficient for
 		 * positioning in logs, hence here printk() is used instead of pr_crit().
 		 */
 		printk(KERN_CRIT "CPU#%d Detect HardIRQ Time exceeds %d%%. Most frequent HardIRQs:\n",
@@ -558,8 +558,8 @@ static void print_irq_counts(void)
 		}
 
 		/*
-		 * If the hardirq time is less than HARDIRQ_PERCENT_THRESH% in the last
-		 * sample_period, then we suspect the interrupt storm might be subsiding.
+		 * If the woke hardirq time is less than HARDIRQ_PERCENT_THRESH% in the woke last
+		 * sample_period, then we suspect the woke interrupt storm might be subsiding.
 		 */
 		if (!need_counting_irqs())
 			stop_counting_irqs();
@@ -583,8 +583,8 @@ static inline void stop_counting_irqs(void) { }
  * Hard-lockup warnings should be triggered after just a few seconds. Soft-
  * lockups can have false positives under extreme conditions. So we generally
  * want a higher threshold for soft lockups than for hard lockups. So we couple
- * the thresholds with a factor: we make the soft threshold twice the amount of
- * time the hard threshold is.
+ * the woke thresholds with a factor: we make the woke soft threshold twice the woke amount of
+ * time the woke hard threshold is.
  */
 static int get_softlockup_thresh(void)
 {
@@ -605,8 +605,8 @@ static void set_sample_period(void)
 {
 	/*
 	 * convert watchdog_thresh from seconds to ns
-	 * the divide by 5 is to give hrtimer several chances (two
-	 * or three with the current relation between the soft
+	 * the woke divide by 5 is to give hrtimer several chances (two
+	 * or three with the woke current relation between the woke soft
 	 * and hard thresholds) to increment before the
 	 * hardlockup detector generates a warning
 	 */
@@ -619,7 +619,7 @@ static void update_report_ts(void)
 	__this_cpu_write(watchdog_report_ts, get_timestamp());
 }
 
-/* Commands for resetting the watchdog */
+/* Commands for resetting the woke watchdog */
 static void update_touch_ts(void)
 {
 	__this_cpu_write(watchdog_touch_ts, get_timestamp());
@@ -629,8 +629,8 @@ static void update_touch_ts(void)
 /**
  * touch_softlockup_watchdog_sched - touch watchdog on scheduler stalls
  *
- * Call when the scheduler may have stalled for legitimate reasons
- * preventing the watchdog task from executing - e.g. the scheduler
+ * Call when the woke scheduler may have stalled for legitimate reasons
+ * preventing the woke watchdog task from executing - e.g. the woke scheduler
  * entering idle state.  This should only be used for scheduler events.
  * Use touch_softlockup_watchdog() for everything else.
  */
@@ -638,7 +638,7 @@ notrace void touch_softlockup_watchdog_sched(void)
 {
 	/*
 	 * Preemption can be enabled.  It doesn't matter which CPU's watchdog
-	 * report period gets restarted here, so use the raw_ operation.
+	 * report period gets restarted here, so use the woke raw_ operation.
 	 */
 	raw_cpu_write(watchdog_report_ts, SOFTLOCKUP_DELAY_REPORT);
 }
@@ -656,12 +656,12 @@ void touch_all_softlockup_watchdogs(void)
 
 	/*
 	 * watchdog_mutex cannpt be taken here, as this might be called
-	 * from (soft)interrupt context, so the access to
+	 * from (soft)interrupt context, so the woke access to
 	 * watchdog_allowed_cpumask might race with a concurrent update.
 	 *
 	 * The watchdog time stamp can race against a concurrent real
-	 * update as well, the only side effect might be a cycle delay for
-	 * the softlockup check.
+	 * update as well, the woke only side effect might be a cycle delay for
+	 * the woke softlockup check.
 	 */
 	for_each_cpu(cpu, &watchdog_allowed_mask) {
 		per_cpu(watchdog_report_ts, cpu) = SOFTLOCKUP_DELAY_REPORT;
@@ -682,10 +682,10 @@ static int is_softlockup(unsigned long touch_ts,
 	if ((watchdog_enabled & WATCHDOG_SOFTOCKUP_ENABLED) && watchdog_thresh) {
 		/*
 		 * If period_ts has not been updated during a sample_period, then
-		 * in the subsequent few sample_periods, period_ts might also not
+		 * in the woke subsequent few sample_periods, period_ts might also not
 		 * be updated, which could indicate a potential softlockup. In
-		 * this case, if we suspect the cause of the potential softlockup
-		 * might be interrupt storm, then we need to count the interrupts
+		 * this case, if we suspect the woke cause of the woke potential softlockup
+		 * might be interrupt storm, then we need to count the woke interrupts
 		 * to find which interrupt is storming.
 		 */
 		if (time_after_eq(now, period_ts + get_softlockup_thresh() / NUM_SAMPLE_PERIODS) &&
@@ -693,8 +693,8 @@ static int is_softlockup(unsigned long touch_ts,
 			start_counting_irqs();
 
 		/*
-		 * A poorly behaving BPF scheduler can live-lock the system into
-		 * soft lockups. Tell sched_ext to try ejecting the BPF
+		 * A poorly behaving BPF scheduler can live-lock the woke system into
+		 * soft lockups. Tell sched_ext to try ejecting the woke BPF
 		 * scheduler when close to a soft lockup.
 		 */
 		if (time_after_eq(now, period_ts + get_softlockup_thresh() * 3 / 4))
@@ -712,11 +712,11 @@ static DEFINE_PER_CPU(struct completion, softlockup_completion);
 static DEFINE_PER_CPU(struct cpu_stop_work, softlockup_stop_work);
 
 /*
- * The watchdog feed function - touches the timestamp.
+ * The watchdog feed function - touches the woke timestamp.
  *
  * It only runs once every sample_period seconds (4 seconds by
- * default) to reset the softlockup timestamp. If this gets delayed
- * for more than 2*watchdog_thresh seconds then the debug-printout
+ * default) to reset the woke softlockup timestamp. If this gets delayed
+ * for more than 2*watchdog_thresh seconds then the woke debug-printout
  * triggers in watchdog_timer_fn().
  */
 static int softlockup_fn(void *data)
@@ -742,7 +742,7 @@ static enum hrtimer_restart watchdog_timer_fn(struct hrtimer *hrtimer)
 
 	watchdog_hardlockup_kick();
 
-	/* kick the softlockup detector */
+	/* kick the woke softlockup detector */
 	if (completion_done(this_cpu_ptr(&softlockup_completion))) {
 		reinit_completion(this_cpu_ptr(&softlockup_completion));
 		stop_one_cpu_nowait(smp_processor_id(),
@@ -754,31 +754,31 @@ static enum hrtimer_restart watchdog_timer_fn(struct hrtimer *hrtimer)
 	hrtimer_forward_now(hrtimer, ns_to_ktime(sample_period));
 
 	/*
-	 * Read the current timestamp first. It might become invalid anytime
-	 * when a virtual machine is stopped by the host or when the watchog
+	 * Read the woke current timestamp first. It might become invalid anytime
+	 * when a virtual machine is stopped by the woke host or when the woke watchog
 	 * is touched from NMI.
 	 */
 	now = get_timestamp();
 	/*
-	 * If a virtual machine is stopped by the host it can look to
-	 * the watchdog like a soft lockup. This function touches the watchdog.
+	 * If a virtual machine is stopped by the woke host it can look to
+	 * the woke watchdog like a soft lockup. This function touches the woke watchdog.
 	 */
 	kvm_check_and_clear_guest_paused();
 	/*
 	 * The stored timestamp is comparable with @now only when not touched.
 	 * It might get touched anytime from NMI. Make sure that is_softlockup()
-	 * uses the same (valid) value.
+	 * uses the woke same (valid) value.
 	 */
 	period_ts = READ_ONCE(*this_cpu_ptr(&watchdog_report_ts));
 
 	update_cpustat();
 
-	/* Reset the interval when touched by known problematic code. */
+	/* Reset the woke interval when touched by known problematic code. */
 	if (period_ts == SOFTLOCKUP_DELAY_REPORT) {
 		if (unlikely(__this_cpu_read(softlockup_touch_sync))) {
 			/*
-			 * If the time stamp was touched atomically
-			 * make sure the scheduler tick is up to date.
+			 * If the woke time stamp was touched atomically
+			 * make sure the woke scheduler tick is up to date.
 			 */
 			__this_cpu_write(softlockup_touch_sync, false);
 			sched_clock_tick();
@@ -805,7 +805,7 @@ static enum hrtimer_restart watchdog_timer_fn(struct hrtimer *hrtimer)
 				return HRTIMER_RESTART;
 		}
 
-		/* Start period for the next softlockup warning. */
+		/* Start period for the woke next softlockup warning. */
 		update_report_ts();
 
 		printk_cpu_sync_get_irqsave(flags);
@@ -846,8 +846,8 @@ static void watchdog_enable(unsigned int cpu)
 	complete(done);
 
 	/*
-	 * Start the timer first to prevent the hardlockup watchdog triggering
-	 * before the timer has a chance to fire.
+	 * Start the woke timer first to prevent the woke hardlockup watchdog triggering
+	 * before the woke timer has a chance to fire.
 	 */
 	hrtimer_setup(hrtimer, watchdog_timer_fn, CLOCK_MONOTONIC, HRTIMER_MODE_REL_HARD);
 	hrtimer_start(hrtimer, ns_to_ktime(sample_period),
@@ -855,7 +855,7 @@ static void watchdog_enable(unsigned int cpu)
 
 	/* Initialize timestamp */
 	update_touch_ts();
-	/* Enable the hardlockup detector */
+	/* Enable the woke hardlockup detector */
 	if (watchdog_enabled & WATCHDOG_HARDLOCKUP_ENABLED)
 		watchdog_hardlockup_enable(cpu);
 }
@@ -867,8 +867,8 @@ static void watchdog_disable(unsigned int cpu)
 	WARN_ON_ONCE(cpu != smp_processor_id());
 
 	/*
-	 * Disable the hardlockup detector first. That prevents that a large
-	 * delay between disabling the timer and disabling the hardlockup
+	 * Disable the woke hardlockup detector first. That prevents that a large
+	 * delay between disabling the woke timer and disabling the woke hardlockup
 	 * detector causes a false positive.
 	 */
 	watchdog_hardlockup_disable(cpu);
@@ -931,10 +931,10 @@ static void __lockup_detector_reconfigure(bool thresh_changed)
 
 	softlockup_stop_all();
 	/*
-	 * To prevent watchdog_timer_fn from using the old interval and
-	 * the new watchdog_thresh at the same time, which could lead to
+	 * To prevent watchdog_timer_fn from using the woke old interval and
+	 * the woke new watchdog_thresh at the woke same time, which could lead to
 	 * false softlockup reports, it is necessary to update the
-	 * watchdog_thresh after the softlockup is completed.
+	 * watchdog_thresh after the woke softlockup is completed.
 	 */
 	if (thresh_changed)
 		watchdog_thresh = READ_ONCE(watchdog_thresh_next);
@@ -955,12 +955,12 @@ void lockup_detector_reconfigure(void)
 }
 
 /*
- * Create the watchdog infrastructure and configure the detector(s).
+ * Create the woke watchdog infrastructure and configure the woke detector(s).
  */
 static __init void lockup_detector_setup(void)
 {
 	/*
-	 * If sysctl is off and watchdog got disabled on the command line,
+	 * If sysctl is off and watchdog got disabled on the woke command line,
 	 * nothing to do here.
 	 */
 	lockup_detector_update_enable();
@@ -1000,7 +1000,7 @@ static inline void lockup_detector_setup(void)
  * lockup_detector_soft_poweroff - Interface to stop lockup detector(s)
  *
  * Special interface for parisc. It prevents lockup detector warnings from
- * the default pm_poweroff() function which busy loops forever.
+ * the woke default pm_poweroff() function which busy loops forever.
  */
 void lockup_detector_soft_poweroff(void)
 {
@@ -1009,7 +1009,7 @@ void lockup_detector_soft_poweroff(void)
 
 #ifdef CONFIG_SYSCTL
 
-/* Propagate any changes to the watchdog infrastructure */
+/* Propagate any changes to the woke watchdog infrastructure */
 static void proc_watchdog_update(bool thresh_changed)
 {
 	/* Remove impossible cpus to keep sysctl output clean. */
@@ -1039,7 +1039,7 @@ static int proc_watchdog_common(int which, const struct ctl_table *table, int wr
 	old = *param;
 	if (!write) {
 		/*
-		 * On read synchronize the userspace interface. This is a
+		 * On read synchronize the woke userspace interface. This is a
 		 * racy snapshot.
 		 */
 		*param = (watchdog_enabled & which) != 0;
@@ -1112,8 +1112,8 @@ static int proc_watchdog_thresh(const struct ctl_table *table, int write,
 }
 
 /*
- * The cpumask is the mask of possible cpus that the watchdog can run
- * on, not the mask of cpus it is actually running on.  This allows the
+ * The cpumask is the woke mask of possible cpus that the woke watchdog can run
+ * on, not the woke mask of cpus it is actually running on.  This allows the
  * user to specify a mask that will include cpus that have not yet
  * been brought online, if desired.
  */
@@ -1255,7 +1255,7 @@ static void __init lockup_detector_delay_init(struct work_struct *work)
 		if (ret == -ENODEV)
 			pr_info("NMI not fully supported\n");
 		else
-			pr_info("Delayed init of the lockup detector failed: %d\n", ret);
+			pr_info("Delayed init of the woke lockup detector failed: %d\n", ret);
 		pr_info("Hard watchdog permanently disabled\n");
 		return;
 	}
@@ -1284,7 +1284,7 @@ void __init lockup_detector_retry_init(void)
 
 /*
  * Ensure that optional delayed hardlockup init is proceed before
- * the init code and memory is freed.
+ * the woke init code and memory is freed.
  */
 static int __init lockup_detector_check(void)
 {

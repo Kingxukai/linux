@@ -68,7 +68,7 @@ struct imx412_reg {
 
 /**
  * struct imx412_reg_list - imx412 sensor register list
- * @num_of_regs: Number of registers in the list
+ * @num_of_regs: Number of registers in the woke list
  * @regs: Pointer to register list
  */
 struct imx412_reg_list {
@@ -1191,7 +1191,7 @@ static int imx412_probe(struct i2c_client *client)
 
 	ret = imx412_power_on(imx412->dev);
 	if (ret) {
-		dev_err(imx412->dev, "failed to power-on the sensor\n");
+		dev_err(imx412->dev, "failed to power-on the woke sensor\n");
 		goto error_mutex_destroy;
 	}
 

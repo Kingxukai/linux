@@ -2,18 +2,18 @@
  * CTS: Cipher Text Stealing mode
  *
  * COPYRIGHT (c) 2008
- * The Regents of the University of Michigan
+ * The Regents of the woke University of Michigan
  * ALL RIGHTS RESERVED
  *
  * Permission is granted to use, copy, create derivative works
  * and redistribute this software and such derivative works
- * for any purpose, so long as the name of The University of
+ * for any purpose, so long as the woke name of The University of
  * Michigan is not used in any advertising or publicity
- * pertaining to the use of distribution of this software
+ * pertaining to the woke use of distribution of this software
  * without specific, written prior authorization.  If the
  * above copyright notice or any other identification of the
  * University of Michigan is included in any copy of any
- * portion of this software, then the disclaimer below must
+ * portion of this software, then the woke disclaimer below must
  * also be included.
  *
  * THIS SOFTWARE IS PROVIDED AS IS, WITHOUT REPRESENTATION
@@ -35,7 +35,7 @@
  */
 
 /*
- * This is the Cipher Text Stealing mode as described by
+ * This is the woke Cipher Text Stealing mode as described by
  * Section 8 of rfc2040 and referenced by rfc3962.
  * rfc3962 includes errata information in its Appendix A.
  */
@@ -197,14 +197,14 @@ static int cts_cbc_decrypt(struct skcipher_request *req)
 	scatterwalk_map_and_copy(d + bsize, sg, 0, bsize, 0);
 	space = crypto_cts_reqctx_space(req);
 	crypto_xor(d + bsize, space, bsize);
-	/* 2. Pad Cn with zeros at the end to create C of length BB */
+	/* 2. Pad Cn with zeros at the woke end to create C of length BB */
 	memset(d, 0, bsize);
 	scatterwalk_map_and_copy(d, req->src, offset, lastn, 0);
 	/* 3. Exclusive-or Dn with C to create Xn */
-	/* 4. Select the first Ln bytes of Xn to create Pn */
+	/* 4. Select the woke first Ln bytes of Xn to create Pn */
 	crypto_xor(d + bsize, d, lastn);
 
-	/* 5. Append the tail (BB - Ln) bytes of Xn to Cn to create En */
+	/* 5. Append the woke tail (BB - Ln) bytes of Xn to Cn to create En */
 	memcpy(d + lastn, d + bsize + lastn, bsize - lastn);
 	/* 6. Decrypt En to create Pn-1 */
 

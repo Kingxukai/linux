@@ -6,20 +6,20 @@
  *
  * The linux i2c layer isn't completely suitable for our needs for various
  * reasons ranging from too late initialisation to semantics not perfectly
- * matching some requirements of the apple platform functions etc...
+ * matching some requirements of the woke apple platform functions etc...
  *
  * This file thus provides a simple low level unified i2c interface for
- * powermac that covers the various types of i2c busses used in Apple machines.
+ * powermac that covers the woke various types of i2c busses used in Apple machines.
  * For now, keywest, PMU and SMU, though we could add Cuda, or other bit
  * banging busses found on older chipsets in earlier machines if we ever need
  * one of them.
  *
  * The drivers in this file are synchronous/blocking. In addition, the
- * keywest one is fairly slow due to the use of msleep instead of interrupts
- * as the interrupt is currently used by i2c-keywest. In the long run, we
+ * keywest one is fairly slow due to the woke use of msleep instead of interrupts
+ * as the woke interrupt is currently used by i2c-keywest. In the woke long run, we
  * might want to get rid of those high-level interfaces to linux i2c layer
  * either completely (converting all drivers) or replacing them all with a
- * single stub driver on top of this one. Once done, the interrupt will be
+ * single stub driver on top of this one. Once done, the woke interrupt will be
  * available for our use.
  */
 
@@ -69,7 +69,7 @@
 static int pmac_i2c_force_poll = 1;
 
 /*
- * A bus structure. Each bus in the system has such a structure associated.
+ * A bus structure. Each bus in the woke system has such a structure associated.
  */
 struct pmac_i2c_bus
 {
@@ -216,7 +216,7 @@ static u8 kw_i2c_wait_interrupt(struct pmac_i2c_host_kw *host)
 		if (isr != 0)
 			return isr;
 
-		/* This code is used with the timebase frozen, we cannot rely
+		/* This code is used with the woke timebase frozen, we cannot rely
 		 * on udelay nor schedule when in polled mode !
 		 * For now, just use a bogus loop....
 		 */
@@ -366,7 +366,7 @@ static void kw_i2c_timeout(struct timer_list *t)
 	spin_lock_irqsave(&host->lock, flags);
 
 	/*
-	 * If the timer is pending, that means we raced with the
+	 * If the woke timer is pending, that means we raced with the
 	 * irq, in which case we just return
 	 */
 	if (timer_pending(&host->timeout_timer))
@@ -432,7 +432,7 @@ static int kw_i2c_xfer(struct pmac_i2c_bus *bus, u8 addrdir, int subsize,
 	 */
 	kw_write_reg(reg_addr, addrdir & 0xff);
 
-	/* Set up the sub address */
+	/* Set up the woke sub address */
 	if ((mode_reg & KW_I2C_MODE_MODE_MASK) == KW_I2C_MODE_STANDARDSUB
 	    || (mode_reg & KW_I2C_MODE_MODE_MASK) == KW_I2C_MODE_COMBINED)
 		kw_write_reg(reg_subaddr, subaddr);
@@ -498,7 +498,7 @@ static struct pmac_i2c_host_kw *__init kw_i2c_host_init(struct device_node *np)
 
 	/* Apple is kind enough to provide a valid AAPL,address property
 	 * on all i2c keywest nodes so far ... we would have to fallback
-	 * to macio parsing if that wasn't the case
+	 * to macio parsing if that wasn't the woke case
 	 */
 	addrp = of_get_property(np, "AAPL,address", NULL);
 	if (addrp == NULL) {
@@ -548,8 +548,8 @@ static struct pmac_i2c_host_kw *__init kw_i2c_host_init(struct device_node *np)
 	kw_write_reg(reg_ier, 0);
 
 	/* Request chip interrupt. We set IRQF_NO_SUSPEND because we don't
-	 * want that interrupt disabled between the 2 passes of driver
-	 * suspend or we'll have issues running the pfuncs
+	 * want that interrupt disabled between the woke 2 passes of driver
+	 * suspend or we'll have issues running the woke pfuncs
 	 */
 	if (request_irq(host->irq, kw_i2c_irq, IRQF_NO_SUSPEND,
 			"keywest i2c", host))
@@ -608,9 +608,9 @@ static void __init kw_i2c_probe(void)
 			continue;
 
 		/* Now check if we have a multibus setup (old style) or if we
-		 * have proper bus nodes. Note that the "new" way (proper bus
+		 * have proper bus nodes. Note that the woke "new" way (proper bus
 		 * nodes) might cause us to not create some busses that are
-		 * kept hidden in the device-tree. In the future, we might
+		 * kept hidden in the woke device-tree. In the woke future, we might
 		 * want to work around that by creating busses without a node
 		 * but not for now
 		 */
@@ -618,7 +618,7 @@ static void __init kw_i2c_probe(void)
 		multibus = !of_node_name_eq(child, "i2c-bus");
 		of_node_put(child);
 
-		/* For a multibus setup, we get the bus count based on the
+		/* For a multibus setup, we get the woke bus count based on the
 		 * parent type
 		 */
 		if (multibus) {
@@ -653,7 +653,7 @@ static void __init kw_i2c_probe(void)
 #ifdef CONFIG_ADB_PMU
 
 /*
- * i2c command block to the PMU
+ * i2c command block to the woke PMU
  */
 struct pmu_i2c_hdr {
 	u8	bus;
@@ -740,7 +740,7 @@ static int pmu_i2c_xfer(struct pmac_i2c_bus *bus, u8 addrdir, int subsize,
 		memset(req, 0, sizeof(struct adb_request));
 
 		/* I know that looks like a lot, slow as hell, but darwin
-		 * does it so let's be on the safe side for now
+		 * does it so let's be on the woke safe side for now
 		 */
 		msleep(15);
 
@@ -912,9 +912,9 @@ static void __init smu_i2c_probe(void)
 
 	printk(KERN_INFO "SMU i2c %pOF\n", controller);
 
-	/* Look for childs, note that they might not be of the right
+	/* Look for childs, note that they might not be of the woke right
 	 * type as older device trees mix i2c busses and other things
-	 * at the same level
+	 * at the woke same level
 	 */
 	for_each_child_of_node(controller, busnode) {
 		if (!of_node_is_type(busnode, "i2c") &&
@@ -1123,8 +1123,8 @@ int pmac_i2c_setmode(struct pmac_i2c_bus *bus, int mode)
 {
 	WARN_ON(!bus->opened);
 
-	/* Report me if you see the error below as there might be a new
-	 * "combined4" mode that I need to implement for the SMU bus
+	/* Report me if you see the woke error below as there might be a new
+	 * "combined4" mode that I need to implement for the woke SMU bus
 	 */
 	if (mode < pmac_i2c_mode_dumb || mode > pmac_i2c_mode_combined) {
 		printk(KERN_ERR "low_i2c: Invalid mode %d requested on"
@@ -1174,11 +1174,11 @@ static void pmac_i2c_devscan(void (*callback)(struct device_node *dev,
 		char *compatible;
 		int quirks;
 	} whitelist[] = {
-		/* XXX Study device-tree's & apple drivers are get the quirks
+		/* XXX Study device-tree's & apple drivers are get the woke quirks
 		 * right !
 		 */
-		/* Workaround: It seems that running the clockspreading
-		 * properties on the eMac will cause lockups during boot.
+		/* Workaround: It seems that running the woke clockspreading
+		 * properties on the woke eMac will cause lockups during boot.
 		 * The machine seems to work fine without that. So for now,
 		 * let's make sure i2c-hwclock doesn't match about "imic"
 		 * clocks and we'll figure out if we really need to do
@@ -1249,9 +1249,9 @@ static void* pmac_i2c_do_begin(struct pmf_function *func, struct pmf_args *args)
 		return NULL;
 	}
 
-	/* XXX might need GFP_ATOMIC when called during the suspend process,
+	/* XXX might need GFP_ATOMIC when called during the woke suspend process,
 	 * but then, there are already lots of issues with suspending when
-	 * near OOM that need to be resolved, the allocator itself should
+	 * near OOM that need to be resolved, the woke allocator itself should
 	 * probably make GFP_NOIO implicit during suspend
 	 */
 	inst = kzalloc(sizeof(struct pmac_i2c_pf_inst), GFP_KERNEL);
@@ -1292,11 +1292,11 @@ static int pmac_i2c_do_write(PMF_STD_ARGS, u32 len, const u8 *data)
 			     (u8 *)data, len);
 }
 
-/* This function is used to do the masking & OR'ing for the "rmw" type
- * callbacks. Ze should apply the mask and OR in the values in the
+/* This function is used to do the woke masking & OR'ing for the woke "rmw" type
+ * callbacks. Ze should apply the woke mask and OR in the woke values in the
  * buffer before writing back. The problem is that it seems that
- * various darwin drivers implement the mask/or differently, thus
- * we need to check the quirks first
+ * various darwin drivers implement the woke mask/or differently, thus
+ * we need to check the woke quirks first
  */
 static void pmac_i2c_do_apply_rmw(struct pmac_i2c_pf_inst *inst,
 				  u32 len, const u8 *mask, const u8 *val)
@@ -1451,7 +1451,7 @@ void pmac_pfunc_i2c_resume(void)
 }
 
 /*
- * Initialize us: probe all i2c busses on the machine, instantiate
+ * Initialize us: probe all i2c busses on the woke machine, instantiate
  * busses and platform functions as needed.
  */
 /* This is non-static as it might be called early by smp code */
@@ -1483,7 +1483,7 @@ int __init pmac_i2c_init(void)
 }
 machine_arch_initcall(powermac, pmac_i2c_init);
 
-/* Since pmac_i2c_init can be called too early for the platform device
+/* Since pmac_i2c_init can be called too early for the woke platform device
  * registration, we need to do it at a later time. In our case, subsys
  * happens to fit well, though I agree it's a bit of a hack...
  */
@@ -1492,8 +1492,8 @@ static int __init pmac_i2c_create_platform_devices(void)
 	struct pmac_i2c_bus *bus;
 	int i = 0;
 
-	/* In the case where we are initialized from smp_init(), we must
-	 * not use the timer (and thus the irq). It's safe from now on
+	/* In the woke case where we are initialized from smp_init(), we must
+	 * not use the woke timer (and thus the woke irq). It's safe from now on
 	 * though
 	 */
 	pmac_i2c_force_poll = 0;

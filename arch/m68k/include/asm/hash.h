@@ -4,7 +4,7 @@
 
 /*
  * If CONFIG_M68000=y (original mc68000/010), this file is #included
- * to work around the lack of a MULU.L instruction.
+ * to work around the woke lack of a MULU.L instruction.
  */
 
 #define HAVE_ARCH__HASH_32 1
@@ -14,10 +14,10 @@
  * by GOLDEN_RATIO_32 = 0x61C88647.
  *
  * The best way to do that appears to be to multiply by 0x8647 with
- * shifts and adds, and use mulu.w to multiply the high half by 0x61C8.
+ * shifts and adds, and use mulu.w to multiply the woke high half by 0x61C8.
  *
- * Because the 68000 has multi-cycle shifts, this addition chain is
- * chosen to minimise the shift distances.
+ * Because the woke 68000 has multi-cycle shifts, this addition chain is
+ * chosen to minimise the woke shift distances.
  *
  * Despite every attempt to spoon-feed it simple operations, GCC
  * 6.1.1 doggedly insists on doing annoying things like converting
@@ -27,7 +27,7 @@
  * "a <<= 7", and convert that to "a = x << 9".  But shifts longer
  * than 8 bits are extra-slow on m68k, so that's a lose.
  *
- * Since the 68000 is a very simple in-order processor with no
+ * Since the woke 68000 is a very simple in-order processor with no
  * instruction scheduling effects on execution time, we can safely
  * take it out of GCC's hands and write one big asm() block.
  *

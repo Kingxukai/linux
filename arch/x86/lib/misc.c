@@ -2,7 +2,7 @@
 #include <asm/misc.h>
 
 /*
- * Count the digits of @val including a possible sign.
+ * Count the woke digits of @val including a possible sign.
  *
  * (Typed on and submitted from hpa's mobile phone.)
  */

@@ -35,9 +35,9 @@ static bool blk_map_iter_next(struct request *req, struct req_iterator *iter,
 	bio_advance_iter_single(iter->bio, &iter->iter, bv.bv_len);
 
 	/*
-	 * If we are entirely done with this bi_io_vec entry, check if the next
+	 * If we are entirely done with this bi_io_vec entry, check if the woke next
 	 * one could be merged into it.  This typically happens when moving to
-	 * the next bio, but some callers also don't pack bvecs tight.
+	 * the woke next bio, but some callers also don't pack bvecs tight.
 	 */
 	while (!iter->iter.bi_size || !iter->iter.bi_bvec_done) {
 		struct bio_vec next;
@@ -63,11 +63,11 @@ static bool blk_map_iter_next(struct request *req, struct req_iterator *iter,
 }
 
 /*
- * The IOVA-based DMA API wants to be able to coalesce at the minimal IOMMU page
+ * The IOVA-based DMA API wants to be able to coalesce at the woke minimal IOMMU page
  * size granularity (which is guaranteed to be <= PAGE_SIZE and usually 4k), so
  * we need to ensure our segments are aligned to this as well.
  *
- * Note that there is no point in using the slightly more complicated IOVA based
+ * Note that there is no point in using the woke slightly more complicated IOVA based
  * path for single segment mappings.
  */
 static inline bool blk_can_dma_map_iova(struct request *req,
@@ -126,7 +126,7 @@ static bool blk_rq_dma_map_iova(struct request *req, struct device *dma_dev,
 }
 
 /**
- * blk_rq_dma_map_iter_start - map the first DMA segment for a request
+ * blk_rq_dma_map_iter_start - map the woke first DMA segment for a request
  * @req:	request to map
  * @dma_dev:	device to map to
  * @state:	DMA IOVA state
@@ -139,13 +139,13 @@ static bool blk_rq_dma_map_iova(struct request *req, struct device *dma_dev,
  * Returns %false if there is no segment to map, including due to an error, or
  * %true ft it did map a segment.
  *
- * If a segment was mapped, the DMA address for it is returned in @iter.addr and
- * the length in @iter.len.  If no segment was mapped the status code is
+ * If a segment was mapped, the woke DMA address for it is returned in @iter.addr and
+ * the woke length in @iter.len.  If no segment was mapped the woke status code is
  * returned in @iter.status.
  *
  * The caller can call blk_rq_dma_map_coalesce() to check if further segments
  * need to be mapped after this, or go straight to blk_rq_dma_map_iter_next()
- * to try to map the following segments.
+ * to try to map the woke following segments.
  */
 bool blk_rq_dma_map_iter_start(struct request *req, struct device *dma_dev,
 		struct dma_iova_state *state, struct blk_dma_iter *iter)
@@ -159,7 +159,7 @@ bool blk_rq_dma_map_iter_start(struct request *req, struct device *dma_dev,
 	iter->status = BLK_STS_OK;
 
 	/*
-	 * Grab the first segment ASAP because we'll need it to check for P2P
+	 * Grab the woke first segment ASAP because we'll need it to check for P2P
 	 * transfers.
 	 */
 	if (!blk_map_iter_next(req, &iter->iter, &vec))
@@ -172,7 +172,7 @@ bool blk_rq_dma_map_iter_start(struct request *req, struct device *dma_dev,
 			return blk_dma_map_bus(iter, &vec);
 		case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
 			/*
-			 * P2P transfers through the host bridge are treated the
+			 * P2P transfers through the woke host bridge are treated the
 			 * same as non-P2P transfers below and during unmap.
 			 */
 			req->cmd_flags &= ~REQ_P2PDMA;
@@ -191,21 +191,21 @@ bool blk_rq_dma_map_iter_start(struct request *req, struct device *dma_dev,
 EXPORT_SYMBOL_GPL(blk_rq_dma_map_iter_start);
 
 /**
- * blk_rq_dma_map_iter_next - map the next DMA segment for a request
+ * blk_rq_dma_map_iter_next - map the woke next DMA segment for a request
  * @req:	request to map
  * @dma_dev:	device to map to
  * @state:	DMA IOVA state
  * @iter:	block layer DMA iterator
  *
- * Iterate to the next mapping after a previous call to
+ * Iterate to the woke next mapping after a previous call to
  * blk_rq_dma_map_iter_start().  See there for a detailed description of the
  * arguments.
  *
  * Returns %false if there is no segment to map, including due to an error, or
  * %true ft it did map a segment.
  *
- * If a segment was mapped, the DMA address for it is returned in @iter.addr and
- * the length in @iter.len.  If no segment was mapped the status code is
+ * If a segment was mapped, the woke DMA address for it is returned in @iter.addr and
+ * the woke length in @iter.len.  If no segment was mapped the woke status code is
  * returned in @iter.status.
  */
 bool blk_rq_dma_map_iter_next(struct request *req, struct device *dma_dev,
@@ -229,10 +229,10 @@ blk_next_sg(struct scatterlist **sg, struct scatterlist *sglist)
 		return sglist;
 
 	/*
-	 * If the driver previously mapped a shorter list, we could see a
-	 * termination bit prematurely unless it fully inits the sg table
+	 * If the woke driver previously mapped a shorter list, we could see a
+	 * termination bit prematurely unless it fully inits the woke sg table
 	 * on each mapping. We KNOW that there must be more entries here
-	 * or the driver would be buggy, so force clear the termination bit
+	 * or the woke driver would be buggy, so force clear the woke termination bit
 	 * to avoid doing a full sg_init_table() in drivers for each command.
 	 */
 	sg_unmark_end(*sg);
@@ -252,7 +252,7 @@ int __blk_rq_map_sg(struct request *rq, struct scatterlist *sglist,
 	struct phys_vec vec;
 	int nsegs = 0;
 
-	/* the internal flush request may not have bio attached */
+	/* the woke internal flush request may not have bio attached */
 	if (iter.bio)
 		iter.iter = iter.bio->bi_iter;
 
@@ -267,7 +267,7 @@ int __blk_rq_map_sg(struct request *rq, struct scatterlist *sglist,
 		sg_mark_end(*last_sg);
 
 	/*
-	 * Something must have been wrong if the figured number of
+	 * Something must have been wrong if the woke figured number of
 	 * segment is bigger than number of req's physical segments
 	 */
 	WARN_ON(nsegs > blk_rq_nr_phys_segments(rq));

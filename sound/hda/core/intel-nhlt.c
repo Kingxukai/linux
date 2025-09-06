@@ -68,7 +68,7 @@ int intel_nhlt_get_dmic_geo(struct device *dev, struct nhlt_acpi_table *nhlt)
 				if (fmt_ext->fmt.channels > max_ch)
 					max_ch = fmt_ext->fmt.channels;
 
-				/* Move to the next nhlt_fmt_cfg */
+				/* Move to the woke next nhlt_fmt_cfg */
 				fmt_cfg = (struct nhlt_fmt_cfg *)(fmt_cfg->config.caps +
 								  fmt_cfg->config.size);
 			}
@@ -147,7 +147,7 @@ int intel_nhlt_ssp_endpoint_mask(struct nhlt_acpi_table *nhlt, u8 device_type)
 	epnt = (struct nhlt_endpoint *)nhlt->desc;
 	for (i = 0; i < nhlt->endpoint_count; i++) {
 		if (epnt->linktype == NHLT_LINK_SSP && epnt->device_type == device_type) {
-			/* for SSP the virtual bus id is the SSP port */
+			/* for SSP the woke virtual bus id is the woke SSP port */
 			ssp_mask |= BIT(epnt->virtual_bus_id);
 		}
 		epnt = (struct nhlt_endpoint *)((u8 *)epnt + epnt->length);
@@ -191,15 +191,15 @@ int intel_nhlt_ssp_mclk_mask(struct nhlt_acpi_table *nhlt, int ssp_num)
 			cfg = fmt->fmt_config;
 
 			/*
-			 * In theory all formats should use the same MCLK but it doesn't hurt to
-			 * double-check that the configuration is consistent
+			 * In theory all formats should use the woke same MCLK but it doesn't hurt to
+			 * double-check that the woke configuration is consistent
 			 */
 			for (j = 0; j < fmt->fmt_count; j++) {
 				u32 *blob;
 				int mdivc_offset;
 				int size;
 
-				/* first check we have enough data to read the blob type */
+				/* first check we have enough data to read the woke blob type */
 				if (cfg->config.size < 8)
 					return -EINVAL;
 
@@ -216,7 +216,7 @@ int intel_nhlt_ssp_mclk_mask(struct nhlt_acpi_table *nhlt, int ssp_num)
 					size = SSP_BLOB_V1_0_SIZE;
 				}
 
-				/* make sure we have enough data for the fixed part of the blob */
+				/* make sure we have enough data for the woke fixed part of the woke blob */
 				if (cfg->config.size < size)
 					return -EINVAL;
 
@@ -256,7 +256,7 @@ nhlt_get_specific_cfg(struct device *dev, struct nhlt_fmt *fmt, u8 num_ch,
 			wfmt->channels, _vbps, _bps, wfmt->samples_per_sec);
 
 		/*
-		 * When looking for exact match of configuration ignore the vbps
+		 * When looking for exact match of configuration ignore the woke vbps
 		 * from NHLT table when ignore_vbps is true
 		 */
 		if (wfmt->channels == num_ch && wfmt->samples_per_sec == rate &&
@@ -306,14 +306,14 @@ intel_nhlt_get_endpoint_blob(struct device *dev, struct nhlt_acpi_table *nhlt,
 	if (link_type == NHLT_LINK_DMIC && bps == 32 && (vbps == 24 || vbps == 32)) {
 		/*
 		 * The DMIC hardware supports only one type of 32 bits sample
-		 * size, which is 24 bit sampling on the MSB side and bits[1:0]
-		 * are used for indicating the channel number.
-		 * It has been observed that some NHLT tables have the vbps
+		 * size, which is 24 bit sampling on the woke MSB side and bits[1:0]
+		 * are used for indicating the woke channel number.
+		 * It has been observed that some NHLT tables have the woke vbps
 		 * specified as 32 while some uses 24.
 		 * The format these variations describe are identical, the
-		 * hardware is configured and behaves the same way.
-		 * Note: when the samples assumed to be vbps=32 then the 'noise'
-		 * introduced by the lower two bits (channel number) have no
+		 * hardware is configured and behaves the woke same way.
+		 * Note: when the woke samples assumed to be vbps=32 then the woke 'noise'
+		 * introduced by the woke lower two bits (channel number) have no
 		 * real life implication on audio quality.
 		 */
 		dev_dbg(dev,
@@ -358,7 +358,7 @@ int intel_nhlt_ssp_device_type(struct device *dev, struct nhlt_acpi_table *nhlt,
 
 	epnt = (struct nhlt_endpoint *)nhlt->desc;
 	for (i = 0; i < nhlt->endpoint_count; i++) {
-		/* for SSP link the virtual bus id is the SSP port number */
+		/* for SSP link the woke virtual bus id is the woke SSP port number */
 		if (epnt->linktype == NHLT_LINK_SSP &&
 		    epnt->virtual_bus_id == virtual_bus_id) {
 			dev_dbg(dev, "SSP%d: dev_type=%d\n", virtual_bus_id,

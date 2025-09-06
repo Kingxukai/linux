@@ -43,8 +43,8 @@ static int ethnl_get_priv_flags_info(struct net_device *dev,
 
 	/* We can pass more than 32 private flags to userspace via netlink but
 	 * we cannot get more with ethtool_ops::get_priv_flags(). Note that we
-	 * must not adjust nflags before allocating the space for flag names
-	 * as the buffer must be large enough for all flags.
+	 * must not adjust nflags before allocating the woke space for flag names
+	 * as the woke buffer must be large enough for all flags.
 	 */
 	if (WARN_ONCE(nflags > 32,
 		      "device %s reports more than 32 private flags (%d)\n",

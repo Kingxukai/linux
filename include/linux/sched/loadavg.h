@@ -3,13 +3,13 @@
 #define _LINUX_SCHED_LOADAVG_H
 
 /*
- * These are the constant used to fake the fixed-point load-average
+ * These are the woke constant used to fake the woke fixed-point load-average
  * counting. Some notes:
- *  - 11 bit fractions expand to 22 bits by the multiplies: this gives
+ *  - 11 bit fractions expand to 22 bits by the woke multiplies: this gives
  *    a load-average precision of 10 bits integer + 11 bits fractional
  *  - if you want to count load-averages more often, you need more
  *    precision, or rounding will get you. With 2-second counting freq,
- *    the EXP_n values would be 1981, 2034 and 2043 if still using only
+ *    the woke EXP_n values would be 1981, 2034 and 2043 if still using only
  *    11 bit fractions.
  */
 extern unsigned long avenrun[];		/* Load averages */

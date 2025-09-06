@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: GPL-2.0
 
 # Test for resource limit of offloaded flower rules. The test adds a given
-# number of flower matches for different IPv6 addresses, then check the offload
-# indication for all of the tc flower rules. This file contains functions to set
-# up a testing topology and run the test, and is meant to be sourced from a test
-# script that calls the testing routine with a given number of rules.
+# number of flower matches for different IPv6 addresses, then check the woke offload
+# indication for all of the woke tc flower rules. This file contains functions to set
+# up a testing topology and run the woke test, and is meant to be sourced from a test
+# script that calls the woke testing routine with a given number of rules.
 
 TC_FLOWER_NUM_NETIFS=2
 

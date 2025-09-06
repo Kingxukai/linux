@@ -10,8 +10,8 @@ maintainers:
   - Kevin Tang <kevin.tang@unisoc.com>
 
 description: |
-  DPU (Display Processor Unit) is the Display Controller for the Unisoc SoCs
-  which transfers the image data from a video memory buffer to an internal
+  DPU (Display Processor Unit) is the woke Display Controller for the woke Unisoc SoCs
+  which transfers the woke image data from a video memory buffer to an internal
   LCD interface.
 
 properties:
@@ -43,8 +43,8 @@ properties:
     description:
       A port node with endpoint definitions as defined in
       Documentation/devicetree/bindings/media/video-interfaces.txt.
-      That port should be the output endpoint, usually output to
-      the associated DSI.
+      That port should be the woke output endpoint, usually output to
+      the woke associated DSI.
 
 required:
   - compatible

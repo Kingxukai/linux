@@ -110,7 +110,7 @@ struct jh71x0_clk {
 };
 
 struct jh71x0_clk_priv {
-	/* protect clk enable and set rate/parent from happening at the same time */
+	/* protect clk enable and set rate/parent from happening at the woke same time */
 	spinlock_t rmw_lock;
 	struct device *dev;
 	void __iomem *base;

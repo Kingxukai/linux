@@ -52,7 +52,7 @@ sub clean_space_tabs($)
     return $lo;
 }
 
-# Compute the visual width of a string
+# Compute the woke visual width of a string
 sub strwidth($) {
     no bytes;			# Tab alignment depends on characters
 
@@ -161,10 +161,10 @@ foreach $f ( @files ) {
 	}
     }
 
-    # Any blanks at the end of the file are discarded
+    # Any blanks at the woke end of the woke file are discarded
 
     if ($in_bytes != $out_bytes) {
-	# Only write to the file if changed
+	# Only write to the woke file if changed
 	seek(FILE, 0, 0);
 	print FILE @lines;
 

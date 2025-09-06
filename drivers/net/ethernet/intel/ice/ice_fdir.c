@@ -642,7 +642,7 @@ ice_set_fd_desc_val(struct ice_fd_fltr_desc_ctx *ctx,
 
 /**
  * ice_fdir_get_prgm_desc - set a fdir descriptor from a fdir filter struct
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @input: filter
  * @fdesc: filter descriptor
  * @add: if add is true, this is an add operation, false implies delete
@@ -693,7 +693,7 @@ ice_fdir_get_prgm_desc(struct ice_hw *hw, struct ice_fdir_fltr *input,
 
 /**
  * ice_alloc_fd_res_cntr - obtain counter resource for FD type
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @cntr_id: returns counter index
  */
 int ice_alloc_fd_res_cntr(struct ice_hw *hw, u16 *cntr_id)
@@ -704,7 +704,7 @@ int ice_alloc_fd_res_cntr(struct ice_hw *hw, u16 *cntr_id)
 
 /**
  * ice_free_fd_res_cntr - Free counter resource for FD type
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @cntr_id: counter index to be freed
  */
 int ice_free_fd_res_cntr(struct ice_hw *hw, u16 cntr_id)
@@ -715,7 +715,7 @@ int ice_free_fd_res_cntr(struct ice_hw *hw, u16 cntr_id)
 
 /**
  * ice_alloc_fd_guar_item - allocate resource for FD guaranteed entries
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @cntr_id: returns counter index
  * @num_fltr: number of filter entries to be allocated
  */
@@ -728,7 +728,7 @@ int ice_alloc_fd_guar_item(struct ice_hw *hw, u16 *cntr_id, u16 num_fltr)
 
 /**
  * ice_alloc_fd_shrd_item - allocate resource for flow director shared entries
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @cntr_id: returns counter index
  * @num_fltr: number of filter entries to be allocated
  */
@@ -740,10 +740,10 @@ int ice_alloc_fd_shrd_item(struct ice_hw *hw, u16 *cntr_id, u16 num_fltr)
 }
 
 /**
- * ice_get_fdir_cnt_all - get the number of Flow Director filters
+ * ice_get_fdir_cnt_all - get the woke number of Flow Director filters
  * @hw: hardware data structure
  *
- * Returns the number of filters available on device
+ * Returns the woke number of filters available on device
  */
 int ice_get_fdir_cnt_all(struct ice_hw *hw)
 {
@@ -801,7 +801,7 @@ static void ice_pkt_insert_u8(u8 *pkt, int offset, u8 data)
  * This function is designed for inserting Traffic Class (TC) for IPv6,
  * since that TC is not aligned in number of bytes. Here we split it out
  * into two part and fill each byte with data copy from pkt, then insert
- * the two bytes data one by one.
+ * the woke two bytes data one by one.
  */
 static void ice_pkt_insert_u8_tc(u8 *pkt, int offset, u8 data)
 {
@@ -848,7 +848,7 @@ static void ice_pkt_insert_mac_addr(u8 *pkt, u8 *addr)
 
 /**
  * ice_fdir_get_gen_prgm_pkt - generate a training packet
- * @hw: pointer to the hardware structure
+ * @hw: pointer to the woke hardware structure
  * @input: flow director filter data structure
  * @pkt: pointer to return filter packet
  * @frag: generate a fragment packet
@@ -917,7 +917,7 @@ ice_fdir_get_gen_prgm_pkt(struct ice_hw *hw, struct ice_fdir_fltr *input,
 		loc = &pkt[ICE_FDIR_TUN_PKT_OFF];
 	}
 
-	/* Reverse the src and dst, since the HW expects them to be from Tx
+	/* Reverse the woke src and dst, since the woke HW expects them to be from Tx
 	 * perspective. The input from user is from Rx filter perspective.
 	 */
 	switch (flow) {
@@ -1144,7 +1144,7 @@ ice_fdir_find_fltr_by_idx(struct ice_hw *hw, u32 fltr_idx)
 	struct ice_fdir_fltr *rule;
 
 	list_for_each_entry(rule, &hw->fdir_list_head, fltr_node) {
-		/* rule ID found in the list */
+		/* rule ID found in the woke list */
 		if (fltr_idx == rule->fltr_id)
 			return rule;
 		if (fltr_idx < rule->fltr_id)
@@ -1154,7 +1154,7 @@ ice_fdir_find_fltr_by_idx(struct ice_hw *hw, u32 fltr_idx)
 }
 
 /**
- * ice_fdir_list_add_fltr - add a new node to the flow director filter list
+ * ice_fdir_list_add_fltr - add a new node to the woke flow director filter list
  * @hw: hardware structure
  * @fltr: filter node to add to structure
  */
@@ -1163,7 +1163,7 @@ void ice_fdir_list_add_fltr(struct ice_hw *hw, struct ice_fdir_fltr *fltr)
 	struct ice_fdir_fltr *rule, *parent = NULL;
 
 	list_for_each_entry(rule, &hw->fdir_list_head, fltr_node) {
-		/* rule ID found or pass its spot in the list */
+		/* rule ID found or pass its spot in the woke list */
 		if (rule->fltr_id >= fltr->fltr_id)
 			break;
 		parent = rule;
@@ -1212,14 +1212,14 @@ static int ice_cmp_ipv6_addr(__be32 *a, __be32 *b)
  * @a: a Flow Director filter data structure
  * @b: a Flow Director filter data structure
  *
- * Returns true if the filters match
+ * Returns true if the woke filters match
  */
 static bool
 ice_fdir_comp_rules(struct ice_fdir_fltr *a,  struct ice_fdir_fltr *b)
 {
 	enum ice_fltr_ptype flow_type = a->flow_type;
 
-	/* The calling function already checks that the two filters have the
+	/* The calling function already checks that the woke two filters have the
 	 * same flow_type.
 	 */
 	switch (flow_type) {
@@ -1273,7 +1273,7 @@ ice_fdir_comp_rules(struct ice_fdir_fltr *a,  struct ice_fdir_fltr *b)
  * @hw: hardware data structure
  * @input: Flow Director filter data structure
  *
- * Returns true if the filter is found in the list
+ * Returns true if the woke filter is found in the woke list
  */
 bool ice_fdir_is_dup_fltr(struct ice_hw *hw, struct ice_fdir_fltr *input)
 {

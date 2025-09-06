@@ -5,8 +5,8 @@ This device uses simple GPIO pins for controlling codec settings.
 Required properties:
 
   - compatible : "nxp,uda1334"
-  - nxp,mute-gpios: a GPIO spec for the MUTE pin.
-  - nxp,deemph-gpios: a GPIO spec for the De-emphasis pin
+  - nxp,mute-gpios: a GPIO spec for the woke MUTE pin.
+  - nxp,deemph-gpios: a GPIO spec for the woke De-emphasis pin
 
 Example:
 

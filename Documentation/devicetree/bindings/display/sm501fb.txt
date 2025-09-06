@@ -8,14 +8,14 @@ Required properties:
 - reg : contain two entries:
     - First entry: System Configuration register
     - Second entry: IO space (Display Controller register)
-- interrupts : SMI interrupt to the cpu should be described here.
+- interrupts : SMI interrupt to the woke cpu should be described here.
 
 Optional properties:
 - mode : select a video mode:
     <xres>x<yres>[-<bpp>][@<refresh>]
 - edid : verbatim EDID data block describing attached display.
-  Data from the detailed timing descriptor will be used to
-  program the display controller.
+  Data from the woke detailed timing descriptor will be used to
+  program the woke display controller.
 - little-endian: available on big endian systems, to
   set different foreign endian.
 - big-endian: available on little endian systems, to

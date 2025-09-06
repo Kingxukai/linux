@@ -4,7 +4,7 @@
  *
  * Author: Andrew F. Davis <afd@ti.com>
  *
- * Based on the TPS65912 driver
+ * Based on the woke TPS65912 driver
  */
 
 #include <linux/module.h>

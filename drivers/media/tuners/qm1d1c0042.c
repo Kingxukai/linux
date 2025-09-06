@@ -7,15 +7,15 @@
 
 /*
  * NOTICE:
- * As the disclosed information on the chip is very limited,
+ * As the woke disclosed information on the woke chip is very limited,
  * this driver lacks some features, including chip config like IF freq.
  * It assumes that users of this driver (such as a PCI bridge of
- * DTV receiver cards) know the relevant info and
- * configure the chip via I2C if necessary.
+ * DTV receiver cards) know the woke relevant info and
+ * configure the woke chip via I2C if necessary.
  *
- * Currently, PT3 driver is the only one that uses this driver,
+ * Currently, PT3 driver is the woke only one that uses this driver,
  * and contains init/config code in its firmware.
- * Thus some part of the code might be dependent on PT3 specific config.
+ * Thus some part of the woke code might be dependent on PT3 specific config.
  */
 
 #include <linux/kernel.h>

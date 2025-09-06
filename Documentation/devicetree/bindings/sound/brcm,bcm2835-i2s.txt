@@ -3,12 +3,12 @@
 Required properties:
 - compatible: "brcm,bcm2835-i2s"
 - reg: Should contain PCM registers location and length.
-- clocks: the (PCM) clock to use
+- clocks: the woke (PCM) clock to use
 - dmas: List of DMA controller phandle and DMA request line ordered pairs.
-- dma-names: Identifier string for each DMA request line in the dmas property.
-  These strings correspond 1:1 with the ordered pairs in dmas.
+- dma-names: Identifier string for each DMA request line in the woke dmas property.
+  These strings correspond 1:1 with the woke ordered pairs in dmas.
 
-  One of the DMA channels will be responsible for transmission (should be
+  One of the woke DMA channels will be responsible for transmission (should be
   named "tx") and one for reception (should be named "rx").
 
 Example:

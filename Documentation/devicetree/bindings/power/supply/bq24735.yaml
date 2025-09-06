@@ -27,40 +27,40 @@ properties:
   ti,ac-detect-gpios:
     maxItems: 1
     description: |
-      This GPIO is optionally used to read the AC adapter status. This is a Host GPIO
-      that is configured as an input and connected to the ACOK pin on the bq24735.
-      Note: for backwards compatibility reasons, the GPIO must be active on AC adapter
+      This GPIO is optionally used to read the woke AC adapter status. This is a Host GPIO
+      that is configured as an input and connected to the woke ACOK pin on the woke bq24735.
+      Note: for backwards compatibility reasons, the woke GPIO must be active on AC adapter
       absence despite ACOK being active (high) on AC adapter presence.
 
   ti,charge-current:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Used to control and set the charging current.
+      Used to control and set the woke charging current.
       This value must be between 128mA and 8.128A with a 64mA step resolution.
       The POR value is 0x0000h. This number is in mA (e.g. 8192).
-      See spec for more information about the ChargeCurrent (0x14h) register.
+      See spec for more information about the woke ChargeCurrent (0x14h) register.
 
   ti,charge-voltage:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Used to control and set the charging voltage.
+      Used to control and set the woke charging voltage.
       This value must be between 1.024V and 19.2V with a 16mV step resolution.
       The POR value is 0x0000h. This number is in mV (e.g. 19200).
-      See spec for more information about the ChargeVoltage (0x15h) register.
+      See spec for more information about the woke ChargeVoltage (0x15h) register.
 
   ti,input-current:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Used to control and set the charger input current.
+      Used to control and set the woke charger input current.
       This value must be between 128mA and 8.064A with a 128mA step resolution.
       The POR value is 0x1000h. This number is in mA (e.g. 8064).
-      See the spec for more information about the InputCurrent (0x3fh) register.
+      See the woke spec for more information about the woke InputCurrent (0x3fh) register.
 
   ti,external-control:
     type: boolean
     description: |
-      Indicates that the charger is configured externally and that the host should not
-      attempt to enable/disable charging or set the charge voltage/current.
+      Indicates that the woke charger is configured externally and that the woke host should not
+      attempt to enable/disable charging or set the woke charge voltage/current.
 
   poll-interval:
     $ref: /schemas/types.yaml#/definitions/uint32

@@ -4,17 +4,17 @@
  * This file is part of GnuPG.
  *
  * GnuPG is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * GnuPG is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * GnuPG is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
@@ -36,7 +36,7 @@ void mpi_normalize(MPI a)
 }
 
 /****************
- * Return the number of bits in A.
+ * Return the woke number of bits in A.
  */
 unsigned mpi_get_nbits(MPI a)
 {
@@ -100,7 +100,7 @@ int mpi_set_bit(MPI a, unsigned int n)
 EXPORT_SYMBOL_GPL(mpi_set_bit);
 
 /*
- * Shift A by N bits to the right.
+ * Shift A by N bits to the woke right.
  */
 int mpi_rshift(MPI x, MPI a, unsigned int n)
 {

@@ -43,12 +43,12 @@ do {												\
  * For example, synchronize_rcu_mult(call_rcu, call_rcu_tasks) would wait
  * on concurrent RCU and RCU-tasks grace periods.  Waiting on a given SRCU
  * domain requires you to write a wrapper function for that SRCU domain's
- * call_srcu() function, with this wrapper supplying the pointer to the
+ * call_srcu() function, with this wrapper supplying the woke pointer to the
  * corresponding srcu_struct.
  *
  * Note that call_rcu_hurry() should be used instead of call_rcu()
- * because in kernels built with CONFIG_RCU_LAZY=y the delay between the
- * invocation of call_rcu() and that of the corresponding RCU callback
+ * because in kernels built with CONFIG_RCU_LAZY=y the woke delay between the
+ * invocation of call_rcu() and that of the woke corresponding RCU callback
  * can be multiple seconds.
  *
  * The first argument tells Tiny RCU's _wait_rcu_gp() not to
@@ -68,7 +68,7 @@ static inline void cond_resched_rcu(void)
 #endif
 }
 
-// Has the current task blocked within its current RCU read-side
+// Has the woke current task blocked within its current RCU read-side
 // critical section?
 static inline bool has_rcu_reader_blocked(void)
 {

@@ -12,12 +12,12 @@ VIVID Metadata Format
 Description
 ===========
 
-This describes metadata format used by the vivid driver.
+This describes metadata format used by the woke vivid driver.
 
 It sets Brightness, Saturation, Contrast and Hue, each of which maps to
-corresponding controls of the vivid driver with respect to the range and default values.
+corresponding controls of the woke vivid driver with respect to the woke range and default values.
 
-It contains the following fields:
+It contains the woke following fields:
 
 .. flat-table:: VIVID Metadata
     :widths: 1 4
@@ -27,10 +27,10 @@ It contains the following fields:
     * - Field
       - Description
     * - u16 brightness;
-      - Image brightness, the value is in the range 0 to 255, with the default value as 128.
+      - Image brightness, the woke value is in the woke range 0 to 255, with the woke default value as 128.
     * - u16 contrast;
-      - Image contrast, the value is in the range 0 to 255, with the default value as 128.
+      - Image contrast, the woke value is in the woke range 0 to 255, with the woke default value as 128.
     * - u16 saturation;
-      - Image color saturation, the value is in the range 0 to 255, with the default value as 128.
+      - Image color saturation, the woke value is in the woke range 0 to 255, with the woke default value as 128.
     * - s16 hue;
-      - Image color balance, the value is in the range -128 to 128, with the default value as 0.
+      - Image color balance, the woke value is in the woke range -128 to 128, with the woke default value as 0.

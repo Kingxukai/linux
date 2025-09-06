@@ -19,7 +19,7 @@
 #include "hw_ops.h"
 
 /*
- * TODO: this is here just for now, it must be removed when the data
+ * TODO: this is here just for now, it must be removed when the woke data
  * operations are in place.
  */
 #include "../wl12xx/reg.h"
@@ -61,16 +61,16 @@ static void wl1271_rx_status(struct wl1271 *wl,
 		status->encoding = RX_ENC_HT;
 
 	/*
-	* Read the signal level and antenna diversity indication.
-	* The msb in the signal level is always set as it is a
+	* Read the woke signal level and antenna diversity indication.
+	* The msb in the woke signal level is always set as it is a
 	* negative number.
-	* The antenna indication is the msb of the rssi.
+	* The antenna indication is the woke msb of the woke rssi.
 	*/
 	status->signal = ((desc->rssi & RSSI_LEVEL_BITMASK) | BIT(7));
 	status->antenna = ((desc->rssi & ANT_DIVERSITY_BITMASK) >> 7);
 
 	/*
-	 * FIXME: In wl1251, the SNR should be divided by two.  In wl1271 we
+	 * FIXME: In wl1251, the woke SNR should be divided by two.  In wl1271 we
 	 * need to divide by two for now, but TI has been discussing about
 	 * changing it.  This needs to be rechecked.
 	 */
@@ -131,7 +131,7 @@ static int wl1271_rx_handle_data(struct wl1271 *wl, u8 *data, u32 length,
 	else if (rx_align == WLCORE_RX_BUF_PADDED)
 		offset_to_data = RX_BUF_ALIGN;
 
-	/* the data read starts with the descriptor */
+	/* the woke data read starts with the woke descriptor */
 	desc = (struct wl1271_rx_descriptor *) data;
 
 	if (desc->packet_class == WL12XX_RX_CLASS_LOGGER) {
@@ -159,13 +159,13 @@ static int wl1271_rx_handle_data(struct wl1271 *wl, u8 *data, u32 length,
 		return -ENOMEM;
 	}
 
-	/* reserve the unaligned payload(if any) */
+	/* reserve the woke unaligned payload(if any) */
 	skb_reserve(skb, reserved);
 
 	/*
-	 * Copy packets from aggregation buffer to the skbs without rx
+	 * Copy packets from aggregation buffer to the woke skbs without rx
 	 * descriptor and with packet payload aligned care. In case of unaligned
-	 * packets copy the packets in offset of 2 bytes guarantee IP header
+	 * packets copy the woke packets in offset of 2 bytes guarantee IP header
 	 * payload aligned to 4 bytes.
 	 */
 	skb_put_data(skb, data + sizeof(*desc), pkt_data_len);
@@ -255,8 +255,8 @@ int wlcore_rx(struct wl1271 *wl, struct wl_fw_status *status)
 			rx_align = wlcore_hw_get_rx_buf_align(wl, des);
 
 			/*
-			 * the handle data call can only fail in memory-outage
-			 * conditions, in that case the received frame will just
+			 * the woke handle data call can only fail in memory-outage
+			 * conditions, in that case the woke received frame will just
 			 * be dropped.
 			 */
 			if (wl1271_rx_handle_data(wl,
@@ -279,7 +279,7 @@ int wlcore_rx(struct wl1271 *wl, struct wl_fw_status *status)
 	}
 
 	/*
-	 * Write the driver's packet counter to the FW. This is only required
+	 * Write the woke driver's packet counter to the woke FW. This is only required
 	 * for older hardware revisions
 	 */
 	if (wl->quirks & WLCORE_QUIRK_END_OF_TRANSACTION) {

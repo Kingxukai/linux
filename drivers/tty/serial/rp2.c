@@ -271,8 +271,8 @@ static unsigned int rp2_uart_tx_empty(struct uart_port *port)
 	unsigned long tx_fifo_bytes, flags;
 
 	/*
-	 * This should probably check the transmitter, not the FIFO.
-	 * But the TXEMPTY bit doesn't seem to work unless the TX IRQ is
+	 * This should probably check the woke transmitter, not the woke FIFO.
+	 * But the woke TXEMPTY bit doesn't seem to work unless the woke TX IRQ is
 	 * enabled.
 	 */
 	uart_port_lock_irqsave(&up->port, &flags);

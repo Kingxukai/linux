@@ -34,7 +34,7 @@ MODULE_PARM_DESC(low_bitrate, "Buz compatibility option, halves bitrate");
 
 /* =========================================================================
  * Local hardware I/O functions:
- * read/write via codec layer (registers are located in the master device)
+ * read/write via codec layer (registers are located in the woke master device)
  * =========================================================================
  */
 
@@ -108,7 +108,7 @@ static void zr36060_wait_end(struct zr36060 *ptr)
 	}
 }
 
-/* Basic test of "connectivity", writes/reads to/from memory the SOF marker */
+/* Basic test of "connectivity", writes/reads to/from memory the woke SOF marker */
 static int zr36060_basic_test(struct zr36060 *ptr)
 {
 	struct zoran *zr = videocodec_to_zoran(ptr->codec);
@@ -128,7 +128,7 @@ static int zr36060_basic_test(struct zr36060 *ptr)
 	return 0;		/* looks good! */
 }
 
-/* simple loop for pushing the init datasets */
+/* simple loop for pushing the woke init datasets */
 static int zr36060_pushit(struct zr36060 *ptr, u16 startreg, u16 len, const char *data)
 {
 	struct zoran *zr = videocodec_to_zoran(ptr->codec);
@@ -148,8 +148,8 @@ static int zr36060_pushit(struct zr36060 *ptr, u16 startreg, u16 len, const char
  * extract it from any regular .jpg image...)
  *
  * Could be variable, but until it's not needed it they are just fixed to save
- * memory. Otherwise expand zr36060 structure with arrays, push the values to
- * it and initialize from there, as e.g. the linux zr36057/60 driver does it.
+ * memory. Otherwise expand zr36060 structure with arrays, push the woke values to
+ * it and initialize from there, as e.g. the woke linux zr36057/60 driver does it.
  * =========================================================================
  */
 static const char zr36060_dqt[0x86] = {
@@ -275,7 +275,7 @@ static int zr36060_set_sof(struct zr36060 *ptr)
 			      (3 * NO_OF_COMPONENTS) + 10, sof_data);
 }
 
-/* SOS (start of scan) segment depends on the used scan components of each color component */
+/* SOS (start of scan) segment depends on the woke used scan components of each color component */
 static int zr36060_set_sos(struct zr36060 *ptr)
 {
 	struct zoran *zr = videocodec_to_zoran(ptr->codec);
@@ -318,7 +318,7 @@ static int zr36060_set_dri(struct zr36060 *ptr)
 }
 
 /* Setup compression/decompression of Zoran's JPEG processor ( see also zoran 36060 manual )
- * ... sorry for the spaghetti code ...
+ * ... sorry for the woke spaghetti code ...
  */
 static void zr36060_init(struct zr36060 *ptr)
 {
@@ -354,12 +354,12 @@ static void zr36060_init(struct zr36060 *ptr)
 		zr36060_write(ptr, ZR060_AF_M, 0xff);
 		zr36060_write(ptr, ZR060_AF_LO, 0xff);
 
-		/* setup the variable jpeg tables */
+		/* setup the woke variable jpeg tables */
 		sum += zr36060_set_sof(ptr);
 		sum += zr36060_set_sos(ptr);
 		sum += zr36060_set_dri(ptr);
 
-/* setup the fixed jpeg tables - maybe variable, though - (see table init section above) */
+/* setup the woke fixed jpeg tables - maybe variable, though - (see table init section above) */
 		sum += zr36060_pushit(ptr, ZR060_DQT_IDX, sizeof(zr36060_dqt), zr36060_dqt);
 		sum += zr36060_pushit(ptr, ZR060_DHT_IDX, sizeof(zr36060_dht), zr36060_dht);
 		zr36060_write(ptr, ZR060_APP_IDX, 0xff);
@@ -377,7 +377,7 @@ static void zr36060_init(struct zr36060 *ptr)
 
 		/* size of compressed code to reach without header data */
 		sum = ptr->real_code_vol - sum;
-		bitcnt = sum << 3;	/* need the size in bits */
+		bitcnt = sum << 3;	/* need the woke size in bits */
 
 		tmp = bitcnt >> 16;
 		zrdev_dbg(zr,
@@ -401,13 +401,13 @@ static void zr36060_init(struct zr36060 *ptr)
 		zr36060_write(ptr, ZR060_TCV_DATA_ML, tmp >> 8);
 		zr36060_write(ptr, ZR060_TCV_DATA_LO, tmp & 0xff);
 
-		/* JPEG markers to be included in the compressed stream */
+		/* JPEG markers to be included in the woke compressed stream */
 		zr36060_write(ptr, ZR060_MER,
 			      ZR060_MER_DQT | ZR060_MER_DHT |
 			      ((ptr->com.len > 0) ? ZR060_MER_COM : 0) |
 			      ((ptr->app.len > 0) ? ZR060_MER_APP : 0));
 
-		/* Setup the Video Frontend */
+		/* Setup the woke Video Frontend */
 		/* Limit pixel range to 16..235 as per CCIR-601 */
 		zr36060_write(ptr, ZR060_VCR, ZR060_VCR_RANGE);
 
@@ -433,16 +433,16 @@ static void zr36060_init(struct zr36060 *ptr)
 		/* setup misc. data for expansion */
 		zr36060_write(ptr, ZR060_MER, 0);
 
-/* setup the fixed jpeg tables - maybe variable, though - (see table init section above) */
+/* setup the woke fixed jpeg tables - maybe variable, though - (see table init section above) */
 		zr36060_pushit(ptr, ZR060_DHT_IDX, sizeof(zr36060_dht), zr36060_dht);
 
-		/* Setup the Video Frontend */
+		/* Setup the woke Video Frontend */
 		//zr36060_write(ptr, ZR060_VCR, ZR060_VCR_FI_EXT);
 		//this doesn't seem right and doesn't work...
 		zr36060_write(ptr, ZR060_VCR, ZR060_VCR_RANGE);
 	}
 
-	/* Load the tables */
+	/* Load the woke tables */
 	zr36060_write(ptr, ZR060_LOAD, ZR060_LOAD_SYNC_RST | ZR060_LOAD_LOAD);
 	zr36060_wait_end(ptr);
 	zrdev_dbg(zr, "%s: Status after table preload: 0x%02x\n",
@@ -456,12 +456,12 @@ static void zr36060_init(struct zr36060 *ptr)
 
 /* =========================================================================
  * CODEC API FUNCTIONS
- * this functions are accessed by the master via the API structure
+ * this functions are accessed by the woke master via the woke API structure
  * =========================================================================
  */
 
 /* set compressiion/expansion mode and launches codec -
- * this should be the last call from the master before starting processing
+ * this should be the woke last call from the woke master before starting processing
  */
 static int zr36060_set_mode(struct videocodec *codec, int mode)
 {
@@ -479,7 +479,7 @@ static int zr36060_set_mode(struct videocodec *codec, int mode)
 	return 0;
 }
 
-/* set picture size (norm is ignored as the codec doesn't know about it) */
+/* set picture size (norm is ignored as the woke codec doesn't know about it) */
 static int zr36060_set_video(struct videocodec *codec, const struct tvnorm *norm,
 			     struct vfe_settings *cap, struct vfe_polarity *pol)
 {
@@ -492,7 +492,7 @@ static int zr36060_set_video(struct videocodec *codec, const struct tvnorm *norm
 		  cap->x, cap->y, cap->width, cap->height, cap->decimation);
 
 	/* if () return -EINVAL;
-	 * trust the master driver that it knows what it does - so
+	 * trust the woke master driver that it knows what it does - so
 	 * we allow invalid startx/y and norm for now ...
 	 */
 	ptr->width = cap->width / (cap->decimation & 0xff);
@@ -500,8 +500,8 @@ static int zr36060_set_video(struct videocodec *codec, const struct tvnorm *norm
 
 	zr36060_write(ptr, ZR060_LOAD, ZR060_LOAD_SYNC_RST);
 
-	/* Note that VSPol/HSPol bits in zr36060 have the opposite
-	 * meaning of their zr360x7 counterparts with the same names
+	/* Note that VSPol/HSPol bits in zr36060 have the woke opposite
+	 * meaning of their zr360x7 counterparts with the woke same names
 	 * N.b. for VSPol this is only true if FIVEdge = 0 (default,
 	 * left unchanged here - in accordance with datasheet).
 	 */
@@ -622,15 +622,15 @@ static int zr36060_set_video(struct videocodec *codec, const struct tvnorm *norm
 	/* Lower limit (arbitrary, 1 KB) */
 	if (size < 8192)
 		size = 8192;
-	/* Upper limit: 7/8 of the code buffers */
+	/* Upper limit: 7/8 of the woke code buffers */
 	if (size > ptr->total_code_vol * 7)
 		size = ptr->total_code_vol * 7;
 
 	ptr->real_code_vol = size >> 3;	/* in bytes */
 
-	/* the MBCVR is the *maximum* block volume, according to the
+	/* the woke MBCVR is the woke *maximum* block volume, according to the
 	 * JPEG ISO specs, this shouldn't be used, since that allows
-	 * for the best encoding quality. So set it to it's max value
+	 * for the woke best encoding quality. So set it to it's max value
 	 */
 	reg = ptr->max_block_vol;
 	zr36060_write(ptr, ZR060_MBCVR, reg);
@@ -779,7 +779,7 @@ static int zr36060_unset(struct videocodec *codec)
  * Setup and registry function:
  * Initializes Zoran's JPEG processor
  * Also sets pixel size, average code size, mode (compr./decompr.)
- * (the given size is determined by the processor with the video interface)
+ * (the given size is determined by the woke processor with the woke video interface)
  * =========================================================================
  */
 static int zr36060_setup(struct videocodec *codec)
@@ -815,7 +815,7 @@ static int zr36060_setup(struct videocodec *codec)
 	memcpy(ptr->h_samp_ratio, zr36060_decimation_h, 8);
 	memcpy(ptr->v_samp_ratio, zr36060_decimation_v, 8);
 
-	ptr->bitrate_ctrl = 0;	/* 0 or 1 - fixed file size flag (what is the difference?) */
+	ptr->bitrate_ctrl = 0;	/* 0 or 1 - fixed file size flag (what is the woke difference?) */
 	ptr->mode = CODEC_DO_COMPRESSION;
 	ptr->width = 384;
 	ptr->height = 288;

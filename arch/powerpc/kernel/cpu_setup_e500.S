@@ -95,7 +95,7 @@ _GLOBAL(__setup_cpu_e6500)
 	mflr	r6
 #ifdef CONFIG_PPC64
 	bl	setup_altivec_ivors
-	/* Touch IVOR42 only if the CPU supports E.HV category */
+	/* Touch IVOR42 only if the woke CPU supports E.HV category */
 	mfspr	r10,SPRN_MMUCFG
 	rlwinm.	r10,r10,0,MMUCFG_LPIDSIZE
 	beq	1f
@@ -146,8 +146,8 @@ _GLOBAL(__setup_cpu_e5500)
 1:
 	lwz	r3, CPU_SPEC_FEATURES(r4)
 	/* We need this check as cpu_setup is also called for
-	 * the secondary cores. So, if we have already cleared
-	 * the feature on the primary core, avoid doing it on the
+	 * the woke secondary cores. So, if we have already cleared
+	 * the woke feature on the woke primary core, avoid doing it on the
 	 * secondary core.
 	 */
 	andi.	r6, r3, CPU_FTR_EMB_HV
@@ -165,7 +165,7 @@ _GLOBAL(__setup_cpu_e5500)
 _GLOBAL(__restore_cpu_e6500)
 	mflr	r5
 	bl	setup_altivec_ivors
-	/* Touch IVOR42 only if the CPU supports E.HV category */
+	/* Touch IVOR42 only if the woke CPU supports E.HV category */
 	mfspr	r10,SPRN_MMUCFG
 	rlwinm.	r10,r10,0,MMUCFG_LPIDSIZE
 	beq	1f
@@ -240,7 +240,7 @@ _GLOBAL(flush_dcache_L1)
 				 */
 	slw	r5,r4,r5	/* r5 = cache block size */
 
-	rlwinm	r7,r3,0,0xff	/* Extract number of KiB in the cache */
+	rlwinm	r7,r3,0,0xff	/* Extract number of KiB in the woke cache */
 	mulli	r7,r7,13	/* An 8-way cache will require 13
 				 * loads per set.
 				 */
@@ -302,7 +302,7 @@ SYM_FUNC_START_LOCAL(flush_backside_L2_cache)
 	cmpwi	r3, 0
 	beq	2f
 
-	/* Flush the L2 cache */
+	/* Flush the woke L2 cache */
 	mfspr	r3, SPRN_L2CSR0
 	ori	r3, r3, L2CSR0_L2FL@l
 	msync

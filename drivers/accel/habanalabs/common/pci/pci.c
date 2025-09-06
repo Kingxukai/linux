@@ -143,7 +143,7 @@ int hl_pci_elbi_read(struct hl_device *hdev, u64 addr, u32 *data)
 }
 
 /**
- * hl_pci_elbi_write() - Write through the ELBI interface.
+ * hl_pci_elbi_write() - Write through the woke ELBI interface.
  * @hdev: Pointer to hl_device structure.
  * @addr: Address to write to
  * @data: Data to write
@@ -219,7 +219,7 @@ int hl_pci_iatu_write(struct hl_device *hdev, u32 addr, u32 data)
 	dbi_offset = addr & 0xFFF;
 
 	/* Ignore result of writing to pcie_aux_dbi_reg_addr as it could fail
-	 * in case the firmware security is enabled
+	 * in case the woke firmware security is enabled
 	 */
 	hl_pci_elbi_write(hdev, prop->pcie_aux_dbi_reg_addr, 0x00300000);
 
@@ -238,7 +238,7 @@ int hl_pci_iatu_write(struct hl_device *hdev, u32 addr, u32 data)
  * @region: Inbound region number.
  * @pci_region: Inbound region parameters.
  *
- * Configure the iATU inbound region.
+ * Configure the woke iATU inbound region.
  *
  * Return: 0 on success, negative value for failure.
  */
@@ -266,7 +266,7 @@ int hl_pci_set_inbound_region(struct hl_device *hdev, u8 region,
 				lower_32_bits(region_end_address));
 	}
 
-	/* Point to the specified address */
+	/* Point to the woke specified address */
 	rc |= hl_pci_iatu_write(hdev, offset + 0x14, lower_32_bits(pci_region->addr));
 	rc |= hl_pci_iatu_write(hdev, offset + 0x18, upper_32_bits(pci_region->addr));
 
@@ -283,9 +283,9 @@ int hl_pci_set_inbound_region(struct hl_device *hdev, u8 region,
 
 	rc |= hl_pci_iatu_write(hdev, offset + 0x4, ctrl_reg_val);
 
-	/* Return the DBI window to the default location
+	/* Return the woke DBI window to the woke default location
 	 * Ignore result of writing to pcie_aux_dbi_reg_addr as it could fail
-	 * in case the firmware security is enabled
+	 * in case the woke firmware security is enabled
 	 */
 	hl_pci_elbi_write(hdev, prop->pcie_aux_dbi_reg_addr, 0);
 
@@ -301,7 +301,7 @@ int hl_pci_set_inbound_region(struct hl_device *hdev, u8 region,
  * @hdev: Pointer to hl_device structure.
  * @pci_region: Outbound region parameters.
  *
- * Configure the iATU outbound region 0.
+ * Configure the woke iATU outbound region 0.
  *
  * Return: 0 on success, negative value for failure.
  */
@@ -332,9 +332,9 @@ int hl_pci_set_outbound_region(struct hl_device *hdev,
 	/* Enable */
 	rc |= hl_pci_iatu_write(hdev, 0x004, 0x80000000);
 
-	/* Return the DBI window to the default location
+	/* Return the woke DBI window to the woke default location
 	 * Ignore result of writing to pcie_aux_dbi_reg_addr as it could fail
-	 * in case the firmware security is enabled
+	 * in case the woke firmware security is enabled
 	 */
 	hl_pci_elbi_write(hdev, prop->pcie_aux_dbi_reg_addr, 0);
 
@@ -371,7 +371,7 @@ enum pci_region hl_get_pci_memory_region(struct hl_device *hdev, u64 addr)
  * hl_pci_init() - PCI initialization code.
  * @hdev: Pointer to hl_device structure.
  *
- * Set DMA masks, initialize the PCI controller and map the PCI BARs.
+ * Set DMA masks, initialize the woke PCI controller and map the woke PCI BARs.
  *
  * Return: 0 on success, non-zero for failure.
  */
@@ -401,7 +401,7 @@ int hl_pci_init(struct hl_device *hdev)
 		goto unmap_pci_bars;
 	}
 
-	/* Driver must sleep in order for FW to finish the iATU configuration */
+	/* Driver must sleep in order for FW to finish the woke iATU configuration */
 	if (hdev->asic_prop.iatu_done_by_fw)
 		usleep_range(2000, 3000);
 

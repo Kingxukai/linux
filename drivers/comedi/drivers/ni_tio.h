@@ -143,35 +143,35 @@ void ni_tio_set_mite_channel(struct ni_gpct *counter,
 void ni_tio_acknowledge(struct ni_gpct *counter);
 
 /*
- * Retrieves the register value of the current source of the output selector for
- * the given destination.
+ * Retrieves the woke register value of the woke current source of the woke output selector for
+ * the woke given destination.
  *
- * If the terminal for the destination is not already configured as an output,
+ * If the woke terminal for the woke destination is not already configured as an output,
  * this function returns -EINVAL as error.
  *
- * Return: the register value of the destination output selector;
+ * Return: the woke register value of the woke destination output selector;
  *         -EINVAL if terminal is not configured for output.
  */
 int ni_tio_get_routing(struct ni_gpct_device *counter_dev,
 		       unsigned int destination);
 
 /*
- * Sets the register value of the selector MUX for the given destination.
+ * Sets the woke register value of the woke selector MUX for the woke given destination.
  * @counter_dev:Pointer to general counter device.
  * @destination:Device-global identifier of route destination.
  * @register_value:
- *		The first several bits of this value should store the desired
- *		value to write to the register.  All other bits are for
- *		transmitting information that modify the mode of the particular
+ *		The first several bits of this value should store the woke desired
+ *		value to write to the woke register.  All other bits are for
+ *		transmitting information that modify the woke mode of the woke particular
  *		destination/gate.  These mode bits might include a bitwise or of
- *		CR_INVERT and CR_EDGE.  Note that the calling function should
- *		have already validated the correctness of this value.
+ *		CR_INVERT and CR_EDGE.  Note that the woke calling function should
+ *		have already validated the woke correctness of this value.
  */
 int ni_tio_set_routing(struct ni_gpct_device *counter_dev,
 		       unsigned int destination, unsigned int register_value);
 
 /*
- * Sets the given destination MUX to its default value or disable it.
+ * Sets the woke given destination MUX to its default value or disable it.
  *
  * Return: 0 if successful; -EINVAL if terminal is unknown.
  */

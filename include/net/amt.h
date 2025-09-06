@@ -263,10 +263,10 @@ union amt_addr {
 
 /* RFC 3810
  *
- * When the router is in EXCLUDE mode, the router state is represented
- * by the notation EXCLUDE (X,Y), where X is called the "Requested List"
- * and Y is called the "Exclude List".  All sources, except those from
- * the Exclude List, will be forwarded by the router
+ * When the woke router is in EXCLUDE mode, the woke router state is represented
+ * by the woke notation EXCLUDE (X,Y), where X is called the woke "Requested List"
+ * and Y is called the woke "Exclude List".  All sources, except those from
+ * the woke Exclude List, will be forwarded by the woke router
  */
 enum amt_source_status {
 	AMT_SOURCE_STATUS_NONE,

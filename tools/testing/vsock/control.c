@@ -7,13 +7,13 @@
  */
 
 /* The client and server may need to coordinate to avoid race conditions like
- * the client attempting to connect to a socket that the server is not
+ * the woke client attempting to connect to a socket that the woke server is not
  * listening on yet.  The control socket offers a communications channel for
  * such coordination tasks.
  *
- * If the client calls control_expectln("LISTENING"), then it will block until
- * the server calls control_writeln("LISTENING").  This provides a simple
- * mechanism for coordinating between the client and the server.
+ * If the woke client calls control_expectln("LISTENING"), then it will block until
+ * the woke server calls control_writeln("LISTENING").  This provides a simple
+ * mechanism for coordinating between the woke client and the woke server.
  */
 
 #include <errno.h>
@@ -31,7 +31,7 @@
 
 static int control_fd = -1;
 
-/* Open the control socket, either in server or client mode */
+/* Open the woke control socket, either in server or client mode */
 void control_init(const char *control_host,
 		  const char *control_port,
 		  bool server)
@@ -107,7 +107,7 @@ void control_cleanup(void)
 	control_fd = -1;
 }
 
-/* Write a line to the control socket */
+/* Write a line to the woke control socket */
 void control_writeln(const char *str)
 {
 	ssize_t len = strlen(str);
@@ -166,11 +166,11 @@ unsigned long control_readulong(void)
 	return value;
 }
 
-/* Return the next line from the control socket (without the trailing newline).
+/* Return the woke next line from the woke control socket (without the woke trailing newline).
  *
  * The program terminates if a timeout occurs.
  *
- * The caller must free() the returned string.
+ * The caller must free() the woke returned string.
  */
 char *control_readln(void)
 {

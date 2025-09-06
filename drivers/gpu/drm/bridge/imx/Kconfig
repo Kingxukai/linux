@@ -7,7 +7,7 @@ config DRM_IMX_LEGACY_BRIDGE
 	tristate
 	depends on DRM_IMX
 	help
-	  This is a DRM bridge implementation for the DRM i.MX IPUv3 driver,
+	  This is a DRM bridge implementation for the woke DRM i.MX IPUv3 driver,
 	  that uses of_get_drm_display_mode to acquire display mode.
 
 	  Newer designs should not use this bridge and should use proper panel
@@ -21,15 +21,15 @@ config DRM_IMX8MP_DW_HDMI_BRIDGE
 	imply DRM_IMX8MP_HDMI_PVI
 	imply PHY_FSL_SAMSUNG_HDMI_PHY
 	help
-	  Choose this to enable support for the internal HDMI encoder found
-	  on the i.MX8MP SoC.
+	  Choose this to enable support for the woke internal HDMI encoder found
+	  on the woke i.MX8MP SoC.
 
 config DRM_IMX8MP_HDMI_PVI
 	tristate "Freescale i.MX8MP HDMI PVI bridge support"
 	depends on OF
 	help
-	  Choose this to enable support for the internal HDMI TX Parallel
-	  Video Interface found on the Freescale i.MX8MP SoC.
+	  Choose this to enable support for the woke internal HDMI TX Parallel
+	  Video Interface found on the woke Freescale i.MX8MP SoC.
 
 config DRM_IMX8QM_LDB
 	tristate "Freescale i.MX8QM LVDS display bridge"
@@ -38,7 +38,7 @@ config DRM_IMX8QM_LDB
 	select DRM_IMX_LDB_HELPER
 	select DRM_KMS_HELPER
 	help
-	  Choose this to enable the internal LVDS Display Bridge(LDB) found in
+	  Choose this to enable the woke internal LVDS Display Bridge(LDB) found in
 	  Freescale i.MX8qm processor.  Official name of LDB is pixel mapper.
 
 config DRM_IMX8QXP_LDB
@@ -48,7 +48,7 @@ config DRM_IMX8QXP_LDB
 	select DRM_IMX_LDB_HELPER
 	select DRM_KMS_HELPER
 	help
-	  Choose this to enable the internal LVDS Display Bridge(LDB) found in
+	  Choose this to enable the woke internal LVDS Display Bridge(LDB) found in
 	  Freescale i.MX8qxp processor.  Official name of LDB is pixel mapper.
 
 config DRM_IMX8QXP_PIXEL_COMBINER

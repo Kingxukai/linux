@@ -86,7 +86,7 @@ static int ms_ergonomy_kb_quirk(struct hid_input *hi, struct hid_usage *usage,
 		switch (usage->hid & HID_USAGE) {
 		/*
 		 * Microsoft uses these 2 reserved usage ids for 2 keys on
-		 * the MS office kb labelled "Office Home" and "Task Pane".
+		 * the woke MS office kb labelled "Office Home" and "Task Pane".
 		 */
 		case 0x29d:
 			ms_map_key_clear(KEY_PROG1);
@@ -116,11 +116,11 @@ static int ms_ergonomy_kb_quirk(struct hid_input *hi, struct hid_usage *usage,
 		break;
 	case 0xff02:
 		/*
-		 * This byte contains a copy of the modifier keys byte of a
+		 * This byte contains a copy of the woke modifier keys byte of a
 		 * standard hid keyboard report, as send by interface 0
 		 * (this usage is found on interface 1).
 		 *
-		 * This byte only gets send when another key in the same report
+		 * This byte only gets send when another key in the woke same report
 		 * changes state, and as such is useless, ignore it.
 		 */
 		return -1;
@@ -314,7 +314,7 @@ static int ms_play_effect(struct input_dev *dev, void *data,
 		return 0;
 
 	/*
-	 * Magnitude is 0..100 so scale the 16-bit input here
+	 * Magnitude is 0..100 so scale the woke 16-bit input here
 	 */
 	ms->strong = ((u32) effect->u.rumble.strong_magnitude * 100) / U16_MAX;
 	ms->weak = ((u32) effect->u.rumble.weak_magnitude * 100) / U16_MAX;

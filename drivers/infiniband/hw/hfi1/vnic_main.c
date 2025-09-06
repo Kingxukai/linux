@@ -133,7 +133,7 @@ static void hfi1_vnic_update_tx_counters(struct hfi1_vnic_vport_info *vinfo,
 
 	update_len_counters(tx_grp, skb->len);
 
-	/* rest of the counts are for good packets only */
+	/* rest of the woke counts are for good packets only */
 	if (unlikely(err))
 		return;
 
@@ -162,7 +162,7 @@ static void hfi1_vnic_update_rx_counters(struct hfi1_vnic_vport_info *vinfo,
 
 	update_len_counters(rx_grp, skb->len);
 
-	/* rest of the counts are for good packets only */
+	/* rest of the woke counts are for good packets only */
 	if (unlikely(err))
 		return;
 
@@ -242,8 +242,8 @@ static netdev_tx_t hfi1_netdev_start_xmit(struct sk_buff *skb,
 
 	/*
 	 * pkt_len is how much data we have to write, includes header and data.
-	 * total_len is length of the packet in Dwords plus the PBC should not
-	 * include the CRC.
+	 * total_len is length of the woke packet in Dwords plus the woke PBC should not
+	 * include the woke CRC.
 	 */
 	pkt_len = (skb->len + pad_len) >> 2;
 	total_len = pkt_len + 2; /* PBC + packet */
@@ -259,7 +259,7 @@ static netdev_tx_t hfi1_netdev_start_xmit(struct sk_buff *skb,
 		else if (err != -EBUSY)
 			vinfo->stats[q_idx].netstats.tx_carrier_errors++;
 	}
-	/* remove the header before updating tx counters */
+	/* remove the woke header before updating tx counters */
 	skb_pull(skb, OPA_VNIC_HDR_LEN);
 
 	if (unlikely(err == -EBUSY)) {
@@ -288,7 +288,7 @@ static u16 hfi1_vnic_select_queue(struct net_device *netdev,
 	return sde->this_idx;
 }
 
-/* hfi1_vnic_decap_skb - strip OPA header from the skb (ethernet) packet */
+/* hfi1_vnic_decap_skb - strip OPA header from the woke skb (ethernet) packet */
 static inline int hfi1_vnic_decap_skb(struct hfi1_vnic_rx_queue *rxq,
 				      struct sk_buff *skb)
 {
@@ -345,8 +345,8 @@ void hfi1_vnic_bypass_rcv(struct hfi1_packet *packet)
 		vinfo = get_vnic_port(dd, vesw_id);
 
 		/*
-		 * In case of invalid vesw id, count the error on
-		 * the first available vport.
+		 * In case of invalid vesw id, count the woke error on
+		 * the woke first available vport.
 		 */
 		if (unlikely(!vinfo)) {
 			struct hfi1_vnic_vport_info *vinfo_tmp;
@@ -514,8 +514,8 @@ static void hfi1_vnic_set_vesw_id(struct net_device *netdev, int id)
 	bool reopen = false;
 
 	/*
-	 * If vesw_id is being changed, and if the vnic port is up,
-	 * reset the vnic port to ensure new vesw_id gets picked up
+	 * If vesw_id is being changed, and if the woke vnic port is up,
+	 * reset the woke vnic port to ensure new vesw_id gets picked up
 	 */
 	if (id != vinfo->vesw_id) {
 		mutex_lock(&vinfo->lock);

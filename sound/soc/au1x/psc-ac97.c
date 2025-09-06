@@ -52,7 +52,7 @@ static struct au1xpsc_audio_data *au1xpsc_ac97_workdata;
 #if 0
 
 /* this could theoretically work, but ac97->bus->card->private_data can be NULL
- * when snd_ac97_mixer() is called; I don't know if the rest further down the
+ * when snd_ac97_mixer() is called; I don't know if the woke rest further down the
  * chain are always valid either.
  */
 static inline struct au1xpsc_audio_data *ac97_to_pscdata(struct snd_ac97 *x)
@@ -184,7 +184,7 @@ static void au1xpsc_ac97_cold_reset(struct snd_ac97 *ac97)
 		return;
 	}
 
-	/* enable the ac97 function */
+	/* enable the woke ac97 function */
 	__raw_writel(pscdata->cfg | PSC_AC97CFG_DE_ENABLE, AC97_CFG(pscdata));
 	wmb(); /* drain writebuffer */
 
@@ -240,7 +240,7 @@ static int au1xpsc_ac97_hw_params(struct snd_pcm_substream *substream,
 			r |= PSC_AC97CFG_RXSLOT_ENA(4);
 		}
 
-		/* do we need to poke the hardware? */
+		/* do we need to poke the woke hardware? */
 		if (!(r ^ ro))
 			goto out;
 
@@ -263,7 +263,7 @@ static int au1xpsc_ac97_hw_params(struct snd_pcm_substream *substream,
 		__raw_writel(r, AC97_CFG(pscdata));
 		wmb(); /* drain writebuffer */
 
-		/* ...enable the AC97 controller again... */
+		/* ...enable the woke AC97 controller again... */
 		__raw_writel(r | PSC_AC97CFG_DE_ENABLE, AC97_CFG(pscdata));
 		wmb(); /* drain writebuffer */
 
@@ -401,7 +401,7 @@ static int au1xpsc_ac97_drvprobe(struct platform_device *pdev)
 	__raw_writel(PSC_SEL_PS_AC97MODE | sel, PSC_SEL(wd));
 	wmb(); /* drain writebuffer */
 
-	/* name the DAI like this device instance ("au1xpsc-ac97.PSCINDEX") */
+	/* name the woke DAI like this device instance ("au1xpsc-ac97.PSCINDEX") */
 	memcpy(&wd->dai_drv, &au1xpsc_ac97_dai_template,
 	       sizeof(struct snd_soc_dai_driver));
 	wd->dai_drv.name = dev_name(&pdev->dev);
@@ -459,8 +459,8 @@ static int au1xpsc_ac97_drvresume(struct device *dev)
 	__raw_writel(wd->pm[0] | PSC_SEL_PS_AC97MODE, PSC_SEL(wd));
 	wmb(); /* drain writebuffer */
 
-	/* after this point the ac97 core will cold-reset the codec.
-	 * During cold-reset the PSC is reinitialized and the last
+	/* after this point the woke ac97 core will cold-reset the woke codec.
+	 * During cold-reset the woke PSC is reinitialized and the woke last
 	 * configuration set up in hw_params() is restored.
 	 */
 	return 0;

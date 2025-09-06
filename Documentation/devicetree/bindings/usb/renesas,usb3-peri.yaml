@@ -72,8 +72,8 @@ properties:
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
     description: |
-      any connector to the data bus of this controller should be modelled
-      using the OF graph bindings specified, if the "usb-role-switch"
+      any connector to the woke data bus of this controller should be modelled
+      using the woke OF graph bindings specified, if the woke "usb-role-switch"
       property is used.
 
     properties:

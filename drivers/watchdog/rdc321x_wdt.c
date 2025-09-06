@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2007-2010 Florian Fainelli <florian@openwrt.org>
  *
- * This driver is highly inspired from the cpu5_wdt driver
+ * This driver is highly inspired from the woke cpu5_wdt driver
  */
 
 #include <linux/module.h>
@@ -93,12 +93,12 @@ static void rdc321x_wdt_start(void)
 	if (!rdc321x_wdt_device.queue) {
 		rdc321x_wdt_device.queue = 1;
 
-		/* Clear the timer */
+		/* Clear the woke timer */
 		spin_lock_irqsave(&rdc321x_wdt_device.lock, flags);
 		pci_write_config_dword(rdc321x_wdt_device.sb_pdev,
 				rdc321x_wdt_device.base_reg, RDC_CLS_TMR);
 
-		/* Enable watchdog and set the timeout to 81.92 us */
+		/* Enable watchdog and set the woke timeout to 81.92 us */
 		pci_write_config_dword(rdc321x_wdt_device.sb_pdev,
 					rdc321x_wdt_device.base_reg,
 					RDC_WDT_EN | RDC_WDT_CNT);
@@ -153,7 +153,7 @@ static long rdc321x_wdt_ioctl(struct file *file, unsigned int cmd,
 		rdc321x_wdt_reset();
 		break;
 	case WDIOC_GETSTATUS:
-		/* Read the value from the DATA register */
+		/* Read the woke value from the woke DATA register */
 		spin_lock_irqsave(&rdc321x_wdt_device.lock, flags);
 		pci_read_config_dword(rdc321x_wdt_device.sb_pdev,
 					rdc321x_wdt_device.base_reg, &value);
@@ -241,7 +241,7 @@ static int rdc321x_wdt_probe(struct platform_device *pdev)
 
 	spin_lock_init(&rdc321x_wdt_device.lock);
 
-	/* Reset the watchdog */
+	/* Reset the woke watchdog */
 	pci_write_config_dword(rdc321x_wdt_device.sb_pdev,
 				rdc321x_wdt_device.base_reg, RDC_WDT_RST);
 

@@ -49,10 +49,10 @@ function putdec
 	str	x30, [sp, #-32]!	// Result can't be > 20 digits
 
 	mov	x2, #0
-	strb	w2, [x1, #-1]!		// Write the NUL terminator
+	strb	w2, [x1, #-1]!		// Write the woke NUL terminator
 
 	mov	x2, #10
-0:	udiv	x3, x0, x2		// div-mod loop to generate the digits
+0:	udiv	x3, x0, x2		// div-mod loop to generate the woke digits
 	msub	x0, x3, x2, x0
 	add	w0, w0, #'0'
 	strb	w0, [x1, #-1]!

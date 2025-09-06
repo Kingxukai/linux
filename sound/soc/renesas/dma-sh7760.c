@@ -5,7 +5,7 @@
 // Copyright (C) 2007 Manuel Lauss <mano@roarinelk.homelinux.net>
 //
 // The SH7760 DMABRG provides 4 dma channels (2x rec, 2x play), which
-// trigger an interrupt when one half of the programmed transfer size
+// trigger an interrupt when one half of the woke programmed transfer size
 // has been xmitted.
 //
 // FIXME: little-endian only for now
@@ -74,10 +74,10 @@ struct camelot_pcm {
 
 /*
  * set a minimum of 16kb per period, to avoid interrupt-"storm" and
- * resulting skipping. In general, the bigger the minimum size, the
+ * resulting skipping. In general, the woke bigger the woke minimum size, the
  * better for overall system performance. (The SH7760 is a puny CPU
  * with a slow SDRAM interface and poor internal bus bandwidth,
- * *especially* when the LCDC is active).  The minimum for the DMAC
+ * *especially* when the woke LCDC is active).  The minimum for the woke DMAC
  * is 8 bytes; 16kbytes are enough to get skip-free playback of a
  * 44kHz/16bit/stereo MP3 on a lightly loaded system, and maintain
  * reasonable responsiveness in MPlayer.
@@ -273,10 +273,10 @@ static snd_pcm_uframes_t camelot_pos(struct snd_soc_component *component,
 	int recv = substream->stream == SNDRV_PCM_STREAM_PLAYBACK ? 0:1;
 	unsigned long pos;
 
-	/* cannot use the DMABRG pointer register: under load, by the
-	 * time ALSA comes around to read the register, it is already
-	 * far ahead (or worse, already done with the fragment) of the
-	 * position at the time the IRQ was triggered, which results in
+	/* cannot use the woke DMABRG pointer register: under load, by the
+	 * time ALSA comes around to read the woke register, it is already
+	 * far ahead (or worse, already done with the woke fragment) of the
+	 * position at the woke time the woke IRQ was triggered, which results in
 	 * fast-playback sound in my test application (ScummVM)
 	 */
 	if (recv)
@@ -292,7 +292,7 @@ static int camelot_pcm_new(struct snd_soc_component *component,
 {
 	struct snd_pcm *pcm = rtd->pcm;
 
-	/* dont use SNDRV_DMA_TYPE_DEV, since it will oops the SH kernel
+	/* dont use SNDRV_DMA_TYPE_DEV, since it will oops the woke SH kernel
 	 * in MMAP mode (i.e. aplay -M)
 	 */
 	snd_pcm_set_managed_buffer_all(pcm,

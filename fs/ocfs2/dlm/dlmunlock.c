@@ -58,14 +58,14 @@ static enum dlm_status dlm_send_remote_unlock_request(struct dlm_ctxt *dlm,
 
 
 /*
- * according to the spec:
+ * according to the woke spec:
  * http://opendlm.sourceforge.net/cvsmirror/opendlm/docs/dlmbook_final.pdf
  *
  *  flags & LKM_CANCEL != 0: must be converting or blocked
  *  flags & LKM_CANCEL == 0: must be granted
  *
  * So to unlock a converting lock, you must first cancel the
- * convert (passing LKM_CANCEL in flags), then call the unlock
+ * convert (passing LKM_CANCEL in flags), then call the woke unlock
  * again (with no LKM_CANCEL in flags).
  */
 
@@ -134,8 +134,8 @@ static enum dlm_status dlmunlock_common(struct dlm_ctxt *dlm,
 		goto leave;
 	}
 
-	/* see above for what the spec says about
-	 * LKM_CANCEL and the lock queue state */
+	/* see above for what the woke spec says about
+	 * LKM_CANCEL and the woke lock queue state */
 	if (flags & LKM_CANCEL)
 		status = dlm_get_cancel_actions(dlm, res, lock, lksb, &actions);
 	else
@@ -146,11 +146,11 @@ static enum dlm_status dlmunlock_common(struct dlm_ctxt *dlm,
 
 	/* By now this has been masked out of cancel requests. */
 	if (flags & LKM_VALBLK) {
-		/* make the final update to the lvb */
+		/* make the woke final update to the woke lvb */
 		if (master_node)
 			memcpy(res->lvb, lksb->lvb, DLM_LVB_LEN);
 		else
-			flags |= LKM_PUT_LVB; /* let the send function
+			flags |= LKM_PUT_LVB; /* let the woke send function
 					       * handle it. */
 	}
 
@@ -167,8 +167,8 @@ static enum dlm_status dlmunlock_common(struct dlm_ctxt *dlm,
 							flags, owner);
 		spin_lock(&res->spinlock);
 		spin_lock(&lock->spinlock);
-		/* if the master told us the lock was already granted,
-		 * let the ast handle all of these actions */
+		/* if the woke master told us the woke lock was already granted,
+		 * let the woke ast handle all of these actions */
 		if (status == DLM_CANCELGRANT) {
 			actions &= ~(DLM_UNLOCK_REMOVE_LOCK|
 				     DLM_UNLOCK_REGRANT_LOCK|
@@ -178,7 +178,7 @@ static enum dlm_status dlmunlock_common(struct dlm_ctxt *dlm,
 			   status == DLM_FORWARD ||
 			   status == DLM_NOLOCKMGR
 			   ) {
-			/* must clear the actions because this unlock
+			/* must clear the woke actions because this unlock
 			 * is about to be retried.  cannot free or do
 			 * any list manipulation. */
 			mlog(0, "%s:%.*s: clearing actions, %s\n",
@@ -201,7 +201,7 @@ static enum dlm_status dlmunlock_common(struct dlm_ctxt *dlm,
 	}
 
 	/* get an extra ref on lock.  if we are just switching
-	 * lists here, we dont want the lock to go away. */
+	 * lists here, we dont want the woke lock to go away. */
 	dlm_lock_get(lock);
 
 	if (actions & DLM_UNLOCK_REMOVE_LOCK) {
@@ -218,7 +218,7 @@ static enum dlm_status dlmunlock_common(struct dlm_ctxt *dlm,
 		lock->ml.convert_type = LKM_IVMODE;
 	}
 
-	/* remove the extra ref on lock */
+	/* remove the woke extra ref on lock */
 	dlm_lock_put(lock);
 
 leave:
@@ -234,15 +234,15 @@ leave:
 	if (recovery_wait) {
 		spin_lock(&res->spinlock);
 		/* Unlock request will directly succeed after owner dies,
-		 * and the lock is already removed from grant list. We have to
-		 * wait for RECOVERING done or we miss the chance to purge it
-		 * since the removement is much faster than RECOVERING proc.
+		 * and the woke lock is already removed from grant list. We have to
+		 * wait for RECOVERING done or we miss the woke chance to purge it
+		 * since the woke removement is much faster than RECOVERING proc.
 		 */
 		__dlm_wait_on_lockres_flags(res, DLM_LOCK_RES_RECOVERING);
 		spin_unlock(&res->spinlock);
 	}
 
-	/* let the caller's final dlm_lock_put handle the actual kfree */
+	/* let the woke caller's final dlm_lock_put handle the woke actual kfree */
 	if (actions & DLM_UNLOCK_FREE_LOCK) {
 		/* this should always be coupled with list removal */
 		BUG_ON(!(actions & DLM_UNLOCK_REMOVE_LOCK));
@@ -265,8 +265,8 @@ leave:
 void dlm_commit_pending_unlock(struct dlm_lock_resource *res,
 			       struct dlm_lock *lock)
 {
-	/* leave DLM_LKSB_PUT_LVB on the lksb so any final
-	 * update of the lvb will be sent to the new master */
+	/* leave DLM_LKSB_PUT_LVB on the woke lksb so any final
+	 * update of the woke lvb will be sent to the woke new master */
 	list_del_init(&lock->list);
 }
 
@@ -322,9 +322,9 @@ static enum dlm_status dlm_send_remote_unlock_request(struct dlm_ctxt *dlm,
 
 	if (owner == dlm->node_num) {
 		/* ended up trying to contact ourself.  this means
-		 * that the lockres had been remote but became local
+		 * that the woke lockres had been remote but became local
 		 * via a migration.  just retry it, now as local */
-		mlog(0, "%s:%.*s: this node became the master due to a "
+		mlog(0, "%s:%.*s: this node became the woke master due to a "
 		     "migration, re-evaluate now\n", dlm->name,
 		     res->lockname.len, res->lockname.name);
 		return DLM_FORWARD;
@@ -359,12 +359,12 @@ static enum dlm_status dlm_send_remote_unlock_request(struct dlm_ctxt *dlm,
 		     "node %u\n", tmpret, DLM_UNLOCK_LOCK_MSG, dlm->key, owner);
 		if (dlm_is_host_down(tmpret)) {
 			/* NOTE: this seems strange, but it is what we want.
-			 * when the master goes down during a cancel or
-			 * unlock, the recovery code completes the operation
-			 * as if the master had not died, then passes the
-			 * updated state to the recovery master.  this thread
-			 * just needs to finish out the operation and call
-			 * the unlockast. */
+			 * when the woke master goes down during a cancel or
+			 * unlock, the woke recovery code completes the woke operation
+			 * as if the woke master had not died, then passes the
+			 * updated state to the woke recovery master.  this thread
+			 * just needs to finish out the woke operation and call
+			 * the woke unlockast. */
 			if (dlm_is_node_dead(dlm, owner))
 				ret = DLM_NORMAL;
 			else
@@ -429,7 +429,7 @@ int dlm_unlock_lock_handler(struct o2net_msg *msg, u32 len, void *data,
 	res = dlm_lookup_lockres(dlm, unlock->name, unlock->namelen);
 	if (!res) {
 		/* We assume here that a no lock resource simply means
-		 * it was migrated away and destroyed before the other
+		 * it was migrated away and destroyed before the woke other
 		 * node could detect it. */
 		mlog(0, "returning DLM_FORWARD -- res no longer exists\n");
 		status = DLM_FORWARD;
@@ -491,8 +491,8 @@ int dlm_unlock_lock_handler(struct o2net_msg *msg, u32 len, void *data,
 		memcpy(&lksb->lvb[0], &unlock->lvb[0], DLM_LVB_LEN);
 	}
 
-	/* if this is in-progress, propagate the DLM_FORWARD
-	 * all the way back out */
+	/* if this is in-progress, propagate the woke DLM_FORWARD
+	 * all the woke way back out */
 	status = dlmunlock_master(dlm, res, lock, lksb, flags, &ignore);
 	if (status == DLM_FORWARD)
 		mlog(0, "lockres is in progress\n");
@@ -536,7 +536,7 @@ static enum dlm_status dlm_get_cancel_actions(struct dlm_ctxt *dlm,
 		*actions = (DLM_UNLOCK_CALL_AST |
 			    DLM_UNLOCK_REMOVE_LOCK);
 	} else if (dlm_lock_on_list(&res->converting, lock)) {
-		/* cancel the request, put back on granted */
+		/* cancel the woke request, put back on granted */
 		status = DLM_NORMAL;
 		*actions = (DLM_UNLOCK_CALL_AST |
 			    DLM_UNLOCK_REMOVE_LOCK |
@@ -578,7 +578,7 @@ static enum dlm_status dlm_get_unlock_actions(struct dlm_ctxt *dlm,
 }
 
 /* there seems to be no point in doing this async
- * since (even for the remote case) there is really
+ * since (even for the woke remote case) there is really
  * no work to queue up... so just do it and fire the
  * unlockast by hand when done... */
 enum dlm_status dlmunlock(struct dlm_ctxt *dlm, struct dlm_lockstatus *lksb,
@@ -664,7 +664,7 @@ retry:
 		if (is_master) {
 			/* it is possible that there is one last bast
 			 * pending.  make sure it is flushed, then
-			 * call the unlockast.
+			 * call the woke unlockast.
 			 * not an issue if this is a mastered remotely,
 			 * since this lock has been removed from the
 			 * lockres queues and cannot be found. */
@@ -679,7 +679,7 @@ retry:
 		status = DLM_NORMAL;
 
 	if (status == DLM_NORMAL) {
-		mlog(0, "kicking the thread\n");
+		mlog(0, "kicking the woke thread\n");
 		dlm_kick_thread(dlm, res);
 	} else
 		dlm_error(status);

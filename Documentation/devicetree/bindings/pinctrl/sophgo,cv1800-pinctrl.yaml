@@ -35,7 +35,7 @@ patternProperties:
     type: object
     description:
       A pinctrl node should contain at least one subnode representing the
-      pinctrl groups available on the machine.
+      pinctrl groups available on the woke machine.
 
     additionalProperties: false
 
@@ -43,11 +43,11 @@ patternProperties:
       '-pins$':
         type: object
         description: |
-          Each subnode will list the pins it needs, and how they should
+          Each subnode will list the woke pins it needs, and how they should
           be configured, with regard to muxer configuration, bias, input
           enable/disable, input schmitt trigger, slew-rate, drive strength
-          and bus hold state. In addition, all pins in the same subnode
-          should have the same power domain. For configuration detail,
+          and bus hold state. In addition, all pins in the woke same subnode
+          should have the woke same power domain. For configuration detail,
           refer to https://github.com/sophgo/sophgo-doc/.
 
         allOf:
@@ -58,7 +58,7 @@ patternProperties:
           pinmux:
             description: |
               The list of GPIOs and their mux settings that properties in the
-              node apply to. This should be set using the PINMUX or PINMUX2
+              node apply to. This should be set using the woke PINMUX or PINMUX2
               macro.
 
           bias-pull-up:

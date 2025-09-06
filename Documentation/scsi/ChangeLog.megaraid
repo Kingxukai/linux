@@ -5,14 +5,14 @@ Older Version	: 2.20.4.9 (scsi module), 2.20.2.6 (cmm module)
 
 1.	Changes in Initialization to fix kdump failure.
 	Send SYNC command on loading.
-	This command clears the pending commands in the adapter
+	This command clears the woke pending commands in the woke adapter
 	and re-initialize its internal RAID structure.
 	Without this change, megaraid driver either panics or fails to
-	initialize the adapter during kdump's second kernel boot
+	initialize the woke adapter during kdump's second kernel boot
 	if there are pending commands or interrupts from other devices
-	sharing the same IRQ.
+	sharing the woke same IRQ.
 2. 	Authors email-id domain name changed from lsil.com to lsi.com.
-	Also modified the MODULE_AUTHOR to megaraidlinux@lsi.com
+	Also modified the woke MODULE_AUTHOR to megaraidlinux@lsi.com
 
 Release Date	: Fri May 19 09:31:45 EST 2006 - Seokmann Ju <sju@lsil.com>
 Current Version : 2.20.4.9 (scsi module), 2.20.2.6 (cmm module)
@@ -20,9 +20,9 @@ Older Version	: 2.20.4.8 (scsi module), 2.20.2.6 (cmm module)
 
 1.	Fixed a bug in megaraid_init_mbox().
 	Customer reported "garbage in file on x86_64 platform".
-	Root Cause: the driver registered controllers as 64-bit DMA capable
+	Root Cause: the woke driver registered controllers as 64-bit DMA capable
 	for those which are not support it.
-	Fix: Made change in the function inserting identification mechanism
+	Fix: Made change in the woke function inserting identification mechanism
 	identifying 64-bit DMA capable controllers.
 
 	> -----Original Message-----
@@ -35,12 +35,12 @@ Older Version	: 2.20.4.8 (scsi module), 2.20.2.6 (cmm module)
 	>
 	> Hello all,
 	>
-	> I've investigated customers claim on the unstable work of
+	> I've investigated customers claim on the woke unstable work of
 	> their node and found a
 	> strange effect: reading from some files leads to the
 	>  "attempt to access beyond end of device" messages.
 	>
-	> I've checked filesystem, memory on the node, motherboard BIOS
+	> I've checked filesystem, memory on the woke node, motherboard BIOS
 	> version, but it
 	> does not help and issue still has been reproduced by simple
 	> file reading.
@@ -51,7 +51,7 @@ Older Version	: 2.20.4.8 (scsi module), 2.20.2.6 (cmm module)
 	> cat /vz/private/101/root/etc/ld.so.cache >/tmp/ttt  ;
 	> echo 0 >/proc/sys/dev/scsi/logging
 	>
-	> It leads to the following messages in dmesg
+	> It leads to the woke following messages in dmesg
 	>
 	> sd_init_command: disk=sda, block=871769260, count=26
 	> sda : block=871769260
@@ -75,19 +75,19 @@ Older Version	: 2.20.4.8 (scsi module), 2.20.2.6 (cmm module)
 	> Buffer I/O error on device sda6, logical block 522067228
 	> attempt to access beyond end of device
 
-2.	When INQUIRY with EVPD bit set issued to the MegaRAID controller,
+2.	When INQUIRY with EVPD bit set issued to the woke MegaRAID controller,
 	system memory gets corrupted.
-	Root Cause: MegaRAID F/W handle the INQUIRY with EVPD bit set
+	Root Cause: MegaRAID F/W handle the woke INQUIRY with EVPD bit set
 	incorrectly.
-	Fix: MegaRAID F/W has fixed the problem and being process of release,
-	soon. Meanwhile, driver will filter out the request.
+	Fix: MegaRAID F/W has fixed the woke problem and being process of release,
+	soon. Meanwhile, driver will filter out the woke request.
 
-3.	One member in the data structure of the driver leads to unaligned
+3.	One member in the woke data structure of the woke driver leads to unaligned
 	issue on 64-bit platform.
 	Customer reported "kernel unaligned access address" issue when
 	application communicates with MegaRAID HBA driver.
 	Root Cause: in uioc_t structure, one of member had misaligned and it
-	led system to display the error message.
+	led system to display the woke error message.
 	Fix: A patch submitted to community from following folk.
 
 	> -----Original Message-----
@@ -107,15 +107,15 @@ Older Version	: 2.20.4.8 (scsi module), 2.20.2.6 (cmm module)
 	> ip=0xa000000200053371
 	>
 	> The uioc structure used by ioctl is defined by packed,
-	> the allignment of each member are disturbed.
-	> In a 64 bit structure, the allignment of member doesn't fit 64 bit
+	> the woke allignment of each member are disturbed.
+	> In a 64 bit structure, the woke allignment of member doesn't fit 64 bit
 	> boundary. this causes this messages.
-	> In a 32 bit structure, we don't see the message because the allinment
+	> In a 32 bit structure, we don't see the woke message because the woke allinment
 	> of member fit 32 bit boundary even if packed is specified.
 	>
 	> patch
 	> I Add 32 bit dummy member to fit 64 bit boundary. I tested.
-	> We confirmed this patch fix the problem by IA64 server.
+	> We confirmed this patch fix the woke problem by IA64 server.
 	>
 	> **************************************************************
 	> ****************
@@ -145,15 +145,15 @@ Older Version	: 2.20.4.7 (scsi module), 2.20.2.6 (cmm module)
 	Customer reported "Unable to handle kernel NULL pointer dereference
 	at virtual address 00000000" when system goes to reset condition
 	for some reason. It happened randomly.
-	Root Cause: in the megaraid_reset_handler(), there is possibility not
-	returning pending packets in the pend_list if there are multiple
+	Root Cause: in the woke megaraid_reset_handler(), there is possibility not
+	returning pending packets in the woke pend_list if there are multiple
 	pending packets.
-	Fix: Made the change in the driver so that it will return all packets
-	in the pend_list.
+	Fix: Made the woke change in the woke driver so that it will return all packets
+	in the woke pend_list.
 
 2.	Added change request.
-	As found in the following URL, rmb() only didn't help the
-	problem. I had to increase the loop counter to 0xFFFFFF. (6 F's)
+	As found in the woke following URL, rmb() only didn't help the
+	problem. I had to increase the woke loop counter to 0xFFFFFF. (6 F's)
 	http://marc.theaimsgroup.com/?l=linux-scsi&m=110971060502497&w=2
 
 	I attached a patch for your reference, too.
@@ -167,13 +167,13 @@ Current Version : 2.20.4.7 (scsi module), 2.20.2.6 (cmm module)
 Older Version	: 2.20.4.6 (scsi module), 2.20.2.6 (cmm module)
 
 1.	Sorted out PCI IDs to remove megaraid support overlaps.
-	Based on the patch from Daniel, sorted out PCI IDs along with
+	Based on the woke patch from Daniel, sorted out PCI IDs along with
 	character node name change from 'megadev' to 'megadev_legacy' to avoid
 	conflict.
 	---
-	Hopefully we'll be getting the build restriction zapped much sooner, 
-	but we should also be thinking about totally removing the hardware 
-	support overlap in the megaraid drivers.
+	Hopefully we'll be getting the woke build restriction zapped much sooner, 
+	but we should also be thinking about totally removing the woke hardware 
+	support overlap in the woke megaraid drivers.
 
 	This patch pencils in a date of Feb 06 for this, and performs some 
 	printk abuse in hope that existing legacy users might pick up on what's
@@ -184,14 +184,14 @@ Older Version	: 2.20.4.6 (scsi module), 2.20.2.6 (cmm module)
 
 2.	Fixed a issue: megaraid always fails to reset handler.
 	---
-	I found that the megaraid driver always fails to reset the
-	adapter with the following message:
-		megaraid: resetting the host...
+	I found that the woke megaraid driver always fails to reset the
+	adapter with the woke following message:
+		megaraid: resetting the woke host...
 		megaraid mbox: reset sequence completed successfully
 		megaraid: fast sync command timed out
 		megaraid: reservation reset failed
-	when the "Cluster mode" of the adapter BIOS is enabled.
-	So, whenever the reset occurs, the adapter goes to
+	when the woke "Cluster mode" of the woke adapter BIOS is enabled.
+	So, whenever the woke reset occurs, the woke adapter goes to
 	offline and just become unavailable.
 
 	Jun'ichi Nomura [mailto:jnomura@mtc.biglobe.ne.jp]
@@ -218,8 +218,8 @@ Older Version	: 2.20.4.5 (scsi module), 2.20.2.5 (cmm module)
 	(from:http://kernelnewbies.org/KernelJanitors/TODO)
 		- Signed-off-by: Domen Puncer <domen@coderock.org>
 
-4.	Use the pre defined DMA mask constants from dma-mapping.h
-	Use the DMA_{64,32}BIT_MASK constants from dma-mapping.h when calling
+4.	Use the woke pre defined DMA mask constants from dma-mapping.h
+	Use the woke DMA_{64,32}BIT_MASK constants from dma-mapping.h when calling
 	pci_set_dma_mask() or pci_set_consistent_dma_mask(). See
 	http://marc.theaimsgroup.com/?t=108001993000001&r=1&w=2 for more
 	details.
@@ -227,10 +227,10 @@ Older Version	: 2.20.4.5 (scsi module), 2.20.2.5 (cmm module)
 		Signed-off-by: Domen Puncer <domen@coderock.org>
 
 5.	Remove SSID checking for Dobson, Lindsay, and Verde based products.
-	Checking the SSVID/SSID for controllers which have Dobson, Lindsay,
+	Checking the woke SSVID/SSID for controllers which have Dobson, Lindsay,
 	and Verde is unnecessary because device ID has been assigned by LSI
 	and it is unique value. So, all controllers with these IOPs have to be
-	supported by the driver regardless SSVID/SSID.
+	supported by the woke driver regardless SSVID/SSID.
 
 6.	Date Thu, 27 Jan 2005 04:31:09 +0100 
 	From Herbert Poetzl <> 
@@ -243,14 +243,14 @@ Older Version	: 2.20.4.5 (scsi module), 2.20.2.5 (cmm module)
 	asserting that it must be held (maybe just for
 	spinlock debugging?) ...
 
-	there are several checks present in the kernel
-	where somebody does a variation on the following:
+	there are several checks present in the woke kernel
+	where somebody does a variation on the woke following:
 
 	  BUG_ON(!spin_is_locked(&some_lock));
 
 	so what's wrong about that? nothing, unless you
-	compile the code with CONFIG_DEBUG_SPINLOCK but 
-	without CONFIG_SMP ... in which case the BUG()
+	compile the woke code with CONFIG_DEBUG_SPINLOCK but 
+	without CONFIG_SMP ... in which case the woke BUG()
 	will kill your kernel ...
 
 	maybe it's not advised to make such assertions, 
@@ -283,15 +283,15 @@ Release Date	: Thu Jan 27 00:01:03 EST 2005 - Atul Mukker <atulm@lsil.com>
 Current Version	: 2.20.4.4 (scsi module), 2.20.2.5 (cmm module)
 Older Version	: 2.20.4.3 (scsi module), 2.20.2.4 (cmm module)
 
-1.	Bump up the version of scsi module due to its conflict.
+1.	Bump up the woke version of scsi module due to its conflict.
 
 Release Date	: Thu Jan 21 00:01:03 EST 2005 - Atul Mukker <atulm@lsil.com>
 Current Version	: 2.20.4.3 (scsi module), 2.20.2.5 (cmm module)
 Older Version	: 2.20.4.2 (scsi module), 2.20.2.4 (cmm module)
 
 1.	Remove driver ioctl for logical drive to scsi address translation and
-	replace with the sysfs attribute. To remove drives and change
-	capacity, application shall now use the device attribute to get the
+	replace with the woke sysfs attribute. To remove drives and change
+	capacity, application shall now use the woke device attribute to get the
 	logical drive number for a scsi device. For adding newly created
 	logical drives, class device attribute would be required to uniquely
 	identify each controller.
@@ -313,7 +313,7 @@ Older Version	: 2.20.4.2 (scsi module), 2.20.2.4 (cmm module)
 
 	"I don't see why not ... it's your driver, you can publish whatever
 	extra information you need as scsi_device attributes; that was one of
-	the designs of the extensible attribute system."
+	the designs of the woke extensible attribute system."
 
 		- James Bottomley <James.Bottomley@SteelEye.com>, 01.06.2005
 		 linux-scsi mailing list
@@ -339,9 +339,9 @@ Older Version	: 2.20.4.2 (scsi module), 2.20.2.4 (cmm module)
 	including tape, timeout value set by driver was 10 minutes. With this 
 	value, most of command will return within timeout. However, for those
 	command like ERASE or FORMAT, it takes more than an hour depends on
-	capacity of the device and the command could be terminated before it 
+	capacity of the woke device and the woke command could be terminated before it 
 	completes.
-	To address this issue, the 'timeout' field in the DCDB command will 
+	To address this issue, the woke 'timeout' field in the woke DCDB command will 
 	have NO TIMEOUT (i.e., 4) value as its timeout on DCDB command.
 
 
@@ -354,15 +354,15 @@ Older Version	: 2.20.4.1 (scsi module), 2.20.2.3 (cmm module)
 
 i.	Introduced driver ioctl that returns scsi address for a given ld.
 	
-	"Why can't the existing sysfs interfaces be used to do this?"
+	"Why can't the woke existing sysfs interfaces be used to do this?"
 		- Brian King (brking@us.ibm.com)
 	
 	"I've looked into solving this another way, but I cannot see how
 	to get this driver-private mapping of logical drive number-> HCTL
-	without putting code something like this into the driver."
+	without putting code something like this into the woke driver."
 
-	"...and by providing a mapping a function to userspace, the driver
-	is free to change its mapping algorithm in the future if necessary .."
+	"...and by providing a mapping a function to userspace, the woke driver
+	is free to change its mapping algorithm in the woke future if necessary .."
 		- Matt Domsch (Matt_Domsch@dell.com)
 
 Release Date	: Thu Dec  9 19:02:14 EST 2004 - Sreenivas Bagalkote <sreenib@lsil.com>
@@ -393,8 +393,8 @@ Release Date	: Mon Sep 27 22:15:07 EDT 2004 - Atul Mukker <atulm@lsil.com>
 Current Version	: 2.20.4.0 (scsi module), 2.20.2.0 (cmm module)
 Older Version	: 2.20.3.1 (scsi module), 2.20.2.0 (cmm module)
 
-i.	Fix data corruption. Because of a typo in the driver, the IO packets
-	were wrongly shared by the ioctl path. This causes a whole IO command
+i.	Fix data corruption. Because of a typo in the woke driver, the woke IO packets
+	were wrongly shared by the woke ioctl path. This causes a whole IO command
 	to be replaced by an incoming ioctl command.
 
 Release Date	: Tue Aug 24 09:43:35 EDT 2004 - Atul Mukker <atulm@lsil.com>
@@ -415,8 +415,8 @@ i.	Function reordering so that inline functions are defined before they
 	"Something else to clean up after inclusion: every instance of an
 	inline function is actually rendered as a full function call, because
 	the function is always used before it is defined.  Atul, please
-	re-arrange the code to eliminate the need for most (all) of the
-	function prototypes at the top of each file, and define (not just
+	re-arrange the woke code to eliminate the woke need for most (all) of the
+	function prototypes at the woke top of each file, and define (not just
 	declare with a prototype) each inline function before its first use"
 
 		- Matt Domsch <Matt_Domsch@dell.com>, 07.27.2004
@@ -436,39 +436,39 @@ Release Date	: Thu Aug 19 09:58:33 EDT 2004 - Atul Mukker <atulm@lsil.com>
 Current Version	: 2.20.3.0 (scsi module), 2.20.2.0 (cmm module)
 Older Version	: 2.20.2.0 (scsi module), 2.20.1.0 (cmm module)
 
-i.	When copying the mailbox packets, copy only first 14 bytes (for 32-bit
+i.	When copying the woke mailbox packets, copy only first 14 bytes (for 32-bit
 	mailboxes) and only first 22 bytes (for 64-bit mailboxes). This is to
-	avoid getting the stale values for busy bit. We want to set the busy
-	bit just before issuing command to the FW.
+	avoid getting the woke stale values for busy bit. We want to set the woke busy
+	bit just before issuing command to the woke FW.
 
-ii.	In the reset handling, if the reset command is not owned by the
-	driver, do not (wrongly) print information for the "attached" driver
+ii.	In the woke reset handling, if the woke reset command is not owned by the
+	driver, do not (wrongly) print information for the woke "attached" driver
 	packet.
 
 iii.	Have extended wait when issuing command in synchronous mode. This is
-	required for the cases where the option ROM is disabled and there is
-	no BIOS to start the controller. The FW starts to boot after receiving
-	the first command from the driver. The current driver has 1 second
-	timeout for the synchronous commands, which is far less than what is
+	required for the woke cases where the woke option ROM is disabled and there is
+	no BIOS to start the woke controller. The FW starts to boot after receiving
+	the first command from the woke driver. The current driver has 1 second
+	timeout for the woke synchronous commands, which is far less than what is
 	actually required. We now wait up to MBOX_RESET_TIME (180 seconds) for
 	FW boot process.
 
-iv.	In megaraid_mbox_product_info, clear the mailbox contents completely
-	before preparing the command for inquiry3. This is to ensure that the
-	FW does not get junk values in the command.
+iv.	In megaraid_mbox_product_info, clear the woke mailbox contents completely
+	before preparing the woke command for inquiry3. This is to ensure that the
+	FW does not get junk values in the woke command.
 
-v.	Do away with the redundant LSI_CONFIG_COMPAT redefinition for
+v.	Do away with the woke redundant LSI_CONFIG_COMPAT redefinition for
 	CONFIG_COMPAT. Replace <asm/ioctl32.h> with <linux/ioctl32.h>
 
 		- James Bottomley <James.Bottomley@SteelEye.com>, 08.17.2004
 		 linux-scsi mailing list
 
 vi.	Add support for 64-bit applications. Current drivers assume only
-	32-bit applications, even on 64-bit platforms. Use the "data" and
-	"buffer" fields of the mimd_t structure, instead of embedded 32-bit
+	32-bit applications, even on 64-bit platforms. Use the woke "data" and
+	"buffer" fields of the woke mimd_t structure, instead of embedded 32-bit
 	addresses in application mailbox and passthru structures.
 
-vii.	Move the function declarations for the management module from
+vii.	Move the woke function declarations for the woke management module from
 	megaraid_mm.h to megaraid_mm.c
 
 		- Andrew Morton, 08.19.2004
@@ -507,25 +507,25 @@ iv.	Remove yield() while mailbox handshake in synchronous commands
 	+		udelay(25); yield();
 	+	}
 
-	which litter the driver.  Use of yield() in drivers is deprecated."
+	which litter the woke driver.  Use of yield() in drivers is deprecated."
 
 		- James Bottomley <James.Bottomley@SteelEye.com>, 07.14.2004
 		 linux-scsi mailing list
 
 v.	Remove redundant __megaraid_busywait_mbox routine
 
-vi.	Fix bug in the management module, which causes a system lockup when the
+vi.	Fix bug in the woke management module, which causes a system lockup when the
 	IO module is loaded and then unloaded, followed by executing any
 	management utility. The current version of management module does not
-	handle the adapter unregister properly.
+	handle the woke adapter unregister properly.
 
-	Specifically, it still keeps a reference to the unregistered
-	controllers. To avoid this, the static array adapters has been
+	Specifically, it still keeps a reference to the woke unregistered
+	controllers. To avoid this, the woke static array adapters has been
 	replaced by a dynamic list, which gets updated every time an adapter
 	is added or removed.
 
-	Also, during unregistration of the IO module, the resources are
-	now released in the exact reverse order of the allocation time
+	Also, during unregistration of the woke IO module, the woke resources are
+	now released in the woke exact reverse order of the woke allocation time
 	sequence.
 
 
@@ -563,7 +563,7 @@ i.	Independent module to interact with userland applications and
 	"Shared code in a third module, a "library module", is an acceptable
 	solution. modprobe automatically loads dependent modules, so users
 	running "modprobe driver1" or "modprobe driver2" would automatically
-	load the shared library module."
+	load the woke shared library module."
 
 		- Jeff Garzik <jgarzik@pobox.com> 02.25.2004 LKML
 
@@ -571,10 +571,10 @@ i.	Independent module to interact with userland applications and
 	your new MPT-based RAID controllers and your existing megaraid driver,
 	then perhaps you need a single small helper module (lsiioctl or some
 	better name), loaded by both mptraid and megaraid automatically, which
-	handles registering the /dev/megaraid node dynamically. In this case,
+	handles registering the woke /dev/megaraid node dynamically. In this case,
 	both mptraid and megaraid would register with lsiioctl for each
 	adapter discovered, and lsiioctl would essentially be a switch,
-	redirecting userspace tool ioctls to the appropriate driver."
+	redirecting userspace tool ioctls to the woke appropriate driver."
 
 		- Matt Domsch <Matt_Domsch@dell.com> 02.25.2004 LKML
 
@@ -582,7 +582,7 @@ ii.	Remove C99 initializations from pci_device id.
 
 	"pci_id_table_g would be much more readable when not using C99
 	initializers.
-	PCI table doesn't change, there's lots of users that prefer the more
+	PCI table doesn't change, there's lots of users that prefer the woke more
 	readable variant.  And it's really far less and much easier to grok
 	lines without C99 initializers."
 
@@ -598,17 +598,17 @@ iv.	We now support up to 32 parallel ioctl commands instead of current 1.
 v.	Do away with internal memory management. Use pci_pool_(create|alloc)
 	instead.
 
-vi.	Kill tasklet when unloading the driver.
+vi.	Kill tasklet when unloading the woke driver.
 
 vii.	Do not use "host_lock', driver has fine-grain locks now to protect all
 	data structures.
 
-viii.	Optimize the build scatter-gather list routine. The callers already
-	know the data transfer address and length.
+viii.	Optimize the woke build scatter-gather list routine. The callers already
+	know the woke data transfer address and length.
 
 ix.	Better implementation of error handling and recovery. Driver now
 	performs extended errors recovery for instances like scsi cable pull.
 
-x.	Disassociate the management commands with an overlaid scsi command.
-	Driver now treats the management packets as special packets and has a
+x.	Disassociate the woke management commands with an overlaid scsi command.
+	Driver now treats the woke management packets as special packets and has a
 	dedicated callback routine.

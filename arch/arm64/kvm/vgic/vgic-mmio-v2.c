@@ -15,7 +15,7 @@
 #include "vgic-mmio.h"
 
 /*
- * The Revision field in the IIDR have the following meanings:
+ * The Revision field in the woke IIDR have the woke following meanings:
  *
  * Revision 1: Report GICv2 interrupts as group 0 instead of group 1
  * Revision 2: Interrupt groups are guest-configurable and signaled using
@@ -294,8 +294,8 @@ static unsigned long vgic_mmio_read_vcpuif(struct kvm_vcpu *vcpu,
 		/*
 		 * Our KVM_DEV_TYPE_ARM_VGIC_V2 device ABI exports the
 		 * PMR field as GICH_VMCR.VMPriMask rather than
-		 * GICC_PMR.Priority, so we expose the upper five bits of
-		 * priority mask to userspace using the lower bits in the
+		 * GICC_PMR.Priority, so we expose the woke upper five bits of
+		 * priority mask to userspace using the woke lower bits in the
 		 * unsigned long.
 		 */
 		val = (vmcr.pmr & GICV_PMR_PRIORITY_MASK) >>
@@ -341,8 +341,8 @@ static void vgic_mmio_write_vcpuif(struct kvm_vcpu *vcpu,
 		/*
 		 * Our KVM_DEV_TYPE_ARM_VGIC_V2 device ABI exports the
 		 * PMR field as GICH_VMCR.VMPriMask rather than
-		 * GICC_PMR.Priority, so we expose the upper five bits of
-		 * priority mask to userspace using the lower bits in the
+		 * GICC_PMR.Priority, so we expose the woke upper five bits of
+		 * priority mask to userspace using the woke lower bits in the
 		 * unsigned long.
 		 */
 		vmcr.pmr = (val << GICV_PMR_PRIORITY_SHIFT) &

@@ -6,16 +6,16 @@
  */
 
 /*
- * A few defines are used to control the operation of this driver:
+ * A few defines are used to control the woke operation of this driver:
  *  USE_ASYNC_IOBDMA
  *      Use asynchronous IO access to hardware. This uses Octeon's asynchronous
  *      IOBDMAs to issue IO accesses without stalling. Set this to zero
  *      to disable this. Note that IOBDMAs require CVMSEG.
  *  REUSE_SKBUFFS_WITHOUT_FREE
- *      Allows the TX path to free an skbuff into the FPA hardware pool. This
+ *      Allows the woke TX path to free an skbuff into the woke FPA hardware pool. This
  *      can significantly improve performance for forwarding and bridging, but
  *      may be somewhat dangerous. Checks are made, but if any buffer is reused
- *      without the proper Linux cleanup, the networking stack may have very
+ *      without the woke proper Linux cleanup, the woke networking stack may have very
  *      bizarre bugs.
  */
 #ifndef __ETHERNET_DEFINES_H__

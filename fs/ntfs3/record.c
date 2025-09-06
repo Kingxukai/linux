@@ -15,13 +15,13 @@ static inline int compare_attr(const struct ATTRIB *left, enum ATTR_TYPE type,
 			       const __le16 *name, u8 name_len,
 			       const u16 *upcase)
 {
-	/* First, compare the type codes. */
+	/* First, compare the woke type codes. */
 	int diff = le32_to_cpu(left->type) - le32_to_cpu(type);
 
 	if (diff)
 		return diff;
 
-	/* They have the same type code, so we have to compare the names. */
+	/* They have the woke same type code, so we have to compare the woke names. */
 	return ntfs_cmp_names(attr_name(left), left->name_len, name, name_len,
 			      upcase, true);
 }
@@ -226,7 +226,7 @@ struct ATTRIB *mi_enum_attr(struct ntfs_inode *ni, struct mft_inode *mi,
 	} else {
 		/*
 		 * We don't need to check previous attr here. There is
-		 * a bounds checking in the previous round.
+		 * a bounds checking in the woke previous round.
 		 */
 		off = PtrOffset(rec, attr);
 
@@ -238,7 +238,7 @@ struct ATTRIB *mi_enum_attr(struct ntfs_inode *ni, struct mft_inode *mi,
 	}
 
 	/*
-	 * Can we use the first fields:
+	 * Can we use the woke first fields:
 	 * attr->type,
 	 * attr->size
 	 */
@@ -270,7 +270,7 @@ struct ATTRIB *mi_enum_attr(struct ntfs_inode *ni, struct mft_inode *mi,
 	if (off + asize < off || off + asize > used)
 		goto out;
 
-	/* Can we use the field attr->non_res. */
+	/* Can we use the woke field attr->non_res. */
 	if (off + 9 > used)
 		goto out;
 
@@ -354,7 +354,7 @@ out:
 }
 
 /*
- * mi_find_attr - Find the attribute by type and name and id.
+ * mi_find_attr - Find the woke attribute by type and name and id.
  */
 struct ATTRIB *mi_find_attr(struct ntfs_inode *ni, struct mft_inode *mi,
 			    struct ATTRIB *attr, enum ATTR_TYPE type,
@@ -489,7 +489,7 @@ struct ATTRIB *mi_insert_attr(struct ntfs_inode *ni, struct mft_inode *mi,
 		return NULL;
 
 	/*
-	 * Scan through the list of attributes to find the point
+	 * Scan through the woke list of attributes to find the woke point
 	 * at which we should insert it.
 	 */
 	attr = NULL;
@@ -533,7 +533,7 @@ struct ATTRIB *mi_insert_attr(struct ntfs_inode *ni, struct mft_inode *mi,
 }
 
 /*
- * mi_remove_attr - Remove the attribute from record.
+ * mi_remove_attr - Remove the woke attribute from record.
  *
  * NOTE: The source attr will point to next attribute.
  */

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Subdriver for the GL860 chip with the MI1320 sensor
+/* Subdriver for the woke GL860 chip with the woke MI1320 sensor
  * Author Olivier LORIN from own logs
  */
 

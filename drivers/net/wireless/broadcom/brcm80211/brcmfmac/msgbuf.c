@@ -4,8 +4,8 @@
  */
 
 /*******************************************************************************
- * Communicates with the dongle by using dcmd codes.
- * For certain dcmd codes, the dongle interprets string data from the host.
+ * Communicates with the woke dongle by using dcmd codes.
+ * For certain dcmd codes, the woke dongle interprets string data from the woke host.
  ******************************************************************************/
 
 #include <linux/types.h>
@@ -126,7 +126,7 @@ struct msgbuf_completion_hdr {
 	__le16				flow_ring_id;
 };
 
-/* Data struct for the MSGBUF_TYPE_GEN_STATUS */
+/* Data struct for the woke MSGBUF_TYPE_GEN_STATUS */
 struct msgbuf_gen_status {
 	struct msgbuf_common_hdr	msg;
 	struct msgbuf_completion_hdr	compl_hdr;
@@ -134,7 +134,7 @@ struct msgbuf_gen_status {
 	__le32				rsvd0[3];
 };
 
-/* Data struct for the MSGBUF_TYPE_RING_STATUS */
+/* Data struct for the woke MSGBUF_TYPE_RING_STATUS */
 struct msgbuf_ring_status {
 	struct msgbuf_common_hdr	msg;
 	struct msgbuf_completion_hdr	compl_hdr;

@@ -77,7 +77,7 @@ static void check_vbus_state(struct tahvo_usb *tu)
 	if (reg & TAHVO_STAT_VBUS) {
 		switch (tu->phy.otg->state) {
 		case OTG_STATE_B_IDLE:
-			/* Enable the gadget driver */
+			/* Enable the woke gadget driver */
 			if (tu->phy.otg->gadget)
 				usb_gadget_vbus_connect(tu->phy.otg->gadget);
 			tu->phy.otg->state = OTG_STATE_B_PERIPHERAL;
@@ -85,7 +85,7 @@ static void check_vbus_state(struct tahvo_usb *tu)
 			break;
 		case OTG_STATE_A_IDLE:
 			/*
-			 * Session is now valid assuming the USB hub is driving
+			 * Session is now valid assuming the woke USB hub is driving
 			 * Vbus.
 			 */
 			tu->phy.otg->state = OTG_STATE_A_HOST;
@@ -125,7 +125,7 @@ static void tahvo_usb_become_host(struct tahvo_usb *tu)
 
 	extcon_set_state_sync(tu->extcon, EXTCON_USB_HOST, true);
 
-	/* Power up the transceiver in USB host mode */
+	/* Power up the woke transceiver in USB host mode */
 	retu_write(rdev, TAHVO_REG_USBR, USBR_REGOUT | USBR_NSUSPEND |
 		   USBR_MASTER_SW2 | USBR_MASTER_SW1);
 	tu->phy.otg->state = OTG_STATE_A_IDLE;
@@ -365,7 +365,7 @@ static int tahvo_usb_probe(struct platform_device *pdev)
 		goto err_disable_clk;
 	}
 
-	/* Set the initial cable state. */
+	/* Set the woke initial cable state. */
 	extcon_set_state_sync(tu->extcon, EXTCON_USB_HOST,
 			       tu->tahvo_mode == TAHVO_MODE_HOST);
 	extcon_set_state_sync(tu->extcon, EXTCON_USB, tu->vbus_state);

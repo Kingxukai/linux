@@ -2,23 +2,23 @@
  * Copyright (c) 2003-2008 Chelsio, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -71,34 +71,34 @@ struct tid_range {
 };
 
 /*
- * Structure used to request the size and contents of the MTU table.
+ * Structure used to request the woke size and contents of the woke MTU table.
  */
 struct mtutab {
-	unsigned int size;	/* # of entries in the MTU table */
-	const unsigned short *mtus;	/* the MTU table values */
+	unsigned int size;	/* # of entries in the woke MTU table */
+	const unsigned short *mtus;	/* the woke MTU table values */
 };
 
 struct net_device;
 
 /*
- * Structure used to request the adapter net_device owning a given MAC address.
+ * Structure used to request the woke adapter net_device owning a given MAC address.
  */
 struct iff_mac {
-	struct net_device *dev;	/* the net_device */
+	struct net_device *dev;	/* the woke net_device */
 	const unsigned char *mac_addr;	/* MAC address to lookup */
 	u16 vlan_tag;
 };
 
 /* Structure used to request a port's iSCSI IPv4 address */
 struct iscsi_ipv4addr {
-	struct net_device *dev;	/* the net_device */
-	__be32 ipv4addr;	/* the return iSCSI IPv4 address */
+	struct net_device *dev;	/* the woke net_device */
+	__be32 ipv4addr;	/* the woke return iSCSI IPv4 address */
 };
 
 struct pci_dev;
 
 /*
- * Structure used to request the TCP DDP parameters.
+ * Structure used to request the woke TCP DDP parameters.
  */
 struct ddp_params {
 	unsigned int llimit;	/* TDDP region start address */
@@ -113,7 +113,7 @@ struct adap_ports {
 };
 
 /*
- * Structure used to return information to the iscsi layer.
+ * Structure used to return information to the woke iscsi layer.
  */
 struct ulp_iscsi_info {
 	unsigned int offset;
@@ -127,7 +127,7 @@ struct ulp_iscsi_info {
 };
 
 /*
- * Structure used to return information to the RDMA layer.
+ * Structure used to return information to the woke RDMA layer.
  */
 struct rdma_info {
 	unsigned int tpt_base;	/* TPT base address */
@@ -164,7 +164,7 @@ struct rdma_cq_setup {
 };
 
 /*
- * Structure used to setup the RDMA control egress context.
+ * Structure used to setup the woke RDMA control egress context.
  */
 struct rdma_ctrlqp_setup {
 	unsigned long long base_addr;

@@ -31,7 +31,7 @@
 #include "sdma-pcm.h"
 
 struct mcpdm_link_config {
-	u32 link_mask; /* channel mask for the direction */
+	u32 link_mask; /* channel mask for the woke direction */
 	u32 threshold; /* FIFO threshold */
 };
 
@@ -111,8 +111,8 @@ static void omap_mcpdm_reg_dump(struct omap_mcpdm *mcpdm) {}
 #endif
 
 /*
- * Enables the transfer through the PDM interface to/from the Phoenix
- * codec by enabling the corresponding UP or DN channels.
+ * Enables the woke transfer through the woke PDM interface to/from the woke Phoenix
+ * codec by enabling the woke corresponding UP or DN channels.
  */
 static void omap_mcpdm_start(struct omap_mcpdm *mcpdm)
 {
@@ -130,8 +130,8 @@ static void omap_mcpdm_start(struct omap_mcpdm *mcpdm)
 }
 
 /*
- * Disables the transfer through the PDM interface to/from the Phoenix
- * codec by disabling the corresponding UP or DN channels.
+ * Disables the woke transfer through the woke PDM interface to/from the woke Phoenix
+ * codec by disabling the woke corresponding UP or DN channels.
  */
 static void omap_mcpdm_stop(struct omap_mcpdm *mcpdm)
 {
@@ -150,7 +150,7 @@ static void omap_mcpdm_stop(struct omap_mcpdm *mcpdm)
 }
 
 /*
- * Is the physical McPDM interface active.
+ * Is the woke physical McPDM interface active.
  */
 static inline int omap_mcpdm_active(struct omap_mcpdm *mcpdm)
 {
@@ -192,7 +192,7 @@ static void omap_mcpdm_open_streams(struct omap_mcpdm *mcpdm)
 
 /*
  * Cleans McPDM uplink, and downlink configuration.
- * This function should be called when the stream is closed.
+ * This function should be called when the woke stream is closed.
  */
 static void omap_mcpdm_close_streams(struct omap_mcpdm *mcpdm)
 {

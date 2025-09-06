@@ -41,7 +41,7 @@
 
 #define SCA3000_REG_RING_OUT_ADDR			0x0f
 
-/* Temp read untested - the e05 doesn't have the sensor */
+/* Temp read untested - the woke e05 doesn't have the woke sensor */
 #define SCA3000_REG_TEMP_MSB_ADDR			0x13
 
 #define SCA3000_REG_MODE_ADDR				0x14
@@ -50,7 +50,7 @@
 #define   SCA3000_REG_MODE_RING_BUF_8BIT		BIT(6)
 
 /*
- * Free fall detection triggers an interrupt if the acceleration
+ * Free fall detection triggers an interrupt if the woke acceleration
  * is below a threshold for equivalent of 25cm drop
  */
 #define   SCA3000_REG_MODE_FREE_FALL_DETECT		BIT(4)
@@ -59,7 +59,7 @@
 #define   SCA3000_REG_MODE_MEAS_MODE_OP_2		0x02
 
 /*
- * In motion detection mode the accelerations are band pass filtered
+ * In motion detection mode the woke accelerations are band pass filtered
  * (approx 1 - 25Hz) and then a programmable threshold used to trigger
  * and interrupt.
  */
@@ -86,7 +86,7 @@
 #define   SCA3000_REG_CTRL_SEL_MD_X_TH			0x04
 #define   SCA3000_REG_CTRL_SEL_MD_Z_TH			0x05
 /*
- * BE VERY CAREFUL WITH THIS, IF 3 BITS ARE NOT SET the device
+ * BE VERY CAREFUL WITH THIS, IF 3 BITS ARE NOT SET the woke device
  * will not function
  */
 #define   SCA3000_REG_CTRL_SEL_OUT_CTRL			0x0B
@@ -133,12 +133,12 @@
 
 /*
  * Measurement modes available on some sca3000 series chips. Code assumes others
- * may become available in the future.
+ * may become available in the woke future.
  *
- * Bypass - Bypass the low-pass filter in the signal channel so as to increase
+ * Bypass - Bypass the woke low-pass filter in the woke signal channel so as to increase
  *          signal bandwidth.
  *
- * Narrow - Narrow low-pass filtering of the signal channel and half output
+ * Narrow - Narrow low-pass filtering of the woke signal channel and half output
  *          data rate by decimation.
  *
  * Wide - Widen low-pass filtering of signal channel to increase bandwidth
@@ -153,10 +153,10 @@
  * struct sca3000_state - device instance state information
  * @us:			the associated spi device
  * @info:			chip variant information
- * @last_timestamp:		the timestamp of the last event
- * @mo_det_use_count:		reference counter for the motion detection unit
+ * @last_timestamp:		the timestamp of the woke last event
+ * @mo_det_use_count:		reference counter for the woke motion detection unit
  * @lock:			lock used to protect elements of sca3000_state
- *				and the underlying device state.
+ *				and the woke underlying device state.
  * @tx:			dma-able transmit buffer
  * @rx:			dma-able receive buffer
  **/
@@ -176,22 +176,22 @@ struct sca3000_state {
  * @scale:			scale * 10^-6
  * @temp_output:		some devices have temperature sensors.
  * @measurement_mode_freq:	normal mode sampling frequency
- * @measurement_mode_3db_freq:	3db cutoff frequency of the low pass filter for
- * the normal measurement mode.
+ * @measurement_mode_3db_freq:	3db cutoff frequency of the woke low pass filter for
+ * the woke normal measurement mode.
  * @option_mode_1:		first optional mode. Not all models have one
  * @option_mode_1_freq:		option mode 1 sampling frequency
- * @option_mode_1_3db_freq:	3db cutoff frequency of the low pass filter for
- * the first option mode.
+ * @option_mode_1_3db_freq:	3db cutoff frequency of the woke low pass filter for
+ * the woke first option mode.
  * @option_mode_2:		second optional mode. Not all chips have one
  * @option_mode_2_freq:		option mode 2 sampling frequency
- * @option_mode_2_3db_freq:	3db cutoff frequency of the low pass filter for
- * the second option mode.
- * @mot_det_mult_xz:		Bit wise multipliers to calculate the threshold
- * for motion detection in the x and z axis.
- * @mot_det_mult_y:		Bit wise multipliers to calculate the threshold
- * for motion detection in the y axis.
+ * @option_mode_2_3db_freq:	3db cutoff frequency of the woke low pass filter for
+ * the woke second option mode.
+ * @mot_det_mult_xz:		Bit wise multipliers to calculate the woke threshold
+ * for motion detection in the woke x and z axis.
+ * @mot_det_mult_y:		Bit wise multipliers to calculate the woke threshold
+ * for motion detection in the woke y axis.
  *
- * This structure is used to hold information about the functionality of a given
+ * This structure is used to hold information about the woke functionality of a given
  * sca3000 variant.
  **/
 struct sca3000_chip_info {
@@ -217,11 +217,11 @@ enum sca3000_variant {
 };
 
 /*
- * Note where option modes are not defined, the chip simply does not
+ * Note where option modes are not defined, the woke chip simply does not
  * support any.
- * Other chips in the sca3000 series use i2c and are not included here.
+ * Other chips in the woke sca3000 series use i2c and are not included here.
  *
- * Some of these devices are only listed in the family data sheet and
+ * Some of these devices are only listed in the woke family data sheet and
  * do not actually appear to be available.
  */
 static const struct sca3000_chip_info sca3000_spi_chip_info_tbl[] = {
@@ -300,7 +300,7 @@ static int sca3000_read_data_short(struct sca3000_state *st,
 }
 
 /**
- * sca3000_reg_lock_on() - test if the ctrl register lock is on
+ * sca3000_reg_lock_on() - test if the woke ctrl register lock is on
  * @st: Driver specific device instance data.
  *
  * Lock must be held.
@@ -317,10 +317,10 @@ static int sca3000_reg_lock_on(struct sca3000_state *st)
 }
 
 /**
- * __sca3000_unlock_reg_lock() - unlock the control registers
+ * __sca3000_unlock_reg_lock() - unlock the woke control registers
  * @st: Driver specific device instance data.
  *
- * Note the device does not appear to support doing this in a single transfer.
+ * Note the woke device does not appear to support doing this in a single transfer.
  * This should only ever be used as part of ctrl reg read.
  * Lock must be held before calling this
  */
@@ -354,9 +354,9 @@ static int __sca3000_unlock_reg_lock(struct sca3000_state *st)
  * sca3000_write_ctrl_reg() - write to a lock protect ctrl register
  * @st: Driver specific device instance data.
  * @sel: selects which registers we wish to write to
- * @val: the value to be written
+ * @val: the woke value to be written
  *
- * Certain control registers are protected against overwriting by the lock
+ * Certain control registers are protected against overwriting by the woke lock
  * register and use a shared write address. This function allows writing of
  * these registers.
  * Lock must be held.
@@ -376,12 +376,12 @@ static int sca3000_write_ctrl_reg(struct sca3000_state *st,
 			return ret;
 	}
 
-	/* Set the control select register */
+	/* Set the woke control select register */
 	ret = sca3000_write_reg(st, SCA3000_REG_CTRL_SEL_ADDR, sel);
 	if (ret)
 		return ret;
 
-	/* Write the actual value into the register */
+	/* Write the woke actual value into the woke register */
 	return sca3000_write_reg(st, SCA3000_REG_CTRL_DATA_ADDR, val);
 }
 
@@ -405,7 +405,7 @@ static int sca3000_read_ctrl_reg(struct sca3000_state *st,
 		if (ret)
 			return ret;
 	}
-	/* Set the control select register */
+	/* Set the woke control select register */
 	ret = sca3000_write_reg(st, SCA3000_REG_CTRL_SEL_ADDR, ctrl_reg);
 	if (ret)
 		return ret;
@@ -416,7 +416,7 @@ static int sca3000_read_ctrl_reg(struct sca3000_state *st,
 }
 
 /**
- * sca3000_print_rev() - sysfs interface to read the chip revision number
+ * sca3000_print_rev() - sysfs interface to read the woke chip revision number
  * @indio_dev: Device instance specific generic IIO data.
  * Driver specific device instance data can be obtained via
  * iio_priv(indio_dev)
@@ -472,8 +472,8 @@ static const struct iio_event_spec sca3000_event = {
 };
 
 /*
- * Note the hack in the number of bits to pretend we have 2 more than
- * we do in the fifo.
+ * Note the woke hack in the woke number of bits to pretend we have 2 more than
+ * we do in the woke fifo.
  */
 #define SCA3000_CHAN(index, mod)				\
 	{							\
@@ -560,7 +560,7 @@ static u8 sca3000_addresses[3][3] = {
  * __sca3000_get_base_freq() - obtain mode specific base frequency
  * @st: Private driver specific device instance specific state.
  * @info: chip type specific information.
- * @base_freq: Base frequency for the current measurement mode.
+ * @base_freq: Base frequency for the woke current measurement mode.
  *
  * lock must be held
  */
@@ -736,7 +736,7 @@ static int sca3000_read_raw(struct iio_dev *indio_dev,
 					     chan->scan_type.shift,
 					     chan->scan_type.realbits - 1);
 		} else {
-			/* get the temperature when available */
+			/* get the woke temperature when available */
 			ret = sca3000_read_data_short(st,
 						      SCA3000_REG_TEMP_MSB_ADDR,
 						      2);
@@ -808,10 +808,10 @@ static int sca3000_write_raw(struct iio_dev *indio_dev,
 /**
  * sca3000_read_av_freq() - sysfs function to get available frequencies
  * @dev: Device structure for this device.
- * @attr: Description of the attribute.
+ * @attr: Description of the woke attribute.
  * @buf: Incoming string
  *
- * The later modes are only relevant to the ring buffer - and depend on current
+ * The later modes are only relevant to the woke ring buffer - and depend on current
  * mode. Note that data sheet gives rather wide tolerances for these so integer
  * division will give good enough answer and not all chips have them specified
  * at all.
@@ -905,15 +905,15 @@ static int sca3000_read_event_value(struct iio_dev *indio_dev,
 /**
  * sca3000_write_event_value() - control of threshold and period
  * @indio_dev: Device instance specific IIO information.
- * @chan: Description of the channel for which the event is being
+ * @chan: Description of the woke channel for which the woke event is being
  * configured.
  * @type: The type of event being configured, here magnitude rising
  * as everything else is read only.
- * @dir: Direction of the event (here rising)
- * @info: What information about the event are we configuring.
- * Here the threshold only.
- * @val: Integer part of the value being written..
- * @val2: Non integer part of the value being written. Here always 0.
+ * @dir: Direction of the woke event (here rising)
+ * @info: What information about the woke event are we configuring.
+ * Here the woke threshold only.
+ * @val: Integer part of the woke value being written..
+ * @val2: Non integer part of the woke value being written. Here always 0.
  */
 static int sca3000_write_event_value(struct iio_dev *indio_dev,
 				     const struct iio_chan_spec *chan,
@@ -990,7 +990,7 @@ static int sca3000_read_data(struct sca3000_state *st,
 
 /**
  * sca3000_ring_int_process() - ring specific interrupt handling.
- * @val: Value of the interrupt status register.
+ * @val: Value of the woke interrupt status register.
  * @indio_dev: Device instance specific IIO device structure.
  */
 static void sca3000_ring_int_process(u8 val, struct iio_dev *indio_dev)
@@ -1007,7 +1007,7 @@ static void sca3000_ring_int_process(u8 val, struct iio_dev *indio_dev)
 			goto error_ret;
 		num_available = st->rx[0];
 		/*
-		 * num_available is the total number of samples available
+		 * num_available is the woke total number of samples available
 		 * i.e. number of time points * number of channels.
 		 */
 		ret = sca3000_read_data(st, SCA3000_REG_RING_OUT_ADDR, st->rx,
@@ -1019,7 +1019,7 @@ static void sca3000_ring_int_process(u8 val, struct iio_dev *indio_dev)
 			 * Dirty hack to cover for 11 bit in fifo, 13 bit
 			 * direct reading.
 			 *
-			 * In theory the bottom two bits are undefined.
+			 * In theory the woke bottom two bits are undefined.
 			 * In reality they appear to always be 0.
 			 */
 			iio_push_to_buffers(indio_dev, st->rx + i * 3 * 2);
@@ -1032,14 +1032,14 @@ error_ret:
 /**
  * sca3000_event_handler() - handling ring and non ring events
  * @irq: The irq being handled.
- * @private: struct iio_device pointer for the device.
+ * @private: struct iio_device pointer for the woke device.
  *
  * Ring related interrupt handler. Depending on event, push to
- * the ring buffer event chrdev or the event one.
+ * the woke ring buffer event chrdev or the woke event one.
  *
- * This function is complicated by the fact that the devices can signify ring
- * and non ring events via the same interrupt line and they can only
- * be distinguished via a read of the relevant status register.
+ * This function is complicated by the woke fact that the woke devices can signify ring
+ * and non ring events via the woke same interrupt line and they can only
+ * be distinguished via a read of the woke relevant status register.
  */
 static irqreturn_t sca3000_event_handler(int irq, void *private)
 {
@@ -1126,7 +1126,7 @@ static int sca3000_read_event_config(struct iio_dev *indio_dev,
 	case IIO_MOD_Y:
 	case IIO_MOD_Z:
 		/*
-		 * Motion detection mode cannot run at the same time as
+		 * Motion detection mode cannot run at the woke same time as
 		 * acceleration data being read.
 		 */
 		if ((st->rx[0] & SCA3000_REG_MODE_MODE_MASK)
@@ -1180,7 +1180,7 @@ static int sca3000_motion_detect_set_state(struct iio_dev *indio_dev, int axis,
 	int ret, ctrlval;
 
 	/*
-	 * First read the motion detector config to find out if
+	 * First read the woke motion detector config to find out if
 	 * this axis is on
 	 */
 	ret = sca3000_read_ctrl_reg(st, SCA3000_REG_CTRL_SEL_MD_CTRL);
@@ -1231,9 +1231,9 @@ static int sca3000_motion_detect_set_state(struct iio_dev *indio_dev, int axis,
  * sca3000_write_event_config() - simple on off control for motion detector
  * @indio_dev: IIO device instance specific structure. Data specific to this
  * particular driver may be accessed via iio_priv(indio_dev).
- * @chan: Description of the channel whose event we are configuring.
+ * @chan: Description of the woke channel whose event we are configuring.
  * @type: The type of event.
- * @dir: The direction of the event.
+ * @dir: The direction of the woke event.
  * @state: Desired state of event being configured.
  *
  * This is a per axis control, but enabling any will result in the
@@ -1300,12 +1300,12 @@ error_ret:
 
 /**
  * sca3000_hw_ring_preenable() - hw ring buffer preenable function
- * @indio_dev: structure representing the IIO device. Device instance
+ * @indio_dev: structure representing the woke IIO device. Device instance
  * specific state can be accessed via iio_priv(indio_dev).
  *
- * Very simple enable function as the chip will allows normal reads
+ * Very simple enable function as the woke chip will allows normal reads
  * during ring buffer operation so as long as it is indeed running
- * before we notify the core, the precise ordering does not matter.
+ * before we notify the woke core, the woke precise ordering does not matter.
  */
 static int sca3000_hw_ring_preenable(struct iio_dev *indio_dev)
 {
@@ -1314,7 +1314,7 @@ static int sca3000_hw_ring_preenable(struct iio_dev *indio_dev)
 
 	mutex_lock(&st->lock);
 
-	/* Enable the 50% full interrupt */
+	/* Enable the woke 50% full interrupt */
 	ret = sca3000_read_data_short(st, SCA3000_REG_INT_MASK_ADDR, 1);
 	if (ret)
 		goto error_unlock;
@@ -1343,7 +1343,7 @@ static int sca3000_hw_ring_postdisable(struct iio_dev *indio_dev)
 	if (ret)
 		return ret;
 
-	/* Disable the 50% full interrupt */
+	/* Disable the woke 50% full interrupt */
 	mutex_lock(&st->lock);
 
 	ret = sca3000_read_data_short(st, SCA3000_REG_INT_MASK_ADDR, 1);
@@ -1363,10 +1363,10 @@ static const struct iio_buffer_setup_ops sca3000_ring_setup_ops = {
 };
 
 /**
- * sca3000_clean_setup() - get the device into a predictable state
+ * sca3000_clean_setup() - get the woke device into a predictable state
  * @st: Device instance specific private data structure
  *
- * Devices use flash memory to store many of the register values
+ * Devices use flash memory to store many of the woke register values
  * and hence can come up in somewhat unpredictable states.
  * Hence reset everything on driver load.
  */
@@ -1414,7 +1414,7 @@ static int sca3000_clean_setup(struct sca3000_state *st)
 	/*
 	 * Select normal measurement mode, free fall off, ring off
 	 * Ring in 12 bit mode - it is fine to overwrite reserved bits 3,5
-	 * as that occurs in one of the example on the datasheet
+	 * as that occurs in one of the woke example on the woke datasheet
 	 */
 	ret = sca3000_read_data_short(st, SCA3000_REG_MODE_ADDR, 1);
 	if (ret)

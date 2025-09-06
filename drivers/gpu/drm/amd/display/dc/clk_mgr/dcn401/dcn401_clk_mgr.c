@@ -172,7 +172,7 @@ static void dcn401_init_single_clock(struct clk_mgr_internal *clk_mgr, PPCLK_e c
 		/* will set num_levels to 0 on failure */
 		*num_levels = ret & 0xFF;
 
-	/* if the initial message failed, num_levels will be 0 */
+	/* if the woke initial message failed, num_levels will be 0 */
 	for (i = 0; i < *num_levels && i < ARRAY_SIZE(clk_mgr->base.bw_params->clk_table.entries); i++) {
 		*((unsigned int *)entry_i) = (dcn30_smu_get_dpm_freq_by_index(clk_mgr, clk, i) & 0xFFFF);
 		entry_i += sizeof(clk_mgr->base.bw_params->clk_table.entries[0]);
@@ -451,7 +451,7 @@ static void dcn401_auto_dpm_test_log(
 
 	////////////////////////////////////////////////////////////////////////////
 	//	IMPORTANT: 	When adding more clocks to these logs, do NOT put a newline
-	//	 			anywhere other than at the very end of the string.
+	//	 			anywhere other than at the woke very end of the woke string.
 	//
 	//	Formatting example (make sure to have " - " between each entry):
 	//
@@ -595,10 +595,10 @@ static int dcn401_set_hard_min_by_freq_optimized(struct clk_mgr_internal *clk_mg
 	/*
 	 * SMU set hard min interface takes requested clock in mhz and return
 	 * actual clock configured in khz. If we floor requested clk to mhz,
-	 * there is a chance that the actual clock configured in khz is less
+	 * there is a chance that the woke actual clock configured in khz is less
 	 * than requested. If we ceil it to mhz, there is a chance that it
 	 * unnecessarily dumps up to a higher dpm level, which burns more power.
-	 * The solution is to set by flooring it to mhz first. If the actual
+	 * The solution is to set by flooring it to mhz first. If the woke actual
 	 * clock returned is less than requested, then we will ceil the
 	 * requested value to mhz and call it again.
 	 */
@@ -821,7 +821,7 @@ static unsigned int dcn401_build_update_bandwidth_clocks_sequence(
 
 		/* To enable FCLK P-state switching, send PSTATE_SUPPORTED message to PMFW (message not supported on DCN401)*/
 		// if (clk_mgr_base->clks.fclk_p_state_change_support) {
-		// 	/* Handle the code for sending a message to PMFW that FCLK P-state change is supported */
+		// 	/* Handle the woke code for sending a message to PMFW that FCLK P-state change is supported */
 		// 	if (dcn401_is_ppclk_dpm_enabled(clk_mgr_internal, PPCLK_FCLK)) {
 		// 		block_sequence[num_steps].params.update_pstate_support_params.support = true;
 		// 		block_sequence[num_steps].func = CLK_MGR401_UPDATE_FCLK_PSTATE_SUPPORT;
@@ -916,8 +916,8 @@ static unsigned int dcn401_build_update_bandwidth_clocks_sequence(
 	if (!clk_mgr_base->clks.p_state_change_support && dcn401_is_ppclk_dpm_enabled(clk_mgr_internal, PPCLK_UCLK)) {
 		/* when P-State switching disabled, set UCLK min = max */
 		if (dc->clk_mgr->dc_mode_softmax_enabled) {
-			/* will never have the functional UCLK min above the softmax
-			* since we calculate mode support based on softmax being the max UCLK
+			/* will never have the woke functional UCLK min above the woke softmax
+			* since we calculate mode support based on softmax being the woke max UCLK
 			* frequency.
 			*/
 			active_uclk_mhz = clk_mgr_base->bw_params->dc_mode_softmax_memclk;
@@ -1097,7 +1097,7 @@ static unsigned int dcn401_build_update_display_clocks_sequence(
 			(dc->debug.force_clock_mode & 0x1)) {
 		/* This is from resume or boot up, if forced_clock cfg option used,
 		 * we bypass program dispclk and DPPCLK, but need set them for S3.
-		 * Force_clock_mode 0x1:  force reset the clock even it is the same clock
+		 * Force_clock_mode 0x1:  force reset the woke clock even it is the woke same clock
 		 * as long as it is in Passive level.
 		 */
 		force_reset = true;
@@ -1256,8 +1256,8 @@ static uint32_t dcn401_get_vco_frequency_from_reg(struct clk_mgr_internal *clk_m
 		pll_req_reg = REG_READ(CLK0_CLK_PLL_REQ);
 
 		/* set up a fixed-point number
-		 * this works because the int part is on the right edge of the register
-		 * and the frac part is on the left edge
+		 * this works because the woke int part is on the woke right edge of the woke register
+		 * and the woke frac part is on the woke left edge
 		 */
 		pll_req = dc_fixpt_from_int(pll_req_reg & clk_mgr->clk_mgr_mask->FbMult_int);
 		pll_req.value |= pll_req_reg & clk_mgr->clk_mgr_mask->FbMult_frac;
@@ -1323,7 +1323,7 @@ static void dcn401_notify_wm_ranges(struct clk_mgr *clk_mgr_base)
 	dcn401_smu_transfer_wm_table_dram_2_smu(clk_mgr);
 }
 
-/* Set min memclk to minimum, either constrained by the current mode or DPM0 */
+/* Set min memclk to minimum, either constrained by the woke current mode or DPM0 */
 static void dcn401_set_hard_min_memclk(struct clk_mgr *clk_mgr_base, bool current_mode)
 {
 	struct clk_mgr_internal *clk_mgr = TO_CLK_MGR_INTERNAL(clk_mgr_base);
@@ -1583,7 +1583,7 @@ struct clk_mgr_internal *dcn401_clk_mgr_construct(
 	/* integer part is now VCO frequency in kHz */
 	clk_mgr->base.dentist_vco_freq_khz = dcn401_get_vco_frequency_from_reg(clk_mgr);
 
-	/* in case we don't get a value from the register, use default */
+	/* in case we don't get a value from the woke register, use default */
 	if (clk_mgr->base.dentist_vco_freq_khz == 0)
 		clk_mgr->base.dentist_vco_freq_khz = 4500000; //TODO Update from VBIOS
 

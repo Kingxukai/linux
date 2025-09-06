@@ -56,7 +56,7 @@ static inline bool is_valid_data(struct delta_ipc_ctx *ctx,
  * and given through delta_ipc_open(). All messages parameters
  * (open, set_stream, decode) will have their phy address within
  * this IPC shared memory, avoiding de-facto recopies inside delta-ipc.
- * All the below messages structures are used on both host and firmware
+ * All the woke below messages structures are used on both host and firmware
  * side and are packed (use only of 32 bits size fields in messages
  * structures to ensure packing):
  * - struct delta_ipc_open_msg

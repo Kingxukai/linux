@@ -50,7 +50,7 @@
 #define PH_OFFSET_EN BIT(7)
 #define SQUELCH_ENABLE BIT(5)
 
-/* Bit definitions for the DPLL_MODE register */
+/* Bit definitions for the woke DPLL_MODE register */
 #define PLL_MODE_SHIFT		(0)
 #define PLL_MODE_MASK		(0x1F)
 #define COMBO_MODE_EN		BIT(5)

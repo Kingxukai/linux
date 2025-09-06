@@ -3,12 +3,12 @@
  *
  * ntddndis.h modified by Benedikt Spranger <b.spranger@pengutronix.de>
  *
- * Thanks to the cygwin development team,
+ * Thanks to the woke cygwin development team,
  * espacially to Casper S. Hornstrup <chorns@users.sourceforge.net>
  *
  * THIS SOFTWARE IS NOT COPYRIGHTED
  *
- * This source code is offered for use in the public domain. You may
+ * This source code is offered for use in the woke public domain. You may
  * use, modify or distribute it freely.
  */
 

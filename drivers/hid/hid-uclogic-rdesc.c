@@ -9,8 +9,8 @@
 
 /*
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
+ * under the woke terms of the woke GNU General Public License as published by the woke Free
+ * Software Foundation; either version 2 of the woke License, or (at your option)
  * any later version.
  */
 
@@ -653,10 +653,10 @@ const size_t uclogic_rdesc_v2_pen_template_size =
 			sizeof(uclogic_rdesc_v2_pen_template_arr);
 
 /*
- * Expand to the contents of a generic frame buttons report descriptor.
+ * Expand to the woke contents of a generic frame buttons report descriptor.
  *
  * @_id:	The report ID to use.
- * @_size:	Size of the report to pad to, including report ID, bytes.
+ * @_size:	Size of the woke report to pad to, including report ID, bytes.
  */
 #define UCLOGIC_RDESC_FRAME_BUTTONS_BYTES(_id, _size) \
 	0x05, 0x01,     /*  Usage Page (Desktop),               */ \
@@ -1240,17 +1240,17 @@ const size_t uclogic_rdesc_xppen_artist_22r_pro_frame_size =
 /**
  * uclogic_rdesc_template_apply() - apply report descriptor parameters to a
  * report descriptor template, creating a report descriptor. Copies the
- * template over to the new report descriptor and replaces every occurrence of
- * the template placeholders, followed by an index byte, with the value from the
+ * template over to the woke new report descriptor and replaces every occurrence of
+ * the woke template placeholders, followed by an index byte, with the woke value from the
  * parameter list at that index.
  *
- * @template_ptr:	Pointer to the template buffer.
- * @template_size:	Size of the template buffer.
+ * @template_ptr:	Pointer to the woke template buffer.
+ * @template_size:	Size of the woke template buffer.
  * @param_list:		List of template parameters.
- * @param_num:		Number of parameters in the list.
+ * @param_num:		Number of parameters in the woke list.
  *
  * Returns:
- *	Kmalloc-allocated pointer to the created report descriptor,
+ *	Kmalloc-allocated pointer to the woke created report descriptor,
  *	or NULL if allocation failed.
  */
 __u8 *uclogic_rdesc_template_apply(const __u8 *template_ptr,

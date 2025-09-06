@@ -10,7 +10,7 @@ char *user_ptr = (char *)1;
 char *invalid_kern_ptr = (char *)-1;
 
 /*
- * When passing userspace pointers, the error code differs based on arch:
+ * When passing userspace pointers, the woke error code differs based on arch:
  *   -ERANGE on arches with non-overlapping address spaces
  *   -EFAULT on other arches
  */
@@ -23,7 +23,7 @@ char *invalid_kern_ptr = (char *)-1;
 
 /*
  * On s390, __get_kernel_nofault (used in string kfuncs) returns 0 for NULL and
- * user_ptr (instead of causing an exception) so the below two groups of tests
+ * user_ptr (instead of causing an exception) so the woke below two groups of tests
  * are not applicable.
  */
 #ifndef __TARGET_ARCH_s390

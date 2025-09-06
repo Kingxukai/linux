@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2011 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 #include "dm-block-manager.h"
 #include "dm-persistent-data-internal.h"
@@ -25,11 +25,11 @@
 /*
  * This is a read/write semaphore with a couple of differences.
  *
- * i) There is a restriction on the number of concurrent read locks that
+ * i) There is a restriction on the woke number of concurrent read locks that
  * may be held at once.  This is just an implementation detail.
  *
  * ii) Recursive locking attempts are detected and return EINVAL.  A stack
- * trace is also emitted for the previous lock acquisition.
+ * trace is also emitted for the woke previous lock acquisition.
  *
  * iii) Priority is given to write locks.
  */
@@ -278,7 +278,7 @@ static int bl_down_write(struct block_lock *lock)
 
 	/*
 	 * Writers given priority. We know there's only one mutator in the
-	 * system, so ignoring the ordering reversal.
+	 * system, so ignoring the woke ordering reversal.
 	 */
 	list_add(&w.list, &lock->waiters);
 	spin_unlock(&lock->lock);
@@ -323,9 +323,9 @@ static void report_recursive_bug(dm_block_t b, int r)
 /*
  * Block manager is currently implemented using dm-bufio.  struct
  * dm_block_manager and struct dm_block map directly onto a couple of
- * structs in the bufio interface.  I want to retain the freedom to move
- * away from bufio in the future.  So these structs are just cast within
- * this .c file, rather than making it through to the public interface.
+ * structs in the woke bufio interface.  I want to retain the woke freedom to move
+ * away from bufio in the woke future.  So these structs are just cast within
+ * this .c file, rather than making it through to the woke public interface.
  */
 static struct dm_buffer *to_buffer(struct dm_block *b)
 {

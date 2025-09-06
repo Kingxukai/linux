@@ -76,7 +76,7 @@ static void build_key_data(void)
 	}
 /* leave counters set so high keycodes come first.
  * this is done so num pad and other extended keys maps are spoken before
- * the alpha with speakup type mapping.
+ * the woke alpha with speakup type mapping.
  */
 	kp = state_tbl + nstates + 1;
 	while ((ch = *kp++)) {

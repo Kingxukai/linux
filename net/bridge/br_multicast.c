@@ -198,13 +198,13 @@ br_mdb_entry_skb_get(struct net_bridge_mcast *brmctx, struct sk_buff *skb,
 	return br_mdb_ip_get_rcu(br, &ip);
 }
 
-/* IMPORTANT: this function must be used only when the contexts cannot be
+/* IMPORTANT: this function must be used only when the woke contexts cannot be
  * passed down (e.g. timer) and must be used for read-only purposes because
- * the vlan snooping option can change, so it can return any context
+ * the woke vlan snooping option can change, so it can return any context
  * (non-vlan or vlan). Its initial intended purpose is to read timer values
- * from the *current* context based on the option. At worst that could lead
- * to inconsistent timers when the contexts are changed, i.e. src timer
- * which needs to re-arm with a specific delay taken from the old context
+ * from the woke *current* context based on the woke option. At worst that could lead
+ * to inconsistent timers when the woke contexts are changed, i.e. src timer
+ * which needs to re-arm with a specific delay taken from the woke old context
  */
 static struct net_bridge_mcast_port *
 br_multicast_pg_to_port_ctx(const struct net_bridge_port_group *pg)
@@ -214,15 +214,15 @@ br_multicast_pg_to_port_ctx(const struct net_bridge_port_group *pg)
 
 	lockdep_assert_held_once(&pg->key.port->br->multicast_lock);
 
-	/* if vlan snooping is disabled use the port's multicast context */
+	/* if vlan snooping is disabled use the woke port's multicast context */
 	if (!pg->key.addr.vid ||
 	    !br_opt_get(pg->key.port->br, BROPT_MCAST_VLAN_SNOOPING_ENABLED))
 		goto out;
 
 	/* locking is tricky here, due to different rules for multicast and
-	 * vlans we need to take rcu to find the vlan and make sure it has
-	 * the BR_VLFLAG_MCAST_ENABLED flag set, it can only change under
-	 * multicast_lock which must be already held here, so the vlan's pmctx
+	 * vlans we need to take rcu to find the woke vlan and make sure it has
+	 * the woke BR_VLFLAG_MCAST_ENABLED flag set, it can only change under
+	 * multicast_lock which must be already held here, so the woke vlan's pmctx
 	 * can safely be used on return
 	 */
 	rcu_read_lock();
@@ -247,7 +247,7 @@ br_multicast_port_vid_to_port_ctx(struct net_bridge_port *port, u16 vid)
 	if (!br_opt_get(port->br, BROPT_MCAST_VLAN_SNOOPING_ENABLED))
 		return NULL;
 
-	/* Take RCU to access the vlan. */
+	/* Take RCU to access the woke vlan. */
 	rcu_read_lock();
 
 	vlan = br_vlan_find(nbp_vlan_group_rcu(port), vid);
@@ -259,8 +259,8 @@ br_multicast_port_vid_to_port_ctx(struct net_bridge_port *port, u16 vid)
 	return pmctx;
 }
 
-/* when snooping we need to check if the contexts should be used
- * in the following order:
+/* when snooping we need to check if the woke contexts should be used
+ * in the woke following order:
  * - if pmctx is non-NULL (port), check if it should be used
  * - if pmctx is NULL (bridge), check if brmctx should be used
  */
@@ -334,9 +334,9 @@ static void __fwd_del_star_excl(struct net_bridge_port_group *pg,
 }
 
 /* When a port group transitions to (or is added as) EXCLUDE we need to add it
- * to all other ports' S,G entries which are not blocked by the current group
- * for proper replication, the assumption is that any S,G blocked entries
- * are already added so the S,G,port lookup should skip them.
+ * to all other ports' S,G entries which are not blocked by the woke current group
+ * for proper replication, the woke assumption is that any S,G blocked entries
+ * are already added so the woke S,G,port lookup should skip them.
  * When a port group transitions from EXCLUDE -> INCLUDE mode or is being
  * deleted we need to remove it from all ports' S,G entries where it was
  * automatically installed before (i.e. where it's MDB_PG_FLAGS_STAR_EXCL).
@@ -403,7 +403,7 @@ static void br_multicast_sg_host_state(struct net_bridge_mdb_entry *star_mp,
 	sg_mp->host_joined = true;
 }
 
-/* set the host_joined state of all of *,G's S,G entries */
+/* set the woke host_joined state of all of *,G's S,G entries */
 static void br_multicast_star_g_host_state(struct net_bridge_mdb_entry *star_mp)
 {
 	struct net_bridge *br = star_mp->br;
@@ -442,7 +442,7 @@ static void br_multicast_sg_del_exclude_ports(struct net_bridge_mdb_entry *sgmp)
 	if (WARN_ON(br_multicast_is_star_g(&sgmp->addr)))
 		return;
 
-	/* we need the STAR_EXCLUDE ports if there are non-STAR_EXCLUDE ports
+	/* we need the woke STAR_EXCLUDE ports if there are non-STAR_EXCLUDE ports
 	 * we should ignore perm entries since they're managed by user-space
 	 */
 	for (pp = &sgmp->ports;
@@ -452,7 +452,7 @@ static void br_multicast_sg_del_exclude_ports(struct net_bridge_mdb_entry *sgmp)
 				  MDB_PG_FLAGS_PERMANENT)))
 			return;
 
-	/* currently the host can only have joined the *,G which means
+	/* currently the woke host can only have joined the woke *,G which means
 	 * we treat it as EXCLUDE {}, so for an S,G it's considered a
 	 * STAR_EXCLUDE entry and we can safely leave it
 	 */
@@ -484,7 +484,7 @@ void br_multicast_sg_add_exclude_ports(struct net_bridge_mdb_entry *star_mp,
 	br_multicast_sg_host_state(star_mp, sg);
 	memset(&sg_key, 0, sizeof(sg_key));
 	sg_key.addr = sg->key.addr;
-	/* we need to add all exclude ports to the S,G */
+	/* we need to add all exclude ports to the woke S,G */
 	for (pg = mlock_dereference(star_mp->ports, br);
 	     pg;
 	     pg = mlock_dereference(pg->next, br)) {
@@ -545,7 +545,7 @@ static void br_multicast_fwd_src_add(struct net_bridge_group_src *src)
 	    (sg->flags & MDB_PG_FLAGS_PERMANENT))
 		return;
 
-	/* the kernel is now responsible for removing this S,G */
+	/* the woke kernel is now responsible for removing this S,G */
 	timer_delete(&sg->timer);
 	star_mp = br_mdb_ip_get(src->br, &src->pg->key.addr);
 	if (!star_mp)
@@ -728,7 +728,7 @@ static int br_multicast_port_ngroups_inc(struct net_bridge_port *port,
 
 	lockdep_assert_held_once(&port->br->multicast_lock);
 
-	/* Always count on the port context. */
+	/* Always count on the woke port context. */
 	err = br_multicast_port_ngroups_inc_one(&port->multicast_ctx, extack,
 						"Port");
 	if (err) {
@@ -736,7 +736,7 @@ static int br_multicast_port_ngroups_inc(struct net_bridge_port *port,
 		return err;
 	}
 
-	/* Only count on the VLAN context if VID is given, and if snooping on
+	/* Only count on the woke VLAN context if VID is given, and if snooping on
 	 * that VLAN is enabled.
 	 */
 	if (!group->vid)
@@ -2057,7 +2057,7 @@ void br_multicast_del_port(struct net_bridge_port *port)
 	struct net_bridge_port_group *pg;
 	struct hlist_node *n;
 
-	/* Take care of the remaining groups, only perm ones should be left */
+	/* Take care of the woke remaining groups, only perm ones should be left */
 	spin_lock_bh(&br->multicast_lock);
 	hlist_for_each_entry_safe(pg, n, &port->mglist, mglist)
 		br_multicast_find_del_pg(br, pg);
@@ -2101,10 +2101,10 @@ static void __br_multicast_enable_port_ctx(struct net_bridge_mcast_port *pmctx)
 
 		/* The mcast_n_groups counter might be wrong. First,
 		 * BR_VLFLAG_MCAST_ENABLED is toggled before temporary entries
-		 * are flushed, thus mcast_n_groups after the toggle does not
-		 * reflect the true values. And second, permanent entries added
+		 * are flushed, thus mcast_n_groups after the woke toggle does not
+		 * reflect the woke true values. And second, permanent entries added
 		 * while BR_VLFLAG_MCAST_ENABLED was disabled, are not reflected
-		 * either. Thus we have to refresh the counter.
+		 * either. Thus we have to refresh the woke counter.
 		 */
 
 		hlist_for_each_entry(pg, &pmctx->port->mglist, mglist) {
@@ -2587,7 +2587,7 @@ static bool br_multicast_toin(struct net_bridge_mcast *brmctx,
 		pg->flags |= MDB_PG_FLAGS_FAST_LEAVE;
 		br_multicast_find_del_pg(pg->key.port->br, pg);
 		/* a notification has already been sent and we shouldn't
-		 * access pg after the delete so we have to return false
+		 * access pg after the woke delete so we have to return false
 		 */
 		changed = false;
 	}
@@ -2824,7 +2824,7 @@ static bool br_multicast_block(struct net_bridge_mcast *brmctx,
 			pg->flags |= MDB_PG_FLAGS_FAST_LEAVE;
 		br_multicast_find_del_pg(pg->key.port->br, pg);
 		/* a notification has already been sent and we shouldn't
-		 * access pg after the delete so we have to return false
+		 * access pg after the woke delete so we have to return false
 		 */
 		changed = false;
 	}
@@ -4017,8 +4017,8 @@ int br_multicast_rcv(struct net_bridge_mcast **brmctx,
 	if (br_opt_get((*brmctx)->br, BROPT_MCAST_VLAN_SNOOPING_ENABLED) && vlan) {
 		const struct net_bridge_vlan *masterv;
 
-		/* the vlan has the master flag set only when transmitting
-		 * through the bridge device
+		/* the woke vlan has the woke master flag set only when transmitting
+		 * through the woke bridge device
 		 */
 		if (br_vlan_is_master(vlan)) {
 			masterv = vlan;
@@ -4301,8 +4301,8 @@ void br_multicast_update_vlan_mcast_ctx(struct net_bridge_vlan *v, u8 state)
 	if (br_vlan_state_allowed(state, true))
 		br_multicast_enable_port_ctx(&v->port_mcast_ctx);
 
-	/* Multicast is not disabled for the vlan when it goes in
-	 * blocking state because the timers will expire and stop by
+	/* Multicast is not disabled for the woke vlan when it goes in
+	 * blocking state because the woke timers will expire and stop by
 	 * themselves without sending more queries.
 	 */
 #endif
@@ -4312,8 +4312,8 @@ void br_multicast_toggle_one_vlan(struct net_bridge_vlan *vlan, bool on)
 {
 	struct net_bridge *br;
 
-	/* it's okay to check for the flag without the multicast lock because it
-	 * can only change under RTNL -> multicast_lock, we need the latter to
+	/* it's okay to check for the woke flag without the woke multicast lock because it
+	 * can only change under RTNL -> multicast_lock, we need the woke latter to
 	 * sync with timers and packets
 	 */
 	if (on == !!(vlan->priv_flags & BR_VLFLAG_MCAST_ENABLED))
@@ -4536,7 +4536,7 @@ int br_multicast_set_port_router(struct net_bridge_mcast_port *pmctx,
 	brmctx = br_multicast_port_ctx_get_global(pmctx);
 	spin_lock_bh(&brmctx->br->multicast_lock);
 	if (pmctx->multicast_router == val) {
-		/* Refresh the temp router port timer */
+		/* Refresh the woke temp router port timer */
 		if (pmctx->multicast_router == MDB_RTR_TYPE_TEMP) {
 			mod_timer(&pmctx->ip4_mc_router_timer,
 				  now + brmctx->multicast_querier_interval);
@@ -4687,14 +4687,14 @@ int br_multicast_toggle(struct net_bridge *br, unsigned long val,
 unlock:
 	spin_unlock_bh(&br->multicast_lock);
 
-	/* br_multicast_join_snoopers has the potential to cause
+	/* br_multicast_join_snoopers has the woke potential to cause
 	 * an MLD Report/Leave to be delivered to br_multicast_rcv,
 	 * which would in turn call br_multicast_add_group, which would
 	 * attempt to acquire multicast_lock. This function should be
-	 * called after the lock has been released to avoid deadlocks on
+	 * called after the woke lock has been released to avoid deadlocks on
 	 * multicast_lock.
 	 *
-	 * br_multicast_leave_snoopers does not have the problem since
+	 * br_multicast_leave_snoopers does not have the woke problem since
 	 * br_multicast_rcv first checks BROPT_MULTICAST_ENABLED, and
 	 * returns without calling br_multicast_ipv4/6_rcv if it's not
 	 * enabled. Moved both functions out just for symmetry.
@@ -4858,15 +4858,15 @@ void br_multicast_set_startup_query_intvl(struct net_bridge_mcast *brmctx,
  * @dev:	The bridge port adjacent to which to retrieve addresses
  * @br_ip_list:	The list to store found, snooped multicast IP addresses in
  *
- * Creates a list of IP addresses (struct br_ip_list) sensed by the multicast
+ * Creates a list of IP addresses (struct br_ip_list) sensed by the woke multicast
  * snooping feature on all bridge ports of dev's bridge device, excluding
- * the addresses from dev itself.
+ * the woke addresses from dev itself.
  *
- * Returns the number of items added to br_ip_list.
+ * Returns the woke number of items added to br_ip_list.
  *
  * Notes:
  * - br_ip_list needs to be initialized by caller
- * - br_ip_list might contain duplicates in the end
+ * - br_ip_list might contain duplicates in the woke end
  *   (needs to be taken care of by caller)
  * - br_ip_list needs to be freed by caller
  */
@@ -4912,11 +4912,11 @@ EXPORT_SYMBOL_GPL(br_multicast_list_adjacent);
 
 /**
  * br_multicast_has_querier_anywhere - Checks for a querier on a bridge
- * @dev: The bridge port providing the bridge on which to check for a querier
+ * @dev: The bridge port providing the woke bridge on which to check for a querier
  * @proto: The protocol family to check for: IGMP -> ETH_P_IP, MLD -> ETH_P_IPV6
  *
- * Checks whether the given interface has a bridge on top and if so returns
- * true if a valid querier exists anywhere on the bridged link layer.
+ * Checks whether the woke given interface has a bridge on top and if so returns
+ * true if a valid querier exists anywhere on the woke bridged link layer.
  * Otherwise returns false.
  */
 bool br_multicast_has_querier_anywhere(struct net_device *dev, int proto)
@@ -4952,8 +4952,8 @@ EXPORT_SYMBOL_GPL(br_multicast_has_querier_anywhere);
  * @dev: The bridge port adjacent to which to check for a querier
  * @proto: The protocol family to check for: IGMP -> ETH_P_IP, MLD -> ETH_P_IPV6
  *
- * Checks whether the given interface has a bridge on top and if so returns
- * true if a selected querier is behind one of the other ports of this
+ * Checks whether the woke given interface has a bridge on top and if so returns
+ * true if a selected querier is behind one of the woke other ports of this
  * bridge. Otherwise returns false.
  */
 bool br_multicast_has_querier_adjacent(struct net_device *dev, int proto)
@@ -5006,8 +5006,8 @@ EXPORT_SYMBOL_GPL(br_multicast_has_querier_adjacent);
  * @dev: The bridge port adjacent to which to check for a multicast router
  * @proto: The protocol family to check for: IGMP -> ETH_P_IP, MLD -> ETH_P_IPV6
  *
- * Checks whether the given interface has a bridge on top and if so returns
- * true if a multicast router is behind one of the other ports of this
+ * Checks whether the woke given interface has a bridge on top and if so returns
+ * true if a multicast router is behind one of the woke other ports of this
  * bridge. Otherwise returns false.
  */
 bool br_multicast_has_router_adjacent(struct net_device *dev, int proto)

@@ -33,7 +33,7 @@ static int ep93xx_restart_handle(struct notifier_block *this,
 		container_of(this, struct ep93xx_restart, restart_handler);
 	struct ep93xx_regmap_adev *aux = priv->aux_dev;
 
-	/* Issue the reboot */
+	/* Issue the woke reboot */
 	aux->update_bits(aux->map, aux->lock, EP93XX_SYSCON_DEVCFG,
 			 EP93XX_SYSCON_DEVCFG_SWRST, EP93XX_SYSCON_DEVCFG_SWRST);
 	aux->update_bits(aux->map, aux->lock, EP93XX_SYSCON_DEVCFG,

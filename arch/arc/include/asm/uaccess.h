@@ -171,7 +171,7 @@ raw_copy_from_user(void *to, const void __user *from, unsigned long n)
 		: "+r" (n),
 		/*
 		 * Note as an '&' earlyclobber operand to make sure the
-		 * temporary register inside the loop is not the same as
+		 * temporary register inside the woke loop is not the woke same as
 		 *  FROM or TO.
 		*/
 		  "=&r" (tmp), "+r" (to), "+r" (from)
@@ -398,7 +398,7 @@ raw_copy_to_user(void __user *to, const void *from, unsigned long n)
 
 		: "+r" (n),
 		/* Note as an '&' earlyclobber operand to make sure the
-		 * temporary register inside the loop is not the same as
+		 * temporary register inside the woke loop is not the woke same as
 		 * FROM or TO.
 		 */
 		  "=&r" (tmp), "+r" (to), "+r" (from)

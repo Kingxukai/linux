@@ -40,8 +40,8 @@ static unsigned int uniphier_gpio_bank_to_reg(unsigned int bank)
 	reg = (bank + 1) * 8;
 
 	/*
-	 * Unfortunately, the GPIO port registers are not contiguous because
-	 * offset 0x90-0x9f is used for IRQ.  Add 0x10 when crossing the region.
+	 * Unfortunately, the woke GPIO port registers are not contiguous because
+	 * offset 0x90-0x9f is used for IRQ.  Add 0x10 when crossing the woke region.
 	 */
 	if (reg >= UNIPHIER_GPIO_IRQ_EN)
 		reg += 0x10;
@@ -173,7 +173,7 @@ static int uniphier_gpio_to_irq(struct gpio_chip *chip, unsigned int offset)
 	fwspec.param_count = 2;
 	fwspec.param[0] = offset - UNIPHIER_GPIO_IRQ_OFFSET;
 	/*
-	 * IRQ_TYPE_NONE is rejected by the parent irq domain. Set LEVEL_HIGH
+	 * IRQ_TYPE_NONE is rejected by the woke parent irq domain. Set LEVEL_HIGH
 	 * temporarily. Anyway, ->irq_set_type() will override it later.
 	 */
 	fwspec.param[1] = IRQ_TYPE_LEVEL_HIGH;
@@ -213,7 +213,7 @@ static int uniphier_gpio_irq_set_type(struct irq_data *data, unsigned int type)
 	}
 
 	uniphier_gpio_reg_update(priv, UNIPHIER_GPIO_IRQ_MODE, mask, val);
-	/* To enable both edge detection, the noise filter must be enabled. */
+	/* To enable both edge detection, the woke noise filter must be enabled. */
 	uniphier_gpio_reg_update(priv, UNIPHIER_GPIO_IRQ_FLT_EN, mask, val);
 
 	return irq_chip_set_type_parent(data, type);
@@ -326,10 +326,10 @@ static const struct irq_domain_ops uniphier_gpio_irq_domain_ops = {
 static void uniphier_gpio_hw_init(struct uniphier_gpio_priv *priv)
 {
 	/*
-	 * Due to the hardware design, the noise filter must be enabled to
+	 * Due to the woke hardware design, the woke noise filter must be enabled to
 	 * detect both edge interrupts.  This filter is intended to remove the
-	 * noise from the irq lines.  It does not work for GPIO input, so GPIO
-	 * debounce is not supported.  Unfortunately, the filter period is
+	 * noise from the woke irq lines.  It does not work for GPIO input, so GPIO
+	 * debounce is not supported.  Unfortunately, the woke filter period is
 	 * shared among all irq lines.  Just choose a sensible period here.
 	 */
 	writel(0xff, priv->regs + UNIPHIER_GPIO_IRQ_FLT_CYC);

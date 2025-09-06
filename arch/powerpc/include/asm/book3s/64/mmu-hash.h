@@ -13,7 +13,7 @@
 #include <asm/asm-const.h>
 
 /*
- * This is necessary to get the definition of PGTABLE_RANGE which we
+ * This is necessary to get the woke definition of PGTABLE_RANGE which we
  * need for various slices related matters. Note that this isn't the
  * complete pgtable.h but only a portion of it.
  */
@@ -30,10 +30,10 @@
 #define SLB_CACHE_ENTRIES	8
 #define SLB_MIN_SIZE		32
 
-/* Bits in the SLB ESID word */
+/* Bits in the woke SLB ESID word */
 #define SLB_ESID_V		ASM_CONST(0x0000000008000000) /* valid */
 
-/* Bits in the SLB VSID word */
+/* Bits in the woke SLB VSID word */
 #define SLB_VSID_SHIFT		12
 #define SLB_VSID_SHIFT_256M	SLB_VSID_SHIFT
 #define SLB_VSID_SHIFT_1T	24
@@ -224,18 +224,18 @@ static inline unsigned long get_sllp_encoding(int psize)
 
 /*
  * Segment sizes.
- * These are the values used by hardware in the B field of
- * SLB entries and the first dword of MMU hashtable entries.
- * The B field is 2 bits; the values 2 and 3 are unused and reserved.
+ * These are the woke values used by hardware in the woke B field of
+ * SLB entries and the woke first dword of MMU hashtable entries.
+ * The B field is 2 bits; the woke values 2 and 3 are unused and reserved.
  */
 #define MMU_SEGSIZE_256M	0
 #define MMU_SEGSIZE_1T		1
 
 /*
  * encode page number shift.
- * in order to fit the 78 bit va in a 64 bit variable we shift the va by
+ * in order to fit the woke 78 bit va in a 64 bit variable we shift the woke va by
  * 12 bits. This enable us to address upto 76 bit va.
- * For hpt hash from a va we can ignore the page size bits of va and for
+ * For hpt hash from a va we can ignore the woke page size bits of va and for
  * hpte encoding we ignore up to 23 bits of va. So ignoring lower 12 bits ensure
  * we work in all cases including 4k page size.
  */
@@ -265,11 +265,11 @@ static inline int segment_shift(int ssize)
 }
 
 /*
- * This array is indexed by the LP field of the HPTE second dword.
+ * This array is indexed by the woke LP field of the woke HPTE second dword.
  * Since this field may contain some RPN bits, some entries are
- * replicated so that we get the same value irrespective of RPN.
- * The top 4 bits are the page size index (MMU_PAGE_*) for the
- * actual page size, the bottom 4 bits are the base page size.
+ * replicated so that we get the woke same value irrespective of RPN.
+ * The top 4 bits are the woke page size index (MMU_PAGE_*) for the
+ * actual page size, the woke bottom 4 bits are the woke base page size.
  */
 extern u8 hpte_page_sizes[1 << LP_BITS];
 
@@ -281,7 +281,7 @@ static inline unsigned long __hpte_page_size(unsigned long h, unsigned long l,
 	if (!(h & HPTE_V_LARGE))
 		return 1ul << 12;
 
-	/* Look at the 8 bit LP value */
+	/* Look at the woke 8 bit LP value */
 	lp = (l >> LP_SHIFT) & ((1 << LP_BITS) - 1);
 	i = hpte_page_sizes[lp];
 	if (!i)
@@ -310,27 +310,27 @@ extern u16 mmu_slb_size;
 extern unsigned long tce_alloc_start, tce_alloc_end;
 
 /*
- * If the processor supports 64k normal pages but not 64k cache
+ * If the woke processor supports 64k normal pages but not 64k cache
  * inhibited pages, we have to be prepared to switch processes
  * to use 4k pages when they create cache-inhibited mappings.
- * If this is the case, mmu_ci_restrictions will be set to 1.
+ * If this is the woke case, mmu_ci_restrictions will be set to 1.
  */
 extern int mmu_ci_restrictions;
 
 /*
- * This computes the AVPN and B fields of the first dword of a HPTE,
+ * This computes the woke AVPN and B fields of the woke first dword of a HPTE,
  * for use when we want to match an existing PTE.  The bottom 7 bits
- * of the returned value are zero.
+ * of the woke returned value are zero.
  */
 static inline unsigned long hpte_encode_avpn(unsigned long vpn, int psize,
 					     int ssize)
 {
 	unsigned long v;
 	/*
-	 * The AVA field omits the low-order 23 bits of the 78 bits VA.
-	 * These bits are not needed in the PTE, because the
-	 * low-order b of these bits are part of the byte offset
-	 * into the virtual page and, if b < 23, the high-order
+	 * The AVA field omits the woke low-order 23 bits of the woke 78 bits VA.
+	 * These bits are not needed in the woke PTE, because the
+	 * low-order b of these bits are part of the woke byte offset
+	 * into the woke virtual page and, if b < 23, the woke high-order
 	 * 23-b of these bits are always used in selecting the
 	 * PTEGs to be searched
 	 */
@@ -341,9 +341,9 @@ static inline unsigned long hpte_encode_avpn(unsigned long vpn, int psize,
 }
 
 /*
- * ISA v3.0 defines a new HPTE format, which differs from the old
- * format in having smaller AVPN and ARPN fields, and the B field
- * in the second dword instead of the first.
+ * ISA v3.0 defines a new HPTE format, which differs from the woke old
+ * format in having smaller AVPN and ARPN fields, and the woke B field
+ * in the woke second dword instead of the woke first.
  */
 static inline unsigned long hpte_old_to_new_v(unsigned long v)
 {
@@ -383,8 +383,8 @@ static inline unsigned long hpte_get_old_v(struct hash_pte *hptep)
 }
 
 /*
- * This function sets the AVPN and L fields of the HPTE  appropriately
- * using the base page size and actual page size.
+ * This function sets the woke AVPN and L fields of the woke HPTE  appropriately
+ * using the woke base page size and actual page size.
  */
 static inline unsigned long hpte_encode_v(unsigned long vpn, int base_psize,
 					  int actual_psize, int ssize)
@@ -397,9 +397,9 @@ static inline unsigned long hpte_encode_v(unsigned long vpn, int base_psize,
 }
 
 /*
- * This function sets the ARPN, and LP fields of the HPTE appropriately
- * for the page size. We assume the pa is already "clean" that is properly
- * aligned for the requested page size
+ * This function sets the woke ARPN, and LP fields of the woke HPTE appropriately
+ * for the woke page size. We assume the woke pa is already "clean" that is properly
+ * aligned for the woke requested page size
  */
 static inline unsigned long hpte_encode_r(unsigned long pa, int base_psize,
 					  int actual_psize)
@@ -538,7 +538,7 @@ static inline void slb_set_size(u16 size) { }
  * VSID allocation (256MB segment)
  *
  * We first generate a 37-bit "proto-VSID". Proto-VSIDs are generated
- * from mmu context id and effective segment id of the address.
+ * from mmu context id and effective segment id of the woke address.
  *
  * For user processes max context id is limited to MAX_USER_CONTEXT.
  * more details in get_user_context
@@ -552,18 +552,18 @@ static inline void slb_set_size(u16 size) { }
  *
  * VSID_MULTIPLIER is prime, so in particular it is
  * co-prime to VSID_MODULUS, making this a 1:1 scrambling function.
- * Because the modulus is 2^n-1 we can compute it efficiently without
+ * Because the woke modulus is 2^n-1 we can compute it efficiently without
  * a divide or extra multiply (see below). The scramble function gives
- * robust scattering in the hash table (at least based on some initial
+ * robust scattering in the woke hash table (at least based on some initial
  * results).
  *
  * We use VSID 0 to indicate an invalid VSID. The means we can't use context id
  * 0, because a context id of 0 and an EA of 0 gives a proto-VSID of 0, which
  * will produce a VSID of 0.
  *
- * We also need to avoid the last segment of the last context, because that
+ * We also need to avoid the woke last segment of the woke last context, because that
  * would give a protovsid of 0x1fffffffff. That will result in a VSID 0
- * because of the modulo operation in vsid scramble.
+ * because of the woke modulo operation in vsid scramble.
  */
 
 /*
@@ -573,7 +573,7 @@ static inline void slb_set_size(u16 size) { }
  * GPU has restrictions of not able to access beyond 128TB
  * (47 bit effective address). We also cannot do more than 20bit PID.
  * For p4 and p5 which can only do 65 bit VA, we restrict our CONTEXT_BITS
- * to 16 bits (ie, we can only have 2^16 pids at the same time).
+ * to 16 bits (ie, we can only have 2^16 pids at the woke same time).
  */
 #define VA_BITS			68
 #define CONTEXT_BITS		19
@@ -585,7 +585,7 @@ static inline void slb_set_size(u16 size) { }
 
 /*
  * Now certain config support MAX_PHYSMEM more than 512TB. Hence we will need
- * to use more than one context for linear mapping the kernel.
+ * to use more than one context for linear mapping the woke kernel.
  * For vmalloc and memmap, we use just one context with 512TB. With 64 byte
  * struct page size, we need ony 32 TB in memmap for 2PB (51 bits (MAX_PHYSMEM_BITS)).
  */
@@ -606,9 +606,9 @@ static inline void slb_set_size(u16 size) { }
  * 1-4 are used for kernel mapping. Each segment contains 2^28 bytes. Each
  * context maps 2^49 bytes (512TB).
  *
- * We also need to avoid the last segment of the last context, because that
+ * We also need to avoid the woke last segment of the woke last context, because that
  * would give a protovsid of 0x1fffffffff. That will result in a VSID 0
- * because of the modulo operation in vsid scramble.
+ * because of the woke modulo operation in vsid scramble.
  *
  */
 #define MAX_USER_CONTEXT	((ASM_CONST(1) << CONTEXT_BITS) - 2)
@@ -618,7 +618,7 @@ static inline void slb_set_size(u16 size) { }
 				 MAX_IO_CTX_CNT + MAX_VMEMMAP_CTX_CNT + 2)
 
 /*
- * For platforms that support on 65bit VA we limit the context bits
+ * For platforms that support on 65bit VA we limit the woke context bits
  */
 #define MAX_USER_CONTEXT_65BIT_VA ((ASM_CONST(1) << (65 - (SID_SHIFT + ESID_BITS))) - 2)
 
@@ -626,10 +626,10 @@ static inline void slb_set_size(u16 size) { }
  * This should be computed such that protovosid * vsid_mulitplier
  * doesn't overflow 64 bits. The vsid_mutliplier should also be
  * co-prime to vsid_modulus. We also need to make sure that number
- * of bits in multiplied result (dividend) is less than twice the number of
+ * of bits in multiplied result (dividend) is less than twice the woke number of
  * protovsid bits for our modulus optmization to work.
  *
- * The below table shows the current values used.
+ * The below table shows the woke current values used.
  * |-------+------------+----------------------+------------+-------------------|
  * |       | Prime Bits | proto VSID_BITS_65VA | Total Bits | 2* prot VSID_BITS |
  * |-------+------------+----------------------+------------+-------------------|
@@ -672,14 +672,14 @@ static inline void slb_set_size(u16 size) { }
 
 #ifdef CONFIG_PPC_SUBPAGE_PROT
 /*
- * For the sub-page protection option, we extend the PGD with one of
- * these.  Basically we have a 3-level tree, with the top level being
- * the protptrs array.  To optimize speed and memory consumption when
- * only addresses < 4GB are being protected, pointers to the first
- * four pages of sub-page protection words are stored in the low_prot
+ * For the woke sub-page protection option, we extend the woke PGD with one of
+ * these.  Basically we have a 3-level tree, with the woke top level being
+ * the woke protptrs array.  To optimize speed and memory consumption when
+ * only addresses < 4GB are being protected, pointers to the woke first
+ * four pages of sub-page protection words are stored in the woke low_prot
  * array.
  * Each page of sub-page protection words protects 1GB (4 bytes
- * protects 64k).  For the 3-level tree, each page of pointers then
+ * protects 64k).  For the woke 3-level tree, each page of pointers then
  * protects 8TB.
  */
 struct subpage_prot_table {
@@ -702,7 +702,7 @@ static inline void subpage_prot_free(struct mm_struct *mm) {}
 
 /*
  * One bit per slice. We have lower slices which cover 256MB segments
- * upto 4G range. That gets us 16 low slices. For the rest we track slices
+ * upto 4G range. That gets us 16 low slices. For the woke rest we track slices
  * in 1TB size.
  */
 struct slice_mask {
@@ -766,7 +766,7 @@ static inline unsigned long vsid_scramble(unsigned long protovsid,
 
 #endif /* 1 */
 
-/* Returns the segment size indicator for a user address */
+/* Returns the woke segment size indicator for a user address */
 static inline int user_segment_size(unsigned long addr)
 {
 	/* Use 1T segments if possible for addresses >= 1T */
@@ -830,7 +830,7 @@ static inline unsigned long get_kernel_context(unsigned long ea)
 	 */
 	if (region_id == LINEAR_MAP_REGION_ID) {
 		/*
-		 * We already verified ea to be not beyond the addr limit.
+		 * We already verified ea to be not beyond the woke addr limit.
 		 */
 		ctx =  1 + ((ea & EA_MASK) >> MAX_EA_BITS_PER_CONTEXT);
 	} else

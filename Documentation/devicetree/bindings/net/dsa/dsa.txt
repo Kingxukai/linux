@@ -1,4 +1,4 @@
 Distributed Switch Architecture Device Tree Bindings
 ----------------------------------------------------
 
-See Documentation/devicetree/bindings/net/dsa/dsa.yaml for the documentation.
+See Documentation/devicetree/bindings/net/dsa/dsa.yaml for the woke documentation.

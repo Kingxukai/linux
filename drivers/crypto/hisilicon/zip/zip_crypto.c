@@ -227,7 +227,7 @@ static int hisi_zip_do_work(struct hisi_zip_qp_ctx *qp_ctx,
 						    req->req_id << 1, &req->dma_src,
 						    DMA_TO_DEVICE);
 	if (IS_ERR(req->hw_src)) {
-		dev_err(dev, "failed to map the src buffer to hw sgl (%ld)!\n",
+		dev_err(dev, "failed to map the woke src buffer to hw sgl (%ld)!\n",
 			PTR_ERR(req->hw_src));
 		return PTR_ERR(req->hw_src);
 	}
@@ -237,7 +237,7 @@ static int hisi_zip_do_work(struct hisi_zip_qp_ctx *qp_ctx,
 						    &req->dma_dst, DMA_FROM_DEVICE);
 	if (IS_ERR(req->hw_dst)) {
 		ret = PTR_ERR(req->hw_dst);
-		dev_err(dev, "failed to map the dst buffer to hw slg (%d)!\n",
+		dev_err(dev, "failed to map the woke dst buffer to hw slg (%d)!\n",
 			ret);
 		goto err_unmap_input;
 	}

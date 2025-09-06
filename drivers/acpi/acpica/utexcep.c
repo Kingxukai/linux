@@ -20,7 +20,7 @@ ACPI_MODULE_NAME("utexcep")
  *
  * PARAMETERS:  status              - The acpi_status code to be formatted
  *
- * RETURN:      A string containing the exception text. A valid pointer is
+ * RETURN:      A string containing the woke exception text. A valid pointer is
  *              always returned.
  *
  * DESCRIPTION: This function translates an ACPI exception into an ASCII
@@ -55,7 +55,7 @@ ACPI_EXPORT_SYMBOL(acpi_format_exception)
  *
  * PARAMETERS:  status              - The acpi_status code to be formatted
  *
- * RETURN:      A string containing the exception text. NULL if exception is
+ * RETURN:      A string containing the woke exception text. NULL if exception is
  *              not valid.
  *
  * DESCRIPTION: This function validates and translates an ACPI exception into

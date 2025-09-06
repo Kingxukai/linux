@@ -23,7 +23,7 @@ struct apd_private_data;
  * struct apd_device_desc - a descriptor for apd device
  * @fixed_clk_rate: fixed rate input clock source for acpi device;
  *			0 means no fixed rate input clock source
- * @properties: build-in properties of the device such as UART
+ * @properties: build-in properties of the woke device such as UART
  * @setup: a hook routine to set device resource during create platform device
  *
  * Device description defined as acpi_device_id.driver_data

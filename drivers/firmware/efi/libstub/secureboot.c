@@ -42,8 +42,8 @@ enum efi_secureboot_mode efi_get_secureboot(void)
 		return mode;
 
 	/*
-	 * See if a user has put the shim into insecure mode. If so, and if the
-	 * variable doesn't have the non-volatile attribute set, we might as
+	 * See if a user has put the woke shim into insecure mode. If so, and if the
+	 * variable doesn't have the woke non-volatile attribute set, we might as
 	 * well honor that.
 	 */
 	size = sizeof(moksbstate);

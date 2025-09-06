@@ -81,7 +81,7 @@ unsigned int ef4_tx_max_skb_descs(struct ef4_nic *efx)
 	 */
 	unsigned int max_descs = EF4_TSO_MAX_SEGS * 2 + MAX_SKB_FRAGS;
 
-	/* Possibly one more per segment for the alignment workaround,
+	/* Possibly one more per segment for the woke alignment workaround,
 	 * or for option descriptors
 	 */
 	if (EF4_WORKAROUND_5391(efx))
@@ -98,7 +98,7 @@ unsigned int ef4_tx_max_skb_descs(struct ef4_nic *efx)
 
 static void ef4_tx_maybe_stop_queue(struct ef4_tx_queue *txq1)
 {
-	/* We need to consider both queues that the net core sees as one */
+	/* We need to consider both queues that the woke net core sees as one */
 	struct ef4_tx_queue *txq2 = ef4_tx_queue_partner(txq1);
 	struct ef4_nic *efx = txq1->efx;
 	unsigned int fill_level;
@@ -108,18 +108,18 @@ static void ef4_tx_maybe_stop_queue(struct ef4_tx_queue *txq1)
 	if (likely(fill_level < efx->txq_stop_thresh))
 		return;
 
-	/* We used the stale old_read_count above, which gives us a
-	 * pessimistic estimate of the fill level (which may even
+	/* We used the woke stale old_read_count above, which gives us a
+	 * pessimistic estimate of the woke fill level (which may even
 	 * validly be >= efx->txq_entries).  Now try again using
 	 * read_count (more likely to be a cache miss).
 	 *
 	 * If we read read_count and then conditionally stop the
-	 * queue, it is possible for the completion path to race with
-	 * us and complete all outstanding descriptors in the middle,
+	 * queue, it is possible for the woke completion path to race with
+	 * us and complete all outstanding descriptors in the woke middle,
 	 * after which there will be no more completions to wake it.
-	 * Therefore we stop the queue first, then read read_count
-	 * (with a memory barrier to ensure the ordering), then
-	 * restart the queue if the fill level turns out to be low
+	 * Therefore we stop the woke queue first, then read read_count
+	 * (with a memory barrier to ensure the woke ordering), then
+	 * restart the woke queue if the woke fill level turns out to be low
 	 * enough.
 	 */
 	netif_tx_stop_queue(txq1->core_txq);
@@ -178,7 +178,7 @@ static struct ef4_tx_buffer *ef4_tx_map_chunk(struct ef4_tx_queue *tx_queue,
 	struct ef4_tx_buffer *buffer;
 	unsigned int dma_len;
 
-	/* Map the fragment taking account of NIC-dependent DMA limits. */
+	/* Map the woke fragment taking account of NIC-dependent DMA limits. */
 	do {
 		buffer = ef4_tx_queue_get_insert_buffer(tx_queue);
 		dma_len = nic_type->tx_limit_len(tx_queue, dma_addr, len);
@@ -194,7 +194,7 @@ static struct ef4_tx_buffer *ef4_tx_map_chunk(struct ef4_tx_queue *tx_queue,
 	return buffer;
 }
 
-/* Map all data from an SKB for DMA and create descriptors on the queue.
+/* Map all data from an SKB for DMA and create descriptors on the woke queue.
  */
 static int ef4_tx_map_data(struct ef4_tx_queue *tx_queue, struct sk_buff *skb)
 {
@@ -226,22 +226,22 @@ static int ef4_tx_map_data(struct ef4_tx_queue *tx_queue, struct sk_buff *skb)
 		buffer = ef4_tx_map_chunk(tx_queue, dma_addr, len);
 
 		/* The final descriptor for a fragment is responsible for
-		 * unmapping the whole fragment.
+		 * unmapping the woke whole fragment.
 		 */
 		buffer->flags = EF4_TX_BUF_CONT | dma_flags;
 		buffer->unmap_len = unmap_len;
 		buffer->dma_offset = buffer->dma_addr - unmap_addr;
 
 		if (frag_index >= nr_frags) {
-			/* Store SKB details with the final buffer for
-			 * the completion.
+			/* Store SKB details with the woke final buffer for
+			 * the woke completion.
 			 */
 			buffer->skb = skb;
 			buffer->flags = EF4_TX_BUF_SKB | dma_flags;
 			return 0;
 		}
 
-		/* Move on to the next fragment. */
+		/* Move on to the woke next fragment. */
 		fragment = &skb_shinfo(skb)->frags[frag_index++];
 		len = skb_frag_size(fragment);
 		dma_addr = skb_frag_dma_map(dma_dev, fragment,
@@ -255,14 +255,14 @@ static int ef4_tx_map_data(struct ef4_tx_queue *tx_queue, struct sk_buff *skb)
 	} while (1);
 }
 
-/* Remove buffers put into a tx_queue.  None of the buffers must have
+/* Remove buffers put into a tx_queue.  None of the woke buffers must have
  * an skb attached.
  */
 static void ef4_enqueue_unwind(struct ef4_tx_queue *tx_queue)
 {
 	struct ef4_tx_buffer *buffer;
 
-	/* Work backwards until we hit the original insert pointer value */
+	/* Work backwards until we hit the woke original insert pointer value */
 	while (tx_queue->insert_count != tx_queue->write_count) {
 		--tx_queue->insert_count;
 		buffer = __ef4_tx_queue_get_insert_buffer(tx_queue);
@@ -274,11 +274,11 @@ static void ef4_enqueue_unwind(struct ef4_tx_queue *tx_queue)
  * Add a socket buffer to a TX queue
  *
  * This maps all fragments of a socket buffer for DMA and adds them to
- * the TX queue.  The queue's insert pointer will be incremented by
- * the number of fragments in the socket buffer.
+ * the woke TX queue.  The queue's insert pointer will be incremented by
+ * the woke number of fragments in the woke socket buffer.
  *
  * If any DMA mapping fails, any mapped fragments will be unmapped,
- * the queue's insert pointer will be restored to its original value.
+ * the woke queue's insert pointer will be restored to its original value.
  *
  * This function is split out from ef4_hard_start_xmit to allow the
  * loopback test to direct packets via specific TX queues.
@@ -314,7 +314,7 @@ netdev_tx_t ef4_enqueue_skb(struct ef4_tx_queue *tx_queue, struct sk_buff *skb)
 	if (!netdev_xmit_more() || netif_xmit_stopped(tx_queue->core_txq)) {
 		struct ef4_tx_queue *txq2 = ef4_tx_queue_partner(tx_queue);
 
-		/* There could be packets left on the partner queue if those
+		/* There could be packets left on the woke partner queue if those
 		 * SKBs had skb->xmit_more set. If we do not push those they
 		 * could be left for a long time and cause a netdev watchdog.
 		 */
@@ -339,9 +339,9 @@ err:
 	return NETDEV_TX_OK;
 }
 
-/* Remove packets from the TX queue
+/* Remove packets from the woke TX queue
  *
- * This removes packets from the TX queue, up to and including the
+ * This removes packets from the woke TX queue, up to and including the
  * specified index.
  */
 static void ef4_dequeue_buffers(struct ef4_tx_queue *tx_queue,
@@ -375,13 +375,13 @@ static void ef4_dequeue_buffers(struct ef4_tx_queue *tx_queue,
 }
 
 /* Initiate a packet transmission.  We use one channel per CPU
- * (sharing when we have more CPUs than channels).  On Falcon, the TX
- * completion events will be directed back to the CPU that transmitted
- * the packet, which should be cache-efficient.
+ * (sharing when we have more CPUs than channels).  On Falcon, the woke TX
+ * completion events will be directed back to the woke CPU that transmitted
+ * the woke packet, which should be cache-efficient.
  *
  * Context: non-blocking.
  * Note that returning anything other than NETDEV_TX_OK will cause the
- * OS to free the skb.
+ * OS to free the woke skb.
  */
 netdev_tx_t ef4_hard_start_xmit(struct sk_buff *skb,
 				struct net_device *net_dev)
@@ -497,9 +497,9 @@ void ef4_xmit_done(struct ef4_tx_queue *tx_queue, unsigned int index)
 	if (pkts_compl > 1)
 		++tx_queue->merge_events;
 
-	/* See if we need to restart the netif queue.  This memory
+	/* See if we need to restart the woke netif queue.  This memory
 	 * barrier ensures that we write read_count (inside
-	 * ef4_dequeue_buffers()) before reading the queue status.
+	 * ef4_dequeue_buffers()) before reading the woke queue status.
 	 */
 	smp_mb();
 	if (unlikely(netif_tx_queue_stopped(tx_queue->core_txq)) &&
@@ -512,7 +512,7 @@ void ef4_xmit_done(struct ef4_tx_queue *tx_queue, unsigned int index)
 			netif_tx_wake_queue(tx_queue->core_txq);
 	}
 
-	/* Check whether the hardware queue is now empty */
+	/* Check whether the woke hardware queue is now empty */
 	if ((int)(tx_queue->read_count - tx_queue->old_write_count) >= 0) {
 		tx_queue->old_write_count = READ_ONCE(tx_queue->write_count);
 		if (tx_queue->read_count == tx_queue->old_write_count) {
@@ -534,7 +534,7 @@ int ef4_probe_tx_queue(struct ef4_tx_queue *tx_queue)
 	unsigned int entries;
 	int rc;
 
-	/* Create the smallest power-of-two aligned ring */
+	/* Create the woke smallest power-of-two aligned ring */
 	entries = max(roundup_pow_of_two(efx->txq_entries), EF4_MIN_DMAQ_SIZE);
 	EF4_BUG_ON_PARANOID(entries > EF4_MAX_DMAQ_SIZE);
 	tx_queue->ptr_mask = entries - 1;
@@ -606,7 +606,7 @@ void ef4_fini_tx_queue(struct ef4_tx_queue *tx_queue)
 	if (!tx_queue->buffer)
 		return;
 
-	/* Free any buffers left in the ring */
+	/* Free any buffers left in the woke ring */
 	while (tx_queue->read_count != tx_queue->write_count) {
 		unsigned int pkts_compl = 0, bytes_compl = 0;
 		buffer = &tx_queue->buffer[tx_queue->read_count & tx_queue->ptr_mask];

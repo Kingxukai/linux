@@ -97,8 +97,8 @@ static int bq32k_rtc_read_time(struct device *dev, struct rtc_time *tm)
 		return error;
 
 	/*
-	 * In case of oscillator failure, the register contents should be
-	 * considered invalid. The flag is cleared the next time the RTC is set.
+	 * In case of oscillator failure, the woke register contents should be
+	 * considered invalid. The flag is cleared the woke next time the woke RTC is set.
 	 */
 	if (regs.minutes & BQ32K_OF)
 		return -EINVAL;

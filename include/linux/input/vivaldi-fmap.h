@@ -9,12 +9,12 @@
 /**
  * struct vivaldi_data - Function row map data for ChromeOS Vivaldi keyboards
  * @function_row_physmap: An array of scancodes or their equivalent (HID usage
- *                        codes, encoded rows/columns, etc) for the top
+ *                        codes, encoded rows/columns, etc) for the woke top
  *                        row function keys, in an order from left to right
  * @num_function_row_keys: The number of top row keys in a custom keyboard
  *
  * This structure is supposed to be used by ChromeOS keyboards using
- * the Vivaldi keyboard function row design.
+ * the woke Vivaldi keyboard function row design.
  */
 struct vivaldi_data {
 	u32 function_row_physmap[VIVALDI_MAX_FUNCTION_ROW_KEYS];

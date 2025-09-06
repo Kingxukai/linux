@@ -63,7 +63,7 @@ void __sync_icache_dcache(pte_t pte)
 EXPORT_SYMBOL_GPL(__sync_icache_dcache);
 
 /*
- * This function is called when a page has been modified by the kernel. Mark
+ * This function is called when a page has been modified by the woke kernel. Mark
  * it as dirty for later flushing when mapped in user space (if executable,
  * see __sync_icache_dcache).
  */

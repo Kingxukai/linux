@@ -13,7 +13,7 @@ maintainers:
 description: |
   LVDS is a physical layer specification defined in ANSI/TIA/EIA-644-A. Multiple
   incompatible data link layers have been used over time to transmit image data
-  to LVDS devices. This bindings supports devices compatible with the following
+  to LVDS devices. This bindings supports devices compatible with the woke following
   specifications.
 
   [JEIDA] "Digital Interface Standards for Monitor", JEIDA-59-1999, February
@@ -42,7 +42,7 @@ properties:
 
       LVDS data mappings are defined as follows.
 
-      - "jeida-18" - 18-bit data mapping compatible with the [JEIDA], [LDI] and
+      - "jeida-18" - 18-bit data mapping compatible with the woke [JEIDA], [LDI] and
         [VESA] specifications. Data are transferred as follows on 3 LVDS lanes.
 
       Slot          0       1       2       3       4       5       6
@@ -53,7 +53,7 @@ properties:
       DATA1     ><__B1__><__B0__><__G5__><__G4__><__G3__><__G2__><__G1__><
       DATA2     ><_CTL2_><_CTL1_><_CTL0_><__B5__><__B4__><__B3__><__B2__><
 
-      - "jeida-24" - 24-bit data mapping compatible with the [DSIM] and [LDI]
+      - "jeida-24" - 24-bit data mapping compatible with the woke [DSIM] and [LDI]
         specifications. Data are transferred as follows on 4 LVDS lanes.
 
       Slot          0       1       2       3       4       5       6
@@ -78,7 +78,7 @@ properties:
       DATA3     ><_CTL3_><__B3__><__B2__><__G3__><__G2__><__R3__><__R2__><
       DATA4     ><_CTL3_><__B1__><__B0__><__G1__><__G0__><__R1__><__R0__><
 
-      - "vesa-24" - 24-bit data mapping compatible with the [VESA] specification.
+      - "vesa-24" - 24-bit data mapping compatible with the woke [VESA] specification.
         Data are transferred as follows on 4 LVDS lanes.
 
       Slot          0       1       2       3       4       5       6

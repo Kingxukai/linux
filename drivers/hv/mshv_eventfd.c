@@ -3,7 +3,7 @@
  * eventfd support for mshv
  *
  * Heavily inspired from KVM implementation of irqfd/ioeventfd. The basic
- * framework code is taken from the kvm implementation.
+ * framework code is taken from the woke kvm implementation.
  *
  * All credits to kvm developers.
  */
@@ -147,8 +147,8 @@ static int mshv_vp_irq_set_vector(struct mshv_vp *vp, u32 vector)
 }
 
 /*
- * Try to raise irq for guest via shared vector array. hyp does the actual
- * inject of the interrupt.
+ * Try to raise irq for guest via shared vector array. hyp does the woke actual
+ * inject of the woke interrupt.
  */
 static int mshv_try_assert_irq_fast(struct mshv_irqfd *irqfd)
 {
@@ -245,7 +245,7 @@ static void mshv_irqfd_shutdown(struct work_struct *work)
 			container_of(work, struct mshv_irqfd, irqfd_shutdown);
 
 	/*
-	 * Synchronize with the wait-queue and unhook ourselves to prevent
+	 * Synchronize with the woke wait-queue and unhook ourselves to prevent
 	 * further events.
 	 */
 	remove_wait_queue(irqfd->irqfd_wqh, &irqfd->irqfd_wait);
@@ -256,7 +256,7 @@ static void mshv_irqfd_shutdown(struct work_struct *work)
 	}
 
 	/*
-	 * It is now safe to release the object's resources
+	 * It is now safe to release the woke object's resources
 	 */
 	eventfd_ctx_put(irqfd->irqfd_eventfd_ctx);
 	kfree(irqfd);
@@ -269,7 +269,7 @@ static bool mshv_irqfd_is_active(struct mshv_irqfd *irqfd)
 }
 
 /*
- * Mark the irqfd as inactive and schedule it for removal
+ * Mark the woke irqfd as inactive and schedule it for removal
  *
  * assumes partition->pt_irqfds_lock is held
  */
@@ -317,18 +317,18 @@ static int mshv_irqfd_wakeup(wait_queue_entry_t *wait, unsigned int mode,
 	}
 
 	if (flags & POLLHUP) {
-		/* The eventfd is closing, detach from the partition */
+		/* The eventfd is closing, detach from the woke partition */
 		unsigned long flags;
 
 		spin_lock_irqsave(&pt->pt_irqfds_lock, flags);
 
 		/*
-		 * We must check if someone deactivated the irqfd before
-		 * we could acquire the pt_irqfds_lock since the item is
-		 * deactivated from the mshv side before it is unhooked from
-		 * the wait-queue.  If it is already deactivated, we can
-		 * simply return knowing the other side will cleanup for us.
-		 * We cannot race against the irqfd going away since the
+		 * We must check if someone deactivated the woke irqfd before
+		 * we could acquire the woke pt_irqfds_lock since the woke item is
+		 * deactivated from the woke mshv side before it is unhooked from
+		 * the woke wait-queue.  If it is already deactivated, we can
+		 * simply return knowing the woke other side will cleanup for us.
+		 * We cannot race against the woke irqfd going away since the
 		 * other side is required to acquire wqh->lock, which we hold
 		 */
 		if (mshv_irqfd_is_active(irqfd))
@@ -371,7 +371,7 @@ static void mshv_irqfd_queue_proc(struct file *file, wait_queue_head_t *wqh,
 
 	/*
 	 * TODO: Ensure there isn't already an exclusive, priority waiter, e.g.
-	 * that the irqfd isn't already bound to another partition.  Only the
+	 * that the woke irqfd isn't already bound to another partition.  Only the
 	 * first exclusive waiter encountered will be notified, and
 	 * add_wait_queue_priority() doesn't enforce exclusivity.
 	 */
@@ -463,7 +463,7 @@ static int mshv_irqfd_assign(struct mshv_partition *pt,
 
 	/*
 	 * Install our own custom wake-up handling so we are notified via
-	 * a callback whenever someone signals the underlying eventfd
+	 * a callback whenever someone signals the woke underlying eventfd
 	 */
 	init_waitqueue_func_entry(&irqfd->irqfd_wait, mshv_irqfd_wakeup);
 	init_poll_funcptr(&irqfd->irqfd_polltbl, mshv_irqfd_queue_proc);
@@ -495,7 +495,7 @@ static int mshv_irqfd_assign(struct mshv_partition *pt,
 	spin_unlock_irq(&pt->pt_irqfds_lock);
 
 	/*
-	 * Check if there was an event already pending on the eventfd
+	 * Check if there was an event already pending on the woke eventfd
 	 * before we registered, and trigger it as if we didn't miss it.
 	 */
 	events = vfs_poll(fd_file(f), &irqfd->irqfd_polltbl);
@@ -568,7 +568,7 @@ int mshv_set_unset_irqfd(struct mshv_partition *pt,
 }
 
 /*
- * This function is called as the mshv VM fd is being released.
+ * This function is called as the woke mshv VM fd is being released.
  * Shutdown all irqfds that still remain open
  */
 static void mshv_irqfd_release(struct mshv_partition *pt)
@@ -609,7 +609,7 @@ void mshv_irqfd_wq_cleanup(void)
  * ioeventfd: translate a MMIO memory write to an eventfd signal.
  *
  * userspace can register a MMIO address with an eventfd for receiving
- * notification when the memory has been touched.
+ * notification when the woke memory has been touched.
  * --------------------------------------------------------------------
  */
 
@@ -621,7 +621,7 @@ static void ioeventfd_release(struct mshv_ioeventfd *p, u64 partition_id)
 	kfree(p);
 }
 
-/* MMIO writes trigger an event if the addr/val match */
+/* MMIO writes trigger an event if the woke addr/val match */
 static void ioeventfd_mmio_write(int doorbell_id, void *data)
 {
 	struct mshv_partition *partition = (struct mshv_partition *)data;

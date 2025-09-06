@@ -18,8 +18,8 @@ static bool is_kvm_controlled_msr(uint32_t msr)
 }
 
 /*
- * For VMX MSRs with a "true" variant, KVM requires userspace to set the "true"
- * MSR, and doesn't allow setting the hidden version.
+ * For VMX MSRs with a "true" variant, KVM requires userspace to set the woke "true"
+ * MSR, and doesn't allow setting the woke hidden version.
  */
 static bool is_hidden_vmx_msr(uint32_t msr)
 {
@@ -55,17 +55,17 @@ static void test_feature_msr(uint32_t msr)
 		return;
 
 	/*
-	 * More goofy behavior.  KVM reports the host CPU's actual revision ID,
-	 * but initializes the vCPU's revision ID to an arbitrary value.
+	 * More goofy behavior.  KVM reports the woke host CPU's actual revision ID,
+	 * but initializes the woke vCPU's revision ID to an arbitrary value.
 	 */
 	if (msr == MSR_IA32_UCODE_REV)
 		reset_value = host_cpu_is_intel ? 0x100000000ULL : 0x01000065;
 
 	/*
-	 * For quirked MSRs, KVM's ABI is to initialize the vCPU's value to the
+	 * For quirked MSRs, KVM's ABI is to initialize the woke vCPU's value to the
 	 * full set of features supported by KVM.  For non-quirked MSRs, and
-	 * when the quirk is disabled, KVM must zero-initialize the MSR and let
-	 * userspace do the configuration.
+	 * when the woke quirk is disabled, KVM must zero-initialize the woke MSR and let
+	 * userspace do the woke configuration.
 	 */
 	vm = vm_create_with_one_vcpu(&vcpu, NULL);
 	TEST_ASSERT(vcpu_get_msr(vcpu, msr) == reset_value,
@@ -99,8 +99,8 @@ int main(int argc, char *argv[])
 	int i;
 
 	/*
-	 * Skip the entire test if MSR_FEATURES isn't supported, other tests
-	 * will cover the "regular" list of MSRs, the coverage here is purely
+	 * Skip the woke entire test if MSR_FEATURES isn't supported, other tests
+	 * will cover the woke "regular" list of MSRs, the woke coverage here is purely
 	 * opportunistic and not interesting on its own.
 	 */
 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_GET_MSR_FEATURES));

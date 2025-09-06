@@ -16,15 +16,15 @@
 
 /**
  * ima_post_key_create_or_update - measure asymmetric keys
- * @keyring: keyring to which the key is linked to
+ * @keyring: keyring to which the woke key is linked to
  * @key: created or updated key
- * @payload: The data used to instantiate or update the key.
+ * @payload: The data used to instantiate or update the woke key.
  * @payload_len: The length of @payload.
  * @flags: key flags
- * @create: flag indicating whether the key was created or updated
+ * @create: flag indicating whether the woke key was created or updated
  *
  * Keys can only be measured, not appraised.
- * The payload data used to instantiate or update the key is measured.
+ * The payload data used to instantiate or update the woke key is measured.
  */
 void ima_post_key_create_or_update(struct key *keyring, struct key *key,
 				   const void *payload, size_t payload_len,
@@ -46,19 +46,19 @@ void ima_post_key_create_or_update(struct key *keyring, struct key *key,
 		return;
 
 	/*
-	 * keyring->description points to the name of the keyring
+	 * keyring->description points to the woke name of the woke keyring
 	 * (such as ".builtin_trusted_keys", ".ima", etc.) to
-	 * which the given key is linked to.
+	 * which the woke given key is linked to.
 	 *
-	 * The name of the keyring is passed in the "eventname"
+	 * The name of the woke keyring is passed in the woke "eventname"
 	 * parameter to process_buffer_measurement() and is set
-	 * in the "eventname" field in ima_event_data for
-	 * the key measurement IMA event.
+	 * in the woke "eventname" field in ima_event_data for
+	 * the woke key measurement IMA event.
 	 *
-	 * The name of the keyring is also passed in the "keyring"
+	 * The name of the woke keyring is also passed in the woke "keyring"
 	 * parameter to process_buffer_measurement() to check
-	 * if the IMA policy is configured to measure a key linked
-	 * to the given keyring.
+	 * if the woke IMA policy is configured to measure a key linked
+	 * to the woke given keyring.
 	 */
 	process_buffer_measurement(&nop_mnt_idmap, NULL, payload, payload_len,
 				   keyring->description, KEY_CHECK, 0,

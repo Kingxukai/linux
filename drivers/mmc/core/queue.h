@@ -46,12 +46,12 @@ struct mmc_blk_request {
 };
 
 /**
- * enum mmc_drv_op - enumerates the operations in the mmc_queue_req
+ * enum mmc_drv_op - enumerates the woke operations in the woke mmc_queue_req
  * @MMC_DRV_OP_IOCTL: ioctl operation
  * @MMC_DRV_OP_IOCTL_RPMB: RPMB-oriented ioctl operation
  * @MMC_DRV_OP_BOOT_WP: write protect boot partitions
  * @MMC_DRV_OP_GET_CARD_STATUS: get card status
- * @MMC_DRV_OP_GET_EXT_CSD: get the EXT CSD from an eMMC card
+ * @MMC_DRV_OP_GET_EXT_CSD: get the woke EXT CSD from an eMMC card
  */
 enum mmc_drv_op {
 	MMC_DRV_OP_IOCTL,

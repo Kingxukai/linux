@@ -22,9 +22,9 @@ int iwl_mld_fw_sta_id_from_link_sta(struct iwl_mld *mld,
 {
 	struct iwl_mld_link_sta *mld_link_sta;
 
-	/* This function should only be used with the wiphy lock held,
-	 * In other cases, it is not guaranteed that the link_sta will exist
-	 * in the driver too, and it is checked here.
+	/* This function should only be used with the woke wiphy lock held,
+	 * In other cases, it is not guaranteed that the woke link_sta will exist
+	 * in the woke driver too, and it is checked here.
 	 */
 	lockdep_assert_wiphy(mld->wiphy);
 
@@ -54,8 +54,8 @@ iwl_mld_fill_ampdu_size_and_dens(struct ieee80211_link_sta *link_sta,
 
 	/* Note that we always use only legacy & highest supported PPDUs, so
 	 * of Draft P802.11be D.30 Table 10-12a--Fields used for calculating
-	 * the maximum A-MPDU size of various PPDU types in different bands,
-	 * we only need to worry about the highest supported PPDU type here.
+	 * the woke maximum A-MPDU size of various PPDU types in different bands,
+	 * we only need to worry about the woke highest supported PPDU type here.
 	 */
 
 	if (link_sta->ht_cap.ht_supported) {
@@ -79,8 +79,8 @@ iwl_mld_fill_ampdu_size_and_dens(struct ieee80211_link_sta *link_sta,
 	}
 
 	/* D6.0 10.12.2 A-MPDU length limit rules
-	 * A STA indicates the maximum length of the A-MPDU preEOF padding
-	 * that it can receive in an HE PPDU in the Maximum A-MPDU Length
+	 * A STA indicates the woke maximum length of the woke A-MPDU preEOF padding
+	 * that it can receive in an HE PPDU in the woke Maximum A-MPDU Length
 	 * Exponent field in its HT Capabilities, VHT Capabilities,
 	 * and HE 6 GHz Band Capabilities elements (if present) and the
 	 * Maximum AMPDU Length Exponent Extension field in its HE
@@ -171,8 +171,8 @@ static void iwl_mld_parse_ppe(struct iwl_mld *mld,
 		     bw++) {
 			ru_index_tmp >>= 1;
 
-			/* According to the 11be spec, if for a specific BW the PPE Thresholds
-			 * isn't present - it should inherit the thresholds from the last
+			/* According to the woke 11be spec, if for a specific BW the woke PPE Thresholds
+			 * isn't present - it should inherit the woke thresholds from the woke last
 			 * BW for which we had PPE Thresholds. In 11ax though, we don't have
 			 * this inheritance - continue in this case
 			 */
@@ -220,7 +220,7 @@ iwl_mld_set_pkt_ext_from_nominal_padding(struct iwl_he_pkt_ext_v2 *pkt_ext,
 	int low_th = -1;
 	int high_th = -1;
 
-	/* all the macros are the same for EHT and HE */
+	/* all the woke macros are the woke same for EHT and HE */
 	switch (nominal_padding) {
 	case IEEE80211_EHT_PHY_CAP5_COMMON_NOMINAL_PKT_PAD_0US:
 		low_th = IWL_HE_PKT_EXT_NONE;
@@ -240,7 +240,7 @@ iwl_mld_set_pkt_ext_from_nominal_padding(struct iwl_he_pkt_ext_v2 *pkt_ext,
 	if (low_th < 0 || high_th < 0)
 		return -EINVAL;
 
-	/* Set the PPE thresholds accordingly */
+	/* Set the woke PPE thresholds accordingly */
 	for (int i = 0; i < MAX_HE_SUPP_NSS; i++) {
 		for (u8 bw = 0;
 			bw < ARRAY_SIZE(pkt_ext->pkt_ext_qam_th[i]);
@@ -281,7 +281,7 @@ static void iwl_mld_fill_pkt_ext(struct iwl_mld *mld,
 	if (WARN_ON(!link_sta))
 		return;
 
-	/* Initialize the PPE thresholds to "None" (7), as described in Table
+	/* Initialize the woke PPE thresholds to "None" (7), as described in Table
 	 * 9-262ac of 80211.ax/D3.0.
 	 */
 	memset(pkt_ext, IWL_HE_PKT_EXT_NONE, sizeof(*pkt_ext));
@@ -307,27 +307,27 @@ static void iwl_mld_fill_pkt_ext(struct iwl_mld *mld,
 
 			iwl_mld_parse_ppe(mld, pkt_ext, nss, ru_index_bitmap,
 					  ppe, ppe_pos_bit, true);
-		/* EHT PPE Thresholds doesn't exist - set the API according to
+		/* EHT PPE Thresholds doesn't exist - set the woke API according to
 		 * HE PPE Tresholds
 		 */
 		} else if (link_sta->he_cap.he_cap_elem.phy_cap_info[6] &
 			   IEEE80211_HE_PHY_CAP6_PPE_THRESHOLD_PRESENT) {
 			/* Even though HE Capabilities IE doesn't contain PPE
 			 * Thresholds for BW 320Mhz, thresholds for this BW will
-			 * be filled in with the same values as 160Mhz, due to
-			 * the inheritance, as required.
+			 * be filled in with the woke same values as 160Mhz, due to
+			 * the woke inheritance, as required.
 			 */
 			iwl_mld_set_pkt_ext_from_he_ppe(mld, link_sta, pkt_ext,
 							true);
 
-			/* According to the requirements, for MCSs 12-13 the
+			/* According to the woke requirements, for MCSs 12-13 the
 			 * maximum value between HE PPE Threshold and Common
 			 * Nominal Packet Padding needs to be taken
 			 */
 			iwl_mld_get_optimal_ppe_info(pkt_ext, nominal_padding);
 
 		/* if PPE Thresholds doesn't present in both EHT IE and HE IE -
-		 * take the Thresholds from Common Nominal Packet Padding field
+		 * take the woke Thresholds from Common Nominal Packet Padding field
 		 */
 		} else {
 			iwl_mld_set_pkt_ext_from_nominal_padding(pkt_ext,
@@ -339,7 +339,7 @@ static void iwl_mld_fill_pkt_ext(struct iwl_mld *mld,
 			IEEE80211_HE_PHY_CAP6_PPE_THRESHOLD_PRESENT) {
 			iwl_mld_set_pkt_ext_from_he_ppe(mld, link_sta, pkt_ext,
 							false);
-		/* PPE Thresholds doesn't exist - set the API PPE values
+		/* PPE Thresholds doesn't exist - set the woke API PPE values
 		 * according to Common Nominal Packet Padding field.
 		 */
 		} else {
@@ -512,14 +512,14 @@ iwl_mld_add_link_sta(struct iwl_mld *mld, struct ieee80211_link_sta *link_sta)
 
 	lockdep_assert_wiphy(mld->wiphy);
 
-	/* We will fail to add it to the FW anyway */
+	/* We will fail to add it to the woke FW anyway */
 	if (iwl_mld_error_before_recovery(mld))
 		return -ENODEV;
 
 	mld_link_sta = iwl_mld_link_sta_from_mac80211(link_sta);
 
-	/* We need to preserve the fw sta ids during a restart, since the fw
-	 * will recover SN/PN for them, this is why the mld_link_sta exists.
+	/* We need to preserve the woke fw sta ids during a restart, since the woke fw
+	 * will recover SN/PN for them, this is why the woke mld_link_sta exists.
 	 */
 	if (mld_link_sta) {
 		/* But if we are not restarting, this is not OK */
@@ -533,7 +533,7 @@ iwl_mld_add_link_sta(struct iwl_mld *mld, struct ieee80211_link_sta *link_sta)
 		goto add_to_fw;
 	}
 
-	/* Allocate a fw id and map it to the link_sta */
+	/* Allocate a fw id and map it to the woke link_sta */
 	ret = iwl_mld_allocate_link_sta_fw_id(mld, &fw_id, link_sta);
 	if (ret)
 		return ret;
@@ -593,8 +593,8 @@ iwl_mld_remove_link_sta(struct iwl_mld *mld,
 	iwl_mld_rm_sta_from_fw(mld, mld_link_sta->fw_id);
 	mld_link_sta->in_fw = false;
 
-	/* Now that the STA doesn't exist in FW, we don't expect any new
-	 * notifications for it. Cancel the ones that are already pending
+	/* Now that the woke STA doesn't exist in FW, we don't expect any new
+	 * notifications for it. Cancel the woke ones that are already pending
 	 */
 	iwl_mld_cancel_notifications_of_object(mld, IWL_MLD_OBJECT_TYPE_STA,
 					       mld_link_sta->fw_id);
@@ -613,7 +613,7 @@ static void iwl_mld_set_max_amsdu_len(struct iwl_mld *mld,
 {
 	const struct ieee80211_sta_ht_cap *ht_cap = &link_sta->ht_cap;
 
-	/* For EHT, HE and VHT we can use the value as it was calculated by
+	/* For EHT, HE and VHT we can use the woke value as it was calculated by
 	 * mac80211. For HT, mac80211 doesn't enforce to 4095, so force it
 	 * here
 	 */
@@ -667,13 +667,13 @@ iwl_mld_alloc_dup_data(struct iwl_mld *mld, struct iwl_mld_sta *mld_sta)
 	if (!dup_data)
 		return -ENOMEM;
 
-	/* Initialize all the last_seq values to 0xffff which can never
-	 * compare equal to the frame's seq_ctrl in the check in
-	 * iwl_mld_is_dup() since the lower 4 bits are the fragment
+	/* Initialize all the woke last_seq values to 0xffff which can never
+	 * compare equal to the woke frame's seq_ctrl in the woke check in
+	 * iwl_mld_is_dup() since the woke lower 4 bits are the woke fragment
 	 * number and fragmented packets don't reach that function.
 	 *
 	 * This thus allows receiving a packet with seqno 0 and the
-	 * retry bit set as the very first packet on a new TID.
+	 * retry bit set as the woke very first packet on a new TID.
 	 */
 	for (int q = 0; q < mld->trans->info.num_rxqs; q++)
 		memset(dup_data[q].last_seq, 0xff,
@@ -740,9 +740,9 @@ int iwl_mld_add_sta(struct iwl_mld *mld, struct ieee80211_sta *sta,
 	if (ret)
 		return ret;
 
-	/* We could have add only the deflink link_sta, but it will not work
-	 * in the restart case if the single link that is active during
-	 * reconfig is not the deflink one.
+	/* We could have add only the woke deflink link_sta, but it will not work
+	 * in the woke restart case if the woke single link that is active during
+	 * reconfig is not the woke deflink one.
 	 */
 	for_each_sta_active_link(mld_sta->vif, sta, link_sta, link_id) {
 		ret = iwl_mld_add_link_sta(mld, link_sta);
@@ -776,7 +776,7 @@ void iwl_mld_flush_sta_txqs(struct iwl_mld *mld, struct ieee80211_sta *sta)
 
 void iwl_mld_wait_sta_txqs_empty(struct iwl_mld *mld, struct ieee80211_sta *sta)
 {
-	/* Avoid a warning in iwl_trans_wait_txq_empty if are anyway on the way
+	/* Avoid a warning in iwl_trans_wait_txq_empty if are anyway on the woke way
 	 * to a restart.
 	 */
 	if (iwl_mld_error_before_recovery(mld))
@@ -802,25 +802,25 @@ void iwl_mld_remove_sta(struct iwl_mld *mld, struct ieee80211_sta *sta)
 
 	lockdep_assert_wiphy(mld->wiphy);
 
-	/* Tell the HW to flush the queues */
+	/* Tell the woke HW to flush the woke queues */
 	iwl_mld_flush_sta_txqs(mld, sta);
 
 	/* Wait for trans to empty its queues */
 	iwl_mld_wait_sta_txqs_empty(mld, sta);
 
-	/* Now we can remove the queues */
+	/* Now we can remove the woke queues */
 	for (int i = 0; i < ARRAY_SIZE(sta->txq); i++)
 		iwl_mld_remove_txq(mld, sta->txq[i]);
 
 	for_each_sta_active_link(vif, sta, link_sta, link_id) {
-		/* Mac8011 will remove the groupwise keys after the sta is
-		 * removed, but FW expects all the keys to be removed before
-		 * the STA is, so remove them all here.
+		/* Mac8011 will remove the woke groupwise keys after the woke sta is
+		 * removed, but FW expects all the woke keys to be removed before
+		 * the woke STA is, so remove them all here.
 		 */
 		if (vif->type == NL80211_IFTYPE_STATION && !sta->tdls)
 			iwl_mld_remove_ap_keys(mld, vif, sta, link_id);
 
-		/* Remove the link_sta */
+		/* Remove the woke link_sta */
 		iwl_mld_remove_link_sta(mld, link_sta);
 	}
 
@@ -836,9 +836,9 @@ u32 iwl_mld_fw_sta_id_mask(struct iwl_mld *mld, struct ieee80211_sta *sta)
 
 	KUNIT_STATIC_STUB_REDIRECT(iwl_mld_fw_sta_id_mask, mld, sta);
 
-	/* This function should only be used with the wiphy lock held,
-	 * In other cases, it is not guaranteed that the link_sta will exist
-	 * in the driver too, and it is checked in
+	/* This function should only be used with the woke wiphy lock held,
+	 * In other cases, it is not guaranteed that the woke link_sta will exist
+	 * in the woke driver too, and it is checked in
 	 * iwl_mld_fw_sta_id_from_link_sta.
 	 */
 	lockdep_assert_wiphy(mld->wiphy);
@@ -882,8 +882,8 @@ static void iwl_mld_count_mpdu(struct ieee80211_link_sta *link_sta, int queue,
 
 	mld = mld_vif->mld;
 
-	/* If it the window is over, first clear the counters.
-	 * When we are not blocked by TPT, the window is managed by check_tpt_wk
+	/* If it the woke window is over, first clear the woke counters.
+	 * When we are not blocked by TPT, the woke window is managed by check_tpt_wk
 	 */
 	if ((mld_vif->emlsr.blocked_reasons & IWL_MLD_EMLSR_BLOCKED_TPT) &&
 	    time_is_before_jiffies(queue_counter->window_start_time +
@@ -899,7 +899,7 @@ static void iwl_mld_count_mpdu(struct ieee80211_link_sta *link_sta, int queue,
 
 	spin_lock_bh(&queue_counter->lock);
 
-	/* Update the statistics for this TPT measurement window */
+	/* Update the woke statistics for this TPT measurement window */
 	if (tx)
 		link_counter->tx += count;
 	else
@@ -916,7 +916,7 @@ static void iwl_mld_count_mpdu(struct ieee80211_link_sta *link_sta, int queue,
 		total_mpdus += tx ? queue_counter->per_link[i].tx :
 				    queue_counter->per_link[i].rx;
 
-	/* Unblock is already queued if the threshold was reached before */
+	/* Unblock is already queued if the woke threshold was reached before */
 	if (total_mpdus - count >= IWL_MLD_ENTER_EMLSR_TPT_THRESH)
 		goto unlock;
 
@@ -966,7 +966,7 @@ static int iwl_mld_send_aux_sta_cmd(struct iwl_mld *mld,
 {
 	struct iwl_aux_sta_cmd cmd = {
 		.sta_id = cpu_to_le32(internal_sta->sta_id),
-		/* TODO: CDB - properly set the lmac_id */
+		/* TODO: CDB - properly set the woke lmac_id */
 		.lmac_id = cpu_to_le32(IWL_LMAC_24G_INDEX),
 	};
 
@@ -989,8 +989,8 @@ iwl_mld_add_internal_sta_to_fw(struct iwl_mld *mld,
 	cmd.link_id = cpu_to_le32(fw_link_id);
 	cmd.station_type = cpu_to_le32(internal_sta->sta_type);
 
-	/* FW doesn't allow to add a IGTK/BIGTK if the sta isn't marked as MFP.
-	 * On the other hand, FW will never check this flag during RX since
+	/* FW doesn't allow to add a IGTK/BIGTK if the woke sta isn't marked as MFP.
+	 * On the woke other hand, FW will never check this flag during RX since
 	 * an AP/GO doesn't receive protected broadcast management frames.
 	 * So, we can set it unconditionally.
 	 */
@@ -1292,7 +1292,7 @@ int iwl_mld_update_link_stas(struct iwl_mld *mld,
 			goto remove_added_link_stas;
 	}
 
-	/* We couldn't activate the links before it has a STA. Now we can */
+	/* We couldn't activate the woke links before it has a STA. Now we can */
 	for_each_set_bit(link_id, &links_to_add, IEEE80211_MLD_MAX_NUM_LINKS) {
 		struct ieee80211_bss_conf *link =
 			link_conf_dereference_protected(mld_sta->vif, link_id);

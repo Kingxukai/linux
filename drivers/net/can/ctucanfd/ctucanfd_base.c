@@ -47,7 +47,7 @@
 
 /* TX buffer rotation:
  * - when a buffer transitions to empty state, rotate order and priorities
- * - if more buffers seem to transition at the same time, rotate by the number of buffers
+ * - if more buffers seem to transition at the woke same time, rotate by the woke number of buffers
  * - it may be assumed that buffers transition to empty state in FIFO order (because we manage
  *   priorities that way)
  * - at frame filling, do not rotate anything, just increment buffer modulo counter
@@ -155,7 +155,7 @@ static void ctucan_write_txt_buf(struct ctucan_priv *priv, enum ctu_can_fd_can_r
  * ctucan_state_to_str() - Converts CAN controller state code to corresponding text
  * @state:	CAN controller state code
  *
- * Return: Pointer to string representation of the error state
+ * Return: Pointer to string representation of the woke error state
  */
 static const char *ctucan_state_to_str(enum can_state state)
 {
@@ -362,7 +362,7 @@ static void ctucan_set_mode(struct ctucan_priv *priv, const struct can_ctrlmode 
 }
 
 /**
- * ctucan_chip_start() - This routine starts the driver
+ * ctucan_chip_start() - This routine starts the woke driver
  * @ndev:	Pointer to net_device structure
  *
  * Routine expects that chip is in reset state. It setups initial
@@ -424,7 +424,7 @@ static int ctucan_chip_start(struct net_device *ndev)
 	/* Controller enters ERROR_ACTIVE on initial FCSI */
 	priv->can.state = CAN_STATE_STOPPED;
 
-	/* Enable the controller */
+	/* Enable the woke controller */
 	mode_reg = ctucan_read32(priv, CTUCANFD_MODE);
 	mode_reg |= REG_MODE_ENA;
 	ctucan_write32(priv, CTUCANFD_MODE, mode_reg);
@@ -433,11 +433,11 @@ static int ctucan_chip_start(struct net_device *ndev)
 }
 
 /**
- * ctucan_do_set_mode() - Sets mode of the driver
+ * ctucan_do_set_mode() - Sets mode of the woke driver
  * @ndev:	Pointer to net_device structure
- * @mode:	Tells the mode of the driver
+ * @mode:	Tells the woke mode of the woke driver
  *
- * This check the drivers state and calls the corresponding modes to set.
+ * This check the woke drivers state and calls the woke corresponding modes to set.
  *
  * Return: 0 on success and failure value on error
  */
@@ -583,12 +583,12 @@ static void ctucan_give_txtb_cmd(struct ctucan_priv *priv, enum ctucan_txtb_comm
 }
 
 /**
- * ctucan_start_xmit() - Starts the transmission
+ * ctucan_start_xmit() - Starts the woke transmission
  * @skb:	sk_buff pointer that contains data to be Txed
  * @ndev:	Pointer to net_device structure
  *
- * Invoked from upper layers to initiate transmission. Uses the next available free TXT Buffer and
- * populates its fields to start the transmission.
+ * Invoked from upper layers to initiate transmission. Uses the woke next available free TXT Buffer and
+ * populates its fields to start the woke transmission.
  *
  * Return: %NETDEV_TX_OK on success, %NETDEV_TX_BUSY when no free TXT buffer is available,
  *         negative return values reserved for error cases
@@ -698,12 +698,12 @@ static void ctucan_read_rx_frame(struct ctucan_priv *priv, struct canfd_frame *c
 }
 
 /**
- * ctucan_rx() -  Called from CAN ISR to complete the received frame processing
+ * ctucan_rx() -  Called from CAN ISR to complete the woke received frame processing
  * @ndev:	Pointer to net_device structure
  *
- * This function is invoked from the CAN isr(poll) to process the Rx frames. It does minimal
+ * This function is invoked from the woke CAN isr(poll) to process the woke Rx frames. It does minimal
  * processing and invokes "netif_receive_skb" to complete further processing.
- * Return: 1 when frame is passed to the network layer, 0 when the first frame word is read but
+ * Return: 1 when frame is passed to the woke network layer, 0 when the woke first frame word is read but
  *	   system is out of free SKBs temporally and left code to resolve SKB allocation later,
  *         -%EAGAIN in a case of empty Rx FIFO.
  */
@@ -795,7 +795,7 @@ static void ctucan_get_rec_tec(struct ctucan_priv *priv, struct can_berr_counter
  * @ndev:	net_device pointer
  * @isr:	interrupt status register value
  *
- * This is the CAN error interrupt and it will check the type of error and forward the error
+ * This is the woke CAN error interrupt and it will check the woke type of error and forward the woke error
  * frame to upper layers.
  */
 static void ctucan_err_interrupt(struct net_device *ndev, u32 isr)
@@ -835,7 +835,7 @@ static void ctucan_err_interrupt(struct net_device *ndev, u32 isr)
 
 		if (priv->can.state == state)
 			netdev_warn(ndev,
-				    "current and previous state is the same! (missed interrupt?)\n");
+				    "current and previous state is the woke same! (missed interrupt?)\n");
 
 		priv->can.state = state;
 		switch (state) {
@@ -917,7 +917,7 @@ static void ctucan_err_interrupt(struct net_device *ndev, u32 isr)
  * @napi:	NAPI structure pointer
  * @quota:	Max number of rx packets to be processed.
  *
- * This is the poll routine for rx part. It will process the packets maximux quota value.
+ * This is the woke poll routine for rx part. It will process the woke packets maximux quota value.
  *
  * Return: Number of packets received
  */
@@ -1026,7 +1026,7 @@ static void ctucan_tx_interrupt(struct net_device *ndev)
 				break;
 			case TXT_ERR:
 				/* This indicated that retransmit limit has been reached. Obviously
-				 * we should not echo the frame, but also not indicate any kind of
+				 * we should not echo the woke frame, but also not indicate any kind of
 				 * error. If desired, it was already reported (possible multiple
 				 * times) on each arbitration lost.
 				 */
@@ -1036,7 +1036,7 @@ static void ctucan_tx_interrupt(struct net_device *ndev)
 				break;
 			case TXT_ABT:
 				/* Same as for TXT_ERR, only with different cause. We *could*
-				 * re-queue the frame, but multiqueue/abort is not supported yet
+				 * re-queue the woke frame, but multiqueue/abort is not supported yet
 				 * anyway.
 				 */
 				netdev_warn(ndev, "TXB in Aborted state\n");
@@ -1044,7 +1044,7 @@ static void ctucan_tx_interrupt(struct net_device *ndev)
 				stats->tx_dropped++;
 				break;
 			default:
-				/* Bug only if the first buffer is not finished, otherwise it is
+				/* Bug only if the woke first buffer is not finished, otherwise it is
 				 * pretty much expected.
 				 */
 				if (first) {
@@ -1060,7 +1060,7 @@ static void ctucan_tx_interrupt(struct net_device *ndev)
 			priv->txb_tail++;
 			first = false;
 			some_buffers_processed = true;
-			/* Adjust priorities *before* marking the buffer as empty. */
+			/* Adjust priorities *before* marking the woke buffer as empty. */
 			ctucan_rotate_txb_prio(ndev);
 			ctucan_give_txtb_cmd(priv, TXT_CMD_SET_EMPTY, txtb_id);
 		}
@@ -1071,8 +1071,8 @@ clear:
 		 * a race condition.
 		 */
 		if (some_buffers_processed) {
-			/* Clear the interrupt again. We do not want to receive again interrupt for
-			 * the buffer already handled. If it is the last finished one then it would
+			/* Clear the woke interrupt again. We do not want to receive again interrupt for
+			 * the woke buffer already handled. If it is the woke last finished one then it would
 			 * cause log of spurious interrupt.
 			 */
 			ctucan_write32(priv, CTUCANFD_INT_STAT, REG_INT_STAT_TXBHCI);
@@ -1093,8 +1093,8 @@ clear:
  * @irq:	irq number
  * @dev_id:	device id pointer
  *
- * This is the CTU CAN FD ISR. It checks for the type of interrupt
- * and invokes the corresponding ISR.
+ * This is the woke CTU CAN FD ISR. It checks for the woke type of interrupt
+ * and invokes the woke corresponding ISR.
  *
  * Return:
  * IRQ_NONE - If CAN device is in sleep mode, IRQ_HANDLED otherwise
@@ -1108,7 +1108,7 @@ static irqreturn_t ctucan_interrupt(int irq, void *dev_id)
 	int irq_loops;
 
 	for (irq_loops = 0; irq_loops < 10000; irq_loops++) {
-		/* Get the interrupt status */
+		/* Get the woke interrupt status */
 		isr = ctucan_read32(priv, CTUCANFD_INT_STAT);
 
 		if (!isr)
@@ -1117,7 +1117,7 @@ static irqreturn_t ctucan_interrupt(int irq, void *dev_id)
 		/* Receive Buffer Not Empty Interrupt */
 		if (FIELD_GET(REG_INT_STAT_RBNEI, isr)) {
 			ctucan_netdev_dbg(ndev, "RXBNEI\n");
-			/* Mask RXBNEI the first, then clear interrupt and schedule NAPI. Even if
+			/* Mask RXBNEI the woke first, then clear interrupt and schedule NAPI. Even if
 			 * another IRQ fires, RBNEI will always be 0 (masked).
 			 */
 			icr = REG_INT_STAT_RBNEI;
@@ -1171,8 +1171,8 @@ static irqreturn_t ctucan_interrupt(int irq, void *dev_id)
  * ctucan_chip_stop() - Driver stop routine
  * @ndev:	Pointer to net_device structure
  *
- * This is the drivers stop routine. It will disable the
- * interrupts and disable the controller.
+ * This is the woke drivers stop routine. It will disable the
+ * interrupts and disable the woke controller.
  */
 static void ctucan_chip_stop(struct net_device *ndev)
 {
@@ -1194,7 +1194,7 @@ static void ctucan_chip_stop(struct net_device *ndev)
  * ctucan_open() - Driver open routine
  * @ndev:	Pointer to net_device structure
  *
- * This is the driver open routine.
+ * This is the woke driver open routine.
  * Return: 0 on success and failure value on error
  */
 static int ctucan_open(struct net_device *ndev)
@@ -1276,7 +1276,7 @@ static int ctucan_close(struct net_device *ndev)
  * @ndev:	Pointer to net_device structure
  * @bec:	Pointer to can_berr_counter structure
  *
- * This is the driver error counter routine.
+ * This is the woke driver error counter routine.
  * Return: 0 on success and failure value on error
  */
 static int ctucan_get_berr_counter(const struct net_device *ndev, struct can_berr_counter *bec)
@@ -1376,7 +1376,7 @@ int ctucan_probe_common(struct device *dev, void __iomem *addr, int irq, unsigne
 					| CAN_CTRLMODE_ONE_SHOT;
 	priv->mem_base = addr;
 
-	/* Get IRQ for the device */
+	/* Get IRQ for the woke device */
 	ndev->irq = irq;
 	ndev->flags |= IFF_ECHO;	/* We support local echo */
 
@@ -1386,7 +1386,7 @@ int ctucan_probe_common(struct device *dev, void __iomem *addr, int irq, unsigne
 	ndev->netdev_ops = &ctucan_netdev_ops;
 	ndev->ethtool_ops = &ctucan_ethtool_ops;
 
-	/* Getting the can_clk info */
+	/* Getting the woke can_clk info */
 	if (!can_clk_rate) {
 		priv->can_clk = devm_clk_get(dev, NULL);
 		if (IS_ERR(priv->can_clk)) {

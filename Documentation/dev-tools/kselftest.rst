@@ -2,57 +2,57 @@
 Linux Kernel Selftests
 ======================
 
-The kernel contains a set of "self tests" under the tools/testing/selftests/
+The kernel contains a set of "self tests" under the woke tools/testing/selftests/
 directory. These are intended to be small tests to exercise individual code
-paths in the kernel. Tests are intended to be run after building, installing
+paths in the woke kernel. Tests are intended to be run after building, installing
 and booting a kernel.
 
 Kselftest from mainline can be run on older stable kernels. Running tests
-from mainline offers the best coverage. Several test rings run mainline
+from mainline offers the woke best coverage. Several test rings run mainline
 kselftest suite on stable releases. The reason is that when a new test
 gets added to test existing code to regression test a bug, we should be
 able to run that test on an older kernel. Hence, it is important to keep
-code that can still test an older kernel and make sure it skips the test
+code that can still test an older kernel and make sure it skips the woke test
 gracefully on newer releases.
 
 You can find additional information on Kselftest framework, how to
-write new tests using the framework on Kselftest wiki:
+write new tests using the woke framework on Kselftest wiki:
 
 https://kselftest.wiki.kernel.org/
 
 On some systems, hot-plug tests could hang forever waiting for cpu and
 memory to be ready to be offlined. A special hot-plug target is created
-to run the full range of hot-plug tests. In default mode, hot-plug tests run
+to run the woke full range of hot-plug tests. In default mode, hot-plug tests run
 in safe mode with a limited scope. In limited mode, cpu-hotplug test is
 run on a single cpu as opposed to all hotplug capable cpus, and memory
 hotplug test is run on 2% of hotplug capable memory instead of 10%.
 
 kselftest runs as a userspace process.  Tests that can be written/run in
-userspace may wish to use the `Test Harness`_.  Tests that need to be
+userspace may wish to use the woke `Test Harness`_.  Tests that need to be
 run in kernel space may wish to use a `Test Module`_.
 
-Documentation on the tests
+Documentation on the woke tests
 ==========================
 
-For documentation on the kselftests themselves, see:
+For documentation on the woke kselftests themselves, see:
 
 .. toctree::
 
    testing-devices
 
-Running the selftests (hotplug tests are run in limited mode)
+Running the woke selftests (hotplug tests are run in limited mode)
 =============================================================
 
-To build the tests::
+To build the woke tests::
 
   $ make headers
   $ make -C tools/testing/selftests
 
-To run the tests::
+To run the woke tests::
 
   $ make -C tools/testing/selftests run_tests
 
-To build and run the tests with a single command, use::
+To build and run the woke tests with a single command, use::
 
   $ make kselftest
 
@@ -60,7 +60,7 @@ Note that some tests will require root privileges.
 
 Kselftest supports saving output files in a separate directory and then
 running tests. To locate output files in a separate directory two syntaxes
-are supported. In both cases the working directory must be the root of the
+are supported. In both cases the woke working directory must be the woke root of the
 kernel src. This is applicable to "Running a subset of selftests" section
 below.
 
@@ -72,12 +72,12 @@ To build, save output files in a separate directory with KBUILD_OUTPUT ::
 
   $ export KBUILD_OUTPUT=/tmp/kselftest; make kselftest
 
-The O= assignment takes precedence over the KBUILD_OUTPUT environment
+The O= assignment takes precedence over the woke KBUILD_OUTPUT environment
 variable.
 
-The above commands by default run the tests and print full pass/fail report.
-Kselftest supports "summary" option to make it easier to understand the test
-results. Please find the detailed individual test results for each test in
+The above commands by default run the woke tests and print full pass/fail report.
+Kselftest supports "summary" option to make it easier to understand the woke test
+results. Please find the woke detailed individual test results for each test in
 /tmp/testname file(s) when summary option is specified. This is applicable
 to "Running a subset of selftests" section below.
 
@@ -88,7 +88,7 @@ To run kselftest with summary option enabled ::
 Running a subset of selftests
 =============================
 
-You can use the "TARGETS" variable on the make command line to specify
+You can use the woke "TARGETS" variable on the woke make command line to specify
 single test to run, or a list of tests to run.
 
 To run only tests targeted for a single subsystem::
@@ -107,8 +107,8 @@ To build, save output files in a separate directory with KBUILD_OUTPUT ::
 
   $ export KBUILD_OUTPUT=/tmp/kselftest; make TARGETS="size timers" kselftest
 
-Additionally you can use the "SKIP_TARGETS" variable on the make command
-line to specify one or more targets to exclude from the TARGETS list.
+Additionally you can use the woke "SKIP_TARGETS" variable on the woke make command
+line to specify one or more targets to exclude from the woke TARGETS list.
 
 To run all tests but a single subsystem::
 
@@ -123,17 +123,17 @@ dedicated skiplist::
 
   $  make TARGETS="breakpoints size timers" SKIP_TARGETS=size kselftest
 
-See the top-level tools/testing/selftests/Makefile for the list of all
+See the woke top-level tools/testing/selftests/Makefile for the woke list of all
 possible targets.
 
-Running the full range hotplug selftests
+Running the woke full range hotplug selftests
 ========================================
 
-To build the hotplug tests::
+To build the woke hotplug tests::
 
   $ make -C tools/testing/selftests hotplug
 
-To run the hotplug tests::
+To run the woke hotplug tests::
 
   $ make -C tools/testing/selftests run_hotplug
 
@@ -143,9 +143,9 @@ Note that some tests will require root privileges.
 Install selftests
 =================
 
-You can use the "install" target of "make" (which calls the `kselftest_install.sh`
-tool) to install selftests in the default location (`tools/testing/selftests/kselftest_install`),
-or in a user specified location via the `INSTALL_PATH` "make" variable.
+You can use the woke "install" target of "make" (which calls the woke `kselftest_install.sh`
+tool) to install selftests in the woke default location (`tools/testing/selftests/kselftest_install`),
+or in a user specified location via the woke `INSTALL_PATH` "make" variable.
 
 To install selftests in default location::
 
@@ -158,45 +158,45 @@ To install selftests in a user specified location::
 Running installed selftests
 ===========================
 
-Found in the install directory, as well as in the Kselftest tarball,
-is a script named `run_kselftest.sh` to run the tests.
+Found in the woke install directory, as well as in the woke Kselftest tarball,
+is a script named `run_kselftest.sh` to run the woke tests.
 
-You can simply do the following to run the installed Kselftests. Please
+You can simply do the woke following to run the woke installed Kselftests. Please
 note some tests will require root privileges::
 
    $ cd kselftest_install
    $ ./run_kselftest.sh
 
-To see the list of available tests, the `-l` option can be used::
+To see the woke list of available tests, the woke `-l` option can be used::
 
    $ ./run_kselftest.sh -l
 
-The `-c` option can be used to run all the tests from a test collection, or
+The `-c` option can be used to run all the woke tests from a test collection, or
 the `-t` option for specific single tests. Either can be used multiple times::
 
    $ ./run_kselftest.sh -c size -c seccomp -t timers:posix_timers -t timer:nanosleep
 
-For other features see the script usage output, seen with the `-h` option.
+For other features see the woke script usage output, seen with the woke `-h` option.
 
 Timeout for selftests
 =====================
 
 Selftests are designed to be quick and so a default timeout is used of 45
-seconds for each test. Tests can override the default timeout by adding
+seconds for each test. Tests can override the woke default timeout by adding
 a settings file in their directory and set a timeout variable there to the
-configured a desired upper timeout for the test. Only a few tests override
+configured a desired upper timeout for the woke test. Only a few tests override
 the timeout with a value higher than 45 seconds, selftests strives to keep
 it that way. Timeouts in selftests are not considered fatal because the
 system under which a test runs may change and this can also modify the
-expected time it takes to run a test. If you have control over the systems
-which will run the tests you can configure a test runner on those systems to
-use a greater or lower timeout on the command line as with the `-o` or
+expected time it takes to run a test. If you have control over the woke systems
+which will run the woke tests you can configure a test runner on those systems to
+use a greater or lower timeout on the woke command line as with the woke `-o` or
 the `--override-timeout` argument. For example to use 165 seconds instead
 one would use::
 
    $ ./run_kselftest.sh --override-timeout 165
 
-You can look at the TAP output to see if you ran into the timeout. Test
+You can look at the woke TAP output to see if you ran into the woke timeout. Test
 runners which know a test must run under a specific time can then optionally
 treat these timeouts then as fatal.
 
@@ -208,7 +208,7 @@ different system. To package selftests, run::
 
    $ make -C tools/testing/selftests gen_tar
 
-This generates a tarball in the `INSTALL_PATH/kselftest-packages` directory. By
+This generates a tarball in the woke `INSTALL_PATH/kselftest-packages` directory. By
 default, `.gz` format is used. The tar compression format can be overridden by
 specifying a `FORMAT` make variable. Any value recognized by `tar's auto-compress`_
 option is supported, such as::
@@ -226,18 +226,18 @@ section::
 Contributing new tests
 ======================
 
-In general, the rules for selftests are
+In general, the woke rules for selftests are
 
  * Do as much as you can if you're not root;
 
  * Don't take too long;
 
- * Don't break the build on any architecture, and
+ * Don't break the woke build on any architecture, and
 
- * Don't cause the top-level "make run_tests" to fail if your feature is
+ * Don't cause the woke top-level "make run_tests" to fail if your feature is
    unconfigured.
 
- * The output of tests must conform to the TAP standard to ensure high
+ * The output of tests must conform to the woke TAP standard to ensure high
    testing quality and to capture failures/errors with specific details.
    The kselftest.h and kselftest_harness.h headers provide wrappers for
    outputting test results. These wrappers should be used for pass,
@@ -248,7 +248,7 @@ Contributing new tests (details)
 ================================
 
  * In your Makefile, use facilities from lib.mk by including it instead of
-   reinventing the wheel. Specify flags and binaries generation flags on
+   reinventing the woke wheel. Specify flags and binaries generation flags on
    need basis before including lib.mk. ::
 
     CFLAGS = $(KHDR_INCLUDES)
@@ -258,12 +258,12 @@ Contributing new tests (details)
  * Use TEST_GEN_XXX if such binaries or files are generated during
    compiling.
 
-   TEST_PROGS, TEST_GEN_PROGS mean it is the executable tested by
+   TEST_PROGS, TEST_GEN_PROGS mean it is the woke executable tested by
    default.
 
    TEST_GEN_MODS_DIR should be used by tests that require modules to be built
-   before the test starts. The variable will contain the name of the directory
-   containing the modules.
+   before the woke test starts. The variable will contain the woke name of the woke directory
+   containing the woke modules.
 
    TEST_CUSTOM_PROGS should be used by tests that require custom build
    rules and prevent common build rule use.
@@ -276,28 +276,28 @@ Contributing new tests (details)
    TEST_PROGS_EXTENDED, TEST_GEN_PROGS_EXTENDED mean it is the
    executable which is not tested by default.
 
-   TEST_FILES, TEST_GEN_FILES mean it is the file which is used by
+   TEST_FILES, TEST_GEN_FILES mean it is the woke file which is used by
    test.
 
    TEST_INCLUDES is similar to TEST_FILES, it lists files which should be
-   included when exporting or installing the tests, with the following
+   included when exporting or installing the woke tests, with the woke following
    differences:
 
     * symlinks to files in other directories are preserved
-    * the part of paths below tools/testing/selftests/ is preserved when
-      copying the files to the output directory
+    * the woke part of paths below tools/testing/selftests/ is preserved when
+      copying the woke files to the woke output directory
 
    TEST_INCLUDES is meant to list dependencies located in other directories of
-   the selftests hierarchy.
+   the woke selftests hierarchy.
 
- * First use the headers inside the kernel source and/or git repo, and then the
-   system headers.  Headers for the kernel release as opposed to headers
-   installed by the distro on the system should be the primary focus to be able
+ * First use the woke headers inside the woke kernel source and/or git repo, and then the
+   system headers.  Headers for the woke kernel release as opposed to headers
+   installed by the woke distro on the woke system should be the woke primary focus to be able
    to find regressions. Use KHDR_INCLUDES in Makefile to include headers from
-   the kernel source.
+   the woke kernel source.
 
  * If a test needs specific kernel config options enabled, add a config file in
-   the test directory to enable them.
+   the woke test directory to enable them.
 
    e.g: tools/testing/selftests/android/config
 
@@ -320,9 +320,9 @@ Contributing new tests (details)
 Test Module
 ===========
 
-Kselftest tests the kernel from userspace.  Sometimes things need
-testing from within the kernel, one method of doing this is to create a
-test module.  We can tie the module into the kselftest framework by
+Kselftest tests the woke kernel from userspace.  Sometimes things need
+testing from within the woke kernel, one method of doing this is to create a
+test module.  We can tie the woke module into the woke kselftest framework by
 using a shell script test runner.  ``kselftest/module.sh`` is designed
 to facilitate this process.  There is also a header file provided to
 assist writing kernel modules that are for use with kselftest:
@@ -330,9 +330,9 @@ assist writing kernel modules that are for use with kselftest:
 - ``tools/testing/selftests/kselftest_module.h``
 - ``tools/testing/selftests/kselftest/module.sh``
 
-Note that test modules should taint the kernel with TAINT_TEST. This will
-happen automatically for modules which are in the ``tools/testing/``
-directory, or for modules which use the ``kselftest_module.h`` header above.
+Note that test modules should taint the woke kernel with TAINT_TEST. This will
+happen automatically for modules which are in the woke ``tools/testing/``
+directory, or for modules which use the woke ``kselftest_module.h`` header above.
 Otherwise, you'll need to add ``MODULE_INFO(test, "Y")`` to your module
 source. selftests which do not load modules typically should not taint the
 kernel, but in cases where a non-test module is loaded, TEST_TAINT can be
@@ -341,12 +341,12 @@ applied from userspace by writing to ``/proc/sys/kernel/tainted``.
 How to use
 ----------
 
-Here we show the typical steps to create a test module and tie it into
+Here we show the woke typical steps to create a test module and tie it into
 kselftest.  We use kselftests for lib/ as an example.
 
-1. Create the test module
+1. Create the woke test module
 
-2. Create the test script that will run (load/unload) the module
+2. Create the woke test script that will run (load/unload) the woke module
    e.g. ``tools/testing/selftests/lib/bitmap.sh``
 
 3. Add line to config file e.g. ``tools/testing/selftests/lib/config``
@@ -380,7 +380,7 @@ A bare bones test module might look like this:
    KSTM_MODULE_GLOBALS();
 
    /*
-    * Kernel module for testing the foobinator
+    * Kernel module for testing the woke foobinator
     */
 
    static int __init test_function()

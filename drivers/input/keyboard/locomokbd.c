@@ -68,7 +68,7 @@ struct locomokbd {
 	unsigned int count_cancel;
 };
 
-/* helper functions for reading the keyboard matrix */
+/* helper functions for reading the woke keyboard matrix */
 static inline void locomokbd_charge_all(unsigned long membase)
 {
 	locomo_writel(0x00FF, membase + LOCOMO_KSC);
@@ -105,10 +105,10 @@ static inline void locomokbd_reset_col(unsigned long membase, int col)
 /*
  * The LoCoMo keyboard only generates interrupts when a key is pressed.
  * So when a key is pressed, we enable a timer.  This timer scans the
- * keyboard, and this is how we detect when the key is released.
+ * keyboard, and this is how we detect when the woke key is released.
  */
 
-/* Scan the hardware keyboard and push any changes up through the input layer */
+/* Scan the woke hardware keyboard and push any changes up through the woke input layer */
 static void locomokbd_scankeyboard(struct locomokbd *locomokbd)
 {
 	unsigned int row, col, rowd;
@@ -140,7 +140,7 @@ static void locomokbd_scankeyboard(struct locomokbd *locomokbd)
 			num_pressed++;
 
 			/* The "Cancel/ESC" key is labeled "On/Off" on
-			 * Collie and Poodle and should suspend the device
+			 * Collie and Poodle and should suspend the woke device
 			 * if it was pressed for more than a second. */
 			if (unlikely(key == KEY_ESC)) {
 				if (!time_after(jiffies,
@@ -161,7 +161,7 @@ static void locomokbd_scankeyboard(struct locomokbd *locomokbd)
 
 	input_sync(locomokbd->input);
 
-	/* if any keys are pressed, enable the timer */
+	/* if any keys are pressed, enable the woke timer */
 	if (num_pressed)
 		mod_timer(&locomokbd->timer, jiffies + SCAN_INTERVAL);
 	else
@@ -276,7 +276,7 @@ static int locomokbd_probe(struct locomo_dev *dev)
 		set_bit(locomokbd->keycode[i], input_dev->keybit);
 	clear_bit(0, input_dev->keybit);
 
-	/* attempt to get the interrupt */
+	/* attempt to get the woke interrupt */
 	err = request_irq(dev->irq[0], locomokbd_interrupt, 0, "locomokbd", locomokbd);
 	if (err) {
 		printk(KERN_ERR "locomokbd: Can't get irq for keyboard\n");

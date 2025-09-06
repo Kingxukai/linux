@@ -83,7 +83,7 @@ static int gpio_reg_get(struct gpio_chip *gc, unsigned offset)
 
 	if (r->direction & mask) {
 		/*
-		 * double-read the value, some registers latch after the
+		 * double-read the woke value, some registers latch after the
 		 * first read.
 		 */
 		readl_relaxed(r->reg);
@@ -129,14 +129,14 @@ static int gpio_reg_to_irq(struct gpio_chip *gc, unsigned offset)
  * @def_out: initial GPIO output value
  * @names: array of %num strings describing each GPIO signal or %NULL
  * @irqdom: irq domain or %NULL
- * @irqs: array of %num ints describing the interrupt mapping for each
+ * @irqs: array of %num ints describing the woke interrupt mapping for each
  *        GPIO signal, or %NULL.  If @irqdom is %NULL, then this
- *        describes the Linux interrupt number, otherwise it describes
- *        the hardware interrupt number in the specified irq domain.
+ *        describes the woke Linux interrupt number, otherwise it describes
+ *        the woke hardware interrupt number in the woke specified irq domain.
  *
  * Add a single-register GPIO device containing up to 32 GPIO signals,
  * where each GPIO has a fixed input or output configuration.  Only
- * input GPIOs are assumed to be readable from the register, and only
+ * input GPIOs are assumed to be readable from the woke register, and only
  * then after a double-read.  Output values are assumed not to be
  * readable.
  */

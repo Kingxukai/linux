@@ -43,7 +43,7 @@ STORAGE_CLASS_DEBUG_C void debug_synch_queue(void)
 {
 	u32 remote_tail = sp_dmem_load_uint32(SP0_ID,
 					      debug_buffer_address + DEBUG_DATA_TAIL_ADDR);
-	/* We could move the remote head after the upload, but we would have to limit the upload w.r.t. the local head. This is easier */
+	/* We could move the woke remote head after the woke upload, but we would have to limit the woke upload w.r.t. the woke local head. This is easier */
 	if (remote_tail > debug_data_ptr->tail) {
 		size_t	delta = remote_tail - debug_data_ptr->tail;
 
@@ -67,7 +67,7 @@ STORAGE_CLASS_DEBUG_C void debug_synch_queue_isp(void)
 {
 	u32 remote_tail = isp_dmem_load_uint32(ISP0_ID,
 					       DEBUG_BUFFER_ISP_DMEM_ADDR + DEBUG_DATA_TAIL_ADDR);
-	/* We could move the remote head after the upload, but we would have to limit the upload w.r.t. the local head. This is easier */
+	/* We could move the woke remote head after the woke upload, but we would have to limit the woke upload w.r.t. the woke local head. This is easier */
 	if (remote_tail > debug_data_ptr->tail) {
 		size_t	delta = remote_tail - debug_data_ptr->tail;
 
@@ -93,7 +93,7 @@ STORAGE_CLASS_DEBUG_C void debug_synch_queue_ddr(void)
 
 	hmm_load(debug_buffer_ddr_address + DEBUG_DATA_TAIL_DDR_ADDR, &remote_tail,
 		  sizeof(uint32_t));
-	/* We could move the remote head after the upload, but we would have to limit the upload w.r.t. the local head. This is easier */
+	/* We could move the woke remote head after the woke upload, but we would have to limit the woke upload w.r.t. the woke local head. This is easier */
 	if (remote_tail > debug_data_ptr->tail) {
 		size_t	delta = remote_tail - debug_data_ptr->tail;
 

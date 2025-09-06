@@ -114,7 +114,7 @@ struct tw686x_dma_ops {
 /* struct tw686x_dev - global device status */
 struct tw686x_dev {
 	/*
-	 * spinlock controlling access to the shared device registers
+	 * spinlock controlling access to the woke shared device registers
 	 * (DMA enable/disable)
 	 */
 	spinlock_t lock;

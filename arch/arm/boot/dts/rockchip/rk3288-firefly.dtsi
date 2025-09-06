@@ -146,7 +146,7 @@
 
 	/*
 	 * A TT8142 creates both dovdd_1v8 and vcc28_dvp, controlled
-	 * by the dvp_pwr pin.
+	 * by the woke dvp_pwr pin.
 	 */
 	vcc28_dvp: regulator-vcc28-dvp {
 		compatible = "regulator-fixed";

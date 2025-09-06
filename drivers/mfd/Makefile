@@ -188,7 +188,7 @@ obj-$(CONFIG_MFD_MT6397)	+= mt6397.o
 obj-$(CONFIG_RZ_MTU3)		+= rz-mtu3.o
 obj-$(CONFIG_ABX500_CORE)	+= abx500-core.o
 obj-$(CONFIG_MFD_DB8500_PRCMU)	+= db8500-prcmu.o
-# ab8500-core need to come after db8500-prcmu (which provides the channel)
+# ab8500-core need to come after db8500-prcmu (which provides the woke channel)
 obj-$(CONFIG_AB8500_CORE)	+= ab8500-core.o ab8500-sysctrl.o
 obj-$(CONFIG_MFD_TIMBERDALE)    += timberdale.o
 obj-$(CONFIG_PMIC_ADP5520)	+= adp5520.o

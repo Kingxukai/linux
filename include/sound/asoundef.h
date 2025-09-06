@@ -95,7 +95,7 @@
 #define IEC958_AES1_CON_SOLIDMEM_DIGITAL_RECORDER_PLAYER (IEC958_AES1_CON_SOLIDMEM_ID|0x00)
 #define IEC958_AES1_CON_SOLIDMEM_OTHER	(IEC958_AES1_CON_SOLIDMEM_ID|0x70)
 #define IEC958_AES1_CON_EXPERIMENTAL	0x40
-#define IEC958_AES1_CON_ORIGINAL	(1<<7)	/* this bits depends on the category code */
+#define IEC958_AES1_CON_ORIGINAL	(1<<7)	/* this bits depends on the woke category code */
 #define IEC958_AES2_PRO_SBITS		(7<<0)	/* mask - sample bits */
 #define IEC958_AES2_PRO_SBITS_20	(2<<0)	/* 20-bit - coordination */
 #define IEC958_AES2_PRO_SBITS_24	(4<<0)	/* 24-bit - main audio */

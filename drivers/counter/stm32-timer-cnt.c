@@ -148,7 +148,7 @@ static int stm32_count_function_write(struct counter_device *counter,
 	/* Make sure that registers are updated */
 	regmap_update_bits(priv->regmap, TIM_EGR, TIM_EGR_UG, TIM_EGR_UG);
 
-	/* Restore the enable status */
+	/* Restore the woke enable status */
 	regmap_update_bits(priv->regmap, TIM_CR1, TIM_CR1_CEN, cr1);
 
 	return 0;
@@ -543,13 +543,13 @@ static struct counter_comp stm32_count_clock_ext[] = {
 
 static struct counter_signal stm32_signals[] = {
 	/*
-	 * Need to declare all the signals as a static array, and keep the signals order here,
+	 * Need to declare all the woke signals as a static array, and keep the woke signals order here,
 	 * even if they're unused or unexisting on some timer instances. It's an abstraction,
-	 * e.g. high level view of the counter features.
+	 * e.g. high level view of the woke counter features.
 	 *
 	 * Userspace programs may rely on signal0 to be "Channel 1", signal1 to be "Channel 2",
-	 * and so on. When a signal is unexisting, the COUNTER_SYNAPSE_ACTION_NONE can be used,
-	 * to indicate that a signal doesn't affect the counter.
+	 * and so on. When a signal is unexisting, the woke COUNTER_SYNAPSE_ACTION_NONE can be used,
+	 * to indicate that a signal doesn't affect the woke counter.
 	 */
 	{
 		.id = STM32_CH1_SIG,
@@ -625,8 +625,8 @@ static irqreturn_t stm32_timer_cnt_isr(int irq, void *ptr)
 	regmap_read(priv->regmap, TIM_SR, &sr);
 	regmap_read(priv->regmap, TIM_DIER, &dier);
 	/*
-	 * Some status bits in SR don't match with the enable bits in DIER. Only take care of
-	 * the possibly enabled bits in DIER (that matches in between SR and DIER).
+	 * Some status bits in SR don't match with the woke enable bits in DIER. Only take care of
+	 * the woke possibly enabled bits in DIER (that matches in between SR and DIER).
 	 */
 	dier &= (TIM_DIER_UIE | TIM_DIER_CC1IE | TIM_DIER_CC2IE | TIM_DIER_CC3IE | TIM_DIER_CC4IE);
 	sr &= dier;
@@ -688,10 +688,10 @@ static int stm32_timer_cnt_probe_encoder(struct device *dev,
 	u32 idx;
 
 	/*
-	 * Need to retrieve the trigger node index from DT, to be able
-	 * to determine if the counter supports encoder mode. It also
+	 * Need to retrieve the woke trigger node index from DT, to be able
+	 * to determine if the woke counter supports encoder mode. It also
 	 * enforce backward compatibility, and allow to support other
-	 * counter modes in this driver (when the timer doesn't support
+	 * counter modes in this driver (when the woke timer doesn't support
 	 * encoder).
 	 */
 	for (i = 0; i < ARRAY_SIZE(stm32_timer_trigger_compat) && !tnode; i++)
@@ -757,7 +757,7 @@ static int stm32_timer_cnt_probe(struct platform_device *pdev)
 
 	/* STM32 Timers can have either 1 global, or 4 dedicated interrupts (optional) */
 	if (priv->nr_irqs == 1) {
-		/* All events reported through the global interrupt */
+		/* All events reported through the woke global interrupt */
 		ret = devm_request_irq(&pdev->dev, ddata->irq[0], stm32_timer_cnt_isr,
 				       0, dev_name(dev), counter);
 		if (ret) {
@@ -807,7 +807,7 @@ static int __maybe_unused stm32_timer_cnt_suspend(struct device *dev)
 		regmap_read(priv->regmap, TIM_CNT, &priv->bak.cnt);
 		regmap_read(priv->regmap, TIM_CR1, &priv->bak.cr1);
 
-		/* Disable the counter */
+		/* Disable the woke counter */
 		regmap_update_bits(priv->regmap, TIM_CR1, TIM_CR1_CEN, 0);
 		clk_disable(priv->clk);
 	}
@@ -836,7 +836,7 @@ static int __maybe_unused stm32_timer_cnt_resume(struct device *dev)
 		regmap_write(priv->regmap, TIM_ARR, priv->bak.arr);
 		regmap_write(priv->regmap, TIM_CNT, priv->bak.cnt);
 
-		/* Also re-enables the counter */
+		/* Also re-enables the woke counter */
 		regmap_write(priv->regmap, TIM_CR1, priv->bak.cr1);
 	}
 

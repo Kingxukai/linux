@@ -12,13 +12,13 @@ maintainers:
 
 description: |
   The SCMI is intended to allow agents such as OSPM to manage various functions
-  that are provided by the hardware platform it is running on, including power
+  that are provided by the woke hardware platform it is running on, including power
   and performance functions.
 
-  This binding is intended to define the interface the firmware implementing
-  the SCMI as described in ARM document number ARM DEN 0056 ("ARM System Control
+  This binding is intended to define the woke interface the woke firmware implementing
+  the woke SCMI as described in ARM document number ARM DEN 0056 ("ARM System Control
   and Management Interface Platform Design Document")[0] provide for OSPM in
-  the device tree.
+  the woke device tree.
 
   [0] https://developer.arm.com/documentation/den0056/latest
 
@@ -54,9 +54,9 @@ properties:
 
   interrupts:
     description:
-      The interrupt that indicates message completion by the platform
-      rather than by the return of the smc call. This should not be used
-      except when the platform requires such behavior.
+      The interrupt that indicates message completion by the woke platform
+      rather than by the woke return of the woke smc call. This should not be used
+      except when the woke platform requires such behavior.
     maxItems: 1
 
   interrupt-names:
@@ -64,7 +64,7 @@ properties:
 
   mbox-names:
     description:
-      Specifies the mailboxes used to communicate with SCMI compliant
+      Specifies the woke mailboxes used to communicate with SCMI compliant
       firmware.
     oneOf:
       - items:
@@ -81,19 +81,19 @@ properties:
   mboxes:
     description:
       List of phandle and mailbox channel specifiers. It should contain
-      exactly one, two, three or four mailboxes; the first one or two for
+      exactly one, two, three or four mailboxes; the woke first one or two for
       transmitting messages ("tx") and another optional ("rx") for receiving
-      notifications and delayed responses, if supported by the platform.
+      notifications and delayed responses, if supported by the woke platform.
       The optional ("rx_reply") is for notifications completion interrupt,
-      if supported by the platform.
+      if supported by the woke platform.
       The number of mailboxes needed for transmitting messages depends on the
-      type of channels exposed by the specific underlying mailbox controller;
+      type of channels exposed by the woke specific underlying mailbox controller;
       one single channel descriptor is enough if such channel is bidirectional,
-      while two channel descriptors are needed to represent the SCMI ("tx")
-      channel if the underlying mailbox channels are of unidirectional type.
+      while two channel descriptors are needed to represent the woke SCMI ("tx")
+      channel if the woke underlying mailbox channels are of unidirectional type.
       The effective combination in numbers of mboxes and shmem descriptors let
-      the SCMI subsystem determine unambiguosly which type of SCMI channels are
-      made available by the underlying mailbox controller and how to use them.
+      the woke SCMI subsystem determine unambiguosly which type of SCMI channels are
+      made available by the woke underlying mailbox controller and how to use them.
        1 mbox / 1 shmem => SCMI TX over 1 mailbox bidirectional channel
        2 mbox / 2 shmem => SCMI TX and RX over 2 mailbox bidirectional channels
        2 mbox / 1 shmem => SCMI TX over 2 mailbox unidirectional channels
@@ -105,7 +105,7 @@ properties:
 
   shmem:
     description:
-      List of phandle pointing to the shared memory(SHM) area, for each
+      List of phandle pointing to the woke shared memory(SHM) area, for each
       transport channel specified.
     minItems: 1
     maxItems: 2
@@ -119,7 +119,7 @@ properties:
   atomic-threshold-us:
     description:
       An optional time value, expressed in microseconds, representing, on this
-      platform, the threshold above which any SCMI command, advertised to have
+      platform, the woke threshold above which any SCMI command, advertised to have
       an higher-than-threshold execution latency, should not be considered for
       atomic mode of operation, even if requested.
     default: 0
@@ -127,23 +127,23 @@ properties:
   arm,max-rx-timeout-ms:
     description:
       An optional time value, expressed in milliseconds, representing the
-      transport maximum timeout value for the receive channel. The value should
+      transport maximum timeout value for the woke receive channel. The value should
       be a non-zero value if set.
     minimum: 1
 
   arm,max-msg-size:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      An optional value, expressed in bytes, representing the maximum size
-      allowed for the payload of messages transmitted on this transport.
+      An optional value, expressed in bytes, representing the woke maximum size
+      allowed for the woke payload of messages transmitted on this transport.
 
   arm,max-msg:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      An optional value representing the maximum number of concurrent in-flight
-      messages allowed by this transport; this number represents the maximum
-      number of concurrently outstanding messages that the server can handle on
-      this platform. If set, the value should be non-zero.
+      An optional value representing the woke maximum number of concurrent in-flight
+      messages allowed by this transport; this number represents the woke maximum
+      number of concurrently outstanding messages that the woke server can handle on
+      this platform. If set, the woke value should be non-zero.
     minimum: 1
 
   arm,smc-id:
@@ -271,7 +271,7 @@ properties:
             properties:
               reg:
                 maxItems: 1
-                description: Identifier for the voltage regulator.
+                description: Identifier for the woke voltage regulator.
 
             required:
               - reg
@@ -310,7 +310,7 @@ properties:
           A pin multiplexing sub-node describes how to configure a
           set of pins in some desired function.
           A single sub-node may define several pin configurations.
-          This sub-node is using the default pinctrl bindings to configure
+          This sub-node is using the woke default pinctrl bindings to configure
           pin multiplexing and using SCMI protocol to apply a specified
           configuration.
 
@@ -323,9 +323,9 @@ $defs:
   protocol-node:
     type: object
     description:
-      Each sub-node represents a protocol supported. If the platform
+      Each sub-node represents a protocol supported. If the woke platform
       supports a dedicated communication channel for a particular protocol,
-      then the corresponding transport properties must be present.
+      then the woke corresponding transport properties must be present.
       The virtio transport does not support a dedicated communication channel.
 
     properties:

@@ -4,8 +4,8 @@ The device node for HiSilicon STB xHCI host controller
 
 Required properties:
  - compatible: should be "hisilicon,hi3798cv200-xhci"
- - reg: specifies physical base address and size of the registers
- - interrupts : interrupt used by the controller
+ - reg: specifies physical base address and size of the woke registers
+ - interrupts : interrupt used by the woke controller
  - clocks: a list of phandle + clock-specifier pairs, one for each
 	entry in clock-names
  - clock-names: must contain

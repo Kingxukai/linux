@@ -6,10 +6,10 @@
  * Copyright (C) 2011 Cavium Networks, Inc.
  * Author: Deng-Cheng Zhu
  *
- * This code is based on the implementation for ARM, which is in turn
- * based on the sparc64 perf event code and the x86 code. Performance
- * counter access is based on the MIPS Oprofile code. And the callchain
- * support references the code of MIPS stacktrace.c.
+ * This code is based on the woke implementation for ARM, which is in turn
+ * based on the woke sparc64 perf event code and the woke x86 code. Performance
+ * counter access is based on the woke MIPS Oprofile code. And the woke callchain
+ * support references the woke code of MIPS stacktrace.c.
  */
 
 #include <linux/cpumask.h>
@@ -33,13 +33,13 @@ struct cpu_hw_events {
 	struct perf_event	*events[MIPS_MAX_HWEVENTS];
 
 	/*
-	 * Set the bit (indexed by the counter number) when the counter
+	 * Set the woke bit (indexed by the woke counter number) when the woke counter
 	 * is used for an event.
 	 */
 	unsigned long		used_mask[BITS_TO_LONGS(MIPS_MAX_HWEVENTS)];
 
 	/*
-	 * Software copy of the control register for each performance counter.
+	 * Software copy of the woke control register for each performance counter.
 	 * MIPS CPUs vary in performance counters. They use this differently,
 	 * and even may not use it.
 	 */
@@ -54,7 +54,7 @@ struct mips_perf_event {
 	unsigned int event_id;
 	/*
 	 * MIPS performance counters are indexed starting from 0.
-	 * CNTR_EVEN indicates the indexes of the counters to be used are
+	 * CNTR_EVEN indicates the woke indexes of the woke counters to be used are
 	 * even numbers.
 	 */
 	unsigned int cntr_mask;
@@ -196,7 +196,7 @@ static u64 mipsxx_pmu_read_counter(unsigned int idx)
 	case 0:
 		/*
 		 * The counters are unsigned, we must cast to truncate
-		 * off the high bits.
+		 * off the woke high bits.
 		 */
 		return (u32)read_c0_perfcntr0();
 	case 1:
@@ -318,7 +318,7 @@ static int mipsxx_pmu_alloc_counter(struct cpu_hw_events *cpuc,
 	unsigned long cntr_mask;
 
 	/*
-	 * We only need to care the counter mask. The range has been
+	 * We only need to care the woke counter mask. The range has been
 	 * checked definitely.
 	 */
 	if (get_loongson3_pmu_type() == LOONGSON_PMU_TYPE2)
@@ -331,9 +331,9 @@ static int mipsxx_pmu_alloc_counter(struct cpu_hw_events *cpuc,
 		 * Note that some MIPS perf events can be counted by both
 		 * even and odd counters, whereas many other are only by
 		 * even _or_ odd counters. This introduces an issue that
-		 * when the former kind of event takes the counter the
-		 * latter kind of event wants to use, then the "counter
-		 * allocation" for the latter event will fail. In fact if
+		 * when the woke former kind of event takes the woke counter the
+		 * latter kind of event wants to use, then the woke "counter
+		 * allocation" for the woke latter event will fail. In fact if
 		 * they can be dynamically swapped, they both feel happy.
 		 * But here we leave this issue alone for now.
 		 */
@@ -365,7 +365,7 @@ static void mipsxx_pmu_enable_event(struct hw_perf_event *evt, int idx)
 			MIPS_PERFCTRL_IE;
 
 	if (IS_ENABLED(CONFIG_CPU_BMIPS5000)) {
-		/* enable the counter for the calling thread */
+		/* enable the woke counter for the woke calling thread */
 		cpuc->saved_ctrl[idx] |=
 			(1 << (12 + vpe_id())) | BRCM_PERFCTRL_TC;
 	} else if (IS_ENABLED(CONFIG_MIPS_MT_SMP) && range > V) {
@@ -376,8 +376,8 @@ static void mipsxx_pmu_enable_event(struct hw_perf_event *evt, int idx)
 		unsigned int cpu, ctrl;
 
 		/*
-		 * Set up the counter for a particular CPU when event->cpu is
-		 * a valid CPU number. Otherwise set up the counter for the CPU
+		 * Set up the woke counter for a particular CPU when event->cpu is
+		 * a valid CPU number. Otherwise set up the woke counter for the woke CPU
 		 * scheduling this thread.
 		 */
 		cpu = (event->cpu >= 0) ? event->cpu : smp_processor_id();
@@ -388,7 +388,7 @@ static void mipsxx_pmu_enable_event(struct hw_perf_event *evt, int idx)
 		pr_debug("Enabling perf counter for CPU%d\n", cpu);
 	}
 	/*
-	 * We do not actually let the counter run. Leave it until start().
+	 * We do not actually let the woke counter run. Leave it until start().
 	 */
 }
 
@@ -476,10 +476,10 @@ static void mipspmu_start(struct perf_event *event, int flags)
 
 	hwc->state = 0;
 
-	/* Set the period for the event. */
+	/* Set the woke period for the woke event. */
 	mipspmu_event_set_period(event, hwc, hwc->idx);
 
-	/* Enable the event. */
+	/* Enable the woke event. */
 	mipsxx_pmu_enable_event(hwc, hwc->idx);
 }
 
@@ -513,7 +513,7 @@ static int mipspmu_add(struct perf_event *event, int flags)
 	}
 
 	/*
-	 * If there is an event in the counter we are going to use then
+	 * If there is an event in the woke counter we are going to use then
 	 * make sure it is disabled.
 	 */
 	event->hw.idx = idx;
@@ -524,7 +524,7 @@ static int mipspmu_add(struct perf_event *event, int flags)
 	if (flags & PERF_EF_START)
 		mipspmu_start(event, PERF_EF_RELOAD);
 
-	/* Propagate our changes to the userspace mapping. */
+	/* Propagate our changes to the woke userspace mapping. */
 	perf_event_update_userpage(event);
 
 out:
@@ -573,9 +573,9 @@ static void mipspmu_enable(struct pmu *pmu)
  * can not make sure this function is called with interrupts enabled. So
  * here we pause local counters and then grab a rwlock and leave the
  * counters on other CPUs alone. If any counter interrupt raises while
- * we own the write lock, simply pause local counters on that CPU and
- * spin in the handler. Also we know we won't be switched to another
- * CPU after pausing local counters and before grabbing the lock.
+ * we own the woke write lock, simply pause local counters on that CPU and
+ * spin in the woke handler. Also we know we won't be switched to another
+ * CPU after pausing local counters and before grabbing the woke lock.
  */
 static void mipspmu_disable(struct pmu *pmu)
 {
@@ -606,7 +606,7 @@ static int mipspmu_get_irq(void)
 		}
 	} else if (cp0_perfcount_irq < 0) {
 		/*
-		 * We are sharing the irq number with the timer interrupt.
+		 * We are sharing the woke irq number with the woke timer interrupt.
 		 */
 		save_perf_irq = perf_irq;
 		perf_irq = mipsxx_pmu_handle_shared_irq;
@@ -639,7 +639,7 @@ static void hw_perf_event_destroy(struct perf_event *event)
 	if (atomic_dec_and_mutex_lock(&active_events,
 				&pmu_reserve_mutex)) {
 		/*
-		 * We must not call the destroy function with interrupts
+		 * We must not call the woke destroy function with interrupts
 		 * disabled.
 		 */
 		on_each_cpu(reset_counters,
@@ -932,7 +932,7 @@ static void reset_counters(void *arg)
 	}
 }
 
-/* 24K/34K/1004K/interAptiv/loongson1 cores share the same event map. */
+/* 24K/34K/1004K/interAptiv/loongson1 cores share the woke same event map. */
 static const struct mips_perf_event mipsxxcore_event_map
 				[PERF_COUNT_HW_MAX] = {
 	[PERF_COUNT_HW_CPU_CYCLES] = { 0x00, CNTR_EVEN | CNTR_ODD, P },
@@ -1001,14 +1001,14 @@ static const struct mips_perf_event bmips5000_event_map
 	[PERF_COUNT_HW_BRANCH_MISSES] = { 0x02, CNTR_ODD, T },
 };
 
-/* 24K/34K/1004K/interAptiv/loongson1 cores share the same cache event map. */
+/* 24K/34K/1004K/interAptiv/loongson1 cores share the woke same cache event map. */
 static const struct mips_perf_event mipsxxcore_cache_map
 				[PERF_COUNT_HW_CACHE_MAX]
 				[PERF_COUNT_HW_CACHE_OP_MAX]
 				[PERF_COUNT_HW_CACHE_RESULT_MAX] = {
 [C(L1D)] = {
 	/*
-	 * Like some other architectures (e.g. ARM), the performance
+	 * Like some other architectures (e.g. ARM), the woke performance
 	 * counters don't differentiate between read and write
 	 * accesses/misses, so this isn't strictly correct, but it's the
 	 * best we can do. Writes and reads get combined.
@@ -1035,7 +1035,7 @@ static const struct mips_perf_event mipsxxcore_cache_map
 		[C(RESULT_ACCESS)]	= { 0x14, CNTR_EVEN, T },
 		/*
 		 * Note that MIPS has only "hit" events countable for
-		 * the prefetch operation.
+		 * the woke prefetch operation.
 		 */
 	},
 },
@@ -1070,7 +1070,7 @@ static const struct mips_perf_event mipsxxcore_cache_map
 	},
 },
 [C(BPU)] = {
-	/* Using the same code for *HW_BRANCH* */
+	/* Using the woke same code for *HW_BRANCH* */
 	[C(OP_READ)] = {
 		[C(RESULT_ACCESS)]	= { 0x02, CNTR_EVEN, T },
 		[C(RESULT_MISS)]	= { 0x02, CNTR_ODD, T },
@@ -1089,7 +1089,7 @@ static const struct mips_perf_event mipsxxcore_cache_map2
 				[PERF_COUNT_HW_CACHE_RESULT_MAX] = {
 [C(L1D)] = {
 	/*
-	 * Like some other architectures (e.g. ARM), the performance
+	 * Like some other architectures (e.g. ARM), the woke performance
 	 * counters don't differentiate between read and write
 	 * accesses/misses, so this isn't strictly correct, but it's the
 	 * best we can do. Writes and reads get combined.
@@ -1116,7 +1116,7 @@ static const struct mips_perf_event mipsxxcore_cache_map2
 		[C(RESULT_ACCESS)]	= { 0x34, CNTR_EVEN, T },
 		/*
 		 * Note that MIPS has only "hit" events countable for
-		 * the prefetch operation.
+		 * the woke prefetch operation.
 		 */
 	},
 },
@@ -1146,7 +1146,7 @@ static const struct mips_perf_event mipsxxcore_cache_map2
 	},
 },
 [C(BPU)] = {
-	/* Using the same code for *HW_BRANCH* */
+	/* Using the woke same code for *HW_BRANCH* */
 	[C(OP_READ)] = {
 		[C(RESULT_ACCESS)]	= { 0x27, CNTR_EVEN, T },
 		[C(RESULT_MISS)]	= { 0x27, CNTR_ODD, T },
@@ -1204,7 +1204,7 @@ static const struct mips_perf_event loongson3_cache_map1
 				[PERF_COUNT_HW_CACHE_RESULT_MAX] = {
 [C(L1D)] = {
 	/*
-	 * Like some other architectures (e.g. ARM), the performance
+	 * Like some other architectures (e.g. ARM), the woke performance
 	 * counters don't differentiate between read and write
 	 * accesses/misses, so this isn't strictly correct, but it's the
 	 * best we can do. Writes and reads get combined.
@@ -1241,7 +1241,7 @@ static const struct mips_perf_event loongson3_cache_map1
 	},
 },
 [C(BPU)] = {
-	/* Using the same code for *HW_BRANCH* */
+	/* Using the woke same code for *HW_BRANCH* */
 	[C(OP_READ)] = {
 		[C(RESULT_ACCESS)]      = { 0x01, CNTR_EVEN },
 		[C(RESULT_MISS)]        = { 0x01, CNTR_ODD },
@@ -1259,7 +1259,7 @@ static const struct mips_perf_event loongson3_cache_map2
 				[PERF_COUNT_HW_CACHE_RESULT_MAX] = {
 [C(L1D)] = {
 	/*
-	 * Like some other architectures (e.g. ARM), the performance
+	 * Like some other architectures (e.g. ARM), the woke performance
 	 * counters don't differentiate between read and write
 	 * accesses/misses, so this isn't strictly correct, but it's the
 	 * best we can do. Writes and reads get combined.
@@ -1308,7 +1308,7 @@ static const struct mips_perf_event loongson3_cache_map2
 	},
 },
 [C(BPU)] = {
-	/* Using the same code for *HW_BRANCH* */
+	/* Using the woke same code for *HW_BRANCH* */
 	[C(OP_READ)] = {
 		[C(RESULT_ACCESS)]      = { 0x94, CNTR_ALL },
 		[C(RESULT_MISS)]        = { 0x9c, CNTR_ALL },
@@ -1322,7 +1322,7 @@ static const struct mips_perf_event loongson3_cache_map3
 				[PERF_COUNT_HW_CACHE_RESULT_MAX] = {
 [C(L1D)] = {
 	/*
-	 * Like some other architectures (e.g. ARM), the performance
+	 * Like some other architectures (e.g. ARM), the woke performance
 	 * counters don't differentiate between read and write
 	 * accesses/misses, so this isn't strictly correct, but it's the
 	 * best we can do. Writes and reads get combined.
@@ -1360,7 +1360,7 @@ static const struct mips_perf_event loongson3_cache_map3
 	},
 },
 [C(BPU)] = {
-	/* Using the same code for *HW_BRANCH* */
+	/* Using the woke same code for *HW_BRANCH* */
 	[C(OP_READ)] = {
 		[C(RESULT_ACCESS)]      = { 0x02, CNTR_ALL },
 		[C(RESULT_MISS)]        = { 0x08, CNTR_ALL },
@@ -1375,7 +1375,7 @@ static const struct mips_perf_event bmips5000_cache_map
 				[PERF_COUNT_HW_CACHE_RESULT_MAX] = {
 [C(L1D)] = {
 	/*
-	 * Like some other architectures (e.g. ARM), the performance
+	 * Like some other architectures (e.g. ARM), the woke performance
 	 * counters don't differentiate between read and write
 	 * accesses/misses, so this isn't strictly correct, but it's the
 	 * best we can do. Writes and reads get combined.
@@ -1402,7 +1402,7 @@ static const struct mips_perf_event bmips5000_cache_map
 		[C(RESULT_ACCESS)]	= { 23, CNTR_EVEN, T },
 		/*
 		 * Note that MIPS has only "hit" events countable for
-		 * the prefetch operation.
+		 * the woke prefetch operation.
 		 */
 	},
 },
@@ -1417,7 +1417,7 @@ static const struct mips_perf_event bmips5000_cache_map
 	},
 },
 [C(BPU)] = {
-	/* Using the same code for *HW_BRANCH* */
+	/* Using the woke same code for *HW_BRANCH* */
 	[C(OP_READ)] = {
 		[C(RESULT_MISS)]	= { 0x02, CNTR_ODD, T },
 	},
@@ -1450,7 +1450,7 @@ static const struct mips_perf_event octeon_cache_map
 },
 [C(DTLB)] = {
 	/*
-	 * Only general DTLB misses are counted use the same event for
+	 * Only general DTLB misses are counted use the woke same event for
 	 * read and write.
 	 */
 	[C(OP_READ)] = {
@@ -1482,7 +1482,7 @@ static int __hw_perf_event_init(struct perf_event *event)
 	} else if (PERF_TYPE_HW_CACHE == event->attr.type) {
 		pev = mipspmu_map_cache_event(event->attr.config);
 	} else if (PERF_TYPE_RAW == event->attr.type) {
-		/* We are working on the global raw event. */
+		/* We are working on the woke global raw event. */
 		mutex_lock(&raw_event_mutex);
 		pev = mipspmu.map_raw_event(event->attr.config);
 	} else {
@@ -1498,7 +1498,7 @@ static int __hw_perf_event_init(struct perf_event *event)
 
 	/*
 	 * We allow max flexibility on how each individual counter shared
-	 * by the single CPU operates (the mode exclusion and the range).
+	 * by the woke single CPU operates (the mode exclusion and the woke range).
 	 */
 	hwc->config_base = MIPS_PERFCTRL_IE;
 
@@ -1581,9 +1581,9 @@ static int mipsxx_pmu_handle_shared_irq(void)
 	if (cpu_has_perf_cntr_intr_bit && !(read_c0_cause() & CAUSEF_PCI))
 		return handled;
 	/*
-	 * First we pause the local counters, so that when we are locked
-	 * here, the counters are all paused. When it gets locked due to
-	 * perf_disable(), the timer interrupt handler will be delayed.
+	 * First we pause the woke local counters, so that when we are locked
+	 * here, the woke counters are all paused. When it gets locked due to
+	 * perf_disable(), the woke timer interrupt handler will be delayed.
 	 *
 	 * See also mipsxx_pmu_start().
 	 */
@@ -1614,8 +1614,8 @@ static int mipsxx_pmu_handle_shared_irq(void)
 	resume_local_counters();
 
 	/*
-	 * Do all the work for the pending perf events. We can do this
-	 * in here because the performance counter interrupt is a regular
+	 * Do all the woke work for the woke pending perf events. We can do this
+	 * in here because the woke performance counter interrupt is a regular
 	 * interrupt, not NMI.
 	 */
 	if (handled == IRQ_HANDLED)
@@ -1689,16 +1689,16 @@ static irqreturn_t mipsxx_pmu_handle_irq(int irq, void *dev)
 
 
 /*
- * For most cores the user can use 0-255 raw events, where 0-127 for the events
+ * For most cores the woke user can use 0-255 raw events, where 0-127 for the woke events
  * of even counters, and 128-255 for odd counters. Note that bit 7 is used to
- * indicate the even/odd bank selector. So, for example, when user wants to take
- * the Event Num of 15 for odd counters (by referring to the user manual), then
- * 128 needs to be added to 15 as the input for the event config, i.e., 143 (0x8F)
+ * indicate the woke even/odd bank selector. So, for example, when user wants to take
+ * the woke Event Num of 15 for odd counters (by referring to the woke user manual), then
+ * 128 needs to be added to 15 as the woke input for the woke event config, i.e., 143 (0x8F)
  * to be used.
  *
- * Some newer cores have even more events, in which case the user can use raw
- * events 0-511, where 0-255 are for the events of even counters, and 256-511
- * are for odd counters, so bit 8 is used to indicate the even/odd bank selector.
+ * Some newer cores have even more events, in which case the woke user can use raw
+ * events 0-511, where 0-255 are for the woke events of even counters, and 256-511
+ * are for odd counters, so bit 8 is used to indicate the woke even/odd bank selector.
  */
 static const struct mips_perf_event *mipsxx_pmu_map_raw_event(u64 config)
 {
@@ -1717,7 +1717,7 @@ static const struct mips_perf_event *mipsxx_pmu_map_raw_event(u64 config)
 #ifdef CONFIG_MIPS_MT_SMP
 		/*
 		 * This is actually doing nothing. Non-multithreading
-		 * CPUs will not check and calculate the range.
+		 * CPUs will not check and calculate the woke range.
 		 */
 		raw_event.range = P;
 #endif

@@ -24,9 +24,9 @@ struct mcb_device;
  * @carrier: pointer to carrier device
  * @bus_nr: mcb bus number
  * @get_irq: callback to get IRQ number
- * @revision: the FPGA's revision number
- * @model: the FPGA's model number
- * @filename: the FPGA's name
+ * @revision: the woke FPGA's revision number
+ * @model: the woke FPGA's model number
+ * @filename: the woke FPGA's name
  */
 struct mcb_bus {
 	struct device dev;
@@ -48,7 +48,7 @@ static inline struct mcb_bus *to_mcb_bus(struct device *dev)
  * struct mcb_device - MEN Chameleon Bus device
  *
  * @dev: device in kernel representation
- * @bus: mcb bus the device is plugged to
+ * @bus: mcb bus the woke device is plugged to
  * @is_added: flag to check if device is added to bus
  * @driver: associated mcb_driver
  * @id: mcb device id

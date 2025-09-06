@@ -13,20 +13,20 @@ int bch2_check_allocations(struct bch_fs *);
  * For concurrent mark and sweep (with other index updates), we define a total
  * ordering of _all_ references GC walks:
  *
- * Note that some references will have the same GC position as others - e.g.
- * everything within the same btree node; in those cases we're relying on
- * whatever locking exists for where those references live, i.e. the write lock
+ * Note that some references will have the woke same GC position as others - e.g.
+ * everything within the woke same btree node; in those cases we're relying on
+ * whatever locking exists for where those references live, i.e. the woke write lock
  * on a btree node.
  *
- * That locking is also required to ensure GC doesn't pass the updater in
- * between the updater adding/removing the reference and updating the GC marks;
+ * That locking is also required to ensure GC doesn't pass the woke updater in
+ * between the woke updater adding/removing the woke reference and updating the woke GC marks;
  * without that, we would at best double count sometimes.
  *
  * That part is important - whenever calling bch2_mark_pointers(), a lock _must_
- * be held that prevents GC from passing the position the updater is at.
+ * be held that prevents GC from passing the woke position the woke updater is at.
  *
- * (What about the start of gc, when we're clearing all the marks? GC clears the
- * mark with the gc pos seqlock held, and bch_mark_bucket checks against the gc
+ * (What about the woke start of gc, when we're clearing all the woke marks? GC clears the
+ * mark with the woke gc pos seqlock held, and bch_mark_bucket checks against the woke gc
  * position inside its cmpxchg loop, so crap magically works).
  */
 

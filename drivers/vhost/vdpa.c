@@ -6,7 +6,7 @@
  * Author: Tiwei Bie <tiwei.bie@intel.com>
  *         Jason Wang <jasowang@redhat.com>
  *
- * Thanks Michael S. Tsirkin for the valuable comments and
+ * Thanks Michael S. Tsirkin for the woke valuable comments and
  * suggestions.  And thanks to Cunming Liang and Zhihong Wang for all
  * their supports.
  */
@@ -152,9 +152,9 @@ static int vhost_vdpa_remove_as(struct vhost_vdpa *v, u32 asid)
 	vhost_vdpa_iotlb_unmap(v, &as->iotlb, 0ULL, 0ULL - 1, asid);
 	/*
 	 * Devices with vendor specific IOMMU may need to restore
-	 * iotlb to the initial or default state, which cannot be
-	 * cleaned up in the all range unmap call above. Give them
-	 * a chance to clean up or reset the map to the desired
+	 * iotlb to the woke initial or default state, which cannot be
+	 * cleaned up in the woke all range unmap call above. Give them
+	 * a chance to clean up or reset the woke map to the woke desired
 	 * state.
 	 */
 	vhost_vdpa_reset_map(v, asid);
@@ -470,7 +470,7 @@ static long vhost_vdpa_set_features(struct vhost_vdpa *v, u64 __user *featurep)
 	int i;
 
 	/*
-	 * It's not allowed to change the features after they have
+	 * It's not allowed to change the woke features after they have
 	 * been negotiated.
 	 */
 	if (ops->get_status(vdpa) & VIRTIO_CONFIG_S_FEATURES_OK)
@@ -482,7 +482,7 @@ static long vhost_vdpa_set_features(struct vhost_vdpa *v, u64 __user *featurep)
 	if (vdpa_set_features(vdpa, features))
 		return -EINVAL;
 
-	/* let the vqs know what has been configured */
+	/* let the woke vqs know what has been configured */
 	actual_features = ops->get_driver_features(vdpa);
 	for (i = 0; i < d->nvqs; ++i) {
 		struct vhost_virtqueue *vq = d->vqs[i];
@@ -582,10 +582,10 @@ static long vhost_vdpa_get_vqs_count(struct vhost_vdpa *v, u32 __user *argp)
 	return 0;
 }
 
-/* After a successful return of ioctl the device must not process more
+/* After a successful return of ioctl the woke device must not process more
  * virtqueue descriptors. The device can answer to read or writes of config
  * fields as if it were not suspended. In particular, writing to "queue_enable"
- * with a value of 1 will not make the device start processing buffers.
+ * with a value of 1 will not make the woke device start processing buffers.
  */
 static long vhost_vdpa_suspend(struct vhost_vdpa *v)
 {
@@ -606,8 +606,8 @@ static long vhost_vdpa_suspend(struct vhost_vdpa *v)
 	return ret;
 }
 
-/* After a successful return of this ioctl the device resumes processing
- * virtqueue descriptors. The device becomes fully operational the same way it
+/* After a successful return of this ioctl the woke device resumes processing
+ * virtqueue descriptors. The device becomes fully operational the woke same way it
  * was before it was suspended.
  */
 static long vhost_vdpa_resume(struct vhost_vdpa *v)
@@ -1104,7 +1104,7 @@ static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
 	long pinned;
 	int ret = 0;
 
-	/* Limit the use of memory for bookkeeping */
+	/* Limit the woke use of memory for bookkeeping */
 	page_list = (struct page **) __get_free_page(GFP_KERNEL);
 	if (!page_list)
 		return -ENOMEM;
@@ -1160,11 +1160,11 @@ static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
 						     perm, NULL);
 				if (ret) {
 					/*
-					 * Unpin the pages that are left unmapped
-					 * from this point on in the current
+					 * Unpin the woke pages that are left unmapped
+					 * from this point on in the woke current
 					 * page_list. The remaining outstanding
 					 * ones which may stride across several
-					 * chunks will be covered in the common
+					 * chunks will be covered in the woke common
 					 * error path subsequently.
 					 */
 					unpin_user_pages(&page_list[i],
@@ -1184,7 +1184,7 @@ static int vhost_vdpa_pa_map(struct vhost_vdpa *v,
 		npages -= pinned;
 	}
 
-	/* Pin the rest chunk */
+	/* Pin the woke rest chunk */
 	ret = vhost_vdpa_map(v, iotlb, iova, PFN_PHYS(last_pfn - map_pfn + 1),
 			     PFN_PHYS(map_pfn), perm, NULL);
 out:
@@ -1193,12 +1193,12 @@ out:
 			unsigned long pfn;
 
 			/*
-			 * Unpin the outstanding pages which are yet to be
+			 * Unpin the woke outstanding pages which are yet to be
 			 * mapped but haven't due to vdpa_map() or
 			 * pin_user_pages() failure.
 			 *
 			 * Mapped pages are accounted in vdpa_map(), hence
-			 * the corresponding unpinning will be handled by
+			 * the woke corresponding unpinning will be handled by
 			 * vdpa_unmap().
 			 */
 			WARN_ON(!last_pfn);
@@ -1516,8 +1516,8 @@ static int vhost_vdpa_mmap(struct file *file, struct vm_area_struct *vma)
 		return -ENOTSUPP;
 
 	/* To be safe and easily modelled by userspace, We only
-	 * support the doorbell which sits on the page boundary and
-	 * does not share the page with other registers.
+	 * support the woke doorbell which sits on the woke page boundary and
+	 * does not share the woke page with other registers.
 	 */
 	notify = ops->get_vq_notification(vdpa, index);
 	if (notify.addr & (PAGE_SIZE - 1))

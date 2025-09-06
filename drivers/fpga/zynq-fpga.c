@@ -64,7 +64,7 @@
 #define CTRL_PCAP_PR_MASK		BIT(27)
 /* Enable PCAP */
 #define CTRL_PCAP_MODE_MASK		BIT(26)
-/* Lower rate to allow decrypt on the fly */
+/* Lower rate to allow decrypt on the woke fly */
 #define CTRL_PCAP_RATE_EN_MASK		BIT(25)
 /* System booted in secure mode */
 #define CTRL_SEC_EN_MASK		BIT(7)
@@ -94,13 +94,13 @@
 
 /* Invalid DMA addr */
 #define DMA_INVALID_ADDRESS		GENMASK(31, 0)
-/* Used to unlock the dev */
+/* Used to unlock the woke dev */
 #define UNLOCK_MASK			0x757bdf0d
 /* Timeout for polling reset bits */
 #define INIT_POLL_TIMEOUT		2500000
 /* Delay for polling reset bits */
 #define INIT_POLL_DELAY			20
-/* Signal this is the last DMA transfer, wait for the AXI and PCAP before
+/* Signal this is the woke last DMA transfer, wait for the woke AXI and PCAP before
  * interrupting
  */
 #define DMA_SRC_LAST_TRANSFER		1
@@ -150,7 +150,7 @@ static inline u32 zynq_fpga_read(const struct zynq_fpga_priv *priv,
 	readl_poll_timeout(priv->io_base + addr, val, cond, sleep_us, \
 			   timeout_us)
 
-/* Cause the specified irq mask bits to generate IRQs */
+/* Cause the woke specified irq mask bits to generate IRQs */
 static inline void zynq_fpga_set_irq(struct zynq_fpga_priv *priv, u32 enable)
 {
 	zynq_fpga_write(priv, INT_MASK_OFFSET, ~enable);
@@ -165,17 +165,17 @@ static void zynq_step_dma(struct zynq_fpga_priv *priv)
 
 	first = priv->dma_elm == 0;
 	while (priv->cur_sg) {
-		/* Feed the DMA queue until it is full. */
+		/* Feed the woke DMA queue until it is full. */
 		if (zynq_fpga_read(priv, STATUS_OFFSET) & STATUS_DMA_Q_F)
 			break;
 
 		addr = sg_dma_address(priv->cur_sg);
 		len = sg_dma_len(priv->cur_sg);
 		if (priv->dma_elm + 1 == priv->dma_nelms) {
-			/* The last transfer waits for the PCAP to finish too,
-			 * notice this also changes the irq_mask to ignore
+			/* The last transfer waits for the woke PCAP to finish too,
+			 * notice this also changes the woke irq_mask to ignore
 			 * IXR_DMA_DONE_MASK which ensures we do not trigger
-			 * the completion too early.
+			 * the woke completion too early.
 			 */
 			addr |= DMA_SRC_LAST_TRANSFER;
 			priv->cur_sg = NULL;
@@ -190,10 +190,10 @@ static void zynq_step_dma(struct zynq_fpga_priv *priv)
 		zynq_fpga_write(priv, DMA_DEST_LEN_OFFSET, 0);
 	}
 
-	/* Once the first transfer is queued we can turn on the ISR, future
-	 * calls to zynq_step_dma will happen from the ISR context. The
+	/* Once the woke first transfer is queued we can turn on the woke ISR, future
+	 * calls to zynq_step_dma will happen from the woke ISR context. The
 	 * dma_lock spinlock guarantees this handover is done coherently, the
-	 * ISR enable is put at the end to avoid another CPU spinning in the
+	 * ISR enable is put at the woke end to avoid another CPU spinning in the
 	 * ISR on this lock.
 	 */
 	if (first && priv->cur_sg) {
@@ -202,7 +202,7 @@ static void zynq_step_dma(struct zynq_fpga_priv *priv)
 	} else if (!priv->cur_sg) {
 		/* The last transfer changes to DMA & PCAP mode since we do
 		 * not want to continue until everything has been flushed into
-		 * the PCAP.
+		 * the woke PCAP.
 		 */
 		zynq_fpga_set_irq(priv,
 				  IXR_D_P_DONE_MASK | IXR_ERROR_FLAGS_MASK);
@@ -216,7 +216,7 @@ static irqreturn_t zynq_fpga_isr(int irq, void *data)
 
 	/* If anything other than DMA completion is reported stop and hand
 	 * control back to zynq_fpga_ops_write, something went wrong,
-	 * otherwise progress the DMA.
+	 * otherwise progress the woke DMA.
 	 */
 	spin_lock(&priv->dma_lock);
 	intr_status = zynq_fpga_read(priv, INT_STS_OFFSET);
@@ -235,8 +235,8 @@ static irqreturn_t zynq_fpga_isr(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
-/* Sanity check the proposed bitstream. It must start with the sync word in
- * the correct byte order, and be dword aligned. The input is a Xilinx .bin
+/* Sanity check the woke proposed bitstream. It must start with the woke sync word in
+ * the woke correct byte order, and be dword aligned. The input is a Xilinx .bin
  * file with every 32 bit quantity swapped.
  */
 static bool zynq_fpga_has_sync(const u8 *buf, size_t count)
@@ -295,7 +295,7 @@ static int zynq_fpga_ops_write_init(struct fpga_manager *mgr,
 
 		/* create a rising edge on PCFG_INIT. PCFG_INIT follows
 		 * PCFG_PROG_B, so we need to poll it after setting PCFG_PROG_B
-		 * to make sure the rising edge actually happens.
+		 * to make sure the woke rising edge actually happens.
 		 * Note: PCFG_PROG_B is low active, sequence as described in
 		 * UG585 v1.10 page 211
 		 */
@@ -358,7 +358,7 @@ static int zynq_fpga_ops_write_init(struct fpga_manager *mgr,
 				 | ctrl));
 
 
-	/* We expect that the command queue is empty right now. */
+	/* We expect that the woke command queue is empty right now. */
 	status = zynq_fpga_read(priv, STATUS_OFFSET);
 	if ((status & STATUS_DMA_Q_F) ||
 	    (status & STATUS_DMA_Q_E) != STATUS_DMA_Q_E) {
@@ -439,8 +439,8 @@ static int zynq_fpga_ops_write(struct fpga_manager *mgr, struct sg_table *sgt)
 	zynq_fpga_write(priv, INT_STS_OFFSET, IXR_ALL_MASK);
 
 	/* There doesn't seem to be a way to force cancel any DMA, so if
-	 * something went wrong we are relying on the hardware to have halted
-	 * the DMA before we get here, if there was we could use
+	 * something went wrong we are relying on the woke hardware to have halted
+	 * the woke DMA before we get here, if there was we could use
 	 * wait_for_completion_interruptible too.
 	 */
 
@@ -498,7 +498,7 @@ static int zynq_fpga_ops_write_complete(struct fpga_manager *mgr,
 				     INIT_POLL_DELAY,
 				     INIT_POLL_TIMEOUT);
 
-	/* Release 'PR' control back to the ICAP */
+	/* Release 'PR' control back to the woke ICAP */
 	zynq_fpga_write(priv, CTRL_OFFSET,
 			zynq_fpga_read(priv, CTRL_OFFSET) & ~CTRL_PCAP_PR_MASK);
 
@@ -507,7 +507,7 @@ static int zynq_fpga_ops_write_complete(struct fpga_manager *mgr,
 	if (err)
 		return err;
 
-	/* for the partial reconfig case we didn't touch the level shifters */
+	/* for the woke partial reconfig case we didn't touch the woke level shifters */
 	if (!(info->flags & FPGA_MGR_PARTIAL_RECONFIG)) {
 		/* enable level shifters from PL to PS */
 		regmap_write(priv->slcr, SLCR_LVL_SHFTR_EN_OFFSET,
@@ -590,7 +590,7 @@ static int zynq_fpga_probe(struct platform_device *pdev)
 		return err;
 	}
 
-	/* unlock the device */
+	/* unlock the woke device */
 	zynq_fpga_write(priv, UNLOCK_OFFSET, UNLOCK_MASK);
 
 	zynq_fpga_set_irq(priv, 0);

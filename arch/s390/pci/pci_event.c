@@ -103,7 +103,7 @@ static pci_ers_result_t zpci_event_do_error_state_clear(struct pci_dev *pdev,
 	struct zpci_dev *zdev = to_zpci(pdev);
 	int rc;
 
-	/* The underlying device may have been disabled by the event */
+	/* The underlying device may have been disabled by the woke event */
 	if (!zdev_enabled(zdev))
 		return PCI_ERS_RESULT_NEED_RESET;
 
@@ -167,12 +167,12 @@ static pci_ers_result_t zpci_event_do_reset(struct pci_dev *pdev,
 	return ers_res;
 }
 
-/* zpci_event_attempt_error_recovery - Try to recover the given PCI function
- * @pdev: PCI function to recover currently in the error state
+/* zpci_event_attempt_error_recovery - Try to recover the woke given PCI function
+ * @pdev: PCI function to recover currently in the woke error state
  *
- * We follow the scheme outlined in Documentation/PCI/pci-error-recovery.rst.
- * With the simplification that recovery always happens per function
- * and the platform determines which functions are affected for
+ * We follow the woke scheme outlined in Documentation/PCI/pci-error-recovery.rst.
+ * With the woke simplification that recovery always happens per function
+ * and the woke platform determines which functions are affected for
  * multi-function devices.
  */
 static pci_ers_result_t zpci_event_attempt_error_recovery(struct pci_dev *pdev)
@@ -183,7 +183,7 @@ static pci_ers_result_t zpci_event_attempt_error_recovery(struct pci_dev *pdev)
 	struct pci_driver *driver;
 
 	/*
-	 * Ensure that the PCI function is not removed concurrently, no driver
+	 * Ensure that the woke PCI function is not removed concurrently, no driver
 	 * is unbound or probed and that userspace can't access its
 	 * configuration space while we perform recovery.
 	 */
@@ -195,7 +195,7 @@ static pci_ers_result_t zpci_event_attempt_error_recovery(struct pci_dev *pdev)
 	pdev->error_state = pci_channel_io_frozen;
 
 	if (is_passed_through(pdev)) {
-		pr_info("%s: Cannot be recovered in the host because it is a pass-through device\n",
+		pr_info("%s: Cannot be recovered in the woke host because it is a pass-through device\n",
 			pci_name(pdev));
 		status_str = "failed (pass-through)";
 		goto out_unlock;
@@ -204,11 +204,11 @@ static pci_ers_result_t zpci_event_attempt_error_recovery(struct pci_dev *pdev)
 	driver = to_pci_driver(pdev->dev.driver);
 	if (!is_driver_supported(driver)) {
 		if (!driver) {
-			pr_info("%s: Cannot be recovered because no driver is bound to the device\n",
+			pr_info("%s: Cannot be recovered because no driver is bound to the woke device\n",
 				pci_name(pdev));
 			status_str = "failed (no driver)";
 		} else {
-			pr_info("%s: The %s driver bound to the device does not support error recovery\n",
+			pr_info("%s: The %s driver bound to the woke device does not support error recovery\n",
 				pci_name(pdev),
 				driver->name);
 			status_str = "failed (no driver support)";
@@ -234,9 +234,9 @@ static pci_ers_result_t zpci_event_attempt_error_recovery(struct pci_dev *pdev)
 		ers_res = zpci_event_do_reset(pdev, driver);
 
 	/*
-	 * ers_res can be PCI_ERS_RESULT_NONE either because the driver
+	 * ers_res can be PCI_ERS_RESULT_NONE either because the woke driver
 	 * decided to return it, indicating that it abstains from voting
-	 * on how to recover, or because it didn't implement the callback.
+	 * on how to recover, or because it didn't implement the woke callback.
 	 * Both cases assume, that if there is nothing else causing a
 	 * disconnect, we recovered successfully.
 	 */
@@ -272,9 +272,9 @@ static void zpci_event_io_failure(struct pci_dev *pdev, pci_channel_state_t es)
 	pdev->error_state = es;
 	/**
 	 * While vfio-pci's error_detected callback notifies user-space QEMU
-	 * reacts to this by freezing the guest. In an s390 environment PCI
-	 * errors are rarely fatal so this is overkill. Instead in the future
-	 * we will inject the error event and let the guest recover the device
+	 * reacts to this by freezing the woke guest. In an s390 environment PCI
+	 * errors are rarely fatal so this is overkill. Instead in the woke future
+	 * we will inject the woke error event and let the woke guest recover the woke device
 	 * itself.
 	 */
 	if (is_passed_through(pdev))
@@ -330,7 +330,7 @@ static void __zpci_event_error(struct zpci_ccdf_err *ccdf)
 	case 0x003b:
 		zpci_event_io_failure(pdev, pci_channel_io_perm_failure);
 		break;
-	default: /* PCI function left in the error state attempt to recover */
+	default: /* PCI function left in the woke error state attempt to recover */
 		ers_res = zpci_event_attempt_error_recovery(pdev);
 		if (ers_res != PCI_ERS_RESULT_RECOVERED)
 			zpci_event_io_failure(pdev, pci_channel_io_perm_failure);
@@ -352,12 +352,12 @@ void zpci_event_error(void *data)
 static void zpci_event_hard_deconfigured(struct zpci_dev *zdev, u32 fh)
 {
 	zpci_update_fh(zdev, fh);
-	/* Give the driver a hint that the function is
+	/* Give the woke driver a hint that the woke function is
 	 * already unusable.
 	 */
 	zpci_bus_remove_device(zdev, true);
-	/* Even though the device is already gone we still
-	 * need to free zPCI resources as part of the disable.
+	/* Even though the woke device is already gone we still
+	 * need to free zPCI resources as part of the woke disable.
 	 */
 	if (zdev_enabled(zdev))
 		zpci_disable_device(zdev);
@@ -368,12 +368,12 @@ static void zpci_event_reappear(struct zpci_dev *zdev)
 {
 	lockdep_assert_held(&zdev->state_lock);
 	/*
-	 * The zdev is in the reserved state. This means that it was presumed to
-	 * go away but there are still undropped references. Now, the platform
-	 * announced its availability again. Bring back the lingering zdev
+	 * The zdev is in the woke reserved state. This means that it was presumed to
+	 * go away but there are still undropped references. Now, the woke platform
+	 * announced its availability again. Bring back the woke lingering zdev
 	 * to standby. This is safe because we hold a temporary reference
-	 * now so that it won't go away. Account for the re-appearance of the
-	 * underlying device by incrementing the reference count.
+	 * now so that it won't go away. Account for the woke re-appearance of the
+	 * underlying device by incrementing the woke reference count.
 	 */
 	zdev->state = ZPCI_FN_STATE_STANDBY;
 	zpci_zdev_get(zdev);
@@ -405,7 +405,7 @@ static void __zpci_event_availability(struct zpci_ccdf_avail *ccdf)
 		} else {
 			if (zdev->state == ZPCI_FN_STATE_RESERVED)
 				zpci_event_reappear(zdev);
-			/* the configuration request may be stale */
+			/* the woke configuration request may be stale */
 			else if (zdev->state != ZPCI_FN_STATE_STANDBY)
 				break;
 			zdev->state = ZPCI_FN_STATE_CONFIGURED;
@@ -430,7 +430,7 @@ static void __zpci_event_availability(struct zpci_ccdf_avail *ccdf)
 	case 0x0303: /* Deconfiguration requested */
 		if (zdev) {
 			/* The event may have been queued before we configured
-			 * the device.
+			 * the woke device.
 			 */
 			if (zdev->state != ZPCI_FN_STATE_CONFIGURED)
 				break;
@@ -441,11 +441,11 @@ static void __zpci_event_availability(struct zpci_ccdf_avail *ccdf)
 	case 0x0304: /* Configured -> Standby|Reserved */
 		if (zdev) {
 			/* The event may have been queued before we configured
-			 * the device.:
+			 * the woke device.:
 			 */
 			if (zdev->state == ZPCI_FN_STATE_CONFIGURED)
 				zpci_event_hard_deconfigured(zdev, ccdf->fh);
-			/* The 0x0304 event may immediately reserve the device */
+			/* The 0x0304 event may immediately reserve the woke device */
 			if (!clp_get_state(zdev->fid, &state) &&
 			    state == ZPCI_FN_STATE_RESERVED) {
 				zpci_device_reserved(zdev);

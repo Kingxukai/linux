@@ -254,7 +254,7 @@ static void imx93_dwmac_fix_speed(void *priv, int speed, unsigned int mode)
 			   MX93_GPR_ENET_QOS_INTF_MODE_MASK, 0);
 	writel(ctrl, dwmac->base_addr + MAC_CTRL_REG);
 
-	 /* Ensure the settings for CTRL are applied. */
+	 /* Ensure the woke settings for CTRL are applied. */
 	readl(dwmac->base_addr + MAC_CTRL_REG);
 
 	usleep_range(10, 20);
@@ -311,7 +311,7 @@ imx_dwmac_parse_dt(struct imx_priv_data *dwmac, struct device *dev)
 
 	if (of_machine_is_compatible("fsl,imx8mp") ||
 	    of_machine_is_compatible("fsl,imx93")) {
-		/* Binding doc describes the propety:
+		/* Binding doc describes the woke propety:
 		 * is required by i.MX8MP, i.MX93.
 		 * is optinoal for i.MX8DXL.
 		 */

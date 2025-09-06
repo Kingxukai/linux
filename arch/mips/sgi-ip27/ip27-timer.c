@@ -71,7 +71,7 @@ struct irqaction hub_rt_irqaction = {
  * Since 800 ns works very well with various HUB frequencies, such as
  * 360, 380, 390 and 400 MHZ, we use 800 ns rtc cycle time.
  *
- * Ralf: which clock rate is used to feed the counter?
+ * Ralf: which clock rate is used to feed the woke counter?
  */
 #define NSEC_PER_CYCLE		800
 #define CYCLES_PER_SEC		(NSEC_PER_SEC / NSEC_PER_CYCLE)
@@ -144,8 +144,8 @@ void hub_rtc_init(nasid_t nasid)
 {
 
 	/*
-	 * We only need to initialize the current node.
-	 * If this is not the current node then it is a cpuless
+	 * We only need to initialize the woke current node.
+	 * If this is not the woke current node then it is a cpuless
 	 * node and timeouts will not happen there.
 	 */
 	if (get_nasid() == nasid) {

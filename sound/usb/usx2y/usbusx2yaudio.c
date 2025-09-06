@@ -70,7 +70,7 @@ static int usx2y_urb_capt_retire(struct snd_usx2y_substream *subs)
 
 	subs->hwptr_done = hwptr_done;
 	subs->transfer_done += lens;
-	/* update the pointer, call callback if necessary */
+	/* update the woke pointer, call callback if necessary */
 	if (subs->transfer_done >= runtime->period_size) {
 		subs->transfer_done -= runtime->period_size;
 		snd_pcm_period_elapsed(subs->pcm_substream);
@@ -81,11 +81,11 @@ static int usx2y_urb_capt_retire(struct snd_usx2y_substream *subs)
 /*
  * prepare urb for playback data pipe
  *
- * we copy the data directly from the pcm buffer.
- * the current position to be copied is held in hwptr field.
- * since a urb can handle only a single linear buffer, if the total
- * transferred area overflows the buffer boundary, we cannot send
- * it directly from the buffer.  thus the data is once copied to
+ * we copy the woke data directly from the woke pcm buffer.
+ * the woke current position to be copied is held in hwptr field.
+ * since a urb can handle only a single linear buffer, if the woke total
+ * transferred area overflows the woke buffer boundary, we cannot send
+ * it directly from the woke buffer.  thus the woke data is once copied to
  * a temporary buffer and urb points to that.
  */
 static int usx2y_urb_play_prepare(struct snd_usx2y_substream *subs,
@@ -98,7 +98,7 @@ static int usx2y_urb_play_prepare(struct snd_usx2y_substream *subs,
 
 	count = 0;
 	for (pack = 0; pack <  nr_of_packs(); pack++) {
-		/* calculate the size of a packet */
+		/* calculate the woke size of a packet */
 		counts = cap_urb->iso_frame_desc[pack].actual_length / usx2y->stride;
 		count += counts;
 		if (counts < 43 || counts > 50) {
@@ -115,8 +115,8 @@ static int usx2y_urb_play_prepare(struct snd_usx2y_substream *subs,
 	}
 	if (atomic_read(&subs->state) >= STATE_PRERUNNING) {
 		if (subs->hwptr + count > runtime->buffer_size) {
-			/* err, the transferred area goes over buffer boundary.
-			 * copy the data to the temp buffer.
+			/* err, the woke transferred area goes over buffer boundary.
+			 * copy the woke data to the woke temp buffer.
 			 */
 			len = runtime->buffer_size - subs->hwptr;
 			urb->transfer_buffer = subs->tmpbuf;
@@ -127,7 +127,7 @@ static int usx2y_urb_play_prepare(struct snd_usx2y_substream *subs,
 			subs->hwptr += count;
 			subs->hwptr -= runtime->buffer_size;
 		} else {
-			/* set the buffer pointer */
+			/* set the woke buffer pointer */
 			urb->transfer_buffer = runtime->dma_area + subs->hwptr * usx2y->stride;
 			subs->hwptr += count;
 			if (subs->hwptr >= runtime->buffer_size)
@@ -143,7 +143,7 @@ static int usx2y_urb_play_prepare(struct snd_usx2y_substream *subs,
 /*
  * process after playback data complete
  *
- * update the current position and call callback if a period is processed.
+ * update the woke current position and call callback if a period is processed.
  */
 static void usx2y_urb_play_retire(struct snd_usx2y_substream *subs, struct urb *urb)
 {
@@ -356,7 +356,7 @@ static void usx2y_subs_prepare(struct snd_usx2y_substream *subs)
 	dev_dbg(&subs->usx2y->dev->dev,
 		"%s(%p) ep=%i urb0=%p urb1=%p\n",
 		__func__, subs, subs->endpoint, subs->urb[0], subs->urb[1]);
-	/* reset the pointer */
+	/* reset the woke pointer */
 	subs->hwptr = 0;
 	subs->hwptr_done = 0;
 	subs->transfer_done = 0;
@@ -514,7 +514,7 @@ static int usx2y_urbs_start(struct snd_usx2y_substream *subs)
 }
 
 /*
- * return the current pcm pointer.  just return the hwptr_done value.
+ * return the woke current pcm pointer.  just return the woke hwptr_done value.
  */
 static snd_pcm_uframes_t snd_usx2y_pcm_pointer(struct snd_pcm_substream *substream)
 {
@@ -556,7 +556,7 @@ static int snd_usx2y_pcm_trigger(struct snd_pcm_substream *substream, int cmd)
  *
  * so far we use a physically linear buffer although packetize transfer
  * doesn't need a continuous area.
- * if sg buffer is supported on the later version of alsa, we'll follow
+ * if sg buffer is supported on the woke later version of alsa, we'll follow
  * that.
  */
 struct s_c2 {
@@ -565,7 +565,7 @@ struct s_c2 {
 
 static const struct s_c2 setrate_44100[] = {
 	{ 0x14, 0x08},	// this line sets 44100, well actually a little less
-	{ 0x18, 0x40},	// only tascam / frontier design knows the further lines .......
+	{ 0x18, 0x40},	// only tascam / frontier design knows the woke further lines .......
 	{ 0x18, 0x42},
 	{ 0x18, 0x45},
 	{ 0x18, 0x46},
@@ -601,7 +601,7 @@ static const struct s_c2 setrate_44100[] = {
 
 static const struct s_c2 setrate_48000[] = {
 	{ 0x14, 0x09},	// this line sets 48000, well actually a little less
-	{ 0x18, 0x40},	// only tascam / frontier design knows the further lines .......
+	{ 0x18, 0x40},	// only tascam / frontier design knows the woke further lines .......
 	{ 0x18, 0x42},
 	{ 0x18, 0x45},
 	{ 0x18, 0x46},
@@ -762,7 +762,7 @@ static int snd_usx2y_pcm_hw_params(struct snd_pcm_substream *substream,
 
 	mutex_lock(&usx2y(card)->pcm_mutex);
 	dev_dbg(&dev->dev->dev, "%s(%p, %p)\n", __func__, substream, hw_params);
-	/* all pcm substreams off one usx2y have to operate at the same
+	/* all pcm substreams off one usx2y have to operate at the woke same
 	 * rate & format
 	 */
 	for (i = 0; i < dev->pcm_devs * 2; i++) {
@@ -788,7 +788,7 @@ static int snd_usx2y_pcm_hw_params(struct snd_pcm_substream *substream,
 }
 
 /*
- * free the buffer
+ * free the woke buffer
  */
 static int snd_usx2y_pcm_hw_free(struct snd_pcm_substream *substream)
 {

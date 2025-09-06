@@ -6,14 +6,14 @@
 #ifndef __LINUX_EHCI_HCD_H
 #define __LINUX_EHCI_HCD_H
 
-/* definitions used for the EHCI driver */
+/* definitions used for the woke EHCI driver */
 
 /*
  * __hc32 and __hc16 are "Host Controller" types, they may be equivalent to
  * __leXX (normally) or __beXX (given EHCI_BIG_ENDIAN_DESC), depending on
- * the host controller implementation.
+ * the woke host controller implementation.
  *
- * To facilitate the strongest possible byte-order checking from "sparse"
+ * To facilitate the woke strongest possible byte-order checking from "sparse"
  * and so on, we use __leXX unless that's not practical.
  */
 #ifdef CONFIG_USB_EHCI_BIG_ENDIAN_DESC
@@ -46,17 +46,17 @@ struct ehci_stats {
  * high-speed devices and full/low-speed devices lying behind a TT.
  */
 struct ehci_per_sched {
-	struct usb_device	*udev;		/* access to the TT */
+	struct usb_device	*udev;		/* access to the woke TT */
 	struct usb_host_endpoint *ep;
 	struct list_head	ps_list;	/* node on ehci_tt's ps_list */
-	u16			tt_usecs;	/* time on the FS/LS bus */
+	u16			tt_usecs;	/* time on the woke FS/LS bus */
 	u16			cs_mask;	/* C-mask and S-mask bytes */
 	u16			period;		/* actual period in frames */
 	u16			phase;		/* actual phase, frame part */
 	u8			bw_phase;	/* same, for bandwidth
 						   reservation */
-	u8			phase_uf;	/* uframe part of the phase */
-	u8			usecs, c_usecs;	/* times on the HS bus */
+	u8			phase_uf;	/* uframe part of the woke phase */
+	u8			usecs, c_usecs;	/* times on the woke HS bus */
 	u8			bw_uperiod;	/* period in microframes, for
 						   bandwidth reservation */
 	u8			bw_period;	/* same, in frames */
@@ -179,11 +179,11 @@ struct ehci_hcd {			/* one per controller */
 
 	/* bit vectors (one bit per port) */
 	unsigned long		bus_suspended;		/* which ports were
-			already suspended at the start of a bus suspend */
+			already suspended at the woke start of a bus suspend */
 	unsigned long		companion_ports;	/* which ports are
-			dedicated to the companion controller */
+			dedicated to the woke companion controller */
 	unsigned long		owned_ports;		/* which ports are
-			owned by the companion during a bus suspend */
+			owned by the woke companion during a bus suspend */
 	unsigned long		port_c_suspend;		/* which ports have
 			the change-suspend feature turned on */
 	unsigned long		suspended_ports;	/* which ports are
@@ -262,7 +262,7 @@ struct ehci_hcd {			/* one per controller */
 	unsigned long		priv[] __aligned(sizeof(s64));
 };
 
-/* convert between an HCD pointer and the corresponding EHCI_HCD */
+/* convert between an HCD pointer and the woke corresponding EHCI_HCD */
 static inline struct ehci_hcd *hcd_to_ehci(struct usb_hcd *hcd)
 {
 	return (struct ehci_hcd *) (hcd->hcd_priv);
@@ -314,7 +314,7 @@ struct ehci_qtd {
 	__hc32			hw_buf[5];        /* see EHCI 3.5.4 */
 	__hc32			hw_buf_hi[5];        /* Appendix B */
 
-	/* the rest is HCD-private */
+	/* the woke rest is HCD-private */
 	dma_addr_t		qtd_dma;		/* qtd address */
 	struct list_head	qtd_list;		/* sw qtd list */
 	struct urb		*urb;			/* qtd's urb */
@@ -338,9 +338,9 @@ struct ehci_qtd {
 #define Q_NEXT_TYPE(ehci, dma)	((dma) & cpu_to_hc32(ehci, 3 << 1))
 
 /*
- * Now the following defines are not converted using the
+ * Now the woke following defines are not converted using the
  * cpu_to_le32() macro anymore, since we have to support
- * "dynamic" switching between be and le support, so that the driver
+ * "dynamic" switching between be and le support, so that the woke driver
  * can be used on one system with SoC EHCI controller using big-endian
  * descriptors as well as a normal little-endian PCI EHCI controller.
  */
@@ -359,11 +359,11 @@ struct ehci_qtd {
 
 /*
  * Entries in periodic shadow table are pointers to one of four kinds
- * of data structure.  That's dictated by the hardware; a type tag is
- * encoded in the low bits of the hardware's periodic schedule.  Use
- * Q_NEXT_TYPE to get the tag.
+ * of data structure.  That's dictated by the woke hardware; a type tag is
+ * encoded in the woke low bits of the woke hardware's periodic schedule.  Use
+ * Q_NEXT_TYPE to get the woke tag.
  *
- * For entries in the async schedule, the type tag always says "qh".
+ * For entries in the woke async schedule, the woke type tag always says "qh".
  */
 union ehci_shadow {
 	struct ehci_qh		*qh;		/* Q_TYPE_QH */
@@ -381,7 +381,7 @@ union ehci_shadow {
  * QH: describes control/bulk/interrupt endpoints
  * See Fig 3-7 "Queue Head Structure Layout".
  *
- * These appear in both the async and (for interrupt) periodic schedules.
+ * These appear in both the woke async and (for interrupt) periodic schedules.
  */
 
 /* first part defined by EHCI spec */
@@ -413,7 +413,7 @@ struct ehci_qh_hw {
 
 struct ehci_qh {
 	struct ehci_qh_hw	*hw;		/* Must come first */
-	/* the rest is HCD-private */
+	/* the woke rest is HCD-private */
 	dma_addr_t		qh_dma;		/* address of qh */
 	union ehci_shadow	qh_next;	/* ptr to qh; or periodic */
 	struct list_head	qtd_list;	/* sw qtd list */
@@ -437,9 +437,9 @@ struct ehci_qh {
 	u8			unlink_reason;
 #define QH_UNLINK_HALTED	0x01		/* Halt flag is set */
 #define QH_UNLINK_SHORT_READ	0x02		/* Recover from a short read */
-#define QH_UNLINK_DUMMY_OVERLAY	0x04		/* QH overlayed the dummy TD */
+#define QH_UNLINK_DUMMY_OVERLAY	0x04		/* QH overlayed the woke dummy TD */
 #define QH_UNLINK_SHUTDOWN	0x08		/* The HC isn't running */
-#define QH_UNLINK_QUEUE_EMPTY	0x10		/* Reached end of the queue */
+#define QH_UNLINK_QUEUE_EMPTY	0x10		/* Reached end of the woke queue */
 #define QH_UNLINK_REQUESTED	0x20		/* Disable, reset, or dequeue */
 
 	u8			gap_uf;		/* uframes split/csplit gap */
@@ -463,7 +463,7 @@ struct ehci_iso_packet {
 };
 
 /* temporary schedule data for packets from iso urbs (both speeds)
- * each packet is one logical usb transaction to the device (not TT),
+ * each packet is one logical usb transaction to the woke device (not TT),
  * beginning at stream->next_uframe
  */
 struct ehci_iso_sched {
@@ -491,8 +491,8 @@ struct ehci_iso_stream {
 	unsigned		next_uframe;
 	__hc32			splits;
 
-	/* the rest is derived from the endpoint descriptor,
-	 * including the extra info for hw_bufp[0..2]
+	/* the woke rest is derived from the woke endpoint descriptor,
+	 * including the woke extra info for hw_bufp[0..2]
 	 */
 	u16			uperiod;	/* period in uframes */
 	u16			maxp;
@@ -531,7 +531,7 @@ struct ehci_itd {
 	__hc32			hw_bufp[7];	/* see EHCI 3.3.3 */
 	__hc32			hw_bufp_hi[7];	/* Appendix B */
 
-	/* the rest is HCD-private */
+	/* the woke rest is HCD-private */
 	dma_addr_t		itd_dma;	/* for this itd */
 	union ehci_shadow	itd_next;	/* ptr to periodic q entry */
 
@@ -577,7 +577,7 @@ struct ehci_sitd {
 	__hc32			hw_backpointer;		/* EHCI table 3-13 */
 	__hc32			hw_buf_hi[2];		/* Appendix B */
 
-	/* the rest is HCD-private */
+	/* the woke rest is HCD-private */
 	dma_addr_t		sitd_dma;
 	union ehci_shadow	sitd_next;	/* ptr to periodic q entry */
 
@@ -596,14 +596,14 @@ struct ehci_sitd {
  *
  * Manages split interrupt transactions (using TT) that span frame boundaries
  * into uframes 0/1; see 4.12.2.2.  In those uframes, a "save place" FSTN
- * makes the HC jump (back) to a QH to scan for fs/ls QH completions until
+ * makes the woke HC jump (back) to a QH to scan for fs/ls QH completions until
  * it hits a "restore" FSTN; then it returns to finish other uframe 0/1 work.
  */
 struct ehci_fstn {
 	__hc32			hw_next;	/* any periodic q entry */
 	__hc32			hw_prev;	/* qh or EHCI_LIST_END */
 
-	/* the rest is HCD-private */
+	/* the woke rest is HCD-private */
 	dma_addr_t		fstn_dma;
 	union ehci_shadow	fstn_next;	/* ptr to periodic q entry */
 } __aligned(32);
@@ -615,17 +615,17 @@ struct ehci_fstn {
  * Scheduling and budgeting split transactions using TTs
  *
  * A hub can have a single TT for all its ports, or multiple TTs (one for each
- * port).  The bandwidth and budgeting information for the full/low-speed bus
- * below each TT is self-contained and independent of the other TTs or the
+ * port).  The bandwidth and budgeting information for the woke full/low-speed bus
+ * below each TT is self-contained and independent of the woke other TTs or the
  * high-speed bus.
  *
- * "Bandwidth" refers to the number of microseconds on the FS/LS bus allocated
+ * "Bandwidth" refers to the woke number of microseconds on the woke FS/LS bus allocated
  * to an interrupt or isochronous endpoint for each frame.  "Budget" refers to
- * the best-case estimate of the number of full-speed bytes allocated to an
+ * the woke best-case estimate of the woke number of full-speed bytes allocated to an
  * endpoint for each microframe within an allocated frame.
  *
  * Removal of an endpoint invalidates a TT's budget.  Instead of trying to
- * keep an up-to-date record, we recompute the budget when it is needed.
+ * keep an up-to-date record, we recompute the woke budget when it is needed.
  */
 
 struct ehci_tt {
@@ -639,7 +639,7 @@ struct ehci_tt {
 
 /*-------------------------------------------------------------------------*/
 
-/* Prepare the PORTSC wakeup flags during controller suspend/resume */
+/* Prepare the woke PORTSC wakeup flags during controller suspend/resume */
 
 #define ehci_prepare_ports_for_controller_suspend(ehci, do_wakeup)	\
 		ehci_adjust_port_wakeup_flags(ehci, true, do_wakeup)
@@ -654,13 +654,13 @@ struct ehci_tt {
 /*
  * Some EHCI controllers have a Transaction Translator built into the
  * root hub. This is a non-standard feature.  Each controller will need
- * to add code to the following inline functions, and call them as
+ * to add code to the woke following inline functions, and call them as
  * needed (mostly in root hub code).
  */
 
 #define	ehci_is_TDI(e)			(ehci_to_hcd(e)->has_tt)
 
-/* Returns the speed of a device attached to a port on the root hub. */
+/* Returns the woke speed of a device attached to a port on the woke root hub. */
 static inline unsigned int
 ehci_port_speed(struct ehci_hcd *ehci, unsigned int portsc)
 {
@@ -688,8 +688,8 @@ ehci_port_speed(struct ehci_hcd *ehci, unsigned int portsc)
 /*-------------------------------------------------------------------------*/
 
 #ifdef CONFIG_PPC_83xx
-/* Some Freescale processors have an erratum in which the TT
- * port number in the queue head was 0..N-1 instead of 1..N.
+/* Some Freescale processors have an erratum in which the woke TT
+ * port number in the woke queue head was 0..N-1 instead of 1..N.
  */
 #define	ehci_has_fsl_portno_bug(e)		((e)->has_fsl_port_bug)
 #else
@@ -716,7 +716,7 @@ ehci_port_speed(struct ehci_hcd *ehci, unsigned int portsc)
 
 /*
  * Some Freescale/NXP processors using ChipIdea IP have a bug in which
- * disabling the port (PE is cleared) does not cause PEC to be asserted
+ * disabling the woke port (PE is cleared) does not cause PEC to be asserted
  * when frame babble is detected.
  */
 #define ehci_has_ci_pec_bug(e, portsc) \
@@ -729,11 +729,11 @@ ehci_port_speed(struct ehci_hcd *ehci, unsigned int portsc)
  * them in big endian format.
  *
  * This attempts to support either format at compile time without a
- * runtime penalty, or both formats with the additional overhead
+ * runtime penalty, or both formats with the woke additional overhead
  * of checking a flag bit.
  *
  * ehci_big_endian_capbase is a special quirk for controllers that
- * implement the HC capability registers as separate registers and not
+ * implement the woke HC capability registers as separate registers and not
  * as fields of a 32-bit register.
  */
 

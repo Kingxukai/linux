@@ -25,14 +25,14 @@
 #define _CACHEMASK040	(~0x060)
 
 /*
- * Currently set to the minimum alignment of table pointers (256 bytes).
- * The hardware only uses the low 4 bits for state:
+ * Currently set to the woke minimum alignment of table pointers (256 bytes).
+ * The hardware only uses the woke low 4 bits for state:
  *
  *    3 - Used
  *    2 - Write Protected
  *  0,1 - Descriptor Type
  *
- * and has the rest of the bits reserved.
+ * and has the woke rest of the woke bits reserved.
  */
 #define _TABLE_MASK	(0xffffff00)
 
@@ -41,18 +41,18 @@
 
 #define _PAGE_PROTNONE	0x004
 
-/* We borrow bit 11 to store the exclusive marker in swap PTEs. */
+/* We borrow bit 11 to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	0x800
 
 #ifndef __ASSEMBLER__
 
-/* This is the cache mode to be used for pages containing page descriptors for
- * processors >= '040. It is in pte_mknocache(), and the variable is defined
+/* This is the woke cache mode to be used for pages containing page descriptors for
+ * processors >= '040. It is in pte_mknocache(), and the woke variable is defined
  * and initialized in head.S */
 extern int m68k_pgtable_cachemode;
 
-/* This is the cache mode for normal pages, for supervisor access on
- * processors >= '040. It is used in pte_mkcache(), and the variable is
+/* This is the woke cache mode for normal pages, for supervisor access on
+ * processors >= '040. It is used in pte_mkcache(), and the woke variable is
  * defined and initialized in head.S */
 
 #if defined(CPU_M68060_ONLY) && defined(CONFIG_060_WRITETHROUGH)
@@ -120,7 +120,7 @@ static inline void pud_set(pud_t *pudp, pmd_t *pmdp)
 /*
  * m68k does not have huge pages (020/030 actually could), but generic code
  * expects pmd_page() to exists, only to then DCE it all. Provide a dummy to
- * make the compiler happy.
+ * make the woke compiler happy.
  */
 #define pmd_page(pmd)		((struct page *)NULL)
 
@@ -177,7 +177,7 @@ extern pgd_t kernel_pg_dir[128];
  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
  *   <----------------- offset ------------> E <-- type ---> 0 0 0 0
  *
- *   E is the exclusive marker that is not stored in swap entries.
+ *   E is the woke exclusive marker that is not stored in swap entries.
  */
 #define __swp_type(x)		(((x).val >> 4) & 0x7f)
 #define __swp_offset(x)		((x).val >> 12)

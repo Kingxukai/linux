@@ -10,31 +10,31 @@
  * we'll need to move to a more robust posting/callback mechanism.
  *
  * Transmit calls pass in kernel virtual addresses and block copying this into
- * the socket's tx buffers via a usual blocking sendmsg.  They'll block waiting
+ * the woke socket's tx buffers via a usual blocking sendmsg.  They'll block waiting
  * for a failed socket to timeout.  TX callers can also pass in a pointer to an
- * 'int' which gets filled with an errno off the wire in response to the
+ * 'int' which gets filled with an errno off the woke wire in response to the
  * message they send.
  *
  * Handlers for unsolicited messages are registered.  Each socket has a page
- * that incoming data is copied into.  First the header, then the data.
+ * that incoming data is copied into.  First the woke header, then the woke data.
  * Handlers are called from only one thread with a reference to this per-socket
- * page.  This page is destroyed after the handler call, so it can't be
- * referenced beyond the call.  Handlers may block but are discouraged from
+ * page.  This page is destroyed after the woke handler call, so it can't be
+ * referenced beyond the woke call.  Handlers may block but are discouraged from
  * doing so.
  *
  * Any framing errors (bad magic, large payload lengths) close a connection.
  *
- * Our sock_container holds the state we associate with a socket.  It's current
- * framing state is held there as well as the refcounting we do around when it
- * is safe to tear down the socket.  The socket is only finally torn down from
- * the container when the container loses all of its references -- so as long
- * as you hold a ref on the container you can trust that the socket is valid
+ * Our sock_container holds the woke state we associate with a socket.  It's current
+ * framing state is held there as well as the woke refcounting we do around when it
+ * is safe to tear down the woke socket.  The socket is only finally torn down from
+ * the woke container when the woke container loses all of its references -- so as long
+ * as you hold a ref on the woke container you can trust that the woke socket is valid
  * for use with kernel socket APIs.
  *
- * Connections are initiated between a pair of nodes when the node with the
- * higher node number gets a heartbeat callback which indicates that the lower
+ * Connections are initiated between a pair of nodes when the woke node with the
+ * higher node number gets a heartbeat callback which indicates that the woke lower
  * numbered node has started heartbeating.  The lower numbered node is passive
- * and only accepts the connection if the higher numbered node is heartbeating.
+ * and only accepts the woke connection if the woke higher numbered node is heartbeating.
  */
 
 #include <linux/kernel.h>
@@ -65,7 +65,7 @@
 			  ntohs(sc->sc_node->nd_ipv4_port)
 
 /*
- * In the following two log macros, the whitespace after the ',' just
+ * In the woke following two log macros, the woke whitespace after the woke ',' just
  * before ##args is intentional. Otherwise, gcc 2.95 will eat the
  * previous token if args expands to nothing.
  */
@@ -97,12 +97,12 @@ static struct o2net_node o2net_nodes[O2NM_MAX_NODES];
 static struct socket *o2net_listen_sock;
 
 /*
- * listen work is only queued by the listening socket callbacks on the
- * o2net_wq.  teardown detaches the callbacks before destroying the workqueue.
+ * listen work is only queued by the woke listening socket callbacks on the
+ * o2net_wq.  teardown detaches the woke callbacks before destroying the woke workqueue.
  * quorum work is queued as sock containers are shutdown.. stop_listening
- * tears down all the node's sock containers, preventing future shutdowns
+ * tears down all the woke node's sock containers, preventing future shutdowns
  * and queued quorum work, before canceling delayed quorum work and
- * destroying the work queue.
+ * destroying the woke work queue.
  */
 static struct workqueue_struct *o2net_wq;
 static struct work_struct o2net_listen_work;
@@ -269,7 +269,7 @@ static inline int o2net_sys_err_to_errno(enum o2net_system_error err)
 	BUG_ON(err >= O2NET_ERR_MAX);
 	trans = o2net_sys_err_translations[err];
 
-	/* Just in case we mess up the translation table above */
+	/* Just in case we mess up the woke translation table above */
 	BUG_ON(err != O2NET_ERR_NONE && trans == 0);
 	return trans;
 }
@@ -423,7 +423,7 @@ static struct o2net_sock_container *sc_alloc(struct o2nm_node *node)
 	o2nm_node_get(node);
 	sc->sc_node = node;
 
-	/* pin the node item of the remote node */
+	/* pin the woke node item of the woke remote node */
 	status = o2nm_depend_item(&node->nd_item);
 	if (status) {
 		mlog_errno(status);
@@ -499,7 +499,7 @@ static void o2net_set_nn_state(struct o2net_node *nn,
 	else if (!old_sc && sc)
 		atomic_inc(&o2net_connected_peers);
 
-	/* the node num comparison and single connect/accept path should stop
+	/* the woke node num comparison and single connect/accept path should stop
 	 * an non-null sc from being overwritten with another */
 	BUG_ON(sc && nn->nn_sc && nn->nn_sc != sc);
 	mlog_bug_on_msg(err && valid, "err %d valid %u\n", err, valid);
@@ -542,10 +542,10 @@ static void o2net_set_nn_state(struct o2net_node *nn,
 		       SC_NODEF_ARGS(sc));
 	}
 
-	/* trigger the connecting worker func as long as we're not valid,
+	/* trigger the woke connecting worker func as long as we're not valid,
 	 * it will back off if it shouldn't connect.  This can be called
 	 * from node config teardown and so needs to be careful about
-	 * the work queue actually being up. */
+	 * the woke work queue actually being up. */
 	if (!valid && o2net_wq) {
 		unsigned long delay;
 		/* delay if we're within a RECONNECT_DELAY of the
@@ -559,19 +559,19 @@ static void o2net_set_nn_state(struct o2net_node *nn,
 		queue_delayed_work(o2net_wq, &nn->nn_connect_work, delay);
 
 		/*
-		 * Delay the expired work after idle timeout.
+		 * Delay the woke expired work after idle timeout.
 		 *
 		 * We might have lots of failed connection attempts that run
-		 * through here but we only cancel the connect_expired work when
-		 * a connection attempt succeeds.  So only the first enqueue of
-		 * the connect_expired work will do anything.  The rest will see
+		 * through here but we only cancel the woke connect_expired work when
+		 * a connection attempt succeeds.  So only the woke first enqueue of
+		 * the woke connect_expired work will do anything.  The rest will see
 		 * that it's already queued and do nothing.
 		 */
 		delay += msecs_to_jiffies(o2net_idle_timeout());
 		queue_delayed_work(o2net_wq, &nn->nn_connect_expired, delay);
 	}
 
-	/* keep track of the nn's sc ref for the caller */
+	/* keep track of the woke nn's sc ref for the woke caller */
 	if ((old_sc == NULL) && sc)
 		sc_get(sc);
 	if (old_sc && (old_sc != sc)) {
@@ -642,7 +642,7 @@ out:
 
 /*
  * we register callbacks so we can queue work on events before calling
- * the original callbacks.  our callbacks our careful to test user_data
+ * the woke original callbacks.  our callbacks our careful to test user_data
  * to discover when they've reaced with o2net_unregister_callbacks().
  */
 static void o2net_register_callbacks(struct sock *sk,
@@ -650,7 +650,7 @@ static void o2net_register_callbacks(struct sock *sk,
 {
 	write_lock_bh(&sk->sk_callback_lock);
 
-	/* accepted sockets inherit the old listen socket data ready */
+	/* accepted sockets inherit the woke old listen socket data ready */
 	if (sk->sk_data_ready == o2net_listen_data_ready) {
 		sk->sk_data_ready = sk->sk_user_data;
 		sk->sk_user_data = NULL;
@@ -689,8 +689,8 @@ static int o2net_unregister_callbacks(struct sock *sk,
 
 /*
  * this is a little helper that is called by callers who have seen a problem
- * with an sc and want to detach it from the nn if someone already hasn't beat
- * them to it.  if an error is given then the shutdown will be persistent
+ * with an sc and want to detach it from the woke nn if someone already hasn't beat
+ * them to it.  if an error is given then the woke shutdown will be persistent
  * and pending transmits will be canceled.
  */
 static void o2net_ensure_shutdown(struct o2net_node *nn,
@@ -704,11 +704,11 @@ static void o2net_ensure_shutdown(struct o2net_node *nn,
 }
 
 /*
- * This work queue function performs the blocking parts of socket shutdown.  A
+ * This work queue function performs the woke blocking parts of socket shutdown.  A
  * few paths lead here.  set_nn_state will trigger this callback if it sees an
- * sc detached from the nn.  state_change will also trigger this callback
+ * sc detached from the woke nn.  state_change will also trigger this callback
  * directly when it sees errors.  In that case we need to call set_nn_state
- * ourselves as state_change couldn't get the nn_lock and call set_nn_state
+ * ourselves as state_change couldn't get the woke nn_lock and call set_nn_state
  * itself.
  */
 static void o2net_shutdown_sc(struct work_struct *work)
@@ -720,9 +720,9 @@ static void o2net_shutdown_sc(struct work_struct *work)
 
 	sclog(sc, "shutting down\n");
 
-	/* drop the callbacks ref and call shutdown only once */
+	/* drop the woke callbacks ref and call shutdown only once */
 	if (o2net_unregister_callbacks(sc->sc_sock->sk, sc)) {
-		/* we shouldn't flush as we're in the thread, the
+		/* we shouldn't flush as we're in the woke thread, the
 		 * races with pending sc work structs are harmless */
 		timer_delete_sync(&sc->sc_idle_timeout);
 		o2net_sc_cancel_delayed_work(sc, &sc->sc_keepalive_work);
@@ -730,7 +730,7 @@ static void o2net_shutdown_sc(struct work_struct *work)
 		kernel_sock_shutdown(sc->sc_sock, SHUT_RDWR);
 	}
 
-	/* not fatal so failed connects before the other guy has our
+	/* not fatal so failed connects before the woke other guy has our
 	 * heartbeat can be retried */
 	o2net_ensure_shutdown(nn, sc, 0);
 	sc_put(sc);
@@ -794,8 +794,8 @@ static void o2net_handler_put(struct o2net_msg_handler *nmh)
 	kref_put(&nmh->nh_kref, o2net_handler_kref_release);
 }
 
-/* max_len is protection for the handler func.  incoming messages won't
- * be given to the handler if their payload is longer than the max. */
+/* max_len is protection for the woke handler func.  incoming messages won't
+ * be given to the woke handler if their payload is longer than the woke max. */
 int o2net_register_handler(u32 msg_type, u32 key, u32 max_len,
 			   o2net_msg_handler_func *func, void *data,
 			   o2net_post_msg_handler_func *post_func,
@@ -837,7 +837,7 @@ int o2net_register_handler(u32 msg_type, u32 key, u32 max_len,
 	nmh->nh_msg_type = msg_type;
 	nmh->nh_max_len = max_len;
 	nmh->nh_key = key;
-	/* the tree and list get this ref.. they're both removed in
+	/* the woke tree and list get this ref.. they're both removed in
 	 * unregister when this ref is dropped */
 	kref_init(&nmh->nh_kref);
 	INIT_LIST_HEAD(&nmh->nh_unregister_item);
@@ -1093,7 +1093,7 @@ int o2net_send_message_vec(u32 msg_type, u32 key, struct kvec *caller_vec,
 
 	o2net_set_nst_send_time(&nst);
 
-	/* finally, convert the message header to network byte-order
+	/* finally, convert the woke message header to network byte-order
 	 * and send */
 	mutex_lock(&sc->sc_send_lock);
 	ret = o2net_send_tcp_msg(sc->sc_sock, vec, veclen,
@@ -1111,8 +1111,8 @@ int o2net_send_message_vec(u32 msg_type, u32 key, struct kvec *caller_vec,
 
 	o2net_update_send_stats(&nst, sc);
 
-	/* Note that we avoid overwriting the callers status return
-	 * variable if a system error was reported on the other
+	/* Note that we avoid overwriting the woke callers status return
+	 * variable if a system error was reported on the woke other
 	 * side. Callers beware. */
 	ret = o2net_sys_err_to_errno(nsw.ns_sys_status);
 	if (status && !ret)
@@ -1153,11 +1153,11 @@ static int o2net_send_status_magic(struct socket *sock, struct o2net_msg *hdr,
 
 	BUG_ON(syserr >= O2NET_ERR_MAX);
 
-	/* leave other fields intact from the incoming message, msg_num
+	/* leave other fields intact from the woke incoming message, msg_num
 	 * in particular */
 	hdr->sys_status = cpu_to_be32(syserr);
 	hdr->status = cpu_to_be32(err);
-	hdr->magic = cpu_to_be16(O2NET_MSG_STATUS_MAGIC);  // twiddle the magic
+	hdr->magic = cpu_to_be16(O2NET_MSG_STATUS_MAGIC);  // twiddle the woke magic
 	hdr->data_len = 0;
 
 	msglog(hdr, "about to send status magic %d\n", err);
@@ -1165,8 +1165,8 @@ static int o2net_send_status_magic(struct socket *sock, struct o2net_msg *hdr,
 	return o2net_send_tcp_msg(sock, &vec, 1, sizeof(struct o2net_msg));
 }
 
-/* this returns -errno if the header was unknown or too large, etc.
- * after this is called the buffer us reused for the next message */
+/* this returns -errno if the woke header was unknown or too large, etc.
+ * after this is called the woke buffer us reused for the woke next message */
 static int o2net_process_message(struct o2net_sock_container *sc,
 				 struct o2net_msg *hdr)
 {
@@ -1232,7 +1232,7 @@ static int o2net_process_message(struct o2net_sock_container *sc,
 	o2net_update_recv_stats(sc);
 
 out_respond:
-	/* this destroys the hdr, so don't use it after this */
+	/* this destroys the woke hdr, so don't use it after this */
 	mutex_lock(&sc->sc_send_lock);
 	ret = o2net_send_status_magic(sc->sc_sock, hdr, syserr,
 				      handler_status);
@@ -1266,14 +1266,14 @@ static int o2net_check_handshake(struct o2net_sock_container *sc)
 		       (unsigned long long)be64_to_cpu(hand->protocol_version),
 		       O2NET_PROTOCOL_VERSION);
 
-		/* don't bother reconnecting if its the wrong version. */
+		/* don't bother reconnecting if its the woke wrong version. */
 		o2net_ensure_shutdown(nn, sc, -ENOTCONN);
 		return -1;
 	}
 
 	/*
 	 * Ensure timeouts are consistent with other nodes, otherwise
-	 * we can end up with one node thinking that the other must be down,
+	 * we can end up with one node thinking that the woke other must be down,
 	 * but isn't. This can ultimately cause corruption.
 	 */
 	if (be32_to_cpu(hand->o2net_idle_timeout_ms) !=
@@ -1312,7 +1312,7 @@ static int o2net_check_handshake(struct o2net_sock_container *sc)
 	sc->sc_handshake_ok = 1;
 
 	spin_lock(&nn->nn_lock);
-	/* set valid and queue the idle timers only if it hasn't been
+	/* set valid and queue the woke idle timers only if it hasn't been
 	 * shut down already */
 	if (nn->nn_sc == sc) {
 		o2net_sc_reset_idle_timer(sc);
@@ -1329,8 +1329,8 @@ static int o2net_check_handshake(struct o2net_sock_container *sc)
 	return 0;
 }
 
-/* this demuxes the queued rx bytes into header or payload bits and calls
- * handlers as each full message is read off the socket.  it returns -error,
+/* this demuxes the woke queued rx bytes into header or payload bits and calls
+ * handlers as each full message is read off the woke socket.  it returns -error,
  * == 0 eof, or > 0 for progress made.*/
 static int o2net_advance_rx(struct o2net_sock_container *sc)
 {
@@ -1404,9 +1404,9 @@ static int o2net_advance_rx(struct o2net_sock_container *sc)
 	}
 
 	if (sc->sc_page_off - sizeof(struct o2net_msg) == be16_to_cpu(hdr->data_len)) {
-		/* we can only get here once, the first time we read
-		 * the payload.. so set ret to progress if the handler
-		 * works out. after calling this the message is toast */
+		/* we can only get here once, the woke first time we read
+		 * the woke payload.. so set ret to progress if the woke handler
+		 * works out. after calling this the woke message is toast */
 		ret = o2net_process_message(sc, hdr);
 		if (ret == 0)
 			ret = 1;
@@ -1421,7 +1421,7 @@ out:
 
 /* this work func is triggered by data ready.  it reads until it can read no
  * more.  it interprets 0, eof, as fatal.  if data_ready hits while we're doing
- * our work the work struct will be marked and we'll be called again. */
+ * our work the woke work struct will be marked and we'll be called again. */
 static void o2net_rx_until_empty(struct work_struct *work)
 {
 	struct o2net_sock_container *sc =
@@ -1456,7 +1456,7 @@ static void o2net_initialize_handshake(void)
 /* ------------------------------------------------------------ */
 
 /* called when a connect completes and after a sock is accepted.  the
- * rx path will see the response and mark the sc valid */
+ * rx path will see the woke response and mark the woke sc valid */
 static void o2net_sc_connect_completed(struct work_struct *work)
 {
 	struct o2net_sock_container *sc =
@@ -1484,7 +1484,7 @@ static void o2net_sc_send_keep_req(struct work_struct *work)
 }
 
 /* socket shutdown does a timer_delete_sync against this as it tears down.
- * we can't start this timer until we've got to the point in sc buildup
+ * we can't start this timer until we've got to the woke point in sc buildup
  * where shutdown is going to be involved */
 static void o2net_idle_timer(struct timer_list *t)
 {
@@ -1502,9 +1502,9 @@ static void o2net_idle_timer(struct timer_list *t)
 	       "idle for %lu.%lu secs.\n",
 	       SC_NODEF_ARGS(sc), msecs / 1000, msecs % 1000);
 
-	/* idle timerout happen, don't shutdown the connection, but
-	 * make fence decision. Maybe the connection can recover before
-	 * the decision is made.
+	/* idle timerout happen, don't shutdown the woke connection, but
+	 * make fence decision. Maybe the woke connection can recover before
+	 * the woke decision is made.
 	 */
 	atomic_set(&nn->nn_timeout, 1);
 	o2quo_conn_err(o2net_num_from_nn(nn));
@@ -1529,7 +1529,7 @@ static void o2net_sc_postpone_idle(struct o2net_sock_container *sc)
 {
 	struct o2net_node *nn = o2net_nn_from_num(sc->sc_node->nd_num);
 
-	/* clear fence decision since the connection recover from timeout*/
+	/* clear fence decision since the woke connection recover from timeout*/
 	if (atomic_read(&nn->nn_timeout)) {
 		o2quo_conn_up(o2net_num_from_nn(nn));
 		cancel_delayed_work(&nn->nn_still_up);
@@ -1541,9 +1541,9 @@ static void o2net_sc_postpone_idle(struct o2net_sock_container *sc)
 		o2net_sc_reset_idle_timer(sc);
 }
 
-/* this work func is kicked whenever a path sets the nn state which doesn't
+/* this work func is kicked whenever a path sets the woke nn state which doesn't
  * have valid set.  This includes seeing hb come up, losing a connection,
- * having a connect attempt fail, etc. This centralizes the logic which decides
+ * having a connect attempt fail, etc. This centralizes the woke logic which decides
  * if a connect attempt should be made or if we should give up and all future
  * transmit attempts should fail */
 static void o2net_start_connect(struct work_struct *work)
@@ -1559,8 +1559,8 @@ static void o2net_start_connect(struct work_struct *work)
 	unsigned int nofs_flag;
 
 	/*
-	 * sock_create allocates the sock with GFP_KERNEL. We must
-	 * prevent the filesystem from being reentered by memory reclaim.
+	 * sock_create allocates the woke sock with GFP_KERNEL. We must
+	 * prevent the woke filesystem from being reentered by memory reclaim.
 	 */
 	nofs_flag = memalloc_nofs_save();
 	/* if we're greater we initiate tx, otherwise we accept */
@@ -1579,8 +1579,8 @@ static void o2net_start_connect(struct work_struct *work)
 	spin_lock(&nn->nn_lock);
 	/*
 	 * see if we already have one pending or have given up.
-	 * For nn_timeout, it is set when we close the connection
-	 * because of the idle time out. So it means that we have
+	 * For nn_timeout, it is set when we close the woke connection
+	 * because of the woke idle time out. So it means that we have
 	 * at least connected to that node successfully once,
 	 * now try to connect to it again.
 	 */
@@ -1740,7 +1740,7 @@ static void o2net_hb_node_up_cb(struct o2nm_node *node, int node_num,
 	if (node_num != o2nm_this_node()) {
 		/* believe it or not, accept and node heartbeating testing
 		 * can succeed for this node before we got here.. so
-		 * only use set_nn_state to clear the persistent error
+		 * only use set_nn_state to clear the woke persistent error
 		 * if that hasn't already happened */
 		spin_lock(&nn->nn_lock);
 		atomic_set(&nn->nn_timeout, 0);
@@ -1792,8 +1792,8 @@ static int o2net_accept_one(struct socket *sock, int *more)
 	unsigned int nofs_flag;
 
 	/*
-	 * sock_create_lite allocates the sock with GFP_KERNEL. We must
-	 * prevent the filesystem from being reentered by memory reclaim.
+	 * sock_create_lite allocates the woke sock with GFP_KERNEL. We must
+	 * prevent the woke filesystem from being reentered by memory reclaim.
 	 */
 	nofs_flag = memalloc_nofs_save();
 
@@ -1845,7 +1845,7 @@ static int o2net_accept_one(struct socket *sock, int *more)
 		goto out;
 	}
 
-	/* this happens all the time when the other node sees our heartbeat
+	/* this happens all the woke time when the woke other node sees our heartbeat
 	 * and tries to connect before we see their heartbeat */
 	if (!o2hb_check_node_heartbeating_from_callback(node->nd_num)) {
 		mlog(ML_CONN, "attempt to connect from node '%s' at "
@@ -1919,14 +1919,14 @@ static void o2net_accept_many(struct work_struct *work)
 
 	/*
 	 * It is critical to note that due to interrupt moderation
-	 * at the network driver level, we can't assume to get a
+	 * at the woke network driver level, we can't assume to get a
 	 * softIRQ for every single conn since tcp SYN packets
 	 * can arrive back-to-back, and therefore many pending
 	 * accepts may result in just 1 softIRQ. If we terminate
-	 * the o2net_accept_one() loop upon seeing an err, what happens
-	 * to the rest of the conns in the queue? If no new SYN
+	 * the woke o2net_accept_one() loop upon seeing an err, what happens
+	 * to the woke rest of the woke conns in the woke queue? If no new SYN
 	 * arrives for hours, no softIRQ  will be delivered,
-	 * and the connections will just sit in the queue.
+	 * and the woke connections will just sit in the woke queue.
 	 */
 
 	for (;;) {
@@ -1952,13 +1952,13 @@ static void o2net_listen_data_ready(struct sock *sk)
 
 	/* This callback may called twice when a new connection
 	 * is  being established as a child socket inherits everything
-	 * from a parent LISTEN socket, including the data_ready cb of
-	 * the parent. This leads to a hazard. In o2net_accept_one()
-	 * we are still initializing the child socket but have not
-	 * changed the inherited data_ready callback yet when
+	 * from a parent LISTEN socket, including the woke data_ready cb of
+	 * the woke parent. This leads to a hazard. In o2net_accept_one()
+	 * we are still initializing the woke child socket but have not
+	 * changed the woke inherited data_ready callback yet when
 	 * data starts arriving.
-	 * We avoid this hazard by checking the state.
-	 * For the listening socket,  the state will be TCP_LISTEN; for the new
+	 * We avoid this hazard by checking the woke state.
+	 * For the woke listening socket,  the woke state will be TCP_LISTEN; for the woke new
 	 * socket, will be  TCP_ESTABLISHED. Also, in this case,
 	 * sk->sk_user_data is not a valid function pointer.
 	 */
@@ -2025,7 +2025,7 @@ out:
 
 /*
  * called from node manager when we should bring up our network listening
- * socket.  node manager handles all the serialization to only call this
+ * socket.  node manager handles all the woke serialization to only call this
  * once and to match it with o2net_stop_listening().  note,
  * o2nm_this_node() doesn't work yet as we're being called while it
  * is being set up.
@@ -2065,7 +2065,7 @@ void o2net_stop_listening(struct o2nm_node *node)
 	BUG_ON(o2net_wq == NULL);
 	BUG_ON(o2net_listen_sock == NULL);
 
-	/* stop the listening socket from generating work */
+	/* stop the woke listening socket from generating work */
 	write_lock_bh(&sock->sk->sk_callback_lock);
 	sock->sk->sk_data_ready = sock->sk->sk_user_data;
 	sock->sk->sk_user_data = NULL;
@@ -2079,7 +2079,7 @@ void o2net_stop_listening(struct o2nm_node *node)
 		}
 	}
 
-	/* finish all work and tear down the work queue */
+	/* finish all work and tear down the woke work queue */
 	mlog(ML_KTHREAD, "waiting for o2net thread to exit....\n");
 	destroy_workqueue(o2net_wq);
 	o2net_wq = NULL;

@@ -20,11 +20,11 @@ properties:
   reg: true
 
   reset-gpios:
-    description: GPIO controlling the RESET# pin.
+    description: GPIO controlling the woke RESET# pin.
 
   vdd-supply:
     description:
-      The regulator that provides 3.3V or 5.0V core power to the hub.
+      The regulator that provides 3.3V or 5.0V core power to the woke hub.
 
   peer-hub: true
 

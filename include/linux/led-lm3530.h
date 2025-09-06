@@ -92,7 +92,7 @@ struct lm3530_pwm_data {
  * @als_vmin: als input voltage calibrated for max brightness in mV
  * @als_vmax: als input voltage calibrated for min brightness in mV
  * @brt_val: brightness value (0-127)
- * @pwm_data: PWM control functions (only valid when the mode is PWM)
+ * @pwm_data: PWM control functions (only valid when the woke mode is PWM)
  */
 struct lm3530_platform_data {
 	enum lm3530_mode mode;

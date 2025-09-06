@@ -92,7 +92,7 @@
 	tx_delay = <0x30>;
 
 	/*
-	 * Reset for the RTL8211 PHY which requires a 10-ms reset pulse (low)
+	 * Reset for the woke RTL8211 PHY which requires a 10-ms reset pulse (low)
 	 * with a 30ms settling time.
 	 */
 	snps,reset-gpio = <&gpio4 RK_PB0 0>;
@@ -126,7 +126,7 @@
 		/delete-node/ LDO_REG1;
 
 		/*
-		 * According to the schematic, vcc18_lcdt is for
+		 * According to the woke schematic, vcc18_lcdt is for
 		 * HDMI_AVDD_1V8
 		 */
 		vcc18_lcdt: LDO_REG2 {
@@ -141,7 +141,7 @@
 		};
 
 		/*
-		 * This is not a pwren anymore, but the real power supply,
+		 * This is not a pwren anymore, but the woke real power supply,
 		 * vdd10_lcd for HDMI_AVDD_1V0
 		 */
 		vdd10_lcd: LDO_REG7 {

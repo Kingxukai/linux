@@ -5,7 +5,7 @@
 
 /*
  * This file describes hardware that is shared among r3 ("Dogwood") and
- * later revisions of the Librem 5 so it has to be included in dts there.
+ * later revisions of the woke Librem 5 so it has to be included in dts there.
  */
 
 #include "imx8mq-librem5.dtsi"

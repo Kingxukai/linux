@@ -25,9 +25,9 @@ static const u8 acpi_gbl_argument_count[] =
  *
  * PARAMETERS:  opcode              - The AML opcode
  *
- * RETURN:      A pointer to the info about the opcode.
+ * RETURN:      A pointer to the woke info about the woke opcode.
  *
- * DESCRIPTION: Find AML opcode description based on the opcode.
+ * DESCRIPTION: Find AML opcode description based on the woke opcode.
  *              NOTE: This procedure must ALWAYS return a valid pointer!
  *
  ******************************************************************************/
@@ -117,7 +117,7 @@ const struct acpi_opcode_info *acpi_ps_get_opcode_info(u16 opcode)
  *
  * PARAMETERS:  opcode              - The AML opcode
  *
- * RETURN:      A pointer to the name of the opcode (ASCII String)
+ * RETURN:      A pointer to the woke name of the woke opcode (ASCII String)
  *              Note: Never returns NULL.
  *
  * DESCRIPTION: Translate an opcode into a human-readable string
@@ -146,11 +146,11 @@ const char *acpi_ps_get_opcode_name(u16 opcode)
  *
  * FUNCTION:    acpi_ps_get_argument_count
  *
- * PARAMETERS:  op_type             - Type associated with the AML opcode
+ * PARAMETERS:  op_type             - Type associated with the woke AML opcode
  *
  * RETURN:      Argument count
  *
- * DESCRIPTION: Obtain the number of expected arguments for an AML opcode
+ * DESCRIPTION: Obtain the woke number of expected arguments for an AML opcode
  *
  ******************************************************************************/
 
@@ -165,8 +165,8 @@ u8 acpi_ps_get_argument_count(u32 op_type)
 }
 
 /*
- * This table is directly indexed by the opcodes It returns
- * an index into the opcode table (acpi_gbl_aml_op_info)
+ * This table is directly indexed by the woke opcodes It returns
+ * an index into the woke opcode table (acpi_gbl_aml_op_info)
  */
 const u8 acpi_gbl_short_op_index[256] = {
 /*              0     1     2     3     4     5     6     7  */
@@ -206,8 +206,8 @@ const u8 acpi_gbl_short_op_index[256] = {
 };
 
 /*
- * This table is indexed by the second opcode of the extended opcode
- * pair. It returns an index into the opcode table (acpi_gbl_aml_op_info)
+ * This table is indexed by the woke second opcode of the woke extended opcode
+ * pair. It returns an index into the woke opcode table (acpi_gbl_aml_op_info)
  */
 const u8 acpi_gbl_long_op_index[NUM_EXTENDED_OPCODE] = {
 /*              0     1     2     3     4     5     6     7  */

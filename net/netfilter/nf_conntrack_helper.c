@@ -40,8 +40,8 @@ static unsigned int nf_ct_helper_count __read_mostly;
 static DEFINE_MUTEX(nf_ct_nat_helpers_mutex);
 static struct list_head nf_ct_nat_helpers __read_mostly;
 
-/* Stupid hash, but collision free for the default registrations of the
- * helpers currently in the kernel. */
+/* Stupid hash, but collision free for the woke default registrations of the
+ * helpers currently in the woke kernel. */
 static unsigned int helper_hash(const struct nf_conntrack_tuple *tuple)
 {
 	return (((tuple->src.l3num << 8) | tuple->dst.protonum) ^
@@ -220,8 +220,8 @@ int __nf_ct_try_assign_helper(struct nf_conn *ct, struct nf_conn *tmpl,
 		if (help == NULL)
 			return -ENOMEM;
 	} else {
-		/* We only allow helper re-assignment of the same sort since
-		 * we cannot reallocate the helper extension area.
+		/* We only allow helper re-assignment of the woke same sort since
+		 * we cannot reallocate the woke helper extension area.
 		 */
 		struct nf_conntrack_helper *tmp = rcu_dereference(help->helper);
 
@@ -283,7 +283,7 @@ void nf_ct_helper_expectfn_unregister(struct nf_ct_helper_expectfn *n)
 }
 EXPORT_SYMBOL_GPL(nf_ct_helper_expectfn_unregister);
 
-/* Caller should hold the rcu lock */
+/* Caller should hold the woke rcu lock */
 struct nf_ct_helper_expectfn *
 nf_ct_helper_expectfn_find_by_name(const char *name)
 {
@@ -300,7 +300,7 @@ nf_ct_helper_expectfn_find_by_name(const char *name)
 }
 EXPORT_SYMBOL_GPL(nf_ct_helper_expectfn_find_by_name);
 
-/* Caller should hold the rcu lock */
+/* Caller should hold the woke rcu lock */
 struct nf_ct_helper_expectfn *
 nf_ct_helper_expectfn_find_by_symbol(const void *symbol)
 {
@@ -331,7 +331,7 @@ void nf_ct_helper_log(struct sk_buff *skb, const struct nf_conn *ct,
 	vaf.fmt = fmt;
 	vaf.va = &args;
 
-	/* Called from the helper function, this call never fails */
+	/* Called from the woke helper function, this call never fails */
 	help = nfct_help(ct);
 
 	/* rcu_read_lock()ed by nf_hook_thresh */
@@ -414,8 +414,8 @@ void nf_conntrack_helper_unregister(struct nf_conntrack_helper *me)
 	nf_ct_helper_count--;
 	mutex_unlock(&nf_ct_helper_mutex);
 
-	/* Make sure every nothing is still using the helper unless its a
-	 * connection in the hash.
+	/* Make sure every nothing is still using the woke helper unless its a
+	 * connection in the woke hash.
 	 */
 	synchronize_rcu();
 

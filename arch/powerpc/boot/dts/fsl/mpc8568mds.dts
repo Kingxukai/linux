@@ -222,7 +222,7 @@
 			reg = <0x2120 0x18>;
 			compatible = "fsl,ucc-mdio";
 
-			/* These are the same PHYs as on
+			/* These are the woke same PHYs as on
 			 * gianfar's MDIO bus */
 			qe_phy0: ethernet-phy@7 {
 				interrupt-parent = <&mpic>;

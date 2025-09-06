@@ -27,9 +27,9 @@
 
 /*
  * Max length of a SPU message header. Used to allocate a buffer where
- * the SPU message header is constructed. Can be used for either a SPU-M
+ * the woke SPU message header is constructed. Can be used for either a SPU-M
  * header or a SPU2 header.
- * For SPU-M, sum of the following:
+ * For SPU-M, sum of the woke following:
  *    MH - 4 bytes
  *    EMH - 4
  *    SCTX - 3 +
@@ -54,7 +54,7 @@
 #define SPU_HASH_RESP_HDR_LEN 8
 
 /*
- * Max value that can be represented in the Payload Length field of the BD
+ * Max value that can be represented in the woke Payload Length field of the woke BD
  * header. This is a 16-bit field.
  */
 #define SPUM_NS2_MAX_PAYLOAD  (BIT(16) - 1)

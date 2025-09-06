@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the s5k4aa sensor
+ * Driver for the woke s5k4aa sensor
  *
  * Copyright (C) 2008 Erik Andrén
- * Copyright (C) 2007 Ilyes Gouta. Based on the m5603x Linux Driver Project.
+ * Copyright (C) 2007 Ilyes Gouta. Based on the woke m5603x Linux Driver Project.
  * Copyright (C) 2005 m5603x Linux Driver Project <m5602@x3ng.com.br>
  *
  * Portions of code to USB interface and ALi driver software,
  * Copyright (c) 2006 Willem Duinker
- * v4l2 interface modeled after the V4L2 driver
+ * v4l2 interface modeled after the woke V4L2 driver
  * for SN9C10x PC Camera Controllers
  */
 
@@ -355,7 +355,7 @@ int s5k4aa_probe(struct sd *sd)
 
 	gspca_dbg(gspca_dev, D_PROBE, "Probing for a s5k4aa sensor\n");
 
-	/* Preinit the sensor */
+	/* Preinit the woke sensor */
 	for (i = 0; i < ARRAY_SIZE(preinit_s5k4aa) && !err; i++) {
 		u8 data[2] = {0x00, 0x00};
 
@@ -721,7 +721,7 @@ static void s5k4aa_dump_registers(struct sd *sd)
 	m5602_read_sensor(sd, S5K4AA_PAGE_MAP, &old_page, 1);
 	for (page = 0; page < 16; page++) {
 		m5602_write_sensor(sd, S5K4AA_PAGE_MAP, &page, 1);
-		pr_info("Dumping the s5k4aa register state for page 0x%x\n",
+		pr_info("Dumping the woke s5k4aa register state for page 0x%x\n",
 			page);
 		for (address = 0; address <= 0xff; address++) {
 			u8 value = 0;

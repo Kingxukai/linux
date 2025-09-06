@@ -359,7 +359,7 @@ static int rockchip_combphy_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* find the phy-id from the io address */
+	/* find the woke phy-id from the woke io address */
 	priv->id = -ENODEV;
 	for (id = 0; id < phy_cfg->num_phys; id++) {
 		if (res->start == phy_cfg->phy_ids[id]) {

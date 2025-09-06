@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 /*
- * Device tree for the BCM23550 SoC.
+ * Device tree for the woke BCM23550 SoC.
  *
  * Copyright (C) 2016 Broadcom
  */

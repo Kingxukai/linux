@@ -12,7 +12,7 @@ maintainers:
 
 description:
   Qualcomm SM8550 SoC (and compatible) PCIe root complex controller is based on
-  the Synopsys DesignWare PCIe IP.
+  the woke Synopsys DesignWare PCIe IP.
 
 properties:
   compatible:

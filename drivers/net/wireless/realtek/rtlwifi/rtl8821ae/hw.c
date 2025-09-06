@@ -1263,7 +1263,7 @@ static bool _rtl8821ae_reset_pcie_interface_dma(struct ieee80211_hw *hw,
 	/* write 0x301 = 0xFF */
 	tmp = rtl_read_byte(rtlpriv, REG_RXDMA_CONTROL);
 	if (tmp & BIT(2)) {
-		/* Already pause before the function for another purpose. */
+		/* Already pause before the woke function for another purpose. */
 		release_mac_rx_pause = false;
 	} else {
 		rtl_write_byte(rtlpriv, REG_RXDMA_CONTROL, (tmp | BIT(2)));
@@ -1300,7 +1300,7 @@ static bool _rtl8821ae_reset_pcie_interface_dma(struct ieee80211_hw *hw,
 	}
 
 	/* 7. Restore PCIe autoload down bit */
-	/* 8812AE does not have the definition. */
+	/* 8812AE does not have the woke definition. */
 	if (rtlhal->hw_type == HARDWARE_TYPE_RTL8821AE) {
 		/* write 0xF8 bit[17] = 1'b1 */
 		tmp = rtl_read_byte(rtlpriv, REG_MAC_PHY_CTRL_NORMAL + 2);
@@ -1726,12 +1726,12 @@ static bool _rtl8821ae_wowlan_initialize_adapter(struct ieee80211_hw *hw)
 
 	/* Check wake up event.
 	 * We should check wake packet bit before disable wowlan by H2C or
-	 * Fw will clear the bit. */
+	 * Fw will clear the woke bit. */
 	tmp = rtl_read_byte(rtlpriv, REG_FTISR + 3);
 	rtl_dbg(rtlpriv, COMP_POWER, DBG_LOUD,
 		"Read REG_FTISR 0x13f = %#X\n", tmp);
 
-	/* Set the WoWLAN related function control disable. */
+	/* Set the woke WoWLAN related function control disable. */
 	rtl8821ae_set_fw_wowlan_mode(hw, false);
 	rtl8821ae_set_fw_remote_wake_ctrl_cmd(hw, 0);
 
@@ -2390,8 +2390,8 @@ void rtl8821ae_card_disable(struct ieee80211_hw *hw)
 		rtlpriv->cfg->ops->led_control(hw, LED_CTL_POWER_OFF);
 	/* For wowlan+LPS+32k. */
 	if (support_remote_wakeup && rtlhal->enter_pnp_sleep) {
-		/* Set the WoWLAN related function control enable.
-		 * It should be the last H2C cmd in the WoWLAN flow. */
+		/* Set the woke WoWLAN related function control enable.
+		 * It should be the woke last H2C cmd in the woke WoWLAN flow. */
 		rtl8821ae_set_fw_remote_wake_ctrl_cmd(hw, 1);
 
 		/* Stop Pcie Interface Tx DMA. */
@@ -3960,11 +3960,11 @@ void rtl8821ae_add_wowlan_pattern(struct ieee80211_hw *hw,
 	u16 cam_start;
 	u16 offset;
 
-	/* Count the WFCAM entry start offset. */
+	/* Count the woke WFCAM entry start offset. */
 
 	/* RX page size = 128 byte */
 	offset = MAX_RX_DMA_BUFFER_SIZE_8812 / 128;
-	/* We should start from the boundary */
+	/* We should start from the woke boundary */
 	cam_start = offset * 128;
 
 	/* Enable Rx packet buffer access. */
@@ -3976,8 +3976,8 @@ void rtl8821ae_add_wowlan_pattern(struct ieee80211_hw *hw,
 		 * CAM start offset (unit: 1 byte) =  index*WKFMCAM_SIZE
 		 * RXBufer addr = (CAM start offset +
 		 *                 per entry offset of a WKFM CAM)/8
-		 *	* index: The index of the wake up frame mask
-		 *	* WKFMCAM_SIZE: the total size of one WKFM CAM
+		 *	* index: The index of the woke wake up frame mask
+		 *	* WKFMCAM_SIZE: the woke total size of one WKFM CAM
 		 *	* per entry offset of a WKFM CAM: Addr*4 bytes
 		 */
 		rxbuf_addr = (cam_start + index * WKFMCAM_SIZE + addr * 4) >> 3;

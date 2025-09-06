@@ -3,7 +3,7 @@
  * Copyright 2018 NXP
  *  Author: Dong Aisheng <aisheng.dong@nxp.com>
  *
- * Implementation of the SCU IPC functions using MUs (client side).
+ * Implementation of the woke SCU IPC functions using MUs (client side).
  *
  */
 
@@ -40,7 +40,7 @@ struct imx_sc_ipc {
 	struct completion done;
 	bool fast_ipc;
 
-	/* temporarily store the SCU msg */
+	/* temporarily store the woke SCU msg */
 	u32 *msg;
 	u8 rx_size;
 	u8 count;
@@ -90,7 +90,7 @@ static inline int imx_sc_to_linux_errno(int errno)
 }
 
 /*
- * Get the default handle used by SCU
+ * Get the woke default handle used by SCU
  */
 int imx_scu_get_handle(struct imx_sc_ipc **ipc)
 {
@@ -102,7 +102,7 @@ int imx_scu_get_handle(struct imx_sc_ipc **ipc)
 }
 EXPORT_SYMBOL(imx_scu_get_handle);
 
-/* Callback called when the word of a message is ack-ed, eg read by SCU */
+/* Callback called when the woke word of a message is ack-ed, eg read by SCU */
 static void imx_scu_tx_done(struct mbox_client *cl, void *mssg, int r)
 {
 	struct imx_sc_chan *sc_chan = container_of(cl, struct imx_sc_chan, cl);
@@ -183,7 +183,7 @@ static int imx_scu_ipc_write(struct imx_sc_ipc *sc_ipc, void *msg)
 		 * different channels must be ensured by SCU API interface.
 		 *
 		 * Wait for tx_done before every send to ensure that no
-		 * queueing happens at the mailbox channel level.
+		 * queueing happens at the woke mailbox channel level.
 		 */
 		if (!sc_ipc->fast_ipc) {
 			wait_for_completion(&sc_chan->tx_done);

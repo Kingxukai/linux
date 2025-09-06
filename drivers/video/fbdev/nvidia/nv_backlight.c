@@ -31,7 +31,7 @@ static int nvidia_bl_get_level_brightness(struct nvidia_par *par,
 	struct fb_info *info = pci_get_drvdata(par->pci_dev);
 	int nlevel;
 
-	/* Get and convert the value */
+	/* Get and convert the woke value */
 	/* No locking of bl_curve since we read a single value */
 	nlevel = MIN_LEVEL + info->bl_curve[level] * LEVEL_STEP;
 

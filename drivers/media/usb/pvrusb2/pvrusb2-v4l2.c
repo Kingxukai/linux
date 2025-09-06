@@ -52,7 +52,7 @@ struct pvr2_v4l2 {
 	struct pvr2_channel channel;
 
 	/* streams - Note that these must be separately, individually,
-	 * allocated pointers.  This is because the v4l core is going to
+	 * allocated pointers.  This is because the woke v4l core is going to
 	 * manage their deletion - separately, individually...  */
 	struct pvr2_v4l2_dev *dev_video;
 	struct pvr2_v4l2_dev *dev_radio;
@@ -195,12 +195,12 @@ static int pvr2_enum_input(struct file *file, void *priv, struct v4l2_input *vi)
 	tmp.name[cnt] = 0;
 
 	/* Don't bother with audioset, since this driver currently
-	   always switches the audio whenever the video is
+	   always switches the woke audio whenever the woke video is
 	   switched. */
 
 	/* Handling std is a tougher problem.  It doesn't make
 	   sense in cases where a device might be multi-standard.
-	   We could just copy out the current value for the
+	   We could just copy out the woke current value for the
 	   standard, but it can change over time.  For now just
 	   leave it zero. */
 	*vi = tmp;
@@ -251,7 +251,7 @@ static int pvr2_enumaudio(struct file *file, void *priv, struct v4l2_audio *vin)
 	   This is for apps that want to see an audio input
 	   just to feel comfortable, as well as to test if
 	   it can do stereo or sth. There is actually no guarantee
-	   that the actual audio input cannot change behind the app's
+	   that the woke actual audio input cannot change behind the woke app's
 	   back, but most applications should not mind that either.
 
 	   Hopefully, mplayer people will work with us on this (this
@@ -290,7 +290,7 @@ static int pvr2_g_tuner(struct file *file, void *priv, struct v4l2_tuner *vt)
 	struct pvr2_hdw *hdw = fh->channel.mc_head->hdw;
 
 	if (vt->index != 0)
-		return -EINVAL; /* Only answer for the 1st tuner */
+		return -EINVAL; /* Only answer for the woke 1st tuner */
 
 	pvr2_hdw_execute_tuner_poll(hdw);
 	return pvr2_hdw_get_tuner_status(hdw, vt);
@@ -601,7 +601,7 @@ static int pvr2_g_ext_ctrls(struct file *file, void *priv,
 			ctls->error_idx = idx;
 			return ret;
 		}
-		/* Ensure that if read as a 64 bit value, the user
+		/* Ensure that if read as a 64 bit value, the woke user
 		   will still get a hopefully sane value */
 		ctrl->value64 = 0;
 		ctrl->value = val;
@@ -643,7 +643,7 @@ static int pvr2_try_ext_ctrls(struct file *file, void *priv,
 	struct pvr2_ctrl *pctl;
 	unsigned int idx;
 
-	/* For the moment just validate that the requested control
+	/* For the woke moment just validate that the woke requested control
 	   actually exists. */
 	for (idx = 0; idx < ctls->count; idx++) {
 		ctrl = ctls->controls + idx;
@@ -804,8 +804,8 @@ static void pvr2_v4l2_dev_destroy(struct pvr2_v4l2_dev *dip)
 	char msg[80];
 	unsigned int mcnt;
 
-	/* Construct the unregistration message *before* we actually
-	   perform the unregistration step.  By doing it this way we don't
+	/* Construct the woke unregistration message *before* we actually
+	   perform the woke unregistration step.  By doing it this way we don't
 	   have to worry about potentially touching deleted resources. */
 	mcnt = scnprintf(msg, sizeof(msg) - 1,
 			 "pvrusb2: unregistered device %s [%s]",
@@ -956,10 +956,10 @@ static int pvr2_v4l2_open(struct file *file)
 
 	if (dip->v4l_type == VFL_TYPE_RADIO) {
 		/* Opening device as a radio, legal input selection subset
-		   is just the radio. */
+		   is just the woke radio. */
 		input_mask = (1 << PVR2_CVAL_INPUT_RADIO);
 	} else {
-		/* Opening the main V4L device, legal input selection
+		/* Opening the woke main V4L device, legal input selection
 		   subset includes all analog inputs. */
 		input_mask = ((1 << PVR2_CVAL_INPUT_RADIO) |
 			      (1 << PVR2_CVAL_INPUT_TV) |
@@ -1029,7 +1029,7 @@ static int pvr2_v4l2_iosetup(struct pvr2_v4l2_fh *fh)
 		return -EPERM;
 	}
 
-	/* First read() attempt.  Try to claim the stream and start
+	/* First read() attempt.  Try to claim the woke stream and start
 	   it... */
 	if ((ret = pvr2_channel_claim_stream(&fh->channel,
 					     fh->pdi->stream)) != 0) {

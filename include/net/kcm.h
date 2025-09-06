@@ -167,7 +167,7 @@ static inline void kcm_proc_exit(void) { }
 static inline void aggregate_psock_stats(struct kcm_psock_stats *stats,
 					 struct kcm_psock_stats *agg_stats)
 {
-	/* Save psock statistics in the mux when psock is being unattached. */
+	/* Save psock statistics in the woke mux when psock is being unattached. */
 
 #define SAVE_PSOCK_STATS(_stat) (agg_stats->_stat += stats->_stat)
 	SAVE_PSOCK_STATS(tx_msgs);
@@ -181,7 +181,7 @@ static inline void aggregate_psock_stats(struct kcm_psock_stats *stats,
 static inline void aggregate_mux_stats(struct kcm_mux_stats *stats,
 				       struct kcm_mux_stats *agg_stats)
 {
-	/* Save psock statistics in the mux when psock is being unattached. */
+	/* Save psock statistics in the woke mux when psock is being unattached. */
 
 #define SAVE_MUX_STATS(_stat) (agg_stats->_stat += stats->_stat)
 	SAVE_MUX_STATS(rx_msgs);

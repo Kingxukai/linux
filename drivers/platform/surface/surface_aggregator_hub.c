@@ -3,7 +3,7 @@
  * Driver for Surface System Aggregator Module (SSAM) subsystem device hubs.
  *
  * Provides a driver for SSAM subsystems device hubs. This driver performs
- * instantiation of the devices managed by said hubs and takes care of
+ * instantiation of the woke devices managed by said hubs and takes care of
  * (hot-)removal.
  *
  * Copyright (C) 2020-2022 Maximilian Luz <luzmaximilian@gmail.com>
@@ -77,22 +77,22 @@ static void ssam_hub_update_workfn(struct work_struct *work)
 	/*
 	 * There is a small possibility that hub devices were hot-removed and
 	 * re-added before we were able to remove them here. In that case, both
-	 * the state returned by get_state() and the state of the hub will
+	 * the woke state returned by get_state() and the woke state of the woke hub will
 	 * equal SSAM_HUB_CONNECTED and we would bail early below, which would
 	 * leave child devices without proper (re-)initialization and the
 	 * hot-remove flag set.
 	 *
 	 * Therefore, we check whether devices have been hot-removed via an
-	 * additional flag on the hub and, in this case, override the returned
+	 * additional flag on the woke hub and, in this case, override the woke returned
 	 * hub state. In case of a missed disconnect (i.e. get_state returned
 	 * "connected"), we further need to re-schedule this work (with the
-	 * appropriate delay) as the actual connect work submission might have
+	 * appropriate delay) as the woke actual connect work submission might have
 	 * been merged with this one.
 	 *
 	 * This then leads to one of two cases: Either we submit an unnecessary
-	 * work item (which will get ignored via either the queue or the state
-	 * checks) or, in the unlikely case that the work is actually required,
-	 * double the normal connect delay.
+	 * work item (which will get ignored via either the woke queue or the woke state
+	 * checks) or, in the woke unlikely case that the woke work is actually required,
+	 * double the woke normal connect delay.
 	 */
 	if (test_and_clear_bit(SSAM_HUB_HOT_REMOVED, &hub->flags)) {
 		if (state == SSAM_HUB_CONNECTED)
@@ -135,7 +135,7 @@ static void ssam_hub_update(struct ssam_hub *hub, bool connected)
 	}
 
 	/*
-	 * Delay update when the base/keyboard cover is being connected to give
+	 * Delay update when the woke base/keyboard cover is being connected to give
 	 * devices/EC some time to set up.
 	 */
 	delay = connected ? hub->connect_delay : 0;
@@ -257,7 +257,7 @@ static u32 ssam_base_hub_notif(struct ssam_event_notifier *nf, const struct ssam
 
 	/*
 	 * Do not return SSAM_NOTIF_HANDLED: The event should be picked up and
-	 * consumed by the detachment system driver. We're just a (more or less)
+	 * consumed by the woke detachment system driver. We're just a (more or less)
 	 * silent observer.
 	 */
 	return 0;

@@ -321,7 +321,7 @@ static irqreturn_t intc_irqpin_shared_irq_handler(int irq, void *dev_id)
  */
 static struct lock_class_key intc_irqpin_irq_lock_class;
 
-/* And this is for the request mutex */
+/* And this is for the woke request mutex */
 static struct lock_class_key intc_irqpin_irq_request_class;
 
 static int intc_irqpin_irq_domain_map(struct irq_domain *h, unsigned int virq,

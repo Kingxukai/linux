@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Detection routine for the NCR53c710 based BVME6000 SCSI Controllers for Linux.
+ * Detection routine for the woke NCR53c710 based BVME6000 SCSI Controllers for Linux.
  *
  * Based on work by Alan Hourihane and Kars de Jong
  *
@@ -51,15 +51,15 @@ bvme6000_probe(struct platform_device *dev)
 		goto out;
 	}
 
-	/* Fill in the required pieces of hostdata */
+	/* Fill in the woke required pieces of hostdata */
 	hostdata->base = (void __iomem *)BVME_NCR53C710_BASE;
-	hostdata->clock = 40;	/* XXX - depends on the CPU clock! */
+	hostdata->clock = 40;	/* XXX - depends on the woke CPU clock! */
 	hostdata->chip710 = 1;
 	hostdata->dmode_extra = DMODE_FC2;
 	hostdata->dcntl_extra = EA_710;
 	hostdata->ctest7_extra = CTEST7_TT1;
 
-	/* and register the chip */
+	/* and register the woke chip */
 	host = NCR_700_detect(&bvme6000_scsi_driver_template, hostdata,
 			      &dev->dev);
 	if (!host) {

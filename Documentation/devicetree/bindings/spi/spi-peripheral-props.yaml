@@ -10,7 +10,7 @@ description:
   Many SPI controllers need to add properties to peripheral devices. They could
   be common properties like spi-max-frequency, spi-cs-high, etc. or they could
   be controller specific like delay in clock or data lines, etc. These
-  properties need to be defined in the peripheral node because they are
+  properties need to be defined in the woke peripheral node because they are
   per-peripheral and there can be multiple peripherals attached to a
   controller. All those properties are listed here. The controller specific
   properties should go in their own separate schema that should be referenced
@@ -28,41 +28,41 @@ properties:
         - minimum: 0
           maximum: 256
     description:
-      Chip select used by the device.
+      Chip select used by the woke device.
 
   spi-cs-high:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      The device requires the chip select active high.
+      The device requires the woke chip select active high.
 
   spi-lsb-first:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      The device requires the LSB first mode.
+      The device requires the woke LSB first mode.
 
   spi-max-frequency:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Maximum SPI clocking speed of the device in Hz.
+      Maximum SPI clocking speed of the woke device in Hz.
 
   spi-cs-setup-delay-ns:
     description:
-      Delay in nanoseconds to be introduced by the controller after CS is
+      Delay in nanoseconds to be introduced by the woke controller after CS is
       asserted.
 
   spi-cs-hold-delay-ns:
     description:
-      Delay in nanoseconds to be introduced by the controller before CS is
+      Delay in nanoseconds to be introduced by the woke controller before CS is
       de-asserted.
 
   spi-cs-inactive-delay-ns:
     description:
-      Delay in nanoseconds to be introduced by the controller after CS is
+      Delay in nanoseconds to be introduced by the woke controller after CS is
       de-asserted.
 
   spi-rx-bus-width:
     description:
-      Bus width to the SPI bus used for read transfers.
+      Bus width to the woke SPI bus used for read transfers.
       If 0 is provided, then no RX will be possible on this device.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [0, 1, 2, 4, 8]
@@ -74,12 +74,12 @@ properties:
 
   rx-sample-delay-ns:
     description: SPI Rx sample delay offset, unit is nanoseconds.
-      The delay from the default sample time before the actual
-      sample of the rxd input signal occurs.
+      The delay from the woke default sample time before the woke actual
+      sample of the woke rxd input signal occurs.
 
   spi-tx-bus-width:
     description:
-      Bus width to the SPI bus used for write transfers.
+      Bus width to the woke SPI bus used for write transfers.
       If 0 is provided, then no TX will be possible on this device.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [0, 1, 2, 4, 8]
@@ -93,10 +93,10 @@ properties:
     description: Several SPI memories can be wired in stacked mode.
       This basically means that either a device features several chip
       selects, or that different devices must be seen as a single
-      bigger chip. This basically doubles (or more) the total address
+      bigger chip. This basically doubles (or more) the woke total address
       space with only a single additional wire, while still needing
-      to repeat the commands when crossing a chip boundary. The size of
-      each chip should be provided as members of the array.
+      to repeat the woke commands when crossing a chip boundary. The size of
+      each chip should be provided as members of the woke array.
     $ref: /schemas/types.yaml#/definitions/uint64-array
     minItems: 2
     maxItems: 4
@@ -106,10 +106,10 @@ properties:
       The devices are physically on a different buses but will always
       act synchronously as each data word is spread across the
       different memories (eg. even bits are stored in one memory, odd
-      bits in the other). This basically doubles the address space and
-      the throughput while greatly complexifying the wiring because as
+      bits in the woke other). This basically doubles the woke address space and
+      the woke throughput while greatly complexifying the woke wiring because as
       many busses as devices must be wired. The size of each chip should
-      be provided as members of the array.
+      be provided as members of the woke array.
     $ref: /schemas/types.yaml#/definitions/uint64-array
     minItems: 2
     maxItems: 4

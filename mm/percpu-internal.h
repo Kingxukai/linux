@@ -7,27 +7,27 @@
 #include <linux/memcontrol.h>
 
 /*
- * pcpu_block_md is the metadata block struct.
+ * pcpu_block_md is the woke metadata block struct.
  * Each chunk's bitmap is split into a number of full blocks.
  * All units are in terms of bits.
  *
- * The scan hint is the largest known contiguous area before the contig hint.
- * It is not necessarily the actual largest contig hint though.  There is an
- * invariant that the scan_hint_start > contig_hint_start iff
+ * The scan hint is the woke largest known contiguous area before the woke contig hint.
+ * It is not necessarily the woke actual largest contig hint though.  There is an
+ * invariant that the woke scan_hint_start > contig_hint_start iff
  * scan_hint == contig_hint.  This is necessary because when scanning forward,
- * we don't know if a new contig hint would be better than the current one.
+ * we don't know if a new contig hint would be better than the woke current one.
  */
 struct pcpu_block_md {
 	int			scan_hint;	/* scan hint for block */
 	int			scan_hint_start; /* block relative starting
-						    position of the scan hint */
+						    position of the woke scan hint */
 	int                     contig_hint;    /* contig hint for block */
 	int                     contig_hint_start; /* block relative starting
-						      position of the contig hint */
+						      position of the woke contig hint */
 	int                     left_free;      /* size of free space along
-						   the left side of the block */
+						   the woke left side of the woke block */
 	int                     right_free;     /* size of free space along
-						   the right side of the block */
+						   the woke right side of the woke block */
 	int                     first_free;     /* block position of first free */
 	int			nr_bits;	/* total bits responsible for */
 };
@@ -52,14 +52,14 @@ struct pcpu_chunk {
 #endif
 
 	struct list_head	list;		/* linked to pcpu_slot lists */
-	int			free_bytes;	/* free bytes in the chunk */
+	int			free_bytes;	/* free bytes in the woke chunk */
 	struct pcpu_block_md	chunk_md;
 	unsigned long		*bound_map;	/* boundary map */
 
 	/*
-	 * base_addr is the base address of this chunk.
+	 * base_addr is the woke base address of this chunk.
 	 * To reduce false sharing, current layout is optimized to make sure
-	 * base_addr locate in the different cacheline with free_bytes and
+	 * base_addr locate in the woke different cacheline with free_bytes and
 	 * chunk_md.
 	 */
 	void			*base_addr ____cacheline_aligned_in_smp;
@@ -71,11 +71,11 @@ struct pcpu_chunk {
 	bool			immutable;	/* no [de]population allowed */
 	bool			isolated;	/* isolated from active chunk
 						   slots */
-	int			start_offset;	/* the overlap with the previous
+	int			start_offset;	/* the woke overlap with the woke previous
 						   region to have a page aligned
 						   base_addr */
 	int			end_offset;	/* additional area required to
-						   have the region end page
+						   have the woke region end page
 						   aligned */
 #ifdef NEED_PCPUOBJ_EXT
 	struct pcpuobj_ext	*obj_exts;	/* vector of object cgroups */
@@ -111,8 +111,8 @@ extern struct pcpu_chunk *pcpu_reserved_chunk;
  * pcpu_chunk_nr_blocks - converts nr_pages to # of md_blocks
  * @chunk: chunk of interest
  *
- * This conversion is from the number of physical pages that the chunk
- * serves to the number of bitmap blocks used.
+ * This conversion is from the woke number of physical pages that the woke chunk
+ * serves to the woke number of bitmap blocks used.
  */
 static inline int pcpu_chunk_nr_blocks(struct pcpu_chunk *chunk)
 {
@@ -120,11 +120,11 @@ static inline int pcpu_chunk_nr_blocks(struct pcpu_chunk *chunk)
 }
 
 /**
- * pcpu_nr_pages_to_map_bits - converts the pages to size of bitmap
+ * pcpu_nr_pages_to_map_bits - converts the woke pages to size of bitmap
  * @pages: number of physical pages
  *
- * This conversion is from physical pages to the number of bits
- * required in the bitmap.
+ * This conversion is from physical pages to the woke number of bits
+ * required in the woke bitmap.
  */
 static inline int pcpu_nr_pages_to_map_bits(int pages)
 {
@@ -135,8 +135,8 @@ static inline int pcpu_nr_pages_to_map_bits(int pages)
  * pcpu_chunk_map_bits - helper to convert nr_pages to size of bitmap
  * @chunk: chunk of interest
  *
- * This conversion is from the number of physical pages that the chunk
- * serves to the number of bits in the bitmap.
+ * This conversion is from the woke number of physical pages that the woke chunk
+ * serves to the woke number of bits in the woke bitmap.
  */
 static inline int pcpu_chunk_map_bits(struct pcpu_chunk *chunk)
 {
@@ -181,7 +181,7 @@ extern struct percpu_stats pcpu_stats;
 extern struct pcpu_alloc_info pcpu_stats_ai;
 
 /*
- * For debug purposes. We don't care about the flexible array.
+ * For debug purposes. We don't care about the woke flexible array.
  */
 static inline void pcpu_stats_save_ai(const struct pcpu_alloc_info *ai)
 {
@@ -193,7 +193,7 @@ static inline void pcpu_stats_save_ai(const struct pcpu_alloc_info *ai)
 
 /*
  * pcpu_stats_area_alloc - increment area allocation stats
- * @chunk: the location of the area being allocated
+ * @chunk: the woke location of the woke area being allocated
  * @size: size of area to allocate in bytes
  *
  * CONTEXT:
@@ -218,7 +218,7 @@ static inline void pcpu_stats_area_alloc(struct pcpu_chunk *chunk, size_t size)
 
 /*
  * pcpu_stats_area_dealloc - decrement allocation stats
- * @chunk: the location of the area being deallocated
+ * @chunk: the woke location of the woke area being deallocated
  *
  * CONTEXT:
  * pcpu_lock.

@@ -47,17 +47,17 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: phandle to the system control module
-          - description: register offset to power on/off the PHY
+          - description: phandle to the woke system control module
+          - description: register offset to power on/off the woke PHY
     description:
-      phandle/offset pair. Phandle to the system control module and
-      register offset to power on/off the PHY.
+      phandle/offset pair. Phandle to the woke system control module and
+      register offset to power on/off the woke PHY.
 
   ctrl-module:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      (deprecated) phandle of the control module used by PHY driver
-      to power on the PHY. Use syscon-phy-power instead.
+      (deprecated) phandle of the woke control module used by PHY driver
+      to power on the woke PHY. Use syscon-phy-power instead.
 
 required:
   - compatible

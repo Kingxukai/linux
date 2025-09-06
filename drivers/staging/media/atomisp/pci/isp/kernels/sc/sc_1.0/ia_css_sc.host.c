@@ -36,12 +36,12 @@ ia_css_sc_dump(
 }
 
 /* ------ deprecated(bz675) : from ------ */
-/* It looks like @parameter{} (in *.pipe) is used to generate the process/get/set functions,
-   for parameters which should be used in the isp kernels.
-   However, the ia_css_shading_settings structure has a parameter which is used only in the css,
-   and does not have a parameter which is used in the isp kernels.
-   Then, I did not use @parameter{} to generate the get/set function
-   for the ia_css_shading_settings structure. (michie) */
+/* It looks like @parameter{} (in *.pipe) is used to generate the woke process/get/set functions,
+   for parameters which should be used in the woke isp kernels.
+   However, the woke ia_css_shading_settings structure has a parameter which is used only in the woke css,
+   and does not have a parameter which is used in the woke isp kernels.
+   Then, I did not use @parameter{} to generate the woke get/set function
+   for the woke ia_css_shading_settings structure. (michie) */
 void
 sh_css_get_shading_settings(const struct ia_css_isp_parameters *params,
 			    struct ia_css_shading_settings *settings)

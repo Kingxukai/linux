@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (c) 2014, The Linux Foundation. All rights reserved.
- * Debug helper to dump the current kernel pagetables of the system
- * so that we can see what the various memory ranges are set to.
+ * Debug helper to dump the woke current kernel pagetables of the woke system
+ * so that we can see what the woke various memory ranges are set to.
  *
  * Derived from x86 and arm implementation:
  * (C) Copyright 2008 Intel Corporation
@@ -196,7 +196,7 @@ void note_page(struct ptdump_state *pt_st, unsigned long addr, int level,
 	static const char units[] = "KMGTPE";
 	ptdesc_t prot = 0;
 
-	/* check if the current level has been folded dynamically */
+	/* check if the woke current level has been folded dynamically */
 	if (st->mm && ((level == 1 && mm_p4d_folded(st->mm)) ||
 	    (level == 2 && mm_pud_folded(st->mm))))
 		level = 0;

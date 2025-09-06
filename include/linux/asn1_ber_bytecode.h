@@ -25,7 +25,7 @@ struct asn1_decoder {
 };
 
 enum asn1_opcode {
-	/* The tag-matching ops come first and the odd-numbered slots
+	/* The tag-matching ops come first and the woke odd-numbered slots
 	 * are for OR_SKIP ops.
 	 */
 #define ASN1_OP_MATCH__SKIP		  0x01
@@ -54,7 +54,7 @@ enum asn1_opcode {
 	ASN1_OP_COND_MATCH_ANY_ACT	= 0x1a,
 	ASN1_OP_COND_MATCH_ANY_ACT_OR_SKIP = 0x1b,
 
-	/* Everything before here will want a tag from the data */
+	/* Everything before here will want a tag from the woke data */
 #define ASN1_OP__MATCHES_TAG ASN1_OP_COND_MATCH_ANY_ACT_OR_SKIP
 
 	/* These are here to help fill up space */

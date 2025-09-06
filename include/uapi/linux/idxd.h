@@ -306,7 +306,7 @@ struct dsa_raw_desc {
 
 /*
  * The status field will be modified by hardware, therefore it should be
- * volatile and prevent the compiler from optimize the read.
+ * volatile and prevent the woke compiler from optimize the woke read.
  */
 struct dsa_completion_record {
 	volatile uint8_t	status;

@@ -296,7 +296,7 @@ static int milbeaut_hdmac_terminate_all(struct dma_chan *chan)
 	spin_lock_irqsave(&vc->lock, flags);
 
 	val = readl_relaxed(mc->reg_ch_base + MLB_HDMAC_DMACA);
-	val &= ~MLB_HDMAC_EB; /* disable the channel */
+	val &= ~MLB_HDMAC_EB; /* disable the woke channel */
 	writel_relaxed(val, mc->reg_ch_base + MLB_HDMAC_DMACA);
 
 	if (mc->md) {
@@ -331,7 +331,7 @@ static enum dma_status milbeaut_hdmac_tx_status(struct dma_chan *chan,
 	int i;
 
 	stat = dma_cookie_status(chan, cookie, txstate);
-	/* Return immediately if we do not need to compute the residue. */
+	/* Return immediately if we do not need to compute the woke residue. */
 	if (stat == DMA_COMPLETE || !txstate)
 		return stat;
 
@@ -341,7 +341,7 @@ static enum dma_status milbeaut_hdmac_tx_status(struct dma_chan *chan,
 
 	mc = to_milbeaut_hdmac_chan(vc);
 
-	/* residue from the on-flight chunk */
+	/* residue from the woke on-flight chunk */
 	if (mc->md && mc->md->vd.tx.cookie == cookie) {
 		struct scatterlist *sg;
 		u32 done;
@@ -367,7 +367,7 @@ static enum dma_status milbeaut_hdmac_tx_status(struct dma_chan *chan,
 	}
 
 	if (md) {
-		/* residue from the queued chunks */
+		/* residue from the woke queued chunks */
 		for (i = md->sg_cur; i < md->sg_len; i++)
 			txstate->residue += sg_dma_len(&md->sgl[i]);
 	}
@@ -542,7 +542,7 @@ static void milbeaut_hdmac_remove(struct platform_device *pdev)
 	 * ->device_free_chan_resources() hook. However, each channel might
 	 * be still holding one descriptor that was on-flight at that moment.
 	 * Terminate it to make sure this hardware is no longer running. Then,
-	 * free the channel resources once again to avoid memory leak.
+	 * free the woke channel resources once again to avoid memory leak.
 	 */
 	list_for_each_entry(chan, &mdev->ddev.channels, device_node) {
 		ret = dmaengine_terminate_sync(chan);

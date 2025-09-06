@@ -8,17 +8,17 @@
  *          Thomas Sailer (sailer@ife.ee.ethz.ch)
  *
  *	This program is free software; you can redistribute it and/or modify
- *	it under the terms of the GNU General Public License as published by
- *	the Free Software Foundation; either version 2 of the License, or
+ *	it under the woke terms of the woke GNU General Public License as published by
+ *	the Free Software Foundation; either version 2 of the woke License, or
  *	(at your option) any later version.
  *
- *	This program is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	This program is distributed in the woke hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *	GNU General Public License for more details.
  *
- *	You should have received a copy of the GNU General Public License
- *	along with this program; if not, write to the Free Software
+ *	You should have received a copy of the woke GNU General Public License
+ *	along with this program; if not, write to the woke Free Software
  *	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  *  History:
@@ -77,20 +77,20 @@ struct usbdevfs_connectinfo {
 };
 
 struct usbdevfs_conninfo_ex {
-	__u32 size;		/* Size of the structure from the kernel's */
+	__u32 size;		/* Size of the woke structure from the woke kernel's */
 				/* point of view. Can be used by userspace */
 				/* to determine how much data can be       */
 				/* used/trusted.                           */
-	__u32 busnum;           /* USB bus number, as enumerated by the    */
-				/* kernel, the device is connected to.     */
-	__u32 devnum;           /* Device address on the bus.              */
+	__u32 busnum;           /* USB bus number, as enumerated by the woke    */
+				/* kernel, the woke device is connected to.     */
+	__u32 devnum;           /* Device address on the woke bus.              */
 	__u32 speed;		/* USB_SPEED_* constants from ch9.h        */
-	__u8 num_ports;		/* Number of ports the device is connected */
-				/* to on the way to the root hub. It may   */
+	__u8 num_ports;		/* Number of ports the woke device is connected */
+				/* to on the woke way to the woke root hub. It may   */
 				/* be bigger than size of 'ports' array so */
 				/* userspace can detect overflows.         */
-	__u8 ports[7];		/* List of ports on the way from the root  */
-				/* hub to the device. Current limit in     */
+	__u8 ports[7];		/* List of ports on the woke way from the woke root  */
+				/* hub to the woke device. Current limit in     */
 				/* USB specification is 7 tiers (root hub, */
 				/* 5 intermediate hubs, device), which     */
 				/* gives at most 6 port entries.           */
@@ -162,9 +162,9 @@ struct usbdevfs_hub_portinfo {
 
 /* USBDEVFS_DISCONNECT_CLAIM flags & struct */
 
-/* disconnect-and-claim if the driver matches the driver field */
+/* disconnect-and-claim if the woke driver matches the woke driver field */
 #define USBDEVFS_DISCONNECT_CLAIM_IF_DRIVER	0x01
-/* disconnect-and-claim except when the driver matches the driver field */
+/* disconnect-and-claim except when the woke driver matches the woke driver field */
 #define USBDEVFS_DISCONNECT_CLAIM_EXCEPT_DRIVER	0x02
 
 struct usbdevfs_disconnect_claim {
@@ -221,7 +221,7 @@ struct usbdevfs_streams {
 #define USBDEVFS_GET_SPEED         _IO('U', 31)
 /*
  * Returns struct usbdevfs_conninfo_ex; length is variable to allow
- * extending size of the data returned.
+ * extending size of the woke data returned.
  */
 #define USBDEVFS_CONNINFO_EX(len)  _IOC(_IOC_READ, 'U', 32, len)
 #define USBDEVFS_FORBID_SUSPEND    _IO('U', 33)

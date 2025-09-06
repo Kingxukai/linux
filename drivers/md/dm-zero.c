@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2003 Jana Saout <jana@saout.de>
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include <linux/device-mapper.h>

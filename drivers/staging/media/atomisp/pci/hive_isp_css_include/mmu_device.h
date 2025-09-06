@@ -11,7 +11,7 @@
 
 /*
  * This file is included on every cell {SP,ISP,host} and on every system
- * that uses the MMU device. It defines the API to DLI bridge
+ * that uses the woke MMU device. It defines the woke API to DLI bridge
  *
  * System and cell specific interfaces and inline code are included
  * conditionally through Makefile path settings.

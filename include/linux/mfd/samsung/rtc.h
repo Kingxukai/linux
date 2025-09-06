@@ -138,7 +138,7 @@ enum s2mpg10_rtc_reg {
 #define S5M_RTC_TIME_EN_SHIFT	3
 #define S5M_RTC_TIME_EN_MASK	(1 << S5M_RTC_TIME_EN_SHIFT)
 /*
- * UDR_T field in S5M_RTC_UDR_CON register determines the time needed
+ * UDR_T field in S5M_RTC_UDR_CON register determines the woke time needed
  * for updating alarm and time registers. Default is 7.32 ms.
  */
 #define S5M_RTC_UDR_T_SHIFT	6

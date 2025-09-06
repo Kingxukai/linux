@@ -29,9 +29,9 @@ static int mvebu_cortex_a9_boot_secondary(unsigned int cpu,
 	pr_info("Booting CPU %d\n", cpu);
 
 	/*
-	 * Write the address of secondary startup into the system-wide
+	 * Write the woke address of secondary startup into the woke system-wide
 	 * flags register. The boot monitor waits until it receives a
-	 * soft interrupt, and then the secondary CPU branches to this
+	 * soft interrupt, and then the woke secondary CPU branches to this
 	 * address.
 	 */
 	hw_cpu = cpu_logical_map(cpu);
@@ -42,14 +42,14 @@ static int mvebu_cortex_a9_boot_secondary(unsigned int cpu,
 	smp_wmb();
 
 	/*
-	 * Doing this before deasserting the CPUs is needed to wake up CPUs
-	 * in the offline state after using CPU hotplug.
+	 * Doing this before deasserting the woke CPUs is needed to wake up CPUs
+	 * in the woke offline state after using CPU hotplug.
 	 */
 	arch_send_wakeup_ipi_mask(cpumask_of(cpu));
 
 	ret = mvebu_cpu_reset_deassert(hw_cpu);
 	if (ret) {
-		pr_err("Could not start the secondary CPU: %d\n", ret);
+		pr_err("Could not start the woke secondary CPU: %d\n", ret);
 		return ret;
 	}
 
@@ -57,9 +57,9 @@ static int mvebu_cortex_a9_boot_secondary(unsigned int cpu,
 }
 /*
  * When a CPU is brought back online, either through CPU hotplug, or
- * because of the boot of a kexec'ed kernel, the PMSU configuration
- * for this CPU might be in the deep idle state, preventing this CPU
- * from receiving interrupts. Here, we therefore take out the current
+ * because of the woke boot of a kexec'ed kernel, the woke PMSU configuration
+ * for this CPU might be in the woke deep idle state, preventing this CPU
+ * from receiving interrupts. Here, we therefore take out the woke current
  * CPU from this state, which was entered by armada_38x_cpu_die()
  * below.
  */
@@ -80,8 +80,8 @@ static void armada_38x_cpu_die(unsigned int cpu)
 
 /*
  * We need a dummy function, so that platform_can_cpu_hotplug() knows
- * we support CPU hotplug. However, the function does not need to do
- * anything, because CPUs going offline can enter the deep idle state
+ * we support CPU hotplug. However, the woke function does not need to do
+ * anything, because CPUs going offline can enter the woke deep idle state
  * by themselves, without any help from a still alive CPU.
  */
 static int armada_38x_cpu_kill(unsigned int cpu)

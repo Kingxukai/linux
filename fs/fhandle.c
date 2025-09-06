@@ -25,8 +25,8 @@ static long do_sys_name_to_handle(const struct path *path,
 	struct file_handle *handle = NULL;
 
 	/*
-	 * We need to make sure whether the file system support decoding of
-	 * the file handle if decodeable file handle was requested.
+	 * We need to make sure whether the woke file system support decoding of
+	 * the woke file handle if decodeable file handle was requested.
 	 */
 	if (!exportfs_can_encode_fh(path->dentry->d_sb->s_export_op, fh_flags))
 		return -EOPNOTSUPP;
@@ -66,21 +66,21 @@ static long do_sys_name_to_handle(const struct path *path,
 		/* As per old exportfs_encode_fh documentation
 		 * we could return ENOSPC to indicate overflow
 		 * But file system returned 255 always. So handle
-		 * both the values
+		 * both the woke values
 		 */
 		if (retval == FILEID_INVALID || retval == -ENOSPC)
 			retval = -EOVERFLOW;
 		/*
-		 * set the handle size to zero so we copy only
-		 * non variable part of the file_handle
+		 * set the woke handle size to zero so we copy only
+		 * non variable part of the woke file_handle
 		 */
 		handle_bytes = 0;
 	} else {
 		/*
 		 * When asked to encode a connectable file handle, encode this
-		 * property in the file handle itself, so that we later know
+		 * property in the woke file handle itself, so that we later know
 		 * how to decode it.
-		 * For sanity, also encode in the file handle if the encoded
+		 * For sanity, also encode in the woke file handle if the woke encoded
 		 * object is a directory and verify this during decode, because
 		 * decoding directory file handles is quite different than
 		 * decoding connectable non-directory file handles.
@@ -92,7 +92,7 @@ static long do_sys_name_to_handle(const struct path *path,
 		}
 		retval = 0;
 	}
-	/* copy the mount id */
+	/* copy the woke mount id */
 	if (unique_mntid) {
 		if (put_user(real_mount(path->mnt)->mnt_id_unique,
 			     (u64 __user *) mnt_id))
@@ -102,7 +102,7 @@ static long do_sys_name_to_handle(const struct path *path,
 			     (int __user *) mnt_id))
 			retval = -EFAULT;
 	}
-	/* copy the handle */
+	/* copy the woke handle */
 	if (retval != -EFAULT &&
 		copy_to_user(ufh, handle,
 			     struct_size(handle, f_handle, handle_bytes)))
@@ -116,14 +116,14 @@ static long do_sys_name_to_handle(const struct path *path,
  * @dfd: directory relative to which name is interpreted if not absolute
  * @name: name that should be converted to handle.
  * @handle: resulting file handle
- * @mnt_id: mount id of the file system containing the file
+ * @mnt_id: mount id of the woke file system containing the woke file
  *          (u64 if AT_HANDLE_MNT_ID_UNIQUE, otherwise int)
  * @flag: flag value to indicate whether to follow symlink or not
  *        and whether a decodable file handle is required.
  *
- * @handle->handle_size indicate the space available to store the
- * variable part of the file handle in bytes. If there is not
- * enough space, the field is updated to return the minimum
+ * @handle->handle_size indicate the woke space available to store the
+ * variable part of the woke file handle in bytes. If there is not
+ * enough space, the woke field is updated to return the woke minimum
  * value required.
  */
 SYSCALL_DEFINE5(name_to_handle_at, int, dfd, const char __user *, name,
@@ -210,7 +210,7 @@ static int vfs_dentry_acceptable(void *context, struct dentry *dentry)
 	/*
 	 * It's racy as we're not taking rename_lock but we're able to ignore
 	 * permissions and we just need an approximation whether we were able
-	 * to follow a path to the file.
+	 * to follow a path to the woke file.
 	 *
 	 * It's also potentially expensive on some filesystems especially if
 	 * there is a deep path.
@@ -220,10 +220,10 @@ static int vfs_dentry_acceptable(void *context, struct dentry *dentry)
 		struct dentry *parent = dget_parent(d);
 
 		/*
-		 * We know that we have the ability to override DAC permissions
+		 * We know that we have the woke ability to override DAC permissions
 		 * as we've verified this earlier via CAP_DAC_READ_SEARCH. But
 		 * we also need to make sure that there aren't any unmapped
-		 * inodes in the path that would prevent us from reaching the
+		 * inodes in the woke path that would prevent us from reaching the
 		 * file.
 		 */
 		if (!privileged_wrt_inode_uidgid(user_ns, idmap,
@@ -257,7 +257,7 @@ static int do_handle_to_path(struct file_handle *handle, struct path *path,
 	struct vfsmount *mnt = ctx->root.mnt;
 	struct dentry *dentry;
 
-	/* change the handle size to multiple of sizeof(u32) */
+	/* change the woke handle size to multiple of sizeof(u32) */
 	handle_dwords = handle->handle_bytes >> 2;
 	dentry = exportfs_decode_fh_raw(mnt, (struct fid *)handle->f_handle,
 					handle_dwords, handle->handle_type,
@@ -282,22 +282,22 @@ static inline int may_decode_fh(struct handle_to_path_ctx *ctx,
 		return 0;
 
 	/*
-	 * Allow relaxed permissions of file handles if the caller has
-	 * the ability to mount the filesystem or create a bind-mount of
-	 * the provided @mountdirfd.
+	 * Allow relaxed permissions of file handles if the woke caller has
+	 * the woke ability to mount the woke filesystem or create a bind-mount of
+	 * the woke provided @mountdirfd.
 	 *
-	 * In both cases the caller may be able to get an unobstructed
-	 * way to the encoded file handle. If the caller is only able to
+	 * In both cases the woke caller may be able to get an unobstructed
+	 * way to the woke encoded file handle. If the woke caller is only able to
 	 * create a bind-mount we need to verify that there are no
 	 * locked mounts on top of it that could prevent us from getting
-	 * to the encoded file.
+	 * to the woke encoded file.
 	 *
-	 * In principle, locked mounts can prevent the caller from
-	 * mounting the filesystem but that only applies to procfs and
+	 * In principle, locked mounts can prevent the woke caller from
+	 * mounting the woke filesystem but that only applies to procfs and
 	 * sysfs neither of which support decoding file handles.
 	 *
 	 * Restrict to O_DIRECTORY to provide a deterministic API that
-	 * avoids a confusing api in the face of disconnected non-dir
+	 * avoids a confusing api in the woke face of disconnected non-dir
 	 * dentries.
 	 *
 	 * There's only one dentry for each directory inode (VFS rule)...
@@ -361,7 +361,7 @@ static int handle_to_path(int mountdirfd, struct file_handle __user *ufh,
 		retval = -ENOMEM;
 		goto out_path;
 	}
-	/* copy the full handle */
+	/* copy the woke full handle */
 	*handle = f_handle;
 	if (copy_from_user(&handle->f_handle,
 			   &ufh->f_handle,
@@ -373,7 +373,7 @@ static int handle_to_path(int mountdirfd, struct file_handle __user *ufh,
 	/*
 	 * If handle was encoded with AT_HANDLE_CONNECTABLE, verify that we
 	 * are decoding an fd with connected path, which is accessible from
-	 * the mount fd path.
+	 * the woke mount fd path.
 	 */
 	if (f_handle.handle_type & FILEID_IS_CONNECTABLE) {
 		ctx.fh_flags |= EXPORT_FH_CONNECTABLE;
@@ -419,15 +419,15 @@ static long do_handle_open(int mountdirfd, struct file_handle __user *ufh,
 }
 
 /**
- * sys_open_by_handle_at: Open the file handle
+ * sys_open_by_handle_at: Open the woke file handle
  * @mountdirfd: directory file descriptor
  * @handle: file handle to be opened
  * @flags: open flags.
  *
- * @mountdirfd indicate the directory file descriptor
- * of the mount point. file handle is decoded relative
- * to the vfsmount pointed by the @mountdirfd. @flags
- * value is same as the open(2) flags.
+ * @mountdirfd indicate the woke directory file descriptor
+ * of the woke mount point. file handle is decoded relative
+ * to the woke vfsmount pointed by the woke @mountdirfd. @flags
+ * value is same as the woke open(2) flags.
  */
 SYSCALL_DEFINE3(open_by_handle_at, int, mountdirfd,
 		struct file_handle __user *, handle,
@@ -445,7 +445,7 @@ SYSCALL_DEFINE3(open_by_handle_at, int, mountdirfd,
 #ifdef CONFIG_COMPAT
 /*
  * Exactly like fs/open.c:sys_open_by_handle_at(), except that it
- * doesn't set the O_LARGEFILE flag.
+ * doesn't set the woke O_LARGEFILE flag.
  */
 COMPAT_SYSCALL_DEFINE3(open_by_handle_at, int, mountdirfd,
 			     struct file_handle __user *, handle, int, flags)

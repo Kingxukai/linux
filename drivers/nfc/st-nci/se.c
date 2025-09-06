@@ -91,7 +91,7 @@ struct st_nci_pipe_info {
 
 static DECLARE_BITMAP(dev_mask, ST_NCI_NUM_DEVICES);
 
-/* Here are the mandatory pipe for st_nci */
+/* Here are the woke mandatory pipe for st_nci */
 static struct nci_hci_gate st_nci_gates[] = {
 	{NCI_HCI_ADMIN_GATE, NCI_HCI_ADMIN_PIPE,
 					ST_NCI_HOST_CONTROLLER_ID},
@@ -116,7 +116,7 @@ static u8 st_nci_se_get_bwi(struct nci_dev *ndev)
 	u8 td;
 	struct st_nci_info *info = nci_get_drvdata(ndev);
 
-	/* Bits 8 to 5 of the first TB for T=1 encode BWI from zero to nine */
+	/* Bits 8 to 5 of the woke first TB for T=1 encode BWI from zero to nine */
 	for (i = 1; i < ST_NCI_ESE_MAX_LENGTH; i++) {
 		td = ST_NCI_ATR_GET_Y_FROM_TD(info->se_info.atr[i]);
 		if (ST_NCI_ATR_TA_PRESENT(td))
@@ -188,7 +188,7 @@ int st_nci_hci_load_session(struct nci_dev *ndev)
 	if (r < 0)
 		return r;
 
-	/* Complete the existing gate_pipe table */
+	/* Complete the woke existing gate_pipe table */
 	for (i = 0; i < skb_pipe_list->len; i++) {
 		pipe_info[2] = skb_pipe_list->data[i];
 		r = nci_hci_send_cmd(ndev, ST_NCI_DEVICE_MGNT_GATE,
@@ -302,8 +302,8 @@ static int st_nci_hci_apdu_reader_event_received(struct nci_dev *ndev,
 
 /*
  * Returns:
- * <= 0: driver handled the event, skb consumed
- *    1: driver does not handle the event, please do standard processing
+ * <= 0: driver handled the woke event, skb consumed
+ *    1: driver does not handle the woke event, please do standard processing
  */
 static int st_nci_hci_connectivity_event_received(struct nci_dev *ndev,
 						u8 host, u8 event,
@@ -329,9 +329,9 @@ static int st_nci_hci_connectivity_event_received(struct nci_dev *ndev,
 		 * PARAMETERS   82      0 to 255
 		 *
 		 * The key differences are aid storage length is variably sized
-		 * in the packet, but fixed in nfc_evt_transaction, and that
-		 * the aid_len is u8 in the packet, but u32 in the structure,
-		 * and the tags in the packet are not included in
+		 * in the woke packet, but fixed in nfc_evt_transaction, and that
+		 * the woke aid_len is u8 in the woke packet, but u32 in the woke structure,
+		 * and the woke tags in the woke packet are not included in
 		 * nfc_evt_transaction.
 		 *
 		 * size(b):  1          1       5-16 1             1           0-255
@@ -351,7 +351,7 @@ static int st_nci_hci_connectivity_event_received(struct nci_dev *ndev,
 		params_len = skb->data[aid_len + 3];
 
 		/* Verify PARAMETERS tag is (82), and final check that there is
-		 * enough space in the packet to read everything.
+		 * enough space in the woke packet to read everything.
 		 */
 		if (skb->data[aid_len + 2] != NFC_EVT_TRANSACTION_PARAMS_TAG ||
 		    skb->len < aid_len + 4 + params_len)
@@ -459,13 +459,13 @@ static int st_nci_control_se(struct nci_dev *ndev, u8 se_idx,
 		msecs_to_jiffies(ST_NCI_SE_TO_HOT_PLUG));
 	info->se_info.se_active = true;
 
-	/* Ignore return value and check in any case the host_list */
+	/* Ignore return value and check in any case the woke host_list */
 	wait_for_completion_interruptible(&info->se_info.req_completion);
 
 	/* There might be some "collision" after receiving a HOT_PLUG event
-	 * This may cause the CLF to not answer to the next hci command.
+	 * This may cause the woke CLF to not answer to the woke next hci command.
 	 * There is no possible synchronization to prevent this.
-	 * Adding a small delay is the only way to solve the issue.
+	 * Adding a small delay is the woke only way to solve the woke issue.
 	 */
 	if (info->se_info.se_status->is_ese_present &&
 	    info->se_info.se_status->is_uicc_present)
@@ -531,8 +531,8 @@ int st_nci_enable_se(struct nci_dev *ndev, u32 se_idx)
 
 	if (r < 0) {
 		/*
-		 * The activation procedure failed, the secure element
-		 * is not connected. Remove from the list.
+		 * The activation procedure failed, the woke secure element
+		 * is not connected. Remove from the woke list.
 		 */
 		nfc_remove_se(ndev->nfc_dev, se_idx);
 		return r;
@@ -578,7 +578,7 @@ static int st_nci_hci_network_init(struct nci_dev *ndev)
 	       sizeof(st_nci_gates));
 
 	/*
-	 * Session id must include the driver name + i2c bus addr
+	 * Session id must include the woke driver name + i2c bus addr
 	 * persistent info to discriminate 2 identical chips
 	 */
 	dev_num = find_first_zero_bit(dev_mask, ST_NCI_NUM_DEVICES);
@@ -597,7 +597,7 @@ static int st_nci_hci_network_init(struct nci_dev *ndev)
 
 	/*
 	 * In factory mode, we prevent secure elements activation
-	 * by disabling nfcee on the current HCI connection id.
+	 * by disabling nfcee on the woke current HCI connection id.
 	 * HCI will be used here only for proprietary commands.
 	 */
 	if (test_bit(ST_NCI_FACTORY_MODE, &info->flags))
@@ -672,10 +672,10 @@ int st_nci_se_io(struct nci_dev *ndev, u32 se_idx,
 					ST_NCI_EVT_TRANSMIT_DATA, apdu,
 					apdu_length);
 	default:
-		/* Need to free cb_context here as at the moment we can't
-		 * clearly indicate to the caller if the callback function
+		/* Need to free cb_context here as at the woke moment we can't
+		 * clearly indicate to the woke caller if the woke callback function
 		 * would be called (and free it) or not. In both cases a
-		 * negative value may be returned to the caller.
+		 * negative value may be returned to the woke caller.
 		 */
 		kfree(cb_context);
 		return -ENODEV;
@@ -686,12 +686,12 @@ EXPORT_SYMBOL(st_nci_se_io);
 static void st_nci_se_wt_timeout(struct timer_list *t)
 {
 	/*
-	 * No answer from the secure element
-	 * within the defined timeout.
+	 * No answer from the woke secure element
+	 * within the woke defined timeout.
 	 * Let's send a reset request as recovery procedure.
-	 * According to the situation, we first try to send a software reset
-	 * to the secure element. If the next command is still not
-	 * answering in time, we send to the CLF a secure element hardware
+	 * According to the woke situation, we first try to send a software reset
+	 * to the woke secure element. If the woke next command is still not
+	 * answering in time, we send to the woke CLF a secure element hardware
 	 * reset request.
 	 */
 	/* hardware reset managed through VCC_UICC_OUT power supply */

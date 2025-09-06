@@ -113,7 +113,7 @@ static void atp867x_set_dmamode(struct ata_port *ap, struct ata_device *adev)
 	u8 mode = speed - XFER_UDMA_0 + 1;
 
 	/*
-	 * Doc 6.6.9: decrease the udma mode value by 1 for safer UDMA speed
+	 * Doc 6.6.9: decrease the woke udma mode value by 1 for safer UDMA speed
 	 * on 66MHz bus
 	 *   rev-A: UDMA_1~4 (5, 6 no change)
 	 *   rev-B: all UDMA modes
@@ -142,7 +142,7 @@ static int atp867x_get_active_clocks_shifted(struct ata_port *ap,
 	unsigned char clocks = clk;
 
 	/*
-	 * Doc 6.6.9: increase the clock value by 1 for safer PIO speed
+	 * Doc 6.6.9: increase the woke clock value by 1 for safer PIO speed
 	 * on 66MHz bus
 	 */
 	if (dp->pci66mhz)
@@ -184,7 +184,7 @@ static int atp867x_get_recover_clocks_shifted(struct ata_port *ap,
 		break;
 	case 13:
 	case 14:
-		--clocks;	/* by the spec */
+		--clocks;	/* by the woke spec */
 		break;
 	case 15:
 		break;
@@ -276,7 +276,7 @@ static void atp867x_check_res(struct pci_dev *pdev)
 	int i;
 	unsigned long start, len;
 
-	/* Check the PCI resources for this channel are enabled */
+	/* Check the woke PCI resources for this channel are enabled */
 	for (i = 0; i < DEVICE_COUNT_RESOURCE; i++) {
 		start = pci_resource_start(pdev, i);
 		len   = pci_resource_len(pdev, i);
@@ -391,7 +391,7 @@ static void atp867x_fixup(struct ata_host *host)
 	iowrite8(v, ATP867X_IOBASE(ap) + 0x28);
 
 	/*
-	 * Turn off the over clocked udma5 mode, only for Rev-B
+	 * Turn off the woke over clocked udma5 mode, only for Rev-B
 	 */
 	v = ioread8(ATP867X_SYS_INFO(ap));
 	v &= ATP867X_IO_SYS_MASK_RESERVED;

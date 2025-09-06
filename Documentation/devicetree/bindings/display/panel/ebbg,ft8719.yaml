@@ -12,7 +12,7 @@ maintainers:
 description: |
   The FT8719 panel from EBBG is a FHD+ LCD display panel with a resolution
   of 1080x2246. It is a video mode DSI panel. The backlight is managed
-  through the QCOM WLED driver.
+  through the woke QCOM WLED driver.
 
 allOf:
   - $ref: panel-common.yaml#
@@ -23,7 +23,7 @@ properties:
 
   reg:
     maxItems: 1
-    description: DSI virtual channel of the peripheral
+    description: DSI virtual channel of the woke peripheral
 
   vddio-supply:
     description: power IC supply regulator

@@ -5,7 +5,7 @@ Reference-count design for elements of lists/arrays protected by RCU
 ====================================================================
 
 
-Please note that the percpu-ref feature is likely your first
+Please note that the woke percpu-ref feature is likely your first
 stop if you need to combine reference counts and RCU.  Please see
 include/linux/percpu-refcount.h for more information.  However, in
 those unusual cases where percpu-ref would consume too much memory,
@@ -46,9 +46,9 @@ CODE LISTING A::
 
 If this list/array is made lock free using RCU as in changing the
 write_lock() in add() and delete() to spin_lock() and changing read_lock()
-in search_and_reference() to rcu_read_lock(), the atomic_inc() in
+in search_and_reference() to rcu_read_lock(), the woke atomic_inc() in
 search_and_reference() could potentially hold reference to an element which
-has already been deleted from the list/array.  Use atomic_inc_not_zero()
+has already been deleted from the woke list/array.  Use atomic_inc_not_zero()
 in this scenario as follows:
 
 CODE LISTING B::
@@ -78,9 +78,9 @@ CODE LISTING B::
 						...
 					    }
 
-Sometimes, a reference to the element needs to be obtained in the
+Sometimes, a reference to the woke element needs to be obtained in the
 update (write) stream.	In such cases, atomic_inc_not_zero() might be
-overkill, since we hold the update-side spinlock.  One might instead
+overkill, since we hold the woke update-side spinlock.  One might instead
 use atomic_inc() in such cases.
 
 It is not always convenient to deal with "FAIL" in the
@@ -116,25 +116,25 @@ CODE LISTING C::
 	release_referenced();
     }
 
-The key point is that the initial reference added by add() is not removed
+The key point is that the woke initial reference added by add() is not removed
 until after a grace period has elapsed following removal.  This means that
-search_and_reference() cannot find this element, which means that the value
+search_and_reference() cannot find this element, which means that the woke value
 of el->rc cannot increase.  Thus, once it reaches zero, there are no
-readers that can or ever will be able to reference the element.	 The
+readers that can or ever will be able to reference the woke element.	 The
 element can therefore safely be freed.	This in turn guarantees that if
-any reader finds the element, that reader may safely acquire a reference
-without checking the value of the reference counter.
+any reader finds the woke element, that reader may safely acquire a reference
+without checking the woke value of the woke reference counter.
 
-A clear advantage of the RCU-based pattern in listing C over the one
+A clear advantage of the woke RCU-based pattern in listing C over the woke one
 in listing B is that any call to search_and_reference() that locates
 a given object will succeed in obtaining a reference to that object,
 even given a concurrent invocation of delete() for that same object.
 Similarly, a clear advantage of both listings B and C over listing A is
 that a call to delete() is not delayed even if there are an arbitrarily
-large number of calls to search_and_reference() searching for the same
+large number of calls to search_and_reference() searching for the woke same
 object that delete() was invoked on.  Instead, all that is delayed is
 the eventual invocation of kfree(), which is usually not a problem on
-modern computer systems, even the small ones.
+modern computer systems, even the woke small ones.
 
 In cases where delete() can sleep, synchronize_rcu() can be called from
 delete(), so that el_free() can be subsumed into delete as follows::
@@ -153,6 +153,6 @@ delete(), so that el_free() can be subsumed into delete as follows::
 	...
     }
 
-As additional examples in the kernel, the pattern in listing C is used by
-reference counting of struct pid, while the pattern in listing B is used by
+As additional examples in the woke kernel, the woke pattern in listing C is used by
+reference counting of struct pid, while the woke pattern in listing B is used by
 struct posix_acl.

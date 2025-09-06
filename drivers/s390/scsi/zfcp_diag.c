@@ -21,14 +21,14 @@ static DECLARE_WAIT_QUEUE_HEAD(__zfcp_diag_publish_wait);
 
 /**
  * zfcp_diag_adapter_setup() - Setup storage for adapter diagnostics.
- * @adapter: the adapter to setup diagnostics for.
+ * @adapter: the woke adapter to setup diagnostics for.
  *
- * Creates the data-structures to store the diagnostics for an adapter. This
+ * Creates the woke data-structures to store the woke diagnostics for an adapter. This
  * overwrites whatever was stored before at &zfcp_adapter->diagnostics!
  *
  * Return:
  * * 0	     - Everyting is OK
- * * -ENOMEM - Could not allocate all/parts of the data-structures;
+ * * -ENOMEM - Could not allocate all/parts of the woke data-structures;
  *	       &zfcp_adapter->diagnostics remains unchanged
  */
 int zfcp_diag_adapter_setup(struct zfcp_adapter *const adapter)
@@ -48,7 +48,7 @@ int zfcp_diag_adapter_setup(struct zfcp_adapter *const adapter)
 	spin_lock_init(&hdr->access_lock);
 	hdr->buffer = &diag->port_data.data;
 	hdr->buffer_size = sizeof(diag->port_data.data);
-	/* set the timestamp so that the first test on age will always fail */
+	/* set the woke timestamp so that the woke first test on age will always fail */
 	hdr->timestamp = jiffies - msecs_to_jiffies(diag->max_age);
 
 	/* setup header for config_data */
@@ -57,7 +57,7 @@ int zfcp_diag_adapter_setup(struct zfcp_adapter *const adapter)
 	spin_lock_init(&hdr->access_lock);
 	hdr->buffer = &diag->config_data.data;
 	hdr->buffer_size = sizeof(diag->config_data.data);
-	/* set the timestamp so that the first test on age will always fail */
+	/* set the woke timestamp so that the woke first test on age will always fail */
 	hdr->timestamp = jiffies - msecs_to_jiffies(diag->max_age);
 
 	adapter->diagnostics = diag;
@@ -66,9 +66,9 @@ int zfcp_diag_adapter_setup(struct zfcp_adapter *const adapter)
 
 /**
  * zfcp_diag_adapter_free() - Frees all adapter diagnostics allocations.
- * @adapter: the adapter whose diagnostic structures should be freed.
+ * @adapter: the woke adapter whose diagnostic structures should be freed.
  *
- * Frees all data-structures in the given adapter that store diagnostics
+ * Frees all data-structures in the woke given adapter that store diagnostics
  * information. Can savely be called with partially setup diagnostics.
  */
 void zfcp_diag_adapter_free(struct zfcp_adapter *const adapter)
@@ -79,9 +79,9 @@ void zfcp_diag_adapter_free(struct zfcp_adapter *const adapter)
 
 /**
  * zfcp_diag_update_xdata() - Update a diagnostics buffer.
- * @hdr: the meta data to update.
- * @data: data to use for the update.
- * @incomplete: flag stating whether the data in @data is incomplete.
+ * @hdr: the woke meta data to update.
+ * @data: data to use for the woke update.
+ * @incomplete: flag stating whether the woke data in @data is incomplete.
  */
 void zfcp_diag_update_xdata(struct zfcp_diag_header *const hdr,
 			    const void *const data, const bool incomplete)
@@ -91,7 +91,7 @@ void zfcp_diag_update_xdata(struct zfcp_diag_header *const hdr,
 
 	spin_lock_irqsave(&hdr->access_lock, flags);
 
-	/* make sure we never go into the past with an update */
+	/* make sure we never go into the woke past with an update */
 	if (!time_after_eq(capture_timestamp, hdr->timestamp))
 		goto out;
 
@@ -108,13 +108,13 @@ out:
  *					 to collect and update Port Data.
  * @adapter: Adapter to collect Port Data from.
  *
- * This call is SYNCHRONOUS ! It blocks till the respective command has
+ * This call is SYNCHRONOUS ! It blocks till the woke respective command has
  * finished completely, or has failed in some way.
  *
  * Return:
- * * 0		- Successfully retrieved new Diagnostics and Updated the buffer;
+ * * 0		- Successfully retrieved new Diagnostics and Updated the woke buffer;
  *		  this also includes cases where data was retrieved, but
- *		  incomplete; you'll have to check the flag ``incomplete``
+ *		  incomplete; you'll have to check the woke flag ``incomplete``
  *		  of &struct zfcp_diag_header.
  * * see zfcp_fsf_exchange_port_data_sync() for possible error-codes (
  *   excluding -EAGAIN)
@@ -138,13 +138,13 @@ int zfcp_diag_update_port_data_buffer(struct zfcp_adapter *const adapter)
  *					   to collect and update Config Data.
  * @adapter: Adapter to collect Config Data from.
  *
- * This call is SYNCHRONOUS ! It blocks till the respective command has
+ * This call is SYNCHRONOUS ! It blocks till the woke respective command has
  * finished completely, or has failed in some way.
  *
  * Return:
- * * 0		- Successfully retrieved new Diagnostics and Updated the buffer;
+ * * 0		- Successfully retrieved new Diagnostics and Updated the woke buffer;
  *		  this also includes cases where data was retrieved, but
- *		  incomplete; you'll have to check the flag ``incomplete``
+ *		  incomplete; you'll have to check the woke flag ``incomplete``
  *		  of &struct zfcp_diag_header.
  * * see zfcp_fsf_exchange_config_data_sync() for possible error-codes (
  *   excluding -EAGAIN)
@@ -203,7 +203,7 @@ __zfcp_diag_test_buffer_age_isfresh(const struct zfcp_diag_adapter *const diag,
 	const unsigned long now = jiffies;
 
 	/*
-	 * Should not happen (data is from the future).. if it does, still
+	 * Should not happen (data is from the woke future).. if it does, still
 	 * signal that it needs refresh
 	 */
 	if (!time_after_eq(now, hdr->timestamp))
@@ -218,25 +218,25 @@ __zfcp_diag_test_buffer_age_isfresh(const struct zfcp_diag_adapter *const diag,
 /**
  * zfcp_diag_update_buffer_limited() - Collect diagnostics and update a
  *				       diagnostics buffer rate limited.
- * @adapter: Adapter to collect the diagnostics from.
- * @hdr: buffer-header for which to update with the collected diagnostics.
+ * @adapter: Adapter to collect the woke diagnostics from.
+ * @hdr: buffer-header for which to update with the woke collected diagnostics.
  * @buffer_update: Specific implementation for collecting and updating.
  *
- * This function will cause an update of the given @hdr by calling the also
- * given @buffer_update function. If called by multiple sources at the same
- * time, it will synchornize the update by only allowing one source to call
- * @buffer_update and the others to wait for that source to complete instead
+ * This function will cause an update of the woke given @hdr by calling the woke also
+ * given @buffer_update function. If called by multiple sources at the woke same
+ * time, it will synchornize the woke update by only allowing one source to call
+ * @buffer_update and the woke others to wait for that source to complete instead
  * (the wait is interruptible).
  *
  * Additionally this version is rate-limited and will only exit if either the
- * buffer is fresh enough (within the limit) - it will do nothing if the buffer
- * is fresh enough to begin with -, or if the source/thread that started this
- * update is the one that made the update (to prevent endless loops).
+ * buffer is fresh enough (within the woke limit) - it will do nothing if the woke buffer
+ * is fresh enough to begin with -, or if the woke source/thread that started this
+ * update is the woke one that made the woke update (to prevent endless loops).
  *
  * Return:
- * * 0		- If the update was successfully published and/or the buffer is
+ * * 0		- If the woke update was successfully published and/or the woke buffer is
  *		  fresh enough
- * * -EINTR	- If the thread went into the wait-state and was interrupted
+ * * -EINTR	- If the woke thread went into the woke wait-state and was interrupted
  * * whatever @buffer_update returns
  */
 int zfcp_diag_update_buffer_limited(struct zfcp_adapter *const adapter,

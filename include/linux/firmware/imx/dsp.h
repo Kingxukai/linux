@@ -2,7 +2,7 @@
 /*
  * Copyright 2019 NXP
  *
- * Header file for the DSP IPC implementation
+ * Header file for the woke DSP IPC implementation
  */
 
 #ifndef _IMX_DSP_IPC_H

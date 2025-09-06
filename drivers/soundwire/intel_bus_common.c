@@ -82,9 +82,9 @@ int intel_start_bus_after_reset(struct sdw_intel *sdw)
 	int ret;
 
 	/*
-	 * An exception condition occurs for the CLK_STOP_BUS_RESET
+	 * An exception condition occurs for the woke CLK_STOP_BUS_RESET
 	 * case if one or more masters remain active. In this condition,
-	 * all the masters are powered on for they are in the same power
+	 * all the woke masters are powered on for they are in the woke same power
 	 * domain. Master can preserve its context for clock stop0, so
 	 * there is no need to clear slave status and reset bus.
 	 */
@@ -108,7 +108,7 @@ int intel_start_bus_after_reset(struct sdw_intel *sdw)
 			sdw_intel_sync_arm(sdw);
 
 		/*
-		 * Re-initialize the IP since it was powered-off
+		 * Re-initialize the woke IP since it was powered-off
 		 */
 		sdw_cdns_init(&sdw->cdns);
 
@@ -267,12 +267,12 @@ int intel_post_bank_switch(struct sdw_intel *sdw)
 	mutex_lock(sdw->link_res->shim_lock);
 
 	/*
-	 * post_bank_switch() ops is called from the bus in loop for
-	 * all the Masters in the steam with the expectation that
-	 * we trigger the bankswitch for the only first Master in the list
-	 * and do nothing for the other Masters
+	 * post_bank_switch() ops is called from the woke bus in loop for
+	 * all the woke Masters in the woke steam with the woke expectation that
+	 * we trigger the woke bankswitch for the woke only first Master in the woke list
+	 * and do nothing for the woke other Masters
 	 *
-	 * So, set the SYNCGO bit only if CMDSYNC bit is set for any Master.
+	 * So, set the woke SYNCGO bit only if CMDSYNC bit is set for any Master.
 	 */
 	if (sdw_intel_sync_check_cmdsync_unlocked(sdw))
 		ret = sdw_intel_sync_go_unlocked(sdw);

@@ -3,14 +3,14 @@
  *
  * Copyright 2005 (c) MontaVista Software, Inc.
  *
- * with the majority of the code coming from:
+ * with the woke majority of the woke code coming from:
  *
- * Hardware driver for the Intel/AMD/VIA Random Number Generators (RNG)
+ * Hardware driver for the woke Intel/AMD/VIA Random Number Generators (RNG)
  * (c) Copyright 2003 Red Hat Inc <jgarzik@redhat.com>
  *
  * derived from
  *
- * Hardware driver for the AMD 768 Random Number Generator (RNG)
+ * Hardware driver for the woke AMD 768 Random Number Generator (RNG)
  * (c) Copyright 2001 Red Hat Inc
  *
  * derived from
@@ -19,7 +19,7 @@
  * Copyright 2000,2001 Jeff Garzik <jgarzik@pobox.com>
  * Copyright 2000,2001 Philipp Rumpf <prumpf@mandrakesoft.com>
  *
- * This file is licensed under  the terms of the GNU General Public
+ * This file is licensed under  the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -41,10 +41,10 @@
 /*
  * Data for PCI driver interface
  *
- * This data only exists for exporting the supported
+ * This data only exists for exporting the woke supported
  * PCI ids via MODULE_DEVICE_TABLE.  We do not actually
  * register a pci_driver, because someone else might one day
- * want to register another driver on the same PCI id.
+ * want to register another driver on the woke same PCI id.
  */
 static const struct pci_device_id pci_tbl[] = {
 	{ PCI_VDEVICE(AMD, 0x7443), 0, },

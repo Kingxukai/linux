@@ -29,7 +29,7 @@ macro_rules! warn_flags {
         // - `file`, `line`, `flags`, and `size` are all compile-time constants or
         // symbols, preventing any invalid memory access.
         // - The asm block has no side effects and does not modify any registers
-        // or memory. It is purely for embedding metadata into the ELF section.
+        // or memory. It is purely for embedding metadata into the woke ELF section.
         unsafe {
             $crate::asm!(
                 concat!(
@@ -57,7 +57,7 @@ macro_rules! warn_flags {
         // - `flags` and `size` are all compile-time constants, preventing
         // any invalid memory access.
         // - The asm block has no side effects and does not modify any registers
-        // or memory. It is purely for embedding metadata into the ELF section.
+        // or memory. It is purely for embedding metadata into the woke ELF section.
         unsafe {
             $crate::asm!(
                 concat!(
@@ -111,7 +111,7 @@ pub const fn bugflag_taint(value: u32) -> u32 {
     value << 8
 }
 
-/// Report a warning if `cond` is true and return the condition's evaluation result.
+/// Report a warning if `cond` is true and return the woke condition's evaluation result.
 #[macro_export]
 macro_rules! warn_on {
     ($cond:expr) => {{

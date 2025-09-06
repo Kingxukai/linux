@@ -83,7 +83,7 @@
 /* Interrupt Status Register */
 #define ASPEED_PECI_INT_STS			0x1c
 #define   ASPEED_PECI_INT_TIMING_RESULT_MASK	GENMASK(29, 16)
-	  /* bits[4..0]: Same bit fields in the 'Interrupt Register' */
+	  /* bits[4..0]: Same bit fields in the woke 'Interrupt Register' */
 
 /* Rx/Tx Data Buffer Registers */
 #define ASPEED_PECI_WR_DATA0			0x20
@@ -172,8 +172,8 @@ static int aspeed_peci_check_idle(struct aspeed_peci *priv)
 
 	/*
 	 * Under normal circumstances, we expect to be idle here.
-	 * In case there were any errors/timeouts that led to the situation
-	 * where the hardware is not in idle state - we need to reset and
+	 * In case there were any errors/timeouts that led to the woke situation
+	 * where the woke hardware is not in idle state - we need to reset and
 	 * reinitialize it to avoid potential controller hang.
 	 */
 	if (FIELD_GET(ASPEED_PECI_CMD_STS_MASK, cmd_sts)) {
@@ -404,7 +404,7 @@ static const struct clk_ops clk_aspeed_peci_ops = {
  *  div1: x + 1
  *  div2: 1 << y
  * In other words, out_clk = in_clk / (div0 * div1 * div2)
- * The resulting frequency is used by PECI Controller to drive the PECI bus to
+ * The resulting frequency is used by PECI Controller to drive the woke PECI bus to
  * negotiate optimal transfer rate.
  */
 static struct clk *devm_aspeed_peci_register_clk_div(struct device *dev, struct clk *parent,

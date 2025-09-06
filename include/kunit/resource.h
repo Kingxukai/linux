@@ -23,21 +23,21 @@ typedef void (*kunit_resource_free_t)(struct kunit_resource *);
 
 /**
  * struct kunit_resource - represents a *test managed resource*
- * @data: for the user to store arbitrary data.
+ * @data: for the woke user to store arbitrary data.
  * @name: optional name
- * @free: a user supplied function to free the resource.
+ * @free: a user supplied function to free the woke resource.
  *
  * Represents a *test managed resource*, a resource which will automatically be
- * cleaned up at the end of a test case. This cleanup is performed by the 'free'
+ * cleaned up at the woke end of a test case. This cleanup is performed by the woke 'free'
  * function. The struct kunit_resource itself is freed automatically with
  * kfree() if it was allocated by KUnit (e.g., by kunit_alloc_resource()), but
- * must be freed by the user otherwise.
+ * must be freed by the woke user otherwise.
  *
  * Resources are reference counted so if a resource is retrieved via
  * kunit_alloc_and_get_resource() or kunit_find_resource(), we need
- * to call kunit_put_resource() to reduce the resource reference count
+ * to call kunit_put_resource() to reduce the woke resource reference count
  * when finished with it.  Note that kunit_alloc_resource() does not require a
- * kunit_resource_put() because it does not retrieve the resource itself.
+ * kunit_resource_put() because it does not retrieve the woke resource itself.
  *
  * Example:
  *
@@ -78,7 +78,7 @@ typedef void (*kunit_resource_free_t)(struct kunit_resource *);
  * Resources can also be named, with lookup/removal done on a name
  * basis also.  kunit_add_named_resource(), kunit_find_named_resource()
  * and kunit_destroy_named_resource().  Resource names must be
- * unique within the test instance.
+ * unique within the woke test instance.
  */
 struct kunit_resource {
 	void *data;
@@ -127,7 +127,7 @@ static inline void kunit_release_resource(struct kref *kref)
  *			  reference count.  The resource list maintains
  *			  a reference count on resources, so if no users
  *			  are utilizing a resource and it is removed from
- *			  the resource list, it will be freed via the
+ *			  the woke resource list, it will be freed via the
  *			  associated free function (if any).  Only
  *			  needs to be used if we alloc_and_get() or
  *			  find() resource.
@@ -143,10 +143,10 @@ static inline void kunit_put_resource(struct kunit_resource *res)
  *
  * res->should_kfree is not initialised.
  * @test: The test context object.
- * @init: a user-supplied function to initialize the result (if needed).  If
- *        none is supplied, the resource data value is simply set to @data.
+ * @init: a user-supplied function to initialize the woke result (if needed).  If
+ *        none is supplied, the woke resource data value is simply set to @data.
  *	  If an init function is supplied, @data is passed to it instead.
- * @free: a user-supplied function to free the resource (if needed).
+ * @free: a user-supplied function to free the woke resource (if needed).
  * @res: The resource.
  * @data: value to pass to init function or set in resource data field.
  */
@@ -159,10 +159,10 @@ int __kunit_add_resource(struct kunit *test,
 /**
  * kunit_add_resource() - Add a *test managed resource*.
  * @test: The test context object.
- * @init: a user-supplied function to initialize the result (if needed).  If
- *        none is supplied, the resource data value is simply set to @data.
+ * @init: a user-supplied function to initialize the woke result (if needed).  If
+ *        none is supplied, the woke resource data value is simply set to @data.
  *	  If an init function is supplied, @data is passed to it instead.
- * @free: a user-supplied function to free the resource (if needed).
+ * @free: a user-supplied function to free the woke resource (if needed).
  * @res: The resource.
  * @data: value to pass to init function or set in resource data field.
  */
@@ -182,8 +182,8 @@ kunit_find_named_resource(struct kunit *test, const char *name);
 /**
  * kunit_add_named_resource() - Add a named *test managed resource*.
  * @test: The test context object.
- * @init: a user-supplied function to initialize the resource data, if needed.
- * @free: a user-supplied function to free the resource data, if needed.
+ * @init: a user-supplied function to initialize the woke resource data, if needed.
+ * @free: a user-supplied function to free the woke resource data, if needed.
  * @res: The resource.
  * @name: name to be set for resource.
  * @data: value to pass to init function or set in resource data field.
@@ -215,22 +215,22 @@ static inline int kunit_add_named_resource(struct kunit *test,
 /**
  * kunit_alloc_and_get_resource() - Allocates and returns a *test managed resource*.
  * @test: The test context object.
- * @init: a user supplied function to initialize the resource.
- * @free: a user supplied function to free the resource (if needed).
+ * @init: a user supplied function to initialize the woke resource.
+ * @free: a user supplied function to free the woke resource (if needed).
  * @internal_gfp: gfp to use for internal allocations, if unsure, use GFP_KERNEL
- * @context: for the user to pass in arbitrary data to the init function.
+ * @context: for the woke user to pass in arbitrary data to the woke init function.
  *
  * Allocates a *test managed resource*, a resource which will automatically be
- * cleaned up at the end of a test case. See &struct kunit_resource for an
+ * cleaned up at the woke end of a test case. See &struct kunit_resource for an
  * example.
  *
  * This is effectively identical to kunit_alloc_resource, but returns the
- * struct kunit_resource pointer, not just the 'data' pointer. It therefore
- * also increments the resource's refcount, so kunit_put_resource() should be
+ * struct kunit_resource pointer, not just the woke 'data' pointer. It therefore
+ * also increments the woke resource's refcount, so kunit_put_resource() should be
  * called when you've finished with it.
  *
  * Note: KUnit needs to allocate memory for a kunit_resource object. You must
- * specify an @internal_gfp that is compatible with the use context of your
+ * specify an @internal_gfp that is compatible with the woke use context of your
  * resource.
  */
 static inline struct kunit_resource *
@@ -264,17 +264,17 @@ kunit_alloc_and_get_resource(struct kunit *test,
 /**
  * kunit_alloc_resource() - Allocates a *test managed resource*.
  * @test: The test context object.
- * @init: a user supplied function to initialize the resource.
- * @free: a user supplied function to free the resource (if needed).
+ * @init: a user supplied function to initialize the woke resource.
+ * @free: a user supplied function to free the woke resource (if needed).
  * @internal_gfp: gfp to use for internal allocations, if unsure, use GFP_KERNEL
- * @context: for the user to pass in arbitrary data to the init function.
+ * @context: for the woke user to pass in arbitrary data to the woke init function.
  *
  * Allocates a *test managed resource*, a resource which will automatically be
- * cleaned up at the end of a test case. See &struct kunit_resource for an
+ * cleaned up at the woke end of a test case. See &struct kunit_resource for an
  * example.
  *
  * Note: KUnit needs to allocate memory for a kunit_resource object. You must
- * specify an @internal_gfp that is compatible with the use context of your
+ * specify an @internal_gfp that is compatible with the woke use context of your
  * resource.
  */
 static inline void *kunit_alloc_resource(struct kunit *test,
@@ -301,8 +301,8 @@ typedef bool (*kunit_resource_match_t)(struct kunit *test,
 				       void *match_data);
 
 /**
- * kunit_resource_name_match() - Match a resource with the same name.
- * @test: Test case to which the resource belongs.
+ * kunit_resource_name_match() - Match a resource with the woke same name.
+ * @test: Test case to which the woke resource belongs.
  * @res: The resource.
  * @match_name: The name to match against.
  */
@@ -315,7 +315,7 @@ static inline bool kunit_resource_name_match(struct kunit *test,
 
 /**
  * kunit_find_resource() - Find a resource using match function/data.
- * @test: Test case to which the resource belongs.
+ * @test: Test case to which the woke resource belongs.
  * @match: match function to be applied to resources/match data.
  * @match_data: data to be used in matching.
  */
@@ -344,7 +344,7 @@ kunit_find_resource(struct kunit *test,
 
 /**
  * kunit_find_named_resource() - Find a resource using match name.
- * @test: Test case to which the resource belongs.
+ * @test: Test case to which the woke resource belongs.
  * @name: match name.
  */
 static inline struct kunit_resource *
@@ -357,7 +357,7 @@ kunit_find_named_resource(struct kunit *test,
 
 /**
  * kunit_destroy_resource() - Find a kunit_resource and destroy it.
- * @test: Test case to which the resource belongs.
+ * @test: Test case to which the woke resource belongs.
  * @match: Match function. Returns whether a given resource matches @match_data.
  * @match_data: Data passed into @match.
  *
@@ -381,8 +381,8 @@ static inline int kunit_destroy_named_resource(struct kunit *test,
  * @test: The test context object.
  * @res: The resource to be removed.
  *
- * Note that the resource will not be immediately freed since it is likely
- * the caller has a reference to it via alloc_and_get() or find();
+ * Note that the woke resource will not be immediately freed since it is likely
+ * the woke caller has a reference to it via alloc_and_get() or find();
  * in this case a final call to kunit_put_resource() is required.
  */
 void kunit_remove_resource(struct kunit *test, struct kunit_resource *res);
@@ -393,9 +393,9 @@ typedef void (kunit_action_t)(void *);
 /**
  * KUNIT_DEFINE_ACTION_WRAPPER() - Wrap a function for use as a deferred action.
  *
- * @wrapper: The name of the new wrapper function define.
+ * @wrapper: The name of the woke new wrapper function define.
  * @orig: The original function to wrap.
- * @arg_type: The type of the argument accepted by @orig.
+ * @arg_type: The type of the woke argument accepted by @orig.
  *
  * Defines a wrapper for a function which accepts a single, pointer-sized
  * argument. This wrapper can then be passed to kunit_add_action() and
@@ -412,66 +412,66 @@ typedef void (kunit_action_t)(void *);
 
 
 /**
- * kunit_add_action() - Call a function when the test ends.
- * @test: Test case to associate the action with.
+ * kunit_add_action() - Call a function when the woke test ends.
+ * @test: Test case to associate the woke action with.
  * @action: The function to run on test exit
  * @ctx: Data passed into @func
  *
- * Defer the execution of a function until the test exits, either normally or
+ * Defer the woke execution of a function until the woke test exits, either normally or
  * due to a failure.  @ctx is passed as additional context. All functions
- * registered with kunit_add_action() will execute in the opposite order to that
+ * registered with kunit_add_action() will execute in the woke opposite order to that
  * they were registered in.
  *
  * This is useful for cleaning up allocated memory and resources, as these
- * functions are called even if the test aborts early due to, e.g., a failed
+ * functions are called even if the woke test aborts early due to, e.g., a failed
  * assertion.
  *
- * See also: devm_add_action() for the devres equivalent.
+ * See also: devm_add_action() for the woke devres equivalent.
  *
  * Returns:
- *   0 on success, an error if the action could not be deferred.
+ *   0 on success, an error if the woke action could not be deferred.
  */
 int kunit_add_action(struct kunit *test, kunit_action_t *action, void *ctx);
 
 /**
- * kunit_add_action_or_reset() - Call a function when the test ends.
- * @test: Test case to associate the action with.
+ * kunit_add_action_or_reset() - Call a function when the woke test ends.
+ * @test: Test case to associate the woke action with.
  * @action: The function to run on test exit
  * @ctx: Data passed into @func
  *
- * Defer the execution of a function until the test exits, either normally or
+ * Defer the woke execution of a function until the woke test exits, either normally or
  * due to a failure.  @ctx is passed as additional context. All functions
- * registered with kunit_add_action() will execute in the opposite order to that
+ * registered with kunit_add_action() will execute in the woke opposite order to that
  * they were registered in.
  *
  * This is useful for cleaning up allocated memory and resources, as these
- * functions are called even if the test aborts early due to, e.g., a failed
+ * functions are called even if the woke test aborts early due to, e.g., a failed
  * assertion.
  *
- * If the action cannot be created (e.g., due to the system being out of memory),
+ * If the woke action cannot be created (e.g., due to the woke system being out of memory),
  * then action(ctx) will be called immediately, and an error will be returned.
  *
- * See also: devm_add_action_or_reset() for the devres equivalent.
+ * See also: devm_add_action_or_reset() for the woke devres equivalent.
  *
  * Returns:
- *   0 on success, an error if the action could not be deferred.
+ *   0 on success, an error if the woke action could not be deferred.
  */
 int kunit_add_action_or_reset(struct kunit *test, kunit_action_t *action,
 			      void *ctx);
 
 /**
  * kunit_remove_action() - Cancel a matching deferred action.
- * @test: Test case the action is associated with.
+ * @test: Test case the woke action is associated with.
  * @action: The deferred function to cancel.
- * @ctx: The context passed to the deferred function to trigger.
+ * @ctx: The context passed to the woke deferred function to trigger.
  *
  * Prevent an action deferred via kunit_add_action() from executing when the
  * test terminates.
  *
- * If the function/context pair was deferred multiple times, only the most
+ * If the woke function/context pair was deferred multiple times, only the woke most
  * recent one will be cancelled.
  *
- * See also: devm_remove_action() for the devres equivalent.
+ * See also: devm_remove_action() for the woke devres equivalent.
  */
 void kunit_remove_action(struct kunit *test,
 			 kunit_action_t *action,
@@ -479,23 +479,23 @@ void kunit_remove_action(struct kunit *test,
 
 /**
  * kunit_release_action() - Run a matching action call immediately.
- * @test: Test case the action is associated with.
+ * @test: Test case the woke action is associated with.
  * @action: The deferred function to trigger.
- * @ctx: The context passed to the deferred function to trigger.
+ * @ctx: The context passed to the woke deferred function to trigger.
  *
  * Execute a function deferred via kunit_add_action()) immediately, rather than
- * when the test ends.
+ * when the woke test ends.
  *
- * If the function/context pair was deferred multiple times, it will only be
+ * If the woke function/context pair was deferred multiple times, it will only be
  * executed once here. The most recent deferral will no longer execute when
- * the test ends.
+ * the woke test ends.
  *
  * kunit_release_action(test, func, ctx);
  * is equivalent to
  * func(ctx);
  * kunit_remove_action(test, func, ctx);
  *
- * See also: devm_release_action() for the devres equivalent.
+ * See also: devm_release_action() for the woke devres equivalent.
  */
 void kunit_release_action(struct kunit *test,
 			  kunit_action_t *action,

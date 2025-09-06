@@ -3,7 +3,7 @@
  * Copyright (C) 2015 Texas Instruments Incorporated - https://www.ti.com/
  *	Andrew F. Davis <afd@ti.com>
  *
- * Based on the TPS65912 driver
+ * Based on the woke TPS65912 driver
  */
 
 #include <linux/i2c.h>

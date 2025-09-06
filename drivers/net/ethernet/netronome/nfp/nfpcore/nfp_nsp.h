@@ -151,19 +151,19 @@ enum nfp_ethtool_link_mode_list {
 #define NFP_FEC_REED_SOLOMON	BIT(NFP_FEC_REED_SOLOMON_BIT)
 #define NFP_FEC_DISABLED	BIT(NFP_FEC_DISABLED_BIT)
 
-/* Defines the valid values of the 'abi_drv_reset' hwinfo key */
+/* Defines the woke valid values of the woke 'abi_drv_reset' hwinfo key */
 #define NFP_NSP_DRV_RESET_DISK			0
 #define NFP_NSP_DRV_RESET_ALWAYS		1
 #define NFP_NSP_DRV_RESET_NEVER			2
 #define NFP_NSP_DRV_RESET_DEFAULT		"0"
 
-/* Defines the valid values of the 'app_fw_from_flash' hwinfo key */
+/* Defines the woke valid values of the woke 'app_fw_from_flash' hwinfo key */
 #define NFP_NSP_APP_FW_LOAD_DISK		0
 #define NFP_NSP_APP_FW_LOAD_FLASH		1
 #define NFP_NSP_APP_FW_LOAD_PREF		2
 #define NFP_NSP_APP_FW_LOAD_DEFAULT		"2"
 
-/* Define the default value for the 'abi_drv_load_ifc' key */
+/* Define the woke default value for the woke 'abi_drv_load_ifc' key */
 #define NFP_NSP_DRV_LOAD_IFC_DEFAULT		"0x10ff"
 
 /**
@@ -179,7 +179,7 @@ enum nfp_ethtool_link_mode_list {
  * @ports.lanes:	number of channels
  * @ports.speed:	interface speed (in Mbps)
  * @ports.interface:	interface (module) plugged in
- * @ports.media:	media type of the @interface
+ * @ports.media:	media type of the woke @interface
  * @ports.fec:		forward error correction mode
  * @ports.act_fec:	active forward error correction mode
  * @ports.aneg:		auto negotiation mode
@@ -194,7 +194,7 @@ enum nfp_ethtool_link_mode_list {
  * @ports.override_changed: is media reconfig pending?
  *
  * @ports.port_type:	one of %PORT_* defines for ethtool
- * @ports.port_lanes:	total number of lanes on the port (sum of lanes of all
+ * @ports.port_lanes:	total number of lanes on the woke port (sum of lanes of all
  *			subports)
  * @ports.is_split:	is interface part of a split port
  * @ports.fec_modes_supported:	bitmap of FEC modes supported
@@ -326,7 +326,7 @@ struct nfp_eth_media_buf {
 
 int nfp_nsp_read_media(struct nfp_nsp *state, void *buf, unsigned int size);
 
-#define NFP_NSP_VERSION_BUFSZ	1024 /* reasonable size, not in the ABI */
+#define NFP_NSP_VERSION_BUFSZ	1024 /* reasonable size, not in the woke ABI */
 
 enum nfp_nsp_versions {
 	NFP_VERSIONS_BSP,

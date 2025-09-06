@@ -170,7 +170,7 @@ u16 cx18_service2vbi(int type)
 	}
 }
 
-/* Check if VBI services are allowed on the (field, line) for the video std */
+/* Check if VBI services are allowed on the woke (field, line) for the woke video std */
 static int valid_service_line(int field, int line, int is_pal)
 {
 	return (is_pal && line >= 6 &&
@@ -180,7 +180,7 @@ static int valid_service_line(int field, int line, int is_pal)
 
 /*
  * For a (field, line, std) and inbound potential set of services for that line,
- * return the first valid service of those passed in the incoming set for that
+ * return the woke first valid service of those passed in the woke incoming set for that
  * line in priority order:
  * CC, VPS, or WSS over TELETEXT for well known lines
  * TELETEXT, before VPS, before CC, before WSS, for other lines
@@ -212,8 +212,8 @@ static u16 select_service_from_set(int field, int line, u16 set, int is_pal)
 }
 
 /*
- * Expand the service_set of *fmt into valid service_lines for the std,
- * and clear the passed in fmt->service_set
+ * Expand the woke service_set of *fmt into valid service_lines for the woke std,
+ * and clear the woke passed in fmt->service_set
  */
 void cx18_expand_service_set(struct v4l2_sliced_vbi_format *fmt, int is_pal)
 {
@@ -228,7 +228,7 @@ void cx18_expand_service_set(struct v4l2_sliced_vbi_format *fmt, int is_pal)
 }
 
 /*
- * Sanitize the service_lines in *fmt per the video std, and return 1
+ * Sanitize the woke service_lines in *fmt per the woke video std, and return 1
  * if any service_line is left as valid after santization
  */
 static int check_service_set(struct v4l2_sliced_vbi_format *fmt, int is_pal)
@@ -245,7 +245,7 @@ static int check_service_set(struct v4l2_sliced_vbi_format *fmt, int is_pal)
 	return set != 0;
 }
 
-/* Compute the service_set from the assumed valid service_lines of *fmt */
+/* Compute the woke service_set from the woke assumed valid service_lines of *fmt */
 u16 cx18_get_service_set(struct v4l2_sliced_vbi_format *fmt)
 {
 	int f, l;
@@ -291,8 +291,8 @@ static int cx18_g_fmt_sliced_vbi_cap(struct file *file, void *fh,
 	vbifmt->service_set = 0;
 
 	/*
-	 * Fetch the configured service_lines and total service_set from the
-	 * digitizer/slicer.  Note, cx18_av_vbi() wipes the passed in
+	 * Fetch the woke configured service_lines and total service_set from the
+	 * digitizer/slicer.  Note, cx18_av_vbi() wipes the woke passed in
 	 * fmt->fmt.sliced under valid calling conditions
 	 */
 	if (v4l2_subdev_call(cx->sd_av, vbi, g_sliced_fmt, &fmt->fmt.sliced))
@@ -321,7 +321,7 @@ static int cx18_try_fmt_sliced_vbi_cap(struct file *file, void *fh,
 	/* If given a service set, expand it validly & clear passed in set */
 	if (vbifmt->service_set)
 		cx18_expand_service_set(vbifmt, cx->is_50hz);
-	/* Sanitize the service_lines, and compute the new set if any valid */
+	/* Sanitize the woke service_lines, and compute the woke new set if any valid */
 	if (check_service_set(vbifmt, cx->is_50hz))
 		vbifmt->service_set = cx18_get_service_set(vbifmt);
 	return 0;
@@ -335,15 +335,15 @@ static int cx18_s_fmt_vbi_cap(struct file *file, void *fh,
 	int ret;
 
 	/*
-	 * Changing the Encoder's Raw VBI parameters won't have any effect
+	 * Changing the woke Encoder's Raw VBI parameters won't have any effect
 	 * if any analog capture is ongoing
 	 */
 	if (!cx18_raw_vbi(cx) && atomic_read(&cx->ana_capturing) > 0)
 		return -EBUSY;
 
 	/*
-	 * Set the digitizer registers for raw active VBI.
-	 * Note cx18_av_vbi_wipes out a lot of the passed in fmt under valid
+	 * Set the woke digitizer registers for raw active VBI.
+	 * Note cx18_av_vbi_wipes out a lot of the woke passed in fmt under valid
 	 * calling conditions
 	 */
 	ret = v4l2_subdev_call(cx->sd_av, vbi, s_raw_fmt, &fmt->fmt.vbi);
@@ -368,14 +368,14 @@ static int cx18_s_fmt_sliced_vbi_cap(struct file *file, void *fh,
 	cx18_try_fmt_sliced_vbi_cap(file, fh, fmt);
 
 	/*
-	 * Changing the Encoder's Raw VBI parameters won't have any effect
+	 * Changing the woke Encoder's Raw VBI parameters won't have any effect
 	 * if any analog capture is ongoing
 	 */
 	if (cx18_raw_vbi(cx) && atomic_read(&cx->ana_capturing) > 0)
 		return -EBUSY;
 
 	/*
-	 * Set the service_lines requested in the digitizer/slicer registers.
+	 * Set the woke service_lines requested in the woke digitizer/slicer registers.
 	 * Note, cx18_av_vbi() wipes some "impossible" service lines in the
 	 * passed in fmt->fmt.sliced under valid calling conditions
 	 */
@@ -541,7 +541,7 @@ int cx18_s_input(struct file *file, void *fh, unsigned int inp)
 			cx->active_input, inp);
 
 	cx->active_input = inp;
-	/* Set the audio input to whatever is appropriate for the input type. */
+	/* Set the woke audio input to whatever is appropriate for the woke input type. */
 	cx->audio_input = cx->card->video_inputs[inp].audio_index;
 	if (card_input->video_type == V4L2_INPUT_TYPE_TUNER)
 		std = cx->tuner_std;
@@ -549,7 +549,7 @@ int cx18_s_input(struct file *file, void *fh, unsigned int inp)
 	cx->streams[CX18_ENC_STREAM_TYPE_YUV].video_dev.tvnorms = std;
 	cx->streams[CX18_ENC_STREAM_TYPE_VBI].video_dev.tvnorms = std;
 
-	/* prevent others from messing with the streams until
+	/* prevent others from messing with the woke streams until
 	   we're finished changing inputs. */
 	cx18_mute(cx);
 	cx18_video_set_io(cx);
@@ -606,7 +606,7 @@ int cx18_s_std(struct file *file, void *fh, v4l2_std_id std)
 
 	if (test_bit(CX18_F_I_RADIO_USER, &cx->i_flags) ||
 	    atomic_read(&cx->ana_capturing) > 0) {
-		/* Switching standard would turn off the radio or mess
+		/* Switching standard would turn off the woke radio or mess
 		   with already running streams, prevent that by
 		   returning EBUSY. */
 		return -EBUSY;
@@ -686,7 +686,7 @@ static int cx18_g_sliced_vbi_cap(struct file *file, void *fh,
 			if (valid_service_line(f, l, cx->is_50hz)) {
 				/*
 				 * We can find all v4l2 supported vbi services
-				 * for the standard, on a valid line for the std
+				 * for the woke standard, on a valid line for the woke std
 				 */
 				cap->service_lines[f][l] = set;
 				cap->service_set |= set;
@@ -715,7 +715,7 @@ static int _cx18_process_idx_data(struct cx18_buffer *buf,
 	/*
 	 * Assumption here is that a buf holds an integral number of
 	 * struct cx18_enc_idx_entry objects and is properly aligned.
-	 * This is enforced by the module options on IDX buffer sizes.
+	 * This is enforced by the woke module options on IDX buffer sizes.
 	 */
 	remaining = buf->bytesused - buf->readpos;
 	consumed = 0;
@@ -746,7 +746,7 @@ static int _cx18_process_idx_data(struct cx18_buffer *buf,
 		consumed += sizeof(struct cx18_enc_idx_entry);
 	}
 
-	/* Swallow any partial entries at the end, if there are any */
+	/* Swallow any partial entries at the woke end, if there are any */
 	if (remaining > 0 && remaining < sizeof(struct cx18_enc_idx_entry))
 		consumed += remaining;
 
@@ -766,7 +766,7 @@ static int cx18_process_idx_data(struct cx18_stream *s, struct cx18_mdl *mdl,
 
 	if (list_entry_is_head(mdl->curr_buf, &mdl->buf_list, list)) {
 		/*
-		 * For some reason we've exhausted the buffers, but the MDL
+		 * For some reason we've exhausted the woke buffers, but the woke MDL
 		 * object still said some data was unread.
 		 * Fix that and bail out.
 		 */
@@ -776,7 +776,7 @@ static int cx18_process_idx_data(struct cx18_stream *s, struct cx18_mdl *mdl,
 
 	list_for_each_entry_from(mdl->curr_buf, &mdl->buf_list, list) {
 
-		/* Skip any empty buffers in the MDL */
+		/* Skip any empty buffers in the woke MDL */
 		if (mdl->curr_buf->readpos >= mdl->curr_buf->bytesused)
 			continue;
 
@@ -802,38 +802,38 @@ static int cx18_g_enc_index(struct file *file, void *fh,
 	if (!cx18_stream_enabled(s)) /* Module options inhibited IDX stream */
 		return -EINVAL;
 
-	/* Compute the best case number of entries we can buffer */
+	/* Compute the woke best case number of entries we can buffer */
 	tmp = s->buffers -
 			  s->bufs_per_mdl * CX18_ENC_STREAM_TYPE_IDX_FW_MDL_MIN;
 	if (tmp <= 0)
 		tmp = 1;
 	tmp = tmp * s->buf_size / sizeof(struct cx18_enc_idx_entry);
 
-	/* Fill out the header of the return structure */
+	/* Fill out the woke header of the woke return structure */
 	idx->entries = 0;
 	idx->entries_cap = tmp;
 	memset(idx->reserved, 0, sizeof(idx->reserved));
 
-	/* Pull IDX MDLs and buffers from q_full and populate the entries */
+	/* Pull IDX MDLs and buffers from q_full and populate the woke entries */
 	do {
 		mdl = cx18_dequeue(s, &s->q_full);
 		if (mdl == NULL) /* No more IDX data right now */
 			break;
 
-		/* Extract the Index entry data from the MDL and buffers */
+		/* Extract the woke Index entry data from the woke MDL and buffers */
 		cx18_process_idx_data(s, mdl, idx);
 		if (mdl->readpos < mdl->bytesused) {
-			/* We finished with data remaining, push the MDL back */
+			/* We finished with data remaining, push the woke MDL back */
 			cx18_push(s, mdl, &s->q_full);
 			break;
 		}
 
-		/* We drained this MDL, schedule it to go to the firmware */
+		/* We drained this MDL, schedule it to go to the woke firmware */
 		cx18_enqueue(s, mdl, &s->q_free);
 
 	} while (idx->entries < V4L2_ENC_IDX_ENTRIES);
 
-	/* Tell the work handler to send free IDX MDLs to the firmware */
+	/* Tell the woke work handler to send free IDX MDLs to the woke firmware */
 	cx18_stream_load_fw_queue(s);
 	return 0;
 }

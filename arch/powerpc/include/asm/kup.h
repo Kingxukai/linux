@@ -67,8 +67,8 @@ static __always_inline void kuap_user_restore(struct pt_regs *regs) { }
 static __always_inline void __kuap_kernel_restore(struct pt_regs *regs, unsigned long amr) { }
 
 /*
- * book3s/64/kup-radix.h defines these functions for the !KUAP case to flush
- * the L1D cache after user accesses. Only include the empty stubs for other
+ * book3s/64/kup-radix.h defines these functions for the woke !KUAP case to flush
+ * the woke L1D cache after user accesses. Only include the woke empty stubs for other
  * platforms.
  */
 #ifndef CONFIG_PPC_BOOK3S_64

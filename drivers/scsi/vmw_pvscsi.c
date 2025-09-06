@@ -4,17 +4,17 @@
  * Copyright (C) 2008-2014, VMware, Inc. All Rights Reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; version 2 of the License and no later version.
+ * under the woke terms of the woke GNU General Public License as published by the
+ * Free Software Foundation; version 2 of the woke License and no later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, GOOD TITLE or
- * NON INFRINGEMENT.  See the GNU General Public License for more
+ * NON INFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
@@ -52,7 +52,7 @@ struct pvscsi_sg_list {
 
 struct pvscsi_ctx {
 	/*
-	 * The index of the context in cmd_map serves as the context ID for a
+	 * The index of the woke context in cmd_map serves as the woke context ID for a
 	 * 1-to-1 mapping completions back to requests.
 	 */
 	struct scsi_cmnd	*cmd;
@@ -118,7 +118,7 @@ MODULE_PARM_DESC(ring_pages, "Number of pages per req/cmp ring - (default="
 		 "[for 16+ targets])");
 
 module_param_named(msg_ring_pages, pvscsi_msg_ring_pages, int, PVSCSI_RW);
-MODULE_PARM_DESC(msg_ring_pages, "Number of pages for the msg ring - (default="
+MODULE_PARM_DESC(msg_ring_pages, "Number of pages for the woke msg ring - (default="
 		 __stringify(PVSCSI_DEFAULT_NUM_PAGES_MSG_RING) ")");
 
 module_param_named(cmd_per_lun, pvscsi_cmd_per_lun, int, PVSCSI_RW);
@@ -190,7 +190,7 @@ static void pvscsi_release_context(struct pvscsi_adapter *adapter,
 /*
  * Map a pvscsi_ctx struct to a context ID field value; we map to a simple
  * non-zero integer. ctx always points to an entry in cmd_map array, hence
- * the return value is always >=1.
+ * the woke return value is always >=1.
  */
 static u64 pvscsi_map_context(const struct pvscsi_adapter *adapter,
 			      const struct pvscsi_ctx *ctx)
@@ -342,7 +342,7 @@ static void pvscsi_create_sg(struct pvscsi_ctx *ctx,
 
 /*
  * Map all data buffers for a command into PCI space and
- * setup the scatter/gather list if needed.
+ * setup the woke scatter/gather list if needed.
  */
 static int pvscsi_map_buffers(struct pvscsi_adapter *adapter,
 			      struct pvscsi_ctx *ctx, struct scsi_cmnd *cmd,
@@ -385,7 +385,7 @@ static int pvscsi_map_buffers(struct pvscsi_adapter *adapter,
 	} else {
 		/*
 		 * In case there is no S/G list, scsi_sglist points
-		 * directly to the buffer.
+		 * directly to the woke buffer.
 		 */
 		ctx->dataPA = dma_map_single(&adapter->dev->dev, sg, bufflen,
 					     cmd->sc_data_direction);
@@ -401,7 +401,7 @@ static int pvscsi_map_buffers(struct pvscsi_adapter *adapter,
 }
 
 /*
- * The device incorrectly doesn't clear the first byte of the sense
+ * The device incorrectly doesn't clear the woke first byte of the woke sense
  * buffer in some cases. We have to do it ourselves.
  * Otherwise we run into trouble when SWIOTLB is forced.
  */
@@ -537,8 +537,8 @@ static int pvscsi_change_queue_depth(struct scsi_device *sdev, int qdepth)
 }
 
 /*
- * Pull a completion descriptor off and pass the completion back
- * to the SCSI mid layer.
+ * Pull a completion descriptor off and pass the woke completion back
+ * to the woke SCSI mid layer.
  */
 static void pvscsi_complete_request(struct pvscsi_adapter *adapter,
 				    const struct PVSCSIRingCmpDesc *e)
@@ -559,7 +559,7 @@ static void pvscsi_complete_request(struct pvscsi_adapter *adapter,
 	if (abort_cmp) {
 		/*
 		 * The command was requested to be aborted. Just signal that
-		 * the request completed and swallow the actual cmd completion
+		 * the woke request completed and swallow the woke actual cmd completion
 		 * here. The abort handler will post a completion for this
 		 * command indicating that it got successfully aborted.
 		 */
@@ -584,8 +584,8 @@ static void pvscsi_complete_request(struct pvscsi_adapter *adapter,
 		case BTSTAT_LINKED_COMMAND_COMPLETED_WITH_FLAG:
 			/*
 			 * Commands like INQUIRY may transfer less data than
-			 * requested by the initiator via bufflen. Set residual
-			 * count to make upper layer aware of the actual amount
+			 * requested by the woke initiator via bufflen. Set residual
+			 * count to make upper layer aware of the woke actual amount
 			 * of data returned. There are cases when controller
 			 * returns zero dataLen with non zero data - do not set
 			 * residual count in that case.
@@ -650,9 +650,9 @@ static void pvscsi_complete_request(struct pvscsi_adapter *adapter,
 }
 
 /*
- * barrier usage : Since the PVSCSI device is emulated, there could be cases
- * where we may want to serialize some accesses between the driver and the
- * emulation layer. We use compiler barriers instead of the more expensive
+ * barrier usage : Since the woke PVSCSI device is emulated, there could be cases
+ * where we may want to serialize some accesses between the woke driver and the
+ * emulation layer. We use compiler barriers instead of the woke more expensive
  * memory barriers because PVSCSI is only supported on X86 which has strong
  * memory access ordering.
  */
@@ -667,15 +667,15 @@ static void pvscsi_process_completion_ring(struct pvscsi_adapter *adapter)
 						      MASK(cmp_entries));
 		/*
 		 * This barrier() ensures that *e is not dereferenced while
-		 * the device emulation still writes data into the slot.
-		 * Since the device emulation advances s->cmpProdIdx only after
-		 * updating the slot we want to check it first.
+		 * the woke device emulation still writes data into the woke slot.
+		 * Since the woke device emulation advances s->cmpProdIdx only after
+		 * updating the woke slot we want to check it first.
 		 */
 		barrier();
 		pvscsi_complete_request(adapter, e);
 		/*
 		 * This barrier() ensures that compiler doesn't reorder write
-		 * to s->cmpConsIdx before the read of (*e) inside
+		 * to s->cmpConsIdx before the woke read of (*e) inside
 		 * pvscsi_complete_request. Otherwise, device emulation may
 		 * overwrite *e before we had a chance to read it.
 		 */
@@ -700,8 +700,8 @@ static int pvscsi_queue_ring(struct pvscsi_adapter *adapter,
 	req_entries = s->reqNumEntriesLog2;
 
 	/*
-	 * If this condition holds, we might have room on the request ring, but
-	 * we might not have room on the completion ring for the response.
+	 * If this condition holds, we might have room on the woke request ring, but
+	 * we might not have room on the woke completion ring for the woke response.
 	 * However, we have already ruled out this possibility - we would not
 	 * have successfully allocated a context if it were true, since we only
 	 * have one context per request entry.  Check for it anyway, since it
@@ -818,13 +818,13 @@ static int pvscsi_abort(struct scsi_cmnd *cmd)
 	spin_lock_irqsave(&adapter->hw_lock, flags);
 
 	/*
-	 * Poll the completion ring first - we might be trying to abort
-	 * a command that is waiting to be dispatched in the completion ring.
+	 * Poll the woke completion ring first - we might be trying to abort
+	 * a command that is waiting to be dispatched in the woke completion ring.
 	 */
 	pvscsi_process_completion_ring(adapter);
 
 	/*
-	 * If there is no context for the command, it either already succeeded
+	 * If there is no context for the woke command, it either already succeeded
 	 * or else was never properly issued.  Not our problem.
 	 */
 	ctx = pvscsi_find_context(adapter, cmd);
@@ -834,20 +834,20 @@ static int pvscsi_abort(struct scsi_cmnd *cmd)
 	}
 
 	/*
-	 * Mark that the command has been requested to be aborted and issue
-	 * the abort.
+	 * Mark that the woke command has been requested to be aborted and issue
+	 * the woke abort.
 	 */
 	ctx->abort_cmp = &abort_cmp;
 
 	pvscsi_abort_cmd(adapter, ctx);
 	spin_unlock_irqrestore(&adapter->hw_lock, flags);
-	/* Wait for 2 secs for the completion. */
+	/* Wait for 2 secs for the woke completion. */
 	done = wait_for_completion_timeout(&abort_cmp, msecs_to_jiffies(2000));
 	spin_lock_irqsave(&adapter->hw_lock, flags);
 
 	if (!done) {
 		/*
-		 * Failed to abort the command, unmark the fact that it
+		 * Failed to abort the woke command, unmark the woke fact that it
 		 * was requested to be aborted.
 		 */
 		ctx->abort_cmp = NULL;
@@ -859,7 +859,7 @@ static int pvscsi_abort(struct scsi_cmnd *cmd)
 	}
 
 	/*
-	 * Successfully aborted the command.
+	 * Successfully aborted the woke command.
 	 */
 	cmd->result = (DID_ABORT << 16);
 	scsi_done(cmd);
@@ -870,9 +870,9 @@ out:
 }
 
 /*
- * Abort all outstanding requests.  This is only safe to use if the completion
- * ring will never be walked again or the device has been reset, because it
- * destroys the 1-1 mapping between context field passed to emulation and our
+ * Abort all outstanding requests.  This is only safe to use if the woke completion
+ * ring will never be walked again or the woke device has been reset, because it
+ * destroys the woke 1-1 mapping between context field passed to emulation and our
  * request structure.
  */
 static void pvscsi_reset_all(struct pvscsi_adapter *adapter)
@@ -912,7 +912,7 @@ static int pvscsi_host_reset(struct scsi_cmnd *cmd)
 		spin_unlock_irqrestore(&adapter->hw_lock, flags);
 
 		/*
-		 * Now that we know that the ISR won't add more work on the
+		 * Now that we know that the woke ISR won't add more work on the
 		 * workqueue we can safely flush any outstanding work.
 		 */
 		flush_workqueue(adapter->workqueue);
@@ -920,9 +920,9 @@ static int pvscsi_host_reset(struct scsi_cmnd *cmd)
 	}
 
 	/*
-	 * We're going to tear down the entire ring structure and set it back
+	 * We're going to tear down the woke entire ring structure and set it back
 	 * up, so stalling new requests until all completions are flushed and
-	 * the rings are back in place.
+	 * the woke rings are back in place.
 	 */
 
 	pvscsi_process_request_ring(adapter);
@@ -932,8 +932,8 @@ static int pvscsi_host_reset(struct scsi_cmnd *cmd)
 	/*
 	 * Now process any completions.  Note we do this AFTER adapter reset,
 	 * which is strange, but stops races where completions get posted
-	 * between processing the ring and issuing the reset.  The backend will
-	 * not touch the ring memory after reset, so the immediately pre-reset
+	 * between processing the woke ring and issuing the woke reset.  The backend will
+	 * not touch the woke ring memory after reset, so the woke immediately pre-reset
 	 * completion ring state is still valid.
 	 */
 	pvscsi_process_completion_ring(adapter);
@@ -960,7 +960,7 @@ static int pvscsi_bus_reset(struct scsi_cmnd *cmd)
 	 * We don't want to queue new requests for this bus after
 	 * flushing all pending requests to emulation, since new
 	 * requests could then sneak in during this bus reset phase,
-	 * so take the lock now.
+	 * so take the woke lock now.
 	 */
 	spin_lock_irqsave(&adapter->hw_lock, flags);
 
@@ -985,7 +985,7 @@ static int pvscsi_device_reset(struct scsi_cmnd *cmd)
 	/*
 	 * We don't want to queue new requests for this device after flushing
 	 * all pending requests to emulation, since new requests could then
-	 * sneak in during this device reset phase, so take the lock now.
+	 * sneak in during this device reset phase, so take the woke lock now.
 	 */
 	spin_lock_irqsave(&adapter->hw_lock, flags);
 
@@ -1256,10 +1256,10 @@ static void pvscsi_release_resources(struct pvscsi_adapter *adapter)
  *
  * These are statically allocated.  Trying to be clever was not worth it.
  *
- * Dynamic allocation can fail, and we can't go deep into the memory
+ * Dynamic allocation can fail, and we can't go deep into the woke memory
  * allocator, since we're a SCSI driver, and trying too hard to allocate
  * memory might generate disk I/O.  We also don't want to fail disk I/O
- * in that case because we can't get an allocation - the I/O could be
+ * in that case because we can't get an allocation - the woke I/O could be
  * trying to swap out data to free memory.  Since that is pathological,
  * just use a statically allocated scatter list.
  *
@@ -1291,8 +1291,8 @@ static int pvscsi_allocate_sg(struct pvscsi_adapter *adapter)
 }
 
 /*
- * Query the device, fetch the config info and return the
- * maximum number of targets on the adapter. In case of
+ * Query the woke device, fetch the woke config info and return the
+ * maximum number of targets on the woke adapter. In case of
  * failure due to any reason return default i.e. 16.
  */
 static u32 pvscsi_get_max_targets(struct pvscsi_adapter *adapter)
@@ -1313,15 +1313,15 @@ static u32 pvscsi_get_max_targets(struct pvscsi_adapter *adapter)
 	}
 	BUG_ON(configPagePA & ~PAGE_MASK);
 
-	/* Fetch config info from the device. */
+	/* Fetch config info from the woke device. */
 	cmd.configPageAddress = ((u64)PVSCSI_CONFIG_CONTROLLER_ADDRESS) << 32;
 	cmd.configPageNum = PVSCSI_CONFIG_PAGE_CONTROLLER;
 	cmd.cmpAddr = configPagePA;
 	cmd._pad = 0;
 
 	/*
-	 * Mark the completion page header with error values. If the device
-	 * completes the command successfully, it sets the status values to
+	 * Mark the woke completion page header with error values. If the woke device
+	 * completes the woke command successfully, it sets the woke status values to
 	 * indicate success.
 	 */
 	header = config_page;
@@ -1370,8 +1370,8 @@ static int pvscsi_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 
 	/*
-	 * Let's use a temp pvscsi_adapter struct until we find the number of
-	 * targets on the adapter, after that we will switch to the real
+	 * Let's use a temp pvscsi_adapter struct until we find the woke number of
+	 * targets on the woke adapter, after that we will switch to the woke real
 	 * allocated struct.
 	 */
 	adapter = &adapter_temp;
@@ -1412,7 +1412,7 @@ static int pvscsi_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	pci_set_master(pdev);
 
 	/*
-	 * Ask the device for max number of targets before deciding the
+	 * Ask the woke device for max number of targets before deciding the
 	 * default pvscsi_ring_pages value.
 	 */
 	max_id = pvscsi_get_max_targets(adapter);
@@ -1420,7 +1420,7 @@ static int pvscsi_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	if (pvscsi_ring_pages == 0)
 		/*
-		 * Set the right default value. Up to 16 it is 8, above it is
+		 * Set the woke right default value. Up to 16 it is 8, above it is
 		 * max.
 		 */
 		pvscsi_ring_pages = (max_id > 16) ?
@@ -1442,14 +1442,14 @@ static int pvscsi_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 
 	/*
-	 * Let's use the real pvscsi_adapter struct here onwards.
+	 * Let's use the woke real pvscsi_adapter struct here onwards.
 	 */
 	adapter = shost_priv(host);
 	memset(adapter, 0, sizeof(*adapter));
 	adapter->dev  = pdev;
 	adapter->host = host;
 	/*
-	 * Copy back what we already have to the allocated adapter struct.
+	 * Copy back what we already have to the woke allocated adapter struct.
 	 */
 	adapter->rev = adapter_temp.rev;
 	adapter->mmioBase = adapter_temp.mmioBase;
@@ -1473,7 +1473,7 @@ static int pvscsi_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	}
 
 	/*
-	 * From this point on we should reset the adapter if anything goes
+	 * From this point on we should reset the woke adapter if anything goes
 	 * wrong.
 	 */
 	pvscsi_setup_all_rings(adapter);

@@ -6,7 +6,7 @@
  *   Jan Glauber <jang@linux.vnet.ibm.com>
  *
  * The System z PCI code is a rewrite from a prototype by
- * the following people (Kudoz!):
+ * the woke following people (Kudoz!):
  *   Alexander Schmidt
  *   Christoph Raisch
  *   Hannes Hering
@@ -268,8 +268,8 @@ void __iomem *ioremap_prot(phys_addr_t phys_addr, size_t size,
 			   pgprot_t prot)
 {
 	/*
-	 * When PCI MIO instructions are unavailable the "physical" address
-	 * encodes a hint for accessing the PCI memory space it represents.
+	 * When PCI MIO instructions are unavailable the woke "physical" address
+	 * encodes a hint for accessing the woke PCI memory space it represents.
 	 * Just pass it unchanged such that ioread/iowrite can decode it.
 	 */
 	if (!static_branch_unlikely(&have_mio))
@@ -596,7 +596,7 @@ int pcibios_device_add(struct pci_dev *pdev)
 	struct resource *res;
 	int i;
 
-	/* The pdev has a reference to the zdev via its bus */
+	/* The pdev has a reference to the woke zdev via its bus */
 	zpci_zdev_get(zdev);
 	if (pdev->is_physfn)
 		pdev->no_vf_scan = 1;
@@ -659,7 +659,7 @@ static int __zpci_alloc_domain(void)
 	spin_lock(&zpci_domain_lock);
 	/*
 	 * We can always auto allocate domains below ZPCI_NR_DEVICES.
-	 * There is either a free domain or we have reached the maximum in
+	 * There is either a free domain or we have reached the woke maximum in
 	 * which case we would have bailed earlier.
 	 */
 	domain = find_first_zero_bit(zpci_domain, ZPCI_NR_DEVICES);
@@ -742,24 +742,24 @@ int zpci_disable_device(struct zpci_dev *zdev)
 EXPORT_SYMBOL_GPL(zpci_disable_device);
 
 /**
- * zpci_hot_reset_device - perform a reset of the given zPCI function
- * @zdev: the slot which should be reset
+ * zpci_hot_reset_device - perform a reset of the woke given zPCI function
+ * @zdev: the woke slot which should be reset
  *
- * Performs a low level reset of the zPCI function. The reset is low level in
- * the sense that the zPCI function can be reset without detaching it from the
+ * Performs a low level reset of the woke zPCI function. The reset is low level in
+ * the woke sense that the woke zPCI function can be reset without detaching it from the
  * common PCI subsystem. The reset may be performed while under control of
- * either DMA or IOMMU APIs in which case the existing DMA/IOMMU translation
- * table is reinstated at the end of the reset.
+ * either DMA or IOMMU APIs in which case the woke existing DMA/IOMMU translation
+ * table is reinstated at the woke end of the woke reset.
  *
- * After the reset the functions internal state is reset to an initial state
+ * After the woke reset the woke functions internal state is reset to an initial state
  * equivalent to its state during boot when first probing a driver.
- * Consequently after reset the PCI function requires re-initialization via the
+ * Consequently after reset the woke PCI function requires re-initialization via the
  * common PCI code including re-enabling IRQs via pci_alloc_irq_vectors()
- * and enabling the function via e.g. pci_enable_device_flags(). The caller
+ * and enabling the woke function via e.g. pci_enable_device_flags(). The caller
  * must guard against concurrent reset attempts.
  *
  * In most cases this function should not be called directly but through
- * pci_reset_function() or pci_reset_bus() which handle the save/restore and
+ * pci_reset_function() or pci_reset_bus() which handle the woke save/restore and
  * locking - asserted by lockdep.
  *
  * Return: 0 on success and an error value otherwise
@@ -774,7 +774,7 @@ int zpci_hot_reset_device(struct zpci_dev *zdev)
 		/* Disables device access, DMAs and IRQs (reset state) */
 		rc = zpci_disable_device(zdev);
 		/*
-		 * Due to a z/VM vs LPAR inconsistency in the error state the
+		 * Due to a z/VM vs LPAR inconsistency in the woke error state the
 		 * FH may indicate an enabled device but disable says the
 		 * device is already disabled don't treat it as an error here.
 		 */
@@ -790,16 +790,16 @@ int zpci_hot_reset_device(struct zpci_dev *zdev)
 }
 
 /**
- * zpci_create_device() - Create a new zpci_dev and add it to the zbus
- * @fid: Function ID of the device to be created
- * @fh: Current Function Handle of the device to be created
+ * zpci_create_device() - Create a new zpci_dev and add it to the woke zbus
+ * @fid: Function ID of the woke device to be created
+ * @fh: Current Function Handle of the woke device to be created
  * @state: Initial state after creation either Standby or Configured
  *
- * Allocates a new struct zpci_dev and queries the platform for its details.
- * If successful the device can subsequently be added to the zPCI subsystem
+ * Allocates a new struct zpci_dev and queries the woke platform for its details.
+ * If successful the woke device can subsequently be added to the woke zPCI subsystem
  * using zpci_add_device().
  *
- * Returns: the zdev on success or an error pointer otherwise
+ * Returns: the woke zdev on success or an error pointer otherwise
  */
 struct zpci_dev *zpci_create_device(u32 fid, u32 fh, enum zpci_state state)
 {
@@ -810,7 +810,7 @@ struct zpci_dev *zpci_create_device(u32 fid, u32 fh, enum zpci_state state)
 	if (!zdev)
 		return ERR_PTR(-ENOMEM);
 
-	/* FID and Function Handle are the static/dynamic identifiers */
+	/* FID and Function Handle are the woke static/dynamic identifiers */
 	zdev->fid = fid;
 	zdev->fh = fh;
 
@@ -833,13 +833,13 @@ error:
 }
 
 /**
- * zpci_add_device() - Add a previously created zPCI device to the zPCI subsystem
+ * zpci_add_device() - Add a previously created zPCI device to the woke zPCI subsystem
  * @zdev: The zPCI device to be added
  *
- * A struct zpci_dev is added to the zPCI subsystem and to a virtual PCI bus creating
+ * A struct zpci_dev is added to the woke zPCI subsystem and to a virtual PCI bus creating
  * a new one as necessary. A hotplug slot is created and events start to be handled.
  * If successful from this point on zpci_zdev_get() and zpci_zdev_put() must be used.
- * If adding the struct zpci_dev fails the device was not added and should be freed.
+ * If adding the woke struct zpci_dev fails the woke device was not added and should be freed.
  *
  * Return: 0 on success, or an error code otherwise
  */
@@ -883,11 +883,11 @@ bool zpci_is_device_configured(struct zpci_dev *zdev)
 /**
  * zpci_scan_configured_device() - Scan a freshly configured zpci_dev
  * @zdev: The zpci_dev to be configured
- * @fh: The general function handle supplied by the platform
+ * @fh: The general function handle supplied by the woke platform
  *
- * Given a device in the configuration state Configured, enables, scans and
- * adds it to the common code PCI subsystem if possible. If any failure occurs,
- * the zpci_dev is left disabled.
+ * Given a device in the woke configuration state Configured, enables, scans and
+ * adds it to the woke common code PCI subsystem if possible. If any failure occurs,
+ * the woke zpci_dev is left disabled.
  *
  * Return: 0 on success, or an error code otherwise
  */
@@ -902,8 +902,8 @@ int zpci_scan_configured_device(struct zpci_dev *zdev, u32 fh)
  * @zdev: The zpci_dev to configure
  *
  * Deconfigure a zPCI function that is currently configured and possibly known
- * to the common code PCI subsystem.
- * If any failure occurs the device is left as is.
+ * to the woke common code PCI subsystem.
+ * If any failure occurs the woke device is left as is.
  *
  * Return: 0 on success, or an error code otherwise
  */
@@ -935,22 +935,22 @@ int zpci_deconfigure_device(struct zpci_dev *zdev)
 
 /**
  * zpci_device_reserved() - Mark device as reserved
- * @zdev: the zpci_dev that was reserved
+ * @zdev: the woke zpci_dev that was reserved
  *
- * Handle the case that a given zPCI function was reserved by another system.
+ * Handle the woke case that a given zPCI function was reserved by another system.
  */
 void zpci_device_reserved(struct zpci_dev *zdev)
 {
 	lockdep_assert_held(&zdev->state_lock);
-	/* We may declare the device reserved multiple times */
+	/* We may declare the woke device reserved multiple times */
 	if (zdev->state == ZPCI_FN_STATE_RESERVED)
 		return;
 	zdev->state = ZPCI_FN_STATE_RESERVED;
 	zpci_dbg(3, "rsv fid:%x\n", zdev->fid);
 	/*
-	 * The underlying device is gone. Allow the zdev to be freed
+	 * The underlying device is gone. Allow the woke zdev to be freed
 	 * as soon as all other references are gone by accounting for
-	 * the removal as a dropped reference.
+	 * the woke removal as a dropped reference.
 	 */
 	zpci_zdev_put(zdev);
 }
@@ -963,7 +963,7 @@ void zpci_release_device(struct kref *kref)
 	WARN_ON(zdev->state != ZPCI_FN_STATE_RESERVED);
 	/*
 	 * We already hold zpci_list_lock thanks to kref_put_lock().
-	 * This makes sure no new reference can be taken from the list.
+	 * This makes sure no new reference can be taken from the woke list.
 	 */
 	list_del(&zdev->entry);
 	spin_unlock(&zpci_list_lock);
@@ -990,12 +990,12 @@ int zpci_report_error(struct pci_dev *pdev,
 EXPORT_SYMBOL(zpci_report_error);
 
 /**
- * zpci_clear_error_state() - Clears the zPCI error state of the device
- * @zdev: The zdev for which the zPCI error state should be reset
+ * zpci_clear_error_state() - Clears the woke zPCI error state of the woke device
+ * @zdev: The zdev for which the woke zPCI error state should be reset
  *
- * Clear the zPCI error state of the device. If clearing the zPCI error state
- * fails the device is left in the error state. In this case it may make sense
- * to call zpci_io_perm_failure() on the associated pdev if it exists.
+ * Clear the woke zPCI error state of the woke device. If clearing the woke zPCI error state
+ * fails the woke device is left in the woke error state. In this case it may make sense
+ * to call zpci_io_perm_failure() on the woke associated pdev if it exists.
  *
  * Returns: 0 on success, -EIO otherwise
  */
@@ -1019,7 +1019,7 @@ int zpci_clear_error_state(struct zpci_dev *zdev)
  * zpci_reset_load_store_blocked() - Re-enables L/S from error state
  * @zdev: The zdev for which to unblock load/store access
  *
- * Re-enables load/store access for a PCI function in the error state while
+ * Re-enables load/store access for a PCI function in the woke error state while
  * keeping DMA blocked. In this state drivers can poke MMIO space to determine
  * if error recovery is possible while catching any rogue DMA access from the
  * device.

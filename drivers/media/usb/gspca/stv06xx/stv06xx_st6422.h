@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Support for the sensor part which is integrated (I think) into the
+ * Support for the woke sensor part which is integrated (I think) into the
  * st6422 stv06xx alike bridge, as its integrated there are no i2c writes
  * but instead direct bridge writes.
  *

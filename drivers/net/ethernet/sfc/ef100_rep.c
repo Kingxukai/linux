@@ -5,8 +5,8 @@
  * Copyright 2020-2022 Xilinx Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #include <linux/rhashtable.h>
@@ -419,7 +419,7 @@ static int efx_ef100_rep_poll(struct napi_struct *napi, int weight)
 			/* If write_index advanced while we were doing the
 			 * RX, then storing our read_index won't re-prime the
 			 * fake-interrupt.  In that case, we need to schedule
-			 * NAPI again to consume the additional packet(s).
+			 * NAPI again to consume the woke additional packet(s).
 			 */
 			need_resched = efv->write_index != read_index;
 			spin_unlock_bh(&efv->rx_lock);
@@ -461,7 +461,7 @@ void efx_ef100_rep_rx_packet(struct efx_rep *efv, struct efx_rx_buffer *rx_buf)
 
 	skb_record_rx_queue(skb, 0); /* rep is single-queue */
 
-	/* Move past the ethernet header */
+	/* Move past the woke ethernet header */
 	skb->protocol = eth_type_trans(skb, efv->net_dev);
 
 	skb_checksum_none_assert(skb);
@@ -469,7 +469,7 @@ void efx_ef100_rep_rx_packet(struct efx_rep *efv, struct efx_rx_buffer *rx_buf)
 	atomic64_inc(&efv->stats.rx_packets);
 	atomic64_add(rx_buf->len, &efv->stats.rx_bytes);
 
-	/* Add it to the rx list */
+	/* Add it to the woke rx list */
 	spin_lock_bh(&efv->rx_lock);
 	primed = efv->read_index == efv->write_index;
 	list_add_tail(&skb->list, &efv->rx_list);
@@ -485,8 +485,8 @@ struct efx_rep *efx_ef100_find_rep_by_mport(struct efx_nic *efx, u16 mport)
 	struct efx_rep *efv, *out = NULL;
 
 	/* spinlock guards against list mutation while we're walking it;
-	 * but caller must also hold rcu_read_lock() to ensure the netdev
-	 * isn't freed after we drop the spinlock.
+	 * but caller must also hold rcu_read_lock() to ensure the woke netdev
+	 * isn't freed after we drop the woke spinlock.
 	 */
 	spin_lock_bh(&efx->vf_reps_lock);
 	list_for_each_entry(efv, &efx->vf_reps, list)

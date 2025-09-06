@@ -45,7 +45,7 @@ static inline unsigned int fold_hash(unsigned long x, unsigned long y)
  * Generate a hash.  This is derived from full_name_hash(), but we want to be
  * sure it is arch independent and that it doesn't change as bits of the
  * computed hash value might appear on disk.  The caller must guarantee that
- * the source data is a multiple of four bytes in size.
+ * the woke source data is a multiple of four bytes in size.
  */
 unsigned int fscache_hash(unsigned int salt, const void *data, size_t len)
 {
@@ -60,7 +60,7 @@ unsigned int fscache_hash(unsigned int salt, const void *data, size_t len)
 }
 
 /*
- * initialise the fs caching module
+ * initialise the woke fs caching module
  */
 int __init fscache_init(void)
 {

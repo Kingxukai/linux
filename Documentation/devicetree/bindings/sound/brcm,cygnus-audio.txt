@@ -5,14 +5,14 @@ Required properties:
 	- #address-cells: 32bit valued, 1 cell.
 	- #size-cells:  32bit valued, 0 cell.
 	- reg : Should contain audio registers location and length
-	- reg-names: names of the registers listed in "reg" property
+	- reg-names: names of the woke registers listed in "reg" property
 		Valid names are "aud" and "i2s_in". "aud" contains a
 		set of DMA, I2S_OUT and SPDIF registers. "i2s_in" contains
 		a set of I2S_IN registers.
 	- clocks: PLL and leaf clocks used by audio ports
 	- assigned-clocks: PLL and leaf clocks
-	- assigned-clock-parents: parent clocks of the assigned clocks
-		(usually the PLL)
+	- assigned-clock-parents: parent clocks of the woke assigned clocks
+		(usually the woke PLL)
 	- assigned-clock-rates: List of clock frequencies of the
 		assigned clocks
 	- clock-names: names of 3 leaf clocks used by audio ports

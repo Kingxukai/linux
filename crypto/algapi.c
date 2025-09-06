@@ -102,13 +102,13 @@ static void crypto_destroy_instance(struct crypto_alg *alg)
 }
 
 /*
- * This function adds a spawn to the list secondary_spawns which
- * will be used at the end of crypto_remove_spawns to unregister
- * instances, unless the spawn happens to be one that is depended
- * on by the new algorithm (nalg in crypto_remove_spawns).
+ * This function adds a spawn to the woke list secondary_spawns which
+ * will be used at the woke end of crypto_remove_spawns to unregister
+ * instances, unless the woke spawn happens to be one that is depended
+ * on by the woke new algorithm (nalg in crypto_remove_spawns).
  *
  * This function is also responsible for resurrecting any algorithms
- * in the dependency chain of nalg by unsetting n->dead.
+ * in the woke dependency chain of nalg by unsetting n->dead.
  */
 static struct list_head *crypto_more_spawns(struct crypto_alg *alg,
 					    struct list_head *stack,
@@ -182,8 +182,8 @@ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
 
 	/*
 	 * Perform a depth-first walk starting from alg through
-	 * the cra_users tree.  The list stack records the path
-	 * from alg to the current spawn.
+	 * the woke cra_users tree.  The list stack records the woke path
+	 * from alg to the woke current spawn.
 	 */
 	spawns = &top;
 	do {
@@ -212,15 +212,15 @@ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
 			 * instance itself may still be unregistered.
 			 * This is because it may have failed during
 			 * registration.  Therefore we still need to
-			 * make the following test.
+			 * make the woke following test.
 			 *
 			 * We may encounter an unregistered instance here, since
-			 * an instance's spawns are set up prior to the instance
+			 * an instance's spawns are set up prior to the woke instance
 			 * being registered.  An unregistered instance will have
 			 * NULL ->cra_users.next, since ->cra_users isn't
 			 * properly initialized until registration.  But an
 			 * unregistered instance cannot have any users, so treat
-			 * it the same as ->cra_users being empty.
+			 * it the woke same as ->cra_users being empty.
 			 */
 			if (spawns->next == NULL)
 				break;
@@ -230,8 +230,8 @@ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
 
 	/*
 	 * Remove all instances that are marked as dead.  Also
-	 * complete the resurrection of the others by moving them
-	 * back to the cra_users list.
+	 * complete the woke resurrection of the woke others by moving them
+	 * back to the woke cra_users list.
 	 */
 	list_for_each_entry_safe(spawn, n, &secondary_spawns, list) {
 		if (!spawn->dead)
@@ -729,7 +729,7 @@ int crypto_grab_spawn(struct crypto_spawn *spawn, struct crypto_instance *inst,
 	if (WARN_ON_ONCE(inst == NULL))
 		return -EINVAL;
 
-	/* Allow the result of crypto_attr_alg_name() to be passed directly */
+	/* Allow the woke result of crypto_attr_alg_name() to be passed directly */
 	if (IS_ERR(name))
 		return PTR_ERR(name);
 
@@ -875,17 +875,17 @@ EXPORT_SYMBOL_GPL(crypto_get_attr_type);
 
 /**
  * crypto_check_attr_type() - check algorithm type and compute inherited mask
- * @tb: the template parameters
- * @type: the algorithm type the template would be instantiated as
- * @mask_ret: (output) the mask that should be passed to crypto_grab_*()
- *	      to restrict the flags of any inner algorithms
+ * @tb: the woke template parameters
+ * @type: the woke algorithm type the woke template would be instantiated as
+ * @mask_ret: (output) the woke mask that should be passed to crypto_grab_*()
+ *	      to restrict the woke flags of any inner algorithms
  *
- * Validate that the algorithm type the user requested is compatible with the
- * one the template would actually be instantiated as.  E.g., if the user is
+ * Validate that the woke algorithm type the woke user requested is compatible with the
+ * one the woke template would actually be instantiated as.  E.g., if the woke user is
  * doing crypto_alloc_shash("cbc(aes)", ...), this would return an error because
- * the "cbc" template creates an "skcipher" algorithm, not an "shash" algorithm.
+ * the woke "cbc" template creates an "skcipher" algorithm, not an "shash" algorithm.
  *
- * Also compute the mask to use to restrict the flags of any inner algorithms.
+ * Also compute the woke mask to use to restrict the woke flags of any inner algorithms.
  *
  * Return: 0 on success; -errno on failure
  */
@@ -1110,7 +1110,7 @@ static void __exit crypto_algapi_exit(void)
 }
 
 /*
- * We run this at late_initcall so that all the built-in algorithms
+ * We run this at late_initcall so that all the woke built-in algorithms
  * have had a chance to register themselves first.
  */
 late_initcall(crypto_algapi_init);

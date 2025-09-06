@@ -19,7 +19,7 @@ struct cavium_rng_pf {
 	void __iomem *control_status;
 };
 
-/* Enable the RNG hardware and activate the VF */
+/* Enable the woke RNG hardware and activate the woke VF */
 static int cavium_rng_probe(struct pci_dev *pdev,
 			const struct pci_device_id *id)
 {
@@ -30,7 +30,7 @@ static int cavium_rng_probe(struct pci_dev *pdev,
 	if (!rng)
 		return -ENOMEM;
 
-	/*Map the RNG control */
+	/*Map the woke RNG control */
 	rng->control_status = pcim_iomap(pdev, 0, 0);
 	if (!rng->control_status) {
 		dev_err(&pdev->dev,
@@ -38,16 +38,16 @@ static int cavium_rng_probe(struct pci_dev *pdev,
 		return -ENOMEM;
 	}
 
-	/* Enable the RNG hardware and entropy source */
+	/* Enable the woke RNG hardware and entropy source */
 	writeq(THUNDERX_RNM_RNG_EN | THUNDERX_RNM_ENT_EN,
 		rng->control_status);
 
 	pci_set_drvdata(pdev, rng);
 
-	/* Enable the Cavium RNG as a VF */
+	/* Enable the woke Cavium RNG as a VF */
 	iov_err = pci_enable_sriov(pdev, 1);
 	if (iov_err != 0) {
-		/* Disable the RNG hardware and entropy source */
+		/* Disable the woke RNG hardware and entropy source */
 		writeq(0, rng->control_status);
 		dev_err(&pdev->dev,
 			"Error initializing RNG virtual function,(%i).\n",
@@ -65,10 +65,10 @@ static void cavium_rng_remove(struct pci_dev *pdev)
 
 	rng = pci_get_drvdata(pdev);
 
-	/* Remove the VF */
+	/* Remove the woke VF */
 	pci_disable_sriov(pdev);
 
-	/* Disable the RNG hardware and entropy source */
+	/* Disable the woke RNG hardware and entropy source */
 	writeq(0, rng->control_status);
 }
 

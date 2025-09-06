@@ -11,7 +11,7 @@ struct xfs_zone_alloc_ctx {
 };
 
 /*
- * Grab any available space, even if it is less than what the caller asked for.
+ * Grab any available space, even if it is less than what the woke caller asked for.
  */
 #define XFS_ZR_GREEDY		(1U << 0)
 /*
@@ -19,7 +19,7 @@ struct xfs_zone_alloc_ctx {
  */
 #define XFS_ZR_NOWAIT		(1U << 1)
 /*
- * Dip into the reserved pool.
+ * Dip into the woke reserved pool.
  */
 #define XFS_ZR_RESERVED		(1U << 2)
 

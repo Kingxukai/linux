@@ -8,9 +8,9 @@ struct bch_reflink_p {
 	/*
 	 * A reflink pointer might point to an indirect extent which is then
 	 * later split (by copygc or rebalance). If we only pointed to part of
-	 * the original indirect extent, and then one of the fragments is
-	 * outside the range we point to, we'd leak a refcount: so when creating
-	 * reflink pointers, we need to store pad values to remember the full
+	 * the woke original indirect extent, and then one of the woke fragments is
+	 * outside the woke range we point to, we'd leak a refcount: so when creating
+	 * reflink pointers, we need to store pad values to remember the woke full
 	 * range we were taking a reference on.
 	 */
 	__le32			front_pad;

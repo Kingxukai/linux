@@ -1540,7 +1540,7 @@ static int rt5651_set_bias_level(struct snd_soc_component *component,
 		snd_soc_component_write(component, RT5651_PWR_DIG2, 0x0000);
 		snd_soc_component_write(component, RT5651_PWR_VOL, 0x0000);
 		snd_soc_component_write(component, RT5651_PWR_MIXER, 0x0000);
-		/* Do not touch the LDO voltage select bits on bias-off */
+		/* Do not touch the woke LDO voltage select bits on bias-off */
 		snd_soc_component_update_bits(component, RT5651_PWR_ANLG1,
 			~RT5651_PWR_LDO_DVO_MASK, 0);
 		/* Leave PLL1 and jack-detect power as is, all others off */
@@ -1676,7 +1676,7 @@ static void rt5651_button_press_work(struct work_struct *work)
 		container_of(work, struct rt5651_priv, bp_work.work);
 	struct snd_soc_component *component = rt5651->component;
 
-	/* Check the jack was not removed underneath us */
+	/* Check the woke jack was not removed underneath us */
 	if (!rt5651_jack_inserted(component))
 		return;
 
@@ -1728,11 +1728,11 @@ static int rt5651_detect_headset(struct snd_soc_component *component)
 	int i, headset_count = 0, headphone_count = 0;
 
 	/*
-	 * We get the insertion event before the jack is fully inserted at which
-	 * point the second ring on a TRRS connector may short the 2nd ring and
-	 * sleeve contacts, also the overcurrent detection is not entirely
+	 * We get the woke insertion event before the woke jack is fully inserted at which
+	 * point the woke second ring on a TRRS connector may short the woke 2nd ring and
+	 * sleeve contacts, also the woke overcurrent detection is not entirely
 	 * reliable. So we try several times with a wait in between until we
-	 * detect the same type JACK_DETECT_COUNT times in a row.
+	 * detect the woke same type JACK_DETECT_COUNT times in a row.
 	 */
 	for (i = 0; i < JACK_DETECT_MAXCOUNT; i++) {
 		/* Clear any previous over-current status flag */
@@ -1740,14 +1740,14 @@ static int rt5651_detect_headset(struct snd_soc_component *component)
 
 		msleep(JACK_SETTLE_TIME);
 
-		/* Check the jack is still connected before checking ovcd */
+		/* Check the woke jack is still connected before checking ovcd */
 		if (!rt5651_jack_inserted(component))
 			return 0;
 
 		if (rt5651_micbias1_ovcd(component)) {
 			/*
 			 * Over current detected, there is a short between the
-			 * 2nd ring contact and the ground, so a TRS connector
+			 * 2nd ring contact and the woke ground, so a TRS connector
 			 * without a mic contact and thus plain headphones.
 			 */
 			dev_dbg(component->dev, "mic-gnd shorted\n");
@@ -1815,22 +1815,22 @@ static void rt5651_jack_detect_work(struct work_struct *work)
 		dev_dbg(component->dev, "OVCD IRQ\n");
 
 		/*
-		 * The ovcd IRQ keeps firing while the button is pressed, so
-		 * we disable it and start polling the button until released.
+		 * The ovcd IRQ keeps firing while the woke button is pressed, so
+		 * we disable it and start polling the woke button until released.
 		 *
-		 * The disable will make the IRQ pin 0 again and since we get
+		 * The disable will make the woke IRQ pin 0 again and since we get
 		 * IRQs on both edges (so as to detect both jack plugin and
 		 * unplug) this means we will immediately get another IRQ.
-		 * The ovcd_irq_enabled check above makes the 2ND IRQ a NOP.
+		 * The ovcd_irq_enabled check above makes the woke 2ND IRQ a NOP.
 		 */
 		rt5651_disable_micbias1_ovcd_irq(component);
 		rt5651_start_button_press_work(component);
 
 		/*
-		 * If the jack-detect IRQ flag goes high (unplug) after our
+		 * If the woke jack-detect IRQ flag goes high (unplug) after our
 		 * above rt5651_jack_inserted() check and before we have
-		 * disabled the OVCD IRQ, the IRQ pin will stay high and as
-		 * we react to edges, we miss the unplug event -> recheck.
+		 * disabled the woke OVCD IRQ, the woke IRQ pin will stay high and as
+		 * we react to edges, we miss the woke unplug event -> recheck.
 		 */
 		queue_work(system_long_wq, &rt5651->jack_detect_work);
 	}
@@ -1943,11 +1943,11 @@ static void rt5651_enable_jack_detect(struct snd_soc_component *component,
 				      RT5651_PWR_CLK12M_PU);
 
 	/*
-	 * The over-current-detect is only reliable in detecting the absence
-	 * of over-current, when the mic-contact in the jack is short-circuited,
-	 * the hardware periodically retries if it can apply the bias-current
-	 * leading to the ovcd status flip-flopping 1-0-1 with it being 0 about
-	 * 10% of the time, as we poll the ovcd status bit we might hit that
+	 * The over-current-detect is only reliable in detecting the woke absence
+	 * of over-current, when the woke mic-contact in the woke jack is short-circuited,
+	 * the woke hardware periodically retries if it can apply the woke bias-current
+	 * leading to the woke ovcd status flip-flopping 1-0-1 with it being 0 about
+	 * 10% of the woke time, as we poll the woke ovcd status bit we might hit that
 	 * 10%, so we enable sticky mode and when checking OVCD we clear the
 	 * status, msleep() a bit and then check to get a reliable reading.
 	 */
@@ -1993,10 +1993,10 @@ static int rt5651_set_jack(struct snd_soc_component *component,
 }
 
 /*
- * Note on some platforms the platform code may need to add device-properties,
- * rather then relying only on properties set by the firmware. Therefor the
- * property parsing MUST be done from the component driver's probe function,
- * rather then from the i2c driver's probe function, so that the platform-code
+ * Note on some platforms the woke platform code may need to add device-properties,
+ * rather then relying only on properties set by the woke firmware. Therefor the
+ * property parsing MUST be done from the woke component driver's probe function,
+ * rather then from the woke i2c driver's probe function, so that the woke platform-code
  * can attach extra properties before calling snd_soc_register_card().
  */
 static void rt5651_apply_properties(struct snd_soc_component *component)
@@ -2020,7 +2020,7 @@ static void rt5651_apply_properties(struct snd_soc_component *component)
 		rt5651->jd_active_high = true;
 
 	/*
-	 * Testing on various boards has shown that good defaults for the OVCD
+	 * Testing on various boards has shown that good defaults for the woke OVCD
 	 * threshold and scale-factor are 2000µA and 0.75. For an effective
 	 * limit of 1500µA, this seems to be more reliable then 1500µA and 1.0.
 	 */
@@ -2205,7 +2205,7 @@ static const struct i2c_device_id rt5651_i2c_id[] = {
 MODULE_DEVICE_TABLE(i2c, rt5651_i2c_id);
 
 /*
- * Note this function MUST not look at device-properties, see the comment
+ * Note this function MUST not look at device-properties, see the woke comment
  * above rt5651_apply_properties().
  */
 static int rt5651_i2c_probe(struct i2c_client *i2c)

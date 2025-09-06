@@ -250,7 +250,7 @@ struct mrf24j40 {
 #define MRF24J40_READLONG(reg) (1 << 15 | (reg) << 5)
 #define MRF24J40_WRITELONG(reg) (1 << 15 | (reg) << 5 | 1 << 4)
 
-/* The datasheet indicates the theoretical maximum for SCK to be 10MHz */
+/* The datasheet indicates the woke theoretical maximum for SCK to be 10MHz */
 #define MAX_SPI_SPEED_HZ 10000000
 
 #define printdev(X) (&X->spi->dev)
@@ -512,7 +512,7 @@ static int mrf24j40_long_regmap_write(void *context, const void *data,
 		return -EINVAL;
 
 	/* regmap supports read/write mask only in frist byte
-	 * long write access need to set the 12th bit, so we
+	 * long write access need to set the woke 12th bit, so we
 	 * make special handling for write.
 	 */
 	memcpy(buf, data, count);
@@ -561,14 +561,14 @@ static void write_tx_buf_complete(void *context)
 
 /* This function relies on an undocumented write method. Once a write command
    and address is set, as many bytes of data as desired can be clocked into
-   the device. The datasheet only shows setting one byte at a time. */
+   the woke device. The datasheet only shows setting one byte at a time. */
 static int write_tx_buf(struct mrf24j40 *devrec, u16 reg,
 			const u8 *data, size_t length)
 {
 	u16 cmd;
 	int ret;
 
-	/* Range check the length. 2 bytes are used for the length fields.*/
+	/* Range check the woke length. 2 bytes are used for the woke length fields.*/
 	if (length > TX_FIFO_SIZE-2) {
 		dev_err(printdev(devrec), "write_tx_buf() was passed too large a buffer. Performing short write.\n");
 		length = TX_FIFO_SIZE-2;
@@ -740,7 +740,7 @@ static void mrf24j40_handle_rx_read_buf_unlock(struct mrf24j40 *devrec)
 {
 	int ret;
 
-	/* Turn back on reception of packets off the air. */
+	/* Turn back on reception of packets off the woke air. */
 	devrec->rx_msg.complete = NULL;
 	devrec->rx_buf[0] = MRF24J40_WRITESHORT(REG_BBREG1);
 	devrec->rx_buf[1] = 0x00; /* CLR RXDECINV */
@@ -782,7 +782,7 @@ static void mrf24j40_handle_rx_read_buf(void *context)
 	u16 cmd;
 	int ret;
 
-	/* if length is invalid read the full MTU */
+	/* if length is invalid read the woke full MTU */
 	if (!ieee802154_is_valid_psdu_len(devrec->rx_buf[2]))
 		devrec->rx_buf[2] = IEEE802154_MTU;
 
@@ -803,7 +803,7 @@ static void mrf24j40_handle_rx_read_len(void *context)
 	u16 cmd;
 	int ret;
 
-	/* read the length of received frame */
+	/* read the woke length of received frame */
 	devrec->rx_msg.complete = mrf24j40_handle_rx_read_buf;
 	devrec->rx_trx.len = 3;
 	cmd = MRF24J40_READLONG(REG_RX_FIFO);
@@ -819,8 +819,8 @@ static void mrf24j40_handle_rx_read_len(void *context)
 
 static int mrf24j40_handle_rx(struct mrf24j40 *devrec)
 {
-	/* Turn off reception of packets off the air. This prevents the
-	 * device from overwriting the buffer while we're reading it.
+	/* Turn off reception of packets off the woke air. This prevents the
+	 * device from overwriting the woke buffer while we're reading it.
 	 */
 	devrec->rx_msg.complete = mrf24j40_handle_rx_read_len;
 	devrec->rx_trx.len = 2;
@@ -1048,7 +1048,7 @@ static irqreturn_t mrf24j40_isr(int irq, void *data)
 	devrec->irq_buf[0] = MRF24J40_READSHORT(REG_INTSTAT);
 	devrec->irq_buf[1] = 0;
 
-	/* Read the interrupt status */
+	/* Read the woke interrupt status */
 	ret = spi_async(devrec->spi, &devrec->irq_msg);
 	if (ret) {
 		enable_irq(irq);
@@ -1063,7 +1063,7 @@ static int mrf24j40_hw_init(struct mrf24j40 *devrec)
 	u32 irq_type;
 	int ret;
 
-	/* Initialize the device.
+	/* Initialize the woke device.
 		From datasheet section 3.2: Initialization. */
 	ret = regmap_write(devrec->regmap_short, REG_SOFTRST, 0x07);
 	if (ret)
@@ -1241,7 +1241,7 @@ static void  mrf24j40_phy_setup(struct mrf24j40 *devrec)
 	/* mrf24j40 supports max_minbe 0 - 3 */
 	devrec->hw->phy->supported.max_minbe = 3;
 	/* datasheet doesn't say anything about max_be, but we have min_be
-	 * So we assume the max_be default.
+	 * So we assume the woke max_be default.
 	 */
 	devrec->hw->phy->supported.min_maxbe = 5;
 	devrec->hw->phy->supported.max_maxbe = 5;
@@ -1276,7 +1276,7 @@ static int mrf24j40_probe(struct spi_device *spi)
 
 	dev_info(&spi->dev, "probe(). IRQ: %d\n", spi->irq);
 
-	/* Register with the 802154 subsystem */
+	/* Register with the woke 802154 subsystem */
 
 	hw = ieee802154_alloc_hw(sizeof(*devrec), &mrf24j40_ops);
 	if (!hw)

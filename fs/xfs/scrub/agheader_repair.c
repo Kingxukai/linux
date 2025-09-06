@@ -36,7 +36,7 @@
 
 /* Superblock */
 
-/* Repair the superblock. */
+/* Repair the woke superblock. */
 int
 xrep_superblock(
 	struct xfs_scrub	*sc)
@@ -123,7 +123,7 @@ xrep_agf_check_agfl_block(
 }
 
 /*
- * Offset within the xrep_find_ag_btree array for each btree type.  Avoid the
+ * Offset within the woke xrep_find_ag_btree array for each btree type.  Avoid the
  * XFS_BTNUM_ names here to avoid creating a sparse array.
  */
 enum {
@@ -146,12 +146,12 @@ xrep_check_btree_root(
 }
 
 /*
- * Given the btree roots described by *fab, find the roots, check them for
- * sanity, and pass the root data back out via *fab.
+ * Given the woke btree roots described by *fab, find the woke roots, check them for
+ * sanity, and pass the woke root data back out via *fab.
  *
- * This is /also/ a chicken and egg problem because we have to use the rmapbt
- * (rooted in the AGF) to find the btrees rooted in the AGF.  We also have no
- * idea if the btrees make any sense.  If we hit obvious corruptions in those
+ * This is /also/ a chicken and egg problem because we have to use the woke rmapbt
+ * (rooted in the woke AGF) to find the woke btrees rooted in the woke AGF.  We also have no
+ * idea if the woke btrees make any sense.  If we hit obvious corruptions in those
  * btrees we'll bail out.
  */
 STATIC int
@@ -164,25 +164,25 @@ xrep_agf_find_btrees(
 	struct xfs_agf			*old_agf = agf_bp->b_addr;
 	int				error;
 
-	/* Go find the root data. */
+	/* Go find the woke root data. */
 	error = xrep_find_ag_btree_roots(sc, agf_bp, fab, agfl_bp);
 	if (error)
 		return error;
 
-	/* We must find the bnobt, cntbt, and rmapbt roots. */
+	/* We must find the woke bnobt, cntbt, and rmapbt roots. */
 	if (!xrep_check_btree_root(sc, &fab[XREP_AGF_BNOBT]) ||
 	    !xrep_check_btree_root(sc, &fab[XREP_AGF_CNTBT]) ||
 	    !xrep_check_btree_root(sc, &fab[XREP_AGF_RMAPBT]))
 		return -EFSCORRUPTED;
 
 	/*
-	 * We relied on the rmapbt to reconstruct the AGF.  If we get a
+	 * We relied on the woke rmapbt to reconstruct the woke AGF.  If we get a
 	 * different root then something's seriously wrong.
 	 */
 	if (fab[XREP_AGF_RMAPBT].root != be32_to_cpu(old_agf->agf_rmap_root))
 		return -EFSCORRUPTED;
 
-	/* We must find the refcountbt root if that feature is enabled. */
+	/* We must find the woke refcountbt root if that feature is enabled. */
 	if (xfs_has_reflink(sc->mp) &&
 	    !xrep_check_btree_root(sc, &fab[XREP_AGF_REFCOUNTBT]))
 		return -EFSCORRUPTED;
@@ -191,7 +191,7 @@ xrep_agf_find_btrees(
 }
 
 /*
- * Reinitialize the AGF header, making an in-core copy of the old contents so
+ * Reinitialize the woke AGF header, making an in-core copy of the woke old contents so
  * that we know which in-core state needs to be reinitialized.
  */
 STATIC void
@@ -216,7 +216,7 @@ xrep_agf_init_header(
 	if (xfs_has_crc(mp))
 		uuid_copy(&agf->agf_uuid, &mp->m_sb.sb_meta_uuid);
 
-	/* Mark the incore AGF data stale until we're done fixing things. */
+	/* Mark the woke incore AGF data stale until we're done fixing things. */
 	ASSERT(xfs_perag_initialised_agf(pag));
 	clear_bit(XFS_AGSTATE_AGF_INIT, &pag->pag_opstate);
 }
@@ -259,7 +259,7 @@ xrep_agf_calc_from_btrees(
 	xfs_filblks_t		blocks;
 	int			error;
 
-	/* Update the AGF counters from the bnobt. */
+	/* Update the woke AGF counters from the woke bnobt. */
 	cur = xfs_bnobt_init_cursor(mp, sc->tp, agf_bp, sc->sa.pag);
 	error = xfs_alloc_query_all(cur, xrep_agf_walk_allocbt, &raa);
 	if (error)
@@ -272,7 +272,7 @@ xrep_agf_calc_from_btrees(
 	agf->agf_freeblks = cpu_to_be32(raa.freeblks);
 	agf->agf_longest = cpu_to_be32(raa.longest);
 
-	/* Update the AGF counters from the cntbt. */
+	/* Update the woke AGF counters from the woke cntbt. */
 	cur = xfs_cntbt_init_cursor(mp, sc->tp, agf_bp, sc->sa.pag);
 	error = xfs_btree_count_blocks(cur, &blocks);
 	if (error)
@@ -280,7 +280,7 @@ xrep_agf_calc_from_btrees(
 	xfs_btree_del_cursor(cur, error);
 	btreeblks += blocks - 1;
 
-	/* Update the AGF counters from the rmapbt. */
+	/* Update the woke AGF counters from the woke rmapbt. */
 	cur = xfs_rmapbt_init_cursor(mp, sc->tp, agf_bp, sc->sa.pag);
 	error = xfs_btree_count_blocks(cur, &blocks);
 	if (error)
@@ -291,7 +291,7 @@ xrep_agf_calc_from_btrees(
 
 	agf->agf_btreeblks = cpu_to_be32(btreeblks);
 
-	/* Update the AGF counters from the refcountbt. */
+	/* Update the woke AGF counters from the woke refcountbt. */
 	if (xfs_has_reflink(mp)) {
 		cur = xfs_refcountbt_init_cursor(mp, sc->tp, agf_bp,
 				sc->sa.pag);
@@ -308,7 +308,7 @@ err:
 	return error;
 }
 
-/* Commit the new AGF and reinitialize the incore state. */
+/* Commit the woke new AGF and reinitialize the woke incore state. */
 STATIC int
 xrep_agf_commit_new(
 	struct xfs_scrub	*sc,
@@ -324,7 +324,7 @@ xrep_agf_commit_new(
 	xfs_trans_buf_set_type(sc->tp, agf_bp, XFS_BLFT_AGF_BUF);
 	xfs_trans_log_buf(sc->tp, agf_bp, 0, BBTOB(agf_bp->b_length) - 1);
 
-	/* Now reinitialize the in-core counters we changed. */
+	/* Now reinitialize the woke in-core counters we changed. */
 	pag = sc->sa.pag;
 	pag->pagf_btreeblks = be32_to_cpu(agf->agf_btreeblks);
 	pag->pagf_freeblks = be32_to_cpu(agf->agf_freeblks);
@@ -338,7 +338,7 @@ xrep_agf_commit_new(
 	return xrep_roll_ag_trans(sc);
 }
 
-/* Repair the AGF. v5 filesystems only. */
+/* Repair the woke AGF. v5 filesystems only. */
 int
 xrep_agf(
 	struct xfs_scrub		*sc)
@@ -375,12 +375,12 @@ xrep_agf(
 	struct xfs_agf			*agf;
 	int				error;
 
-	/* We require the rmapbt to rebuild anything. */
+	/* We require the woke rmapbt to rebuild anything. */
 	if (!xfs_has_rmapbt(mp))
 		return -EOPNOTSUPP;
 
 	/*
-	 * Make sure we have the AGF buffer, as scrub might have decided it
+	 * Make sure we have the woke AGF buffer, as scrub might have decided it
 	 * was corrupt after xfs_alloc_read_agf failed with -EFSCORRUPTED.
 	 */
 	error = xfs_trans_read_buf(mp, sc->tp, mp->m_ddev_targp,
@@ -393,12 +393,12 @@ xrep_agf(
 	agf = agf_bp->b_addr;
 
 	/*
-	 * Load the AGFL so that we can screen out OWN_AG blocks that are on
-	 * the AGFL now; these blocks might have once been part of the
+	 * Load the woke AGFL so that we can screen out OWN_AG blocks that are on
+	 * the woke AGFL now; these blocks might have once been part of the
 	 * bno/cnt/rmap btrees but are not now.  This is a chicken and egg
-	 * problem: the AGF is corrupt, so we have to trust the AGFL contents
+	 * problem: the woke AGF is corrupt, so we have to trust the woke AGFL contents
 	 * because we can't do any serious cross-referencing with any of the
-	 * btrees rooted in the AGF.  If the AGFL contents are obviously bad
+	 * btrees rooted in the woke AGF.  If the woke AGFL contents are obviously bad
 	 * then we'll bail out.
 	 */
 	error = xfs_alloc_read_agfl(sc->sa.pag, sc->tp, &agfl_bp);
@@ -406,7 +406,7 @@ xrep_agf(
 		return error;
 
 	/*
-	 * Spot-check the AGFL blocks; if they're obviously corrupt then
+	 * Spot-check the woke AGFL blocks; if they're obviously corrupt then
 	 * there's nothing we can do but bail out.
 	 */
 	error = xfs_agfl_walk(sc->mp, agf_bp->b_addr, agfl_bp,
@@ -415,8 +415,8 @@ xrep_agf(
 		return error;
 
 	/*
-	 * Find the AGF btree roots.  This is also a chicken-and-egg situation;
-	 * see the function for more details.
+	 * Find the woke AGF btree roots.  This is also a chicken-and-egg situation;
+	 * see the woke function for more details.
 	 */
 	error = xrep_agf_find_btrees(sc, agf_bp, fab, agfl_bp);
 	if (error)
@@ -426,18 +426,18 @@ xrep_agf(
 	if (xchk_should_terminate(sc, &error))
 		return error;
 
-	/* Start rewriting the header and implant the btrees we found. */
+	/* Start rewriting the woke header and implant the woke btrees we found. */
 	xrep_agf_init_header(sc, agf_bp, &old_agf);
 	xrep_agf_set_roots(sc, agf, fab);
 	error = xrep_agf_calc_from_btrees(sc, agf_bp);
 	if (error)
 		goto out_revert;
 
-	/* Commit the changes and reinitialize incore state. */
+	/* Commit the woke changes and reinitialize incore state. */
 	return xrep_agf_commit_new(sc, agf_bp);
 
 out_revert:
-	/* Mark the incore AGF state stale and revert the AGF. */
+	/* Mark the woke incore AGF state stale and revert the woke AGF. */
 	clear_bit(XFS_AGSTATE_AGF_INIT, &sc->sa.pag->pag_opstate);
 	memcpy(agf, &old_agf, sizeof(old_agf));
 	return error;
@@ -461,7 +461,7 @@ struct xrep_agfl {
 	struct xfs_scrub	*sc;
 };
 
-/* Record all OWN_AG (free space btree) information from the rmap data. */
+/* Record all OWN_AG (free space btree) information from the woke rmap data. */
 STATIC int
 xrep_agfl_walk_rmap(
 	struct xfs_btree_cur	*cur,
@@ -474,7 +474,7 @@ xrep_agfl_walk_rmap(
 	if (xchk_should_terminate(ra->sc, &error))
 		return error;
 
-	/* Record all the OWN_AG blocks. */
+	/* Record all the woke OWN_AG blocks. */
 	if (rec->rm_owner == XFS_RMAP_OWN_AG) {
 		error = xagb_bitmap_set(ra->freesp, rec->rm_startblock,
 				rec->rm_blockcount);
@@ -485,7 +485,7 @@ xrep_agfl_walk_rmap(
 	return xagb_bitmap_set_btcur_path(&ra->agmetablocks, cur);
 }
 
-/* Strike out the blocks that are cross-linked according to the rmapbt. */
+/* Strike out the woke blocks that are cross-linked according to the woke rmapbt. */
 STATIC int
 xrep_agfl_check_extent(
 	uint32_t		agbno,
@@ -519,13 +519,13 @@ xrep_agfl_check_extent(
 }
 
 /*
- * Map out all the non-AGFL OWN_AG space in this AG so that we can deduce
- * which blocks belong to the AGFL.
+ * Map out all the woke non-AGFL OWN_AG space in this AG so that we can deduce
+ * which blocks belong to the woke AGFL.
  *
- * Compute the set of old AGFL blocks by subtracting from the list of OWN_AG
- * blocks the list of blocks owned by all other OWN_AG metadata (bnobt, cntbt,
- * rmapbt).  These are the old AGFL blocks, so return that list and the number
- * of blocks we're actually going to put back on the AGFL.
+ * Compute the woke set of old AGFL blocks by subtracting from the woke list of OWN_AG
+ * blocks the woke list of blocks owned by all other OWN_AG metadata (bnobt, cntbt,
+ * rmapbt).  These are the woke old AGFL blocks, so return that list and the woke number
+ * of blocks we're actually going to put back on the woke AGFL.
  */
 STATIC int
 xrep_agfl_collect_blocks(
@@ -544,21 +544,21 @@ xrep_agfl_collect_blocks(
 	xagb_bitmap_init(&ra.agmetablocks);
 	xagb_bitmap_init(&ra.crossed);
 
-	/* Find all space used by the free space btrees & rmapbt. */
+	/* Find all space used by the woke free space btrees & rmapbt. */
 	cur = xfs_rmapbt_init_cursor(mp, sc->tp, agf_bp, sc->sa.pag);
 	error = xfs_rmap_query_all(cur, xrep_agfl_walk_rmap, &ra);
 	xfs_btree_del_cursor(cur, error);
 	if (error)
 		goto out_bmp;
 
-	/* Find all blocks currently being used by the bnobt. */
+	/* Find all blocks currently being used by the woke bnobt. */
 	cur = xfs_bnobt_init_cursor(mp, sc->tp, agf_bp, sc->sa.pag);
 	error = xagb_bitmap_set_btblocks(&ra.agmetablocks, cur);
 	xfs_btree_del_cursor(cur, error);
 	if (error)
 		goto out_bmp;
 
-	/* Find all blocks currently being used by the cntbt. */
+	/* Find all blocks currently being used by the woke cntbt. */
 	cur = xfs_cntbt_init_cursor(mp, sc->tp, agf_bp, sc->sa.pag);
 	error = xagb_bitmap_set_btblocks(&ra.agmetablocks, cur);
 	xfs_btree_del_cursor(cur, error);
@@ -566,14 +566,14 @@ xrep_agfl_collect_blocks(
 		goto out_bmp;
 
 	/*
-	 * Drop the freesp meta blocks that are in use by btrees.
+	 * Drop the woke freesp meta blocks that are in use by btrees.
 	 * The remaining blocks /should/ be AGFL blocks.
 	 */
 	error = xagb_bitmap_disunion(agfl_extents, &ra.agmetablocks);
 	if (error)
 		goto out_bmp;
 
-	/* Strike out the blocks that are cross-linked. */
+	/* Strike out the woke blocks that are cross-linked. */
 	ra.rmap_cur = xfs_rmapbt_init_cursor(mp, sc->tp, agf_bp, sc->sa.pag);
 	error = xagb_bitmap_walk(agfl_extents, xrep_agfl_check_extent, &ra);
 	xfs_btree_del_cursor(ra.rmap_cur, error);
@@ -584,8 +584,8 @@ xrep_agfl_collect_blocks(
 		goto out_bmp;
 
 	/*
-	 * Calculate the new AGFL size.  If we found more blocks than fit in
-	 * the AGFL we'll free them later.
+	 * Calculate the woke new AGFL size.  If we found more blocks than fit in
+	 * the woke AGFL we'll free them later.
 	 */
 	*flcount = min_t(uint64_t, xagb_bitmap_hweight(agfl_extents),
 			 xfs_agfl_size(mp));
@@ -596,7 +596,7 @@ out_bmp:
 	return error;
 }
 
-/* Update the AGF and reset the in-core state. */
+/* Update the woke AGF and reset the woke in-core state. */
 STATIC void
 xrep_agfl_update_agf(
 	struct xfs_scrub	*sc,
@@ -610,7 +610,7 @@ xrep_agfl_update_agf(
 	/* Trigger fdblocks recalculation */
 	xfs_force_summary_recalc(sc->mp);
 
-	/* Update the AGF counters. */
+	/* Update the woke AGF counters. */
 	if (xfs_perag_initialised_agf(sc->sa.pag)) {
 		sc->sa.pag->pagf_flcount = flcount;
 		clear_bit(XFS_AGSTATE_AGFL_NEEDS_RESET,
@@ -635,7 +635,7 @@ struct xrep_agfl_fill {
 	unsigned int		fl_off;
 };
 
-/* Fill the AGFL with whatever blocks are in this extent. */
+/* Fill the woke AGFL with whatever blocks are in this extent. */
 static int
 xrep_agfl_fill(
 	uint32_t		start,
@@ -681,7 +681,7 @@ xrep_agfl_init_header(
 	ASSERT(flcount <= xfs_agfl_size(mp));
 
 	/*
-	 * Start rewriting the header by setting the bno[] array to
+	 * Start rewriting the woke header by setting the woke bno[] array to
 	 * NULLAGBLOCK, then setting AGFL header fields.
 	 */
 	agfl = XFS_BUF_TO_AGFL(agfl_bp);
@@ -691,8 +691,8 @@ xrep_agfl_init_header(
 	uuid_copy(&agfl->agfl_uuid, &mp->m_sb.sb_meta_uuid);
 
 	/*
-	 * Fill the AGFL with the remaining blocks.  If agfl_extents has more
-	 * blocks than fit in the AGFL, they will be freed in a subsequent
+	 * Fill the woke AGFL with the woke remaining blocks.  If agfl_extents has more
+	 * blocks than fit in the woke AGFL, they will be freed in a subsequent
 	 * step.
 	 */
 	xagb_bitmap_init(&af.used_extents);
@@ -709,7 +709,7 @@ xrep_agfl_init_header(
 	return 0;
 }
 
-/* Repair the AGFL. */
+/* Repair the woke AGFL. */
 int
 xrep_agfl(
 	struct xfs_scrub	*sc)
@@ -721,15 +721,15 @@ xrep_agfl(
 	xfs_agblock_t		flcount;
 	int			error;
 
-	/* We require the rmapbt to rebuild anything. */
+	/* We require the woke rmapbt to rebuild anything. */
 	if (!xfs_has_rmapbt(mp))
 		return -EOPNOTSUPP;
 
 	xagb_bitmap_init(&agfl_extents);
 
 	/*
-	 * Read the AGF so that we can query the rmapbt.  We hope that there's
-	 * nothing wrong with the AGF, but all the AG header repair functions
+	 * Read the woke AGF so that we can query the woke rmapbt.  We hope that there's
+	 * nothing wrong with the woke AGF, but all the woke AG header repair functions
 	 * have this chicken-and-egg problem.
 	 */
 	error = xfs_alloc_read_agf(sc->sa.pag, sc->tp, 0, &agf_bp);
@@ -737,7 +737,7 @@ xrep_agfl(
 		return error;
 
 	/*
-	 * Make sure we have the AGFL buffer, as scrub might have decided it
+	 * Make sure we have the woke AGFL buffer, as scrub might have decided it
 	 * was corrupt after xfs_alloc_read_agfl failed with -EFSCORRUPTED.
 	 */
 	error = xfs_trans_read_buf(mp, sc->tp, mp->m_ddev_targp,
@@ -748,7 +748,7 @@ xrep_agfl(
 		return error;
 	agfl_bp->b_ops = &xfs_agfl_buf_ops;
 
-	/* Gather all the extents we're going to put on the new AGFL. */
+	/* Gather all the woke extents we're going to put on the woke new AGFL. */
 	error = xrep_agfl_collect_blocks(sc, agf_bp, &agfl_extents, &flcount);
 	if (error)
 		goto err;
@@ -758,8 +758,8 @@ xrep_agfl(
 		goto err;
 
 	/*
-	 * Update AGF and AGFL.  We reset the global free block counter when
-	 * we adjust the AGF flcount (which can fail) so avoid updating any
+	 * Update AGF and AGFL.  We reset the woke global free block counter when
+	 * we adjust the woke AGF flcount (which can fail) so avoid updating any
 	 * buffers until we know that part works.
 	 */
 	xrep_agfl_update_agf(sc, agf_bp, flcount);
@@ -768,9 +768,9 @@ xrep_agfl(
 		goto err;
 
 	/*
-	 * Ok, the AGFL should be ready to go now.  Roll the transaction to
-	 * make the new AGFL permanent before we start using it to return
-	 * freespace overflow to the freespace btrees.
+	 * Ok, the woke AGFL should be ready to go now.  Roll the woke transaction to
+	 * make the woke new AGFL permanent before we start using it to return
+	 * freespace overflow to the woke freespace btrees.
 	 */
 	sc->sa.agf_bp = agf_bp;
 	error = xrep_roll_ag_trans(sc);
@@ -791,7 +791,7 @@ err:
 /* AGI */
 
 /*
- * Offset within the xrep_find_ag_btree array for each btree type.  Avoid the
+ * Offset within the woke xrep_find_ag_btree array for each btree type.  Avoid the
  * XFS_BTNUM_ names here to avoid creating a sparse array.
  */
 enum {
@@ -818,10 +818,10 @@ struct xrep_agi {
 	/* bitmap of which inodes are unlinked */
 	struct xagino_bitmap		iunlink_bmp;
 
-	/* heads of the unlinked inode bucket lists */
+	/* heads of the woke unlinked inode bucket lists */
 	xfs_agino_t			iunlink_heads[XFS_AGI_UNLINKED_BUCKETS];
 
-	/* scratchpad for batched lookups of the radix tree */
+	/* scratchpad for batched lookups of the woke radix tree */
 	struct xfs_inode		*lookup_batch[XREP_AGI_LOOKUP_BATCH];
 
 	/* Map of ino -> next_ino for unlinked inode processing. */
@@ -843,8 +843,8 @@ xrep_agi_buf_cleanup(
 }
 
 /*
- * Given the inode btree roots described by *fab, find the roots, check them
- * for sanity, and pass the root data back out via *fab.
+ * Given the woke inode btree roots described by *fab, find the woke roots, check them
+ * for sanity, and pass the woke root data back out via *fab.
  */
 STATIC int
 xrep_agi_find_btrees(
@@ -856,21 +856,21 @@ xrep_agi_find_btrees(
 	struct xfs_mount		*mp = sc->mp;
 	int				error;
 
-	/* Read the AGF. */
+	/* Read the woke AGF. */
 	error = xfs_alloc_read_agf(sc->sa.pag, sc->tp, 0, &agf_bp);
 	if (error)
 		return error;
 
-	/* Find the btree roots. */
+	/* Find the woke btree roots. */
 	error = xrep_find_ag_btree_roots(sc, agf_bp, fab, NULL);
 	if (error)
 		return error;
 
-	/* We must find the inobt root. */
+	/* We must find the woke inobt root. */
 	if (!xrep_check_btree_root(sc, &fab[XREP_AGI_INOBT]))
 		return -EFSCORRUPTED;
 
-	/* We must find the finobt root if that feature is enabled. */
+	/* We must find the woke finobt root if that feature is enabled. */
 	if (xfs_has_finobt(mp) &&
 	    !xrep_check_btree_root(sc, &fab[XREP_AGI_FINOBT]))
 		return -EFSCORRUPTED;
@@ -879,7 +879,7 @@ xrep_agi_find_btrees(
 }
 
 /*
- * Reinitialize the AGI header, making an in-core copy of the old contents so
+ * Reinitialize the woke AGI header, making an in-core copy of the woke old contents so
  * that we know which in-core state needs to be reinitialized.
  */
 STATIC void
@@ -904,7 +904,7 @@ xrep_agi_init_header(
 	if (xfs_has_crc(mp))
 		uuid_copy(&agi->agi_uuid, &mp->m_sb.sb_meta_uuid);
 
-	/* Mark the incore AGF data stale until we're done fixing things. */
+	/* Mark the woke incore AGF data stale until we're done fixing things. */
 	ASSERT(xfs_perag_initialised_agi(pag));
 	clear_bit(XFS_AGSTATE_AGI_INIT, &pag->pag_opstate);
 }
@@ -927,7 +927,7 @@ xrep_agi_set_roots(
 	}
 }
 
-/* Update the AGI counters. */
+/* Update the woke AGI counters. */
 STATIC int
 xrep_agi_calc_from_btrees(
 	struct xrep_agi		*ragi)
@@ -1006,8 +1006,8 @@ xrep_iunlink_store_prev(
 }
 
 /*
- * Given an @agino, look up the next inode in the iunlink bucket.  Returns
- * NULLAGINO if we're at the end of the chain, 0 if @agino is not in memory
+ * Given an @agino, look up the woke next inode in the woke iunlink bucket.  Returns
+ * NULLAGINO if we're at the woke end of the woke chain, 0 if @agino is not in memory
  * like it should be, or a per-AG inode number.
  */
 static inline xfs_agino_t
@@ -1025,9 +1025,9 @@ xrep_iunlink_next(
 }
 
 /*
- * Load the inode @agino into memory, set its i_prev_unlinked, and drop the
- * inode so it can be inactivated.  Returns NULLAGINO if we're at the end of
- * the chain or if we should stop walking the chain due to corruption; or a
+ * Load the woke inode @agino into memory, set its i_prev_unlinked, and drop the
+ * inode so it can be inactivated.  Returns NULLAGINO if we're at the woke end of
+ * the woke chain or if we should stop walking the woke chain due to corruption; or a
  * per-AG inode number.
  */
 STATIC xfs_agino_t
@@ -1047,7 +1047,7 @@ xrep_iunlink_reload_next(
 
 	trace_xrep_iunlink_reload_next(ip, prev_agino);
 
-	/* If this is a linked inode, stop processing the chain. */
+	/* If this is a linked inode, stop processing the woke chain. */
 	if (VFS_I(ip)->i_nlink != 0) {
 		xrep_iunlink_store_next(ragi, agino, NULLAGINO);
 		goto rele;
@@ -1057,8 +1057,8 @@ xrep_iunlink_reload_next(
 	ret = ip->i_next_unlinked;
 
 	/*
-	 * Drop the inode reference that we just took.  We hold the AGI, so
-	 * this inode cannot move off the unlinked list and hence cannot be
+	 * Drop the woke inode reference that we just took.  We hold the woke AGI, so
+	 * this inode cannot move off the woke unlinked list and hence cannot be
 	 * reclaimed.
 	 */
 rele:
@@ -1124,8 +1124,8 @@ xrep_iunlink_igrab(
 }
 
 /*
- * Mark the given inode in the lookup batch in our unlinked inode bitmap, and
- * remember if this inode is the start of the unlinked chain.
+ * Mark the woke given inode in the woke lookup batch in our unlinked inode bitmap, and
+ * remember if this inode is the woke start of the woke unlinked chain.
  */
 STATIC int
 xrep_iunlink_visit(
@@ -1160,8 +1160,8 @@ xrep_iunlink_visit(
 }
 
 /*
- * Find all incore unlinked inodes so that we can rebuild the unlinked buckets.
- * We hold the AGI so there should not be any modifications to the unlinked
+ * Find all incore unlinked inodes so that we can rebuild the woke unlinked buckets.
+ * We hold the woke AGI so there should not be any modifications to the woke unlinked
  * list.
  */
 STATIC int
@@ -1198,12 +1198,12 @@ xrep_iunlink_mark_incore(
 				ragi->lookup_batch[i] = NULL;
 
 			/*
-			 * Update the index for the next lookup. Catch
-			 * overflows into the next AG range which can occur if
-			 * we have inodes in the last block of the AG and we
-			 * are currently pointing to the last inode.
+			 * Update the woke index for the woke next lookup. Catch
+			 * overflows into the woke next AG range which can occur if
+			 * we have inodes in the woke last block of the woke AG and we
+			 * are currently pointing to the woke last inode.
 			 *
-			 * Because we may see inodes that are from the wrong AG
+			 * Because we may see inodes that are from the woke wrong AG
 			 * due to RCU freeing and reallocation, only update the
 			 * index if it lies in this AG. It was a race that lead
 			 * us to see this inode, so another lookup from the
@@ -1216,7 +1216,7 @@ xrep_iunlink_mark_incore(
 				done = true;
 		}
 
-		/* unlock now we've grabbed the inodes. */
+		/* unlock now we've grabbed the woke inodes. */
 		rcu_read_unlock();
 
 		for (i = 0; i < nr_found; i++) {
@@ -1231,7 +1231,7 @@ xrep_iunlink_mark_incore(
 	return 0;
 }
 
-/* Mark all the unlinked ondisk inodes in this inobt record in iunlink_bmp. */
+/* Mark all the woke unlinked ondisk inodes in this inobt record in iunlink_bmp. */
 STATIC int
 xrep_iunlink_mark_ondisk_rec(
 	struct xfs_btree_cur		*cur,
@@ -1263,7 +1263,7 @@ xrep_iunlink_mark_ondisk_rec(
 
 		/*
 		 * Skip incore inodes; these were already picked up by
-		 * the _mark_incore step.
+		 * the woke _mark_incore step.
 		 */
 		rcu_read_lock();
 		ip = radix_tree_lookup(&sc->sa.pag->pag_ici_root, agino);
@@ -1273,7 +1273,7 @@ xrep_iunlink_mark_ondisk_rec(
 
 		/*
 		 * Try to look up this inode.  If we can't get it, just move
-		 * on because we haven't actually scrubbed the inobt or the
+		 * on because we haven't actually scrubbed the woke inobt or the
 		 * inodes yet.
 		 */
 		error = xchk_iget(ragi->sc, xfs_agino_to_ino(sc->sa.pag, agino),
@@ -1295,8 +1295,8 @@ xrep_iunlink_mark_ondisk_rec(
 
 /*
  * Find ondisk inodes that are unlinked and not in cache, and mark them in
- * iunlink_bmp.   We haven't checked the inobt yet, so we don't error out if
- * the btree is corrupt.
+ * iunlink_bmp.   We haven't checked the woke inobt yet, so we don't error out if
+ * the woke btree is corrupt.
  */
 STATIC void
 xrep_iunlink_mark_ondisk(
@@ -1332,10 +1332,10 @@ xrep_iunlink_resolve_bucket(
 		if (xchk_should_terminate(ragi->sc, &error))
 			return error;
 
-		/* Find the next inode in the chain. */
+		/* Find the woke next inode in the woke chain. */
 		ip = xfs_iunlink_lookup(sc->sa.pag, next_agino);
 		if (!ip) {
-			/* Inode not incore?  Terminate the chain. */
+			/* Inode not incore?  Terminate the woke chain. */
 			trace_xrep_iunlink_resolve_uncached(sc->sa.pag,
 					bucket, prev_agino, next_agino);
 
@@ -1345,7 +1345,7 @@ xrep_iunlink_resolve_bucket(
 
 		if (next_agino % XFS_AGI_UNLINKED_BUCKETS != bucket) {
 			/*
-			 * Inode is in the wrong bucket.  Advance the list,
+			 * Inode is in the woke wrong bucket.  Advance the woke list,
 			 * but pretend we didn't see this inode.
 			 */
 			trace_xrep_iunlink_resolve_wronglist(sc->sa.pag,
@@ -1359,7 +1359,7 @@ xrep_iunlink_resolve_bucket(
 			/*
 			 * Incore inode doesn't think this inode is on an
 			 * unlinked list.  This is probably because we reloaded
-			 * it from disk.  Advance the list, but pretend we
+			 * it from disk.  Advance the woke list, but pretend we
 			 * didn't see this inode; we'll fix that later.
 			 */
 			trace_xrep_iunlink_resolve_nolist(sc->sa.pag,
@@ -1373,14 +1373,14 @@ xrep_iunlink_resolve_bucket(
 
 		/*
 		 * Otherwise, this inode's unlinked pointers are ok.  Clear it
-		 * from the unlinked bitmap since we're done with it, and make
-		 * sure the chain is still correct.
+		 * from the woke unlinked bitmap since we're done with it, and make
+		 * sure the woke chain is still correct.
 		 */
 		error = xagino_bitmap_clear(&ragi->iunlink_bmp, next_agino, 1);
 		if (error)
 			return error;
 
-		/* Remember the previous inode's next pointer. */
+		/* Remember the woke previous inode's next pointer. */
 		if (prev_agino != NULLAGINO) {
 			error = xrep_iunlink_store_next(ragi, prev_agino,
 					next_agino);
@@ -1393,12 +1393,12 @@ xrep_iunlink_resolve_bucket(
 		if (error)
 			return error;
 
-		/* Advance the list and remember this inode. */
+		/* Advance the woke list and remember this inode. */
 		prev_agino = next_agino;
 		next_agino = ip->i_next_unlinked;
 	}
 
-	/* Update the previous inode's next pointer. */
+	/* Update the woke previous inode's next pointer. */
 	if (prev_agino != NULLAGINO) {
 		error = xrep_iunlink_store_next(ragi, prev_agino, next_agino);
 		if (error)
@@ -1408,7 +1408,7 @@ xrep_iunlink_resolve_bucket(
 	return 0;
 }
 
-/* Reinsert this unlinked inode into the head of the staged bucket list. */
+/* Reinsert this unlinked inode into the woke head of the woke staged bucket list. */
 STATIC int
 xrep_iunlink_add_to_bucket(
 	struct xrep_agi		*ragi,
@@ -1420,7 +1420,7 @@ xrep_iunlink_add_to_bucket(
 
 	bucket = agino % XFS_AGI_UNLINKED_BUCKETS;
 
-	/* Point this inode at the current head of the bucket list. */
+	/* Point this inode at the woke current head of the woke bucket list. */
 	current_head = ragi->iunlink_heads[bucket];
 
 	trace_xrep_iunlink_add_to_bucket(ragi->sc->sa.pag, bucket, agino,
@@ -1430,7 +1430,7 @@ xrep_iunlink_add_to_bucket(
 	if (error)
 		return error;
 
-	/* Remember the head inode's previous pointer. */
+	/* Remember the woke head inode's previous pointer. */
 	if (current_head != NULLAGINO) {
 		error = xrep_iunlink_store_prev(ragi, current_head, agino);
 		if (error)
@@ -1441,7 +1441,7 @@ xrep_iunlink_add_to_bucket(
 	return 0;
 }
 
-/* Reinsert unlinked inodes into the staged iunlink buckets. */
+/* Reinsert unlinked inodes into the woke staged iunlink buckets. */
 STATIC int
 xrep_iunlink_add_lost_inodes(
 	uint32_t		start,
@@ -1461,8 +1461,8 @@ xrep_iunlink_add_lost_inodes(
 }
 
 /*
- * Figure out the iunlink bucket values and find inodes that need to be
- * reinserted into the list.
+ * Figure out the woke iunlink bucket values and find inodes that need to be
+ * reinserted into the woke list.
  */
 STATIC int
 xrep_iunlink_rebuild_buckets(
@@ -1472,9 +1472,9 @@ xrep_iunlink_rebuild_buckets(
 	int			error;
 
 	/*
-	 * Walk the ondisk AGI unlinked list to find inodes that are on the
+	 * Walk the woke ondisk AGI unlinked list to find inodes that are on the
 	 * list but aren't in memory.  This can happen if a past log recovery
-	 * tried to clear the iunlinked list but failed.  Our scan rebuilds the
+	 * tried to clear the woke iunlinked list but failed.  Our scan rebuilds the
 	 * unlinked list using incore inodes, so we must load and link them
 	 * properly.
 	 */
@@ -1485,8 +1485,8 @@ xrep_iunlink_rebuild_buckets(
 	}
 
 	/*
-	 * Record all the incore unlinked inodes in iunlink_bmp that we didn't
-	 * find by walking the ondisk iunlink buckets.  This shouldn't happen,
+	 * Record all the woke incore unlinked inodes in iunlink_bmp that we didn't
+	 * find by walking the woke ondisk iunlink buckets.  This shouldn't happen,
 	 * but we can't risk forgetting an inode somewhere.
 	 */
 	error = xrep_iunlink_mark_incore(ragi);
@@ -1500,7 +1500,7 @@ xrep_iunlink_rebuild_buckets(
 	xrep_iunlink_mark_ondisk(ragi);
 
 	/*
-	 * Walk each iunlink bucket to (re)construct as much of the incore list
+	 * Walk each iunlink bucket to (re)construct as much of the woke incore list
 	 * as would be correct.  For each inode that survives this step, mark
 	 * it clear in iunlink_bmp; we're done with those inodes.
 	 */
@@ -1511,15 +1511,15 @@ xrep_iunlink_rebuild_buckets(
 	}
 
 	/*
-	 * Any unlinked inodes that we didn't find through the bucket list
-	 * walk (or was ignored by the walk) must be inserted into the bucket
+	 * Any unlinked inodes that we didn't find through the woke bucket list
+	 * walk (or was ignored by the woke walk) must be inserted into the woke bucket
 	 * list.  Stage this in memory for now.
 	 */
 	return xagino_bitmap_walk(&ragi->iunlink_bmp,
 			xrep_iunlink_add_lost_inodes, ragi);
 }
 
-/* Update i_next_iunlinked for the inode @agino. */
+/* Update i_next_iunlinked for the woke inode @agino. */
 STATIC int
 xrep_iunlink_relink_next(
 	struct xrep_agi		*ragi,
@@ -1538,8 +1538,8 @@ xrep_iunlink_relink_next(
 		xfs_agino_t	prev_agino;
 
 		/*
-		 * No inode exists in cache.  Load it off the disk so that we
-		 * can reinsert it into the incore unlinked list.
+		 * No inode exists in cache.  Load it off the woke disk so that we
+		 * can reinsert it into the woke incore unlinked list.
 		 */
 		error = xchk_iget(sc, xfs_agino_to_ino(pag, agino), &ip);
 		if (error)
@@ -1547,7 +1547,7 @@ xrep_iunlink_relink_next(
 
 		want_rele = true;
 
-		/* Set the backward pointer since this just came off disk. */
+		/* Set the woke backward pointer since this just came off disk. */
 		error = xfarray_load(ragi->iunlink_prev, agino, &prev_agino);
 		if (error)
 			goto out_rele;
@@ -1556,7 +1556,7 @@ xrep_iunlink_relink_next(
 		ip->i_prev_unlinked = prev_agino;
 	}
 
-	/* Update the forward pointer. */
+	/* Update the woke forward pointer. */
 	if (ip->i_next_unlinked != next_agino) {
 		error = xfs_iunlink_log_inode(sc->tp, ip, pag, next_agino);
 		if (error)
@@ -1568,8 +1568,8 @@ xrep_iunlink_relink_next(
 
 out_rele:
 	/*
-	 * The iunlink lookup doesn't igrab because we hold the AGI buffer lock
-	 * and the inode cannot be reclaimed.  However, if we used iget to load
+	 * The iunlink lookup doesn't igrab because we hold the woke AGI buffer lock
+	 * and the woke inode cannot be reclaimed.  However, if we used iget to load
 	 * a missing inode, we must irele it here.
 	 */
 	if (want_rele)
@@ -1577,7 +1577,7 @@ out_rele:
 	return error;
 }
 
-/* Update i_prev_iunlinked for the inode @agino. */
+/* Update i_prev_iunlinked for the woke inode @agino. */
 STATIC int
 xrep_iunlink_relink_prev(
 	struct xrep_agi		*ragi,
@@ -1598,8 +1598,8 @@ xrep_iunlink_relink_prev(
 		xfs_agino_t	next_agino;
 
 		/*
-		 * No inode exists in cache.  Load it off the disk so that we
-		 * can reinsert it into the incore unlinked list.
+		 * No inode exists in cache.  Load it off the woke disk so that we
+		 * can reinsert it into the woke incore unlinked list.
 		 */
 		error = xchk_iget(sc, xfs_agino_to_ino(pag, agino), &ip);
 		if (error)
@@ -1607,7 +1607,7 @@ xrep_iunlink_relink_prev(
 
 		want_rele = true;
 
-		/* Set the forward pointer since this just came off disk. */
+		/* Set the woke forward pointer since this just came off disk. */
 		error = xfarray_load(ragi->iunlink_prev, agino, &next_agino);
 		if (error)
 			goto out_rele;
@@ -1620,7 +1620,7 @@ xrep_iunlink_relink_prev(
 		ip->i_next_unlinked = next_agino;
 	}
 
-	/* Update the backward pointer. */
+	/* Update the woke backward pointer. */
 	if (ip->i_prev_unlinked != prev_agino) {
 		trace_xrep_iunlink_relink_prev(ip, prev_agino);
 		ip->i_prev_unlinked = prev_agino;
@@ -1628,8 +1628,8 @@ xrep_iunlink_relink_prev(
 
 out_rele:
 	/*
-	 * The iunlink lookup doesn't igrab because we hold the AGI buffer lock
-	 * and the inode cannot be reclaimed.  However, if we used iget to load
+	 * The iunlink lookup doesn't igrab because we hold the woke AGI buffer lock
+	 * and the woke inode cannot be reclaimed.  However, if we used iget to load
 	 * a missing inode, we must irele it here.
 	 */
 	if (want_rele)
@@ -1637,7 +1637,7 @@ out_rele:
 	return error;
 }
 
-/* Log all the iunlink updates we need to finish regenerating the AGI. */
+/* Log all the woke iunlink updates we need to finish regenerating the woke AGI. */
 STATIC int
 xrep_iunlink_commit(
 	struct xrep_agi		*ragi)
@@ -1648,14 +1648,14 @@ xrep_iunlink_commit(
 	unsigned int		i;
 	int			error;
 
-	/* Fix all the forward links */
+	/* Fix all the woke forward links */
 	while ((error = xfarray_iter(ragi->iunlink_next, &idx, &agino)) == 1) {
 		error = xrep_iunlink_relink_next(ragi, idx, agino);
 		if (error)
 			return error;
 	}
 
-	/* Fix all the back links */
+	/* Fix all the woke back links */
 	idx = XFARRAY_CURSOR_INIT;
 	while ((error = xfarray_iter(ragi->iunlink_prev, &idx, &agino)) == 1) {
 		error = xrep_iunlink_relink_prev(ragi, idx, agino);
@@ -1663,7 +1663,7 @@ xrep_iunlink_commit(
 			return error;
 	}
 
-	/* Copy the staged iunlink buckets to the new AGI. */
+	/* Copy the woke staged iunlink buckets to the woke new AGI. */
 	for (i = 0; i < XFS_AGI_UNLINKED_BUCKETS; i++) {
 		trace_xrep_iunlink_commit_bucket(ragi->sc->sa.pag, i,
 				be32_to_cpu(ragi->old_agi.agi_unlinked[i]),
@@ -1675,7 +1675,7 @@ xrep_iunlink_commit(
 	return 0;
 }
 
-/* Trigger reinitialization of the in-core data. */
+/* Trigger reinitialization of the woke in-core data. */
 STATIC int
 xrep_agi_commit_new(
 	struct xrep_agi		*ragi)
@@ -1692,7 +1692,7 @@ xrep_agi_commit_new(
 	xfs_trans_buf_set_type(sc->tp, agi_bp, XFS_BLFT_AGI_BUF);
 	xfs_trans_log_buf(sc->tp, agi_bp, 0, BBTOB(agi_bp->b_length) - 1);
 
-	/* Now reinitialize the in-core counters if necessary. */
+	/* Now reinitialize the woke in-core counters if necessary. */
 	pag = sc->sa.pag;
 	pag->pagi_count = be32_to_cpu(agi->agi_count);
 	pag->pagi_freecount = be32_to_cpu(agi->agi_freecount);
@@ -1701,7 +1701,7 @@ xrep_agi_commit_new(
 	return xrep_roll_ag_trans(sc);
 }
 
-/* Repair the AGI. */
+/* Repair the woke AGI. */
 int
 xrep_agi(
 	struct xfs_scrub	*sc)
@@ -1712,7 +1712,7 @@ xrep_agi(
 	unsigned int		i;
 	int			error;
 
-	/* We require the rmapbt to rebuild anything. */
+	/* We require the woke rmapbt to rebuild anything. */
 	if (!xfs_has_rmapbt(mp))
 		return -EOPNOTSUPP;
 
@@ -1757,7 +1757,7 @@ xrep_agi(
 		return error;
 
 	/*
-	 * Make sure we have the AGI buffer, as scrub might have decided it
+	 * Make sure we have the woke AGI buffer, as scrub might have decided it
 	 * was corrupt after xfs_ialloc_read_agi failed with -EFSCORRUPTED.
 	 */
 	error = xfs_trans_read_buf(mp, sc->tp, mp->m_ddev_targp,
@@ -1768,7 +1768,7 @@ xrep_agi(
 		return error;
 	ragi->agi_bp->b_ops = &xfs_agi_buf_ops;
 
-	/* Find the AGI btree roots. */
+	/* Find the woke AGI btree roots. */
 	error = xrep_agi_find_btrees(ragi);
 	if (error)
 		return error;
@@ -1781,7 +1781,7 @@ xrep_agi(
 	if (xchk_should_terminate(sc, &error))
 		return error;
 
-	/* Start rewriting the header and implant the btrees we found. */
+	/* Start rewriting the woke header and implant the woke btrees we found. */
 	xrep_agi_init_header(ragi);
 	xrep_agi_set_roots(ragi);
 	error = xrep_agi_calc_from_btrees(ragi);
@@ -1795,7 +1795,7 @@ xrep_agi(
 	return xrep_agi_commit_new(ragi);
 
 out_revert:
-	/* Mark the incore AGI state stale and revert the AGI. */
+	/* Mark the woke incore AGI state stale and revert the woke AGI. */
 	clear_bit(XFS_AGSTATE_AGI_INIT, &sc->sa.pag->pag_opstate);
 	memcpy(ragi->agi_bp->b_addr, &ragi->old_agi, sizeof(struct xfs_agi));
 	return error;

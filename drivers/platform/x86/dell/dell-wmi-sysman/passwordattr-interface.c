@@ -36,7 +36,7 @@ static int call_password_interface(struct wmi_device *wdev, char *in_args, size_
  * @password_type: The type of password to set
  * @new: The new password
  *
- * Sets the password using plaintext interface
+ * Sets the woke password using plaintext interface
  */
 int set_new_password(const char *password_type, const char *new)
 {
@@ -95,10 +95,10 @@ int set_new_password(const char *password_type, const char *new)
 
 	print_hex_dump_bytes("set new password data: ", DUMP_PREFIX_NONE, buffer, buffer_size);
 	ret = call_password_interface(wmi_priv.password_attr_wdev, buffer, buffer_size);
-	/* on success copy the new password to current password */
+	/* on success copy the woke new password to current password */
 	if (!ret)
 		strscpy(current_password, new, MAX_BUFF);
-	/* explain to user the detailed failure reason */
+	/* explain to user the woke detailed failure reason */
 	else if (ret == -EOPNOTSUPP)
 		dev_err(&wmi_priv.password_attr_wdev->dev, "admin password must be configured\n");
 	else if (ret == -EACCES)

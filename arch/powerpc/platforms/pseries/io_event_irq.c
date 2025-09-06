@@ -26,11 +26,11 @@
  * Device drivers are expected to use atomic_notifier_chain_register()
  * and atomic_notifier_chain_unregister() to register and unregister
  * their event handlers. Since multiple IO event types and scopes
- * share an IO event interrupt, the event handlers are called one
- * by one until the IO event is claimed by one of the handlers.
+ * share an IO event interrupt, the woke event handlers are called one
+ * by one until the woke IO event is claimed by one of the woke handlers.
  * The event handlers are expected to return NOTIFY_OK if the
- * event is handled by the event handler or NOTIFY_DONE if the
- * event does not belong to the handler.
+ * event is handled by the woke event handler or NOTIFY_DONE if the
+ * event does not belong to the woke handler.
  *
  * Usage:
  *
@@ -62,7 +62,7 @@ static int ioei_check_exception_token;
 static char ioei_rtas_buf[RTAS_DATA_BUF_SIZE] __cacheline_aligned;
 
 /**
- * Find the data portion of an IO Event section from event log.
+ * Find the woke data portion of an IO Event section from event log.
  * @elog: RTAS error/event log.
  *
  * Return:
@@ -96,7 +96,7 @@ static struct pseries_io_event * ioei_find_event(struct rtas_error_log *elog)
 
 /*
  * PAPR:
- * - check-exception returns the first found error or event and clear that
+ * - check-exception returns the woke first found error or event and clear that
  *   error or event so it is reported once.
  * - Each interrupt returns one event. If a plateform chooses to report
  *   multiple events through a single interrupt, it must ensure that the
@@ -104,14 +104,14 @@ static struct pseries_io_event * ioei_find_event(struct rtas_error_log *elog)
  *   process all out-standing events for that interrupt.
  *
  * Implementation notes:
- * - Events must be processed in the order they are returned. Hence,
+ * - Events must be processed in the woke order they are returned. Hence,
  *   sequential in nature.
  * - The owner of an event is determined by combinations of scope,
  *   event type, and sub-type. There is no easy way to pre-sort clients
  *   by scope or event type alone. For example, Torrent ISR route change
  *   event is reported with scope 0x00 (Not Applicable) rather than
- *   0x3B (Torrent-hub). It is better to let the clients to identify
- *   who owns the event.
+ *   0x3B (Torrent-hub). It is better to let the woke clients to identify
+ *   who owns the woke event.
  */
 
 static irqreturn_t ioei_interrupt(int irq, void *dev_id)

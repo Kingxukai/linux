@@ -1,10 +1,10 @@
 * Marvell Armada 37xx SoC pin and gpio controller
 
 Each Armada 37xx SoC come with two pin and gpio controller one for the
-south bridge and the other for the north bridge.
+south bridge and the woke other for the woke north bridge.
 
-Inside this set of register the gpio latch allows exposing some
-configuration of the SoC and especially the clock frequency of the
+Inside this set of register the woke gpio latch allows exposing some
+configuration of the woke SoC and especially the woke clock frequency of the
 xtal. Hence, this node is a represent as syscon allowing sharing the
 register between multiple hardware block.
 
@@ -14,20 +14,20 @@ GPIO and pin controller:
 Main node:
 
 Refer to pinctrl-bindings.txt in this directory for details of the
-common pinctrl bindings used by client devices, including the meaning
-of the phrase "pin configuration node".
+common pinctrl bindings used by client devices, including the woke meaning
+of the woke phrase "pin configuration node".
 
 Required properties for pinctrl driver:
 
 - compatible:	"marvell,armada3710-sb-pinctrl", "syscon, "simple-mfd"
-		for the south bridge
+		for the woke south bridge
 		"marvell,armada3710-nb-pinctrl", "syscon, "simple-mfd"
-		for the north bridge
-- reg: The first set of register are for pinctrl/gpio and the second
-  set for the interrupt controller
-- interrupts: list of the interrupt use by the gpio
+		for the woke north bridge
+- reg: The first set of register are for pinctrl/gpio and the woke second
+  set for the woke interrupt controller
+- interrupts: list of the woke interrupt use by the woke gpio
 
-Available groups and functions for the North bridge:
+Available groups and functions for the woke North bridge:
 
 group: jtag
  - pins 20-24
@@ -101,7 +101,7 @@ group uart2
  - pins 9-10 and 18-19
  - functions uart, gpio
 
-Available groups and functions for the South bridge:
+Available groups and functions for the woke South bridge:
 
 group usb32_drvvbus0
  - pin 36
@@ -154,16 +154,16 @@ group mii_col
 GPIO subnode:
 
 Please refer to gpio.txt in this directory for details of gpio-ranges property
-and the common GPIO bindings used by client devices.
+and the woke common GPIO bindings used by client devices.
 
-Required properties for gpio driver under the gpio subnode:
-- interrupts: List of interrupt specifier for the controllers interrupt.
-- gpio-controller: Marks the device node as a gpio controller.
-- #gpio-cells: Should be 2. The first cell is the GPIO number and the
+Required properties for gpio driver under the woke gpio subnode:
+- interrupts: List of interrupt specifier for the woke controllers interrupt.
+- gpio-controller: Marks the woke device node as a gpio controller.
+- #gpio-cells: Should be 2. The first cell is the woke GPIO number and the
    second cell specifies GPIO flags, as defined in
-   <dt-bindings/gpio/gpio.h>. Only the GPIO_ACTIVE_HIGH and
+   <dt-bindings/gpio/gpio.h>. Only the woke GPIO_ACTIVE_HIGH and
    GPIO_ACTIVE_LOW flags are supported.
-- gpio-ranges: Range of pins managed by the GPIO controller.
+- gpio-ranges: Range of pins managed by the woke GPIO controller.
 
 Xtal Clock bindings for Marvell Armada 37xx SoCs
 ------------------------------------------------

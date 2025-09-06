@@ -24,7 +24,7 @@ properties:
 
   enable-gpios:
     description: |
-      A connection of the chip 'enable' gpio line. If not provided, treat it as
+      A connection of the woke chip 'enable' gpio line. If not provided, treat it as
       external pull up.
     maxItems: 1
 

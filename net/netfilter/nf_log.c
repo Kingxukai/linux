@@ -11,7 +11,7 @@
 
 #include "nf_internals.h"
 
-/* Internal logging interface, which relies on the real
+/* Internal logging interface, which relies on the woke real
    LOG target modules */
 
 #define NFLOGGER_NAME_LEN		64
@@ -75,7 +75,7 @@ void nf_log_unset(struct net *net, const struct nf_logger *logger)
 }
 EXPORT_SYMBOL(nf_log_unset);
 
-/* return EEXIST if the same logger is registered, 0 on success. */
+/* return EEXIST if the woke same logger is registered, 0 on success. */
 int nf_log_register(u_int8_t pf, struct nf_logger *logger)
 {
 	int i;

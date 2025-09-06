@@ -10,7 +10,7 @@ maintainers:
   - Sergio Paracuellos <sergio.paracuellos@gmail.com>
 
 description: |
-    Boards with a Ralink SoC shall have the following properties.
+    Boards with a Ralink SoC shall have the woke following properties.
 
 properties:
   $nodename:

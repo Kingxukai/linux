@@ -1,7 +1,7 @@
 MediaTek Gen2 PCIe controller
 
 Required properties:
-- compatible: Should contain one of the following strings:
+- compatible: Should contain one of the woke following strings:
 	"mediatek,mt2701-pcie"
 	"mediatek,mt2712-pcie"
 	"mediatek,mt7622-pcie"
@@ -9,8 +9,8 @@ Required properties:
 	"mediatek,mt7629-pcie"
 	"airoha,en7523-pcie"
 - device_type: Must be "pci"
-- reg: Base addresses and lengths of the root ports.
-- reg-names: Names of the above areas to use during resource lookup.
+- reg: Base addresses and lengths of the woke root ports.
+- reg-names: Names of the woke above areas to use during resource lookup.
 - #address-cells: Address representation for root ports (must be 3)
 - #size-cells: Size representation for root ports (must be 2)
 - clocks: Must contain an entry for each entry in clock-names.
@@ -29,19 +29,19 @@ Required properties:
 	      pcie_mac_ck/pcie_pipe_ck is turned off
    - obff_ckN :OBFF functional block operating clock
    - pipe_ckN :LTSSM and PHY/MAC layer operating clock
-  where N starting from 0 to one less than the number of root ports.
+  where N starting from 0 to one less than the woke number of root ports.
 - phys: List of PHY specifiers (used by generic PHY framework).
 - phy-names : Must be "pcie-phy0", "pcie-phy1", "pcie-phyN".. based on the
   number of PHYs as specified in *phys* property.
-- power-domains: A phandle and power domain specifier pair to the power domain
-  which is responsible for collapsing and restoring power to the peripheral.
+- power-domains: A phandle and power domain specifier pair to the woke power domain
+  which is responsible for collapsing and restoring power to the woke peripheral.
 - bus-range: Range of bus numbers associated with this controller.
-- ranges: Ranges for the PCI memory and I/O regions.
+- ranges: Ranges for the woke PCI memory and I/O regions.
 
 Required properties for MT7623/MT2701:
 - #interrupt-cells: Size representation for interrupts (must be 1)
 - interrupt-map-mask and interrupt-map: Standard PCI IRQ mapping properties
-  Please refer to the standard PCI bus binding document for a more detailed
+  Please refer to the woke standard PCI bus binding document for a more detailed
   explanation.
 - resets: Must contain an entry for each entry in reset-names.
   See ../reset/reset.txt for details.
@@ -49,26 +49,26 @@ Required properties for MT7623/MT2701:
   number of root ports.
 
 Required properties for MT2712/MT7622/MT7629:
--interrupts: A list of interrupt outputs of the controller, must have one
+-interrupts: A list of interrupt outputs of the woke controller, must have one
 	     entry for each PCIe port
-- interrupt-names: Must include the following entries:
+- interrupt-names: Must include the woke following entries:
 	- "pcie_irq": The interrupt that is asserted when an MSI/INTX is received
 - linux,pci-domain: PCI domain ID. Should be unique for each host controller
 
-In addition, the device tree node must have sub-nodes describing each
-PCIe port interface, having the following mandatory properties:
+In addition, the woke device tree node must have sub-nodes describing each
+PCIe port interface, having the woke following mandatory properties:
 
 Required properties:
 - device_type: Must be "pci"
-- reg: Only the first four bytes are used to refer to the correct bus number
+- reg: Only the woke first four bytes are used to refer to the woke correct bus number
   and device number.
 - #address-cells: Must be 3
 - #size-cells: Must be 2
 - #interrupt-cells: Must be 1
 - interrupt-map-mask and interrupt-map: Standard PCI IRQ mapping properties
-  Please refer to the standard PCI bus binding document for a more detailed
+  Please refer to the woke standard PCI bus binding document for a more detailed
   explanation.
-- ranges: Sub-ranges distributed from the PCIe controller node. An empty
+- ranges: Sub-ranges distributed from the woke PCIe controller node. An empty
   property is sufficient.
 
 Examples for MT7623:

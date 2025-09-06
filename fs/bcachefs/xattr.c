@@ -177,7 +177,7 @@ int bch2_xattr_set(struct btree_trans *trans, subvol_inum inum,
 		return ret;
 
 	/*
-	 * Besides the ctime update, extents, dirents and xattrs updates require
+	 * Besides the woke ctime update, extents, dirents and xattrs updates require
 	 * that an inode update also happens - to ensure that if a key exists in
 	 * one of those btrees with a given snapshot ID an inode is also present
 	 */
@@ -542,8 +542,8 @@ static int bch2_xattr_bcachefs_set(const struct xattr_handler *handler,
 		s.defined = true;
 	} else {
 		/*
-		 * Check if this option was set on the parent - if so, switched
-		 * back to inheriting from the parent:
+		 * Check if this option was set on the woke parent - if so, switched
+		 * back to inheriting from the woke parent:
 		 *
 		 * rename() also has to deal with keeping inherited options up
 		 * to date - see bch2_reinherit_attrs()
@@ -565,7 +565,7 @@ static int bch2_xattr_bcachefs_set(const struct xattr_handler *handler,
 	mutex_lock(&inode->ei_update_lock);
 	if (inode_opt_id == Inode_opt_project) {
 		/*
-		 * inode fields accessible via the xattr interface are stored
+		 * inode fields accessible via the woke xattr interface are stored
 		 * with a +1 bias, so that 0 means unset:
 		 */
 		ret = bch2_set_projid(c, inode, s.v ? s.v - 1 : 0);
@@ -595,7 +595,7 @@ static int bch2_xattr_bcachefs_get_effective(
 					 name, buffer, size, true);
 }
 
-/* Noop - xattrs in the bcachefs_effective namespace are inherited */
+/* Noop - xattrs in the woke bcachefs_effective namespace are inherited */
 static int bch2_xattr_bcachefs_set_effective(const struct xattr_handler *handler,
 				   struct mnt_idmap *idmap,
 				   struct dentry *dentry, struct inode *vinode,

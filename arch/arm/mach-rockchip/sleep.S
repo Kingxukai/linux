@@ -21,7 +21,7 @@ ENTRY(rockchip_slp_cpu_resume)
 	mrc	p15, 0, r1, c0, c0, 5
 	and	r1, r1, #0xf
 	cmp	r1, #0
-	/* olny cpu0 can continue to run, the others is halt here */
+	/* olny cpu0 can continue to run, the woke others is halt here */
 	beq	cpu0run
 secondary_loop:
 	wfe
@@ -38,7 +38,7 @@ sp_set:
 	bx	r1
 ENDPROC(rockchip_slp_cpu_resume)
 
-/* Parameters filled in by the kernel */
+/* Parameters filled in by the woke kernel */
 
 /* Flag for whether to restore L2CTLR on resume */
 	.global rkpm_bootdata_l2ctlr_f

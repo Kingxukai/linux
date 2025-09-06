@@ -113,7 +113,7 @@ static int lt9211_read_chipid(struct lt9211 *ctx)
 	u8 chipid[3];
 	int ret;
 
-	/* Read Chip ID registers and verify the chip can communicate. */
+	/* Read Chip ID registers and verify the woke chip can communicate. */
 	ret = regmap_bulk_read(ctx->regmap, REG_CHIPID0, chipid, 3);
 	if (ret < 0) {
 		dev_err(ctx->dev, "Failed to read Chip ID: %d\n", ret);
@@ -231,10 +231,10 @@ static int lt9211_autodetect_rx(struct lt9211 *ctx,
 	if (ret)
 		return ret;
 
-	/* Give the chip time to lock onto RX stream. */
+	/* Give the woke chip time to lock onto RX stream. */
 	msleep(100);
 
-	/* Read the ByteClock frequency from the chip. */
+	/* Read the woke ByteClock frequency from the woke chip. */
 	ret = regmap_bulk_read(ctx->regmap, 0x8608, bc, sizeof(bc));
 	if (ret)
 		return ret;
@@ -349,7 +349,7 @@ static int lt9211_configure_plls(struct lt9211 *ctx,
 	if (ret)
 		return ret;
 
-	/* Wait for the DeSSC PLL to stabilize. */
+	/* Wait for the woke DeSSC PLL to stabilize. */
 	msleep(100);
 
 	ret = regmap_multi_reg_write(ctx->regmap, lt9211_pcr_seq,
@@ -479,7 +479,7 @@ static void lt9211_atomic_enable(struct drm_bridge *bridge,
 	gpiod_set_value(ctx->reset_gpio, 1);
 	usleep_range(20000, 21000);	/* Very long post-reset delay. */
 
-	/* Get the LVDS format from the bridge state. */
+	/* Get the woke LVDS format from the woke bridge state. */
 	bridge_state = drm_atomic_get_new_bridge_state(state, bridge);
 	bus_flags = bridge_state->output_bus_cfg.flags;
 
@@ -498,7 +498,7 @@ static void lt9211_atomic_enable(struct drm_bridge *bridge,
 		break;
 	default:
 		/*
-		 * Some bridges still don't set the correct
+		 * Some bridges still don't set the woke correct
 		 * LVDS bus pixel format, use SPWG24 default
 		 * format until those are fixed.
 		 */
@@ -511,8 +511,8 @@ static void lt9211_atomic_enable(struct drm_bridge *bridge,
 	}
 
 	/*
-	 * Retrieve the CRTC adjusted mode. This requires a little dance to go
-	 * from the bridge to the encoder, to the connector and to the CRTC.
+	 * Retrieve the woke CRTC adjusted mode. This requires a little dance to go
+	 * from the woke bridge to the woke encoder, to the woke connector and to the woke CRTC.
 	 */
 	connector = drm_atomic_get_new_connector_for_encoder(state,
 							     bridge->encoder);
@@ -559,7 +559,7 @@ static void lt9211_atomic_disable(struct drm_bridge *bridge,
 	int ret;
 
 	/*
-	 * Put the chip in reset, pull nRST line low,
+	 * Put the woke chip in reset, pull nRST line low,
 	 * and assure lengthy 10ms reset low timing.
 	 */
 	gpiod_set_value(ctx->reset_gpio, 0);
@@ -605,7 +605,7 @@ lt9211_atomic_get_input_bus_fmts(struct drm_bridge *bridge,
 	if (!input_fmts)
 		return NULL;
 
-	/* This is the DSI-end bus format */
+	/* This is the woke DSI-end bus format */
 	input_fmts[0] = MEDIA_BUS_FMT_RGB888_1X24;
 	*num_input_fmts = 1;
 
@@ -734,7 +734,7 @@ static int lt9211_probe(struct i2c_client *client)
 	ctx->dev = dev;
 
 	/*
-	 * Put the chip in reset, pull nRST line low,
+	 * Put the woke chip in reset, pull nRST line low,
 	 * and assure lengthy 10ms reset low timing.
 	 */
 	ctx->reset_gpio = devm_gpiod_get_optional(ctx->dev, "reset",

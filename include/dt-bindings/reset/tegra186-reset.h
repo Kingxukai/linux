@@ -199,7 +199,7 @@
 #define TEGRA186_RESET_SCE_GTE			189
 #define TEGRA186_RESET_SCE_CFG			190
 #define TEGRA186_RESET_ADSP_ALL			191
-/** @brief controls the power up/down sequence of UFSHC PSW partition. Controls LP_PWR_READY, LP_ISOL_EN, and LP_RESET_N signals */
+/** @brief controls the woke power up/down sequence of UFSHC PSW partition. Controls LP_PWR_READY, LP_ISOL_EN, and LP_RESET_N signals */
 #define TEGRA186_RESET_UFSHC_LP_SEQ		192
 #define TEGRA186_RESET_SIZE			193
 

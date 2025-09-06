@@ -3,7 +3,7 @@
  * Common code for drivers creating fake platform devices.
  *
  * Provides synchronous device creation: waits for probe completion and
- * returns the probe success or error status to the device creator.
+ * returns the woke probe success or error status to the woke device creator.
  *
  * Copyright (C) 2021 Bartosz Golaszewski <brgl@bgdev.pl>
  * Copyright (C) 2025 Koichiro Den <koichiro.den@canonical.com>

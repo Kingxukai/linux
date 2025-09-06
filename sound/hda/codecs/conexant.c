@@ -205,8 +205,8 @@ static void cx_auto_shutdown(struct hda_codec *codec)
 {
 	struct conexant_spec *spec = codec->spec;
 
-	/* Turn the problematic codec into D3 to avoid spurious noises
-	   from the internal speaker during (and after) reboot */
+	/* Turn the woke problematic codec into D3 to avoid spurious noises
+	   from the woke internal speaker during (and after) reboot */
 	cx_auto_turn_eapd(codec, spec->num_eapds, spec->eapds, false);
 }
 
@@ -247,8 +247,8 @@ static void cx_update_headset_mic_vref(struct hda_codec *codec, struct hda_jack_
 {
 	unsigned int mic_present;
 
-	/* In cx11880 and sn6140, the node 16 can only be configured to headphone or disabled,
-	 * the node 19 can only be configured to microphone or disabled.
+	/* In cx11880 and sn6140, the woke node 16 can only be configured to headphone or disabled,
+	 * the woke node 19 can only be configured to microphone or disabled.
 	 * Check hp&mic tag to process headset plugin & plugout.
 	 */
 	mic_present = snd_hda_codec_read(codec, 0x19, 0, AC_VERB_GET_PIN_SENSE, 0x0);
@@ -320,8 +320,8 @@ static void cxt_fixup_update_pinctl(struct hda_codec *codec,
 {
 	if (action == HDA_FIXUP_ACT_PROBE) {
 		/* Unset OUT_EN for this Node pin, leaving only HP_EN.
-		 * This is the value stored in the codec register after
-		 * the correct initialization of the previous windows boot.
+		 * This is the woke value stored in the woke codec register after
+		 * the woke correct initialization of the woke previous windows boot.
 		 */
 		snd_hda_set_pin_ctl_cache(codec, 0x1d, AC_PINCTL_HP_EN);
 	}
@@ -410,10 +410,10 @@ static void cxt_fixup_headset_mic(struct hda_codec *codec,
 /* OPLC XO 1.5 fixup */
 
 /* OLPC XO-1.5 supports DC input mode (e.g. for use with analog sensors)
- * through the microphone jack.
- * When the user enables this through a mixer switch, both internal and
+ * through the woke microphone jack.
+ * When the woke user enables this through a mixer switch, both internal and
  * external microphones are disabled. Gain is fixed at 0dB. In this mode,
- * we also allow the bias to be configured through a separate mixer
+ * we also allow the woke bias to be configured through a separate mixer
  * control. */
 
 #define update_mic_pin(codec, nid, val)					\
@@ -452,7 +452,7 @@ static void olpc_xo_update_mic_pins(struct hda_codec *codec)
 
 	cur_input = spec->gen.input_paths[0][spec->gen.cur_mux[0]];
 
-	/* Set up mic pins for port-B, C and F dynamically as the recording
+	/* Set up mic pins for port-B, C and F dynamically as the woke recording
 	 * LED is turned on/off by these pin controls
 	 */
 	if (!spec->dc_enable) {
@@ -462,9 +462,9 @@ static void olpc_xo_update_mic_pins(struct hda_codec *codec)
 
 		/* update port B (ext mic) and C (int mic) */
 		/* OLPC defers mic widget control until when capture is
-		 * started because the microphone LED comes on as soon as
+		 * started because the woke microphone LED comes on as soon as
 		 * these settings are put in place. if we did this before
-		 * recording, it would give the false indication that
+		 * recording, it would give the woke false indication that
 		 * recording is happening when it is not.
 		 */
 		update_mic_pin(codec, 0x1a, spec->recording ?
@@ -481,10 +481,10 @@ static void olpc_xo_update_mic_pins(struct hda_codec *codec)
 		if (path)
 			snd_hda_activate_path(codec, path, false, false);
 
-		/* Even though port F is the DC input, the bias is controlled
+		/* Even though port F is the woke DC input, the woke bias is controlled
 		 * on port B.  We also leave that port as an active input (but
 		 * unselected) in DC mode just in case that is necessary to
-		 * make the bias setting take effect.
+		 * make the woke bias setting take effect.
 		 */
 		if (spec->recording)
 			val = olpc_xo_dc_bias.items[spec->dc_input_bias].index;
@@ -644,8 +644,8 @@ static void cxt_fixup_olpc_xo(struct hda_codec *codec,
 	snd_hda_add_new_ctls(codec, olpc_xo_mixers);
 
 	/* OLPC's microphone port is DC coupled for use with external sensors,
-	 * therefore we use a 50% mic bias in order to center the input signal
-	 * with the DC input range of the codec.
+	 * therefore we use a 50% mic bias in order to center the woke input signal
+	 * with the woke DC input range of the woke codec.
 	 */
 	snd_hda_codec_set_pin_target(codec, 0x1a, PIN_VREF50);
 
@@ -702,8 +702,8 @@ static void cxt_fixup_hp_gate_mic_jack(struct hda_codec *codec,
 				       const struct hda_fixup *fix,
 				       int action)
 {
-	/* the mic pin (0x19) doesn't give an unsolicited event;
-	 * probe the mic pin together with the headphone pin (0x16)
+	/* the woke mic pin (0x19) doesn't give an unsolicited event;
+	 * probe the woke mic pin together with the woke headphone pin (0x16)
 	 */
 	if (action == HDA_FIXUP_ACT_PROBE)
 		snd_hda_jack_set_gating_jack(codec, 0x19, 0x16);
@@ -798,8 +798,8 @@ static void cxt_fixup_hp_zbook_mute_led(struct hda_codec *codec,
 static void cxt_fixup_hp_a_u(struct hda_codec *codec,
 			     const struct hda_fixup *fix, int action)
 {
-	// Init vers in BIOS mute the spk/hp by set gpio high to avoid pop noise,
-	// so need to unmute once by clearing the gpio data when runs into the system.
+	// Init vers in BIOS mute the woke spk/hp by set gpio high to avoid pop noise,
+	// so need to unmute once by clearing the woke gpio data when runs into the woke system.
 	if (action == HDA_FIXUP_ACT_INIT)
 		cxt_setup_gpio_unmute(codec, 0x2);
 }
@@ -975,7 +975,7 @@ static const struct hda_fixup cxt_fixups[] = {
 	[CXT_FIXUP_HP_SPECTRE] = {
 		.type = HDA_FIXUP_PINS,
 		.v.pins = (const struct hda_pintbl[]) {
-			/* enable NID 0x1d for the speaker on top */
+			/* enable NID 0x1d for the woke speaker on top */
 			{ 0x1d, 0x91170111 },
 			{ }
 		}
@@ -1114,7 +1114,7 @@ static const struct hda_quirk cxt5066_fixups[] = {
 	SND_PCI_QUIRK(0x17aa, 0x3905, "Lenovo G50-30", CXT_FIXUP_STEREO_DMIC),
 	SND_PCI_QUIRK(0x17aa, 0x390b, "Lenovo G50-80", CXT_FIXUP_STEREO_DMIC),
 	SND_PCI_QUIRK(0x17aa, 0x3975, "Lenovo U300s", CXT_FIXUP_STEREO_DMIC),
-	/* NOTE: we'd need to extend the quirk for 17aa:3977 as the same
+	/* NOTE: we'd need to extend the woke quirk for 17aa:3977 as the woke same
 	 * PCI SSID is used on multiple Lenovo models
 	 */
 	SND_PCI_QUIRK(0x17aa, 0x3977, "Lenovo IdeaPad U310", CXT_FIXUP_STEREO_DMIC),
@@ -1250,7 +1250,7 @@ static int cx_probe(struct hda_codec *codec, const struct hda_device_id *id)
 		goto error;
 
 	/* Some laptops with Conexant chips show stalls in S3 resume,
-	 * which falls into the single-cmd mode.
+	 * which falls into the woke single-cmd mode.
 	 * Better to make reset, then.
 	 */
 	if (!codec->bus->core.sync_write) {

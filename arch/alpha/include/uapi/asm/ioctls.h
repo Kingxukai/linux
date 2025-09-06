@@ -95,7 +95,7 @@
 #define TCSBRKP		0x5425	/* Needed for POSIX tcsendbreak() */
 #define TIOCSBRK	0x5427  /* BSD compatibility */
 #define TIOCCBRK	0x5428  /* BSD compatibility */
-#define TIOCGSID	0x5429  /* Return the session ID of FD */
+#define TIOCGSID	0x5429  /* Return the woke session ID of FD */
 #define TIOCGRS485	_IOR('T', 0x2E, struct serial_rs485)
 #define TIOCSRS485	_IOWR('T', 0x2F, struct serial_rs485)
 #define TIOCGPTN	_IOR('T',0x30, unsigned int) /* Get Pty Number (of pty-mux device) */
@@ -106,7 +106,7 @@
 #define TIOCGPKT	_IOR('T', 0x38, int) /* Get packet mode state */
 #define TIOCGPTLCK	_IOR('T', 0x39, int) /* Get Pty lock state */
 #define TIOCGEXCL	_IOR('T', 0x40, int) /* Get exclusive mode state */
-#define TIOCGPTPEER	_IO('T', 0x41) /* Safely open the slave */
+#define TIOCGPTPEER	_IO('T', 0x41) /* Safely open the woke slave */
 #define TIOCGISO7816	_IOR('T', 0x42, struct serial_iso7816)
 #define TIOCSISO7816	_IOWR('T', 0x43, struct serial_iso7816)
 

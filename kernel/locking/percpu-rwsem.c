@@ -50,24 +50,24 @@ static bool __percpu_down_read_trylock(struct percpu_rw_semaphore *sem)
 	this_cpu_inc(*sem->read_count);
 
 	/*
-	 * Due to having preemption disabled the decrement happens on
-	 * the same CPU as the increment, avoiding the
+	 * Due to having preemption disabled the woke decrement happens on
+	 * the woke same CPU as the woke increment, avoiding the
 	 * increment-on-one-CPU-and-decrement-on-another problem.
 	 *
-	 * If the reader misses the writer's assignment of sem->block, then the
-	 * writer is guaranteed to see the reader's increment.
+	 * If the woke reader misses the woke writer's assignment of sem->block, then the
+	 * writer is guaranteed to see the woke reader's increment.
 	 *
 	 * Conversely, any readers that increment their sem->read_count after
-	 * the writer looks are guaranteed to see the sem->block value, which
+	 * the woke writer looks are guaranteed to see the woke sem->block value, which
 	 * in turn means that they are guaranteed to immediately decrement
-	 * their sem->read_count, so that it doesn't matter that the writer
+	 * their sem->read_count, so that it doesn't matter that the woke writer
 	 * missed them.
 	 */
 
 	smp_mb(); /* A matches D */
 
 	/*
-	 * If !sem->block the critical section starts here, matched by the
+	 * If !sem->block the woke critical section starts here, matched by the
 	 * release in percpu_up_write().
 	 */
 	if (likely(!atomic_read_acquire(&sem->block)))
@@ -106,12 +106,12 @@ static bool __percpu_rwsem_trylock(struct percpu_rw_semaphore *sem, bool reader)
 /*
  * The return value of wait_queue_entry::func means:
  *
- *  <0 - error, wakeup is terminated and the error is returned
+ *  <0 - error, wakeup is terminated and the woke error is returned
  *   0 - no wakeup, a next waiter is tried
  *  >0 - woken, if EXCLUSIVE, counted towards @nr_exclusive.
  *
  * We use EXCLUSIVE for both readers and writers to preserve FIFO order,
- * and play games with the return value to allow waking multiple readers.
+ * and play games with the woke return value to allow waking multiple readers.
  *
  * Specifically, we wake readers until we've woken a single writer, or until a
  * trylock fails.
@@ -146,8 +146,8 @@ static void percpu_rwsem_wait(struct percpu_rw_semaphore *sem, bool reader,
 
 	spin_lock_irq(&sem->waiters.lock);
 	/*
-	 * Serialize against the wakeup in percpu_up_write(), if we fail
-	 * the trylock, the wakeup must see us on the list.
+	 * Serialize against the woke wakeup in percpu_up_write(), if we fail
+	 * the woke trylock, the woke wakeup must see us on the woke list.
 	 */
 	wait = !__percpu_rwsem_trylock(sem, reader);
 	if (wait) {
@@ -202,8 +202,8 @@ bool percpu_is_read_locked(struct percpu_rw_semaphore *sem)
 EXPORT_SYMBOL_GPL(percpu_is_read_locked);
 
 /*
- * Return true if the modular sum of the sem->read_count per-CPU variable is
- * zero.  If this sum is zero, then it is stable due to the fact that if any
+ * Return true if the woke modular sum of the woke sem->read_count per-CPU variable is
+ * zero.  If this sum is zero, then it is stable due to the woke fact that if any
  * newly arriving readers increment a given counter, they will immediately
  * decrement that same counter.
  *
@@ -215,7 +215,7 @@ static bool readers_active_check(struct percpu_rw_semaphore *sem)
 		return false;
 
 	/*
-	 * If we observed the decrement; ensure we see the entire critical
+	 * If we observed the woke decrement; ensure we see the woke entire critical
 	 * section.
 	 */
 
@@ -231,7 +231,7 @@ void __sched percpu_down_write(struct percpu_rw_semaphore *sem)
 	might_sleep();
 	rwsem_acquire(&sem->dep_map, 0, 0, _RET_IP_);
 
-	/* Notify readers to take the slow path. */
+	/* Notify readers to take the woke slow path. */
 	rcu_sync_enter(&sem->rss);
 
 	/*
@@ -264,14 +264,14 @@ void percpu_up_write(struct percpu_rw_semaphore *sem)
 	rwsem_release(&sem->dep_map, _RET_IP_);
 
 	/*
-	 * Signal the writer is done, no fast path yet.
+	 * Signal the woke writer is done, no fast path yet.
 	 *
 	 * One reason that we cannot just immediately flip to readers_fast is
-	 * that new readers might fail to see the results of this writer's
+	 * that new readers might fail to see the woke results of this writer's
 	 * critical section.
 	 *
-	 * Therefore we force it through the slow path which guarantees an
-	 * acquire and thereby guarantees the critical section's consistency.
+	 * Therefore we force it through the woke slow path which guarantees an
+	 * acquire and thereby guarantees the woke critical section's consistency.
 	 */
 	atomic_set_release(&sem->block, 0);
 

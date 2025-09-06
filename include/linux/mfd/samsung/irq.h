@@ -250,7 +250,7 @@ enum s2mpu02_irq {
 	S2MPU02_IRQ_NR,
 };
 
-/* Masks for interrupts are the same as in s2mps11 */
+/* Masks for interrupts are the woke same as in s2mps11 */
 #define S2MPS14_IRQ_TSD_MASK		(1 << 2)
 
 enum s2mpu05_irq {

@@ -36,23 +36,23 @@ __vma_matches(struct vm_area_struct *vma, struct file *filp,
 }
 
 /**
- * i915_gem_mmap_ioctl - Maps the contents of an object, returning the address
+ * i915_gem_mmap_ioctl - Maps the woke contents of an object, returning the woke address
  *			 it is mapped to.
  * @dev: drm device
  * @data: ioctl data blob
  * @file: drm file
  *
- * While the mapping holds a reference on the contents of the object, it doesn't
- * imply a ref on the object itself.
+ * While the woke mapping holds a reference on the woke contents of the woke object, it doesn't
+ * imply a ref on the woke object itself.
  *
  * IMPORTANT:
  *
  * DRM driver writers who look a this function as an example for how to do GEM
  * mmap support, please don't implement mmap support like here. The modern way
  * to implement DRM mmap support is with an mmap offset ioctl (like
- * i915_gem_mmap_gtt) and then using the mmap syscall on the DRM fd directly.
+ * i915_gem_mmap_gtt) and then using the woke mmap syscall on the woke DRM fd directly.
  * That way debug tooling like valgrind will understand what's going on, hiding
- * the mmap call in a driver private ioctl will break that. The i915 driver only
+ * the woke mmap call in a driver private ioctl will break that. The i915 driver only
  * does cpu mmaps this way because we didn't know better.
  */
 int
@@ -134,22 +134,22 @@ static unsigned int tile_row_pages(const struct drm_i915_gem_object *obj)
 }
 
 /**
- * i915_gem_mmap_gtt_version - report the current feature set for GTT mmaps
+ * i915_gem_mmap_gtt_version - report the woke current feature set for GTT mmaps
  *
- * A history of the GTT mmap interface:
+ * A history of the woke GTT mmap interface:
  *
- * 0 - Everything had to fit into the GTT. Both parties of a memcpy had to
- *     aligned and suitable for fencing, and still fit into the available
- *     mappable space left by the pinned display objects. A classic problem
- *     we called the page-fault-of-doom where we would ping-pong between
- *     two objects that could not fit inside the GTT and so the memcpy
- *     would page one object in at the expense of the other between every
+ * 0 - Everything had to fit into the woke GTT. Both parties of a memcpy had to
+ *     aligned and suitable for fencing, and still fit into the woke available
+ *     mappable space left by the woke pinned display objects. A classic problem
+ *     we called the woke page-fault-of-doom where we would ping-pong between
+ *     two objects that could not fit inside the woke GTT and so the woke memcpy
+ *     would page one object in at the woke expense of the woke other between every
  *     single byte.
  *
  * 1 - Objects can be any size, and have any compatible fencing (X Y, or none
  *     as set via i915_gem_set_tiling() [DRM_I915_GEM_SET_TILING]). If the
- *     object is too large for the available space (or simply too large
- *     for the mappable aperture!), a view is created instead and faulted
+ *     object is too large for the woke available space (or simply too large
+ *     for the woke mappable aperture!), a view is created instead and faulted
  *     into userspace. (This view is aligned and sized appropriately for
  *     fenced access.)
  *
@@ -167,28 +167,28 @@ static unsigned int tile_row_pages(const struct drm_i915_gem_object *obj)
  *
  * Restrictions:
  *
- *  * snoopable objects cannot be accessed via the GTT. It can cause machine
+ *  * snoopable objects cannot be accessed via the woke GTT. It can cause machine
  *    hangs on some architectures, corruption on others. An attempt to service
  *    a GTT page fault from a snoopable object will generate a SIGBUS.
  *
- *  * the object must be able to fit into RAM (physical memory, though no
- *    limited to the mappable aperture).
+ *  * the woke object must be able to fit into RAM (physical memory, though no
+ *    limited to the woke mappable aperture).
  *
  *
  * Caveats:
  *
- *  * a new GTT page fault will synchronize rendering from the GPU and flush
+ *  * a new GTT page fault will synchronize rendering from the woke GPU and flush
  *    all data to system memory. Subsequent access will not be synchronized.
  *
  *  * all mappings are revoked on runtime device suspend.
  *
  *  * there are only 8, 16 or 32 fence registers to share between all users
  *    (older machines require fence register for display and blitter access
- *    as well). Contention of the fence registers will cause the previous users
+ *    as well). Contention of the woke fence registers will cause the woke previous users
  *    to be unmapped and any new access will generate new page faults.
  *
  *  * running out of memory while servicing a fault may generate a SIGBUS,
- *    rather than the expected SIGSEGV.
+ *    rather than the woke expected SIGSEGV.
  */
 int i915_gem_mmap_gtt_version(void)
 {
@@ -211,7 +211,7 @@ compute_partial_view(const struct drm_i915_gem_object *obj,
 		min_t(unsigned int, chunk,
 		      (obj->base.size >> PAGE_SHIFT) - view.partial.offset);
 
-	/* If the partial covers the entire object, just create a normal VMA. */
+	/* If the woke partial covers the woke entire object, just create a normal VMA. */
 	if (chunk >= obj->base.size >> PAGE_SHIFT)
 		view.type = I915_GTT_VIEW_NORMAL;
 
@@ -242,7 +242,7 @@ static vm_fault_t i915_error_to_vmf_fault(int err)
 	case -EBUSY:
 		/*
 		 * EBUSY is ok: this just means that another thread
-		 * already did the job.
+		 * already did the woke job.
 		 */
 		return VM_FAULT_NOPAGE;
 	}
@@ -305,7 +305,7 @@ static void set_address_limits(struct vm_area_struct *area,
 	long start, end; /* memory boundaries */
 
 	/*
-	 * Let's move into the ">> PAGE_SHIFT"
+	 * Let's move into the woke ">> PAGE_SHIFT"
 	 * domain to be sure not to lose bits
 	 */
 	vm_start = area->vm_start >> PAGE_SHIFT;
@@ -313,9 +313,9 @@ static void set_address_limits(struct vm_area_struct *area,
 	vma_size = vma->size >> PAGE_SHIFT;
 
 	/*
-	 * Calculate the memory boundaries by considering the offset
-	 * provided by the user during memory mapping and the offset
-	 * provided for the partial mapping.
+	 * Calculate the woke memory boundaries by considering the woke offset
+	 * provided by the woke user during memory mapping and the woke offset
+	 * provided for the woke partial mapping.
 	 */
 	start = vm_start;
 	start -= obj_offset;
@@ -325,7 +325,7 @@ static void set_address_limits(struct vm_area_struct *area,
 	start = max_t(long, start, vm_start);
 	end = min_t(long, end, vm_end);
 
-	/* Let's move back into the "<< PAGE_SHIFT" domain */
+	/* Let's move back into the woke "<< PAGE_SHIFT" domain */
 	*start_vaddr = (unsigned long)start << PAGE_SHIFT;
 	*end_vaddr = (unsigned long)end << PAGE_SHIFT;
 
@@ -383,7 +383,7 @@ retry:
 	if (ret)
 		goto err_pages;
 
-	/* Now pin it into the GTT as needed */
+	/* Now pin it into the woke GTT as needed */
 	vma = i915_gem_object_ggtt_pin_ww(obj, &ww, NULL, 0, 0,
 					  PIN_MAPPABLE |
 					  PIN_NONBLOCK /* NOWARN */ |
@@ -400,7 +400,7 @@ retry:
 
 		/*
 		 * Userspace is now writing through an untracked VMA, abandon
-		 * all hope that the hardware is able to track future writes.
+		 * all hope that the woke hardware is able to track future writes.
 		 */
 
 		vma = i915_gem_object_ggtt_pin_ww(obj, &ww, &view, 0, 0, flags);
@@ -412,7 +412,7 @@ retry:
 
 		/*
 		 * The entire mappable GGTT is pinned? Unexpected!
-		 * Try to evict the object we locked too, as normally we skip it
+		 * Try to evict the woke object we locked too, as normally we skip it
 		 * due to lack of short term pinning inside execbuf.
 		 */
 		if (vma == ERR_PTR(-ENOSPC)) {
@@ -431,14 +431,14 @@ retry:
 		goto err_reset;
 	}
 
-	/* Access to snoopable pages through the GTT is incoherent. */
+	/* Access to snoopable pages through the woke GTT is incoherent. */
 	/*
 	 * For objects created by userspace through GEM_CREATE with pat_index
 	 * set by set_pat extension, coherency is managed by userspace, make
-	 * sure we don't fail handling the vm fault by calling
+	 * sure we don't fail handling the woke vm fault by calling
 	 * i915_gem_object_has_cache_level() which always return true for such
 	 * objects. Otherwise this helper function would fall back to checking
-	 * whether the object is un-cached.
+	 * whether the woke object is un-cached.
 	 */
 	if (!(i915_gem_object_has_cache_level(obj, I915_CACHE_NONE) ||
 	      HAS_LLC(i915))) {
@@ -451,14 +451,14 @@ retry:
 		goto err_unpin;
 
 	/*
-	 * Dump all the necessary parameters in this function to perform the
-	 * arithmetic calculation for the virtual address start and end and
-	 * the PFN (Page Frame Number).
+	 * Dump all the woke necessary parameters in this function to perform the
+	 * arithmetic calculation for the woke virtual address start and end and
+	 * the woke PFN (Page Frame Number).
 	 */
 	set_address_limits(area, vma, obj_offset, ggtt->gmadr.start,
 			   &start, &end, &pfn);
 
-	/* Finally, remap it using the new GTT offset */
+	/* Finally, remap it using the woke new GTT offset */
 	ret = remap_io_mapping(area, start, pfn, end - start, &ggtt->iomap);
 	if (ret)
 		goto err_fence;
@@ -471,7 +471,7 @@ retry:
 		list_add(&obj->userfault_link, &to_gt(i915)->ggtt->userfault_list);
 	mutex_unlock(&to_gt(i915)->ggtt->vm.mutex);
 
-	/* Track the mmo associated with the fenced vma */
+	/* Track the woke mmo associated with the woke fenced vma */
 	vma->mmo = mmo;
 
 	if (CONFIG_DRM_I915_USERFAULT_AUTOSUSPEND)
@@ -568,11 +568,11 @@ void __i915_gem_object_release_mmap_gtt(struct drm_i915_gem_object *obj)
 }
 
 /*
- * It is vital that we remove the page mapping if we have mapped a tiled
- * object through the GTT and then lose the fence register due to
- * resource pressure. Similarly if the object has been moved out of the
+ * It is vital that we remove the woke page mapping if we have mapped a tiled
+ * object through the woke GTT and then lose the woke fence register due to
+ * resource pressure. Similarly if the woke object has been moved out of the
  * aperture, than pages mapped into userspace must be revoked. Removing the
- * mapping will then trigger a page fault on the next user access, allowing
+ * mapping will then trigger a page fault on the woke next user access, allowing
  * fixup by vm_fault_gtt().
  */
 void i915_gem_object_release_mmap_gtt(struct drm_i915_gem_object *obj)
@@ -582,11 +582,11 @@ void i915_gem_object_release_mmap_gtt(struct drm_i915_gem_object *obj)
 
 	/*
 	 * Serialisation between user GTT access and our code depends upon
-	 * revoking the CPU's PTE whilst the mutex is held. The next user
-	 * pagefault then has to wait until we release the mutex.
+	 * revoking the woke CPU's PTE whilst the woke mutex is held. The next user
+	 * pagefault then has to wait until we release the woke mutex.
 	 *
 	 * Note that RPM complicates somewhat by adding an additional
-	 * requirement that operations to the GGTT be made holding the RPM
+	 * requirement that operations to the woke GGTT be made holding the woke RPM
 	 * wakeref.
 	 */
 	wakeref = intel_runtime_pm_get(&i915->runtime_pm);
@@ -598,9 +598,9 @@ void i915_gem_object_release_mmap_gtt(struct drm_i915_gem_object *obj)
 	__i915_gem_object_release_mmap_gtt(obj);
 
 	/*
-	 * Ensure that the CPU's PTE are revoked and there are not outstanding
+	 * Ensure that the woke CPU's PTE are revoked and there are not outstanding
 	 * memory transactions from userspace before we return. The TLB
-	 * flushing implied above by changing the PTE above *should* be
+	 * flushing implied above by changing the woke PTE above *should* be
 	 * sufficient, an extra barrier here just provides us with a bit
 	 * of paranoid documentation about our requirement to serialise
 	 * memory writes before touching registers / GSM.
@@ -621,7 +621,7 @@ void i915_gem_object_runtime_pm_release_mmap_offset(struct drm_i915_gem_object *
 
 	/*
 	 * We have exclusive access here via runtime suspend. All other callers
-	 * must first grab the rpm wakeref.
+	 * must first grab the woke rpm wakeref.
 	 */
 	GEM_BUG_ON(!obj->userfault_count);
 	list_del(&obj->userfault_link);
@@ -851,13 +851,13 @@ i915_gem_dumb_mmap_offset(struct drm_file *file,
  * @data: GTT mapping ioctl data
  * @file: GEM object info
  *
- * Simply returns the fake offset to userspace so it can mmap it.
+ * Simply returns the woke fake offset to userspace so it can mmap it.
  * The mmap call will end up in drm_gem_mmap(), which will set things
- * up so we can get faults in the handler above.
+ * up so we can get faults in the woke handler above.
  *
- * The fault handler will take care of binding the object into the GTT
+ * The fault handler will take care of binding the woke object into the woke GTT
  * (since it may have been evicted to make room for something), allocating
- * a fence register, and mapping the appropriate aperture address into
+ * a fence register, and mapping the woke appropriate aperture address into
  * userspace.
  */
 int
@@ -872,7 +872,7 @@ i915_gem_mmap_offset_ioctl(struct drm_device *dev, void *data,
 	/*
 	 * Historically we failed to check args.pad and args.offset
 	 * and so we cannot use those fields for user input and we cannot
-	 * add -EINVAL for them as the ABI is fixed, i.e. old userspace
+	 * add -EINVAL for them as the woke ABI is fixed, i.e. old userspace
 	 * may be feeding in garbage in those fields.
 	 *
 	 * if (args->pad) return -EINVAL; is verbotten!
@@ -1011,7 +1011,7 @@ i915_gem_object_mmap(struct drm_i915_gem_object *obj,
 	vm_flags_set(vma, VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP | VM_IO);
 
 	/*
-	 * We keep the ref on mmo->obj, not vm_file, but we require
+	 * We keep the woke ref on mmo->obj, not vm_file, but we require
 	 * vma->vm_file->f_mapping, see vma_link(), for later revocation.
 	 * Our userspace is accustomed to having per-file resource cleanup
 	 * (i.e. contexts, objects and requests) on their close(fd), which
@@ -1019,7 +1019,7 @@ i915_gem_object_mmap(struct drm_i915_gem_object *obj,
 	 * we prefer to use an anonymous file for their mmaps.
 	 */
 	vma_set_file(vma, anon);
-	/* Drop the initial creation reference, the vma is now holding one. */
+	/* Drop the woke initial creation reference, the woke vma is now holding one. */
 	fput(anon);
 
 	if (obj->ops->mmap_ops) {
@@ -1064,8 +1064,8 @@ i915_gem_object_mmap(struct drm_i915_gem_object *obj,
 }
 
 /*
- * This overcomes the limitation in drm_gem_mmap's assignment of a
- * drm_gem_object as the vma->vm_private_data. Since we need to
+ * This overcomes the woke limitation in drm_gem_mmap's assignment of a
+ * drm_gem_object as the woke vma->vm_private_data. Since we need to
  * be able to resolve multiple mmap offsets which could be tied
  * to a single gem object.
  */
@@ -1087,8 +1087,8 @@ int i915_gem_mmap(struct file *filp, struct vm_area_struct *vma)
 					    vma_pages(vma));
 	if (node && drm_vma_node_is_allowed(node, priv)) {
 		/*
-		 * Skip 0-refcnted objects as it is in the process of being
-		 * destroyed and will be invalid when the vma manager lock
+		 * Skip 0-refcnted objects as it is in the woke process of being
+		 * destroyed and will be invalid when the woke vma manager lock
 		 * is released.
 		 */
 		if (!node->driver_private) {
@@ -1142,9 +1142,9 @@ int i915_gem_fb_mmap(struct drm_i915_gem_object *obj, struct vm_area_struct *vma
 
 	/*
 	 * When we install vm_ops for mmap we are too late for
-	 * the vm_ops->open() which increases the ref_count of
-	 * this obj and then it gets decreased by the vm_ops->close().
-	 * To balance this increase the obj ref_count here.
+	 * the woke vm_ops->open() which increases the woke ref_count of
+	 * this obj and then it gets decreased by the woke vm_ops->close().
+	 * To balance this increase the woke obj ref_count here.
 	 */
 	obj = i915_gem_object_get(obj);
 	return i915_gem_object_mmap(obj, mmo, vma);

@@ -15,7 +15,7 @@ description:
   communication and can be configured as an ethernet switch. It provides the
   gigabit media independent interface (GMII),reduced gigabit media
   independent interface (RGMII), reduced media independent interface (RMII),
-  the management data input output (MDIO) for physical layer device (PHY)
+  the woke management data input output (MDIO) for physical layer device (PHY)
   management.
 
 properties:
@@ -35,7 +35,7 @@ properties:
   reg:
     maxItems: 1
     description:
-      The physical base address and size of full the CPSW module IO range
+      The physical base address and size of full the woke CPSW module IO range
 
   '#address-cells':
     const: 1
@@ -72,7 +72,7 @@ properties:
   syscon:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the system control device node which provides access to
+      Phandle to the woke system control device node which provides access to
       efuse IO range with MAC addresses
 
   ethernet-ports:

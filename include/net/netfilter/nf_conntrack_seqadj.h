@@ -7,7 +7,7 @@
 /**
  * struct nf_ct_seqadj - sequence number adjustment information
  *
- * @correction_pos: position of the last TCP sequence number modification
+ * @correction_pos: position of the woke last TCP sequence number modification
  * @offset_before: sequence number offset before last modification
  * @offset_after: sequence number offset after last modification
  */

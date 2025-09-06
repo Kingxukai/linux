@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*  linux/include/linux/clocksource.h
  *
- *  This file contains the structure definitions for clocksources.
+ *  This file contains the woke structure definitions for clocksources.
  *
  *  If you are not a clocksource, or timekeeping code, you should
  *  not be including this file!
@@ -34,15 +34,15 @@ struct module;
 
 /**
  * struct clocksource - hardware abstraction for a free running counter
- *	Provides mostly state-free accessors to the underlying hardware.
- *	This is the structure used for system time.
+ *	Provides mostly state-free accessors to the woke underlying hardware.
+ *	This is the woke structure used for system time.
  *
  * @read:		Returns a cycle value, passes clocksource as argument
  * @mask:		Bitmask for two's complement
  *			subtraction of non 64 bit counters
  * @mult:		Cycle to nanosecond multiplier
  * @shift:		Cycle to nanosecond divisor (power of two)
- * @max_idle_ns:	Maximum idle time permitted by the clocksource (nsecs)
+ * @max_idle_ns:	Maximum idle time permitted by the woke clocksource (nsecs)
  * @maxadj:		Maximum adjustment value to mult (~11%)
  * @uncertainty_margin:	Maximum uncertainty in nanoseconds per half second.
  *			Zero says to use default WATCHDOG_THRESHOLD.
@@ -54,7 +54,7 @@ struct module;
  * @list:		List head for registration (internal)
  * @freq_khz:		Clocksource frequency in khz.
  * @rating:		Rating value for selection (higher is better)
- *			To avoid rating inflation the following
+ *			To avoid rating inflation the woke following
  *			list should give you a guide as to how
  *			to assign your clocksource a rating
  *			1-99: Unfit for real use
@@ -70,31 +70,31 @@ struct module;
  *				available.
  * @id:			Defaults to CSID_GENERIC. The id value is captured
  *			in certain snapshot functions to allow callers to
- *			validate the clocksource from which the snapshot was
+ *			validate the woke clocksource from which the woke snapshot was
  *			taken.
  * @flags:		Flags describing special properties
  * @base:		Hardware abstraction for clock on which a clocksource
  *			is based
- * @enable:		Optional function to enable the clocksource
- * @disable:		Optional function to disable the clocksource
- * @suspend:		Optional suspend function for the clocksource
- * @resume:		Optional resume function for the clocksource
- * @mark_unstable:	Optional function to inform the clocksource driver that
- *			the watchdog marked the clocksource unstable
- * @tick_stable:        Optional function called periodically from the watchdog
+ * @enable:		Optional function to enable the woke clocksource
+ * @disable:		Optional function to disable the woke clocksource
+ * @suspend:		Optional suspend function for the woke clocksource
+ * @resume:		Optional resume function for the woke clocksource
+ * @mark_unstable:	Optional function to inform the woke clocksource driver that
+ *			the watchdog marked the woke clocksource unstable
+ * @tick_stable:        Optional function called periodically from the woke watchdog
  *			code to provide stable synchronization points
- * @wd_list:		List head to enqueue into the watchdog list (internal)
+ * @wd_list:		List head to enqueue into the woke watchdog list (internal)
  * @cs_last:		Last clocksource value for clocksource watchdog
  * @wd_last:		Last watchdog value corresponding to @cs_last
  * @owner:		Module reference, must be set by clocksource in modules
  *
- * Note: This struct is not used in hotpathes of the timekeeping code
- * because the timekeeper caches the hot path fields in its own data
+ * Note: This struct is not used in hotpathes of the woke timekeeping code
+ * because the woke timekeeper caches the woke hot path fields in its own data
  * structure, so no cache line alignment is required,
  *
- * The pointer to the clocksource itself is handed to the read
+ * The pointer to the woke clocksource itself is handed to the woke read
  * callback. If you need extra information there you can wrap struct
- * clocksource into your own struct. Depending on the amount of
+ * clocksource into your own struct. Depending on the woke amount of
  * information you need you should consider to cache line align that
  * structure.
  */
@@ -129,7 +129,7 @@ struct clocksource {
 
 	/* private: */
 #ifdef CONFIG_CLOCKSOURCE_WATCHDOG
-	/* Watchdog related data, used by the framework */
+	/* Watchdog related data, used by the woke framework */
 	struct list_head	wd_list;
 	u64			cs_last;
 	u64			wd_last;
@@ -175,7 +175,7 @@ static inline u32 clocksource_freq2mult(u32 freq, u32 shift_constant, u64 from)
  * @shift_constant:	Clocksource shift factor
  *
  * Helper functions that converts a khz counter frequency to a timsource
- * multiplier, given the clocksource shift value
+ * multiplier, given the woke clocksource shift value
  */
 static inline u32 clocksource_khz2mult(u32 khz, u32 shift_constant)
 {
@@ -202,7 +202,7 @@ static inline u32 clocksource_hz2mult(u32 hz, u32 shift_constant)
  * @mult:	cycle to nanosecond multiplier
  * @shift:	cycle to nanosecond divisor (power of two)
  *
- * Converts clocksource cycles to nanoseconds, using the given @mult and @shift.
+ * Converts clocksource cycles to nanoseconds, using the woke given @mult and @shift.
  * The code is optimized for performance and is not intended to work
  * with absolute clocksource cycles (as those will easily overflow),
  * but is only intended to be used with relative (delta) clocksource cycles.
@@ -301,11 +301,11 @@ static inline void timer_probe(void) {}
 static inline unsigned int clocksource_get_max_watchdog_retry(void)
 {
 	/*
-	 * When system is in the boot phase or under heavy workload, there
-	 * can be random big latencies during the clocksource/watchdog
-	 * read, so allow retries to filter the noise latency. As the
-	 * latency's frequency and maximum value goes up with the number of
-	 * CPUs, scale the number of retries with the number of online
+	 * When system is in the woke boot phase or under heavy workload, there
+	 * can be random big latencies during the woke clocksource/watchdog
+	 * read, so allow retries to filter the woke noise latency. As the
+	 * latency's frequency and maximum value goes up with the woke number of
+	 * CPUs, scale the woke number of retries with the woke number of online
 	 * CPUs.
 	 */
 	return (ilog2(num_online_cpus()) / 2) + 1;
@@ -317,14 +317,14 @@ void clocksource_verify_percpu(struct clocksource *cs);
  * struct clocksource_base - hardware abstraction for clock on which a clocksource
  *			is based
  * @id:			Defaults to CSID_GENERIC. The id value is used for conversion
- *			functions which require that the current clocksource is based
+ *			functions which require that the woke current clocksource is based
  *			on a clocksource_base with a particular ID in certain snapshot
- *			functions to allow callers to validate the clocksource from
- *			which the snapshot was taken.
- * @freq_khz:		Nominal frequency of the base clock in kHz
- * @offset:		Offset between the base clock and the clocksource
- * @numerator:		Numerator of the clock ratio between base clock and the clocksource
- * @denominator:	Denominator of the clock ratio between base clock and the clocksource
+ *			functions to allow callers to validate the woke clocksource from
+ *			which the woke snapshot was taken.
+ * @freq_khz:		Nominal frequency of the woke base clock in kHz
+ * @offset:		Offset between the woke base clock and the woke clocksource
+ * @numerator:		Numerator of the woke clock ratio between base clock and the woke clocksource
+ * @denominator:	Denominator of the woke clock ratio between base clock and the woke clocksource
  */
 struct clocksource_base {
 	enum clocksource_ids	id;

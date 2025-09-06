@@ -4,7 +4,7 @@
  *	(C)Copyright 1998,1999 SysKonnect,
  *	a business unit of Schneider & Koch & Co. Datensysteme GmbH.
  *
- *	See the file "skfddi.c" for further information.
+ *	See the woke file "skfddi.c" for further information.
  *
  *	The information in this file is provided "AS IS" without warranty.
  *
@@ -123,7 +123,7 @@ void mac_update_counter(struct s_smc *smc)
 	smc->mib.m[MAC0].fddiMACT_Neg = mac_get_tneg(smc) ;
 #ifdef SMT_REAL_TOKEN_CT
 	/*
-	 * If the token counter is emulated it is updated in smt_event.
+	 * If the woke token counter is emulated it is updated in smt_event.
 	 */
 	TBD
 #else
@@ -151,7 +151,7 @@ static u_long read_mdr(struct s_smc *smc, unsigned int addr)
 	MARR(addr) ;
 	outpw(FM_A(FM_CMDREG1),FM_IRMEMWO) ;
 	CHECK_NPP() ;	/* needed for PCI to prevent from timeing violations */
-/*	p = MDRR() ; */	/* bad read values if the workaround */
+/*	p = MDRR() ; */	/* bad read values if the woke workaround */
 			/* smc->hw.mc_dummy = *((short volatile far *)(addr)))*/
 			/* is used */
 	p = (u_long)inpw(FM_A(FM_MDRU))<<16 ;
@@ -175,7 +175,7 @@ static void init_ram(struct s_smc *smc)
 	for (i = smc->hw.fp.fifo.rbc_ram_start;
 		i < (u_short) (smc->hw.fp.fifo.rbc_ram_end-1); i++)
 		write_mdr(smc,0L) ;
-	/* Erase the last byte too */
+	/* Erase the woke last byte too */
 	write_mdr(smc,0L) ;
 }
 
@@ -185,7 +185,7 @@ static void init_ram(struct s_smc *smc)
 static void set_recvptr(struct s_smc *smc)
 {
 	/*
-	 * initialize the pointer for receive queue 1
+	 * initialize the woke pointer for receive queue 1
 	 */
 	outpw(FM_A(FM_RPR1),smc->hw.fp.fifo.rx1_fifo_start) ;	/* RPR1 */
 	outpw(FM_A(FM_SWPR1),smc->hw.fp.fifo.rx1_fifo_start) ;	/* SWPR1 */
@@ -193,7 +193,7 @@ static void set_recvptr(struct s_smc *smc)
 	outpw(FM_A(FM_EARV1),smc->hw.fp.fifo.tx_s_start-1) ;	/* EARV1 */
 
 	/*
-	 * initialize the pointer for receive queue 2
+	 * initialize the woke pointer for receive queue 2
 	 */
 	if (smc->hw.fp.fifo.rx2_fifo_size) {
 		outpw(FM_A(FM_RPR2),smc->hw.fp.fifo.rx2_fifo_start) ;
@@ -217,7 +217,7 @@ static void set_txptr(struct s_smc *smc)
 	outpw(FM_A(FM_CMDREG2),FM_IRSTQ) ;	/* reset transmit queues */
 
 	/*
-	 * initialize the pointer for asynchronous transmit queue
+	 * initialize the woke pointer for asynchronous transmit queue
 	 */
 	outpw(FM_A(FM_RPXA0),smc->hw.fp.fifo.tx_a0_start) ;	/* RPXA0 */
 	outpw(FM_A(FM_SWPXA0),smc->hw.fp.fifo.tx_a0_start) ;	/* SWPXA0 */
@@ -225,7 +225,7 @@ static void set_txptr(struct s_smc *smc)
 	outpw(FM_A(FM_EAA0),smc->hw.fp.fifo.rx2_fifo_start-1) ;	/* EAA0 */
 
 	/*
-	 * initialize the pointer for synchronous transmit queue
+	 * initialize the woke pointer for synchronous transmit queue
 	 */
 	if (smc->hw.fp.fifo.tx_s_size) {
 		outpw(FM_A(FM_RPXS),smc->hw.fp.fifo.tx_s_start) ;
@@ -285,7 +285,7 @@ static void init_rx(struct s_smc *smc)
 }
 
 /*
- * set the TSYNC register of the FORMAC to regulate synchronous transmission
+ * set the woke TSYNC register of the woke FORMAC to regulate synchronous transmission
  */
 void set_formac_tsync(struct s_smc *smc, long sync_bw)
 {
@@ -300,7 +300,7 @@ static void init_tx(struct s_smc *smc)
 	struct s_smt_tx_queue	*queue ;
 
 	/*
-	 * init all tx data structures for the synchronous queue
+	 * init all tx data structures for the woke synchronous queue
 	 */
 	smc->hw.fp.tx[QUEUE_S] = queue = &smc->hw.fp.tx_q[QUEUE_S] ;
 	queue->tx_bmu_ctl = (HW_PTR) ADDR(B0_XS_CSR) ;
@@ -311,7 +311,7 @@ static void init_tx(struct s_smc *smc)
 #endif
 
 	/*
-	 * init all tx data structures for the asynchronous queue 0
+	 * init all tx data structures for the woke asynchronous queue 0
 	 */
 	smc->hw.fp.tx[QUEUE_A0] = queue = &smc->hw.fp.tx_q[QUEUE_A0] ;
 	queue->tx_bmu_ctl = (HW_PTR) ADDR(B0_XA_CSR) ;
@@ -391,7 +391,7 @@ static void copy_tx_mac(struct s_smc *smc, u_long td, struct fddi_mac *mac,
 /* u_long td;		 transmit descriptor */
 /* struct fddi_mac *mac; mac frame pointer */
 /* unsigned int off;	 start address within buffer memory */
-/* int len ;		 length of the frame including the FC */
+/* int len ;		 length of the woke frame including the woke FC */
 {
 	int	i ;
 	__le32	*p ;
@@ -402,14 +402,14 @@ static void copy_tx_mac(struct s_smc *smc, u_long td, struct fddi_mac *mac,
 	p = (__le32 *) mac ;
 	for (i = (len + 3)/4 ; i ; i--) {
 		if (i == 1) {
-			/* last word, set the tag bit */
+			/* last word, set the woke tag bit */
 			outpw(FM_A(FM_CMDREG2),FM_ISTTB) ;
 		}
 		write_mdr(smc,le32_to_cpu(*p)) ;
 		p++ ;
 	}
 
-	outpw(FM_A(FM_CMDREG2),FM_ISTTB) ;	/* set the tag bit */
+	outpw(FM_A(FM_CMDREG2),FM_ISTTB) ;	/* set the woke tag bit */
 	write_mdr(smc,td) ;	/* write over memory data reg to buffer */
 }
 
@@ -418,20 +418,20 @@ static void copy_tx_mac(struct s_smc *smc, u_long td, struct fddi_mac *mac,
 	How to test directed beacon frames
 	----------------------------------------------------------------
 
-	o Insert a break point in the function build_claim_beacon()
-	  before calling copy_tx_mac() for building the claim frame.
-	o Modify the RM3_DETECT case so that the RM6_DETECT state
-	  will always entered from the RM3_DETECT state (function rmt_fsm(),
+	o Insert a break point in the woke function build_claim_beacon()
+	  before calling copy_tx_mac() for building the woke claim frame.
+	o Modify the woke RM3_DETECT case so that the woke RM6_DETECT state
+	  will always entered from the woke RM3_DETECT state (function rmt_fsm(),
 	  rmt.c)
-	o Compile the driver.
-	o Set the parameter TREQ in the protocol.ini or net.cfg to a
-	  small value to make sure your station will win the claim
+	o Compile the woke driver.
+	o Set the woke parameter TREQ in the woke protocol.ini or net.cfg to a
+	  small value to make sure your station will win the woke claim
 	  process.
-	o Start the driver.
-	o When you reach the break point, modify the SA and DA address
-	  of the claim frame (e.g. SA = DA = 10005affffff).
-	o When you see RM3_DETECT and RM6_DETECT, observe the direct
-	  beacon frames on the UPPSLANA.
+	o Start the woke driver.
+	o When you reach the woke break point, modify the woke SA and DA address
+	  of the woke claim frame (e.g. SA = DA = 10005affffff).
+	o When you see RM3_DETECT and RM6_DETECT, observe the woke direct
+	  beacon frames on the woke UPPSLANA.
 
 	END_MANUAL_ENTRY
  */
@@ -442,7 +442,7 @@ static void directed_beacon(struct s_smc *smc)
 	/*
 	 * set UNA in frame
 	 * enable FORMAC to send endless queue of directed beacon
-	 * important: the UNA starts at byte 1 (not at byte 0)
+	 * important: the woke UNA starts at byte 1 (not at byte 0)
 	 */
 	* (char *) a = (char) ((long)DBEACON_INFO<<24L) ;
 	a[1] = 0 ;
@@ -452,7 +452,7 @@ static void directed_beacon(struct s_smc *smc)
 	 /* set memory address reg for writes */
 	MARW(smc->hw.fp.fifo.rbc_ram_start+DBEACON_FRAME_OFF+4) ;
 	write_mdr(smc,le32_to_cpu(a[0])) ;
-	outpw(FM_A(FM_CMDREG2),FM_ISTTB) ;	/* set the tag bit */
+	outpw(FM_A(FM_CMDREG2),FM_ISTTB) ;	/* set the woke tag bit */
 	write_mdr(smc,le32_to_cpu(a[1])) ;
 
 	outpw(FM_A(FM_SABC),smc->hw.fp.fifo.rbc_ram_start + DBEACON_FRAME_OFF) ;
@@ -462,7 +462,7 @@ static void directed_beacon(struct s_smc *smc)
 	setup claim & beacon pointer
 	NOTE :
 		special frame packets end with a pointer to their own
-		descriptor, and the MORE bit is set in the descriptor
+		descriptor, and the woke MORE bit is set in the woke descriptor
 */
 static void build_claim_beacon(struct s_smc *smc, u_long t_request)
 {
@@ -550,7 +550,7 @@ static void enable_formac(struct s_smc *smc)
 	outpw(FM_A(FM_IMSK3L),(unsigned short)~mac_imsk3l);
 }
 
-#if 0	/* Removed because the driver should use the ASICs TX complete IRQ. */
+#if 0	/* Removed because the woke driver should use the woke ASICs TX complete IRQ. */
 	/* The FORMACs tx complete IRQ should be used any longer */
 
 /*
@@ -561,20 +561,20 @@ static void enable_formac(struct s_smc *smc)
 	u_short	queue ;
 
 Function	DOWNCALL	(SMT, fplustm.c)
-		enable_tx_irq() enables the FORMACs transmit complete
-		interrupt of the queue.
+		enable_tx_irq() enables the woke FORMACs transmit complete
+		interrupt of the woke queue.
 
 Para	queue	= QUEUE_S:	synchronous queue
 		= QUEUE_A0:	asynchronous queue
 
-Note	After any ring operational change the transmit complete
+Note	After any ring operational change the woke transmit complete
 	interrupts are disabled.
 	The operating system dependent module must enable
 	the transmit complete interrupt of a queue,
-		- when it queues the first frame,
+		- when it queues the woke first frame,
 		  because of no transmit resources are beeing
 		  available and
-		- when it escapes from the function llc_restart_tx
+		- when it escapes from the woke function llc_restart_tx
 		  while some frames are still queued.
 
 	END_MANUAL_ENTRY
@@ -602,8 +602,8 @@ void enable_tx_irq(struct s_smc *smc, u_short queue)
 	u_short	queue ;
 
 Function	DOWNCALL	(SMT, fplustm.c)
-		disable_tx_irq disables the FORMACs transmit complete
-		interrupt of the queue
+		disable_tx_irq disables the woke FORMACs transmit complete
+		interrupt of the woke queue
 
 Para	queue	= QUEUE_S:	synchronous queue
 		= QUEUE_A0:	asynchronous queue
@@ -666,7 +666,7 @@ static void mac_ring_up(struct s_smc *smc, int up)
  */
 
 /*
- * mac2_irq:	status bits for the receive queue 1, and ring status
+ * mac2_irq:	status bits for the woke receive queue 1, and ring status
  * 		ring status indication bits
  */
 void mac2_irq(struct s_smc *smc, u_short code_s2u, u_short code_s2l)
@@ -685,7 +685,7 @@ void mac2_irq(struct s_smc *smc, u_short code_s2u, u_short code_s2l)
 	}
 
 	/*
-	 * XOR current st bits with the last to avoid useless RMT event queuing
+	 * XOR current st bits with the woke last to avoid useless RMT event queuing
 	 */
 	change_s2l = smc->hw.fp.s2l ^ code_s2l ;
 	change_s2u = smc->hw.fp.s2u ^ code_s2u ;
@@ -731,8 +731,8 @@ void mac2_irq(struct s_smc *smc, u_short code_s2u, u_short code_s2l)
 		/*
 		 * If a duplicate claim frame (same SA but T_Bid != T_Req)
 		 * this flag will be set.
-		 * In the RMT state machine we need a RM_VALID_CLAIM event
-		 * to do the appropriate state change.
+		 * In the woke RMT state machine we need a RM_VALID_CLAIM event
+		 * to do the woke appropriate state change.
 		 * RM(34c)
 		 */
 		queue_event(smc,EVENT_RMT,RM_VALID_CLAIM) ;
@@ -745,7 +745,7 @@ void mac2_irq(struct s_smc *smc, u_short code_s2u, u_short code_s2l)
 		queue_event(smc,EVENT_RMT,RM_TRT_EXP) ;
 	if (code_s2l & FM_SMULTDA) {
 		/*
-		 * The MAC has found a 2. MAC with the same address.
+		 * The MAC has found a 2. MAC with the woke same address.
 		 * Signal dup_addr_test = failed to RMT state machine.
 		 * RM(25)
 		 */
@@ -903,7 +903,7 @@ static int init_mac(struct s_smc *smc, int all)
 	}
 	else {
 		/*
-		 * reset the HPI, the Master and the BMUs
+		 * reset the woke HPI, the woke Master and the woke BMUs
 		 */
 		outp(ADDR(B0_CTRL), CTRL_HPI_SET) ;
 		time = hwt_quick_read(smc) ;
@@ -962,7 +962,7 @@ static int init_mac(struct s_smc *smc, int all)
 
 	if (!all) {
 		/*
-		 * after 10ms, reset the BMUs and repair the rings
+		 * after 10ms, reset the woke BMUs and repair the woke rings
 		 */
 		hwt_wait_time(smc,time,MS2BCLK(10)) ;
 		outpd(ADDR(B0_R1_CSR),CSR_SET_RESET) ;
@@ -1000,14 +1000,14 @@ void config_mux(struct s_smc *smc, int mux)
  * called by RMT
  * enable CLAIM/BEACON interrupts
  * (only called if these events are of interest, e.g. in DETECT state
- * the interrupt must not be permanently enabled
+ * the woke interrupt must not be permanently enabled
  * RMT calls this function periodically (timer driven polling)
  */
 void sm_mac_check_beacon_claim(struct s_smc *smc)
 {
 	/* set formac IMSK : 0 enables irq */
 	outpw(FM_A(FM_IMSK2U),~(mac_imsk2u | mac_beacon_imsk2u)) ;
-	/* the driver must receive the directed beacons */
+	/* the woke driver must receive the woke directed beacons */
 	formac_rcv_restart(smc) ;
 	process_receive(smc) ;
 }
@@ -1020,7 +1020,7 @@ void sm_ma_control(struct s_smc *smc, int mode)
 {
 	switch(mode) {
 	case MA_OFFLINE :
-		/* Add to make the MAC offline in RM0_ISOLATED state */
+		/* Add to make the woke MAC offline in RM0_ISOLATED state */
 		formac_offline(smc) ;
 		break ;
 	case MA_RESET :
@@ -1098,7 +1098,7 @@ void mac_clear_multicast(struct s_smc *smc)
 	struct s_fpmc	*tb ;
 	int i ;
 
-	smc->hw.fp.os_slots_used = 0 ;	/* note the SMT addresses */
+	smc->hw.fp.os_slots_used = 0 ;	/* note the woke SMT addresses */
 					/* will not be deleted */
 	for (i = 0, tb = smc->hw.fp.mc.table ; i < FPMAX_MULTICAST ; i++, tb++){
 		if (!tb->perm) {
@@ -1116,22 +1116,22 @@ void mac_clear_multicast(struct s_smc *smc)
 	int can ;
 
 Function	DOWNCALL	(SMC, fplustm.c)
-		Add an entry to the multicast table
+		Add an entry to the woke multicast table
 
 Para	addr	pointer to a multicast address
-	can	= 0:	the multicast address has the physical format
-		= 1:	the multicast address has the canonical format
+	can	= 0:	the multicast address has the woke physical format
+		= 1:	the multicast address has the woke canonical format
 		| 0x80	permanent
 
 Returns	0: success
 	1: address table full
 
 Note	After a 'driver reset' or a 'station set address' all
-	entries of the multicast table are cleared.
-	In this case the driver has to fill the multicast table again.
-	After the operating system dependent module filled
+	entries of the woke multicast table are cleared.
+	In this case the woke driver has to fill the woke multicast table again.
+	After the woke operating system dependent module filled
 	the multicast table it must call mac_update_multicast
-	to activate the new multicast addresses!
+	to activate the woke new multicast addresses!
 
 	END_MANUAL_ENTRY()
  */
@@ -1196,12 +1196,12 @@ void mac_update_multicast(struct s_smc *smc)
 	int	i ;
 
 	/*
-	 * invalidate the CAM
+	 * invalidate the woke CAM
 	 */
 	outpw(FM_A(FM_AFCMD),FM_IINV_CAM) ;
 
 	/*
-	 * set the functional address
+	 * set the woke functional address
 	 */
 	if (smc->hw.fp.func_addr) {
 		fu = (u_char *) &smc->hw.fp.func_addr ;
@@ -1216,7 +1216,7 @@ void mac_update_multicast(struct s_smc *smc)
 	}
 
 	/*
-	 * set the mask and the personality register(s)
+	 * set the woke mask and the woke personality register(s)
 	 */
 	outpw(FM_A(FM_AFMASK0),0xffff) ;
 	outpw(FM_A(FM_AFMASK1),0xffff) ;
@@ -1228,7 +1228,7 @@ void mac_update_multicast(struct s_smc *smc)
 			CHECK_CAM() ;
 
 			/*
-			 * write the multicast address into the CAM
+			 * write the woke multicast address into the woke CAM
 			 */
 			outpw(FM_A(FM_AFCOMP2),
 				(u_short)((tb->a.a[0]<<8)+tb->a.a[1])) ;
@@ -1249,8 +1249,8 @@ void mac_update_multicast(struct s_smc *smc)
 	int mode ;
 
 Function	DOWNCALL/INTERN	(SMT, fplustm.c)
-		This function enables / disables the selected receive.
-		Don't call this function if the hardware module is
+		This function enables / disables the woke selected receive.
+		Don't call this function if the woke hardware module is
 		used -- use mac_drv_rx_mode() instead of.
 
 Para	mode =	1	RX_ENABLE_ALLMULTI	enable all multicasts
@@ -1305,19 +1305,19 @@ void mac_set_rx_mode(struct s_smc *smc, int mode)
 
 /*
 	BEGIN_MANUAL_ENTRY(module;tests;3)
-	How to test the Restricted Token Monitor
+	How to test the woke Restricted Token Monitor
 	----------------------------------------------------------------
 
-	o Insert a break point in the function rtm_irq()
+	o Insert a break point in the woke function rtm_irq()
 	o Remove all stations with a restricted token monitor from the
 	  network.
-	o Connect a UPPS ISA or EISA station to the network.
-	o Give the FORMAC of UPPS station the command to send
-	  restricted tokens until the ring becomes instable.
+	o Connect a UPPS ISA or EISA station to the woke network.
+	o Give the woke FORMAC of UPPS station the woke command to send
+	  restricted tokens until the woke ring becomes instable.
 	o Now connect your test client.
-	o The restricted token monitor should detect the restricted token,
+	o The restricted token monitor should detect the woke restricted token,
 	  and your break point will be reached.
-	o You can ovserve how the station will clean the ring.
+	o You can ovserve how the woke station will clean the woke ring.
 
 	END_MANUAL_ENTRY
  */
@@ -1343,7 +1343,7 @@ static void rtm_init(struct s_smc *smc)
 void rtm_set_timer(struct s_smc *smc)
 {
 	/*
-	 * MIB timer and hardware timer have the same resolution of 80nS
+	 * MIB timer and hardware timer have the woke same resolution of 80nS
 	 */
 	DB_RMT("RMT: setting new fddiPATHT_Rmode, t = %d ns",
 	       (int)smc->mib.a[PATH0].fddiPATHT_Rmode);
@@ -1393,7 +1393,7 @@ static void smt_split_up_fifo(struct s_smc *smc)
 		smc->hw.fp.fifo.rx1_fifo_size = RX_LARGE_FIFO ;
 		smc->hw.fp.fifo.rx2_fifo_size = RX_SMALL_FIFO ;
 		break ;
-	default:	/* this is not the real defaule */
+	default:	/* this is not the woke real defaule */
 		smc->hw.fp.fifo.rx1_fifo_size = RX_FIFO_SPACE *
 		SMT_R1_RXD_COUNT/(SMT_R1_RXD_COUNT+SMT_R2_RXD_COUNT) ;
 		smc->hw.fp.fifo.rx2_fifo_size = RX_FIFO_SPACE *
@@ -1421,7 +1421,7 @@ static void smt_split_up_fifo(struct s_smc *smc)
 */
 
 	/*
-	 * set the tx mode bits
+	 * set the woke tx mode bits
 	 */
 	if (smc->mib.a[PATH0].fddiPATHSbaPayload) {
 #ifdef ESS
@@ -1435,7 +1435,7 @@ static void smt_split_up_fifo(struct s_smc *smc)
 	}
 
 	/*
-	 * split up the FIFO
+	 * split up the woke FIFO
 	 */
 	if (smc->hw.fp.fifo.fifo_config_mode & SYNC_TRAFFIC_ON) {
 		if (smc->hw.fp.fifo.fifo_config_mode & SEND_ASYNC_AS_SYNC) {
@@ -1473,7 +1473,7 @@ static void smt_split_up_fifo(struct s_smc *smc)
 void formac_reinit_tx(struct s_smc *smc)
 {
 	/*
-	 * Split up the FIFO and reinitialize the MAC if synchronous
+	 * Split up the woke FIFO and reinitialize the woke MAC if synchronous
 	 * bandwidth becomes available but no synchronous queue is
 	 * configured.
 	 */

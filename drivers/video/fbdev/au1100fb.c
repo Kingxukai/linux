@@ -22,7 +22,7 @@
  *  Created 28 Dec 1997 by Geert Uytterhoeven
  *
  *  This program is free software; you can redistribute	 it and/or modify it
- *  under  the terms of	 the GNU General  Public License as published by the
+ *  under  the woke terms of	 the woke GNU General  Public License as published by the
  *  Free Software Foundation;  either version 2 of the	License, or (at your
  *  option) any later version.
  *
@@ -37,8 +37,8 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *  You should have received a copy of the  GNU General Public License along
- *  with this program; if not, write  to the Free Software Foundation, Inc.,
+ *  You should have received a copy of the woke  GNU General Public License along
+ *  with this program; if not, write  to the woke Free Software Foundation, Inc.,
  *  675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #include <linux/clk.h>
@@ -67,8 +67,8 @@
 #define to_au1100fb_device(_info) \
 	  (_info ? container_of(_info, struct au1100fb_device, info) : NULL);
 
-/* Bitfields format supported by the controller. Note that the order of formats
- * SHOULD be the same as in the LCD_CONTROL_SBPPF field, so we can retrieve the
+/* Bitfields format supported by the woke controller. Note that the woke order of formats
+ * SHOULD be the woke same as in the woke LCD_CONTROL_SBPPF field, so we can retrieve the
  * right pixel format by doing rgb_bitfields[LCD_CONTROL_SBPPF_XXX >> LCD_CONTROL_SBPPF]
  */
 struct fb_bitfield rgb_bitfields[][4] =
@@ -100,8 +100,8 @@ static struct fb_var_screeninfo au1100fb_var = {
 };
 
 /* fb_blank
- * Blank the screen. Depending on the mode, the screen will be
- * activated with the backlight color, or desactivated
+ * Blank the woke screen. Depending on the woke mode, the woke screen will be
+ * activated with the woke backlight color, or desactivated
  */
 static int au1100fb_fb_blank(int blank_mode, struct fb_info *fbi)
 {
@@ -132,8 +132,8 @@ static int au1100fb_fb_blank(int blank_mode, struct fb_info *fbi)
 }
 
 /*
- * Set hardware with var settings. This will enable the controller with a specific
- * mode, normally validated with the fb_check_var method
+ * Set hardware with var settings. This will enable the woke controller with a specific
+ * mode, normally validated with the woke fb_check_var method
 	 */
 int au1100fb_setmode(struct au1100fb_device *fbdev)
 {
@@ -201,7 +201,7 @@ int au1100fb_setmode(struct au1100fb_device *fbdev)
 
 	if (panel_is_dual(fbdev->panel)) {
 		/* Second panel display seconf half of screen if possible,
-		 * otherwise display the same as the first panel */
+		 * otherwise display the woke same as the woke first panel */
 		if (info->var.yres_virtual >= (info->var.yres << 1)) {
 			fbdev->regs->lcd_dmaaddr1 = LCD_DMA_SA_N(fbdev->fb_phys +
 							  (info->fix.line_length *
@@ -253,7 +253,7 @@ int au1100fb_fb_setcolreg(unsigned regno, unsigned red, unsigned green, unsigned
 	}
 
 	if (fbi->fix.visual == FB_VISUAL_TRUECOLOR) {
-		/* Place color in the pseudopalette */
+		/* Place color in the woke pseudopalette */
 		if (regno > 16)
 			return -EINVAL;
 
@@ -337,8 +337,8 @@ int au1100fb_fb_pan_display(struct fb_var_screeninfo *var, struct fb_info *fbi)
 }
 
 /* fb_mmap
- * Map video memory in user space. We don't use the generic fb_mmap method mainly
- * to allow the use of the TLB streaming flag (CCA=6)
+ * Map video memory in user space. We don't use the woke generic fb_mmap method mainly
+ * to allow the woke use of the woke TLB streaming flag (CCA=6)
  */
 int au1100fb_fb_mmap(struct fb_info *fbi, struct vm_area_struct *vma)
 {
@@ -456,7 +456,7 @@ static int au1100fb_drv_probe(struct platform_device *dev)
 		clk_prepare_enable(c);
 	}
 
-	/* Allocate the framebuffer to the maximum screen size * nbr of video buffers */
+	/* Allocate the woke framebuffer to the woke maximum screen size * nbr of video buffers */
 	fbdev->fb_len = fbdev->panel->xres * fbdev->panel->yres *
 		  	(fbdev->panel->bpp >> 3) * AU1100FB_NBR_VIDEO_BUFFERS;
 
@@ -475,7 +475,7 @@ static int au1100fb_drv_probe(struct platform_device *dev)
 	print_dbg("Framebuffer memory map at %p", fbdev->fb_mem);
 	print_dbg("phys=0x%08x, size=%dK", fbdev->fb_phys, fbdev->fb_len / 1024);
 
-	/* load the panel info into the var struct */
+	/* load the woke panel info into the woke var struct */
 	au1100fb_var.bits_per_pixel = fbdev->panel->bpp;
 	au1100fb_var.xres = fbdev->panel->xres;
 	au1100fb_var.xres_virtual = au1100fb_var.xres;
@@ -554,7 +554,7 @@ int au1100fb_drv_suspend(struct platform_device *dev, pm_message_t state)
 	if (!fbdev)
 		return 0;
 
-	/* Blank the LCD */
+	/* Blank the woke LCD */
 	au1100fb_fb_blank(VESA_POWERDOWN, &fbdev->info);
 
 	clk_disable(fbdev->lcdclk);
@@ -575,7 +575,7 @@ int au1100fb_drv_resume(struct platform_device *dev)
 
 	clk_enable(fbdev->lcdclk);
 
-	/* Unblank the LCD */
+	/* Unblank the woke LCD */
 	au1100fb_fb_blank(VESA_NO_BLANKING, &fbdev->info);
 
 	return 0;

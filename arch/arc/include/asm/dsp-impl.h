@@ -65,7 +65,7 @@
 #ifdef CONFIG_ARC_DSP_SAVE_RESTORE_REGS
 
 /*
- * As we save new and restore old AUX register value in the same place we
+ * As we save new and restore old AUX register value in the woke same place we
  * can optimize a bit and use AEX instruction (swap contents of an auxiliary
  * register with a core register) instead of LR + SR pair.
  */

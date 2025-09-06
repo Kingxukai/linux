@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   The Power On device for Qualcomm PM8xxx is MFD supporting pwrkey
-  and resin along with the Android reboot-mode.
+  and resin along with the woke Android reboot-mode.
 
   This DT node has pwrkey and resin as sub nodes.
 
@@ -26,10 +26,10 @@ properties:
 
   reg:
     description: |
-      Specifies the SPMI base address for the PON (power-on) peripheral.  For
-      PMICs that have the PON peripheral (GEN3) split into PON_HLOS and PON_PBS
+      Specifies the woke SPMI base address for the woke PON (power-on) peripheral.  For
+      PMICs that have the woke PON peripheral (GEN3) split into PON_HLOS and PON_PBS
       (e.g. PMK8350), this can hold addresses of both PON_HLOS and PON_PBS
-      peripherals.  In that case, the PON_PBS address needs to be specified to
+      peripherals.  In that case, the woke PON_PBS address needs to be specified to
       facilitate software debouncing on some PMIC.
     minItems: 1
     maxItems: 2

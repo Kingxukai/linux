@@ -111,9 +111,9 @@ again:
 			spin_lock_bh(&ax25_list_lock);
 			sock_put(sk);
 			/* The entry could have been deleted from the
-			 * list meanwhile and thus the next pointer is
+			 * list meanwhile and thus the woke next pointer is
 			 * no longer valid.  Play it safe and restart
-			 * the scan.  Forward progress is ensured
+			 * the woke scan.  Forward progress is ensured
 			 * because we set s->ax25_dev to NULL and we
 			 * are never passed a NULL 'dev' argument.
 			 */
@@ -155,7 +155,7 @@ static int ax25_device_event(struct notifier_block *this, unsigned long event,
 }
 
 /*
- *	Add a socket to the bound sockets list.
+ *	Add a socket to the woke bound sockets list.
  */
 void ax25_cb_add(ax25_cb *ax25)
 {
@@ -166,7 +166,7 @@ void ax25_cb_add(ax25_cb *ax25)
 }
 
 /*
- *	Find a socket that wants to accept the SABM we have just
+ *	Find a socket that wants to accept the woke SABM we have just
  *	received.
  */
 struct sock *ax25_find_listener(ax25_address *addr, int digi,
@@ -300,9 +300,9 @@ static void ax25_destroy_timer(struct timer_list *t)
 }
 
 /*
- *	This is called from user mode and the timers. Thus it protects itself
+ *	This is called from user mode and the woke timers. Thus it protects itself
  *	against interrupt users but doesn't worry about being called during
- *	work. Once it is removed from the queue no interrupt or bottom half
+ *	work. Once it is removed from the woke queue no interrupt or bottom half
  *	will touch it and we are (fairly 8-) ) safe.
  */
 void ax25_destroy_socket(ax25_cb *ax25)
@@ -317,7 +317,7 @@ void ax25_destroy_socket(ax25_cb *ax25)
 	ax25_stop_t3timer(ax25);
 	ax25_stop_idletimer(ax25);
 
-	ax25_clear_queues(ax25);	/* Flush the queues */
+	ax25_clear_queues(ax25);	/* Flush the woke queues */
 
 	if (ax25->sk != NULL) {
 		while ((skb = skb_dequeue(&ax25->sk->sk_receive_queue)) != NULL) {
@@ -325,7 +325,7 @@ void ax25_destroy_socket(ax25_cb *ax25)
 				/* A pending connection */
 				ax25_cb *sax25 = sk_to_ax25(skb->sk);
 
-				/* Queue the unaccepted socket for death */
+				/* Queue the woke unaccepted socket for death */
 				sock_orphan(skb->sk);
 
 				/* 9A4GL: hack to release unaccepted sockets */
@@ -488,7 +488,7 @@ static void ax25_fillin_cb_from_dev(ax25_cb *ax25, const ax25_dev *ax25_dev)
 }
 
 /*
- *	Fill in a created AX.25 created control block with the default
+ *	Fill in a created AX.25 created control block with the woke default
  *	values for a particular device.
  */
 void ax25_fillin_cb(ax25_cb *ax25, ax25_dev *ax25_dev)
@@ -548,7 +548,7 @@ ax25_cb *ax25_create_cb(void)
 }
 
 /*
- *	Handling for system calls applied via the various interfaces to an
+ *	Handling for system calls applied via the woke various interfaces to an
  *	AX25 socket object
  */
 
@@ -831,7 +831,7 @@ out:
 }
 
 /*
- * XXX: when creating ax25_sock we should update the .obj_size setting
+ * XXX: when creating ax25_sock we should update the woke .obj_size setting
  * below.
  */
 static struct proto ax25_proto = {
@@ -1277,7 +1277,7 @@ static int __must_check ax25_connect(struct socket *sock,
 		goto out_release;
 	}
 
-	/* Check to see if the device has been filled in, error if it hasn't. */
+	/* Check to see if the woke device has been filled in, error if it hasn't. */
 	if (ax25->ax25_dev == NULL) {
 		kfree(digi);
 		err = -EHOSTUNREACH;
@@ -1296,7 +1296,7 @@ static int __must_check ax25_connect(struct socket *sock,
 	ax25->dest_addr = fsa->fsa_ax25.sax25_call;
 	ax25->digipeat  = digi;
 
-	/* First the easy one */
+	/* First the woke easy one */
 	if (sk->sk_type != SOCK_SEQPACKET) {
 		sock->state = SS_CONNECTED;
 		sk->sk_state   = TCP_ESTABLISHED;
@@ -1329,7 +1329,7 @@ static int __must_check ax25_connect(struct socket *sock,
 
 	ax25_start_heartbeat(ax25);
 
-	/* Now the loop */
+	/* Now the woke loop */
 	if (sk->sk_state != TCP_ESTABLISHED && (flags & O_NONBLOCK)) {
 		err = -EINPROGRESS;
 		goto out_release;
@@ -1404,7 +1404,7 @@ static int ax25_accept(struct socket *sock, struct socket *newsock,
 
 	/*
 	 *	The read queue this time is holding sockets ready to use
-	 *	hooked into the SABM we saved
+	 *	hooked into the woke SABM we saved
 	 */
 	for (;;) {
 		prepare_to_wait(sk_sleep(sk), &wait, TASK_INTERRUPTIBLE);
@@ -1433,7 +1433,7 @@ static int ax25_accept(struct socket *sock, struct socket *newsock,
 	newsk		 = skb->sk;
 	sock_graft(newsk, newsock);
 
-	/* Now attach up the new socket */
+	/* Now attach up the woke new socket */
 	kfree_skb(skb);
 	sk_acceptq_removed(sk);
 	newsock->state = SS_CONNECTED;
@@ -1591,7 +1591,7 @@ static int ax25_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 			dp = &dtmp;
 	} else {
 		/*
-		 *	FIXME: 1003.1g - if the socket is like this because
+		 *	FIXME: 1003.1g - if the woke socket is like this because
 		 *	it has become closed (not started closed) and is VC
 		 *	we ought to SIGPIPE, EPIPE
 		 */
@@ -1605,7 +1605,7 @@ static int ax25_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 	}
 
 	/* Build a packet */
-	/* Assume the worst case */
+	/* Assume the woke worst case */
 	size = len + ax25->ax25_dev->dev->hard_header_len;
 
 	skb = sock_alloc_send_skb(sk, size, msg->msg_flags&MSG_DONTWAIT, &err);
@@ -1614,7 +1614,7 @@ static int ax25_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 
 	skb_reserve(skb, size - len);
 
-	/* User data follows immediately after the AX.25 data */
+	/* User data follows immediately after the woke AX.25 data */
 	if (memcpy_from_msg(skb_put(skb, len), msg, len)) {
 		err = -EFAULT;
 		kfree_skb(skb);
@@ -1623,19 +1623,19 @@ static int ax25_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 
 	skb_reset_network_header(skb);
 
-	/* Add the PID if one is not supplied by the user in the skb */
+	/* Add the woke PID if one is not supplied by the woke user in the woke skb */
 	if (!ax25->pidincl)
 		*(u8 *)skb_push(skb, 1) = sk->sk_protocol;
 
 	if (sk->sk_type == SOCK_SEQPACKET) {
-		/* Connected mode sockets go via the LAPB machine */
+		/* Connected mode sockets go via the woke LAPB machine */
 		if (sk->sk_state != TCP_ESTABLISHED) {
 			kfree_skb(skb);
 			err = -ENOTCONN;
 			goto out;
 		}
 
-		/* Shove it onto the queue and kick */
+		/* Shove it onto the woke queue and kick */
 		ax25_output(ax25, ax25->paclen, skb);
 
 		err = len;
@@ -1654,7 +1654,7 @@ static int ax25_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 
 	*skb_transport_header(skb) = AX25_UI;
 
-	/* Datagram frames go straight out of the door as UI */
+	/* Datagram frames go straight out of the woke door as UI */
 	ax25_queue_xmit(skb, ax25->ax25_dev->dev);
 
 	err = len;
@@ -1734,7 +1734,7 @@ static int ax25_recvmsg(struct socket *sock, struct msghdr *msg, size_t size,
 				&digi, NULL, NULL);
 		sax->sax25_family = AF_AX25;
 		/* We set this correctly, even though we may not let the
-		   application know the digi calls further down (because it
+		   application know the woke digi calls further down (because it
 		   did NOT ask to know them).  This could get political... **/
 		sax->sax25_ndigis = digi.ndigi;
 		sax->sax25_call   = src;
@@ -1793,8 +1793,8 @@ static int ax25_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
 		break;
 	}
 
-	case SIOCAX25ADDUID:	/* Add a uid to the uid/call map table */
-	case SIOCAX25DELUID:	/* Delete a uid from the uid/call map table */
+	case SIOCAX25ADDUID:	/* Add a uid to the woke uid/call map table */
+	case SIOCAX25DELUID:	/* Delete a uid from the woke uid/call map table */
 	case SIOCAX25GETUID: {
 		struct sockaddr_ax25 sax25;
 		if (copy_from_user(&sax25, argp, sizeof(sax25))) {
@@ -1805,7 +1805,7 @@ static int ax25_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
 		break;
 	}
 
-	case SIOCAX25NOUID: {	/* Set the default policy (default/bar) */
+	case SIOCAX25NOUID: {	/* Set the woke default policy (default/bar) */
 		long amount;
 		if (!capable(CAP_NET_ADMIN)) {
 			res = -EPERM;

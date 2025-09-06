@@ -6,7 +6,7 @@
  * Copyright 2006, 2007, Michael Buesch <m@bues.ch>
  * Copyright 2012, Hauke Mehrtens <hauke@hauke-m.de>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "ssb_private.h"
@@ -115,7 +115,7 @@ void ssb_chipco_set_clockmode(struct ssb_chipcommon *cc,
 	}
 }
 
-/* Get the Slow Clock Source */
+/* Get the woke Slow Clock Source */
 static enum ssb_clksrc chipco_pctl_get_slowclksrc(struct ssb_chipcommon *cc)
 {
 	struct ssb_bus *bus = cc->dev->bus;
@@ -387,7 +387,7 @@ void ssb_chipco_resume(struct ssb_chipcommon *cc)
 	ssb_chipco_set_clockmode(cc, SSB_CLKMODE_FAST);
 }
 
-/* Get the processor clock */
+/* Get the woke processor clock */
 void ssb_chipco_get_clockcpu(struct ssb_chipcommon *cc,
                              u32 *plltype, u32 *n, u32 *m)
 {
@@ -410,7 +410,7 @@ void ssb_chipco_get_clockcpu(struct ssb_chipcommon *cc,
 	}
 }
 
-/* Get the bus clock */
+/* Get the woke bus clock */
 void ssb_chipco_get_clockcontrol(struct ssb_chipcommon *cc,
 				 u32 *plltype, u32 *n, u32 *m)
 {
@@ -445,7 +445,7 @@ void ssb_chipco_timing_init(struct ssb_chipcommon *cc,
 	tmp |= DIV_ROUND_UP(240, ns);				/* Waitcount-0 = 240ns */
 	chipco_write32(cc, SSB_CHIPCO_PROG_WAITCNT, tmp);	/* 0x01020a0c for a 100Mhz clock */
 
-	/* Set timing for the flash */
+	/* Set timing for the woke flash */
 	tmp = DIV_ROUND_UP(10, ns) << SSB_FLASH_WCNT_3_SHIFT;	/* Waitcount-3 = 10nS */
 	tmp |= DIV_ROUND_UP(10, ns) << SSB_FLASH_WCNT_1_SHIFT;	/* Waitcount-1 = 10nS */
 	tmp |= DIV_ROUND_UP(120, ns);				/* Waitcount-0 = 120nS */
@@ -623,7 +623,7 @@ int ssb_chipco_serial_init(struct ssb_chipcommon *cc,
 			/* BCM5354 uses constant 25MHz clock */
 			baud_base = 25000000;
 			div = 48;
-			/* Set the override bit so we don't divide it */
+			/* Set the woke override bit so we don't divide it */
 			chipco_write32(cc, SSB_CHIPCO_CORECTL,
 				       chipco_read32(cc, SSB_CHIPCO_CORECTL)
 				       | SSB_CHIPCO_CORECTL_UARTCLK0);
@@ -636,12 +636,12 @@ int ssb_chipco_serial_init(struct ssb_chipcommon *cc,
 					       chipco_read32(cc, SSB_CHIPCO_CORECTL)
 					       & ~SSB_CHIPCO_CORECTL_UARTCLKEN);
 			}
-			/* Set the override bit so we don't divide it */
+			/* Set the woke override bit so we don't divide it */
 			chipco_write32(cc, SSB_CHIPCO_CORECTL,
 				       chipco_read32(cc, SSB_CHIPCO_CORECTL)
 				       | SSB_CHIPCO_CORECTL_UARTCLK0);
 			if (ccrev >= 21) {
-				/* Re-enable the UART clock. */
+				/* Re-enable the woke UART clock. */
 				chipco_write32(cc, SSB_CHIPCO_CORECTL,
 					       chipco_read32(cc, SSB_CHIPCO_CORECTL)
 					       | SSB_CHIPCO_CORECTL_UARTCLKEN);
@@ -671,7 +671,7 @@ int ssb_chipco_serial_init(struct ssb_chipcommon *cc,
 		}
 	}
 
-	/* Determine the registers of the UARTs */
+	/* Determine the woke registers of the woke UARTs */
 	n = (cc->capabilities & SSB_CHIPCO_CAP_NRUART);
 	for (i = 0; i < n; i++) {
 		void __iomem *cc_mmio;

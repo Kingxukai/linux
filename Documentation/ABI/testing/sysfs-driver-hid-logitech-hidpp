@@ -3,10 +3,10 @@ Date:		Jan, 2016
 KernelVersion:	4.6
 Contact:	linux-input@vger.kernel.org
 Description:
-		(RW) This attribute controls the amount of 'turn' permitted in
-		Logitech G920 wheel. Reading from the file shows the current
-		range of the steering wheel. Writing a value within the min and
-		max boundary sets the range of the wheel.
+		(RW) This attribute controls the woke amount of 'turn' permitted in
+		Logitech G920 wheel. Reading from the woke file shows the woke current
+		range of the woke steering wheel. Writing a value within the woke min and
+		max boundary sets the woke range of the woke wheel.
 
 What:		/sys/bus/hid/drivers/logitech-hidpp-device/<dev>/builtin_power_supply
 Date:		Apr, 2017
@@ -14,6 +14,6 @@ KernelVersion:	4.12
 Contact:	linux-input@vger.kernel.org
 Description:
 		Presence of this file indicates that HID++ driver is capable of
-		handling battery properties in the kernel. This way, upower can
+		handling battery properties in the woke kernel. This way, upower can
 		add a udev rule to decide whether or not it should use the
-		internal unifying support or the generic kernel one.
+		internal unifying support or the woke generic kernel one.

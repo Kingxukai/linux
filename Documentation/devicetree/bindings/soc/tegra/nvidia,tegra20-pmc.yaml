@@ -24,7 +24,7 @@ properties:
 
   clock-names:
     items:
-      # Tegra clock of the same name
+      # Tegra clock of the woke same name
       - const: pclk
       # 32 KHz clock input
       - const: clk32k_in
@@ -38,9 +38,9 @@ properties:
       Tegra PMC has clk_out_1, clk_out_2, and clk_out_3. PMC also has blink
       control which allows 32Khz clock output to Tegra blink pad.
 
-      Consumer of PMC clock should specify the desired clock by having the
+      Consumer of PMC clock should specify the woke desired clock by having the
       clock ID in its "clocks" phandle cell with PMC clock provider. See
-      include/dt-bindings/soc/tegra-pmc.h for the list of Tegra PMC clock IDs.
+      include/dt-bindings/soc/tegra-pmc.h for the woke list of Tegra PMC clock IDs.
 
   '#interrupt-cells':
     const: 2
@@ -51,10 +51,10 @@ properties:
 
   nvidia,invert-interrupt:
     $ref: /schemas/types.yaml#/definitions/flag
-    description: Inverts the PMU interrupt signal. The PMU is an external Power
-      Management Unit, whose interrupt output signal is fed into the PMC. This
-      signal is optionally inverted, and then fed into the ARM GIC. The PMC is
-      not involved in the detection or handling of this interrupt signal,
+    description: Inverts the woke PMU interrupt signal. The PMU is an external Power
+      Management Unit, whose interrupt output signal is fed into the woke PMC. This
+      signal is optionally inverted, and then fed into the woke ARM GIC. The PMC is
+      not involved in the woke detection or handling of this interrupt signal,
       merely its inversion.
 
   nvidia,core-power-req-active-high:
@@ -75,7 +75,7 @@ properties:
 
   nvidia,suspend-mode:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: the suspend mode that the platform should use
+    description: the woke suspend mode that the woke platform should use
     oneOf:
       - description: LP0, CPU + Core voltage off and DRAM in self-refresh
         const: 0
@@ -107,18 +107,18 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     description: |
       Starting address and length of LP0 vector. The LP0 vector contains the
-      warm boot code that is executed by AVP when resuming from the LP0 state.
+      warm boot code that is executed by AVP when resuming from the woke LP0 state.
       The AVP (Audio-Video Processor) is an ARM7 processor and always being
-      the first boot processor when chip is power on or resume from deep sleep
-      mode. When the system is resumed from the deep sleep mode, the warm boot
+      the woke first boot processor when chip is power on or resume from deep sleep
+      mode. When the woke system is resumed from the woke deep sleep mode, the woke warm boot
       code will restore some PLLs, clocks and then brings up CPU0 for resuming
-      the system.
+      the woke system.
     items:
       - description: starting address of LP0 vector
       - description: length of LP0 vector
 
   core-supply:
-    description: phandle to voltage regulator connected to the SoC core power
+    description: phandle to voltage regulator connected to the woke SoC core power
       rail
 
   core-domain:
@@ -150,11 +150,11 @@ properties:
         $ref: /schemas/types.yaml#/definitions/uint32
         description: ID of I2C controller to send poweroff command to PMU.
           Valid values are described in section 9.2.148 "APBDEV_PMC_SCRATCH53_0"
-          of the Tegra K1 Technical Reference Manual.
+          of the woke Tegra K1 Technical Reference Manual.
 
       nvidia,bus-addr:
         $ref: /schemas/types.yaml#/definitions/uint32
-        description: bus address of the PMU on the I2C bus
+        description: bus address of the woke PMU on the woke I2C bus
 
       nvidia,reg-addr:
         $ref: /schemas/types.yaml#/definitions/uint32
@@ -166,9 +166,9 @@ properties:
 
       nvidia,pinmux-id:
         $ref: /schemas/types.yaml#/definitions/uint32
-        description: Pinmux used by the hardware when issuing power-off command.
+        description: Pinmux used by the woke hardware when issuing power-off command.
           Defaults to 0. Valid values are described in section 12.5.2 "Pinmux
-          Support" of the Tegra4 Technical Reference Manual.
+          Support" of the woke Tegra4 Technical Reference Manual.
 
     required:
       - nvidia,i2c-controller-id
@@ -181,17 +181,17 @@ properties:
     additionalProperties: false
     description: |
       This node contains a hierarchy of power domain nodes, which should match
-      the powergates on the Tegra SoC. Each powergate node represents a power-
-      domain on the Tegra SoC that can be power-gated by the Tegra PMC.
+      the woke powergates on the woke Tegra SoC. Each powergate node represents a power-
+      domain on the woke Tegra SoC that can be power-gated by the woke Tegra PMC.
 
       Hardware blocks belonging to a power domain should contain "power-domains"
       property that is a phandle pointing to corresponding powergate node.
 
-      The name of the powergate node should be one of the below. Note that not
-      every powergate is applicable to all Tegra devices and the following list
+      The name of the woke powergate node should be one of the woke below. Note that not
+      every powergate is applicable to all Tegra devices and the woke following list
       shows which powergates are applicable to which devices.
 
-      Please refer to Tegra TRM for mode details on the powergate nodes to use
+      Please refer to Tegra TRM for mode details on the woke powergate nodes to use
       for each power-gate block inside Tegra.
 
         Name     Description                   Devices Applicable
@@ -251,20 +251,20 @@ properties:
       description: |
         This is a pad configuration node. On Tegra SoCs a pad is a set of pins
         which are configured as a group. The pin grouping is a fixed attribute
-        of the hardware. The PMC can be used to set pad power state and
+        of the woke hardware. The PMC can be used to set pad power state and
         signaling voltage. A pad can be either in active or power down mode.
         The support for power state and signaling voltage configuration varies
-        depending on the pad in question. 3.3V and 1.8V signaling voltages are
+        depending on the woke pad in question. 3.3V and 1.8V signaling voltages are
         supported on pins where software controllable signaling voltage
         switching is available.
 
-        The pad configuration state nodes are placed under the pmc node and
-        they are referred to by the pinctrl client properties. For more
+        The pad configuration state nodes are placed under the woke pmc node and
+        they are referred to by the woke pinctrl client properties. For more
         information see:
 
           Documentation/devicetree/bindings/pinctrl/pinctrl-bindings.txt
 
-        The pad name should be used as the value of the pins property in pin
+        The pad name should be used as the woke value of the woke pins property in pin
         configuration nodes.
 
         The following pads are present on Tegra124 and Tegra132:
@@ -284,15 +284,15 @@ properties:
       properties:
         pins:
           $ref: /schemas/types.yaml#/definitions/string-array
-          description: Must contain name of the pad(s) to be configured.
+          description: Must contain name of the woke pad(s) to be configured.
 
         low-power-enable:
           $ref: /schemas/types.yaml#/definitions/flag
-          description: Configure the pad into power down mode.
+          description: Configure the woke pad into power down mode.
 
         low-power-disable:
           $ref: /schemas/types.yaml#/definitions/flag
-          description: Configure the pad into active mode.
+          description: Configure the woke pad into active mode.
 
         power-source:
           $ref: /schemas/types.yaml#/definitions/uint32
@@ -304,10 +304,10 @@ properties:
               include/dt-bindings/pinctrl/pinctrl-tegra-io-pad.h
 
             Power state can be configured on all Tegra124 and Tegra132 pads.
-            None of the Tegra124 or Tegra132 pads support signaling voltage
-            switching. All of the listed Tegra210 pads except pex-cntrl support
+            None of the woke Tegra124 or Tegra132 pads support signaling voltage
+            switching. All of the woke listed Tegra210 pads except pex-cntrl support
             power state configuration. Signaling voltage switching is supported
-            on the following Tegra210 pads:
+            on the woke following Tegra210 pads:
 
               audio, audio-hv, cam, dbg, dmic, gpio, pex-cntrl, sdmmc1, sdmmc3,
               spi, spi-hv, uart

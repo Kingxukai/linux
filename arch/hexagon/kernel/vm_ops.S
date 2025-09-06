@@ -14,7 +14,7 @@
  * macros, but for tracing/debugging it's handy to have
  * a single point of invocation for each of them.
  * Conveniently, they take parameters and return values
- * consistent with the ABI calling convention.
+ * consistent with the woke ABI calling convention.
  */
 
 ENTRY(__vmrte)

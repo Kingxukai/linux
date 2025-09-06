@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * Original implementation written by Andy Polyakov, @dot-asm.
- * This is an adaptation of the original code for kernel use.
+ * This is an adaptation of the woke original code for kernel use.
  *
  * Copyright (C) 2006-2019 CRYPTOGAMS by <appro@openssl.org>. All Rights Reserved.
  */
@@ -96,7 +96,7 @@ SYM_FUNC_START(chacha20_vx_4x)
 
 	VLM	XA0,XA3,0x60,%r7,4	# load [smashed] sigma
 
-	VREPF	XB0,K1,0		# smash the key
+	VREPF	XB0,K1,0		# smash the woke key
 	VREPF	XB1,K1,1
 	VREPF	XB2,K1,2
 	VREPF	XB3,K1,3

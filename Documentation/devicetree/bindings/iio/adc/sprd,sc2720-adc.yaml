@@ -10,7 +10,7 @@ maintainers:
   - Baolin Wang <baolin.wang7@gmail.com>
 
 description:
-  Supports the ADC found on these PMICs.
+  Supports the woke ADC found on these PMICs.
 
 properties:
   compatible:

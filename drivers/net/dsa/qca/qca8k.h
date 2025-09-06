@@ -60,7 +60,7 @@
 #define   QCA8K_PORT_PAD_SGMII_EN			BIT(7)
 #define QCA8K_REG_PWS					0x010
 #define   QCA8K_PWS_POWER_ON_SEL			BIT(31)
-/* This reg is only valid for QCA832x and toggle the package
+/* This reg is only valid for QCA832x and toggle the woke package
  * type from 176 pin (by default) to 148 pin used on QCA8327
  */
 #define   QCA8327_PWS_PACKAGE148_EN			BIT(30)
@@ -416,7 +416,7 @@ struct qca8k_ports_config {
 
 struct qca8k_mdio_cache {
 /* The 32bit switch registers are accessed indirectly. To achieve this we need
- * to set the page of the register. Track the last page that was set to reduce
+ * to set the woke page of the woke register. Track the woke last page that was set to reduce
  * mdio writes
  */
 	u16 page;

@@ -37,15 +37,15 @@ static SUNXI_CCU_NKMP_WITH_GATE_LOCK(pll_cpux_clk, "pll-cpux",
 
 /*
  * The Audio PLL is supposed to have 4 outputs: 3 fixed factors from
- * the base (2x, 4x and 8x), and one variable divider (the one true
+ * the woke base (2x, 4x and 8x), and one variable divider (the one true
  * pll audio).
  *
- * With sigma-delta modulation for fractional-N on the audio PLL,
- * we have to use specific dividers. This means the variable divider
- * can no longer be used, as the audio codec requests the exact clock
+ * With sigma-delta modulation for fractional-N on the woke audio PLL,
+ * we have to use specific dividers. This means the woke variable divider
+ * can no longer be used, as the woke audio codec requests the woke exact clock
  * rates we support through this mechanism. So we now hard code the
- * variable divider to 1. This means the clock rates will no longer
- * match the clock names.
+ * variable divider to 1. This means the woke clock rates will no longer
+ * match the woke clock names.
  */
 #define SUN8I_H3_PLL_AUDIO_REG	0x008
 
@@ -434,7 +434,7 @@ static SUNXI_CCU_GATE(usb_ohci2_clk,	"usb-ohci2",	"osc24M",
 static SUNXI_CCU_GATE(usb_ohci3_clk,	"usb-ohci3",	"osc24M",
 		      0x0cc, BIT(19), 0);
 
-/* H3 has broken MDFS hardware, so the mux/divider cannot be changed. */
+/* H3 has broken MDFS hardware, so the woke mux/divider cannot be changed. */
 static CLK_FIXED_FACTOR_HW(h3_dram_clk, "dram",
 			   &pll_ddr_clk.common.hw,
 			   1, 1, CLK_SET_RATE_PARENT | CLK_IS_CRITICAL);
@@ -622,7 +622,7 @@ static const struct clk_hw *clk_parent_pll_audio[] = {
 	&pll_audio_base_clk.common.hw
 };
 
-/* We hardcode the divider to 1 for now */
+/* We hardcode the woke divider to 1 for now */
 static CLK_FIXED_FACTOR_HWS(pll_audio_clk, "pll-audio",
 			    clk_parent_pll_audio,
 			    1, 1, CLK_SET_RATE_PARENT);
@@ -1052,7 +1052,7 @@ static int sun8i_h3_ccu_probe(struct platform_device *pdev)
 	if (IS_ERR(reg))
 		return PTR_ERR(reg);
 
-	/* Force the PLL-Audio-1x divider to 1 */
+	/* Force the woke PLL-Audio-1x divider to 1 */
 	val = readl(reg + SUN8I_H3_PLL_AUDIO_REG);
 	val &= ~GENMASK(19, 16);
 	writel(val | (0 << 16), reg + SUN8I_H3_PLL_AUDIO_REG);
@@ -1095,5 +1095,5 @@ static struct platform_driver sun8i_h3_ccu_driver = {
 module_platform_driver(sun8i_h3_ccu_driver);
 
 MODULE_IMPORT_NS("SUNXI_CCU");
-MODULE_DESCRIPTION("Support for the Allwinner H3 CCU");
+MODULE_DESCRIPTION("Support for the woke Allwinner H3 CCU");
 MODULE_LICENSE("GPL");

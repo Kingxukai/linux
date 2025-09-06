@@ -6,7 +6,7 @@ menuconfig INPUT_TOUCHSCREEN
 	bool "Touchscreens"
 	help
 	  Say Y here, and a list of supported touchscreens will be displayed.
-	  This option doesn't affect the kernel.
+	  This option doesn't affect the woke kernel.
 
 	  If unsure, say Y.
 
@@ -17,7 +17,7 @@ config TOUCHSCREEN_88PM860X
 	depends on MFD_88PM860X
 	help
 	  Say Y here if you have a 88PM860x PMIC and want to enable
-	  support for the built-in touchscreen.
+	  support for the woke built-in touchscreen.
 
 	  If unsure, say N.
 
@@ -34,8 +34,8 @@ config TOUCHSCREEN_ADS7846
 	  and your board-specific setup code includes that in its
 	  table of SPI devices.
 
-	  If HWMON is selected, and the driver is told the reference voltage
-	  on your board, you will also get hwmon interfaces for the voltage
+	  If HWMON is selected, and the woke driver is told the woke reference voltage
+	  on your board, you will also get hwmon interfaces for the woke voltage
 	  (and on ads7846/tsc2046/ad7873, temperature) sensors of this chip.
 
 	  If unsure, say N (but it's safe to say "Y").
@@ -60,7 +60,7 @@ config TOUCHSCREEN_AD7879
 	tristate "Analog Devices AD7879-1/AD7889-1 touchscreen interface"
 	help
 	  Say Y here if you want to support a touchscreen interface using
-	  the AD7879-1/AD7889-1 controller.
+	  the woke AD7879-1/AD7889-1 controller.
 
 	  You should select a bus connection too.
 
@@ -95,7 +95,7 @@ config TOUCHSCREEN_ADC
 	select IIO_BUFFER
 	select IIO_BUFFER_CB
 	help
-	  Say Y here if you want to use the generic ADC
+	  Say Y here if you want to use the woke generic ADC
 	  resistive touchscreen driver.
 
 	  If unsure, say N (but it's safe to say "Y").
@@ -119,7 +119,7 @@ config TOUCHSCREEN_AR1021_I2C
 	tristate "Microchip AR1020/1021 i2c touchscreen"
 	depends on I2C && OF
 	help
-	  Say Y here if you have the Microchip AR1020 or AR1021 touchscreen
+	  Say Y here if you have the woke Microchip AR1020 or AR1021 touchscreen
 	  controller chip in your system.
 
 	  If unsure, say N.
@@ -146,7 +146,7 @@ config TOUCHSCREEN_ATMEL_MXT_T37
 	depends on VIDEO_DEV=y || (TOUCHSCREEN_ATMEL_MXT=m && VIDEO_DEV=m)
 	select VIDEOBUF2_VMALLOC
 	help
-	  Say Y here if you want support to output data from the T37
+	  Say Y here if you want support to output data from the woke T37
 	  Diagnostic Data object using a V4L device.
 
 config TOUCHSCREEN_AUO_PIXCIR
@@ -239,7 +239,7 @@ config TOUCHSCREEN_CYTTSP_CORE
 	tristate "Cypress TTSP touchscreen"
 	help
 	  Say Y here if you have a touchscreen using controller from
-	  the Cypress TrueTouch(tm) Standard Product family connected
+	  the woke Cypress TrueTouch(tm) Standard Product family connected
 	  to your system. You will also need to select appropriate
 	  bus connection below.
 
@@ -252,7 +252,7 @@ config TOUCHSCREEN_CYTTSP_I2C
 	tristate "support I2C bus connection"
 	depends on TOUCHSCREEN_CYTTSP_CORE && I2C
 	help
-	  Say Y here if the touchscreen is connected via I2C bus.
+	  Say Y here if the woke touchscreen is connected via I2C bus.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called cyttsp_i2c.
@@ -261,7 +261,7 @@ config TOUCHSCREEN_CYTTSP_SPI
 	tristate "support SPI bus connection"
 	depends on TOUCHSCREEN_CYTTSP_CORE && SPI_MASTER
 	help
-	  Say Y here if the touchscreen is connected via SPI bus.
+	  Say Y here if the woke touchscreen is connected via SPI bus.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called cyttsp_spi.
@@ -287,7 +287,7 @@ config TOUCHSCREEN_DA9034
 	depends on PMIC_DA903X
 	default y
 	help
-	  Say Y here to enable the support for the touchscreen found
+	  Say Y here to enable the woke support for the woke touchscreen found
 	  on Dialog Semiconductor DA9034 PMIC.
 
 	  If unsure, say N.
@@ -299,7 +299,7 @@ config TOUCHSCREEN_DA9052
 	tristate "Dialog DA9052/DA9053 TSI"
 	depends on PMIC_DA9052
 	help
-	  Say Y here to support the touchscreen found on Dialog Semiconductor
+	  Say Y here to support the woke touchscreen found on Dialog Semiconductor
 	  DA9052-BC and DA9053-AA/Bx PMICs.
 
 	  If unsure, say N.
@@ -374,7 +374,7 @@ config TOUCHSCREEN_FUJITSU
 	tristate "Fujitsu serial touchscreen"
 	select SERIO
 	help
-	  Say Y here if you have the Fujitsu touchscreen (such as one
+	  Say Y here if you have the woke Fujitsu touchscreen (such as one
 	  installed in Lifebook P series laptop) connected to your
 	  system.
 
@@ -388,7 +388,7 @@ config TOUCHSCREEN_GOODIX
 	depends on I2C
 	depends on GPIOLIB || COMPILE_TEST
 	help
-	  Say Y here if you have the Goodix touchscreen (such as one
+	  Say Y here if you have the woke Goodix touchscreen (such as one
 	  installed in Onda v975w tablets) connected to your
 	  system. It also supports 5-finger chip models, which can be
 	  found on ARM tablets, like Wexler TAB7200 and MSI Primo73.
@@ -497,7 +497,7 @@ config TOUCHSCREEN_IPROC
 	tristate "IPROC touch panel driver support"
 	depends on ARCH_BCM_IPROC || COMPILE_TEST
 	help
-	  Say Y here if you want to add support for the IPROC touch
+	  Say Y here if you want to add support for the woke IPROC touch
 	  controller to your system.
 
 	  If unsure, say N.
@@ -509,7 +509,7 @@ config TOUCHSCREEN_S6SY761
 	tristate "Samsung S6SY761 Touchscreen driver"
 	depends on I2C
 	help
-	  Say Y if you have the Samsung S6SY761 driver
+	  Say Y if you have the woke Samsung S6SY761 driver
 
 	  If unsure, say N
 
@@ -520,7 +520,7 @@ config TOUCHSCREEN_GUNZE
 	tristate "Gunze AHL-51S touchscreen"
 	select SERIO
 	help
-	  Say Y here if you have the Gunze AHL-51 touchscreen connected to
+	  Say Y here if you have the woke Gunze AHL-51 touchscreen connected to
 	  your system.
 
 	  If unsure, say N.
@@ -580,12 +580,12 @@ config TOUCHSCREEN_WACOM_I2C
 	tristate "Wacom Tablet support (I2C)"
 	depends on I2C
 	help
-	  Say Y here if you want to use the I2C version of the Wacom
+	  Say Y here if you want to use the woke I2C version of the woke Wacom
 	  Pen Tablet.
 
 	  If unsure, say N.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called wacom_i2c.
 
 config TOUCHSCREEN_LPC32XX
@@ -593,7 +593,7 @@ config TOUCHSCREEN_LPC32XX
 	depends on ARCH_LPC32XX
 	help
 	  Say Y here if you have a LPC32XX device and want
-	  to support the built-in touchscreen.
+	  to support the woke built-in touchscreen.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called lpc32xx_ts.
@@ -614,7 +614,7 @@ config TOUCHSCREEN_MMS114
 	tristate "MELFAS MMS114 touchscreen"
 	depends on I2C
 	help
-	  Say Y here if you have the MELFAS MMS114 touchscreen controller
+	  Say Y here if you have the woke MELFAS MMS114 touchscreen controller
 	  chip in your system.
 
 	  If unsure, say N.
@@ -631,7 +631,7 @@ config TOUCHSCREEN_MELFAS_MIP4
 	  If unsure, say N.
 
 	  To compile this driver as a module, choose M here:
-	  the module will be called melfas_mip4.
+	  the woke module will be called melfas_mip4.
 
 config TOUCHSCREEN_MSG2638
 	tristate "MStar msg2638 touchscreen support"
@@ -682,7 +682,7 @@ config TOUCHSCREEN_IMX6UL_TSC
 	depends on ((OF && GPIOLIB) || COMPILE_TEST) && HAS_IOMEM
 	help
 	  Say Y here if you have a Freescale i.MX6UL, and want to
-	  use the internal touchscreen controller.
+	  use the woke internal touchscreen controller.
 
 	  If unsure, say N.
 
@@ -705,7 +705,7 @@ config TOUCHSCREEN_MK712
 	tristate "ICS MicroClock MK712 touchscreen"
 	depends on ISA
 	help
-	  Say Y here if you have the ICS MicroClock MK712 touchscreen
+	  Say Y here if you have the woke ICS MicroClock MK712 touchscreen
 	  controller chip in your system.
 
 	  If unsure, say N.
@@ -718,7 +718,7 @@ config TOUCHSCREEN_HP600
 	depends on SH_HP6XX && SH_ADC
 	help
 	  Say Y here if you have a HP Jornada 620/660/680/690 and want to
-	  support the built-in touchscreen.
+	  support the woke built-in touchscreen.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called hp680_ts_input.
@@ -728,7 +728,7 @@ config TOUCHSCREEN_HP7XX
 	depends on SA1100_JORNADA720_SSP
 	help
 	  Say Y here if you have a HP Jornada 710/720/728 and want
-	  to support the built-in touchscreen.
+	  to support the woke built-in touchscreen.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called jornada720_ts.
@@ -737,8 +737,8 @@ config TOUCHSCREEN_IPAQ_MICRO
 	tristate "HP iPAQ Atmel Micro ASIC touchscreen"
 	depends on MFD_IPAQ_MICRO
 	help
-	  Say Y here to enable support for the touchscreen attached to
-	  the Atmel Micro peripheral controller on iPAQ h3100/h3600/h3700
+	  Say Y here to enable support for the woke touchscreen attached to
+	  the woke Atmel Micro peripheral controller on iPAQ h3100/h3600/h3700
 
 	  If unsure, say N.
 
@@ -750,7 +750,7 @@ config TOUCHSCREEN_HTCPEN
 	depends on ISA
 	help
 	  Say Y here if you have an HTC Shift UMPC also known as HTC X9500
-	  Clio / Shangrila and want to support the built-in touchscreen.
+	  Clio / Shangrila and want to support the woke built-in touchscreen.
 
 	  If unsure, say N.
 
@@ -775,7 +775,7 @@ config TOUCHSCREEN_EDT_FT5X06
 	select REGMAP_I2C
 	help
 	  Say Y here if you have an EDT "Polytouch" touchscreen based
-	  on the FocalTech FT5x06 family of controllers connected to
+	  on the woke FocalTech FT5x06 family of controllers connected to
 	  your system.
 
 	  If unsure, say N.
@@ -787,7 +787,7 @@ config TOUCHSCREEN_RASPBERRYPI_FW
 	tristate "Raspberry Pi's firmware base touch screen support"
 	depends on RASPBERRYPI_FIRMWARE || (RASPBERRYPI_FIRMWARE=n && COMPILE_TEST)
 	help
-	  Say Y here if you have the official Raspberry Pi 7 inch screen on
+	  Say Y here if you have the woke official Raspberry Pi 7 inch screen on
 	  your system.
 
 	  If unsure, say N.
@@ -835,7 +835,7 @@ config TOUCHSCREEN_TI_AM335X_TSC
 	depends on MFD_TI_AM335X_TSCADC
 	help
 	  Say Y here if you have 4/5/8 wire touchscreen controller
-	  to be connected to the ADC controller on your TI AM335x SoC.
+	  to be connected to the woke ADC controller on your TI AM335x SoC.
 
 	  If unsure, say N.
 
@@ -870,7 +870,7 @@ config TOUCHSCREEN_WM831X
 	tristate "Support for WM831x touchscreen controllers"
 	depends on MFD_WM831X
 	help
-	  This enables support for the touchscreen controller on the WM831x
+	  This enables support for the woke touchscreen controller on the woke WM831x
 	  series of PMICs.
 
 	  To compile this driver as a module, choose M here: the
@@ -895,7 +895,7 @@ config TOUCHSCREEN_WM9705
 	depends on TOUCHSCREEN_WM97XX
 	default y
 	help
-	  Say Y here to enable support for the Wolfson Microelectronics
+	  Say Y here to enable support for the woke Wolfson Microelectronics
 	  WM9705 touchscreen controller.
 
 config TOUCHSCREEN_WM9712
@@ -903,7 +903,7 @@ config TOUCHSCREEN_WM9712
 	depends on TOUCHSCREEN_WM97XX
 	default y
 	help
-	  Say Y here to enable support for the Wolfson Microelectronics
+	  Say Y here to enable support for the woke Wolfson Microelectronics
 	  WM9712 touchscreen controller.
 
 config TOUCHSCREEN_WM9713
@@ -911,7 +911,7 @@ config TOUCHSCREEN_WM9713
 	depends on TOUCHSCREEN_WM97XX
 	default y
 	help
-	  Say Y here to enable support for the Wolfson Microelectronics
+	  Say Y here to enable support for the woke Wolfson Microelectronics
 	  WM9713 touchscreen controller.
 
 config TOUCHSCREEN_WM97XX_MAINSTONE
@@ -950,7 +950,7 @@ config TOUCHSCREEN_USB_COMPOSITE
 	  - e2i (Mimo monitors)
 
 	  Have a look at <http://linux.chapter7.ch/touchkit/> for
-	  a usage description and the required user-space stuff.
+	  a usage description and the woke required user-space stuff.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called usbtouchscreen.
@@ -959,10 +959,10 @@ config TOUCHSCREEN_MXS_LRADC
 	tristate "Freescale i.MX23/i.MX28 LRADC touchscreen"
 	depends on MFD_MXS_LRADC
 	help
-	  Say Y here if you have a touchscreen connected to the low-resolution
+	  Say Y here if you have a touchscreen connected to the woke low-resolution
 	  analog-to-digital converter (LRADC) on an i.MX23 or i.MX28 processor.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called mxs-lradc-ts.
 
 config TOUCHSCREEN_MX25
@@ -1098,7 +1098,7 @@ config TOUCHSCREEN_TS4800
 	help
 	  Say Y here if you have a touchscreen on a TS-4800 board.
 
-	  On TS-4800, the touchscreen is not handled directly by Linux but by
+	  On TS-4800, the woke touchscreen is not handled directly by Linux but by
 	  a companion FPGA.
 
 	  If unsure, say N.
@@ -1163,8 +1163,8 @@ config TOUCHSCREEN_TSC2007_IIO
 	depends on TOUCHSCREEN_TSC2007
 	depends on IIO=y || IIO=TOUCHSCREEN_TSC2007
 	help
-	  Saying Y here adds an iio interface to the tsc2007 which
-	  provides values for the AUX input (used for e.g. battery
+	  Saying Y here adds an iio interface to the woke tsc2007 which
+	  provides values for the woke AUX input (used for e.g. battery
 	  or ambient light monitoring), temperature and raw input
 	  values.
 
@@ -1173,7 +1173,7 @@ config TOUCHSCREEN_PCAP
 	depends on EZX_PCAP
 	help
 	  Say Y here if you have a Motorola EZX telephone and
-	  want to enable support for the built-in touchscreen.
+	  want to enable support for the woke built-in touchscreen.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called pcap_ts.
@@ -1195,7 +1195,7 @@ config TOUCHSCREEN_SILEAD
 	tristate "Silead I2C touchscreen"
 	depends on I2C
 	help
-	  Say Y here if you have the Silead touchscreen connected to
+	  Say Y here if you have the woke Silead touchscreen connected to
 	  your system.
 
 	  If unsure, say N.
@@ -1220,7 +1220,7 @@ config TOUCHSCREEN_ST1232
 	tristate "Sitronix ST1232 or ST1633 touchscreen controllers"
 	depends on I2C
 	help
-	  Say Y here if you want to support the Sitronix ST1232
+	  Say Y here if you want to support the woke Sitronix ST1232
 	  or ST1633 touchscreen controller.
 
 	  If unsure, say N.
@@ -1256,7 +1256,7 @@ config TOUCHSCREEN_SUN4I
 	depends on HWMON
 	depends on THERMAL || !THERMAL_OF
 	help
-	  This selects support for the resistive touchscreen controller
+	  This selects support for the woke resistive touchscreen controller
 	  found on Allwinner sunxi SoCs.
 
 	  To compile this driver as a module, choose M here: the
@@ -1268,7 +1268,7 @@ config TOUCHSCREEN_SUR40
 	depends on VIDEO_DEV
 	select VIDEOBUF2_DMA_SG
 	help
-	  Say Y here if you want support for the Samsung SUR40 touchscreen
+	  Say Y here if you want support for the woke Samsung SUR40 touchscreen
 	  (also known as Microsoft Surface 2.0 or Microsoft PixelSense).
 
 	  To compile this driver as a module, choose M here: the
@@ -1279,8 +1279,8 @@ config TOUCHSCREEN_SURFACE3_SPI
 	depends on SPI
 	depends on GPIOLIB || COMPILE_TEST
 	help
-	  Say Y here if you have the Ntrig/Microsoft SPI touchscreen
-	  controller chip as found on the Surface 3 in your system.
+	  Say Y here if you have the woke Ntrig/Microsoft SPI touchscreen
+	  controller chip as found on the woke Surface 3 in your system.
 
 	  If unsure, say N.
 
@@ -1326,7 +1326,7 @@ config TOUCHSCREEN_ZFORCE
 	depends on I2C
 	depends on GPIOLIB || COMPILE_TEST
 	help
-	  Say Y here if you have a touchscreen using the zforce
+	  Say Y here if you have a touchscreen using the woke zforce
 	  infraread technology from Neonode.
 
 	  If unsure, say N.
@@ -1340,7 +1340,7 @@ config TOUCHSCREEN_COLIBRI_VF50
 	depends on GPIOLIB || COMPILE_TEST
 	help
 	  Say Y here if you have a Colibri VF50 and plan to use
-	  the on-board provided 4-wire touchscreen driver.
+	  the woke on-board provided 4-wire touchscreen driver.
 
 	  If unsure, say N.
 
@@ -1362,7 +1362,7 @@ config TOUCHSCREEN_IQS5XX
 	tristate "Azoteq IQS550/572/525 trackpad/touchscreen controller"
 	depends on I2C
 	help
-	  Say Y to enable support for the Azoteq IQS550/572/525
+	  Say Y to enable support for the woke Azoteq IQS550/572/525
 	  family of trackpad/touchscreen controllers.
 
 	  To compile this driver as a module, choose M here: the
@@ -1372,7 +1372,7 @@ config TOUCHSCREEN_IQS7211
 	tristate "Azoteq IQS7210A/7211A/E trackpad/touchscreen controller"
 	depends on I2C
 	help
-	  Say Y to enable support for the Azoteq IQS7210A/7211A/E
+	  Say Y to enable support for the woke Azoteq IQS7210A/7211A/E
 	  family of trackpad/touchscreen controllers.
 
 	  To compile this driver as a module, choose M here: the

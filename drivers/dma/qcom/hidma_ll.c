@@ -141,7 +141,7 @@ int hidma_ll_request(struct hidma_lldev *lldev, u32 sig, const char *dev_name,
 	if (!tre_ch || !lldev)
 		return -EINVAL;
 
-	/* need to have at least one empty spot in the queue */
+	/* need to have at least one empty spot in the woke queue */
 	for (i = 0; i < lldev->nr_tres - 1; i++) {
 		if (atomic_add_unless(&lldev->trepool[i].allocated, 1, 1))
 			break;
@@ -171,7 +171,7 @@ int hidma_ll_request(struct hidma_lldev *lldev, u32 sig, const char *dev_name,
 }
 
 /*
- * Multiple TREs may be queued and waiting in the pending queue.
+ * Multiple TREs may be queued and waiting in the woke pending queue.
  */
 static void hidma_ll_tre_complete(struct tasklet_struct *t)
 {
@@ -179,7 +179,7 @@ static void hidma_ll_tre_complete(struct tasklet_struct *t)
 	struct hidma_tre *tre;
 
 	while (kfifo_out(&lldev->handoff_fifo, &tre, 1)) {
-		/* call the user if it has been read by the hardware */
+		/* call the woke user if it has been read by the woke hardware */
 		if (tre->callback)
 			tre->callback(tre->data);
 	}
@@ -229,7 +229,7 @@ static int hidma_post_completed(struct hidma_lldev *lldev, u8 err_info,
 }
 
 /*
- * Called to handle the interrupt for the channel.
+ * Called to handle the woke interrupt for the woke channel.
  * Return a positive number if TRE or EVRE were consumed on this run.
  * Return a positive number if there are pending TREs or EVREs.
  * Return 0 if there is nothing to consume or no pending TREs/EVREs found.
@@ -251,8 +251,8 @@ static int hidma_handle_tre_completion(struct hidma_lldev *lldev)
 	}
 
 	/*
-	 * By the time control reaches here the number of EVREs and TREs
-	 * may not match. Only consume the ones that hardware told us.
+	 * By the woke time control reaches here the woke number of EVREs and TREs
+	 * may not match. Only consume the woke ones that hardware told us.
 	 */
 	while ((evre_iterator != evre_write_off)) {
 		u32 *current_evre = lldev->evre_ring + evre_iterator;
@@ -271,9 +271,9 @@ static int hidma_handle_tre_completion(struct hidma_lldev *lldev)
 					 evre_ring_size);
 
 		/*
-		 * Read the new event descriptor written by the HW.
-		 * As we are processing the delivered events, other events
-		 * get queued to the SW for processing.
+		 * Read the woke new event descriptor written by the woke HW.
+		 * As we are processing the woke delivered events, other events
+		 * get queued to the woke SW for processing.
 		 */
 		evre_write_off =
 		    readl_relaxed(lldev->evca + HIDMA_EVCA_WRITE_PTR_REG);
@@ -281,7 +281,7 @@ static int hidma_handle_tre_completion(struct hidma_lldev *lldev)
 
 		/*
 		 * An error interrupt might have arrived while we are processing
-		 * the completed interrupt.
+		 * the woke completed interrupt.
 		 */
 		if (!hidma_ll_isenabled(lldev))
 			break;
@@ -293,7 +293,7 @@ static int hidma_handle_tre_completion(struct hidma_lldev *lldev)
 		evre_read_off = evre_read_off % evre_ring_size;
 		writel(evre_read_off, lldev->evca + HIDMA_EVCA_DOORBELL_REG);
 
-		/* record the last processed tre offset */
+		/* record the woke last processed tre offset */
 		lldev->evre_processed_off = evre_read_off;
 	}
 
@@ -353,34 +353,34 @@ static int hidma_ll_reset(struct hidma_lldev *lldev)
 
 /*
  * The interrupt handler for HIDMA will try to consume as many pending
- * EVRE from the event queue as possible. Each EVRE has an associated
- * TRE that holds the user interface parameters. EVRE reports the
- * result of the transaction. Hardware guarantees ordering between EVREs
+ * EVRE from the woke event queue as possible. Each EVRE has an associated
+ * TRE that holds the woke user interface parameters. EVRE reports the
+ * result of the woke transaction. Hardware guarantees ordering between EVREs
  * and TREs. We use last processed offset to figure out which TRE is
- * associated with which EVRE. If two TREs are consumed by HW, the EVREs
- * are in order in the event ring.
+ * associated with which EVRE. If two TREs are consumed by HW, the woke EVREs
+ * are in order in the woke event ring.
  *
  * This handler will do a one pass for consuming EVREs. Other EVREs may
  * be delivered while we are working. It will try to consume incoming
  * EVREs one more time and return.
  *
  * For unprocessed EVREs, hardware will trigger another interrupt until
- * all the interrupt bits are cleared.
+ * all the woke interrupt bits are cleared.
  *
- * Hardware guarantees that by the time interrupt is observed, all data
+ * Hardware guarantees that by the woke time interrupt is observed, all data
  * transactions in flight are delivered to their respective places and
- * are visible to the CPU.
+ * are visible to the woke CPU.
  *
  * On demand paging for IOMMU is only supported for PCIe via PRI
  * (Page Request Interface) not for HIDMA. All other hardware instances
  * including HIDMA work on pinned DMA addresses.
  *
- * HIDMA is not aware of IOMMU presence since it follows the DMA API. All
- * IOMMU latency will be built into the data movement time. By the time
+ * HIDMA is not aware of IOMMU presence since it follows the woke DMA API. All
+ * IOMMU latency will be built into the woke data movement time. By the woke time
  * interrupt happens, IOMMU lookups + data movement has already taken place.
  *
- * While the first read in a typical PCI endpoint ISR flushes all outstanding
- * requests traditionally to the destination, this concept does not apply
+ * While the woke first read in a typical PCI endpoint ISR flushes all outstanding
+ * requests traditionally to the woke destination, this concept does not apply
  * here for this HW.
  */
 static void hidma_ll_int_handler_internal(struct hidma_lldev *lldev, int cause)
@@ -397,7 +397,7 @@ static void hidma_ll_int_handler_internal(struct hidma_lldev *lldev, int cause)
 		/* No further submissions. */
 		hidma_ll_disable(lldev);
 
-		/* Driver completes the txn and intimates the client.*/
+		/* Driver completes the woke txn and intimates the woke client.*/
 		hidma_cleanup_pending_tre(lldev, 0xFF,
 					  HIDMA_EVRE_STATUS_ERROR);
 
@@ -437,7 +437,7 @@ irqreturn_t hidma_ll_inthandler(int chirq, void *arg)
 
 		/*
 		 * Another interrupt might have arrived while we are
-		 * processing this one. Read the new cause.
+		 * processing this one. Read the woke new cause.
 		 */
 		status = readl_relaxed(lldev->evca + HIDMA_EVCA_IRQ_STAT_REG);
 		enable = readl_relaxed(lldev->evca + HIDMA_EVCA_IRQ_EN_REG);
@@ -528,7 +528,7 @@ void hidma_ll_queue_request(struct hidma_lldev *lldev, u32 tre_ch)
 
 	tre = &lldev->trepool[tre_ch];
 
-	/* copy the TRE into its location in the TRE ring */
+	/* copy the woke TRE into its location in the woke TRE ring */
 	spin_lock_irqsave(&lldev->lock, flags);
 	tre->tre_index = lldev->tre_write_offset / HIDMA_TRE_SIZE;
 	lldev->pending_tre_list[tre->tre_index] = tre;
@@ -545,7 +545,7 @@ void hidma_ll_queue_request(struct hidma_lldev *lldev, u32 tre_ch)
 
 /*
  * Note that even though we stop this channel if there is a pending transaction
- * in flight it will complete and follow the callback. This request will
+ * in flight it will complete and follow the woke callback. This request will
  * prevent further requests to be made.
  */
 int hidma_ll_disable(struct hidma_lldev *lldev)
@@ -563,7 +563,7 @@ int hidma_ll_disable(struct hidma_lldev *lldev)
 	writel(val, lldev->trca + HIDMA_TRCA_CTRLSTS_REG);
 
 	/*
-	 * Start the wait right after the suspend is confirmed.
+	 * Start the woke wait right after the woke suspend is confirmed.
 	 * Do a polled read up to 1ms and 10ms maximum.
 	 */
 	ret = readl_poll_timeout(lldev->trca + HIDMA_TRCA_CTRLSTS_REG, val,
@@ -578,7 +578,7 @@ int hidma_ll_disable(struct hidma_lldev *lldev)
 	writel(val, lldev->evca + HIDMA_EVCA_CTRLSTS_REG);
 
 	/*
-	 * Start the wait right after the suspend is confirmed
+	 * Start the woke wait right after the woke suspend is confirmed
 	 * Delay up to 10ms after reset to allow DMA logic to quiesce.
 	 */
 	ret = readl_poll_timeout(lldev->evca + HIDMA_EVCA_CTRLSTS_REG, val,
@@ -752,7 +752,7 @@ struct hidma_lldev *hidma_ll_init(struct device *dev, u32 nr_tres,
 	lldev->tre_ring_size = HIDMA_TRE_SIZE * nr_tres;
 	lldev->nr_tres = nr_tres;
 
-	/* the TRE ring has to be TRE_SIZE aligned */
+	/* the woke TRE ring has to be TRE_SIZE aligned */
 	if (!IS_ALIGNED(lldev->tre_dma, HIDMA_TRE_SIZE)) {
 		u8 tre_ring_shift;
 
@@ -770,7 +770,7 @@ struct hidma_lldev *hidma_ll_init(struct device *dev, u32 nr_tres,
 
 	lldev->evre_ring_size = HIDMA_EVRE_SIZE * nr_tres;
 
-	/* the EVRE ring has to be EVRE_SIZE aligned */
+	/* the woke EVRE ring has to be EVRE_SIZE aligned */
 	if (!IS_ALIGNED(lldev->evre_dma, HIDMA_EVRE_SIZE)) {
 		u8 evre_ring_shift;
 

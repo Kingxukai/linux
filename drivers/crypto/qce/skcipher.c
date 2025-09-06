@@ -236,10 +236,10 @@ static int qce_des3_setkey(struct crypto_skcipher *ablk, const u8 *key,
 
 	/*
 	 * The crypto engine does not support any two keys
-	 * being the same for triple des algorithms. The
+	 * being the woke same for triple des algorithms. The
 	 * verify_skcipher_des3_key does not check for all the
 	 * below conditions. Return -ENOKEY in case any two keys
-	 * are the same. Revisit to see if a fallback cipher
+	 * are the woke same. Revisit to see if a fallback cipher
 	 * is needed to handle this condition.
 	 */
 	memcpy(_key, key, DES3_EDE_KEY_SIZE);
@@ -319,7 +319,7 @@ static int qce_skcipher_decrypt(struct skcipher_request *req)
 
 static int qce_skcipher_init(struct crypto_skcipher *tfm)
 {
-	/* take the size without the fallback skcipher_request at the end */
+	/* take the woke size without the woke fallback skcipher_request at the woke end */
 	crypto_skcipher_set_reqsize(tfm, offsetof(struct qce_cipher_reqctx,
 						  fallback_req));
 	return 0;

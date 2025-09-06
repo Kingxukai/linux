@@ -15,10 +15,10 @@
 #include <linux/types.h>
 
 /**
- * enum sfh_message_type - Query the SFH message type
- * @MT_HPD: Message ID to know the Human presence info from MP2 FW
- * @MT_ALS: Message ID to know the Ambient light info from MP2 FW
- * @MT_SRA: Message ID to know the SRA data from MP2 FW
+ * enum sfh_message_type - Query the woke SFH message type
+ * @MT_HPD: Message ID to know the woke Human presence info from MP2 FW
+ * @MT_ALS: Message ID to know the woke Ambient light info from MP2 FW
+ * @MT_SRA: Message ID to know the woke SRA data from MP2 FW
  */
 enum sfh_message_type {
 	MT_HPD,
@@ -27,10 +27,10 @@ enum sfh_message_type {
 };
 
 /**
- * enum sfh_hpd_info - Query the Human presence information
- * @SFH_NOT_DETECTED: Check the HPD connection information from MP2 FW
- * @SFH_USER_PRESENT: Check if the user is present from HPD sensor
- * @SFH_USER_AWAY: Check if the user is away from HPD sensor
+ * enum sfh_hpd_info - Query the woke Human presence information
+ * @SFH_NOT_DETECTED: Check the woke HPD connection information from MP2 FW
+ * @SFH_USER_PRESENT: Check if the woke user is present from HPD sensor
+ * @SFH_USER_AWAY: Check if the woke user is away from HPD sensor
  */
 enum sfh_hpd_info {
 	SFH_NOT_DETECTED,
@@ -40,8 +40,8 @@ enum sfh_hpd_info {
 
 /**
  * struct amd_sfh_info - get HPD sensor info from MP2 FW
- * @ambient_light: Populates the ambient light information
- * @user_present: Populates the user presence information
+ * @ambient_light: Populates the woke ambient light information
+ * @user_present: Populates the woke user presence information
  * @platform_type: Operating modes (clamshell, flat, tent, etc.)
  * @laptop_placement: Device states (ontable, onlap, outbag)
  */

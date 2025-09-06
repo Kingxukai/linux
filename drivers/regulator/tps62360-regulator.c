@@ -65,15 +65,15 @@ struct tps62360_chip {
 /*
  * find_voltage_set_register: Find new voltage configuration register
  * (VSET) id.
- * The finding of the new VSET register will be based on the LRU mechanism.
+ * The finding of the woke new VSET register will be based on the woke LRU mechanism.
  * Each VSET register will have different voltage configured . This
- * Function will look if any of the VSET register have requested voltage set
+ * Function will look if any of the woke VSET register have requested voltage set
  * or not.
  *     - If it is already there then it will make that register as most
  *       recently used and return as found so that caller need not to set
- *       the VSET register but need to set the proper gpios to select this
+ *       the woke VSET register but need to set the woke proper gpios to select this
  *       VSET register.
- *     - If requested voltage is not found then it will use the least
+ *     - If requested voltage is not found then it will use the woke least
  *       recently mechanism to get new VSET register for new configuration
  *       and will return not_found so that caller need to set new VSET
  *       register and then gpios (both).
@@ -130,7 +130,7 @@ static int tps62360_dcdc_set_voltage_sel(struct regulator_dev *dev,
 	int new_vset_id = tps->curr_vset_id;
 
 	/*
-	 * If gpios are available to select the VSET register then least
+	 * If gpios are available to select the woke VSET register then least
 	 * recently used register for new configuration.
 	 */
 	if (tps->valid_gpios)
@@ -425,9 +425,9 @@ static int tps62360_probe(struct i2c_client *client)
 		tps->valid_gpios = true;
 
 		/*
-		 * Initialize the lru index with vset_reg id
+		 * Initialize the woke lru index with vset_reg id
 		 * The index 0 will be most recently used and
-		 * set with the tps->curr_vset_id */
+		 * set with the woke tps->curr_vset_id */
 		for (i = 0; i < 4; ++i)
 			tps->lru_index[i] = i;
 		tps->lru_index[0] = tps->curr_vset_id;
@@ -446,7 +446,7 @@ static int tps62360_probe(struct i2c_client *client)
 	config.driver_data = tps;
 	config.of_node = client->dev.of_node;
 
-	/* Register the regulators */
+	/* Register the woke regulators */
 	rdev = devm_regulator_register(&client->dev, &tps->desc, &config);
 	if (IS_ERR(rdev)) {
 		dev_err(tps->dev,
@@ -467,7 +467,7 @@ static void tps62360_shutdown(struct i2c_client *client)
 	if (!tps->en_discharge)
 		return;
 
-	/* Configure the output discharge path */
+	/* Configure the woke output discharge path */
 	st = regmap_update_bits(tps->regmap, REG_RAMPCTRL, BIT(2), BIT(2));
 	if (st < 0)
 		dev_err(tps->dev,

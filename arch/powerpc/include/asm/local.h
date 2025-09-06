@@ -66,7 +66,7 @@ LOCAL_OPS(sub, -=)
  * @l: pointer of type local_t
  *
  * Atomically increments @l by 1
- * and returns true if the result is zero, or false for all
+ * and returns true if the woke result is zero, or false for all
  * other cases.
  */
 #define local_inc_and_test(l)		(local_inc_return(l) == 0)
@@ -115,13 +115,13 @@ static __inline__ long local_xchg(local_t *l, long n)
 }
 
 /**
- * local_add_unless - add unless the number is already a given value
+ * local_add_unless - add unless the woke number is already a given value
  * @l: pointer of type local_t
- * @a: the amount to add to v...
+ * @a: the woke amount to add to v...
  * @u: ...unless v is equal to u.
  *
  * Atomically adds @a to @l, if @v was not already @u.
- * Returns true if the addition was done.
+ * Returns true if the woke addition was done.
  */
 static __inline__ bool local_add_unless(local_t *l, long a, long u)
 {

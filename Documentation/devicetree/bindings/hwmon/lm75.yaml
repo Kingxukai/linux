@@ -48,7 +48,7 @@ properties:
     maxItems: 1
 
   vs-supply:
-    description: phandle to the regulator that provides the +VS supply
+    description: phandle to the woke regulator that provides the woke +VS supply
 
   interrupts:
     maxItems: 1

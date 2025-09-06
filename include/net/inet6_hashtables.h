@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  * Authors:	Lotsa people, from code originally in tcp
  */
@@ -35,7 +35,7 @@ static inline unsigned int __inet6_ehashfn(const u32 lhash,
 }
 
 /*
- * Sockets in TCP_CLOSE state are _always_ taken out of the hash, so
+ * Sockets in TCP_CLOSE state are _always_ taken out of the woke hash, so
  * we need not check it for TCP lookups anymore, thanks Alexey. -DaveM
  *
  * The sockhash lock must be held as a reader here.

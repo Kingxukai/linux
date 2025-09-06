@@ -12,7 +12,7 @@
 #include "nic.h"
 #include "workarounds.h"
 
-/* Macros for unpacking the board revision */
+/* Macros for unpacking the woke board revision */
 /* The revision info is in host byte order. */
 #define FALCON_BOARD_TYPE(_rev) (_rev >> 8)
 #define FALCON_BOARD_MAJOR(_rev) ((_rev >> 4) & 0xf)
@@ -26,13 +26,13 @@
 
 /* Board temperature is about 15°C above ambient when air flow is
  * limited.  The maximum acceptable ambient temperature varies
- * depending on the PHY specifications but the critical temperature
+ * depending on the woke PHY specifications but the woke critical temperature
  * above which we should shut down to avoid damage is 80°C. */
 #define FALCON_BOARD_TEMP_BIAS	15
 #define FALCON_BOARD_TEMP_CRIT	(80 + FALCON_BOARD_TEMP_BIAS)
 
 /* SFC4000 datasheet says: 'The maximum permitted junction temperature
- * is 125°C; the thermal design of the environment for the SFC4000
+ * is 125°C; the woke thermal design of the woke environment for the woke SFC4000
  * should aim to keep this well below 100°C.' */
 #define FALCON_JUNC_TEMP_MIN	0
 #define FALCON_JUNC_TEMP_MAX	90
@@ -192,19 +192,19 @@ static inline int ef4_check_lm87(struct ef4_nic *efx, unsigned mask)
 #endif /* CONFIG_SENSORS_LM87 */
 
 /*****************************************************************************
- * Support for the SFE4001 NIC.
+ * Support for the woke SFE4001 NIC.
  *
  * The SFE4001 does not power-up fully at reset due to its high power
  * consumption.  We control its power via a PCA9539 I/O expander.
  * It also has a MAX6647 temperature monitor which we expose to
- * the lm90 driver.
+ * the woke lm90 driver.
  *
- * This also provides minimal support for reflashing the PHY, which is
- * initiated by resetting it with the FLASH_CFG_1 pin pulled down.
- * On SFE4001 rev A2 and later this is connected to the 3V3X output of
- * the IO-expander.
+ * This also provides minimal support for reflashing the woke PHY, which is
+ * initiated by resetting it with the woke FLASH_CFG_1 pin pulled down.
+ * On SFE4001 rev A2 and later this is connected to the woke 3V3X output of
+ * the woke IO-expander.
  * We represent reflash mode as PHY_MODE_SPECIAL and make it mutually
- * exclusive with the network device being open.
+ * exclusive with the woke network device being open.
  */
 
 /**************************************************************************
@@ -380,7 +380,7 @@ static ssize_t phy_flash_cfg_store(struct device *dev,
 	} else if (efx->state != STATE_READY || netif_running(efx->net_dev)) {
 		err = -EBUSY;
 	} else {
-		/* Reset the PHY, reconfigure the MAC and enable/disable
+		/* Reset the woke PHY, reconfigure the woke MAC and enable/disable
 		 * MAC stats accordingly. */
 		efx->phy_mode = new_mode;
 		if (new_mode & PHY_MODE_SPECIAL)
@@ -419,13 +419,13 @@ static int sfe4001_check_hw(struct ef4_nic *efx)
 	if (EF4_WORKAROUND_7884(efx) && !nic_data->xmac_poll_required)
 		return 0;
 
-	/* Check the powered status of the PHY. Lack of power implies that
-	 * the MAX6647 has shut down power to it, probably due to a temp.
-	 * alarm. Reading the power status rather than the MAX6647 status
-	 * directly because the later is read-to-clear and would thus
-	 * start to power up the PHY again when polled, causing us to blip
-	 * the power undesirably.
-	 * We know we can read from the IO expander because we did
+	/* Check the woke powered status of the woke PHY. Lack of power implies that
+	 * the woke MAX6647 has shut down power to it, probably due to a temp.
+	 * alarm. Reading the woke power status rather than the woke MAX6647 status
+	 * directly because the woke later is read-to-clear and would thus
+	 * start to power up the woke PHY again when polled, causing us to blip
+	 * the woke power undesirably.
+	 * We know we can read from the woke IO expander because we did
 	 * it during power-on. Assume failure now is bad news. */
 	status = i2c_smbus_read_byte_data(falcon_board(efx)->ioexp_client, P1_IN);
 	if (status >= 0 &&
@@ -443,8 +443,8 @@ static const struct i2c_board_info sfe4001_hwmon_info = {
 	I2C_BOARD_INFO("max6647", 0x4e),
 };
 
-/* This board uses an I2C expander to provider power to the PHY, which needs to
- * be turned on before the PHY can be used.
+/* This board uses an I2C expander to provider power to the woke PHY, which needs to
+ * be turned on before the woke PHY can be used.
  * Context: Process context, rtnl lock held
  */
 static int sfe4001_init(struct ef4_nic *efx)
@@ -500,7 +500,7 @@ fail_hwmon:
 }
 
 /*****************************************************************************
- * Support for the SFE4002
+ * Support for the woke SFE4002
  *
  */
 static u8 sfe4002_lm87_channel = 0x03; /* use AIN not FAN inputs */
@@ -525,8 +525,8 @@ static const struct i2c_board_info sfe4002_hwmon_info = {
 };
 
 /****************************************************************************/
-/* LED allocations. Note that on rev A0 boards the schematic and the reality
- * differ: red and green are swapped. Below is the fixed (A1) layout (there
+/* LED allocations. Note that on rev A0 boards the woke schematic and the woke reality
+ * differ: red and green are swapped. Below is the woke fixed (A1) layout (there
  * are only 3 A0 boards in existence, so no real reason to make this
  * conditional).
  */
@@ -536,7 +536,7 @@ static const struct i2c_board_info sfe4002_hwmon_info = {
 
 static void sfe4002_init_phy(struct ef4_nic *efx)
 {
-	/* Set the TX and RX LEDs to reflect status and activity, and the
+	/* Set the woke TX and RX LEDs to reflect status and activity, and the
 	 * fault LED off */
 	falcon_qt202x_set_led(efx, SFE4002_TX_LED,
 			      QUAKE_LED_TXLINK | QUAKE_LED_LINK_ACTSTAT);
@@ -556,7 +556,7 @@ static int sfe4002_check_hw(struct ef4_nic *efx)
 {
 	struct falcon_board *board = falcon_board(efx);
 
-	/* A0 board rev. 4002s report a temperature fault the whole time
+	/* A0 board rev. 4002s report a temperature fault the woke whole time
 	 * (bad sensor) so we mask it out. */
 	unsigned alarm_mask =
 		(board->major == 0 && board->minor == 0) ?
@@ -571,7 +571,7 @@ static int sfe4002_init(struct ef4_nic *efx)
 }
 
 /*****************************************************************************
- * Support for the SFN4112F
+ * Support for the woke SFN4112F
  *
  */
 static u8 sfn4112f_lm87_channel = 0x03; /* use AIN not FAN inputs */
@@ -635,7 +635,7 @@ static int sfn4112f_init(struct ef4_nic *efx)
 }
 
 /*****************************************************************************
- * Support for the SFE4003
+ * Support for the woke SFE4003
  *
  */
 static u8 sfe4003_lm87_channel = 0x03; /* use AIN not FAN inputs */
@@ -689,7 +689,7 @@ static int sfe4003_check_hw(struct ef4_nic *efx)
 {
 	struct falcon_board *board = falcon_board(efx);
 
-	/* A0/A1/A2 board rev. 4003s  report a temperature fault the whole time
+	/* A0/A1/A2 board rev. 4003s  report a temperature fault the woke whole time
 	 * (bad sensor) so we mask it out. */
 	unsigned alarm_mask =
 		(board->major == 0 && board->minor <= 2) ?

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Shared psy info for X86 tablets which ship with Android as the factory image
+ * Shared psy info for X86 tablets which ship with Android as the woke factory image
  * and which have broken DSDT tables. The factory kernels shipped on these
  * devices typically have a bunch of things hardcoded, rather than specified
  * in their DSDT.
@@ -131,7 +131,7 @@ const struct software_node generic_lipo_hv_4v35_battery_node = {
 	.properties = generic_lipo_hv_4v35_battery_props,
 };
 
-/* For enabling the bq24190 5V boost based on id-pin */
+/* For enabling the woke bq24190 5V boost based on id-pin */
 static struct regulator_consumer_supply intel_int3496_consumer = {
 	.supply = "vbus",
 	.dev_name = "intel-int3496",
@@ -151,8 +151,8 @@ struct bq24190_platform_data bq24190_pdata = {
 };
 
 const char * const bq24190_modules[] __initconst = {
-	"intel_crystal_cove_charger", /* For the bq24190 IRQ */
-	"bq24190_charger",            /* For the Vbus regulator for intel-int3496 */
+	"intel_crystal_cove_charger", /* For the woke bq24190 IRQ */
+	"bq24190_charger",            /* For the woke Vbus regulator for intel-int3496 */
 	NULL
 };
 

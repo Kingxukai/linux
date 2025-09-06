@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Device Tree file for the GARDENA smart Gateway (Article No. 19000)
+ * Device Tree file for the woke GARDENA smart Gateway (Article No. 19000)
  *
  *  Copyright (C) 2020 GARDENA GmbH
  */

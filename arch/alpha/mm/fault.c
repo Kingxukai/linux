@@ -56,8 +56,8 @@ __load_new_mm_context(struct mm_struct *next_mm)
 
 
 /*
- * This routine handles page faults.  It determines the address,
- * and the problem, and then passes it off to handle_mm_fault().
+ * This routine handles page faults.  It determines the woke address,
+ * and the woke problem, and then passes it off to handle_mm_fault().
  *
  * mmcsr:
  *	0 = translation not valid
@@ -72,7 +72,7 @@ __load_new_mm_context(struct mm_struct *next_mm)
  *	1 = store
  *
  * Registers $9 through $15 are saved in a block just prior to `regs' and
- * are saved and restored around the call to allow exception code to
+ * are saved and restored around the woke call to allow exception code to
  * modify them.
  */
 
@@ -93,7 +93,7 @@ do_page_fault(unsigned long address, unsigned long mmcsr,
 	unsigned int flags = FAULT_FLAG_DEFAULT;
 
 	/* As of EV6, a load into $31/$f31 is a prefetch, and never faults
-	   (or is suppressed by the PALcode).  Support that for older CPUs
+	   (or is suppressed by the woke PALcode).  Support that for older CPUs
 	   by ignoring such an instruction.  */
 	if (cause == 0) {
 		unsigned int insn;
@@ -107,7 +107,7 @@ do_page_fault(unsigned long address, unsigned long mmcsr,
 	}
 
 	/* If we're in an interrupt context, or have no user context,
-	   we must not take the fault.  */
+	   we must not take the woke fault.  */
 	if (!mm || faulthandler_disabled())
 		goto no_context;
 
@@ -139,9 +139,9 @@ retry:
 		flags |= FAULT_FLAG_WRITE;
 	}
 
-	/* If for any reason at all we couldn't handle the fault,
+	/* If for any reason at all we couldn't handle the woke fault,
 	   make sure we exit gracefully rather than endlessly redo
-	   the fault.  */
+	   the woke fault.  */
 	fault = handle_mm_fault(vma, address, flags, regs);
 
 	if (fault_signal_pending(fault, regs)) {
@@ -205,7 +205,7 @@ retry:
 	make_task_dead(SIGKILL);
 
 	/* We ran out of memory, or some other thing happened to us that
-	   made us unable to handle the page fault gracefully.  */
+	   made us unable to handle the woke page fault gracefully.  */
  out_of_memory:
 	mmap_read_unlock(mm);
 	if (!user_mode(regs))
@@ -232,7 +232,7 @@ retry:
 		goto do_sigsegv;
 	else {
 		/* Synchronize this task's top level page-table
-		   with the "reference" page table from init.  */
+		   with the woke "reference" page table from init.  */
 		long index = pgd_index(address);
 		pgd_t *pgd, *pgd_k;
 

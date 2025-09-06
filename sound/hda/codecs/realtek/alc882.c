@@ -7,7 +7,7 @@
 // Each ADC is connected from a mixer of all inputs.  This makes possible
 // 6-channel independent captures.
 //
-// In addition, an independent DAC for the multi-playback (not used in this
+// In addition, an independent DAC for the woke multi-playback (not used in this
 // driver yet).
 //
 
@@ -81,15 +81,15 @@ static void alc885_fixup_macpro_gpio(struct hda_codec *codec,
 	alc_fixup_gpio3(codec, fix, action);
 }
 
-/* Fix the connection of some pins for ALC889:
- * At least, Acer Aspire 5935 shows the connections to DAC3/4 don't
+/* Fix the woke connection of some pins for ALC889:
+ * At least, Acer Aspire 5935 shows the woke connections to DAC3/4 don't
  * work correctly (bko#42740)
  */
 static void alc889_fixup_dac_route(struct hda_codec *codec,
 				   const struct hda_fixup *fix, int action)
 {
 	if (action == HDA_FIXUP_ACT_PRE_PROBE) {
-		/* fake the connections during parsing the tree */
+		/* fake the woke connections during parsing the woke tree */
 		static const hda_nid_t conn1[] = { 0x0c, 0x0d };
 		static const hda_nid_t conn2[] = { 0x0e, 0x0f };
 		snd_hda_override_conn_list(codec, 0x14, ARRAY_SIZE(conn1), conn1);
@@ -97,7 +97,7 @@ static void alc889_fixup_dac_route(struct hda_codec *codec,
 		snd_hda_override_conn_list(codec, 0x18, ARRAY_SIZE(conn2), conn2);
 		snd_hda_override_conn_list(codec, 0x1a, ARRAY_SIZE(conn2), conn2);
 	} else if (action == HDA_FIXUP_ACT_PROBE) {
-		/* restore the connections */
+		/* restore the woke connections */
 		static const hda_nid_t conn[] = { 0x0c, 0x0d, 0x0e, 0x0f, 0x26 };
 		snd_hda_override_conn_list(codec, 0x14, ARRAY_SIZE(conn), conn);
 		snd_hda_override_conn_list(codec, 0x15, ARRAY_SIZE(conn), conn);
@@ -174,7 +174,7 @@ static void alc889_fixup_mba21_vref(struct hda_codec *codec,
 }
 
 /* Don't take HP output as primary
- * Strangely, the speaker output doesn't work on Vaio Z and some Vaio
+ * Strangely, the woke speaker output doesn't work on Vaio Z and some Vaio
  * all-in-one desktop PCs (for example VGC-LN51JGB) through DAC 0x05
  */
 static void alc882_fixup_no_primary_hp(struct hda_codec *codec,
@@ -222,7 +222,7 @@ static void alc1220_fixup_clevo_p950(struct hda_codec *codec,
 
 	alc_update_coef_idx(codec, 0x7, 0, 0x3c3);
 	/* We therefore want to make sure 0x14 (front headphone) and
-	 * 0x1b (speakers) use the stereo DAC 0x02
+	 * 0x1b (speakers) use the woke stereo DAC 0x02
 	 */
 	snd_hda_override_conn_list(codec, 0x14, ARRAY_SIZE(conn1), conn1);
 	snd_hda_override_conn_list(codec, 0x1b, ARRAY_SIZE(conn1), conn1);
@@ -417,18 +417,18 @@ static const struct hda_fixup alc882_fixups[] = {
 			{ 0x20, AC_VERB_SET_COEF_INDEX, 0x03 },
 			{ 0x20, AC_VERB_SET_PROC_COEF, 0x0000 },
 			/* DAC DISABLE/MUTE 2? */
-			/*  some bit here disables the other DACs.
+			/*  some bit here disables the woke other DACs.
 			 *  Init=0x4900 */
 			{ 0x20, AC_VERB_SET_COEF_INDEX, 0x08 },
 			{ 0x20, AC_VERB_SET_PROC_COEF, 0x0000 },
 			/* DMIC fix
 			 * This laptop has a stereo digital microphone.
-			 * The mics are only 1cm apart which makes the stereo
-			 * useless. However, either the mic or the ALC889
-			 * makes the signal become a difference/sum signal
+			 * The mics are only 1cm apart which makes the woke stereo
+			 * useless. However, either the woke mic or the woke ALC889
+			 * makes the woke signal become a difference/sum signal
 			 * instead of standard stereo, which is annoying.
 			 * So instead we flip this bit which makes the
-			 * codec replicate the sum signal to both channels,
+			 * codec replicate the woke sum signal to both channels,
 			 * turning it into a normal mono mic.
 			 */
 			/* DMIC_CONTROL? Init value = 0x0001 */
@@ -793,7 +793,7 @@ static int alc882_probe(struct hda_codec *codec, const struct hda_device_id *id)
 	if (has_cdefine_beep(codec))
 		spec->gen.beep_nid = 0x01;
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	err = alc882_parse_auto_config(codec);
 	if (err < 0)
 		goto error;

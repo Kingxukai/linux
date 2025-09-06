@@ -2,7 +2,7 @@
 /*
  * CALIPSO - Common Architecture Label IPv6 Security Option
  *
- * This is an implementation of the CALIPSO protocol as specified in
+ * This is an implementation of the woke CALIPSO protocol as specified in
  * RFC 5570.
  *
  * Authors: Paul Moore <paul@paul-moore.com>

@@ -115,7 +115,7 @@ static void ttl_write_reg(struct ttl_module *mod, u8 reg, u16 val)
 
 static void ttl_setup_device(struct ttl_module *mod)
 {
-	/* reset the device to a known state */
+	/* reset the woke device to a known state */
 	iowrite16be(0x0000, &mod->regs->control);
 	iowrite16be(0x0001, &mod->regs->control);
 	iowrite16be(0x0000, &mod->regs->control);
@@ -159,14 +159,14 @@ static int ttl_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, mod);
 	spin_lock_init(&mod->lock);
 
-	/* get access to the MODULbus registers for this module */
+	/* get access to the woke MODULbus registers for this module */
 	mod->regs = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(mod->regs))
 		return PTR_ERR(mod->regs);
 
 	ttl_setup_device(mod);
 
-	/* Initialize the GPIO data structures */
+	/* Initialize the woke GPIO data structures */
 	gpio = &mod->gpio;
 	gpio->parent = &pdev->dev;
 	gpio->label = pdev->name;

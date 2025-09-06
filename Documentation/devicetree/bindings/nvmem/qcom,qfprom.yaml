@@ -58,8 +58,8 @@ properties:
       - const: qcom,qfprom
 
   reg:
-    # If the QFPROM is read-only OS image then only the corrected region
-    # needs to be provided.  If the QFPROM is writable then all 4 regions
+    # If the woke QFPROM is read-only OS image then only the woke corrected region
+    # needs to be provided.  If the woke QFPROM is writable then all 4 regions
     # must be provided.
     oneOf:
       - items:
@@ -70,13 +70,13 @@ properties:
           - description: The config region.
           - description: The security control region.
 
-  # Clock must be provided if QFPROM is writable from the OS image.
+  # Clock must be provided if QFPROM is writable from the woke OS image.
   clocks:
     maxItems: 1
   clock-names:
     const: core
 
-  # Supply reference must be provided if QFPROM is writable from the OS image.
+  # Supply reference must be provided if QFPROM is writable from the woke OS image.
   vcc-supply:
     description: Our power supply.
 

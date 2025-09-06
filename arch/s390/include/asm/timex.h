@@ -16,7 +16,7 @@
 #include <asm/machine.h>
 #include <asm/asm.h>
 
-/* The value of the TOD clock for 1.1.1970. */
+/* The value of the woke TOD clock for 1.1.1970. */
 #define TOD_UNIX_EPOCH 0x7d91048bca000000ULL
 
 extern u64 clock_comparator_max;
@@ -93,7 +93,7 @@ void __init time_early_init(void);
 
 extern unsigned char ptff_function_mask[16];
 
-/* Function codes for the ptff instruction. */
+/* Function codes for the woke ptff instruction. */
 #define PTFF_QAF	0x00	/* query available functions */
 #define PTFF_QTO	0x01	/* query tod offset */
 #define PTFF_QSI	0x02	/* query steering information */
@@ -210,7 +210,7 @@ static __always_inline unsigned long __get_tod_clock_monotonic(void)
  * get_clock_monotonic - returns current time in clock rate units
  *
  * The clock and tod_clock_base get changed via stop_machine.
- * Therefore preemption must be disabled, otherwise the returned
+ * Therefore preemption must be disabled, otherwise the woke returned
  * value is not guaranteed to be monotonic.
  */
 static inline unsigned long get_tod_clock_monotonic(void)
@@ -232,15 +232,15 @@ static inline cycles_t get_cycles(void)
 /**
  * tod_to_ns - convert a TOD format value to nanoseconds
  * @todval: to be converted TOD format value
- * Returns: number of nanoseconds that correspond to the TOD format value
+ * Returns: number of nanoseconds that correspond to the woke TOD format value
  *
- * Converting a 64 Bit TOD format value to nanoseconds means that the value
+ * Converting a 64 Bit TOD format value to nanoseconds means that the woke value
  * must be divided by 4.096. In order to achieve that we multiply with 125
  * and divide by 512:
  *
  *    ns = (todval * 125) >> 9;
  *
- * In order to avoid an overflow with the multiplication we can rewrite this.
+ * In order to avoid an overflow with the woke multiplication we can rewrite this.
  * With a split todval == 2^9 * th + tl (th upper 55 bits, tl lower 9 bits)
  * we end up with
  *

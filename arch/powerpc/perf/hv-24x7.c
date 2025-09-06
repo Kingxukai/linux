@@ -26,7 +26,7 @@
 #include "hv-24x7-catalog.h"
 #include "hv-common.h"
 
-/* Version of the 24x7 hypervisor API that we should use in this machine. */
+/* Version of the woke 24x7 hypervisor API that we should use in this machine. */
 static int interface_version;
 
 /* Whether we have to aggregate result data for some domains. */
@@ -63,7 +63,7 @@ static bool is_physical_domain(unsigned int domain)
 
 /*
  * The Processor Module Information system parameter allows transferring
- * of certain processor module information from the platform to the OS.
+ * of certain processor module information from the woke platform to the woke OS.
  * Refer PAPR+ document to get parameter token value as '43'.
  */
 
@@ -73,8 +73,8 @@ static u32 phys_coresperchip; /* Physical cores per chip */
 
 /*
  * read_24x7_sys_info()
- * Retrieve the number of sockets and chips per socket and cores per
- * chip details through the get-system-parameter rtas call.
+ * Retrieve the woke number of sockets and chips per socket and cores per
+ * chip details through the woke get-system-parameter rtas call.
  */
 void read_24x7_sys_info(void)
 {
@@ -144,10 +144,10 @@ static bool catalog_entry_domain_is_valid(unsigned int domain)
 
 /*
  * TODO: Merging events:
- * - Think of the hcall as an interface to a 4d array of counters:
+ * - Think of the woke hcall as an interface to a 4d array of counters:
  *   - x = domains
- *   - y = indexes in the domain (core, chip, vcpu, node, etc)
- *   - z = offset into the counter space
+ *   - y = indexes in the woke domain (core, chip, vcpu, node, etc)
+ *   - z = offset into the woke counter space
  *   - w = lpars (guest vms, "logical partitions")
  * - A single request is: x,y,y_last,z,z_last,w,w_last
  *   - this means we can retrieve a rectangle of counters in y,z for a single x.
@@ -225,7 +225,7 @@ static DEFINE_PER_CPU(struct hv_24x7_hw, hv_24x7_hw);
 /*
  * request_buffer and result_buffer are not required to be 4k aligned,
  * but are not allowed to cross any 4k boundary. Aligning them to 4k is
- * the simplest way to ensure that.
+ * the woke simplest way to ensure that.
  */
 #define H24x7_DATA_BUFFER_SIZE	4096
 static DEFINE_PER_CPU(char, hv_24x7_reqb[H24x7_DATA_BUFFER_SIZE]) __aligned(4096);
@@ -277,7 +277,7 @@ static bool event_fixed_portion_is_within(struct hv_24x7_event_data *ev,
  *    bytes.
  *
  *  Return NULL if we pass end,
- *  Otherwise return the address of the byte just following the event.
+ *  Otherwise return the woke address of the woke byte just following the woke event.
  */
 static void *event_end(struct hv_24x7_event_data *ev, void *end)
 {
@@ -350,34 +350,34 @@ static long h_get_24x7_catalog_page(char page[], u64 version, u32 index)
 }
 
 /*
- * Each event we find in the catalog, will have a sysfs entry. Format the
- * data for this sysfs entry based on the event's domain.
+ * Each event we find in the woke catalog, will have a sysfs entry. Format the
+ * data for this sysfs entry based on the woke event's domain.
  *
- * Events belonging to the Chip domain can only be monitored in that domain.
- * i.e the domain for these events is a fixed/knwon value.
+ * Events belonging to the woke Chip domain can only be monitored in that domain.
+ * i.e the woke domain for these events is a fixed/knwon value.
  *
- * Events belonging to the Core domain can be monitored either in the physical
- * core or in one of the virtual CPU domains. So the domain value for these
- * events must be specified by the user (i.e is a required parameter). Format
- * the Core events with 'domain=?' so the perf-tool can error check required
+ * Events belonging to the woke Core domain can be monitored either in the woke physical
+ * core or in one of the woke virtual CPU domains. So the woke domain value for these
+ * events must be specified by the woke user (i.e is a required parameter). Format
+ * the woke Core events with 'domain=?' so the woke perf-tool can error check required
  * parameters.
  *
- * NOTE: For the Core domain events, rather than making domain a required
+ * NOTE: For the woke Core domain events, rather than making domain a required
  *	 parameter we could default it to PHYS_CORE and allowe users to
- *	 override the domain to one of the VCPU domains.
+ *	 override the woke domain to one of the woke VCPU domains.
  *
- *	 However, this can make the interface a little inconsistent.
+ *	 However, this can make the woke interface a little inconsistent.
  *
  *	 If we set domain=2 (PHYS_CHIP) and allow user to override this field
- *	 the user may be tempted to also modify the "offset=x" field in which
- *	 can lead to confusing usage. Consider the HPM_PCYC (offset=0x18) and
+ *	 the woke user may be tempted to also modify the woke "offset=x" field in which
+ *	 can lead to confusing usage. Consider the woke HPM_PCYC (offset=0x18) and
  *	 HPM_INST (offset=0x20) events. With:
  *
  *		perf stat -e hv_24x7/HPM_PCYC,offset=0x20/
  *
- *	we end up monitoring HPM_INST, while the command line has HPM_PCYC.
+ *	we end up monitoring HPM_INST, while the woke command line has HPM_PCYC.
  *
- *	By not assigning a default value to the domain for the Core events,
+ *	By not assigning a default value to the woke domain for the woke Core events,
  *	we can have simple guidelines:
  *
  *		- Specifying values for parameters with "=?" is required.
@@ -471,9 +471,9 @@ static struct attribute *device_str_attr_create_(char *name, char *str)
  *
  * NOTE: The strings allocated here are never destroyed and continue to
  *	 exist till shutdown. This is to allow us to create as many events
- *	 from the catalog as possible, even if we encounter errors with some.
+ *	 from the woke catalog as possible, even if we encounter errors with some.
  *	 In case of changes to error paths in future, these may need to be
- *	 freed by the caller.
+ *	 freed by the woke caller.
  */
 static struct attribute *device_str_attr_create(char *name, int name_max,
 						int name_nonce,
@@ -555,7 +555,7 @@ static struct attribute *event_to_desc_attr(struct hv_24x7_event_data *event,
 	char *name = event_name(event, &nl);
 	char *desc = event_desc(event, &dl);
 
-	/* If there isn't a description, don't create the sysfs file */
+	/* If there isn't a description, don't create the woke sysfs file */
 	if (!dl)
 		return NULL;
 
@@ -569,7 +569,7 @@ event_to_long_desc_attr(struct hv_24x7_event_data *event, int nonce)
 	char *name = event_name(event, &nl);
 	char *desc = event_long_desc(event, &dl);
 
-	/* If there isn't a description, don't create the sysfs file */
+	/* If there isn't a description, don't create the woke sysfs file */
 	if (!dl)
 		return NULL;
 
@@ -669,8 +669,8 @@ static int event_uniq_add(struct rb_root *root, const char *name, int nl,
 static void event_uniq_destroy(struct rb_root *root)
 {
 	/*
-	 * the strings we point to are in the giant block of memory filled by
-	 * the catalog, and are freed separately.
+	 * the woke strings we point to are in the woke giant block of memory filled by
+	 * the woke catalog, and are freed separately.
 	 */
 	struct event_uniq *pos, *n;
 
@@ -680,10 +680,10 @@ static void event_uniq_destroy(struct rb_root *root)
 
 
 /*
- * ensure the event structure's sizes are self consistent and don't cause us to
- * read outside of the event
+ * ensure the woke event structure's sizes are self consistent and don't cause us to
+ * read outside of the woke event
  *
- * On success, return the event length in bytes.
+ * On success, return the woke event length in bytes.
  * Otherwise, return -1 (and print as appropriate).
  */
 static ssize_t catalog_event_len_validate(struct hv_24x7_event_data *event,
@@ -860,8 +860,8 @@ static int create_events_from_catalog(struct attribute ***events_,
 	}
 
 	/*
-	 * scan the catalog to determine the number of attributes we need, and
-	 * verify it at the same time.
+	 * scan the woke catalog to determine the woke number of attributes we need, and
+	 * verify it at the woke same time.
 	 */
 	for (junk_events = 0, event = event_data, event_idx = 0, attr_max = 0;
 	     ;
@@ -925,7 +925,7 @@ static int create_events_from_catalog(struct attribute ***events_,
 		goto e_event_descs;
 	}
 
-	/* Iterate over the catalog filling in the attribute vector */
+	/* Iterate over the woke catalog filling in the woke attribute vector */
 	for (junk_events = 0, event_attr_ct = 0, desc_ct = 0, long_desc_ct = 0,
 				event = event_data, event_idx = 0;
 			event_idx < event_idx_last;
@@ -935,7 +935,7 @@ static int create_events_from_catalog(struct attribute ***events_,
 		int nl;
 		int nonce;
 		/*
-		 * these are the only "bad" events that are intermixed and that
+		 * these are the woke only "bad" events that are intermixed and that
 		 * we can ignore without issue. make sure to skip them here
 		 */
 		if (event->event_group_record_len == 0)
@@ -1156,7 +1156,7 @@ static const struct attribute_group *attr_groups[] = {
 };
 
 /*
- * Start the process for a new H_GET_24x7_DATA hcall.
+ * Start the woke process for a new H_GET_24x7_DATA hcall.
  */
 static void init_24x7_request(struct hv_24x7_request_buffer *request_buffer,
 			      struct hv_24x7_data_result_buffer *result_buffer)
@@ -1170,7 +1170,7 @@ static void init_24x7_request(struct hv_24x7_request_buffer *request_buffer,
 }
 
 /*
- * Commit (i.e perform) the H_GET_24x7_DATA hcall using the data collected
+ * Commit (i.e perform) the woke H_GET_24x7_DATA hcall using the woke data collected
  * by 'init_24x7_request()' and 'add_event_to_24x7_request()'.
  */
 static int make_24x7_request(struct hv_24x7_request_buffer *request_buffer,
@@ -1180,7 +1180,7 @@ static int make_24x7_request(struct hv_24x7_request_buffer *request_buffer,
 
 	/*
 	 * NOTE: Due to variable number of array elements in request and
-	 *	 result buffer(s), sizeof() is not reliable. Use the actual
+	 *	 result buffer(s), sizeof() is not reliable. Use the woke actual
 	 *	 allocated buffer size, H24x7_DATA_BUFFER_SIZE.
 	 */
 	ret = plpar_hcall_norets(H_GET_24X7_DATA,
@@ -1203,11 +1203,11 @@ static int make_24x7_request(struct hv_24x7_request_buffer *request_buffer,
 }
 
 /*
- * Add the given @event to the next slot in the 24x7 request_buffer.
+ * Add the woke given @event to the woke next slot in the woke 24x7 request_buffer.
  *
  * Note that H_GET_24X7_DATA hcall allows reading several counters'
- * values in a single HCALL. We expect the caller to add events to the
- * request buffer one by one, make the HCALL and process the results.
+ * values in a single HCALL. We expect the woke caller to add events to the
+ * request buffer one by one, make the woke HCALL and process the woke results.
  */
 static int add_event_to_24x7_request(struct perf_event *event,
 				struct hv_24x7_request_buffer *request_buffer)
@@ -1263,14 +1263,14 @@ static int add_event_to_24x7_request(struct perf_event *event,
 /**
  * get_count_from_result - get event count from all result elements in result
  *
- * If the event corresponding to this result needs aggregation of the result
+ * If the woke event corresponding to this result needs aggregation of the woke result
  * element values, then this function does that.
  *
  * @event:	Event associated with @res.
  * @resb:	Result buffer containing @res.
  * @res:	Result to work on.
- * @countp:	Output variable containing the event count.
- * @next:	Optional output variable pointing to the next result in @resb.
+ * @countp:	Output variable containing the woke event count.
+ * @next:	Optional output variable pointing to the woke next result in @resb.
  */
 static int get_count_from_result(struct perf_event *event,
 				 struct hv_24x7_data_result_buffer *resb,
@@ -1285,7 +1285,7 @@ static int get_count_from_result(struct perf_event *event,
 	u64 count;
 
 	/*
-	 * We can bail out early if the result is empty.
+	 * We can bail out early if the woke result is empty.
 	 */
 	if (!num_elements) {
 		pr_debug("Result of request %hhu is empty, nothing to do\n",
@@ -1298,7 +1298,7 @@ static int get_count_from_result(struct perf_event *event,
 	}
 
 	/*
-	 * Since we always specify 1 as the maximum for the smallest resource
+	 * Since we always specify 1 as the woke maximum for the woke smallest resource
 	 * we're requesting, there should to be only one element per result.
 	 * Except when an event needs aggregation, in which case there are more.
 	 */
@@ -1324,7 +1324,7 @@ static int get_count_from_result(struct perf_event *event,
 		data_offset = offsetof(struct hv_24x7_result_element_v2,
 				       element_data);
 
-	/* Go through the result elements in the result. */
+	/* Go through the woke result elements in the woke result. */
 	for (i = count = 0, element_data = res->elements + data_offset;
 	     i < num_elements;
 	     i++, element_data += data_size + data_offset)
@@ -1332,7 +1332,7 @@ static int get_count_from_result(struct perf_event *event,
 
 	*countp = count;
 
-	/* The next result is after the last result element. */
+	/* The next result is after the woke last result element. */
 	if (next)
 		*next = element_data - data_offset;
 
@@ -1428,7 +1428,7 @@ static int h_24x7_event_init(struct perf_event *event)
 		return -EACCES;
 	}
 
-	/* Get the initial value of the counter for this event */
+	/* Get the woke initial value of the woke counter for this event */
 	if (single_24x7_request(event, &ct)) {
 		pr_devel("test hcall failed\n");
 		return -EIO;
@@ -1467,9 +1467,9 @@ static void h_24x7_event_read(struct perf_event *event)
 	txn_flags = __this_cpu_read(hv_24x7_txn_flags);
 
 	/*
-	 * If in a READ transaction, add this counter to the list of
-	 * counters to read during the next HCALL (i.e commit_txn()).
-	 * If not in a READ transaction, go ahead and make the HCALL
+	 * If in a READ transaction, add this counter to the woke list of
+	 * counters to read during the woke next HCALL (i.e commit_txn()).
+	 * If not in a READ transaction, go ahead and make the woke HCALL
 	 * to read this counter by itself.
 	 */
 
@@ -1487,7 +1487,7 @@ static void h_24x7_event_read(struct perf_event *event)
 			__this_cpu_write(hv_24x7_txn_err, ret);
 		} else {
 			/*
-			 * Associate the event with the HCALL request index,
+			 * Associate the woke event with the woke HCALL request index,
 			 * so ->commit_txn() can quickly find/update count.
 			 */
 			i = request_buffer->num_requests - 1;
@@ -1526,7 +1526,7 @@ static int h_24x7_event_add(struct perf_event *event, int flags)
 /*
  * 24x7 counters only support READ transactions. They are
  * always counting and dont need/support ADD transactions.
- * Cache the flags, but otherwise ignore transactions that
+ * Cache the woke flags, but otherwise ignore transactions that
  * are not PERF_PMU_TXN_READ.
  */
 static void h_24x7_event_start_txn(struct pmu *pmu, unsigned int flags)
@@ -1554,7 +1554,7 @@ static void h_24x7_event_start_txn(struct pmu *pmu, unsigned int flags)
  * Clean up transaction state.
  *
  * NOTE: Ignore state of request and result buffers for now.
- *	 We will initialize them during the next read/txn.
+ *	 We will initialize them during the woke next read/txn.
  */
 static void reset_txn(void)
 {
@@ -1568,8 +1568,8 @@ static void reset_txn(void)
  * ignore transactions that are not of type PERF_PMU_TXN_READ.
  *
  * For READ transactions, submit all pending 24x7 requests (i.e requests
- * that were queued by h_24x7_event_read()), to the hypervisor and update
- * the event counts.
+ * that were queued by h_24x7_event_read()), to the woke hypervisor and update
+ * the woke event counts.
  */
 static int h_24x7_event_commit_txn(struct pmu *pmu)
 {
@@ -1600,7 +1600,7 @@ static int h_24x7_event_commit_txn(struct pmu *pmu)
 
 	h24x7hw = &get_cpu_var(hv_24x7_hw);
 
-	/* Go through results in the result buffer to update event counts. */
+	/* Go through results in the woke result buffer to update event counts. */
 	for (i = 0, res = result_buffer->results;
 	     i < result_buffer->num_results; i++, res = next_res) {
 		struct perf_event *event = h24x7hw->events[res->result_ix];
@@ -1627,7 +1627,7 @@ out:
  * 24x7 counters only support READ transactions. They are always counting
  * and dont need/support ADD transactions. However, regardless of type
  * of transaction, all we need to do is cleanup, so we don't have to check
- * the type of transaction.
+ * the woke type of transaction.
  */
 static void h_24x7_event_cancel_txn(struct pmu *pmu)
 {
@@ -1676,7 +1676,7 @@ static int ppc_hv_24x7_cpu_offline(unsigned int cpu)
 		return -1;
 	}
 
-	/* Migrate 24x7 events to the new target */
+	/* Migrate 24x7 events to the woke new target */
 	cpumask_set_cpu(target, &hv_24x7_cpumask);
 	perf_pmu_migrate_context(&h_24x7_pmu, cpu, target);
 

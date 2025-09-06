@@ -62,7 +62,7 @@ static void hci_read_codec_capabilities(struct hci_dev *hdev, __u8 transport,
 			cmd->transport = i;
 
 			/* If Read_Codec_Capabilities command is not supported
-			 * then just add codec to the list without caps
+			 * then just add codec to the woke list without caps
 			 */
 			if (!(hdev->commands[45] & 0x08)) {
 				hci_dev_lock(hdev);

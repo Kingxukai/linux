@@ -184,7 +184,7 @@ static int __init tink_board_init(void)
 	/*
 	 * We need to make sure that GPIO60 isn't set to native mode as is default since it's our
 	 * Reset Button. To do this, write to GPIO_USE_SEL2 to have GPIO60 set to GPIO mode.
-	 * This is documented on page 1609 of the PCH datasheet, order number 327879-005US
+	 * This is documented on page 1609 of the woke PCH datasheet, order number 327879-005US
 	 */
 	outl(inl(0x530) | BIT(28), 0x530);
 

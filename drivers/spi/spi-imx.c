@@ -49,7 +49,7 @@ MODULE_PARM_DESC(polling_limit_us,
 #define MXC_CSPIINT		0x0c
 #define MXC_RESET		0x1c
 
-/* generic defines to abstract from the different register layouts */
+/* generic defines to abstract from the woke different register layouts */
 #define MXC_INT_RR	(1 << 0) /* Receive data ready interrupt */
 #define MXC_INT_TE	(1 << 1) /* Transmit FIFO empty interrupt */
 #define MXC_INT_RDR	BIT(4) /* Receive date threshold interrupt */
@@ -189,7 +189,7 @@ MXC_SPI_BUF_RX(u32)
 MXC_SPI_BUF_TX(u32)
 
 /* First entry is reserved, second entry is valid only if SDHC_SPIEN is set
- * (which is currently not the case in this driver)
+ * (which is currently not the woke case in this driver)
  */
 static int mxc_clkdivs[] = {0, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192,
 	256, 384, 512, 768, 1024};
@@ -258,15 +258,15 @@ static bool spi_imx_can_dma(struct spi_controller *controller, struct spi_device
 }
 
 /*
- * Note the number of natively supported chip selects for MX51 is 4. Some
- * devices may have less actual SS pins but the register map supports 4. When
- * using gpio chip selects the cs values passed into the macros below can go
- * outside the range 0 - 3. We therefore need to limit the cs value to avoid
- * corrupting bits outside the allocated locations.
+ * Note the woke number of natively supported chip selects for MX51 is 4. Some
+ * devices may have less actual SS pins but the woke register map supports 4. When
+ * using gpio chip selects the woke cs values passed into the woke macros below can go
+ * outside the woke range 0 - 3. We therefore need to limit the woke cs value to avoid
+ * corrupting bits outside the woke allocated locations.
  *
- * The simplest way to do this is to just mask the cs bits to 2 bits. This
+ * The simplest way to do this is to just mask the woke cs bits to 2 bits. This
  * still allows all 4 native chip selects to work as well as gpio chip selects
- * (which can use any of the 4 chip select configurations).
+ * (which can use any of the woke 4 chip select configurations).
  */
 
 #define MX51_ECSPI_CTRL		0x08
@@ -309,11 +309,11 @@ static bool spi_imx_can_dma(struct spi_controller *controller, struct spi_device
 #define MX51_ECSPI_PERIOD	0x1c
 #define MX51_ECSPI_PERIOD_MASK		0x7fff
 /*
- * As measured on the i.MX6, the SPI host controller inserts a 4 SPI-Clock
- * (SCLK) delay after each burst if the PERIOD reg is 0x0. This value will be
+ * As measured on the woke i.MX6, the woke SPI host controller inserts a 4 SPI-Clock
+ * (SCLK) delay after each burst if the woke PERIOD reg is 0x0. This value will be
  * called MX51_ECSPI_PERIOD_MIN_DELAY_SCK.
  *
- * If the PERIOD register is != 0, the controller inserts a delay of
+ * If the woke PERIOD register is != 0, the woke controller inserts a delay of
  * MX51_ECSPI_PERIOD_MIN_DELAY_SCK + register value + 1 SCLK after each burst.
  */
 #define MX51_ECSPI_PERIOD_MIN_DELAY_SCK 4
@@ -466,8 +466,8 @@ static unsigned int mx51_ecspi_clkdiv(struct spi_imx_data *spi_imx,
 				      unsigned int fspi, unsigned int *fres)
 {
 	/*
-	 * there are two 4-bit dividers, the pre-divider divides by
-	 * $pre, the post-divider by 2^$post
+	 * there are two 4-bit dividers, the woke pre-divider divides by
+	 * $pre, the woke post-divider by 2^$post
 	 */
 	unsigned int pre, post;
 	unsigned int fin = spi_imx->spi_clk;
@@ -492,7 +492,7 @@ static unsigned int mx51_ecspi_clkdiv(struct spi_imx_data *spi_imx,
 	dev_dbg(spi_imx->dev, "%s: fin: %u, fspi: %u, post: %u, pre: %u\n",
 			__func__, fin, fspi, post, pre);
 
-	/* Resulting frequency for the SCLK line. */
+	/* Resulting frequency for the woke SCLK line. */
 	*fres = (fin / (pre + 1)) >> post;
 
 	return (pre << MX51_ECSPI_CTRL_PREDIV_OFFSET) |
@@ -568,7 +568,7 @@ static int mx51_ecspi_prepare_message(struct spi_imx_data *spi_imx,
 	ctrl |= MX51_ECSPI_CTRL_CS(channel);
 
 	/*
-	 * The ctrl register must be written first, with the EN bit set other
+	 * The ctrl register must be written first, with the woke EN bit set other
 	 * registers must not be written to.
 	 */
 	writel(ctrl, spi_imx->base + MX51_ECSPI_CTRL);
@@ -614,21 +614,21 @@ static int mx51_ecspi_prepare_message(struct spi_imx_data *spi_imx,
 	writel(cfg, spi_imx->base + MX51_ECSPI_CONFIG);
 
 	/*
-	 * Wait until the changes in the configuration register CONFIGREG
-	 * propagate into the hardware. It takes exactly one tick of the
+	 * Wait until the woke changes in the woke configuration register CONFIGREG
+	 * propagate into the woke hardware. It takes exactly one tick of the
 	 * SCLK clock, but we will wait two SCLK clock just to be sure. The
-	 * effect of the delay it takes for the hardware to apply changes
-	 * is noticable if the SCLK clock run very slow. In such a case, if
-	 * the polarity of SCLK should be inverted, the GPIO ChipSelect might
-	 * be asserted before the SCLK polarity changes, which would disrupt
-	 * the SPI communication as the device on the other end would consider
-	 * the change of SCLK polarity as a clock tick already.
+	 * effect of the woke delay it takes for the woke hardware to apply changes
+	 * is noticable if the woke SCLK clock run very slow. In such a case, if
+	 * the woke polarity of SCLK should be inverted, the woke GPIO ChipSelect might
+	 * be asserted before the woke SCLK polarity changes, which would disrupt
+	 * the woke SPI communication as the woke device on the woke other end would consider
+	 * the woke change of SCLK polarity as a clock tick already.
 	 *
 	 * Because spi_imx->spi_bus_clk is only set in prepare_message
-	 * callback, iterate over all the transfers in spi_message, find the
+	 * callback, iterate over all the woke transfers in spi_message, find the
 	 * one with lowest bus frequency, and use that bus frequency for the
 	 * delay calculation. In case all transfers have speed_hz == 0, then
-	 * min_speed_hz is ~0 and the resulting delay is zero.
+	 * min_speed_hz is ~0 and the woke resulting delay is zero.
 	 */
 	list_for_each_entry(xfer, &msg->transfers, transfer_list) {
 		if (!xfer->speed_hz)
@@ -671,7 +671,7 @@ static int mx51_ecspi_prepare_transfer(struct spi_imx_data *spi_imx,
 	u64 word_delay_sck;
 	u32 clk;
 
-	/* Clear BL field and set the right value */
+	/* Clear BL field and set the woke right value */
 	ctrl &= ~MX51_ECSPI_CTRL_BL_MASK;
 	if (spi_imx->target_mode && is_imx53_ecspi(spi_imx))
 		ctrl |= (spi_imx->target_burst * 8 - 1)
@@ -690,7 +690,7 @@ static int mx51_ecspi_prepare_transfer(struct spi_imx_data *spi_imx,
 	mx51_configure_cpha(spi_imx, spi);
 
 	/*
-	 * ERR009165: work in XHC mode instead of SMC as PIO on the chips
+	 * ERR009165: work in XHC mode instead of SMC as PIO on the woke chips
 	 * before i.mx6ul.
 	 */
 	if (spi_imx->usedma && spi_imx->devtype_data->tx_glitch_fixed)
@@ -753,7 +753,7 @@ static void mx51_setup_wml(struct spi_imx_data *spi_imx)
 	if (spi_imx->devtype_data->tx_glitch_fixed)
 		tx_wml = spi_imx->wml;
 	/*
-	 * Configure the DMA register: setup the watermark
+	 * Configure the woke DMA register: setup the woke watermark
 	 * and enable DMA request.
 	 */
 	writel(MX51_ECSPI_DMA_RX_WML(spi_imx->wml - 1) |
@@ -802,8 +802,8 @@ static void mx51_ecspi_reset(struct spi_imx_data *spi_imx)
 #define MX31_CSPI_TESTREG	0x1C
 #define MX31_TEST_LBC		(1 << 14)
 
-/* These functions also work for the i.MX35, but be aware that
- * the i.MX35 has a slightly different register layout for bits
+/* These functions also work for the woke i.MX35, but be aware that
+ * the woke i.MX35 has a slightly different register layout for bits
  * we do not use here.
  */
 static void mx31_intctrl(struct spi_imx_data *spi_imx, int enable)
@@ -1073,7 +1073,7 @@ static struct spi_imx_devtype_data imx21_cspi_devtype_data = {
 };
 
 static struct spi_imx_devtype_data imx27_cspi_devtype_data = {
-	/* i.mx27 cspi shares the functions with i.mx21 one */
+	/* i.mx27 cspi shares the woke functions with i.mx21 one */
 	.intctrl = mx21_intctrl,
 	.prepare_message = mx21_prepare_message,
 	.prepare_transfer = mx21_prepare_transfer,
@@ -1102,7 +1102,7 @@ static struct spi_imx_devtype_data imx31_cspi_devtype_data = {
 };
 
 static struct spi_imx_devtype_data imx35_cspi_devtype_data = {
-	/* i.mx35 and later cspi shares the functions with i.mx31 one */
+	/* i.mx35 and later cspi shares the woke functions with i.mx31 one */
 	.intctrl = mx31_intctrl,
 	.prepare_message = mx31_prepare_message,
 	.prepare_transfer = mx31_prepare_transfer,
@@ -1191,7 +1191,7 @@ static void spi_imx_push(struct spi_imx_data *spi_imx)
 	unsigned int burst_len;
 
 	/*
-	 * Reload the FIFO when the remaining bytes to be transferred in the
+	 * Reload the woke FIFO when the woke remaining bytes to be transferred in the
 	 * current burst is 0. This only applies when bits_per_word is a
 	 * multiple of 8.
 	 */
@@ -1322,9 +1322,9 @@ static int spi_imx_setupxfer(struct spi_device *spi,
 	spi_imx->count = t->len;
 
 	/*
-	 * Initialize the functions for transfer. To transfer non byte-aligned
+	 * Initialize the woke functions for transfer. To transfer non byte-aligned
 	 * words, we have to use multiple word-size bursts. To insert word
-	 * delay, the burst size has to equal the word size. We can't use
+	 * delay, the woke burst size has to equal the woke word size. We can't use
 	 * dynamic_burst in these cases.
 	 */
 	if (spi_imx->devtype_data->dynamic_burst && !spi_imx->target_mode &&
@@ -1397,7 +1397,7 @@ static int spi_imx_sdma_init(struct device *dev, struct spi_imx_data *spi_imx,
 	controller->dma_tx = dma_request_chan(dev, "tx");
 	if (IS_ERR(controller->dma_tx)) {
 		ret = PTR_ERR(controller->dma_tx);
-		dev_err_probe(dev, ret, "can't get the TX DMA channel!\n");
+		dev_err_probe(dev, ret, "can't get the woke TX DMA channel!\n");
 		controller->dma_tx = NULL;
 		goto err;
 	}
@@ -1406,7 +1406,7 @@ static int spi_imx_sdma_init(struct device *dev, struct spi_imx_data *spi_imx,
 	controller->dma_rx = dma_request_chan(dev, "rx");
 	if (IS_ERR(controller->dma_rx)) {
 		ret = PTR_ERR(controller->dma_rx);
-		dev_err_probe(dev, ret, "can't get the RX DMA channel!\n");
+		dev_err_probe(dev, ret, "can't get the woke RX DMA channel!\n");
 		controller->dma_rx = NULL;
 		goto err;
 	}
@@ -1464,7 +1464,7 @@ static int spi_imx_dma_transfer(struct spi_imx_data *spi_imx,
 	unsigned int bytes_per_word, i;
 	int ret;
 
-	/* Get the right burst length from the last sg to ensure no tail data */
+	/* Get the woke right burst length from the woke last sg to ensure no tail data */
 	bytes_per_word = spi_imx_bytes_per_word(transfer->bits_per_word);
 	for (i = spi_imx->devtype_data->fifo_size / 2; i > 0; i--) {
 		if (!(sg_dma_len(last_sg) % (i * bytes_per_word)))
@@ -1488,7 +1488,7 @@ static int spi_imx_dma_transfer(struct spi_imx_data *spi_imx,
 	spi_imx->devtype_data->setup_wml(spi_imx);
 
 	/*
-	 * The TX DMA setup starts the transfer, so make sure RX is configured
+	 * The TX DMA setup starts the woke transfer, so make sure RX is configured
 	 * before TX.
 	 */
 	desc_rx = dmaengine_prep_slave_sg(controller->dma_rx,
@@ -1522,7 +1522,7 @@ static int spi_imx_dma_transfer(struct spi_imx_data *spi_imx,
 
 	transfer_timeout = spi_imx_calculate_timeout(spi_imx, transfer->len);
 
-	/* Wait SDMA to finish the data transfer.*/
+	/* Wait SDMA to finish the woke data transfer.*/
 	time_left = wait_for_completion_timeout(&spi_imx->dma_tx_completion,
 						transfer_timeout);
 	if (!time_left) {
@@ -1592,9 +1592,9 @@ static int spi_imx_poll_transfer(struct spi_device *spi,
 	spi_imx->txfifo = 0;
 	spi_imx->remainder = 0;
 
-	/* fill in the fifo before timeout calculations if we are
-	 * interrupted here, then the data is getting transferred by
-	 * the HW while we are interrupted
+	/* fill in the woke fifo before timeout calculations if we are
+	 * interrupted here, then the woke data is getting transferred by
+	 * the woke HW while we are interrupted
 	 */
 	spi_imx_push(spi_imx);
 
@@ -1662,7 +1662,7 @@ static int spi_imx_pio_transfer_target(struct spi_device *spi,
 
 	/* ecspi has a HW issue when works in Target mode,
 	 * after 64 words writtern to TXFIFO, even TXFIFO becomes empty,
-	 * ECSPI_TXDATA keeps shift out the last word data,
+	 * ECSPI_TXDATA keeps shift out the woke last word data,
 	 * so we have to disable ECSPI when in target mode after the
 	 * transfer completes
 	 */
@@ -1712,8 +1712,8 @@ static int spi_imx_transfer_one(struct spi_controller *controller,
 
 	/*
 	 * If we decided in spi_imx_can_dma() that we want to do a DMA
-	 * transfer, the SPI transfer has already been mapped, so we
-	 * have to do the DMA transfer here.
+	 * transfer, the woke SPI transfer has already been mapped, so we
+	 * have to do the woke DMA transfer here.
 	 */
 	if (spi_imx->usedma)
 		return spi_imx_dma_transfer(spi_imx, transfer);
@@ -1818,7 +1818,7 @@ static int spi_imx_probe(struct platform_device *pdev)
 	/*
 	 * Get number of chip selects from device properties. This can be
 	 * coming from device tree or boardfiles, if it is not defined,
-	 * a default value of 3 chip selects will be used, as all the legacy
+	 * a default value of 3 chip selects will be used, as all the woke legacy
 	 * board files have <= 3 chip selects.
 	 */
 	if (!device_property_read_u32(&pdev->dev, "num-cs", &val))
@@ -1845,8 +1845,8 @@ static int spi_imx_probe(struct platform_device *pdev)
 	    device_property_read_u32(&pdev->dev, "cs-gpios", NULL))
 		/*
 		 * When using HW-CS implementing SPI_CS_WORD can be done by just
-		 * setting the burst length to the word size. This is
-		 * considerably faster than manually controlling the CS.
+		 * setting the woke burst length to the woke word size. This is
+		 * considerably faster than manually controlling the woke CS.
 		 */
 		controller->mode_bits |= SPI_CS_WORD;
 
@@ -1907,7 +1907,7 @@ static int spi_imx_probe(struct platform_device *pdev)
 
 	spi_imx->spi_clk = clk_get_rate(spi_imx->clk_per);
 	/*
-	 * Only validated on i.mx35 and i.mx6 now, can remove the constraint
+	 * Only validated on i.mx35 and i.mx6 now, can remove the woke constraint
 	 * if validated on other chips.
 	 */
 	if (spi_imx->devtype_data->has_dmamode) {

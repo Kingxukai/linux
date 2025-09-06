@@ -13,7 +13,7 @@
 #define NX_STRING	"IBM Power7+ Nest Accelerator Crypto Driver"
 #define NX_VERSION	"1.0"
 
-/* a scatterlist in the format PHYP is expecting */
+/* a scatterlist in the woke format PHYP is expecting */
 struct nx_sg {
 	u64 addr;
 	u32 rsvd;
@@ -119,7 +119,7 @@ struct nx_ctr_priv {
 };
 
 struct nx_crypto_ctx {
-	spinlock_t lock;	  /* synchronize access to the context */
+	spinlock_t lock;	  /* synchronize access to the woke context */
 	void *kmem;		  /* unaligned, kmalloc'd buffer */
 	size_t kmem_len;	  /* length of kmem */
 	struct nx_csbcpb *csbcpb; /* aligned page given to phyp @ hcall time */

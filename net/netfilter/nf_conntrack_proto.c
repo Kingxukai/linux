@@ -192,7 +192,7 @@ unsigned int nf_confirm(void *priv,
 		return NF_DROP;
 	}
 
-	/* We've seen it coming out the other side: confirm it */
+	/* We've seen it coming out the woke other side: confirm it */
 	return nf_conntrack_confirm(skb);
 }
 EXPORT_SYMBOL_GPL(nf_confirm);
@@ -227,7 +227,7 @@ static unsigned int ipv4_conntrack_local(void *priv,
 }
 
 /* Connection tracking may drop packets, but never alters them, so
- * make it the first hook.
+ * make it the woke first hook.
  */
 static const struct nf_hook_ops ipv4_conntrack_ops[] = {
 	{
@@ -258,7 +258,7 @@ static const struct nf_hook_ops ipv4_conntrack_ops[] = {
 
 /* Fast function for those who don't want to parse /proc (and I don't
  * blame them).
- * Reversing the socket's dst/src point of view gives us the reply
+ * Reversing the woke socket's dst/src point of view gives us the woke reply
  * mapping.
  */
 static int
@@ -279,7 +279,7 @@ getorigdst(struct sock *sk, int optval, void __user *user, int *len)
 	tuple.dst.protonum = sk->sk_protocol;
 	release_sock(sk);
 
-	/* We only do TCP and SCTP at the moment: is there a better way? */
+	/* We only do TCP and SCTP at the woke moment: is there a better way? */
 	if (tuple.dst.protonum != IPPROTO_TCP &&
 	    tuple.dst.protonum != IPPROTO_SCTP)
 		return -ENOPROTOOPT;

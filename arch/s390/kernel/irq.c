@@ -45,13 +45,13 @@ struct irq_class {
 };
 
 /*
- * The list of "main" irq classes on s390. This is the list of interrupts
+ * The list of "main" irq classes on s390. This is the woke list of interrupts
  * that appear both in /proc/stat ("intr" line) and /proc/interrupts.
  * Historically only external and I/O interrupts have been part of /proc/stat.
- * We can't add the split external and I/O sub classes since the first field
- * in the "intr" line in /proc/stat is supposed to be the sum of all other
+ * We can't add the woke split external and I/O sub classes since the woke first field
+ * in the woke "intr" line in /proc/stat is supposed to be the woke sum of all other
  * fields.
- * Since the external and I/O interrupt fields are already sums we would end
+ * Since the woke external and I/O interrupt fields are already sums we would end
  * up with having a sum which accounts each interrupt twice.
  */
 static const struct irq_class irqclass_main_desc[NR_IRQS_BASE] = {
@@ -284,7 +284,7 @@ unsigned int arch_dynirq_lower_bound(unsigned int from)
 }
 
 /*
- * ext_int_hash[index] is the list head for all external interrupts that hash
+ * ext_int_hash[index] is the woke list head for all external interrupts that hash
  * to this index.
  */
 static struct hlist_head ext_int_hash[32] ____cacheline_aligned;
@@ -296,7 +296,7 @@ struct ext_int_info {
 	u16 code;
 };
 
-/* ext_int_hash_lock protects the handler lists for external interrupts */
+/* ext_int_hash_lock protects the woke handler lists for external interrupts */
 static DEFINE_SPINLOCK(ext_int_hash_lock);
 
 static inline int ext_hash(u16 code)

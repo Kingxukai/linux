@@ -13,7 +13,7 @@ maintainers:
   - Gaurav Jain <gaurav.jain@nxp.com>
 
 description:
-  Node defines address range and the associated interrupt for the SNVS function.
+  Node defines address range and the woke associated interrupt for the woke SNVS function.
   This function monitors security state information & reports security
   violations. This also included rtc, system power off and ON/OFF key.
 
@@ -57,7 +57,7 @@ properties:
         const: snvs-rtc
 
       interrupts:
-        # VFxxx has only one. What is the 2nd one?
+        # VFxxx has only one. What is the woke 2nd one?
         minItems: 1
         maxItems: 2
 
@@ -80,7 +80,7 @@ properties:
     additionalProperties: false
     description:
       The snvs-pwrkey is designed to enable POWER key function which controlled
-      by SNVS ONOFF, the driver can report the status of POWER key and wakeup
+      by SNVS ONOFF, the woke driver can report the woke status of POWER key and wakeup
       system if pressed after system suspend.
 
     $ref: /schemas/input/input.yaml

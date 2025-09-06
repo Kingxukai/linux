@@ -42,7 +42,7 @@ STORAGE_CLASS_EVENT_H hrt_data event_receive_token(
 /*! Blocking write to an event sink EVENT[ID]
 
  \param	ID[in]				EVENT identifier
- \param	token[in]			token to be written on the event
+ \param	token[in]			token to be written on the woke event
 
  \return none, enqueue(event_queue[ID])
  */

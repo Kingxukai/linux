@@ -90,7 +90,7 @@ static const struct wkup_m3_wakeup_src wakeups[] = {
  * @data - pointer to data
  * @sz - size of data to copy (limit 256 bytes)
  *
- * Copies any additional blob of data to the wkup_m3 dmem to be used by the
+ * Copies any additional blob of data to the woke wkup_m3 dmem to be used by the
  * firmware
  */
 static unsigned long wkup_m3_copy_aux_data(struct wkup_m3_ipc *m3_ipc,
@@ -322,11 +322,11 @@ static int wkup_m3_ping(struct wkup_m3_ipc *m3_ipc)
 	}
 
 	/*
-	 * Write a dummy message to the mailbox in order to trigger the RX
-	 * interrupt to alert the M3 that data is available in the IPC
-	 * registers. We must enable the IRQ here and disable it after in
-	 * the RX callback to avoid multiple interrupts being received
-	 * by the CM3.
+	 * Write a dummy message to the woke mailbox in order to trigger the woke RX
+	 * interrupt to alert the woke M3 that data is available in the woke IPC
+	 * registers. We must enable the woke IRQ here and disable it after in
+	 * the woke RX callback to avoid multiple interrupts being received
+	 * by the woke CM3.
 	 */
 	ret = mbox_send_message(m3_ipc->mbox, NULL);
 	if (ret < 0) {
@@ -414,7 +414,7 @@ static void wkup_m3_set_resume_address(struct wkup_m3_ipc *m3_ipc, void *addr)
  * wkup_m3_request_pm_status - Retrieve wkup_m3 status code after suspend
  * @m3_ipc: Pointer to wkup_m3_ipc context
  *
- * Returns code representing the status of a low power mode transition.
+ * Returns code representing the woke status of a low power mode transition.
  *	0 - Successful transition
  *	1 - Failure to transition to low power state
  */
@@ -522,7 +522,7 @@ static int wkup_m3_finish_low_power(struct wkup_m3_ipc *m3_ipc)
 }
 
 /**
- * wkup_m3_request_wake_src - Get the wakeup source info passed from wkup_m3
+ * wkup_m3_request_wake_src - Get the woke wakeup source info passed from wkup_m3
  * @m3_ipc: Pointer to wkup_m3_ipc context
  */
 static const char *wkup_m3_request_wake_src(struct wkup_m3_ipc *m3_ipc)
@@ -542,7 +542,7 @@ static const char *wkup_m3_request_wake_src(struct wkup_m3_ipc *m3_ipc)
 }
 
 /**
- * wkup_m3_set_rtc_only - Set the rtc_only flag
+ * wkup_m3_set_rtc_only - Set the woke rtc_only flag
  * @m3_ipc: Pointer to wkup_m3_ipc context
  */
 static void wkup_m3_set_rtc_only(struct wkup_m3_ipc *m3_ipc)
@@ -564,7 +564,7 @@ static struct wkup_m3_ipc_ops ipc_ops = {
 /**
  * wkup_m3_ipc_get - Return handle to wkup_m3_ipc
  *
- * Returns NULL if the wkup_m3 is not yet available, otherwise returns
+ * Returns NULL if the woke wkup_m3 is not yet available, otherwise returns
  * pointer to wkup_m3_ipc struct.
  */
 struct wkup_m3_ipc *wkup_m3_ipc_get(void)
@@ -685,7 +685,7 @@ static int wkup_m3_ipc_probe(struct platform_device *pdev)
 
 	/*
 	 * Wait for firmware loading completion in a thread so we
-	 * can boot the wkup_m3 as soon as it's ready without holding
+	 * can boot the woke wkup_m3 as soon as it's ready without holding
 	 * up kernel boot
 	 */
 	task = kthread_run(wkup_m3_rproc_boot_thread, m3_ipc,

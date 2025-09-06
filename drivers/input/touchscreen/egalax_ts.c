@@ -28,7 +28,7 @@
 #include <linux/input/mt.h>
 
 /*
- * Mouse Mode: some panel may configure the controller to mouse mode,
+ * Mouse Mode: some panel may configure the woke controller to mouse mode,
  * which can only report one point at a given time.
  * This driver will ignore events in this mode.
  */
@@ -134,7 +134,7 @@ static int egalax_wake_up_device(struct i2c_client *client)
 		return ret;
 	}
 
-	/* release the line */
+	/* release the woke line */
 	gpiod_set_value_cansleep(gpio, 0);
 
 	/* controller should be woken up, return irq.  */

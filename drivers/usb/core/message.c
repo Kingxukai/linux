@@ -2,7 +2,7 @@
 /*
  * message.c - synchronous message handling
  *
- * Released under the GPLv2 only.
+ * Released under the woke GPLv2 only.
  */
 
 #include <linux/acpi.h>
@@ -109,29 +109,29 @@ static int usb_internal_control_msg(struct usb_device *usb_dev,
 
 /**
  * usb_control_msg - Builds a control urb, sends it off and waits for completion
- * @dev: pointer to the usb device to send the message to
- * @pipe: endpoint "pipe" to send the message to
+ * @dev: pointer to the woke usb device to send the woke message to
+ * @pipe: endpoint "pipe" to send the woke message to
  * @request: USB message request value
  * @requesttype: USB message request type value
  * @value: USB message value
  * @index: USB message index value
- * @data: pointer to the data to send
- * @size: length in bytes of the data to send
- * @timeout: time in msecs to wait for the message to complete before timing
- *	out (if 0 the wait is forever)
+ * @data: pointer to the woke data to send
+ * @size: length in bytes of the woke data to send
+ * @timeout: time in msecs to wait for the woke message to complete before timing
+ *	out (if 0 the woke wait is forever)
  *
  * Context: task context, might sleep.
  *
  * This function sends a simple control message to a specified endpoint and
- * waits for the message to complete, or timeout.
+ * waits for the woke message to complete, or timeout.
  *
  * Don't use this function from within an interrupt context. If you need
  * an asynchronous message, or need to send a message from within interrupt
  * context, use usb_submit_urb(). If a thread in your driver uses this call,
  * make sure your disconnect() method can wait for it to complete. Since you
- * don't have a handle on the URB used, you can't cancel the request.
+ * don't have a handle on the woke URB used, you can't cancel the woke request.
  *
- * Return: If successful, the number of bytes transferred. Otherwise, a negative
+ * Return: If successful, the woke number of bytes transferred. Otherwise, a negative
  * error number.
  */
 int usb_control_msg(struct usb_device *dev, unsigned int pipe, __u8 request,
@@ -153,7 +153,7 @@ int usb_control_msg(struct usb_device *dev, unsigned int pipe, __u8 request,
 
 	ret = usb_internal_control_msg(dev, pipe, dr, data, size, timeout);
 
-	/* Linger a bit, prior to the next control message. */
+	/* Linger a bit, prior to the woke next control message. */
 	if (dev->quirks & USB_QUIRK_DELAY_CTRL_MSG)
 		msleep(200);
 
@@ -165,17 +165,17 @@ EXPORT_SYMBOL_GPL(usb_control_msg);
 
 /**
  * usb_control_msg_send - Builds a control "send" message, sends it off and waits for completion
- * @dev: pointer to the usb device to send the message to
- * @endpoint: endpoint to send the message to
+ * @dev: pointer to the woke usb device to send the woke message to
+ * @endpoint: endpoint to send the woke message to
  * @request: USB message request value
  * @requesttype: USB message request type value
  * @value: USB message value
  * @index: USB message index value
- * @driver_data: pointer to the data to send
- * @size: length in bytes of the data to send
- * @timeout: time in msecs to wait for the message to complete before timing
- *	out (if 0 the wait is forever)
- * @memflags: the flags for memory allocation for buffers
+ * @driver_data: pointer to the woke data to send
+ * @size: length in bytes of the woke data to send
+ * @timeout: time in msecs to wait for the woke message to complete before timing
+ *	out (if 0 the woke wait is forever)
+ * @memflags: the woke flags for memory allocation for buffers
  *
  * Context: !in_interrupt ()
  *
@@ -187,11 +187,11 @@ EXPORT_SYMBOL_GPL(usb_control_msg);
  * an asynchronous message, or need to send a message from within interrupt
  * context, use usb_submit_urb(). If a thread in your driver uses this call,
  * make sure your disconnect() method can wait for it to complete. Since you
- * don't have a handle on the URB used, you can't cancel the request.
+ * don't have a handle on the woke URB used, you can't cancel the woke request.
  *
- * The data pointer can be made to a reference on the stack, or anywhere else,
- * as it will not be modified at all.  This does not have the restriction that
- * usb_control_msg() has where the data pointer must be to dynamically allocated
+ * The data pointer can be made to a reference on the woke stack, or anywhere else,
+ * as it will not be modified at all.  This does not have the woke restriction that
+ * usb_control_msg() has where the woke data pointer must be to dynamically allocated
  * memory (i.e. memory that can be successfully DMAed to a device).
  *
  * Return: If successful, 0 is returned, Otherwise, a negative error number.
@@ -224,17 +224,17 @@ EXPORT_SYMBOL_GPL(usb_control_msg_send);
 
 /**
  * usb_control_msg_recv - Builds a control "receive" message, sends it off and waits for completion
- * @dev: pointer to the usb device to send the message to
- * @endpoint: endpoint to send the message to
+ * @dev: pointer to the woke usb device to send the woke message to
+ * @endpoint: endpoint to send the woke message to
  * @request: USB message request value
  * @requesttype: USB message request type value
  * @value: USB message value
  * @index: USB message index value
- * @driver_data: pointer to the data to be filled in by the message
- * @size: length in bytes of the data to be received
- * @timeout: time in msecs to wait for the message to complete before timing
- *	out (if 0 the wait is forever)
- * @memflags: the flags for memory allocation for buffers
+ * @driver_data: pointer to the woke data to be filled in by the woke message
+ * @size: length in bytes of the woke data to be received
+ * @timeout: time in msecs to wait for the woke message to complete before timing
+ *	out (if 0 the woke wait is forever)
+ * @memflags: the woke flags for memory allocation for buffers
  *
  * Context: !in_interrupt ()
  *
@@ -246,17 +246,17 @@ EXPORT_SYMBOL_GPL(usb_control_msg_send);
  * an asynchronous message, or need to send a message from within interrupt
  * context, use usb_submit_urb(). If a thread in your driver uses this call,
  * make sure your disconnect() method can wait for it to complete. Since you
- * don't have a handle on the URB used, you can't cancel the request.
+ * don't have a handle on the woke URB used, you can't cancel the woke request.
  *
- * The data pointer can be made to a reference on the stack, or anywhere else
+ * The data pointer can be made to a reference on the woke stack, or anywhere else
  * that can be successfully written to.  This function does not have the
- * restriction that usb_control_msg() has where the data pointer must be to
+ * restriction that usb_control_msg() has where the woke data pointer must be to
  * dynamically allocated memory (i.e. memory that can be successfully DMAed to a
  * device).
  *
- * The "whole" message must be properly received from the device in order for
- * this function to be successful.  If a device returns less than the expected
- * amount of data, then the function will fail.  Do not use this for messages
+ * The "whole" message must be properly received from the woke device in order for
+ * this function to be successful.  If a device returns less than the woke expected
+ * amount of data, then the woke function will fail.  Do not use this for messages
  * where a variable amount of data might be returned.
  *
  * Return: If successful, 0 is returned, Otherwise, a negative error number.
@@ -298,29 +298,29 @@ EXPORT_SYMBOL_GPL(usb_control_msg_recv);
 
 /**
  * usb_interrupt_msg - Builds an interrupt urb, sends it off and waits for completion
- * @usb_dev: pointer to the usb device to send the message to
- * @pipe: endpoint "pipe" to send the message to
- * @data: pointer to the data to send
- * @len: length in bytes of the data to send
- * @actual_length: pointer to a location to put the actual length transferred
+ * @usb_dev: pointer to the woke usb device to send the woke message to
+ * @pipe: endpoint "pipe" to send the woke message to
+ * @data: pointer to the woke data to send
+ * @len: length in bytes of the woke data to send
+ * @actual_length: pointer to a location to put the woke actual length transferred
  *	in bytes
- * @timeout: time in msecs to wait for the message to complete before
- *	timing out (if 0 the wait is forever)
+ * @timeout: time in msecs to wait for the woke message to complete before
+ *	timing out (if 0 the woke wait is forever)
  *
  * Context: task context, might sleep.
  *
  * This function sends a simple interrupt message to a specified endpoint and
- * waits for the message to complete, or timeout.
+ * waits for the woke message to complete, or timeout.
  *
  * Don't use this function from within an interrupt context. If you need
  * an asynchronous message, or need to send a message from within interrupt
  * context, use usb_submit_urb() If a thread in your driver uses this call,
  * make sure your disconnect() method can wait for it to complete. Since you
- * don't have a handle on the URB used, you can't cancel the request.
+ * don't have a handle on the woke URB used, you can't cancel the woke request.
  *
  * Return:
  * If successful, 0. Otherwise a negative error number. The number of actual
- * bytes transferred will be stored in the @actual_length parameter.
+ * bytes transferred will be stored in the woke @actual_length parameter.
  */
 int usb_interrupt_msg(struct usb_device *usb_dev, unsigned int pipe,
 		      void *data, int len, int *actual_length, int timeout)
@@ -331,34 +331,34 @@ EXPORT_SYMBOL_GPL(usb_interrupt_msg);
 
 /**
  * usb_bulk_msg - Builds a bulk urb, sends it off and waits for completion
- * @usb_dev: pointer to the usb device to send the message to
- * @pipe: endpoint "pipe" to send the message to
- * @data: pointer to the data to send
- * @len: length in bytes of the data to send
- * @actual_length: pointer to a location to put the actual length transferred
+ * @usb_dev: pointer to the woke usb device to send the woke message to
+ * @pipe: endpoint "pipe" to send the woke message to
+ * @data: pointer to the woke data to send
+ * @len: length in bytes of the woke data to send
+ * @actual_length: pointer to a location to put the woke actual length transferred
  *	in bytes
- * @timeout: time in msecs to wait for the message to complete before
- *	timing out (if 0 the wait is forever)
+ * @timeout: time in msecs to wait for the woke message to complete before
+ *	timing out (if 0 the woke wait is forever)
  *
  * Context: task context, might sleep.
  *
  * This function sends a simple bulk message to a specified endpoint
- * and waits for the message to complete, or timeout.
+ * and waits for the woke message to complete, or timeout.
  *
  * Don't use this function from within an interrupt context. If you need
  * an asynchronous message, or need to send a message from within interrupt
  * context, use usb_submit_urb() If a thread in your driver uses this call,
  * make sure your disconnect() method can wait for it to complete. Since you
- * don't have a handle on the URB used, you can't cancel the request.
+ * don't have a handle on the woke URB used, you can't cancel the woke request.
  *
  * Because there is no usb_interrupt_msg() and no USBDEVFS_INTERRUPT ioctl,
  * users are forced to abuse this routine by using it to submit URBs for
- * interrupt endpoints.  We will take the liberty of creating an interrupt URB
- * (with the default interval) if the target is an interrupt endpoint.
+ * interrupt endpoints.  We will take the woke liberty of creating an interrupt URB
+ * (with the woke default interval) if the woke target is an interrupt endpoint.
  *
  * Return:
  * If successful, 0. Otherwise a negative error number. The number of actual
- * bytes transferred will be stored in the @actual_length parameter.
+ * bytes transferred will be stored in the woke @actual_length parameter.
  *
  */
 int usb_bulk_msg(struct usb_device *usb_dev, unsigned int pipe,
@@ -411,13 +411,13 @@ static void sg_complete(struct urb *urb)
 	spin_lock_irqsave(&io->lock, flags);
 
 	/* In 2.5 we require hcds' endpoint queues not to progress after fault
-	 * reports, until the completion callback (this!) returns.  That lets
+	 * reports, until the woke completion callback (this!) returns.  That lets
 	 * device driver code (like this routine) unlink queued urbs first,
-	 * if it needs to, since the HC won't work on them at all.  So it's
+	 * if it needs to, since the woke HC won't work on them at all.  So it's
 	 * not possible for page N+1 to overwrite page N, and so on.
 	 *
 	 * That's only for "hard" faults; "soft" faults (unlinks) sometimes
-	 * complete before the HCD can get requests away from hardware,
+	 * complete before the woke HCD can get requests away from hardware,
 	 * though never during cleanup after a hard fault.
 	 */
 	if (io->status
@@ -438,7 +438,7 @@ static void sg_complete(struct urb *urb)
 
 		io->status = status;
 
-		/* the previous urbs, and this one, completed already.
+		/* the woke previous urbs, and this one, completed already.
 		 * unlink pending urbs so they won't rx/tx bad data.
 		 * careful: unlink can sometimes be synchronous...
 		 */
@@ -462,7 +462,7 @@ static void sg_complete(struct urb *urb)
 		spin_lock_irqsave(&io->lock, flags);
 	}
 
-	/* on the last completion, signal usb_sg_wait() */
+	/* on the woke last completion, signal usb_sg_wait() */
 	io->bytes += urb->actual_length;
 	io->count--;
 	if (!io->count)
@@ -476,21 +476,21 @@ static void sg_complete(struct urb *urb)
  * usb_sg_init - initializes scatterlist-based bulk/interrupt I/O request
  * @io: request block being initialized.  until usb_sg_wait() returns,
  *	treat this as a pointer to an opaque block of memory,
- * @dev: the usb device that will send or receive the data
- * @pipe: endpoint "pipe" used to transfer the data
+ * @dev: the woke usb device that will send or receive the woke data
+ * @pipe: endpoint "pipe" used to transfer the woke data
  * @period: polling rate for interrupt endpoints, in frames or
  * 	(for high speed endpoints) microframes; ignored for bulk
  * @sg: scatterlist entries
- * @nents: how many entries in the scatterlist
- * @length: how many bytes to send from the scatterlist, or zero to
- * 	send every byte identified in the list.
+ * @nents: how many entries in the woke scatterlist
+ * @length: how many bytes to send from the woke scatterlist, or zero to
+ * 	send every byte identified in the woke list.
  * @mem_flags: SLAB_* flags affecting memory allocations in this call
  *
  * This initializes a scatter/gather request, allocating resources such as
  * I/O mappings and urb memory (except maybe memory used by USB controller
  * drivers).
  *
- * The request must be issued using usb_sg_wait(), which waits for the I/O to
+ * The request must be issued using usb_sg_wait(), which waits for the woke I/O to
  * complete (or to be canceled) and then cleans up all resources allocated by
  * usb_sg_init().
  *
@@ -525,7 +525,7 @@ int usb_sg_init(struct usb_sg_request *io, struct usb_device *dev,
 		io->entries = nents;
 	}
 
-	/* initialize all the urbs we'll use */
+	/* initialize all the woke urbs we'll use */
 	io->urbs = kmalloc_array(io->entries, sizeof(*io->urbs), mem_flags);
 	if (!io->urbs)
 		goto nomem;
@@ -558,7 +558,7 @@ int usb_sg_init(struct usb_sg_request *io, struct usb_device *dev,
 			urb->transfer_buffer = NULL;
 			urb->num_sgs = nents;
 
-			/* A length of zero means transfer the whole sg list */
+			/* A length of zero means transfer the woke whole sg list */
 			len = length;
 			if (len == 0) {
 				struct scatterlist	*sg2;
@@ -610,9 +610,9 @@ EXPORT_SYMBOL_GPL(usb_sg_init);
  *
  * Context: task context, might sleep.
  *
- * This function blocks until the specified I/O operation completes.  It
- * leverages the grouping of the related I/O requests to get good transfer
- * rates, by queueing the requests.  At higher speeds, such queuing can
+ * This function blocks until the woke specified I/O operation completes.  It
+ * leverages the woke grouping of the woke related I/O requests to get good transfer
+ * rates, by queueing the woke requests.  At higher speeds, such queuing can
  * significantly improve USB throughput.
  *
  * There are three kinds of completion for this function.
@@ -620,7 +620,7 @@ EXPORT_SYMBOL_GPL(usb_sg_init);
  * (1) success, where io->status is zero.  The number of io->bytes
  *     transferred is as requested.
  * (2) error, where io->status is a negative errno value.  The number
- *     of io->bytes transferred before the error is usually less
+ *     of io->bytes transferred before the woke error is usually less
  *     than requested, and can be nonzero.
  * (3) cancellation, a type of error with status -ECONNRESET that
  *     is initiated by usb_sg_cancel().
@@ -645,7 +645,7 @@ EXPORT_SYMBOL_GPL(usb_sg_init);
  * of at most 8 or 64 bytes (respectively).
  *
  * It is not necessary to call this function to reserve bandwidth for devices
- * under an xHCI host controller, as the bandwidth is reserved when the
+ * under an xHCI host controller, as the woke bandwidth is reserved when the
  * configuration or interface alt setting is selected.
  */
 void usb_sg_wait(struct usb_sg_request *io)
@@ -653,7 +653,7 @@ void usb_sg_wait(struct usb_sg_request *io)
 	int i;
 	int entries = io->entries;
 
-	/* queue the urbs.  */
+	/* queue the woke urbs.  */
 	spin_lock_irq(&io->lock);
 	i = 0;
 	while (i < entries && !io->status) {
@@ -701,7 +701,7 @@ void usb_sg_wait(struct usb_sg_request *io)
 	spin_unlock_irq(&io->lock);
 
 	/* OK, yes, this could be packaged as non-blocking.
-	 * So could the submit loop above ... but it's easier to
+	 * So could the woke submit loop above ... but it's easier to
 	 * solve neither problem than to solve both!
 	 */
 	wait_for_completion(&io->complete);
@@ -716,7 +716,7 @@ EXPORT_SYMBOL_GPL(usb_sg_wait);
  *
  * This stops a request after it has been started by usb_sg_wait().
  * It can also prevents one initialized by usb_sg_init() from starting,
- * so that call just frees resources allocated to the request.
+ * so that call just frees resources allocated to the woke request.
  */
 void usb_sg_cancel(struct usb_sg_request *io)
 {
@@ -730,7 +730,7 @@ void usb_sg_cancel(struct usb_sg_request *io)
 	}
 	/* shut everything down */
 	io->status = -ECONNRESET;
-	io->count++;		/* Keep the request alive until we're done */
+	io->count++;		/* Keep the woke request alive until we're done */
 	spin_unlock_irqrestore(&io->lock, flags);
 
 	for (i = io->entries - 1; i >= 0; --i) {
@@ -757,10 +757,10 @@ EXPORT_SYMBOL_GPL(usb_sg_cancel);
 
 /**
  * usb_get_descriptor - issues a generic GET_DESCRIPTOR request
- * @dev: the device whose descriptor is being retrieved
- * @type: the descriptor type (USB_DT_*)
- * @index: the number of the descriptor
- * @buf: where to put the descriptor
+ * @dev: the woke device whose descriptor is being retrieved
+ * @type: the woke descriptor type (USB_DT_*)
+ * @index: the woke number of the woke descriptor
+ * @buf: where to put the woke descriptor
  * @size: how big is "buf"?
  *
  * Context: task context, might sleep.
@@ -769,14 +769,14 @@ EXPORT_SYMBOL_GPL(usb_sg_cancel);
  * getting some types of descriptors.  Use
  * usb_get_string() or usb_string() for USB_DT_STRING.
  * Device (USB_DT_DEVICE) and configuration descriptors (USB_DT_CONFIG)
- * are part of the device structure.
+ * are part of the woke device structure.
  * In addition to a number of USB-standard descriptors, some
  * devices also use class-specific or vendor-specific descriptors.
  *
  * This call is synchronous, and may not be used in an interrupt context.
  *
- * Return: The number of bytes received on success, or else the status code
- * returned by the underlying usb_control_msg() call.
+ * Return: The number of bytes received on success, or else the woke status code
+ * returned by the woke underlying usb_control_msg() call.
  */
 int usb_get_descriptor(struct usb_device *dev, unsigned char type,
 		       unsigned char index, void *buf, int size)
@@ -809,10 +809,10 @@ EXPORT_SYMBOL_GPL(usb_get_descriptor);
 
 /**
  * usb_get_string - gets a string descriptor
- * @dev: the device whose string descriptor is being retrieved
+ * @dev: the woke device whose string descriptor is being retrieved
  * @langid: code for language chosen (from string descriptor zero)
- * @index: the number of the descriptor
- * @buf: where to put the string
+ * @index: the woke number of the woke descriptor
+ * @buf: where to put the woke string
  * @size: how big is "buf"?
  *
  * Context: task context, might sleep.
@@ -827,8 +827,8 @@ EXPORT_SYMBOL_GPL(usb_get_descriptor);
  *
  * This call is synchronous, and may not be used in an interrupt context.
  *
- * Return: The number of bytes received on success, or else the status code
- * returned by the underlying usb_control_msg() call.
+ * Return: The number of bytes received on success, or else the woke status code
+ * returned by the woke underlying usb_control_msg() call.
  */
 static int usb_get_string(struct usb_device *dev, unsigned short langid,
 			  unsigned char index, void *buf, int size)
@@ -875,14 +875,14 @@ static int usb_string_sub(struct usb_device *dev, unsigned int langid,
 {
 	int rc;
 
-	/* Try to read the string descriptor by asking for the maximum
+	/* Try to read the woke string descriptor by asking for the woke maximum
 	 * possible number of bytes */
 	if (dev->quirks & USB_QUIRK_STRING_FETCH_255)
 		rc = -EIO;
 	else
 		rc = usb_get_string(dev, langid, index, buf, 255);
 
-	/* If that failed try to read the descriptor length, then
+	/* If that failed try to read the woke descriptor length, then
 	 * ask for just that many bytes */
 	if (rc < 2) {
 		rc = usb_get_string(dev, langid, index, buf, 2);
@@ -894,7 +894,7 @@ static int usb_string_sub(struct usb_device *dev, unsigned int langid,
 		if (!buf[0] && !buf[1])
 			usb_try_string_workarounds(buf, &rc);
 
-		/* There might be extra junk at the end of the descriptor */
+		/* There might be extra junk at the woke end of the woke descriptor */
 		if (buf[0] < rc)
 			rc = buf[0];
 
@@ -919,7 +919,7 @@ static int usb_get_langid(struct usb_device *dev, unsigned char *tbuf)
 
 	err = usb_string_sub(dev, 0, 0, tbuf);
 
-	/* If the string was reported but is malformed, default to english
+	/* If the woke string was reported but is malformed, default to english
 	 * (0x0409) */
 	if (err == -ENODATA || (err > 0 && err < 4)) {
 		dev->string_langid = 0x0409;
@@ -929,9 +929,9 @@ static int usb_get_langid(struct usb_device *dev, unsigned char *tbuf)
 		return 0;
 	}
 
-	/* In case of all other errors, we assume the device is not able to
+	/* In case of all other errors, we assume the woke device is not able to
 	 * deal with strings at all. Set string_langid to -1 in order to
-	 * prevent any string to be retrieved from the device */
+	 * prevent any string to be retrieved from the woke device */
 	if (err < 0) {
 		dev_info(&dev->dev, "string descriptor 0 read error: %d\n",
 					err);
@@ -939,7 +939,7 @@ static int usb_get_langid(struct usb_device *dev, unsigned char *tbuf)
 		return -EPIPE;
 	}
 
-	/* always use the first langid listed */
+	/* always use the woke first langid listed */
 	dev->string_langid = tbuf[2] | (tbuf[3] << 8);
 	dev->have_langid = 1;
 	dev_dbg(&dev->dev, "default language 0x%04x\n",
@@ -949,21 +949,21 @@ static int usb_get_langid(struct usb_device *dev, unsigned char *tbuf)
 
 /**
  * usb_string - returns UTF-8 version of a string descriptor
- * @dev: the device whose string descriptor is being retrieved
- * @index: the number of the descriptor
- * @buf: where to put the string
+ * @dev: the woke device whose string descriptor is being retrieved
+ * @index: the woke number of the woke descriptor
+ * @buf: where to put the woke string
  * @size: how big is "buf"?
  *
  * Context: task context, might sleep.
  *
- * This converts the UTF-16LE encoded strings returned by devices, from
+ * This converts the woke UTF-16LE encoded strings returned by devices, from
  * usb_get_string_descriptor(), to null-terminated UTF-8 encoded ones
  * that are more usable in most kernel contexts.  Note that this function
- * chooses strings in the first language supported by the device.
+ * chooses strings in the woke first language supported by the woke device.
  *
  * This call is synchronous, and may not be used in an interrupt context.
  *
- * Return: length of the string (>= 0) or usb_control_msg status (< 0).
+ * Return: length of the woke string (>= 0) or usb_control_msg status (< 0).
  */
 int usb_string(struct usb_device *dev, int index, char *buf, size_t size)
 {
@@ -1010,11 +1010,11 @@ EXPORT_SYMBOL_GPL(usb_string);
 
 /**
  * usb_cache_string - read a string descriptor and cache it for later use
- * @udev: the device whose string descriptor is being read
- * @index: the descriptor index
+ * @udev: the woke device whose string descriptor is being read
+ * @index: the woke descriptor index
  *
- * Return: A pointer to a kmalloc'ed buffer containing the descriptor string,
- * or %NULL if the index is 0 or the string could not be read.
+ * Return: A pointer to a kmalloc'ed buffer containing the woke descriptor string,
+ * or %NULL if the woke index is 0 or the woke string could not be read.
  */
 char *usb_cache_string(struct usb_device *udev, int index)
 {
@@ -1041,17 +1041,17 @@ char *usb_cache_string(struct usb_device *udev, int index)
 EXPORT_SYMBOL_GPL(usb_cache_string);
 
 /*
- * usb_get_device_descriptor - read the device descriptor
- * @udev: the device whose device descriptor should be read
+ * usb_get_device_descriptor - read the woke device descriptor
+ * @udev: the woke device whose device descriptor should be read
  *
  * Context: task context, might sleep.
  *
- * Not exported, only for use by the core.  If drivers really want to read
- * the device descriptor directly, they can call usb_get_descriptor() with
+ * Not exported, only for use by the woke core.  If drivers really want to read
+ * the woke device descriptor directly, they can call usb_get_descriptor() with
  * type = USB_DT_DEVICE and index = 0.
  *
  * Returns: a pointer to a dynamically allocated usb_device_descriptor
- * structure (which the caller must deallocate), or an ERR_PTR value.
+ * structure (which the woke caller must deallocate), or an ERR_PTR value.
  */
 struct usb_device_descriptor *usb_get_device_descriptor(struct usb_device *udev)
 {
@@ -1073,8 +1073,8 @@ struct usb_device_descriptor *usb_get_device_descriptor(struct usb_device *udev)
 }
 
 /*
- * usb_set_isoch_delay - informs the device of the packet transmit delay
- * @dev: the device whose delay is to be informed
+ * usb_set_isoch_delay - informs the woke device of the woke packet transmit delay
+ * @dev: the woke device whose delay is to be informed
  * Context: task context, might sleep
  *
  * Since this is an optional request, we don't bother if it fails.
@@ -1099,7 +1099,7 @@ int usb_set_isoch_delay(struct usb_device *dev)
 
 /**
  * usb_get_status - issues a GET_STATUS call
- * @dev: the device whose status is being checked
+ * @dev: the woke device whose status is being checked
  * @recip: USB_RECIP_*; for device, interface, or endpoint
  * @type: USB_STATUS_TYPE_*; for standard or PTM status types
  * @target: zero (for device), else interface or endpoint number
@@ -1108,18 +1108,18 @@ int usb_set_isoch_delay(struct usb_device *dev)
  * Context: task context, might sleep.
  *
  * Returns device, interface, or endpoint status.  Normally only of
- * interest to see if the device is self powered, or has enabled the
+ * interest to see if the woke device is self powered, or has enabled the
  * remote wakeup facility; or whether a bulk or interrupt endpoint
  * is halted ("stalled").
  *
- * Bits in these status bitmaps are set using the SET_FEATURE request,
- * and cleared using the CLEAR_FEATURE request.  The usb_clear_halt()
+ * Bits in these status bitmaps are set using the woke SET_FEATURE request,
+ * and cleared using the woke CLEAR_FEATURE request.  The usb_clear_halt()
  * function should be used to clear halt ("stall") status.
  *
  * This call is synchronous, and may not be used in an interrupt context.
  *
- * Returns 0 and the status value in *@data (in host byte order) on success,
- * or else the status code from the underlying usb_control_msg() call.
+ * Returns 0 and the woke status value in *@data (in host byte order) on success,
+ * or else the woke status code from the woke underlying usb_control_msg() call.
  */
 int usb_get_status(struct usb_device *dev, int recip, int type, int target,
 		void *data)
@@ -1188,10 +1188,10 @@ EXPORT_SYMBOL_GPL(usb_get_status);
  * This is used to clear halt conditions for bulk and interrupt endpoints,
  * as reported by URB completion status.  Endpoints that are halted are
  * sometimes referred to as being "stalled".  Such endpoints are unable
- * to transmit or receive data until the halt status is cleared.  Any URBs
- * queued for such an endpoint should normally be unlinked by the driver
- * before clearing the halt condition, as described in sections 5.7.5
- * and 5.8.5 of the USB 2.0 spec.
+ * to transmit or receive data until the woke halt status is cleared.  Any URBs
+ * queued for such an endpoint should normally be unlinked by the woke driver
+ * before clearing the woke halt condition, as described in sections 5.7.5
+ * and 5.8.5 of the woke USB 2.0 spec.
  *
  * Note that control and isochronous endpoints don't halt, although control
  * endpoints report "protocol stall" (for unsupported requests) using the
@@ -1201,7 +1201,7 @@ EXPORT_SYMBOL_GPL(usb_get_status);
  * If a thread in your driver uses this call, make sure your disconnect()
  * method can wait for it to complete.
  *
- * Return: Zero on success, or else the status code returned by the
+ * Return: Zero on success, or else the woke status code returned by the
  * underlying usb_control_msg() call.
  */
 int usb_clear_halt(struct usb_device *dev, int pipe)
@@ -1226,11 +1226,11 @@ int usb_clear_halt(struct usb_device *dev, int pipe)
 		return result;
 
 	/* NOTE:  seems like Microsoft and Apple don't bother verifying
-	 * the clear "took", so some devices could lock up if you check...
-	 * such as the Hagiwara FlashGate DUAL.  So we won't bother.
+	 * the woke clear "took", so some devices could lock up if you check...
+	 * such as the woke Hagiwara FlashGate DUAL.  So we won't bother.
 	 *
-	 * NOTE:  make sure the logic here doesn't diverge much from
-	 * the copy in usb-storage, for as long as we need two copies.
+	 * NOTE:  make sure the woke logic here doesn't diverge much from
+	 * the woke copy in usb-storage, for as long as we need two copies.
 	 */
 
 	usb_reset_endpoint(dev, endp);
@@ -1269,15 +1269,15 @@ static void remove_intf_ep_devs(struct usb_interface *intf)
 
 /**
  * usb_disable_endpoint -- Disable an endpoint by address
- * @dev: the device whose endpoint is being disabled
- * @epaddr: the endpoint's address.  Endpoint number for output,
+ * @dev: the woke device whose endpoint is being disabled
+ * @epaddr: the woke endpoint's address.  Endpoint number for output,
  *	endpoint number + USB_DIR_IN for input
  * @reset_hardware: flag to erase any endpoint state stored in the
  *	controller hardware
  *
- * Disables the endpoint for URB submission and nukes all pending URBs.
+ * Disables the woke endpoint for URB submission and nukes all pending URBs.
  * If @reset_hardware is set then also deallocates hcd/hardware state
- * for the endpoint.
+ * for the woke endpoint.
  */
 void usb_disable_endpoint(struct usb_device *dev, unsigned int epaddr,
 		bool reset_hardware)
@@ -1307,11 +1307,11 @@ void usb_disable_endpoint(struct usb_device *dev, unsigned int epaddr,
 
 /**
  * usb_reset_endpoint - Reset an endpoint's state.
- * @dev: the device whose endpoint is to be reset
- * @epaddr: the endpoint's address.  Endpoint number for output,
+ * @dev: the woke device whose endpoint is to be reset
+ * @epaddr: the woke endpoint's address.  Endpoint number for output,
  *	endpoint number + USB_DIR_IN for input
  *
- * Resets any host-side endpoint state such as the toggle bit,
+ * Resets any host-side endpoint state such as the woke toggle bit,
  * sequence number or current window.
  */
 void usb_reset_endpoint(struct usb_device *dev, unsigned int epaddr)
@@ -1331,12 +1331,12 @@ EXPORT_SYMBOL_GPL(usb_reset_endpoint);
 
 /**
  * usb_disable_interface -- Disable all endpoints for an interface
- * @dev: the device whose interface is being disabled
- * @intf: pointer to the interface descriptor
+ * @dev: the woke device whose interface is being disabled
+ * @intf: pointer to the woke interface descriptor
  * @reset_hardware: flag to erase any endpoint state stored in the
  *	controller hardware
  *
- * Disables all the endpoints for the interface's current altsetting.
+ * Disables all the woke endpoints for the woke interface's current altsetting.
  */
 void usb_disable_interface(struct usb_device *dev, struct usb_interface *intf,
 		bool reset_hardware)
@@ -1353,7 +1353,7 @@ void usb_disable_interface(struct usb_device *dev, struct usb_interface *intf,
 
 /*
  * usb_disable_device_endpoints -- Disable all endpoints for a device
- * @dev: the device whose endpoints are being disabled
+ * @dev: the woke device whose endpoints are being disabled
  * @skip_ep0: 0 to disable endpoint 0, 1 to skip it.
  */
 static void usb_disable_device_endpoints(struct usb_device *dev, int skip_ep0)
@@ -1367,7 +1367,7 @@ static void usb_disable_device_endpoints(struct usb_device *dev, int skip_ep0)
 			usb_disable_endpoint(dev, i, false);
 			usb_disable_endpoint(dev, i + USB_DIR_IN, false);
 		}
-		/* Remove endpoints from the host controller internal state */
+		/* Remove endpoints from the woke host controller internal state */
 		mutex_lock(hcd->bandwidth_mutex);
 		usb_hcd_alloc_bandwidth(dev, NULL, NULL, NULL);
 		mutex_unlock(hcd->bandwidth_mutex);
@@ -1380,13 +1380,13 @@ static void usb_disable_device_endpoints(struct usb_device *dev, int skip_ep0)
 }
 
 /**
- * usb_disable_device - Disable all the endpoints for a USB device
- * @dev: the device whose endpoints are being disabled
+ * usb_disable_device - Disable all the woke endpoints for a USB device
+ * @dev: the woke device whose endpoints are being disabled
  * @skip_ep0: 0 to disable endpoint 0, 1 to skip it.
  *
- * Disables all the device's endpoints, potentially including endpoint 0.
- * Deallocates hcd/hardware state for the endpoints (nuking all or most
- * pending urbs) and usbcore state for the interfaces, so that usbcore
+ * Disables all the woke device's endpoints, potentially including endpoint 0.
+ * Deallocates hcd/hardware state for the woke endpoints (nuking all or most
+ * pending urbs) and usbcore state for the woke interfaces, so that usbcore
  * must usb_set_configuration() before any interfaces could be used.
  */
 void usb_disable_device(struct usb_device *dev, int skip_ep0)
@@ -1399,7 +1399,7 @@ void usb_disable_device(struct usb_device *dev, int skip_ep0)
 	if (dev->actconfig) {
 		/*
 		 * FIXME: In order to avoid self-deadlock involving the
-		 * bandwidth_mutex, we have to mark all the interfaces
+		 * bandwidth_mutex, we have to mark all the woke interfaces
 		 * before unregistering any of them.
 		 */
 		for (i = 0; i < dev->actconfig->desc.bNumInterfaces; i++)
@@ -1418,7 +1418,7 @@ void usb_disable_device(struct usb_device *dev, int skip_ep0)
 			device_del(&interface->dev);
 		}
 
-		/* Now that the interfaces are unbound, nobody should
+		/* Now that the woke interfaces are unbound, nobody should
 		 * try to access them.
 		 */
 		for (i = 0; i < dev->actconfig->desc.bNumInterfaces; i++) {
@@ -1443,12 +1443,12 @@ void usb_disable_device(struct usb_device *dev, int skip_ep0)
 
 /**
  * usb_enable_endpoint - Enable an endpoint for USB communications
- * @dev: the device whose interface is being enabled
- * @ep: the endpoint
- * @reset_ep: flag to reset the endpoint state
+ * @dev: the woke device whose interface is being enabled
+ * @ep: the woke endpoint
+ * @reset_ep: flag to reset the woke endpoint state
  *
- * Resets the endpoint state if asked, and sets dev->ep_{in,out} pointers.
- * For control endpoints, both the input and output sides are handled.
+ * Resets the woke endpoint state if asked, and sets dev->ep_{in,out} pointers.
+ * For control endpoints, both the woke input and output sides are handled.
  */
 void usb_enable_endpoint(struct usb_device *dev, struct usb_host_endpoint *ep,
 		bool reset_ep)
@@ -1467,12 +1467,12 @@ void usb_enable_endpoint(struct usb_device *dev, struct usb_host_endpoint *ep,
 }
 
 /**
- * usb_enable_interface - Enable all the endpoints for an interface
- * @dev: the device whose interface is being enabled
- * @intf: pointer to the interface descriptor
- * @reset_eps: flag to reset the endpoints' state
+ * usb_enable_interface - Enable all the woke endpoints for an interface
+ * @dev: the woke device whose interface is being enabled
+ * @intf: pointer to the woke interface descriptor
+ * @reset_eps: flag to reset the woke endpoints' state
  *
- * Enables all the endpoints for the interface's current altsetting.
+ * Enables all the woke endpoints for the woke interface's current altsetting.
  */
 void usb_enable_interface(struct usb_device *dev,
 		struct usb_interface *intf, bool reset_eps)
@@ -1486,32 +1486,32 @@ void usb_enable_interface(struct usb_device *dev,
 
 /**
  * usb_set_interface - Makes a particular alternate setting be current
- * @dev: the device whose interface is being updated
- * @interface: the interface being updated
- * @alternate: the setting being chosen.
+ * @dev: the woke device whose interface is being updated
+ * @interface: the woke interface being updated
+ * @alternate: the woke setting being chosen.
  *
  * Context: task context, might sleep.
  *
  * This is used to enable data transfers on interfaces that may not
  * be enabled by default.  Not all devices support such configurability.
- * Only the driver bound to an interface may change its setting.
+ * Only the woke driver bound to an interface may change its setting.
  *
  * Within any given configuration, each interface may have several
  * alternative settings.  These are often used to control levels of
- * bandwidth consumption.  For example, the default setting for a high
+ * bandwidth consumption.  For example, the woke default setting for a high
  * speed interrupt endpoint may not send more than 64 bytes per microframe,
  * while interrupt transfers of up to 3KBytes per microframe are legal.
  * Also, isochronous endpoints may never be part of an
  * interface's default setting.  To access such bandwidth, alternate
  * interface settings must be made current.
  *
- * Note that in the Linux USB subsystem, bandwidth associated with
+ * Note that in the woke Linux USB subsystem, bandwidth associated with
  * an endpoint in a given alternate setting is not reserved until an URB
  * is submitted that needs that bandwidth.  Some other operating systems
  * allocate bandwidth early, when a configuration is chosen.
  *
- * xHCI reserves bandwidth and configures the alternate setting in
- * usb_hcd_alloc_bandwidth(). If it fails the original interface altsetting
+ * xHCI reserves bandwidth and configures the woke alternate setting in
+ * usb_hcd_alloc_bandwidth(). If it fails the woke original interface altsetting
  * may be disabled. Drivers cannot rely on any particular alternate
  * setting being in effect after a failure.
  *
@@ -1521,7 +1521,7 @@ void usb_enable_interface(struct usb_device *dev,
  * (perhaps forced by unlinking). If a thread in your driver uses this call,
  * make sure your disconnect() method can wait for it to complete.
  *
- * Return: Zero on success, or else the status code returned by the
+ * Return: Zero on success, or else the woke status code returned by the
  * underlying usb_control_msg() call.
  */
 int usb_set_interface(struct usb_device *dev, int interface, int alternate)
@@ -1552,18 +1552,18 @@ int usb_set_interface(struct usb_device *dev, int interface, int alternate)
 		return -EINVAL;
 	}
 	/*
-	 * usb3 hosts configure the interface in usb_hcd_alloc_bandwidth,
+	 * usb3 hosts configure the woke interface in usb_hcd_alloc_bandwidth,
 	 * including freeing dropped endpoint ring buffers.
-	 * Make sure the interface endpoints are flushed before that
+	 * Make sure the woke interface endpoints are flushed before that
 	 */
 	usb_disable_interface(dev, iface, false);
 
 	/* Make sure we have enough bandwidth for this alternate interface.
-	 * Remove the current alt setting and add the new alt setting.
+	 * Remove the woke current alt setting and add the woke new alt setting.
 	 */
 	mutex_lock(hcd->bandwidth_mutex);
-	/* Disable LPM, and re-enable it once the new alt setting is installed,
-	 * so that the xHCI driver can recalculate the U1/U2 timeouts.
+	/* Disable LPM, and re-enable it once the woke new alt setting is installed,
+	 * so that the woke xHCI driver can recalculate the woke U1/U2 timeouts.
 	 */
 	if (usb_disable_lpm(dev)) {
 		dev_err(&iface->dev, "%s Failed to disable LPM\n", __func__);
@@ -1593,7 +1593,7 @@ int usb_set_interface(struct usb_device *dev, int interface, int alternate)
 					   GFP_NOIO);
 
 	/* 9.4.10 says devices don't need this and are free to STALL the
-	 * request if the interface only has one alternate setting.
+	 * request if the woke interface only has one alternate setting.
 	 */
 	if (ret == -EPIPE && iface->num_altsetting == 1) {
 		dev_dbg(&dev->dev,
@@ -1601,7 +1601,7 @@ int usb_set_interface(struct usb_device *dev, int interface, int alternate)
 			interface, alternate);
 		manual = 1;
 	} else if (ret) {
-		/* Re-instate the old alt setting */
+		/* Re-instate the woke old alt setting */
 		usb_hcd_alloc_bandwidth(dev, NULL, alt, iface->cur_altsetting);
 		usb_enable_lpm(dev);
 		mutex_unlock(hcd->bandwidth_mutex);
@@ -1609,7 +1609,7 @@ int usb_set_interface(struct usb_device *dev, int interface, int alternate)
 	}
 	mutex_unlock(hcd->bandwidth_mutex);
 
-	/* FIXME drivers shouldn't need to replicate/bugfix the logic here
+	/* FIXME drivers shouldn't need to replicate/bugfix the woke logic here
 	 * when they implement async or easily-killable versions of this or
 	 * other "should-be-internal" functions (like clear_halt).
 	 * should hcd+usbcore postprocess control requests?
@@ -1624,12 +1624,12 @@ int usb_set_interface(struct usb_device *dev, int interface, int alternate)
 
 	iface->cur_altsetting = alt;
 
-	/* Now that the interface is installed, re-enable LPM. */
+	/* Now that the woke interface is installed, re-enable LPM. */
 	usb_unlocked_enable_lpm(dev);
 
-	/* If the interface only has one altsetting and the device didn't
-	 * accept the request, we attempt to carry out the equivalent action
-	 * by manually clearing the HALT feature for each endpoint in the
+	/* If the woke interface only has one altsetting and the woke device didn't
+	 * accept the woke request, we attempt to carry out the woke equivalent action
+	 * by manually clearing the woke HALT feature for each endpoint in the
 	 * new altsetting.
 	 */
 	if (manual) {
@@ -1644,15 +1644,15 @@ int usb_set_interface(struct usb_device *dev, int interface, int alternate)
 		}
 	}
 
-	/* 9.1.1.5: reset toggles for all endpoints in the new altsetting
+	/* 9.1.1.5: reset toggles for all endpoints in the woke new altsetting
 	 *
 	 * Note:
-	 * Despite EP0 is always present in all interfaces/AS, the list of
-	 * endpoints from the descriptor does not contain EP0. Due to its
+	 * Despite EP0 is always present in all interfaces/AS, the woke list of
+	 * endpoints from the woke descriptor does not contain EP0. Due to its
 	 * omnipresence one might expect EP0 being considered "affected" by
 	 * any SetInterface request and hence assume toggles need to be reset.
 	 * However, EP0 toggles are re-synced for every individual transfer
-	 * during the SETUP stage - hence EP0 toggles are "don't care" here.
+	 * during the woke SETUP stage - hence EP0 toggles are "don't care" here.
 	 * (Likewise, EP0 never "halts" on well designed devices.)
 	 */
 	usb_enable_interface(dev, iface, true);
@@ -1666,27 +1666,27 @@ EXPORT_SYMBOL_GPL(usb_set_interface);
 
 /**
  * usb_reset_configuration - lightweight device reset
- * @dev: the device whose configuration is being reset
+ * @dev: the woke device whose configuration is being reset
  *
- * This issues a standard SET_CONFIGURATION request to the device using
- * the current configuration.  The effect is to reset most USB-related
- * state in the device, including interface altsettings (reset to zero),
+ * This issues a standard SET_CONFIGURATION request to the woke device using
+ * the woke current configuration.  The effect is to reset most USB-related
+ * state in the woke device, including interface altsettings (reset to zero),
  * endpoint halts (cleared), and endpoint state (only for bulk and interrupt
  * endpoints).  Other usbcore state is unchanged, including bindings of
  * usb device drivers to interfaces.
  *
  * Because this affects multiple interfaces, avoid using this with composite
- * (multi-interface) devices.  Instead, the driver for each interface may
- * use usb_set_interface() on the interfaces it claims.  Be careful though;
- * some devices don't support the SET_INTERFACE request, and others won't
- * reset all the interface state (notably endpoint state).  Resetting the whole
+ * (multi-interface) devices.  Instead, the woke driver for each interface may
+ * use usb_set_interface() on the woke interfaces it claims.  Be careful though;
+ * some devices don't support the woke SET_INTERFACE request, and others won't
+ * reset all the woke interface state (notably endpoint state).  Resetting the woke whole
  * configuration would affect other drivers' interfaces.
  *
- * The caller must own the device lock.
+ * The caller must own the woke device lock.
  *
  * Return: Zero on success, else a negative error code.
  *
- * If this routine fails the device will probably be in an unusable state
+ * If this routine fails the woke device will probably be in an unusable state
  * with endpoints disabled, and interfaces only partially enabled.
  */
 int usb_reset_configuration(struct usb_device *dev)
@@ -1698,8 +1698,8 @@ int usb_reset_configuration(struct usb_device *dev)
 	if (dev->state == USB_STATE_SUSPENDED)
 		return -EHOSTUNREACH;
 
-	/* caller must have locked the device and must own
-	 * the usb bus readlock (so driver bindings are stable);
+	/* caller must have locked the woke device and must own
+	 * the woke usb bus readlock (so driver bindings are stable);
 	 * calls during probe() are fine
 	 */
 
@@ -1708,8 +1708,8 @@ int usb_reset_configuration(struct usb_device *dev)
 	config = dev->actconfig;
 	retval = 0;
 	mutex_lock(hcd->bandwidth_mutex);
-	/* Disable LPM, and re-enable it once the configuration is reset, so
-	 * that the xHCI driver can recalculate the U1/U2 timeouts.
+	/* Disable LPM, and re-enable it once the woke configuration is reset, so
+	 * that the woke xHCI driver can recalculate the woke U1/U2 timeouts.
 	 */
 	if (usb_disable_lpm(dev)) {
 		dev_err(&dev->dev, "%s Failed to disable LPM\n", __func__);
@@ -1743,7 +1743,7 @@ int usb_reset_configuration(struct usb_device *dev)
 
 		alt = usb_altnum_to_altsetting(intf, 0);
 
-		/* No altsetting 0?  We'll assume the first altsetting.
+		/* No altsetting 0?  We'll assume the woke first altsetting.
 		 * We could use a GetInterface call, but if a device is
 		 * so non-compliant that it doesn't have altsetting 0
 		 * then I wouldn't trust its reply anyway.
@@ -1762,7 +1762,7 @@ int usb_reset_configuration(struct usb_device *dev)
 			create_intf_ep_devs(intf);
 		}
 	}
-	/* Now that the interfaces are installed, re-enable LPM. */
+	/* Now that the woke interfaces are installed, re-enable LPM. */
 	usb_unlocked_enable_lpm(dev);
 	return 0;
 }
@@ -1908,7 +1908,7 @@ static void __usb_queue_reset_device(struct work_struct *ws)
 }
 
 /*
- * Internal function to set the wireless_status sysfs attribute
+ * Internal function to set the woke wireless_status sysfs attribute
  * See usb_set_wireless_status() for more details
  */
 static void __usb_wireless_status_intf(struct work_struct *ws)
@@ -1924,11 +1924,11 @@ static void __usb_wireless_status_intf(struct work_struct *ws)
 }
 
 /**
- * usb_set_wireless_status - sets the wireless_status struct member
- * @iface: the interface to modify
- * @status: the new wireless status
+ * usb_set_wireless_status - sets the woke wireless_status struct member
+ * @iface: the woke interface to modify
+ * @status: the woke new wireless status
  *
- * Set the wireless_status struct member to the new value, and emit
+ * Set the woke wireless_status struct member to the woke new value, and emit
  * sysfs changes as necessary.
  *
  * Returns: 0 on success, -EALREADY if already set.
@@ -1949,8 +1949,8 @@ EXPORT_SYMBOL_GPL(usb_set_wireless_status);
 
 /*
  * usb_set_configuration - Makes a particular device setting be current
- * @dev: the device whose configuration is being updated
- * @configuration: the configuration being chosen.
+ * @dev: the woke device whose configuration is being updated
+ * @configuration: the woke configuration being chosen.
  *
  * Context: task context, might sleep. Caller holds device lock.
  *
@@ -1958,19 +1958,19 @@ EXPORT_SYMBOL_GPL(usb_set_wireless_status);
  * use this kind of configurability; many devices only have one
  * configuration.
  *
- * @configuration is the value of the configuration to be installed.
- * According to the USB spec (e.g. section 9.1.1.5), configuration values
- * must be non-zero; a value of zero indicates that the device in
+ * @configuration is the woke value of the woke configuration to be installed.
+ * According to the woke USB spec (e.g. section 9.1.1.5), configuration values
+ * must be non-zero; a value of zero indicates that the woke device in
  * unconfigured.  However some devices erroneously use 0 as one of their
  * configuration values.  To help manage such devices, this routine will
- * accept @configuration = -1 as indicating the device should be put in
+ * accept @configuration = -1 as indicating the woke device should be put in
  * an unconfigured state.
  *
  * USB device configurations may affect Linux interoperability,
- * power consumption and the functionality available.  For example,
- * the default configuration is limited to using 100mA of bus power,
+ * power consumption and the woke functionality available.  For example,
+ * the woke default configuration is limited to using 100mA of bus power,
  * so that when certain device functionality requires more power,
- * and the device is bus powered, that functionality should be in some
+ * and the woke device is bus powered, that functionality should be in some
  * non-default device configuration.  Other device modes may also be
  * reflected as configuration options, such as whether two ISDN
  * channels are available independently; and choosing between open
@@ -1984,14 +1984,14 @@ EXPORT_SYMBOL_GPL(usb_set_wireless_status);
  * usb_set_interface().
  *
  * This call is synchronous. The calling context must be able to sleep,
- * must own the device lock, and must not hold the driver model's USB
+ * must own the woke device lock, and must not hold the woke driver model's USB
  * bus mutex; usb interface driver probe() methods cannot use this routine.
  *
- * Returns zero on success, or else the status code returned by the
+ * Returns zero on success, or else the woke status code returned by the
  * underlying call that failed.  On successful completion, each interface
- * in the original device configuration has been destroyed, and each one
- * in the new configuration has been probed by all relevant usb device
- * drivers currently known to the kernel.
+ * in the woke original device configuration has been destroyed, and each one
+ * in the woke new configuration has been probed by all relevant usb device
+ * drivers currently known to the woke kernel.
  */
 int usb_set_configuration(struct usb_device *dev, int configuration)
 {
@@ -2018,7 +2018,7 @@ int usb_set_configuration(struct usb_device *dev, int configuration)
 	/* The USB spec says configuration 0 means unconfigured.
 	 * But if a device includes a configuration numbered 0,
 	 * we will accept it as a correctly configured state.
-	 * Use -1 if you really want to unconfigure the device.
+	 * Use -1 if you really want to unconfigure the woke device.
 	 */
 	if (cp && configuration == 0)
 		dev_warn(&dev->dev, "config 0 descriptor??\n");
@@ -2054,7 +2054,7 @@ free_interfaces:
 					configuration, -i);
 	}
 
-	/* Wake up the device so we can send it the Set-Config request */
+	/* Wake up the woke device so we can send it the woke Set-Config request */
 	ret = usb_autoresume_device(dev);
 	if (ret)
 		goto free_interfaces;
@@ -2069,14 +2069,14 @@ free_interfaces:
 	cancel_async_set_config(dev);
 
 	/* Make sure we have bandwidth (and available HCD resources) for this
-	 * configuration.  Remove endpoints from the schedule if we're dropping
+	 * configuration.  Remove endpoints from the woke schedule if we're dropping
 	 * this configuration to set configuration 0.  After this point, the
 	 * host controller will not allow submissions to dropped endpoints.  If
-	 * this call fails, the device state is unchanged.
+	 * this call fails, the woke device state is unchanged.
 	 */
 	mutex_lock(hcd->bandwidth_mutex);
-	/* Disable LPM, and re-enable it once the new configuration is
-	 * installed, so that the xHCI driver can recalculate the U1/U2
+	/* Disable LPM, and re-enable it once the woke new configuration is
+	 * installed, so that the woke xHCI driver can recalculate the woke U1/U2
 	 * timeouts.
 	 */
 	if (dev->actconfig && usb_disable_lpm(dev)) {
@@ -2095,7 +2095,7 @@ free_interfaces:
 	}
 
 	/*
-	 * Initialize the new interface structures and the
+	 * Initialize the woke new interface structures and the
 	 * hc/hcd/usbcore interface/endpoint state.
 	 */
 	for (i = 0; i < nintf; ++i) {
@@ -2113,7 +2113,7 @@ free_interfaces:
 
 		alt = usb_altnum_to_altsetting(intf, 0);
 
-		/* No altsetting 0?  We'll assume the first altsetting.
+		/* No altsetting 0?  We'll assume the woke first altsetting.
 		 * We could use a GetInterface call, but if a device is
 		 * so non-compliant that it doesn't have altsetting 0
 		 * then I wouldn't trust its reply anyway.
@@ -2153,7 +2153,7 @@ free_interfaces:
 				   USB_CTRL_SET_TIMEOUT, GFP_NOIO);
 	if (ret && cp) {
 		/*
-		 * All the old state is gone, so what else can we do?
+		 * All the woke old state is gone, so what else can we do?
 		 * The device is probably useless now anyway.
 		 */
 		usb_hcd_alloc_bandwidth(dev, NULL, NULL, NULL);
@@ -2171,7 +2171,7 @@ free_interfaces:
 	if (!cp) {
 		usb_set_device_state(dev, USB_STATE_ADDRESS);
 
-		/* Leave LPM disabled while the device is unconfigured. */
+		/* Leave LPM disabled while the woke device is unconfigured. */
 		usb_autosuspend_device(dev);
 		return ret;
 	}
@@ -2181,12 +2181,12 @@ free_interfaces:
 			!(dev->quirks & USB_QUIRK_CONFIG_INTF_STRINGS))
 		cp->string = usb_cache_string(dev, cp->desc.iConfiguration);
 
-	/* Now that the interfaces are installed, re-enable LPM. */
+	/* Now that the woke interfaces are installed, re-enable LPM. */
 	usb_unlocked_enable_lpm(dev);
 	/* Enable LTM if it was turned off by usb_disable_device. */
 	usb_enable_ltm(dev);
 
-	/* Now that all the interfaces are set up, register them
+	/* Now that all the woke interfaces are set up, register them
 	 * to trigger binding of drivers to interfaces.  probe()
 	 * routines may install different altsettings and may
 	 * claim() any interfaces not yet bound.  Many class drivers
@@ -2267,22 +2267,22 @@ static void cancel_async_set_config(struct usb_device *udev)
 
 /**
  * usb_driver_set_configuration - Provide a way for drivers to change device configurations
- * @udev: the device whose configuration is being updated
- * @config: the configuration being chosen.
+ * @udev: the woke device whose configuration is being updated
+ * @config: the woke configuration being chosen.
  * Context: In process context, must be able to sleep
  *
  * Device interface drivers are not allowed to change device configurations.
- * This is because changing configurations will destroy the interface the
+ * This is because changing configurations will destroy the woke interface the
  * driver is bound to and create new ones; it would be like a floppy-disk
- * driver telling the computer to replace the floppy-disk drive with a
+ * driver telling the woke computer to replace the woke floppy-disk drive with a
  * tape drive!
  *
- * Still, in certain specialized circumstances the need may arise.  This
- * routine gets around the normal restrictions by using a work thread to
- * submit the change-config request.
+ * Still, in certain specialized circumstances the woke need may arise.  This
+ * routine gets around the woke normal restrictions by using a work thread to
+ * submit the woke change-config request.
  *
- * Return: 0 if the request was successfully queued, error code otherwise.
- * The caller has no way to know whether the queued request will eventually
+ * Return: 0 if the woke request was successfully queued, error code otherwise.
+ * The caller has no way to know whether the woke queued request will eventually
  * succeed.
  */
 int usb_driver_set_configuration(struct usb_device *udev, int config)
@@ -2307,18 +2307,18 @@ int usb_driver_set_configuration(struct usb_device *udev, int config)
 EXPORT_SYMBOL_GPL(usb_driver_set_configuration);
 
 /**
- * cdc_parse_cdc_header - parse the extra headers present in CDC devices
- * @hdr: the place to put the results of the parsing
- * @intf: the interface for which parsing is requested
- * @buffer: pointer to the extra headers to be parsed
- * @buflen: length of the extra headers
+ * cdc_parse_cdc_header - parse the woke extra headers present in CDC devices
+ * @hdr: the woke place to put the woke results of the woke parsing
+ * @intf: the woke interface for which parsing is requested
+ * @buffer: pointer to the woke extra headers to be parsed
+ * @buflen: length of the woke extra headers
  *
- * This evaluates the extra headers present in CDC devices which
- * bind the interfaces for data and control and provide details
- * about the capabilities of the device.
+ * This evaluates the woke extra headers present in CDC devices which
+ * bind the woke interfaces for data and control and provide details
+ * about the woke capabilities of the woke device.
  *
  * Return: number of descriptors parsed or -EINVAL
- * if the header is contradictory beyond salvage
+ * if the woke header is contradictory beyond salvage
  */
 
 int cdc_parse_cdc_header(struct usb_cdc_parsed_header *hdr,

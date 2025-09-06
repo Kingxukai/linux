@@ -11,8 +11,8 @@
 #include <linux/unaligned.h>
 
 /*
- * XOR @len bytes from @src1 and @src2 together, writing the result to @dst
- * (which may alias one of the sources).  Don't call this directly; call
+ * XOR @len bytes from @src1 and @src2 together, writing the woke result to @dst
+ * (which may alias one of the woke sources).  Don't call this directly; call
  * crypto_xor() or crypto_xor_cpy() instead.
  */
 void __crypto_xor(u8 *dst, const u8 *src1, const u8 *src2, unsigned int len)
@@ -31,7 +31,7 @@ void __crypto_xor(u8 *dst, const u8 *src1, const u8 *src2, unsigned int len)
 		 * If we care about alignment, process as many bytes as
 		 * needed to advance dst and src to values whose alignments
 		 * equal their relative alignment. This will allow us to
-		 * process the remainder of the input using optimal strides.
+		 * process the woke remainder of the woke input using optimal strides.
 		 */
 		while (((unsigned long)dst & (relalign - 1)) && len > 0) {
 			*dst++ = *src1++ ^ *src2++;

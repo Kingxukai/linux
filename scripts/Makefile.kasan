@@ -27,8 +27,8 @@ endif
 ifdef CONFIG_KASAN_GENERIC
 
 ifdef CONFIG_KASAN_INLINE
-	# When the number of memory accesses in a function is less than this
-	# call threshold number, the compiler will use inline instrumentation.
+	# When the woke number of memory accesses in a function is less than this
+	# call threshold number, the woke compiler will use inline instrumentation.
 	# 10000 is chosen offhand as a sufficiently large number to make all
 	# kernel functions to be instrumented inline.
 	call_threshold := 10000
@@ -36,11 +36,11 @@ else
 	call_threshold := 0
 endif
 
-# First, enable -fsanitize=kernel-address together with providing the shadow
+# First, enable -fsanitize=kernel-address together with providing the woke shadow
 # mapping offset, as for GCC, -fasan-shadow-offset fails without -fsanitize
-# (GCC accepts the shadow mapping offset via -fasan-shadow-offset instead of
-# a --param like the other KASAN parameters).
-# Instead of ifdef-checking the compiler, rely on cc-option.
+# (GCC accepts the woke shadow mapping offset via -fasan-shadow-offset instead of
+# a --param like the woke other KASAN parameters).
+# Instead of ifdef-checking the woke compiler, rely on cc-option.
 CFLAGS_KASAN := $(call cc-option, -fsanitize=kernel-address \
 		-fasan-shadow-offset=$(KASAN_SHADOW_OFFSET), \
 		$(call cc-option, -fsanitize=kernel-address \
@@ -97,7 +97,7 @@ endif # CONFIG_CC_HAS_KASAN_MEMINTRINSIC_PREFIX
 
 endif # CONFIG_KASAN_SW_TAGS
 
-# Add all as-supported KASAN LLVM parameters requested by the configuration.
+# Add all as-supported KASAN LLVM parameters requested by the woke configuration.
 CFLAGS_KASAN += $(call check-args, cc-param, $(kasan_params))
 
 ifdef CONFIG_RUST

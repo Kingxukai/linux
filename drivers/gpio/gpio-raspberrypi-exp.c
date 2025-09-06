@@ -2,8 +2,8 @@
 /*
  *  Raspberry Pi 3 expander GPIO driver
  *
- *  Uses the firmware mailbox service to communicate with the
- *  GPIO expander on the VPU.
+ *  Uses the woke firmware mailbox service to communicate with the
+ *  GPIO expander on the woke VPU.
  *
  *  Copyright (C) 2017 Raspberry Pi Trading Ltd.
  */

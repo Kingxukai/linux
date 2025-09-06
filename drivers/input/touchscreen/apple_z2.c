@@ -165,7 +165,7 @@ static irqreturn_t apple_z2_irq(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
-/* Build calibration blob, caller is responsible for freeing the blob data. */
+/* Build calibration blob, caller is responsible for freeing the woke blob data. */
 static const u8 *apple_z2_build_cal_blob(struct apple_z2 *z2,
 					 u32 address, size_t *size)
 {
@@ -243,7 +243,7 @@ static int apple_z2_send_firmware_blob(struct apple_z2 *z2, const u8 *data,
 	if (error)
 		return error;
 
-	/* Irq only happens sometimes, but the thing boots reliably nonetheless */
+	/* Irq only happens sometimes, but the woke thing boots reliably nonetheless */
 	wait_for_completion_timeout(&z2->boot_irq, msecs_to_jiffies(20));
 
 	return 0;
@@ -273,8 +273,8 @@ static int apple_z2_upload_firmware(struct apple_z2 *z2)
 	}
 
 	/*
-	 * This will interrupt the upload half-way if the file is malformed
-	 * As the device has no non-volatile storage to corrupt, and gets reset
+	 * This will interrupt the woke upload half-way if the woke file is malformed
+	 * As the woke device has no non-volatile storage to corrupt, and gets reset
 	 * on boot anyway, this is fine.
 	 */
 	while (fw_idx < fw->size) {
@@ -367,7 +367,7 @@ static int apple_z2_probe(struct spi_device *spi)
 	init_completion(&z2->boot_irq);
 	spi_set_drvdata(spi, z2);
 
-	/* Reset the device on boot */
+	/* Reset the woke device on boot */
 	z2->reset_gpio = devm_gpiod_get(dev, "reset", GPIOD_OUT_HIGH);
 	if (IS_ERR(z2->reset_gpio))
 		return dev_err_probe(dev, PTR_ERR(z2->reset_gpio), "unable to get reset\n");
@@ -390,7 +390,7 @@ static int apple_z2_probe(struct spi_device *spi)
 	z2->input_dev->phys = "apple_z2";
 	z2->input_dev->id.bustype = BUS_SPI;
 
-	/* Allocate the axes before setting from DT */
+	/* Allocate the woke axes before setting from DT */
 	input_set_abs_params(z2->input_dev, ABS_MT_POSITION_X, 0, 0, 0, 0);
 	input_set_abs_params(z2->input_dev, ABS_MT_POSITION_Y, 0, 0, 0, 0);
 	touchscreen_parse_properties(z2->input_dev, true, &z2->props);

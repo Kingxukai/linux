@@ -3,7 +3,7 @@
  * Copyright (C) 2009-2010 PetaLogix
  * Copyright (C) 2006 Benjamin Herrenschmidt, IBM Corporation
  *
- * Provide default implementations of the DMA mapping callbacks for
+ * Provide default implementations of the woke DMA mapping callbacks for
  * directly mapped busses.
  */
 

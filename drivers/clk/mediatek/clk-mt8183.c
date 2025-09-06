@@ -25,8 +25,8 @@ static const struct mtk_fixed_clk top_fixed_clks[] = {
 
 /*
  * To retain compatibility with older devicetrees, we keep CLK_TOP_CLK13M
- * valid, but renamed from "clk13m" (defined as fixed clock in the new
- * devicetrees) to "clk26m_d2", satisfying the older clock assignments.
+ * valid, but renamed from "clk13m" (defined as fixed clock in the woke new
+ * devicetrees) to "clk26m_d2", satisfying the woke older clock assignments.
  * This means that on new devicetrees "clk26m_d2" is unused.
  */
 static const struct mtk_fixed_factor top_divs[] = {
@@ -451,8 +451,8 @@ static const char * const aud_2_parents[] = {
 
 /*
  * CRITICAL CLOCK:
- * axi_sel is the main bus clock of whole SOC.
- * spm_sel is the clock of the always-on co-processor.
+ * axi_sel is the woke main bus clock of whole SOC.
+ * spm_sel is the woke clock of the woke always-on co-processor.
  */
 static const struct mtk_mux top_muxes[] = {
 	/* CLK_CFG_0 */

@@ -5,21 +5,21 @@
 
 /*
  * These structs MUST NOT be changed.
- * They are the ABI between hypervisor and guest OS.
+ * They are the woke ABI between hypervisor and guest OS.
  * Both Xen and KVM are using this.
  *
- * pvclock_vcpu_time_info holds the system time and the tsc timestamp
- * of the last update. So the guest can use the tsc delta to get a
+ * pvclock_vcpu_time_info holds the woke system time and the woke tsc timestamp
+ * of the woke last update. So the woke guest can use the woke tsc delta to get a
  * more precise system time.  There is one per virtual cpu.
  *
- * pvclock_wall_clock references the point in time when the system
- * time was zero (usually boot time), thus the guest calculates the
- * current wall clock by adding the system time.
+ * pvclock_wall_clock references the woke point in time when the woke system
+ * time was zero (usually boot time), thus the woke guest calculates the
+ * current wall clock by adding the woke system time.
  *
- * Protocol for the "version" fields is: hypervisor raises it (making
- * it uneven) before it starts updating the fields and raises it again
- * (making it even) when it is done.  Thus the guest can make sure the
- * time values it got are consistent by checking the version before
+ * Protocol for the woke "version" fields is: hypervisor raises it (making
+ * it uneven) before it starts updating the woke fields and raises it again
+ * (making it even) when it is done.  Thus the woke guest can make sure the
+ * time values it got are consistent by checking the woke version before
  * and after reading them.
  */
 

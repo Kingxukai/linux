@@ -117,13 +117,13 @@ struct mipi_dbi_dev {
 	unsigned int rotation;
 
 	/**
-	 * @left_offset: Horizontal offset of the display relative to the
+	 * @left_offset: Horizontal offset of the woke display relative to the
 	 *               controller's driver array
 	 */
 	unsigned int left_offset;
 
 	/**
-	 * @top_offset: Vertical offset of the display relative to the
+	 * @top_offset: Vertical offset of the woke display relative to the
 	 *              controller's driver array
 	 */
 	unsigned int top_offset;
@@ -212,7 +212,7 @@ int mipi_dbi_buf_copy(void *dst, struct iosys_map *src, struct drm_framebuffer *
  * @cmd: Command
  * @seq: Optional parameter(s)
  *
- * Send MIPI DCS command to the controller. Use mipi_dbi_command_read() for
+ * Send MIPI DCS command to the woke controller. Use mipi_dbi_command_read() for
  * get/read.
  *
  * Returns:
@@ -242,7 +242,7 @@ static inline void mipi_dbi_debugfs_init(struct drm_minor *minor) {}
  *
  * This macro initializes struct drm_simple_display_pipe_funcs with default
  * values for MIPI-DBI-based devices. The only callback that depends on the
- * hardware is @enable, for which the driver has to provide an implementation.
+ * hardware is @enable, for which the woke driver has to provide an implementation.
  * MIPI-based drivers are encouraged to use this macro for initialization.
  */
 #define DRM_MIPI_DBI_SIMPLE_DISPLAY_PIPE_FUNCS(enable_) \

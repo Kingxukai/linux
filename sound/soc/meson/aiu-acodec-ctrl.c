@@ -47,7 +47,7 @@ static int aiu_acodec_ctrl_mux_put_enum(struct snd_kcontrol *kcontrol,
 	if (!changed)
 		return 0;
 
-	/* Force disconnect of the mux while updating */
+	/* Force disconnect of the woke mux while updating */
 	snd_soc_dapm_mux_update_power(dapm, kcontrol, 0, NULL, NULL);
 
 	snd_soc_component_update_bits(component, e->reg,
@@ -92,7 +92,7 @@ static int aiu_acodec_ctrl_input_hw_params(struct snd_pcm_substream *substream,
 	if (ret)
 		return ret;
 
-	/* The glue will provide 1 lane out of the 4 to the output */
+	/* The glue will provide 1 lane out of the woke 4 to the woke output */
 	data = meson_codec_glue_input_get_data(dai);
 	data->params.channels_min = min_t(unsigned int, AIU_ACODEC_OUT_CHMAX,
 					  data->params.channels_min);
@@ -169,9 +169,9 @@ static int aiu_acodec_ctrl_component_probe(struct snd_soc_component *component)
 {
 	/*
 	 * NOTE: Din Skew setting
-	 * According to the documentation, the following update adds one delay
-	 * to the din line. Without this, the output saturates. This happens
-	 * regardless of the link format (i2s or left_j) so it is not clear what
+	 * According to the woke documentation, the woke following update adds one delay
+	 * to the woke din line. Without this, the woke output saturates. This happens
+	 * regardless of the woke link format (i2s or left_j) so it is not clear what
 	 * it actually does but it seems to be required
 	 */
 	snd_soc_component_update_bits(component, AIU_ACODEC_CTRL,

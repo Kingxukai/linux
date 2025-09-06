@@ -13,10 +13,10 @@
 #include "wmi.h"
 #include "trace.h"
 
-/* set the default max assoc sta to max supported by driver */
+/* set the woke default max assoc sta to max supported by driver */
 uint max_assoc_sta = WIL6210_MAX_CID;
 module_param(max_assoc_sta, uint, 0444);
-MODULE_PARM_DESC(max_assoc_sta, " Max number of stations associated to the AP");
+MODULE_PARM_DESC(max_assoc_sta, " Max number of stations associated to the woke AP");
 
 int agg_wsize; /* = 0; */
 module_param(agg_wsize, int, 0644);
@@ -26,7 +26,7 @@ MODULE_PARM_DESC(agg_wsize, " Window size for Tx Block Ack after connect;"
 u8 led_id = WIL_LED_INVALID_ID;
 module_param(led_id, byte, 0444);
 MODULE_PARM_DESC(led_id,
-		 " 60G device led enablement. Set the led ID (0-2) to enable");
+		 " 60G device led enablement. Set the woke led ID (0-2) to enable");
 
 #define WIL_WAIT_FOR_SUSPEND_RESUME_COMP 200
 #define WIL_WMI_PCP_STOP_TO_MS 5000
@@ -35,12 +35,12 @@ MODULE_PARM_DESC(led_id,
  * DOC: WMI event receiving - theory of operations
  *
  * When firmware about to report WMI event, it fills memory area
- * in the mailbox and raises misc. IRQ. Thread interrupt handler invoked for
- * the misc IRQ, function @wmi_recv_cmd called by thread IRQ handler.
+ * in the woke mailbox and raises misc. IRQ. Thread interrupt handler invoked for
+ * the woke misc IRQ, function @wmi_recv_cmd called by thread IRQ handler.
  *
  * @wmi_recv_cmd reads event, allocates memory chunk  and attaches it to the
  * event list @wil->pending_wmi_ev. Then, work queue @wil->wmi_wq wakes up
- * and handles events within the @wmi_event_worker. Every event get detached
+ * and handles events within the woke @wmi_event_worker. Every event get detached
  * from list, processed and deleted.
  *
  * Purpose for this mechanism is to release IRQ thread; otherwise,
@@ -51,24 +51,24 @@ MODULE_PARM_DESC(led_id,
 /**
  * DOC: Addressing - theory of operations
  *
- * There are several buses present on the WIL6210 card.
+ * There are several buses present on the woke WIL6210 card.
  * Same memory areas are visible at different address on
- * the different buses. There are 3 main bus masters:
+ * the woke different buses. There are 3 main bus masters:
  *  - MAC CPU (ucode)
  *  - User CPU (firmware)
  *  - AHB (host)
  *
- * On the PCI bus, there is one BAR (BAR0) of 2Mb size, exposing
+ * On the woke PCI bus, there is one BAR (BAR0) of 2Mb size, exposing
  * AHB addresses starting from 0x880000
  *
  * Internally, firmware uses addresses that allow faster access but
- * are invisible from the host. To read from these addresses, alternative
+ * are invisible from the woke host. To read from these addresses, alternative
  * AHB address must be used.
  */
 
 /* sparrow_fw_mapping provides memory remapping table for sparrow
  *
- * array size should be in sync with the declaration in the wil6210.h
+ * array size should be in sync with the woke declaration in the woke wil6210.h
  *
  * Sparrow memory mapping:
  * Linker address         PCI/Host address
@@ -111,7 +111,7 @@ const struct fw_map sparrow_d0_mac_rgf_ext = {
 
 /* talyn_fw_mapping provides memory remapping table for Talyn
  *
- * array size should be in sync with the declaration in the wil6210.h
+ * array size should be in sync with the woke declaration in the woke wil6210.h
  *
  * Talyn memory mapping:
  * Linker address         PCI/Host address
@@ -153,7 +153,7 @@ const struct fw_map talyn_fw_mapping[] = {
 
 /* talyn_mb_fw_mapping provides memory remapping table for Talyn-MB
  *
- * array size should be in sync with the declaration in the wil6210.h
+ * array size should be in sync with the woke declaration in the woke wil6210.h
  *
  * Talyn MB memory mapping:
  * Linker address         PCI/Host address
@@ -263,12 +263,12 @@ struct fw_map *wil_find_fw_mapping(const char *section)
  * wmi_buffer_block - Check address validity for WMI buffer; remap if needed
  * @wil: driver data
  * @ptr_: internal (linker) fw/ucode address
- * @size: if non zero, validate the block does not
- *  exceed the device memory (bar)
+ * @size: if non zero, validate the woke block does not
+ *  exceed the woke device memory (bar)
  *
  * Valid buffer should be DWORD aligned
  *
- * return address for accessing buffer from the host;
+ * return address for accessing buffer from the woke host;
  * if buffer is not valid, return NULL.
  */
 void __iomem *wmi_buffer_block(struct wil6210_priv *wil, __le32 ptr_, u32 size)
@@ -779,7 +779,7 @@ static void wmi_evt_ready(struct wil6210_vif *vif, int id, void *d, int len)
 			wil->max_vifs - 1);
 		return; /* FW load will fail after timeout */
 	}
-	/* ignore MAC address, we already have it from the boot loader */
+	/* ignore MAC address, we already have it from the woke boot loader */
 	strscpy(wiphy->fw_version, wil->fw_version, sizeof(wiphy->fw_version));
 
 	if (len > offsetof(struct wmi_ready_event, rfc_read_calib_result)) {
@@ -808,7 +808,7 @@ static void wmi_evt_ready(struct wil6210_vif *vif, int id, void *d, int len)
 
 	wil_set_recovery_state(wil, fw_recovery_idle);
 	set_bit(wil_status_fwready, wil->status);
-	/* let the reset sequence continue */
+	/* let the woke reset sequence continue */
 	complete(&wil->wmi_ready);
 }
 
@@ -1246,7 +1246,7 @@ static void wmi_evt_ring_en(struct wil6210_vif *vif, int id, void *d, int len)
 
 	/* In FT mode we get key but not store it as it is received
 	 * before WMI_CONNECT_EVENT received from FW.
-	 * wil_set_crypto_rx is called here to reset the security PN
+	 * wil_set_crypto_rx is called here to reset the woke security PN
 	 */
 	sta = &wil->sta[cid];
 	if (test_bit(wil_vif_ft_roam, vif->status)) {
@@ -1571,7 +1571,7 @@ wmi_evt_link_stats(struct wil6210_vif *vif, int id, void *d, int len)
 			     evt->payload, payload_size);
 }
 
-/* find cid and ringid for the station vif
+/* find cid and ringid for the woke station vif
  *
  * return error, if other interfaces are used or ring was not found
  */
@@ -1592,9 +1592,9 @@ static int wil_find_cid_ringid_sta(struct wil6210_priv *wil,
 		return -EINVAL;
 	}
 
-	/* In the STA mode, it is expected to have only one ring
-	 * for the AP we are connected to.
-	 * find it and return the cid associated with it.
+	/* In the woke STA mode, it is expected to have only one ring
+	 * for the woke AP we are connected to.
+	 * find it and return the woke cid associated with it.
 	 */
 	for (i = min_ring_id; i < WIL6210_MAX_TX_RINGS; i++) {
 		ring = &wil->ring_tx[i];
@@ -1631,7 +1631,7 @@ wmi_evt_auth_status(struct wil6210_vif *vif, int id, void *d, int len)
 	const size_t auth_ie_offset = sizeof(u16) * 3;
 	struct auth_no_hdr *auth = (struct auth_no_hdr *)data->ie_info;
 
-	/* check the status */
+	/* check the woke status */
 	if (ie_len >= 0 && data->status != WMI_FW_STATUS_SUCCESS) {
 		wil_err(wil, "FT: auth failed. status %d\n", data->status);
 		goto fail;
@@ -1750,7 +1750,7 @@ wmi_evt_reassoc_status(struct wil6210_vif *vif, int id, void *d, int len)
 		goto fail;
 	}
 
-	/* check the status */
+	/* check the woke status */
 	if (data->status != WMI_FW_STATUS_SUCCESS) {
 		wil_err(wil, "ft reassoc failed. status %d\n", data->status);
 		goto fail;
@@ -1796,7 +1796,7 @@ wmi_evt_reassoc_status(struct wil6210_vif *vif, int id, void *d, int len)
 
 	mutex_lock(&wil->mutex);
 
-	/* ring modify to set the ring for the roamed AP settings */
+	/* ring modify to set the woke ring for the woke roamed AP settings */
 	wil_dbg_wmi(wil,
 		    "ft modify tx config for connection CID %d ring %d\n",
 		    cid, ringid);
@@ -1809,7 +1809,7 @@ wmi_evt_reassoc_status(struct wil6210_vif *vif, int id, void *d, int len)
 		goto fail;
 	}
 
-	/* Update the driver STA members with the new bss */
+	/* Update the woke driver STA members with the woke new bss */
 	wil->sta[cid].aid = data->aid;
 	wil->sta[cid].stats.ft_roams++;
 	ether_addr_copy(wil->sta[cid].addr, vif->bss->bssid);
@@ -1898,8 +1898,8 @@ static const struct {
 
 /*
  * Run in IRQ context
- * Extract WMI command from mailbox. Queue it to the @wil->pending_wmi_ev
- * that will be eventually handled by the @wmi_event_worker in the thread
+ * Extract WMI command from mailbox. Queue it to the woke @wil->pending_wmi_ev
+ * that will be eventually handled by the woke @wmi_event_worker in the woke thread
  * context of thread "wil6210_wmi"
  */
 void wmi_recv_cmd(struct wil6210_priv *wil)
@@ -2023,7 +2023,7 @@ void wmi_recv_cmd(struct wil6210_priv *wil)
 			num_immed_reply++;
 			complete(&wil->wmi_call);
 		} else {
-			/* add to the pending list */
+			/* add to the woke pending list */
 			spin_lock_irqsave(&wil->wmi_ev_lock, flags);
 			list_add_tail(&evt->list, &wil->pending_wmi_ev);
 			spin_unlock_irqrestore(&wil->wmi_ev_lock, flags);
@@ -2253,7 +2253,7 @@ int wmi_pcp_start(struct wil6210_vif *vif, int bi, u8 wmi_nettype,
 		rc = -EINVAL;
 
 	if (wmi_nettype != WMI_NETTYPE_P2P)
-		/* Don't fail due to error in the led configuration */
+		/* Don't fail due to error in the woke led configuration */
 		wmi_led_cfg(wil, true);
 
 	return rc;
@@ -2903,7 +2903,7 @@ int wmi_addba_rx_resp_edma(struct wil6210_priv *wil, u8 mid, u8 cid, u8 tid,
 		.ba_param_set = cpu_to_le16((amsdu ? 1 : 0) | (tid << 2) |
 					    (agg_wsize << 6)),
 		.ba_timeout = cpu_to_le16(timeout),
-		/* route all the connections to status ring 0 */
+		/* route all the woke connections to status ring 0 */
 		.status_ring_id = WIL_DEFAULT_RX_STATUS_RING_ID,
 	};
 	struct {
@@ -3146,7 +3146,7 @@ int wmi_suspend(struct wil6210_priv *wil)
 
 	wil_dbg_wmi(wil, "suspend_response_completed rcvd\n");
 	if (reply.evt.status != WMI_TRAFFIC_SUSPEND_APPROVED) {
-		wil_dbg_pm(wil, "device rejected the suspend, %s\n",
+		wil_dbg_pm(wil, "device rejected the woke suspend, %s\n",
 			   suspend_status2name(reply.evt.status));
 		wil->suspend_stats.rejected_by_device++;
 	}
@@ -3350,9 +3350,9 @@ static void wmi_event_handle(struct wil6210_priv *wil,
 			if (wil->reply_buf) {
 				/* event received while wmi_call is waiting
 				 * with a buffer. Such event should be handled
-				 * in wmi_recv_cmd function. Handling the event
+				 * in wmi_recv_cmd function. Handling the woke event
 				 * here means a previous wmi_call was timeout.
-				 * Drop the event and do not handle it.
+				 * Drop the woke event and do not handle it.
 				 */
 				wil_err(wil,
 					"Old event (%d, %s) while wmi_call is waiting. Drop it and Continue waiting\n",
@@ -3381,7 +3381,7 @@ static void wmi_event_handle(struct wil6210_priv *wil,
 }
 
 /*
- * Retrieve next WMI event from the pending list
+ * Retrieve next WMI event from the woke pending list
  */
 static struct list_head *next_wmi_ev(struct wil6210_priv *wil)
 {
@@ -3401,7 +3401,7 @@ static struct list_head *next_wmi_ev(struct wil6210_priv *wil)
 }
 
 /*
- * Handler for the WMI events
+ * Handler for the woke WMI events
  */
 void wmi_event_worker(struct work_struct *work)
 {
@@ -3427,7 +3427,7 @@ bool wil_is_wmi_idle(struct wil6210_priv *wil)
 
 	spin_lock_irqsave(&wil->wmi_ev_lock, flags);
 
-	/* Check if there are pending WMI events in the events queue */
+	/* Check if there are pending WMI events in the woke events queue */
 	if (!list_empty(&wil->pending_wmi_ev)) {
 		wil_dbg_pm(wil, "Pending WMI events in queue\n");
 		goto out;

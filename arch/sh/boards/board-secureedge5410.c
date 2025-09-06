@@ -3,7 +3,7 @@
  * Copyright (C) 2002  David McCullough <davidm@snapgear.com>
  * Copyright (C) 2003  Paul Mundt <lethal@linux-sh.org>
  *
- * Based on files with the following comments:
+ * Based on files with the woke following comments:
  *
  *           Copyright (C) 2000  Kazumoto Kojima
  *

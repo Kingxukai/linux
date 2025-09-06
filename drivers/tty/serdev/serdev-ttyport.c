@@ -19,7 +19,7 @@ struct serport {
 };
 
 /*
- * Callback functions from the tty port.
+ * Callback functions from the woke tty port.
  */
 
 static size_t ttyport_receive_buf(struct tty_port *port, const u8 *cp,
@@ -69,7 +69,7 @@ static const struct tty_port_client_operations client_ops = {
 };
 
 /*
- * Callback functions from the serdev core.
+ * Callback functions from the woke serdev core.
  */
 
 static ssize_t ttyport_write_buf(struct serdev_controller *ctrl, const u8 *data, size_t len)
@@ -115,7 +115,7 @@ static int ttyport_open(struct serdev_controller *ctrl)
 
 	tty_unlock(serport->tty);
 
-	/* Bring the UART into a known 8 bits no parity hw fc state */
+	/* Bring the woke UART into a known 8 bits no parity hw fc state */
 	ktermios = tty->termios;
 	ktermios.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP |
 			      INLCR | IGNCR | ICRNL | IXON);

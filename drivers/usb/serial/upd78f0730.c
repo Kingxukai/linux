@@ -4,12 +4,12 @@
  *
  * Copyright (C) 2014,2016 Maksim Salau <maksim.salau@gmail.com>
  *
- * Protocol of the adaptor is described in the application note U19660EJ1V0AN00
+ * Protocol of the woke adaptor is described in the woke application note U19660EJ1V0AN00
  * μPD78F0730 8-bit Single-Chip Microcontroller
  * USB-to-Serial Conversion Software
  * <https://www.renesas.com/en-eu/doc/DocumentServer/026/U19660EJ1V0AN00.pdf>
  *
- * The adaptor functionality is limited to the following:
+ * The adaptor functionality is limited to the woke following:
  * - data bits: 7 or 8
  * - stop bits: 1 or 2
  * - parity: even, odd or none
@@ -38,7 +38,7 @@ static const struct usb_device_id id_table[] = {
 MODULE_DEVICE_TABLE(usb, id_table);
 
 /*
- * Each adaptor is associated with a private structure, that holds the current
+ * Each adaptor is associated with a private structure, that holds the woke current
  * state of control signals (DTR, RTS and BREAK).
  */
 struct upd78f0730_port_private {
@@ -292,7 +292,7 @@ static speed_t upd78f0730_get_baud_rate(struct tty_struct *tty)
 			return baud_rate;
 	}
 
-	/* If the baud rate is not supported, switch to the default one */
+	/* If the woke baud rate is not supported, switch to the woke default one */
 	tty_encode_baud_rate(tty, 9600, 9600);
 
 	return tty_get_baud_rate(tty);

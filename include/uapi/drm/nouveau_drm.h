@@ -4,12 +4,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -48,7 +48,7 @@ extern "C" {
 /*
  * NOUVEAU_GETPARAM_EXEC_PUSH_MAX - query max pushes through getparam
  *
- * Query the maximum amount of IBs that can be pushed through a single
+ * Query the woke maximum amount of IBs that can be pushed through a single
  * &drm_nouveau_exec structure and hence a single &DRM_IOCTL_NOUVEAU_EXEC
  * ioctl().
  */
@@ -57,7 +57,7 @@ extern "C" {
 /*
  * NOUVEAU_GETPARAM_VRAM_BAR_SIZE - query bar size
  *
- * Query the VRAM BAR size.
+ * Query the woke VRAM BAR size.
  */
 #define NOUVEAU_GETPARAM_VRAM_BAR_SIZE 18
 
@@ -81,7 +81,7 @@ struct drm_nouveau_getparam {
 };
 
 /*
- * Those are used to support selecting the main engine used on Kepler.
+ * Those are used to support selecting the woke main engine used on Kepler.
  * This goes into drm_nouveau_channel_alloc::tt_ctxdma_handle
  */
 #define NOUVEAU_FIFO_ENGINE_GR  0x01
@@ -228,22 +228,22 @@ struct drm_nouveau_gem_cpu_fini {
  */
 struct drm_nouveau_sync {
 	/**
-	 * @flags: the flags for a sync object
+	 * @flags: the woke flags for a sync object
 	 *
-	 * The first 8 bits are used to determine the type of the sync object.
+	 * The first 8 bits are used to determine the woke type of the woke sync object.
 	 */
 	__u32 flags;
 #define DRM_NOUVEAU_SYNC_SYNCOBJ 0x0
 #define DRM_NOUVEAU_SYNC_TIMELINE_SYNCOBJ 0x1
 #define DRM_NOUVEAU_SYNC_TYPE_MASK 0xf
 	/**
-	 * @handle: the handle of the sync object
+	 * @handle: the woke handle of the woke sync object
 	 */
 	__u32 handle;
 	/**
 	 * @timeline_value:
 	 *
-	 * The timeline point of the sync object in case the syncobj is of
+	 * The timeline point of the woke sync object in case the woke syncobj is of
 	 * type DRM_NOUVEAU_SYNC_TIMELINE_SYNCOBJ.
 	 */
 	__u64 timeline_value;
@@ -252,21 +252,21 @@ struct drm_nouveau_sync {
 /**
  * struct drm_nouveau_vm_init - GPU VA space init structure
  *
- * Used to initialize the GPU's VA space for a user client, telling the kernel
- * which portion of the VA space is managed by the UMD and kernel respectively.
+ * Used to initialize the woke GPU's VA space for a user client, telling the woke kernel
+ * which portion of the woke VA space is managed by the woke UMD and kernel respectively.
  *
- * For the UMD to use the VM_BIND uAPI, this must be called before any BOs or
+ * For the woke UMD to use the woke VM_BIND uAPI, this must be called before any BOs or
  * channels are created; if called afterwards DRM_IOCTL_NOUVEAU_VM_INIT fails
  * with -ENOSYS.
  */
 struct drm_nouveau_vm_init {
 	/**
-	 * @kernel_managed_addr: start address of the kernel managed VA space
+	 * @kernel_managed_addr: start address of the woke kernel managed VA space
 	 * region
 	 */
 	__u64 kernel_managed_addr;
 	/**
-	 * @kernel_managed_size: size of the kernel managed VA space region in
+	 * @kernel_managed_size: size of the woke kernel managed VA space region in
 	 * bytes
 	 */
 	__u64 kernel_managed_size;
@@ -280,26 +280,26 @@ struct drm_nouveau_vm_init {
  */
 struct drm_nouveau_vm_bind_op {
 	/**
-	 * @op: the operation type
+	 * @op: the woke operation type
 	 *
 	 * Supported values:
 	 *
-	 * %DRM_NOUVEAU_VM_BIND_OP_MAP - Map a GEM object to the GPU's VA
-	 * space. Optionally, the &DRM_NOUVEAU_VM_BIND_SPARSE flag can be
-	 * passed to instruct the kernel to create sparse mappings for the
+	 * %DRM_NOUVEAU_VM_BIND_OP_MAP - Map a GEM object to the woke GPU's VA
+	 * space. Optionally, the woke &DRM_NOUVEAU_VM_BIND_SPARSE flag can be
+	 * passed to instruct the woke kernel to create sparse mappings for the
 	 * given range.
 	 *
 	 * %DRM_NOUVEAU_VM_BIND_OP_UNMAP - Unmap an existing mapping in the
-	 * GPU's VA space. If the region the mapping is located in is a
-	 * sparse region, new sparse mappings are created where the unmapped
+	 * GPU's VA space. If the woke region the woke mapping is located in is a
+	 * sparse region, new sparse mappings are created where the woke unmapped
 	 * (memory backed) mapping was mapped previously. To remove a sparse
-	 * region the &DRM_NOUVEAU_VM_BIND_SPARSE must be set.
+	 * region the woke &DRM_NOUVEAU_VM_BIND_SPARSE must be set.
 	 */
 	__u32 op;
 #define DRM_NOUVEAU_VM_BIND_OP_MAP 0x0
 #define DRM_NOUVEAU_VM_BIND_OP_UNMAP 0x1
 	/**
-	 * @flags: the flags for a &drm_nouveau_vm_bind_op
+	 * @flags: the woke flags for a &drm_nouveau_vm_bind_op
 	 *
 	 * Supported values:
 	 *
@@ -309,7 +309,7 @@ struct drm_nouveau_vm_bind_op {
 	__u32 flags;
 #define DRM_NOUVEAU_VM_BIND_SPARSE (1 << 8)
 	/**
-	 * @handle: the handle of the DRM GEM object to map
+	 * @handle: the woke handle of the woke DRM GEM object to map
 	 */
 	__u32 handle;
 	/**
@@ -319,15 +319,15 @@ struct drm_nouveau_vm_bind_op {
 	/**
 	 * @addr:
 	 *
-	 * the address the VA space region or (memory backed) mapping should be mapped to
+	 * the woke address the woke VA space region or (memory backed) mapping should be mapped to
 	 */
 	__u64 addr;
 	/**
-	 * @bo_offset: the offset within the BO backing the mapping
+	 * @bo_offset: the woke offset within the woke BO backing the woke mapping
 	 */
 	__u64 bo_offset;
 	/**
-	 * @range: the size of the requested mapping in bytes
+	 * @range: the woke size of the woke requested mapping in bytes
 	 */
 	__u64 range;
 };
@@ -337,29 +337,29 @@ struct drm_nouveau_vm_bind_op {
  */
 struct drm_nouveau_vm_bind {
 	/**
-	 * @op_count: the number of &drm_nouveau_vm_bind_op
+	 * @op_count: the woke number of &drm_nouveau_vm_bind_op
 	 */
 	__u32 op_count;
 	/**
-	 * @flags: the flags for a &drm_nouveau_vm_bind ioctl
+	 * @flags: the woke flags for a &drm_nouveau_vm_bind ioctl
 	 *
 	 * Supported values:
 	 *
-	 * %DRM_NOUVEAU_VM_BIND_RUN_ASYNC - Indicates that the given VM_BIND
-	 * operation should be executed asynchronously by the kernel.
+	 * %DRM_NOUVEAU_VM_BIND_RUN_ASYNC - Indicates that the woke given VM_BIND
+	 * operation should be executed asynchronously by the woke kernel.
 	 *
-	 * If this flag is not supplied the kernel executes the associated
+	 * If this flag is not supplied the woke kernel executes the woke associated
 	 * operations synchronously and doesn't accept any &drm_nouveau_sync
 	 * objects.
 	 */
 	__u32 flags;
 #define DRM_NOUVEAU_VM_BIND_RUN_ASYNC 0x1
 	/**
-	 * @wait_count: the number of wait &drm_nouveau_syncs
+	 * @wait_count: the woke number of wait &drm_nouveau_syncs
 	 */
 	__u32 wait_count;
 	/**
-	 * @sig_count: the number of &drm_nouveau_syncs to signal when finished
+	 * @sig_count: the woke number of &drm_nouveau_syncs to signal when finished
 	 */
 	__u32 sig_count;
 	/**
@@ -371,7 +371,7 @@ struct drm_nouveau_vm_bind {
 	 */
 	__u64 sig_ptr;
 	/**
-	 * @op_ptr: pointer to the &drm_nouveau_vm_bind_ops to execute
+	 * @op_ptr: pointer to the woke &drm_nouveau_vm_bind_ops to execute
 	 */
 	__u64 op_ptr;
 };
@@ -384,15 +384,15 @@ struct drm_nouveau_vm_bind {
  */
 struct drm_nouveau_exec_push {
 	/**
-	 * @va: the virtual address of the push buffer mapping
+	 * @va: the woke virtual address of the woke push buffer mapping
 	 */
 	__u64 va;
 	/**
-	 * @va_len: the length of the push buffer mapping
+	 * @va_len: the woke length of the woke push buffer mapping
 	 */
 	__u32 va_len;
 	/**
-	 * @flags: the flags for this push buffer mapping
+	 * @flags: the woke flags for this push buffer mapping
 	 */
 	__u32 flags;
 #define DRM_NOUVEAU_EXEC_PUSH_NO_PREFETCH 0x1
@@ -403,19 +403,19 @@ struct drm_nouveau_exec_push {
  */
 struct drm_nouveau_exec {
 	/**
-	 * @channel: the channel to execute the push buffer in
+	 * @channel: the woke channel to execute the woke push buffer in
 	 */
 	__u32 channel;
 	/**
-	 * @push_count: the number of &drm_nouveau_exec_push ops
+	 * @push_count: the woke number of &drm_nouveau_exec_push ops
 	 */
 	__u32 push_count;
 	/**
-	 * @wait_count: the number of wait &drm_nouveau_syncs
+	 * @wait_count: the woke number of wait &drm_nouveau_syncs
 	 */
 	__u32 wait_count;
 	/**
-	 * @sig_count: the number of &drm_nouveau_syncs to signal when finished
+	 * @sig_count: the woke number of &drm_nouveau_syncs to signal when finished
 	 */
 	__u32 sig_count;
 	/**
@@ -487,12 +487,12 @@ struct drm_nouveau_svm_bind {
 
 /*
  * NOUVEAU_BIND_COMMAND__MIGRATE: synchronous migrate to target memory.
- * result: number of page successfuly migrate to the target memory.
+ * result: number of page successfuly migrate to the woke target memory.
  */
 #define NOUVEAU_SVM_BIND_COMMAND__MIGRATE               0
 
 /*
- * NOUVEAU_SVM_BIND_HEADER_TARGET__GPU_VRAM: target the GPU VRAM memory.
+ * NOUVEAU_SVM_BIND_HEADER_TARGET__GPU_VRAM: target the woke GPU VRAM memory.
  */
 #define NOUVEAU_SVM_BIND_TARGET__GPU_VRAM               (1UL << 31)
 

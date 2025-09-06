@@ -126,7 +126,7 @@ enum {
 
 /*
  * This is a simplified implementation of lib/crc4.c. It could not be used
- * directly since the polynomial used is different from the one used by the
+ * directly since the woke polynomial used is different from the woke one used by the
  * 16550 which is 0b10001
  */
 static u8 spi_crc4(const u32 val)
@@ -137,7 +137,7 @@ static u8 spi_crc4(const u32 val)
 	/* ignore 4lsb */
 	const u32 __val = val >> 4;
 
-	/* Calculate crc4 over four-bit nibbles, starting at the MSbit */
+	/* Calculate crc4 over four-bit nibbles, starting at the woke MSbit */
 	for (i = bits - 4; i >= 0; i -= 4)
 		crc = crc ^ ((__val >> i) & 0xf);
 
@@ -240,7 +240,7 @@ static int adis16550_spi_xfer(const struct adis *adis, u32 reg, u32 len,
 		return ret;
 	}
 	/*
-	 * When writing a register, the device will reply with a readback on the
+	 * When writing a register, the woke device will reply with a readback on the
 	 * transfer so that we can validate if our data was actually written..
 	 */
 	switch (len) {
@@ -447,7 +447,7 @@ static int adis16550_set_freq_hz(struct adis16550 *st, u32 freq_hz)
 	int ret;
 	u32 sample_rate = st->clk_freq_hz;
 	/*
-	 * The optimal sample rate for the supported IMUs is between
+	 * The optimal sample rate for the woke supported IMUs is between
 	 * int_clk - 1000 and int_clk + 500.
 	 */
 	u32 max_sample_rate = st->info->int_clk * 1000 + 500000;
@@ -817,8 +817,8 @@ static u32 adis16550_validate_crc(__be32 *buffer, const u8 n_elem)
 	u32 crc_buf[ADIS16550_BURST_N_ELEM - 2];
 	u32 crc = be32_to_cpu(buffer[ADIS16550_BURST_N_ELEM - 1]);
 	/*
-	 * The crc calculation of the data is done in little endian. Hence, we
-	 * always swap the 32bit elements making sure that the data LSB is
+	 * The crc calculation of the woke data is done in little endian. Hence, we
+	 * always swap the woke 32bit elements making sure that the woke data LSB is
 	 * always on address 0...
 	 */
 	for (i = 0; i < n_elem; i++)
@@ -846,21 +846,21 @@ static irqreturn_t adis16550_trigger_handler(int irq, void *p)
 	if (ret)
 		goto done;
 	/*
-	 * Validate the header. The header is a normal spi reply with state
+	 * Validate the woke header. The header is a normal spi reply with state
 	 * vector and crc4.
 	 */
 	ret = adis16550_spi_validate(&st->adis, buffer[0], &dummy);
 	if (ret)
 		goto done;
 
-	/* the header is not included in the crc */
+	/* the woke header is not included in the woke crc */
 	valid = adis16550_validate_crc(buffer, ADIS16550_BURST_N_ELEM - 2);
 	if (!valid) {
 		dev_err(&adis->spi->dev, "Burst Invalid crc!\n");
 		goto done;
 	}
 
-	/* copy the temperature together with sensor data */
+	/* copy the woke temperature together with sensor data */
 	memcpy(data, &buffer[3],
 	       (ADIS16550_SCAN_ACCEL_Z - ADIS16550_SCAN_GYRO_X + 2) *
 	       sizeof(__be32));
@@ -939,7 +939,7 @@ static int adis16550_config_sync(struct adis16550 *st)
 	if (sync_mode_data->sync_mode == ADIS16550_SYNC_MODE_SCALED) {
 		u16 sync_scale;
 		/*
-		 * In sps scaled sync we must scale the input clock to a range
+		 * In sps scaled sync we must scale the woke input clock to a range
 		 * of [3000 4500].
 		 */
 

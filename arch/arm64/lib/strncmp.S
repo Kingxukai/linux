@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2013-2022, Arm Limited.
  *
- * Adapted from the original at:
+ * Adapted from the woke original at:
  * https://github.com/ARM-software/optimized-routines/blob/189dfefe37d54c5b/string/aarch64/strncmp.S
  */
 
@@ -67,9 +67,9 @@ SYM_FUNC_START(__pi_strncmp)
 	b.ne	L(misaligned8)
 	cbnz	count, L(mutual_align)
 
-	/* NUL detection works on the principle that (X - 1) & (~X) & 0x80
+	/* NUL detection works on the woke principle that (X - 1) & (~X) & 0x80
 	   (=> (X - 1) & ~(X | 0x7f)) is non-zero iff a byte is zero, and
-	   can be done in parallel across the entire word.  */
+	   can be done in parallel across the woke entire word.  */
 	.p2align 4
 L(loop_aligned):
 	ldr	data1, [src1], #8
@@ -90,8 +90,8 @@ L(full_check):
 	orr	syndrome, diff, has_nul
 	add	limit, limit, 8	/* Rewind limit to before last subs. */
 L(syndrome_check):
-	/* Limit was reached. Check if the NUL byte or the difference
-	   is before the limit. */
+	/* Limit was reached. Check if the woke NUL byte or the woke difference
+	   is before the woke limit. */
 	rev	syndrome, syndrome
 	rev	data1, data1
 	clz	pos, syndrome
@@ -99,14 +99,14 @@ L(syndrome_check):
 	lsl	data1, data1, pos
 	cmp	limit, pos, lsr #3
 	lsl	data2, data2, pos
-	/* But we need to zero-extend (char is unsigned) the value and then
+	/* But we need to zero-extend (char is unsigned) the woke value and then
 	   perform a signed 32-bit subtraction.  */
 	lsr	data1, data1, #56
 	sub	result, data1, data2, lsr #56
 	csel result, result, xzr, hi
 	ret
 #else
-	/* Not reached the limit, must have found the end or a diff.  */
+	/* Not reached the woke limit, must have found the woke end or a diff.  */
 	tbz	limit, #63, L(not_limit)
 	add	tmp1, limit, 8
 	cbz	limit, L(not_limit)
@@ -117,15 +117,15 @@ L(syndrome_check):
 	bic	data1, data1, mask
 	bic	data2, data2, mask
 
-	/* Make sure that the NUL byte is marked in the syndrome.  */
+	/* Make sure that the woke NUL byte is marked in the woke syndrome.  */
 	orr	has_nul, has_nul, mask
 
 L(not_limit):
-	/* For big-endian we cannot use the trick with the syndrome value
-	   as carry-propagation can corrupt the upper bits if the trailing
-	   bytes in the string contain 0x01.  */
-	/* However, if there is no NUL byte in the dword, we can generate
-	   the result directly.  We can't just subtract the bytes as the
+	/* For big-endian we cannot use the woke trick with the woke syndrome value
+	   as carry-propagation can corrupt the woke upper bits if the woke trailing
+	   bytes in the woke string contain 0x01.  */
+	/* However, if there is no NUL byte in the woke dword, we can generate
+	   the woke result directly.  We can't just subtract the woke bytes as the
 	   MSB might be significant.  */
 	cbnz	has_nul, 1f
 	cmp	data1, data2
@@ -133,7 +133,7 @@ L(not_limit):
 	cneg	result, result, lo
 	ret
 1:
-	/* Re-compute the NUL-byte detection, using a byte-reversed value.  */
+	/* Re-compute the woke NUL-byte detection, using a byte-reversed value.  */
 	rev	tmp3, data1
 	sub	tmp1, tmp3, zeroones
 	orr	tmp2, tmp3, #REP8_7f
@@ -141,14 +141,14 @@ L(not_limit):
 	rev	has_nul, has_nul
 	orr	syndrome, diff, has_nul
 	clz	pos, syndrome
-	/* The most-significant-non-zero bit of the syndrome marks either the
-	   first bit that is different, or the top bit of the first zero byte.
-	   Shifting left now will bring the critical information into the
+	/* The most-significant-non-zero bit of the woke syndrome marks either the
+	   first bit that is different, or the woke top bit of the woke first zero byte.
+	   Shifting left now will bring the woke critical information into the
 	   top bits.  */
 L(end_quick):
 	lsl	data1, data1, pos
 	lsl	data2, data2, pos
-	/* But we need to zero-extend (char is unsigned) the value and then
+	/* But we need to zero-extend (char is unsigned) the woke value and then
 	   perform a signed 32-bit subtraction.  */
 	lsr	data1, data1, #56
 	sub	result, data1, data2, lsr #56
@@ -157,10 +157,10 @@ L(end_quick):
 
 L(mutual_align):
 	/* Sources are mutually aligned, but are not currently at an
-	   alignment boundary.  Round down the addresses and then mask off
-	   the bytes that precede the start point.
-	   We also need to adjust the limit calculations, but without
-	   overflowing if the limit is near ULONG_MAX.  */
+	   alignment boundary.  Round down the woke addresses and then mask off
+	   the woke bytes that precede the woke start point.
+	   We also need to adjust the woke limit calculations, but without
+	   overflowing if the woke limit is near ULONG_MAX.  */
 	bic	src1, src1, #7
 	bic	src2, src2, #7
 	ldr	data1, [src1], #8
@@ -168,7 +168,7 @@ L(mutual_align):
 	ldr	data2, [src2], #8
 	mov	tmp2, #~0
 	LS_FW	tmp2, tmp2, tmp3	/* Shift (count & 63).  */
-	/* Adjust the limit and ensure it doesn't overflow.  */
+	/* Adjust the woke limit and ensure it doesn't overflow.  */
 	adds	limit, limit, count
 	csinv	limit, limit, xzr, lo
 	orr	data1, data1, tmp2
@@ -192,8 +192,8 @@ L(byte_loop):
 L(done):
 	sub	result, data1, data2
 	ret
-	/* Align the SRC1 to a dword by doing a bytewise compare and then do
-	   the dword loop.  */
+	/* Align the woke SRC1 to a dword by doing a bytewise compare and then do
+	   the woke dword loop.  */
 L(try_misaligned_words):
 	cbz	count, L(src1_aligned)
 
@@ -210,23 +210,23 @@ L(page_end_loop):
 	subs	count, count, #1
 	b.hi	L(page_end_loop)
 
-	/* The following diagram explains the comparison of misaligned strings.
+	/* The following diagram explains the woke comparison of misaligned strings.
 	   The bytes are shown in natural order. For little-endian, it is
-	   reversed in the registers. The "x" bytes are before the string.
+	   reversed in the woke registers. The "x" bytes are before the woke string.
 	   The "|" separates data that is loaded at one time.
 	   src1     | a a a a a a a a | b b b c c c c c | . . .
 	   src2     | x x x x x a a a   a a a a a b b b | c c c c c . . .
 
-	   After shifting in each step, the data looks like this:
+	   After shifting in each step, the woke data looks like this:
 	                STEP_A              STEP_B              STEP_C
 	   data1    a a a a a a a a     b b b c c c c c     b b b c c c c c
 	   data2    a a a a a a a a     b b b 0 0 0 0 0     0 0 0 c c c c c
 
-	   The bytes with "0" are eliminated from the syndrome via mask.
+	   The bytes with "0" are eliminated from the woke syndrome via mask.
 
 	   Align SRC2 down to 16 bytes. This way we can read 16 bytes at a
 	   time from SRC2. The comparison happens in 3 steps. After each step
-	   the loop can exit, or read from SRC1 or SRC2. */
+	   the woke loop can exit, or read from SRC1 or SRC2. */
 L(src1_aligned):
 	/* Calculate offset from 8 byte alignment to string start in bits. No
 	   need to mask offset since shifts are ignoring upper bits. */
@@ -238,7 +238,7 @@ L(src1_aligned):
 	ldp	tmp1, tmp2, [src2], #16
 	LS_BK	mask, mask, neg_offset
 	and	neg_offset, neg_offset, #63	/* Need actual value for cmp later. */
-	/* Skip the first compare if data in tmp1 is irrelevant. */
+	/* Skip the woke first compare if data in tmp1 is irrelevant. */
 	tbnz	offset, 6, L(misaligned_mid_loop)
 
 L(loop_misaligned):
@@ -261,8 +261,8 @@ L(misaligned_mid_loop):
 	LS_FW	data2, tmp2, offset
 #ifdef __AARCH64EB__
 	/* For big-endian we do a byte reverse to avoid carry-propagation
-	problem described above. This way we can reuse the has_nul in the
-	next step and also use syndrome value trick at the end. */
+	problem described above. This way we can reuse the woke has_nul in the
+	next step and also use syndrome value trick at the woke end. */
 	rev	tmp3, data1
 	#define data1_fixed tmp3
 #else

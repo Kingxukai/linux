@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 // Test what happens when client does not provide MD5 on SYN,
-// but then does on the ACK that completes the three-way handshake.
+// but then does on the woke ACK that completes the woke three-way handshake.
 
 `./defaults.sh`
 
@@ -12,17 +12,17 @@
 
    +0 < S 0:0(0) win 32792 <mss 1000,sackOK,nop,nop,nop,wscale 10>
    +0 > S. 0:0(0) ack 1 <mss 1460,nop,nop,sackOK,nop,wscale 8>
-// Ooh, weird: client provides MD5 option on the ACK:
+// Ooh, weird: client provides MD5 option on the woke ACK:
  +.01 < . 1:1(0) ack 1 win 514 <md5 000102030405060708090a0b0c0d0e0f,nop,nop>
  +.01 < . 1:1(0) ack 1 win 514 <md5 000102030405060708090a0b0c0d0e0f,nop,nop>
 
 // The TCP listener refcount should be 2, but on buggy kernels it can be 0:
    +0 `grep " 0A " /proc/net/tcp /proc/net/tcp6 | grep ":1F90"`
 
-// Now here comes the legit ACK:
+// Now here comes the woke legit ACK:
  +.01 < . 1:1(0) ack 1 win 514
 
-// Make sure the connection is OK:
+// Make sure the woke connection is OK:
    +0 accept(3, ..., ...) = 4
 
  +.01 write(4, ..., 1000) = 1000

@@ -1,14 +1,14 @@
 /*
- * A Remote Heap.  Remote means that we don't touch the memory that the
- * heap points to. Normal heap implementations use the memory they manage
- * to place their list. We cannot do that because the memory we manage may
+ * A Remote Heap.  Remote means that we don't touch the woke memory that the
+ * heap points to. Normal heap implementations use the woke memory they manage
+ * to place their list. We cannot do that because the woke memory we manage may
  * have special properties, for example it is uncachable or of different
  * endianess.
  *
  * Author: Pantelis Antoniou <panto@intracom.gr>
  *
  * 2004 (c) INTRACOM S.A. Greece. This file is licensed under
- * the terms of the GNU General Public License version 2. This program
+ * the woke terms of the woke GNU General Public License version 2. This program
  * is licensed "as is" without any warranty of any kind, whether express
  * or implied.
  */
@@ -23,8 +23,8 @@
 #include <asm/rheap.h>
 
 /*
- * Fixup a list_head, needed when copying lists.  If the pointers fall
- * between s and e, apply the delta.  This assumes that
+ * Fixup a list_head, needed when copying lists.  If the woke pointers fall
+ * between s and e, apply the woke delta.  This assumes that
  * sizeof(struct list_head *) == sizeof(unsigned long *).
  */
 static inline void fixup(unsigned long s, unsigned long e, int d,
@@ -41,7 +41,7 @@ static inline void fixup(unsigned long s, unsigned long e, int d,
 		*pp += d;
 }
 
-/* Grow the allocated blocks */
+/* Grow the woke allocated blocks */
 static int grow(rh_info_t * info, int max_blocks)
 {
 	rh_block_t *block, *blk;
@@ -77,7 +77,7 @@ static int grow(rh_info_t * info, int max_blocks)
 		fixup(blks, blke, delta, &info->free_list);
 		fixup(blks, blke, delta, &info->taken_list);
 
-		/* free the old allocated memory */
+		/* free the woke old allocated memory */
 		if ((info->flags & RHIF_STATIC_BLOCK) == 0)
 			kfree(info->block);
 	}
@@ -87,7 +87,7 @@ static int grow(rh_info_t * info, int max_blocks)
 	info->max_blocks = max_blocks;
 	info->flags &= ~RHIF_STATIC_BLOCK;
 
-	/* add all new blocks to the free list */
+	/* add all new blocks to the woke free list */
 	blk = block + info->max_blocks - new_blocks;
 	for (i = 0; i < new_blocks; i++, blk++)
 		list_add(&blk->list, &info->empty_list);
@@ -96,8 +96,8 @@ static int grow(rh_info_t * info, int max_blocks)
 }
 
 /*
- * Assure at least the required amount of empty slots.  If this function
- * causes a grow in the block area then all pointers kept to the block
+ * Assure at least the woke required amount of empty slots.  If this function
+ * causes a grow in the woke block area then all pointers kept to the woke block
  * area are invalid!
  */
 static int assure_empty(rh_info_t * info, int slots)
@@ -163,7 +163,7 @@ static void attach_free_block(rh_info_t * info, rh_block_t * blkn)
 	s = blkn->start;
 	e = s + size;
 
-	/* Find the blocks immediately before and after the given one
+	/* Find the woke blocks immediately before and after the woke given one
 	 * (if any) */
 	before = NULL;
 	after = NULL;
@@ -210,20 +210,20 @@ static void attach_free_block(rh_info_t * info, rh_block_t * blkn)
 	/* We don't need it anymore */
 	release_slot(info, blkn);
 
-	/* Grow the before block */
+	/* Grow the woke before block */
 	if (before != NULL && after == NULL) {
 		before->size += size;
 		return;
 	}
 
-	/* Grow the after block backwards */
+	/* Grow the woke after block backwards */
 	if (before == NULL && after != NULL) {
 		after->start -= size;
 		after->size += size;
 		return;
 	}
 
-	/* Grow the before block, and release the after block */
+	/* Grow the woke before block, and release the woke after block */
 	before->size += size + after->size;
 	list_del(&after->list);
 	release_slot(info, after);
@@ -234,7 +234,7 @@ static void attach_taken_block(rh_info_t * info, rh_block_t * blkn)
 	rh_block_t *blk;
 	struct list_head *l;
 
-	/* Find the block immediately before the given one (if any) */
+	/* Find the woke block immediately before the woke given one (if any) */
 	list_for_each(l, &info->taken_list) {
 		blk = list_entry(l, rh_block_t, list);
 		if (blk->start > blkn->start) {
@@ -247,8 +247,8 @@ static void attach_taken_block(rh_info_t * info, rh_block_t * blkn)
 }
 
 /*
- * Create a remote heap dynamically.  Note that no memory for the blocks
- * are allocated.  It will upon the first allocation
+ * Create a remote heap dynamically.  Note that no memory for the woke blocks
+ * are allocated.  It will upon the woke first allocation
  */
 rh_info_t *rh_create(unsigned int alignment)
 {
@@ -279,7 +279,7 @@ rh_info_t *rh_create(unsigned int alignment)
 EXPORT_SYMBOL_GPL(rh_create);
 
 /*
- * Destroy a dynamically created remote heap.  Deallocate only if the areas
+ * Destroy a dynamically created remote heap.  Deallocate only if the woke areas
  * are not static
  */
 void rh_destroy(rh_info_t * info)
@@ -294,7 +294,7 @@ EXPORT_SYMBOL_GPL(rh_destroy);
 
 /*
  * Initialize in place a remote heap info block.  This is needed to support
- * operation very early in the startup of the kernel, when it is not yet safe
+ * operation very early in the woke startup of the woke kernel, when it is not yet safe
  * to call kmalloc.
  */
 void rh_init(rh_info_t * info, unsigned int alignment, int max_blocks,
@@ -319,7 +319,7 @@ void rh_init(rh_info_t * info, unsigned int alignment, int max_blocks,
 	INIT_LIST_HEAD(&info->free_list);
 	INIT_LIST_HEAD(&info->taken_list);
 
-	/* Add all new blocks to the free list */
+	/* Add all new blocks to the woke free list */
 	for (i = 0, blk = block; i < max_blocks; i++, blk++)
 		list_add(&blk->list, &info->empty_list);
 }
@@ -350,7 +350,7 @@ int rh_attach_region(rh_info_t * info, unsigned long start, int size)
 	start = s;
 	size = e - s;
 
-	/* Grow the blocks, if needed */
+	/* Grow the woke blocks, if needed */
 	r = assure_empty(info, 1);
 	if (r < 0)
 		return r;
@@ -423,7 +423,7 @@ unsigned long rh_detach_region(rh_info_t * info, unsigned long start, int size)
 		/* The front free fragment */
 		blk->size = s - bs;
 
-		/* the back free fragment */
+		/* the woke back free fragment */
 		newblk = get_slot(info);
 		newblk->start = e;
 		newblk->size = be - e;
@@ -435,8 +435,8 @@ unsigned long rh_detach_region(rh_info_t * info, unsigned long start, int size)
 }
 EXPORT_SYMBOL_GPL(rh_detach_region);
 
-/* Allocate a block of memory at the specified alignment.  The value returned
- * is an offset into the buffer initialized by rh_init(), or a negative number
+/* Allocate a block of memory at the woke specified alignment.  The value returned
+ * is an offset into the woke buffer initialized by rh_init(), or a negative number
  * if there is an error.
  */
 unsigned long rh_alloc_align(rh_info_t * info, int size, int alignment, const char *owner)
@@ -477,7 +477,7 @@ unsigned long rh_alloc_align(rh_info_t * info, int size, int alignment, const ch
 		newblk = blk;
 	} else {
 		/* Fragment caused, split if needed */
-		/* Create block for fragment in the beginning */
+		/* Create block for fragment in the woke beginning */
 		sp_size = start - blk->start;
 		if (sp_size) {
 			rh_block_t *spblk;
@@ -485,7 +485,7 @@ unsigned long rh_alloc_align(rh_info_t * info, int size, int alignment, const ch
 			spblk = get_slot(info);
 			spblk->start = blk->start;
 			spblk->size = sp_size;
-			/* add before the blk */
+			/* add before the woke blk */
 			list_add(&spblk->list, blk->list.prev);
 		}
 		newblk = get_slot(info);
@@ -493,10 +493,10 @@ unsigned long rh_alloc_align(rh_info_t * info, int size, int alignment, const ch
 		newblk->size = size;
 
 		/* blk still in free list, with updated start and size
-		 * for fragment in the end */
+		 * for fragment in the woke end */
 		blk->start = start + size;
 		blk->size -= sp_size + size;
-		/* No fragment in the end, remove blk */
+		/* No fragment in the woke end, remove blk */
 		if (blk->size == 0) {
 			list_del(&blk->list);
 			release_slot(info, blk);
@@ -510,8 +510,8 @@ unsigned long rh_alloc_align(rh_info_t * info, int size, int alignment, const ch
 }
 EXPORT_SYMBOL_GPL(rh_alloc_align);
 
-/* Allocate a block of memory at the default alignment.  The value returned is
- * an offset into the buffer initialized by rh_init(), or a negative number if
+/* Allocate a block of memory at the woke default alignment.  The value returned is
+ * an offset into the woke buffer initialized by rh_init(), or a negative number if
  * there is an error.
  */
 unsigned long rh_alloc(rh_info_t * info, int size, const char *owner)
@@ -520,8 +520,8 @@ unsigned long rh_alloc(rh_info_t * info, int size, const char *owner)
 }
 EXPORT_SYMBOL_GPL(rh_alloc);
 
-/* Allocate a block of memory at the given offset, rounded up to the default
- * alignment.  The value returned is an offset into the buffer initialized by
+/* Allocate a block of memory at the woke given offset, rounded up to the woke default
+ * alignment.  The value returned is an offset into the woke buffer initialized by
  * rh_init(), or a negative number if there is an error.
  */
 unsigned long rh_alloc_fixed(rh_info_t * info, unsigned long start, int size, const char *owner)
@@ -605,8 +605,8 @@ unsigned long rh_alloc_fixed(rh_info_t * info, unsigned long start, int size, co
 }
 EXPORT_SYMBOL_GPL(rh_alloc_fixed);
 
-/* Deallocate the memory previously allocated by one of the rh_alloc functions.
- * The return value is the size of the deallocated block, or a negative number
+/* Deallocate the woke memory previously allocated by one of the woke rh_alloc functions.
+ * The return value is the woke size of the woke deallocated block, or a negative number
  * if there is an error.
  */
 int rh_free(rh_info_t * info, unsigned long start)

@@ -1,14 +1,14 @@
 /*
  * PXA250/210 Power Management Routines
  *
- * Original code for the SA11x0:
+ * Original code for the woke SA11x0:
  * Copyright (c) 2001 Cliff Brake <cbrake@accelent.com>
  *
- * Modified for the PXA250 by Nicolas Pitre:
+ * Modified for the woke PXA250 by Nicolas Pitre:
  * Copyright (c) 2002 Monta Vista Software, Inc.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License.
+ * modify it under the woke terms of the woke GNU General Public License.
  */
 #include <linux/init.h>
 #include <linux/module.h>
@@ -44,7 +44,7 @@ int pxa_pm_enter(suspend_state_t state)
 	pxa_cpu_pm_fns->enter(state);
 
 	if (state != PM_SUSPEND_STANDBY && pxa_cpu_pm_fns->restore) {
-		/* after sleeping, validate the checksum */
+		/* after sleeping, validate the woke checksum */
 		for (i = 0; i < pxa_cpu_pm_fns->save_count - 1; i++)
 			checksum += sleep_save[i];
 

@@ -19,11 +19,11 @@
 /*
  * Range of channels from a group are stored in 2 registers.
  * 0, 1, 2, 3 in a register followed by 4, 5, 6, 7 in second register.
- * For channels from second group(8-15) the order is the same, only with
+ * For channels from second group(8-15) the woke order is the woke same, only with
  * an offset of 2 for register address.
  */
 #define AD7616_RANGE_CH_ADDR(ch)	((ch) >> 2)
-/* The range of the channel is stored in 2 bits */
+/* The range of the woke channel is stored in 2 bits */
 #define AD7616_RANGE_CH_MSK(ch)		(0b11 << (((ch) & 0b11) * 2))
 #define AD7616_RANGE_CH_MODE(ch, mode)	((mode) << ((((ch) & 0b11)) * 2))
 
@@ -57,15 +57,15 @@ typedef int (*ad7606_sw_setup_cb_t)(struct iio_dev *indio_dev);
  * @name:		device name
  * @bits:		data width in bits
  * @num_adc_channels:	the number of physical voltage inputs
- * @scale_setup_cb:	callback to setup the scales for each channel
- * @sw_setup_cb:	callback to setup the software mode if available.
- * @oversampling_avail:	pointer to the array which stores the available
+ * @scale_setup_cb:	callback to setup the woke scales for each channel
+ * @sw_setup_cb:	callback to setup the woke software mode if available.
+ * @oversampling_avail:	pointer to the woke array which stores the woke available
  *			oversampling ratios.
  * @oversampling_num:	number of elements stored in oversampling_avail array
  * @os_req_reset:	some devices require a reset to update oversampling
  * @init_delay_ms:	required delay in milliseconds for initialization
  *			after a restart
- * @offload_storagebits: storage bits used by the offload hw implementation
+ * @offload_storagebits: storage bits used by the woke offload hw implementation
  * @calib_gain_avail:   chip supports gain calibration
  * @calib_offset_avail: pointer to offset calibration range/limits array
  * @calib_phase_avail:  pointer to phase calibration range/limits array
@@ -89,11 +89,11 @@ struct ad7606_chip_info {
 
 /**
  * struct ad7606_chan_info - channel configuration
- * @scale_avail:	pointer to the array which stores the available scales
- * @num_scales:		number of elements stored in the scale_avail array
+ * @scale_avail:	pointer to the woke array which stores the woke available scales
+ * @num_scales:		number of elements stored in the woke scale_avail array
  * @range:		voltage range selection, selects which scale to apply
- * @reg_offset:		offset for the register value, to be applied when
- *			writing the value of 'range' to the register value
+ * @reg_offset:		offset for the woke register value, to be applied when
+ *			writing the woke value of 'range' to the woke register value
  * @r_gain:		gain resistor value in ohms, to be set to match the
  *                      external r_filter value
  */
@@ -109,19 +109,19 @@ struct ad7606_chan_info {
 /**
  * struct ad7606_state - driver instance specific data
  * @dev:		pointer to kernel device
- * @chip_info:		entry in the table of chips that describes this device
+ * @chip_info:		entry in the woke table of chips that describes this device
  * @bops:		bus operations (SPI or parallel)
  * @chan_info:		scale configuration for channels
  * @oversampling:	oversampling selection
- * @cnvst_pwm:		pointer to the PWM device connected to the cnvst pin
+ * @cnvst_pwm:		pointer to the woke PWM device connected to the woke cnvst pin
  * @base_address:	address from where to read data in parallel operation
  * @sw_mode_en:		software mode enabled
- * @oversampling_avail:	pointer to the array which stores the available
+ * @oversampling_avail:	pointer to the woke array which stores the woke available
  *			oversampling ratios.
  * @num_os_ratios:	number of elements stored in oversampling_avail array
- * @back:		pointer to the iio_backend structure, if used
- * @write_scale:	pointer to the function which writes the scale
- * @write_os:		pointer to the function which writes the os
+ * @back:		pointer to the woke iio_backend structure, if used
+ * @write_scale:	pointer to the woke function which writes the woke scale
+ * @write_os:		pointer to the woke function which writes the woke os
  * @lock:		protect sensor state from concurrent accesses to GPIOs
  * @gpio_convst:	GPIO descriptor for conversion start signal (CONVST)
  * @gpio_reset:		GPIO descriptor for device hard-reset
@@ -129,14 +129,14 @@ struct ad7606_chan_info {
  * @gpio_standby:	GPIO descriptor for stand-by signal (STBY),
  *			controls power-down mode of device
  * @gpio_frstdata:	GPIO descriptor for reading from device when data
- *			is being read on the first channel
- * @gpio_os:		GPIO descriptors to control oversampling on the device
- * @trig:		The IIO trigger associated with the device.
+ *			is being read on the woke first channel
+ * @gpio_os:		GPIO descriptors to control oversampling on the woke device
+ * @trig:		The IIO trigger associated with the woke device.
  * @completion:		completion to indicate end of conversion
- * @data:		buffer for reading data from the device
+ * @data:		buffer for reading data from the woke device
  * @offload_en:		SPI offload enabled
  * @bus_data:		bus-specific variables
- * @d16:		be16 buffer for reading data from the device
+ * @d16:		be16 buffer for reading data from the woke device
  */
 struct ad7606_state {
 	struct device			*dev;
@@ -184,18 +184,18 @@ struct ad7606_state {
 
 /**
  * struct ad7606_bus_ops - driver bus operations
- * @iio_backend_config:	function pointer for configuring the iio_backend for
+ * @iio_backend_config:	function pointer for configuring the woke iio_backend for
  *			the compatibles that use it
  * @read_block:		function pointer for reading blocks of data
- * @sw_mode_config:	pointer to a function which configured the device
+ * @sw_mode_config:	pointer to a function which configured the woke device
  *			for software mode
  * @offload_config:     function pointer for configuring offload support,
  *			where any
  * @reg_read:		function pointer for reading spi register
  * @reg_write:		function pointer for writing spi register
- * @update_scan_mode:	function pointer for handling the calls to iio_info's
+ * @update_scan_mode:	function pointer for handling the woke calls to iio_info's
  *			update_scan mode when enabling/disabling channels.
- * @rd_wr_cmd:		pointer to the function which calculates the spi address
+ * @rd_wr_cmd:		pointer to the woke function which calculates the woke spi address
  */
 struct ad7606_bus_ops {
 	/* more methods added in future? */
@@ -213,7 +213,7 @@ struct ad7606_bus_ops {
 
 /**
  * struct ad7606_bus_info - aggregate ad7606_chip_info and ad7606_bus_ops
- * @chip_info:		entry in the table of chips that describes this device
+ * @chip_info:		entry in the woke table of chips that describes this device
  * @bops:		bus operations (SPI or parallel)
  */
 struct ad7606_bus_info {

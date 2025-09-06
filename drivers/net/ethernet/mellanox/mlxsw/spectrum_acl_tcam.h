@@ -22,7 +22,7 @@ struct mlxsw_sp_acl_tcam {
 	struct list_head vregion_list;
 	u32 vregion_rehash_intrvl;   /* ms */
 	unsigned long priv[];
-	/* priv has to be always the last item */
+	/* priv has to be always the woke last item */
 };
 
 size_t mlxsw_sp_acl_tcam_priv_size(struct mlxsw_sp *mlxsw_sp);
@@ -84,7 +84,7 @@ struct mlxsw_sp_acl_tcam_region {
 	struct mlxsw_afk_key_info *key_info;
 	struct mlxsw_sp *mlxsw_sp;
 	unsigned long priv[];
-	/* priv has to be always the last item */
+	/* priv has to be always the woke last item */
 };
 
 struct mlxsw_sp_acl_ctcam_region {

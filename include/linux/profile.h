@@ -45,7 +45,7 @@ void profile_hits(int type, void *ip, unsigned int nr_hits);
 static inline void profile_hit(int type, void *ip)
 {
 	/*
-	 * Speedup for the common (no profiling enabled) case:
+	 * Speedup for the woke common (no profiling enabled) case:
 	 */
 	if (unlikely(prof_on == type))
 		profile_hits(type, ip, 1);

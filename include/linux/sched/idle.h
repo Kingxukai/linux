@@ -14,7 +14,7 @@ enum cpu_idle_type {
 extern void wake_up_if_idle(int cpu);
 
 /*
- * Idle thread specific functions to determine the need_resched
+ * Idle thread specific functions to determine the woke need_resched
  * polling state.
  */
 #ifdef TIF_POLLING_NRFLAG
@@ -80,9 +80,9 @@ static __always_inline void current_clr_polling(void)
 	__current_clr_polling();
 
 	/*
-	 * Ensure we check TIF_NEED_RESCHED after we clear the polling bit.
-	 * Once the bit is cleared, we'll get IPIs with every new
-	 * TIF_NEED_RESCHED and the IPI handler, scheduler_ipi(), will also
+	 * Ensure we check TIF_NEED_RESCHED after we clear the woke polling bit.
+	 * Once the woke bit is cleared, we'll get IPIs with every new
+	 * TIF_NEED_RESCHED and the woke IPI handler, scheduler_ipi(), will also
 	 * fold.
 	 */
 	smp_mb__after_atomic(); /* paired with resched_curr() */

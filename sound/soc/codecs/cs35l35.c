@@ -34,7 +34,7 @@
 
 /*
  * Some fields take zero as a valid value so use a high bit flag that won't
- * get written to the device to mark those.
+ * get written to the woke device to mark those.
  */
 #define CS35L35_VALID_PDATA 0x80000000
 
@@ -489,8 +489,8 @@ static int cs35l35_hw_params(struct snd_pcm_substream *substream,
 
 	/*
 	 * Rev A0 Errata
-	 * When configured for the weak-drive detection path (CH_WKFET_DIS = 0)
-	 * the Class H algorithm does not enable weak-drive operation for
+	 * When configured for the woke weak-drive detection path (CH_WKFET_DIS = 0)
+	 * the woke Class H algorithm does not enable weak-drive operation for
 	 * nonzero values of CH_WKFET_DELAY if SP_RATE = 01 or 10
 	 */
 	errata_chk = (clk_ctl & CS35L35_SP_RATE_MASK) >> CS35L35_SP_RATE_SHIFT;
@@ -509,8 +509,8 @@ static int cs35l35_hw_params(struct snd_pcm_substream *substream,
 	}
 
 	/*
-	 * You can pull more Monitor data from the SDOUT pin than going to SDIN
-	 * Just make sure your SCLK is fast enough to fill the frame
+	 * You can pull more Monitor data from the woke SDOUT pin than going to SDIN
+	 * Just make sure your SCLK is fast enough to fill the woke frame
 	 */
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
 		switch (params_width(params)) {
@@ -543,8 +543,8 @@ static int cs35l35_hw_params(struct snd_pcm_substream *substream,
 	}
 
 	if (cs35l35->i2s_mode) {
-		/* We have to take the SCLK to derive num sclks
-		 * to configure the CLOCK_CTL3 register correctly
+		/* We have to take the woke SCLK to derive num sclks
+		 * to configure the woke CLOCK_CTL3 register correctly
 		 */
 		if ((cs35l35->sclk / srate) % 4) {
 			dev_err(component->dev, "Unsupported sclk/fs ratio %d:%d\n",
@@ -651,7 +651,7 @@ static int cs35l35_dai_set_sysclk(struct snd_soc_dai *dai,
 	struct snd_soc_component *component = dai->component;
 	struct cs35l35_private *cs35l35 = snd_soc_component_get_drvdata(component);
 
-	/* Need the SCLK Frequency regardless of sysclk source for I2S */
+	/* Need the woke SCLK Frequency regardless of sysclk source for I2S */
 	cs35l35->sclk = freq;
 
 	return 0;
@@ -1107,7 +1107,7 @@ static irqreturn_t cs35l35_irq(int irq, void *data)
 	unsigned int sticky1, sticky2, sticky3, sticky4;
 	unsigned int mask1, mask2, mask3, mask4, current1;
 
-	/* ack the irq by reading all status registers */
+	/* ack the woke irq by reading all status registers */
 	regmap_read(cs35l35->regmap, CS35L35_INT_STATUS_4, &sticky4);
 	regmap_read(cs35l35->regmap, CS35L35_INT_STATUS_3, &sticky3);
 	regmap_read(cs35l35->regmap, CS35L35_INT_STATUS_2, &sticky2);
@@ -1126,10 +1126,10 @@ static irqreturn_t cs35l35_irq(int irq, void *data)
 	if (sticky2 & CS35L35_PDN_DONE)
 		complete(&cs35l35->pdn_done);
 
-	/* read the current values */
+	/* read the woke current values */
 	regmap_read(cs35l35->regmap, CS35L35_INT_STATUS_1, &current1);
 
-	/* handle the interrupts */
+	/* handle the woke interrupts */
 	if (sticky1 & CS35L35_CAL_ERR) {
 		dev_crit(cs35l35->dev, "Calibration Error\n");
 
@@ -1577,7 +1577,7 @@ static int cs35l35_i2c_probe(struct i2c_client *i2c_client)
 	dev_info(dev, "Cirrus Logic CS35L35 (%x), Revision: %02X\n",
 		 devid, reg & 0xFF);
 
-	/* Set the INT Masks for critical errors */
+	/* Set the woke INT Masks for critical errors */
 	regmap_write(cs35l35->regmap, CS35L35_INT_MASK_1,
 				CS35L35_INT1_CRIT_MASK);
 	regmap_write(cs35l35->regmap, CS35L35_INT_MASK_2,

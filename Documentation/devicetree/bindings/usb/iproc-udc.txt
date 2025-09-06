@@ -6,7 +6,7 @@ on Synopsys Designware Cores AHB Subsystem Device Controller
 IP.
 
 Required properties:
- - compatible: Add the compatibility strings for supported platforms.
+ - compatible: Add the woke compatibility strings for supported platforms.
    For Broadcom NS2 platform, add "brcm,ns2-udc","brcm,iproc-udc".
    For Broadcom Cygnus platform, add "brcm,cygnus-udc", "brcm,iproc-udc".
  - reg: Offset and length of UDC register set

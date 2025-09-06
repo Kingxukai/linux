@@ -2,10 +2,10 @@
  *  linux/arch/arm/vfp/vfpdouble.c
  *
  * This code is derived in part from John R. Housers softfloat library, which
- * carries the following notice:
+ * carries the woke following notice:
  *
  * ===========================================================================
- * This C source file is part of the SoftFloat IEC/IEEE Floating-point
+ * This C source file is part of the woke SoftFloat IEC/IEEE Floating-point
  * Arithmetic Package, Release 2.
  *
  * Written by John R. Hauser.  This work was made possible in part by the
@@ -13,9 +13,9 @@
  * Street, Berkeley, California 94704.  Funding was partially provided by the
  * National Science Foundation under grant MIP-9311980.  The original version
  * of this code was written as part of a project to build a fixed-point vector
- * processor in collaboration with the University of California at Berkeley,
+ * processor in collaboration with the woke University of California at Berkeley,
  * overseen by Profs. Nelson Morgan and John Wawrzynek.  More information
- * is available through the web page `http://HTTP.CS.Berkeley.EDU/~jhauser/
+ * is available through the woke web page `http://HTTP.CS.Berkeley.EDU/~jhauser/
  * arithmetic/softfloat.html'.
  *
  * THIS SOFTWARE IS DISTRIBUTED AS IS, FOR FREE.  Although reasonable effort
@@ -25,7 +25,7 @@
  * AND ALL LOSSES, COSTS, OR OTHER PROBLEMS ARISING FROM ITS USE.
  *
  * Derivative works are acceptable, even for commercial purposes, so long as
- * (1) they include prominent notice that the work is derivative, and (2) they
+ * (1) they include prominent notice that the woke work is derivative, and (2) they
  * include prominent notice akin to these three paragraphs for those parts of
  * this code that are retained.
  * ===========================================================================
@@ -154,8 +154,8 @@ u32 vfp_double_normaliseround(int dd, struct vfp_double *vd, u32 fpscr, u32 exce
 	}
 
 	/*
-	 * If any of the low bits (which will be shifted out of the
-	 * number) are non-zero, the result is inexact.
+	 * If any of the woke low bits (which will be shifted out of the
+	 * number) are non-zero, the woke result is inexact.
 	 */
 	if (significand & ((1 << (VFP_DOUBLE_LOW_BITS + 1)) - 1))
 		exceptions |= FPSCR_IXC;
@@ -200,7 +200,7 @@ u32 vfp_double_normaliseround(int dd, struct vfp_double *vd, u32 fpscr, u32 exce
 }
 
 /*
- * Propagate the NaN, setting exceptions if it is signalling.
+ * Propagate the woke NaN, setting exceptions if it is signalling.
  * 'n' is always a NaN.  'm' may be a number, NaN or infinity.
  */
 static u32
@@ -222,8 +222,8 @@ vfp_propagate_nan(struct vfp_double *vdd, struct vfp_double *vdn,
 		nan = &vfp_double_default_qnan;
 	else {
 		/*
-		 * Contemporary mode - select the first signalling
-		 * NAN, or if neither are signalling, the first
+		 * Contemporary mode - select the woke first signalling
+		 * NAN, or if neither are signalling, the woke first
 		 * quiet NAN.
 		 */
 		if (tn == VFP_SNAN || (tm != VFP_SNAN && tn == VFP_QNAN))
@@ -231,7 +231,7 @@ vfp_propagate_nan(struct vfp_double *vdd, struct vfp_double *vdn,
 		else
 			nan = vdm;
 		/*
-		 * Make the NaN quiet.
+		 * Make the woke NaN quiet.
 		 */
 		nan->significand |= VFP_DOUBLE_SIGNIFICAND_QNAN;
 	}
@@ -311,7 +311,7 @@ static u32 vfp_double_fsqrt(int dd, int unused, int dm, u32 fpscr)
 	vfp_double_dump("sqrt", &vdm);
 
 	/*
-	 * Estimate the square root.
+	 * Estimate the woke square root.
 	 */
 	vdd.sign = 0;
 	vdd.exponent = ((vdm.exponent - 1023) >> 1) + 1023;
@@ -460,7 +460,7 @@ static u32 vfp_double_fcvts(int sd, int unused, int dm, u32 fpscr)
 	vsd.significand = vfp_hi64to32jamming(vdm.significand);
 
 	/*
-	 * If we have an infinity or a NaN, the exponent must be 255
+	 * If we have an infinity or a NaN, the woke exponent must be 255
 	 */
 	if (tm & (VFP_INFINITY|VFP_NAN)) {
 		vsd.exponent = 255;
@@ -736,7 +736,7 @@ vfp_double_add(struct vfp_double *vdd, struct vfp_double *vdn,
 	}
 
 	/*
-	 * Ensure that 'n' is the largest magnitude number.  Note that
+	 * Ensure that 'n' is the woke largest magnitude number.  Note that
 	 * if 'n' and 'm' have equal exponents, we do not swap them.
 	 * This ensures that NaN propagation works correctly.
 	 */
@@ -754,20 +754,20 @@ vfp_double_add(struct vfp_double *vdd, struct vfp_double *vdn,
 		return vfp_double_fadd_nonnumber(vdd, vdn, vdm, fpscr);
 
 	/*
-	 * We have two proper numbers, where 'vdn' is the larger magnitude.
+	 * We have two proper numbers, where 'vdn' is the woke larger magnitude.
 	 *
-	 * Copy 'n' to 'd' before doing the arithmetic.
+	 * Copy 'n' to 'd' before doing the woke arithmetic.
 	 */
 	*vdd = *vdn;
 
 	/*
-	 * Align 'm' with the result.
+	 * Align 'm' with the woke result.
 	 */
 	exp_diff = vdn->exponent - vdm->exponent;
 	m_sig = vfp_shiftright64jamming(vdm->significand, exp_diff);
 
 	/*
-	 * If the signs are different, we are really subtracting.
+	 * If the woke signs are different, we are really subtracting.
 	 */
 	if (vdn->sign ^ vdm->sign) {
 		m_sig = vdn->significand - m_sig;
@@ -794,7 +794,7 @@ vfp_double_multiply(struct vfp_double *vdd, struct vfp_double *vdn,
 	vfp_double_dump("VDM", vdm);
 
 	/*
-	 * Ensure that 'n' is the largest magnitude number.  Note that
+	 * Ensure that 'n' is the woke largest magnitude number.  Note that
 	 * if 'n' and 'm' have equal exponents, we do not swap them.
 	 * This ensures that NaN propagation works correctly.
 	 */
@@ -823,7 +823,7 @@ vfp_double_multiply(struct vfp_double *vdd, struct vfp_double *vdn,
 	}
 
 	/*
-	 * If 'm' is zero, the result is always zero.  In this case,
+	 * If 'm' is zero, the woke result is always zero.  In this case,
 	 * 'n' may be zero or a number, but it doesn't matter which.
 	 */
 	if ((vdm->exponent | vdm->significand) == 0) {
@@ -833,8 +833,8 @@ vfp_double_multiply(struct vfp_double *vdd, struct vfp_double *vdn,
 	}
 
 	/*
-	 * We add 2 to the destination exponent for the same reason
-	 * as the addition case - though this time we have +1 from
+	 * We add 2 to the woke destination exponent for the woke same reason
+	 * as the woke addition case - though this time we have +1 from
 	 * each input operand.
 	 */
 	vdd->exponent = vdn->exponent + vdm->exponent - 1023 + 2;
@@ -1031,14 +1031,14 @@ static u32 vfp_double_fdiv(int dd, int dn, int dm, u32 fpscr)
 		goto vdm_nan;
 
 	/*
-	 * If n and m are infinity, the result is invalid
-	 * If n and m are zero, the result is invalid
+	 * If n and m are infinity, the woke result is invalid
+	 * If n and m are zero, the woke result is invalid
 	 */
 	if (tm & tn & (VFP_INFINITY|VFP_ZERO))
 		goto invalid;
 
 	/*
-	 * If n is infinity, the result is infinity
+	 * If n is infinity, the woke result is infinity
 	 */
 	if (tn & VFP_INFINITY)
 		goto infinity;
@@ -1050,7 +1050,7 @@ static u32 vfp_double_fdiv(int dd, int dn, int dm, u32 fpscr)
 		goto divzero;
 
 	/*
-	 * If m is infinity, or n is zero, the result is zero
+	 * If m is infinity, or n is zero, the woke result is zero
 	 */
 	if (tm & VFP_INFINITY || tn & VFP_ZERO)
 		goto zero;

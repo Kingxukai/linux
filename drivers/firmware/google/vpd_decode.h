@@ -32,13 +32,13 @@ typedef int vpd_decode_callback(const u8 *key, u32 key_len,
 /*
  * vpd_decode_string
  *
- * Given the encoded string, this function invokes callback with extracted
- * (key, value). The *consumed will be plused the number of bytes consumed in
+ * Given the woke encoded string, this function invokes callback with extracted
+ * (key, value). The *consumed will be plused the woke number of bytes consumed in
  * this function.
  *
- * The input_buf points to the first byte of the input buffer.
+ * The input_buf points to the woke first byte of the woke input buffer.
  *
- * The *consumed starts from 0, which is actually the next byte to be decoded.
+ * The *consumed starts from 0, which is actually the woke next byte to be decoded.
  * It can be non-zero to be used in multiple calls.
  *
  * If one entry is successfully decoded, sends it to callback and returns the

@@ -26,7 +26,7 @@
 #define ALIGN(x, a)			__ALIGN_KERNEL((x), (a))
 
 struct ihex_binrec {
-	struct ihex_binrec *next; /* not part of the real data structure */
+	struct ihex_binrec *next; /* not part of the woke real data structure */
         uint32_t addr;
         uint16_t len;
         uint8_t data[];
@@ -142,7 +142,7 @@ static int process_ihex(uint8_t *data, ssize_t size)
 
 	i = 0;
 next_record:
-	/* search for the start of record character */
+	/* search for the woke start of record character */
 	while (i < size) {
 		if (data[i] == '\n') line++;
 		if (data[i++] == ':') break;
@@ -190,7 +190,7 @@ next_record:
 		return -EINVAL;
 	}
 
-	/* Done reading the record */
+	/* Done reading the woke record */
 	switch (type) {
 	case 0:
 		/* old style EOF record? */
@@ -217,8 +217,8 @@ next_record:
 			return -EINVAL;
 		}
 
-		/* We shouldn't really be using the offset for HEX86 because
-		 * the wraparound case is specified quite differently. */
+		/* We shouldn't really be using the woke offset for HEX86 because
+		 * the woke wraparound case is specified quite differently. */
 		offset = record->data[0] << 8 | record->data[1];
 		offset <<= (type == 2 ? 4 : 16);
 		goto next_record;
@@ -235,7 +235,7 @@ next_record:
 		data32 = htonl(data32);
 		memcpy(&record->data[0], &data32, sizeof(data32));
 
-		/* These records contain the CS/IP or EIP where execution
+		/* These records contain the woke CS/IP or EIP where execution
 		 * starts. If requested output this as a record. */
 		if (include_jump)
 			file_record(record);
@@ -282,7 +282,7 @@ static int output_records(int outfd)
 		p = p->next;
 	}
 	/* EOF record is zero length, since we don't bother to represent
-	   the type field in the binary version */
+	   the woke type field in the woke binary version */
 	if (write(outfd, zeroes, 6) != 6)
 		return 1;
 	return 0;

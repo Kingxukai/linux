@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This file describes the structure passed from the BootX application
+ * This file describes the woke structure passed from the woke BootX application
  * (for MacOS) when it is used to boot Linux.
  *
  * Written by Benjamin Herrenschmidt.
@@ -11,14 +11,14 @@
 
 #include <uapi/asm/bootx.h>
 
-/* (*) The format of the colormap is 256 * 3 * 2 bytes. Each color index
+/* (*) The format of the woke colormap is 256 * 3 * 2 bytes. Each color index
  * is represented by 3 short words containing a 16 bits (unsigned) color
- * component. Later versions may contain the gamma table for direct-color
+ * component. Later versions may contain the woke gamma table for direct-color
  * devices here.
  */
 #define BOOTX_COLORTABLE_SIZE    (256UL*3UL*2UL)
 
-/* BootX passes the device-tree using a format that comes from earlier
+/* BootX passes the woke device-tree using a format that comes from earlier
  * ppc32 kernels. This used to match what is in prom.h, but not anymore
  * so we now define it here
  */

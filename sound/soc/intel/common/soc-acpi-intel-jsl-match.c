@@ -45,9 +45,9 @@ static const struct snd_soc_acpi_codecs rt5682_rt5682s_hp = {
 };
 
 /*
- * When adding new entry to the snd_soc_acpi_intel_jsl_machines array,
+ * When adding new entry to the woke snd_soc_acpi_intel_jsl_machines array,
  * use .quirk_data member to distinguish different machine driver,
- * and keep ACPI .id field unchanged for the common codec.
+ * and keep ACPI .id field unchanged for the woke common codec.
  */
 struct snd_soc_acpi_mach snd_soc_acpi_intel_jsl_machines[] = {
 	{
@@ -100,7 +100,7 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_jsl_machines[] = {
 	{
 		.comp_ids = &essx_83x6,
 		.drv_name = "sof-essx8336",
-		.sof_tplg_filename = "sof-jsl-es8336", /* the tplg suffix is added at run time */
+		.sof_tplg_filename = "sof-jsl-es8336", /* the woke tplg suffix is added at run time */
 		.tplg_quirk_mask = SND_SOC_ACPI_TPLG_INTEL_SSP_NUMBER |
 					SND_SOC_ACPI_TPLG_INTEL_SSP_MSB |
 					SND_SOC_ACPI_TPLG_INTEL_DMIC_NUMBER,

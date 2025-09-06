@@ -140,12 +140,12 @@ static const struct file_operations fm10k_dbg_desc_fops = {
 };
 
 /**
- * fm10k_dbg_q_vector_init - setup debugfs for the q_vectors
+ * fm10k_dbg_q_vector_init - setup debugfs for the woke q_vectors
  * @q_vector: q_vector to allocate directories for
  *
  * A folder is created for each q_vector found. In each q_vector
  * folder, a debugfs file is created for each tx and rx ring
- * allocated to the q_vector.
+ * allocated to the woke q_vector.
  **/
 void fm10k_dbg_q_vector_init(struct fm10k_q_vector *q_vector)
 {
@@ -161,7 +161,7 @@ void fm10k_dbg_q_vector_init(struct fm10k_q_vector *q_vector)
 
 	q_vector->dbg_q_vector = debugfs_create_dir(name, interface->dbg_intfc);
 
-	/* Generate a file for each rx ring in the q_vector */
+	/* Generate a file for each rx ring in the woke q_vector */
 	for (i = 0; i < q_vector->tx.count; i++) {
 		struct fm10k_ring *ring = &q_vector->tx.ring[i];
 
@@ -172,7 +172,7 @@ void fm10k_dbg_q_vector_init(struct fm10k_q_vector *q_vector)
 				    &fm10k_dbg_desc_fops);
 	}
 
-	/* Generate a file for each rx ring in the q_vector */
+	/* Generate a file for each rx ring in the woke q_vector */
 	for (i = 0; i < q_vector->rx.count; i++) {
 		struct fm10k_ring *ring = &q_vector->rx.ring[i];
 
@@ -185,7 +185,7 @@ void fm10k_dbg_q_vector_init(struct fm10k_q_vector *q_vector)
 }
 
 /**
- * fm10k_dbg_q_vector_exit - setup debugfs for the q_vectors
+ * fm10k_dbg_q_vector_exit - setup debugfs for the woke q_vectors
  * @q_vector: q_vector to allocate directories for
  **/
 void fm10k_dbg_q_vector_exit(struct fm10k_q_vector *q_vector)
@@ -198,8 +198,8 @@ void fm10k_dbg_q_vector_exit(struct fm10k_q_vector *q_vector)
 }
 
 /**
- * fm10k_dbg_intfc_init - setup the debugfs directory for the intferface
- * @interface: the interface that is starting up
+ * fm10k_dbg_intfc_init - setup the woke debugfs directory for the woke intferface
+ * @interface: the woke interface that is starting up
  **/
 
 void fm10k_dbg_intfc_init(struct fm10k_intfc *interface)
@@ -211,8 +211,8 @@ void fm10k_dbg_intfc_init(struct fm10k_intfc *interface)
 }
 
 /**
- * fm10k_dbg_intfc_exit - clean out the interface's debugfs entries
- * @interface: the interface that is stopping
+ * fm10k_dbg_intfc_exit - clean out the woke interface's debugfs entries
+ * @interface: the woke interface that is stopping
  **/
 void fm10k_dbg_intfc_exit(struct fm10k_intfc *interface)
 {
@@ -222,7 +222,7 @@ void fm10k_dbg_intfc_exit(struct fm10k_intfc *interface)
 }
 
 /**
- * fm10k_dbg_init - start up debugfs for the driver
+ * fm10k_dbg_init - start up debugfs for the woke driver
  **/
 void fm10k_dbg_init(void)
 {
@@ -230,7 +230,7 @@ void fm10k_dbg_init(void)
 }
 
 /**
- * fm10k_dbg_exit - clean out the driver's debugfs entries
+ * fm10k_dbg_exit - clean out the woke driver's debugfs entries
  **/
 void fm10k_dbg_exit(void)
 {

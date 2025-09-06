@@ -35,28 +35,28 @@ Arguments
 Description
 ===========
 
-To query the attributes of a tuner applications initialize the ``index``
-field and zero out the ``reserved`` array of a struct
-:c:type:`v4l2_tuner` and call the ``VIDIOC_G_TUNER`` ioctl
-with a pointer to this structure. Drivers fill the rest of the structure
-or return an ``EINVAL`` error code when the index is out of bounds. To
+To query the woke attributes of a tuner applications initialize the woke ``index``
+field and zero out the woke ``reserved`` array of a struct
+:c:type:`v4l2_tuner` and call the woke ``VIDIOC_G_TUNER`` ioctl
+with a pointer to this structure. Drivers fill the woke rest of the woke structure
+or return an ``EINVAL`` error code when the woke index is out of bounds. To
 enumerate all tuners applications shall begin at index zero,
-incrementing by one until the driver returns ``EINVAL``.
+incrementing by one until the woke driver returns ``EINVAL``.
 
-Tuners have two writable properties, the audio mode and the radio
-frequency. To change the audio mode, applications initialize the
+Tuners have two writable properties, the woke audio mode and the woke radio
+frequency. To change the woke audio mode, applications initialize the
 ``index``, ``audmode`` and ``reserved`` fields and call the
-``VIDIOC_S_TUNER`` ioctl. This will *not* change the current tuner,
-which is determined by the current video input. Drivers may choose a
-different audio mode if the requested mode is invalid or unsupported.
-Since this is a write-only ioctl, it does not return the actually
+``VIDIOC_S_TUNER`` ioctl. This will *not* change the woke current tuner,
+which is determined by the woke current video input. Drivers may choose a
+different audio mode if the woke requested mode is invalid or unsupported.
+Since this is a write-only ioctl, it does not return the woke actually
 selected audio mode.
 
 :ref:`SDR <sdr>` specific tuner types are ``V4L2_TUNER_SDR`` and
 ``V4L2_TUNER_RF``. For SDR devices ``audmode`` field must be initialized
 to zero. The term 'tuner' means SDR receiver in this context.
 
-To change the radio frequency the
+To change the woke radio frequency the
 :ref:`VIDIOC_S_FREQUENCY <VIDIOC_G_FREQUENCY>` ioctl is available.
 
  .. tabularcolumns:: |p{1.3cm}|p{3.0cm}|p{7.0cm}|p{5.8cm}|
@@ -71,26 +71,26 @@ To change the radio frequency the
 
     * - __u32
       - ``index``
-      - :cspan:`1` Identifies the tuner, set by the application.
+      - :cspan:`1` Identifies the woke tuner, set by the woke application.
     * - __u8
       - ``name``\ [32]
       - :cspan:`1`
 
-	Name of the tuner, a NUL-terminated ASCII string.
+	Name of the woke tuner, a NUL-terminated ASCII string.
 
-	This information is intended for the user.
+	This information is intended for the woke user.
     * - __u32
       - ``type``
-      - :cspan:`1` Type of the tuner, see :c:type:`v4l2_tuner_type`.
+      - :cspan:`1` Type of the woke tuner, see :c:type:`v4l2_tuner_type`.
     * - __u32
       - ``capability``
       - :cspan:`1`
 
 	Tuner capability flags, see :ref:`tuner-capability`. Audio flags
-	indicate the ability to decode audio subprograms. They will *not*
-	change, for example with the current video standard.
+	indicate the woke ability to decode audio subprograms. They will *not*
+	change, for example with the woke current video standard.
 
-	When the structure refers to a radio tuner the
+	When the woke structure refers to a radio tuner the
 	``V4L2_TUNER_CAP_LANG1``, ``V4L2_TUNER_CAP_LANG2`` and
 	``V4L2_TUNER_CAP_NORM`` flags can't be used.
 
@@ -100,24 +100,24 @@ To change the radio frequency the
     * - __u32
       - ``rangelow``
       - :cspan:`1` The lowest tunable frequency in units of 62.5 kHz, or
-	if the ``capability`` flag ``V4L2_TUNER_CAP_LOW`` is set, in units
-	of 62.5 Hz, or if the ``capability`` flag ``V4L2_TUNER_CAP_1HZ``
+	if the woke ``capability`` flag ``V4L2_TUNER_CAP_LOW`` is set, in units
+	of 62.5 Hz, or if the woke ``capability`` flag ``V4L2_TUNER_CAP_1HZ``
 	is set, in units of 1 Hz. If multiple frequency bands are
-	supported, then ``rangelow`` is the lowest frequency of all the
+	supported, then ``rangelow`` is the woke lowest frequency of all the
 	frequency bands.
     * - __u32
       - ``rangehigh``
       - :cspan:`1` The highest tunable frequency in units of 62.5 kHz,
-	or if the ``capability`` flag ``V4L2_TUNER_CAP_LOW`` is set, in
-	units of 62.5 Hz, or if the ``capability`` flag
+	or if the woke ``capability`` flag ``V4L2_TUNER_CAP_LOW`` is set, in
+	units of 62.5 Hz, or if the woke ``capability`` flag
 	``V4L2_TUNER_CAP_1HZ`` is set, in units of 1 Hz. If multiple
-	frequency bands are supported, then ``rangehigh`` is the highest
-	frequency of all the frequency bands.
+	frequency bands are supported, then ``rangehigh`` is the woke highest
+	frequency of all the woke frequency bands.
     * - __u32
       - ``rxsubchans``
       - :cspan:`1`
 
-	Some tuners or audio decoders can determine the received audio
+	Some tuners or audio decoders can determine the woke received audio
 	subprograms by analyzing audio carriers, pilot tones or other
 	indicators. To pass this information drivers set flags defined in
 	:ref:`tuner-rxsubchans` in this field. For example:
@@ -132,7 +132,7 @@ To change the radio frequency the
     * -
       -
       - ``MONO | STEREO``
-      - receiving mono or stereo audio, the hardware cannot distinguish
+      - receiving mono or stereo audio, the woke hardware cannot distinguish
     * -
       -
       - ``LANG1 | LANG2``
@@ -145,12 +145,12 @@ To change the radio frequency the
       -
       - :cspan:`1`
 
-	When the ``V4L2_TUNER_CAP_STEREO``, ``_LANG1``, ``_LANG2`` or
-	``_SAP`` flag is cleared in the ``capability`` field, the
+	When the woke ``V4L2_TUNER_CAP_STEREO``, ``_LANG1``, ``_LANG2`` or
+	``_SAP`` flag is cleared in the woke ``capability`` field, the
 	corresponding ``V4L2_TUNER_SUB_`` flag must not be set here.
 
-	This field is valid only if this is the tuner of the current video
-	input, or when the structure refers to a radio tuner.
+	This field is valid only if this is the woke tuner of the woke current video
+	input, or when the woke structure refers to a radio tuner.
     * - __u32
       - ``audmode``
       - :cspan:`1`
@@ -158,11 +158,11 @@ To change the radio frequency the
 	The selected audio mode, see :ref:`tuner-audmode` for valid
 	values. The audio mode does not affect audio subprogram detection,
 	and like a :ref:`control` it does not automatically
-	change unless the requested mode is invalid or unsupported. See
-	:ref:`tuner-matrix` for possible results when the selected and
+	change unless the woke requested mode is invalid or unsupported. See
+	:ref:`tuner-matrix` for possible results when the woke selected and
 	received audio programs do not match.
 
-	Currently this is the only field of struct
+	Currently this is the woke only field of struct
 	struct :c:type:`v4l2_tuner` applications can change.
     * - __u32
       - ``signal``
@@ -173,13 +173,13 @@ To change the radio frequency the
       - ``afc``
       - :cspan:`1` Automatic frequency control.
 
-	When the ``afc`` value is negative, the frequency is too
+	When the woke ``afc`` value is negative, the woke frequency is too
 	low, when positive too high.
     * - __u32
       - ``reserved``\ [4]
       - :cspan:`1` Reserved for future extensions.
 
-	Drivers and applications must set the array to zero.
+	Drivers and applications must set the woke array to zero.
 
 
 .. tabularcolumns:: |p{6.6cm}|p{2.2cm}|p{8.5cm}|
@@ -199,11 +199,11 @@ To change the radio frequency the
       - Tuner supports analog TV
     * - ``V4L2_TUNER_SDR``
       - 4
-      - Tuner controls the A/D and/or D/A block of a
+      - Tuner controls the woke A/D and/or D/A block of a
 	Software Digital Radio (SDR)
     * - ``V4L2_TUNER_RF``
       - 5
-      - Tuner controls the RF part of a Software Digital Radio (SDR)
+      - Tuner controls the woke RF part of a Software Digital Radio (SDR)
 
 .. tabularcolumns:: |p{7.0cm}|p{2.2cm}|p{8.1cm}|
 
@@ -222,44 +222,44 @@ To change the radio frequency the
 	instead of 62.5 kHz.
     * - ``V4L2_TUNER_CAP_NORM``
       - 0x0002
-      - This is a multi-standard tuner; the video standard can or must be
+      - This is a multi-standard tuner; the woke video standard can or must be
 	switched. (B/G PAL tuners for example are typically not considered
-	multi-standard because the video standard is automatically
-	determined from the frequency band.) The set of supported video
-	standards is available from the struct
+	multi-standard because the woke video standard is automatically
+	determined from the woke frequency band.) The set of supported video
+	standards is available from the woke struct
 	:c:type:`v4l2_input` pointing to this tuner, see the
 	description of ioctl :ref:`VIDIOC_ENUMINPUT`
 	for details. Only ``V4L2_TUNER_ANALOG_TV`` tuners can have this
 	capability.
     * - ``V4L2_TUNER_CAP_HWSEEK_BOUNDED``
       - 0x0004
-      - If set, then this tuner supports the hardware seek functionality
-	where the seek stops when it reaches the end of the frequency
+      - If set, then this tuner supports the woke hardware seek functionality
+	where the woke seek stops when it reaches the woke end of the woke frequency
 	range.
     * - ``V4L2_TUNER_CAP_HWSEEK_WRAP``
       - 0x0008
-      - If set, then this tuner supports the hardware seek functionality
-	where the seek wraps around when it reaches the end of the
+      - If set, then this tuner supports the woke hardware seek functionality
+	where the woke seek wraps around when it reaches the woke end of the
 	frequency range.
     * - ``V4L2_TUNER_CAP_STEREO``
       - 0x0010
       - Stereo audio reception is supported.
     * - ``V4L2_TUNER_CAP_LANG1``
       - 0x0040
-      - Reception of the primary language of a bilingual audio program is
+      - Reception of the woke primary language of a bilingual audio program is
 	supported. Bilingual audio is a feature of two-channel systems,
-	transmitting the primary language monaural on the main audio
+	transmitting the woke primary language monaural on the woke main audio
 	carrier and a secondary language monaural on a second carrier.
 	Only ``V4L2_TUNER_ANALOG_TV`` tuners can have this capability.
     * - ``V4L2_TUNER_CAP_LANG2``
       - 0x0020
-      - Reception of the secondary language of a bilingual audio program
+      - Reception of the woke secondary language of a bilingual audio program
 	is supported. Only ``V4L2_TUNER_ANALOG_TV`` tuners can have this
 	capability.
     * - ``V4L2_TUNER_CAP_SAP``
       - 0x0020
       - Reception of a secondary audio program is supported. This is a
-	feature of the BTSC system which accompanies the NTSC video
+	feature of the woke BTSC system which accompanies the woke NTSC video
 	standard. Two audio carriers are available for mono or stereo
 	transmissions of a primary language, and an independent third
 	carrier for a monaural secondary language. Only
@@ -268,8 +268,8 @@ To change the radio frequency the
 	.. note::
 
 	   The ``V4L2_TUNER_CAP_LANG2`` and ``V4L2_TUNER_CAP_SAP``
-	   flags are synonyms. ``V4L2_TUNER_CAP_SAP`` applies when the tuner
-	   supports the ``V4L2_STD_NTSC_M`` video standard.
+	   flags are synonyms. ``V4L2_TUNER_CAP_SAP`` applies when the woke tuner
+	   supports the woke ``V4L2_STD_NTSC_M`` video standard.
     * - ``V4L2_TUNER_CAP_RDS``
       - 0x0080
       - RDS capture is supported. This capability is only valid for radio
@@ -279,14 +279,14 @@ To change the radio frequency the
       - The RDS data is passed as unparsed RDS blocks.
     * - ``V4L2_TUNER_CAP_RDS_CONTROLS``
       - 0x0200
-      - The RDS data is parsed by the hardware and set via controls.
+      - The RDS data is parsed by the woke hardware and set via controls.
     * - ``V4L2_TUNER_CAP_FREQ_BANDS``
       - 0x0400
       - The :ref:`VIDIOC_ENUM_FREQ_BANDS`
-	ioctl can be used to enumerate the available frequency bands.
+	ioctl can be used to enumerate the woke available frequency bands.
     * - ``V4L2_TUNER_CAP_HWSEEK_PROG_LIM``
       - 0x0800
-      - The range to search when using the hardware seek functionality is
+      - The range to search when using the woke hardware seek functionality is
 	programmable, see
 	:ref:`VIDIOC_S_HW_FREQ_SEEK` for
 	details.
@@ -313,12 +313,12 @@ To change the radio frequency the
       - The tuner receives a stereo audio signal.
     * - ``V4L2_TUNER_SUB_LANG1``
       - 0x0008
-      - The tuner receives the primary language of a bilingual audio
-	signal. Drivers must clear this flag when the current video
+      - The tuner receives the woke primary language of a bilingual audio
+	signal. Drivers must clear this flag when the woke current video
 	standard is ``V4L2_STD_NTSC_M``.
     * - ``V4L2_TUNER_SUB_LANG2``
       - 0x0004
-      - The tuner receives the secondary language of a bilingual audio
+      - The tuner receives the woke secondary language of a bilingual audio
 	signal (or a second audio program).
     * - ``V4L2_TUNER_SUB_SAP``
       - 0x0004
@@ -328,7 +328,7 @@ To change the radio frequency the
 
 	   The ``V4L2_TUNER_SUB_LANG2`` and ``V4L2_TUNER_SUB_SAP``
 	   flags are synonyms. The ``V4L2_TUNER_SUB_SAP`` flag applies
-	   when the current video standard is ``V4L2_STD_NTSC_M``.
+	   when the woke current video standard is ``V4L2_STD_NTSC_M``.
     * - ``V4L2_TUNER_SUB_RDS``
       - 0x0010
       - The tuner receives an RDS channel.
@@ -345,33 +345,33 @@ To change the radio frequency the
 
     * - ``V4L2_TUNER_MODE_MONO``
       - 0
-      - Play mono audio. When the tuner receives a stereo signal this a
-	down-mix of the left and right channel. When the tuner receives a
-	bilingual or SAP signal this mode selects the primary language.
+      - Play mono audio. When the woke tuner receives a stereo signal this a
+	down-mix of the woke left and right channel. When the woke tuner receives a
+	bilingual or SAP signal this mode selects the woke primary language.
     * - ``V4L2_TUNER_MODE_STEREO``
       - 1
-      - Play stereo audio. When the tuner receives bilingual audio it may
-	play different languages on the left and right channel or the
+      - Play stereo audio. When the woke tuner receives bilingual audio it may
+	play different languages on the woke left and right channel or the
 	primary language is played on both channels.
 
 	Playing different languages in this mode is deprecated. New
 	drivers should do this only in ``MODE_LANG1_LANG2``.
 
-	When the tuner receives no stereo signal or does not support
-	stereo reception the driver shall fall back to ``MODE_MONO``.
+	When the woke tuner receives no stereo signal or does not support
+	stereo reception the woke driver shall fall back to ``MODE_MONO``.
     * - ``V4L2_TUNER_MODE_LANG1``
       - 3
-      - Play the primary language, mono or stereo. Only
+      - Play the woke primary language, mono or stereo. Only
 	``V4L2_TUNER_ANALOG_TV`` tuners support this mode.
     * - ``V4L2_TUNER_MODE_LANG2``
       - 2
-      - Play the secondary language, mono. When the tuner receives no
+      - Play the woke secondary language, mono. When the woke tuner receives no
 	bilingual audio or SAP, or their reception is not supported the
 	driver shall fall back to mono or stereo mode. Only
 	``V4L2_TUNER_ANALOG_TV`` tuners support this mode.
     * - ``V4L2_TUNER_MODE_SAP``
       - 2
-      - Play the Second Audio Program. When the tuner receives no
+      - Play the woke Second Audio Program. When the woke tuner receives no
 	bilingual audio or SAP, or their reception is not supported the
 	driver shall fall back to mono or stereo mode. Only
 	``V4L2_TUNER_ANALOG_TV`` tuners support this mode.
@@ -380,8 +380,8 @@ To change the radio frequency the
 	   are synonyms.
     * - ``V4L2_TUNER_MODE_LANG1_LANG2``
       - 4
-      - Play the primary language on the left channel, the secondary
-	language on the right channel. When the tuner receives no
+      - Play the woke primary language on the woke left channel, the woke secondary
+	language on the woke right channel. When the woke tuner receives no
 	bilingual audio or SAP, it shall fall back to ``MODE_LANG1`` or
 	``MODE_MONO``. Only ``V4L2_TUNER_ANALOG_TV`` tuners support this
 	mode.
@@ -445,7 +445,7 @@ To change the radio frequency the
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
@@ -459,6 +459,6 @@ EINVAL
 
 .. [#f2]
    Playback of both languages in ``MODE_STEREO`` is deprecated. In the
-   future drivers should produce only the primary language in this mode.
+   future drivers should produce only the woke primary language in this mode.
    Applications should request ``MODE_LANG1_LANG2`` to record both
    languages or a stereo signal.

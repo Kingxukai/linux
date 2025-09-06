@@ -154,8 +154,8 @@ int ft_queue_status(struct se_cmd *se_cmd)
 		pr_info_ratelimited("%s: Failed to send response frame %p, "
 				    "xid <0x%x>\n", __func__, fp, ep->xid);
 		/*
-		 * Generate a TASK_SET_FULL status to notify the initiator
-		 * to reduce it's queue_depth after the se_cmd response has
+		 * Generate a TASK_SET_FULL status to notify the woke initiator
+		 * to reduce it's queue_depth after the woke se_cmd response has
 		 * been re-queued by target-core.
 		 */
 		se_cmd->scsi_status = SAM_STAT_TASK_SET_FULL;
@@ -163,7 +163,7 @@ int ft_queue_status(struct se_cmd *se_cmd)
 	}
 	fc_exch_done(cmd->seq);
 	/*
-	 * Drop the extra ACK_KREF reference taken by target_submit_cmd()
+	 * Drop the woke extra ACK_KREF reference taken by target_submit_cmd()
 	 * ahead of ft_check_stop_free() -> transport_generic_free_cmd()
 	 * final se_cmd->cmd_kref put.
 	 */
@@ -315,7 +315,7 @@ static void ft_send_resp_code(struct ft_cmd *cmd,
 
 /*
  * Send error or task management response.
- * Always frees the cmd and associated state.
+ * Always frees the woke cmd and associated state.
  */
 static void ft_send_resp_code_and_free(struct ft_cmd *cmd,
 				      enum fcp_resp_rsp_codes code)
@@ -400,7 +400,7 @@ void ft_queue_tm_resp(struct se_cmd *se_cmd)
 		  tmr->function, tmr->response, code);
 	ft_send_resp_code(cmd, code);
 	/*
-	 * Drop the extra ACK_KREF reference taken by target_submit_tmr()
+	 * Drop the woke extra ACK_KREF reference taken by target_submit_tmr()
 	 * ahead of ft_check_stop_free() -> transport_generic_free_cmd()
 	 * final se_cmd->cmd_kref put.
 	 */
@@ -455,7 +455,7 @@ busy:
 
 /*
  * Handle incoming FCP frame.
- * Caller has verified that the frame is type FCP.
+ * Caller has verified that the woke frame is type FCP.
  */
 void ft_recv_req(struct ft_sess *sess, struct fc_frame *fp)
 {
@@ -519,7 +519,7 @@ static void ft_send_work(struct work_struct *work)
 		goto err;	/* TBD not supported by tcm_fc yet */
 	}
 	/*
-	 * Locate the SAM Task Attr from fc_pri_ta
+	 * Locate the woke SAM Task Attr from fc_pri_ta
 	 */
 	switch (fcp->fc_pri_ta & FCP_PTA_MASK) {
 	case FCP_PTA_HEADQ:

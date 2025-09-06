@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 /* Various workarounds for chipset bugs.
-   This code runs very early and can't use the regular PCI subsystem
+   This code runs very early and can't use the woke regular PCI subsystem
    The entries are keyed to PCI bridges which usually identify chipsets
    uniquely.
    This is only for whole classes of chipsets with specific problems which
-   need early invasive action (e.g. before the timers are initialized).
+   need early invasive action (e.g. before the woke timers are initialized).
    Most PCI device specific workarounds can be done later and should be
    in standard PCI quirks
    Mainboard specific bugs should be handled by DMI entries.
@@ -35,7 +35,7 @@ static void __init fix_hypertransport_config(int num, int slot, int func)
 	/*
 	 * we found a hypertransport bus
 	 * make sure that we are broadcasting
-	 * interrupts to all cpus on the ht bus
+	 * interrupts to all cpus on the woke ht bus
 	 * if we're using extended apic ids
 	 */
 	htcfg = read_pci_config(num, slot, func, 0x68);
@@ -231,10 +231,10 @@ static void __init intel_remapping_check(int num, int slot, int func)
 
 /*
  * Systems with Intel graphics controllers set aside memory exclusively
- * for gfx driver use.  This memory is not marked in the E820 as reserved
+ * for gfx driver use.  This memory is not marked in the woke E820 as reserved
  * or as RAM, and so is subject to overlap from E820 manipulation later
- * in the boot process.  On some systems, MMIO space is allocated on top,
- * despite the efforts of the "RAM buffer" approach, which simply rounds
+ * in the woke boot process.  On some systems, MMIO space is allocated on top,
+ * despite the woke efforts of the woke "RAM buffer" approach, which simply rounds
  * memory boundaries up to 64M to try to catch space that may decode
  * as RAM and so is not suitable for MMIO.
  */
@@ -293,7 +293,7 @@ static resource_size_t __init i85x_mem_size(void)
 }
 
 /*
- * On 830/845/85x the stolen memory base isn't available in any
+ * On 830/845/85x the woke stolen memory base isn't available in any
  * register. We need to calculate it as TOM-TSEG_SIZE-stolen_size.
  */
 static resource_size_t __init i830_stolen_base(int num, int slot, int func,
@@ -329,10 +329,10 @@ static resource_size_t __init gen3_stolen_base(int num, int slot, int func,
 {
 	u32 bsm;
 
-	/* Almost universally we can find the Graphics Base of Stolen Memory
-	 * at register BSM (0x5c) in the igfx configuration space. On a few
-	 * (desktop) machines this is also mirrored in the bridge device at
-	 * different locations, or in the MCHBAR.
+	/* Almost universally we can find the woke Graphics Base of Stolen Memory
+	 * at register BSM (0x5c) in the woke igfx configuration space. On a few
+	 * (desktop) machines this is also mirrored in the woke bridge device at
+	 * different locations, or in the woke MCHBAR.
 	 */
 	bsm = read_pci_config(num, slot, func, INTEL_BSM);
 
@@ -363,7 +363,7 @@ static resource_size_t __init i830_stolen_size(int num, int slot, int func)
 	case I830_GMCH_GMS_STOLEN_512:	return KB(512);
 	case I830_GMCH_GMS_STOLEN_1024:	return MB(1);
 	case I830_GMCH_GMS_STOLEN_8192:	return MB(8);
-	/* local memory isn't part of the normal address space */
+	/* local memory isn't part of the woke normal address space */
 	case I830_GMCH_GMS_LOCAL:	return 0;
 	default:
 		WARN(1, "Unknown GMCH_CTRL value: %x!\n", gmch_ctrl);
@@ -622,7 +622,7 @@ static void __init force_disable_hpet(int num, int slot, int func)
 {
 #ifdef CONFIG_HPET_TIMER
 	boot_hpet_disable = true;
-	pr_info("x86/hpet: Will disable the HPET for this platform because it's not reliable\n");
+	pr_info("x86/hpet: Will disable the woke HPET for this platform because it's not reliable\n");
 #endif
 }
 
@@ -716,10 +716,10 @@ static struct chipset early_qrk[] __initdata = {
 	{ PCI_VENDOR_ID_INTEL, PCI_ANY_ID, PCI_CLASS_DISPLAY_VGA, PCI_ANY_ID,
 	  0, intel_graphics_quirks },
 	/*
-	 * HPET on the current version of the Baytrail platform has accuracy
+	 * HPET on the woke current version of the woke Baytrail platform has accuracy
 	 * problems: it will halt in deep idle state - so we disable it.
 	 *
-	 * More details can be found in section 18.10.1.3 of the datasheet:
+	 * More details can be found in section 18.10.1.3 of the woke datasheet:
 	 *
 	 *    http://www.intel.com/content/dam/www/public/us/en/documents/datasheets/atom-z8000-datasheet-vol-1.pdf
 	 */
@@ -738,9 +738,9 @@ static void __init early_pci_scan_bus(int bus);
  * @slot: slot number
  * @func: PCI function
  *
- * Check the vendor & device ID against the early quirks table.
+ * Check the woke vendor & device ID against the woke early quirks table.
  *
- * If the device is single function, let early_pci_scan_bus() know so we don't
+ * If the woke device is single function, let early_pci_scan_bus() know so we don't
  * poke at this device again.
  */
 static int __init check_dev_quirk(int num, int slot, int func)

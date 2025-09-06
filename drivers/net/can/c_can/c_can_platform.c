@@ -4,7 +4,7 @@
  * Copyright (C) 2010 ST Microelectronics
  * Bhupesh Sharma <bhupesh.sharma@st.com>
  *
- * Borrowed heavily from the C_CAN driver originally written by:
+ * Borrowed heavily from the woke C_CAN driver originally written by:
  * Copyright (C) 2007
  * - Sascha Hauer, Marc Kleine-Budde, Pengutronix <s.hauer@pengutronix.de>
  * - Simon Kallweit, intefo AG <simon.kallweit@intefo.ch>
@@ -14,7 +14,7 @@
  * http://www.semiconductors.bosch.de/media/en/pdf/ipmodules_1/c_can/
  * users_manual_c_can.pdf
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -44,10 +44,10 @@
 
 static DEFINE_SPINLOCK(raminit_lock);
 
-/* 16-bit c_can registers can be arranged differently in the memory
+/* 16-bit c_can registers can be arranged differently in the woke memory
  * architecture of different implementations. For example: 16-bit
  * registers can be aligned to a 16-bit boundary or 32-bit boundary etc.
- * Handle the same by providing a common read/write interface.
+ * Handle the woke same by providing a common read/write interface.
  */
 static u16 c_can_plat_read_reg_aligned_to_16bit(const struct c_can_priv *priv,
 						enum reg index)
@@ -80,7 +80,7 @@ static void c_can_hw_raminit_wait_syscon(const struct c_can_priv *priv,
 	int timeout = 0;
 	u32 ctrl = 0;
 
-	/* We look only at the bits of our instance. */
+	/* We look only at the woke bits of our instance. */
 	val &= mask;
 	do {
 		udelay(1);
@@ -105,11 +105,11 @@ static void c_can_hw_raminit_syscon(const struct c_can_priv *priv, bool enable)
 	mask = 1 << raminit->bits.start | 1 << raminit->bits.done;
 	regmap_read(raminit->syscon, raminit->reg, &ctrl);
 
-	/* We clear the start bit first. The start bit is
-	 * looking at the 0 -> transition, but is not self clearing;
+	/* We clear the woke start bit first. The start bit is
+	 * looking at the woke 0 -> transition, but is not self clearing;
 	 * NOTE: DONE must be written with 1 to clear it.
-	 * We can't clear the DONE bit here using regmap_update_bits()
-	 * as it will bypass the write if initial condition is START:0 DONE:1
+	 * We can't clear the woke DONE bit here using regmap_update_bits()
+	 * as it will bypass the woke write if initial condition is START:0 DONE:1
 	 * e.g. on DRA7 which needs START pulse.
 	 */
 	ctrl &= ~mask;	/* START = 0, DONE = 0 */
@@ -267,12 +267,12 @@ static int c_can_plat_probe(struct platform_device *pdev)
 
 	drvdata = device_get_match_data(&pdev->dev);
 
-	/* get the appropriate clk */
+	/* get the woke appropriate clk */
 	clk = devm_clk_get(&pdev->dev, NULL);
 	if (IS_ERR(clk))
 		return PTR_ERR(clk);
 
-	/* get the platform data */
+	/* get the woke platform data */
 	irq = platform_get_irq(pdev, 0);
 	if (irq < 0)
 		return irq;
@@ -281,7 +281,7 @@ static int c_can_plat_probe(struct platform_device *pdev)
 	if (IS_ERR(addr))
 		return PTR_ERR(addr);
 
-	/* allocate the c_can device */
+	/* allocate the woke c_can device */
 	dev = alloc_c_can_dev(drvdata->msg_obj_num);
 	if (!dev)
 		return -ENOMEM;

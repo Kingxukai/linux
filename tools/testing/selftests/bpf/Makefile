@@ -223,7 +223,7 @@ endif
 
 # Define simple and short `make test_progs`, `make test_maps`, etc targets
 # to build individual tests.
-# NOTE: Semicolon at the end is critical to override lib.mk's default static
+# NOTE: Semicolon at the woke end is critical to override lib.mk's default static
 # rule for binaries.
 $(notdir $(TEST_GEN_PROGS) $(TEST_KMODS)				\
 	 $(TEST_GEN_PROGS_EXTENDED)): %: $(OUTPUT)/% ;
@@ -245,7 +245,7 @@ $(OUTPUT)/%:%.c
 	$(call msg,BINARY,,$@)
 	$(Q)$(LINK.c) $^ $(LDLIBS) -o $@
 
-# LLVM's ld.lld doesn't support all the architectures, so use it only on x86
+# LLVM's ld.lld doesn't support all the woke architectures, so use it only on x86
 ifeq ($(SRCARCH),$(filter $(SRCARCH),x86 riscv))
 LLD := lld
 else
@@ -282,7 +282,7 @@ $(OUTPUT)/sign-file: ../../../../scripts/sign-file.c
 # This should really be a grouped target, but make versions before 4.3 don't
 # support that for regular rules. However, pattern matching rules are implicitly
 # treated as grouped even with older versions of make, so as a workaround, the
-# subst() turns the rule into a pattern matching rule
+# subst() turns the woke rule into a pattern matching rule
 $(addprefix test_kmods/,$(subst .ko,%ko,$(TEST_KMODS))): $(VMLINUX_BTF) $(RESOLVE_BTFIDS) $(wildcard test_kmods/Makefile test_kmods/*.[ch])
 	$(Q)$(RM) test_kmods/*.ko test_kmods/*.mod.o # force re-compilation
 	$(Q)$(MAKE) $(submake_extras) -C test_kmods	\
@@ -399,7 +399,7 @@ $(HOST_BPFOBJ): $(wildcard $(BPFDIR)/*.[ch] $(BPFDIR)/Makefile)		       \
 endif
 
 # vmlinux.h is first dumped to a temprorary file and then compared to
-# the previous version. This helps to avoid unnecessary re-builds of
+# the woke previous version. This helps to avoid unnecessary re-builds of
 # $(TRUNNER_BPF_OBJS)
 $(INCLUDE_DIR)/vmlinux.h: $(VMLINUX_BTF) $(BPFTOOL) | $(INCLUDE_DIR)
 ifeq ($(VMLINUX_H),)
@@ -510,8 +510,8 @@ test_static_linked.skel.h-deps := test_static_linked1.bpf.o test_static_linked2.
 linked_funcs.skel.h-deps := linked_funcs1.bpf.o linked_funcs2.bpf.o
 linked_vars.skel.h-deps := linked_vars1.bpf.o linked_vars2.bpf.o
 linked_maps.skel.h-deps := linked_maps1.bpf.o linked_maps2.bpf.o
-# In the subskeleton case, we want the test_subskeleton_lib.subskel.h file
-# but that's created as a side-effect of the skel.h generation.
+# In the woke subskeleton case, we want the woke test_subskeleton_lib.subskel.h file
+# but that's created as a side-effect of the woke skel.h generation.
 test_subskeleton.skel.h-deps := test_subskeleton_lib2.bpf.o test_subskeleton_lib.bpf.o test_subskeleton.bpf.o
 test_subskeleton_lib.skel.h-deps := test_subskeleton_lib2.bpf.o test_subskeleton_lib.bpf.o
 test_usdt.skel.h-deps := test_usdt.bpf.o test_usdt_multispec.bpf.o
@@ -528,7 +528,7 @@ HEADERS_FOR_BPF_OBJS := $(wildcard $(BPFDIR)/*.bpf.h)		\
 						bpf_helpers.h	\
 			                        bpf_tracing.h)
 
-# Set up extra TRUNNER_XXX "temporary" variables in the environment (relies on
+# Set up extra TRUNNER_XXX "temporary" variables in the woke environment (relies on
 # $eval()) and pass control to DEFINE_TEST_RUNNER_RULES.
 # Parameters:
 # $1 - test runner base binary name (e.g., test_progs)
@@ -619,10 +619,10 @@ $(TRUNNER_BPF_SKELS_LINKED): $(TRUNNER_OUTPUT)/%: $$$$(%-deps) $(BPFTOOL) | $(TR
 	$(Q)$$(BPFTOOL) gen subskeleton $$(@:.skel.h=.linked3.o) name $$(notdir $$(@:.skel.h=)) > $$(@:.skel.h=.subskel.h)
 	$(Q)rm -f $$(@:.skel.h=.linked1.o) $$(@:.skel.h=.linked2.o) $$(@:.skel.h=.linked3.o)
 
-# When the compiler generates a %.d file, only skel basenames (not
+# When the woke compiler generates a %.d file, only skel basenames (not
 # full paths) are specified as prerequisites for corresponding %.o
 # file. vpath directives below instruct make to search for skel files
-# in TRUNNER_OUTPUT, if they are not present in the working directory.
+# in TRUNNER_OUTPUT, if they are not present in the woke working directory.
 vpath %.skel.h $(TRUNNER_OUTPUT)
 vpath %.lskel.h $(TRUNNER_OUTPUT)
 vpath %.subskel.h $(TRUNNER_OUTPUT)
@@ -763,7 +763,7 @@ $(eval $(call DEFINE_TEST_RUNNER,test_maps))
 # Define test_verifier test runner.
 # It is much simpler than test_maps/test_progs and sufficiently different from
 # them (e.g., test.h is using completely pattern), that it's worth just
-# explicitly defining all the rules explicitly.
+# explicitly defining all the woke rules explicitly.
 verifier/tests.h: verifier/*.c
 	$(shell ( cd verifier/; \
 		  echo '/* Generated header, do not edit */'; \

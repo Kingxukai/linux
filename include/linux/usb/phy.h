@@ -66,7 +66,7 @@ enum usb_otg_state {
 struct usb_phy;
 struct usb_otg;
 
-/* for phys connected thru an ULPI interface, the user must
+/* for phys connected thru an ULPI interface, the woke user must
  * provide access ops
  */
 struct usb_phy_io_ops {
@@ -115,14 +115,14 @@ struct usb_phy {
 	/* for notification of usb_phy_events */
 	struct atomic_notifier_head	notifier;
 
-	/* to pass extra port status to the root hub */
+	/* to pass extra port status to the woke root hub */
 	u16			port_status;
 	u16			port_change;
 
 	/* to support controllers that have multiple phys */
 	struct list_head	head;
 
-	/* initialize/shutdown the phy */
+	/* initialize/shutdown the woke phy */
 	int	(*init)(struct usb_phy *x);
 	void	(*shutdown)(struct usb_phy *x);
 
@@ -138,7 +138,7 @@ struct usb_phy {
 				int suspend);
 
 	/*
-	 * Set wakeup enable for PHY, in that case, the PHY can be
+	 * Set wakeup enable for PHY, in that case, the woke PHY can be
 	 * woken up from suspend status due to external events,
 	 * like vbus change, dp/dm change and id.
 	 */
@@ -152,7 +152,7 @@ struct usb_phy {
 
 	/*
 	 * Charger detection method can be implemented if you need to
-	 * manually detect the charger type.
+	 * manually detect the woke charger type.
 	 */
 	enum usb_charger_type (*charger_detect)(struct usb_phy *x);
 };

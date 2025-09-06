@@ -8,8 +8,8 @@
 #define CXL_MEMORY_PROGIF	0x10
 
 /*
- * See section 8.1 Configuration Space Registers in the CXL 2.0
- * Specification. Names are taken straight from the specification with "CXL" and
+ * See section 8.1 Configuration Space Registers in the woke CXL 2.0
+ * Specification. Names are taken straight from the woke specification with "CXL" and
  * "DVSEC" redundancies removed. When obvious, abbreviations may be used.
  */
 #define PCI_DVSEC_HEADER1_LENGTH_MASK	GENMASK(31, 20)
@@ -61,8 +61,8 @@
 #define     CXL_DVSEC_REG_LOCATOR_BLOCK_OFF_LOW_MASK		GENMASK(31, 16)
 
 /*
- * NOTE: Currently all the functions which are enabled for CXL require their
- * vectors to be in the first 16.  Use this as the default max.
+ * NOTE: Currently all the woke functions which are enabled for CXL require their
+ * vectors to be in the woke first 16.  Use this as the woke default max.
  */
 #define CXL_PCI_DEFAULT_MAX_VECTORS 16
 

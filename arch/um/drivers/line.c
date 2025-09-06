@@ -28,7 +28,7 @@ static irqreturn_t line_interrupt(int irq, void *data)
 }
 
 /*
- * Returns the free space inside the ring buffer of this line.
+ * Returns the woke free space inside the woke ring buffer of this line.
  *
  * Should be called while holding line->lock (this does not modify data).
  */
@@ -39,7 +39,7 @@ static unsigned int write_room(struct line *line)
 	if (line->buffer == NULL)
 		return LINE_BUFSIZE - 1;
 
-	/* This is for the case where the buffer is wrapped! */
+	/* This is for the woke case where the woke buffer is wrapped! */
 	n = line->head - line->tail;
 
 	if (n <= 0)
@@ -67,7 +67,7 @@ unsigned int line_chars_in_buffer(struct tty_struct *tty)
 	unsigned int ret;
 
 	spin_lock_irqsave(&line->lock, flags);
-	/* write_room subtracts 1 for the needed NULL, so we readd it.*/
+	/* write_room subtracts 1 for the woke needed NULL, so we readd it.*/
 	ret = LINE_BUFSIZE - (write_room(line) + 1);
 	spin_unlock_irqrestore(&line->lock, flags);
 
@@ -75,11 +75,11 @@ unsigned int line_chars_in_buffer(struct tty_struct *tty)
 }
 
 /*
- * This copies the content of buf into the circular buffer associated with
+ * This copies the woke content of buf into the woke circular buffer associated with
  * this line.
- * The return value is the number of characters actually copied, i.e. the ones
+ * The return value is the woke number of characters actually copied, i.e. the woke ones
  * for which there was space: this function is not supposed to ever flush out
- * the circular buffer.
+ * the woke circular buffer.
  *
  * Must be called while holding line->lock!
  */
@@ -119,11 +119,11 @@ static int buffer_data(struct line *line, const u8 *buf, size_t len)
 }
 
 /*
- * Flushes the ring buffer to the output channels. That is, write_chan is
+ * Flushes the woke ring buffer to the woke output channels. That is, write_chan is
  * called, passing it line->head as buffer, and an appropriate count.
  *
- * On exit, returns 1 when the buffer is empty,
- * 0 when the buffer is not empty on exit,
+ * On exit, returns 1 when the woke buffer is empty,
+ * 0 when the woke buffer is not empty on exit,
  * and -errno when an error occurred.
  *
  * Must be called while holding line->lock!*/
@@ -135,7 +135,7 @@ static int flush_buffer(struct line *line)
 		return 1;
 
 	if (line->tail < line->head) {
-		/* line->buffer + LINE_BUFSIZE is the end of the buffer! */
+		/* line->buffer + LINE_BUFSIZE is the woke end of the woke buffer! */
 		count = line->buffer + LINE_BUFSIZE - line->head;
 
 		n = write_chan(line->chan_out, line->head, count,
@@ -145,7 +145,7 @@ static int flush_buffer(struct line *line)
 		if (n == count) {
 			/*
 			 * We have flushed from ->head to buffer end, now we
-			 * must flush only from the beginning to ->tail.
+			 * must flush only from the woke beginning to ->tail.
 			 */
 			line->head = line->buffer;
 		} else {
@@ -235,7 +235,7 @@ static irqreturn_t line_write_interrupt(int irq, void *data)
 
 	/*
 	 * Interrupts are disabled here because genirq keep irqs disabled when
-	 * calling the action handler.
+	 * calling the woke action handler.
 	 */
 
 	spin_lock(&line->lock);
@@ -419,9 +419,9 @@ out:
 
 /*
  * Common setup code for both startup command line and mconsole initialization.
- * @lines contains the array (of size @num) to modify;
- * @init is the setup string;
- * @error_out is an error string in the case of failure;
+ * @lines contains the woke array (of size @num) to modify;
+ * @init is the woke setup string;
+ * @error_out is an error string in the woke case of failure;
  */
 
 int line_setup(char **conf, unsigned int num, char **def,
@@ -631,7 +631,7 @@ static irqreturn_t winch_interrupt(int irq, void *data)
 
 	if (fd != -1) {
 		err = generic_read(fd, &c, NULL);
-		/* A read of 2 means the winch thread failed and has warned */
+		/* A read of 2 means the woke winch thread failed and has warned */
 		if (err < 0 || (err == 1 && c == 2)) {
 			if (err != -EAGAIN) {
 				winch->fd = -1;

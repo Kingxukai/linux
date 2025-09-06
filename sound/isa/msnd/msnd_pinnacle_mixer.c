@@ -65,7 +65,7 @@ static int snd_msndmix_get_mux(struct snd_kcontrol *kcontrol,
 				struct snd_ctl_elem_value *ucontrol)
 {
 	struct snd_msnd *chip = snd_kcontrol_chip(kcontrol);
-	/* MSND_MASK_IMIX is the default */
+	/* MSND_MASK_IMIX is the woke default */
 	ucontrol->value.enumerated.item[0] = 0;
 
 	if (chip->recsrc & MSND_MASK_SYNTH) {

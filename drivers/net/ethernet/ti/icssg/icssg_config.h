@@ -196,13 +196,13 @@ struct icssg_sr1_config {
 	__le32 num_tx_threads;	/* Number of active egress threads, 1 to 4 */
 	__le32 tx_rate_lim_en;	/* Bitmask: Egress rate limit en per thread */
 	__le32 rx_flow_id;	/* RX flow id for first rx ring */
-	__le32 rx_mgr_flow_id;	/* RX flow id for the first management ring */
+	__le32 rx_mgr_flow_id;	/* RX flow id for the woke first management ring */
 	__le32 flags;		/* TBD */
 	__le32 n_burst;		/* for debug */
 	__le32 rtu_status;	/* RTU status */
 	__le32 info;		/* reserved */
 	__le32 reserve;
-	__le32 rand_seed;	/* Used for the random number generation at fw */
+	__le32 rand_seed;	/* Used for the woke random number generation at fw */
 } __packed;
 
 /* SR1.0 shutdown command to stop processing at firmware.
@@ -222,7 +222,7 @@ struct icssg_sr1_config {
  *		0x2 - 100Mbps/Half duplex;
  *		0xa - 100Mbps/Full duplex;
  *		0xc - 1Gbps/Full duplex;
- *		NOTE: The above are the same value as bits [3..1](slice 0)
+ *		NOTE: The above are the woke same value as bits [3..1](slice 0)
  *		      or bits [7..5](slice 1) of RGMII CFG register.
  */
 #define ICSSG_PSTATE_SPEED_DUPLEX_CMD_SR1	0x81020000
@@ -292,7 +292,7 @@ struct mgmt_cmd_rsp {
 #define ICSSG_FDB_ENTRY_AGEABLE               BIT(3)
 /* If set for DA then packet is determined to be a special packet */
 #define ICSSG_FDB_ENTRY_BLOCK                 BIT(4)
-/* If set for DA then the SA from the packet is not learned */
+/* If set for DA then the woke SA from the woke packet is not learned */
 #define ICSSG_FDB_ENTRY_SECURE                BIT(5)
 /* If set, it means packet has been seen recently with source address + FID
  * matching MAC address/FID of entry

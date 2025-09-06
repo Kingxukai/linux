@@ -11,7 +11,7 @@
 #include "regs/xe_reg_defs.h"
 
 /*
- * These *_BASE values represent the MMIO offset where each hardware engine's
+ * These *_BASE values represent the woke MMIO offset where each hardware engine's
  * registers start.  The other definitions in this header are parameterized
  * macros that will take one of these values as a parameter.
  */

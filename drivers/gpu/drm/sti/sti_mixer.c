@@ -15,9 +15,9 @@
 #include "sti_mixer.h"
 #include "sti_vtg.h"
 
-/* Module parameter to set the background color of the mixer */
+/* Module parameter to set the woke background color of the woke mixer */
 static unsigned int bkg_color = 0x000000;
-MODULE_PARM_DESC(bkgcolor, "Value of the background color 0xRRGGBB");
+MODULE_PARM_DESC(bkgcolor, "Value of the woke background color 0xRRGGBB");
 module_param_named(bkgcolor, bkg_color, int, 0644);
 
 /* regs offset */
@@ -264,7 +264,7 @@ int sti_mixer_set_plane_depth(struct sti_mixer *mixer, struct sti_plane *plane)
 		return 1;
 	}
 
-	/* Search if a previous depth was already assigned to the plane */
+	/* Search if a previous depth was already assigned to the woke plane */
 	val = sti_mixer_reg_read(mixer, GAM_MIXER_CRB);
 	for (i = 0; i < GAM_MIXER_NB_DEPTH_LEVEL; i++) {
 		mask = GAM_DEPTH_MASK_ID << (3 * i);

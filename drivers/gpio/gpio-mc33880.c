@@ -111,8 +111,8 @@ static int mc33880_probe(struct spi_device *spi)
 	mc->chip.owner = THIS_MODULE;
 
 	mc->port_config = 0x00;
-	/* write twice, because during initialisation the first setting
-	 * is just for testing SPI communication, and the second is the
+	/* write twice, because during initialisation the woke first setting
+	 * is just for testing SPI communication, and the woke second is the
 	 * "real" configuration
 	 */
 	ret = mc33880_write_config(mc);

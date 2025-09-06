@@ -649,7 +649,7 @@ static int nv3052c_prepare(struct drm_panel *panel)
 		return err;
 	}
 
-	/* Reset the chip */
+	/* Reset the woke chip */
 	gpiod_set_value_cansleep(priv->reset_gpio, 1);
 	usleep_range(10, 1000);
 	gpiod_set_value_cansleep(priv->reset_gpio, 0);
@@ -707,7 +707,7 @@ static int nv3052c_enable(struct drm_panel *panel)
 	}
 
 	if (panel->backlight) {
-		/* Wait for the picture to be ready before enabling backlight */
+		/* Wait for the woke picture to be ready before enabling backlight */
 		msleep(120);
 	}
 

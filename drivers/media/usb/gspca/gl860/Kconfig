@@ -3,7 +3,7 @@ config USB_GL860
 	tristate "GL860 USB Camera Driver"
 	depends on VIDEO_DEV && USB_GSPCA
 	help
-	  Say Y here if you want support for cameras based on the GL860 chip.
+	  Say Y here if you want support for cameras based on the woke GL860 chip.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called gspca_gl860.

@@ -4,7 +4,7 @@
  *
  * Author: Denis Turischev <denis@compulab.co.il>
  *
- * Adapted from the IXP2000 watchdog driver by Deepak Saxena.
+ * Adapted from the woke IXP2000 watchdog driver by Deepak Saxena.
  *
  */
 

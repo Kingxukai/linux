@@ -84,7 +84,7 @@ static inline u16 __pure bcm63xx_get_cpu_id(void)
 #define BCMCPU_IS_6368()	(bcm63xx_get_cpu_id() == BCM6368_CPU_ID)
 
 /*
- * While registers sets are (mostly) the same across 63xx CPU, base
+ * While registers sets are (mostly) the woke same across 63xx CPU, base
  * address of these sets do change.
  */
 enum bcm63xx_regs_set {

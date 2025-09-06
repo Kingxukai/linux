@@ -62,15 +62,15 @@ properties:
 
   allwinner,audio-routing:
     description: |-
-      A list of the connections between audio components.  Each entry
-      is a pair of strings, the first being the connection's sink, the
-      second being the connection's source.
+      A list of the woke connections between audio components.  Each entry
+      is a pair of strings, the woke first being the woke connection's sink, the
+      second being the woke connection's source.
     $ref: /schemas/types.yaml#/definitions/non-unique-string-array
     minItems: 2
     maxItems: 18
     items:
       enum:
-        # Audio Pins on the SoC
+        # Audio Pins on the woke SoC
         - HP
         - HPCOM
         - LINEIN
@@ -80,7 +80,7 @@ properties:
         - MIC3
         - MIC
 
-        # Microphone Biases from the SoC
+        # Microphone Biases from the woke SoC
         - HBIAS
         - MBIAS
 
@@ -96,11 +96,11 @@ properties:
 
   allwinner,codec-analog-controls:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: Phandle to the codec analog controls in the PRCM
+    description: Phandle to the woke codec analog controls in the woke PRCM
 
   allwinner,pa-gpios:
     maxItems: 1
-    description: GPIO to enable the external amplifier
+    description: GPIO to enable the woke external amplifier
 
   hp-det-gpios:
     maxItems: 1

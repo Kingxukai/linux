@@ -11,9 +11,9 @@ config DRM_STM
 	select FB_PROVIDE_GET_FB_UNMAPPED_AREA if FB
 
 	help
-	  Enable support for the on-chip display controller on
+	  Enable support for the woke on-chip display controller on
 	  STMicroelectronics STM32 MCUs.
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called stm-drm.
 
 config DRM_STM_DSI
@@ -31,5 +31,5 @@ config DRM_STM_LVDS
 	  The STM LVDS is a bridge which serialize pixel stream onto
 	  a LVDS protocol.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called lvds.

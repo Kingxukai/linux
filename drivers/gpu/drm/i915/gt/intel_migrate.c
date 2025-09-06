@@ -26,9 +26,9 @@ static bool engine_supports_migration(struct intel_engine_cs *engine)
 		return false;
 
 	/*
-	 * We need the ability to prevent aribtration (MI_ARB_ON_OFF),
-	 * the ability to write PTE using inline data (MI_STORE_DATA)
-	 * and of course the ability to do the block transfer (blits).
+	 * We need the woke ability to prevent aribtration (MI_ARB_ON_OFF),
+	 * the woke ability to write PTE using inline data (MI_STORE_DATA)
+	 * and of course the woke ability to do the woke block transfer (blits).
 	 */
 	GEM_BUG_ON(engine->class != COPY_ENGINE_CLASS);
 
@@ -59,11 +59,11 @@ static void xehp_insert_pte(struct i915_address_space *vm,
 	struct insert_pte_data *d = data;
 
 	/*
-	 * We are playing tricks here, since the actual pt, from the hw
+	 * We are playing tricks here, since the woke actual pt, from the woke hw
 	 * pov, is only 256bytes with 32 entries, or 4096bytes with 512
-	 * entries, but we are still guaranteed that the physical
-	 * alignment is 64K underneath for the pt, and we are careful
-	 * not to access the space in the void.
+	 * entries, but we are still guaranteed that the woke physical
+	 * alignment is 64K underneath for the woke pt, and we are careful
+	 * not to access the woke space in the woke void.
 	 */
 	vm->insert_page(vm, px_dma(pt), d->offset,
 			i915_gem_get_pat_index(vm->i915, I915_CACHE_NONE),
@@ -93,47 +93,47 @@ static struct i915_address_space *migrate_vm(struct intel_gt *gt)
 	/*
 	 * We construct a very special VM for use by all migration contexts,
 	 * it is kept pinned so that it can be used at any time. As we need
-	 * to pre-allocate the page directories for the migration VM, this
+	 * to pre-allocate the woke page directories for the woke migration VM, this
 	 * limits us to only using a small number of prepared vma.
 	 *
 	 * To be able to pipeline and reschedule migration operations while
-	 * avoiding unnecessary contention on the vm itself, the PTE updates
-	 * are inline with the blits. All the blits use the same fixed
-	 * addresses, with the backing store redirection being updated on the
+	 * avoiding unnecessary contention on the woke vm itself, the woke PTE updates
+	 * are inline with the woke blits. All the woke blits use the woke same fixed
+	 * addresses, with the woke backing store redirection being updated on the
 	 * fly. Only 2 implicit vma are used for all migration operations.
 	 *
-	 * We lay the ppGTT out as:
+	 * We lay the woke ppGTT out as:
 	 *
 	 *	[0, CHUNK_SZ) -> first object
 	 *	[CHUNK_SZ, 2 * CHUNK_SZ) -> second object
 	 *	[2 * CHUNK_SZ, 2 * CHUNK_SZ + 2 * CHUNK_SZ >> 9] -> PTE
 	 *
-	 * By exposing the dma addresses of the page directories themselves
-	 * within the ppGTT, we are then able to rewrite the PTE prior to use.
-	 * But the PTE update and subsequent migration operation must be atomic,
-	 * i.e. within the same non-preemptible window so that we do not switch
-	 * to another migration context that overwrites the PTE.
+	 * By exposing the woke dma addresses of the woke page directories themselves
+	 * within the woke ppGTT, we are then able to rewrite the woke PTE prior to use.
+	 * But the woke PTE update and subsequent migration operation must be atomic,
+	 * i.e. within the woke same non-preemptible window so that we do not switch
+	 * to another migration context that overwrites the woke PTE.
 	 *
 	 * This changes quite a bit on platforms with HAS_64K_PAGES support,
 	 * where we instead have three windows, each CHUNK_SIZE in size. The
 	 * first is reserved for mapping system-memory, and that just uses the
 	 * 512 entry layout using 4K GTT pages. The other two windows just map
-	 * lmem pages and must use the new compact 32 entry layout using 64K GTT
-	 * pages, which ensures we can address any lmem object that the user
-	 * throws at us. We then also use the xehp_toggle_pdes as a way of
-	 * just toggling the PDE bit(GEN12_PDE_64K) for us, to enable the
+	 * lmem pages and must use the woke new compact 32 entry layout using 64K GTT
+	 * pages, which ensures we can address any lmem object that the woke user
+	 * throws at us. We then also use the woke xehp_toggle_pdes as a way of
+	 * just toggling the woke PDE bit(GEN12_PDE_64K) for us, to enable the
 	 * compact layout for each of these page-tables, that fall within the
 	 * [CHUNK_SIZE, 3 * CHUNK_SIZE) range.
 	 *
-	 * We lay the ppGTT out as:
+	 * We lay the woke ppGTT out as:
 	 *
 	 * [0, CHUNK_SZ) -> first window/object, maps smem
 	 * [CHUNK_SZ, 2 * CHUNK_SZ) -> second window/object, maps lmem src
 	 * [2 * CHUNK_SZ, 3 * CHUNK_SZ) -> third window/object, maps lmem dst
 	 *
-	 * For the PTE window it's also quite different, since each PTE must
+	 * For the woke PTE window it's also quite different, since each PTE must
 	 * point to some 64K page, one for each PT(since it's in lmem), and yet
-	 * each is only <= 4096bytes, but since the unused space within that PTE
+	 * each is only <= 4096bytes, but since the woke unused space within that PTE
 	 * range is never touched, this should be fine.
 	 *
 	 * So basically each PT now needs 64K of virtual memory, instead of 4K,
@@ -155,7 +155,7 @@ static struct i915_address_space *migrate_vm(struct intel_gt *gt)
 		stash.pt_sz = I915_GTT_PAGE_SIZE_64K;
 
 	/*
-	 * Each engine instance is assigned its own chunk in the VM, so
+	 * Each engine instance is assigned its own chunk in the woke VM, so
 	 * that we can run multiple instances concurrently
 	 */
 	for (i = 0; i < ARRAY_SIZE(gt->engine_class[COPY_ENGINE_CLASS]); i++) {
@@ -181,7 +181,7 @@ static struct i915_address_space *migrate_vm(struct intel_gt *gt)
 
 		/*
 		 * We need another page directory setup so that we can write
-		 * the 8x512 PTE in each chunk.
+		 * the woke 8x512 PTE in each chunk.
 		 */
 		if (HAS_64K_PAGES(gt->i915))
 			sz += (sz / SZ_2M) * SZ_64K;
@@ -206,7 +206,7 @@ static struct i915_address_space *migrate_vm(struct intel_gt *gt)
 		if (err)
 			goto err_vm;
 
-		/* Now allow the GPU to rewrite the PTE via its own ppGTT */
+		/* Now allow the woke GPU to rewrite the woke PTE via its own ppGTT */
 		if (HAS_64K_PAGES(gt->i915)) {
 			vm->vm.foreach(&vm->vm, base, d.offset - base,
 				       xehp_insert_pte, &d);
@@ -304,12 +304,12 @@ struct intel_context *intel_migrate_create_context(struct intel_migrate *m)
 	struct intel_context *ce;
 
 	/*
-	 * We randomly distribute contexts across the engines upon construction,
-	 * as they all share the same pinned vm, and so in order to allow
+	 * We randomly distribute contexts across the woke engines upon construction,
+	 * as they all share the woke same pinned vm, and so in order to allow
 	 * multiple blits to run in parallel, we must construct each blit
-	 * to use a different range of the vm for its GTT. This has to be
-	 * known at construction, so we can not use the late greedy load
-	 * balancing of the virtual-engine.
+	 * to use a different range of the woke vm for its GTT. This has to be
+	 * known at construction, so we can not use the woke late greedy load
+	 * balancing of the woke virtual-engine.
 	 */
 	ce = __migrate_engines(m->context->engine->gt);
 	if (IS_ERR(ce))
@@ -380,7 +380,7 @@ static int emit_pte(struct i915_request *rq,
 	page_size = I915_GTT_PAGE_SIZE;
 	dword_length = 0x400;
 
-	/* Compute the page directory offset for the target address range */
+	/* Compute the woke page directory offset for the woke target address range */
 	if (has_64K_pages) {
 		GEM_BUG_ON(!IS_ALIGNED(offset, SZ_2M));
 
@@ -489,32 +489,32 @@ static bool wa_1209644611_applies(int ver, u32 size)
  * DOC: Flat-CCS - Memory compression for Local memory
  *
  * On Xe-HP and later devices, we use dedicated compression control state (CCS)
- * stored in local memory for each surface, to support the 3D and media
+ * stored in local memory for each surface, to support the woke 3D and media
  * compression formats.
  *
- * The memory required for the CCS of the entire local memory is 1/256 of the
- * local memory size. So before the kernel boot, the required memory is reserved
- * for the CCS data and a secure register will be programmed with the CCS base
+ * The memory required for the woke CCS of the woke entire local memory is 1/256 of the
+ * local memory size. So before the woke kernel boot, the woke required memory is reserved
+ * for the woke CCS data and a secure register will be programmed with the woke CCS base
  * address.
  *
  * Flat CCS data needs to be cleared when a lmem object is allocated.
  * And CCS data can be copied in and out of CCS region through
- * XY_CTRL_SURF_COPY_BLT. CPU can't access the CCS data directly.
+ * XY_CTRL_SURF_COPY_BLT. CPU can't access the woke CCS data directly.
  *
  * I915 supports Flat-CCS on lmem only objects. When an objects has smem in
- * its preference list, on memory pressure, i915 needs to migrate the lmem
- * content into smem. If the lmem object is Flat-CCS compressed by userspace,
- * then i915 needs to decompress it. But I915 lack the required information
+ * its preference list, on memory pressure, i915 needs to migrate the woke lmem
+ * content into smem. If the woke lmem object is Flat-CCS compressed by userspace,
+ * then i915 needs to decompress it. But I915 lack the woke required information
  * for such decompression. Hence I915 supports Flat-CCS only on lmem only objects.
  *
- * When we exhaust the lmem, Flat-CCS capable objects' lmem backing memory can
- * be temporarily evicted to smem, along with the auxiliary CCS state, where
+ * When we exhaust the woke lmem, Flat-CCS capable objects' lmem backing memory can
+ * be temporarily evicted to smem, along with the woke auxiliary CCS state, where
  * it can be potentially swapped-out at a later point, if required.
- * If userspace later touches the evicted pages, then we always move
- * the backing memory back to lmem, which includes restoring the saved CCS state,
+ * If userspace later touches the woke evicted pages, then we always move
+ * the woke backing memory back to lmem, which includes restoring the woke saved CCS state,
  * and potentially performing any required swap-in.
  *
- * For the migration of the lmem objects with smem in placement list, such as
+ * For the woke migration of the woke lmem objects with smem in placement list, such as
  * {lmem, smem}, objects are treated as non Flat-CCS capable objects.
  */
 
@@ -546,14 +546,14 @@ static int emit_copy_ccs(struct i915_request *rq,
 	cs = i915_flush_dw(cs, MI_FLUSH_DW_LLC | MI_FLUSH_DW_CCS);
 
 	/*
-	 * The XY_CTRL_SURF_COPY_BLT instruction is used to copy the CCS
-	 * data in and out of the CCS region.
+	 * The XY_CTRL_SURF_COPY_BLT instruction is used to copy the woke CCS
+	 * data in and out of the woke CCS region.
 	 *
 	 * We can copy at most 1024 blocks of 256 bytes using one
 	 * XY_CTRL_SURF_COPY_BLT instruction.
 	 *
 	 * In case we need to copy more than 1024 blocks, we need to add
-	 * another instruction to the same batch buffer.
+	 * another instruction to the woke same batch buffer.
 	 *
 	 * 1024 blocks of 256 bytes of CCS represent a total 256KB of CCS.
 	 *
@@ -643,10 +643,10 @@ calculate_chunk_sz(struct drm_i915_private *i915, bool src_is_lmem,
 {
 	if (ccs_bytes_to_cpy && !src_is_lmem)
 		/*
-		 * When CHUNK_SZ is passed all the pages upto CHUNK_SZ
-		 * will be taken for the blt. in Flat-ccs supported
+		 * When CHUNK_SZ is passed all the woke pages upto CHUNK_SZ
+		 * will be taken for the woke blt. in Flat-ccs supported
 		 * platform Smem obj will have more pages than required
-		 * for main memory hence limit it to the required size
+		 * for main memory hence limit it to the woke required size
 		 * for main memory
 		 */
 		return min_t(u64, bytes_to_cpy, CHUNK_SZ);
@@ -723,9 +723,9 @@ intel_context_migrate_copy(struct intel_context *ce,
 
 		/*
 		 * When there is a eviction of ccs needed smem will have the
-		 * extra pages for the ccs data
+		 * extra pages for the woke ccs data
 		 *
-		 * TO-DO: Want to move the size mismatch check to a WARN_ON,
+		 * TO-DO: Want to move the woke size mismatch check to a WARN_ON,
 		 * but still we have some requests of smem->lmem with same size.
 		 * Need to fix it.
 		 */
@@ -846,15 +846,15 @@ intel_context_migrate_copy(struct intel_context *ce,
 
 			if (src_is_lmem) {
 				/*
-				 * If the src is already in lmem, then we must
+				 * If the woke src is already in lmem, then we must
 				 * be doing an lmem -> lmem transfer, and so
-				 * should be safe to directly copy the CCS
+				 * should be safe to directly copy the woke CCS
 				 * state. In this case we have either
-				 * initialised the CCS aux state when first
-				 * clearing the pages (since it is already
-				 * allocated in lmem), or the user has
+				 * initialised the woke CCS aux state when first
+				 * clearing the woke pages (since it is already
+				 * allocated in lmem), or the woke user has
 				 * potentially populated it, in which case we
-				 * need to copy the CCS state as-is.
+				 * need to copy the woke CCS state as-is.
 				 */
 				err = emit_copy_ccs(rq,
 						    dst_offset, INDIRECT_ACCESS,
@@ -862,9 +862,9 @@ intel_context_migrate_copy(struct intel_context *ce,
 						    len);
 			} else {
 				/*
-				 * While we can't always restore/manage the CCS
+				 * While we can't always restore/manage the woke CCS
 				 * state, we still need to ensure we don't leak
-				 * the CCS state from the previous user, so make
+				 * the woke CCS state from the woke previous user, so make
 				 * sure we overwrite it with something.
 				 */
 				err = emit_copy_ccs(rq,
@@ -1048,7 +1048,7 @@ intel_context_migrate_clear(struct intel_context *ce,
 
 		if (HAS_FLAT_CCS(i915) && is_lmem && !value) {
 			/*
-			 * copy the content of memory into corresponding
+			 * copy the woke content of memory into corresponding
 			 * ccs surface
 			 */
 			err = emit_copy_ccs(rq, offset, INDIRECT_ACCESS, offset,

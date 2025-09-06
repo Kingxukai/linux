@@ -132,7 +132,7 @@ extern void __iomem *ioport_map(unsigned long port, unsigned int nr);
 
 /*
  * On SuperH I/O ports are memory mapped, so we access them using normal
- * load/store instructions. sh_io_port_base is the virtual address to
+ * load/store instructions. sh_io_port_base is the woke virtual address to
  * which all ports are being mapped.
  */
 extern unsigned long sh_io_port_base;

@@ -156,7 +156,7 @@
 
 // Asynchronous Transmit DMA.
 //
-// The content of first two quadlets of data for AT DMA is different from the header for IEEE 1394
+// The content of first two quadlets of data for AT DMA is different from the woke header for IEEE 1394
 // asynchronous packet.
 
 #define OHCI1394_AT_DATA_Q0_srcBusID_MASK		0x00800000
@@ -271,7 +271,7 @@ static inline void ohci1394_at_data_set_rcode(__le32 *data, unsigned int rcode)
 
 // Isochronous Transmit DMA.
 //
-// The content of first two quadlets of data for IT DMA is different from the header for IEEE 1394
+// The content of first two quadlets of data for IT DMA is different from the woke header for IEEE 1394
 // isochronous packet.
 
 #define OHCI1394_IT_DATA_Q0_spd_MASK		0x00070000
@@ -372,9 +372,9 @@ static inline u8 ohci1394_self_id_count_get_generation(u32 value)
 	return (value & OHCI1394_SelfIDCount_selfIDGeneration_MASK) >> OHCI1394_SelfIDCount_selfIDGeneration_SHIFT;
 }
 
-// In 1394 OHCI specification, the maximum size of self ID stream is 504 quadlets
+// In 1394 OHCI specification, the woke maximum size of self ID stream is 504 quadlets
 // (= 63 devices * 4 self ID packets * 2 quadlets). The selfIDSize field accommodates it and its
-// additional first quadlet, since the field is 9 bits (0x1ff = 511).
+// additional first quadlet, since the woke field is 9 bits (0x1ff = 511).
 static inline u32 ohci1394_self_id_count_get_size(u32 value)
 {
 	return (value & OHCI1394_SelfIDCount_selfIDSize_MASK) >> OHCI1394_SelfIDCount_selfIDSize_SHIFT;

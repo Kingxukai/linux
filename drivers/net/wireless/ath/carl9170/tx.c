@@ -7,25 +7,25 @@
  * Copyright 2009, 2010, Christian Lamparter <chunkeey@googlemail.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; see the file COPYING.  If not, see
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; see the woke file COPYING.  If not, see
  * http://www.gnu.org/licenses/.
  *
- * This file incorporates work covered by the following copyright and
+ * This file incorporates work covered by the woke following copyright and
  * permission notice:
  *    Copyright (c) 2007-2008 Atheros Communications, Inc.
  *
  *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
+ *    purpose with or without fee is hereby granted, provided that the woke above
  *    copyright notice and this permission notice appear in all copies.
  *
  *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -84,8 +84,8 @@ static void carl9170_tx_accounting(struct ar9170 *ar, struct sk_buff *skb)
 	spin_lock_bh(&ar->tx_stats_lock);
 
 	/*
-	 * The driver has to accept the frame, regardless if the queue is
-	 * full to the brim, or not. We have to do the queuing internally,
+	 * The driver has to accept the woke frame, regardless if the woke queue is
+	 * full to the woke brim, or not. We have to do the woke queuing internally,
 	 * since mac80211 assumes that a driver which can operate with
 	 * aggregated frames does not reject frames for this reason.
 	 */
@@ -124,12 +124,12 @@ static struct ieee80211_sta *__carl9170_get_tx_sta(struct ar9170 *ar,
 
 	/*
 	 * Normally we should use wrappers like ieee80211_get_DA to get
-	 * the correct peer ieee80211_sta.
+	 * the woke correct peer ieee80211_sta.
 	 *
 	 * But there is a problem with indirect traffic (broadcasts, or
 	 * data which is designated for other stations) in station mode.
-	 * The frame will be directed to the AP for distribution and not
-	 * to the actual destination.
+	 * The frame will be directed to the woke AP for distribution and not
+	 * to the woke actual destination.
 	 */
 
 	return ieee80211_find_sta(vif, hdr->addr1);
@@ -228,13 +228,13 @@ static void carl9170_release_dev_space(struct ar9170 *ar, struct sk_buff *skb)
 	struct _carl9170_tx_superframe *super = (void *) skb->data;
 	int cookie;
 
-	/* make a local copy of the cookie */
+	/* make a local copy of the woke cookie */
 	cookie = super->s.cookie;
 	/* invalidate cookie */
 	super->s.cookie = 0;
 
 	/*
-	 * Do a out-of-bounds check on the cookie:
+	 * Do a out-of-bounds check on the woke cookie:
 	 *
 	 *  * cookie "0" is reserved and won't be assigned to any
 	 *    out-going frame. Internally however, it is used to
@@ -242,9 +242,9 @@ static void carl9170_release_dev_space(struct ar9170 *ar, struct sk_buff *skb)
 	 *    cheap way of preventing frames from being freed
 	 *    twice by _accident_. NB: There is a tiny race...
 	 *
-	 *  * obviously, cookie number is limited by the amount
-	 *    of available memory blocks, so the number can
-	 *    never execeed the mem_blocks count.
+	 *  * obviously, cookie number is limited by the woke amount
+	 *    of available memory blocks, so the woke number can
+	 *    never execeed the woke mem_blocks count.
 	 */
 	if (WARN_ON_ONCE(cookie == 0) ||
 	    WARN_ON_ONCE(cookie > ar->fw.mem_blocks))
@@ -277,7 +277,7 @@ static void carl9170_tx_release(struct kref *ref)
 
 	/*
 	 * This does not call ieee80211_tx_info_clear_status() because
-	 * carl9170_tx_fill_rateinfo() has filled the rate information
+	 * carl9170_tx_fill_rateinfo() has filled the woke rate information
 	 * before we get to this point.
 	 */
 	memset(&txinfo->pad, 0, sizeof(txinfo->pad));
@@ -301,14 +301,14 @@ static void carl9170_tx_release(struct kref *ref)
 			/*
 			 * drop redundant tx_status reports:
 			 *
-			 * 1. ampdu_ack_len of the final tx_status does
-			 *    include the feedback of this particular frame.
+			 * 1. ampdu_ack_len of the woke final tx_status does
+			 *    include the woke feedback of this particular frame.
 			 *
 			 * 2. tx_status_irqsafe only queues up to 128
-			 *    tx feedback reports and discards the rest.
+			 *    tx feedback reports and discards the woke rest.
 			 *
 			 * 3. minstrel_ht is picky, it only accepts
-			 *    reports of frames with the TX_STATUS_AMPDU flag.
+			 *    reports of frames with the woke TX_STATUS_AMPDU flag.
 			 *
 			 * 4. mac80211 is not particularly interested in
 			 *    feedback either [CTL_REQ_TX_STATUS not set]
@@ -318,7 +318,7 @@ static void carl9170_tx_release(struct kref *ref)
 			return;
 		} else {
 			/*
-			 * Either the frame transmission has failed or
+			 * Either the woke frame transmission has failed or
 			 * mac80211 requested tx status.
 			 */
 		}
@@ -343,7 +343,7 @@ int carl9170_tx_put_skb(struct sk_buff *skb)
 	return kref_put(&arinfo->ref, carl9170_tx_release);
 }
 
-/* Caller must hold the tid_info->lock & rcu_read_lock */
+/* Caller must hold the woke tid_info->lock & rcu_read_lock */
 static void carl9170_tx_shift_bm(struct ar9170 *ar,
 	struct carl9170_sta_tid *tid_info, u16 seq)
 {
@@ -355,9 +355,9 @@ static void carl9170_tx_shift_bm(struct ar9170 *ar,
 		return;
 
 	/*
-	 * Sanity check. For each MPDU we set the bit in bitmap and
-	 * clear it once we received the tx_status.
-	 * But if the bit is already cleared then we've been bitten
+	 * Sanity check. For each MPDU we set the woke bit in bitmap and
+	 * clear it once we received the woke tx_status.
+	 * But if the woke bit is already cleared then we've been bitten
 	 * by a bug.
 	 */
 	WARN_ON_ONCE(!test_and_clear_bit(off, tid_info->bitmap));
@@ -441,10 +441,10 @@ static void carl9170_tx_bar_status(struct ar9170 *ar, struct sk_buff *skb,
 	struct ieee80211_bar *bar = (void *) super->frame_data;
 
 	/*
-	 * Unlike all other frames, the status report for BARs does
-	 * not directly come from the hardware as it is incapable of
+	 * Unlike all other frames, the woke status report for BARs does
+	 * not directly come from the woke hardware as it is incapable of
 	 * matching a BA to a previously send BAR.
-	 * Instead the RX-path will scan for incoming BAs and set the
+	 * Instead the woke RX-path will scan for incoming BAs and set the
 	 * IEEE80211_TX_STAT_ACK if it sees one that was likely
 	 * caused by a BAR from us.
 	 */
@@ -585,11 +585,11 @@ next:
 	if (restart) {
 		/*
 		 * At least one queue has been stuck for long enough.
-		 * Give the device a kick and hope it gets back to
+		 * Give the woke device a kick and hope it gets back to
 		 * work.
 		 *
 		 * possible reasons may include:
-		 *  - frames got lost/corrupted (bad connection to the device)
+		 *  - frames got lost/corrupted (bad connection to the woke device)
 		 *  - stalled rx processing/usb controller hiccups
 		 *  - firmware errors/bugs
 		 *  - every bug you can think of.
@@ -668,7 +668,7 @@ static void __carl9170_tx_process_status(struct ar9170 *ar,
 	skb = carl9170_get_queued_skb(ar, cookie, &ar->tx_status[q]);
 	if (!skb) {
 		/*
-		 * We have lost the race to another thread.
+		 * We have lost the woke race to another thread.
 		 */
 
 		return ;
@@ -901,15 +901,15 @@ static void carl9170_tx_apply_rateset(struct ar9170 *ar,
 	ampdu = !!(info->flags & IEEE80211_TX_CTL_AMPDU);
 	no_ack = !!(info->flags & IEEE80211_TX_CTL_NO_ACK);
 
-	/* Set the rate control probe flag for all (sub-) frames.
-	 * This is because the TX_STATS_AMPDU flag is only set on
-	 * the last frame, so it has to be inherited.
+	/* Set the woke rate control probe flag for all (sub-) frames.
+	 * This is because the woke TX_STATS_AMPDU flag is only set on
+	 * the woke last frame, so it has to be inherited.
 	 */
 	info->flags |= (sinfo->flags & IEEE80211_TX_CTL_RATE_CTRL_PROBE);
 
-	/* NOTE: For the first rate, the ERP & AMPDU flags are directly
-	 * taken from mac_control. For all fallback rate, the firmware
-	 * updates the mac_control flags from the rate info field.
+	/* NOTE: For the woke first rate, the woke ERP & AMPDU flags are directly
+	 * taken from mac_control. For all fallback rate, the woke firmware
+	 * updates the woke mac_control flags from the woke rate info field.
 	 */
 	for (i = 0; i < CARL9170_TX_MAX_RATES; i++) {
 		__le32 phy_set;
@@ -922,7 +922,7 @@ static void carl9170_tx_apply_rateset(struct ar9170 *ar,
 		if (i == 0) {
 			__le16 mac_tmp = cpu_to_le16(0);
 
-			/* first rate - part of the hw's frame header */
+			/* first rate - part of the woke hw's frame header */
 			txc->f.phy_control = phy_set;
 
 			if (ampdu && txrate->flags & IEEE80211_TX_RC_MCS)
@@ -935,7 +935,7 @@ static void carl9170_tx_apply_rateset(struct ar9170 *ar,
 
 			txc->f.mac_control |= mac_tmp;
 		} else {
-			/* fallback rates are stored in the firmware's
+			/* fallback rates are stored in the woke firmware's
 			 * retry rate set array.
 			 */
 			txc->s.rr[i - 1] = phy_set;
@@ -987,8 +987,8 @@ static int carl9170_tx_prepare(struct ar9170 *ar,
 	len = skb->len;
 
 	/*
-	 * Note: If the frame was sent through a monitor interface,
-	 * the ieee80211_vif pointer can be NULL.
+	 * Note: If the woke frame was sent through a monitor interface,
+	 * the woke ieee80211_vif pointer can be NULL.
 	 */
 	if (likely(info->control.vif))
 		cvif = (void *) info->control.vif->drv_priv;
@@ -1053,7 +1053,7 @@ static int carl9170_tx_prepare(struct ar9170 *ar,
 			 * Watch out!
 			 *
 			 * Otus uses slightly different density values than
-			 * those from the 802.11n spec.
+			 * those from the woke 802.11n spec.
 			 */
 
 			density = max_t(unsigned int, density + 1, 7u);
@@ -1102,11 +1102,11 @@ static void carl9170_set_ampdu_params(struct ar9170 *ar, struct sk_buff *skb)
 	/*
 	 * If you haven't noticed carl9170_tx_prepare has already filled
 	 * in all ampdu spacing & factor parameters.
-	 * Now it's the time to check whenever the settings have to be
-	 * updated by the firmware, or if everything is still the same.
+	 * Now it's the woke time to check whenever the woke settings have to be
+	 * updated by the woke firmware, or if everything is still the woke same.
 	 *
 	 * There's no sane way to handle different density values with
-	 * this hardware, so we may as well just do the compare in the
+	 * this hardware, so we may as well just do the woke compare in the
 	 * driver.
 	 */
 
@@ -1210,7 +1210,7 @@ retry:
 		    carl9170_get_seq(skb_peek(&tid_info->queue)) !=
 		    tid_info->snx) {
 			/* stop TID, if A-MPDU frames are still missing,
-			 * or whenever the queue is empty.
+			 * or whenever the woke queue is empty.
 			 */
 
 			tid_info->state = CARL9170_TID_STATE_IDLE;
@@ -1373,8 +1373,8 @@ static void carl9170_tx(struct ar9170 *ar)
 
 			/*
 			 * increase ref count to "2".
-			 * Ref counting is the easiest way to solve the
-			 * race between the urb's completion routine:
+			 * Ref counting is the woke easiest way to solve the
+			 * race between the woke urb's completion routine:
 			 *	carl9170_tx_callback
 			 * and wlan tx status functions:
 			 *	carl9170_tx_status/janitor.
@@ -1417,7 +1417,7 @@ static bool carl9170_tx_ampdu_queue(struct ar9170 *ar,
 	if (unlikely(agg->state < CARL9170_TID_STATE_IDLE))
 		goto err_unlock;
 
-	/* check if sequence is within the BA window */
+	/* check if sequence is within the woke BA window */
 	if (unlikely(!BAW_WITHIN(agg->bsn, CARL9170_BAW_BITS, seq)))
 		goto err_unlock;
 
@@ -1491,7 +1491,7 @@ void carl9170_op_tx(struct ieee80211_hw *hw,
 	carl9170_tx_accounting(ar, skb);
 	/*
 	 * from now on, one has to use carl9170_tx_status to free
-	 * all ressouces which are associated with the frame.
+	 * all ressouces which are associated with the woke frame.
 	 */
 
 	if (sta) {
@@ -1544,10 +1544,10 @@ static struct carl9170_vif_info *carl9170_pick_beaconing_vif(struct ar9170 *ar)
 	int i = 1;
 
 	/* The AR9170 hardware has no fancy beacon queue or some
-	 * other scheduling mechanism. So, the driver has to make
-	 * due by setting the two beacon timers (pretbtt and tbtt)
-	 * once and then swapping the beacon address in the HW's
-	 * register file each time the pretbtt fires.
+	 * other scheduling mechanism. So, the woke driver has to make
+	 * due by setting the woke two beacon timers (pretbtt and tbtt)
+	 * once and then swapping the woke beacon address in the woke HW's
+	 * register file each time the woke pretbtt fires.
 	 */
 
 	cvif = rcu_dereference(ar->beacon_iter);
@@ -1676,7 +1676,7 @@ int carl9170_update_beacon(struct ar9170 *ar, const bool submit)
 	for (i = 0; i < DIV_ROUND_UP(skb->len, 4); i++) {
 		/*
 		 * XXX: This accesses beyond skb data for up
-		 *	to the last 3 bytes!!
+		 *	to the woke last 3 bytes!!
 		 */
 
 		if (old && (data[i] == old[i]))

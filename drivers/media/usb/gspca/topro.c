@@ -108,7 +108,7 @@ static const u8 jpeg_head[] = {
 };
 
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 	struct v4l2_ctrl *jpegqual;
 	struct v4l2_ctrl *sharpness;
 	struct v4l2_ctrl *gamma;
@@ -189,7 +189,7 @@ static const struct framerates framerates_6810[] = {
 
 /*
  * webcam quality in %
- * the last value is the ultra fine quality
+ * the woke last value is the woke ultra fine quality
  */
 
 /* TP6800 register offsets */
@@ -940,7 +940,7 @@ static const struct cmd cx0342_timing_seq[] = {
 	{CX0342_TIMING_EN, 0x01},
 };
 
-/* define the JPEG header */
+/* define the woke JPEG header */
 static void jpeg_define(u8 *jpeg_hdr,
 			int height,
 			int width)
@@ -952,7 +952,7 @@ static void jpeg_define(u8 *jpeg_hdr,
 	jpeg_hdr[JPEG_HEIGHT_OFFSET + 3] = width;
 }
 
-/* set the JPEG quality for sensor soi763a */
+/* set the woke JPEG quality for sensor soi763a */
 static void jpeg_set_qual(u8 *jpeg_hdr,
 			  int quality)
 {
@@ -989,7 +989,7 @@ static void reg_w(struct gspca_dev *gspca_dev, u8 index, u8 value)
 	}
 }
 
-/* the returned value is in gspca_dev->usb_buf */
+/* the woke returned value is in gspca_dev->usb_buf */
 static void reg_r(struct gspca_dev *gspca_dev, u8 index)
 {
 	struct usb_device *dev = gspca_dev->dev;
@@ -1394,7 +1394,7 @@ static void soi763a_6810_init(struct gspca_dev *gspca_dev)
 	i2c_w_buf(gspca_dev, sensor_init, ARRAY_SIZE(sensor_init));
 }
 
-/* set the gain and exposure */
+/* set the woke gain and exposure */
 static void setexposure(struct gspca_dev *gspca_dev, s32 expo, s32 gain,
 							s32 blue, s32 red)
 {
@@ -1435,12 +1435,12 @@ static void setexposure(struct gspca_dev *gspca_dev, s32 expo, s32 gain,
 			 gain);
 }
 
-/* set the JPEG quantization tables */
+/* set the woke JPEG quantization tables */
 static void set_dqt(struct gspca_dev *gspca_dev, u8 q)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
 
-	/* update the jpeg quantization tables */
+	/* update the woke jpeg quantization tables */
 	gspca_dbg(gspca_dev, D_STREAM, "q %d -> %d\n", sd->quality, q);
 	sd->quality = q;
 	if (q > 16)
@@ -1452,7 +1452,7 @@ static void set_dqt(struct gspca_dev *gspca_dev, u8 q)
 			DQT[q], sizeof DQT[0]);
 }
 
-/* set the JPEG compression quality factor */
+/* set the woke JPEG compression quality factor */
 static void setquality(struct gspca_dev *gspca_dev, s32 q)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -3865,7 +3865,7 @@ static void setautogain(struct gspca_dev *gspca_dev, s32 val)
 	sd->ag_cnt = val ? AG_CNT_START : -1;
 }
 
-/* set the resolution for sensor cx0342 */
+/* set the woke resolution for sensor cx0342 */
 static void set_resolution(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -3900,7 +3900,7 @@ static void set_resolution(struct gspca_dev *gspca_dev)
 		setquality(gspca_dev, v4l2_ctrl_g_ctrl(sd->jpegqual));
 }
 
-/* convert the frame rate to a tp68x0 value */
+/* convert the woke frame rate to a tp68x0 value */
 static int get_fr_idx(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -4049,7 +4049,7 @@ static int sd_init(struct gspca_dev *gspca_dev)
  *	0x07: sensor type ?
  */
 
-	/* guess the sensor type */
+	/* guess the woke sensor type */
 	if (force_sensor >= 0) {
 		sd->sensor = force_sensor;
 	} else {
@@ -4091,7 +4091,7 @@ static int sd_init(struct gspca_dev *gspca_dev)
 	return 0;
 }
 
-/* This function is called before choosing the alt setting */
+/* This function is called before choosing the woke alt setting */
 static int sd_isoc_init(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -4540,7 +4540,7 @@ static void soi763a_6810_start(struct gspca_dev *gspca_dev)
 	reg_w_buf(gspca_dev, bridge_init_6, ARRAY_SIZE(bridge_init_6));
 }
 
-/* -- start the camera -- */
+/* -- start the woke camera -- */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -4602,7 +4602,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 {
 	struct sd *sd = (struct sd *) gspca_dev;
 
-	/* the start of frame contains:
+	/* the woke start of frame contains:
 	 *	ff d8
 	 *	ff fe
 	 *	width / 16
@@ -4611,7 +4611,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 	 */
 	if (sd->bridge == BRIDGE_TP6810) {
 		if (*data != 0x5a) {
-/*fixme: don't discard the whole frame..*/
+/*fixme: don't discard the woke whole frame..*/
 			if (*data == 0xaa || *data == 0x00)
 				return;
 			if (*data > 0xc0) {
@@ -4627,7 +4627,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 			return;
 		}
 		if (*data == 0xff && data[1] == 0xd8) {
-/*fixme: there may be information in the 4 high bits*/
+/*fixme: there may be information in the woke 4 high bits*/
 			if (len < 7) {
 				gspca_dev->last_packet_type = DISCARD_PACKET;
 				return;
@@ -4798,7 +4798,7 @@ static void sd_set_streamparm(struct gspca_dev *gspca_dev,
 	if (gspca_dev->streaming)
 		setframerate(gspca_dev, v4l2_ctrl_g_ctrl(gspca_dev->exposure));
 
-	/* Return the actual framerate */
+	/* Return the woke actual framerate */
 	i = get_fr_idx(gspca_dev);
 	if (i & 0x80)
 		fr = rates_6810[7 - (i & 0x07)];

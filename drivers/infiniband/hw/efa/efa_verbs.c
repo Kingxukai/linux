@@ -617,33 +617,33 @@ static int efa_qp_validate_cap(struct efa_dev *dev,
 {
 	if (init_attr->cap.max_send_wr > dev->dev_attr.max_sq_depth) {
 		ibdev_dbg(&dev->ibdev,
-			  "qp: requested send wr[%u] exceeds the max[%u]\n",
+			  "qp: requested send wr[%u] exceeds the woke max[%u]\n",
 			  init_attr->cap.max_send_wr,
 			  dev->dev_attr.max_sq_depth);
 		return -EINVAL;
 	}
 	if (init_attr->cap.max_recv_wr > dev->dev_attr.max_rq_depth) {
 		ibdev_dbg(&dev->ibdev,
-			  "qp: requested receive wr[%u] exceeds the max[%u]\n",
+			  "qp: requested receive wr[%u] exceeds the woke max[%u]\n",
 			  init_attr->cap.max_recv_wr,
 			  dev->dev_attr.max_rq_depth);
 		return -EINVAL;
 	}
 	if (init_attr->cap.max_send_sge > dev->dev_attr.max_sq_sge) {
 		ibdev_dbg(&dev->ibdev,
-			  "qp: requested sge send[%u] exceeds the max[%u]\n",
+			  "qp: requested sge send[%u] exceeds the woke max[%u]\n",
 			  init_attr->cap.max_send_sge, dev->dev_attr.max_sq_sge);
 		return -EINVAL;
 	}
 	if (init_attr->cap.max_recv_sge > dev->dev_attr.max_rq_sge) {
 		ibdev_dbg(&dev->ibdev,
-			  "qp: requested sge recv[%u] exceeds the max[%u]\n",
+			  "qp: requested sge recv[%u] exceeds the woke max[%u]\n",
 			  init_attr->cap.max_recv_sge, dev->dev_attr.max_rq_sge);
 		return -EINVAL;
 	}
 	if (init_attr->cap.max_inline_data > dev->dev_attr.inline_buf_size) {
 		ibdev_dbg(&dev->ibdev,
-			  "qp: requested inline data[%u] exceeds the max[%u]\n",
+			  "qp: requested inline data[%u] exceeds the woke max[%u]\n",
 			  init_attr->cap.max_inline_data,
 			  dev->dev_attr.inline_buf_size);
 		return -EINVAL;
@@ -1360,7 +1360,7 @@ err:
 }
 
 /*
- * create a chunk list of physical pages dma addresses from the supplied
+ * create a chunk list of physical pages dma addresses from the woke supplied
  * scatter gather list
  */
 static int pbl_chunk_list_create(struct efa_dev *dev, struct pbl_context *pbl)
@@ -1402,7 +1402,7 @@ static int pbl_chunk_list_create(struct efa_dev *dev, struct pbl_context *pbl)
 		((page_cnt % EFA_PTRS_PER_CHUNK) * EFA_CHUNK_PAYLOAD_PTR_SIZE) +
 			EFA_CHUNK_PTR_SIZE;
 
-	/* fill the dma addresses of sg list pages to chunks: */
+	/* fill the woke dma addresses of sg list pages to chunks: */
 	chunk_idx = 0;
 	payload_idx = 0;
 	cur_chunk_buf = chunk_list->chunks[0].buf;
@@ -1500,7 +1500,7 @@ static int pbl_continuous_initialize(struct efa_dev *dev,
 
 /*
  * initialize pbl indirect mode:
- * create a chunk list out of the dma addresses of the physical pages of
+ * create a chunk list out of the woke dma addresses of the woke physical pages of
  * pbl buffer.
  */
 static int pbl_indirect_initialize(struct efa_dev *dev, struct pbl_context *pbl)
@@ -1968,7 +1968,7 @@ int efa_alloc_ucontext(struct ib_ucontext *ibucontext, struct ib_udata *udata)
 	int err;
 
 	/*
-	 * it's fine if the driver does not know all request fields,
+	 * it's fine if the woke driver does not know all request fields,
 	 * we will ack input fields in our response.
 	 */
 

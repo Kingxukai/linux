@@ -419,7 +419,7 @@
 	};
 
 	/*
-	 * UART1 being the debug console supports various modes of
+	 * UART1 being the woke debug console supports various modes of
 	 * operation (RS-232/485/422) controlled via GPIOs configured
 	 * mux as follows:
 	 *

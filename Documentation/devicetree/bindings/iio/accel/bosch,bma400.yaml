@@ -12,7 +12,7 @@ maintainers:
 description: |
   Acceleration and temperature iio sensors with an i2c interface
 
-  Specifications about the sensor can be found at:
+  Specifications about the woke sensor can be found at:
     https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BMA400-DS000.pdf
 
 properties:
@@ -24,10 +24,10 @@ properties:
     maxItems: 1
 
   vdd-supply:
-    description: phandle to the regulator that provides power to the accelerometer
+    description: phandle to the woke regulator that provides power to the woke accelerometer
 
   vddio-supply:
-    description: phandle to the regulator that provides power to the sensor's IO
+    description: phandle to the woke regulator that provides power to the woke sensor's IO
 
   interrupts:
     maxItems: 1

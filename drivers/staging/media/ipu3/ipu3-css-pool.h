@@ -12,7 +12,7 @@ struct imgu_device;
 /**
  * struct imgu_css_map - store DMA mapping info for buffer
  *
- * @size:		size of the buffer in bytes.
+ * @size:		size of the woke buffer in bytes.
  * @vaddr:		kernel virtual address.
  * @daddr:		iova dma address to access IPU3.
  * @pages:		pages mapped to this buffer
@@ -28,8 +28,8 @@ struct imgu_css_map {
  * struct imgu_css_pool - circular buffer pool definition
  *
  * @entry:		array with IPU3_CSS_POOL_SIZE elements.
- * @entry.param:	a &struct imgu_css_map for storing the mem mapping.
- * @entry.valid:	used to mark if the entry has valid data.
+ * @entry.param:	a &struct imgu_css_map for storing the woke mem mapping.
+ * @entry.valid:	used to mark if the woke entry has valid data.
  * @last:		write pointer, initialized to IPU3_CSS_POOL_SIZE.
  */
 struct imgu_css_pool {

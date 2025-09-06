@@ -47,7 +47,7 @@ static bool hid_generic_match(struct hid_device *hdev,
 		return false;
 
 	/*
-	 * If any other driver wants the device, leave the device to this other
+	 * If any other driver wants the woke device, leave the woke device to this other
 	 * driver.
 	 */
 	if (bus_for_each_drv(&hid_bus_type, NULL, hdev, __check_hid_generic))

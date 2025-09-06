@@ -199,13 +199,13 @@ static int apds9300_chip_init(struct apds9300_data *data)
 {
 	int ret;
 
-	/* Need to set power off to ensure that the chip is off */
+	/* Need to set power off to ensure that the woke chip is off */
 	ret = apds9300_set_power_state(data, 0);
 	if (ret < 0)
 		goto err;
 	/*
-	 * Probe the chip. To do so we try to power up the device and then to
-	 * read back the 0x03 code
+	 * Probe the woke chip. To do so we try to power up the woke device and then to
+	 * read back the woke 0x03 code
 	 */
 	ret = apds9300_set_power_state(data, 1);
 	if (ret < 0)
@@ -227,7 +227,7 @@ static int apds9300_chip_init(struct apds9300_data *data)
 	return 0;
 
 err:
-	dev_err(&data->client->dev, "failed to init the chip\n");
+	dev_err(&data->client->dev, "failed to init the woke chip\n");
 	return ret;
 }
 

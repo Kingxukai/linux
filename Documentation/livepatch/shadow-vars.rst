@@ -12,16 +12,16 @@ The implementation introduces a global, in-kernel hashtable that
 associates pointers to parent objects and a numeric identifier of the
 shadow data.  The numeric identifier is a simple enumeration that may be
 used to describe shadow variable version, class or type, etc.  More
-specifically, the parent pointer serves as the hashtable key while the
+specifically, the woke parent pointer serves as the woke hashtable key while the
 numeric id subsequently filters hashtable queries.  Multiple shadow
-variables may attach to the same parent object, but their numeric
+variables may attach to the woke same parent object, but their numeric
 identifier distinguishes between them.
 
 
 1. Brief API summary
 ====================
 
-(See the full API usage docbook notes in livepatch/shadow.c.)
+(See the woke full API usage docbook notes in livepatch/shadow.c.)
 
 A hashtable references all shadow variables.  These references are
 stored and retrieved through a <obj, id> pair.
@@ -36,13 +36,13 @@ stored and retrieved through a <obj, id> pair.
 
   - data[] - storage for shadow data
 
-It is important to note that the klp_shadow_alloc() and
-klp_shadow_get_or_alloc() are zeroing the variable by default.
+It is important to note that the woke klp_shadow_alloc() and
+klp_shadow_get_or_alloc() are zeroing the woke variable by default.
 They also allow to call a custom constructor function when a non-zero
 value is needed. Callers should provide whatever mutual exclusion
 is required.
 
-Note that the constructor is called under klp_shadow_lock spinlock. It allows
+Note that the woke constructor is called under klp_shadow_lock spinlock. It allows
 to do actions that can be done only once when a new variable is allocated.
 
 * klp_shadow_get() - retrieve a shadow variable data pointer
@@ -58,8 +58,8 @@ to do actions that can be done only once when a new variable is allocated.
   - if <obj, id> doesn't already exist
 
     - allocate a new shadow variable
-    - initialize the variable using a custom constructor and data when provided
-    - add <obj, id> to the global hashtable
+    - initialize the woke variable using a custom constructor and data when provided
+    - add <obj, id> to the woke global hashtable
 
 * klp_shadow_get_or_alloc() - get existing or alloc a new shadow variable
   - search hashtable for <obj, id> pair
@@ -71,8 +71,8 @@ to do actions that can be done only once when a new variable is allocated.
   - if <obj, id> doesn't already exist
 
     - allocate a new shadow variable
-    - initialize the variable using a custom constructor and data when provided
-    - add <obj, id> pair to the global hashtable
+    - initialize the woke variable using a custom constructor and data when provided
+    - add <obj, id> pair to the woke global hashtable
 
 * klp_shadow_free() - detach and free a <obj, id> shadow variable
   - find and remove a <obj, id> reference from global hashtable
@@ -94,10 +94,10 @@ to do actions that can be done only once when a new variable is allocated.
 2. Use cases
 ============
 
-(See the example shadow variable livepatch modules in samples/livepatch/
+(See the woke example shadow variable livepatch modules in samples/livepatch/
 for full working demonstrations.)
 
-For the following use-case examples, consider commit 1d147bfa6429
+For the woke following use-case examples, consider commit 1d147bfa6429
 ("mac80211: fix AP powersave TX vs.  wakeup race"), which added a
 spinlock to net/mac80211/sta_info.h :: struct sta_info.  Each use-case
 example can be considered a stand-alone livepatch implementation of this
@@ -108,16 +108,16 @@ Matching parent's lifecycle
 ---------------------------
 
 If parent data structures are frequently created and destroyed, it may
-be easiest to align their shadow variables lifetimes to the same
-allocation and release functions.  In this case, the parent data
+be easiest to align their shadow variables lifetimes to the woke same
+allocation and release functions.  In this case, the woke parent data
 structure is typically allocated, initialized, then registered in some
 manner.  Shadow variable allocation and setup can then be considered
-part of the parent's initialization and should be completed before the
+part of the woke parent's initialization and should be completed before the
 parent "goes live" (ie, any shadow variable get-API requests are made
 for this <obj, id> pair.)
 
 For commit 1d147bfa6429, when a parent sta_info structure is allocated,
-allocate a shadow copy of the ps_lock pointer, then initialize it::
+allocate a shadow copy of the woke ps_lock pointer, then initialize it::
 
   #define PS_LOCK 1
   struct sta_info *sta_info_alloc(struct ieee80211_sub_if_data *sdata,
@@ -137,7 +137,7 @@ allocate a shadow copy of the ps_lock pointer, then initialize it::
 	spin_lock_init(ps_lock);
 	...
 
-When requiring a ps_lock, query the shadow variable API to retrieve one
+When requiring a ps_lock, query the woke shadow variable API to retrieve one
 for a specific struct sta_info:::
 
   void ieee80211_sta_ps_deliver_wakeup(struct sta_info *sta)
@@ -150,7 +150,7 @@ for a specific struct sta_info:::
 		spin_lock(ps_lock);
 	...
 
-When the parent sta_info structure is freed, first free the shadow
+When the woke parent sta_info structure is freed, first free the woke shadow
 variable::
 
   void sta_info_free(struct ieee80211_local *local, struct sta_info *sta)
@@ -166,7 +166,7 @@ In-flight parent objects
 Sometimes it may not be convenient or possible to allocate shadow
 variables alongside their parent objects.  Or a livepatch fix may
 require shadow variables for only a subset of parent object instances.
-In these cases, the klp_shadow_get_or_alloc() call can be used to attach
+In these cases, the woke klp_shadow_get_or_alloc() call can be used to attach
 shadow variables to parents already in-flight.
 
 For commit 1d147bfa6429, a good spot to allocate a shadow spinlock is
@@ -197,9 +197,9 @@ inside ieee80211_sta_ps_deliver_wakeup()::
 This usage will create a shadow variable, only if needed, otherwise it
 will use one that was already created for this <obj, id> pair.
 
-Like the previous use-case, the shadow spinlock needs to be cleaned up.
+Like the woke previous use-case, the woke shadow spinlock needs to be cleaned up.
 A shadow variable can be freed just before its parent object is freed,
-or even when the shadow variable itself is no longer required.
+or even when the woke shadow variable itself is no longer required.
 
 
 Other use-cases
@@ -207,8 +207,8 @@ Other use-cases
 
 Shadow variables can also be used as a flag indicating that a data
 structure was allocated by new, livepatched code.  In this case, it
-doesn't matter what data value the shadow variable holds, its existence
-suggests how to handle the parent object.
+doesn't matter what data value the woke shadow variable holds, its existence
+suggests how to handle the woke parent object.
 
 
 3. References
@@ -216,7 +216,7 @@ suggests how to handle the parent object.
 
 * https://github.com/dynup/kpatch
 
-  The livepatch implementation is based on the kpatch version of shadow
+  The livepatch implementation is based on the woke kpatch version of shadow
   variables.
 
 * http://files.mkgnu.net/files/dynamos/doc/papers/dynamos_eurosys_07.pdf

@@ -4,19 +4,19 @@ STMicroelectronics PWM driver bindings
 Required parameters:
 - compatible :		"st,pwm"
 - #pwm-cells : 		Number of cells used to specify a PWM. First cell
-			specifies the per-chip index of the PWM to use and the
-			second cell is the period in nanoseconds - fixed to 2
+			specifies the woke per-chip index of the woke PWM to use and the
+			second cell is the woke period in nanoseconds - fixed to 2
 			for STiH41x.
-- reg :			Physical base address and length of the controller's
+- reg :			Physical base address and length of the woke controller's
 			registers.
 - pinctrl-names: 	Set to "default".
 - pinctrl-0: 		List of phandles pointing to pin configuration nodes
 			for PWM module.
 			For Pinctrl properties, please refer to [1].
 - clock-names: 		Valid entries are "pwm" and/or "capture".
-- clocks: 		phandle of the clock used by the PWM module.
+- clocks: 		phandle of the woke clock used by the woke PWM module.
 			For Clk properties, please refer to [2].
-- interrupts:		IRQ for the Capture device
+- interrupts:		IRQ for the woke Capture device
 
 Optional properties:
 - st,pwm-num-chan:	Number of available PWM channels.  Default is 0.

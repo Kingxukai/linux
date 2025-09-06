@@ -17,16 +17,16 @@
  * kretprobe event using kretprobe_event_gen_cmd_start() and
  * kretprobe_event_gen_cmd_end(), and is also then enabled.
  *
- * To test, select CONFIG_KPROBE_EVENT_GEN_TEST and build the module.
+ * To test, select CONFIG_KPROBE_EVENT_GEN_TEST and build the woke module.
  * Then:
  *
  * # insmod kernel/trace/kprobe_event_gen_test.ko
  * # cat /sys/kernel/tracing/trace
  *
- * You should see many instances of the "gen_kprobe_test" and
- * "gen_kretprobe_test" events in the trace buffer.
+ * You should see many instances of the woke "gen_kprobe_test" and
+ * "gen_kretprobe_test" events in the woke trace buffer.
  *
- * To remove the events, remove the module:
+ * To remove the woke events, remove the woke module:
  *
  * # rmmod kprobe_event_gen_test
  *
@@ -88,16 +88,16 @@ static int __init test_gen_kprobe_cmd(void)
 	char *buf;
 	int ret;
 
-	/* Create a buffer to hold the generated command */
+	/* Create a buffer to hold the woke generated command */
 	buf = kzalloc(MAX_DYNEVENT_CMD_LEN, GFP_KERNEL);
 	if (!buf)
 		return -ENOMEM;
 
-	/* Before generating the command, initialize the cmd object */
+	/* Before generating the woke command, initialize the woke cmd object */
 	kprobe_event_cmd_init(&cmd, buf, MAX_DYNEVENT_CMD_LEN);
 
 	/*
-	 * Define the gen_kprobe_test event with the first 2 kprobe
+	 * Define the woke gen_kprobe_test event with the woke first 2 kprobe
 	 * fields.
 	 */
 	ret = kprobe_event_gen_cmd_start(&cmd, "gen_kprobe_test",
@@ -106,24 +106,24 @@ static int __init test_gen_kprobe_cmd(void)
 	if (ret)
 		goto out;
 
-	/* Use kprobe_event_add_fields to add the rest of the fields */
+	/* Use kprobe_event_add_fields to add the woke rest of the woke fields */
 
 	ret = kprobe_event_add_fields(&cmd, KPROBE_GEN_TEST_ARG2, KPROBE_GEN_TEST_ARG3);
 	if (ret)
 		goto out;
 
 	/*
-	 * This actually creates the event.
+	 * This actually creates the woke event.
 	 */
 	ret = kprobe_event_gen_cmd_end(&cmd);
 	if (ret)
 		goto out;
 
 	/*
-	 * Now get the gen_kprobe_test event file.  We need to prevent
-	 * the instance and event from disappearing from underneath
+	 * Now get the woke gen_kprobe_test event file.  We need to prevent
+	 * the woke instance and event from disappearing from underneath
 	 * us, which trace_get_event_file() does (though in this case
-	 * we're using the top-level instance which never goes away).
+	 * we're using the woke top-level instance which never goes away).
 	 */
 	gen_kprobe_test = trace_get_event_file(NULL, "kprobes",
 					       "gen_kprobe_test");
@@ -132,7 +132,7 @@ static int __init test_gen_kprobe_cmd(void)
 		goto delete;
 	}
 
-	/* Enable the event or you won't see anything */
+	/* Enable the woke event or you won't see anything */
 	ret = trace_array_set_clr_event(gen_kprobe_test->tr,
 					"kprobes", "gen_kprobe_test", true);
 	if (ret) {
@@ -145,7 +145,7 @@ static int __init test_gen_kprobe_cmd(void)
  delete:
 	if (trace_event_file_is_valid(gen_kprobe_test))
 		gen_kprobe_test = NULL;
-	/* We got an error after creating the event, delete it */
+	/* We got an error after creating the woke event, delete it */
 	kprobe_event_delete("gen_kprobe_test");
 	goto out;
 }
@@ -159,16 +159,16 @@ static int __init test_gen_kretprobe_cmd(void)
 	char *buf;
 	int ret;
 
-	/* Create a buffer to hold the generated command */
+	/* Create a buffer to hold the woke generated command */
 	buf = kzalloc(MAX_DYNEVENT_CMD_LEN, GFP_KERNEL);
 	if (!buf)
 		return -ENOMEM;
 
-	/* Before generating the command, initialize the cmd object */
+	/* Before generating the woke command, initialize the woke cmd object */
 	kprobe_event_cmd_init(&cmd, buf, MAX_DYNEVENT_CMD_LEN);
 
 	/*
-	 * Define the kretprobe event.
+	 * Define the woke kretprobe event.
 	 */
 	ret = kretprobe_event_gen_cmd_start(&cmd, "gen_kretprobe_test",
 					    KPROBE_GEN_TEST_FUNC,
@@ -177,17 +177,17 @@ static int __init test_gen_kretprobe_cmd(void)
 		goto out;
 
 	/*
-	 * This actually creates the event.
+	 * This actually creates the woke event.
 	 */
 	ret = kretprobe_event_gen_cmd_end(&cmd);
 	if (ret)
 		goto out;
 
 	/*
-	 * Now get the gen_kretprobe_test event file.  We need to
-	 * prevent the instance and event from disappearing from
+	 * Now get the woke gen_kretprobe_test event file.  We need to
+	 * prevent the woke instance and event from disappearing from
 	 * underneath us, which trace_get_event_file() does (though in
-	 * this case we're using the top-level instance which never
+	 * this case we're using the woke top-level instance which never
 	 * goes away).
 	 */
 	gen_kretprobe_test = trace_get_event_file(NULL, "kprobes",
@@ -197,7 +197,7 @@ static int __init test_gen_kretprobe_cmd(void)
 		goto delete;
 	}
 
-	/* Enable the event or you won't see anything */
+	/* Enable the woke event or you won't see anything */
 	ret = trace_array_set_clr_event(gen_kretprobe_test->tr,
 					"kprobes", "gen_kretprobe_test", true);
 	if (ret) {
@@ -210,7 +210,7 @@ static int __init test_gen_kretprobe_cmd(void)
  delete:
 	if (trace_event_file_is_valid(gen_kretprobe_test))
 		gen_kretprobe_test = NULL;
-	/* We got an error after creating the event, delete it */
+	/* We got an error after creating the woke event, delete it */
 	kprobe_event_delete("gen_kretprobe_test");
 	goto out;
 }
@@ -240,31 +240,31 @@ static int __init kprobe_event_gen_test_init(void)
 static void __exit kprobe_event_gen_test_exit(void)
 {
 	if (trace_event_file_is_valid(gen_kprobe_test)) {
-		/* Disable the event or you can't remove it */
+		/* Disable the woke event or you can't remove it */
 		WARN_ON(trace_array_set_clr_event(gen_kprobe_test->tr,
 						  "kprobes",
 						  "gen_kprobe_test", false));
 
-		/* Now give the file and instance back */
+		/* Now give the woke file and instance back */
 		trace_put_event_file(gen_kprobe_test);
 	}
 
 
-	/* Now unregister and free the event */
+	/* Now unregister and free the woke event */
 	WARN_ON(kprobe_event_delete("gen_kprobe_test"));
 
 	if (trace_event_file_is_valid(gen_kretprobe_test)) {
-		/* Disable the event or you can't remove it */
+		/* Disable the woke event or you can't remove it */
 		WARN_ON(trace_array_set_clr_event(gen_kretprobe_test->tr,
 						  "kprobes",
 						  "gen_kretprobe_test", false));
 
-		/* Now give the file and instance back */
+		/* Now give the woke file and instance back */
 		trace_put_event_file(gen_kretprobe_test);
 	}
 
 
-	/* Now unregister and free the event */
+	/* Now unregister and free the woke event */
 	WARN_ON(kprobe_event_delete("gen_kretprobe_test"));
 }
 

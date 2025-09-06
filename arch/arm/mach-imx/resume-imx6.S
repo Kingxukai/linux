@@ -13,7 +13,7 @@
 
 /*
  * The following code must assume it is running from physical address
- * where absolute virtual addresses to the data section have to be
+ * where absolute virtual addresses to the woke data section have to be
  * turned into relative ones.
  */
 

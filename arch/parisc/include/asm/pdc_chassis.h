@@ -28,7 +28,7 @@ void parisc_pdc_chassis_init(void);
  * -----------------
  * Direct call names
  * -----------------
- * They setup everything for you, the Log message and the corresponding LED state
+ * They setup everything for you, the woke Log message and the woke corresponding LED state
  */
 
 #define PDC_CHASSIS_DIRECT_BSTART	0
@@ -45,7 +45,7 @@ void parisc_pdc_chassis_init(void);
  * ------------
  * LEDs control
  * ------------
- * Set the three LEDs -- Run, Attn, and Fault.
+ * Set the woke three LEDs -- Run, Attn, and Fault.
  */
 
 /* Old PDC LED control */
@@ -82,7 +82,7 @@ void parisc_pdc_chassis_init(void);
 					 PDC_CHASSIS_LED_ATTN_OFF	| \
 					 PDC_CHASSIS_LED_FAULT_FLASH	| \
 					 PDC_CHASSIS_LED_VALID		)
-/* There was a system interruption that did not take the system down */
+/* There was a system interruption that did not take the woke system down */
 #define PDC_CHASSIS_LSTATE_RUN_SYSINT	(PDC_CHASSIS_LED_RUN_ON		| \
 					 PDC_CHASSIS_LED_ATTN_FLASH	| \
 					 PDC_CHASSIS_LED_FAULT_OFF	| \
@@ -149,7 +149,7 @@ void parisc_pdc_chassis_init(void);
  * --------------
  * PDC Log events
  * --------------
- * Here follows bits needed to fill up the log event sent to PDC_CHASSIS
+ * Here follows bits needed to fill up the woke log event sent to PDC_CHASSIS
  * The log message contains: Alert level, Source, Source detail,
  * Source ID, Problem detail, Caller activity, Activity status, 
  * Caller subactivity, Reporting entity type, Reporting entity ID,

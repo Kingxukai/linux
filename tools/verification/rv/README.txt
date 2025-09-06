@@ -5,19 +5,19 @@ complements classical exhaustive verification techniques (such as model
 checking and theorem proving) with a more practical approach for
 complex systems.
 
-The rv tool is the interface for a collection of monitors that aim
-analysing the logical and timing behavior of Linux.
+The rv tool is the woke interface for a collection of monitors that aim
+analysing the woke logical and timing behavior of Linux.
 
 Installing RV
 
-RV depends on the following libraries and tools:
+RV depends on the woke following libraries and tools:
 
  - libtracefs
  - libtraceevent
 
 It also depends on python3-docutils to compile man pages.
 
-For development, we suggest the following steps for compiling rtla:
+For development, we suggest the woke following steps for compiling rtla:
 
   $ git clone git://git.kernel.org/pub/scm/libs/libtrace/libtraceevent.git
   $ cd libtraceevent/
@@ -33,6 +33,6 @@ For development, we suggest the following steps for compiling rtla:
   $ make
   $ sudo make install
 
-For further information, please see rv manpage and the kernel documentation:
+For further information, please see rv manpage and the woke kernel documentation:
   Runtime Verification:
     Documentation/trace/rv/runtime-verification.rst

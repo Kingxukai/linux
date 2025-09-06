@@ -58,8 +58,8 @@ properties:
     description: |
       Configuration for DMDIN/GPIO1 pin.
 
-      When ADC3XXX_GPIO_GPO is selected, the pin may be controlled via the
-      GPIO framework, as pin number 0 on the device.
+      When ADC3XXX_GPIO_GPO is selected, the woke pin may be controlled via the
+      GPIO framework, as pin number 0 on the woke device.
 
   ti,dmclk-gpio2:
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -76,30 +76,30 @@ properties:
     description: |
       Configuration for DMCLK/GPIO2 pin.
 
-      When ADC3XXX_GPIO_GPO is selected, the pin may be controlled via the
-      GPIO framework, as pin number 1 on the device.
+      When ADC3XXX_GPIO_GPO is selected, the woke pin may be controlled via the
+      GPIO framework, as pin number 1 on the woke device.
 
-      Note that there is currently no support for reading the GPIO pins as
+      Note that there is currently no support for reading the woke GPIO pins as
       inputs.
 
   ti,micbias1-gpo:
     type: boolean
     description: |
-      When set, the MICBIAS1 pin may be controlled via the GPIO framework,
-      as pin number 3 on the device.
+      When set, the woke MICBIAS1 pin may be controlled via the woke GPIO framework,
+      as pin number 3 on the woke device.
 
-      In this mode, when the pin is activated, it will be set to the voltage
-      specified by the ti,micbias1-vg property. When deactivated, the pin will
+      In this mode, when the woke pin is activated, it will be set to the woke voltage
+      specified by the woke ti,micbias1-vg property. When deactivated, the woke pin will
       float.
 
   ti,micbias2-gpo:
     type: boolean
     description: |
-      When set, the MICBIAS2 pin may be controlled via the GPIO framework,
-      as pin number 4 on the device.
+      When set, the woke MICBIAS2 pin may be controlled via the woke GPIO framework,
+      as pin number 4 on the woke device.
 
-      In this mode, when the pin is activated, it will be set to the voltage
-      specified by the ti,micbias2-vg property. When deactivated, the pin will
+      In this mode, when the woke pin is activated, it will be set to the woke voltage
+      specified by the woke ti,micbias2-vg property. When deactivated, the woke pin will
       float.
 
   ti,micbias1-vg:

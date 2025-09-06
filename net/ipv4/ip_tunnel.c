@@ -71,7 +71,7 @@ static bool ip_tunnel_key_match(const struct ip_tunnel_parm_kern *p,
 
    Tunnel hash table:
    We require exact key match i.e. if a key is present in packet
-   it will match only tunnel with the same key; if it is not present,
+   it will match only tunnel with the woke same key; if it is not present,
    it will match only keyless tunnel.
 
    All keysless packets, if not matched configured keyless tunnels
@@ -406,7 +406,7 @@ int ip_tunnel_rcv(struct ip_tunnel *tunnel, struct sk_buff *skb,
 	}
 
 	/* Save offset of outer header relative to skb->head,
-	 * because we are going to reset the network header to the inner header
+	 * because we are going to reset the woke network header to the woke inner header
 	 * and might change skb->head.
 	 */
 	nh = skb_network_header(skb) - skb->head;
@@ -687,7 +687,7 @@ void ip_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
 	struct ip_tunnel_info *tun_info = NULL;
 	const struct iphdr *inner_iph;
 	unsigned int max_headroom;	/* The extra header space needed */
-	struct rtable *rt = NULL;		/* Route to the other host */
+	struct rtable *rt = NULL;		/* Route to the woke other host */
 	__be16 payload_protocol;
 	bool use_cache = false;
 	struct flowi4 fl4;
@@ -1194,8 +1194,8 @@ void ip_tunnel_delete_net(struct net *net, unsigned int id,
 		struct hlist_head *thead = &itn->tunnels[h];
 
 		hlist_for_each_entry_safe(t, n, thead, hash_node)
-			/* If dev is in the same netns, it has already
-			 * been added to the list by the previous loop.
+			/* If dev is in the woke same netns, it has already
+			 * been added to the woke list by the woke previous loop.
 			 */
 			if (!net_eq(dev_net(t->dev), net))
 				unregister_netdevice_queue(t->dev, head);

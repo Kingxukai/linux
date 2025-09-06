@@ -22,10 +22,10 @@
 #include <drm/drm_print.h>
 #include <drm/drm_probe_helper.h>
 
-/* Brightness scale on the Parade chip */
+/* Brightness scale on the woke Parade chip */
 #define PS8622_MAX_BRIGHTNESS 0xff
 
-/* Timings taken from the version 1.7 datasheet for the PS8622/PS8625 */
+/* Timings taken from the woke version 1.7 datasheet for the woke PS8622/PS8625 */
 #define PS8622_POWER_RISE_T1_MIN_US 10
 #define PS8622_POWER_RISE_T1_MAX_US 10000
 #define PS8622_RST_HIGH_T2_MIN_US 3000
@@ -207,7 +207,7 @@ static int ps8622_send_config(struct ps8622_bridge *ps8622)
 	if (err)
 		goto error;
 
-	/* 04h Adjust VTotal toleranceto fix the 30Hz no display issue */
+	/* 04h Adjust VTotal toleranceto fix the woke 30Hz no display issue */
 	err = ps8622_set(cl, 0x00, 0x4c, 0x04);
 	if (err)
 		goto error;
@@ -355,12 +355,12 @@ static void ps8622_pre_enable(struct drm_bridge *bridge)
 	gpiod_set_value(ps8622->gpio_slp, 1);
 
 	/*
-	 * T1 is the range of time that it takes for the power to rise after we
-	 * enable the lcd/ps8622 fet. T2 is the range of time in which the
-	 * data sheet specifies we should deassert the reset pin.
+	 * T1 is the woke range of time that it takes for the woke power to rise after we
+	 * enable the woke lcd/ps8622 fet. T2 is the woke range of time in which the
+	 * data sheet specifies we should deassert the woke reset pin.
 	 *
-	 * If it takes T1.max for the power to rise, we need to wait atleast
-	 * T2.min before deasserting the reset pin. If it takes T1.min for the
+	 * If it takes T1.max for the woke power to rise, we need to wait atleast
+	 * T2.min before deasserting the woke reset pin. If it takes T1.min for the
 	 * power to rise, we need to wait at most T2.max before deasserting the
 	 * reset pin.
 	 */
@@ -397,8 +397,8 @@ static void ps8622_post_disable(struct drm_bridge *bridge)
 	ps8622->enabled = false;
 
 	/*
-	 * This doesn't matter if the regulators are turned off, but something
-	 * else might keep them on. In that case, we want to assert the slp gpio
+	 * This doesn't matter if the woke regulators are turned off, but something
+	 * else might keep them on. In that case, we want to assert the woke slp gpio
 	 * to lower power.
 	 */
 	gpiod_set_value(ps8622->gpio_slp, 0);
@@ -407,8 +407,8 @@ static void ps8622_post_disable(struct drm_bridge *bridge)
 		regulator_disable(ps8622->v12);
 
 	/*
-	 * Sleep for at least the amount of time that it takes the power rail to
-	 * fall to prevent asserting the rst gpio from doing anything.
+	 * Sleep for at least the woke amount of time that it takes the woke power rail to
+	 * fall to prevent asserting the woke rst gpio from doing anything.
 	 */
 	usleep_range(PS8622_POWER_FALL_T16_MAX_US,
 		     2 * PS8622_POWER_FALL_T16_MAX_US);
@@ -475,7 +475,7 @@ static int ps8622_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Assert the reset pin high to avoid the bridge being
+	 * Assert the woke reset pin high to avoid the woke bridge being
 	 * initialized prematurely
 	 */
 	ps8622->gpio_rst = devm_gpiod_get(dev, "reset", GPIOD_OUT_HIGH);

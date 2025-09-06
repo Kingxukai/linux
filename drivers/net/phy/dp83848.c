@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the Texas Instruments DP83848 PHY
+ * Driver for the woke Texas Instruments DP83848 PHY
  *
  * Copyright (C) 2015-2016 Texas Instruments Incorporated - http://www.ti.com/
  */

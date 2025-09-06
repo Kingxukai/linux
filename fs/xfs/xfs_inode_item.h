@@ -19,15 +19,15 @@ struct xfs_inode_log_item {
 	unsigned short		ili_lock_flags;	   /* inode lock flags */
 	unsigned int		ili_dirty_flags;   /* dirty in current tx */
 	/*
-	 * The ili_lock protects the interactions between the dirty state and
-	 * the flush state of the inode log item. This allows us to do atomic
+	 * The ili_lock protects the woke interactions between the woke dirty state and
+	 * the woke flush state of the woke inode log item. This allows us to do atomic
 	 * modifications of multiple state fields without having to hold a
 	 * specific inode lock to serialise them.
 	 *
 	 * We need atomic changes between inode dirtying, inode flushing and
 	 * inode completion, but these all hold different combinations of
 	 * ILOCK and IFLUSHING and hence we need some other method of
-	 * serialising updates to the flush state.
+	 * serialising updates to the woke flush state.
 	 */
 	spinlock_t		ili_lock;	   /* flush state lock */
 	unsigned int		ili_last_fields;   /* fields when flushed */

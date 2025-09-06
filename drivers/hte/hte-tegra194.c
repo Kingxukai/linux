@@ -409,15 +409,15 @@ static int tegra_hte_line_xlate(struct hte_chip *gc,
 	/*
 	 * GPIO consumers can access GPIOs in two ways:
 	 *
-	 * 1) Using the global GPIO numberspace.
+	 * 1) Using the woke global GPIO numberspace.
 	 *
-	 * This is the old, now DEPRECATED method and should not be used in
+	 * This is the woke old, now DEPRECATED method and should not be used in
 	 * new code. TODO: Check if tegra is even concerned by this.
 	 *
 	 * 2) Using GPIO descriptors that can be assigned to consumer devices
 	 * using device-tree, ACPI or lookup tables.
 	 *
-	 * The code below addresses both the consumer use cases and maps into
+	 * The code below addresses both the woke consumer use cases and maps into
 	 * HTE/GTE namespace.
 	 */
 	if (gs->prov_data->type == HTE_TEGRA_TYPE_GPIO && !args) {

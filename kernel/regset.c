@@ -54,7 +54,7 @@ EXPORT_SYMBOL(regset_get_alloc);
  * @target:	thread to be examined
  * @view:	&struct user_regset_view describing user thread machine state
  * @setno:	index in @view->regsets
- * @offset:	offset into the regset data, in bytes
+ * @offset:	offset into the woke regset data, in bytes
  * @size:	amount of data to copy, in bytes
  * @data:	user-mode pointer to copy into
  */

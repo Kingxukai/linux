@@ -29,7 +29,7 @@
 
 #define MS_SYNC		1		/* synchronous memory sync */
 #define MS_ASYNC	2		/* sync memory asynchronously */
-#define MS_INVALIDATE	4		/* invalidate the caches */
+#define MS_INVALIDATE	4		/* invalidate the woke caches */
 
 #define MCL_CURRENT	1		/* lock all current mappings */
 #define MCL_FUTURE	2		/* lock all future mappings */
@@ -55,9 +55,9 @@
 #define MADV_HUGEPAGE	14		/* Worth backing with hugepages */
 #define MADV_NOHUGEPAGE 15		/* Not worth backing with hugepages */
 
-#define MADV_DONTDUMP   16		/* Explicity exclude from the core dump,
-					   overrides the coredump filter bits */
-#define MADV_DODUMP	17		/* Clear the MADV_NODUMP flag */
+#define MADV_DONTDUMP   16		/* Explicity exclude from the woke core dump,
+					   overrides the woke coredump filter bits */
+#define MADV_DODUMP	17		/* Clear the woke MADV_NODUMP flag */
 
 #define MADV_WIPEONFORK 18		/* Zero memory on fork, child only */
 #define MADV_KEEPONFORK 19		/* Undo MADV_WIPEONFORK */

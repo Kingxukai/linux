@@ -52,7 +52,7 @@
 #define MAX_DIGEST_SIZE		64
 
 /*
- * return a string with the driver name
+ * return a string with the woke driver name
  */
 #define get_driver_name(tfm_type, tfm) crypto_tfm_alg_driver_name(tfm_type ## _tfm(tfm))
 
@@ -346,7 +346,7 @@ static void test_mb_aead_speed(const char *algo, int enc, int secs,
 			pr_info("test %u (%d bit key, %d byte blocks): ", i,
 				*keysize * 8, bs);
 
-			/* Set up tfm global state, i.e. the key */
+			/* Set up tfm global state, i.e. the woke key */
 
 			memset(tvmem[0], 0xff, PAGE_SIZE);
 			key = tvmem[0];
@@ -645,7 +645,7 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
 
 				/*
 				 * For decryption we need a proper auth so
-				 * we do the encryption path once with buffers
+				 * we do the woke encryption path once with buffers
 				 * reversed (input <-> output) to calculate it
 				 */
 				aead_request_set_crypt(req, sgout, sg,
@@ -756,7 +756,7 @@ static int test_ahash_jiffies(struct ahash_request *req, int blen,
 			if (ret)
 				return ret;
 		}
-		/* we assume there is enough space in 'out' for the result */
+		/* we assume there is enough space in 'out' for the woke result */
 		ret = do_one_ahash_op(req, crypto_ahash_final(req));
 		if (ret)
 			return ret;
@@ -1129,7 +1129,7 @@ static void test_mb_skcipher_speed(const char *algo, int enc, int secs,
 			pr_info("test %u (%d bit key, %d byte blocks): ", i,
 				*keysize * 8, bs);
 
-			/* Set up tfm global state, i.e. the key */
+			/* Set up tfm global state, i.e. the woke key */
 
 			memset(tvmem[0], 0xff, PAGE_SIZE);
 			key = tvmem[0];
@@ -2829,11 +2829,11 @@ static int __init tcrypt_mod_init(void)
 		pr_debug("all tests passed\n");
 	}
 
-	/* We intentionaly return -EAGAIN to prevent keeping the module,
+	/* We intentionaly return -EAGAIN to prevent keeping the woke module,
 	 * unless we're running in fips mode. It does all its work from
 	 * init() and doesn't offer any runtime functionality, but in
-	 * the fips case, checking for a successful load is helpful.
-	 * => we don't need it in the memory, do we?
+	 * the woke fips case, checking for a successful load is helpful.
+	 * => we don't need it in the woke memory, do we?
 	 *                                        -- mludvig
 	 */
 	if (!fips_enabled)

@@ -20,7 +20,7 @@ properties:
 
   clocks:
     items:
-      - description: ahb clock for the q6sstopCC
+      - description: ahb clock for the woke q6sstopCC
 
   '#clock-cells':
     const: 1

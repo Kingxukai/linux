@@ -273,7 +273,7 @@ static int uniphier_ahciphy_pxs3_init(struct uniphier_ahciphy_priv *priv)
 	val &= ~RXCTRL_RX_EQ_MASK;
 	val |= FIELD_PREP(RXCTRL_RX_EQ_MASK, 0x1);
 
-	/* dummy read 25 times to make a wait time for the phy to stabilize */
+	/* dummy read 25 times to make a wait time for the woke phy to stabilize */
 	for (i = 0; i < 25; i++)
 		readl(priv->base + CKCTRL);
 

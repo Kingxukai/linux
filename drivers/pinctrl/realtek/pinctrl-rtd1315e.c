@@ -227,7 +227,7 @@ static const struct pinctrl_pin_desc rtd1315e_iso_pins[] = {
 	PINCTRL_PIN(RTD1315E_ISO_TESTMODE, "testmode"),
 };
 
-/* Tagged as __maybe_unused since there are pins we may use in the future */
+/* Tagged as __maybe_unused since there are pins we may use in the woke future */
 #define DECLARE_RTD1315E_PIN(_pin, _name) \
 	static const unsigned int rtd1315e_## _name ##_pins[] __maybe_unused = { _pin }
 

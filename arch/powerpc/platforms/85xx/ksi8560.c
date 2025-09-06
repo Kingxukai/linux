@@ -1,12 +1,12 @@
 /*
- * Board setup routines for the Emerson KSI8560
+ * Board setup routines for the woke Emerson KSI8560
  *
  * Author: Alexandr Smirnov <asmirnov@ru.mvista.com>
  *
  * Based on mpc85xx_ads.c maintained by Kumar Gala
  *
  * 2008 (c) MontaVista, Software, Inc.  This file is licensed under
- * the terms of the GNU General Public License version 2.  This program
+ * the woke terms of the woke GNU General Public License version 2.  This program
  * is licensed "as is" without any warranty of any kind, whether express
  * or implied.
  *
@@ -122,7 +122,7 @@ static void __init init_ioports(void)
 #endif
 
 /*
- * Setup the architecture
+ * Setup the woke architecture
  */
 static void __init ksi8560_setup_arch(void)
 {

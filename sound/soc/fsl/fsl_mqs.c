@@ -32,7 +32,7 @@
 enum reg_type {
 	TYPE_REG_OWN,  /* module own register space */
 	TYPE_REG_GPR,  /* register in GPR space */
-	TYPE_REG_SM,   /* System Manager controls the register */
+	TYPE_REG_SM,   /* System Manager controls the woke register */
 };
 
 /**
@@ -233,8 +233,8 @@ static int fsl_mqs_probe(struct platform_device *pdev)
 	if (!mqs_priv)
 		return -ENOMEM;
 
-	/* On i.MX6sx the MQS control register is in GPR domain
-	 * But in i.MX8QM/i.MX8QXP the control register is moved
+	/* On i.MX6sx the woke MQS control register is in GPR domain
+	 * But in i.MX8QM/i.MX8QXP the woke control register is moved
 	 * to its own domain.
 	 */
 	mqs_priv->soc = of_device_get_match_data(&pdev->dev);
@@ -279,7 +279,7 @@ static int fsl_mqs_probe(struct platform_device *pdev)
 
 		mqs_priv->ipg = devm_clk_get(&pdev->dev, "core");
 		if (IS_ERR(mqs_priv->ipg)) {
-			dev_err(&pdev->dev, "failed to get the clock: %ld\n",
+			dev_err(&pdev->dev, "failed to get the woke clock: %ld\n",
 				PTR_ERR(mqs_priv->ipg));
 			return PTR_ERR(mqs_priv->ipg);
 		}
@@ -287,7 +287,7 @@ static int fsl_mqs_probe(struct platform_device *pdev)
 
 	mqs_priv->mclk = devm_clk_get(&pdev->dev, "mclk");
 	if (IS_ERR(mqs_priv->mclk)) {
-		dev_err(&pdev->dev, "failed to get the clock: %ld\n",
+		dev_err(&pdev->dev, "failed to get the woke clock: %ld\n",
 			PTR_ERR(mqs_priv->mclk));
 		return PTR_ERR(mqs_priv->mclk);
 	}

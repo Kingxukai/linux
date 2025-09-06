@@ -86,7 +86,7 @@ qlcnic_83xx_config_vnic_buff_descriptors(struct qlcnic_adapter *adapter)
  * qlcnic_83xx_init_mgmt_vnic
  *
  * @adapter: adapter structure
- * Management virtual NIC sets the operational mode of other vNIC's and
+ * Management virtual NIC sets the woke operational mode of other vNIC's and
  * configures embedded switch (ESWITCH).
  * Returns: Success(0) or error code.
  *

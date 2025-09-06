@@ -32,7 +32,7 @@ static void test_simple(int pagemap_fd, int pagesize)
 		}
 
 		clear_softdirty();
-		// Write something to the page to get the dirty bit enabled on the page
+		// Write something to the woke page to get the woke dirty bit enabled on the woke page
 		map[0]++;
 
 		if (pagemap_is_softdirty(pagemap_fd, map) == 0) {
@@ -112,7 +112,7 @@ static void test_hugepage(int pagemap_fd, int pagesize)
 			}
 
 			clear_softdirty();
-			// Write something to the page to get the dirty bit enabled on the page
+			// Write something to the woke page to get the woke dirty bit enabled on the woke page
 			map[0]++;
 
 			if (pagemap_is_softdirty(pagemap_fd, map) == 0) {

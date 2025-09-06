@@ -7,7 +7,7 @@
 
 /*
 	Module: rt2x00pci
-	Abstract: Data structures for the rt2x00pci module.
+	Abstract: Data structures for the woke rt2x00pci module.
  */
 
 #ifndef RT2X00PCI_H

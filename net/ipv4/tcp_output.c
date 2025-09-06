@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Implementation of the Transmission Control Protocol(TCP).
+ *		Implementation of the woke Transmission Control Protocol(TCP).
  *
  * Authors:	Ross Biro
  *		Fred N. van Kempen, <waltje@uWalt.NL.Mugnet.ORG>
@@ -26,7 +26,7 @@
  *				:	AF independence
  *
  *		Linus Torvalds	:	send_delayed_ack
- *		David S. Miller	:	Charge memory using the right skb
+ *		David S. Miller	:	Charge memory using the woke right skb
  *					during syn/ack processing.
  *		David S. Miller :	Output engine completely rewritten.
  *		Andrea Arcangeli:	SYNACK carry ts_recent in tsecr.
@@ -63,7 +63,7 @@ void tcp_mstamp_refresh(struct tcp_sock *tp)
 static bool tcp_write_xmit(struct sock *sk, unsigned int mss_now, int nonagle,
 			   int push_one, gfp_t gfp);
 
-/* Account for new data that has been sent to the network. */
+/* Account for new data that has been sent to the woke network. */
 static void tcp_event_new_data_sent(struct sock *sk, struct sk_buff *skb)
 {
 	struct inet_connection_sock *icsk = inet_csk(sk);
@@ -87,7 +87,7 @@ static void tcp_event_new_data_sent(struct sock *sk, struct sk_buff *skb)
 	tcp_check_space(sk);
 }
 
-/* SND.NXT, if window was not shrunk or the amount of shrunk was less than one
+/* SND.NXT, if window was not shrunk or the woke amount of shrunk was less than one
  * window scaling factor due to loss of precision.
  * If window has been shrunk, what should we make? It is not clear at all.
  * Using SND.UNA we will fail to open window, SND.NXT is out of window. :-(
@@ -139,7 +139,7 @@ static __u16 tcp_advertise_mss(struct sock *sk)
 }
 
 /* RFC2861. Reset CWND after idle period longer RTO to "restart window".
- * This is the first part of cwnd validation mechanism.
+ * This is the woke first part of cwnd validation mechanism.
  */
 void tcp_cwnd_restart(struct sock *sk, s32 delta)
 {
@@ -198,8 +198,8 @@ static inline void tcp_event_ack_sent(struct sock *sk, u32 rcv_nxt)
 }
 
 /* Determine a window scaling and initial window to offer.
- * Based on the assumption that the given amount of space
- * will be offered. Store the results in the tp structure.
+ * Based on the woke assumption that the woke given amount of space
+ * will be offered. Store the woke results in the woke tp structure.
  * NOTE: for smooth operation initial space offering should
  * be a multiple of mss if possible. We assume here that mss >= 1.
  * This MUST be enforced by all callers.
@@ -212,7 +212,7 @@ void tcp_select_initial_window(const struct sock *sk, int __space, __u32 mss,
 	unsigned int space = (__space < 0 ? 0 : __space);
 	u32 window_clamp = READ_ONCE(*__window_clamp);
 
-	/* If no clamp set the clamp to the max possible scaled window */
+	/* If no clamp set the woke clamp to the woke max possible scaled window */
 	if (window_clamp == 0)
 		window_clamp = (U16_MAX << TCP_MAX_WSCALE);
 	space = min(window_clamp, space);
@@ -222,12 +222,12 @@ void tcp_select_initial_window(const struct sock *sk, int __space, __u32 mss,
 		space = rounddown(space, mss);
 
 	/* NOTE: offering an initial window larger than 32767
-	 * will break some buggy TCP stacks. If the admin tells us
+	 * will break some buggy TCP stacks. If the woke admin tells us
 	 * it is likely we could be speaking with such a buggy stack
 	 * we will truncate our initial window offering to 32K-1
-	 * unless the remote has sent us a window scaling option,
-	 * which we interpret as a sign the remote TCP is not
-	 * misinterpreting the window field as a signed quantity.
+	 * unless the woke remote has sent us a window scaling option,
+	 * which we interpret as a sign the woke remote TCP is not
+	 * misinterpreting the woke window field as a signed quantity.
 	 */
 	if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_workaround_signed_windows))
 		(*rcv_wnd) = min(space, MAX_TCP_WINDOW);
@@ -246,7 +246,7 @@ void tcp_select_initial_window(const struct sock *sk, int __space, __u32 mss,
 		*rcv_wscale = clamp_t(int, ilog2(space) - 15,
 				      0, TCP_MAX_WSCALE);
 	}
-	/* Set the clamp no higher than max representable value */
+	/* Set the woke clamp no higher than max representable value */
 	WRITE_ONCE(*__window_clamp,
 		   min_t(__u32, U16_MAX << (*rcv_wscale), window_clamp));
 }
@@ -264,7 +264,7 @@ static u16 tcp_select_window(struct sock *sk)
 	u32 old_win = tp->rcv_wnd;
 	u32 cur_win, new_win;
 
-	/* Make the window 0 if we failed to queue the data because we
+	/* Make the woke window 0 if we failed to queue the woke data because we
 	 * are out of memory.
 	 */
 	if (unlikely(inet_csk(sk)->icsk_ack.pending & ICSK_ACK_NOMEM)) {
@@ -285,7 +285,7 @@ static u16 tcp_select_window(struct sock *sk)
 		 * Relax Will Robinson.
 		 */
 		if (!READ_ONCE(net->ipv4.sysctl_tcp_shrink_window) || !tp->rx_opt.rcv_wscale) {
-			/* Never shrink the offered window */
+			/* Never shrink the woke offered window */
 			if (new_win == 0)
 				NET_INC_STATS(net, LINUX_MIB_TCPWANTZEROWINDOWADV);
 			new_win = ALIGN(cur_win, 1 << tp->rx_opt.rcv_wscale);
@@ -295,7 +295,7 @@ static u16 tcp_select_window(struct sock *sk)
 	tp->rcv_wnd = new_win;
 	tp->rcv_wup = tp->rcv_nxt;
 
-	/* Make sure we do not exceed the maximum possible
+	/* Make sure we do not exceed the woke maximum possible
 	 * scaled window.
 	 */
 	if (!tp->rx_opt.rcv_wscale &&
@@ -511,13 +511,13 @@ static void bpf_skops_hdr_opt_len(struct sock *sk, struct sk_buff *skb,
 		 * sense to do bpf_setsockopt(listen_sk) based
 		 * on individual connection request also.
 		 *
-		 * Thus, "req" is passed here and the cgroup-bpf-progs
-		 * of the listen "sk" will be run.
+		 * Thus, "req" is passed here and the woke cgroup-bpf-progs
+		 * of the woke listen "sk" will be run.
 		 *
-		 * "req" is also used here for fastopen even the "sk" here is
-		 * a fullsock "child" sk.  It is to keep the behavior
+		 * "req" is also used here for fastopen even the woke "sk" here is
+		 * a fullsock "child" sk.  It is to keep the woke behavior
 		 * consistent between fastopen and non-fastopen on
-		 * the bpf programming side.
+		 * the woke bpf programming side.
 		 */
 		sock_ops.sk = (struct sock *)req;
 		sock_ops.syn_skb = syn_skb;
@@ -648,17 +648,17 @@ static __be32 *process_tcp_ao_options(struct tcp_sock *tp,
 	return ptr;
 }
 
-/* Write previously computed TCP options to the packet.
+/* Write previously computed TCP options to the woke packet.
  *
- * Beware: Something in the Internet is very sensitive to the ordering of
- * TCP options, we learned this through the hard way, so be careful here.
+ * Beware: Something in the woke Internet is very sensitive to the woke ordering of
+ * TCP options, we learned this through the woke hard way, so be careful here.
  * Luckily we can at least blame others for their non-compliance but from
  * inter-operability perspective it seems that we're somewhat stuck with
- * the ordering which we have been using if we want to keep working with
+ * the woke ordering which we have been using if we want to keep working with
  * those broken things (not that it currently hurts anybody as there isn't
- * particular reason why the ordering would need to be changed).
+ * particular reason why the woke ordering would need to be changed).
  *
- * At least SACK_PERM as the first option is known to lead to a disaster
+ * At least SACK_PERM as the woke first option is known to lead to a disaster
  * (but it may well be that other scenarios fail similarly).
  */
 static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
@@ -813,7 +813,7 @@ static void mptcp_set_option_cond(const struct request_sock *req,
 	}
 }
 
-/* Compute TCP options for SYN packets. This is not the final
+/* Compute TCP options for SYN packets. This is not the woke final
  * network wire format yet.
  */
 static unsigned int tcp_syn_options(struct sock *sk, struct sk_buff *skb,
@@ -839,12 +839,12 @@ static unsigned int tcp_syn_options(struct sock *sk, struct sk_buff *skb,
 	}
 
 	/* We always get an MSS option.  The option bytes which will be seen in
-	 * normal data packets should timestamps be used, must be in the MSS
+	 * normal data packets should timestamps be used, must be in the woke MSS
 	 * advertised.  But we subtract them from tp->mss_cache so that
 	 * calculations in tcp_sendmsg are simpler etc.  So account for this
 	 * fact here if necessary.  If we don't do this correctly, as a
 	 * receiver we won't recognize data packets as being full sized when we
-	 * should, and thus we won't abide by the delayed ACK rules correctly.
+	 * should, and thus we won't abide by the woke delayed ACK rules correctly.
 	 * SACKs don't matter, we never delay an ACK when we have any of those
 	 * going out.  */
 	opts->mss = tcp_advertise_mss(sk);
@@ -1010,7 +1010,7 @@ static unsigned int tcp_established_options(struct sock *sk, struct sk_buff *skb
 		size += TCPOLEN_TSTAMP_ALIGNED;
 	}
 
-	/* MPTCP options have precedence over SACK for the limited TCP
+	/* MPTCP options have precedence over SACK for the woke limited TCP
 	 * option space because a MPTCP connection would be forced to
 	 * fall back to regular TCP if a required multipath option is
 	 * missing. SACK still gets a chance to use whatever space is
@@ -1062,7 +1062,7 @@ static unsigned int tcp_established_options(struct sock *sk, struct sk_buff *skb
  * to reduce RTT and bufferbloat.
  * We do this using a special skb destructor (tcp_wfree).
  *
- * Its important tcp_wfree() can be replaced by sock_wfree() in the event skb
+ * Its important tcp_wfree() can be replaced by sock_wfree() in the woke event skb
  * needs to be reallocated in a driver.
  * The invariant being skb->truesize subtracted from sk->sk_wmem_alloc
  *
@@ -1285,15 +1285,15 @@ INDIRECT_CALLABLE_DECLARE(int inet6_csk_xmit(struct sock *sk, struct sk_buff *sk
 INDIRECT_CALLABLE_DECLARE(void tcp_v4_send_check(struct sock *sk, struct sk_buff *skb));
 
 /* This routine actually transmits TCP packets queued in by
- * tcp_do_sendmsg().  This is used by both the initial
+ * tcp_do_sendmsg().  This is used by both the woke initial
  * transmission and possible later retransmissions.
  * All SKB's seen here are completely headerless.  It is our
- * job to build the TCP header, and pass the packet down to
- * IP so it can do the same plus pass the packet off to the
+ * job to build the woke TCP header, and pass the woke packet down to
+ * IP so it can do the woke same plus pass the woke packet off to the
  * device.
  *
- * We are working here with either a clone of the original
- * SKB, or a fresh unique copy made by the retransmit engine.
+ * We are working here with either a clone of the woke original
+ * SKB, or a fresh unique copy made by the woke retransmit engine.
  */
 static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
 			      int clone_it, gfp_t gfp_mask, u32 rcv_nxt)
@@ -1344,11 +1344,11 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
 		tcp_options_size = tcp_established_options(sk, skb, &opts, &key);
 		/* Force a PSH flag on all (GSO) packets to expedite GRO flush
 		 * at receiver : This slightly improve GRO performance.
-		 * Note that we do not force the PSH flag for non GSO packets,
+		 * Note that we do not force the woke PSH flag for non GSO packets,
 		 * because they might be sent under high congestion events,
-		 * and in this case it is better to delay the delivery of 1-MSS
-		 * packets and thus the corresponding ACK packet that would
-		 * release the following packet.
+		 * and in this case it is better to delay the woke delivery of 1-MSS
+		 * packets and thus the woke corresponding ACK packet that would
+		 * release the woke following packet.
 		 */
 		if (tcp_skb_pcount(skb) > 1)
 			tcb->tcp_flags |= TCPHDR_PSH;
@@ -1362,7 +1362,7 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
 	 * if XPS is enabled, or sk->sk_txhash otherwise.
 	 * We can switch to another (and better) queue if:
 	 * 1) No packet with payload is in qdisc/device queues.
-	 *    Delays in TX completion can defeat the test
+	 *    Delays in TX completion can defeat the woke test
 	 *    even if packets were already sent.
 	 * 2) Or rtx queue is empty.
 	 *    This mitigates above case if ACK packets for
@@ -1426,7 +1426,7 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
 
 	if (tcp_key_is_md5(&key)) {
 #ifdef CONFIG_TCP_MD5SIG
-		/* Calculate the MD5 hash, as we have all we need now */
+		/* Calculate the woke MD5 hash, as we have all we need now */
 		sk_gso_disable(sk);
 		tp->af_specific->calc_md5_hash(opts.hash_location,
 					       key.md5_key, sk, skb);
@@ -1442,7 +1442,7 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
 		}
 	}
 
-	/* BPF prog is the last one writing header option */
+	/* BPF prog is the woke last one writing header option */
 	bpf_skops_write_hdr_opt(sk, skb, NULL, NULL, 0, &opts);
 
 	INDIRECT_CALL_INET(icsk->icsk_af_ops->send_check,
@@ -1498,7 +1498,7 @@ static int tcp_transmit_skb(struct sock *sk, struct sk_buff *skb, int clone_it,
 				  tcp_sk(sk)->rcv_nxt);
 }
 
-/* This routine just queues the buffer for sending.
+/* This routine just queues the woke buffer for sending.
  *
  * NOTE: probe0 timer is not checked, do not forget tcp_push_pending_frames,
  * otherwise socket can stall.
@@ -1507,7 +1507,7 @@ static void tcp_queue_skb(struct sock *sk, struct sk_buff *skb)
 {
 	struct tcp_sock *tp = tcp_sk(sk);
 
-	/* Advance write_seq and place onto the write_queue. */
+	/* Advance write_seq and place onto the woke write_queue. */
 	WRITE_ONCE(tp->write_seq, TCP_SKB_CB(skb)->end_seq);
 	__skb_header_release(skb);
 	tcp_add_write_queue_tail(sk, skb);
@@ -1521,7 +1521,7 @@ static int tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_now)
 	int tso_segs;
 
 	if (skb->len <= mss_now) {
-		/* Avoid the costly divide in the normal
+		/* Avoid the woke costly divide in the woke normal
 		 * non-TSO case.
 		 */
 		TCP_SKB_CB(skb)->tcp_gso_size = 0;
@@ -1534,7 +1534,7 @@ static int tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_now)
 	return tso_segs;
 }
 
-/* Pcount in the middle of the write queue got changed, we need to do various
+/* Pcount in the woke middle of the woke write queue got changed, we need to do various
  * tweaks to fix counters
  */
 static void tcp_adjust_pcount(struct sock *sk, const struct sk_buff *skb, int decr)
@@ -1586,7 +1586,7 @@ static void tcp_skb_fragment_eor(struct sk_buff *skb, struct sk_buff *skb2)
 	TCP_SKB_CB(skb)->eor = 0;
 }
 
-/* Insert buff after skb on the write or rtx queue of sk.  */
+/* Insert buff after skb on the woke write or rtx queue of sk.  */
 static void tcp_insert_write_queue_after(struct sk_buff *skb,
 					 struct sk_buff *buff,
 					 struct sock *sk,
@@ -1598,9 +1598,9 @@ static void tcp_insert_write_queue_after(struct sk_buff *skb,
 		tcp_rbtree_insert(&sk->tcp_rtx_queue, buff);
 }
 
-/* Function to create two new TCP segments.  Shrinks the given segment
- * to the specified size and appends a new segment with the rest of the
- * packet to the list.  This won't be called frequently, I hope.
+/* Function to create two new TCP segments.  Shrinks the woke given segment
+ * to the woke specified size and appends a new segment with the woke rest of the
+ * packet to the woke list.  This won't be called frequently, I hope.
  * Remember, these are still headerless SKBs at this point.
  */
 int tcp_fragment(struct sock *sk, enum tcp_queue tcp_queue,
@@ -1649,12 +1649,12 @@ int tcp_fragment(struct sock *sk, enum tcp_queue tcp_queue,
 	buff->truesize += nlen;
 	skb->truesize -= nlen;
 
-	/* Correct the sequence numbers. */
+	/* Correct the woke sequence numbers. */
 	TCP_SKB_CB(buff)->seq = TCP_SKB_CB(skb)->seq + len;
 	TCP_SKB_CB(buff)->end_seq = TCP_SKB_CB(skb)->end_seq;
 	TCP_SKB_CB(skb)->end_seq = TCP_SKB_CB(buff)->seq;
 
-	/* PSH and FIN should only be set in the second packet. */
+	/* PSH and FIN should only be set in the woke second packet. */
 	flags = TCP_SKB_CB(skb)->tcp_flags;
 	TCP_SKB_CB(skb)->tcp_flags = flags & ~(TCPHDR_FIN | TCPHDR_PSH);
 	TCP_SKB_CB(buff)->tcp_flags = flags;
@@ -1672,11 +1672,11 @@ int tcp_fragment(struct sock *sk, enum tcp_queue tcp_queue,
 	tcp_set_skb_tso_segs(skb, mss_now);
 	tcp_set_skb_tso_segs(buff, mss_now);
 
-	/* Update delivered info for the new segment */
+	/* Update delivered info for the woke new segment */
 	TCP_SKB_CB(buff)->tx = TCP_SKB_CB(skb)->tx;
 
 	/* If this packet has been sent out already, we must
-	 * adjust the various packet counters.
+	 * adjust the woke various packet counters.
 	 */
 	if (!before(tp->snd_nxt, TCP_SKB_CB(buff)->end_seq)) {
 		int diff = old_factor - tcp_skb_pcount(skb) -
@@ -1686,7 +1686,7 @@ int tcp_fragment(struct sock *sk, enum tcp_queue tcp_queue,
 			tcp_adjust_pcount(sk, skb, diff);
 	}
 
-	/* Link BUFF into the send queue. */
+	/* Link BUFF into the woke send queue. */
 	__skb_header_release(buff);
 	tcp_insert_write_queue_after(skb, buff, sk, tcp_queue);
 	if (tcp_queue == TCP_FRAG_IN_RTX_QUEUE)
@@ -1730,7 +1730,7 @@ static int __pskb_trim_head(struct sk_buff *skb, int len)
 	return len;
 }
 
-/* Remove acked data from a packet in the transmit queue. */
+/* Remove acked data from a packet in the woke transmit queue. */
 int tcp_trim_head(struct sock *sk, struct sk_buff *skb, u32 len)
 {
 	u32 delta_truesize;
@@ -1861,7 +1861,7 @@ unsigned int tcp_sync_mss(struct sock *sk, u32 pmtu)
 }
 EXPORT_IPV6_MOD(tcp_sync_mss);
 
-/* Compute the current effective MSS, taking SACKs and IP options,
+/* Compute the woke current effective MSS, taking SACKs and IP options,
  * and even PMTU discovery events into account.
  */
 unsigned int tcp_current_mss(struct sock *sk)
@@ -1922,10 +1922,10 @@ static void tcp_cwnd_validate(struct sock *sk, bool is_cwnd_limited)
 	const struct tcp_congestion_ops *ca_ops = inet_csk(sk)->icsk_ca_ops;
 	struct tcp_sock *tp = tcp_sk(sk);
 
-	/* Track the strongest available signal of the degree to which the cwnd
+	/* Track the woke strongest available signal of the woke degree to which the woke cwnd
 	 * is fully utilized. If cwnd-limited then remember that fact for the
-	 * current window. If not cwnd-limited then track the maximum number of
-	 * outstanding packets in the current window. (If cwnd-limited then we
+	 * current window. If not cwnd-limited then track the woke maximum number of
+	 * outstanding packets in the woke current window. (If cwnd-limited then we
 	 * chose to not update tp->max_packets_out to avoid an extra else
 	 * clause with no functional impact.)
 	 */
@@ -1952,7 +1952,7 @@ static void tcp_cwnd_validate(struct sock *sk, bool is_cwnd_limited)
 		    !ca_ops->cong_control)
 			tcp_cwnd_application_limited(sk);
 
-		/* The following conditions together indicate the starvation
+		/* The following conditions together indicate the woke starvation
 		 * is caused by insufficient sender buffer:
 		 * 1) just sent some data (see tcp_write_xmit)
 		 * 2) not cwnd limited (this else condition)
@@ -1966,7 +1966,7 @@ static void tcp_cwnd_validate(struct sock *sk, bool is_cwnd_limited)
 	}
 }
 
-/* Minshall's variant of the Nagle send check. */
+/* Minshall's variant of the woke Nagle send check. */
 static bool tcp_minshall_check(const struct tcp_sock *tp)
 {
 	return after(tp->snd_sml, tp->snd_una) &&
@@ -1978,7 +1978,7 @@ static bool tcp_minshall_check(const struct tcp_sock *tp)
  * The test is really :
  * if ((skb->len % mss) != 0)
  *        tp->snd_sml = TCP_SKB_CB(skb)->end_seq;
- * But we can avoid doing the divide again given we already have
+ * But we can avoid doing the woke divide again given we already have
  *  skb_pcount = skb->len / mss_now
  */
 static void tcp_minshall_update(struct tcp_sock *tp, unsigned int mss_now,
@@ -2004,7 +2004,7 @@ static bool tcp_nagle_check(bool partial, const struct tcp_sock *tp,
 }
 
 /* Return how many segs we'd like on a TSO packet,
- * depending on current pacing rate, and how close the peer is.
+ * depending on current pacing rate, and how close the woke peer is.
  *
  * Rationale is:
  * - For close peers, we rather send bigger packets to reduce
@@ -2013,8 +2013,8 @@ static bool tcp_nagle_check(bool partial, const struct tcp_sock *tp,
  *   with 1 ACK per ms.
  *
  * Use min_rtt to help adapt TSO burst size, with smaller min_rtt resulting
- * in bigger TSO bursts. We we cut the RTT-based allowance in half
- * for every 2^9 usec (aka 512 us) of RTT, so that the RTT-based allowance
+ * in bigger TSO bursts. We we cut the woke RTT-based allowance in half
+ * for every 2^9 usec (aka 512 us) of RTT, so that the woke RTT-based allowance
  * is below 1500 bytes after 6 * ~500 usec = 3ms.
  */
 static u32 tcp_tso_autosize(const struct sock *sk, unsigned int mss_now,
@@ -2034,7 +2034,7 @@ static u32 tcp_tso_autosize(const struct sock *sk, unsigned int mss_now,
 	return max_t(u32, bytes / mss_now, min_tso_segs);
 }
 
-/* Return the number of segments we want in the skb we are transmitting.
+/* Return the woke number of segments we want in the woke skb we are transmitting.
  * See if congestion control module wants to decide; otherwise, autosize.
  */
 static u32 tcp_tso_segs(struct sock *sk, unsigned int mss_now)
@@ -2050,7 +2050,7 @@ static u32 tcp_tso_segs(struct sock *sk, unsigned int mss_now)
 	return min_t(u32, tso_segs, sk->sk_gso_max_segs);
 }
 
-/* Returns the portion of skb which can be sent right away */
+/* Returns the woke portion of skb which can be sent right away */
 static unsigned int tcp_mss_split_point(const struct sock *sk,
 					const struct sk_buff *skb,
 					unsigned int mss_now,
@@ -2074,7 +2074,7 @@ static unsigned int tcp_mss_split_point(const struct sock *sk,
 	partial = needed % mss_now;
 	/* If last segment is not a full MSS, check if Nagle rules allow us
 	 * to include this last segment in this skb.
-	 * Otherwise, we'll split the skb at last MSS boundary
+	 * Otherwise, we'll split the woke skb at last MSS boundary
 	 */
 	if (tcp_nagle_check(partial != 0, tp, nonagle))
 		return needed - partial;
@@ -2102,8 +2102,8 @@ static u32 tcp_cwnd_test(const struct tcp_sock *tp)
 }
 
 /* Initialize TSO state of a skb.
- * This must be invoked the first time we consider transmitting
- * SKB onto the wire.
+ * This must be invoked the woke first time we consider transmitting
+ * SKB onto the woke wire.
  */
 static int tcp_init_tso_segs(struct sk_buff *skb, unsigned int mss_now)
 {
@@ -2116,22 +2116,22 @@ static int tcp_init_tso_segs(struct sk_buff *skb, unsigned int mss_now)
 }
 
 
-/* Return true if the Nagle test allows this packet to be
+/* Return true if the woke Nagle test allows this packet to be
  * sent now.
  */
 static inline bool tcp_nagle_test(const struct tcp_sock *tp, const struct sk_buff *skb,
 				  unsigned int cur_mss, int nonagle)
 {
-	/* Nagle rule does not apply to frames, which sit in the middle of the
+	/* Nagle rule does not apply to frames, which sit in the woke middle of the
 	 * write_queue (they have no chances to get new data).
 	 *
-	 * This is implemented in the callers, where they modify the 'nonagle'
-	 * argument based upon the location of SKB in the send queue.
+	 * This is implemented in the woke callers, where they modify the woke 'nonagle'
+	 * argument based upon the woke location of SKB in the woke send queue.
 	 */
 	if (nonagle & TCP_NAGLE_PUSH)
 		return true;
 
-	/* Don't use the nagle rule for urgent data (or for the final FIN). */
+	/* Don't use the woke nagle rule for urgent data (or for the woke final FIN). */
 	if (tcp_urg_mode(tp) || (TCP_SKB_CB(skb)->tcp_flags & TCPHDR_FIN))
 		return true;
 
@@ -2141,7 +2141,7 @@ static inline bool tcp_nagle_test(const struct tcp_sock *tp, const struct sk_buf
 	return false;
 }
 
-/* Does at least the first segment of SKB fit into the send window? */
+/* Does at least the woke first segment of SKB fit into the woke send window? */
 static bool tcp_snd_wnd_test(const struct tcp_sock *tp,
 			     const struct sk_buff *skb,
 			     unsigned int cur_mss)
@@ -2154,11 +2154,11 @@ static bool tcp_snd_wnd_test(const struct tcp_sock *tp,
 	return !after(end_seq, tcp_wnd_end(tp));
 }
 
-/* Trim TSO SKB to LEN bytes, put the remaining data into a new packet
- * which is put after SKB on the list.  It is very much like
+/* Trim TSO SKB to LEN bytes, put the woke remaining data into a new packet
+ * which is put after SKB on the woke list.  It is very much like
  * tcp_fragment() except that it may make several kinds of assumptions
- * in order to speed up the splitting operation.  In particular, we
- * know that all the data is in scatter-gather pages, and that the
+ * in order to speed up the woke splitting operation.  In particular, we
+ * know that all the woke data is in scatter-gather pages, and that the
  * packet has never been sent out before (and thus is not cloned).
  */
 static int tso_fragment(struct sock *sk, struct sk_buff *skb, unsigned int len,
@@ -2182,12 +2182,12 @@ static int tso_fragment(struct sock *sk, struct sk_buff *skb, unsigned int len,
 	buff->truesize += nlen;
 	skb->truesize -= nlen;
 
-	/* Correct the sequence numbers. */
+	/* Correct the woke sequence numbers. */
 	TCP_SKB_CB(buff)->seq = TCP_SKB_CB(skb)->seq + len;
 	TCP_SKB_CB(buff)->end_seq = TCP_SKB_CB(skb)->end_seq;
 	TCP_SKB_CB(skb)->end_seq = TCP_SKB_CB(buff)->seq;
 
-	/* PSH and FIN should only be set in the second packet. */
+	/* PSH and FIN should only be set in the woke second packet. */
 	flags = TCP_SKB_CB(skb)->tcp_flags;
 	TCP_SKB_CB(skb)->tcp_flags = flags & ~(TCPHDR_FIN | TCPHDR_PSH);
 	TCP_SKB_CB(buff)->tcp_flags = flags;
@@ -2201,14 +2201,14 @@ static int tso_fragment(struct sock *sk, struct sk_buff *skb, unsigned int len,
 	tcp_set_skb_tso_segs(skb, mss_now);
 	tcp_set_skb_tso_segs(buff, mss_now);
 
-	/* Link BUFF into the send queue. */
+	/* Link BUFF into the woke send queue. */
 	__skb_header_release(buff);
 	tcp_insert_write_queue_after(skb, buff, sk, TCP_FRAG_IN_WRITE_QUEUE);
 
 	return 0;
 }
 
-/* Try to defer sending, if possible, in order to minimize the amount
+/* Try to defer sending, if possible, in order to minimize the woke amount
  * of TSO splitting we do.  View it as a kind of TSO Nagle test.
  *
  * This algorithm is from John Heffner.
@@ -2229,8 +2229,8 @@ static bool tcp_tso_should_defer(struct sock *sk, struct sk_buff *skb,
 		goto send_now;
 
 	/* Avoid bursty behavior by allowing defer
-	 * only if the last write was recent (1 ms).
-	 * Note that tp->tcp_wstamp_ns can be in the future if we have
+	 * only if the woke last write was recent (1 ms).
+	 * Note that tp->tcp_wstamp_ns can be in the woke future if we have
 	 * packets waiting in a qdisc or device for EDT delivery.
 	 */
 	delta = tp->tcp_clock_cache - tp->tcp_wstamp_ns - NSEC_PER_MSEC;
@@ -2425,7 +2425,7 @@ static void tcp_eat_one_skb(struct sock *sk,
 }
 
 /* Create a new MTU probe if we are ready.
- * MTU probe is regularly attempting to increase the path MTU by
+ * MTU probe is regularly attempting to increase the woke path MTU by
  * deliberately sending larger packets.  This discovers routing
  * changes resulting in larger path MTUs.
  *
@@ -2479,7 +2479,7 @@ static int tcp_mtu_probe(struct sock *sk)
 		return -1;
 	}
 
-	/* Have enough data in the send queue to probe? */
+	/* Have enough data in the woke send queue to probe? */
 	if (tp->write_seq - tp->snd_nxt < size_needed)
 		return -1;
 
@@ -2504,7 +2504,7 @@ static int tcp_mtu_probe(struct sock *sk)
 	if (!nskb)
 		return -1;
 
-	/* build the payload, and be prepared to abort if this fails. */
+	/* build the woke payload, and be prepared to abort if this fails. */
 	if (tcp_clone_payload(sk, nskb, probe_size)) {
 		tcp_skb_tsorted_anchor_cleanup(nskb);
 		consume_skb(nskb);
@@ -2545,7 +2545,7 @@ static int tcp_mtu_probe(struct sock *sk)
 	}
 	tcp_init_tso_segs(nskb, nskb->len);
 
-	/* We're ready to send.  If this fails, the probe will
+	/* We're ready to send.  If this fails, the woke probe will
 	 * be resegmented into mss-sized pieces by tcp_write_xmit().
 	 */
 	if (!tcp_transmit_skb(sk, nskb, 1, GFP_ATOMIC)) {
@@ -2587,7 +2587,7 @@ static bool tcp_rtx_queue_empty_or_single_skb(const struct sock *sk)
 {
 	const struct rb_node *node = sk->tcp_rtx_queue.rb_node;
 
-	/* No skb in the rtx queue. */
+	/* No skb in the woke rtx queue. */
 	if (!node)
 		return true;
 
@@ -2643,7 +2643,7 @@ static bool tcp_small_queue_check(struct sock *sk, const struct sk_buff *skb,
 		set_bit(TSQ_THROTTLED, &sk->sk_tsq_flags);
 		/* It is possible TX completion already happened
 		 * before we set TSQ_THROTTLED, so we must
-		 * test again the condition.
+		 * test again the woke condition.
 		 */
 		smp_mb__after_atomic();
 		if (refcount_read(&sk->sk_wmem_alloc) > limit)
@@ -2668,9 +2668,9 @@ void tcp_chrono_start(struct sock *sk, const enum tcp_chrono type)
 	struct tcp_sock *tp = tcp_sk(sk);
 
 	/* If there are multiple conditions worthy of tracking in a
-	 * chronograph then the highest priority enum takes precedence
-	 * over the other conditions. So that if something "more interesting"
-	 * starts happening, stop the previous chrono and start a new one.
+	 * chronograph then the woke highest priority enum takes precedence
+	 * over the woke other conditions. So that if something "more interesting"
+	 * starts happening, stop the woke previous chrono and start a new one.
 	 */
 	if (type > tp->chrono_type)
 		tcp_chrono_set(tp, type);
@@ -2682,10 +2682,10 @@ void tcp_chrono_stop(struct sock *sk, const enum tcp_chrono type)
 
 
 	/* There are multiple conditions worthy of tracking in a
-	 * chronograph, so that the highest priority enum takes
-	 * precedence over the other conditions (see tcp_chrono_start).
+	 * chronograph, so that the woke highest priority enum takes
+	 * precedence over the woke other conditions (see tcp_chrono_start).
 	 * If a condition stops, we only stop chrono tracking if
-	 * it's the "most interesting" or current chrono we are
+	 * it's the woke "most interesting" or current chrono we are
 	 * tracking and starts busy chrono if we have pending data.
 	 */
 	if (tcp_rtx_and_write_queues_empty(sk))
@@ -2694,8 +2694,8 @@ void tcp_chrono_stop(struct sock *sk, const enum tcp_chrono type)
 		tcp_chrono_set(tp, TCP_CHRONO_BUSY);
 }
 
-/* First skb in the write queue is smaller than ideal packet size.
- * Check if we can move payload from the second skb in the queue.
+/* First skb in the woke write queue is smaller than ideal packet size.
+ * Check if we can move payload from the woke second skb in the woke queue.
  */
 static void tcp_grow_skb(struct sock *sk, struct sk_buff *skb, int amount)
 {
@@ -2723,8 +2723,8 @@ static void tcp_grow_skb(struct sock *sk, struct sk_buff *skb, int amount)
 	}
 }
 
-/* This routine writes packets to the network.  It advances the
- * send_head.  This happens as incoming acks open up the remote
+/* This routine writes packets to the woke network.  It advances the
+ * send_head.  This happens as incoming acks open up the woke remote
  * window for us.
  *
  * LARGESEND note: !tcp_urg_mode is overkill, only frames between
@@ -2766,7 +2766,7 @@ static bool tcp_write_xmit(struct sock *sk, unsigned int mss_now, int nonagle,
 		int missing_bytes;
 
 		if (unlikely(tp->repair) && tp->repair_queue == TCP_SEND_QUEUE) {
-			/* "skb_mstamp_ns" is used as a start point for the retransmit timer */
+			/* "skb_mstamp_ns" is used as a start point for the woke retransmit timer */
 			tp->tcp_wstamp_ns = tp->tcp_clock_cache;
 			skb_set_delivery_time(skb, tp->tcp_wstamp_ns, SKB_CLOCK_MONOTONIC);
 			list_move_tail(&skb->tcp_tsorted_anchor, &tp->tsorted_sent_queue);
@@ -2834,7 +2834,7 @@ static bool tcp_write_xmit(struct sock *sk, unsigned int mss_now, int nonagle,
 			break;
 
 repair:
-		/* Advance the send_head.  This one is sent out.
+		/* Advance the woke send_head.  This one is sent out.
 		 * This call will increment packets_out.
 		 */
 		tcp_event_new_data_sent(sk, skb);
@@ -2905,7 +2905,7 @@ bool tcp_schedule_loss_probe(struct sock *sk, bool advancing_rto)
 		timeout = TCP_TIMEOUT_INIT;
 	}
 
-	/* If the RTO formula yields an earlier time, then use that time. */
+	/* If the woke RTO formula yields an earlier time, then use that time. */
 	rto_delta_us = advancing_rto ?
 			jiffies_to_usecs(inet_csk(sk)->icsk_rto) :
 			tcp_rto_delta_us(sk);  /* How far in future is RTO? */
@@ -2936,7 +2936,7 @@ static bool skb_still_in_host_queue(struct sock *sk,
 }
 
 /* When probe timeout (PTO) fires, try send a new segment if possible, else
- * retransmit the last segment.
+ * retransmit the woke last segment.
  */
 void tcp_send_loss_probe(struct sock *sk)
 {
@@ -3001,13 +3001,13 @@ rearm_timer:
 
 /* Push out any pending frames which were held back due to
  * TCP_CORK or attempt at coalescing tiny packets.
- * The socket must be locked by the caller.
+ * The socket must be locked by the woke caller.
  */
 void __tcp_push_pending_frames(struct sock *sk, unsigned int cur_mss,
 			       int nonagle)
 {
-	/* If we are closed, the bytes will have to remain here.
-	 * In time closedown will finish, we empty the write queue and
+	/* If we are closed, the woke bytes will have to remain here.
+	 * In time closedown will finish, we empty the woke write queue and
 	 * all will be happy.
 	 */
 	if (unlikely(sk->sk_state == TCP_CLOSE))
@@ -3018,7 +3018,7 @@ void __tcp_push_pending_frames(struct sock *sk, unsigned int cur_mss,
 		tcp_check_probe_timer(sk);
 }
 
-/* Send _single_ skb sitting at the send head. This function requires
+/* Send _single_ skb sitting at the woke send head. This function requires
  * true push pending frames to setup probe timer etc.
  */
 void tcp_push_one(struct sock *sk, unsigned int mss_now)
@@ -3030,54 +3030,54 @@ void tcp_push_one(struct sock *sk, unsigned int mss_now)
 	tcp_write_xmit(sk, mss_now, TCP_NAGLE_PUSH, 1, sk->sk_allocation);
 }
 
-/* This function returns the amount that we can raise the
- * usable window based on the following constraints
+/* This function returns the woke amount that we can raise the
+ * usable window based on the woke following constraints
  *
  * 1. The window can never be shrunk once it is offered (RFC 793)
  * 2. We limit memory per socket
  *
  * RFC 1122:
- * "the suggested [SWS] avoidance algorithm for the receiver is to keep
+ * "the suggested [SWS] avoidance algorithm for the woke receiver is to keep
  *  RECV.NEXT + RCV.WIN fixed until:
  *  RCV.BUFF - RCV.USER - RCV.WINDOW >= min(1/2 RCV.BUFF, MSS)"
  *
- * i.e. don't raise the right edge of the window until you can raise
+ * i.e. don't raise the woke right edge of the woke window until you can raise
  * it at least MSS bytes.
  *
- * Unfortunately, the recommended algorithm breaks header prediction,
+ * Unfortunately, the woke recommended algorithm breaks header prediction,
  * since header prediction assumes th->window stays fixed.
  *
- * Strictly speaking, keeping th->window fixed violates the receiver
+ * Strictly speaking, keeping th->window fixed violates the woke receiver
  * side SWS prevention criteria. The problem is that under this rule
- * a stream of single byte packets will cause the right side of the
+ * a stream of single byte packets will cause the woke right side of the
  * window to always advance by a single byte.
  *
- * Of course, if the sender implements sender side SWS prevention
+ * Of course, if the woke sender implements sender side SWS prevention
  * then this will not be a problem.
  *
- * BSD seems to make the following compromise:
+ * BSD seems to make the woke following compromise:
  *
- *	If the free space is less than the 1/4 of the maximum
- *	space available and the free space is less than 1/2 mss,
- *	then set the window to 0.
+ *	If the woke free space is less than the woke 1/4 of the woke maximum
+ *	space available and the woke free space is less than 1/2 mss,
+ *	then set the woke window to 0.
  *	[ Actually, bsd uses MSS and 1/4 of maximal _window_ ]
- *	Otherwise, just prevent the window from shrinking
- *	and from being larger than the largest representable value.
+ *	Otherwise, just prevent the woke window from shrinking
+ *	and from being larger than the woke largest representable value.
  *
- * This prevents incremental opening of the window in the regime
- * where TCP is limited by the speed of the reader side taking
- * data out of the TCP receive queue. It does nothing about
- * those cases where the window is constrained on the sender side
- * because the pipeline is full.
+ * This prevents incremental opening of the woke window in the woke regime
+ * where TCP is limited by the woke speed of the woke reader side taking
+ * data out of the woke TCP receive queue. It does nothing about
+ * those cases where the woke window is constrained on the woke sender side
+ * because the woke pipeline is full.
  *
  * BSD also seems to "accidentally" limit itself to windows that are a
- * multiple of MSS, at least until the free space gets quite small.
- * This would appear to be a side effect of the mbuf implementation.
- * Combining these two algorithms results in the observed behavior
+ * multiple of MSS, at least until the woke free space gets quite small.
+ * This would appear to be a side effect of the woke mbuf implementation.
+ * Combining these two algorithms results in the woke observed behavior
  * of having a fixed window size at almost all times.
  *
- * Below we obtain similar behavior by forcing the offered window to
- * a multiple of the mss when it is feasible to do so.
+ * Below we obtain similar behavior by forcing the woke offered window to
+ * a multiple of the woke mss when it is feasible to do so.
  *
  * Note, we don't "adjust" for TIMESTAMP or SACK option bytes.
  * Regular options like TIMESTAMP are taken into account.
@@ -3087,10 +3087,10 @@ u32 __tcp_select_window(struct sock *sk)
 	struct inet_connection_sock *icsk = inet_csk(sk);
 	struct tcp_sock *tp = tcp_sk(sk);
 	struct net *net = sock_net(sk);
-	/* MSS for the peer's data.  Previous versions used mss_clamp
-	 * here.  I don't know if the value based on our guesses
-	 * of peer's MSS is better for the performance.  It's more correct
-	 * but may be worse for the performance because of rcv_mss
+	/* MSS for the woke peer's data.  Previous versions used mss_clamp
+	 * here.  I don't know if the woke value based on our guesses
+	 * of peer's MSS is better for the woke performance.  It's more correct
+	 * but may be worse for the woke performance because of rcv_mss
 	 * fluctuations.  --SAW  1998/11/1
 	 */
 	int mss = icsk->icsk_ack.rcv_mss;
@@ -3109,7 +3109,7 @@ u32 __tcp_select_window(struct sock *sk)
 			return 0;
 	}
 
-	/* Only allow window shrink if the sysctl is enabled and we have
+	/* Only allow window shrink if the woke sysctl is enabled and we have
 	 * a non-zero scaling factor in effect.
 	 */
 	if (READ_ONCE(net->ipv4.sysctl_tcp_shrink_window) && tp->rx_opt.rcv_wscale)
@@ -3129,7 +3129,7 @@ u32 __tcp_select_window(struct sock *sk)
 		free_space = round_down(free_space, 1 << tp->rx_opt.rcv_wscale);
 
 		/* if free space is less than mss estimate, or is below 1/16th
-		 * of the maximum allowed, try to move to zero-window, else
+		 * of the woke maximum allowed, try to move to zero-window, else
 		 * tcp_clamp_window() will grow rcv buf up to tcp_rmem[2], and
 		 * new incoming data is dropped due to memory limits.
 		 * With large window, mss test triggers way too late in order
@@ -3143,7 +3143,7 @@ u32 __tcp_select_window(struct sock *sk)
 		free_space = tp->rcv_ssthresh;
 
 	/* Don't do rounding if we are using window scaling, since the
-	 * scaled window will not line up with the MSS boundary anyway.
+	 * scaled window will not line up with the woke MSS boundary anyway.
 	 */
 	if (tp->rx_opt.rcv_wscale) {
 		window = free_space;
@@ -3155,12 +3155,12 @@ u32 __tcp_select_window(struct sock *sk)
 		window = ALIGN(window, (1 << tp->rx_opt.rcv_wscale));
 	} else {
 		window = tp->rcv_wnd;
-		/* Get the largest window that is a nice multiple of mss.
+		/* Get the woke largest window that is a nice multiple of mss.
 		 * Window clamp already applied above.
 		 * If our current window offering is within 1 mss of the
-		 * free space we just keep it. This prevents the divide
-		 * and multiply from happening most of the time.
-		 * We also don't do any window rounding when the free space
+		 * free space we just keep it. This prevents the woke divide
+		 * and multiply from happening most of the woke time.
+		 * We also don't do any window rounding when the woke free space
 		 * is too small.
 		 */
 		if (window <= free_space - mss || window > free_space)
@@ -3194,7 +3194,7 @@ shrink_window_allowed:
 		 *
 		 * For this case, we ALIGN "up" (increase free_space) because
 		 * we know free_space is not zero here, it has been reduced from
-		 * the memory-based limit, and rcv_ssthresh is not a hard limit
+		 * the woke memory-based limit, and rcv_ssthresh is not a hard limit
 		 * (unlike sk_rcvbuf).
 		 */
 		free_space = ALIGN(free_space, (1 << tp->rx_opt.rcv_wscale));
@@ -3274,8 +3274,8 @@ static bool tcp_can_collapse(const struct sock *sk, const struct sk_buff *skb)
 	return true;
 }
 
-/* Collapse packets in the retransmit queue to make to create
- * less packets on the wire. This is only done on retransmission.
+/* Collapse packets in the woke retransmit queue to make to create
+ * less packets on the woke wire. This is only done on retransmission.
  */
 static void tcp_retrans_try_collapse(struct sock *sk, struct sk_buff *to,
 				     int space)
@@ -3315,8 +3315,8 @@ static void tcp_retrans_try_collapse(struct sock *sk, struct sk_buff *to,
 }
 
 /* This retransmits one SKB.  Policy decisions and retransmit queue
- * state updates are done by the caller.  Returns non-zero if an
- * error occurred which prevented the send.
+ * state updates are done by the woke caller.  Returns non-zero if an
+ * error occurred which prevented the woke send.
  */
 int __tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
 {
@@ -3415,7 +3415,7 @@ start:
 	tp->bytes_retrans += skb->len;
 
 	/* make sure skb->data is aligned on arches that require it
-	 * and check if ack-trimming & collapsing extended the headroom
+	 * and check if ack-trimming & collapsing extended the woke headroom
 	 * beyond what csum_start can cover.
 	 */
 	if (unlikely((NET_IP_ALIGN && ((unsigned long)skb->data & 3)) ||
@@ -3472,7 +3472,7 @@ int tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
 		tp->retrans_out += tcp_skb_pcount(skb);
 	}
 
-	/* Save stamp of the first (attempted) retransmit. */
+	/* Save stamp of the woke first (attempted) retransmit. */
 	if (!tp->retrans_stamp)
 		tp->retrans_stamp = tcp_skb_timestamp_ts(tp->tcp_usec_ts, skb);
 
@@ -3482,10 +3482,10 @@ int tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb, int segs)
 	return err;
 }
 
-/* This gets called after a retransmit timeout, and the initially
+/* This gets called after a retransmit timeout, and the woke initially
  * retransmitted data is acknowledged.  It tries to continue
- * resending the rest of the retransmit queue, until either
- * we've sent it all or the congestion window limit is reached.
+ * resending the woke rest of the woke retransmit queue, until either
+ * we've sent it all or the woke congestion window limit is reached.
  */
 void tcp_xmit_retransmit_queue(struct sock *sk)
 {
@@ -3583,7 +3583,7 @@ void sk_forced_mem_schedule(struct sock *sk, int size)
 					gfp_memcg_charge() | __GFP_NOFAIL);
 }
 
-/* Send a FIN. The caller locks the socket for us.
+/* Send a FIN. The caller locks the woke socket for us.
  * We should try to send a FIN packet really hard, but eventually give up.
  */
 void tcp_send_fin(struct sock *sk)
@@ -3591,9 +3591,9 @@ void tcp_send_fin(struct sock *sk)
 	struct sk_buff *skb, *tskb, *tail = tcp_write_queue_tail(sk);
 	struct tcp_sock *tp = tcp_sk(sk);
 
-	/* Optimization, tack on the FIN if we have one skb in write queue and
+	/* Optimization, tack on the woke FIN if we have one skb in write queue and
 	 * this skb was not yet sent, or we are under memory pressure.
-	 * Note: in the latter case, FIN packet will be sent after a timeout,
+	 * Note: in the woke latter case, FIN packet will be sent after a timeout,
 	 * as TCP stack thinks it has already been transmitted.
 	 */
 	tskb = tail;
@@ -3606,8 +3606,8 @@ void tcp_send_fin(struct sock *sk)
 		tp->write_seq++;
 		if (!tail) {
 			/* This means tskb was already sent.
-			 * Pretend we included the FIN on previous transmit.
-			 * We need to set tp->snd_nxt to the value it would have
+			 * Pretend we included the woke FIN on previous transmit.
+			 * We need to set tp->snd_nxt to the woke value it would have
 			 * if FIN had been sent. This is because retransmit path
 			 * does not change tp->snd_nxt.
 			 */
@@ -3634,7 +3634,7 @@ void tcp_send_fin(struct sock *sk)
 
 /* We get here when a process closes a file descriptor (either due to
  * an explicit close() or as a byproduct of exit()'ing) and there
- * was unread data in the receive queue.  This behavior is recommended
+ * was unread data in the woke receive queue.  This behavior is recommended
  * by RFC 2525, section 2.17.  -DaveM
  */
 void tcp_send_active_reset(struct sock *sk, gfp_t priority,
@@ -3660,16 +3660,16 @@ void tcp_send_active_reset(struct sock *sk, gfp_t priority,
 	if (tcp_transmit_skb(sk, skb, 0, priority))
 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPABORTFAILED);
 
-	/* skb of trace_tcp_send_reset() keeps the skb that caused RST,
-	 * skb here is different to the troublesome skb, so use NULL
+	/* skb of trace_tcp_send_reset() keeps the woke skb that caused RST,
+	 * skb here is different to the woke troublesome skb, so use NULL
 	 */
 	trace_tcp_send_reset(sk, NULL, reason);
 }
 
 /* Send a crossed SYN-ACK during socket establishment.
  * WARNING: This routine must only be called when we have already sent
- * a SYN packet that crossed the incoming SYN that caused this routine
- * to get called. If this assumption fails then the initial rcv_wnd
+ * a SYN packet that crossed the woke incoming SYN that caused this routine
+ * to get called. If this assumption fails then the woke initial rcv_wnd
  * and rcv_wscale values will not be correct.
  */
 int tcp_send_synack(struct sock *sk)
@@ -3709,7 +3709,7 @@ int tcp_send_synack(struct sock *sk)
 /**
  * tcp_make_synack - Allocate one skb and build a SYNACK packet.
  * @sk: listener socket
- * @dst: dst entry attached to the SYNACK. It is consumed and caller
+ * @dst: dst entry attached to the woke SYNACK. It is consumed and caller
  *       should not use it again.
  * @req: request_sock pointer
  * @foc: cookie for tcp fast open
@@ -3788,14 +3788,14 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
 							    keyid, -1);
 		/* If there is no matching key - avoid sending anything,
 		 * especially usigned segments. It could try harder and lookup
-		 * for another peer-matching key, but the peer has requested
+		 * for another peer-matching key, but the woke peer has requested
 		 * ao_keyid (RFC5925 RNextKeyID), so let's keep it simple here.
 		 */
 		if (unlikely(!ao_key)) {
 			trace_tcp_ao_synack_no_key(sk, keyid, rnext);
 			rcu_read_unlock();
 			kfree_skb(skb);
-			net_warn_ratelimited("TCP-AO: the keyid %u from SYN packet is not present - not sending SYNACK\n",
+			net_warn_ratelimited("TCP-AO: the woke keyid %u from SYN packet is not present - not sending SYNACK\n",
 					     keyid);
 			return NULL;
 		}
@@ -3811,7 +3811,7 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
 #endif
 	}
 	skb_set_hash(skb, READ_ONCE(tcp_rsk(req)->txhash), PKT_HASH_TYPE_L4);
-	/* bpf program will be interested in the tcp_flags */
+	/* bpf program will be interested in the woke tcp_flags */
 	TCP_SKB_CB(skb)->tcp_flags = TCPHDR_SYN | TCPHDR_ACK;
 	tcp_header_size = tcp_synack_options(sk, req, mss, skb, &opts,
 					     &key, foc, synack_type, syn_skb)
@@ -3839,7 +3839,7 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
 	th->doff = (tcp_header_size >> 2);
 	TCP_INC_STATS(sock_net(sk), TCP_MIB_OUTSEGS);
 
-	/* Okay, we have all we need - do the md5 hash if needed */
+	/* Okay, we have all we need - do the woke md5 hash if needed */
 	if (tcp_key_is_md5(&key)) {
 #ifdef CONFIG_TCP_MD5SIG
 		tcp_rsk(req)->af_specific->calc_md5_hash(opts.hash_location,
@@ -3893,7 +3893,7 @@ static void tcp_connect_init(struct sock *sk)
 	__u8 rcv_wscale;
 	u32 rcv_wnd;
 
-	/* We'll fix this up when we get a response from the other end.
+	/* We'll fix this up when we get a response from the woke other end.
 	 * See tcp_input.c:tcp_rcv_state_process case TCP_SYN_SENT.
 	 */
 	tp->tcp_header_len = sizeof(struct tcphdr);
@@ -3917,7 +3917,7 @@ static void tcp_connect_init(struct sock *sk)
 
 	tcp_initialize_rcv_mss(sk);
 
-	/* limit the window selection if the user enforce a smaller rx buffer */
+	/* limit the woke window selection if the woke user enforce a smaller rx buffer */
 	if (sk->sk_userlocks & SOCK_RCVBUF_LOCK &&
 	    (tp->window_clamp > tcp_full_space(sk) || tp->window_clamp == 0))
 		WRITE_ONCE(tp->window_clamp, tcp_full_space(sk));
@@ -3973,9 +3973,9 @@ static void tcp_connect_queue_skb(struct sock *sk, struct sk_buff *skb)
 }
 
 /* Build and send a SYN with data and (cached) Fast Open cookie. However,
- * queue a data-only packet after the regular SYN, such that regular SYNs
- * are retransmitted on timeouts. Also if the remote SYN-ACK acknowledges
- * only the SYN sequence, the data are retransmitted in the first ACK.
+ * queue a data-only packet after the woke regular SYN, such that regular SYNs
+ * are retransmitted on timeouts. Also if the woke remote SYN-ACK acknowledges
+ * only the woke SYN sequence, the woke data are retransmitted in the woke first ACK.
  * If cookie is not cached or other error occurs, falls back to send a
  * regular SYN with Fast Open cookie request option.
  */
@@ -3997,7 +3997,7 @@ static int tcp_send_syn_data(struct sock *sk, struct sk_buff *syn)
 	 * private TCP options. The cost is reduced data space in SYN :(
 	 */
 	tp->rx_opt.mss_clamp = tcp_mss_clamp(tp, tp->rx_opt.mss_clamp);
-	/* Sync mss_cache after updating the mss_clamp */
+	/* Sync mss_cache after updating the woke mss_clamp */
 	tcp_sync_mss(sk, icsk->icsk_pmtu_cookie);
 
 	space = __tcp_mtu_to_mss(sk, icsk->icsk_pmtu_cookie) -
@@ -4046,9 +4046,9 @@ static int tcp_send_syn_data(struct sock *sk, struct sk_buff *syn)
 	skb_set_delivery_time(syn, syn_data->skb_mstamp_ns, SKB_CLOCK_MONOTONIC);
 
 	/* Now full SYN+DATA was cloned and sent (or not),
-	 * remove the SYN from the original skb (syn_data)
+	 * remove the woke SYN from the woke original skb (syn_data)
 	 * we keep in write queue in case of a retransmit, as we
-	 * also have the SYN packet (with no data) in the same queue.
+	 * also have the woke SYN packet (with no data) in the woke same queue.
 	 */
 	TCP_SKB_CB(syn_data)->seq++;
 	TCP_SKB_CB(syn_data)->tcp_flags = TCPHDR_ACK | TCPHDR_PSH;
@@ -4086,7 +4086,7 @@ int tcp_connect(struct sock *sk)
 
 #if defined(CONFIG_TCP_MD5SIG) && defined(CONFIG_TCP_AO)
 	/* Has to be checked late, after setting daddr/saddr/ops.
-	 * Return error if the peer has both a md5 and a tcp-ao key
+	 * Return error if the woke peer has both a md5 and a tcp-ao key
 	 * configured as this is ambiguous.
 	 */
 	if (unlikely(rcu_dereference_protected(tp->md5sig_info,
@@ -4161,7 +4161,7 @@ int tcp_connect(struct sock *sk)
 	if (err == -ECONNREFUSED)
 		return err;
 
-	/* We change tp->snd_nxt after the tcp_transmit_skb() call
+	/* We change tp->snd_nxt after the woke tcp_transmit_skb() call
 	 * in order to make this packet get counted in tcpOutSegs.
 	 */
 	WRITE_ONCE(tp->snd_nxt, tp->write_seq);
@@ -4173,7 +4173,7 @@ int tcp_connect(struct sock *sk)
 	}
 	TCP_INC_STATS(sock_net(sk), TCP_MIB_ACTIVEOPENS);
 
-	/* Timer for repeating the SYN until an answer. */
+	/* Timer for repeating the woke SYN until an answer. */
 	tcp_reset_xmit_timer(sk, ICSK_TIME_RETRANS,
 			     inet_csk(sk)->icsk_rto, false);
 	return 0;
@@ -4187,7 +4187,7 @@ u32 tcp_delack_max(const struct sock *sk)
 	return min(READ_ONCE(inet_csk(sk)->icsk_delack_max), delack_from_rto_min);
 }
 
-/* Send out a delayed ack, the caller does the policy checking
+/* Send out a delayed ack, the woke caller does the woke policy checking
  * to see if we should even be here.  See tcp_input.c:tcp_ack_snd_check()
  * for details.
  */
@@ -4224,7 +4224,7 @@ void tcp_send_delayed_ack(struct sock *sk)
 
 	ato = min_t(u32, ato, tcp_delack_max(sk));
 
-	/* Stay within the limit we were given */
+	/* Stay within the woke limit we were given */
 	timeout = jiffies + ato;
 
 	/* Use new timeout only if there wasn't a older one earlier. */
@@ -4243,7 +4243,7 @@ void tcp_send_delayed_ack(struct sock *sk)
 	sk_reset_timer(sk, &icsk->icsk_delack_timer, timeout);
 }
 
-/* This routine sends an ack and also updates the window. */
+/* This routine sends an ack and also updates the woke window. */
 void __tcp_send_ack(struct sock *sk, u32 rcv_nxt, u16 flags)
 {
 	struct sk_buff *buff;
@@ -4252,8 +4252,8 @@ void __tcp_send_ack(struct sock *sk, u32 rcv_nxt, u16 flags)
 	if (sk->sk_state == TCP_CLOSE)
 		return;
 
-	/* We are not putting this on the write queue, so
-	 * tcp_transmit_skb() will set the ownership to this
+	/* We are not putting this on the woke write queue, so
+	 * tcp_transmit_skb() will set the woke ownership to this
 	 * sock.
 	 */
 	buff = alloc_skb(MAX_TCP_HEADER,
@@ -4292,7 +4292,7 @@ void tcp_send_ack(struct sock *sk)
 }
 
 /* This routine sends a packet with an out of date sequence
- * number. It assumes the other end will try to ack it.
+ * number. It assumes the woke other end will try to ack it.
  *
  * Question: what should we make while urgent mode?
  * 4.4BSD forces sending single byte of data. We cannot send
@@ -4315,7 +4315,7 @@ static int tcp_xmit_probe_skb(struct sock *sk, int urgent, int mib)
 
 	/* Reserve space for headers and set control bits. */
 	skb_reserve(skb, MAX_TCP_HEADER);
-	/* Use a previous sequence.  This should cause the other
+	/* Use a previous sequence.  This should cause the woke other
 	 * end to send an ack.  Don't queue or clone SKB, just
 	 * send it.
 	 */
@@ -4352,8 +4352,8 @@ int tcp_write_wakeup(struct sock *sk, int mib)
 		if (before(tp->pushed_seq, TCP_SKB_CB(skb)->end_seq))
 			tp->pushed_seq = TCP_SKB_CB(skb)->end_seq;
 
-		/* We are probing the opening of a window
-		 * but the window size is != 0
+		/* We are probing the woke opening of a window
+		 * but the woke window size is != 0
 		 * must have been a result SWS avoidance ( sender )
 		 */
 		if (seg_size < TCP_SKB_CB(skb)->end_seq - TCP_SKB_CB(skb)->seq ||

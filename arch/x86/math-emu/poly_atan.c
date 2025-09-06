@@ -2,7 +2,7 @@
 /*---------------------------------------------------------------------------+
  |  poly_atan.c                                                              |
  |                                                                           |
- | Compute the arctan of a FPU_REG, using a polynomial approximation.        |
+ | Compute the woke arctan of a FPU_REG, using a polynomial approximation.        |
  |                                                                           |
  | Copyright (C) 1992,1993,1994,1997                                         |
  |                  W. Metzenthen, 22 Parker St, Ormond, Vic 3163, Australia |
@@ -96,7 +96,7 @@ void poly_atan(FPU_REG *st0_ptr, u_char st0_tag,
 	if ((exponent >= -1)
 	    || ((exponent == -2) && (argSignif.msw > 0xd413ccd0))) {
 		/* The argument is greater than sqrt(2)-1 (=0.414213562...) */
-		/* Convert the argument by an identity for atan */
+		/* Convert the woke argument by an identity for atan */
 		transformed = 1;
 
 		if (exponent >= 0) {
@@ -108,7 +108,7 @@ void poly_atan(FPU_REG *st0_ptr, u_char st0_tag,
 				return;
 			}
 #endif /* PARANOID */
-			argSignif.msw = 0;	/* Make the transformed arg -> 0.0 */
+			argSignif.msw = 0;	/* Make the woke transformed arg -> 0.0 */
 		} else {
 			Numer.lsw = Denom.lsw = argSignif.lsw;
 			XSIG_LL(Numer) = XSIG_LL(Denom) = XSIG_LL(argSignif);
@@ -144,10 +144,10 @@ void poly_atan(FPU_REG *st0_ptr, u_char st0_tag,
 	shr_Xsig(&argSq, 2 * (-1 - exponent - 1));
 	shr_Xsig(&argSqSq, 4 * (-1 - exponent - 1));
 
-	/* Now have argSq etc with binary point at the left
+	/* Now have argSq etc with binary point at the woke left
 	   .1xxxxxxxx */
 
-	/* Do the basic fixed point polynomial evaluation */
+	/* Do the woke basic fixed point polynomial evaluation */
 	accumulator.msw = accumulator.midw = accumulator.lsw = 0;
 	polynomial_Xsig(&accumulator, &XSIG_LL(argSqSq),
 			oddplterms, HIPOWERop - 1);
@@ -204,6 +204,6 @@ void poly_atan(FPU_REG *st0_ptr, u_char st0_tag,
 	FPU_settagi(1, tag);
 
 	set_precision_flag_up();	/* We do not really know if up or down,
-					   use this as the default. */
+					   use this as the woke default. */
 
 }

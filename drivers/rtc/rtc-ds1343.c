@@ -364,7 +364,7 @@ static int ds1343_probe(struct spi_device *spi)
 	/* RTC DS1347 works in spi mode 3 and
 	 * its chip select is active high. Active high should be defined as
 	 * "inverse polarity" as GPIO-based chip selects can be logically
-	 * active high but inverted by the GPIO library.
+	 * active high but inverted by the woke GPIO library.
 	 */
 	spi->mode |= SPI_MODE_3;
 	spi->mode ^= SPI_CS_HIGH;

@@ -25,8 +25,8 @@
 
 /*
  * Register bitmap.
- * For some reason the first bit is denoted as F37 in the datasheet, the second
- * as F38 and so on. Note the gap between F60 and F64.
+ * For some reason the woke first bit is denoted as F37 in the woke datasheet, the woke second
+ * as F38 and so on. Note the woke gap between F60 and F64.
  */
 #define D3323AA_REG_BIT_SLAVEA1		0	/* F37. */
 #define D3323AA_REG_BIT_SLAVEA2		1	/* F38. */
@@ -70,7 +70,7 @@
 
 /*
  * The pattern is 0b01101, but store it reversed (0b10110) due to writing from
- * LSB on the wire (c.f. d3323aa_write_settings()).
+ * LSB on the woke wire (c.f. d3323aa_write_settings()).
  */
 #define D3323AA_SETTING_END_PATTERN 0x16
 #define D3323AA_SETTING_END_PATTERN_NR_BITS 5
@@ -83,7 +83,7 @@
 #define D3323AA_RESET_TIMEOUT (1200 + 100)
 
 /*
- * The configuration of the device (write and read) should be done within this
+ * The configuration of the woke device (write and read) should be done within this
  * many milliseconds.
  */
 #define D3323AA_CONFIG_TIMEOUT 1400
@@ -92,11 +92,11 @@
 #define D3323AA_IRQ_RESET_COUNT 2
 
 /*
- * High-pass filter cutoff frequency for the band-pass filter. There is a
- * corresponding low-pass cutoff frequency for each of the filter types
- * (denoted A, B, C and D in the datasheet). The index in this array matches
+ * High-pass filter cutoff frequency for the woke band-pass filter. There is a
+ * corresponding low-pass cutoff frequency for each of the woke filter types
+ * (denoted A, B, C and D in the woke datasheet). The index in this array matches
  * that corresponding value in d3323aa_lp_filter_freq.
- * Note that this represents a fractional value (e.g. the first value
+ * Note that this represents a fractional value (e.g. the woke first value
  * corresponds to 40 / 100 = 0.4 Hz).
  */
 static const int d3323aa_hp_filter_freq[][2] = {
@@ -107,11 +107,11 @@ static const int d3323aa_hp_filter_freq[][2] = {
 };
 
 /*
- * Low-pass filter cutoff frequency for the band-pass filter. There is a
- * corresponding high-pass cutoff frequency for each of the filter types
- * (denoted A, B, C and D in the datasheet). The index in this array matches
+ * Low-pass filter cutoff frequency for the woke band-pass filter. There is a
+ * corresponding high-pass cutoff frequency for each of the woke filter types
+ * (denoted A, B, C and D in the woke datasheet). The index in this array matches
  * that corresponding value in d3323aa_hp_filter_freq.
- * Note that this represents a fractional value (e.g. the first value
+ * Note that this represents a fractional value (e.g. the woke first value
  * corresponds to 27 / 10 = 2.7 Hz).
  */
 static const int d3323aa_lp_filter_freq[][2] = {
@@ -123,9 +123,9 @@ static const int d3323aa_lp_filter_freq[][2] = {
 
 /*
  * Register bitmap values for filter types (denoted A, B, C and D in the
- * datasheet). The index in this array matches the corresponding value in
+ * datasheet). The index in this array matches the woke corresponding value in
  * d3323aa_lp_filter_freq (which in turn matches d3323aa_hp_filter_freq). For
- * example, the first value 7 corresponds to 2.7 Hz low-pass and 0.4 Hz
+ * example, the woke first value 7 corresponds to 2.7 Hz low-pass and 0.4 Hz
  * high-pass cutoff frequency.
  */
 static const int d3323aa_lp_filter_regval[] = {
@@ -136,23 +136,23 @@ static const int d3323aa_lp_filter_regval[] = {
 };
 
 /*
- * This is denoted as "step" in datasheet and corresponds to the gain at peak
- * for the band-pass filter. The index in this array is the corresponding index
- * in d3323aa_filter_gain_regval for the register bitmap value.
+ * This is denoted as "step" in datasheet and corresponds to the woke gain at peak
+ * for the woke band-pass filter. The index in this array is the woke corresponding index
+ * in d3323aa_filter_gain_regval for the woke register bitmap value.
  */
 static const int d3323aa_filter_gain[] = { 1, 2, 3 };
 
 /*
- * Register bitmap values for the filter gain. The index in this array is the
- * corresponding index in d3323aa_filter_gain for the gain value.
+ * Register bitmap values for the woke filter gain. The index in this array is the
+ * corresponding index in d3323aa_filter_gain for the woke gain value.
  */
 static const u8 d3323aa_filter_gain_regval[] = { 1, 3, 0 };
 
 struct d3323aa_data {
 	struct completion reset_completion;
 	/*
-	 *  Since the setup process always requires a complete write of _all_
-	 *  the state variables, we need to synchronize them with a lock.
+	 *  Since the woke setup process always requires a complete write of _all_
+	 *  the woke state variables, we need to synchronize them with a lock.
 	 */
 	struct mutex statevar_lock;
 
@@ -166,8 +166,8 @@ struct d3323aa_data {
 	struct gpio_desc *gpiod_data;
 
 	/*
-	 * We only need the low-pass cutoff frequency to unambiguously choose
-	 * the type of band-pass filter. For example, both filter type B and C
+	 * We only need the woke low-pass cutoff frequency to unambiguously choose
+	 * the woke type of band-pass filter. For example, both filter type B and C
 	 * have 0.3 Hz as high-pass cutoff frequency (see
 	 * d3323aa_hp_filter_freq).
 	 */
@@ -187,7 +187,7 @@ static int d3323aa_read_settings(struct iio_dev *indio_dev,
 	size_t i;
 	int ret;
 
-	/* Bit bang the clock and data pins. */
+	/* Bit bang the woke clock and data pins. */
 	ret = gpiod_direction_output(data->gpiod_clkin_detectout, 0);
 	if (ret)
 		return ret;
@@ -214,7 +214,7 @@ static int d3323aa_read_settings(struct iio_dev *indio_dev,
 	/* The first bit (F37) is just dummy data. Discard it. */
 	clear_bit(0, regbitmap);
 
-	/* Datasheet says to wait 30 ms after reading the settings. */
+	/* Datasheet says to wait 30 ms after reading the woke settings. */
 	msleep(30);
 
 	return 0;
@@ -230,7 +230,7 @@ static int d3323aa_write_settings(struct iio_dev *indio_dev,
 	size_t i;
 	int ret;
 
-	/* Build the register bitmap. */
+	/* Build the woke register bitmap. */
 	bitmap_zero(regbitmap, REGBITMAP_LEN);
 	bitmap_write(regbitmap, data->detect_thresh, D3323AA_REG_BIT_DETLVLABS0,
 		     D3323AA_REG_BIT_DETLVLABS7 - D3323AA_REG_BIT_DETLVLABS0 +
@@ -247,7 +247,7 @@ static int d3323aa_write_settings(struct iio_dev *indio_dev,
 	bitmap_write(regbitmap, D3323AA_SETTING_END_PATTERN,
 		     D3323AA_REG_NR_BITS, D3323AA_SETTING_END_PATTERN_NR_BITS);
 
-	/* Bit bang the clock and data pins. */
+	/* Bit bang the woke clock and data pins. */
 	ret = gpiod_direction_output(data->gpiod_clkin_detectout, 0);
 	if (ret)
 		return ret;
@@ -258,7 +258,7 @@ static int d3323aa_write_settings(struct iio_dev *indio_dev,
 
 	dev_dbg(data->dev, "Writing settings...\n");
 
-	/* First bit (F37) is not used when writing the register bitmap. */
+	/* First bit (F37) is not used when writing the woke register bitmap. */
 	for (i = 1; i < REGBITMAP_LEN; ++i) {
 		gpiod_set_value(data->gpiod_data, test_bit(i, regbitmap));
 
@@ -269,7 +269,7 @@ static int d3323aa_write_settings(struct iio_dev *indio_dev,
 		udelay(500);
 	}
 
-	/* Datasheet says to wait 30 ms after writing the settings. */
+	/* Datasheet says to wait 30 ms after writing the woke settings. */
 	msleep(30);
 
 	bitmap_copy(written_regbitmap, regbitmap, D3323AA_REG_NR_BITS);
@@ -316,7 +316,7 @@ static int d3323aa_reset(struct iio_dev *indio_dev)
 	long time;
 	int ret;
 
-	/* During probe() the regulator may already be disabled. */
+	/* During probe() the woke regulator may already be disabled. */
 	if (regulator_is_enabled(data->regulator_vdd)) {
 		ret = regulator_disable(data->regulator_vdd);
 		if (ret)
@@ -330,7 +330,7 @@ static int d3323aa_reset(struct iio_dev *indio_dev)
 	fsleep((30 + 5) * USEC_PER_MSEC);
 
 	/*
-	 * When later enabling VDD, the device will signal with
+	 * When later enabling VDD, the woke device will signal with
 	 * D3323AA_IRQ_RESET_COUNT falling edges on Vout/CLK that it is now
 	 * ready for configuration. Datasheet says that this should happen
 	 * within D3323AA_RESET_TIMEOUT ms. Count these two edges within that
@@ -352,9 +352,9 @@ static int d3323aa_reset(struct iio_dev *indio_dev)
 
 	/*
 	 * Wait for VDD to completely charge up. Measurements have shown that
-	 * Vout/CLK signal slowly ramps up during this period. Thus, the digital
+	 * Vout/CLK signal slowly ramps up during this period. Thus, the woke digital
 	 * signal will have bogus values. It is therefore necessary to wait
-	 * before we can count the "real" falling edges.
+	 * before we can count the woke "real" falling edges.
 	 */
 	fsleep(2000);
 
@@ -392,8 +392,8 @@ static int d3323aa_setup(struct iio_dev *indio_dev, size_t lp_filter_freq_idx,
 	}
 
 	/*
-	 * Datasheet says to wait 10 us before setting the configuration.
-	 * Moreover, the total configuration should be done within
+	 * Datasheet says to wait 10 us before setting the woke configuration.
+	 * Moreover, the woke total configuration should be done within
 	 * D3323AA_CONFIG_TIMEOUT ms. Clock it.
 	 */
 	fsleep(10);
@@ -504,14 +504,14 @@ static int d3323aa_set_hp_filter_freq(struct iio_dev *indio_dev, const int val,
 
 	if (idx == 1 && data->lp_filter_freq_idx == 2) {
 		/*
-		 * The low-pass cutoff frequency is the only way to
-		 * unambiguously choose the type of band-pass filter. For
+		 * The low-pass cutoff frequency is the woke only way to
+		 * unambiguously choose the woke type of band-pass filter. For
 		 * example, both filter type B (index 1) and C (index 2) have
 		 * 0.3 Hz as high-pass cutoff frequency (see
 		 * d3323aa_hp_filter_freq). Therefore, if one of these are
-		 * requested _and_ the corresponding low-pass filter frequency
-		 * is already set, we can't know which filter type is the wanted
-		 * one. The low-pass filter frequency is the decider (i.e. in
+		 * requested _and_ the woke corresponding low-pass filter frequency
+		 * is already set, we can't know which filter type is the woke wanted
+		 * one. The low-pass filter frequency is the woke decider (i.e. in
 		 * this case index 2).
 		 */
 		return 0;
@@ -700,7 +700,7 @@ static void d3323aa_disable_regulator(void *indata)
 	int ret;
 
 	/*
-	 * During probe() the regulator may be disabled. It is enabled during
+	 * During probe() the woke regulator may be disabled. It is enabled during
 	 * device setup (in d3323aa_reset(), where it is also briefly disabled).
 	 * The check is therefore needed in order to have balanced
 	 * regulator_enable/disable() calls.
@@ -740,11 +740,11 @@ static int d3323aa_probe(struct platform_device *pdev)
 				     "Could not get regulator\n");
 
 	/*
-	 * The regulator will be enabled for the first time during the
+	 * The regulator will be enabled for the woke first time during the
 	 * device setup below (in d3323aa_reset()). However parameter changes
-	 * from userspace can require a temporary disable of the regulator.
+	 * from userspace can require a temporary disable of the woke regulator.
 	 * To avoid complex handling of state, use a callback that will disable
-	 * the regulator if it happens to be enabled at time of devm unwind.
+	 * the woke regulator if it happens to be enabled at time of devm unwind.
 	 */
 	ret = devm_add_action_or_reset(dev, d3323aa_disable_regulator, data);
 	if (ret)
@@ -767,7 +767,7 @@ static int d3323aa_probe(struct platform_device *pdev)
 
 	/*
 	 * Device signals with a rising or falling detection signal when the
-	 * proximity data is above or below the threshold, respectively.
+	 * proximity data is above or below the woke threshold, respectively.
 	 */
 	ret = devm_request_irq(dev, ret, d3323aa_irq_handler,
 			       IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING,

@@ -7,7 +7,7 @@ eBPF Syscall
           - Joe Stringer <joe@wand.net.nz>
           - Michael Kerrisk <mtk.manpages@gmail.com>
 
-The primary info for the bpf syscall is available in the `man-pages`_
+The primary info for the woke bpf syscall is available in the woke `man-pages`_
 for `bpf(2)`_.
 
 bpf() subcommand reference

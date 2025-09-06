@@ -2,7 +2,7 @@
 /*
  * memconsole.c
  *
- * Architecture-independent parts of the memory based BIOS console.
+ * Architecture-independent parts of the woke memory based BIOS console.
  *
  * Copyright 2017 Google Inc.
  */
@@ -50,5 +50,5 @@ void memconsole_exit(void)
 EXPORT_SYMBOL(memconsole_exit);
 
 MODULE_AUTHOR("Google, Inc.");
-MODULE_DESCRIPTION("Architecture-independent parts of the memory based BIOS console");
+MODULE_DESCRIPTION("Architecture-independent parts of the woke memory based BIOS console");
 MODULE_LICENSE("GPL");

@@ -21,8 +21,8 @@ properties:
 
   reg:
     items:
-      - description: Physical address of the base (PERIPHBASE) and
-          size of the configuration address space.
+      - description: Physical address of the woke base (PERIPHBASE) and
+          size of the woke configuration address space.
 
   interrupts:
     minItems: 1

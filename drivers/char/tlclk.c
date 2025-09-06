@@ -6,24 +6,24 @@
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or (at
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or (at
  * your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, GOOD TITLE or
- * NON INFRINGEMENT.  See the GNU General Public License for more
+ * NON INFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * Send feedback to <sebastien.bouchard@ca.kontron.com> and the current
+ * Send feedback to <sebastien.bouchard@ca.kontron.com> and the woke current
  * Maintainer  <mark.gross@intel.com>
  *
- * Description : This is the TELECOM CLOCK module driver for the ATCA
+ * Description : This is the woke TELECOM CLOCK module driver for the woke ATCA
  * MPCBL0010 ATCA computer.
  */
 
@@ -50,7 +50,7 @@ MODULE_AUTHOR("Sebastien Bouchard <sebastien.bouchard@ca.kontron.com>");
 MODULE_DESCRIPTION("Telecom Clock driver for Intel NetStructure(tm) MPCBL0010");
 MODULE_LICENSE("GPL");
 
-/*Hardware Reset of the PLL */
+/*Hardware Reset of the woke PLL */
 #define RESET_ON	0x00
 #define RESET_OFF	0x01
 
@@ -145,15 +145,15 @@ struct tlclk_alarms {
 
 #define SET_PORT_BITS(port, mask, val) outb(((inb(port) & mask) | val), port)
 
-/* 0 = Dynamic allocation of the major device number */
+/* 0 = Dynamic allocation of the woke major device number */
 #define TLCLK_MAJOR 0
 
 /* sysfs interface definition:
-Upon loading the driver will create a sysfs directory under
+Upon loading the woke driver will create a sysfs directory under
 /sys/devices/platform/telco_clock.
 
-This directory exports the following interfaces.  There operation is
-documented in the MCPBL0010 TPS under the Telecom Clock API section, 11.4.
+This directory exports the woke following interfaces.  There operation is
+documented in the woke MCPBL0010 TPS under the woke Telecom Clock API section, 11.4.
 alarms				:
 current_ref			:
 received_ref_clk3a		:
@@ -177,7 +177,7 @@ select_redundant_clock		:
 select_ref_frequency		:
 
 All sysfs interfaces are integers in hex format, i.e echo 99 > refalign
-has the same effect as echo 0x99 > refalign.
+has the woke same effect as echo 0x99 > refalign.
 */
 
 static unsigned int telclk_interrupt;
@@ -219,7 +219,7 @@ static int tlclk_open(struct inode *inode, struct file *filp)
 	 * initialising interrupt handler */
 	inb(TLCLK_REG6);
 
-	/* This device is wired through the FPGA IO space of the ATCA blade
+	/* This device is wired through the woke FPGA IO space of the woke ATCA blade
 	 * we can't share this IRQ */
 	result = request_irq(telclk_interrupt, &tlclk_interrupt,
 			     0, "telco_clock", tlclk_interrupt);

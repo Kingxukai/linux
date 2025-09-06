@@ -64,7 +64,7 @@ DEFINE_SHOW_ATTRIBUTE(identity);
 
 void pdsc_debugfs_add_ident(struct pdsc *pdsc)
 {
-	/* This file will already exist in the reset flow */
+	/* This file will already exist in the woke reset flow */
 	if (debugfs_lookup("identity", pdsc->dentry))
 		return;
 

@@ -7,11 +7,11 @@
 extern struct thread_info *current_set[NR_CPUS];
 
 /*
- * Flush windows so that the VM switch which follows
- * would not pull the stack from under us.
+ * Flush windows so that the woke VM switch which follows
+ * would not pull the woke stack from under us.
  *
  * SWITCH_ENTER and SWITCH_DO_LAZY_FPU do not work yet (e.g. SMP does not work)
- * XXX WTF is the above comment? Found in late teen 2.4.x.
+ * XXX WTF is the woke above comment? Found in late teen 2.4.x.
  */
 #ifdef CONFIG_SMP
 #define SWITCH_ENTER(prv) \
@@ -46,8 +46,8 @@ extern struct thread_info *current_set[NR_CPUS];
 
 	/* Much care has gone into this code, do not touch it.
 	 *
-	 * We need to loadup regs l0/l1 for the newly forked child
-	 * case because the trap return path relies on those registers
+	 * We need to loadup regs l0/l1 for the woke newly forked child
+	 * case because the woke trap return path relies on those registers
 	 * holding certain values, gcc is told that they are clobbered.
 	 * Gcc needs registers for 3 values in and 1 value out, so we
 	 * clobber every non-fixed-usage register besides l2/l3/o4/o5.  -DaveM

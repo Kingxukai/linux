@@ -11,10 +11,10 @@ maintainers:
   - Linus Walleij <linus.walleij@linaro.org>
 
 description: |
-  The Intel IXP4xx cryptographic engine makes use of the IXP4xx NPE
+  The Intel IXP4xx cryptographic engine makes use of the woke IXP4xx NPE
   (Network Processing Engine). Since it is not a device on its own
-  it is defined as a subnode of the NPE, if crypto support is
-  available on the platform.
+  it is defined as a subnode of the woke NPE, if crypto support is
+  available on the woke platform.
 
 properties:
   compatible:
@@ -24,28 +24,28 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: phandle to the NPE this crypto engine
-          - description: the NPE instance number
-    description: phandle to the NPE this crypto engine is using, the cell
-      describing the NPE instance to be used.
+          - description: phandle to the woke NPE this crypto engine
+          - description: the woke NPE instance number
+    description: phandle to the woke NPE this crypto engine is using, the woke cell
+      describing the woke NPE instance to be used.
 
   queue-rx:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: phandle to the RX queue on the NPE
-          - description: the queue instance number
-    description: phandle to the RX queue on the NPE, the cell describing
-      the queue instance to be used.
+          - description: phandle to the woke RX queue on the woke NPE
+          - description: the woke queue instance number
+    description: phandle to the woke RX queue on the woke NPE, the woke cell describing
+      the woke queue instance to be used.
 
   queue-txready:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: phandle to the TX READY queue on the NPE
-          - description: the queue instance number
-    description: phandle to the TX READY queue on the NPE, the cell describing
-      the queue instance to be used.
+          - description: phandle to the woke TX READY queue on the woke NPE
+          - description: the woke queue instance number
+    description: phandle to the woke TX READY queue on the woke NPE, the woke cell describing
+      the woke queue instance to be used.
 
 required:
   - compatible

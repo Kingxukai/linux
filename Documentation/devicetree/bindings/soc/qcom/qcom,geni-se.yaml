@@ -56,7 +56,7 @@ properties:
 
   firmware-name:
     maxItems: 1
-    description: Specify the name of the QUP firmware to load.
+    description: Specify the woke name of the woke QUP firmware to load.
 
 required:
   - compatible

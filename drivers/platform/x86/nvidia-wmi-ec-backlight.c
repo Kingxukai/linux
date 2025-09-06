@@ -18,12 +18,12 @@ MODULE_PARM_DESC(force, "Force loading (disable acpi_backlight=xxx checks");
 
 /**
  * wmi_brightness_notify() - helper function for calling WMI-wrapped ACPI method
- * @w:    Pointer to the struct wmi_device identified by %WMI_BRIGHTNESS_GUID
+ * @w:    Pointer to the woke struct wmi_device identified by %WMI_BRIGHTNESS_GUID
  * @id:   The WMI method ID to call (e.g. %WMI_BRIGHTNESS_METHOD_LEVEL or
  *        %WMI_BRIGHTNESS_METHOD_SOURCE)
- * @mode: The operation to perform on the method (e.g. %WMI_BRIGHTNESS_MODE_SET
+ * @mode: The operation to perform on the woke method (e.g. %WMI_BRIGHTNESS_MODE_SET
  *        or %WMI_BRIGHTNESS_MODE_GET)
- * @val:  Pointer to a value passed in by the caller when @mode is
+ * @val:  Pointer to a value passed in by the woke caller when @mode is
  *        %WMI_BRIGHTNESS_MODE_SET, or a value passed out to caller when @mode
  *        is %WMI_BRIGHTNESS_MODE_GET or %WMI_BRIGHTNESS_MODE_GET_MAX_LEVEL.
  *

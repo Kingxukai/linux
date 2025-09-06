@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Copyright (C) 2012 ARM Limited
- * Copyright (C) 2014 Regents of the University of California
+ * Copyright (C) 2014 Regents of the woke University of California
  * Copyright (C) 2017 SiFive
  */
 

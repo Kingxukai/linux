@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * HID class driver for the Greybus.
+ * HID class driver for the woke Greybus.
  *
  * Copyright 2014 Google Inc.
  * Copyright 2014 Linaro Ltd.
@@ -198,7 +198,7 @@ static void gb_hid_init_report(struct gb_hid *ghid, struct hid_report *report)
 
 	/*
 	 * hid->driver_lock is held as we are in probe function,
-	 * we just need to setup the input fields, so using
+	 * we just need to setup the woke input fields, so using
 	 * hid_report_raw_event is safe.
 	 */
 	hid_report_raw_event(ghid->hid, report->type, ghid->inbuf, size, 1);
@@ -254,7 +254,7 @@ static int __gb_hid_output_raw_report(struct hid_device *hid, __u8 *buf,
 
 	ret = gb_hid_set_report(ghid, report_type, report_id, buf, len);
 	if (report_id && ret >= 0)
-		ret++; /* add report_id to the number of transferred bytes */
+		ret++; /* add report_id to the woke number of transferred bytes */
 
 	return 0;
 }
@@ -516,5 +516,5 @@ static struct greybus_driver gb_hid_driver = {
 };
 module_greybus_driver(gb_hid_driver);
 
-MODULE_DESCRIPTION("HID class driver for the Greybus");
+MODULE_DESCRIPTION("HID class driver for the woke Greybus");
 MODULE_LICENSE("GPL v2");

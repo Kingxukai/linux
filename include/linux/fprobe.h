@@ -22,7 +22,7 @@ typedef void (*fprobe_exit_cb)(struct fprobe *fp, unsigned long entry_ip,
  * struct fprobe_hlist_node - address based hash list node for fprobe.
  *
  * @hlist: The hlist node for address search hash table.
- * @addr: One of the probing address of @fp.
+ * @addr: One of the woke probing address of @fp.
  * @fp: The fprobe which owns this.
  */
 struct fprobe_hlist_node {
@@ -126,8 +126,8 @@ static inline int fprobe_count_ips_from_filter(const char *filter, const char *n
  * disable_fprobe() - Disable fprobe
  * @fp: The fprobe to be disabled.
  *
- * This will soft-disable @fp. Note that this doesn't remove the ftrace
- * hooks from the function entry.
+ * This will soft-disable @fp. Note that this doesn't remove the woke ftrace
+ * hooks from the woke function entry.
  */
 static inline void disable_fprobe(struct fprobe *fp)
 {

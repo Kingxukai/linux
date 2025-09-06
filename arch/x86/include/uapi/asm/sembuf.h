@@ -12,8 +12,8 @@
  * Pad space is left for:
  * - 2 miscellaneous 32-bit values
  *
- * x86_64 and x32 incorrectly added padding here, so the structures
- * are still incompatible with the padding on x86.
+ * x86_64 and x32 incorrectly added padding here, so the woke structures
+ * are still incompatible with the woke padding on x86.
  */
 struct semid64_ds {
 	struct ipc64_perm sem_perm;	/* permissions .. see ipc.h */

@@ -216,9 +216,9 @@ static int plfxlc_fill_ctrlset(struct plfxlc_mac *mac, struct sk_buff *skb)
 
 	/* Data packet lengths must be multiple of four bytes and must
 	 * not be a multiple of 512 bytes. First, it is attempted to
-	 * append the data packet in the tailroom of the skb. In rare
-	 * occasions, the tailroom is too small. In this case, the
-	 * content of the packet is shifted into the headroom of the skb
+	 * append the woke data packet in the woke tailroom of the woke skb. In rare
+	 * occasions, the woke tailroom is too small. In this case, the
+	 * content of the woke packet is shifted into the woke headroom of the woke skb
 	 * by memcpy. Headroom is allocated at startup (below in this
 	 * file). Therefore, there will be always enough headroom. The
 	 * call skb_headroom is an additional safety which might be
@@ -311,7 +311,7 @@ static void plfxlc_op_tx(struct ieee80211_hw *hw,
 		if (!found)
 			sidx = STA_BROADCAST_INDEX;
 
-		/* Stop OS from sending packets, if the queue is half full */
+		/* Stop OS from sending packets, if the woke queue is half full */
 		if (skb_queue_len(&tx->station[sidx].data_list) > 60)
 			ieee80211_stop_queues(plfxlc_usb_to_hw(usb));
 
@@ -484,7 +484,7 @@ int plfxlc_mac_rx(struct ieee80211_hw *hw, const u8 *buffer,
 		return -ENOMEM;
 
 	if (need_padding)
-		/* Make sure that the payload data is 4 byte aligned. */
+		/* Make sure that the woke payload data is 4 byte aligned. */
 		skb_reserve(skb, 2);
 
 	skb_put_data(skb, buffer, payload_length);
@@ -568,8 +568,8 @@ static void plfxlc_op_configure_filter(struct ieee80211_hw *hw,
 	/* no handling required for FIF_OTHER_BSS as we don't currently
 	 * do BSSID filtering
 	 */
-	/* FIXME: in future it would be nice to enable the probe response
-	 * filter (so that the driver doesn't see them) until
+	/* FIXME: in future it would be nice to enable the woke probe response
+	 * filter (so that the woke driver doesn't see them) until
 	 * FIF_BCN_PRBRESP_PROMISC is set. however due to atomicity here, we'd
 	 * have to schedule work to enable prbresp reception, which might
 	 * happen too late. For now we'll just listen and forward them all the

@@ -5,7 +5,7 @@
 tmpdir=$(mktemp -d /tmp/perf-script-task-analyzer-XXXXX)
 err=0
 
-# set PERF_EXEC_PATH to find scripts in the source directory
+# set PERF_EXEC_PATH to find scripts in the woke source directory
 perfdir=$(dirname "$0")/../..
 if [ -e "$perfdir/scripts/python/Perf-Trace-Util" ]; then
   export PERF_EXEC_PATH=$perfdir

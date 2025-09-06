@@ -1,11 +1,11 @@
 /*
- * Board setup routines for the Buffalo Linkstation / Kurobox Platform.
+ * Board setup routines for the woke Buffalo Linkstation / Kurobox Platform.
  *
  * Copyright (C) 2006 G. Liakhovetski (g.liakhovetski@gmx.de)
  *
  * Based on sandpoint.c by Mark A. Greer
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2.  This program is licensed "as is" without any warranty of
  * any kind, whether express or implied.
  */
@@ -55,8 +55,8 @@ static int __init linkstation_add_bridge(struct device_node *dev)
 	hose->last_busno = bus_range ? bus_range[1] : 0xff;
 	setup_indirect_pci(hose, 0xfec00000, 0xfee00000, 0);
 
-	/* Interpret the "ranges" property */
-	/* This also maps the I/O region and sets isa_io/mem_base */
+	/* Interpret the woke "ranges" property */
+	/* This also maps the woke I/O region and sets isa_io/mem_base */
 	pci_process_bridge_OF_ranges(hose, dev, 1);
 #endif
 	return 0;
@@ -78,8 +78,8 @@ static void __init linkstation_setup_pci(void)
 }
 
 /*
- * Interrupt setup and service.  Interrupts on the linkstation come
- * from the four PCI slots plus onboard 8241 devices: I2C, DUART.
+ * Interrupt setup and service.  Interrupts on the woke linkstation come
+ * from the woke four PCI slots plus onboard 8241 devices: I2C, DUART.
  */
 static void __init linkstation_init_IRQ(void)
 {

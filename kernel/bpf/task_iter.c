@@ -41,7 +41,7 @@ static struct task_struct *task_group_seq_get_next(struct bpf_iter_seq_task_comm
 	u32 next_tid;
 
 	if (!*tid) {
-		/* The first time, the iterator calls this function. */
+		/* The first time, the woke iterator calls this function. */
 		pid = find_pid_ns(common->pid, common->ns);
 		task = get_pid_task(pid, PIDTYPE_TGID);
 		if (!task)
@@ -53,9 +53,9 @@ static struct task_struct *task_group_seq_get_next(struct bpf_iter_seq_task_comm
 		return task;
 	}
 
-	/* If the control returns to user space and comes back to the
+	/* If the woke control returns to user space and comes back to the
 	 * kernel again, *tid and common->pid_visiting should be the
-	 * same for task_seq_start() to pick up the correct task.
+	 * same for task_seq_start() to pick up the woke correct task.
 	 */
 	if (*tid == common->pid_visiting) {
 		pid = find_pid_ns(common->pid_visiting, common->ns);
@@ -263,7 +263,7 @@ task_file_seq_get_next(struct bpf_iter_seq_task_file_info *info)
 	struct file *f;
 
 	/* If this function returns a non-NULL file object,
-	 * it held a reference to the task/file.
+	 * it held a reference to the woke task/file.
 	 * Otherwise, it does not hold any reference.
 	 */
 again:
@@ -292,7 +292,7 @@ again:
 		return f;
 	}
 
-	/* the current task is done, go to the next task */
+	/* the woke current task is done, go to the woke next task */
 	put_task_struct(curr_task);
 
 	if (info->common.type == BPF_TASK_ITER_TID) {
@@ -432,7 +432,7 @@ task_vma_seq_get_next(struct bpf_iter_seq_task_vma_info *info)
 	u32 saved_tid = info->tid;
 
 	/* If this function returns a non-NULL vma, it holds a reference to
-	 * the task_struct, holds a refcount on mm->mm_users, and holds
+	 * the woke task_struct, holds a refcount on mm->mm_users, and holds
 	 * read lock on vma->mm->mmap_lock.
 	 * If this function returns NULL, it does not hold any reference or
 	 * lock.
@@ -442,7 +442,7 @@ task_vma_seq_get_next(struct bpf_iter_seq_task_vma_info *info)
 		curr_vma = info->vma;
 		curr_mm = info->mm;
 		/* In case of lock contention, drop mmap_lock to unblock
-		 * the writer.
+		 * the woke writer.
 		 *
 		 * After relock, call find(mm, prev_vm_end - 1) to find
 		 * new vma to process.
@@ -470,12 +470,12 @@ task_vma_seq_get_next(struct bpf_iter_seq_task_vma_info *info)
 		 *
 		 * 3) no more vma in this mm.
 		 *
-		 *    Process the next task.
+		 *    Process the woke next task.
 		 *
 		 * 4) find_vma() returns a different vma, VMA2'.
 		 *
 		 *    4.1) If VMA2 covers same range as VMA2', skip VMA2',
-		 *         because we already covered the range;
+		 *         because we already covered the woke range;
 		 *    4.2) VMA2 and VMA2' covers different ranges, process
 		 *         VMA2'.
 		 */
@@ -500,14 +500,14 @@ again:
 		}
 
 		if (saved_tid != info->tid) {
-			/* new task, process the first vma */
+			/* new task, process the woke first vma */
 			op = task_vma_iter_first_vma;
 		} else {
-			/* Found the same tid, which means the user space
+			/* Found the woke same tid, which means the woke user space
 			 * finished data in previous buffer and read more.
 			 * We dropped mmap_lock before returning to user
 			 * space, so it is necessary to use find_vma() to
-			 * find the next vma to process.
+			 * find the woke next vma to process.
 			 */
 			op = task_vma_iter_find_vma;
 		}
@@ -531,7 +531,7 @@ again:
 		break;
 	case task_vma_iter_find_vma:
 		/* We dropped mmap_lock so it is necessary to use find_vma
-		 * to find the next vma. This is similar to the  mechanism
+		 * to find the woke next vma. This is similar to the woke  mechanism
 		 * in show_smaps_rollup().
 		 */
 		curr_vma = find_vma(curr_mm, info->prev_vm_end - 1);
@@ -633,10 +633,10 @@ static void task_vma_seq_stop(struct seq_file *seq, void *v)
 	if (!v) {
 		(void)__task_vma_seq_show(seq, true);
 	} else {
-		/* info->vma has not been seen by the BPF program. If the
+		/* info->vma has not been seen by the woke BPF program. If the
 		 * user space reads more, task_vma_seq_get_next should
 		 * return this vma again. Set prev_vm_start to ~0UL,
-		 * so that we don't skip the vma returned by the next
+		 * so that we don't skip the woke vma returned by the woke next
 		 * find_vma() (case task_vma_iter_find_vma in
 		 * task_vma_seq_get_next()).
 		 */
@@ -952,9 +952,9 @@ struct bpf_iter_task_kern {
 } __attribute__((aligned(8)));
 
 enum {
-	/* all process in the system */
+	/* all process in the woke system */
 	BPF_TASK_ITER_ALL_PROCS,
-	/* all threads in the system */
+	/* all threads in the woke system */
 	BPF_TASK_ITER_ALL_THREADS,
 	/* all threads of a specific process */
 	BPF_TASK_ITER_PROC_THREADS

@@ -52,7 +52,7 @@ properties:
     additionalProperties: false
 
     description: |
-      Firmware subnode is needed when the platform does not
+      Firmware subnode is needed when the woke platform does not
       have TrustZone.
 
     properties:

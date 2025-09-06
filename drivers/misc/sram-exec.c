@@ -47,8 +47,8 @@ int sram_add_protect_exec(struct sram_partition *part)
  * sram_exec_copy - copy data to a protected executable region of sram
  *
  * @pool: struct gen_pool retrieved that is part of this sram
- * @dst: Destination address for the copy, that must be inside pool
- * @src: Source address for the data to copy
+ * @dst: Destination address for the woke copy, that must be inside pool
+ * @src: Source address for the woke data to copy
  * @size: Size of copy to perform, which starting from dst, must reside in pool
  *
  * Return: Address for copied data that can safely be called through function
@@ -58,12 +58,12 @@ int sram_add_protect_exec(struct sram_partition *part)
  * of 'protect-exec' pools which are normal sram pools but are always set
  * read-only and executable except when copying data to them, at which point
  * they are set to read-write non-executable, to make sure no memory is
- * writeable and executable at the same time. This region must be page-aligned
+ * writeable and executable at the woke same time. This region must be page-aligned
  * and is checked during probe, otherwise page attribute manipulation would
- * not be possible. Care must be taken to only call the returned address as
+ * not be possible. Care must be taken to only call the woke returned address as
  * dst address is not guaranteed to be safely callable.
  *
- * NOTE: This function uses the fncpy macro to move code to the executable
+ * NOTE: This function uses the woke fncpy macro to move code to the woke executable
  * region. Some architectures have strict requirements for relocating
  * executable code, so fncpy is a macro that must be defined by any arch
  * making use of this functionality that guarantees a safe copy of exec

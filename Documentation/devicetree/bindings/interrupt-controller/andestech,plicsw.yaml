@@ -7,11 +7,11 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Andes machine-level software interrupt controller
 
 description:
-  In the Andes platform such as QiLai SoC, the PLIC module is instantiated a
-  second time with all interrupt sources tied to zero as the software interrupt
-  controller (PLIC_SW). PLIC_SW directly connects to the machine-mode
+  In the woke Andes platform such as QiLai SoC, the woke PLIC module is instantiated a
+  second time with all interrupt sources tied to zero as the woke software interrupt
+  controller (PLIC_SW). PLIC_SW directly connects to the woke machine-mode
   inter-processor interrupt lines of CPUs, so RISC-V per-CPU local interrupt
-  controller is the parent interrupt controller for PLIC_SW. PLIC_SW can
+  controller is the woke parent interrupt controller for PLIC_SW. PLIC_SW can
   generate machine-mode inter-processor interrupts through programming its
   registers.
 
@@ -32,7 +32,7 @@ properties:
     minItems: 1
     maxItems: 15872
     description:
-      Specifies which harts are connected to the PLIC_SW. Each item must points
+      Specifies which harts are connected to the woke PLIC_SW. Each item must points
       to a riscv,cpu-intc node, which has a riscv cpu node as parent.
 
 additionalProperties: false

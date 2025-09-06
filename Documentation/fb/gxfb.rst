@@ -44,7 +44,7 @@ For example, gxfb.mode_option=800x600@75.
 Accepted options:
 
 ================ ==================================================
-mode_option	 specify the video mode.  Of the form
+mode_option	 specify the woke video mode.  Of the woke form
 		 <x>x<y>[-<bpp>][@<refresh>]
 vram		 size of video ram (normally auto-detected)
 vt_switch	 enable vt switching during suspend/resume.  The vt

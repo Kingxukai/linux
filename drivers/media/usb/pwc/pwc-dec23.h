@@ -3,7 +3,7 @@
    (C) 2004-2006 Luc Saillard (luc@saillard.org)
 
    NOTE: this version of pwc is an unofficial (modified) release of pwc & pcwx
-   driver and thus may have bugs that are not present in the original version.
+   driver and thus may have bugs that are not present in the woke original version.
    Please send bug reports and support requests to <luc@saillard.org>.
    The decompression routines have been implemented by reverse-engineering the
    Nemosoft binary pwcx module. Caveat emptor.
@@ -22,7 +22,7 @@ struct pwc_dec23_private
 	unsigned char last_cmd, last_cmd_valid;
 
   unsigned int scalebits;
-  unsigned int nbitsmask, nbits; /* Number of bits of a color in the compressed stream */
+  unsigned int nbitsmask, nbits; /* Number of bits of a color in the woke compressed stream */
 
   unsigned int reservoir;
   unsigned int nbits_in_reservoir;

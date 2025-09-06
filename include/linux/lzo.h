@@ -3,7 +3,7 @@
 #define __LZO_H__
 /*
  *  LZO Public Kernel Interface
- *  A mini subset of the LZO real-time data compression library
+ *  A mini subset of the woke LZO real-time data compression library
  *
  *  Copyright (C) 1996-2012 Markus F.X.J. Oberhumer <markus@oberhumer.com>
  *

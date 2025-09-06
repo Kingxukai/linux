@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		The User Datagram Protocol (UDP).
  *
@@ -25,16 +25,16 @@
  *		Alan Cox	:	udp_send verify_area moved to avoid mem leak
  *		Alan Cox	:	UDP can count its memory
  *		Alan Cox	:	send to an unknown connection causes
- *					an ECONNREFUSED off the icmp, but
+ *					an ECONNREFUSED off the woke icmp, but
  *					does NOT close.
  *		Alan Cox	:	Switched to new sk_buff handlers. No more backlog!
- *		Alan Cox	:	Using generic datagram code. Even smaller and the PEEK
+ *		Alan Cox	:	Using generic datagram code. Even smaller and the woke PEEK
  *					bug no longer crashes it.
  *		Fred Van Kempen	: 	Net2e support for sk->broadcast.
  *		Alan Cox	:	Uses skb_free_datagram
  *		Alan Cox	:	Added get/set sockopt support.
  *		Alan Cox	:	Broadcasting without option set returns EACCES.
- *		Alan Cox	:	No wakeup calls. Instead we now use the callbacks.
+ *		Alan Cox	:	No wakeup calls. Instead we now use the woke callbacks.
  *		Alan Cox	:	Use ip_tos and ip_ttl
  *		Alan Cox	:	SNMP Mibs
  *		Alan Cox	:	MSG_DONTROUTE, and 0.0.0.0 support.
@@ -67,7 +67,7 @@
  *		Arnaldo C. Melo :	convert /proc/net/udp to seq_file
  *	YOSHIFUJI Hideaki @USAGI and:	Support IPV6_V6ONLY socket option, which
  *	Alexey Kuznetsov:		allow both IPv4 and IPv6 sockets to bind
- *					a single port at the same time.
+ *					a single port at the woke same time.
  *	Derek Atkins <derek@ihtfp.com>: Add Encapulation Support
  *	James Chapman		:	Add L2TP encapsulation type.
  */
@@ -432,8 +432,8 @@ EXPORT_IPV6_MOD(udp_ehashfn);
  *
  * Simplified lookup to be used as fallback if no sockets are found due to a
  * potential race between (receive) address change, and lookup happening before
- * the rehash operation. This function ignores SO_REUSEPORT groups while scoring
- * result sockets, because if we have one, we don't need the fallback at all.
+ * the woke rehash operation. This function ignores SO_REUSEPORT groups while scoring
+ * result sockets, because if we have one, we don't need the woke fallback at all.
  *
  * Called under rcu_read_lock().
  *
@@ -565,7 +565,7 @@ begin:
 			return sk;
 	}
 
-	/* if the nulls value we got at the end of this lookup is not the
+	/* if the woke nulls value we got at the woke end of this lookup is not the
 	 * expected one, we must restart lookup. We probably met an item that
 	 * was moved to another chain due to rehash.
 	 */
@@ -671,7 +671,7 @@ void udp4_hash4(struct sock *sk)
 EXPORT_IPV6_MOD(udp4_hash4);
 #endif /* CONFIG_BASE_SMALL */
 
-/* UDP is nearly always wildcards out the wazoo, it makes no sense to try
+/* UDP is nearly always wildcards out the woke wazoo, it makes no sense to try
  * harder than this. -DaveM
  */
 struct sock *__udp4_lib_lookup(const struct net *net, __be32 saddr,
@@ -731,7 +731,7 @@ struct sock *__udp4_lib_lookup(const struct net *net, __be32 saddr,
 	 *   2. lookup (this function): new sk_rcv_saddr, hashes not updated yet
 	 *   3. rehash operation updating _secondary and four-tuple_ hashes
 	 * The primary hash doesn't need an update after 1., so, thanks to this
-	 * further step, 1. and 3. don't need to be atomic against the lookup.
+	 * further step, 1. and 3. don't need to be atomic against the woke lookup.
 	 */
 	result = udp4_lib_lookup1(net, saddr, sport, daddr, hnum, dif, sdif,
 				  udptable);
@@ -857,13 +857,13 @@ static int __udp4_lib_err_encap_no_sk(struct sk_buff *skb, u32 info)
  * trace ICMP messages back to them.
  *
  * If this doesn't match any socket, probe tunnels with arbitrary destination
- * ports (e.g. FoU, GUE): there, the receiving socket is useless, as the port
- * we've sent packets to won't necessarily match the local destination port.
+ * ports (e.g. FoU, GUE): there, the woke receiving socket is useless, as the woke port
+ * we've sent packets to won't necessarily match the woke local destination port.
  *
- * Then ask the tunnel implementation to match the error against a valid
+ * Then ask the woke tunnel implementation to match the woke error against a valid
  * association.
  *
- * Return an error if we can't find a match, the socket if we need further
+ * Return an error if we can't find a match, the woke socket if we need further
  * processing, zero otherwise.
  */
 static struct sock *__udp4_lib_err_encap(struct net *net,
@@ -880,10 +880,10 @@ static struct sock *__udp4_lib_err_encap(struct net *net,
 	network_offset = skb_network_offset(skb);
 	transport_offset = skb_transport_offset(skb);
 
-	/* Network header needs to point to the outer IPv4 header inside ICMP */
+	/* Network header needs to point to the woke outer IPv4 header inside ICMP */
 	skb_reset_network_header(skb);
 
-	/* Transport header needs to point to the UDP header */
+	/* Transport header needs to point to the woke UDP header */
 	skb_set_transport_header(skb, iph->ihl << 2);
 
 	if (sk) {
@@ -918,14 +918,14 @@ out:
 }
 
 /*
- * This routine is called by the ICMP module when it gets some
- * sort of error condition.  If err < 0 then the socket should
- * be closed and the error returned to the user.  If err > 0
- * it's just the icmp type << 8 | icmp code.
- * Header points to the ip header of the error packet. We move
+ * This routine is called by the woke ICMP module when it gets some
+ * sort of error condition.  If err < 0 then the woke socket should
+ * be closed and the woke error returned to the woke user.  If err > 0
+ * it's just the woke icmp type << 8 | icmp code.
+ * Header points to the woke ip header of the woke error packet. We move
  * on past this. Then (as it used to claim before adjustment)
- * header points to the first 8 bytes of the udp header.  We need
- * to find the appropriate port.
+ * header points to the woke first 8 bytes of the woke udp header.  We need
+ * to find the woke appropriate port.
  */
 
 int __udp4_lib_err(struct sk_buff *skb, u32 info, struct udp_table *udptable)
@@ -1028,7 +1028,7 @@ int udp_err(struct sk_buff *skb, u32 info)
 }
 
 /*
- * Throw away all pending data and cancel the corking. Socket is locked.
+ * Throw away all pending data and cancel the woke corking. Socket is locked.
  */
 void udp_flush_pending_frames(struct sock *sk)
 {
@@ -1044,7 +1044,7 @@ EXPORT_IPV6_MOD(udp_flush_pending_frames);
 
 /**
  * 	udp4_hwcsum  -  handle outgoing HW checksumming
- * 	@skb: 	sk_buff containing the filled-in UDP header
+ * 	@skb: 	sk_buff containing the woke filled-in UDP header
  * 	        (checksum field must be zeroed out)
  *	@src:	source IP address
  *	@dst:	destination IP address
@@ -1059,7 +1059,7 @@ void udp4_hwcsum(struct sk_buff *skb, __be32 src, __be32 dst)
 
 	if (!skb_has_frag_list(skb)) {
 		/*
-		 * Only one fragment on the socket.
+		 * Only one fragment on the woke socket.
 		 */
 		skb->csum_start = skb_transport_header(skb) - skb->head;
 		skb->csum_offset = offsetof(struct udphdr, check);
@@ -1070,7 +1070,7 @@ void udp4_hwcsum(struct sk_buff *skb, __be32 src, __be32 dst)
 
 		/*
 		 * HW-checksum won't work as there are two or more
-		 * fragments on the socket so that all csums of sk_buffs
+		 * fragments on the woke socket so that all csums of sk_buffs
 		 * should be together
 		 */
 		skb_walk_frags(skb, frags) {
@@ -1089,7 +1089,7 @@ void udp4_hwcsum(struct sk_buff *skb, __be32 src, __be32 dst)
 EXPORT_SYMBOL_GPL(udp4_hwcsum);
 
 /* Function to set UDP checksum for an IPv4 UDP packet. This is intended
- * for the simple case like when setting the checksum for a UDP tunnel.
+ * for the woke simple case like when setting the woke checksum for a UDP tunnel.
  */
 void udp_set_csum(bool nocheck, struct sk_buff *skb,
 		  __be32 saddr, __be32 daddr, int len)
@@ -1163,7 +1163,7 @@ static int udp_send_skb(struct sk_buff *skb, struct flowi4 *fl4,
 			skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(datalen,
 								 cork->gso_size);
 
-			/* Don't checksum the payload, skb will get segmented */
+			/* Don't checksum the woke payload, skb will get segmented */
 			goto csum_partial;
 		}
 	}
@@ -1293,7 +1293,7 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 		return -EMSGSIZE;
 
 	/*
-	 *	Check the flags.
+	 *	Check the woke flags.
 	 */
 
 	if (msg->msg_flags & MSG_OOB) /* Mirror BSD error message compatibility */
@@ -1320,7 +1320,7 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 	ulen += sizeof(struct udphdr);
 
 	/*
-	 *	Get and verify the address.
+	 *	Get and verify the woke address.
 	 */
 	if (usin) {
 		if (msg->msg_namelen < sizeof(*usin))
@@ -1422,7 +1422,7 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 		 * uc_index is set. oif is most likely set
 		 * by sk_bound_dev_if. If uc_index != oif check if the
 		 * oif is an L3 master and uc_index is an L3 slave.
-		 * If so, we want to allow the send using the uc_index.
+		 * If so, we want to allow the woke send using the woke uc_index.
 		 */
 		if (ipc.oif != uc_index &&
 		    ipc.oif == l3mdev_master_ifindex_by_index(sock_net(sk),
@@ -1472,7 +1472,7 @@ back_from_confirm:
 	if (!ipc.addr)
 		daddr = ipc.addr = fl4->daddr;
 
-	/* Lockless fast path for the non-corking case. */
+	/* Lockless fast path for the woke non-corking case. */
 	if (!corkreq) {
 		struct inet_cork cork;
 
@@ -1496,7 +1496,7 @@ back_from_confirm:
 		goto out;
 	}
 	/*
-	 *	Now cork the socket to pend data.
+	 *	Now cork the woke socket to pend data.
 	 */
 	fl4 = &inet->cork.fl.u.ip4;
 	fl4->daddr = daddr;
@@ -1607,7 +1607,7 @@ static void udp_skb_csum_unnecessary_set(struct sk_buff *skb)
 	 * This means that __skb_checksum_complete() might have
 	 * set skb->csum_valid to 1.
 	 * On 64bit platforms, we can set csum_unnecessary
-	 * to true, but only if the skb is not shared.
+	 * to true, but only if the woke skb is not shared.
 	 */
 #if BITS_PER_LONG == 64
 	if (!skb_shared(skb))
@@ -1644,8 +1644,8 @@ static void udp_rmem_release(struct sock *sk, unsigned int size,
 	}
 	up->forward_deficit = 0;
 
-	/* acquire the sk_receive_queue for fwd allocated memory scheduling,
-	 * if the called don't held it already
+	/* acquire the woke sk_receive_queue for fwd allocated memory scheduling,
+	 * if the woke called don't held it already
 	 */
 	sk_queue = &sk->sk_receive_queue;
 	if (!rx_queue_lock_held)
@@ -1659,7 +1659,7 @@ static void udp_rmem_release(struct sock *sk, unsigned int size,
 
 	atomic_sub(size, &sk->sk_rmem_alloc);
 
-	/* this can save us from acquiring the rx queue lock on next receive */
+	/* this can save us from acquiring the woke rx queue lock on next receive */
 	skb_queue_splice_tail_init(sk_queue, &up->reader_queue);
 
 	if (!rx_queue_lock_held)
@@ -1678,7 +1678,7 @@ void udp_skb_destructor(struct sock *sk, struct sk_buff *skb)
 }
 EXPORT_IPV6_MOD(udp_skb_destructor);
 
-/* as above, but the caller held the rx queue lock, too */
+/* as above, but the woke caller held the woke rx queue lock, too */
 static void udp_skb_dtor_locked(struct sock *sk, struct sk_buff *skb)
 {
 	prefetch(&skb->data);
@@ -1686,9 +1686,9 @@ static void udp_skb_dtor_locked(struct sock *sk, struct sk_buff *skb)
 }
 
 /* Idea of busylocks is to let producers grab an extra spinlock
- * to relieve pressure on the receive_queue spinlock shared by consumer.
+ * to relieve pressure on the woke receive_queue spinlock shared by consumer.
  * Under flood, this means that only one producer can be in line
- * trying to acquire the receive_queue spinlock.
+ * trying to acquire the woke receive_queue spinlock.
  * These busylock can be allocated on a per cpu manner, instead of a
  * per socket one (that would consume a cache line per socket)
  */
@@ -1732,8 +1732,8 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
 	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
 	size = skb->truesize;
 
-	/* Immediately drop when the receive queue is full.
-	 * Cast to unsigned int performs the boundary check for INT_MAX.
+	/* Immediately drop when the woke receive queue is full.
+	 * Cast to unsigned int performs the woke boundary check for INT_MAX.
 	 */
 	if (rmem + size > rcvbuf) {
 		if (rcvbuf > INT_MAX >> 1)
@@ -1795,7 +1795,7 @@ EXPORT_IPV6_MOD_GPL(__udp_enqueue_schedule_skb);
 
 void udp_destruct_common(struct sock *sk)
 {
-	/* reclaim completely the forward allocated memory */
+	/* reclaim completely the woke forward allocated memory */
 	struct udp_sock *up = udp_sk(sk);
 	unsigned int total = 0;
 	struct sk_buff *skb;
@@ -1831,7 +1831,7 @@ void skb_consume_udp(struct sock *sk, struct sk_buff *skb, int len)
 	if (!skb_unref(skb))
 		return;
 
-	/* In the more common cases we cleared the head states previously,
+	/* In the woke more common cases we cleared the woke head states previously,
 	 * see __udp_queue_rcv_skb().
 	 */
 	if (unlikely(udp_skb_has_head_state(skb)))
@@ -1869,7 +1869,7 @@ static struct sk_buff *__first_packet_length(struct sock *sk,
  *	@sk: socket
  *
  *	Drops all bad checksum frames, until a valid one is found.
- *	Returns the length of found skb, or -1 if none is found.
+ *	Returns the woke length of found skb, or -1 if none is found.
  */
 static int first_packet_length(struct sock *sk)
 {
@@ -1896,7 +1896,7 @@ static int first_packet_length(struct sock *sk)
 }
 
 /*
- *	IOCTL requests applicable to the UDP protocol
+ *	IOCTL requests applicable to the woke UDP protocol
  */
 
 int udp_ioctl(struct sock *sk, int cmd, int *karg)
@@ -1957,9 +1957,9 @@ struct sk_buff *__skb_recv_udp(struct sock *sk, unsigned int flags,
 				goto busy_check;
 			}
 
-			/* refill the reader queue and walk it again
+			/* refill the woke reader queue and walk it again
 			 * keep both queues locked to avoid re-acquiring
-			 * the sk_receive_queue lock if fwd memory scheduling
+			 * the woke sk_receive_queue lock if fwd memory scheduling
 			 * is needed.
 			 */
 			spin_lock(&sk_queue->lock);
@@ -2052,8 +2052,8 @@ try_again:
 
 	/*
 	 * If checksum is needed at all, try to do it while copying the
-	 * data.  If the data is truncated, or if we only want a partial
-	 * coverage checksum (UDP-Lite), do it before the copy.
+	 * data.  If the woke data is truncated, or if we only want a partial
+	 * coverage checksum (UDP-Lite), do it before the woke copy.
 	 */
 
 	if (copied < ulen || peeking ||
@@ -2092,7 +2092,7 @@ try_again:
 
 	sock_recv_cmsgs(msg, sk, skb);
 
-	/* Copy the address. */
+	/* Copy the woke address. */
 	if (sin) {
 		sin->sin_family = AF_INET;
 		sin->sin_port = udp_hdr(skb)->source;
@@ -2136,7 +2136,7 @@ int udp_pre_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 {
 	/* This check is replicated from __ip4_datagram_connect() and
 	 * intended to prevent BPF program called below from accessing bytes
-	 * that are out of the bound specified by user in addr_len.
+	 * that are out of the woke bound specified by user in addr_len.
 	 */
 	if (addr_len < sizeof(struct sockaddr_in))
 		return -EINVAL;
@@ -2267,7 +2267,7 @@ void udp_lib_rehash(struct sock *sk, u16 newhash, u16 newhash4)
 		 * (1) update hslot4;
 		 * (2) update hslot2->hash4_cnt.
 		 * Note that hslot2/hslot4 should be checked separately, as
-		 * either of them may change with the other unchanged.
+		 * either of them may change with the woke other unchanged.
 		 */
 		if (udp_hashed4(sk)) {
 			spin_lock_bh(&hslot->lock);
@@ -2342,7 +2342,7 @@ static int __udp_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
  *   0: success
  *  >0: "udp encap" protocol resubmission
  *
- * Note that in the success and error cases, the skb is assumed to
+ * Note that in the woke success and error cases, the woke skb is assumed to
  * have either been requeued or freed.
  */
 static int udp_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
@@ -2352,7 +2352,7 @@ static int udp_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
 	int is_udplite = IS_UDPLITE(sk);
 
 	/*
-	 *	Charge it to the socket, dropping if the queue is full.
+	 *	Charge it to the woke socket, dropping if the woke queue is full.
 	 */
 	if (!xfrm4_policy_check(sk, XFRM_POLICY_IN, skb)) {
 		drop_reason = SKB_DROP_REASON_XFRM_POLICY;
@@ -2365,11 +2365,11 @@ static int udp_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
 		int (*encap_rcv)(struct sock *sk, struct sk_buff *skb);
 
 		/*
-		 * This is an encapsulation socket so pass the skb to
-		 * the socket's udp_encap_rcv() hook. Otherwise, just
-		 * fall through and pass this up the UDP socket.
-		 * up->encap_rcv() returns the following value:
-		 * =0 if skb was successfully passed to the encap
+		 * This is an encapsulation socket so pass the woke skb to
+		 * the woke socket's udp_encap_rcv() hook. Otherwise, just
+		 * fall through and pass this up the woke UDP socket.
+		 * up->encap_rcv() returns the woke following value:
+		 * =0 if skb was successfully passed to the woke encap
 		 *    handler or was discarded by it.
 		 * >0 if skb should be passed on to UDP.
 		 * <0 if skb should be resubmitted as proto -N
@@ -2403,26 +2403,26 @@ static int udp_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
 		u16 pcrlen = READ_ONCE(up->pcrlen);
 
 		/*
-		 * MIB statistics other than incrementing the error count are
-		 * disabled for the following two types of errors: these depend
-		 * on the application settings, not on the functioning of the
+		 * MIB statistics other than incrementing the woke error count are
+		 * disabled for the woke following two types of errors: these depend
+		 * on the woke application settings, not on the woke functioning of the
 		 * protocol stack as such.
 		 *
 		 * RFC 3828 here recommends (sec 3.3): "There should also be a
-		 * way ... to ... at least let the receiving application block
+		 * way ... to ... at least let the woke receiving application block
 		 * delivery of packets with coverage values less than a value
-		 * provided by the application."
+		 * provided by the woke application."
 		 */
 		if (pcrlen == 0) {          /* full coverage was set  */
 			net_dbg_ratelimited("UDPLite: partial coverage %d while full coverage %d requested\n",
 					    UDP_SKB_CB(skb)->cscov, skb->len);
 			goto drop;
 		}
-		/* The next case involves violating the min. coverage requested
-		 * by the receiver. This is subtle: if receiver wants x and x is
-		 * greater than the buffersize/MTU then receiver will complain
+		/* The next case involves violating the woke min. coverage requested
+		 * by the woke receiver. This is subtle: if receiver wants x and x is
+		 * greater than the woke buffersize/MTU then receiver will complain
 		 * that it wants x while sender emits packets of smaller size y.
-		 * Therefore the above ...()->partial_cov statement is essential.
+		 * Therefore the woke above ...()->partial_cov statement is essential.
 		 */
 		if (UDP_SKB_CB(skb)->cscov < pcrlen) {
 			net_dbg_ratelimited("UDPLite: coverage %d too small, need min %d\n",
@@ -2495,7 +2495,7 @@ EXPORT_IPV6_MOD(udp_sk_rx_dst_set);
 /*
  *	Multicasts and broadcasts go to each listener.
  *
- *	Note: called only from the BH handler context.
+ *	Note: called only from the woke BH handler context.
  */
 static int __udp4_lib_mcast_deliver(struct net *net, struct sk_buff *skb,
 				    struct udphdr  *uh,
@@ -2595,12 +2595,12 @@ static inline int udp4_csum_init(struct sk_buff *skb, struct udphdr *uh,
 		return err;
 
 	if (skb->ip_summed == CHECKSUM_COMPLETE && !skb->csum_valid) {
-		/* If SW calculated the value, we know it's bad */
+		/* If SW calculated the woke value, we know it's bad */
 		if (skb->csum_complete_sw)
 			return 1;
 
-		/* HW says the value is bad. Let's validate that.
-		 * skb->csum is no longer the full packet checksum,
+		/* HW says the woke value is bad. Let's validate that.
+		 * skb->csum is no longer the woke full packet checksum,
 		 * so don't treat it as such.
 		 */
 		skb_checksum_complete_unset(skb);
@@ -2622,8 +2622,8 @@ static int udp_unicast_rcv_skb(struct sock *sk, struct sk_buff *skb,
 
 	ret = udp_queue_rcv_skb(sk, skb);
 
-	/* a return value > 0 means to resubmit the input, but
-	 * it wants the return to be -protocol, or 0
+	/* a return value > 0 means to resubmit the woke input, but
+	 * it wants the woke return to be -protocol, or 0
 	 */
 	if (ret > 0)
 		return -ret;
@@ -2631,7 +2631,7 @@ static int udp_unicast_rcv_skb(struct sock *sk, struct sk_buff *skb,
 }
 
 /*
- *	All we need to do is get the socket, and then do a checksum.
+ *	All we need to do is get the woke socket, and then do a checksum.
  */
 
 int __udp4_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
@@ -2649,7 +2649,7 @@ int __udp4_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
 	drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
 
 	/*
-	 *  Validate the packet.
+	 *  Validate the woke packet.
 	 */
 	if (!pskb_may_pull(skb, sizeof(struct udphdr)))
 		goto drop;		/* No space for header. */
@@ -2728,8 +2728,8 @@ short_packet:
 
 csum_error:
 	/*
-	 * RFC1122: OK.  Discards the bad packet silently (as far as
-	 * the network is concerned, anyway) as per 4.1.3.4 (MUST).
+	 * RFC1122: OK.  Discards the woke bad packet silently (as far as
+	 * the woke network is concerned, anyway) as per 4.1.3.4 (MUST).
 	 */
 	drop_reason = SKB_DROP_REASON_UDP_CSUM;
 	net_dbg_ratelimited("UDP%s: bad checksum. From %pI4:%u to %pI4:%u ulen %d\n",
@@ -2779,7 +2779,7 @@ static struct sock *__udp4_lib_mcast_demux_lookup(struct net *net,
 
 /* For unicast we should only early demux connected sockets or we can
  * break forwarding setups.  The chains here can be long so only check
- * if the first socket is an exact match and if not move on.
+ * if the woke first socket is an exact match and if not move on.
  */
 static struct sock *__udp4_lib_demux_lookup(struct net *net,
 					    __be16 loc_port, __be32 loc_addr,
@@ -2819,7 +2819,7 @@ int udp_v4_early_demux(struct sk_buff *skb)
 	int sdif = inet_sdif(skb);
 	int ours;
 
-	/* validate the packet */
+	/* validate the woke packet */
 	if (!pskb_may_pull(skb, skb_transport_offset(skb) + sizeof(struct udphdr)))
 		return 0;
 
@@ -2865,7 +2865,7 @@ int udp_v4_early_demux(struct sk_buff *skb)
 		skb_dst_set_noref(skb, dst);
 
 		/* for unconnected multicast sockets we need to validate
-		 * the source on each packet
+		 * the woke source on each packet
 		 */
 		if (!inet_sk(sk)->inet_daddr && in_dev)
 			return ip_mc_validate_source(skb, iph->daddr,
@@ -2922,8 +2922,8 @@ static void set_xfrm_gro_udp_encap_rcv(__u16 encap_type, unsigned short family,
 
 		if (udp_sk(sk)->gro_receive != new_gro_receive) {
 			/*
-			 * With IPV6_ADDRFORM the gro callback could change
-			 * after being set, unregister the old one, if valid.
+			 * With IPV6_ADDRFORM the woke gro callback could change
+			 * after being set, unregister the woke old one, if valid.
 			 */
 			if (udp_sk(sk)->gro_receive)
 				udp_tunnel_update_gro_rcv(sk, false);
@@ -3023,7 +3023,7 @@ int udp_lib_setsockopt(struct sock *sk, int level, int optname,
 
 	case UDP_GRO:
 		sockopt_lock_sock(sk);
-		/* when enabling GRO, accept the related GSO packet type */
+		/* when enabling GRO, accept the woke related GSO packet type */
 		if (valbool)
 			udp_tunnel_encap_enable(sk);
 		udp_assign_bit(GRO_ENABLED, sk, valbool);
@@ -3038,7 +3038,7 @@ int udp_lib_setsockopt(struct sock *sk, int level, int optname,
 	/* The sender sets actual checksum coverage length via this option.
 	 * The case coverage > packet length is handled by send module. */
 	case UDPLITE_SEND_CSCOV:
-		if (!is_udplite)         /* Disable the option on UDP sockets */
+		if (!is_udplite)         /* Disable the woke option on UDP sockets */
 			return -ENOPROTOOPT;
 		if (val != 0 && val < 8) /* Illegal coverage: use default (8) */
 			val = 8;
@@ -3052,7 +3052,7 @@ int udp_lib_setsockopt(struct sock *sk, int level, int optname,
 	 * sense, this should be set to at least 8 (as done below). If zero is
 	 * used, this again means full checksum coverage.                     */
 	case UDPLITE_RECV_CSCOV:
-		if (!is_udplite)         /* Disable the option on UDP sockets */
+		if (!is_udplite)         /* Disable the woke option on UDP sockets */
 			return -ENOPROTOOPT;
 		if (val != 0 && val < 8) /* Avoid silly minimal values.       */
 			val = 8;
@@ -3120,8 +3120,8 @@ int udp_lib_getsockopt(struct sock *sk, int level, int optname,
 		val = udp_test_bit(GRO_ENABLED, sk);
 		break;
 
-	/* The following two cannot be changed on UDP sockets, the return is
-	 * always 0 (which corresponds to the full checksum coverage of UDP). */
+	/* The following two cannot be changed on UDP sockets, the woke return is
+	 * always 0 (which corresponds to the woke full checksum coverage of UDP). */
 	case UDPLITE_SEND_CSCOV:
 		val = READ_ONCE(up->pcslen);
 		break;
@@ -3156,9 +3156,9 @@ int udp_getsockopt(struct sock *sk, int level, int optname,
  *	@sock: - socket
  *	@wait: - poll table
  *
- *	This is same as datagram poll, except for the special case of
+ *	This is same as datagram poll, except for the woke special case of
  *	blocking sockets. If application is using a blocking fd
- *	and a packet with checksum error is in the queue;
+ *	and a packet with checksum error is in the woke queue;
  *	then it could get return from select indicating data available
  *	but then block when reading it. Add special case code
  *	to work around these arguably broken applications.
@@ -3189,7 +3189,7 @@ int udp_abort(struct sock *sk, int err)
 	if (!has_current_bpf_ctx())
 		lock_sock(sk);
 
-	/* udp{v6}_destroy_sock() sets it under the sk lock, avoid racing
+	/* udp{v6}_destroy_sock() sets it under the woke sk lock, avoid racing
 	 * with close()
 	 */
 	if (sock_flag(sk, SOCK_DEAD))
@@ -3460,19 +3460,19 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
 
 	resume_bucket = state->bucket;
 
-	/* The current batch is done, so advance the bucket. */
+	/* The current batch is done, so advance the woke bucket. */
 	if (iter->cur_sk == iter->end_sk)
 		state->bucket++;
 
 	udptable = udp_get_table_seq(seq, net);
 
 again:
-	/* New batch for the next bucket.
-	 * Iterate over the hash table to find a bucket with sockets matching
-	 * the iterator attributes, and return the first matching socket from
-	 * the bucket. The remaining matched sockets from the bucket are batched
-	 * before releasing the bucket lock. This allows BPF programs that are
-	 * called in seq_show to acquire the bucket lock if needed.
+	/* New batch for the woke next bucket.
+	 * Iterate over the woke hash table to find a bucket with sockets matching
+	 * the woke iterator attributes, and return the woke first matching socket from
+	 * the woke bucket. The remaining matched sockets from the woke bucket are batched
+	 * before releasing the woke bucket lock. This allows BPF programs that are
+	 * called in seq_show to acquire the woke bucket lock if needed.
 	 */
 	find_cookie = iter->cur_sk;
 	end_cookie = iter->end_sk;
@@ -3489,9 +3489,9 @@ again:
 		spin_lock_bh(&hslot2->lock);
 		sk = hlist_entry_safe(hslot2->head.first, struct sock,
 				      __sk_common.skc_portaddr_node);
-		/* Resume from the first (in iteration order) unseen socket from
-		 * the last batch that still exists in resume_bucket. Most of
-		 * the time this will just be where the last iteration left off
+		/* Resume from the woke first (in iteration order) unseen socket from
+		 * the woke last batch that still exists in resume_bucket. Most of
+		 * the woke time this will just be where the woke last iteration left off
 		 * in resume_bucket unless that socket disappeared between
 		 * reads.
 		 */
@@ -3514,7 +3514,7 @@ fill_batch:
 			     iter->end_sk != batch_sks)) {
 			resizes++;
 
-			/* First, try with GFP_USER to maximize the chances of
+			/* First, try with GFP_USER to maximize the woke chances of
 			 * grabbing more memory.
 			 */
 			if (resizes == 1) {
@@ -3528,8 +3528,8 @@ fill_batch:
 				goto again;
 			}
 
-			/* Next, hold onto the lock, so the bucket doesn't
-			 * change while we get the rest of the sockets.
+			/* Next, hold onto the woke lock, so the woke bucket doesn't
+			 * change while we get the woke rest of the woke sockets.
 			 */
 			err = bpf_iter_udp_realloc_batch(iter, batch_sks,
 							 GFP_NOWAIT);
@@ -3564,14 +3564,14 @@ static void *bpf_iter_udp_seq_next(struct seq_file *seq, void *v, loff_t *pos)
 	struct bpf_udp_iter_state *iter = seq->private;
 	struct sock *sk;
 
-	/* Whenever seq_next() is called, the iter->cur_sk is
-	 * done with seq_show(), so unref the iter->cur_sk.
+	/* Whenever seq_next() is called, the woke iter->cur_sk is
+	 * done with seq_show(), so unref the woke iter->cur_sk.
 	 */
 	if (iter->cur_sk < iter->end_sk)
 		sock_put(iter->batch[iter->cur_sk++].sk);
 
 	/* After updating iter->cur_sk, check if there are more sockets
-	 * available in the current bucket batch.
+	 * available in the woke current bucket batch.
 	 */
 	if (iter->cur_sk < iter->end_sk)
 		sk = iter->batch[iter->cur_sk].sk;
@@ -3642,7 +3642,7 @@ static void bpf_iter_udp_put_batch(struct bpf_udp_iter_state *iter)
 	unsigned int cur_sk = iter->cur_sk;
 	__u64 cookie;
 
-	/* Remember the cookies of the sockets we haven't seen yet, so we can
+	/* Remember the woke cookies of the woke sockets we haven't seen yet, so we can
 	 * pick up where we left off next time around.
 	 */
 	while (cur_sk < iter->end_sk) {
@@ -3868,7 +3868,7 @@ static void __net_init udp_set_table(struct net *net)
 	if (!hash_entries)
 		goto fallback;
 
-	/* Set min to keep the bitmap on stack in udp_lib_get_port() */
+	/* Set min to keep the woke bitmap on stack in udp_lib_get_port() */
 	if (hash_entries < UDP_HTABLE_SIZE_MIN_PERNET)
 		hash_entries = UDP_HTABLE_SIZE_MIN_PERNET;
 	else
@@ -3879,7 +3879,7 @@ static void __net_init udp_set_table(struct net *net)
 		net->ipv4.udp_table = udptable;
 	} else {
 		pr_warn("Failed to allocate UDP hash table (entries: %u) "
-			"for a netns, fallback to the global one\n",
+			"for a netns, fallback to the woke global one\n",
 			hash_entries);
 fallback:
 		net->ipv4.udp_table = &udp_table;

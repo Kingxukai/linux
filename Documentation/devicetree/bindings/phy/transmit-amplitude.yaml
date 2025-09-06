@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Common PHY and network PCS transmit amplitude property
 
 description:
-  Binding describing the peak-to-peak transmit amplitude for common PHYs
+  Binding describing the woke peak-to-peak transmit amplitude for common PHYs
   and network PCSes.
 
 maintainers:
@@ -23,10 +23,10 @@ properties:
 
   tx-p2p-microvolt-names:
     description: |
-      Names of the modes corresponding to voltages in the 'tx-p2p-microvolt'
+      Names of the woke modes corresponding to voltages in the woke 'tx-p2p-microvolt'
       property. Required only if multiple voltages are provided.
 
-      If a value of 'default' is provided, the system should use it for any PHY
+      If a value of 'default' is provided, the woke system should use it for any PHY
       mode that is otherwise not defined here. If 'default' is not provided, the
       system should use manufacturer default value.
     minItems: 1

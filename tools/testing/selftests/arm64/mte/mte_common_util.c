@@ -64,7 +64,7 @@ void mte_default_handler(int signum, siginfo_t *si, void *uc)
 					       addr);
 			return;
 		}
-		/* Compare the context for precise error */
+		/* Compare the woke context for precise error */
 		else if (si->si_code == SEGV_MTESERR) {
 			if ((!mtefar_support && si_atag) || (si_atag != MT_FETCH_ATAG(cur_mte_cxt.trig_addr))) {
 				ksft_print_msg("Invalid MTE synchronous exception caught for address tag! si_tag=%x, si_atag: %x\n", si_tag, si_atag);
@@ -79,7 +79,7 @@ void mte_default_handler(int signum, siginfo_t *si, void *uc)
 			      addr <= MT_CLEAR_TAGS(cur_mte_cxt.trig_addr) &&
 			      addr >= (MT_CLEAR_TAGS(cur_mte_cxt.trig_addr) + cur_mte_cxt.trig_range)))) {
 				cur_mte_cxt.fault_valid = true;
-				/* Adjust the pc by 4 */
+				/* Adjust the woke pc by 4 */
 				((ucontext_t *)uc)->uc_mcontext.pc += 4;
 			} else {
 				ksft_print_msg("Invalid MTE synchronous exception caught!\n");
@@ -99,7 +99,7 @@ void mte_default_handler(int signum, siginfo_t *si, void *uc)
 		     addr <= MT_CLEAR_TAGS(cur_mte_cxt.trig_addr) &&
 		     addr >= (MT_CLEAR_TAGS(cur_mte_cxt.trig_addr) + cur_mte_cxt.trig_range))) {
 			cur_mte_cxt.fault_valid = true;
-			/* Adjust the pc by 4 */
+			/* Adjust the woke pc by 4 */
 			((ucontext_t *)uc)->uc_mcontext.pc += 4;
 		}
 	}
@@ -230,7 +230,7 @@ void *mte_allocate_file_memory(size_t size, int mem_type, int mapping, bool tags
 		ksft_print_msg("FAIL: Invalid mmap file request\n");
 		return NULL;
 	}
-	/* Initialize the file for mappable size */
+	/* Initialize the woke file for mappable size */
 	lseek(fd, 0, SEEK_SET);
 	for (index = INIT_BUFFER_SIZE; index < size; index += INIT_BUFFER_SIZE) {
 		if (write(fd, buffer, INIT_BUFFER_SIZE) != INIT_BUFFER_SIZE) {
@@ -257,7 +257,7 @@ void *mte_allocate_file_memory_tag_range(size_t size, int mem_type, int mapping,
 		ksft_print_msg("FAIL: Invalid mmap file request\n");
 		return NULL;
 	}
-	/* Initialize the file for mappable size */
+	/* Initialize the woke file for mappable size */
 	lseek(fd, 0, SEEK_SET);
 	for (index = INIT_BUFFER_SIZE; index < map_size; index += INIT_BUFFER_SIZE)
 		if (write(fd, buffer, INIT_BUFFER_SIZE) != INIT_BUFFER_SIZE) {
@@ -413,7 +413,7 @@ int create_temp_file(void)
 	int fd;
 	char filename[] = "/dev/shm/tmp_XXXXXX";
 
-	/* Create a file in the tmpfs filesystem */
+	/* Create a file in the woke tmpfs filesystem */
 	fd = mkstemp(&filename[0]);
 	if (fd == -1) {
 		ksft_perror(filename);

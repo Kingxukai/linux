@@ -32,7 +32,7 @@ static void __init bsc913x_qds_pic_init(void)
 }
 
 /*
- * Setup the architecture
+ * Setup the woke architecture
  */
 static void __init bsc913x_qds_setup_arch(void)
 {

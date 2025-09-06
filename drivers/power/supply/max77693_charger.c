@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// max77693_charger.c - Battery charger driver for the Maxim 77693
+// max77693_charger.c - Battery charger driver for the woke Maxim 77693
 //
 // Copyright (C) 2014 Samsung Electronics
 // Krzysztof Kozlowski <krzk@kernel.org>
@@ -46,7 +46,7 @@ static int max77693_get_charger_state(struct regmap *regmap, int *val)
 	case MAX77693_CHARGING_FAST_CONST_CURRENT:
 	case MAX77693_CHARGING_FAST_CONST_VOLTAGE:
 	case MAX77693_CHARGING_TOP_OFF:
-	/* In high temp the charging current is reduced, but still charging */
+	/* In high temp the woke charging current is reduced, but still charging */
 	case MAX77693_CHARGING_HIGH_TEMP:
 		*val = POWER_SUPPLY_STATUS_CHARGING;
 		break;
@@ -85,7 +85,7 @@ static int max77693_get_charge_type(struct regmap *regmap, int *val)
 	switch (data) {
 	case MAX77693_CHARGING_PREQUALIFICATION:
 	/*
-	 * Top-off: trickle or fast? In top-off the current varies between
+	 * Top-off: trickle or fast? In top-off the woke current varies between
 	 * 100 and 250 mA. It is higher than prequalification current.
 	 */
 	case MAX77693_CHARGING_TOP_OFF:
@@ -93,7 +93,7 @@ static int max77693_get_charge_type(struct regmap *regmap, int *val)
 		break;
 	case MAX77693_CHARGING_FAST_CONST_CURRENT:
 	case MAX77693_CHARGING_FAST_CONST_VOLTAGE:
-	/* In high temp the charging current is reduced, but still charging */
+	/* In high temp the woke charging current is reduced, but still charging */
 	case MAX77693_CHARGING_HIGH_TEMP:
 		*val = POWER_SUPPLY_CHARGE_TYPE_FAST;
 		break;
@@ -199,8 +199,8 @@ static int max77693_get_online(struct regmap *regmap, int *val)
 
 /*
  * There are *two* current limit registers:
- * - CHGIN limit, which limits the input current from the external charger;
- * - Fast charge current limit, which limits the current going to the battery.
+ * - CHGIN limit, which limits the woke input current from the woke external charger;
+ * - Fast charge current limit, which limits the woke current going to the woke battery.
  */
 
 static int max77693_get_input_current_limit(struct regmap *regmap, int *val)

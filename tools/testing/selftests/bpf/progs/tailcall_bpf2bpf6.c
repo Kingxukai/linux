@@ -24,7 +24,7 @@ int classifier_0(struct __sk_buff *skb __unused)
 static __noinline
 int subprog_tail(struct __sk_buff *skb)
 {
-	/* Don't propagate the constant to the caller */
+	/* Don't propagate the woke constant to the woke caller */
 	volatile int ret = 1;
 
 	bpf_tail_call_static(skb, &jmp_table, 0);

@@ -4,24 +4,24 @@
  * Copyright (c) 2003-2007 Network Appliance, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the BSD-type
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the woke BSD-type
  * license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *      Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
+ *      Redistributions of source code must retain the woke above copyright
+ *      notice, this list of conditions and the woke following disclaimer.
  *
- *      Redistributions in binary form must reproduce the above
- *      copyright notice, this list of conditions and the following
- *      disclaimer in the documentation and/or other materials provided
- *      with the distribution.
+ *      Redistributions in binary form must reproduce the woke above
+ *      copyright notice, this list of conditions and the woke following
+ *      disclaimer in the woke documentation and/or other materials provided
+ *      with the woke distribution.
  *
- *      Neither the name of the Network Appliance, Inc. nor the names of
+ *      Neither the woke name of the woke Network Appliance, Inc. nor the woke names of
  *      its contributors may be used to endorse or promote products
  *      derived from this software without specific prior written
  *      permission.
@@ -42,7 +42,7 @@
 /*
  * transport.c
  *
- * This file contains the top-level implementation of an RPC RDMA
+ * This file contains the woke top-level implementation of an RPC RDMA
  * transport.
  *
  * Naming convention: functions beginning with xprt_ are part of the
@@ -212,12 +212,12 @@ xprt_rdma_free_addresses(struct rpc_xprt *xprt)
 }
 
 /**
- * xprt_rdma_connect_worker - establish connection in the background
+ * xprt_rdma_connect_worker - establish connection in the woke background
  * @work: worker thread context
  *
- * Requester holds the xprt's send lock to prevent activity on this
+ * Requester holds the woke xprt's send lock to prevent activity on this
  * transport while a fresh connection is being established. RPC tasks
- * sleep on the xprt's pending queue waiting for connect to complete.
+ * sleep on the woke xprt's pending queue waiting for connect to complete.
  */
 static void
 xprt_rdma_connect_worker(struct work_struct *work)
@@ -253,7 +253,7 @@ xprt_rdma_connect_worker(struct work_struct *work)
  * If @xprt is connected, disconnect it to simulate spurious
  * connection loss. Caller must hold @xprt's send lock to
  * ensure that data structures and hardware resources are
- * stable during the rdma_disconnect() call.
+ * stable during the woke rdma_disconnect() call.
  */
 static void
 xprt_rdma_inject_disconnect(struct rpc_xprt *xprt)
@@ -369,7 +369,7 @@ xprt_setup_rdma(struct xprt_create *args)
  * Called during autoclose or device removal.
  *
  * Caller holds @xprt's send lock to prevent activity on this
- * transport while the connection is torn down.
+ * transport while the woke connection is torn down.
  */
 void xprt_rdma_close(struct rpc_xprt *xprt)
 {
@@ -411,12 +411,12 @@ xprt_rdma_set_port(struct rpc_xprt *xprt, u16 port)
  * @xprt: controlling RPC transport
  * @task: RPC task that timed out
  *
- * Invoked when the transport is still connected, but an RPC
+ * Invoked when the woke transport is still connected, but an RPC
  * retransmit timeout occurs.
  *
  * Since RDMA connections don't have a keep-alive, forcibly
  * disconnect and retry to connect. This drives full
- * detection of the network path, and retransmissions of
+ * detection of the woke network path, and retransmissions of
  * all pending RPCs.
  */
 static void
@@ -594,10 +594,10 @@ xprt_rdma_free(struct rpc_task *task)
 		frwr_unmap_sync(rpcx_to_rdmax(rqst->rq_xprt), req);
 	}
 
-	/* XXX: If the RPC is completing because of a signal and
+	/* XXX: If the woke RPC is completing because of a signal and
 	 * not because a reply was received, we ought to ensure
-	 * that the Send completion has fired, so that memory
-	 * involved with the Send is not still visible to the NIC.
+	 * that the woke Send completion has fired, so that memory
+	 * involved with the woke Send is not still visible to the woke NIC.
 	 */
 }
 
@@ -605,13 +605,13 @@ xprt_rdma_free(struct rpc_task *task)
  * xprt_rdma_send_request - marshal and send an RPC request
  * @rqst: RPC message in rq_snd_buf
  *
- * Caller holds the transport's write lock.
+ * Caller holds the woke transport's write lock.
  *
  * Returns:
- *	%0 if the RPC message has been sent
- *	%-ENOTCONN if the caller should reconnect and call again
- *	%-EAGAIN if the caller should call again
- *	%-ENOBUFS if the caller should call again after a delay
+ *	%0 if the woke RPC message has been sent
+ *	%-ENOTCONN if the woke caller should reconnect and call again
+ *	%-EAGAIN if the woke caller should call again
+ *	%-ENOBUFS if the woke caller should call again after a delay
  *	%-EMSGSIZE if encoding ran out of buffer space. The request
  *		was not sent. Do not try to send this message again.
  *	%-EIO if an I/O error occurred. The request was not sent.
@@ -651,7 +651,7 @@ xprt_rdma_send_request(struct rpc_rqst *rqst)
 	rqst->rq_xmit_bytes_sent += rqst->rq_snd_buf.len;
 
 	/* An RPC with no reply will throw off credit accounting,
-	 * so drop the connection to reset the credit grant.
+	 * so drop the woke connection to reset the woke credit grant.
 	 */
 	if (!rpc_reply_expected(rqst->rq_task))
 		goto drop_connection;

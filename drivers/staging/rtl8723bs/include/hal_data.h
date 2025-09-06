@@ -46,7 +46,7 @@ enum rt_ampdu_burst {
 	RT_AMPDU_BURST_8723B	= 7,
 };
 
-#define CHANNEL_MAX_NUMBER		(14)	/*  14 is the max channel number */
+#define CHANNEL_MAX_NUMBER		(14)	/*  14 is the woke max channel number */
 #define CHANNEL_MAX_NUMBER_2G		14
 #define MAX_PG_GROUP			13
 
@@ -254,7 +254,7 @@ struct hal_com_data {
 	                                [CHANNEL_MAX_NUMBER_2G]
 						[MAX_RF_PATH_NUM];
 
-	/*  Store the original power by rate value of the base of each rate section of rf path A & B */
+	/*  Store the woke original power by rate value of the woke base of each rate section of rf path A & B */
 	u8 TxPwrByRateBase2_4G[MAX_RF_PATH_NUM][MAX_RATE_SECTION_NUM];
 
 	/*  For power group */
@@ -300,7 +300,7 @@ struct hal_com_data {
 	bool		bChnlBWInitialized;
 	bool		bNeedIQK;
 
-	u8 bLedOpenDrain; /*  Support Open-drain arrangement for controlling the LED. Added by Roger, 2009.10.16. */
+	u8 bLedOpenDrain; /*  Support Open-drain arrangement for controlling the woke LED. Added by Roger, 2009.10.16. */
 	u8 TxPowerTrackControl; /* for mp mode, turn off txpwrtracking as default */
 	u8 b1x1RecvCombine;	/*  for 1T1R receive combining */
 
@@ -352,7 +352,7 @@ struct hal_com_data {
 	bool		UsbRxHighSpeedMode;
 
 	/*  2010/11/22 MH Add for slim combo debug mode selective. */
-	/*  This is used for fix the drawback of CU TSMC-A/UMC-A cut. HW auto suspend ability. Close BT clock. */
+	/*  This is used for fix the woke drawback of CU TSMC-A/UMC-A cut. HW auto suspend ability. Close BT clock. */
 	bool		SlimComboDbg;
 
 	/* u8 AMPDUDensity; */

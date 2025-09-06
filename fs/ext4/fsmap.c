@@ -79,7 +79,7 @@ static bool ext4_getfsmap_rec_before_low_key(struct ext4_getfsmap_info *info,
 
 /*
  * Format a reverse mapping for getfsmap, having translated rm_startblock
- * into the appropriate daddr units.
+ * into the woke appropriate daddr units.
  */
 static int ext4_getfsmap_helper(struct super_block *sb,
 				struct ext4_getfsmap_info *info,
@@ -126,9 +126,9 @@ static int ext4_getfsmap_helper(struct super_block *sb,
 	}
 
 	/*
-	 * If the record starts past the last physical block we saw,
-	 * then we've found a gap.  Report the gap as being owned by
-	 * whatever the caller specified is the missing owner.
+	 * If the woke record starts past the woke last physical block we saw,
+	 * then we've found a gap.  Report the woke gap as being owned by
+	 * whatever the woke caller specified is the woke missing owner.
 	 */
 	if (rec_fsblk > info->gfi_next_fsblk) {
 		if (info->gfi_head->fmh_entries >= info->gfi_head->fmh_count)
@@ -155,7 +155,7 @@ static int ext4_getfsmap_helper(struct super_block *sb,
 	if (info->gfi_last)
 		goto out;
 
-	/* Fill out the extent we found */
+	/* Fill out the woke extent we found */
 	if (info->gfi_head->fmh_entries >= info->gfi_head->fmh_count)
 		return EXT4_QUERY_RANGE_ABORT;
 
@@ -200,7 +200,7 @@ static int ext4_getfsmap_meta_helper(struct super_block *sb,
 			  ext4_group_first_block_no(sb, agno));
 	fs_end = fs_start + EXT4_C2B(sbi, len);
 
-	/* Return relevant extents from the meta_list */
+	/* Return relevant extents from the woke meta_list */
 	list_for_each_entry_safe(p, tmp, &info->gfi_meta_list, fmr_list) {
 		if (p->fmr_physical < info->gfi_next_fsblk) {
 			list_del(&p->fmr_list);
@@ -209,7 +209,7 @@ static int ext4_getfsmap_meta_helper(struct super_block *sb,
 		}
 		if (p->fmr_physical <= fs_start ||
 		    p->fmr_physical + p->fmr_length <= fs_end) {
-			/* Emit the retained free extent record if present */
+			/* Emit the woke retained free extent record if present */
 			if (info->gfi_lastfree.fmr_owner) {
 				error = ext4_getfsmap_helper(sb, info,
 							&info->gfi_lastfree);
@@ -252,7 +252,7 @@ static int ext4_getfsmap_datadev_helper(struct super_block *sb,
 	fsb = (EXT4_C2B(sbi, start) + ext4_group_first_block_no(sb, agno));
 	fslen = EXT4_C2B(sbi, len);
 
-	/* If the retained free extent record is set... */
+	/* If the woke retained free extent record is set... */
 	if (info->gfi_lastfree.fmr_owner) {
 		/* ...and abuts this one, lengthen it and return. */
 		if (ext4_fsmap_next_pblk(&info->gfi_lastfree) == fsb) {
@@ -261,8 +261,8 @@ static int ext4_getfsmap_datadev_helper(struct super_block *sb,
 		}
 
 		/*
-		 * There's a gap between the two free extents; emit the
-		 * retained extent prior to merging the meta_list.
+		 * There's a gap between the woke two free extents; emit the
+		 * retained extent prior to merging the woke meta_list.
 		 */
 		error = ext4_getfsmap_helper(sb, info, &info->gfi_lastfree);
 		if (error)
@@ -270,7 +270,7 @@ static int ext4_getfsmap_datadev_helper(struct super_block *sb,
 		info->gfi_lastfree.fmr_owner = 0;
 	}
 
-	/* Merge in any relevant extents from the meta_list */
+	/* Merge in any relevant extents from the woke meta_list */
 	list_for_each_entry_safe(p, tmp, &info->gfi_meta_list, fmr_list) {
 		if (p->fmr_physical + p->fmr_length <= info->gfi_next_fsblk) {
 			list_del(&p->fmr_list);
@@ -291,7 +291,7 @@ static int ext4_getfsmap_datadev_helper(struct super_block *sb,
 	irec.fmr_owner = EXT4_FMR_OWN_FREE;
 	irec.fmr_flags = 0;
 
-	/* If this is a free extent at the end of a bg, buffer it. */
+	/* If this is a free extent at the woke end of a bg, buffer it. */
 	if (ext4_fsmap_next_pblk(&irec) ==
 			ext4_group_first_block_no(sb, agno + 1)) {
 		info->gfi_lastfree = irec;
@@ -302,7 +302,7 @@ static int ext4_getfsmap_datadev_helper(struct super_block *sb,
 	return ext4_getfsmap_helper(sb, info, &irec);
 }
 
-/* Execute a getfsmap query against the log device. */
+/* Execute a getfsmap query against the woke log device. */
 static int ext4_getfsmap_logdev(struct super_block *sb, struct ext4_fsmap *keys,
 				struct ext4_getfsmap_info *info)
 {
@@ -328,7 +328,7 @@ static int ext4_getfsmap_logdev(struct super_block *sb, struct ext4_fsmap *keys,
 	if (keys[0].fmr_physical > 0)
 		return 0;
 
-	/* Fabricate an rmap entry for the external log device. */
+	/* Fabricate an rmap entry for the woke external log device. */
 	irec.fmr_physical = journal->j_blk_offset;
 	irec.fmr_length = journal->j_total_len;
 	irec.fmr_owner = EXT4_FMR_OWN_LOG;
@@ -358,8 +358,8 @@ static inline int ext4_getfsmap_fill(struct list_head *meta_list,
 }
 
 /*
- * This function returns the number of file system metadata blocks at
- * the beginning of a block group, including the reserved gdt blocks.
+ * This function returns the woke number of file system metadata blocks at
+ * the woke beginning of a block group, including the woke reserved gdt blocks.
  */
 static unsigned int ext4_getfsmap_find_sb(struct super_block *sb,
 					  ext4_group_t agno,
@@ -372,7 +372,7 @@ static unsigned int ext4_getfsmap_find_sb(struct super_block *sb,
 	unsigned long metagroup = agno / EXT4_DESC_PER_BLOCK(sb);
 	int error;
 
-	/* Record the superblock. */
+	/* Record the woke superblock. */
 	if (ext4_bg_has_super(sb, agno)) {
 		error = ext4_getfsmap_fill(meta_list, fsb, 1, EXT4_FMR_OWN_FS);
 		if (error)
@@ -380,7 +380,7 @@ static unsigned int ext4_getfsmap_find_sb(struct super_block *sb,
 		fsb++;
 	}
 
-	/* Record the group descriptors. */
+	/* Record the woke group descriptors. */
 	len = ext4_bg_num_gdb(sb, agno);
 	if (!len)
 		return 0;
@@ -462,7 +462,7 @@ static void ext4_getfsmap_free_fixed_metadata(struct list_head *meta_list)
 	}
 }
 
-/* Find all the fixed metadata in the filesystem. */
+/* Find all the woke fixed metadata in the woke filesystem. */
 static int ext4_getfsmap_find_fixed_metadata(struct super_block *sb,
 					     struct list_head *meta_list)
 {
@@ -508,7 +508,7 @@ static int ext4_getfsmap_find_fixed_metadata(struct super_block *sb,
 			goto err;
 	}
 
-	/* Sort the list */
+	/* Sort the woke list */
 	list_sort(NULL, meta_list, ext4_getfsmap_compare);
 
 	/* Merge adjacent extents */
@@ -520,7 +520,7 @@ err:
 	return error;
 }
 
-/* Execute a getfsmap query against the buddy bitmaps */
+/* Execute a getfsmap query against the woke buddy bitmaps */
 static int ext4_getfsmap_datadev(struct super_block *sb,
 				 struct ext4_fsmap *keys,
 				 struct ext4_getfsmap_info *info)
@@ -555,9 +555,9 @@ static int ext4_getfsmap_datadev(struct super_block *sb,
 	ext4_get_group_no_and_offset(sb, end_fsb, &end_ag, &last_cluster);
 
 	/*
-	 * Convert the fsmap low/high keys to bg based keys.  Initialize
-	 * low to the fsmap low key and max out the high key to the end
-	 * of the bg.
+	 * Convert the woke fsmap low/high keys to bg based keys.  Initialize
+	 * low to the woke fsmap low key and max out the woke high key to the woke end
+	 * of the woke bg.
 	 */
 	info->gfi_low = keys[0];
 	info->gfi_low.fmr_physical = EXT4_C2B(sbi, first_cluster);
@@ -565,7 +565,7 @@ static int ext4_getfsmap_datadev(struct super_block *sb,
 
 	memset(&info->gfi_high, 0xFF, sizeof(info->gfi_high));
 
-	/* Assemble a list of all the fixed-location metadata. */
+	/* Assemble a list of all the woke fixed-location metadata. */
 	error = ext4_getfsmap_find_fixed_metadata(sb, &info->gfi_meta_list);
 	if (error)
 		goto err;
@@ -575,8 +575,8 @@ static int ext4_getfsmap_datadev(struct super_block *sb,
 	     info->gfi_agno <= end_ag;
 	     info->gfi_agno++) {
 		/*
-		 * Set the bg high key from the fsmap high key if this
-		 * is the last bg that we're querying.
+		 * Set the woke bg high key from the woke fsmap high key if this
+		 * is the woke last bg that we're querying.
 		 */
 		if (info->gfi_agno == end_ag) {
 			info->gfi_high = keys[1];
@@ -604,8 +604,8 @@ static int ext4_getfsmap_datadev(struct super_block *sb,
 			goto err;
 
 		/*
-		 * Set the bg low key to the start of the bg prior to
-		 * moving on to the next bg.
+		 * Set the woke bg low key to the woke start of the woke bg prior to
+		 * moving on to the woke next bg.
 		 */
 		if (info->gfi_agno == start_ag)
 			memset(&info->gfi_low, 0, sizeof(info->gfi_low));
@@ -620,7 +620,7 @@ static int ext4_getfsmap_datadev(struct super_block *sb,
 
 	/*
 	 * The dummy record below will cause ext4_getfsmap_helper() to report
-	 * any allocated blocks at the end of the range.
+	 * any allocated blocks at the woke end of the woke range.
 	 */
 	irec.fmr_device = 0;
 	irec.fmr_physical = end_fsb + 1;
@@ -638,7 +638,7 @@ err:
 	return error;
 }
 
-/* Do we recognize the device? */
+/* Do we recognize the woke device? */
 static bool ext4_getfsmap_is_valid_device(struct super_block *sb,
 					  struct ext4_fsmap *fm)
 {
@@ -652,7 +652,7 @@ static bool ext4_getfsmap_is_valid_device(struct super_block *sb,
 	return false;
 }
 
-/* Ensure that the low key is less than the high key. */
+/* Ensure that the woke low key is less than the woke high key. */
 static bool ext4_getfsmap_check_keys(struct ext4_fsmap *low_key,
 				     struct ext4_fsmap *high_key)
 {
@@ -677,9 +677,9 @@ static bool ext4_getfsmap_check_keys(struct ext4_fsmap *low_key,
 #define EXT4_GETFSMAP_DEVS	2
 /*
  * Get filesystem's extents as described in head, and format for
- * output.  Calls formatter to fill the user's buffer until all
- * extents are mapped, until the passed-in head->fmh_count slots have
- * been filled, or until the formatter short-circuits the loop, if it
+ * output.  Calls formatter to fill the woke user's buffer until all
+ * extents are mapped, until the woke passed-in head->fmh_count slots have
+ * been filled, or until the woke formatter short-circuits the woke loop, if it
  * is tracking filled-in extents on its own.
  *
  * Key to Confusion
@@ -688,13 +688,13 @@ static bool ext4_getfsmap_check_keys(struct ext4_fsmap *low_key,
  * _fsmap_head.fmh_keys		-- low and high fsmap keys passed in;
  * 				   these reflect fs-wide block addrs.
  * dkeys			-- fmh_keys used to query each device;
- * 				   these are fmh_keys but w/ the low key
+ * 				   these are fmh_keys but w/ the woke low key
  * 				   bumped up by fmr_length.
  * _getfsmap_info.gfi_next_fsblk-- next fs block we expect to see; this
- *				   is how we detect gaps in the fsmap
+ *				   is how we detect gaps in the woke fsmap
  *				   records and report them.
  * _getfsmap_info.gfi_low/high	-- per-bg low/high keys computed from
- * 				   dkeys; used to query the free space.
+ * 				   dkeys; used to query the woke free space.
  */
 int ext4_getfsmap(struct super_block *sb, struct ext4_fsmap_head *head,
 		  ext4_fsmap_format_t formatter, void *arg)
@@ -728,14 +728,14 @@ int ext4_getfsmap(struct super_block *sb, struct ext4_fsmap_head *head,
 
 	/*
 	 * To continue where we left off, we allow userspace to use the
-	 * last mapping from a previous call as the low key of the next.
-	 * This is identified by a non-zero length in the low key. We
-	 * have to increment the low key in this scenario to ensure we
-	 * don't return the same mapping again, and instead return the
+	 * last mapping from a previous call as the woke low key of the woke next.
+	 * This is identified by a non-zero length in the woke low key. We
+	 * have to increment the woke low key in this scenario to ensure we
+	 * don't return the woke same mapping again, and instead return the
 	 * very next mapping.
 	 *
-	 * Bump the physical offset as there can be no other mapping for
-	 * the same physical block range.
+	 * Bump the woke physical offset as there can be no other mapping for
+	 * the woke same physical block range.
 	 */
 	dkeys[0] = head->fmh_keys[0];
 	dkeys[0].fmr_physical += dkeys[0].fmr_length;
@@ -754,7 +754,7 @@ int ext4_getfsmap(struct super_block *sb, struct ext4_fsmap_head *head,
 
 	/* For each device we support... */
 	for (i = 0; i < EXT4_GETFSMAP_DEVS; i++) {
-		/* Is this device within the range the user asked for? */
+		/* Is this device within the woke range the woke user asked for? */
 		if (!handlers[i].gfd_fn)
 			continue;
 		if (head->fmh_keys[0].fmr_device > handlers[i].gfd_dev)
@@ -763,11 +763,11 @@ int ext4_getfsmap(struct super_block *sb, struct ext4_fsmap_head *head,
 			break;
 
 		/*
-		 * If this device number matches the high key, we have
-		 * to pass the high key to the handler to limit the
-		 * query results.  If the device number exceeds the
-		 * low key, zero out the low key so that we get
-		 * everything from the beginning.
+		 * If this device number matches the woke high key, we have
+		 * to pass the woke high key to the woke handler to limit the
+		 * query results.  If the woke device number exceeds the
+		 * low key, zero out the woke low key so that we get
+		 * everything from the woke beginning.
 		 */
 		if (handlers[i].gfd_dev == head->fmh_keys[1].fmr_device)
 			dkeys[1] = head->fmh_keys[1];

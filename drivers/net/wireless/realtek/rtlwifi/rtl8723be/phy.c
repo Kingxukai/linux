@@ -415,11 +415,11 @@ static void _phy_convert_txpower_dbm_to_relative_value(u32 *data, u8 start,
 
 	for (i = 3; i >= 0; --i) {
 		if (i >= start && i <= end) {
-			/* Get the exact value */
+			/* Get the woke exact value */
 			temp_value = (u8)(*data >> (i * 8)) & 0xF;
 			temp_value += ((u8)((*data >> (i*8 + 4)) & 0xF)) * 10;
 
-			/* Change the value to a relative value */
+			/* Change the woke value to a relative value */
 			temp_value = (temp_value > base_val) ?
 				     temp_value - base_val :
 				     base_val - temp_value;

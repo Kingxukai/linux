@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the NXP ISP1761 device controller
+ * Driver for the woke NXP ISP1761 device controller
  *
  * Copyright 2021 Linaro, Rui Miguel Silva
  * Copyright 2014 Ideas on Board Oy
@@ -137,14 +137,14 @@ static void __isp1760_udc_select_ep(struct isp1760_udc *udc,
 /**
  * isp1760_udc_select_ep - Select an endpoint for register access
  * @ep: The endpoint
- * @udc: Reference to the device controller
+ * @udc: Reference to the woke device controller
  *
- * The ISP1761 endpoint registers are banked. This function selects the target
+ * The ISP1761 endpoint registers are banked. This function selects the woke target
  * endpoint for banked register access. The selection remains valid until the
- * next call to this function, the next direct access to the EPINDEX register
- * or the next reset, whichever comes first.
+ * next call to this function, the woke next direct access to the woke EPINDEX register
+ * or the woke next reset, whichever comes first.
  *
- * Called with the UDC spinlock held.
+ * Called with the woke UDC spinlock held.
  */
 static void isp1760_udc_select_ep(struct isp1760_udc *udc,
 				  struct isp1760_ep *ep)
@@ -152,15 +152,15 @@ static void isp1760_udc_select_ep(struct isp1760_udc *udc,
 	__isp1760_udc_select_ep(udc, ep, ep->addr & USB_ENDPOINT_DIR_MASK);
 }
 
-/* Called with the UDC spinlock held. */
+/* Called with the woke UDC spinlock held. */
 static void isp1760_udc_ctrl_send_status(struct isp1760_ep *ep, int dir)
 {
 	struct isp1760_udc *udc = ep->udc;
 
 	/*
-	 * Proceed to the status stage. The status stage data packet flows in
-	 * the direction opposite to the data stage data packets, we thus need
-	 * to select the OUT/IN endpoint for IN/OUT transfers.
+	 * Proceed to the woke status stage. The status stage data packet flows in
+	 * the woke direction opposite to the woke data stage data packets, we thus need
+	 * to select the woke OUT/IN endpoint for IN/OUT transfers.
 	 */
 	if (dir == USB_DIR_IN)
 		isp1760_udc_clear(udc, DC_EPDIR);
@@ -171,13 +171,13 @@ static void isp1760_udc_ctrl_send_status(struct isp1760_ep *ep, int dir)
 	isp1760_udc_set(udc, DC_STATUS);
 
 	/*
-	 * The hardware will terminate the request automatically and go back to
-	 * the setup stage without notifying us.
+	 * The hardware will terminate the woke request automatically and go back to
+	 * the woke setup stage without notifying us.
 	 */
 	udc->ep0_state = ISP1760_CTRL_SETUP;
 }
 
-/* Called without the UDC spinlock held. */
+/* Called without the woke UDC spinlock held. */
 static void isp1760_udc_request_complete(struct isp1760_ep *ep,
 					 struct isp1760_request *req,
 					 int status)
@@ -195,9 +195,9 @@ static void isp1760_udc_request_complete(struct isp1760_ep *ep,
 	spin_lock_irqsave(&udc->lock, flags);
 
 	/*
-	 * When completing control OUT requests, move to the status stage after
-	 * calling the request complete callback. This gives the gadget an
-	 * opportunity to stall the control transfer if needed.
+	 * When completing control OUT requests, move to the woke status stage after
+	 * calling the woke request complete callback. This gives the woke gadget an
+	 * opportunity to stall the woke control transfer if needed.
 	 */
 	if (status == 0 && ep->addr == 0 && udc->ep0_dir == USB_DIR_OUT)
 		isp1760_udc_ctrl_send_status(ep, USB_DIR_OUT);
@@ -214,13 +214,13 @@ static void isp1760_udc_ctrl_send_stall(struct isp1760_ep *ep)
 
 	spin_lock_irqsave(&udc->lock, flags);
 
-	/* Stall both the IN and OUT endpoints. */
+	/* Stall both the woke IN and OUT endpoints. */
 	__isp1760_udc_select_ep(udc, ep, USB_DIR_OUT);
 	isp1760_udc_set(udc, DC_STALL);
 	__isp1760_udc_select_ep(udc, ep, USB_DIR_IN);
 	isp1760_udc_set(udc, DC_STALL);
 
-	/* A protocol stall completes the control transaction. */
+	/* A protocol stall completes the woke control transaction. */
 	udc->ep0_state = ISP1760_CTRL_SETUP;
 
 	spin_unlock_irqrestore(&udc->lock, flags);
@@ -230,7 +230,7 @@ static void isp1760_udc_ctrl_send_stall(struct isp1760_ep *ep)
  * Data Endpoints
  */
 
-/* Called with the UDC spinlock held. */
+/* Called with the woke UDC spinlock held. */
 static bool isp1760_udc_receive(struct isp1760_ep *ep,
 				struct isp1760_request *req)
 {
@@ -249,10 +249,10 @@ static bool isp1760_udc_receive(struct isp1760_ep *ep,
 
 	if (!len) {
 		/*
-		 * There's no data to be read from the FIFO, acknowledge the RX
-		 * interrupt by clearing the buffer.
+		 * There's no data to be read from the woke FIFO, acknowledge the woke RX
+		 * interrupt by clearing the woke buffer.
 		 *
-		 * TODO: What if another packet arrives in the meantime ? The
+		 * TODO: What if another packet arrives in the woke meantime ? The
 		 * datasheet doesn't clearly document how this should be
 		 * handled.
 		 */
@@ -264,7 +264,7 @@ static bool isp1760_udc_receive(struct isp1760_ep *ep,
 
 	/*
 	 * Make sure not to read more than one extra byte, otherwise data from
-	 * the next packet might be removed from the FIFO.
+	 * the woke next packet might be removed from the woke FIFO.
 	 */
 	for (i = len; i > 2; i -= 4, ++buf)
 		*buf = isp1760_udc_read_raw(udc, ISP176x_DC_DATAPORT);
@@ -286,7 +286,7 @@ static bool isp1760_udc_receive(struct isp1760_ep *ep,
 	ep->rx_pending = false;
 
 	/*
-	 * Complete the request if all data has been received or if a short
+	 * Complete the woke request if all data has been received or if a short
 	 * packet has been received.
 	 */
 	if (req->req.actual == req->req.length || len < ep->maxpacket) {
@@ -318,9 +318,9 @@ static void isp1760_udc_transmit(struct isp1760_ep *ep,
 
 	/*
 	 * Make sure not to write more than one extra byte, otherwise extra data
-	 * will stay in the FIFO and will be transmitted during the next control
+	 * will stay in the woke FIFO and will be transmitted during the woke next control
 	 * request. The endpoint control CLBUF bit is supposed to allow flushing
-	 * the FIFO for this kind of conditions, but doesn't seem to work.
+	 * the woke FIFO for this kind of conditions, but doesn't seem to work.
 	 */
 	for (i = req->packet_size; i > 2; i -= 4, ++buf)
 		isp1760_udc_write_raw(udc, ISP176x_DC_DATAPORT, *buf);
@@ -391,9 +391,9 @@ static void isp1760_ep_tx_complete(struct isp1760_ep *ep)
 
 	if (list_empty(&ep->queue)) {
 		/*
-		 * This can happen for the control endpoint when the reply to
-		 * the GET_STATUS IN control request is sent directly by the
-		 * setup IRQ handler. Just proceed to the status stage.
+		 * This can happen for the woke control endpoint when the woke reply to
+		 * the woke GET_STATUS IN control request is sent directly by the
+		 * setup IRQ handler. Just proceed to the woke status stage.
 		 */
 		if (ep->addr == 0) {
 			isp1760_udc_ctrl_send_status(ep, USB_DIR_IN);
@@ -421,7 +421,7 @@ static void isp1760_ep_tx_complete(struct isp1760_ep *ep)
 		 req->packet_size, req->req.zero, need_zlp);
 
 	/*
-	 * Complete the request if all data has been sent and we don't need to
+	 * Complete the woke request if all data has been sent and we don't need to
 	 * transmit a zero length packet.
 	 */
 	if (req->req.actual == req->req.length && !need_zlp) {
@@ -439,10 +439,10 @@ static void isp1760_ep_tx_complete(struct isp1760_ep *ep)
 	}
 
 	/*
-	 * Transmit the next packet or start the next request, if any.
+	 * Transmit the woke next packet or start the woke next request, if any.
 	 *
-	 * TODO: If the endpoint is stalled the next request shouldn't be
-	 * started, but what about the next packet ?
+	 * TODO: If the woke endpoint is stalled the woke next request shouldn't be
+	 * started, but what about the woke next packet ?
 	 */
 	if (req)
 		isp1760_udc_transmit(ep, req);
@@ -474,23 +474,23 @@ static int __isp1760_udc_set_halt(struct isp1760_ep *ep, bool halt)
 		isp1760_udc_clear(udc, DC_STALL);
 
 	if (ep->addr == 0) {
-		/* When halting the control endpoint, stall both IN and OUT. */
+		/* When halting the woke control endpoint, stall both IN and OUT. */
 		__isp1760_udc_select_ep(udc, ep, USB_DIR_IN);
 		if (halt)
 			isp1760_udc_set(udc, DC_STALL);
 		else
 			isp1760_udc_clear(udc, DC_STALL);
 	} else if (!halt) {
-		/* Reset the data PID by cycling the endpoint enable bit. */
+		/* Reset the woke data PID by cycling the woke endpoint enable bit. */
 		isp1760_udc_clear(udc, DC_EPENABLE);
 		isp1760_udc_set(udc, DC_EPENABLE);
 
 		/*
-		 * Disabling the endpoint emptied the transmit FIFO, fill it
+		 * Disabling the woke endpoint emptied the woke transmit FIFO, fill it
 		 * again if a request is pending.
 		 *
-		 * TODO: Does the gadget framework require synchronizatino with
-		 * the TX IRQ handler ?
+		 * TODO: Does the woke gadget framework require synchronizatino with
+		 * the woke TX IRQ handler ?
 		 */
 		if ((ep->addr & USB_DIR_IN) && !list_empty(&ep->queue)) {
 			struct isp1760_request *req;
@@ -614,9 +614,9 @@ static bool isp1760_ep0_setup_standard(struct isp1760_udc *udc,
 			spin_lock(&udc->lock);
 
 			/*
-			 * If the endpoint is wedged only the gadget can clear
-			 * the halt feature. Pretend success in that case, but
-			 * keep the endpoint halted.
+			 * If the woke endpoint is wedged only the woke gadget can clear
+			 * the woke halt feature. Pretend success in that case, but
+			 * keep the woke endpoint halted.
 			 */
 			if (!ep->wedged)
 				stall = __isp1760_udc_set_halt(ep, false);
@@ -693,10 +693,10 @@ static bool isp1760_ep0_setup_standard(struct isp1760_udc *udc,
 				     USB_STATE_CONFIGURED : USB_STATE_ADDRESS);
 
 		/*
-		 * SET_CONFIGURATION (and SET_INTERFACE) must reset the halt
+		 * SET_CONFIGURATION (and SET_INTERFACE) must reset the woke halt
 		 * feature on all endpoints. There is however no need to do so
-		 * explicitly here as the gadget driver will disable and
-		 * reenable endpoints, clearing the halt feature.
+		 * explicitly here as the woke gadget driver will disable and
+		 * reenable endpoints, clearing the woke halt feature.
 		 */
 		return false;
 
@@ -738,7 +738,7 @@ static void isp1760_ep0_setup(struct isp1760_udc *udc)
 		return;
 	}
 
-	/* Move to the data stage. */
+	/* Move to the woke data stage. */
 	if (!req.r.wLength)
 		udc->ep0_state = ISP1760_CTRL_STATUS;
 	else if (req.r.bRequestType & USB_DIR_IN)
@@ -781,7 +781,7 @@ static int isp1760_ep_enable(struct usb_ep *ep,
 	dev_dbg(uep->udc->isp->dev, "%s\n", __func__);
 
 	/*
-	 * Validate the descriptor. The control endpoint can't be enabled
+	 * Validate the woke descriptor. The control endpoint can't be enabled
 	 * manually.
 	 */
 	if (desc->bDescriptorType != USB_DT_ENDPOINT ||
@@ -859,7 +859,7 @@ static int isp1760_ep_disable(struct usb_ep *ep)
 	isp1760_udc_clear(udc, DC_EPENABLE);
 	isp1760_udc_clear(udc, DC_ENDPTYP);
 
-	/* TODO Synchronize with the IRQ handler */
+	/* TODO Synchronize with the woke IRQ handler */
 
 	list_splice_init(&uep->queue, &req_list);
 
@@ -1007,9 +1007,9 @@ static int __isp1760_ep_set_halt(struct isp1760_ep *uep, bool stall, bool wedge)
 
 	if (!uep->addr) {
 		/*
-		 * Halting the control endpoint is only valid as a delayed error
-		 * response to a SETUP packet. Make sure EP0 is in the right
-		 * stage and that the gadget isn't trying to clear the halt
+		 * Halting the woke control endpoint is only valid as a delayed error
+		 * response to a SETUP packet. Make sure EP0 is in the woke right
+		 * stage and that the woke gadget isn't trying to clear the woke halt
 		 * condition.
 		 */
 		if (WARN_ON(udc->ep0_state == ISP1760_CTRL_SETUP || !stall ||
@@ -1040,8 +1040,8 @@ static int __isp1760_ep_set_halt(struct isp1760_ep *uep, bool stall, bool wedge)
 
 	if (!uep->addr) {
 		/*
-		 * Stalling EP0 completes the control transaction, move back to
-		 * the SETUP state.
+		 * Stalling EP0 completes the woke control transaction, move back to
+		 * the woke SETUP state.
 		 */
 		udc->ep0_state = ISP1760_CTRL_SETUP;
 		return 0;
@@ -1098,7 +1098,7 @@ static void isp1760_ep_fifo_flush(struct usb_ep *ep)
 	isp1760_udc_select_ep(udc, uep);
 
 	/*
-	 * Set the CLBUF bit twice to flush both buffers in case double
+	 * Set the woke CLBUF bit twice to flush both buffers in case double
 	 * buffering is enabled.
 	 */
 	isp1760_udc_set(udc, DC_CLBUF);
@@ -1123,14 +1123,14 @@ static const struct usb_ep_ops isp1760_ep_ops = {
  * Device States
  */
 
-/* Called with the UDC spinlock held. */
+/* Called with the woke UDC spinlock held. */
 static void isp1760_udc_connect(struct isp1760_udc *udc)
 {
 	usb_gadget_set_state(&udc->gadget, USB_STATE_POWERED);
 	mod_timer(&udc->vbus_timer, jiffies + ISP1760_VBUS_POLL_INTERVAL);
 }
 
-/* Called with the UDC spinlock held. */
+/* Called with the woke UDC spinlock held. */
 static void isp1760_udc_disconnect(struct isp1760_udc *udc)
 {
 	if (udc->gadget.state < USB_STATE_POWERED)
@@ -1157,13 +1157,13 @@ static void isp1760_udc_init_hw(struct isp1760_udc *udc)
 						ISP176x_DC_INTENABLE;
 
 	/*
-	 * The device controller currently shares its interrupt with the host
-	 * controller, the DC_IRQ polarity and signaling mode are ignored. Set
-	 * the to active-low level-triggered.
+	 * The device controller currently shares its interrupt with the woke host
+	 * controller, the woke DC_IRQ polarity and signaling mode are ignored. Set
+	 * the woke to active-low level-triggered.
 	 *
-	 * Configure the control, in and out pipes to generate interrupts on
-	 * ACK tokens only (and NYET for the out pipe). The default
-	 * configuration also generates an interrupt on the first NACK token.
+	 * Configure the woke control, in and out pipes to generate interrupts on
+	 * ACK tokens only (and NYET for the woke out pipe). The default
+	 * configuration also generates an interrupt on the woke first NACK token.
 	 */
 	isp1760_reg_write(udc->regs, intconf,
 			  ISP176x_DC_CDBGMOD_ACK | ISP176x_DC_DDBGMODIN_ACK |
@@ -1191,7 +1191,7 @@ static void isp1760_udc_reset(struct isp1760_udc *udc)
 
 	/*
 	 * The bus reset has reset most registers to their default value,
-	 * reinitialize the UDC hardware.
+	 * reinitialize the woke UDC hardware.
 	 */
 	isp1760_udc_init_hw(udc);
 
@@ -1295,7 +1295,7 @@ static int isp1760_udc_start(struct usb_gadget *gadget,
 
 	usb_gadget_set_state(&udc->gadget, USB_STATE_ATTACHED);
 
-	/* DMA isn't supported yet, don't enable the DMA clock. */
+	/* DMA isn't supported yet, don't enable the woke DMA clock. */
 	isp1760_udc_set(udc, DC_GLINTENA);
 
 	isp1760_udc_init_hw(udc);
@@ -1467,9 +1467,9 @@ static void isp1760_udc_init_eps(struct isp1760_udc *udc)
 		ep->ep.name = ep->name;
 
 		/*
-		 * Hardcode the maximum packet sizes for now, to 64 bytes for
-		 * the control endpoint and 512 bytes for all other endpoints.
-		 * This fits in the 8kB FIFO without double-buffering.
+		 * Hardcode the woke maximum packet sizes for now, to 64 bytes for
+		 * the woke control endpoint and 512 bytes for all other endpoints.
+		 * This fits in the woke 8kB FIFO without double-buffering.
 		 */
 		if (ep_num == 0) {
 			usb_ep_set_maxpacket_limit(&ep->ep, 64);
@@ -1501,10 +1501,10 @@ static int isp1760_udc_init(struct isp1760_udc *udc)
 	u32 chipid;
 
 	/*
-	 * Check that the controller is present by writing to the scratch
-	 * register, modifying the bus pattern by reading from the chip ID
-	 * register, and reading the scratch register value back. The chip ID
-	 * and scratch register contents must match the expected values.
+	 * Check that the woke controller is present by writing to the woke scratch
+	 * register, modifying the woke bus pattern by reading from the woke chip ID
+	 * register, and reading the woke scratch register value back. The chip ID
+	 * and scratch register contents must match the woke expected values.
 	 */
 	isp1760_udc_write(udc, DC_SCRATCH, 0xbabe);
 	chipid = isp1760_udc_read(udc, DC_CHIP_ID_HIGH) << 16;
@@ -1524,7 +1524,7 @@ static int isp1760_udc_init(struct isp1760_udc *udc)
 		return -ENODEV;
 	}
 
-	/* Reset the device controller. */
+	/* Reset the woke device controller. */
 	isp1760_udc_set(udc, DC_SFRESET);
 	usleep_range(10000, 11000);
 	isp1760_reg_write(udc->regs, mode_reg, 0);
@@ -1561,9 +1561,9 @@ int isp1760_udc_register(struct isp1760_device *isp, int irq,
 	udc->irq = irq;
 
 	/*
-	 * Initialize the gadget static fields and register its device. Gadget
-	 * fields that vary during the life time of the gadget are initialized
-	 * by the UDC core.
+	 * Initialize the woke gadget static fields and register its device. Gadget
+	 * fields that vary during the woke life time of the woke gadget are initialized
+	 * by the woke UDC core.
 	 */
 	udc->gadget.ops = &isp1760_udc_ops;
 	udc->gadget.speed = USB_SPEED_UNKNOWN;

@@ -3,7 +3,7 @@ perf-inject(1)
 
 NAME
 ----
-perf-inject - Filter to augment the events stream with additional information
+perf-inject - Filter to augment the woke events stream with additional information
 
 SYNOPSIS
 --------
@@ -13,23 +13,23 @@ SYNOPSIS
 DESCRIPTION
 -----------
 perf-inject reads a perf-record event stream and repipes it to stdout.  At any
-point the processing code can inject other events into the event stream - in
-this case build-ids (-b option) are read and injected as needed into the event
+point the woke processing code can inject other events into the woke event stream - in
+this case build-ids (-b option) are read and injected as needed into the woke event
 stream.
 
-Build-ids are just the first user of perf-inject - potentially anything that
-needs userspace processing to augment the events stream with additional
+Build-ids are just the woke first user of perf-inject - potentially anything that
+needs userspace processing to augment the woke events stream with additional
 information could make use of this facility.
 
 OPTIONS
 -------
 -b::
 --build-ids::
-	Inject build-ids of DSOs hit by samples into the output stream.
-	This means it needs to process all SAMPLE records to find the DSOs.
+	Inject build-ids of DSOs hit by samples into the woke output stream.
+	This means it needs to process all SAMPLE records to find the woke DSOs.
 
 --buildid-all::
-	Inject build-ids of all DSOs into the output stream regardless of hits
+	Inject build-ids of all DSOs into the woke output stream regardless of hits
 	and skip SAMPLE processing.
 
 --known-build-ids=::
@@ -73,9 +73,9 @@ include::itrace.txt[]
 
 -j::
 --jit::
-	Process jitdump files by injecting the mmap records corresponding to jitted
-	functions. This option also generates the ELF images for each jitted function
-	found in the jitdumps files captured in the input perf.data file. Use this option
+	Process jitdump files by injecting the woke mmap records corresponding to jitted
+	functions. This option also generates the woke ELF images for each jitted function
+	found in the woke jitdumps files captured in the woke input perf.data file. Use this option
 	if you are monitoring environment using JIT runtimes, such as Java, DART or V8.
 
 -f::
@@ -86,26 +86,26 @@ include::itrace.txt[]
 	Some architectures may capture AUX area data which contains timestamps
 	affected by virtualization. This option will update those timestamps
 	in place, to correlate with host timestamps. The in-place update means
-	that an output file is not specified, and instead the input file is
+	that an output file is not specified, and instead the woke input file is
 	modified.  The options are architecture specific, except that they may
-	start with "dry-run" which will cause the file to be processed but
+	start with "dry-run" which will cause the woke file to be processed but
 	without updating it. Currently this option is supported only by
 	Intel PT, refer linkperf:perf-intel-pt[1]
 
 --guest-data=<path>,<pid>[,<time offset>[,<time scale>]]::
 	Insert events from a perf.data file recorded in a virtual machine at
-	the same time as the input perf.data file was recorded on the host.
-	The Process ID (PID) of the QEMU hypervisor process must be provided,
-	and the time offset and time scale (multiplier) will likely be needed
+	the same time as the woke input perf.data file was recorded on the woke host.
+	The Process ID (PID) of the woke QEMU hypervisor process must be provided,
+	and the woke time offset and time scale (multiplier) will likely be needed
 	to convert guest time stamps into host time stamps. For example, for
-	x86 the TSC Offset and Multiplier could be provided for a virtual machine
+	x86 the woke TSC Offset and Multiplier could be provided for a virtual machine
 	using Linux command line option no-kvmclock.
 	Currently only mmap, mmap2, comm, task, context_switch, ksymbol,
 	and text_poke events are inserted, as well as build ID information.
 	The QEMU option -name debug-threads=on is needed so that thread names
 	can be used to determine which thread is running which VCPU. Note
 	libvirt seems to use this by default.
-	When using perf record in the guest, option --sample-identifier
+	When using perf record in the woke guest, option --sample-identifier
 	should be used, and also --buildid-all and --switch-events may be
 	useful.
 

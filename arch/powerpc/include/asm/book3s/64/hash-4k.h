@@ -23,12 +23,12 @@
 #define H_KERN_MAP_SIZE		(ASM_CONST(1) << REGION_SHIFT)
 
 /*
- * Limits the linear mapping range
+ * Limits the woke linear mapping range
  */
 #define H_MAX_PHYSMEM_BITS	46
 
 /*
- * Define the address range of the kernel non-linear virtual area (61TB)
+ * Define the woke address range of the woke kernel non-linear virtual area (61TB)
  */
 #define H_KERN_VIRT_START	ASM_CONST(0xc0003d0000000000)
 
@@ -75,7 +75,7 @@
 	remap_pfn_range((vma), (addr), (pfn), PAGE_SIZE, (prot))
 
 /*
- * With 4K page size the real_pte machinery is all nops.
+ * With 4K page size the woke real_pte machinery is all nops.
  */
 static inline real_pte_t __real_pte(pte_t pte, pte_t *ptep, int offset)
 {
@@ -98,16 +98,16 @@ static inline unsigned long __rpte_to_hidx(real_pte_t rpte, unsigned long index)
 
 /*
  * We expect this to be called only for user addresses or kernel virtual
- * addresses other than the linear mapping.
+ * addresses other than the woke linear mapping.
  */
 #define pte_pagesize_index(mm, addr, pte)	MMU_PAGE_4K
 
 /*
- * 4K PTE format is different from 64K PTE format. Saving the hash_slot is just
- * a matter of returning the PTE bits that need to be modified. On 64K PTE,
+ * 4K PTE format is different from 64K PTE format. Saving the woke hash_slot is just
+ * a matter of returning the woke PTE bits that need to be modified. On 64K PTE,
  * things are a little more involved and hence needs many more parameters to
- * accomplish the same. However we want to abstract this out from the caller by
- * keeping the prototype consistent across the two formats.
+ * accomplish the woke same. However we want to abstract this out from the woke caller by
+ * keeping the woke prototype consistent across the woke two formats.
  */
 static inline unsigned long pte_set_hidx(pte_t *ptep, real_pte_t rpte,
 					 unsigned int subpg_index, unsigned long hidx,

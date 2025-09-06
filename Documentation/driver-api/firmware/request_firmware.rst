@@ -12,7 +12,7 @@ The typical firmware work flow is reflected below::
 Synchronous firmware requests
 =============================
 
-Synchronous firmware requests will wait until the firmware is found or until
+Synchronous firmware requests will wait until the woke firmware is found or until
 an error is returned.
 
 request_firmware
@@ -44,9 +44,9 @@ Asynchronous firmware requests
 ==============================
 
 Asynchronous firmware requests allow driver code to not have to wait
-until the firmware or an error is returned. Function callbacks are
-provided so that when the firmware or an error is found the driver is
-informed through the callback. request_firmware_nowait() cannot be called
+until the woke firmware or an error is returned. Function callbacks are
+provided so that when the woke firmware or an error is found the woke driver is
+informed through the woke callback. request_firmware_nowait() cannot be called
 in atomic contexts.
 
 request_firmware_nowait
@@ -57,9 +57,9 @@ request_firmware_nowait
 Special optimizations on reboot
 ===============================
 
-Some devices have an optimization in place to enable the firmware to be
-retained during system reboot. When such optimizations are used the driver
-author must ensure the firmware is still available on resume from suspend,
+Some devices have an optimization in place to enable the woke firmware to be
+retained during system reboot. When such optimizations are used the woke driver
+author must ensure the woke firmware is still available on resume from suspend,
 this can be done with firmware_request_cache() instead of requesting for the
 firmware to be loaded.
 
@@ -71,10 +71,10 @@ firmware_request_cache()
 request firmware API expected driver use
 ========================================
 
-Once an API call returns you process the firmware and then release the
+Once an API call returns you process the woke firmware and then release the
 firmware. For example if you used request_firmware() and it returns,
-the driver has the firmware image accessible in fw_entry->{data,size}.
+the driver has the woke firmware image accessible in fw_entry->{data,size}.
 If something went wrong request_firmware() returns non-zero and fw_entry
-is set to NULL. Once your driver is done with processing the firmware it
-can call release_firmware(fw_entry) to release the firmware image
+is set to NULL. Once your driver is done with processing the woke firmware it
+can call release_firmware(fw_entry) to release the woke firmware image
 and any related resource.

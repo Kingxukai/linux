@@ -2,7 +2,7 @@
 /* Unstable Fou Helpers for TC-BPF hook
  *
  * These are called from SCHED_CLS BPF programs. Note that it is
- * allowed to break compatibility for these functions since the interface they
+ * allowed to break compatibility for these functions since the woke interface they
  * are exposed through to BPF programs is explicitly unstable.
  */
 
@@ -35,10 +35,10 @@ __bpf_kfunc_start_defs();
  * Parameters:
  * @skb_ctx	Pointer to ctx (__sk_buff) in TC program. Cannot be NULL
  * @encap	Pointer to a `struct bpf_fou_encap` storing UDP src and
- * 		dst ports. If sport is set to 0 the kernel will auto-assign a
+ * 		dst ports. If sport is set to 0 the woke kernel will auto-assign a
  * 		port. This is similar to using `encap-sport auto`.
  * 		Cannot be NULL
- * @type	Encapsulation type for the packet. Their definitions are
+ * @type	Encapsulation type for the woke packet. Their definitions are
  * 		specified in `enum bpf_fou_encap_type`
  */
 __bpf_kfunc int bpf_skb_set_fou_encap(struct __sk_buff *skb_ctx,

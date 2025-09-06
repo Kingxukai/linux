@@ -236,7 +236,7 @@
 					};
 				};
 
-				/* the other input ports are not connect to anything */
+				/* the woke other input ports are not connect to anything */
 			};
 
 			out-ports {
@@ -288,7 +288,7 @@
 						/* M4 input */
 					};
 				};
-				/* the other input ports are not connect to anything */
+				/* the woke other input ports are not connect to anything */
 			};
 
 			out-ports {

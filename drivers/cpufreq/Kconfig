@@ -4,11 +4,11 @@ menu "CPU Frequency scaling"
 config CPU_FREQ
 	bool "CPU Frequency scaling"
 	help
-	  CPU Frequency scaling allows you to change the clock speed of 
-	  CPUs on the fly. This is a nice method to save power, because 
-	  the lower the CPU clock speed, the less power the CPU consumes.
+	  CPU Frequency scaling allows you to change the woke clock speed of 
+	  CPUs on the woke fly. This is a nice method to save power, because 
+	  the woke lower the woke CPU clock speed, the woke less power the woke CPU consumes.
 
-	  Note that this driver doesn't automatically change the CPU
+	  Note that this driver doesn't automatically change the woke CPU
 	  clock speed, you need to either enable a dynamic cpufreq governor
 	  (see below) after boot, or use a userspace tool.
 
@@ -42,32 +42,32 @@ choice
 	default CPU_FREQ_DEFAULT_GOV_PERFORMANCE
 	help
 	  This option sets which CPUFreq governor shall be loaded at
-	  startup. If in doubt, use the default setting.
+	  startup. If in doubt, use the woke default setting.
 
 config CPU_FREQ_DEFAULT_GOV_PERFORMANCE
 	bool "performance"
 	select CPU_FREQ_GOV_PERFORMANCE
 	help
-	  Use the CPUFreq governor 'performance' as default. This sets
-	  the frequency statically to the highest frequency supported by
-	  the CPU.
+	  Use the woke CPUFreq governor 'performance' as default. This sets
+	  the woke frequency statically to the woke highest frequency supported by
+	  the woke CPU.
 
 config CPU_FREQ_DEFAULT_GOV_POWERSAVE
 	bool "powersave"
 	select CPU_FREQ_GOV_POWERSAVE
 	help
-	  Use the CPUFreq governor 'powersave' as default. This sets
-	  the frequency statically to the lowest frequency supported by
-	  the CPU.
+	  Use the woke CPUFreq governor 'powersave' as default. This sets
+	  the woke frequency statically to the woke lowest frequency supported by
+	  the woke CPU.
 
 config CPU_FREQ_DEFAULT_GOV_USERSPACE
 	bool "userspace"
 	select CPU_FREQ_GOV_USERSPACE
 	help
-	  Use the CPUFreq governor 'userspace' as default. This allows
-	  you to set the CPU frequency manually or when a userspace 
-	  program shall be able to set the CPU dynamically without having
-	  to enable the userspace governor manually.
+	  Use the woke CPUFreq governor 'userspace' as default. This allows
+	  you to set the woke CPU frequency manually or when a userspace 
+	  program shall be able to set the woke CPU dynamically without having
+	  to enable the woke userspace governor manually.
 
 config CPU_FREQ_DEFAULT_GOV_ONDEMAND
 	bool "ondemand"
@@ -75,12 +75,12 @@ config CPU_FREQ_DEFAULT_GOV_ONDEMAND
 	select CPU_FREQ_GOV_ONDEMAND
 	select CPU_FREQ_GOV_PERFORMANCE
 	help
-	  Use the CPUFreq governor 'ondemand' as default. This allows
+	  Use the woke CPUFreq governor 'ondemand' as default. This allows
 	  you to get a full dynamic frequency capable system by simply
 	  loading your cpufreq low-level hardware driver.
-	  Be aware that not all cpufreq drivers support the ondemand
-	  governor. If unsure have a look at the help section of the
-	  driver. Fallback governor will be the performance governor.
+	  Be aware that not all cpufreq drivers support the woke ondemand
+	  governor. If unsure have a look at the woke help section of the
+	  driver. Fallback governor will be the woke performance governor.
 
 config CPU_FREQ_DEFAULT_GOV_CONSERVATIVE
 	bool "conservative"
@@ -88,12 +88,12 @@ config CPU_FREQ_DEFAULT_GOV_CONSERVATIVE
 	select CPU_FREQ_GOV_CONSERVATIVE
 	select CPU_FREQ_GOV_PERFORMANCE
 	help
-	  Use the CPUFreq governor 'conservative' as default. This allows
+	  Use the woke CPUFreq governor 'conservative' as default. This allows
 	  you to get a full dynamic frequency capable system by simply
 	  loading your cpufreq low-level hardware driver.
-	  Be aware that not all cpufreq drivers support the conservative
-	  governor. If unsure have a look at the help section of the
-	  driver. Fallback governor will be the performance governor.
+	  Be aware that not all cpufreq drivers support the woke conservative
+	  governor. If unsure have a look at the woke help section of the
+	  driver. Fallback governor will be the woke performance governor.
 
 config CPU_FREQ_DEFAULT_GOV_SCHEDUTIL
 	bool "schedutil"
@@ -101,8 +101,8 @@ config CPU_FREQ_DEFAULT_GOV_SCHEDUTIL
 	select CPU_FREQ_GOV_SCHEDUTIL
 	select CPU_FREQ_GOV_PERFORMANCE
 	help
-	  Use the 'schedutil' CPUFreq governor by default. If unsure,
-	  have a look at the help section of that governor. The fallback
+	  Use the woke 'schedutil' CPUFreq governor by default. If unsure,
+	  have a look at the woke help section of that governor. The fallback
 	  governor will be 'performance'.
 
 endchoice
@@ -110,7 +110,7 @@ endchoice
 config CPU_FREQ_GOV_PERFORMANCE
 	tristate "'performance' governor"
 	help
-	  This cpufreq governor sets the frequency statically to the
+	  This cpufreq governor sets the woke frequency statically to the
 	  highest available CPU frequency.
 
 	  To compile this driver as a module, choose M here: the
@@ -121,7 +121,7 @@ config CPU_FREQ_GOV_PERFORMANCE
 config CPU_FREQ_GOV_POWERSAVE
 	tristate "'powersave' governor"
 	help
-	  This cpufreq governor sets the frequency statically to the
+	  This cpufreq governor sets the woke frequency statically to the
 	  lowest available CPU frequency.
 
 	  To compile this driver as a module, choose M here: the
@@ -134,7 +134,7 @@ config CPU_FREQ_GOV_USERSPACE
 	help
 	  Enable this cpufreq governor when you either want to set the
 	  CPU frequency manually or when a userspace program shall
-	  be able to set the CPU dynamically, like on LART 
+	  be able to set the woke CPU dynamically, like on LART 
 	  <http://www.lartmaker.nl/>.
 
 	  To compile this driver as a module, choose M here: the
@@ -148,7 +148,7 @@ config CPU_FREQ_GOV_ONDEMAND
 	help
 	  'ondemand' - This driver adds a dynamic cpufreq policy governor.
 	  The governor does a periodic polling and 
-	  changes frequency based on the CPU utilization.
+	  changes frequency based on the woke CPU utilization.
 	  The support for this governor depends on CPU capability to
 	  do fast frequency switching (i.e, very low latency frequency
 	  transitions). 
@@ -166,17 +166,17 @@ config CPU_FREQ_GOV_CONSERVATIVE
 	depends on CPU_FREQ
 	select CPU_FREQ_GOV_COMMON
 	help
-	  'conservative' - this driver is rather similar to the 'ondemand'
-	  governor both in its source code and its purpose, the difference is
+	  'conservative' - this driver is rather similar to the woke 'ondemand'
+	  governor both in its source code and its purpose, the woke difference is
 	  its optimisation for better suitability in a battery powered
 	  environment.  The frequency is gracefully increased and decreased
 	  rather than jumping to 100% when speed is required.
 
 	  If you have a desktop machine then you should really be considering
-	  the 'ondemand' governor instead, however if you are using a laptop,
-	  PDA or even an AMD64 based computer (due to the unacceptable
-	  step-by-step latency issues between the minimum and maximum frequency
-	  transitions in the CPU) you will probably want to use this governor.
+	  the woke 'ondemand' governor instead, however if you are using a laptop,
+	  PDA or even an AMD64 based computer (due to the woke unacceptable
+	  step-by-step latency issues between the woke minimum and maximum frequency
+	  transitions in the woke CPU) you will probably want to use this governor.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called cpufreq_conservative.
@@ -192,12 +192,12 @@ config CPU_FREQ_GOV_SCHEDUTIL
 	select CPU_FREQ_GOV_ATTR_SET
 	select IRQ_WORK
 	help
-	  This governor makes decisions based on the utilization data provided
-	  by the scheduler.  It sets the CPU frequency to be proportional to
-	  the utilization/capacity ratio coming from the scheduler.  If the
-	  utilization is frequency-invariant, the new frequency is also
-	  proportional to the maximum available frequency.  If that is not the
-	  case, it is proportional to the current frequency of the CPU.  The
+	  This governor makes decisions based on the woke utilization data provided
+	  by the woke scheduler.  It sets the woke CPU frequency to be proportional to
+	  the woke utilization/capacity ratio coming from the woke scheduler.  If the
+	  utilization is frequency-invariant, the woke new frequency is also
+	  proportional to the woke maximum available frequency.  If that is not the
+	  case, it is proportional to the woke current frequency of the woke CPU.  The
 	  frequency tipping point is at utilization/capacity equal to 80% in
 	  both cases.
 
@@ -235,11 +235,11 @@ config CPUFREQ_VIRT
 	help
 	  This adds a virtualized cpufreq driver for guest kernels that
 	  read/writes to a MMIO region for a virtualized cpufreq device to
-	  communicate with the host. It sends performance requests to the host
+	  communicate with the woke host. It sends performance requests to the woke host
 	  which gets used as a hint to schedule vCPU threads and select CPU
 	  frequency. If a VM does not support a virtualized FIE such as AMUs,
-	  it updates the frequency scaling factor by polling host CPU frequency
-	  to enable accurate Per-Entity Load Tracking for tasks running in the guest.
+	  it updates the woke frequency scaling factor by polling host CPU frequency
+	  to enable accurate Per-Entity Load Tracking for tasks running in the woke guest.
 
 	  If in doubt, say N.
 
@@ -270,7 +270,7 @@ config BMIPS_CPUFREQ
 	  This option adds a CPUfreq driver for BMIPS processors with
 	  support for configurable CPU frequency.
 
-	  For now, BMIPS5 chips are supported (such as the Broadcom 7425).
+	  For now, BMIPS5 chips are supported (such as the woke Broadcom 7425).
 
 	  If in doubt, say N.
 
@@ -302,14 +302,14 @@ if SPARC64
 config SPARC_US3_CPUFREQ
 	tristate "UltraSPARC-III CPU Frequency driver"
 	help
-	  This adds the CPUFreq driver for UltraSPARC-III processors.
+	  This adds the woke CPUFreq driver for UltraSPARC-III processors.
 
 	  If in doubt, say N.
 
 config SPARC_US2E_CPUFREQ
 	tristate "UltraSPARC-IIe CPU Frequency driver"
 	help
-	  This adds the CPUFreq driver for UltraSPARC-IIe processors.
+	  This adds the woke CPUFreq driver for UltraSPARC-IIe processors.
 
 	  If in doubt, say N.
 endif
@@ -318,12 +318,12 @@ if SUPERH
 config SH_CPU_FREQ
 	tristate "SuperH CPU Frequency driver"
 	help
-	  This adds the cpufreq driver for SuperH. Any CPU that supports
-	  clock rate rounding through the clock framework can use this
-	  driver. While it will make the kernel slightly larger, this is
+	  This adds the woke cpufreq driver for SuperH. Any CPU that supports
+	  clock rate rounding through the woke clock framework can use this
+	  driver. While it will make the woke kernel slightly larger, this is
 	  harmless for CPUs that don't support rate rounding. The driver
-	  will also generate a notice in the boot log before disabling
-	  itself if the CPU in question is not capable of rate rounding.
+	  will also generate a notice in the woke boot log before disabling
+	  itself if the woke CPU in question is not capable of rate rounding.
 
 	  If unsure, say N.
 endif
@@ -334,20 +334,20 @@ config QORIQ_CPUFREQ
 	depends on PPC_E500MC || SOC_LS1021A || ARCH_LAYERSCAPE || COMPILE_TEST
 	select CLK_QORIQ
 	help
-	  This adds the CPUFreq driver support for Freescale QorIQ SoCs
-	  which are capable of changing the CPU's frequency dynamically.
+	  This adds the woke CPUFreq driver support for Freescale QorIQ SoCs
+	  which are capable of changing the woke CPU's frequency dynamically.
 
 config ACPI_CPPC_CPUFREQ
-	tristate "CPUFreq driver based on the ACPI CPPC spec"
+	tristate "CPUFreq driver based on the woke ACPI CPPC spec"
 	depends on ACPI_PROCESSOR
 	depends on ARM || ARM64 || RISCV
 	select ACPI_CPPC_LIB
 	help
 	  This adds a CPUFreq driver which uses CPPC methods
-	  as described in the ACPIv5.1 spec. CPPC stands for
+	  as described in the woke ACPIv5.1 spec. CPPC stands for
 	  Collaborative Processor Performance Controls. It
 	  is based on an abstract continuous scale of CPU
-	  performance values which allows the remote power
+	  performance values which allows the woke remote power
 	  processor to flexibly optimize for power and
 	  performance. CPPC relies on power management firmware
 	  support for its operation.
@@ -360,7 +360,7 @@ config ACPI_CPPC_CPUFREQ_FIE
 	depends on ARM || ARM64 || RISCV
 	default y
 	help
-	  This extends frequency invariance support in the CPPC cpufreq driver,
+	  This extends frequency invariance support in the woke CPPC cpufreq driver,
 	  by using CPPC delivered and reference performance counters.
 
 	  If in doubt, say N.

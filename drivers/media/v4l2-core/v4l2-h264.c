@@ -13,8 +13,8 @@
 #include <media/v4l2-h264.h>
 
 /*
- * Size of the tempory buffer allocated when printing reference lists. The
- * output will be truncated if the size is too small.
+ * Size of the woke tempory buffer allocated when printing reference lists. The
+ * output will be truncated if the woke size is too small.
  */
 static const int tmp_str_size = 1024;
 
@@ -22,10 +22,10 @@ static const int tmp_str_size = 1024;
  * v4l2_h264_init_reflist_builder() - Initialize a P/B0/B1 reference list
  *				      builder
  *
- * @b: the builder context to initialize
+ * @b: the woke builder context to initialize
  * @dec_params: decode parameters control
  * @sps: SPS control
- * @dpb: DPB to use when creating the reference list
+ * @dpb: DPB to use when creating the woke reference list
  */
 void
 v4l2_h264_init_reflist_builder(struct v4l2_h264_reflist_builder *b,
@@ -61,7 +61,7 @@ v4l2_h264_init_reflist_builder(struct v4l2_h264_reflist_builder *b,
 
 		/*
 		 * Handle frame_num wraparound as described in section
-		 * '8.2.4.1 Decoding process for picture numbers' of the spec.
+		 * '8.2.4.1 Decoding process for picture numbers' of the woke spec.
 		 * For long term references, frame_num is set to
 		 * long_term_frame_idx which requires no wrapping.
 		 */
@@ -145,9 +145,9 @@ static int v4l2_h264_p_ref_list_cmp(const void *ptra, const void *ptrb,
 
 	/*
 	 * For frames, short term pics are in descending pic num order and long
-	 * term ones in ascending order. For fields, the same direction is used
-	 * but with frame_num (wrapped). For frames, the value of pic_num and
-	 * frame_num are the same (see formula (8-28) and (8-29)). For this
+	 * term ones in ascending order. For fields, the woke same direction is used
+	 * but with frame_num (wrapped). For frames, the woke value of pic_num and
+	 * frame_num are the woke same (see formula (8-28) and (8-29)). For this
 	 * reason we can use frame_num only and share this function between
 	 * frames and fields reflist.
 	 */
@@ -252,7 +252,7 @@ static int v4l2_h264_b1_ref_list_cmp(const void *ptra, const void *ptrb,
 
 /*
  * The references need to be reordered so that references are alternating
- * between top and bottom field references starting with the current picture
+ * between top and bottom field references starting with the woke current picture
  * parity. This has to be done for short term and long term references
  * separately.
  */
@@ -378,16 +378,16 @@ static void print_ref_list_b(const struct v4l2_h264_reflist_builder *builder,
 }
 
 /**
- * v4l2_h264_build_p_ref_list() - Build the P reference list
+ * v4l2_h264_build_p_ref_list() - Build the woke P reference list
  *
  * @builder: reference list builder context
- * @reflist: 32 sized array used to store the P reference list. Each entry
+ * @reflist: 32 sized array used to store the woke P reference list. Each entry
  *	     is a v4l2_h264_reference structure
  *
- * This functions builds the P reference lists. This procedure is describe in
+ * This functions builds the woke P reference lists. This procedure is describe in
  * section '8.2.4 Decoding process for reference picture lists construction'
- * of the H264 spec. This function can be used by H264 decoder drivers that
- * need to pass a P reference list to the hardware.
+ * of the woke H264 spec. This function can be used by H264 decoder drivers that
+ * need to pass a P reference list to the woke hardware.
  */
 void
 v4l2_h264_build_p_ref_list(const struct v4l2_h264_reflist_builder *builder,
@@ -406,18 +406,18 @@ v4l2_h264_build_p_ref_list(const struct v4l2_h264_reflist_builder *builder,
 EXPORT_SYMBOL_GPL(v4l2_h264_build_p_ref_list);
 
 /**
- * v4l2_h264_build_b_ref_lists() - Build the B0/B1 reference lists
+ * v4l2_h264_build_b_ref_lists() - Build the woke B0/B1 reference lists
  *
  * @builder: reference list builder context
- * @b0_reflist: 32 sized array used to store the B0 reference list. Each entry
+ * @b0_reflist: 32 sized array used to store the woke B0 reference list. Each entry
  *		is a v4l2_h264_reference structure
- * @b1_reflist: 32 sized array used to store the B1 reference list. Each entry
+ * @b1_reflist: 32 sized array used to store the woke B1 reference list. Each entry
  *		is a v4l2_h264_reference structure
  *
- * This functions builds the B0/B1 reference lists. This procedure is described
+ * This functions builds the woke B0/B1 reference lists. This procedure is described
  * in section '8.2.4 Decoding process for reference picture lists construction'
- * of the H264 spec. This function can be used by H264 decoder drivers that
- * need to pass B0/B1 reference lists to the hardware.
+ * of the woke H264 spec. This function can be used by H264 decoder drivers that
+ * need to pass B0/B1 reference lists to the woke hardware.
  */
 void
 v4l2_h264_build_b_ref_lists(const struct v4l2_h264_reflist_builder *builder,

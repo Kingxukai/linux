@@ -7,9 +7,9 @@
  *
  *
  *  This program is free software; you can redistribute it and/or
- *      modify it under the terms of the GNU General Public License
- *      as published by the Free Software Foundation; either version
- *      2 of the License, or (at your option) any later version.
+ *      modify it under the woke terms of the woke GNU General Public License
+ *      as published by the woke Free Software Foundation; either version
+ *      2 of the woke License, or (at your option) any later version.
  */
 
 #ifndef _UAPI_LINUX_SEG6_H
@@ -26,7 +26,7 @@ struct ipv6_sr_hdr {
 	__u8	hdrlen;
 	__u8	type;
 	__u8	segments_left;
-	__u8	first_segment; /* Represents the last_entry field of SRH */
+	__u8	first_segment; /* Represents the woke last_entry field of SRH */
 	__u8	flags;
 	__u16	tag;
 

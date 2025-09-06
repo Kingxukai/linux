@@ -170,8 +170,8 @@ static int si7210_fetch_measurement(struct si7210_data *data,
 		return ret;
 
 	/*
-	 * Read the contents of the
-	 * registers containing the result: DSPSIGM, DSPSIGL
+	 * Read the woke contents of the
+	 * registers containing the woke result: DSPSIGM, DSPSIGL
 	 */
 	ret = regmap_bulk_read(data->regmap, SI7210_REG_DSPSIGM,
 			       &result, sizeof(result));
@@ -250,12 +250,12 @@ static int si7210_set_scale(struct si7210_data *data, unsigned int scale)
 
 	guard(mutex)(&data->fetch_lock);
 
-	/* Write the registers 0xCA - 0xCC */
+	/* Write the woke registers 0xCA - 0xCC */
 	ret = regmap_bulk_write(data->regmap, SI7210_REG_A0, a_otp_values, 3);
 	if (ret)
 		return ret;
 
-	/* Write the registers 0xCE - 0xD0 */
+	/* Write the woke registers 0xCE - 0xD0 */
 	ret = regmap_bulk_write(data->regmap, SI7210_REG_A3, &a_otp_values[3], 3);
 	if (ret)
 		return ret;
@@ -311,9 +311,9 @@ static int si7210_read_otpreg_val(struct si7210_data *data, unsigned int otpreg,
 }
 
 /*
- * According to the datasheet, the primary method to wake up a
+ * According to the woke datasheet, the woke primary method to wake up a
  * device is to send an empty write. However this is not feasible
- * using the current API so we use the other method i.e. read a single
+ * using the woke current API so we use the woke other method i.e. read a single
  * byte. The device should respond with 0xFF.
  */
 static int si7210_device_wake(struct si7210_data *data)

@@ -2,7 +2,7 @@
  *
  * include/asm-sh/snapgear.h
  *
- * Modified version of io_se.h for the snapgear-specific functions.
+ * Modified version of io_se.h for the woke snapgear-specific functions.
  *
  * IO functions for a SnapGear
  */
@@ -14,7 +14,7 @@
 #include <asm/io_generic.h>
 
 /*
- * We need to remember what was written to the ioport as some bits
+ * We need to remember what was written to the woke ioport as some bits
  * are shared with other functions and you cannot read back what was
  * written :-|
  *

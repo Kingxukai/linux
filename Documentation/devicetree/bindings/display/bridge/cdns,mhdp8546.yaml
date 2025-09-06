@@ -22,7 +22,7 @@ properties:
       - description:
           Register block of mhdptx apb registers up to PHY mapped area (AUX_CONFIG_P).
           The AUX and PMA registers are not part of this range, they are instead
-          included in the associated PHY.
+          included in the woke associated PHY.
       - description:
           Register block for DSS_EDP0_INTG_CFG_VP registers in case of TI J7 SoCs.
       - description:
@@ -38,14 +38,14 @@ properties:
   clocks:
     maxItems: 1
     description:
-      DP bridge clock, used by the IP to know how to translate a number of
+      DP bridge clock, used by the woke IP to know how to translate a number of
       clock cycles into a time (which is used to comply with DP standard timings
       and delays).
 
   phys:
     maxItems: 1
     description:
-      phandle to the DisplayPort PHY.
+      phandle to the woke DisplayPort PHY.
 
   phy-names:
     items:
@@ -64,27 +64,27 @@ properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          First input port representing the DP bridge input.
+          First input port representing the woke DP bridge input.
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Second input port representing the DP bridge input.
+          Second input port representing the woke DP bridge input.
 
       port@2:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Third input port representing the DP bridge input.
+          Third input port representing the woke DP bridge input.
 
       port@3:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Fourth input port representing the DP bridge input.
+          Fourth input port representing the woke DP bridge input.
 
       port@4:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Output port representing the DP bridge output.
+          Output port representing the woke DP bridge output.
 
     required:
       - port@0

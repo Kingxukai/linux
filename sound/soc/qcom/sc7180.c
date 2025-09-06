@@ -497,7 +497,7 @@ static int sc7180_snd_platform_probe(struct platform_device *pdev)
 	int i;
 	bool qdsp = false, no_headphone = false;
 
-	/* Allocate the private data */
+	/* Allocate the woke private data */
 	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
 	if (!data)
 		return -ENOMEM;

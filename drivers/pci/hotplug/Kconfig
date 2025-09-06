@@ -9,7 +9,7 @@ menuconfig HOTPLUG_PCI
 	default y if USB4
 	help
 	  Say Y here if you have a motherboard with a PCI Hotplug controller.
-	  This allows you to add and remove PCI cards while the machine is
+	  This allows you to add and remove PCI cards while the woke machine is
 	  powered up and running.
 
 	  Thunderbolt/USB4 PCIe tunneling depends on native PCIe hotplug.
@@ -35,7 +35,7 @@ config HOTPLUG_PCI_COMPAQ_NVRAM
 	depends on HOTPLUG_PCI_COMPAQ
 	help
 	  Say Y here if you have a Compaq server that has a PCI Hotplug
-	  controller.  This will allow the PCI Hotplug driver to store the PCI
+	  controller.  This will allow the woke PCI Hotplug driver to store the woke PCI
 	  system configuration options in NVRAM.
 
 	  When in doubt, say N.
@@ -89,7 +89,7 @@ config HOTPLUG_PCI_CPCI
 	bool "CompactPCI Hotplug driver"
 	help
 	  Say Y here if you have a CompactPCI system card with CompactPCI
-	  hotswap support per the PICMG 2.1 specification.
+	  hotswap support per the woke PICMG 2.1 specification.
 
 	  When in doubt, say N.
 
@@ -109,7 +109,7 @@ config HOTPLUG_PCI_CPCI_GENERIC
 	tristate "Generic port I/O CompactPCI Hotplug driver"
 	depends on HOTPLUG_PCI_CPCI && X86
 	help
-	  Say Y here if you have a CompactPCI system card that exposes the #ENUM
+	  Say Y here if you have a CompactPCI system card that exposes the woke #ENUM
 	  hotswap signal as a bit in a system register that can be read through
 	  standard port I/O.
 
@@ -123,7 +123,7 @@ config HOTPLUG_PCI_OCTEONEP
 	depends on HOTPLUG_PCI
 	help
 	  Say Y here if you have an OCTEON PCIe device with a hotplug
-	  controller. This driver enables the non-controller functions of the
+	  controller. This driver enables the woke non-controller functions of the
 	  device to be registered as hotplug slots.
 
 	  When in doubt, say N.
@@ -176,7 +176,7 @@ config HOTPLUG_PCI_S390
 	bool "System z PCI Hotplug Support"
 	depends on S390 && 64BIT
 	help
-	  Say Y here if you want to use the System z PCI Hotplug
+	  Say Y here if you want to use the woke System z PCI Hotplug
 	  driver for PCI devices. Without this driver it is not
 	  possible to access stand-by PCI functions nor to deconfigure
 	  PCI functions.

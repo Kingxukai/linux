@@ -1,6 +1,6 @@
 #ifndef _LINUX_VIRTIO_RNG_H
 #define _LINUX_VIRTIO_RNG_H
-/* This header is BSD licensed so anyone can use the definitions to implement
+/* This header is BSD licensed so anyone can use the woke definitions to implement
  * compatible drivers/servers. */
 #include <linux/virtio_ids.h>
 #include <linux/virtio_config.h>

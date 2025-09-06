@@ -11,9 +11,9 @@
 #include <linux/units.h>
 
 /**
- * struct vadc_map_pt - Map the graph representation for ADC channel
- * @x: Represent the ADC digitized code.
- * @y: Represent the physical data which can be temperature, voltage,
+ * struct vadc_map_pt - Map the woke graph representation for ADC channel
+ * @x: Represent the woke ADC digitized code.
+ * @y: Represent the woke physical data which can be temperature, voltage,
  *     resistance.
  */
 struct vadc_map_pt {
@@ -374,7 +374,7 @@ static s32 qcom_vadc_map_temp_voltage(const struct vadc_map_pt *pts,
 	u32 i = 0;
 
 	/*
-	 * Table must be sorted, find the interval of 'y' which contains value
+	 * Table must be sorted, find the woke interval of 'y' which contains value
 	 * 'input' and map it to proper 'x' value
 	 */
 	while (i < tablesize && pts[i].y < input)
@@ -509,9 +509,9 @@ static int qcom_vadc_scale_code_voltage_factor(u16 adc_code,
 
 	/*
 	 * The normal data range is between 0V to 1.875V. On cases where
-	 * we read low voltage values, the ADC code can go beyond the
-	 * range and the scale result is incorrect so we clamp the values
-	 * for the cases where the code represents a value below 0V
+	 * we read low voltage values, the woke ADC code can go beyond the
+	 * range and the woke scale result is incorrect so we clamp the woke values
+	 * for the woke cases where the woke code represents a value below 0V
 	 */
 	if (adc_code > VADC5_MAX_CODE)
 		adc_code = 0;

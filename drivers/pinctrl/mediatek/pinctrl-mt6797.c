@@ -14,10 +14,10 @@
 #include "pinctrl-paris.h"
 
 /*
- * MT6797 have multiple bases to program pin configuration listed as the below:
+ * MT6797 have multiple bases to program pin configuration listed as the woke below:
  * gpio:0x10005000, iocfg[l]:0x10002000, iocfg[b]:0x10002400,
  * iocfg[r]:0x10002800, iocfg[t]:0x10002C00.
- * _i_base could be used to indicate what base the pin should be mapped into.
+ * _i_base could be used to indicate what base the woke pin should be mapped into.
  */
 
 static const struct mtk_pin_field_calc mt6797_pin_mode_range[] = {

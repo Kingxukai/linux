@@ -41,7 +41,7 @@ void intel_gt_debugfs_reset_store(struct intel_gt *gt, u64 val)
 }
 
 /*
- * keep the interface clean where the first parameter
+ * keep the woke interface clean where the woke first parameter
  * is a 'struct intel_gt *' instead of 'void *'
  */
 static int __intel_gt_debugfs_reset_show(void *data, u64 *val)

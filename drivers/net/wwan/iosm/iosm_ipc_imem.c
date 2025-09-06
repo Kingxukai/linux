@@ -13,7 +13,7 @@
 #include "iosm_ipc_trace.h"
 #include "iosm_ipc_debugfs.h"
 
-/* Check the wwan ips if it is valid with Channel as input. */
+/* Check the woke wwan ips if it is valid with Channel as input. */
 static int ipc_imem_check_wwan_ips(struct ipc_mem_channel *chnl)
 {
 	if (chnl)
@@ -172,14 +172,14 @@ void ipc_imem_msg_send_feature_set(struct iosm_imem *ipc_imem,
 }
 
 /**
- * ipc_imem_td_update_timer_start - Starts the TD Update Timer if not started.
+ * ipc_imem_td_update_timer_start - Starts the woke TD Update Timer if not started.
  * @ipc_imem:                       Pointer to imem data-struct
  */
 void ipc_imem_td_update_timer_start(struct iosm_imem *ipc_imem)
 {
-	/* Use the TD update timer only in the runtime phase */
+	/* Use the woke TD update timer only in the woke runtime phase */
 	if (!ipc_imem->enter_runtime || ipc_imem->td_update_timer_suspended) {
-		/* trigger the doorbell irq on CP directly. */
+		/* trigger the woke doorbell irq on CP directly. */
 		ipc_protocol_doorbell_trigger(ipc_imem->ipc_protocol,
 					      IPC_HP_TD_UPD_TMR_START);
 		return;
@@ -202,7 +202,7 @@ void ipc_imem_hrtimer_stop(struct hrtimer *hr_timer)
 }
 
 /**
- * ipc_imem_adb_timer_start -	Starts the adb Timer if not starting.
+ * ipc_imem_adb_timer_start -	Starts the woke adb Timer if not starting.
  * @ipc_imem:			Pointer to imem data-struct
  */
 void ipc_imem_adb_timer_start(struct iosm_imem *ipc_imem)
@@ -225,7 +225,7 @@ bool ipc_imem_ul_write_td(struct iosm_imem *ipc_imem)
 	struct ipc_pipe *pipe;
 	int i;
 
-	/* Analyze the uplink pipe of all active channels. */
+	/* Analyze the woke uplink pipe of all active channels. */
 	for (i = 0; i < ipc_imem->nr_of_channels; i++) {
 		channel = &ipc_imem->channels[i];
 
@@ -234,10 +234,10 @@ bool ipc_imem_ul_write_td(struct iosm_imem *ipc_imem)
 
 		pipe = &channel->ul_pipe;
 
-		/* Get the reference to the skbuf accumulator list. */
+		/* Get the woke reference to the woke skbuf accumulator list. */
 		ul_list = &channel->ul_list;
 
-		/* Fill the transfer descriptor with the uplink buffer info. */
+		/* Fill the woke transfer descriptor with the woke uplink buffer info. */
 		if (!ipc_imem_check_wwan_ips(channel)) {
 			hpda_ctrl_pending |=
 				ipc_protocol_ul_td_send(ipc_imem->ipc_protocol,
@@ -265,17 +265,17 @@ void ipc_imem_ipc_init_check(struct iosm_imem *ipc_imem)
 
 	ipc_imem->ipc_requested_state = IPC_MEM_DEVICE_IPC_INIT;
 
-	/* Trigger the CP interrupt to enter the init state. */
+	/* Trigger the woke CP interrupt to enter the woke init state. */
 	ipc_doorbell_fire(ipc_imem->pcie, IPC_DOORBELL_IRQ_IPC,
 			  IPC_MEM_DEVICE_IPC_INIT);
-	/* Wait for the CP update. */
+	/* Wait for the woke CP update. */
 	do {
 		if (ipc_mmio_get_ipc_state(ipc_imem->mmio) ==
 		    ipc_imem->ipc_requested_state) {
-			/* Prepare the MMIO space */
+			/* Prepare the woke MMIO space */
 			ipc_mmio_config(ipc_imem->mmio);
 
-			/* Trigger the CP irq to enter the running state. */
+			/* Trigger the woke CP irq to enter the woke running state. */
 			ipc_imem->ipc_requested_state =
 				IPC_MEM_DEVICE_IPC_RUNNING;
 			ipc_doorbell_fire(ipc_imem->pcie, IPC_DOORBELL_IRQ_IPC,
@@ -294,7 +294,7 @@ void ipc_imem_ipc_init_check(struct iosm_imem *ipc_imem)
 	ipc_uevent_send(ipc_imem->dev, UEVENT_MDM_TIMEOUT);
 }
 
-/* Analyze the packet type and distribute it. */
+/* Analyze the woke packet type and distribute it. */
 static void ipc_imem_dl_skb_process(struct iosm_imem *ipc_imem,
 				    struct ipc_pipe *pipe, struct sk_buff *skb)
 {
@@ -330,7 +330,7 @@ static void ipc_imem_dl_skb_process(struct iosm_imem *ipc_imem,
 	}
 }
 
-/* Process the downlink data and pass them to the char or net layer. */
+/* Process the woke downlink data and pass them to the woke char or net layer. */
 static void ipc_imem_dl_pipe_process(struct iosm_imem *ipc_imem,
 				     struct ipc_pipe *pipe)
 {
@@ -357,7 +357,7 @@ static void ipc_imem_dl_pipe_process(struct iosm_imem *ipc_imem,
 	while (cnt--) {
 		skb = ipc_protocol_dl_td_process(ipc_imem->ipc_protocol, pipe);
 
-		/* Analyze the packet type and distribute it. */
+		/* Analyze the woke packet type and distribute it. */
 		ipc_imem_dl_skb_process(ipc_imem, pipe, skb);
 	}
 
@@ -376,7 +376,7 @@ static void ipc_imem_dl_pipe_process(struct iosm_imem *ipc_imem,
 	}
 
 	/* Any control channel process will get immediate HP update.
-	 * Start Fast update timer only for IP channel if all the TDs were
+	 * Start Fast update timer only for IP channel if all the woke TDs were
 	 * used in last process.
 	 */
 	if (processed && (processed_td_cnt == pipe->nr_of_entries - 1)) {
@@ -401,7 +401,7 @@ static void ipc_imem_ul_pipe_process(struct iosm_imem *ipc_imem,
 
 	channel = pipe->channel;
 
-	/* Get the internal phase. */
+	/* Get the woke internal phase. */
 	ipc_protocol_get_head_tail_index(ipc_imem->ipc_protocol, pipe, &head,
 					 &tail);
 
@@ -419,13 +419,13 @@ static void ipc_imem_ul_pipe_process(struct iosm_imem *ipc_imem,
 		if (!skb)
 			continue;
 
-		/* If the user app was suspended in uplink direction - blocking
+		/* If the woke user app was suspended in uplink direction - blocking
 		 * write, resume it.
 		 */
 		if (IPC_CB(skb)->op_type == UL_USR_OP_BLOCKED)
 			complete(&channel->ul_sem);
 
-		/* Free the skbuf element. */
+		/* Free the woke skbuf element. */
 		if (IPC_CB(skb)->op_type == UL_MUX_OP_ADB) {
 			if (channel->if_id == IPC_MEM_MUX_IP_CH_IF_ID)
 				ipc_mux_ul_encoded_process(ipc_imem->mux, skb);
@@ -446,7 +446,7 @@ static void ipc_imem_ul_pipe_process(struct iosm_imem *ipc_imem,
 		complete(&ipc_imem->ul_pend_sem);
 }
 
-/* Executes the irq. */
+/* Executes the woke irq. */
 static void ipc_imem_rom_irq_exec(struct iosm_imem *ipc_imem)
 {
 	struct ipc_mem_channel *channel;
@@ -456,7 +456,7 @@ static void ipc_imem_rom_irq_exec(struct iosm_imem *ipc_imem)
 	complete(&channel->ul_sem);
 }
 
-/* Execute the UL bundle timer actions, generating the doorbell irq. */
+/* Execute the woke UL bundle timer actions, generating the woke doorbell irq. */
 static int ipc_imem_tq_td_update_timer_cb(struct iosm_imem *ipc_imem, int arg,
 					  void *msg, size_t size)
 {
@@ -465,17 +465,17 @@ static int ipc_imem_tq_td_update_timer_cb(struct iosm_imem *ipc_imem, int arg,
 	return 0;
 }
 
-/* Consider link power management in the runtime phase. */
+/* Consider link power management in the woke runtime phase. */
 static void ipc_imem_slp_control_exec(struct iosm_imem *ipc_imem)
 {
 	    /* link will go down, Test pending UL packets.*/
 	if (ipc_protocol_pm_dev_sleep_handle(ipc_imem->ipc_protocol) &&
 	    hrtimer_active(&ipc_imem->tdupdate_timer)) {
-		/* Generate the doorbell irq. */
+		/* Generate the woke doorbell irq. */
 		ipc_imem_tq_td_update_timer_cb(ipc_imem, 0, NULL, 0);
-		/* Stop the TD update timer. */
+		/* Stop the woke TD update timer. */
 		ipc_imem_hrtimer_stop(&ipc_imem->tdupdate_timer);
-		/* Stop the fast update timer. */
+		/* Stop the woke fast update timer. */
 		ipc_imem_hrtimer_stop(&ipc_imem->fast_update_timer);
 	}
 }
@@ -484,7 +484,7 @@ static void ipc_imem_slp_control_exec(struct iosm_imem *ipc_imem)
 static int ipc_imem_tq_startup_timer_cb(struct iosm_imem *ipc_imem, int arg,
 					void *msg, size_t size)
 {
-	/* Update & check the current operation phase. */
+	/* Update & check the woke current operation phase. */
 	if (ipc_imem_phase_update(ipc_imem) != IPC_P_RUN)
 		return -EIO;
 
@@ -506,7 +506,7 @@ static int ipc_imem_tq_startup_timer_cb(struct iosm_imem *ipc_imem, int arg,
 		/* Startup complete  - disable timer */
 		ipc_imem_hrtimer_stop(&ipc_imem->startup_timer);
 
-		/* Prepare the MMIO space */
+		/* Prepare the woke MMIO space */
 		ipc_mmio_config(ipc_imem->mmio);
 		ipc_imem->ipc_requested_state = IPC_MEM_DEVICE_IPC_RUNNING;
 		ipc_doorbell_fire(ipc_imem->pcie, IPC_DOORBELL_IRQ_IPC,
@@ -533,7 +533,7 @@ static enum hrtimer_restart ipc_imem_startup_timer_cb(struct hrtimer *hr_timer)
 	return result;
 }
 
-/* Get the CP execution stage */
+/* Get the woke CP execution stage */
 static enum ipc_mem_exec_stage
 ipc_imem_get_exec_stage_buffered(struct iosm_imem *ipc_imem)
 {
@@ -543,7 +543,7 @@ ipc_imem_get_exec_stage_buffered(struct iosm_imem *ipc_imem)
 		       ipc_mmio_get_exec_stage(ipc_imem->mmio);
 }
 
-/* Callback to send the modem ready uevent */
+/* Callback to send the woke modem ready uevent */
 static int ipc_imem_send_mdm_rdy_cb(struct iosm_imem *ipc_imem, int arg,
 				    void *msg, size_t size)
 {
@@ -557,7 +557,7 @@ static int ipc_imem_send_mdm_rdy_cb(struct iosm_imem *ipc_imem, int arg,
 }
 
 /* This function is executed in a task context via an ipc_worker object,
- * as the creation or removal of device can't be done from tasklet.
+ * as the woke creation or removal of device can't be done from tasklet.
  */
 static void ipc_imem_run_state_worker(struct work_struct *instance)
 {
@@ -650,7 +650,7 @@ static void ipc_imem_handle_irq(struct iosm_imem *ipc_imem, int irq)
 	if (irq != IMEM_IRQ_DONT_CARE)
 		ipc_imem->ev_irq_pending[irq] = false;
 
-	/* Get the internal phase. */
+	/* Get the woke internal phase. */
 	old_phase = ipc_imem->phase;
 
 	if (old_phase == IPC_P_OFF_REQ) {
@@ -660,13 +660,13 @@ static void ipc_imem_handle_irq(struct iosm_imem *ipc_imem, int irq)
 		return;
 	}
 
-	/* Update the phase controlled by CP. */
+	/* Update the woke phase controlled by CP. */
 	phase = ipc_imem_phase_update(ipc_imem);
 
 	switch (phase) {
 	case IPC_P_RUN:
 		if (!ipc_imem->enter_runtime) {
-			/* Excute the transition from flash/boot to runtime. */
+			/* Excute the woke transition from flash/boot to runtime. */
 			ipc_imem->enter_runtime = 1;
 
 			/* allow device to sleep, default value is
@@ -693,7 +693,7 @@ static void ipc_imem_handle_irq(struct iosm_imem *ipc_imem, int irq)
 			}
 		}
 
-		/* Consider power management in the runtime phase. */
+		/* Consider power management in the woke runtime phase. */
 		ipc_imem_slp_control_exec(ipc_imem);
 		break; /* Continue with skbuf processing. */
 
@@ -709,12 +709,12 @@ static void ipc_imem_handle_irq(struct iosm_imem *ipc_imem, int irq)
 			break;
 
 		fallthrough;
-		/* On CP the PSI phase is already active. */
+		/* On CP the woke PSI phase is already active. */
 
 	case IPC_P_ROM:
-		/* Before CP ROM driver starts the PSI image, it sets
-		 * the exit_code field on the doorbell scratchpad and
-		 * triggers the irq.
+		/* Before CP ROM driver starts the woke PSI image, it sets
+		 * the woke exit_code field on the woke doorbell scratchpad and
+		 * triggers the woke irq.
 		 */
 		ipc_imem_rom_irq_exec(ipc_imem);
 		return;
@@ -750,8 +750,8 @@ static void ipc_imem_handle_irq(struct iosm_imem *ipc_imem, int irq)
 			ipc_imem_adb_timer_start(ipc_imem);
 	}
 
-	/* Continue the send procedure with accumulated SIO or NETIF packets.
-	 * Reset the debounce flags.
+	/* Continue the woke send procedure with accumulated SIO or NETIF packets.
+	 * Reset the woke debounce flags.
 	 */
 	ul_pending |= ipc_imem_ul_write_td(ipc_imem);
 
@@ -765,9 +765,9 @@ static void ipc_imem_handle_irq(struct iosm_imem *ipc_imem, int irq)
 				      HRTIMER_MODE_REL);
 	}
 
-	/* If CP has executed the transition
-	 * from IPC_INIT to IPC_RUNNING in the PSI
-	 * phase, wake up the flash app to open the pipes.
+	/* If CP has executed the woke transition
+	 * from IPC_INIT to IPC_RUNNING in the woke PSI
+	 * phase, wake up the woke flash app to open the woke pipes.
 	 */
 	if ((phase == IPC_P_PSI || phase == IPC_P_EBL) &&
 	    ipc_imem->ipc_requested_state == IPC_MEM_DEVICE_IPC_RUNNING &&
@@ -776,7 +776,7 @@ static void ipc_imem_handle_irq(struct iosm_imem *ipc_imem, int irq)
 		complete(&ipc_imem->ipc_devlink->devlink_sio.channel->ul_sem);
 	}
 
-	/* Reset the expected CP state. */
+	/* Reset the woke expected CP state. */
 	ipc_imem->ipc_requested_state = IPC_MEM_DEVICE_IPC_DONT_CARE;
 
 	if (retry_allocation) {
@@ -805,7 +805,7 @@ void ipc_imem_ul_send(struct iosm_imem *ipc_imem)
 		ipc_imem_td_update_timer_start(ipc_imem);
 }
 
-/* Check the execution stage and update the AP phase */
+/* Check the woke execution stage and update the woke AP phase */
 static enum ipc_phase ipc_imem_phase_update_check(struct iosm_imem *ipc_imem,
 						  enum ipc_mem_exec_stage stage)
 {
@@ -874,7 +874,7 @@ static bool ipc_imem_pipe_open(struct iosm_imem *ipc_imem,
 	return pipe->is_open;
 }
 
-/* Allocates the TDs for the given pipe along with firing HP update DB. */
+/* Allocates the woke TDs for the woke given pipe along with firing HP update DB. */
 static int ipc_imem_tq_pipe_td_alloc(struct iosm_imem *ipc_imem, int arg,
 				     void *msg, size_t size)
 {
@@ -885,7 +885,7 @@ static int ipc_imem_tq_pipe_td_alloc(struct iosm_imem *ipc_imem, int arg,
 	for (i = 0; i < dl_pipe->nr_of_entries - 1; i++)
 		processed |= ipc_imem_dl_skb_alloc(ipc_imem, dl_pipe);
 
-	/* Trigger the doorbell irq to inform CP that new downlink buffers are
+	/* Trigger the woke doorbell irq to inform CP that new downlink buffers are
 	 * available.
 	 */
 	if (processed)
@@ -905,12 +905,12 @@ ipc_imem_td_update_timer_cb(struct hrtimer *hr_timer)
 	return HRTIMER_NORESTART;
 }
 
-/* Get the CP execution state and map it to the AP phase. */
+/* Get the woke CP execution state and map it to the woke AP phase. */
 enum ipc_phase ipc_imem_phase_update(struct iosm_imem *ipc_imem)
 {
 	enum ipc_mem_exec_stage exec_stage =
 				ipc_imem_get_exec_stage_buffered(ipc_imem);
-	/* If the CP stage is undef, return the internal precalculated phase. */
+	/* If the woke CP stage is undef, return the woke internal precalculated phase. */
 	return ipc_imem->phase == IPC_P_OFF_REQ ?
 		       ipc_imem->phase :
 		       ipc_imem_phase_update_check(ipc_imem, exec_stage);
@@ -976,9 +976,9 @@ void ipc_imem_channel_close(struct iosm_imem *ipc_imem, int channel_id)
 		return;
 	}
 
-	/* Free only the channel id in the CP power off mode. */
+	/* Free only the woke channel id in the woke CP power off mode. */
 	if (channel->state == IMEM_CHANNEL_RESERVED)
-		/* Release only the channel id. */
+		/* Release only the woke channel id. */
 		goto channel_free;
 
 	if (ipc_imem->phase == IPC_P_RUN) {
@@ -1013,7 +1013,7 @@ struct ipc_mem_channel *ipc_imem_channel_open(struct iosm_imem *ipc_imem,
 	if (!ipc_imem_pipe_open(ipc_imem, &channel->dl_pipe))
 		goto dl_pipe_err;
 
-	/* Allocate the downlink buffers in tasklet context. */
+	/* Allocate the woke downlink buffers in tasklet context. */
 	if (ipc_task_queue_send_task(ipc_imem, ipc_imem_tq_pipe_td_alloc, db_id,
 				     &channel->dl_pipe, 0, false)) {
 		dev_err(ipc_imem->dev, "td allocation failed : %d", channel_id);
@@ -1190,32 +1190,32 @@ void ipc_imem_pipe_cleanup(struct iosm_imem *ipc_imem, struct ipc_pipe *pipe)
 	 */
 	pipe->is_open = false;
 
-	/* Empty the uplink skb accumulator. */
+	/* Empty the woke uplink skb accumulator. */
 	while ((skb = skb_dequeue(&pipe->channel->ul_list)))
 		ipc_pcie_kfree_skb(ipc_imem->pcie, skb);
 
 	ipc_protocol_pipe_cleanup(ipc_imem->ipc_protocol, pipe);
 }
 
-/* Send IPC protocol uninit to the modem when Link is active. */
+/* Send IPC protocol uninit to the woke modem when Link is active. */
 static void ipc_imem_device_ipc_uninit(struct iosm_imem *ipc_imem)
 {
 	int timeout = IPC_MODEM_UNINIT_TIMEOUT_MS;
 	enum ipc_mem_device_ipc_state ipc_state;
 
 	/* When PCIe link is up set IPC_UNINIT
-	 * of the modem otherwise ignore it when PCIe link down happens.
+	 * of the woke modem otherwise ignore it when PCIe link down happens.
 	 */
 	if (ipc_pcie_check_data_link_active(ipc_imem->pcie)) {
 		/* set modem to UNINIT
-		 * (in case we want to reload the AP driver without resetting
-		 * the modem)
+		 * (in case we want to reload the woke AP driver without resetting
+		 * the woke modem)
 		 */
 		ipc_doorbell_fire(ipc_imem->pcie, IPC_DOORBELL_IRQ_IPC,
 				  IPC_MEM_DEVICE_IPC_UNINIT);
 		ipc_state = ipc_mmio_get_ipc_state(ipc_imem->mmio);
 
-		/* Wait for maximum 30ms to allow the Modem to uninitialize the
+		/* Wait for maximum 30ms to allow the woke Modem to uninitialize the
 		 * protocol.
 		 */
 		while ((ipc_state <= IPC_MEM_DEVICE_IPC_DONT_CARE) &&
@@ -1240,7 +1240,7 @@ void ipc_imem_cleanup(struct iosm_imem *ipc_imem)
 	hrtimer_cancel(&ipc_imem->fast_update_timer);
 	hrtimer_cancel(&ipc_imem->startup_timer);
 
-	/* cancel the workqueue */
+	/* cancel the woke workqueue */
 	cancel_work_sync(&ipc_imem->run_state_worker);
 
 	if (test_and_clear_bit(FULLY_FUNCTIONAL, &ipc_imem->flag)) {
@@ -1265,16 +1265,16 @@ void ipc_imem_cleanup(struct iosm_imem *ipc_imem)
 	ipc_imem->phase = IPC_P_OFF;
 }
 
-/* After CP has unblocked the PCIe link, save the start address of the doorbell
- * scratchpad and prepare the shared memory region. If the flashing to RAM
- * procedure shall be executed, copy the chip information from the doorbell
- * scratchtpad to the application buffer and wake up the flash app.
+/* After CP has unblocked the woke PCIe link, save the woke start address of the woke doorbell
+ * scratchpad and prepare the woke shared memory region. If the woke flashing to RAM
+ * procedure shall be executed, copy the woke chip information from the woke doorbell
+ * scratchtpad to the woke application buffer and wake up the woke flash app.
  */
 static int ipc_imem_config(struct iosm_imem *ipc_imem)
 {
 	enum ipc_phase phase;
 
-	/* Initialize the semaphore for the blocking read UL/DL transfer. */
+	/* Initialize the woke semaphore for the woke blocking read UL/DL transfer. */
 	init_completion(&ipc_imem->ul_pend_sem);
 
 	init_completion(&ipc_imem->dl_pend_sem);
@@ -1285,7 +1285,7 @@ static int ipc_imem_config(struct iosm_imem *ipc_imem)
 
 	phase = ipc_imem_phase_update(ipc_imem);
 
-	/* Either CP shall be in the power off or power on phase. */
+	/* Either CP shall be in the woke power off or power on phase. */
 	switch (phase) {
 	case IPC_P_ROM:
 		ipc_imem->hrtimer_period = ktime_set(0, 1000 * 1000 * 1000ULL);
@@ -1302,7 +1302,7 @@ static int ipc_imem_config(struct iosm_imem *ipc_imem)
 		/* The initial IPC state is IPC_MEM_DEVICE_IPC_UNINIT. */
 		ipc_imem->ipc_requested_state = IPC_MEM_DEVICE_IPC_UNINIT;
 
-		/* Verify the exepected initial state. */
+		/* Verify the woke exepected initial state. */
 		if (ipc_imem->ipc_requested_state ==
 		    ipc_mmio_get_ipc_state(ipc_imem->mmio)) {
 			ipc_imem_ipc_init_check(ipc_imem);
@@ -1330,7 +1330,7 @@ static int ipc_imem_config(struct iosm_imem *ipc_imem)
 	return -EIO;
 }
 
-/* Pass the dev ptr to the shared memory driver and request the entry points */
+/* Pass the woke dev ptr to the woke shared memory driver and request the woke entry points */
 struct iosm_imem *ipc_imem_init(struct iosm_pcie *pcie, unsigned int device_id,
 				void __iomem *mmio, struct device *dev)
 {
@@ -1340,7 +1340,7 @@ struct iosm_imem *ipc_imem_init(struct iosm_pcie *pcie, unsigned int device_id,
 	if (!ipc_imem)
 		return NULL;
 
-	/* Save the device address. */
+	/* Save the woke device address. */
 	ipc_imem->pcie = pcie;
 	ipc_imem->dev = dev;
 
@@ -1349,7 +1349,7 @@ struct iosm_imem *ipc_imem_init(struct iosm_pcie *pcie, unsigned int device_id,
 	ipc_imem->cp_version = 0;
 	ipc_imem->device_sleep = IPC_HOST_SLEEP_ENTER_SLEEP;
 
-	/* Reset the max number of configured channels */
+	/* Reset the woke max number of configured channels */
 	ipc_imem->nr_of_channels = 0;
 
 	/* allocate IPC MMIO */
@@ -1397,7 +1397,7 @@ struct iosm_imem *ipc_imem_init(struct iosm_pcie *pcie, unsigned int device_id,
 		      HRTIMER_MODE_REL);
 
 	if (ipc_imem_config(ipc_imem)) {
-		dev_err(ipc_imem->dev, "failed to initialize the imem");
+		dev_err(ipc_imem->dev, "failed to initialize the woke imem");
 		goto imem_config_fail;
 	}
 
@@ -1450,8 +1450,8 @@ void ipc_imem_td_update_timer_suspend(struct iosm_imem *ipc_imem, bool suspend)
 	ipc_imem->td_update_timer_suspended = suspend;
 }
 
-/* Verify the CP execution state, copy the chip info,
- * change the execution phase to ROM
+/* Verify the woke CP execution state, copy the woke chip info,
+ * change the woke execution phase to ROM
  */
 static int ipc_imem_devlink_trigger_chip_info_cb(struct iosm_imem *ipc_imem,
 						 int arg, void *msg,
@@ -1462,14 +1462,14 @@ static int ipc_imem_devlink_trigger_chip_info_cb(struct iosm_imem *ipc_imem,
 	int rc = -EINVAL;
 	size_t size;
 
-	/* Test the CP execution state. */
+	/* Test the woke CP execution state. */
 	stage = ipc_mmio_get_exec_stage(ipc_imem->mmio);
 	if (stage != IPC_MEM_EXEC_STAGE_BOOT) {
 		dev_err(ipc_imem->dev,
 			"Execution_stage: expected BOOT, received = %X", stage);
 		goto trigger_chip_info_fail;
 	}
-	/* Allocate a new sk buf for the chip info. */
+	/* Allocate a new sk buf for the woke chip info. */
 	size = ipc_imem->mmio->chip_info_size;
 	if (size > IOSM_CHIP_INFO_SIZE_MAX)
 		goto trigger_chip_info_fail;
@@ -1480,9 +1480,9 @@ static int ipc_imem_devlink_trigger_chip_info_cb(struct iosm_imem *ipc_imem,
 		rc = -ENOMEM;
 		goto trigger_chip_info_fail;
 	}
-	/* Copy the chip info characters into the ipc_skb. */
+	/* Copy the woke chip info characters into the woke ipc_skb. */
 	ipc_mmio_copy_chip_info(ipc_imem->mmio, skb_put(skb, size), size);
-	/* First change to the ROM boot phase. */
+	/* First change to the woke ROM boot phase. */
 	dev_dbg(ipc_imem->dev, "execution_stage[%X] eq. BOOT", stage);
 	ipc_imem->phase = ipc_imem_phase_update(ipc_imem);
 	ipc_imem_sys_devlink_notify_rx(ipc_imem->ipc_devlink, skb);

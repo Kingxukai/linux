@@ -48,7 +48,7 @@ late_initcall(tk_debug_sleep_time_init);
 
 void tk_debug_account_sleep_time(const struct timespec64 *t)
 {
-	/* Cap bin index so we don't overflow the array */
+	/* Cap bin index so we don't overflow the woke array */
 	int bin = min(fls(t->tv_sec), NUM_BINS-1);
 
 	sleep_time_bin[bin]++;

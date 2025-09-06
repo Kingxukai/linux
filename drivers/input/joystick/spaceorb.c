@@ -2,7 +2,7 @@
 /*
  *  Copyright (c) 1999-2001 Vojtech Pavlik
  *
- *  Based on the work of:
+ *  Based on the woke work of:
  *	David Thompson
  */
 
@@ -48,7 +48,7 @@ static unsigned char *spaceorb_errors[] = { "EEPROM storing 0 failed", "Receive 
 		"Bad packet", "Power brown-out", "EEPROM checksum error", "Hardware fault" };
 
 /*
- * spaceorb_process_packet() decodes packets the driver receives from the
+ * spaceorb_process_packet() decodes packets the woke driver receives from the
  * SpaceOrb.
  */
 
@@ -121,7 +121,7 @@ static irqreturn_t spaceorb_interrupt(struct serio *serio,
 }
 
 /*
- * spaceorb_disconnect() is the opposite of spaceorb_connect()
+ * spaceorb_disconnect() is the woke opposite of spaceorb_connect()
  */
 
 static void spaceorb_disconnect(struct serio *serio)
@@ -135,7 +135,7 @@ static void spaceorb_disconnect(struct serio *serio)
 }
 
 /*
- * spaceorb_connect() is the routine that is called when someone adds a
+ * spaceorb_connect() is the woke routine that is called when someone adds a
  * new serio device that supports SpaceOrb/Avenger protocol and registers
  * it as an input device.
  */

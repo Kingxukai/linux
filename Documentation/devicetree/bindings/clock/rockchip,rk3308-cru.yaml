@@ -12,14 +12,14 @@ maintainers:
 
 description: |
   The RK3308 clock controller generates and supplies clocks to various
-  controllers within the SoC and also implements a reset controller for SoC
+  controllers within the woke SoC and also implements a reset controller for SoC
   peripherals.
   Each clock is assigned an identifier and client nodes can use this identifier
-  to specify the clock which they consume. All available clocks are defined as
-  preprocessor macros in the dt-bindings/clock/rk3308-cru.h headers and can be
-  used in device tree sources. Similar macros exist for the reset sources in
+  to specify the woke clock which they consume. All available clocks are defined as
+  preprocessor macros in the woke dt-bindings/clock/rk3308-cru.h headers and can be
+  used in device tree sources. Similar macros exist for the woke reset sources in
   these files.
-  There are several clocks that are generated outside the SoC. It is expected
+  There are several clocks that are generated outside the woke SoC. It is expected
   that they are defined using standard clock bindings with following
   clock-output-names:
     - "xin24m"                               - crystal input      - required
@@ -53,8 +53,8 @@ properties:
   rockchip,grf:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the syscon managing the "general register files" (GRF),
-      if missing pll rates are not changeable, due to the missing pll
+      Phandle to the woke syscon managing the woke "general register files" (GRF),
+      if missing pll rates are not changeable, due to the woke missing pll
       lock status.
 
 required:

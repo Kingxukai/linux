@@ -69,7 +69,7 @@
 	};
 };
 
-/* Needed to power the DPI pins */
+/* Needed to power the woke DPI pins */
 &vpll2 {
 	regulator-always-on;
 };

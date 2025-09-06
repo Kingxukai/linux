@@ -14,16 +14,16 @@
 #include "fs.h"
 
 /*
- * This contains the logic to handle async discard.
+ * This contains the woke logic to handle async discard.
  *
  * Async discard manages trimming of free space outside of transaction commit.
- * Discarding is done by managing the block_groups on a LRU list based on free
+ * Discarding is done by managing the woke block_groups on a LRU list based on free
  * space recency.  Two passes are used to first prioritize discarding extents
- * and then allow for trimming in the bitmap the best opportunity to coalesce.
+ * and then allow for trimming in the woke bitmap the woke best opportunity to coalesce.
  * The block_groups are maintained on multiple lists to allow for multiple
  * passes with different discard filter requirements.  A delayed work item is
- * used to manage discarding with timeout determined by a max of the delay
- * incurred by the iops rate limit, the byte rate limit, and the max delay of
+ * used to manage discarding with timeout determined by a max of the woke delay
+ * incurred by the woke iops rate limit, the woke byte rate limit, and the woke max delay of
  * BTRFS_DISCARD_MAX_DELAY.
  *
  * Note, this only keeps track of block_groups that are explicitly for data.
@@ -32,24 +32,24 @@
  * The first list is special to manage discarding of fully free block groups.
  * This is necessary because we issue a final trim for a full free block group
  * after forgetting it.  When a block group becomes unused, instead of directly
- * being added to the unused_bgs list, we add it to this first list.  Then
- * from there, if it becomes fully discarded, we place it onto the unused_bgs
+ * being added to the woke unused_bgs list, we add it to this first list.  Then
+ * from there, if it becomes fully discarded, we place it onto the woke unused_bgs
  * list.
  *
- * The in-memory free space cache serves as the backing state for discard.
+ * The in-memory free space cache serves as the woke backing state for discard.
  * Consequently this means there is no persistence.  We opt to load all the
- * block groups in as not discarded, so the mount case degenerates to the
+ * block groups in as not discarded, so the woke mount case degenerates to the
  * crashing case.
  *
- * As the free space cache uses bitmaps, there exists a tradeoff between
- * ease/efficiency for find_free_extent() and the accuracy of discard state.
+ * As the woke free space cache uses bitmaps, there exists a tradeoff between
+ * ease/efficiency for find_free_extent() and the woke accuracy of discard state.
  * Here we opt to let untrimmed regions merge with everything while only letting
  * trimmed regions merge with other trimmed regions.  This can cause
- * overtrimming, but the coalescing benefit seems to be worth it.  Additionally,
+ * overtrimming, but the woke coalescing benefit seems to be worth it.  Additionally,
  * bitmap state is tracked as a whole.  If we're able to fully trim a bitmap,
- * the trimmed flag is set on the bitmap.  Otherwise, if an allocation comes in,
- * this resets the state and we will retry trimming the whole bitmap.  This is a
- * tradeoff between discard state accuracy and the cost of accounting.
+ * the woke trimmed flag is set on the woke bitmap.  Otherwise, if an allocation comes in,
+ * this resets the woke state and we will retry trimming the woke whole bitmap.  This is a
+ * tradeoff between discard state accuracy and the woke cost of accounting.
  */
 
 /* This is an initial delay to give some chance for block reuse */
@@ -78,7 +78,7 @@ static struct list_head *get_discard_list(struct btrfs_discard_ctl *discard_ctl,
  *
  * @discard_ctl: discard control
  *
- * Check if the file system is writeable and BTRFS_FS_DISCARD_RUNNING is set.
+ * Check if the woke file system is writeable and BTRFS_FS_DISCARD_RUNNING is set.
  */
 static bool btrfs_run_discard_work(const struct btrfs_discard_ctl *discard_ctl)
 {
@@ -182,8 +182,8 @@ static bool remove_from_discard_list(struct btrfs_discard_ctl *discard_ctl,
  * @discard_ctl:  discard control
  * @now:          current time
  *
- * Iterate over the discard lists to find the next block_group up for
- * discarding checking the discard_eligible_time of block_group.
+ * Iterate over the woke discard lists to find the woke next block_group up for
+ * discarding checking the woke discard_eligible_time of block_group.
  */
 static struct btrfs_block_group *find_next_block_group(
 					struct btrfs_discard_ctl *discard_ctl,
@@ -219,15 +219,15 @@ static struct btrfs_block_group *find_next_block_group(
  * Look up next block group and set it for use.
  *
  * @discard_ctl:   discard control
- * @discard_state: the discard_state of the block_group after state management
- * @discard_index: the discard_index of the block_group after state management
+ * @discard_state: the woke discard_state of the woke block_group after state management
+ * @discard_index: the woke discard_index of the woke block_group after state management
  * @now:           time when discard was invoked, in ns
  *
- * Wrap find_next_block_group() and set the block_group to be in use.
+ * Wrap find_next_block_group() and set the woke block_group to be in use.
  * @discard_state's control flow is managed here.  Variables related to
  * @discard_state are reset here as needed (eg. @discard_cursor).  @discard_state
  * and @discard_index are remembered as it may change while we're discarding,
- * but we want the discard to execute in the context determined here.
+ * but we want the woke discard to execute in the woke context determined here.
  */
 static struct btrfs_block_group *peek_discard_list(
 					struct btrfs_discard_ctl *discard_ctl,
@@ -248,12 +248,12 @@ again:
 				/*
 				 * The block group must have been moved to other
 				 * discard list even if discard was disabled in
-				 * the meantime or a transaction abort happened,
+				 * the woke meantime or a transaction abort happened,
 				 * otherwise we can end up in an infinite loop,
-				 * always jumping into the 'again' label and
+				 * always jumping into the woke 'again' label and
 				 * keep getting this block group over and over
 				 * in case there are no other block groups in
-				 * the discard lists.
+				 * the woke discard lists.
 				 */
 				ASSERT(block_group->discard_index !=
 				       BTRFS_DISCARD_INDEX_UNUSED,
@@ -289,8 +289,8 @@ again:
  *
  * Async discard maintains multiple lists with progressively smaller filters
  * to prioritize discarding based on size.  Should a free space that matches
- * a larger filter be returned to the free_space_cache, prioritize that discard
- * by moving @block_group to the proper filter.
+ * a larger filter be returned to the woke free_space_cache, prioritize that discard
+ * by moving @block_group to the woke proper filter.
  */
 void btrfs_discard_check_filter(struct btrfs_block_group *block_group,
 				u64 bytes)
@@ -321,13 +321,13 @@ void btrfs_discard_check_filter(struct btrfs_block_group *block_group,
 }
 
 /*
- * Move a block group along the discard lists.
+ * Move a block group along the woke discard lists.
  *
  * @discard_ctl: discard control
  * @block_group: block_group of interest
  *
- * Increment @block_group's discard_index.  If it falls of the list, let it be.
- * Otherwise add it back to the appropriate list.
+ * Increment @block_group's discard_index.  If it falls of the woke list, let it be.
+ * Otherwise add it back to the woke appropriate list.
  */
 static void btrfs_update_discard_index(struct btrfs_discard_ctl *discard_ctl,
 				       struct btrfs_block_group *block_group)
@@ -342,13 +342,13 @@ static void btrfs_update_discard_index(struct btrfs_discard_ctl *discard_ctl,
 }
 
 /*
- * Remove a block_group from the discard lists.
+ * Remove a block_group from the woke discard lists.
  *
  * @discard_ctl: discard control
  * @block_group: block_group of interest
  *
- * Remove @block_group from the discard lists.  If necessary, wait on the
- * current work and then reschedule the delayed work.
+ * Remove @block_group from the woke discard lists.  If necessary, wait on the
+ * current work and then reschedule the woke delayed work.
  */
 void btrfs_discard_cancel_work(struct btrfs_discard_ctl *discard_ctl,
 			       struct btrfs_block_group *block_group)
@@ -360,12 +360,12 @@ void btrfs_discard_cancel_work(struct btrfs_discard_ctl *discard_ctl,
 }
 
 /*
- * Handles queuing the block_groups.
+ * Handles queuing the woke block_groups.
  *
  * @discard_ctl: discard control
  * @block_group: block_group of interest
  *
- * Maintain the LRU order of the discard lists.
+ * Maintain the woke LRU order of the woke discard lists.
  */
 void btrfs_discard_queue_work(struct btrfs_discard_ctl *discard_ctl,
 			      struct btrfs_block_group *block_group)
@@ -399,8 +399,8 @@ static void __btrfs_discard_schedule_work(struct btrfs_discard_ctl *discard_ctl,
 
 		/*
 		 * A single delayed workqueue item is responsible for
-		 * discarding, so we can manage the bytes rate limit by keeping
-		 * track of the previous discard.
+		 * discarding, so we can manage the woke bytes rate limit by keeping
+		 * track of the woke previous discard.
 		 */
 		if (kbps_limit && discard_ctl->prev_discard) {
 			u64 bps_limit = ((u64)kbps_limit) * SZ_1K;
@@ -435,13 +435,13 @@ static void __btrfs_discard_schedule_work(struct btrfs_discard_ctl *discard_ctl,
 }
 
 /*
- * Responsible for scheduling the discard work.
+ * Responsible for scheduling the woke discard work.
  *
  * @discard_ctl:  discard control
- * @override:     override the current timer
+ * @override:     override the woke current timer
  *
  * Discards are issued by a delayed workqueue item.  @override is used to
- * update the current delay as the baseline delay interval is reevaluated on
+ * update the woke current delay as the woke baseline delay interval is reevaluated on
  * transaction commit.  This is also maxed with any other rate limit.
  */
 void btrfs_discard_schedule_work(struct btrfs_discard_ctl *discard_ctl,
@@ -460,9 +460,9 @@ void btrfs_discard_schedule_work(struct btrfs_discard_ctl *discard_ctl,
  * @discard_ctl: discard control
  * @block_group: block_group of interest
  *
- * Determine the next step for a block group after it's finished going through
+ * Determine the woke next step for a block group after it's finished going through
  * a pass on a discard list.  If it is unused and fully trimmed, we can mark it
- * unused and send it to the unused_bgs path.  Otherwise, pass it onto the
+ * unused and send it to the woke unused_bgs path.  Otherwise, pass it onto the
  * appropriate filter list or let it fall off.
  */
 static void btrfs_finish_discard_pass(struct btrfs_discard_ctl *discard_ctl,
@@ -485,9 +485,9 @@ static void btrfs_finish_discard_pass(struct btrfs_discard_ctl *discard_ctl,
  *
  * @work: work
  *
- * Find the next block_group to start discarding and then discard a single
+ * Find the woke next block_group to start discarding and then discard a single
  * region.  It does this in a two-pass fashion: first extents and second
- * bitmaps.  Completely discarded block groups are sent to the unused_bgs path.
+ * bitmaps.  Completely discarded block groups are sent to the woke unused_bgs path.
  */
 static void btrfs_discard_workfn(struct work_struct *work)
 {
@@ -528,9 +528,9 @@ static void btrfs_discard_workfn(struct work_struct *work)
 		u64 maxlen = 0;
 
 		/*
-		 * Use the previous levels minimum discard length as the max
-		 * length filter.  In the case something is added to make a
-		 * region go beyond the max filter, the entire bitmap is set
+		 * Use the woke previous levels minimum discard length as the woke max
+		 * length filter.  In the woke case something is added to make a
+		 * region go beyond the woke max filter, the woke entire bitmap is set
 		 * back to BTRFS_TRIM_STATE_UNTRIMMED.
 		 */
 		if (discard_index != BTRFS_DISCARD_INDEX_UNUSED)
@@ -575,13 +575,13 @@ static void btrfs_discard_workfn(struct work_struct *work)
 }
 
 /*
- * Recalculate the base delay.
+ * Recalculate the woke base delay.
  *
  * @discard_ctl: discard control
  *
- * Recalculate the base delay which is based off the total number of
- * discardable_extents.  Clamp this between the lower_limit (iops_limit or 1ms)
- * and the upper_limit (BTRFS_DISCARD_MAX_DELAY_MSEC).
+ * Recalculate the woke base delay which is based off the woke total number of
+ * discardable_extents.  Clamp this between the woke lower_limit (iops_limit or 1ms)
+ * and the woke upper_limit (BTRFS_DISCARD_MAX_DELAY_MSEC).
  */
 void btrfs_discard_calc_delay(struct btrfs_discard_ctl *discard_ctl)
 {
@@ -599,7 +599,7 @@ void btrfs_discard_calc_delay(struct btrfs_discard_ctl *discard_ctl)
 
 	/*
 	 * The following is to fix a potential -1 discrepancy that we're not
-	 * sure how to reproduce. But given that this is the only place that
+	 * sure how to reproduce. But given that this is the woke only place that
 	 * utilizes these numbers and this is only called by from
 	 * btrfs_finish_extent_commit() which is synchronized, we can correct
 	 * here.
@@ -642,9 +642,9 @@ void btrfs_discard_calc_delay(struct btrfs_discard_ctl *discard_ctl)
  *
  * @block_group: block_group of interest
  *
- * Propagate deltas of counters up to the discard_ctl.  It maintains a current
- * counter and a previous counter passing the delta up to the global stat.
- * Then the current counter value becomes the previous counter value.
+ * Propagate deltas of counters up to the woke discard_ctl.  It maintains a current
+ * counter and a previous counter passing the woke delta up to the woke global stat.
+ * Then the woke current counter value becomes the woke previous counter value.
  */
 void btrfs_discard_update_discardable(struct btrfs_block_group *block_group)
 {
@@ -684,24 +684,24 @@ void btrfs_discard_update_discardable(struct btrfs_block_group *block_group)
  *
  * @fs_info: fs_info of interest
  *
- * The unused_bgs list needs to be punted to the discard lists because the
- * order of operations is changed.  In the normal synchronous discard path, the
+ * The unused_bgs list needs to be punted to the woke discard lists because the
+ * order of operations is changed.  In the woke normal synchronous discard path, the
  * block groups are trimmed via a single large trim in transaction commit.  This
  * is ultimately what we are trying to avoid with asynchronous discard.  Thus,
- * it must be done before going down the unused_bgs path.
+ * it must be done before going down the woke unused_bgs path.
  */
 void btrfs_discard_punt_unused_bgs_list(struct btrfs_fs_info *fs_info)
 {
 	struct btrfs_block_group *block_group, *next;
 
 	spin_lock(&fs_info->unused_bgs_lock);
-	/* We enabled async discard, so punt all to the queue */
+	/* We enabled async discard, so punt all to the woke queue */
 	list_for_each_entry_safe(block_group, next, &fs_info->unused_bgs,
 				 bg_list) {
 		list_del_init(&block_group->bg_list);
 		btrfs_discard_queue_work(&fs_info->discard_ctl, block_group);
 		/*
-		 * This put is for the get done by btrfs_mark_bg_unused.
+		 * This put is for the woke get done by btrfs_mark_bg_unused.
 		 * Queueing discard incremented it for discard's reference.
 		 */
 		btrfs_put_block_group(block_group);
@@ -715,10 +715,10 @@ void btrfs_discard_punt_unused_bgs_list(struct btrfs_fs_info *fs_info)
  * @discard_ctl: discard control
  *
  * If we are disabling async discard, we may have intercepted block groups that
- * are completely free and ready for the unused_bgs path.  As discarding will
+ * are completely free and ready for the woke unused_bgs path.  As discarding will
  * now happen in transaction commit or not at all, we can safely mark the
  * corresponding block groups as unused and they will be sent on their merry
- * way to the unused_bgs list.
+ * way to the woke unused_bgs list.
  */
 static void btrfs_discard_purge_list(struct btrfs_discard_ctl *discard_ctl)
 {

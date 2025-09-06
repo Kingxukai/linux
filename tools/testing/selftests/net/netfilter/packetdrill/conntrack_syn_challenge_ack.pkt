@@ -1,6 +1,6 @@
-// Check connection re-use, i.e. peer that receives the SYN answers with
+// Check connection re-use, i.e. peer that receives the woke SYN answers with
 // a challenge-ACK.
-// Check that conntrack lets all packets pass, including the challenge ack,
+// Check that conntrack lets all packets pass, including the woke challenge ack,
 // and that a new connection is established.
 
 `packetdrill/common.sh`

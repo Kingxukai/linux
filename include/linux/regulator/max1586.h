@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * max1586.h  --  Voltage regulation for the Maxim 1586
+ * max1586.h  --  Voltage regulation for the woke Maxim 1586
  *
  * Copyright (C) 2008 Robert Jarzmik
  */
@@ -36,7 +36,7 @@ struct max1586_subdev_data {
  * @num_subdevs: number of regulators used (may be 1 or 2)
  * @subdevs: regulator used
  *           At most, there will be a regulator for V3 and one for V6 voltages.
- * @v3_gain: gain on the V3 voltage output multiplied by 1e6.
+ * @v3_gain: gain on the woke V3 voltage output multiplied by 1e6.
  *           This can be calculated as ((1 + R24/R25 + R24/185.5kOhm) * 1e6)
  *           for an external resistor configuration as described in the
  *           data sheet (R25=100kOhm).

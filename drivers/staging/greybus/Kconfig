@@ -8,7 +8,7 @@ config GREYBUS_AUDIO
 	  Select this option if you have a device that follows the
 	  Greybus Audio Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-audio.ko
 
 config GREYBUS_AUDIO_APB_CODEC
@@ -19,7 +19,7 @@ config GREYBUS_AUDIO_APB_CODEC
           ports and acts as a Greybus "Dummy codec". This device is a
           bridge from an APB-I2S port to a Unipro network.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-audio-codec.ko
 
 
@@ -29,7 +29,7 @@ config GREYBUS_BOOTROM
 	  Select this option if you have a device that follows the
 	  Greybus Bootrom Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-bootrom.ko
 
 config GREYBUS_CAMERA
@@ -39,7 +39,7 @@ config GREYBUS_CAMERA
 	  Select this option if you have a device that follows the
 	  Greybus Camera Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-camera.ko
 
 config GREYBUS_FIRMWARE
@@ -49,7 +49,7 @@ config GREYBUS_FIRMWARE
 	  Select this option if you have a device that follows the
 	  Greybus Firmware Download Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-firmware.ko
 
 config GREYBUS_HID
@@ -59,7 +59,7 @@ config GREYBUS_HID
 	  Select this option if you have a device that follows the
 	  Greybus HID Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-hid.ko
 
 config GREYBUS_LIGHT
@@ -69,7 +69,7 @@ config GREYBUS_LIGHT
 	  Select this option if you have a device that follows the
 	  Greybus LED Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-light.ko
 
 config GREYBUS_LOG
@@ -78,7 +78,7 @@ config GREYBUS_LOG
 	  Select this option if you have a device that follows the
 	  Greybus Debug Log Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-log.ko
 
 config GREYBUS_LOOPBACK
@@ -87,7 +87,7 @@ config GREYBUS_LOOPBACK
 	  Select this option if you have a device that follows the
 	  Greybus Debug Log Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-log.ko
 
 config GREYBUS_POWER
@@ -97,7 +97,7 @@ config GREYBUS_POWER
 	  Select this option if you have a device that follows the
 	  Greybus Powersupply Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-power-supply.ko
 
 config GREYBUS_RAW
@@ -106,7 +106,7 @@ config GREYBUS_RAW
 	  Select this option if you have a device that follows the
 	  Greybus Raw Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-raw.ko
 
 config GREYBUS_VIBRATOR
@@ -115,7 +115,7 @@ config GREYBUS_VIBRATOR
 	  Select this option if you have a device that follows the
 	  Greybus Vibrator Motor Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-vibrator.ko
 
 menuconfig GREYBUS_BRIDGED_PHY
@@ -126,7 +126,7 @@ menuconfig GREYBUS_BRIDGED_PHY
 	  different "traditional" busses by tunneling them over Greybus.
 	  Examples of this include serial, SPI, USB, and others.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-phy.ko
 
 if GREYBUS_BRIDGED_PHY
@@ -139,7 +139,7 @@ config GREYBUS_GPIO
 	  Select this option if you have a device that follows the
 	  Greybus GPIO Bridged PHY Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-gpio.ko
 
 config GREYBUS_I2C
@@ -149,7 +149,7 @@ config GREYBUS_I2C
 	  Select this option if you have a device that follows the
 	  Greybus I2C Bridged PHY Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-i2c.ko
 
 config GREYBUS_PWM
@@ -159,7 +159,7 @@ config GREYBUS_PWM
 	  Select this option if you have a device that follows the
 	  Greybus PWM Bridged PHY Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-pwm.ko
 
 config GREYBUS_SDIO
@@ -169,7 +169,7 @@ config GREYBUS_SDIO
 	  Select this option if you have a device that follows the
 	  Greybus SDIO Bridged PHY Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-sdio.ko
 
 config GREYBUS_SPI
@@ -179,7 +179,7 @@ config GREYBUS_SPI
 	  Select this option if you have a device that follows the
 	  Greybus SPI Bridged PHY Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-spi.ko
 
 config GREYBUS_UART
@@ -189,7 +189,7 @@ config GREYBUS_UART
 	  Select this option if you have a device that follows the
 	  Greybus UART Bridged PHY Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-uart.ko
 
 config GREYBUS_USB
@@ -199,7 +199,7 @@ config GREYBUS_USB
 	  Select this option if you have a device that follows the
 	  Greybus USB Host Bridged PHY Class specification.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-usb.ko
 
 endif	# GREYBUS_BRIDGED_PHY
@@ -210,7 +210,7 @@ config GREYBUS_ARCHE
 	help
 	  Select this option if you have an Arche device.
 
-	  To compile this code as a module, chose M here: the module
+	  To compile this code as a module, chose M here: the woke module
 	  will be called gb-arche.ko
 
 endif	# GREYBUS

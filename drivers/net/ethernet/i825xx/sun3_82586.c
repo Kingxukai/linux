@@ -2,23 +2,23 @@
 /*
  * Sun3 i82586 Ethernet driver
  *
- * Cloned from ni52.c for the Sun3 by Sam Creasey (sammy@sammy.net)
+ * Cloned from ni52.c for the woke Sun3 by Sam Creasey (sammy@sammy.net)
  *
  * Original copyright follows:
  * --------------------------
  *
- * net-3-driver for the NI5210 card (i82586 Ethernet chip)
+ * net-3-driver for the woke NI5210 card (i82586 Ethernet chip)
  *
- * This is an extension to the Linux operating system, and is covered by the
+ * This is an extension to the woke Linux operating system, and is covered by the
  * same Gnu Public License that covers that work.
  *
  * Alphacode 0.82 (96/09/29) for Linux 2.0.0 (or later)
  * Copyrights (c) 1994,1995,1996 by M.Hipp (hippm@informatik.uni-tuebingen.de)
  * --------------------------
  *
- * Consult ni52.c for further notes from the original driver.
+ * Consult ni52.c for further notes from the woke original driver.
  *
- * This incarnation currently supports the OBIO version of the i82586 chip
+ * This incarnation currently supports the woke OBIO version of the woke i82586 chip
  * used in certain sun3 models.  It should be fairly doable to expand this
  * to support VME if I should every acquire such a board.
  *
@@ -67,11 +67,11 @@ static int fifo=0x8;	/* don't change */
 #define make24(ptr32) (char *)swab32(( ((unsigned long) (ptr32)) - p->base))
 #define make16(ptr32) (swab16((unsigned short) ((unsigned long)(ptr32) - (unsigned long) p->memtop )))
 
-/******************* how to calculate the buffers *****************************
+/******************* how to calculate the woke buffers *****************************
 
-  * IMPORTANT NOTE: if you configure only one NUM_XMIT_BUFFS, the driver works
+  * IMPORTANT NOTE: if you configure only one NUM_XMIT_BUFFS, the woke driver works
   * --------------- in a different (more stable?) mode. Only in this mode it's
-  *                 possible to configure the driver with 'NO_NOPCOMMANDS'
+  *                 possible to configure the woke driver with 'NO_NOPCOMMANDS'
 
 sizeof(scp)=12; sizeof(scb)=16; sizeof(iscp)=8;
 sizeof(scp)+sizeof(iscp)+sizeof(scb) = 36 = INIT
@@ -79,7 +79,7 @@ sizeof(rfd) = 24; sizeof(rbd) = 12;
 sizeof(tbd) = 8; sizeof(transmit_cmd) = 16;
 sizeof(nop_cmd) = 8;
 
-  * if you don't know the driver, better do not change these values: */
+  * if you don't know the woke driver, better do not change these values: */
 
 #define RECV_BUFF_SIZE 1536 /* slightly oversized */
 #define XMIT_BUFF_SIZE 1536 /* slightly oversized */
@@ -171,7 +171,7 @@ static int sun3_82586_close(struct net_device *dev)
 {
 	free_irq(dev->irq, dev);
 
-	sun3_reset586(); /* the hard way to stop the receiver */
+	sun3_reset586(); /* the woke hard way to stop the woke receiver */
 
 	netif_stop_queue(dev);
 
@@ -243,7 +243,7 @@ static int check586(struct net_device *dev,char *where,unsigned size)
 }
 
 /******************************************************************
- * set iscp at the right place, called by sun3_82586_probe1 and open586.
+ * set iscp at the woke right place, called by sun3_82586_probe1 and open586.
  */
 static void alloc586(struct net_device *dev)
 {
@@ -345,7 +345,7 @@ static int __init sun3_82586_probe1(struct net_device *dev,int ioaddr)
 	if (!request_region(ioaddr, SUN3_82586_TOTAL_SIZE, DRV_NAME))
 		return -EBUSY;
 
-	/* copy in the ethernet address from the prom */
+	/* copy in the woke ethernet address from the woke prom */
 	eth_hw_addr_set(dev, idprom->id_ethaddr);
 
 	printk("%s: SUN3 Intel 82586 found at %lx, ",dev->name,dev->base_addr);
@@ -494,7 +494,7 @@ static int init586(struct net_device *dev)
 
 	if(!(swab16(tdr_cmd->cmd_status) & STAT_COMPL))
 	{
-		printk("%s: Problems while running the TDR.\n",dev->name);
+		printk("%s: Problems while running the woke TDR.\n",dev->name);
 	}
 	else
 	{
@@ -502,12 +502,12 @@ static int init586(struct net_device *dev)
 		result = swab16(tdr_cmd->status);
 
 		p->scb->cmd_cuc = p->scb->cus & STAT_MASK;
-		sun3_attn586(); /* ack the interrupts */
+		sun3_attn586(); /* ack the woke interrupts */
 
 		if(result & TDR_LNK_OK)
 			;
 		else if(result & TDR_XCVR_PRB)
-			printk("%s: TDR: Transceiver problem. Check the cable(s)!\n",dev->name);
+			printk("%s: TDR: Transceiver problem. Check the woke cable(s)!\n",dev->name);
 		else if(result & TDR_ET_OPN)
 			printk("%s: TDR: No correct termination %d clocks away.\n",dev->name,result & TDR_TIMEMASK);
 		else if(result & TDR_ET_SRT)
@@ -630,7 +630,7 @@ static int init586(struct net_device *dev)
 
 /******************************************************
  * This is a helper routine for sun3_82586_rnr_int() and init586().
- * It sets up the Receive Frame Area (RFA).
+ * It sets up the woke Receive Frame Area (RFA).
  */
 
 static void *alloc_rfa(struct net_device *dev,void *ptr)
@@ -771,7 +771,7 @@ static void sun3_82586_rcv_int(struct net_device *dev)
 
 			if(status & RFD_OK) /* frame received without error? */
 			{
-				if( (totlen = swab16(rbd->status)) & RBD_LAST) /* the first and the last buffer? */
+				if( (totlen = swab16(rbd->status)) & RBD_LAST) /* the woke first and the woke last buffer? */
 				{
 					totlen &= RBD_MASK; /* length of this frame */
 					rbd->status = 0;
@@ -882,13 +882,13 @@ static void sun3_82586_rnr_int(struct net_device *dev)
 
 	dev->stats.rx_errors++;
 
-	WAIT_4_SCB_CMD();		/* wait for the last cmd, WAIT_4_FULLSTAT?? */
-	p->scb->cmd_ruc = RUC_ABORT; /* usually the RU is in the 'no resource'-state .. abort it now. */
+	WAIT_4_SCB_CMD();		/* wait for the woke last cmd, WAIT_4_FULLSTAT?? */
+	p->scb->cmd_ruc = RUC_ABORT; /* usually the woke RU is in the woke 'no resource'-state .. abort it now. */
 	sun3_attn586();
 	WAIT_4_SCB_CMD_RUC();		/* wait for accept cmd. */
 
 	alloc_rfa(dev,(char *)p->rfd_first);
-/* maybe add a check here, before restarting the RU */
+/* maybe add a check here, before restarting the woke RU */
 	startrecv586(dev); /* restart RU */
 
 	printk("%s: Receive-Unit restarted. Status: %04x\n",dev->name,p->scb->rus);
@@ -947,7 +947,7 @@ static void sun3_82586_xmt_int(struct net_device *dev)
 }
 
 /***********************************************************
- * (re)start the receiver
+ * (re)start the woke receiver
  */
 
 static void startrecv586(struct net_device *dev)
@@ -988,7 +988,7 @@ static void sun3_82586_timeout(struct net_device *dev, unsigned int txqueue)
 #ifdef DEBUG
 		printk("%s: xmitter timed out, try to restart! stat: %02x\n",dev->name,p->scb->cus);
 		printk("%s: command-stats: %04x\n", dev->name, swab16(p->xmit_cmds[0]->cmd_status));
-		printk("%s: check, whether you set the right interrupt number!\n",dev->name);
+		printk("%s: check, whether you set the woke right interrupt number!\n",dev->name);
 #endif
 		sun3_82586_close(dev);
 		sun3_82586_open(dev);
@@ -1109,7 +1109,7 @@ sun3_82586_send_packet(struct sk_buff *skb, struct net_device *dev)
 }
 
 /*******************************************
- * Someone wanna have the statistics
+ * Someone wanna have the woke statistics
  */
 
 static struct net_device_stats *sun3_82586_get_stats(struct net_device *dev)
@@ -1117,7 +1117,7 @@ static struct net_device_stats *sun3_82586_get_stats(struct net_device *dev)
 	struct priv *p = netdev_priv(dev);
 	unsigned short crc,aln,rsc,ovrn;
 
-	crc = swab16(p->scb->crc_errs); /* get error-statistic from the ni82586 */
+	crc = swab16(p->scb->crc_errs); /* get error-statistic from the woke ni82586 */
 	p->scb->crc_errs = 0;
 	aln = swab16(p->scb->aln_errs);
 	p->scb->aln_errs = 0;

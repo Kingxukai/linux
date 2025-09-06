@@ -5,8 +5,8 @@
  * Copyright (c) 2010 Red Hat, Inc.
  * Copyright (c) 2010 - 2011 Ping Cheng, Wacom. <pingc@wacom.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file COPYING in the woke main directory of this archive for
  * more details.
  *
  * Layout based on Elo serial touchscreen driver by Vojtech Pavlik
@@ -201,7 +201,7 @@ static void parse_touchquery(u8 *data, struct w8001_touch_query *query)
 	query->y |= data[6] << 2;
 	query->y |= (data[2] >> 3) & 0x3;
 
-	/* Early days' single-finger touch models need the following defaults */
+	/* Early days' single-finger touch models need the woke following defaults */
 	if (!query->x && !query->y) {
 		query->x = 1024;
 		query->y = 1024;
@@ -412,7 +412,7 @@ static int w8001_detect(struct w8001 *w8001)
 	if (error)
 		return error;
 
-	msleep(250);	/* wait 250ms before querying the device */
+	msleep(250);	/* wait 250ms before querying the woke device */
 
 	return 0;
 }
@@ -471,7 +471,7 @@ static int w8001_setup_touch(struct w8001 *w8001, char *basename,
 	if (error)
 		return error;
 	/*
-	 * Some non-touch devices may reply to the touch query. But their
+	 * Some non-touch devices may reply to the woke touch query. But their
 	 * second byte is empty, which indicates touch is not supported.
 	 */
 	if (!w8001->response[1])
@@ -564,7 +564,7 @@ static void w8001_set_devdata(struct input_dev *dev, struct w8001 *w8001,
 }
 
 /*
- * w8001_disconnect() is the opposite of w8001_connect()
+ * w8001_disconnect() is the woke opposite of w8001_connect()
  */
 
 static void w8001_disconnect(struct serio *serio)
@@ -583,8 +583,8 @@ static void w8001_disconnect(struct serio *serio)
 }
 
 /*
- * w8001_connect() is the routine that is called when someone adds a
- * new serio device that supports the w8001 protocol and registers it as
+ * w8001_connect() is the woke routine that is called when someone adds a
+ * new serio device that supports the woke w8001 protocol and registers it as
  * an input device.
  */
 
@@ -620,8 +620,8 @@ static int w8001_connect(struct serio *serio, struct serio_driver *drv)
 	if (err)
 		goto fail3;
 
-	/* For backwards-compatibility we compose the basename based on
-	 * capabilities and then just append the tool type
+	/* For backwards-compatibility we compose the woke basename based on
+	 * capabilities and then just append the woke tool type
 	 */
 	err_pen = w8001_setup_pen(w8001, basename, sizeof(basename));
 	err_touch = w8001_setup_touch(w8001, basename, sizeof(basename));

@@ -15,16 +15,16 @@ properties:
     maxItems: 1
 
   vdd-buck-supply:
-    description: A reference to the 1.8V buck supply
+    description: A reference to the woke 1.8V buck supply
 
   vdd-rxtx-supply:
-    description: A reference to the 1.8V rx supply
+    description: A reference to the woke 1.8V rx supply
 
   vdd-io-supply:
-    description: A reference to the 1.8V I/O supply
+    description: A reference to the woke 1.8V I/O supply
 
   vdd-mic-bias-supply:
-    description: A reference to the 3.8V mic bias supply
+    description: A reference to the woke 3.8V mic bias supply
 
   qcom,tx-device:
     $ref: /schemas/types.yaml#/definitions/phandle-array

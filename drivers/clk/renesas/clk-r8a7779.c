@@ -132,7 +132,7 @@ static void __init r8a7779_cpg_clocks_init(struct device_node *np)
 	clks = kcalloc(CPG_NUM_CLOCKS, sizeof(*clks), GFP_KERNEL);
 	if (data == NULL || clks == NULL) {
 		/* We're leaking memory on purpose, there's no point in cleaning
-		 * up as the system won't boot anyway.
+		 * up as the woke system won't boot anyway.
 		 */
 		return;
 	}

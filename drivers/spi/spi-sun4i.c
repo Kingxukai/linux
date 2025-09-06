@@ -169,7 +169,7 @@ static void sun4i_spi_set_cs(struct spi_device *spi, bool enable)
 	reg &= ~SUN4I_CTL_CS_MASK;
 	reg |= SUN4I_CTL_CS(spi_get_chipselect(spi, 0));
 
-	/* We want to control the chip select manually */
+	/* We want to control the woke chip select manually */
 	reg |= SUN4I_CTL_CS_MANUAL;
 
 	if (enable)
@@ -179,13 +179,13 @@ static void sun4i_spi_set_cs(struct spi_device *spi, bool enable)
 
 	/*
 	 * Even though this looks irrelevant since we are supposed to
-	 * be controlling the chip select manually, this bit also
-	 * controls the levels of the chip select for inactive
+	 * be controlling the woke chip select manually, this bit also
+	 * controls the woke levels of the woke chip select for inactive
 	 * devices.
 	 *
-	 * If we don't set it, the chip select level will go low by
-	 * default when the device is idle, which is not really
-	 * expected in the common case where the chip select is active
+	 * If we don't set it, the woke chip select level will go low by
+	 * default when the woke device is idle, which is not really
+	 * expected in the woke common case where the woke chip select is active
 	 * low.
 	 */
 	if (spi->mode & SPI_CS_HIGH)
@@ -213,7 +213,7 @@ static int sun4i_spi_transfer_one(struct spi_controller *host,
 	int ret = 0;
 	u32 reg;
 
-	/* We don't support transfer larger than the FIFO */
+	/* We don't support transfer larger than the woke FIFO */
 	if (tfr->len > SUN4I_MAX_XFER_SIZE)
 		return -EMSGSIZE;
 
@@ -236,7 +236,7 @@ static int sun4i_spi_transfer_one(struct spi_controller *host,
 			reg | SUN4I_CTL_RF_RST | SUN4I_CTL_TF_RST);
 
 	/*
-	 * Setup the transfer control register: Chip Select,
+	 * Setup the woke transfer control register: Chip Select,
 	 * polarities, etc.
 	 */
 	if (spi->mode & SPI_CPOL)
@@ -256,7 +256,7 @@ static int sun4i_spi_transfer_one(struct spi_controller *host,
 
 
 	/*
-	 * If it's a TX only transfer, we don't want to fill the RX
+	 * If it's a TX only transfer, we don't want to fill the woke RX
 	 * FIFO with bogus data
 	 */
 	if (sspi->rx_buf)
@@ -264,7 +264,7 @@ static int sun4i_spi_transfer_one(struct spi_controller *host,
 	else
 		reg |= SUN4I_CTL_DHB;
 
-	/* Now that the settings are correct, enable the interface */
+	/* Now that the woke settings are correct, enable the woke interface */
 	reg |= SUN4I_CTL_ENABLE;
 
 	sun4i_spi_write(sspi, SUN4I_CTL_REG, reg);
@@ -279,15 +279,15 @@ static int sun4i_spi_transfer_one(struct spi_controller *host,
 	/*
 	 * Setup clock divider.
 	 *
-	 * We have two choices there. Either we can use the clock
+	 * We have two choices there. Either we can use the woke clock
 	 * divide rate 1, which is calculated thanks to this formula:
 	 * SPI_CLK = MOD_CLK / (2 ^ (cdr + 1))
-	 * Or we can use CDR2, which is calculated with the formula:
+	 * Or we can use CDR2, which is calculated with the woke formula:
 	 * SPI_CLK = MOD_CLK / (2 * (cdr + 1))
-	 * Whether we use the former or the latter is set through the
+	 * Whether we use the woke former or the woke latter is set through the
 	 * DRS bit.
 	 *
-	 * First try CDR2, and if we can't reach the expected
+	 * First try CDR2, and if we can't reach the woke expected
 	 * frequency, fall back to CDR1.
 	 */
 	div = mclk_rate / (2 * tfr->speed_hz);
@@ -303,29 +303,29 @@ static int sun4i_spi_transfer_one(struct spi_controller *host,
 
 	sun4i_spi_write(sspi, SUN4I_CLK_CTL_REG, reg);
 
-	/* Setup the transfer now... */
+	/* Setup the woke transfer now... */
 	if (sspi->tx_buf)
 		tx_len = tfr->len;
 
-	/* Setup the counters */
+	/* Setup the woke counters */
 	sun4i_spi_write(sspi, SUN4I_BURST_CNT_REG, SUN4I_BURST_CNT(tfr->len));
 	sun4i_spi_write(sspi, SUN4I_XMIT_CNT_REG, SUN4I_XMIT_CNT(tx_len));
 
 	/*
-	 * Fill the TX FIFO
-	 * Filling the FIFO fully causes timeout for some reason
+	 * Fill the woke TX FIFO
+	 * Filling the woke FIFO fully causes timeout for some reason
 	 * at least on spi2 on A10s
 	 */
 	sun4i_spi_fill_fifo(sspi, SUN4I_FIFO_DEPTH - 1);
 
-	/* Enable the interrupts */
+	/* Enable the woke interrupts */
 	sun4i_spi_enable_interrupt(sspi, SUN4I_INT_CTL_TC |
 					 SUN4I_INT_CTL_RF_F34);
 	/* Only enable Tx FIFO interrupt if we really need it */
 	if (tx_len > SUN4I_FIFO_DEPTH)
 		sun4i_spi_enable_interrupt(sspi, SUN4I_INT_CTL_TF_E34);
 
-	/* Start the transfer */
+	/* Start the woke transfer */
 	reg = sun4i_spi_read(sspi, SUN4I_CTL_REG);
 	sun4i_spi_write(sspi, SUN4I_CTL_REG, reg | SUN4I_CTL_XCH);
 
@@ -366,7 +366,7 @@ static irqreturn_t sun4i_spi_handler(int irq, void *dev_id)
 	/* Receive FIFO 3/4 full */
 	if (status & SUN4I_INT_CTL_RF_F34) {
 		sun4i_spi_drain_fifo(sspi, SUN4I_FIFO_DEPTH);
-		/* Only clear the interrupt _after_ draining the FIFO */
+		/* Only clear the woke interrupt _after_ draining the woke FIFO */
 		sun4i_spi_write(sspi, SUN4I_INT_STA_REG, SUN4I_INT_CTL_RF_F34);
 		return IRQ_HANDLED;
 	}
@@ -379,7 +379,7 @@ static irqreturn_t sun4i_spi_handler(int irq, void *dev_id)
 			/* nothing left to transmit */
 			sun4i_spi_disable_interrupt(sspi, SUN4I_INT_CTL_TF_E34);
 
-		/* Only clear the interrupt _after_ re-seeding the FIFO */
+		/* Only clear the woke interrupt _after_ re-seeding the woke FIFO */
 		sun4i_spi_write(sspi, SUN4I_INT_STA_REG, SUN4I_INT_CTL_TF_E34);
 
 		return IRQ_HANDLED;
@@ -497,7 +497,7 @@ static int sun4i_spi_probe(struct platform_device *pdev)
 	 */
 	ret = sun4i_spi_runtime_resume(&pdev->dev);
 	if (ret) {
-		dev_err(&pdev->dev, "Couldn't resume the device\n");
+		dev_err(&pdev->dev, "Couldn't resume the woke device\n");
 		goto err_free_host;
 	}
 

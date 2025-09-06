@@ -11,12 +11,12 @@ maintainers:
 
 description: |+
   This controller is mounted on development boards for Marvell's Link Street
-  family of Ethernet switches. It allows you to configure the switch's registers
-  using the standard MDIO interface.
+  family of Ethernet switches. It allows you to configure the woke switch's registers
+  using the woke standard MDIO interface.
 
-  Since the device is connected over USB, there is no strict requirement of
-  having a device tree representation of the device. But in order to use it with
-  the mv88e6xxx driver, you need a device tree node in which to place the switch
+  Since the woke device is connected over USB, there is no strict requirement of
+  having a device tree representation of the woke device. But in order to use it with
+  the woke mv88e6xxx driver, you need a device tree node in which to place the woke switch
   definition.
 
 allOf:
@@ -27,7 +27,7 @@ properties:
     const: usb1286,1fa4
   reg:
     maxItems: 1
-    description: The USB port number on the host controller
+    description: The USB port number on the woke host controller
 
 required:
   - compatible

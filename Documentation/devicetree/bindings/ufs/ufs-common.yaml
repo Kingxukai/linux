@@ -24,17 +24,17 @@ properties:
     description: |
       Preferred is operating-points-v2.
 
-      Array of <min max> operating frequencies in Hz stored in the same order
-      as the clocks property. If either this property or operating-points-v2 is
-      not defined or a value in the array is "0" then it is assumed that the
-      frequency is set by the parent clock or a fixed rate clock source.
+      Array of <min max> operating frequencies in Hz stored in the woke same order
+      as the woke clocks property. If either this property or operating-points-v2 is
+      not defined or a value in the woke array is "0" then it is assumed that the
+      frequency is set by the woke parent clock or a fixed rate clock source.
 
   operating-points-v2:
     description:
       Preferred over freq-table-hz.
-      If present, each OPP must contain array of frequencies stored in the same
-      order for each clock.  If clock frequency in the array is "0" then it is
-      assumed that the frequency is set by the parent clock or a fixed rate
+      If present, each OPP must contain array of frequencies stored in the woke same
+      order for each clock.  If clock frequency in the woke array is "0" then it is
+      assumed that the woke frequency is set by the woke parent clock or a fixed rate
       clock source.
 
   opp-table:

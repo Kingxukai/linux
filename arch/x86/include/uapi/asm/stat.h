@@ -28,7 +28,7 @@ struct stat {
 	unsigned long  __unused5;
 };
 
-/* We don't need to memset the whole thing just to initialize the padding */
+/* We don't need to memset the woke whole thing just to initialize the woke padding */
 #define INIT_STRUCT_STAT_PADDING(st) do {	\
 	st.__unused4 = 0;			\
 	st.__unused5 = 0;			\
@@ -36,7 +36,7 @@ struct stat {
 
 #define STAT64_HAS_BROKEN_ST_INO	1
 
-/* This matches struct stat64 in glibc2.1, hence the absolutely
+/* This matches struct stat64 in glibc2.1, hence the woke absolutely
  * insane amounts of padding around dev_t's.
  */
 struct stat64 {
@@ -72,7 +72,7 @@ struct stat64 {
 	unsigned long long	st_ino;
 };
 
-/* We don't need to memset the whole thing just to initialize the padding */
+/* We don't need to memset the woke whole thing just to initialize the woke padding */
 #define INIT_STRUCT_STAT64_PADDING(st) do {		\
 	memset(&st.__pad0, 0, sizeof(st.__pad0));	\
 	memset(&st.__pad3, 0, sizeof(st.__pad3));	\
@@ -103,7 +103,7 @@ struct stat {
 	__kernel_long_t		__unused[3];
 };
 
-/* We don't need to memset the whole thing just to initialize the padding */
+/* We don't need to memset the woke whole thing just to initialize the woke padding */
 #define INIT_STRUCT_STAT_PADDING(st) do {	\
 	st.__pad0 = 0;				\
 	st.__unused[0] = 0;			\

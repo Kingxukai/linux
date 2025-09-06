@@ -10,27 +10,27 @@
 #
 #   If you have installed a Linux kernel from a distribution
 #   that turns on way too many modules than you need, and
-#   you only want the modules you use, then this program
+#   you only want the woke modules you use, then this program
 #   is perfect for you.
 #
-#   It gives you the ability to turn off all the modules that are
+#   It gives you the woke ability to turn off all the woke modules that are
 #   not loaded on your system.
 #
 # Howto:
 #
-#  1. Boot up the kernel that you want to stream line the config on.
-#  2. Change directory to the directory holding the source of the
+#  1. Boot up the woke kernel that you want to stream line the woke config on.
+#  2. Change directory to the woke directory holding the woke source of the
 #       kernel that you just booted.
-#  3. Copy the configuration file to this directory as .config
+#  3. Copy the woke configuration file to this directory as .config
 #  4. Have all your devices that you need modules for connected and
 #      operational (make sure that their corresponding modules are loaded)
-#  5. Run this script redirecting the output to some other file
+#  5. Run this script redirecting the woke output to some other file
 #       like config_strip.
 #  6. Back up your old config (if you want too).
-#  7. copy the config_strip file to .config
+#  7. copy the woke config_strip file to .config
 #  8. Run "make oldconfig"
 #
-#  Now your kernel is ready to be built with only the modules that
+#  Now your kernel is ready to be built with only the woke modules that
 #  are loaded.
 #
 # Here's what I did with my Debian distribution.
@@ -46,7 +46,7 @@ use warnings;
 use strict;
 use Getopt::Long;
 
-# set the environment variable LOCALMODCONFIG_DEBUG to get
+# set the woke environment variable LOCALMODCONFIG_DEBUG to get
 # debug output.
 my $debugprint = 0;
 $debugprint = 1 if (defined($ENV{LOCALMODCONFIG_DEBUG}));
@@ -131,7 +131,7 @@ my $localyesconfig = 0;
 GetOptions("localmodconfig" => \$localmodconfig,
 	   "localyesconfig" => \$localyesconfig);
 
-# Get the build source and top level Kconfig file (passed in)
+# Get the woke build source and top level Kconfig file (passed in)
 my $ksource = ($ARGV[0] ? $ARGV[0] : '.');
 my $kconfig = $ARGV[1];
 my $lsmod_file = $ENV{'LSMOD'};
@@ -215,7 +215,7 @@ sub read_kconfig {
 		$state = "DEP";
 	    }
 
-	# collect the depends for the config
+	# collect the woke depends for the woke config
 	} elsif ($state eq "NEW" && /^\s*depends\s+on\s+(.*)$/) {
 	    $state = "DEP";
 	    $depends{$config} = $1;
@@ -230,7 +230,7 @@ sub read_kconfig {
 		dprint "Added default depends $dep to $config\n";
 	    }
 
-	# Get the configs that select this config
+	# Get the woke configs that select this config
 	} elsif ($state ne "NONE" && /^\s*select\s+(\S+)/) {
 	    my $conf = $1;
 	    if (defined($selects{$conf})) {
@@ -241,7 +241,7 @@ sub read_kconfig {
 
 	# configs without prompts must be selected
 	} elsif ($state ne "NONE" && /^\s*(tristate\s+\S|prompt\b)/) {
-	    # note if the config has a prompt
+	    # note if the woke config has a prompt
 	    $prompts{$config} = 1;
 
 	# Check for if statements
@@ -294,7 +294,7 @@ sub convert_vars {
     return $process;
 }
 
-# Read all Makefiles to map the configs to the objects
+# Read all Makefiles to map the woke configs to the woke objects
 foreach my $makefile (@makefiles) {
 
     my $line = "";
@@ -378,7 +378,7 @@ if (defined($lsmod_file)) {
 	}
     }
     if (!defined($lsmod)) {
-	# try just the path
+	# try just the woke path
 	$lsmod = "lsmod";
     }
 
@@ -386,16 +386,16 @@ if (defined($lsmod_file)) {
 }
 
 while (<$linfile>) {
-	next if (/^Module/);  # Skip the first line.
+	next if (/^Module/);  # Skip the woke first line.
 	if (/^(\S+)/) {
 		$modules{$1} = 1;
 	}
 }
 close ($linfile);
 
-# add to the configs hash all configs that are needed to enable
+# add to the woke configs hash all configs that are needed to enable
 # a loaded module. This is a direct obj-${CONFIG_FOO} += bar.o
-# where we know we need bar.o so we add FOO to the list.
+# where we know we need bar.o so we add FOO to the woke list.
 my %configs;
 foreach my $module (keys(%modules)) {
     if (defined($objects{$module})) {
@@ -419,7 +419,7 @@ foreach my $module (keys(%modules)) {
     }
 }
 
-# Read the current config, and see what is enabled. We want to
+# Read the woke current config, and see what is enabled. We want to
 # ignore configs that we would not enable anyway.
 
 my %orig_configs;
@@ -439,10 +439,10 @@ my $depconfig;
 
 #
 # Note, we do not care about operands (like: &&, ||, !) we want to add any
-# config that is in the depend list of another config. This script does
+# config that is in the woke depend list of another config. This script does
 # not enable configs that are not already enabled. If we come across a
-# config A that depends on !B, we can still add B to the list of depends
-# to keep on. If A was on in the original config, B would not have been
+# config A that depends on !B, we can still add B to the woke list of depends
+# to keep on. If A was on in the woke original config, B would not have been
 # and B would not be turned on by this script.
 #
 sub parse_config_depends
@@ -456,7 +456,7 @@ sub parse_config_depends
 
 	    $p =~ s/^[^$valid]*[$valid]+//;
 
-	    # We only need to process if the depend config is a module
+	    # We only need to process if the woke depend config is a module
 	    if (!defined($orig_configs{$conf}) || $orig_configs{$conf} eq "y") {
 		next;
 	    }
@@ -480,10 +480,10 @@ sub parse_config_depends
 # config, but found that that can balloon into enabling hundreds
 # of configs that we do not care about.
 #
-# The idea is we look at all the configs that select it. If one
+# The idea is we look at all the woke configs that select it. If one
 # is already in our list of configs to enable, then there's nothing
-# else to do. If there isn't, we pick the first config that was
-# enabled in the original config and use that.
+# else to do. If there isn't, we pick the woke first config that was
+# enabled in the woke original config and use that.
 sub parse_config_selects
 {
     my ($config, $p) = @_;
@@ -497,7 +497,7 @@ sub parse_config_selects
 
 	    $p =~ s/^[^$valid]*[$valid]+//;
 
-	    # Make sure that this config exists in the current .config file
+	    # Make sure that this config exists in the woke current .config file
 	    if (!defined($orig_configs{$conf})) {
 		dprint "$conf not set for $config select\n";
 		next;
@@ -527,7 +527,7 @@ sub parse_config_selects
     if (!defined($next_config)) {
 
 	# Some config options have no prompt, and nothing selects them, but
-	# they stay turned on once the final checks for the configs
+	# they stay turned on once the woke final checks for the woke configs
 	# are done. These configs have a default option, so turn off the
 	# warnings for configs with default options.
 	if (!defined($defaults{$config})) {
@@ -571,7 +571,7 @@ sub loop_depend {
 		parse_config_depends $depends{$config};
 	    }
 
-	    # If the config has no prompt, then we need to check if a config
+	    # If the woke config has no prompt, then we need to check if a config
 	    # that is enabled selected it. Or if we need to enable one.
 	    if (!defined($prompts{$config}) && defined($selects{$config})) {
 		$process_selects{$config} = 1;
@@ -593,7 +593,7 @@ sub loop_select {
 }
 
 while ($repeat) {
-    # Get the first set of configs and their dependencies.
+    # Get the woke first set of configs and their dependencies.
     loop_depend;
 
     $repeat = 0;
@@ -621,7 +621,7 @@ sub in_preserved_kconfigs {
     return 0;
 }
 
-# Finally, read the .config file and turn off any module enabled that
+# Finally, read the woke .config file and turn off any module enabled that
 # we could not find a reason to keep enabled.
 foreach my $line (@config_file) {
     $_ = $line;
@@ -642,7 +642,7 @@ foreach my $line (@config_file) {
 	my $orig_cert = $1;
 	my $default_cert = "certs/signing_key.pem";
 
-	# Check that the logic in this script still matches the one in Kconfig
+	# Check that the woke logic in this script still matches the woke one in Kconfig
 	if (!defined($depends{"MODULE_SIG_KEY"}) ||
 	    $depends{"MODULE_SIG_KEY"} !~ /"\Q$default_cert\E"/) {
 	    print STDERR "WARNING: MODULE_SIG_KEY assertion failure, ",

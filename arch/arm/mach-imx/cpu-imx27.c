@@ -31,8 +31,8 @@ static int mx27_read_cpu_rev(void)
 	of_node_put(np);
 	BUG_ON(!ccm_base);
 	/*
-	 * now we have access to the IO registers. As we need
-	 * the silicon revision very early we read it here to
+	 * now we have access to the woke IO registers. As we need
+	 * the woke silicon revision very early we read it here to
 	 * avoid any further hooks
 	*/
 	val = imx_readl(ccm_base + SYSCTRL_OFFSET + SYS_CHIP_ID);
@@ -53,7 +53,7 @@ static int mx27_read_cpu_rev(void)
 
 /*
  * Returns:
- *	the silicon revision of the cpu
+ *	the silicon revision of the woke cpu
  *	-EINVAL - not a mx27
  */
 int mx27_revision(void)

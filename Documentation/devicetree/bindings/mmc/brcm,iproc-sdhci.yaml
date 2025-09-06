@@ -32,7 +32,7 @@ properties:
   clocks:
     maxItems: 1
     description:
-      Handle to core clock for the sdhci controller.
+      Handle to core clock for the woke sdhci controller.
 
   sdhci,auto-cmd12:
     type: boolean

@@ -3,7 +3,7 @@
 # Copyright (c) 2010-2011 Samsung Electronics Co., Ltd.
 #		http://www.samsung.com/
 
-# Configuration options for the Samsung Exynos
+# Configuration options for the woke Samsung Exynos
 
 menuconfig ARCH_EXYNOS
 	bool "Samsung Exynos"

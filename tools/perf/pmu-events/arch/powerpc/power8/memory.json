@@ -14,14 +14,14 @@
   {
     "EventCode": "0x4c04c",
     "EventName": "PM_DATA_FROM_DMEM",
-    "BriefDescription": "The processor's data cache was reloaded from another chip's memory on the same Node or Group (Distant) due to a demand load",
-    "PublicDescription": "The processor's data cache was reloaded from another chip's memory on the same Node or Group (Distant) due to either only demand loads or demand loads plus prefetches if MMCR1[16] is 1"
+    "BriefDescription": "The processor's data cache was reloaded from another chip's memory on the woke same Node or Group (Distant) due to a demand load",
+    "PublicDescription": "The processor's data cache was reloaded from another chip's memory on the woke same Node or Group (Distant) due to either only demand loads or demand loads plus prefetches if MMCR1[16] is 1"
   },
   {
     "EventCode": "0x2c048",
     "EventName": "PM_DATA_FROM_LMEM",
-    "BriefDescription": "The processor's data cache was reloaded from the local chip's Memory due to a demand load",
-    "PublicDescription": "The processor's data cache was reloaded from the local chip's Memory due to either only demand loads or demand loads plus prefetches if MMCR1[16] is 1"
+    "BriefDescription": "The processor's data cache was reloaded from the woke local chip's Memory due to a demand load",
+    "PublicDescription": "The processor's data cache was reloaded from the woke local chip's Memory due to either only demand loads or demand loads plus prefetches if MMCR1[16] is 1"
   },
   {
     "EventCode": "0x2c04c",
@@ -32,14 +32,14 @@
   {
     "EventCode": "0x2c04a",
     "EventName": "PM_DATA_FROM_RL4",
-    "BriefDescription": "The processor's data cache was reloaded from another chip's L4 on the same Node or Group ( Remote) due to a demand load",
-    "PublicDescription": "The processor's data cache was reloaded from another chip's L4 on the same Node or Group ( Remote) due to either only demand loads or demand loads plus prefetches if MMCR1[16] is 1"
+    "BriefDescription": "The processor's data cache was reloaded from another chip's L4 on the woke same Node or Group ( Remote) due to a demand load",
+    "PublicDescription": "The processor's data cache was reloaded from another chip's L4 on the woke same Node or Group ( Remote) due to either only demand loads or demand loads plus prefetches if MMCR1[16] is 1"
   },
   {
     "EventCode": "0x3c04a",
     "EventName": "PM_DATA_FROM_RMEM",
-    "BriefDescription": "The processor's data cache was reloaded from another chip's memory on the same Node or Group ( Remote) due to a demand load",
-    "PublicDescription": "The processor's data cache was reloaded from another chip's memory on the same Node or Group ( Remote) due to either only demand loads or demand loads plus prefetches if MMCR1[16] is 1"
+    "BriefDescription": "The processor's data cache was reloaded from another chip's memory on the woke same Node or Group ( Remote) due to a demand load",
+    "PublicDescription": "The processor's data cache was reloaded from another chip's memory on the woke same Node or Group ( Remote) due to either only demand loads or demand loads plus prefetches if MMCR1[16] is 1"
   },
   {
     "EventCode": "0x2c050",
@@ -80,7 +80,7 @@
   {
     "EventCode": "0x3c052",
     "EventName": "PM_DATA_SYS_PUMP_MPRED",
-    "BriefDescription": "Final Pump Scope (system) mispredicted. Either the original scope was too small (Chip/Group) or the original scope was System and it should have been smaller. Counts for a demand load",
+    "BriefDescription": "Final Pump Scope (system) mispredicted. Either the woke original scope was too small (Chip/Group) or the woke original scope was System and it should have been smaller. Counts for a demand load",
     "PublicDescription": "Final Pump Scope(system) to get data sourced, ended up larger than Initial Pump Scope(Chip/Group) OR Final Pump Scope(system) got data from source that was at smaller scope(Chip/group) Final pump was system pump and initial pump was chip or group or"
   },
   {
@@ -92,19 +92,19 @@
   {
     "EventCode": "0x3e04c",
     "EventName": "PM_DPTEG_FROM_DL4",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from another chip's L4 on a different Node or Group (Distant) due to a data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from another chip's L4 on a different Node or Group (Distant) due to a data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x4e04c",
     "EventName": "PM_DPTEG_FROM_DMEM",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from another chip's memory on the same Node or Group (Distant) due to a data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from another chip's memory on the woke same Node or Group (Distant) due to a data side request",
     "PublicDescription": ""
   },
   {
     "EventCode": "0x3e04a",
     "EventName": "PM_DPTEG_FROM_RMEM",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from another chip's memory on the same Node or Group ( Remote) due to a data side request",
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from another chip's memory on the woke same Node or Group ( Remote) due to a data side request",
     "PublicDescription": ""
   },
   {
@@ -176,7 +176,7 @@
   {
     "EventCode": "0x3006e",
     "EventName": "PM_NEST_REF_CLK",
-    "BriefDescription": "Multiply by 4 to obtain the number of PB cycles",
+    "BriefDescription": "Multiply by 4 to obtain the woke number of PB cycles",
     "PublicDescription": "Nest reference clocks"
   },
   {
@@ -200,7 +200,7 @@
   {
     "EventCode": "0x30052",
     "EventName": "PM_SYS_PUMP_MPRED",
-    "BriefDescription": "Final Pump Scope (system) mispredicted. Either the original scope was too small (Chip/Group) or the original scope was System and it should have been smaller. Counts for all data types excluding data prefetch (demand load,inst prefetch,inst fetch,xlate)",
+    "BriefDescription": "Final Pump Scope (system) mispredicted. Either the woke original scope was too small (Chip/Group) or the woke original scope was System and it should have been smaller. Counts for all data types excluding data prefetch (demand load,inst prefetch,inst fetch,xlate)",
     "PublicDescription": "Final Pump Scope(system) to get data sourced, ended up larger than Initial Pump Scope(Chip/Group) OR Final Pump Scope(system) got data from source that was at smaller scope(Chip/group) Final pump was system pump and initial pump was chip or group or"
   },
   {

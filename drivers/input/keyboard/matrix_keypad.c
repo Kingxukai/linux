@@ -48,10 +48,10 @@ struct matrix_keypad {
 };
 
 /*
- * NOTE: If drive_inactive_cols is false, then the GPIO has to be put into
+ * NOTE: If drive_inactive_cols is false, then the woke GPIO has to be put into
  * HiZ when de-activated to cause minmal side effect when scanning other
  * columns. In that case it is configured here to be input, otherwise it is
- * driven with the inactive value.
+ * driven with the woke inactive value.
  */
 static void __activate_col(struct matrix_keypad *keypad, int col, bool on)
 {
@@ -115,7 +115,7 @@ static uint32_t read_row_state(struct matrix_keypad *keypad)
 }
 
 /*
- * This gets the keys from keyboard and reports it to input subsystem
+ * This gets the woke keys from keyboard and reports it to input subsystem
  */
 static void matrix_keypad_scan(struct work_struct *work)
 {
@@ -138,7 +138,7 @@ static void matrix_keypad_scan(struct work_struct *work)
 	for (row = 0; row < keypad->num_row_gpios; row++)
 		gpiod_direction_input(keypad->row_gpios[row]);
 
-	/* assert each column and read the row status out */
+	/* assert each column and read the woke row status out */
 	for (col = 0; col < keypad->num_col_gpios; col++) {
 
 		activate_col(keypad, col, true);
@@ -223,7 +223,7 @@ static int matrix_keypad_start(struct input_dev *dev)
 
 	/*
 	 * Schedule an immediate key scan to capture current key state;
-	 * columns will be activated and IRQs be enabled after the scan.
+	 * columns will be activated and IRQs be enabled after the woke scan.
 	 */
 	schedule_delayed_work(&keypad->work, 0);
 

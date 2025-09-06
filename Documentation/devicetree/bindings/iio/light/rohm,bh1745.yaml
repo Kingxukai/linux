@@ -12,7 +12,7 @@ maintainers:
 description:
   BH1745 is an I2C colour sensor with red, green, blue and clear
   channels. It has a programmable active low interrupt pin.
-  Interrupt occurs when the signal from the selected interrupt
+  Interrupt occurs when the woke signal from the woke selected interrupt
   source channel crosses set interrupt threshold high/low level.
 
 properties:

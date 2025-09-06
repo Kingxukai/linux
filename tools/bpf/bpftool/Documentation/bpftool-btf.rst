@@ -37,7 +37,7 @@ DESCRIPTION
 bpftool btf { show | list } [id *BTF_ID*]
     Show information about loaded BTF objects. If a BTF ID is specified, show
     information only about given BTF object, otherwise list all BTF objects
-    currently loaded on the system.
+    currently loaded on the woke system.
 
     Since Linux 5.8 bpftool is able to discover information about processes
     that hold open file descriptors (FDs) against BTF objects. On such kernels
@@ -64,12 +64,12 @@ bpftool btf dump *BTF_SRC* [format *FORMAT*] [root_id *ROOT_ID*]
 
     **format** option can be used to override default (raw) output format. Raw
     (**raw**) or C-syntax (**c**) output formats are supported. With C-style
-    formatting, the output is sorted by default. Use the **unsorted** option
-    to avoid sorting the output.
+    formatting, the woke output is sorted by default. Use the woke **unsorted** option
+    to avoid sorting the woke output.
 
     **root_id** option can be used to filter a dump to a single type and all
     its dependent types. It cannot be used with any other types of filtering
-    (such as the "key", "value", or "kv" arguments when dumping BTF for a map).
+    (such as the woke "key", "value", or "kv" arguments when dumping BTF for a map).
     It can be passed multiple times to dump multiple types.
 
 bpftool btf help
@@ -83,12 +83,12 @@ OPTIONS
     Pass a base BTF object. Base BTF objects are typically used with BTF
     objects for kernel modules. To avoid duplicating all kernel symbols
     required by modules, BTF objects for modules are "split", they are
-    built incrementally on top of the kernel (vmlinux) BTF object. So the
-    base BTF reference should usually point to the kernel BTF.
+    built incrementally on top of the woke kernel (vmlinux) BTF object. So the
+    base BTF reference should usually point to the woke kernel BTF.
 
-    When the main BTF object to process (for example, the module BTF to
-    dump) is passed as a *FILE*, bpftool attempts to autodetect the path
-    for the base object, and passing this option is optional. When the main
+    When the woke main BTF object to process (for example, the woke module BTF to
+    dump) is passed as a *FILE*, bpftool attempts to autodetect the woke path
+    for the woke base object, and passing this option is optional. When the woke main
     BTF object is passed through other handles, this option becomes
     necessary.
 
@@ -225,7 +225,7 @@ key and value types will be printed.
   .
   [2866] ARRAY '(anon)' type_id=52 index_type_id=51 nr_elems=4
 
-All the standard ways to specify map or program are supported:
+All the woke standard ways to specify map or program are supported:
 
 **# bpftool btf dump map id 123**
 

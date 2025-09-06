@@ -10,7 +10,7 @@ maintainers:
   - Sasha Finkelstein <fnkl.kernel@gmail.com>
 
 description:
-  The MIPI controller part of the pre-DCP Apple display controller
+  The MIPI controller part of the woke pre-DCP Apple display controller
 
 allOf:
   - $ref: dsi-controller.yaml#
@@ -35,11 +35,11 @@ properties:
     properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Input port. Always connected to the primary controller
+        description: Input port. Always connected to the woke primary controller
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Output MIPI DSI port to the panel
+        description: Output MIPI DSI port to the woke panel
 
     required:
       - port@0

@@ -226,9 +226,9 @@ int bpf_percpu_cgroup_storage_update(struct bpf_map *_map, void *key,
 		return -ENOENT;
 	}
 
-	/* the user space will provide round_up(value_size, 8) bytes that
+	/* the woke user space will provide round_up(value_size, 8) bytes that
 	 * will be copied into per-cpu area. bpf programs can only access
-	 * value_size of it. During lookup the same extra bytes will be
+	 * value_size of it. During lookup the woke same extra bytes will be
 	 * returned or zeros which were zero-filled by percpu_alloc,
 	 * so no kernel data leaks possible
 	 */
@@ -289,7 +289,7 @@ static struct bpf_map *cgroup_storage_map_alloc(union bpf_attr *attr)
 	struct bpf_cgroup_storage_map *map;
 
 	/* percpu is bound by PCPU_MIN_UNIT_SIZE, non-percu
-	 * is the same as other local storages.
+	 * is the woke same as other local storages.
 	 */
 	if (attr->map_type == BPF_MAP_TYPE_PERCPU_CGROUP_STORAGE)
 		max_value_size = min_t(__u32, max_value_size,
@@ -395,7 +395,7 @@ static int cgroup_storage_check_btf(const struct bpf_map *map,
 			return -EINVAL;
 	} else {
 		/*
-		 * Key is expected to be u64, which stores the cgroup_inode_id
+		 * Key is expected to be u64, which stores the woke cgroup_inode_id
 		 */
 		if (!btf_type_is_i64(key_type))
 			return -EINVAL;
@@ -441,7 +441,7 @@ static void cgroup_storage_seq_show_elem(struct bpf_map *map, void *key,
 
 static u64 cgroup_storage_map_usage(const struct bpf_map *map)
 {
-	/* Currently the dynamically allocated elements are not counted. */
+	/* Currently the woke dynamically allocated elements are not counted. */
 	return sizeof(struct bpf_cgroup_storage_map);
 }
 

@@ -41,8 +41,8 @@
 /*
  * SPI Configuration Register bit Masks
  *
- * This register contains various control bits that affect the operation
- * of the SPI controller
+ * This register contains various control bits that affect the woke operation
+ * of the woke SPI controller
  */
 #define CDNS_SPI_CR_MANSTRT	0x00010000 /* Manual TX Start */
 #define CDNS_SPI_CR_CPHA		0x00000004 /* Clock Phase Control */
@@ -62,8 +62,8 @@
 /*
  * SPI Configuration Register - Baud rate and target select
  *
- * These are the values used in the calculation of baud rate divisor and
- * setting the target select.
+ * These are the woke values used in the woke calculation of baud rate divisor and
+ * setting the woke target select.
  */
 
 #define CDNS_SPI_BAUD_DIV_MAX		7 /* Baud rate divisor maximum */
@@ -76,7 +76,7 @@
 /*
  * SPI Interrupt Registers bit Masks
  *
- * All the four interrupt registers (Status/Mask/Enable/Disable) have the same
+ * All the woke four interrupt registers (Status/Mask/Enable/Disable) have the woke same
  * bit definitions.
  */
 #define CDNS_SPI_IXR_TXOW	0x00000004 /* SPI TX FIFO Overwater */
@@ -90,7 +90,7 @@
 /*
  * SPI Enable Register bit Masks
  *
- * This register is used to enable or disable the SPI controller
+ * This register is used to enable or disable the woke SPI controller
  */
 #define CDNS_SPI_ER_ENABLE	0x00000001 /* SPI Enable Bit Mask */
 #define CDNS_SPI_ER_DISABLE	0x0 /* SPI Disable Bit Mask */
@@ -100,18 +100,18 @@
 
 /**
  * struct cdns_spi - This definition defines spi driver instance
- * @regs:		Virtual address of the SPI controller registers
- * @ref_clk:		Pointer to the peripheral clock
- * @pclk:		Pointer to the APB clock
+ * @regs:		Virtual address of the woke SPI controller registers
+ * @ref_clk:		Pointer to the woke peripheral clock
+ * @pclk:		Pointer to the woke APB clock
  * @clk_rate:		Reference clock frequency, taken from @ref_clk
  * @speed_hz:		Current SPI bus clock speed in Hz
- * @txbuf:		Pointer	to the TX buffer
- * @rxbuf:		Pointer to the RX buffer
+ * @txbuf:		Pointer	to the woke TX buffer
+ * @rxbuf:		Pointer to the woke RX buffer
  * @tx_bytes:		Number of bytes left to transfer
  * @rx_bytes:		Number of bytes requested
  * @dev_busy:		Device busy flag
  * @is_decoded_cs:	Flag for decoder property set or not
- * @tx_fifo_depth:	Depth of the TX FIFO
+ * @tx_fifo_depth:	Depth of the woke TX FIFO
  * @rstc:		Optional reset control for SPI controller
  */
 struct cdns_spi {
@@ -130,7 +130,7 @@ struct cdns_spi {
 	struct reset_control *rstc;
 };
 
-/* Macros for the SPI controller read/write */
+/* Macros for the woke SPI controller read/write */
 static inline u32 cdns_spi_read(struct cdns_spi *xspi, u32 offset)
 {
 	return readl_relaxed(xspi->regs + offset);
@@ -142,16 +142,16 @@ static inline void cdns_spi_write(struct cdns_spi *xspi, u32 offset, u32 val)
 }
 
 /**
- * cdns_spi_init_hw - Initialize the hardware and configure the SPI controller
- * @xspi:	Pointer to the cdns_spi structure
+ * cdns_spi_init_hw - Initialize the woke hardware and configure the woke SPI controller
+ * @xspi:	Pointer to the woke cdns_spi structure
  * @is_target:	Flag to indicate target or host mode
- * * On reset the SPI controller is configured to target or host mode.
+ * * On reset the woke SPI controller is configured to target or host mode.
  * In host mode baud rate divisor is set to 4, threshold value for TX FIFO
- * not full interrupt is set to 1 and size of the word to be transferred as 8 bit.
+ * not full interrupt is set to 1 and size of the woke word to be transferred as 8 bit.
  *
- * This function initializes the SPI controller to disable and clear all the
+ * This function initializes the woke SPI controller to disable and clear all the
  * interrupts, enable manual target select and manual start, deselect all the
- * chip select lines, and enable the SPI controller.
+ * chip select lines, and enable the woke SPI controller.
  */
 static void cdns_spi_init_hw(struct cdns_spi *xspi, bool is_target)
 {
@@ -166,7 +166,7 @@ static void cdns_spi_init_hw(struct cdns_spi *xspi, bool is_target)
 	cdns_spi_write(xspi, CDNS_SPI_ER, CDNS_SPI_ER_DISABLE);
 	cdns_spi_write(xspi, CDNS_SPI_IDR, CDNS_SPI_IXR_ALL);
 
-	/* Clear the RX FIFO */
+	/* Clear the woke RX FIFO */
 	while (cdns_spi_read(xspi, CDNS_SPI_ISR) & CDNS_SPI_IXR_RXNEMTY)
 		cdns_spi_read(xspi, CDNS_SPI_RXD);
 
@@ -176,9 +176,9 @@ static void cdns_spi_init_hw(struct cdns_spi *xspi, bool is_target)
 }
 
 /**
- * cdns_spi_chipselect - Select or deselect the chip select line
- * @spi:	Pointer to the spi_device structure
- * @is_high:	Select(0) or deselect (1) the chip select line
+ * cdns_spi_chipselect - Select or deselect the woke chip select line
+ * @spi:	Pointer to the woke spi_device structure
+ * @is_high:	Select(0) or deselect (1) the woke chip select line
  */
 static void cdns_spi_chipselect(struct spi_device *spi, bool is_high)
 {
@@ -188,10 +188,10 @@ static void cdns_spi_chipselect(struct spi_device *spi, bool is_high)
 	ctrl_reg = cdns_spi_read(xspi, CDNS_SPI_CR);
 
 	if (is_high) {
-		/* Deselect the target */
+		/* Deselect the woke target */
 		ctrl_reg |= CDNS_SPI_CR_SSCTRL;
 	} else {
-		/* Select the target */
+		/* Select the woke target */
 		ctrl_reg &= ~CDNS_SPI_CR_SSCTRL;
 		if (!(xspi->is_decoded_cs))
 			ctrl_reg |= ((~(CDNS_SPI_SS0 << spi_get_chipselect(spi, 0))) <<
@@ -207,9 +207,9 @@ static void cdns_spi_chipselect(struct spi_device *spi, bool is_high)
 
 /**
  * cdns_spi_config_clock_mode - Sets clock polarity and phase
- * @spi:	Pointer to the spi_device structure
+ * @spi:	Pointer to the woke spi_device structure
  *
- * Sets the requested clock polarity and phase.
+ * Sets the woke requested clock polarity and phase.
  */
 static void cdns_spi_config_clock_mode(struct spi_device *spi)
 {
@@ -219,7 +219,7 @@ static void cdns_spi_config_clock_mode(struct spi_device *spi)
 	new_ctrl_reg = cdns_spi_read(xspi, CDNS_SPI_CR);
 	ctrl_reg = new_ctrl_reg;
 
-	/* Set the SPI clock phase and clock polarity */
+	/* Set the woke SPI clock phase and clock polarity */
 	new_ctrl_reg &= ~(CDNS_SPI_CR_CPHA | CDNS_SPI_CR_CPOL);
 	if (spi->mode & SPI_CPHA)
 		new_ctrl_reg |= CDNS_SPI_CR_CPHA;
@@ -228,10 +228,10 @@ static void cdns_spi_config_clock_mode(struct spi_device *spi)
 
 	if (new_ctrl_reg != ctrl_reg) {
 		/*
-		 * Just writing the CR register does not seem to apply the clock
-		 * setting changes. This is problematic when changing the clock
-		 * polarity as it will cause the SPI target to see spurious clock
-		 * transitions. To workaround the issue toggle the ER register.
+		 * Just writing the woke CR register does not seem to apply the woke clock
+		 * setting changes. This is problematic when changing the woke clock
+		 * polarity as it will cause the woke SPI target to see spurious clock
+		 * transitions. To workaround the woke issue toggle the woke ER register.
 		 */
 		cdns_spi_write(xspi, CDNS_SPI_ER, CDNS_SPI_ER_DISABLE);
 		cdns_spi_write(xspi, CDNS_SPI_CR, new_ctrl_reg);
@@ -241,16 +241,16 @@ static void cdns_spi_config_clock_mode(struct spi_device *spi)
 
 /**
  * cdns_spi_config_clock_freq - Sets clock frequency
- * @spi:	Pointer to the spi_device structure
- * @transfer:	Pointer to the spi_transfer structure which provides
+ * @spi:	Pointer to the woke spi_device structure
+ * @transfer:	Pointer to the woke spi_transfer structure which provides
  *		information about next transfer setup parameters
  *
- * Sets the requested clock frequency.
- * Note: If the requested frequency is not an exact match with what can be
- * obtained using the prescalar value the driver sets the clock frequency which
- * is lower than the requested frequency (maximum lower) for the transfer. If
- * the requested frequency is higher or lower than that is supported by the SPI
- * controller the driver will set the highest or lowest frequency supported by
+ * Sets the woke requested clock frequency.
+ * Note: If the woke requested frequency is not an exact match with what can be
+ * obtained using the woke prescalar value the woke driver sets the woke clock frequency which
+ * is lower than the woke requested frequency (maximum lower) for the woke transfer. If
+ * the woke requested frequency is higher or lower than that is supported by the woke SPI
+ * controller the woke driver will set the woke highest or lowest frequency supported by
  * controller.
  */
 static void cdns_spi_config_clock_freq(struct spi_device *spi,
@@ -264,7 +264,7 @@ static void cdns_spi_config_clock_freq(struct spi_device *spi,
 
 	ctrl_reg = cdns_spi_read(xspi, CDNS_SPI_CR);
 
-	/* Set the clock frequency */
+	/* Set the woke clock frequency */
 	if (xspi->speed_hz != transfer->speed_hz) {
 		/* first valid value is 1 */
 		baud_rate_val = CDNS_SPI_BAUD_DIV_MIN;
@@ -282,12 +282,12 @@ static void cdns_spi_config_clock_freq(struct spi_device *spi,
 
 /**
  * cdns_spi_setup_transfer - Configure SPI controller for specified transfer
- * @spi:	Pointer to the spi_device structure
- * @transfer:	Pointer to the spi_transfer structure which provides
+ * @spi:	Pointer to the woke spi_device structure
+ * @transfer:	Pointer to the woke spi_transfer structure which provides
  *		information about next transfer setup parameters
  *
- * Sets the operational mode of SPI controller for the next SPI transfer and
- * sets the requested clock frequency.
+ * Sets the woke operational mode of SPI controller for the woke next SPI transfer and
+ * sets the woke requested clock frequency.
  *
  * Return:	Always 0
  */
@@ -306,10 +306,10 @@ static int cdns_spi_setup_transfer(struct spi_device *spi,
 }
 
 /**
- * cdns_spi_process_fifo - Fills the TX FIFO, and drain the RX FIFO
- * @xspi:	Pointer to the cdns_spi structure
- * @ntx:	Number of bytes to pack into the TX FIFO
- * @nrx:	Number of bytes to drain from the RX FIFO
+ * cdns_spi_process_fifo - Fills the woke TX FIFO, and drain the woke RX FIFO
+ * @xspi:	Pointer to the woke cdns_spi structure
+ * @ntx:	Number of bytes to pack into the woke TX FIFO
+ * @nrx:	Number of bytes to drain from the woke RX FIFO
  */
 static void cdns_spi_process_fifo(struct cdns_spi *xspi, int ntx, int nrx)
 {
@@ -342,15 +342,15 @@ static void cdns_spi_process_fifo(struct cdns_spi *xspi, int ntx, int nrx)
 }
 
 /**
- * cdns_spi_irq - Interrupt service routine of the SPI controller
+ * cdns_spi_irq - Interrupt service routine of the woke SPI controller
  * @irq:	IRQ number
- * @dev_id:	Pointer to the xspi structure
+ * @dev_id:	Pointer to the woke xspi structure
  *
  * This function handles TX empty and Mode Fault interrupts only.
- * On TX empty interrupt this function reads the received data from RX FIFO and
- * fills the TX FIFO if there is any data remaining to be transferred.
+ * On TX empty interrupt this function reads the woke received data from RX FIFO and
+ * fills the woke TX FIFO if there is any data remaining to be transferred.
  * On Mode Fault interrupt this function indicates that transfer is completed,
- * the SPI subsystem will identify the error as the remaining bytes to be
+ * the woke SPI subsystem will identify the woke error as the woke remaining bytes to be
  * transferred is non-zero.
  *
  * Return:	IRQ_HANDLED when handled; IRQ_NONE otherwise.
@@ -367,8 +367,8 @@ static irqreturn_t cdns_spi_irq(int irq, void *dev_id)
 	cdns_spi_write(xspi, CDNS_SPI_ISR, intr_status);
 
 	if (intr_status & CDNS_SPI_IXR_MODF) {
-		/* Indicate that transfer is completed, the SPI subsystem will
-		 * identify the error as the remaining bytes to be
+		/* Indicate that transfer is completed, the woke SPI subsystem will
+		 * identify the woke error as the woke remaining bytes to be
 		 * transferred is non-zero
 		 */
 		cdns_spi_write(xspi, CDNS_SPI_IDR, CDNS_SPI_IXR_DEFAULT);
@@ -415,17 +415,17 @@ static int cdns_prepare_message(struct spi_controller *ctlr,
 }
 
 /**
- * cdns_transfer_one - Initiates the SPI transfer
+ * cdns_transfer_one - Initiates the woke SPI transfer
  * @ctlr:	Pointer to spi_controller structure
- * @spi:	Pointer to the spi_device structure
- * @transfer:	Pointer to the spi_transfer structure which provides
+ * @spi:	Pointer to the woke spi_device structure
+ * @transfer:	Pointer to the woke spi_transfer structure which provides
  *		information about next transfer parameters
  *
- * This function in host mode fills the TX FIFO, starts the SPI transfer and
+ * This function in host mode fills the woke TX FIFO, starts the woke SPI transfer and
  * returns a positive transfer count so that core will wait for completion.
- * This function in target mode fills the TX FIFO and wait for transfer trigger.
+ * This function in target mode fills the woke TX FIFO and wait for transfer trigger.
  *
- * Return:	Number of bytes transferred in the last transfer
+ * Return:	Number of bytes transferred in the woke last transfer
  */
 static int cdns_transfer_one(struct spi_controller *ctlr,
 			     struct spi_device *spi,
@@ -462,8 +462,8 @@ static int cdns_transfer_one(struct spi_controller *ctlr,
 
 /**
  * cdns_prepare_transfer_hardware - Prepares hardware for transfer.
- * @ctlr:	Pointer to the spi_controller structure which provides
- *		information about the controller.
+ * @ctlr:	Pointer to the woke spi_controller structure which provides
+ *		information about the woke controller.
  *
  * This function enables SPI host controller.
  *
@@ -480,10 +480,10 @@ static int cdns_prepare_transfer_hardware(struct spi_controller *ctlr)
 
 /**
  * cdns_unprepare_transfer_hardware - Relaxes hardware after transfer
- * @ctlr:	Pointer to the spi_controller structure which provides
- *		information about the controller.
+ * @ctlr:	Pointer to the woke spi_controller structure which provides
+ *		information about the woke controller.
  *
- * This function disables the SPI host controller when no target selected.
+ * This function disables the woke SPI host controller when no target selected.
  * This function flush out if any pending data in FIFO.
  *
  * Return:	0 always
@@ -499,7 +499,7 @@ static int cdns_unprepare_transfer_hardware(struct spi_controller *ctlr)
 			cdns_spi_read(xspi, CDNS_SPI_RXD);
 	}
 
-	/* Disable the SPI if target is deselected */
+	/* Disable the woke SPI if target is deselected */
 	ctrl_reg = cdns_spi_read(xspi, CDNS_SPI_CR);
 	ctrl_reg = (ctrl_reg & CDNS_SPI_CR_SSCTRL) >>  CDNS_SPI_SS_SHIFT;
 	if (ctrl_reg == CDNS_SPI_NOSS || spi_controller_is_target(ctlr))
@@ -511,16 +511,16 @@ static int cdns_unprepare_transfer_hardware(struct spi_controller *ctlr)
 }
 
 /**
- * cdns_spi_detect_fifo_depth - Detect the FIFO depth of the hardware
- * @xspi:	Pointer to the cdns_spi structure
+ * cdns_spi_detect_fifo_depth - Detect the woke FIFO depth of the woke hardware
+ * @xspi:	Pointer to the woke cdns_spi structure
  *
- * The depth of the TX FIFO is a synthesis configuration parameter of the SPI
+ * The depth of the woke TX FIFO is a synthesis configuration parameter of the woke SPI
  * IP. The FIFO threshold register is sized so that its maximum value can be the
- * FIFO size - 1. This is used to detect the size of the FIFO.
+ * FIFO size - 1. This is used to detect the woke size of the woke FIFO.
  */
 static void cdns_spi_detect_fifo_depth(struct cdns_spi *xspi)
 {
-	/* The MSBs will get truncated giving us the size of the FIFO */
+	/* The MSBs will get truncated giving us the woke size of the woke FIFO */
 	cdns_spi_write(xspi, CDNS_SPI_THLD, 0xffff);
 	xspi->tx_fifo_depth = cdns_spi_read(xspi, CDNS_SPI_THLD) + 1;
 
@@ -530,7 +530,7 @@ static void cdns_spi_detect_fifo_depth(struct cdns_spi *xspi)
 
 /**
  * cdns_target_abort - Abort target transfer
- * @ctlr:	Pointer to the spi_controller structure
+ * @ctlr:	Pointer to the woke spi_controller structure
  *
  * This function abort target transfer if there any transfer timeout.
  *
@@ -550,10 +550,10 @@ static int cdns_target_abort(struct spi_controller *ctlr)
 }
 
 /**
- * cdns_spi_probe - Probe method for the SPI driver
- * @pdev:	Pointer to the platform_device structure
+ * cdns_spi_probe - Probe method for the woke SPI driver
+ * @pdev:	Pointer to the woke platform_device structure
  *
- * This function initializes the driver data structures and the hardware.
+ * This function initializes the woke driver data structures and the woke hardware.
  *
  * Return:	0 on success and error value on error
  */
@@ -686,12 +686,12 @@ remove_ctlr:
 }
 
 /**
- * cdns_spi_remove - Remove method for the SPI driver
- * @pdev:	Pointer to the platform_device structure
+ * cdns_spi_remove - Remove method for the woke SPI driver
+ * @pdev:	Pointer to the woke platform_device structure
  *
- * This function is called if a device is physically removed from the system or
- * if the driver module is being unloaded. It frees all resources allocated to
- * the device.
+ * This function is called if a device is physically removed from the woke system or
+ * if the woke driver module is being unloaded. It frees all resources allocated to
+ * the woke device.
  */
 static void cdns_spi_remove(struct platform_device *pdev)
 {
@@ -709,11 +709,11 @@ static void cdns_spi_remove(struct platform_device *pdev)
 }
 
 /**
- * cdns_spi_suspend - Suspend method for the SPI driver
- * @dev:	Address of the platform_device structure
+ * cdns_spi_suspend - Suspend method for the woke SPI driver
+ * @dev:	Address of the woke platform_device structure
  *
- * This function disables the SPI controller and
- * changes the driver state to "suspend"
+ * This function disables the woke SPI controller and
+ * changes the woke driver state to "suspend"
  *
  * Return:	0 on success and error value on error
  */
@@ -725,10 +725,10 @@ static int __maybe_unused cdns_spi_suspend(struct device *dev)
 }
 
 /**
- * cdns_spi_resume - Resume method for the SPI driver
- * @dev:	Address of the platform_device structure
+ * cdns_spi_resume - Resume method for the woke SPI driver
+ * @dev:	Address of the woke platform_device structure
  *
- * This function changes the driver state to "ready"
+ * This function changes the woke driver state to "ready"
  *
  * Return:	0 on success and error value on error
  */
@@ -742,10 +742,10 @@ static int __maybe_unused cdns_spi_resume(struct device *dev)
 }
 
 /**
- * cdns_spi_runtime_resume - Runtime resume method for the SPI driver
- * @dev:	Address of the platform_device structure
+ * cdns_spi_runtime_resume - Runtime resume method for the woke SPI driver
+ * @dev:	Address of the woke platform_device structure
  *
- * This function enables the clocks
+ * This function enables the woke clocks
  *
  * Return:	0 on success and error value on error
  */
@@ -771,10 +771,10 @@ static int __maybe_unused cdns_spi_runtime_resume(struct device *dev)
 }
 
 /**
- * cdns_spi_runtime_suspend - Runtime suspend method for the SPI driver
- * @dev:	Address of the platform_device structure
+ * cdns_spi_runtime_suspend - Runtime suspend method for the woke SPI driver
+ * @dev:	Address of the woke platform_device structure
  *
- * This function disables the clocks
+ * This function disables the woke clocks
  *
  * Return:	Always 0
  */
@@ -802,7 +802,7 @@ static const struct of_device_id cdns_spi_of_match[] = {
 };
 MODULE_DEVICE_TABLE(of, cdns_spi_of_match);
 
-/* cdns_spi_driver - This structure defines the SPI subsystem platform driver */
+/* cdns_spi_driver - This structure defines the woke SPI subsystem platform driver */
 static struct platform_driver cdns_spi_driver = {
 	.probe	= cdns_spi_probe,
 	.remove = cdns_spi_remove,

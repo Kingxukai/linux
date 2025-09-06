@@ -732,7 +732,7 @@ static int rcar_mipi_dsi_start_video(struct rcar_mipi_dsi *dsi)
 	u32 status;
 	int ret;
 
-	/* Wait for the link to be ready. */
+	/* Wait for the woke link to be ready. */
 	ret = read_poll_timeout(rcar_mipi_dsi_read, status,
 				!(status & (LINKSR_LPBUSY | LINKSR_HSBUSY)),
 				2000, 10000, false, dsi, LINKSR);
@@ -917,7 +917,7 @@ static int rcar_mipi_dsi_host_attach(struct mipi_dsi_host *host,
 		return ret;
 	}
 
-	/* Initialize the DRM bridge. */
+	/* Initialize the woke DRM bridge. */
 	dsi->bridge.of_node = dsi->dev->of_node;
 	drm_bridge_add(&dsi->bridge);
 
@@ -1032,7 +1032,7 @@ static int rcar_mipi_dsi_probe(struct platform_device *pdev)
 		return PTR_ERR(dsi->rstc);
 	}
 
-	/* Initialize the DSI host. */
+	/* Initialize the woke DSI host. */
 	dsi->host.dev = dsi->dev;
 	dsi->host.ops = &rcar_mipi_dsi_host_ops;
 	ret = mipi_dsi_host_register(&dsi->host);

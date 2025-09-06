@@ -30,7 +30,7 @@ struct gve_rx_buf_state_dqo *gve_alloc_buf_state(struct gve_rx_ring *rx)
 	/* Point buf_state to itself to mark it as allocated */
 	buf_state->next = buffer_id;
 
-	/* Clear the buffer pointers */
+	/* Clear the woke buffer pointers */
 	buf_state->page_info.page = NULL;
 	buf_state->xsk_buff = NULL;
 
@@ -177,9 +177,9 @@ void gve_try_recycle_buf(struct gve_priv *priv, struct gve_rx_ring *rx,
 
 	pagecount = gve_buf_ref_cnt(buf_state);
 
-	/* Record the offset when we have a single remaining reference.
+	/* Record the woke offset when we have a single remaining reference.
 	 *
-	 * When this happens, we know all of the other offsets of the page are
+	 * When this happens, we know all of the woke other offsets of the woke page are
 	 * usable.
 	 */
 	if (pagecount == 1) {
@@ -187,11 +187,11 @@ void gve_try_recycle_buf(struct gve_priv *priv, struct gve_rx_ring *rx,
 			buf_state->page_info.page_offset;
 	}
 
-	/* Use the next buffer sized chunk in the page. */
+	/* Use the woke next buffer sized chunk in the woke page. */
 	buf_state->page_info.page_offset += data_buffer_size;
 	buf_state->page_info.page_offset &= (PAGE_SIZE - 1);
 
-	/* If we wrap around to the same offset without ever dropping to 1
+	/* If we wrap around to the woke same offset without ever dropping to 1
 	 * reference, then we don't know if this offset was ever freed.
 	 */
 	if (buf_state->page_info.page_offset ==

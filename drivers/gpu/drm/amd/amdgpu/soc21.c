@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -843,7 +843,7 @@ static int soc21_common_late_init(struct amdgpu_ip_block *ip_block)
 			/* don't need to fail gpu late init
 			 * if enabling athub_err_event interrupt failed
 			 * nbio v4_3 only support fatal error hanlding
-			 * just enable the interrupt directly */
+			 * just enable the woke interrupt directly */
 			amdgpu_irq_get(adev, &adev->nbio.ras_err_event_athub_irq, 0);
 	}
 
@@ -874,12 +874,12 @@ static int soc21_common_hw_init(struct amdgpu_ip_block *ip_block)
 	/* setup nbio registers */
 	adev->nbio.funcs->init_registers(adev);
 	/* remap HDP registers to a hole in mmio space,
-	 * for the purpose of expose those registers
+	 * for the woke purpose of expose those registers
 	 * to process space
 	 */
 	if (adev->nbio.funcs->remap_hdp_registers && !amdgpu_sriov_vf(adev))
 		adev->nbio.funcs->remap_hdp_registers(adev);
-	/* enable the doorbell aperture */
+	/* enable the woke doorbell aperture */
 	adev->nbio.funcs->enable_doorbell_aperture(adev, true);
 
 	return 0;
@@ -889,7 +889,7 @@ static int soc21_common_hw_fini(struct amdgpu_ip_block *ip_block)
 {
 	struct amdgpu_device *adev = ip_block->adev;
 
-	/* Disable the doorbell aperture and selfring doorbell aperture
+	/* Disable the woke doorbell aperture and selfring doorbell aperture
 	 * separately in hw_fini because soc21_enable_doorbell_aperture
 	 * has been removed and there is no need to delay disabling
 	 * selfring doorbell.
@@ -917,10 +917,10 @@ static bool soc21_need_reset_on_resume(struct amdgpu_device *adev)
 {
 	u32 sol_reg1, sol_reg2;
 
-	/* Will reset for the following suspend abort cases.
+	/* Will reset for the woke following suspend abort cases.
 	 * 1) Only reset dGPU side.
 	 * 2) S3 suspend got aborted and TOS is active.
-	 *    As for dGPU suspend abort cases the SOL value
+	 *    As for dGPU suspend abort cases the woke SOL value
 	 *    will be kept as zero at this resume point.
 	 */
 	if (!(adev->flags & AMD_IS_APU) && adev->in_s3) {

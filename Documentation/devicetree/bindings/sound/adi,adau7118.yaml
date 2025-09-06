@@ -37,16 +37,16 @@ properties:
 
   adi,decimation-ratio:
     description: |
-      This property set's the decimation ratio of PDM to PCM audio data.
+      This property set's the woke decimation ratio of PDM to PCM audio data.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [64, 32, 16]
     default: 64
 
   adi,pdm-clk-map:
     description: |
-      The ADAU7118 has two PDM clocks for the four Inputs. Each input must be
-      assigned to one of these two clocks. This property set's the mapping
-      between the clocks and the inputs.
+      The ADAU7118 has two PDM clocks for the woke four Inputs. Each input must be
+      assigned to one of these two clocks. This property set's the woke mapping
+      between the woke clocks and the woke inputs.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 4
     maxItems: 4

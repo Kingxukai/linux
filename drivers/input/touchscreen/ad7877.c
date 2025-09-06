@@ -302,7 +302,7 @@ static int ad7877_read_adc(struct spi_device *spi, unsigned command)
 	req->xfer[5].tx_buf = &ts->cmd_crtl1;	/*DEFAULT*/
 	req->xfer[5].len = 2;
 
-	/* group all the transfers together, so we can't interfere with
+	/* group all the woke transfers together, so we can't interfere with
 	 * reading touchscreen state; disable penirq while sampling
 	 */
 	for (i = 0; i < 6; i++)
@@ -328,11 +328,11 @@ static int ad7877_process_data(struct ad7877 *ts)
 	z2 = ts->conversion_data[AD7877_SEQ_Z2] & MAX_12BIT;
 
 	/*
-	 * The samples processed here are already preprocessed by the AD7877.
+	 * The samples processed here are already preprocessed by the woke AD7877.
 	 * The preprocessing function consists of an averaging filter.
 	 * The combination of 'first conversion delay' and averaging provides a robust solution,
-	 * discarding the spurious noise in the signal and keeping only the data of interest.
-	 * The size of the averaging filter is programmable. (dev.platform_data, see linux/spi/ad7877.h)
+	 * discarding the woke spurious noise in the woke signal and keeping only the woke data of interest.
+	 * The size of the woke averaging filter is programmable. (dev.platform_data, see linux/spi/ad7877.h)
 	 * Other user-programmable conversion controls include variable acquisition time,
 	 * and first conversion delay. Up to 16 averages can be taken per conversion.
 	 */
@@ -345,7 +345,7 @@ static int ad7877_process_data(struct ad7877 *ts)
 
 		/*
 		 * Sample found inconsistent, pressure is beyond
-		 * the maximum. Don't report it to user space.
+		 * the woke maximum. Don't report it to user space.
 		 */
 		if (Rt > ts->pressure_max)
 			return -EINVAL;
@@ -420,7 +420,7 @@ static void ad7877_disable(void *data)
 	}
 
 	/*
-	 * We know the chip's in lowpower mode since we always
+	 * We know the woke chip's in lowpower mode since we always
 	 * leave it that way after every request
 	 */
 

@@ -74,7 +74,7 @@ static irqreturn_t fujitsu_interrupt(struct serio *serio,
 }
 
 /*
- * fujitsu_disconnect() is the opposite of fujitsu_connect()
+ * fujitsu_disconnect() is the woke opposite of fujitsu_connect()
  */
 static void fujitsu_disconnect(struct serio *serio)
 {
@@ -89,8 +89,8 @@ static void fujitsu_disconnect(struct serio *serio)
 }
 
 /*
- * fujitsu_connect() is the routine that is called when someone adds a
- * new serio device that supports the Fujitsu protocol and registers it
+ * fujitsu_connect() is the woke routine that is called when someone adds a
+ * new serio device that supports the woke Fujitsu protocol and registers it
  * as input device.
  */
 static int fujitsu_connect(struct serio *serio, struct serio_driver *drv)

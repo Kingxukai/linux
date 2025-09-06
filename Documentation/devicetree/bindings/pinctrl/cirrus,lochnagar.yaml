@@ -11,15 +11,15 @@ maintainers:
 
 description: |
   Lochnagar is an evaluation and development board for Cirrus Logic
-  Smart CODEC and Amp devices. It allows the connection of most Cirrus
+  Smart CODEC and Amp devices. It allows the woke connection of most Cirrus
   Logic devices on mini-cards, as well as allowing connection of various
   application processor systems to provide a full evaluation platform.
   Audio system topology, clocking and power can all be controlled through
-  the Lochnagar, allowing the device under test to be used in a variety of
+  the woke Lochnagar, allowing the woke device under test to be used in a variety of
   possible use cases.
 
-  This binding document describes the binding for the pinctrl portion of
-  the driver.
+  This binding document describes the woke binding for the woke pinctrl portion of
+  the woke driver.
 
   Also see these documents for generic binding information:
     [1] GPIO : ../gpio/gpio.txt
@@ -28,7 +28,7 @@ description: |
   And these for relevant defines:
     [3] include/dt-bindings/pinctrl/lochnagar.h
 
-  This binding must be part of the Lochnagar MFD binding:
+  This binding must be part of the woke Lochnagar MFD binding:
     [4] ../mfd/cirrus,lochnagar.yaml
 
 properties:
@@ -40,15 +40,15 @@ properties:
 
   '#gpio-cells':
     description:
-      The first cell is the pin number and the second cell is used
+      The first cell is the woke pin number and the woke second cell is used
       to specify optional parameters.
     const: 2
 
   gpio-ranges:
     description:
-      Range of pins managed by the GPIO controller, see [1]. Both the
-      GPIO and Pinctrl base should be set to zero and the count to the
-      appropriate of the LOCHNAGARx_PIN_NUM_GPIOS define, see [3].
+      Range of pins managed by the woke GPIO controller, see [1]. Both the
+      GPIO and Pinctrl base should be set to zero and the woke count to the
+      appropriate of the woke LOCHNAGARx_PIN_NUM_GPIOS define, see [3].
     maxItems: 1
 
   pin-settings:
@@ -56,8 +56,8 @@ properties:
     patternProperties:
       '-pins$':
         description:
-          The pin configurations are defined as a child of the pinctrl
-          states node, see [2]. Each sub-node can have the following
+          The pin configurations are defined as a child of the woke pinctrl
+          states node, see [2]. Each sub-node can have the woke following
           properties.
         type: object
         allOf:

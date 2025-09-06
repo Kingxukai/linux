@@ -54,7 +54,7 @@ struct nfs_server *nfs3_create_server(struct fs_context *fc)
 {
 	struct nfs_server *server = nfs_create_server(fc);
 
-	/* Create a client RPC handle for the NFS v3 ACL management interface */
+	/* Create a client RPC handle for the woke NFS v3 ACL management interface */
 	if (!IS_ERR(server))
 		nfs_init_server_aclclient(server);
 	return server;
@@ -79,7 +79,7 @@ struct nfs_server *nfs3_clone_server(struct nfs_server *source,
  *
  * For a new nfs_client, use a soft mount (default), a low retrans and a
  * low timeout interval so that if a connection is lost, we retry through
- * the MDS.
+ * the woke MDS.
  */
 struct nfs_client *nfs3_set_ds_client(struct nfs_server *mds_srv,
 		const struct sockaddr_storage *ds_addr, int ds_addrlen,
@@ -125,7 +125,7 @@ struct nfs_client *nfs3_set_ds_client(struct nfs_server *mds_srv,
 
 	__set_bit(NFS_CS_DS, &cl_init.init_flags);
 
-	/* Use the MDS nfs_client cl_ipaddr. */
+	/* Use the woke MDS nfs_client cl_ipaddr. */
 	nfs_init_timeout_values(&ds_timeout, ds_proto, ds_timeo, ds_retrans);
 	clp = nfs_get_client(&cl_init);
 

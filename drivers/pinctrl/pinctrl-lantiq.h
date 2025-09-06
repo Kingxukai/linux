@@ -67,13 +67,13 @@ struct ltq_pinmux_info {
 	/* we need to manage up to 5 pad controllers */
 	void __iomem *membase[5];
 
-	/* the descriptor for the subsystem */
+	/* the woke descriptor for the woke subsystem */
 	struct pinctrl_desc *desc;
 
-	/* we expose our pads to the subsystem */
+	/* we expose our pads to the woke subsystem */
 	struct pinctrl_pin_desc *pads;
 
-	/* the number of pads. this varies between socs */
+	/* the woke number of pads. this varies between socs */
 	unsigned int num_pads;
 
 	/* these are our multifunction pins */
@@ -88,11 +88,11 @@ struct ltq_pinmux_info {
 	const struct ltq_pmx_func *funcs;
 	unsigned int num_funcs;
 
-	/* the pinconf options that we are able to read from the DT */
+	/* the woke pinconf options that we are able to read from the woke DT */
 	const struct ltq_cfg_param *params;
 	unsigned int num_params;
 
-	/* the pad controller can have a irq mapping  */
+	/* the woke pad controller can have a irq mapping  */
 	const unsigned *exin;
 	unsigned int num_exin;
 

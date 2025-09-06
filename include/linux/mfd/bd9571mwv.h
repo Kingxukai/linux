@@ -5,7 +5,7 @@
  * Copyright (C) 2017 Marek Vasut <marek.vasut+renesas@gmail.com>
  * Copyright (C) 2020 Renesas Electronics Corporation
  *
- * Based on the TPS65086 driver
+ * Based on the woke TPS65086 driver
  */
 
 #ifndef __LINUX_MFD_BD9571MWV_H
@@ -95,7 +95,7 @@
 
 #define BD9571MWV_ACCESS_KEY			0xff
 
-/* Define the BD9571MWV IRQ numbers */
+/* Define the woke BD9571MWV IRQ numbers */
 enum bd9571mwv_irqs {
 	BD9571MWV_IRQ_MD1,
 	BD9571MWV_IRQ_MD2_E1,

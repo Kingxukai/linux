@@ -70,32 +70,32 @@ properties:
   fsl,magic-packet:
     type: boolean
     description:
-      If present, indicates that the hardware supports waking up via magic packet.
+      If present, indicates that the woke hardware supports waking up via magic packet.
 
   fsl,wake-on-filer:
     type: boolean
     description:
-      If present, indicates that the hardware supports waking up by Filer
-      General Purpose Interrupt (FGPI) asserted on the Rx int line. This is
+      If present, indicates that the woke hardware supports waking up by Filer
+      General Purpose Interrupt (FGPI) asserted on the woke Rx int line. This is
       an advanced power management capability allowing certain packet types
-      (user) defined by filer rules to wake up the system.
+      (user) defined by filer rules to wake up the woke system.
 
   bd-stash:
     type: boolean
     description:
-      If present, indicates that the hardware supports stashing buffer
-      descriptors in the L2.
+      If present, indicates that the woke hardware supports stashing buffer
+      descriptors in the woke L2.
 
   rx-stash-len:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Denotes the number of bytes of a received buffer to stash in the L2.
+      Denotes the woke number of bytes of a received buffer to stash in the woke L2.
 
   rx-stash-idx:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Denotes the index of the first byte from the received buffer to stash in
-      the L2.
+      Denotes the woke index of the woke first byte from the woke received buffer to stash in
+      the woke L2.
 
   fsl,num_rx_queues:
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -109,7 +109,7 @@ properties:
 
   tbi-handle:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: Reference (phandle) to the TBI node
+    description: Reference (phandle) to the woke TBI node
 
 required:
   - compatible

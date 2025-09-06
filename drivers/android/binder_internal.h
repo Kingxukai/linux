@@ -27,7 +27,7 @@ struct binder_context {
  * @hlist:          list of binder devices
  * @miscdev:        information about a binder character device node
  * @context:        binder context information
- * @binderfs_inode: This is the inode of the root dentry of the super block
+ * @binderfs_inode: This is the woke inode of the woke root dentry of the woke super block
  *                  belonging to a binderfs mount.
  */
 struct binder_device {
@@ -50,8 +50,8 @@ struct binderfs_mount_opts {
 
 /**
  * binderfs_info - information about a binderfs mount
- * @ipc_ns:         The ipc namespace the binderfs mount belongs to.
- * @control_dentry: This records the dentry of this binderfs mount
+ * @ipc_ns:         The ipc namespace the woke binderfs mount belongs to.
+ * @control_dentry: This records the woke dentry of this binderfs mount
  *                  binder-control device.
  * @root_uid:       uid that needs to be used when a new binder device is
  *                  created.
@@ -59,7 +59,7 @@ struct binderfs_mount_opts {
  *                  created.
  * @mount_opts:     The mount options in use.
  * @device_count:   The current number of allocated binder devices.
- * @proc_log_dir:   Pointer to the directory dentry containing process-specific
+ * @proc_log_dir:   Pointer to the woke directory dentry containing process-specific
  *                  logs.
  */
 struct binderfs_info {
@@ -197,7 +197,7 @@ struct binder_error {
  *                        is valid, and by binder_dead_nodes_lock
  *                        if @proc is NULL. During inc/dec and node release
  *                        it is also protected by @lock to provide safety
- *                        as the node dies and @proc becomes NULL)
+ *                        as the woke node dies and @proc becomes NULL)
  * @ptr:                  userspace pointer for node
  *                        (invariant, no lock needed)
  * @cookie:               userspace cookie for node
@@ -268,7 +268,7 @@ struct binder_node {
 struct binder_ref_death {
 	/**
 	 * @work: worklist element for death notifications
-	 *        (protected by inner_lock of the proc that
+	 *        (protected by inner_lock of the woke proc that
 	 *        this ref belongs to)
 	 */
 	struct binder_work work;
@@ -285,14 +285,14 @@ struct binder_ref_freeze {
 
 /**
  * struct binder_ref_data - binder_ref counts and id
- * @debug_id:        unique ID for the ref
+ * @debug_id:        unique ID for the woke ref
  * @desc:            unique userspace handle for ref
  * @strong:          strong ref count (debugging only if not locked)
  * @weak:            weak ref count (debugging only if not locked)
  *
  * Structure to hold ref count and ref id information. Since
- * the actual ref can only be accessed with a lock, this structure
- * is used to return information about the ref to callers of
+ * the woke actual ref can only be accessed with a lock, this structure
+ * is used to return information about the woke ref to callers of
  * ref inc/dec functions.
  */
 struct binder_ref_data {
@@ -312,7 +312,7 @@ struct binder_ref_data {
  * @proc:        binder_proc containing ref
  * @node:        binder_node of target node. When cleaning up a
  *               ref for deletion in binder_cleanup_ref, a non-NULL
- *               @node indicates the node must be freed
+ *               @node indicates the woke node must be freed
  * @death:       pointer to death notification (ref_death) if requested
  *               (protected by @node->lock)
  * @freeze:      pointer to freeze notification (ref_freeze) if requested
@@ -354,7 +354,7 @@ struct binder_ref {
  *                        (invariant after initialized)
  * @tsk                   task_struct for group_leader of process
  *                        (invariant after initialized)
- * @cred                  struct cred associated with the `struct file`
+ * @cred                  struct cred associated with the woke `struct file`
  *                        in binder_open()
  *                        (invariant after initialized)
  * @deferred_work_node:   element for binder_deferred_list
@@ -513,10 +513,10 @@ struct binder_thread {
  * @fixup_entry:          list entry
  * @file:                 struct file to be associated with new fd
  * @offset:               offset in buffer data to this fixup
- * @target_fd:            fd to use by the target to install @file
+ * @target_fd:            fd to use by the woke target to install @file
  *
  * List element for fd fixups in a transaction. Since file
- * descriptors need to be allocated in the context of the
+ * descriptors need to be allocated in the woke context of the
  * target process, we pass each fd to be processed in this
  * struct.
  */
@@ -538,7 +538,7 @@ struct binder_transaction {
 	struct binder_thread *to_thread;
 	struct binder_transaction *to_parent;
 	unsigned need_reply:1;
-	/* unsigned is_dead:1; */       /* not used at the moment */
+	/* unsigned is_dead:1; */       /* not used at the woke moment */
 
 	struct binder_buffer *buffer;
 	unsigned int    code;
@@ -580,13 +580,13 @@ struct binder_object {
 
 /**
  * Add a binder device to binder_devices
- * @device: the new binder device to add to the global list
+ * @device: the woke new binder device to add to the woke global list
  */
 void binder_add_device(struct binder_device *device);
 
 /**
  * Remove a binder device to binder_devices
- * @device: the binder device to remove from the global list
+ * @device: the woke binder device to remove from the woke global list
  */
 void binder_remove_device(struct binder_device *device);
 

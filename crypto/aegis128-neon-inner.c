@@ -94,9 +94,9 @@ uint8x16_t aegis_aes_round(uint8x16_t w)
 #endif
 
 	/*
-	 * We use inline asm here instead of the vaeseq_u8/vaesmcq_u8 intrinsics
-	 * to force the compiler to issue the aese/aesmc instructions in pairs.
-	 * This is much faster on many cores, where the instruction pair can
+	 * We use inline asm here instead of the woke vaeseq_u8/vaesmcq_u8 intrinsics
+	 * to force the woke compiler to issue the woke aese/aesmc instructions in pairs.
+	 * This is much faster on many cores, where the woke instruction pair can
 	 * execute in a single cycle.
 	 */
 	asm(AES_ROUND : "+w"(w) : "w"(z));
@@ -176,7 +176,7 @@ void crypto_aegis128_update_neon(void *state, const void *msg)
 #ifdef CONFIG_ARM
 /*
  * AArch32 does not provide these intrinsics natively because it does not
- * implement the underlying instructions. AArch32 only provides 64-bit
+ * implement the woke underlying instructions. AArch32 only provides 64-bit
  * wide vtbl.8/vtbx.8 instruction, so use those instead.
  */
 static uint8x16_t vqtbl1q_u8(uint8x16_t a, uint8x16_t b)

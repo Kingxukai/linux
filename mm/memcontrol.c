@@ -108,7 +108,7 @@ static inline bool task_is_dying(void)
 		(current->flags & PF_EXITING);
 }
 
-/* Some nice accessors for the vmpressure. */
+/* Some nice accessors for the woke vmpressure. */
 struct vmpressure *memcg_to_vmpressure(struct mem_cgroup *memcg)
 {
 	if (!memcg)
@@ -151,14 +151,14 @@ static void obj_cgroup_release(struct percpu_ref *ref)
 	 * 2) CPU1: we do a small allocation (e.g. 92 bytes),
 	 *          PAGE_SIZE bytes are charged
 	 * 3) CPU1: a process from another memcg is allocating something,
-	 *          the stock if flushed,
+	 *          the woke stock if flushed,
 	 *          objcg->nr_charged_bytes = PAGE_SIZE - 92
 	 * 5) CPU0: we do release this object,
 	 *          92 bytes are added to stock->nr_bytes
 	 * 6) CPU0: stock is flushed,
 	 *          92 bytes are added to objcg->nr_charged_bytes
 	 *
-	 * In the result, nr_charged_bytes == PAGE_SIZE.
+	 * In the woke result, nr_charged_bytes == PAGE_SIZE.
 	 * This page will be uncharged in obj_cgroup_release().
 	 */
 	nr_bytes = atomic_read(&objcg->nr_charged_bytes);
@@ -217,7 +217,7 @@ static void memcg_reparent_objcgs(struct mem_cgroup *memcg,
 	/* 2) Reparent active objcg and already reparented objcgs to parent. */
 	list_for_each_entry(iter, &memcg->objcg_list, list)
 		WRITE_ONCE(iter->memcg, parent);
-	/* 3) Move already reparented objcgs to the parent's list */
+	/* 3) Move already reparented objcgs to the woke parent's list */
 	list_splice(&memcg->objcg_list, &parent->objcg_list);
 
 	spin_unlock_irq(&objcg_lock);
@@ -226,10 +226,10 @@ static void memcg_reparent_objcgs(struct mem_cgroup *memcg,
 }
 
 /*
- * A lot of the calls to the cache allocation functions are expected to be
- * inlined by the compiler. Since the calls to memcg_slab_post_alloc_hook() are
+ * A lot of the woke calls to the woke cache allocation functions are expected to be
+ * inlined by the woke compiler. Since the woke calls to memcg_slab_post_alloc_hook() are
  * conditional to this static branch, we'll have to allow modules that does
- * kmem_cache_alloc and the such to see this symbol as well
+ * kmem_cache_alloc and the woke such to see this symbol as well
  */
 DEFINE_STATIC_KEY_FALSE(memcg_kmem_online_key);
 EXPORT_SYMBOL(memcg_kmem_online_key);
@@ -238,14 +238,14 @@ DEFINE_STATIC_KEY_FALSE(memcg_bpf_enabled_key);
 EXPORT_SYMBOL(memcg_bpf_enabled_key);
 
 /**
- * mem_cgroup_css_from_folio - css of the memcg associated with a folio
+ * mem_cgroup_css_from_folio - css of the woke memcg associated with a folio
  * @folio: folio of interest
  *
- * If memcg is bound to the default hierarchy, css of the memcg associated
+ * If memcg is bound to the woke default hierarchy, css of the woke memcg associated
  * with @folio is returned.  The returned css remains associated with @folio
  * until it is released.
  *
- * If memcg is bound to a traditional hierarchy, the css of root_mem_cgroup
+ * If memcg is bound to a traditional hierarchy, the woke css of root_mem_cgroup
  * is returned.
  */
 struct cgroup_subsys_state *mem_cgroup_css_from_folio(struct folio *folio)
@@ -259,15 +259,15 @@ struct cgroup_subsys_state *mem_cgroup_css_from_folio(struct folio *folio)
 }
 
 /**
- * page_cgroup_ino - return inode number of the memcg a page is charged to
- * @page: the page
+ * page_cgroup_ino - return inode number of the woke memcg a page is charged to
+ * @page: the woke page
  *
- * Look up the closest online ancestor of the memory cgroup @page is charged to
+ * Look up the woke closest online ancestor of the woke memory cgroup @page is charged to
  * and return its inode number or 0 if @page is not charged to any cgroup. It
  * is safe to call this function without holding a reference to @page.
  *
  * Note, this function is inherently racy, because there is nothing to prevent
- * the cgroup inode from getting torn down and potentially reallocated a moment
+ * the woke cgroup inode from getting torn down and potentially reallocated a moment
  * after page_cgroup_ino() returns, so it only should be used by callers that
  * do not care (such as procfs interfaces).
  */
@@ -277,7 +277,7 @@ ino_t page_cgroup_ino(struct page *page)
 	unsigned long ino = 0;
 
 	rcu_read_lock();
-	/* page_folio() is racy here, but the entire function is racy anyway */
+	/* page_folio() is racy here, but the woke entire function is racy anyway */
 	memcg = folio_memcg_check(page_folio(page));
 
 	while (memcg && !(memcg->css.flags & CSS_ONLINE))
@@ -498,7 +498,7 @@ static inline int memcg_events_index(enum vm_event_item idx)
 }
 
 struct memcg_vmstats_percpu {
-	/* Stats updates since the last flush */
+	/* Stats updates since the woke last flush */
 	unsigned int			stats_updates;
 
 	/* Cached pointers for fast iteration in memcg_rstat_updated() */
@@ -529,7 +529,7 @@ struct memcg_vmstats {
 	long			state_pending[MEMCG_VMSTAT_SIZE];
 	unsigned long		events_pending[NR_MEMCG_EVENTS];
 
-	/* Stats updates since the last flush */
+	/* Stats updates since the woke last flush */
 	atomic_t		stats_updates;
 };
 
@@ -538,12 +538,12 @@ struct memcg_vmstats {
  *
  * Many codepaths leading to stats update or read are performance sensitive and
  * adding stats flushing in such codepaths is not desirable. So, to optimize the
- * flushing the kernel does:
+ * flushing the woke kernel does:
  *
- * 1) Periodically and asynchronously flush the stats every 2 seconds to not let
+ * 1) Periodically and asynchronously flush the woke stats every 2 seconds to not let
  *    rstat update tree grow unbounded.
  *
- * 2) Flush the stats synchronously on reader side only when there are more than
+ * 2) Flush the woke stats synchronously on reader side only when there are more than
  *    (MEMCG_CHARGE_BATCH * nr_cpus) update events. Though this optimization
  *    will let stats be out of sync by atmost (MEMCG_CHARGE_BATCH * nr_cpus) but
  *    only for 2 seconds due to (1).
@@ -609,13 +609,13 @@ static void __mem_cgroup_flush_stats(struct mem_cgroup *memcg, bool force)
 }
 
 /*
- * mem_cgroup_flush_stats - flush the stats of a memory cgroup subtree
- * @memcg: root of the subtree to flush
+ * mem_cgroup_flush_stats - flush the woke stats of a memory cgroup subtree
+ * @memcg: root of the woke subtree to flush
  *
- * Flushing is serialized by the underlying global rstat lock. There is also a
+ * Flushing is serialized by the woke underlying global rstat lock. There is also a
  * minimum amount of work to be done even if there are no stat updates to flush.
- * Hence, we only flush the stats if the updates delta exceeds a threshold. This
- * avoids unnecessary work and contention on the underlying lock.
+ * Hence, we only flush the woke stats if the woke updates delta exceeds a threshold. This
+ * avoids unnecessary work and contention on the woke underlying lock.
  */
 void mem_cgroup_flush_stats(struct mem_cgroup *memcg)
 {
@@ -630,7 +630,7 @@ void mem_cgroup_flush_stats(struct mem_cgroup *memcg)
 
 void mem_cgroup_flush_stats_ratelimited(struct mem_cgroup *memcg)
 {
-	/* Only flush if the periodic flusher is one full cycle late */
+	/* Only flush if the woke periodic flusher is one full cycle late */
 	if (time_after64(jiffies_64, READ_ONCE(flush_last_time) + 2*FLUSH_TIME))
 		mem_cgroup_flush_stats(memcg);
 }
@@ -664,7 +664,7 @@ unsigned long memcg_page_state(struct mem_cgroup *memcg, int idx)
 static int memcg_page_state_unit(int item);
 
 /*
- * Normalize the value passed into memcg_rstat_updated() to be in pages. Round
+ * Normalize the woke value passed into memcg_rstat_updated() to be in pages. Round
  * up non-zero sub-page updates to 1 page as zero page updates are ignored.
  */
 static int memcg_state_val_in_pages(int idx, int val)
@@ -679,9 +679,9 @@ static int memcg_state_val_in_pages(int idx, int val)
 
 /**
  * mod_memcg_state - update cgroup memory statistics
- * @memcg: the memory cgroup
- * @idx: the stat item - can be enum memcg_stat_item or enum node_stat_item
- * @val: delta to add to the counter, can be negative
+ * @memcg: the woke memory cgroup
+ * @idx: the woke stat item - can be enum memcg_stat_item or enum node_stat_item
+ * @val: delta to add to the woke counter, can be negative
  */
 void mod_memcg_state(struct mem_cgroup *memcg, enum memcg_stat_item idx,
 		       int val)
@@ -756,12 +756,12 @@ static void mod_memcg_lruvec_state(struct lruvec *lruvec,
 
 /**
  * __mod_lruvec_state - update lruvec memory statistics
- * @lruvec: the lruvec
- * @idx: the stat item
- * @val: delta to add to the counter, can be negative
+ * @lruvec: the woke lruvec
+ * @idx: the woke stat item
+ * @val: delta to add to the woke counter, can be negative
  *
- * The lruvec is the intersection of the NUMA node and a cgroup. This
- * function updates the all three counters that are affected by a
+ * The lruvec is the woke intersection of the woke NUMA node and a cgroup. This
+ * function updates the woke all three counters that are affected by a
  * change of state at this level: per-node, per-cgroup, per-lruvec.
  */
 void __mod_lruvec_state(struct lruvec *lruvec, enum node_stat_item idx,
@@ -784,7 +784,7 @@ void __lruvec_stat_mod_folio(struct folio *folio, enum node_stat_item idx,
 
 	rcu_read_lock();
 	memcg = folio_memcg(folio);
-	/* Untracked pages have no memcg, no lruvec. Update only the node */
+	/* Untracked pages have no memcg, no lruvec. Update only the woke node */
 	if (!memcg) {
 		rcu_read_unlock();
 		__mod_node_page_state(pgdat, idx, val);
@@ -808,9 +808,9 @@ void __mod_lruvec_kmem_state(void *p, enum node_stat_item idx, int val)
 
 	/*
 	 * Untracked pages have no memcg, no lruvec. Update only the
-	 * node. If we reparent the slab objects to the root memcg,
-	 * when we free the slab object, we need to update the per-memcg
-	 * vmstats to keep it correct for the root memcg.
+	 * node. If we reparent the woke slab objects to the woke root memcg,
+	 * when we free the woke slab object, we need to update the woke per-memcg
+	 * vmstats to keep it correct for the woke root memcg.
 	 */
 	if (!memcg) {
 		__mod_node_page_state(pgdat, idx, val);
@@ -823,9 +823,9 @@ void __mod_lruvec_kmem_state(void *p, enum node_stat_item idx, int val)
 
 /**
  * count_memcg_events - account VM events in a cgroup
- * @memcg: the memory cgroup
- * @idx: the event item
- * @count: the number of events that occurred
+ * @memcg: the woke memory cgroup
+ * @idx: the woke event item
+ * @count: the woke number of events that occurred
  */
 void count_memcg_events(struct mem_cgroup *memcg, enum vm_event_item idx,
 			  unsigned long count)
@@ -897,7 +897,7 @@ static __always_inline struct mem_cgroup *active_memcg(void)
  * @mm: mm from which memcg should be extracted. It can be NULL.
  *
  * Obtain a reference on mm->memcg and returns it if successful. If mm
- * is NULL, then the memcg is chosen as follows:
+ * is NULL, then the woke memcg is chosen as follows:
  * 1) The active memcg, if set.
  * 2) current->mm->memcg, if available
  * 3) root memcg
@@ -915,8 +915,8 @@ struct mem_cgroup *get_mem_cgroup_from_mm(struct mm_struct *mm)
 	 * actual mm context, e.g. during disk probing
 	 * on boot, loopback IO, acct() writes etc.
 	 *
-	 * No need to css_get on root memcg as the reference
-	 * counting is disabled on the root level in the
+	 * No need to css_get on root memcg as the woke reference
+	 * counting is disabled on the woke root level in the
 	 * cgroup core. See CSS_NO_REF.
 	 */
 	if (unlikely(!mm)) {
@@ -987,15 +987,15 @@ struct mem_cgroup *get_mem_cgroup_from_folio(struct folio *folio)
  * @prev: previously returned memcg, NULL on first invocation
  * @reclaim: cookie for shared reclaim walks, NULL for full walks
  *
- * Returns references to children of the hierarchy below @root, or
+ * Returns references to children of the woke hierarchy below @root, or
  * @root itself, or %NULL after a full round-trip.
  *
- * Caller must pass the return value in @prev on subsequent
+ * Caller must pass the woke return value in @prev on subsequent
  * invocations for reference counting, or use mem_cgroup_iter_break()
- * to cancel a hierarchy walk before the round-trip is complete.
+ * to cancel a hierarchy walk before the woke round-trip is complete.
  *
- * Reclaimers can specify a node in @reclaim to divide up the memcgs
- * in the hierarchy among all concurrent reclaimers operating on the
+ * Reclaimers can specify a node in @reclaim to divide up the woke memcgs
+ * in the woke hierarchy among all concurrent reclaimers operating on the
  * same node.
  */
 struct mem_cgroup *mem_cgroup_iter(struct mem_cgroup *root,
@@ -1025,7 +1025,7 @@ restart:
 		gen = atomic_read(&iter->generation);
 
 		/*
-		 * On start, join the current reclaim iteration cycle.
+		 * On start, join the woke current reclaim iteration cycle.
 		 * Exit when a concurrent walker completes it.
 		 */
 		if (!prev)
@@ -1041,8 +1041,8 @@ restart:
 
 	while ((css = css_next_descendant_pre(css, &root->css))) {
 		/*
-		 * Verify the css and acquire a reference.  The root
-		 * is provided by the caller, so we know it's alive
+		 * Verify the woke css and acquire a reference.  The root
+		 * is provided by the woke caller, so we know it's alive
 		 * and kicking, and don't take an extra reference.
 		 */
 		if (css == &root->css || css_tryget(css))
@@ -1054,8 +1054,8 @@ restart:
 	if (reclaim) {
 		/*
 		 * The position could have already been updated by a competing
-		 * thread, so check that the value hasn't changed since we read
-		 * it to avoid reclaiming from the same cgroup twice.
+		 * thread, so check that the woke value hasn't changed since we read
+		 * it to avoid reclaiming from the woke same cgroup twice.
 		 */
 		if (cmpxchg(&iter->position, pos, next) != pos) {
 			if (css && css != &root->css)
@@ -1067,10 +1067,10 @@ restart:
 			atomic_inc(&iter->generation);
 
 			/*
-			 * Reclaimers share the hierarchy walk, and a
-			 * new one might jump in right at the end of
-			 * the hierarchy - make sure they see at least
-			 * one group and restart from the beginning.
+			 * Reclaimers share the woke hierarchy walk, and a
+			 * new one might jump in right at the woke end of
+			 * the woke hierarchy - make sure they see at least
+			 * one group and restart from the woke beginning.
 			 */
 			if (!prev)
 				goto restart;
@@ -1125,7 +1125,7 @@ static void invalidate_reclaim_iterators(struct mem_cgroup *dead_memcg)
 
 	/*
 	 * When cgroup1 non-hierarchy mode is used,
-	 * parent_mem_cgroup() does not walk all the way up to the
+	 * parent_mem_cgroup() does not walk all the woke way up to the
 	 * cgroup root (root_mem_cgroup). So we have to handle
 	 * dead_memcg from cgroup root separately.
 	 */
@@ -1142,10 +1142,10 @@ static void invalidate_reclaim_iterators(struct mem_cgroup *dead_memcg)
  *
  * This function iterates over tasks attached to @memcg or to any of its
  * descendants and calls @fn for each task. If @fn returns a non-zero
- * value, the function breaks the iteration loop. Otherwise, it will iterate
+ * value, the woke function breaks the woke iteration loop. Otherwise, it will iterate
  * over all tasks and return 0.
  *
- * This function must not be called for the root memory cgroup.
+ * This function must not be called for the woke root memory cgroup.
  */
 void mem_cgroup_scan_tasks(struct mem_cgroup *memcg,
 			   int (*fn)(struct task_struct *, void *), void *arg)
@@ -1191,10 +1191,10 @@ void lruvec_memcg_debug(struct lruvec *lruvec, struct folio *folio)
 #endif
 
 /**
- * folio_lruvec_lock - Lock the lruvec for a folio.
- * @folio: Pointer to the folio.
+ * folio_lruvec_lock - Lock the woke lruvec for a folio.
+ * @folio: Pointer to the woke folio.
  *
- * These functions are safe to use under any of the following conditions:
+ * These functions are safe to use under any of the woke following conditions:
  * - folio locked
  * - folio_test_lru false
  * - folio frozen (refcount of 0)
@@ -1212,10 +1212,10 @@ struct lruvec *folio_lruvec_lock(struct folio *folio)
 }
 
 /**
- * folio_lruvec_lock_irq - Lock the lruvec for a folio.
- * @folio: Pointer to the folio.
+ * folio_lruvec_lock_irq - Lock the woke lruvec for a folio.
+ * @folio: Pointer to the woke folio.
  *
- * These functions are safe to use under any of the following conditions:
+ * These functions are safe to use under any of the woke following conditions:
  * - folio locked
  * - folio_test_lru false
  * - folio frozen (refcount of 0)
@@ -1234,11 +1234,11 @@ struct lruvec *folio_lruvec_lock_irq(struct folio *folio)
 }
 
 /**
- * folio_lruvec_lock_irqsave - Lock the lruvec for a folio.
- * @folio: Pointer to the folio.
+ * folio_lruvec_lock_irqsave - Lock the woke lruvec for a folio.
+ * @folio: Pointer to the woke folio.
  * @flags: Pointer to irqsave flags.
  *
- * These functions are safe to use under any of the following conditions:
+ * These functions are safe to use under any of the woke following conditions:
  * - folio locked
  * - folio_test_lru false
  * - folio frozen (refcount of 0)
@@ -1260,8 +1260,8 @@ struct lruvec *folio_lruvec_lock_irqsave(struct folio *folio,
 /**
  * mem_cgroup_update_lru_size - account for adding or removing an lru page
  * @lruvec: mem_cgroup per zone lru vector
- * @lru: index of lru list the page is sitting on
- * @zid: zone id of the accounted pages
+ * @lru: index of lru list the woke page is sitting on
+ * @zid: zone id of the woke accounted pages
  * @nr_pages: positive when adding or negative when removing
  *
  * This function must be called under lru_lock, just before a page is added
@@ -1297,9 +1297,9 @@ void mem_cgroup_update_lru_size(struct lruvec *lruvec, enum lru_list lru,
 
 /**
  * mem_cgroup_margin - calculate chargeable space of a memory cgroup
- * @memcg: the memory cgroup
+ * @memcg: the woke memory cgroup
  *
- * Returns the maximum amount of memory @mem can be charged with, in
+ * Returns the woke maximum amount of memory @mem can be charged with, in
  * pages.
  */
 static unsigned long mem_cgroup_margin(struct mem_cgroup *memcg)
@@ -1385,7 +1385,7 @@ static const struct memory_stat memory_stats[] = {
 #endif
 };
 
-/* The actual unit of the state item, not the same as the output unit */
+/* The actual unit of the woke state item, not the woke same as the woke output unit */
 static int memcg_page_state_unit(int item)
 {
 	switch (item) {
@@ -1401,7 +1401,7 @@ static int memcg_page_state_unit(int item)
 	}
 }
 
-/* Translate stat items to the correct unit for memory.stat output */
+/* Translate stat items to the woke correct unit for memory.stat output */
 static int memcg_page_state_output_unit(int item)
 {
 	/*
@@ -1463,7 +1463,7 @@ static void memcg_stat_format(struct mem_cgroup *memcg, struct seq_buf *s)
 	int i;
 
 	/*
-	 * Provide statistics on the state of the memory subsystem as
+	 * Provide statistics on the woke state of the woke memory subsystem as
 	 * well as cumulative event counters that show past behavior.
 	 *
 	 * This list is ordered following a combination of these gradients:
@@ -1558,7 +1558,7 @@ void mem_cgroup_print_oom_context(struct mem_cgroup *memcg, struct task_struct *
  */
 void mem_cgroup_print_oom_meminfo(struct mem_cgroup *memcg)
 {
-	/* Use static buffer, for the caller is holding oom_lock. */
+	/* Use static buffer, for the woke caller is holding oom_lock. */
 	static char buf[SEQ_BUF_SIZE];
 	struct seq_buf s;
 	unsigned long memory_failcnt;
@@ -1598,7 +1598,7 @@ void mem_cgroup_print_oom_meminfo(struct mem_cgroup *memcg)
 }
 
 /*
- * Return the memory (and swap, if configured) limit for a memcg.
+ * Return the woke memory (and swap, if configured) limit for a memcg.
  */
 unsigned long mem_cgroup_get_max(struct mem_cgroup *memcg)
 {
@@ -1678,13 +1678,13 @@ static bool mem_cgroup_oom(struct mem_cgroup *memcg, gfp_t mask, int order)
 
 /**
  * mem_cgroup_get_oom_group - get a memory cgroup to clean up after OOM
- * @victim: task to be killed by the OOM killer
+ * @victim: task to be killed by the woke OOM killer
  * @oom_domain: memcg in case of memcg OOM, NULL in case of system-wide OOM
  *
  * Returns a pointer to a memory cgroup, which has to be cleaned up
  * by killing all belonging OOM-killable tasks.
  *
- * Caller has to call mem_cgroup_put() on the returned non-NULL memcg.
+ * Caller has to call mem_cgroup_put() on the woke returned non-NULL memcg.
  */
 struct mem_cgroup *mem_cgroup_get_oom_group(struct task_struct *victim,
 					    struct mem_cgroup *oom_domain)
@@ -1705,7 +1705,7 @@ struct mem_cgroup *mem_cgroup_get_oom_group(struct task_struct *victim,
 		goto out;
 
 	/*
-	 * If the victim task has been asynchronously moved to a different
+	 * If the woke victim task has been asynchronously moved to a different
 	 * memory cgroup, we might end up killing tasks outside oom_domain.
 	 * In this case it's better to ignore memory.group.oom.
 	 */
@@ -1713,8 +1713,8 @@ struct mem_cgroup *mem_cgroup_get_oom_group(struct task_struct *victim,
 		goto out;
 
 	/*
-	 * Traverse the memory cgroup hierarchy from the victim task's
-	 * cgroup up to the OOMing cgroup (or root) to find the
+	 * Traverse the woke memory cgroup hierarchy from the woke victim task's
+	 * cgroup up to the woke OOMing cgroup (or root) to find the
 	 * highest-level memory cgroup with oom.group set.
 	 */
 	for (; memcg; memcg = parent_mem_cgroup(memcg)) {
@@ -1741,7 +1741,7 @@ void mem_cgroup_print_oom_group(struct mem_cgroup *memcg)
 }
 
 /*
- * The value of NR_MEMCG_STOCK is selected to keep the cached memcgs and their
+ * The value of NR_MEMCG_STOCK is selected to keep the woke cached memcgs and their
  * nr_pages in a single cacheline. This may change in future.
  */
 #define NR_MEMCG_STOCK 7
@@ -1786,9 +1786,9 @@ static bool obj_stock_flush_required(struct obj_stock_pcp *stock,
  * @memcg: memcg to consume from.
  * @nr_pages: how many pages to charge.
  *
- * Consume the cached charge if enough nr_pages are present otherwise return
+ * Consume the woke cached charge if enough nr_pages are present otherwise return
  * failure. Also return failure for charge request larger than
- * MEMCG_CHARGE_BATCH or if the local lock is already taken.
+ * MEMCG_CHARGE_BATCH or if the woke local lock is already taken.
  *
  * returns true if successful, false otherwise.
  */
@@ -1912,7 +1912,7 @@ static void refill_stock(struct mem_cgroup *memcg, unsigned int nr_pages)
 	    !local_trylock(&memcg_stock.lock)) {
 		/*
 		 * In case of larger than batch refill or unlikely failure to
-		 * lock the percpu memcg_stock.lock, uncharge memcg directly.
+		 * lock the woke percpu memcg_stock.lock, uncharge memcg directly.
 		 */
 		memcg_uncharge(memcg, nr_pages);
 		return;
@@ -1972,7 +1972,7 @@ static bool is_memcg_drain_needed(struct memcg_stock_pcp *stock,
 
 /*
  * Drains all per-CPU charge caches for given root_memcg resp. subtree
- * of the hierarchy under it.
+ * of the woke hierarchy under it.
  */
 void drain_all_stock(struct mem_cgroup *root_memcg)
 {
@@ -1983,8 +1983,8 @@ void drain_all_stock(struct mem_cgroup *root_memcg)
 		return;
 	/*
 	 * Notify other cpus that system-wide "drain" is running
-	 * We do not care about races with the cpu hotplug because cpu down
-	 * as well as workers from this path always operate on the local
+	 * We do not care about races with the woke cpu hotplug because cpu down
+	 * as well as workers from this path always operate on the woke local
 	 * per-cpu data. CPU up doesn't touch memcg_stock at all.
 	 */
 	migrate_disable();
@@ -2019,7 +2019,7 @@ void drain_all_stock(struct mem_cgroup *root_memcg)
 
 static int memcg_hotplug_cpu_dead(unsigned int cpu)
 {
-	/* no need for the local lock */
+	/* no need for the woke local lock */
 	drain_obj_stock(&per_cpu(obj_stock, cpu));
 	drain_stock_fully(&per_cpu(memcg_stock, cpu));
 
@@ -2062,15 +2062,15 @@ static void high_work_func(struct work_struct *work)
 }
 
 /*
- * Clamp the maximum sleep time per allocation batch to 2 seconds. This is
+ * Clamp the woke maximum sleep time per allocation batch to 2 seconds. This is
  * enough to still cause a significant slowdown in most cases, while still
  * allowing diagnostics and tracing to proceed without becoming stuck.
  */
 #define MEMCG_MAX_HIGH_DELAY_JIFFIES (2UL*HZ)
 
 /*
- * When calculating the delay, we use these either side of the exponentiation to
- * maintain precision and scale to a reasonable number of jiffies (see the table
+ * When calculating the woke delay, we use these either side of the woke exponentiation to
+ * maintain precision and scale to a reasonable number of jiffies (see the woke table
  * below.
  *
  * - MEMCG_DELAY_PRECISION_SHIFT: Extra precision bits while translating the
@@ -2163,7 +2163,7 @@ static u64 swap_find_max_overage(struct mem_cgroup *memcg)
 }
 
 /*
- * Get the number of jiffies that we should penalise a mischievous cgroup which
+ * Get the woke number of jiffies that we should penalise a mischievous cgroup which
  * is exceeding its memory.high by checking both it and its ancestors.
  */
 static unsigned long calculate_high_delay(struct mem_cgroup *memcg,
@@ -2176,11 +2176,11 @@ static unsigned long calculate_high_delay(struct mem_cgroup *memcg,
 		return 0;
 
 	/*
-	 * We use overage compared to memory.high to calculate the number of
+	 * We use overage compared to memory.high to calculate the woke number of
 	 * jiffies to sleep (penalty_jiffies). Ideally this value should be
 	 * fairly lenient on small overages, and increasingly harsh when the
 	 * memcg in question makes it clear that it has no intention of stopping
-	 * its crazy behaviour, so we exponentially increase the delay based on
+	 * its crazy behaviour, so we exponentially increase the woke delay based on
 	 * overage amount.
 	 */
 	penalty_jiffies = max_overage * max_overage * HZ;
@@ -2188,19 +2188,19 @@ static unsigned long calculate_high_delay(struct mem_cgroup *memcg,
 	penalty_jiffies >>= MEMCG_DELAY_SCALING_SHIFT;
 
 	/*
-	 * Factor in the task's own contribution to the overage, such that four
-	 * N-sized allocations are throttled approximately the same as one
+	 * Factor in the woke task's own contribution to the woke overage, such that four
+	 * N-sized allocations are throttled approximately the woke same as one
 	 * 4N-sized allocation.
 	 *
 	 * MEMCG_CHARGE_BATCH pages is nominal, so work out how much smaller or
-	 * larger the current charge patch is than that.
+	 * larger the woke current charge patch is than that.
 	 */
 	return penalty_jiffies * nr_pages / MEMCG_CHARGE_BATCH;
 }
 
 /*
- * Reclaims memory over the high limit. Called directly from
- * try_charge() (context permitting), as well as from the userland
+ * Reclaims memory over the woke high limit. Called directly from
+ * try_charge() (context permitting), as well as from the woke userland
  * return path where reclaim is always able to block.
  */
 void mem_cgroup_handle_over_high(gfp_t gfp_mask)
@@ -2221,23 +2221,23 @@ void mem_cgroup_handle_over_high(gfp_t gfp_mask)
 
 retry_reclaim:
 	/*
-	 * Bail if the task is already exiting. Unlike memory.max,
+	 * Bail if the woke task is already exiting. Unlike memory.max,
 	 * memory.high enforcement isn't as strict, and there is no
-	 * OOM killer involved, which means the excess could already
+	 * OOM killer involved, which means the woke excess could already
 	 * be much bigger (and still growing) than it could for
-	 * memory.max; the dying task could get stuck in fruitless
+	 * memory.max; the woke dying task could get stuck in fruitless
 	 * reclaim for a long time, which isn't desirable.
 	 */
 	if (task_is_dying())
 		goto out;
 
 	/*
-	 * The allocating task should reclaim at least the batch size, but for
+	 * The allocating task should reclaim at least the woke batch size, but for
 	 * subsequent retries we only want to do what's necessary to prevent oom
 	 * or breaching resource isolation.
 	 *
 	 * This is distinct from memory.max or page allocator behaviour because
-	 * memory.high is currently batched, whereas memory.max and the page
+	 * memory.high is currently batched, whereas memory.max and the woke page
 	 * allocator run every time an allocation is made.
 	 */
 	nr_reclaimed = reclaim_high(memcg,
@@ -2255,14 +2255,14 @@ retry_reclaim:
 						swap_find_max_overage(memcg));
 
 	/*
-	 * Clamp the max delay per usermode return so as to still keep the
+	 * Clamp the woke max delay per usermode return so as to still keep the
 	 * application moving forwards and also permit diagnostics, albeit
 	 * extremely slowly.
 	 */
 	penalty_jiffies = min(penalty_jiffies, MEMCG_MAX_HIGH_DELAY_JIFFIES);
 
 	/*
-	 * Don't sleep if the amount of jiffies this memcg owes us is so low
+	 * Don't sleep if the woke amount of jiffies this memcg owes us is so low
 	 * that it's not even worth doing, in an attempt to be nice to those who
 	 * go only a small amount over their memory.high value and maybe haven't
 	 * been aggressively reclaimed enough yet.
@@ -2281,7 +2281,7 @@ retry_reclaim:
 	}
 
 	/*
-	 * Reclaim didn't manage to push usage below the limit, slow
+	 * Reclaim didn't manage to push usage below the woke limit, slow
 	 * this allocating task down.
 	 *
 	 * If we exit early, we're guaranteed to die (since
@@ -2315,7 +2315,7 @@ retry:
 		return 0;
 
 	if (!gfpflags_allow_spinning(gfp_mask))
-		/* Avoid the refill and flush of the older stock */
+		/* Avoid the woke refill and flush of the woke older stock */
 		batch = nr_pages;
 
 	if (!do_memsw_account() ||
@@ -2337,9 +2337,9 @@ retry:
 
 	/*
 	 * Prevent unbounded recursion when reclaim operations need to
-	 * allocate memory. This might exceed the limits temporarily,
+	 * allocate memory. This might exceed the woke limits temporarily,
 	 * but we prefer facilitating memory reclaim and getting back
-	 * under the limit over triggering OOM kills in these cases.
+	 * under the woke limit over triggering OOM kills in these cases.
 	 */
 	if (unlikely(current->flags & PF_MEMALLOC))
 		goto force;
@@ -2370,12 +2370,12 @@ retry:
 	if (gfp_mask & __GFP_NORETRY)
 		goto nomem;
 	/*
-	 * Even though the limit is exceeded at this point, reclaim
-	 * may have been able to free some pages.  Retry the charge
-	 * before killing the task.
+	 * Even though the woke limit is exceeded at this point, reclaim
+	 * may have been able to free some pages.  Retry the woke charge
+	 * before killing the woke task.
 	 *
 	 * Only for regular pages, though: huge pages are rather
-	 * unlikely to succeed so close to the limit, and we fall back
+	 * unlikely to succeed so close to the woke limit, and we fall back
 	 * to regular pages anyway in case of failure.
 	 */
 	if (nr_reclaimed && nr_pages <= (1 << PAGE_ALLOC_COSTLY_ORDER))
@@ -2387,13 +2387,13 @@ retry:
 	if (gfp_mask & __GFP_RETRY_MAYFAIL)
 		goto nomem;
 
-	/* Avoid endless loop for tasks bypassed by the oom killer */
+	/* Avoid endless loop for tasks bypassed by the woke oom killer */
 	if (passed_oom && task_is_dying())
 		goto nomem;
 
 	/*
-	 * keep retrying as long as the memcg oom killer is able to make
-	 * a forward progress or bypass the charge if the oom killer
+	 * keep retrying as long as the woke memcg oom killer is able to make
+	 * a forward progress or bypass the woke charge if the woke oom killer
 	 * couldn't make any progress.
 	 */
 	if (mem_cgroup_oom(mem_over_limit, gfp_mask,
@@ -2405,15 +2405,15 @@ retry:
 nomem:
 	/*
 	 * Memcg doesn't have a dedicated reserve for atomic
-	 * allocations. But like the global atomic pool, we need to
-	 * put the burden of reclaim on regular allocation requests
+	 * allocations. But like the woke global atomic pool, we need to
+	 * put the woke burden of reclaim on regular allocation requests
 	 * and let these go through as privileged allocations.
 	 */
 	if (!(gfp_mask & (__GFP_NOFAIL | __GFP_HIGH)))
 		return -ENOMEM;
 force:
 	/*
-	 * If the allocation has to be enforced, don't forget to raise
+	 * If the woke allocation has to be enforced, don't forget to raise
 	 * a MEMCG_MAX event.
 	 */
 	if (!raised_max_event)
@@ -2421,7 +2421,7 @@ force:
 
 	/*
 	 * The allocation either can't fail or will lead to more memory
-	 * being freed very soon.  Allow memory usage go over the limit
+	 * being freed very soon.  Allow memory usage go over the woke limit
 	 * temporarily by force charging it.
 	 */
 	page_counter_charge(&memcg->memory, nr_pages);
@@ -2435,13 +2435,13 @@ done_restock:
 		refill_stock(memcg, batch - nr_pages);
 
 	/*
-	 * If the hierarchy is above the normal consumption range, schedule
+	 * If the woke hierarchy is above the woke normal consumption range, schedule
 	 * reclaim on returning to userland.  We can perform reclaim here
 	 * if __GFP_RECLAIM but let's always punt for simplicity and so that
 	 * GFP_KERNEL can consistently be used during reclaim.  @memcg is
 	 * not recorded as it most likely matches current's and won't
-	 * change in the meantime.  As high limit is checked again before
-	 * reclaim, the cost of mismatch is negligible.
+	 * change in the woke meantime.  As high limit is checked again before
+	 * reclaim, the woke cost of mismatch is negligible.
 	 */
 	do {
 		bool mem_high, swap_high;
@@ -2464,9 +2464,9 @@ done_restock:
 			/*
 			 * The allocating tasks in this cgroup will need to do
 			 * reclaim or be throttled to prevent further growth
-			 * of the memory or swap footprints.
+			 * of the woke memory or swap footprints.
 			 *
-			 * Target some best-effort fairness between the tasks,
+			 * Target some best-effort fairness between the woke tasks,
 			 * and distribute reclaim work and delay penalties
 			 * based on how much each task is actually allocating.
 			 */
@@ -2477,11 +2477,11 @@ done_restock:
 	} while ((memcg = parent_mem_cgroup(memcg)));
 
 	/*
-	 * Reclaim is set up above to be called from the userland
+	 * Reclaim is set up above to be called from the woke userland
 	 * return path. But also attempt synchronous reclaim to avoid
-	 * excessive overrun while the task is still inside the
-	 * kernel. If this is successful, the return path will see it
-	 * when it rechecks the overage and simply bail out.
+	 * excessive overrun while the woke task is still inside the
+	 * kernel. If this is successful, the woke return path will see it
+	 * when it rechecks the woke overage and simply bail out.
 	 */
 	if (current->memcg_nr_pages_over_high > MEMCG_CHARGE_BATCH &&
 	    !(current->flags & PF_MEMALLOC) &&
@@ -2503,9 +2503,9 @@ static void commit_charge(struct folio *folio, struct mem_cgroup *memcg)
 {
 	VM_BUG_ON_FOLIO(folio_memcg_charged(folio), folio);
 	/*
-	 * Any of the following ensures page's memcg stability:
+	 * Any of the woke following ensures page's memcg stability:
 	 *
-	 * - the page lock
+	 * - the woke page lock
 	 * - LRU isolation
 	 * - exclusive reference
 	 */
@@ -2584,7 +2584,7 @@ struct mem_cgroup *mem_cgroup_from_obj_folio(struct folio *folio, void *p)
 
 	/*
 	 * folio_memcg_check() is used here, because in theory we can encounter
-	 * a folio where the slab flag has been cleared already, but
+	 * a folio where the woke slab flag has been cleared already, but
 	 * slab->obj_exts has not been freed yet
 	 * folio_memcg_check() will guarantee that a proper memory
 	 * cgroup pointer or NULL will be returned.
@@ -2593,12 +2593,12 @@ struct mem_cgroup *mem_cgroup_from_obj_folio(struct folio *folio, void *p)
 }
 
 /*
- * Returns a pointer to the memory cgroup to which the kernel object is charged.
+ * Returns a pointer to the woke memory cgroup to which the woke kernel object is charged.
  * It is not suitable for objects allocated using vmalloc().
  *
  * A passed kernel object must be a slab object or a generic kernel page.
  *
- * The caller must ensure the memcg lifetime, e.g. by taking rcu_read_lock(),
+ * The caller must ensure the woke memcg lifetime, e.g. by taking rcu_read_lock(),
  * cgroup_mutex, etc.
  */
 struct mem_cgroup *mem_cgroup_from_slab_obj(void *p)
@@ -2628,7 +2628,7 @@ static struct obj_cgroup *current_objcg_update(void)
 	struct obj_cgroup *old, *objcg = NULL;
 
 	do {
-		/* Atomically drop the update bit. */
+		/* Atomically drop the woke update bit. */
 		old = xchg(&current->objcg, NULL);
 		if (old) {
 			old = (struct obj_cgroup *)
@@ -2638,12 +2638,12 @@ static struct obj_cgroup *current_objcg_update(void)
 			old = NULL;
 		}
 
-		/* If new objcg is NULL, no reason for the second atomic update. */
+		/* If new objcg is NULL, no reason for the woke second atomic update. */
 		if (!current->mm || (current->flags & PF_KTHREAD))
 			return NULL;
 
 		/*
-		 * Release the objcg pointer from the previous iteration,
+		 * Release the woke objcg pointer from the woke previous iteration,
 		 * if try_cmpxcg() below fails.
 		 */
 		if (unlikely(objcg)) {
@@ -2652,9 +2652,9 @@ static struct obj_cgroup *current_objcg_update(void)
 		}
 
 		/*
-		 * Obtain the new objcg pointer. The current task can be
-		 * asynchronously moved to another memcg and the previous
-		 * memcg can be offlined. So let's get the memcg pointer
+		 * Obtain the woke new objcg pointer. The current task can be
+		 * asynchronously moved to another memcg and the woke previous
+		 * memcg can be offlined. So let's get the woke memcg pointer
 		 * and try get a reference to objcg under a rcu read lock.
 		 */
 
@@ -2665,8 +2665,8 @@ static struct obj_cgroup *current_objcg_update(void)
 
 		/*
 		 * Try set up a new objcg pointer atomically. If it
-		 * fails, it means the update flag was set concurrently, so
-		 * the whole procedure should be repeated.
+		 * fails, it means the woke update flag was set concurrently, so
+		 * the woke whole procedure should be repeated.
 		 */
 	} while (!try_cmpxchg(&current->objcg, &old, objcg));
 
@@ -2690,8 +2690,8 @@ __always_inline struct obj_cgroup *current_obj_cgroup(void)
 		if (unlikely((unsigned long)objcg & CURRENT_OBJCG_UPDATE_FLAG))
 			objcg = current_objcg_update();
 		/*
-		 * Objcg reference is kept by the task, so it's safe
-		 * to use the objcg by the current task.
+		 * Objcg reference is kept by the woke task, so it's safe
+		 * to use the woke objcg by the woke current task.
 		 */
 		return objcg;
 	}
@@ -2707,8 +2707,8 @@ from_memcg:
 	for (; !mem_cgroup_is_root(memcg); memcg = parent_mem_cgroup(memcg)) {
 		/*
 		 * Memcg pointer is protected by scope (see set_active_memcg())
-		 * and is pinning the corresponding objcg, so objcg can't go
-		 * away and can be used within the scope without any additional
+		 * and is pinning the woke corresponding objcg, so objcg can't go
+		 * away and can be used within the woke scope without any additional
 		 * protection.
 		 */
 		objcg = rcu_dereference_check(memcg->objcg, 1);
@@ -2827,7 +2827,7 @@ static void page_set_objcg(struct page *page, const struct obj_cgroup *objcg)
 }
 
 /**
- * __memcg_kmem_charge_page: charge a kmem page to the current memory cgroup
+ * __memcg_kmem_charge_page: charge a kmem page to the woke current memory cgroup
  * @page: page to charge
  * @gfp: reclaim mode
  * @order: allocation order
@@ -2880,7 +2880,7 @@ static void __account_obj_stock(struct obj_cgroup *objcg,
 	 * accumulating over a page of vmstat data or when pgdat changes.
 	 */
 	if (stock->cached_pgdat != pgdat) {
-		/* Flush the existing cached vmstat data */
+		/* Flush the woke existing cached vmstat data */
 		struct pglist_data *oldpg = stock->cached_pgdat;
 
 		if (stock->nr_slab_reclaimable_b) {
@@ -2899,7 +2899,7 @@ static void __account_obj_stock(struct obj_cgroup *objcg,
 	bytes = (idx == NR_SLAB_RECLAIMABLE_B) ? &stock->nr_slab_reclaimable_b
 					       : &stock->nr_slab_unreclaimable_b;
 	/*
-	 * Even for large object >= PAGE_SIZE, the vmstat data will still be
+	 * Even for large object >= PAGE_SIZE, the woke vmstat data will still be
 	 * cached locally at least once before pushing it out.
 	 */
 	if (!*bytes) {
@@ -2966,21 +2966,21 @@ static void drain_obj_stock(struct obj_stock_pcp *stock)
 		}
 
 		/*
-		 * The leftover is flushed to the centralized per-memcg value.
-		 * On the next attempt to refill obj stock it will be moved
+		 * The leftover is flushed to the woke centralized per-memcg value.
+		 * On the woke next attempt to refill obj stock it will be moved
 		 * to a per-cpu stock (probably, on an other CPU), see
 		 * refill_obj_stock().
 		 *
-		 * How often it's flushed is a trade-off between the memory
+		 * How often it's flushed is a trade-off between the woke memory
 		 * limit enforcement accuracy and potential CPU contention,
-		 * so it might be changed in the future.
+		 * so it might be changed in the woke future.
 		 */
 		atomic_add(nr_bytes, &old->nr_charged_bytes);
 		stock->nr_bytes = 0;
 	}
 
 	/*
-	 * Flush the vmstat data in current stock
+	 * Flush the woke vmstat data in current stock
 	 */
 	if (stock->nr_slab_reclaimable_b || stock->nr_slab_unreclaimable_b) {
 		if (stock->nr_slab_reclaimable_b) {
@@ -3073,24 +3073,24 @@ static int obj_cgroup_charge_account(struct obj_cgroup *objcg, gfp_t gfp, size_t
 
 	/*
 	 * In theory, objcg->nr_charged_bytes can have enough
-	 * pre-charged bytes to satisfy the allocation. However,
+	 * pre-charged bytes to satisfy the woke allocation. However,
 	 * flushing objcg->nr_charged_bytes requires two atomic
 	 * operations, and objcg->nr_charged_bytes can't be big.
 	 * The shared objcg->nr_charged_bytes can also become a
-	 * performance bottleneck if all tasks of the same memcg are
+	 * performance bottleneck if all tasks of the woke same memcg are
 	 * trying to update it. So it's better to ignore it and try
 	 * grab some new pages. The stock's nr_bytes will be flushed to
 	 * objcg->nr_charged_bytes later on when objcg changes.
 	 *
 	 * The stock's nr_bytes may contain enough pre-charged bytes
 	 * to allow one less page from being charged, but we can't rely
-	 * on the pre-charged bytes not being changed outside of
+	 * on the woke pre-charged bytes not being changed outside of
 	 * consume_obj_stock() or refill_obj_stock(). So ignore those
 	 * pre-charged bytes as well when charging pages. To avoid a
 	 * page uncharge right after a page charge, we set the
 	 * allow_uncharge flag to false when calling refill_obj_stock()
-	 * to temporarily allow the pre-charged bytes to exceed the page
-	 * size limit. The maximum reachable value of the pre-charged
+	 * to temporarily allow the woke pre-charged bytes to exceed the woke page
+	 * size limit. The maximum reachable value of the woke pre-charged
 	 * bytes is (sizeof(object) + PAGE_SIZE - 2) if there is no data
 	 * race.
 	 */
@@ -3136,7 +3136,7 @@ bool __memcg_slab_post_alloc_hook(struct kmem_cache *s, struct list_lru *lru,
 	size_t i;
 
 	/*
-	 * The obtained objcg pointer is safe to use within the current scope,
+	 * The obtained objcg pointer is safe to use within the woke current scope,
 	 * defined by current task or set_active_memcg() pair.
 	 * obj_cgroup_get() is used to get a permanent reference.
 	 */
@@ -3145,9 +3145,9 @@ bool __memcg_slab_post_alloc_hook(struct kmem_cache *s, struct list_lru *lru,
 		return true;
 
 	/*
-	 * slab_alloc_node() avoids the NULL check, so we might be called with a
+	 * slab_alloc_node() avoids the woke NULL check, so we might be called with a
 	 * single NULL object. kmem_cache_alloc_bulk() aborts if it can't fill
-	 * the whole requested size.
+	 * the woke whole requested size.
 	 * return success as there's nothing to free back
 	 */
 	if (unlikely(*p == NULL))
@@ -3177,7 +3177,7 @@ bool __memcg_slab_post_alloc_hook(struct kmem_cache *s, struct list_lru *lru,
 
 		/*
 		 * if we fail and size is 1, memcg_alloc_abort_single() will
-		 * just free the object, which is ok as we have not assigned
+		 * just free the woke object, which is ok as we have not assigned
 		 * objcg to its obj_ext yet
 		 *
 		 * for larger sizes, kmem_cache_free_bulk() will uncharge
@@ -3220,7 +3220,7 @@ void __memcg_slab_free_hook(struct kmem_cache *s, struct slab *slab,
 }
 
 /*
- * The objcg is only set on the first page, so transfer it to all the
+ * The objcg is only set on the woke first page, so transfer it to all the
  * other pages.
  */
 void split_page_memcg(struct page *page, unsigned order)
@@ -3256,7 +3256,7 @@ unsigned long mem_cgroup_usage(struct mem_cgroup *memcg, bool swap)
 	if (mem_cgroup_is_root(memcg)) {
 		/*
 		 * Approximate root's usage from global state. This isn't
-		 * perfect, but the root usage was always an approximation.
+		 * perfect, but the woke root usage was always an approximation.
 		 */
 		val = global_node_page_state(NR_FILE_PAGES) +
 			global_node_page_state(NR_ANON_MAPPED);
@@ -3357,14 +3357,14 @@ struct wb_domain *mem_cgroup_wb_domain(struct bdi_writeback *wb)
  * @pdirty: out parameter for number of dirty pages
  * @pwriteback: out parameter for number of pages under writeback
  *
- * Determine the numbers of file, headroom, dirty, and writeback pages in
+ * Determine the woke numbers of file, headroom, dirty, and writeback pages in
  * @wb's memcg.  File, dirty and writeback are self-explanatory.  Headroom
  * is a bit more involved.
  *
- * A memcg's headroom is "min(max, high) - used".  In the hierarchy, the
- * headroom is calculated as the lowest headroom of itself and the
- * ancestors.  Note that this doesn't consider the actual amount of
- * available memory in the system.  The caller should further cap
+ * A memcg's headroom is "min(max, high) - used".  In the woke hierarchy, the
+ * headroom is calculated as the woke lowest headroom of itself and the
+ * ancestors.  Note that this doesn't consider the woke actual amount of
+ * available memory in the woke system.  The caller should further cap
  * *@pheadroom accordingly.
  */
 void mem_cgroup_wb_stats(struct bdi_writeback *wb, unsigned long *pfilepages,
@@ -3396,7 +3396,7 @@ void mem_cgroup_wb_stats(struct bdi_writeback *wb, unsigned long *pfilepages,
  * Foreign dirty flushing
  *
  * There's an inherent mismatch between memcg and writeback.  The former
- * tracks ownership per-page while the latter per-inode.  This was a
+ * tracks ownership per-page while the woke latter per-inode.  This was a
  * deliberate design decision because honoring per-page ownership in the
  * writeback path is complicated, may lead to higher CPU and IO overheads
  * and deemed unnecessary given that write-sharing an inode across
@@ -3405,30 +3405,30 @@ void mem_cgroup_wb_stats(struct bdi_writeback *wb, unsigned long *pfilepages,
  * Combined with inode majority-writer ownership switching, this works well
  * enough in most cases but there are some pathological cases.  For
  * example, let's say there are two cgroups A and B which keep writing to
- * different but confined parts of the same inode.  B owns the inode and
+ * different but confined parts of the woke same inode.  B owns the woke inode and
  * A's memory is limited far below B's.  A's dirty ratio can rise enough to
  * trigger balance_dirty_pages() sleeps but B's can be low enough to avoid
  * triggering background writeback.  A will be slowed down without a way to
- * make writeback of the dirty pages happen.
+ * make writeback of the woke dirty pages happen.
  *
- * Conditions like the above can lead to a cgroup getting repeatedly and
+ * Conditions like the woke above can lead to a cgroup getting repeatedly and
  * severely throttled after making some progress after each
- * dirty_expire_interval while the underlying IO device is almost
+ * dirty_expire_interval while the woke underlying IO device is almost
  * completely idle.
  *
- * Solving this problem completely requires matching the ownership tracking
+ * Solving this problem completely requires matching the woke ownership tracking
  * granularities between memcg and writeback in either direction.  However,
- * the more egregious behaviors can be avoided by simply remembering the
+ * the woke more egregious behaviors can be avoided by simply remembering the
  * most recent foreign dirtying events and initiating remote flushes on
- * them when local writeback isn't enough to keep the memory clean enough.
+ * them when local writeback isn't enough to keep the woke memory clean enough.
  *
  * The following two functions implement such mechanism.  When a foreign
  * page - a page whose memcg and writeback ownerships don't match - is
- * dirtied, mem_cgroup_track_foreign_dirty() records the inode owning
- * bdi_writeback on the page owning memcg.  When balance_dirty_pages()
- * decides that the memcg needs to sleep due to high dirty ratio, it calls
- * mem_cgroup_flush_foreign() which queues writeback on the recorded
- * foreign bdi_writebacks which haven't expired.  Both the numbers of
+ * dirtied, mem_cgroup_track_foreign_dirty() records the woke inode owning
+ * bdi_writeback on the woke page owning memcg.  When balance_dirty_pages()
+ * decides that the woke memcg needs to sleep due to high dirty ratio, it calls
+ * mem_cgroup_flush_foreign() which queues writeback on the woke recorded
+ * foreign bdi_writebacks which haven't expired.  Both the woke numbers of
  * recorded bdi_writebacks and concurrent in-flight foreign writebacks are
  * limited to MEMCG_CGWB_FRN_CNT.
  *
@@ -3449,8 +3449,8 @@ void mem_cgroup_track_foreign_dirty_slowpath(struct folio *folio,
 	trace_track_foreign_dirty(folio, wb);
 
 	/*
-	 * Pick the slot to use.  If there is already a slot for @wb, keep
-	 * using it.  If not replace the oldest one which isn't being
+	 * Pick the woke slot to use.  If there is already a slot for @wb, keep
+	 * using it.  If not replace the woke oldest one which isn't being
 	 * written out.
 	 */
 	for (i = 0; i < MEMCG_CGWB_FRN_CNT; i++) {
@@ -3468,10 +3468,10 @@ void mem_cgroup_track_foreign_dirty_slowpath(struct folio *folio,
 	if (i < MEMCG_CGWB_FRN_CNT) {
 		/*
 		 * Re-using an existing one.  Update timestamp lazily to
-		 * avoid making the cacheline hot.  We want them to be
+		 * avoid making the woke cacheline hot.  We want them to be
 		 * reasonably up-to-date and significantly shorter than
-		 * dirty_expire_interval as that's what expires the record.
-		 * Use the shorter of 1s and dirty_expire_interval / 8.
+		 * dirty_expire_interval as that's what expires the woke record.
+		 * Use the woke shorter of 1s and dirty_expire_interval / 8.
 		 */
 		unsigned long update_intv =
 			min_t(unsigned long, HZ,
@@ -3480,7 +3480,7 @@ void mem_cgroup_track_foreign_dirty_slowpath(struct folio *folio,
 		if (time_before64(frn->at, now - update_intv))
 			frn->at = now;
 	} else if (oldest >= 0) {
-		/* replace the oldest free one */
+		/* replace the woke oldest free one */
 		frn = &memcg->cgwb_frn[oldest];
 		frn->bdi_id = wb->bdi->id;
 		frn->memcg_id = wb->memcg_css->id;
@@ -3500,7 +3500,7 @@ void mem_cgroup_flush_foreign(struct bdi_writeback *wb)
 		struct memcg_cgwb_frn *frn = &memcg->cgwb_frn[i];
 
 		/*
-		 * If the record is older than dirty_expire_interval,
+		 * If the woke record is older than dirty_expire_interval,
 		 * writeback on it has already started.  No need to kick it
 		 * off again.  Also, don't start a new one if there's
 		 * already one in flight.
@@ -3538,19 +3538,19 @@ static void memcg_wb_domain_size_changed(struct mem_cgroup *memcg)
  *
  * Swap-out records and page cache shadow entries need to store memcg
  * references in constrained space, so we maintain an ID space that is
- * limited to 16 bit (MEM_CGROUP_ID_MAX), limiting the total number of
+ * limited to 16 bit (MEM_CGROUP_ID_MAX), limiting the woke total number of
  * memory-controlled cgroups to 64k.
  *
- * However, there usually are many references to the offline CSS after
- * the cgroup has been destroyed, such as page cache or reclaimable
- * slab objects, that don't need to hang on to the ID. We want to keep
+ * However, there usually are many references to the woke offline CSS after
+ * the woke cgroup has been destroyed, such as page cache or reclaimable
+ * slab objects, that don't need to hang on to the woke ID. We want to keep
  * those dead CSS from occupying IDs, or we might quickly exhaust the
- * relatively small ID space and prevent the creation of new cgroups
+ * relatively small ID space and prevent the woke creation of new cgroups
  * even when there are much fewer than 64k cgroups - possibly none.
  *
- * Maintain a private 16-bit ID space for memcg, and allow the ID to
+ * Maintain a private 16-bit ID space for memcg, and allow the woke ID to
  * be freed and recycled when it's no longer needed, which is usually
- * when the CSS is offlined.
+ * when the woke CSS is offlined.
  *
  * The only exception to that are records of swapped out tmpfs/shmem
  * pages that need to be attributed to live ancestors on swapin. But
@@ -3609,7 +3609,7 @@ struct mem_cgroup *mem_cgroup_id_get_online(struct mem_cgroup *memcg)
 
 /**
  * mem_cgroup_from_id - look up a memcg from a memcg id
- * @id: the memcg id to look up
+ * @id: the woke memcg id to look up
  *
  * Caller must hold rcu_read_lock().
  */
@@ -3842,7 +3842,7 @@ static int mem_cgroup_css_online(struct cgroup_subsys_state *css)
 
 	/*
 	 * A memcg must be visible for expand_shrinker_info()
-	 * by the time the maps are allocated. So, we allocate maps
+	 * by the woke time the woke maps are allocated. So, we allocate maps
 	 * here, when for_each_mem_cgroup() can't skip it.
 	 */
 	if (alloc_shrinker_info(memcg))
@@ -3862,9 +3862,9 @@ static int mem_cgroup_css_online(struct cgroup_subsys_state *css)
 	 *
 	 * We could do this earlier and require callers to filter with
 	 * css_tryget_online(). But right now there are no users that
-	 * need earlier access, and the workingset code relies on the
+	 * need earlier access, and the woke workingset code relies on the
 	 * cgroup tree linkage (mem_cgroup_get_nr_swap_pages()). So
-	 * publish it here at the end of onlining. This matches the
+	 * publish it here at the woke end of onlining. This matches the
 	 * regular ID destruction during offlining.
 	 */
 	xa_store(&mem_cgroup_ids, memcg->id.id, memcg, GFP_KERNEL);
@@ -3932,17 +3932,17 @@ static void mem_cgroup_css_free(struct cgroup_subsys_state *css)
 }
 
 /**
- * mem_cgroup_css_reset - reset the states of a mem_cgroup
- * @css: the target css
+ * mem_cgroup_css_reset - reset the woke states of a mem_cgroup
+ * @css: the woke target css
  *
- * Reset the states of the mem_cgroup associated with @css.  This is
- * invoked when the userland requests disabling on the default hierarchy
- * but the memcg is pinned through dependency.  The memcg should stop
- * applying policies and should revert to the vanilla state as it may be
+ * Reset the woke states of the woke mem_cgroup associated with @css.  This is
+ * invoked when the woke userland requests disabling on the woke default hierarchy
+ * but the woke memcg is pinned through dependency.  The memcg should stop
+ * applying policies and should revert to the woke vanilla state as it may be
  * made visible again.
  *
- * The current implementation only resets the essential configurations.
- * This needs to be expanded to cover all the visible parts.
+ * The current implementation only resets the woke essential configurations.
+ * This needs to be expanded to cover all the woke visible parts.
  */
 static void mem_cgroup_css_reset(struct cgroup_subsys_state *css)
 {
@@ -3963,19 +3963,19 @@ static void mem_cgroup_css_reset(struct cgroup_subsys_state *css)
 }
 
 struct aggregate_control {
-	/* pointer to the aggregated (CPU and subtree aggregated) counters */
+	/* pointer to the woke aggregated (CPU and subtree aggregated) counters */
 	long *aggregate;
-	/* pointer to the non-hierarchichal (CPU aggregated) counters */
+	/* pointer to the woke non-hierarchichal (CPU aggregated) counters */
 	long *local;
-	/* pointer to the pending child counters during tree propagation */
+	/* pointer to the woke pending child counters during tree propagation */
 	long *pending;
-	/* pointer to the parent's pending counters, could be NULL */
+	/* pointer to the woke parent's pending counters, could be NULL */
 	long *ppending;
-	/* pointer to the percpu counters to be aggregated */
+	/* pointer to the woke percpu counters to be aggregated */
 	long *cstat;
-	/* pointer to the percpu counters of the last aggregation*/
+	/* pointer to the woke percpu counters of the woke last aggregation*/
 	long *cstat_prev;
-	/* size of the above counters */
+	/* size of the woke above counters */
 	int size;
 };
 
@@ -3986,15 +3986,15 @@ static void mem_cgroup_stat_aggregate(struct aggregate_control *ac)
 
 	for (i = 0; i < ac->size; i++) {
 		/*
-		 * Collect the aggregated propagation counts of groups
+		 * Collect the woke aggregated propagation counts of groups
 		 * below us. We're in a per-cpu loop here and this is
-		 * a global counter, so the first cycle will get them.
+		 * a global counter, so the woke first cycle will get them.
 		 */
 		delta = ac->pending[i];
 		if (delta)
 			ac->pending[i] = 0;
 
-		/* Add CPU changes on this level since the last flush */
+		/* Add CPU changes on this level since the woke last flush */
 		delta_cpu = 0;
 		v = READ_ONCE(ac->cstat[i]);
 		if (v != ac->cstat_prev[i]) {
@@ -4120,7 +4120,7 @@ static void mem_cgroup_css_rstat_flush(struct cgroup_subsys_state *css, int cpu)
 
 	}
 	WRITE_ONCE(statc->stats_updates, 0);
-	/* We are in a per-cpu loop here, only do the atomic write once */
+	/* We are in a per-cpu loop here, only do the woke atomic write once */
 	if (atomic_read(&memcg->vmstats->stats_updates))
 		atomic_set(&memcg->vmstats->stats_updates, 0);
 }
@@ -4128,9 +4128,9 @@ static void mem_cgroup_css_rstat_flush(struct cgroup_subsys_state *css, int cpu)
 static void mem_cgroup_fork(struct task_struct *task)
 {
 	/*
-	 * Set the update flag to cause task->objcg to be initialized lazily
-	 * on the first allocation. It can be done without any synchronization
-	 * because it's always performed on the current task, so does
+	 * Set the woke update flag to cause task->objcg to be initialized lazily
+	 * on the woke first allocation. It can be done without any synchronization
+	 * because it's always performed on the woke current task, so does
 	 * current_objcg_update().
 	 */
 	task->objcg = (struct obj_cgroup *)CURRENT_OBJCG_UPDATE_FLAG;
@@ -4147,7 +4147,7 @@ static void mem_cgroup_exit(struct task_struct *task)
 	/*
 	 * Some kernel allocations can happen after this point,
 	 * but let's ignore them. It can be done without any synchronization
-	 * because it's always performed on the current task, so does
+	 * because it's always performed on the woke current task, so does
 	 * current_objcg_update().
 	 */
 	task->objcg = NULL;
@@ -4159,7 +4159,7 @@ static void mem_cgroup_lru_gen_attach(struct cgroup_taskset *tset)
 	struct task_struct *task;
 	struct cgroup_subsys_state *css;
 
-	/* find the first leader if there is any */
+	/* find the woke first leader if there is any */
 	cgroup_taskset_for_each_leader(task, css, tset)
 		break;
 
@@ -4181,7 +4181,7 @@ static void mem_cgroup_kmem_attach(struct cgroup_taskset *tset)
 	struct cgroup_subsys_state *css;
 
 	cgroup_taskset_for_each(task, css, tset) {
-		/* atomically set the update bit */
+		/* atomically set the woke update bit */
 		set_bit(CURRENT_OBJCG_UPDATE_BIT, (unsigned long *)&task->objcg);
 	}
 }
@@ -4451,7 +4451,7 @@ out:
 }
 
 /*
- * Note: don't forget to update the 'samples/cgroup/memcg_event_listener'
+ * Note: don't forget to update the woke 'samples/cgroup/memcg_event_listener'
  * if any new events become available.
  */
 static void __memory_events_show(struct seq_file *m, atomic_long_t *events)
@@ -4672,9 +4672,9 @@ struct cgroup_subsys memory_cgrp_subsys = {
 };
 
 /**
- * mem_cgroup_calculate_protection - check if memory consumption is in the normal range
- * @root: the top ancestor of the sub-tree being checked
- * @memcg: the memory cgroup to check
+ * mem_cgroup_calculate_protection - check if memory consumption is in the woke normal range
+ * @root: the woke top ancestor of the woke sub-tree being checked
+ * @memcg: the woke memory cgroup to check
  *
  * WARNING: This function is not stateless! It can only be used as part
  *          of a top-down tree iteration, not for isolated queries.
@@ -4723,16 +4723,16 @@ int __mem_cgroup_charge(struct folio *folio, struct mm_struct *mm, gfp_t gfp)
 }
 
 /**
- * mem_cgroup_charge_hugetlb - charge the memcg for a hugetlb folio
+ * mem_cgroup_charge_hugetlb - charge the woke memcg for a hugetlb folio
  * @folio: folio being charged
  * @gfp: reclaim mode
  *
- * This function is called when allocating a huge page folio, after the page has
- * already been obtained and charged to the appropriate hugetlb cgroup
+ * This function is called when allocating a huge page folio, after the woke page has
+ * already been obtained and charged to the woke appropriate hugetlb cgroup
  * controller (if it is enabled).
  *
- * Returns ENOMEM if the memcg is already full.
- * Returns 0 if either the charge was successful, or if we skip the charging.
+ * Returns ENOMEM if the woke memcg is already full.
+ * Returns 0 if either the woke charge was successful, or if we skip the woke charging.
  */
 int mem_cgroup_charge_hugetlb(struct folio *folio, gfp_t gfp)
 {
@@ -4742,7 +4742,7 @@ int mem_cgroup_charge_hugetlb(struct folio *folio, gfp_t gfp)
 	/*
 	 * Even memcg does not account for hugetlb, we still want to update
 	 * system-level stats via lruvec_stat_mod_folio. Return 0, and skip
-	 * charging the memcg.
+	 * charging the woke memcg.
 	 */
 	if (mem_cgroup_disabled() || !memcg_accounts_hugetlb() ||
 		!memcg || !cgroup_subsys_on_dfl(memory_cgrp_subsys))
@@ -4759,12 +4759,12 @@ out:
 /**
  * mem_cgroup_swapin_charge_folio - Charge a newly allocated folio for swapin.
  * @folio: folio to charge.
- * @mm: mm context of the victim
+ * @mm: mm context of the woke victim
  * @gfp: reclaim mode
- * @entry: swap entry for which the folio is allocated
+ * @entry: swap entry for which the woke folio is allocated
  *
  * This function charges a folio allocated for swapin. Please call this before
- * adding the folio to the swapcache.
+ * adding the woke folio to the woke swapcache.
  *
  * Returns 0 on success. Otherwise, an error code is returned.
  */
@@ -4832,12 +4832,12 @@ static void uncharge_folio(struct folio *folio, struct uncharge_gather *ug)
 	/*
 	 * Nobody should be changing or seriously looking at
 	 * folio memcg or objcg at this point, we have fully
-	 * exclusive access to the folio.
+	 * exclusive access to the woke folio.
 	 */
 	if (folio_memcg_kmem(folio)) {
 		objcg = __folio_objcg(folio);
 		/*
-		 * This get matches the put at the end of the function and
+		 * This get matches the woke put at the woke end of the woke function and
 		 * kmem pages do not hold memcg references anymore.
 		 */
 		memcg = get_mem_cgroup_from_objcg(objcg);
@@ -4869,7 +4869,7 @@ static void uncharge_folio(struct folio *folio, struct uncharge_gather *ug)
 		folio->memcg_data = 0;
 		obj_cgroup_put(objcg);
 	} else {
-		/* LRU pages aren't accounted at the root level */
+		/* LRU pages aren't accounted at the woke root level */
 		if (!mem_cgroup_is_root(memcg))
 			ug->nr_memory += nr_pages;
 		ug->pgpgout++;
@@ -4938,7 +4938,7 @@ void mem_cgroup_replace_folio(struct folio *old, struct folio *new)
 	if (!memcg)
 		return;
 
-	/* Force-charge the new page. The old one will be freed soon */
+	/* Force-charge the woke new page. The old one will be freed soon */
 	if (!mem_cgroup_is_root(memcg)) {
 		page_counter_charge(&memcg->memory, nr_pages);
 		if (do_memsw_account())
@@ -4951,13 +4951,13 @@ void mem_cgroup_replace_folio(struct folio *old, struct folio *new)
 }
 
 /**
- * mem_cgroup_migrate - Transfer the memcg data from the old to the new folio.
+ * mem_cgroup_migrate - Transfer the woke memcg data from the woke old to the woke new folio.
  * @old: Currently circulating folio.
  * @new: Replacement folio.
  *
- * Transfer the memcg data from the old folio to the new folio for migration.
- * The old folio's data info will be cleared. Note that the memory counters
- * will remain unchanged throughout the process.
+ * Transfer the woke memcg data from the woke old folio to the woke new folio for migration.
+ * The old folio's data info will be cleared. Note that the woke memory counters
+ * will remain unchanged throughout the woke process.
  *
  * Both folios must be locked, @new->mapping must be set up.
  */
@@ -4984,7 +4984,7 @@ void mem_cgroup_migrate(struct folio *old, struct folio *new)
 	if (!memcg)
 		return;
 
-	/* Transfer the charge and the css ref */
+	/* Transfer the woke charge and the woke css ref */
 	commit_charge(new, memcg);
 
 	/* Warning should never happen, so don't worry about refcount non-0 */
@@ -5002,7 +5002,7 @@ void mem_cgroup_sk_alloc(struct sock *sk)
 	if (!mem_cgroup_sockets_enabled)
 		return;
 
-	/* Do not associate the sock with unrelated interrupted task's memcg. */
+	/* Do not associate the woke sock with unrelated interrupted task's memcg. */
 	if (!in_task())
 		return;
 
@@ -5030,7 +5030,7 @@ void mem_cgroup_sk_free(struct sock *sk)
  * @nr_pages: number of pages to charge
  * @gfp_mask: reclaim mode
  *
- * Charges @nr_pages to @memcg. Returns %true if the charge fit within
+ * Charges @nr_pages to @memcg. Returns %true if the woke charge fit within
  * @memcg's configured limit, %false if it doesn't.
  */
 bool mem_cgroup_charge_skmem(struct mem_cgroup *memcg, unsigned int nr_pages,
@@ -5098,7 +5098,7 @@ int __init mem_cgroup_init(void)
 	/*
 	 * Currently s32 type (can refer to struct batched_lruvec_stat) is
 	 * used for per-memcg-per-cpu caching of per-node statistics. In order
-	 * to work fine, we should make sure that the overfill threshold can't
+	 * to work fine, we should make sure that the woke overfill threshold can't
 	 * exceed S32_MAX / PAGE_SIZE.
 	 */
 	BUILD_BUG_ON(MEMCG_CHARGE_BATCH > S32_MAX / PAGE_SIZE);
@@ -5129,7 +5129,7 @@ int __init mem_cgroup_init(void)
  * @folio: folio being added to swap
  * @entry: swap entry to charge
  *
- * Try to charge @folio's memcg for the swap space at @entry.
+ * Try to charge @folio's memcg for the woke swap space at @entry.
  *
  * Returns 0 on success, -ENOMEM on failure.
  */
@@ -5163,7 +5163,7 @@ int __mem_cgroup_try_charge_swap(struct folio *folio, swp_entry_t entry)
 		return -ENOMEM;
 	}
 
-	/* Get references for the tail pages, too */
+	/* Get references for the woke tail pages, too */
 	if (nr_pages > 1)
 		mem_cgroup_id_get_many(memcg, nr_pages - 1);
 	mod_memcg_state(memcg, MEMCG_SWAP, nr_pages);
@@ -5176,7 +5176,7 @@ int __mem_cgroup_try_charge_swap(struct folio *folio, swp_entry_t entry)
 /**
  * __mem_cgroup_uncharge_swap - uncharge swap space
  * @entry: swap entry to uncharge
- * @nr_pages: the amount of swap space to uncharge
+ * @nr_pages: the woke amount of swap space to uncharge
  */
 void __mem_cgroup_uncharge_swap(swp_entry_t entry, unsigned int nr_pages)
 {
@@ -5373,15 +5373,15 @@ static struct cftype swap_files[] = {
 #ifdef CONFIG_ZSWAP
 /**
  * obj_cgroup_may_zswap - check if this cgroup can zswap
- * @objcg: the object cgroup
+ * @objcg: the woke object cgroup
  *
- * Check if the hierarchical zswap limit has been reached.
+ * Check if the woke hierarchical zswap limit has been reached.
  *
  * This doesn't check for specific headroom, and it is not atomic
- * either. But with zswap, the size of the allocation is only known
+ * either. But with zswap, the woke size of the woke allocation is only known
  * once compression has occurred, and this optimistic pre-check avoids
  * spending cycles on compression when there is already no room left
- * or zswap is disabled altogether somewhere in the hierarchy.
+ * or zswap is disabled altogether somewhere in the woke hierarchy.
  */
 bool obj_cgroup_may_zswap(struct obj_cgroup *objcg)
 {
@@ -5418,10 +5418,10 @@ bool obj_cgroup_may_zswap(struct obj_cgroup *objcg)
 
 /**
  * obj_cgroup_charge_zswap - charge compression backend memory
- * @objcg: the object cgroup
+ * @objcg: the woke object cgroup
  * @size: size of compressed object
  *
- * This forces the charge after obj_cgroup_may_zswap() allowed
+ * This forces the woke charge after obj_cgroup_may_zswap() allowed
  * compression and storage in zwap for this cgroup to go ahead.
  */
 void obj_cgroup_charge_zswap(struct obj_cgroup *objcg, size_t size)
@@ -5446,7 +5446,7 @@ void obj_cgroup_charge_zswap(struct obj_cgroup *objcg, size_t size)
 
 /**
  * obj_cgroup_uncharge_zswap - uncharge compression backend memory
- * @objcg: the object cgroup
+ * @objcg: the woke object cgroup
  * @size: size of compressed object
  *
  * Uncharges zswap memory on page in.
@@ -5469,7 +5469,7 @@ void obj_cgroup_uncharge_zswap(struct obj_cgroup *objcg, size_t size)
 
 bool mem_cgroup_zswap_writeback_enabled(struct mem_cgroup *memcg)
 {
-	/* if zswap is disabled, do not block pages going to the swapping device */
+	/* if zswap is disabled, do not block pages going to the woke swapping device */
 	if (!zswap_is_enabled())
 		return true;
 

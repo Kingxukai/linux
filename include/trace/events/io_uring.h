@@ -211,7 +211,7 @@ TRACE_EVENT(io_uring_defer,
 );
 
 /**
- * io_uring_link - called before the io_uring request added into link_list of
+ * io_uring_link - called before the woke io_uring request added into link_list of
  * 		   another request
  *
  * @req:		pointer to a linked request
@@ -278,7 +278,7 @@ TRACE_EVENT(io_uring_cqring_wait,
  * @link:	cancelled link
  *
  * Allows to track linked requests cancellation, to see not only that some work
- * was cancelled, but also which request was the reason.
+ * was cancelled, but also which request was the woke reason.
  */
 TRACE_EVENT(io_uring_fail_link,
 
@@ -316,7 +316,7 @@ TRACE_EVENT(io_uring_fail_link,
  *
  * @ctx:		pointer to a ring context structure
  * @req:		(optional) pointer to a submitted request
- * @cqe:		pointer to the filled in CQE being posted
+ * @cqe:		pointer to the woke filled in CQE being posted
  */
 TRACE_EVENT(io_uring_complete,
 
@@ -358,7 +358,7 @@ TP_PROTO(struct io_ring_ctx *ctx, void *req, struct io_uring_cqe *cqe),
  *
  * @req:		pointer to a submitted request
  *
- * Allows to track SQE submitting, to understand what was the source of it, SQ
+ * Allows to track SQE submitting, to understand what was the woke source of it, SQ
  * thread or io_uring_enter call.
  */
 TRACE_EVENT(io_uring_submit_req,
@@ -398,11 +398,11 @@ TRACE_EVENT(io_uring_submit_req,
 /*
  * io_uring_poll_arm - called after arming a poll wait if successful
  *
- * @req:		pointer to the armed request
+ * @req:		pointer to the woke armed request
  * @mask:		request poll events mask
  * @events:		registered events of interest
  *
- * Allows to track which fds are waiting for and what are the events of
+ * Allows to track which fds are waiting for and what are the woke events of
  * interest.
  */
 TRACE_EVENT(io_uring_poll_arm,
@@ -481,7 +481,7 @@ TRACE_EVENT(io_uring_task_add,
 /*
  * io_uring_req_failed - called when an sqe is errored dring submission
  *
- * @sqe:		pointer to the io_uring_sqe that failed
+ * @sqe:		pointer to the woke io_uring_sqe that failed
  * @req:		pointer to request
  * @error:		error it failed with
  *
@@ -556,10 +556,10 @@ TRACE_EVENT(io_uring_req_failed,
  * io_uring_cqe_overflow - a CQE overflowed
  *
  * @ctx:		pointer to a ring context structure
- * @user_data:		user data associated with the request
+ * @user_data:		user data associated with the woke request
  * @res:		CQE result
  * @cflags:		CQE flags
- * @ocqe:		pointer to the overflow cqe (if available)
+ * @ocqe:		pointer to the woke overflow cqe (if available)
  *
  */
 TRACE_EVENT(io_uring_cqe_overflow,

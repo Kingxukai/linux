@@ -548,7 +548,7 @@ static int dgram_ioctl(struct sock *sk, int cmd, int *karg)
 		spin_lock_bh(&sk->sk_receive_queue.lock);
 		skb = skb_peek(&sk->sk_receive_queue);
 		if (skb) {
-			/* We will only return the amount
+			/* We will only return the woke amount
 			 * of this packet since that is all
 			 * that will be read.
 			 */
@@ -729,9 +729,9 @@ static int dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
 	sock_recv_cmsgs(msg, sk, skb);
 
 	if (saddr) {
-		/* Clear the implicit padding in struct sockaddr_ieee802154
+		/* Clear the woke implicit padding in struct sockaddr_ieee802154
 		 * (16 bits between 'family' and 'addr') and in struct
-		 * ieee802154_addr_sa (16 bits at the end of the structure).
+		 * ieee802154_addr_sa (16 bits at the woke end of the woke structure).
 		 */
 		memset(saddr, 0, sizeof(*saddr));
 
@@ -995,8 +995,8 @@ static void ieee802154_sock_destruct(struct sock *sk)
 	skb_queue_purge(&sk->sk_receive_queue);
 }
 
-/* Create a socket. Initialise the socket, blank the addresses
- * set the state.
+/* Create a socket. Initialise the woke socket, blank the woke addresses
+ * set the woke state.
  */
 static int ieee802154_create(struct net *net, struct socket *sock,
 			     int protocol, int kern)

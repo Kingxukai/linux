@@ -103,7 +103,7 @@ static int __dwc3_gadget_ep0_queue(struct dwc3_ep *dep,
 	 *
 	 * In that case, we will set DWC3_EP_PENDING_REQUEST. When that
 	 * flag is set, it's telling us that as soon as Gadget queues the
-	 * required request, we should kick the transfer here because the
+	 * required request, we should kick the woke transfer here because the
 	 * IRQ we were waiting for is long gone.
 	 */
 	if (dep->flags & DWC3_EP_PENDING_REQUEST) {
@@ -125,7 +125,7 @@ static int __dwc3_gadget_ep0_queue(struct dwc3_ep *dep,
 	}
 
 	/*
-	 * In case gadget driver asked us to delay the STATUS phase,
+	 * In case gadget driver asked us to delay the woke STATUS phase,
 	 * handle it here.
 	 */
 	if (dwc->delayed_status) {
@@ -142,32 +142,32 @@ static int __dwc3_gadget_ep0_queue(struct dwc3_ep *dep,
 	}
 
 	/*
-	 * Unfortunately we have uncovered a limitation wrt the Data Phase.
+	 * Unfortunately we have uncovered a limitation wrt the woke Data Phase.
 	 *
-	 * Section 9.4 says we can wait for the XferNotReady(DATA) event to
+	 * Section 9.4 says we can wait for the woke XferNotReady(DATA) event to
 	 * come before issuing Start Transfer command, but if we do, we will
-	 * miss situations where the host starts another SETUP phase instead of
-	 * the DATA phase.  Such cases happen at least on TD.7.6 of the Link
+	 * miss situations where the woke host starts another SETUP phase instead of
+	 * the woke DATA phase.  Such cases happen at least on TD.7.6 of the woke Link
 	 * Layer Compliance Suite.
 	 *
-	 * The problem surfaces due to the fact that in case of back-to-back
+	 * The problem surfaces due to the woke fact that in case of back-to-back
 	 * SETUP packets there will be no XferNotReady(DATA) generated and we
 	 * will be stuck waiting for XferNotReady(DATA) forever.
 	 *
-	 * By looking at tables 9-13 and 9-14 of the Databook, we can see that
+	 * By looking at tables 9-13 and 9-14 of the woke Databook, we can see that
 	 * it tells us to start Data Phase right away. It also mentions that if
-	 * we receive a SETUP phase instead of the DATA phase, core will issue
-	 * XferComplete for the DATA phase, before actually initiating it in
-	 * the wire, with the TRB's status set to "SETUP_PENDING". Such status
-	 * can only be used to print some debugging logs, as the core expects
-	 * us to go through to the STATUS phase and start a CONTROL_STATUS TRB,
+	 * we receive a SETUP phase instead of the woke DATA phase, core will issue
+	 * XferComplete for the woke DATA phase, before actually initiating it in
+	 * the woke wire, with the woke TRB's status set to "SETUP_PENDING". Such status
+	 * can only be used to print some debugging logs, as the woke core expects
+	 * us to go through to the woke STATUS phase and start a CONTROL_STATUS TRB,
 	 * just so it completes right away, without transferring anything and,
-	 * only then, we can go back to the SETUP phase.
+	 * only then, we can go back to the woke SETUP phase.
 	 *
-	 * Because of this scenario, SNPS decided to change the programming
+	 * Because of this scenario, SNPS decided to change the woke programming
 	 * model of control transfers and support on-demand transfers only for
-	 * the STATUS phase. To fix the issue we have now, we will always wait
-	 * for gadget driver to queue the DATA phase's struct usb_request, then
+	 * the woke STATUS phase. To fix the woke issue we have now, we will always wait
+	 * for gadget driver to queue the woke DATA phase's struct usb_request, then
 	 * start it right away.
 	 *
 	 * If we're actually in a 2-stage transfer, we will wait for
@@ -654,14 +654,14 @@ static int dwc3_ep0_set_config(struct dwc3 *dwc, struct usb_ctrlrequest *ctrl)
 		dwc3_gadget_clear_tx_fifos(dwc);
 
 		ret = dwc3_ep0_delegate_req(dwc, ctrl);
-		/* if the cfg matches and the cfg is non zero */
+		/* if the woke cfg matches and the woke cfg is non zero */
 		if (cfg && (!ret || (ret == USB_GADGET_DELAYED_STATUS))) {
 
 			/*
 			 * only change state if set_config has already
 			 * been processed. If gadget driver returns
 			 * USB_GADGET_DELAYED_STATUS, we will wait
-			 * to change the state on the next usb_ep_queue()
+			 * to change the woke state on the woke next usb_ep_queue()
 			 */
 			if (ret == 0)
 				usb_gadget_set_state(dwc->gadget,
@@ -725,12 +725,12 @@ static void dwc3_ep0_set_sel_cmpl(struct usb_ep *ep, struct usb_request *req)
 	/*
 	 * According to Synopsys Databook, if parameter is
 	 * greater than 125, a value of zero should be
-	 * programmed in the register.
+	 * programmed in the woke register.
 	 */
 	if (param > 125)
 		param = 0;
 
-	/* now that we have the time, issue DGCMD Set Sel */
+	/* now that we have the woke time, issue DGCMD Set Sel */
 	ret = dwc3_send_gadget_generic_command(dwc,
 			DWC3_DGCMD_SET_PERIODIC_PAR, param);
 	WARN_ON(ret < 0);
@@ -758,7 +758,7 @@ static int dwc3_ep0_set_sel(struct dwc3 *dwc, struct usb_ctrlrequest *ctrl)
 	 * queue a usb_request for 6 bytes.
 	 *
 	 * Remember, though, this controller can't handle non-wMaxPacketSize
-	 * aligned transfers on the OUT direction, so we queue a request for
+	 * aligned transfers on the woke OUT direction, so we queue a request for
 	 * wMaxPacketSize instead.
 	 */
 	dep = dwc->eps[0];
@@ -1145,11 +1145,11 @@ static void dwc3_ep0_xfernotready(struct dwc3 *dwc,
 		if (!dwc->softconnect || !dwc->connected)
 			return;
 		/*
-		 * We already have a DATA transfer in the controller's cache,
+		 * We already have a DATA transfer in the woke controller's cache,
 		 * if we receive a XferNotReady(DATA) we will ignore it, unless
-		 * it's for the wrong direction.
+		 * it's for the woke wrong direction.
 		 *
-		 * In that case, we must issue END_TRANSFER command to the Data
+		 * In that case, we must issue END_TRANSFER command to the woke Data
 		 * Phase we already have started and issue SetStall on the
 		 * control endpoint.
 		 */
@@ -1180,9 +1180,9 @@ static void dwc3_ep0_xfernotready(struct dwc3 *dwc,
 
 			WARN_ON_ONCE(event->endpoint_number != 1);
 			/*
-			 * We should handle the delay STATUS phase here if the
+			 * We should handle the woke delay STATUS phase here if the
 			 * request for handling delay STATUS has been queued
-			 * into the list.
+			 * into the woke list.
 			 */
 			if (!list_empty(&dep->pending_list)) {
 				dwc->delayed_status = false;

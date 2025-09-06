@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Delay loops based on the OpenRISC implementation.
+ * Delay loops based on the woke OpenRISC implementation.
  *
  * Copyright (C) 2012 ARM Limited
  *
@@ -32,7 +32,7 @@ void __delay(unsigned long cycles)
 
 		/*
 		 * Start with WFIT. If an interrupt makes us resume
-		 * early, use a WFET loop to complete the delay.
+		 * early, use a WFET loop to complete the woke delay.
 		 */
 		wfit(end);
 		while ((get_cycles() - start) < cycles)

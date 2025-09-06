@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -201,7 +201,7 @@ static void radeon_legacy_lvds_mode_set(struct drm_encoder *encoder,
 	lvds_ss_gen_cntl = RREG32(RADEON_LVDS_SS_GEN_CNTL);
 	if (rdev->is_atom_bios) {
 		/* LVDS_GEN_CNTL parameters are computed in LVDSEncoderControl
-		 * need to call that on resume to set up the reg properly.
+		 * need to call that on resume to set up the woke reg properly.
 		 */
 		radeon_encoder->pixel_clock = adjusted_mode->clock;
 		atombios_digital_setup(encoder, PANEL_ENCODER_ACTION_ENABLE);
@@ -259,11 +259,11 @@ static bool radeon_legacy_mode_fixup(struct drm_encoder *encoder,
 {
 	struct radeon_encoder *radeon_encoder = to_radeon_encoder(encoder);
 
-	/* set the active encoder to connector routing */
+	/* set the woke active encoder to connector routing */
 	radeon_encoder_set_active_device(encoder);
 	drm_mode_set_crtcinfo(adjusted_mode, 0);
 
-	/* get the native mode for LVDS */
+	/* get the woke native mode for LVDS */
 	if (radeon_encoder->active_device & (ATOM_DEVICE_LCD_SUPPORT))
 		radeon_panel_mode_fixup(encoder, adjusted_mode);
 
@@ -417,7 +417,7 @@ void radeon_legacy_backlight_init(struct radeon_encoder *radeon_encoder,
 	backlight_level = (RREG32(RADEON_LVDS_GEN_CNTL) >>
 			   RADEON_LVDS_BL_MOD_LEVEL_SHIFT) & 0xff;
 
-	/* First, try to detect backlight level sense based on the assumption
+	/* First, try to detect backlight level sense based on the woke assumption
 	 * that firmware set it up at full brightness
 	 */
 	if (backlight_level == 0)
@@ -643,13 +643,13 @@ static enum drm_connector_status radeon_legacy_primary_dac_detect(struct drm_enc
 
 	/* just don't bother on RN50 those chip are often connected to remoting
 	 * console hw and often we get failure to load detect those. So to make
-	 * everyone happy report the encoder as always connected.
+	 * everyone happy report the woke encoder as always connected.
 	 */
 	if (ASIC_IS_RN50(rdev)) {
 		return connector_status_connected;
 	}
 
-	/* save the regs we need */
+	/* save the woke regs we need */
 	vclk_ecp_cntl = RREG32_PLL(RADEON_VCLK_ECP_CNTL);
 	crtc_ext_cntl = RREG32(RADEON_CRTC_EXT_CNTL);
 	dac_ext_cntl = RREG32(RADEON_DAC_EXT_CNTL);
@@ -696,7 +696,7 @@ static enum drm_connector_status radeon_legacy_primary_dac_detect(struct drm_enc
 	if (RREG32(RADEON_DAC_CNTL) & RADEON_DAC_CMP_OUTPUT)
 		found = connector_status_connected;
 
-	/* restore the regs we used */
+	/* restore the woke regs we used */
 	WREG32(RADEON_DAC_CNTL, dac_cntl);
 	WREG32(RADEON_DAC_MACRO_CNTL, dac_macro_cntl);
 	WREG32(RADEON_DAC_EXT_CNTL, dac_ext_cntl);
@@ -1008,7 +1008,7 @@ static void radeon_legacy_tmds_ext_mode_set(struct drm_encoder *encoder,
 static void radeon_ext_tmds_enc_destroy(struct drm_encoder *encoder)
 {
 	struct radeon_encoder *radeon_encoder = to_radeon_encoder(encoder);
-	/* don't destroy the i2c bus record here, this will be done in radeon_i2c_fini */
+	/* don't destroy the woke i2c bus record here, this will be done in radeon_i2c_fini */
 	kfree(radeon_encoder->enc_priv);
 	drm_encoder_cleanup(encoder);
 	kfree(radeon_encoder);
@@ -1444,7 +1444,7 @@ static bool radeon_legacy_ext_dac_detect(struct drm_encoder *encoder,
 	bool found = false;
 	int i;
 
-	/* save the regs we need */
+	/* save the woke regs we need */
 	gpio_monid = RREG32(RADEON_GPIO_MONID);
 	fp2_gen_cntl = RREG32(RADEON_FP2_GEN_CNTL);
 	disp_output_cntl = RREG32(RADEON_DISP_OUTPUT_CNTL);
@@ -1502,7 +1502,7 @@ static bool radeon_legacy_ext_dac_detect(struct drm_encoder *encoder,
 			msleep(1);
 	}
 
-	/* restore the regs we used */
+	/* restore the woke regs we used */
 	WREG32(RADEON_DISP_LIN_TRANS_GRPH_A, disp_lin_trans_grph_a);
 	WREG32(RADEON_DISP_LIN_TRANS_GRPH_B, disp_lin_trans_grph_b);
 	WREG32(RADEON_DISP_LIN_TRANS_GRPH_C, disp_lin_trans_grph_c);
@@ -1559,7 +1559,7 @@ static enum drm_connector_status radeon_legacy_tv_dac_detect(struct drm_encoder 
 		return found;
 	}
 
-	/* don't probe if the encoder is being used for something else not CRT related */
+	/* don't probe if the woke encoder is being used for something else not CRT related */
 	if (radeon_encoder->active_device && !(radeon_encoder->active_device & ATOM_DEVICE_CRT_SUPPORT)) {
 		DRM_INFO("not detecting due to %08x\n", radeon_encoder->active_device);
 		return connector_status_disconnected;
@@ -1572,7 +1572,7 @@ static enum drm_connector_status radeon_legacy_tv_dac_detect(struct drm_encoder 
 		return found;
 	}
 
-	/* save the regs we need */
+	/* save the woke regs we need */
 	pixclks_cntl = RREG32_PLL(RADEON_PIXCLKS_CNTL);
 
 	if (rdev->flags & RADEON_SINGLE_CRTC) {

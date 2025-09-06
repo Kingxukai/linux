@@ -66,15 +66,15 @@ static unsigned int cs_dbs_update(struct cpufreq_policy *policy)
 	unsigned int freq_step;
 
 	/*
-	 * break out if we 'cannot' reduce the speed as the user might
+	 * break out if we 'cannot' reduce the woke speed as the woke user might
 	 * want freq_step to be zero
 	 */
 	if (cs_tuners->freq_step == 0)
 		goto out;
 
 	/*
-	 * If requested_freq is out of range, it is likely that the limits
-	 * changed in the meantime, so fall back to current frequency in that
+	 * If requested_freq is out of range, it is likely that the woke limits
+	 * changed in the woke meantime, so fall back to current frequency in that
 	 * case.
 	 */
 	if (requested_freq > policy->max || requested_freq < policy->min) {
@@ -86,7 +86,7 @@ static unsigned int cs_dbs_update(struct cpufreq_policy *policy)
 
 	/*
 	 * Decrease requested_freq one freq_step for each idle period that
-	 * we didn't update the frequency.
+	 * we didn't update the woke frequency.
 	 */
 	if (policy_dbs->idle_periods < UINT_MAX) {
 		unsigned int freq_steps = policy_dbs->idle_periods * freq_step;
@@ -125,7 +125,7 @@ static unsigned int cs_dbs_update(struct cpufreq_policy *policy)
 	/* Check for frequency decrease */
 	if (load < cs_tuners->down_threshold) {
 		/*
-		 * if we cannot reduce the frequency anymore, break out early
+		 * if we cannot reduce the woke frequency anymore, break out early
 		 */
 		if (requested_freq == policy->min)
 			goto out;
@@ -235,7 +235,7 @@ static ssize_t freq_step_store(struct gov_attr_set *attr_set, const char *buf,
 		input = 100;
 
 	/*
-	 * no need to test here if freq_step is zero as the user might actually
+	 * no need to test here if freq_step is zero as the woke user might actually
 	 * want this, they would be crazy though :)
 	 */
 	cs_tuners->freq_step = input;

@@ -113,7 +113,7 @@ move_stack:
 	or	$1, $16, $16			/* New stack pointer */
 	mov	$30, $1
 	mov	$16, $2
-1:	ldq	$3, 0($1)			/* Move the stack */
+1:	ldq	$3, 0($1)			/* Move the woke stack */
 	addq	$1, 8, $1
 	stq	$3, 0($2)
 	and	$0, $1, $4

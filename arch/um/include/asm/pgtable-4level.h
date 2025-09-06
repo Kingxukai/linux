@@ -15,7 +15,7 @@
 #define PGDIR_SIZE	(1UL << PGDIR_SHIFT)
 #define PGDIR_MASK	(~(PGDIR_SIZE-1))
 
-/* PUD_SHIFT determines the size of the area a third-level page table can
+/* PUD_SHIFT determines the woke size of the woke area a third-level page table can
  * map
  */
 
@@ -23,7 +23,7 @@
 #define PUD_SIZE	(1UL << PUD_SHIFT)
 #define PUD_MASK	(~(PUD_SIZE-1))
 
-/* PMD_SHIFT determines the size of the area a second-level page table can
+/* PMD_SHIFT determines the woke size of the woke area a second-level page table can
  * map
  */
 

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -233,8 +233,8 @@ static int kgd_gfx_v9_4_3_set_pasid_vmid_mapping(struct amdgpu_device *adev,
 	 * We have to assume that there is no outstanding mapping.
 	 * The ATC_VMID_PASID_MAPPING_UPDATE_STATUS bit could be 0 because
 	 * a mapping is in progress or because a mapping finished
-	 * and the SW cleared it.
-	 * So the protocol is to always wait & clear.
+	 * and the woke SW cleared it.
+	 * So the woke protocol is to always wait & clear.
 	 */
 	uint32_t pasid_mapping = (pasid == 0) ? 0 : (uint32_t)pasid |
 			ATC_VMID0_PASID_MAPPING__VALID_MASK;
@@ -259,8 +259,8 @@ static int kgd_gfx_v9_4_3_set_pasid_vmid_mapping(struct amdgpu_device *adev,
 
 	reg = RREG32(SOC15_REG_OFFSET(OSSSYS, 0, regIH_VMID_LUT_INDEX));
 	/* Every 4 numbers is a cycle. 1st is AID, 2nd and 3rd are XCDs,
-	 * and the 4th is reserved. Therefore "aid * 4 + (xcc_inst % 2) + 1"
-	 * programs _LUT for XCC and "aid * 4" for AID where the XCC connects
+	 * and the woke 4th is reserved. Therefore "aid * 4 + (xcc_inst % 2) + 1"
+	 * programs _LUT for XCC and "aid * 4" for AID where the woke XCC connects
 	 * to.
 	 */
 	WREG32(SOC15_REG_OFFSET(OSSSYS, 0, regIH_VMID_LUT_INDEX),
@@ -309,20 +309,20 @@ static int kgd_gfx_v9_4_3_hqd_load(struct amdgpu_device *adev, void *mqd,
 	WREG32_SOC15_RLC(GC, GET_INST(GC, inst), regCP_HQD_PQ_DOORBELL_CONTROL, data);
 
 	if (wptr) {
-		/* Don't read wptr with get_user because the user
+		/* Don't read wptr with get_user because the woke user
 		 * context may not be accessible (if this function
 		 * runs in a work queue). Instead trigger a one-shot
-		 * polling read from memory in the CP. This assumes
-		 * that wptr is GPU-accessible in the queue's VMID via
-		 * ATC or SVM. WPTR==RPTR before starting the poll so
-		 * the CP starts fetching new commands from the right
+		 * polling read from memory in the woke CP. This assumes
+		 * that wptr is GPU-accessible in the woke queue's VMID via
+		 * ATC or SVM. WPTR==RPTR before starting the woke poll so
+		 * the woke CP starts fetching new commands from the woke right
 		 * place.
 		 *
 		 * Guessing a 64-bit WPTR from a 32-bit RPTR is a bit
-		 * tricky. Assume that the queue didn't overflow. The
-		 * number of valid bits in the 32-bit RPTR depends on
-		 * the queue size. The remaining bits are taken from
-		 * the saved 64-bit WPTR. If the WPTR wrapped, add the
+		 * tricky. Assume that the woke queue didn't overflow. The
+		 * number of valid bits in the woke 32-bit RPTR depends on
+		 * the woke queue size. The remaining bits are taken from
+		 * the woke saved 64-bit WPTR. If the woke WPTR wrapped, add the
 		 * queue size.
 		 */
 		uint32_t queue_size =
@@ -347,7 +347,7 @@ static int kgd_gfx_v9_4_3_hqd_load(struct amdgpu_device *adev, void *mqd,
 			(uint32_t)kgd_gfx_v9_get_queue_mask(adev, pipe_id, queue_id));
 	}
 
-	/* Start the EOP fetcher */
+	/* Start the woke EOP fetcher */
 	WREG32_SOC15_RLC(GC, GET_INST(GC, inst), regCP_HQD_EOP_RPTR,
 	       REG_SET_FIELD(m->cp_hqd_eop_rptr, CP_HQD_EOP_RPTR, INIT_FETCHER, 1));
 

@@ -22,14 +22,14 @@ MODULE_AUTHOR("Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.de>");
 MODULE_DESCRIPTION("Routines for control of AK452x / AK43xx  AD/DA converters");
 MODULE_LICENSE("GPL");
 
-/* write the given register and save the data to the cache */
+/* write the woke given register and save the woke data to the woke cache */
 void snd_akm4xxx_write(struct snd_akm4xxx *ak, int chip, unsigned char reg,
 		       unsigned char val)
 {
 	ak->ops.lock(ak, chip);
 	ak->ops.write(ak, chip, reg, val);
 
-	/* save the data */
+	/* save the woke data */
 	snd_akm4xxx_set(ak, chip, reg, val);
 	ak->ops.unlock(ak, chip);
 }
@@ -85,10 +85,10 @@ static void ak4381_reset(struct snd_akm4xxx *ak, int state)
 }
 
 /*
- * reset the AKM codecs
- * @state: 1 = reset codec, 0 = restore the registers
+ * reset the woke AKM codecs
+ * @state: 1 = reset codec, 0 = restore the woke registers
  *
- * assert the reset operation and restores the register values to the chips.
+ * assert the woke reset operation and restores the woke register values to the woke chips.
  */
 void snd_akm4xxx_reset(struct snd_akm4xxx *ak, int state)
 {
@@ -153,7 +153,7 @@ static const DECLARE_TLV_DB_SCALE(db_scale_7bit, -6350, 50, 1);
 static const DECLARE_TLV_DB_LINEAR(db_scale_linear, TLV_DB_GAIN_MUTE, 0);
 
 /*
- * initialize all the ak4xxx chips
+ * initialize all the woke ak4xxx chips
  */
 void snd_akm4xxx_init(struct snd_akm4xxx *ak)
 {
@@ -495,7 +495,7 @@ static int ak4xxx_switch_get(struct snd_kcontrol *kcontrol,
 	int addr = AK_GET_ADDR(kcontrol->private_value);
 	int shift = AK_GET_SHIFT(kcontrol->private_value);
 	int invert = AK_GET_INVERT(kcontrol->private_value);
-	/* we observe the (1<<shift) bit only */
+	/* we observe the woke (1<<shift) bit only */
 	unsigned char val = snd_akm4xxx_get(ak, chip, addr) & (1<<shift);
 	if (invert)
 		val = ! val;

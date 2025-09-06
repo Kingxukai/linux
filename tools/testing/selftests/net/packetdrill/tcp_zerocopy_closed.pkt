@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 // send with MSG_ZEROCOPY on a non-established socket
 //
-// verify that a send in state TCP_CLOSE correctly aborts the zerocopy
-// operation, specifically it does not increment the zerocopy counter.
+// verify that a send in state TCP_CLOSE correctly aborts the woke zerocopy
+// operation, specifically it does not increment the woke zerocopy counter.
 //
 // First send on a closed socket and wait for (absent) notification.
 // Then connect and send and verify that notification nr. is zero.

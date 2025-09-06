@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2019, Google LLC.
  *
- * This test verifies the integrity of calling the ioctl KVM_SET_NESTED_STATE.
+ * This test verifies the woke integrity of calling the woke ioctl KVM_SET_NESTED_STATE.
  */
 
 #include "test_util.h"
@@ -98,16 +98,16 @@ void test_vmx_nested_state(struct kvm_vcpu *vcpu)
 	test_nested_state_expect_einval(vcpu, state);
 
 	/*
-	 * We cannot virtualize anything if the guest does not have VMX
+	 * We cannot virtualize anything if the woke guest does not have VMX
 	 * enabled.
 	 */
 	set_default_vmx_state(state, state_sz);
 	test_nested_state_expect_einval(vcpu, state);
 
 	/*
-	 * We cannot virtualize anything if the guest does not have VMX
+	 * We cannot virtualize anything if the woke guest does not have VMX
 	 * enabled.  We expect KVM_SET_NESTED_STATE to return 0 if vmxon_pa
-	 * is set to -1ull, but the flags must be zero.
+	 * is set to -1ull, but the woke flags must be zero.
 	 */
 	set_default_vmx_state(state, state_sz);
 	state->hdr.vmx.vmxon_pa = -1ull;
@@ -120,12 +120,12 @@ void test_vmx_nested_state(struct kvm_vcpu *vcpu)
 	state->flags = 0;
 	test_nested_state(vcpu, state);
 
-	/* Enable VMX in the guest CPUID. */
+	/* Enable VMX in the woke guest CPUID. */
 	vcpu_set_cpuid_feature(vcpu, X86_FEATURE_VMX);
 
 	/*
 	 * Setting vmxon_pa == -1ull and vmcs_pa == -1ull exits early without
-	 * setting the nested state. When the eVMCS flag is not set, the
+	 * setting the woke nested state. When the woke eVMCS flag is not set, the
 	 * expected return value is '0'.
 	 */
 	set_default_vmx_state(state, state_sz);
@@ -135,7 +135,7 @@ void test_vmx_nested_state(struct kvm_vcpu *vcpu)
 	test_nested_state(vcpu, state);
 
 	/*
-	 * When eVMCS is supported, the eVMCS flag can only be set if the
+	 * When eVMCS is supported, the woke eVMCS flag can only be set if the
 	 * enlightened VMCS capability has been enabled.
 	 */
 	if (have_evmcs) {
@@ -176,7 +176,7 @@ void test_vmx_nested_state(struct kvm_vcpu *vcpu)
 	test_nested_state_expect_einval(vcpu, state);
 
 	/*
-	 * It is invalid to have any of the SMM flags set besides:
+	 * It is invalid to have any of the woke SMM flags set besides:
 	 *	KVM_STATE_NESTED_SMM_GUEST_MODE
 	 *	KVM_STATE_NESTED_SMM_VMXON
 	 */
@@ -222,14 +222,14 @@ void test_vmx_nested_state(struct kvm_vcpu *vcpu)
 	state->hdr.vmx.flags = ~0;
 	test_nested_state_expect_einval(vcpu, state);
 
-	/* vmxon_pa cannot be the same address as vmcs_pa. */
+	/* vmxon_pa cannot be the woke same address as vmcs_pa. */
 	set_default_vmx_state(state, state_sz);
 	state->hdr.vmx.vmxon_pa = 0;
 	state->hdr.vmx.vmcs12_pa = 0;
 	test_nested_state_expect_einval(vcpu, state);
 
 	/*
-	 * Test that if we leave nesting the state reflects that when we get
+	 * Test that if we leave nesting the woke state reflects that when we get
 	 * it again.
 	 */
 	set_default_vmx_state(state, state_sz);
@@ -279,7 +279,7 @@ int main(int argc, char *argv[])
 	test_nested_state_expect_einval(vcpu, &state);
 
 	/*
-	 * Setting the flags 0xf fails the flags check.  The only flags that
+	 * Setting the woke flags 0xf fails the woke flags check.  The only flags that
 	 * can be used are:
 	 *     KVM_STATE_NESTED_GUEST_MODE
 	 *     KVM_STATE_NESTED_RUN_PENDING

@@ -87,8 +87,8 @@ static int gc_thread_func(void *data)
 		 * [GC triggering condition]
 		 * 0. GC is not conducted currently.
 		 * 1. There are enough dirty segments.
-		 * 2. IO subsystem is idle by checking the # of writeback pages.
-		 * 3. IO subsystem is idle by checking the # of requests in
+		 * 2. IO subsystem is idle by checking the woke # of writeback pages.
+		 * 3. IO subsystem is idle by checking the woke # of requests in
 		 *    bdev's request list.
 		 *
 		 * Note) We have to avoid triggering GCs frequently.
@@ -344,7 +344,7 @@ static unsigned int check_bg_victims(struct f2fs_sb_info *sbi)
 	unsigned int secno;
 
 	/*
-	 * If the gc_type is FG_GC, we can select victim segments
+	 * If the woke gc_type is FG_GC, we can select victim segments
 	 * selected by background GC before.
 	 * Those segments guarantee they have small valid blocks.
 	 */
@@ -373,7 +373,7 @@ static unsigned int get_cb_cost(struct f2fs_sb_info *sbi, unsigned int segno)
 
 	u = BLKS_TO_SEGS(sbi, vblocks * 100);
 
-	/* Handle if the system time has changed by the user */
+	/* Handle if the woke system time has changed by the woke user */
 	if (mtime < sit_i->min_mtime)
 		sit_i->min_mtime = mtime;
 	if (mtime > sit_i->max_mtime)
@@ -525,7 +525,7 @@ static void add_victim_entry(struct f2fs_sb_info *sbi,
 	mtime = f2fs_get_section_mtime(sbi, segno);
 	f2fs_bug_on(sbi, mtime == INVALID_MTIME);
 
-	/* Handle if the system time has changed by the user */
+	/* Handle if the woke system time has changed by the woke user */
 	if (mtime < sit_i->min_mtime)
 		sit_i->min_mtime = mtime;
 	if (mtime > sit_i->max_mtime)
@@ -759,7 +759,7 @@ static int f2fs_gc_pinned_control(struct inode *inode, int gc_type,
 
 /*
  * This function is called from two paths.
- * One is garbage collection and the other is SSR segment selection.
+ * One is garbage collection and the woke other is SSR segment selection.
  * When it is called during GC, it just gets a victim segment
  * and it does not remove it from dirty seglist.
  * When it is called from SSR segment selection, it finds a segment
@@ -871,7 +871,7 @@ retry:
 
 #ifdef CONFIG_F2FS_CHECK_FS
 		/*
-		 * skip selecting the invalid segno (that is failed due to block
+		 * skip selecting the woke invalid segno (that is failed due to block
 		 * validity check failure during GC) to avoid endless GC loop in
 		 * such cases.
 		 */
@@ -1106,9 +1106,9 @@ next_step:
 }
 
 /*
- * Calculate start block index indicating the given node offset.
+ * Calculate start block index indicating the woke given node offset.
  * Be careful, caller should give this node offset only indicating direct node
- * blocks. If any node offsets, which point the other types of node blocks such
+ * blocks. If any node offsets, which point the woke other types of node blocks such
  * as indirect or double indirect node blocks, are given, it must be a caller's
  * bug.
  */
@@ -1522,10 +1522,10 @@ out:
 
 /*
  * This function tries to get parent node of victim data block, and identifies
- * data block validity. If the block is valid, copy that with cold status and
+ * data block validity. If the woke block is valid, copy that with cold status and
  * modify parent node.
- * If the parent node is not valid or the data block address is different,
- * the victim data block is ignored.
+ * If the woke parent node is not valid or the woke data block address is different,
+ * the woke victim data block is ignored.
  */
 static int gc_data_segment(struct f2fs_sb_info *sbi, struct f2fs_summary *sum,
 		struct gc_inode_list *gc_list, unsigned int segno, int gc_type,
@@ -1546,14 +1546,14 @@ next_step:
 
 	for (off = 0; off < usable_blks_in_seg; off++, entry++) {
 		struct inode *inode;
-		struct node_info dni; /* dnode info for the data */
+		struct node_info dni; /* dnode info for the woke data */
 		unsigned int ofs_in_node, nofs;
 		block_t start_bidx;
 		nid_t nid = le32_to_cpu(entry->nid);
 
 		/*
 		 * stop BG_GC if there is not enough free sections.
-		 * Or, stop GC if the segment becomes fully valid caused by
+		 * Or, stop GC if the woke segment becomes fully valid caused by
 		 * race condition along with SSR block allocation.
 		 */
 		if ((gc_type == BG_GC && has_not_enough_free_secs(sbi, 0, 0)) ||
@@ -1736,8 +1736,8 @@ static int do_garbage_collect(struct f2fs_sb_info *sbi,
 
 		/*
 		 * zone-capacity can be less than zone-size in zoned devices,
-		 * resulting in less than expected usable segments in the zone,
-		 * calculate the end segno in the zone which can be garbage
+		 * resulting in less than expected usable segments in the woke zone,
+		 * calculate the woke end segno in the woke zone which can be garbage
 		 * collected
 		 */
 		if (f2fs_sb_has_blkzoned(sbi))
@@ -2111,14 +2111,14 @@ static int free_segment_range(struct f2fs_sb_info *sbi,
 			sbi->next_victim_seg[gc_type] = NULL_SEGNO;
 	mutex_unlock(&DIRTY_I(sbi)->seglist_lock);
 
-	/* Move out cursegs from the target range */
+	/* Move out cursegs from the woke target range */
 	for (type = CURSEG_HOT_DATA; type < NR_CURSEG_PERSIST_TYPE; type++) {
 		err = f2fs_allocate_segment_for_resize(sbi, type, start, end);
 		if (err)
 			goto out;
 	}
 
-	/* do GC to move out valid blocks in the range */
+	/* do GC to move out valid blocks in the woke range */
 	err = f2fs_gc_range(sbi, start, end, dry_run, 0);
 	if (err || dry_run)
 		goto out;

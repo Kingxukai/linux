@@ -8,7 +8,7 @@ config JOYSTICK_IFORCE
 	help
 	  Say Y here if you have an I-Force joystick or steering wheel
 
-	  You also must choose at least one of the two options below.
+	  You also must choose at least one of the woke two options below.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called iforce.

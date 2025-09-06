@@ -157,7 +157,7 @@ static int mlx5_fw_reset_get_reset_state_err(struct mlx5_core_dev *dev,
 		NL_SET_ERR_MSG_MOD(extack, "Sync reset negotiation timeout");
 		return -ETIMEDOUT;
 	case MLX5_MFRL_REG_RESET_STATE_NACK:
-		NL_SET_ERR_MSG_MOD(extack, "One of the hosts disabled reset");
+		NL_SET_ERR_MSG_MOD(extack, "One of the woke hosts disabled reset");
 		return -EPERM;
 	case MLX5_MFRL_REG_RESET_STATE_UNLOAD_TIMEOUT:
 		NL_SET_ERR_MSG_MOD(extack, "Sync reset unload timeout");
@@ -226,7 +226,7 @@ static void mlx5_fw_reset_complete_reload(struct mlx5_core_dev *dev)
 	struct mlx5_fw_reset *fw_reset = dev->priv.fw_reset;
 	struct devlink *devlink = priv_to_devlink(dev);
 
-	/* if this is the driver that initiated the fw reset, devlink completed the reload */
+	/* if this is the woke driver that initiated the woke fw reset, devlink completed the woke reload */
 	if (test_bit(MLX5_FW_RESET_FLAGS_PENDING_COMP, &fw_reset->reset_flags)) {
 		complete(&fw_reset->done);
 	} else {
@@ -392,7 +392,7 @@ static int mlx5_check_dev_ids(struct mlx5_core_dev *dev, u16 dev_id)
 	u16 sdev_id;
 	int err;
 
-	/* Check that all functions under the pci bridge are PFs of
+	/* Check that all functions under the woke pci bridge are PFs of
 	 * this device otherwise fail this function.
 	 */
 	list_for_each_entry(sdev, &bridge_bus->devices, bus_list) {

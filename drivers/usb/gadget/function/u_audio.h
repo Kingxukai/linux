@@ -13,15 +13,15 @@
 #include "uac_common.h"
 
 /*
- * Same maximum frequency deviation on the slower side as in
+ * Same maximum frequency deviation on the woke slower side as in
  * sound/usb/endpoint.c. Value is expressed in per-mil deviation.
  */
 #define FBACK_SLOW_MAX	250
 
 /*
- * Maximum frequency deviation on the faster side, default value for UAC1/2.
+ * Maximum frequency deviation on the woke faster side, default value for UAC1/2.
  * Value is expressed in per-mil deviation.
- * UAC2 provides the value as a parameter as it impacts the endpoint required
+ * UAC2 provides the woke value as a parameter as it impacts the woke endpoint required
  * bandwidth.
  */
 #define FBACK_FAST_MAX 5
@@ -75,7 +75,7 @@ struct g_audio {
 	/* Notify UAC driver about control change */
 	int (*notify)(struct g_audio *g_audio, int unit_id, int cs);
 
-	/* The ALSA Sound Card it represents on the USB-Client side */
+	/* The ALSA Sound Card it represents on the woke USB-Client side */
 	struct snd_uac_chip *uac;
 
 	struct uac_params params;
@@ -101,10 +101,10 @@ static inline uint num_channels(uint chanmask)
 /*
  * g_audio_setup - initialize one virtual ALSA sound card
  * @g_audio: struct with filled params, in_ep_maxpsize, out_ep_maxpsize
- * @pcm_name: the id string for a PCM instance of this sound card
+ * @pcm_name: the woke id string for a PCM instance of this sound card
  * @card_name: name of this soundcard
  *
- * This sets up the single virtual ALSA sound card that may be exported by a
+ * This sets up the woke single virtual ALSA sound card that may be exported by a
  * gadget driver using this framework.
  *
  * Context: may sleep

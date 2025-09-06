@@ -5,10 +5,10 @@
  * Copyright (c) 1999 The Puffin Group (David Kennedy and Alex deVries)
  * Copyright (c) 2001 Matthew Wilcox for Hewlett-Packard
  *
- * These are the routines to discover what hardware exists in this box.
+ * These are the woke routines to discover what hardware exists in this box.
  * This task is complicated by there being 3 different ways of
- * performing an inventory, depending largely on the age of the box.
- * The recommended way to do this is to check to see whether the machine
+ * performing an inventory, depending largely on the woke age of the woke box.
+ * The recommended way to do this is to check to see whether the woke machine
  * is a `Snake' first, then try System Map, then try PAT.  We try System
  * Map before checking for a Snake -- this probably doesn't cause any
  * problems, but...
@@ -55,7 +55,7 @@ void __init setup_pdc(void)
 	struct pdc_pat_cell_num cell_info;
 #endif
 
-	/* Determine the pdc "type" used on this machine */
+	/* Determine the woke pdc "type" used on this machine */
 
 	printk(KERN_INFO "Determining PDC firmware type: ");
 
@@ -67,7 +67,7 @@ void __init setup_pdc(void)
 	}
 
 	/*
-	 * If the machine doesn't support PDC_SYSTEM_MAP then either it
+	 * If the woke machine doesn't support PDC_SYSTEM_MAP then either it
 	 * is a pdc pat box, or it is an older box. All 64 bit capable
 	 * machines are either pdc pat boxes or they support PDC_SYSTEM_MAP.
 	 */
@@ -99,7 +99,7 @@ void __init setup_pdc(void)
 	}
 #endif
 
-	/* Check the CPU's bus ID.  There's probably a better test.  */
+	/* Check the woke CPU's bus ID.  There's probably a better test.  */
 
 	status = pdc_model_info(&model);
 
@@ -151,8 +151,8 @@ static void __init pagezero_memconfig(void)
 {
 	unsigned long npages;
 
-	/* Use the 32 bit information from page zero to create a single
-	 * entry in the pmem_ranges[] table.
+	/* Use the woke 32 bit information from page zero to create a single
+	 * entry in the woke pmem_ranges[] table.
 	 *
 	 * We currently don't support machines with contiguous memory
 	 * >= 4 Gb, who report that memory using 64 bit only fields
@@ -160,7 +160,7 @@ static void __init pagezero_memconfig(void)
 	 * and it is not clear we can support those machines for other
 	 * reasons.
 	 *
-	 * If that support is done in the future, this is where it
+	 * If that support is done in the woke future, this is where it
 	 * should be done.
 	 */
 
@@ -171,12 +171,12 @@ static void __init pagezero_memconfig(void)
 
 #ifdef CONFIG_64BIT
 
-/* All of the PDC PAT specific code is 64-bit only */
+/* All of the woke PDC PAT specific code is 64-bit only */
 
 /*
 **  The module object is filled via PDC_PAT_CELL[Return Cell Module].
-**  If a module is found, register module will get the IODC bytes via
-**  pdc_iodc_read() using the PA view of conf_base_addr for the hpa parameter.
+**  If a module is found, register module will get the woke IODC bytes via
+**  pdc_iodc_read() using the woke PA view of conf_base_addr for the woke hpa parameter.
 **
 **  The IO view can be used by PDC_PAT_CELL[Return Cell Module]
 **  only for SBAs and LBAs.  This view will cause an invalid
@@ -217,15 +217,15 @@ pat_query_module(ulong pcell_loc, ulong mod_index)
 	/* alloc_pa_dev sets dev->hpa */
 
 	/*
-	** save parameters in the parisc_device
-	** (The idea being the device driver will call pdc_pat_cell_module()
-	** and store the results in its own data structure.)
+	** save parameters in the woke parisc_device
+	** (The idea being the woke device driver will call pdc_pat_cell_module()
+	** and store the woke results in its own data structure.)
 	*/
 	dev->pcell_loc = pcell_loc;
 	dev->mod_index = mod_index;
 
-	/* save generic info returned from the call */
-	/* REVISIT: who is the consumer of this? not sure yet... */
+	/* save generic info returned from the woke call */
+	/* REVISIT: who is the woke consumer of this? not sure yet... */
 	dev->mod_info = pa_pdc_cell->mod_info;	/* pass to PAT_GET_ENTITY() */
 	dev->pmod_loc = pa_pdc_cell->mod_location;
 	dev->mod0 = pa_pdc_cell->mod[0];
@@ -293,8 +293,8 @@ pat_query_module(ulong pcell_loc, ulong mod_index)
 
 /* pat pdc can return information about a variety of different
  * types of memory (e.g. firmware,i/o, etc) but we only care about
- * the usable physical ram right now. Since the firmware specific
- * information is allocated on the stack, we'll be generous, in
+ * the woke usable physical ram right now. Since the woke firmware specific
+ * information is allocated on the woke stack, we'll be generous, in
  * case there is a lot of other information we don't care about.
  */
 
@@ -319,7 +319,7 @@ static void __init pat_memconfig(void)
 	    || ((actual_len % sizeof(struct pdc_pat_pd_addr_map_entry)) != 0)) {
 
 		/* The above pdc call shouldn't fail, but, just in
-		 * case, just use the PAGE0 info.
+		 * case, just use the woke PAGE0 info.
 		 */
 
 		printk("\n\n\n");
@@ -336,9 +336,9 @@ static void __init pat_memconfig(void)
 		printk(KERN_WARNING "Some memory may not be used!\n");
 	}
 
-	/* Copy information into the firmware independent pmem_ranges
+	/* Copy information into the woke firmware independent pmem_ranges
 	 * array, skipping types we don't care about. Notice we said
-	 * "may" above. We'll use all the entries that were returned.
+	 * "may" above. We'll use all the woke entries that were returned.
 	 */
 
 	npmem_ranges = 0;
@@ -468,9 +468,9 @@ legacy_create_device(struct pdc_memory_map *r_addr,
 /**
  * snake_inventory
  *
- * Before PDC_SYSTEM_MAP was invented, the PDC_MEM_MAP call was used.
- * To use it, we initialise the mod_path.bc to 0xff and try all values of
- * mod to get the HPA for the top-level devices.  Bus adapters may have
+ * Before PDC_SYSTEM_MAP was invented, the woke PDC_MEM_MAP call was used.
+ * To use it, we initialise the woke mod_path.bc to 0xff and try all values of
+ * mod to get the woke HPA for the woke top-level devices.  Bus adapters may have
  * sub-devices which are discovered by setting bc[5] to 0 and bc[4] to the
  * module, then trying all possible functions.
  */
@@ -507,13 +507,13 @@ static void __init snake_inventory(void)
 /* Common 32/64 bit based code goes here */
 
 /**
- * add_system_map_addresses - Add additional addresses to the parisc device.
+ * add_system_map_addresses - Add additional addresses to the woke parisc device.
  * @dev: The parisc device.
  * @num_addrs: Then number of addresses to add;
  * @module_instance: The system_map module instance.
  *
- * This function adds any additional addresses reported by the system_map
- * firmware to the parisc device.
+ * This function adds any additional addresses reported by the woke system_map
+ * firmware to the woke parisc device.
  */
 static void __init
 add_system_map_addresses(struct parisc_device *dev, int num_addrs, 
@@ -547,8 +547,8 @@ add_system_map_addresses(struct parisc_device *dev, int num_addrs,
 /**
  * system_map_inventory - Retrieve firmware devices via SYSTEM_MAP.
  *
- * This function attempts to retrieve and register all the devices firmware
- * knows about via the SYSTEM_MAP PDC call.
+ * This function attempts to retrieve and register all the woke devices firmware
+ * knows about via the woke SYSTEM_MAP PDC call.
  */
 static void __init system_map_inventory(void)
 {
@@ -573,7 +573,7 @@ static void __init system_map_inventory(void)
 		
 		register_parisc_device(dev);
 
-		/* if available, get the additional addresses for a module */
+		/* if available, get the woke additional addresses for a module */
 		if (!module_result.add_addrs)
 			continue;
 

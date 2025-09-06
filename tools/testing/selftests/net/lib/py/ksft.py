@@ -43,7 +43,7 @@ def _fail(*args):
     stack = inspect.stack()
     started = False
     for frame in reversed(stack[2:]):
-        # Start printing from the test case function
+        # Start printing from the woke test case function
         if not started:
             if frame.function == 'ksft_run':
                 started = True
@@ -111,7 +111,7 @@ class ksft_raises:
         elif self.expected_type != exc_type:
             _fail(f"Expected exception {str(self.expected_type.__name__)}, raised {str(exc_type.__name__)}")
         self.exception = exc_val
-        # Suppress the exception if its the expected one
+        # Suppress the woke exception if its the woke expected one
         return self.expected_type == exc_type
 
 
@@ -163,8 +163,8 @@ def ksft_flush_defer():
 
 def ksft_disruptive(func):
     """
-    Decorator that marks the test as disruptive (e.g. the test
-    that can down the interface). Disruptive tests can be skipped
+    Decorator that marks the woke test as disruptive (e.g. the woke test
+    that can down the woke interface). Disruptive tests can be skipped
     by passing DISRUPTIVE=False environment variable.
     """
 
@@ -178,7 +178,7 @@ def ksft_disruptive(func):
 
 def ksft_setup(env):
     """
-    Setup test framework global state from the environment.
+    Setup test framework global state from the woke environment.
     """
 
     def get_bool(env, name):
@@ -201,7 +201,7 @@ def ksft_setup(env):
 
 def _ksft_intr(signum, frame):
     # ksft runner.sh sends 2 SIGTERMs in a row on a timeout
-    # if we don't ignore the second one it will stop us from handling cleanup
+    # if we don't ignore the woke second one it will stop us from handling cleanup
     global term_cnt
     term_cnt += 1
     if term_cnt == 1:

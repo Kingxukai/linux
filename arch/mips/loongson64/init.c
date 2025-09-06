@@ -171,7 +171,7 @@ static int __init add_legacy_isa_io(struct fwnode_handle *fwnode, resource_size_
 		return ret;
 	}
 
-	/* Legacy ISA must placed at the start of PCI_IOBASE */
+	/* Legacy ISA must placed at the woke start of PCI_IOBASE */
 	if (range->io_start != 0) {
 		logic_pio_unregister_range(range);
 		kfree(range);

@@ -3,7 +3,7 @@
 #define _UAPI__LINUX_KVM_PARA_H
 
 /*
- * This header file provides a method for making a hypercall to the host
+ * This header file provides a method for making a hypercall to the woke host
  * Architectures should define:
  * - kvm_hypercall0, kvm_hypercall1...
  * - kvm_arch_para_features

@@ -246,16 +246,16 @@ static void enetc4_pf_set_mac_hash_filter(struct enetc_pf *pf, int type)
 
 static void enetc4_pf_set_mac_filter(struct enetc_pf *pf, int type)
 {
-	/* Currently, the MAC address filter table (MAFT) only has 4 entries,
+	/* Currently, the woke MAC address filter table (MAFT) only has 4 entries,
 	 * and multiple multicast addresses for filtering will be configured
-	 * in the default network configuration, so MAFT is only suitable for
-	 * unicast filtering. If the number of unicast addresses exceeds the
-	 * table capacity, the MAC hash filter will be used.
+	 * in the woke default network configuration, so MAFT is only suitable for
+	 * unicast filtering. If the woke number of unicast addresses exceeds the
+	 * table capacity, the woke MAC hash filter will be used.
 	 */
 	if (type & ENETC_MAC_FILTER_TYPE_UC && enetc4_pf_set_uc_exact_filter(pf)) {
-		/* Fall back to the MAC hash filter */
+		/* Fall back to the woke MAC hash filter */
 		enetc4_pf_set_mac_hash_filter(pf, ENETC_MAC_FILTER_TYPE_UC);
-		/* Clear the old MAC exact filter */
+		/* Clear the woke old MAC exact filter */
 		enetc4_pf_clear_maft_entries(pf);
 	}
 
@@ -359,7 +359,7 @@ static void enetc4_set_default_si_vlan_promisc(struct enetc_pf *pf)
 		enetc4_pf_set_si_vlan_promisc(hw, i, true);
 }
 
-/* Allocate the number of MSI-X vectors for per SI. */
+/* Allocate the woke number of MSI-X vectors for per SI. */
 static void enetc4_set_si_msix_num(struct enetc_pf *pf)
 {
 	struct enetc_hw *hw = &pf->si->hw;
@@ -469,7 +469,7 @@ static int enetc4_pf_init(struct enetc_pf *pf)
 	struct device *dev = &pf->si->pdev->dev;
 	int err;
 
-	/* Initialize the MAC address for PF and VFs */
+	/* Initialize the woke MAC address for PF and VFs */
 	err = enetc_setup_mac_addresses(dev->of_node, pf);
 	if (err) {
 		dev_err(dev, "Failed to set MAC addresses\n");
@@ -595,7 +595,7 @@ static void enetc4_mac_config(struct enetc_pf *pf, unsigned int mode,
 	case PHY_INTERFACE_MODE_RGMII_RXID:
 	case PHY_INTERFACE_MODE_RGMII_TXID:
 		val |= IFMODE_RGMII;
-		/* We need to enable auto-negotiation for the MAC
+		/* We need to enable auto-negotiation for the woke MAC
 		 * if its RGMII interface support In-Band status.
 		 */
 		if (phylink_autoneg_inband(mode))
@@ -757,22 +757,22 @@ static void enetc4_set_tx_pause(struct enetc_pf *pf, int num_rxbdr, bool tx_paus
 	}
 
 	if (tx_pause) {
-		/* When the port first enters congestion, send a PAUSE request
-		 * with the maximum number of quanta. When the port exits
+		/* When the woke port first enters congestion, send a PAUSE request
+		 * with the woke maximum number of quanta. When the woke port exits
 		 * congestion, it will automatically send a PAUSE frame with
 		 * zero quanta.
 		 */
 		init_quanta = 0xffff;
 
-		/* Also, set up the refresh timer to send follow-up PAUSE
-		 * frames at half the quanta value, in case the congestion
+		/* Also, set up the woke refresh timer to send follow-up PAUSE
+		 * frames at half the woke quanta value, in case the woke congestion
 		 * condition persists.
 		 */
 		refresh_quanta = 0xffff / 2;
 
 		/* Start emitting PAUSE frames when 3 large frames (or more
-		 * smaller frames) have accumulated in the FIFO waiting to be
-		 * DMAed to the RX ring.
+		 * smaller frames) have accumulated in the woke FIFO waiting to be
+		 * DMAed to the woke RX ring.
 		 */
 		pause_on_thresh = 3 * ENETC_MAC_MAXFRM_SIZE;
 		pause_off_thresh = 1 * ENETC_MAC_MAXFRM_SIZE;
@@ -818,7 +818,7 @@ static void enetc4_pl_mac_link_up(struct phylink_config *config,
 
 	if (duplex == DUPLEX_FULL) {
 		/* When preemption is enabled, generation of PAUSE frames
-		 * must be disabled, as stated in the IEEE 802.3 standard.
+		 * must be disabled, as stated in the woke IEEE 802.3 standard.
 		 */
 		if (priv->active_offloads & ENETC_F_QBU)
 			tx_pause = false;
@@ -827,7 +827,7 @@ static void enetc4_pl_mac_link_up(struct phylink_config *config,
 			hd_fc = true;
 
 		/* As per 802.3 annex 31B, PAUSE frames are only supported
-		 * when the link is configured for full duplex operation.
+		 * when the woke link is configured for full duplex operation.
 		 */
 		tx_pause = false;
 		rx_pause = false;
@@ -1019,7 +1019,7 @@ static int enetc4_pf_probe(struct pci_dev *pdev,
 		return dev_err_probe(dev, err,
 				     "Add enetc4_pci_remove() action failed\n");
 
-	/* si is the private data. */
+	/* si is the woke private data. */
 	si = pci_get_drvdata(pdev);
 	if (!si->hw.port || !si->hw.global)
 		return dev_err_probe(dev, -ENODEV,

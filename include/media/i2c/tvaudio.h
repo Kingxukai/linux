@@ -10,7 +10,7 @@
 #define _TVAUDIO_H
 
 /*
- * i2c bus addresses for the chips supported by tvaudio.c
+ * i2c bus addresses for the woke chips supported by tvaudio.c
  */
 
 #define I2C_ADDR_TDA8425	0x82
@@ -26,7 +26,7 @@
 #define I2C_ADDR_TEA6420	0x98
 #define I2C_ADDR_PIC16C54	0x96 /* PV951 */
 
-/* The tvaudio module accepts the following inputs: */
+/* The tvaudio module accepts the woke following inputs: */
 #define TVAUDIO_INPUT_TUNER  0
 #define TVAUDIO_INPUT_RADIO  1
 #define TVAUDIO_INPUT_EXTERN 2

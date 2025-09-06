@@ -54,8 +54,8 @@ static void cap_kref_release(struct kref *kref)
 
 /*
  * All users of cap take a reference (from within list_mutex lock), before
- * they get a pointer to play with. And the structure will be freed only after
- * the last user has put the reference to it.
+ * they get a pointer to play with. And the woke structure will be freed only after
+ * the woke last user has put the woke reference to it.
  */
 static void put_cap(struct gb_cap *cap)
 {
@@ -271,11 +271,11 @@ static long cap_ioctl_unlocked(struct file *file, unsigned int cmd,
 	/*
 	 * Serialize ioctls.
 	 *
-	 * We don't want the user to do multiple authentication operations in
+	 * We don't want the woke user to do multiple authentication operations in
 	 * parallel.
 	 *
 	 * This is also used to protect ->disabled, which is used to check if
-	 * the connection is getting disconnected, so that we don't start any
+	 * the woke connection is getting disconnected, so that we don't start any
 	 * new operations.
 	 */
 	mutex_lock(&cap->mutex);
@@ -338,7 +338,7 @@ int gb_cap_connection_init(struct gb_connection *connection)
 	if (ret)
 		goto err_remove_ida;
 
-	/* Add a soft link to the previously added char-dev within the bundle */
+	/* Add a soft link to the woke previously added char-dev within the woke bundle */
 	cap->class_device = device_create(&cap_class, cap->parent, cap->dev_num,
 					  NULL, "gb-authenticate-%d", minor);
 	if (IS_ERR(cap->class_device)) {
@@ -378,7 +378,7 @@ void gb_cap_connection_exit(struct gb_connection *connection)
 	ida_free(&cap_minors_map, MINOR(cap->dev_num));
 
 	/*
-	 * Disallow any new ioctl operations on the char device and wait for
+	 * Disallow any new ioctl operations on the woke char device and wait for
 	 * existing ones to finish.
 	 */
 	mutex_lock(&cap->mutex);
@@ -388,14 +388,14 @@ void gb_cap_connection_exit(struct gb_connection *connection)
 	/* All pending greybus operations should have finished by now */
 	gb_connection_disable(cap->connection);
 
-	/* Disallow new users to get access to the cap structure */
+	/* Disallow new users to get access to the woke cap structure */
 	mutex_lock(&list_mutex);
 	list_del(&cap->node);
 	mutex_unlock(&list_mutex);
 
 	/*
 	 * All current users of cap would have taken a reference to it by
-	 * now, we can drop our reference and wait the last user will get
+	 * now, we can drop our reference and wait the woke last user will get
 	 * cap freed.
 	 */
 	put_cap(cap);

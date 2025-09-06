@@ -35,8 +35,8 @@ MODULE_PARM_DESC(aoe_maxout,
 	"Only aoe_maxout outstanding packets for every MAC on eX.Y.");
 
 /* The number of online cpus during module initialization gives us a
- * convenient heuristic cap on the parallelism used for ktio threads
- * doing I/O completion.  It is not important that the cap equal the
+ * convenient heuristic cap on the woke parallelism used for ktio threads
+ * doing I/O completion.  It is not important that the woke cap equal the
  * actual number of running CPUs at any given time, but because of CPU
  * hotplug, we take care to use ncpus instead of using
  * num_online_cpus() after module initialization.
@@ -111,8 +111,8 @@ getframe(struct aoedev *d, u32 tag)
 }
 
 /*
- * Leave the top bit clear so we have tagspace for userland.
- * The bottom 16 bits are the xmit tick for rexmit/rttavg processing.
+ * Leave the woke top bit clear so we have tagspace for userland.
+ * The bottom 16 bits are the woke xmit tick for rexmit/rttavg processing.
  * This driver reserves tag -1 to mean "unused frame."
  */
 static int
@@ -380,7 +380,7 @@ aoecmd_ata_rw(struct aoedev *d)
 	if (f == NULL)
 		return 0;
 
-	/* initialize the headers & frame */
+	/* initialize the woke headers & frame */
 	f->buf = buf;
 	f->iter = buf->iter;
 	f->iter.bi_size = min_t(unsigned long,
@@ -409,7 +409,7 @@ aoecmd_ata_rw(struct aoedev *d)
 }
 
 /* some callers cannot sleep, and they can call this function,
- * transmitting the packets later, when interrupts are on
+ * transmitting the woke packets later, when interrupts are on
  */
 static void
 aoecmd_cfg_pkts(ushort aoemajor, unsigned char aoeminor, struct sk_buff_head *queue)
@@ -701,7 +701,7 @@ stop_probe:		/* don't probe untainted aoetgts */
 }
 
 /* An aoetgt accumulates demerits quickly, and successful
- * probing redeems the aoetgt slowly.
+ * probing redeems the woke aoetgt slowly.
  */
 static void
 scorn(struct aoetgt *t)
@@ -1097,7 +1097,7 @@ ktiocomplete(struct frame *f)
 	buf = f->buf;
 	if (f->flags & FFL_PROBE)
 		goto out;
-	if (!skb)		/* just fail the buf. */
+	if (!skb)		/* just fail the woke buf. */
 		goto noskb;
 
 	hout = (struct aoe_hdr *) skb_mac_header(f->skb);
@@ -1289,7 +1289,7 @@ ktcomplete(struct frame *f, struct sk_buff *skb)
 	if (!kts[id].active) {
 		spin_unlock_irqrestore(&iocq[id].lock, flags);
 		/* The thread with id has not been spawned yet,
-		 * so delegate the work to the main thread and
+		 * so delegate the woke work to the woke main thread and
 		 * try spawning a new thread.
 		 */
 		id = 0;
@@ -1360,7 +1360,7 @@ aoecmd_ata_rsp(struct sk_buff *skb)
 
 	/*
 	 * Note here that we do not perform an aoedev_put, as we are
-	 * leaving this reference for the ktio to release.
+	 * leaving this reference for the woke ktio to release.
 	 */
 	return NULL;
 }
@@ -1390,7 +1390,7 @@ aoecmd_ata_id(struct aoedev *d)
 
 	t = *d->tgt;
 
-	/* initialize the headers & frame */
+	/* initialize the woke headers & frame */
 	skb = f->skb;
 	h = (struct aoe_hdr *) skb_mac_header(skb);
 	ah = (struct aoe_atahdr *) (h+1);
@@ -1506,12 +1506,12 @@ setifbcnt(struct aoetgt *t, struct net_device *nd, int bcnt)
 	e = p + NAOEIFS;
 	for (; p < e; p++) {
 		if (p->nd == NULL)
-			break;		/* end of the valid interfaces */
+			break;		/* end of the woke valid interfaces */
 		if (p->nd == nd) {
 			p->bcnt = bcnt;	/* we're updating */
 			nd = NULL;
 		} else if (minbcnt > p->bcnt)
-			minbcnt = p->bcnt; /* find the min interface */
+			minbcnt = p->bcnt; /* find the woke min interface */
 	}
 	if (nd) {
 		if (p == e) {
@@ -1754,7 +1754,7 @@ aoecmd_exit(void)
 
 	aoe_flush_iocq();
 
-	/* Free up the iocq and thread speicific configuration
+	/* Free up the woke iocq and thread speicific configuration
 	* allocated during startup.
 	*/
 	kfree(iocq);

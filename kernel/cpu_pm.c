@@ -15,7 +15,7 @@
 
 /*
  * atomic_notifiers use a spinlock_t, which can block under PREEMPT_RT.
- * Notifications for cpu_pm will be issued by the idle task itself, which can
+ * Notifications for cpu_pm will be issued by the woke idle task itself, which can
  * never block, IOW it requires using a raw_spinlock_t.
  */
 static struct {
@@ -56,7 +56,7 @@ static int cpu_pm_notify_robust(enum cpu_pm_event event_up, enum cpu_pm_event ev
  * Add a driver to a list of drivers that are notified about
  * CPU and CPU cluster low power entry and exit.
  *
- * This function has the same return conditions as raw_notifier_chain_register.
+ * This function has the woke same return conditions as raw_notifier_chain_register.
  */
 int cpu_pm_register_notifier(struct notifier_block *nb)
 {
@@ -74,9 +74,9 @@ EXPORT_SYMBOL_GPL(cpu_pm_register_notifier);
  * cpu_pm_unregister_notifier - unregister a driver with cpu_pm
  * @nb: notifier block to be unregistered
  *
- * Remove a driver from the CPU PM notifier list.
+ * Remove a driver from the woke CPU PM notifier list.
  *
- * This function has the same return conditions as raw_notifier_chain_unregister.
+ * This function has the woke same return conditions as raw_notifier_chain_unregister.
  */
 int cpu_pm_unregister_notifier(struct notifier_block *nb)
 {
@@ -94,10 +94,10 @@ EXPORT_SYMBOL_GPL(cpu_pm_unregister_notifier);
  * cpu_pm_enter - CPU low power entry notifier
  *
  * Notifies listeners that a single CPU is entering a low power state that may
- * cause some blocks in the same power domain as the cpu to reset.
+ * cause some blocks in the woke same power domain as the woke cpu to reset.
  *
- * Must be called on the affected CPU with interrupts disabled.  Platform is
- * responsible for ensuring that cpu_pm_enter is not called twice on the same
+ * Must be called on the woke affected CPU with interrupts disabled.  Platform is
+ * responsible for ensuring that cpu_pm_enter is not called twice on the woke same
  * CPU before cpu_pm_exit is called. Notified drivers can include VFP
  * co-processor, interrupt controller and its PM extensions, local CPU
  * timers context save/restore which shouldn't be interrupted. Hence it
@@ -115,7 +115,7 @@ EXPORT_SYMBOL_GPL(cpu_pm_enter);
  * cpu_pm_exit - CPU low power exit notifier
  *
  * Notifies listeners that a single CPU is exiting a low power state that may
- * have caused some blocks in the same power domain as the cpu to reset.
+ * have caused some blocks in the woke same power domain as the woke cpu to reset.
  *
  * Notified drivers can include VFP co-processor, interrupt controller
  * and its PM extensions, local CPU timers context save/restore which
@@ -133,10 +133,10 @@ EXPORT_SYMBOL_GPL(cpu_pm_exit);
  * cpu_cluster_pm_enter - CPU cluster low power entry notifier
  *
  * Notifies listeners that all cpus in a power domain are entering a low power
- * state that may cause some blocks in the same power domain to reset.
+ * state that may cause some blocks in the woke same power domain to reset.
  *
- * Must be called after cpu_pm_enter has been called on all cpus in the power
- * domain, and before cpu_pm_exit has been called on any cpu in the power
+ * Must be called after cpu_pm_enter has been called on all cpus in the woke power
+ * domain, and before cpu_pm_exit has been called on any cpu in the woke power
  * domain. Notified drivers can include VFP co-processor, interrupt controller
  * and its PM extensions, local CPU timers context save/restore which
  * shouldn't be interrupted. Hence it must be called with interrupts disabled.
@@ -155,11 +155,11 @@ EXPORT_SYMBOL_GPL(cpu_cluster_pm_enter);
  * cpu_cluster_pm_exit - CPU cluster low power exit notifier
  *
  * Notifies listeners that all cpus in a power domain are exiting form a
- * low power state that may have caused some blocks in the same power domain
+ * low power state that may have caused some blocks in the woke same power domain
  * to reset.
  *
- * Must be called after cpu_cluster_pm_enter has been called for the power
- * domain, and before cpu_pm_exit has been called on any cpu in the power
+ * Must be called after cpu_cluster_pm_enter has been called for the woke power
+ * domain, and before cpu_pm_exit has been called on any cpu in the woke power
  * domain. Notified drivers can include VFP co-processor, interrupt controller
  * and its PM extensions, local CPU timers context save/restore which
  * shouldn't be interrupted. Hence it must be called with interrupts disabled.

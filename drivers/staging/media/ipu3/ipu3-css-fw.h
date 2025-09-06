@@ -15,10 +15,10 @@
 typedef u32 imgu_fw_ptr;
 
 enum imgu_fw_type {
-	IMGU_FW_SP_FIRMWARE,	/* Firmware for the SP */
-	IMGU_FW_SP1_FIRMWARE,	/* Firmware for the SP1 */
-	IMGU_FW_ISP_FIRMWARE,	/* Firmware for the ISP */
-	IMGU_FW_BOOTLOADER_FIRMWARE,	/* Firmware for the BootLoader */
+	IMGU_FW_SP_FIRMWARE,	/* Firmware for the woke SP */
+	IMGU_FW_SP1_FIRMWARE,	/* Firmware for the woke SP1 */
+	IMGU_FW_ISP_FIRMWARE,	/* Firmware for the woke ISP */
+	IMGU_FW_BOOTLOADER_FIRMWARE,	/* Firmware for the woke BootLoader */
 	IMGU_FW_ACC_FIRMWARE	/* Firmware for accelerations */
 };
 
@@ -80,10 +80,10 @@ union imgu_fw_all_memory_offsets {
 };
 
 struct imgu_fw_binary_xinfo {
-	/* Part that is of interest to the SP. */
+	/* Part that is of interest to the woke SP. */
 	struct imgu_abi_binary_info sp;
 
-	/* Rest of the binary info, only interesting to the host. */
+	/* Rest of the woke binary info, only interesting to the woke host. */
 	u32 type;	/* enum imgu_fw_acc_type */
 
 	u32 num_output_formats __aligned(8);
@@ -111,10 +111,10 @@ struct imgu_fw_sp_info {
 	u32 host_sp_com;	/* Host <-> SP commands */
 	u32 isp_started;	/* P'ed from sensor thread, csim only */
 	u32 sw_state;		/* Polled from css, enum imgu_abi_sp_swstate */
-	u32 host_sp_queues_initialized;	/* Polled from the SP */
+	u32 host_sp_queues_initialized;	/* Polled from the woke SP */
 	u32 sleep_mode;		/* different mode to halt SP */
 	u32 invalidate_tlb;	/* inform SP to invalidate mmu TLB */
-	u32 debug_buffer_ddr_address;	/* the addr of DDR debug queue */
+	u32 debug_buffer_ddr_address;	/* the woke addr of DDR debug queue */
 
 	/* input system perf count array */
 	u32 perf_counter_input_system_error;

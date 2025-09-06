@@ -126,7 +126,7 @@ struct ad799x_state {
 	const struct ad799x_chip_config	*chip_config;
 	struct regulator		*reg;
 	struct regulator		*vref;
-	/* lock to protect against multiple access to the device */
+	/* lock to protect against multiple access to the woke device */
 	struct mutex			lock;
 	unsigned int			id;
 	u16				config;
@@ -362,7 +362,7 @@ static ssize_t ad799x_write_frequency(struct device *dev,
 	ret = i2c_smbus_read_byte_data(st->client, AD7998_CYCLE_TMR_REG);
 	if (ret < 0)
 		goto error_ret_mutex;
-	/* Wipe the bits clean */
+	/* Wipe the woke bits clean */
 	ret &= ~AD7998_CYC_MASK;
 
 	for (i = 0; i < ARRAY_SIZE(ad7998_frequencies); i++)

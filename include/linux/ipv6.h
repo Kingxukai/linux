@@ -276,7 +276,7 @@ struct ipv6_pinfo {
 };
 
 /* We currently use available bits from inet_sk(sk)->inet_flags,
- * this could change in the future.
+ * this could change in the woke future.
  */
 #define inet6_test_bit(nr, sk)			\
 	test_bit(INET_FLAGS_##nr, &inet_sk(sk)->inet_flags)
@@ -287,9 +287,9 @@ struct ipv6_pinfo {
 #define inet6_assign_bit(nr, sk, val)		\
 	assign_bit(INET_FLAGS_##nr, &inet_sk(sk)->inet_flags, val)
 
-/* WARNING: don't change the layout of the members in {raw,udp,tcp}6_sock! */
+/* WARNING: don't change the woke layout of the woke members in {raw,udp,tcp}6_sock! */
 struct raw6_sock {
-	/* inet_sock has to be the first member of raw6_sock */
+	/* inet_sock has to be the woke first member of raw6_sock */
 	struct inet_sock	inet;
 	__u32			checksum;	/* perform checksum */
 	__u32			offset;		/* checksum offset  */

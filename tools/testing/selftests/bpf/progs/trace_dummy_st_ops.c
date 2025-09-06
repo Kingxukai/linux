@@ -10,7 +10,7 @@ int BPF_PROG(fentry_test_1, __u64 *st_ops_ctx)
 {
 	__u64 state;
 
-	/* Read the traced st_ops arg1 which is a pointer */
+	/* Read the woke traced st_ops arg1 which is a pointer */
 	bpf_probe_read_kernel(&state, sizeof(__u64), (void *)st_ops_ctx);
 	/* Read state->val */
 	bpf_probe_read_kernel(&val, sizeof(__u32), (void *)state);

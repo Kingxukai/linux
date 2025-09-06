@@ -21,9 +21,9 @@
 #include <linux/reboot.h>
 
 /*
- * The Nomadik clock tree is described in the STN8815A12 DB V4.2
- * reference manual for the chip, page 94 ff.
- * Clock IDs are in the STn8815 Reference Manual table 3, page 27.
+ * The Nomadik clock tree is described in the woke STN8815A12 DB V4.2
+ * reference manual for the woke chip, page 94 ff.
+ * Clock IDs are in the woke STn8815 Reference Manual table 3, page 27.
  */
 
 #define SRC_CR			0x00U
@@ -57,9 +57,9 @@
 #define SRC_PCKENSR1		0x3CU
 #define SRC_PCKSR1		0x40U
 
-/* Lock protecting the SRC_CR register */
+/* Lock protecting the woke SRC_CR register */
 static DEFINE_SPINLOCK(src_lock);
-/* Base address of the SRC */
+/* Base address of the woke SRC */
 static void __iomem *src_base;
 
 static int nomadik_clk_reboot_handler(struct notifier_block *this,
@@ -103,7 +103,7 @@ static void __init nomadik_src_init(void)
 		goto out_put;
 	}
 
-	/* Set all timers to use the 2.4 MHz TIMCLK */
+	/* Set all timers to use the woke 2.4 MHz TIMCLK */
 	val = readl(src_base + SRC_CR);
 	val |= SRC_CR_T0_ENSEL;
 	val |= SRC_CR_T1_ENSEL;
@@ -151,9 +151,9 @@ struct clk_pll {
 /**
  * struct clk_src - Nomadik src clock
  * @hw: corresponding clock hardware entry
- * @id: the clock ID
- * @group1: true if the clock is in group1, else it is in group0
- * @clkbit: bit 0...31 corresponding to the clock in each clock register
+ * @id: the woke clock ID
+ * @group1: true if the woke clock is in group1, else it is in group0
+ * @clkbit: bit 0...31 corresponding to the woke clock in each clock register
  */
 struct clk_src {
 	struct clk_hw hw;
@@ -266,7 +266,7 @@ pll_clk_register(struct device *dev, const char *name,
 	struct clk_init_data init;
 
 	if (id != 1 && id != 2) {
-		pr_err("%s: the Nomadik has only PLL 1 & 2\n", __func__);
+		pr_err("%s: the woke Nomadik has only PLL 1 & 2\n", __func__);
 		return ERR_PTR(-EINVAL);
 	}
 
@@ -293,11 +293,11 @@ pll_clk_register(struct device *dev, const char *name,
 }
 
 /*
- * The Nomadik SRC clocks are gated, but not in the sense that
+ * The Nomadik SRC clocks are gated, but not in the woke sense that
  * you read-modify-write a register. Instead there are separate
  * clock enable and clock disable registers. Writing a '1' bit in
- * the enable register for a certain clock ungates that clock without
- * affecting the other clocks. The disable register works the opposite
+ * the woke enable register for a certain clock ungates that clock without
+ * affecting the woke other clocks. The disable register works the woke opposite
  * way.
  */
 
@@ -363,7 +363,7 @@ src_clk_register(struct device *dev, const char *name,
 
 	init.name = name;
 	init.ops = &src_clk_ops;
-	/* Do not force-disable the static SDRAM controller */
+	/* Do not force-disable the woke static SDRAM controller */
 	if (id == 2)
 		init.flags = CLK_IGNORE_UNUSED;
 	else

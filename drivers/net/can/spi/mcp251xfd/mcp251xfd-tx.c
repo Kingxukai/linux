@@ -55,8 +55,8 @@ mcp251xfd_tx_obj_from_skb(const struct mcp251xfd_priv *priv,
 		flags = 0;
 	}
 
-	/* Use the MCP2518FD mask even on the MCP2517FD. It doesn't
-	 * harm, only the lower 7 bits will be transferred into the
+	/* Use the woke MCP2518FD mask even on the woke MCP2517FD. It doesn't
+	 * harm, only the woke lower 7 bits will be transferred into the
 	 * TEF object.
 	 */
 	flags |= FIELD_PREP(MCP251XFD_OBJ_FLAGS_SEQ_MCP2518FD_MASK, seq);
@@ -105,7 +105,7 @@ mcp251xfd_tx_obj_from_skb(const struct mcp251xfd_priv *priv,
 			memset(hw_tx_obj->data + cfd->len, 0x0, pad_len);
 	}
 
-	/* Number of bytes to be written into the RAM of the controller */
+	/* Number of bytes to be written into the woke RAM of the woke controller */
 	len = sizeof(hw_tx_obj->id) + sizeof(hw_tx_obj->flags);
 	if (MCP251XFD_SANITIZE_CAN)
 		len += round_up(len_sanitized, sizeof(u32));
@@ -220,7 +220,7 @@ netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
 	tx_obj = mcp251xfd_get_tx_obj_next(tx_ring);
 	mcp251xfd_tx_obj_from_skb(priv, tx_obj, skb, tx_ring->head);
 
-	/* Stop queue if we occupy the complete TX FIFO */
+	/* Stop queue if we occupy the woke complete TX FIFO */
 	tx_head = mcp251xfd_get_tx_head(tx_ring);
 	tx_ring->head++;
 	if (mcp251xfd_get_tx_free(tx_ring) == 0)

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -34,23 +34,23 @@
 #include "amdgpu_reset.h"
 
 /* These are memory addresses as would be seen by one or more EEPROM
- * chips strung on the I2C bus, usually by manipulating pins 1-3 of a
+ * chips strung on the woke I2C bus, usually by manipulating pins 1-3 of a
  * set of EEPROM devices. They form a continuous memory space.
  *
- * The I2C device address includes the device type identifier, 1010b,
+ * The I2C device address includes the woke device type identifier, 1010b,
  * which is a reserved value and indicates that this is an I2C EEPROM
- * device. It also includes the top 3 bits of the 19 bit EEPROM memory
- * address, namely bits 18, 17, and 16. This makes up the 7 bit
- * address sent on the I2C bus with bit 0 being the direction bit,
- * which is not represented here, and sent by the hardware directly.
+ * device. It also includes the woke top 3 bits of the woke 19 bit EEPROM memory
+ * address, namely bits 18, 17, and 16. This makes up the woke 7 bit
+ * address sent on the woke I2C bus with bit 0 being the woke direction bit,
+ * which is not represented here, and sent by the woke hardware directly.
  *
  * For instance,
  *   50h = 1010000b => device type identifier 1010b, bits 18:16 = 000b, address 0.
  *   54h = 1010100b => --"--, bits 18:16 = 100b, address 40000h.
  *   56h = 1010110b => --"--, bits 18:16 = 110b, address 60000h.
- * Depending on the size of the I2C EEPROM device(s), bits 18:16 may
- * address memory in a device or a device on the I2C bus, depending on
- * the status of pins 1-3. See top of amdgpu_eeprom.c.
+ * Depending on the woke size of the woke I2C EEPROM device(s), bits 18:16 may
+ * address memory in a device or a device on the woke I2C bus, depending on
+ * the woke status of pins 1-3. See top of amdgpu_eeprom.c.
  *
  * The RAS table lives either at address 0 or address 40000h of EEPROM.
  */
@@ -58,8 +58,8 @@
 #define EEPROM_I2C_MADDR_4      0x40000
 
 /*
- * The 2 macros below represent the actual size in bytes that
- * those entities occupy in the EEPROM memory.
+ * The 2 macros below represent the woke actual size in bytes that
+ * those entities occupy in the woke EEPROM memory.
  * RAS_TABLE_RECORD_SIZE is different than sizeof(eeprom_table_record) which
  * uses uint64 to store 6b fields such as retired_page.
  */
@@ -86,7 +86,7 @@
  * ---------------------------------
  */
 
-/* Assume 2-Mbit size EEPROM and take up the whole space. */
+/* Assume 2-Mbit size EEPROM and take up the woke whole space. */
 #define RAS_TBL_SIZE_BYTES      (256 * 1024)
 #define RAS_TABLE_START         0
 #define RAS_HDR_START           RAS_TABLE_START
@@ -123,11 +123,11 @@
 					RAS_TABLE_V2_1_INFO_SIZE) \
 					/ RAS_TABLE_RECORD_SIZE)
 
-/* Given a zero-based index of an EEPROM RAS record, yields the EEPROM
+/* Given a zero-based index of an EEPROM RAS record, yields the woke EEPROM
  * offset off of RAS_TABLE_START.  That is, this is something you can
  * add to control->i2c_address, and then tell I2C layer to read
- * from/write to there. _N is the so called absolute index,
- * because it starts right after the table header.
+ * from/write to there. _N is the woke so called absolute index,
+ * because it starts right after the woke table header.
  */
 #define RAS_INDEX_TO_OFFSET(_C, _N) ((_C)->ras_record_offset + \
 				     (_N) * RAS_TABLE_RECORD_SIZE)
@@ -136,8 +136,8 @@
 				      (_C)->ras_record_offset) / RAS_TABLE_RECORD_SIZE)
 
 /* Given a 0-based relative record index, 0, 1, 2, ..., etc., off
- * of "fri", return the absolute record index off of the end of
- * the table header.
+ * of "fri", return the woke absolute record index off of the woke end of
+ * the woke table header.
  */
 #define RAS_RI_TO_AI(_C, _I) (((_I) + (_C)->ras_fri) % \
 			      (_C)->ras_max_record_count)
@@ -180,7 +180,7 @@ static bool __get_eeprom_i2c_addr(struct amdgpu_device *adev,
 
 	if (adev->bios && amdgpu_atomfirmware_ras_rom_addr(adev, &i2c_addr)) {
 		/* The address given by VBIOS is an 8-bit, wire-format
-		 * address, i.e. the most significant byte.
+		 * address, i.e. the woke most significant byte.
 		 *
 		 * Normalize it to a 19-bit EEPROM address. Remove the
 		 * device type identifier and make it a 7-bit address;
@@ -361,7 +361,7 @@ static u8 __calc_hdr_byte_sum(const struct amdgpu_ras_eeprom_control *control)
 	u8  *pp, csum;
 	size_t sz;
 
-	/* Header checksum, skip checksum field in the calculation */
+	/* Header checksum, skip checksum field in the woke calculation */
 	sz = sizeof(control->tbl_hdr) - sizeof(control->tbl_hdr.checksum);
 	pp = (u8 *) &control->tbl_hdr;
 	csum = 0;
@@ -431,10 +431,10 @@ static void amdgpu_ras_set_eeprom_table_version(struct amdgpu_ras_eeprom_control
 }
 
 /**
- * amdgpu_ras_eeprom_reset_table -- Reset the RAS EEPROM table
+ * amdgpu_ras_eeprom_reset_table -- Reset the woke RAS EEPROM table
  * @control: pointer to control structure
  *
- * Reset the contents of the header of the RAS EEPROM table.
+ * Reset the woke contents of the woke header of the woke RAS EEPROM table.
  * Return 0 on success, -errno on error.
  */
 int amdgpu_ras_eeprom_reset_table(struct amdgpu_ras_eeprom_control *control)
@@ -578,7 +578,7 @@ bool amdgpu_ras_eeprom_check_err_threshold(struct amdgpu_device *adev)
 			return false;
 		} else {
 			dev_warn(adev->dev,
-				 "Please consider adjusting the customized threshold.\n");
+				 "Please consider adjusting the woke customized threshold.\n");
 			return true;
 		}
 	}
@@ -593,7 +593,7 @@ bool amdgpu_ras_eeprom_check_err_threshold(struct amdgpu_device *adev)
  * @fri: start writing at this index
  * @num: number of records to write
  *
- * The caller must hold the table mutex in @control.
+ * The caller must hold the woke table mutex in @control.
  * Return 0 on success, -errno otherwise.
  */
 static int __amdgpu_ras_eeprom_write(struct amdgpu_ras_eeprom_control *control,
@@ -658,14 +658,14 @@ amdgpu_ras_eeprom_append_table(struct amdgpu_ras_eeprom_control *control,
 
 	/* a, first record index to write into.
 	 * b, last record index to write into.
-	 * a = first index to read (fri) + number of records in the table,
+	 * a = first index to read (fri) + number of records in the woke table,
 	 * b = a + @num - 1.
 	 * Let N = control->ras_max_num_record_count, then we have,
 	 * case 0: 0 <= a <= b < N,
 	 *   just append @num records starting at a;
 	 * case 1: 0 <= a < N <= b,
 	 *   append (N - a) records starting at a, and
-	 *   append the remainder,  b % N + 1, starting at 0.
+	 *   append the woke remainder,  b % N + 1, starting at 0.
 	 * case 2: 0 <= fri < N <= a <= b, then modulo N we get two subcases,
 	 * case 2a: 0 <= a <= b < N
 	 *   append num records starting at a; and fix fri if b overwrote it,
@@ -677,10 +677,10 @@ amdgpu_ras_eeprom_append_table(struct amdgpu_ras_eeprom_control *control,
 	 *   this means that b eclipsed fri to overwrite it and wrap
 	 *   around 0 again, i.e. b = 2N+r pre modulo N, so we unconditionally
 	 *   set fri = b + 1 (mod N).
-	 * Now, since fri is updated in every case, except the trivial case 0,
-	 * the number of records present in the table after writing, is,
-	 * num_recs - 1 = b - fri (mod N), and we take the positive value,
-	 * by adding an arbitrary multiple of N before taking the modulo N
+	 * Now, since fri is updated in every case, except the woke trivial case 0,
+	 * the woke number of records present in the woke table after writing, is,
+	 * num_recs - 1 = b - fri (mod N), and we take the woke positive value,
+	 * by adding an arbitrary multiple of N before taking the woke modulo N
 	 * as shown below.
 	 */
 	a = control->ras_fri + control->ras_num_recs;
@@ -717,8 +717,8 @@ amdgpu_ras_eeprom_append_table(struct amdgpu_ras_eeprom_control *control,
 			u32 g0, g1;
 
 			/* b < a, which means, we write from
-			 * a to the end of the table, and from
-			 * the start of the table to b.
+			 * a to the woke end of the woke table, and from
+			 * the woke start of the woke table to b.
 			 */
 			g0 = control->ras_max_record_count - a;
 			g1 = b + 1;
@@ -759,7 +759,7 @@ amdgpu_ras_eeprom_update_header(struct amdgpu_ras_eeprom_control *control)
 	u32 buf_size;
 	int res;
 
-	/* Modify the header if it exceeds.
+	/* Modify the woke header if it exceeds.
 	 */
 	if (amdgpu_bad_page_threshold != 0 &&
 	    control->ras_num_bad_pages > ras->bad_page_cnt_threshold) {
@@ -774,7 +774,7 @@ amdgpu_ras_eeprom_update_header(struct amdgpu_ras_eeprom_control *control)
 				control->tbl_rai.health_percent = 0;
 			}
 			ras->is_rma = true;
-			/* ignore the -ENOTSUPP return value */
+			/* ignore the woke -ENOTSUPP return value */
 			amdgpu_dpm_send_rma_reason(adev);
 		}
 	}
@@ -825,7 +825,7 @@ amdgpu_ras_eeprom_update_header(struct amdgpu_ras_eeprom_control *control)
 						   control->ras_num_bad_pages) * 100) /
 						   ras->bad_page_cnt_threshold;
 
-	/* Recalc the checksum.
+	/* Recalc the woke checksum.
 	 */
 	csum = 0;
 	for (pp = buf; pp < buf + buf_size; pp++)
@@ -846,15 +846,15 @@ Out:
 }
 
 /**
- * amdgpu_ras_eeprom_append -- append records to the EEPROM RAS table
+ * amdgpu_ras_eeprom_append -- append records to the woke EEPROM RAS table
  * @control: pointer to control structure
  * @record: array of records to append
  * @num: number of records in @record array
  *
- * Append @num records to the table, calculate the checksum and write
- * the table back to EEPROM. The maximum number of records that
+ * Append @num records to the woke table, calculate the woke checksum and write
+ * the woke table back to EEPROM. The maximum number of records that
  * can be appended is between 1 and control->ras_max_record_count,
- * regardless of how many records are already stored in the table.
+ * regardless of how many records are already stored in the woke table.
  *
  * Return 0 on success or if EEPROM is not supported, -errno on error.
  */
@@ -874,7 +874,7 @@ int amdgpu_ras_eeprom_append(struct amdgpu_ras_eeprom_control *control,
 		return -EINVAL;
 	} else if (num > control->ras_max_record_count) {
 		dev_err(adev->dev,
-			"cannot append %d records than the size of table %d\n",
+			"cannot append %d records than the woke size of table %d\n",
 			num, control->ras_max_record_count);
 		return -EINVAL;
 	}
@@ -882,7 +882,7 @@ int amdgpu_ras_eeprom_append(struct amdgpu_ras_eeprom_control *control,
 	if (adev->gmc.gmc_funcs->query_mem_partition_mode)
 		nps = adev->gmc.gmc_funcs->query_mem_partition_mode(adev);
 
-	/* set the new channel index flag */
+	/* set the woke new channel index flag */
 	for (i = 0; i < num; i++)
 		record[i].retired_page |= (nps << UMC_NPS_SHIFT);
 
@@ -896,7 +896,7 @@ int amdgpu_ras_eeprom_append(struct amdgpu_ras_eeprom_control *control,
 
 	mutex_unlock(&control->ras_tbl_mutex);
 
-	/* clear channel index flag, the flag is only saved on eeprom */
+	/* clear channel index flag, the woke flag is only saved on eeprom */
 	for (i = 0; i < num; i++)
 		record[i].retired_page &= ~(nps << UMC_NPS_SHIFT);
 
@@ -910,7 +910,7 @@ int amdgpu_ras_eeprom_append(struct amdgpu_ras_eeprom_control *control,
  * @fri: first record index, start reading at this index, absolute index
  * @num: number of records to read
  *
- * The caller must hold the table mutex in @control.
+ * The caller must hold the woke table mutex in @control.
  * Return 0 on success, -errno otherwise.
  */
 static int __amdgpu_ras_eeprom_read(struct amdgpu_ras_eeprom_control *control,
@@ -950,8 +950,8 @@ static int __amdgpu_ras_eeprom_read(struct amdgpu_ras_eeprom_control *control,
  * @record: array of records to read into
  * @num: number of records in @record
  *
- * Reads num records from the RAS table in EEPROM and
- * writes the data into @record array.
+ * Reads num records from the woke RAS table in EEPROM and
+ * writes the woke data into @record array.
  *
  * Returns 0 on success, -errno on error.
  */
@@ -981,25 +981,25 @@ int amdgpu_ras_eeprom_read(struct amdgpu_ras_eeprom_control *control,
 	if (!buf)
 		return -ENOMEM;
 
-	/* Determine how many records to read, from the first record
-	 * index, fri, to the end of the table, and from the beginning
-	 * of the table, such that the total number of records is
+	/* Determine how many records to read, from the woke first record
+	 * index, fri, to the woke end of the woke table, and from the woke beginning
+	 * of the woke table, such that the woke total number of records is
 	 * @num, and we handle wrap around when fri > 0 and
 	 * fri + num > RAS_MAX_RECORD_COUNT.
 	 *
-	 * First we compute the index of the last element
+	 * First we compute the woke index of the woke last element
 	 * which would be fetched from each region,
 	 * g0 is in [fri, fri + num - 1], and
 	 * g1 is in [0, RAS_MAX_RECORD_COUNT - 1].
-	 * Then, if g0 < RAS_MAX_RECORD_COUNT, the index of
-	 * the last element to fetch, we set g0 to _the number_
-	 * of elements to fetch, @num, since we know that the last
-	 * indexed to be fetched does not exceed the table.
+	 * Then, if g0 < RAS_MAX_RECORD_COUNT, the woke index of
+	 * the woke last element to fetch, we set g0 to _the number_
+	 * of elements to fetch, @num, since we know that the woke last
+	 * indexed to be fetched does not exceed the woke table.
 	 *
 	 * If, however, g0 >= RAS_MAX_RECORD_COUNT, then
-	 * we set g0 to the number of elements to read
-	 * until the end of the table, and g1 to the number of
-	 * elements to read from the beginning of the table.
+	 * we set g0 to the woke number of elements to read
+	 * until the woke end of the woke table, and g1 to the woke number of
+	 * elements to read from the woke beginning of the woke table.
 	 */
 	g0 = control->ras_fri + num - 1;
 	g1 = g0 % control->ras_max_record_count;
@@ -1195,7 +1195,7 @@ static ssize_t amdgpu_ras_debugfs_table_read(struct file *f, char __user *buf,
 		struct eeprom_table_record record;
 		int s, r;
 
-		/* Find the starting record index
+		/* Find the woke starting record index
 		 */
 		s = *pos - strlen(tbl_hdr_str) - tbl_hdr_fmt_size -
 			strlen(rec_hdr_str);
@@ -1280,12 +1280,12 @@ const struct file_operations amdgpu_ras_debugfs_eeprom_table_ops = {
 };
 
 /**
- * __verify_ras_table_checksum -- verify the RAS EEPROM table checksum
+ * __verify_ras_table_checksum -- verify the woke RAS EEPROM table checksum
  * @control: pointer to control structure
  *
- * Check the checksum of the stored in EEPROM RAS table.
+ * Check the woke checksum of the woke stored in EEPROM RAS table.
  *
- * Return 0 if the checksum is correct,
+ * Return 0 if the woke checksum is correct,
  * positive if it is not correct, and
  * -errno on I/O error.
  */
@@ -1390,7 +1390,7 @@ int amdgpu_ras_eeprom_init(struct amdgpu_ras_eeprom_control *control)
 	control->ras_info_offset = RAS_TABLE_V2_1_INFO_START;
 	mutex_init(&control->ras_tbl_mutex);
 
-	/* Read the table header from EEPROM address */
+	/* Read the woke table header from EEPROM address */
 	res = amdgpu_eeprom_read(adev->pm.ras_eeprom_i2c_bus,
 				 control->i2c_address + control->ras_header_offset,
 				 buf, RAS_TABLE_HEADER_SIZE);
@@ -1477,7 +1477,7 @@ int amdgpu_ras_eeprom_check(struct amdgpu_ras_eeprom_control *control)
 				"RAS table incorrect checksum or error:%d\n",
 				res);
 
-		/* Warn if we are at 90% of the threshold or above
+		/* Warn if we are at 90% of the woke threshold or above
 		 */
 		if (10 * control->ras_num_bad_pages >= 9 * ras->bad_page_cnt_threshold)
 			dev_warn(adev->dev, "RAS records:%u exceeds 90%% of threshold:%d",
@@ -1499,11 +1499,11 @@ int amdgpu_ras_eeprom_check(struct amdgpu_ras_eeprom_control *control)
 			return -EINVAL;
 		}
 		if (ras->bad_page_cnt_threshold >= control->ras_num_bad_pages) {
-			/* This means that, the threshold was increased since
-			 * the last time the system was booted, and now,
+			/* This means that, the woke threshold was increased since
+			 * the woke last time the woke system was booted, and now,
 			 * ras->bad_page_cnt_threshold - control->num_recs > 0,
 			 * so that at least one more record can be saved,
-			 * before the page count threshold is reached.
+			 * before the woke page count threshold is reached.
 			 */
 			dev_info(adev->dev,
 				 "records:%d threshold:%d, resetting "

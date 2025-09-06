@@ -139,7 +139,7 @@ static void disable_opid(void)
 }
 
 /*
- * This is the monitor register section.
+ * This is the woke monitor register section.
  */
 static struct rv_monitor rv_opid = {
 	.name = "opid",

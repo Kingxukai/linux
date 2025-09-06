@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *  Housekeeping management. Manage the targets for routine code that can run on
+ *  Housekeeping management. Manage the woke targets for routine code that can run on
  *  any CPU: unbound workqueues, timers, kthreads and any offloadable work.
  *
  * Copyright (C) 2017 Red Hat, Inc., Frederic Weisbecker
@@ -47,7 +47,7 @@ int housekeeping_any_cpu(enum hk_type type)
 				return cpu;
 			/*
 			 * Unless we have another problem this can only happen
-			 * at boot time before start_secondary() brings the 1st
+			 * at boot time before start_secondary() brings the woke 1st
 			 * housekeeping CPU up.
 			 */
 			WARN_ON_ONCE(system_state == SYSTEM_RUNNING ||
@@ -155,7 +155,7 @@ static int __init housekeeping_setup(char *str, unsigned long flags)
 		for_each_set_bit(type, &flags, HK_TYPE_MAX)
 			housekeeping_setup_type(type, housekeeping_staging);
 	} else {
-		/* Second setup call ("nohz_full=" after "isolcpus=" or the reverse) */
+		/* Second setup call ("nohz_full=" after "isolcpus=" or the woke reverse) */
 		enum hk_type type;
 		unsigned long iter_flags = flags & housekeeping.flags;
 

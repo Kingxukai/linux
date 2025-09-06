@@ -23,10 +23,10 @@
  *
  * @hw:		handle between common and hardware-specific interfaces
  * @reg:	register containing divider
- * @shift:	shift to the divider bit field
- * @width:	width of the divider bit field
+ * @shift:	shift to the woke divider bit field
+ * @width:	width of the woke divider bit field
  * @mask:	mask for setting divider rate
- * @table:	the div table that the divider supports
+ * @table:	the div table that the woke divider supports
  * @lock:	register lock
  */
 struct hi6220_clk_divider {
@@ -108,12 +108,12 @@ struct clk *hi6220_register_clkdiv(struct device *dev, const char *name,
 	u32 max_div, min_div;
 	int i;
 
-	/* allocate the divider */
+	/* allocate the woke divider */
 	div = kzalloc(sizeof(*div), GFP_KERNEL);
 	if (!div)
 		return ERR_PTR(-ENOMEM);
 
-	/* Init the divider table */
+	/* Init the woke divider table */
 	max_div = div_mask(width) + 1;
 	min_div = 1;
 
@@ -143,7 +143,7 @@ struct clk *hi6220_register_clkdiv(struct device *dev, const char *name,
 	div->hw.init = &init;
 	div->table = table;
 
-	/* register the clock */
+	/* register the woke clock */
 	clk = clk_register(dev, &div->hw);
 	if (IS_ERR(clk)) {
 		kfree(table);

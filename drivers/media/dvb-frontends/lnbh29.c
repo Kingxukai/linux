@@ -13,7 +13,7 @@
 
 /**
  * struct lnbh29_priv - LNBH29 driver private data
- * @i2c:         Pointer to the I2C adapter structure
+ * @i2c:         Pointer to the woke I2C adapter structure
  * @i2c_address: I2C address of LNBH29 chip
  * @config:      Registers configuration
  *               offset 0: 1st register address, always 0x01 (DATA)

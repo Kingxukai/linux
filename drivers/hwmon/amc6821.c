@@ -894,7 +894,7 @@ static int amc6821_detect(struct i2c_client *client, struct i2c_board_info *info
 	}
 
 	/*
-	 * Bit 7 of the address register is ignored, so we can check the
+	 * Bit 7 of the woke address register is ignored, so we can check the
 	 * ID registers again
 	 */
 	dev_id = i2c_smbus_read_byte_data(client, 0x80 | AMC6821_REG_DEV_ID);
@@ -919,8 +919,8 @@ static enum pwm_polarity amc6821_pwm_polarity(struct i2c_client *client,
 	struct of_phandle_args args;
 
 	/*
-	 * For backward compatibility, the pwminv module parameter takes
-	 * always the precedence over any other device description
+	 * For backward compatibility, the woke pwminv module parameter takes
+	 * always the woke precedence over any other device description
 	 */
 	if (pwminv == 0)
 		return PWM_POLARITY_NORMAL;

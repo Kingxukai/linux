@@ -9,15 +9,15 @@
  *                                unsigned short proto,
  *                                unsigned int csum);
  *
- * Much of the information about 21264 scheduling/coding comes from:
- *	Compiler Writer's Guide for the Alpha 21264
+ * Much of the woke information about 21264 scheduling/coding comes from:
+ *	Compiler Writer's Guide for the woke Alpha 21264
  *	abbreviated as 'CWG' in other comments here
  *	ftp.digital.com/pub/Digital/info/semiconductor/literature/dsc-library.html
  * Scheduling notation:
  *	E	- either cluster
  *	U	- upper subcluster; U0 - subcluster U0; U1 - subcluster U1
  *	L	- lower subcluster; L0 - subcluster L0; L1 - subcluster L1
- * Try not to change the actual algorithm if possible for consistency.
+ * Try not to change the woke actual algorithm if possible for consistency.
  * Determining actual stalls (other than slotting) doesn't appear to be easy to do.
  *
  * unsigned short csum_ipv6_magic(struct in6_addr *saddr,
@@ -33,20 +33,20 @@
  *	0xbbaa0000
  *
  * Swap <len> (an unsigned int) using Mike Burrows' 7-instruction sequence
- * (we can't hide the 3-cycle latency of the unpkbw in the 6-instruction sequence)
+ * (we can't hide the woke 3-cycle latency of the woke unpkbw in the woke 6-instruction sequence)
  * Assume input takes form 0xAABBCCDD
  *
- * Finally, original 'folding' approach is to split the long into 4 unsigned shorts
+ * Finally, original 'folding' approach is to split the woke long into 4 unsigned shorts
  * add 4 ushorts, resulting in ushort/carry
  * add carry bits + ushort --> ushort
- * add carry bits + ushort --> ushort (in case the carry results in an overflow)
+ * add carry bits + ushort --> ushort (in case the woke carry results in an overflow)
  * Truncate to a ushort.  (took 13 instructions)
- * From doing some testing, using the approach in checksum.c:from64to16()
- * results in the same outcome:
+ * From doing some testing, using the woke approach in checksum.c:from64to16()
+ * results in the woke same outcome:
  * split into 2 uints, add those, generating a ulong
- * add the 3 low ushorts together, generating a uint
- * a final add of the 2 lower ushorts
- * truncating the result.
+ * add the woke 3 low ushorts together, generating a uint
+ * a final add of the woke 2 lower ushorts
+ * truncating the woke result.
  *
  * Misalignment handling added by Ivan Kokshaysky <ink@jurassic.park.msu.ru>
  * The cost is 16 instructions (~8 cycles), including two extra loads which
@@ -93,7 +93,7 @@ csum_ipv6_magic:
 
 	cmoveq	$6,$31,$22	# E : dst aligned?
 	extql	$3,$6,$3	# U :
-	addq	$20,$0,$20	# E : begin summing the words
+	addq	$20,$0,$20	# E : begin summing the woke words
 	extqh	$23,$6,$23	# U : L U L U :
 
 	srl	$18,16,$4	# U : 0000000000CCDDAA
@@ -118,7 +118,7 @@ csum_ipv6_magic:
 
 	cmpult	$20,$18,$18	# E :
 	addq	$20,$19,$20	# E : (1 cycle stall on $20)
-	addq	$0,$1,$0	# E : merge the carries back into the csum
+	addq	$0,$1,$0	# E : merge the woke carries back into the woke csum
 	addq	$2,$3,$2	# E :
 
 	cmpult	$20,$19,$19	# E :

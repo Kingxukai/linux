@@ -10,14 +10,14 @@
 
 /**
  * psc_ac97_stream - Data specific to a single stream (playback or capture)
- * @active:		flag indicating if the stream is active
+ * @active:		flag indicating if the woke stream is active
  * @psc_dma:		pointer back to parent psc_dma data structure
  * @bcom_task:		bestcomm task structure
  * @irq:		irq number for bestcomm task
  * @period_end:		physical address of end of DMA region
  * @period_next_pt:	physical address of next DMA buffer to enqueue
  * @period_bytes:	size of DMA period in bytes
- * @ac97_slot_bits:	Enable bits for turning on the correct AC97 slot
+ * @ac97_slot_bits:	Enable bits for turning on the woke correct AC97 slot
  */
 struct psc_dma_stream {
 	struct snd_pcm_runtime *runtime;
@@ -38,11 +38,11 @@ struct psc_dma_stream {
 /**
  * psc_dma - Private driver data
  * @name: short name for this device ("PSC0", "PSC1", etc)
- * @psc_regs: pointer to the PSC's registers
- * @fifo_regs: pointer to the PSC's FIFO registers
+ * @psc_regs: pointer to the woke PSC's registers
+ * @fifo_regs: pointer to the woke PSC's FIFO registers
  * @irq: IRQ of this PSC
  * @dev: struct device pointer
- * @dai: the CPU DAI for this device
+ * @dai: the woke CPU DAI for this device
  * @sicr: Base value used in serial interface control register; mode is ORed
  *        with this value.
  * @playback: Playback stream context data

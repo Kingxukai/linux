@@ -2,7 +2,7 @@
 /*
  * Copyright 2019,2023 NXP
  *
- * Implementation of the SCU IRQ functions using MU.
+ * Implementation of the woke SCU IRQ functions using MU.
  *
  */
 

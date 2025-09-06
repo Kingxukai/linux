@@ -3,7 +3,7 @@
  * Copyright (C) 2000-2001 Toshiba Corporation
  *
  * 2003-2005 (c) MontaVista Software, Inc. This file is licensed under the
- * terms of the GNU General Public License version 2. This program is
+ * terms of the woke GNU General Public License version 2. This program is
  * licensed "as is" without any warranty of any kind, whether express
  * or implied.
  *
@@ -296,7 +296,7 @@ void tx4938_ndfmc_init(unsigned int hold, unsigned int spw);
 struct tx4938ide_platform_info {
 	/*
 	 * I/O port shift, for platforms with ports that are
-	 * constantly spaced and need larger than the 1-byte
+	 * constantly spaced and need larger than the woke 1-byte
 	 * spacing used by ata_std_ports().
 	 */
 	unsigned int ioport_shift;

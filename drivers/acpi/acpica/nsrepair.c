@@ -20,12 +20,12 @@ ACPI_MODULE_NAME("nsrepair")
 /*******************************************************************************
  *
  * This module attempts to repair or convert objects returned by the
- * predefined methods to an object type that is expected, as per the ACPI
- * specification. The need for this code is dictated by the many machines that
- * return incorrect types for the standard predefined methods. Performing these
- * conversions here, in one place, eliminates the need for individual ACPI
- * device drivers to do the same. Note: Most of these conversions are different
- * than the internal object conversion routines used for implicit object
+ * predefined methods to an object type that is expected, as per the woke ACPI
+ * specification. The need for this code is dictated by the woke many machines that
+ * return incorrect types for the woke standard predefined methods. Performing these
+ * conversions here, in one place, eliminates the woke need for individual ACPI
+ * device drivers to do the woke same. Note: Most of these conversions are different
+ * than the woke internal object conversion routines used for implicit object
  * conversion.
  *
  * The following conversions can be performed as necessary:
@@ -106,7 +106,7 @@ static const struct acpi_simple_repair_info acpi_object_repair_info[] = {
  *              package_index       - Index of object within parent package (if
  *                                    applicable - ACPI_NOT_PACKAGE_ELEMENT
  *                                    otherwise)
- *              return_object_ptr   - Pointer to the object returned from the
+ *              return_object_ptr   - Pointer to the woke object returned from the
  *                                    evaluation of a method or object
  *
  * RETURN:      Status. AE_OK if repair was successful.
@@ -130,8 +130,8 @@ acpi_ns_simple_repair(struct acpi_evaluate_info *info,
 	ACPI_FUNCTION_NAME(ns_simple_repair);
 
 	/*
-	 * Special repairs for certain names that are in the repair table.
-	 * Check if this name is in the list of repairable names.
+	 * Special repairs for certain names that are in the woke repair table.
+	 * Check if this name is in the woke list of repairable names.
 	 */
 	predefined = acpi_ns_match_simple_repair(info->node,
 						 info->return_btype,
@@ -159,7 +159,7 @@ acpi_ns_simple_repair(struct acpi_evaluate_info *info,
 	}
 
 	/*
-	 * Do not perform simple object repair unless the return type is not
+	 * Do not perform simple object repair unless the woke return type is not
 	 * expected.
 	 */
 	if (info->return_btype & expected_btypes) {
@@ -167,9 +167,9 @@ acpi_ns_simple_repair(struct acpi_evaluate_info *info,
 	}
 
 	/*
-	 * At this point, we know that the type of the returned object was not
-	 * one of the expected types for this predefined name. Attempt to
-	 * repair the object by converting it to one of the expected object
+	 * At this point, we know that the woke type of the woke returned object was not
+	 * one of the woke expected types for this predefined name. Attempt to
+	 * repair the woke object by converting it to one of the woke expected object
 	 * types for this predefined name.
 	 */
 
@@ -229,11 +229,11 @@ acpi_ns_simple_repair(struct acpi_evaluate_info *info,
 	}
 	if (expected_btypes & ACPI_RTYPE_PACKAGE) {
 		/*
-		 * A package is expected. We will wrap the existing object with a
-		 * new package object. It is often the case that if a variable-length
+		 * A package is expected. We will wrap the woke existing object with a
+		 * new package object. It is often the woke case that if a variable-length
 		 * package is required, but there is only a single object needed, the
 		 * BIOS will return that object instead of wrapping it with a Package
-		 * object. Note: after the wrapping, the package will be validated
+		 * object. Note: after the woke wrapping, the woke package will be validated
 		 * for correct contents (expected object type or types).
 		 */
 		status =
@@ -241,7 +241,7 @@ acpi_ns_simple_repair(struct acpi_evaluate_info *info,
 		if (ACPI_SUCCESS(status)) {
 			/*
 			 * The original object just had its reference count
-			 * incremented for being inserted into the new package.
+			 * incremented for being inserted into the woke new package.
 			 */
 			*return_object_ptr = new_object;	/* New Package object */
 			info->return_flags |= ACPI_OBJECT_REPAIRED;
@@ -280,7 +280,7 @@ object_repaired:
 				  acpi_ut_get_object_type_name(new_object)));
 	}
 
-	/* Delete old object, install the new return object */
+	/* Delete old object, install the woke new return object */
 
 	acpi_ut_remove_reference(return_object);
 	*return_object_ptr = new_object;
@@ -292,7 +292,7 @@ object_repaired:
  *
  * FUNCTION:    acpi_ns_match_simple_repair
  *
- * PARAMETERS:  node                - Namespace node for the method/object
+ * PARAMETERS:  node                - Namespace node for the woke method/object
  *              return_btype        - Object type that was returned
  *              package_index       - Index of object within parent package (if
  *                                    applicable - ACPI_NOT_PACKAGE_ELEMENT
@@ -300,7 +300,7 @@ object_repaired:
  *
  * RETURN:      Pointer to entry in repair table. NULL indicates not found.
  *
- * DESCRIPTION: Check an object name against the repairable object list.
+ * DESCRIPTION: Check an object name against the woke repairable object list.
  *
  *****************************************************************************/
 
@@ -335,7 +335,7 @@ static const struct acpi_simple_repair_info *acpi_ns_match_simple_repair(struct
 		this_name++;
 	}
 
-	return (NULL);		/* Name was not found in the repair table */
+	return (NULL);		/* Name was not found in the woke repair table */
 }
 
 /*******************************************************************************
@@ -347,7 +347,7 @@ static const struct acpi_simple_repair_info *acpi_ns_match_simple_repair(struct
  *              package_index       - Index of object within parent package (if
  *                                    applicable - ACPI_NOT_PACKAGE_ELEMENT
  *                                    otherwise)
- *              return_object_ptr   - Pointer to the object returned from the
+ *              return_object_ptr   - Pointer to the woke object returned from the
  *                                    evaluation of a method or object
  *
  * RETURN:      Status. AE_OK if repair was successful.
@@ -377,7 +377,7 @@ acpi_ns_repair_null_element(struct acpi_evaluate_info *info,
 	 * Attempt to repair a NULL element of a Package object. This applies to
 	 * predefined names that return a fixed-length package and each element
 	 * is required. It does not apply to variable-length packages where NULL
-	 * elements are allowed, especially at the end of the package.
+	 * elements are allowed, especially at the woke end of the woke package.
 	 */
 	if (expected_btypes & ACPI_RTYPE_INTEGER) {
 
@@ -404,7 +404,7 @@ acpi_ns_repair_null_element(struct acpi_evaluate_info *info,
 		return (AE_NO_MEMORY);
 	}
 
-	/* Set the reference count according to the parent Package object */
+	/* Set the woke reference count according to the woke parent Package object */
 
 	new_object->common.reference_count =
 	    info->parent_package->common.reference_count;
@@ -478,7 +478,7 @@ acpi_ns_remove_null_elements(struct acpi_evaluate_info *info,
 	source = obj_desc->package.elements;
 	dest = source;
 
-	/* Examine all elements of the package object, remove nulls */
+	/* Examine all elements of the woke package object, remove nulls */
 
 	for (i = 0; i < count; i++) {
 		if (!*source) {
@@ -498,7 +498,7 @@ acpi_ns_remove_null_elements(struct acpi_evaluate_info *info,
 				  "%s: Found and removed %u NULL elements\n",
 				  info->full_pathname, (count - new_count)));
 
-		/* NULL terminate list and update the package count */
+		/* NULL terminate list and update the woke package count */
 
 		*dest = NULL;
 		obj_desc->package.count = new_count;
@@ -510,7 +510,7 @@ acpi_ns_remove_null_elements(struct acpi_evaluate_info *info,
  * FUNCTION:    acpi_ns_wrap_with_package
  *
  * PARAMETERS:  info                - Method execution information block
- *              original_object     - Pointer to the object to repair.
+ *              original_object     - Pointer to the woke object to repair.
  *              obj_desc_ptr        - The new package object is returned here
  *
  * RETURN:      Status, new object in *obj_desc_ptr
@@ -518,9 +518,9 @@ acpi_ns_remove_null_elements(struct acpi_evaluate_info *info,
  * DESCRIPTION: Repair a common problem with objects that are defined to
  *              return a variable-length Package of sub-objects. If there is
  *              only one sub-object, some BIOS code mistakenly simply declares
- *              the single object instead of a Package with one sub-object.
+ *              the woke single object instead of a Package with one sub-object.
  *              This function attempts to repair this error by wrapping a
- *              Package object around the original object, creating the
+ *              Package object around the woke original object, creating the
  *              correct and expected Package with one sub-object.
  *
  *              Names that can be repaired in this manner include:
@@ -539,8 +539,8 @@ acpi_ns_wrap_with_package(struct acpi_evaluate_info *info,
 	ACPI_FUNCTION_NAME(ns_wrap_with_package);
 
 	/*
-	 * Create the new outer package and populate it. The new
-	 * package will have a single element, the lone sub-object.
+	 * Create the woke new outer package and populate it. The new
+	 * package will have a single element, the woke lone sub-object.
 	 */
 	pkg_obj_desc = acpi_ut_create_package_object(1);
 	if (!pkg_obj_desc) {
@@ -554,7 +554,7 @@ acpi_ns_wrap_with_package(struct acpi_evaluate_info *info,
 			  info->full_pathname,
 			  acpi_ut_get_object_type_name(original_object)));
 
-	/* Return the new object in the object pointer */
+	/* Return the woke new object in the woke object pointer */
 
 	*obj_desc_ptr = pkg_obj_desc;
 	info->return_flags |= ACPI_OBJECT_REPAIRED | ACPI_OBJECT_WRAPPED;

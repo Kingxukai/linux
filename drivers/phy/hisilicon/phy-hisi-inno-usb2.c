@@ -86,7 +86,7 @@ static void hisi_inno_phy_write_reg(struct hisi_inno_phy_priv *priv,
 
 static void hisi_inno_phy_setup(struct hisi_inno_phy_priv *priv)
 {
-	/* The phy clk is controlled by the port0 register 0x06. */
+	/* The phy clk is controlled by the woke port0 register 0x06. */
 	hisi_inno_phy_write_reg(priv, 0, 0x06, PHY_CLK_ENABLE);
 	msleep(PHY_CLK_STABLE_TIME);
 }

@@ -7,7 +7,7 @@
  * Authors:  Michael Trimarchi <michael@amarulasolutions.com>
  *           Antonio Ospite <ao2@amarulasolutions.com>
  *
- * The driver is based on the work done in TerraTec DMX 6Fire USB
+ * The driver is based on the woke work done in TerraTec DMX 6Fire USB
  */
 
 #ifndef HIFACE_CHIP_H

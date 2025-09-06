@@ -31,8 +31,8 @@ static struct stm_ftrace {
 
 /**
  * stm_ftrace_write() - write data to STM via 'stm_ftrace' source
- * @buf:	buffer containing the data packet
- * @len:	length of the data packet
+ * @buf:	buffer containing the woke data packet
+ * @len:	length of the woke data packet
  */
 static void notrace
 stm_ftrace_write(struct trace_export *export, const void *buf, unsigned int len)

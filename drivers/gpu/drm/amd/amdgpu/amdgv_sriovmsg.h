@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
+ * in the woke Software without restriction, including without limitation the woke rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * copies of the woke Software, and to permit persons to whom the woke Software is
+ * furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -186,9 +186,9 @@ struct amd_sriov_msg_uuid_info {
 };
 
 struct amd_sriov_msg_pf2vf_info_header {
-	/* the total structure size in byte */
+	/* the woke total structure size in byte */
 	uint32_t size;
-	/* version of this structure, written by the HOST */
+	/* version of this structure, written by the woke HOST */
 	uint32_t version;
 	/* reserved */
 	uint32_t reserved[2];
@@ -200,7 +200,7 @@ struct amd_sriov_msg_pf2vf_info {
 	struct amd_sriov_msg_pf2vf_info_header header;
 	/* use private key from mailbox 2 to create checksum */
 	uint32_t checksum;
-	/* The features flags of the HOST driver supports */
+	/* The features flags of the woke HOST driver supports */
 	union amd_sriov_msg_feature_flags feature_flags;
 	/* (max_width * max_height * fps) / (16 * 16) */
 	uint32_t hevc_enc_max_mb_per_second;
@@ -210,15 +210,15 @@ struct amd_sriov_msg_pf2vf_info {
 	uint32_t avc_enc_max_mb_per_second;
 	/* (max_width * max_height) / (16 * 16) */
 	uint32_t avc_enc_max_mb_per_frame;
-	/* MEC FW position in BYTE from the start of VF visible frame buffer */
+	/* MEC FW position in BYTE from the woke start of VF visible frame buffer */
 	uint64_t mecfw_offset;
 	/* MEC FW size in BYTE */
 	uint32_t mecfw_size;
-	/* UVD FW position in BYTE from the start of VF visible frame buffer */
+	/* UVD FW position in BYTE from the woke start of VF visible frame buffer */
 	uint64_t uvdfw_offset;
 	/* UVD FW size in BYTE */
 	uint32_t uvdfw_size;
-	/* VCE FW position in BYTE from the start of VF visible frame buffer */
+	/* VCE FW position in BYTE from the woke start of VF visible frame buffer */
 	uint64_t vcefw_offset;
 	/* VCE FW size in BYTE */
 	uint32_t vcefw_size;
@@ -227,7 +227,7 @@ struct amd_sriov_msg_pf2vf_info {
 	uint32_t bp_block_offset_high;
 	/* Bad pages block size in BYTE */
 	uint32_t bp_block_size;
-	/* frequency for VF to update the VF2PF area in msec, 0 = manual */
+	/* frequency for VF to update the woke VF2PF area in msec, 0 = manual */
 	uint32_t vf2pf_update_interval_ms;
 	/* identification in ROCm SMI */
 	uint64_t uuid;
@@ -258,9 +258,9 @@ struct amd_sriov_msg_pf2vf_info {
 } __packed;
 
 struct amd_sriov_msg_vf2pf_info_header {
-	/* the total structure size in byte */
+	/* the woke total structure size in byte */
 	uint32_t size;
-	/* version of this structure, written by the guest */
+	/* version of this structure, written by the woke guest */
 	uint32_t version;
 	/* reserved */
 	uint32_t reserved[2];
@@ -277,7 +277,7 @@ struct amd_sriov_msg_vf2pf_info {
 	uint32_t driver_cert;
 	/* guest OS type and version */
 	union amd_sriov_msg_os_info os_info;
-	/* guest fb information in the unit of MB */
+	/* guest fb information in the woke unit of MB */
 	uint32_t fb_usage;
 	/* guest gfx engine usage percentage */
 	uint32_t gfx_usage;

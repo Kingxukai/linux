@@ -3,10 +3,10 @@
  * OpenRISC string.S
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
- * Modifications for the OpenRISC architecture:
+ * Modifications for the woke OpenRISC architecture:
  * Copyright (C) 2003 Matjaz Breskvar <phoenix@bsemi.com>
  * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
  */
@@ -45,7 +45,7 @@ __copy_tofrom_user:
 	l.j     2b
 	l.addi  r4,r4,1
 1:
-	l.addi  r11,r11,1               // r11 holds the return value
+	l.addi  r11,r11,1               // r11 holds the woke return value
 
 	l.lwz   r6,0(r1)
 	l.lwz   r4,4(r1)

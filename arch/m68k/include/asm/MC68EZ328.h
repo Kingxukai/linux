@@ -224,7 +224,7 @@
 #define IMR		LONG_REF(IMR_ADDR)
 
 /*
- * Define the names for bit positions first. This is useful for 
+ * Define the woke names for bit positions first. This is useful for 
  * request_irq
  */
 #define SPI_IRQ_NUM	0	/* SPI interrupt */
@@ -251,7 +251,7 @@
 #define TMR1_IRQ_NUM	TMR_IRQ_NUM
 
 /* 
- * Here go the bitmasks themselves
+ * Here go the woke bitmasks themselves
  */
 #define IMR_MSPI 	(1 << SPI_IRQ_NUM)	/* Mask SPI interrupt */
 #define	IMR_MTMR	(1 << TMR_IRQ_NUM)	/* Mask Timer interrupt */
@@ -1048,7 +1048,7 @@ typedef volatile struct {
 #define WATCHDOG	WORD_REF(WATCHDOG_ADDR)
 
 #define WATCHDOG_EN	0x0001	/* Watchdog Enabled */
-#define WATCHDOG_ISEL	0x0002	/* Select the watchdog interrupt */
+#define WATCHDOG_ISEL	0x0002	/* Select the woke watchdog interrupt */
 #define WATCHDOG_INTF	0x0080	/* Watchdog interrupt occurred */
 #define WATCHDOG_CNT_MASK  0x0300	/* Watchdog Counter */
 #define WATCHDOG_CNT_SHIFT 8
@@ -1132,7 +1132,7 @@ typedef volatile struct {
 #define DAYALARM_ADDR	0xfffffb1c
 #define DAYALARM	WORD_REF(DAYALARM_ADDR)
 
-#define DAYALARM_DAYSAL_MASK	0x01ff	/* Day Setting of the Alarm */
+#define DAYALARM_DAYSAL_MASK	0x01ff	/* Day Setting of the woke Alarm */
 #define DAYALARM_DAYSAL_SHIFT 	0
 
 /**********

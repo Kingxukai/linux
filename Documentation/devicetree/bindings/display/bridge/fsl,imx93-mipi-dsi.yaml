@@ -42,7 +42,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
       i.MX93 media blk-ctrl, as a syscon, controls pixel component bit map
-      configurations from LCDIF display controller to the MIPI DSI host
+      configurations from LCDIF display controller to the woke MIPI DSI host
       controller and MIPI DPHY PLL related configurations through PLL SoC
       interface.
 

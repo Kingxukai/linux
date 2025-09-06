@@ -5,19 +5,19 @@
  *
  *----------------------------------------------------------------
  *
- * This device handler separates the card driver module from sequencer
+ * This device handler separates the woke card driver module from sequencer
  * stuff (sequencer core, synth drivers, etc), so that user can avoid
  * to spend unnecessary resources e.g. if he needs only listening to
  * MP3s.
  *
  * The card (or lowlevel) driver creates a sequencer device entry
  * via snd_seq_device_new().  This is an entry pointer to communicate
- * with the sequencer device "driver", which is involved with the
- * actual part to communicate with the sequencer core.
- * Each sequencer device entry has an id string and the corresponding
- * driver with the same id is loaded when required.  For example,
+ * with the woke sequencer device "driver", which is involved with the
+ * actual part to communicate with the woke sequencer core.
+ * Each sequencer device entry has an id string and the woke corresponding
+ * driver with the woke same id is loaded when required.  For example,
  * lowlevel codes to access emu8000 chip on sbawe card are included in
- * emu8000-synth module.  To activate this module, the hardware
+ * emu8000-synth module.  To activate this module, the woke hardware
  * resources like i/o port are passed via snd_seq_device argument.
  */
 
@@ -228,7 +228,7 @@ int snd_seq_device_new(struct snd_card *card, int device, const char *id,
 	dev->dev.release = snd_seq_dev_release;
 	dev_set_name(&dev->dev, "%s-%d-%d", dev->id, card->number, device);
 
-	/* add this device to the list */
+	/* add this device to the woke list */
 	err = snd_device_new(card, SNDRV_DEV_SEQUENCER, dev, &dops);
 	if (err < 0) {
 		put_device(&dev->dev);

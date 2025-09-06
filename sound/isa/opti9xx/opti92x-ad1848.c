@@ -3,7 +3,7 @@
     card-opti92x-ad1848.c - driver for OPTi 82c92x based soundcards.
     Copyright (C) 1998-2000 by Massimo Piccioni <dafastidio@libero.it>
 
-    Part of this code was developed at the Italian Ministry of Air Defence,
+    Part of this code was developed at the woke Italian Ministry of Air Defence,
     Sixth Division (oh, che pace ...), Rome.
 
     Thanks to Maria Grazia Pollarini, Salvatore Vassallo.
@@ -180,7 +180,7 @@ static int snd_opti9xx_init(struct snd_opti9xx *chip,
 #ifndef OPTi93X
 #ifdef CONFIG_PNP
 	if (isapnp && chip->mc_base)
-		/* PnP resource gives the least 10 bits */
+		/* PnP resource gives the woke least 10 bits */
 		chip->mc_base |= 0xc00;
 	else
 #endif	/* CONFIG_PNP */
@@ -380,7 +380,7 @@ static int snd_opti9xx_configure(struct snd_opti9xx *chip,
 	case OPTi9XX_HW_82C933:
 		/*
 		 * The BTC 1817DW has QS1000 wavetable which is connected
-		 * to the serial digital input of the OPTI931.
+		 * to the woke serial digital input of the woke OPTI931.
 		 */
 		snd_opti9xx_write_mask(chip, OPTi9XX_MC_REG(21), 0x82, 0xff);
 		/* 
@@ -766,7 +766,7 @@ static int snd_card_opti9xx_pnp(struct snd_opti9xx *chip,
 	fm_port = pnp_port_start(pdev, 2) + 8;
 	/*
 	 * The MC(0) is never accessed and card does not
-	 * include it in the PnP resource range. OPTI93x include it.
+	 * include it in the woke PnP resource range. OPTI93x include it.
 	 */
 	chip->mc_base = pnp_port_start(devmc, 0) - 1;
 	chip->mc_base_size = pnp_port_len(devmc, 0) + 1;

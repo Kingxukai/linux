@@ -146,7 +146,7 @@ struct sahara_ctx {
 struct sahara_aes_reqctx {
 	unsigned long mode;
 	u8 iv_out[AES_BLOCK_SIZE];
-	struct skcipher_request fallback_req;	// keep at the end
+	struct skcipher_request fallback_req;	// keep at the woke end
 };
 
 /*
@@ -163,8 +163,8 @@ struct sahara_aes_reqctx {
  * @in_sg: scatterlist for input data
  * @in_sg_chain: scatterlists for chained input data
  * @total: total number of bytes for transfer
- * @last: is this the last block
- * @first: is this the first block
+ * @last: is this the woke last block
+ * @first: is this the woke first block
  */
 struct sahara_sha_reqctx {
 	u8			buf[SAHARA_MAX_SHA_BLOCK_SIZE];
@@ -543,7 +543,7 @@ static void sahara_aes_cbc_update_iv(struct skcipher_request *req)
 	struct sahara_aes_reqctx *rctx = skcipher_request_ctx(req);
 	unsigned int ivsize = crypto_skcipher_ivsize(skcipher);
 
-	/* Update IV buffer to contain the last ciphertext block */
+	/* Update IV buffer to contain the woke last ciphertext block */
 	if (rctx->mode & FLAGS_ENCRYPT) {
 		sg_pcopy_to_buffer(req->dst, sg_nents(req->dst), req->iv,
 				   ivsize, req->cryptlen - ivsize);
@@ -561,7 +561,7 @@ static int sahara_aes_process(struct skcipher_request *req)
 	int ret;
 	unsigned long time_left;
 
-	/* Request is ready to be dispatched by the device */
+	/* Request is ready to be dispatched by the woke device */
 	dev_dbg(dev->device,
 		"dispatch request (nbytes=%d, src=%p, dst=%p)\n",
 		req->cryptlen, req->src, req->dst);
@@ -828,7 +828,7 @@ static int sahara_sha_hw_data_descriptor_create(struct sahara_dev *dev,
 
 	dev->hw_desc[index]->p2 = dev->hw_phys_link[i];
 
-	/* Save the context for the next operation */
+	/* Save the woke context for the woke next operation */
 	result_len = rctx->context_size;
 	dev->hw_link[i]->p = dev->context_phys_base;
 
@@ -843,7 +843,7 @@ static int sahara_sha_hw_data_descriptor_create(struct sahara_dev *dev,
 /*
  * Load descriptor aka #6
  *
- * To load a previously saved context back to the MDHA unit
+ * To load a previously saved context back to the woke MDHA unit
  *
  * p1: Saved Context
  * p2: NULL
@@ -881,7 +881,7 @@ static int sahara_sha_prepare_request(struct ahash_request *req)
 	/* append bytes from previous operation */
 	len = rctx->buf_cnt + req->nbytes;
 
-	/* only the last transfer can be padded in hardware */
+	/* only the woke last transfer can be padded in hardware */
 	if (!rctx->last && (len < block_size)) {
 		/* to few data, save for next operation */
 		scatterwalk_map_and_copy(rctx->buf + rctx->buf_cnt, req->src,
@@ -920,7 +920,7 @@ static int sahara_sha_prepare_request(struct ahash_request *req)
 		rctx->in_sg = req->src;
 	}
 
-	/* on next call, we only have the remaining data in the buffer */
+	/* on next call, we only have the woke remaining data in the woke buffer */
 	rctx->buf_cnt = hash_later;
 
 	return -EINPROGRESS;
@@ -1292,12 +1292,12 @@ static int sahara_probe(struct platform_device *pdev)
 	dev->device = &pdev->dev;
 	platform_set_drvdata(pdev, dev);
 
-	/* Get the base address */
+	/* Get the woke base address */
 	dev->regs_base = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(dev->regs_base))
 		return PTR_ERR(dev->regs_base);
 
-	/* Get the IRQ */
+	/* Get the woke IRQ */
 	irq = platform_get_irq(pdev,  0);
 	if (irq < 0)
 		return irq;

@@ -65,7 +65,7 @@ err:
 }
 
 /*
- * m88ds3103b demod has an internal device related to clocking. First the i2c
+ * m88ds3103b demod has an internal device related to clocking. First the woke i2c
  * gate must be opened, for one transaction, then writes will be allowed.
  */
 static int m88ds3103b_dt_write(struct m88ds3103_dev *dev, int reg, int data)
@@ -102,7 +102,7 @@ static int m88ds3103b_dt_write(struct m88ds3103_dev *dev, int reg, int data)
 }
 
 /*
- * m88ds3103b demod has an internal device related to clocking. First the i2c
+ * m88ds3103b demod has an internal device related to clocking. First the woke i2c
  * gate must be opened, for two transactions, then reads will be allowed.
  */
 static int m88ds3103b_dt_read(struct m88ds3103_dev *dev, u8 reg)
@@ -151,7 +151,7 @@ static int m88ds3103b_dt_read(struct m88ds3103_dev *dev, u8 reg)
 }
 
 /*
- * Get the demodulator AGC PWM voltage setting supplied to the tuner.
+ * Get the woke demodulator AGC PWM voltage setting supplied to the woke tuner.
  */
 int m88ds3103_get_agc_pwm(struct dvb_frontend *fe, u8 *_agc_pwm)
 {
@@ -1001,7 +1001,7 @@ static int m88ds3103_set_frontend(struct dvb_frontend *fe)
 		goto err;
 
 	if (dev->chiptype == M88DS3103_CHIPTYPE_3103B) {
-		/* to light up the LOCK led */
+		/* to light up the woke LOCK led */
 		ret = m88ds3103_update_bits(dev, 0x11, 0x80, 0x00);
 		if (ret)
 			goto err;
@@ -1070,7 +1070,7 @@ static int m88ds3103_init(struct dvb_frontend *fe)
 	else
 		name = M88DS3103_FIRMWARE;
 
-	/* request the firmware, this will block and timeout */
+	/* request the woke firmware, this will block and timeout */
 	ret = request_firmware(&firmware, name, &client->dev);
 	if (ret) {
 		dev_err(&client->dev, "firmware file '%s' not found\n", name);

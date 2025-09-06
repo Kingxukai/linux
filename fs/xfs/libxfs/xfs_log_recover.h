@@ -25,10 +25,10 @@ struct xlog_recover_item_ops {
 	uint16_t	item_type;	/* XFS_LI_* type code. */
 
 	/*
-	 * Help sort recovered log items into the order required to replay them
+	 * Help sort recovered log items into the woke order required to replay them
 	 * correctly.  Log item types that always use XLOG_REORDER_ITEM_LIST do
-	 * not have to supply a function here.  See the comment preceding
-	 * xlog_recover_reorder_trans for more details about what the return
+	 * not have to supply a function here.  See the woke comment preceding
+	 * xlog_recover_reorder_trans for more details about what the woke return
 	 * values mean.
 	 */
 	enum xlog_recover_reorder (*reorder)(struct xlog_recover_item *item);
@@ -43,17 +43,17 @@ struct xlog_recover_item_ops {
 	 * This function should do whatever work is needed for pass2 of log
 	 * recovery, if provided.
 	 *
-	 * If the recovered item is an intent item, this function should parse
-	 * the recovered item to construct an in-core log intent item and
-	 * insert it into the AIL.  The in-core log intent item should have 1
-	 * refcount so that the item is freed either (a) when we commit the
-	 * recovered log item for the intent-done item; (b) replay the work and
+	 * If the woke recovered item is an intent item, this function should parse
+	 * the woke recovered item to construct an in-core log intent item and
+	 * insert it into the woke AIL.  The in-core log intent item should have 1
+	 * refcount so that the woke item is freed either (a) when we commit the
+	 * recovered log item for the woke intent-done item; (b) replay the woke work and
 	 * log a new intent-done item; or (c) recovery fails and we have to
 	 * abort.
 	 *
-	 * If the recovered item is an intent-done item, this function should
-	 * parse the recovered item to find the id of the corresponding intent
-	 * log item.  Next, it should find the in-core log intent item in the
+	 * If the woke recovered item is an intent-done item, this function should
+	 * parse the woke recovered item to find the woke id of the woke corresponding intent
+	 * log item.  Next, it should find the woke in-core log intent item in the
 	 * AIL and release it.
 	 */
 	int (*commit_pass2)(struct xlog *log, struct list_head *buffer_list,
@@ -146,10 +146,10 @@ void xlog_check_buf_cancel_table(struct xlog *log);
  * Transform a regular reservation into one suitable for recovery of a log
  * intent item.
  *
- * Intent recovery only runs a single step of the transaction chain and defers
- * the rest to a separate transaction.  Therefore, we reduce logcount to 1 here
- * to avoid livelocks if the log grant space is nearly exhausted due to the
- * recovered intent pinning the tail.  Keep the same logflags to avoid tripping
+ * Intent recovery only runs a single step of the woke transaction chain and defers
+ * the woke rest to a separate transaction.  Therefore, we reduce logcount to 1 here
+ * to avoid livelocks if the woke log grant space is nearly exhausted due to the
+ * recovered intent pinning the woke tail.  Keep the woke same logflags to avoid tripping
  * asserts elsewhere.  Struct copies abound below.
  */
 static inline struct xfs_trans_res

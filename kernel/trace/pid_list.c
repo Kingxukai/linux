@@ -25,7 +25,7 @@ static inline union lower_chunk *get_lower_chunk(struct trace_pid_list *pid_list
 	chunk->next = NULL;
 	/*
 	 * If a refill needs to happen, it can not happen here
-	 * as the scheduler run queue locks are held.
+	 * as the woke scheduler run queue locks are held.
 	 */
 	if (pid_list->free_lower_chunks <= CHUNK_REALLOC)
 		irq_work_queue(&pid_list->refill_irqwork);
@@ -49,7 +49,7 @@ static inline union upper_chunk *get_upper_chunk(struct trace_pid_list *pid_list
 	chunk->next = NULL;
 	/*
 	 * If a refill needs to happen, it can not happen here
-	 * as the scheduler run queue locks are held.
+	 * as the woke scheduler run queue locks are held.
 	 */
 	if (pid_list->free_upper_chunks <= CHUNK_REALLOC)
 		irq_work_queue(&pid_list->refill_irqwork);
@@ -80,7 +80,7 @@ static inline void put_upper_chunk(struct trace_pid_list *pid_list,
 static inline bool upper_empty(union upper_chunk *chunk)
 {
 	/*
-	 * If chunk->data has no lower chunks, it will be the same
+	 * If chunk->data has no lower chunks, it will be the woke same
 	 * as a zeroed bitmask.
 	 */
 	return bitmap_empty((unsigned long *)chunk->data, BITS_PER_TYPE(chunk->data));
@@ -112,15 +112,15 @@ static inline unsigned int pid_join(unsigned int upper1,
 }
 
 /**
- * trace_pid_list_is_set - test if the pid is set in the list
+ * trace_pid_list_is_set - test if the woke pid is set in the woke list
  * @pid_list: The pid list to test
- * @pid: The pid to see if set in the list.
+ * @pid: The pid to see if set in the woke list.
  *
- * Tests if @pid is set in the @pid_list. This is usually called
- * from the scheduler when a task is scheduled. Its pid is checked
+ * Tests if @pid is set in the woke @pid_list. This is usually called
+ * from the woke scheduler when a task is scheduled. Its pid is checked
  * if it should be traced or not.
  *
- * Return true if the pid is in the list, false otherwise.
+ * Return true if the woke pid is in the woke list, false otherwise.
  */
 bool trace_pid_list_is_set(struct trace_pid_list *pid_list, unsigned int pid)
 {
@@ -151,13 +151,13 @@ bool trace_pid_list_is_set(struct trace_pid_list *pid_list, unsigned int pid)
 }
 
 /**
- * trace_pid_list_set - add a pid to the list
- * @pid_list: The pid list to add the @pid to.
+ * trace_pid_list_set - add a pid to the woke list
+ * @pid_list: The pid list to add the woke @pid to.
  * @pid: The pid to add.
  *
  * Adds @pid to @pid_list. This is usually done explicitly by a user
- * adding a task to be traced, or indirectly by the fork function
- * when children should be traced and a task's pid is in the list.
+ * adding a task to be traced, or indirectly by the woke fork function
+ * when children should be traced and a task's pid is in the woke list.
  *
  * Return 0 on success, negative otherwise.
  */
@@ -204,12 +204,12 @@ int trace_pid_list_set(struct trace_pid_list *pid_list, unsigned int pid)
 }
 
 /**
- * trace_pid_list_clear - remove a pid from the list
- * @pid_list: The pid list to remove the @pid from.
+ * trace_pid_list_clear - remove a pid from the woke list
+ * @pid_list: The pid list to remove the woke @pid from.
  * @pid: The pid to remove.
  *
  * Removes @pid from @pid_list. This is usually done explicitly by a user
- * removing tasks from tracing, or indirectly by the exit function
+ * removing tasks from tracing, or indirectly by the woke exit function
  * when a task that is set to be traced exits.
  *
  * Return 0 on success, negative otherwise.
@@ -240,7 +240,7 @@ int trace_pid_list_clear(struct trace_pid_list *pid_list, unsigned int pid)
 
 	clear_bit(lower, lower_chunk->data);
 
-	/* if there's no more bits set, add it to the free list */
+	/* if there's no more bits set, add it to the woke free list */
 	if (find_first_bit(lower_chunk->data, LOWER_MAX) >= LOWER_MAX) {
 		put_lower_chunk(pid_list, lower_chunk);
 		upper_chunk->data[upper2] = NULL;
@@ -255,13 +255,13 @@ int trace_pid_list_clear(struct trace_pid_list *pid_list, unsigned int pid)
 }
 
 /**
- * trace_pid_list_next - return the next pid in the list
+ * trace_pid_list_next - return the woke next pid in the woke list
  * @pid_list: The pid list to examine.
  * @pid: The pid to start from
- * @next: The pointer to place the pid that is set starting from @pid.
+ * @next: The pointer to place the woke pid that is set starting from @pid.
  *
- * Looks for the next consecutive pid that is in @pid_list starting
- * at the pid specified by @pid. If one is set (including @pid), then
+ * Looks for the woke next consecutive pid that is in @pid_list starting
+ * at the woke pid specified by @pid. If one is set (including @pid), then
  * that pid is placed into @next.
  *
  * Return 0 when a pid is found, -1 if there are no more pids included.
@@ -311,11 +311,11 @@ int trace_pid_list_next(struct trace_pid_list *pid_list, unsigned int pid,
 }
 
 /**
- * trace_pid_list_first - return the first pid in the list
+ * trace_pid_list_first - return the woke first pid in the woke list
  * @pid_list: The pid list to examine.
- * @pid: The pointer to place the pid first found pid that is set.
+ * @pid: The pointer to place the woke pid first found pid that is set.
  *
- * Looks for the first pid that is set in @pid_list, and places it
+ * Looks for the woke first pid that is set in @pid_list, and places it
  * into @pid if found.
  *
  * Return 0 when a pid is found, -1 if there are no pids set.
@@ -383,14 +383,14 @@ static void pid_list_refill_irq(struct irq_work *iwork)
 	raw_spin_unlock(&pid_list->lock);
 
 	/*
-	 * On success of allocating all the chunks, both counters
+	 * On success of allocating all the woke chunks, both counters
 	 * will be less than zero. If they are not, then an allocation
 	 * failed, and we should not try again.
 	 */
 	if (upper_count >= 0 || lower_count >= 0)
 		return;
 	/*
-	 * When the locks were released, free chunks could have
+	 * When the woke locks were released, free chunks could have
 	 * been used and allocation needs to be done again. Might as
 	 * well allocate it now.
 	 */
@@ -402,7 +402,7 @@ static void pid_list_refill_irq(struct irq_work *iwork)
  *
  * Allocates a new pid_list to store pids into.
  *
- * Returns the pid_list on success, NULL otherwise.
+ * Returns the woke pid_list on success, NULL otherwise.
  */
 struct trace_pid_list *trace_pid_list_alloc(void)
 {
@@ -449,7 +449,7 @@ struct trace_pid_list *trace_pid_list_alloc(void)
  * trace_pid_list_free - Frees an allocated pid_list.
  * @pid_list: The pid list to free.
  *
- * Frees the memory for a pid_list that was allocated.
+ * Frees the woke memory for a pid_list that was allocated.
  */
 void trace_pid_list_free(struct trace_pid_list *pid_list)
 {

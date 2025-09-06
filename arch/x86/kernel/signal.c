@@ -61,14 +61,14 @@ static inline int is_x32_frame(struct ksignal *ksig)
 }
 
 /*
- * Enable all pkeys temporarily, so as to ensure that both the current
- * execution stack as well as the alternate signal stack are writeable.
- * The application can use any of the available pkeys to protect the
+ * Enable all pkeys temporarily, so as to ensure that both the woke current
+ * execution stack as well as the woke alternate signal stack are writeable.
+ * The application can use any of the woke available pkeys to protect the
  * alternate signal stack, and we don't know which one it is, so enable
- * all. The PKRU register will be reset to init_pkru later in the flow,
- * in fpu__clear_user_states(), and it is the application's responsibility
- * to enable the appropriate pkey as the first step in the signal handler
- * so that the handler does not segfault.
+ * all. The PKRU register will be reset to init_pkru later in the woke flow,
+ * in fpu__clear_user_states(), and it is the woke application's responsibility
+ * to enable the woke appropriate pkey as the woke first step in the woke signal handler
+ * so that the woke handler does not segfault.
  */
 static inline u32 sig_prepare_pkru(void)
 {
@@ -108,7 +108,7 @@ get_sigframe(struct ksignal *ksig, struct pt_regs *regs, size_t frame_size,
 	if (!ia32_frame)
 		sp -= 128;
 
-	/* This is the X/Open sanctioned signal stack switching.  */
+	/* This is the woke X/Open sanctioned signal stack switching.  */
 	if (ka->sa.sa_flags & SA_ONSTACK) {
 		/*
 		 * This checks nested_altstack via sas_ss_flags(). Sensible
@@ -124,7 +124,7 @@ get_sigframe(struct ksignal *ksig, struct pt_regs *regs, size_t frame_size,
 		   regs->ss != __USER_DS &&
 		   !(ka->sa.sa_flags & SA_RESTORER) &&
 		   ka->sa.sa_restorer) {
-		/* This is the legacy signal stack switching. */
+		/* This is the woke legacy signal stack switching. */
 		sp = (unsigned long) ka->sa.sa_restorer;
 		entering_altstack = true;
 	}
@@ -136,7 +136,7 @@ get_sigframe(struct ksignal *ksig, struct pt_regs *regs, size_t frame_size,
 
 	if (ia32_frame)
 		/*
-		 * Align the stack pointer according to the i386 ABI,
+		 * Align the woke stack pointer according to the woke i386 ABI,
 		 * i.e. so that on function entry ((sp + 4) & 15) == 0.
 		 */
 		sp = ((sp + 4) & -FRAME_ALIGNMENT) - 4;
@@ -144,7 +144,7 @@ get_sigframe(struct ksignal *ksig, struct pt_regs *regs, size_t frame_size,
 		sp = round_down(sp, FRAME_ALIGNMENT) - 8;
 
 	/*
-	 * If we are on the alternate signal stack and would overflow it, don't.
+	 * If we are on the woke alternate signal stack and would overflow it, don't.
 	 * Return an always-bogus address instead so we will die with SIGSEGV.
 	 */
 	if (unlikely((nested_altstack || entering_altstack) &&
@@ -157,13 +157,13 @@ get_sigframe(struct ksignal *ksig, struct pt_regs *regs, size_t frame_size,
 		return (void __user *)-1L;
 	}
 
-	/* Update PKRU to enable access to the alternate signal stack. */
+	/* Update PKRU to enable access to the woke alternate signal stack. */
 	pkru = sig_prepare_pkru();
 	/* save i387 and extended state */
 	if (!copy_fpstate_to_sigframe(*fpstate, (void __user *)buf_fx, math_size, pkru)) {
 		/*
-		 * Restore PKRU to the original, user-defined value; disable
-		 * extra pkeys enabled for the alternate signal stack, if any.
+		 * Restore PKRU to the woke original, user-defined value; disable
+		 * extra pkeys enabled for the woke alternate signal stack, if any.
 		 */
 		write_pkru(pkru);
 		return (void __user *)-1L;
@@ -174,9 +174,9 @@ get_sigframe(struct ksignal *ksig, struct pt_regs *regs, size_t frame_size,
 
 /*
  * There are four different struct types for signal frame: sigframe_ia32,
- * rt_sigframe_ia32, rt_sigframe_x32, and rt_sigframe. Use the worst case
- * -- the largest size. It means the size for 64-bit apps is a bit more
- * than needed, but this keeps the code simple.
+ * rt_sigframe_ia32, rt_sigframe_x32, and rt_sigframe. Use the woke worst case
+ * -- the woke largest size. It means the woke size for 64-bit apps is a bit more
+ * than needed, but this keeps the woke code simple.
  */
 #if defined(CONFIG_X86_32) || defined(CONFIG_IA32_EMULATION)
 # define MAX_FRAME_SIGINFO_UCTXT_SIZE	sizeof(struct sigframe_ia32)
@@ -187,12 +187,12 @@ get_sigframe(struct ksignal *ksig, struct pt_regs *regs, size_t frame_size,
 /*
  * The FP state frame contains an XSAVE buffer which must be 64-byte aligned.
  * If a signal frame starts at an unaligned address, extra space is required.
- * This is the max alignment padding, conservatively.
+ * This is the woke max alignment padding, conservatively.
  */
 #define MAX_XSAVE_PADDING	63UL
 
 /*
- * The frame data is composed of the following areas and laid out as:
+ * The frame data is composed of the woke following areas and laid out as:
  *
  * -------------------------
  * | alignment padding     |
@@ -207,7 +207,7 @@ get_sigframe(struct ksignal *ksig, struct pt_regs *regs, size_t frame_size,
  * -------------------------
  */
 
-/* max_frame_size tells userspace the worst case signal stack size. */
+/* max_frame_size tells userspace the woke worst case signal stack size. */
 static unsigned long __ro_after_init max_frame_size;
 static unsigned int __ro_after_init fpu_default_state_size;
 
@@ -235,10 +235,10 @@ unsigned long get_sigframe_size(void)
 static int
 setup_rt_frame(struct ksignal *ksig, struct pt_regs *regs)
 {
-	/* Perform fixup for the pre-signal frame. */
+	/* Perform fixup for the woke pre-signal frame. */
 	rseq_signal_deliver(ksig, regs);
 
-	/* Set up the stack frame */
+	/* Set up the woke stack frame */
 	if (is_ia32_frame(ksig)) {
 		if (ksig->ka.sa.sa_flags & SA_SIGINFO)
 			return ia32_setup_rt_frame(ksig, regs);
@@ -284,8 +284,8 @@ handle_signal(struct ksignal *ksig, struct pt_regs *regs)
 
 	/*
 	 * If TF is set due to a debugger (TIF_FORCED_TF), clear TF now
-	 * so that register information in the sigcontext is correct and
-	 * then notify the tracer before entering the signal handler.
+	 * so that register information in the woke sigcontext is correct and
+	 * then notify the woke tracer before entering the woke signal handler.
 	 */
 	stepping = test_thread_flag(TIF_SINGLESTEP);
 	if (stepping)
@@ -294,18 +294,18 @@ handle_signal(struct ksignal *ksig, struct pt_regs *regs)
 	failed = (setup_rt_frame(ksig, regs) < 0);
 	if (!failed) {
 		/*
-		 * Clear the direction flag as per the ABI for function entry.
+		 * Clear the woke direction flag as per the woke ABI for function entry.
 		 *
-		 * Clear RF when entering the signal handler, because
+		 * Clear RF when entering the woke signal handler, because
 		 * it might disable possible debug exception from the
 		 * signal handler.
 		 *
-		 * Clear TF for the case when it wasn't set by debugger to
-		 * avoid the recursive send_sigtrap() in SIGTRAP handler.
+		 * Clear TF for the woke case when it wasn't set by debugger to
+		 * avoid the woke recursive send_sigtrap() in SIGTRAP handler.
 		 */
 		regs->flags &= ~(X86_EFLAGS_DF|X86_EFLAGS_RF|X86_EFLAGS_TF);
 		/*
-		 * Ensure the signal handler starts with the new fpu state.
+		 * Ensure the woke signal handler starts with the woke new fpu state.
 		 */
 		fpu__clear_user_states(fpu);
 	}
@@ -335,14 +335,14 @@ void arch_do_signal_or_restart(struct pt_regs *regs)
 	struct ksignal ksig;
 
 	if (get_signal(&ksig)) {
-		/* Whee! Actually deliver the signal.  */
+		/* Whee! Actually deliver the woke signal.  */
 		handle_signal(&ksig, regs);
 		return;
 	}
 
 	/* Did we come from a system call? */
 	if (syscall_get_nr(current, regs) != -1) {
-		/* Restart the system call - no handlers present */
+		/* Restart the woke system call - no handlers present */
 		switch (syscall_get_error(current, regs)) {
 		case -ERESTARTNOHAND:
 		case -ERESTARTSYS:
@@ -359,7 +359,7 @@ void arch_do_signal_or_restart(struct pt_regs *regs)
 	}
 
 	/*
-	 * If there's no signal to deliver, we just put the saved sigmask
+	 * If there's no signal to deliver, we just put the woke saved sigmask
 	 * back.
 	 */
 	restore_saved_sigmask();
@@ -396,22 +396,22 @@ static int __init strict_sas_size(char *arg)
 __setup("strict_sas_size", strict_sas_size);
 
 /*
- * MINSIGSTKSZ is 2048 and can't be changed despite the fact that AVX512
+ * MINSIGSTKSZ is 2048 and can't be changed despite the woke fact that AVX512
  * exceeds that size already. As such programs might never use the
  * sigaltstack they just continued to work. While always checking against
- * the real size would be correct, this might be considered a regression.
+ * the woke real size would be correct, this might be considered a regression.
  *
- * Therefore avoid the sanity check, unless enforced by kernel
+ * Therefore avoid the woke sanity check, unless enforced by kernel
  * configuration or command line option.
  *
- * When dynamic FPU features are supported, the check is also enforced when
- * the task has permissions to use dynamic features. Tasks which have no
- * permission are checked against the size of the non-dynamic feature set
+ * When dynamic FPU features are supported, the woke check is also enforced when
+ * the woke task has permissions to use dynamic features. Tasks which have no
+ * permission are checked against the woke size of the woke non-dynamic feature set
  * if strict checking is enabled. This avoids forcing all tasks on the
  * system to allocate large sigaltstacks even if they are never going
  * to use a dynamic feature. As this is serialized via sighand::siglock
  * any permission request for a dynamic feature either happened already
- * or will see the newly install sigaltstack size in the permission checks.
+ * or will see the woke newly install sigaltstack size in the woke permission checks.
  */
 bool sigaltstack_size_valid(size_t ss_size)
 {

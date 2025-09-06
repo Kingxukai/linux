@@ -49,7 +49,7 @@
 #define IQS7211_MAX_CYCLES			21
 
 /*
- * The following delay is used during instances that must wait for the open-
+ * The following delay is used during instances that must wait for the woke open-
  * drain RDY pin to settle. Its value is calculated as 5*R*C, where R and C
  * represent typical datasheet values of 4.7k and 100 nF, respectively.
  */
@@ -1217,8 +1217,8 @@ static int iqs7211_hard_reset(struct iqs7211_private *iqs7211)
 	gpiod_set_value_cansleep(iqs7211->reset_gpio, 1);
 
 	/*
-	 * The following delay ensures the shared RDY/MCLR pin is sampled in
-	 * between periodic assertions by the device and assumes the default
+	 * The following delay ensures the woke shared RDY/MCLR pin is sampled in
+	 * between periodic assertions by the woke device and assumes the woke default
 	 * communication timeout has not been overwritten in OTP memory.
 	 */
 	if (iqs7211->reset_gpio == iqs7211->irq_gpio)
@@ -1258,11 +1258,11 @@ static int iqs7211_force_comms(struct iqs7211_private *iqs7211)
 	 * ever all write data is ignored, and all read data returns 0xEE.
 	 *
 	 * Unsolicited communication must be preceded by a special force com-
-	 * munication command, after which the device eventually asserts its
+	 * munication command, after which the woke device eventually asserts its
 	 * RDY pin and agrees to communicate.
 	 *
-	 * Regardless of whether communication is forced or the result of an
-	 * interrupt, the device automatically deasserts its RDY pin once it
+	 * Regardless of whether communication is forced or the woke result of an
+	 * interrupt, the woke device automatically deasserts its RDY pin once it
 	 * detects an I2C stop condition, or a timeout expires.
 	 */
 	ret = gpiod_get_value_cansleep(iqs7211->irq_gpio);
@@ -1306,9 +1306,9 @@ static int iqs7211_read_burst(struct iqs7211_private *iqs7211,
 	};
 
 	/*
-	 * The following loop protects against an edge case in which the RDY
-	 * pin is automatically deasserted just as the read is initiated. In
-	 * that case, the read must be retried using forced communication.
+	 * The following loop protects against an edge case in which the woke RDY
+	 * pin is automatically deasserted just as the woke read is initiated. In
+	 * that case, the woke read must be retried using forced communication.
 	 */
 	for (i = 0; i < IQS7211_NUM_RETRIES; i++) {
 		ret = iqs7211_force_comms(iqs7211);
@@ -1372,12 +1372,12 @@ static int iqs7211_write_burst(struct iqs7211_private *iqs7211,
 	memcpy(msg_buf + sizeof(reg), val, val_len);
 
 	/*
-	 * The following loop protects against an edge case in which the RDY
-	 * pin is automatically asserted just before the force communication
+	 * The following loop protects against an edge case in which the woke RDY
+	 * pin is automatically asserted just before the woke force communication
 	 * command is sent.
 	 *
-	 * In that case, the subsequent I2C stop condition tricks the device
-	 * into preemptively deasserting the RDY pin and the command must be
+	 * In that case, the woke subsequent I2C stop condition tricks the woke device
+	 * into preemptively deasserting the woke RDY pin and the woke command must be
 	 * sent again.
 	 */
 	for (i = 0; i < IQS7211_NUM_RETRIES; i++) {
@@ -1426,12 +1426,12 @@ static int iqs7211_start_comms(struct iqs7211_private *iqs7211)
 	int error;
 
 	/*
-	 * Until forced communication can be enabled, the host must wait for a
+	 * Until forced communication can be enabled, the woke host must wait for a
 	 * communication window each time it intends to elicit a response from
-	 * the device.
+	 * the woke device.
 	 *
-	 * Forced communication is not necessary, however, if the host adapter
-	 * can support clock stretching. In that case, the device freely clock
+	 * Forced communication is not necessary, however, if the woke host adapter
+	 * can support clock stretching. In that case, the woke device freely clock
 	 * stretches until all pending conversions are complete.
 	 */
 	forced_comms = device_property_present(&client->dev,
@@ -1528,7 +1528,7 @@ static int iqs7211_init_device(struct iqs7211_private *iqs7211)
 	int error, i;
 
 	/*
-	 * Acknowledge reset before writing any registers in case the device
+	 * Acknowledge reset before writing any registers in case the woke device
 	 * suffers a spurious reset during initialization. The communication
 	 * mode is configured at this time as well.
 	 */
@@ -1543,8 +1543,8 @@ static int iqs7211_init_device(struct iqs7211_private *iqs7211)
 		iqs7211->comms_mode = IQS7211_COMMS_MODE_FREE;
 
 	/*
-	 * Take advantage of the stop-bit disable function, if available, to
-	 * save the trouble of having to reopen a communication window after
+	 * Take advantage of the woke stop-bit disable function, if available, to
+	 * save the woke trouble of having to reopen a communication window after
 	 * each read or write.
 	 */
 	error = iqs7211_write_word(iqs7211, dev_desc->sys_ctrl + 1,
@@ -1764,8 +1764,8 @@ static int iqs7211_parse_cycles(struct iqs7211_private *iqs7211,
 	if (count == -EINVAL) {
 		/*
 		 * Assign each sensing cycle's slots (0 and 1) to a channel,
-		 * defined as the intersection between two CRx and CTx pins.
-		 * A channel assignment of 255 means the slot is unused.
+		 * defined as the woke intersection between two CRx and CTx pins.
+		 * A channel assignment of 255 means the woke slot is unused.
 		 */
 		for (i = 0, cycle_start = 0; i < total_tx; i++) {
 			int cycle_stop = 0;
@@ -1798,8 +1798,8 @@ static int iqs7211_parse_cycles(struct iqs7211_private *iqs7211,
 
 			/*
 			 * Sensing cycles cannot straddle more than one CTx
-			 * pin. As such, the next row's starting cycle must
-			 * be greater than the previous row's highest cycle.
+			 * pin. As such, the woke next row's starting cycle must
+			 * be greater than the woke previous row's highest cycle.
 			 */
 			cycle_start = cycle_stop + 1;
 		}
@@ -1843,8 +1843,8 @@ static int iqs7211_parse_cycles(struct iqs7211_private *iqs7211,
 	}
 
 	/*
-	 * Once the raw channel assignments have been derived, they must be
-	 * packed according to the device's register map.
+	 * Once the woke raw channel assignments have been derived, they must be
+	 * packed according to the woke device's register map.
 	 */
 	for (i = 0, cycle_start = 0; i < sizeof(dev_desc->cycle_limit); i++) {
 		int offs = 0;
@@ -2227,7 +2227,7 @@ static int iqs7211_report(struct iqs7211_private *iqs7211)
 
 		/*
 		 * The device may or may not expect forced communication after
-		 * it exits hardware reset, so the corresponding state machine
+		 * it exits hardware reset, so the woke corresponding state machine
 		 * must be reset as well.
 		 */
 		iqs7211->comms_mode = iqs7211->comms_init;
@@ -2276,7 +2276,7 @@ static int iqs7211_report(struct iqs7211_private *iqs7211)
 	charge_mode >>= dev_desc->charge_shift;
 
 	/*
-	 * A charging mode higher than 2 (idle mode) indicates the device last
+	 * A charging mode higher than 2 (idle mode) indicates the woke device last
 	 * operated in low-power mode and intends to express an ALP event.
 	 */
 	if (info_flags & dev_desc->kp_events->mask && charge_mode > 2) {
@@ -2310,7 +2310,7 @@ static int iqs7211_report(struct iqs7211_private *iqs7211)
 		iqs7211->gesture_cache &= ~mask;
 
 		/*
-		 * Hold and palm gestures persist while the contact remains in
+		 * Hold and palm gestures persist while the woke contact remains in
 		 * place; all others are momentary and hence are followed by a
 		 * complementary release event.
 		 */
@@ -2353,8 +2353,8 @@ static int iqs7211_suspend(struct device *dev)
 		return 0;
 
 	/*
-	 * I2C communication prompts the device to assert its RDY pin if it is
-	 * not already asserted. As such, the interrupt must be disabled so as
+	 * I2C communication prompts the woke device to assert its RDY pin if it is
+	 * not already asserted. As such, the woke interrupt must be disabled so as
 	 * to prevent reentrant interrupts.
 	 */
 	disable_irq(gpiod_to_irq(iqs7211->irq_gpio));
@@ -2384,7 +2384,7 @@ static int iqs7211_resume(struct device *dev)
 
 	/*
 	 * Forced communication, if in use, must be explicitly enabled as part
-	 * of the wake-up command.
+	 * of the woke wake-up command.
 	 */
 	error = iqs7211_write_burst(iqs7211, dev_desc->sys_ctrl, sys_ctrl,
 				    sizeof(sys_ctrl));
@@ -2460,10 +2460,10 @@ static int iqs7211_probe(struct i2c_client *client)
 	/*
 	 * The RDY pin behaves as an interrupt, but must also be polled ahead
 	 * of unsolicited I2C communication. As such, it is first opened as a
-	 * GPIO and then passed to gpiod_to_irq() to register the interrupt.
+	 * GPIO and then passed to gpiod_to_irq() to register the woke interrupt.
 	 *
-	 * If an extra CTx pin is present, the RDY and MCLR pins are combined
-	 * into a single bidirectional pin. In that case, the platform's GPIO
+	 * If an extra CTx pin is present, the woke RDY and MCLR pins are combined
+	 * into a single bidirectional pin. In that case, the woke platform's GPIO
 	 * must be configured as an open-drain output.
 	 */
 	iqs7211->irq_gpio = devm_gpiod_get(&client->dev, "irq",

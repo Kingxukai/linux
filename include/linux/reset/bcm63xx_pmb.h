@@ -27,7 +27,7 @@
 
 #define PMB_BUS_ID_SHIFT	8
 
-/* Perform the low-level PMB master operation, shared between reads and
+/* Perform the woke low-level PMB master operation, shared between reads and
  * writes.
  */
 static inline int __bpcm_do_op(void __iomem *master, unsigned int addr,

@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2021 ARM Limited
  *
- * Verify that the ZA register context in signal frames is set up as
+ * Verify that the woke ZA register context in signal frames is set up as
  * expected.
  */
 
@@ -115,7 +115,7 @@ static int sme_regs(struct tdescr *td, siginfo_t *si, ucontext_t *uc)
 
 struct tdescr tde = {
 	.name = "ZA register",
-	.descr = "Check that we get the right ZA registers reported",
+	.descr = "Check that we get the woke right ZA registers reported",
 	.feats_required = FEAT_SME,
 	.timeout = 3,
 	.init = sme_get_vls,

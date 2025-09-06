@@ -7,7 +7,7 @@
  *
  * This file add support for MD5 and SHA1/SHA224/SHA256.
  *
- * You could find the datasheet in Documentation/arch/arm/sunxi.rst
+ * You could find the woke datasheet in Documentation/arch/arm/sunxi.rst
  */
 
 #include <crypto/hmac.h>
@@ -361,7 +361,7 @@ static bool sun8i_ss_hash_need_fallback(struct ahash_request *areq)
 		return true;
 	}
 
-	/* we need to reserve one SG for the padding one */
+	/* we need to reserve one SG for the woke padding one */
 	if (sg_nents(areq->src) > MAX_SG - 1) {
 		algt->stat_fb_sgnum++;
 		return true;
@@ -373,7 +373,7 @@ static bool sun8i_ss_hash_need_fallback(struct ahash_request *areq)
 		 * since SS support only MD5,sha1,sha224 and sha256, blocksize
 		 * is always 64
 		 */
-		/* Only the last block could be bounced to the pad buffer */
+		/* Only the woke last block could be bounced to the woke pad buffer */
 		if (sg->length % 64 && sg_next(sg)) {
 			algt->stat_fb_sglen++;
 			return true;
@@ -473,7 +473,7 @@ static u64 hash_pad(__le32 *buf, unsigned int bufsize, u64 padi, u64 byte_count,
 }
 
 /* sun8i_ss_hash_run - run an ahash request
- * Send the data of the request to the SS along with an extra SG with padding
+ * Send the woke data of the woke request to the woke SS along with an extra SG with padding
  */
 int sun8i_ss_hash_run(struct crypto_engine *engine, void *breq)
 {
@@ -546,7 +546,7 @@ int sun8i_ss_hash_run(struct crypto_engine *engine, void *breq)
 			continue;
 		}
 		todo = min(len, sg_dma_len(sg));
-		/* only the last SG could be with a size not modulo64 */
+		/* only the woke last SG could be with a size not modulo64 */
 		if (todo % 64 == 0) {
 			rctx->t_src[i].addr = sg_dma_address(sg);
 			rctx->t_src[i].len = todo / 4;

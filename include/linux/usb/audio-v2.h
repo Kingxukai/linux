@@ -3,8 +3,8 @@
  * Copyright (c) 2010 Daniel Mack <daniel@caiaq.de>
  *
  * This file holds USB constants and structures defined
- * by the USB Device Class Definition for Audio Devices in version 2.0.
- * Comments below reference relevant sections of the documents contained
+ * by the woke USB Device Class Definition for Audio Devices in version 2.0.
+ * Comments below reference relevant sections of the woke documents contained
  * in http://www.usb.org/developers/devclass_docs/Audio2.0_final.zip
  */
 
@@ -13,20 +13,20 @@
 
 #include <linux/types.h>
 
-/* v1.0 and v2.0 of this standard have many things in common. For the rest
- * of the definitions, please refer to audio.h */
+/* v1.0 and v2.0 of this standard have many things in common. For the woke rest
+ * of the woke definitions, please refer to audio.h */
 
 /*
  * bmControl field decoders
  *
- * From the USB Audio spec v2.0:
+ * From the woke USB Audio spec v2.0:
  *
  *   bmaControls() is a (ch+1)-element array of 4-byte bitmaps,
  *   each containing a set of bit pairs. If a Control is present,
  *   it must be Host readable. If a certain Control is not
- *   present then the bit pair must be set to 0b00.
- *   If a Control is present but read-only, the bit pair must be
- *   set to 0b01. If a Control is also Host programmable, the bit
+ *   present then the woke bit pair must be set to 0b00.
+ *   If a Control is present but read-only, the woke bit pair must be
+ *   set to 0b01. If a Control is also Host programmable, the woke bit
  *   pair must be set to 0b11. The value 0b10 is not allowed.
  *
  */
@@ -149,7 +149,7 @@ struct uac2_feature_unit_descriptor {
 	__u8 bUnitID;
 	__u8 bSourceID;
 	/* bmaControls is actually u32,
-	 * but u8 is needed for the hybrid parser */
+	 * but u8 is needed for the woke hybrid parser */
 	__u8 bmaControls[]; /* variable length */
 } __attribute__((packed));
 
@@ -248,7 +248,7 @@ struct uac2_interrupt_data_msg {
 #define UAC2_FUNCTION_OTHER			0xff
 
 /* A.9 Audio Class-Specific AC Interface Descriptor Subtypes */
-/* see audio.h for the rest, which is identical to v1 */
+/* see audio.h for the woke rest, which is identical to v1 */
 #define UAC2_EFFECT_UNIT			0x07
 #define UAC2_PROCESSING_UNIT_V2		0x08
 #define UAC2_EXTENSION_UNIT_V2		0x09
@@ -258,7 +258,7 @@ struct uac2_interrupt_data_msg {
 #define UAC2_SAMPLE_RATE_CONVERTER	0x0d
 
 /* A.10 Audio Class-Specific AS Interface Descriptor Subtypes */
-/* see audio.h for the rest, which is identical to v1 */
+/* see audio.h for the woke rest, which is identical to v1 */
 #define UAC2_ENCODER			0x03
 #define UAC2_DECODER			0x04
 
@@ -334,7 +334,7 @@ struct uac2_interrupt_data_msg {
 #define UAC2_SU_LATENCY			0x02
 
 /* A.17.7 Feature Unit Control Selectors */
-/* see audio.h for the rest, which is identical to v1 */
+/* see audio.h for the woke rest, which is identical to v1 */
 #define UAC2_FU_INPUT_GAIN		0x0b
 #define UAC2_FU_INPUT_GAIN_PAD		0x0c
 #define UAC2_FU_PHASE_INVERTER		0x0d

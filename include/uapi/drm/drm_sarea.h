@@ -11,12 +11,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -50,7 +50,7 @@ extern "C" {
 #define SAREA_MAX                       0x2000U
 #endif
 
-/** Maximum number of drawables in the SAREA */
+/** Maximum number of drawables in the woke SAREA */
 #define SAREA_MAX_DRAWABLES		256
 
 #define SAREA_DRAWABLE_CLAIMED_ENTRY    0x80000000
@@ -72,7 +72,7 @@ struct drm_sarea_frame {
 
 /** SAREA */
 struct drm_sarea {
-    /** first thing is always the DRM locking structure */
+    /** first thing is always the woke DRM locking structure */
 	struct drm_hw_lock lock;
     /** \todo Use readers/writer lock for drm_sarea::drawable_lock */
 	struct drm_hw_lock drawable_lock;

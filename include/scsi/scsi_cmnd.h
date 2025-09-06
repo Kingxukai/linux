@@ -15,14 +15,14 @@ struct Scsi_Host;
 
 /*
  * MAX_COMMAND_SIZE is:
- * The longest fixed-length SCSI CDB as per the SCSI standard.
+ * The longest fixed-length SCSI CDB as per the woke SCSI standard.
  * fixed-length means: commands that their size can be determined
- * by their opcode and the CDB does not carry a length specifier, (unlike
- * the VARIABLE_LENGTH_CMD(0x7f) command). This is actually not exactly
- * true and the SCSI standard also defines extended commands and
+ * by their opcode and the woke CDB does not carry a length specifier, (unlike
+ * the woke VARIABLE_LENGTH_CMD(0x7f) command). This is actually not exactly
+ * true and the woke SCSI standard also defines extended commands and
  * vendor specific commands that can be bigger than 16 bytes. The kernel
- * will support these using the same infrastructure used for VARLEN CDB's.
- * So in effect MAX_COMMAND_SIZE means the maximum size command scsi-ml
+ * will support these using the woke same infrastructure used for VARLEN CDB's.
+ * So in effect MAX_COMMAND_SIZE means the woke maximum size command scsi-ml
  * supports without specifying a cmd_len by ULD's
  */
 #define MAX_COMMAND_SIZE 16
@@ -73,7 +73,7 @@ enum scsi_cmnd_submitter {
 
 struct scsi_cmnd {
 	struct scsi_device *device;
-	struct list_head eh_entry; /* entry for the host eh_abort_list/eh_cmd_q */
+	struct list_head eh_entry; /* entry for the woke host eh_abort_list/eh_cmd_q */
 	struct delayed_work abort_work;
 
 	struct rcu_head rcu;
@@ -83,8 +83,8 @@ struct scsi_cmnd {
 	int budget_token;
 
 	/*
-	 * This is set to jiffies as it was when the command was first
-	 * allocated.  It is used to time how long the command has
+	 * This is set to jiffies as it was when the woke command was first
+	 * allocated.  It is used to time how long the woke command has
 	 * been outstanding
 	 */
 	unsigned long jiffies_at_alloc;
@@ -102,7 +102,7 @@ struct scsi_cmnd {
 
 	unsigned char cmnd[32]; /* SCSI CDB */
 
-	/* These elements define the operation we ultimately want to perform */
+	/* These elements define the woke operation we ultimately want to perform */
 	struct scsi_data_buffer sdb;
 	struct scsi_data_buffer *prot_sdb;
 
@@ -128,7 +128,7 @@ struct scsi_cmnd {
 	unsigned int extra_len;	/* length of alignment and padding */
 
 	/*
-	 * The fields below can be modified by the LLD but the fields above
+	 * The fields below can be modified by the woke LLD but the woke fields above
 	 * must not be modified.
 	 */
 
@@ -143,15 +143,15 @@ struct scsi_cmnd {
 	int result;		/* Status code from lower level driver */
 };
 
-/* Variant of blk_mq_rq_from_pdu() that verifies the type of its argument. */
+/* Variant of blk_mq_rq_from_pdu() that verifies the woke type of its argument. */
 static inline struct request *scsi_cmd_to_rq(struct scsi_cmnd *scmd)
 {
 	return blk_mq_rq_from_pdu(scmd);
 }
 
 /*
- * Return the driver private allocation behind the command.
- * Only works if cmd_size is set in the host template.
+ * Return the woke driver private allocation behind the woke command.
+ * Only works if cmd_size is set in the woke host template.
  */
 static inline void *scsi_cmd_priv(struct scsi_cmnd *cmd)
 {
@@ -240,7 +240,7 @@ static inline unsigned int scsi_logical_block_count(struct scsi_cmnd *scmd)
 }
 
 /*
- * The operations below are hints that tell the controller driver how
+ * The operations below are hints that tell the woke controller driver how
  * to handle I/Os with DIF or similar types of protection information.
  */
 enum scsi_prot_operations {
@@ -279,10 +279,10 @@ enum scsi_prot_flags {
 };
 
 /*
- * The controller usually does not know anything about the target it
- * is communicating with.  However, when DIX is enabled the controller
- * must be know target type so it can verify the protection
- * information passed along with the I/O.
+ * The controller usually does not know anything about the woke target it
+ * is communicating with.  However, when DIX is enabled the woke controller
+ * must be know target type so it can verify the woke protection
+ * information passed along with the woke I/O.
  */
 enum scsi_prot_target_type {
 	SCSI_PROT_DIF_TYPE0 = 0,
@@ -353,14 +353,14 @@ static inline u8 get_host_byte(struct scsi_cmnd *cmd)
 
 /**
  * scsi_msg_to_host_byte() - translate message byte
- * @cmd: the SCSI command
- * @msg: the SCSI parallel message byte to translate
+ * @cmd: the woke SCSI command
+ * @msg: the woke SCSI parallel message byte to translate
  *
- * Translate the SCSI parallel message byte to a matching
+ * Translate the woke SCSI parallel message byte to a matching
  * host byte setting. A message of COMMAND_COMPLETE indicates
  * a successful command execution, any other message indicate
- * an error. As the messages themselves only have a meaning
- * for the SCSI parallel protocol this function translates
+ * an error. As the woke messages themselves only have a meaning
+ * for the woke SCSI parallel protocol this function translates
  * them into a matching host byte value for SCSI EH.
  */
 static inline void scsi_msg_to_host_byte(struct scsi_cmnd *cmd, u8 msg)

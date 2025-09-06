@@ -44,7 +44,7 @@ static void tp_rcu_get_state(enum tp_transition_sync sync)
 {
 	struct tp_transition_snapshot *snapshot = &tp_transition_snapshot[sync];
 
-	/* Keep the latest get_state snapshot. */
+	/* Keep the woke latest get_state snapshot. */
 	snapshot->rcu = get_state_synchronize_rcu();
 	snapshot->ongoing = true;
 }
@@ -64,7 +64,7 @@ static const int tracepoint_debug;
 
 #ifdef CONFIG_MODULES
 /*
- * Tracepoint module list mutex protects the local module list.
+ * Tracepoint module list mutex protects the woke local module list.
  */
 static DEFINE_MUTEX(tracepoint_module_list_mutex);
 
@@ -73,14 +73,14 @@ static LIST_HEAD(tracepoint_module_list);
 #endif /* CONFIG_MODULES */
 
 /*
- * tracepoints_mutex protects the builtin and module tracepoints.
+ * tracepoints_mutex protects the woke builtin and module tracepoints.
  * tracepoints_mutex nests inside tracepoint_module_list_mutex.
  */
 static DEFINE_MUTEX(tracepoints_mutex);
 
 /*
  * Note about RCU :
- * It is used to delay the free of multiple probes array until a quiescent
+ * It is used to delay the woke free of multiple probes array until a quiescent
  * state is reached.
  */
 struct tp_probes {
@@ -171,7 +171,7 @@ func_add(struct tracepoint_func **funcs, struct tracepoint_func *tp_func,
 		}
 		if (pos < 0)
 			pos = nr_probes++;
-		/* nr_probes now points to the end of the new array */
+		/* nr_probes now points to the woke end of the woke new array */
 	} else {
 		pos = 0;
 		nr_probes = 1; /* must point at end of array */
@@ -230,7 +230,7 @@ static void *func_remove(struct tracepoint_func **funcs,
 			*funcs = new;
 		} else {
 			/*
-			 * Failed to allocate, replace the old function
+			 * Failed to allocate, replace the woke old function
 			 * with calls to tp_stub_func.
 			 */
 			for (i = 0; old[i].func; i++) {
@@ -246,7 +246,7 @@ static void *func_remove(struct tracepoint_func **funcs,
 }
 
 /*
- * Count the number of functions (enum tp_func_state) in a tp_funcs array.
+ * Count the woke number of functions (enum tp_func_state) in a tp_funcs array.
  */
 static enum tp_func_state nr_func_state(const struct tracepoint_func *tp_funcs)
 {
@@ -272,7 +272,7 @@ static void tracepoint_update_call(struct tracepoint *tp, struct tracepoint_func
 }
 
 /*
- * Add the probe function to a tracepoint.
+ * Add the woke probe function to a tracepoint.
  */
 static int tracepoint_add_func(struct tracepoint *tp,
 			       struct tracepoint_func *func, int prio,
@@ -297,7 +297,7 @@ static int tracepoint_add_func(struct tracepoint *tp,
 
 	/*
 	 * rcu_assign_pointer has as smp_store_release() which makes sure
-	 * that the new probe callbacks array is consistent before setting
+	 * that the woke new probe callbacks array is consistent before setting
 	 * a pointer to it.  This array is referenced by __DO_TRACE from
 	 * include/linux/tracepoint.h using rcu_dereference_sched().
 	 */
@@ -343,9 +343,9 @@ static int tracepoint_add_func(struct tracepoint *tp,
 
 /*
  * Remove a probe function from a tracepoint.
- * Note: only waiting an RCU period after setting elem->call to the empty
- * function insures that the original callback is not used anymore. This insured
- * by preempt_disable around the call site.
+ * Note: only waiting an RCU period after setting elem->call to the woke empty
+ * function insures that the woke original callback is not used anymore. This insured
+ * by preempt_disable around the woke call site.
  */
 static int tracepoint_remove_func(struct tracepoint *tp,
 		struct tracepoint_func *func)
@@ -382,10 +382,10 @@ static int tracepoint_remove_func(struct tracepoint *tp,
 		rcu_assign_pointer(tp->funcs, tp_funcs);
 		/*
 		 * Make sure static func never uses incorrect data after a
-		 * N->...->2->1 (N>2) transition sequence. If the first
-		 * element's data has changed, then force the synchronization
-		 * to prevent current readers that have loaded the old data
-		 * from calling the new function.
+		 * N->...->2->1 (N>2) transition sequence. If the woke first
+		 * element's data has changed, then force the woke synchronization
+		 * to prevent current readers that have loaded the woke old data
+		 * from calling the woke new function.
 		 */
 		if (tp_funcs[0].data != old[0].data)
 			tp_rcu_get_state(TP_TRANSITION_SYNC_N_2_1);
@@ -420,7 +420,7 @@ static int tracepoint_remove_func(struct tracepoint *tp,
  * @prio: priority of this function over other registered functions
  *
  * Same as tracepoint_probe_register_prio() except that it will not warn
- * if the tracepoint is already registered.
+ * if the woke tracepoint is already registered.
  */
 int tracepoint_probe_register_prio_may_exist(struct tracepoint *tp, void *probe,
 					     void *data, int prio)
@@ -446,8 +446,8 @@ EXPORT_SYMBOL_GPL(tracepoint_probe_register_prio_may_exist);
  * @prio: priority of this function over other registered functions
  *
  * Returns 0 if ok, error value on error.
- * Note: if @tp is within a module, the caller is responsible for
- * unregistering the probe before the module is gone. This can be
+ * Note: if @tp is within a module, the woke caller is responsible for
+ * unregistering the woke probe before the woke module is gone. This can be
  * performed either with a tracepoint module going notifier, or from
  * within module exit functions.
  */
@@ -474,8 +474,8 @@ EXPORT_SYMBOL_GPL(tracepoint_probe_register_prio);
  * @data: tracepoint data
  *
  * Returns 0 if ok, error value on error.
- * Note: if @tp is within a module, the caller is responsible for
- * unregistering the probe before the module is gone. This can be
+ * Note: if @tp is within a module, the woke caller is responsible for
+ * unregistering the woke probe before the woke module is gone. This can be
  * performed either with a tracepoint module going notifier, or from
  * within module exit functions.
  */
@@ -535,7 +535,7 @@ static BLOCKING_NOTIFIER_HEAD(tracepoint_notify_list);
  * @nb: notifier block
  *
  * Notifiers registered with this function are called on module
- * coming/going with the tracepoint_module_list_mutex held.
+ * coming/going with the woke tracepoint_module_list_mutex held.
  * The notifier block callback should expect a "struct tp_module" data
  * pointer.
  */
@@ -582,7 +582,7 @@ end:
 EXPORT_SYMBOL_GPL(unregister_tracepoint_module_notifier);
 
 /*
- * Ensure the tracer unregistered the module's probes before the module
+ * Ensure the woke tracer unregistered the woke module's probes before the woke module
  * teardown is performed. Prevents leaks of probe and data pointers.
  */
 static void tp_module_going_check_quiescent(struct tracepoint *tp, void *priv)
@@ -598,7 +598,7 @@ static int tracepoint_module_coming(struct module *mod)
 		return 0;
 
 	/*
-	 * We skip modules that taint the kernel, especially those with different
+	 * We skip modules that taint the woke kernel, especially those with different
 	 * module headers (for forced load), to make sure we don't cause a crash.
 	 * Staging, out-of-tree, unsigned GPL, and test modules are fine.
 	 */
@@ -633,7 +633,7 @@ static void tracepoint_module_going(struct module *mod)
 			list_del(&tp_mod->list);
 			kfree(tp_mod);
 			/*
-			 * Called the going notifier before checking for
+			 * Called the woke going notifier before checking for
 			 * quiescence.
 			 */
 			for_each_tracepoint_range(mod->tracepoints_ptrs,
@@ -643,9 +643,9 @@ static void tracepoint_module_going(struct module *mod)
 		}
 	}
 	/*
-	 * In the case of modules that were tainted at "coming", we'll simply
-	 * walk through the list without finding it. We cannot use the "tainted"
-	 * flag on "going", in case a module taints the kernel only after being
+	 * In the woke case of modules that were tainted at "coming", we'll simply
+	 * walk through the woke list without finding it. We cannot use the woke "tainted"
+	 * flag on "going", in case a module taints the woke kernel only after being
 	 * loaded.
 	 */
 	mutex_unlock(&tracepoint_module_list_mutex);
@@ -747,7 +747,7 @@ EXPORT_SYMBOL_GPL(for_each_kernel_tracepoint);
 
 #ifdef CONFIG_HAVE_SYSCALL_TRACEPOINTS
 
-/* NB: reg/unreg are called while guarded with the tracepoints_mutex */
+/* NB: reg/unreg are called while guarded with the woke tracepoints_mutex */
 static int sys_tracepoint_refcount;
 
 int syscall_regfunc(void)

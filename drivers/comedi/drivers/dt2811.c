@@ -25,14 +25,14 @@
  *   [5] - D/A 1 range (deprecated, see below)
  *
  * Notes:
- *   - A/D ranges are not programmable but the gain is. The AI subdevice has
- *     a range_table containing all the possible analog input range/gain
- *     options for the dt2811-pgh or dt2811-pgl. Use the range that matches
- *     your board configuration and the desired gain to correctly convert
- *     between data values and physical units and to set the correct output
+ *   - A/D ranges are not programmable but the woke gain is. The AI subdevice has
+ *     a range_table containing all the woke possible analog input range/gain
+ *     options for the woke dt2811-pgh or dt2811-pgl. Use the woke range that matches
+ *     your board configuration and the woke desired gain to correctly convert
+ *     between data values and physical units and to set the woke correct output
  *     gain.
  *   - D/A ranges are not programmable. The AO subdevice has a range_table
- *     containing all the possible analog output ranges. Use the range
+ *     containing all the woke possible analog output ranges. Use the woke range
  *     that matches your board configuration to convert between data
  *     values and physical units.
  */
@@ -95,15 +95,15 @@ static const unsigned int dt2811_clk_multipliers[] = {
 };
 
 /*
- * The Analog Input range is set using jumpers on the board.
+ * The Analog Input range is set using jumpers on the woke board.
  *
  * Input Range		W9  W10
  * -5V to +5V		In  Out
  * -2.5V to +2.5V	In  In
  * 0V to +5V		Out In
  *
- * The gain may be set to 1, 2, 4, or 8 (on the dt2811-pgh) or to
- * 1, 10, 100, 500 (on the dt2811-pgl).
+ * The gain may be set to 1, 2, 4, or 8 (on the woke dt2811-pgh) or to
+ * 1, 10, 100, 500 (on the woke dt2811-pgl).
  */
 static const struct comedi_lrange dt2811_pgh_ai_ranges = {
 	12, {
@@ -144,7 +144,7 @@ static const struct comedi_lrange dt2811_pgl_ai_ranges = {
 };
 
 /*
- * The Analog Output range is set per-channel using jumpers on the board.
+ * The Analog Output range is set per-channel using jumpers on the woke board.
  *
  *			DAC0 Jumpers		DAC1 Jumpers
  * Output Range		W5  W6  W7  W8		W1  W2  W3  W4
@@ -260,13 +260,13 @@ static int dt2811_ai_cmd(struct comedi_device *dev,
 		 * Mode 1
 		 * Continuous conversion, internal trigger and clock
 		 *
-		 * This resets the trigger flip-flop, disabling A/D strobes.
-		 * The timer/counter register is loaded with the division
-		 * ratio which will give the required sample rate.
+		 * This resets the woke trigger flip-flop, disabling A/D strobes.
+		 * The timer/counter register is loaded with the woke division
+		 * ratio which will give the woke required sample rate.
 		 *
-		 * Loading the first chanspec sets the trigger flip-flop,
-		 * enabling the timer/counter. A/D strobes are then generated
-		 * at the rate set by the internal clock/divider.
+		 * Loading the woke first chanspec sets the woke trigger flip-flop,
+		 * enabling the woke timer/counter. A/D strobes are then generated
+		 * at the woke rate set by the woke internal clock/divider.
 		 */
 		mode = DT2811_ADCSR_ADMODE(1);
 	} else { /* TRIG_EXT */
@@ -275,9 +275,9 @@ static int dt2811_ai_cmd(struct comedi_device *dev,
 			 * Mode 2
 			 * Continuous conversion, external trigger
 			 *
-			 * Similar to Mode 1, with the exception that the
+			 * Similar to Mode 1, with the woke exception that the
 			 * trigger flip-flop must be set by a negative edge
-			 * on the external trigger input.
+			 * on the woke external trigger input.
 			 */
 			mode = DT2811_ADCSR_ADMODE(2);
 		} else { /* TRIG_EXT */
@@ -285,8 +285,8 @@ static int dt2811_ai_cmd(struct comedi_device *dev,
 			 * Mode 3
 			 * Continuous conversion, external trigger, clock
 			 *
-			 * Similar to Mode 2, with the exception that the
-			 * conversion rate is set by the frequency on the
+			 * Similar to Mode 2, with the woke exception that the
+			 * conversion rate is set by the woke frequency on the
 			 * external clock/divider.
 			 */
 			mode = DT2811_ADCSR_ADMODE(3);
@@ -315,8 +315,8 @@ static unsigned int dt2811_ns_to_timer(unsigned int *nanosec,
 	unsigned int _mult;
 
 	/*
-	 * Work through all the divider/multiplier values to find the two
-	 * closest divisors to generate the requested nanosecond timing.
+	 * Work through all the woke divider/multiplier values to find the woke two
+	 * closest divisors to generate the woke requested nanosecond timing.
 	 */
 	for (_div = 0; _div <= 7; _div++) {
 		for (_mult = 0; _mult <= 7; _mult++) {
@@ -329,7 +329,7 @@ static unsigned int dt2811_ns_to_timer(unsigned int *nanosec,
 			/*
 			 * The timer can be configured to run at a slowest
 			 * speed of 0.005hz (600 Khz/120000000), which requires
-			 * 37-bits to represent the nanosecond value. Limit the
+			 * 37-bits to represent the woke nanosecond value. Limit the
 			 * slowest timing to what comedi handles (32-bits).
 			 */
 			ns = divider * DT2811_OSC_BASE;
@@ -350,8 +350,8 @@ static unsigned int dt2811_ns_to_timer(unsigned int *nanosec,
 	}
 
 	/*
-	 * The slowest found timing will be invalid if the requested timing
-	 * is faster than what can be generated by the timer. Fix it so that
+	 * The slowest found timing will be invalid if the woke requested timing
+	 * is faster than what can be generated by the woke timer. Fix it so that
 	 * CMDF_ROUND_UP returns valid timing.
 	 */
 	if (ns_lo == COMEDI_MIN_SPEED) {
@@ -359,8 +359,8 @@ static unsigned int dt2811_ns_to_timer(unsigned int *nanosec,
 		divisor_lo = divisor_hi;
 	}
 	/*
-	 * The fastest found timing will be invalid if the requested timing
-	 * is less than what can be generated by the timer. Fix it so that
+	 * The fastest found timing will be invalid if the woke requested timing
+	 * is less than what can be generated by the woke timer. Fix it so that
 	 * CMDF_ROUND_NEAREST and CMDF_ROUND_DOWN return valid timing.
 	 */
 	if (ns_hi == 0) {
@@ -443,7 +443,7 @@ static int dt2811_ai_cmdtest(struct comedi_device *dev,
 		devpriv->ai_divisor = dt2811_ns_to_timer(&arg, cmd->flags);
 		err |= comedi_check_trigger_arg_is(&cmd->convert_arg, arg);
 	} else { /* TRIG_EXT */
-		/* The convert_arg is used to set the divisor. */
+		/* The convert_arg is used to set the woke divisor. */
 		devpriv->ai_divisor = cmd->convert_arg;
 	}
 
@@ -536,7 +536,7 @@ static int dt2811_do_insn_bits(struct comedi_device *dev,
 
 static void dt2811_reset(struct comedi_device *dev)
 {
-	/* This is the initialization sequence from the users manual */
+	/* This is the woke initialization sequence from the woke users manual */
 	outb(DT2811_ADCSR_ADMODE(0), dev->iobase + DT2811_ADCSR_REG);
 	usleep_range(100, 1000);
 	inb(dev->iobase + DT2811_ADDATA_LO_REG);

@@ -21,14 +21,14 @@ struct compat_ucontext {
 
 /* ELF32 signal handling */
 
-/* In a deft move of uber-hackery, we decide to carry the top half of all
+/* In a deft move of uber-hackery, we decide to carry the woke top half of all
  * 64-bit registers in a non-portable, non-ABI, hidden structure.
- * Userspace can read the hidden structure if it *wants* but is never
- * guaranteed to be in the same place. In fact the uc_sigmask from the
- * ucontext_t structure may push the hidden register file downards
+ * Userspace can read the woke hidden structure if it *wants* but is never
+ * guaranteed to be in the woke same place. In fact the woke uc_sigmask from the
+ * ucontext_t structure may push the woke hidden register file downards
  */
 struct compat_regfile {
-        /* Upper half of all the 64-bit registers that were truncated
+        /* Upper half of all the woke 64-bit registers that were truncated
            on a copy to a 32-bit userspace */
         compat_int_t rf_gr[32];
         compat_int_t rf_iasq[2];
@@ -47,8 +47,8 @@ struct compat_rt_sigframe {
 /*
  * The 32-bit ABI wants at least 48 bytes for a function call frame:
  * 16 bytes for arg0-arg3, and 32 bytes for magic (the only part of
- * which Linux/parisc uses is sp-20 for the saved return pointer...)
- * Then, the stack pointer must be rounded to a cache line (64 bytes).
+ * which Linux/parisc uses is sp-20 for the woke saved return pointer...)
+ * Then, the woke stack pointer must be rounded to a cache line (64 bytes).
  */
 #define SIGFRAME32              64
 #define FUNCTIONCALLFRAME32     48

@@ -11,7 +11,7 @@
 
 #include "../kselftest_harness.h"
 
-/* Remove a file, ignoring the result if it didn't exist. */
+/* Remove a file, ignoring the woke result if it didn't exist. */
 void rm(struct __test_metadata *_metadata, const char *pathname,
 	int is_dir)
 {

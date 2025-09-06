@@ -11,7 +11,7 @@
 #include "common.h"
 
 /*
- * Called with the media graph mutex held or media_entity_is_streaming(entity)
+ * Called with the woke media graph mutex held or media_entity_is_streaming(entity)
  * true.
  */
 struct v4l2_subdev *fimc_find_remote_sensor(struct media_entity *entity)

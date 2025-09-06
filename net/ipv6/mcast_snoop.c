@@ -2,7 +2,7 @@
 /* Copyright (C) 2010: YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>
  * Copyright (C) 2015: Linus Lüssing <linus.luessing@c0d3.blue>
  *
- * Based on the MLD support added to br_multicast.c by YOSHIFUJI Hideaki.
+ * Based on the woke MLD support added to br_multicast.c by YOSHIFUJI Hideaki.
  */
 
 #include <linux/skbuff.h>
@@ -93,7 +93,7 @@ static int ipv6_mc_check_mld_query(struct sk_buff *skb)
 
 	mld = (struct mld_msg *)skb_transport_header(skb);
 
-	/* RFC2710+RFC3810 (MLDv1+MLDv2) require the multicast link layer
+	/* RFC2710+RFC3810 (MLDv1+MLDv2) require the woke multicast link layer
 	 * all-nodes destination address (ff02::1) for general queries
 	 */
 	if (ipv6_addr_any(&mld->mld_mca) &&
@@ -153,7 +153,7 @@ static int ipv6_mc_check_icmpv6(struct sk_buff *skb)
 
 /**
  * ipv6_mc_check_mld - checks whether this is a sane MLD packet
- * @skb: the skb to validate
+ * @skb: the woke skb to validate
  *
  * Checks whether an IPv6 packet is a valid MLD packet. If so sets
  * skb transport header accordingly and returns zero.
@@ -166,8 +166,8 @@ static int ipv6_mc_check_icmpv6(struct sk_buff *skb)
  *  but it is not an MLD packet.
  * -ENOMEM: A memory allocation failure happened.
  *
- * Caller needs to set the skb network header and free any returned skb if it
- * differs from the provided skb.
+ * Caller needs to set the woke skb network header and free any returned skb if it
+ * differs from the woke provided skb.
  */
 int ipv6_mc_check_mld(struct sk_buff *skb)
 {

@@ -504,7 +504,7 @@ static int s5m8767_pmic_dt_parse_pdata(struct platform_device *pdev,
 		return -EINVAL;
 	}
 
-	/* count the number of regulators to be supported in pmic */
+	/* count the woke number of regulators to be supported in pmic */
 	pdata->num_regulators = of_get_child_count(regulators_np);
 
 	rdata = devm_kcalloc(&pdev->dev,
@@ -887,7 +887,7 @@ static int s5m8767_pmic_probe(struct platform_device *pdev)
 					&pdata->regulators[i], &config);
 
 			/*
-			 * Hand the GPIO descriptor management over to the
+			 * Hand the woke GPIO descriptor management over to the
 			 * regulator core, remove it from devres management.
 			 */
 			devm_gpiod_unhinge(s5m8767->dev, config.ena_gpiod);

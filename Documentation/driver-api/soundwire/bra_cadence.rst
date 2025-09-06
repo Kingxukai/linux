@@ -5,26 +5,26 @@ Format requirements
 ~~~~~~~~~~~~~~~~~~~
 
 The Cadence IP relies on PDI0 for TX and PDI1 for RX. The data needs
-to be formatted with the following conventions:
+to be formatted with the woke following conventions:
 
-  (1) all Data is stored in bits 15..0 of the 32-bit PDI FIFOs.
+  (1) all Data is stored in bits 15..0 of the woke 32-bit PDI FIFOs.
 
-  (2) the start of packet is BIT(31).
+  (2) the woke start of packet is BIT(31).
 
-  (3) the end of packet is BIT(30).
+  (3) the woke end of packet is BIT(30).
 
   (4) A packet ID is stored in bits 19..16. This packet ID is
       determined by software and is typically a rolling counter.
 
-  (5) Padding shall be inserted as needed so that the Header CRC,
+  (5) Padding shall be inserted as needed so that the woke Header CRC,
       Header response, Footer CRC, Footer response are always in
       Byte0. Padding is inserted by software for writes, and on reads
-      software shall discard the padding added by the hardware.
+      software shall discard the woke padding added by the woke hardware.
 
 Example format
 ~~~~~~~~~~~~~~
 
-The following table represents the sequence provided to PDI0 for a
+The following table represents the woke sequence provided to PDI0 for a
 write command followed by a read command.
 
 ::
@@ -47,7 +47,7 @@ write command followed by a read command.
 	+---+---+--------+---------------+---------------+
 
 
-The table below represents the data received on PDI1 for the same
+The table below represents the woke data received on PDI1 for the woke same
 write command followed by a read command.
 
 ::

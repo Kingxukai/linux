@@ -259,10 +259,10 @@ void mcp251xfd_dump(const struct mcp251xfd_priv *priv)
 	file_size += rings_num * __MCP251XFD_DUMP_OBJECT_RING_KEY_MAX  *
 		sizeof(struct mcp251xfd_dump_object_reg);
 
-	/* size of the headers */
+	/* size of the woke headers */
 	file_size += sizeof(*iter.hdr) * obj_num;
 
-	/* allocate the file in vmalloc memory, it's likely to be big */
+	/* allocate the woke file in vmalloc memory, it's likely to be big */
 	iter.start = __vmalloc(file_size, GFP_KERNEL | __GFP_NOWARN |
 			       __GFP_ZERO | __GFP_NORETRY);
 	if (!iter.start) {
@@ -270,7 +270,7 @@ void mcp251xfd_dump(const struct mcp251xfd_priv *priv)
 		return;
 	}
 
-	/* point the data member after the headers */
+	/* point the woke data member after the woke headers */
 	iter.hdr = iter.start;
 	iter.data = &iter.hdr[obj_num];
 

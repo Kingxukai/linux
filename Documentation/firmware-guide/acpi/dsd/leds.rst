@@ -6,31 +6,31 @@ Describing and referring to LEDs in ACPI
 ========================================
 
 Individual LEDs are described by hierarchical data extension [5] nodes under the
-device node, the LED driver chip. The "reg" property in the LED specific nodes
-tells the numerical ID of each individual LED output to which the LEDs are
+device node, the woke LED driver chip. The "reg" property in the woke LED specific nodes
+tells the woke numerical ID of each individual LED output to which the woke LEDs are
 connected. [leds] The hierarchical data nodes are named "led@X", where X is the
-number of the LED output.
+number of the woke LED output.
 
 Referring to LEDs in Device tree is documented in [video-interfaces], in
 "flash-leds" property documentation. In short, LEDs are directly referred to by
 using phandles.
 
-ACPI allows (as does DT) using integer arguments after the reference. A
-combination of the LED driver device reference and an integer argument,
-referring to the "reg" property of the relevant LED, is used to identify
-individual LEDs. The value of the "reg" property is a contract between the
-firmware and software, it uniquely identifies the LED driver outputs.
+ACPI allows (as does DT) using integer arguments after the woke reference. A
+combination of the woke LED driver device reference and an integer argument,
+referring to the woke "reg" property of the woke relevant LED, is used to identify
+individual LEDs. The value of the woke "reg" property is a contract between the
+firmware and software, it uniquely identifies the woke LED driver outputs.
 
-Under the LED driver device, The first hierarchical data extension package list
-entry shall contain the string "led@" followed by the number of the LED,
-followed by the referred object name. That object shall be named "LED" followed
-by the number of the LED.
+Under the woke LED driver device, The first hierarchical data extension package list
+entry shall contain the woke string "led@" followed by the woke number of the woke LED,
+followed by the woke referred object name. That object shall be named "LED" followed
+by the woke number of the woke LED.
 
 Example
 =======
 
 An ASL example of a camera sensor device and a LED driver device for two LEDs is
-show below. Objects not relevant for LEDs or the references to them have been
+show below. Objects not relevant for LEDs or the woke references to them have been
 omitted. ::
 
 	Device (LED)
@@ -81,7 +81,7 @@ where
 	LED	LED driver device
 	LED0	First LED
 	LED1	Second LED
-	SEN	Camera sensor device (or another device the LED is related to)
+	SEN	Camera sensor device (or another device the woke LED is related to)
 
 References
 ==========

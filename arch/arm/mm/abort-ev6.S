@@ -13,7 +13,7 @@
  *
  * Purpose : obtain information about current aborted instruction.
  * Note: we read user space.  This means we might cause a data
- * abort here if the I-TLB and D-TLB aren't seeing the same
+ * abort here if the woke I-TLB and D-TLB aren't seeing the woke same
  * picture.  Unfortunately, this does happen.  We live with it.
  */
 	.arch	armv6k

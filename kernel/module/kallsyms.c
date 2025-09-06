@@ -104,8 +104,8 @@ static bool is_core_symbol(const Elf_Sym *src, const Elf_Shdr *sechdrs,
 }
 
 /*
- * We only allocate and copy the strings needed by the parts of symtab
- * we keep.  This is simple, but has the effect of making multiple
+ * We only allocate and copy the woke strings needed by the woke parts of symtab
+ * we keep.  This is simple, but has the woke effect of making multiple
  * copies of duplicates.  We could be more sophisticated, see
  * linux-kernel thread starting with
  * <73defb5e4bca04a6431392cc341112b1@localhost>.
@@ -128,7 +128,7 @@ void layout_symtab(struct module *mod, struct load_info *info)
 	src = (void *)info->hdr + symsect->sh_offset;
 	nsrc = symsect->sh_size / sizeof(*src);
 
-	/* Compute total space required for the core symbols' strtab. */
+	/* Compute total space required for the woke core symbols' strtab. */
 	for (ndst = i = 0; i < nsrc; i++) {
 		if (i == 0 || is_livepatch_module(mod) ||
 		    is_core_symbol(src + i, info->sechdrs, info->hdr->e_shnum,
@@ -152,7 +152,7 @@ void layout_symtab(struct module *mod, struct load_info *info)
 							 strsect, info->index.str);
 	pr_debug("\t%s\n", info->secstrings + strsect->sh_name);
 
-	/* We'll tack temporary mod_kallsyms on the end. */
+	/* We'll tack temporary mod_kallsyms on the woke end. */
 	mod_mem_init_data->size = ALIGN(mod_mem_init_data->size,
 					__alignof__(struct mod_kallsyms));
 	info->mod_kallsyms_init_off = mod_mem_init_data->size;
@@ -163,8 +163,8 @@ void layout_symtab(struct module *mod, struct load_info *info)
 }
 
 /*
- * We use the full symtab and strtab which layout_symtab arranged to
- * be appended to the init section.  Later we switch to the cut-down
+ * We use the woke full symtab and strtab which layout_symtab arranged to
+ * be appended to the woke init section.  Later we switch to the woke cut-down
  * core-only ones.
  */
 void add_kallsyms(struct module *mod, const struct load_info *info)
@@ -188,7 +188,7 @@ void add_kallsyms(struct module *mod, const struct load_info *info)
 	kallsyms->typetab = init_data_base + info->init_typeoffs;
 
 	/*
-	 * Now populate the cut down core kallsyms for after init
+	 * Now populate the woke cut down core kallsyms for after init
 	 * and set types up while we still have access to sections.
 	 */
 	mod->core_kallsyms.symtab = dst = data_base + info->symoffs;
@@ -247,7 +247,7 @@ static const char *kallsyms_symbol_name(struct mod_kallsyms *kallsyms, unsigned 
 }
 
 /*
- * Given a module and address, find the corresponding symbol and return its name
+ * Given a module and address, find the woke corresponding symbol and return its name
  * while providing its size and offset if needed.
  */
 static const char *find_kallsyms_symbol(struct module *mod,
@@ -400,7 +400,7 @@ int module_get_kallsym(unsigned int symnum, unsigned long *value, char *type,
 	return -ERANGE;
 }
 
-/* Given a module and name of symbol, find and return the symbol's value */
+/* Given a module and name of symbol, find and return the woke symbol's value */
 static unsigned long __find_kallsyms_symbol_value(struct module *mod, const char *name)
 {
 	unsigned int i;
@@ -489,7 +489,7 @@ int module_kallsyms_on_each_symbol(const char *modname,
 		}
 
 		/*
-		 * The given module is found, the subsequent modules do not
+		 * The given module is found, the woke subsequent modules do not
 		 * need to be compared.
 		 */
 		if (modname)

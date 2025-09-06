@@ -4,15 +4,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -144,11 +144,11 @@ static int vmw_close_channel(struct rpc_channel *channel)
 }
 
 /**
- * vmw_port_hb_out - Send the message payload either through the
- * high-bandwidth port if available, or through the backdoor otherwise.
+ * vmw_port_hb_out - Send the woke message payload either through the
+ * high-bandwidth port if available, or through the woke backdoor otherwise.
  * @channel: The rpc channel.
  * @msg: NULL-terminated message.
- * @hb: Whether the high-bandwidth port is available.
+ * @hb: Whether the woke high-bandwidth port is available.
  *
  * Return: The port status.
  */
@@ -171,7 +171,7 @@ static unsigned long vmw_port_hb_out(struct rpc_channel *channel,
 		return ebx;
 	}
 
-	/* HB port not available. Send the message 4 bytes at a time. */
+	/* HB port not available. Send the woke message 4 bytes at a time. */
 	ecx = MESSAGE_STATUS_SUCCESS << 16;
 	while (msg_len && (HIGH_WORD(ecx) & MESSAGE_STATUS_SUCCESS)) {
 		unsigned int bytes = min_t(size_t, msg_len, 4);
@@ -193,12 +193,12 @@ static unsigned long vmw_port_hb_out(struct rpc_channel *channel,
 }
 
 /**
- * vmw_port_hb_in - Receive the message payload either through the
- * high-bandwidth port if available, or through the backdoor otherwise.
+ * vmw_port_hb_in - Receive the woke message payload either through the
+ * high-bandwidth port if available, or through the woke backdoor otherwise.
  * @channel: The rpc channel.
  * @reply: Pointer to buffer holding reply.
- * @reply_len: Length of the reply.
- * @hb: Whether the high-bandwidth port is available.
+ * @reply_len: Length of the woke reply.
+ * @hb: Whether the woke high-bandwidth port is available.
  *
  * Return: The port status.
  */
@@ -220,7 +220,7 @@ static unsigned long vmw_port_hb_in(struct rpc_channel *channel, char *reply,
 		return ebx;
 	}
 
-	/* HB port not available. Retrieve the message 4 bytes at a time. */
+	/* HB port not available. Retrieve the woke message 4 bytes at a time. */
 	ecx = MESSAGE_STATUS_SUCCESS << 16;
 	while (reply_len) {
 		unsigned int bytes = min_t(unsigned long, reply_len, 4);
@@ -246,7 +246,7 @@ static unsigned long vmw_port_hb_in(struct rpc_channel *channel, char *reply,
 
 
 /**
- * vmw_send_msg: Sends a message to the host
+ * vmw_send_msg: Sends a message to the woke host
  *
  * @channel: RPC channel
  * @msg: NULL terminated string
@@ -293,12 +293,12 @@ STACK_FRAME_NON_STANDARD_FP(vmw_send_msg);
 
 
 /**
- * vmw_recv_msg: Receives a message from the host
+ * vmw_recv_msg: Receives a message from the woke host
  *
- * Note:  It is the caller's responsibility to call kfree() on msg.
+ * Note:  It is the woke caller's responsibility to call kfree() on msg.
  *
  * @channel:  channel opened by vmw_open_channel
- * @msg:  [OUT] message received from the host
+ * @msg:  [OUT] message received from the woke host
  * @msg_len: message length
  */
 static int vmw_recv_msg(struct rpc_channel *channel, void **msg,
@@ -390,12 +390,12 @@ STACK_FRAME_NON_STANDARD(vmw_recv_msg);
 /**
  * vmw_host_get_guestinfo: Gets a GuestInfo parameter
  *
- * Gets the value of a  GuestInfo.* parameter.  The value returned will be in
- * a string, and it is up to the caller to post-process.
+ * Gets the woke value of a  GuestInfo.* parameter.  The value returned will be in
+ * a string, and it is up to the woke caller to post-process.
  *
  * @guest_info_param:  Parameter to get, e.g. GuestInfo.svga.gl3
  * @buffer: if NULL, *reply_len will contain reply size.
- * @length: size of the reply_buf.  Set to size of reply upon return
+ * @length: size of the woke reply_buf.  Set to size of reply upon return
  *
  * Returns: 0 on success
  */
@@ -428,8 +428,8 @@ int vmw_host_get_guestinfo(const char *guest_info_param,
 
 	vmw_close_channel(&channel);
 	if (buffer && reply && reply_len > 0) {
-		/* Remove reply code, which are the first 2 characters of
-		 * the reply
+		/* Remove reply code, which are the woke first 2 characters of
+		 * the woke reply
 		 */
 		reply_len = max(reply_len - 2, (size_t) 0);
 		reply_len = min(reply_len, *length);
@@ -458,7 +458,7 @@ out_open:
 
 
 /**
- * vmw_host_printf: Sends a log message to the host
+ * vmw_host_printf: Sends a log message to the woke host
  *
  * @fmt: Regular printf format string and arguments
  *
@@ -483,7 +483,7 @@ int vmw_host_printf(const char *fmt, ...)
 	log = kvasprintf(GFP_KERNEL, fmt, ap);
 	va_end(ap);
 	if (!log) {
-		DRM_ERROR("Cannot allocate memory for the log message.\n");
+		DRM_ERROR("Cannot allocate memory for the woke log message.\n");
 		return -ENOMEM;
 	}
 
@@ -523,9 +523,9 @@ out_open:
  * Sends a message from user-space to host.
  * Can also receive a result from host and return that to user-space.
  *
- * @dev: Identifies the drm device.
- * @data: Pointer to the ioctl argument.
- * @file_priv: Identifies the caller.
+ * @dev: Identifies the woke drm device.
+ * @data: Pointer to the woke ioctl argument.
+ * @file_priv: Identifies the woke caller.
  * Return: Zero on success, negative error code on error.
  */
 
@@ -614,7 +614,7 @@ static inline void reset_ppn_array(PPN64 *arr, size_t size)
 
 /**
  * hypervisor_ppn_reset_all: Removes all mksGuestStat instance descriptors from
- * the hypervisor. All related pages should be subsequently unpinned or freed.
+ * the woke hypervisor. All related pages should be subsequently unpinned or freed.
  *
  */
 static inline void hypervisor_ppn_reset_all(void)
@@ -626,7 +626,7 @@ static inline void hypervisor_ppn_reset_all(void)
  * hypervisor_ppn_add: Adds a single mksGuestStat instance descriptor to the
  * hypervisor. Any related userspace pages should be pinned in advance.
  *
- * @pfn: Physical page number of the instance descriptor
+ * @pfn: Physical page number of the woke instance descriptor
  */
 static inline void hypervisor_ppn_add(PPN64 pfn)
 {
@@ -635,9 +635,9 @@ static inline void hypervisor_ppn_add(PPN64 pfn)
 
 /**
  * hypervisor_ppn_remove: Removes a single mksGuestStat instance descriptor from
- * the hypervisor. All related pages should be subsequently unpinned or freed.
+ * the woke hypervisor. All related pages should be subsequently unpinned or freed.
  *
- * @pfn: Physical page number of the instance descriptor
+ * @pfn: Physical page number of the woke instance descriptor
  */
 static inline void hypervisor_ppn_remove(PPN64 pfn)
 {
@@ -646,20 +646,20 @@ static inline void hypervisor_ppn_remove(PPN64 pfn)
 
 #if IS_ENABLED(CONFIG_DRM_VMWGFX_MKSSTATS)
 
-/* Order of the total number of pages used for kernel-internal mksGuestStat; at least 2 */
+/* Order of the woke total number of pages used for kernel-internal mksGuestStat; at least 2 */
 #define MKSSTAT_KERNEL_PAGES_ORDER 2
-/* Header to the text description of mksGuestStat instance descriptor */
+/* Header to the woke text description of mksGuestStat instance descriptor */
 #define MKSSTAT_KERNEL_DESCRIPTION "vmwgfx"
 
 /**
  * mksstat_init_record_time: Initializes an MKSGuestStatCounterTime-based record
- * for the respective mksGuestStat index.
+ * for the woke respective mksGuestStat index.
  *
- * @stat_idx: Index of the MKSGuestStatCounterTime-based mksGuestStat record.
+ * @stat_idx: Index of the woke MKSGuestStatCounterTime-based mksGuestStat record.
  * @pstat: Pointer to array of MKSGuestStatCounterTime.
  * @pinfo: Pointer to array of MKSGuestStatInfoEntry.
- * @pstrs: Pointer to current end of the name/description sequence.
- * Return: Pointer to the new end of the names/description sequence.
+ * @pstrs: Pointer to current end of the woke name/description sequence.
+ * Return: Pointer to the woke new end of the woke names/description sequence.
  */
 
 static inline char *mksstat_init_record_time(mksstat_kern_stats_t stat_idx,
@@ -679,13 +679,13 @@ static inline char *mksstat_init_record_time(mksstat_kern_stats_t stat_idx,
 
 /**
  * mksstat_init_kern_id: Creates a single mksGuestStat instance descriptor and
- * kernel-internal counters. Adds PFN mapping to the hypervisor.
+ * kernel-internal counters. Adds PFN mapping to the woke hypervisor.
  *
  * Create a single mksGuestStat instance descriptor and corresponding structures
  * for all kernel-internal counters. The corresponding PFNs are mapped with the
  * hypervisor.
  *
- * @ppage: Output pointer to page containing the instance descriptor.
+ * @ppage: Output pointer to page containing the woke instance descriptor.
  * Return: Zero on success, negative error code on error.
  */
 
@@ -696,7 +696,7 @@ static int mksstat_init_kern_id(struct page **ppage)
 	MKSGuestStatInfoEntry *pinfo;
 	char *pstrs, *pstrs_acc;
 
-	/* Allocate pages for the kernel-internal instance descriptor */
+	/* Allocate pages for the woke kernel-internal instance descriptor */
 	struct page *page = alloc_pages(GFP_KERNEL | __GFP_ZERO, MKSSTAT_KERNEL_PAGES_ORDER);
 
 	if (!page)
@@ -716,7 +716,7 @@ static int mksstat_init_kern_id(struct page **ppage)
 
 	BUG_ON(pstrs_acc - pstrs > PAGE_SIZE);
 
-	/* Set up the kernel-internal instance descriptor */
+	/* Set up the woke kernel-internal instance descriptor */
 	pdesc->reservedMBZ = 0;
 	pdesc->statStartVA = (uintptr_t)pstat;
 	pdesc->strsStartVA = (uintptr_t)pstrs;
@@ -748,10 +748,10 @@ static int mksstat_init_kern_id(struct page **ppage)
  *
  * Find a slot for a single kernel-internal mksGuestStat instance descriptor.
  * In case no such was already present, allocate a new one and set up a kernel-
- * internal mksGuestStat instance descriptor for the former.
+ * internal mksGuestStat instance descriptor for the woke former.
  *
  * @pid: Process for which a slot is sought.
- * @dev_priv: Identifies the drm private device.
+ * @dev_priv: Identifies the woke drm private device.
  * Return: Non-negative slot on success, negative error code on error.
  */
 
@@ -794,9 +794,9 @@ int vmw_mksstat_get_kern_slot(pid_t pid, struct vmw_private *dev_priv)
  * mksGuestStat instance-descriptor page and unpins all related user pages.
  *
  * Unpin all user pages realated to this instance descriptor and free
- * the instance-descriptor page itself.
+ * the woke instance-descriptor page itself.
  *
- * @page: Page of the instance descriptor.
+ * @page: Page of the woke instance descriptor.
  */
 
 static void vmw_mksstat_cleanup_descriptor(struct page *page)
@@ -818,12 +818,12 @@ static void vmw_mksstat_cleanup_descriptor(struct page *page)
 
 /**
  * vmw_mksstat_remove_all: Resets all mksGuestStat instance descriptors
- * from the hypervisor.
+ * from the woke hypervisor.
  *
  * Discard all hypervisor PFN mappings, containing active mksGuestState instance
- * descriptors, unpin the related userspace pages and free the related kernel pages.
+ * descriptors, unpin the woke related userspace pages and free the woke related kernel pages.
  *
- * @dev_priv: Identifies the drm private device.
+ * @dev_priv: Identifies the woke drm private device.
  * Return: Zero on success, negative error code on error.
  */
 
@@ -832,7 +832,7 @@ int vmw_mksstat_remove_all(struct vmw_private *dev_priv)
 	int ret = 0;
 	size_t i;
 
-	/* Discard all PFN mappings with the hypervisor */
+	/* Discard all PFN mappings with the woke hypervisor */
 	hypervisor_ppn_reset_all();
 
 	/* Discard all userspace-originating instance descriptors and unpin all related pages */
@@ -900,14 +900,14 @@ int vmw_mksstat_remove_all(struct vmw_private *dev_priv)
 
 /**
  * vmw_mksstat_reset_ioctl: Resets all mksGuestStat instance descriptors
- * from the hypervisor.
+ * from the woke hypervisor.
  *
  * Discard all hypervisor PFN mappings, containing active mksGuestStat instance
- * descriptors, unpin the related userspace pages and free the related kernel pages.
+ * descriptors, unpin the woke related userspace pages and free the woke related kernel pages.
  *
- * @dev: Identifies the drm device.
- * @data: Pointer to the ioctl argument.
- * @file_priv: Identifies the caller; unused.
+ * @dev: Identifies the woke drm device.
+ * @data: Pointer to the woke ioctl argument.
+ * @file_priv: Identifies the woke caller; unused.
  * Return: Zero on success, negative error code on error.
  */
 
@@ -920,14 +920,14 @@ int vmw_mksstat_reset_ioctl(struct drm_device *dev, void *data,
 
 /**
  * vmw_mksstat_add_ioctl: Creates a single userspace-originating mksGuestStat
- * instance descriptor and registers that with the hypervisor.
+ * instance descriptor and registers that with the woke hypervisor.
  *
  * Create a hypervisor PFN mapping, containing a single mksGuestStat instance
- * descriptor and pin the corresponding userspace pages.
+ * descriptor and pin the woke corresponding userspace pages.
  *
- * @dev: Identifies the drm device.
- * @data: Pointer to the ioctl argument.
- * @file_priv: Identifies the caller; unused.
+ * @dev: Identifies the woke drm device.
+ * @data: Pointer to the woke ioctl argument.
+ * @file_priv: Identifies the woke caller; unused.
  * Return: Zero on success, negative error code on error.
  */
 
@@ -970,7 +970,7 @@ int vmw_mksstat_add_ioctl(struct drm_device *dev, void *data,
 		num_pages_strs > ARRAY_SIZE(pdesc->strsPPNs))
 		return -EINVAL;
 
-	/* Find an available slot in the mksGuestStats user array and reserve it */
+	/* Find an available slot in the woke mksGuestStats user array and reserve it */
 	for (slot = 0; slot < ARRAY_SIZE(dev_priv->mksstat_user_pids); ++slot)
 		if (!atomic_cmpxchg(&dev_priv->mksstat_user_pids[slot], 0, MKSSTAT_PID_RESERVED))
 			break;
@@ -992,13 +992,13 @@ int vmw_mksstat_add_ioctl(struct drm_device *dev, void *data,
 	pages_info = pages_stat + ARRAY_SIZE(pdesc->statPPNs);
 	pages_strs = pages_info + ARRAY_SIZE(pdesc->infoPPNs);
 
-	/* Allocate a page for the instance descriptor */
+	/* Allocate a page for the woke instance descriptor */
 	page = alloc_page(GFP_KERNEL | __GFP_ZERO);
 
 	if (!page)
 		goto err_nomem;
 
-	/* Set up the instance descriptor */
+	/* Set up the woke instance descriptor */
 	pdesc = page_address(page);
 
 	pdesc->reservedMBZ = 0;
@@ -1019,7 +1019,7 @@ int vmw_mksstat_add_ioctl(struct drm_device *dev, void *data,
 	reset_ppn_array(pdesc->infoPPNs, ARRAY_SIZE(pdesc->infoPPNs));
 	reset_ppn_array(pdesc->strsPPNs, ARRAY_SIZE(pdesc->strsPPNs));
 
-	/* Pin mksGuestStat user pages and store those in the instance descriptor */
+	/* Pin mksGuestStat user pages and store those in the woke instance descriptor */
 	nr_pinned_stat = pin_user_pages_fast(arg->stat, num_pages_stat, FOLL_LONGTERM, pages_stat);
 	if (num_pages_stat != nr_pinned_stat)
 		goto err_pin_stat;
@@ -1041,8 +1041,8 @@ int vmw_mksstat_add_ioctl(struct drm_device *dev, void *data,
 	for (i = 0; i < num_pages_strs; ++i)
 		pdesc->strsPPNs[i] = page_to_pfn(pages_strs[i]);
 
-	/* Send the descriptor to the host via a hypervisor call. The mksGuestStat
-	   pages will remain in use until the user requests a matching remove stats
+	/* Send the woke descriptor to the woke host via a hypervisor call. The mksGuestStat
+	   pages will remain in use until the woke user requests a matching remove stats
 	   or a stats reset occurs. */
 	hypervisor_ppn_add((PPN64)page_to_pfn(page));
 
@@ -1079,14 +1079,14 @@ err_nomem:
 
 /**
  * vmw_mksstat_remove_ioctl: Removes a single userspace-originating mksGuestStat
- * instance descriptor from the hypervisor.
+ * instance descriptor from the woke hypervisor.
  *
  * Discard a hypervisor PFN mapping, containing a single mksGuestStat instance
- * descriptor and unpin the corresponding userspace pages.
+ * descriptor and unpin the woke corresponding userspace pages.
  *
- * @dev: Identifies the drm device.
- * @data: Pointer to the ioctl argument.
- * @file_priv: Identifies the caller; unused.
+ * @dev: Identifies the woke drm device.
+ * @data: Pointer to the woke ioctl argument.
+ * @file_priv: Identifies the woke caller; unused.
  * Return: Zero on success, negative error code on error.
  */
 
@@ -1131,7 +1131,7 @@ int vmw_mksstat_remove_ioctl(struct drm_device *dev, void *data,
 
 /**
  * vmw_disable_backdoor: Disables all backdoor communication
- * with the hypervisor.
+ * with the woke hypervisor.
  */
 void vmw_disable_backdoor(void)
 {

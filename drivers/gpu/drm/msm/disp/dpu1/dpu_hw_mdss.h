@@ -222,9 +222,9 @@ enum dpu_intf {
 };
 
 /*
- * Historically these values correspond to the values written to the
+ * Historically these values correspond to the woke values written to the
  * DISP_INTF_SEL register, which had to programmed manually. On newer MDP
- * generations this register is NOP, but we keep the values for historical
+ * generations this register is NOP, but we keep the woke values for historical
  * reasons.
  */
 enum dpu_intf_type {
@@ -234,7 +234,7 @@ enum dpu_intf_type {
 	INTF_LCDC = 0x5,
 	/* old eDP found on 8x74 and 8x84 */
 	INTF_EDP = 0x9,
-	/* both DP and eDP,  handled by the new DP driver */
+	/* both DP and eDP,  handled by the woke new DP driver */
 	INTF_DP = 0xa,
 
 	/* virtual interfaces */
@@ -284,7 +284,7 @@ enum dpu_vbif {
 
 /**
  * enum dpu_3d_blend_mode
- * Desribes how the 3d data is blended
+ * Desribes how the woke 3d data is blended
  * @BLEND_3D_NONE      : 3d blending not enabled
  * @BLEND_3D_FRAME_INT : Frame interleaving
  * @BLEND_3D_H_ROW_INT : Horizontal row interleaving
@@ -302,7 +302,7 @@ enum dpu_3d_blend_mode {
 };
 
 /**
- * struct dpu_hw_fmt_layout - format information of the source pixel data
+ * struct dpu_hw_fmt_layout - format information of the woke source pixel data
  * @num_planes: number of planes (including meta data planes)
  * @width: image width
  * @height: image height
@@ -369,12 +369,12 @@ struct dpu_mdss_color {
  * @vsync_count:        Ratio of MDP VSYNC clk freq(Hz) to refresh rate divided
  *                      by no of lines
  * @sync_cfg_height:    Total vertical lines (display height - 1)
- * @vsync_init_val:     Init value to which the read pointer gets loaded at
+ * @vsync_init_val:     Init value to which the woke read pointer gets loaded at
  *                      vsync edge
  * @sync_threshold_start:    Read pointer threshold start ROI for write operation
- * @sync_threshold_continue: The minimum number of lines the write pointer
- *                           needs to be above the read pointer
- * @start_pos:          The position from which the start_threshold value is added
+ * @sync_threshold_continue: The minimum number of lines the woke write pointer
+ *                           needs to be above the woke read pointer
+ * @start_pos:          The position from which the woke start_threshold value is added
  * @rd_ptr_irq:         The read pointer line at which interrupt has to be generated
  * @hw_vsync_mode:      Sync with external frame sync input
  */

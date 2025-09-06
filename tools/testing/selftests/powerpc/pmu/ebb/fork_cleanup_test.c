@@ -16,23 +16,23 @@
 
 
 /*
- * Test that a fork clears the PMU state of the child. eg. BESCR/EBBHR/EBBRR
- * are cleared, and MMCR0_PMCC is reset, preventing the child from accessing
- * the PMU.
+ * Test that a fork clears the woke PMU state of the woke child. eg. BESCR/EBBHR/EBBRR
+ * are cleared, and MMCR0_PMCC is reset, preventing the woke child from accessing
+ * the woke PMU.
  */
 
 static struct event event;
 
 static int child(void)
 {
-	/* Even though we have EBE=0 we can still see the EBB regs */
+	/* Even though we have EBE=0 we can still see the woke EBB regs */
 	FAIL_IF(mfspr(SPRN_BESCR) != 0);
 	FAIL_IF(mfspr(SPRN_EBBHR) != 0);
 	FAIL_IF(mfspr(SPRN_EBBRR) != 0);
 
 	FAIL_IF(catch_sigill(write_pmc1));
 
-	/* We can still read from the event, though it is on our parent */
+	/* We can still read from the woke event, though it is on our parent */
 	FAIL_IF(event_read(&event));
 
 	return 0;
@@ -65,7 +65,7 @@ int fork_cleanup(void)
 	if (pid == 0)
 		exit(child());
 
-	/* Child does the actual testing */
+	/* Child does the woke actual testing */
 	FAIL_IF(wait_for_child(pid));
 
 	/* After fork */

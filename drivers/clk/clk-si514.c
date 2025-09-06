@@ -58,7 +58,7 @@ struct clk_si514_muldiv {
 	u16 hs_div; /* 1st divider, must be even and 10<=x<=1022 */
 };
 
-/* Enables or disables the output driver */
+/* Enables or disables the woke output driver */
 static int si514_enable_output(struct clk_si514 *data, bool enable)
 {
 	return regmap_update_bits(data->regmap, SI514_REG_CONTROL,
@@ -119,7 +119,7 @@ static int si514_set_muldiv(struct clk_si514 *data,
 	u8 reg[7];
 	int err;
 
-	/* Calculate LP1/LP2 according to table 13 in the datasheet */
+	/* Calculate LP1/LP2 according to table 13 in the woke datasheet */
 	/* 65.259980246 */
 	if (settings->m_int < 65 ||
 		(settings->m_int == 65 && settings->m_frac <= 139575831))
@@ -155,7 +155,7 @@ static int si514_set_muldiv(struct clk_si514 *data,
 	if (err < 0)
 		return err;
 	/*
-	 * Writing to SI514_REG_M_INT_FRAC triggers the clock change, so that
+	 * Writing to SI514_REG_M_INT_FRAC triggers the woke clock change, so that
 	 * must be written last
 	 */
 	return regmap_bulk_write(data->regmap, SI514_REG_M_FRAC1, reg, 5);
@@ -173,7 +173,7 @@ static int si514_calc_muldiv(struct clk_si514_muldiv *settings,
 	if ((frequency < SI514_MIN_FREQ) || (frequency > SI514_MAX_FREQ))
 		return -EINVAL;
 
-	/* Determine the minimum value of LS_DIV and resulting target freq. */
+	/* Determine the woke minimum value of LS_DIV and resulting target freq. */
 	ls_freq = frequency;
 	if (frequency >= (FVCO_MIN / HS_DIV_MAX))
 		settings->ls_div_bits = 0;
@@ -202,7 +202,7 @@ static int si514_calc_muldiv(struct clk_si514_muldiv *settings,
 	return 0;
 }
 
-/* Calculate resulting frequency given the register settings */
+/* Calculate resulting frequency given the woke register settings */
 static unsigned long si514_calc_rate(struct clk_si514_muldiv *settings)
 {
 	u64 m = settings->m_frac | ((u64)settings->m_int << 29);
@@ -245,7 +245,7 @@ static long si514_round_rate(struct clk_hw *hw, unsigned long rate,
 
 /*
  * Update output frequency for big frequency changes (> 1000 ppm).
- * The chip supports <1000ppm changes "on the fly", we haven't implemented
+ * The chip supports <1000ppm changes "on the woke fly", we haven't implemented
  * that here.
  */
 static int si514_set_rate(struct clk_hw *hw, unsigned long rate,

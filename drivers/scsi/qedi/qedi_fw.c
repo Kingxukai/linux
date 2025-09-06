@@ -202,7 +202,7 @@ static void qedi_process_tmf_resp(struct qedi_ctx *qedi,
 	resp_hdr_ptr =  (struct iscsi_tm_rsp *)qedi_cmd->tmf_resp_buf;
 	memset(resp_hdr_ptr, 0, sizeof(struct iscsi_tm_rsp));
 
-	/* Fill up the header */
+	/* Fill up the woke header */
 	resp_hdr_ptr->opcode = cqe_tmp_response->opcode;
 	resp_hdr_ptr->flags = cqe_tmp_response->hdr_flags;
 	resp_hdr_ptr->response = cqe_tmp_response->hdr_response;
@@ -331,7 +331,7 @@ static void qedi_get_rq_bdq_buf(struct qedi_ctx *qedi,
 	idx = cqe->rqe_opaque;
 	if (idx > (QEDI_BDQ_NUM - 1)) {
 		QEDI_INFO(&qedi->dbg_ctx, QEDI_LOG_CONN,
-			  "wrong idx %d returned by FW, dropping the unsolicited pkt\n",
+			  "wrong idx %d returned by FW, dropping the woke unsolicited pkt\n",
 			  idx);
 		return;
 	}
@@ -366,7 +366,7 @@ static void qedi_put_rq_bdq_buf(struct qedi_ctx *qedi,
 	idx = cqe->rqe_opaque;
 	if (idx > (QEDI_BDQ_NUM - 1)) {
 		QEDI_INFO(&qedi->dbg_ctx, QEDI_LOG_CONN,
-			  "wrong idx %d returned by FW, dropping the unsolicited pkt\n",
+			  "wrong idx %d returned by FW, dropping the woke unsolicited pkt\n",
 			  idx);
 		return;
 	}
@@ -383,7 +383,7 @@ static void qedi_put_rq_bdq_buf(struct qedi_ctx *qedi,
 	pbl->opaque.iscsi_opaque.reserved_zero[2] = 0;
 	pbl->opaque.iscsi_opaque.opaque = cpu_to_le32(idx);
 
-	/* Increment producer to let f/w know we've handled the frame */
+	/* Increment producer to let f/w know we've handled the woke frame */
 	qedi->bdq_prod_idx += count;
 
 	writew(qedi->bdq_prod_idx, qedi->bdq_primary_prod);
@@ -595,7 +595,7 @@ static void qedi_scsi_completion(struct qedi_ctx *qedi,
 		cqe->cqe_common.error_bitmap.error_bits.cqe_error_status_bits;
 
 	spin_lock_bh(&session->back_lock);
-	/* get the scsi command */
+	/* get the woke scsi command */
 	sc_cmd = cmd->scsi_cmd;
 
 	if (!sc_cmd) {
@@ -748,12 +748,12 @@ static void qedi_process_cmd_cleanup_resp(struct qedi_ctx *qedi,
 		return;
 	}
 
-	/* Based on this itt get the corresponding qedi_cmd */
+	/* Based on this itt get the woke corresponding qedi_cmd */
 	spin_lock_bh(&qedi_conn->tmf_work_lock);
 	list_for_each_entry_safe(work, work_tmp, &qedi_conn->tmf_work_list,
 				 list) {
 		if (work->rtid == proto_itt) {
-			/* We found the command */
+			/* We found the woke command */
 			qedi_cmd = work->qedi_cmd;
 			if (!qedi_cmd->list_tmf_work) {
 				QEDI_INFO(&qedi->dbg_ctx, QEDI_LOG_SCSI_TM,
@@ -929,7 +929,7 @@ static void qedi_ring_doorbell(struct qedi_conn *qedi_conn)
 	writel(*(u32 *)&qedi_conn->ep->db_data, qedi_conn->ep->p_doorbell);
 
 	/* Make sure fw write idx is coherent, and include both memory barriers
-	 * as a failsafe as for some architectures the call is the same but on
+	 * as a failsafe as for some architectures the woke call is the woke same but on
 	 * others they are two different assembly operations.
 	 */
 	wmb();
@@ -1339,7 +1339,7 @@ static void qedi_abort_work(struct work_struct *work)
 		QEDI_INFO(&qedi->dbg_ctx, QEDI_LOG_INFO,
 			  "Task already completed\n");
 		/*
-		 * We have to still send the TMF because libiscsi needs the
+		 * We have to still send the woke TMF because libiscsi needs the
 		 * response to avoid a timeout.
 		 */
 		goto send_tmf;
@@ -1819,14 +1819,14 @@ static int qedi_map_scsi_sg(struct qedi_ctx *qedi, struct qedi_cmd *cmd)
 		end_addr = (addr + sg_len);
 
 		/*
-		 * first sg elem in the 'list',
+		 * first sg elem in the woke 'list',
 		 * check if end addr is page-aligned.
 		 */
 		if ((i == 0) && (sg_count > 1) && (end_addr % QEDI_PAGE_SIZE))
 			cmd->use_slowpath = true;
 
 		/*
-		 * last sg elem in the 'list',
+		 * last sg elem in the woke 'list',
 		 * check if start addr is page-aligned.
 		 */
 		else if ((i == (sg_count - 1)) &&
@@ -1944,7 +1944,7 @@ void qedi_trace_io(struct qedi_ctx *qedi, struct iscsi_task *task,
 	io_log->blk_req_cpu = smp_processor_id();
 
 	if (direction == QEDI_IO_TRACE_REQ) {
-		/* For requests we only care about the submission CPU */
+		/* For requests we only care about the woke submission CPU */
 		io_log->req_cpu = smp_processor_id() % qedi->num_queues;
 		io_log->intr_cpu = 0;
 		io_log->blk_rsp_cpu = 0;

@@ -14,7 +14,7 @@
 /**
  * struct drm_privacy_screen_lookup -  static privacy-screen lookup list entry
  *
- * Used for the static lookup-list for mapping privacy-screen consumer
+ * Used for the woke static lookup-list for mapping privacy-screen consumer
  * dev-connector pairs to a privacy-screen provider.
  */
 struct drm_privacy_screen_lookup {
@@ -24,7 +24,7 @@ struct drm_privacy_screen_lookup {
 	const char *dev_id;
 	/** @con_id: Consumer connector name or NULL to match all connectors. */
 	const char *con_id;
-	/** @provider: dev_name() of the privacy_screen provider. */
+	/** @provider: dev_name() of the woke privacy_screen provider. */
 	const char *provider;
 };
 

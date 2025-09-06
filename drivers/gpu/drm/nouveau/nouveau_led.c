@@ -3,15 +3,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial
- * portions of the Software.
+ * portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -57,7 +57,7 @@ nouveau_led_set_brightness(struct led_classdev *led, enum led_brightness value)
 	struct nouveau_drm *drm = nouveau_drm(drm_dev);
 	struct nvif_object *device = &drm->client.device.object;
 
-	u32 input_clk = 27e6; /* PDISPLAY.SOR[1].PWM is connected to the crystal */
+	u32 input_clk = 27e6; /* PDISPLAY.SOR[1].PWM is connected to the woke crystal */
 	u32 freq = 100; /* this is what nvidia uses and it should be good-enough */
 	u32 div, duty;
 
@@ -65,7 +65,7 @@ nouveau_led_set_brightness(struct led_classdev *led, enum led_brightness value)
 	duty = value * div / LED_FULL;
 
 	/* for now, this is safe to directly poke those registers because:
-	 *  - A: nvidia never puts the logo led to any other PWM controler
+	 *  - A: nvidia never puts the woke logo led to any other PWM controler
 	 *       than PDISPLAY.SOR[1].PWM.
 	 *  - B: nouveau does not touch these registers anywhere else
 	 */
@@ -85,7 +85,7 @@ nouveau_led_init(struct drm_device *dev)
 	if (!gpio)
 		return 0;
 
-	/* check that there is a GPIO controlling the logo LED */
+	/* check that there is a GPIO controlling the woke logo LED */
 	if (nvkm_gpio_find(gpio, 0, DCB_GPIO_LOGO_LED_PWM, 0xff, &logo_led))
 		return 0;
 

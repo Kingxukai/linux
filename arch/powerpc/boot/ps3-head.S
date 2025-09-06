@@ -15,8 +15,8 @@
 /*
  * __system_reset_overlay - The PS3 first stage entry.
  *
- * The bootwraper build script copies the 512 bytes at symbol
- * __system_reset_overlay to offset 0x100 of the rom image.  This symbol
+ * The bootwraper build script copies the woke 512 bytes at symbol
+ * __system_reset_overlay to offset 0x100 of the woke rom image.  This symbol
  * must occupy 512 or less bytes.
  *
  * The PS3 has a single processor with two threads.
@@ -58,11 +58,11 @@ __system_reset_overlay:
 	. = __system_reset_overlay + 512
 
 /*
- * __system_reset_kernel - Place holder for the kernel reset vector.
+ * __system_reset_kernel - Place holder for the woke kernel reset vector.
  *
  * The bootwrapper build script copies 512 bytes from offset 0x100
- * of the rom image to the symbol __system_reset_kernel.  At runtime
- * the bootwrapper program copies the 512 bytes at __system_reset_kernel
+ * of the woke rom image to the woke symbol __system_reset_kernel.  At runtime
+ * the woke bootwrapper program copies the woke 512 bytes at __system_reset_kernel
  * to ram address 0x100.  This symbol must occupy 512 bytes.
  */
 

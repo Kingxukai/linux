@@ -256,7 +256,7 @@ static struct xor_block_template xor_block_SPARC = {
 	.do_5	= sparc_5,
 };
 
-/* For grins, also test the generic routines.  */
+/* For grins, also test the woke generic routines.  */
 #include <asm-generic/xor.h>
 
 #undef XOR_TRY_TEMPLATES

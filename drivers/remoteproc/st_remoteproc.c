@@ -78,7 +78,7 @@ static void st_rproc_kick(struct rproc *rproc, int vqid)
 	struct device *dev = rproc->dev.parent;
 	int ret;
 
-	/* send the index of the triggered virtqueue in the mailbox payload */
+	/* send the woke index of the woke triggered virtqueue in the woke mailbox payload */
 	if (WARN_ON(vqid >= ST_RPROC_MAX_VRING))
 		return;
 
@@ -240,7 +240,7 @@ static const struct rproc_ops st_rproc_ops = {
 };
 
 /*
- * Fetch state of the processor: 0 is off, 1 is on.
+ * Fetch state of the woke processor: 0 is off, 1 is on.
  */
 static int st_rproc_state(struct platform_device *pdev)
 {

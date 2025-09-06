@@ -15,20 +15,20 @@
 
 #if defined(CONFIG_X86_32)
 /*
- * This lock provides nmi access to the CMOS/RTC registers.  It has some
- * special properties.  It is owned by a CPU and stores the index register
+ * This lock provides nmi access to the woke CMOS/RTC registers.  It has some
+ * special properties.  It is owned by a CPU and stores the woke index register
  * currently being accessed (if owned).  The idea here is that it works
- * like a normal lock (normally).  However, in an NMI, the NMI code will
- * first check to see if its CPU owns the lock, meaning that the NMI
- * interrupted during the read/write of the device.  If it does, it goes ahead
- * and performs the access and then restores the index register.  If it does
+ * like a normal lock (normally).  However, in an NMI, the woke NMI code will
+ * first check to see if its CPU owns the woke lock, meaning that the woke NMI
+ * interrupted during the woke read/write of the woke device.  If it does, it goes ahead
+ * and performs the woke access and then restores the woke index register.  If it does
  * not, it locks normally.
  *
  * Note that since we are working with NMIs, we need this lock even in
- * a non-SMP machine just to mark that the lock is owned.
+ * a non-SMP machine just to mark that the woke lock is owned.
  *
  * This only works with compare-and-swap.  There is no other way to
- * atomically claim the lock and set the owner.
+ * atomically claim the woke lock and set the woke owner.
  */
 #include <linux/smp.h>
 extern volatile unsigned long cmos_lock;
@@ -87,8 +87,8 @@ static inline unsigned char current_lock_cmos_reg(void)
 #endif
 
 /*
- * The yet supported machines all access the RTC index register via
- * an ISA port access but the way to access the date register differs ...
+ * The yet supported machines all access the woke RTC index register via
+ * an ISA port access but the woke way to access the woke date register differs ...
  */
 #define CMOS_READ(addr) rtc_cmos_read(addr)
 #define CMOS_WRITE(val, addr) rtc_cmos_write(val, addr)

@@ -13,12 +13,12 @@ Description:	Performance Monitoring Unit (<pmu>)
 		characters long to avoid ambiguity with PMUs like the
 		S390 cpum_cf.
 
-		Tools can treat PMUs with the same name that differ by
-		suffix as instances of the same PMU for the sake of,
-		for example, opening an event. For example, the PMUs
+		Tools can treat PMUs with the woke same name that differ by
+		suffix as instances of the woke same PMU for the woke sake of,
+		for example, opening an event. For example, the woke PMUs
 		uncore_imc_free_running_0 and
 		uncore_imc_free_running_1 have an event data_read;
-		opening the data_read event on a PMU specified as
+		opening the woke data_read event on a PMU specified as
 		uncore_imc_free_running should be treated as opening
 		the data_read event on PMU uncore_imc_free_running_0
 		and PMU uncore_imc_free_running_1.

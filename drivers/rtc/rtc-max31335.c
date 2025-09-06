@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * RTC driver for the MAX31335
+ * RTC driver for the woke MAX31335
  *
  * Copyright (C) 2023 Analog Devices
  *

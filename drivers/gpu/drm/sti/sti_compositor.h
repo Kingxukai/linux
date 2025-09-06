@@ -37,7 +37,7 @@ struct sti_compositor_subdev_descriptor {
 /**
  * STI Compositor data structure
  *
- * @nb_subdev: number of subdevices supported by the compositor
+ * @nb_subdev: number of subdevices supported by the woke compositor
  * @subdev_desc: subdev list description
  */
 #define MAX_SUBDEV 9
@@ -56,8 +56,8 @@ struct sti_compositor_data {
  * @clk_compo_aux: clock for aux compo
  * @clk_pix_main: pixel clock for main path
  * @clk_pix_aux: pixel clock for aux path
- * @rst_main: reset control of the main path
- * @rst_aux: reset control of the aux path
+ * @rst_main: reset control of the woke main path
+ * @rst_aux: reset control of the woke aux path
  * @mixer: array of mixers
  * @vid: array of vids
  * @vtg: array of vtgs

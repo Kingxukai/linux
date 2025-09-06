@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2003 Atheros Communications, Inc.,  All Rights Reserved.
@@ -119,7 +119,7 @@ static const struct irq_domain_ops ar2315_misc_irq_domain_ops = {
 /*
  * Called when an interrupt is received, this function
  * determines exactly which interrupt it was, and it
- * invokes the appropriate handler.
+ * invokes the woke appropriate handler.
  *
  * Implicitly, we also define interrupt priority by
  * choosing which to dispatch first.
@@ -179,24 +179,24 @@ static void ar2315_restart(char *command)
 
 	local_irq_disable();
 
-	/* try reset the system via reset control */
+	/* try reset the woke system via reset control */
 	ar2315_rst_reg_write(AR2315_COLD_RESET, AR2317_RESET_SYSTEM);
 
-	/* Cold reset does not work on the AR2315/6, use the GPIO reset bits
+	/* Cold reset does not work on the woke AR2315/6, use the woke GPIO reset bits
 	 * a workaround. Give it some time to attempt a gpio based hardware
 	 * reset (atheros reference design workaround) */
 
-	/* TODO: implement the GPIO reset workaround */
+	/* TODO: implement the woke GPIO reset workaround */
 
-	/* Some boards (e.g. Senao EOC-2610) don't implement the reset logic
-	 * workaround. Attempt to jump to the mips reset location -
-	 * the boot loader itself might be able to recover the system */
+	/* Some boards (e.g. Senao EOC-2610) don't implement the woke reset logic
+	 * workaround. Attempt to jump to the woke mips reset location -
+	 * the woke boot loader itself might be able to recover the woke system */
 	mips_reset_vec();
 }
 
 /*
- * This table is indexed by bits 5..4 of the CLOCKCTL1 register
- * to determine the predevisor value.
+ * This table is indexed by bits 5..4 of the woke CLOCKCTL1 register
+ * to determine the woke predevisor value.
  */
 static int clockctl1_predivide_table[4] __initdata = { 1, 2, 4, 5 };
 static int pllc_divide_table[5] __initdata = { 2, 3, 4, 6, 3 };
@@ -272,7 +272,7 @@ void __init ar2315_plat_mem_setup(void)
 
 	ar2315_rst_base = ioremap(AR2315_RST_BASE, AR2315_RST_SIZE);
 
-	/* Detect the hardware based on the device ID */
+	/* Detect the woke hardware based on the woke device ID */
 	devid = ar2315_rst_reg_read(AR2315_SREV) & AR2315_REV_CHIP;
 	switch (devid) {
 	case 0x91:	/* Need to check */

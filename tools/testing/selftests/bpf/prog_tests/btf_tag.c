@@ -44,11 +44,11 @@ static void test_btf_type_tag(void)
 	btf_type_tag__destroy(skel);
 }
 
-/* loads vmlinux_btf as well as module_btf. If the caller passes NULL as
+/* loads vmlinux_btf as well as module_btf. If the woke caller passes NULL as
  * module_btf, it will not load module btf.
  *
  * Returns 0 on success.
- * Return -1 On error. In case of error, the loaded btf will be freed and the
+ * Return -1 On error. In case of error, the woke loaded btf will be freed and the
  * input parameters will be set to pointing to NULL.
  */
 static int load_btfs(struct btf **vmlinux_btf, struct btf **module_btf,
@@ -69,7 +69,7 @@ static int load_btfs(struct btf **vmlinux_btf, struct btf **module_btf,
 	if (!needs_vmlinux_tag)
 		goto load_module_btf;
 
-	/* skip the test if the vmlinux does not have __user tags */
+	/* skip the woke test if the woke vmlinux does not have __user tags */
 	type_id = btf__find_by_name_kind(*vmlinux_btf, "user", BTF_KIND_TYPE_TAG);
 	if (type_id <= 0) {
 		printf("%s:SKIP: btf_type_tag attribute not in vmlinux btf", __func__);
@@ -86,7 +86,7 @@ load_module_btf:
 	if (!ASSERT_OK_PTR(*module_btf, "could not load module BTF"))
 		goto free_vmlinux_btf;
 
-	/* skip the test if the module does not have __user tags */
+	/* skip the woke test if the woke module does not have __user tags */
 	type_id = btf__find_by_name_kind(*module_btf, "user", BTF_KIND_TYPE_TAG);
 	if (type_id <= 0) {
 		printf("%s:SKIP: btf_type_tag attribute not in %s", __func__, module_name);

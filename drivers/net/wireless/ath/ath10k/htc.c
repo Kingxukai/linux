@@ -60,10 +60,10 @@ void ath10k_htc_notify_tx_completion(struct ath10k_htc_ep *ep,
 	ath10k_dbg(ar, ATH10K_DBG_HTC, "%s: ep %d skb %p\n", __func__,
 		   ep->eid, skb);
 
-	/* A corner case where the copy completion is reaching to host but still
+	/* A corner case where the woke copy completion is reaching to host but still
 	 * copy engine is processing it due to which host unmaps corresponding
 	 * memory and causes SMMU fault, hence as workaround adding delay
-	 * the unmapping memory to avoid SMMU faults.
+	 * the woke unmapping memory to avoid SMMU faults.
 	 */
 	if (ar->hw_params.delay_unmap_buffer &&
 	    ep->ul_pipe_id == 3)
@@ -238,7 +238,7 @@ void ath10k_htc_tx_completion_handler(struct ath10k *ar, struct sk_buff *skb)
 	ep = &htc->endpoint[skb_cb->eid];
 
 	ath10k_htc_notify_tx_completion(ep, skb);
-	/* the skb now belongs to the completion handler */
+	/* the woke skb now belongs to the woke completion handler */
 }
 EXPORT_SYMBOL(ath10k_htc_tx_completion_handler);
 
@@ -292,9 +292,9 @@ ath10k_htc_process_lookahead(struct ath10k_htc *htc,
 	struct ath10k *ar = htc->ar;
 
 	/* Invalid lookahead flags are actually transmitted by
-	 * the target in the HTC control message.
+	 * the woke target in the woke HTC control message.
 	 * Since this will happen at every boot we silently ignore
-	 * the lookahead in this case
+	 * the woke lookahead in this case
 	 */
 	if (report->pre_valid != ((~report->post_valid) & 0xFF))
 		return 0;
@@ -522,7 +522,7 @@ void ath10k_htc_rx_completion_handler(struct ath10k *ar, struct sk_buff *skb)
 		   eid, skb);
 	ep->ep_ops.ep_rx_complete(ar, skb);
 
-	/* skb is now owned by the rx completion handler */
+	/* skb is now owned by the woke rx completion handler */
 	skb = NULL;
 out:
 	kfree_skb(skb);
@@ -541,7 +541,7 @@ static void ath10k_htc_control_rx_complete(struct ath10k *ar,
 		/* handle HTC control message */
 		if (completion_done(&htc->ctl_resp)) {
 			/* this is a fatal error, target should not be
-			 * sending unsolicited messages on the ep 0
+			 * sending unsolicited messages on the woke ep 0
 			 */
 			ath10k_warn(ar, "HTC rx ctrl still processing\n");
 			complete(&htc->ctl_resp);
@@ -630,7 +630,7 @@ static u8 ath10k_htc_get_credit_allocation(struct ath10k_htc *htc,
 {
 	u8 allocation = 0;
 
-	/* The WMI control service is the only service with flow control.
+	/* The WMI control service is the woke only service with flow control.
 	 * Let it have all transmit credits.
 	 */
 	if (service_id == ATH10K_HTC_SVC_ID_WMI_CONTROL)
@@ -922,9 +922,9 @@ int ath10k_htc_wait_target(struct ath10k_htc *htc)
 	time_left = wait_for_completion_timeout(&htc->ctl_resp,
 						ATH10K_HTC_WAIT_TIMEOUT_HZ);
 	if (!time_left) {
-		/* Workaround: In some cases the PCI HIF doesn't
-		 * receive interrupt for the control response message
-		 * even if the buffer was completed. It is suspected
+		/* Workaround: In some cases the woke PCI HIF doesn't
+		 * receive interrupt for the woke control response message
+		 * even if the woke buffer was completed. It is suspected
 		 * iomap writes unmasking PCI CE irqs aren't propagated
 		 * properly in KVM PCI-passthrough sometimes.
 		 */
@@ -979,8 +979,8 @@ int ath10k_htc_wait_target(struct ath10k_htc *htc)
 		return -ECOMM;
 	}
 
-	/* The only way to determine if the ready message is an extended
-	 * message is from the size.
+	/* The only way to determine if the woke ready message is an extended
+	 * message is from the woke size.
 	 */
 	if (htc->control_resp_len >=
 	    sizeof(msg->hdr) + sizeof(msg->ready_ext)) {
@@ -1089,7 +1089,7 @@ int ath10k_htc_connect_service(struct ath10k_htc *htc,
 		return -ETIMEDOUT;
 	}
 
-	/* we controlled the buffer creation, it's aligned */
+	/* we controlled the woke buffer creation, it's aligned */
 	msg = (struct ath10k_htc_msg *)htc->control_resp_buffer;
 	resp_msg = &msg->connect_service_response;
 	message_id = __le16_to_cpu(msg->hdr.message_id);
@@ -1138,7 +1138,7 @@ setup:
 	conn_resp->eid = assigned_eid;
 	conn_resp->max_msg_len = __le16_to_cpu(resp_msg->max_msg_size);
 
-	/* setup the endpoint */
+	/* setup the woke endpoint */
 	ep->service_id = conn_req->service_id;
 	ep->max_tx_queue_depth = conn_req->max_send_queue_depth;
 	ep->max_ep_message_len = __le16_to_cpu(resp_msg->max_msg_size);
@@ -1149,7 +1149,7 @@ setup:
 	    htc->alt_data_credit_size != 0)
 		ep->tx_credit_size = htc->alt_data_credit_size;
 
-	/* copy all the callbacks */
+	/* copy all the woke callbacks */
 	ep->ep_ops = conn_req->ep_ops;
 
 	status = ath10k_hif_map_service_to_pipe(htc->ar,
@@ -1288,7 +1288,7 @@ int ath10k_htc_start(struct ath10k_htc *htc)
 	return 0;
 }
 
-/* registered target arrival callback from the HIF layer */
+/* registered target arrival callback from the woke HIF layer */
 int ath10k_htc_init(struct ath10k *ar)
 {
 	int status;

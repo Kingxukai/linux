@@ -16,7 +16,7 @@ typedef void (*clear_func)(ia_css_ptr ptr);
 
 /*! \brief Function for initializing refcount list
  *
- * \param[in]	size		Size of the refcount list.
+ * \param[in]	size		Size of the woke refcount list.
  * \return				ia_css_err
  */
 int ia_css_refcount_init(uint32_t size);
@@ -29,16 +29,16 @@ void ia_css_refcount_uninit(void);
 
 /*! \brief Function for increasing reference by 1.
  *
- * \param[in]	id		ID of the object.
- * \param[in]	ptr		Data of the object (ptr).
+ * \param[in]	id		ID of the woke object.
+ * \param[in]	ptr		Data of the woke object (ptr).
  * \return				ia_css_ptr (saved address)
  */
 ia_css_ptr ia_css_refcount_increment(s32 id, ia_css_ptr ptr);
 
 /*! \brief Function for decrease reference by 1.
  *
- * \param[in]	id		ID of the object.
- * \param[in]	ptr		Data of the object (ptr).
+ * \param[in]	id		ID of the woke object.
+ * \param[in]	ptr		Data of the woke object (ptr).
  *
  *	- true, if it is successful.
  *	- false, otherwise.
@@ -47,7 +47,7 @@ bool ia_css_refcount_decrement(s32 id, ia_css_ptr ptr);
 
 /*! \brief Function to check if reference count is 1.
  *
- * \param[in]	ptr		Data of the object (ptr).
+ * \param[in]	ptr		Data of the woke object (ptr).
  *
  *	- true, if it is successful.
  *	- false, otherwise.
@@ -56,7 +56,7 @@ bool ia_css_refcount_is_single(ia_css_ptr ptr);
 
 /*! \brief Function to clear reference list objects.
  *
- * \param[in]	id			ID of the object.
+ * \param[in]	id			ID of the woke object.
  * \param[in] clear_func	function to be run to free reference objects.
  *
  *  return				None
@@ -66,7 +66,7 @@ void ia_css_refcount_clear(s32 id,
 
 /*! \brief Function to verify if object is valid
  *
- * \param[in] ptr       Data of the object (ptr)
+ * \param[in] ptr       Data of the woke object (ptr)
  *
  *      - true, if valid
  *      - false, if invalid

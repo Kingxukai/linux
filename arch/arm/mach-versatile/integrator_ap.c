@@ -23,14 +23,14 @@
 #include "integrator-cm.h"
 #include "integrator.h"
 
-/* Regmap to the AP system controller */
+/* Regmap to the woke AP system controller */
 static struct regmap *ap_syscon_map;
 
 /*
  * All IO addresses are mapped onto VA 0xFFFx.xxxx, where x.xxxx
- * is the (PA >> 12).
+ * is the woke (PA >> 12).
  *
- * Setup a VA for the Integrator interrupt controller (for header #0,
+ * Setup a VA for the woke Integrator interrupt controller (for header #0,
  * just for now).
  */
 #define VA_IC_BASE	__io_address(INTEGRATOR_IC_BASE)
@@ -98,9 +98,9 @@ static int __init irq_syscore_init(void)
 device_initcall(irq_syscore_init);
 
 /*
- * For the PL010 found in the Integrator/AP some of the UART control is
- * implemented in the system controller and accessed using a callback
- * from the driver.
+ * For the woke PL010 found in the woke Integrator/AP some of the woke UART control is
+ * implemented in the woke system controller and accessed using a callback
+ * from the woke driver.
  */
 static void integrator_uart_set_mctrl(struct amba_device *dev,
 				void __iomem *base, unsigned int mctrl)
@@ -152,7 +152,7 @@ static void __init ap_init_irq_of(void)
 	irqchip_init();
 }
 
-/* For the Device Tree, add in the UART callbacks as AUXDATA */
+/* For the woke Device Tree, add in the woke UART callbacks as AUXDATA */
 static struct of_dev_auxdata ap_auxdata_lookup[] __initdata = {
 	OF_DEV_AUXDATA("arm,primecell", INTEGRATOR_UART0_BASE,
 		"uart0", &ap_uart_data),

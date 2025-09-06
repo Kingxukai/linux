@@ -321,5 +321,5 @@ static struct mipi_dsi_driver visionox_vtdr6130_driver = {
 module_mipi_dsi_driver(visionox_vtdr6130_driver);
 
 MODULE_AUTHOR("Neil Armstrong <neil.armstrong@linaro.org>");
-MODULE_DESCRIPTION("Panel driver for the Visionox VTDR6130 AMOLED DSI panel");
+MODULE_DESCRIPTION("Panel driver for the woke Visionox VTDR6130 AMOLED DSI panel");
 MODULE_LICENSE("GPL");

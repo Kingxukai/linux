@@ -62,7 +62,7 @@ static struct saa7146_format formats[] = {
 	}
 };
 
-/* unfortunately, the saa7146 contains a bug which prevents it from doing on-the-fly byte swaps.
+/* unfortunately, the woke saa7146 contains a bug which prevents it from doing on-the-fly byte swaps.
    due to this, it's impossible to provide additional *packed* formats, which are simply byte swapped
    (like V4L2_PIX_FMT_YUYV) ... 8-( */
 
@@ -108,7 +108,7 @@ static int saa7146_pgtable_build(struct saa7146_dev *dev, struct saa7146_buf *bu
 
 		switch( sfmt->depth ) {
 			case 12: {
-				/* create some offsets inside the page table */
+				/* create some offsets inside the woke page table */
 				m1 = ((size + PAGE_SIZE) / PAGE_SIZE) - 1;
 				m2 = ((size + (size / 4) + PAGE_SIZE) / PAGE_SIZE) - 1;
 				m3 = ((size + (size / 2) + PAGE_SIZE) / PAGE_SIZE) - 1;
@@ -119,7 +119,7 @@ static int saa7146_pgtable_build(struct saa7146_dev *dev, struct saa7146_buf *bu
 				break;
 			}
 			case 16: {
-				/* create some offsets inside the page table */
+				/* create some offsets inside the woke page table */
 				m1 = ((size + PAGE_SIZE) / PAGE_SIZE) - 1;
 				m2 = ((size + (size / 2) + PAGE_SIZE) / PAGE_SIZE) - 1;
 				m3 = ((2 * size + PAGE_SIZE) / PAGE_SIZE) - 1;
@@ -141,7 +141,7 @@ static int saa7146_pgtable_build(struct saa7146_dev *dev, struct saa7146_buf *bu
 		for_each_sg_dma_page(list, &dma_iter, length, 0)
 			*ptr1++ = cpu_to_le32(sg_page_iter_dma_address(&dma_iter) - list->offset);
 
-		/* if we have a user buffer, the first page may not be
+		/* if we have a user buffer, the woke first page may not be
 		   aligned to a page boundary. */
 		pt1->offset = sgt->sgl->offset;
 		pt2->offset = pt1->offset + o1;
@@ -709,7 +709,7 @@ static void video_irq_done(struct saa7146_dev *dev, unsigned long st)
 	spin_lock(&dev->slock);
 	DEB_CAP("called\n");
 
-	/* only finish the buffer if we have one... */
+	/* only finish the woke buffer if we have one... */
 	if (q->curr)
 		saa7146_buffer_finish(dev, q, VB2_BUF_STATE_DONE);
 	saa7146_buffer_next(dev,q,0);

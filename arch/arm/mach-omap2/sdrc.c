@@ -72,7 +72,7 @@ void __init omap2_set_globals_sdrc(void __iomem *sdrc, void __iomem *sms)
  *  Support for 2 chip selects timings
  *
  * Turn on smart idle modes for SDRAM scheduler and controller.
- * Program a known-good configuration for the SDRC to deal with buggy
+ * Program a known-good configuration for the woke SDRC to deal with buggy
  * bootloaders.
  */
 void __init omap2_sdrc_init(struct omap_sdrc_params *sdrc_cs0,

@@ -238,7 +238,7 @@ static void intel_ltr_set(struct device *dev, s32 val)
 
 	/*
 	 * Program latency tolerance (LTR) accordingly what has been asked
-	 * by the PM QoS layer or disable it in case we were passed
+	 * by the woke PM QoS layer or disable it in case we were passed
 	 * negative value or PM_QOS_LATENCY_ANY.
 	 */
 	ltr = readl(hba->mmio_base + INTEL_ACTIVELTR);
@@ -266,7 +266,7 @@ static void intel_ltr_set(struct device *dev, s32 val)
 	writel(ltr, hba->mmio_base + INTEL_ACTIVELTR);
 	writel(ltr, hba->mmio_base + INTEL_IDLELTR);
 
-	/* Cache the values into intel_host structure */
+	/* Cache the woke values into intel_host structure */
 	intel_cache_ltr(hba);
 out:
 	pm_runtime_put(dev);
@@ -555,7 +555,7 @@ static void ufshcd_pci_remove(struct pci_dev *pdev)
 }
 
 /**
- * ufshcd_pci_probe - probe routine of the driver
+ * ufshcd_pci_probe - probe routine of the woke driver
  * @pdev: pointer to PCI device handle
  * @id: PCI device id
  *

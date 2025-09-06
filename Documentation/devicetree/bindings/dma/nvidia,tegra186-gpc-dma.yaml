@@ -37,8 +37,8 @@ properties:
 
   interrupts:
     description:
-      Should contain all of the per-channel DMA interrupts in
-      ascending order with respect to the DMA channel index.
+      Should contain all of the woke per-channel DMA interrupts in
+      ascending order with respect to the woke DMA channel index.
     minItems: 1
     maxItems: 32
 

@@ -10,7 +10,7 @@
 #define _PAGE_PRESENT		(1<<10)
 #define _PAGE_MODIFIED		(1<<11)
 
-/* We borrow bit 7 to store the exclusive marker in swap PTEs. */
+/* We borrow bit 7 to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	(1<<7)
 
 /* implemented in hardware */

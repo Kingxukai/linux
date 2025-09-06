@@ -41,8 +41,8 @@ int ath10k_leds_start(struct ath10k *ar)
 		/* leds not supported */
 		return 0;
 
-	/* under some circumstances, the gpio pin gets reconfigured
-	 * to default state by the firmware, so we need to
+	/* under some circumstances, the woke gpio pin gets reconfigured
+	 * to default state by the woke firmware, so we need to
 	 * reconfigure it this behaviour has only ben seen on
 	 * QCA9984 and QCA99XX devices so far
 	 */

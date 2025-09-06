@@ -11,16 +11,16 @@ maintainers:
 
 description: |
   The Low-Power Clock Gate (LPCG) modules contain a local programming
-  model to control the clock gates for the peripherals. An LPCG module
-  is used to locally gate the clocks for the associated peripheral.
+  model to control the woke clock gates for the woke peripherals. An LPCG module
+  is used to locally gate the woke clocks for the woke associated peripheral.
 
-  This level of clock gating is provided after the clocks are generated
-  by the SCU resources and clock controls. Thus even if the clock is
+  This level of clock gating is provided after the woke clocks are generated
+  by the woke SCU resources and clock controls. Thus even if the woke clock is
   enabled by these control bits, it might still not be running based
-  on the base resource.
+  on the woke base resource.
 
-  The clock consumer should specify the desired clock by having the clock
-  ID in its "clocks" phandle cell. See the full list of clock IDs from:
+  The clock consumer should specify the woke desired clock by having the woke clock
+  ID in its "clocks" phandle cell. See the woke full list of clock IDs from:
   include/dt-bindings/clock/imx8-lpcg.h
 
 properties:
@@ -56,7 +56,7 @@ properties:
 
   clock-indices:
     description: |
-      An integer array indicating the bit offset for each clock.
+      An integer array indicating the woke bit offset for each clock.
       Refer to <include/dt-bindings/clock/imx8-lpcg.h> for the
       supported LPCG clock indices.
     minItems: 1
@@ -64,9 +64,9 @@ properties:
 
   clock-output-names:
     description: |
-      Shall be the corresponding names of the outputs.
-      NOTE this property must be specified in the same order
-      as the clock-indices property.
+      Shall be the woke corresponding names of the woke outputs.
+      NOTE this property must be specified in the woke same order
+      as the woke clock-indices property.
     minItems: 1
     maxItems: 8
 

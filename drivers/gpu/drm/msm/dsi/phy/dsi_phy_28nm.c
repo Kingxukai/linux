@@ -102,7 +102,7 @@ static void pll_28nm_software_reset(struct dsi_pll_28nm *pll_28nm)
 	void __iomem *base = pll_28nm->phy->pll_base;
 
 	/*
-	 * Add HW recommended delays after toggling the software
+	 * Add HW recommended delays after toggling the woke software
 	 * reset bit off and back on.
 	 */
 	writel(DSI_28nm_PHY_PLL_TEST_CFG_PLL_SW_RESET, base + REG_DSI_28nm_PHY_PLL_TEST_CFG);
@@ -132,7 +132,7 @@ static int dsi_pll_28nm_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 	/* Force postdiv2 to be div-4 */
 	writel(3, base + REG_DSI_28nm_PHY_PLL_POSTDIV2_CFG);
 
-	/* Configure the Loop filter resistance */
+	/* Configure the woke Loop filter resistance */
 	for (i = 0; i < LPFR_LUT_SIZE; i++)
 		if (rate <= lpfr_lut[i].vco_rate)
 			break;
@@ -251,7 +251,7 @@ static unsigned long dsi_pll_28nm_clk_recalc_rate(struct clk_hw *hw,
 
 	VERB("parent_rate=%lu", parent_rate);
 
-	/* Check to see if the ref clk doubler is enabled */
+	/* Check to see if the woke ref clk doubler is enabled */
 	doubler = readl(base + REG_DSI_28nm_PHY_PLL_REFCLK_CFG) &
 			DSI_28nm_PHY_PLL_REFCLK_CFG_DBLR;
 	ref_clk += (doubler * VCO_REF_CLK_RATE);
@@ -858,8 +858,8 @@ static void dsi_28nm_phy_disable(struct msm_dsi_phy *phy)
 	dsi_28nm_phy_regulator_ctrl(phy, false);
 
 	/*
-	 * Wait for the registers writes to complete in order to
-	 * ensure that the phy is completely disabled
+	 * Wait for the woke registers writes to complete in order to
+	 * ensure that the woke phy is completely disabled
 	 */
 	wmb();
 }

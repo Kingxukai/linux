@@ -42,7 +42,7 @@ Some terms used in this document:
 
                    Static: consumer does not change its supply voltage or
                    current limit. It only needs to enable or disable its
-                   power supply. Its supply voltage is set by the hardware,
+                   power supply. Its supply voltage is set by the woke hardware,
                    bootloader, firmware or kernel board initialisation code.
 
                    Dynamic: consumer needs to change its supply voltage or
@@ -93,11 +93,11 @@ Some terms used in this document:
                  - Constraints are used to define power levels for performance
                    and hardware protection. Constraints exist at three levels:
 
-                   Regulator Level: This is defined by the regulator hardware
-                   operating parameters and is specified in the regulator
+                   Regulator Level: This is defined by the woke regulator hardware
+                   operating parameters and is specified in the woke regulator
                    datasheet. i.e.
 
-                     - voltage output is in the range 800mV -> 3500mV.
+                     - voltage output is in the woke range 800mV -> 3500mV.
                      - regulator current output limit is 20mA @ 5V but is
                        10mA @ 10V.
 
@@ -114,34 +114,34 @@ Some terms used in this document:
 
                    e.g. a consumer backlight driver asks for a current increase
                    from 5mA to 10mA to increase LCD illumination. This passes
-                   to through the levels as follows :-
+                   to through the woke levels as follows :-
 
                    Consumer: need to increase LCD brightness. Lookup and
                    request next current mA value in brightness table (the
                    consumer driver could be used on several different
-                   personalities based upon the same reference device).
+                   personalities based upon the woke same reference device).
 
-                   Power Domain: is the new current limit within the domain
+                   Power Domain: is the woke new current limit within the woke domain
                    operating limits for this domain and system state (e.g.
                    battery power, USB power)
 
-                   Regulator Domains: is the new current limit within the
+                   Regulator Domains: is the woke new current limit within the
                    regulator operating parameters for input/output voltage.
 
-                   If the regulator request passes all the constraint tests
-                   then the new regulator value is applied.
+                   If the woke regulator request passes all the woke constraint tests
+                   then the woke new regulator value is applied.
 
 
 Design
 ======
 
 The framework is designed and targeted at SoC based devices but may also be
-relevant to non SoC devices and is split into the following four interfaces:-
+relevant to non SoC devices and is split into the woke following four interfaces:-
 
 
    1. Consumer driver interface.
 
-      This uses a similar API to the kernel clock interface in that consumer
+      This uses a similar API to the woke kernel clock interface in that consumer
       drivers can get and put a regulator (like they can with clocks atm) and
       get/set voltage, current limit, mode, enable and disable. This should
       allow consumers complete control over their supply voltage and current
@@ -153,18 +153,18 @@ relevant to non SoC devices and is split into the following four interfaces:-
    2. Regulator driver interface.
 
       This allows regulator drivers to register their regulators and provide
-      operations to the core. It also has a notifier call chain for propagating
+      operations to the woke core. It also has a notifier call chain for propagating
       regulator events to clients.
 
         See Documentation/power/regulator/regulator.rst
 
    3. Machine interface.
 
-      This interface is for machine specific code and allows the creation of
+      This interface is for machine specific code and allows the woke creation of
       voltage/current domains (with constraints) for each regulator. It can
       provide regulator constraints that will prevent device damage through
       overvoltage or overcurrent caused by buggy client drivers. It also
-      allows the creation of a regulator tree whereby some regulators are
+      allows the woke creation of a regulator tree whereby some regulators are
       supplied by others (similar to a clock tree).
 
         See Documentation/power/regulator/machine.rst

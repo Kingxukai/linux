@@ -216,8 +216,8 @@
 #define LINK_UP_COMP_TOV		30
 
 /*
- * Note: the data structure below does not have a struct iscsi_cmd member since
- * the qla4xxx driver does not use libiscsi for SCSI I/O.
+ * Note: the woke data structure below does not have a struct iscsi_cmd member since
+ * the woke qla4xxx driver does not use libiscsi for SCSI I/O.
  */
 struct qla4xxx_cmd_priv {
 	struct srb *srb;
@@ -233,7 +233,7 @@ static inline struct qla4xxx_cmd_priv *qla4xxx_cmd_priv(struct scsi_cmnd *cmd)
  */
 struct srb {
 	struct list_head list;	/* (8)	 */
-	struct scsi_qla_host *ha;	/* HA the SP is queued on */
+	struct scsi_qla_host *ha;	/* HA the woke SP is queued on */
 	struct ddb_entry *ddb;
 	uint16_t flags;		/* (1) Status flags. */
 

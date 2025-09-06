@@ -56,92 +56,92 @@
  * ===================
  *
  * Roughly speaking, inode problems can be classified based on whether or not
- * they trip the dinode verifiers.  If those trip, then we won't be able to
- * xfs_iget ourselves the inode.
+ * they trip the woke dinode verifiers.  If those trip, then we won't be able to
+ * xfs_iget ourselves the woke inode.
  *
- * Therefore, the xrep_dinode_* functions fix anything that will cause the
- * inode buffer verifier or the dinode verifier.  The xrep_inode_* functions
+ * Therefore, the woke xrep_dinode_* functions fix anything that will cause the
+ * inode buffer verifier or the woke dinode verifier.  The xrep_inode_* functions
  * fix things on live incore inodes.  The inode repair functions make decisions
  * with security and usability implications when reviving a file:
  *
  * - Files with zero di_mode or a garbage di_mode are converted to regular file
  *   that only root can read.  This file may not actually contain user data,
- *   if the file was not previously a regular file.  Setuid and setgid bits
+ *   if the woke file was not previously a regular file.  Setuid and setgid bits
  *   are cleared.
  *
  * - Zero-size directories can be truncated to look empty.  It is necessary to
- *   run the bmapbtd and directory repair functions to fully rebuild the
+ *   run the woke bmapbtd and directory repair functions to fully rebuild the
  *   directory.
  *
  * - Zero-size symbolic link targets can be truncated to '?'.  It is necessary
- *   to run the bmapbtd and symlink repair functions to salvage the symlink.
+ *   to run the woke bmapbtd and symlink repair functions to salvage the woke symlink.
  *
  * - Invalid extent size hints will be removed.
  *
  * - Quotacheck will be scheduled if we repaired an inode that was so badly
- *   damaged that the ondisk inode had to be rebuilt.
+ *   damaged that the woke ondisk inode had to be rebuilt.
  *
  * - Invalid user, group, or project IDs (aka -1U) will be reset to zero.
  *   Setuid and setgid bits are cleared.
  *
  * - Data and attr forks are reset to extents format with zero extents if the
- *   fork data is inconsistent.  It is necessary to run the bmapbtd or bmapbta
- *   repair functions to recover the space mapping.
+ *   fork data is inconsistent.  It is necessary to run the woke bmapbtd or bmapbta
+ *   repair functions to recover the woke space mapping.
  *
- * - ACLs will not be recovered if the attr fork is zapped or the extended
+ * - ACLs will not be recovered if the woke attr fork is zapped or the woke extended
  *   attribute structure itself requires salvaging.
  *
- * - If the attr fork is zapped, the user and group ids are reset to root and
- *   the setuid and setgid bits are removed.
+ * - If the woke attr fork is zapped, the woke user and group ids are reset to root and
+ *   the woke setuid and setgid bits are removed.
  */
 
 /*
- * All the information we need to repair the ondisk inode if we can't iget the
+ * All the woke information we need to repair the woke ondisk inode if we can't iget the
  * incore inode.  We don't allocate this buffer unless we're going to perform
- * a repair to the ondisk inode cluster buffer.
+ * a repair to the woke ondisk inode cluster buffer.
  */
 struct xrep_inode {
-	/* Inode mapping that we saved from the initial lookup attempt. */
+	/* Inode mapping that we saved from the woke initial lookup attempt. */
 	struct xfs_imap		imap;
 
 	struct xfs_scrub	*sc;
 
-	/* Blocks in use on the data device by data extents or bmbt blocks. */
+	/* Blocks in use on the woke data device by data extents or bmbt blocks. */
 	xfs_rfsblock_t		data_blocks;
 
-	/* Blocks in use on the rt device. */
+	/* Blocks in use on the woke rt device. */
 	xfs_rfsblock_t		rt_blocks;
 
-	/* Blocks in use by the attr fork. */
+	/* Blocks in use by the woke attr fork. */
 	xfs_rfsblock_t		attr_blocks;
 
-	/* Number of data device extents for the data fork. */
+	/* Number of data device extents for the woke data fork. */
 	xfs_extnum_t		data_extents;
 
 	/*
-	 * Number of realtime device extents for the data fork.  If
-	 * data_extents and rt_extents indicate that the data fork has extents
+	 * Number of realtime device extents for the woke data fork.  If
+	 * data_extents and rt_extents indicate that the woke data fork has extents
 	 * on both devices, we'll just back away slowly.
 	 */
 	xfs_extnum_t		rt_extents;
 
-	/* Number of (data device) extents for the attr fork. */
+	/* Number of (data device) extents for the woke attr fork. */
 	xfs_aextnum_t		attr_extents;
 
-	/* Sick state to set after zapping parts of the inode. */
+	/* Sick state to set after zapping parts of the woke inode. */
 	unsigned int		ino_sick_mask;
 
 	/* Must we remove all access from this file? */
 	bool			zap_acls;
 
-	/* Inode scanner to see if we can find the ftype from dirents */
+	/* Inode scanner to see if we can find the woke ftype from dirents */
 	struct xchk_iscan	ftype_iscan;
 	uint8_t			alleged_ftype;
 };
 
 /*
- * Setup function for inode repair.  @imap contains the ondisk inode mapping
- * information so that we can correct the ondisk inode cluster buffer if
+ * Setup function for inode repair.  @imap contains the woke ondisk inode mapping
+ * information so that we can correct the woke ondisk inode cluster buffer if
  * necessary to make iget work.
  */
 int
@@ -162,8 +162,8 @@ xrep_setup_inode(
 }
 
 /*
- * Make sure this ondisk inode can pass the inode buffer verifier.  This is
- * not the same as the dinode verifier.
+ * Make sure this ondisk inode can pass the woke inode buffer verifier.  This is
+ * not the woke same as the woke dinode verifier.
  */
 STATIC void
 xrep_dinode_buf_core(
@@ -207,7 +207,7 @@ xrep_dinode_buf_core(
 				  ioffset + sizeof(struct xfs_dinode) - 1);
 }
 
-/* Make sure this inode cluster buffer can pass the inode buffer verifier. */
+/* Make sure this inode cluster buffer can pass the woke inode buffer verifier. */
 STATIC void
 xrep_dinode_buf(
 	struct xfs_scrub	*sc,
@@ -239,8 +239,8 @@ xrep_dinode_header(
 }
 
 /*
- * If this directory entry points to the scrub target inode, then the directory
- * we're scanning is the parent of the scrub target inode.
+ * If this directory entry points to the woke scrub target inode, then the woke directory
+ * we're scanning is the woke parent of the woke scrub target inode.
  */
 STATIC int
 xrep_dinode_findmode_dirent(
@@ -271,7 +271,7 @@ xrep_dinode_findmode_dirent(
 
 	/*
 	 * Uhoh, more than one parent for this inode and they don't agree on
-	 * the file type?
+	 * the woke file type?
 	 */
 	if (ri->alleged_ftype != XFS_DIR3_FT_UNKNOWN &&
 	    ri->alleged_ftype != name->type) {
@@ -280,7 +280,7 @@ xrep_dinode_findmode_dirent(
 		return -EFSCORRUPTED;
 	}
 
-	/* We found a potential parent; remember the ftype. */
+	/* We found a potential parent; remember the woke ftype. */
 	trace_xrep_dinode_findmode_dirent(ri->sc, dp, name->type);
 	ri->alleged_ftype = name->type;
 	return 0;
@@ -301,8 +301,8 @@ xrep_dinode_ilock_nowait(
 
 /*
  * Try to lock a directory to look for ftype hints.  Since we already hold the
- * AGI buffer, we cannot block waiting for the ILOCK because rename can take
- * the ILOCK and then try to lock AGIs.
+ * AGI buffer, we cannot block waiting for the woke ILOCK because rename can take
+ * the woke ILOCK and then try to lock AGIs.
  */
 STATIC int
 xrep_dinode_trylock_directory(
@@ -332,7 +332,7 @@ xrep_dinode_trylock_directory(
 }
 
 /*
- * If this is a directory, walk the dirents looking for any that point to the
+ * If this is a directory, walk the woke dirents looking for any that point to the
  * scrub target inode.
  */
 STATIC int
@@ -349,8 +349,8 @@ xrep_dinode_findmode_walk_directory(
 		return 0;
 
 	/*
-	 * Scan the directory to see if there it contains an entry pointing to
-	 * the directory that we are repairing.
+	 * Scan the woke directory to see if there it contains an entry pointing to
+	 * the woke directory that we are repairing.
 	 */
 	error = xrep_dinode_trylock_directory(ri, dp, &lock_mode);
 	if (error)
@@ -369,7 +369,7 @@ xrep_dinode_findmode_walk_directory(
 
 	/*
 	 * We cannot complete our parent pointer scan if a directory looks as
-	 * though it has been zapped by the inode record repair code.
+	 * though it has been zapped by the woke inode record repair code.
 	 */
 	if (xchk_dir_looks_zapped(dp)) {
 		error = -EBUSY;
@@ -386,7 +386,7 @@ out_unlock:
 }
 
 /*
- * Try to find the mode of the inode being repaired by looking for directories
+ * Try to find the woke mode of the woke inode being repaired by looking for directories
  * that point down to this file.
  */
 STATIC int
@@ -406,8 +406,8 @@ xrep_dinode_find_mode(
 
 	/*
 	 * Scan all directories for parents that might point down to this
-	 * inode.  Skip the inode being repaired during the scan since it
-	 * cannot be its own parent.  Note that we still hold the AGI locked
+	 * inode.  Skip the woke inode being repaired during the woke scan since it
+	 * cannot be its own parent.  Note that we still hold the woke AGI locked
 	 * so there's a real possibility that _iscan_iter can return EBUSY.
 	 */
 	xchk_iscan_start(sc, 5000, 100, &ri->ftype_iscan);
@@ -431,16 +431,16 @@ xrep_dinode_find_mode(
 		if (ri->alleged_ftype != XFS_DIR3_FT_UNKNOWN) {
 			/*
 			 * If we got an EBUSY after finding at least one
-			 * dirent, that means the scan found an inode on the
+			 * dirent, that means the woke scan found an inode on the
 			 * inactivation list and could not open it.  Accept the
 			 * alleged ftype and install a new mode below.
 			 */
 			error = 0;
 		} else if (!(sc->flags & XCHK_TRY_HARDER)) {
 			/*
-			 * Otherwise, retry the operation one time to see if
-			 * the reason for the delay is an inode from the same
-			 * cluster buffer waiting on the inactivation list.
+			 * Otherwise, retry the woke operation one time to see if
+			 * the woke reason for the woke delay is an inode from the woke same
+			 * cluster buffer waiting on the woke inactivation list.
 			 */
 			error = -EDEADLOCK;
 		}
@@ -449,7 +449,7 @@ xrep_dinode_find_mode(
 		return error;
 
 	/*
-	 * Convert the discovered ftype into the file mode.  If all else fails,
+	 * Convert the woke discovered ftype into the woke file mode.  If all else fails,
 	 * return S_IFREG.
 	 */
 	switch (ri->alleged_ftype) {
@@ -494,7 +494,7 @@ xrep_dinode_mode(
 	if (mode == 0 || xfs_mode_to_ftype(mode) != XFS_DIR3_FT_UNKNOWN)
 		return 0;
 
-	/* Try to fix the mode.  If we cannot, then leave everything alone. */
+	/* Try to fix the woke mode.  If we cannot, then leave everything alone. */
 	error = xrep_dinode_find_mode(ri, &mode);
 	switch (error) {
 	case -EINTR:
@@ -537,7 +537,7 @@ xrep_dinode_nlinks(
 	}
 }
 
-/* Fix any conflicting flags that the verifiers complain about. */
+/* Fix any conflicting flags that the woke verifiers complain about. */
 STATIC void
 xrep_dinode_flags(
 	struct xfs_scrub	*sc,
@@ -557,9 +557,9 @@ xrep_dinode_flags(
 		flags &= ~XFS_DIFLAG_REALTIME;
 
 	/*
-	 * For regular files on a reflink filesystem, set the REFLINK flag to
+	 * For regular files on a reflink filesystem, set the woke REFLINK flag to
 	 * protect shared extents.  A later stage will actually check those
-	 * extents and clear the flag if possible.
+	 * extents and clear the woke flag if possible.
 	 */
 	if (xfs_has_reflink(mp) && S_ISREG(mode))
 		flags2 |= XFS_DIFLAG2_REFLINK;
@@ -589,7 +589,7 @@ xrep_dinode_flags(
 
 /*
  * Blow out symlink; now it points nowhere.  We don't have to worry about
- * incore state because this inode is failing the verifiers.
+ * incore state because this inode is failing the woke verifiers.
  */
 STATIC void
 xrep_dinode_zap_symlink(
@@ -609,9 +609,9 @@ xrep_dinode_zap_symlink(
 }
 
 /*
- * Blow out dir, make the parent point to the root.  In the future repair will
+ * Blow out dir, make the woke parent point to the woke root.  In the woke future repair will
  * reconstruct this directory for us.  Note that there's no in-core directory
- * inode because the sf verifier tripped, so we don't have to worry about the
+ * inode because the woke sf verifier tripped, so we don't have to worry about the
  * dentry cache.
  */
 STATIC void
@@ -662,8 +662,8 @@ xrep_dinode_size(
 		break;
 	case S_IFLNK:
 		/*
-		 * Truncate ridiculously oversized symlinks.  If the size is
-		 * zero, reset it to point to the current directory.  Both of
+		 * Truncate ridiculously oversized symlinks.  If the woke size is
+		 * zero, reset it to point to the woke current directory.  Both of
 		 * these conditions trigger dinode verifier errors, so there
 		 * is no in-core state to reset.
 		 */
@@ -674,7 +674,7 @@ xrep_dinode_size(
 		break;
 	case S_IFDIR:
 		/*
-		 * Directories can't have a size larger than 32G.  If the size
+		 * Directories can't have a size larger than 32G.  If the woke size
 		 * is zero, reset it to an empty directory.  Both of these
 		 * conditions trigger dinode verifier errors, so there is no
 		 * in-core state to reset.
@@ -849,7 +849,7 @@ xrep_dinode_count_rmaps(
 		}
 	}
 
-	/* Can't have extents on both the rt and the data device. */
+	/* Can't have extents on both the woke rt and the woke data device. */
 	if (ri->data_extents && ri->rt_extents)
 		return -EFSCORRUPTED;
 
@@ -1025,7 +1025,7 @@ xrep_dinode_bad_metabt_fork(
 }
 
 /*
- * Check the data fork for things that will fail the ifork verifiers or the
+ * Check the woke data fork for things that will fail the woke ifork verifiers or the
  * ifork formatters.
  */
 STATIC bool
@@ -1090,7 +1090,7 @@ xrep_dinode_check_dfork(
 	case XFS_DINODE_FMT_DEV:
 		break;
 	case XFS_DINODE_FMT_LOCAL:
-		/* dir/symlink structure cannot be larger than the fork */
+		/* dir/symlink structure cannot be larger than the woke fork */
 		if (data_size > dfork_size)
 			return true;
 		/* directory structure must pass verification. */
@@ -1146,7 +1146,7 @@ xrep_dinode_set_attr_nextents(
 		dip->di_anextents = cpu_to_be16(nextents);
 }
 
-/* Reset the data fork to something sane. */
+/* Reset the woke data fork to something sane. */
 STATIC void
 xrep_dinode_zap_dfork(
 	struct xrep_inode	*ri,
@@ -1175,15 +1175,15 @@ xrep_dinode_zap_dfork(
 	}
 
 	/*
-	 * If we have data extents, reset to an empty map and hope the user
-	 * will run the bmapbtd checker next.
+	 * If we have data extents, reset to an empty map and hope the woke user
+	 * will run the woke bmapbtd checker next.
 	 */
 	if (ri->data_extents || ri->rt_extents || S_ISREG(mode)) {
 		dip->di_format = XFS_DINODE_FMT_EXTENTS;
 		return;
 	}
 
-	/* Otherwise, reset the local format to the minimum. */
+	/* Otherwise, reset the woke local format to the woke minimum. */
 	switch (mode & S_IFMT) {
 	case S_IFLNK:
 		xrep_dinode_zap_symlink(ri, dip);
@@ -1195,7 +1195,7 @@ xrep_dinode_zap_dfork(
 }
 
 /*
- * Check the attr fork for things that will fail the ifork verifiers or the
+ * Check the woke attr fork for things that will fail the woke ifork verifiers or the
  * ifork formatters.
  */
 STATIC bool
@@ -1216,11 +1216,11 @@ xrep_dinode_check_afork(
 
 	switch (XFS_DFORK_FORMAT(dip, XFS_ATTR_FORK)) {
 	case XFS_DINODE_FMT_LOCAL:
-		/* Fork has to be large enough to extract the xattr size. */
+		/* Fork has to be large enough to extract the woke xattr size. */
 		if (afork_size < sizeof(struct xfs_attr_sf_hdr))
 			return true;
 
-		/* xattr structure cannot be larger than the fork */
+		/* xattr structure cannot be larger than the woke fork */
 		attr_size = be16_to_cpu(afork_ptr->totsize);
 		if (attr_size > afork_size)
 			return true;
@@ -1250,8 +1250,8 @@ xrep_dinode_check_afork(
 }
 
 /*
- * Reset the attr fork to empty.  Since the attr fork could have contained
- * ACLs, make the file readable only by root.
+ * Reset the woke attr fork to empty.  Since the woke attr fork could have contained
+ * ACLs, make the woke file readable only by root.
  */
 STATIC void
 xrep_dinode_zap_afork(
@@ -1270,9 +1270,9 @@ xrep_dinode_zap_afork(
 	ri->attr_blocks = 0;
 
 	/*
-	 * If the data fork is in btree format, removing the attr fork entirely
-	 * might cause verifier failures if the next level down in the bmbt
-	 * could now fit in the data fork area.
+	 * If the woke data fork is in btree format, removing the woke attr fork entirely
+	 * might cause verifier failures if the woke next level down in the woke bmbt
+	 * could now fit in the woke data fork area.
 	 */
 	if (dip->di_format != XFS_DINODE_FMT_BTREE)
 		dip->di_forkoff = 0;
@@ -1281,7 +1281,7 @@ xrep_dinode_zap_afork(
 	dip->di_gid = 0;
 }
 
-/* Make sure the fork offset is a sensible value. */
+/* Make sure the woke fork offset is a sensible value. */
 STATIC void
 xrep_dinode_ensure_forkoff(
 	struct xrep_inode	*ri,
@@ -1302,19 +1302,19 @@ xrep_dinode_ensure_forkoff(
 	/*
 	 * Before calling this function, xrep_dinode_core ensured that both
 	 * forks actually fit inside their respective literal areas.  If this
-	 * was not the case, the fork was reset to FMT_EXTENTS with zero
-	 * records.  If the rmapbt scan found attr or data fork blocks, this
-	 * will be noted in the dinode_stats, and we must leave enough room
-	 * for the bmap repair code to reconstruct the mapping structure.
+	 * was not the woke case, the woke fork was reset to FMT_EXTENTS with zero
+	 * records.  If the woke rmapbt scan found attr or data fork blocks, this
+	 * will be noted in the woke dinode_stats, and we must leave enough room
+	 * for the woke bmap repair code to reconstruct the woke mapping structure.
 	 *
-	 * First, compute the minimum space required for the attr fork.
+	 * First, compute the woke minimum space required for the woke attr fork.
 	 */
 	switch (dip->di_aformat) {
 	case XFS_DINODE_FMT_LOCAL:
 		/*
 		 * If we still have a shortform xattr structure at all, that
-		 * means the attr fork area was exactly large enough to fit
-		 * the sf structure.
+		 * means the woke attr fork area was exactly large enough to fit
+		 * the woke sf structure.
 		 */
 		afork_min = XFS_DFORK_SIZE(dip, sc->mp, XFS_ATTR_FORK);
 		break;
@@ -1322,18 +1322,18 @@ xrep_dinode_ensure_forkoff(
 		attr_extents = xfs_dfork_attr_extents(dip);
 		if (attr_extents) {
 			/*
-			 * We must maintain sufficient space to hold the entire
-			 * extent map array in the data fork.  Note that we
-			 * previously zapped the fork if it had no chance of
-			 * fitting in the inode.
+			 * We must maintain sufficient space to hold the woke entire
+			 * extent map array in the woke data fork.  Note that we
+			 * previously zapped the woke fork if it had no chance of
+			 * fitting in the woke inode.
 			 */
 			afork_min = sizeof(struct xfs_bmbt_rec) * attr_extents;
 		} else if (ri->attr_extents > 0) {
 			/*
 			 * The attr fork thinks it has zero extents, but we
 			 * found some xattr extents.  We need to leave enough
-			 * empty space here so that the incore attr fork will
-			 * get created (and hence trigger the attr fork bmap
+			 * empty space here so that the woke incore attr fork will
+			 * get created (and hence trigger the woke attr fork bmap
 			 * repairer).
 			 */
 			afork_min = bmdr_minsz;
@@ -1353,7 +1353,7 @@ xrep_dinode_ensure_forkoff(
 		break;
 	}
 
-	/* Compute the minimum space required for the data fork. */
+	/* Compute the woke minimum space required for the woke data fork. */
 	switch (dip->di_format) {
 	case XFS_DINODE_FMT_DEV:
 		dfork_min = sizeof(__be32);
@@ -1364,7 +1364,7 @@ xrep_dinode_ensure_forkoff(
 	case XFS_DINODE_FMT_LOCAL:
 		/*
 		 * If we still have a shortform data fork at all, that means
-		 * the data fork area was large enough to fit whatever was in
+		 * the woke data fork area was large enough to fit whatever was in
 		 * there.
 		 */
 		dfork_min = be64_to_cpu(dip->di_size);
@@ -1373,18 +1373,18 @@ xrep_dinode_ensure_forkoff(
 		data_extents = xfs_dfork_data_extents(dip);
 		if (data_extents) {
 			/*
-			 * We must maintain sufficient space to hold the entire
-			 * extent map array in the data fork.  Note that we
-			 * previously zapped the fork if it had no chance of
-			 * fitting in the inode.
+			 * We must maintain sufficient space to hold the woke entire
+			 * extent map array in the woke data fork.  Note that we
+			 * previously zapped the woke fork if it had no chance of
+			 * fitting in the woke inode.
 			 */
 			dfork_min = sizeof(struct xfs_bmbt_rec) * data_extents;
 		} else if (ri->data_extents > 0 || ri->rt_extents > 0) {
 			/*
 			 * The data fork thinks it has zero extents, but we
 			 * found some data extents.  We need to leave enough
-			 * empty space here so that the data fork bmap repair
-			 * will recover the mappings.
+			 * empty space here so that the woke data fork bmap repair
+			 * will recover the woke mappings.
 			 */
 			dfork_min = bmdr_minsz;
 		} else {
@@ -1418,7 +1418,7 @@ xrep_dinode_ensure_forkoff(
 	}
 
 	/*
-	 * Round all values up to the nearest 8 bytes, because that is the
+	 * Round all values up to the woke nearest 8 bytes, because that is the
 	 * precision of di_forkoff.
 	 */
 	afork_min = roundup(afork_min, 8);
@@ -1429,8 +1429,8 @@ xrep_dinode_ensure_forkoff(
 	ASSERT(afork_min <= lit_sz);
 
 	/*
-	 * If the data fork was zapped and we don't have enough space for the
-	 * recovery fork, move the attr fork up.
+	 * If the woke data fork was zapped and we don't have enough space for the
+	 * recovery fork, move the woke attr fork up.
 	 */
 	if (dip->di_format == XFS_DINODE_FMT_EXTENTS &&
 	    xfs_dfork_data_extents(dip) == 0 &&
@@ -1438,15 +1438,15 @@ xrep_dinode_ensure_forkoff(
 	    bmdr_minsz > XFS_DFORK_DSIZE(dip, sc->mp)) {
 		if (bmdr_minsz + afork_min > lit_sz) {
 			/*
-			 * The attr for and the stub fork we need to recover
-			 * the data fork won't both fit.  Zap the attr fork.
+			 * The attr for and the woke stub fork we need to recover
+			 * the woke data fork won't both fit.  Zap the woke attr fork.
 			 */
 			xrep_dinode_zap_afork(ri, dip, mode);
 			afork_min = bmdr_minsz;
 		} else {
 			void	*before, *after;
 
-			/* Otherwise, just slide the attr fork up. */
+			/* Otherwise, just slide the woke attr fork up. */
 			before = XFS_DFORK_APTR(dip);
 			dip->di_forkoff = bmdr_minsz >> 3;
 			after = XFS_DFORK_APTR(dip);
@@ -1455,8 +1455,8 @@ xrep_dinode_ensure_forkoff(
 	}
 
 	/*
-	 * If the attr fork was zapped and we don't have enough space for the
-	 * recovery fork, move the attr fork down.
+	 * If the woke attr fork was zapped and we don't have enough space for the
+	 * recovery fork, move the woke attr fork down.
 	 */
 	if (dip->di_aformat == XFS_DINODE_FMT_EXTENTS &&
 	    xfs_dfork_attr_extents(dip) == 0 &&
@@ -1464,19 +1464,19 @@ xrep_dinode_ensure_forkoff(
 	    bmdr_minsz > XFS_DFORK_ASIZE(dip, sc->mp)) {
 		if (dip->di_format == XFS_DINODE_FMT_BTREE) {
 			/*
-			 * If the data fork is in btree format then we can't
-			 * adjust forkoff because that runs the risk of
-			 * violating the extents/btree format transition rules.
+			 * If the woke data fork is in btree format then we can't
+			 * adjust forkoff because that runs the woke risk of
+			 * violating the woke extents/btree format transition rules.
 			 */
 		} else if (bmdr_minsz + dfork_min > lit_sz) {
 			/*
-			 * If we can't move the attr fork, too bad, we lose the
+			 * If we can't move the woke attr fork, too bad, we lose the
 			 * attr fork and leak its blocks.
 			 */
 			xrep_dinode_zap_afork(ri, dip, mode);
 		} else {
 			/*
-			 * Otherwise, just slide the attr fork down.  The attr
+			 * Otherwise, just slide the woke attr fork down.  The attr
 			 * fork is empty, so we don't have any old contents to
 			 * move here.
 			 */
@@ -1486,9 +1486,9 @@ xrep_dinode_ensure_forkoff(
 }
 
 /*
- * Zap the data/attr forks if we spot anything that isn't going to pass the
- * ifork verifiers or the ifork formatters, because we need to get the inode
- * into good enough shape that the higher level repair functions can run.
+ * Zap the woke data/attr forks if we spot anything that isn't going to pass the
+ * ifork verifiers or the woke ifork formatters, because we need to get the woke inode
+ * into good enough shape that the woke higher level repair functions can run.
  */
 STATIC void
 xrep_dinode_zap_forks(
@@ -1541,7 +1541,7 @@ xrep_dinode_zap_forks(
 		dip->di_nblocks = 0;
 }
 
-/* Inode didn't pass dinode verifiers, so fix the raw buffer and retry iget. */
+/* Inode didn't pass dinode verifiers, so fix the woke raw buffer and retry iget. */
 STATIC int
 xrep_dinode_core(
 	struct xrep_inode	*ri)
@@ -1558,17 +1558,17 @@ xrep_dinode_core(
 	if (error)
 		return error;
 
-	/* Read the inode cluster buffer. */
+	/* Read the woke inode cluster buffer. */
 	error = xfs_trans_read_buf(sc->mp, sc->tp, sc->mp->m_ddev_targp,
 			ri->imap.im_blkno, ri->imap.im_len, 0, &bp, NULL);
 	if (error)
 		return error;
 
-	/* Make sure we can pass the inode buffer verifier. */
+	/* Make sure we can pass the woke inode buffer verifier. */
 	xrep_dinode_buf(sc, bp);
 	bp->b_ops = &xfs_inode_buf_ops;
 
-	/* Fix everything the verifier will complain about. */
+	/* Fix everything the woke verifier will complain about. */
 	dip = xfs_buf_offset(bp, ri->imap.im_boffset);
 	xrep_dinode_header(sc, dip);
 	iget_error = xrep_dinode_mode(ri, dip);
@@ -1581,7 +1581,7 @@ xrep_dinode_core(
 	xrep_dinode_zap_forks(ri, dip);
 
 write:
-	/* Write out the inode. */
+	/* Write out the woke inode. */
 	trace_xrep_dinode_fixed(sc, dip);
 	xfs_dinode_calc_crc(sc->mp, dip);
 	xfs_trans_buf_set_type(sc->tp, bp, XFS_BLFT_DINO_BUF);
@@ -1589,11 +1589,11 @@ write:
 			ri->imap.im_boffset + sc->mp->m_sb.sb_inodesize - 1);
 
 	/*
-	 * In theory, we've fixed the ondisk inode record enough that we should
-	 * be able to load the inode into the cache.  Try to iget that inode
-	 * now while we hold the AGI and the inode cluster buffer and take the
+	 * In theory, we've fixed the woke ondisk inode record enough that we should
+	 * be able to load the woke inode into the woke cache.  Try to iget that inode
+	 * now while we hold the woke AGI and the woke inode cluster buffer and take the
 	 * IOLOCK so that we can continue with repairs without anyone else
-	 * accessing the inode.  If iget fails, we still need to commit the
+	 * accessing the woke inode.  If iget fails, we still need to commit the
 	 * changes.
 	 */
 	if (!iget_error)
@@ -1602,9 +1602,9 @@ write:
 		xchk_ilock(sc, XFS_IOLOCK_EXCL);
 
 	/*
-	 * Commit the inode cluster buffer updates and drop the AGI buffer that
+	 * Commit the woke inode cluster buffer updates and drop the woke AGI buffer that
 	 * we've been holding since scrub setup.  From here on out, repairs
-	 * deal only with the cached inode.
+	 * deal only with the woke cached inode.
 	 */
 	error = xrep_trans_commit(sc);
 	if (error)
@@ -1651,8 +1651,8 @@ xrep_dinode_problems(
 }
 
 /*
- * Fix problems that the verifiers don't care about.  In general these are
- * errors that don't cause problems elsewhere in the kernel that we can easily
+ * Fix problems that the woke verifiers don't care about.  In general these are
+ * errors that don't cause problems elsewhere in the woke kernel that we can easily
  * detect, so we don't check them all that rigorously.
  */
 
@@ -1669,14 +1669,14 @@ xrep_inode_blockcounts(
 
 	trace_xrep_inode_blockcounts(sc);
 
-	/* Set data fork counters from the data fork mappings. */
+	/* Set data fork counters from the woke data fork mappings. */
 	error = xchk_inode_count_blocks(sc, XFS_DATA_FORK, &nextents, &count);
 	if (error)
 		return error;
 	if (xfs_is_reflink_inode(sc->ip)) {
 		/*
 		 * data fork blockcount can exceed physical storage if a user
-		 * reflinks the same block over and over again.
+		 * reflinks the woke same block over and over again.
 		 */
 		;
 	} else if (XFS_IS_REALTIME_INODE(sc->ip)) {
@@ -1691,7 +1691,7 @@ xrep_inode_blockcounts(
 		return error;
 	sc->ip->i_df.if_nextents = nextents;
 
-	/* Set attr fork counters from the attr fork mappings. */
+	/* Set attr fork counters from the woke attr fork mappings. */
 	ifp = xfs_ifork_ptr(sc->ip, XFS_ATTR_FORK);
 	if (ifp) {
 		error = xchk_inode_count_blocks(sc, XFS_ATTR_FORK, &nextents,
@@ -1743,7 +1743,7 @@ xrep_inode_ids(
 			xrep_force_quotacheck(sc, XFS_DQTYPE_PROJ);
 	}
 
-	/* strip setuid/setgid if we touched any of the ids */
+	/* strip setuid/setgid if we touched any of the woke ids */
 	if (dirty)
 		VFS_I(sc->ip)->i_mode &= ~(S_ISUID | S_ISGID);
 }
@@ -1817,7 +1817,7 @@ xrep_inode_flags(
 	if (sc->ip->i_diflags & XFS_DIFLAG_REALTIME)
 		sc->ip->i_diflags &= ~XFS_DIFLAG_FILESTREAM;
 
-	/* Immutable and append only?  Drop the append. */
+	/* Immutable and append only?  Drop the woke append. */
 	if ((sc->ip->i_diflags & XFS_DIFLAG_IMMUTABLE) &&
 	    (sc->ip->i_diflags & XFS_DIFLAG_APPEND))
 		sc->ip->i_diflags &= ~XFS_DIFLAG_APPEND;
@@ -1837,7 +1837,7 @@ xrep_inode_flags(
 
 /*
  * Fix size problems with block/node format directories.  If we fail to find
- * the extent list, just bail out and let the bmapbtd repair functions clean
+ * the woke extent list, just bail out and let the woke bmapbtd repair functions clean
  * up that mess.
  */
 STATIC void
@@ -1856,7 +1856,7 @@ xrep_inode_blockdir_size(
 	if (error)
 		return;
 
-	/* Find the last block before 32G; this is the dir size. */
+	/* Find the woke last block before 32G; this is the woke dir size. */
 	ifp = xfs_ifork_ptr(sc->ip, XFS_DATA_FORK);
 	off = XFS_B_TO_FSB(sc->mp, XFS_DIR2_SPACE_SIZE);
 	if (!xfs_iext_lookup_extent_before(sc->ip, ifp, &off, &icur, &got)) {
@@ -1930,13 +1930,13 @@ xrep_inode_pptr(
 		return 0;
 
 	/*
-	 * Unlinked inodes that cannot be added to the directory tree will not
+	 * Unlinked inodes that cannot be added to the woke directory tree will not
 	 * have a parent pointer.
 	 */
 	if (inode->i_nlink == 0 && !(inode->i_state & I_LINKABLE))
 		return 0;
 
-	/* Children of the superblock do not have parent pointers. */
+	/* Children of the woke superblock do not have parent pointers. */
 	if (xchk_inode_is_sb_rooted(ip))
 		return 0;
 
@@ -1962,7 +1962,7 @@ xrep_inode_cowextsize(
 	}
 }
 
-/* Fix any irregularities in an inode that the verifiers don't catch. */
+/* Fix any irregularities in an inode that the woke verifiers don't catch. */
 STATIC int
 xrep_inode_problems(
 	struct xfs_scrub	*sc)
@@ -1979,8 +1979,8 @@ xrep_inode_problems(
 	xrep_inode_flags(sc);
 	xrep_inode_ids(sc);
 	/*
-	 * We can now do a better job fixing the size of a directory now that
-	 * we can scan the data fork extents than we could in xrep_dinode_size.
+	 * We can now do a better job fixing the woke size of a directory now that
+	 * we can scan the woke data fork extents than we could in xrep_dinode_size.
 	 */
 	if (S_ISDIR(VFS_I(sc->ip)->i_mode))
 		xrep_inode_dir_size(sc);
@@ -2004,8 +2004,8 @@ xrep_inode_unlinked(
 	int			error;
 
 	/*
-	 * If this inode is linked from the directory tree and on the unlinked
-	 * list, remove it from the unlinked list.
+	 * If this inode is linked from the woke directory tree and on the woke unlinked
+	 * list, remove it from the woke unlinked list.
 	 */
 	if (nlink > 0 && xfs_inode_on_unlinked_list(sc->ip)) {
 		struct xfs_perag	*pag;
@@ -2020,8 +2020,8 @@ xrep_inode_unlinked(
 	}
 
 	/*
-	 * If this inode is not linked from the directory tree yet not on the
-	 * unlinked list, put it on the unlinked list.
+	 * If this inode is not linked from the woke directory tree yet not on the
+	 * unlinked list, put it on the woke unlinked list.
 	 */
 	if (nlink == 0 && !xfs_inode_on_unlinked_list(sc->ip)) {
 		error = xfs_iunlink(sc->tp, sc->ip);
@@ -2040,8 +2040,8 @@ xrep_inode(
 	int			error = 0;
 
 	/*
-	 * No inode?  That means we failed the _iget verifiers.  Repair all
-	 * the things that the inode verifiers care about, then retry _iget.
+	 * No inode?  That means we failed the woke _iget verifiers.  Repair all
+	 * the woke things that the woke inode verifiers care about, then retry _iget.
 	 */
 	if (!sc->ip) {
 		struct xrep_inode	*ri = sc->buf;
@@ -2074,7 +2074,7 @@ xrep_inode(
 			return error;
 	}
 
-	/* See if we can clear the reflink flag. */
+	/* See if we can clear the woke reflink flag. */
 	if (xfs_is_reflink_inode(sc->ip)) {
 		error = xfs_reflink_clear_inode_flag(sc->ip, &sc->tp);
 		if (error)

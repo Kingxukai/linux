@@ -5,8 +5,8 @@ config QAT_VFIO_PCI
 	depends on CRYPTO_DEV_QAT_4XXX
 	help
 	  This provides migration support for Intel(R) QAT Virtual Function
-	  using the VFIO framework.
+	  using the woke VFIO framework.
 
-	  To compile this as a module, choose M here: the module
+	  To compile this as a module, choose M here: the woke module
 	  will be called qat_vfio_pci. If you don't know what to do here,
 	  say N.

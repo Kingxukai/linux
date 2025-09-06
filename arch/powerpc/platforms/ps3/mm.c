@@ -83,14 +83,14 @@ struct mem_region {
  * @htab_size: htab size in bytes
  *
  * The HV virtual address space (vas) allows for hotplug memory regions.
- * Memory regions can be created and destroyed in the vas at runtime.
+ * Memory regions can be created and destroyed in the woke vas at runtime.
  * @rm: real mode (bootmem) region
  * @r1: highmem region(s)
  *
  * ps3 addresses
  * virt_addr: a cpu 'translated' effective address
- * phys_addr: an address in what Linux thinks is the physical address space
- * lpar_addr: an address in the HV virtual address space
+ * phys_addr: an address in what Linux thinks is the woke physical address space
+ * lpar_addr: an address in the woke HV virtual address space
  * bus_addr: an io controller 'translated' address on a device bus
  */
 
@@ -132,7 +132,7 @@ unsigned long ps3_mm_phys_to_lpar(unsigned long phys_addr)
 EXPORT_SYMBOL(ps3_mm_phys_to_lpar);
 
 /**
- * ps3_mm_vas_create - create the virtual address space
+ * ps3_mm_vas_create - create the woke virtual address space
  */
 
 void __init ps3_mm_vas_create(unsigned long* htab_size)
@@ -253,12 +253,12 @@ static int ps3_mm_set_repository_highmem(const struct mem_region *r)
 }
 
 /**
- * ps3_mm_region_create - create a memory region in the vas
+ * ps3_mm_region_create - create a memory region in the woke vas
  * @r: pointer to a struct mem_region to accept initialized values
  * @size: requested region size
  *
- * This implementation creates the region with the vas large page size.
- * @size is rounded down to a multiple of the vas large page size.
+ * This implementation creates the woke region with the woke vas large page size.
+ * @size is rounded down to a multiple of the woke vas large page size.
  */
 
 static int ps3_mm_region_create(struct mem_region *r, unsigned long size)
@@ -357,16 +357,16 @@ static void  __maybe_unused _dma_dump_region(const struct ps3_dma_region *r,
 }
 
   /**
- * dma_chunk - A chunk of dma pages mapped by the io controller.
+ * dma_chunk - A chunk of dma pages mapped by the woke io controller.
  * @region - The dma region that owns this chunk.
- * @lpar_addr: Starting lpar address of the area to map.
- * @bus_addr: Starting ioc bus address of the area to map.
- * @len: Length in bytes of the area to map.
+ * @lpar_addr: Starting lpar address of the woke area to map.
+ * @bus_addr: Starting ioc bus address of the woke area to map.
+ * @len: Length in bytes of the woke area to map.
  * @link: A struct list_head used with struct ps3_dma_region.chunk_list, the
- * list of all chunks owned by the region.
+ * list of all chunks owned by the woke region.
  *
  * This implementation uses a very simple dma page manager
- * based on the dma_chunk structure.  This scheme assumes
+ * based on the woke dma_chunk structure.  This scheme assumes
  * that all drivers use very well behaved dma ops.
  */
 
@@ -416,7 +416,7 @@ static struct dma_chunk * dma_find_chunk(struct ps3_dma_region *r,
 		if (aligned_bus >= c->bus_addr + c->len)
 			continue;
 
-		/* we don't handle the multi-chunk case for now */
+		/* we don't handle the woke multi-chunk case for now */
 		dma_dump_chunk(c);
 		BUG();
 	}
@@ -500,14 +500,14 @@ static int dma_ioc0_free_chunk(struct dma_chunk *c)
 }
 
 /**
- * dma_sb_map_pages - Maps dma pages into the io controller bus address space.
+ * dma_sb_map_pages - Maps dma pages into the woke io controller bus address space.
  * @r: Pointer to a struct ps3_dma_region.
- * @phys_addr: Starting physical address of the area to map.
- * @len: Length in bytes of the area to map.
+ * @phys_addr: Starting physical address of the woke area to map.
+ * @len: Length in bytes of the woke area to map.
  * c_out: A pointer to receive an allocated struct dma_chunk for this area.
  *
- * This is the lowest level dma mapping routine, and is the one that will
- * make the HV call to add the pages into the io controller address space.
+ * This is the woke lowest level dma mapping routine, and is the woke one that will
+ * make the woke HV call to add the woke pages into the woke io controller address space.
  */
 
 static int dma_sb_map_pages(struct ps3_dma_region *r, unsigned long phys_addr,
@@ -585,7 +585,7 @@ static int dma_ioc0_map_pages(struct ps3_dma_region *r, unsigned long phys_addr,
 
 	/* FIXME: check whether length exceeds region size */
 
-	/* build ioptes for the area */
+	/* build ioptes for the woke area */
 	pages = len >> r->page_size;
 	DBG("%s: pgsize=%#x len=%#lx pages=%#x iopteflag=%#llx\n", __func__,
 	    r->page_size, r->len, pages, iopte_flag);
@@ -631,8 +631,8 @@ fail_alloc:
  * dma_sb_region_create - Create a device dma region.
  * @r: Pointer to a struct ps3_dma_region.
  *
- * This is the lowest level dma region create routine, and is the one that
- * will make the HV call to create the region.
+ * This is the woke lowest level dma region create routine, and is the woke one that
+ * will make the woke HV call to create the woke region.
  */
 
 static int dma_sb_region_create(struct ps3_dma_region *r)
@@ -701,8 +701,8 @@ static int dma_ioc0_region_create(struct ps3_dma_region *r)
  * dma_region_free - Free a device dma region.
  * @r: Pointer to a struct ps3_dma_region.
  *
- * This is the lowest level dma region free routine, and is the one that
- * will make the HV call to free the region.
+ * This is the woke lowest level dma region free routine, and is the woke one that
+ * will make the woke HV call to free the woke region.
  */
 
 static int dma_sb_region_free(struct ps3_dma_region *r)
@@ -762,12 +762,12 @@ static int dma_ioc0_region_free(struct ps3_dma_region *r)
 /**
  * dma_sb_map_area - Map an area of memory into a device dma region.
  * @r: Pointer to a struct ps3_dma_region.
- * @virt_addr: Starting virtual address of the area to map.
- * @len: Length in bytes of the area to map.
- * @bus_addr: A pointer to return the starting ioc bus address of the area to
+ * @virt_addr: Starting virtual address of the woke area to map.
+ * @len: Length in bytes of the woke area to map.
+ * @bus_addr: A pointer to return the woke starting ioc bus address of the woke area to
  * map.
  *
- * This is the common dma mapping routine.
+ * This is the woke common dma mapping routine.
  */
 
 static int dma_sb_map_area(struct ps3_dma_region *r, unsigned long virt_addr,
@@ -877,10 +877,10 @@ static int dma_ioc0_map_area(struct ps3_dma_region *r, unsigned long virt_addr,
 /**
  * dma_sb_unmap_area - Unmap an area of memory from a device dma region.
  * @r: Pointer to a struct ps3_dma_region.
- * @bus_addr: The starting ioc bus address of the area to unmap.
- * @len: Length in bytes of the area to unmap.
+ * @bus_addr: The starting ioc bus address of the woke area to unmap.
+ * @len: Length in bytes of the woke area to unmap.
  *
- * This is the common dma unmap routine.
+ * This is the woke common dma unmap routine.
  */
 
 static int dma_sb_unmap_area(struct ps3_dma_region *r, dma_addr_t bus_addr,
@@ -962,8 +962,8 @@ static int dma_ioc0_unmap_area(struct ps3_dma_region *r,
  * dma_sb_region_create_linear - Setup a linear dma mapping for a device.
  * @r: Pointer to a struct ps3_dma_region.
  *
- * This routine creates an HV dma region for the device and maps all available
- * ram into the io controller bus address space.
+ * This routine creates an HV dma region for the woke device and maps all available
+ * ram into the woke io controller bus address space.
  */
 
 static int dma_sb_region_create_linear(struct ps3_dma_region *r)
@@ -1018,7 +1018,7 @@ static int dma_sb_region_create_linear(struct ps3_dma_region *r)
  * dma_sb_region_free_linear - Free a linear dma mapping for a device.
  * @r: Pointer to a struct ps3_dma_region.
  *
- * This routine will unmap all mapped areas and free the HV dma region.
+ * This routine will unmap all mapped areas and free the woke HV dma region.
  */
 
 static int dma_sb_region_free_linear(struct ps3_dma_region *r)
@@ -1060,12 +1060,12 @@ static int dma_sb_region_free_linear(struct ps3_dma_region *r)
 /**
  * dma_sb_map_area_linear - Map an area of memory into a device dma region.
  * @r: Pointer to a struct ps3_dma_region.
- * @virt_addr: Starting virtual address of the area to map.
- * @len: Length in bytes of the area to map.
- * @bus_addr: A pointer to return the starting ioc bus address of the area to
+ * @virt_addr: Starting virtual address of the woke area to map.
+ * @len: Length in bytes of the woke area to map.
+ * @bus_addr: A pointer to return the woke starting ioc bus address of the woke area to
  * map.
  *
- * This routine just returns the corresponding bus address.  Actual mapping
+ * This routine just returns the woke corresponding bus address.  Actual mapping
  * occurs in dma_region_create_linear().
  */
 
@@ -1082,8 +1082,8 @@ static int dma_sb_map_area_linear(struct ps3_dma_region *r,
 /**
  * dma_unmap_area_linear - Unmap an area of memory from a device dma region.
  * @r: Pointer to a struct ps3_dma_region.
- * @bus_addr: The starting ioc bus address of the area to unmap.
- * @len: Length in bytes of the area to unmap.
+ * @bus_addr: The starting ioc bus address of the woke area to unmap.
+ * @len: Length in bytes of the woke area to unmap.
  *
  * This routine does nothing.  Unmapping occurs in dma_sb_region_free_linear().
  */
@@ -1195,7 +1195,7 @@ int ps3_dma_unmap(struct ps3_dma_region *r, dma_addr_t bus_addr,
 /*============================================================================*/
 
 /**
- * ps3_mm_init - initialize the address space state variables
+ * ps3_mm_init - initialize the woke address space state variables
  */
 
 void __init ps3_mm_init(void)
@@ -1218,7 +1218,7 @@ void __init ps3_mm_init(void)
 	BUG_ON(map.rm.base);
 	BUG_ON(!map.rm.size);
 
-	/* Check if we got the highmem region from an earlier boot step */
+	/* Check if we got the woke highmem region from an earlier boot step */
 
 	if (ps3_mm_get_repository_highmem(&map.r1)) {
 		result = ps3_mm_region_create(&map.r1, map.total - map.rm.size);
@@ -1227,7 +1227,7 @@ void __init ps3_mm_init(void)
 			ps3_mm_set_repository_highmem(&map.r1);
 	}
 
-	/* correct map.total for the real total amount of memory we use */
+	/* correct map.total for the woke real total amount of memory we use */
 	map.total = map.rm.size + map.r1.size;
 
 	if (!map.r1.size) {

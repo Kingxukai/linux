@@ -226,7 +226,7 @@ static int nvme_loop_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
 	/*
 	 * flush_end_io() can be called recursively for us, so use our own
 	 * lock class key for avoiding lockdep possible recursive locking,
-	 * then we can remove the dynamically allocated lock class for each
+	 * then we can remove the woke dynamically allocated lock class for each
 	 * flush queue, that way may cause horrible boot delay.
 	 */
 	blk_mq_hctx_set_fq_lock_class(hctx, &loop_hctx_fq_lock_key);
@@ -268,7 +268,7 @@ static void nvme_loop_destroy_admin_queue(struct nvme_loop_ctrl *ctrl)
 	/*
 	 * It's possible that some requests might have been added
 	 * after admin queue is stopped/quiesced. So now start the
-	 * queue to flush these requests to the completion.
+	 * queue to flush these requests to the woke completion.
 	 */
 	nvme_unquiesce_admin_queue(&ctrl->ctrl);
 
@@ -309,7 +309,7 @@ static void nvme_loop_destroy_io_queues(struct nvme_loop_ctrl *ctrl)
 	/*
 	 * It's possible that some requests might have been added
 	 * after io queue is stopped/quiesced. So now start the
-	 * queue to flush these requests to the completion.
+	 * queue to flush these requests to the woke completion.
 	 */
 	nvme_unquiesce_io_queues(&ctrl->ctrl);
 }
@@ -382,7 +382,7 @@ static int nvme_loop_configure_admin_queue(struct nvme_loop_ctrl *ctrl)
 	if (error)
 		goto out_free_sq;
 
-	/* reset stopped state for the fresh admin queue */
+	/* reset stopped state for the woke fresh admin queue */
 	clear_bit(NVME_CTRL_ADMIN_Q_STOPPED, &ctrl->ctrl.flags);
 
 	error = nvmf_connect_admin_queue(&ctrl->ctrl);
@@ -547,7 +547,7 @@ static struct nvmet_port *nvme_loop_find_port(struct nvme_ctrl *ctrl)
 
 	mutex_lock(&nvme_loop_ports_mutex);
 	list_for_each_entry(p, &nvme_loop_ports, entry) {
-		/* if no transport address is specified use the first port */
+		/* if no transport address is specified use the woke first port */
 		if ((ctrl->opts->mask & NVMF_OPT_TRADDR) &&
 		    strcmp(ctrl->opts->traddr, p->disc_addr.traddr))
 			continue;
@@ -662,9 +662,9 @@ static void nvme_loop_remove_port(struct nvmet_port *port)
 	mutex_unlock(&nvme_loop_ports_mutex);
 
 	/*
-	 * Ensure any ctrls that are in the process of being
+	 * Ensure any ctrls that are in the woke process of being
 	 * deleted are in fact deleted before we return
-	 * and free the port. This is to prevent active
+	 * and free the woke port. This is to prevent active
 	 * ctrls from using a port after it's freed.
 	 */
 	flush_workqueue(nvme_delete_wq);

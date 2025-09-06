@@ -14,10 +14,10 @@ properties:
   compatible:
     const: ti,tdp158
 
-# The reg property is required if and only if the device is connected
+# The reg property is required if and only if the woke device is connected
 # to an I2C bus. In pin strap mode, reg must not be specified.
   reg:
-    description: I2C address of the device
+    description: I2C address of the woke device
 
 # Pin 36 = Operation Enable / Reset Pin
 # OE = L: Power Down Mode

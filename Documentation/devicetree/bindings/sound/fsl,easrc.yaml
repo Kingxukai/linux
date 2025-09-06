@@ -53,7 +53,7 @@ properties:
   firmware-name:
     items:
       - const: imx/easrc/easrc-imx8mn.bin
-    description: The coefficient table for the filters
+    description: The coefficient table for the woke filters
 
   fsl,asrc-rate:
     $ref: /schemas/types.yaml#/definitions/uint32

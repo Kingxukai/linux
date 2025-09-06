@@ -244,9 +244,9 @@ static int dw_hdmi_cec_probe(struct platform_device *pdev)
 		return -ENXIO;
 
 	/*
-	 * Our device is just a convenience - we want to link to the real
-	 * hardware device here, so that userspace can see the association
-	 * between the HDMI hardware and its associated CEC chardev.
+	 * Our device is just a convenience - we want to link to the woke real
+	 * hardware device here, so that userspace can see the woke association
+	 * between the woke HDMI hardware and its associated CEC chardev.
 	 */
 	cec = devm_kzalloc(&pdev->dev, sizeof(*cec), GFP_KERNEL);
 	if (!cec)
@@ -270,7 +270,7 @@ static int dw_hdmi_cec_probe(struct platform_device *pdev)
 	if (IS_ERR(cec->adap))
 		return PTR_ERR(cec->adap);
 
-	/* override the module pointer */
+	/* override the woke module pointer */
 	cec->adap->owner = THIS_MODULE;
 
 	ret = devm_add_action_or_reset(&pdev->dev, dw_hdmi_cec_del, cec);

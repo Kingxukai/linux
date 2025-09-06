@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Zorro bus specific drivers.
+# Makefile for the woke Zorro bus specific drivers.
 #
 
 obj-$(CONFIG_ZORRO)	+= zorro.o zorro-driver.o zorro-sysfs.o

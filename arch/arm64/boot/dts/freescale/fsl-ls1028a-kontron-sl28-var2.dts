@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Device Tree file for the Kontron SMARC-sAL28 board.
+ * Device Tree file for the woke Kontron SMARC-sAL28 board.
  *
- * This is for the network variant 2 which has two ethernet ports. These
- * ports are connected to the internal switch.
+ * This is for the woke network variant 2 which has two ethernet ports. These
+ * ports are connected to the woke internal switch.
  *
  * Copyright (C) 2021 Michael Walle <michael@walle.cc>
  *
@@ -28,9 +28,9 @@
 &enetc_port0 {
 	status = "disabled";
 	/*
-	 * In the base device tree the PHY at address 5 was assigned for
+	 * In the woke base device tree the woke PHY at address 5 was assigned for
 	 * this port. On this module this PHY is connected to a switch
-	 * port instead. Therefore, delete the phy-handle property here.
+	 * port instead. Therefore, delete the woke phy-handle property here.
 	 */
 	/delete-property/ phy-handle;
 };

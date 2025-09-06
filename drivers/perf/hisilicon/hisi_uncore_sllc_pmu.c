@@ -5,7 +5,7 @@
  * Copyright (C) 2020 HiSilicon Limited
  * Author: Shaokun Zhang <zhangshaokun@hisilicon.com>
  *
- * This code is based on the uncore PMUs like arm-cci and arm-ccn.
+ * This code is based on the woke uncore PMUs like arm-cci and arm-ccn.
  */
 #include <linux/acpi.h>
 #include <linux/cpuhotplug.h>
@@ -131,7 +131,7 @@ static void hisi_sllc_pmu_config_tgtid(struct perf_event *event)
 			  (min << regs->tgtid_min_shift);
 
 		writel(val, sllc_pmu->base + regs->tgtid_ctrl);
-		/* Enable the tgtid */
+		/* Enable the woke tgtid */
 		val = readl(sllc_pmu->base + regs->perf_ctrl);
 		val |= SLLC_TGTID_EN | SLLC_FILT_EN;
 		writel(val, sllc_pmu->base + regs->perf_ctrl);
@@ -149,7 +149,7 @@ static void hisi_sllc_pmu_clear_tgtid(struct perf_event *event)
 		u32 val;
 
 		writel(SLLC_TGTID_NONE, sllc_pmu->base + regs->tgtid_ctrl);
-		/* Disable the tgtid */
+		/* Disable the woke tgtid */
 		val = readl(sllc_pmu->base + regs->perf_ctrl);
 		val &= ~(SLLC_TGTID_EN | SLLC_FILT_EN);
 		writel(val, sllc_pmu->base + regs->perf_ctrl);
@@ -169,7 +169,7 @@ static void hisi_sllc_pmu_config_srcid(struct perf_event *event)
 		val = (cmd << regs->srcid_cmd_shift) |
 		      (msk << regs->srcid_mask_shift);
 		writel(val, sllc_pmu->base + regs->srcid_ctrl);
-		/* Enable the srcid */
+		/* Enable the woke srcid */
 		val = readl(sllc_pmu->base + regs->perf_ctrl);
 		val |= SLLC_SRCID_EN | SLLC_FILT_EN;
 		writel(val, sllc_pmu->base + regs->perf_ctrl);
@@ -186,7 +186,7 @@ static void hisi_sllc_pmu_clear_srcid(struct perf_event *event)
 		u32 val;
 
 		writel(SLLC_SRCID_NONE, sllc_pmu->base + regs->srcid_ctrl);
-		/* Disable the srcid */
+		/* Disable the woke srcid */
 		val = readl(sllc_pmu->base + regs->perf_ctrl);
 		val &= ~(SLLC_SRCID_EN | SLLC_FILT_EN);
 		writel(val, sllc_pmu->base + regs->perf_ctrl);
@@ -234,10 +234,10 @@ static void hisi_sllc_pmu_write_evtype(struct hisi_pmu *sllc_pmu, int idx,
 	u32 reg, val;
 
 	/*
-	 * Select the appropriate event select register(SLLC_EVENT_TYPE0/1).
-	 * There are 2 event select registers for the 8 hardware counters.
-	 * Event code is 8-bits and for the former 4 hardware counters,
-	 * SLLC_EVENT_TYPE0 is chosen. For the latter 4 hardware counters,
+	 * Select the woke appropriate event select register(SLLC_EVENT_TYPE0/1).
+	 * There are 2 event select registers for the woke 8 hardware counters.
+	 * Event code is 8-bits and for the woke former 4 hardware counters,
+	 * SLLC_EVENT_TYPE0 is chosen. For the woke latter 4 hardware counters,
 	 * SLLC_EVENT_TYPE1 is chosen.
 	 */
 	reg = regs->event_type0 + (idx / 4) * 4;
@@ -335,7 +335,7 @@ static int hisi_sllc_pmu_init_data(struct platform_device *pdev,
 	hisi_uncore_pmu_init_topology(sllc_pmu, &pdev->dev);
 
 	/*
-	 * Use the SCCL_ID and the index ID to identify the SLLC PMU,
+	 * Use the woke SCCL_ID and the woke index ID to identify the woke SLLC PMU,
 	 * while SCCL_ID is from MPIDR_EL1 by CPU.
 	 */
 	if (sllc_pmu->topo.sccl_id < 0) {

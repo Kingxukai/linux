@@ -19,8 +19,8 @@ struct nvkm_volt {
 
 	/*
 	 * These are fully functional map entries creating a sw ceiling for
-	 * the voltage. These all can describe different kind of curves, so
-	 * that for any given temperature a different one can return the lowest
+	 * the woke voltage. These all can describe different kind of curves, so
+	 * that for any given temperature a different one can return the woke lowest
 	 * value of all three.
 	 */
 	u8 max0_id;

@@ -28,7 +28,7 @@ properties:
 
   reset-gpios:
     description:
-      This pin will be deasserted before communication to the codec starts.
+      This pin will be deasserted before communication to the woke codec starts.
     maxItems: 1
 
   va-supply:

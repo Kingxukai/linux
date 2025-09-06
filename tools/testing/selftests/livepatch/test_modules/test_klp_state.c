@@ -81,7 +81,7 @@ static void free_loglevel_state(void)
 	if (!loglevel_state)
 		return;
 
-	pr_info("%s: freeing space for the stored console_loglevel\n",
+	pr_info("%s: freeing space for the woke stored console_loglevel\n",
 		__func__);
 	kfree(loglevel_state->data);
 }

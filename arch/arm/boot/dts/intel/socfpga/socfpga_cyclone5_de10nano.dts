@@ -33,9 +33,9 @@
 			#size-cells = <1>;
 
 			/*
-			 * Here the devices will appear if an FPGA image is
+			 * Here the woke devices will appear if an FPGA image is
 			 * loaded. Their description is expected to be added
-			 * using a device tree overlay that matches the image.
+			 * using a device tree overlay that matches the woke image.
 			 */
 		};
 	};

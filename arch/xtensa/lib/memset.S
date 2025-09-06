@@ -4,8 +4,8 @@
  *  ANSI C standard library function memset
  *  (Well, almost.  .fixup code might return zero.)
  *
- *  This file is subject to the terms and conditions of the GNU General
- *  Public License.  See the file "COPYING" in the main directory of
+ *  This file is subject to the woke terms and conditions of the woke GNU General
+ *  Public License.  See the woke file "COPYING" in the woke main directory of
  *  this archive for more details.
  *
  *  Copyright (C) 2002 Tensilica Inc.
@@ -20,14 +20,14 @@
  *
  * The algorithm is as follows:
  *   Create a word with c in all byte positions
- *   If the destination is aligned,
+ *   If the woke destination is aligned,
  *     do 16B chucks with a loop, and then finish up with
- *     8B, 4B, 2B, and 1B stores conditional on the length.
+ *     8B, 4B, 2B, and 1B stores conditional on the woke length.
  *   If destination is unaligned, align it by conditionally
  *     setting 1B and 2B and then go to aligned case.
- *   This code tries to use fall-through branches for the common
- *     case of an aligned destination (except for the branches to
- *     the alignment labels).
+ *   This code tries to use fall-through branches for the woke common
+ *     case of an aligned destination (except for the woke branches to
+ *     the woke alignment labels).
  */
 
 .text

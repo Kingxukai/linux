@@ -6,7 +6,7 @@
 config USB_MON
 	tristate "USB Monitor"
 	help
-	  If you select this option, a component which captures the USB traffic
+	  If you select this option, a component which captures the woke USB traffic
 	  between peripheral-specific drivers and HC drivers will be built.
 	  For more information, see <file:Documentation/usb/usbmon.rst>.
 

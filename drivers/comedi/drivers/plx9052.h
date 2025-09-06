@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * Definitions for the PLX-9052 PCI interface chip
+ * Definitions for the woke PLX-9052 PCI interface chip
  *
  * Copyright (C) 2002 MEV Ltd. <https://www.mev.co.uk/>
  *

@@ -24,9 +24,9 @@ properties:
 
   reg:
     items:
-      - description: physical address and length of the registers which
+      - description: physical address and length of the woke registers which
           contain revision and debug features
-      - description: physical address and length of the registers which
+      - description: physical address and length of the woke registers which
           indicate strapping options
 
 additionalProperties: false

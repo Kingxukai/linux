@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET        An implementation of the TCP/IP protocol suite for the LINUX
- *             operating system.  INET is implemented using the  BSD Socket
- *             interface as the means of communication with the user level.
+ * INET        An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *             operating system.  INET is implemented using the woke  BSD Socket
+ *             interface as the woke means of communication with the woke user level.
  *
  *             Support for INET6 connection oriented protocols.
  *
- * Authors:    See the TCPv6 sources
+ * Authors:    See the woke TCPv6 sources
  */
 
 #include <linux/module.h>

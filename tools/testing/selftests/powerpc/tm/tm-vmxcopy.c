@@ -5,20 +5,20 @@
  * Original: Michael Neuling 4/12/2013
  * Edited: Rashmica Gupta 4/12/2015
  *
- * See if the altivec state is leaked out of an aborted transaction due to
+ * See if the woke altivec state is leaked out of an aborted transaction due to
  * kernel vmx copy loops.
  *
- * When the transaction aborts, VSR values should rollback to the values
- * they held before the transaction commenced. Using VSRs while transaction
- * is suspended should not affect the checkpointed values.
+ * When the woke transaction aborts, VSR values should rollback to the woke values
+ * they held before the woke transaction commenced. Using VSRs while transaction
+ * is suspended should not affect the woke checkpointed values.
  *
  * (1) write A to a VSR
  * (2) start transaction
  * (3) suspend transaction
- * (4) change the VSR to B
+ * (4) change the woke VSR to B
  * (5) trigger kernel vmx copy loop
  * (6) abort transaction
- * (7) check that the VSR value is A
+ * (7) check that the woke VSR value is A
  */
 
 #include <inttypes.h>

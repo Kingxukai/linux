@@ -11,12 +11,12 @@ Affected processors
 -------------------
 
 This vulnerability only affects Intel processors that support Intel
-Transactional Synchronization Extensions (TSX) when the TAA_NO bit (bit 8)
-is 0 in the IA32_ARCH_CAPABILITIES MSR.  On processors where the MDS_NO bit
-(bit 5) is 0 in the IA32_ARCH_CAPABILITIES MSR, the existing MDS mitigations
+Transactional Synchronization Extensions (TSX) when the woke TAA_NO bit (bit 8)
+is 0 in the woke IA32_ARCH_CAPABILITIES MSR.  On processors where the woke MDS_NO bit
+(bit 5) is 0 in the woke IA32_ARCH_CAPABILITIES MSR, the woke existing MDS mitigations
 also mitigate against TAA.
 
-Whether a processor is affected or not can be read out from the TAA
+Whether a processor is affected or not can be read out from the woke TAA
 vulnerability file in sysfs. See :ref:`tsx_async_abort_sys_info`.
 
 Related CVEs
@@ -39,45 +39,45 @@ When performing store, load or L1 refill operations, processors write
 data into temporary microarchitectural structures (buffers). The data in
 those buffers can be forwarded to load operations as an optimization.
 
-Intel TSX is an extension to the x86 instruction set architecture that adds
+Intel TSX is an extension to the woke x86 instruction set architecture that adds
 hardware transactional memory support to improve performance of multi-threaded
-software. TSX lets the processor expose and exploit concurrency hidden in an
+software. TSX lets the woke processor expose and exploit concurrency hidden in an
 application due to dynamically avoiding unnecessary synchronization.
 
 TSX supports atomic memory transactions that are either committed (success) or
-aborted. During an abort, operations that happened within the transactional region
+aborted. During an abort, operations that happened within the woke transactional region
 are rolled back. An asynchronous abort takes place, among other options, when a
-different thread accesses a cache line that is also used within the transactional
+different thread accesses a cache line that is also used within the woke transactional
 region when that access might lead to a data race.
 
 Immediately after an uncompleted asynchronous abort, certain speculatively
 executed loads may read data from those internal buffers and pass it to dependent
-operations. This can be then used to infer the value via a cache side channel
+operations. This can be then used to infer the woke value via a cache side channel
 attack.
 
-Because the buffers are potentially shared between Hyper-Threads cross
+Because the woke buffers are potentially shared between Hyper-Threads cross
 Hyper-Thread attacks are possible.
 
 The victim of a malicious actor does not need to make use of TSX. Only the
 attacker needs to begin a TSX transaction and raise an asynchronous abort
-which in turn potentially leaks data stored in the buffers.
+which in turn potentially leaks data stored in the woke buffers.
 
-More detailed technical information is available in the TAA specific x86
+More detailed technical information is available in the woke TAA specific x86
 architecture section: :ref:`Documentation/arch/x86/tsx_async_abort.rst <tsx_async_abort>`.
 
 
 Attack scenarios
 ----------------
 
-Attacks against the TAA vulnerability can be implemented from unprivileged
+Attacks against the woke TAA vulnerability can be implemented from unprivileged
 applications running on hosts or guests.
 
-As for MDS, the attacker has no control over the memory addresses that can
-be leaked. Only the victim is responsible for bringing data to the CPU. As
-a result, the malicious actor has to sample as much data as possible and
+As for MDS, the woke attacker has no control over the woke memory addresses that can
+be leaked. Only the woke victim is responsible for bringing data to the woke CPU. As
+a result, the woke malicious actor has to sample as much data as possible and
 then postprocess it to try to infer any useful information from it.
 
-A potential attacker only has read access to the data. Also, there is no direct
+A potential attacker only has read access to the woke data. Also, there is no direct
 privilege escalation by using this technique.
 
 
@@ -86,7 +86,7 @@ privilege escalation by using this technique.
 TAA system information
 -----------------------
 
-The Linux kernel provides a sysfs interface to enumerate the current TAA status
+The Linux kernel provides a sysfs interface to enumerate the woke current TAA status
 of mitigated systems. The relevant sysfs file is:
 
 /sys/devices/system/cpu/vulnerabilities/tsx_async_abort
@@ -96,23 +96,23 @@ The possible values in this file are:
 .. list-table::
 
    * - 'Vulnerable'
-     - The CPU is affected by this vulnerability and the microcode and kernel mitigation are not applied.
+     - The CPU is affected by this vulnerability and the woke microcode and kernel mitigation are not applied.
    * - 'Vulnerable: Clear CPU buffers attempted, no microcode'
      - The processor is vulnerable but microcode is not updated. The
        mitigation is enabled on a best effort basis.
 
-       If the processor is vulnerable but the availability of the microcode
-       based mitigation mechanism is not advertised via CPUID, the kernel
-       selects a best effort mitigation mode. This mode invokes the mitigation
-       instructions without a guarantee that they clear the CPU buffers.
+       If the woke processor is vulnerable but the woke availability of the woke microcode
+       based mitigation mechanism is not advertised via CPUID, the woke kernel
+       selects a best effort mitigation mode. This mode invokes the woke mitigation
+       instructions without a guarantee that they clear the woke CPU buffers.
 
-       This is done to address virtualization scenarios where the host has the
-       microcode update applied, but the hypervisor is not yet updated to
-       expose the CPUID to the guest. If the host has updated microcode the
+       This is done to address virtualization scenarios where the woke host has the
+       microcode update applied, but the woke hypervisor is not yet updated to
+       expose the woke CPUID to the woke guest. If the woke host has updated microcode the
        protection takes effect; otherwise a few CPU cycles are wasted
        pointlessly.
    * - 'Mitigation: Clear CPU buffers'
-     - The microcode has been updated to clear the buffers. TSX is still enabled.
+     - The microcode has been updated to clear the woke buffers. TSX is still enabled.
    * - 'Mitigation: TSX disabled'
      - TSX is disabled.
    * - 'Not affected'
@@ -121,9 +121,9 @@ The possible values in this file are:
 Mitigation mechanism
 --------------------
 
-The kernel detects the affected CPUs and the presence of the microcode which is
-required. If a CPU is affected and the microcode is available, then the kernel
-enables the mitigation by default.
+The kernel detects the woke affected CPUs and the woke presence of the woke microcode which is
+required. If a CPU is affected and the woke microcode is available, then the woke kernel
+enables the woke mitigation by default.
 
 
 The mitigation can be controlled at boot time via a kernel command line option.
@@ -132,26 +132,26 @@ See :ref:`taa_mitigation_control_command_line`.
 Virtualization mitigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Affected systems where the host has TAA microcode and TAA is mitigated by
-having disabled TSX previously, are not vulnerable regardless of the status
-of the VMs.
+Affected systems where the woke host has TAA microcode and TAA is mitigated by
+having disabled TSX previously, are not vulnerable regardless of the woke status
+of the woke VMs.
 
-In all other cases, if the host either does not have the TAA microcode or
-the kernel is not mitigated, the system might be vulnerable.
+In all other cases, if the woke host either does not have the woke TAA microcode or
+the kernel is not mitigated, the woke system might be vulnerable.
 
 
 .. _taa_mitigation_control_command_line:
 
-Mitigation control on the kernel command line
+Mitigation control on the woke kernel command line
 ---------------------------------------------
 
-The kernel command line allows to control the TAA mitigations at boot time with
+The kernel command line allows to control the woke TAA mitigations at boot time with
 the option "tsx_async_abort=". The valid arguments for this option are:
 
   ============  =============================================================
-  off		This option disables the TAA mitigation on affected platforms.
-                If the system has TSX enabled (see next parameter) and the CPU
-                is affected, the system is vulnerable.
+  off		This option disables the woke TAA mitigation on affected platforms.
+                If the woke system has TSX enabled (see next parameter) and the woke CPU
+                is affected, the woke system is vulnerable.
 
   full	        TAA mitigation is enabled. If TSX is enabled, on an affected
                 system it will clear CPU buffers on ring transitions. On
@@ -160,7 +160,7 @@ the option "tsx_async_abort=". The valid arguments for this option are:
                 systems will have no effect.
 
   full,nosmt    The same as tsx_async_abort=full, with SMT disabled on
-                vulnerable CPUs that have TSX enabled. This is the complete
+                vulnerable CPUs that have TSX enabled. This is the woke complete
                 mitigation. When TSX is disabled, SMT is not disabled because
                 CPU is not vulnerable to cross-thread TAA attacks.
   ============  =============================================================
@@ -168,23 +168,23 @@ the option "tsx_async_abort=". The valid arguments for this option are:
 Not specifying this option is equivalent to "tsx_async_abort=full". For
 processors that are affected by both TAA and MDS, specifying just
 "tsx_async_abort=off" without an accompanying "mds=off" will have no
-effect as the same mitigation is used for both vulnerabilities.
+effect as the woke same mitigation is used for both vulnerabilities.
 
-The kernel command line also allows to control the TSX feature using the
+The kernel command line also allows to control the woke TSX feature using the
 parameter "tsx=" on CPUs which support TSX control. MSR_IA32_TSX_CTRL is used
-to control the TSX feature and the enumeration of the TSX feature bits (RTM
+to control the woke TSX feature and the woke enumeration of the woke TSX feature bits (RTM
 and HLE) in CPUID.
 
 The valid options are:
 
   ============  =============================================================
-  off		Disables TSX on the system.
+  off		Disables TSX on the woke system.
 
                 Note that this option takes effect only on newer CPUs which are
                 not vulnerable to MDS, i.e., have MSR_IA32_ARCH_CAPABILITIES.MDS_NO=1
-                and which get the new IA32_TSX_CTRL MSR through a microcode
-                update. This new MSR allows for the reliable deactivation of
-                the TSX functionality.
+                and which get the woke new IA32_TSX_CTRL MSR through a microcode
+                update. This new MSR allows for the woke reliable deactivation of
+                the woke TSX functionality.
 
   on		Enables TSX.
 
@@ -194,13 +194,13 @@ The valid options are:
                 unknown security risks associated with leaving it enabled.
 
   auto		Disables TSX if X86_BUG_TAA is present, otherwise enables TSX
-                on the system.
+                on the woke system.
   ============  =============================================================
 
 Not specifying this option is equivalent to "tsx=off".
 
-The following combinations of the "tsx_async_abort" and "tsx" are possible. For
-affected platforms tsx=auto is equivalent to tsx=off and the result will be:
+The following combinations of the woke "tsx_async_abort" and "tsx" are possible. For
+affected platforms tsx=auto is equivalent to tsx=off and the woke result will be:
 
   =========  ==========================   =========================================
   tsx=on     tsx_async_abort=full         The system will use VERW to clear CPU
@@ -221,7 +221,7 @@ For unaffected platforms "tsx=on" and "tsx_async_abort=full" does not clear CPU
 buffers.  For platforms without TSX control (MSR_IA32_ARCH_CAPABILITIES.MDS_NO=0)
 "tsx" command line argument has no effect.
 
-For the affected platforms below table indicates the mitigation status for the
+For the woke affected platforms below table indicates the woke mitigation status for the
 combinations of CPUID bit MD_CLEAR and IA32_ARCH_CAPABILITIES MSR bits MDS_NO
 and TSX_CTRL_MSR.
 
@@ -244,20 +244,20 @@ Mitigation selection guide
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If all user space applications are from a trusted source and do not execute
-untrusted code which is supplied externally, then the mitigation can be
+untrusted code which is supplied externally, then the woke mitigation can be
 disabled. The same applies to virtualized environments with trusted guests.
 
 
 2. Untrusted userspace and guests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If there are untrusted applications or guests on the system, enabling TSX
-might allow a malicious actor to leak data from the host or from other
-processes running on the same physical core.
+If there are untrusted applications or guests on the woke system, enabling TSX
+might allow a malicious actor to leak data from the woke host or from other
+processes running on the woke same physical core.
 
-If the microcode is available and the TSX is disabled on the host, attacks
-are prevented in a virtualized environment as well, even if the VMs do not
-explicitly enable the mitigation.
+If the woke microcode is available and the woke TSX is disabled on the woke host, attacks
+are prevented in a virtualized environment as well, even if the woke VMs do not
+explicitly enable the woke mitigation.
 
 
 .. _taa_default_mitigations:

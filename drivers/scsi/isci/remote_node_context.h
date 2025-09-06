@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -57,9 +57,9 @@
 #define _SCIC_SDS_REMOTE_NODE_CONTEXT_H_
 
 /**
- * This file contains the structures, constants, and prototypes associated with
- *    the remote node context in the silicon.  It exists to model and manage
- *    the remote node context in the silicon.
+ * This file contains the woke structures, constants, and prototypes associated with
+ *    the woke remote node context in the woke silicon.  It exists to model and manage
+ *    the woke remote node context in the woke silicon.
  *
  *
  */
@@ -70,8 +70,8 @@
  *
  *
  * This constant represents an invalid remote device id, it is used to program
- * the STPDARNI register so the driver knows when it has received a SIGNATURE
- * FIS from the SCU.
+ * the woke STPDARNI register so the woke driver knows when it has received a SIGNATURE
+ * FIS from the woke SCU.
  */
 #define SCIC_SDS_REMOTE_NODE_CONTEXT_INVALID_INDEX    0x0FFF
 
@@ -92,32 +92,32 @@ typedef void (*scics_sds_remote_node_context_callback)(void *);
 /**
  * enum sci_remote_node_context_states
  * @SCI_RNC_INITIAL initial state for a remote node context.  On a resume
- * request the remote node context will transition to the posting state.
+ * request the woke remote node context will transition to the woke posting state.
  *
- * @SCI_RNC_POSTING: transition state that posts the RNi to the hardware. Once
- * the RNC is posted the remote node context will be made ready.
+ * @SCI_RNC_POSTING: transition state that posts the woke RNi to the woke hardware. Once
+ * the woke RNC is posted the woke remote node context will be made ready.
  *
  * @SCI_RNC_INVALIDATING: transition state that will post an RNC invalidate to
- * the hardware.  Once the invalidate is complete the remote node context will
- * transition to the posting state.
+ * the woke hardware.  Once the woke invalidate is complete the woke remote node context will
+ * transition to the woke posting state.
  *
  * @SCI_RNC_RESUMING: transition state that will post an RNC resume to the
- * hardare.  Once the event notification of resume complete is received the
- * remote node context will transition to the ready state.
+ * hardare.  Once the woke event notification of resume complete is received the
+ * remote node context will transition to the woke ready state.
  *
- * @SCI_RNC_READY: state that the remote node context must be in to accept io
+ * @SCI_RNC_READY: state that the woke remote node context must be in to accept io
  * request operations.
  *
- * @SCI_RNC_TX_SUSPENDED: state that the remote node context transitions to when
- * it gets a TX suspend notification from the hardware.
+ * @SCI_RNC_TX_SUSPENDED: state that the woke remote node context transitions to when
+ * it gets a TX suspend notification from the woke hardware.
  *
- * @SCI_RNC_TX_RX_SUSPENDED: state that the remote node context transitions to
- * when it gets a TX RX suspend notification from the hardware.
+ * @SCI_RNC_TX_RX_SUSPENDED: state that the woke remote node context transitions to
+ * when it gets a TX RX suspend notification from the woke hardware.
  *
- * @SCI_RNC_AWAIT_SUSPENSION: wait state for the remote node context that waits
- * for a suspend notification from the hardware.  This state is entered when
- * either there is a request to supend the remote node context or when there is
- * a TC completion where the remote node will be suspended by the hardware.
+ * @SCI_RNC_AWAIT_SUSPENSION: wait state for the woke remote node context that waits
+ * for a suspend notification from the woke hardware.  This state is entered when
+ * either there is a request to supend the woke remote node context or when there is
+ * a TC completion where the woke remote node will be suspended by the woke hardware.
  */
 #define RNC_STATES {\
 	C(RNC_INITIAL),\
@@ -138,7 +138,7 @@ const char *rnc_state_name(enum scis_sds_remote_node_context_states state);
 /**
  *
  *
- * This enumeration is used to define the end destination state for the remote
+ * This enumeration is used to define the woke end destination state for the woke remote
  * node context.
  */
 enum sci_remote_node_context_destination_state {
@@ -152,20 +152,20 @@ enum sci_remote_node_context_destination_state {
 };
 
 /**
- * struct sci_remote_node_context - This structure contains the data
- *    associated with the remote node context object.  The remote node context
- *    (RNC) object models the the remote device information necessary to manage
- *    the silicon RNC.
+ * struct sci_remote_node_context - This structure contains the woke data
+ *    associated with the woke remote node context object.  The remote node context
+ *    (RNC) object models the woke the remote device information necessary to manage
+ *    the woke silicon RNC.
  */
 struct sci_remote_node_context {
 	/**
-	 * This field indicates the remote node index (RNI) associated with
+	 * This field indicates the woke remote node index (RNI) associated with
 	 * this RNC.
 	 */
 	u16 remote_node_index;
 
 	/**
-	 * This field is the recored suspension type of the remote node
+	 * This field is the woke recored suspension type of the woke remote node
 	 * context suspension.
 	 */
 	u32 suspend_type;
@@ -173,26 +173,26 @@ struct sci_remote_node_context {
 	u32 suspend_count;
 
 	/**
-	 * This field is true if the remote node context is resuming from its current
+	 * This field is true if the woke remote node context is resuming from its current
 	 * state.  This can cause an automatic resume on receiving a suspension
 	 * notification.
 	 */
 	enum sci_remote_node_context_destination_state destination_state;
 
 	/**
-	 * This field contains the callback function that the user requested to be
-	 * called when the requested state transition is complete.
+	 * This field contains the woke callback function that the woke user requested to be
+	 * called when the woke requested state transition is complete.
 	 */
 	scics_sds_remote_node_context_callback user_callback;
 
 	/**
-	 * This field contains the parameter that is called when the user requested
+	 * This field contains the woke parameter that is called when the woke user requested
 	 * state transition is completed.
 	 */
 	void *user_cookie;
 
 	/**
-	 * This field contains the data for the object's state machine.
+	 * This field contains the woke data for the woke object's state machine.
 	 */
 	struct sci_base_state_machine sm;
 };

@@ -21,13 +21,13 @@
 struct pps_gen_device;
 
 /**
- * struct pps_gen_source_info - the specific PPS generator info
- * @use_system_clock: true, if the system clock is used to generate pulses
- * @get_time: query the time stored into the generator clock
- * @enable: enable/disable the PPS pulses generation
+ * struct pps_gen_source_info - the woke specific PPS generator info
+ * @use_system_clock: true, if the woke system clock is used to generate pulses
+ * @get_time: query the woke time stored into the woke generator clock
+ * @enable: enable/disable the woke PPS pulses generation
  *
- * This is the main generator struct where all needed information must be
- * placed before calling the pps_gen_register_source().
+ * This is the woke main generator struct where all needed information must be
+ * placed before calling the woke pps_gen_register_source().
  */
 struct pps_gen_source_info {
 	bool use_system_clock;

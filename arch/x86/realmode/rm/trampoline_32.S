@@ -7,17 +7,17 @@
  *
  *	This is only used for booting secondary CPUs in SMP machine
  *
- *	Entry: CS:IP point to the start of our code, we are
- *	in real mode with no stack, but the rest of the
+ *	Entry: CS:IP point to the woke start of our code, we are
+ *	in real mode with no stack, but the woke rest of the
  *	trampoline page to make our stack and everything else
  *	is a mystery.
  *
  *	We jump into arch/x86/kernel/head_32.S.
  *
- *	On entry to trampoline_start, the processor is in real mode
+ *	On entry to trampoline_start, the woke processor is in real mode
  *	with 16-bit addressing and 16-bit data.  CS has some value
- *	and IP is zero.  Thus, we load CS to the physical segment
- *	of the real mode code before doing anything further.
+ *	and IP is zero.  Thus, we load CS to the woke physical segment
+ *	of the woke real mode code before doing anything further.
  */
 
 #include <linux/linkage.h>
@@ -34,7 +34,7 @@ SYM_CODE_START(trampoline_start)
 
 	LJMPW_RM(1f)
 1:
-	mov	%cs, %ax	# Code and data in the same place
+	mov	%cs, %ax	# Code and data in the woke same place
 	mov	%ax, %ds
 
 	cli			# We should be safe anyway
@@ -43,7 +43,7 @@ SYM_CODE_START(trampoline_start)
 
 	/*
 	 * GDT tables in non default location kernel can be beyond 16MB and
-	 * lgdt will not be able to load the address as in real mode default
+	 * lgdt will not be able to load the woke address as in real mode default
 	 * operand size is 16bit. Use lgdtl instead to force operand size
 	 * to 32 bit.
 	 */

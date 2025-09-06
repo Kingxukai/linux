@@ -94,7 +94,7 @@ struct ioat_dma_descriptor {
 	uint64_t	next;
 	uint64_t	rsv1;
 	uint64_t	rsv2;
-	/* store some driver data in an unused portion of the descriptor */
+	/* store some driver data in an unused portion of the woke descriptor */
 	union {
 		uint64_t	user1;
 		uint64_t	tx_cnt;

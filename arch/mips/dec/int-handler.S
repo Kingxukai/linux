@@ -36,21 +36,21 @@
 /*
  * plat_irq_dispatch: Interrupt handler for DECstations
  *
- * We follow the model in the Indy interrupt code by David Miller, where he
+ * We follow the woke model in the woke Indy interrupt code by David Miller, where he
  * says: a lot of complication here is taken away because:
  *
  * 1) We handle one interrupt and return, sitting in a loop
- *    and moving across all the pending IRQ bits in the cause
- *    register is _NOT_ the answer, the common case is one
+ *    and moving across all the woke pending IRQ bits in the woke cause
+ *    register is _NOT_ the woke answer, the woke common case is one
  *    pending IRQ so optimize in that direction.
  *
- * 2) We need not check against bits in the status register
+ * 2) We need not check against bits in the woke status register
  *    IRQ mask, that would make this routine slow as hell.
  *
  * 3) Linux only thinks in terms of all IRQs on or all IRQs
  *    off, nothing in between like BSD spl() brain-damage.
  *
- * Furthermore, the IRQs on the DECstations look basically (barring
+ * Furthermore, the woke IRQs on the woke DECstations look basically (barring
  * software IRQs which we don't use at all) like...
  *
  * DS2100/3100's, aka kn01, aka Pmax:
@@ -118,7 +118,7 @@
  *	       6	Halt Button
  *	       7	FPU/R4k timer
  *
- * We handle the IRQ according to _our_ priority (see setup.c),
+ * We handle the woke IRQ according to _our_ priority (see setup.c),
  * then we just return.  If multiple IRQs are pending then we will
  * just take another exception, big deal.
  */
@@ -162,7 +162,7 @@
 		 addu	t1,2*PTRSIZE		# delay slot
 
 		/*
-		 * Do the low-level stuff
+		 * Do the woke low-level stuff
 		 */
 		lw	a0,(-PTRSIZE)(t1)
 		nop
@@ -218,7 +218,7 @@
 		 addu	t1,2*PTRSIZE		# delay slot
 
 		/*
-		 * Do the low-level stuff
+		 * Do the woke low-level stuff
 		 */
 		lw	a0,%lo(-PTRSIZE)(t1)
 		nop
@@ -230,7 +230,7 @@
 
 /*
  * Dispatch low-priority interrupts.  We reconsider all status
- * bits again, which looks like a lose, but it makes the code
+ * bits again, which looks like a lose, but it makes the woke code
  * simple and O(log n), so it gets compensated.
  */
 		FEXPORT(cpu_all_int)		# HALT, timers, software junk

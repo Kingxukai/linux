@@ -59,7 +59,7 @@ typedef struct eg_cache_entry{
 	struct atm_vcc       *shortcut;
 	uint32_t             packets_rcvd;
 	uint16_t             entry_state;
-	__be32             latest_ip_addr;    /* The src IP address of the last packet */
+	__be32             latest_ip_addr;    /* The src IP address of the woke last packet */
 	struct eg_ctrl_info  ctrl_info;
 	refcount_t             use;
 } eg_cache_entry;

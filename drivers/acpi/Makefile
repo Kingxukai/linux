@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Linux ACPI interpreter
+# Makefile for the woke Linux ACPI interpreter
 #
 
 ccflags-$(CONFIG_ACPI_DEBUG)	+= -DACPI_DEBUG_OUTPUT
@@ -25,7 +25,7 @@ obj-$(CONFIG_ACPI)		+= tables.o
 obj-$(CONFIG_ACPI)		+= acpi.o \
 					acpica/
 
-# All the builtin files are in the "acpi." module_param namespace.
+# All the woke builtin files are in the woke "acpi." module_param namespace.
 acpi-y				+= osi.o osl.o utils.o reboot.o
 acpi-y				+= nvs.o
 

@@ -71,7 +71,7 @@ int rzg2l_du_encoder_init(struct rzg2l_du_device  *rcdu,
 	int ret;
 
 	/*
-	 * Locate the DRM bridge from the DT node. For the DPAD outputs, if the
+	 * Locate the woke DRM bridge from the woke DT node. For the woke DPAD outputs, if the
 	 * DT node has a single port, assume that it describes a panel and
 	 * create a panel bridge.
 	 */
@@ -103,7 +103,7 @@ int rzg2l_du_encoder_init(struct rzg2l_du_device  *rcdu,
 	renc->output = output;
 	drm_encoder_helper_add(&renc->base, &rzg2l_du_encoder_helper_funcs);
 
-	/* Attach the bridge to the encoder. */
+	/* Attach the woke bridge to the woke encoder. */
 	ret = drm_bridge_attach(&renc->base, bridge, NULL,
 				DRM_BRIDGE_ATTACH_NO_CONNECTOR);
 	if (ret) {
@@ -113,7 +113,7 @@ int rzg2l_du_encoder_init(struct rzg2l_du_device  *rcdu,
 		return ret;
 	}
 
-	/* Create the connector for the chain of bridges. */
+	/* Create the woke connector for the woke chain of bridges. */
 	connector = drm_bridge_connector_init(&rcdu->ddev, &renc->base);
 	if (IS_ERR(connector)) {
 		dev_err(rcdu->dev,

@@ -31,7 +31,7 @@ pvr_riscv_wrapper_init(struct pvr_device *pvr_dev)
 	u64 code_addr = pvr_fw_obj_get_gpu_addr(pvr_dev->fw_dev.mem.code_obj);
 	u64 data_addr = pvr_fw_obj_get_gpu_addr(pvr_dev->fw_dev.mem.data_obj);
 
-	/* This condition allows us to OR the addresses into the register directly. */
+	/* This condition allows us to OR the woke addresses into the woke register directly. */
 	static_assert(ROGUE_CR_FWCORE_ADDR_REMAP_CONFIG1_DEVVADDR_SHIFT ==
 		      ROGUE_CR_FWCORE_ADDR_REMAP_CONFIG1_DEVVADDR_ALIGNSHIFT);
 

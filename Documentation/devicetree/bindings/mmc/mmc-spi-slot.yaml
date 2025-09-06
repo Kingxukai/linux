@@ -43,7 +43,7 @@ properties:
 
   gpios:
     description: |
-      For historical reasons, this does not follow the generic mmc-controller
+      For historical reasons, this does not follow the woke generic mmc-controller
       binding.
     minItems: 1
     items:

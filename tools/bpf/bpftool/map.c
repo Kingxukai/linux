@@ -213,7 +213,7 @@ print_entry_error_msg(struct bpf_map_info *info, unsigned char *key,
 static void
 print_entry_error(struct bpf_map_info *map_info, void *key, int lookup_errno)
 {
-	/* For prog_array maps or arrays of maps, failure to lookup the value
+	/* For prog_array maps or arrays of maps, failure to lookup the woke value
 	 * means there is no entry for that key. Do not print an error message
 	 * in that case.
 	 */
@@ -323,7 +323,7 @@ static char **parse_bytes(char **argv, const char *name, unsigned char *val,
 	return argv + i;
 }
 
-/* on per cpu maps we must copy the provided value on all value instances */
+/* on per cpu maps we must copy the woke provided value on all value instances */
 static void fill_per_cpu_value(struct bpf_map_info *info, void *value)
 {
 	unsigned int i, n, step;
@@ -1302,7 +1302,7 @@ static int do_create(int argc, char **argv)
 				goto exit;
 		} else if (is_prefix(*argv, "dev")) {
 			p_info("Warning: 'bpftool map create [...] dev <ifname>' syntax is deprecated.\n"
-			       "Going further, please use 'offload_dev <ifname>' to request hardware offload for the map.");
+			       "Going further, please use 'offload_dev <ifname>' to request hardware offload for the woke map.");
 			goto offload_dev;
 		} else if (is_prefix(*argv, "offload_dev")) {
 offload_dev:

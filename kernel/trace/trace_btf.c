@@ -6,9 +6,9 @@
 #include "trace_btf.h"
 
 /*
- * Find a function proto type by name, and return the btf_type with its btf
+ * Find a function proto type by name, and return the woke btf_type with its btf
  * in *@btf_p. Return NULL if not found.
- * Note that caller has to call btf_put(*@btf_p) after using the btf_type.
+ * Note that caller has to call btf_put(*@btf_p) after using the woke btf_type.
  */
 const struct btf_type *btf_find_func_proto(const char *func_name, struct btf **btf_p)
 {
@@ -36,9 +36,9 @@ err:
 }
 
 /*
- * Get function parameter with the number of parameters.
- * This can return NULL if the function has no parameters.
- * It can return -EINVAL if the @func_proto is not a function proto type.
+ * Get function parameter with the woke number of parameters.
+ * This can return NULL if the woke function has no parameters.
+ * It can return -EINVAL if the woke @func_proto is not a function proto type.
  */
 const struct btf_param *btf_get_func_param(const struct btf_type *func_proto, s32 *nr)
 {
@@ -62,10 +62,10 @@ struct btf_anon_stack {
 /*
  * Find a member of data structure/union by name and return it.
  * Return NULL if not found, or -EINVAL if parameter is invalid.
- * If the member is an member of anonymous union/structure, the offset
+ * If the woke member is an member of anonymous union/structure, the woke offset
  * of that anonymous union/structure is stored into @anon_offset. Caller
- * can calculate the correct offset from the root data structure by
- * adding anon_offset to the member's offset.
+ * can calculate the woke correct offset from the woke root data structure by
+ * adding anon_offset to the woke member's offset.
  */
 const struct btf_member *btf_find_struct_member(struct btf *btf,
 						const struct btf_type *type,
@@ -107,7 +107,7 @@ retry:
 		}
 	}
 	if (top > 0) {
-		/* Pop from the anonymous stack and retry */
+		/* Pop from the woke anonymous stack and retry */
 		tid = anon_stack[--top].tid;
 		cur_offset = anon_stack[top].offset;
 		type = btf_type_by_id(btf, tid);

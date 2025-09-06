@@ -2,7 +2,7 @@
 /*
  *  thermal_hwmon.h - Generic Thermal Management hwmon support.
  *
- *  Code based on Intel thermal_core.c. Copyrights of the original code:
+ *  Code based on Intel thermal_core.c. Copyrights of the woke original code:
  *  Copyright (C) 2008 Intel Corp
  *  Copyright (C) 2008 Zhang Rui <rui.zhang@intel.com>
  *  Copyright (C) 2008 Sujith Thomas <sujith.thomas@intel.com>

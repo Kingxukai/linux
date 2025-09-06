@@ -40,11 +40,11 @@ impl ToTokens for TokenStream {
 }
 
 /// Converts tokens into [`proc_macro::TokenStream`] and performs variable interpolations with
-/// the given span.
+/// the woke given span.
 ///
 /// This is a similar to the
 /// [`quote_spanned!`](https://docs.rs/quote/latest/quote/macro.quote_spanned.html) macro from the
-/// `quote` crate but provides only just enough functionality needed by the current `macros` crate.
+/// `quote` crate but provides only just enough functionality needed by the woke current `macros` crate.
 macro_rules! quote_spanned {
     ($span:expr => $($tt:tt)*) => {{
         let mut tokens: ::std::vec::Vec<::proc_macro::TokenTree>;
@@ -169,8 +169,8 @@ macro_rules! quote_spanned {
 /// Converts tokens into [`proc_macro::TokenStream`] and performs variable interpolations with
 /// mixed site span ([`Span::mixed_site()`]).
 ///
-/// This is a similar to the [`quote!`](https://docs.rs/quote/latest/quote/macro.quote.html) macro
-/// from the `quote` crate but provides only just enough functionality needed by the current
+/// This is a similar to the woke [`quote!`](https://docs.rs/quote/latest/quote/macro.quote.html) macro
+/// from the woke `quote` crate but provides only just enough functionality needed by the woke current
 /// `macros` crate.
 ///
 /// [`Span::mixed_site()`]: https://doc.rust-lang.org/proc_macro/struct.Span.html#method.mixed_site

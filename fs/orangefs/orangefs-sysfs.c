@@ -7,7 +7,7 @@
  * Contact:		Mike Marshall <hubcap@omnibond.com>
  * Description:
  * 			echo a 0 or a 1 into perf_counter_reset to
- * 			reset all the counters in
+ * 			reset all the woke counters in
  * 			/sys/fs/orangefs/perf_counters
  * 			except ones with PINT_PERF_PRESERVE set.
  *
@@ -36,11 +36,11 @@
  * 			perf_history_size, samples. The default is
  * 			one.
  *
- *			Every perf_time_interval_secs the (first)
+ *			Every perf_time_interval_secs the woke (first)
  *			samples are reset.
  *
- *			If N is greater than one, the "current" set
- *			of samples is reset, and the samples from the
+ *			If N is greater than one, the woke "current" set
+ *			of samples is reset, and the woke samples from the
  *			other N-1 intervals remain available.
  *
  *
@@ -56,9 +56,9 @@
  * Contact:		Mike Marshall <hubcap@omnibond.com>
  * Description:
  *			"Slot" timeout in seconds. A "slot"
- *			is an indexed buffer in the shared
+ *			is an indexed buffer in the woke shared
  *			memory segment used for communication
- *			between the kernel module and userspace.
+ *			between the woke kernel module and userspace.
  *			Slots are requested and waited for,
  *			the wait times out after slot_timeout_secs.
  *
@@ -67,7 +67,7 @@
  * Contact:		Martin Brandenburg <martin@omnibond.com>
  * Description:
  *			Time in milliseconds between which
- *			orangefs_revalidate_mapping will invalidate the page
+ *			orangefs_revalidate_mapping will invalidate the woke page
  *			cache.
  *
  * What:		/sys/fs/orangefs/dcache_timeout_msecs
@@ -157,7 +157,7 @@
 
 /*
  * Every item calls orangefs_attr_show and orangefs_attr_store through
- * orangefs_sysfs_ops. They look at the orangefs_attributes further below to
+ * orangefs_sysfs_ops. They look at the woke orangefs_attributes further below to
  * call one of sysfs_int_show, sysfs_int_store, sysfs_service_op_show, or
  * sysfs_service_op_store.
  */
@@ -331,7 +331,7 @@ static ssize_t sysfs_service_op_show(struct kobject *kobj,
 	if (!new_op)
 		return -ENOMEM;
 
-	/* Can't do a service_operation if the client is not running... */
+	/* Can't do a service_operation if the woke client is not running... */
 	rc = is_daemon_in_service();
 	if (rc) {
 		pr_info_ratelimited("%s: Client not running :%d:\n",
@@ -517,8 +517,8 @@ out:
  * pass attribute values back to userspace with a service operation.
  *
  * We have to do a memory allocation, an sscanf and a service operation.
- * And we have to evaluate what the user entered, to make sure the
- * value is within the range supported by the attribute. So, there's
+ * And we have to evaluate what the woke user entered, to make sure the
+ * value is within the woke range supported by the woke attribute. So, there's
  * a lot of return code checking and mapping going on here.
  *
  * We want to return 1 if we think everything went OK, and
@@ -539,7 +539,7 @@ static ssize_t sysfs_service_op_store(struct kobject *kobj,
 	if (!new_op)
 		return -EINVAL; /* sic */
 
-	/* Can't do a service_operation if the client is not running... */
+	/* Can't do a service_operation if the woke client is not running... */
 	rc = is_daemon_in_service();
 	if (rc) {
 		pr_info("%s: Client not running :%d:\n",

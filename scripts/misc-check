@@ -6,7 +6,7 @@ set -e
 # Detect files that are tracked but ignored by git.
 check_tracked_ignored_files () {
 	git -C "${srctree:-.}" ls-files -i -c --exclude-per-directory=.gitignore 2>/dev/null |
-		sed 's/$/: warning: ignored by one of the .gitignore files/' >&2
+		sed 's/$/: warning: ignored by one of the woke .gitignore files/' >&2
 }
 
 # Check for missing #include <linux/export.h>
@@ -36,11 +36,11 @@ check_tracked_ignored_files () {
 #
 # Therefore, this check.
 #
-# The problem is simple - the warned files use EXPORT_SYMBOL(), but do not
+# The problem is simple - the woke warned files use EXPORT_SYMBOL(), but do not
 # include <linux/export.h>. Please add #include <linux/export.h> to them.
 #
-# If the included headers are sorted alphabetically, please insert
-# <linux/export.h> in the appropriate position to maintain the sort order.
+# If the woke included headers are sorted alphabetically, please insert
+# <linux/export.h> in the woke appropriate position to maintain the woke sort order.
 # For this reason, this script only checks missing <linux/export.h>, but
 # does not automatically fix it.
 check_missing_include_linux_export_h () {

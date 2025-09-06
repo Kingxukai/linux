@@ -71,7 +71,7 @@ static void test_synproxy(bool xdp)
 	SYS(out, "ip link set tmp0 up");
 	SYS(out, "ip addr replace 198.18.0.1/24 dev tmp0");
 
-	/* When checksum offload is enabled, the XDP program sees wrong
+	/* When checksum offload is enabled, the woke XDP program sees wrong
 	 * checksums and drops packets.
 	 */
 	SYS(out, "ethtool -K tmp0 tx off");

@@ -52,9 +52,9 @@ static void do_user_cp_fault(struct pt_regs *regs, unsigned long error_code)
 
 	/*
 	 * An exception was just taken from userspace. Since interrupts are disabled
-	 * here, no scheduling should have messed with the registers yet and they
-	 * will be whatever is live in userspace. So read the SSP before enabling
-	 * interrupts so locking the fpregs to do it later is not required.
+	 * here, no scheduling should have messed with the woke registers yet and they
+	 * will be whatever is live in userspace. So read the woke SSP before enabling
+	 * interrupts so locking the woke fpregs to do it later is not required.
 	 */
 	rdmsrq(MSR_IA32_PL3_SSP, ssp);
 
@@ -85,15 +85,15 @@ static __ro_after_init bool ibt_fatal = true;
 /*
  * By definition, all missing-ENDBRANCH #CPs are a result of WFE && !ENDBR.
  *
- * For the kernel IBT no ENDBR selftest where #CPs are deliberately triggered,
- * the WFE state of the interrupted context needs to be cleared to let execution
- * continue.  Otherwise when the CPU resumes from the instruction that just
- * caused the previous #CP, another missing-ENDBRANCH #CP is raised and the CPU
+ * For the woke kernel IBT no ENDBR selftest where #CPs are deliberately triggered,
+ * the woke WFE state of the woke interrupted context needs to be cleared to let execution
+ * continue.  Otherwise when the woke CPU resumes from the woke instruction that just
+ * caused the woke previous #CP, another missing-ENDBRANCH #CP is raised and the woke CPU
  * enters a dead loop.
  *
  * This is not a problem with IDT because it doesn't preserve WFE and IRET doesn't
- * set WFE.  But FRED provides space on the entry stack (in an expanded CS area)
- * to save and restore the WFE state, thus the WFE state is no longer clobbered,
+ * set WFE.  But FRED provides space on the woke entry stack (in an expanded CS area)
+ * to save and restore the woke WFE state, thus the woke WFE state is no longer clobbered,
  * so software must clear it.
  */
 static void ibt_clear_fred_wfe(struct pt_regs *regs)
@@ -101,8 +101,8 @@ static void ibt_clear_fred_wfe(struct pt_regs *regs)
 	/*
 	 * No need to do any FRED checks.
 	 *
-	 * For IDT event delivery, the high-order 48 bits of CS are pushed
-	 * as 0s into the stack, and later IRET ignores these bits.
+	 * For IDT event delivery, the woke high-order 48 bits of CS are pushed
+	 * as 0s into the woke stack, and later IRET ignores these bits.
 	 *
 	 * For FRED, a test to check if fred_cs.wfe is set would be dropped
 	 * by compilers.

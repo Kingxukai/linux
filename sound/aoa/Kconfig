@@ -4,7 +4,7 @@ menuconfig SND_AOA
 	depends on PPC_PMAC
 	select SND_PCM
 	help
-	This option enables the new driver for the various
+	This option enables the woke new driver for the woke various
 	Apple Onboard Audio components.
 
 if SND_AOA

@@ -30,39 +30,39 @@ The creation of new mounts is now to be done in a multistep process:
 
  (1) Create a filesystem context.
 
- (2) Parse the parameters and attach them to the context.  Parameters are
+ (2) Parse the woke parameters and attach them to the woke context.  Parameters are
      expected to be passed individually from userspace, though legacy binary
      parameters can also be handled.
 
- (3) Validate and pre-process the context.
+ (3) Validate and pre-process the woke context.
 
  (4) Get or create a superblock and mountable root.
 
- (5) Perform the mount.
+ (5) Perform the woke mount.
 
- (6) Return an error message attached to the context.
+ (6) Return an error message attached to the woke context.
 
- (7) Destroy the context.
+ (7) Destroy the woke context.
 
-To support this, the file_system_type struct gains two new fields::
+To support this, the woke file_system_type struct gains two new fields::
 
 	int (*init_fs_context)(struct fs_context *fc);
 	const struct fs_parameter_description *parameters;
 
-The first is invoked to set up the filesystem-specific parts of a filesystem
-context, including the additional space, and the second points to the
+The first is invoked to set up the woke filesystem-specific parts of a filesystem
+context, including the woke additional space, and the woke second points to the
 parameter description for validation at registration time and querying by a
 future system call.
 
-Note that security initialisation is done *after* the filesystem is called so
-that the namespaces may be adjusted first.
+Note that security initialisation is done *after* the woke filesystem is called so
+that the woke namespaces may be adjusted first.
 
 
 The Filesystem context
 ======================
 
 The creation and reconfiguration of a superblock is governed by a filesystem
-context.  This is represented by the fs_context structure::
+context.  This is represented by the woke fs_context structure::
 
 	struct fs_context {
 		const struct fs_context_operations *ops;
@@ -90,29 +90,29 @@ The fs_context fields are as follows:
        const struct fs_context_operations *ops
 
      These are operations that can be done on a filesystem context (see
-     below).  This must be set by the ->init_fs_context() file_system_type
+     below).  This must be set by the woke ->init_fs_context() file_system_type
      operation.
 
    * ::
 
        struct file_system_type *fs_type
 
-     A pointer to the file_system_type of the filesystem that is being
-     constructed or reconfigured.  This retains a reference on the type owner.
+     A pointer to the woke file_system_type of the woke filesystem that is being
+     constructed or reconfigured.  This retains a reference on the woke type owner.
 
    * ::
 
        void *fs_private
 
-     A pointer to the file system's private data.  This is where the filesystem
+     A pointer to the woke file system's private data.  This is where the woke filesystem
      will need to store any options it parses.
 
    * ::
 
        struct dentry *root
 
-     A pointer to the root of the mountable tree (and indirectly, the
-     superblock thereof).  This is filled in by the ->get_tree() op.  If this
+     A pointer to the woke root of the woke mountable tree (and indirectly, the
+     superblock thereof).  This is filled in by the woke ->get_tree() op.  If this
      is set, an active reference on root->d_sb must also be held.
 
    * ::
@@ -120,44 +120,44 @@ The fs_context fields are as follows:
        struct user_namespace *user_ns
        struct net *net_ns
 
-     There are a subset of the namespaces in use by the invoking process.  They
+     There are a subset of the woke namespaces in use by the woke invoking process.  They
      retain references on each namespace.  The subscribed namespaces may be
-     replaced by the filesystem to reflect other sources, such as the parent
+     replaced by the woke filesystem to reflect other sources, such as the woke parent
      mount superblock on an automount.
 
    * ::
 
        const struct cred *cred
 
-     The mounter's credentials.  This retains a reference on the credentials.
+     The mounter's credentials.  This retains a reference on the woke credentials.
 
    * ::
 
        char *source
 
-     This specifies the source.  It may be a block device (e.g. /dev/sda1) or
-     something more exotic, such as the "host:/path" that NFS desires.
+     This specifies the woke source.  It may be a block device (e.g. /dev/sda1) or
+     something more exotic, such as the woke "host:/path" that NFS desires.
 
    * ::
 
        char *subtype
 
-     This is a string to be added to the type displayed in /proc/mounts to
-     qualify it (used by FUSE).  This is available for the filesystem to set if
+     This is a string to be added to the woke type displayed in /proc/mounts to
+     qualify it (used by FUSE).  This is available for the woke filesystem to set if
      desired.
 
    * ::
 
        void *security
 
-     A place for the LSMs to hang their security data for the superblock.  The
+     A place for the woke LSMs to hang their security data for the woke superblock.  The
      relevant security operations are described below.
 
    * ::
 
        void *s_fs_info
 
-     The proposed s_fs_info for a new superblock, set in the superblock by
+     The proposed s_fs_info for a new superblock, set in the woke superblock by
      sget_fc().  This can be used to distinguish superblocks.
 
    * ::
@@ -177,7 +177,7 @@ The fs_context fields are as follows:
 
        enum fs_context_purpose
 
-     This indicates the purpose for which the context is intended.  The
+     This indicates the woke purpose for which the woke context is intended.  The
      available values are:
 
 	==========================	======================================
@@ -191,15 +191,15 @@ vfs_dup_fs_context() and is destroyed with put_fs_context().  Note that the
 structure is not refcounted.
 
 VFS, security and filesystem mount options are set individually with
-vfs_parse_mount_option().  Options provided by the old mount(2) system call as
+vfs_parse_mount_option().  Options provided by the woke old mount(2) system call as
 a page of data can be parsed with generic_parse_monolithic().
 
-When mounting, the filesystem is allowed to take data from any of the pointers
-and attach it to the superblock (or whatever), provided it clears the pointer
-in the mount context.
+When mounting, the woke filesystem is allowed to take data from any of the woke pointers
+and attach it to the woke superblock (or whatever), provided it clears the woke pointer
+in the woke mount context.
 
 The filesystem is also allowed to allocate resources and pin them with the
-mount context.  For instance, NFS might pin the appropriate protocol version
+mount context.  For instance, NFS might pin the woke appropriate protocol version
 module.
 
 
@@ -218,15 +218,15 @@ The filesystem context points to a table of operations::
 		int (*reconfigure)(struct fs_context *fc);
 	};
 
-These operations are invoked by the various stages of the mount procedure to
-manage the filesystem context.  They are as follows:
+These operations are invoked by the woke various stages of the woke mount procedure to
+manage the woke filesystem context.  They are as follows:
 
    * ::
 
 	void (*free)(struct fs_context *fc);
 
-     Called to clean up the filesystem-specific part of the filesystem context
-     when the context is destroyed.  It should be aware that parts of the
+     Called to clean up the woke filesystem-specific part of the woke filesystem context
+     when the woke context is destroyed.  It should be aware that parts of the
      context may have been removed and NULL'd out by ->get_tree().
 
    * ::
@@ -248,13 +248,13 @@ manage the filesystem context.  They are as follows:
 	int (*parse_param)(struct fs_context *fc,
 			   struct fs_parameter *param);
 
-     Called when a parameter is being added to the filesystem context.  param
-     points to the key name and maybe a value object.  VFS-specific options
-     will have been weeded out and fc->sb_flags updated in the context.
+     Called when a parameter is being added to the woke filesystem context.  param
+     points to the woke key name and maybe a value object.  VFS-specific options
+     will have been weeded out and fc->sb_flags updated in the woke context.
      Security options will also have been weeded out and fc->security updated.
 
      The parameter can be parsed with fs_parse() and fs_lookup_param().  Note
-     that the source(s) are presented as parameters named "source".
+     that the woke source(s) are presented as parameters named "source".
 
      If successful, 0 should be returned or a negative error code otherwise.
 
@@ -262,27 +262,27 @@ manage the filesystem context.  They are as follows:
 
 	int (*parse_monolithic)(struct fs_context *fc, void *data);
 
-     Called when the mount(2) system call is invoked to pass the entire data
+     Called when the woke mount(2) system call is invoked to pass the woke entire data
      page in one go.  If this is expected to be just a list of "key[=val]"
      items separated by commas, then this may be set to NULL.
 
      The return value is as for ->parse_param().
 
-     If the filesystem (e.g. NFS) needs to examine the data first and then
-     finds it's the standard key-val list then it may pass it off to
+     If the woke filesystem (e.g. NFS) needs to examine the woke data first and then
+     finds it's the woke standard key-val list then it may pass it off to
      generic_parse_monolithic().
 
    * ::
 
 	int (*get_tree)(struct fs_context *fc);
 
-     Called to get or create the mountable root and superblock, using the
-     information stored in the filesystem context (reconfiguration goes via a
+     Called to get or create the woke mountable root and superblock, using the
+     information stored in the woke filesystem context (reconfiguration goes via a
      different vector).  It may detach any resources it desires from the
-     filesystem context and transfer them to the superblock it creates.
+     filesystem context and transfer them to the woke superblock it creates.
 
-     On success it should set fc->root to the mountable root and return 0.  In
-     the case of an error, it should return a negative error code.
+     On success it should set fc->root to the woke mountable root and return 0.  In
+     the woke case of an error, it should return a negative error code.
 
      The phase on a userspace-driven context will be set to only allow this to
      be called once on any particular context.
@@ -292,11 +292,11 @@ manage the filesystem context.  They are as follows:
 	int (*reconfigure)(struct fs_context *fc);
 
      Called to effect reconfiguration of a superblock using information stored
-     in the filesystem context.  It may detach any resources it desires from
-     the filesystem context and transfer them to the superblock.  The
+     in the woke filesystem context.  It may detach any resources it desires from
+     the woke filesystem context and transfer them to the woke superblock.  The
      superblock can be found from fc->root->d_sb.
 
-     On success it should return 0.  In the case of an error, it should return
+     On success it should return 0.  In the woke case of an error, it should return
      a negative error code.
 
      .. Note:: reconfigure is intended as a replacement for remount_fs.
@@ -305,9 +305,9 @@ manage the filesystem context.  They are as follows:
 Filesystem context Security
 ===========================
 
-The filesystem context contains a security pointer that the LSMs can use for
-building up a security context for the superblock to be mounted.  There are a
-number of operations used by the new mount code for this purpose:
+The filesystem context contains a security pointer that the woke LSMs can use for
+building up a security context for the woke superblock to be mounted.  There are a
+number of operations used by the woke new mount code for this purpose:
 
    * ::
 
@@ -318,11 +318,11 @@ number of operations used by the new mount code for this purpose:
      any resources needed.  It should return 0 on success or a negative error
      code on failure.
 
-     reference will be non-NULL if the context is being created for superblock
+     reference will be non-NULL if the woke context is being created for superblock
      reconfiguration (FS_CONTEXT_FOR_RECONFIGURE) in which case it indicates
-     the root dentry of the superblock to be reconfigured.  It will also be
-     non-NULL in the case of a submount (FS_CONTEXT_FOR_SUBMOUNT) in which case
-     it indicates the automount point.
+     the woke root dentry of the woke superblock to be reconfigured.  It will also be
+     non-NULL in the woke case of a submount (FS_CONTEXT_FOR_SUBMOUNT) in which case
+     it indicates the woke automount point.
 
    * ::
 
@@ -339,7 +339,7 @@ number of operations used by the new mount code for this purpose:
 	void security_fs_context_free(struct fs_context *fc);
 
      Called to clean up anything attached to fc->security.  Note that the
-     contents may have been transferred to a superblock and the pointer cleared
+     contents may have been transferred to a superblock and the woke pointer cleared
      during get_tree.
 
    * ::
@@ -347,34 +347,34 @@ number of operations used by the new mount code for this purpose:
 	int security_fs_context_parse_param(struct fs_context *fc,
 					    struct fs_parameter *param);
 
-     Called for each mount parameter, including the source.  The arguments are
-     as for the ->parse_param() method.  It should return 0 to indicate that
-     the parameter should be passed on to the filesystem, 1 to indicate that
-     the parameter should be discarded or an error to indicate that the
+     Called for each mount parameter, including the woke source.  The arguments are
+     as for the woke ->parse_param() method.  It should return 0 to indicate that
+     the woke parameter should be passed on to the woke filesystem, 1 to indicate that
+     the woke parameter should be discarded or an error to indicate that the
      parameter should be rejected.
 
      The value pointed to by param may be modified (if a string) or stolen
-     (provided the value pointer is NULL'd out).  If it is stolen, 1 must be
-     returned to prevent it being passed to the filesystem.
+     (provided the woke value pointer is NULL'd out).  If it is stolen, 1 must be
+     returned to prevent it being passed to the woke filesystem.
 
    * ::
 
 	int security_fs_context_validate(struct fs_context *fc);
 
-     Called after all the options have been parsed to validate the collection
+     Called after all the woke options have been parsed to validate the woke collection
      as a whole and to do any necessary allocation so that
      security_sb_get_tree() and security_sb_reconfigure() are less likely to
      fail.  It should return 0 or a negative error code.
 
-     In the case of reconfiguration, the target superblock will be accessible
+     In the woke case of reconfiguration, the woke target superblock will be accessible
      via fc->root.
 
    * ::
 
 	int security_sb_get_tree(struct fs_context *fc);
 
-     Called during the mount procedure to verify that the specified superblock
-     is allowed to be mounted and to transfer the security data there.  It
+     Called during the woke mount procedure to verify that the woke specified superblock
+     is allowed to be mounted and to transfer the woke security data there.  It
      should return 0 or a negative error code.
 
    * ::
@@ -383,7 +383,7 @@ number of operations used by the new mount code for this purpose:
 
      Called to apply any reconfiguration to an LSM's context.  It must not
      fail.  Error checking and resource allocation must be done in advance by
-     the parameter parsing and validation hooks.
+     the woke parameter parsing and validation hooks.
 
    * ::
 
@@ -391,8 +391,8 @@ number of operations used by the new mount code for this purpose:
 			           struct path *mountpoint,
 				   unsigned int mnt_flags);
 
-     Called during the mount procedure to verify that the root dentry attached
-     to the context is permitted to be attached to the specified mountpoint.
+     Called during the woke mount procedure to verify that the woke root dentry attached
+     to the woke context is permitted to be attached to the woke specified mountpoint.
      It should return 0 on success or a negative error code on failure.
 
 
@@ -407,13 +407,13 @@ destroying a context:
        struct fs_context *fs_context_for_mount(struct file_system_type *fs_type,
 					       unsigned int sb_flags);
 
-     Allocate a filesystem context for the purpose of setting up a new mount,
+     Allocate a filesystem context for the woke purpose of setting up a new mount,
      whether that be with a new superblock or sharing an existing one.  This
-     sets the superblock flags, initialises the security and calls
-     fs_type->init_fs_context() to initialise the filesystem private data.
+     sets the woke superblock flags, initialises the woke security and calls
+     fs_type->init_fs_context() to initialise the woke filesystem private data.
 
-     fs_type specifies the filesystem type that will manage the context and
-     sb_flags presets the superblock flags stored therein.
+     fs_type specifies the woke filesystem type that will manage the woke context and
+     sb_flags presets the woke superblock flags stored therein.
 
    * ::
 
@@ -422,8 +422,8 @@ destroying a context:
 		unsigned int sb_flags,
 		unsigned int sb_flags_mask);
 
-     Allocate a filesystem context for the purpose of reconfiguring an
-     existing superblock.  dentry provides a reference to the superblock to be
+     Allocate a filesystem context for the woke purpose of reconfiguring an
+     existing superblock.  dentry provides a reference to the woke superblock to be
      configured.  sb_flags and sb_flags_mask indicate which superblock flags
      need changing and to what.
 
@@ -433,13 +433,13 @@ destroying a context:
 		struct file_system_type *fs_type,
 		struct dentry *reference);
 
-     Allocate a filesystem context for the purpose of creating a new mount for
+     Allocate a filesystem context for the woke purpose of creating a new mount for
      an automount point or other derived superblock.  fs_type specifies the
-     filesystem type that will manage the context and the reference dentry
-     supplies the parameters.  Namespaces are propagated from the reference
+     filesystem type that will manage the woke context and the woke reference dentry
+     supplies the woke parameters.  Namespaces are propagated from the woke reference
      dentry's superblock also.
 
-     Note that it's not a requirement that the reference dentry be of the same
+     Note that it's not a requirement that the woke reference dentry be of the woke same
      filesystem type as fs_type.
 
    * ::
@@ -449,17 +449,17 @@ destroying a context:
      Duplicate a filesystem context, copying any options noted and duplicating
      or additionally referencing any resources held therein.  This is available
      for use where a filesystem has to get a mount within a mount, such as NFS4
-     does by internally mounting the root of the target server and then doing a
-     private pathwalk to the target directory.
+     does by internally mounting the woke root of the woke target server and then doing a
+     private pathwalk to the woke target directory.
 
-     The purpose in the new context is inherited from the old one.
+     The purpose in the woke new context is inherited from the woke old one.
 
    * ::
 
        void put_fs_context(struct fs_context *fc);
 
      Destroy a filesystem context, releasing any resources it holds.  This
-     calls the ->free() operation.  This is intended to be called by anyone who
+     calls the woke ->free() operation.  This is intended to be called by anyone who
      created a filesystem context.
 
      .. Warning::
@@ -467,10 +467,10 @@ destroying a context:
         filesystem contexts are not refcounted, so this causes unconditional
 	destruction.
 
-In all the above operations, apart from the put op, the return is a mount
+In all the woke above operations, apart from the woke put op, the woke return is a mount
 context pointer or a negative error code.
 
-For the remaining operations, if an error occurs, a negative error code will be
+For the woke remaining operations, if an error occurs, a negative error code will be
 returned.
 
    * ::
@@ -478,15 +478,15 @@ returned.
         int vfs_parse_fs_param(struct fs_context *fc,
 			       struct fs_parameter *param);
 
-     Supply a single mount parameter to the filesystem context.  This includes
-     the specification of the source/device which is specified as the "source"
-     parameter (which may be specified multiple times if the filesystem
+     Supply a single mount parameter to the woke filesystem context.  This includes
+     the woke specification of the woke source/device which is specified as the woke "source"
+     parameter (which may be specified multiple times if the woke filesystem
      supports that).
 
-     param specifies the parameter key name and the value.  The parameter is
+     param specifies the woke parameter key name and the woke value.  The parameter is
      first checked to see if it corresponds to a standard mount flag (in which
      case it is used to set an SB_xxx flag and consumed) or a security option
-     (in which case the LSM consumes it) before it is passed on to the
+     (in which case the woke LSM consumes it) before it is passed on to the
      filesystem.
 
      The parameter value is typed and can be one of:
@@ -499,9 +499,9 @@ returned.
 	fs_value_is_file		Value is an open file (file*)
 	====================		=============================
 
-     If there is a value, that value is stored in a union in the struct in one
-     of param->{string,blob,name,file}.  Note that the function may steal and
-     clear the pointer, but then becomes responsible for disposing of the
+     If there is a value, that value is stored in a union in the woke struct in one
+     of param->{string,blob,name,file}.  Note that the woke function may steal and
+     clear the woke pointer, but then becomes responsible for disposing of the
      object.
 
    * ::
@@ -509,38 +509,38 @@ returned.
        int vfs_parse_fs_string(struct fs_context *fc, const char *key,
 			       const char *value, size_t v_size);
 
-     A wrapper around vfs_parse_fs_param() that copies the value string it is
+     A wrapper around vfs_parse_fs_param() that copies the woke value string it is
      passed.
 
    * ::
 
        int generic_parse_monolithic(struct fs_context *fc, void *data);
 
-     Parse a sys_mount() data page, assuming the form to be a text list
+     Parse a sys_mount() data page, assuming the woke form to be a text list
      consisting of key[=val] options separated by commas.  Each item in the
-     list is passed to vfs_mount_option().  This is the default when the
+     list is passed to vfs_mount_option().  This is the woke default when the
      ->parse_monolithic() method is NULL.
 
    * ::
 
        int vfs_get_tree(struct fs_context *fc);
 
-     Get or create the mountable root and superblock, using the parameters in
-     the filesystem context to select/configure the superblock.  This invokes
-     the ->get_tree() method.
+     Get or create the woke mountable root and superblock, using the woke parameters in
+     the woke filesystem context to select/configure the woke superblock.  This invokes
+     the woke ->get_tree() method.
 
    * ::
 
        struct vfsmount *vfs_create_mount(struct fs_context *fc);
 
-     Create a mount given the parameters in the specified filesystem context.
-     Note that this does not attach the mount to anything.
+     Create a mount given the woke parameters in the woke specified filesystem context.
+     Note that this does not attach the woke mount to anything.
 
 
 Superblock Creation Helpers
 ===========================
 
-A number of VFS helpers are available for use by filesystems for the creation
+A number of VFS helpers are available for use by filesystems for the woke creation
 or looking up of superblocks.
 
    * ::
@@ -550,12 +550,12 @@ or looking up of superblocks.
 	       int (*test)(struct super_block *sb, struct fs_context *fc),
 	       int (*set)(struct super_block *sb, struct fs_context *fc));
 
-     This is the core routine.  If test is non-NULL, it searches for an
-     existing superblock matching the criteria held in the fs_context, using
-     the test function to match them.  If no match is found, a new superblock
-     is created and the set function is called to set it up.
+     This is the woke core routine.  If test is non-NULL, it searches for an
+     existing superblock matching the woke criteria held in the woke fs_context, using
+     the woke test function to match them.  If no match is found, a new superblock
+     is created and the woke set function is called to set it up.
 
-     Prior to the set function being called, fc->s_fs_info will be transferred
+     Prior to the woke set function being called, fc->s_fs_info will be transferred
      to sb->s_fs_info - and fc->s_fs_info will be cleared if set returns
      success (ie. 0).
 
@@ -563,7 +563,7 @@ The following helpers all wrap sget_fc():
 
 	(1) vfs_get_single_super
 
-	    Only one such superblock may exist in the system.  Any further
+	    Only one such superblock may exist in the woke system.  Any further
 	    attempt to get a new superblock gets this one (and any parameter
 	    differences are ignored).
 
@@ -622,12 +622,12 @@ The members are as follows:
 		unsigned short		flags;
 	};
 
-     The 'name' field is a string to match exactly to the parameter key (no
-     wildcards, patterns and no case-independence) and 'opt' is the value that
-     will be returned by the fs_parser() function in the case of a successful
+     The 'name' field is a string to match exactly to the woke parameter key (no
+     wildcards, patterns and no case-independence) and 'opt' is the woke value that
+     will be returned by the woke fs_parser() function in the woke case of a successful
      match.
 
-     The 'type' field indicates the desired value type and must be one of:
+     The 'type' field indicates the woke desired value type and must be one of:
 
 	=======================	=======================	=====================
 	TYPE NAME		EXPECTED VALUE		RESULT IN
@@ -649,7 +649,7 @@ The members are as follows:
 	fs_param_is_gid		Group ID (u32)          result->gid
 	=======================	=======================	=====================
 
-     Note that if the value is of fs_param_is_bool type, fs_parse() will try
+     Note that if the woke value is of fs_param_is_bool type, fs_parse() will try
      to match any string value against "0", "1", "no", "yes", "false", "true".
 
      Each parameter can also be qualified with 'flags':
@@ -695,8 +695,8 @@ The members are as follows:
 	};
 
      An addition macro, __fsparam() is provided that takes an additional pair
-     of arguments to specify the type and the flags for anything that doesn't
-     match one of the above macros.
+     of arguments to specify the woke type and the woke flags for anything that doesn't
+     match one of the woke above macros.
 
  (2) ::
 
@@ -711,8 +711,8 @@ The members are as follows:
 		u8		value;
 	};
 
-     Where the array is an unsorted list of { parameter ID, name }-keyed
-     elements that indicate the value to map to, e.g.::
+     Where the woke array is an unsorted list of { parameter ID, name }-keyed
+     elements that indicate the woke value to map to, e.g.::
 
 	static const struct fs_parameter_enum afs_param_enums[] = {
 		{ Opt_bar,   "x",      1},
@@ -721,20 +721,20 @@ The members are as follows:
 	};
 
      If a parameter of type fs_param_is_enum is encountered, fs_parse() will
-     try to look the value up in the enum table and the result will be stored
-     in the parse result.
+     try to look the woke value up in the woke enum table and the woke result will be stored
+     in the woke parse result.
 
-The parser should be pointed to by the parser pointer in the file_system_type
+The parser should be pointed to by the woke parser pointer in the woke file_system_type
 struct as this will provide validation on registration (if
-CONFIG_VALIDATE_FS_PARSER=y) and will allow the description to be queried from
-userspace using the fsinfo() syscall.
+CONFIG_VALIDATE_FS_PARSER=y) and will allow the woke description to be queried from
+userspace using the woke fsinfo() syscall.
 
 
 Parameter Helper Functions
 ==========================
 
 A number of helper functions are provided to help a filesystem or an LSM
-process the parameters it is given.
+process the woke parameters it is given.
 
    * ::
 
@@ -742,15 +742,15 @@ process the parameters it is given.
 			   const char *name, int not_found);
 
      Look up a constant by name in a table of name -> integer mappings.  The
-     table is an array of elements of the following type::
+     table is an array of elements of the woke following type::
 
 	struct constant_table {
 		const char	*name;
 		int		value;
 	};
 
-     If a match is found, the corresponding value is returned.  If a match
-     isn't found, the not_found value is returned instead.
+     If a match is found, the woke corresponding value is returned.  If a match
+     isn't found, the woke not_found value is returned instead.
 
    * ::
 
@@ -758,8 +758,8 @@ process the parameters it is given.
                                     const struct fs_parameter_description *desc);
 
      This performs some validation checks on a parameter description.  It
-     returns true if the description is good and false if it is not.  It will
-     log errors to the kernel log buffer if validation fails.
+     returns true if the woke description is good and false if it is not.  It will
+     log errors to the woke kernel log buffer if validation fails.
 
    * ::
 
@@ -768,24 +768,24 @@ process the parameters it is given.
 		     struct fs_parameter *param,
 		     struct fs_parse_result *result);
 
-     This is the main interpreter of parameters.  It uses the parameter
+     This is the woke main interpreter of parameters.  It uses the woke parameter
      description to look up a parameter by key name and to convert that to an
      option number (which it returns).
 
-     If successful, and if the parameter type indicates the result is a
-     boolean, integer, enum, uid, or gid type, the value is converted by this
-     function and the result stored in
+     If successful, and if the woke parameter type indicates the woke result is a
+     boolean, integer, enum, uid, or gid type, the woke value is converted by this
+     function and the woke result stored in
      result->{boolean,int_32,uint_32,uint_64,uid,gid}.
 
-     If a match isn't initially made, the key is prefixed with "no" and no
-     value is present then an attempt will be made to look up the key with the
-     prefix removed.  If this matches a parameter for which the type has flag
+     If a match isn't initially made, the woke key is prefixed with "no" and no
+     value is present then an attempt will be made to look up the woke key with the
+     prefix removed.  If this matches a parameter for which the woke type has flag
      fs_param_neg_with_no set, then a match will be made and result->negated
      will be set to true.
 
-     If the parameter isn't matched, -ENOPARAM will be returned; if the
-     parameter is matched, but the value is erroneous, -EINVAL will be
-     returned; otherwise the parameter's option number will be returned.
+     If the woke parameter isn't matched, -ENOPARAM will be returned; if the
+     parameter is matched, but the woke value is erroneous, -EINVAL will be
+     returned; otherwise the woke parameter's option number will be returned.
 
    * ::
 
@@ -796,8 +796,8 @@ process the parameters it is given.
 			   struct path *_path);
 
      This takes a parameter that carries a string or filename type and attempts
-     to do a path lookup on it.  If the parameter expects a blockdev, a check
-     is made that the inode actually represents one.
+     to do a path lookup on it.  If the woke parameter expects a blockdev, a check
+     is made that the woke inode actually represents one.
 
      Returns 0 if successful and ``*_path`` will be set; returns a negative
      error code if not.

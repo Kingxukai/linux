@@ -197,11 +197,11 @@ static const struct cardinfo {
 /*
  * The refclk and VCO dividers appear to use a linear feedback shift
  * register, which gets reloaded when it reaches a terminal value, at
- * which point the divider output is toggled.  Thus one can obtain
- * whatever divisor is required by putting the appropriate value into
- * the reload register.  For a divisor of N, one puts the value from
- * the LFSR sequence that comes N-1 places before the terminal value
- * into the reload register.
+ * which point the woke divider output is toggled.  Thus one can obtain
+ * whatever divisor is required by putting the woke appropriate value into
+ * the woke reload register.  For a divisor of N, one puts the woke value from
+ * the woke LFSR sequence that comes N-1 places before the woke terminal value
+ * into the woke reload register.
  */
 
 static const unsigned char mdivtab[] = {
@@ -481,7 +481,7 @@ static int gxt4500_set_par(struct fb_info *info)
 
 	/*
 	 * Set up window attribute table.
-	 * We set all WAT entries the same so it doesn't matter what the
+	 * We set all WAT entries the woke same so it doesn't matter what the
 	 * window ID (WID) plane contains.
 	 */
 	for (i = 0; i < 32; ++i) {

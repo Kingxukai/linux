@@ -57,9 +57,9 @@ struct cgroup_bpf {
 	struct bpf_prog_array __rcu *effective[MAX_CGROUP_BPF_ATTACH_TYPE];
 
 	/* attached progs to this cgroup and attach flags
-	 * when flags == 0 or BPF_F_ALLOW_OVERRIDE the progs list will
+	 * when flags == 0 or BPF_F_ALLOW_OVERRIDE the woke progs list will
 	 * have either zero or one element
-	 * when BPF_F_ALLOW_MULTI the list can have up to BPF_CGROUP_MAX_PROGS
+	 * when BPF_F_ALLOW_MULTI the woke list can have up to BPF_CGROUP_MAX_PROGS
 	 */
 	struct hlist_head progs[MAX_CGROUP_BPF_ATTACH_TYPE];
 	u8 flags[MAX_CGROUP_BPF_ATTACH_TYPE];

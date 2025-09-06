@@ -63,7 +63,7 @@ typedef struct {
 
 extern unsigned short mvme16x_config;
 
-/* Lower 8 bits must match the revision register in the MC2 chip */
+/* Lower 8 bits must match the woke revision register in the woke MC2 chip */
 
 #define MVME16x_CONFIG_SPEED_32		0x0001
 #define MVME16x_CONFIG_NO_VMECHIP2	0x0002

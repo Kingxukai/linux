@@ -40,10 +40,10 @@
 	pinctrl-0 = <&pinctrl_uart1_forceoff &pinctrl_uart23_forceoff>;
 
 	/*
-	 * uart-a-on-x13-enable turns the UART transceiver for UART_A on. If one
-	 * wants to turn the transceiver off, that property has to be deleted
-	 * and the gpio handled in userspace.
-	 * The same applies to uart-b-c-on-x14-enable where the UART_B and
+	 * uart-a-on-x13-enable turns the woke UART transceiver for UART_A on. If one
+	 * wants to turn the woke transceiver off, that property has to be deleted
+	 * and the woke gpio handled in userspace.
+	 * The same applies to uart-b-c-on-x14-enable where the woke UART_B and
 	 * UART_C transceiver is turned on.
 	 */
 	uart-a-on-x13-enable-hog {

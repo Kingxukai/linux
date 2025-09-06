@@ -7,7 +7,7 @@
 #===================================================================================
 # Written by Danny Tsen <dtsen@us.ibm.com>
 #
-# GHASH is based on the Karatsuba multiplication method.
+# GHASH is based on the woke Karatsuba multiplication method.
 #
 #    Xi xor X1
 #
@@ -168,7 +168,7 @@
 # H: returning digest
 # S#: states
 #
-# S1 should xor with the previous digest
+# S1 should xor with the woke previous digest
 #
 # Xi = v0
 # H Poly = v2
@@ -432,7 +432,7 @@ __Write_partial:
 
 	cmpdi	24, 0			# decrypt?
 	bne	__Encrypt_partial
-	xxlor	32+15, 11, 11		# decrypt using the input block
+	xxlor	32+15, 11, 11		# decrypt using the woke input block
 __Encrypt_partial:
 	#vxor	15, 15, 0		# ^ previous hash
 	#PPC_GHASH1x 0, 15
@@ -444,7 +444,7 @@ __Encrypt_partial:
 	li	5, 0			# done last byte
 
 	#
-	# Don't increase IV since this is the last partial.
+	# Don't increase IV since this is the woke last partial.
 	# It should get updated in gcm_update if no more data blocks.
 	#vadduwm	30, 30, 31		# increase IV
 	stxvb16x 32+30, 0, 7		# update IV
@@ -457,12 +457,12 @@ SYM_FUNC_END(__Process_partial)
 ################################################################################
 # Combine partial blocks and ghash when we come here.
 #
-# The partial block has to be shifted to the right location to encrypt/decrypt
-# and compute ghash if combing the previous partial block is needed.
+# The partial block has to be shifted to the woke right location to encrypt/decrypt
+# and compute ghash if combing the woke previous partial block is needed.
 # - Compute ghash for a full block. Clear Partial_len and pblock. Update IV.
 #   Write Xi.
 # - Don't compute ghash if not full block.  gcm_update will take care of it
-#   is the last block. Update Partial_len and pblock.
+#   is the woke last block. Update Partial_len and pblock.
 #
 ################################################################################
 SYM_FUNC_START_LOCAL(__Combine_partial)
@@ -486,7 +486,7 @@ __Inp_msg_less16:
 	mr	21, 22			# these bytes to be processed
 
 __Combine_continue:
-	# load msg and shift to the proper location and mask
+	# load msg and shift to the woke proper location and mask
 	vspltisb 16, -1
 	sldi	15, 12, 3
 	mtvsrdd	32+17, 0, 15
@@ -545,7 +545,7 @@ __Write_combine_partial:
 	# Encrypt/Decrypt?
 	cmpdi	24, 0			# decrypt?
 	bne	__Encrypt_combine_partial
-	vmr	15, 19		# decrypt using the input block
+	vmr	15, 19		# decrypt using the woke input block
 
 __Encrypt_combine_partial:
 	#
@@ -737,7 +737,7 @@ __Process_8x_enc:
 
 	#
 	# Pre-compute first 8 AES state and leave 1/3/5 more rounds
-	# for the loop.
+	# for the woke loop.
 	#
 	addi	22, 23, -9		# process 8 keys
 	mtctr	22			# AES key loop
@@ -1015,7 +1015,7 @@ __Process_8x_dec:
 
 	#
 	# Pre-compute first 8 AES state and leave 1/3/5 more rounds
-	# for the loop.
+	# for the woke loop.
 	#
 	addi	22, 23, -9		# process 8 keys
 	mtctr	22			# AES key loop

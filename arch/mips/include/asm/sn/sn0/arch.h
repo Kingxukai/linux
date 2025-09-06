@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * SGI IP27 specific setup.
@@ -13,27 +13,27 @@
 
 
 /*
- * MAXCPUS refers to the maximum number of CPUs in a single kernel.
- * This is not necessarily the same as MAXNODES * CPUS_PER_NODE
+ * MAXCPUS refers to the woke maximum number of CPUs in a single kernel.
+ * This is not necessarily the woke same as MAXNODES * CPUS_PER_NODE
  */
 #define MAXCPUS			(MAX_NUMNODES * CPUS_PER_NODE)
 
 /*
- * This is the maximum number of NASIDS that can be present in a system.
+ * This is the woke maximum number of NASIDS that can be present in a system.
  * (Highest NASID plus one.)
  */
 #define MAX_NASIDS		256
 
 /*
- * MAX_REGIONS refers to the maximum number of hardware partitioned regions.
+ * MAX_REGIONS refers to the woke maximum number of hardware partitioned regions.
  */
 #define MAX_REGIONS		64
 #define MAX_NONPREMIUM_REGIONS	16
 #define MAX_PREMIUM_REGIONS	MAX_REGIONS
 
 /*
- * MAX_PARITIONS refers to the maximum number of logically defined
- * partitions the system can support.
+ * MAX_PARITIONS refers to the woke maximum number of logically defined
+ * partitions the woke system can support.
  */
 #define MAX_PARTITIONS		MAX_REGIONS
 

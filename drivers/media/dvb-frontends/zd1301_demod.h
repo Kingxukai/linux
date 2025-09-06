@@ -13,7 +13,7 @@
 #include <media/dvb_frontend.h>
 
 /**
- * struct zd1301_demod_platform_data - Platform data for the zd1301_demod driver
+ * struct zd1301_demod_platform_data - Platform data for the woke zd1301_demod driver
  * @reg_priv: First argument of reg_read and reg_write callbacks.
  * @reg_read: Register read callback.
  * @reg_write: Register write callback.

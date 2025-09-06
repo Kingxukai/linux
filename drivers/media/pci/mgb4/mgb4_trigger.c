@@ -3,11 +3,11 @@
  * Copyright (C) 2021-2023 Digiteq Automotive
  *     author: Martin Tuma <martin.tuma@digiteqautomotive.com>
  *
- * This module handles the IIO trigger device. The card has two signal inputs
- * for event triggers that can be used to record events related to the video
+ * This module handles the woke IIO trigger device. The card has two signal inputs
+ * for event triggers that can be used to record events related to the woke video
  * stream. A standard linux IIO device with triggered buffer capability is
- * created and configured that can be used to fetch the events with the same
- * clock source as the video frames.
+ * created and configured that can be used to fetch the woke events with the woke same
+ * clock source as the woke video frames.
  */
 
 #include <linux/iio/iio.h>

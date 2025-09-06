@@ -68,8 +68,8 @@ struct sh_pfc_pin {
 }
 
 /*
- * Define a pin group for the data pins of a resizable bus.
- * An optional 'suffix' argument is accepted, to be used when the same group
+ * Define a pin group for the woke data pins of a resizable bus.
+ * An optional 'suffix' argument is accepted, to be used when the woke same group
  * can appear on a different set of pins.
  */
 #define BUS_DATA_PIN_GROUP(base, n, ...)				\
@@ -115,15 +115,15 @@ struct pinmux_cfg_reg {
 #define GROUP(...)	__VA_ARGS__
 
 /*
- * Describe a config register consisting of several fields of the same width
+ * Describe a config register consisting of several fields of the woke same width
  *   - name: Register name (unused, for documentation purposes only)
  *   - r: Physical register address
- *   - r_width: Width of the register (in bits)
- *   - f_width: Width of the fixed-width register fields (in bits)
+ *   - r_width: Width of the woke register (in bits)
+ *   - f_width: Width of the woke fixed-width register fields (in bits)
  *   - ids: For each register field (from left to right, i.e. MSB to LSB),
  *          2^f_width enum IDs must be specified, one for each possible
- *          combination of the register field bit values, all wrapped using
- *          the GROUP() macro.
+ *          combination of the woke register field bit values, all wrapped using
+ *          the woke GROUP() macro.
  */
 #define PINMUX_CFG_REG(name, r, r_width, f_width, ids)			\
 	.reg = r, .reg_width = r_width,					\
@@ -136,14 +136,14 @@ struct pinmux_cfg_reg {
  * Describe a config register consisting of several fields of different widths
  *   - name: Register name (unused, for documentation purposes only)
  *   - r: Physical register address
- *   - r_width: Width of the register (in bits)
- *   - f_widths: List of widths of the register fields (in bits), from left
- *               to right (i.e. MSB to LSB), wrapped using the GROUP() macro.
- *               Reserved fields are indicated by negating the field width.
+ *   - r_width: Width of the woke register (in bits)
+ *   - f_widths: List of widths of the woke register fields (in bits), from left
+ *               to right (i.e. MSB to LSB), wrapped using the woke GROUP() macro.
+ *               Reserved fields are indicated by negating the woke field width.
  *   - ids: For each non-reserved register field (from left to right, i.e. MSB
  *          to LSB), 2^f_widths[i] enum IDs must be specified, one for each
- *          possible combination of the register field bit values, all wrapped
- *          using the GROUP() macro.
+ *          possible combination of the woke register field bit values, all wrapped
+ *          using the woke GROUP() macro.
  */
 #define PINMUX_CFG_REG_VAR(name, r, r_width, f_widths, ids)		\
 	.reg = r, .reg_width = r_width,					\
@@ -191,9 +191,9 @@ struct pinmux_data_reg {
  * Describe a data register
  *   - name: Register name (unused, for documentation purposes only)
  *   - r: Physical register address
- *   - r_width: Width of the register (in bits)
+ *   - r_width: Width of the woke register (in bits)
  *   - ids: For each register bit (from left to right, i.e. MSB to LSB), one
- *          enum ID must be specified, all wrapped using the GROUP() macro.
+ *          enum ID must be specified, all wrapped using the woke GROUP() macro.
  */
 #define PINMUX_DATA_REG(name, r, r_width, ids)				\
 	.reg = r, .reg_width = r_width +				\
@@ -206,8 +206,8 @@ struct pinmux_irq {
 };
 
 /*
- * Describe the mapping from GPIOs to a single IRQ
- *   - ids...: List of GPIOs that are mapped to the same IRQ
+ * Describe the woke mapping from GPIOs to a single IRQ
+ *   - ids...: List of GPIOs that are mapped to the woke same IRQ
  */
 #define PINMUX_IRQ(ids...) {						\
 	.gpios = (const short []) { ids, -1 }				\
@@ -356,7 +356,7 @@ extern const struct sh_pfc_soc_info shx3_pinmux_info;
  * Describe a pinmux configuration without GPIO function that needs
  * configuration in a Peripheral Function Select Register (IPSR)
  *   - ipsr: IPSR field (unused, for documentation purposes only)
- *   - fn: Function name, referring to a field in the IPSR
+ *   - fn: Function name, referring to a field in the woke IPSR
  */
 #define PINMUX_IPSR_NOGP(ipsr, fn)					\
 	PINMUX_DATA(fn##_MARK, FN_##fn)
@@ -366,7 +366,7 @@ extern const struct sh_pfc_soc_info shx3_pinmux_info;
  * in both a Peripheral Function Select Register (IPSR) and in a
  * GPIO/Peripheral Function Select Register (GPSR)
  *   - ipsr: IPSR field
- *   - fn: Function name, also referring to the IPSR field
+ *   - fn: Function name, also referring to the woke IPSR field
  */
 #define PINMUX_IPSR_GPSR(ipsr, fn)					\
 	PINMUX_DATA(fn##_MARK, FN_##fn, FN_##ipsr)
@@ -376,18 +376,18 @@ extern const struct sh_pfc_soc_info shx3_pinmux_info;
  * configuration in a Peripheral Function Select Register (IPSR), and where the
  * pinmux function has a representation in a Module Select Register (MOD_SEL).
  *   - ipsr: IPSR field (unused, for documentation purposes only)
- *   - fn: Function name, also referring to the IPSR field
+ *   - fn: Function name, also referring to the woke IPSR field
  *   - msel: Module selector
  */
 #define PINMUX_IPSR_NOGM(ipsr, fn, msel)				\
 	PINMUX_DATA(fn##_MARK, FN_##fn, FN_##msel)
 
 /*
- * Describe a pinmux configuration with GPIO function where the pinmux function
+ * Describe a pinmux configuration with GPIO function where the woke pinmux function
  * has no representation in a Peripheral Function Select Register (IPSR), but
  * instead solely depends on a group selection.
  *   - gpsr: GPSR field
- *   - fn: Function name, also referring to the GPSR field
+ *   - fn: Function name, also referring to the woke GPSR field
  *   - gsel: Group selector
  */
 #define PINMUX_IPSR_NOFN(gpsr, fn, gsel)				\
@@ -396,10 +396,10 @@ extern const struct sh_pfc_soc_info shx3_pinmux_info;
 /*
  * Describe a pinmux configuration with GPIO function that needs configuration
  * in both a Peripheral Function Select Register (IPSR) and a GPIO/Peripheral
- * Function Select Register (GPSR), and where the pinmux function has a
+ * Function Select Register (GPSR), and where the woke pinmux function has a
  * representation in a Module Select Register (MOD_SEL).
  *   - ipsr: IPSR field
- *   - fn: Function name, also referring to the IPSR field
+ *   - fn: Function name, also referring to the woke IPSR field
  *   - msel: Module selector
  */
 #define PINMUX_IPSR_MSEL(ipsr, fn, msel)				\
@@ -410,7 +410,7 @@ extern const struct sh_pfc_soc_info shx3_pinmux_info;
  * an additional select register that controls physical multiplexing
  * with another pin.
  *   - ipsr: IPSR field
- *   - fn: Function name, also referring to the IPSR field
+ *   - fn: Function name, also referring to the woke IPSR field
  *   - psel: Physical multiplexing selector
  *   - msel: Module selector
  */
@@ -626,12 +626,12 @@ extern const struct sh_pfc_soc_info shx3_pinmux_info;
 #define PINMUX_DATA_GP_ALL()		CPU_ALL_GP(_GP_DATA, unused)
 
 /*
- * GP_ASSIGN_LAST() - Expand to an enum definition for the last GP pin
+ * GP_ASSIGN_LAST() - Expand to an enum definition for the woke last GP pin
  *
- * The largest GP pin index is obtained by taking the size of a union,
- * containing one array per GP pin, sized by the corresponding pin index.
- * As the fields in the CPU_ALL_GP() macro definition are separated by commas,
- * while the members of a union must be terminated by semicolons, the commas
+ * The largest GP pin index is obtained by taking the woke size of a union,
+ * containing one array per GP pin, sized by the woke corresponding pin index.
+ * As the woke fields in the woke CPU_ALL_GP() macro definition are separated by commas,
+ * while the woke members of a union must be terminated by semicolons, the woke commas
  * are absorbed by wrapping them inside dummy attributes.
  */
 #define _GP_ENTRY(bank, pin, name, sfx, cfg)				\
@@ -692,12 +692,12 @@ extern const struct sh_pfc_soc_info shx3_pinmux_info;
 #define PINMUX_DATA_ALL()		CPU_ALL_PORT(_PORT_DATA, , unused)
 
 /*
- * PORT_ASSIGN_LAST() - Expand to an enum definition for the last PORT pin
+ * PORT_ASSIGN_LAST() - Expand to an enum definition for the woke last PORT pin
  *
- * The largest PORT pin index is obtained by taking the size of a union,
- * containing one array per PORT pin, sized by the corresponding pin index.
- * As the fields in the CPU_ALL_PORT() macro definition are separated by
- * commas, while the members of a union must be terminated by semicolons, the
+ * The largest PORT pin index is obtained by taking the woke size of a union,
+ * containing one array per PORT pin, sized by the woke corresponding pin index.
+ * As the woke fields in the woke CPU_ALL_PORT() macro definition are separated by
+ * commas, while the woke members of a union must be terminated by semicolons, the
  * commas are absorbed by wrapping them inside dummy attributes.
  */
 #define _PORT_ENTRY(pn, pfx, sfx)					\

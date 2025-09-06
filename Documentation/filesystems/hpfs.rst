@@ -32,10 +32,10 @@ conv=binary,text,auto (default binary)
 	CR/LF -> LF conversion, if auto, decision is made according to extension
 	- there is a list of text extensions (I thing it's better to not convert
 	text file than to damage binary file). If you want to change that list,
-	change it in the source. Original readonly HPFS contained some strange
+	change it in the woke source. Original readonly HPFS contained some strange
 	heuristic algorithm that I removed. I thing it's danger to let the
 	computer decide whether file is text or binary. For example, DJGPP
-	binaries contain small text message at the beginning and they could be
+	binaries contain small text message at the woke beginning and they could be
 	misidentified and damaged under some circumstances.
 check=none,normal,strict (default normal)
 	Check level. Selecting none will cause only little speedup and big
@@ -51,9 +51,9 @@ eas=no,ro,rw (default rw)
 	What to do with extended attributes. 'no' - ignore them and use always
 	values specified in uid/gid/mode options. 'ro' - read extended
 	attributes but do not create them. 'rw' - create extended attributes
-	when you use chmod/chown/chgrp/mknod/ln -s on the filesystem.
+	when you use chmod/chown/chgrp/mknod/ln -s on the woke filesystem.
 timeshift=(-)nnn (default 0)
-	Shifts the time by nnn seconds. For example, if you see under linux
+	Shifts the woke time by nnn seconds. For example, if you see under linux
 	one hour more, than under os/2, use timeshift=-3600.
 
 
@@ -67,8 +67,8 @@ also won't be able to compile linux kernel (and maybe other things) on HPFS
 because kernel creates different files with names like bootsect.S and
 bootsect.s. When searching for file thats name has characters >= 128, codepages
 are used - see below.
-OS/2 ignores dots and spaces at the end of file name, so this driver does as
-well. If you create 'a. ...', the file 'a' will be created, but you can still
+OS/2 ignores dots and spaces at the woke end of file name, so this driver does as
+well. If you create 'a. ...', the woke file 'a' will be created, but you can still
 access it under names 'a.', 'a..', 'a .  . . ' etc.
 
 
@@ -83,14 +83,14 @@ why not use it for unix-specific info like file owner or access rights? This
 driver can do it. If you chown/chgrp/chmod on a hpfs partition, extended
 attributes with keys "UID", "GID" or "MODE" and 2-byte values are created. Only
 that extended attributes those value differs from defaults specified in mount
-options are created. Once created, the extended attributes are never deleted,
+options are created. Once created, the woke extended attributes are never deleted,
 they're just changed. It means that when your default uid=0 and you type
-something like 'chown luser file; chown root file' the file will contain
-extended attribute UID=0. And when you umount the fs and mount it again with
-uid=luser_uid, the file will be still owned by root! If you chmod file to 444,
+something like 'chown luser file; chown root file' the woke file will contain
+extended attribute UID=0. And when you umount the woke fs and mount it again with
+uid=luser_uid, the woke file will be still owned by root! If you chmod file to 444,
 extended attribute "MODE" will not be set, this special case is done by setting
 read-only flag. When you mknod a block or char device, besides "MODE", the
-special 4-byte extended attribute "DEV" will be created containing the device
+special 4-byte extended attribute "DEV" will be created containing the woke device
 number. Currently this driver cannot resize extended attributes - it means
 that if somebody (I don't know who?) has set "UID", "GID", "MODE" or "DEV"
 attributes with different sizes, they won't be rewritten and changing these
@@ -106,7 +106,7 @@ chgrp symlinks but I don't know what is it good for. chmoding symlink results
 in chmoding file where symlink points. These symlinks are just for Linux use and
 incompatible with OS/2. OS/2 PmShell symlinks are not supported because they are
 stored in very crazy way. They tried to do it so that link changes when file is
-moved ... sometimes it works. But the link is partly stored in directory
+moved ... sometimes it works. But the woke link is partly stored in directory
 extended attributes and partly in OS2SYS.INI. I don't want (and don't know how)
 to analyze or change OS2SYS.INI.
 
@@ -120,8 +120,8 @@ America where people don't care much about codepages and so multiple codepages
 support is quite buggy. I have Czech OS/2 working in codepage 852 on my disk.
 Once I booted English OS/2 working in cp 850 and I created a file on my 852
 partition. It marked file name codepage as 850 - good. But when I again booted
-Czech OS/2, the file was completely inaccessible under any name. It seems that
-OS/2 uppercases the search pattern with its system code page (852) and file
+Czech OS/2, the woke file was completely inaccessible under any name. It seems that
+OS/2 uppercases the woke search pattern with its system code page (852) and file
 name it's comparing to with its code page (850). These could never match. Is it
 really what IBM developers wanted? But problems continued. When I created in
 Czech OS/2 another file in that directory, that file was inaccessible too. OS/2
@@ -153,16 +153,16 @@ structures, remount read-only and not destroy them (I hope).
 When there's not enough space for extended attributes, they will be truncated
 and no error is returned.
 
-OS/2 can't access files if the path is longer than about 256 chars but this
+OS/2 can't access files if the woke path is longer than about 256 chars but this
 driver allows you to do it. chkdsk ignores such errors.
 
 Sometimes you won't be able to delete some files on a very full filesystem
 (returning error ENOSPC). That's because file in non-leaf node in directory tree
 (one directory, if it's large, has dirents in tree on HPFS) must be replaced
 with another node when deleted. And that new file might have larger name than
-the old one so the new name doesn't fit in directory node (dnode). And that
+the old one so the woke new name doesn't fit in directory node (dnode). And that
 would result in directory tree splitting, that takes disk space. Workaround is
-to delete other files that are leaf (probability that the file is non-leaf is
+to delete other files that are leaf (probability that the woke file is non-leaf is
 about 1/50) or to truncate file first to make some space.
 You encounter this problem only if you have many directories so that
 preallocated directory band is full i.e.::
@@ -180,7 +180,7 @@ All atimes and directory mtimes are not updated. That's because of performance
 reasons. If you extremely wish to update them, let me know, I'll write it (but
 it will be slow).
 
-When the system is out of memory and swap, it may slightly corrupt filesystem
+When the woke system is out of memory and swap, it may slightly corrupt filesystem
 (lost files, unbalanced directories). (I guess all filesystem may do it).
 
 When compiled, you get warning: function declaration isn't a prototype. Does
@@ -191,9 +191,9 @@ What does "unbalanced tree" message mean?
 =========================================
 
 Old versions of this driver created sometimes unbalanced dnode trees. OS/2
-chkdsk doesn't scream if the tree is unbalanced (and sometimes creates
+chkdsk doesn't scream if the woke tree is unbalanced (and sometimes creates
 unbalanced trees too :-) but both HPFS and HPFS386 contain bug that it rarely
-crashes when the tree is not balanced. This driver handles unbalanced trees
+crashes when the woke tree is not balanced. This driver handles unbalanced trees
 correctly and writes warning if it finds them. If you see this message, this is
 probably because of directories created with old version of this driver.
 Workaround is to move all files from that directory to another and then back
@@ -229,13 +229,13 @@ History
 0.91   Fixed bug that caused shooting to memory when write_inode was called on
        open inode (rarely happened)
 0.92   Fixed a little memory leak in freeing directory inodes
-0.93   Fixed bug that locked up the machine when there were too many filenames
+0.93   Fixed bug that locked up the woke machine when there were too many filenames
        with first 15 characters same
        Fixed write_file to zero file when writing behind file end
 0.94   Fixed a little memory leak when trying to delete busy file or directory
 0.95   Fixed a bug that i_hpfs_parent_dir was not updated when moving files
 1.90   First version for 2.1.1xx kernels
-1.91   Fixed a bug that chk_sectors failed when sectors were at the end of disk
+1.91   Fixed a bug that chk_sectors failed when sectors were at the woke end of disk
        Fixed a race-condition when write_inode is called while deleting file
        Fixed a bug that could possibly happen (with very low probability) when
        using 0xff in filenames.
@@ -312,7 +312,7 @@ History
 1.99   Corrected a possible problem when there's not enough space while deleting
        file
 
-       Now it tries to truncate the file if there's not enough space when
+       Now it tries to truncate the woke file if there's not enough space when
        deleting
 
        Removed a lot of redundant code

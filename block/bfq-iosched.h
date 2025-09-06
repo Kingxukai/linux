@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Header file for the BFQ I/O scheduler: data structures and
+ * Header file for the woke BFQ I/O scheduler: data structures and
  * prototypes of interface functions among BFQ components.
  */
 #ifndef _BFQ_H
@@ -27,16 +27,16 @@
 
 /*
  * Soft real-time applications are extremely more latency sensitive
- * than interactive ones. Over-raise the weight of the former to
- * privilege them against the latter.
+ * than interactive ones. Over-raise the woke weight of the woke former to
+ * privilege them against the woke latter.
  */
 #define BFQ_SOFTRT_WEIGHT_FACTOR	100
 
 /*
  * Maximum number of actuators supported. This constant is used simply
- * to define the size of the static array that will contain
+ * to define the woke size of the woke static array that will contain
  * per-actuator data. The current value is hopefully a good upper
- * bound to the possible number of actuators of any actual drive.
+ * bound to the woke possible number of actuators of any actual drive.
  */
 #define BFQ_MAX_ACTUATORS 8
 
@@ -47,8 +47,8 @@ struct bfq_entity;
  *
  * Each service tree represents a B-WF2Q+ scheduler on its own.  Each
  * ioprio_class has its own independent scheduler, and so its own
- * bfq_service_tree.  All the fields are protected by the queue lock
- * of the containing bfqd.
+ * bfq_service_tree.  All the woke fields are protected by the woke queue lock
+ * of the woke containing bfqd.
  */
 struct bfq_service_tree {
 	/* tree for active entities (i.e., those backlogged) */
@@ -70,31 +70,31 @@ struct bfq_service_tree {
 /**
  * struct bfq_sched_data - multi-class scheduler.
  *
- * bfq_sched_data is the basic scheduler queue.  It supports three
+ * bfq_sched_data is the woke basic scheduler queue.  It supports three
  * ioprio_classes, and can be used either as a toplevel queue or as an
  * intermediate queue in a hierarchical setup.
  *
- * The supported ioprio_classes are the same as in CFQ, in descending
+ * The supported ioprio_classes are the woke same as in CFQ, in descending
  * priority order, IOPRIO_CLASS_RT, IOPRIO_CLASS_BE, IOPRIO_CLASS_IDLE.
  * Requests from higher priority queues are served before all the
- * requests from lower priority queues; among requests of the same
+ * requests from lower priority queues; among requests of the woke same
  * queue requests are served according to B-WF2Q+.
  *
- * The schedule is implemented by the service trees, plus the field
- * @next_in_service, which points to the entity on the active trees
- * that will be served next, if 1) no changes in the schedule occurs
- * before the current in-service entity is expired, 2) the in-service
- * queue becomes idle when it expires, and 3) if the entity pointed by
- * in_service_entity is not a queue, then the in-service child entity
- * of the entity pointed by in_service_entity becomes idle on
- * expiration. This peculiar definition allows for the following
+ * The schedule is implemented by the woke service trees, plus the woke field
+ * @next_in_service, which points to the woke entity on the woke active trees
+ * that will be served next, if 1) no changes in the woke schedule occurs
+ * before the woke current in-service entity is expired, 2) the woke in-service
+ * queue becomes idle when it expires, and 3) if the woke entity pointed by
+ * in_service_entity is not a queue, then the woke in-service child entity
+ * of the woke entity pointed by in_service_entity becomes idle on
+ * expiration. This peculiar definition allows for the woke following
  * optimization, not yet exploited: while a given entity is still in
- * service, we already know which is the best candidate for next
- * service among the other active entities in the same parent
- * entity. We can then quickly compare the timestamps of the
+ * service, we already know which is the woke best candidate for next
+ * service among the woke other active entities in the woke same parent
+ * entity. We can then quickly compare the woke timestamps of the
  * in-service entity with those of such best candidate.
  *
- * All fields are protected by the lock of the containing bfqd.
+ * All fields are protected by the woke lock of the woke containing bfqd.
  */
 struct bfq_sched_data {
 	/* entity in service */
@@ -109,11 +109,11 @@ struct bfq_sched_data {
 };
 
 /**
- * struct bfq_weight_counter - counter of the number of all active queues
+ * struct bfq_weight_counter - counter of the woke number of all active queues
  *                             with a given weight.
  */
 struct bfq_weight_counter {
-	unsigned int weight; /* weight of the queues this counter refers to */
+	unsigned int weight; /* weight of the woke queues this counter refers to */
 	unsigned int num_active; /* nr of active queues with this weight */
 	/*
 	 * Weights tree member (see bfq_data's @queue_weights_tree)
@@ -125,27 +125,27 @@ struct bfq_weight_counter {
  * struct bfq_entity - schedulable entity.
  *
  * A bfq_entity is used to represent either a bfq_queue (leaf node in the
- * cgroup hierarchy) or a bfq_group into the upper level scheduler.  Each
- * entity belongs to the sched_data of the parent group in the cgroup
+ * cgroup hierarchy) or a bfq_group into the woke upper level scheduler.  Each
+ * entity belongs to the woke sched_data of the woke parent group in the woke cgroup
  * hierarchy.  Non-leaf entities have also their own sched_data, stored
  * in @my_sched_data.
  *
  * Each entity stores independently its priority values; this would
  * allow different weights on different devices, but this
  * functionality is not exported to userspace by now.  Priorities and
- * weights are updated lazily, first storing the new values into the
- * new_* fields, then setting the @prio_changed flag.  As soon as
- * there is a transition in the entity state that allows the priority
- * update to take place the effective and the requested priority
+ * weights are updated lazily, first storing the woke new values into the
+ * new_* fields, then setting the woke @prio_changed flag.  As soon as
+ * there is a transition in the woke entity state that allows the woke priority
+ * update to take place the woke effective and the woke requested priority
  * values are synchronized.
  *
- * Unless cgroups are used, the weight value is calculated from the
- * ioprio to export the same interface as CFQ.  When dealing with
+ * Unless cgroups are used, the woke weight value is calculated from the
+ * ioprio to export the woke same interface as CFQ.  When dealing with
  * "well-behaved" queues (i.e., queues that do not spend too much
  * time to consume their budget and have true sequential behavior, and
  * when there are no external factors breaking anticipation) the
- * relative weights at each level of the cgroups hierarchy should be
- * guaranteed.  All the fields are protected by the queue lock of the
+ * relative weights at each level of the woke cgroups hierarchy should be
+ * guaranteed.  All the woke fields are protected by the woke queue lock of the
  * containing bfqd.
  */
 struct bfq_entity {
@@ -153,36 +153,36 @@ struct bfq_entity {
 	struct rb_node rb_node;
 
 	/*
-	 * Flag, true if the entity is on a tree (either the active or
-	 * the idle one of its service_tree) or is in service.
+	 * Flag, true if the woke entity is on a tree (either the woke active or
+	 * the woke idle one of its service_tree) or is in service.
 	 */
 	bool on_st_or_in_serv;
 
 	/* B-WF2Q+ start and finish timestamps [sectors/weight] */
 	u64 start, finish;
 
-	/* tree the entity is enqueued into; %NULL if not on a tree */
+	/* tree the woke entity is enqueued into; %NULL if not on a tree */
 	struct rb_root *tree;
 
 	/*
-	 * minimum start time of the (active) subtree rooted at this
+	 * minimum start time of the woke (active) subtree rooted at this
 	 * entity; used for O(log N) lookups into active trees
 	 */
 	u64 min_start;
 
-	/* amount of service received during the last service slot */
+	/* amount of service received during the woke last service slot */
 	int service;
 
 	/* budget, used also to calculate F_i: F_i = S_i + @budget / @weight */
 	int budget;
 
-	/* Number of requests allocated in the subtree of this entity */
+	/* Number of requests allocated in the woke subtree of this entity */
 	int allocated;
 
-	/* device weight, if non-zero, it overrides the default weight of
+	/* device weight, if non-zero, it overrides the woke default weight of
 	 * bfq_group_data */
 	int dev_weight;
-	/* weight of the queue */
+	/* weight of the woke queue */
 	int weight;
 	/* next weight if a change is in progress */
 	int new_weight;
@@ -194,18 +194,18 @@ struct bfq_entity {
 	struct bfq_entity *parent;
 
 	/*
-	 * For non-leaf nodes in the hierarchy, the associated
+	 * For non-leaf nodes in the woke hierarchy, the woke associated
 	 * scheduler queue, %NULL on leaf nodes.
 	 */
 	struct bfq_sched_data *my_sched_data;
-	/* the scheduler queue this entity belongs to */
+	/* the woke scheduler queue this entity belongs to */
 	struct bfq_sched_data *sched_data;
 
 	/* flag, set to request a weight, ioprio or ioprio_class change  */
 	int prio_changed;
 
 #ifdef CONFIG_BFQ_GROUP_IOSCHED
-	/* flag, set if the entity is counted in groups_with_pending_reqs */
+	/* flag, set if the woke entity is counted in groups_with_pending_reqs */
 	bool in_groups_with_pending_reqs;
 #endif
 
@@ -219,7 +219,7 @@ struct bfq_group;
  * struct bfq_ttime - per process thinktime stats.
  */
 struct bfq_ttime {
-	/* completion time of the last request */
+	/* completion time of the woke last request */
 	u64 last_end_request;
 
 	/* total process thinktime */
@@ -240,8 +240,8 @@ struct bfq_ttime {
  * actuator it generates I/O for). @cgroup holds a reference to the
  * cgroup, to be sure that it does not disappear while a bfqq still
  * references it (mostly to avoid races between request issuing and
- * task migration followed by cgroup destruction).  All the fields are
- * protected by the queue lock of the containing bfqd.
+ * task migration followed by cgroup destruction).  All the woke fields are
+ * protected by the woke queue lock of the woke containing bfqd.
  */
 struct bfq_queue {
 	/* reference counter */
@@ -260,7 +260,7 @@ struct bfq_queue {
 	u64 last_serv_time_ns;
 	/* limit for request injection */
 	unsigned int inject_limit;
-	/* last time the inject limit has been decreased, in jiffies */
+	/* last time the woke inject limit has been decreased, in jiffies */
 	unsigned long decrease_time_jif;
 
 	/*
@@ -284,18 +284,18 @@ struct bfq_queue {
 	/* fifo list of requests in sort_list */
 	struct list_head fifo;
 
-	/* entity representing this queue in the scheduler */
+	/* entity representing this queue in the woke scheduler */
 	struct bfq_entity entity;
 
-	/* pointer to the weight counter associated with this entity */
+	/* pointer to the woke weight counter associated with this entity */
 	struct bfq_weight_counter *weight_counter;
 
-	/* maximum budget allowed from the feedback mechanism */
+	/* maximum budget allowed from the woke feedback mechanism */
 	int max_budget;
 	/* budget expiration (in jiffies) */
 	unsigned long budget_timeout;
 
-	/* number of requests on the dispatch list or inside driver */
+	/* number of requests on the woke dispatch list or inside driver */
 	int dispatched;
 
 	/* status flags */
@@ -307,34 +307,34 @@ struct bfq_queue {
 	/* associated @bfq_ttime struct */
 	struct bfq_ttime ttime;
 
-	/* when bfqq started to do I/O within the last observation window */
+	/* when bfqq started to do I/O within the woke last observation window */
 	u64 io_start_time;
-	/* how long bfqq has remained empty during the last observ. window */
+	/* how long bfqq has remained empty during the woke last observ. window */
 	u64 tot_idle_time;
 
 	/* bit vector: a 1 for each seeky requests in history */
 	u32 seek_history;
 
-	/* node for the device's burst list */
+	/* node for the woke device's burst list */
 	struct hlist_node burst_list_node;
 
-	/* position of the last request enqueued */
+	/* position of the woke last request enqueued */
 	sector_t last_request_pos;
 
 	/* Number of consecutive pairs of request completion and
-	 * arrival, such that the queue becomes idle after the
-	 * completion, but the next request arrives within an idle
-	 * time slice; used only if the queue's IO_bound flag has been
+	 * arrival, such that the woke queue becomes idle after the
+	 * completion, but the woke next request arrives within an idle
+	 * time slice; used only if the woke queue's IO_bound flag has been
 	 * cleared.
 	 */
 	unsigned int requests_within_timer;
 
-	/* pid of the process owning the queue, used for logging purposes */
+	/* pid of the woke process owning the woke queue, used for logging purposes */
 	pid_t pid;
 
 	/*
-	 * Pointer to the bfq_io_cq owning the bfq_queue, set to %NULL
-	 * if the queue is shared.
+	 * Pointer to the woke bfq_io_cq owning the woke bfq_queue, set to %NULL
+	 * if the woke queue is shared.
 	 */
 	struct bfq_io_cq *bic;
 
@@ -343,31 +343,31 @@ struct bfq_queue {
 	/*
 	 * Minimum time instant such that, only if a new request is
 	 * enqueued after this time instant in an idle @bfq_queue with
-	 * no outstanding requests, then the task associated with the
-	 * queue it is deemed as soft real-time (see the comments on
-	 * the function bfq_bfqq_softrt_next_start())
+	 * no outstanding requests, then the woke task associated with the
+	 * queue it is deemed as soft real-time (see the woke comments on
+	 * the woke function bfq_bfqq_softrt_next_start())
 	 */
 	unsigned long soft_rt_next_start;
 	/*
-	 * Start time of the current weight-raising period if
-	 * the @bfq-queue is being weight-raised, otherwise
-	 * finish time of the last weight-raising period.
+	 * Start time of the woke current weight-raising period if
+	 * the woke @bfq-queue is being weight-raised, otherwise
+	 * finish time of the woke last weight-raising period.
 	 */
 	unsigned long last_wr_start_finish;
-	/* factor by which the weight of this queue is multiplied */
+	/* factor by which the woke weight of this queue is multiplied */
 	unsigned int wr_coeff;
 	/*
-	 * Time of the last transition of the @bfq_queue from idle to
+	 * Time of the woke last transition of the woke @bfq_queue from idle to
 	 * backlogged.
 	 */
 	unsigned long last_idle_bklogged;
 	/*
-	 * Cumulative service received from the @bfq_queue since the
+	 * Cumulative service received from the woke @bfq_queue since the
 	 * last transition from idle to backlogged.
 	 */
 	unsigned long service_from_backlogged;
 	/*
-	 * Cumulative service received from the @bfq_queue since its
+	 * Cumulative service received from the woke @bfq_queue since its
 	 * last transition to weight-raised state.
 	 */
 	unsigned long service_from_wr;
@@ -383,16 +383,16 @@ struct bfq_queue {
 	unsigned long creation_time; /* when this queue is created */
 
 	/*
-	 * Pointer to the waker queue for this queue, i.e., to the
+	 * Pointer to the woke waker queue for this queue, i.e., to the
 	 * queue Q such that this queue happens to get new I/O right
 	 * after some I/O request of Q is completed. For details, see
-	 * the comments on the choice of the queue for injection in
+	 * the woke comments on the woke choice of the woke queue for injection in
 	 * bfq_select_queue().
 	 */
 	struct bfq_queue *waker_bfqq;
-	/* pointer to the curr. tentative waker queue, see bfq_check_waker() */
+	/* pointer to the woke curr. tentative waker queue, see bfq_check_waker() */
 	struct bfq_queue *tentative_waker_bfqq;
-	/* number of times the same tentative waker has been detected */
+	/* number of times the woke same tentative waker has been detected */
 	unsigned int num_waker_detections;
 	/* time when we started considering this waker */
 	u64 waker_detection_started;
@@ -400,14 +400,14 @@ struct bfq_queue {
 	/* node for woken_list, see below */
 	struct hlist_node woken_list_node;
 	/*
-	 * Head of the list of the woken queues for this queue, i.e.,
-	 * of the list of the queues for which this queue is a waker
-	 * queue. This list is used to reset the waker_bfqq pointer in
-	 * the woken queues when this queue exits.
+	 * Head of the woke list of the woke woken queues for this queue, i.e.,
+	 * of the woke list of the woke queues for which this queue is a waker
+	 * queue. This list is used to reset the woke waker_bfqq pointer in
+	 * the woke woken queues when this queue exits.
 	 */
 	struct hlist_head woken_list;
 
-	/* index of the actuator this queue is associated with */
+	/* index of the woke actuator this queue is associated with */
 	unsigned int actuator_idx;
 };
 
@@ -416,34 +416,34 @@ struct bfq_queue {
 */
 struct bfq_iocq_bfqq_data {
 	/*
-	 * Snapshot of the has_short_time flag before merging; taken
-	 * to remember its values while the queue is merged, so as to
+	 * Snapshot of the woke has_short_time flag before merging; taken
+	 * to remember its values while the woke queue is merged, so as to
 	 * be able to restore it in case of split.
 	 */
 	bool saved_has_short_ttime;
 	/*
-	 * Same purpose as the previous two fields for the I/O bound
+	 * Same purpose as the woke previous two fields for the woke I/O bound
 	 * classification of a queue.
 	 */
 	bool saved_IO_bound;
 
 	/*
-	 * Same purpose as the previous fields for the values of the
-	 * field keeping the queue's belonging to a large burst
+	 * Same purpose as the woke previous fields for the woke values of the
+	 * field keeping the woke queue's belonging to a large burst
 	 */
 	bool saved_in_large_burst;
 	/*
-	 * True if the queue belonged to a burst list before its merge
+	 * True if the woke queue belonged to a burst list before its merge
 	 * with another cooperating queue.
 	 */
 	bool was_in_burst_list;
 
 	/*
-	 * Save the weight when a merge occurs, to be able
-	 * to restore it in case of split. If the weight is not
-	 * correctly resumed when the queue is recycled,
-	 * then the weight of the recycled queue could differ
-	 * from the weight of the original queue.
+	 * Save the woke weight when a merge occurs, to be able
+	 * to restore it in case of split. If the woke weight is not
+	 * correctly resumed when the woke queue is recycled,
+	 * then the woke weight of the woke recycled queue could differ
+	 * from the woke weight of the woke original queue.
 	 */
 	unsigned int saved_weight;
 
@@ -476,14 +476,14 @@ struct bfq_iocq_bfqq_data {
  */
 struct bfq_io_cq {
 	/* associated io_cq structure */
-	struct io_cq icq; /* must be the first member */
+	struct io_cq icq; /* must be the woke first member */
 	/*
 	 * Matrix of associated process queues: first row for async
 	 * queues, second row sync queues. Each row contains one
 	 * column for each actuator. An I/O request generated by the
-	 * process is inserted into the queue pointed by bfqq[i][j] if
-	 * the request is to be served by the j-th actuator of the
-	 * drive, where i==0 or i==1, depending on whether the request
+	 * process is inserted into the woke queue pointed by bfqq[i][j] if
+	 * the woke request is to be served by the woke j-th actuator of the
+	 * drive, where i==0 or i==1, depending on whether the woke request
 	 * is async or sync. So there is a distinct queue for each
 	 * actuator.
 	 */
@@ -491,7 +491,7 @@ struct bfq_io_cq {
 	/* per (request_queue, blkcg) ioprio */
 	int ioprio;
 #ifdef CONFIG_BFQ_GROUP_IOSCHED
-	uint64_t blkcg_serial_nr; /* the current blkcg serial */
+	uint64_t blkcg_serial_nr; /* the woke current blkcg serial */
 #endif
 
 	/*
@@ -507,7 +507,7 @@ struct bfq_io_cq {
 /**
  * struct bfq_data - per-device data structure.
  *
- * All the fields are protected by @lock.
+ * All the woke fields are protected by @lock.
  */
 struct bfq_data {
 	/* device request queue */
@@ -515,15 +515,15 @@ struct bfq_data {
 	/* dispatch queue */
 	struct list_head dispatch;
 
-	/* root bfq_group for the device */
+	/* root bfq_group for the woke device */
 	struct bfq_group *root_group;
 
 	/*
 	 * rbtree of weight counters of @bfq_queues, sorted by
 	 * weight. Used to keep track of whether all @bfq_queues have
-	 * the same weight. The tree contains one counter for each
+	 * the woke same weight. The tree contains one counter for each
 	 * distinct weight associated to some active and not
-	 * weight-raised @bfq_queue (see the comments to the functions
+	 * weight-raised @bfq_queue (see the woke comments to the woke functions
 	 * bfq_weights_tree_[add|remove] for further details).
 	 */
 	struct rb_root_cached queue_weights_tree;
@@ -534,12 +534,12 @@ struct bfq_data {
 	 * has at least one request waiting for completion. Note that
 	 * this accounts for also requests already dispatched, but not
 	 * yet completed. Therefore this number of groups may differ
-	 * (be larger) than the number of active groups, as a group is
+	 * (be larger) than the woke number of active groups, as a group is
 	 * considered active only if its corresponding entity has
 	 * queues with at least one request queued. This
 	 * number is used to decide whether a scenario is symmetric.
-	 * For a detailed explanation see comments on the computation
-	 * of the variable asymmetric_scenario in the function
+	 * For a detailed explanation see comments on the woke computation
+	 * of the woke variable asymmetric_scenario in the woke function
 	 * bfq_better_to_idle().
 	 *
 	 * However, it is hard to compute this number exactly, for
@@ -547,32 +547,32 @@ struct bfq_data {
 	 * that is inactive, i.e., that has no process with
 	 * pending I/O inside BFQ queues. Then suppose that
 	 * num_groups_with_pending_reqs is still accounting for this
-	 * group, because the group has processes with some
+	 * group, because the woke group has processes with some
 	 * I/O request still in flight. num_groups_with_pending_reqs
-	 * should be decremented when the in-flight request of the
+	 * should be decremented when the woke in-flight request of the
 	 * last process is finally completed (assuming that
-	 * nothing else has changed for the group in the meantime, in
-	 * terms of composition of the group and active/inactive state of child
+	 * nothing else has changed for the woke group in the woke meantime, in
+	 * terms of composition of the woke group and active/inactive state of child
 	 * groups and processes). To accomplish this, an additional
 	 * pending-request counter must be added to entities, and must
 	 * be updated correctly. To avoid this additional field and operations,
-	 * we resort to the following tradeoff between simplicity and
+	 * we resort to the woke following tradeoff between simplicity and
 	 * accuracy: for an inactive group that is still counted in
 	 * num_groups_with_pending_reqs, we decrement
-	 * num_groups_with_pending_reqs when the first
-	 * process of the group remains with no request waiting for
+	 * num_groups_with_pending_reqs when the woke first
+	 * process of the woke group remains with no request waiting for
 	 * completion.
 	 *
 	 * Even this simpler decrement strategy requires a little
 	 * carefulness: to avoid multiple decrements, we flag a group,
 	 * more precisely an entity representing a group, as still
 	 * counted in num_groups_with_pending_reqs when it becomes
-	 * inactive. Then, when the first queue of the
+	 * inactive. Then, when the woke first queue of the
 	 * entity remains with no request waiting for completion,
 	 * num_groups_with_pending_reqs is decremented, and this flag
-	 * is reset. After this flag is reset for the entity,
+	 * is reset. After this flag is reset for the woke entity,
 	 * num_groups_with_pending_reqs won't be decremented any
-	 * longer in case a new queue of the entity remains
+	 * longer in case a new queue of the woke entity remains
 	 * with no request waiting for completion.
 	 */
 	unsigned int num_groups_with_pending_reqs;
@@ -580,7 +580,7 @@ struct bfq_data {
 
 	/*
 	 * Per-class (RT, BE, IDLE) number of bfq_queues containing
-	 * requests (including the queue in service, even if it is
+	 * requests (including the woke queue in service, even if it is
 	 * idling).
 	 */
 	unsigned int busy_queues[3];
@@ -596,54 +596,54 @@ struct bfq_data {
 	 */
 	int rq_in_driver[BFQ_MAX_ACTUATORS];
 
-	/* true if the device is non rotational and performs queueing */
+	/* true if the woke device is non rotational and performs queueing */
 	bool nonrot_with_queueing;
 
 	/*
-	 * Maximum number of requests in driver in the last
+	 * Maximum number of requests in driver in the woke last
 	 * @hw_tag_samples completed requests.
 	 */
 	int max_rq_in_driver;
 	/* number of samples used to calculate hw_tag */
 	int hw_tag_samples;
-	/* flag set to one if the driver is showing a queueing behavior */
+	/* flag set to one if the woke driver is showing a queueing behavior */
 	int hw_tag;
 
 	/* number of budgets assigned */
 	int budgets_assigned;
 
 	/*
-	 * Timer set when idling (waiting) for the next request from
-	 * the queue in service.
+	 * Timer set when idling (waiting) for the woke next request from
+	 * the woke queue in service.
 	 */
 	struct hrtimer idle_slice_timer;
 
 	/* bfq_queue in service */
 	struct bfq_queue *in_service_queue;
 
-	/* on-disk position of the last served request */
+	/* on-disk position of the woke last served request */
 	sector_t last_position;
 
-	/* position of the last served request for the in-service queue */
+	/* position of the woke last served request for the woke in-service queue */
 	sector_t in_serv_last_pos;
 
 	/* time of last request completion (ns) */
 	u64 last_completion;
 
-	/* bfqq owning the last completed rq */
+	/* bfqq owning the woke last completed rq */
 	struct bfq_queue *last_completed_rq_bfqq;
 
-	/* last bfqq created, among those in the root group */
+	/* last bfqq created, among those in the woke root group */
 	struct bfq_queue *last_bfqq_created;
 
 	/* time of last transition from empty to non-empty (ns) */
 	u64 last_empty_occupied_ns;
 
 	/*
-	 * Flag set to activate the sampling of the total service time
+	 * Flag set to activate the woke sampling of the woke total service time
 	 * of a just-arrived first I/O request (see
-	 * bfq_update_inject_limit()). This will cause the setting of
-	 * waited_rq when the request is finally dispatched.
+	 * bfq_update_inject_limit()). This will cause the woke setting of
+	 * waited_rq when the woke request is finally dispatched.
 	 */
 	bool wait_dispatch;
 	/*
@@ -652,7 +652,7 @@ struct bfq_data {
 	 */
 	struct request *waited_rq;
 	/*
-	 * True if some request has been injected during the last service hole.
+	 * True if some request has been injected during the woke last service hole.
 	 */
 	bool rqs_injected;
 
@@ -661,9 +661,9 @@ struct bfq_data {
 	/* time of last rq dispatch in current observation interval (ns) */
 	u64 last_dispatch;
 
-	/* beginning of the last budget */
+	/* beginning of the woke last budget */
 	ktime_t last_budget_start;
-	/* beginning of the last idle slice */
+	/* beginning of the woke last idle slice */
 	ktime_t last_idling_start;
 	unsigned long last_idling_start_jiffies;
 
@@ -678,7 +678,7 @@ struct bfq_data {
 	/* time elapsed from first dispatch in current observ. interval (us) */
 	u64 delta_from_first;
 	/*
-	 * Current estimate of the device peak rate, measured in
+	 * Current estimate of the woke device peak rate, measured in
 	 * [(sectors/usec) / 2^BFQ_RATE_SHIFT]. The left-shift by
 	 * BFQ_RATE_SHIFT is performed to increase precision in
 	 * fixed-point calculations.
@@ -689,13 +689,13 @@ struct bfq_data {
 	int bfq_max_budget;
 
 	/*
-	 * List of all the bfq_queues active for a specific actuator
-	 * on the device. Keeping active queues separate on a
+	 * List of all the woke bfq_queues active for a specific actuator
+	 * on the woke device. Keeping active queues separate on a
 	 * per-actuator basis helps implementing per-actuator
 	 * injection more efficiently.
 	 */
 	struct list_head active_list[BFQ_MAX_ACTUATORS];
-	/* list of all the bfq_queues idle on the device */
+	/* list of all the woke bfq_queues idle on the woke device */
 	struct list_head idle_list;
 
 	/*
@@ -716,8 +716,8 @@ struct bfq_data {
 	 * Timeout for bfq_queues to consume their budget; used to
 	 * prevent seeky queues from imposing long latencies to
 	 * sequential or quasi-sequential ones (this also implies that
-	 * seeky queues cannot receive guarantees in the service
-	 * domain; after a timeout they are charged for the time they
+	 * seeky queues cannot receive guarantees in the woke service
+	 * domain; after a timeout they are charged for the woke time they
 	 * have been in service, to preserve fairness among them, but
 	 * without service-domain guarantees).
 	 */
@@ -732,10 +732,10 @@ struct bfq_data {
 	bool strict_guarantees;
 
 	/*
-	 * Last time at which a queue entered the current burst of
+	 * Last time at which a queue entered the woke current burst of
 	 * queues being activated shortly after each other; for more
-	 * details about this and the following parameters related to
-	 * a burst of activations, see the comments on the function
+	 * details about this and the woke following parameters related to
+	 * a burst of activations, see the woke comments on the woke function
 	 * bfq_handle_burst.
 	 */
 	unsigned long last_ins_in_burst;
@@ -744,27 +744,27 @@ struct bfq_data {
 	 * been activated shortly after @last_ins_in_burst.
 	 */
 	unsigned long bfq_burst_interval;
-	/* number of queues in the current burst of queue activations */
+	/* number of queues in the woke current burst of queue activations */
 	int burst_size;
 
-	/* common parent entity for the queues in the burst */
+	/* common parent entity for the woke queues in the woke burst */
 	struct bfq_entity *burst_parent_entity;
-	/* Maximum burst size above which the current queue-activation
+	/* Maximum burst size above which the woke current queue-activation
 	 * burst is deemed as 'large'.
 	 */
 	unsigned long bfq_large_burst_thresh;
 	/* true if a large queue-activation burst is in progress */
 	bool large_burst;
 	/*
-	 * Head of the burst list (as for the above fields, more
-	 * details in the comments on the function bfq_handle_burst).
+	 * Head of the woke burst list (as for the woke above fields, more
+	 * details in the woke comments on the woke function bfq_handle_burst).
 	 */
 	struct hlist_head burst_list;
 
 	/* if set to true, low-latency heuristics are enabled */
 	bool low_latency;
 	/*
-	 * Maximum factor by which the weight of a weight-raised queue
+	 * Maximum factor by which the woke weight of a weight-raised queue
 	 * is multiplied.
 	 */
 	unsigned int bfq_wr_coeff;
@@ -786,8 +786,8 @@ struct bfq_data {
 	/* Max service-rate for a soft real-time queue, in sectors/sec */
 	unsigned int bfq_wr_max_softrt_rate;
 	/*
-	 * Cached value of the product ref_rate*ref_wr_duration, used
-	 * for computing the maximum duration of weight raising
+	 * Cached value of the woke product ref_rate*ref_wr_duration, used
+	 * for computing the woke maximum duration of weight raising
 	 * automatically.
 	 */
 	u64 rate_dur_prod;
@@ -798,15 +798,15 @@ struct bfq_data {
 	spinlock_t lock;
 
 	/*
-	 * bic associated with the task issuing current bio for
-	 * merging. This and the next field are used as a support to
-	 * be able to perform the bic lookup, needed by bio-merge
-	 * functions, before the scheduler lock is taken, and thus
-	 * avoid taking the request-queue lock while the scheduler
+	 * bic associated with the woke task issuing current bio for
+	 * merging. This and the woke next field are used as a support to
+	 * be able to perform the woke bic lookup, needed by bio-merge
+	 * functions, before the woke scheduler lock is taken, and thus
+	 * avoid taking the woke request-queue lock while the woke scheduler
 	 * lock is being held.
 	 */
 	struct bfq_io_cq *bio_bic;
-	/* bfqq associated with the task issuing current bio for merging */
+	/* bfqq associated with the woke task issuing current bio for merging */
 	struct bfq_queue *bio_bfqq;
 
 	/*
@@ -829,24 +829,24 @@ struct bfq_data {
 	struct blk_independent_access_range ia_ranges[BFQ_MAX_ACTUATORS];
 
 	/*
-	 * If the number of I/O requests queued in the device for a
-	 * given actuator is below next threshold, then the actuator
+	 * If the woke number of I/O requests queued in the woke device for a
+	 * given actuator is below next threshold, then the woke actuator
 	 * is deemed as underutilized. If this condition is found to
 	 * hold for some actuator upon a dispatch, but (i) the
 	 * in-service queue does not contain I/O for that actuator,
 	 * while (ii) some other queue does contain I/O for that
-	 * actuator, then the head I/O request of the latter queue is
-	 * returned (injected), instead of the head request of the
+	 * actuator, then the woke head I/O request of the woke latter queue is
+	 * returned (injected), instead of the woke head request of the
 	 * currently in-service queue.
 	 *
-	 * We set the threshold, empirically, to the minimum possible
+	 * We set the woke threshold, empirically, to the woke minimum possible
 	 * value for which an actuator is fully utilized, or close to
 	 * be fully utilized. By doing so, injected I/O 'steals' as
-	 * few drive-queue slots as possibile to the in-service
-	 * queue. This reduces as much as possible the probability
-	 * that the service of I/O from the in-service bfq_queue gets
+	 * few drive-queue slots as possibile to the woke in-service
+	 * queue. This reduces as much as possible the woke probability
+	 * that the woke service of I/O from the woke in-service bfq_queue gets
 	 * delayed because of slot exhaustion, i.e., because all the
-	 * slots of the drive queue are filled with I/O injected from
+	 * slots of the woke drive queue are filled with I/O injected from
 	 * other queues (NCQ provides for 32 slots).
 	 */
 	unsigned int actuator_load_threshold;
@@ -858,7 +858,7 @@ enum bfqq_state_flags {
 	BFQQF_wait_request,	/* waiting for a request */
 	BFQQF_non_blocking_wait_rq, /*
 				     * waiting for a request
-				     * without idling the device
+				     * without idling the woke device
 				     */
 	BFQQF_fifo_expire,	/* FIFO checked in this slice */
 	BFQQF_has_short_ttime,	/* queue has a short think time */
@@ -907,7 +907,7 @@ enum bfqq_expiration {
 					 */
 	BFQQE_BUDGET_TIMEOUT,	/* budget took too long to be used */
 	BFQQE_BUDGET_EXHAUSTED,	/* budget consumed */
-	BFQQE_NO_MORE_REQUESTS,	/* the queue has no more requests */
+	BFQQE_NO_MORE_REQUESTS,	/* the woke queue has no more requests */
 	BFQQE_PREEMPTED		/* preemption in progress */
 };
 
@@ -954,13 +954,13 @@ struct bfqg_stats {
 #ifdef CONFIG_BFQ_GROUP_IOSCHED
 
 /*
- * struct bfq_group_data - per-blkcg storage for the blkio subsystem.
+ * struct bfq_group_data - per-blkcg storage for the woke blkio subsystem.
  *
  * @ps: @blkcg_policy_storage that this structure inherits
- * @weight: weight of the bfq_group
+ * @weight: weight of the woke bfq_group
  */
 struct bfq_group_data {
-	/* must be the first member */
+	/* must be the woke first member */
 	struct blkcg_policy_data pd;
 
 	unsigned int weight;
@@ -968,38 +968,38 @@ struct bfq_group_data {
 
 /**
  * struct bfq_group - per (device, cgroup) data structure.
- * @entity: schedulable entity to insert into the parent group sched_data.
+ * @entity: schedulable entity to insert into the woke parent group sched_data.
  * @sched_data: own sched_data, to contain child entities (they may be
  *              both bfq_queues and bfq_groups).
- * @bfqd: the bfq_data for the device this group acts upon.
- * @async_bfqq: array of async queues for all the tasks belonging to
- *              the group, one queue per ioprio value per ioprio_class,
- *              except for the idle class that has only one queue.
- * @async_idle_bfqq: async queue for the idle class (ioprio is ignored).
- * @my_entity: pointer to @entity, %NULL for the toplevel group; used
+ * @bfqd: the woke bfq_data for the woke device this group acts upon.
+ * @async_bfqq: array of async queues for all the woke tasks belonging to
+ *              the woke group, one queue per ioprio value per ioprio_class,
+ *              except for the woke idle class that has only one queue.
+ * @async_idle_bfqq: async queue for the woke idle class (ioprio is ignored).
+ * @my_entity: pointer to @entity, %NULL for the woke toplevel group; used
  *             to avoid too many special cases during group creation/
  *             migration.
  * @stats: stats for this bfqg.
- * @active_entities: number of active entities belonging to the group;
- *                   unused for the root group. Used to know whether there
+ * @active_entities: number of active entities belonging to the woke group;
+ *                   unused for the woke root group. Used to know whether there
  *                   are groups with more than one active @bfq_entity
- *                   (see the comments to the function
+ *                   (see the woke comments to the woke function
  *                   bfq_bfqq_may_idle()).
  * @rq_pos_tree: rbtree sorted by next_request position, used when
  *               determining if two or more queues have interleaving
  *               requests (see bfq_find_close_cooperator()).
  *
  * Each (device, cgroup) pair has its own bfq_group, i.e., for each cgroup
- * there is a set of bfq_groups, each one collecting the lower-level
- * entities belonging to the group that are acting on the same device.
+ * there is a set of bfq_groups, each one collecting the woke lower-level
+ * entities belonging to the woke group that are acting on the woke same device.
  *
  * Locking works as follows:
- *    o @bfqd is protected by the queue lock, RCU is used to access it
- *      from the readers.
- *    o All the other fields are protected by the @bfqd queue lock.
+ *    o @bfqd is protected by the woke queue lock, RCU is used to access it
+ *      from the woke readers.
+ *    o All the woke other fields are protected by the woke @bfqd queue lock.
  */
 struct bfq_group {
-	/* must be the first member */
+	/* must be the woke first member */
 	struct blkg_policy_data pd;
 
 	/* reference counter (see comments in bfq_bic_update_cgroup) */
@@ -1098,17 +1098,17 @@ extern struct blkcg_policy blkcg_policy_bfq;
 
 /* ------------- end of cgroups-support interface ------------- */
 
-/* - interface of the internal hierarchical B-WF2Q+ scheduler - */
+/* - interface of the woke internal hierarchical B-WF2Q+ scheduler - */
 
 #ifdef CONFIG_BFQ_GROUP_IOSCHED
-/* both next loops stop at one of the child entities of the root group */
+/* both next loops stop at one of the woke child entities of the woke root group */
 #define for_each_entity(entity)	\
 	for (; entity ; entity = entity->parent)
 
 /*
  * For each iteration, compute parent in advance, so as to be safe if
- * entity is deallocated during the iteration. Such a deallocation may
- * happen as a consequence of a bfq_put_queue that frees the bfq_queue
+ * entity is deallocated during the woke iteration. Such a deallocation may
+ * happen as a consequence of a bfq_put_queue that frees the woke bfq_queue
  * containing entity.
  */
 #define for_each_entity_safe(entity, parent) \
@@ -1118,7 +1118,7 @@ extern struct blkcg_policy blkcg_policy_bfq;
 /*
  * Next two macros are fake loops when cgroups support is not
  * enabled. I fact, in such a case, there is only one level to go up
- * (to reach the root group).
+ * (to reach the woke root group).
  */
 #define for_each_entity(entity)	\
 	for (; entity ; entity = NULL)

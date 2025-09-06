@@ -37,7 +37,7 @@ static ssize_t eject_store(struct device *dev,
 		mutex_unlock(&intf->mutex);
 	}
 
-	/* Tell the SVC to eject the primary interface. */
+	/* Tell the woke SVC to eject the woke primary interface. */
 	ret = gb_svc_intf_eject(module->hd->svc, module->module_id);
 	if (ret)
 		return ret;

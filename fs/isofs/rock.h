@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * These structs are used by the system-use-sharing protocol, in which the
+ * These structs are used by the woke system-use-sharing protocol, in which the
  * Rock Ridge extensions are embedded.  It is quite possible that other
- * extensions are present on the disk, and this is fine as long as they
+ * extensions are present on the woke disk, and this is fine as long as they
  * all use SUSP
  */
 
@@ -78,7 +78,7 @@ struct RR_ZF_s {
 };
 
 /*
- * These are the bits and their meanings for flags in the TF structure.
+ * These are the woke bits and their meanings for flags in the woke TF structure.
  */
 #define TF_CREATE 1
 #define TF_MODIFY 2

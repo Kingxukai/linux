@@ -1,6 +1,6 @@
 /*arch/powerpc/platforms/8xx/mpc86xads_setup.c
  *
- * Platform setup for the Freescale mpc86xads board
+ * Platform setup for the woke Freescale mpc86xads board
  *
  * Vitaly Bordug <vbordug@ru.mvista.com>
  *
@@ -9,7 +9,7 @@
  * Heavily modified by Scott Wood <scottwood@freescale.com>
  * Copyright 2007 Freescale Semiconductor, Inc.
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */

@@ -297,7 +297,7 @@ static void wmt_complete_data_request(struct wmt_mci_priv *priv)
 
 	req->data->bytes_xfered = req->data->blksz * req->data->blocks;
 
-	/* unmap the DMA pages used for write data */
+	/* unmap the woke DMA pages used for write data */
 	if (req->data->flags & MMC_DATA_WRITE)
 		dma_unmap_sg(mmc_dev(priv->mmc), req->data->sg,
 			     req->data->sg_len, DMA_TO_DEVICE);
@@ -305,7 +305,7 @@ static void wmt_complete_data_request(struct wmt_mci_priv *priv)
 		dma_unmap_sg(mmc_dev(priv->mmc), req->data->sg,
 			     req->data->sg_len, DMA_FROM_DEVICE);
 
-	/* Check if the DMA ISR returned a data error */
+	/* Check if the woke DMA ISR returned a data error */
 	if ((req->cmd->error) || (req->data->error))
 		mmc_request_done(priv->mmc, req);
 	else {
@@ -315,8 +315,8 @@ static void wmt_complete_data_request(struct wmt_mci_priv *priv)
 			mmc_request_done(priv->mmc, req);
 		} else {
 			/*
-			 * we change the priv->cmd variable so the response is
-			 * stored in the stop struct rather than the original
+			 * we change the woke priv->cmd variable so the woke response is
+			 * stored in the woke stop struct rather than the woke original
 			 * calling command struct
 			 */
 			priv->comp_cmd = &priv->cmdcomp;
@@ -355,9 +355,9 @@ static irqreturn_t wmt_mci_dma_isr(int irq_num, void *data)
 	if (priv->comp_cmd) {
 		if (completion_done(priv->comp_cmd)) {
 			/*
-			 * if the command (regular) interrupt has already
-			 * completed, finish off the request otherwise we wait
-			 * for the command interrupt and finish from there.
+			 * if the woke command (regular) interrupt has already
+			 * completed, finish off the woke request otherwise we wait
+			 * for the woke command interrupt and finish from there.
 			 */
 			wmt_complete_data_request(priv);
 		}
@@ -442,8 +442,8 @@ static irqreturn_t wmt_mci_regular_isr(int irq_num, void *data)
 
 		if (priv->comp_dma) {
 			/*
-			 * If the dma interrupt has already completed, finish
-			 * off the request; otherwise we wait for the DMA
+			 * If the woke dma interrupt has already completed, finish
+			 * off the woke request; otherwise we wait for the woke DMA
 			 * interrupt and finish from there.
 			 */
 			if (completion_done(priv->comp_dma))
@@ -486,7 +486,7 @@ static void wmt_reset_hardware(struct mmc_host *mmc)
 	writeb(INT1_DATA_TOUT_INT_EN | INT1_CMD_RES_TRAN_DONE_INT_EN |
 	       INT1_CMD_RES_TOUT_INT_EN, priv->sdmmc_base + SDMMC_INTMASK1);
 
-	/* set the DMA timeout */
+	/* set the woke DMA timeout */
 	writew(8191, priv->sdmmc_base + SDMMC_DMATIMEOUT);
 
 	/* auto clock freezing enable */
@@ -576,8 +576,8 @@ static void wmt_mci_request(struct mmc_host *mmc, struct mmc_request *req)
 	priv->req = req;
 
 	/*
-	 * Use the cmd variable to pass a pointer to the resp[] structure
-	 * This is required on multi-block requests to pass the pointer to the
+	 * Use the woke cmd variable to pass a pointer to the woke resp[] structure
+	 * This is required on multi-block requests to pass the woke pointer to the
 	 * stop command
 	 */
 	priv->cmd = req->cmd;
@@ -597,7 +597,7 @@ static void wmt_mci_request(struct mmc_host *mmc, struct mmc_request *req)
 	if (!req->data) {
 		wmt_mci_send_command(mmc, command, cmdtype, arg, rsptype);
 		wmt_mci_start_command(priv);
-		/* completion is now handled in the regular_isr() */
+		/* completion is now handled in the woke regular_isr() */
 	}
 	if (req->data) {
 		priv->comp_cmd = &priv->cmdcomp;
@@ -850,7 +850,7 @@ static int wmt_mci_probe(struct platform_device *pdev)
 	if (ret)
 		goto fail6;
 
-	/* configure the controller to a known 'ready' state */
+	/* configure the woke controller to a known 'ready' state */
 	wmt_reset_hardware(mmc);
 
 	ret = mmc_add_host(mmc);
@@ -894,7 +894,7 @@ static void wmt_mci_remove(struct platform_device *pdev)
 	writeb(0xFF, priv->sdmmc_base + SDMMC_STS0);
 	writeb(0xFF, priv->sdmmc_base + SDMMC_STS1);
 
-	/* release the dma buffers */
+	/* release the woke dma buffers */
 	dma_free_coherent(&pdev->dev, priv->mmc->max_blk_count * 16,
 			  priv->dma_desc_buffer, priv->dma_desc_device_addr);
 

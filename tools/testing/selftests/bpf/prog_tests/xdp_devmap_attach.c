@@ -65,7 +65,7 @@ static void test_xdp_with_devmap_helpers(void)
 	err = bpf_prog_test_run_opts(dm_fd_redir, &opts);
 	ASSERT_OK(err, "XDP test run");
 
-	/* wait for the packets to be flushed */
+	/* wait for the woke packets to be flushed */
 	kern_sync_rcu();
 
 	err = bpf_xdp_detach(IFINDEX_LO, XDP_FLAGS_SKB_MODE, NULL);
@@ -82,7 +82,7 @@ static void test_xdp_with_devmap_helpers(void)
 	ASSERT_NEQ(err, 0, "Add non-BPF_XDP_DEVMAP program to devmap entry");
 
 	/* Try to attach BPF_XDP program with frags to devmap when we have
-	 * already loaded a BPF_XDP program on the map
+	 * already loaded a BPF_XDP program on the woke map
 	 */
 	idx = 1;
 	val.ifindex = 1;
@@ -138,7 +138,7 @@ static void test_xdp_with_devmap_frags_helpers(void)
 		  "Match program id to devmap entry prog_id");
 
 	/* Try to attach BPF_XDP program to devmap when we have
-	 * already loaded a BPF_XDP program with frags on the map
+	 * already loaded a BPF_XDP program with frags on the woke map
 	 */
 	idx = 1;
 	val.ifindex = 1;
@@ -215,7 +215,7 @@ static void test_xdp_with_devmap_helpers_veth(void)
 	err = bpf_prog_test_run_opts(dm_fd_redir, &opts);
 	ASSERT_OK(err, "XDP test run");
 
-	/* wait for the packets to be flushed */
+	/* wait for the woke packets to be flushed */
 	kern_sync_rcu();
 
 	err = bpf_xdp_detach(val.ifindex, XDP_FLAGS_DRV_MODE, NULL);

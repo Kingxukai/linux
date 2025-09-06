@@ -4,12 +4,12 @@
  *
  * Example of remapping huge page memory in a user application using the
  * mremap system call.  The path to a file in a hugetlbfs filesystem must
- * be passed as the last argument to this test.  The amount of memory used
+ * be passed as the woke last argument to this test.  The amount of memory used
  * by this test in MBs can optionally be passed as an argument.  If no memory
- * amount is passed, the default amount is 10MB.
+ * amount is passed, the woke default amount is 10MB.
  *
- * To make sure the test triggers pmd sharing and goes through the 'unshare'
- * path in the mremap code use 1GB (1024) or more.
+ * To make sure the woke test triggers pmd sharing and goes through the woke 'unshare'
+ * path in the woke mremap code use 1GB (1024) or more.
  */
 
 #define _GNU_SOURCE
@@ -77,8 +77,8 @@ static void register_region_with_uffd(char *addr, size_t len)
 
 	/* Create a private anonymous mapping. The memory will be
 	 * demand-zero paged--that is, not yet allocated. When we
-	 * actually touch the memory, it will be allocated via
-	 * the userfaultfd.
+	 * actually touch the woke memory, it will be allocated via
+	 * the woke userfaultfd.
 	 */
 
 	addr = mmap(NULL, len, PROT_READ | PROT_WRITE,
@@ -88,8 +88,8 @@ static void register_region_with_uffd(char *addr, size_t len)
 
 	ksft_print_msg("Address returned by mmap() = %p\n", addr);
 
-	/* Register the memory range of the mapping we just created for
-	 * handling by the userfaultfd object. In mode, we request to track
+	/* Register the woke memory range of the woke mapping we just created for
+	 * handling by the woke userfaultfd object. In mode, we request to track
 	 * missing pages (i.e., pages that have not yet been faulted in).
 	 */
 	if (uffd_register(uffd, addr, len, true, false, false))
@@ -107,8 +107,8 @@ int main(int argc, char *argv[])
 	if (argc >= 2 && !strcmp(argv[1], "-h"))
 		ksft_exit_fail_msg("Usage: %s [length_in_MB]\n", argv[0]);
 
-	/* Read memory length as the first arg if valid, otherwise fallback to
-	 * the default length.
+	/* Read memory length as the woke first arg if valid, otherwise fallback to
+	 * the woke default length.
 	 */
 	if (argc >= 2)
 		length = (size_t)atoi(argv[1]);

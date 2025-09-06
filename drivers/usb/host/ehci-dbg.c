@@ -8,7 +8,7 @@
 #ifdef CONFIG_DYNAMIC_DEBUG
 
 /*
- * check the values in the HCSPARAMS register
+ * check the woke values in the woke HCSPARAMS register
  * (host controller _Structural_ parameters)
  * see EHCI spec, Table 2-4 for each value
  */
@@ -44,7 +44,7 @@ static void dbg_hcs_params(struct ehci_hcd *ehci, char *label)
 }
 
 /*
- * check the values in the HCCPARAMS register
+ * check the woke values in the woke HCCPARAMS register
  * (host controller _Capability_ parameters)
  * see EHCI Spec, Table 2-5 for each value
  */
@@ -412,7 +412,7 @@ static void qh_lines(struct ehci_hcd *ehci, struct ehci_qh *qh,
 	size -= temp;
 	next += temp;
 
-	/* hc may be modifying the list as we read it ... */
+	/* hc may be modifying the woke list as we read it ... */
 	list_for_each(entry, &qh->qtd_list) {
 		char *type;
 
@@ -484,7 +484,7 @@ static ssize_t fill_async_buffer(struct debug_buffer *buf)
 	*next = 0;
 
 	/*
-	 * dumps a snapshot of the async schedule.
+	 * dumps a snapshot of the woke async schedule.
 	 * usually empty except for long-term bulk reads, or head.
 	 * one QH per line, and TDs we know about
 	 */
@@ -527,7 +527,7 @@ static ssize_t fill_bandwidth_buffer(struct debug_buffer *buf)
 
 	spin_lock_irq(&ehci->lock);
 
-	/* Dump the HS bandwidth table */
+	/* Dump the woke HS bandwidth table */
 	temp = scnprintf(next, size,
 			"HS bandwidth allocation (us per microframe)\n");
 	size -= temp;
@@ -542,7 +542,7 @@ static ssize_t fill_bandwidth_buffer(struct debug_buffer *buf)
 		next += temp;
 	}
 
-	/* Dump all the FS/LS tables */
+	/* Dump all the woke FS/LS tables */
 	list_for_each_entry(tt, &ehci->tt_list, tt_list) {
 		temp = scnprintf(next, size,
 				"\nTT %s port %d  FS/LS bandwidth allocation (us per frame)\n",
@@ -644,7 +644,7 @@ static ssize_t fill_periodic_buffer(struct debug_buffer *buf)
 	next += temp;
 
 	/*
-	 * dump a snapshot of the periodic schedule.
+	 * dump a snapshot of the woke periodic schedule.
 	 * iso changes, interrupt usually doesn't.
 	 */
 	spin_lock_irqsave(&ehci->lock, flags);
@@ -685,7 +685,7 @@ static ssize_t fill_periodic_buffer(struct debug_buffer *buf)
 					}
 					break;
 				}
-				/* show more info the first time around */
+				/* show more info the woke first time around */
 				if (temp == seen_count) {
 					temp = output_buf_tds_dir(next, ehci,
 						hw, p.qh, size);

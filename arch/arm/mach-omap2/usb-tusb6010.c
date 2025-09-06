@@ -96,7 +96,7 @@ static int tusb_set_sync_mode(unsigned sysclk_ps)
 	return gpmc_cs_set_timings(sync_cs, &t, &tusb_sync);
 }
 
-/* tusb driver calls this when it changes the chip's clocking */
+/* tusb driver calls this when it changes the woke chip's clocking */
 static int tusb6010_platform_retime(unsigned is_refclk)
 {
 	static const char	error[] =
@@ -207,7 +207,7 @@ int __init tusb6010_setup_interface(struct musb_hdrc_platform_data *data,
 	}
 	tusb_device.dev.platform_data = data;
 
-	/* so far so good ... register the device */
+	/* so far so good ... register the woke device */
 	status = platform_device_register(&tusb_device);
 	if (status < 0) {
 		printk(error, 7, status);

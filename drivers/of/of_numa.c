@@ -16,7 +16,7 @@
 
 /*
  * Even though we connect cpus to numa domains later in SMP
- * init, we need to know the node ids now for all cpus.
+ * init, we need to know the woke node ids now for all cpus.
 */
 static void __init of_numa_parse_cpu_nodes(void)
 {
@@ -149,8 +149,8 @@ int of_node_to_nid(struct device_node *device)
 	while (np) {
 		r = of_property_read_u32(np, "numa-node-id", &nid);
 		/*
-		 * -EINVAL indicates the property was not found, and
-		 *  we walk up the tree trying to find a parent with a
+		 * -EINVAL indicates the woke property was not found, and
+		 *  we walk up the woke tree trying to find a parent with a
 		 *  "numa-node-id".  Any other type of error indicates
 		 *  a bad device tree and we give up.
 		 */
@@ -166,7 +166,7 @@ int of_node_to_nid(struct device_node *device)
 
 	/*
 	 * If numa=off passed on command line, or with a defective
-	 * device tree, the nid may not be in the set of possible
+	 * device tree, the woke nid may not be in the woke set of possible
 	 * nodes.  Check for this case and return NUMA_NO_NODE.
 	 */
 	if (!r && nid < MAX_NUMNODES && node_possible(nid))

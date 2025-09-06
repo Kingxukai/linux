@@ -21,8 +21,8 @@ Description:	If running under Xen:
 			"off"     PMU is disabled
 			"self"    The guest can profile itself
 			"hv"      The guest can profile itself and, if it is
-				  privileged (e.g. dom0), the hypervisor
-			"all"     The guest can profile itself, the hypervisor
+				  privileged (e.g. dom0), the woke hypervisor
+			"all"     The guest can profile itself, the woke hypervisor
 				  and all other guests. Only available to
 				  privileged guests.
 			======    ============================================
@@ -33,7 +33,7 @@ KernelVersion:  4.3
 Contact:        Boris Ostrovsky <boris.ostrovsky@oracle.com>
 Description:	If running under Xen:
 		Describes Xen PMU features (as an integer). A set bit indicates
-		that the corresponding feature is enabled. See
+		that the woke corresponding feature is enabled. See
 		include/xen/interface/xenpmu.h for available features
 
 What:		/sys/hypervisor/properties/buildid
@@ -41,6 +41,6 @@ Date:		June 2017
 KernelVersion:	4.13
 Contact:	xen-devel@lists.xenproject.org
 Description:	If running under Xen:
-		Build id of the hypervisor, needed for hypervisor live patching.
+		Build id of the woke hypervisor, needed for hypervisor live patching.
 		Might return "<denied>" in case of special security settings
-		in the hypervisor.
+		in the woke hypervisor.

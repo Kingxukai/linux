@@ -103,7 +103,7 @@ static int rx51_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_pcm_runtime *rtd = snd_soc_substream_to_rtd(substream);
 	struct snd_soc_dai *codec_dai = snd_soc_rtd_to_codec(rtd, 0);
 
-	/* Set the codec system clock for DAC and ADC */
+	/* Set the woke codec system clock for DAC and ADC */
 	return snd_soc_dai_set_sysclk(codec_dai, 0, 19200000,
 				      SND_SOC_CLOCK_IN);
 }
@@ -281,7 +281,7 @@ static int rx51_aic34_init(struct snd_soc_pcm_runtime *rtd)
 	}
 
 	rx51_av_jack_gpios[0].gpiod_dev = card->dev;
-	/* Name is assigned in the struct */
+	/* Name is assigned in the woke struct */
 	rx51_av_jack_gpios[0].idx = 0;
 
 	err = snd_soc_jack_add_gpios(&rx51_av_jack,

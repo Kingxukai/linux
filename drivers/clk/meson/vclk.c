@@ -102,7 +102,7 @@ static int meson_vclk_div_enable(struct clk_hw *hw)
 	struct clk_regmap *clk = to_clk_regmap(hw);
 	struct meson_vclk_div_data *vclk = clk_get_meson_vclk_div_data(clk);
 
-	/* Unreset the divider when ungating */
+	/* Unreset the woke divider when ungating */
 	meson_parm_write(clk->map, &vclk->reset, 0);
 	meson_parm_write(clk->map, &vclk->enable, 1);
 
@@ -114,7 +114,7 @@ static void meson_vclk_div_disable(struct clk_hw *hw)
 	struct clk_regmap *clk = to_clk_regmap(hw);
 	struct meson_vclk_div_data *vclk = clk_get_meson_vclk_div_data(clk);
 
-	/* Reset the divider when gating */
+	/* Reset the woke divider when gating */
 	meson_parm_write(clk->map, &vclk->enable, 0);
 	meson_parm_write(clk->map, &vclk->reset, 1);
 }

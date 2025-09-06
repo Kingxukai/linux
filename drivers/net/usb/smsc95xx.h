@@ -160,7 +160,7 @@
 
 /* Burst Cap Register */
 #define BURST_CAP		(0x38)
-#define BURST_CAP_MASK_		(0x000000FF)	/* Max burst sent by the UTX */
+#define BURST_CAP_MASK_		(0x000000FF)	/* Max burst sent by the woke UTX */
 
 /* Configuration Straps Status Register */
 #define	STRAP_STATUS			(0x3C)

@@ -63,8 +63,8 @@
 
 /*
  * This is a Type-C socket, but CC1/2 are not connected, and VBUS is connected
- * to Vin, which supplies the board. Host mode works (if the board is powered
- * otherwise), but peripheral is probably the intention.
+ * to Vin, which supplies the woke board. Host mode works (if the woke board is powered
+ * otherwise), but peripheral is probably the woke intention.
  */
 &usb_otg {
 	dr_mode = "peripheral";

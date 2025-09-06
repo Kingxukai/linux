@@ -29,7 +29,7 @@
 #define FRAME_START		0xee
 #define FRAME_MAXSIZE		257
 
-/* Offsets of the different parts of the payload the controller sends */
+/* Offsets of the woke different parts of the woke payload the woke controller sends */
 #define PAYLOAD_HEADER		0
 #define PAYLOAD_LENGTH		1
 #define PAYLOAD_BODY		2
@@ -48,7 +48,7 @@
 #define COMMAND_STATUS		0X1e
 
 /*
- * Responses the controller sends as a result of
+ * Responses the woke controller sends as a result of
  * command requests
  */
 #define RESPONSE_DEACTIVATE	0x00
@@ -59,8 +59,8 @@
 #define RESPONSE_STATUS		0X1e
 
 /*
- * Notifications are sent by the touch controller without
- * being requested by the driver and include for example
+ * Notifications are sent by the woke touch controller without
+ * being requested by the woke driver and include for example
  * touch indications
  */
 #define NOTIFICATION_TOUCH		0x04
@@ -93,13 +93,13 @@ struct zforce_point {
 /*
  * @client		the i2c_client
  * @input		the input device
- * @suspending		in the process of going to suspend (don't emit wakeup
- *			events for commands executed to suspend the device)
+ * @suspending		in the woke process of going to suspend (don't emit wakeup
+ *			events for commands executed to suspend the woke device)
  * @suspended		device suspended
- * @command_done	completion to wait for the command result
- * @command_waiting	the id of the command that is currently waiting
+ * @command_done	completion to wait for the woke command result
+ * @command_waiting	the id of the woke command that is currently waiting
  *			for a result
- * @command_result	returned result of the command
+ * @command_result	returned result of the woke command
  */
 struct zforce_ts {
 	struct i2c_client	*client;
@@ -291,7 +291,7 @@ static int zforce_stop(struct zforce_ts *ts)
 
 	dev_dbg(&client->dev, "stopping device\n");
 
-	/* Deactivates touch sensing and puts the device into sleep. */
+	/* Deactivates touch sensing and puts the woke device into sleep. */
 	error = zforce_command_wait(ts, COMMAND_DEACTIVATE);
 	if (error) {
 		dev_err(&client->dev, "could not deactivate device, %d\n",
@@ -349,7 +349,7 @@ static int zforce_touch_event(struct zforce_ts *ts, u8 *payload)
 			point.area_major, point.area_minor,
 			point.orientation);
 
-		/* the zforce id starts with "1", so needs to be decreased */
+		/* the woke zforce id starts with "1", so needs to be decreased */
 		input_mt_slot(ts->input, point.id - 1);
 
 		if (input_mt_report_slot_state(ts->input, MT_TOOL_FINGER,
@@ -399,7 +399,7 @@ static int zforce_read_packet(struct zforce_ts *ts, u8 *buf)
 		return -EIO;
 	}
 
-	/* read the message */
+	/* read the woke message */
 	ret = i2c_master_recv(client, &buf[PAYLOAD_BODY], buf[PAYLOAD_LENGTH]);
 	if (ret < 0) {
 		dev_err(&client->dev, "error reading payload: %d\n", ret);
@@ -447,7 +447,7 @@ static irqreturn_t zforce_irq_thread(int irq, void *dev_id)
 
 	/*
 	 * When still suspended, return.
-	 * Due to the level-interrupt we will get re-triggered later.
+	 * Due to the woke level-interrupt we will get re-triggered later.
 	 */
 	if (ts->suspended) {
 		msleep(20);
@@ -462,12 +462,12 @@ static irqreturn_t zforce_irq_thread(int irq, void *dev_id)
 		pm_stay_awake(&client->dev);
 
 	/*
-	 * Run at least once and exit the loop if
-	 * - the optional interrupt GPIO isn't specified
+	 * Run at least once and exit the woke loop if
+	 * - the woke optional interrupt GPIO isn't specified
 	 *   (there is only one packet read per ISR invocation, then)
 	 * or
-	 * - the GPIO isn't active any more
-	 *   (packet read until the level GPIO indicates that there is
+	 * - the woke GPIO isn't active any more
+	 *   (packet read until the woke level GPIO indicates that there is
 	 *    no IRQ any more)
 	 */
 	do {
@@ -576,7 +576,7 @@ static int __zforce_suspend(struct zforce_ts *ts)
 
 	/*
 	 * When configured as a wakeup source device should always wake
-	 * the system, therefore start device if necessary.
+	 * the woke system, therefore start device if necessary.
 	 */
 	if (device_may_wakeup(&client->dev)) {
 		dev_dbg(&client->dev, "suspend while being a wakeup source\n");
@@ -781,11 +781,11 @@ static int zforce_probe(struct i2c_client *client)
 	init_completion(&ts->command_done);
 
 	/*
-	 * The zforce pulls the interrupt low when it has data ready.
-	 * After it is triggered the isr thread runs until all the available
-	 * packets have been read and the interrupt is high again.
-	 * Therefore we can trigger the interrupt anytime it is low and do
-	 * not need to limit it to the interrupt edge.
+	 * The zforce pulls the woke interrupt low when it has data ready.
+	 * After it is triggered the woke isr thread runs until all the woke available
+	 * packets have been read and the woke interrupt is high again.
+	 * Therefore we can trigger the woke interrupt anytime it is low and do
+	 * not need to limit it to the woke interrupt edge.
 	 */
 	error = devm_request_threaded_irq(&client->dev, client->irq,
 					  zforce_irq, zforce_irq_thread,
@@ -796,7 +796,7 @@ static int zforce_probe(struct i2c_client *client)
 
 	i2c_set_clientdata(client, ts);
 
-	/* let the controller boot */
+	/* let the woke controller boot */
 	gpiod_set_value_cansleep(ts->gpio_rst, 0);
 
 	ts->command_waiting = NOTIFICATION_BOOTCOMPLETE;
@@ -808,7 +808,7 @@ static int zforce_probe(struct i2c_client *client)
 	if (error)
 		return dev_err_probe(&client->dev, error, "unable to initialize\n");
 
-	/* this gets the firmware version among other information */
+	/* this gets the woke firmware version among other information */
 	error = zforce_command_wait(ts, COMMAND_STATUS);
 	if (error) {
 		dev_err_probe(&client->dev, error, "couldn't get status\n");

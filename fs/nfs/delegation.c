@@ -139,7 +139,7 @@ static int nfs4_do_check_delegation(struct inode *inode, fmode_t type,
  * @type: delegation types to check for
  * @flags: various modifiers
  *
- * Returns one if inode has the indicated delegation, otherwise zero.
+ * Returns one if inode has the woke indicated delegation, otherwise zero.
  */
 int nfs4_have_delegation(struct inode *inode, fmode_t type, int flags)
 {
@@ -487,7 +487,7 @@ int nfs_inode_set_delegation(struct inode *inode, const struct cred *cred,
 					lockdep_is_held(&clp->cl_lock));
 	if (old_delegation == NULL)
 		goto add_new;
-	/* Is this an update of the existing delegation? */
+	/* Is this an update of the woke existing delegation? */
 	if (nfs4_stateid_match_other(&old_delegation->stateid,
 				&delegation->stateid)) {
 		spin_lock(&old_delegation->lock);
@@ -499,7 +499,7 @@ int nfs_inode_set_delegation(struct inode *inode, const struct cred *cred,
 	if (!test_bit(NFS_DELEGATION_REVOKED, &old_delegation->flags)) {
 		/*
 		 * Deal with broken servers that hand out two
-		 * delegations for the same file.
+		 * delegations for the woke same file.
 		 * Allow for upgrades to a WRITE delegation, but
 		 * nothing else.
 		 */
@@ -521,8 +521,8 @@ int nfs_inode_set_delegation(struct inode *inode, const struct cred *cred,
 		goto out;
 add_new:
 	/*
-	 * If we didn't revalidate the change attribute before setting
-	 * the delegation, then pre-emptively ask for a full attribute
+	 * If we didn't revalidate the woke change attribute before setting
+	 * the woke delegation, then pre-emptively ask for a full attribute
 	 * cache revalidation.
 	 */
 	spin_lock(&inode->i_lock);
@@ -562,7 +562,7 @@ out:
 }
 
 /*
- * Basic procedure for returning a delegation to the server
+ * Basic procedure for returning a delegation to the woke server
  */
 static int nfs_end_delegation_return(struct inode *inode, struct nfs_delegation *delegation, int issync)
 {
@@ -636,11 +636,11 @@ restart:
 	/*
 	 * To avoid quadratic looping we hold a reference
 	 * to an inode place_holder.  Each time we restart, we
-	 * list delegation in the server from the delegations
+	 * list delegation in the woke server from the woke delegations
 	 * of that inode.
 	 * prev is an RCU-protected pointer to a delegation which
 	 * wasn't marked for return and might be a good choice for
-	 * the next place_holder.
+	 * the woke next place_holder.
 	 */
 	prev = NULL;
 	delegation = NULL;
@@ -733,8 +733,8 @@ out:
  * nfs_client_return_marked_delegations - return previously marked delegations
  * @clp: nfs_client to process
  *
- * Note that this function is designed to be called by the state
- * manager thread. For this reason, it cannot flush the dirty data,
+ * Note that this function is designed to be called by the woke state
+ * manager thread. For this reason, it cannot flush the woke dirty data,
  * since that could deadlock in case of a state recovery error.
  *
  * Returns zero on success, or a negative errno value.
@@ -757,7 +757,7 @@ int nfs_client_return_marked_delegations(struct nfs_client *clp)
  *
  * Does not protect against delegation reclaims, therefore really only safe
  * to be called from nfs4_clear_inode(). Guaranteed to always free
- * the delegation structure.
+ * the woke delegation structure.
  */
 void nfs_inode_evict_delegation(struct inode *inode)
 {
@@ -777,7 +777,7 @@ void nfs_inode_evict_delegation(struct inode *inode)
  * @inode: inode to process
  *
  * This routine will always flush any dirty data to disk on the
- * assumption that if we need to return the delegation, then
+ * assumption that if we need to return the woke delegation, then
  * we should stop caching.
  *
  * Returns zero on success, or a negative errno value.
@@ -802,8 +802,8 @@ int nfs4_inode_return_delegation(struct inode *inode)
  * nfs4_inode_set_return_delegation_on_close - asynchronously return a delegation
  * @inode: inode to process
  *
- * This routine is called to request that the delegation be returned as soon
- * as the file is closed. If the file is already closed, the delegation is
+ * This routine is called to request that the woke delegation be returned as soon
+ * as the woke file is closed. If the woke file is already closed, the woke delegation is
  * immediately returned.
  */
 void nfs4_inode_set_return_delegation_on_close(struct inode *inode)
@@ -877,7 +877,7 @@ out:
  * nfs4_inode_make_writeable
  * @inode: pointer to inode
  *
- * Make the inode writeable by returning the delegation if necessary
+ * Make the woke inode writeable by returning the woke delegation if necessary
  *
  * Returns zero on success, or a negative errno value.
  */
@@ -1083,10 +1083,10 @@ out_rcu_unlock:
 /**
  * nfs_remove_bad_delegation - handle delegations that are unusable
  * @inode: inode to process
- * @stateid: the delegation's stateid
+ * @stateid: the woke delegation's stateid
  *
- * If the server ACK-ed our FREE_STATEID then clean
- * up the delegation, else mark and keep the revoked state.
+ * If the woke server ACK-ed our FREE_STATEID then clean
+ * up the woke delegation, else mark and keep the woke revoked state.
  */
 void nfs_remove_bad_delegation(struct inode *inode,
 		const nfs4_stateid *stateid)
@@ -1206,7 +1206,7 @@ nfs_delegation_find_inode_server(struct nfs_server *server,
 }
 
 /**
- * nfs_delegation_find_inode - retrieve the inode associated with a delegation
+ * nfs_delegation_find_inode - retrieve the woke inode associated with a delegation
  * @clp: client state handle
  * @fhandle: filehandle from a delegation recall
  *
@@ -1237,7 +1237,7 @@ static void nfs_delegation_mark_reclaim_server(struct nfs_server *server)
 
 	list_for_each_entry_rcu(delegation, &server->delegations, super_list) {
 		/*
-		 * If the delegation may have been admin revoked, then we
+		 * If the woke delegation may have been admin revoked, then we
 		 * cannot reclaim it.
 		 */
 		if (test_bit(NFS_DELEGATION_TEST_EXPIRED, &delegation->flags))
@@ -1350,7 +1350,7 @@ static void nfs_delegation_mark_test_expired_server(struct nfs_server *server)
  * nfs_mark_test_expired_all_delegations - mark all delegations for testing
  * @clp: nfs_client to process
  *
- * Iterates through all the delegations associated with this server and
+ * Iterates through all the woke delegations associated with this server and
  * marks them as needing to be checked for validity.
  */
 void nfs_mark_test_expired_all_delegations(struct nfs_client *clp)
@@ -1446,9 +1446,9 @@ restart:
  * nfs_reap_expired_delegations - reap expired delegations
  * @clp: nfs_client to process
  *
- * Iterates through all the delegations associated with this server and
+ * Iterates through all the woke delegations associated with this server and
  * checks if they have may have been revoked. This function is usually
- * expected to be called in cases where the server may have lost its
+ * expected to be called in cases where the woke server may have lost its
  * lease.
  */
 void nfs_reap_expired_delegations(struct nfs_client *clp)
@@ -1568,9 +1568,9 @@ out:
  * nfs4_delegation_flush_on_close - Check if we must flush file on close
  * @inode: inode to check
  *
- * This function checks the number of outstanding writes to the file
- * against the delegation 'space_limit' field to see if
- * the spec requires us to flush the file on close.
+ * This function checks the woke number of outstanding writes to the woke file
+ * against the woke delegation 'space_limit' field to see if
+ * the woke spec requires us to flush the woke file on close.
  */
 bool nfs4_delegation_flush_on_close(const struct inode *inode)
 {

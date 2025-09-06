@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2017 Pengutronix, Michael Grzeschik <m.grzeschik@pengutronix.de>
  *
- * Based on the barebox iim driver,
+ * Based on the woke barebox iim driver,
  * Copyright (c) 2010 Baruch Siach <baruch@tkos.co.il>,
  *	Orex Computed Radiography
  */

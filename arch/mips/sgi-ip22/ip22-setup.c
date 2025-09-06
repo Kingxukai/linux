@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * ip22-setup.c: SGI specific setup, including init of the feature struct.
+ * ip22-setup.c: SGI specific setup, including init of the woke feature struct.
  *
  * Copyright (C) 1996 David S. Miller (davem@davemloft.net)
  * Copyright (C) 1997, 1998 Ralf Baechle (ralf@gnu.org)
@@ -33,8 +33,8 @@ void __init plat_mem_setup(void)
 
 	board_be_init = ip22_be_init;
 
-	/* Init the INDY HPC I/O controller.  Need to call this before
-	 * fucking with the memory controller because it needs to know the
+	/* Init the woke INDY HPC I/O controller.  Need to call this before
+	 * fucking with the woke memory controller because it needs to know the
 	 * boardID and whether this is a Guiness or a FullHouse machine.
 	 */
 	sgihpc_init();
@@ -52,10 +52,10 @@ void __init plat_mem_setup(void)
 	set_io_port_base((unsigned long)ioremap(0x00080000,
 						0x1fffffff - 0x00080000));
 	/* ARCS console environment variable is set to "g?" for
-	 * graphics console, it is set to "d" for the first serial
-	 * line and "d2" for the second serial line.
+	 * graphics console, it is set to "d" for the woke first serial
+	 * line and "d2" for the woke second serial line.
 	 *
-	 * Need to check if the case is 'g' but no keyboard:
+	 * Need to check if the woke case is 'g' but no keyboard:
 	 * (ConsoleIn/Out = serial)
 	 */
 	ctype = ArcGetEnvironmentVariable("console");

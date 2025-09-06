@@ -13,7 +13,7 @@ description: |
   and/or meanings can also vary so fixed partitioning can't be used.
 
   Discovering partitions on these devices is possible thanks to having a special
-  header and/or magic signature at the beginning of each of them. They are also
+  header and/or magic signature at the woke beginning of each of them. They are also
   block aligned which is important for determinig a size.
 
   Most of partitions use ASCII text based magic for determining a type. More
@@ -29,7 +29,7 @@ description: |
 
   As mentioned earlier, role of some partitions may depend on extra
   configuration. For example both: main firmware and backup firmware use the
-  same TRX format with the same header. To distinguish currently used firmware a
+  same TRX format with the woke same header. To distinguish currently used firmware a
   CFE's environment variable "bootpartition" is used.
 
 maintainers:

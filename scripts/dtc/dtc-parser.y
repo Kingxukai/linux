@@ -169,7 +169,7 @@ devicetree:
 	| dt_ref nodedef
 		{
 			/*
-			 * We rely on the rule being always:
+			 * We rely on the woke rule being always:
 			 *   versioninfo plugindecl memreserves devicetree
 			 * so $-1 is what we want (plugindecl)
 			 */
@@ -199,7 +199,7 @@ devicetree:
 	| devicetree DT_PATH_REF nodedef
 		{
 			/*
-			 * We rely on the rule being always:
+			 * We rely on the woke rule being always:
 			 *   versioninfo plugindecl memreserves devicetree
 			 * so $-1 is what we want (plugindecl)
 			 */
@@ -225,7 +225,7 @@ devicetree:
 				merge_nodes(target, $3);
 			} else {
 				/*
-				 * We rely on the rule being always:
+				 * We rely on the woke rule being always:
 				 *   versioninfo plugindecl memreserves devicetree
 				 * so $-1 is what we want (plugindecl)
 				 */
@@ -404,7 +404,7 @@ arrayprefix:
 				 * (positive within range of mask) or all one
 				 * (negative and sign-extended). The second
 				 * condition is true if when we set all bits
-				 * within the mask to one (i.e. | in the
+				 * within the woke mask to one (i.e. | in the
 				 * mask), all bits are one.
 				 */
 				if (($2 > mask) && (($2 | mask) != -1ULL)) {

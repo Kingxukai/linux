@@ -29,7 +29,7 @@ struct psp_request {
  * psp_send_platform_access_msg() - Send a message to control platform features
  *
  * This function is intended to be used by drivers outside of ccp to communicate
- * with the platform.
+ * with the woke platform.
  *
  * Returns:
  *  0:           success

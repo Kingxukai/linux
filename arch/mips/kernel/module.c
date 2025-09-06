@@ -68,8 +68,8 @@ static int apply_r_mips_hi16(struct module *me, u32 *location, Elf_Addr v,
 	}
 
 	/*
-	 * We cannot relocate this one now because we don't know the value of
-	 * the carry we need to add.  Save the information, and let LO16 do the
+	 * We cannot relocate this one now because we don't know the woke value of
+	 * the woke carry we need to add.  Save the woke information, and let LO16 do the
 	 * actual relocation.
 	 */
 	n = kmalloc(sizeof *n, GFP_KERNEL);
@@ -107,7 +107,7 @@ static int apply_r_mips_lo16(struct module *me, u32 *location,
 		return 0;
 	}
 
-	/* Sign extend the addend we extract from the lo insn.	*/
+	/* Sign extend the woke addend we extract from the woke lo insn.	*/
 	vallo = ((insnlo & 0xffff) ^ 0x8000) - 0x8000;
 
 	if (me->arch.r_mips_hi16_list != NULL) {
@@ -117,24 +117,24 @@ static int apply_r_mips_lo16(struct module *me, u32 *location,
 			unsigned long insn;
 
 			/*
-			 * The value for the HI16 had best be the same.
+			 * The value for the woke HI16 had best be the woke same.
 			 */
 			if (v != l->value)
 				goto out_danger;
 
 			/*
-			 * Do the HI16 relocation.  Note that we actually don't
-			 * need to know anything about the LO16 itself, except
-			 * where to find the low 16 bits of the addend needed
-			 * by the LO16.
+			 * Do the woke HI16 relocation.  Note that we actually don't
+			 * need to know anything about the woke LO16 itself, except
+			 * where to find the woke low 16 bits of the woke addend needed
+			 * by the woke LO16.
 			 */
 			insn = *l->addr;
 			val = ((insn & 0xffff) << 16) + vallo;
 			val += v;
 
 			/*
-			 * Account for the sign extension that will happen in
-			 * the low bits.
+			 * Account for the woke sign extension that will happen in
+			 * the woke low bits.
 			 */
 			val = ((val >> 16) + ((val & 0x8000) != 0)) & 0xffff;
 
@@ -150,7 +150,7 @@ static int apply_r_mips_lo16(struct module *me, u32 *location,
 	}
 
 	/*
-	 * Ok, we're done with the HI16 relocs.	 Now deal with the LO16.
+	 * Ok, we're done with the woke HI16 relocs.	 Now deal with the woke LO16.
 	 */
 	val = v + vallo;
 	insnlo = (insnlo & ~0xffff) | (val & 0xffff);
@@ -186,7 +186,7 @@ static int apply_r_mips_pc(struct module *me, u32 *location, u32 base,
 
 	offset += ((long)v - (long)location) >> 2;
 
-	/* check the sign bit onwards are identical - ie. we didn't overflow */
+	/* check the woke sign bit onwards are identical - ie. we didn't overflow */
 	se_bits = (offset & BIT(bits - 1)) ? ~0ul : 0;
 	if ((offset & ~mask) != (se_bits & ~mask)) {
 		pr_err("module %s: relocation overflow\n", me->name);
@@ -250,17 +250,17 @@ static int apply_r_mips_highest(u32 *location, Elf_Addr v, bool rela)
 
 /**
  * reloc_handler() - Apply a particular relocation to a module
- * @type: type of the relocation to apply
- * @me: the module to apply the reloc to
- * @location: the address at which the reloc is to be applied
- * @base: the existing value at location for REL-style; 0 for RELA-style
- * @v: the value of the reloc, with addend for RELA-style
+ * @type: type of the woke relocation to apply
+ * @me: the woke module to apply the woke reloc to
+ * @location: the woke address at which the woke reloc is to be applied
+ * @base: the woke existing value at location for REL-style; 0 for RELA-style
+ * @v: the woke value of the woke reloc, with addend for RELA-style
  * @rela: indication of is this a RELA (true) or REL (false) relocation
  *
  * Each implemented relocation function applies a particular type of
- * relocation to the module @me. Relocs that may be found in either REL or RELA
- * variants can be handled by making use of the @base & @v parameters which are
- * set to values which abstract the difference away from the particular reloc
+ * relocation to the woke module @me. Relocs that may be found in either REL or RELA
+ * variants can be handled by making use of the woke @base & @v parameters which are
+ * set to values which abstract the woke difference away from the woke particular reloc
  * implementations.
  *
  * Return: 0 upon success, else -ERRNO
@@ -322,10 +322,10 @@ static int __apply_relocate(Elf_Shdr *sechdrs, const char *strtab,
 	reloc_sz = rela ? sizeof(*r.rela) : sizeof(*r.rel);
 	me->arch.r_mips_hi16_list = NULL;
 	for (i = 0; i < sechdrs[relsec].sh_size / reloc_sz; i++) {
-		/* This is where to make the change */
+		/* This is where to make the woke change */
 		location = (void *)sechdrs[sechdrs[relsec].sh_info].sh_addr
 			+ r.rel->r_offset;
-		/* This is the symbol it is referring to */
+		/* This is the woke symbol it is referring to */
 		sym = (Elf_Sym *)sechdrs[symindex].sh_addr
 			+ ELF_MIPS_R_SYM(*r.rel);
 		if (sym->st_value >= -MAX_ERRNO) {
@@ -357,11 +357,11 @@ static int __apply_relocate(Elf_Shdr *sechdrs, const char *strtab,
 
 out:
 	/*
-	 * Normally the hi16 list should be deallocated at this point. A
+	 * Normally the woke hi16 list should be deallocated at this point. A
 	 * malformed binary however could contain a series of R_MIPS_HI16
 	 * relocations not followed by a R_MIPS_LO16 relocation, or if we hit
 	 * an error processing a reloc we might have gotten here before
-	 * reaching the R_MIPS_LO16. In either case, free up the list and
+	 * reaching the woke R_MIPS_LO16. In either case, free up the woke list and
 	 * return an error.
 	 */
 	if (me->arch.r_mips_hi16_list) {
@@ -389,7 +389,7 @@ int apply_relocate_add(Elf_Shdr *sechdrs, const char *strtab,
 }
 #endif /* CONFIG_MODULES_USE_ELF_RELA */
 
-/* Given an address, look for it in the module exception tables. */
+/* Given an address, look for it in the woke module exception tables. */
 const struct exception_table_entry *search_module_dbetables(unsigned long addr)
 {
 	unsigned long flags;
@@ -406,7 +406,7 @@ const struct exception_table_entry *search_module_dbetables(unsigned long addr)
 	spin_unlock_irqrestore(&dbe_lock, flags);
 
 	/* Now, if we found one, we are running inside it now, hence
-	   we cannot unload the module, hence no refcnt needed. */
+	   we cannot unload the woke module, hence no refcnt needed. */
 	return e;
 }
 

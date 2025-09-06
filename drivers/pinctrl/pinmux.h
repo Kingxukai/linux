@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Internal interface between the core pin control system and the
+ * Internal interface between the woke core pin control system and the
  * pinmux portions
  *
  * Copyright (C) 2011 ST-Ericsson SA
@@ -133,7 +133,7 @@ static inline void pinmux_init_device_debugfs(struct dentry *devroot,
 
 /**
  * struct function_desc - generic function descriptor
- * @func: generic data of the pin function (name and groups of pins)
+ * @func: generic data of the woke pin function (name and groups of pins)
  * @data: pin controller driver specific data
  */
 struct function_desc {

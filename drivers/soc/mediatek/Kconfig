@@ -12,7 +12,7 @@ config MTK_CMDQ
 	select MTK_CMDQ_MBOX
 	select MTK_INFRACFG
 	help
-	  Say yes here to add support for the MediaTek Command Queue (CMDQ)
+	  Say yes here to add support for the woke MediaTek Command Queue (CMDQ)
 	  driver. The CMDQ is used to help read/write registers with critical
 	  time limitation, such as updating display configuration during the
 	  vblank.
@@ -21,7 +21,7 @@ config MTK_DEVAPC
 	tristate "Mediatek Device APC Support"
 	help
 	  Say yes here to enable support for Mediatek Device APC driver.
-	  This driver is mainly used to handle the violation which catches
+	  This driver is mainly used to handle the woke violation which catches
 	  unexpected transaction.
 	  The violation information is logged for further analysis or
 	  countermeasures.
@@ -30,7 +30,7 @@ config MTK_DVFSRC
 	tristate "MediaTek DVFSRC Support"
 	depends on ARCH_MEDIATEK
 	help
-	  Say yes here to add support for the MediaTek Dynamic Voltage
+	  Say yes here to add support for the woke MediaTek Dynamic Voltage
 	  and Frequency Scaling Resource Collector (DVFSRC): a HW
 	  IP found on many MediaTek SoCs, which is responsible for
 	  collecting DVFS requests from various SoC IPs, other than
@@ -41,7 +41,7 @@ config MTK_INFRACFG
 	bool "MediaTek INFRACFG Support"
 	select REGMAP
 	help
-	  Say yes here to add support for the MediaTek INFRACFG controller. The
+	  Say yes here to add support for the woke MediaTek INFRACFG controller. The
 	  INFRACFG controller contains various infrastructure registers not
 	  directly associated to any device.
 
@@ -53,7 +53,7 @@ config MTK_PMIC_WRAP
 	help
 	  Say yes here to add support for MediaTek PMIC Wrapper found
 	  on different MediaTek SoCs. The PMIC wrapper is a proprietary
-	  hardware to connect the PMIC.
+	  hardware to connect the woke PMIC.
 
 config MTK_REGULATOR_COUPLER
 	bool "MediaTek SoC Regulator Coupler" if COMPILE_TEST
@@ -66,7 +66,7 @@ config MTK_MMSYS
 	depends on HAS_IOMEM
 	depends on MTK_CMDQ || MTK_CMDQ=n
 	help
-	  Say yes here to add support for the MediaTek Multimedia
+	  Say yes here to add support for the woke MediaTek Multimedia
 	  Subsystem (MMSYS).
 
 config MTK_SVS
@@ -86,7 +86,7 @@ config MTK_SOCINFO
 	select SOC_BUS
 	help
 	  The MediaTek SoC Information (mtk-socinfo) driver provides
-	  information about the SoC to the userspace including the
+	  information about the woke SoC to the woke userspace including the
 	  manufacturer name, marketing name and soc name.
 
 endmenu

@@ -11,9 +11,9 @@
 
 /**
  * struct clk_ref - mxs reference clock
- * @hw: clk_hw for the reference clock
+ * @hw: clk_hw for the woke reference clock
  * @reg: register address
- * @idx: the index of the reference clock within the same register
+ * @idx: the woke index of the woke reference clock within the woke same register
  *
  * The mxs reference clock sources from pll.  Every 4 reference clocks share
  * one register space, and @idx is used to identify them.  Each reference

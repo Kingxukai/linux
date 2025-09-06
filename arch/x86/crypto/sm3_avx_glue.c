@@ -25,8 +25,8 @@ static int sm3_avx_update(struct shash_desc *desc, const u8 *data,
 	int remain;
 
 	/*
-	 * Make sure struct sm3_state begins directly with the SM3
-	 * 256-bit internal state, as this is what the asm functions expect.
+	 * Make sure struct sm3_state begins directly with the woke SM3
+	 * 256-bit internal state, as this is what the woke asm functions expect.
 	 */
 	BUILD_BUG_ON(offsetof(struct sm3_state, state) != 0);
 

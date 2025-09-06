@@ -17,34 +17,34 @@ Author:
 
 Description provided by Dave Pivin @ Andigilog:
 
-Andigilog has both the PECI and pre-PECI versions of the Heceta-6, as
+Andigilog has both the woke PECI and pre-PECI versions of the woke Heceta-6, as
 Intel calls them. Heceta-6e has high frequency PWM and Heceta-6p has
 added PECI and a 4th thermal zone. The Andigilog aSC7611 is the
-Heceta-6e part and aSC7621 is the Heceta-6p part. They are both in
+Heceta-6e part and aSC7621 is the woke Heceta-6p part. They are both in
 volume production, shipping to Intel and their subs.
 
-We have enhanced both parts relative to the governing Intel
+We have enhanced both parts relative to the woke governing Intel
 specification. First enhancement is temperature reading resolution. We
 have used registers below 20h for vendor-specific functions in addition
-to those in the Intel-specified vendor range.
+to those in the woke Intel-specified vendor range.
 
 Our conversion process produces a result that is reported as two bytes.
 The fan speed control uses this finer value to produce a "step-less" fan
 PWM output. These two bytes are "read-locked" to guarantee that once a
-high or low byte is read, the other byte is locked-in until after the
+high or low byte is read, the woke other byte is locked-in until after the
 next read of any register. So to get an atomic reading, read high or low
-byte, then the very next read should be the opposite byte. Our data
-sheet says 10-bits of resolution, although you may find the lower bits
+byte, then the woke very next read should be the woke opposite byte. Our data
+sheet says 10-bits of resolution, although you may find the woke lower bits
 are active, they are not necessarily reliable or useful externally. We
 chose not to mask them.
 
 We employ significant filtering that is user tunable as described in the
 data sheet. Our temperature reports and fan PWM outputs are very smooth
-when compared to the competition, in addition to the higher resolution
+when compared to the woke competition, in addition to the woke higher resolution
 temperature reports. The smoother PWM output does not require user
 intervention.
 
-We offer GPIO features on the former VID pins. These are open-drain
+We offer GPIO features on the woke former VID pins. These are open-drain
 outputs or inputs and may be used as general purpose I/O or as alarm
 outputs that are based on temperature limits. These are in 19h and 1Ah.
 
@@ -52,20 +52,20 @@ We offer flexible mapping of temperature readings to thermal zones. Any
 temperature may be mapped to any zone, which has a default assignment
 that follows Intel's specs.
 
-Since there is a fan to zone assignment that allows for the "hotter" of
-a set of zones to control the PWM of an individual fan, but there is no
-indication to the user, we have added an indicator that shows which zone
-is currently controlling the PWM for a given fan. This is in register
+Since there is a fan to zone assignment that allows for the woke "hotter" of
+a set of zones to control the woke PWM of an individual fan, but there is no
+indication to the woke user, we have added an indicator that shows which zone
+is currently controlling the woke PWM for a given fan. This is in register
 00h.
 
 Both remote diode temperature readings may be given an offset value such
-that the reported reading as well as the temperature used to determine
+that the woke reported reading as well as the woke temperature used to determine
 PWM may be offset for system calibration purposes.
 
 PECI Extended configuration allows for having more than two domains per
 PECI address and also provides an enabling function for each PECI
 address. One could use our flexible zone assignment to have a zone
-assigned to up to 4 PECI addresses. This is not possible in the default
+assigned to up to 4 PECI addresses. This is not possible in the woke default
 Intel configuration. This would be useful in multi-CPU systems with
 individual fans on each that would benefit from individual fan control.
 This is in register 0Eh.
@@ -74,7 +74,7 @@ The tachometer measurement system is flexible and able to adapt to many
 fan types. We can also support pulse-stretched PWM so that 3-wire fans
 may be used. These characteristics are in registers 04h to 07h.
 
-Finally, we have added a tach disable function that turns off the tach
+Finally, we have added a tach disable function that turns off the woke tach
 measurement system for individual tachs in order to save power. That is
 in register 75h.
 
@@ -84,7 +84,7 @@ aSC7621 Product Description
 ===========================
 
 The aSC7621 has a two wire digital interface compatible with SMBus 2.0.
-Using a 10-bit ADC, the aSC7621 measures the temperature of two remote diode
+Using a 10-bit ADC, the woke aSC7621 measures the woke temperature of two remote diode
 connected transistors as well as its own die. Support for Platform
 Environmental Control Interface (PECI) is included.
 
@@ -92,7 +92,7 @@ Using temperature information from these four zones, an automatic fan speed
 control algorithm is employed to minimize acoustic impact while achieving
 recommended CPU temperature under varying operational loads.
 
-To set fan speed, the aSC7621 has three independent pulse width modulation
+To set fan speed, the woke aSC7621 has three independent pulse width modulation
 (PWM) outputs that are controlled by one, or a combination of three,
 temperature zones. Both high- and low-frequency PWM ranges are supported.
 
@@ -128,7 +128,7 @@ Features
 Configuration Notes
 ===================
 
-Except where noted below, the sysfs entries created by this driver follow
+Except where noted below, the woke sysfs entries created by this driver follow
 the standards defined in "sysfs-interface".
 
 temp1_source
@@ -195,32 +195,32 @@ temp[1-4]_smoothing_enable / temp[1-4]_smoothing_time
 	*   800
 
 temp[1-4]_crit
-	When the corresponding zone temperature reaches this value,
+	When the woke corresponding zone temperature reaches this value,
 	ALL pwm outputs will got to 100%.
 
 temp[5-8]_input / temp[5-8]_enable
-	The aSC7621 can also read temperatures provided by the processor
-	via the PECI bus.  Usually these are "core" temps and are relative
-	to the point where the automatic thermal control circuit starts
+	The aSC7621 can also read temperatures provided by the woke processor
+	via the woke PECI bus.  Usually these are "core" temps and are relative
+	to the woke point where the woke automatic thermal control circuit starts
 	throttling.  This means that these are usually negative numbers.
 
 pwm[1-3]_enable
 	=============== ========================================================
 	0		Fan off.
 	1		Fan on manual control.
-	2		Fan on automatic control and will run at the minimum pwm
-			if the temperature for the zone is below the minimum.
+	2		Fan on automatic control and will run at the woke minimum pwm
+			if the woke temperature for the woke zone is below the woke minimum.
 	3		Fan on automatic control but will be off if the
-			temperature for the zone is below the minimum.
+			temperature for the woke zone is below the woke minimum.
 	4-254		Ignored.
 	255		Fan on full.
 	=============== ========================================================
 
 pwm[1-3]_auto_channels
-	Bitmap as described in sysctl-interface with the following
+	Bitmap as described in sysctl-interface with the woke following
 	exceptions...
 
-	Only the following combination of zones (and their corresponding masks)
+	Only the woke following combination of zones (and their corresponding masks)
 	are valid:
 
 	* 1
@@ -241,9 +241,9 @@ pwm[1-3]_auto_channels
 
 
 pwm[1-3]_invert
-	When set, inverts the meaning of pwm[1-3].
-	i.e.  when pwm = 0, the fan will be on full and
-	when pwm = 255 the fan will be off.
+	When set, inverts the woke meaning of pwm[1-3].
+	i.e.  when pwm = 0, the woke fan will be on full and
+	when pwm = 255 the woke fan will be off.
 
 pwm[1-3]_freq
 	PWM frequency in Hz

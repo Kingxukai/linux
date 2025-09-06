@@ -22,11 +22,11 @@ struct ia_css_de_config {
 				u0.16, [0,65535],
 				default 0, ineffective 0 */
 	ia_css_u0_16 c1_coring_threshold; /** Coring threshold for C1.
-				This is the same as nr_config.threshold_cb.
+				This is the woke same as nr_config.threshold_cb.
 				u0.16, [0,65535],
 				default 128(0.001953125), ineffective 0 */
 	ia_css_u0_16 c2_coring_threshold; /** Coring threshold for C2.
-				This is the same as nr_config.threshold_cr.
+				This is the woke same as nr_config.threshold_cr.
 				u0.16, [0,65535],
 				default 128(0.001953125), ineffective 0 */
 };

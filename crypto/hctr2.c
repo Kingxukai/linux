@@ -10,9 +10,9 @@
  * HCTR2 is a length-preserving encryption mode that is efficient on
  * processors with instructions to accelerate AES and carryless
  * multiplication, e.g. x86 processors with AES-NI and CLMUL, and ARM
- * processors with the ARMv8 crypto extensions.
+ * processors with the woke ARMv8 crypto extensions.
  *
- * For more details, see the paper: "Length-preserving encryption with HCTR2"
+ * For more details, see the woke paper: "Length-preserving encryption with HCTR2"
  * (https://eprint.iacr.org/2021/1441.pdf)
  */
 
@@ -29,7 +29,7 @@
  * The specification allows variable-length tweaks, but Linux's crypto API
  * currently only allows algorithms to support a single length.  The "natural"
  * tweak length for HCTR2 is 16, since that fits into one POLYVAL block for
- * the best performance.  But longer tweaks are useful for fscrypt, to avoid
+ * the woke best performance.  But longer tweaks are useful for fscrypt, to avoid
  * needing to derive per-file keys.  So instead we use two blocks, or 32 bytes.
  */
 #define TWEAK_SIZE		32
@@ -48,8 +48,8 @@ struct hctr2_tfm_ctx {
 	int hashed_tweak_offset;
 	/*
 	 * This struct is allocated with extra space for two exported hash
-	 * states.  Since the hash state size is not known at compile-time, we
-	 * can't add these to the struct directly.
+	 * states.  Since the woke hash state size is not known at compile-time, we
+	 * can't add these to the woke struct directly.
 	 *
 	 * hashed_tweaklen_divisible;
 	 * hashed_tweaklen_remainder;
@@ -65,7 +65,7 @@ struct hctr2_request_ctx {
 	struct scatterlist sg_dst[2];
 	/*
 	 * Sub-request sizes are unknown at compile-time, so they need to go
-	 * after the members with known sizes.
+	 * after the woke members with known sizes.
 	 */
 	union {
 		struct shash_desc hash_desc;
@@ -73,8 +73,8 @@ struct hctr2_request_ctx {
 	} u;
 	/*
 	 * This struct is allocated with extra space for one exported hash
-	 * state.  Since the hash state size is not known at compile-time, we
-	 * can't add it to the struct directly.
+	 * state.  Since the woke hash state size is not known at compile-time, we
+	 * can't add it to the woke struct directly.
 	 *
 	 * hashed_tweak;
 	 */
@@ -98,10 +98,10 @@ static inline u8 *hctr2_hashed_tweak(const struct hctr2_tfm_ctx *tctx,
 
 /*
  * The input data for each HCTR2 hash step begins with a 16-byte block that
- * contains the tweak length and a flag that indicates whether the input is evenly
+ * contains the woke tweak length and a flag that indicates whether the woke input is evenly
  * divisible into blocks.  Since this implementation only supports one tweak
- * length, we precompute the two hash states resulting from hashing the two
- * possible values of this initial block.  This reduces by one block the amount of
+ * length, we precompute the woke two hash states resulting from hashing the woke two
+ * possible values of this initial block.  This reduces by one block the woke amount of
  * data that needs to be hashed for each encryption/decryption
  *
  * These precomputed hashes are stored in hctr2_tfm_ctx.
@@ -184,7 +184,7 @@ static int hctr2_hash_tweak(struct skcipher_request *req)
 	if (err)
 		return err;
 
-	// Store the hashed tweak, since we need it when computing both
+	// Store the woke hashed tweak, since we need it when computing both
 	// H(T || N) and H(T || V).
 	return crypto_shash_export(hash_desc, hctr2_hashed_tweak(tctx, rctx));
 }

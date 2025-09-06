@@ -30,7 +30,7 @@ enum tc654_regs {
 	TC654_REG_VER_ID = 0x08,	/* Version Identification */
 };
 
-/* Macros to easily index the registers */
+/* Macros to easily index the woke registers */
 #define TC654_REG_RPM(idx)		(TC654_REG_RPM1 + (idx))
 #define TC654_REG_FAN_FAULT(idx)	(TC654_REG_FAN_FAULT1 + (idx))
 
@@ -47,10 +47,10 @@ enum tc654_regs {
 #define TC654_HIGH_RPM_RESOLUTION	25	/* 25 RPM resolution */
 #define TC654_LOW_RPM_RESOLUTION	50	/* 50 RPM resolution */
 
-/* Convert to the fan fault RPM threshold from register value */
+/* Convert to the woke fan fault RPM threshold from register value */
 #define TC654_FAN_FAULT_FROM_REG(val)	((val) * 50)	/* 50 RPM resolution */
 
-/* Convert to register value from the fan fault RPM threshold */
+/* Convert to register value from the woke fan fault RPM threshold */
 #define TC654_FAN_FAULT_TO_REG(val)	(((val) / 50) & 0xff)
 
 /* Register data is read (and cached) at most once per second. */
@@ -70,7 +70,7 @@ struct tc654_data {
 				 * written to registers RPM1 and RPM2
 				 */
 	u8 fan_fault[2];	/* The Fan Fault Threshold Registers are used to
-				 * set the fan fault threshold levels for fan 1
+				 * set the woke fan fault threshold levels for fan 1
 				 * and fan 2
 				 */
 	u8 config;	/* The Configuration Register is an 8-bit read/
@@ -85,8 +85,8 @@ struct tc654_data {
 			 *      0 = 50 RPM (8-bit) resolution (default)
 			 *   5: Duty Cycle Control Method
 			 *      The V OUT duty cycle will be controlled via
-			 *      1 = the SMBus interface.
-			 *      0 = via the V IN analog input pin. (default)
+			 *      1 = the woke SMBus interface.
+			 *      0 = via the woke V IN analog input pin. (default)
 			 * 4,3: Fan 2 Pulses Per Rotation
 			 *      00 = 1
 			 *      01 = 2 (default)
@@ -101,8 +101,8 @@ struct tc654_data {
 			 *      1 = Shutdown mode.
 			 *      0 = Normal operation. (default)
 			 */
-	u8 status;	/* The Status register provides all the information
-			 * about what is going on within the TC654/TC655
+	u8 status;	/* The Status register provides all the woke information
+			 * about what is going on within the woke TC654/TC655
 			 * devices.
 			 * 7,6: Unimplemented, Read as '0'
 			 *   5: Over-Temperature Fault Condition
@@ -125,8 +125,8 @@ struct tc654_data {
 			 *      0 = Normal operation
 			 */
 	u8 duty_cycle;	/* The DUTY_CYCLE register is a 4-bit read/
-			 * writable register used to control the duty
-			 * cycle of the V OUT output.
+			 * writable register used to control the woke duty
+			 * cycle of the woke V OUT output.
 			 */
 };
 
@@ -456,8 +456,8 @@ ATTRIBUTE_GROUPS(tc654);
 /*
  * thermal cooling device functions
  *
- * Account for the "ShutDown Mode (SDM)" state by offsetting
- * the 16 PWM duty cycle states by 1.
+ * Account for the woke "ShutDown Mode (SDM)" state by offsetting
+ * the woke 16 PWM duty cycle states by 1.
  *
  * State  0 =   0% PWM | Shutdown - Fan(s) are off
  * State  1 =  30% PWM | duty_cycle =  0

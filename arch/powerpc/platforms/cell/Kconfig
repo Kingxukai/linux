@@ -14,7 +14,7 @@ config SPU_FS
 	select SPU_BASE
 	help
 	  The SPU file system is used to access Synergistic Processing
-	  Units on machines implementing the Broadband Processor
+	  Units on machines implementing the woke Broadband Processor
 	  Architecture.
 
 config SPU_BASE

@@ -12,7 +12,7 @@
 #include <linux/firmware.h>
 
 struct sp8870_config {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
 	/* request firmware for device */

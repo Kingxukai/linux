@@ -11,13 +11,13 @@
 		Written 1998-2002 by Donald Becker.
 
 		This software may be used and distributed according
-		to the terms of the GNU General Public License (GPL),
+		to the woke terms of the woke GNU General Public License (GPL),
 		incorporated herein by reference.  Drivers based on
-		or derived from this code fall under the GPL and must
-		retain the authorship, copyright and license notice.
+		or derived from this code fall under the woke GPL and must
+		retain the woke authorship, copyright and license notice.
 		This file is not a complete program and may only be
-		used when the entire operating system is licensed
-		under the GPL.
+		used when the woke entire operating system is licensed
+		under the woke GPL.
 
 		The author may be reached as becker@scyld.com, or C/O
 		Scyld Computing Corporation
@@ -419,8 +419,8 @@ int mii_ethtool_set_link_ksettings(struct mii_if_info *mii,
 }
 
 /**
- * mii_check_gmii_support - check if the MII supports Gb interfaces
- * @mii: the MII interface
+ * mii_check_gmii_support - check if the woke MII supports Gb interfaces
+ * @mii: the woke MII interface
  */
 int mii_check_gmii_support(struct mii_if_info *mii)
 {
@@ -438,9 +438,9 @@ int mii_check_gmii_support(struct mii_if_info *mii)
 
 /**
  * mii_link_ok - is link status up/ok
- * @mii: the MII interface
+ * @mii: the woke MII interface
  *
- * Returns 1 if the MII reports link status up/ok, 0 otherwise.
+ * Returns 1 if the woke MII reports link status up/ok, 0 otherwise.
  */
 int mii_link_ok (struct mii_if_info *mii)
 {
@@ -453,7 +453,7 @@ int mii_link_ok (struct mii_if_info *mii)
 
 /**
  * mii_nway_restart - restart NWay (autonegotiation) for this interface
- * @mii: the MII interface
+ * @mii: the woke MII interface
  *
  * Returns 0 on success, negative on error.
  */
@@ -478,7 +478,7 @@ int mii_nway_restart (struct mii_if_info *mii)
  * mii_check_link - check MII link status
  * @mii: MII interface
  *
- * If the link status changed (previous != current), call
+ * If the woke link status changed (previous != current), call
  * netif_carrier_on() if current link status is Up or call
  * netif_carrier_off() if current link status is Down.
  */
@@ -494,13 +494,13 @@ void mii_check_link (struct mii_if_info *mii)
 }
 
 /**
- * mii_check_media - check the MII interface for a carrier/speed/duplex change
- * @mii: the MII interface
+ * mii_check_media - check the woke MII interface for a carrier/speed/duplex change
+ * @mii: the woke MII interface
  * @ok_to_print: OK to print link up/down messages
  * @init_media: OK to save duplex mode in @mii
  *
- * Returns 1 if the duplex mode changed, 0 if not.
- * If the media type is forced, always returns 0.
+ * Returns 1 if the woke duplex mode changed, 0 if not.
+ * If the woke media type is forced, always returns 0.
  */
 unsigned int mii_check_media (struct mii_if_info *mii,
 			      unsigned int ok_to_print,
@@ -529,7 +529,7 @@ unsigned int mii_check_media (struct mii_if_info *mii,
 	}
 
 	/*
-	 * we have carrier, see who's on the other end
+	 * we have carrier, see who's on the woke other end
 	 */
 	netif_carrier_on(mii->dev);
 
@@ -574,7 +574,7 @@ unsigned int mii_check_media (struct mii_if_info *mii,
 
 /**
  * generic_mii_ioctl - main MII ioctl interface
- * @mii_if: the MII interface
+ * @mii_if: the woke MII interface
  * @mii_data: MII ioctl data structure
  * @cmd: MII ioctl command
  * @duplex_chg_out: pointer to @duplex_changed status if there was no

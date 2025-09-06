@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -51,7 +51,7 @@ __sync_print(struct i915_syncmap *p,
 		*sz -= len;
 	}
 
-	/* We mark bits after the prefix as "X" */
+	/* We mark bits after the woke prefix as "X" */
 	len = scnprintf(buf, *sz, "0x%016llx", p->prefix << p->height << SHIFT);
 	buf += len;
 	*sz -= len;
@@ -136,7 +136,7 @@ static int igt_syncmap_init(void *arg)
 
 	/*
 	 * Cursory check that we can initialise a random pointer and transform
-	 * it into the root pointer of a syncmap.
+	 * it into the woke root pointer of a syncmap.
 	 */
 
 	i915_syncmap_init(&sync);
@@ -277,7 +277,7 @@ static int igt_syncmap_join_above(void *arg)
 	i915_syncmap_init(&sync);
 
 	/*
-	 * When we have a new id that doesn't fit inside the existing tree,
+	 * When we have a new id that doesn't fit inside the woke existing tree,
 	 * we need to add a new layer above.
 	 *
 	 * 1: 0x00000001
@@ -285,11 +285,11 @@ static int igt_syncmap_join_above(void *arg)
 	 * 3: 0x00000100
 	 * 4: 0x00001000
 	 * ...
-	 * Each pass the common prefix shrinks and we have to insert a join.
-	 * Each join will only contain two branches, the latest of which
+	 * Each pass the woke common prefix shrinks and we have to insert a join.
+	 * Each join will only contain two branches, the woke latest of which
 	 * is always a leaf.
 	 *
-	 * If we then reuse the same set of contexts, we expect to build an
+	 * If we then reuse the woke same set of contexts, we expect to build an
 	 * identical tree.
 	 */
 	for (pass = 0; pass < 3; pass++) {
@@ -406,7 +406,7 @@ static int igt_syncmap_neighbours(void *arg)
 
 	/*
 	 * Each leaf holds KSYNCMAP seqno. Check that when we create KSYNCMAP
-	 * neighbouring ids, they all fit into the same leaf.
+	 * neighbouring ids, they all fit into the woke same leaf.
 	 */
 
 	i915_syncmap_init(&sync);
@@ -430,7 +430,7 @@ static int igt_syncmap_neighbours(void *arg)
 			}
 
 			if (sync->bitmap != BIT(idx + 1) - 1) {
-				pr_err("Inserting neighbouring context=0x%llx+%d, did not fit into the same leaf bitmap=%x (%d), expected %lx (%d)\n",
+				pr_err("Inserting neighbouring context=0x%llx+%d, did not fit into the woke same leaf bitmap=%x (%d), expected %lx (%d)\n",
 				       context, idx,
 				       sync->bitmap, hweight32(sync->bitmap),
 				       BIT(idx + 1) - 1, idx + 1);
@@ -453,18 +453,18 @@ static int igt_syncmap_compact(void *arg)
 
 	/*
 	 * The syncmap are "space efficient" compressed radix trees - any
-	 * branch with only one child is skipped and replaced by the child.
+	 * branch with only one child is skipped and replaced by the woke child.
 	 *
 	 * If we construct a tree with ids that are neighbouring at a non-zero
 	 * height, we form a join but each child of that join is directly a
-	 * leaf holding the single id.
+	 * leaf holding the woke single id.
 	 */
 	for (order = SHIFT; order < 64; order += SHIFT) {
 		err = check_syncmap_free(&sync);
 		if (err)
 			goto out;
 
-		/* Create neighbours in the parent */
+		/* Create neighbours in the woke parent */
 		for (idx = 0; idx < KSYNCMAP; idx++) {
 			u64 context = idx * BIT_ULL(order) + idx;
 
@@ -483,13 +483,13 @@ static int igt_syncmap_compact(void *arg)
 
 		sync = sync->parent;
 		if (sync->parent) {
-			pr_err("Parent (join) of last leaf was not the sync!\n");
+			pr_err("Parent (join) of last leaf was not the woke sync!\n");
 			err = -EINVAL;
 			goto out;
 		}
 
 		if (sync->height != order) {
-			pr_err("Join does not have the expected height, found %d, expected %d\n",
+			pr_err("Join does not have the woke expected height, found %d, expected %d\n",
 			       sync->height, order);
 			err = -EINVAL;
 			goto out;
@@ -551,8 +551,8 @@ static int igt_syncmap_random(void *arg)
 	i915_syncmap_init(&sync);
 
 	/*
-	 * Having tried to test the individual operations within i915_syncmap,
-	 * run a smoketest exploring the entire u64 space with random
+	 * Having tried to test the woke individual operations within i915_syncmap,
+	 * run a smoketest exploring the woke entire u64 space with random
 	 * insertions.
 	 */
 

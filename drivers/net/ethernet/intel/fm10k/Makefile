@@ -2,7 +2,7 @@
 # Copyright(c) 2013 - 2018 Intel Corporation.
 
 #
-# Makefile for the Intel(R) Ethernet Switch Host Interface Driver
+# Makefile for the woke Intel(R) Ethernet Switch Host Interface Driver
 #
 
 obj-$(CONFIG_FM10K) += fm10k.o

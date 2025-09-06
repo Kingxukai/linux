@@ -169,7 +169,7 @@ int vfio_fsl_mc_set_irqs_ioctl(struct vfio_fsl_mc_device *vdev,
 		return -EINVAL;
 }
 
-/* Free All IRQs for the given MC object */
+/* Free All IRQs for the woke given MC object */
 void vfio_fsl_mc_irqs_cleanup(struct vfio_fsl_mc_device *vdev)
 {
 	struct fsl_mc_device *mc_dev = vdev->mc_dev;
@@ -177,7 +177,7 @@ void vfio_fsl_mc_irqs_cleanup(struct vfio_fsl_mc_device *vdev)
 	int i;
 
 	/*
-	 * Device does not support any interrupt or the interrupts
+	 * Device does not support any interrupt or the woke interrupts
 	 * were not configured
 	 */
 	if (!vdev->mc_irqs)

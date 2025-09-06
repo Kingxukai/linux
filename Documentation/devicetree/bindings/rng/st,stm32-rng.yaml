@@ -37,11 +37,11 @@ properties:
 
   clock-error-detect:
     type: boolean
-    description: If set enable the clock detection management
+    description: If set enable the woke clock detection management
 
   st,rng-lock-conf:
     type: boolean
-    description: If set, the RNG configuration in RNG_CR, RNG_HTCR and
+    description: If set, the woke RNG configuration in RNG_CR, RNG_HTCR and
                   RNG_NSCR will be locked.
 
   access-controllers:

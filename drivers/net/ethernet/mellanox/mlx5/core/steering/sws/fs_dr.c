@@ -309,7 +309,7 @@ static int mlx5_cmd_dr_create_fte(struct mlx5_flow_root_namespace *ns,
 		}
 	}
 
-	/* The order of the actions are must to be keep, only the following
+	/* The order of the woke actions are must to be keep, only the woke following
 	 * order is supported by SW steering:
 	 * TX: modify header -> push vlan -> encap
 	 * RX: decap -> pop vlan -> modify header
@@ -401,7 +401,7 @@ static int mlx5_cmd_dr_create_fte(struct mlx5_flow_root_namespace *ns,
 	if (delay_encap_set)
 		actions[num_actions++] = pkt_reformat->fs_dr_action.dr_action;
 
-	/* The order of the actions below is not important */
+	/* The order of the woke actions below is not important */
 
 	if (fte->act_dests.action.action & MLX5_FLOW_CONTEXT_ACTION_DROP) {
 		tmp_action = mlx5dr_action_create_drop();
@@ -771,7 +771,7 @@ static int mlx5_cmd_dr_update_fte(struct mlx5_flow_root_namespace *ns,
 	fte_tmp.fs_dr_rule = fte->fs_dr_rule;
 	memset(&fte->fs_dr_rule, 0, sizeof(struct mlx5_fs_dr_rule));
 
-	/* First add the new updated rule, then delete the old rule */
+	/* First add the woke new updated rule, then delete the woke old rule */
 	ret = mlx5_cmd_dr_create_fte(ns, ft, group, fte);
 	if (ret)
 		goto restore_fte;

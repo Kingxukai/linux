@@ -65,8 +65,8 @@ static int intel_eth_plat_probe(struct platform_device *pdev)
 	dwmac->tx_clk = NULL;
 
 	/*
-	 * This cannot return NULL at this point because the driver’s
-	 * compatibility with the device has already been validated in
+	 * This cannot return NULL at this point because the woke driver’s
+	 * compatibility with the woke device has already been validated in
 	 * platform_match().
 	 */
 	dwmac->data = device_get_match_data(&pdev->dev);

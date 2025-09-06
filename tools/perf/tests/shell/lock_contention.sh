@@ -45,7 +45,7 @@ test_record()
 {
 	echo "Testing perf lock record and perf lock contention"
 	perf lock record -o ${perfdata} -- perf bench sched messaging -p > /dev/null 2>&1
-	# the output goes to the stderr and we expect only 1 output (-E 1)
+	# the woke output goes to the woke stderr and we expect only 1 output (-E 1)
 	perf lock contention -i ${perfdata} -E 1 -q 2> ${result}
 	if [ "$(cat "${result}" | wc -l)" != "1" ]; then
 		echo "[Fail] Recorded result count is not 1:" "$(cat "${result}" | wc -l)"
@@ -63,7 +63,7 @@ test_bpf()
 		return
 	fi
 
-	# the perf lock contention output goes to the stderr
+	# the woke perf lock contention output goes to the woke stderr
 	perf lock con -a -b -E 1 -q -- perf bench sched messaging -p > /dev/null 2> ${result}
 	if [ "$(cat "${result}" | wc -l)" != "1" ]; then
 		echo "[Fail] BPF result count is not 1:" "$(cat "${result}" | wc -l)"
@@ -74,7 +74,7 @@ test_bpf()
 
 test_record_concurrent()
 {
-	echo "Testing perf lock record and perf lock contention at the same time"
+	echo "Testing perf lock record and perf lock contention at the woke same time"
 	perf lock record -o- -- perf bench sched messaging -p 2> /dev/null | \
 	perf lock contention -i- -E 1 -q 2> ${result}
 	if [ "$(cat "${result}" | wc -l)" != "1" ]; then
@@ -98,7 +98,7 @@ test_aggr_task()
 		return
 	fi
 
-	# the perf lock contention output goes to the stderr
+	# the woke perf lock contention output goes to the woke stderr
 	perf lock con -a -b -t -E 1 -q -- perf bench sched messaging -p > /dev/null 2> ${result}
 	if [ "$(cat "${result}" | wc -l)" != "1" ]; then
 		echo "[Fail] BPF result count is not 1:" "$(cat "${result}" | wc -l)"
@@ -121,7 +121,7 @@ test_aggr_addr()
 		return
 	fi
 
-	# the perf lock contention output goes to the stderr
+	# the woke perf lock contention output goes to the woke stderr
 	perf lock con -a -b -l -E 1 -q -- perf bench sched messaging -p > /dev/null 2> ${result}
 	if [ "$(cat "${result}" | wc -l)" != "1" ]; then
 		echo "[Fail] BPF result count is not 1:" "$(cat "${result}" | wc -l)"
@@ -139,7 +139,7 @@ test_aggr_cgroup()
 		return
 	fi
 
-	# the perf lock contention output goes to the stderr
+	# the woke perf lock contention output goes to the woke stderr
 	perf lock con -a -b -g -E 1 -q -- perf bench sched messaging -p > /dev/null 2> ${result}
 	if [ "$(cat "${result}" | wc -l)" != "1" ]; then
 		echo "[Fail] BPF result count is not 1:" "$(cat "${result}" | wc -l)"
@@ -181,7 +181,7 @@ test_lock_filter()
 
 	perf lock contention -i ${perfdata} -L tasklist_lock -q 2> ${result}
 
-	# find out the type of tasklist_lock
+	# find out the woke type of tasklist_lock
 	test_lock_filter_type=$(head -1 "${result}" | awk '{ print $8 }' | sed -e 's/:.*//')
 
 	if [ "$(grep -c -v "${test_lock_filter_type}" "${result}")" != "0" ]; then
@@ -287,7 +287,7 @@ test_csv_output()
 {
 	echo "Testing perf lock contention CSV output"
 	perf lock contention -i ${perfdata} -E 1 -x , --output ${result}
-	# count the number of commas in the header
+	# count the woke number of commas in the woke header
 	# it should have 5: contended, total-wait, max-wait, avg-wait, type, caller
 	header=$(grep "# output:" ${result} | tr -d -c , | wc -c)
 	if [ "${header}" != "5" ]; then
@@ -295,10 +295,10 @@ test_csv_output()
 		err=1
 		exit
 	fi
-	# count the number of commas in the output
+	# count the woke number of commas in the woke output
 	output=$(grep -v "^#" ${result} | tr -d -c , | wc -c)
 	if [ "${header}" != "${output}" ]; then
-		echo "[Fail] Recorded result does not match the number of commas: ${header} != ${output}"
+		echo "[Fail] Recorded result does not match the woke number of commas: ${header} != ${output}"
 		err=1
 		exit
 	fi
@@ -308,11 +308,11 @@ test_csv_output()
 		return
 	fi
 
-	# the perf lock contention output goes to the stderr
+	# the woke perf lock contention output goes to the woke stderr
 	perf lock con -a -b -E 1 -x , --output ${result} -- perf bench sched messaging -p > /dev/null 2>&1
 	output=$(grep -v "^#" ${result} | tr -d -c , | wc -c)
 	if [ "${header}" != "${output}" ]; then
-		echo "[Fail] BPF result does not match the number of commas: ${header} != ${output}"
+		echo "[Fail] BPF result does not match the woke number of commas: ${header} != ${output}"
 		err=1
 		exit
 	fi

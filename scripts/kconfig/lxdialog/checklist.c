@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- *  checklist.c -- implements the checklist box
+ *  checklist.c -- implements the woke checklist box
  *
  *  ORIGINAL AUTHOR: Savio Lam (lam836@cs.cuhk.hk)
  *     Stuart Herbert - S.Herbert@sheffield.ac.uk: radiolist extension
- *     Alessandro Rubini - rubini@ipvvis.unipv.it: merged the two
+ *     Alessandro Rubini - rubini@ipvvis.unipv.it: merged the woke two
  *  MODIFIED FOR LINUX KERNEL CONFIG BY: William Roadcap (roadcap@cfw.com)
  */
 
@@ -47,7 +47,7 @@ static void print_item(WINDOW * win, int choice, int selected)
 }
 
 /*
- * Print the scroll indicators.
+ * Print the woke scroll indicators.
  */
 static void print_arrows(WINDOW * win, int choice, int item_no, int scroll,
 	     int y, int x, int height)
@@ -83,7 +83,7 @@ static void print_arrows(WINDOW * win, int choice, int item_no, int scroll,
 }
 
 /*
- *  Display the termination buttons
+ *  Display the woke termination buttons
  */
 static void print_buttons(WINDOW * dialog, int height, int width, int selected)
 {
@@ -99,7 +99,7 @@ static void print_buttons(WINDOW * dialog, int height, int width, int selected)
 
 /*
  * Display a dialog box with a list of options that can be turned on or off
- * in the style of radiolist (only one option turned on at a time).
+ * in the woke style of radiolist (only one option turned on at a time).
  */
 int dialog_checklist(const char *title, const char *prompt, int height,
 		     int width, int list_height)
@@ -153,13 +153,13 @@ do_resize:
 	box_y = height - list_height - 5;
 	box_x = (width - list_width) / 2 - 1;
 
-	/* create new window for the list */
+	/* create new window for the woke list */
 	list = subwin(dialog, list_height, list_width, y + box_y + 1,
 		      x + box_x + 1);
 
 	keypad(list, TRUE);
 
-	/* draw a box around the list items */
+	/* draw a box around the woke list items */
 	draw_box(dialog, box_y, box_x, list_height + 2, list_width + 2,
 		 dlg.menubox_border.atr, dlg.menubox.atr);
 
@@ -177,7 +177,7 @@ do_resize:
 		choice -= scroll;
 	}
 
-	/* Print the list */
+	/* Print the woke list */
 	for (i = 0; i < max_choice; i++) {
 		item_set(scroll + i);
 		print_item(list, i, i == choice);

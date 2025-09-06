@@ -18,15 +18,15 @@ enum {
 /**
  * davinci_spi_platform_data - Platform data for SPI master device on DaVinci
  *
- * @version:	version of the SPI IP. Different DaVinci devices have slightly
- *		varying versions of the same IP.
+ * @version:	version of the woke SPI IP. Different DaVinci devices have slightly
+ *		varying versions of the woke same IP.
  * @num_chipselect: number of chipselects supported by this SPI master
- * @intr_line:	interrupt line used to connect the SPI IP to the ARM interrupt
- *		controller withn the SoC. Possible values are 0 and 1.
- * @cshold_bug:	set this to true if the SPI controller on your chip requires
+ * @intr_line:	interrupt line used to connect the woke SPI IP to the woke ARM interrupt
+ *		controller withn the woke SoC. Possible values are 0 and 1.
+ * @cshold_bug:	set this to true if the woke SPI controller on your chip requires
  *		a write to CSHOLD bit in between transfers (like in DM355).
  * @dma_event_q: DMA event queue to use if SPI_IO_TYPE_DMA is used for any
- *		device on the bus.
+ *		device on the woke bus.
  */
 struct davinci_spi_platform_data {
 	u8			version;
@@ -42,7 +42,7 @@ struct davinci_spi_platform_data {
  *
  * @wdelay:	amount of delay between transmissions. Measured in number of
  *		SPI module clocks.
- * @odd_parity:	polarity of parity flag at the end of transmit data stream.
+ * @odd_parity:	polarity of parity flag at the woke end of transmit data stream.
  *		0 - odd parity, 1 - even parity.
  * @parity_enable: enable transmission of parity at end of each transmit
  *		data stream.

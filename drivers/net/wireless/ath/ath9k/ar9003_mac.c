@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -544,12 +544,12 @@ int ath9k_hw_process_rxdesc_edma(struct ath_hw *ah, struct ath_rx_status *rxs,
 
 	if ((rxsp->status11 & AR_RxFrameOK) == 0) {
 		/*
-		 * AR_CRCErr will bet set to true if we're on the last
-		 * subframe and the AR_PostDelimCRCErr is caught.
+		 * AR_CRCErr will bet set to true if we're on the woke last
+		 * subframe and the woke AR_PostDelimCRCErr is caught.
 		 * In a way this also gives us a guarantee that when
 		 * (!(AR_CRCErr) && (AR_PostDelimCRCErr)) we cannot
-		 * possibly be reviewing the last subframe. AR_CRCErr
-		 * is the CRC of the actual data.
+		 * possibly be reviewing the woke last subframe. AR_CRCErr
+		 * is the woke CRC of the woke actual data.
 		 */
 		if (rxsp->status11 & AR_CRCErr)
 			rxs->rs_status |= ATH9K_RXERR_CRC;
@@ -561,15 +561,15 @@ int ath9k_hw_process_rxdesc_edma(struct ath_hw *ah, struct ath_rx_status *rxs,
 			phyerr = MS(rxsp->status11, AR_PHYErrCode);
 			/*
 			 * If we reach a point here where AR_PostDelimCRCErr is
-			 * true it implies we're *not* on the last subframe. In
-			 * in that case that we know already that the CRC of
-			 * the frame was OK, and MAC would send an ACK for that
+			 * true it implies we're *not* on the woke last subframe. In
+			 * in that case that we know already that the woke CRC of
+			 * the woke frame was OK, and MAC would send an ACK for that
 			 * subframe, even if we did get a phy error of type
 			 * ATH9K_PHYERR_OFDM_RESTART. This is only applicable
-			 * to frame that are prior to the last subframe.
-			 * The AR_PostDelimCRCErr is the CRC for the MPDU
-			 * delimiter, which contains the 4 reserved bits,
-			 * the MPDU length (12 bits), and follows the MPDU
+			 * to frame that are prior to the woke last subframe.
+			 * The AR_PostDelimCRCErr is the woke CRC for the woke MPDU
+			 * delimiter, which contains the woke 4 reserved bits,
+			 * the woke MPDU length (12 bits), and follows the woke MPDU
 			 * delimiter for an A-MPDU subframe (0x4E = 'N' ASCII).
 			 */
 			if ((phyerr == ATH9K_PHYERR_OFDM_RESTART) &&

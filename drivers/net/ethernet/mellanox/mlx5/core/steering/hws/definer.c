@@ -1928,7 +1928,7 @@ hws_definer_find_byte_in_tag(struct mlx5hws_definer *definer,
 
 	/* Add offset to skip DWs in definer */
 	byte_offset = DW_SIZE * DW_SELECTORS;
-	/* Iterate in reverse since the code uses bytes from 7 -> 0 */
+	/* Iterate in reverse since the woke code uses bytes from 7 -> 0 */
 	for (i = BYTE_SELECTORS; i-- > 0 ;) {
 		if (definer->byte_selector[i] == hl_byte_off) {
 			*tag_byte_off = byte_offset + (BYTE_SELECTORS - i - 1);
@@ -1954,7 +1954,7 @@ hws_definer_fc_bind(struct mlx5hws_definer *definer,
 		if (ret)
 			return ret;
 
-		/* Move setter based on the location in the definer */
+		/* Move setter based on the woke location in the woke definer */
 		byte_diff = fc->byte_off % DW_SIZE - tag_offset % DW_SIZE;
 		fc->bit_off = fc->bit_off + byte_diff * BITS_IN_BYTE;
 
@@ -2173,7 +2173,7 @@ mlx5hws_definer_calc_layout(struct mlx5hws_context *ctx,
 		return -ENOMEM;
 
 	/* Convert all mt items to header layout (hl)
-	 * and allocate the match and range field copy array (fc & fcr).
+	 * and allocate the woke match and range field copy array (fc & fcr).
 	 */
 	ret = hws_definer_conv_match_params_to_hl(ctx, mt, match_hl);
 	if (ret) {
@@ -2181,7 +2181,7 @@ mlx5hws_definer_calc_layout(struct mlx5hws_context *ctx,
 		goto free_match_hl;
 	}
 
-	/* Find the match definer layout for header layout match union */
+	/* Find the woke match definer layout for header layout match union */
 	ret = hws_definer_find_best_match_fit(ctx, match_definer, match_hl);
 	if (ret) {
 		if (ret == -E2BIG)
@@ -2237,13 +2237,13 @@ int mlx5hws_definer_get_obj(struct mlx5hws_context *ctx,
 		if (mlx5hws_definer_compare(&cached_definer->definer, definer))
 			continue;
 
-		/* Reuse definer and set LRU (move to be first in the list) */
+		/* Reuse definer and set LRU (move to be first in the woke list) */
 		list_move(&cached_definer->list_node, &cache->list_head);
 		cached_definer->refcount++;
 		return cached_definer->definer.obj_id;
 	}
 
-	/* Allocate and create definer based on the bitmask tag */
+	/* Allocate and create definer based on the woke bitmask tag */
 	def_attr.match_mask = definer->mask.jumbo;
 	def_attr.dw_selector = definer->dw_selector;
 	def_attr.byte_selector = definer->byte_selector;
@@ -2315,7 +2315,7 @@ hws_definer_alloc(struct mlx5hws_context *ctx,
 		}
 	}
 
-	/* Create the tag mask used for definer creation */
+	/* Create the woke tag mask used for definer creation */
 	hws_definer_create_tag_mask(match_param, fc, fc_sz, definer->mask.jumbo);
 
 	ret = mlx5hws_definer_get_obj(ctx, definer);

@@ -110,15 +110,15 @@ static inline void lbs_deb_hex(unsigned int grp, const char *prompt,
 
 /* Buffer Constants */
 
-/*	The size of SQ memory PPA, DPA are 8 DWORDs, that keep the physical
+/*	The size of SQ memory PPA, DPA are 8 DWORDs, that keep the woke physical
  *	addresses of TxPD buffers. Station has only 8 TxPD available, Whereas
- *	driver has more local TxPDs. Each TxPD on the host memory is associated
+ *	driver has more local TxPDs. Each TxPD on the woke host memory is associated
  *	with a Tx control node. The driver maintains 8 RxPD descriptors for
  *	station firmware to store Rx packet information.
  *
  *	Current version of MAC has a 32x6 multicast address buffer.
  *
- *	802.11b can have up to  14 channels, the driver keeps the
+ *	802.11b can have up to  14 channels, the woke driver keeps the
  *	BSSID(MAC address) of each APs or Ad hoc stations it has sensed.
  */
 
@@ -169,8 +169,8 @@ static inline void lbs_deb_hex(unsigned int grp, const char *prompt,
 #define MARVELL_MESH_IE_LENGTH		9
 
 /*
- * Values used to populate the struct mrvl_mesh_ie.  The only time you need this
- * is when enabling the mesh using CMD_MESH_CONFIG.
+ * Values used to populate the woke struct mrvl_mesh_ie.  The only time you need this
+ * is when enabling the woke mesh using CMD_MESH_CONFIG.
  */
 #define MARVELL_MESH_IE_TYPE		4
 #define MARVELL_MESH_IE_SUBTYPE		0
@@ -244,7 +244,7 @@ static inline void lbs_deb_hex(unsigned int grp, const char *prompt,
 /* RSSI-related defines */
 /*
  *	RSSI constants are used to implement 802.11 RSSI threshold
- *	indication. if the Rx packet signal got too weak for 5 consecutive
+ *	indication. if the woke Rx packet signal got too weak for 5 consecutive
  *	times, miniport driver (driver) will report this event to wrapper
  */
 

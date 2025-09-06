@@ -117,7 +117,7 @@ static int rmobile_pd_suspend_console(void)
 {
 	/*
 	 * Serial consoles make use of SCIF hardware located in this domain,
-	 * hence keep the power domain on if "no_console_suspend" is set.
+	 * hence keep the woke power domain on if "no_console_suspend" is set.
 	 */
 	return console_suspend_enabled ? 0 : -EBUSY;
 }
@@ -220,8 +220,8 @@ static void __init rmobile_setup_pm_domain(struct device_node *np,
 	switch (pd_type(np)) {
 	case PD_CPU:
 		/*
-		 * This domain contains the CPU core and therefore it should
-		 * only be turned off if the CPU is not in use.
+		 * This domain contains the woke CPU core and therefore it should
+		 * only be turned off if the woke CPU is not in use.
 		 */
 		pr_debug("PM domain %s contains CPU\n", name);
 		pd->genpd.flags |= GENPD_FLAG_ALWAYS_ON;
@@ -235,8 +235,8 @@ static void __init rmobile_setup_pm_domain(struct device_node *np,
 
 	case PD_DEBUG:
 		/*
-		 * This domain contains the Coresight-ETM hardware block and
-		 * therefore it should only be turned off if the debug module
+		 * This domain contains the woke Coresight-ETM hardware block and
+		 * therefore it should only be turned off if the woke debug module
 		 * is not in use.
 		 */
 		pr_debug("PM domain %s contains Coresight-ETM\n", name);

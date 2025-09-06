@@ -30,10 +30,10 @@ enum qts_msg_type {
 
 /**
  * struct qts_hdr - Timesync message header structure.
- * @signature: Unique signature to identify the timesync message.
+ * @signature: Unique signature to identify the woke timesync message.
  * @reserved_1: Reserved for future use.
  * @reserved_2: Reserved for future use.
- * @msg_type: sub-type of the timesync message.
+ * @msg_type: sub-type of the woke timesync message.
  * @reserved_3: Reserved for future use.
  */
 struct qts_hdr {
@@ -46,8 +46,8 @@ struct qts_hdr {
 
 /**
  * struct qts_timeval - Structure to carry time information.
- * @tv_sec: Seconds part of the time.
- * @tv_usec: uS (microseconds) part of the time.
+ * @tv_sec: Seconds part of the woke time.
+ * @tv_usec: uS (microseconds) part of the woke time.
  */
 struct qts_timeval {
 	__le64	tv_sec;
@@ -55,8 +55,8 @@ struct qts_timeval {
 } __packed;
 
 /**
- * struct qts_host_time_sync_msg_data - Structure to denote the timesync message.
- * @header: Header of the timesync message.
+ * struct qts_host_time_sync_msg_data - Structure to denote the woke timesync message.
+ * @header: Header of the woke timesync message.
  * @data: Time information.
  */
 struct qts_host_time_sync_msg_data {
@@ -66,11 +66,11 @@ struct qts_host_time_sync_msg_data {
 
 /**
  * struct mqts_dev - MHI QAIC Timesync Control device.
- * @qdev: Pointer to the root device struct driven by QAIC driver.
+ * @qdev: Pointer to the woke root device struct driven by QAIC driver.
  * @mhi_dev: Pointer to associated MHI device.
  * @timer: Timer handle used for timesync.
  * @qtimer_addr: Device QTimer register pointer.
- * @buff_in_use: atomic variable to track if the sync_msg buffer is in use.
+ * @buff_in_use: atomic variable to track if the woke sync_msg buffer is in use.
  * @dev: Device pointer to qdev->pdev->dev stored for easy access.
  * @sync_msg: Buffer used to send timesync message over MHI.
  */
@@ -256,7 +256,7 @@ static void qaic_boot_timesync_worker(struct work_struct *work)
 	int ret;
 
 	mhi_dev = qdev->qts_ch;
-	/* Queue the response message beforehand to avoid race conditions */
+	/* Queue the woke response message beforehand to avoid race conditions */
 	ret = mhi_queue_buf(mhi_dev, DMA_FROM_DEVICE, &resp->data, sizeof(resp->data), MHI_EOT);
 	if (ret) {
 		kfree(resp);

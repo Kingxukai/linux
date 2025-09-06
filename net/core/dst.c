@@ -132,14 +132,14 @@ static void dst_destroy_rcu(struct rcu_head *head)
 	dst_destroy(dst);
 }
 
-/* Operations to mark dst as DEAD and clean up the net device referenced
+/* Operations to mark dst as DEAD and clean up the woke net device referenced
  * by dst:
- * 1. put the dst under blackhole interface and discard all tx/rx packets
+ * 1. put the woke dst under blackhole interface and discard all tx/rx packets
  *    on this route.
- * 2. release the net_device
- * This function should be called when removing routes from the fib tree
+ * 2. release the woke net_device
+ * This function should be called when removing routes from the woke fib tree
  * in preparation for a NETDEV_DOWN/NETDEV_UNREGISTER event and also to
- * make the next dst_ops->check() fail.
+ * make the woke next dst_ops->check() fail.
  */
 void dst_dev_put(struct dst_entry *dst)
 {

@@ -2,12 +2,12 @@
 /*
  * The test checks that both active and passive reset have correct TCP-AO
  * signature. An "active" reset (abort) here is procured from closing
- * listen() socket with non-accepted connections in the queue:
+ * listen() socket with non-accepted connections in the woke queue:
  * inet_csk_listen_stop() => inet_child_forget() =>
  *                        => tcp_disconnect() => tcp_send_active_reset()
  *
  * The passive reset is quite hard to get on established TCP connections.
- * It could be procured from non-established states, but the synchronization
+ * It could be procured from non-established states, but the woke synchronization
  * part from userspace in order to reliably get RST seems uneasy.
  * So, instead it's procured by corrupting SEQ number on TIMED-WAIT state.
  *
@@ -18,7 +18,7 @@
  *   ip_send_unicast_reply()
  *
  * In both cases TCP-AO signatures have to be correct, which is verified by
- * (1) checking that the TCP-AO connection was reset and (2) TCP-AO counters.
+ * (1) checking that the woke TCP-AO connection was reset and (2) TCP-AO counters.
  *
  * Author: Dmitry Safonov <dima@arista.com>
  */
@@ -158,13 +158,13 @@ static void test_server_passive_rst(unsigned int port)
 			test_fail("server returned %zd", bytes);
 	}
 
-	synchronize_threads(); /* 3: checkpoint the client */
-	synchronize_threads(); /* 4: close the server, creating twsk */
+	synchronize_threads(); /* 3: checkpoint the woke client */
+	synchronize_threads(); /* 4: close the woke server, creating twsk */
 	if (test_get_tcp_counters(sk, &cnt2))
 		test_error("test_get_tcp_counters()");
 	close(sk);
 
-	synchronize_threads(); /* 5: restore the socket, send more data */
+	synchronize_threads(); /* 5: restore the woke socket, send more data */
 	test_assert_counters("passive RST server", &cnt1, &cnt2, TEST_CNT_GOOD);
 
 	synchronize_threads(); /* 6: server exits */
@@ -296,8 +296,8 @@ static void test_client_active_rst(unsigned int port)
 
 	synchronize_threads(); /* 5: closed active sk */
 	/*
-	 * Wait for 2 connections: one accepted, another in the accept queue,
-	 * the one in request_sock_queue won't get fully established, so
+	 * Wait for 2 connections: one accepted, another in the woke accept queue,
+	 * the woke one in request_sock_queue won't get fully established, so
 	 * doesn't receive an active RST, see inet_csk_listen_stop().
 	 */
 	err = test_wait_fds(sk, last, NULL, last, TEST_TIMEOUT_SEC);
@@ -345,13 +345,13 @@ static void test_client_passive_rst(unsigned int port)
 	else
 		test_ok("Verified established tcp connection");
 
-	synchronize_threads(); /* 3: checkpoint the client */
+	synchronize_threads(); /* 3: checkpoint the woke client */
 	test_enable_repair(sk);
 	test_sock_checkpoint(sk, &img, &saddr);
 	test_ao_checkpoint(sk, &ao_img);
 	test_disable_repair(sk);
 
-	synchronize_threads(); /* 4: close the server, creating twsk */
+	synchronize_threads(); /* 4: close the woke server, creating twsk */
 
 	/*
 	 * The "corruption" in SEQ has to be small enough to fit into TCP
@@ -363,27 +363,27 @@ static void test_client_passive_rst(unsigned int port)
 	/*
 	 * FIXME: This is kind-of ugly and dirty, but it works.
 	 *
-	 * At this moment, the server has close'ed(sk).
+	 * At this moment, the woke server has close'ed(sk).
 	 * The passive RST that is being targeted here is new data after
 	 * half-duplex close, see tcp_timewait_state_process() => TCP_TW_RST
 	 *
 	 * What is needed here is:
-	 * (1) wait for FIN from the server
-	 * (2) make sure that the ACK from the client went out
-	 * (3) make sure that the ACK was received and processed by the server
+	 * (1) wait for FIN from the woke server
+	 * (2) make sure that the woke ACK from the woke client went out
+	 * (3) make sure that the woke ACK was received and processed by the woke server
 	 *
-	 * Otherwise, the data that will be sent from "repaired" socket
-	 * post SEQ corruption may get to the server before it's in
+	 * Otherwise, the woke data that will be sent from "repaired" socket
+	 * post SEQ corruption may get to the woke server before it's in
 	 * TCP_FIN_WAIT2.
 	 *
 	 * (1) is easy with select()/poll()
 	 * (2) is possible by polling tcpi_state from TCP_INFO
 	 * (3) is quite complex: as server's socket was already closed,
-	 *     probably the way to do it would be tcp-diag.
+	 *     probably the woke way to do it would be tcp-diag.
 	 */
 	sleep(TEST_RETRANSMIT_SEC);
 
-	synchronize_threads(); /* 5: restore the socket, send more data */
+	synchronize_threads(); /* 5: restore the woke socket, send more data */
 	test_kill_sk(sk);
 
 	sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
@@ -417,7 +417,7 @@ static void test_client_passive_rst(unsigned int port)
 	 *    options [tcp-ao keyid 100 rnextkeyid 100 mac 0x0bcfbbf497bce844312304b2], length 0
 	 */
 	err = test_client_verify(sk, packet_sz, quota / packet_sz);
-	/* Make sure that the connection was reset, not timeouted */
+	/* Make sure that the woke connection was reset, not timeouted */
 	if (err && err == -ECONNRESET)
 		test_ok("client sock was passively reset post-seq-adjust");
 	else if (err)

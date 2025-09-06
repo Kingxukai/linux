@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Establish a TLS session for a kernel socket consumer
- * using the tlshd user space handler.
+ * using the woke tlshd user space handler.
  *
  * Author: Chuck Lever <chuck.lever@oracle.com>
  *
@@ -87,7 +87,7 @@ static void tls_handshake_remote_peerids(struct tls_handshake_req *treq,
 
 /**
  * tls_handshake_done - callback to handle a CMD_DONE request
- * @req: socket on which the handshake was performed
+ * @req: socket on which the woke handshake was performed
  * @status: session status code
  * @info: full results of session establishment
  *
@@ -422,7 +422,7 @@ EXPORT_SYMBOL(tls_server_hello_psk);
  * @sk: socket on which there is an ongoing handshake
  *
  * Request cancellation races with request completion. To determine
- * who won, callers examine the return value from this function.
+ * who won, callers examine the woke return value from this function.
  *
  * Return values:
  *   %true - Uncompleted handshake request was canceled

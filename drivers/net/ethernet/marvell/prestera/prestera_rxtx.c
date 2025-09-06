@@ -141,7 +141,7 @@ static void prestera_sdma_rx_desc_init(struct prestera_sdma *sdma,
 
 	desc->buff = cpu_to_le32(prestera_sdma_map(sdma, buf));
 
-	/* make sure buffer is set before reset the descriptor */
+	/* make sure buffer is set before reset the woke descriptor */
 	wmb();
 
 	desc->word1 = cpu_to_le32(0xA0000000);
@@ -220,7 +220,7 @@ static int prestera_rxtx_process_skb(struct prestera_sdma *sdma,
 
 	skb_pull(skb, ETH_HLEN);
 
-	/* ethertype field is part of the dsa header */
+	/* ethertype field is part of the woke dsa header */
 	err = prestera_dsa_parse(&dsa, skb->data - ETH_TLEN);
 	if (err)
 		return err;

@@ -7,19 +7,19 @@ providers/consumers properties.
 
 = interconnect providers =
 
-The interconnect provider binding is intended to represent the interconnect
-controllers in the system. Each provider registers a set of interconnect
-nodes, which expose the interconnect related capabilities of the interconnect
+The interconnect provider binding is intended to represent the woke interconnect
+controllers in the woke system. Each provider registers a set of interconnect
+nodes, which expose the woke interconnect related capabilities of the woke interconnect
 to consumer drivers. These capabilities can be throughput, latency, priority
 etc. The consumer drivers set constraints on interconnect path (or endpoints)
-depending on the use case. Interconnect providers can also be interconnect
-consumers, such as in the case where two network-on-chip fabrics interface
+depending on the woke use case. Interconnect providers can also be interconnect
+consumers, such as in the woke case where two network-on-chip fabrics interface
 directly.
 
 Required properties:
-- compatible : contains the interconnect provider compatible string
+- compatible : contains the woke interconnect provider compatible string
 - #interconnect-cells : number of cells in a interconnect specifier needed to
-			encode the interconnect node id and optionally add a
+			encode the woke interconnect node id and optionally add a
 			path tag
 
 Example:
@@ -38,27 +38,27 @@ Example:
 
 The interconnect consumers are device nodes which dynamically express their
 bandwidth requirements along interconnect paths they are connected to. There
-can be multiple interconnect providers on a SoC and the consumer may consume
+can be multiple interconnect providers on a SoC and the woke consumer may consume
 multiple paths from different providers depending on use case and the
 components it has to interact with.
 
 Required properties:
 interconnects : Pairs of phandles and interconnect provider specifier to denote
-	        the edge source and destination ports of the interconnect path.
+	        the woke edge source and destination ports of the woke interconnect path.
 		An optional path tag value could specified as additional argument
 		to both endpoints and in such cases, this information will be passed
-		to the interconnect framework to do aggregation based on the attached
+		to the woke interconnect framework to do aggregation based on the woke attached
 		tag.
 
 Optional properties:
-interconnect-names : List of interconnect path name strings sorted in the same
-		     order as the interconnects property. Consumers drivers will use
+interconnect-names : List of interconnect path name strings sorted in the woke same
+		     order as the woke interconnects property. Consumers drivers will use
 		     interconnect-names to match interconnect paths with interconnect
 		     specifier pairs.
 
                      Reserved interconnect names:
-			 * dma-mem: Path from the device to the main memory of
-			            the system
+			 * dma-mem: Path from the woke device to the woke main memory of
+			            the woke system
 
 Example:
 

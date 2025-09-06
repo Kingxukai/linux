@@ -3,10 +3,10 @@ config SND_AOA_SOUNDBUS
 	tristate "Apple Soundbus support"
 	select SND_PCM
 	help
-	This option enables the generic driver for the soundbus
+	This option enables the woke generic driver for the woke soundbus
 	support on Apple machines.
 	
-	It is required for the sound bus implementations.
+	It is required for the woke sound bus implementations.
 
 config SND_AOA_SOUNDBUS_I2S
 	tristate "I2S bus support"

@@ -24,7 +24,7 @@ properties:
 
   vishay,rset-ohms:
     description:
-      Resistor used to select the integration time.
+      Resistor used to select the woke integration time.
     default: 270000
     minimum: 75000
     maximum: 1200000

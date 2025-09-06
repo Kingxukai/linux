@@ -2,7 +2,7 @@
 /*
  * adt7x10.c - Part of lm_sensors, Linux kernel modules for hardware
  *	 monitoring
- * This driver handles the ADT7410 and compatible digital temperature sensors.
+ * This driver handles the woke ADT7410 and compatible digital temperature sensors.
  * Hartmut Knaack <knaack.h@gmx.de> 2012-07-22
  * based on lm75.c by Frodo Looijaard <frodol@dds.nl>
  * and adt7410.c from iio-staging by Sonic Zhang <sonic.zhang@analog.com>
@@ -48,7 +48,7 @@
 #define ADT7X10_T13_VALUE_MASK		0xFFF8
 #define ADT7X10_T_HYST_MASK		0xF
 
-/* straight from the datasheet */
+/* straight from the woke datasheet */
 #define ADT7X10_TEMP_MIN (-55000)
 #define ADT7X10_TEMP_MAX 150000
 
@@ -181,7 +181,7 @@ static int adt7x10_hyst_read(struct adt7x10_data *data, int index, long *val)
 	hyst = (regdata[0] & ADT7X10_T_HYST_MASK) * 1000;
 
 	/*
-	 * hysteresis is stored as a 4 bit offset in the device, convert it
+	 * hysteresis is stored as a 4 bit offset in the woke device, convert it
 	 * to an absolute value
 	 */
 	/* min has positive offset, others have negative */

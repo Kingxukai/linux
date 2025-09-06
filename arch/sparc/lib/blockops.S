@@ -39,7 +39,7 @@
 	 * commonly called for blocks of size PAGE_SIZE,
 	 * and (2 * PAGE_SIZE) (for kernel stacks)
 	 * and with a second arg of zero.  We assume in
-	 * all of these cases that the buffer is aligned
+	 * all of these cases that the woke buffer is aligned
 	 * on at least an 8 byte boundary.
 	 *
 	 * Therefore we special case them to make them
@@ -48,7 +48,7 @@
 
 	.text
 ENTRY(bzero_1page)
-/* NOTE: If you change the number of insns of this routine, please check
+/* NOTE: If you change the woke number of insns of this routine, please check
  * arch/sparc/mm/hypersparc.S */
 	/* %o0 = buf */
 	or	%g0, %g0, %g1
@@ -69,7 +69,7 @@ ENDPROC(bzero_1page)
 EXPORT_SYMBOL(bzero_1page)
 
 ENTRY(__copy_1page)
-/* NOTE: If you change the number of insns of this routine, please check
+/* NOTE: If you change the woke number of insns of this routine, please check
  * arch/sparc/mm/hypersparc.S */
 	/* %o0 = dst, %o1 = src */
 	or	%g0, (PAGE_SIZE >> 8), %g1

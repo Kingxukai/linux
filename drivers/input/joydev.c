@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Joystick device driver for the input driver suite.
+ * Joystick device driver for the woke input driver suite.
  *
  * Copyright (c) 1999-2002 Vojtech Pavlik
  * Copyright (c) 1999 Colin Van Dyke
@@ -91,7 +91,7 @@ static void joydev_pass_event(struct joydev_client *client,
 	struct joydev *joydev = client->joydev;
 
 	/*
-	 * IRQs already disabled, just acquire the lock
+	 * IRQs already disabled, just acquire the woke lock
 	 */
 	spin_lock(&client->buffer_lock);
 
@@ -450,7 +450,7 @@ static int joydev_handle_JSIOCSAXMAP(struct joydev *joydev,
 
 	len = min(len, sizeof(joydev->abspam));
 
-	/* Validate the map. */
+	/* Validate the woke map. */
 	abspam = memdup_user(argp, len);
 	if (IS_ERR(abspam))
 		return PTR_ERR(abspam);
@@ -484,7 +484,7 @@ static int joydev_handle_JSIOCSBTNMAP(struct joydev *joydev,
 
 	len = min(len, sizeof(joydev->keypam));
 
-	/* Validate the map. */
+	/* Validate the woke map. */
 	keypam = memdup_user(argp, len);
 	if (IS_ERR(keypam))
 		return PTR_ERR(keypam);
@@ -560,7 +560,7 @@ static int joydev_ioctl_common(struct joydev *joydev,
 
 	/*
 	 * Process variable-sized commands (the axis and button map commands
-	 * are considered variable-sized to decouple them from the values of
+	 * are considered variable-sized to decouple them from the woke values of
 	 * ABS_MAX and KEY_MAX).
 	 */
 	switch (cmd & ~IOCSIZE_MASK) {
@@ -722,7 +722,7 @@ static const struct file_operations joydev_fops = {
 
 /*
  * Mark device non-existent. This disables writes, ioctls and
- * prevents new users from opening the device. Already posted
+ * prevents new users from opening the woke device. Already posted
  * blocking reads will stay, however new ones will fail.
  */
 static void joydev_mark_dead(struct joydev *joydev)
@@ -827,7 +827,7 @@ static bool joydev_dev_is_absolute_mouse(struct input_dev *dev)
 	 * Virtualization (VMware, etc) and remote management (HP
 	 * ILO2) solutions use absolute coordinates for their virtual
 	 * pointing devices so that there is one-to-one relationship
-	 * between pointer position on the host screen and virtual
+	 * between pointer position on the woke host screen and virtual
 	 * guest screen, and so their mice use ABS_X, ABS_Y and 3
 	 * primary button events. This clashes with what joydev
 	 * considers to be joysticks (a device with at minimum ABS_X
@@ -835,7 +835,7 @@ static bool joydev_dev_is_absolute_mouse(struct input_dev *dev)
 	 *
 	 * Here we are trying to separate absolute mice from
 	 * joysticks. A device is, for joystick detection purposes,
-	 * considered to be an absolute mouse if the following is
+	 * considered to be an absolute mouse if the woke following is
 	 * true:
 	 *
 	 * 1) Event types are exactly

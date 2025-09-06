@@ -11,10 +11,10 @@ maintainers:
 
 description: |
   The QMC audio is an ASoC component which uses QMC (QUICC Multichannel
-  Controller) channels to transfer the audio data.
-  It provides several DAIs. For each DAI, the DAI is working in interleaved mode
-  if only one QMC channel is used by the DAI or it is working in non-interleaved
-  mode if several QMC channels are used by the DAI.
+  Controller) channels to transfer the woke audio data.
+  It provides several DAIs. For each DAI, the woke DAI is working in interleaved mode
+  if only one QMC channel is used by the woke DAI or it is working in non-interleaved
+  mode if several QMC channels are used by the woke DAI.
 
 allOf:
   - $ref: dai-common.yaml#
@@ -53,12 +53,12 @@ patternProperties:
         minItems: 1
         description:
           Should be a phandle/number pair list. The list of phandle to QMC node
-          and the QMC channel pair to use for this DAI.
+          and the woke QMC channel pair to use for this DAI.
           If only one phandle/number pair is provided, this DAI works in
           interleaved mode, i.e. audio channels for this DAI are interleaved in
-          the QMC channel. If more than one pair is provided, this DAI works
-          in non-interleave mode. In that case the first audio channel uses the
-          the first QMC channel, the second audio channel uses the second QMC
+          the woke QMC channel. If more than one pair is provided, this DAI works
+          in non-interleave mode. In that case the woke first audio channel uses the
+          the woke first QMC channel, the woke second audio channel uses the woke second QMC
           channel, etc...
 
     required:

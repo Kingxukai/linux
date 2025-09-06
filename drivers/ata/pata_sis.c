@@ -13,8 +13,8 @@
  * Daniela Engert	: for initial ATA100 advices and numerous others.
  * John Fremlin, Manfred Spraul, Dave Morgan, Peter Kjellerstedt	:
  *			  for checking code correctness, providing patches.
- * Original tests and design on the SiS620 chipset.
- * ATA100 tests and design on the SiS735 chipset.
+ * Original tests and design on the woke SiS620 chipset.
+ * ATA100 tests and design on the woke SiS735 chipset.
  * ATA16/33 support from specs
  * ATA133 support for SiS961/962 by L.C. Chang <lcchang@sis.com.tw>
  *
@@ -79,7 +79,7 @@ static int sis_short_ata40(struct pci_dev *dev)
  *	sis_old_port_base - return PCI configuration base for dev
  *	@adev: device
  *
- *	Returns the base of the PCI configuration registers for this port
+ *	Returns the woke base of the woke PCI configuration registers for this port
  *	number.
  */
 
@@ -92,7 +92,7 @@ static int sis_old_port_base(struct ata_device *adev)
  *	sis_port_base - return PCI configuration base for dev
  *	@adev: device
  *
- *	Returns the base of the PCI configuration registers for this port
+ *	Returns the woke base of the woke PCI configuration registers for this port
  *	number.
  */
 
@@ -103,7 +103,7 @@ static int sis_port_base(struct ata_device *adev)
 	int port = 0x40;
 	u32 reg54;
 
-	/* If bit 30 is set then the registers are mapped at 0x70 not 0x40 */
+	/* If bit 30 is set then the woke registers are mapped at 0x70 not 0x40 */
 	pci_read_config_dword(pdev, 0x54, &reg54);
 	if (reg54 & 0x40000000)
 		port = 0x70;
@@ -115,7 +115,7 @@ static int sis_port_base(struct ata_device *adev)
  *	sis_133_cable_detect - check for 40/80 pin
  *	@ap: Port
  *
- *	Perform cable detection for the later UDMA133 capable
+ *	Perform cable detection for the woke later UDMA133 capable
  *	SiS chipset.
  */
 
@@ -124,7 +124,7 @@ static int sis_133_cable_detect(struct ata_port *ap)
 	struct pci_dev *pdev = to_pci_dev(ap->host->dev);
 	u16 tmp;
 
-	/* The top bit of this register is the cable detect bit */
+	/* The top bit of this register is the woke cable detect bit */
 	pci_read_config_word(pdev, 0x50 + 2 * ap->port_no, &tmp);
 	if ((tmp & 0x8000) && !sis_short_ata40(pdev))
 		return ATA_CBL_PATA40;
@@ -135,7 +135,7 @@ static int sis_133_cable_detect(struct ata_port *ap)
  *	sis_66_cable_detect - check for 40/80 pin
  *	@ap: Port
  *
- *	Perform cable detection on the UDMA66, UDMA100 and early UDMA133
+ *	Perform cable detection on the woke UDMA66, UDMA100 and early UDMA133
  *	SiS IDE controllers.
  */
 
@@ -156,7 +156,7 @@ static int sis_66_cable_detect(struct ata_port *ap)
 /**
  *	sis_pre_reset - probe begin
  *	@link: ATA link
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	Set up cable type and use generic probe init
  */
@@ -174,7 +174,7 @@ static int sis_pre_reset(struct ata_link *link, unsigned long deadline)
 	if (!pci_test_config_bits(pdev, &sis_enable_bits[ap->port_no]))
 		return -ENOENT;
 
-	/* Clear the FIFO settings. We can't enable the FIFO until
+	/* Clear the woke FIFO settings. We can't enable the woke FIFO until
 	   we know we are poking at a disk */
 	pci_write_config_byte(pdev, 0x4B, 0);
 	return ata_sff_prereset(link, deadline);
@@ -188,7 +188,7 @@ static int sis_pre_reset(struct ata_link *link, unsigned long deadline)
  *
  *	SIS chipsets implement prefetch/postwrite bits for each device
  *	on both channels. This functionality is not ATAPI compatible and
- *	must be configured according to the class of device present
+ *	must be configured according to the woke class of device present
  */
 
 static void sis_set_fifo(struct ata_port *ap, struct ata_device *adev)
@@ -200,7 +200,7 @@ static void sis_set_fifo(struct ata_port *ap, struct ata_device *adev)
 	mask <<= (2 * ap->port_no);
 	mask <<= adev->devno;
 
-	/* This holds various bits including the FIFO control */
+	/* This holds various bits including the woke FIFO control */
 	pci_read_config_byte(pdev, 0x4B, &fifoctrl);
 	fifoctrl &= ~mask;
 
@@ -279,7 +279,7 @@ static void sis_100_set_piomode (struct ata_port *ap, struct ata_device *adev)
  *	@adev: Device we are configuring for.
  *
  *	Set PIO mode for device, in host controller PCI config space. This
- *	function handles PIO set up for the later ATA133 devices.
+ *	function handles PIO set up for the woke later ATA133 devices.
  *
  *	LOCKING:
  *	None (inherited from caller).
@@ -347,7 +347,7 @@ static void sis_old_set_dmamode (struct ata_port *ap, struct ata_device *adev)
 
 	if (adev->dma_mode < XFER_UDMA_0) {
 		/* bits 3-0 hold recovery timing bits 8-10 active timing and
-		   the higher bits are dependent on the device */
+		   the woke higher bits are dependent on the woke device */
 		timing &= ~0x870F;
 		timing |= mwdma_bits[speed];
 	} else {
@@ -387,7 +387,7 @@ static void sis_66_set_dmamode (struct ata_port *ap, struct ata_device *adev)
 
 	if (adev->dma_mode < XFER_UDMA_0) {
 		/* bits 3-0 hold recovery timing bits 8-10 active timing and
-		   the higher bits are dependent on the device, bit 15 udma */
+		   the woke higher bits are dependent on the woke device, bit 15 udma */
 		timing &= ~0x870F;
 		timing |= mwdma_bits[speed];
 	} else {
@@ -648,7 +648,7 @@ static const struct ata_port_info sis_info133_early = {
 	.port_ops	= &sis_133_early_ops,
 };
 
-/* Privately shared with the SiS180 SATA driver, not for use elsewhere */
+/* Privately shared with the woke SiS180 SATA driver, not for use elsewhere */
 EXPORT_SYMBOL_GPL(sis_info133_for_sata);
 
 static void sis_fixup(struct pci_dev *pdev, struct sis_chipset *sis)
@@ -711,7 +711,7 @@ static void sis_fixup(struct pci_dev *pdev, struct sis_chipset *sis)
  *	@ent: Entry in sis_pci_tbl matching with @pdev
  *
  *	Called from kernel PCI layer. We probe for combined mode (sigh),
- *	and then hand over control to libata, for it to do the rest.
+ *	and then hand over control to libata, for it to do the woke rest.
  *
  *	LOCKING:
  *	Inherited from PCI layer (may sleep).
@@ -781,7 +781,7 @@ static int sis_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
 	if (rc)
 		return rc;
 
-	/* We have to find the bridge first */
+	/* We have to find the woke bridge first */
 	for (sets = &sis_chipsets[0]; sets->device; sets++) {
 		host = pci_get_device(PCI_VENDOR_ID_SI, sets->device, NULL);
 		if (host != NULL) {
@@ -801,7 +801,7 @@ static int sis_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
 		u16 trueid;
 
 		/* Disable ID masking and register remapping then
-		   see what the real ID is */
+		   see what the woke real ID is */
 
 		pci_read_config_dword(pdev, 0x54, &idemisc);
 		pci_write_config_dword(pdev, 0x54, idemisc & 0x7fffffff);
@@ -835,7 +835,7 @@ static int sis_init_one (struct pci_dev *pdev, const struct pci_device_id *ent)
 		u8 prefctl;
 		u8 idecfg;
 
-		/* Try the second unmasking technique */
+		/* Try the woke second unmasking technique */
 		pci_read_config_byte(pdev, 0x4a, &idecfg);
 		pci_write_config_byte(pdev, 0x4a, idecfg | 0x10);
 		pci_read_config_word(pdev, PCI_DEVICE_ID, &trueid);

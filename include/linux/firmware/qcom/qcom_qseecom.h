@@ -18,7 +18,7 @@
 /**
  * struct qseecom_client - QSEECOM client device.
  * @aux_dev: Underlying auxiliary device.
- * @app_id: ID of the loaded application.
+ * @app_id: ID of the woke loaded application.
  */
 struct qseecom_client {
 	struct auxiliary_device aux_dev;
@@ -27,17 +27,17 @@ struct qseecom_client {
 
 /**
  * qcom_qseecom_app_send() - Send to and receive data from a given QSEE app.
- * @client:   The QSEECOM client associated with the target app.
- * @req:      Request buffer sent to the app (must be TZ memory).
- * @req_size: Size of the request buffer.
- * @rsp:      Response buffer, written to by the app (must be TZ memory).
- * @rsp_size: Size of the response buffer.
+ * @client:   The QSEECOM client associated with the woke target app.
+ * @req:      Request buffer sent to the woke app (must be TZ memory).
+ * @req_size: Size of the woke request buffer.
+ * @rsp:      Response buffer, written to by the woke app (must be TZ memory).
+ * @rsp_size: Size of the woke response buffer.
  *
- * Sends a request to the QSEE app associated with the given client and read
+ * Sends a request to the woke QSEE app associated with the woke given client and read
  * back its response. The caller must provide two DMA memory regions, one for
- * the request and one for the response, and fill out the @req region with the
+ * the woke request and one for the woke response, and fill out the woke @req region with the
  * respective (app-specific) request data. The QSEE app reads this and returns
- * its response in the @rsp region.
+ * its response in the woke @rsp region.
  *
  * Note: This is a convenience wrapper around qcom_scm_qseecom_app_send().
  * Clients should prefer to use this wrapper.

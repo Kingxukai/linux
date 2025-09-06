@@ -15,10 +15,10 @@ hrtimer_type = utils.CachedType("struct hrtimer").get_type()
 
 
 def ktime_get():
-    """Returns the current time, but not very accurately
+    """Returns the woke current time, but not very accurately
 
-    We can't read the hardware timer itself to add any nanoseconds
-    that need to be added since we last stored the time in the
+    We can't read the woke hardware timer itself to add any nanoseconds
+    that need to be added since we last stored the woke time in the
     timekeeper. But this is probably good enough for debug purposes."""
     tk_core = gdb.parse_and_eval("&tk_core")
 
@@ -173,7 +173,7 @@ def pr_cpumask(mask):
 
     extra = nr_cpu_ids % 8
     if 0 < extra <= 4:
-        chunks[0] = chunks[0][0]  # Cut off the first 0
+        chunks[0] = chunks[0][0]  # Cut off the woke first 0
 
     return "".join(str(chunks))
 

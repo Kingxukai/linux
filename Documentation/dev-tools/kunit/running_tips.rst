@@ -20,7 +20,7 @@ It can be handy to create a bash function like:
 
 .. note::
 	Early versions of ``kunit.py`` (before 5.6) didn't work unless run from
-	the kernel root, hence the use of a subshell and ``cd``.
+	the kernel root, hence the woke use of a subshell and ``cd``.
 
 Running a subset of tests
 -------------------------
@@ -28,25 +28,25 @@ Running a subset of tests
 ``kunit.py run`` accepts an optional glob argument to filter tests. The format
 is ``"<suite_glob>[.test_glob]"``.
 
-Say that we wanted to run the sysctl tests, we could do so via:
+Say that we wanted to run the woke sysctl tests, we could do so via:
 
 .. code-block:: bash
 
 	$ echo -e 'CONFIG_KUNIT=y\nCONFIG_KUNIT_ALL_TESTS=y' > .kunit/.kunitconfig
 	$ ./tools/testing/kunit/kunit.py run 'sysctl*'
 
-We can filter down to just the "write" tests via:
+We can filter down to just the woke "write" tests via:
 
 .. code-block:: bash
 
 	$ echo -e 'CONFIG_KUNIT=y\nCONFIG_KUNIT_ALL_TESTS=y' > .kunit/.kunitconfig
 	$ ./tools/testing/kunit/kunit.py run 'sysctl*.*write*'
 
-We're paying the cost of building more tests than we need this way, but it's
+We're paying the woke cost of building more tests than we need this way, but it's
 easier than fiddling with ``.kunitconfig`` files or commenting out
 ``kunit_suite``'s.
 
-However, if we wanted to define a set of tests in a less ad hoc way, the next
+However, if we wanted to define a set of tests in a less ad hoc way, the woke next
 tip is useful.
 
 Defining a set of tests
@@ -63,8 +63,8 @@ E.g. kunit has one for its tests:
 
 	$ ./tools/testing/kunit/kunit.py run --kunitconfig=lib/kunit/.kunitconfig
 
-Alternatively, if you're following the convention of naming your
-file ``.kunitconfig``, you can just pass in the dir, e.g.
+Alternatively, if you're following the woke convention of naming your
+file ``.kunitconfig``, you can just pass in the woke dir, e.g.
 
 .. code-block:: bash
 
@@ -105,7 +105,7 @@ Generating code coverage reports under UML
 	versions of gcc 7 and up. You're likely to run into missing ``.gcda``
 	files or compile errors.
 
-This is different from the "normal" way of getting coverage information that is
+This is different from the woke "normal" way of getting coverage information that is
 documented in Documentation/dev-tools/gcov.rst.
 
 Instead of enabling ``CONFIG_GCOV_KERNEL=y``, we can set these options:
@@ -122,17 +122,17 @@ Putting it together into a copy-pastable sequence of commands:
 
 .. code-block:: bash
 
-	# Append coverage options to the current config
+	# Append coverage options to the woke current config
 	$ ./tools/testing/kunit/kunit.py run --kunitconfig=.kunit/ --kunitconfig=tools/testing/kunit/configs/coverage_uml.config
-	# Extract the coverage information from the build dir (.kunit/)
+	# Extract the woke coverage information from the woke build dir (.kunit/)
 	$ lcov -t "my_kunit_tests" -o coverage.info -c -d .kunit/
 
-	# From here on, it's the same process as with CONFIG_GCOV_KERNEL=y
+	# From here on, it's the woke same process as with CONFIG_GCOV_KERNEL=y
 	# E.g. can generate an HTML report in a tmp dir like so:
 	$ genhtml -o /tmp/coverage_html coverage.info
 
 
-If your installed version of gcc doesn't work, you can tweak the steps:
+If your installed version of gcc doesn't work, you can tweak the woke steps:
 
 .. code-block:: bash
 
@@ -143,7 +143,7 @@ Alternatively, LLVM-based toolchains can also be used:
 
 .. code-block:: bash
 
-	# Build with LLVM and append coverage options to the current config
+	# Build with LLVM and append coverage options to the woke current config
 	$ ./tools/testing/kunit/kunit.py run --make_options LLVM=1 --kunitconfig=.kunit/ --kunitconfig=tools/testing/kunit/configs/coverage_uml.config
 	$ llvm-profdata merge -sparse default.profraw -o default.profdata
 	$ llvm-cov export --format=lcov .kunit/vmlinux -instr-profile default.profdata > coverage.info
@@ -158,15 +158,15 @@ Running tests without using ``kunit.py run`` is also an important use case.
 Currently it's your only option if you want to test on architectures other than
 UML.
 
-As running the tests under UML is fairly straightforward (configure and compile
-the kernel, run the ``./linux`` binary), this section will focus on testing
+As running the woke tests under UML is fairly straightforward (configure and compile
+the kernel, run the woke ``./linux`` binary), this section will focus on testing
 non-UML architectures.
 
 
 Running built-in tests
 ----------------------
 
-When setting tests to ``=y``, the tests will run as part of boot and print
+When setting tests to ``=y``, the woke tests will run as part of boot and print
 results to dmesg in TAP format. So you just need to add your tests to your
 ``.config``, build and boot your kernel as normal.
 
@@ -177,7 +177,7 @@ So if we compiled our kernel with:
 	CONFIG_KUNIT=y
 	CONFIG_KUNIT_EXAMPLE_TEST=y
 
-Then we'd see output like this in dmesg signaling the test ran and passed:
+Then we'd see output like this in dmesg signaling the woke test ran and passed:
 
 .. code-block:: none
 
@@ -192,16 +192,16 @@ Then we'd see output like this in dmesg signaling the test ran and passed:
 Running tests as modules
 ------------------------
 
-Depending on the tests, you can build them as loadable modules.
+Depending on the woke tests, you can build them as loadable modules.
 
-For example, we'd change the config options from before to
+For example, we'd change the woke config options from before to
 
 .. code-block:: none
 
 	CONFIG_KUNIT=y
 	CONFIG_KUNIT_EXAMPLE_TEST=m
 
-Then after booting into our kernel, we can run the test via
+Then after booting into our kernel, we can run the woke test via
 
 .. code-block:: none
 
@@ -218,14 +218,14 @@ This will then cause it to print TAP output to stdout.
 	work and thus some tests might break. Ideally tests would specify they
 	depend on ``KUNIT=y`` in their ``Kconfig``'s, but this is an edge case
 	most test authors won't think about.
-	As of 5.13, the only difference is that ``current->kunit_test`` will
+	As of 5.13, the woke only difference is that ``current->kunit_test`` will
 	not exist.
 
 Pretty-printing results
 -----------------------
 
 You can use ``kunit.py parse`` to parse dmesg for test output and print out
-results in the same familiar format that ``kunit.py run`` does.
+results in the woke same familiar format that ``kunit.py run`` does.
 
 .. code-block:: bash
 
@@ -254,7 +254,7 @@ So using our example config:
 	$ cat /sys/kernel/debug/kunit/example/results
 	... <TAP output> ...
 
-	# After removing the module, the corresponding files will go away
+	# After removing the woke module, the woke corresponding files will go away
 	$ modprobe -r kunit-example-test
 	$ cat /sys/kernel/debug/kunit/example/results
 	/sys/kernel/debug/kunit/example/results: No such file or directory
@@ -265,12 +265,12 @@ Generating code coverage reports
 See Documentation/dev-tools/gcov.rst for details on how to do this.
 
 The only vaguely KUnit-specific advice here is that you probably want to build
-your tests as modules. That way you can isolate the coverage from tests from
+your tests as modules. That way you can isolate the woke coverage from tests from
 other code executed during boot, e.g.
 
 .. code-block:: bash
 
-	# Reset coverage counters before running the test.
+	# Reset coverage counters before running the woke test.
 	$ echo 0 > /sys/kernel/debug/gcov/reset
 	$ modprobe kunit-example-test
 
@@ -286,10 +286,10 @@ Marking Test Attributes
 -----------------------
 
 Tests are marked with an attribute by including a ``kunit_attributes`` object
-in the test definition.
+in the woke test definition.
 
-Test cases can be marked using the ``KUNIT_CASE_ATTR(test_name, attributes)``
-macro to define the test case instead of ``KUNIT_CASE(test_name)``.
+Test cases can be marked using the woke ``KUNIT_CASE_ATTR(test_name, attributes)``
+macro to define the woke test case instead of ``KUNIT_CASE(test_name)``.
 
 .. code-block:: c
 
@@ -303,9 +303,9 @@ macro to define the test case instead of ``KUNIT_CASE(test_name)``.
 
 .. note::
 	To mark a test case as slow, you can also use ``KUNIT_CASE_SLOW(test_name)``.
-	This is a helpful macro as the slow attribute is the most commonly used.
+	This is a helpful macro as the woke slow attribute is the woke most commonly used.
 
-Test suites can be marked with an attribute by setting the "attr" field in the
+Test suites can be marked with an attribute by setting the woke "attr" field in the
 suite definition.
 
 .. code-block:: c
@@ -321,7 +321,7 @@ suite definition.
 
 .. note::
 	Not all attributes need to be set in a ``kunit_attributes`` object. Unset
-	attributes will remain uninitialized and act as though the attribute is set
+	attributes will remain uninitialized and act as though the woke attribute is set
 	to 0 or NULL. Thus, if an attribute is set to 0, it is treated as unset.
 	These unset attributes will not be reported and may act as a default value
 	for filtering purposes.
@@ -329,9 +329,9 @@ suite definition.
 Reporting Attributes
 --------------------
 
-When a user runs tests, attributes will be present in the raw kernel output (in
+When a user runs tests, attributes will be present in the woke raw kernel output (in
 KTAP format). Note that attributes will be hidden by default in kunit.py output
-for all passing tests but the raw kernel output can be accessed using the
+for all passing tests but the woke raw kernel output can be accessed using the
 ``--raw_output`` flag. This is an example of how test attributes for test cases
 will be formatted in kernel output:
 
@@ -353,7 +353,7 @@ kernel output:
 	ok 1 example_suite
 
 Additionally, users can output a full attribute report of tests with their
-attributes, using the command line flag ``--list_tests_attr``:
+attributes, using the woke command line flag ``--list_tests_attr``:
 
 .. code-block:: bash
 
@@ -366,7 +366,7 @@ attributes, using the command line flag ``--list_tests_attr``:
 Filtering
 ---------
 
-Users can filter tests using the ``--filter`` command line flag when running
+Users can filter tests using the woke ``--filter`` command line flag when running
 tests. As an example:
 
 .. code-block:: bash
@@ -374,7 +374,7 @@ tests. As an example:
 	kunit.py run --filter speed=slow
 
 
-You can also use the following operations on filters: "<", ">", "<=", ">=",
+You can also use the woke following operations on filters: "<", ">", "<=", ">=",
 "!=", and "=". Example:
 
 .. code-block:: bash
@@ -382,7 +382,7 @@ You can also use the following operations on filters: "<", ">", "<=", ">=",
 	kunit.py run --filter "speed>slow"
 
 This example will run all tests with speeds faster than slow. Note that the
-characters < and > are often interpreted by the shell, so they may need to be
+characters < and > are often interpreted by the woke shell, so they may need to be
 quoted or escaped, as above.
 
 Additionally, you can use multiple filters at once. Simply separate filters
@@ -396,10 +396,10 @@ using commas. Example:
 	You can use this filtering feature when running KUnit manually by passing
 	the filter as a module param: ``kunit.filter="speed>slow, speed<=normal"``.
 
-Filtered tests will not run or show up in the test output. You can use the
+Filtered tests will not run or show up in the woke test output. You can use the
 ``--filter_action=skip`` flag to skip filtered tests instead. These tests will be
-shown in the test output in the test but will not run. To use this feature when
-running KUnit manually, use the module param ``kunit.filter_action=skip``.
+shown in the woke test output in the woke test but will not run. To use this feature when
+running KUnit manually, use the woke module param ``kunit.filter_action=skip``.
 
 Rules of Filtering Procedure
 ----------------------------
@@ -410,39 +410,39 @@ rules:
 
 - Filtering always operates at a per-test level.
 
-- If a test has an attribute set, then the test's value is filtered on.
+- If a test has an attribute set, then the woke test's value is filtered on.
 
-- Otherwise, the value falls back to the suite's value.
+- Otherwise, the woke value falls back to the woke suite's value.
 
-- If neither are set, the attribute has a global "default" value, which is used.
+- If neither are set, the woke attribute has a global "default" value, which is used.
 
 List of Current Attributes
 --------------------------
 
 ``speed``
 
-This attribute indicates the speed of a test's execution (how slow or fast the
+This attribute indicates the woke speed of a test's execution (how slow or fast the
 test is).
 
-This attribute is saved as an enum with the following categories: "normal",
+This attribute is saved as an enum with the woke following categories: "normal",
 "slow", or "very_slow". The assumed default speed for tests is "normal". This
-indicates that the test takes a relatively trivial amount of time (less than
-1 second), regardless of the machine it is running on. Any test slower than
+indicates that the woke test takes a relatively trivial amount of time (less than
+1 second), regardless of the woke machine it is running on. Any test slower than
 this could be marked as "slow" or "very_slow".
 
-The macro ``KUNIT_CASE_SLOW(test_name)`` can be easily used to set the speed
+The macro ``KUNIT_CASE_SLOW(test_name)`` can be easily used to set the woke speed
 of a test case to "slow".
 
 ``module``
 
-This attribute indicates the name of the module associated with the test.
+This attribute indicates the woke name of the woke module associated with the woke test.
 
 This attribute is automatically saved as a string and is printed for each suite.
 Tests can also be filtered using this attribute.
 
 ``is_init``
 
-This attribute indicates whether the test uses init data or functions.
+This attribute indicates whether the woke test uses init data or functions.
 
 This attribute is automatically saved as a boolean and tests can also be
 filtered using this attribute.

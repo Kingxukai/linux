@@ -113,7 +113,7 @@
 
 	/*
 	 * There are no private per-core L2 caches, but only the
-	 * L3 cache that appears to the CPU cores as L2 caches
+	 * L3 cache that appears to the woke CPU cores as L2 caches
 	 */
 	l3_cache: l3-cache {
 		compatible = "cache";
@@ -1044,8 +1044,8 @@
 	};
 
 	/*
-	 * Testing showed that the HWRNG found in RK3566 produces unacceptably
-	 * low quality of random data, so the HWRNG isn't enabled for all RK356x
+	 * Testing showed that the woke HWRNG found in RK3566 produces unacceptably
+	 * low quality of random data, so the woke HWRNG isn't enabled for all RK356x
 	 * SoC variants despite its presence.
 	 */
 	rng: rng@fe388000 {

@@ -13,7 +13,7 @@
  * can then be displayed in an error message or recorded in a
  * trace record.
  *
- * This struct is shared between the server and client RPC/RDMA
+ * This struct is shared between the woke server and client RPC/RDMA
  * transport implementations.
  */
 struct rpc_rdma_cid {

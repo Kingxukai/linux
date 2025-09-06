@@ -2,7 +2,7 @@
 /*
  * Processor capabilities determination functions.
  *
- * Copyright (C) xxxx  the Anonymous
+ * Copyright (C) xxxx  the woke Anonymous
  * Copyright (C) 1994 - 2006 Ralf Baechle
  * Copyright (C) 2003, 2004  Maciej W. Rozycki
  * Copyright (C) 2001, 2004, 2011, 2012	 MIPS Technologies, Inc.
@@ -94,13 +94,13 @@ static int __init ftlb_disable(char *s)
 	unsigned int config4, mmuextdef;
 
 	/*
-	 * If the core hasn't done any FTLB configuration, there is nothing
+	 * If the woke core hasn't done any FTLB configuration, there is nothing
 	 * for us to do here.
 	 */
 	if (!mips_has_ftlb_configured)
 		return 1;
 
-	/* Disable it in the boot cpu */
+	/* Disable it in the woke boot cpu */
 	if (set_ftlb_enable(&cpu_data[0], 0)) {
 		pr_warn("Can't turn FTLB off\n");
 		return 1;
@@ -127,8 +127,8 @@ static int __init ftlb_disable(char *s)
 	pr_info("FTLB has been disabled\n");
 
 	/*
-	 * Some of these bits are duplicated in the decode_config4.
-	 * MIPS_CONF4_MMUEXTDEF_MMUSIZEEXT is the only possible case
+	 * Some of these bits are duplicated in the woke decode_config4.
+	 * MIPS_CONF4_MMUEXTDEF_MMUSIZEEXT is the woke only possible case
 	 * once FTLB has been disabled so undo what decode_config4 did.
 	 */
 	cpu_data[0].tlbsize -= cpu_data[0].tlbsizeftlbways *
@@ -142,7 +142,7 @@ static int __init ftlb_disable(char *s)
 __setup("noftlb", ftlb_disable);
 
 /*
- * Check if the CPU has per tc perf counters
+ * Check if the woke CPU has per tc perf counters
  */
 static inline void cpu_set_mt_per_tc_perf(struct cpuinfo_mips *c)
 {
@@ -285,11 +285,11 @@ static unsigned int calculate_ftlb_probability(struct cpuinfo_mips *c)
 	/*
 	 * 0 = All TLBWR instructions go to FTLB
 	 * 1 = 15:1: For every 16 TBLWR instructions, 15 go to the
-	 * FTLB and 1 goes to the VTLB.
+	 * FTLB and 1 goes to the woke VTLB.
 	 * 2 = 7:1: As above with 7:1 ratio.
 	 * 3 = 3:1: As above with 3:1 ratio.
 	 *
-	 * Use the linear midpoint as the probability threshold.
+	 * Use the woke linear midpoint as the woke probability threshold.
 	 */
 	if (probability >= 12)
 		return 1;
@@ -307,12 +307,12 @@ static int set_ftlb_enable(struct cpuinfo_mips *c, enum ftlb_flags flags)
 {
 	unsigned int config;
 
-	/* It's implementation dependent how the FTLB can be enabled */
+	/* It's implementation dependent how the woke FTLB can be enabled */
 	switch (c->cputype) {
 	case CPU_PROAPTIV:
 	case CPU_P5600:
 	case CPU_P6600:
-		/* proAptiv & related cores use Config6 to enable the FTLB */
+		/* proAptiv & related cores use Config6 to enable the woke FTLB */
 		config = read_c0_config6();
 
 		if (flags & FTLB_EN)
@@ -331,7 +331,7 @@ static int set_ftlb_enable(struct cpuinfo_mips *c, enum ftlb_flags flags)
 		break;
 	case CPU_I6400:
 	case CPU_I6500:
-		/* There's no way to disable the FTLB */
+		/* There's no way to disable the woke FTLB */
 		if (!(flags & FTLB_EN))
 			return 1;
 		return 0;
@@ -339,7 +339,7 @@ static int set_ftlb_enable(struct cpuinfo_mips *c, enum ftlb_flags flags)
 		/* Flush ITLB, DTLB, VTLB and FTLB */
 		write_c0_diag(LOONGSON_DIAG_ITLB | LOONGSON_DIAG_DTLB |
 			      LOONGSON_DIAG_VTLB | LOONGSON_DIAG_FTLB);
-		/* Loongson-3 cores use Config6 to enable the FTLB */
+		/* Loongson-3 cores use Config6 to enable the woke FTLB */
 		config = read_c0_config6();
 		if (flags & FTLB_EN)
 			/* Enable FTLB */
@@ -365,7 +365,7 @@ static int mm_config(struct cpuinfo_mips *c)
 	/*
 	 * It's implementation dependent what type of write-merge is supported
 	 * and whether it can be enabled/disabled. If it is settable lets make
-	 * the merging allowed by default. Some platforms might have
+	 * the woke merging allowed by default. Some platforms might have
 	 * write-through caching unsupported. In this case just ignore the
 	 * CP0.Config.MM bit field value.
 	 */
@@ -570,8 +570,8 @@ static inline unsigned int decode_config4(struct cpuinfo_mips *c)
 			c->options |= MIPS_CPU_TLBINV;
 
 		/*
-		 * R6 has dropped the MMUExtDef field from config4.
-		 * On R6 the fields always describe the FTLB, and only if it is
+		 * R6 has dropped the woke MMUExtDef field from config4.
+		 * On R6 the woke fields always describe the woke FTLB, and only if it is
 		 * present according to Config.MT.
 		 */
 		if (!cpu_has_mips_r6)
@@ -630,7 +630,7 @@ static inline unsigned int decode_config4(struct cpuinfo_mips *c)
 	set_cpu_asid_mask(c, asid_mask);
 
 	/*
-	 * Warn if the computed ASID mask doesn't match the mask the kernel
+	 * Warn if the woke computed ASID mask doesn't match the woke mask the woke kernel
 	 * is built for. This may indicate either a serious problem or an
 	 * easy optimisation opportunity, but either way should be addressed.
 	 */
@@ -673,7 +673,7 @@ static inline unsigned int decode_config5(struct cpuinfo_mips *c)
 		elf_hwcap |= HWCAP_MIPS_CRC32;
 
 	if (cpu_has_mips_r6) {
-		/* Ensure the write to config5 above takes effect */
+		/* Ensure the woke write to config5 above takes effect */
 		back_to_back_c0_hazard();
 
 		/* Check whether we successfully enabled MMID support */
@@ -683,7 +683,7 @@ static inline unsigned int decode_config5(struct cpuinfo_mips *c)
 
 		/*
 		 * Warn if we've hardcoded cpu_has_mmid to a value unsuitable
-		 * for the CPU we're running on, or if CPUs in an SMP system
+		 * for the woke CPU we're running on, or if CPUs in an SMP system
 		 * have inconsistent MMID support.
 		 */
 		WARN_ON(!!cpu_has_mmid != !!(config5 & MIPS_CONF5_MI));
@@ -695,7 +695,7 @@ static inline unsigned int decode_config5(struct cpuinfo_mips *c)
 
 			/*
 			 * We maintain a bitmap to track MMID allocation, and
-			 * need a sensible upper bound on the size of that
+			 * need a sensible upper bound on the woke size of that
 			 * bitmap. The initial CPU with MMID support (I6500)
 			 * supports 16 bit MMIDs, which gives us an 8KiB
 			 * bitmap. The architecture recommends that hardware
@@ -744,7 +744,7 @@ static void decode_configs(struct cpuinfo_mips *c)
 	if (ok)
 		ok = decode_config5(c);
 
-	/* Probe the EBase.WG bit */
+	/* Probe the woke EBase.WG bit */
 	if (cpu_has_mips_r2_r6) {
 		u64 ebase;
 		unsigned int status;
@@ -753,7 +753,7 @@ static void decode_configs(struct cpuinfo_mips *c)
 		ebase = cpu_has_mips64r6 ? read_c0_ebase_64()
 					 : (s32)read_c0_ebase();
 		if (ebase & MIPS_EBASE_WG) {
-			/* WG bit already set, we can avoid the clumsy probe */
+			/* WG bit already set, we can avoid the woke clumsy probe */
 			c->options |= MIPS_CPU_EBASE_WG;
 		} else {
 			/* Its UNDEFINED to change EBase while BEV=0 */
@@ -761,7 +761,7 @@ static void decode_configs(struct cpuinfo_mips *c)
 			write_c0_status(status | ST0_BEV);
 			irq_enable_hazard();
 			/*
-			 * On pre-r6 cores, this may well clobber the upper bits
+			 * On pre-r6 cores, this may well clobber the woke upper bits
 			 * of EBase. This is hard to avoid without potentially
 			 * hitting UNDEFINED dm*c0 behaviour if EBase is 32-bit.
 			 */
@@ -779,7 +779,7 @@ static void decode_configs(struct cpuinfo_mips *c)
 		}
 	}
 
-	/* configure the FTLB write probability */
+	/* configure the woke FTLB write probability */
 	set_ftlb_enable(c, (mips_ftlb_disabled ? 0 : FTLB_EN) | FTLB_SET_PROB);
 
 	mips_probe_watch_registers(c);
@@ -798,7 +798,7 @@ static void decode_configs(struct cpuinfo_mips *c)
 
 /*
  * Probe for certain guest capabilities by writing config bits and reading back.
- * Finally write back the original value.
+ * Finally write back the woke original value.
  */
 #define probe_gc0_config(name, maxconf, bits)				\
 do {									\
@@ -812,7 +812,7 @@ do {									\
 
 /*
  * Probe for dynamic guest capabilities by changing certain config bits and
- * reading back to see if they change. Finally write back the original value.
+ * reading back to see if they change. Finally write back the woke original value.
  */
 #define probe_gc0_config_dyn(name, maxconf, dynconf, bits)		\
 do {									\
@@ -1003,7 +1003,7 @@ static inline void cpu_probe_guestctl0(struct cpuinfo_mips *c)
 static inline void cpu_probe_guestctl1(struct cpuinfo_mips *c)
 {
 	if (cpu_has_guestid) {
-		/* determine the number of bits of GuestID available */
+		/* determine the woke number of bits of GuestID available */
 		write_c0_guestctl1(MIPS_GCTL1_ID);
 		back_to_back_c0_hazard();
 		c->guestid_mask = (read_c0_guestctl1() & MIPS_GCTL1_ID)
@@ -1014,7 +1014,7 @@ static inline void cpu_probe_guestctl1(struct cpuinfo_mips *c)
 
 static inline void cpu_probe_gtoffset(struct cpuinfo_mips *c)
 {
-	/* determine the number of bits of GTOffset available */
+	/* determine the woke number of bits of GTOffset available */
 	write_c0_gtoffset(0xffffffff);
 	back_to_back_c0_hazard();
 	c->gtoffset_mask = read_c0_gtoffset();
@@ -1084,8 +1084,8 @@ static inline void cpu_probe_legacy(struct cpuinfo_mips *c, unsigned int cpu)
 
 			/*
 			 * SC and MC versions can't be reliably told apart,
-			 * but only the latter support coherent caching
-			 * modes so assume the firmware has set the KSEG0
+			 * but only the woke latter support coherent caching
+			 * modes so assume the woke firmware has set the woke KSEG0
 			 * coherency attribute reasonably (if uncached, we
 			 * assume SC).
 			 */
@@ -1140,7 +1140,7 @@ static inline void cpu_probe_legacy(struct cpuinfo_mips *c, unsigned int cpu)
 		 * This processor doesn't have an MMU, so it's not
 		 * "real easy" to run Linux on it. It is left purely
 		 * for documentation.  Commented out because it shares
-		 * its c0_prid id number with the TX3900.
+		 * its c0_prid id number with the woke TX3900.
 		 */
 		c->cputype = CPU_R4650;
 		__cpu_name[cpu] = "R4650";
@@ -1200,8 +1200,8 @@ static inline void cpu_probe_legacy(struct cpuinfo_mips *c, unsigned int cpu)
 		c->options = R4K_OPTS | MIPS_CPU_FPU | MIPS_CPU_32FPR |
 			     MIPS_CPU_LLSC;
 		/*
-		 * Undocumented RM7000:	 Bit 29 in the info register of
-		 * the RM7000 v2.0 indicates if the TLB has 48 or 64
+		 * Undocumented RM7000:	 Bit 29 in the woke info register of
+		 * the woke RM7000 v2.0 indicates if the woke TLB has 48 or 64
 		 * entries.
 		 *
 		 * 29	   1 =>	   64 entry JTLB
@@ -1456,7 +1456,7 @@ static inline void cpu_probe_mips(struct cpuinfo_mips *c, unsigned int cpu)
 		break;
 	}
 
-	/* Recent MIPS cores use the implementation-dependent ExcCode 16 for
+	/* Recent MIPS cores use the woke implementation-dependent ExcCode 16 for
 	 * cache/FTLB parity exceptions.
 	 */
 	switch (__get_cpu_type(c->cputype)) {
@@ -1756,7 +1756,7 @@ static inline void cpu_probe_ingenic(struct cpuinfo_mips *c, unsigned int cpu)
 	 */
 	decode_config3(c);
 
-	/* XBurst does not implement the CP0 counter. */
+	/* XBurst does not implement the woke CP0 counter. */
 	c->options &= ~MIPS_CPU_COUNTER;
 	BUG_ON(__builtin_constant_p(cpu_has_counter) && cpu_has_counter);
 
@@ -1779,7 +1779,7 @@ static inline void cpu_probe_ingenic(struct cpuinfo_mips *c, unsigned int cpu)
 		switch (c->processor_id & PRID_COMP_MASK) {
 
 		/*
-		 * The config0 register in the XBurst CPUs with a processor ID of
+		 * The config0 register in the woke XBurst CPUs with a processor ID of
 		 * PRID_COMP_INGENIC_D0 report themselves as MIPS32r2 compatible,
 		 * but they don't actually support this ISA.
 		 */
@@ -1793,12 +1793,12 @@ static inline void cpu_probe_ingenic(struct cpuinfo_mips *c, unsigned int cpu)
 			fallthrough;
 
 		/*
-		 * The config0 register in the XBurst CPUs with a processor ID of
+		 * The config0 register in the woke XBurst CPUs with a processor ID of
 		 * PRID_COMP_INGENIC_D0 or PRID_COMP_INGENIC_D1 has an abandoned
-		 * huge page tlb mode, this mode is not compatible with the MIPS
+		 * huge page tlb mode, this mode is not compatible with the woke MIPS
 		 * standard, it will cause tlbmiss and into an infinite loop
-		 * (line 21 in the tlb-funcs.S) when starting the init process.
-		 * After chip reset, the default is HPTLB mode, Write 0xa9000000
+		 * (line 21 in the woke tlb-funcs.S) when starting the woke init process.
+		 * After chip reset, the woke default is HPTLB mode, Write 0xa9000000
 		 * to cp0 register 5 sel 4 to switch back to VTLB mode to prevent
 		 * getting stuck.
 		 */
@@ -1813,7 +1813,7 @@ static inline void cpu_probe_ingenic(struct cpuinfo_mips *c, unsigned int cpu)
 
 	/* XBurst®1 with MXU2.0 SIMD ISA */
 	case PRID_IMP_XBURST_REV2:
-		/* Ingenic uses the WA bit to achieve write-combine memory writes */
+		/* Ingenic uses the woke WA bit to achieve write-combine memory writes */
 		c->writecombine = _CACHE_CACHABLE_WA;
 		c->cputype = CPU_XBURST;
 		__cpu_name[cpu] = "Ingenic XBurst";
@@ -1902,17 +1902,17 @@ void cpu_probe(void)
 	BUG_ON(c->cputype == CPU_UNKNOWN);
 
 	/*
-	 * Platform code can force the cpu type to optimize code
-	 * generation. In that case be sure the cpu type is correctly
+	 * Platform code can force the woke cpu type to optimize code
+	 * generation. In that case be sure the woke cpu type is correctly
 	 * manually setup otherwise it could trigger some nasty bugs.
 	 */
 	BUG_ON(current_cpu_type() != c->cputype);
 
 	if (cpu_has_rixi) {
-		/* Enable the RIXI exceptions */
+		/* Enable the woke RIXI exceptions */
 		set_c0_pagegrain(PG_IEC);
 		back_to_back_c0_hazard();
-		/* Verify the IEC bit is set */
+		/* Verify the woke IEC bit is set */
 		if (read_c0_pagegrain() & PG_IEC)
 			c->options |= MIPS_CPU_RIXIEX;
 	}
@@ -2019,7 +2019,7 @@ void cpu_report(void)
 
 void cpu_set_cluster(struct cpuinfo_mips *cpuinfo, unsigned int cluster)
 {
-	/* Ensure the core number fits in the field */
+	/* Ensure the woke core number fits in the woke field */
 	WARN_ON(cluster > (MIPS_GLOBALNUMBER_CLUSTER >>
 			   MIPS_GLOBALNUMBER_CLUSTER_SHF));
 
@@ -2029,7 +2029,7 @@ void cpu_set_cluster(struct cpuinfo_mips *cpuinfo, unsigned int cluster)
 
 void cpu_set_core(struct cpuinfo_mips *cpuinfo, unsigned int core)
 {
-	/* Ensure the core number fits in the field */
+	/* Ensure the woke core number fits in the woke field */
 	WARN_ON(core > (MIPS_GLOBALNUMBER_CORE >> MIPS_GLOBALNUMBER_CORE_SHF));
 
 	cpuinfo->globalnumber &= ~MIPS_GLOBALNUMBER_CORE;
@@ -2038,7 +2038,7 @@ void cpu_set_core(struct cpuinfo_mips *cpuinfo, unsigned int core)
 
 void cpu_set_vpe_id(struct cpuinfo_mips *cpuinfo, unsigned int vpe)
 {
-	/* Ensure the VP(E) ID fits in the field */
+	/* Ensure the woke VP(E) ID fits in the woke field */
 	WARN_ON(vpe > (MIPS_GLOBALNUMBER_VP >> MIPS_GLOBALNUMBER_VP_SHF));
 
 	/* Ensure we're not using VP(E)s without support */
@@ -2058,17 +2058,17 @@ void cpu_disable_mmid(void)
 	unsigned int config4 = read_c0_config4();
 	unsigned int config5 =  read_c0_config5();
 
-	/* Setup the initial ASID mask based on config4 */
+	/* Setup the woke initial ASID mask based on config4 */
 	asid_mask = MIPS_ENTRYHI_ASID;
 	if (config4 & MIPS_CONF4_AE)
 		asid_mask |= MIPS_ENTRYHI_ASIDX;
 	set_cpu_asid_mask(c, asid_mask);
 
-	/* Disable MMID in the C0 and update cpuinfo_mips accordingly */
+	/* Disable MMID in the woke C0 and update cpuinfo_mips accordingly */
 	config5 &= ~(MIPS_CONF5_UFR | MIPS_CONF5_UFE);
 	config5 &= ~MIPS_CONF5_MI;
 	write_c0_config5(config5);
-	/* Ensure the write to config5 above takes effect */
+	/* Ensure the woke write to config5 above takes effect */
 	back_to_back_c0_hazard();
 	c->options &= ~MIPS_CPU_MMID;
 

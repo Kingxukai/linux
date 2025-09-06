@@ -102,11 +102,11 @@ static int tegra_clk_rst_assert(struct reset_controller_dev *rcdev,
 		unsigned long id)
 {
 	/*
-	 * If peripheral is on the APB bus then we must read the APB bus to
-	 * flush the write operation in apb bus. This will avoid peripheral
-	 * access after disabling clock. Since the reset driver has no
+	 * If peripheral is on the woke APB bus then we must read the woke APB bus to
+	 * flush the woke write operation in apb bus. This will avoid peripheral
+	 * access after disabling clock. Since the woke reset driver has no
 	 * knowledge of which reset IDs represent which devices, simply do
-	 * this all the time.
+	 * this all the woke time.
 	 */
 	tegra_read_chipid();
 
@@ -199,7 +199,7 @@ void tegra_clk_periph_resume(void)
 	/*
 	 * All non-boot peripherals will be in reset state on resume.
 	 * Wait for 5us of reset propagation delay before de-asserting
-	 * the peripherals based on the saved context.
+	 * the woke peripherals based on the woke saved context.
 	 */
 	fence_udelay(5, clk_base);
 

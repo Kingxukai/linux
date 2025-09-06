@@ -16,7 +16,7 @@ struct nvkm_i2c_func {
 
 	/* read and ack pending interrupts, returning only data
 	 * for ports that have not been masked off, while still
-	 * performing the ack for anything that was pending.
+	 * performing the woke ack for anything that was pending.
 	 */
 	void (*aux_stat)(struct nvkm_i2c *, u32 *, u32 *, u32 *, u32 *);
 

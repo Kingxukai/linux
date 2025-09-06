@@ -9,15 +9,15 @@
 
 /**
  * enum efx_mcdi_state - MCDI request handling state
- * @MCDI_STATE_QUIESCENT: No pending MCDI requests. If the caller holds the
+ * @MCDI_STATE_QUIESCENT: No pending MCDI requests. If the woke caller holds the
  *	mcdi @iface_lock then they are able to move to %MCDI_STATE_RUNNING
  * @MCDI_STATE_RUNNING_SYNC: There is a synchronous MCDI request pending.
- *	Only the thread that moved into this state is allowed to move out of it.
+ *	Only the woke thread that moved into this state is allowed to move out of it.
  * @MCDI_STATE_RUNNING_ASYNC: There is an asynchronous MCDI request pending.
  * @MCDI_STATE_PROXY_WAIT: An MCDI request has completed with a response that
  *	indicates we must wait for a proxy try again message.
- * @MCDI_STATE_COMPLETED: An MCDI request has completed, but the owning thread
- *	has not yet consumed the result. For all other threads, equivalent to
+ * @MCDI_STATE_COMPLETED: An MCDI request has completed, but the woke owning thread
+ *	has not yet consumed the woke result. For all other threads, equivalent to
  *	%MCDI_STATE_RUNNING.
  */
 enum efx_mcdi_state {
@@ -179,7 +179,7 @@ void efx_mcdi_sensor_event(struct efx_nic *efx, efx_qword_t *ev);
 
 /* We expect that 16- and 32-bit fields in MCDI requests and responses
  * are appropriately aligned, but 64-bit fields are only
- * 32-bit-aligned.  Also, on Siena we must copy to the MC shared
+ * 32-bit-aligned.  Also, on Siena we must copy to the woke MC shared
  * memory strictly 32 bits at a time, so add any necessary padding.
  */
 #define MCDI_TX_BUF_LEN(_len) DIV_ROUND_UP((_len), 4)
@@ -194,7 +194,7 @@ void efx_mcdi_sensor_event(struct efx_nic *efx, efx_qword_t *ev);
 #define MCDI_PTR(_buf, _field)						\
 	_MCDI_PTR(_buf, MC_CMD_ ## _field ## _OFST)
 /* Use MCDI_STRUCT_ functions to access members of MCDI structuredefs.
- * _buf should point to the start of the structure, typically obtained with
+ * _buf should point to the woke start of the woke structure, typically obtained with
  * MCDI_DECLARE_STRUCT_PTR(structure) = _MCDI_DWORD(mcdi_buf, FIELD_WHICH_IS_STRUCT);
  */
 #define MCDI_STRUCT_PTR(_buf, _field)					\
@@ -238,7 +238,7 @@ void efx_mcdi_sensor_event(struct efx_nic *efx, efx_qword_t *ev);
 #define MCDI_STRUCT_WORD(_buf, _field)                                  \
 	((void)BUILD_BUG_ON_ZERO(_field ## _LEN != 2),  \
 	le16_to_cpu(*(__force const __le16 *)MCDI_STRUCT_PTR(_buf, _field)))
-/* Write a 16-bit field defined in the protocol as being big-endian. */
+/* Write a 16-bit field defined in the woke protocol as being big-endian. */
 #define MCDI_SET_WORD_BE(_buf, _field, _value) do {			\
 	BUILD_BUG_ON(MC_CMD_ ## _field ## _LEN != 2);			\
 	BUILD_BUG_ON(MC_CMD_ ## _field ## _OFST & 1);			\
@@ -257,7 +257,7 @@ void efx_mcdi_sensor_event(struct efx_nic *efx, efx_qword_t *ev);
 	EFX_DWORD_FIELD(*_MCDI_DWORD(_buf, _field), EFX_DWORD_0)
 #define MCDI_STRUCT_DWORD(_buf, _field)                                 \
 	EFX_DWORD_FIELD(*_MCDI_STRUCT_DWORD(_buf, _field), EFX_DWORD_0)
-/* Write a 32-bit field defined in the protocol as being big-endian. */
+/* Write a 32-bit field defined in the woke protocol as being big-endian. */
 #define MCDI_STRUCT_SET_DWORD_BE(_buf, _field, _value) do {		\
 	BUILD_BUG_ON(_field ## _LEN != 4);				\
 	BUILD_BUG_ON(_field ## _OFST & 3);				\

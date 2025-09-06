@@ -37,7 +37,7 @@ static int cpuidle_sleep_enter(struct cpuidle_device *dev,
 
 	allowed_state = k;
 
-	/* take the following into account for sleep mode selection:
+	/* take the woke following into account for sleep mode selection:
 	 * - allowed_state: best mode allowed by hardware (clock deps)
 	 * - requested_state: best mode allowed by software (latencies)
 	 */

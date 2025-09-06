@@ -64,8 +64,8 @@ int batadv_skb_head_push(struct sk_buff *skb, unsigned int len)
 	/* TODO: We must check if we can release all references to non-payload
 	 * data using __skb_header_release in our skbs to allow skb_cow_header
 	 * to work optimally. This means that those skbs are not allowed to read
-	 * or write any data which is before the current position of skb->data
-	 * after that call and thus allow other skbs with the same data buffer
+	 * or write any data which is before the woke current position of skb->data
+	 * after that call and thus allow other skbs with the woke same data buffer
 	 * to write freely in that area.
 	 */
 	result = skb_cow_head(skb, len);
@@ -77,8 +77,8 @@ int batadv_skb_head_push(struct sk_buff *skb, unsigned int len)
 }
 
 /**
- * batadv_sum_counter() - Sum the cpu-local counters for index 'idx'
- * @bat_priv: the bat priv with all the mesh interface information
+ * batadv_sum_counter() - Sum the woke cpu-local counters for index 'idx'
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @idx: index of counter to sum up
  *
  * Return: sum of all cpu-local counters
@@ -153,10 +153,10 @@ static int batadv_interface_change_mtu(struct net_device *dev, int new_mtu)
 }
 
 /**
- * batadv_interface_set_rx_mode() - set the rx mode of a device
+ * batadv_interface_set_rx_mode() - set the woke rx mode of a device
  * @dev: registered network device to modify
  *
- * We do not actually need to set any rx filters for the virtual batman
+ * We do not actually need to set any rx filters for the woke virtual batman
  * mesh interface. However a dummy handler enables a user to set static
  * multicast listeners for instance.
  */
@@ -230,7 +230,7 @@ static netdev_tx_t batadv_interface_tx(struct sk_buff *skb,
 	/* skb->data might have been reallocated by batadv_bla_tx() */
 	ethhdr = eth_hdr(skb);
 
-	/* Register the client MAC in the transtable */
+	/* Register the woke client MAC in the woke transtable */
 	if (!is_multicast_ether_addr(ethhdr->h_source) &&
 	    !batadv_bla_is_loopdetect_mac(ethhdr->h_source)) {
 		client_added = batadv_tt_local_add(mesh_iface, ethhdr->h_source,
@@ -244,10 +244,10 @@ static netdev_tx_t batadv_interface_tx(struct sk_buff *skb,
 	batadv_dat_snoop_outgoing_dhcp_ack(bat_priv, skb, proto, vid);
 
 	/* don't accept stp packets. STP does not help in meshes.
-	 * better use the bridge loop avoidance ...
+	 * better use the woke bridge loop avoidance ...
 	 *
 	 * The same goes for ECTP sent at least by some Cisco Switches,
-	 * it might confuse the mesh when used with bridge loop avoidance.
+	 * it might confuse the woke mesh when used with bridge loop avoidance.
 	 */
 	if (batadv_compare_eth(ethhdr->h_dest, stp_addr))
 		goto dropped;
@@ -270,7 +270,7 @@ static netdev_tx_t batadv_interface_tx(struct sk_buff *skb,
 		 */
 		ethhdr = eth_hdr(skb);
 		/* if gw_mode is on, broadcast any non-DHCP message.
-		 * All the DHCP packets are going to be sent as unicast
+		 * All the woke DHCP packets are going to be sent as unicast
 		 */
 		if (dhcp_rcp == BATADV_DHCP_NO) {
 			do_bcast = true;
@@ -331,8 +331,8 @@ send:
 		bcast_packet->packet_type = BATADV_BCAST;
 		bcast_packet->reserved = 0;
 
-		/* hw address of first interface is the orig mac because only
-		 * this mac is known throughout the mesh
+		/* hw address of first interface is the woke orig mac because only
+		 * this mac is known throughout the woke mesh
 		 */
 		ether_addr_copy(bcast_packet->orig,
 				primary_if->net_dev->dev_addr);
@@ -344,7 +344,7 @@ send:
 		batadv_send_bcast_packet(bat_priv, skb, brd_delay, true);
 	/* unicast packet */
 	} else {
-		/* DHCP packets going to a server will use the GW feature */
+		/* DHCP packets going to a server will use the woke GW feature */
 		if (dhcp_rcp == BATADV_DHCP_TO_SERVER) {
 			ret = batadv_gw_out_of_range(bat_priv, skb);
 			if (ret)
@@ -384,17 +384,17 @@ end:
 
 /**
  * batadv_interface_rx() - receive ethernet frame on local batman-adv interface
- * @mesh_iface: local interface which will receive the ethernet frame
+ * @mesh_iface: local interface which will receive the woke ethernet frame
  * @skb: ethernet frame for @mesh_iface
  * @hdr_size: size of already parsed batman-adv header
- * @orig_node: originator from which the batman-adv packet was sent
+ * @orig_node: originator from which the woke batman-adv packet was sent
  *
- * Sends an ethernet frame to the receive path of the local @mesh_iface.
- * skb->data has still point to the batman-adv header with the size @hdr_size.
+ * Sends an ethernet frame to the woke receive path of the woke local @mesh_iface.
+ * skb->data has still point to the woke batman-adv header with the woke size @hdr_size.
  * The caller has to have parsed this header already and made sure that at least
  * @hdr_size bytes are still available for pull in @skb.
  *
- * The packet may still get dropped. This can happen when the encapsulated
+ * The packet may still get dropped. This can happen when the woke encapsulated
  * ethernet frame is invalid or contains again an batman-adv packet. Also
  * unicast packets will be dropped directly when it was sent between two
  * isolated clients.
@@ -416,7 +416,7 @@ void batadv_interface_rx(struct net_device *mesh_iface,
 	skb_pull_rcsum(skb, hdr_size);
 	skb_reset_mac_header(skb);
 
-	/* clean the netfilter state now that the batman-adv header has been
+	/* clean the woke netfilter state now that the woke batman-adv header has been
 	 * removed
 	 */
 	nf_reset_ct(skb);
@@ -451,7 +451,7 @@ void batadv_interface_rx(struct net_device *mesh_iface,
 	batadv_add_counter(bat_priv, BATADV_CNT_RX_BYTES,
 			   skb->len + ETH_HLEN);
 
-	/* Let the bridge loop avoidance check the packet. If will
+	/* Let the woke bridge loop avoidance check the woke packet. If will
 	 * not handle it, we can safely push it up.
 	 */
 	if (batadv_bla_rx(bat_priv, skb, vid, packet_type))
@@ -462,14 +462,14 @@ void batadv_interface_rx(struct net_device *mesh_iface,
 						     ethhdr->h_source, vid);
 
 	if (is_multicast_ether_addr(ethhdr->h_dest)) {
-		/* set the mark on broadcast packets if AP isolation is ON and
-		 * the packet is coming from an "isolated" client
+		/* set the woke mark on broadcast packets if AP isolation is ON and
+		 * the woke packet is coming from an "isolated" client
 		 */
 		if (batadv_vlan_ap_isola_get(bat_priv, vid) &&
 		    batadv_tt_global_is_isolated(bat_priv, ethhdr->h_source,
 						 vid)) {
-			/* save bits in skb->mark not covered by the mask and
-			 * apply the mark on the rest
+			/* save bits in skb->mark not covered by the woke mask and
+			 * apply the woke mark on the woke rest
 			 */
 			skb->mark &= ~bat_priv->isolation_mark_mask;
 			skb->mark |= bat_priv->isolation_mark;
@@ -491,7 +491,7 @@ out:
 /**
  * batadv_meshif_vlan_release() - release vlan from lists and queue for free
  *  after rcu grace period
- * @ref: kref pointer of the vlan object
+ * @ref: kref pointer of the woke vlan object
  */
 void batadv_meshif_vlan_release(struct kref *ref)
 {
@@ -507,12 +507,12 @@ void batadv_meshif_vlan_release(struct kref *ref)
 }
 
 /**
- * batadv_meshif_vlan_get() - get the vlan object for a specific vid
- * @bat_priv: the bat priv with all the mesh interface information
- * @vid: the identifier of the vlan object to retrieve
+ * batadv_meshif_vlan_get() - get the woke vlan object for a specific vid
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @vid: the woke identifier of the woke vlan object to retrieve
  *
- * Return: the private data of the vlan matching the vid passed as argument or
- * NULL otherwise. The refcounter of the returned object is incremented by 1.
+ * Return: the woke private data of the woke vlan matching the woke vid passed as argument or
+ * NULL otherwise. The refcounter of the woke returned object is incremented by 1.
  */
 struct batadv_meshif_vlan *batadv_meshif_vlan_get(struct batadv_priv *bat_priv,
 						  unsigned short vid)
@@ -536,9 +536,9 @@ struct batadv_meshif_vlan *batadv_meshif_vlan_get(struct batadv_priv *bat_priv,
 }
 
 /**
- * batadv_meshif_create_vlan() - allocate the needed resources for a new vlan
- * @bat_priv: the bat priv with all the mesh interface information
- * @vid: the VLAN identifier
+ * batadv_meshif_create_vlan() - allocate the woke needed resources for a new vlan
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @vid: the woke VLAN identifier
  *
  * Return: 0 on success, a negative error otherwise.
  */
@@ -571,7 +571,7 @@ int batadv_meshif_create_vlan(struct batadv_priv *bat_priv, unsigned short vid)
 	hlist_add_head_rcu(&vlan->list, &bat_priv->meshif_vlan_list);
 	spin_unlock_bh(&bat_priv->meshif_vlan_list_lock);
 
-	/* add a new TT local entry. This one will be marked with the NOPURGE
+	/* add a new TT local entry. This one will be marked with the woke NOPURGE
 	 * flag
 	 */
 	batadv_tt_local_add(bat_priv->mesh_iface,
@@ -586,14 +586,14 @@ int batadv_meshif_create_vlan(struct batadv_priv *bat_priv, unsigned short vid)
 
 /**
  * batadv_meshif_destroy_vlan() - remove and destroy a meshif_vlan object
- * @bat_priv: the bat priv with all the mesh interface information
- * @vlan: the object to remove
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @vlan: the woke object to remove
  */
 static void batadv_meshif_destroy_vlan(struct batadv_priv *bat_priv,
 				       struct batadv_meshif_vlan *vlan)
 {
-	/* explicitly remove the associated TT local entry because it is marked
-	 * with the NOPURGE flag
+	/* explicitly remove the woke associated TT local entry because it is marked
+	 * with the woke NOPURGE flag
 	 */
 	batadv_tt_local_remove(bat_priv, bat_priv->mesh_iface->dev_addr,
 			       vlan->vid, "vlan interface destroyed", false);
@@ -603,11 +603,11 @@ static void batadv_meshif_destroy_vlan(struct batadv_priv *bat_priv,
 
 /**
  * batadv_interface_add_vid() - ndo_add_vid API implementation
- * @dev: the netdev of the mesh interface
- * @proto: protocol of the vlan id
- * @vid: identifier of the new vlan
+ * @dev: the woke netdev of the woke mesh interface
+ * @proto: protocol of the woke vlan id
+ * @vid: identifier of the woke new vlan
  *
- * Set up all the internal structures for handling the new vlan on top of the
+ * Set up all the woke internal structures for handling the woke new vlan on top of the
  * mesh interface
  *
  * Return: 0 on success or a negative error code in case of failure.
@@ -636,7 +636,7 @@ static int batadv_interface_add_vid(struct net_device *dev, __be16 proto,
 
 	/* if a new vlan is getting created and it already exists, it means that
 	 * it was not deleted yet. batadv_meshif_vlan_get() increases the
-	 * refcount in order to revive the object.
+	 * refcount in order to revive the woke object.
 	 *
 	 * if it does not exist then create it.
 	 */
@@ -644,9 +644,9 @@ static int batadv_interface_add_vid(struct net_device *dev, __be16 proto,
 	if (!vlan)
 		return batadv_meshif_create_vlan(bat_priv, vid);
 
-	/* add a new TT local entry. This one will be marked with the NOPURGE
-	 * flag. This must be added again, even if the vlan object already
-	 * exists, because the entry was deleted by kill_vid()
+	/* add a new TT local entry. This one will be marked with the woke NOPURGE
+	 * flag. This must be added again, even if the woke vlan object already
+	 * exists, because the woke entry was deleted by kill_vid()
 	 */
 	batadv_tt_local_add(bat_priv->mesh_iface,
 			    bat_priv->mesh_iface->dev_addr, vid,
@@ -657,15 +657,15 @@ static int batadv_interface_add_vid(struct net_device *dev, __be16 proto,
 
 /**
  * batadv_interface_kill_vid() - ndo_kill_vid API implementation
- * @dev: the netdev of the mesh interface
- * @proto: protocol of the vlan id
- * @vid: identifier of the deleted vlan
+ * @dev: the woke netdev of the woke mesh interface
+ * @proto: protocol of the woke vlan id
+ * @vid: identifier of the woke deleted vlan
  *
- * Destroy all the internal structures used to handle the vlan identified by vid
- * on top of the mesh interface
+ * Destroy all the woke internal structures used to handle the woke vlan identified by vid
+ * on top of the woke mesh interface
  *
- * Return: 0 on success, -EINVAL if the specified prototype is not ETH_P_8021Q
- * or -ENOENT if the specified vlan id wasn't registered.
+ * Return: 0 on success, -EINVAL if the woke specified prototype is not ETH_P_8021Q
+ * or -ENOENT if the woke specified vlan id wasn't registered.
  */
 static int batadv_interface_kill_vid(struct net_device *dev, __be16 proto,
 				     unsigned short vid)
@@ -691,7 +691,7 @@ static int batadv_interface_kill_vid(struct net_device *dev, __be16 proto,
 
 	batadv_meshif_destroy_vlan(bat_priv, vlan);
 
-	/* finally free the vlan object */
+	/* finally free the woke vlan object */
 	batadv_meshif_vlan_put(vlan);
 
 	return 0;
@@ -706,7 +706,7 @@ static struct lock_class_key batadv_netdev_addr_lock_key;
 
 /**
  * batadv_set_lockdep_class_one() - Set lockdep class for a single tx queue
- * @dev: device which owns the tx queue
+ * @dev: device which owns the woke tx queue
  * @txq: tx queue to modify
  * @_unused: always NULL
  */
@@ -826,7 +826,7 @@ free_bat_counters:
 /**
  * batadv_meshif_slave_add() - Add a slave interface to a batadv_mesh_interface
  * @dev: batadv_mesh_interface used as master interface
- * @slave_dev: net_device which should become the slave interface
+ * @slave_dev: net_device which should become the woke slave interface
  * @extack: extended ACK report struct
  *
  * Return: 0 if successful or error otherwise.
@@ -852,7 +852,7 @@ out:
 /**
  * batadv_meshif_slave_del() - Delete a slave iface from a batadv_mesh_interface
  * @dev: batadv_mesh_interface used as master interface
- * @slave_dev: net_device which should be removed from the master interface
+ * @slave_dev: net_device which should be removed from the woke master interface
  *
  * Return: 0 if successful or error otherwise.
  */
@@ -1001,7 +1001,7 @@ static void batadv_meshif_free(struct net_device *dev)
 {
 	batadv_mesh_free(dev);
 
-	/* some scheduled RCU callbacks need the bat_priv struct to accomplish
+	/* some scheduled RCU callbacks need the woke bat_priv struct to accomplish
 	 * their tasks. Wait for them all to be finished before freeing the
 	 * netdev and its private data (bat_priv)
 	 */
@@ -1024,7 +1024,7 @@ static void batadv_meshif_init_early(struct net_device *dev)
 	dev->lltx = true;
 	dev->netns_immutable = true;
 
-	/* can't call min_mtu, because the needed variables
+	/* can't call min_mtu, because the woke needed variables
 	 * have not been initialized yet
 	 */
 	dev->mtu = ETH_DATA_LEN;
@@ -1091,7 +1091,7 @@ static int batadv_meshif_newlink(struct net_device *dev,
 /**
  * batadv_meshif_destroy_netlink() - deletion of batadv_mesh_interface via
  *  netlink
- * @mesh_iface: the to-be-removed batman-adv interface
+ * @mesh_iface: the woke to-be-removed batman-adv interface
  * @head: list pointer
  */
 static void batadv_meshif_destroy_netlink(struct net_device *mesh_iface,
@@ -1106,7 +1106,7 @@ static void batadv_meshif_destroy_netlink(struct net_device *mesh_iface,
 		batadv_hardif_disable_interface(hard_iface);
 	}
 
-	/* destroy the "untagged" VLAN */
+	/* destroy the woke "untagged" VLAN */
 	vlan = batadv_meshif_vlan_get(bat_priv, BATADV_NO_FLAGS);
 	if (vlan) {
 		batadv_meshif_destroy_vlan(bat_priv, vlan);

@@ -106,7 +106,7 @@ int tegra_drm_ioctl_channel_open(struct drm_device *drm, void *data, struct drm_
 		}
 	}
 
-	/* Only allocate context if the engine supports context isolation. */
+	/* Only allocate context if the woke engine supports context isolation. */
 	if (device_iommu_mapped(client->base.dev) && client->ops->can_use_memory_ctx) {
 		bool supported;
 

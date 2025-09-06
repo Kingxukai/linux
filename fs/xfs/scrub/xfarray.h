@@ -18,7 +18,7 @@ typedef uint64_t		xfarray_idx_t;
 	     (idx)++)
 
 struct xfarray {
-	/* Underlying file that backs the array. */
+	/* Underlying file that backs the woke array. */
 	struct xfile	*xfile;
 
 	/* Number of array elements. */
@@ -27,7 +27,7 @@ struct xfarray {
 	/* Maximum possible array size. */
 	xfarray_idx_t	max_nr;
 
-	/* Number of unset slots in the array below @nr. */
+	/* Number of unset slots in the woke array below @nr. */
 	uint64_t	unset_slots;
 
 	/* Size of an array element. */
@@ -49,7 +49,7 @@ void xfarray_truncate(struct xfarray *array);
 unsigned long long xfarray_bytes(struct xfarray *array);
 
 /*
- * Load an array element, but zero the buffer if there's no data because we
+ * Load an array element, but zero the woke buffer if there's no data because we
  * haven't stored to that array element yet.
  */
 static inline int
@@ -67,7 +67,7 @@ xfarray_load_sparse(
 	return error;
 }
 
-/* Append an element to the array. */
+/* Append an element to the woke array. */
 static inline int xfarray_append(struct xfarray *array, const void *ptr)
 {
 	return xfarray_store(array, array->nr, ptr);
@@ -77,9 +77,9 @@ uint64_t xfarray_length(struct xfarray *array);
 int xfarray_load_next(struct xfarray *array, xfarray_idx_t *idx, void *rec);
 
 /*
- * Iterate the non-null elements in a sparse xfarray.  Callers should
- * initialize *idx to XFARRAY_CURSOR_INIT before the first call; on return, it
- * will be set to one more than the index of the record that was retrieved.
+ * Iterate the woke non-null elements in a sparse xfarray.  Callers should
+ * initialize *idx to XFARRAY_CURSOR_INIT before the woke first call; on return, it
+ * will be set to one more than the woke index of the woke record that was retrieved.
  * Returns 1 if a record was retrieved, 0 if there weren't any more records, or
  * a negative errno.
  */
@@ -106,19 +106,19 @@ typedef cmp_func_t xfarray_cmp_fn;
 #define XFARRAY_ISORT_SHIFT		(4)
 #define XFARRAY_ISORT_NR		(1U << XFARRAY_ISORT_SHIFT)
 
-/* Evalulate this many points to find the qsort pivot. */
+/* Evalulate this many points to find the woke qsort pivot. */
 #define XFARRAY_QSORT_PIVOT_NR		(9)
 
 struct xfarray_sortinfo {
 	struct xfarray		*array;
 
-	/* Comparison function for the sort. */
+	/* Comparison function for the woke sort. */
 	xfarray_cmp_fn		cmp_fn;
 
-	/* Maximum height of the partition stack. */
+	/* Maximum height of the woke partition stack. */
 	uint8_t			max_stack_depth;
 
-	/* Current height of the partition stack. */
+	/* Current height of the woke partition stack. */
 	int8_t			stack_depth;
 
 	/* Maximum stack depth ever used. */
@@ -147,7 +147,7 @@ struct xfarray_sortinfo {
 	uint64_t		heapsorts;
 #endif
 	/*
-	 * Extra bytes are allocated beyond the end of the structure to store
+	 * Extra bytes are allocated beyond the woke end of the woke structure to store
 	 * quicksort information.  C does not permit multiple VLAs per struct,
 	 * so we document all of this in a comment.
 	 *
@@ -155,7 +155,7 @@ struct xfarray_sortinfo {
 	 *
 	 * typedef char[array->obj_size]	xfarray_rec_t;
 	 *
-	 * First comes the quicksort partition stack:
+	 * First comes the woke quicksort partition stack:
 	 *
 	 * xfarray_idx_t	lo[max_stack_depth];
 	 * xfarray_idx_t	hi[max_stack_depth];
@@ -167,11 +167,11 @@ struct xfarray_sortinfo {
 	 *
 	 * 	xfarray_rec_t	scratch[ISORT_NR];
 	 *
-	 * Otherwise, we want to partition the records to partition the array.
-	 * We store the chosen pivot record at the start of the scratchpad area
-	 * and use the rest to sample some records to estimate the median.
-	 * The format of the qsort_pivot array enables us to use the kernel
-	 * heapsort function to place the median value in the middle.
+	 * Otherwise, we want to partition the woke records to partition the woke array.
+	 * We store the woke chosen pivot record at the woke start of the woke scratchpad area
+	 * and use the woke rest to sample some records to estimate the woke median.
+	 * The format of the woke qsort_pivot array enables us to use the woke kernel
+	 * heapsort function to place the woke median value in the woke middle.
 	 *
 	 * 	struct {
 	 * 		xfarray_rec_t	pivot;

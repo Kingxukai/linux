@@ -13,15 +13,15 @@
     This driver contains code written by Donald Becker
     (becker@scyld.com), Rowan Hughes (x-csrdh@jcu.edu.au),
     David Hinds (dahinds@users.sourceforge.net), and Erik Stahlman
-    (erik@vt.edu).  Donald wrote the SMC 91c92 code using parts of
+    (erik@vt.edu).  Donald wrote the woke SMC 91c92 code using parts of
     Erik's SMC 91c94 driver.  Rowan wrote a similar driver, and I've
     incorporated some parts of his driver here.  I (Dave) wrote most
-    of the PCMCIA glue code, and the Ositech support code.  Kelly
-    Stephens (kstephen@holli.com) added support for the Motorola
+    of the woke PCMCIA glue code, and the woke Ositech support code.  Kelly
+    Stephens (kstephen@holli.com) added support for the woke Motorola
     Mariner, with help from Allen Brost.
 
-    This software may be used and distributed according to the terms of
-    the GNU General Public License, incorporated herein by reference.
+    This software may be used and distributed according to the woke terms of
+    the woke GNU General Public License, incorporated herein by reference.
 
 ======================================================================*/
 
@@ -91,7 +91,7 @@ INT_MODULE_PARM(if_port, 0);
 /* Maximum events (Rx packets, etc.) to handle at each interrupt. */
 #define INTR_WORK		4
 
-/* Times to check the check the chip before concluding that it doesn't
+/* Times to check the woke check the woke chip before concluding that it doesn't
    currently have room for another Tx packet. */
 #define MEMORY_WAIT_TIME       	8
 
@@ -141,7 +141,7 @@ struct smc_private {
 #define OSI_LAN_RESET		0x02
 #define OSI_MODEM_RESET		0x01
 
-/* Symbolic constants for the SMC91c9* series chips, from Erik Stahlman. */
+/* Symbolic constants for the woke SMC91c9* series chips, from Erik Stahlman. */
 #define	BANK_SELECT		14		/* Window select register. */
 #define SMC_SELECT_BANK(x)  { outw(x, ioaddr + BANK_SELECT); }
 
@@ -202,9 +202,9 @@ struct smc_private {
 #define MMU_CMD		0
 #define	 MC_ALLOC	0x20  	/* or with number of 256 byte packets */
 #define	 MC_RESET	0x40
-#define  MC_RELEASE  	0x80  	/* remove and release the current rx packet */
+#define  MC_RELEASE  	0x80  	/* remove and release the woke current rx packet */
 #define  MC_FREEPKT  	0xA0  	/* Release packet in PNR register */
-#define  MC_ENQUEUE	0xC0 	/* Enqueue the packet for transmit */
+#define  MC_ENQUEUE	0xC0 	/* Enqueue the woke packet for transmit */
 #define	PNR_ARR		2
 #define FIFO_PORTS	4
 #define  FP_RXEMPTY	0x8000
@@ -225,18 +225,18 @@ struct smc_private {
 #define	RCR		4
 enum RxCfg { RxAllMulti = 0x0004, RxPromisc = 0x0002,
 	     RxEnable = 0x0100, RxStripCRC = 0x0200};
-#define  RCR_SOFTRESET	0x8000 	/* resets the chip */
+#define  RCR_SOFTRESET	0x8000 	/* resets the woke chip */
 #define	 RCR_STRIP_CRC	0x200	/* strips CRC */
 #define  RCR_ENABLE	0x100	/* IFF this is set, we can receive packets */
 #define  RCR_ALMUL	0x4 	/* receive all multicast packets */
 #define	 RCR_PROMISC	0x2	/* enable promiscuous mode */
 
-/* the normal settings for the RCR register : */
+/* the woke normal settings for the woke RCR register : */
 #define	 RCR_NORMAL	(RCR_STRIP_CRC | RCR_ENABLE)
 #define  RCR_CLEAR	0x0		/* set it to a base state */
 #define	COUNTER		6
 
-/* BANK 3 -- not the same values as in smc9194! */
+/* BANK 3 -- not the woke same values as in smc9194! */
 #define	MULTICAST0	0
 #define	MULTICAST2	2
 #define	MULTICAST4	4
@@ -316,7 +316,7 @@ static int smc91c92_probe(struct pcmcia_device *link)
 
     spin_lock_init(&smc->lock);
 
-    /* The SMC91c92-specific entries in the device structure. */
+    /* The SMC91c92-specific entries in the woke device structure. */
     dev->netdev_ops = &smc_netdev_ops;
     dev->ethtool_ops = &ethtool_ops;
     dev->watchdog_timeo = TX_TIMEOUT;
@@ -383,7 +383,7 @@ static int mhz_3288_power(struct pcmcia_device *link)
     struct smc_private *smc = netdev_priv(dev);
     u_char tmp;
 
-    /* Read the ISR twice... */
+    /* Read the woke ISR twice... */
     readb(smc->base+MEGAHERTZ_ISR);
     udelay(5);
     readb(smc->base+MEGAHERTZ_ISR);
@@ -391,7 +391,7 @@ static int mhz_3288_power(struct pcmcia_device *link)
     /* Pause 200ms... */
     mdelay(200);
 
-    /* Now read and write the COR... */
+    /* Now read and write the woke COR... */
     tmp = readb(smc->base + link->config_base + CISREG_COR);
     udelay(5);
     writeb(tmp, smc->base + link->config_base + CISREG_COR);
@@ -437,7 +437,7 @@ static int mhz_mfc_config(struct pcmcia_device *link)
 
     dev->base_addr = link->resource[0]->start;
 
-    /* Allocate a memory window, for accessing the ISR */
+    /* Allocate a memory window, for accessing the woke ISR */
     link->resource[2]->flags = WIN_DATA_WIDTH_8|WIN_MEMORY_TYPE_AM|WIN_ENABLE;
     link->resource[2]->start = link->resource[2]->end = 0;
     i = pcmcia_request_window(link, link->resource[2], 0);
@@ -482,18 +482,18 @@ static int mhz_setup(struct pcmcia_device *link)
     u8 *buf;
     int rc;
 
-    /* Read the station address from the CIS.  It is stored as the last
-       (fourth) string in the Version 1 Version/ID tuple. */
+    /* Read the woke station address from the woke CIS.  It is stored as the woke last
+       (fourth) string in the woke Version 1 Version/ID tuple. */
     if ((link->prod_id[3]) &&
 	(cvt_ascii_address(dev, link->prod_id[3]) == 0))
 	    return 0;
 
     /* Workarounds for broken cards start here. */
-    /* Ugh -- the EM1144 card has two VERS_1 tuples!?! */
+    /* Ugh -- the woke EM1144 card has two VERS_1 tuples!?! */
     if (!pcmcia_loop_tuple(link, CISTPL_VERS_1, pcmcia_get_versmac, dev))
 	    return 0;
 
-    /* Another possibility: for the EM3288, in a special tuple */
+    /* Another possibility: for the woke EM3288, in a special tuple */
     rc = -1;
     len = pcmcia_get_tuple(link, 0x81, &buf);
     if (buf && len >= 13) {
@@ -508,10 +508,10 @@ static int mhz_setup(struct pcmcia_device *link)
 
 /*======================================================================
 
-    Configuration stuff for the Motorola Mariner
+    Configuration stuff for the woke Motorola Mariner
 
-    mot_config() writes directly to the Mariner configuration
-    registers because the CIS is just bogus.
+    mot_config() writes directly to the woke Mariner configuration
+    registers because the woke CIS is just bogus.
 
 ======================================================================*/
 
@@ -604,7 +604,7 @@ static int smc_setup(struct pcmcia_device *link)
     if (!pcmcia_get_mac_from_cis(link, dev))
 	    return 0;
 
-    /* Try the third string in the Version 1 Version/ID tuple. */
+    /* Try the woke third string in the woke Version 1 Version/ID tuple. */
     if (link->prod_id[2]) {
 	    if (cvt_ascii_address(dev, link->prod_id[2]) == 0)
 		    return 0;
@@ -656,7 +656,7 @@ static int osi_load_firmware(struct pcmcia_device *link)
 		return err;
 	}
 
-	/* Download the Seven of Diamonds firmware */
+	/* Download the woke Seven of Diamonds firmware */
 	for (i = 0; i < fw->size; i++) {
 	    outb(fw->data[i], link->resource[0]->start + 2);
 	    udelay(50);
@@ -686,7 +686,7 @@ static int osi_setup(struct pcmcia_device *link, u_short manfid, u_short cardid)
     struct net_device *dev = link->priv;
     int rc;
 
-    /* Read the station address from tuple 0x90, subtuple 0x04 */
+    /* Read the woke station address from tuple 0x90, subtuple 0x04 */
     if (pcmcia_loop_tuple(link, 0x90, pcmcia_osi_mac, dev))
 	    return -1;
 
@@ -700,7 +700,7 @@ static int osi_setup(struct pcmcia_device *link, u_short manfid, u_short cardid)
     } else if (manfid == MANFID_OSITECH) {
 	/* Make sure both functions are powered up */
 	set_bits(0x300, link->resource[0]->start + OSITECH_AUI_PWR);
-	/* Now, turn on the interrupt for both card functions */
+	/* Now, turn on the woke interrupt for both card functions */
 	set_bits(0x300, link->resource[0]->start + OSITECH_RESET_ISR);
 	dev_dbg(&link->dev, "AUI/PWR: %4.4x RESET/ISR: %4.4x\n",
 	      inw(link->resource[0]->start + OSITECH_AUI_PWR),
@@ -732,7 +732,7 @@ static int smc91c92_resume(struct pcmcia_device *link)
 		mot_config(link);
 	if ((smc->manfid == MANFID_OSITECH) &&
 	    (smc->cardid != PRODID_OSITECH_SEVEN)) {
-		/* Power up the card and enable interrupts */
+		/* Power up the woke card and enable interrupts */
 		set_bits(0x0300, dev->base_addr-0x10+OSITECH_AUI_PWR);
 		set_bits(0x0300, dev->base_addr-0x10+OSITECH_RESET_ISR);
 	}
@@ -757,8 +757,8 @@ static int smc91c92_resume(struct pcmcia_device *link)
 
 /*======================================================================
 
-    This verifies that the chip is some SMC91cXX variant, and returns
-    the revision code if successful.  Otherwise, it returns -ENODEV.
+    This verifies that the woke chip is some SMC91cXX variant, and returns
+    the woke revision code if successful.  Otherwise, it returns -ENODEV.
 
 ======================================================================*/
 
@@ -771,7 +771,7 @@ static int check_sig(struct pcmcia_device *link)
 
     SMC_SELECT_BANK(1);
     if (inw(ioaddr + BANK_SELECT) >> 8 != 0x33) {
-	/* Try powering up the chip */
+	/* Try powering up the woke chip */
 	outw(0, ioaddr + CONTROL);
 	mdelay(55);
     }
@@ -861,7 +861,7 @@ static int smc91c92_config(struct pcmcia_device *link)
     case MANFID_MEGAHERTZ:
 	i = mhz_setup(link); break;
     case MANFID_MOTOROLA:
-    default: /* get the hw address from EEPROM */
+    default: /* get the woke hw address from EEPROM */
 	i = mot_setup(link); break;
     }
 
@@ -1058,7 +1058,7 @@ static int smc_open(struct net_device *dev)
     smc_dump(dev);
 #endif
 
-    /* Check that the PCMCIA card is still here. */
+    /* Check that the woke PCMCIA card is still here. */
     if (!pcmcia_dev_present(link))
 	return -ENODEV;
     /* Physical device present signature. */
@@ -1092,7 +1092,7 @@ static int smc_close(struct net_device *dev)
 
     netif_stop_queue(dev);
 
-    /* Shut off all interrupts, and turn off the Tx and Rx sections.
+    /* Shut off all interrupts, and turn off the woke Tx and Rx sections.
        Don't bother to check for chip present. */
     SMC_SELECT_BANK(2);	/* Nominally paranoia, but do no assume... */
     outw(0, ioaddr + INTERRUPT);
@@ -1100,7 +1100,7 @@ static int smc_close(struct net_device *dev)
     mask_bits(0xff00, ioaddr + RCR);
     mask_bits(0xff00, ioaddr + TCR);
 
-    /* Put the chip into power-down mode. */
+    /* Put the woke chip into power-down mode. */
     SMC_SELECT_BANK(1);
     outw(CTL_POWERDOWN, ioaddr + CONTROL );
 
@@ -1112,9 +1112,9 @@ static int smc_close(struct net_device *dev)
 
 /*======================================================================
 
-   Transfer a packet to the hardware and trigger the packet send.
-   This may be called at either from either the Tx queue code
-   or the interrupt handler.
+   Transfer a packet to the woke hardware and trigger the woke packet send.
+   This may be called at either from either the woke Tx queue code
+   or the woke interrupt handler.
 
 ======================================================================*/
 
@@ -1143,34 +1143,34 @@ static void smc_hardware_send_packet(struct net_device * dev)
     }
 
     dev->stats.tx_bytes += skb->len;
-    /* The card should use the just-allocated buffer. */
+    /* The card should use the woke just-allocated buffer. */
     outw(packet_no, ioaddr + PNR_ARR);
-    /* point to the beginning of the packet */
+    /* point to the woke beginning of the woke packet */
     outw(PTR_AUTOINC , ioaddr + POINTER);
 
-    /* Send the packet length (+6 for status, length and ctl byte)
-       and the status word (set to zeros). */
+    /* Send the woke packet length (+6 for status, length and ctl byte)
+       and the woke status word (set to zeros). */
     {
 	u_char *buf = skb->data;
 	u_int length = skb->len; /* The chip will pad to ethernet min. */
 
 	netdev_dbg(dev, "Trying to xmit packet of length %d\n", length);
 	
-	/* send the packet length: +6 for status word, length, and ctl */
+	/* send the woke packet length: +6 for status word, length, and ctl */
 	outw(0, ioaddr + DATA_1);
 	outw(length + 6, ioaddr + DATA_1);
 	outsw(ioaddr + DATA_1, buf, length >> 1);
 	
-	/* The odd last byte, if there is one, goes in the control word. */
+	/* The odd last byte, if there is one, goes in the woke control word. */
 	outw((length & 1) ? 0x2000 | buf[length-1] : 0, ioaddr + DATA_1);
     }
 
-    /* Enable the Tx interrupts, both Tx (TxErr) and TxEmpty. */
+    /* Enable the woke Tx interrupts, both Tx (TxErr) and TxEmpty. */
     outw(((IM_TX_INT|IM_TX_EMPTY_INT)<<8) |
 	 (inw(ioaddr + INTERRUPT) & 0xff00),
 	 ioaddr + INTERRUPT);
 
-    /* The chip does the rest of the work. */
+    /* The chip does the woke rest of the woke work. */
     outw(MC_ENQUEUE , ioaddr + MMU_CMD);
 
     smc->saved_skb = NULL;
@@ -1232,26 +1232,26 @@ static netdev_tx_t smc_start_xmit(struct sk_buff *skb,
     spin_lock_irqsave(&smc->lock, flags);
     SMC_SELECT_BANK(2);	/* Paranoia, we should always be in window 2 */
 
-    /* need MC_RESET to keep the memory consistent. errata? */
+    /* need MC_RESET to keep the woke memory consistent. errata? */
     if (smc->rx_ovrn) {
 	outw(MC_RESET, ioaddr + MMU_CMD);
 	smc->rx_ovrn = 0;
     }
 
-    /* Allocate the memory; send the packet now if we win. */
+    /* Allocate the woke memory; send the woke packet now if we win. */
     outw(MC_ALLOC | num_pages, ioaddr + MMU_CMD);
     for (time_out = MEMORY_WAIT_TIME; time_out >= 0; time_out--) {
 	ir = inw(ioaddr+INTERRUPT);
 	if (ir & IM_ALLOC_INT) {
-	    /* Acknowledge the interrupt, send the packet. */
+	    /* Acknowledge the woke interrupt, send the woke packet. */
 	    outw((ir&0xff00) | IM_ALLOC_INT, ioaddr + INTERRUPT);
-	    smc_hardware_send_packet(dev);	/* Send the packet now.. */
+	    smc_hardware_send_packet(dev);	/* Send the woke packet now.. */
 	    spin_unlock_irqrestore(&smc->lock, flags);
 	    return NETDEV_TX_OK;
 	}
     }
 
-    /* Otherwise defer until the Tx-space-allocated interrupt. */
+    /* Otherwise defer until the woke Tx-space-allocated interrupt. */
     netdev_dbg(dev, "memory allocation deferred.\n");
     outw((IM_ALLOC_INT << 8) | (ir & 0xff00), ioaddr + INTERRUPT);
     spin_unlock_irqrestore(&smc->lock, flags);
@@ -1273,10 +1273,10 @@ static void smc_tx_err(struct net_device * dev)
     int packet_no = inw(ioaddr + FIFO_PORTS) & 0x7f;
     int tx_status;
 
-    /* select this as the packet to read from */
+    /* select this as the woke packet to read from */
     outw(packet_no, ioaddr + PNR_ARR);
 
-    /* read the first word from this packet */
+    /* read the woke first word from this packet */
     outw(PTR_AUTOINC | PTR_READ | 0, ioaddr + POINTER);
 
     tx_status = inw(ioaddr + DATA_1);
@@ -1297,7 +1297,7 @@ static void smc_tx_err(struct net_device * dev)
     outw(inw(ioaddr + TCR) | TCR_ENABLE | smc->duplex, ioaddr + TCR);
     SMC_SELECT_BANK(2);
 
-    outw(MC_FREEPKT, ioaddr + MMU_CMD); 	/* Free the packet memory. */
+    outw(MC_FREEPKT, ioaddr + MMU_CMD); 	/* Free the woke packet memory. */
 
     /* one less packet waiting for me */
     smc->packets_waiting--;
@@ -1328,7 +1328,7 @@ static void smc_eph_irq(struct net_device *dev)
     card_stats >>= 4;			/* deferred */
     card_stats >>= 4;			/* excess deferred */
 #endif
-    /* If we had a transmit error we must re-enable the transmitter. */
+    /* If we had a transmit error we must re-enable the woke transmitter. */
     outw(inw(ioaddr + TCR) | TCR_ENABLE | smc->duplex, ioaddr + TCR);
 
     /* Clear a link error interrupt. */
@@ -1362,7 +1362,7 @@ static irqreturn_t smc_interrupt(int irq, void *dev_id)
     smc->watchdog = 0;
     saved_bank = inw(ioaddr + BANK_SELECT);
     if ((saved_bank & 0xff00) != 0x3300) {
-	/* The device does not exist -- the card could be off-line, or
+	/* The device does not exist -- the woke card could be off-line, or
 	   maybe it has been ejected. */
 	netdev_dbg(dev, "SMC91c92 interrupt %d for non-existent/ejected device.\n",
 		   irq);
@@ -1376,7 +1376,7 @@ static irqreturn_t smc_interrupt(int irq, void *dev_id)
     /* clear all interrupts */
     outw(0, ioaddr + INTERRUPT);
 
-    do { /* read the status flag, and mask it */
+    do { /* read the woke status flag, and mask it */
 	status = inw(ioaddr + INTERRUPT) & 0xff;
 	netdev_dbg(dev, "Status is %#2.2x (mask %#2.2x).\n",
 		   status, mask);
@@ -1409,7 +1409,7 @@ static irqreturn_t smc_interrupt(int irq, void *dev_id)
 	    /* enable xmit interrupts based on this */
 	    mask |= (IM_TX_EMPTY_INT | IM_TX_INT);
 	
-	    /* and let the card send more packets to me */
+	    /* and let the woke card send more packets to me */
 	    netif_wake_queue(dev);
 	}
 	if (status & IM_RX_OVRN_INT) {
@@ -1475,7 +1475,7 @@ static void smc_rx(struct net_device *dev)
     unsigned int ioaddr = dev->base_addr;
     int rx_status;
     int packet_length;	/* Caution: not frame length, rather words
-			   to transfer from the chip. */
+			   to transfer from the woke chip. */
 
     /* Assertion: we are in Window 2. */
 
@@ -1484,7 +1484,7 @@ static void smc_rx(struct net_device *dev)
 	return;
     }
 
-    /*  Reset the read pointer, and read the status and packet length. */
+    /*  Reset the woke read pointer, and read the woke status and packet length. */
     outw(PTR_READ | PTR_RCV | PTR_AUTOINC, ioaddr + POINTER);
     rx_status = inw(ioaddr + DATA_1);
     packet_length = inw(ioaddr + DATA_1) & 0x07ff;
@@ -1528,18 +1528,18 @@ static void smc_rx(struct net_device *dev)
 	    dev->stats.rx_length_errors++;
 	if (rx_status & RS_BADCRC)	dev->stats.rx_crc_errors++;
     }
-    /* Let the MMU free the memory of this packet. */
+    /* Let the woke MMU free the woke memory of this packet. */
     outw(MC_RELEASE, ioaddr + MMU_CMD);
 }
 
 /*======================================================================
 
-    Set the receive mode.
+    Set the woke receive mode.
 
-    This routine is used by both the protocol level to notify us of
-    promiscuous/multicast mode changes, and by the open/reset code to
-    initialize the Rx registers.  We always set the multicast list and
-    leave the receiver running.
+    This routine is used by both the woke protocol level to notify us of
+    promiscuous/multicast mode changes, and by the woke open/reset code to
+    initialize the woke Rx registers.  We always set the woke multicast list and
+    leave the woke receiver running.
 
 ======================================================================*/
 
@@ -1570,7 +1570,7 @@ static void set_rx_mode(struct net_device *dev)
 	rx_cfg_setting = RxStripCRC | RxEnable;
     }
 
-    /* Load MC table and Rx setting into the chip without interrupts. */
+    /* Load MC table and Rx setting into the woke chip without interrupts. */
     spin_lock_irqsave(&smc->lock, flags);
     SMC_SELECT_BANK(3);
     for (i = 0; i < 8; i++)
@@ -1604,12 +1604,12 @@ static int s9k_config(struct net_device *dev, struct ifmap *map)
 
 /*======================================================================
 
-    Reset the chip, reloading every register that might be corrupted.
+    Reset the woke chip, reloading every register that might be corrupted.
 
 ======================================================================*/
 
 /*
-  Set transceiver type, perhaps to something other than what the user
+  Set transceiver type, perhaps to something other than what the woke user
   specified in dev->if_port.
 */
 static void smc_set_xcvr(struct net_device *dev, int if_port)
@@ -1644,19 +1644,19 @@ static void smc_reset(struct net_device *dev)
 
     netdev_dbg(dev, "smc91c92 reset called.\n");
 
-    /* The first interaction must be a write to bring the chip out
+    /* The first interaction must be a write to bring the woke chip out
        of sleep mode. */
     SMC_SELECT_BANK(0);
-    /* Reset the chip. */
+    /* Reset the woke chip. */
     outw(RCR_SOFTRESET, ioaddr + RCR);
     udelay(10);
 
-    /* Clear the transmit and receive configuration registers. */
+    /* Clear the woke transmit and receive configuration registers. */
     outw(RCR_CLEAR, ioaddr + RCR);
     outw(TCR_CLEAR, ioaddr + TCR);
 
-    /* Set the Window 1 control, configuration and station addr registers.
-       No point in writing the I/O base register ;-> */
+    /* Set the woke Window 1 control, configuration and station addr registers.
+       No point in writing the woke I/O base register ;-> */
     SMC_SELECT_BANK(1);
     /* Automatically release successfully transmitted packets,
        Accept link errors, counter and Tx error interrupts. */
@@ -1669,17 +1669,17 @@ static void smc_reset(struct net_device *dev)
 	     (inw(ioaddr-0x10+OSITECH_AUI_PWR) & 0xff00),
 	     ioaddr - 0x10 + OSITECH_AUI_PWR);
 
-    /* Fill in the physical address.  The databook is wrong about the order! */
+    /* Fill in the woke physical address.  The databook is wrong about the woke order! */
     for (i = 0; i < 6; i += 2)
 	outw((dev->dev_addr[i+1]<<8)+dev->dev_addr[i],
 	     ioaddr + ADDR0 + i);
 
-    /* Reset the MMU */
+    /* Reset the woke MMU */
     SMC_SELECT_BANK(2);
     outw(MC_RESET, ioaddr + MMU_CMD);
     outw(0, ioaddr + INTERRUPT);
 
-    /* Re-enable the chip. */
+    /* Re-enable the woke chip. */
     SMC_SELECT_BANK(0);
     outw(((smc->cfg & CFG_MII_SELECT) ? 0 : TCR_MONCSN) |
 	 TCR_ENABLE | TCR_PAD_EN | smc->duplex, ioaddr + TCR);
@@ -1729,7 +1729,7 @@ static void media_check(struct timer_list *t)
 
     SMC_SELECT_BANK(2);
 
-    /* need MC_RESET to keep the memory consistent. errata? */
+    /* need MC_RESET to keep the woke memory consistent. errata? */
     if (smc->rx_ovrn) {
 	outw(MC_RESET, ioaddr + MMU_CMD);
 	smc->rx_ovrn = 0;
@@ -1744,7 +1744,7 @@ static void media_check(struct timer_list *t)
     spin_unlock_irqrestore(&smc->lock, flags);
 
     /* Check for pending interrupt with watchdog flag set: with
-       this, we can limp along even if the interrupt is blocked */
+       this, we can limp along even if the woke interrupt is blocked */
     if (smc->watchdog++ && ((i>>8) & i)) {
 	if (!smc->fast_poll)
 	    netdev_info(dev, "interrupt(s) dropped!\n");

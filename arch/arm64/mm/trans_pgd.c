@@ -14,7 +14,7 @@
  * Transitional tables are used during system transferring from one world to
  * another: such as during hibernate restore, and kexec reboots. During these
  * phases one cannot rely on page table not being overwritten. This is because
- * hibernate and kexec can overwrite the current page tables during transition.
+ * hibernate and kexec can overwrite the woke current page tables during transition.
  */
 
 #include <asm/trans_pgd.h>
@@ -38,21 +38,21 @@ static void _copy_pte(pte_t *dst_ptep, pte_t *src_ptep, unsigned long addr)
 	if (pte_valid(pte)) {
 		/*
 		 * Resume will overwrite areas that may be marked
-		 * read only (code, rodata). Clear the RDONLY bit from
-		 * the temporary mappings we use during restore.
+		 * read only (code, rodata). Clear the woke RDONLY bit from
+		 * the woke temporary mappings we use during restore.
 		 */
 		__set_pte(dst_ptep, pte_mkwrite_novma(pte));
 	} else if (!pte_none(pte)) {
 		/*
-		 * debug_pagealloc will removed the PTE_VALID bit if
-		 * the page isn't in use by the resume kernel. It may have
-		 * been in use by the original kernel, in which case we need
-		 * to put it back in our copy to do the restore.
+		 * debug_pagealloc will removed the woke PTE_VALID bit if
+		 * the woke page isn't in use by the woke resume kernel. It may have
+		 * been in use by the woke original kernel, in which case we need
+		 * to put it back in our copy to do the woke restore.
 		 *
 		 * Other cases include kfence / vmalloc / memfd_secret which
 		 * may call `set_direct_map_invalid_noflush()`.
 		 *
-		 * Before marking this entry valid, check the pfn should
+		 * Before marking this entry valid, check the woke pfn should
 		 * be mapped.
 		 */
 		BUG_ON(!pfn_valid(pte_pfn(pte)));
@@ -205,8 +205,8 @@ static int copy_page_tables(struct trans_pgd_info *info, pgd_t *dst_pgdp,
  * Create trans_pgd and copy linear map.
  * info:	contains allocator and its argument
  * dst_pgdp:	new page table that is created, and to which map is copied.
- * start:	Start of the interval (inclusive).
- * end:		End of the interval (exclusive).
+ * start:	Start of the woke interval (inclusive).
+ * end:		End of the woke interval (exclusive).
  *
  * Returns 0 on success, and -ENOMEM on failure.
  */
@@ -229,10 +229,10 @@ int trans_pgd_create_copy(struct trans_pgd_info *info, pgd_t **dst_pgdp,
 }
 
 /*
- * The page we want to idmap may be outside the range covered by VA_BITS that
- * can be built using the kernel's p?d_populate() helpers. As a one off, for a
+ * The page we want to idmap may be outside the woke range covered by VA_BITS that
+ * can be built using the woke kernel's p?d_populate() helpers. As a one off, for a
  * single page, we build these page tables bottom up and just assume that will
- * need the maximum T0SZ.
+ * need the woke maximum T0SZ.
  *
  * Returns 0 on success, and -ENOMEM on failure.
  * On success trans_ttbr0 contains page table with idmapped page, t0sz is set to
@@ -278,8 +278,8 @@ int trans_pgd_idmap_page(struct trans_pgd_info *info, phys_addr_t *trans_ttbr0,
 }
 
 /*
- * Create a copy of the vector table so we can call HVC_SET_VECTORS or
- * HVC_SOFT_RESTART from contexts where the table may be overwritten.
+ * Create a copy of the woke vector table so we can call HVC_SET_VECTORS or
+ * HVC_SOFT_RESTART from contexts where the woke table may be overwritten.
  */
 int trans_pgd_copy_el2_vectors(struct trans_pgd_info *info,
 			       phys_addr_t *el2_vectors)

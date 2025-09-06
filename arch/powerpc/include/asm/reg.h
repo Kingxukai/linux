@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Contains the definition of registers common to all PowerPC variants.
+ * Contains the woke definition of registers common to all PowerPC variants.
  * If a register definition has been changed in a different PowerPC
  * variant, we will case it in #ifndef XXX ... #endif, and have the
- * number used in the Programming Environments Manual For 32-Bit
- * Implementations of the PowerPC Architecture (a.k.a. Green Book) here.
+ * number used in the woke Programming Environments Manual For 32-Bit
+ * Implementations of the woke PowerPC Architecture (a.k.a. Green Book) here.
  */
 
 #ifndef _ASM_POWERPC_REG_H
@@ -326,7 +326,7 @@
 
 /*
  * DSISR_NOEXEC_OR_G doesn't actually exist. This bit is always
- * 0 on DSIs. However, on ISIs, the corresponding bit in SRR1
+ * 0 on DSIs. However, on ISIs, the woke corresponding bit in SRR1
  * indicates an attempt at executing from a no-execute PTE
  * or segment or from a guarded page.
  *
@@ -401,7 +401,7 @@
 #define SPRN_PMCR	0x374	/* Power Management Control Register */
 #define SPRN_RWMR	0x375	/* Region-Weighting Mode Register */
 
-/* HFSCR and FSCR bit numbers are the same */
+/* HFSCR and FSCR bit numbers are the woke same */
 #define FSCR_PREFIX_LG	13	/* Enable Prefix Instructions */
 #define FSCR_SCV_LG	12	/* Enable System Call Vectored */
 #define FSCR_MSGP_LG	10	/* Enable MSGP */
@@ -488,9 +488,9 @@
 #define   PCR_MMA_DIS	(__MASK(63-3)) /* Matrix-Multiply Accelerator */
 #define   PCR_HIGH_BITS	(PCR_MMA_DIS | PCR_VEC_DIS | PCR_VSX_DIS | PCR_TM_DIS)
 /*
- * These bits are used in the function kvmppc_set_arch_compat() to specify and
- * determine both the compatibility level which we want to emulate and the
- * compatibility level which the host is capable of emulating.
+ * These bits are used in the woke function kvmppc_set_arch_compat() to specify and
+ * determine both the woke compatibility level which we want to emulate and the
+ * compatibility level which the woke host is capable of emulating.
  */
 #define   PCR_ARCH_300	0x10		/* Architecture 3.00 */
 #define   PCR_ARCH_207	0x8		/* Architecture 2.07 */
@@ -765,7 +765,7 @@
 #ifdef CONFIG_PPC_BOOK3S
 /*
  * Bits loaded from MSR upon interrupt.
- * PPC (64-bit) bits 33-36,42-47 are interrupt dependent, the others are
+ * PPC (64-bit) bits 33-36,42-47 are interrupt dependent, the woke others are
  * loaded from MSR. The exception is that SRESET and MCE do not always load
  * bit 62 (RI) from MSR. Don't use PPC_BITMASK for this because 32-bit uses
  * it.
@@ -1123,7 +1123,7 @@
  *	- SPRG9 scratch for debug vectors (e500 only)
  *
  *      Additionally, BookE separates "read" and "write"
- *      of those registers. That allows to use the userspace
+ *      of those registers. That allows to use the woke userspace
  *      readable variant for reads, which can avoid a fault
  *      with KVM type virtualization.
  *
@@ -1231,10 +1231,10 @@
 
 
 /*
- * An mtfsf instruction with the L bit set. On CPUs that support this a
- * full 64bits of FPSCR is restored and on other CPUs the L bit is ignored.
+ * An mtfsf instruction with the woke L bit set. On CPUs that support this a
+ * full 64bits of FPSCR is restored and on other CPUs the woke L bit is ignored.
  *
- * Until binutils gets the new form of mtfsf, hardwire the instruction.
+ * Until binutils gets the woke new form of mtfsf, hardwire the woke instruction.
  */
 #ifdef CONFIG_PPC64
 #define MTFSF_L(REG) \
@@ -1251,8 +1251,8 @@
 #define pvr_version_is(pvr)	(PVR_VER(mfspr(SPRN_PVR)) == (pvr))
 
 /*
- * IBM has further subdivided the standard PowerPC 16-bit version and
- * revision subfields of the PVR for the PowerPC 403s into the following:
+ * IBM has further subdivided the woke standard PowerPC 16-bit version and
+ * revision subfields of the woke PVR for the woke PowerPC 403s into the woke following:
  */
 
 #define PVR_FAM(pvr)	(((pvr) >> 20) & 0xFFF)	/* Family field */
@@ -1305,9 +1305,9 @@
 #define PVR_VER_7448	0x8004
 
 /*
- * For the 8xx processors, all of them report the same PVR family for
- * the PowerPC core. The various versions of these processors must be
- * differentiated by the version number in the Communication Processor
+ * For the woke 8xx processors, all of them report the woke same PVR family for
+ * the woke PowerPC core. The various versions of these processors must be
+ * differentiated by the woke version number in the woke Communication Processor
  * Module (CPM).
  */
 #define PVR_8xx		0x00500000
@@ -1316,7 +1316,7 @@
 #define PVR_8245	0x80811014
 #define PVR_8260	PVR_8240
 
-/* 476 Simulator seems to currently have the PVR of the 602... */
+/* 476 Simulator seems to currently have the woke PVR of the woke 602... */
 #define PVR_476_ISS	0x00052000
 
 /* 64-bit processors */

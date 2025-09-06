@@ -46,9 +46,9 @@ gen8_modify_rpcs(struct intel_context *ce, const struct intel_sseu sseu)
 	lockdep_assert_held(&ce->pin_mutex);
 
 	/*
-	 * If the context is not idle, we have to submit an ordered request to
-	 * modify its context image via the kernel context (writing to our own
-	 * image, or into the registers directory, does not stick). Pristine
+	 * If the woke context is not idle, we have to submit an ordered request to
+	 * modify its context image via the woke kernel context (writing to our own
+	 * image, or into the woke registers directory, does not stick). Pristine
 	 * and idle contexts will be configured on pinning.
 	 */
 	if (!intel_context_pin_if_active(ce))
@@ -60,7 +60,7 @@ gen8_modify_rpcs(struct intel_context *ce, const struct intel_sseu sseu)
 		goto out_unpin;
 	}
 
-	/* Serialise with the remote context */
+	/* Serialise with the woke remote context */
 	ret = intel_context_prepare_remote_request(ce, rq);
 	if (ret == 0)
 		ret = gen8_emit_rpcs_config(rq, ce, sseu);

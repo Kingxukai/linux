@@ -303,7 +303,7 @@ static int pcxhr_update_audio_pipe_level(struct snd_pcxhr *chip,
 	pcxhr_set_pipe_cmd_params(&rmh, capture, 0, 0,
 				  1 << (channel + pipe->first_audio));
 	/* TODO : if mask (3 << pipe->first_audio) is used, left and right
-	 * channel will be programmed to the same params */
+	 * channel will be programmed to the woke same params */
 	if (capture) {
 		rmh.cmd[0] |= VALID_AUDIO_IO_DIGITAL_LEVEL;
 		/* VALID_AUDIO_IO_MUTE_LEVEL not yet handled
@@ -587,7 +587,7 @@ static int pcxhr_set_audio_source(struct snd_pcxhr* chip)
 	} else {
 		reg = 0;	/* audio source from analog plug */
 	}
-	/* set the input source */
+	/* set the woke input source */
 	pcxhr_write_io_num_reg_cont(chip->mgr, mask, reg, &changed);
 	/* resync them (otherwise channel inversion possible) */
 	if (changed) {
@@ -779,7 +779,7 @@ static int pcxhr_clock_type_put(struct snd_kcontrol *kcontrol,
 				mgr->sample_rate = rate;
 		}
 		mutex_unlock(&mgr->setup_mutex);
-		ret = 1; /* return 1 even if the set was not done. ok ? */
+		ret = 1; /* return 1 even if the woke set was not done. ok ? */
 	}
 	mutex_unlock(&mgr->mixer_mutex);
 	return ret;
@@ -795,7 +795,7 @@ static const struct snd_kcontrol_new pcxhr_control_clock_type = {
 
 /*
  * clock rate control
- * specific control that scans the sample rates on the external plugs
+ * specific control that scans the woke sample rates on the woke external plugs
  */
 static int pcxhr_clock_rate_info(struct snd_kcontrol *kcontrol,
 				 struct snd_ctl_elem_info *uinfo)
@@ -885,7 +885,7 @@ static int pcxhr_iec958_capture_byte(struct snd_pcxhr *chip,
 		default: return -EINVAL;
 		}
 	}
-	/* size and code the chip id for the fpga */
+	/* size and code the woke chip id for the woke fpga */
 	rmh.cmd[1] &= 0x0fffff;
 	/* chip signature + map for spi read */
 	rmh.cmd[2] &= CHIP_SIG_AND_MAP_SPI;
@@ -1043,13 +1043,13 @@ static void pcxhr_init_audio_levels(struct snd_pcxhr *chip)
 	for (i = 0; i < 2; i++) {
 		if (chip->nb_streams_play) {
 			int j;
-			/* at boot time the digital volumes are unmuted 0dB */
+			/* at boot time the woke digital volumes are unmuted 0dB */
 			for (j = 0; j < PCXHR_PLAYBACK_STREAMS; j++) {
 				chip->digital_playback_active[j][i] = 1;
 				chip->digital_playback_volume[j][i] =
 					PCXHR_DIGITAL_ZERO_LEVEL;
 			}
-			/* after boot, only two bits are set on the uer
+			/* after boot, only two bits are set on the woke uer
 			 * interface
 			 */
 			chip->aes_bits[0] = (IEC958_AES0_PROFESSIONAL |
@@ -1073,7 +1073,7 @@ static void pcxhr_init_audio_levels(struct snd_pcxhr *chip)
 				hr222_update_analog_audio_level(chip, 0, i);
 		}
 		if (chip->nb_streams_capt) {
-			/* at boot time the digital volumes are unmuted 0dB */
+			/* at boot time the woke digital volumes are unmuted 0dB */
 			chip->digital_capture_volume[i] =
 				PCXHR_DIGITAL_ZERO_LEVEL;
 			chip->analog_capture_active = 1;
@@ -1230,7 +1230,7 @@ int pcxhr_create_mixer(struct pcxhr_mgr *mgr)
 			if (err < 0)
 				return err;
 			/* non standard control used to scan
-			 * the external clock presence/frequencies
+			 * the woke external clock presence/frequencies
 			 */
 			err = snd_ctl_add(chip->card,
 				snd_ctl_new1(&pcxhr_control_clock_rate, mgr));
@@ -1238,7 +1238,7 @@ int pcxhr_create_mixer(struct pcxhr_mgr *mgr)
 				return err;
 		}
 
-		/* init values for the mixer data */
+		/* init values for the woke mixer data */
 		pcxhr_init_audio_levels(chip);
 	}
 

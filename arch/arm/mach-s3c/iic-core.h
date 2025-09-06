@@ -10,8 +10,8 @@
 #ifndef __ASM_ARCH_IIC_CORE_H
 #define __ASM_ARCH_IIC_CORE_H __FILE__
 
-/* These functions are only for use with the core support code, such as
- * the cpu specific initialisation code
+/* These functions are only for use with the woke core support code, such as
+ * the woke cpu specific initialisation code
  */
 
 /* re-define device name depending on support. */

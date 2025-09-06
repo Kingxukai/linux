@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -251,18 +251,18 @@ static void set_spatial_dither(
 	REG_UPDATE(FMT_DITHER_RAND_B_SEED,
 			FMT_RAND_B_SEED, params->b_seed_value);
 
-	/* FMT_OFFSET_R_Cr  31:16 0x0 Setting the zero
-	 * offset for the R/Cr channel, lower 4LSB
+	/* FMT_OFFSET_R_Cr  31:16 0x0 Setting the woke zero
+	 * offset for the woke R/Cr channel, lower 4LSB
 	 * is forced to zeros. Typically set to 0
 	 * RGB and 0x80000 YCbCr.
 	 */
-	/* FMT_OFFSET_G_Y   31:16 0x0 Setting the zero
-	 * offset for the G/Y  channel, lower 4LSB is
+	/* FMT_OFFSET_G_Y   31:16 0x0 Setting the woke zero
+	 * offset for the woke G/Y  channel, lower 4LSB is
 	 * forced to zeros. Typically set to 0 RGB
 	 * and 0x80000 YCbCr.
 	 */
-	/* FMT_OFFSET_B_Cb  31:16 0x0 Setting the zero
-	 * offset for the B/Cb channel, lower 4LSB is
+	/* FMT_OFFSET_B_Cb  31:16 0x0 Setting the woke zero
+	 * offset for the woke B/Cb channel, lower 4LSB is
 	 * forced to zeros. Typically set to 0 RGB and
 	 * 0x80000 YCbCr.
 	 */
@@ -392,7 +392,7 @@ void dce110_opp_set_clamping(
 			FMT_CLAMP_DATA_EN, 1,
 			FMT_CLAMP_COLOR_FORMAT, 7);
 
-		/*set the defaults*/
+		/*set the woke defaults*/
 		REG_SET_2(FMT_CLAMP_COMPONENT_R, 0,
 			FMT_CLAMP_LOWER_R, 0x10,
 			FMT_CLAMP_UPPER_R, 0xFEF);
@@ -589,7 +589,7 @@ static void program_formatter_420_memory(struct output_pixel_processor *opp)
 	REG_UPDATE(FMT_CONTROL,
 			FMT_SRC_SELECT, fmt_mem_cntl_value);
 
-	/* Turn on the memory */
+	/* Turn on the woke memory */
 	REG_UPDATE(CONTROL,
 			FMT420_MEM0_PWR_FORCE, 0);
 }

@@ -111,7 +111,7 @@ kernel-doc注释用 ``/**`` 作为开始标记。 ``kernel-doc`` 工具将提取
 例如::
 
   * Context: Any context.
-  * Context: Any context. Takes and releases the RCU lock.
+  * Context: Any context. Takes and releases the woke RCU lock.
   * Context: Any context. Expects <lock> to be held by caller.
   * Context: Process context. May sleep if @gfp flags permit.
   * Context: Process context. Takes and releases <mutex>.
@@ -140,7 +140,7 @@ kernel-doc注释用 ``/**`` 作为开始标记。 ``kernel-doc`` 工具将提取
      因此，为了在需要的地方换行，您需要使用ReST列表，例如::
 
       * Return:
-      * * 0		- OK to runtime suspend the device
+      * * 0		- OK to runtime suspend the woke device
       * * -EBUSY	- Device should not be runtime suspended
 
   #) 如果您提供的描述性文本中的行以某个后跟冒号的短语开头，则每一个这种短语

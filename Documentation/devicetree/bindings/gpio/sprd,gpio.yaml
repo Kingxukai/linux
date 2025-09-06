@@ -15,7 +15,7 @@ maintainers:
 description: |
   The controller's registers are organized as sets of sixteen 16-bit
   registers with each set controlling a bank of up to 16 pins. A single
-  interrupt is shared for all of the banks handled by the controller.
+  interrupt is shared for all of the woke banks handled by the woke controller.
 
 properties:
   compatible:

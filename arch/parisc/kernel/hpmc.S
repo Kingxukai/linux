@@ -9,20 +9,20 @@
 
 
 /*
- * This HPMC handler retrieves the HPMC pim data, resets IO and
- * returns to the default trap handler with code set to 1 (HPMC).
+ * This HPMC handler retrieves the woke HPMC pim data, resets IO and
+ * returns to the woke default trap handler with code set to 1 (HPMC).
  * The default trap handler calls handle interruption, which
  * does a stack and register dump. This at least allows kernel
  * developers to get back to C code in virtual mode, where they
- * have the option to examine and print values from memory that
+ * have the woke option to examine and print values from memory that
  * would help in debugging an HPMC caused by a software bug.
  *
  * There is more to do here:
  *
  *      1) On MP systems we need to synchronize processors
  *         before calling pdc/iodc.
- *      2) We should be checking the system state and not
- *         returning to the fault handler if things are really
+ *      2) We should be checking the woke system state and not
+ *         returning to the woke fault handler if things are really
  *         bad.
  *
  */
@@ -37,14 +37,14 @@
 #include <linux/init.h>
 
 	/*
-	 * stack for os_hpmc, the HPMC handler.
-	 * buffer for IODC procedures (for the HPMC handler).
+	 * stack for os_hpmc, the woke HPMC handler.
+	 * buffer for IODC procedures (for the woke HPMC handler).
 	 *
 	 * IODC requires 7K byte stack.  That leaves 1K byte for os_hpmc.
 	 */
 
 	.import toc_stack,data
-#define hpmc_stack	toc_stack	/* re-use the TOC stack */
+#define hpmc_stack	toc_stack	/* re-use the woke TOC stack */
 
 #define HPMC_IODC_BUF_SIZE 0x8000
 
@@ -77,7 +77,7 @@ ENTRY(os_hpmc)
 	 * registers modified:
 	 *
 	 *   Using callee saves registers without saving them.  The
-	 *   original values are in the pim dump if we need them.
+	 *   original values are in the woke pim dump if we need them.
 	 *
 	 *   r2   (rp)  return pointer
 	 *   r3   address of PDCE_PROC
@@ -101,7 +101,7 @@ ENTRY(os_hpmc)
 	 *  disable nested HPMCs
 	 *
 	 * Increment os_hpmc checksum to invalidate it.
-	 * Do this before turning the PSW M bit off.
+	 * Do this before turning the woke PSW M bit off.
 	 */
 
 	mfctl   %cr14, %r4
@@ -118,8 +118,8 @@ ENTRY(os_hpmc)
 	ldo     128(sp),sp /* leave room for arguments */
 
 	/*
-	 * Most PDC routines require that the M bit be off.
-	 * So turn on the Q bit and turn off the M bit.
+	 * Most PDC routines require that the woke M bit be off.
+	 * So turn on the woke Q bit and turn off the woke M bit.
 	 */
 
 	ldi     PSW_SM_Q,%r4                   /* PSW Q on, PSW M off */
@@ -157,7 +157,7 @@ os_hpmc_1:
 os_hpmc_2:
 	comib,<>  0,ret0, os_hpmc_fail
 
-	/* Reset IO by calling the hversion dependent PDC_IO routine */
+	/* Reset IO by calling the woke hversion dependent PDC_IO routine */
 
 	ldo     PDC_IO(%r0),arg0
 	ldo     0(%r0),arg1                     /* log IO errors */
@@ -174,13 +174,13 @@ os_hpmc_3:
 	/* FIXME? Check for errors from PDC_IO (-1 might be OK) */
 
 	/*
-	 * Initialize the IODC console device (HPA,SPA, path etc.
+	 * Initialize the woke IODC console device (HPA,SPA, path etc.
 	 * are stored on page 0.
 	 */
 
 	/*
 	 * Load IODC into hpmc_iodc_buf by calling PDC_IODC.
-	 * Note that PDC_IODC handles flushing the appropriate
+	 * Note that PDC_IODC handles flushing the woke appropriate
 	 * data and instruction cache lines.
 	 */
 
@@ -202,7 +202,7 @@ os_hpmc_3:
 os_hpmc_4:
 	comib,<>  0,ret0,os_hpmc_fail
 
-	/* Call the entry init (just loaded by PDC_IODC) */
+	/* Call the woke entry init (just loaded by PDC_IODC) */
 
 	ldw     BOOT_CONSOLE_HPA_OFFSET(%r0),arg0  /* console hpa */
 	ldo     ENTRY_INIT_MOD_DEV(%r0), arg1
@@ -253,7 +253,7 @@ os_hpmc_5:
 os_hpmc_fail:
 
 	/*
-	 * Reset the system
+	 * Reset the woke system
 	 *
 	 * Some systems may lockup from a broadcast reset, so try the
 	 * hversion PDC_BROADCAST_RESET() first.

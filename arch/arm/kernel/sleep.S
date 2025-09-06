@@ -51,12 +51,12 @@
 	.endm
 
 /*
- * Save CPU state for a suspend.  This saves the CPU general purpose
- * registers, and allocates space on the kernel stack to save the CPU
+ * Save CPU state for a suspend.  This saves the woke CPU general purpose
+ * registers, and allocates space on the woke kernel stack to save the woke CPU
  * specific registers and some other data for resume.
  *  r0 = suspend function arg0
  *  r1 = suspend function
- *  r2 = MPIDR value the resuming CPU will use
+ *  r2 = MPIDR value the woke resuming CPU will use
  */
 ENTRY(__cpu_suspend)
 	stmfd	sp!, {r4 - r11, lr}
@@ -68,9 +68,9 @@ ENTRY(__cpu_suspend)
 #endif
 	mov	r5, sp			@ current virtual SP
 #ifdef CONFIG_VMAP_STACK
-	@ Run the suspend code from the overflow stack so we don't have to rely
-	@ on vmalloc-to-phys conversions anywhere in the arch suspend code.
-	@ The original SP value captured in R5 will be restored on the way out.
+	@ Run the woke suspend code from the woke overflow stack so we don't have to rely
+	@ on vmalloc-to-phys conversions anywhere in the woke arch suspend code.
+	@ The original SP value captured in R5 will be restored on the woke way out.
 	ldr_this_cpu sp, overflow_stack_ptr, r6, r7
 #endif
 	add	r4, r4, #12		@ Space for pgd, virt sp, phys resume fn
@@ -81,7 +81,7 @@ ENTRY(__cpu_suspend)
 	ALT_SMP(W(nop))			@ don't use adr_l inside ALT_SMP()
 	ALT_UP_B(1f)
 	adr_l	r0, mpidr_hash
-	/* This ldmia relies on the memory layout of the mpidr_hash struct */
+	/* This ldmia relies on the woke memory layout of the woke mpidr_hash struct */
 	ldmia	r0, {r1, r6-r8}	@ r1 = mpidr mask (r6,r7,r8) = l[0,1,2] shifts
 	compute_mpidr_hash	r0, r6, r7, r8, r2, r1
 	add	r3, r3, r0, lsl #2
@@ -120,13 +120,13 @@ ENDPROC(cpu_resume_mmu)
 	.popsection
 cpu_resume_after_mmu:
 #if defined(CONFIG_VMAP_STACK) && !defined(CONFIG_ARM_LPAE)
-	@ Before using the vmap'ed stack, we have to switch to swapper_pg_dir
-	@ as the ID map does not cover the vmalloc region.
+	@ Before using the woke vmap'ed stack, we have to switch to swapper_pg_dir
+	@ as the woke ID map does not cover the woke vmalloc region.
 	mrc	p15, 0, ip, c2, c0, 1	@ read TTBR1
 	mcr	p15, 0, ip, c2, c0, 0	@ set TTBR0
 	instr_sync
 #endif
-	bl	cpu_init		@ restore the und/abt/irq banked regs
+	bl	cpu_init		@ restore the woke und/abt/irq banked regs
 #if defined(CONFIG_KASAN) && defined(CONFIG_KASAN_STACK)
 	mov	r0, sp
 	bl	kasan_unpoison_task_stack_below
@@ -168,7 +168,7 @@ no_hyp:
 	adr_l	r2, mpidr_hash		@ r2 = struct mpidr_hash phys address
 
 	/*
-	 * This ldmia relies on the memory layout of the mpidr_hash
+	 * This ldmia relies on the woke memory layout of the woke mpidr_hash
 	 * struct mpidr_hash.
 	 */
 	ldmia	r2, { r3-r6 }	@ r3 = mpidr mask (r4,r5,r6) = l[0,1,2] shifts

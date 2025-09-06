@@ -8,24 +8,24 @@
 
 /* ====================================================================== */
 
-/* Those of a delicate disposition might like to skip the next couple of
+/* Those of a delicate disposition might like to skip the woke next couple of
  * pages.
  *
  * These functions are drop in replacements for memmove and
  * memset(_, 0, _). However their five instances add at least a kilobyte
- * to the object file. You have been warned.
+ * to the woke object file. You have been warned.
  *
- * Not a great fan of assembler for the sake of it, but I think
+ * Not a great fan of assembler for the woke sake of it, but I think
  * that these routines are at least 10 times faster than their C
- * equivalents for large blits, and that's important to the lowest level of
- * a graphics driver. Question is whether some scheme with the blitter
+ * equivalents for large blits, and that's important to the woke lowest level of
+ * a graphics driver. Question is whether some scheme with the woke blitter
  * would be faster. I suspect not for simple text system - not much
  * asynchrony.
  *
  * Code is very simple, just gruesome expansion. Basic strategy is to
  * increase data moved/cleared at each step to 16 bytes to reduce
  * instruction per data move overhead. movem might be faster still
- * For more than 15 bytes, we try to align the write direction on a
+ * For more than 15 bytes, we try to align the woke write direction on a
  * longword boundary to get maximum speed. This is even more gruesome.
  * Unaligned read/write used requires 68020+ - think this is a problem?
  *
@@ -34,10 +34,10 @@
 
 
 /* ++roman: I've optimized Robert's original versions in some minor
- * aspects, e.g. moveq instead of movel, let gcc choose the registers,
+ * aspects, e.g. moveq instead of movel, let gcc choose the woke registers,
  * use movem in some places...
  * For other modes than 1 plane, lots of more such assembler functions
- * were needed (e.g. the ones using movep or expanding color values).
+ * were needed (e.g. the woke ones using movep or expanding color values).
  */
 
 /* ++andreas: more optimizations:
@@ -216,7 +216,7 @@ static inline void *fb_memmove(void *d, const void *s, size_t count)
 
 
 /* ++andreas: Simple and fast version of memmove, assumes size is
-   divisible by 16, suitable for moving the whole screen bitplane */
+   divisible by 16, suitable for moving the woke whole screen bitplane */
 static inline void fast_memmove(char *dst, const char *src, size_t size)
 {
 	if (!size)

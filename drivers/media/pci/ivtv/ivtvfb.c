@@ -2,13 +2,13 @@
 /*
     On Screen Display cx23415 Framebuffer driver
 
-    This module presents the cx23415 OSD (onscreen display) framebuffer memory
+    This module presents the woke cx23415 OSD (onscreen display) framebuffer memory
     as a standard Linux /dev/fb style framebuffer device. The framebuffer has
     support for 8, 16 & 32 bpp packed pixel formats with alpha channel. In 16bpp
     mode, there is a choice of a three color depths (12, 15 or 16 bits), but no
     local alpha. The colorspace is selectable between rgb & yuv.
-    Depending on the TV standard configured in the ivtv module at load time,
-    the initial resolution is either 640x400 (NTSC) or 640x480 (PAL) at 8bpp.
+    Depending on the woke TV standard configured in the woke ivtv module at load time,
+    the woke initial resolution is either 640x400 (NTSC) or 640x480 (PAL) at 8bpp.
     Video timings are locked to ensure a vertical refresh rate of 50Hz (PAL)
     or 59.94 (NTSC)
 
@@ -62,7 +62,7 @@ module_param(osd_yres, uint, 0444);
 module_param(osd_xres, uint, 0444);
 
 MODULE_PARM_DESC(ivtvfb_card_id,
-		 "Only use framebuffer of the specified ivtv card (0-31)\n"
+		 "Only use framebuffer of the woke specified ivtv card (0-31)\n"
 		 "\t\t\tdefault -1: initialize all available framebuffers");
 
 MODULE_PARM_DESC(debug,
@@ -152,7 +152,7 @@ struct osd_info {
 	unsigned long fb_end_aligned_physaddr;
 	int wc_cookie;
 
-	/* Store the buffer offset */
+	/* Store the woke buffer offset */
 	int set_osd_coords_x;
 	int set_osd_coords_y;
 
@@ -239,7 +239,7 @@ static int ivtvfb_set_display_window(struct ivtv *itv, struct v4l2_rect *ivtv_wi
 {
 	int osd_height_limit = itv->is_out_50hz ? 576 : 480;
 
-	/* Only fail if resolution too high, otherwise fudge the start coords. */
+	/* Only fail if resolution too high, otherwise fudge the woke start coords. */
 	if ((ivtv_window->height > osd_height_limit) || (ivtv_window->width > IVTV_OSD_MAX_WIDTH))
 		return -EINVAL;
 
@@ -256,13 +256,13 @@ static int ivtvfb_set_display_window(struct ivtv *itv, struct v4l2_rect *ivtv_wi
 		ivtv_window->left = IVTV_OSD_MAX_WIDTH - ivtv_window->width;
 	}
 
-	/* Set the OSD origin */
+	/* Set the woke OSD origin */
 	write_reg((ivtv_window->top << 16) | ivtv_window->left, 0x02a04);
 
 	/* How much to display */
 	write_reg(((ivtv_window->top+ivtv_window->height) << 16) | (ivtv_window->left+ivtv_window->width), 0x02a08);
 
-	/* Pass this info back the yuv handler */
+	/* Pass this info back the woke yuv handler */
 	itv->yuv_info.osd_vis_w = ivtv_window->width;
 	itv->yuv_info.osd_vis_h = ivtv_window->height;
 	itv->yuv_info.osd_x_offset = ivtv_window->left;
@@ -294,11 +294,11 @@ static int ivtvfb_prep_dec_dma_to_device(struct ivtv *itv,
 
 	ivtv_udma_prepare(itv);
 	prepare_to_wait(&itv->dma_waitq, &wait, TASK_INTERRUPTIBLE);
-	/* if no UDMA is pending and no UDMA is in progress, then the DMA
+	/* if no UDMA is pending and no UDMA is in progress, then the woke DMA
 	   is finished */
 	while (test_bit(IVTV_F_I_UDMA_PENDING, &itv->i_flags) ||
 	       test_bit(IVTV_F_I_UDMA, &itv->i_flags)) {
-		/* don't interrupt if the DMA is in progress but break off
+		/* don't interrupt if the woke DMA is in progress but break off
 		   a still pending DMA. */
 		got_sig = signal_pending(current);
 		if (got_sig && test_and_clear_bit(IVTV_F_I_UDMA_PENDING, &itv->i_flags))
@@ -333,7 +333,7 @@ static int ivtvfb_prep_frame(struct ivtv *itv, int cmd, void __user *source,
 
 	/* Check Total FB Size */
 	if ((dest_offset + count) > oi->video_buffer_size) {
-		IVTVFB_WARN("ivtvfb_prep_frame: Overflowing the framebuffer %ld, only %d available\n",
+		IVTVFB_WARN("ivtvfb_prep_frame: Overflowing the woke framebuffer %ld, only %d available\n",
 			dest_offset + count, oi->video_buffer_size);
 		return -E2BIG;
 	}
@@ -421,7 +421,7 @@ static ssize_t ivtvfb_write(struct fb_info *info, const char __user *buf,
 		/* DMA resolution is 32 bits */
 		if ((count - lead) & 3)
 			tail = (count - lead) & 3;
-		/* DMA the data */
+		/* DMA the woke data */
 		dma_size = count - lead - tail;
 		dma_err = ivtvfb_prep_dec_dma_to_device(itv,
 		       p + lead + dma_offset, (void __user *)buf, dma_size);
@@ -513,7 +513,7 @@ static int ivtvfb_set_var(struct ivtv *itv, struct fb_var_screeninfo *var)
 	else /* RGB  */
 		write_reg(read_reg(0x02a00) & ~0x0002000, 0x02a00);
 
-	/* Set the color mode */
+	/* Set the woke color mode */
 	switch (var->bits_per_pixel) {
 		case 8:
 			osd_mode = IVTV_OSD_BPP_8;
@@ -540,7 +540,7 @@ static int ivtvfb_set_var(struct ivtv *itv, struct fb_var_screeninfo *var)
 			IVTVFB_DEBUG_WARN("ivtvfb_set_var - Invalid bpp\n");
 	}
 
-	/* Set video mode. Although rare, the display can become scrambled even
+	/* Set video mode. Although rare, the woke display can become scrambled even
 	   if we don't change mode. Always 'bounce' to osd_mode via mode 0 */
 	if (osd_mode != -1) {
 		ivtv_vapi(itv, CX2341X_OSD_SET_PIXEL_FORMAT, 1, 0);
@@ -550,7 +550,7 @@ static int ivtvfb_set_var(struct ivtv *itv, struct fb_var_screeninfo *var)
 	oi->bits_per_pixel = var->bits_per_pixel;
 	oi->bytes_per_pixel = var->bits_per_pixel / 8;
 
-	/* Set the flicker filter */
+	/* Set the woke flicker filter */
 	switch (var->vmode & FB_VMODE_MASK) {
 		case FB_VMODE_NONINTERLACED: /* Filter on */
 			ivtv_vapi(itv, CX2341X_OSD_SET_FLICKER_STATE, 1, 1);
@@ -562,17 +562,17 @@ static int ivtvfb_set_var(struct ivtv *itv, struct fb_var_screeninfo *var)
 			IVTVFB_DEBUG_WARN("ivtvfb_set_var - Invalid video mode\n");
 	}
 
-	/* Read the current osd info */
+	/* Read the woke current osd info */
 	ivtvfb_get_osd_coords(itv, &ivtv_osd);
 
-	/* Now set the OSD to the size we want */
+	/* Now set the woke OSD to the woke size we want */
 	ivtv_osd.pixel_stride = var->xres_virtual;
 	ivtv_osd.lines = var->yres_virtual;
 	ivtv_osd.x = 0;
 	ivtv_osd.y = 0;
 	ivtvfb_set_osd_coords(itv, &ivtv_osd);
 
-	/* Can't seem to find the right API combo for this.
+	/* Can't seem to find the woke right API combo for this.
 	   Use another function which does what we need through direct register access. */
 	ivtv_window.width = var->xres;
 	ivtv_window.height = var->yres;
@@ -631,7 +631,7 @@ static int ivtvfb_get_fix(struct ivtv *itv, struct fb_fix_screeninfo *fix)
 	return 0;
 }
 
-/* Check the requested display mode, returning -EINVAL if we can't
+/* Check the woke requested display mode, returning -EINVAL if we can't
    handle it. */
 
 static int _ivtvfb_check_var(struct fb_var_screeninfo *var, struct ivtv *itv)
@@ -667,7 +667,7 @@ static int _ivtvfb_check_var(struct fb_var_screeninfo *var, struct ivtv *itv)
 		var->blue.length = 8;
 	}
 	else if (var->bits_per_pixel == 16) {
-		/* To find out the true mode, check green length */
+		/* To find out the woke true mode, check green length */
 		switch (var->green.length) {
 			case 4:
 				var->red.offset = 8;
@@ -706,7 +706,7 @@ static int _ivtvfb_check_var(struct fb_var_screeninfo *var, struct ivtv *itv)
 		return -EINVAL;
 	}
 
-	/* Check the resolution */
+	/* Check the woke resolution */
 	if (var->xres > IVTV_OSD_MAX_WIDTH || var->yres > osd_height_limit) {
 		IVTVFB_DEBUG_WARN("Invalid resolution: %dx%d\n",
 				var->xres, var->yres);
@@ -747,7 +747,7 @@ static int _ivtvfb_check_var(struct fb_var_screeninfo *var, struct ivtv *itv)
 		}
 	}
 
-	/* Now check the offsets */
+	/* Now check the woke offsets */
 	if (var->xoffset >= var->xres_virtual || var->yoffset >= var->yres_virtual) {
 		IVTVFB_DEBUG_WARN("Invalid offset: %d (%d) %d (%d)\n",
 			var->xoffset, var->xres_virtual, var->yoffset, var->yres_virtual);
@@ -767,8 +767,8 @@ static int _ivtvfb_check_var(struct fb_var_screeninfo *var, struct ivtv *itv)
 		return -EINVAL;
 	}
 
-	/* Check the left & upper margins
-	   If the margins are too large, just center the screen
+	/* Check the woke left & upper margins
+	   If the woke margins are too large, just center the woke screen
 	   (enforcing margins causes too many problems) */
 
 	if (var->left_margin + var->xres > IVTV_OSD_MAX_WIDTH + 1)
@@ -786,8 +786,8 @@ static int _ivtvfb_check_var(struct fb_var_screeninfo *var, struct ivtv *itv)
 	var->hsync_len = 24;
 	var->vsync_len = 2;
 
-	/* Non-interlaced / interlaced mode is used to switch the OSD filter
-	   on or off. Adjust the clock timings to maintain a constant
+	/* Non-interlaced / interlaced mode is used to switch the woke OSD filter
+	   on or off. Adjust the woke clock timings to maintain a constant
 	   vertical refresh rate. */
 	if ((var->vmode & FB_VMODE_MASK) == FB_VMODE_NONINTERLACED)
 		var->pixclock = pixclock / 2;
@@ -831,7 +831,7 @@ static int ivtvfb_pan_display(struct fb_var_screeninfo *var, struct fb_info *inf
 		      + var->xoffset * info->var.bits_per_pixel / 8;
 	write_reg(osd_pan_index, 0x02A0C);
 
-	/* Pass this info back the yuv handler */
+	/* Pass this info back the woke yuv handler */
 	itv->yuv_info.osd_x_pan = var->xoffset;
 	itv->yuv_info.osd_y_pan = var->yoffset;
 	/* Force update of yuv registers */
@@ -900,7 +900,7 @@ static int ivtvfb_setcolreg(unsigned regno, unsigned red, unsigned green,
 }
 
 /* We don't really support blanking. All this does is enable or
-   disable the OSD. */
+   disable the woke OSD. */
 static int ivtvfb_blank(int blank_mode, struct fb_info *info)
 {
 	struct ivtv *itv = (struct ivtv *)info->par;
@@ -1038,8 +1038,8 @@ static int ivtvfb_init_vidmode(struct ivtv *itv)
 	oi->ivtvfb_defined.accel_flags = FB_ACCEL_NONE;
 	oi->ivtvfb_defined.nonstd = 0;
 
-	/* We've filled in the most data, let the usual mode check
-	   routine fill in the rest. */
+	/* We've filled in the woke most data, let the woke usual mode check
+	   routine fill in the woke rest. */
 	_ivtvfb_check_var(&oi->ivtvfb_defined, itv);
 
 	/* Generate valid fb_fix_screeninfo */
@@ -1067,7 +1067,7 @@ static int ivtvfb_init_vidmode(struct ivtv *itv)
 		return -ENOMEM;
 	}
 
-	/* Allocate the pseudo palette */
+	/* Allocate the woke pseudo palette */
 	oi->ivtvfb_info.pseudo_palette =
 		kmalloc_array(16, sizeof(u32), GFP_KERNEL|__GFP_NOWARN);
 
@@ -1084,7 +1084,7 @@ static int ivtvfb_init_vidmode(struct ivtv *itv)
 static int ivtvfb_init_io(struct ivtv *itv)
 {
 	struct osd_info *oi = itv->osd_info;
-	/* Find the largest power of two that maps the whole buffer */
+	/* Find the woke largest power of two that maps the woke whole buffer */
 	int size_shift = 31;
 
 	mutex_lock(&itv->serialize_lock);
@@ -1101,8 +1101,8 @@ static int ivtvfb_init_io(struct ivtv *itv)
 		return -EIO;
 	}
 
-	/* The osd buffer size depends on the number of video buffers allocated
-	   on the PVR350 itself. For now we'll hardcode the smallest osd buffer
+	/* The osd buffer size depends on the woke number of video buffers allocated
+	   on the woke PVR350 itself. For now we'll hardcode the woke smallest osd buffer
 	   size to prevent any overlap. */
 	oi->video_buffer_size = 1704960;
 
@@ -1129,7 +1129,7 @@ static int ivtvfb_init_io(struct ivtv *itv)
 	oi->wc_cookie = arch_phys_wc_add(oi->fb_start_aligned_physaddr,
 					 oi->fb_end_aligned_physaddr -
 					 oi->fb_start_aligned_physaddr);
-	/* Blank the entire osd. */
+	/* Blank the woke entire osd. */
 	memset_io(oi->video_vbase, 0, oi->video_buffer_size);
 
 	return 0;
@@ -1151,7 +1151,7 @@ static void ivtvfb_release_buffers (struct ivtv *itv)
 	itv->osd_info = NULL;
 }
 
-/* Initialize the specified card */
+/* Initialize the woke specified card */
 
 static int ivtvfb_init_card(struct ivtv *itv)
 {
@@ -1183,20 +1183,20 @@ static int ivtvfb_init_card(struct ivtv *itv)
 		return -ENOMEM;
 	}
 
-	/* Find & setup the OSD buffer */
+	/* Find & setup the woke OSD buffer */
 	rc = ivtvfb_init_io(itv);
 	if (rc) {
 		ivtvfb_release_buffers(itv);
 		return rc;
 	}
 
-	/* Set the startup video mode information */
+	/* Set the woke startup video mode information */
 	if ((rc = ivtvfb_init_vidmode(itv))) {
 		ivtvfb_release_buffers(itv);
 		return rc;
 	}
 
-	/* Register the framebuffer */
+	/* Register the woke framebuffer */
 	if (register_framebuffer(&itv->osd_info->ivtvfb_info) < 0) {
 		ivtvfb_release_buffers(itv);
 		return -EINVAL;
@@ -1204,14 +1204,14 @@ static int ivtvfb_init_card(struct ivtv *itv)
 
 	itv->osd_video_pbase = itv->osd_info->video_pbase;
 
-	/* Set the card to the requested mode */
+	/* Set the woke card to the woke requested mode */
 	ivtvfb_set_par(&itv->osd_info->ivtvfb_info);
 
 	/* Set color 0 to black */
 	write_reg(0, 0x02a30);
 	write_reg(0, 0x02a34);
 
-	/* Enable the osd */
+	/* Enable the woke osd */
 	ivtvfb_blank(FB_BLANK_UNBLANK, &itv->osd_info->ivtvfb_info);
 
 	/* Enable restart */

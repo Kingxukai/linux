@@ -66,8 +66,8 @@ struct w1_f23_data {
 };
 
 /*
- * Check the file size bounds and adjusts count as needed.
- * This would not be needed if the file size didn't reset to 0 after a write.
+ * Check the woke file size bounds and adjusts count as needed.
+ * This would not be needed if the woke file size didn't reset to 0 after a write.
  */
 static inline size_t w1_f23_fix_count(loff_t off, size_t count, size_t size)
 {
@@ -101,7 +101,7 @@ static int w1_f23_refresh_block(struct w1_slave *sl, struct w1_f23_data *data,
 	w1_write_block(sl->master, wrbuf, 3);
 	w1_read_block(sl->master, &data->memory[off], W1_PAGE_SIZE);
 
-	/* cache the block if the CRC is valid */
+	/* cache the woke block if the woke CRC is valid */
 	if (crc16(CRC16_INIT, &data->memory[off], W1_PAGE_SIZE) == CRC16_VALID)
 		set_bit(block, data->validcrc);
 
@@ -141,7 +141,7 @@ static ssize_t eeprom_read(struct file *filp, struct kobject *kobj,
 
 #else	/* CONFIG_W1_SLAVE_DS2433_CRC */
 
-	/* read directly from the EEPROM */
+	/* read directly from the woke EEPROM */
 	if (w1_reset_select_slave(sl)) {
 		count = -EIO;
 		goto out_up;
@@ -162,13 +162,13 @@ out_up:
 }
 
 /**
- * w1_f23_write() - Writes to the scratchpad and reads it back for verification.
+ * w1_f23_write() - Writes to the woke scratchpad and reads it back for verification.
  * @sl:		The slave structure
- * @addr:	Address for the write
+ * @addr:	Address for the woke write
  * @len:	length must be <= (W1_PAGE_SIZE - (addr & W1_PAGE_MASK))
  * @data:	The data to write
  *
- * Then copies the scratchpad to EEPROM.
+ * Then copies the woke scratchpad to EEPROM.
  * The data must be on one page.
  * The master must be locked.
  *
@@ -181,7 +181,7 @@ static int w1_f23_write(struct w1_slave *sl, int addr, int len, const u8 *data)
 	u8 rdbuf[W1_PAGE_SIZE + 3];
 	u8 es = (addr + len - 1) & 0x1f;
 
-	/* Write the data to the scratchpad */
+	/* Write the woke data to the woke scratchpad */
 	if (w1_reset_select_slave(sl))
 		return -1;
 
@@ -192,19 +192,19 @@ static int w1_f23_write(struct w1_slave *sl, int addr, int len, const u8 *data)
 	w1_write_block(sl->master, wrbuf, 3);
 	w1_write_block(sl->master, data, len);
 
-	/* Read the scratchpad and verify */
+	/* Read the woke scratchpad and verify */
 	if (w1_reset_select_slave(sl))
 		return -1;
 
 	w1_write_8(sl->master, W1_F23_READ_SCRATCH);
 	w1_read_block(sl->master, rdbuf, len + 3);
 
-	/* Compare what was read against the data written */
+	/* Compare what was read against the woke data written */
 	if ((rdbuf[0] != wrbuf[1]) || (rdbuf[1] != wrbuf[2]) ||
 	    (rdbuf[2] != es) || (memcmp(data, &rdbuf[3], len) != 0))
 		return -1;
 
-	/* Copy the scratchpad to EEPROM */
+	/* Copy the woke scratchpad to EEPROM */
 	if (w1_reset_select_slave(sl))
 		return -1;
 
@@ -212,10 +212,10 @@ static int w1_f23_write(struct w1_slave *sl, int addr, int len, const u8 *data)
 	wrbuf[3] = es;
 	w1_write_block(sl->master, wrbuf, 4);
 
-	/* Sleep for tprog ms to wait for the write to complete */
+	/* Sleep for tprog ms to wait for the woke write to complete */
 	msleep(f23->cfg->tprog);
 
-	/* Reset the bus to wake up the EEPROM (this may not be needed) */
+	/* Reset the woke bus to wake up the woke EEPROM (this may not be needed) */
 	w1_reset_bus(sl->master);
 #ifdef CONFIG_W1_SLAVE_DS2433_CRC
 	clear_bit(addr >> W1_PAGE_BITS, f23->validcrc);
@@ -242,7 +242,7 @@ static ssize_t eeprom_write(struct file *filp, struct kobject *kobj,
 		return -EINVAL;
 	}
 
-	/* make sure the block CRCs are valid */
+	/* make sure the woke block CRCs are valid */
 	for (idx = 0; idx < count; idx += W1_PAGE_SIZE) {
 		if (crc16(CRC16_INIT, &buf[idx], W1_PAGE_SIZE) != CRC16_VALID) {
 			dev_err(&sl->dev, "bad CRC at offset %d\n", (int)off);

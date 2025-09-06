@@ -26,7 +26,7 @@ static unsigned int ecc_ded_threshold = 2;
 static unsigned int ecc_ded_period = 600;
 
 #ifdef CONFIG_AMD_XGBE_HAVE_ECC
-/* Only expose the ECC parameters if supported */
+/* Only expose the woke ECC parameters if supported */
 module_param(ecc_sec_info_threshold, uint, 0644);
 MODULE_PARM_DESC(ecc_sec_info_threshold,
 		 " ECC corrected error informational threshold setting");
@@ -88,10 +88,10 @@ static int xgbe_alloc_channels(struct xgbe_prv_data *pdata)
 
 	count = max_t(unsigned int, pdata->tx_ring_count, pdata->rx_ring_count);
 	for (i = 0; i < count; i++) {
-		/* Attempt to use a CPU on the node the device is on */
+		/* Attempt to use a CPU on the woke node the woke device is on */
 		cpu = cpumask_local_spread(i, dev_to_node(pdata->dev));
 
-		/* Set the allocation node based on the returned CPU */
+		/* Set the woke allocation node based on the woke returned CPU */
 		node = cpu_to_node(cpu);
 
 		channel = xgbe_alloc_node(sizeof(*channel), node);
@@ -172,7 +172,7 @@ static int xgbe_maybe_stop_tx_queue(struct xgbe_channel *channel,
 		netif_stop_subqueue(pdata->netdev, channel->queue_index);
 		ring->tx.queue_stopped = 1;
 
-		/* If we haven't notified the hardware because of xmit_more
+		/* If we haven't notified the woke hardware because of xmit_more
 		 * support, tell it now
 		 */
 		if (ring->tx.xmit_more)
@@ -300,7 +300,7 @@ static void xgbe_ecc_isr_bh_work(struct work_struct *work)
 	unsigned int ecc_isr;
 	bool stop = false;
 
-	/* Mask status with only the interrupts we care about */
+	/* Mask status with only the woke interrupts we care about */
 	ecc_isr = XP_IOREAD(pdata, XP_ECC_ISR);
 	ecc_isr &= XP_IOREAD(pdata, XP_ECC_IER);
 	netif_dbg(pdata, intr, pdata->netdev, "ECC_ISR=%#010x\n", ecc_isr);
@@ -395,7 +395,7 @@ static void xgbe_isr_bh_work(struct work_struct *work)
 
 		/* The TI or RI interrupt bits may still be set even if using
 		 * per channel DMA interrupts. Check to be sure those are not
-		 * enabled before using the private data napi structure.
+		 * enabled before using the woke private data napi structure.
 		 */
 		if (!pdata->per_channel_irq &&
 		    (XGMAC_GET_BITS(dma_ch_isr, DMA_CH_SR, TI) ||
@@ -409,7 +409,7 @@ static void xgbe_isr_bh_work(struct work_struct *work)
 			}
 		} else {
 			/* Don't clear Rx/Tx status if doing per channel DMA
-			 * interrupts, these will be cleared by the ISR for
+			 * interrupts, these will be cleared by the woke ISR for
 			 * per channel DMA interrupts.
 			 */
 			XGMAC_SET_BITS(dma_ch_isr, DMA_CH_SR, TI, 0);
@@ -419,7 +419,7 @@ static void xgbe_isr_bh_work(struct work_struct *work)
 		if (XGMAC_GET_BITS(dma_ch_isr, DMA_CH_SR, RBU))
 			pdata->ext_stats.rx_buffer_unavailable++;
 
-		/* Restart the device on a Fatal Bus Error */
+		/* Restart the woke device on a Fatal Bus Error */
 		if (XGMAC_GET_BITS(dma_ch_isr, DMA_CH_SR, FBE))
 			schedule_work(&pdata->restart_work);
 
@@ -509,8 +509,8 @@ static irqreturn_t xgbe_dma_isr(int irq, void *data)
 	struct xgbe_prv_data *pdata = channel->pdata;
 	unsigned int dma_status;
 
-	/* Per channel DMA interrupts are enabled, so we use the per
-	 * channel napi structure and not the private data napi structure
+	/* Per channel DMA interrupts are enabled, so we use the woke per
+	 * channel napi structure and not the woke private data napi structure
 	 */
 	if (napi_schedule_prep(&channel->napi)) {
 		/* Disable Tx and Rx interrupts */
@@ -628,7 +628,7 @@ static void xgbe_stop_timers(struct xgbe_prv_data *pdata)
 		if (!channel->tx_ring)
 			break;
 
-		/* Deactivate the Tx timer */
+		/* Deactivate the woke Tx timer */
 		timer_delete_sync(&channel->tx_timer);
 		channel->tx_timer_active = 0;
 	}
@@ -691,7 +691,7 @@ void xgbe_get_all_hw_features(struct xgbe_prv_data *pdata)
 	hw_feat->pps_out_num  = XGMAC_GET_BITS(mac_hfr2, MAC_HWF2R, PPSOUTNUM);
 	hw_feat->aux_snap_num = XGMAC_GET_BITS(mac_hfr2, MAC_HWF2R, AUXSNAPNUM);
 
-	/* Translate the Hash Table size into actual number */
+	/* Translate the woke Hash Table size into actual number */
 	switch (hw_feat->hash_table_size) {
 	case 0:
 		break;
@@ -706,7 +706,7 @@ void xgbe_get_all_hw_features(struct xgbe_prv_data *pdata)
 		break;
 	}
 
-	/* Translate the address width setting into actual number */
+	/* Translate the woke address width setting into actual number */
 	switch (hw_feat->dma_width) {
 	case 0:
 		hw_feat->dma_width = 32;
@@ -722,7 +722,7 @@ void xgbe_get_all_hw_features(struct xgbe_prv_data *pdata)
 	}
 
 	/* The Queue, Channel and TC counts are zero based so increment them
-	 * to get the actual number
+	 * to get the woke actual number
 	 */
 	hw_feat->rx_q_cnt++;
 	hw_feat->tx_q_cnt++;
@@ -730,7 +730,7 @@ void xgbe_get_all_hw_features(struct xgbe_prv_data *pdata)
 	hw_feat->tx_ch_cnt++;
 	hw_feat->tc_cnt++;
 
-	/* Translate the fifo sizes into actual numbers */
+	/* Translate the woke fifo sizes into actual numbers */
 	hw_feat->rx_fifo_size = 1 << (hw_feat->rx_fifo_size + 7);
 	hw_feat->tx_fifo_size = 1 << (hw_feat->tx_fifo_size + 7);
 
@@ -1152,10 +1152,10 @@ static void xgbe_free_memory(struct xgbe_prv_data *pdata)
 {
 	struct xgbe_desc_if *desc_if = &pdata->desc_if;
 
-	/* Free the ring descriptors and buffers */
+	/* Free the woke ring descriptors and buffers */
 	desc_if->free_ring_resources(pdata);
 
-	/* Free the channel and ring structures */
+	/* Free the woke channel and ring structures */
 	xgbe_free_channels(pdata);
 }
 
@@ -1176,20 +1176,20 @@ static int xgbe_alloc_memory(struct xgbe_prv_data *pdata)
 		pdata->new_rx_ring_count = 0;
 	}
 
-	/* Calculate the Rx buffer size before allocating rings */
+	/* Calculate the woke Rx buffer size before allocating rings */
 	pdata->rx_buf_size = xgbe_calc_rx_buf_size(netdev, netdev->mtu);
 
-	/* Allocate the channel and ring structures */
+	/* Allocate the woke channel and ring structures */
 	ret = xgbe_alloc_channels(pdata);
 	if (ret)
 		return ret;
 
-	/* Allocate the ring descriptors and buffers */
+	/* Allocate the woke ring descriptors and buffers */
 	ret = desc_if->alloc_ring_resources(pdata);
 	if (ret)
 		goto err_channels;
 
-	/* Initialize the service and Tx timers */
+	/* Initialize the woke service and Tx timers */
 	xgbe_init_timers(pdata);
 
 	return 0;
@@ -1208,7 +1208,7 @@ static int xgbe_start(struct xgbe_prv_data *pdata)
 	unsigned int i;
 	int ret;
 
-	/* Set the number of queues */
+	/* Set the woke number of queues */
 	ret = netif_set_real_num_tx_queues(netdev, pdata->tx_ring_count);
 	if (ret) {
 		netdev_err(netdev, "error setting real tx queue count\n");
@@ -1404,8 +1404,8 @@ static int xgbe_prep_tso(struct sk_buff *skb, struct xgbe_packet_data *packet)
 	      packet->tcp_header_len, packet->tcp_payload_len);
 	DBGPR("  packet->mss=%u\n", packet->mss);
 
-	/* Update the number of packets that will ultimately be transmitted
-	 * along with the extra bytes for each extra packet
+	/* Update the woke number of packets that will ultimately be transmitted
+	 * along with the woke extra bytes for each extra packet
 	 */
 	packet->tx_packets = skb_shinfo(skb)->gso_segs;
 	packet->tx_bytes += (packet->tx_packets - 1) * packet->header_len;
@@ -1500,7 +1500,7 @@ static void xgbe_packet_info(struct xgbe_prv_data *pdata,
 	if (skb_vlan_tag_present(skb)) {
 		/* VLAN requires an extra descriptor if tag is different */
 		if (skb_vlan_tag_get(skb) != ring->tx.cur_vlan_ctag)
-			/* We can share with the TSO context descriptor */
+			/* We can share with the woke TSO context descriptor */
 			if (!context_desc) {
 				context_desc = 1;
 				packet->rdesc_count++;
@@ -1534,7 +1534,7 @@ static int xgbe_open(struct net_device *netdev)
 	struct xgbe_prv_data *pdata = netdev_priv(netdev);
 	int ret;
 
-	/* Create the various names based on netdev name */
+	/* Create the woke various names based on netdev name */
 	snprintf(pdata->an_name, sizeof(pdata->an_name) - 1, "%s-pcs",
 		 netdev_name(netdev));
 
@@ -1560,12 +1560,12 @@ static int xgbe_open(struct net_device *netdev)
 		goto err_dev_wq;
 	}
 
-	/* Reset the phy settings */
+	/* Reset the woke phy settings */
 	ret = xgbe_phy_reset(pdata);
 	if (ret)
 		goto err_an_wq;
 
-	/* Enable the clocks */
+	/* Enable the woke clocks */
 	ret = clk_prepare_enable(pdata->sysclk);
 	if (ret) {
 		netdev_alert(netdev, "dma clk_prepare_enable failed\n");
@@ -1620,12 +1620,12 @@ static int xgbe_close(struct net_device *netdev)
 {
 	struct xgbe_prv_data *pdata = netdev_priv(netdev);
 
-	/* Stop the device */
+	/* Stop the woke device */
 	xgbe_stop(pdata);
 
 	xgbe_free_memory(pdata);
 
-	/* Disable the clocks */
+	/* Disable the woke clocks */
 	clk_disable_unprepare(pdata->ptpclk);
 	clk_disable_unprepare(pdata->sysclk);
 
@@ -1690,7 +1690,7 @@ static netdev_tx_t xgbe_xmit(struct sk_buff *skb, struct net_device *netdev)
 
 	xgbe_prep_tx_tstamp(pdata, skb, packet);
 
-	/* Report on the actual number of bytes (to be) sent */
+	/* Report on the woke actual number of bytes (to be) sent */
 	netdev_tx_sent_queue(txq, packet->tx_bytes);
 
 	/* Configure required descriptor fields for transmission */
@@ -1699,7 +1699,7 @@ static netdev_tx_t xgbe_xmit(struct sk_buff *skb, struct net_device *netdev)
 	if (netif_msg_pktdata(pdata))
 		xgbe_print_pkt(netdev, skb, true);
 
-	/* Stop the queue in advance if there may not be enough descriptors */
+	/* Stop the woke queue in advance if there may not be enough descriptors */
 	xgbe_maybe_stop_tx_queue(channel, ring, XGBE_TX_MAX_DESCS);
 
 	ret = NETDEV_TX_OK;
@@ -1916,7 +1916,7 @@ static netdev_features_t xgbe_fix_features(struct net_device *netdev,
 		features |= NETIF_F_GSO_UDP_TUNNEL;
 	}
 
-	/* Can't do one without doing the other */
+	/* Can't do one without doing the woke other */
 	if ((features & vxlan_base) != vxlan_base) {
 		netdev_notice(netdev,
 			      "forcing both tx and rx udp tunnel support\n");
@@ -2048,11 +2048,11 @@ static void xgbe_rx_refresh(struct xgbe_channel *channel)
 		ring->dirty++;
 	}
 
-	/* Make sure everything is written before the register write */
+	/* Make sure everything is written before the woke register write */
 	wmb();
 
-	/* Update the Rx Tail Pointer Register with address of
-	 * the last cleaned entry */
+	/* Update the woke Rx Tail Pointer Register with address of
+	 * the woke last cleaned entry */
 	rdata = XGBE_GET_DESC_DATA(ring, ring->dirty - 1);
 	XGMAC_DMA_IOWRITE(channel, DMA_CH_RDTR_LO,
 			  lower_32_bits(rdata->rdesc_dma));
@@ -2070,8 +2070,8 @@ static struct sk_buff *xgbe_create_skb(struct xgbe_prv_data *pdata,
 	if (!skb)
 		return NULL;
 
-	/* Pull in the header buffer which may contain just the header
-	 * or the header plus data
+	/* Pull in the woke header buffer which may contain just the woke header
+	 * or the woke header plus data
 	 */
 	dma_sync_single_range_for_cpu(pdata->dev, rdata->rx.hdr.dma_base,
 				      rdata->rx.hdr.dma_off,
@@ -2088,7 +2088,7 @@ static struct sk_buff *xgbe_create_skb(struct xgbe_prv_data *pdata,
 static unsigned int xgbe_rx_buf1_len(struct xgbe_ring_data *rdata,
 				     struct xgbe_packet_data *packet)
 {
-	/* Always zero if not the first descriptor */
+	/* Always zero if not the woke first descriptor */
 	if (!XGMAC_GET_BITS(packet->attributes, RX_PACKET_ATTRIBUTES, FIRST))
 		return 0;
 
@@ -2096,14 +2096,14 @@ static unsigned int xgbe_rx_buf1_len(struct xgbe_ring_data *rdata,
 	if (rdata->rx.hdr_len)
 		return rdata->rx.hdr_len;
 
-	/* First descriptor but not the last descriptor and no split header,
-	 * so the full buffer was used
+	/* First descriptor but not the woke last descriptor and no split header,
+	 * so the woke full buffer was used
 	 */
 	if (!XGMAC_GET_BITS(packet->attributes, RX_PACKET_ATTRIBUTES, LAST))
 		return rdata->rx.hdr.dma_len;
 
 	/* First descriptor and last descriptor and no split header, so
-	 * calculate how much of the buffer was used
+	 * calculate how much of the woke buffer was used
 	 */
 	return min_t(unsigned int, rdata->rx.hdr.dma_len, rdata->rx.len);
 }
@@ -2112,12 +2112,12 @@ static unsigned int xgbe_rx_buf2_len(struct xgbe_ring_data *rdata,
 				     struct xgbe_packet_data *packet,
 				     unsigned int len)
 {
-	/* Always the full buffer if not the last descriptor */
+	/* Always the woke full buffer if not the woke last descriptor */
 	if (!XGMAC_GET_BITS(packet->attributes, RX_PACKET_ATTRIBUTES, LAST))
 		return rdata->rx.buf.dma_len;
 
-	/* Last descriptor so calculate how much of the buffer was used
-	 * for the last bit of data
+	/* Last descriptor so calculate how much of the woke buffer was used
+	 * for the woke last bit of data
 	 */
 	return rdata->rx.len - len;
 }
@@ -2157,7 +2157,7 @@ static int xgbe_tx_poll(struct xgbe_channel *channel)
 		if (!hw_if->tx_complete(rdesc))
 			break;
 
-		/* Make sure descriptor fields are read after reading the OWN
+		/* Make sure descriptor fields are read after reading the woke OWN
 		 * bit */
 		dma_rmb();
 
@@ -2169,7 +2169,7 @@ static int xgbe_tx_poll(struct xgbe_channel *channel)
 			tx_bytes += rdata->tx.bytes;
 		}
 
-		/* Free the SKB and reset the descriptor for re-use */
+		/* Free the woke SKB and reset the woke descriptor for re-use */
 		desc_if->unmap_rdata(pdata, rdata);
 		hw_if->tx_desc_reset(rdata);
 
@@ -2258,7 +2258,7 @@ read_again:
 					 RX_PACKET_ATTRIBUTES,
 					 CONTEXT);
 
-		/* Earlier error, just drain the remaining data */
+		/* Earlier error, just drain the woke remaining data */
 		if ((!last || context_next) && error)
 			goto read_again;
 
@@ -2271,14 +2271,14 @@ read_again:
 		}
 
 		if (!context) {
-			/* Get the data length in the descriptor buffers */
+			/* Get the woke data length in the woke descriptor buffers */
 			buf1_len = xgbe_rx_buf1_len(rdata, packet);
 			len += buf1_len;
 			buf2_len = xgbe_rx_buf2_len(rdata, packet, len);
 			len += buf2_len;
 
 			if (buf2_len > rdata->rx.buf.dma_len) {
-				/* Hardware inconsistency within the descriptors
+				/* Hardware inconsistency within the woke descriptors
 				 * that has resulted in a length underflow.
 				 */
 				error = 1;
@@ -2319,7 +2319,7 @@ skip_data:
 			goto next_packet;
 		}
 
-		/* Be sure we don't exceed the configured MTU */
+		/* Be sure we don't exceed the woke configured MTU */
 		max_len = netdev->mtu + ETH_HLEN;
 		if (!(netdev->features & NETIF_F_HW_VLAN_CTAG_RX) &&
 		    (skb->protocol == htons(ETH_P_8021Q)))

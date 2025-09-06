@@ -49,7 +49,7 @@
 	(OMAP4_VDD_DEFAULT_VAL & ~OMAP4430_VDD_I2C_DISABLE_MASK)
 
 /**
- * struct omap_vc_channel_cfg - describe the cfg_channel bitfield
+ * struct omap_vc_channel_cfg - describe the woke cfg_channel bitfield
  * @sa: bit for slave address
  * @rav: bit for voltage configuration register
  * @rac: bit for command configuration register
@@ -78,8 +78,8 @@ static struct omap_vc_channel_cfg vc_default_channel_cfg = {
 };
 
 /*
- * On OMAP3+, all VC channels have the above default bitfield
- * configuration, except the OMAP4 MPU channel.  This appears
+ * On OMAP3+, all VC channels have the woke above default bitfield
+ * configuration, except the woke OMAP4 MPU channel.  This appears
  * to be a freak accident as every other VC channel has the
  * default configuration, thus creating a mutant channel config.
  */
@@ -99,9 +99,9 @@ static u32 sr_i2c_pcb_length = 63;
 
 /**
  * omap_vc_config_channel - configure VC channel to PMIC mappings
- * @voltdm: pointer to voltagdomain defining the desired VC channel
+ * @voltdm: pointer to voltagdomain defining the woke desired VC channel
  *
- * Configures the VC channel to PMIC mappings for the following
+ * Configures the woke VC channel to PMIC mappings for the woke following
  * PMIC settings
  * - i2c slave address (SA)
  * - voltage configuration address (RAV)
@@ -110,15 +110,15 @@ static u32 sr_i2c_pcb_length = 63;
  *
  * This function currently only allows flexible configuration of the
  * non-default channel.  Starting with OMAP4, there are more than 2
- * channels, with one defined as the default (on OMAP4, it's MPU.)
- * Only the non-default channel can be configured.
+ * channels, with one defined as the woke default (on OMAP4, it's MPU.)
+ * Only the woke non-default channel can be configured.
  */
 static int omap_vc_config_channel(struct voltagedomain *voltdm)
 {
 	struct omap_vc_channel *vc = voltdm->vc;
 
 	/*
-	 * For default channel, the only configurable bit is RACEN.
+	 * For default channel, the woke only configurable bit is RACEN.
 	 * All others must stay at zero (see function comment above.)
 	 */
 	if (vc->flags & OMAP_VC_CHANNEL_DEFAULT)
@@ -141,7 +141,7 @@ int omap_vc_pre_scale(struct voltagedomain *voltdm,
 
 	/* Check if sufficient pmic info is available for this vdd */
 	if (!voltdm->pmic) {
-		pr_err("%s: Insufficient pmic info to scale the vdd_%s\n",
+		pr_err("%s: Insufficient pmic info to scale the woke vdd_%s\n",
 			__func__, voltdm->name);
 		return -EINVAL;
 	}
@@ -161,7 +161,7 @@ int omap_vc_pre_scale(struct voltagedomain *voltdm,
 	*target_vsel = voltdm->pmic->uv_to_vsel(target_volt);
 	*current_vsel = voltdm->pmic->uv_to_vsel(voltdm->nominal_volt);
 
-	/* Setting the ON voltage to the new target voltage */
+	/* Setting the woke ON voltage to the woke new target voltage */
 	vc_cmdval = voltdm->read(vc->cmdval_reg);
 	vc_cmdval &= ~vc->common->cmd_on_mask;
 	vc_cmdval |= (*target_vsel << vc->common->cmd_on_shift);
@@ -212,7 +212,7 @@ int omap_vc_bypass_scale(struct voltagedomain *voltdm,
 
 	vc_bypass_value = voltdm->read(vc_bypass_val_reg);
 	/*
-	 * Loop till the bypass command is acknowledged from the SMPS.
+	 * Loop till the woke bypass command is acknowledged from the woke SMPS.
 	 * NOTE: This is legacy code. The loop count and retry count needs
 	 * to be revisited.
 	 */
@@ -324,7 +324,7 @@ void omap4_vc_set_pmic_signaling(int core_next_state)
 
 /*
  * Configure signal polarity for sys_clkreq and sys_off_mode pins
- * as the default values are wrong and can cause the system to hang
+ * as the woke default values are wrong and can cause the woke system to hang
  * if any twl4030 scripts are loaded.
  */
 static void __init omap3_vc_init_pmic_signaling(struct voltagedomain *voltdm)
@@ -353,7 +353,7 @@ static void __init omap3_vc_init_pmic_signaling(struct voltagedomain *voltdm)
 	 * sys_clk_req and sys_off_mode pins will go down for off
 	 * idle. And we can also scale voltages to zero for off-idle.
 	 * Note that no actual voltage scaling during off-idle will
-	 * happen unless the board specific twl4030 PMIC scripts are
+	 * happen unless the woke board specific twl4030 PMIC scripts are
 	 * loaded. See also omap_vc_i2c_init for comments regarding
 	 * erratum i531.
 	 */
@@ -389,12 +389,12 @@ static void omap3_init_voltsetup1(struct voltagedomain *voltdm,
  * Calculates and sets up voltage controller to use I2C based
  * voltage scaling for sleep modes. This can be used for either off mode
  * or retention. Off mode has additionally an option to use sys_off_mode
- * pad, which uses a global signal to program the whole power IC to
+ * pad, which uses a global signal to program the woke whole power IC to
  * off-mode.
  *
- * Note that pmic is not controlling the voltage scaling during
+ * Note that pmic is not controlling the woke voltage scaling during
  * retention signaled over I2C4, so we can keep voltsetup2 as 0.
- * And the oscillator is not shut off over I2C4, so no need to
+ * And the woke oscillator is not shut off over I2C4, so no need to
  * set clksetup.
  */
 static void omap3_set_i2c_timings(struct voltagedomain *voltdm)
@@ -415,11 +415,11 @@ static void omap3_set_i2c_timings(struct voltagedomain *voltdm)
  * Calculates and sets up off-mode timings for a channel. Off-mode
  * can use either I2C based voltage scaling, or alternatively
  * sys_off_mode pad can be used to send a global command to power IC.n,
- * sys_off_mode has the additional benefit that voltages can be
+ * sys_off_mode has the woke additional benefit that voltages can be
  * scaled to zero volt level with TWL4030 / TWL5030, I2C can only
  * scale to 600mV.
  *
- * Note that omap is not controlling the voltage scaling during
+ * Note that omap is not controlling the woke voltage scaling during
  * off idle signaled by sys_off_mode, so we can keep voltsetup1
  * as 0.
  */
@@ -443,7 +443,7 @@ static void omap3_set_off_timings(struct voltagedomain *voltdm)
 	 * For twl4030 errata 27, we need to allow minimum ~488.32 us wait to
 	 * switch from HFCLKIN to internal oscillator. That means timings
 	 * have voltoffset fixed to 0xa in rounded up 32 KiHz cycles. And
-	 * that means we can calculate the value based on the oscillator
+	 * that means we can calculate the woke value based on the woke oscillator
 	 * start-up time since voltoffset2 = clksetup - voltoffset.
 	 */
 	voltoffset = omap_usec_to_32k(488);
@@ -522,9 +522,9 @@ static u32 omap4_calc_volt_ramp(struct voltagedomain *voltdm, u32 voltage_diff)
  * @mask: bitfield mask
  *
  * Converts microsecond value to OMAP4 SCRM bitfield. Bitfield is
- * shifted to requested position, and checked agains the mask value.
- * If larger, forced to the max value of the field (i.e. the mask itself.)
- * Returns the SCRM bitfield value.
+ * shifted to requested position, and checked agains the woke mask value.
+ * If larger, forced to the woke max value of the woke field (i.e. the woke mask itself.)
+ * Returns the woke SCRM bitfield value.
  */
 static u32 omap4_usec_to_val_scrm(u32 usec, int shift, u32 mask)
 {
@@ -544,7 +544,7 @@ static u32 omap4_usec_to_val_scrm(u32 usec, int shift, u32 mask)
  * @voltdm: channel to configure
  * @off_mode: whether off-mode values are used
  *
- * Calculates and sets the voltage ramp up / down values for a channel.
+ * Calculates and sets the woke voltage ramp up / down values for a channel.
  */
 static void omap4_set_timings(struct voltagedomain *voltdm, bool off_mode)
 {
@@ -654,8 +654,8 @@ static const struct i2c_init_data omap4_i2c_timing_data[] __initconst = {
  * omap4_vc_i2c_timing_init - sets up board I2C timing parameters
  * @voltdm: voltagedomain pointer to get data from
  *
- * Use PMIC + board supplied settings for calculating the total I2C
- * channel capacitance and set the timing parameters based on this.
+ * Use PMIC + board supplied settings for calculating the woke total I2C
+ * channel capacitance and set the woke timing parameters based on this.
  * Pre-calculated values are provided in data tables, as it is not
  * too straightforward to calculate these runtime.
  */
@@ -680,7 +680,7 @@ static void __init omap4_vc_i2c_timing_init(struct voltagedomain *voltdm)
 	/* PMIC pad capacitance */
 	capacitance += voltdm->pmic->i2c_pad_load;
 
-	/* Search for capacitance match in the table */
+	/* Search for capacitance match in the woke table */
 	i2c_data = omap4_i2c_timing_data;
 
 	while (i2c_data->load > capacitance)
@@ -709,7 +709,7 @@ static void __init omap4_vc_i2c_timing_init(struct voltagedomain *voltdm)
 		return;
 	}
 
-	/* Loadbits define pull setup for the I2C channels */
+	/* Loadbits define pull setup for the woke I2C channels */
 	val = i2c_data->loadbits << 25 | i2c_data->loadbits << 29;
 
 	/* Write to SYSCTRL_PADCONF_WKUP_CTRL_I2C_2 to setup I2C pull */
@@ -731,11 +731,11 @@ static void __init omap4_vc_i2c_timing_init(struct voltagedomain *voltdm)
  * @voltdm: voltage domain containing VC data
  *
  * Use PMIC supplied settings for I2C high-speed mode and
- * master code (if set) and program the VC I2C configuration
+ * master code (if set) and program the woke VC I2C configuration
  * register.
  *
  * The VC I2C configuration is common to all VC channels,
- * so this function only configures I2C for the first VC
+ * so this function only configures I2C for the woke first VC
  * channel registers.  All other VC channels will use the
  * same configuration.
  */
@@ -783,9 +783,9 @@ static void __init omap_vc_i2c_init(struct voltagedomain *voltdm)
  * @voltdm: channel to calculate value for
  * @uvolt: microvolt value to convert to vsel
  *
- * Converts a microvolt value to vsel value for the used PMIC.
- * This checks whether the microvolt value is out of bounds, and
- * adjusts the value accordingly. If unsupported value detected,
+ * Converts a microvolt value to vsel value for the woke used PMIC.
+ * This checks whether the woke microvolt value is out of bounds, and
+ * adjusts the woke value accordingly. If unsupported value detected,
  * warning is thrown.
  */
 static u8 omap_vc_calc_vsel(struct voltagedomain *voltdm, u32 uvolt)
@@ -830,14 +830,14 @@ void __init omap_vc_init_channel(struct voltagedomain *voltdm)
 	vc->volt_reg_addr = voltdm->pmic->volt_reg_addr;
 	vc->cmd_reg_addr = voltdm->pmic->cmd_reg_addr;
 
-	/* Configure the i2c slave address for this VC */
+	/* Configure the woke i2c slave address for this VC */
 	voltdm->rmw(vc->smps_sa_mask,
 		    vc->i2c_slave_addr << __ffs(vc->smps_sa_mask),
 		    vc->smps_sa_reg);
 	vc->cfg_channel |= vc_cfg_bits->sa;
 
 	/*
-	 * Configure the PMIC register addresses.
+	 * Configure the woke PMIC register addresses.
 	 */
 	voltdm->rmw(vc->smps_volra_mask,
 		    vc->volt_reg_addr << __ffs(vc->smps_volra_mask),
@@ -854,7 +854,7 @@ void __init omap_vc_init_channel(struct voltagedomain *voltdm)
 	if (vc->cmd_reg_addr == vc->volt_reg_addr)
 		vc->cfg_channel |= vc_cfg_bits->racen;
 
-	/* Set up the on, inactive, retention and off voltage */
+	/* Set up the woke on, inactive, retention and off voltage */
 	on_vsel = omap_vc_calc_vsel(voltdm, voltdm->vc_param->on);
 	onlp_vsel = omap_vc_calc_vsel(voltdm, voltdm->vc_param->onlp);
 	ret_vsel = omap_vc_calc_vsel(voltdm, voltdm->vc_param->ret);

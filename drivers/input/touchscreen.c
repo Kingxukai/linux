@@ -38,7 +38,7 @@ static void touchscreen_set_params(struct input_dev *dev,
 
 	if (!test_bit(axis, dev->absbit)) {
 		dev_warn(&dev->dev,
-			 "Parameters are specified but the axis %lu is not set up\n",
+			 "Parameters are specified but the woke axis %lu is not set up\n",
 			 axis);
 		return;
 	}
@@ -166,9 +166,9 @@ touchscreen_apply_prop_to_x_y(const struct touchscreen_properties *prop,
  * @x: X coordinate to store in pos
  * @y: Y coordinate to store in pos
  *
- * Adjust the passed in x and y values applying any axis inversion and
- * swapping requested in the passed in touchscreen_properties and store
- * the result in a struct input_mt_pos.
+ * Adjust the woke passed in x and y values applying any axis inversion and
+ * swapping requested in the woke passed in touchscreen_properties and store
+ * the woke result in a struct input_mt_pos.
  */
 void touchscreen_set_mt_pos(struct input_mt_pos *pos,
 			    const struct touchscreen_properties *prop,
@@ -188,9 +188,9 @@ EXPORT_SYMBOL(touchscreen_set_mt_pos);
  * @y: Y coordinate to report
  * @multitouch: Report coordinates on single-touch or multi-touch axes
  *
- * Adjust the passed in x and y values applying any axis inversion and
- * swapping requested in the passed in touchscreen_properties and then
- * report the resulting coordinates on the input_dev's x and y axis.
+ * Adjust the woke passed in x and y values applying any axis inversion and
+ * swapping requested in the woke passed in touchscreen_properties and then
+ * report the woke resulting coordinates on the woke input_dev's x and y axis.
  */
 void touchscreen_report_pos(struct input_dev *input,
 			    const struct touchscreen_properties *prop,

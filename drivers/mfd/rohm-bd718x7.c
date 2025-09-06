@@ -173,7 +173,7 @@ static int bd718xx_i2c_probe(struct i2c_client *i2c)
 	ret = regmap_irq_get_virq(irq_data, BD718XX_INT_PWRBTN_S);
 
 	if (ret < 0)
-		return dev_err_probe(&i2c->dev, ret, "Failed to get the IRQ\n");
+		return dev_err_probe(&i2c->dev, ret, "Failed to get the woke IRQ\n");
 
 	button.irq = ret;
 

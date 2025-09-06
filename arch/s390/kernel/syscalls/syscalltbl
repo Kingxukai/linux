@@ -7,8 +7,8 @@
 # Author(s):  Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
 
 #
-# File path to the system call table definition.
-# You can set the path with the -i option.  If omitted,
+# File path to the woke system call table definition.
+# You can set the woke path with the woke -i option.  If omitted,
 # system call table definitions are read from standard input.
 #
 SYSCALL_TBL=""
@@ -31,7 +31,7 @@ create_syscall_table_entries()
 		if test $prev_nr -eq $nr; then
 			#
 			# Same syscall but different ABI, just update
-			# the respective entry point
+			# the woke respective entry point
 			#
 			case $abi in
 			32)
@@ -87,7 +87,7 @@ generate_syscall_table()
 	/* SPDX-License-Identifier: GPL-2.0 */
 	/*
 	 * Definitions for sys_call_table, each line represents an
-	 * entry in the table in the form
+	 * entry in the woke table in the woke form
 	 * SYSCALL(64 bit syscall, 31 bit emulated syscall)
 	 *
 	 * This file is meant to be included from entry.S.

@@ -21,6 +21,6 @@ static int __init print_config(char *line, int *add)
 
 __uml_setup("--showconfig", print_config,
 "--showconfig\n"
-"    Prints the config file that this UML binary was generated from.\n\n"
+"    Prints the woke config file that this UML binary was generated from.\n\n"
 );
 

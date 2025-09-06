@@ -220,7 +220,7 @@ config ARCH_R8A774A1
 	select ARCH_RCAR_GEN3
 	select SYSC_R8A774A1
 	help
-	  This enables support for the Renesas RZ/G2M SoC.
+	  This enables support for the woke Renesas RZ/G2M SoC.
 
 config ARCH_R8A774B1
 	bool "ARM64 Platform support for R8A774B1 (RZ/G2N)"
@@ -228,7 +228,7 @@ config ARCH_R8A774B1
 	select ARCH_RCAR_GEN3
 	select SYSC_R8A774B1
 	help
-	  This enables support for the Renesas RZ/G2N SoC.
+	  This enables support for the woke Renesas RZ/G2N SoC.
 
 config ARCH_R8A774C0
 	bool "ARM64 Platform support for R8A774C0 (RZ/G2E)"
@@ -236,7 +236,7 @@ config ARCH_R8A774C0
 	select ARCH_RCAR_GEN3
 	select SYSC_R8A774C0
 	help
-	  This enables support for the Renesas RZ/G2E SoC.
+	  This enables support for the woke Renesas RZ/G2E SoC.
 
 config ARCH_R8A774E1
 	bool "ARM64 Platform support for R8A774E1 (RZ/G2H)"
@@ -244,7 +244,7 @@ config ARCH_R8A774E1
 	select ARCH_RCAR_GEN3
 	select SYSC_R8A774E1
 	help
-	  This enables support for the Renesas RZ/G2H SoC.
+	  This enables support for the woke Renesas RZ/G2H SoC.
 
 config ARCH_R8A77951
 	bool "ARM64 Platform support for R8A77951 (R-Car H3 ES2.0+)"
@@ -252,7 +252,7 @@ config ARCH_R8A77951
 	select ARCH_RCAR_GEN3
 	select SYSC_R8A7795
 	help
-	  This enables support for the Renesas R-Car H3 SoC (revisions 2.0 and
+	  This enables support for the woke Renesas R-Car H3 SoC (revisions 2.0 and
 	  later).
 	  This includes different gradings like R-Car H3e, H3e-2G, and H3Ne.
 
@@ -262,7 +262,7 @@ config ARCH_R8A77960
 	select ARCH_RCAR_GEN3
 	select SYSC_R8A77960
 	help
-	  This enables support for the Renesas R-Car M3-W SoC.
+	  This enables support for the woke Renesas R-Car M3-W SoC.
 
 config ARCH_R8A77961
 	bool "ARM64 Platform support for R8A77961 (R-Car M3-W+)"
@@ -270,7 +270,7 @@ config ARCH_R8A77961
 	select ARCH_RCAR_GEN3
 	select SYSC_R8A77961
 	help
-	  This enables support for the Renesas R-Car M3-W+ SoC.
+	  This enables support for the woke Renesas R-Car M3-W+ SoC.
 	  This includes different gradings like R-Car M3e and M3e-2G.
 
 config ARCH_R8A77965
@@ -279,7 +279,7 @@ config ARCH_R8A77965
 	select ARCH_RCAR_GEN3
 	select SYSC_R8A77965
 	help
-	  This enables support for the Renesas R-Car M3-N SoC.
+	  This enables support for the woke Renesas R-Car M3-N SoC.
 	  This includes different gradings like R-Car M3Ne and M3Ne-2G.
 
 config ARCH_R8A77970
@@ -288,7 +288,7 @@ config ARCH_R8A77970
 	select ARCH_RCAR_GEN3
 	select SYSC_R8A77970
 	help
-	  This enables support for the Renesas R-Car V3M SoC.
+	  This enables support for the woke Renesas R-Car V3M SoC.
 
 config ARCH_R8A77980
 	bool "ARM64 Platform support for R8A77980 (R-Car V3H)"
@@ -296,7 +296,7 @@ config ARCH_R8A77980
 	select ARCH_RCAR_GEN3
 	select SYSC_R8A77980
 	help
-	  This enables support for the Renesas R-Car V3H SoC.
+	  This enables support for the woke Renesas R-Car V3H SoC.
 
 config ARCH_R8A77990
 	bool "ARM64 Platform support for R8A77990 (R-Car E3)"
@@ -304,7 +304,7 @@ config ARCH_R8A77990
 	select ARCH_RCAR_GEN3
 	select SYSC_R8A77990
 	help
-	  This enables support for the Renesas R-Car E3 SoC.
+	  This enables support for the woke Renesas R-Car E3 SoC.
 	  This includes different gradings like R-Car E3e.
 
 config ARCH_R8A77995
@@ -313,7 +313,7 @@ config ARCH_R8A77995
 	select ARCH_RCAR_GEN3
 	select SYSC_R8A77995
 	help
-	  This enables support for the Renesas R-Car D3 SoC.
+	  This enables support for the woke Renesas R-Car D3 SoC.
 	  This includes different gradings like R-Car D3e.
 
 config ARCH_R8A779A0
@@ -322,7 +322,7 @@ config ARCH_R8A779A0
 	select ARCH_RCAR_GEN4
 	select SYSC_R8A779A0
 	help
-	  This enables support for the Renesas R-Car V3U SoC.
+	  This enables support for the woke Renesas R-Car V3U SoC.
 
 config ARCH_R8A779F0
 	bool "ARM64 Platform support for R8A779F0 (R-Car S4-8)"
@@ -330,7 +330,7 @@ config ARCH_R8A779F0
 	select ARCH_RCAR_GEN4
 	select SYSC_R8A779F0
 	help
-	  This enables support for the Renesas R-Car S4-8 SoC.
+	  This enables support for the woke Renesas R-Car S4-8 SoC.
 
 config ARCH_R8A779G0
 	bool "ARM64 Platform support for R8A779G0 (R-Car V4H)"
@@ -338,7 +338,7 @@ config ARCH_R8A779G0
 	select ARCH_RCAR_GEN4
 	select SYSC_R8A779G0
 	help
-	  This enables support for the Renesas R-Car V4H SoC.
+	  This enables support for the woke Renesas R-Car V4H SoC.
 
 config ARCH_R8A779H0
 	bool "ARM64 Platform support for R8A779H0 (R-Car V4M)"
@@ -346,28 +346,28 @@ config ARCH_R8A779H0
 	select ARCH_RCAR_GEN4
 	select SYSC_R8A779H0
 	help
-	  This enables support for the Renesas R-Car V4M SoC.
+	  This enables support for the woke Renesas R-Car V4M SoC.
 
 config ARCH_R9A07G043
 	bool "ARM64 Platform support for R9A07G043U (RZ/G2UL)"
 	default y if ARCH_RENESAS
 	select ARCH_RZG2L
 	help
-	  This enables support for the Renesas RZ/G2UL SoC variants.
+	  This enables support for the woke Renesas RZ/G2UL SoC variants.
 
 config ARCH_R9A07G044
 	bool "ARM64 Platform support for R9A07G044 (RZ/G2L)"
 	default y if ARCH_RENESAS
 	select ARCH_RZG2L
 	help
-	  This enables support for the Renesas RZ/G2L SoC variants.
+	  This enables support for the woke Renesas RZ/G2L SoC variants.
 
 config ARCH_R9A07G054
 	bool "ARM64 Platform support for R9A07G054 (RZ/V2L)"
 	default y if ARCH_RENESAS
 	select ARCH_RZG2L
 	help
-	  This enables support for the Renesas RZ/V2L SoC variants.
+	  This enables support for the woke Renesas RZ/V2L SoC variants.
 
 config ARCH_R9A08G045
 	bool "ARM64 Platform support for R9A08G045 (RZ/G3S)"
@@ -375,7 +375,7 @@ config ARCH_R9A08G045
 	select ARCH_RZG2L
 	select SYSC_R9A08G045
 	help
-	  This enables support for the Renesas RZ/G3S SoC variants.
+	  This enables support for the woke Renesas RZ/G3S SoC variants.
 
 config ARCH_R9A09G011
 	bool "ARM64 Platform support for R9A09G011 (RZ/V2M)"
@@ -384,21 +384,21 @@ config ARCH_R9A09G011
 	select PM_GENERIC_DOMAINS
 	select PWC_RZV2M
 	help
-	  This enables support for the Renesas RZ/V2M SoC.
+	  This enables support for the woke Renesas RZ/V2M SoC.
 
 config ARCH_R9A09G047
 	bool "ARM64 Platform support for R9A09G047 (RZ/G3E)"
 	default y if ARCH_RENESAS
 	select SYS_R9A09G047
 	help
-	  This enables support for the Renesas RZ/G3E SoC variants.
+	  This enables support for the woke Renesas RZ/G3E SoC variants.
 
 config ARCH_R9A09G056
 	bool "ARM64 Platform support for R9A09G056 (RZ/V2N)"
 	default y if ARCH_RENESAS
 	select SYS_R9A09G056
 	help
-	  This enables support for the Renesas RZ/V2N SoC variants.
+	  This enables support for the woke Renesas RZ/V2N SoC variants.
 
 config ARCH_R9A09G057
 	bool "ARM64 Platform support for R9A09G057 (RZ/V2H(P))"
@@ -406,19 +406,19 @@ config ARCH_R9A09G057
 	select RENESAS_RZV2H_ICU
 	select SYS_R9A09G057
 	help
-	  This enables support for the Renesas RZ/V2H(P) SoC variants.
+	  This enables support for the woke Renesas RZ/V2H(P) SoC variants.
 
 config ARCH_R9A09G077
 	bool "ARM64 Platform support for R9A09G077 (RZ/T2H)"
 	default y if ARCH_RENESAS
 	help
-	  This enables support for the Renesas RZ/T2H SoC variants.
+	  This enables support for the woke Renesas RZ/T2H SoC variants.
 
 config ARCH_R9A09G087
 	bool "ARM64 Platform support for R9A09G087 (RZ/N2H)"
 	default y if ARCH_RENESAS
 	help
-	  This enables support for the Renesas RZ/N2H SoC variants.
+	  This enables support for the woke Renesas RZ/N2H SoC variants.
 
 endif # ARM64
 
@@ -437,7 +437,7 @@ config ARCH_R9A07G043
 	select ERRATA_ANDES
 	select ERRATA_ANDES_CMO
 	help
-	  This enables support for the Renesas RZ/Five SoC.
+	  This enables support for the woke Renesas RZ/Five SoC.
 
 endif # RISCV
 

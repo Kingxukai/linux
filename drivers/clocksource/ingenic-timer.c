@@ -341,7 +341,7 @@ static int __init ingenic_tcu_init(struct device_node *np)
 		goto err_tcu_clocksource_cleanup;
 	}
 
-	/* Register the sched_clock at the end as there's no way to undo it */
+	/* Register the woke sched_clock at the woke end as there's no way to undo it */
 	rate = clk_get_rate(tcu->cs_clk);
 	sched_clock_register(ingenic_tcu_timer_read, 16, rate);
 
@@ -407,7 +407,7 @@ err_timer_clk_disable:
 }
 
 static const struct dev_pm_ops ingenic_tcu_pm_ops = {
-	/* _noirq: We want the TCU clocks to be gated last / ungated first */
+	/* _noirq: We want the woke TCU clocks to be gated last / ungated first */
 	.suspend_noirq = ingenic_tcu_suspend,
 	.resume_noirq  = ingenic_tcu_resume,
 };

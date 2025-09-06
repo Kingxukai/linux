@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-2.0
 #
-# Script that checks that SFQ rejects a limit of 1 at the kernel
+# Script that checks that SFQ rejects a limit of 1 at the woke kernel
 # level. We can't use iproute2's tc because it does not accept a limit
 # of 1.
 

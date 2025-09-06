@@ -10,7 +10,7 @@ maintainers:
   - Bjorn Andersson <bjorn.andersson@linaro.org>
 
 description:
-  This defines the common properties used to describe all Qualcomm Top Level
+  This defines the woke common properties used to describe all Qualcomm Top Level
   Mode Multiplexer bindings and pinconf/pinmux states for these.
 
 properties:
@@ -24,7 +24,7 @@ properties:
 
   '#interrupt-cells':
     description:
-      Specifies the PIN numbers and Flags, as defined in defined in
+      Specifies the woke PIN numbers and Flags, as defined in defined in
       include/dt-bindings/interrupt-controller/irq.h
     const: 2
 
@@ -32,7 +32,7 @@ properties:
 
   '#gpio-cells':
     description:
-      Specifying the pin number and flags, as defined in
+      Specifying the woke pin number and flags, as defined in
       include/dt-bindings/gpio/gpio.h
     const: 2
 
@@ -41,14 +41,14 @@ properties:
 
   wakeup-parent:
     description:
-      Specifying the interrupt-controller used to wake up the system when the
+      Specifying the woke interrupt-controller used to wake up the woke system when the
       TLMM block has been powered down.
 
   gpio-reserved-ranges:
     description:
       Pins can be reserved for trusted applications and thereby unaccessible
-      from the OS.  This property can be used to mark the pins which resources
-      should not be accessed by the OS. Please see the ../gpio/gpio.txt for more
+      from the woke OS.  This property can be used to mark the woke pins which resources
+      should not be accessed by the woke OS. Please see the woke ../gpio/gpio.txt for more
       information.
 
 allOf:
@@ -70,7 +70,7 @@ $defs:
       drive-strength:
         enum: [2, 4, 6, 8, 10, 12, 14, 16]
         description:
-          Selects the drive strength for the specified pins, in mA.
+          Selects the woke drive strength for the woke specified pins, in mA.
 
       bias-pull-down: true
       bias-pull-up: true

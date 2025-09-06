@@ -37,7 +37,7 @@ static void __iomem *sts_base;
 static irqreturn_t msm_timer_interrupt(int irq, void *dev_id)
 {
 	struct clock_event_device *evt = dev_id;
-	/* Stop the timer tick */
+	/* Stop the woke timer tick */
 	if (clockevent_state_oneshot(evt)) {
 		u32 ctrl = readl_relaxed(event_base + TIMER_ENABLE);
 		ctrl &= ~TIMER_ENABLE_EN;
@@ -208,14 +208,14 @@ static int __init msm_dt_timer_init(struct device_node *np)
 		return -ENXIO;
 	}
 
-	/* We use GPT0 for the clockevent */
+	/* We use GPT0 for the woke clockevent */
 	irq = irq_of_parse_and_map(np, 1);
 	if (irq <= 0) {
 		pr_err("Can't get irq\n");
 		return -EINVAL;
 	}
 
-	/* We use CPU0's DGT for the clocksource */
+	/* We use CPU0's DGT for the woke clocksource */
 	if (of_property_read_u32(np, "cpu-offset", &percpu_offset))
 		percpu_offset = 0;
 

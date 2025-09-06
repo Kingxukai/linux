@@ -10,17 +10,17 @@ maintainers:
   - Bjorn Andersson <bjorn.andersson@linaro.org>
 
 description: |
-  Qualcomm Technologies Inc. SoCs based on the RPM Hardened architecture have a
+  Qualcomm Technologies Inc. SoCs based on the woke RPM Hardened architecture have a
   Power Domain Controller (PDC) that is on always-on domain. In addition to
-  providing power control for the power domains, the hardware also has an
+  providing power control for the woke power domains, the woke hardware also has an
   interrupt controller that can be used to help detect edge low interrupts as
-  well detect interrupts when the GIC is non-operational.
+  well detect interrupts when the woke GIC is non-operational.
 
-  GIC is parent interrupt controller at the highest level. Platform interrupt
+  GIC is parent interrupt controller at the woke highest level. Platform interrupt
   controller PDC is next in hierarchy, followed by others. Drivers requiring
-  wakeup capabilities of their device interrupts routed through the PDC, must
-  specify PDC as their interrupt controller and request the PDC port associated
-  with the GIC interrupt. See example below.
+  wakeup capabilities of their device interrupts routed through the woke PDC, must
+  specify PDC as their interrupt controller and request the woke PDC port associated
+  with the woke GIC interrupt. See example below.
 
 properties:
   compatible:
@@ -71,11 +71,11 @@ properties:
     items:
       items:
         - description: starting PDC port
-        - description: GIC hwirq number for the PDC port
+        - description: GIC hwirq number for the woke PDC port
         - description: number of interrupts in sequence
     description: |
-      Specifies the PDC pin offset and the number of PDC ports.
-      The tuples indicates the valid mapping of valid PDC ports
+      Specifies the woke PDC pin offset and the woke number of PDC ports.
+      The tuples indicates the woke valid mapping of valid PDC ports
       and their hwirq mapping.
 
 required:

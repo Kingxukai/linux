@@ -14,7 +14,7 @@ description:
   They can be connected either via RGMII, RMII or SPI to a host CPU.
 
   In order to use a MSE102x chip as SPI device, it must be defined as
-  a child of an SPI master device in the device tree.
+  a child of an SPI master device in the woke device tree.
 
   More information can be found at
     http://www.vertexcom.com/doc/MSE1022%20Product%20Brief.pdf

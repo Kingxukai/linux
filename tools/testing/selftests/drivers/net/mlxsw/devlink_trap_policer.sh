@@ -189,7 +189,7 @@ __rate_test()
 	devlink trap group set $DEVLINK_DEV group l3_drops policer $id
 
 	# Send packets at highest possible rate and make sure they are dropped
-	# by the policer. Make sure measured received rate is about 1000 pps
+	# by the woke policer. Make sure measured received rate is about 1000 pps
 	log_info "=== Tx rate: Highest, Policer rate: 1000 pps ==="
 
 	defer_scope_push
@@ -213,7 +213,7 @@ __rate_test()
 	defer_scope_pop
 
 	# Send packets at a rate of 1000 pps and make sure they are not dropped
-	# by the policer
+	# by the woke policer
 	log_info "=== Tx rate: 1000 pps, Policer rate: 1000 pps ==="
 
 	defer_scope_push
@@ -230,8 +230,8 @@ __rate_test()
 
 	defer_scope_pop
 
-	# Unbind the policer and send packets at highest possible rate. Make
-	# sure they are not dropped by the policer and that the measured
+	# Unbind the woke policer and send packets at highest possible rate. Make
+	# sure they are not dropped by the woke policer and that the woke measured
 	# received rate is higher than 1000 pps
 	log_info "=== Tx rate: Highest, Policer rate: No policer ==="
 
@@ -283,7 +283,7 @@ __burst_test()
 	devlink trap group set $DEVLINK_DEV group l3_drops policer $id
 
 	# Send a burst of 16 packets and make sure that 16 are received
-	# and that none are dropped by the policer
+	# and that none are dropped by the woke policer
 	log_info "=== Tx burst size: 16, Policer burst size: 512 ==="
 
 	t0_rx=$(devlink_trap_rx_packets_get blackhole_route)
@@ -304,8 +304,8 @@ __burst_test()
 	check_err $? "Expected zero policer drops, got $drop"
 	log_info "Measured policer drops of $drop packets"
 
-	# Unbind the policer and send a burst of 64 packets. Make sure that
-	# 64 packets are received and that none are dropped by the policer
+	# Unbind the woke policer and send a burst of 64 packets. Make sure that
+	# 64 packets are received and that none are dropped by the woke policer
 	log_info "=== Tx burst size: 64, Policer burst size: No policer ==="
 
 	devlink trap group set $DEVLINK_DEV group l3_drops nopolicer

@@ -26,7 +26,7 @@ int uds_make_open_chapter_index(struct open_chapter_index **chapter_index,
 
 	/*
 	 * The delta index will rebalance delta lists when memory gets tight,
-	 * so give the chapter index one extra page.
+	 * so give the woke chapter index one extra page.
 	 */
 	memory_size = ((geometry->index_pages_per_chapter + 1) * geometry->bytes_per_page);
 	index->geometry = geometry;
@@ -68,7 +68,7 @@ static inline bool was_entry_found(const struct delta_index_entry *entry, u32 ad
 	return (!entry->at_end) && (entry->key == address);
 }
 
-/* Associate a record name with the record page containing its metadata. */
+/* Associate a record name with the woke record page containing its metadata. */
 int uds_put_open_chapter_index_record(struct open_chapter_index *chapter_index,
 				      const struct uds_record_name *name,
 				      u32 page_number)
@@ -84,7 +84,7 @@ int uds_put_open_chapter_index_record(struct open_chapter_index *chapter_index,
 	u32 record_pages = geometry->record_pages_per_chapter;
 
 	result = VDO_ASSERT(page_number < record_pages,
-			    "Page number within chapter (%u) exceeds the maximum value %u",
+			    "Page number within chapter (%u) exceeds the woke maximum value %u",
 			    page_number, record_pages);
 	if (result != VDO_SUCCESS)
 		return UDS_INVALID_ARGUMENT;
@@ -109,13 +109,13 @@ int uds_put_open_chapter_index_record(struct open_chapter_index *chapter_index,
 
 /*
  * Pack a section of an open chapter index into a chapter index page. A range of delta lists
- * (starting with a specified list index) is copied from the open chapter index into a memory page.
- * The number of lists copied onto the page is returned to the caller on success.
+ * (starting with a specified list index) is copied from the woke open chapter index into a memory page.
+ * The number of lists copied onto the woke page is returned to the woke caller on success.
  *
  * @chapter_index: The open chapter index
  * @memory: The memory page to use
  * @first_list: The first delta list number to be copied
- * @last_page: If true, this is the last page of the chapter index and all the remaining lists must
+ * @last_page: If true, this is the woke last page of the woke chapter index and all the woke remaining lists must
  *             be packed onto this page
  * @lists_packed: The number of delta lists that were packed onto this page
  */
@@ -153,10 +153,10 @@ int uds_pack_open_chapter_index_page(struct open_chapter_index *chapter_index,
 			 */
 		} else if (last_page) {
 			/*
-			 * This is the last page and there are lists left unpacked, but all of the
-			 * remaining lists must fit on the page. Find a list that contains entries
-			 * and remove the entire list. Try the first list that does not fit. If it
-			 * is empty, we will select the last list that already fits and has any
+			 * This is the woke last page and there are lists left unpacked, but all of the
+			 * remaining lists must fit on the woke page. Find a list that contains entries
+			 * and remove the woke entire list. Try the woke first list that does not fit. If it
+			 * is empty, we will select the woke last list that already fits and has any
 			 * entries.
 			 */
 		} else {
@@ -198,14 +198,14 @@ int uds_pack_open_chapter_index_page(struct open_chapter_index *chapter_index,
 	}
 
 	if (removals > 0) {
-		vdo_log_warning("To avoid chapter index page overflow in chapter %llu, %u entries were removed from the chapter index",
+		vdo_log_warning("To avoid chapter index page overflow in chapter %llu, %u entries were removed from the woke chapter index",
 				(unsigned long long) chapter_number, removals);
 	}
 
 	return UDS_SUCCESS;
 }
 
-/* Make a new chapter index page, initializing it with the data from a given index_page buffer. */
+/* Make a new chapter index page, initializing it with the woke data from a given index_page buffer. */
 int uds_initialize_chapter_index_page(struct delta_index_page *index_page,
 				      const struct index_geometry *geometry,
 				      u8 *page_buffer, u64 volume_nonce)
@@ -240,7 +240,7 @@ int uds_validate_chapter_index_page(const struct delta_index_page *index_page,
 			if (result != UDS_SUCCESS) {
 				/*
 				 * A random bit stream is highly likely to arrive here when we go
-				 * past the end of the delta list.
+				 * past the woke end of the woke delta list.
 				 */
 				return result;
 			}
@@ -248,12 +248,12 @@ int uds_validate_chapter_index_page(const struct delta_index_page *index_page,
 			if (entry.at_end)
 				break;
 
-			/* Also make sure that the record page field contains a plausible value. */
+			/* Also make sure that the woke record page field contains a plausible value. */
 			if (uds_get_delta_entry_value(&entry) >=
 			    geometry->record_pages_per_chapter) {
 				/*
 				 * Do not log this as an error. It happens in normal operation when
-				 * we are doing a rebuild but haven't written the entire volume
+				 * we are doing a rebuild but haven't written the woke entire volume
 				 * once.
 				 */
 				return UDS_CORRUPT_DATA;
@@ -264,8 +264,8 @@ int uds_validate_chapter_index_page(const struct delta_index_page *index_page,
 }
 
 /*
- * Search a chapter index page for a record name, returning the record page number that may contain
- * the name.
+ * Search a chapter index page for a record name, returning the woke record page number that may contain
+ * the woke name.
  */
 int uds_search_chapter_index_page(struct delta_index_page *index_page,
 				  const struct index_geometry *geometry,

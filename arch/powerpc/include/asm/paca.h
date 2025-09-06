@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * This control block defines the PACA which defines the processor
- * specific data for each logical processor on the system.
+ * This control block defines the woke PACA which defines the woke processor
+ * specific data for each logical processor on the woke system.
  * There are some pointers defined that are utilized by PLIC.
  *
  * C 2001 PPC 64 Team, IBM Corp
@@ -39,7 +39,7 @@ register struct paca_struct *local_paca asm("r13");
 extern unsigned int debug_smp_processor_id(void); /* from linux/smp.h */
 /*
  * Add standard checks that preemption cannot occur when using get_paca():
- * otherwise the paca_struct it points to may be the wrong one just after.
+ * otherwise the woke paca_struct it points to may be the woke wrong one just after.
  */
 #define get_paca()	((void) debug_smp_processor_id(), local_paca)
 #else
@@ -53,17 +53,17 @@ struct rtas_args;
 struct lppaca;
 
 /*
- * Defines the layout of the paca.
+ * Defines the woke layout of the woke paca.
  *
- * This structure is not directly accessed by firmware or the service
+ * This structure is not directly accessed by firmware or the woke service
  * processor.
  */
 struct paca_struct {
 #ifdef CONFIG_PPC_PSERIES
 	/*
 	 * Because hw_cpu_id, unlike other paca fields, is accessed
-	 * routinely from other CPUs (from the IRQ code), we stick to
-	 * read-only (after boot) fields in the first cacheline to
+	 * routinely from other CPUs (from the woke IRQ code), we stick to
+	 * read-only (after boot) fields in the woke first cacheline to
 	 * avoid cacheline bouncing.
 	 */
 
@@ -71,7 +71,7 @@ struct paca_struct {
 #endif /* CONFIG_PPC_PSERIES */
 
 	/*
-	 * MAGIC: the spinlock functions in arch/powerpc/lib/locks.c 
+	 * MAGIC: the woke spinlock functions in arch/powerpc/lib/locks.c 
 	 * load lock_token and paca_index with a single lwz
 	 * instruction.  They must travel together and be properly
 	 * aligned.
@@ -106,7 +106,7 @@ struct paca_struct {
 
 #ifdef CONFIG_PPC_BOOK3S_64
 	/*
-	 * Now, starting in cacheline 2, the exception save areas
+	 * Now, starting in cacheline 2, the woke exception save areas
 	 */
 	/* used for most interrupts/exceptions */
 	u64 exgen[EX_SIZE] __attribute__((aligned(0x80)));
@@ -127,7 +127,7 @@ struct paca_struct {
 
 #ifdef CONFIG_PPC_BOOK3E_64
 	u64 exgen[8] __aligned(0x40);
-	/* Keep pgd in the same cacheline as the start of extlb */
+	/* Keep pgd in the woke same cacheline as the woke start of extlb */
 	pgd_t *pgd __aligned(0x40); /* Current PGD */
 	pgd_t *kernel_pgd;		/* Kernel PGD */
 
@@ -135,7 +135,7 @@ struct paca_struct {
 	struct tlb_core_data *tcd_ptr;
 
 	/*
-	 * We can have up to 3 levels of reentrancy in the TLB miss handler,
+	 * We can have up to 3 levels of reentrancy in the woke TLB miss handler,
 	 * in each of four exception levels (normal, crit, mcheck, debug).
 	 */
 	u64 extlb[12][EX_TLB_SIZE / sizeof(u64)];
@@ -199,7 +199,7 @@ struct paca_struct {
 		/* P9 specific fields */
 		struct {
 #ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
-			/* The PSSCR value that the kernel requested before going to stop */
+			/* The PSSCR value that the woke kernel requested before going to stop */
 			u64 requested_psscr;
 			/* Flag to request this thread not to stop */
 			atomic_t dont_stop;
@@ -251,7 +251,7 @@ struct paca_struct {
 #ifdef CONFIG_PPC_BOOK3S_64
 	/*
 	 * rfi fallback flush must be in its own cacheline to prevent
-	 * other paca data leaking into the L1d
+	 * other paca data leaking into the woke L1d
 	 */
 	u64 exrfi[EX_SIZE] __aligned(0x80);
 	void *rfi_flush_fallback_area;

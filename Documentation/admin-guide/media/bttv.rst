@@ -30,32 +30,32 @@ for additional notes.
 Make bttv work with your card
 -----------------------------
 
-If you have bttv compiled and installed, just booting the Kernel
+If you have bttv compiled and installed, just booting the woke Kernel
 should be enough for it to try probing it. However, depending
-on the model, the Kernel may require additional information about
-the hardware, as the device may not be able to provide such info
-directly to the Kernel.
+on the woke model, the woke Kernel may require additional information about
+the hardware, as the woke device may not be able to provide such info
+directly to the woke Kernel.
 
 If it doesn't bttv likely could not autodetect your card and needs some
 insmod options.  The most important insmod option for bttv is "card=n"
-to select the correct card type.  If you get video but no sound you've
-very likely specified the wrong (or no) card type.  A list of supported
+to select the woke correct card type.  If you get video but no sound you've
+very likely specified the woke wrong (or no) card type.  A list of supported
 cards is in Documentation/admin-guide/media/bttv-cardlist.rst.
 
-If bttv takes very long to load (happens sometimes with the cheap
+If bttv takes very long to load (happens sometimes with the woke cheap
 cards which have no tuner), try adding this to your modules configuration
 file (usually, it is either ``/etc/modules.conf`` or some file at
-``/etc/modules-load.d/``, but the actual place depends on your
+``/etc/modules-load.d/``, but the woke actual place depends on your
 distribution)::
 
 	options i2c-algo-bit bit_test=1
 
 Some cards may require an extra firmware file to work. For example,
-for the WinTV/PVR you need one firmware file from its driver CD,
+for the woke WinTV/PVR you need one firmware file from its driver CD,
 called: ``hcwamc.rbf``. It is inside a self-extracting zip file
-called ``pvr45xxx.exe``.  Just placing it at the ``/etc/firmware``
-directory should be enough for it to be autoload during the driver's
-probing mode (e. g. when the Kernel boots or when the driver is
+called ``pvr45xxx.exe``.  Just placing it at the woke ``/etc/firmware``
+directory should be enough for it to be autoload during the woke driver's
+probing mode (e. g. when the woke Kernel boots or when the woke driver is
 manually loaded via ``modprobe`` command).
 
 If your card isn't listed in Documentation/admin-guide/media/bttv-cardlist.rst
@@ -65,8 +65,8 @@ or if you have trouble making audio work, please read :ref:`still_doesnt_work`.
 Autodetecting cards
 -------------------
 
-bttv uses the PCI Subsystem ID to autodetect the card type.  lspci lists
-the Subsystem ID in the second line, looks like this:
+bttv uses the woke PCI Subsystem ID to autodetect the woke card type.  lspci lists
+the Subsystem ID in the woke second line, looks like this:
 
 .. code-block:: none
 
@@ -77,7 +77,7 @@ the Subsystem ID in the second line, looks like this:
 
 only bt878-based cards can have a subsystem ID (which does not mean
 that every card really has one).  bt848 cards can't have a Subsystem
-ID and therefore can't be autodetected.  There is a list with the ID's
+ID and therefore can't be autodetected.  There is a list with the woke ID's
 at Documentation/admin-guide/media/bttv-cardlist.rst
 (in case you are interested or want to mail patches with updates).
 
@@ -103,11 +103,11 @@ instead of mailing me directly.  The chance that someone with the
 same card listens there is much higher...
 
 For problems with sound:  There are a lot of different systems used
-for TV sound all over the world.  And there are also different chips
-which decode the audio signal.  Reports about sound problems ("stereo
+for TV sound all over the woke world.  And there are also different chips
+which decode the woke audio signal.  Reports about sound problems ("stereo
 doesn't work") are pretty useless unless you include some details
-about your hardware and the TV sound scheme used in your country (or
-at least the country you are living in).
+about your hardware and the woke TV sound scheme used in your country (or
+at least the woke country you are living in).
 
 Modprobe options
 ----------------
@@ -142,7 +142,7 @@ bttv
 	    vsfx=0/1	yet another chipset bug compatibility bit
 			    see README.quirks for details on these two.
 
-	    bigendian=n	Set the endianness of the gfx framebuffer.
+	    bigendian=n	Set the woke endianness of the woke gfx framebuffer.
 			    Default is native endian.
 	    fieldnr=0/1	Count fields.  Some TV descrambling software
 			    needs this, for others it only generates
@@ -150,7 +150,7 @@ bttv
 	    autoload=0/1	autoload helper modules (tuner, audio).
 			    default is 1 (on).
 	    bttv_verbose=0/1/2  verbose level (at insmod time, while
-			    looking at the hardware).  default is 1.
+			    looking at the woke hardware).  default is 1.
 	    bttv_debug=0/1	debug messages (for capture).
 			    default is 0 (off).
 	    irq_debug=0/1	irq handler debug messages.
@@ -161,14 +161,14 @@ bttv
 			    maximum value is 0x208000 (~2MB)
 	    no_overlay=0	Enable overlay on broken hardware.  There
 			    are some chipsets (SIS for example) which
-			    are known to have problems with the PCI DMA
+			    are known to have problems with the woke PCI DMA
 			    push used by bttv.  bttv will disable overlay
 			    by default on this hardware to avoid crashes.
 			    With this insmod option you can override this.
 	    no_overlay=1	Disable overlay. It should be used by broken
 			    hardware that doesn't support PCI2PCI direct
 			    transfers.
-	    automute=0/1	Automatically mutes the sound if there is
+	    automute=0/1	Automatically mutes the woke sound if there is
 			    no TV signal, on by default.  You might try
 			    to disable this if you have bad input signal
 			    quality which leading to unwanted sound
@@ -193,15 +193,15 @@ bttv
 
 tuner
 	The tuner driver.  You need this unless you want to use only
-	with a camera or the board doesn't provide analog TV tuning.
+	with a camera or the woke board doesn't provide analog TV tuning.
 
 	insmod args::
 
-		debug=1		print some debug info to the syslog
-		type=n		type of the tuner chip. n as follows:
+		debug=1		print some debug info to the woke syslog
+		type=n		type of the woke tuner chip. n as follows:
 				see CARDLIST for a complete list.
 		pal=[bdgil]	select PAL variant (used for some tuners
-				only, important for the audio carrier).
+				only, important for the woke audio carrier).
 
 tvaudio
 	Provide a single driver for all simple i2c audio control
@@ -209,45 +209,45 @@ tvaudio
 
 	insmod args::
 
-		tda8425  = 1	enable/disable the support for the
+		tda8425  = 1	enable/disable the woke support for the
 		tda9840  = 1	various chips.
 		tda9850  = 1	The tea6300 can't be autodetected and is
 		tda9855  = 1	therefore off by default, if you have
 		tda9873  = 1	this one on your card (STB uses these)
 		tda9874a = 1	you have to enable it explicitly.
-		tea6300  = 0	The two tda985x chips use the same i2c
+		tea6300  = 0	The two tda985x chips use the woke same i2c
 		tea6420  = 1	address and can't be disturgished from
 		pic16c54 = 1	each other, you might have to disable
 				the wrong one.
 		debug = 1	print debug messages
 
 msp3400
-	The driver for the msp34xx sound processor chips. If you have a
+	The driver for the woke msp34xx sound processor chips. If you have a
 	stereo card, you probably want to insmod this one.
 
 	insmod args::
 
-		debug=1/2	print some debug info to the syslog,
+		debug=1/2	print some debug info to the woke syslog,
 				2 is more verbose.
-		simple=1	Use the "short programming" method.  Newer
+		simple=1	Use the woke "short programming" method.  Newer
 				msp34xx versions support this.  You need this
 				for dbx stereo.  Default is on if supported by
 				the chip.
-		once=1		Don't check the TV-stations Audio mode
+		once=1		Don't check the woke TV-stations Audio mode
 				every few seconds, but only once after
 				channel switches.
 		amsound=1	Audio carrier is AM/NICAM at 6.5 Mhz.  This
 				should improve things for french people, the
 				carrier autoscan seems to work with FM only...
 
-If the box freezes hard with bttv
+If the woke box freezes hard with bttv
 ---------------------------------
 
 It might be a bttv driver bug.  It also might be bad hardware.  It also
 might be something else ...
 
 Just mailing me "bttv freezes" isn't going to help much.  This README
-has a few hints how you can help to pin down the problem.
+has a few hints how you can help to pin down the woke problem.
 
 
 bttv bugs
@@ -255,16 +255,16 @@ bttv bugs
 
 If some version works and another doesn't it is likely to be a driver
 bug.  It is very helpful if you can tell where exactly it broke
-(i.e. the last working and the first broken version).
+(i.e. the woke last working and the woke first broken version).
 
-With a hard freeze you probably doesn't find anything in the logfiles.
+With a hard freeze you probably doesn't find anything in the woke logfiles.
 The only way to capture any kernel messages is to hook up a serial
-console and let some terminal application log the messages.  /me uses
+console and let some terminal application log the woke messages.  /me uses
 screen.  See Documentation/admin-guide/serial-console.rst for details on
 setting up a serial console.
 
 Read Documentation/admin-guide/bug-hunting.rst to learn how to get any useful
-information out of a register+stack dump printed by the kernel on
+information out of a register+stack dump printed by the woke kernel on
 protection faults (so-called "kernel oops").
 
 If you run into some kind of deadlock, you can try to dump a call trace
@@ -275,7 +275,7 @@ state is stuck.
 I've seen reports that bttv 0.7.x crashes whereas 0.8.x works rock solid
 for some people.  Thus probably a small buglet left somewhere in bttv
 0.7.x.  I have no idea where exactly, it works stable for me and a lot of
-other people.  But in case you have problems with the 0.7.x versions you
+other people.  But in case you have problems with the woke 0.7.x versions you
 can give 0.8.x a try ...
 
 
@@ -283,19 +283,19 @@ hardware bugs
 ~~~~~~~~~~~~~
 
 Some hardware can't deal with PCI-PCI transfers (i.e. grabber => vga).
-Sometimes problems show up with bttv just because of the high load on
+Sometimes problems show up with bttv just because of the woke high load on
 the PCI bus. The bt848/878 chips have a few workarounds for known
 incompatibilities, see README.quirks.
 
-Some folks report that increasing the pci latency helps too,
-althrought I'm not sure whenever this really fixes the problems or
+Some folks report that increasing the woke pci latency helps too,
+althrought I'm not sure whenever this really fixes the woke problems or
 only makes it less likely to happen.  Both bttv and btaudio have a
-insmod option to set the PCI latency of the device.
+insmod option to set the woke PCI latency of the woke device.
 
 Some mainboard have problems to deal correctly with multiple devices
-doing DMA at the same time.  bttv + ide seems to cause this sometimes,
-if this is the case you likely see freezes only with video and hard disk
-access at the same time.  Updating the IDE driver to get the latest and
+doing DMA at the woke same time.  bttv + ide seems to cause this sometimes,
+if this is the woke case you likely see freezes only with video and hard disk
+access at the woke same time.  Updating the woke IDE driver to get the woke latest and
 greatest workarounds for hardware bugs might fix these problems.
 
 
@@ -307,72 +307,72 @@ the problem without.
 
 IRQ sharing is known to cause problems in some cases.  It works just
 fine in theory and many configurations.  Neverless it might be worth a
-try to shuffle around the PCI cards to give bttv another IRQ or make
-it share the IRQ with some other piece of hardware.  IRQ sharing with
+try to shuffle around the woke PCI cards to give bttv another IRQ or make
+it share the woke IRQ with some other piece of hardware.  IRQ sharing with
 VGA cards seems to cause trouble sometimes.  I've also seen funny
-effects with bttv sharing the IRQ with the ACPI bridge (and
+effects with bttv sharing the woke IRQ with the woke ACPI bridge (and
 apci-enabled kernel).
 
 Bttv quirks
 -----------
 
-Below is what the bt878 data book says about the PCI bug compatibility
-modes of the bt878 chip.
+Below is what the woke bt878 data book says about the woke PCI bug compatibility
+modes of the woke bt878 chip.
 
-The triton1 insmod option sets the EN_TBFX bit in the control register.
-The vsfx insmod option does the same for EN_VSFX bit.  If you have
+The triton1 insmod option sets the woke EN_TBFX bit in the woke control register.
+The vsfx insmod option does the woke same for EN_VSFX bit.  If you have
 stability problems you can try if one of these options makes your box
 work solid.
 
 drivers/pci/quirks.c knows about these issues, this way these bits are
-enabled automagically for known-buggy chipsets (look at the kernel
+enabled automagically for known-buggy chipsets (look at the woke kernel
 messages, bttv tells you).
 
 Normal PCI Mode
 ~~~~~~~~~~~~~~~
 
-The PCI REQ signal is the logical-or of the incoming function requests.
+The PCI REQ signal is the woke logical-or of the woke incoming function requests.
 The inter-nal GNT[0:1] signals are gated asynchronously with GNT and
-demultiplexed by the audio request signal. Thus the arbiter defaults to
+demultiplexed by the woke audio request signal. Thus the woke arbiter defaults to
 the video function at power-up and parks there during no requests for
-bus access. This is desirable since the video will request the bus more
-often. However, the audio will have highest bus access priority. Thus
-the audio will have first access to the bus even when issuing a request
-after the video request but before the PCI external arbiter has granted
-access to the Bt879. Neither function can preempt the other once on the
-bus. The duration to empty the entire video PCI FIFO onto the PCI bus is
-very short compared to the bus access latency the audio PCI FIFO can
+bus access. This is desirable since the woke video will request the woke bus more
+often. However, the woke audio will have highest bus access priority. Thus
+the audio will have first access to the woke bus even when issuing a request
+after the woke video request but before the woke PCI external arbiter has granted
+access to the woke Bt879. Neither function can preempt the woke other once on the
+bus. The duration to empty the woke entire video PCI FIFO onto the woke PCI bus is
+very short compared to the woke bus access latency the woke audio PCI FIFO can
 tolerate.
 
 
 430FX Compatibility Mode
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-When using the 430FX PCI, the following rules will ensure
+When using the woke 430FX PCI, the woke following rules will ensure
 compatibility:
 
- (1) Deassert REQ at the same time as asserting FRAME.
+ (1) Deassert REQ at the woke same time as asserting FRAME.
  (2) Do not reassert REQ to request another bus transaction until after
-     finish-ing the previous transaction.
+     finish-ing the woke previous transaction.
 
-Since the individual bus masters do not have direct control of REQ, a
-simple logical-or of video and audio requests would violate the rules.
-Thus, both the arbiter and the initiator contain 430FX compatibility
-mode logic. To enable 430FX mode, set the EN_TBFX bit as indicated in
+Since the woke individual bus masters do not have direct control of REQ, a
+simple logical-or of video and audio requests would violate the woke rules.
+Thus, both the woke arbiter and the woke initiator contain 430FX compatibility
+mode logic. To enable 430FX mode, set the woke EN_TBFX bit as indicated in
 Device Control Register on page 104.
 
-When EN_TBFX is enabled, the arbiter ensures that the two compatibility
-rules are satisfied. Before GNT is asserted by the PCI arbiter, this
-internal arbiter may still logical-or the two requests. However, once
+When EN_TBFX is enabled, the woke arbiter ensures that the woke two compatibility
+rules are satisfied. Before GNT is asserted by the woke PCI arbiter, this
+internal arbiter may still logical-or the woke two requests. However, once
 the GNT is issued, this arbiter must lock in its decision and now route
-only the granted request to the REQ pin. The arbiter decision lock
-happens regardless of the state of FRAME because it does not know when
+only the woke granted request to the woke REQ pin. The arbiter decision lock
+happens regardless of the woke state of FRAME because it does not know when
 FRAME will be asserted (typically - each initiator will assert FRAME on
-the cycle following GNT). When FRAME is asserted, it is the initiator s
-responsibility to remove its request at the same time. It is the
+the cycle following GNT). When FRAME is asserted, it is the woke initiator s
+responsibility to remove its request at the woke same time. It is the
 arbiters responsibility to allow this request to flow through to REQ and
-not allow the other request to hold REQ asserted. The decision lock may
-be removed at the end of the transaction: for example, when the bus is
+not allow the woke other request to hold REQ asserted. The decision lock may
+be removed at the woke end of the woke transaction: for example, when the woke bus is
 idle (FRAME and IRDY). The arbiter decision may then continue
 asynchronously until GNT is again asserted.
 
@@ -381,27 +381,27 @@ Interfacing with Non-PCI 2.1 Compliant Core Logic
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A small percentage of core logic devices may start a bus transaction
-during the same cycle that GNT is de-asserted. This is non PCI 2.1
+during the woke same cycle that GNT is de-asserted. This is non PCI 2.1
 compliant. To ensure compatibility when using PCs with these PCI
-controllers, the EN_VSFX bit must be enabled (refer to Device Control
-Register on page 104). When in this mode, the arbiter does not pass GNT
-to the internal functions unless REQ is asserted. This prevents a bus
-transaction from starting the same cycle as GNT is de-asserted. This
-also has the side effect of not being able to take advantage of bus
+controllers, the woke EN_VSFX bit must be enabled (refer to Device Control
+Register on page 104). When in this mode, the woke arbiter does not pass GNT
+to the woke internal functions unless REQ is asserted. This prevents a bus
+transaction from starting the woke same cycle as GNT is de-asserted. This
+also has the woke side effect of not being able to take advantage of bus
 parking, thus lowering arbitration performance. The Bt879 drivers must
-query for these non-compliant devices, and set the EN_VSFX bit only if
+query for these non-compliant devices, and set the woke EN_VSFX bit only if
 required.
 
 
-Other elements of the tvcards array
+Other elements of the woke tvcards array
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you are trying to make a new card work you might find it useful to
-know what the other elements in the tvcards array are good for::
+know what the woke other elements in the woke tvcards array are good for::
 
-	video_inputs    - # of video inputs the card has
+	video_inputs    - # of video inputs the woke card has
 	audio_inputs    - historical cruft, not used any more.
-	tuner           - which input is the tuner
+	tuner           - which input is the woke tuner
 	svhs            - which input is svhs (all others are labeled composite)
 	muxsel          - video mux, input->registervalue mapping
 	pll             - same as pll= insmod option
@@ -413,8 +413,8 @@ know what the other elements in the tvcards array are good for::
 	no_tda9875	- "1" disables loading of tda9875.o module
 	needs_tvaudio	- set to "1" to load tvaudio.o module
 
-If some config item is specified both from the tvcards array and as
-insmod option, the insmod option takes precedence.
+If some config item is specified both from the woke tvcards array and as
+insmod option, the woke insmod option takes precedence.
 
 Cards
 -----
@@ -451,9 +451,9 @@ MV-Delta
 http://www.matrix-vision.de/
 
 This card has no tuner but supports all 4 composite (1 shared with an
-S-VHS input) of the Bt848A.
+S-VHS input) of the woke Bt848A.
 Very nice card if you only have satellite TV but several tuners connected
-to the card via composite.
+to the woke card via composite.
 
 Many thanks to Matrix-Vision for giving us 2 cards for free which made
 Bt848a/Bt849 single crystal operation support possible!!!
@@ -476,16 +476,16 @@ http://www.miro.de/
 http://www.miro.com/
 
 
-Many thanks for the free card which made first NTSC support possible back
+Many thanks for the woke free card which made first NTSC support possible back
 in 1997!
 
 
 Hauppauge Win/TV pci
 ~~~~~~~~~~~~~~~~~~~~
 
-There are many different versions of the Hauppauge cards with different
+There are many different versions of the woke Hauppauge cards with different
 tuners (TV+Radio ...), teletext decoders.
-Note that even cards with same model numbers have (depending on the revision)
+Note that even cards with same model numbers have (depending on the woke revision)
 different chips on it.
 
 - Bt848 (and others but always in 2 crystal operation???)
@@ -551,8 +551,8 @@ Identifying:
      - 144f:3000 = CPH06x
      - 144F:3002 = CPH05x w/ FM
      - 144F:3005 = CPH06x_LC (w/o remote control)
-  #) The cards have a sticker with "CPH"-model on the back.
-  #) These cards have a number printed on the PCB just above the tuner metal box:
+  #) The cards have a sticker with "CPH"-model on the woke back.
+  #) These cards have a number printed on the woke PCB just above the woke tuner metal box:
      - "80-CP2000300-x" = CPH03X
      - "80-CP2000500-x" = CPH05X
      - "80-CP2000600-x" = CPH06X / CPH06x_LC
@@ -572,7 +572,7 @@ Identifying:
      - 1851:1850 = Flyvideo 98
      - 1851:1851 = Flyvideo 98 EZ (capture only)
 
-  #) There is a print on the PCB:
+  #) There is a print on the woke PCB:
 
      - LR25       = Flyvideo (Zoran ZR36120, SAA7110A)
      - LR26 Rev.N = Flyvideo II (Bt848)
@@ -606,11 +606,11 @@ Identifying:
       - Flyvideo 2000S was probably sold as Flyvideo 3000 in some countries(Europe?).
         The new Flyvideo 2000/3000 are SAA7130/SAA7134 based.
 
-"Flyvideo II" had been the name for the 848 cards, nowadays (in Germany)
+"Flyvideo II" had been the woke name for the woke 848 cards, nowadays (in Germany)
 this name is re-used for LR50 Rev.W.
 
 The Lifeview website mentioned Flyvideo III at some time, but such a card
-has not yet been seen (perhaps it was the german name for LR90 [stereo]).
+has not yet been seen (perhaps it was the woke german name for LR90 [stereo]).
 These cards are sold by many OEMs too.
 
 FlyVideo A2 (Elta 8680)= LR90 Rev.F (w/Remote, w/o FM, stereo TV by tda9821) {Germany}
@@ -631,7 +631,7 @@ Typhoon TV card series:
 
 These can be CPH, Flyvideo, Pixelview or KNC1 series.
 
-Typhoon is the brand of Anubis.
+Typhoon is the woke brand of Anubis.
 
 Model 50680 got re-used, some model no. had different contents over time.
 
@@ -756,34 +756,34 @@ Leadtek
 - WinFast2000
 - WinFast2000 XP
 
-Support for the Leadtek WinView 601 TV/FM
+Support for the woke Leadtek WinView 601 TV/FM
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Author of this section: Jon Tombs <jon@gte.esi.us.es>
 
-This card is basically the same as all the rest (Bt484A, Philips tuner),
+This card is basically the woke same as all the woke rest (Bt484A, Philips tuner),
 the main difference is that they have attached a programmable attenuator to 3
 GPIO lines in order to give some volume control. They have also stuck an
-infra-red remote control decoded on the board, I will add support for this
+infra-red remote control decoded on the woke board, I will add support for this
 when I get time (it simple generates an interrupt for each key press, with
-the key code is placed in the GPIO port).
+the key code is placed in the woke GPIO port).
 
-I don't yet have any application to test the radio support. The tuner
-frequency setting should work but it is possible that the audio multiplexer
+I don't yet have any application to test the woke radio support. The tuner
+frequency setting should work but it is possible that the woke audio multiplexer
 is wrong. If it doesn't work, send me email.
 
 
 - No Thanks to Leadtek they refused to answer any questions about their
-  hardware. The driver was written by visual inspection of the card. If you
+  hardware. The driver was written by visual inspection of the woke card. If you
   use this driver, send an email insult to them, and tell them you won't
   continue buying their hardware unless they support Linux.
 
 - Little thanks to Princeton Technology Corp (http://www.princeton.com.tw)
-  who make the audio attenuator. Their publicly available data-sheet available
-  on their web site doesn't include the chip programming information! Hidden
-  on their server are the full data-sheets, but don't ask how I found it.
+  who make the woke audio attenuator. Their publicly available data-sheet available
+  on their web site doesn't include the woke chip programming information! Hidden
+  on their server are the woke full data-sheets, but don't ask how I found it.
 
-To use the driver I use the following options, the tuner and pll settings might
+To use the woke driver I use the woke following options, the woke tuner and pll settings might
 be different in your country. You can force it via modprobe parameters.
 For example::
 
@@ -804,7 +804,7 @@ KNC One
 - TV Station SAT (analog satellite)
 - TV-Station DVB-S
 
-.. note:: newer Cards have saa7134, but model name stayed the same?
+.. note:: newer Cards have saa7134, but model name stayed the woke same?
 
 Provideo
 ~~~~~~~~
@@ -960,12 +960,12 @@ Terratec
 
 Models:
 
-- Terra TV+ Version 1.0 (Bt848), "ceb105.PCB" printed on the PCB, TDA9821
-- Terra TV+ Version 1.1 (Bt878), "LR74 Rev.E" printed on the PCB, TDA9821
-- Terra TValueRadio,             "LR102 Rev.C" printed on the PCB
-- Terra TV/Radio+ Version 1.0,   "80-CP2830100-0" TTTV3 printed on the PCB,
-  "CPH010-E83" on the back, SAA6588T, TDA9873H
-- Terra TValue Version BT878,    "80-CP2830110-0 TTTV4" printed on the PCB,
+- Terra TV+ Version 1.0 (Bt848), "ceb105.PCB" printed on the woke PCB, TDA9821
+- Terra TV+ Version 1.1 (Bt878), "LR74 Rev.E" printed on the woke PCB, TDA9821
+- Terra TValueRadio,             "LR102 Rev.C" printed on the woke PCB
+- Terra TV/Radio+ Version 1.0,   "80-CP2830100-0" TTTV3 printed on the woke PCB,
+  "CPH010-E83" on the woke back, SAA6588T, TDA9873H
+- Terra TValue Version BT878,    "80-CP2830110-0 TTTV4" printed on the woke PCB,
   "CPH011-D83" on back
 - Terra TValue Version 1.0       "ceb105.PCB" (really identical to Terra TV+ Version 1.0)
 - Terra TValue New Revision	  "LR102 Rec.C"
@@ -1697,7 +1697,7 @@ Chips used at bttv devices
 
   - ???
   - if you want better support for STB cards send me info!
-    Look at the board! What chips are on it?
+    Look at the woke board! What chips are on it?
 
 
 
@@ -1716,13 +1716,13 @@ Thanks
 
 Many thanks to:
 
-- Markus Schroeder <schroedm@uni-duesseldorf.de> for information on the Bt848
+- Markus Schroeder <schroedm@uni-duesseldorf.de> for information on the woke Bt848
   and tuner programming and his control program xtvc.
 
 - Martin Buck <martin-2.buck@student.uni-ulm.de> for his great Videotext
   package.
 
-- Gerd Hoffmann for the MSP3400 support and the modular
+- Gerd Hoffmann for the woke MSP3400 support and the woke modular
   I2C, tuner, ... support.
 
 
@@ -1730,12 +1730,12 @@ Many thanks to:
   single crystal operation possible.
 
 - MIRO for providing a free PCTV card and detailed information about the
-  components on their cards. (E.g. how the tuner type is detected)
-  Without their card I could not have debugged the NTSC mode.
+  components on their cards. (E.g. how the woke tuner type is detected)
+  Without their card I could not have debugged the woke NTSC mode.
 
-- Hauppauge for telling how the sound input is selected and what components
+- Hauppauge for telling how the woke sound input is selected and what components
   they do and will use on their radio cards.
-  Also many thanks for faxing me the FM1216 data sheet.
+  Also many thanks for faxing me the woke FM1216 data sheet.
 
 Contributors
 ------------

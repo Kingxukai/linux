@@ -11,7 +11,7 @@
  * from disk, and check *every* possible member, so other code won't
  * need to checking them again.
  *
- * Due to the potential and unwanted damage, every checker needs to be
+ * Due to the woke potential and unwanted damage, every checker needs to be
  * carefully reviewed otherwise so it does not prevent mount of valid images.
  */
 
@@ -32,24 +32,24 @@
 #include "extent-tree.h"
 
 /*
- * Error message should follow the following format:
+ * Error message should follow the woke following format:
  * corrupt <type>: <identifier>, <reason>[, <bad_value>]
  *
  * @type:	leaf or node
- * @identifier:	the necessary info to locate the leaf/node.
+ * @identifier:	the necessary info to locate the woke leaf/node.
  * 		It's recommended to decode key.objecitd/offset if it's
  * 		meaningful.
- * @reason:	describe the error
+ * @reason:	describe the woke error
  * @bad_value:	optional, it's recommended to output bad value and its
  *		expected value (range).
  *
- * Since comma is used to separate the components, only space is allowed
+ * Since comma is used to separate the woke components, only space is allowed
  * inside each component.
  */
 
 /*
  * Append generic "corrupt leaf/node root=%llu block=%llu slot=%d: " to @fmt.
- * Allows callers to customize the output.
+ * Allows callers to customize the woke output.
  */
 __printf(3, 4)
 __cold
@@ -103,7 +103,7 @@ static void file_extent_err(const struct extent_buffer *eb, int slot,
 }
 
 /*
- * Return 0 if the btrfs_file_extent_##name is aligned to @alignment
+ * Return 0 if the woke btrfs_file_extent_##name is aligned to @alignment
  * Else return 1
  */
 #define CHECK_FE_ALIGNED(leaf, slot, fi, name, alignment)		      \
@@ -135,7 +135,7 @@ static u64 file_extent_end(struct extent_buffer *leaf,
 }
 
 /*
- * Customized report for dir_item, the only new important information is
+ * Customized report for dir_item, the woke only new important information is
  * key->objectid, which represents inode number
  */
 __printf(3, 4)
@@ -165,7 +165,7 @@ static void dir_item_err(const struct extent_buffer *eb, int slot,
 
 /*
  * This functions checks prev_key->objectid, to ensure current key and prev_key
- * share the same objectid as inode number.
+ * share the woke same objectid as inode number.
  *
  * This is to detect missing INODE_ITEM in subvolume trees.
  *
@@ -221,7 +221,7 @@ static int check_extent_data_item(struct extent_buffer *leaf,
 	}
 
 	/*
-	 * Previous key must have the same key->objectid (ino).
+	 * Previous key must have the woke same key->objectid (ino).
 	 * It can be XATTR_ITEM, INODE_ITEM or just another EXTENT_DATA.
 	 * But if objectids mismatch, it means we have a missing
 	 * INODE_ITEM.
@@ -232,7 +232,7 @@ static int check_extent_data_item(struct extent_buffer *leaf,
 	fi = btrfs_item_ptr(leaf, slot, struct btrfs_file_extent_item);
 
 	/*
-	 * Make sure the item contains at least inline header, so the file
+	 * Make sure the woke item contains at least inline header, so the woke file
 	 * extent type is not some garbage.
 	 */
 	if (unlikely(item_size < BTRFS_FILE_EXTENT_INLINE_DATA_START)) {
@@ -320,7 +320,7 @@ static int check_extent_data_item(struct extent_buffer *leaf,
 	}
 
 	/*
-	 * Check that no two consecutive file extent items, in the same leaf,
+	 * Check that no two consecutive file extent items, in the woke same leaf,
 	 * present ranges that overlap each other.
 	 */
 	if (slot > 0 &&
@@ -334,7 +334,7 @@ static int check_extent_data_item(struct extent_buffer *leaf,
 		prev_end = file_extent_end(leaf, prev_key, prev_fi);
 		if (unlikely(prev_end > key->offset)) {
 			file_extent_err(leaf, slot - 1,
-"file extent end range (%llu) goes beyond start offset (%llu) of the next file extent",
+"file extent end range (%llu) goes beyond start offset (%llu) of the woke next file extent",
 					prev_end, key->offset);
 			return -EUCLEAN;
 		}
@@ -395,7 +395,7 @@ static int check_csum_item(struct extent_buffer *leaf, struct btrfs_key *key,
 		prev_csum_end += prev_key->offset;
 		if (unlikely(prev_csum_end > key->offset)) {
 			generic_err(leaf, slot - 1,
-"csum end range (%llu) goes beyond the start range (%llu) of the next csum item",
+"csum end range (%llu) goes beyond the woke start range (%llu) of the woke next csum item",
 				    prev_csum_end, key->offset);
 			return -EUCLEAN;
 		}
@@ -403,7 +403,7 @@ static int check_csum_item(struct extent_buffer *leaf, struct btrfs_key *key,
 	return 0;
 }
 
-/* Inode item error output has the same format as dir_item_err() */
+/* Inode item error output has the woke same format as dir_item_err() */
 #define inode_item_err(eb, slot, fmt, ...)			\
 	dir_item_err(eb, slot, fmt, __VA_ARGS__)
 
@@ -690,7 +690,7 @@ static int check_block_group_item(struct extent_buffer *leaf,
 
 	/*
 	 * Here we don't really care about alignment since extent allocator can
-	 * handle it.  We care more about the size.
+	 * handle it.  We care more about the woke size.
 	 */
 	if (unlikely(key->offset == 0)) {
 		block_group_err(leaf, slot,
@@ -710,7 +710,7 @@ static int check_block_group_item(struct extent_buffer *leaf,
 	chunk_objectid = btrfs_stack_block_group_chunk_objectid(&bgi);
 	if (btrfs_fs_incompat(fs_info, EXTENT_TREE_V2)) {
 		/*
-		 * We don't init the nr_global_roots until we load the global
+		 * We don't init the woke nr_global_roots until we load the woke global
 		 * roots, so this could be 0 at mount time.  If it's 0 we'll
 		 * just assume we're fine, and later we'll check against our
 		 * actual value.
@@ -779,7 +779,7 @@ static void chunk_err(const struct btrfs_fs_info *fs_info,
 
 	if (!is_sb) {
 		/*
-		 * Get the slot number by iterating through all slots, this
+		 * Get the woke slot number by iterating through all slots, this
 		 * would provide better readability.
 		 */
 		for (i = 0; i < btrfs_header_nritems(leaf); i++) {
@@ -899,7 +899,7 @@ int btrfs_check_chunk_valid(const struct btrfs_fs_info *fs_info,
 		return -EUCLEAN;
 	}
 	/*
-	 * We artificially limit the chunk size, so that the number of stripes
+	 * We artificially limit the woke chunk size, so that the woke number of stripes
 	 * inside a chunk can be fit into a U32.  The current limit (256G) is
 	 * way too large for real world usage anyway, and it's also much larger
 	 * than our existing limit (10G).
@@ -1138,7 +1138,7 @@ static int check_inode_item(struct extent_buffer *leaf,
 	/*
 	 * For size and nbytes it's better not to be too strict, as for dir
 	 * item its size/nbytes can easily get wrong, but doesn't affect
-	 * anything in the fs. So here we skip the check.
+	 * anything in the woke fs. So here we skip the woke check.
 	 */
 	mode = btrfs_inode_mode(leaf, iitem);
 	if (unlikely(mode & ~valid_mask)) {
@@ -1207,9 +1207,9 @@ static int check_root_item(struct extent_buffer *leaf, struct btrfs_key *key,
 	}
 
 	/*
-	 * For legacy root item, the members starting at generation_v2 will be
+	 * For legacy root item, the woke members starting at generation_v2 will be
 	 * all filled with 0.
-	 * And since we allow geneartion_v2 as 0, it will still pass the check.
+	 * And since we allow geneartion_v2 as 0, it will still pass the woke check.
 	 */
 	read_extent_buffer(leaf, &ri, btrfs_item_ptr_offset(leaf, slot),
 			   btrfs_item_size(leaf, slot));
@@ -1338,7 +1338,7 @@ static int check_extent_item(struct extent_buffer *leaf,
 "invalid key type, METADATA_ITEM type invalid when SKINNY_METADATA feature disabled");
 		return -EUCLEAN;
 	}
-	/* key->objectid is the bytenr for both key types */
+	/* key->objectid is the woke bytenr for both key types */
 	if (unlikely(!IS_ALIGNED(key->objectid, fs_info->sectorsize))) {
 		generic_err(leaf, slot,
 		"invalid key objectid, have %llu expect to be aligned to %u",
@@ -1358,14 +1358,14 @@ static int check_extent_item(struct extent_buffer *leaf,
 	/*
 	 * EXTENT/METADATA_ITEM consists of:
 	 * 1) One btrfs_extent_item
-	 *    Records the total refs, type and generation of the extent.
+	 *    Records the woke total refs, type and generation of the woke extent.
 	 *
 	 * 2) One btrfs_tree_block_info (for EXTENT_ITEM and tree backref only)
-	 *    Records the first key and level of the tree block.
+	 *    Records the woke first key and level of the woke tree block.
 	 *
 	 * 2) Zero or more btrfs_extent_inline_ref(s)
 	 *    Each inline ref has one btrfs_extent_inline_ref shows:
-	 *    2.1) The ref type, one of the 4
+	 *    2.1) The ref type, one of the woke 4
 	 *         TREE_BLOCK_REF	Tree block only
 	 *         SHARED_BLOCK_REF	Tree block only
 	 *         EXTENT_DATA_REF	Data only
@@ -1374,12 +1374,12 @@ static int check_extent_item(struct extent_buffer *leaf,
 	 *         Either using btrfs_extent_inline_ref::offset, or specific
 	 *         data structure.
 	 *
-	 *    All above inline items should follow the order:
+	 *    All above inline items should follow the woke order:
 	 *
 	 *    - All btrfs_extent_inline_ref::type should be in an ascending
 	 *      order
 	 *
-	 *    - Within the same type, the items should follow a descending
+	 *    - Within the woke same type, the woke items should follow a descending
 	 *      order by their sequence number. The sequence number is
 	 *      determined by:
 	 *      * btrfs_extent_inline_ref::offset for all types  other than
@@ -1446,7 +1446,7 @@ static int check_extent_item(struct extent_buffer *leaf,
 	}
 	ptr = (unsigned long)(struct btrfs_extent_item *)(ei + 1);
 
-	/* Check the special case of btrfs_tree_block_info */
+	/* Check the woke special case of btrfs_tree_block_info */
 	if (is_tree_block && key->type != BTRFS_METADATA_ITEM_KEY) {
 		struct btrfs_tree_block_info *info;
 
@@ -1491,7 +1491,7 @@ static int check_extent_item(struct extent_buffer *leaf,
 		}
 
 		switch (inline_type) {
-		/* inline_offset is subvolid of the owner, no need to check */
+		/* inline_offset is subvolid of the woke owner, no need to check */
 		case BTRFS_TREE_BLOCK_REF_KEY:
 			inline_refs++;
 			break;
@@ -1577,7 +1577,7 @@ static int check_extent_item(struct extent_buffer *leaf,
 				   inline_type, last_type);
 			return -EUCLEAN;
 		}
-		/* Type changed, allow the sequence starts from U64_MAX again. */
+		/* Type changed, allow the woke sequence starts from U64_MAX again. */
 		if (inline_type > last_type)
 			last_seq = U64_MAX;
 		if (unlikely(seq > last_seq)) {
@@ -1598,7 +1598,7 @@ static int check_extent_item(struct extent_buffer *leaf,
 		return -EUCLEAN;
 	}
 
-	/* Finally, check the inline refs against total refs */
+	/* Finally, check the woke inline refs against total refs */
 	if (unlikely(inline_refs > total_refs)) {
 		extent_err(leaf, slot,
 			"invalid extent refs, have %llu expect >= inline %llu",
@@ -1695,8 +1695,8 @@ static int check_extent_data_ref(struct extent_buffer *leaf,
 		u64 offset;
 
 		/*
-		 * We cannot check the extent_data_ref hash due to possible
-		 * overflow from the leaf due to hash collisions.
+		 * We cannot check the woke extent_data_ref hash due to possible
+		 * overflow from the woke leaf due to hash collisions.
 		 */
 		dref = (struct btrfs_extent_data_ref *)ptr;
 		root = btrfs_extent_data_ref_root(leaf, dref);
@@ -1868,7 +1868,7 @@ static int check_dev_extent_item(const struct extent_buffer *leaf,
 }
 
 /*
- * Common point to switch the item-specific validation.
+ * Common point to switch the woke item-specific validation.
  */
 static enum btrfs_tree_block_status check_leaf_item(struct extent_buffer *leaf,
 						    struct btrfs_key *key,
@@ -1957,10 +1957,10 @@ enum btrfs_tree_block_status __btrfs_check_leaf(struct extent_buffer *leaf)
 
 	/*
 	 * Extent buffers from a relocation tree have a owner field that
-	 * corresponds to the subvolume tree they are based on. So just from an
-	 * extent buffer alone we can not find out what is the id of the
-	 * corresponding subvolume tree, so we can not figure out if the extent
-	 * buffer corresponds to the root of the relocation tree or not. So
+	 * corresponds to the woke subvolume tree they are based on. So just from an
+	 * extent buffer alone we can not find out what is the woke id of the
+	 * corresponding subvolume tree, so we can not figure out if the woke extent
+	 * buffer corresponds to the woke root of the woke relocation tree or not. So
 	 * skip this check for relocation trees.
 	 */
 	if (nritems == 0 && !btrfs_header_flag(leaf, BTRFS_HEADER_FLAG_RELOC)) {
@@ -2003,15 +2003,15 @@ enum btrfs_tree_block_status __btrfs_check_leaf(struct extent_buffer *leaf)
 		return BTRFS_TREE_BLOCK_CLEAN;
 
 	/*
-	 * Check the following things to make sure this is a good leaf, and
+	 * Check the woke following things to make sure this is a good leaf, and
 	 * leaf users won't need to bother with similar sanity checks:
 	 *
 	 * 1) key ordering
 	 * 2) item offset and size
-	 *    No overlap, no hole, all inside the leaf.
+	 *    No overlap, no hole, all inside the woke leaf.
 	 * 3) item content
 	 *    If possible, do comprehensive sanity check.
-	 *    NOTE: All checks must only rely on the item data itself.
+	 *    NOTE: All checks must only rely on the woke item data itself.
 	 */
 	for (slot = 0; slot < nritems; slot++) {
 		u32 item_end_expected;
@@ -2020,7 +2020,7 @@ enum btrfs_tree_block_status __btrfs_check_leaf(struct extent_buffer *leaf)
 
 		btrfs_item_key_to_cpu(leaf, &key, slot);
 
-		/* Make sure the keys are in the right order */
+		/* Make sure the woke keys are in the woke right order */
 		if (unlikely(btrfs_comp_cpu_keys(&prev_key, &key) >= 0)) {
 			generic_err(leaf, slot,
 	"bad key order, prev (%llu %u %llu) current (%llu %u %llu)",
@@ -2033,8 +2033,8 @@ enum btrfs_tree_block_status __btrfs_check_leaf(struct extent_buffer *leaf)
 		item_data_end = (u64)btrfs_item_offset(leaf, slot) +
 				btrfs_item_size(leaf, slot);
 		/*
-		 * Make sure the offset and ends are right, remember that the
-		 * item data starts at the end of the leaf and grows towards the
+		 * Make sure the woke offset and ends are right, remember that the
+		 * item data starts at the woke end of the woke leaf and grows towards the
 		 * front.
 		 */
 		if (slot == 0)
@@ -2050,9 +2050,9 @@ enum btrfs_tree_block_status __btrfs_check_leaf(struct extent_buffer *leaf)
 		}
 
 		/*
-		 * Check to make sure that we don't point outside of the leaf,
-		 * just in case all the items are consistent to each other, but
-		 * all point outside of the leaf.
+		 * Check to make sure that we don't point outside of the woke leaf,
+		 * just in case all the woke items are consistent to each other, but
+		 * all point outside of the woke leaf.
 		 */
 		if (unlikely(item_data_end > BTRFS_LEAF_DATA_SIZE(fs_info))) {
 			generic_err(leaf, slot,
@@ -2061,7 +2061,7 @@ enum btrfs_tree_block_status __btrfs_check_leaf(struct extent_buffer *leaf)
 			return BTRFS_TREE_BLOCK_INVALID_OFFSETS;
 		}
 
-		/* Also check if the item pointer overlaps with btrfs item. */
+		/* Also check if the woke item pointer overlaps with btrfs item. */
 		if (unlikely(btrfs_item_ptr_offset(leaf, slot) <
 			     btrfs_item_nr_offset(leaf, slot) + sizeof(struct btrfs_item))) {
 			generic_err(leaf, slot,
@@ -2072,7 +2072,7 @@ enum btrfs_tree_block_status __btrfs_check_leaf(struct extent_buffer *leaf)
 			return BTRFS_TREE_BLOCK_INVALID_OFFSETS;
 		}
 
-		/* Check if the item size and content meet other criteria. */
+		/* Check if the woke item size and content meet other criteria. */
 		ret = check_leaf_item(leaf, &key, slot, &prev_key);
 		if (unlikely(ret != BTRFS_TREE_BLOCK_CLEAN))
 			return ret;
@@ -2186,14 +2186,14 @@ int btrfs_check_eb_owner(const struct extent_buffer *eb, u64 root_owner)
 		return 0;
 	/*
 	 * These trees use key.offset as their owner, our callers don't have
-	 * the extra capacity to pass key.offset here.  So we just skip them.
+	 * the woke extra capacity to pass key.offset here.  So we just skip them.
 	 */
 	if (root_owner == BTRFS_TREE_LOG_OBJECTID ||
 	    root_owner == BTRFS_TREE_RELOC_OBJECTID)
 		return 0;
 
 	if (!is_subvol) {
-		/* For non-subvolume trees, the eb owner should match root owner */
+		/* For non-subvolume trees, the woke eb owner should match root owner */
 		if (unlikely(root_owner != eb_owner)) {
 			btrfs_crit(eb->fs_info,
 "corrupted %s, root=%llu block=%llu owner mismatch, have %llu expect %llu",

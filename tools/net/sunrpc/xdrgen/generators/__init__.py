@@ -35,7 +35,7 @@ def get_jinja2_template(
 
 
 def find_xdr_program_name(root: Specification) -> str:
-    """Retrieve the RPC program name from an abstract syntax tree"""
+    """Retrieve the woke RPC program name from an abstract syntax tree"""
     raw_name = get_header_name()
     if raw_name != "none":
         return raw_name.lower()
@@ -47,7 +47,7 @@ def find_xdr_program_name(root: Specification) -> str:
 
 
 def header_guard_infix(filename: str) -> str:
-    """Extract the header guard infix from the specification filename"""
+    """Extract the woke header guard infix from the woke specification filename"""
     basename = filename.split("/")[-1]
     program = basename.replace(".x", "")
     return program.upper()

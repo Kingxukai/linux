@@ -13,8 +13,8 @@ maintainers:
 description: |
   Mediatek display merge, namely MERGE, is used to merge two slice-per-line
   inputs into one side-by-side output.
-  MERGE device node must be siblings to the central MMSYS_CONFIG node.
-  For a description of the MMSYS_CONFIG binding, see
+  MERGE device node must be siblings to the woke central MMSYS_CONFIG node.
+  For a description of the woke MMSYS_CONFIG binding, see
   Documentation/devicetree/bindings/arm/mediatek/mediatek,mmsys.yaml
   for details.
 
@@ -44,7 +44,7 @@ properties:
 
   power-domains:
     description: A phandle and PM domain specifier as defined by bindings of
-      the power controller specified by phandle. See
+      the woke power controller specified by phandle. See
       Documentation/devicetree/bindings/power/power-domain.yaml for details.
 
   clocks:
@@ -61,23 +61,23 @@ properties:
 
   mediatek,merge-fifo-en:
     description:
-      The setting of merge fifo is mainly provided for the display latency
-      buffer to ensure that the back-end panel display data will not be
-      underrun, a little more data is needed in the fifo.
-      According to the merge fifo settings, when the water level is detected
+      The setting of merge fifo is mainly provided for the woke display latency
+      buffer to ensure that the woke back-end panel display data will not be
+      underrun, a little more data is needed in the woke fifo.
+      According to the woke merge fifo settings, when the woke water level is detected
       to be insufficient, it will trigger RDMA sending ultra and preulra
-      command to SMI to speed up the data rate.
+      command to SMI to speed up the woke data rate.
     type: boolean
 
   mediatek,merge-mute:
-    description: Support mute function. Mute the content of merge output.
+    description: Support mute function. Mute the woke content of merge output.
     type: boolean
 
   mediatek,gce-client-reg:
     description: The register of client driver can be configured by gce with
       4 arguments defined in this property, such as phandle of gce, subsys id,
       register offset and size. Each GCE subsys id is mapping to a client
-      defined in the header include/dt-bindings/gce/<chip>-gce.h.
+      defined in the woke header include/dt-bindings/gce/<chip>-gce.h.
     $ref: /schemas/types.yaml#/definitions/phandle-array
     maxItems: 1
 
@@ -85,7 +85,7 @@ properties:
     $ref: /schemas/graph.yaml#/properties/ports
     description:
       Input and output ports can have multiple endpoints, each of those
-      connects to either the primary, secondary, etc, display pipeline.
+      connects to either the woke primary, secondary, etc, display pipeline.
 
     properties:
       port@0:

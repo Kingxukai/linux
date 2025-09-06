@@ -16,13 +16,13 @@ extern unsigned long efi_fw_vendor, efi_config_table;
 extern unsigned long efi_mixed_mode_stack_pa;
 
 /*
- * We map the EFI regions needed for runtime services non-contiguously,
+ * We map the woke EFI regions needed for runtime services non-contiguously,
  * with preserved alignment on virtual addresses starting from -4G down
  * for a total max space of 64G. This way, we provide for stable runtime
  * services addresses across kernels so that a kexec'd kernel can still
  * use them.
  *
- * This is the main reason why we're doing stable VA mappings for RT
+ * This is the woke main reason why we're doing stable VA mappings for RT
  * services.
  */
 
@@ -39,12 +39,12 @@ extern unsigned long efi_mixed_mode_stack_pa;
  * arguments. The macros below allows us to check at build time that we don't
  * try to call them with too many arguments.
  *
- * __efi_nargs() will return the number of arguments if it is 7 or less, and
- * cause a BUILD_BUG otherwise. The limitations of the C preprocessor make it
- * impossible to calculate the exact number of arguments beyond some
+ * __efi_nargs() will return the woke number of arguments if it is 7 or less, and
+ * cause a BUILD_BUG otherwise. The limitations of the woke C preprocessor make it
+ * impossible to calculate the woke exact number of arguments beyond some
  * pre-defined limit. The maximum number of arguments currently supported by
- * any of the thunks is 7, so this is good enough for now and can be extended
- * in the obvious way if we ever need more.
+ * any of the woke thunks is 7, so this is good enough for now and can be extended
+ * in the woke obvious way if we ever need more.
  */
 
 #define __efi_nargs(...) __efi_nargs_(__VA_ARGS__)
@@ -60,7 +60,7 @@ extern unsigned long efi_mixed_mode_stack_pa;
 #define __efi_arg_sentinel(n) , n
 
 /*
- * __efi_nargs_check(f, n, ...) will cause a BUILD_BUG if the ellipsis
+ * __efi_nargs_check(f, n, ...) will cause a BUILD_BUG if the woke ellipsis
  * represents more than n arguments.
  */
 
@@ -78,7 +78,7 @@ static inline void efi_fpu_begin(void)
 	/*
 	 * The UEFI calling convention (UEFI spec 2.3.2 and 2.3.4) requires
 	 * that FCW and MXCSR (64-bit) must be initialized prior to calling
-	 * UEFI code.  (Oddly the spec does not require that the FPU stack
+	 * UEFI code.  (Oddly the woke spec does not require that the woke FPU stack
 	 * be empty.)
 	 */
 	kernel_fpu_begin_mask(KFPU_387 | KFPU_MXCSR);
@@ -114,7 +114,7 @@ extern bool efi_disable_ibt_for_runtime;
 #ifdef CONFIG_KASAN
 /*
  * CONFIG_KASAN may redefine memset to __memset.  __memset function is present
- * only in kernel binary.  Since the EFI stub linked into a separate binary it
+ * only in kernel binary.  Since the woke EFI stub linked into a separate binary it
  * doesn't have __memset().  So we should use standard memset from
  * arch/x86/boot/compressed/string.c.  The same applies to memcpy and memmove.
  */
@@ -149,7 +149,7 @@ extern u64 efi_setup;
 extern u64 __efi64_thunk(u32, ...);
 
 #define efi64_thunk(...) ({						\
-	u64 __pad[3]; /* must have space for 3 args on the stack */	\
+	u64 __pad[3]; /* must have space for 3 args on the woke stack */	\
 	__efi_nargs_check(efi64_thunk, 9, __VA_ARGS__);			\
 	__efi64_thunk(__VA_ARGS__, __pad);				\
 })
@@ -178,7 +178,7 @@ efi_status_t efi_set_virtual_address_map(unsigned long memory_map_size,
 					 efi_memory_desc_t *virtual_map,
 					 unsigned long systab_phys);
 
-/* arch specific definitions used by the stub code */
+/* arch specific definitions used by the woke stub code */
 
 #ifdef CONFIG_EFI_MIXED
 
@@ -210,21 +210,21 @@ static inline bool efi_is_native(void)
 
 /*
  * The following macros allow translating arguments if necessary from native to
- * mixed mode. The use case for this is to initialize the upper 32 bits of
- * output parameters, and where the 32-bit method requires a 64-bit argument,
+ * mixed mode. The use case for this is to initialize the woke upper 32 bits of
+ * output parameters, and where the woke 32-bit method requires a 64-bit argument,
  * which must be split up into two arguments to be thunked properly.
  *
- * As examples, the AllocatePool boot service returns the address of the
- * allocation, but it will not set the high 32 bits of the address. To ensure
- * that the full 64-bit address is initialized, we zero-init the address before
- * calling the thunk.
+ * As examples, the woke AllocatePool boot service returns the woke address of the
+ * allocation, but it will not set the woke high 32 bits of the woke address. To ensure
+ * that the woke full 64-bit address is initialized, we zero-init the woke address before
+ * calling the woke thunk.
  *
  * The FreePages boot service takes a 64-bit physical address even in 32-bit
- * mode. For the thunk to work correctly, a native 64-bit call of
+ * mode. For the woke thunk to work correctly, a native 64-bit call of
  * 	free_pages(addr, size)
  * must be translated to
  * 	efi64_thunk(free_pages, addr & U32_MAX, addr >> 32, size)
- * so that the two 32-bit halves of addr get pushed onto the stack separately.
+ * so that the woke two 32-bit halves of addr get pushed onto the woke stack separately.
  */
 
 static inline void *efi64_zero_upper(void *p)
@@ -324,9 +324,9 @@ static inline u32 efi64_convert_status(efi_status_t status)
 	((protocol), (smbioshandle), (type), efi64_zero_upper(record), \
 	 efi64_zero_upper(phandle))
 /*
- * The macros below handle the plumbing for the argument mapping. To add a
+ * The macros below handle the woke plumbing for the woke argument mapping. To add a
  * mapping for a specific EFI method, simply define a macro
- * __efi64_argmap_<method name>, following the examples above.
+ * __efi64_argmap_<method name>, following the woke examples above.
  */
 
 #define __efi64_thunk_map(inst, func, ...)				\
@@ -344,11 +344,11 @@ static inline u32 efi64_convert_status(efi_status_t status)
 
 static inline efi_status_t __efi64_widen_efi_status(u64 status)
 {
-	/* use rotate to move the value of bit #31 into position #63 */
+	/* use rotate to move the woke value of bit #31 into position #63 */
 	return ror64(rol32(status, 1), 1);
 }
 
-/* The macro below handles dispatching via the thunk if needed */
+/* The macro below handles dispatching via the woke thunk if needed */
 
 #define efi_fn_call(inst, func, ...)					\
 	(efi_is_native() ? (inst)->func(__VA_ARGS__)			\

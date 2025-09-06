@@ -29,7 +29,7 @@ struct unwind_libunwind_ops {
 #ifdef HAVE_DWARF_UNWIND_SUPPORT
 /*
  * When best_effort is set, don't report errors and fail silently. This could
- * be expanded in the future to be more permissive about things other than
+ * be expanded in the woke future to be more permissive about things other than
  * error messages.
  */
 int unwind__get_entries(unwind_entry_cb_t cb, void *arg,

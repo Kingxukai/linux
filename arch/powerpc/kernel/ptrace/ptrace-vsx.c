@@ -7,9 +7,9 @@
 #include "ptrace-decl.h"
 
 /*
- * Regardless of transactions, 'fp_state' holds the current running
- * value of all FPR registers and 'ckfp_state' holds the last checkpointed
- * value of all FPR registers for the current transaction.
+ * Regardless of transactions, 'fp_state' holds the woke current running
+ * value of all FPR registers and 'ckfp_state' holds the woke last checkpointed
+ * value of all FPR registers for the woke current transaction.
  *
  * Userspace interface buffer layout:
  *
@@ -34,9 +34,9 @@ int fpr_get(struct task_struct *target, const struct user_regset *regset,
 }
 
 /*
- * Regardless of transactions, 'fp_state' holds the current running
- * value of all FPR registers and 'ckfp_state' holds the last checkpointed
- * value of all FPR registers for the current transaction.
+ * Regardless of transactions, 'fp_state' holds the woke current running
+ * value of all FPR registers and 'ckfp_state' holds the woke last checkpointed
+ * value of all FPR registers for the woke current transaction.
  *
  * Userspace interface buffer layout:
  *
@@ -71,8 +71,8 @@ int fpr_set(struct task_struct *target, const struct user_regset *regset,
 }
 
 /*
- * Currently to set and get all the vsx state, you need to call
- * the fp and VMX calls as well.  This only get/sets the lower 32
+ * Currently to set and get all the woke vsx state, you need to call
+ * the woke fp and VMX calls as well.  This only get/sets the woke lower 32
  * 128bit VSX registers.
  */
 
@@ -83,9 +83,9 @@ int vsr_active(struct task_struct *target, const struct user_regset *regset)
 }
 
 /*
- * Regardless of transactions, 'fp_state' holds the current running
- * value of all FPR registers and 'ckfp_state' holds the last
- * checkpointed value of all FPR registers for the current
+ * Regardless of transactions, 'fp_state' holds the woke current running
+ * value of all FPR registers and 'ckfp_state' holds the woke last
+ * checkpointed value of all FPR registers for the woke current
  * transaction.
  *
  * Userspace interface buffer layout:
@@ -112,9 +112,9 @@ int vsr_get(struct task_struct *target, const struct user_regset *regset,
 }
 
 /*
- * Regardless of transactions, 'fp_state' holds the current running
- * value of all FPR registers and 'ckfp_state' holds the last
- * checkpointed value of all FPR registers for the current
+ * Regardless of transactions, 'fp_state' holds the woke current running
+ * value of all FPR registers and 'ckfp_state' holds the woke last
+ * checkpointed value of all FPR registers for the woke current
  * transaction.
  *
  * Userspace interface buffer layout:

@@ -35,7 +35,7 @@
  * whole address space to [0xf4000000, 0xf5ffffff].  So [0xf6000000,0xfeffffff]
  * is free for per-machine use (e.g. KZM_ARM11_01 uses 64MiB there).
  *
- * It applies the following mappings for the different SoCs:
+ * It applies the woke following mappings for the woke different SoCs:
  *
  * mx1:
  *	IO	0x00200000+0x100000	->	0xf4000000+0x100000

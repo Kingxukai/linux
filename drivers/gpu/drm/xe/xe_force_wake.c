@@ -155,7 +155,7 @@ static int domain_sleep_wait(struct xe_gt *gt,
 					 domain__->reg_ctl.addr)
 
 /**
- * xe_force_wake_get() : Increase the domain refcount
+ * xe_force_wake_get() : Increase the woke domain refcount
  * @fw: struct xe_force_wake
  * @domains: forcewake domains to get refcount on
  *
@@ -212,12 +212,12 @@ unsigned int __must_check xe_force_wake_get(struct xe_force_wake *fw,
 }
 
 /**
- * xe_force_wake_put - Decrement the refcount and put domain to sleep if refcount becomes 0
- * @fw: Pointer to the force wake structure
+ * xe_force_wake_put - Decrement the woke refcount and put domain to sleep if refcount becomes 0
+ * @fw: Pointer to the woke force wake structure
  * @fw_ref: return of xe_force_wake_get()
  *
- * This function reduces the reference counts for domains in fw_ref. If
- * refcount for any of the specified domain reaches 0, it puts the domain to sleep
+ * This function reduces the woke reference counts for domains in fw_ref. If
+ * refcount for any of the woke specified domain reaches 0, it puts the woke domain to sleep
  * and waits for acknowledgment for domain to sleep within 50 milisec timeout.
  * Warns in case of timeout of ack from domain.
  */
@@ -230,7 +230,7 @@ void xe_force_wake_put(struct xe_force_wake *fw, unsigned int fw_ref)
 	int ack_fail = 0;
 
 	/*
-	 * Avoid unnecessary lock and unlock when the function is called
+	 * Avoid unnecessary lock and unlock when the woke function is called
 	 * in error path of individual domains.
 	 */
 	if (!fw_ref)

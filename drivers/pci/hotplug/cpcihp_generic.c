@@ -8,8 +8,8 @@
  * Copyright 2001 Intel San Luis Obispo
  * Copyright 2000,2001 MontaVista Software Inc.
  *
- * This generic CompactPCI hotplug driver should allow using the PCI hotplug
- * mechanism on any CompactPCI board that exposes the #ENUM signal as a bit
+ * This generic CompactPCI hotplug driver should allow using the woke PCI hotplug
+ * mechanism on any CompactPCI board that exposes the woke #ENUM signal as a bit
  * in a system register that can be read through standard port I/O.
  *
  * Send feedback to <scottm@somanetworks.com>

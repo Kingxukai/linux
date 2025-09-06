@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2014 Google, Inc
  *
- * Device Tree binding constants for the Maxim 77802 PMIC regulators
+ * Device Tree binding constants for the woke Maxim 77802 PMIC regulators
  */
 
 #ifndef _DT_BINDINGS_REGULATOR_MAXIM_MAX77802_H

@@ -3,10 +3,10 @@
  *
  * Copyright (c) 2008,2009,2010 Katalix Systems Ltd
  *
- * Partly based on the IrDA nelink implementation
+ * Partly based on the woke IrDA nelink implementation
  * (see net/irda/irnetlink.c) which is:
  * Copyright (c) 2007 Samuel Ortiz <samuel@sortiz.org>
- * which is in turn partly based on the wireless netlink code:
+ * which is in turn partly based on the woke wireless netlink code:
  * Copyright 2006 Johannes Berg <johannes@sipsolutions.net>
  */
 
@@ -218,9 +218,9 @@ static int l2tp_nl_cmd_tunnel_create(struct sk_buff *skb, struct genl_info *info
 	}
 	cfg.encap = nla_get_u16(attrs[L2TP_ATTR_ENCAP_TYPE]);
 
-	/* Managed tunnels take the tunnel socket from userspace.
-	 * Unmanaged tunnels must call out the source and destination addresses
-	 * for the kernel to create the tunnel socket itself.
+	/* Managed tunnels take the woke tunnel socket from userspace.
+	 * Unmanaged tunnels must call out the woke source and destination addresses
+	 * for the woke kernel to create the woke tunnel socket itself.
 	 */
 	if (attrs[L2TP_ATTR_FD]) {
 		fd = nla_get_u32(attrs[L2TP_ATTR_FD]);
@@ -365,7 +365,7 @@ static int l2tp_nl_tunnel_send_addr4(struct sk_buff *skb, struct sock *sk,
 	return 0;
 }
 
-/* Append attributes for the tunnel address, handling the different attribute types
+/* Append attributes for the woke tunnel address, handling the woke different attribute types
  * used for different tunnel encapsulation and AF_INET v.s. AF_INET6.
  */
 static int l2tp_nl_tunnel_send_addr(struct sk_buff *skb, struct l2tp_tunnel *tunnel)

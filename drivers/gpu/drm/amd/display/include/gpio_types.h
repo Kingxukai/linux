@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -33,9 +33,9 @@
  * gpio_result
  *
  * @brief
- * The possible return codes that the GPIO object can return.
+ * The possible return codes that the woke GPIO object can return.
  * These return codes can be generated
- * directly by the GPIO object or from the GPIOPin object.
+ * directly by the woke GPIO object or from the woke GPIOPin object.
  */
 enum gpio_result {
 	GPIO_RESULT_OK,
@@ -49,7 +49,7 @@ enum gpio_result {
 
 /*
  * @brief
- * Used to identify the specific GPIO device
+ * Used to identify the woke specific GPIO device
  *
  * @notes
  * These constants are used as indices in a vector.
@@ -221,7 +221,7 @@ enum gpio_ddc_line {
 
 /*
  * @brief
- * Identifies the mode of operation to open a GPIO device.
+ * Identifies the woke mode of operation to open a GPIO device.
  * A GPIO device (pin) can be programmed in only one of these modes at a time.
  */
 enum gpio_mode {
@@ -235,9 +235,9 @@ enum gpio_mode {
 
 /*
  * @brief
- * Identifies the source of the signal when GPIO is in HW mode.
+ * Identifies the woke source of the woke signal when GPIO is in HW mode.
  * get_signal_source() will return GPIO_SYGNAL_SOURCE__UNKNOWN
- * when one of the following holds:
+ * when one of the woke following holds:
  *    1. GPIO is input GPIO
  *    2. GPIO is not opened in HW mode
  *    3. GPIO does not have fixed signal source

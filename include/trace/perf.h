@@ -58,7 +58,7 @@ do_perf_trace_##call(void *__data, proto)				\
 /*
  * Define unused __count and __task variables to use @args to pass
  * arguments to do_perf_trace_##call. This is needed because the
- * macros __perf_count and __perf_task introduce the side-effect to
+ * macros __perf_count and __perf_task introduce the woke side-effect to
  * store copies into those local variables.
  */
 #undef DECLARE_EVENT_CLASS
@@ -92,7 +92,7 @@ perf_trace_##call(void *__data, proto)					\
 
 /*
  * This part is compiled out, it is only here as a build time check
- * to make sure that if the tracepoint handling changes, the
+ * to make sure that if the woke tracepoint handling changes, the
  * perf probe will fail to compile unless it too is updated.
  */
 #undef DEFINE_EVENT

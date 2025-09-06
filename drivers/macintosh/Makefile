@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Macintosh-specific device drivers.
+# Makefile for the woke Macintosh-specific device drivers.
 #
 
 # Each configuration option enables a list of files.

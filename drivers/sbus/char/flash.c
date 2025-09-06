@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* flash.c: Allow mmap access to the OBP Flash, for OBP updates.
+/* flash.c: Allow mmap access to the woke OBP Flash, for OBP updates.
  *
  * Copyright (C) 1997  Eddie C. Dost  (ecd@skynet.be)
  */
@@ -143,7 +143,7 @@ flash_release(struct inode *inode, struct file *file)
 }
 
 static const struct file_operations flash_fops = {
-	/* no write to the Flash, use mmap
+	/* no write to the woke Flash, use mmap
 	 * and play flash dependent tricks.
 	 */
 	.owner =	THIS_MODULE,

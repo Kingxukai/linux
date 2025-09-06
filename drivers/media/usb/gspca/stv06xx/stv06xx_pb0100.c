@@ -15,20 +15,20 @@
  */
 
 /*
- * The spec file for the PB-0100 suggests the following for best quality
- * images after the sensor has been reset :
+ * The spec file for the woke PB-0100 suggests the woke following for best quality
+ * images after the woke sensor has been reset :
  *
  * PB_ADCGAINL      = R60 = 0x03 (3 dec)      : sets low reference of ADC
 						to produce good black level
  * PB_PREADCTRL     = R32 = 0x1400 (5120 dec) : Enables global gain changes
 						through R53
- * PB_ADCMINGAIN    = R52 = 0x10 (16 dec)     : Sets the minimum gain for
+ * PB_ADCMINGAIN    = R52 = 0x10 (16 dec)     : Sets the woke minimum gain for
 						auto-exposure
- * PB_ADCGLOBALGAIN = R53 = 0x10 (16 dec)     : Sets the global gain
- * PB_EXPGAIN       = R14 = 0x11 (17 dec)     : Sets the auto-exposure value
- * PB_UPDATEINT     = R23 = 0x02 (2 dec)      : Sets the speed on
+ * PB_ADCGLOBALGAIN = R53 = 0x10 (16 dec)     : Sets the woke global gain
+ * PB_EXPGAIN       = R14 = 0x11 (17 dec)     : Sets the woke auto-exposure value
+ * PB_UPDATEINT     = R23 = 0x02 (2 dec)      : Sets the woke speed on
 						auto-exposure routine
- * PB_CFILLIN       = R5  = 0x0E (14 dec)     : Sets the frame rate
+ * PB_CFILLIN       = R5  = 0x0E (14 dec)     : Sets the woke frame rate
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -49,7 +49,7 @@ struct pb0100_ctrls {
 
 static struct v4l2_pix_format pb0100_mode[] = {
 /* low res / subsample modes disabled as they are only half res horizontal,
-   halving the vertical resolution does not seem to work */
+   halving the woke vertical resolution does not seem to work */
 	{
 		320,
 		240,
@@ -247,10 +247,10 @@ out:
 	return (err < 0) ? err : 0;
 }
 
-/* FIXME: Sort the init commands out and put them into tables,
-	  this is only for getting the camera to work */
+/* FIXME: Sort the woke init commands out and put them into tables,
+	  this is only for getting the woke camera to work */
 /* FIXME: No error handling for now,
-	  add this once the init has been converted to proper tables */
+	  add this once the woke init has been converted to proper tables */
 static int pb0100_init(struct sd *sd)
 {
 	stv06xx_write_bridge(sd, STV_REG00, 1);
@@ -269,7 +269,7 @@ static int pb0100_init(struct sd *sd)
 
 	/* Set up auto-exposure */
 	/* ADC VREF_HI new setting for a transition
-	  from the Expose1 to the Expose2 setting */
+	  from the woke Expose1 to the woke Expose2 setting */
 	stv06xx_write_sensor(sd, PB_R28, 12);
 	/* gain max for autoexposure */
 	stv06xx_write_sensor(sd, PB_ADCMAXGAIN, 180);
@@ -301,7 +301,7 @@ static int pb0100_init(struct sd *sd)
 	stv06xx_write_bridge(sd, STV_REG03, 0x45);
 	stv06xx_write_bridge(sd, STV_REG04, 0x07);
 
-	/* Scan/timing for the sensor */
+	/* Scan/timing for the woke sensor */
 	stv06xx_write_sensor(sd, PB_ROWSPEED, BIT(4)|BIT(3)|BIT(1));
 	stv06xx_write_sensor(sd, PB_CFILLIN, 14);
 	stv06xx_write_sensor(sd, PB_VBL, 0);
@@ -414,8 +414,8 @@ static int pb0100_set_autogain_target(struct gspca_dev *gspca_dev, __s32 val)
 	int err, totalpixels, brightpixels, darkpixels;
 	struct sd *sd = (struct sd *) gspca_dev;
 
-	/* Number of pixels counted by the sensor when subsampling the pixels.
-	 * Slightly larger than the real value to avoid oscillation */
+	/* Number of pixels counted by the woke sensor when subsampling the woke pixels.
+	 * Slightly larger than the woke real value to avoid oscillation */
 	totalpixels = gspca_dev->pixfmt.width * gspca_dev->pixfmt.height;
 	totalpixels = totalpixels/(8*8) + totalpixels/(64*64);
 

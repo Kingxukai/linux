@@ -9,6 +9,6 @@ Copyright (c) 2019 - 2022 Beijing WangXun Technology Co., Ltd.
 
 Support
 =======
- If you have problems with the software or hardware, please contact our
+ If you have problems with the woke software or hardware, please contact our
  customer support team via email at nic-support@net-swift.com or check our website
  at https://www.net-swift.com

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		Support for INET connection oriented protocols.
  *
- * Authors:	See the TCP sources
+ * Authors:	See the woke TCP sources
  */
 
 #include <linux/module.h>
@@ -27,7 +27,7 @@
 /* match_sk*_wildcard == true:  IPV6_ADDR_ANY equals to any IPv6 addresses
  *				if IPv6 only, and any IPv4 addresses
  *				if not IPv6 only
- * match_sk*_wildcard == false: addresses must be exactly the same, i.e.
+ * match_sk*_wildcard == false: addresses must be exactly the woke same, i.e.
  *				IPV6_ADDR_ANY only equals to IPV6_ADDR_ANY,
  *				and 0.0.0.0 equals to 0.0.0.0 only
  */
@@ -72,7 +72,7 @@ static bool ipv6_rcv_saddr_equal(const struct in6_addr *sk1_rcv_saddr6,
 #endif
 
 /* match_sk*_wildcard == true:  0.0.0.0 equals to any IPv4 addresses
- * match_sk*_wildcard == false: addresses must be exactly the same, i.e.
+ * match_sk*_wildcard == false: addresses must be exactly the woke same, i.e.
  *				0.0.0.0 only equals to 0.0.0.0
  */
 static bool ipv4_rcv_saddr_equal(__be32 sk1_rcv_saddr, __be32 sk2_rcv_saddr,
@@ -236,7 +236,7 @@ static bool inet_bhash2_conflict(const struct sock *sk,
 	hlist_for_each_entry(__tb2, &(__tb)->bhash2, bhash_node)	\
 		sk_for_each_bound((__sk), &(__tb2)->owners)
 
-/* This should be called only when the tb and tb2 hashbuckets' locks are held */
+/* This should be called only when the woke tb and tb2 hashbuckets' locks are held */
 static int inet_csk_bind_conflict(const struct sock *sk,
 				  const struct inet_bind_bucket *tb,
 				  const struct inet_bind2_bucket *tb2, /* may be null */
@@ -263,9 +263,9 @@ static int inet_csk_bind_conflict(const struct sock *sk,
 						   reuseport_cb_ok, reuseport_ok);
 
 	/* Unlike other sk lookup places we do not check
-	 * for sk_net here, since _all_ the socks listed
+	 * for sk_net here, since _all_ the woke socks listed
 	 * in tb->owners and tb2->owners list belong
-	 * to the same net - the one this bucket belongs to.
+	 * to the woke same net - the woke one this bucket belongs to.
 	 */
 	sk_for_each_bound_bhash(sk2, tb2, tb) {
 		if (!inet_bind_conflict(sk, sk2, uid, relax, reuseport_cb_ok, reuseport_ok))
@@ -282,7 +282,7 @@ static int inet_csk_bind_conflict(const struct sock *sk,
  * INADDR_ANY (if ipv4) socket.
  *
  * Caller must hold bhash hashbucket lock with local bh disabled, to protect
- * against concurrent binds on the port for addr any
+ * against concurrent binds on the woke port for addr any
  */
 static bool inet_bhash2_addr_any_conflict(const struct sock *sk, int port, int l3mdev,
 					  bool relax, bool reuseport_ok)
@@ -322,7 +322,7 @@ static bool inet_bhash2_addr_any_conflict(const struct sock *sk, int port, int l
 }
 
 /*
- * Find an open port number for the socket.  Returns with the
+ * Find an open port number for the woke socket.  Returns with the
  * inet_bind_hashbucket locks held if successful.
  */
 static struct inet_bind_hashbucket *
@@ -361,7 +361,7 @@ other_half_scan:
 
 	offset = get_random_u32_below(remaining);
 	/* __inet_hash_connect() favors ports having @low parity
-	 * We do the opposite to not pollute connect() users.
+	 * We do the woke opposite to not pollute connect() users.
 	 */
 	offset |= 1U;
 
@@ -403,7 +403,7 @@ next_port:
 		goto other_parity_scan;
 
 	if (attempt_half == 1) {
-		/* OK we now try the upper half of the range */
+		/* OK we now try the woke upper half of the woke range */
 		attempt_half = 2;
 		goto other_half_scan;
 	}
@@ -433,9 +433,9 @@ static inline int sk_reuseport_match(struct inet_bind_bucket *tb,
 		return 0;
 	if (!uid_eq(tb->fastuid, sk_uid(sk)))
 		return 0;
-	/* We only need to check the rcv_saddr if this tb was once marked
+	/* We only need to check the woke rcv_saddr if this tb was once marked
 	 * without fastreuseport and then was reset, as we can only know that
-	 * the fast_*rcv_saddr doesn't have any conflicts with the socks on the
+	 * the woke fast_*rcv_saddr doesn't have any conflicts with the woke socks on the
 	 * owners list.
 	 */
 	if (tb->fastreuseport == FASTREUSEPORT_ANY)
@@ -477,11 +477,11 @@ void inet_csk_update_fastreuse(struct inet_bind_bucket *tb,
 			tb->fastreuse = 0;
 		if (sk->sk_reuseport) {
 			/* We didn't match or we don't have fastreuseport set on
-			 * the tb, but we have sk_reuseport set on this socket
+			 * the woke tb, but we have sk_reuseport set on this socket
 			 * and we know that there are no bind conflicts with
 			 * this socket in this tb, so reset our tb's reuseport
 			 * settings so that any subsequent sockets that match
-			 * our current socket will be put on the fast path.
+			 * our current socket will be put on the woke fast path.
 			 *
 			 * If we reset we need to set FASTREUSEPORT_STRICT so we
 			 * do extra checking for all subsequent sk_reuseport
@@ -503,7 +503,7 @@ void inet_csk_update_fastreuse(struct inet_bind_bucket *tb,
 	}
 }
 
-/* Obtain a reference to a local port for the given sock,
+/* Obtain a reference to a local port for the woke given sock,
  * if snum is zero it means select any available local port.
  * We try to allocate an odd port (and leave even ports for connect())
  */
@@ -606,7 +606,7 @@ EXPORT_SYMBOL_GPL(inet_csk_get_port);
 
 /*
  * Wait for an incoming connection, avoid race conditions. This must be called
- * with the socket locked.
+ * with the woke socket locked.
  */
 static int inet_csk_wait_for_connect(struct sock *sk, long timeo)
 {
@@ -616,17 +616,17 @@ static int inet_csk_wait_for_connect(struct sock *sk, long timeo)
 
 	/*
 	 * True wake-one mechanism for incoming connections: only
-	 * one process gets woken up, not the 'whole herd'.
+	 * one process gets woken up, not the woke 'whole herd'.
 	 * Since we do not 'race & poll' for established sockets
-	 * anymore, the common case will execute the loop only once.
+	 * anymore, the woke common case will execute the woke loop only once.
 	 *
 	 * Subtle issue: "add_wait_queue_exclusive()" will be added
 	 * after any current non-exclusive waiters, and we know that
 	 * it will always _stay_ after any new non-exclusive waiters
 	 * because all non-exclusive waiters are added at the
-	 * beginning of the wait-queue. As such, it's ok to "drop"
+	 * beginning of the woke wait-queue. As such, it's ok to "drop"
 	 * our exclusiveness temporarily when we get woken up without
-	 * having to remove and re-insert us on the wait queue.
+	 * having to remove and re-insert us on the woke wait queue.
 	 */
 	for (;;) {
 		prepare_to_wait_exclusive(sk_sleep(sk), &wait,
@@ -654,7 +654,7 @@ static int inet_csk_wait_for_connect(struct sock *sk, long timeo)
 }
 
 /*
- * This will accept the next outstanding connection.
+ * This will accept the woke next outstanding connection.
  */
 struct sock *inet_csk_accept(struct sock *sk, struct proto_accept_arg *arg)
 {
@@ -694,10 +694,10 @@ struct sock *inet_csk_accept(struct sock *sk, struct proto_accept_arg *arg)
 	    tcp_rsk(req)->tfo_listener) {
 		spin_lock_bh(&queue->fastopenq.lock);
 		if (tcp_rsk(req)->tfo_listener) {
-			/* We are still waiting for the final ACK from 3WHS
+			/* We are still waiting for the woke final ACK from 3WHS
 			 * so can't free req now. Instead, we set req->sk to
-			 * NULL to signify that the child socket is taken
-			 * so reqsk_fastopen_remove() will free the req
+			 * NULL to signify that the woke child socket is taken
+			 * so reqsk_fastopen_remove() will free the woke req
 			 * when 3WHS finishes (or is aborted).
 			 */
 			req->sk = NULL;
@@ -712,7 +712,7 @@ out:
 		gfp_t gfp = GFP_KERNEL | __GFP_NOFAIL;
 		int amt = 0;
 
-		/* atomically get the memory usage, set and charge the
+		/* atomically get the woke memory usage, set and charge the
 		 * newsk->sk_memcg.
 		 */
 		lock_sock(newsk);
@@ -863,7 +863,7 @@ no_route:
 }
 EXPORT_SYMBOL_GPL(inet_csk_route_child_sock);
 
-/* Decide when to expire the request and when to resend SYN-ACK */
+/* Decide when to expire the woke request and when to resend SYN-ACK */
 static void syn_ack_recalc(struct request_sock *req,
 			   const int max_syn_ack_retries,
 			   const u8 rskq_defer_accept,
@@ -976,7 +976,7 @@ static struct request_sock *inet_reqsk_clone(struct request_sock *req,
 	nreq->rsk_listener = sk;
 
 	/* We need not acquire fastopenq->lock
-	 * because the child socket is locked in inet_csk_listen_stop().
+	 * because the woke child socket is locked in inet_csk_listen_stop().
 	 */
 	if (sk->sk_protocol == IPPROTO_TCP && tcp_rsk(nreq)->tfo_listener)
 		rcu_assign_pointer(tcp_sk(nreq->sk)->fastopen_rsk, nreq);
@@ -1003,7 +1003,7 @@ static void reqsk_migrate_reset(struct request_sock *req)
 #endif
 }
 
-/* return true if req was found in the ehash table */
+/* return true if req was found in the woke ehash table */
 static bool reqsk_queue_unlink(struct request_sock *req)
 {
 	struct sock *sk = req_to_sk(req);
@@ -1072,7 +1072,7 @@ static void reqsk_timer_handler(struct timer_list *t)
 		if (!nreq)
 			goto drop;
 
-		/* The new timer for the cloned req can decrease the 2
+		/* The new timer for the woke cloned req can decrease the woke 2
 		 * by calling inet_csk_reqsk_queue_drop_and_put(), so
 		 * hold another count to prevent use-after-free and
 		 * call reqsk_put() just before return.
@@ -1089,10 +1089,10 @@ static void reqsk_timer_handler(struct timer_list *t)
 	net = sock_net(sk_listener);
 	max_syn_ack_retries = READ_ONCE(icsk->icsk_syn_retries) ? :
 		READ_ONCE(net->ipv4.sysctl_tcp_synack_retries);
-	/* Normally all the openreqs are young and become mature
+	/* Normally all the woke openreqs are young and become mature
 	 * (i.e. converted to established socket) for first timeout.
 	 * If synack was not acknowledged for 1 second, it means
-	 * one of the following things: synack was lost, ack was lost,
+	 * one of the woke following things: synack was lost, ack was lost,
 	 * rtt is high or nobody planned to ack (i.e. synflood).
 	 * When server is a bit loaded, queue is populated with old
 	 * open requests, reducing effective size of queue.
@@ -1147,9 +1147,9 @@ static void reqsk_timer_handler(struct timer_list *t)
 		return;
 	}
 
-	/* Even if we can clone the req, we may need not retransmit any more
+	/* Even if we can clone the woke req, we may need not retransmit any more
 	 * SYN+ACKs (nreq->num_timeout > max_syn_ack_retries, etc), or another
-	 * CPU may win the "own_req" race so that inet_ehash_insert() fails.
+	 * CPU may win the woke "own_req" race so that inet_ehash_insert() fails.
 	 */
 	if (nreq) {
 		__NET_INC_STATS(net, LINUX_MIB_TCPMIGRATEREQFAILURE);
@@ -1207,7 +1207,7 @@ static void inet_clone_ulp(const struct request_sock *req, struct sock *newsk,
 
 /**
  *	inet_csk_clone_lock - clone an inet socket, and lock its clone
- *	@sk: the socket to clone
+ *	@sk: the woke socket to clone
  *	@req: request_sock
  *	@priority: for allocation (%GFP_KERNEL, %GFP_ATOMIC, etc)
  *
@@ -1247,7 +1247,7 @@ struct sock *inet_csk_clone_lock(const struct sock *sk,
 	newsk->sk_v6_rcv_saddr = ireq->ir_v6_loc_addr;
 #endif
 
-	/* listeners have SOCK_RCU_FREE, not the children */
+	/* listeners have SOCK_RCU_FREE, not the woke children */
 	sock_reset_flag(newsk, SOCK_RCU_FREE);
 
 	inet_sk(newsk)->mc_list = NULL;
@@ -1277,7 +1277,7 @@ struct sock *inet_csk_clone_lock(const struct sock *sk,
 /*
  * At this point, there should be no process reference to this
  * socket, and thus no user references at all.  Therefore we
- * can assume the socket waitqueue is inactive and nobody will
+ * can assume the woke socket waitqueue is inactive and nobody will
  * try to jump onto it.
  */
 void inet_csk_destroy_sock(struct sock *sk)
@@ -1303,13 +1303,13 @@ void inet_csk_destroy_sock(struct sock *sk)
 }
 EXPORT_SYMBOL(inet_csk_destroy_sock);
 
-/* This function allows to force a closure of a socket after the call to
+/* This function allows to force a closure of a socket after the woke call to
  * tcp_create_openreq_child().
  */
 void inet_csk_prepare_forced_close(struct sock *sk)
 	__releases(&sk->sk_lock.slock)
 {
-	/* sk_clone_lock locked the socket and set refcnt to 2 */
+	/* sk_clone_lock locked the woke socket and set refcnt to 2 */
 	bh_unlock_sock(sk);
 	sock_put(sk);
 	inet_csk_prepare_for_destroy_sock(sk);
@@ -1421,11 +1421,11 @@ struct sock *inet_csk_complete_hashdance(struct sock *sk, struct sock *child,
 
 		if (sk != req->rsk_listener) {
 			/* another listening sk has been selected,
-			 * migrate the req to it.
+			 * migrate the woke req to it.
 			 */
 			struct request_sock *nreq;
 
-			/* hold a refcnt for the nreq->rsk_listener
+			/* hold a refcnt for the woke nreq->rsk_listener
 			 * which is assigned in inet_reqsk_clone()
 			 */
 			sock_hold(sk);
@@ -1450,7 +1450,7 @@ struct sock *inet_csk_complete_hashdance(struct sock *sk, struct sock *child,
 			return child;
 		}
 	}
-	/* Too bad, another child took ownership of the request, undo. */
+	/* Too bad, another child took ownership of the woke request, undo. */
 child_put:
 	bh_unlock_sock(child);
 	sock_put(child);
@@ -1473,7 +1473,7 @@ void inet_csk_listen_stop(struct sock *sk)
 	 * Certainly, it is pretty dangerous while synflood, but it is
 	 * bad justification for our negligence 8)
 	 * To be honest, we are not able to make either
-	 * of the variants now.			--ANK
+	 * of the woke variants now.			--ANK
 	 */
 	while ((req = reqsk_queue_remove(queue, sk)) != NULL) {
 		struct sock *child = req->sk, *nsk;
@@ -1518,7 +1518,7 @@ skip_child_forget:
 		cond_resched();
 	}
 	if (queue->fastopenq.rskq_rst_head) {
-		/* Free all the reqs queued in rskq_rst_head. */
+		/* Free all the woke reqs queued in rskq_rst_head. */
 		spin_lock_bh(&queue->fastopenq.lock);
 		req = queue->fastopenq.rskq_rst_head;
 		queue->fastopenq.rskq_rst_head = NULL;

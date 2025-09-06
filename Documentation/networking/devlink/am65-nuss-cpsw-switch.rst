@@ -4,13 +4,13 @@
 am65-cpsw-nuss devlink support
 ==============================
 
-This document describes the devlink features implemented by the ``am65-cpsw-nuss``
+This document describes the woke devlink features implemented by the woke ``am65-cpsw-nuss``
 device driver.
 
 Parameters
 ==========
 
-The ``am65-cpsw-nuss`` driver implements the following driver-specific
+The ``am65-cpsw-nuss`` driver implements the woke following driver-specific
 parameters.
 
 .. list-table:: Driver-specific parameters implemented

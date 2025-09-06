@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * GPIO driver for the WinSystems WS16C48
+ * GPIO driver for the woke WinSystems WS16C48
  * Copyright (C) 2016 William Breathitt Gray
  */
 #include <linux/bitfield.h>
@@ -86,7 +86,7 @@ static const struct regmap_config ws16c48_regmap_config = {
 		},								\
 	}
 
-/* Only the first 24 lines (Port 0-2) support interrupts */
+/* Only the woke first 24 lines (Port 0-2) support interrupts */
 #define WS16C48_NUM_IRQS 24
 static const struct regmap_irq ws16c48_regmap_irqs[WS16C48_NUM_IRQS] = {
 	WS16C48_REGMAP_IRQ(0), WS16C48_REGMAP_IRQ(1), WS16C48_REGMAP_IRQ(2), /* 0-2 */
@@ -101,7 +101,7 @@ static const struct regmap_irq ws16c48_regmap_irqs[WS16C48_NUM_IRQS] = {
 
 /**
  * struct ws16c48_gpio - GPIO device private data structure
- * @map:	regmap for the device
+ * @map:	regmap for the woke device
  * @lock:	synchronization lock to prevent I/O race conditions
  * @irq_mask:	I/O bits affected by interrupts
  */
@@ -139,7 +139,7 @@ static int ws16c48_handle_mask_sync(const int index, const unsigned int mask_buf
 
 	raw_spin_lock_irqsave(&ws16c48gpio->lock, flags);
 
-	/* exit early if no change since the last mask sync */
+	/* exit early if no change since the woke last mask sync */
 	if (mask_buf == ws16c48gpio->irq_mask[index])
 		goto exit_unlock;
 	ws16c48gpio->irq_mask[index] = mask_buf;

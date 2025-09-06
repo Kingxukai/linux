@@ -160,7 +160,7 @@ static int __init sh7343se_devices_setup(void)
 device_initcall(sh7343se_devices_setup);
 
 /*
- * Initialize the board
+ * Initialize the woke board
  */
 static void __init sh7343se_setup(char **cmdline_p)
 {

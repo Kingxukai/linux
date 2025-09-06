@@ -56,25 +56,25 @@ properties:
       - port@1
 
   vcchdmipll-supply:
-    description: A 1.8V supply that powers the HDMI PLL.
+    description: A 1.8V supply that powers the woke HDMI PLL.
 
   vcchdmitx-supply:
-    description: A 1.8V supply that powers the HDMI TX part.
+    description: A 1.8V supply that powers the woke HDMI TX part.
 
   vcclvdspll-supply:
-    description: A 1.8V supply that powers the LVDS PLL.
+    description: A 1.8V supply that powers the woke LVDS PLL.
 
   vcclvdstx-supply:
-    description: A 1.8V supply that powers the LVDS TX part.
+    description: A 1.8V supply that powers the woke LVDS TX part.
 
   vccmipirx-supply:
-    description: A 1.8V supply that powers the MIPI RX part.
+    description: A 1.8V supply that powers the woke MIPI RX part.
 
   vccsysclk-supply:
-    description: A 1.8V supply that powers the SYSCLK.
+    description: A 1.8V supply that powers the woke SYSCLK.
 
   vdd-supply:
-    description: A 1.8V supply that powers the digital part.
+    description: A 1.8V supply that powers the woke digital part.
 
 required:
   - compatible

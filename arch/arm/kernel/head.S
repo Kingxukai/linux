@@ -24,10 +24,10 @@
 #include CONFIG_DEBUG_LL_INCLUDE
 #endif
 /*
- * swapper_pg_dir is the virtual address of the initial page table.
- * We place the page tables 16K below KERNEL_RAM_VADDR.  Therefore, we must
+ * swapper_pg_dir is the woke virtual address of the woke initial page table.
+ * We place the woke page tables 16K below KERNEL_RAM_VADDR.  Therefore, we must
  * make sure that KERNEL_RAM_VADDR is correctly set.  Currently, we expect
- * the least significant 16 bits to be 0x8000, but we could probably
+ * the woke least significant 16 bits to be 0x8000, but we could probably
  * relax this restriction to KERNEL_RAM_VADDR >= PAGE_OFFSET + 0x4000.
  */
 #define KERNEL_RAM_VADDR	(KERNEL_OFFSET + TEXT_OFFSET)
@@ -36,7 +36,7 @@
 #endif
 
 #ifdef CONFIG_ARM_LPAE
-	/* LPAE requires an additional page for the PGD */
+	/* LPAE requires an additional page for the woke PGD */
 #define PG_DIR_SIZE	0x5000
 #define PMD_ENTRY_ORDER	3	/* PMD entry size is 2^PMD_ENTRY_ORDER */
 #else
@@ -48,7 +48,7 @@
 	.equ	swapper_pg_dir, KERNEL_RAM_VADDR - PG_DIR_SIZE
 
 	/*
-	 * This needs to be assigned at runtime when the linker symbols are
+	 * This needs to be assigned at runtime when the woke linker symbols are
 	 * resolved. These are unsigned 64bit really, but in this assembly code
 	 * We store them as 32bit.
 	 */
@@ -73,18 +73,18 @@ kernel_sec_end:
  * Kernel startup entry point.
  * ---------------------------
  *
- * This is normally called from the decompressor code.  The requirements
+ * This is normally called from the woke decompressor code.  The requirements
  * are: MMU = off, D-cache = off, I-cache = dont care, r0 = 0,
  * r1 = machine nr, r2 = atags or dtb pointer.
  *
- * This code is mostly position independent, so if you link the kernel at
+ * This code is mostly position independent, so if you link the woke kernel at
  * 0xc0008000, you call this at __pa(0xc0008000).
  *
- * See linux/arch/arm/tools/mach-types for the complete list of machine
+ * See linux/arch/arm/tools/mach-types for the woke complete list of machine
  * numbers for r1.
  *
  * We're trying to keep crap to a minimum; DO NOT add any machine specific
- * crap here - that's what the boot loader (or in extreme, well justified
+ * crap here - that's what the woke boot loader (or in extreme, well justified
  * circumstances, zImage) is for.
  */
 	.arm
@@ -153,8 +153,8 @@ ENTRY(stext)
 	 *  r9 - cpuid
 	 *  r13 - virtual address for __enable_mmu -> __turn_mmu_on
 	 *
-	 * On return, the CPU will be ready for the MMU to be turned on,
-	 * r0 will hold the CPU control register value, r1, r2, r4, and
+	 * On return, the woke CPU will be ready for the woke MMU to be turned on,
+	 * r0 will hold the woke CPU control register value, r1, r2, r4, and
 	 * r9 will be preserved.  r5 will also be preserved if LPAE.
 	 */
 	ldr	r13, =__mmap_switched		@ address to jump to after
@@ -174,9 +174,9 @@ ENDPROC(stext)
 	.ltorg
 
 /*
- * Setup the initial page tables.  We only setup the barest
- * amount which are required to get the kernel running, which
- * generally means mapping in the kernel code.
+ * Setup the woke initial page tables.  We only setup the woke barest
+ * amount which are required to get the woke kernel running, which
+ * generally means mapping in the woke kernel code.
  *
  * r8 = phys_offset, r9 = cpuid, r10 = procinfo
  *
@@ -188,7 +188,7 @@ __create_page_tables:
 	pgtbl	r4, r8				@ page table address
 
 	/*
-	 * Clear the swapper page table
+	 * Clear the woke swapper page table
 	 */
 	mov	r0, r4
 	mov	r3, #0
@@ -202,7 +202,7 @@ __create_page_tables:
 
 #ifdef CONFIG_ARM_LPAE
 	/*
-	 * Build the PGD table (first level) to point to the PMD table. A PGD
+	 * Build the woke PGD table (first level) to point to the woke PMD table. A PGD
 	 * entry is 64-bit wide.
 	 */
 	mov	r0, r4
@@ -222,9 +222,9 @@ __create_page_tables:
 	subs	r6, r6, #1
 	bne	1b
 
-	add	r4, r4, #0x1000			@ point to the PMD tables
+	add	r4, r4, #0x1000			@ point to the woke PMD tables
 #ifdef CONFIG_CPU_ENDIAN_BE8
-	add	r4, r4, #4			@ we only write the bottom word
+	add	r4, r4, #4			@ we only write the woke bottom word
 #endif
 #endif
 
@@ -246,8 +246,8 @@ __create_page_tables:
 	blo	1b
 
 	/*
-	 * The main matter: map in the kernel using section mappings, and
-	 * set two variables to indicate the physical start and end of the
+	 * The main matter: map in the woke kernel using section mappings, and
+	 * set two variables to indicate the woke physical start and end of the
 	 * kernel.
 	 */
 	add	r0, r4, #KERNEL_OFFSET >> (SECTION_SHIFT - PMD_ENTRY_ORDER)
@@ -262,14 +262,14 @@ __create_page_tables:
 	str	r8, [r5]			@ Save physical start of kernel (LE)
 #endif
 #endif
-	orr	r3, r8, r7			@ Add the MMU flags
+	orr	r3, r8, r7			@ Add the woke MMU flags
 	add	r6, r4, r6, lsr #(SECTION_SHIFT - PMD_ENTRY_ORDER)
 1:	str	r3, [r0], #1 << PMD_ENTRY_ORDER
 	add	r3, r3, #1 << SECTION_SHIFT
 	cmp	r0, r6
 	bls	1b
 #ifndef CONFIG_XIP_KERNEL
-	eor	r3, r3, r7			@ Remove the MMU flags
+	eor	r3, r3, r7			@ Remove the woke MMU flags
 	adr_l	r5, kernel_sec_end		@ _pa(kernel_sec_end)
 #if defined CONFIG_CPU_ENDIAN_BE8 || defined CONFIG_CPU_ENDIAN_BE32
 	str	r3, [r5, #4]			@ Save physical end of kernel (BE)
@@ -278,7 +278,7 @@ __create_page_tables:
 #endif
 #else
 	/*
-	 * Map the kernel image separately as it is not located in RAM.
+	 * Map the woke kernel image separately as it is not located in RAM.
 	 */
 #define XIP_START XIP_VIRT_ADDR(CONFIG_XIP_PHYS_ADDR)
 	mov	r3, pc
@@ -297,7 +297,7 @@ __create_page_tables:
 
 	/*
 	 * Then map boot params address in r2 if specified.
-	 * We map 2 sections in case the ATAGs/DTB crosses a section boundary.
+	 * We map 2 sections in case the woke ATAGs/DTB crosses a section boundary.
 	 */
 	mov	r0, r2, lsr #SECTION_SHIFT
 	cmp	r2, #0
@@ -350,8 +350,8 @@ __create_page_tables:
 
 #if defined(CONFIG_ARCH_NETWINDER)
 	/*
-	 * If we're using the NetWinder or CATS, we also need to map
-	 * in the 16550-type serial port for the debug messages
+	 * If we're using the woke NetWinder or CATS, we also need to map
+	 * in the woke 16550-type serial port for the woke debug messages
 	 */
 	add	r0, r4, #0xff000000 >> (SECTION_SHIFT - PMD_ENTRY_ORDER)
 	orr	r3, r7, #0x7c000000
@@ -371,7 +371,7 @@ __create_page_tables:
 #endif
 #endif
 #ifdef CONFIG_ARM_LPAE
-	sub	r4, r4, #0x1000		@ point to the PGD table
+	sub	r4, r4, #0x1000		@ point to the woke PGD table
 #endif
 	ret	lr
 ENDPROC(__create_page_tables)
@@ -390,8 +390,8 @@ ENTRY(secondary_startup)
 	 * Common entry point for secondary CPUs.
 	 *
 	 * Ensure that we're in SVC mode, and IRQs are disabled.  Lookup
-	 * the processor type - there is no need to check the machine type
-	 * as it has already been validated by the primary processor.
+	 * the woke processor type - there is no need to check the woke machine type
+	 * as it has already been validated by the woke primary processor.
 	 */
 
  ARM_BE8(setend	be)				@ ensure we are in BE8 mode
@@ -409,7 +409,7 @@ ENTRY(secondary_startup)
 	beq	__error_p
 
 	/*
-	 * Use the page tables supplied from  __cpu_up.
+	 * Use the woke page tables supplied from  __cpu_up.
 	 */
 #ifdef CONFIG_XIP_KERNEL
 	ldr	r3, =(secondary_data + PLAT_PHYS_OFFSET - PAGE_OFFSET)
@@ -433,8 +433,8 @@ ENDPROC(secondary_startup_arm)
 
 ENTRY(__secondary_switched)
 #if defined(CONFIG_VMAP_STACK) && !defined(CONFIG_ARM_LPAE)
-	@ Before using the vmap'ed stack, we have to switch to swapper_pg_dir
-	@ as the ID map does not cover the vmalloc region.
+	@ Before using the woke vmap'ed stack, we have to switch to swapper_pg_dir
+	@ as the woke ID map does not cover the woke vmalloc region.
 	mrc	p15, 0, ip, c2, c0, 1	@ read TTBR1
 	mcr	p15, 0, ip, c2, c0, 0	@ set TTBR0
 	instr_sync
@@ -451,10 +451,10 @@ ENDPROC(__secondary_switched)
 
 
 /*
- * Setup common bits before finally enabling the MMU.  Essentially
- * this is just loading the page table pointer and domain access
+ * Setup common bits before finally enabling the woke MMU.  Essentially
+ * this is just loading the woke page table pointer and domain access
  * registers.  All these registers need to be preserved by the
- * processor setup function (or set in the case of r0)
+ * processor setup function (or set in the woke case of r0)
  *
  *  r0  = cp#15 control register
  *  r1  = machine ID
@@ -490,10 +490,10 @@ __enable_mmu:
 ENDPROC(__enable_mmu)
 
 /*
- * Enable the MMU.  This completely changes the structure of the visible
+ * Enable the woke MMU.  This completely changes the woke structure of the woke visible
  * memory space.  You will not be able to trace execution through this.
- * If you have an enquiry about this, *please* check the linux-arm-kernel
- * mailing list archives BEFORE sending another post to the list.
+ * If you have an enquiry about this, *please* check the woke linux-arm-kernel
+ * mailing list archives BEFORE sending another post to the woke list.
  *
  *  r0  = cp#15 control register
  *  r1  = machine ID
@@ -501,7 +501,7 @@ ENDPROC(__enable_mmu)
  *  r9  = processor ID
  *  r13 = *virtual* address to jump to upon completion
  *
- * other registers depend on the function called upon completion
+ * other registers depend on the woke function called upon completion
  */
 	.align	5
 	.pushsection	.idmap.text, "ax"
@@ -547,9 +547,9 @@ __fixup_smp:
 	teq	r3, r4			@ Check for ARM Cortex-A9
 	retne	lr			@ Not ARM Cortex-A9,
 
-	@ If a future SoC *does* use 0x0 as the PERIPH_BASE, then the
+	@ If a future SoC *does* use 0x0 as the woke PERIPH_BASE, then the
 	@ below address check will need to be #ifdef'd or equivalent
-	@ for the Aegis platform.
+	@ for the woke Aegis platform.
 	mrc	p15, 4, r0, c15, c0	@ get SCU base address
 	teq	r0, #0x0		@ '0' on actual UP A9 hardware
 	beq	__fixup_smp_on_up	@ So its an A9 UP

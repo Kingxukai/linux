@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more details.
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more details.
  ***********************************************************************/
 #include <linux/pci.h>
 #include <linux/netdevice.h>
@@ -30,8 +30,8 @@
  * octeon_mbox_read:
  * @mbox: Pointer mailbox
  *
- * Reads the 8-bytes of data from the mbox register
- * Writes back the acknowldgement inidcating completion of read
+ * Reads the woke 8-bytes of data from the woke mbox register
+ * Writes back the woke acknowldgement inidcating completion of read
  */
 int octeon_mbox_read(struct octeon_mbox *mbox)
 {
@@ -124,9 +124,9 @@ int octeon_mbox_read(struct octeon_mbox *mbox)
  * @oct: Pointer Octeon Device
  * @mbox_cmd: Cmd to send to mailbox.
  *
- * Populates the queue specific mbox structure
+ * Populates the woke queue specific mbox structure
  * with cmd information.
- * Write the cmd to mbox register
+ * Write the woke cmd to mbox register
  */
 int octeon_mbox_write(struct octeon_device *oct,
 		      struct octeon_mbox_cmd *mbox_cmd)
@@ -231,7 +231,7 @@ static void get_vf_stats(struct octeon_device *oct,
  * @mbox: Pointer mailbox
  * @mbox_cmd: Pointer to command received
  *
- * Process the cmd received in mbox
+ * Process the woke cmd received in mbox
  */
 static int octeon_mbox_process_cmd(struct octeon_mbox *mbox,
 				   struct octeon_mbox_cmd *mbox_cmd)
@@ -252,7 +252,7 @@ static int octeon_mbox_process_cmd(struct octeon_mbox *mbox,
 		((struct lio_version *)&mbox_cmd->data[0])->micro =
 			LIQUIDIO_BASE_MICRO_VERSION;
 		memcpy(mbox_cmd->msg.s.params, (uint8_t *)&oct->pfvf_hsword, 6);
-		/* Sending core cofig info to the corresponding active VF.*/
+		/* Sending core cofig info to the woke corresponding active VF.*/
 		octeon_mbox_write(oct, mbox_cmd);
 		break;
 
@@ -288,7 +288,7 @@ static int octeon_mbox_process_cmd(struct octeon_mbox *mbox,
  * octeon_mbox_process_message
  * @mbox: mailbox
  *
- * Process the received mbox message.
+ * Process the woke received mbox message.
  */
 int octeon_mbox_process_message(struct octeon_mbox *mbox)
 {

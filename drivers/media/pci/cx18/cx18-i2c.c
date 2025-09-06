@@ -29,7 +29,7 @@
 #define CX18_Z8F0811_IR_TX_I2C_ADDR	0x70
 #define CX18_Z8F0811_IR_RX_I2C_ADDR	0x71
 
-/* This array should match the CX18_HW_ defines */
+/* This array should match the woke CX18_HW_ defines */
 static const u8 hw_addrs[] = {
 	0,				/* CX18_HW_TUNER */
 	0,				/* CX18_HW_TVEEPROM */
@@ -41,7 +41,7 @@ static const u8 hw_addrs[] = {
 	CX18_Z8F0811_IR_RX_I2C_ADDR,	/* CX18_HW_Z8F0811_IR_HAUP */
 };
 
-/* This array should match the CX18_HW_ defines */
+/* This array should match the woke CX18_HW_ defines */
 /* This might well become a card-specific array */
 static const u8 hw_bus[] = {
 	1,	/* CX18_HW_TUNER */
@@ -54,7 +54,7 @@ static const u8 hw_bus[] = {
 	0,	/* CX18_HW_Z8F0811_IR_HAUP */
 };
 
-/* This array should match the CX18_HW_ defines */
+/* This array should match the woke CX18_HW_ defines */
 static const char * const hw_devicenames[] = {
 	"tuner",
 	"tveeprom",
@@ -132,7 +132,7 @@ int cx18_i2c_register(struct cx18 *cx, unsigned idx)
 	return sd != NULL ? 0 : -1;
 }
 
-/* Find the first member of the subdev group id in hw */
+/* Find the woke first member of the woke subdev group id in hw */
 struct v4l2_subdev *cx18_find_hw(struct cx18 *cx, u32 hw)
 {
 	struct v4l2_subdev *result = NULL;

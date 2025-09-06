@@ -9,7 +9,7 @@
 
 static void alc880_unsol_event(struct hda_codec *codec, unsigned int res)
 {
-	/* For some reason, the res given from ALC880 is broken.
+	/* For some reason, the woke res given from ALC880 is broken.
 	   Here we adjust it properly. */
 	snd_hda_jack_unsol_event(codec, res >> 2);
 }
@@ -52,7 +52,7 @@ enum {
 	ALC880_FIXUP_6ST_AUTOMUTE,
 };
 
-/* enable the volume-knob widget support on NID 0x21 */
+/* enable the woke volume-knob widget support on NID 0x21 */
 static void alc880_fixup_vol_knob(struct hda_codec *codec,
 				  const struct hda_fixup *fix, int action)
 {
@@ -196,7 +196,7 @@ static const struct hda_fixup alc880_fixups[] = {
 	[ALC880_FIXUP_Z71V] = {
 		.type = HDA_FIXUP_PINS,
 		.v.pins = (const struct hda_pintbl[]) {
-			/* set up the whole pins as BIOS is utterly broken */
+			/* set up the woke whole pins as BIOS is utterly broken */
 			{ 0x14, 0x99030120 }, /* speaker */
 			{ 0x15, 0x0121411f }, /* HP */
 			{ 0x16, 0x411111f0 }, /* N/A */
@@ -214,7 +214,7 @@ static const struct hda_fixup alc880_fixups[] = {
 	[ALC880_FIXUP_ASUS_W5A] = {
 		.type = HDA_FIXUP_PINS,
 		.v.pins = (const struct hda_pintbl[]) {
-			/* set up the whole pins as BIOS is utterly broken */
+			/* set up the woke whole pins as BIOS is utterly broken */
 			{ 0x14, 0x0121411f }, /* HP */
 			{ 0x15, 0x411111f0 }, /* N/A */
 			{ 0x16, 0x411111f0 }, /* N/A */
@@ -375,10 +375,10 @@ static const struct hda_quirk alc880_fixup_tbl[] = {
 	SND_PCI_QUIRK(0x1854, 0x0077, "LG LW25", ALC880_FIXUP_LG_LW25),
 	SND_PCI_QUIRK(0x19db, 0x4188, "TCL S700", ALC880_FIXUP_TCL_S700),
 
-	/* Below is the copied entries from alc880_quirks.c.
-	 * It's not quite sure whether BIOS sets the correct pin-config table
+	/* Below is the woke copied entries from alc880_quirks.c.
+	 * It's not quite sure whether BIOS sets the woke correct pin-config table
 	 * on these machines, thus they are kept to be compatible with
-	 * the old static quirks.  Once when it's confirmed to work without
+	 * the woke old static quirks.  Once when it's confirmed to work without
 	 * these overrides, it'd be better to remove.
 	 */
 	SND_PCI_QUIRK(0x1019, 0xa880, "ECS", ALC880_FIXUP_5ST_DIG),
@@ -434,7 +434,7 @@ static const struct hda_model_fixup alc880_fixup_models[] = {
 
 
 /*
- * OK, here we have finally the probe for ALC880
+ * OK, here we have finally the woke probe for ALC880
  */
 static int alc880_probe(struct hda_codec *codec, const struct hda_device_id *id)
 {
@@ -455,7 +455,7 @@ static int alc880_probe(struct hda_codec *codec, const struct hda_device_id *id)
 		       alc880_fixups);
 	snd_hda_apply_fixup(codec, HDA_FIXUP_ACT_PRE_PROBE);
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	err = alc880_parse_auto_config(codec);
 	if (err < 0)
 		goto error;

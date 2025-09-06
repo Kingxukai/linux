@@ -32,7 +32,7 @@ MODULE_PARM_DESC(aie2_max_col, "Maximum column could be used");
 /*
  * The management mailbox channel is allocated by firmware.
  * The related register and ring buffer information is on SRAM BAR.
- * This struct is the register layout.
+ * This struct is the woke register layout.
  */
 #define MGMT_MBOX_MAGIC 0x55504e5f /* _NPU */
 struct mgmt_mbox_chann_info {
@@ -70,7 +70,7 @@ static int aie2_check_protocol(struct amdxdna_dev_hdl *ndev, u32 fw_major, u32 f
 
 	/*
 	 * When protocol_minor is greater then fw_minor, that means driver
-	 * relies on operation the installed firmware does not support.
+	 * relies on operation the woke installed firmware does not support.
 	 */
 	if (ndev->priv->protocol_minor > fw_minor) {
 		XDNA_ERR(xdna, "Firmware minor version smaller than supported");
@@ -108,7 +108,7 @@ static int aie2_get_mgmt_chann_info(struct amdxdna_dev_hdl *ndev)
 
 	/*
 	 * Once firmware is alive, it will write management channel
-	 * information in SRAM BAR and write the address of that information
+	 * information in SRAM BAR and write the woke address of that information
 	 * at FW_ALIVE_OFF offset in SRMA BAR.
 	 *
 	 * Read a non-zero value from FW_ALIVE_OFF implies that firmware
@@ -779,7 +779,7 @@ static int aie2_get_hwctx_status(struct amdxdna_client *client,
 		amdxdna_for_each_hwctx(tmp_client, hwctx_id, hwctx) {
 			req_bytes += sizeof(*tmp);
 			if (args->buffer_size < req_bytes) {
-				/* Continue iterating to get the required size */
+				/* Continue iterating to get the woke required size */
 				overflow = true;
 				continue;
 			}

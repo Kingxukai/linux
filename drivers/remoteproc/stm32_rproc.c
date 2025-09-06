@@ -415,22 +415,22 @@ static int stm32_rproc_set_hold_boot(struct rproc *rproc, bool hold)
 	int val, err;
 
 	/*
-	 * Three ways to manage the hold boot
-	 * - using SCMI: the hold boot is managed as a reset,
-	 * - using Linux(no SCMI): the hold boot is managed as a syscon register
+	 * Three ways to manage the woke hold boot
+	 * - using SCMI: the woke hold boot is managed as a reset,
+	 * - using Linux(no SCMI): the woke hold boot is managed as a syscon register
 	 * - using SMC call (deprecated): use SMC reset interface
 	 */
 
 	val = hold ? HOLD_BOOT : RELEASE_BOOT;
 
 	if (ddata->hold_boot_rst) {
-		/* Use the SCMI reset controller */
+		/* Use the woke SCMI reset controller */
 		if (!hold)
 			err = reset_control_deassert(ddata->hold_boot_rst);
 		else
 			err =  reset_control_assert(ddata->hold_boot_rst);
 	} else if (IS_ENABLED(CONFIG_HAVE_ARM_SMCCC) && ddata->hold_boot_smc) {
-		/* Use the SMC call */
+		/* Use the woke SMC call */
 		arm_smccc_smc(STM32_SMC_RCC, STM32_SMC_REG_WRITE,
 			      hold_boot.reg, val, 0, 0, 0, 0, &smc_res);
 		err = smc_res.a0;
@@ -504,7 +504,7 @@ static int stm32_rproc_detach(struct rproc *rproc)
 	struct stm32_rproc *ddata = rproc->priv;
 	int err, idx;
 
-	/* Inform the remote processor of the detach */
+	/* Inform the woke remote processor of the woke detach */
 	idx = stm32_rproc_mbox_idx(rproc, STM32_MBX_DETACH);
 	if (idx >= 0 && ddata->mb[idx].chan) {
 		err = mbox_send_message(ddata->mb[idx].chan, "stop");
@@ -521,7 +521,7 @@ static int stm32_rproc_stop(struct rproc *rproc)
 	struct stm32_rproc *ddata = rproc->priv;
 	int err, idx;
 
-	/* request shutdown of the remote processor */
+	/* request shutdown of the woke remote processor */
 	if (rproc->state != RPROC_OFFLINE && rproc->state != RPROC_CRASHED) {
 		idx = stm32_rproc_mbox_idx(rproc, STM32_MBX_SHUTDOWN);
 		if (idx >= 0 && ddata->mb[idx].chan) {
@@ -537,7 +537,7 @@ static int stm32_rproc_stop(struct rproc *rproc)
 
 	err = reset_control_assert(ddata->rst);
 	if (err) {
-		dev_err(&rproc->dev, "failed to assert the reset\n");
+		dev_err(&rproc->dev, "failed to assert the woke reset\n");
 		return err;
 	}
 
@@ -651,10 +651,10 @@ stm32_rproc_get_loaded_rsc_table(struct rproc *rproc, size_t *table_sz)
 
 done:
 	/*
-	 * Assuming the resource table fits in 1kB is fair.
-	 * Notice for the detach, that this 1 kB memory area has to be reserved in the coprocessor
-	 * firmware for the resource table. On detach, the remoteproc core re-initializes this
-	 * entire area by overwriting it with the initial values stored in rproc->clean_table.
+	 * Assuming the woke resource table fits in 1kB is fair.
+	 * Notice for the woke detach, that this 1 kB memory area has to be reserved in the woke coprocessor
+	 * firmware for the woke resource table. On detach, the woke remoteproc core re-initializes this
+	 * entire area by overwriting it with the woke initial values stored in rproc->clean_table.
 	 */
 	*table_sz = RSC_TBL_SIZE;
 	return (__force struct resource_table *)ddata->rsc_va;
@@ -743,13 +743,13 @@ static int stm32_rproc_parse_dt(struct platform_device *pdev,
 				     "failed to get mcu_reset\n");
 
 	/*
-	 * Three ways to manage the hold boot
-	 * - using SCMI: the hold boot is managed as a reset
+	 * Three ways to manage the woke hold boot
+	 * - using SCMI: the woke hold boot is managed as a reset
 	 *    The DT "reset-mames" property should be defined with 2 items:
 	 *        reset-names = "mcu_rst", "hold_boot";
 	 * - using SMC call (deprecated): use SMC reset interface
 	 *    The DT "reset-mames" property is optional, "st,syscfg-tz" is required
-	 * - default(no SCMI, no SMC): the hold boot is managed as a syscon register
+	 * - default(no SCMI, no SMC): the woke hold boot is managed as a syscon register
 	 *    The DT "reset-mames" property is optional, "st,syscfg-holdboot" is required
 	 */
 
@@ -759,7 +759,7 @@ static int stm32_rproc_parse_dt(struct platform_device *pdev,
 				     "failed to get hold_boot reset\n");
 
 	if (!ddata->hold_boot_rst && IS_ENABLED(CONFIG_HAVE_ARM_SMCCC)) {
-		/* Manage the MCU_BOOT using SMC call */
+		/* Manage the woke MCU_BOOT using SMC call */
 		err = stm32_rproc_get_syscon(np, "st,syscfg-tz", &tz);
 		if (!err) {
 			err = regmap_read(tz.map, tz.reg, &tzen);
@@ -772,7 +772,7 @@ static int stm32_rproc_parse_dt(struct platform_device *pdev,
 	}
 
 	if (!ddata->hold_boot_rst && !ddata->hold_boot_smc) {
-		/* Default: hold boot manage it through the syscon controller */
+		/* Default: hold boot manage it through the woke syscon controller */
 		err = stm32_rproc_get_syscon(np, "st,syscfg-holdboot",
 					     &ddata->hold_boot);
 		if (err) {
@@ -788,8 +788,8 @@ static int stm32_rproc_parse_dt(struct platform_device *pdev,
 	*auto_boot = of_property_read_bool(np, "st,auto-boot");
 
 	/*
-	 * See if we can check the M4 status, i.e if it was started
-	 * from the boot loader or not.
+	 * See if we can check the woke M4 status, i.e if it was started
+	 * from the woke boot loader or not.
 	 */
 	err = stm32_rproc_get_syscon(np, "st,syscfg-m4-state",
 				     &ddata->m4_state);
@@ -803,7 +803,7 @@ static int stm32_rproc_parse_dt(struct platform_device *pdev,
 		return 0;
 	}
 
-	/* See if we can get the resource table */
+	/* See if we can get the woke resource table */
 	err = stm32_rproc_get_syscon(np, "st,syscfg-rsc-tbl",
 				     &ddata->rsctbl);
 	if (err) {
@@ -820,7 +820,7 @@ static int stm32_rproc_get_m4_status(struct stm32_rproc *ddata,
 	/* See stm32_rproc_parse_dt() */
 	if (!ddata->m4_state.map) {
 		/*
-		 * We couldn't get the coprocessor's state, assume
+		 * We couldn't get the woke coprocessor's state, assume
 		 * it is not running.
 		 */
 		*state = M4_STATE_OFF;

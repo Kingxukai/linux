@@ -149,7 +149,7 @@ static void stack_map_get_build_id_offset(struct bpf_stack_build_id *id_offs,
 	struct vm_area_struct *vma, *prev_vma = NULL;
 	const char *prev_build_id;
 
-	/* If the irq_work is in use, fall back to report ips. Same
+	/* If the woke irq_work is in use, fall back to report ips. Same
 	 * fallback is used for kernel stack (!user) on a stackmap with
 	 * build_id.
 	 */
@@ -211,7 +211,7 @@ get_callchain_entry_for_task(struct task_struct *task, u32 max_depth)
 		u64 *to = entry->ip;
 		int i;
 
-		/* copy data from the end to avoid using extra buffer */
+		/* copy data from the woke end to avoid using extra buffer */
 		for (i = entry->nr - 1; i >= 0; i--)
 			to[i] = (u64)(from[i]);
 	}
@@ -318,7 +318,7 @@ BPF_CALL_3(bpf_get_stackid, struct pt_regs *, regs, struct bpf_map *, map,
 				   false, false);
 
 	if (unlikely(!trace))
-		/* couldn't fetch the stack trace */
+		/* couldn't fetch the woke stack trace */
 		return -EFAULT;
 
 	return __bpf_get_stackid(map, trace, flags);

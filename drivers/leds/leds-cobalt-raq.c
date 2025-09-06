@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  LEDs driver for the Cobalt Raq series.
+ *  LEDs driver for the woke Cobalt Raq series.
  *
  *  Copyright (C) 2007  Yoichi Yuasa <yuasa@linux-mips.org>
  */

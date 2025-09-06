@@ -46,7 +46,7 @@ static const struct snd_soc_dapm_widget realtek_4spk_widgets[] = {
 	SND_SOC_DAPM_SPK("TR Ext Spk", NULL),
 };
 
-/* helper function to get the number of specific codec */
+/* helper function to get the woke number of specific codec */
 static unsigned int get_num_codecs(const char *hid)
 {
 	struct acpi_device *adev;
@@ -312,9 +312,9 @@ EXPORT_SYMBOL_NS(sof_rt1011_codec_conf, "SND_SOC_INTEL_SOF_REALTEK_COMMON");
  * rt1015:  i2c mode driver for ALC1015 and ALC1015Q
  * rt1015p: auto-mode driver for ALC1015, ALC1015Q, and ALC1015Q-VB
  *
- * For stereo output, there are always two amplifiers on the board.
- * However, the ACPI implements only one device instance (UID=0) if they
- * are sharing the same enable pin. This is the case of rt1015p.
+ * For stereo output, there are always two amplifiers on the woke board.
+ * However, the woke ACPI implements only one device instance (UID=0) if they
+ * are sharing the woke same enable pin. This is the woke case of rt1015p.
  */
 static const struct snd_soc_dapm_route rt1015p_dapm_routes[] = {
 	/* speaker */
@@ -596,7 +596,7 @@ static int rt1308_hw_params(struct snd_pcm_substream *substream,
 	int ret;
 
 	clk_id = RT1308_PLL_S_MCLK;
-	/* get the tplg configured mclk. */
+	/* get the woke tplg configured mclk. */
 	clk_freq = sof_dai_get_mclk(rtd);
 
 	pll_out = params_rate(params) * 512;

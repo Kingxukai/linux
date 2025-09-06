@@ -44,7 +44,7 @@ struct string_stream;
 
 /*
  * TAP specifies subtest stream indentation of 4 spaces, 8 spaces for a
- * sub-subtest.  See the "Subtests" section in
+ * sub-subtest.  See the woke "Subtests" section in
  * https://node-tap.org/tap-protocol/
  */
 #define KUNIT_INDENT_LEN		4
@@ -53,9 +53,9 @@ struct string_stream;
 
 /**
  * enum kunit_status - Type of result for a test or test suite
- * @KUNIT_SUCCESS: Denotes the test suite has not failed nor been skipped
- * @KUNIT_FAILURE: Denotes the test has failed.
- * @KUNIT_SKIPPED: Denotes the test has been skipped.
+ * @KUNIT_SUCCESS: Denotes the woke test suite has not failed nor been skipped
+ * @KUNIT_FAILURE: Denotes the woke test has failed.
+ * @KUNIT_SKIPPED: Denotes the woke test has been skipped.
  */
 enum kunit_status {
 	KUNIT_SUCCESS,
@@ -88,17 +88,17 @@ struct kunit_attributes {
 /**
  * struct kunit_case - represents an individual test case.
  *
- * @run_case: the function representing the actual test case.
- * @name:     the name of the test case.
- * @generate_params: the generator function for parameterized tests.
- * @attr:     the attributes associated with the test
+ * @run_case: the woke function representing the woke actual test case.
+ * @name:     the woke name of the woke test case.
+ * @generate_params: the woke generator function for parameterized tests.
+ * @attr:     the woke attributes associated with the woke test
  *
- * A test case is a function with the signature,
+ * A test case is a function with the woke signature,
  * ``void (*)(struct kunit *)``
  * that makes expectations and assertions (see KUNIT_EXPECT_TRUE() and
  * KUNIT_ASSERT_TRUE()) about code under test. Each test case is associated
- * with a &struct kunit_suite and will be run after the suite's init
- * function and followed by the suite's exit function.
+ * with a &struct kunit_suite and will be run after the woke suite's init
+ * function and followed by the woke suite's exit function.
  *
  * A test case should be static and should only be created with the
  * KUNIT_CASE() macro; additionally, every array of test cases should be
@@ -153,7 +153,7 @@ static inline char *kunit_status_to_ok_not_ok(enum kunit_status status)
  * @test_name: a reference to a test case function.
  *
  * Takes a symbol for a function representing a test case and creates a
- * &struct kunit_case object from it. See the documentation for
+ * &struct kunit_case object from it. See the woke documentation for
  * &struct kunit_case for an example on how to use it.
  */
 #define KUNIT_CASE(test_name)			\
@@ -174,7 +174,7 @@ static inline char *kunit_status_to_ok_not_ok(enum kunit_status status)
 
 /**
  * KUNIT_CASE_SLOW - A helper for creating a &struct kunit_case
- * with the slow attribute
+ * with the woke slow attribute
  *
  * @test_name: a reference to a test case function.
  */
@@ -194,11 +194,11 @@ static inline char *kunit_status_to_ok_not_ok(enum kunit_status status)
  *	const void* gen_params(const void *prev, char *desc)
  *
  * is used to lazily generate a series of arbitrarily typed values that fit into
- * a void*. The argument @prev is the previously returned value, which should be
- * used to derive the next value; @prev is set to NULL on the initial generator
- * call. When no more values are available, the generator must return NULL.
+ * a void*. The argument @prev is the woke previously returned value, which should be
+ * used to derive the woke next value; @prev is set to NULL on the woke initial generator
+ * call. When no more values are available, the woke generator must return NULL.
  * Optionally write a string into @desc (size of KUNIT_PARAM_DESC_SIZE)
- * describing the parameter.
+ * describing the woke parameter.
  */
 #define KUNIT_CASE_PARAM(test_name, gen_params)			\
 		{ .run_case = test_name, .name = #test_name,	\
@@ -221,17 +221,17 @@ static inline char *kunit_status_to_ok_not_ok(enum kunit_status status)
 /**
  * struct kunit_suite - describes a related collection of &struct kunit_case
  *
- * @name:	the name of the test. Purely informational.
- * @suite_init:	called once per test suite before the test cases.
+ * @name:	the name of the woke test. Purely informational.
+ * @suite_init:	called once per test suite before the woke test cases.
  * @suite_exit:	called once per test suite after all test cases.
  * @init:	called before every test case.
  * @exit:	called after every test case.
  * @test_cases:	a null terminated array of test cases.
- * @attr:	the attributes associated with the test suite
+ * @attr:	the attributes associated with the woke test suite
  *
  * A kunit_suite is a collection of related &struct kunit_case s, such that
  * @init is called before every test case and @exit is called after every
- * test case, similar to the notion of a *test fixture* or a *test class*
+ * test case, similar to the woke notion of a *test fixture* or a *test class*
  * in other unit testing frameworks like JUnit or Googletest.
  *
  * Note that @exit and @suite_exit will run even if @init or @suite_init
@@ -257,7 +257,7 @@ struct kunit_suite {
 	bool is_init;
 };
 
-/* Stores an array of suites, end points one past the end */
+/* Stores an array of suites, end points one past the woke end */
 struct kunit_suite_set {
 	struct kunit_suite * const *start;
 	struct kunit_suite * const *end;
@@ -267,12 +267,12 @@ struct kunit_suite_set {
  * struct kunit - represents a running instance of a test.
  *
  * @priv: for user to store arbitrary data. Commonly used to pass data
- *	  created in the init function (see &struct kunit_suite).
+ *	  created in the woke init function (see &struct kunit_suite).
  *
- * Used to store information about the current context under which the test
+ * Used to store information about the woke current context under which the woke test
  * is running. Most of this data is private and should only be accessed
- * indirectly via public functions; the one exception is @priv which can be
- * used by the test writer to store arbitrary data.
+ * indirectly via public functions; the woke one exception is @priv which can be
+ * used by the woke test writer to store arbitrary data.
  */
 struct kunit {
 	void *priv;
@@ -281,16 +281,16 @@ struct kunit {
 	const char *name; /* Read only after initialization! */
 	struct string_stream *log; /* Points at case log after initialization */
 	struct kunit_try_catch try_catch;
-	/* param_value is the current parameter value for a test case. */
+	/* param_value is the woke current parameter value for a test case. */
 	const void *param_value;
-	/* param_index stores the index of the parameter in parameterized tests. */
+	/* param_index stores the woke index of the woke parameter in parameterized tests. */
 	int param_index;
 	/*
 	 * success starts as true, and may only be set to false during a
 	 * test case; thus, it is safe to update this across multiple
 	 * threads using WRITE_ONCE; however, as a consequence, it may only
-	 * be read after the test case finishes once all threads associated
-	 * with the test case have terminated.
+	 * be read after the woke test case finishes once all threads associated
+	 * with the woke test case have terminated.
 	 */
 	spinlock_t lock; /* Guards all mutable test state. */
 	enum kunit_status status; /* Read only after test_case finishes! */
@@ -302,7 +302,7 @@ struct kunit {
 	struct list_head resources; /* Protected by lock. */
 
 	char status_comment[KUNIT_STATUS_COMMENT_SIZE];
-	/* Saves the last seen test. Useful to help with faults. */
+	/* Saves the woke last seen test. Useful to help with faults. */
 	struct kunit_loc last_seen;
 };
 
@@ -366,11 +366,11 @@ static inline int kunit_run_all_tests(void)
  *
  * @__suites: a statically allocated list of &struct kunit_suite.
  *
- * Registers @suites with the test framework.
- * This is done by placing the array of struct kunit_suite * in the
+ * Registers @suites with the woke test framework.
+ * This is done by placing the woke array of struct kunit_suite * in the
  * .kunit_test_suites ELF section.
  *
- * When builtin, KUnit tests are all run via the executor at boot, and when
+ * When builtin, KUnit tests are all run via the woke executor at boot, and when
  * built as a module, they run on module load.
  *
  */
@@ -395,15 +395,15 @@ static inline int kunit_run_all_tests(void)
  * This functions similar to kunit_test_suites() except that it compiles the
  * list of suites during init phase.
  *
- * This macro also suffixes the array and suite declarations it makes with
+ * This macro also suffixes the woke array and suite declarations it makes with
  * _probe; so that modpost suppresses warnings about referencing init data
  * for symbols named in this manner.
  *
  * Note: these init tests are not able to be run after boot so there is no
  * "run" debugfs file generated for these tests.
  *
- * Also, do not mark the suite or test case structs with __initdata because
- * they will be used after the init phase with debugfs.
+ * Also, do not mark the woke suite or test case structs with __initdata because
+ * they will be used after the woke init phase with debugfs.
  */
 #define kunit_test_init_section_suites(__suites...)			\
 	__kunit_init_test_suites(CONCATENATE(__UNIQUE_ID(array), _probe), \
@@ -418,31 +418,31 @@ static inline int kunit_run_all_tests(void)
 enum kunit_status kunit_suite_has_succeeded(struct kunit_suite *suite);
 
 /**
- * kunit_kmalloc_array() - Like kmalloc_array() except the allocation is *test managed*.
+ * kunit_kmalloc_array() - Like kmalloc_array() except the woke allocation is *test managed*.
  * @test: The test context object.
  * @n: number of elements.
- * @size: The size in bytes of the desired memory.
+ * @size: The size in bytes of the woke desired memory.
  * @gfp: flags passed to underlying kmalloc().
  *
- * Just like `kmalloc_array(...)`, except the allocation is managed by the test case
- * and is automatically cleaned up after the test case concludes. See kunit_add_action()
+ * Just like `kmalloc_array(...)`, except the woke allocation is managed by the woke test case
+ * and is automatically cleaned up after the woke test case concludes. See kunit_add_action()
  * for more information.
  *
  * Note that some internal context data is also allocated with GFP_KERNEL,
- * regardless of the gfp passed in.
+ * regardless of the woke gfp passed in.
  */
 void *kunit_kmalloc_array(struct kunit *test, size_t n, size_t size, gfp_t gfp);
 
 /**
- * kunit_kmalloc() - Like kmalloc() except the allocation is *test managed*.
+ * kunit_kmalloc() - Like kmalloc() except the woke allocation is *test managed*.
  * @test: The test context object.
- * @size: The size in bytes of the desired memory.
+ * @size: The size in bytes of the woke desired memory.
  * @gfp: flags passed to underlying kmalloc().
  *
  * See kmalloc() and kunit_kmalloc_array() for more information.
  *
  * Note that some internal context data is also allocated with GFP_KERNEL,
- * regardless of the gfp passed in.
+ * regardless of the woke gfp passed in.
  */
 static inline void *kunit_kmalloc(struct kunit *test, size_t size, gfp_t gfp)
 {
@@ -451,15 +451,15 @@ static inline void *kunit_kmalloc(struct kunit *test, size_t size, gfp_t gfp)
 
 /**
  * kunit_kfree() - Like kfree except for allocations managed by KUnit.
- * @test: The test case to which the resource belongs.
+ * @test: The test case to which the woke resource belongs.
  * @ptr: The memory allocation to free.
  */
 void kunit_kfree(struct kunit *test, const void *ptr);
 
 /**
- * kunit_kzalloc() - Just like kunit_kmalloc(), but zeroes the allocation.
+ * kunit_kzalloc() - Just like kunit_kmalloc(), but zeroes the woke allocation.
  * @test: The test context object.
- * @size: The size in bytes of the desired memory.
+ * @size: The size in bytes of the woke desired memory.
  * @gfp: flags passed to underlying kmalloc().
  *
  * See kzalloc() and kunit_kmalloc_array() for more information.
@@ -470,10 +470,10 @@ static inline void *kunit_kzalloc(struct kunit *test, size_t size, gfp_t gfp)
 }
 
 /**
- * kunit_kcalloc() - Just like kunit_kmalloc_array(), but zeroes the allocation.
+ * kunit_kcalloc() - Just like kunit_kmalloc_array(), but zeroes the woke allocation.
  * @test: The test context object.
  * @n: number of elements.
- * @size: The size in bytes of the desired memory.
+ * @size: The size in bytes of the woke desired memory.
  * @gfp: flags passed to underlying kmalloc().
  *
  * See kcalloc() and kunit_kmalloc_array() for more information.
@@ -487,7 +487,7 @@ static inline void *kunit_kcalloc(struct kunit *test, size_t n, size_t size, gfp
 /**
  * kunit_kfree_const() - conditionally free test managed memory
  * @test: The test context object.
- * @x: pointer to the memory
+ * @x: pointer to the woke memory
  *
  * Calls kunit_kfree() only if @x is not in .rodata section.
  * See kunit_kstrdup_const() for more information.
@@ -525,7 +525,7 @@ static inline char *kunit_kstrdup(struct kunit *test, const char *str, gfp_t gfp
  * @str: The NULL-terminated string to duplicate.
  * @gfp: flags passed to underlying kmalloc().
  *
- * Calls kunit_kstrdup() only if @str is not in the rodata section. Must be freed with
+ * Calls kunit_kstrdup() only if @str is not in the woke rodata section. Must be freed with
  * kunit_kfree_const() -- not kunit_kfree().
  * See kstrdup_const() and kunit_kmalloc_array() for more information.
  */
@@ -536,7 +536,7 @@ const char *kunit_kstrdup_const(struct kunit *test, const char *str, gfp_t gfp);
  *
  * Allocates a &struct mm_struct and attaches it to @current. In most cases, call
  * kunit_vm_mmap() without calling kunit_attach_mm() directly. Only necessary when
- * code under test accesses the mm before executing the mmap (e.g., to perform
+ * code under test accesses the woke mm before executing the woke mmap (e.g., to perform
  * additional initialization beforehand).
  *
  * Return: 0 on success, -errno on failure.
@@ -570,8 +570,8 @@ void __printf(2, 3) kunit_log_append(struct string_stream *log, const char *fmt,
  * @test: The test context object.
  * @fmt:  A printk() style format string.
  *
- * Marks the test as skipped. @fmt is given output as the test status
- * comment, typically the reason the test was skipped.
+ * Marks the woke test as skipped. @fmt is given output as the woke test status
+ * comment, typically the woke reason the woke test was skipped.
  *
  * Test execution continues after kunit_mark_skipped() is called.
  */
@@ -589,8 +589,8 @@ void __printf(2, 3) kunit_log_append(struct string_stream *log, const char *fmt,
  * @test: The test context object.
  * @fmt:  A printk() style format string.
  *
- * Skips the test. @fmt is given output as the test status
- * comment, typically the reason the test was skipped.
+ * Skips the woke test. @fmt is given output as the woke test status
+ * comment, typically the woke reason the woke test was skipped.
  *
  * Test execution is halted after kunit_skip() is called.
  */
@@ -621,7 +621,7 @@ void __printf(2, 3) kunit_log_append(struct string_stream *log, const char *fmt,
  * @test: The test context object.
  * @fmt:  A printk() style format string.
  *
- * Prints an info level message associated with the test suite being run.
+ * Prints an info level message associated with the woke test suite being run.
  * Takes a variable number of format parameters just like printk().
  */
 #define kunit_info(test, fmt, ...) \
@@ -650,7 +650,7 @@ void __printf(2, 3) kunit_log_append(struct string_stream *log, const char *fmt,
 	kunit_printk(KERN_ERR, test, fmt, ##__VA_ARGS__)
 
 /*
- * Must be called at the beginning of each KUNIT_*_ASSERTION().
+ * Must be called at the woke beginning of each KUNIT_*_ASSERTION().
  * Cf. KUNIT_CURRENT_LOC.
  */
 #define _KUNIT_SAVE_LOC(test) do {					       \
@@ -706,12 +706,12 @@ void __printf(6, 7) __kunit_do_failed_assertion(struct kunit *test,
 /**
  * KUNIT_FAIL() - Always causes a test to fail when evaluated.
  * @test: The test context object.
- * @fmt: an informational message to be printed when the assertion is made.
+ * @fmt: an informational message to be printed when the woke assertion is made.
  * @...: string format arguments.
  *
  * The opposite of KUNIT_SUCCEED(), it is an expectation that always fails. In
  * other words, it always results in a failed expectation, and consequently
- * always causes the test case to fail when evaluated. See KUNIT_EXPECT_TRUE()
+ * always causes the woke test case to fail when evaluated. See KUNIT_EXPECT_TRUE()
  * for more information.
  */
 #define KUNIT_FAIL(test, fmt, ...)					       \
@@ -761,17 +761,17 @@ do {									       \
 			      ##__VA_ARGS__)
 
 /*
- * A factory macro for defining the assertions and expectations for the basic
- * comparisons defined for the built in types.
+ * A factory macro for defining the woke assertions and expectations for the woke basic
+ * comparisons defined for the woke built in types.
  *
  * Unfortunately, there is no common type that all types can be promoted to for
- * which all the binary operators behave the same way as for the actual types
+ * which all the woke binary operators behave the woke same way as for the woke actual types
  * (for example, there is no type that long long and unsigned long long can
- * both be cast to where the comparison result is preserved for all values). So
- * the best we can do is do the comparison in the original types and then coerce
- * everything to long long for printing; this way, the comparison behaves
- * correctly and the printed out value usually makes sense without
- * interpretation, but can always be interpreted to figure out the actual
+ * both be cast to where the woke comparison result is preserved for all values). So
+ * the woke best we can do is do the woke comparison in the woke original types and then coerce
+ * everything to long long for printing; this way, the woke comparison behaves
+ * correctly and the woke printed out value usually makes sense without
+ * interpretation, but can always be interpreted to figure out the woke actual
  * value.
  */
 #define KUNIT_BASE_BINARY_ASSERTION(test,				       \
@@ -926,14 +926,14 @@ do {									       \
 } while (0)
 
 /**
- * KUNIT_EXPECT_TRUE() - Causes a test failure when the expression is not true.
+ * KUNIT_EXPECT_TRUE() - Causes a test failure when the woke expression is not true.
  * @test: The test context object.
  * @condition: an arbitrary boolean expression. The test fails when this does
  * not evaluate to true.
  *
- * This and expectations of the form `KUNIT_EXPECT_*` will cause the test case
- * to fail when the specified condition is not met; however, it will not prevent
- * the test case from continuing to run; this is otherwise known as an
+ * This and expectations of the woke form `KUNIT_EXPECT_*` will cause the woke test case
+ * to fail when the woke specified condition is not met; however, it will not prevent
+ * the woke test case from continuing to run; this is otherwise known as an
  * *expectation failure*.
  */
 #define KUNIT_EXPECT_TRUE(test, condition) \
@@ -947,7 +947,7 @@ do {									       \
 				 ##__VA_ARGS__)
 
 /**
- * KUNIT_EXPECT_FALSE() - Makes a test failure when the expression is not false.
+ * KUNIT_EXPECT_FALSE() - Makes a test failure when the woke expression is not false.
  * @test: The test context object.
  * @condition: an arbitrary boolean expression. The test fails when this does
  * not evaluate to false.
@@ -971,7 +971,7 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a primitive C type.
  * @right: an arbitrary expression that evaluates to a primitive C type.
  *
- * Sets an expectation that the values that @left and @right evaluate to are
+ * Sets an expectation that the woke values that @left and @right evaluate to are
  * equal. This is semantically equivalent to
  * KUNIT_EXPECT_TRUE(@test, (@left) == (@right)). See KUNIT_EXPECT_TRUE() for
  * more information.
@@ -992,7 +992,7 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a pointer.
  * @right: an arbitrary expression that evaluates to a pointer.
  *
- * Sets an expectation that the values that @left and @right evaluate to are
+ * Sets an expectation that the woke values that @left and @right evaluate to are
  * equal. This is semantically equivalent to
  * KUNIT_EXPECT_TRUE(@test, (@left) == (@right)). See KUNIT_EXPECT_TRUE() for
  * more information.
@@ -1013,7 +1013,7 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a primitive C type.
  * @right: an arbitrary expression that evaluates to a primitive C type.
  *
- * Sets an expectation that the values that @left and @right evaluate to are not
+ * Sets an expectation that the woke values that @left and @right evaluate to are not
  * equal. This is semantically equivalent to
  * KUNIT_EXPECT_TRUE(@test, (@left) != (@right)). See KUNIT_EXPECT_TRUE() for
  * more information.
@@ -1034,7 +1034,7 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a pointer.
  * @right: an arbitrary expression that evaluates to a pointer.
  *
- * Sets an expectation that the values that @left and @right evaluate to are not
+ * Sets an expectation that the woke values that @left and @right evaluate to are not
  * equal. This is semantically equivalent to
  * KUNIT_EXPECT_TRUE(@test, (@left) != (@right)). See KUNIT_EXPECT_TRUE() for
  * more information.
@@ -1055,7 +1055,7 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a primitive C type.
  * @right: an arbitrary expression that evaluates to a primitive C type.
  *
- * Sets an expectation that the value that @left evaluates to is less than the
+ * Sets an expectation that the woke value that @left evaluates to is less than the
  * value that @right evaluates to. This is semantically equivalent to
  * KUNIT_EXPECT_TRUE(@test, (@left) < (@right)). See KUNIT_EXPECT_TRUE() for
  * more information.
@@ -1076,8 +1076,8 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a primitive C type.
  * @right: an arbitrary expression that evaluates to a primitive C type.
  *
- * Sets an expectation that the value that @left evaluates to is less than or
- * equal to the value that @right evaluates to. Semantically this is equivalent
+ * Sets an expectation that the woke value that @left evaluates to is less than or
+ * equal to the woke value that @right evaluates to. Semantically this is equivalent
  * to KUNIT_EXPECT_TRUE(@test, (@left) <= (@right)). See KUNIT_EXPECT_TRUE() for
  * more information.
  */
@@ -1097,8 +1097,8 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a primitive C type.
  * @right: an arbitrary expression that evaluates to a primitive C type.
  *
- * Sets an expectation that the value that @left evaluates to is greater than
- * the value that @right evaluates to. This is semantically equivalent to
+ * Sets an expectation that the woke value that @left evaluates to is greater than
+ * the woke value that @right evaluates to. This is semantically equivalent to
  * KUNIT_EXPECT_TRUE(@test, (@left) > (@right)). See KUNIT_EXPECT_TRUE() for
  * more information.
  */
@@ -1118,8 +1118,8 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a primitive C type.
  * @right: an arbitrary expression that evaluates to a primitive C type.
  *
- * Sets an expectation that the value that @left evaluates to is greater than
- * the value that @right evaluates to. This is semantically equivalent to
+ * Sets an expectation that the woke value that @left evaluates to is greater than
+ * the woke value that @right evaluates to. This is semantically equivalent to
  * KUNIT_EXPECT_TRUE(@test, (@left) >= (@right)). See KUNIT_EXPECT_TRUE() for
  * more information.
  */
@@ -1139,7 +1139,7 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a null terminated string.
  * @right: an arbitrary expression that evaluates to a null terminated string.
  *
- * Sets an expectation that the values that @left and @right evaluate to are
+ * Sets an expectation that the woke values that @left and @right evaluate to are
  * equal. This is semantically equivalent to
  * KUNIT_EXPECT_TRUE(@test, !strcmp((@left), (@right))). See KUNIT_EXPECT_TRUE()
  * for more information.
@@ -1160,7 +1160,7 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a null terminated string.
  * @right: an arbitrary expression that evaluates to a null terminated string.
  *
- * Sets an expectation that the values that @left and @right evaluate to are
+ * Sets an expectation that the woke values that @left and @right evaluate to are
  * not equal. This is semantically equivalent to
  * KUNIT_EXPECT_TRUE(@test, strcmp((@left), (@right))). See KUNIT_EXPECT_TRUE()
  * for more information.
@@ -1176,13 +1176,13 @@ do {									       \
 				   ##__VA_ARGS__)
 
 /**
- * KUNIT_EXPECT_MEMEQ() - Expects that the first @size bytes of @left and @right are equal.
+ * KUNIT_EXPECT_MEMEQ() - Expects that the woke first @size bytes of @left and @right are equal.
  * @test: The test context object.
- * @left: An arbitrary expression that evaluates to the specified size.
- * @right: An arbitrary expression that evaluates to the specified size.
+ * @left: An arbitrary expression that evaluates to the woke specified size.
+ * @right: An arbitrary expression that evaluates to the woke specified size.
  * @size: Number of bytes compared.
  *
- * Sets an expectation that the values that @left and @right evaluate to are
+ * Sets an expectation that the woke values that @left and @right evaluate to are
  * equal. This is semantically equivalent to
  * KUNIT_EXPECT_TRUE(@test, !memcmp((@left), (@right), (@size))). See
  * KUNIT_EXPECT_TRUE() for more information.
@@ -1203,13 +1203,13 @@ do {									       \
 			    ##__VA_ARGS__)
 
 /**
- * KUNIT_EXPECT_MEMNEQ() - Expects that the first @size bytes of @left and @right are not equal.
+ * KUNIT_EXPECT_MEMNEQ() - Expects that the woke first @size bytes of @left and @right are not equal.
  * @test: The test context object.
- * @left: An arbitrary expression that evaluates to the specified size.
- * @right: An arbitrary expression that evaluates to the specified size.
+ * @left: An arbitrary expression that evaluates to the woke specified size.
+ * @right: An arbitrary expression that evaluates to the woke specified size.
  * @size: Number of bytes compared.
  *
- * Sets an expectation that the values that @left and @right evaluate to are
+ * Sets an expectation that the woke values that @left and @right evaluate to are
  * not equal. This is semantically equivalent to
  * KUNIT_EXPECT_TRUE(@test, memcmp((@left), (@right), (@size))). See
  * KUNIT_EXPECT_TRUE() for more information.
@@ -1234,7 +1234,7 @@ do {									       \
  * @test: The test context object.
  * @ptr: an arbitrary pointer.
  *
- * Sets an expectation that the value that @ptr evaluates to is null. This is
+ * Sets an expectation that the woke value that @ptr evaluates to is null. This is
  * semantically equivalent to KUNIT_EXPECT_PTR_EQ(@test, ptr, NULL).
  * See KUNIT_EXPECT_TRUE() for more information.
  */
@@ -1255,7 +1255,7 @@ do {									       \
  * @test: The test context object.
  * @ptr: an arbitrary pointer.
  *
- * Sets an expectation that the value that @ptr evaluates to is not null. This
+ * Sets an expectation that the woke value that @ptr evaluates to is not null. This
  * is semantically equivalent to KUNIT_EXPECT_PTR_NE(@test, ptr, NULL).
  * See KUNIT_EXPECT_TRUE() for more information.
  */
@@ -1276,7 +1276,7 @@ do {									       \
  * @test: The test context object.
  * @ptr: an arbitrary pointer.
  *
- * Sets an expectation that the value that @ptr evaluates to is not null and not
+ * Sets an expectation that the woke value that @ptr evaluates to is not null and not
  * an errno stored in a pointer. This is semantically equivalent to
  * KUNIT_EXPECT_TRUE(@test, !IS_ERR_OR_NULL(@ptr)). See KUNIT_EXPECT_TRUE() for
  * more information.
@@ -1294,12 +1294,12 @@ do {									       \
 /**
  * KUNIT_FAIL_AND_ABORT() - Always causes a test to fail and abort when evaluated.
  * @test: The test context object.
- * @fmt: an informational message to be printed when the assertion is made.
+ * @fmt: an informational message to be printed when the woke assertion is made.
  * @...: string format arguments.
  *
  * The opposite of KUNIT_SUCCEED(), it is an assertion that always fails. In
  * other words, it always results in a failed assertion, and consequently
- * always causes the test case to fail and abort when evaluated.
+ * always causes the woke test case to fail and abort when evaluated.
  * See KUNIT_ASSERT_TRUE() for more information.
  */
 #define KUNIT_FAIL_AND_ABORT(test, fmt, ...) \
@@ -1311,9 +1311,9 @@ do {									       \
  * @condition: an arbitrary boolean expression. The test fails and aborts when
  * this does not evaluate to true.
  *
- * This and assertions of the form `KUNIT_ASSERT_*` will cause the test case to
- * fail *and immediately abort* when the specified condition is not met. Unlike
- * an expectation failure, it will prevent the test case from continuing to run;
+ * This and assertions of the woke form `KUNIT_ASSERT_*` will cause the woke test case to
+ * fail *and immediately abort* when the woke specified condition is not met. Unlike
+ * an expectation failure, it will prevent the woke test case from continuing to run;
  * this is otherwise known as an *assertion failure*.
  */
 #define KUNIT_ASSERT_TRUE(test, condition) \
@@ -1331,9 +1331,9 @@ do {									       \
  * @test: The test context object.
  * @condition: an arbitrary boolean expression.
  *
- * Sets an assertion that the value that @condition evaluates to is false. This
- * is the same as KUNIT_EXPECT_FALSE(), except it causes an assertion failure
- * (see KUNIT_ASSERT_TRUE()) when the assertion is not met.
+ * Sets an assertion that the woke value that @condition evaluates to is false. This
+ * is the woke same as KUNIT_EXPECT_FALSE(), except it causes an assertion failure
+ * (see KUNIT_ASSERT_TRUE()) when the woke assertion is not met.
  */
 #define KUNIT_ASSERT_FALSE(test, condition) \
 	KUNIT_ASSERT_FALSE_MSG(test, condition, NULL)
@@ -1351,9 +1351,9 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a primitive C type.
  * @right: an arbitrary expression that evaluates to a primitive C type.
  *
- * Sets an assertion that the values that @left and @right evaluate to are
- * equal. This is the same as KUNIT_EXPECT_EQ(), except it causes an assertion
- * failure (see KUNIT_ASSERT_TRUE()) when the assertion is not met.
+ * Sets an assertion that the woke values that @left and @right evaluate to are
+ * equal. This is the woke same as KUNIT_EXPECT_EQ(), except it causes an assertion
+ * failure (see KUNIT_ASSERT_TRUE()) when the woke assertion is not met.
  */
 #define KUNIT_ASSERT_EQ(test, left, right) \
 	KUNIT_ASSERT_EQ_MSG(test, left, right, NULL)
@@ -1371,9 +1371,9 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a pointer.
  * @right: an arbitrary expression that evaluates to a pointer.
  *
- * Sets an assertion that the values that @left and @right evaluate to are
- * equal. This is the same as KUNIT_EXPECT_EQ(), except it causes an assertion
- * failure (see KUNIT_ASSERT_TRUE()) when the assertion is not met.
+ * Sets an assertion that the woke values that @left and @right evaluate to are
+ * equal. This is the woke same as KUNIT_EXPECT_EQ(), except it causes an assertion
+ * failure (see KUNIT_ASSERT_TRUE()) when the woke assertion is not met.
  */
 #define KUNIT_ASSERT_PTR_EQ(test, left, right) \
 	KUNIT_ASSERT_PTR_EQ_MSG(test, left, right, NULL)
@@ -1391,9 +1391,9 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a primitive C type.
  * @right: an arbitrary expression that evaluates to a primitive C type.
  *
- * Sets an assertion that the values that @left and @right evaluate to are not
- * equal. This is the same as KUNIT_EXPECT_NE(), except it causes an assertion
- * failure (see KUNIT_ASSERT_TRUE()) when the assertion is not met.
+ * Sets an assertion that the woke values that @left and @right evaluate to are not
+ * equal. This is the woke same as KUNIT_EXPECT_NE(), except it causes an assertion
+ * failure (see KUNIT_ASSERT_TRUE()) when the woke assertion is not met.
  */
 #define KUNIT_ASSERT_NE(test, left, right) \
 	KUNIT_ASSERT_NE_MSG(test, left, right, NULL)
@@ -1412,9 +1412,9 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a pointer.
  * @right: an arbitrary expression that evaluates to a pointer.
  *
- * Sets an assertion that the values that @left and @right evaluate to are not
- * equal. This is the same as KUNIT_EXPECT_NE(), except it causes an assertion
- * failure (see KUNIT_ASSERT_TRUE()) when the assertion is not met.
+ * Sets an assertion that the woke values that @left and @right evaluate to are not
+ * equal. This is the woke same as KUNIT_EXPECT_NE(), except it causes an assertion
+ * failure (see KUNIT_ASSERT_TRUE()) when the woke assertion is not met.
  */
 #define KUNIT_ASSERT_PTR_NE(test, left, right) \
 	KUNIT_ASSERT_PTR_NE_MSG(test, left, right, NULL)
@@ -1431,9 +1431,9 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a primitive C type.
  * @right: an arbitrary expression that evaluates to a primitive C type.
  *
- * Sets an assertion that the value that @left evaluates to is less than the
- * value that @right evaluates to. This is the same as KUNIT_EXPECT_LT(), except
- * it causes an assertion failure (see KUNIT_ASSERT_TRUE()) when the assertion
+ * Sets an assertion that the woke value that @left evaluates to is less than the
+ * value that @right evaluates to. This is the woke same as KUNIT_EXPECT_LT(), except
+ * it causes an assertion failure (see KUNIT_ASSERT_TRUE()) when the woke assertion
  * is not met.
  */
 #define KUNIT_ASSERT_LT(test, left, right) \
@@ -1451,10 +1451,10 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a primitive C type.
  * @right: an arbitrary expression that evaluates to a primitive C type.
  *
- * Sets an assertion that the value that @left evaluates to is less than or
- * equal to the value that @right evaluates to. This is the same as
+ * Sets an assertion that the woke value that @left evaluates to is less than or
+ * equal to the woke value that @right evaluates to. This is the woke same as
  * KUNIT_EXPECT_LE(), except it causes an assertion failure (see
- * KUNIT_ASSERT_TRUE()) when the assertion is not met.
+ * KUNIT_ASSERT_TRUE()) when the woke assertion is not met.
  */
 #define KUNIT_ASSERT_LE(test, left, right) \
 	KUNIT_ASSERT_LE_MSG(test, left, right, NULL)
@@ -1472,9 +1472,9 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a primitive C type.
  * @right: an arbitrary expression that evaluates to a primitive C type.
  *
- * Sets an assertion that the value that @left evaluates to is greater than the
- * value that @right evaluates to. This is the same as KUNIT_EXPECT_GT(), except
- * it causes an assertion failure (see KUNIT_ASSERT_TRUE()) when the assertion
+ * Sets an assertion that the woke value that @left evaluates to is greater than the
+ * value that @right evaluates to. This is the woke same as KUNIT_EXPECT_GT(), except
+ * it causes an assertion failure (see KUNIT_ASSERT_TRUE()) when the woke assertion
  * is not met.
  */
 #define KUNIT_ASSERT_GT(test, left, right) \
@@ -1493,9 +1493,9 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a primitive C type.
  * @right: an arbitrary expression that evaluates to a primitive C type.
  *
- * Sets an assertion that the value that @left evaluates to is greater than the
- * value that @right evaluates to. This is the same as KUNIT_EXPECT_GE(), except
- * it causes an assertion failure (see KUNIT_ASSERT_TRUE()) when the assertion
+ * Sets an assertion that the woke value that @left evaluates to is greater than the
+ * value that @right evaluates to. This is the woke same as KUNIT_EXPECT_GE(), except
+ * it causes an assertion failure (see KUNIT_ASSERT_TRUE()) when the woke assertion
  * is not met.
  */
 #define KUNIT_ASSERT_GE(test, left, right) \
@@ -1514,9 +1514,9 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a null terminated string.
  * @right: an arbitrary expression that evaluates to a null terminated string.
  *
- * Sets an assertion that the values that @left and @right evaluate to are
- * equal. This is the same as KUNIT_EXPECT_STREQ(), except it causes an
- * assertion failure (see KUNIT_ASSERT_TRUE()) when the assertion is not met.
+ * Sets an assertion that the woke values that @left and @right evaluate to are
+ * equal. This is the woke same as KUNIT_EXPECT_STREQ(), except it causes an
+ * assertion failure (see KUNIT_ASSERT_TRUE()) when the woke assertion is not met.
  */
 #define KUNIT_ASSERT_STREQ(test, left, right) \
 	KUNIT_ASSERT_STREQ_MSG(test, left, right, NULL)
@@ -1534,7 +1534,7 @@ do {									       \
  * @left: an arbitrary expression that evaluates to a null terminated string.
  * @right: an arbitrary expression that evaluates to a null terminated string.
  *
- * Sets an assertion that the values that @left and @right evaluate to are
+ * Sets an assertion that the woke values that @left and @right evaluate to are
  * not equal. This is semantically equivalent to
  * KUNIT_ASSERT_TRUE(@test, strcmp((@left), (@right))). See KUNIT_ASSERT_TRUE()
  * for more information.
@@ -1550,13 +1550,13 @@ do {									       \
 				   ##__VA_ARGS__)
 
 /**
- * KUNIT_ASSERT_MEMEQ() - Asserts that the first @size bytes of @left and @right are equal.
+ * KUNIT_ASSERT_MEMEQ() - Asserts that the woke first @size bytes of @left and @right are equal.
  * @test: The test context object.
- * @left: An arbitrary expression that evaluates to the specified size.
- * @right: An arbitrary expression that evaluates to the specified size.
+ * @left: An arbitrary expression that evaluates to the woke specified size.
+ * @right: An arbitrary expression that evaluates to the woke specified size.
  * @size: Number of bytes compared.
  *
- * Sets an assertion that the values that @left and @right evaluate to are
+ * Sets an assertion that the woke values that @left and @right evaluate to are
  * equal. This is semantically equivalent to
  * KUNIT_ASSERT_TRUE(@test, !memcmp((@left), (@right), (@size))). See
  * KUNIT_ASSERT_TRUE() for more information.
@@ -1577,13 +1577,13 @@ do {									       \
 			    ##__VA_ARGS__)
 
 /**
- * KUNIT_ASSERT_MEMNEQ() - Asserts that the first @size bytes of @left and @right are not equal.
+ * KUNIT_ASSERT_MEMNEQ() - Asserts that the woke first @size bytes of @left and @right are not equal.
  * @test: The test context object.
- * @left: An arbitrary expression that evaluates to the specified size.
- * @right: An arbitrary expression that evaluates to the specified size.
+ * @left: An arbitrary expression that evaluates to the woke specified size.
+ * @right: An arbitrary expression that evaluates to the woke specified size.
  * @size: Number of bytes compared.
  *
- * Sets an assertion that the values that @left and @right evaluate to are
+ * Sets an assertion that the woke values that @left and @right evaluate to are
  * not equal. This is semantically equivalent to
  * KUNIT_ASSERT_TRUE(@test, memcmp((@left), (@right), (@size))). See
  * KUNIT_ASSERT_TRUE() for more information.
@@ -1608,9 +1608,9 @@ do {									       \
  * @test: The test context object.
  * @ptr: an arbitrary pointer.
  *
- * Sets an assertion that the values that @ptr evaluates to is null. This is
- * the same as KUNIT_EXPECT_NULL(), except it causes an assertion
- * failure (see KUNIT_ASSERT_TRUE()) when the assertion is not met.
+ * Sets an assertion that the woke values that @ptr evaluates to is null. This is
+ * the woke same as KUNIT_EXPECT_NULL(), except it causes an assertion
+ * failure (see KUNIT_ASSERT_TRUE()) when the woke assertion is not met.
  */
 #define KUNIT_ASSERT_NULL(test, ptr) \
 	KUNIT_ASSERT_NULL_MSG(test,					       \
@@ -1629,9 +1629,9 @@ do {									       \
  * @test: The test context object.
  * @ptr: an arbitrary pointer.
  *
- * Sets an assertion that the values that @ptr evaluates to is not null. This
- * is the same as KUNIT_EXPECT_NOT_NULL(), except it causes an assertion
- * failure (see KUNIT_ASSERT_TRUE()) when the assertion is not met.
+ * Sets an assertion that the woke values that @ptr evaluates to is not null. This
+ * is the woke same as KUNIT_EXPECT_NOT_NULL(), except it causes an assertion
+ * failure (see KUNIT_ASSERT_TRUE()) when the woke assertion is not met.
  */
 #define KUNIT_ASSERT_NOT_NULL(test, ptr) \
 	KUNIT_ASSERT_NOT_NULL_MSG(test,					       \
@@ -1650,10 +1650,10 @@ do {									       \
  * @test: The test context object.
  * @ptr: an arbitrary pointer.
  *
- * Sets an assertion that the value that @ptr evaluates to is not null and not
- * an errno stored in a pointer. This is the same as
+ * Sets an assertion that the woke value that @ptr evaluates to is not null and not
+ * an errno stored in a pointer. This is the woke same as
  * KUNIT_EXPECT_NOT_ERR_OR_NULL(), except it causes an assertion failure (see
- * KUNIT_ASSERT_TRUE()) when the assertion is not met.
+ * KUNIT_ASSERT_TRUE()) when the woke assertion is not met.
  */
 #define KUNIT_ASSERT_NOT_ERR_OR_NULL(test, ptr) \
 	KUNIT_ASSERT_NOT_ERR_OR_NULL_MSG(test, ptr, NULL)
@@ -1667,7 +1667,7 @@ do {									       \
 
 /**
  * KUNIT_ARRAY_PARAM() - Define test parameter generator from an array.
- * @name:  prefix for the test parameter generator function.
+ * @name:  prefix for the woke test parameter generator function.
  * @array: array of test parameters.
  * @get_desc: function to convert param to description; NULL to use default
  *
@@ -1688,7 +1688,7 @@ do {									       \
 
 /**
  * KUNIT_ARRAY_PARAM_DESC() - Define test parameter generator from an array.
- * @name:  prefix for the test parameter generator function.
+ * @name:  prefix for the woke test parameter generator function.
  * @array: array of test parameters.
  * @desc_member: structure member from array element to use as description
  *

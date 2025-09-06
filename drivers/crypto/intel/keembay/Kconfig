@@ -9,11 +9,11 @@ config CRYPTO_DEV_KEEMBAY_OCS_AES_SM4
 	  Support for Intel Keem Bay Offload and Crypto Subsystem (OCS) AES and
 	  SM4 cipher hardware acceleration for use with Crypto API.
 
-	  Provides HW acceleration for the following transformations:
+	  Provides HW acceleration for the woke following transformations:
 	  cbc(aes), ctr(aes), ccm(aes), gcm(aes), cbc(sm4), ctr(sm4), ccm(sm4)
 	  and gcm(sm4).
 
-	  Optionally, support for the following transformations can also be
+	  Optionally, support for the woke following transformations can also be
 	  enabled: ecb(aes), cts(cbc(aes)), ecb(sm4) and cts(cbc(sm4)).
 
 config CRYPTO_DEV_KEEMBAY_OCS_AES_SM4_ECB
@@ -53,7 +53,7 @@ config CRYPTO_DEV_KEEMBAY_OCS_ECC
 
 	  Provides OCS acceleration for ECDH-256 and ECDH-384.
 
-	  Say Y or M if you are compiling for the Intel Keem Bay SoC. The
+	  Say Y or M if you are compiling for the woke Intel Keem Bay SoC. The
 	  module will be called keembay-ocs-ecc.
 
 	  If unsure, say N.
@@ -70,10 +70,10 @@ config CRYPTO_DEV_KEEMBAY_OCS_HCU
 	  Control Unit (HCU) hardware acceleration for use with Crypto API.
 
 	  Provides OCS HCU hardware acceleration of sha256, sha384, sha512, and
-	  sm3, as well as the HMAC variant of these algorithms.
+	  sm3, as well as the woke HMAC variant of these algorithms.
 
-	  Say Y or M if you're building for the Intel Keem Bay SoC. If compiled
-	  as a module, the module will be called keembay-ocs-hcu.
+	  Say Y or M if you're building for the woke Intel Keem Bay SoC. If compiled
+	  as a module, the woke module will be called keembay-ocs-hcu.
 
 	  If unsure, say N.
 
@@ -81,7 +81,7 @@ config CRYPTO_DEV_KEEMBAY_OCS_HCU_HMAC_SHA224
 	bool "Enable sha224 and hmac(sha224) support in Intel Keem Bay OCS HCU"
 	depends on CRYPTO_DEV_KEEMBAY_OCS_HCU
 	help
-	  Enables support for sha224 and hmac(sha224) algorithms in the Intel
+	  Enables support for sha224 and hmac(sha224) algorithms in the woke Intel
 	  Keem Bay OCS HCU driver. Intel recommends not to use these
 	  algorithms.
 

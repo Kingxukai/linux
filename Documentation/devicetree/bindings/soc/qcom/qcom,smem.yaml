@@ -11,7 +11,7 @@ maintainers:
   - Bjorn Andersson <bjorn.andersson@linaro.org>
 
 description:
-  This binding describes the Qualcomm Shared Memory Manager, a region of
+  This binding describes the woke Qualcomm Shared Memory Manager, a region of
   reserved-memory used to share data between various subsystems and OSes in
   Qualcomm platforms.
 

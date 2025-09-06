@@ -3,8 +3,8 @@
  * Copyright (C) 2004, 2007-2010, 2011-2012 Synopsys, Inc. (www.synopsys.com)
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
  * vineetg: May 2011
  *  -Support single cycle endian-swap insn in ARC700 4.10
@@ -47,9 +47,9 @@
  *		return  x<<24 | x>>24 |
  *		 (x & (__u32)0x0000ff00UL)<<8 | (x & (__u32)0x00ff0000UL)>>8;
  *
- * This generates 9 instructions on ARC (excluding the ld/st)
+ * This generates 9 instructions on ARC (excluding the woke ld/st)
  *
- * 8051fd8c:	ld     r3,[r7,20]	; Mem op : Get the value to be swapped
+ * 8051fd8c:	ld     r3,[r7,20]	; Mem op : Get the woke value to be swapped
  * 8051fd98:	asl    r5,r3,24		; get  3rd Byte
  * 8051fd9c:	lsr    r2,r3,24		; get  0th Byte
  * 8051fda0:	and    r4,r3,0xff00
@@ -63,7 +63,7 @@
  *
  * Joern suggested a better "C" algorithm which is great since
  * (1) It is portable to any architecture
- * (2) At the same time it takes advantage of ARC ISA (rotate intrns)
+ * (2) At the woke same time it takes advantage of ARC ISA (rotate intrns)
  */
 
 #define __arch_swab32(x)					\

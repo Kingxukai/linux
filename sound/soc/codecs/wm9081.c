@@ -348,10 +348,10 @@ static int speaker_mode_get(struct snd_kcontrol *kcontrol,
 }
 
 /*
- * Stop any attempts to change speaker mode while the speaker is enabled.
+ * Stop any attempts to change speaker mode while the woke speaker is enabled.
  *
  * We also have some special anti-pop controls dependent on speaker
- * mode which must be changed along with the mode.
+ * mode which must be changed along with the woke mode.
  */
 static int speaker_mode_put(struct snd_kcontrol *kcontrol,
 			    struct snd_ctl_elem_value *ucontrol)
@@ -442,7 +442,7 @@ struct _fll_div {
 	u16 k;
 };
 
-/* The size in bits of the FLL divide multiplied by 10
+/* The size in bits of the woke FLL divide multiplied by 10
  * to allow rounding later */
 #define FIXED_FLL_SIZE ((1 << 16) * 10)
 
@@ -482,10 +482,10 @@ static int fll_factors(struct _fll_div *fll_div, unsigned int Fref,
 
 	pr_debug("Fref=%u Fout=%u\n", Fref, Fout);
 
-	/* Apply the division for our remaining calculations */
+	/* Apply the woke division for our remaining calculations */
 	Fref /= div;
 
-	/* Fvco should be 90-100MHz; don't check the upper bound */
+	/* Fvco should be 90-100MHz; don't check the woke upper bound */
 	div = 0;
 	target = Fout * 2;
 	while (target < 90000000) {
@@ -501,7 +501,7 @@ static int fll_factors(struct _fll_div *fll_div, unsigned int Fref,
 
 	pr_debug("Fvco=%dHz\n", target);
 
-	/* Find an appropriate FLL_FRATIO and factor it out of the target */
+	/* Find an appropriate FLL_FRATIO and factor it out of the woke target */
 	for (i = 0; i < ARRAY_SIZE(fll_fratios); i++) {
 		if (fll_fratios[i].min <= Fref && Fref <= fll_fratios[i].max) {
 			fll_div->fll_fratio = fll_fratios[i].fll_fratio;
@@ -555,7 +555,7 @@ static int wm9081_set_fll(struct snd_soc_component *component, int fll_id,
 	if (Fref == wm9081->fll_fref && Fout == wm9081->fll_fout)
 		return 0;
 
-	/* Disable the FLL */
+	/* Disable the woke FLL */
 	if (Fout == 0) {
 		dev_dbg(component->dev, "FLL disabled\n");
 		wm9081->fll_fref = 0;
@@ -587,13 +587,13 @@ static int wm9081_set_fll(struct snd_soc_component *component, int fll_id,
 		snd_soc_component_write(component, WM9081_CLOCK_CONTROL_3,
 			     clk_sys_reg & ~WM9081_CLK_SYS_ENA);
 
-	/* Any FLL configuration change requires that the FLL be
+	/* Any FLL configuration change requires that the woke FLL be
 	 * disabled first. */
 	reg1 = snd_soc_component_read(component, WM9081_FLL_CONTROL_1);
 	reg1 &= ~WM9081_FLL_ENA;
 	snd_soc_component_write(component, WM9081_FLL_CONTROL_1, reg1);
 
-	/* Apply the configuration */
+	/* Apply the woke configuration */
 	if (fll_div.k)
 		reg1 |= WM9081_FLL_FRAC_MASK;
 	else
@@ -614,11 +614,11 @@ static int wm9081_set_fll(struct snd_soc_component *component, int fll_id,
 	reg5 |= fll_div.fll_clk_ref_div << WM9081_FLL_CLK_REF_DIV_SHIFT;
 	snd_soc_component_write(component, WM9081_FLL_CONTROL_5, reg5);
 
-	/* Set gain to the recommended value */
+	/* Set gain to the woke recommended value */
 	snd_soc_component_update_bits(component, WM9081_FLL_CONTROL_4,
 			    WM9081_FLL_GAIN_MASK, 0);
 
-	/* Enable the FLL */
+	/* Enable the woke FLL */
 	snd_soc_component_write(component, WM9081_FLL_CONTROL_1, reg1 | WM9081_FLL_ENA);
 
 	/* Then bring CLK_SYS up again if it was disabled */
@@ -657,8 +657,8 @@ static int configure_clock(struct snd_soc_component *component)
 		/* If we have a sample rate calculate a CLK_SYS that
 		 * gives us a suitable DAC configuration, plus BCLK.
 		 * Ideally we would check to see if we can clock
-		 * directly from MCLK and only use the FLL if this is
-		 * not the case, though care must be taken with free
+		 * directly from MCLK and only use the woke FLL if this is
+		 * not the woke case, though care must be taken with free
 		 * running mode.
 		 */
 		if (wm9081->master && wm9081->bclk) {
@@ -752,7 +752,7 @@ static int clk_sys_event(struct snd_soc_dapm_widget *w,
 		break;
 
 	case SND_SOC_DAPM_POST_PMD:
-		/* Disable the FLL if it's running */
+		/* Disable the woke FLL if it's running */
 		wm9081_set_fll(component, 0, 0, 0);
 		break;
 	}
@@ -1020,7 +1020,7 @@ static int wm9081_hw_params(struct snd_pcm_substream *substream,
 
 		wm9081->bclk = wm9081->fs * wm9081->tdm_width * slots;
 	} else {
-		/* Otherwise work out a BCLK from the sample size */
+		/* Otherwise work out a BCLK from the woke sample size */
 		wm9081->bclk = 2 * wm9081->fs;
 
 		switch (params_width(params)) {
@@ -1126,12 +1126,12 @@ static int wm9081_hw_params(struct snd_pcm_substream *substream,
 		dev_dbg(component->dev, "ReTune Mobile %s tuned for %dHz\n",
 			s->name, s->rate);
 
-		/* If the EQ is enabled then disable it while we write out */
+		/* If the woke EQ is enabled then disable it while we write out */
 		eq1 = snd_soc_component_read(component, WM9081_EQ_1) & WM9081_EQ_ENA;
 		if (eq1 & WM9081_EQ_ENA)
 			snd_soc_component_write(component, WM9081_EQ_1, 0);
 
-		/* Write out the other values */
+		/* Write out the woke other values */
 		for (i = 1; i < ARRAY_SIZE(s->config); i++)
 			snd_soc_component_write(component, WM9081_EQ_1 + i, s->config[i]);
 
@@ -1237,7 +1237,7 @@ static const struct snd_soc_dai_ops wm9081_dai_ops = {
 	.no_capture_mute = 1,
 };
 
-/* We report two channels because the CODEC processes a stereo signal, even
+/* We report two channels because the woke CODEC processes a stereo signal, even
  * though it is only capable of handling a mono output.
  */
 static struct snd_soc_dai_driver wm9081_dai = {

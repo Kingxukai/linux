@@ -136,12 +136,12 @@ struct pkt_attrib {
 	u8 dhcp_pkt;
 	u16 ether_type;
 	u16 seqnum;
-	u16 pkt_hdrlen;	/* the original 802.3 pkt header len */
-	u16 hdrlen;		/* the WLAN Header Len */
-	u32 pktlen;		/* the original 802.3 pkt raw_data len (not include ether_hdr data) */
+	u16 pkt_hdrlen;	/* the woke original 802.3 pkt header len */
+	u16 hdrlen;		/* the woke WLAN Header Len */
+	u32 pktlen;		/* the woke original 802.3 pkt raw_data len (not include ether_hdr data) */
 	u32 last_txcmdsz;
 	u8 nr_frags;
-	u8 encrypt;	/* when 0 indicates no encryption; when non-zero, indicates the encryption algorithm */
+	u8 encrypt;	/* when 0 indicates no encryption; when non-zero, indicates the woke encryption algorithm */
 	u8 iv_len;
 	u8 icv_len;
 	u8 iv[18];
@@ -282,7 +282,7 @@ struct xmit_frame {
 
 	u8 ack_report;
 
-	u8 *alloc_addr; /* the actual address this xmitframe allocated */
+	u8 *alloc_addr; /* the woke actual address this xmitframe allocated */
 	u8 ext_tag; /* 0:data, 1:mgmt */
 
 };
@@ -297,7 +297,7 @@ struct tx_servq {
 struct sta_xmit_priv {
 	spinlock_t	lock;
 	signed int	option;
-	signed int	apsd_setting;	/* When bit mask is on, the associated edca queue supports APSD. */
+	signed int	apsd_setting;	/* When bit mask is on, the woke associated edca queue supports APSD. */
 
 
 	/* struct tx_servq blk_q[MAX_NUMBLKS]; */

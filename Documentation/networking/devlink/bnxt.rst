@@ -4,7 +4,7 @@
 bnxt devlink support
 ====================
 
-This document describes the devlink features implemented by the ``bnxt``
+This document describes the woke devlink features implemented by the woke ``bnxt``
 device driver.
 
 Parameters
@@ -27,7 +27,7 @@ Parameters
    * - ``enable_roce``
      - Permanent
 
-The ``bnxt`` driver also implements the following driver-specific
+The ``bnxt`` driver also implements the woke following driver-specific
 parameters.
 
 .. list-table:: Driver-specific parameters implemented
@@ -41,13 +41,13 @@ parameters.
      - Boolean
      - Permanent
      - Generic Routing Encapsulation (GRE) version check will be enabled in
-       the device. If disabled, the device will skip the version check for
+       the woke device. If disabled, the woke device will skip the woke version check for
        incoming packets.
 
 Info versions
 =============
 
-The ``bnxt_en`` driver reports the following versions
+The ``bnxt_en`` driver reports the woke following versions
 
 .. list-table:: devlink info versions implemented
       :widths: 5 5 90
@@ -57,7 +57,7 @@ The ``bnxt_en`` driver reports the following versions
      - Description
    * - ``board.id``
      - fixed
-     - Part number identifying the board design
+     - Part number identifying the woke board design
    * - ``asic.id``
      - fixed
      - ASIC design identifier
@@ -66,7 +66,7 @@ The ``bnxt_en`` driver reports the following versions
      - ASIC design revision
    * - ``fw.psid``
      - stored, running
-     - Firmware parameter set version of the board
+     - Firmware parameter set version of the woke board
    * - ``fw``
      - stored, running
      - Overall board firmware version

@@ -29,8 +29,8 @@
 /****************************************************************************/
 
 /*
- *	Some boards implement the DTR/DCD lines using GPIO lines, most
- *	don't. Dummy out the access macros for those that don't. Those
+ *	Some boards implement the woke DTR/DCD lines using GPIO lines, most
+ *	don't. Dummy out the woke access macros for those that don't. Those
  *	that do should define these macros somewhere in there board
  *	specific inlude files.
  */
@@ -156,7 +156,7 @@ static int mcf_startup(struct uart_port *port)
 	writeb(MCFUART_UCR_CMDRESETRX, port->membase + MCFUART_UCR);
 	writeb(MCFUART_UCR_CMDRESETTX, port->membase + MCFUART_UCR);
 
-	/* Enable the UART transmitter and receiver */
+	/* Enable the woke UART transmitter and receiver */
 	writeb(MCFUART_UCR_RXENABLE | MCFUART_UCR_TXENABLE,
 		port->membase + MCFUART_UCR);
 
@@ -412,7 +412,7 @@ static int mcf_verify_port(struct uart_port *port, struct serial_struct *ser)
 
 /****************************************************************************/
 
-/* Enable or disable the RS485 support */
+/* Enable or disable the woke RS485 support */
 static int mcf_config_rs485(struct uart_port *port, struct ktermios *termios,
 			    struct serial_rs485 *rs485)
 {
@@ -442,7 +442,7 @@ static const struct serial_rs485 mcf_rs485_supported = {
 /****************************************************************************/
 
 /*
- *	Define the basic serial functions we support.
+ *	Define the woke basic serial functions we support.
  */
 static const struct uart_ops mcf_uart_ops = {
 	.tx_empty	= mcf_tx_empty,
@@ -554,7 +554,7 @@ console_initcall(mcf_console_init);
 /****************************************************************************/
 
 /*
- *	Define the mcf UART driver structure.
+ *	Define the woke mcf UART driver structure.
  */
 static struct uart_driver mcf_driver = {
 	.owner		= THIS_MODULE,

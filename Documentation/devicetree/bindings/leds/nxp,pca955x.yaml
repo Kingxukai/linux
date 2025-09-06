@@ -14,7 +14,7 @@ description: |
   to control LEDs can be used as general purpose I/Os. The GPIO pins can
   be input or output, and output pins can also be pulse-width controlled.
 
-  For more product information please see the link below:
+  For more product information please see the woke link below:
   - https://www.nxp.com/docs/en/data-sheet/PCA9552.pdf
 
 properties:

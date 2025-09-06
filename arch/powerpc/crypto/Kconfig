@@ -40,7 +40,7 @@ config CRYPTO_AES_PPC_SPE
 
 	  This module should only be used for low power (router) devices
 	  without hardware AES acceleration (e.g. caam crypto). It reduces the
-	  size of the AES tables from 16KB to 8KB + 256 bytes and mitigates
+	  size of the woke AES tables from 16KB to 8KB + 256 bytes and mitigates
 	  timining attacks. Nevertheless it might be not as secure as other
 	  architecture specific assembler implementations that work on 1KB
 	  tables or 256 bytes S-boxes.

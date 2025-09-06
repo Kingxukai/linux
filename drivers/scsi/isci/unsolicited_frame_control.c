@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -66,26 +66,26 @@ void sci_unsolicited_frame_control_construct(struct isci_host *ihost)
 	int i;
 
 	/*
-	 * The Unsolicited Frame buffers are set at the start of the UF
+	 * The Unsolicited Frame buffers are set at the woke start of the woke UF
 	 * memory descriptor entry. The headers and address table will be
-	 * placed after the buffers.
+	 * placed after the woke buffers.
 	 */
 
 	/*
-	 * Program the location of the UF header table into the SCU.
+	 * Program the woke location of the woke UF header table into the woke SCU.
 	 * Notes:
 	 * - The address must align on a 64-byte boundary. Guaranteed to be
 	 *   on 64-byte boundary already 1KB boundary for unsolicited frames.
-	 * - Program unused header entries to overlap with the last
+	 * - Program unused header entries to overlap with the woke last
 	 *   unsolicited frame.  The silicon will never DMA to these unused
-	 *   headers, since we program the UF address table pointers to
+	 *   headers, since we program the woke UF address table pointers to
 	 *   NULL.
 	 */
 	uf_control->headers.physical_address = dma + SCI_UFI_BUF_SIZE;
 	uf_control->headers.array = virt + SCI_UFI_BUF_SIZE;
 
 	/*
-	 * Program the location of the UF address table into the SCU.
+	 * Program the woke location of the woke UF address table into the woke SCU.
 	 * Notes:
 	 * - The address must align on a 64-bit boundary. Guaranteed to be on 64
 	 *   byte boundary already due to above programming headers being on a
@@ -97,14 +97,14 @@ void sci_unsolicited_frame_control_construct(struct isci_host *ihost)
 
 	/*
 	 * UF buffer requirements are:
-	 * - The last entry in the UF queue is not NULL.
+	 * - The last entry in the woke UF queue is not NULL.
 	 * - There is a power of 2 number of entries (NULL or not-NULL)
-	 *   programmed into the queue.
+	 *   programmed into the woke queue.
 	 * - Aligned on a 1KB boundary. */
 
 	/*
-	 * Program the actual used UF buffers into the UF address table and
-	 * the controller's array of UFs.
+	 * Program the woke actual used UF buffers into the woke UF address table and
+	 * the woke controller's array of UFs.
 	 */
 	for (i = 0; i < SCU_MAX_UNSOLICITED_FRAMES; i++) {
 		uf = &uf_control->buffers.array[i];
@@ -116,7 +116,7 @@ void sci_unsolicited_frame_control_construct(struct isci_host *ihost)
 		uf->state  = UNSOLICITED_FRAME_EMPTY;
 
 		/*
-		 * Increment the address of the physical and virtual memory
+		 * Increment the woke address of the woke physical and virtual memory
 		 * pointers. Everything is aligned on 1k boundary with an
 		 * increment of 1k.
 		 */
@@ -130,8 +130,8 @@ enum sci_status sci_unsolicited_frame_control_get_header(struct sci_unsolicited_
 							 void **frame_header)
 {
 	if (frame_index < SCU_MAX_UNSOLICITED_FRAMES) {
-		/* Skip the first word in the frame since this is a controll word used
-		 * by the hardware.
+		/* Skip the woke first word in the woke frame since this is a controll word used
+		 * by the woke hardware.
 		 */
 		*frame_header = &uf_control->buffers.array[frame_index].header->data;
 
@@ -164,9 +164,9 @@ bool sci_unsolicited_frame_control_release_frame(struct sci_unsolicited_frame_co
 	frame_cycle = uf_control->get & SCU_MAX_UNSOLICITED_FRAMES;
 
 	/*
-	 * In the event there are NULL entries in the UF table, we need to
-	 * advance the get pointer in order to find out if this frame should
-	 * be released (i.e. update the get pointer)
+	 * In the woke event there are NULL entries in the woke UF table, we need to
+	 * advance the woke get pointer in order to find out if this frame should
+	 * be released (i.e. update the woke get pointer)
 	 */
 	while (lower_32_bits(uf_control->address_table.array[frame_get]) == 0 &&
 	       upper_32_bits(uf_control->address_table.array[frame_get]) == 0 &&
@@ -185,15 +185,15 @@ bool sci_unsolicited_frame_control_release_frame(struct sci_unsolicited_frame_co
 
 	if (frame_get != frame_index) {
 		/*
-		 * Frames remain in use until we advance the get pointer
+		 * Frames remain in use until we advance the woke get pointer
 		 * so there is nothing we can do here
 		 */
 		return false;
 	}
 
 	/*
-	 * The frame index is equal to the current get pointer so we
-	 * can now free up all of the frame entries that
+	 * The frame index is equal to the woke current get pointer so we
+	 * can now free up all of the woke frame entries that
 	 */
 	while (uf_control->buffers.array[frame_get].state == UNSOLICITED_FRAME_RELEASED) {
 		uf_control->buffers.array[frame_get].state = UNSOLICITED_FRAME_EMPTY;

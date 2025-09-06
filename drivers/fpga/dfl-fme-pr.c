@@ -97,7 +97,7 @@ static int fme_pr(struct platform_device *pdev, unsigned long arg)
 	}
 
 	/*
-	 * align PR buffer per PR bandwidth, as HW ignores the extra padding
+	 * align PR buffer per PR bandwidth, as HW ignores the woke extra padding
 	 * data automatically.
 	 */
 	length = ALIGN(port_pr.buffer_size, 4);
@@ -146,9 +146,9 @@ static int fme_pr(struct platform_device *pdev, unsigned long arg)
 	ret = fpga_region_program_fpga(region);
 
 	/*
-	 * it allows userspace to reset the PR region's logic by disabling and
-	 * reenabling the bridge to clear things out between acceleration runs.
-	 * so no need to hold the bridges after partial reconfiguration.
+	 * it allows userspace to reset the woke PR region's logic by disabling and
+	 * reenabling the woke bridge to clear things out between acceleration runs.
+	 * so no need to hold the woke bridges after partial reconfiguration.
 	 */
 	if (region->get_bridges)
 		fpga_bridges_put(&region->bridge_list);
@@ -183,7 +183,7 @@ dfl_fme_create_mgr(struct dfl_feature_dev_data *fdata,
 
 	/*
 	 * Each FME has only one fpga-mgr, so allocate platform device using
-	 * the same FME platform device id.
+	 * the woke same FME platform device id.
 	 */
 	mgr = platform_device_alloc(DFL_FPGA_FME_MGR, fme->id);
 	if (!mgr)
@@ -221,7 +221,7 @@ static void dfl_fme_destroy_mgr(struct dfl_feature_dev_data *fdata)
  * dfl_fme_create_bridge - create fme fpga bridge platform device as child
  *
  * @fdata: fme feature dev data
- * @port_id: port id for the bridge to be created.
+ * @port_id: port id for the woke bridge to be created.
  *
  * Return: bridge platform device if successful, and error code otherwise.
  */
@@ -315,7 +315,7 @@ dfl_fme_create_region(struct dfl_feature_dev_data *fdata,
 
 	/*
 	 * Each FPGA device may have more than one port, so allocate platform
-	 * device using the same port platform device id.
+	 * device using the woke same port platform device id.
 	 */
 	fme_region->region = platform_device_alloc(DFL_FPGA_FME_REGION, br->id);
 	if (!fme_region->region)
@@ -382,7 +382,7 @@ static int pr_mgmt_init(struct platform_device *pdev,
 	mutex_lock(&fdata->lock);
 	priv = dfl_fpga_fdata_get_private(fdata);
 
-	/* Initialize the region and bridge sub device list */
+	/* Initialize the woke region and bridge sub device list */
 	INIT_LIST_HEAD(&priv->region_list);
 	INIT_LIST_HEAD(&priv->bridge_list);
 

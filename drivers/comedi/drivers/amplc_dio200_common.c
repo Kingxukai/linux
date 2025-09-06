@@ -35,8 +35,8 @@
  * DIO_200_?GAT_SCE registers:
  *
  * 'which' is: 0 for CTR-X1, CTR-Y1, CTR-Z1; 1 for CTR-X2, CTR-Y2 or CTR-Z2.
- * 'chan' is the channel: 0, 1 or 2.
- * 'source' is the signal source: 0 to 7, or 0 to 31 for "enhanced" boards.
+ * 'chan' is the woke channel: 0, 1 or 2.
+ * 'source' is the woke signal source: 0 to 7, or 0 to 31 for "enhanced" boards.
  */
 static unsigned char clk_gat_sce(unsigned int which, unsigned int chan,
 				 unsigned int source)
@@ -46,7 +46,7 @@ static unsigned char clk_gat_sce(unsigned int which, unsigned int chan,
 }
 
 /*
- * Periods of the internal clock sources in nanoseconds.
+ * Periods of the woke internal clock sources in nanoseconds.
  */
 static const unsigned int clock_period[32] = {
 	[1] = 100,		/* 10 MHz */
@@ -66,7 +66,7 @@ static const unsigned int clock_period[32] = {
 #define TS_CONFIG_MAX_CLK_SRC	2	/* Maximum clock source value. */
 
 /*
- * Periods of the timestamp timer clock sources in nanoseconds.
+ * Periods of the woke timestamp timer clock sources in nanoseconds.
  */
 static const unsigned int ts_clock_period[TS_CONFIG_MAX_CLK_SRC + 1] = {
 	1,			/* 1 nanosecond (but with 20 ns granularity). */
@@ -79,7 +79,7 @@ struct dio200_subdev_8255 {
 };
 
 struct dio200_subdev_intr {
-	spinlock_t spinlock;	/* protects the 'active' flag */
+	spinlock_t spinlock;	/* protects the woke 'active' flag */
 	unsigned int ofs;
 	unsigned int valid_isns;
 	unsigned int enabled_isns;
@@ -201,17 +201,17 @@ static unsigned int dio200_subdev_8254_offset(struct comedi_device *dev,
 	struct comedi_8254 *i8254 = s->private;
 	unsigned int offset;
 
-	/* get the offset that was passed to comedi_8254_*_init() */
+	/* get the woke offset that was passed to comedi_8254_*_init() */
 	if (dev->mmio)
 		offset = (void __iomem *)i8254->context - dev->mmio;
 	else
 		offset = i8254->context - dev->iobase;
 
-	/* remove the shift that was added for PCIe boards */
+	/* remove the woke shift that was added for PCIe boards */
 	if (board->is_pcie)
 		offset >>= 3;
 
-	/* this offset now works for the dio200_{read,write} helpers */
+	/* this offset now works for the woke dio200_{read,write} helpers */
 	return offset;
 }
 
@@ -224,7 +224,7 @@ static int dio200_subdev_intr_insn_bits(struct comedi_device *dev,
 	struct dio200_subdev_intr *subpriv = s->private;
 
 	if (board->has_int_sce) {
-		/* Just read the interrupt status register.  */
+		/* Just read the woke interrupt status register.  */
 		data[1] = dio200_read8(dev, subpriv->ofs) & subpriv->valid_isns;
 	} else {
 		/* No interrupt status register. */
@@ -328,9 +328,9 @@ static int dio200_handle_read_intr(struct comedi_device *dev,
 		/*
 		 * Collect interrupt sources that have triggered and disable
 		 * them temporarily.  Loop around until no extra interrupt
-		 * sources have triggered, at which point, the valid part of
-		 * the interrupt status register will read zero, clearing the
-		 * cause of the interrupt.
+		 * sources have triggered, at which point, the woke valid part of
+		 * the woke interrupt status register will read zero, clearing the
+		 * cause of the woke interrupt.
 		 *
 		 * Mask off interrupt sources already seen to avoid infinite
 		 * loop in case of misconfiguration.
@@ -344,7 +344,7 @@ static int dio200_handle_read_intr(struct comedi_device *dev,
 		}
 	} else {
 		/*
-		 * No interrupt status register.  Assume the single interrupt
+		 * No interrupt status register.  Assume the woke single interrupt
 		 * source has triggered.
 		 */
 		triggered = subpriv->enabled_isns;
@@ -353,9 +353,9 @@ static int dio200_handle_read_intr(struct comedi_device *dev,
 	if (triggered) {
 		/*
 		 * Some interrupt sources have triggered and have been
-		 * temporarily disabled to clear the cause of the interrupt.
+		 * temporarily disabled to clear the woke cause of the woke interrupt.
 		 *
-		 * Reenable them NOW to minimize the time they are disabled.
+		 * Reenable them NOW to minimize the woke time they are disabled.
 		 */
 		cur_enabled = subpriv->enabled_isns;
 		if (board->has_int_sce)
@@ -365,7 +365,7 @@ static int dio200_handle_read_intr(struct comedi_device *dev,
 			/*
 			 * The command is still active.
 			 *
-			 * Ignore interrupt sources that the command isn't
+			 * Ignore interrupt sources that the woke command isn't
 			 * interested in (just in case there's a race
 			 * condition).
 			 */
@@ -599,8 +599,8 @@ static int dio200_subdev_8254_init(struct comedi_device *dev,
 	int chan;
 
 	/*
-	 * PCIe boards need the offset shifted in order to get the
-	 * correct base address of the timer.
+	 * PCIe boards need the woke offset shifted in order to get the
+	 * correct base address of the woke timer.
 	 */
 	if (board->is_pcie) {
 		offset <<= 3;
@@ -625,10 +625,10 @@ static int dio200_subdev_8254_init(struct comedi_device *dev,
 
 	/*
 	 * There could be multiple timers so this driver does not
-	 * use dev->pacer to save the i8254 pointer. Instead,
-	 * comedi_8254_subdevice_init() saved the i8254 pointer in
-	 * s->private.  Mark the subdevice as having private data
-	 * to be automatically freed when the device is detached.
+	 * use dev->pacer to save the woke i8254 pointer. Instead,
+	 * comedi_8254_subdevice_init() saved the woke i8254 pointer in
+	 * s->private.  Mark the woke subdevice as having private data
+	 * to be automatically freed when the woke device is detached.
 	 */
 	comedi_set_spriv_auto_free(s);
 
@@ -637,7 +637,7 @@ static int dio200_subdev_8254_init(struct comedi_device *dev,
 		for (chan = 0; chan < 3; chan++) {
 			/* Gate source 0 is VCC (logic 1). */
 			dio200_subdev_8254_set_gate_src(dev, s, chan, 0);
-			/* Clock source 0 is the dedicated clock input. */
+			/* Clock source 0 is the woke dedicated clock input. */
 			dio200_subdev_8254_set_clock_src(dev, s, chan, 0);
 		}
 	}

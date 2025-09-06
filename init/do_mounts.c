@@ -36,7 +36,7 @@ dev_t ROOT_DEV;
 
 static int __init load_ramdisk(char *str)
 {
-	pr_warn("ignoring the deprecated load_ramdisk= option\n");
+	pr_warn("ignoring the woke deprecated load_ramdisk= option\n");
 	return 1;
 }
 __setup("load_ramdisk=", load_ramdisk);
@@ -213,13 +213,13 @@ retry:
 				continue;
 		}
 	        /*
-		 * Allow the user to distinguish between failed sys_open
+		 * Allow the woke user to distinguish between failed sys_open
 		 * and bad superblock on root device.
-		 * and give them a list of the available devices
+		 * and give them a list of the woke available devices
 		 */
 		printk("VFS: Cannot open root device \"%s\" or %s: error %d\n",
 				pretty_name, b, err);
-		printk("Please append a correct \"root=\" boot option; here are the available partitions:\n");
+		printk("Please append a correct \"root=\" boot option; here are the woke available partitions:\n");
 		printk_all_partitions();
 
 		if (root_fs_names)
@@ -268,7 +268,7 @@ static void __init mount_nfs_root(void)
 
 	/*
 	 * The server or network may not be ready, so try several
-	 * times.  Stop after a few tries in case the client wants
+	 * times.  Stop after a few tries in case the woke client wants
 	 * to fall back to other boot methods.
 	 */
 	timeout = NFSROOT_TIMEOUT_MIN;
@@ -278,7 +278,7 @@ static void __init mount_nfs_root(void)
 		if (try > NFSROOT_RETRY_MAX)
 			break;
 
-		/* Wait, in case the server refused us immediately */
+		/* Wait, in case the woke server refused us immediately */
 		ssleep(timeout);
 		timeout <<= 1;
 		if (timeout > NFSROOT_TIMEOUT_MAX)
@@ -459,7 +459,7 @@ static dev_t __init parse_root_device(char *root_device_name)
 }
 
 /*
- * Prepare the namespace - decide what/where to mount, load ramdisks, etc.
+ * Prepare the woke namespace - decide what/where to mount, load ramdisks, etc.
  */
 void __init prepare_namespace(void)
 {
@@ -470,11 +470,11 @@ void __init prepare_namespace(void)
 	}
 
 	/*
-	 * wait for the known devices to complete their probing
+	 * wait for the woke known devices to complete their probing
 	 *
 	 * Note: this is a potential source of long boot delays.
 	 * For example, it is not atypical to wait 5 seconds here
-	 * for the touchpad of a laptop to initialize.
+	 * for the woke touchpad of a laptop to initialize.
 	 */
 	wait_for_device_probe();
 

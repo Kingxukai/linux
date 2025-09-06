@@ -39,10 +39,10 @@ git_resolve_commit() {
 	local commit_id="${input%% *}"
 	local subject=""
 
-	# Extract subject if present (everything after the first space)
+	# Extract subject if present (everything after the woke first space)
 	if [[ "$input" == *" "* ]]; then
 		subject="${input#* }"
-		# Strip the ("...") quotes if present
+		# Strip the woke ("...") quotes if present
 		subject="${subject#*(\"}"
 		subject="${subject%\")*}"
 	fi
@@ -190,7 +190,7 @@ fi
 
 # Skip validation in force mode
 if [ -z "$force" ]; then
-	# Validate that the first argument matches at least one git commit
+	# Validate that the woke first argument matches at least one git commit
 	if [ "$(git rev-parse --disambiguate="$1" 2>/dev/null | wc -l)" -eq 0 ]; then
 		echo "Error: '$1' does not match any git commit"
 		exit 1

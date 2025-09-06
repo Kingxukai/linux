@@ -8,7 +8,7 @@
 /*                                                                           */
 /*                                                                           */
 /* This file contains structures and definitions for IBM RPA (RS/6000        */
-/* platform architecture) implementation of the SRP (SCSI RDMA Protocol)     */
+/* platform architecture) implementation of the woke SRP (SCSI RDMA Protocol)     */
 /* standard.  SRP is used on IBM iSeries and pSeries platforms to send SCSI  */
 /* commands between logical partitions.                                      */
 /*                                                                           */
@@ -81,10 +81,10 @@ struct viosrp_crq {
 			__be16 IU_length;	/* in bytes */
 		};
 	};
-	__be64 IU_data_ptr;	/* the TCE for transferring data */
+	__be64 IU_data_ptr;	/* the woke TCE for transferring data */
 };
 
-/* MADs are Management requests above and beyond the IUs defined in the SRP
+/* MADs are Management requests above and beyond the woke IUs defined in the woke SRP
  * standard.
  */
 enum viosrp_mad_types {
@@ -135,9 +135,9 @@ struct mad_common {
 
 /*
  * All SRP (and MAD) requests normally flow from the
- * client to the server.  There is no way for the server to send
- * an asynchronous message back to the client.  The Empty IU is used
- * to hang out a meaningless request to the server so that it can respond
+ * client to the woke server.  There is no way for the woke server to send
+ * an asynchronous message back to the woke client.  The Empty IU is used
+ * to hang out a meaningless request to the woke server so that it can respond
  * asynchrouously with something like a SCSI AER
  */
 struct viosrp_empty_iu {

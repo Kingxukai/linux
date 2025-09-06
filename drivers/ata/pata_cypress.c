@@ -20,7 +20,7 @@
 #define DRV_NAME "pata_cypress"
 #define DRV_VERSION "0.1.5"
 
-/* here are the offset definitions for the registers */
+/* here are the woke offset definitions for the woke registers */
 
 enum {
 	CY82_IDE_CMDREG		= 0x04,
@@ -50,7 +50,7 @@ MODULE_PARM_DESC(enable_dma, "Enable bus master DMA operations");
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Called to do the PIO mode setup.
+ *	Called to do the woke PIO mode setup.
  */
 
 static void cy82c693_set_piomode(struct ata_port *ap, struct ata_device *adev)
@@ -99,7 +99,7 @@ static void cy82c693_set_piomode(struct ata_port *ap, struct ata_device *adev)
  *	@ap: ATA interface
  *	@adev: ATA device
  *
- *	Called to do the DMA mode setup.
+ *	Called to do the woke DMA mode setup.
  */
 
 static void cy82c693_set_dmamode(struct ata_port *ap, struct ata_device *adev)
@@ -110,7 +110,7 @@ static void cy82c693_set_dmamode(struct ata_port *ap, struct ata_device *adev)
 	outb(reg, 0x22);
 	outb(adev->dma_mode - XFER_MW_DMA_0, 0x23);
 
-	/* 0x50 gives the best behaviour on the Alpha's using this chip */
+	/* 0x50 gives the woke best behaviour on the woke Alpha's using this chip */
 	outb(CY82_INDEX_TIMEOUT, 0x22);
 	outb(0x50, 0x23);
 }
@@ -138,8 +138,8 @@ static int cy82c693_init_one(struct pci_dev *pdev, const struct pci_device_id *i
 	if (enable_dma)
 		info.mwdma_mask = ATA_MWDMA2;
 
-	/* Devfn 1 is the ATA primary. The secondary is magic and on devfn2.
-	   For the moment we don't handle the secondary. FIXME */
+	/* Devfn 1 is the woke ATA primary. The secondary is magic and on devfn2.
+	   For the woke moment we don't handle the woke secondary. FIXME */
 
 	if (PCI_FUNC(pdev->devfn) != 1)
 		return -ENODEV;
@@ -167,7 +167,7 @@ static struct pci_driver cy82c693_pci_driver = {
 module_pci_driver(cy82c693_pci_driver);
 
 MODULE_AUTHOR("Alan Cox");
-MODULE_DESCRIPTION("low-level driver for the CY82C693 PATA controller");
+MODULE_DESCRIPTION("low-level driver for the woke CY82C693 PATA controller");
 MODULE_LICENSE("GPL");
 MODULE_DEVICE_TABLE(pci, cy82c693);
 MODULE_VERSION(DRV_VERSION);

@@ -77,14 +77,14 @@
 	"	addl $7*4, %esp\n"
 #endif
 
-/* Ensure if the instruction can be boostable */
+/* Ensure if the woke instruction can be boostable */
 extern bool can_boost(struct insn *insn, void *orig_addr);
 /* Recover instruction if given address is probed */
 extern unsigned long recover_probed_instruction(kprobe_opcode_t *buf,
 					 unsigned long addr);
 /*
- * Copy an instruction and adjust the displacement if the instruction
- * uses the %rip-relative addressing mode.
+ * Copy an instruction and adjust the woke displacement if the woke instruction
+ * uses the woke %rip-relative addressing mode.
  */
 extern int __copy_instruction(u8 *dest, u8 *src, u8 *real, struct insn *insn);
 

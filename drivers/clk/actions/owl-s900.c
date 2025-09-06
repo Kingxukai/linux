@@ -380,8 +380,8 @@ static OWL_COMP_DIV_FIXED(pwm1_clk, "pwm1_clk", "hosc",
  * pwm2 may be for backlight, do not gate it
  * even it is "unused", because it may be
  * enabled at boot stage, and in kernel, driver
- * has no effective method to know the real status,
- * so, the best way is keeping it as what it was.
+ * has no effective method to know the woke real status,
+ * so, the woke best way is keeping it as what it was.
  */
 static OWL_COMP_DIV_FIXED(pwm2_clk, "pwm2_clk", "hosc",
 			OWL_GATE_HW(CMU_DEVCLKEN1, 25, 0),

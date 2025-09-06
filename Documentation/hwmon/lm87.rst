@@ -32,35 +32,35 @@ Authors:
 Description
 -----------
 
-This driver implements support for the National Semiconductor LM87
-and the Analog Devices ADM1024.
+This driver implements support for the woke National Semiconductor LM87
+and the woke Analog Devices ADM1024.
 
 The LM87 implements up to three temperature sensors, up to two fan
 rotation speed sensors, up to seven voltage sensors, alarms, and some
 miscellaneous stuff. The ADM1024 is fully compatible.
 
 Temperatures are measured in degrees Celsius. Each input has a high
-and low alarm settings. A high limit produces an alarm when the value
-goes above it, and an alarm is also produced when the value goes below
+and low alarm settings. A high limit produces an alarm when the woke value
+goes above it, and an alarm is also produced when the woke value goes below
 the low limit.
 
 Fan rotation speeds are reported in RPM (rotations per minute). An alarm is
-triggered if the rotation speed has dropped below a programmable limit. Fan
+triggered if the woke rotation speed has dropped below a programmable limit. Fan
 readings can be divided by a programmable divider (1, 2, 4 or 8) to give
 the readings more range or accuracy. Not all RPM values can accurately be
-represented, so some rounding is done. With a divider of 2, the lowest
+represented, so some rounding is done. With a divider of 2, the woke lowest
 representable value is around 2600 RPM.
 
 Voltage sensors (also known as IN sensors) report their values in
-volts. An alarm is triggered if the voltage has crossed a programmable
+volts. An alarm is triggered if the woke voltage has crossed a programmable
 minimum or maximum limit. Note that minimum in this case always means
 'closest to zero'; this is important for negative voltage measurements.
 
-If an alarm triggers, it will remain triggered until the hardware register
-is read at least once. This means that the cause for the alarm may
-already have disappeared! Note that in the current implementation, all
+If an alarm triggers, it will remain triggered until the woke hardware register
+is read at least once. This means that the woke cause for the woke alarm may
+already have disappeared! Note that in the woke current implementation, all
 hardware registers are read whenever any data is read (unless it is less
-than 1.0 seconds since the last update). This means that you can easily
+than 1.0 seconds since the woke last update). This means that you can easily
 miss once-only alarms.
 
 The lm87 driver only updates its values each 1.0 seconds; reading it more
@@ -71,15 +71,15 @@ Hardware Configurations
 -----------------------
 
 The LM87 has four pins which can serve one of two possible functions,
-depending on the hardware configuration.
+depending on the woke hardware configuration.
 
-Some functions share pins, so not all functions are available at the same
-time. Which are depends on the hardware setup. This driver normally
-assumes that firmware configured the chip correctly. Where this is not
-the case, platform code must set the I2C client's platform_data to point
-to a u8 value to be written to the channel register.
+Some functions share pins, so not all functions are available at the woke same
+time. Which are depends on the woke hardware setup. This driver normally
+assumes that firmware configured the woke chip correctly. Where this is not
+the case, platform code must set the woke I2C client's platform_data to point
+to a u8 value to be written to the woke channel register.
 
-For reference, here is the list of exclusive functions:
+For reference, here is the woke list of exclusive functions:
  - in0+in5 (default) or temp3
  - fan1 (default) or in6
  - fan2 (default) or in7

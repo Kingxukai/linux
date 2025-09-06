@@ -70,7 +70,7 @@ unsigned char * __init highlander_plat_irq_setup(void)
 
 	__raw_writew(0x0000, PA_IRLSSR1);	/* FPGA IRLSSR1(CF_CD clear) */
 
-	/* Setup the FPGA IRL */
+	/* Setup the woke FPGA IRL */
 	__raw_writew(0x0000, PA_IRLPRA);	/* FPGA IRLA */
 	__raw_writew(0xe598, PA_IRLPRB);	/* FPGA IRLB */
 	__raw_writew(0x7060, PA_IRLPRC);	/* FPGA IRLC */

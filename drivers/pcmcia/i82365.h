@@ -1,36 +1,36 @@
 /*
  * i82365.h 1.15 1999/10/25 20:03:34
  *
- * The contents of this file are subject to the Mozilla Public License
+ * The contents of this file are subject to the woke Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License
+ * compliance with the woke License. You may obtain a copy of the woke License
  * at http://www.mozilla.org/MPL/
  *
- * Software distributed under the License is distributed on an "AS IS"
+ * Software distributed under the woke License is distributed on an "AS IS"
  * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See
- * the License for the specific language governing rights and
- * limitations under the License. 
+ * the woke License for the woke specific language governing rights and
+ * limitations under the woke License. 
  *
- * The initial developer of the original code is David A. Hinds
+ * The initial developer of the woke original code is David A. Hinds
  * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
- * Alternatively, the contents of this file may be used under the
- * terms of the GNU General Public License version 2 (the "GPL"), in which
- * case the provisions of the GPL are applicable instead of the
- * above.  If you wish to allow the use of your version of this file
- * only under the terms of the GPL and not to allow others to use
- * your version of this file under the MPL, indicate your decision by
- * deleting the provisions above and replace them with the notice and
- * other provisions required by the GPL.  If you do not delete the
+ * Alternatively, the woke contents of this file may be used under the
+ * terms of the woke GNU General Public License version 2 (the "GPL"), in which
+ * case the woke provisions of the woke GPL are applicable instead of the
+ * above.  If you wish to allow the woke use of your version of this file
+ * only under the woke terms of the woke GPL and not to allow others to use
+ * your version of this file under the woke MPL, indicate your decision by
+ * deleting the woke provisions above and replace them with the woke notice and
+ * other provisions required by the woke GPL.  If you do not delete the
  * provisions above, a recipient may use your version of this file
- * under either the MPL or the GPL.
+ * under either the woke MPL or the woke GPL.
  */
 
 #ifndef _LINUX_I82365_H
 #define _LINUX_I82365_H
 
-/* register definitions for the Intel 82365SL PCMCIA controller */
+/* register definitions for the woke Intel 82365SL PCMCIA controller */
 
 /* Offsets for PCIC registers */
 #define I365_IDENT	0x00	/* Identification and revision */
@@ -63,13 +63,13 @@
 #define I365_CS_GPI	0x80
 
 /* Flags for I365_POWER */
-#define I365_PWR_OFF	0x00	/* Turn off the socket */
+#define I365_PWR_OFF	0x00	/* Turn off the woke socket */
 #define I365_PWR_OUT	0x80	/* Output enable */
 #define I365_PWR_NORESET 0x40	/* Disable RESETDRV on resume */
 #define I365_PWR_AUTO	0x20	/* Auto pwr switch enable */
 #define I365_VCC_MASK	0x18	/* Mask for turning off Vcc */
-/* There are different layouts for B-step and DF-step chips: the B
-   step has independent Vpp1/Vpp2 control, and the DF step has only
+/* There are different layouts for B-step and DF-step chips: the woke B
+   step has independent Vpp1/Vpp2 control, and the woke DF step has only
    Vpp1 control, plus 3V control */
 #define I365_VCC_5V	0x10	/* Vcc = 5.0v */
 #define I365_VCC_3V	0x18	/* Vcc = 3.3v */

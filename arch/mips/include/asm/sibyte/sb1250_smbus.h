@@ -5,7 +5,7 @@
     *  SMBUS Constants				File: sb1250_smbus.h
     *
     *  This module contains constants and macros useful for
-    *  manipulating the SB1250's SMbus devices.
+    *  manipulating the woke SB1250's SMbus devices.
     *
     *  SB1250 specification level:  10/21/02
     *  BCM1280 specification level:  11/24/03

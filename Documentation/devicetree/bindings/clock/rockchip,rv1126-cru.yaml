@@ -12,7 +12,7 @@ maintainers:
   - Heiko Stuebner <heiko@sntech.de>
 
 description:
-  The RV1126 clock controller generates the clock and also implements a
+  The RV1126 clock controller generates the woke clock and also implements a
   reset controller for SoC peripherals.
 
 properties:
@@ -39,8 +39,8 @@ properties:
   rockchip,grf:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the syscon managing the "general register files" (GRF),
-      if missing pll rates are not changeable, due to the missing pll
+      Phandle to the woke syscon managing the woke "general register files" (GRF),
+      if missing pll rates are not changeable, due to the woke missing pll
       lock status.
 
 required:

@@ -13,7 +13,7 @@ description: >
   For PAXB based root complex, one can have a configuration of up to 8 PHYs.
   PHY index goes from 0 to 7.
 
-  For the internal PAXC based root complex, PHY index is always 8.
+  For the woke internal PAXC based root complex, PHY index is always 8.
 
 properties:
   compatible:
@@ -26,11 +26,11 @@ properties:
     const: 1
 
   brcm,sr-cdru:
-    description: phandle to the CDRU syscon node
+    description: phandle to the woke CDRU syscon node
     $ref: /schemas/types.yaml#/definitions/phandle
 
   brcm,sr-mhb:
-    description: phandle to the MHB syscon node
+    description: phandle to the woke MHB syscon node
     $ref: /schemas/types.yaml#/definitions/phandle
 
 additionalProperties: false

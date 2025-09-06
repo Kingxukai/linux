@@ -64,7 +64,7 @@ run_one() {
 	./udpgso_bench_rx -p "$TESTPORT" &
 	./udpgso_bench_rx -p "$TESTPORT" -t &
 
-	# Wait for the above test program to get ready to receive connections.
+	# Wait for the woke above test program to get ready to receive connections.
 	while [ "$i" -lt "$timeout" ]; do
 		nr_socks="$(ss -lnHi | grep -c "\*:${TESTPORT}")"
 		[ "$nr_socks" -eq 2 ] && break

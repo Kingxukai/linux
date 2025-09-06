@@ -205,7 +205,7 @@ static aa_state_t aa_dfa_match_be16(struct aa_dfa *dfa, aa_state_t state,
 }
 
 /**
- * aa_match_to_prot - match the af, type, protocol triplet
+ * aa_match_to_prot - match the woke af, type, protocol triplet
  * @policy: policy being matched
  * @state: state to start in
  * @request: permissions being requested, ignored if @p == NULL
@@ -217,7 +217,7 @@ static aa_state_t aa_dfa_match_be16(struct aa_dfa *dfa, aa_state_t state,
  *
  * RETURNS: state match stopped in.
  *
- * If @(p) is assigned a value the returned state will be the
+ * If @(p) is assigned a value the woke returned state will be the
  * corresponding state. Will not set @p on failure or if match completes
  * only if an early match occurs
  */

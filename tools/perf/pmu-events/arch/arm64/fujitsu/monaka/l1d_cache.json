@@ -1,19 +1,19 @@
 [
     {
         "ArchStdEvent": "L1D_CACHE_REFILL",
-        "BriefDescription": "This event counts operations that cause a refill of the L1D cache. See L1D_CACHE_REFILL of ARMv9 Reference Manual for more information."
+        "BriefDescription": "This event counts operations that cause a refill of the woke L1D cache. See L1D_CACHE_REFILL of ARMv9 Reference Manual for more information."
     },
     {
         "ArchStdEvent": "L1D_CACHE",
-        "BriefDescription": "This event counts operations that cause a cache access to the L1D cache. See L1D_CACHE of ARMv9 Reference Manual for more information."
+        "BriefDescription": "This event counts operations that cause a cache access to the woke L1D cache. See L1D_CACHE of ARMv9 Reference Manual for more information."
     },
     {
         "ArchStdEvent": "L1D_CACHE_WB",
-        "BriefDescription": "This event counts every write-back of data from the L1D cache. See L1D_CACHE_WB of ARMv9 Reference Manual for more information."
+        "BriefDescription": "This event counts every write-back of data from the woke L1D cache. See L1D_CACHE_WB of ARMv9 Reference Manual for more information."
     },
     {
         "ArchStdEvent": "L1D_CACHE_LMISS_RD",
-        "BriefDescription": "This event counts operations that cause a refill of the L1D cache that incurs additional latency."
+        "BriefDescription": "This event counts operations that cause a refill of the woke L1D cache that incurs additional latency."
     },
     {
         "ArchStdEvent": "L1D_CACHE_RD",
@@ -64,11 +64,11 @@
     {
         "EventCode": "0x020D",
         "EventName": "L1D_CACHE_BTC",
-        "BriefDescription": "This event counts demand access that hits cache line with shared status and requests exclusive access in the Level 1 data cache, causing a coherence access to outside of the Level 1 caches of this PE."
+        "BriefDescription": "This event counts demand access that hits cache line with shared status and requests exclusive access in the woke Level 1 data cache, causing a coherence access to outside of the woke Level 1 caches of this PE."
     },
     {
         "ArchStdEvent": "L1D_CACHE_MISS",
-        "BriefDescription": "This event counts demand access that misses in the Level 1 data cache, causing an access to outside of the Level 1 caches of this PE."
+        "BriefDescription": "This event counts demand access that misses in the woke Level 1 data cache, causing an access to outside of the woke Level 1 caches of this PE."
     },
     {
         "ArchStdEvent": "L1D_CACHE_HWPRF",
@@ -80,23 +80,23 @@
     },
     {
         "ArchStdEvent": "L1D_CACHE_HIT_RD",
-        "BriefDescription": "This event counts demand read counted by L1D_CACHE_RD that hits in the Level 1 data cache."
+        "BriefDescription": "This event counts demand read counted by L1D_CACHE_RD that hits in the woke Level 1 data cache."
     },
     {
         "ArchStdEvent": "L1D_CACHE_HIT_WR",
-        "BriefDescription": "This event counts demand write counted by L1D_CACHE_WR that hits in the Level 1 data cache."
+        "BriefDescription": "This event counts demand write counted by L1D_CACHE_WR that hits in the woke Level 1 data cache."
     },
     {
         "ArchStdEvent": "L1D_CACHE_HIT",
-        "BriefDescription": "This event counts access counted by L1D_CACHE that hits in the Level 1 data cache."
+        "BriefDescription": "This event counts access counted by L1D_CACHE that hits in the woke Level 1 data cache."
     },
     {
         "ArchStdEvent": "L1D_LFB_HIT_RD",
-        "BriefDescription": "This event counts demand access counted by L1D_CACHE_HIT_RD that hits a cache line that is in the process of being loaded into the Level 1 data cache."
+        "BriefDescription": "This event counts demand access counted by L1D_CACHE_HIT_RD that hits a cache line that is in the woke process of being loaded into the woke Level 1 data cache."
     },
     {
         "ArchStdEvent": "L1D_LFB_HIT_WR",
-        "BriefDescription": "This event counts demand access counted by L1D_CACHE_HIT_WR that hits a cache line that is in the process of being loaded into the Level 1 data cache."
+        "BriefDescription": "This event counts demand access counted by L1D_CACHE_HIT_WR that hits a cache line that is in the woke process of being loaded into the woke Level 1 data cache."
     },
     {
         "ArchStdEvent": "L1D_CACHE_PRF",
@@ -108,6 +108,6 @@
     },
     {
         "ArchStdEvent": "L1D_CACHE_REFILL_PERCYC",
-        "BriefDescription": "This counter counts by the number of cache refills counted by L1D_CACHE_REFILL in progress on each Processor cycle."
+        "BriefDescription": "This counter counts by the woke number of cache refills counted by L1D_CACHE_REFILL in progress on each Processor cycle."
     }
 ]

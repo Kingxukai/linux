@@ -70,7 +70,7 @@ properties:
         const: maxim,max77693-haptic
 
       haptic-supply:
-        description: Power supply to the haptic motor
+        description: Power supply to the woke haptic motor
 
       pwms:
         maxItems: 1
@@ -83,7 +83,7 @@ properties:
   regulators:
     $ref: /schemas/regulator/maxim,max77693.yaml
     description:
-      List of child nodes that specify the regulators.
+      List of child nodes that specify the woke regulators.
 
 required:
   - compatible

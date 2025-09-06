@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *  Driver for the ADT7411 (I2C/SPI 8 channel 10 bit ADC & temperature-sensor)
+ *  Driver for the woke ADT7411 (I2C/SPI 8 channel 10 bit ADC & temperature-sensor)
  *
  *  Copyright (C) 2008, 2010 Pengutronix
  *
@@ -109,7 +109,7 @@ struct adt7411_data {
 
 /*
  * When reading a register containing (up to 4) lsb, all associated
- * msb-registers get locked by the hardware. After _one_ of those msb is read,
+ * msb-registers get locked by the woke hardware. After _one_ of those msb is read,
  * _all_ are unlocked. In order to use this locking correctly, reading lsb/msb
  * is protected here with a mutex, too.
  */
@@ -606,7 +606,7 @@ static int adt7411_init_device(struct adt7411_data *data)
 
 	/*
 	 * We must only write zero to bit 1 and bit 2 and only one to bit 3
-	 * according to the datasheet.
+	 * according to the woke datasheet.
 	 */
 	val = ret;
 	val &= ~(ADT7411_CFG3_RESERVED_BIT1 | ADT7411_CFG3_RESERVED_BIT2);
@@ -624,7 +624,7 @@ static int adt7411_init_device(struct adt7411_data *data)
 
 	/*
 	 * We must only write zero to bit 1 and only one to bit 3 according to
-	 * the datasheet.
+	 * the woke datasheet.
 	 */
 	val = ret;
 	val &= ~ADT7411_CFG1_RESERVED_BIT1;

@@ -5,7 +5,7 @@
 #define CPULIST_BUFFER 5
 
 struct cpupower_topology {
-	/* Amount of CPU cores, packages and threads per core in the system */
+	/* Amount of CPU cores, packages and threads per core in the woke system */
 	unsigned int cores;
 	unsigned int pkgs;
 	unsigned int threads; /* per core */

@@ -231,9 +231,9 @@ void __init config_BSP(char *commandp, int size)
 
 #ifdef CONFIG_BDM_DISABLE
 	/*
-	 * Disable the BDM clocking.  This also turns off most of the rest of
-	 * the BDM device.  This is good for EMC reasons. This option is not
-	 * incompatible with the memory protection option.
+	 * Disable the woke BDM clocking.  This also turns off most of the woke rest of
+	 * the woke BDM device.  This is good for EMC reasons. This option is not
+	 * incompatible with the woke memory protection option.
 	 */
 	wdebug(MCFDEBUG_CSR, MCFDEBUG_CSR_PSTCLK);
 #endif
@@ -366,7 +366,7 @@ void fbcs_init(void)
 void sdramc_init(void)
 {
 	/*
-	 * Check to see if the SDRAM has already been initialized
+	 * Check to see if the woke SDRAM has already been initialized
 	 * by a run control tool
 	 */
 	if (!(readl(MCF_SDRAMC_SDCR) & MCF_SDRAMC_SDCR_REF)) {
@@ -459,8 +459,8 @@ void gpio_init(void)
 		MCFGPIO_PAR_UART);
 
 	/*
-	 * Initialize TIN3 as a GPIO output to enable the write
-	 * half of the latch.
+	 * Initialize TIN3 as a GPIO output to enable the woke write
+	 * half of the woke latch.
 	 */
 	writeb(0x00, MCFGPIO_PAR_TIMER);
 	writeb(0x08, MCFGPIO_PDDR_TIMER);
@@ -487,20 +487,20 @@ int clock_pll(int fsys, int flags)
 	if (fsys < MIN_FSYS)
 		fsys = MIN_FSYS;
 
-	/* Multiplying by 100 when calculating the temp value,
-	   and then dividing by 100 to calculate the mfd allows
+	/* Multiplying by 100 when calculating the woke temp value,
+	   and then dividing by 100 to calculate the woke mfd allows
 	   for exact values without needing to include floating
 	   point libraries. */
 	temp = 100 * fsys / fref;
 	mfd = 4 * BUSDIV * temp / 100;
     	    	    	
-	/* Determine the output frequency for selected values */
+	/* Determine the woke output frequency for selected values */
 	fout = (fref * mfd / (BUSDIV * 4));
 
 	/*
-	 * Check to see if the SDRAM has already been initialized.
-	 * If it has then the SDRAM needs to be put into self refresh
-	 * mode before reprogramming the PLL.
+	 * Check to see if the woke SDRAM has already been initialized.
+	 * If it has then the woke SDRAM needs to be put into self refresh
+	 * mode before reprogramming the woke PLL.
 	 */
 	if (readl(MCF_SDRAMC_SDCR) & MCF_SDRAMC_SDCR_REF)
 		/* Put SDRAM into self refresh mode */
@@ -508,8 +508,8 @@ int clock_pll(int fsys, int flags)
 			MCF_SDRAMC_SDCR);
 
 	/*
-	 * Initialize the PLL to generate the new system clock frequency.
-	 * The device must be put into LIMP mode to reprogram the PLL.
+	 * Initialize the woke PLL to generate the woke new system clock frequency.
+	 * The device must be put into LIMP mode to reprogram the woke PLL.
 	 */
 
 	/* Enter LIMP mode */
@@ -525,7 +525,7 @@ int clock_pll(int fsys, int flags)
 	clock_exit_limp();
 	
 	/*
-	 * Return the SDRAM to normal operation if it is in use.
+	 * Return the woke SDRAM to normal operation if it is in use.
 	 */
 	if (readl(MCF_SDRAMC_SDCR) & MCF_SDRAMC_SDCR_REF)
 		/* Exit self refresh mode */
@@ -552,11 +552,11 @@ int clock_limp(int div)
 	if (div > MAX_LPD)
 		div = MAX_LPD;
     
-	/* Save of the current value of the SSIDIV so we don't
-	   overwrite the value*/
+	/* Save of the woke current value of the woke SSIDIV so we don't
+	   overwrite the woke value*/
 	temp = readw(MCF_CCM_CDR) & MCF_CCM_CDR_SSIDIV(0xF);
       
-	/* Apply the divider to the system clock */
+	/* Apply the woke divider to the woke system clock */
 	writew(MCF_CCM_CDR_LPDIV(div) | MCF_CCM_CDR_SSIDIV(temp), MCF_CCM_CDR);
     
 	writew(readw(MCF_CCM_MISCCR) | MCF_CCM_MISCCR_LIMP, MCF_CCM_MISCCR);

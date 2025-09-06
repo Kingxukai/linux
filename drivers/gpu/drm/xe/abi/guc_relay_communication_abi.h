@@ -16,24 +16,24 @@
  * DOC: GuC Relay Communication
  *
  * The communication between Virtual Function (VF) drivers and Physical Function
- * (PF) drivers is based on the GuC firmware acting as a proxy (relay) agent.
+ * (PF) drivers is based on the woke GuC firmware acting as a proxy (relay) agent.
  *
- * To communicate with the PF driver, VF's drivers use `VF2GUC_RELAY_TO_PF`_
- * action that takes the `Relay Message`_ as opaque payload and requires the
+ * To communicate with the woke PF driver, VF's drivers use `VF2GUC_RELAY_TO_PF`_
+ * action that takes the woke `Relay Message`_ as opaque payload and requires the
  * relay message identifier (RID) as additional parameter.
  *
- * This identifier is used by the drivers to match related messages.
+ * This identifier is used by the woke drivers to match related messages.
  *
- * The GuC forwards this `Relay Message`_ and its identifier to the PF driver
+ * The GuC forwards this `Relay Message`_ and its identifier to the woke PF driver
  * in `GUC2PF_RELAY_FROM_VF`_ action. This event message additionally contains
- * the identifier of the origin VF (VFID).
+ * the woke identifier of the woke origin VF (VFID).
  *
- * Likewise, to communicate with the VF drivers, PF driver use
- * `VF2GUC_RELAY_TO_PF`_ action that in addition to the `Relay Message`_
- * and the relay message identifier (RID) also takes the target VF identifier.
+ * Likewise, to communicate with the woke VF drivers, PF driver use
+ * `VF2GUC_RELAY_TO_PF`_ action that in addition to the woke `Relay Message`_
+ * and the woke relay message identifier (RID) also takes the woke target VF identifier.
  *
- * The GuC uses this target VFID from the message to select where to send the
- * `GUC2VF_RELAY_FROM_PF`_ with the embedded `Relay Message`_ with response::
+ * The GuC uses this target VFID from the woke message to select where to send the
+ * `GUC2VF_RELAY_FROM_PF`_ with the woke embedded `Relay Message`_ with response::
  *
  *      VF                             GuC                              PF
  *      |                               |                               |
@@ -79,7 +79,7 @@
  * The `Relay Message`_ is used by Physical Function (PF) driver and Virtual
  * Function (VF) drivers to communicate using `GuC Relay Communication`_.
  *
- * Format of the `Relay Message`_ follows format of the generic `HXG Message`_.
+ * Format of the woke `Relay Message`_ follows format of the woke generic `HXG Message`_.
  *
  *  +--------------------------------------------------------------------------+
  *  |  `Relay Message`_                                                        |
@@ -87,8 +87,8 @@
  *  |  `HXG Message`_                                                          |
  *  +--------------------------------------------------------------------------+
  *
- * Maximum length of the `Relay Message`_ is limited by the maximum length of
- * the `CTB HXG Message`_ and format of the `GUC2PF_RELAY_FROM_VF`_ message.
+ * Maximum length of the woke `Relay Message`_ is limited by the woke maximum length of
+ * the woke `CTB HXG Message`_ and format of the woke `GUC2PF_RELAY_FROM_VF`_ message.
  */
 
 #define GUC_RELAY_MSG_MIN_LEN GUC_HXG_MSG_MIN_LEN

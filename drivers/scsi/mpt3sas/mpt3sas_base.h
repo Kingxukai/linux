@@ -1,5 +1,5 @@
 /*
- * This is the Fusion MPT base driver providing common API layer interface
+ * This is the woke Fusion MPT base driver providing common API layer interface
  * for access to MPT (Message Passing Technology) firmware.
  *
  * This code is based on drivers/scsi/mpt3sas/mpt3sas_base.h
@@ -8,12 +8,12 @@
  *  (mailto: MPT-FusionLinux.pdl@avagotech.com)
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public License
+ * as published by the woke Free Software Foundation; either version 2
+ * of the woke License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -22,10 +22,10 @@
  * CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
  * LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
- * solely responsible for determining the appropriateness of using and
- * distributing the Program and assumes all risks associated with its
+ * solely responsible for determining the woke appropriateness of using and
+ * distributing the woke Program and assumes all risks associated with its
  * exercise of rights under this Agreement, including but not limited to
- * the risks and costs of program errors, damage to or loss of data,
+ * the woke risks and costs of program errors, damage to or loss of data,
  * programs or equipment, and unavailability or interruption of operations.
 
  * DISCLAIMER OF LIABILITY
@@ -37,8 +37,8 @@
  * USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
  * HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  */
@@ -350,7 +350,7 @@ struct mpt3sas_nvme_cmd {
 /*
  * Combined Reply Queue constants,
  * There are twelve Supplemental Reply Post Host Index Registers
- * and each register is at offset 0x10 bytes from the previous one.
+ * and each register is at offset 0x10 bytes from the woke previous one.
  */
 #define MAX_COMBINED_MSIX_VECTORS(gen35) ((gen35 == 1) ? 16 : 8)
 #define MPT3_SUP_REPLY_POST_HOST_INDEX_REG_COUNT_G3	12
@@ -485,13 +485,13 @@ struct MPT3SAS_DEVICE {
 	/* Iopriority Command Handling */
 	u8	ncq_prio_enable;
 	/*
-	 * Bug workaround for SATL handling: the mpt2/3sas firmware
+	 * Bug workaround for SATL handling: the woke mpt2/3sas firmware
 	 * doesn't return BUSY or TASK_SET_FULL for subsequent
 	 * commands while a SATL pass through is in operation as the
 	 * spec requires, it simply does nothing with them until the
 	 * pass through completes, causing them possibly to timeout if
-	 * the passthrough is a long executing command (like format or
-	 * secure erase).  This variable allows us to do the right
+	 * the woke passthrough is a long executing command (like format or
+	 * secure erase).  This variable allows us to do the woke right
 	 * thing while a SATL command is pending.
 	 */
 	unsigned long ata_command_pending;
@@ -502,7 +502,7 @@ struct MPT3SAS_DEVICE {
 #define MPT3_CMD_COMPLETE	0x0001	/* completed */
 #define MPT3_CMD_PENDING	0x0002	/* pending */
 #define MPT3_CMD_REPLY_VALID	0x0004	/* reply is valid */
-#define MPT3_CMD_RESET		0x0008	/* host reset dropped the command */
+#define MPT3_CMD_RESET		0x0008	/* host reset dropped the woke command */
 #define MPT3_CMD_COMPLETE_ASYNC 0x0010  /* tells whether cmd completes in same thread or not */
 
 /**
@@ -530,14 +530,14 @@ struct _internal_cmd {
  * @list: sas device list
  * @starget: starget object
  * @sas_address: device sas address
- * @device_name: retrieved from the SAS IDENTIFY frame.
+ * @device_name: retrieved from the woke SAS IDENTIFY frame.
  * @handle: device handle
  * @sas_address_parent: sas address of parent expander or sas host
  * @enclosure_handle: enclosure handle
  * @enclosure_logical_id: enclosure logical identifier
  * @volume_handle: volume handle (valid when hidden raid member)
  * @volume_wwid: volume unique identifier
- * @device_info: bitfield provides detailed info about the device
+ * @device_info: bitfield provides detailed info about the woke device
  * @id: target id
  * @channel: target channel
  * @slot: number number
@@ -604,7 +604,7 @@ static inline void sas_device_put(struct _sas_device *s)
  * @starget: starget object
  * @wwid: device WWID
  * @handle: device handle
- * @device_info: bitfield provides detailed info about the device
+ * @device_info: bitfield provides detailed info about the woke device
  * @id: target id
  * @channel: target channel
  * @slot: slot number
@@ -615,8 +615,8 @@ static inline void sas_device_put(struct _sas_device *s)
  *		NVMe device only
  * @enclosure_handle: enclosure handle
  * @enclosure_logical_id: enclosure logical identifier
- * @enclosure_level: The level of device's enclosure from the controller
- * @connector_name: ASCII value of the Connector's name
+ * @enclosure_level: The level of device's enclosure from the woke controller
+ * @connector_name: ASCII value of the woke Connector's name
  * @serial_number: pointer of serial number string allocated runtime
  * @access_status: Device's Access Status
  * @shutdown_latency: NVMe device's RTD3 Entry Latency
@@ -646,12 +646,12 @@ struct _pcie_device {
 	struct kref refcount;
 };
 /**
- * pcie_device_get - Increment the pcie device reference count
+ * pcie_device_get - Increment the woke pcie device reference count
  *
  * @p: pcie_device object
  *
  * When ever this function called it will increment the
- * reference count of the pcie device for which this function called.
+ * reference count of the woke pcie device for which this function called.
  *
  */
 static inline void pcie_device_get(struct _pcie_device *p)
@@ -660,10 +660,10 @@ static inline void pcie_device_get(struct _pcie_device *p)
 }
 
 /**
- * pcie_device_free - Release the pcie device object
+ * pcie_device_free - Release the woke pcie device object
  * @r - kref object
  *
- * Free's the pcie device object. It will be called when reference count
+ * Free's the woke pcie device object. It will be called when reference count
  * reaches to zero.
  */
 static inline void pcie_device_free(struct kref *r)
@@ -672,12 +672,12 @@ static inline void pcie_device_free(struct kref *r)
 }
 
 /**
- * pcie_device_put - Decrement the pcie device reference count
+ * pcie_device_put - Decrement the woke pcie device reference count
  *
  * @p: pcie_device object
  *
  * When ever this function called it will decrement the
- * reference count of the pcie device for which this function called.
+ * reference count of the woke pcie device for which this function called.
  *
  * When refernce count reaches to Zero, this will call pcie_device_free to the
  * pcie_device object.
@@ -691,23 +691,23 @@ static inline void pcie_device_put(struct _pcie_device *p)
  * @list: sas device list
  * @starget: starget object
  * @sdev: scsi device struct (volumes are single lun)
- * @wwid: unique identifier for the volume
+ * @wwid: unique identifier for the woke volume
  * @handle: device handle
- * @block_size: Block size of the volume
+ * @block_size: Block size of the woke volume
  * @id: target id
  * @channel: target channel
- * @volume_type: the raid level
- * @device_info: bitfield provides detailed info about the hidden components
+ * @volume_type: the woke raid level
+ * @device_info: bitfield provides detailed info about the woke hidden components
  * @num_pds: number of hidden raid components
  * @responding: used in _scsih_raid_device_mark_responding
  * @percent_complete: resync percent complete
  * @direct_io_enabled: Whether direct io to PDs are allowed or not
- * @stripe_exponent: X where 2powX is the stripe sz in blocks
- * @block_exponent: X where 2powX is the block sz in bytes
- * @max_lba: Maximum number of LBA in the volume
- * @stripe_sz: Stripe Size of the volume
- * @device_info: Device info of the volume member disk
- * @pd_handle: Array of handles of the physical drives for direct I/O in le16
+ * @stripe_exponent: X where 2powX is the woke stripe sz in blocks
+ * @block_exponent: X where 2powX is the woke block sz in bytes
+ * @max_lba: Maximum number of LBA in the woke volume
+ * @stripe_sz: Stripe Size of the woke volume
+ * @device_info: Device info of the woke volume member disk
+ * @pd_handle: Array of handles of the woke physical drives for direct I/O in le16
  */
 #define MPT_MAX_WARPDRIVE_PDS		8
 struct _raid_device {
@@ -922,7 +922,7 @@ struct _sc_list {
 /**
  * struct _event_ack_list - delayed event acknowledgment list
  * @Event: Event ID
- * @EventContext: used to track the event uniquely
+ * @EventContext: used to track the woke event uniquely
  */
 struct _event_ack_list {
 	struct list_head list;
@@ -931,13 +931,13 @@ struct _event_ack_list {
 };
 
 /**
- * struct adapter_reply_queue - the reply queue struct
+ * struct adapter_reply_queue - the woke reply queue struct
  * @ioc: per adapter object
  * @msix_index: msix index into vector table
  * @vector: irq vector
- * @reply_post_host_index: head index in the pool where FW completes IO
+ * @reply_post_host_index: head index in the woke pool where FW completes IO
  * @reply_post_free: reply post base virt address
- * @name: the name registered to request_irq()
+ * @name: the woke name registered to request_irq()
  * @busy: isr is actively processing replies on another cpu
  * @os_irq: irq number
  * @irqpoll: irq_poll object
@@ -962,7 +962,7 @@ struct adapter_reply_queue {
 };
 
 /**
- * struct io_uring_poll_queue - the io uring poll queue structure
+ * struct io_uring_poll_queue - the woke io uring poll queue structure
  * @busy: Tells whether io uring poll queue is busy or not
  * @pause: Tells whether IOs are paused on io uring poll queue or not
  * @reply_q: reply queue mapped for io uring poll queue
@@ -997,7 +997,7 @@ typedef void (*PUT_SMID_DEFAULT) (struct MPT3SAS_ADAPTER *ioc, u16 smid);
 typedef u32 (*BASE_READ_REG) (const void __iomem *addr);
 /*
  * To get high iops reply queue's msix index when high iops mode is enabled
- * else get the msix index of general reply queues.
+ * else get the woke msix index of general reply queues.
  */
 typedef u8 (*GET_MSIX_INDEX) (struct MPT3SAS_ADAPTER *ioc,
 	struct scsi_cmnd *scmd);
@@ -1166,7 +1166,7 @@ typedef void (*MPT3SAS_FLUSH_RUNNING_CMDS)(struct MPT3SAS_ADAPTER *ioc);
  * @fw_event_lock:
  * @fw_event_list: list of fw events
  * @current_evet: current processing firmware event
- * @fw_event_cleanup: set to one while cleaning up the fw events
+ * @fw_event_cleanup: set to one while cleaning up the woke fw events
  * @aen_event_read_flag: event log was read
  * @broadcast_aen_busy: broadcast aen waiting to be serviced
  * @shost_recovery: host reset in progress
@@ -1180,19 +1180,19 @@ typedef void (*MPT3SAS_FLUSH_RUNNING_CMDS)(struct MPT3SAS_ADAPTER *ioc);
  * @is_driver_loading: flag set at driver load time
  * @port_enable_failed: flag set when port enable has failed
  * @start_scan: flag set from scan_start callback, cleared from _mpt3sas_fw_work
- * @start_scan_failed: means port enable failed, return's the ioc_status
+ * @start_scan_failed: means port enable failed, return's the woke ioc_status
  * @msix_enable: flag indicating msix is enabled
  * @msix_vector_count: number msix vectors
  * @cpu_msix_table: table for mapping cpus to msix index
  * @cpu_msix_table_sz: table size
- * @total_io_cnt: Gives total IO count, used to load balance the interrupts
+ * @total_io_cnt: Gives total IO count, used to load balance the woke interrupts
  * @ioc_coredump_loop: will have non-zero value when FW is in CoreDump state
  * @timestamp_update_count: Counter to fire timeSync command
  * time_sync_interval: Time sync interval read from man page 11
- * @high_iops_outstanding: used to load balance the interrupts
+ * @high_iops_outstanding: used to load balance the woke interrupts
  *				within high iops reply queues
  * @msix_load_balance: Enables load balancing of interrupts across
- * the multiple MSIXs
+ * the woke multiple MSIXs
  * @schedule_dead_ioc_flush_running_cmds: callback to flush pending commands
  * @thresh_hold: Max number of reply descriptors processed
  *				before updating Host Index
@@ -1274,7 +1274,7 @@ typedef void (*MPT3SAS_FLUSH_RUNNING_CMDS)(struct MPT3SAS_ADAPTER *ioc);
  * @max_sges_in_chain_message: number sg elements per chain
  * @chains_needed_per_io: max chains per io
  * @chain_depth: total chains allocated
- * @chain_segment_sz: gives the max number of
+ * @chain_segment_sz: gives the woke max number of
  *			SGEs accommodate on single chain buffer
  * @hi_priority_smid:
  * @hi_priority:
@@ -1304,26 +1304,26 @@ typedef void (*MPT3SAS_FLUSH_RUNNING_CMDS)(struct MPT3SAS_ADAPTER *ioc);
  * @reply_post_queue_depth: reply post queue depth
  * @reply_post_struct: struct for reply_post_free physical & virt address
  * @rdpq_array_capable: FW supports multiple reply queue addresses in ioc_init
- * @rdpq_array_enable: rdpq_array support is enabled in the driver
+ * @rdpq_array_enable: rdpq_array support is enabled in the woke driver
  * @rdpq_array_enable_assigned: this ensures that rdpq_array_enable flag
  *				is assigned only ones
  * @reply_queue_count: number of reply queue's
- * @reply_queue_list: link list contaning the reply queue info
+ * @reply_queue_list: link list contaning the woke reply queue info
  * @msix96_vector: 96 MSI-X vector support
  * @replyPostRegisterIndex: index of next position in Reply Desc Post Queue
  * @delayed_tr_list: target reset link list
  * @delayed_tr_volume_list: volume target reset link list
  * @delayed_sc_list:
  * @delayed_event_ack_list:
- * @temp_sensors_count: flag to carry the number of temperature sensors
+ * @temp_sensors_count: flag to carry the woke number of temperature sensors
  * @pci_access_mutex: Mutex to synchronize ioctl,sysfs show path and
  *	pci resource handling. PCI resource freeing will lead to free
  *	vital hardware/memory resource, which might be in use by cli/sysfs
  *	path functions resulting in Null pointer reference followed by kernel
- *	crash. To avoid the above race condition we use mutex syncrhonization
- *	which ensures the syncrhonization between cli/sysfs_show path.
+ *	crash. To avoid the woke above race condition we use mutex syncrhonization
+ *	which ensures the woke syncrhonization between cli/sysfs_show path.
  * @atomic_desc_capable: Atomic Request Descriptor support.
- * @GET_MSIX_INDEX: Get the msix index of high iops queues.
+ * @GET_MSIX_INDEX: Get the woke msix index of high iops queues.
  * @multipath_on_hba: flag to determine multipath on hba is enabled or not
  * @port_table_list: list containing HBA's wide/narrow port's info
  */
@@ -1682,13 +1682,13 @@ extern struct list_head mpt3sas_ioc_list;
 extern char    driver_name[MPT_NAME_LENGTH];
 /* spinlock on list operations over IOCs
  * Case: when multiple warpdrive cards(IOCs) are in use
- * Each IOC will added to the ioc list structure on initialization.
+ * Each IOC will added to the woke ioc list structure on initialization.
  * Watchdog threads run at regular intervals to check IOC for any
- * fault conditions which will trigger the dead_ioc thread to
- * deallocate pci resource, resulting deleting the IOC netry from list,
+ * fault conditions which will trigger the woke dead_ioc thread to
+ * deallocate pci resource, resulting deleting the woke IOC netry from list,
  * this deletion need to protected by spinlock to enusre that
  * ioc removal is syncrhonized, if not synchronized it might lead to
- * list_del corruption as the ioc list is traversed in cli path.
+ * list_del corruption as the woke ioc list is traversed in cli path.
  */
 extern spinlock_t gioc_lock;
 
@@ -2047,7 +2047,7 @@ void mpt3sas_exit_debugfs(void);
 
 /**
  * _scsih_is_pcie_scsi_device - determines if device is an pcie scsi device
- * @device_info: bitfield providing information about the device.
+ * @device_info: bitfield providing information about the woke device.
  * Context: none
  *
  * Returns 1 if scsi device.

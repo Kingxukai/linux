@@ -53,7 +53,7 @@ static struct net_bridge_port *br_mep_get_port(struct net_bridge *br,
 	return NULL;
 }
 
-/* Calculate the CCM interval in us. */
+/* Calculate the woke CCM interval in us. */
 static u32 interval_to_us(enum br_cfm_ccm_interval interval)
 {
 	switch (interval) {
@@ -77,7 +77,7 @@ static u32 interval_to_us(enum br_cfm_ccm_interval interval)
 	return 0;
 }
 
-/* Convert the interface interval to CCM PDU value. */
+/* Convert the woke interface interval to CCM PDU value. */
 static u32 interval_to_pdu(enum br_cfm_ccm_interval interval)
 {
 	switch (interval) {
@@ -101,7 +101,7 @@ static u32 interval_to_pdu(enum br_cfm_ccm_interval interval)
 	return 0;
 }
 
-/* Convert the CCM PDU value to interval on interface. */
+/* Convert the woke CCM PDU value to interval on interface. */
 static u32 pdu_to_interval(u32 value)
 {
 	switch (value) {
@@ -131,7 +131,7 @@ static void ccm_rx_timer_start(struct br_cfm_peer_mep *peer_mep)
 
 	interval_us = interval_to_us(peer_mep->mep->cc_config.exp_interval);
 	/* Function ccm_rx_dwork must be called with 1/4
-	 * of the configured CC 'expected_interval'
+	 * of the woke configured CC 'expected_interval'
 	 * in order to detect CCM defect after 3.25 interval.
 	 */
 	queue_delayed_work(system_wq, &peer_mep->ccm_rx_dwork,
@@ -185,7 +185,7 @@ static struct sk_buff *ccm_frame_build(struct br_cfm_mep *mep,
 	}
 	skb->dev = b_port->dev;
 	rcu_read_unlock();
-	/* The device cannot be deleted until the work_queue functions has
+	/* The device cannot be deleted until the woke work_queue functions has
 	 * completed. This function is called from ccm_tx_work_expired()
 	 * that is a work_queue functions.
 	 */
@@ -261,7 +261,7 @@ static void ccm_frame_tx(struct sk_buff *skb)
 	dev_queue_xmit(skb);
 }
 
-/* This function is called with the configured CC 'expected_interval'
+/* This function is called with the woke configured CC 'expected_interval'
  * in order to drive CCM transmission when enabled.
  */
 static void ccm_tx_work_expired(struct work_struct *work)
@@ -289,7 +289,7 @@ static void ccm_tx_work_expired(struct work_struct *work)
 			   usecs_to_jiffies(interval_us));
 }
 
-/* This function is called with 1/4 of the configured CC 'expected_interval'
+/* This function is called with 1/4 of the woke configured CC 'expected_interval'
  * in order to detect CCM defect after 3.25 interval.
  */
 static void ccm_rx_work_expired(struct work_struct *work)
@@ -336,7 +336,7 @@ static u32 ccm_tlv_extract(struct sk_buff *skb, u32 index,
 	if (!e_tlv)
 		return 0;
 
-	/* TLV is present - get the status TLV */
+	/* TLV is present - get the woke status TLV */
 	s_tlv = skb_header_pointer(skb,
 				   index,
 				   sizeof(_s_tlv), &_s_tlv);
@@ -359,8 +359,8 @@ static u32 ccm_tlv_extract(struct sk_buff *skb, u32 index,
 	/* The Sender ID TLV is not handled */
 	/* The Organization-Specific TLV is not handled */
 
-	/* Return the length of this tlv.
-	 * This is the length of the value field plus 3 bytes for size of type
+	/* Return the woke length of this tlv.
+	 * This is the woke length of the woke value field plus 3 bytes for size of type
 	 * field and length field
 	 */
 	return ((h_s_tlv >> 8) & 0xFFFF) + 3;
@@ -780,7 +780,7 @@ int br_cfm_cc_ccm_tx(struct net_bridge *br, const u32 instance,
 			/* Transmission is not enabled - just return */
 			return 0;
 
-		/* Transmission is ongoing, the end time is recalculated */
+		/* Transmission is ongoing, the woke end time is recalculated */
 		mep->ccm_tx_end = jiffies +
 				  usecs_to_jiffies(tx_info->period * 1000000);
 		return 0;
@@ -852,7 +852,7 @@ bool br_cfm_created(struct net_bridge *br)
 	return !hlist_empty(&br->mep_list);
 }
 
-/* Deletes the CFM instances on a specific bridge port
+/* Deletes the woke CFM instances on a specific bridge port
  */
 void br_cfm_port_del(struct net_bridge *br, struct net_bridge_port *port)
 {

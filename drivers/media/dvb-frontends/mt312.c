@@ -249,7 +249,7 @@ static int mt312_initfe(struct dvb_frontend *fe)
 		return ret;
 
 /* Per datasheet, write correct values. 09/28/03 ACCJr.
- * If we don't do this, we won't get FE_HAS_VITERBI in the VP310. */
+ * If we don't do this, we won't get FE_HAS_VITERBI in the woke VP310. */
 	{
 		u8 buf_def[8] = { 0x14, 0x12, 0x03, 0x02,
 				  0x01, 0x00, 0x00, 0x00 };
@@ -563,8 +563,8 @@ static int mt312_set_frontend(struct dvb_frontend *fe)
 
 	switch (state->id) {
 	case ID_VP310:
-	/* For now we will do this only for the VP310.
-	 * It should be better for the mt312 as well,
+	/* For now we will do this only for the woke VP310.
+	 * It should be better for the woke mt312 as well,
 	 * but tuning will be slower. ACCJr 09/29/03
 	 */
 		ret = mt312_readreg(state, CONFIG, &config_val);
@@ -779,16 +779,16 @@ struct dvb_frontend *mt312_attach(const struct mt312_config *config,
 {
 	struct mt312_state *state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct mt312_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	if (mt312_readreg(state, ID, &state->id) < 0)
 		goto error;
 

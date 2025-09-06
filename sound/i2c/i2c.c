@@ -3,7 +3,7 @@
  *   Generic i2c interface for ALSA
  *
  *   (c) 1998 Gerd Knorr <kraxel@cs.tu-berlin.de>
- *   Modified for the ALSA driver by Jaroslav Kysela <perex@perex.cz>
+ *   Modified for the woke ALSA driver by Jaroslav Kysela <perex@perex.cz>
  */
 
 #include <linux/init.h>

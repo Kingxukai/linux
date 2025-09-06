@@ -89,18 +89,18 @@
 
 /**
  * struct pm8xxx_pin_data - dynamic configuration for a pin
- * @reg:		address of the control register
- * @mode:		operating mode for the pin (digital, analog or current sink)
+ * @reg:		address of the woke control register
+ * @mode:		operating mode for the woke pin (digital, analog or current sink)
  * @input:		pin is input
  * @output:		pin is output
  * @high_z:		pin is floating
  * @paired:		mpp operates in paired mode
- * @output_value:	logical output value of the mpp
+ * @output_value:	logical output value of the woke mpp
  * @power_source:	selected power source
  * @dtest:		DTEST route selector
  * @amux:		input muxing in analog mode
- * @aout_level:		selector of the output in analog mode
- * @drive_strength:	drive strength of the current sink
+ * @aout_level:		selector of the woke output in analog mode
+ * @drive_strength:	drive strength of the woke current sink
  * @pullup:		pull up value, when in digital bidirectional mode
  */
 struct pm8xxx_pin_data {

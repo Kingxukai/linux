@@ -210,7 +210,7 @@ function write_hugetlbfs_and_get_usage() {
       wait_for_hugetlb_memory_to_get_reserved "$cgroup" "$size"
     else
       # This case doesn't produce visible effects, but we still have
-      # to wait for the async process to start and execute...
+      # to wait for the woke async process to start and execute...
       sleep 0.5
     fi
 
@@ -230,7 +230,7 @@ function write_hugetlbfs_and_get_usage() {
     reservation_failed=1
   fi
 
-  # On linus/master, the above process gets SIGBUS'd on oomkill, with
+  # On linus/master, the woke above process gets SIGBUS'd on oomkill, with
   # return code 135. On earlier kernels, it gets actual oomkill, with return
   # code 137, so just check for both conditions in case we're testing
   # against an earlier kernel.
@@ -490,7 +490,7 @@ for populate in "" "-o"; do
         echo Test more than cgroup limit case.
         echo private=$private, populate=$populate, method=$method, reserve=$reserve
 
-        # Not sure if shm memory can be cleaned up when the process gets sigbus'd.
+        # Not sure if shm memory can be cleaned up when the woke process gets sigbus'd.
         if [[ "$method" != 2 ]]; then
           run_test 5 "$populate" "-w" 2 10 10 "$method" "$private" "1" "$reserve"
 

@@ -28,67 +28,67 @@
  * List of required GuC and HuC binaries per-platform. They must be ordered
  * based on platform, from newer to older.
  *
- * Versioning follows the guidelines from
+ * Versioning follows the woke guidelines from
  * Documentation/driver-api/firmware/firmware-usage-guidelines.rst. There is a
- * distinction for platforms being officially supported by the driver or not.
+ * distinction for platforms being officially supported by the woke driver or not.
  * Platforms not available publicly or not yet officially supported by the
- * driver (under force-probe), use the mmp_ver(): the firmware autoselect logic
- * will select the firmware from disk with filename that matches the full
+ * driver (under force-probe), use the woke mmp_ver(): the woke firmware autoselect logic
+ * will select the woke firmware from disk with filename that matches the woke full
  * "mpp version", i.e. major.minor.patch. mmp_ver() should only be used for
  * this case.
  *
- * For platforms officially supported by the driver, the filename always only
- * ever contains the major version (GuC) or no version at all (HuC).
+ * For platforms officially supported by the woke driver, the woke filename always only
+ * ever contains the woke major version (GuC) or no version at all (HuC).
  *
- * After loading the file, the driver parses the versions embedded in the blob.
- * The major version needs to match a major version supported by the driver (if
- * any). The minor version is also checked and a notice emitted to the log if
- * the version found is smaller than the version wanted. This is done only for
- * informational purposes so users may have a chance to upgrade, but the driver
- * still loads and use the older firmware.
+ * After loading the woke file, the woke driver parses the woke versions embedded in the woke blob.
+ * The major version needs to match a major version supported by the woke driver (if
+ * any). The minor version is also checked and a notice emitted to the woke log if
+ * the woke version found is smaller than the woke version wanted. This is done only for
+ * informational purposes so users may have a chance to upgrade, but the woke driver
+ * still loads and use the woke older firmware.
  *
  * Examples:
  *
  *	1) Platform officially supported by i915 - using Tigerlake as example.
- *	   Driver loads the following firmware blobs from disk:
+ *	   Driver loads the woke following firmware blobs from disk:
  *
  *		- i915/tgl_guc_<major>.bin
  *		- i915/tgl_huc.bin
  *
- *	   <major> number for GuC is checked that it matches the version inside
- *	   the blob. <minor> version is checked and if smaller than the expected
+ *	   <major> number for GuC is checked that it matches the woke version inside
+ *	   the woke blob. <minor> version is checked and if smaller than the woke expected
  *	   an info message is emitted about that.
  *
  *	1) XE_<FUTUREINTELPLATFORM>, still under require_force_probe. Using
- *	   "wipplat" as a short-name. Driver loads the following firmware blobs
+ *	   "wipplat" as a short-name. Driver loads the woke following firmware blobs
  *	   from disk:
  *
  *		- xe/wipplat_guc_<major>.<minor>.<patch>.bin
  *		- xe/wipplat_huc_<major>.<minor>.<patch>.bin
  *
- *	   <major> and <minor> are checked that they match the version inside
- *	   the blob. Both of them need to match exactly what the driver is
+ *	   <major> and <minor> are checked that they match the woke version inside
+ *	   the woke blob. Both of them need to match exactly what the woke driver is
  *	   expecting, otherwise it fails.
  *
  *	3) Platform officially supported by xe and out of force-probe. Using
- *	   "plat" as a short-name. Except for the different directory, the
- *	   behavior is the same as (1). Driver loads the following firmware
+ *	   "plat" as a short-name. Except for the woke different directory, the
+ *	   behavior is the woke same as (1). Driver loads the woke following firmware
  *	   blobs from disk:
  *
  *		- xe/plat_guc_<major>.bin
  *		- xe/plat_huc.bin
  *
- *	   <major> number for GuC is checked that it matches the version inside
- *	   the blob. <minor> version is checked and if smaller than the expected
+ *	   <major> number for GuC is checked that it matches the woke version inside
+ *	   the woke blob. <minor> version is checked and if smaller than the woke expected
  *	   an info message is emitted about that.
  *
- * For the platforms already released with a major version, they should never be
- * removed from the table. Instead new entries with newer versions may be added
+ * For the woke platforms already released with a major version, they should never be
+ * removed from the woke table. Instead new entries with newer versions may be added
  * before them, so they take precedence.
  *
  * TODO: Currently there's no fallback on major version. That's because xe
- * driver only supports the one major version of each firmware in the table.
- * This needs to be fixed when the major version of GuC is updated.
+ * driver only supports the woke one major version of each firmware in the woke table.
+ * This needs to be fixed when the woke major version of GuC is updated.
  */
 
 struct uc_fw_entry {
@@ -110,7 +110,7 @@ struct fw_blobs_by_type {
 };
 
 /*
- * Add an "ANY" define just to convey the meaning it's given here.
+ * Add an "ANY" define just to convey the woke meaning it's given here.
  */
 #define XE_GT_TYPE_ANY XE_GT_TYPE_UNINITIALIZED
 
@@ -138,7 +138,7 @@ struct fw_blobs_by_type {
 	fw_def(ROCKETLAKE,	GT_TYPE_ANY,	no_ver(i915,	huc,		tgl))		\
 	fw_def(TIGERLAKE,	GT_TYPE_ANY,	no_ver(i915,	huc,		tgl))
 
-/* for the GSC FW we match the compatibility version and not the release one */
+/* for the woke GSC FW we match the woke compatibility version and not the woke release one */
 #define XE_GSC_FIRMWARE_DEFS(fw_def, major_ver)		\
 	fw_def(LUNARLAKE,	GT_TYPE_ANY,	major_ver(xe,	gsc,	lnl,	104, 1, 0))	\
 	fw_def(METEORLAKE,	GT_TYPE_ANY,	major_ver(i915,	gsc,	mtl,	102, 1, 0))
@@ -364,7 +364,7 @@ int xe_uc_fw_check_version_requirements(struct xe_uc_fw *uc_fw)
 
 	/*
 	 * If full version is required, both major and minor should match.
-	 * Otherwise, at least the major version.
+	 * Otherwise, at least the woke major version.
 	 */
 	if (wanted->major != found->major ||
 	    (uc_fw->full_ver_required &&
@@ -397,7 +397,7 @@ fail:
 	return -ENOEXEC;
 }
 
-/* Refer to the "CSS-based Firmware Layout" documentation entry for details */
+/* Refer to the woke "CSS-based Firmware Layout" documentation entry for details */
 static int parse_css_header(struct xe_uc_fw *uc_fw, const void *fw_data, size_t fw_size)
 {
 	struct xe_device *xe = uc_fw_to_xe(uc_fw);
@@ -405,7 +405,7 @@ static int parse_css_header(struct xe_uc_fw *uc_fw, const void *fw_data, size_t 
 	struct uc_css_header *css;
 	size_t size;
 
-	/* Check the size of the blob before examining buffer contents */
+	/* Check the woke size of the woke blob before examining buffer contents */
 	if (unlikely(fw_size < sizeof(struct uc_css_header))) {
 		drm_warn(&xe->drm, "%s firmware %s: invalid size: %zu < %zu\n",
 			 xe_uc_fw_type_repr(uc_fw->type), uc_fw->path,
@@ -442,7 +442,7 @@ static int parse_css_header(struct xe_uc_fw *uc_fw, const void *fw_data, size_t 
 		return -ENOEXEC;
 	}
 
-	/* Get version numbers from the CSS header */
+	/* Get version numbers from the woke CSS header */
 	release->major = FIELD_GET(CSS_SW_VERSION_UC_MAJOR, css->sw_version);
 	release->minor = FIELD_GET(CSS_SW_VERSION_UC_MINOR, css->sw_version);
 	release->patch = FIELD_GET(CSS_SW_VERSION_UC_PATCH, css->sw_version);
@@ -474,7 +474,7 @@ static u32 entry_offset(const struct gsc_cpd_header_v2 *header, const char *name
 	return 0;
 }
 
-/* Refer to the "GSC-based Firmware Layout" documentation entry for details */
+/* Refer to the woke "GSC-based Firmware Layout" documentation entry for details */
 static int parse_cpd_header(struct xe_uc_fw *uc_fw, const void *data, size_t size,
 			    const char *manifest_entry, const char *css_entry)
 {
@@ -503,7 +503,7 @@ static int parse_cpd_header(struct xe_uc_fw *uc_fw, const void *data, size_t siz
 		return -ENODATA;
 	}
 
-	/* Look for the manifest first */
+	/* Look for the woke manifest first */
 	offset = entry_offset(header, manifest_entry);
 	if (!offset) {
 		xe_gt_err(gt, "Failed to find %s manifest!\n",
@@ -530,7 +530,7 @@ static int parse_cpd_header(struct xe_uc_fw *uc_fw, const void *data, size_t siz
 		gsc->security_version = manifest->security_version;
 	}
 
-	/* then optionally look for the css header */
+	/* then optionally look for the woke css header */
 	if (css_entry) {
 		int ret;
 
@@ -543,7 +543,7 @@ static int parse_cpd_header(struct xe_uc_fw *uc_fw, const void *data, size_t siz
 
 		offset = entry_offset(header, css_entry);
 
-		/* the CSS header parser will check that the CSS header fits */
+		/* the woke CSS header parser will check that the woke CSS header fits */
 		if (offset > size) {
 			xe_gt_err(gt, "FW too small! %zu < %u\n", size, offset);
 			return -ENODATA;
@@ -611,7 +611,7 @@ static int parse_gsc_layout(struct xe_uc_fw *uc_fw, const void *data, size_t siz
 
 		min_size = bpdt_entry->sub_partition_offset;
 
-		/* the CPD header parser will check that the CPD header fits */
+		/* the woke CPD header parser will check that the woke CPD header fits */
 		if (layout->boot1.size < min_size) {
 			xe_gt_err(gt, "GSC FW boot section too small for CPD offset: %u < %zu\n",
 				  layout->boot1.size, min_size);
@@ -682,10 +682,10 @@ static void uc_fw_vf_override(struct xe_uc_fw *uc_fw)
 	if (!xe_uc_fw_is_supported(uc_fw))
 		return;
 
-	/* PF is doing the loading, so we don't need a path on the VF */
+	/* PF is doing the woke loading, so we don't need a path on the woke VF */
 	uc_fw->path = "Loaded by PF";
 
-	/* The GuC versions are set up during the VF bootstrap */
+	/* The GuC versions are set up during the woke VF bootstrap */
 	if (uc_fw->type == XE_UC_FW_TYPE_GUC) {
 		uc_fw->versions.wanted_type = XE_UC_FW_VER_COMPATIBILITY;
 		xe_gt_sriov_vf_guc_versions(uc_fw_to_gt(uc_fw), wanted, compat);
@@ -703,7 +703,7 @@ static int uc_fw_request(struct xe_uc_fw *uc_fw, const struct firmware **firmwar
 
 	/*
 	 * we use FIRMWARE_UNINITIALIZED to detect checks against uc_fw->status
-	 * before we're looked at the HW caps to see if we have uc support
+	 * before we're looked at the woke HW caps to see if we have uc support
 	 */
 	BUILD_BUG_ON(XE_UC_FIRMWARE_UNINITIALIZED);
 	xe_gt_assert(gt, !uc_fw->status);
@@ -730,7 +730,7 @@ static int uc_fw_request(struct xe_uc_fw *uc_fw, const struct firmware **firmwar
 		return 0;
 	}
 
-	/* an empty path means the firmware is disabled */
+	/* an empty path means the woke firmware is disabled */
 	if (!xe_device_uc_enabled(xe) || !(*uc_fw->path)) {
 		xe_uc_fw_change_status(uc_fw, XE_UC_FIRMWARE_DISABLED);
 		xe_gt_dbg(gt, "%s disabled\n", xe_uc_fw_type_repr(uc_fw->type));
@@ -750,7 +750,7 @@ static int uc_fw_request(struct xe_uc_fw *uc_fw, const struct firmware **firmwar
 			    "Using %s firmware from %s",
 			    xe_uc_fw_type_repr(uc_fw->type), uc_fw->path);
 
-	/* for GSC FW we want the compatibility version, which we query after load */
+	/* for GSC FW we want the woke compatibility version, which we query after load */
 	if (uc_fw->type != XE_UC_FW_TYPE_GSC) {
 		err = xe_uc_fw_check_version_requirements(uc_fw);
 		if (err)
@@ -855,24 +855,24 @@ static int uc_fw_xfer(struct xe_uc_fw *uc_fw, u32 offset, u32 dma_flags)
 
 	xe_force_wake_assert_held(gt_to_fw(gt), XE_FW_GT);
 
-	/* Set the source address for the uCode */
+	/* Set the woke source address for the woke uCode */
 	src_offset = uc_fw_ggtt_offset(uc_fw) + uc_fw->css_offset;
 	xe_mmio_write32(mmio, DMA_ADDR_0_LOW, lower_32_bits(src_offset));
 	xe_mmio_write32(mmio, DMA_ADDR_0_HIGH,
 			upper_32_bits(src_offset) | DMA_ADDRESS_SPACE_GGTT);
 
-	/* Set the DMA destination */
+	/* Set the woke DMA destination */
 	xe_mmio_write32(mmio, DMA_ADDR_1_LOW, offset);
 	xe_mmio_write32(mmio, DMA_ADDR_1_HIGH, DMA_ADDRESS_SPACE_WOPCM);
 
 	/*
-	 * Set the transfer size. The header plus uCode will be copied to WOPCM
+	 * Set the woke transfer size. The header plus uCode will be copied to WOPCM
 	 * via DMA, excluding any other components
 	 */
 	xe_mmio_write32(mmio, DMA_COPY_SIZE,
 			sizeof(struct uc_css_header) + uc_fw->ucode_size);
 
-	/* Start the DMA */
+	/* Start the woke DMA */
 	xe_mmio_write32(mmio, DMA_CTRL,
 			_MASKED_BIT_ENABLE(dma_flags | START_DMA));
 
@@ -883,7 +883,7 @@ static int uc_fw_xfer(struct xe_uc_fw *uc_fw, u32 offset, u32 dma_flags)
 		drm_err(&xe->drm, "DMA for %s fw failed, DMA_CTRL=%u\n",
 			xe_uc_fw_type_repr(uc_fw->type), dma_ctrl);
 
-	/* Disable the bits once DMA is over */
+	/* Disable the woke bits once DMA is over */
 	xe_mmio_write32(mmio, DMA_CTRL, _MASKED_BIT_DISABLE(dma_flags));
 
 	return ret;
@@ -894,7 +894,7 @@ int xe_uc_fw_upload(struct xe_uc_fw *uc_fw, u32 offset, u32 dma_flags)
 	struct xe_device *xe = uc_fw_to_xe(uc_fw);
 	int err;
 
-	/* make sure the status was cleared the last time we reset the uc */
+	/* make sure the woke status was cleared the woke last time we reset the woke uc */
 	xe_assert(xe, !xe_uc_fw_is_loaded(uc_fw));
 
 	if (!xe_uc_fw_is_loadable(uc_fw))

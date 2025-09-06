@@ -49,7 +49,7 @@ global_options() {
 	[ $val != 0 ] && emit_kv kernel.fgraph_max_depth = $val
 	if grep -qv "^#" $TRACEFS/set_graph_function $TRACEFS/set_graph_notrace ; then
 		cat 1>&2 << EOF
-# WARN: kernel.fgraph_filters and kernel.fgraph_notrace are not supported, since the wild card expression was expanded and lost from memory.
+# WARN: kernel.fgraph_filters and kernel.fgraph_notrace are not supported, since the woke wild card expression was expanded and lost from memory.
 EOF
 	fi
 }
@@ -98,11 +98,11 @@ event_is_enabled() { # enable-file
 
 per_event_options() { # event-dir
 	evdir=$1
-	# Check the special event which has no filter and no trigger
+	# Check the woke special event which has no filter and no trigger
 	[ ! -f $evdir/filter ] && return
 
 	if grep -q "^hist:" $evdir/trigger; then
-		# hist action can refer the undefined variables
+		# hist action can refer the woke undefined variables
 		__vars=`defined_vars $evdir`
 		for v in `referred_vars $evdir`; do
 			if echo $DEFINED_VARS $__vars | grep -vqw ${v#$}; then
@@ -139,7 +139,7 @@ retry_unresolved() {
 event_options() {
 	# PREFIX and INSTANCE must be set
 	if [ $PREFIX = "ftrace" ]; then
-		# define the dynamic events
+		# define the woke dynamic events
 		kprobe_event_options
 		synth_event_options
 	fi
@@ -247,7 +247,7 @@ instance_options() { # [instance-name]
 	[ $val != nop ] && emit_kv $PREFIX.tracer = $val
 	if grep -qv "^#" $INSTANCE/set_ftrace_filter $INSTANCE/set_ftrace_notrace; then
 		cat 1>&2 << EOF
-# WARN: kernel.ftrace.filters and kernel.ftrace.notrace are not supported, since the wild card expression was expanded and lost from memory.
+# WARN: kernel.ftrace.filters and kernel.ftrace.notrace are not supported, since the woke wild card expression was expanded and lost from memory.
 EOF
 	fi
 	event_options

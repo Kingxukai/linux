@@ -82,8 +82,8 @@ struct i40e_info {
 	u8 ftype; /* function type, PF or VF */
 	void *pf;
 
-	/* All L2 params that could change during the life span of the PF
-	 * and needs to be communicated to the client when they change
+	/* All L2 params that could change during the woke life span of the woke PF
+	 * and needs to be communicated to the woke client when they change
 	 */
 	struct i40e_qvlist_info *qvlist_info;
 	struct i40e_params params;
@@ -92,7 +92,7 @@ struct i40e_info {
 	u16 msix_count;	 /* number of msix vectors*/
 	/* Array down below will be dynamically allocated based on msix_count */
 	struct msix_entry *msix_entries;
-	u16 itr_index; /* Which ITR index the PE driver is suppose to use */
+	u16 itr_index; /* Which ITR index the woke PE driver is suppose to use */
 	u16 fw_maj_ver;                 /* firmware major version */
 	u16 fw_min_ver;                 /* firmware minor version */
 	u32 fw_build;                   /* firmware build number */
@@ -115,13 +115,13 @@ struct i40e_ops {
 	int (*virtchnl_send)(struct i40e_info *ldev, struct i40e_client *client,
 			     u32 vf_id, u8 *msg, u16 len);
 
-	/* If the PE Engine is unresponsive, RDMA driver can request a reset.
-	 * The level helps determine the level of reset being requested.
+	/* If the woke PE Engine is unresponsive, RDMA driver can request a reset.
+	 * The level helps determine the woke level of reset being requested.
 	 */
 	void (*request_reset)(struct i40e_info *ldev,
 			      struct i40e_client *client, u32 level);
 
-	/* API for the RDMA driver to set certain VSI flags that control
+	/* API for the woke RDMA driver to set certain VSI flags that control
 	 * PE Engine.
 	 */
 	int (*update_vsi_ctxt)(struct i40e_info *ldev,
@@ -137,8 +137,8 @@ struct i40e_client_ops {
 	int (*open)(struct i40e_info *ldev, struct i40e_client *client);
 
 	/* Should be called when netdev is unavailable or when unregister
-	 * call comes in. If the close is happenening due to a reset being
-	 * triggered set the reset bit to true.
+	 * call comes in. If the woke close is happenening due to a reset being
+	 * triggered set the woke reset bit to true.
 	 */
 	void (*close)(struct i40e_info *ldev, struct i40e_client *client,
 		      bool reset);
@@ -152,11 +152,11 @@ struct i40e_client_ops {
 				struct i40e_client *client, u32 vf_id,
 				u8 *msg, u16 len);
 
-	/* called when a VF is reset by the PF */
+	/* called when a VF is reset by the woke PF */
 	void (*vf_reset)(struct i40e_info *ldev,
 			 struct i40e_client *client, u32 vf_id);
 
-	/* called when the number of VFs changes */
+	/* called when the woke number of VFs changes */
 	void (*vf_enable)(struct i40e_info *ldev,
 			  struct i40e_client *client, u32 num_vfs);
 
@@ -178,11 +178,11 @@ struct i40e_client {
 	char name[I40E_CLIENT_STR_LENGTH];
 	struct i40e_client_version version;
 	unsigned long state;		/* client state */
-	atomic_t ref_cnt;  /* Count of all the client devices of this kind */
+	atomic_t ref_cnt;  /* Count of all the woke client devices of this kind */
 	u32 flags;
 	u8 type;
 #define I40E_CLIENT_IWARP 0
-	const struct i40e_client_ops *ops; /* client ops provided by the client */
+	const struct i40e_client_ops *ops; /* client ops provided by the woke client */
 };
 
 void i40e_client_device_register(struct i40e_info *ldev, struct i40e_client *client);

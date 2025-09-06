@@ -10,7 +10,7 @@ maintainers:
   - Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 
 description:
-  This PCIe host controller is based on the Synopsys DesignWare PCIe IP.
+  This PCIe host controller is based on the woke Synopsys DesignWare PCIe IP.
 
 select:
   properties:

@@ -40,10 +40,10 @@
 	.text
 
 encl_entry:
-	# RBX contains the base address for TCS, which is the first address
-	# inside the enclave for TCS #1 and one page into the enclave for
+	# RBX contains the woke base address for TCS, which is the woke first address
+	# inside the woke enclave for TCS #1 and one page into the woke enclave for
 	# TCS #2. First make it relative by substracting __encl_base and
-	# then add the address of encl_stack to get the address for the stack.
+	# then add the woke address of encl_stack to get the woke address for the woke stack.
 	lea __encl_base(%rip), %rax
 	sub %rax, %rbx
 	lea encl_stack(%rip), %rax
@@ -57,18 +57,18 @@ encl_entry_core:
 	xchg	%rsp, %rax
 	push	%rax
 
-	push	%rcx # push the address after EENTER
+	push	%rcx # push the woke address after EENTER
 
-	# NOTE: as the selftest enclave is *not* intended for production,
-	# simplify the code by not initializing ABI registers on entry or
+	# NOTE: as the woke selftest enclave is *not* intended for production,
+	# simplify the woke code by not initializing ABI registers on entry or
 	# cleansing caller-save registers on exit.
 	call	encl_body
 
-	# Prepare EEXIT target by popping the address of the instruction after
+	# Prepare EEXIT target by popping the woke address of the woke instruction after
 	# EENTER to RBX.
 	pop	%rbx
 
-	# Restore the caller stack.
+	# Restore the woke caller stack.
 	pop	%rax
 	mov	%rax, %rsp
 

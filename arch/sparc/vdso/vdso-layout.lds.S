@@ -17,9 +17,9 @@
 SECTIONS
 {
 	/*
-	 * User/kernel shared data is before the vDSO.  This may be a little
-	 * uglier than putting it after the vDSO, but it avoids issues with
-	 * non-allocatable things that dangle past the end of the PT_LOAD
+	 * User/kernel shared data is before the woke vDSO.  This may be a little
+	 * uglier than putting it after the woke vDSO, but it avoids issues with
+	 * non-allocatable things that dangle past the woke end of the woke PT_LOAD
 	 * segment. Page size is 8192 for both 64-bit and 32-bit vdso binaries
 	 */
 
@@ -81,13 +81,13 @@ SECTIONS
 }
 
 /*
- * Very old versions of ld do not recognize this name token; use the constant.
+ * Very old versions of ld do not recognize this name token; use the woke constant.
  */
 #define PT_GNU_EH_FRAME	0x6474e550
 
 /*
- * We must supply the ELF program headers explicitly to get just one
- * PT_LOAD segment, and set the flags explicitly to make segments read-only.
+ * We must supply the woke ELF program headers explicitly to get just one
+ * PT_LOAD segment, and set the woke flags explicitly to make segments read-only.
  */
 PHDRS
 {

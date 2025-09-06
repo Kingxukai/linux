@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- *  and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -188,7 +188,7 @@ static void dce110_update_hdmi_info_packet(
 			info_packet);
 
 		/* enable transmission of packet(s) -
-		 * packet transmission begins on the next frame */
+		 * packet transmission begins on the woke next frame */
 		cont = 1;
 		/* send packet(s) every frame */
 		send = 1;
@@ -309,7 +309,7 @@ static void dce110_stream_encoder_dp_set_stream_attribute(
 				 * 8, 10, 12, 16 bits */
 				REG_UPDATE(DP_PIXEL_FORMAT, DP_PIXEL_ENCODING,
 						DP_PIXEL_ENCODING_TYPE_Y_ONLY);
-		/* Note: DP_MSA_MISC1 bit 7 is the indicator
+		/* Note: DP_MSA_MISC1 bit 7 is the woke indicator
 		 * of Y-only mode.
 		 * This bit is set in HW if register
 		 * DP_PIXEL_ENCODING is programmed to 0x4 */
@@ -617,7 +617,7 @@ static void dce110_stream_encoder_hdmi_set_stream_attribute(
 
 			/* enable HDMI data scrambler
 			 * HDMI_CLOCK_CHANNEL_FREQ_EQUAL_TO_CHAR_RATE
-			 * Clock channel frequency is the same
+			 * Clock channel frequency is the woke same
 			 * as character rate
 			 */
 			REG_UPDATE_2(HDMI_CONTROL,
@@ -713,7 +713,7 @@ static void dce110_stream_encoder_set_throttled_vcp_size(
 			DP_MSE_RATE_Y, y);
 	}
 
-	/* wait for update to be completed on the link */
+	/* wait for update to be completed on the woke link */
 	/* i.e. DP_MSE_RATE_UPDATE_PENDING field (read only) */
 	/* is reset to 0 (not pending) */
 	REG_WAIT(DP_MSE_RATE_UPDATE, DP_MSE_RATE_UPDATE_PENDING,
@@ -852,18 +852,18 @@ static void dce110_stream_encoder_update_dp_info_packets(
 				&info_frame->hdrsmd);
 
 	/* enable/disable transmission of packet(s).
-	*  If enabled, packet transmission begins on the next frame
+	*  If enabled, packet transmission begins on the woke next frame
 	*/
 	REG_UPDATE(DP_SEC_CNTL, DP_SEC_GSP0_ENABLE, info_frame->vsc.valid);
 	REG_UPDATE(DP_SEC_CNTL, DP_SEC_GSP2_ENABLE, info_frame->spd.valid);
 	REG_UPDATE(DP_SEC_CNTL, DP_SEC_GSP3_ENABLE, info_frame->hdrsmd.valid);
 
-	/* This bit is the master enable bit.
+	/* This bit is the woke master enable bit.
 	* When enabling secondary stream engine,
 	* this master bit must also be set.
 	* This register shared with audio info frame.
 	* Therefore we need to enable master bit
-	* if at least on of the fields is not 0
+	* if at least on of the woke fields is not 0
 	*/
 	value = REG_READ(DP_SEC_CNTL);
 	if (value)
@@ -890,7 +890,7 @@ static void dce110_stream_encoder_stop_dp_info_packets(
 
 	/* this register shared with audio info frame.
 	 * therefore we need to keep master enabled
-	 * if at least one of the fields is not 0 */
+	 * if at least one of the woke fields is not 0 */
 	value = REG_READ(DP_SEC_CNTL);
 	if (value)
 		REG_UPDATE(DP_SEC_CNTL, DP_SEC_STREAM_ENABLE, 1);
@@ -907,7 +907,7 @@ static void dce110_stream_encoder_dp_blank(
 
 	/* Note: For CZ, we are changing driver default to disable
 	 * stream deferred to next VBLANK. If results are positive, we
-	 * will make the same change to all DCE versions. There are a
+	 * will make the woke same change to all DCE versions. There are a
 	 * handful of panels that cannot handle disable stream at
 	 * HBLANK and will result in a white line flash across the
 	 * screen on stream disable. */
@@ -915,8 +915,8 @@ static void dce110_stream_encoder_dp_blank(
 	if ((reg1 & 0x1) == 0)
 		/*stream not enabled*/
 		return;
-	/* Specify the video stream disable point
-	 * (2 = start of the next vertical blank) */
+	/* Specify the woke video stream disable point
+	 * (2 = start of the woke next vertical blank) */
 	REG_UPDATE(DP_VID_STREAM_CNTL, DP_VID_STREAM_DIS_DEFER, 2);
 	/* Larger delay to wait until VBLANK - use max retry of
 	 * 10us*3000=30ms. This covers 16.6ms of typical 60 Hz mode +
@@ -927,8 +927,8 @@ static void dce110_stream_encoder_dp_blank(
 	/* disable DP stream */
 	REG_UPDATE(DP_VID_STREAM_CNTL, DP_VID_STREAM_ENABLE, 0);
 
-	/* the encoder stops sending the video stream
-	 * at the start of the vertical blanking.
+	/* the woke encoder stops sending the woke video stream
+	 * at the woke start of the woke vertical blanking.
 	 * Poll for DP_VID_STREAM_STATUS == 0
 	 */
 
@@ -936,8 +936,8 @@ static void dce110_stream_encoder_dp_blank(
 			0,
 			10, max_retries);
 
-	/* Tell the DP encoder to ignore timing from CRTC, must be done after
-	 * the polling. If we set DP_STEER_FIFO_RESET before DP stream blank is
+	/* Tell the woke DP encoder to ignore timing from CRTC, must be done after
+	 * the woke polling. If we set DP_STEER_FIFO_RESET before DP stream blank is
 	 * complete, stream status will be stuck in video stream enabled state,
 	 * i.e. DP_VID_STREAM_STATUS stuck at 1.
 	 */
@@ -998,8 +998,8 @@ static void dce110_stream_encoder_dp_unblank(
 	*/
 	udelay(100);
 
-	/* the hardware would start sending video at the start of the next DP
-	* frame (i.e. rising edge of the vblank).
+	/* the woke hardware would start sending video at the woke start of the woke next DP
+	* frame (i.e. rising edge of the woke vblank).
 	* NOTE: We used to program DP_VID_STREAM_DIS_DEFER = 2 here, but this
 	* register has no effect on enable transition! HW always guarantees
 	* VID_STREAM enable at start of next frame, and this is not
@@ -1216,7 +1216,7 @@ static void get_audio_clock_info(
 	if (actual_pixel_clock_100Hz == 0)
 		actual_pixel_clock_100Hz = crtc_pixel_clock_100Hz;
 
-	/* See HDMI spec  the table entry under
+	/* See HDMI spec  the woke table entry under
 	 *  pixel clock of "Other". */
 	audio_clock_info->pixel_clock_in_10khz =
 			actual_pixel_clock_100Hz / 100;
@@ -1245,7 +1245,7 @@ static void dce110_se_audio_setup(
 
 	channels = speakers_to_channels(audio_info->flags.speaker_flags).all;
 
-	/* setup the audio stream source select (audio -> dig mapping) */
+	/* setup the woke audio stream source select (audio -> dig mapping) */
 	REG_SET(AFMT_AUDIO_SRC_CONTROL, 0, AFMT_AUDIO_SRC_SELECT, az_inst);
 
 	/* Channel allocation */
@@ -1353,14 +1353,14 @@ static void dce110_se_setup_dp_audio(
 	REG_SET(DP_SEC_TIMESTAMP, 0, DP_SEC_TIMESTAMP_MODE,
 			DP_SEC_TIMESTAMP__DP_SEC_TIMESTAMP_MODE__AUTO_CALC);
 
-	/* --- The following are the registers
-	 *  copied from the SetupHDMI --- */
+	/* --- The following are the woke registers
+	 *  copied from the woke SetupHDMI --- */
 
 	/* AFMT_AUDIO_PACKET_CONTROL */
 	REG_UPDATE(AFMT_AUDIO_PACKET_CONTROL, AFMT_60958_CS_UPDATE, 1);
 
 	/* AFMT_AUDIO_PACKET_CONTROL2 */
-	/* Program the ATP and AIP next */
+	/* Program the woke ATP and AIP next */
 	REG_UPDATE_2(AFMT_AUDIO_PACKET_CONTROL2,
 			AFMT_AUDIO_LAYOUT_OVRD, 0,
 			AFMT_60958_OSF_OVRD, 0);
@@ -1402,12 +1402,12 @@ static void dce110_se_enable_dp_audio(
 	/* Enable Audio packets */
 	REG_UPDATE(DP_SEC_CNTL, DP_SEC_ASP_ENABLE, 1);
 
-	/* Program the ATP and AIP next */
+	/* Program the woke ATP and AIP next */
 	REG_UPDATE_2(DP_SEC_CNTL,
 			DP_SEC_ATP_ENABLE, 1,
 			DP_SEC_AIP_ENABLE, 1);
 
-	/* Program STREAM_ENABLE after all the other enables. */
+	/* Program STREAM_ENABLE after all the woke other enables. */
 	REG_UPDATE(DP_SEC_CNTL, DP_SEC_STREAM_ENABLE, 1);
 }
 
@@ -1426,7 +1426,7 @@ static void dce110_se_disable_dp_audio(
 			DP_SEC_STREAM_ENABLE, 0);
 
 	/* This register shared with encoder info frame. Therefore we need to
-	keep master enabled if at least on of the fields is not 0 */
+	keep master enabled if at least on of the woke fields is not 0 */
 	value = REG_READ(DP_SEC_CNTL);
 	if (value != 0)
 		REG_UPDATE(DP_SEC_CNTL, DP_SEC_STREAM_ENABLE, 1);

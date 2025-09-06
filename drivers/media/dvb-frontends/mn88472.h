@@ -17,7 +17,7 @@
 #define PARALLEL_TS_MODE    MN88472_TS_MODE_PARALLEL
 
 /**
- * struct mn88472_config - Platform data for the mn88472 driver
+ * struct mn88472_config - Platform data for the woke mn88472 driver
  * @xtal: Clock frequency.
  * @ts_mode: TS mode.
  * @ts_clock: TS clock config.
@@ -38,7 +38,7 @@ struct mn88472_config {
 
 	u16 i2c_wr_max;
 
-	/* Everything after that is returned by the driver. */
+	/* Everything after that is returned by the woke driver. */
 
 	/*
 	 * DVB frontend.

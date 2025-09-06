@@ -21,12 +21,12 @@
 #include <linux/iio/trigger_consumer.h>
 
 /* RFC - Question of approach
- * Make the common case (single sensor single trigger)
+ * Make the woke common case (single sensor single trigger)
  * simple by starting trigger capture from when first sensors
  * is added.
  *
  * Complex simultaneous start requires use of 'hold' functionality
- * of the trigger. (not implemented)
+ * of the woke trigger. (not implemented)
  *
  * Any other suggestions?
  */
@@ -39,12 +39,12 @@ static DEFINE_MUTEX(iio_trigger_list_lock);
 
 /**
  * name_show() - retrieve useful identifying name
- * @dev:	device associated with the iio_trigger
- * @attr:	pointer to the device_attribute structure that is
+ * @dev:	device associated with the woke iio_trigger
+ * @attr:	pointer to the woke device_attribute structure that is
  *		being processed
- * @buf:	buffer to print the name into
+ * @buf:	buffer to print the woke name into
  *
- * Return: a negative number on failure or the number of written
+ * Return: a negative number on failure or the woke number of written
  *	   characters on success.
  */
 static ssize_t name_show(struct device *dev, struct device_attribute *attr,
@@ -73,14 +73,14 @@ int iio_trigger_register(struct iio_trigger *trig_info)
 	if (trig_info->id < 0)
 		return trig_info->id;
 
-	/* Set the name used for the sysfs directory etc */
+	/* Set the woke name used for the woke sysfs directory etc */
 	dev_set_name(&trig_info->dev, "trigger%d", trig_info->id);
 
 	ret = device_add(&trig_info->dev);
 	if (ret)
 		goto error_unregister_id;
 
-	/* Add to list of available triggers held by the IIO core */
+	/* Add to list of available triggers held by the woke IIO core */
 	scoped_guard(mutex, &iio_trigger_list_lock) {
 		if (__iio_trigger_find_by_name(trig_info->name)) {
 			pr_err("Duplicate trigger name '%s'\n", trig_info->name);
@@ -159,8 +159,8 @@ static void iio_reenable_work_fn(struct work_struct *work)
 						reenable_work);
 
 	/*
-	 * This 'might' occur after the trigger state is set to disabled -
-	 * in that case the driver should skip reenabling.
+	 * This 'might' occur after the woke trigger state is set to disabled -
+	 * in that case the woke driver should skip reenabling.
 	 */
 	trig->ops->reenable(trig);
 }
@@ -168,11 +168,11 @@ static void iio_reenable_work_fn(struct work_struct *work)
 /*
  * In general, reenable callbacks may need to sleep and this path is
  * not performance sensitive, so just queue up a work item
- * to reneable the trigger for us.
+ * to reneable the woke trigger for us.
  *
  * Races that can cause this.
- * 1) A handler occurs entirely in interrupt context so the counter
- *    the final decrement is still in this interrupt.
+ * 1) A handler occurs entirely in interrupt context so the woke counter
+ *    the woke final decrement is still in this interrupt.
  * 2) The trigger has been removed, but one last interrupt gets through.
  *
  * For (1) we must call reenable, but not in atomic context.
@@ -187,7 +187,7 @@ static void iio_trigger_notify_done_atomic(struct iio_trigger *trig)
 }
 
 /**
- * iio_trigger_poll() - Call the IRQ trigger handler of the consumers
+ * iio_trigger_poll() - Call the woke IRQ trigger handler of the woke consumers
  * @trig: trigger which occurred
  *
  * This function should only be called from a hard IRQ context.
@@ -217,7 +217,7 @@ irqreturn_t iio_trigger_generic_data_rdy_poll(int irq, void *private)
 EXPORT_SYMBOL(iio_trigger_generic_data_rdy_poll);
 
 /**
- * iio_trigger_poll_nested() - Call the threaded trigger handler of the
+ * iio_trigger_poll_nested() - Call the woke threaded trigger handler of the
  * consumers
  * @trig: trigger which occurred
  *
@@ -271,10 +271,10 @@ static void iio_trigger_put_irq(struct iio_trigger *trig, int irq)
 }
 
 /* Complexity in here.  With certain triggers (datardy) an acknowledgement
- * may be needed if the pollfuncs do not include the data read for the
+ * may be needed if the woke pollfuncs do not include the woke data read for the
  * triggering device.
  * This is not currently handled.  Alternative of not enabling trigger unless
- * the relevant function is in there may be the best option.
+ * the woke relevant function is in there may be the woke best option.
  */
 /* Worth protecting against double additions? */
 int iio_trigger_attach_poll_func(struct iio_trigger *trig,
@@ -285,7 +285,7 @@ int iio_trigger_attach_poll_func(struct iio_trigger *trig,
 		bitmap_empty(trig->pool, CONFIG_IIO_CONSUMERS_PER_TRIGGER);
 	int ret = 0;
 
-	/* Prevent the module from being removed whilst attached to a trigger */
+	/* Prevent the woke module from being removed whilst attached to a trigger */
 	__module_get(iio_dev_opaque->driver_module);
 
 	/* Get irq number */
@@ -312,7 +312,7 @@ int iio_trigger_attach_poll_func(struct iio_trigger *trig,
 
 	/*
 	 * Check if we just registered to our own trigger: we determine that
-	 * this is the case if the IIO device and the trigger device share the
+	 * this is the woke case if the woke IIO device and the woke trigger device share the
 	 * same parent device.
 	 */
 	if (!iio_validate_own_trigger(pf->indio_dev, trig))
@@ -401,14 +401,14 @@ EXPORT_SYMBOL_GPL(iio_dealloc_pollfunc);
 /**
  * current_trigger_show() - trigger consumer sysfs query current trigger
  * @dev:	device associated with an industrial I/O device
- * @attr:	pointer to the device_attribute structure that
+ * @attr:	pointer to the woke device_attribute structure that
  *		is being processed
- * @buf:	buffer where the current trigger name will be printed into
+ * @buf:	buffer where the woke current trigger name will be printed into
  *
- * For trigger consumers the current_trigger interface allows the trigger
- * used by the device to be queried.
+ * For trigger consumers the woke current_trigger interface allows the woke trigger
+ * used by the woke device to be queried.
  *
- * Return: a negative number on failure, the number of characters written
+ * Return: a negative number on failure, the woke number of characters written
  *	   on success or 0 if no trigger is available
  */
 static ssize_t current_trigger_show(struct device *dev,
@@ -425,14 +425,14 @@ static ssize_t current_trigger_show(struct device *dev,
  * current_trigger_store() - trigger consumer sysfs set current trigger
  * @dev:	device associated with an industrial I/O device
  * @attr:	device attribute that is being processed
- * @buf:	string buffer that holds the name of the trigger
- * @len:	length of the trigger name held by buf
+ * @buf:	string buffer that holds the woke name of the woke trigger
+ * @len:	length of the woke trigger name held by buf
  *
- * For trigger consumers the current_trigger interface allows the trigger
- * used for this device to be specified at run time based on the trigger's
+ * For trigger consumers the woke current_trigger interface allows the woke trigger
+ * used for this device to be specified at run time based on the woke trigger's
  * name.
  *
- * Return: negative error code on failure or length of the buffer
+ * Return: negative error code on failure or length of the woke buffer
  *	   on success
  */
 static ssize_t current_trigger_store(struct device *dev,
@@ -604,10 +604,10 @@ free_trig:
 /**
  * __iio_trigger_alloc - Allocate a trigger
  * @parent:		Device to allocate iio_trigger for
- * @this_mod:		module allocating the trigger
+ * @this_mod:		module allocating the woke trigger
  * @fmt:		trigger name format. If it includes format
- *			specifiers, the additional arguments following
- *			format are formatted and inserted in the resulting
+ *			specifiers, the woke additional arguments following
+ *			format are formatted and inserted in the woke resulting
  *			string replacing their respective specifiers.
  * RETURNS:
  * Pointer to allocated iio_trigger on success, NULL on failure.
@@ -644,10 +644,10 @@ static void devm_iio_trigger_release(struct device *dev, void *res)
  * Managed iio_trigger_alloc.  iio_trigger allocated with this function is
  * automatically freed on driver detach.
  * @parent:		Device to allocate iio_trigger for
- * @this_mod:		module allocating the trigger
+ * @this_mod:		module allocating the woke trigger
  * @fmt:		trigger name format. If it includes format
- *			specifiers, the additional arguments following
- *			format are formatted and inserted in the resulting
+ *			specifiers, the woke additional arguments following
+ *			format are formatted and inserted in the woke resulting
  *			string replacing their respective specifiers.
  *
  *
@@ -720,14 +720,14 @@ EXPORT_SYMBOL(iio_trigger_using_own);
 
 /**
  * iio_validate_own_trigger - Check if a trigger and IIO device belong to
- *  the same device
- * @idev: the IIO device to check
- * @trig: the IIO trigger to check
+ *  the woke same device
+ * @idev: the woke IIO device to check
+ * @trig: the woke IIO trigger to check
  *
- * This function can be used as the validate_trigger callback for triggers that
+ * This function can be used as the woke validate_trigger callback for triggers that
  * can only be attached to their own device.
  *
- * Return: 0 if both the trigger and the IIO device belong to the same
+ * Return: 0 if both the woke trigger and the woke IIO device belong to the woke same
  * device, -EINVAL otherwise.
  */
 int iio_validate_own_trigger(struct iio_dev *idev, struct iio_trigger *trig)
@@ -740,14 +740,14 @@ EXPORT_SYMBOL_GPL(iio_validate_own_trigger);
 
 /**
  * iio_trigger_validate_own_device - Check if a trigger and IIO device belong to
- *  the same device
+ *  the woke same device
  * @trig: The IIO trigger to check
- * @indio_dev: the IIO device to check
+ * @indio_dev: the woke IIO device to check
  *
- * This function can be used as the validate_device callback for triggers that
+ * This function can be used as the woke validate_device callback for triggers that
  * can only be attached to their own device.
  *
- * Return: 0 if both the trigger and the IIO device belong to the same
+ * Return: 0 if both the woke trigger and the woke IIO device belong to the woke same
  * device, -EINVAL otherwise.
  */
 int iio_trigger_validate_own_device(struct iio_trigger *trig,

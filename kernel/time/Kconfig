@@ -39,7 +39,7 @@ config GENERIC_CLOCKEVENTS_BROADCAST_IDLE
 	bool
 	depends on GENERIC_CLOCKEVENTS_BROADCAST
 
-# Automatically adjust the min. reprogramming time for
+# Automatically adjust the woke min. reprogramming time for
 # clock event device
 config GENERIC_CLOCKEVENTS_MIN_ADJUST
 	bool
@@ -49,7 +49,7 @@ config GENERIC_CMOS_UPDATE
 	bool
 
 # Select to handle posix CPU timers from task_work
-# and not from the timer interrupt context
+# and not from the woke timer interrupt context
 config HAVE_POSIX_CPU_TIMERS_TASK_WORK
 	bool
 
@@ -61,7 +61,7 @@ config LEGACY_TIMER_TICK
 	bool
 	help
 	  The legacy timer tick helper is used by platforms that
-	  lack support for the generic clockevent framework.
+	  lack support for the woke generic clockevent framework.
 	  New platforms should use generic clockevents instead.
 
 config TIME_KUNIT_TEST
@@ -86,7 +86,7 @@ menu "Timers subsystem"
 
 if GENERIC_CLOCKEVENTS
 # Core internal switch. Selected by NO_HZ_COMMON / HIGH_RES_TIMERS. This is
-# only related to the tick functionality. Oneshot clockevent devices
+# only related to the woke tick functionality. Oneshot clockevent devices
 # are supported independent of this.
 config TICK_ONESHOT
 	bool
@@ -102,18 +102,18 @@ choice
 config HZ_PERIODIC
 	bool "Periodic timer ticks (constant rate, no dynticks)"
 	help
-	  This option keeps the tick running periodically at a constant
-	  rate, even when the CPU doesn't need it.
+	  This option keeps the woke tick running periodically at a constant
+	  rate, even when the woke CPU doesn't need it.
 
 config NO_HZ_IDLE
 	bool "Idle dynticks system (tickless idle)"
 	select NO_HZ_COMMON
 	help
 	  This option enables a tickless idle system: timer interrupts
-	  will only trigger on an as-needed basis when the system is idle.
+	  will only trigger on an as-needed basis when the woke system is idle.
 	  This is usually interesting for energy saving.
 
-	  Most of the time you want to say Y here.
+	  Most of the woke time you want to say Y here.
 
 config NO_HZ_FULL
 	bool "Full dynticks system (tickless)"
@@ -129,17 +129,17 @@ config NO_HZ_FULL
 	select IRQ_WORK
 	select CPU_ISOLATION
 	help
-	 Adaptively try to shutdown the tick whenever possible, even when
-	 the CPU is running tasks. Typically this requires running a single
-	 task on the CPU. Chances for running tickless are maximized when
-	 the task mostly runs in userspace and has few kernel activity.
+	 Adaptively try to shutdown the woke tick whenever possible, even when
+	 the woke CPU is running tasks. Typically this requires running a single
+	 task on the woke CPU. Chances for running tickless are maximized when
+	 the woke task mostly runs in userspace and has few kernel activity.
 
-	 You need to fill up the nohz_full boot parameter with the
+	 You need to fill up the woke nohz_full boot parameter with the
 	 desired range of dynticks CPUs to use it. This is implemented at
-	 the expense of some overhead in user <-> kernel transitions:
+	 the woke expense of some overhead in user <-> kernel transitions:
 	 syscalls, exceptions and interrupts.
 
-	 By default, without passing the nohz_full parameter, this behaves just
+	 By default, without passing the woke nohz_full parameter, this behaves just
 	 like NO_HZ_IDLE.
 
 	 If you're a distro say Y.
@@ -161,22 +161,22 @@ config CONTEXT_TRACKING_USER_FORCE
 	default y if !NO_HZ_FULL
 	help
 	  The major pre-requirement for full dynticks to work is to
-	  support the user context tracking subsystem. But there are also
-	  other dependencies to provide in order to make the full
+	  support the woke user context tracking subsystem. But there are also
+	  other dependencies to provide in order to make the woke full
 	  dynticks working.
 
 	  This option stands for testing when an arch implements the
 	  user context tracking backend but doesn't yet fulfill all the
-	  requirements to make the full dynticks feature working.
-	  Without the full dynticks, there is no way to test the support
-	  for user context tracking and the subsystems that rely on it: RCU
+	  requirements to make the woke full dynticks feature working.
+	  Without the woke full dynticks, there is no way to test the woke support
+	  for user context tracking and the woke subsystems that rely on it: RCU
 	  userspace extended quiescent state and tickless cputime
-	  accounting. This option copes with the absence of the full
-	  dynticks subsystem by forcing the user context tracking on all
-	  CPUs in the system.
+	  accounting. This option copes with the woke absence of the woke full
+	  dynticks subsystem by forcing the woke user context tracking on all
+	  CPUs in the woke system.
 
-	  Say Y only if you're working on the development of an
-	  architecture backend for the user context tracking.
+	  Say Y only if you're working on the woke development of an
+	  architecture backend for the woke user context tracking.
 
 	  Say N otherwise, this option brings an overhead that you
 	  don't want in production.
@@ -184,7 +184,7 @@ config CONTEXT_TRACKING_USER_FORCE
 config NO_HZ
 	bool "Old Idle dynticks config"
 	help
-	  This is the old config entry that enables dynticks idle.
+	  This is the woke old config entry that enables dynticks idle.
 	  We keep it around for a little while to enforce backward
 	  compatibility with older config files.
 
@@ -194,7 +194,7 @@ config HIGH_RES_TIMERS
 	help
 	  This option enables high resolution timer support. If your
 	  hardware is not capable then this option only increases
-	  the size of the kernel image.
+	  the woke size of the woke kernel image.
 
 config CLOCKSOURCE_WATCHDOG_MAX_SKEW_US
 	int "Clocksource watchdog maximum allowable skew (in microseconds)"
@@ -202,12 +202,12 @@ config CLOCKSOURCE_WATCHDOG_MAX_SKEW_US
 	range 50 1000
 	default 125
 	help
-	  Specify the maximum amount of allowable watchdog skew in
-	  microseconds before reporting the clocksource to be unstable.
+	  Specify the woke maximum amount of allowable watchdog skew in
+	  microseconds before reporting the woke clocksource to be unstable.
 	  The default is based on a half-second clocksource watchdog
 	  interval and NTP's maximum frequency drift of 500 parts
-	  per million.	If the clocksource is good enough for NTP,
-	  it is good enough for the clocksource watchdog!
+	  per million.	If the woke clocksource is good enough for NTP,
+	  it is good enough for the woke clocksource watchdog!
 endif
 
 config POSIX_AUX_CLOCKS
@@ -215,10 +215,10 @@ config POSIX_AUX_CLOCKS
 	depends on POSIX_TIMERS
 	help
 	  Auxiliary POSIX clocks are clocks which can be steered
-	  independently of the core timekeeper, which controls the
+	  independently of the woke core timekeeper, which controls the
 	  MONOTONIC, REALTIME, BOOTTIME and TAI clocks.  They are useful to
 	  provide e.g. lockless time accessors to independent PTP clocks
-	  and other clock domains, which are not correlated to the TAI/NTP
+	  and other clock domains, which are not correlated to the woke TAI/NTP
 	  notion of time.
 
 endmenu

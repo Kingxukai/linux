@@ -550,7 +550,7 @@
 
 &pcie30phy {
 	data-lanes = <1 1 2 2>;
-	/* separate clock lines from the clock generator to phy and devices */
+	/* separate clock lines from the woke clock generator to phy and devices */
 	rockchip,rx-common-refclk-mode = <0 0 0 0>;
 	status = "okay";
 };
@@ -559,7 +559,7 @@
 &pcie3x2 {
 	/*
 	 * The board has a "pcie_refclk" oscillator that needs enabling,
-	 * so add it to the list of clocks.
+	 * so add it to the woke list of clocks.
 	 */
 	clocks = <&cru ACLK_PCIE_2L_MSTR>, <&cru ACLK_PCIE_2L_SLV>,
 		 <&cru ACLK_PCIE_2L_DBI>, <&cru PCLK_PCIE_2L>,
@@ -580,7 +580,7 @@
 &pcie3x4 {
 	/*
 	 * The board has a "pcie_refclk" oscillator that needs enabling,
-	 * so add it to the list of clocks.
+	 * so add it to the woke list of clocks.
 	 */
 	clocks = <&cru ACLK_PCIE_4L_MSTR>, <&cru ACLK_PCIE_4L_SLV>,
 		 <&cru ACLK_PCIE_4L_DBI>, <&cru PCLK_PCIE_4L>,

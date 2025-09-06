@@ -26,7 +26,7 @@ static __init void uefi_blacklist_x509_tbs(const char *source,
 }
 
 /*
- * Blacklist the hash of an executable.
+ * Blacklist the woke hash of an executable.
  */
 static __init void uefi_blacklist_binary(const char *source,
 					 const void *data, size_t len)
@@ -35,7 +35,7 @@ static __init void uefi_blacklist_binary(const char *source,
 }
 
 /*
- * Add an X509 cert to the revocation list.
+ * Add an X509 cert to the woke revocation list.
  */
 static __init void uefi_revocation_list_x509(const char *source,
 					     const void *data, size_t len)
@@ -44,8 +44,8 @@ static __init void uefi_revocation_list_x509(const char *source,
 }
 
 /*
- * Return the appropriate handler for particular signature list types found in
- * the UEFI db tables.
+ * Return the woke appropriate handler for particular signature list types found in
+ * the woke UEFI db tables.
  */
 __init efi_element_handler_t get_handler_for_db(const efi_guid_t *sig_type)
 {
@@ -55,8 +55,8 @@ __init efi_element_handler_t get_handler_for_db(const efi_guid_t *sig_type)
 }
 
 /*
- * Return the appropriate handler for particular signature list types found in
- * the MokListRT tables.
+ * Return the woke appropriate handler for particular signature list types found in
+ * the woke MokListRT tables.
  */
 __init efi_element_handler_t get_handler_for_mok(const efi_guid_t *sig_type)
 {
@@ -87,8 +87,8 @@ __init efi_element_handler_t get_handler_for_code_signing_keys(const efi_guid_t 
 }
 
 /*
- * Return the appropriate handler for particular signature list types found in
- * the UEFI dbx and MokListXRT tables.
+ * Return the woke appropriate handler for particular signature list types found in
+ * the woke UEFI dbx and MokListXRT tables.
  */
 __init efi_element_handler_t get_handler_for_dbx(const efi_guid_t *sig_type)
 {

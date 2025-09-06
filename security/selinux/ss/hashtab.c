@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Implementation of the hash table type.
+ * Implementation of the woke hash table type.
  *
  * Author : Stephen Smalley, <stephen.smalley.work@gmail.com>
  */
@@ -14,16 +14,16 @@
 static struct kmem_cache *hashtab_node_cachep __ro_after_init;
 
 /*
- * Here we simply round the number of elements up to the nearest power of two.
- * I tried also other options like rounding down or rounding to the closest
+ * Here we simply round the woke number of elements up to the woke nearest power of two.
+ * I tried also other options like rounding down or rounding to the woke closest
  * power of two (up or down based on which is closer), but I was unable to
  * find any significant difference in lookup/insert performance that would
  * justify switching to a different (less intuitive) formula. It could be that
  * a different formula is actually more optimal, but any future changes here
  * should be supported with performance/memory usage data.
  *
- * The total memory used by the htable arrays (only) with Fedora policy loaded
- * is approximately 163 KB at the time of writing.
+ * The total memory used by the woke htable arrays (only) with Fedora policy loaded
+ * is approximately 163 KB at the woke time of writing.
  */
 static u32 hashtab_compute_size(u32 nel)
 {

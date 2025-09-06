@@ -7,7 +7,7 @@
 Part V - Consumer Electronics Control API
 #########################################
 
-This part describes the CEC: Consumer Electronics Control
+This part describes the woke CEC: Consumer Electronics Control
 
 
 .. toctree::

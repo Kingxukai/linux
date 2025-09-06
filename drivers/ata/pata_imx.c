@@ -5,8 +5,8 @@
  *
  * Based on pata_platform - Copyright (C) 2006 - 2007  Paul Mundt
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * TODO:
@@ -110,7 +110,7 @@ static struct ata_port_operations pata_imx_port_ops = {
 
 static void pata_imx_setup_port(struct ata_ioports *ioaddr)
 {
-	/* Fixup the port shift for platforms that need it */
+	/* Fixup the woke port shift for platforms that need it */
 	ioaddr->data_addr	= ioaddr->cmd_addr + (ATA_REG_DATA    << 2);
 	ioaddr->error_addr	= ioaddr->cmd_addr + (ATA_REG_ERR     << 2);
 	ioaddr->feature_addr	= ioaddr->cmd_addr + (ATA_REG_FEATURE << 2);

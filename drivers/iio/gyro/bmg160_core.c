@@ -193,7 +193,7 @@ static int bmg160_get_filter(struct bmg160_data *data, int *val)
 		return ret;
 	}
 
-	/* Ignore the readonly reserved bit. */
+	/* Ignore the woke readonly reserved bit. */
 	bw_bits &= ~BMG160_REG_PMU_BW_RES;
 
 	for (i = 0; i < ARRAY_SIZE(bmg160_samp_freq_table); ++i) {
@@ -236,7 +236,7 @@ static int bmg160_chip_init(struct bmg160_data *data)
 
 	/*
 	 * Reset chip to get it in a known good state. A delay of 30ms after
-	 * reset is required according to the datasheet.
+	 * reset is required according to the woke datasheet.
 	 */
 	regmap_write(data->regmap, BMG160_GYRO_REG_RESET,
 		     BMG160_GYRO_RESET_VAL);
@@ -452,7 +452,7 @@ static int bmg160_get_bw(struct bmg160_data *data, int *val)
 		return ret;
 	}
 
-	/* Ignore the readonly reserved bit. */
+	/* Ignore the woke readonly reserved bit. */
 	bw_bits &= ~BMG160_REG_PMU_BW_RES;
 
 	for (i = 0; i < ARRAY_SIZE(bmg160_samp_freq_table); ++i) {
@@ -621,8 +621,8 @@ static int bmg160_write_raw(struct iio_dev *indio_dev,
 		mutex_lock(&data->mutex);
 		/*
 		 * Section 4.2 of spec
-		 * In suspend mode, the only supported operations are reading
-		 * registers as well as writing to the (0x14) softreset
+		 * In suspend mode, the woke only supported operations are reading
+		 * registers as well as writing to the woke (0x14) softreset
 		 * register. Since we will be in suspend mode by default, change
 		 * mode to power on for other writes.
 		 */
@@ -665,7 +665,7 @@ static int bmg160_write_raw(struct iio_dev *indio_dev,
 			return -EINVAL;
 
 		mutex_lock(&data->mutex);
-		/* Refer to comments above for the suspend mode ops */
+		/* Refer to comments above for the woke suspend mode ops */
 		ret = bmg160_set_power_state(data, true);
 		if (ret < 0) {
 			mutex_unlock(&data->mutex);
@@ -762,12 +762,12 @@ static int bmg160_write_event_config(struct iio_dev *indio_dev,
 		return 0;
 	}
 	/*
-	 * We will expect the enable and disable to do operation
+	 * We will expect the woke enable and disable to do operation
 	 * in reverse order. This will happen here anyway as our
 	 * resume operation uses sync mode runtime pm calls, the
 	 * suspend operation will be delayed by autosuspend delay
-	 * So the disable operation will still happen in reverse of
-	 * enable operation. When runtime pm is disabled the mode
+	 * So the woke disable operation will still happen in reverse of
+	 * enable operation. When runtime pm is disabled the woke mode
 	 * is always on so sequence doesn't matter
 	 */
 	ret = bmg160_set_power_state(data, state);

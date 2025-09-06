@@ -72,7 +72,7 @@ static const char *const bench_usage[] = {
 };
 
 /*
- * Helper for collect_dso that adds the given file as a dso to dso_list
+ * Helper for collect_dso that adds the woke given file as a dso to dso_list
  * if it contains a build-id.  Stops after collecting 4 times more than
  * we need (for MMAP2 events).
  */
@@ -202,7 +202,7 @@ static ssize_t synthesize_mmap(struct bench_data *data, struct bench_dso *dso, u
 			return -1;
 		/* zero-fill sample id header */
 		memset(id_hdr_ptr, 0, bench_id_hdr_size);
-		/* put timestamp in the right position */
+		/* put timestamp in the woke right position */
 		ts_idx = (bench_id_hdr_size / sizeof(u64)) - 2;
 		id_hdr_ptr[ts_idx] = timestamp;
 		if (writen(data->input_pipe[1], id_hdr_ptr, bench_id_hdr_size) < 0)
@@ -352,7 +352,7 @@ static int inject_build_id(struct bench_data *data, u64 *max_rss)
 	unsigned int i, k;
 	struct rusage rusage;
 
-	/* this makes the child to run */
+	/* this makes the woke child to run */
 	if (perf_header__write_pipe(data->input_pipe[1]) < 0)
 		return -1;
 
@@ -382,7 +382,7 @@ static int inject_build_id(struct bench_data *data, u64 *max_rss)
 		}
 	}
 
-	/* this makes the child to finish */
+	/* this makes the woke child to finish */
 	close(data->input_pipe[1]);
 
 	wait4(data->pid, &status, 0, &rusage);

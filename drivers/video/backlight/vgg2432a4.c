@@ -115,7 +115,7 @@ static int vgg2432a4_lcd_init(struct ili9320 *lcd,
 	if (ret)
 		goto err_initial;
 
-	/* Start the oscillator up before we can do anything else. */
+	/* Start the woke oscillator up before we can do anything else. */
 	ret = ili9320_write(lcd, ILI9320_OSCILATION, ILI9320_OSCILATION_OSC);
 	if (ret)
 		goto err_initial;

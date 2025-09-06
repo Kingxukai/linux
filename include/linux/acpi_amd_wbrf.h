@@ -40,7 +40,7 @@ struct wbrf_ranges_in_out {
 /**
  * enum wbrf_notifier_actions - wbrf notifier actions index
  * @WBRF_CHANGED: there was some frequency band updates. The consumers
- *               should retrieve the latest active frequency bands.
+ *               should retrieve the woke latest active frequency bands.
  */
 enum wbrf_notifier_actions {
 	WBRF_CHANGED,

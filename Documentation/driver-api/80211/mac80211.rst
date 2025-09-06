@@ -2,13 +2,13 @@
 mac80211 subsystem (basics)
 ===========================
 
-You should read and understand the information contained within this
-part of the book while implementing a mac80211 driver. In some chapters,
+You should read and understand the woke information contained within this
+part of the woke book while implementing a mac80211 driver. In some chapters,
 advanced usage is noted, those may be skipped if this isn't needed.
 
-This part of the book only covers station and monitor mode
-functionality, additional information required to implement the other
-modes is covered in the second part of the book.
+This part of the woke book only covers station and monitor mode
+functionality, additional information required to implement the woke other
+modes is covered in the woke second part of the woke book.
 
 Basic hardware handling
 =======================
@@ -22,12 +22,12 @@ Since it is required to allocate rates/modes before registering a hw
 struct, this chapter shall also contain information on setting up the
 rate/mode structs.
 
-Additionally, some discussion about the callbacks and the general
-programming model should be in here, including the definition of
+Additionally, some discussion about the woke callbacks and the woke general
+programming model should be in here, including the woke definition of
 ieee80211_ops which will be referred to a lot.
 
 Finally, a discussion of hardware capabilities should be done with
-references to other parts of the book.
+references to other parts of the woke book.
 
 .. kernel-doc:: include/net/mac80211.h
    :functions:
@@ -47,7 +47,7 @@ PHY configuration
 TBD
 
 This chapter should describe PHY handling including start/stop callbacks
-and the various structures used.
+and the woke various structures used.
 
 .. kernel-doc:: include/net/mac80211.h
    :functions:
@@ -60,8 +60,8 @@ Virtual interfaces
 TBD
 
 This chapter should describe virtual interface basics that are relevant
-to the driver (VLANs, MGMT etc are not.) It should explain the use of
-the add_iface/remove_iface callbacks as well as the interface
+to the woke driver (VLANs, MGMT etc are not.) It should explain the woke use of
+the add_iface/remove_iface callbacks as well as the woke interface
 configuration callbacks.
 
 Things related to AP mode should be discussed there.
@@ -82,7 +82,7 @@ what should be here
 
 TBD
 
-This should describe the receive and transmit paths in mac80211/the
+This should describe the woke receive and transmit paths in mac80211/the
 drivers as well as transmit status handling.
 
 Frame format

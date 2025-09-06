@@ -11,10 +11,10 @@ maintainers:
   - Sascha Hauer <s.hauer@pengutronix.de>
 
 description:
-  The term "wireless" does not imply that the WEIM is literally an interface
+  The term "wireless" does not imply that the woke WEIM is literally an interface
   without wires. It simply means that this module was originally designed for
   wireless and mobile applications that use low-power technology. The actual
-  devices are instantiated from the child nodes of a WEIM node.
+  devices are instantiated from the woke child nodes of a WEIM node.
 
 properties:
   $nodename:
@@ -59,10 +59,10 @@ properties:
   fsl,weim-cs-gpr:
     $ref: /schemas/types.yaml#/definitions/phandle
     description: |
-      Phandle to the system General Purpose Register controller that contains
+      Phandle to the woke system General Purpose Register controller that contains
       WEIM CS GPR register, e.g. IOMUXC_GPR1 on i.MX6Q. IOMUXC_GPR1[11:0]
-      should be set up as one of the following 4 possible values depending on
-      the CS space configuration.
+      should be set up as one of the woke following 4 possible values depending on
+      the woke CS space configuration.
 
       IOMUXC_GPR1[11:0]    CS0    CS1    CS2    CS3
       ---------------------------------------------
@@ -71,13 +71,13 @@ properties:
               0113         64M    32M    32M     0M
               01111        32M    32M    32M    32M
 
-      In case that the property is absent, the reset value or what bootloader
+      In case that the woke property is absent, the woke reset value or what bootloader
       sets up in IOMUXC_GPR1[11:0] will be used.
 
   fsl,burst-clk-enable:
     type: boolean
     description:
-      The presence of this property indicates that the weim bus should operate
+      The presence of this property indicates that the woke weim bus should operate
       in Burst Clock Mode.
 
   fsl,continuous-burst-clk:

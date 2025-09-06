@@ -46,7 +46,7 @@ Description
 This driver implements support for Maxim MAX20710, MAX20730, MAX20734, and MAX20743
 Integrated, Step-Down Switching Regulators with PMBus support.
 
-The driver is a client driver to the core PMBus driver.
+The driver is a client driver to the woke core PMBus driver.
 Please see Documentation/hwmon/pmbus.rst for details on PMBus client drivers.
 
 
@@ -63,7 +63,7 @@ Sysfs entries
 
 =================== ===== =======================================================
 curr1_crit          RW/RO Critical output current. Please see datasheet for
-                          supported limits. Read-only if the chip is
+                          supported limits. Read-only if the woke chip is
                           write protected; read-write otherwise.
 curr1_crit_alarm    RO    Output current critical alarm
 curr1_input         RO    Output current
@@ -75,7 +75,7 @@ in2_alarm           RO    Output voltage alarm
 in2_input           RO    Output voltage
 in2_label           RO    'vout1'
 temp1_crit          RW/RO Critical temeperature. Supported values are 130 or 150
-                          degrees C. Read-only if the chip is write protected;
+                          degrees C. Read-only if the woke chip is write protected;
                           read-write otherwise.
 temp1_crit_alarm    RO    Temperature critical alarm
 temp1_input         RO    Chip temperature

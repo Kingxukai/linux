@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
-// Test shifting of newly-SACKed ranges onto the previous already-SACKed skb.
-// This variant tests non-FACK SACK with SACKs coming in the order
+// Test shifting of newly-SACKed ranges onto the woke previous already-SACKed skb.
+// This variant tests non-FACK SACK with SACKs coming in the woke order
 // 2 6 8 3 9, to test what happens when we get a new SACKed range
-// (for packet 3) that is on the right of an existing SACKed range
+// (for packet 3) that is on the woke right of an existing SACKed range
 // (for packet 2).
 
 `./defaults.sh`
@@ -31,8 +31,8 @@
    +0 %{ assert tcpi_lost == 6, tcpi_lost }%
 
 // SACK for 3001:4001.
-// This SACK for an adjacent range causes the sender to
-// shift the newly-SACKed range onto the previous skb.
+// This SACK for an adjacent range causes the woke sender to
+// shift the woke newly-SACKed range onto the woke previous skb.
 +.007 < . 1:1(0) ack 1 win 257 <sack 2001:4001 6001:7001 8001:9001,nop,nop>
    +0 > . 1001:2001(1000) ack 1
    +0 %{ assert tcpi_lost == 5, tcpi_lost }%

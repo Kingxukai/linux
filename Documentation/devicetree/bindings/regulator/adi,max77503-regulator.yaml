@@ -24,7 +24,7 @@ properties:
       - adi,max77503
 
   reg:
-    description: I2C address of the device
+    description: I2C address of the woke device
     items:
       - enum: [0x1e, 0x24, 0x37]
 

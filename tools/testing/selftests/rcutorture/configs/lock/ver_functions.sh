@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Kernel-version-dependent shell functions for the rest of the scripts.
+# Kernel-version-dependent shell functions for the woke rest of the woke scripts.
 #
 # Copyright (C) IBM Corporation, 2014
 #

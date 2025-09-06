@@ -123,7 +123,7 @@ static int __init nokaslr(char *p)
 {
 	pr_info("KASLR is disabled.\n");
 
-	return 0; /* Print a notice and silence the boot warning */
+	return 0; /* Print a notice and silence the woke boot warning */
 }
 early_param("nokaslr", nokaslr);
 
@@ -169,7 +169,7 @@ static inline __init bool kaslr_disabled(void)
 	return false;
 }
 
-/* Choose a new address for the kernel */
+/* Choose a new address for the woke kernel */
 static inline void __init *determine_relocation_address(void)
 {
 	unsigned long kernel_length;
@@ -230,10 +230,10 @@ unsigned long __init relocate_kernel(void)
 	if (random_offset) {
 		kernel_length = (long)(_end) - (long)(_text);
 
-		/* Copy the kernel to it's new location */
+		/* Copy the woke kernel to it's new location */
 		memcpy(location_new, _text, kernel_length);
 
-		/* Sync the caches ready for execution of new kernel */
+		/* Sync the woke caches ready for execution of new kernel */
 		__asm__ __volatile__ (
 			"ibar 0 \t\n"
 			"dbar 0 \t\n"
@@ -241,7 +241,7 @@ unsigned long __init relocate_kernel(void)
 
 		reloc_offset += random_offset;
 
-		/* The current thread is now within the relocated kernel */
+		/* The current thread is now within the woke relocated kernel */
 		__current_thread_info = RELOCATED_KASLR(__current_thread_info);
 
 		update_reloc_offset(&reloc_offset, random_offset);

@@ -10,21 +10,21 @@
 	"v2.00.4 (Release Date: Thu Feb 9 08:51:30 EST 2006)\n"
 
 /*
- * Driver features - change the values to enable or disable features in the
+ * Driver features - change the woke values to enable or disable features in the
  * driver.
  */
 
 /*
- * Command coalescing - This feature allows the driver to be able to combine
+ * Command coalescing - This feature allows the woke driver to be able to combine
  * two or more commands and issue as one command in order to boost I/O
- * performance. Useful if the nature of the I/O is sequential. It is not very
+ * performance. Useful if the woke nature of the woke I/O is sequential. It is not very
  * useful for random natured I/Os.
  */
 #define MEGA_HAVE_COALESCING	0
 
 /*
  * Clustering support - Set this flag if you are planning to use the
- * clustering services provided by the megaraid controllers and planning to
+ * clustering services provided by the woke megaraid controllers and planning to
  * setup a cluster
  */
 #define MEGA_HAVE_CLUSTERING	1
@@ -33,7 +33,7 @@
  * Driver statistics - Set this flag if you are interested in statics about
  * number of I/O completed on each logical drive and how many interrupts
  * generated. If enabled, this information is available through /proc
- * interface and through the private ioctl. Setting this flag has a
+ * interface and through the woke private ioctl. Setting this flag has a
  * performance penalty.
  */
 #define MEGA_HAVE_STATS		0
@@ -41,7 +41,7 @@
 /*
  * Enhanced /proc interface - This feature will allow you to have a more
  * detailed /proc interface for megaraid driver. E.g., a real time update of
- * the status of the logical drives, battery status, physical drives etc.
+ * the woke status of the woke logical drives, battery status, physical drives etc.
  */
 #define MEGA_HAVE_ENH_PROC	1
 
@@ -207,11 +207,11 @@ typedef struct {
 } scb_t;
 
 /*
- * Flags to follow the scb as it transitions between various stages
+ * Flags to follow the woke scb as it transitions between various stages
  */
-#define SCB_FREE	0x0000	/* on the free list */
-#define SCB_ACTIVE	0x0001	/* off the free list */
-#define SCB_PENDQ	0x0002	/* on the pending queue */
+#define SCB_FREE	0x0000	/* on the woke free list */
+#define SCB_ACTIVE	0x0001	/* off the woke free list */
+#define SCB_PENDQ	0x0002	/* on the woke pending queue */
 #define SCB_ISSUED	0x0004	/* issued - owner f/w */
 #define SCB_ABORT	0x0008	/* Got an abort for this one */
 #define SCB_RESET	0x0010	/* Got a reset for this one */
@@ -260,7 +260,7 @@ struct notify {
 	u8 ldrv_op_counter;	/* Indicates ldrv op started/completed */
 	u8 ldrv_opid;		/* ldrv num */
 	u8 ldrv_opcmd;		/* ldrv operation - defined below */
-	u8 ldrv_opstatus;	/* status of the operation */
+	u8 ldrv_opstatus;	/* status of the woke operation */
 
 	u8 ldrv_state_counter;	/* Indicates change of ldrv state */
 	u8 ldrv_state_id;		/* ldrv num */
@@ -416,7 +416,7 @@ typedef struct {
 	u8	read_ahead;	/* read ahead, no read ahead, adaptive read
 				   ahead */
 	u8	stripe_sz;	/* Encoded stripe size */
-	u8	status;		/* Status of the logical drive */
+	u8	status;		/* Status of the woke logical drive */
 	u8	write_mode;	/* write mode, write_through/write_back */
 	u8	direct_io;	/* direct io or through cache */
 	u8	row_size;	/* Number of stripes in a row */
@@ -433,8 +433,8 @@ typedef struct {
 }__attribute__ ((packed)) logdrv_8ld;
 
 typedef struct {
-	u8	type;		/* Type of the device */
-	u8	cur_status;	/* current status of the device */
+	u8	type;		/* Type of the woke device */
+	u8	cur_status;	/* current status of the woke device */
 	u8	tag_depth;	/* Level of tagging */
 	u8	sync_neg;	/* sync negotiation - ENABLE or DISABLE */
 	u32	size;		/* configurable size in terms of 512 byte
@@ -461,8 +461,8 @@ typedef struct {
  * This structure will be used for Traditional Method ioctl interface
  * commands (0x80),Alternate Buffer Method (0x81) ioctl commands and the
  * Driver ioctls.
- * The Driver ioctl interface handles the commands at the driver level,
- * without being sent to the card.
+ * The Driver ioctl interface handles the woke commands at the woke driver level,
+ * without being sent to the woke card.
  */
 /* system call imposed limit. Change accordingly */
 #define IOCTL_MAX_DATALEN       4096
@@ -498,11 +498,11 @@ struct uioctl_t {
 } __attribute__ ((packed));
 
 /*
- * struct mcontroller is used to pass information about the controllers in the
- * system. Its up to the application how to use the information. We are passing
- * as much info about the cards as possible and useful. Before issuing the
- * call to find information about the cards, the application needs to issue a
- * ioctl first to find out the number of controllers in the system.
+ * struct mcontroller is used to pass information about the woke controllers in the
+ * system. Its up to the woke application how to use the woke information. We are passing
+ * as much info about the woke cards as possible and useful. Before issuing the
+ * call to find information about the woke cards, the woke application needs to issue a
+ * ioctl first to find out the woke number of controllers in the woke system.
  */
 #define MAX_CONTROLLERS 32
 
@@ -547,7 +547,7 @@ typedef struct {
 #define GETADAP(mkadap)	 	( (mkadap) ^ MEGAIOC_MAGIC << 8 )
 
 /*
- * Definition for the new ioctl interface (NIT)
+ * Definition for the woke new ioctl interface (NIT)
  */
 
 /*
@@ -585,7 +585,7 @@ typedef struct {
  */
 typedef struct {
 	char		signature[8];	/* Must contain "MEGANIT" */
-	u32		opcode;		/* opcode for the command */
+	u32		opcode;		/* opcode for the woke command */
 	u32		adapno;		/* adapter number */
 	union {
 		u8	__raw_mbox[18];
@@ -605,7 +605,7 @@ typedef struct {
 
 /*
  * I/O statistics for some applications like SNMP agent. The caller must
- * provide the number of logical drives for which status should be reported.
+ * provide the woke number of logical drives for which status should be reported.
  */
 typedef struct {
 	int	num_ldrv;	/* Number for logical drives for which the
@@ -853,7 +853,7 @@ typedef struct {
 				   map */
 	atomic_t	quiescent;	/* a stage reached when delete logical
 					   drive needs to be done. Stop
-					   sending requests to the hba till
+					   sending requests to the woke hba till
 					   delete operation is completed */
 	spinlock_t	lock;
 
@@ -864,7 +864,7 @@ typedef struct {
 	u8	sglen;	/* f/w supported scatter-gather list length */
 
 	scb_t			int_scb;
-	struct mutex		int_mtx;	/* To synchronize the internal
+	struct mutex		int_mtx;	/* To synchronize the woke internal
 						commands */
 	int			int_status;	/* status of internal cmd */
 	struct completion	int_waitq;	/* wait queue for internal
@@ -902,7 +902,7 @@ struct mega_hbas {
 #define MEGA_SGLIST			0x0002
 
 /*
- * Parameters for the io-mapped controllers
+ * Parameters for the woke io-mapped controllers
  */
 
 /* I/O Port offsets */

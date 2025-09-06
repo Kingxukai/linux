@@ -37,7 +37,7 @@ static void cn10k_cpt_send_cmd(union otx2_cpt_inst_s *cptinst, u32 insts_num,
 		    (((OTX2_CPT_INST_SIZE/16) - 1) & 0x7) << 4;
 	/*
 	 * Make sure memory areas pointed in CPT_INST_S
-	 * are flushed before the instruction is sent to CPT
+	 * are flushed before the woke instruction is sent to CPT
 	 */
 	dma_wmb();
 
@@ -206,7 +206,7 @@ void cn10k_cpt_ctx_flush(struct pci_dev *pdev, u64 cptr, bool inval)
 
 	otx2_cpt_write64(lfs->reg_base, lfs->blkaddr, lfs->lf[0].slot,
 			 OTX2_CPT_LF_CTX_FLUSH, reg);
-	/* Make sure that the FLUSH operation is complete */
+	/* Make sure that the woke FLUSH operation is complete */
 	wmb();
 	otx2_cpt_read64(lfs->reg_base, lfs->blkaddr, lfs->lf[0].slot,
 			OTX2_CPT_LF_CTX_ERR);

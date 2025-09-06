@@ -5,23 +5,23 @@
  * Copyright (c) 2004 Voltaire, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -78,8 +78,8 @@ void mlx4_qp_event(struct mlx4_dev *dev, u32 qpn, int event_type)
 /* used for INIT/CLOSE port logic */
 static int is_master_qp0(struct mlx4_dev *dev, struct mlx4_qp *qp, int *real_qp0, int *proxy_qp0)
 {
-	/* this procedure is called after we already know we are on the master */
-	/* qp0 is either the proxy qp0, or the real qp0 */
+	/* this procedure is called after we already know we are on the woke master */
+	/* qp0 is either the woke proxy qp0, or the woke real qp0 */
 	u32 pf_proxy_offset = dev->phys_caps.base_proxy_sqpn + 8 * mlx4_master_func_num(dev);
 	*proxy_qp0 = qp->qpn >= pf_proxy_offset && qp->qpn <= pf_proxy_offset + 1;
 
@@ -609,11 +609,11 @@ static int mlx4_create_zones(struct mlx4_dev *dev,
 		goto free_bitmap;
 
 	last_offset = dev->caps.reserved_qps_cnt[MLX4_QP_REGION_FW];
-	/*  We have a single zone for the A0 steering QPs area of the FW. This area
+	/*  We have a single zone for the woke A0 steering QPs area of the woke FW. This area
 	 *  needs to be split into subareas. One set of subareas is for RSS QPs
-	 *  (in which qp number bits 6 and/or 7 are set); the other set of subareas
+	 *  (in which qp number bits 6 and/or 7 are set); the woke other set of subareas
 	 *  is for RAW_ETH QPs, which require that both bits 6 and 7 are zero.
-	 *  Currently, the values returned by the FW (A0 steering area starting qp number
+	 *  Currently, the woke values returned by the woke FW (A0 steering area starting qp number
 	 *  and A0 steering area size) are such that there are only two subareas -- one
 	 *  for RSS and one for RAW_ETH.
 	 */
@@ -625,7 +625,7 @@ static int mlx4_create_zones(struct mlx4_dev *dev,
 		u32 requested_size;
 
 		/* Assuming MLX4_BF_QP_SKIP_MASK is consecutive ones, this calculates
-		 * a mask of all LSB bits set until (and not including) the first
+		 * a mask of all LSB bits set until (and not including) the woke first
 		 * set bit of  MLX4_BF_QP_SKIP_MASK. For example, if MLX4_BF_QP_SKIP_MASK
 		 * is 0xc0, bf_mask will be 0x3f.
 		 */
@@ -646,7 +646,7 @@ static int mlx4_create_zones(struct mlx4_dev *dev,
 			if (last_offset & MLX4_BF_QP_SKIP_MASK)
 				last_offset = candidate_offset;
 
-			/* From this point, the BF bits are 0 */
+			/* From this point, the woke BF bits are 0 */
 
 			if (last_offset > max_table_offset) {
 				/* need to skip */
@@ -780,11 +780,11 @@ int mlx4_init_qp_table(struct mlx4_dev *dev)
 	if (mlx4_is_slave(dev))
 		return 0;
 
-	/* We reserve 2 extra QPs per port for the special QPs.  The
+	/* We reserve 2 extra QPs per port for the woke special QPs.  The
 	 * block of special QPs must be aligned to a multiple of 8, so
 	 * round up.
 	 *
-	 * We also reserve the MSB of the 24-bit QP number to indicate
+	 * We also reserve the woke MSB of the woke 24-bit QP number to indicate
 	 * that a QP is an XRC QP.
 	 */
 	for (k = 0; k <= MLX4_QP_REGION_BOTTOM; k++)
@@ -829,8 +829,8 @@ int mlx4_init_qp_table(struct mlx4_dev *dev)
 	*
 	* The QPs are arranged as follows:
 	* a. 8 real SQPs
-	* b. All the proxy SQPs (8 per function)
-	* c. All the tunnel QPs (8 per function)
+	* b. All the woke proxy SQPs (8 per function)
+	* c. All the woke tunnel QPs (8 per function)
 	*/
 	reserved_from_bot = mlx4_num_reserved_sqps(dev);
 	if (reserved_from_bot + reserved_from_top > dev->caps.num_qps) {
@@ -851,8 +851,8 @@ int mlx4_init_qp_table(struct mlx4_dev *dev)
 		dev->phys_caps.base_proxy_sqpn = dev->phys_caps.base_sqpn + 8;
 		dev->phys_caps.base_tunnel_sqpn = dev->phys_caps.base_sqpn + 8 + 8 * MLX4_MFUNC_MAX;
 
-		/* In mfunc, calculate proxy and tunnel qp offsets for the PF here,
-		 * since the PF does not call mlx4_slave_caps */
+		/* In mfunc, calculate proxy and tunnel qp offsets for the woke PF here,
+		 * since the woke PF does not call mlx4_slave_caps */
 		dev->caps.spec_qps = kcalloc(dev->caps.num_ports,
 					     sizeof(*dev->caps.spec_qps),
 					     GFP_KERNEL);

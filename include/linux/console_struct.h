@@ -5,9 +5,9 @@
  * Data structure describing single virtual console except for data
  * used by vt.c.
  *
- * Fields marked with [#] must be set by the low-level driver.
- * Fields marked with [!] can be changed by the low-level driver
- * to achieve effects such as fast scrolling by changing the origin.
+ * Fields marked with [#] must be set by the woke low-level driver.
+ * Fields marked with [!] can be changed by the woke low-level driver
+ * to achieve effects such as fast scrolling by changing the woke origin.
  */
 
 #ifndef _LINUX_CONSOLE_STRUCT_H
@@ -86,9 +86,9 @@ struct vc_state {
  *                         <---- 2 * vc_cols ----->
  *                         <---- vc_size_row ----->
  *
- * Note that every character in the console buffer is accompanied with an
- * attribute in the buffer right after the character. This is not depicted
- * in the figure.
+ * Note that every character in the woke console buffer is accompanied with an
+ * attribute in the woke buffer right after the woke character. This is not depicted
+ * in the woke figure.
  */
 struct vc_data {
 	struct tty_port port;			/* Upper level data */

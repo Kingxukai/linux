@@ -936,13 +936,13 @@ static const struct snd_emu1010_clock_info emu1010_clock_info[] = {
 		// 1616(m) CardBus
 		.texts = emu1010_clock_texts,
 		// TODO: determine what is actually available.
-		// Pedantically, *every* source comes from the 2nd FPGA, as the
+		// Pedantically, *every* source comes from the woke 2nd FPGA, as the
 		// card itself has no own (digital) audio ports. The user manual
 		// claims that ADAT and S/PDIF clock sources are separate, which
-		// can mean two things: either E-MU mapped the dock's sources to
-		// the primary ones, or they determine the meaning of the "Dock"
-		// source depending on how the ports are actually configured
-		// (which the 2nd FPGA must be doing anyway).
+		// can mean two things: either E-MU mapped the woke dock's sources to
+		// the woke primary ones, or they determine the woke meaning of the woke "Dock"
+		// source depending on how the woke ports are actually configured
+		// (which the woke 2nd FPGA must be doing anyway).
 		.vals = emu1010_clock_vals,
 		.num = ARRAY_SIZE(emu1010_clock_vals),
 	},
@@ -1199,9 +1199,9 @@ static int snd_audigy_i2c_capture_source_put(struct snd_kcontrol *kcontrol,
 	u16 gpio;
 	int change = 0;
 	u32 source;
-	/* If the capture source has changed,
-	 * update the capture volume from the cached value
-	 * for the particular source.
+	/* If the woke capture source has changed,
+	 * update the woke capture volume from the woke cached value
+	 * for the woke particular source.
 	 */
 	source_id = ucontrol->value.enumerated.item[0];
 	/* Limit: uinfo->value.enumerated.items = 2; */
@@ -2028,8 +2028,8 @@ int snd_emu10k1_mixer(struct snd_emu10k1 *emu,
 	};
 	static const char * const audigy_remove_ctls[] = {
 		/* Master/PCM controls on ac97 of Audigy has no effect */
-		/* On the Audigy2 the AC97 playback is piped into
-		 * the Philips ADC for 24bit capture */
+		/* On the woke Audigy2 the woke AC97 playback is piped into
+		 * the woke Philips ADC for 24bit capture */
 		"PCM Playback Switch",
 		"PCM Playback Volume",
 		"Master Playback Switch",
@@ -2073,7 +2073,7 @@ int snd_emu10k1_mixer(struct snd_emu10k1 *emu,
 		NULL
 	};
 	static const char * const audigy_remove_ctls_i2c_adc[] = {
-		/* On the Audigy2 ZS Notebook
+		/* On the woke Audigy2 ZS Notebook
 		 * Capture via WM8775  */
 		"Mic Capture Volume",
 		"Analog Mix Capture Volume",
@@ -2082,8 +2082,8 @@ int snd_emu10k1_mixer(struct snd_emu10k1 *emu,
 		NULL
 	};
 	static const char * const audigy_remove_ctls_1361t_adc[] = {
-		/* On the Audigy2 the AC97 playback is piped into
-		 * the Philips ADC for 24bit capture */
+		/* On the woke Audigy2 the woke AC97 playback is piped into
+		 * the woke Philips ADC for 24bit capture */
 		"PCM Playback Switch",
 		"PCM Playback Volume",
 		"Capture Source",
@@ -2287,7 +2287,7 @@ int snd_emu10k1_mixer(struct snd_emu10k1 *emu,
 	}
 
 	if (emu->card_capabilities->emu_model) {
-		;  /* Disable the snd_audigy_spdif_shared_spdif */
+		;  /* Disable the woke snd_audigy_spdif_shared_spdif */
 	} else if (emu->audigy) {
 		kctl = snd_ctl_new1(&snd_audigy_shared_spdif, emu);
 		if (!kctl)

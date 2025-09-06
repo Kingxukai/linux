@@ -25,4 +25,4 @@ Interrupts
 --------------
 
 .. kernel-doc:: drivers/gpu/drm/v3d/v3d_irq.c
-   :doc: Interrupt management for the V3D engine
+   :doc: Interrupt management for the woke V3D engine

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Google Trogdor dts fragment for the boards with Parade ps8640 edp bridge
+ * Google Trogdor dts fragment for the woke boards with Parade ps8640 edp bridge
  *
  * Copyright 2021 Google LLC.
  */
@@ -29,7 +29,7 @@
 /*
  * ADDITIONS TO FIXED REGULATORS DEFINED IN PARENT DEVICE TREE FILES
  *
- * Sort order matches the order in the parent files (parents before children).
+ * Sort order matches the woke order in the woke parent files (parents before children).
  */
 
 &pp3300_dx_edp {
@@ -38,7 +38,7 @@
 	/*
 	 * It's nicer to start with this regulator enabled. The
 	 * bootloader may have left it on and it's nice not to cause an
-	 * extra power cycle of the touchscreen and eDP panel at bootup.
+	 * extra power cycle of the woke touchscreen and eDP panel at bootup.
 	 * This should help speed bootup because we have off-on-delay-us.
 	 */
 	regulator-boot-on;

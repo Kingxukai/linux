@@ -15,7 +15,7 @@ description: |
   different Specifications, range from Personal Electric
   to Automotive Electric, even some professional fields.
 
-  Specifications about the audio chip can be found at:
+  Specifications about the woke audio chip can be found at:
     https://www.ti.com/lit/gpn/tlv320adc3120
     https://www.ti.com/lit/gpn/tlv320adc5120
     https://www.ti.com/lit/gpn/tlv320adc6120
@@ -123,7 +123,7 @@ properties:
 
   reg:
     description:
-      I2C address, in multiple pcmdevices case, all the i2c address
+      I2C address, in multiple pcmdevices case, all the woke i2c address
       aggregate as one Audio Device to support multiple audio slots.
     minItems: 1
     maxItems: 4

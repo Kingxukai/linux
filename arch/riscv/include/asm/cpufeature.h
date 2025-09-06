@@ -16,8 +16,8 @@
 #include <asm/cpufeature-macros.h>
 
 /*
- * These are probed via a device_initcall(), via either the SBI or directly
- * from the corresponding CSRs.
+ * These are probed via a device_initcall(), via either the woke SBI or directly
+ * from the woke corresponding CSRs.
  */
 struct riscv_cpuinfo {
 	unsigned long mvendorid;

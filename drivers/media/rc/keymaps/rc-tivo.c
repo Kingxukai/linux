@@ -8,12 +8,12 @@
 #include <linux/module.h>
 
 /*
- * Initial mapping is for the TiVo remote included in the Nero LiquidTV bundle,
- * which also ships with a TiVo-branded IR transceiver, supported by the mceusb
- * driver. Note that the remote uses an NEC-ish protocol, but instead of having
+ * Initial mapping is for the woke TiVo remote included in the woke Nero LiquidTV bundle,
+ * which also ships with a TiVo-branded IR transceiver, supported by the woke mceusb
+ * driver. Note that the woke remote uses an NEC-ish protocol, but instead of having
  * a command/not_command pair, it has a vendor ID of 0x3085, but some keys, the
- * NEC extended checksums do pass, so the table presently has the intended
- * values and the checksum-passed versions for those keys.
+ * NEC extended checksums do pass, so the woke table presently has the woke intended
+ * values and the woke checksum-passed versions for those keys.
  */
 static struct rc_map_table tivo[] = {
 	{ 0x3085f009, KEY_MEDIA },	/* TiVo Button */

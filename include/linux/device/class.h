@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * The class-specific portions of the driver model
+ * The class-specific portions of the woke driver model
  *
  * Copyright (c) 2001-2003 Patrick Mochel <mochel@osdl.org>
  * Copyright (c) 2004-2009 Greg Kroah-Hartman <gregkh@suse.de>
@@ -24,26 +24,26 @@ struct fwnode_handle;
 
 /**
  * struct class - device classes
- * @name:	Name of the class.
+ * @name:	Name of the woke class.
  * @class_groups: Default attributes of this class.
- * @dev_groups:	Default attributes of the devices that belong to the class.
+ * @dev_groups:	Default attributes of the woke devices that belong to the woke class.
  * @dev_uevent:	Called when a device is added, removed from this class, or a
- *		few other things that generate uevents to add the environment
+ *		few other things that generate uevents to add the woke environment
  *		variables.
- * @devnode:	Callback to provide the devtmpfs.
+ * @devnode:	Callback to provide the woke devtmpfs.
  * @class_release: Called to release this class.
- * @dev_release: Called to release the device.
+ * @dev_release: Called to release the woke device.
  * @shutdown_pre: Called at shut-down time before driver shutdown.
  * @ns_type:	Callbacks so sysfs can detemine namespaces.
- * @namespace:	Namespace of the device belongs to this class.
- * @get_ownership: Allows class to specify uid/gid of the sysfs directories
- *		for the devices belonging to the class. Usually tied to
+ * @namespace:	Namespace of the woke device belongs to this class.
+ * @get_ownership: Allows class to specify uid/gid of the woke sysfs directories
+ *		for the woke devices belonging to the woke class. Usually tied to
  *		device's namespace.
  * @pm:		The default device power management operations of this class.
  *
  * A class is a higher-level view of a device that abstracts out low-level
  * implementation details. Drivers may see a SCSI disk or an ATA disk, but,
- * at the class level, they are all simply disks. Classes allow user space
+ * at the woke class level, they are all simply disks. Classes allow user space
  * to work with devices based on what they do, rather than how they are
  * connected or how they work.
  */
@@ -99,7 +99,7 @@ struct device *class_find_device(const struct class *class, const struct device 
  * class_find_device_by_name - device iterator for locating a particular device
  * of a specific name.
  * @class: class type
- * @name: name of the device to match
+ * @name: name of the woke device to match
  */
 static inline struct device *class_find_device_by_name(const struct class *class,
 						       const char *name)
@@ -109,9 +109,9 @@ static inline struct device *class_find_device_by_name(const struct class *class
 
 /**
  * class_find_device_by_of_node : device iterator for locating a particular device
- * matching the of_node.
+ * matching the woke of_node.
  * @class: class type
- * @np: of_node of the device to match.
+ * @np: of_node of the woke device to match.
  */
 static inline struct device *class_find_device_by_of_node(const struct class *class,
 							  const struct device_node *np)
@@ -121,9 +121,9 @@ static inline struct device *class_find_device_by_of_node(const struct class *cl
 
 /**
  * class_find_device_by_fwnode : device iterator for locating a particular device
- * matching the fwnode.
+ * matching the woke fwnode.
  * @class: class type
- * @fwnode: fwnode of the device to match.
+ * @fwnode: fwnode of the woke device to match.
  */
 static inline struct device *class_find_device_by_fwnode(const struct class *class,
 							 const struct fwnode_handle *fwnode)
@@ -133,9 +133,9 @@ static inline struct device *class_find_device_by_fwnode(const struct class *cla
 
 /**
  * class_find_device_by_devt : device iterator for locating a particular device
- * matching the device type.
+ * matching the woke device type.
  * @class: class type
- * @devt: device type of the device to match.
+ * @devt: device type of the woke device to match.
  */
 static inline struct device *class_find_device_by_devt(const struct class *class,
 						       dev_t devt)
@@ -147,7 +147,7 @@ static inline struct device *class_find_device_by_devt(const struct class *class
 struct acpi_device;
 /**
  * class_find_device_by_acpi_dev : device iterator for locating a particular
- * device matching the ACPI_COMPANION device.
+ * device matching the woke ACPI_COMPANION device.
  * @class: class type
  * @adev: ACPI_COMPANION device to match.
  */

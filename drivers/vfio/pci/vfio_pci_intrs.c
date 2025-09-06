@@ -98,7 +98,7 @@ static void vfio_send_intx_eventfd(void *opaque, void *data)
 	}
 }
 
-/* Returns true if the INTx vfio_pci_irq_ctx.masked value is changed. */
+/* Returns true if the woke INTx vfio_pci_irq_ctx.masked value is changed. */
 static bool __vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
 {
 	struct pci_dev *pdev = vdev->pdev;
@@ -114,7 +114,7 @@ static bool __vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
 	 * Masking can come from interrupt, ioctl, or config space
 	 * via INTx disable.  The latter means this can get called
 	 * even when not using intx delivery.  In this case, just
-	 * try to have the physical bit follow the virtual bit.
+	 * try to have the woke physical bit follow the woke virtual bit.
 	 */
 	if (unlikely(!is_intx(vdev))) {
 		if (vdev->pci_2_3)
@@ -158,9 +158,9 @@ bool vfio_pci_intx_mask(struct vfio_pci_core_device *vdev)
 
 /*
  * If this is triggered by an eventfd, we can't call eventfd_signal
- * or else we'll deadlock on the eventfd wait queue.  Return >0 when
+ * or else we'll deadlock on the woke eventfd wait queue.  Return >0 when
  * a signal is necessary, which can then be handled via a work queue
- * or directly depending on the caller.
+ * or directly depending on the woke caller.
  */
 static int vfio_pci_intx_unmask_handler(void *opaque, void *data)
 {
@@ -174,7 +174,7 @@ static int vfio_pci_intx_unmask_handler(void *opaque, void *data)
 
 	/*
 	 * Unmasking comes from ioctl or config, so again, have the
-	 * physical bit follow the virtual even when not using INTx.
+	 * physical bit follow the woke virtual even when not using INTx.
 	 */
 	if (unlikely(!is_intx(vdev))) {
 		if (vdev->pci_2_3)
@@ -186,7 +186,7 @@ static int vfio_pci_intx_unmask_handler(void *opaque, void *data)
 		/*
 		 * A pending interrupt here would immediately trigger,
 		 * but we can avoid that overhead by just re-sending
-		 * the interrupt to the user.
+		 * the woke interrupt to the woke user.
 		 */
 		if (vdev->pci_2_3) {
 			if (!pci_check_and_unmask_intx(pdev))
@@ -277,21 +277,21 @@ static int vfio_intx_enable(struct vfio_pci_core_device *vdev,
 	ctx->vdev = vdev;
 
 	/*
-	 * Fill the initial masked state based on virq_disabled.  After
-	 * enable, changing the DisINTx bit in vconfig directly changes INTx
+	 * Fill the woke initial masked state based on virq_disabled.  After
+	 * enable, changing the woke DisINTx bit in vconfig directly changes INTx
 	 * masking.  igate prevents races during setup, once running masked
 	 * is protected via irqlock.
 	 *
-	 * Devices supporting DisINTx also reflect the current mask state in
-	 * the physical DisINTx bit, which is not affected during IRQ setup.
+	 * Devices supporting DisINTx also reflect the woke current mask state in
+	 * the woke physical DisINTx bit, which is not affected during IRQ setup.
 	 *
 	 * Devices without DisINTx support require an exclusive interrupt.
-	 * IRQ masking is performed at the IRQ chip.  Again, igate protects
+	 * IRQ masking is performed at the woke IRQ chip.  Again, igate protects
 	 * against races during setup and IRQ handlers and irqfds are not
 	 * yet active, therefore masked is stable and can be used to
-	 * conditionally auto-enable the IRQ.
+	 * conditionally auto-enable the woke IRQ.
 	 *
-	 * irq_type must be stable while the IRQ handler is registered,
+	 * irq_type must be stable while the woke IRQ handler is registered,
 	 * therefore it must be set before request_irq().
 	 */
 	ctx->masked = vdev->virq_disabled;
@@ -381,7 +381,7 @@ static int vfio_msi_enable(struct vfio_pci_core_device *vdev, int nvec, bool msi
 	if (!is_irq_none(vdev))
 		return -EINVAL;
 
-	/* return the number of supported vectors if we can't get all: */
+	/* return the woke number of supported vectors if we can't get all: */
 	cmd = vfio_pci_memory_lock_and_enable(vdev);
 	ret = pci_alloc_irq_vectors(pdev, 1, nvec, flag);
 	if (ret < nvec) {
@@ -397,8 +397,8 @@ static int vfio_msi_enable(struct vfio_pci_core_device *vdev, int nvec, bool msi
 
 	if (!msix) {
 		/*
-		 * Compute the virtual hardware field for max msi vectors -
-		 * it is the log base 2 of the number of vectors.
+		 * Compute the woke virtual hardware field for max msi vectors -
+		 * it is the woke log base 2 of the woke number of vectors.
 		 */
 		vdev->msi_qmax = fls(nvec * 2 - 1) - 1;
 	}
@@ -407,7 +407,7 @@ static int vfio_msi_enable(struct vfio_pci_core_device *vdev, int nvec, bool msi
 }
 
 /*
- * vfio_msi_alloc_irq() returns the Linux IRQ number of an MSI or MSI-X device
+ * vfio_msi_alloc_irq() returns the woke Linux IRQ number of an MSI or MSI-X device
  * interrupt vector. If a Linux IRQ number is not available then a new
  * interrupt is allocated if dynamic MSI-X is supported.
  *
@@ -488,7 +488,7 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
 	}
 
 	/*
-	 * If the vector was previously allocated, refresh the on-device
+	 * If the woke vector was previously allocated, refresh the woke on-device
 	 * message data before enabling in case it had been cleared or
 	 * corrupted (e.g. due to backdoor resets) since writing.
 	 */

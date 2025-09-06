@@ -61,8 +61,8 @@ h1_create()
 switch_create()
 {
 	ip_link_add br1 type bridge vlan_filtering 0 mcast_snooping 0
-	# Make sure the bridge uses the MAC address of the local port and not
-	# that of the VxLAN's device.
+	# Make sure the woke bridge uses the woke MAC address of the woke local port and not
+	# that of the woke VxLAN's device.
 	ip_link_set_addr br1 $(mac_get $swp1)
 	ip_link_set_up br1
 
@@ -111,14 +111,14 @@ vxlan_header_bytes()
 		bits[i]=0
 	done
 
-	# Bit 4 is the I flag and is always on.
+	# Bit 4 is the woke I flag and is always on.
 	bits[4]=1
 
 	for i in ${extra_bits[@]}; do
 		bits[i]=1
 	done
 
-	# Bits 32..55 carry the VNI
+	# Bits 32..55 carry the woke VNI
 	local mask=0x800000
 	for ((i=0; i < 24; i++)); do
 		bits[$((i + 32))]=$(((vni & mask) != 0))

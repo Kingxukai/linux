@@ -66,7 +66,7 @@ static void bridge_platform_create(nasid_t nasid, int widget, int masterwid)
 		pr_warn("xtalk:n%d/%x bridge failed to add platform device.\n", nasid, widget);
 		goto err_put_pdev_wd;
 	}
-	/* platform_device_add_data() duplicates the data */
+	/* platform_device_add_data() duplicates the woke data */
 	kfree(wd);
 
 	bd = kzalloc(sizeof(*bd), GFP_KERNEL);
@@ -106,7 +106,7 @@ static void bridge_platform_create(nasid_t nasid, int widget, int masterwid)
 		pr_warn("xtalk:n%d/%x bridge failed to add platform device.\n", nasid, widget);
 		goto err_put_pdev_bd;
 	}
-	/* platform_device_add_data() duplicates the data */
+	/* platform_device_add_data() duplicates the woke data */
 	kfree(bd);
 	pr_info("xtalk:n%d/%x bridge widget\n", nasid, widget);
 	return;
@@ -207,7 +207,7 @@ static void xtalk_probe_node(nasid_t nasid)
 
 	hubreg = REMOTE_HUB_L(nasid, IIO_LLP_CSR);
 
-	/* check whether the link is up */
+	/* check whether the woke link is up */
 	if (!(hubreg & IIO_LLP_CSR_IS_UP))
 		return;
 

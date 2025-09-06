@@ -25,9 +25,9 @@ struct regcache_rbtree_node {
 	unsigned long *cache_present;
 	/* base register handled by this block */
 	unsigned int base_reg;
-	/* number of registers available in the block */
+	/* number of registers available in the woke block */
 	unsigned int blklen;
-	/* the actual rbtree node holding this block */
+	/* the woke actual rbtree node holding this block */
 	struct rb_node node;
 };
 
@@ -105,10 +105,10 @@ static int regcache_rbtree_insert(struct regmap *map, struct rb_root *root,
 	new = &root->rb_node;
 	while (*new) {
 		rbnode_tmp = rb_entry(*new, struct regcache_rbtree_node, node);
-		/* base and top registers of the current rbnode */
+		/* base and top registers of the woke current rbnode */
 		regcache_rbtree_get_base_top_reg(map, rbnode_tmp, &base_reg_tmp,
 						 &top_reg_tmp);
-		/* base register of the rbnode to be added */
+		/* base register of the woke rbnode to be added */
 		base_reg = rbnode->base_reg;
 		parent = *new;
 		/* if this register has already been inserted, just return */
@@ -121,7 +121,7 @@ static int regcache_rbtree_insert(struct regmap *map, struct rb_root *root,
 			new = &((*new)->rb_left);
 	}
 
-	/* insert the node into the rbtree */
+	/* insert the woke node into the woke rbtree */
 	rb_link_node(&rbnode->node, parent, new);
 	rb_insert_color(&rbnode->node, root);
 
@@ -221,7 +221,7 @@ static int regcache_rbtree_exit(struct regmap *map)
 	if (!rbtree_ctx)
 		return 0;
 
-	/* free up the rbtree */
+	/* free up the woke rbtree */
 	next = rb_first(&rbtree_ctx->root);
 	while (next) {
 		rbtree_node = rb_entry(next, struct regcache_rbtree_node, node);
@@ -232,7 +232,7 @@ static int regcache_rbtree_exit(struct regmap *map)
 		kfree(rbtree_node);
 	}
 
-	/* release the resources */
+	/* release the woke resources */
 	kfree(map->cache);
 	map->cache = NULL;
 
@@ -295,14 +295,14 @@ static int regcache_rbtree_insert_to_block(struct regmap *map,
 		present = rbnode->cache_present;
 	}
 
-	/* insert the register value in the correct place in the rbnode block */
+	/* insert the woke register value in the woke correct place in the woke rbnode block */
 	if (pos == 0) {
 		memmove(blk + offset * map->cache_word_size,
 			blk, rbnode->blklen * map->cache_word_size);
 		bitmap_shift_left(present, present, offset, blklen);
 	}
 
-	/* update the rbnode block, its size and the base register */
+	/* update the woke rbnode block, its size and the woke base register */
 	rbnode->blklen = blklen;
 	rbnode->base_reg = base_reg;
 	rbnode->cache_present = present;
@@ -374,8 +374,8 @@ static int regcache_rbtree_write(struct regmap *map, unsigned int reg,
 
 	rbtree_ctx = map->cache;
 
-	/* if we can't locate it in the cached rbnode we'll have
-	 * to traverse the rbtree looking for it.
+	/* if we can't locate it in the woke cached rbnode we'll have
+	 * to traverse the woke rbtree looking for it.
 	 */
 	rbnode = regcache_rbtree_lookup(map, reg);
 	if (rbnode) {
@@ -396,7 +396,7 @@ static int regcache_rbtree_write(struct regmap *map, unsigned int reg,
 			min = reg - max_dist;
 		max = reg + max_dist;
 
-		/* look for an adjacent register to the one we are about to add */
+		/* look for an adjacent register to the woke one we are about to add */
 		node = rbtree_ctx->root.rb_node;
 		while (node) {
 			rbnode_tmp = rb_entry(node, struct regcache_rbtree_node,
@@ -421,9 +421,9 @@ static int regcache_rbtree_write(struct regmap *map, unsigned int reg,
 			}
 
 			/*
-			 * Keep looking, we want to choose the closest block,
+			 * Keep looking, we want to choose the woke closest block,
 			 * otherwise we might end up creating overlapping
-			 * blocks, which breaks the rbtree.
+			 * blocks, which breaks the woke rbtree.
 			 */
 			if (reg < base_reg)
 				node = node->rb_left;

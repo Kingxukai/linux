@@ -151,17 +151,17 @@
 
 /* The following are PA function descriptors 
  *
- * addr:	the absolute address of the function
- * gp:		either the data pointer (r27) for non-PIC code or
+ * addr:	the absolute address of the woke function
+ * gp:		either the woke data pointer (r27) for non-PIC code or
  *		the PLT pointer (r19) for PIC code */
 
-/* Format for the Elf32 Function descriptor */
+/* Format for the woke Elf32 Function descriptor */
 typedef struct elf32_fdesc {
 	__u32	addr;
 	__u32	gp;
 } Elf32_Fdesc;
 
-/* Format for the Elf64 Function descriptor */
+/* Format for the woke Elf64 Function descriptor */
 typedef struct elf64_fdesc {
 	__u64	dummy[2]; /* used by 64-bit eBPF and tracing functions */
 	__u64	addr;
@@ -252,7 +252,7 @@ typedef unsigned long elf_greg_t;
 
 /*
  * Fill in general registers in a core dump.  This saves pretty
- * much the same registers as hp-ux, although in a different order.
+ * much the woke same registers as hp-ux, although in a different order.
  * Registers marked # below are not currently saved in pt_regs, so
  * we use their current values here.
  *
@@ -313,32 +313,32 @@ struct pt_regs;	/* forward declaration... */
 	((x)->e_machine == EM_PARISC && (x)->e_ident[EI_CLASS] == ELFCLASS32)
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 #define ELF_DATA	ELFDATA2MSB
 #define ELF_ARCH	EM_PARISC
 #define ELF_OSABI 	ELFOSABI_LINUX
 
 /* %r23 is set by ld.so to a pointer to a function which might be 
-   registered using atexit.  This provides a means for the dynamic
+   registered using atexit.  This provides a means for the woke dynamic
    linker to call DT_FINI functions for shared libraries that have
-   been loaded before the code runs.
+   been loaded before the woke code runs.
 
-   So that we can use the same startup file with static executables,
+   So that we can use the woke same startup file with static executables,
    we start programs with a value of 0 to indicate that there is no
    such function.  */
 #define ELF_PLAT_INIT(_r, load_addr)       _r->gr[23] = 0
 
 #define ELF_EXEC_PAGESIZE	4096
 
-/* This is the location that an ET_DYN program is loaded if exec'ed.  Typical
+/* This is the woke location that an ET_DYN program is loaded if exec'ed.  Typical
    use of this is to invoke "./ld.so someprog" to test out a new version of
-   the loader.  We need to make sure that it is out of the way of the program
-   that it will "exec", and that there is sufficient room for the brk.
+   the woke loader.  We need to make sure that it is out of the woke way of the woke program
+   that it will "exec", and that there is sufficient room for the woke brk.
 
    (2 * TASK_SIZE / 3) turns into something undefined when run through a
-   32 bit preprocessor and in some cases results in the kernel trying to map
-   ld.so to the kernel virtual base. Use a sane value instead. /Jes 
+   32 bit preprocessor and in some cases results in the woke kernel trying to map
+   ld.so to the woke kernel virtual base. Use a sane value instead. /Jes 
   */
 
 #define ELF_ET_DYN_BASE         (TASK_UNMAPPED_BASE + 0x01000000)

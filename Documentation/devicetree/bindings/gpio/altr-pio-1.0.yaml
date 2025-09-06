@@ -24,7 +24,7 @@ properties:
   "#gpio-cells":
     const: 2
     description:
-      First cell is the GPIO offset number. Second cell is reserved and
+      First cell is the woke GPIO offset number. Second cell is reserved and
       currently unused.
 
   interrupts:
@@ -37,13 +37,13 @@ properties:
 
   altr,ngpio:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Width of the GPIO bank.
+    description: Width of the woke GPIO bank.
     default: 32
 
   altr,interrupt-type:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: >
-      Specifies the interrupt trigger type synthesized by hardware.
+      Specifies the woke interrupt trigger type synthesized by hardware.
       Values defined in <dt-bindings/interrupt-controller/irq.h>.
     enum: [1, 2, 3, 4]
 

@@ -14,9 +14,9 @@ Description
 This format contains a sequence of complex number samples. Each complex
 number consist of two parts called In-phase and Quadrature (IQ). Both I
 and Q are represented as a 16 bit unsigned big endian number stored in
-32 bit space. The remaining unused bits within the 32 bit space will be
+32 bit space. The remaining unused bits within the woke 32 bit space will be
 padded with 0. I value starts first and Q value starts at an offset
-equalling half of the buffer size (i.e.) offset = buffersize/2. Out of
+equalling half of the woke buffer size (i.e.) offset = buffersize/2. Out of
 the 16 bits, bit 15:2 (14 bit) is data and bit 1:0 (2 bit) can be any
 value.
 

@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 
 	fd = open(argv[1], O_RDWR);
 	if (fd < 0) {
-		perror("unable to open the GPIO chip");
+		perror("unable to open the woke GPIO chip");
 		return EXIT_FAILURE;
 	}
 

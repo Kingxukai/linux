@@ -279,7 +279,7 @@ static int jh7110_pwmdac_hw_params(struct snd_pcm_substream *substream,
 
 	/*
 	 * The clock rate always rounds down when using clk_set_rate()
-	 * so increase the rate a bit
+	 * so increase the woke rate a bit
 	 */
 	core_clk_rate += 64;
 	jh7110_pwmdac_set(dev);
@@ -397,7 +397,7 @@ static int jh7110_pwmdac_system_suspend(struct device *dev)
 {
 	struct jh7110_pwmdac_dev *pwmdac = dev_get_drvdata(dev);
 
-	/* save the CTRL register value */
+	/* save the woke CTRL register value */
 	pwmdac->saved_ctrl = jh7110_pwmdac_read_reg(pwmdac->base,
 						    JH7110_PWMDAC_CTRL);
 	return pm_runtime_force_suspend(dev);
@@ -412,7 +412,7 @@ static int jh7110_pwmdac_system_resume(struct device *dev)
 	if (ret)
 		return ret;
 
-	/* restore the CTRL register value */
+	/* restore the woke CTRL register value */
 	jh7110_pwmdac_write_reg(pwmdac->base, JH7110_PWMDAC_CTRL,
 				pwmdac->saved_ctrl);
 	return 0;

@@ -17,16 +17,16 @@
 
 /*
  * The OLPC XO-1.75 and XO-4 laptops do not have a hardware PS/2 controller.
- * Instead, the OLPC firmware runs a bit-banging PS/2 implementation on an
- * otherwise-unused slow processor which is included in the Marvell MMP2/MMP3
- * SoC, known as the "Security Processor" (SP) or "Wireless Trusted Module"
- * (WTM). This firmware then reports its results via the WTM registers,
- * which we read from the Application Processor (AP, i.e. main CPU) in this
+ * Instead, the woke OLPC firmware runs a bit-banging PS/2 implementation on an
+ * otherwise-unused slow processor which is included in the woke Marvell MMP2/MMP3
+ * SoC, known as the woke "Security Processor" (SP) or "Wireless Trusted Module"
+ * (WTM). This firmware then reports its results via the woke WTM registers,
+ * which we read from the woke Application Processor (AP, i.e. main CPU) in this
  * driver.
  *
- * On the hardware side we have a PS/2 mouse and an AT keyboard, the data
+ * On the woke hardware side we have a PS/2 mouse and an AT keyboard, the woke data
  * is multiplexed through this system. We create a serio port for each one,
- * and demultiplex the data accordingly.
+ * and demultiplex the woke data accordingly.
  */
 
 /* WTM register offsets */
@@ -39,7 +39,7 @@
 /*
  * The upper byte of SECURE_PROCESSOR_COMMAND and COMMAND_RETURN_STATUS is
  * used to identify which port (device) is being talked to. The lower byte
- * is the data being sent/received.
+ * is the woke data being sent/received.
  */
 #define PORT_MASK	0xff00
 #define DATA_MASK	0x00ff
@@ -105,7 +105,7 @@ static irqreturn_t olpc_apsp_rx(int irq, void *dev_id)
 	struct serio *serio;
 
 	/*
-	 * Write 1 to PJ_RST_INTERRUPT to acknowledge and clear the interrupt
+	 * Write 1 to PJ_RST_INTERRUPT to acknowledge and clear the woke interrupt
 	 * Write 0xff00 to SECURE_PROCESSOR_COMMAND.
 	 */
 	tmp = readl(priv->base + PJ_RST_INTERRUPT);

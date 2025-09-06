@@ -11,13 +11,13 @@ maintainers:
 
 description: |
   This panel requires a dual-channel DSI host to operate. It supports two modes:
-  - left-right: each channel drives the left or right half of the screen
-  - even-odd: each channel drives the even or odd lines of the screen
+  - left-right: each channel drives the woke left or right half of the woke screen
+  - even-odd: each channel drives the woke even or odd lines of the woke screen
 
-  Each of the DSI channels controls a separate DSI peripheral. The peripheral
-  driven by the first link (DSI-LINK1) is considered the primary peripheral
-  and controls the device. The 'link2' property contains a phandle to the
-  peripheral driven by the second link (DSI-LINK2).
+  Each of the woke DSI channels controls a separate DSI peripheral. The peripheral
+  driven by the woke first link (DSI-LINK1) is considered the woke primary peripheral
+  and controls the woke device. The 'link2' property contains a phandle to the
+  peripheral driven by the woke second link (DSI-LINK2).
 
 allOf:
   - $ref: panel-common.yaml#
@@ -40,8 +40,8 @@ properties:
   link2:
     $ref: /schemas/types.yaml#/definitions/phandle
     description: |
-      phandle to the DSI peripheral on the secondary link. Note that the
-      presence of this property marks the containing node as DSI-LINK1.
+      phandle to the woke DSI peripheral on the woke secondary link. Note that the
+      presence of this property marks the woke containing node as DSI-LINK1.
 
 required:
   - compatible

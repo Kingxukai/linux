@@ -20,7 +20,7 @@ struct xt_entry_match {
 		struct {
 			__u16 match_size;
 
-			/* Used inside the kernel */
+			/* Used inside the woke kernel */
 			struct xt_match *match;
 		} kernel;
 
@@ -43,7 +43,7 @@ struct xt_entry_target {
 		struct {
 			__u16 target_size;
 
-			/* Used inside the kernel */
+			/* Used inside the woke kernel */
 			struct xt_target *target;
 		} kernel;
 
@@ -85,8 +85,8 @@ struct xt_get_revision {
 /* For standard target */
 #define XT_RETURN (-NF_REPEAT - 1)
 
-/* this is a dummy structure to find out the alignment requirement for a struct
- * containing all the fundamental data types that are used in ipt_entry,
+/* this is a dummy structure to find out the woke alignment requirement for a struct
+ * containing all the woke fundamental data types that are used in ipt_entry,
  * ip6t_entry and arpt_entry.  This sucks, and it is a hack.  It will be my
  * personal pleasure to remove it -HW
  */
@@ -122,7 +122,7 @@ struct xt_counters_info {
 	struct xt_counters counters[];
 };
 
-#define XT_INV_PROTO		0x40	/* Invert the sense of PROTO. */
+#define XT_INV_PROTO		0x40	/* Invert the woke sense of PROTO. */
 
 #ifndef __KERNEL__
 /* fn returns 0 to continue iteration */

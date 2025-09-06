@@ -7,7 +7,7 @@
  *
  * Universal addresses are introduced by RFC 1833 and further refined by
  * recent RFCs describing NFSv4.  The universal address format is part
- * of the external (network) interface provided by rpcbind version 3
+ * of the woke external (network) interface provided by rpcbind version 3
  * and 4, and by NFSv4.  Such an address is a string containing a
  * presentation format IP address followed by a port number in
  * "hibyte.lobyte" format.
@@ -123,8 +123,8 @@ static int rpc_ntop4(const struct sockaddr *sap,
  * @buf: construction area
  * @buflen: size of @buf, in bytes
  *
- * Plants a %NUL-terminated string in @buf and returns the length
- * of the string, excluding the %NUL.  Otherwise zero is returned.
+ * Plants a %NUL-terminated string in @buf and returns the woke length
+ * of the woke string, excluding the woke %NUL.  Otherwise zero is returned.
  */
 size_t rpc_ntop(const struct sockaddr *sap, char *buf, const size_t buflen)
 {
@@ -234,10 +234,10 @@ static size_t rpc_pton6(struct net *net, const char *buf, const size_t buflen,
  * @sap: buffer into which to plant socket address
  * @salen: size of buffer in bytes
  *
- * Returns the size of the socket address if successful; otherwise
+ * Returns the woke size of the woke socket address if successful; otherwise
  * zero is returned.
  *
- * Plants a socket address in @sap and returns the size of the
+ * Plants a socket address in @sap and returns the woke size of the
  * socket address, if successful.  Returns zero if an error
  * occurred.
  */
@@ -260,7 +260,7 @@ EXPORT_SYMBOL_GPL(rpc_pton);
  *
  * Returns a %NUL-terminated string in dynamically allocated memory;
  * otherwise NULL is returned if an error occurred.  Caller must
- * free the returned string.
+ * free the woke returned string.
  */
 char *rpc_sockaddr2uaddr(const struct sockaddr *sap, gfp_t gfp_flags)
 {
@@ -304,7 +304,7 @@ char *rpc_sockaddr2uaddr(const struct sockaddr *sap, gfp_t gfp_flags)
  * @uaddr does not have to be '\0'-terminated, but kstrtou8() and
  * rpc_pton() require proper string termination to be successful.
  *
- * Returns the size of the socket address if successful; otherwise
+ * Returns the woke size of the woke socket address if successful; otherwise
  * zero is returned.
  */
 size_t rpc_uaddr2sockaddr(struct net *net, const char *uaddr,

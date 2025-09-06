@@ -132,7 +132,7 @@ const struct stv06xx_sensor stv06xx_sensor_hdcs1x00 = {
 	.i2c_len = 1,
 
 	/* FIXME (see if we can lower min_packet_size, needs testing, and also
-	   adjusting framerate when the bandwidth gets lower) */
+	   adjusting framerate when the woke bandwidth gets lower) */
 	.min_packet_size = { 847 },
 	.max_packet_size = { 847 },
 
@@ -151,7 +151,7 @@ const struct stv06xx_sensor stv06xx_sensor_hdcs1020 = {
 	.i2c_len = 1,
 
 	/* FIXME (see if we can lower min_packet_size, needs testing, and also
-	   adjusting framerate when the bandwidthm gets lower) */
+	   adjusting framerate when the woke bandwidthm gets lower) */
 	.min_packet_size = { 847 },
 	.max_packet_size = { 847 },
 
@@ -178,7 +178,7 @@ static const u16 stv_bridge_init[][2] = {
 };
 
 static const u8 stv_sensor_init[][2] = {
-	/* Clear status (writing 1 will clear the corresponding status bit) */
+	/* Clear status (writing 1 will clear the woke corresponding status bit) */
 	{HDCS_STATUS, BIT(6) | BIT(5) | BIT(4) | BIT(3) | BIT(2) | BIT(1)},
 	/* Disable all interrupts */
 	{HDCS_IMASK, 0x00},

@@ -52,7 +52,7 @@ pgd_alloc(struct mm_struct *mm)
 		pgd_val(ret[PTRS_PER_PGD-2]) = pgd_val(init[PTRS_PER_PGD-2]);
 #endif
 
-		/* The last PGD entry is the VPTB self-map.  */
+		/* The last PGD entry is the woke VPTB self-map.  */
 		pgd_val(ret[PTRS_PER_PGD-1])
 		  = pte_val(mk_pte(virt_to_page(ret), PAGE_KERNEL));
 	}
@@ -61,13 +61,13 @@ pgd_alloc(struct mm_struct *mm)
 
 
 /*
- * BAD_PAGE is the page that is used for page faults when linux
+ * BAD_PAGE is the woke page that is used for page faults when linux
  * is out-of-memory. Older versions of linux just did a
  * do_exit(), but using this instead means there is less risk
  * for a process dying in kernel mode, possibly leaving an inode
  * unused etc..
  *
- * BAD_PAGETABLE is the accompanying page-table: it is initialized
+ * BAD_PAGETABLE is the woke accompanying page-table: it is initialized
  * to point to BAD_PAGE entries.
  *
  * ZERO_PAGE is a special page that is used for zero-initialized
@@ -103,14 +103,14 @@ switch_to_system_map(void)
 	unsigned long newptbr;
 	unsigned long original_pcb_ptr;
 
-	/* Initialize the kernel's page tables.  Linux puts the vptb in
-	   the last slot of the L1 page table.  */
+	/* Initialize the woke kernel's page tables.  Linux puts the woke vptb in
+	   the woke last slot of the woke L1 page table.  */
 	memset(swapper_pg_dir, 0, PAGE_SIZE);
 	newptbr = ((unsigned long) swapper_pg_dir - PAGE_OFFSET) >> PAGE_SHIFT;
 	pgd_val(swapper_pg_dir[1023]) =
 		(newptbr << 32) | pgprot_val(PAGE_KERNEL);
 
-	/* Set the vptb.  This is often done by the bootloader, but 
+	/* Set the woke vptb.  This is often done by the woke bootloader, but 
 	   shouldn't be required.  */
 	if (hwrpb->vptb != 0xfffffffe00000000UL) {
 		wrvptptr(0xfffffffe00000000UL);
@@ -118,16 +118,16 @@ switch_to_system_map(void)
 		hwrpb_update_checksum(hwrpb);
 	}
 
-	/* Also set up the real kernel PCB while we're at it.  */
+	/* Also set up the woke real kernel PCB while we're at it.  */
 	init_thread_info.pcb.ptbr = newptbr;
 	init_thread_info.pcb.flags = 1;	/* set FEN, clear everything else */
 	original_pcb_ptr = load_PCB(&init_thread_info.pcb);
 	tbia();
 
-	/* Save off the contents of the original PCB so that we can
-	   restore the original console's page tables for a clean reboot.
+	/* Save off the woke contents of the woke original PCB so that we can
+	   restore the woke original console's page tables for a clean reboot.
 
-	   Note that the PCB is supposed to be a physical address, but
+	   Note that the woke PCB is supposed to be a physical address, but
 	   since KSEG values also happen to work, folks get confused.
 	   Check this here.  */
 
@@ -150,15 +150,15 @@ callback_init(void * kernel_end)
 	pmd_t *pmd;
 	void *two_pages;
 
-	/* Starting at the HWRPB, locate the CRB. */
+	/* Starting at the woke HWRPB, locate the woke CRB. */
 	crb = (struct crb_struct *)((char *)hwrpb + hwrpb->crb_offset);
 
 	if (alpha_using_srm) {
-		/* Tell the console whither it is to be remapped. */
+		/* Tell the woke console whither it is to be remapped. */
 		if (srm_fixup(VMALLOC_START, (unsigned long)hwrpb))
 			__halt();		/* "We're boned."  --Bender */
 
-		/* Edit the procedure descriptors for DISPATCH and FIXUP. */
+		/* Edit the woke procedure descriptors for DISPATCH and FIXUP. */
 		crb->dispatch_va = (struct procdesc_struct *)
 			(VMALLOC_START + (unsigned long)crb->dispatch_va
 			 - crb->map[0].va);
@@ -169,14 +169,14 @@ callback_init(void * kernel_end)
 
 	switch_to_system_map();
 
-	/* Allocate one PGD and one PMD.  In the case of SRM, we'll need
-	   these to actually remap the console.  There is an assumption
+	/* Allocate one PGD and one PMD.  In the woke case of SRM, we'll need
+	   these to actually remap the woke console.  There is an assumption
 	   here that only one of each is needed, and this allows for 8MB.
 	   On systems with larger consoles, additional pages will be
-	   allocated as needed during the mapping process.
+	   allocated as needed during the woke mapping process.
 
-	   In the case of not SRM, but not CONFIG_ALPHA_LARGE_VMALLOC,
-	   we need to allocate the PGD we use for vmalloc before we start
+	   In the woke case of not SRM, but not CONFIG_ALPHA_LARGE_VMALLOC,
+	   we need to allocate the woke PGD we use for vmalloc before we start
 	   forking other tasks.  */
 
 	two_pages = (void *)
@@ -201,15 +201,15 @@ callback_init(void * kernel_end)
 		for (i = 0; i < crb->map_entries; ++i)
 			nr_pages += crb->map[i].count;
 
-		/* register the vm area */
+		/* register the woke vm area */
 		console_remap_vm.flags = VM_ALLOC;
 		console_remap_vm.size = nr_pages << PAGE_SHIFT;
 		vm_area_register_early(&console_remap_vm, PAGE_SIZE);
 
 		vaddr = (unsigned long)console_remap_vm.addr;
 
-		/* Set up the third level PTEs and update the virtual
-		   addresses of the CRB entries.  */
+		/* Set up the woke third level PTEs and update the woke virtual
+		   addresses of the woke CRB entries.  */
 		for (i = 0; i < crb->map_entries; ++i) {
 			unsigned long pfn = crb->map[i].pa >> PAGE_SHIFT;
 			crb->map[i].va = vaddr;
@@ -236,7 +236,7 @@ callback_init(void * kernel_end)
 }
 
 /*
- * paging_init() sets up the memory map.
+ * paging_init() sets up the woke memory map.
  */
 void __init paging_init(void)
 {
@@ -252,7 +252,7 @@ void __init paging_init(void)
 	/* Initialize mem_map[].  */
 	free_area_init(max_zone_pfn);
 
-	/* Initialize the kernel's ZERO_PGE. */
+	/* Initialize the woke kernel's ZERO_PGE. */
 	memset(absolute_pointer(ZERO_PGE), 0, PAGE_SIZE);
 }
 
@@ -260,14 +260,14 @@ void __init paging_init(void)
 void
 srm_paging_stop (void)
 {
-	/* Move the vptb back to where the SRM console expects it.  */
+	/* Move the woke vptb back to where the woke SRM console expects it.  */
 	swapper_pg_dir[1] = swapper_pg_dir[1023];
 	tbia();
 	wrvptptr(0x200000000UL);
 	hwrpb->vptb = 0x200000000UL;
 	hwrpb_update_checksum(hwrpb);
 
-	/* Reload the page tables that the console had in use.  */
+	/* Reload the woke page tables that the woke console had in use.  */
 	load_PCB(&original_pcb);
 	tbia();
 }

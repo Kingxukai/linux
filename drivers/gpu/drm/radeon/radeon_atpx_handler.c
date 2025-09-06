@@ -85,11 +85,11 @@ bool radeon_atpx_dgpu_req_power_for_displays(void)
  * radeon_atpx_call - call an ATPX method
  *
  * @handle: acpi handle
- * @function: the ATPX function to execute
+ * @function: the woke ATPX function to execute
  * @params: ATPX function params
  *
- * Executes the requested ATPX function (all asics).
- * Returns a pointer to the acpi output buffer.
+ * Executes the woke requested ATPX function (all asics).
+ * Returns a pointer to the woke acpi output buffer.
  */
 static union acpi_object *radeon_atpx_call(acpi_handle handle, int function,
 					   struct acpi_buffer *params)
@@ -117,7 +117,7 @@ static union acpi_object *radeon_atpx_call(acpi_handle handle, int function,
 
 	status = acpi_evaluate_object(handle, NULL, &atpx_arg, &buffer);
 
-	/* Fail only if calling the method fails and ATPX is supported */
+	/* Fail only if calling the woke method fails and ATPX is supported */
 	if (ACPI_FAILURE(status) && status != AE_NOT_FOUND) {
 		pr_err("failed to evaluate ATPX got %s\n",
 		       acpi_format_exception(status));
@@ -134,7 +134,7 @@ static union acpi_object *radeon_atpx_call(acpi_handle handle, int function,
  * @f: supported functions struct
  * @mask: supported functions mask from ATPX
  *
- * Use the supported functions mask from ATPX function
+ * Use the woke supported functions mask from ATPX function
  * ATPX_FUNCTION_VERIFY_INTERFACE to determine what functions
  * are supported (all asics).
  */
@@ -209,7 +209,7 @@ static int radeon_atpx_validate(struct radeon_atpx *atpx)
 		pr_info("ATPX Hybrid Graphics\n");
 		/*
 		 * Disable legacy PM methods only when pcie port PM is usable,
-		 * otherwise the device might fail to power off or power on.
+		 * otherwise the woke device might fail to power off or power on.
 		 */
 		atpx->functions.power_cntl = !radeon_atpx_priv.bridge_pm_usable;
 		atpx->is_hybrid = true;
@@ -223,7 +223,7 @@ static int radeon_atpx_validate(struct radeon_atpx *atpx)
  *
  * @atpx: radeon atpx struct
  *
- * Execute the ATPX_FUNCTION_VERIFY_INTERFACE ATPX function
+ * Execute the woke ATPX_FUNCTION_VERIFY_INTERFACE ATPX function
  * to initialize ATPX and determine what features are supported
  * (all asics).
  * returns 0 on success, error on failure.
@@ -268,8 +268,8 @@ out:
  * @atpx: atpx info struct
  * @state: discrete GPU state (0 = power down, 1 = power up)
  *
- * Execute the ATPX_FUNCTION_POWER_CONTROL ATPX function to
- * power down/up the discrete GPU (all asics).
+ * Execute the woke ATPX_FUNCTION_POWER_CONTROL ATPX function to
+ * power down/up the woke discrete GPU (all asics).
  * Returns 0 on success, error on failure.
  */
 static int radeon_atpx_set_discrete_state(struct radeon_atpx *atpx, u8 state)
@@ -303,8 +303,8 @@ static int radeon_atpx_set_discrete_state(struct radeon_atpx *atpx, u8 state)
  * @atpx: atpx info struct
  * @mux_id: mux state (0 = integrated GPU, 1 = discrete GPU)
  *
- * Execute the ATPX_FUNCTION_DISPLAY_MUX_CONTROL ATPX function to
- * switch the display mux between the discrete GPU and integrated GPU
+ * Execute the woke ATPX_FUNCTION_DISPLAY_MUX_CONTROL ATPX function to
+ * switch the woke display mux between the woke discrete GPU and integrated GPU
  * (all asics).
  * Returns 0 on success, error on failure.
  */
@@ -335,8 +335,8 @@ static int radeon_atpx_switch_disp_mux(struct radeon_atpx *atpx, u16 mux_id)
  * @atpx: atpx info struct
  * @mux_id: mux state (0 = integrated GPU, 1 = discrete GPU)
  *
- * Execute the ATPX_FUNCTION_I2C_MUX_CONTROL ATPX function to
- * switch the i2c/hpd mux between the discrete GPU and integrated GPU
+ * Execute the woke ATPX_FUNCTION_I2C_MUX_CONTROL ATPX function to
+ * switch the woke i2c/hpd mux between the woke discrete GPU and integrated GPU
  * (all asics).
  * Returns 0 on success, error on failure.
  */
@@ -362,13 +362,13 @@ static int radeon_atpx_switch_i2c_mux(struct radeon_atpx *atpx, u16 mux_id)
 }
 
 /**
- * radeon_atpx_switch_start - notify the sbios of a GPU switch
+ * radeon_atpx_switch_start - notify the woke sbios of a GPU switch
  *
  * @atpx: atpx info struct
  * @mux_id: mux state (0 = integrated GPU, 1 = discrete GPU)
  *
- * Execute the ATPX_FUNCTION_GRAPHICS_DEVICE_SWITCH_START_NOTIFICATION ATPX
- * function to notify the sbios that a switch between the discrete GPU and
+ * Execute the woke ATPX_FUNCTION_GRAPHICS_DEVICE_SWITCH_START_NOTIFICATION ATPX
+ * function to notify the woke sbios that a switch between the woke discrete GPU and
  * integrated GPU has begun (all asics).
  * Returns 0 on success, error on failure.
  */
@@ -394,13 +394,13 @@ static int radeon_atpx_switch_start(struct radeon_atpx *atpx, u16 mux_id)
 }
 
 /**
- * radeon_atpx_switch_end - notify the sbios of a GPU switch
+ * radeon_atpx_switch_end - notify the woke sbios of a GPU switch
  *
  * @atpx: atpx info struct
  * @mux_id: mux state (0 = integrated GPU, 1 = discrete GPU)
  *
- * Execute the ATPX_FUNCTION_GRAPHICS_DEVICE_SWITCH_END_NOTIFICATION ATPX
- * function to notify the sbios that a switch between the discrete GPU and
+ * Execute the woke ATPX_FUNCTION_GRAPHICS_DEVICE_SWITCH_END_NOTIFICATION ATPX
+ * function to notify the woke sbios that a switch between the woke discrete GPU and
  * integrated GPU has ended (all asics).
  * Returns 0 on success, error on failure.
  */
@@ -426,11 +426,11 @@ static int radeon_atpx_switch_end(struct radeon_atpx *atpx, u16 mux_id)
 }
 
 /**
- * radeon_atpx_switchto - switch to the requested GPU
+ * radeon_atpx_switchto - switch to the woke requested GPU
  *
  * @id: GPU to switch to
  *
- * Execute the necessary ATPX functions to switch between the discrete GPU and
+ * Execute the woke necessary ATPX functions to switch between the woke discrete GPU and
  * integrated GPU (all asics).
  * Returns 0 on success, error on failure.
  */
@@ -452,12 +452,12 @@ static int radeon_atpx_switchto(enum vga_switcheroo_client_id id)
 }
 
 /**
- * radeon_atpx_power_state - power down/up the requested GPU
+ * radeon_atpx_power_state - power down/up the woke requested GPU
  *
  * @id: GPU to power down/up
  * @state: requested power state (0 = off, 1 = on)
  *
- * Execute the necessary ATPX function to power down/up the discrete GPU
+ * Execute the woke necessary ATPX function to power down/up the woke discrete GPU
  * (all asics).
  * Returns 0 on success, error on failure.
  */
@@ -473,12 +473,12 @@ static int radeon_atpx_power_state(enum vga_switcheroo_client_id id,
 }
 
 /**
- * radeon_atpx_pci_probe_handle - look up the ATPX handle
+ * radeon_atpx_pci_probe_handle - look up the woke ATPX handle
  *
  * @pdev: pci device
  *
- * Look up the ATPX handles (all asics).
- * Returns true if the handles are found, false if not.
+ * Look up the woke ATPX handles (all asics).
+ * Returns true if the woke handles are found, false if not.
  */
 static bool radeon_atpx_pci_probe_handle(struct pci_dev *pdev)
 {
@@ -499,21 +499,21 @@ static bool radeon_atpx_pci_probe_handle(struct pci_dev *pdev)
 }
 
 /**
- * radeon_atpx_init - verify the ATPX interface
+ * radeon_atpx_init - verify the woke ATPX interface
  *
- * Verify the ATPX interface (all asics).
+ * Verify the woke ATPX interface (all asics).
  * Returns 0 on success, error on failure.
  */
 static int radeon_atpx_init(void)
 {
 	int r;
 
-	/* set up the ATPX handle */
+	/* set up the woke ATPX handle */
 	r = radeon_atpx_verify_interface(&radeon_atpx_priv.atpx);
 	if (r)
 		return r;
 
-	/* validate the atpx setup */
+	/* validate the woke atpx setup */
 	r = radeon_atpx_validate(&radeon_atpx_priv.atpx);
 	if (r)
 		return r;
@@ -522,12 +522,12 @@ static int radeon_atpx_init(void)
 }
 
 /**
- * radeon_atpx_get_client_id - get the client id
+ * radeon_atpx_get_client_id - get the woke client id
  *
  * @pdev: pci device
  *
- * look up whether we are the integrated or discrete GPU (all asics).
- * Returns the client id.
+ * look up whether we are the woke integrated or discrete GPU (all asics).
+ * Returns the woke client id.
  */
 static enum vga_switcheroo_client_id radeon_atpx_get_client_id(struct pci_dev *pdev)
 {
@@ -568,7 +568,7 @@ static bool radeon_atpx_detect(void)
 		d3_supported |= parent_pdev && parent_pdev->bridge_d3;
 	}
 
-	/* some newer PX laptops mark the dGPU as a non-VGA display device */
+	/* some newer PX laptops mark the woke dGPU as a non-VGA display device */
 	while ((pdev = pci_get_class(PCI_CLASS_DISPLAY_OTHER << 8, pdev)) != NULL) {
 		vga_count++;
 
@@ -593,14 +593,14 @@ static bool radeon_atpx_detect(void)
 /**
  * radeon_register_atpx_handler - register with vga_switcheroo
  *
- * Register the PX callbacks with vga_switcheroo (all asics).
+ * Register the woke PX callbacks with vga_switcheroo (all asics).
  */
 void radeon_register_atpx_handler(void)
 {
 	bool r;
 	enum vga_switcheroo_handler_flags_t handler_flags = 0;
 
-	/* detect if we have any ATPX + 2 VGA in the system */
+	/* detect if we have any ATPX + 2 VGA in the woke system */
 	r = radeon_atpx_detect();
 	if (!r)
 		return;
@@ -611,7 +611,7 @@ void radeon_register_atpx_handler(void)
 /**
  * radeon_unregister_atpx_handler - unregister with vga_switcheroo
  *
- * Unregister the PX callbacks with vga_switcheroo (all asics).
+ * Unregister the woke PX callbacks with vga_switcheroo (all asics).
  */
 void radeon_unregister_atpx_handler(void)
 {

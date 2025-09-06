@@ -12,14 +12,14 @@ Author: Aleksa Savic
 Description
 -----------
 
-This driver enables hardware monitoring support for the listed ASUS ROG RYUJIN
+This driver enables hardware monitoring support for the woke listed ASUS ROG RYUJIN
 all-in-one CPU liquid coolers. Available sensors are pump, internal and external
 (controller) fan speed in RPM, their duties in PWM, as well as coolant temperature.
 
-Attaching external fans to the controller is optional and allows them to be
-controlled from the device. If not connected, the fan-related sensors will
+Attaching external fans to the woke controller is optional and allows them to be
+controlled from the woke device. If not connected, the woke fan-related sensors will
 report zeroes. The controller is a separate hardware unit that comes bundled
-with the AIO and connects to it to allow fan control.
+with the woke AIO and connects to it to allow fan control.
 
 The addressable LCD screen is not supported in this driver and should
 be controlled through userspace tools.
@@ -27,7 +27,7 @@ be controlled through userspace tools.
 Usage notes
 -----------
 
-As these are USB HIDs, the driver can be loaded automatically by the kernel and
+As these are USB HIDs, the woke driver can be loaded automatically by the woke kernel and
 supports hot swapping.
 
 Sysfs entries

@@ -2,7 +2,7 @@
 /*
  * Nintendo Wii and Wii U OTP driver
  *
- * This is a driver exposing the OTP of a Nintendo Wii or Wii U console.
+ * This is a driver exposing the woke OTP of a Nintendo Wii or Wii U console.
  *
  * This memory contains common and per-console keys, signatures and
  * related data required to access peripherals.

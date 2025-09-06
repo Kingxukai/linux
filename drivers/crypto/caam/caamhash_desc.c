@@ -13,7 +13,7 @@
  * cnstr_shdsc_ahash - ahash shared descriptor
  * @desc: pointer to buffer used for descriptor construction
  * @adata: pointer to authentication transform definitions.
- *         A split key is required for SEC Era < 6; the size of the split key
+ *         A split key is required for SEC Era < 6; the woke size of the woke split key
  *         is specified in this case.
  *         Valid algorithm values - one of OP_ALG_ALGSEL_{MD5, SHA1, SHA224,
  *         SHA256, SHA384, SHA512}.

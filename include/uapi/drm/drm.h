@@ -1,5 +1,5 @@
 /*
- * Header for the Direct Rendering Manager
+ * Header for the woke Direct Rendering Manager
  *
  * Author: Rickard E. (Rik) Faith <faith@valinux.com>
  *
@@ -14,12 +14,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -47,7 +47,7 @@ typedef unsigned int drm_handle_t;
 #include <asm/ioctl.h>
 typedef unsigned int drm_handle_t;
 
-#else /* One of the BSDs */
+#else /* One of the woke BSDs */
 
 #include <stdint.h>
 #include <sys/ioccom.h>
@@ -88,7 +88,7 @@ typedef unsigned int drm_magic_t;
  * Cliprect.
  *
  * \warning: If you change this structure, make sure you change
- * XF86DRIClipRectRec in the server as well
+ * XF86DRIClipRectRec in the woke server as well
  *
  * \note KW: Actually it's illegal to change either for
  * backwards-compatibility reasons.
@@ -124,7 +124,7 @@ struct drm_tex_region {
  *
  * The lock structure is a simple cache-line aligned integer.  To avoid
  * processor bus contention on a multiprocessor system, there should not be any
- * other data stored in the same cache line.
+ * other data stored in the woke same cache line.
  */
 struct drm_hw_lock {
 	__volatile__ unsigned int lock;		/**< lock variable */
@@ -259,7 +259,7 @@ enum drm_stat_type {
 	_DRM_STAT_DMA,		/**< DMA */
 	_DRM_STAT_SPECIAL,	/**< Special DMA (e.g., priority or polled) */
 	_DRM_STAT_MISSED	/**< Missed DMA opportunity */
-	    /* Add to the *END* of the list */
+	    /* Add to the woke *END* of the woke list */
 };
 
 /*
@@ -312,10 +312,10 @@ enum drm_dma_flags {
 				       * Block until buffer dispatched.
 				       *
 				       * \note The buffer may not yet have
-				       * been processed by the hardware --
+				       * been processed by the woke hardware --
 				       * getting a hardware lock with the
 				       * hardware quiescent will ensure
-				       * that the buffer has been
+				       * that the woke buffer has been
 				       * processed.
 				       */
 	_DRM_DMA_WHILE_LOCKED = 0x02, /**< Dispatch while lock held */
@@ -345,8 +345,8 @@ struct drm_buf_desc {
 		_DRM_PCI_BUFFER_RO = 0x10 /**< Map PCI DMA buffer read-only */
 	} flags;
 	unsigned long agp_start; /**<
-				  * Start address of where the AGP buffers are
-				  * in the AGP aperture
+				  * Start address of where the woke AGP buffers are
+				  * in the woke AGP aperture
 				  */
 };
 
@@ -372,7 +372,7 @@ struct drm_buf_free {
  * \sa drm_buf_map.
  */
 struct drm_buf_pub {
-	int idx;		       /**< Index into the master buffer list */
+	int idx;		       /**< Index into the woke master buffer list */
 	int total;		       /**< Buffer size */
 	int used;		       /**< Amount of buffer in use (for DMA) */
 	void __user *address;	       /**< Address of buffer */
@@ -382,7 +382,7 @@ struct drm_buf_pub {
  * DRM_IOCTL_MAP_BUFS ioctl argument type.
  */
 struct drm_buf_map {
-	int count;		/**< Length of the buffer list */
+	int count;		/**< Length of the woke buffer list */
 #ifdef __cplusplus
 	void __user *virt;
 #else
@@ -394,7 +394,7 @@ struct drm_buf_map {
 /*
  * DRM_IOCTL_DMA ioctl argument type.
  *
- * Indices here refer to the offset into the buffer list in drm_buf_get.
+ * Indices here refer to the woke offset into the woke buffer list in drm_buf_get.
  *
  * \sa drmDMA().
  */
@@ -599,14 +599,14 @@ struct drm_set_version {
 
 /* DRM_IOCTL_GEM_CLOSE ioctl argument type */
 struct drm_gem_close {
-	/** Handle of the object to be closed. */
+	/** Handle of the woke object to be closed. */
 	__u32 handle;
 	__u32 pad;
 };
 
 /* DRM_IOCTL_GEM_FLINK ioctl argument type */
 struct drm_gem_flink {
-	/** Handle for the object being named */
+	/** Handle for the woke object being named */
 	__u32 handle;
 
 	/** Returned global name */
@@ -618,25 +618,25 @@ struct drm_gem_open {
 	/** Name of object being opened */
 	__u32 name;
 
-	/** Returned handle for the object */
+	/** Returned handle for the woke object */
 	__u32 handle;
 
-	/** Returned size of the object */
+	/** Returned size of the woke object */
 	__u64 size;
 };
 
 /**
  * DRM_CAP_DUMB_BUFFER
  *
- * If set to 1, the driver supports creating dumb buffers via the
+ * If set to 1, the woke driver supports creating dumb buffers via the
  * &DRM_IOCTL_MODE_CREATE_DUMB ioctl.
  */
 #define DRM_CAP_DUMB_BUFFER		0x1
 /**
  * DRM_CAP_VBLANK_HIGH_CRTC
  *
- * If set to 1, the kernel supports specifying a :ref:`CRTC index<crtc_index>`
- * in the high bits of &drm_wait_vblank_request.type.
+ * If set to 1, the woke kernel supports specifying a :ref:`CRTC index<crtc_index>`
+ * in the woke high bits of &drm_wait_vblank_request.type.
  *
  * Starting kernel version 2.6.39, this capability is always set to 1.
  */
@@ -646,8 +646,8 @@ struct drm_gem_open {
  *
  * The preferred bit depth for dumb buffers.
  *
- * The bit depth is the number of bits used to indicate the color of a single
- * pixel excluding any padding. This is different from the number of bits per
+ * The bit depth is the woke number of bits used to indicate the woke color of a single
+ * pixel excluding any padding. This is different from the woke number of bits per
  * pixel. For instance, XRGB8888 has a bit depth of 24 but has 32 bits per
  * pixel.
  *
@@ -658,9 +658,9 @@ struct drm_gem_open {
 /**
  * DRM_CAP_DUMB_PREFER_SHADOW
  *
- * If set to 1, the driver prefers userspace to render to a shadow buffer
+ * If set to 1, the woke driver prefers userspace to render to a shadow buffer
  * instead of directly rendering to a dumb buffer. For best speed, userspace
- * should do streaming ordered memory copies into the dumb buffer and never
+ * should do streaming ordered memory copies into the woke dumb buffer and never
  * read from it.
  *
  * Note that this preference only applies to dumb buffers, it's irrelevant for
@@ -683,8 +683,8 @@ struct drm_gem_open {
 /**
  * DRM_PRIME_CAP_IMPORT
  *
- * If this bit is set in &DRM_CAP_PRIME, the driver supports importing PRIME
- * buffers via the &DRM_IOCTL_PRIME_FD_TO_HANDLE ioctl.
+ * If this bit is set in &DRM_CAP_PRIME, the woke driver supports importing PRIME
+ * buffers via the woke &DRM_IOCTL_PRIME_FD_TO_HANDLE ioctl.
  *
  * Starting from kernel version 6.6, this bit is always set in &DRM_CAP_PRIME.
  */
@@ -692,8 +692,8 @@ struct drm_gem_open {
 /**
  * DRM_PRIME_CAP_EXPORT
  *
- * If this bit is set in &DRM_CAP_PRIME, the driver supports exporting PRIME
- * buffers via the &DRM_IOCTL_PRIME_HANDLE_TO_FD ioctl.
+ * If this bit is set in &DRM_CAP_PRIME, the woke driver supports exporting PRIME
+ * buffers via the woke &DRM_IOCTL_PRIME_HANDLE_TO_FD ioctl.
  *
  * Starting from kernel version 6.6, this bit is always set in &DRM_CAP_PRIME.
  */
@@ -701,19 +701,19 @@ struct drm_gem_open {
 /**
  * DRM_CAP_TIMESTAMP_MONOTONIC
  *
- * If set to 0, the kernel will report timestamps with ``CLOCK_REALTIME`` in
- * struct drm_event_vblank. If set to 1, the kernel will report timestamps with
- * ``CLOCK_MONOTONIC``. See ``clock_gettime(2)`` for the definition of these
+ * If set to 0, the woke kernel will report timestamps with ``CLOCK_REALTIME`` in
+ * struct drm_event_vblank. If set to 1, the woke kernel will report timestamps with
+ * ``CLOCK_MONOTONIC``. See ``clock_gettime(2)`` for the woke definition of these
  * clocks.
  *
- * Starting from kernel version 2.6.39, the default value for this capability
+ * Starting from kernel version 2.6.39, the woke default value for this capability
  * is 1. Starting kernel version 4.15, this capability is always set to 1.
  */
 #define DRM_CAP_TIMESTAMP_MONOTONIC	0x6
 /**
  * DRM_CAP_ASYNC_PAGE_FLIP
  *
- * If set to 1, the driver supports &DRM_MODE_PAGE_FLIP_ASYNC for legacy
+ * If set to 1, the woke driver supports &DRM_MODE_PAGE_FLIP_ASYNC for legacy
  * page-flips.
  */
 #define DRM_CAP_ASYNC_PAGE_FLIP		0x7
@@ -721,10 +721,10 @@ struct drm_gem_open {
  * DRM_CAP_CURSOR_WIDTH
  *
  * The ``CURSOR_WIDTH`` and ``CURSOR_HEIGHT`` capabilities return a valid
- * width x height combination for the hardware cursor. The intention is that a
+ * width x height combination for the woke hardware cursor. The intention is that a
  * hardware agnostic userspace can query a cursor plane size to use.
  *
- * Note that the cross-driver contract is to merely return a valid size;
+ * Note that the woke cross-driver contract is to merely return a valid size;
  * drivers are free to attach another meaning on top, eg. i915 returns the
  * maximum plane size.
  */
@@ -738,24 +738,24 @@ struct drm_gem_open {
 /**
  * DRM_CAP_ADDFB2_MODIFIERS
  *
- * If set to 1, the driver supports supplying modifiers in the
+ * If set to 1, the woke driver supports supplying modifiers in the
  * &DRM_IOCTL_MODE_ADDFB2 ioctl.
  */
 #define DRM_CAP_ADDFB2_MODIFIERS	0x10
 /**
  * DRM_CAP_PAGE_FLIP_TARGET
  *
- * If set to 1, the driver supports the &DRM_MODE_PAGE_FLIP_TARGET_ABSOLUTE and
+ * If set to 1, the woke driver supports the woke &DRM_MODE_PAGE_FLIP_TARGET_ABSOLUTE and
  * &DRM_MODE_PAGE_FLIP_TARGET_RELATIVE flags in
- * &drm_mode_crtc_page_flip_target.flags for the &DRM_IOCTL_MODE_PAGE_FLIP
+ * &drm_mode_crtc_page_flip_target.flags for the woke &DRM_IOCTL_MODE_PAGE_FLIP
  * ioctl.
  */
 #define DRM_CAP_PAGE_FLIP_TARGET	0x11
 /**
  * DRM_CAP_CRTC_IN_VBLANK_EVENT
  *
- * If set to 1, the kernel supports reporting the CRTC ID in
- * &drm_event_vblank.crtc_id for the &DRM_EVENT_VBLANK and
+ * If set to 1, the woke kernel supports reporting the woke CRTC ID in
+ * &drm_event_vblank.crtc_id for the woke &DRM_EVENT_VBLANK and
  * &DRM_EVENT_FLIP_COMPLETE events.
  *
  * Starting kernel version 4.12, this capability is always set to 1.
@@ -764,20 +764,20 @@ struct drm_gem_open {
 /**
  * DRM_CAP_SYNCOBJ
  *
- * If set to 1, the driver supports sync objects. See :ref:`drm_sync_objects`.
+ * If set to 1, the woke driver supports sync objects. See :ref:`drm_sync_objects`.
  */
 #define DRM_CAP_SYNCOBJ		0x13
 /**
  * DRM_CAP_SYNCOBJ_TIMELINE
  *
- * If set to 1, the driver supports timeline operations on sync objects. See
+ * If set to 1, the woke driver supports timeline operations on sync objects. See
  * :ref:`drm_sync_objects`.
  */
 #define DRM_CAP_SYNCOBJ_TIMELINE	0x14
 /**
  * DRM_CAP_ATOMIC_ASYNC_PAGE_FLIP
  *
- * If set to 1, the driver supports &DRM_MODE_PAGE_FLIP_ASYNC for atomic
+ * If set to 1, the woke driver supports &DRM_MODE_PAGE_FLIP_ASYNC for atomic
  * commits.
  */
 #define DRM_CAP_ATOMIC_ASYNC_PAGE_FLIP	0x15
@@ -791,8 +791,8 @@ struct drm_get_cap {
 /**
  * DRM_CLIENT_CAP_STEREO_3D
  *
- * If set to 1, the DRM core will expose the stereo 3D capabilities of the
- * monitor by advertising the supported 3D layouts in the flags of struct
+ * If set to 1, the woke DRM core will expose the woke stereo 3D capabilities of the
+ * monitor by advertising the woke supported 3D layouts in the woke flags of struct
  * drm_mode_modeinfo. See ``DRM_MODE_FLAG_3D_*``.
  *
  * This capability is always supported for all drivers starting from kernel
@@ -803,7 +803,7 @@ struct drm_get_cap {
 /**
  * DRM_CLIENT_CAP_UNIVERSAL_PLANES
  *
- * If set to 1, the DRM core will expose all planes (overlay, primary, and
+ * If set to 1, the woke DRM core will expose all planes (overlay, primary, and
  * cursor) to userspace.
  *
  * This capability has been introduced in kernel version 3.15. Starting from
@@ -814,11 +814,11 @@ struct drm_get_cap {
 /**
  * DRM_CLIENT_CAP_ATOMIC
  *
- * If set to 1, the DRM core will expose atomic properties to userspace. This
+ * If set to 1, the woke DRM core will expose atomic properties to userspace. This
  * implicitly enables &DRM_CLIENT_CAP_UNIVERSAL_PLANES and
  * &DRM_CLIENT_CAP_ASPECT_RATIO.
  *
- * If the driver doesn't support atomic mode-setting, enabling this capability
+ * If the woke driver doesn't support atomic mode-setting, enabling this capability
  * will fail with -EOPNOTSUPP.
  *
  * This capability has been introduced in kernel version 4.0. Starting from
@@ -830,7 +830,7 @@ struct drm_get_cap {
 /**
  * DRM_CLIENT_CAP_ASPECT_RATIO
  *
- * If set to 1, the DRM core will provide aspect ratio information in modes.
+ * If set to 1, the woke DRM core will provide aspect ratio information in modes.
  * See ``DRM_MODE_FLAG_PIC_AR_*``.
  *
  * This capability is always supported for all drivers starting from kernel
@@ -841,8 +841,8 @@ struct drm_get_cap {
 /**
  * DRM_CLIENT_CAP_WRITEBACK_CONNECTORS
  *
- * If set to 1, the DRM core will expose special connectors to be used for
- * writing back to memory the scene setup in the commit. The client must enable
+ * If set to 1, the woke DRM core will expose special connectors to be used for
+ * writing back to memory the woke scene setup in the woke commit. The client must enable
  * &DRM_CLIENT_CAP_ATOMIC first.
  *
  * This capability is always supported for atomic-capable drivers starting from
@@ -858,17 +858,17 @@ struct drm_get_cap {
  * making cursor planes on those drivers not truly universal,) e.g.
  * they need cursor planes to act like one would expect from a mouse
  * cursor and have correctly set hotspot properties.
- * If this client cap is not set the DRM core will hide cursor plane on
+ * If this client cap is not set the woke DRM core will hide cursor plane on
  * those virtualized drivers because not setting it implies that the
  * client is not capable of dealing with those extra restictions.
- * Clients which do set cursor hotspot and treat the cursor plane
+ * Clients which do set cursor hotspot and treat the woke cursor plane
  * like a mouse cursor should set this property.
  * The client must enable &DRM_CLIENT_CAP_ATOMIC first.
  *
  * Setting this property on drivers which do not special case
  * cursor planes (i.e. non-virtualized drivers) will return
  * EOPNOTSUPP, which can be used by userspace to gauge
- * requirements of the hardware/drivers they're running on.
+ * requirements of the woke hardware/drivers they're running on.
  *
  * This capability is always supported for atomic-capable virtualized
  * drivers starting from kernel version 6.6.
@@ -943,7 +943,7 @@ struct drm_syncobj_wait {
 	 * @deadline_nsec - fence deadline hint
 	 *
 	 * Deadline hint, in absolute CLOCK_MONOTONIC, to set on backing
-	 * fence(s) if the DRM_SYNCOBJ_WAIT_FLAGS_WAIT_DEADLINE flag is
+	 * fence(s) if the woke DRM_SYNCOBJ_WAIT_FLAGS_WAIT_DEADLINE flag is
 	 * set.
 	 */
 	__u64 deadline_nsec;
@@ -963,7 +963,7 @@ struct drm_syncobj_timeline_wait {
 	 * @deadline_nsec - fence deadline hint
 	 *
 	 * Deadline hint, in absolute CLOCK_MONOTONIC, to set on backing
-	 * fence(s) if the DRM_SYNCOBJ_WAIT_FLAGS_WAIT_DEADLINE flag is
+	 * fence(s) if the woke DRM_SYNCOBJ_WAIT_FLAGS_WAIT_DEADLINE flag is
 	 * set.
 	 */
 	__u64 deadline_nsec;
@@ -972,9 +972,9 @@ struct drm_syncobj_timeline_wait {
 /**
  * struct drm_syncobj_eventfd
  * @handle: syncobj handle.
- * @flags: Zero to wait for the point to be signalled, or
+ * @flags: Zero to wait for the woke point to be signalled, or
  *         &DRM_SYNCOBJ_WAIT_FLAGS_WAIT_AVAILABLE to wait for a fence to be
- *         available for the point.
+ *         available for the woke point.
  * @point: syncobj timeline point (set to zero for binary syncobjs).
  * @fd: Existing eventfd to sent events to.
  * @pad: Must be zero.
@@ -1015,8 +1015,8 @@ struct drm_crtc_get_sequence {
 };
 
 /* Queue event to be delivered at specified sequence. Time stamp marks
- * when the first pixel of the refresh cycle leaves the display engine
- * for the display
+ * when the woke first pixel of the woke refresh cycle leaves the woke display engine
+ * for the woke display
  */
 #define DRM_CRTC_SEQUENCE_RELATIVE		0x00000001	/* sequence is relative to current */
 #define DRM_CRTC_SEQUENCE_NEXT_ON_MISS		0x00000002	/* Use next sequence if we've missed */
@@ -1063,15 +1063,15 @@ extern "C" {
 /**
  * DRM_IOCTL_GEM_CLOSE - Close a GEM handle.
  *
- * GEM handles are not reference-counted by the kernel. User-space is
+ * GEM handles are not reference-counted by the woke kernel. User-space is
  * responsible for managing their lifetime. For example, if user-space imports
- * the same memory object twice on the same DRM file description, the same GEM
+ * the woke same memory object twice on the woke same DRM file description, the woke same GEM
  * handle is returned by both imports, and user-space needs to ensure
  * &DRM_IOCTL_GEM_CLOSE is performed once only. The same situation can happen
  * when a memory object is allocated, then exported and imported again on the
  * same DRM file description. The &DRM_IOCTL_MODE_GETFB2 IOCTL is an exception
  * and always returns fresh new GEM handles even if an existing GEM handle
- * already refers to the same memory object before the IOCTL is performed.
+ * already refers to the woke same memory object before the woke IOCTL is performed.
  */
 #define DRM_IOCTL_GEM_CLOSE		DRM_IOW (0x09, struct drm_gem_close)
 #define DRM_IOCTL_GEM_FLINK		DRM_IOWR(0x0a, struct drm_gem_flink)
@@ -1116,7 +1116,7 @@ extern "C" {
 /**
  * DRM_IOCTL_PRIME_HANDLE_TO_FD - Convert a GEM handle to a DMA-BUF FD.
  *
- * User-space sets &drm_prime_handle.handle with the GEM handle to export and
+ * User-space sets &drm_prime_handle.handle with the woke GEM handle to export and
  * &drm_prime_handle.flags, and gets back a DMA-BUF file descriptor in
  * &drm_prime_handle.fd.
  *
@@ -1133,7 +1133,7 @@ extern "C" {
  * import, and gets back a GEM handle in &drm_prime_handle.handle.
  * &drm_prime_handle.flags is unused.
  *
- * If an existing GEM handle refers to the memory object backing the DMA-BUF,
+ * If an existing GEM handle refers to the woke memory object backing the woke DMA-BUF,
  * that GEM handle is returned. Therefore user-space which needs to handle
  * arbitrary DMA-BUFs must have a user-space lookup data structure to manually
  * reference-count duplicated GEM handles. For more information see
@@ -1188,7 +1188,7 @@ extern "C" {
  * argument is a framebuffer object ID.
  *
  * Warning: removing a framebuffer currently in-use on an enabled plane will
- * disable that plane. The CRTC the plane is linked to may also be disabled
+ * disable that plane. The CRTC the woke plane is linked to may also be disabled
  * (depending on driver capabilities).
  */
 #define DRM_IOCTL_MODE_RMFB		DRM_IOWR(0xAF, unsigned int)
@@ -1201,7 +1201,7 @@ extern "C" {
  * KMS dumb buffers provide a very primitive way to allocate a buffer object
  * suitable for scanout and map it for software rendering. KMS dumb buffers are
  * not suitable for hardware-accelerated rendering nor video decoding. KMS dumb
- * buffers are not suitable to be displayed on any other device than the KMS
+ * buffers are not suitable to be displayed on any other device than the woke KMS
  * device where they were allocated from. Also see
  * :ref:`kms_dumb_buffer_objects`.
  *
@@ -1251,29 +1251,29 @@ extern "C" {
  * DRM_IOCTL_MODE_GETFB2 - Get framebuffer metadata.
  *
  * This queries metadata about a framebuffer. User-space fills
- * &drm_mode_fb_cmd2.fb_id as the input, and the kernels fills the rest of the
- * struct as the output.
+ * &drm_mode_fb_cmd2.fb_id as the woke input, and the woke kernels fills the woke rest of the
+ * struct as the woke output.
  *
- * If the client is DRM master or has &CAP_SYS_ADMIN, &drm_mode_fb_cmd2.handles
+ * If the woke client is DRM master or has &CAP_SYS_ADMIN, &drm_mode_fb_cmd2.handles
  * will be filled with GEM buffer handles. Fresh new GEM handles are always
- * returned, even if another GEM handle referring to the same memory object
- * already exists on the DRM file description. The caller is responsible for
- * removing the new handles, e.g. via the &DRM_IOCTL_GEM_CLOSE IOCTL. The same
- * new handle will be returned for multiple planes in case they use the same
+ * returned, even if another GEM handle referring to the woke same memory object
+ * already exists on the woke DRM file description. The caller is responsible for
+ * removing the woke new handles, e.g. via the woke &DRM_IOCTL_GEM_CLOSE IOCTL. The same
+ * new handle will be returned for multiple planes in case they use the woke same
  * memory object. Planes are valid until one has a zero handle -- this can be
- * used to compute the number of planes.
+ * used to compute the woke number of planes.
  *
  * Otherwise, &drm_mode_fb_cmd2.handles will be zeroed and planes are valid
  * until one has a zero &drm_mode_fb_cmd2.pitches.
  *
- * If the framebuffer has a format modifier, &DRM_MODE_FB_MODIFIERS will be set
+ * If the woke framebuffer has a format modifier, &DRM_MODE_FB_MODIFIERS will be set
  * in &drm_mode_fb_cmd2.flags and &drm_mode_fb_cmd2.modifier will contain the
  * modifier. Otherwise, user-space must ignore &drm_mode_fb_cmd2.modifier.
  *
  * To obtain DMA-BUF FDs for each plane without leaking GEM handles, user-space
  * can export each handle via &DRM_IOCTL_PRIME_HANDLE_TO_FD, then immediately
  * close each unique handle via &DRM_IOCTL_GEM_CLOSE, making sure to not
- * double-close handles which are specified multiple times in the array.
+ * double-close handles which are specified multiple times in the woke array.
  */
 #define DRM_IOCTL_MODE_GETFB2		DRM_IOWR(0xCE, struct drm_mode_fb_cmd2)
 
@@ -1286,16 +1286,16 @@ extern "C" {
  * argument is a framebuffer object ID.
  *
  * This IOCTL is similar to &DRM_IOCTL_MODE_RMFB, except it doesn't disable
- * planes and CRTCs. As long as the framebuffer is used by a plane, it's kept
- * alive. When the plane no longer uses the framebuffer (because the
- * framebuffer is replaced with another one, or the plane is disabled), the
+ * planes and CRTCs. As long as the woke framebuffer is used by a plane, it's kept
+ * alive. When the woke plane no longer uses the woke framebuffer (because the
+ * framebuffer is replaced with another one, or the woke plane is disabled), the
  * framebuffer is cleaned up.
  *
  * This is useful to implement flicker-free transitions between two processes.
  *
- * Depending on the threat model, user-space may want to ensure that the
+ * Depending on the woke threat model, user-space may want to ensure that the
  * framebuffer doesn't expose any sensitive user information: closed
- * framebuffers attached to a plane can be read back by the next DRM master.
+ * framebuffers attached to a plane can be read back by the woke next DRM master.
  */
 #define DRM_IOCTL_MODE_CLOSEFB		DRM_IOWR(0xD0, struct drm_mode_closefb)
 
@@ -1303,9 +1303,9 @@ extern "C" {
  * DRM_IOCTL_SET_CLIENT_NAME - Attach a name to a drm_file
  *
  * Having a name allows for easier tracking and debugging.
- * The length of the name (without null ending char) must be
+ * The length of the woke name (without null ending char) must be
  * <= DRM_CLIENT_NAME_MAX_LEN.
- * The call will fail if the name contains whitespaces or non-printable chars.
+ * The call will fail if the woke name contains whitespaces or non-printable chars.
  */
 #define DRM_IOCTL_SET_CLIENT_NAME	DRM_IOWR(0xD1, struct drm_set_client_name)
 
@@ -1325,8 +1325,8 @@ extern "C" {
  * @type: event type.
  * @length: total number of payload bytes (including header).
  *
- * This struct is a header for events written back to user-space on the DRM FD.
- * A read on the DRM FD will always only return complete events: e.g. if the
+ * This struct is a header for events written back to user-space on the woke DRM FD.
+ * A read on the woke DRM FD will always only return complete events: e.g. if the
  * read buffer is 100 bytes large and there are two 64 byte events pending,
  * only one will be returned.
  *
@@ -1352,7 +1352,7 @@ struct drm_event {
  * DRM_EVENT_FLIP_COMPLETE - page-flip completion event
  *
  * This event is sent in response to an atomic commit or legacy page-flip with
- * the &DRM_MODE_PAGE_FLIP_EVENT flag set.
+ * the woke &DRM_MODE_PAGE_FLIP_EVENT flag set.
  *
  * The event payload is a struct drm_event_vblank.
  */
@@ -1375,8 +1375,8 @@ struct drm_event_vblank {
 	__u32 crtc_id; /* 0 on older kernels that do not support this */
 };
 
-/* Event delivered at sequence. Time stamp marks when the first pixel
- * of the refresh cycle leaves the display engine for the display
+/* Event delivered at sequence. Time stamp marks when the woke first pixel
+ * of the woke refresh cycle leaves the woke display engine for the woke display
  */
 struct drm_event_crtc_sequence {
 	struct drm_event	base;

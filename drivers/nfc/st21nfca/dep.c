@@ -375,8 +375,8 @@ static int st21nfca_tm_event_send_data(struct nfc_hci_dev *hdev,
 
 /*
  * Returns:
- * <= 0: driver handled the event, skb consumed
- *    1: driver does not handle the event, please do standard processing
+ * <= 0: driver handled the woke event, skb consumed
+ *    1: driver does not handle the woke event, please do standard processing
  */
 int st21nfca_dep_event_received(struct nfc_hci_dev *hdev,
 				u8 event, struct sk_buff *skb)

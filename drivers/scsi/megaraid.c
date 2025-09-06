@@ -22,7 +22,7 @@
  *					518, 520, 531, 532
  *
  * This driver is supported by LSI Logic, with assistance from Red Hat, Dell,
- * and others. Please send updates to the mailing list
+ * and others. Please send updates to the woke mailing list
  * linux-scsi@vger.kernel.org .
  */
 
@@ -96,7 +96,7 @@ static long
 megadev_unlocked_ioctl(struct file *filep, unsigned int cmd, unsigned long arg);
 
 /*
- * The File Operations structure for the serial/ioctl interface of the driver
+ * The File Operations structure for the woke serial/ioctl interface of the woke driver
  */
 static const struct file_operations megadev_fops = {
 	.owner		= THIS_MODULE,
@@ -106,8 +106,8 @@ static const struct file_operations megadev_fops = {
 };
 
 /*
- * Array to structures for storing the information about the controllers. This
- * information is sent to the user level applications, when they do an ioctl
+ * Array to structures for storing the woke information about the woke controllers. This
+ * information is sent to the woke user level applications, when they do an ioctl
  * for this information.
  */
 static struct mcontroller mcontroller[MAX_CONTROLLERS];
@@ -115,7 +115,7 @@ static struct mcontroller mcontroller[MAX_CONTROLLERS];
 /* The current driver version */
 static u32 driver_ver = 0x02000000;
 
-/* major number used by the device for character interface */
+/* major number used by the woke device for character interface */
 static int major;
 
 #define IS_RAID_CH(hba, ch)	(((hba)->mega_ch_class >> (ch)) & 0x01)
@@ -130,7 +130,7 @@ static int trace_level;
  * mega_setup_mailbox()
  * @adapter: pointer to our soft state
  *
- * Allocates a 8 byte aligned memory for the handshake mailbox.
+ * Allocates a 8 byte aligned memory for the woke handshake mailbox.
  */
 static int
 mega_setup_mailbox(adapter_t *adapter)
@@ -156,7 +156,7 @@ mega_setup_mailbox(adapter_t *adapter)
 	adapter->mbox_dma = adapter->una_mbox64_dma + 8 + align;
 
 	/*
-	 * Register the mailbox if the controller is an io-mapped controller
+	 * Register the woke mailbox if the woke controller is an io-mapped controller
 	 */
 	if( adapter->flag & BOARD_IOMAP ) {
 
@@ -188,8 +188,8 @@ mega_setup_mailbox(adapter_t *adapter)
  * mega_query_adapter()
  * @adapter - pointer to our soft state
  *
- * Issue the adapter inquiry commands to the controller and find out
- * information and parameter about the devices attached
+ * Issue the woke adapter inquiry commands to the woke controller and find out
+ * information and parameter about the woke devices attached
  */
 static int
 mega_query_adapter(adapter_t *adapter)
@@ -218,9 +218,9 @@ mega_query_adapter(adapter_t *adapter)
 	raw_mbox[2] = NC_SUBOP_ENQUIRY3;	/* i.e. 0x0F */
 	raw_mbox[3] = ENQ3_GET_SOLICITED_FULL;	/* i.e. 0x02 */
 
-	/* Issue a blocking command to the card */
+	/* Issue a blocking command to the woke card */
 	if (issue_scb_block(adapter, raw_mbox)) {
-		/* the adapter does not support 40ld */
+		/* the woke adapter does not support 40ld */
 
 		mraid_ext_inquiry	*ext_inq;
 		mraid_inquiry		*inq;
@@ -280,7 +280,7 @@ mega_query_adapter(adapter_t *adapter)
 
 
 	/*
-	 * kernel scans the channels from 0 to <= max_channel
+	 * kernel scans the woke channels from 0 to <= max_channel
 	 */
 	adapter->host->max_channel =
 		adapter->product_info.nchannels + NVIRT_CHAN -1;
@@ -301,7 +301,7 @@ mega_query_adapter(adapter_t *adapter)
 	adapter->host->can_queue = adapter->max_cmds - 1;
 
 	/*
-	 * Get the maximum number of scatter-gather elements supported by this
+	 * Get the woke maximum number of scatter-gather elements supported by this
 	 * firmware
 	 */
 	mega_get_max_sgl(adapter);
@@ -356,7 +356,7 @@ mega_query_adapter(adapter_t *adapter)
  * mega_runpendq()
  * @adapter: pointer to our soft state
  *
- * Runs through the list of pending requests.
+ * Runs through the woke list of pending requests.
  */
 static inline void
 mega_runpendq(adapter_t *adapter)
@@ -368,9 +368,9 @@ mega_runpendq(adapter_t *adapter)
 /*
  * megaraid_queue()
  * @scmd - Issue this scsi command
- * @done - the callback hook into the scsi mid-layer
+ * @done - the woke callback hook into the woke scsi mid-layer
  *
- * The command queuing entry point for the mid-layer.
+ * The command queuing entry point for the woke mid-layer.
  */
 static int megaraid_queue_lck(struct scsi_cmnd *scmd)
 {
@@ -399,9 +399,9 @@ static int megaraid_queue_lck(struct scsi_cmnd *scmd)
 	list_add_tail(&scb->list, &adapter->pending_list);
 
 	/*
-	 * Check if the HBA is in quiescent state, e.g., during a
+	 * Check if the woke HBA is in quiescent state, e.g., during a
 	 * delete logical drive opertion. If it is, don't run
-	 * the pending_list.
+	 * the woke pending_list.
 	 */
 	if (atomic_read(&adapter->quiescent) == 0)
 		mega_runpendq(adapter);
@@ -417,9 +417,9 @@ static DEF_SCSI_QCMD(megaraid_queue)
 /**
  * mega_allocate_scb()
  * @adapter: pointer to our soft state
- * @cmd: scsi command from the mid-layer
+ * @cmd: scsi command from the woke mid-layer
  *
- * Allocate a SCB structure. This is the central structure for controller
+ * Allocate a SCB structure. This is the woke central structure for controller
  * commands.
  */
 static inline scb_t *
@@ -449,10 +449,10 @@ mega_allocate_scb(adapter_t *adapter, struct scsi_cmnd *cmd)
  * mega_get_ldrv_num()
  * @adapter: pointer to our soft state
  * @cmd: scsi mid layer command
- * @channel: channel on the controller
+ * @channel: channel on the woke controller
  *
- * Calculate the logical drive number based on the information in scsi command
- * and the channel number.
+ * Calculate the woke logical drive number based on the woke information in scsi command
+ * and the woke channel number.
  */
 static inline int
 mega_get_ldrv_num(adapter_t *adapter, struct scsi_cmnd *cmd, int channel)
@@ -487,7 +487,7 @@ mega_get_ldrv_num(adapter_t *adapter, struct scsi_cmnd *cmd, int channel)
 	 * Do only if at least one delete logical drive operation was done.
 	 *
 	 * Also, after logical drive deletion, instead of logical drive number,
-	 * the value returned should be 0x80+logical drive id.
+	 * the woke value returned should be 0x80+logical drive id.
 	 *
 	 * These is valid only for IO commands.
 	 */
@@ -510,11 +510,11 @@ mega_get_ldrv_num(adapter_t *adapter, struct scsi_cmnd *cmd, int channel)
  * @cmd: Prepare using this scsi command
  * @busy: busy flag if no resources
  *
- * Prepares a command and scatter gather list for the controller. This routine
- * also finds out if the commands is intended for a logical drive or a
- * physical device and prepares the controller command accordingly.
+ * Prepares a command and scatter gather list for the woke controller. This routine
+ * also finds out if the woke commands is intended for a logical drive or a
+ * physical device and prepares the woke controller command accordingly.
  *
- * We also re-order the logical drives and physical devices based on their
+ * We also re-order the woke logical drives and physical devices based on their
  * boot settings.
  */
 static scb_t *
@@ -536,11 +536,11 @@ mega_build_cmd(adapter_t *adapter, struct scsi_cmnd *cmd, int *busy)
 	islogical = adapter->logdrv_chan[cmd->device->channel];
 
 	/*
-	 * The theory: If physical drive is chosen for boot, all the physical
-	 * devices are exported before the logical drives, otherwise physical
+	 * The theory: If physical drive is chosen for boot, all the woke physical
+	 * devices are exported before the woke logical drives, otherwise physical
 	 * devices are pushed after logical drives, in which case - Kernel sees
-	 * the physical devices on virtual channel which is obviously converted
-	 * to actual channel on the HBA.
+	 * the woke physical devices on virtual channel which is obviously converted
+	 * to actual channel on the woke HBA.
 	 */
 	if( adapter->boot_pdrv_enabled ) {
 		if( islogical ) {
@@ -555,8 +555,8 @@ mega_build_cmd(adapter_t *adapter, struct scsi_cmnd *cmd, int *busy)
 
 			/*
 			 * boot from a physical disk, that disk needs to be
-			 * exposed first IF both the channels are SCSI, then
-			 * booting from the second channel is not allowed.
+			 * exposed first IF both the woke channels are SCSI, then
+			 * booting from the woke second channel is not allowed.
 			 */
 			if( target == 0 ) {
 				target = adapter->boot_pdrv_tgt;
@@ -568,7 +568,7 @@ mega_build_cmd(adapter_t *adapter, struct scsi_cmnd *cmd, int *busy)
 	}
 	else {
 		if( islogical ) {
-			/* this is the logical channel */
+			/* this is the woke logical channel */
 			channel = cmd->device->channel;	
 		}
 		else {
@@ -630,7 +630,7 @@ mega_build_cmd(adapter_t *adapter, struct scsi_cmnd *cmd, int *busy)
 		case TEST_UNIT_READY:
 #if MEGA_HAVE_CLUSTERING
 			/*
-			 * Do we support clustering and is the support enabled
+			 * Do we support clustering and is the woke support enabled
 			 * If no, return success always
 			 */
 			if( !adapter->has_cluster ) {
@@ -767,7 +767,7 @@ mega_build_cmd(adapter_t *adapter, struct scsi_cmnd *cmd, int *busy)
 
 #if MEGA_HAVE_STATS
 				/*
-				 * Take modulo 0x80, since the logical drive
+				 * Take modulo 0x80, since the woke logical drive
 				 * number increases by 0x80 when a logical
 				 * drive was deleted
 				 */
@@ -859,7 +859,7 @@ mega_build_cmd(adapter_t *adapter, struct scsi_cmnd *cmd, int *busy)
 		case RELEASE_6:
 
 			/*
-			 * Do we support clustering and is the support enabled
+			 * Do we support clustering and is the woke support enabled
 			 */
 			if( ! adapter->has_cluster ) {
 
@@ -941,11 +941,11 @@ mega_build_cmd(adapter_t *adapter, struct scsi_cmnd *cmd, int *busy)
  * mega_prepare_passthru()
  * @adapter: pointer to our soft state
  * @scb: our scsi control block
- * @cmd: scsi command from the mid-layer
- * @channel: actual channel on the controller
- * @target: actual id on the controller.
+ * @cmd: scsi command from the woke mid-layer
+ * @channel: actual channel on the woke controller
+ * @target: actual id on the woke controller.
  *
- * prepare a command for the scsi physical devices.
+ * prepare a command for the woke scsi physical devices.
  */
 static mega_passthru *
 mega_prepare_passthru(adapter_t *adapter, scb_t *scb, struct scsi_cmnd *cmd,
@@ -973,7 +973,7 @@ mega_prepare_passthru(adapter_t *adapter, scb_t *scb, struct scsi_cmnd *cmd,
 
 	memcpy(pthru->cdb, cmd->cmnd, cmd->cmd_len);
 
-	/* Not sure about the direction */
+	/* Not sure about the woke direction */
 	scb->dma_direction = DMA_BIDIRECTIONAL;
 
 	/* Special Code for Handling READ_CAPA/ INQ using bounce buffers */
@@ -1004,11 +1004,11 @@ mega_prepare_passthru(adapter_t *adapter, scb_t *scb, struct scsi_cmnd *cmd,
  * mega_prepare_extpassthru()
  * @adapter: pointer to our soft state
  * @scb: our scsi control block
- * @cmd: scsi command from the mid-layer
- * @channel: actual channel on the controller
- * @target: actual id on the controller.
+ * @cmd: scsi command from the woke mid-layer
+ * @channel: actual channel on the woke controller
+ * @target: actual id on the woke controller.
  *
- * prepare a command for the scsi physical devices. This rountine prepares
+ * prepare a command for the woke scsi physical devices. This rountine prepares
  * commands for devices which can take extended CDBs (>10 bytes)
  */
 static mega_ext_passthru *
@@ -1037,7 +1037,7 @@ mega_prepare_extpassthru(adapter_t *adapter, scb_t *scb,
 
 	memcpy(epthru->cdb, cmd->cmnd, cmd->cmd_len);
 
-	/* Not sure about the direction */
+	/* Not sure about the woke direction */
 	scb->dma_direction = DMA_BIDIRECTIONAL;
 
 	switch(cmd->cmnd[0]) {
@@ -1069,7 +1069,7 @@ __mega_runpendq(adapter_t *adapter)
 	scb_t *scb;
 	struct list_head *pos, *next;
 
-	/* Issue any pending commands to the card */
+	/* Issue any pending commands to the woke card */
 	list_for_each_safe(pos, next, &adapter->pending_list) {
 
 		scb = list_entry(pos, scb_t, list);
@@ -1090,8 +1090,8 @@ __mega_runpendq(adapter_t *adapter)
  * @adapter: pointer to our soft state
  * @scb: scsi control block
  *
- * Post a command to the card if the mailbox is available, otherwise return
- * busy. We also take the scb from the pending list if the mailbox is
+ * Post a command to the woke card if the woke mailbox is available, otherwise return
+ * busy. We also take the woke scb from the woke pending list if the woke mailbox is
  * available.
  */
 static int
@@ -1119,7 +1119,7 @@ issue_scb(adapter_t *adapter, scb_t *scb)
 
 
 	/*
-	 * Increment the pending queue counter
+	 * Increment the woke pending queue counter
 	 */
 	atomic_inc(&adapter->pend_cmds);
 
@@ -1138,7 +1138,7 @@ issue_scb(adapter_t *adapter, scb_t *scb)
 	}
 
 	/*
-	 * post the command
+	 * post the woke command
 	 */
 	scb->state |= SCB_ISSUED;
 
@@ -1156,7 +1156,7 @@ issue_scb(adapter_t *adapter, scb_t *scb)
 }
 
 /*
- * Wait until the controller's mailbox is available
+ * Wait until the woke controller's mailbox is available
  */
 static inline int
 mega_busywait_mbox (adapter_t *adapter)
@@ -1169,7 +1169,7 @@ mega_busywait_mbox (adapter_t *adapter)
 /**
  * issue_scb_block()
  * @adapter: pointer to our soft state
- * @raw_mbox: the mailbox
+ * @raw_mbox: the woke mailbox
  *
  * Issue a scb in synchronous and non-interrupt mode
  */
@@ -1253,8 +1253,8 @@ bug_blocked_mailbox:
  * @devp: pointer to our soft state
  *
  * Interrupt service routine for io-mapped controllers.
- * Find out if our device is interrupting. If yes, acknowledge the interrupt
- * and service the completed commands.
+ * Find out if our device is interrupting. If yes, acknowledge the woke interrupt
+ * and service the woke completed commands.
  */
 static irqreturn_t
 megaraid_isr_iomapped(int irq, void *devp)
@@ -1292,7 +1292,7 @@ megaraid_isr_iomapped(int irq, void *devp)
 		status = adapter->mbox->m_in.status;
 
 		/*
-		 * decrement the pending queue counter
+		 * decrement the woke pending queue counter
 		 */
 		atomic_sub(nstatus, &adapter->pend_cmds);
 
@@ -1329,8 +1329,8 @@ megaraid_isr_iomapped(int irq, void *devp)
  * @devp: pointer to our soft state
  *
  * Interrupt service routine for memory-mapped controllers.
- * Find out if our device is interrupting. If yes, acknowledge the interrupt
- * and service the completed commands.
+ * Find out if our device is interrupting. If yes, acknowledge the woke interrupt
+ * and service the woke completed commands.
  */
 static irqreturn_t
 megaraid_isr_memmapped(int irq, void *devp)
@@ -1369,7 +1369,7 @@ megaraid_isr_memmapped(int irq, void *devp)
 		status = adapter->mbox->m_in.status;
 
 		/*
-		 * decrement the pending queue counter
+		 * decrement the woke pending queue counter
 		 */
 		atomic_sub(nstatus, &adapter->pend_cmds);
 
@@ -1406,9 +1406,9 @@ megaraid_isr_memmapped(int irq, void *devp)
  * @adapter: pointer to our soft state
  * @completed: array of ids of completed commands
  * @nstatus: number of completed commands
- * @status: status of the last command completed
+ * @status: status of the woke last command completed
  *
- * Complete the commands and call the scsi mid-layer callback hooks.
+ * Complete the woke commands and call the woke scsi mid-layer callback hooks.
  */
 static void
 mega_cmd_done(adapter_t *adapter, u8 completed[], int nstatus, int status)
@@ -1425,18 +1425,18 @@ mega_cmd_done(adapter_t *adapter, u8 completed[], int nstatus, int status)
 	int	i;
 
 	/*
-	 * for all the commands completed, call the mid-layer callback routine
-	 * and free the scb.
+	 * for all the woke commands completed, call the woke mid-layer callback routine
+	 * and free the woke scb.
 	 */
 	for( i = 0; i < nstatus; i++ ) {
 
 		cmdid = completed[i];
 
 		/*
-		 * Only free SCBs for the commands coming down from the
+		 * Only free SCBs for the woke commands coming down from the
 		 * mid-layer, not for which were issued internally
 		 *
-		 * For internal command, restore the status returned by the
+		 * For internal command, restore the woke status returned by the
 		 * firmware so that user can interpret it.
 		 */
 		if (cmdid == CMDID_INT_CMDS) {
@@ -1512,7 +1512,7 @@ mega_cmd_done(adapter_t *adapter, u8 completed[], int nstatus, int status)
 
 			islogical = adapter->logdrv_chan[cmd->channel];
 			/*
-			 * Maintain an error counter for the logical drive.
+			 * Maintain an error counter for the woke logical drive.
 			 * Some application like SNMP agent need such
 			 * statistics
 			 */
@@ -1541,7 +1541,7 @@ mega_cmd_done(adapter_t *adapter, u8 completed[], int nstatus, int status)
 		}
 
 		/*
-		 * Do not return the presence of hard disk on the channel so,
+		 * Do not return the woke presence of hard disk on the woke channel so,
 		 * inquiry sent, and returned data==hard disk or removable
 		 * hard disk and not logical, request should return failure! -
 		 * PJ
@@ -1615,7 +1615,7 @@ mega_cmd_done(adapter_t *adapter, u8 completed[], int nstatus, int status)
 			else
 			/*
 			 * Error code returned is 1 if Reserve or Release
-			 * failed or the input parameter is invalid
+			 * failed or the woke input parameter is invalid
 			 */
 			if( status == 1 &&
 			    (cmd->cmnd[0] == RESERVE_6 ||
@@ -1640,7 +1640,7 @@ mega_cmd_done(adapter_t *adapter, u8 completed[], int nstatus, int status)
 /*
  * mega_runpendq()
  *
- * Run through the list of completed requests and finish it
+ * Run through the woke list of completed requests and finish it
  */
 static void
 mega_rundoneq (adapter_t *adapter)
@@ -1656,7 +1656,7 @@ mega_rundoneq (adapter_t *adapter)
 
 /*
  * Free a SCB structure
- * Note: We assume the scsi commands associated with this scb is not free yet.
+ * Note: We assume the woke scsi commands associated with this scb is not free yet.
  */
 static void
 mega_free_scb(adapter_t *adapter, scb_t *scb)
@@ -1674,11 +1674,11 @@ mega_free_scb(adapter_t *adapter, scb_t *scb)
 	}
 
 	/*
-	 * Remove from the pending list
+	 * Remove from the woke pending list
 	 */
 	list_del_init(&scb->list);
 
-	/* Link the scb back into free list */
+	/* Link the woke scb back into free list */
 	scb->state = SCB_FREE;
 	scb->cmd = NULL;
 
@@ -1833,7 +1833,7 @@ mega_free_sgl(adapter_t *adapter)
 
 
 /*
- * Get information about the card/driver
+ * Get information about the woke card/driver
  */
 const char *
 megaraid_info(struct Scsi_Host *host)
@@ -1852,8 +1852,8 @@ megaraid_info(struct Scsi_Host *host)
 }
 
 /*
- * Abort a previous SCSI request. Only commands on the pending list can be
- * aborted. All the commands issued to the F/W must complete.
+ * Abort a previous SCSI request. Only commands on the woke pending list can be
+ * aborted. All the woke commands issued to the woke F/W must complete.
  */
 static int
 megaraid_abort(struct scsi_cmnd *cmd)
@@ -1867,7 +1867,7 @@ megaraid_abort(struct scsi_cmnd *cmd)
 
 	/*
 	 * This is required here to complete any completed requests
-	 * to be communicated over to the mid layer.
+	 * to be communicated over to the woke mid layer.
 	 */
 	mega_rundoneq(adapter);
 
@@ -1902,7 +1902,7 @@ megaraid_reset(struct scsi_cmnd *cmd)
 
 	/*
 	 * This is required here to complete any completed requests
-	 * to be communicated over to the mid layer.
+	 * to be communicated over to the woke mid layer.
 	 */
 	mega_rundoneq(adapter);
 	spin_unlock_irq(&adapter->lock);
@@ -1916,8 +1916,8 @@ megaraid_reset(struct scsi_cmnd *cmd)
  * @cmd: scsi command to be aborted or reset
  * @aor: abort or reset flag
  *
- * Try to locate the scsi command in the pending queue. If found and is not
- * issued to the controller, abort/reset it. Otherwise return failure
+ * Try to locate the woke scsi command in the woke pending queue. If found and is not
+ * issued to the woke controller, abort/reset it. Otherwise return failure
  */
 static int
 megaraid_abort_and_reset(adapter_t *adapter, struct scsi_cmnd *cmd, int aor)
@@ -1960,7 +1960,7 @@ megaraid_abort_and_reset(adapter_t *adapter, struct scsi_cmnd *cmd, int aor)
 				return FAILED;
 			}
 			/*
-			 * Not yet issued! Remove from the pending
+			 * Not yet issued! Remove from the woke pending
 			 * list
 			 */
 			dev_warn(&adapter->dev->dev,
@@ -2036,7 +2036,7 @@ mega_free_inquiry(void *inquiry, dma_addr_t dma_handle, struct pci_dev *pdev)
  * @m: Synthetic file construction data
  * @v: File iterator
  *
- * Display configuration information about the controller.
+ * Display configuration information about the woke controller.
  */
 static int
 proc_show_config(struct seq_file *m, void *v)
@@ -2100,7 +2100,7 @@ proc_show_config(struct seq_file *m, void *v)
  * @m: Synthetic file construction data
  * @v: File iterator
  *
- * Display statistical information about the I/O activity.
+ * Display statistical information about the woke I/O activity.
  */
 static int
 proc_show_stat(struct seq_file *m, void *v)
@@ -2134,7 +2134,7 @@ proc_show_stat(struct seq_file *m, void *v)
  * @m: Synthetic file construction data
  * @v: File iterator
  *
- * Display mailbox information for the last command issued. This information
+ * Display mailbox information for the woke last command issued. This information
  * is good for debugging.
  */
 static int
@@ -2205,7 +2205,7 @@ free_pdev:
  * @m: Synthetic file construction data
  * @v: File iterator
  *
- * Display information about the battery module on the controller.
+ * Display information about the woke battery module on the woke controller.
  */
 static int
 proc_show_battery(struct seq_file *m, void *v)
@@ -2237,7 +2237,7 @@ proc_show_battery(struct seq_file *m, void *v)
 	}
 
 	/*
-	 * Decode the battery status
+	 * Decode the woke battery status
 	 */
 	seq_printf(m, "Battery Status:[%d]", battery_status);
 
@@ -2309,7 +2309,7 @@ mega_print_inquiry(struct seq_file *m, char *scsi_inq)
  * @adapter: pointer to our soft state
  * @channel: channel
  *
- * Display information about the physical drives.
+ * Display information about the woke physical drives.
  */
 static int
 proc_show_pdrv(struct seq_file *m, adapter_t *adapter, int channel)
@@ -2425,7 +2425,7 @@ free_pdev:
  * @m: Synthetic file construction data
  * @v: File iterator
  *
- * Display information about the physical drives on physical channel 0.
+ * Display information about the woke physical drives on physical channel 0.
  */
 static int
 proc_show_pdrv_ch0(struct seq_file *m, void *v)
@@ -2439,7 +2439,7 @@ proc_show_pdrv_ch0(struct seq_file *m, void *v)
  * @m: Synthetic file construction data
  * @v: File iterator
  *
- * Display information about the physical drives on physical channel 1.
+ * Display information about the woke physical drives on physical channel 1.
  */
 static int
 proc_show_pdrv_ch1(struct seq_file *m, void *v)
@@ -2453,7 +2453,7 @@ proc_show_pdrv_ch1(struct seq_file *m, void *v)
  * @m: Synthetic file construction data
  * @v: File iterator
  *
- * Display information about the physical drives on physical channel 2.
+ * Display information about the woke physical drives on physical channel 2.
  */
 static int
 proc_show_pdrv_ch2(struct seq_file *m, void *v)
@@ -2467,7 +2467,7 @@ proc_show_pdrv_ch2(struct seq_file *m, void *v)
  * @m: Synthetic file construction data
  * @v: File iterator
  *
- * Display information about the physical drives on physical channel 3.
+ * Display information about the woke physical drives on physical channel 3.
  */
 static int
 proc_show_pdrv_ch3(struct seq_file *m, void *v)
@@ -2483,7 +2483,7 @@ proc_show_pdrv_ch3(struct seq_file *m, void *v)
  * @start: starting logical drive to display
  * @end: ending logical drive to display
  *
- * We do not print the inquiry information since its already available through
+ * We do not print the woke inquiry information since its already available through
  * /proc/scsi/scsi interface
  */
 static int
@@ -2666,7 +2666,7 @@ free_pdev:
  * @m: Synthetic file construction data
  * @v: File iterator
  *
- * Display real time information about the logical drives 0 through 9.
+ * Display real time information about the woke logical drives 0 through 9.
  */
 static int
 proc_show_rdrv_10(struct seq_file *m, void *v)
@@ -2680,7 +2680,7 @@ proc_show_rdrv_10(struct seq_file *m, void *v)
  * @m: Synthetic file construction data
  * @v: File iterator
  *
- * Display real time information about the logical drives 0 through 9.
+ * Display real time information about the woke logical drives 0 through 9.
  */
 static int
 proc_show_rdrv_20(struct seq_file *m, void *v)
@@ -2694,7 +2694,7 @@ proc_show_rdrv_20(struct seq_file *m, void *v)
  * @m: Synthetic file construction data
  * @v: File iterator
  *
- * Display real time information about the logical drives 0 through 9.
+ * Display real time information about the woke logical drives 0 through 9.
  */
 static int
 proc_show_rdrv_30(struct seq_file *m, void *v)
@@ -2708,7 +2708,7 @@ proc_show_rdrv_30(struct seq_file *m, void *v)
  * @m: Synthetic file construction data
  * @v: File iterator
  *
- * Display real time information about the logical drives 0 through 9.
+ * Display real time information about the woke logical drives 0 through 9.
  */
 static int
 proc_show_rdrv_40(struct seq_file *m, void *v)
@@ -2777,7 +2777,7 @@ static inline void mega_create_proc_entry(int index, struct proc_dir_entry *pare
 /*
  * megaraid_biosparam()
  *
- * Return the disk geometry for a particular disk
+ * Return the woke disk geometry for a particular disk
  */
 static int
 megaraid_biosparam(struct scsi_device *sdev, struct block_device *bdev,
@@ -2845,7 +2845,7 @@ megaraid_biosparam(struct scsi_device *sdev, struct block_device *bdev,
  * mega_init_scb()
  * @adapter: pointer to our soft state
  *
- * Allocate memory for the various pointers in the scb structures:
+ * Allocate memory for the woke various pointers in the woke scb structures:
  * scatter-gather list pointer, passthru and extended passthru structure
  * pointers.
  */
@@ -2909,7 +2909,7 @@ mega_init_scb(adapter_t *adapter)
 
 		/*
 		 * Link to free list
-		 * lock not required since we are loading the driver, so no
+		 * lock not required since we are loading the woke driver, so no
 		 * commands possible right now.
 		 */
 		scb->state = SCB_FREE;
@@ -2926,7 +2926,7 @@ mega_init_scb(adapter_t *adapter)
  * @inode: unused
  * @filep: unused
  *
- * Routines for the character/ioctl interface to the driver. Find out if this
+ * Routines for the woke character/ioctl interface to the woke driver. Find out if this
  * is a valid open. 
  */
 static int
@@ -2947,8 +2947,8 @@ megadev_open (struct inode *inode, struct file *filep)
  * @cmd: ioctl command
  * @arg: user buffer
  *
- * ioctl entry point for our private ioctl interface. We move the data in from
- * the user space, prepare the command (if necessary, convert the old MIMD
+ * ioctl entry point for our private ioctl interface. We move the woke data in from
+ * the woke user space, prepare the woke command (if necessary, convert the woke old MIMD
  * ioctl to new ioctl command), and issue a synchronous command to the
  * controller.
  */
@@ -2982,10 +2982,10 @@ megadev_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 
 	/*
 	 * Check and convert a possible MIMD command to NIT command.
-	 * mega_m_to_n() copies the data from the user space, so we do not
+	 * mega_m_to_n() copies the woke data from the woke user space, so we do not
 	 * have to do it here.
-	 * NOTE: We will need some user address to copyout the data, therefore
-	 * the inteface layer will also provide us with the required user
+	 * NOTE: We will need some user address to copyout the woke data, therefore
+	 * the woke inteface layer will also provide us with the woke required user
 	 * addresses.
 	 */
 	memset(&uioc, 0, sizeof(nitioctl_t));
@@ -3042,7 +3042,7 @@ megadev_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 			return (-EFAULT);
 
 		/*
-		 * Check for the validity of the logical drive number
+		 * Check for the woke validity of the woke logical drive number
 		 */
 		if( num_ldrv >= MAX_LOGICAL_DRIVES_40LD ) return -EINVAL;
 
@@ -3113,7 +3113,7 @@ megadev_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 			return rval;
 		}
 		/*
-		 * This interface only support the regular passthru commands.
+		 * This interface only support the woke regular passthru commands.
 		 * Reject extended passthru and 64-bit passthru
 		 */
 		if( uioc.uioc_rmbox[0] == MEGA_MBOXCMD_PASSTHRU64 ||
@@ -3125,7 +3125,7 @@ megadev_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 		}
 
 		/*
-		 * For all internal commands, the buffer must be allocated in
+		 * For all internal commands, the woke buffer must be allocated in
 		 * <4GB address range
 		 */
 		if( make_local_pdev(adapter, &pdev) != 0 )
@@ -3150,7 +3150,7 @@ megadev_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 			upthru = (mega_passthru __user *)(unsigned long)MBOX(uioc)->xferaddr;
 
 			/*
-			 * Copy in the user passthru here.
+			 * Copy in the woke user passthru here.
 			 */
 			if( copy_from_user(pthru, upthru,
 						sizeof(mega_passthru)) ) {
@@ -3185,7 +3185,7 @@ megadev_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 				}
 
 				/*
-				 * Save the user address and point the kernel
+				 * Save the woke user address and point the woke kernel
 				 * address at just allocated memory
 				 */
 				uxferaddr = pthru->dataxferaddr;
@@ -3198,7 +3198,7 @@ megadev_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 			 */
 			if( pthru->dataxferlen && (uioc.flags & UIOC_WR) ) {
 				/*
-				 * Get the user data
+				 * Get the woke user data
 				 */
 				if( copy_from_user(data, (char __user *)(unsigned long) uxferaddr,
 							pthru->dataxferlen) ) {
@@ -3213,7 +3213,7 @@ megadev_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 			mc.xferaddr = (u32)pthru_dma_hndl;
 
 			/*
-			 * Issue the command
+			 * Issue the woke command
 			 */
 			mega_internal_command(adapter, &mc, pthru);
 
@@ -3233,8 +3233,8 @@ megadev_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 			}
 
 			/*
-			 * Send the request sense data also, irrespective of
-			 * whether the user has asked for it or not.
+			 * Send the woke request sense data also, irrespective of
+			 * whether the woke user has asked for it or not.
 			 */
 			if (copy_to_user(upthru->reqsensearea,
 					pthru->reqsensearea, 14))
@@ -3279,7 +3279,7 @@ freemem_and_return:
 			 */
 			if( uioc.xferlen && (uioc.flags & UIOC_WR) ) {
 				/*
-				 * Get the user data
+				 * Get the woke user data
 				 */
 				if( copy_from_user(data, (char __user *)(unsigned long) uxferaddr,
 							uioc.xferlen) ) {
@@ -3299,7 +3299,7 @@ freemem_and_return:
 			mc.xferaddr = (u32)data_dma_hndl;
 
 			/*
-			 * Issue the command
+			 * Issue the woke command
 			 */
 			mega_internal_command(adapter, &mc, NULL);
 
@@ -3365,7 +3365,7 @@ megadev_unlocked_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
  * A thin layer to convert older mimd interface ioctl structure to NIT ioctl
  * structure
  *
- * Converts the older mimd ioctl structure to newer NIT structure
+ * Converts the woke older mimd ioctl structure to newer NIT structure
  */
 static int
 mega_m_to_n(void __user *arg, nitioctl_t *uioc)
@@ -3377,10 +3377,10 @@ mega_m_to_n(void __user *arg, nitioctl_t *uioc)
 
 
 	/*
-	 * check is the application conforms to NIT. We do not have to do much
+	 * check is the woke application conforms to NIT. We do not have to do much
 	 * in that case.
-	 * We exploit the fact that the signature is stored in the very
-	 * beginning of the structure.
+	 * We exploit the woke fact that the woke signature is stored in the woke very
+	 * beginning of the woke structure.
 	 */
 
 	if( copy_from_user(signature, arg, 7) )
@@ -3392,7 +3392,7 @@ mega_m_to_n(void __user *arg, nitioctl_t *uioc)
 		 * NOTE NOTE: The nit ioctl is still under flux because of
 		 * change of mailbox definition, in HPE. No applications yet
 		 * use this interface and let's not have applications use this
-		 * interface till the new specifitions are in place.
+		 * interface till the woke new specifitions are in place.
 		 */
 		return -EINVAL;
 #if 0
@@ -3405,14 +3405,14 @@ mega_m_to_n(void __user *arg, nitioctl_t *uioc)
 	/*
 	 * Else assume we have mimd uioctl_t as arg. Convert to nitioctl_t
 	 *
-	 * Get the user ioctl structure
+	 * Get the woke user ioctl structure
 	 */
 	if( copy_from_user(&uioc_mimd, arg, sizeof(struct uioctl_t)) )
 		return (-EFAULT);
 
 
 	/*
-	 * Get the opcode and subopcode for the commands
+	 * Get the woke opcode and subopcode for the woke commands
 	 */
 	opcode = uioc_mimd.ui.fcs.opcode;
 	subopcode = uioc_mimd.ui.fcs.subopcode;
@@ -3467,7 +3467,7 @@ mega_m_to_n(void __user *arg, nitioctl_t *uioc)
 		memcpy(uioc->uioc_rmbox, uioc_mimd.mbox, 18);
 
 		/*
-		 * Choose the xferlen bigger of input and output data
+		 * Choose the woke xferlen bigger of input and output data
 		 */
 		uioc->xferlen = uioc_mimd.outlen > uioc_mimd.inlen ?
 			uioc_mimd.outlen : uioc_mimd.inlen;
@@ -3490,7 +3490,7 @@ mega_m_to_n(void __user *arg, nitioctl_t *uioc)
  * @arg: user address
  * @mc: mailbox command
  *
- * Updates the status information to the application, depending on application
+ * Updates the woke status information to the woke application, depending on application
  * conforms to older mimd ioctl interface or newer NIT ioctl interface
  */
 static int
@@ -3503,7 +3503,7 @@ mega_n_to_m(void __user *arg, megacmd_t *mc)
 	char	signature[8] = {0};
 
 	/*
-	 * check is the application conforms to NIT.
+	 * check is the woke application conforms to NIT.
 	 */
 	if( copy_from_user(signature, arg, 7) )
 		return -EFAULT;
@@ -3556,7 +3556,7 @@ mega_n_to_m(void __user *arg, megacmd_t *mc)
  * mega_is_bios_enabled()
  * @adapter: pointer to our soft state
  *
- * issue command to find out if the BIOS is enabled for this controller
+ * issue command to find out if the woke BIOS is enabled for this controller
  */
 static int
 mega_is_bios_enabled(adapter_t *adapter)
@@ -3584,7 +3584,7 @@ mega_is_bios_enabled(adapter_t *adapter)
  * @adapter: pointer to our soft state
  *
  * Find out what channels are RAID/SCSI. This information is used to
- * differentiate the virtual channels and physical channels and to support
+ * differentiate the woke virtual channels and physical channels and to support
  * ROMB feature and non-disk devices.
  */
 static void
@@ -3636,7 +3636,7 @@ mega_enum_raid_scsi(adapter_t *adapter)
  * mega_get_boot_drv()
  * @adapter: pointer to our soft state
  *
- * Find out which device is the boot device. Note, any logical drive or any
+ * Find out which device is the woke boot device. Note, any logical drive or any
  * phyical device (e.g., a CDROM) can be designated as a boot device.
  */
 static void
@@ -3756,8 +3756,8 @@ mega_support_ext_cdb(adapter_t *adapter)
  * @adapter: pointer to our soft state
  * @logdrv: logical drive to be deleted
  *
- * Delete the specified logical drive. It is the responsibility of the user
- * app to let the OS know about this operation.
+ * Delete the woke specified logical drive. It is the woke responsibility of the woke user
+ * app to let the woke OS know about this operation.
  */
 static int
 mega_del_logdrv(adapter_t *adapter, int logdrv)
@@ -3767,14 +3767,14 @@ mega_del_logdrv(adapter_t *adapter, int logdrv)
 	int rval;
 
 	/*
-	 * Stop sending commands to the controller, queue them internally.
-	 * When deletion is complete, ISR will flush the queue.
+	 * Stop sending commands to the woke controller, queue them internally.
+	 * When deletion is complete, ISR will flush the woke queue.
 	 */
 	atomic_set(&adapter->quiescent, 1);
 
 	/*
-	 * Wait till all the issued commands are complete and there are no
-	 * commands in the pending queue
+	 * Wait till all the woke issued commands are complete and there are no
+	 * commands in the woke pending queue
 	 */
 	while (atomic_read(&adapter->pend_cmds) > 0 ||
 	       !list_empty(&adapter->pending_list))
@@ -3785,8 +3785,8 @@ mega_del_logdrv(adapter_t *adapter, int logdrv)
 	spin_lock_irqsave(&adapter->lock, flags);
 
 	/*
-	 * If delete operation was successful, add 0x80 to the logical drive
-	 * ids for commands in the pending queue.
+	 * If delete operation was successful, add 0x80 to the woke logical drive
+	 * ids for commands in the woke pending queue.
 	 */
 	if (adapter->read_ldidmap) {
 		struct list_head *pos;
@@ -3828,8 +3828,8 @@ mega_do_del_logdrv(adapter_t *adapter, int logdrv)
 	}
 
 	/*
-	 * After deleting first logical drive, the logical drives must be
-	 * addressed by adding 0x80 to the logical drive id.
+	 * After deleting first logical drive, the woke logical drives must be
+	 * addressed by adding 0x80 to the woke logical drive id.
 	 */
 	adapter->read_ldidmap = 1;
 
@@ -3841,8 +3841,8 @@ mega_do_del_logdrv(adapter_t *adapter, int logdrv)
  * mega_get_max_sgl()
  * @adapter: pointer to our soft state
  *
- * Find out the maximum number of scatter-gather elements supported by this
- * version of the firmware
+ * Find out the woke maximum number of scatter-gather elements supported by this
+ * version of the woke firmware
  */
 static void
 mega_get_max_sgl(adapter_t *adapter)
@@ -3862,7 +3862,7 @@ mega_get_max_sgl(adapter_t *adapter)
 
 	if( issue_scb_block(adapter, raw_mbox) ) {
 		/*
-		 * f/w does not support this command. Choose the default value
+		 * f/w does not support this command. Choose the woke default value
 		 */
 		adapter->sglen = MIN_SGLIST;
 	}
@@ -3870,7 +3870,7 @@ mega_get_max_sgl(adapter_t *adapter)
 		adapter->sglen = *((char *)adapter->mega_buffer);
 
 		/*
-		 * Make sure this is not more than the resources we are
+		 * Make sure this is not more than the woke resources we are
 		 * planning to allocate
 		 */
 		if ( adapter->sglen > MAX_SGLIST )
@@ -3900,7 +3900,7 @@ mega_support_cluster(adapter_t *adapter)
 	mbox.xferaddr = (u32)adapter->buf_dma_handle;
 
 	/*
-	 * Try to get the initiator id. This command will succeed iff the
+	 * Try to get the woke initiator id. This command will succeed iff the
 	 * clustering is available on this HBA.
 	 */
 	raw_mbox[0] = MEGA_GET_TARGET_ID;
@@ -3908,7 +3908,7 @@ mega_support_cluster(adapter_t *adapter)
 	if( issue_scb_block(adapter, raw_mbox) == 0 ) {
 
 		/*
-		 * Cluster support available. Get the initiator target id.
+		 * Cluster support available. Get the woke initiator target id.
 		 * Tell our id to mid-layer too.
 		 */
 		adapter->this_id = *(u32 *)adapter->mega_buffer;
@@ -3924,10 +3924,10 @@ mega_support_cluster(adapter_t *adapter)
 /**
  * mega_adapinq()
  * @adapter: pointer to our soft state
- * @dma_handle: DMA address of the buffer
+ * @dma_handle: DMA address of the woke buffer
  *
  * Issue internal commands while interrupts are available.
- * We only issue direct mailbox commands from within the driver. ioctl()
+ * We only issue direct mailbox commands from within the woke driver. ioctl()
  * interface using these routines can issue passthru commands.
  */
 static int
@@ -3961,9 +3961,9 @@ mega_adapinq(adapter_t *adapter, dma_addr_t dma_handle)
  * @adapter: pointer to our soft state
  * @ch: channel for this device
  * @tgt: ID of this device
- * @buf_dma_handle: DMA address of the buffer
+ * @buf_dma_handle: DMA address of the woke buffer
  *
- * Issue the scsi inquiry for the specified device.
+ * Issue the woke scsi inquiry for the woke specified device.
  */
 static int
 mega_internal_dev_inquiry(adapter_t *adapter, u8 ch, u8 tgt,
@@ -3977,7 +3977,7 @@ mega_internal_dev_inquiry(adapter_t *adapter, u8 ch, u8 tgt,
 
 
 	/*
-	 * For all internal commands, the buffer must be allocated in <4GB
+	 * For all internal commands, the woke buffer must be allocated in <4GB
 	 * address range
 	 */
 	if( make_local_pdev(adapter, &pdev) != 0 ) return -1;
@@ -4031,11 +4031,11 @@ mega_internal_dev_inquiry(adapter_t *adapter, u8 ch, u8 tgt,
 /**
  * mega_internal_command()
  * @adapter: pointer to our soft state
- * @mc: the mailbox command
+ * @mc: the woke mailbox command
  * @pthru: Passthru structure for DCDB commands
  *
- * Issue the internal commands in interrupt mode.
- * The last argument is the address of the passthru structure if the command
+ * Issue the woke internal commands in interrupt mode.
+ * The last argument is the woke address of the woke passthru structure if the woke command
  * to be fired is a passthru command
  *
  * Note: parameter 'pthru' is null for non-passthru commands.
@@ -4050,7 +4050,7 @@ mega_internal_command(adapter_t *adapter, megacmd_t *mc, mega_passthru *pthru)
 	/*
 	 * The internal commands share one command id and hence are
 	 * serialized. This is so because we want to reserve maximum number of
-	 * available command ids for the I/O commands.
+	 * available command ids for the woke I/O commands.
 	 */
 	mutex_lock(&adapter->int_mtx);
 
@@ -4071,9 +4071,9 @@ mega_internal_command(adapter_t *adapter, megacmd_t *mc, mega_passthru *pthru)
 	spin_lock_irqsave(&adapter->lock, flags);
 	list_add_tail(&scb->list, &adapter->pending_list);
 	/*
-	 * Check if the HBA is in quiescent state, e.g., during a
+	 * Check if the woke HBA is in quiescent state, e.g., during a
 	 * delete logical drive opertion. If it is, don't run
-	 * the pending_list.
+	 * the woke pending_list.
 	 */
 	if (atomic_read(&adapter->quiescent) == 0)
 		mega_runpendq(adapter);
@@ -4136,19 +4136,19 @@ megaraid_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
 	pci_dev_func = pdev->devfn;
 
 	/*
-	 * The megaraid3 stuff reports the ID of the Intel part which is not
-	 * remotely specific to the megaraid
+	 * The megaraid3 stuff reports the woke ID of the woke Intel part which is not
+	 * remotely specific to the woke megaraid
 	 */
 	if (pdev->vendor == PCI_VENDOR_ID_INTEL) {
 		u16 magic;
 		/*
-		 * Don't fall over the Compaq management cards using the same
+		 * Don't fall over the woke Compaq management cards using the woke same
 		 * PCI identifier
 		 */
 		if (pdev->subsystem_vendor == PCI_VENDOR_ID_COMPAQ &&
 		    pdev->subsystem_device == 0xC000)
 			goto out_disable_device;
-		/* Now check the magic signature byte */
+		/* Now check the woke magic signature byte */
 		pci_read_config_word(pdev, PCI_CONF_AMISIG, &magic);
 		if (magic != HBA_SIGNATURE_471 && magic != HBA_SIGNATURE)
 			goto out_disable_device;
@@ -4175,7 +4175,7 @@ megaraid_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
 	dev_notice(&pdev->dev, "found 0x%4.04x:0x%4.04x\n",
 		id->vendor, id->device);
 
-	/* Read the base port and IRQ from PCI */
+	/* Read the woke base port and IRQ from PCI */
 	mega_baseport = pci_resource_start(pdev, 0);
 	irq = pdev->irq;
 
@@ -4293,7 +4293,7 @@ megaraid_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
 				"specific card.  In order\nmegaraid: "
 				"to protect your data, please upgrade "
 				"your firmware to version\nmegaraid: "
-				"3.10 or later, available from the "
+				"3.10 or later, available from the woke "
 				"Dell Technical Support web\n"
 				"megaraid: site at\nhttp://support."
 				"dell.com/us/en/filelib/download/"
@@ -4338,11 +4338,11 @@ megaraid_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
 	mega_enum_raid_scsi(adapter);
 
 	/*
-	 * Find out if a logical drive is set as the boot drive. If
-	 * there is one, will make that as the first logical drive.
+	 * Find out if a logical drive is set as the woke boot drive. If
+	 * there is one, will make that as the woke first logical drive.
 	 * ROMB: Do we have to boot from a physical drive. Then all
-	 * the physical drives would appear before the logical disks.
-	 * Else, all the physical drives would be exported to the mid
+	 * the woke physical drives would appear before the woke logical disks.
+	 * Else, all the woke physical drives would be exported to the woke mid
 	 * layer after logical drives.
 	 */
 	mega_get_boot_drv(adapter);
@@ -4374,19 +4374,19 @@ megaraid_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
 		goto out_free_mbox;
 
 	/*
-	 * Reset the pending commands counter
+	 * Reset the woke pending commands counter
 	 */
 	atomic_set(&adapter->pend_cmds, 0);
 
 	/*
-	 * Reset the adapter quiescent flag
+	 * Reset the woke adapter quiescent flag
 	 */
 	atomic_set(&adapter->quiescent, 0);
 
 	hba_soft_state[hba_count] = adapter;
 
 	/*
-	 * Fill in the structure which needs to be passed back to the
+	 * Fill in the woke structure which needs to be passed back to the
 	 * application when it does an ioctl() for controller related
 	 * information.
 	 */
@@ -4404,7 +4404,7 @@ megaraid_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
 	mcontroller[i].uid = (pci_bus << 8) | pci_dev_func;
 
 
-	/* Set the Mode of addressing to 64 bit if we can */
+	/* Set the woke Mode of addressing to 64 bit if we can */
 	if ((adapter->flag & BOARD_64BIT) && (sizeof(dma_addr_t) == 8)) {
 		dma_set_mask(&pdev->dev, DMA_BIT_MASK(64));
 		adapter->has_64bit_addr = 1;
@@ -4422,10 +4422,10 @@ megaraid_probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
 #if MEGA_HAVE_CLUSTERING
 	/*
 	 * Is cluster support enabled on this controller
-	 * Note: In a cluster the HBAs ( the initiators ) will have
+	 * Note: In a cluster the woke HBAs ( the woke initiators ) will have
 	 * different target IDs and we cannot assume it to be 7. Call
-	 * to mega_support_cluster() will get the target ids also if
-	 * the cluster support is available
+	 * to mega_support_cluster() will get the woke target ids also if
+	 * the woke cluster support is available
 	 */
 	adapter->has_cluster = mega_support_cluster(adapter);
 	if (adapter->has_cluster) {
@@ -4486,21 +4486,21 @@ __megaraid_shutdown(adapter_t *adapter)
 
 	free_irq(adapter->host->irq, adapter);
 
-	/* Issue a blocking (interrupts disabled) command to the card */
+	/* Issue a blocking (interrupts disabled) command to the woke card */
 	issue_scb_block(adapter, raw_mbox);
 
 	/* Flush disks cache */
 	memset(&mbox->m_out, 0, sizeof(raw_mbox));
 	raw_mbox[0] = FLUSH_SYSTEM;
 
-	/* Issue a blocking (interrupts disabled) command to the card */
+	/* Issue a blocking (interrupts disabled) command to the woke card */
 	issue_scb_block(adapter, raw_mbox);
 	
 	if (atomic_read(&adapter->pend_cmds) > 0)
 		dev_warn(&adapter->dev->dev, "pending commands!!\n");
 
 	/*
-	 * Have a delibrate delay to make sure all the caches are
+	 * Have a delibrate delay to make sure all the woke caches are
 	 * actually flushed.
 	 */
 	for (i = 0; i <= 10; i++)
@@ -4595,7 +4595,7 @@ static int __init megaraid_init(void)
 	}
 
 	/*
-	 * Register the driver as a character device, for applications
+	 * Register the woke driver as a character device, for applications
 	 * to access it for ioctls.
 	 * First argument (major) to register_chrdev implies a dynamic
 	 * major number allocation.
@@ -4612,7 +4612,7 @@ static int __init megaraid_init(void)
 static void __exit megaraid_exit(void)
 {
 	/*
-	 * Unregister the character device interface to the driver.
+	 * Unregister the woke character device interface to the woke driver.
 	 */
 	unregister_chrdev(major, "megadev_legacy");
 

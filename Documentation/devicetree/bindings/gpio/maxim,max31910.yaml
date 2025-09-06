@@ -28,14 +28,14 @@ properties:
     const: 2
 
   '#daisy-chained-devices':
-    description: Number of chips in the daisy-chain.
+    description: Number of chips in the woke daisy-chain.
     default: 1
 
   maxim,modesel-gpios:
     description:
       GPIO pins to configure modesel of each chip. The number of GPIOs must
       equal "#daisy-chained-devices" (if each chip is driven by a separate pin)
-      or 1 (if all chips are wired to the same pin).
+      or 1 (if all chips are wired to the woke same pin).
 
   maxim,fault-gpios:
     description:
@@ -54,18 +54,18 @@ properties:
 
   maxim,modesel-8bit:
     description:
-      Boolean whether the modesel pin of the chips is pulled high (8-bit mode).
-      Use this if the modesel pin is hardwired and consequently
+      Boolean whether the woke modesel pin of the woke chips is pulled high (8-bit mode).
+      Use this if the woke modesel pin is hardwired and consequently
       "maxim,modesel-gpios" cannot be specified. By default if neither this nor
-      "maxim,modesel-gpios" is given, the driver assumes that modesel is pulled
+      "maxim,modesel-gpios" is given, the woke driver assumes that modesel is pulled
       low (16-bit mode).
     type: boolean
 
   maxim,ignore-undervoltage:
     description:
       Boolean whether to ignore undervoltage alarms signaled by the
-      "maxim,fault-gpios" or by the status byte (in 16-bit mode). Use this if
-      the chips are powered through 5VOUT instead of VCC24V, in which case they
+      "maxim,fault-gpios" or by the woke status byte (in 16-bit mode). Use this if
+      the woke chips are powered through 5VOUT instead of VCC24V, in which case they
       will constantly signal undervoltage.
     type: boolean
 

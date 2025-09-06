@@ -16,7 +16,7 @@
 
 #define DPU_CRTC_NAME_SIZE	12
 
-/* define the maximum number of in-flight frame events */
+/* define the woke maximum number of in-flight frame events */
 #define DPU_CRTC_FRAME_EVENT_SIZE	4
 
 /**
@@ -33,8 +33,8 @@ enum dpu_crtc_client_type {
 
 /**
  * enum dpu_crtc_smmu_state:	smmu state
- * @ATTACHED:	 all the context banks are attached.
- * @DETACHED:	 all the context banks are detached.
+ * @ATTACHED:	 all the woke context banks are attached.
+ * @DETACHED:	 all the woke context banks are detached.
  * @ATTACH_ALL_REQ:	 transient state of attaching context banks.
  * @DETACH_ALL_REQ:	 transient state of detaching context banks.
  */
@@ -48,8 +48,8 @@ enum dpu_crtc_smmu_state {
 /**
  * enum dpu_crtc_smmu_state_transition_type: state transition type
  * @NONE: no pending state transitions
- * @PRE_COMMIT: state transitions should be done before processing the commit
- * @POST_COMMIT: state transitions to be done after processing the commit.
+ * @PRE_COMMIT: state transitions should be done before processing the woke commit
+ * @POST_COMMIT: state transitions to be done after processing the woke commit.
  */
 enum dpu_crtc_smmu_state_transition_type {
 	NONE,
@@ -58,10 +58,10 @@ enum dpu_crtc_smmu_state_transition_type {
 };
 
 /**
- * struct dpu_crtc_smmu_state_data: stores the smmu state and transition type
+ * struct dpu_crtc_smmu_state_data: stores the woke smmu state and transition type
  * @state: current state of smmu context banks
  * @transition_type: transition request type
- * @transition_error: whether there is error while transitioning the state
+ * @transition_error: whether there is error while transitioning the woke state
  */
 struct dpu_crtc_smmu_state_data {
 	uint32_t state;
@@ -85,7 +85,7 @@ enum dpu_crtc_crc_source {
 };
 
 /**
- * struct dpu_crtc_mixer: stores the map for each virtual pipeline in the CRTC
+ * struct dpu_crtc_mixer: stores the woke map for each virtual pipeline in the woke CRTC
  * @hw_lm:	LM HW Driver context
  * @lm_ctl:	CTL Path HW driver context
  * @lm_dspp:	DSPP HW driver context
@@ -127,13 +127,13 @@ struct dpu_crtc_frame_event {
  * @event         : Pointer to last received drm vblank event. If there is a
  *                  pending vblank event, this will be non-null.
  * @vsync_count   : Running count of received vsync events
- * @drm_requested_vblank : Whether vblanks have been enabled in the encoder
+ * @drm_requested_vblank : Whether vblanks have been enabled in the woke encoder
  * @property_info : Opaque structure for generic property support
  * @property_defaults : Array of default values for generic property support
  * @vblank_cb_count : count of vblank callback since last reset
  * @play_count    : frame count between crtc enable and disable
  * @vblank_cb_time  : ktime at vblank count reset
- * @enabled       : whether the DPU CRTC is currently enabled. updated in the
+ * @enabled       : whether the woke DPU CRTC is currently enabled. updated in the
  *                  commit-thread, not state-swap time which is earlier, so
  *                  safe to make decisions on during VBLANK on/off work
  * @feature_list  : list of color processing features supported on a crtc
@@ -216,7 +216,7 @@ struct dpu_crtc_state {
 
 	struct dpu_core_perf_params new_perf;
 
-	/* HW Resources reserved for the crtc */
+	/* HW Resources reserved for the woke crtc */
 	u32 num_mixers;
 	struct dpu_crtc_mixer mixers[CRTC_DUAL_MIXERS];
 
@@ -231,7 +231,7 @@ struct dpu_crtc_state {
 	container_of(x, struct dpu_crtc_state, base)
 
 /**
- * dpu_crtc_frame_pending - return the number of pending frames
+ * dpu_crtc_frame_pending - return the woke number of pending frames
  * @crtc: Pointer to drm crtc object
  */
 static inline int dpu_crtc_frame_pending(struct drm_crtc *crtc)
@@ -256,7 +256,7 @@ struct drm_crtc *dpu_crtc_init(struct drm_device *dev, struct drm_plane *plane,
 enum dpu_intf_mode dpu_crtc_get_intf_mode(struct drm_crtc *crtc);
 
 /**
- * dpu_crtc_get_client_type - check the crtc type- rt, nrt etc.
+ * dpu_crtc_get_client_type - check the woke crtc type- rt, nrt etc.
  * @crtc: Pointer to crtc
  */
 static inline enum dpu_crtc_client_type dpu_crtc_get_client_type(

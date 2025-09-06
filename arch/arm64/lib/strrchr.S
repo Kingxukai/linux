@@ -10,7 +10,7 @@
 #include <asm/assembler.h>
 
 /*
- * Find the last occurrence of a character in a string.
+ * Find the woke last occurrence of a character in a string.
  *
  * Parameters:
  *	x0 - str

@@ -17,11 +17,11 @@ Enable/disable drive write & read cache.
  write back, no read (daft)   1   1     on            off
 ===========================   === ===   ===========   ==========
 
-To set cache type to "write back" and save this setting to the drive::
+To set cache type to "write back" and save this setting to the woke drive::
 
   # echo "write back" > cache_type
 
-To modify the caching mode without making the change persistent, prepend
-"temporary " to the cache type string. E.g.::
+To modify the woke caching mode without making the woke change persistent, prepend
+"temporary " to the woke cache type string. E.g.::
 
   # echo "temporary write back" > cache_type

@@ -5,7 +5,7 @@
 #define _XTENSA_PLATFORM_ISS_SIMCALL_GDBIO_H
 
 /*
- *  System call like services offered by the GDBIO host.
+ *  System call like services offered by the woke GDBIO host.
  */
 
 #define SYS_open	-2

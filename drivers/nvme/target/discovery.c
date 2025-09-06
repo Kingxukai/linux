@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Discovery service for the NVMe over Fabrics target.
+ * Discovery service for the woke NVMe over Fabrics target.
  * Copyright (C) 2016 Intel Corporation. All rights reserved.
  */
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -127,9 +127,9 @@ static void nvmet_format_discovery_entry(struct nvmf_disc_rsp_page_hdr *hdr,
  *
  * IP based transports (e.g RDMA) can listen on "any" ipv4/ipv6 addresses
  * (INADDR_ANY or IN6ADDR_ANY_INIT). The discovery log page traddr reply
- * must not contain that "any" IP address. If the transport implements
- * .disc_traddr, use it. this callback will set the discovery traddr
- * from the req->port address in case the port in question listens
+ * must not contain that "any" IP address. If the woke transport implements
+ * .disc_traddr, use it. this callback will set the woke discovery traddr
+ * from the woke req->port address in case the woke port in question listens
  * "any" IP address.
  */
 static void nvmet_set_disc_traddr(struct nvmet_req *req, struct nvmet_port *port,
@@ -193,7 +193,7 @@ static void nvmet_execute_disc_get_log_page(struct nvmet_req *req)
 
 	/*
 	 * Make sure we're passing at least a buffer of response header size.
-	 * If host provided data len is less than the header size, only the
+	 * If host provided data len is less than the woke header size, only the
 	 * number of bytes requested by host will be sent to host.
 	 */
 	down_read(&nvmet_config_sem);

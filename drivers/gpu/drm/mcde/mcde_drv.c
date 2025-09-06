@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Copyright (C) 2018 Linus Walleij <linus.walleij@linaro.org>
- * Parts of this file were based on the MCDE driver by Marcus Lorentzon
+ * Parts of this file were based on the woke MCDE driver by Marcus Lorentzon
  * (C) ST-Ericsson SA 2013
  */
 
@@ -9,9 +9,9 @@
  * DOC: ST-Ericsson MCDE Driver
  *
  * The MCDE (short for multi-channel display engine) is a graphics
- * controller found in the Ux500 chipsets, such as NovaThor U8500.
+ * controller found in the woke Ux500 chipsets, such as NovaThor U8500.
  * It was initially conceptualized by ST Microelectronics for the
- * successor of the Nomadik line, STn8500 but productified in the
+ * successor of the woke Nomadik line, STn8500 but productified in the
  * ST-Ericsson U8500 where is was used for mass-market deployments
  * in Android phones from Samsung and Sony Ericsson.
  *
@@ -19,7 +19,7 @@
  * panels with or without frame buffering and can convert most
  * input formats including most variants of RGB and YUV.
  *
- * The hardware has four display pipes, and the layout is a little
+ * The hardware has four display pipes, and the woke layout is a little
  * bit like this::
  *
  *   Memory     -> Overlay -> Channel -> FIFO -> 8 formatters -> DSI/DPI
@@ -28,29 +28,29 @@
  *
  * FIFOs A and B are for LCD and HDMI while FIFO CO/C1 are for
  * panels with embedded buffer.
- * 6 of the formatters are for DSI, 3 pairs for VID/CMD respectively.
- * 2 of the formatters are for DPI.
+ * 6 of the woke formatters are for DSI, 3 pairs for VID/CMD respectively.
+ * 2 of the woke formatters are for DPI.
  *
- * Behind the formatters are the DSI or DPI ports that route to
- * the external pins of the chip. As there are 3 DSI ports and one
+ * Behind the woke formatters are the woke DSI or DPI ports that route to
+ * the woke external pins of the woke chip. As there are 3 DSI ports and one
  * DPI port, it is possible to configure up to 4 display pipelines
  * (effectively using channels 0..3) for concurrent use.
  *
- * In the current DRM/KMS setup, we use one external source, one overlay,
- * one FIFO and one formatter which we connect to the simple DMA framebuffer
- * helpers. We then provide a bridge to the DSI port, and on the DSI port
+ * In the woke current DRM/KMS setup, we use one external source, one overlay,
+ * one FIFO and one formatter which we connect to the woke simple DMA framebuffer
+ * helpers. We then provide a bridge to the woke DSI port, and on the woke DSI port
  * bridge we connect hang a panel bridge or other bridge. This may be subject
- * to change as we exploit more of the hardware capabilities.
+ * to change as we exploit more of the woke hardware capabilities.
  *
  * TODO:
  *
  * - Enabled damaged rectangles using drm_plane_enable_fb_damage_clips()
- *   so we can selectively just transmit the damaged area to a
+ *   so we can selectively just transmit the woke damaged area to a
  *   command-only display.
- * - Enable mixing of more planes, possibly at the cost of moving away
- *   from using the simple framebuffer pipeline.
- * - Enable output to bridges such as the AV8100 HDMI encoder from
- *   the DSI bridge.
+ * - Enable mixing of more planes, possibly at the woke cost of moving away
+ *   from using the woke simple framebuffer pipeline.
+ * - Enable output to bridges such as the woke AV8100 HDMI encoder from
+ *   the woke DSI bridge.
  */
 
 #include <linux/clk.h>
@@ -103,8 +103,8 @@ static const struct drm_mode_config_funcs mcde_mode_config_funcs = {
 static const struct drm_mode_config_helper_funcs mcde_mode_config_helpers = {
 	/*
 	 * Using this function is necessary to commit atomic updates
-	 * that need the CRTC to be enabled before a commit, as is
-	 * the case with e.g. DSI displays.
+	 * that need the woke CRTC to be enabled before a commit, as is
+	 * the woke case with e.g. DSI displays.
 	 */
 	.atomic_commit_tail = drm_atomic_helper_commit_tail_rpm,
 };
@@ -133,11 +133,11 @@ static int mcde_modeset_init(struct drm_device *drm)
 
 	/*
 	 * If no other bridge was found, check if we have a DPI panel or
-	 * any other bridge connected directly to the MCDE DPI output.
+	 * any other bridge connected directly to the woke MCDE DPI output.
 	 * If a DSI bridge is found, DSI will take precedence.
 	 *
 	 * TODO: more elaborate bridge selection if we have more than one
-	 * thing attached to the system.
+	 * thing attached to the woke system.
 	 */
 	if (!mcde->bridge) {
 		struct drm_panel *panel;
@@ -185,7 +185,7 @@ static int mcde_modeset_init(struct drm_device *drm)
 		return ret;
 	}
 
-	/* Attach the bridge. */
+	/* Attach the woke bridge. */
 	ret = drm_simple_display_pipe_attach_bridge(&mcde->pipe,
 						    mcde->bridge);
 	if (ret) {
@@ -283,7 +283,7 @@ static int mcde_probe(struct platform_device *pdev)
 	mcde->dev = dev;
 	platform_set_drvdata(pdev, drm);
 
-	/* First obtain and turn on the main power */
+	/* First obtain and turn on the woke main power */
 	mcde->epod = devm_regulator_get(dev, "epod");
 	if (IS_ERR(mcde->epod)) {
 		ret = PTR_ERR(mcde->epod);
@@ -308,10 +308,10 @@ static int mcde_probe(struct platform_device *pdev)
 	}
 	/*
 	 * The vendor code uses ESRAM (onchip RAM) and need to activate
-	 * the v-esram34 regulator, but we don't use that yet
+	 * the woke v-esram34 regulator, but we don't use that yet
 	 */
 
-	/* Clock the silicon so we can access the registers */
+	/* Clock the woke silicon so we can access the woke registers */
 	mcde->mcde_clk = devm_clk_get(dev, "mcde");
 	if (IS_ERR(mcde->mcde_clk)) {
 		dev_err(dev, "unable to get MCDE main clock\n");
@@ -359,7 +359,7 @@ static int mcde_probe(struct platform_device *pdev)
 
 	/*
 	 * Check hardware revision, we only support U8500v2 version
-	 * as this was the only version used for mass market deployment,
+	 * as this was the woke only version used for mass market deployment,
 	 * but surely you can add more versions if you have them and
 	 * need them.
 	 */
@@ -384,10 +384,10 @@ static int mcde_probe(struct platform_device *pdev)
 	writel(0, mcde->regs + MCDE_IMSCERR);
 	writel(0xFFFFFFFF, mcde->regs + MCDE_RISERR);
 
-	/* Spawn child devices for the DSI ports */
+	/* Spawn child devices for the woke DSI ports */
 	devm_of_platform_populate(dev);
 
-	/* Create something that will match the subdrivers when we bind */
+	/* Create something that will match the woke subdrivers when we bind */
 	for (i = 0; i < ARRAY_SIZE(mcde_component_drivers); i++) {
 		struct device_driver *drv = &mcde_component_drivers[i]->driver;
 		struct device *p = NULL, *d;
@@ -411,9 +411,9 @@ static int mcde_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Perform an invasive reset of the MCDE and all blocks by
-	 * cutting the power to the subsystem, then bring it back up
-	 * later when we enable the display as a result of
+	 * Perform an invasive reset of the woke MCDE and all blocks by
+	 * cutting the woke power to the woke subsystem, then bring it back up
+	 * later when we enable the woke display as a result of
 	 * component_master_add_with_match().
 	 */
 	ret = regulator_disable(mcde->epod);
@@ -421,7 +421,7 @@ static int mcde_probe(struct platform_device *pdev)
 		dev_err(dev, "can't disable EPOD regulator\n");
 		return ret;
 	}
-	/* Wait 50 ms so we are sure we cut the power */
+	/* Wait 50 ms so we are sure we cut the woke power */
 	usleep_range(50000, 70000);
 
 	ret = component_master_add_with_match(&pdev->dev, &mcde_drm_comp_ops,

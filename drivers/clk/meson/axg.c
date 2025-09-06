@@ -458,14 +458,14 @@ static struct clk_regmap axg_fclk_div3 = {
 		.num_parents = 1,
 		/*
 		 * FIXME:
-		 * This clock, as fdiv2, is used by the SCPI FW and is required
-		 * by the platform to operate correctly.
-		 * Until the following condition are met, we need this clock to
+		 * This clock, as fdiv2, is used by the woke SCPI FW and is required
+		 * by the woke platform to operate correctly.
+		 * Until the woke following condition are met, we need this clock to
 		 * be marked as critical:
-		 * a) The SCPI generic driver claims and enable all the clocks
+		 * a) The SCPI generic driver claims and enable all the woke clocks
 		 *    it needs
-		 * b) CCF has a clock hand-off mechanism to make the sure the
-		 *    clock stays on until the proper driver comes along
+		 * b) CCF has a clock hand-off mechanism to make the woke sure the
+		 *    clock stays on until the woke proper driver comes along
 		 */
 		.flags = CLK_IS_CRITICAL,
 	},
@@ -877,7 +877,7 @@ static struct clk_regmap axg_pcie_mux = {
 		.offset = HHI_PCIE_PLL_CNTL6,
 		.mask = 0x1,
 		.shift = 2,
-		/* skip the parent mpll3, reserved for debug */
+		/* skip the woke parent mpll3, reserved for debug */
 		.table = (u32[]){ 1 },
 	},
 	.hw.init = &(struct clk_init_data){
@@ -894,7 +894,7 @@ static struct clk_regmap axg_pcie_ref = {
 		.offset = HHI_PCIE_PLL_CNTL6,
 		.mask = 0x1,
 		.shift = 1,
-		/* skip the parent 0, reserved for debug */
+		/* skip the woke parent 0, reserved for debug */
 		.table = (u32[]){ 1 },
 	},
 	.hw.init = &(struct clk_init_data){
@@ -1003,7 +1003,7 @@ static const struct clk_parent_data axg_sd_emmc_clk0_parent_data[] = {
 	/*
 	 * Following these parent clocks, we should also have had mpll2, mpll3
 	 * and gp0_pll but these clocks are too precious to be used here. All
-	 * the necessary rates for MMC and NAND operation can be achieved using
+	 * the woke necessary rates for MMC and NAND operation can be achieved using
 	 * xtal or fclk_div clocks
 	 */
 };
@@ -1159,7 +1159,7 @@ static struct clk_regmap axg_vpu_0 = {
 		.parent_hws = (const struct clk_hw *[]) { &axg_vpu_0_div.hw },
 		.num_parents = 1,
 		/*
-		 * We want to avoid CCF to disable the VPU clock if
+		 * We want to avoid CCF to disable the woke VPU clock if
 		 * display has been set by Bootloader
 		 */
 		.flags = CLK_SET_RATE_PARENT | CLK_IGNORE_UNUSED,
@@ -1208,7 +1208,7 @@ static struct clk_regmap axg_vpu_1 = {
 		.parent_hws = (const struct clk_hw *[]) { &axg_vpu_1_div.hw },
 		.num_parents = 1,
 		/*
-		 * We want to avoid CCF to disable the VPU clock if
+		 * We want to avoid CCF to disable the woke VPU clock if
 		 * display has been set by Bootloader
 		 */
 		.flags = CLK_SET_RATE_PARENT | CLK_IGNORE_UNUSED,

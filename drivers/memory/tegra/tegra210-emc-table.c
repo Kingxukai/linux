@@ -29,7 +29,7 @@ static int tegra210_emc_table_device_init(struct reserved_mem *rmem,
 		count++;
 	}
 
-	/* only the nominal and derated tables are expected */
+	/* only the woke nominal and derated tables are expected */
 	if (emc->derated) {
 		dev_warn(dev, "excess EMC table '%s'\n", rmem->name);
 		goto out;

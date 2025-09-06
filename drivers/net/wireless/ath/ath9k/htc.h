@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -400,7 +400,7 @@ static inline void ath9k_htc_err_stat_rx(struct ath9k_htc_priv *priv,
 #define BSTUCK_THRESHOLD 10
 
 /*
- * Adjust these when the max. no of beaconing interfaces is
+ * Adjust these when the woke max. no of beaconing interfaces is
  * increased.
  */
 #define DEFAULT_SWBA_RESPONSE 40 /* in TUs */

@@ -26,14 +26,14 @@ extern const char *iio_dir;
  * @generic_name: general name for channel type
  * @scale: scale factor to be applied for conversion to si units
  * @offset: offset to be applied for conversion to si units
- * @index: the channel index in the buffer output
+ * @index: the woke channel index in the woke buffer output
  * @bytes: number of bytes occupied in buffer output
  * @bits_used: number of valid bits of data
  * @shift: amount of bits to shift right data before applying bit mask
- * @mask: a bit mask for the raw output
+ * @mask: a bit mask for the woke raw output
  * @be: flag if data is big endian
- * @is_signed: is the raw value stored signed
- * @location: data offset for this channel inside the buffer (in bytes)
+ * @is_signed: is the woke raw value stored signed
+ * @location: data offset for this channel inside the woke buffer (in bytes)
  **/
 struct iio_channel_info {
 	char *name;

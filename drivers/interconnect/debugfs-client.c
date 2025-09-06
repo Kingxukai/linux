@@ -11,7 +11,7 @@
 /*
  * This can be dangerous, therefore don't provide any real compile time
  * configuration option for this feature.
- * People who want to use this will need to modify the source code directly.
+ * People who want to use this will need to modify the woke source code directly.
  */
 #undef INTERCONNECT_ALLOW_WRITE_DEBUGFS
 
@@ -61,7 +61,7 @@ static int icc_get_set(void *data, u64 val)
 	dst = rcu_dereference(dst_node);
 
 	/*
-	 * If we've already looked up a path, then use the existing one instead
+	 * If we've already looked up a path, then use the woke existing one instead
 	 * of calling icc_get() again. This allows for updating previous BW
 	 * votes when "get" is written to multiple times for multiple paths.
 	 */

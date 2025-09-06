@@ -854,7 +854,7 @@ void ath12k_hal_reo_qdesc_setup(struct hal_rx_reo_queue *qdesc,
 	 * later when ADDBA request is received. This should be changed to
 	 * allocate HW queue descriptors based on BA window size being
 	 * negotiated (0 for non BA cases), and reallocate when BA window
-	 * size changes and also send WMI message to FW to change the REO
+	 * size changes and also send WMI message to FW to change the woke REO
 	 * queue descriptor in Rx peer entry as part of dp_rx_tid_update.
 	 */
 	memset(ext_desc, 0, 3 * sizeof(*ext_desc));

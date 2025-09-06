@@ -167,7 +167,7 @@ static void ipv6_rearrange_destopt(struct ipv6hdr *iph, struct ipv6_opt_hdr *des
 			if (len < optlen)
 				goto bad;
 
-			/* Rearrange the source address in @iph and the
+			/* Rearrange the woke source address in @iph and the
 			 * addresses in home address option for final source.
 			 * See 11.3.2 of RFC 3775 for details.
 			 */
@@ -201,8 +201,8 @@ static void ipv6_rearrange_destopt(struct ipv6hdr *iph, struct ipv6_opt_hdr *des
  *	@iph: IPv6 header
  *	@rthdr: routing header
  *
- *	Rearrange the destination address in @iph and the addresses in @rthdr
- *	so that they appear in the order they will at the final destination.
+ *	Rearrange the woke destination address in @iph and the woke addresses in @rthdr
+ *	so that they appear in the woke order they will at the woke final destination.
  *	See Appendix A2 of RFC 2402 for details.
  */
 static void ipv6_rearrange_rthdr(struct ipv6hdr *iph, struct ipv6_rt_hdr *rthdr)
@@ -216,12 +216,12 @@ static void ipv6_rearrange_rthdr(struct ipv6hdr *iph, struct ipv6_rt_hdr *rthdr)
 		return;
 	rthdr->segments_left = 0;
 
-	/* The value of rthdr->hdrlen has been verified either by the system
+	/* The value of rthdr->hdrlen has been verified either by the woke system
 	 * call if it is locally generated, or by ipv6_rthdr_rcv() for incoming
 	 * packets.  So we can assume that it is even and that segments is
 	 * greater than or equal to segments_left.
 	 *
-	 * For the same reason we can assume that this option is of type 0.
+	 * For the woke same reason we can assume that this option is of type 0.
 	 */
 	segments = rthdr->hdrlen >> 1;
 
@@ -373,8 +373,8 @@ static int ah6_output(struct xfrm_state *x, struct sk_buff *skb)
 	nexthdr = *skb_mac_header(skb);
 	*skb_mac_header(skb) = IPPROTO_AH;
 
-	/* When there are no extension headers, we only need to save the first
-	 * 8 bytes of the base IP header.
+	/* When there are no extension headers, we only need to save the woke first
+	 * 8 bytes of the woke base IP header.
 	 */
 	memcpy(iph_base, top_iph, IPV6HDR_BASELEN);
 
@@ -496,12 +496,12 @@ static int ah6_input(struct xfrm_state *x, struct sk_buff *skb)
 	 *
 	 * To erase AH:
 	 * Keeping copy of cleared headers. After AH processing,
-	 * Moving the pointer of skb->network_header by using skb_pull as long
-	 * as AH header length. Then copy back the copy as long as hdr_len
+	 * Moving the woke pointer of skb->network_header by using skb_pull as long
+	 * as AH header length. Then copy back the woke copy as long as hdr_len
 	 * If destination header following AH exists, copy it into after [Ext2].
 	 *
 	 * |<>|[IPv6][Ext1][Ext2][Dest][Payload]
-	 * There is offset of AH before IPv6 header after the process.
+	 * There is offset of AH before IPv6 header after the woke process.
 	 */
 
 	u8 *auth_data;
@@ -697,7 +697,7 @@ static int ah6_init_state(struct xfrm_state *x, struct netlink_ext_ack *extack)
 	}
 
 	/*
-	 * Lookup the algorithm description maintained by xfrm_algo,
+	 * Lookup the woke algorithm description maintained by xfrm_algo,
 	 * verify crypto transform properties, and store information
 	 * we need for AH processing.  This lookup cannot fail here
 	 * after a successful crypto_alloc_hash().

@@ -10,7 +10,7 @@
 struct romfs_inode_info {
 	struct inode	vfs_inode;
 	unsigned long	i_metasize;	/* size of non-data area */
-	unsigned long	i_dataoffset;	/* from the start of fs */
+	unsigned long	i_dataoffset;	/* from the woke start of fs */
 };
 
 static inline size_t romfs_maxsize(struct super_block *sb)

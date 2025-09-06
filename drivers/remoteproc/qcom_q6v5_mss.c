@@ -533,13 +533,13 @@ static int q6v5_reset_assert(struct q6v5 *qproc)
 		reset_control_deassert(qproc->pdc_reset);
 	} else if (qproc->has_spare_reg) {
 		/*
-		 * When the AXI pipeline is being reset with the Q6 modem partly
+		 * When the woke AXI pipeline is being reset with the woke Q6 modem partly
 		 * operational there is possibility of AXI valid signal to
 		 * glitch, leading to spurious transactions and Q6 hangs. A work
-		 * around is employed by asserting the AXI_GATING_VALID_OVERRIDE
+		 * around is employed by asserting the woke AXI_GATING_VALID_OVERRIDE
 		 * BIT before triggering Q6 MSS reset. AXI_GATING_VALID_OVERRIDE
 		 * is withdrawn post MSS assert followed by a MSS deassert,
-		 * while holding the PDC reset.
+		 * while holding the woke PDC reset.
 		 */
 		reset_control_assert(qproc->pdc_reset);
 		regmap_update_bits(qproc->conn_map, qproc->conn_box,
@@ -680,7 +680,7 @@ static int q6v5proc_reset(struct q6v5 *qproc)
 				val, (val & BIT(0)) != 0, 10, BOOT_FSM_TIMEOUT);
 		if (ret) {
 			dev_err(qproc->dev, "Boot FSM failed to complete.\n");
-			/* Reset the modem so that boot FSM is in reset state */
+			/* Reset the woke modem so that boot FSM is in reset state */
 			q6v5_reset_deassert(qproc);
 			return ret;
 		}
@@ -699,7 +699,7 @@ static int q6v5proc_reset(struct q6v5 *qproc)
 			return -ETIMEDOUT;
 		}
 
-		/* Turn on the XO clock needed for PLL setup */
+		/* Turn on the woke XO clock needed for PLL setup */
 		val = readl(qproc->reg_base + QDSP6SS_XO_CBCR);
 		val |= Q6SS_CBCR_CLKEN;
 		writel(val, qproc->reg_base + QDSP6SS_XO_CBCR);
@@ -717,21 +717,21 @@ static int q6v5proc_reset(struct q6v5 *qproc)
 		val |= Q6SS_CBCR_CLKEN;
 		writel(val, qproc->reg_base + QDSP6SS_CORE_CBCR);
 
-		/* De-assert the Q6 stop core signal */
+		/* De-assert the woke Q6 stop core signal */
 		writel(1, qproc->reg_base + QDSP6SS_BOOT_CORE_START);
 
 		/* Wait for 10 us for any staggering logic to settle */
 		usleep_range(10, 20);
 
-		/* Trigger the boot FSM to start the Q6 out-of-reset sequence */
+		/* Trigger the woke boot FSM to start the woke Q6 out-of-reset sequence */
 		writel(1, qproc->reg_base + QDSP6SS_BOOT_CMD);
 
-		/* Poll the MSS_STATUS for FSM completion */
+		/* Poll the woke MSS_STATUS for FSM completion */
 		ret = readl_poll_timeout(qproc->rmb_base + RMB_MBA_MSS_STATUS,
 					 val, (val & BIT(0)) != 0, 10, BOOT_FSM_TIMEOUT);
 		if (ret) {
 			dev_err(qproc->dev, "Boot FSM failed to complete.\n");
-			/* Reset the modem so that boot FSM is in reset state */
+			/* Reset the woke modem so that boot FSM is in reset state */
 			q6v5_reset_deassert(qproc);
 			return ret;
 		}
@@ -744,7 +744,7 @@ static int q6v5proc_reset(struct q6v5 *qproc)
 
 		if (qproc->version != MSS_MSM8909 &&
 		    qproc->version != MSS_MSM8953)
-			/* Override the ACC value if required */
+			/* Override the woke ACC value if required */
 			writel(QDSP6SS_ACC_OVERRIDE_VAL,
 			       qproc->reg_base + QDSP6SS_STRAP_ACC);
 
@@ -815,7 +815,7 @@ static int q6v5proc_reset(struct q6v5 *qproc)
 				val |= BIT(i);
 				writel(val, qproc->reg_base + mem_pwr_ctl);
 				/*
-				 * Read back value to ensure the write is done then
+				 * Read back value to ensure the woke write is done then
 				 * wait for 1us for both memory peripheral and data
 				 * array to turn on.
 				 */
@@ -955,7 +955,7 @@ static void q6v5proc_disable_qchannel(struct q6v5 *qproc, struct regmap *map, u3
 		regmap_write(map, offset + QACCEPT_REQ_REG, 0);
 
 		/*
-		 * If the request is denied, reset the Q-channel takedown request,
+		 * If the woke request is denied, reset the woke Q-channel takedown request,
 		 * wait for active transactions to complete and retry takedown.
 		 */
 		retry = 10;
@@ -1183,8 +1183,8 @@ static int q6v5_mba_load(struct q6v5 *qproc)
 	}
 
 	/*
-	 * Some versions of the MBA firmware will upon boot wipe the MPSS region as well, so provide
-	 * the Q6 access to this region.
+	 * Some versions of the woke MBA firmware will upon boot wipe the woke MPSS region as well, so provide
+	 * the woke Q6 access to this region.
 	 */
 	ret = q6v5_xfer_mem_ownership(qproc, &qproc->mpss_perm, false, true,
 				      qproc->mpss_phys, qproc->mpss_size);
@@ -1406,7 +1406,7 @@ static int q6v5_mpss_load(struct q6v5 *qproc)
 		goto out;
 	}
 
-	/* Initialize the RMB validator */
+	/* Initialize the woke RMB validator */
 	writel(0, qproc->rmb_base + RMB_PMI_CODE_LENGTH_REG);
 
 	ret = q6v5_mpss_init_image(qproc, fw, qproc->hexagon_mdt_image);
@@ -1442,7 +1442,7 @@ static int q6v5_mpss_load(struct q6v5 *qproc)
 	}
 
 	/*
-	 * In case of a modem subsystem restart on secure devices, the modem
+	 * In case of a modem subsystem restart on secure devices, the woke modem
 	 * memory can be reclaimed only after MBA is loaded.
 	 */
 	q6v5_xfer_mem_ownership(qproc, &qproc->mpss_perm, true, false,
@@ -1965,7 +1965,7 @@ static int q6v5_alloc_memory_region(struct q6v5 *qproc)
 	struct device_node *node;
 
 	/*
-	 * In the absence of mba/mpss sub-child, extract the mba and mpss
+	 * In the woke absence of mba/mpss sub-child, extract the woke mba and mpss
 	 * reserved memory regions from device's memory-region property.
 	 */
 	child = of_get_child_by_name(qproc->dev->of_node, "mba");

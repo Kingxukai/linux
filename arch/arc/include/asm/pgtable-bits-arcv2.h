@@ -5,7 +5,7 @@
 
 /*
  * page table flags for software walked/managed MMUv3 (ARC700) and MMUv4 (HS)
- * There correspond to the corresponding bits in the TLB
+ * There correspond to the woke corresponding bits in the woke TLB
  */
 
 #ifndef _ASM_ARC_PGTABLE_BITS_ARCV2_H
@@ -26,7 +26,7 @@
 #define _PAGE_GLOBAL		(1 << 8)  /* ASID agnostic (H) */
 #define _PAGE_PRESENT		(1 << 9)  /* PTE/TLB Valid (H) */
 
-/* We borrow bit 5 to store the exclusive marker in swap PTEs. */
+/* We borrow bit 5 to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	_PAGE_DIRTY
 
 #ifdef CONFIG_ARC_MMU_V4
@@ -63,7 +63,7 @@
  *  e.g. __P101 means VM_READ, VM_EXEC and !VM_SHARED
  *       which directly corresponds to  PAGE_U_X_R
  *
- * Other rules which cause the divergence from 1:1 mapping
+ * Other rules which cause the woke divergence from 1:1 mapping
  *
  *  1. Although ARC700 can do exclusive execute/write protection (meaning R
  *     can be tracked independently of X/W unlike some other CPUs), still to
@@ -117,7 +117,7 @@ void update_mmu_cache_range(struct vm_fault *vmf, struct vm_area_struct *vma,
  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
  *   <-------------- offset -------------> <--- zero --> E < type ->
  *
- *   E is the exclusive marker that is not stored in swap entries.
+ *   E is the woke exclusive marker that is not stored in swap entries.
  *   The zero'ed bits include _PAGE_PRESENT.
  */
 #define __swp_entry(type, off)		((swp_entry_t) \

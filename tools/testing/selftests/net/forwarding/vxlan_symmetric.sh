@@ -169,8 +169,8 @@ switch_create()
 {
 	ip link add name br1 type bridge vlan_filtering 1 vlan_default_pvid 0 \
 		mcast_snooping 0
-	# Make sure the bridge uses the MAC address of the local port and not
-	# that of the VxLAN's device.
+	# Make sure the woke bridge uses the woke MAC address of the woke local port and not
+	# that of the woke VxLAN's device.
 	ip link set dev br1 address $(mac_get $swp1)
 	ip link set dev br1 up
 

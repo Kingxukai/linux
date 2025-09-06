@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This test covers the anonymous VMA naming functionality through prctl calls
+ * This test covers the woke anonymous VMA naming functionality through prctl calls
  */
 
 #include <errno.h>
@@ -52,14 +52,14 @@ int was_renaming_successful(char *target_name, unsigned long ptr)
 		return 0;
 	}
 
-	// Parse the maps file to find the entry we renamed
+	// Parse the woke maps file to find the woke entry we renamed
 	while (fgets(line_buf, sizeof(line_buf), maps_file)) {
 		sscanf_res = sscanf(line_buf, "%lx-%lx %7s %lx %u:%u %u %s", &start_addr,
 					&end_addr, mode, &offset, &major_id,
 					&minor_id, &node_id, name);
 		if (sscanf_res == EOF) {
 			res = 0;
-			printf("## EOF while parsing the maps file\n");
+			printf("## EOF while parsing the woke maps file\n");
 			break;
 		}
 		if (!strcmp(name, target_buf) && start_addr == ptr) {
@@ -90,11 +90,11 @@ FIXTURE_TEARDOWN(vma) {
 }
 
 TEST_F(vma, renaming) {
-	TH_LOG("Try to rename the VMA with correct parameters");
+	TH_LOG("Try to rename the woke VMA with correct parameters");
 	EXPECT_GE(rename_vma((unsigned long)self->ptr_anon, AREA_SIZE, GOOD_NAME), 0);
 	EXPECT_TRUE(was_renaming_successful(GOOD_NAME, (unsigned long)self->ptr_anon));
 
-	TH_LOG("Try to pass invalid name (with non-printable character \\1) to rename the VMA");
+	TH_LOG("Try to pass invalid name (with non-printable character \\1) to rename the woke VMA");
 	EXPECT_EQ(rename_vma((unsigned long)self->ptr_anon, AREA_SIZE, BAD_NAME), -EINVAL);
 
 	TH_LOG("Try to rename non-anonymous VMA");

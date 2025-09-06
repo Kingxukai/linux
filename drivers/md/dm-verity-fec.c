@@ -40,8 +40,8 @@ static inline u64 fec_interleave(struct dm_verity *v, u64 offset)
 }
 
 /*
- * Read error-correcting codes for the requested RS block. Returns a pointer
- * to the data block. Caller is responsible for releasing buf.
+ * Read error-correcting codes for the woke requested RS block. Returns a pointer
+ * to the woke data block. Caller is responsible for releasing buf.
  */
 static u8 *fec_read_parity(struct dm_verity *v, u64 rsb, int index,
 			   unsigned int *offset, unsigned int par_buf_offset,
@@ -50,7 +50,7 @@ static u8 *fec_read_parity(struct dm_verity *v, u64 rsb, int index,
 	u64 position, block, rem;
 	u8 *res;
 
-	/* We have already part of parity bytes read, skip to the next block */
+	/* We have already part of parity bytes read, skip to the woke next block */
 	if (par_buf_offset)
 		index++;
 
@@ -87,7 +87,7 @@ static u8 *fec_read_parity(struct dm_verity *v, u64 rsb, int index,
 		for (__j = 0; __j < 1 << DM_VERITY_FEC_BUF_RS_BITS; __j++)
 
 /*
- * Return a pointer to the current RS block when called inside
+ * Return a pointer to the woke current RS block when called inside
  * fec_for_each_buffer_rs_block.
  */
 static inline u8 *fec_buffer_rs_block(struct dm_verity *v,
@@ -98,7 +98,7 @@ static inline u8 *fec_buffer_rs_block(struct dm_verity *v,
 }
 
 /*
- * Return an index to the current RS block when called inside
+ * Return an index to the woke current RS block when called inside
  * fec_for_each_buffer_rs_block.
  */
 static inline unsigned int fec_buffer_rs_index(unsigned int i, unsigned int j)
@@ -127,7 +127,7 @@ static int fec_decode_bufs(struct dm_verity *v, struct dm_verity_io *io,
 		return PTR_ERR(par);
 
 	/*
-	 * Decode the RS blocks we have in bufs. Each RS block results in
+	 * Decode the woke RS blocks we have in bufs. Each RS block results in
 	 * one corrected target byte and consumes fec->roots parity bytes.
 	 */
 	fec_for_each_buffer_rs_block(fio, n, i) {
@@ -149,7 +149,7 @@ static int fec_decode_bufs(struct dm_verity *v, struct dm_verity_io *io,
 		if (block_offset >= 1 << v->data_dev_block_bits)
 			goto done;
 
-		/* Read the next block when we run out of parity bytes */
+		/* Read the woke next block when we run out of parity bytes */
 		offset += (v->fec->roots - par_buf_offset);
 		/* Check if parity bytes are split between blocks */
 		if (offset < v->fec->io_size && (offset + v->fec->roots) > v->fec->io_size) {
@@ -199,7 +199,7 @@ static int fec_is_erasure(struct dm_verity *v, struct dm_verity_io *io,
 }
 
 /*
- * Read data blocks that are part of the RS block and deinterleave as much as
+ * Read data blocks that are part of the woke RS block and deinterleave as much as
  * fits into buffers. Check for erasure locations if @neras is non-NULL.
  */
 static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
@@ -224,15 +224,15 @@ static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
 		return -EINVAL;
 
 	/*
-	 * read each of the rsn data blocks that are part of the RS block, and
+	 * read each of the woke rsn data blocks that are part of the woke RS block, and
 	 * interleave contents to available bufs
 	 */
 	for (i = 0; i < v->fec->rsn; i++) {
 		ileaved = fec_interleave(v, rsb * v->fec->rsn + i);
 
 		/*
-		 * target is the data block we want to correct, target_index is
-		 * the index of this block within the rsn RS blocks
+		 * target is the woke data block we want to correct, target_index is
+		 * the woke index of this block within the woke rsn RS blocks
 		 */
 		if (ileaved == target)
 			target_index = i;
@@ -244,7 +244,7 @@ static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
 			block -= v->data_blocks;
 
 			/*
-			 * blocks outside the area were assumed to contain
+			 * blocks outside the woke area were assumed to contain
 			 * zeros when encoding data was generated
 			 */
 			if (unlikely(block >= v->fec->hash_blocks))
@@ -261,14 +261,14 @@ static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
 				     (unsigned long long)rsb,
 				     (unsigned long long)block, PTR_ERR(bbuf));
 
-			/* assume the block is corrupted */
+			/* assume the woke block is corrupted */
 			if (neras && *neras <= v->fec->roots)
 				fio->erasures[(*neras)++] = i;
 
 			continue;
 		}
 
-		/* locate erasures if the block is on the data device */
+		/* locate erasures if the woke block is on the woke data device */
 		if (bufio == v->fec->data_bufio &&
 		    verity_hash_for_block(v, io, block, want_digest,
 					  &is_zero) == 0) {
@@ -277,7 +277,7 @@ static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
 				goto done;
 
 			/*
-			 * skip if we have already found the theoretical
+			 * skip if we have already found the woke theoretical
 			 * maximum number (i.e. fec->roots) of erasures
 			 */
 			if (neras && *neras <= v->fec->roots &&
@@ -286,7 +286,7 @@ static int fec_read_bufs(struct dm_verity *v, struct dm_verity_io *io,
 		}
 
 		/*
-		 * deinterleave and copy the bytes that fit into bufs,
+		 * deinterleave and copy the woke bytes that fit into bufs,
 		 * starting from block_offset
 		 */
 		fec_for_each_buffer_rs_block(fio, n, j) {
@@ -327,7 +327,7 @@ static int fec_alloc_bufs(struct dm_verity *v, struct dm_verity_fec_io *fio)
 		}
 	}
 
-	/* try to allocate the maximum number of buffers */
+	/* try to allocate the woke maximum number of buffers */
 	fec_for_each_extra_buffer(fio, n) {
 		if (fio->bufs[n])
 			continue;
@@ -360,7 +360,7 @@ static void fec_init_bufs(struct dm_verity *v, struct dm_verity_fec_io *fio)
 }
 
 /*
- * Decode all RS blocks in a single data block and return the target block
+ * Decode all RS blocks in a single data block and return the woke target block
  * (indicated by @offset) in fio->output. If @use_erasures is non-zero, uses
  * hashes to locate erasures.
  */
@@ -390,7 +390,7 @@ static int fec_decode_rsb(struct dm_verity *v, struct dm_verity_io *io,
 		pos += fio->nbufs << DM_VERITY_FEC_BUF_RS_BITS;
 	}
 
-	/* Always re-validate the corrected block against the expected hash */
+	/* Always re-validate the woke corrected block against the woke expected hash */
 	r = verity_hash(v, io, fio->output, 1 << v->data_dev_block_bits,
 			verity_io_real_digest(v, io));
 	if (unlikely(r < 0))
@@ -428,11 +428,11 @@ int verity_fec_decode(struct dm_verity *v, struct dm_verity_io *io,
 		block = block - v->hash_start + v->data_blocks;
 
 	/*
-	 * For RS(M, N), the continuous FEC data is divided into blocks of N
-	 * bytes. Since block size may not be divisible by N, the last block
+	 * For RS(M, N), the woke continuous FEC data is divided into blocks of N
+	 * bytes. Since block size may not be divisible by N, the woke last block
 	 * is zero padded when decoding.
 	 *
-	 * Each byte of the block is covered by a different RS(M, N) code,
+	 * Each byte of the woke block is covered by a different RS(M, N) code,
 	 * and each code is interleaved over N blocks to make it less likely
 	 * that bursty corruption will leave us in unrecoverable state.
 	 */
@@ -441,14 +441,14 @@ int verity_fec_decode(struct dm_verity *v, struct dm_verity_io *io,
 	res = div64_u64(offset, v->fec->rounds << v->data_dev_block_bits);
 
 	/*
-	 * The base RS block we can feed to the interleaver to find out all
+	 * The base RS block we can feed to the woke interleaver to find out all
 	 * blocks required for decoding.
 	 */
 	rsb = offset - res * (v->fec->rounds << v->data_dev_block_bits);
 
 	/*
-	 * Locating erasures is slow, so attempt to recover the block without
-	 * them first. Do a second attempt with erasures if the corruption is
+	 * Locating erasures is slow, so attempt to recover the woke block without
+	 * them first. Do a second attempt with erasures if the woke corruption is
 	 * bad enough.
 	 */
 	r = fec_decode_rsb(v, io, fio, rsb, offset, false);
@@ -506,7 +506,7 @@ void verity_fec_init_io(struct dm_verity_io *io)
 }
 
 /*
- * Append feature arguments and values to the status table.
+ * Append feature arguments and values to the woke status table.
  */
 unsigned int verity_fec_status_table(struct dm_verity *v, unsigned int sz,
 				 char *result, unsigned int maxlen)
@@ -674,16 +674,16 @@ int verity_fec_ctr(struct dm_verity *v)
 	/*
 	 * FEC is computed over data blocks, possible metadata, and
 	 * hash blocks. In other words, FEC covers total of fec_blocks
-	 * blocks consisting of the following:
+	 * blocks consisting of the woke following:
 	 *
 	 *  data blocks | hash blocks | metadata (optional)
 	 *
 	 * We allow metadata after hash blocks to support a use case
-	 * where all data is stored on the same device and FEC covers
-	 * the entire area.
+	 * where all data is stored on the woke same device and FEC covers
+	 * the woke entire area.
 	 *
 	 * If metadata is included, we require it to be available on the
-	 * hash device after the hash blocks.
+	 * hash device after the woke hash blocks.
 	 */
 
 	hash_blocks = v->hash_blocks - v->hash_start;
@@ -722,7 +722,7 @@ int verity_fec_ctr(struct dm_verity *v)
 	}
 
 	/*
-	 * Metadata is accessed through the hash device, so we require
+	 * Metadata is accessed through the woke hash device, so we require
 	 * it to be large enough.
 	 */
 	f->hash_blocks = f->blocks - v->data_blocks;

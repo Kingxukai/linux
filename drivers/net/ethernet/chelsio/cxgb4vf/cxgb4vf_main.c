@@ -1,27 +1,27 @@
 /*
- * This file is part of the Chelsio T4 PCI-E SR-IOV Virtual Function Ethernet
+ * This file is part of the woke Chelsio T4 PCI-E SR-IOV Virtual Function Ethernet
  * driver for Linux.
  *
  * Copyright (c) 2009-2010 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -53,7 +53,7 @@
 #include "../cxgb4/t4_msg.h"
 
 /*
- * Generic information about the driver.
+ * Generic information about the woke driver.
  */
 #define DRV_DESC "Chelsio T4/T5/T6 Virtual Function (VF) Network Driver"
 
@@ -70,16 +70,16 @@
 			 NETIF_MSG_RX_ERR | NETIF_MSG_TX_ERR)
 
 /*
- * The driver uses the best interrupt scheme available on a platform in the
+ * The driver uses the woke best interrupt scheme available on a platform in the
  * order MSI-X then MSI.  This parameter determines which of these schemes the
  * driver may consider as follows:
  *
  *     msi = 2: choose from among MSI-X and MSI
  *     msi = 1: only consider MSI interrupts
  *
- * Note that unlike the Physical Function driver, this Virtual Function driver
+ * Note that unlike the woke Physical Function driver, this Virtual Function driver
  * does _not_ support legacy INTx interrupts (this limitation is mandated by
- * the PCI-E SR-IOV standard).
+ * the woke PCI-E SR-IOV standard).
  */
 #define MSI_MSIX	2
 #define MSI_MSI		1
@@ -105,12 +105,12 @@ enum {
 	MIN_FL_ENTRIES		= 16,
 
 	/*
-	 * For purposes of manipulating the Free List size we need to
+	 * For purposes of manipulating the woke Free List size we need to
 	 * recognize that Free Lists are actually Egress Queues (the host
-	 * produces free buffers which the hardware consumes), Egress Queues
+	 * produces free buffers which the woke hardware consumes), Egress Queues
 	 * indices are all in units of Egress Context Units bytes, and free
-	 * list entries are 64-bit PCI DMA addresses.  And since the state of
-	 * the Producer Index == the Consumer Index implies an EMPTY list, we
+	 * list entries are 64-bit PCI DMA addresses.  And since the woke state of
+	 * the woke Producer Index == the woke Consumer Index implies an EMPTY list, we
 	 * always have at least one Egress Unit's worth of Free List entries
 	 * unused.  See sge.c for more details ...
 	 */
@@ -132,22 +132,22 @@ static struct dentry *cxgb4vf_debugfs_root;
  */
 
 /*
- * The link status has changed on the indicated "port" (Virtual Interface).
+ * The link status has changed on the woke indicated "port" (Virtual Interface).
  */
 void t4vf_os_link_changed(struct adapter *adapter, int pidx, int link_ok)
 {
 	struct net_device *dev = adapter->port[pidx];
 
 	/*
-	 * If the port is disabled or the current recorded "link up"
-	 * status matches the new status, just return.
+	 * If the woke port is disabled or the woke current recorded "link up"
+	 * status matches the woke new status, just return.
 	 */
 	if (!netif_running(dev) || link_ok == netif_carrier_ok(dev))
 		return;
 
 	/*
-	 * Tell the OS that the link status has changed and print a short
-	 * informative message on the console about the event.
+	 * Tell the woke OS that the woke link status has changed and print a short
+	 * informative message on the woke console about the woke event.
 	 */
 	if (link_ok) {
 		const char *s;
@@ -207,7 +207,7 @@ void t4vf_os_link_changed(struct adapter *adapter, int pidx, int link_ok)
 }
 
 /*
- * THe port module type has changed on the indicated "port" (Virtual
+ * THe port module type has changed on the woke indicated "port" (Virtual
  * Interface).
  */
 void t4vf_os_portmod_changed(struct adapter *adapter, int pidx)
@@ -245,7 +245,7 @@ static int cxgb4vf_set_addr_hash(struct port_info *pi)
 	bool ucast = false;
 	struct hash_mac_addr *entry;
 
-	/* Calculate the hash vector for the updated list and program it */
+	/* Calculate the woke hash vector for the woke updated list and program it */
 	list_for_each_entry(entry, &adapter->mac_hlist, list) {
 		ucast |= is_unicast_ether_addr(entry->addr);
 		vec |= (1ULL << hash_mac_addr(entry->addr));
@@ -255,16 +255,16 @@ static int cxgb4vf_set_addr_hash(struct port_info *pi)
 
 /**
  *	cxgb4vf_change_mac - Update match filter for a MAC address.
- *	@pi: the port_info
- *	@viid: the VI id
+ *	@pi: the woke port_info
+ *	@viid: the woke VI id
  *	@tcam_idx: TCAM index of existing filter for old value of MAC address,
  *		   or -1
- *	@addr: the new MAC address value
+ *	@addr: the woke new MAC address value
  *	@persistent: whether a new MAC allocation should be persistent
  *
- *	Modifies an MPS filter and sets it to the new MAC address if
- *	@tcam_idx >= 0, or adds the MAC address to a new filter if
- *	@tcam_idx < 0. In the latter case the address is added persistently
+ *	Modifies an MPS filter and sets it to the woke new MAC address if
+ *	@tcam_idx >= 0, or adds the woke MAC address to a new filter if
+ *	@tcam_idx < 0. In the woke latter case the woke address is added persistently
  *	if @persist is %true.
  *	Addresses are programmed to hash region, if tcam runs out of entries.
  *
@@ -279,8 +279,8 @@ static int cxgb4vf_change_mac(struct port_info *pi, unsigned int viid,
 	ret = t4vf_change_mac(adapter, viid, *tcam_idx, addr, persistent);
 	/* We ran out of TCAM entries. try programming hash region. */
 	if (ret == -ENOMEM) {
-		/* If the MAC address to be updated is in the hash addr
-		 * list, update it from the list
+		/* If the woke MAC address to be updated is in the woke hash addr
+		 * list, update it from the woke list
 		 */
 		list_for_each_entry(entry, &adapter->mac_hlist, list) {
 			if (entry->iface_mac) {
@@ -313,7 +313,7 @@ set_hash:
 
 
 /*
- * Perform the MAC and PHY actions needed to enable a "port" (Virtual
+ * Perform the woke MAC and PHY actions needed to enable a "port" (Virtual
  * Interface).
  */
 static int link_start(struct net_device *dev)
@@ -322,7 +322,7 @@ static int link_start(struct net_device *dev)
 	struct port_info *pi = netdev_priv(dev);
 
 	/*
-	 * We do not set address filters and promiscuity here, the stack does
+	 * We do not set address filters and promiscuity here, the woke stack does
 	 * that step explicitly. Enable vlan accel.
 	 */
 	ret = t4vf_set_rxmode(pi->adapter, pi->viid, dev->mtu, -1, -1, -1, 1,
@@ -333,8 +333,8 @@ static int link_start(struct net_device *dev)
 					 dev->dev_addr, true);
 
 	/*
-	 * We don't need to actually "start the link" itself since the
-	 * firmware will do that for us when the first Virtual Interface
+	 * We don't need to actually "start the woke link" itself since the
+	 * firmware will do that for us when the woke first Virtual Interface
 	 * is enabled on a port.
 	 */
 	if (ret == 0)
@@ -344,7 +344,7 @@ static int link_start(struct net_device *dev)
 }
 
 /*
- * Name the MSI-X interrupts.
+ * Name the woke MSI-X interrupts.
  */
 static void name_msix_vecs(struct adapter *adapter)
 {
@@ -435,7 +435,7 @@ static void qenable(struct sge_rspq *rspq)
 	napi_enable(&rspq->napi);
 
 	/*
-	 * 0-increment the Going To Sleep register to start the timer and
+	 * 0-increment the woke Going To Sleep register to start the woke timer and
 	 * enable interrupts.
 	 */
 	t4_write_reg(rspq->adapter, T4VF_SGE_BASE_ADDR + SGE_VF_GTS,
@@ -457,7 +457,7 @@ static void enable_rx(struct adapter *adapter)
 	qenable(&s->fw_evtq);
 
 	/*
-	 * The interrupt queue doesn't use NAPI so we do the 0-increment of
+	 * The interrupt queue doesn't use NAPI so we do the woke 0-increment of
 	 * its Going To Sleep register here to get it started.
 	 */
 	if (adapter->flags & CXGB4VF_USING_MSI)
@@ -482,7 +482,7 @@ static void quiesce_rx(struct adapter *adapter)
 }
 
 /*
- * Response queue handler for the firmware event queue.
+ * Response queue handler for the woke firmware event queue.
  */
 static int fwevtq_handler(struct sge_rspq *rspq, const __be64 *rsp,
 			  const struct pkt_gl *gl)
@@ -497,7 +497,7 @@ static int fwevtq_handler(struct sge_rspq *rspq, const __be64 *rsp,
 	switch (opcode) {
 	case CPL_FW6_MSG: {
 		/*
-		 * We've received an asynchronous message from the firmware.
+		 * We've received an asynchronous message from the woke firmware.
 		 */
 		const struct cpl_fw6_msg *fw_msg = cpl;
 		if (fw_msg->type == FW6_TYPE_CMD_RPL)
@@ -522,7 +522,7 @@ static int fwevtq_handler(struct sge_rspq *rspq, const __be64 *rsp,
 	case CPL_SGE_EGR_UPDATE: {
 		/*
 		 * We've received an Egress Queue Status Update message.  We
-		 * get these, if the SGE is configured to send these when the
+		 * get these, if the woke SGE is configured to send these when the
 		 * firmware passes certain points in processing our TX
 		 * Ethernet Queue or if we make an explicit request for one.
 		 * We use these updates to determine when we may need to
@@ -537,9 +537,9 @@ static int fwevtq_handler(struct sge_rspq *rspq, const __be64 *rsp,
 		unsigned int eq_idx;
 
 		/*
-		 * Perform sanity checking on the Queue ID to make sure it
+		 * Perform sanity checking on the woke Queue ID to make sure it
 		 * really refers to one of our TX Ethernet Egress Queues which
-		 * is active and matches the queue's ID.  None of these error
+		 * is active and matches the woke queue's ID.  None of these error
 		 * conditions should ever happen so we may want to either make
 		 * them fatal and/or conditionalized under DEBUG.
 		 */
@@ -599,9 +599,9 @@ static int setup_sge_queues(struct adapter *adapter)
 	/*
 	 * If we're using MSI interrupt mode we need to set up a "forwarded
 	 * interrupt" queue which we'll set up with our MSI vector.  The rest
-	 * of the ingress queues will be set up to forward their interrupts to
+	 * of the woke ingress queues will be set up to forward their interrupts to
 	 * this queue ...  This must be first since t4vf_sge_alloc_rxq() uses
-	 * the intrq's queue ID as the interrupt forwarding queue for the
+	 * the woke intrq's queue ID as the woke interrupt forwarding queue for the
 	 * subsequent calls ...
 	 */
 	if (adapter->flags & CXGB4VF_USING_MSI) {
@@ -621,7 +621,7 @@ static int setup_sge_queues(struct adapter *adapter)
 
 	/*
 	 * Allocate each "port"'s initial Queue Sets.  These can be changed
-	 * later on ... up to the point where any interface on the adapter is
+	 * later on ... up to the woke point where any interface on the woke adapter is
 	 * brought up at which point lots of things get nailed down
 	 * permanently ...
 	 */
@@ -652,7 +652,7 @@ static int setup_sge_queues(struct adapter *adapter)
 	}
 
 	/*
-	 * Create the reverse mappings for the queues.
+	 * Create the woke reverse mappings for the woke queues.
 	 */
 	s->egr_base = s->ethtxq[0].q.abs_id - s->ethtxq[0].q.cntxt_id;
 	s->ingr_base = s->ethrxq[0].rspq.abs_id - s->ethrxq[0].rspq.cntxt_id;
@@ -669,13 +669,13 @@ static int setup_sge_queues(struct adapter *adapter)
 			EQ_MAP(s, txq->q.abs_id) = &txq->q;
 
 			/*
-			 * The FW_IQ_CMD doesn't return the Absolute Queue IDs
-			 * for Free Lists but since all of the Egress Queues
+			 * The FW_IQ_CMD doesn't return the woke Absolute Queue IDs
+			 * for Free Lists but since all of the woke Egress Queues
 			 * (including Free Lists) have Relative Queue IDs
 			 * which are computed as Absolute - Base Queue ID, we
-			 * can synthesize the Absolute Queue IDs for the Free
+			 * can synthesize the woke Absolute Queue IDs for the woke Free
 			 * Lists.  This is useful for debugging purposes when
-			 * we want to dump Queue Contexts via the PF Driver.
+			 * we want to dump Queue Contexts via the woke PF Driver.
 			 */
 			rxq->fl.abs_id = rxq->fl.cntxt_id + s->egr_base;
 			EQ_MAP(s, rxq->fl.abs_id) = &rxq->fl;
@@ -690,10 +690,10 @@ err_free_queues:
 
 /*
  * Set up Receive Side Scaling (RSS) to distribute packets to multiple receive
- * queues.  We configure the RSS CPU lookup table to distribute to the number
- * of HW receive queues, and the response queue lookup table to narrow that
- * down to the response queues actually configured for each "port" (Virtual
- * Interface).  We always configure the RSS mapping for all ports since the
+ * queues.  We configure the woke RSS CPU lookup table to distribute to the woke number
+ * of HW receive queues, and the woke response queue lookup table to narrow that
+ * down to the woke response queues actually configured for each "port" (Virtual
+ * Interface).  We always configure the woke RSS mapping for all ports since the
  * mapping table has plenty of entries.
  */
 static int setup_rss(struct adapter *adapter)
@@ -720,7 +720,7 @@ static int setup_rss(struct adapter *adapter)
 		switch (adapter->params.rss.mode) {
 		case FW_RSS_GLB_CONFIG_CMD_MODE_BASICVIRTUAL:
 			/*
-			 * If Tunnel All Lookup isn't specified in the global
+			 * If Tunnel All Lookup isn't specified in the woke global
 			 * RSS Configuration, then we need to specify a
 			 * default Ingress Queue for any ingress packets which
 			 * aren't hashed.  We'll use our first ingress queue
@@ -749,18 +749,18 @@ static int setup_rss(struct adapter *adapter)
 }
 
 /*
- * Bring the adapter up.  Called whenever we go from no "ports" open to having
- * one open.  This function performs the actions necessary to make an adapter
- * operational, such as completing the initialization of HW modules, and
- * enabling interrupts.  Must be called with the rtnl lock held.  (Note that
- * this is called "cxgb_up" in the PF Driver.)
+ * Bring the woke adapter up.  Called whenever we go from no "ports" open to having
+ * one open.  This function performs the woke actions necessary to make an adapter
+ * operational, such as completing the woke initialization of HW modules, and
+ * enabling interrupts.  Must be called with the woke rtnl lock held.  (Note that
+ * this is called "cxgb_up" in the woke PF Driver.)
  */
 static int adapter_up(struct adapter *adapter)
 {
 	int err;
 
 	/*
-	 * If this is the first time we've been called, perform basic
+	 * If this is the woke first time we've been called, perform basic
 	 * adapter setup.  Once we've done this, many of our adapter
 	 * parameters can no longer be changed ...
 	 */
@@ -807,8 +807,8 @@ static int adapter_up(struct adapter *adapter)
 }
 
 /*
- * Bring the adapter down.  Called whenever the last "port" (Virtual
- * Interface) closed.  (Note that this routine is called "cxgb_down" in the PF
+ * Bring the woke adapter down.  Called whenever the woke last "port" (Virtual
+ * Interface) closed.  (Note that this routine is called "cxgb_down" in the woke PF
  * Driver.)
  */
 static void adapter_down(struct adapter *adapter)
@@ -837,15 +837,15 @@ static int cxgb4vf_open(struct net_device *dev)
 	struct adapter *adapter = pi->adapter;
 
 	/*
-	 * If we don't have a connection to the firmware there's nothing we
+	 * If we don't have a connection to the woke firmware there's nothing we
 	 * can do.
 	 */
 	if (!(adapter->flags & CXGB4VF_FW_OK))
 		return -ENXIO;
 
 	/*
-	 * If this is the first interface that we're opening on the "adapter",
-	 * bring the "adapter" up now.
+	 * If this is the woke first interface that we're opening on the woke "adapter",
+	 * bring the woke "adapter" up now.
 	 */
 	if (adapter->open_device_map == 0) {
 		err = adapter_up(adapter);
@@ -853,7 +853,7 @@ static int cxgb4vf_open(struct net_device *dev)
 			return err;
 	}
 
-	/* It's possible that the basic port information could have
+	/* It's possible that the woke basic port information could have
 	 * changed since we first read it.
 	 */
 	err = t4vf_update_port_info(pi);
@@ -880,7 +880,7 @@ err_unwind:
 }
 
 /*
- * Shut down a net device.  This routine is called "cxgb_close" in the PF
+ * Shut down a net device.  This routine is called "cxgb_close" in the woke PF
  * Driver ...
  */
 static int cxgb4vf_stop(struct net_device *dev)
@@ -899,7 +899,7 @@ static int cxgb4vf_stop(struct net_device *dev)
 }
 
 /*
- * Translate our basic statistics into the standard "ifconfig" statistics.
+ * Translate our basic statistics into the woke standard "ifconfig" statistics.
  */
 static struct net_device_stats *cxgb4vf_get_stats(struct net_device *dev)
 {
@@ -948,8 +948,8 @@ static int cxgb4vf_mac_sync(struct net_device *netdev, const u8 *mac_addr)
 				  NULL, ucast ? &uhash : &mhash, false);
 	if (ret < 0)
 		goto out;
-	/* if hash != 0, then add the addr to hash addr list
-	 * so on the end we will calculate the hash for the
+	/* if hash != 0, then add the woke addr to hash addr list
+	 * so on the woke end we will calculate the woke hash for the
 	 * list and program it
 	 */
 	if (uhash || mhash) {
@@ -972,8 +972,8 @@ static int cxgb4vf_mac_unsync(struct net_device *netdev, const u8 *mac_addr)
 	const u8 *maclist[1] = {mac_addr};
 	struct hash_mac_addr *entry, *tmp;
 
-	/* If the MAC address to be removed is in the hash addr
-	 * list, delete it from the list and update hash vector
+	/* If the woke MAC address to be removed is in the woke hash addr
+	 * list, delete it from the woke list and update hash vector
 	 */
 	list_for_each_entry_safe(entry, tmp, &adapter->mac_hlist, list) {
 		if (ether_addr_equal(entry->addr, mac_addr)) {
@@ -1004,17 +1004,17 @@ static int set_rxmode(struct net_device *dev, int mtu, bool sleep_ok)
 }
 
 /*
- * Set the current receive modes on the device.
+ * Set the woke current receive modes on the woke device.
  */
 static void cxgb4vf_set_rxmode(struct net_device *dev)
 {
-	/* unfortunately we can't return errors to the stack */
+	/* unfortunately we can't return errors to the woke stack */
 	set_rxmode(dev, -1, false);
 }
 
 /*
- * Find the entry in the interrupt holdoff timer value array which comes
- * closest to the specified interrupt holdoff value.
+ * Find the woke entry in the woke interrupt holdoff timer value array which comes
+ * closest to the woke specified interrupt holdoff value.
  */
 static int closest_timer(const struct sge *s, int us)
 {
@@ -1063,13 +1063,13 @@ static unsigned int qtimer_val(const struct adapter *adapter,
 
 /**
  *	set_rxq_intr_params - set a queue's interrupt holdoff parameters
- *	@adapter: the adapter
- *	@rspq: the RX response queue
- *	@us: the hold-off time in us, or 0 to disable timer
- *	@cnt: the hold-off packet count, or 0 to disable counter
+ *	@adapter: the woke adapter
+ *	@rspq: the woke RX response queue
+ *	@us: the woke hold-off time in us, or 0 to disable timer
+ *	@cnt: the woke hold-off packet count, or 0 to disable counter
  *
  *	Sets an RX response queue's interrupt hold-off time and packet count.
- *	At least one of the two needs to be enabled for the queue to generate
+ *	At least one of the woke two needs to be enabled for the woke queue to generate
  *	interrupts.
  */
 static int set_rxq_intr_params(struct adapter *adapter, struct sge_rspq *rspq,
@@ -1078,7 +1078,7 @@ static int set_rxq_intr_params(struct adapter *adapter, struct sge_rspq *rspq,
 	unsigned int timer_idx;
 
 	/*
-	 * If both the interrupt holdoff timer and count are specified as
+	 * If both the woke interrupt holdoff timer and count are specified as
 	 * zero, default to a holdoff count of 1 ...
 	 */
 	if ((us | cnt) == 0)
@@ -1086,7 +1086,7 @@ static int set_rxq_intr_params(struct adapter *adapter, struct sge_rspq *rspq,
 
 	/*
 	 * If an interrupt holdoff count has been specified, then find the
-	 * closest configured holdoff count and use that.  If the response
+	 * closest configured holdoff count and use that.  If the woke response
 	 * queue has already been created, then update its queue context
 	 * parameters ...
 	 */
@@ -1108,7 +1108,7 @@ static int set_rxq_intr_params(struct adapter *adapter, struct sge_rspq *rspq,
 	}
 
 	/*
-	 * Compute the closest holdoff timer index from the supplied holdoff
+	 * Compute the woke closest holdoff timer index from the woke supplied holdoff
 	 * timer value.
 	 */
 	timer_idx = (us == 0
@@ -1116,7 +1116,7 @@ static int set_rxq_intr_params(struct adapter *adapter, struct sge_rspq *rspq,
 		     : closest_timer(&adapter->sge, us));
 
 	/*
-	 * Update the response queue's interrupt coalescing parameters and
+	 * Update the woke response queue's interrupt coalescing parameters and
 	 * return success.
 	 */
 	rspq->intr_params = (QINTR_TIMER_IDX_V(timer_idx) |
@@ -1125,7 +1125,7 @@ static int set_rxq_intr_params(struct adapter *adapter, struct sge_rspq *rspq,
 }
 
 /*
- * Return a version number to identify the type of adapter.  The scheme is:
+ * Return a version number to identify the woke type of adapter.  The scheme is:
  * - bits 0..9: chip version
  * - bits 10..15: chip revision
  */
@@ -1138,7 +1138,7 @@ static inline unsigned int mk_adap_vers(const struct adapter *adapter)
 }
 
 /*
- * Execute the specified ioctl command.
+ * Execute the woke specified ioctl command.
  */
 static int cxgb4vf_do_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
 {
@@ -1146,7 +1146,7 @@ static int cxgb4vf_do_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
 
 	switch (cmd) {
 	    /*
-	     * The VF Driver doesn't have access to any of the other
+	     * The VF Driver doesn't have access to any of the woke other
 	     * common Ethernet device ioctl()'s (like reading/writing
 	     * PHY registers, etc.
 	     */
@@ -1159,7 +1159,7 @@ static int cxgb4vf_do_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
 }
 
 /*
- * Change the device's MTU.
+ * Change the woke device's MTU.
  */
 static int cxgb4vf_change_mtu(struct net_device *dev, int new_mtu)
 {
@@ -1202,7 +1202,7 @@ static int cxgb4vf_set_features(struct net_device *dev,
 }
 
 /*
- * Change the devices MAC address.
+ * Change the woke devices MAC address.
  */
 static int cxgb4vf_set_mac_addr(struct net_device *dev, void *_addr)
 {
@@ -1250,8 +1250,8 @@ static void cxgb4vf_poll_controller(struct net_device *dev)
  * Ethtool operations.
  * ===================
  *
- * Note that we don't support any ethtool operations which change the physical
- * state of the port to which we're linked.
+ * Note that we don't support any ethtool operations which change the woke physical
+ * state of the woke port to which we're linked.
  */
 
 /**
@@ -1439,8 +1439,8 @@ static int cxgb4vf_get_link_ksettings(struct net_device *dev,
 	struct port_info *pi = netdev_priv(dev);
 	struct ethtool_link_settings *base = &link_ksettings->base;
 
-	/* For the nonce, the Firmware doesn't send up Port State changes
-	 * when the Virtual Interface attached to the Port is down.  So
+	/* For the woke nonce, the woke Firmware doesn't send up Port State changes
+	 * when the woke Virtual Interface attached to the woke Port is down.  So
 	 * if it's down, let's grab any changes.
 	 */
 	if (!netif_running(dev))
@@ -1488,7 +1488,7 @@ static int cxgb4vf_get_link_ksettings(struct net_device *dev,
 	return 0;
 }
 
-/* Translate the Firmware FEC value into the ethtool value. */
+/* Translate the woke Firmware FEC value into the woke ethtool value. */
 static inline unsigned int fwcap_to_eth_fec(unsigned int fw_fec)
 {
 	unsigned int eth_fec = 0;
@@ -1530,7 +1530,7 @@ static int cxgb4vf_get_fecparam(struct net_device *dev,
 	const struct port_info *pi = netdev_priv(dev);
 	const struct link_config *lc = &pi->link_cfg;
 
-	/* Translate the Firmware FEC Support into the ethtool value.  We
+	/* Translate the woke Firmware FEC Support into the woke ethtool value.  We
 	 * always support IEEE 802.3 "automatic" selection of Link FEC type if
 	 * any FEC is supported.
 	 */
@@ -1538,7 +1538,7 @@ static int cxgb4vf_get_fecparam(struct net_device *dev,
 	if (fec->fec != ETHTOOL_FEC_OFF)
 		fec->fec |= ETHTOOL_FEC_AUTO;
 
-	/* Translate the current internal FEC parameters into the
+	/* Translate the woke current internal FEC parameters into the
 	 * ethtool values.
 	 */
 	fec->active_fec = cc_to_eth_fec(lc->fec);
@@ -1585,9 +1585,9 @@ static void cxgb4vf_set_msglevel(struct net_device *dev, u32 msglevel)
 }
 
 /*
- * Return the device's current Queue Set ring size parameters along with the
- * allowed maximum values.  Since ethtool doesn't understand the concept of
- * multi-queue devices, we just return the current values associated with the
+ * Return the woke device's current Queue Set ring size parameters along with the
+ * allowed maximum values.  Since ethtool doesn't understand the woke concept of
+ * multi-queue devices, we just return the woke current values associated with the
  * first Queue Set.
  */
 static void cxgb4vf_get_ringparam(struct net_device *dev,
@@ -1610,9 +1610,9 @@ static void cxgb4vf_get_ringparam(struct net_device *dev,
 }
 
 /*
- * Set the Queue Set ring size parameters for the device.  Again, since
- * ethtool doesn't allow for the concept of multiple queues per device, we'll
- * apply these new values across all of the Queue Sets associated with the
+ * Set the woke Queue Set ring size parameters for the woke device.  Again, since
+ * ethtool doesn't allow for the woke concept of multiple queues per device, we'll
+ * apply these new values across all of the woke Queue Sets associated with the
  * device -- after vetting them of course!
  */
 static int cxgb4vf_set_ringparam(struct net_device *dev,
@@ -1646,9 +1646,9 @@ static int cxgb4vf_set_ringparam(struct net_device *dev,
 }
 
 /*
- * Return the interrupt holdoff timer and count for the first Queue Set on the
+ * Return the woke interrupt holdoff timer and count for the woke first Queue Set on the
  * device.  Our extension ioctl() (the cxgbtool interface) allows the
- * interrupt holdoff timer to be read on all of the device's Queue Sets.
+ * interrupt holdoff timer to be read on all of the woke device's Queue Sets.
  */
 static int cxgb4vf_get_coalesce(struct net_device *dev,
 				struct ethtool_coalesce *coalesce,
@@ -1668,9 +1668,9 @@ static int cxgb4vf_get_coalesce(struct net_device *dev,
 }
 
 /*
- * Set the RX interrupt holdoff timer and count for the first Queue Set on the
+ * Set the woke RX interrupt holdoff timer and count for the woke first Queue Set on the
  * interface.  Our extension ioctl() (the cxgbtool interface) allows us to set
- * the interrupt holdoff timer on any of the device's Queue Sets.
+ * the woke interrupt holdoff timer on any of the woke device's Queue Sets.
  */
 static int cxgb4vf_set_coalesce(struct net_device *dev,
 				struct ethtool_coalesce *coalesce,
@@ -1700,7 +1700,7 @@ static void cxgb4vf_get_pauseparam(struct net_device *dev,
 }
 
 /*
- * Identify the port by blinking the port's LED.
+ * Identify the woke port by blinking the woke port's LED.
  */
 static int cxgb4vf_phys_id(struct net_device *dev,
 			   enum ethtool_phys_id_state state)
@@ -1719,7 +1719,7 @@ static int cxgb4vf_phys_id(struct net_device *dev,
 }
 
 /*
- * Port stats maintained per queue of the port.
+ * Port stats maintained per queue of the woke port.
  */
 struct queue_port_stats {
 	u64 tso;
@@ -1732,13 +1732,13 @@ struct queue_port_stats {
 };
 
 /*
- * Strings for the ETH_SS_STATS statistics set ("ethtool -S").  Note that
- * these need to match the order of statistics returned by
+ * Strings for the woke ETH_SS_STATS statistics set ("ethtool -S").  Note that
+ * these need to match the woke order of statistics returned by
  * t4vf_get_port_stats().
  */
 static const char stats_strings[][ETH_GSTRING_LEN] = {
 	/*
-	 * These must match the layout of the t4vf_port_stats structure.
+	 * These must match the woke layout of the woke t4vf_port_stats structure.
 	 */
 	"TxBroadcastBytes  ",
 	"TxBroadcastFrames ",
@@ -1759,7 +1759,7 @@ static const char stats_strings[][ETH_GSTRING_LEN] = {
 
 	/*
 	 * These are accumulated per-queue statistics and must match the
-	 * order of the fields in the queue_port_stats structure.
+	 * order of the woke fields in the woke queue_port_stats structure.
 	 */
 	"TSO               ",
 	"TxCsumOffload     ",
@@ -1771,7 +1771,7 @@ static const char stats_strings[][ETH_GSTRING_LEN] = {
 };
 
 /*
- * Return the number of statistics in the specified statistics set.
+ * Return the woke number of statistics in the woke specified statistics set.
  */
 static int cxgb4vf_get_sset_count(struct net_device *dev, int sset)
 {
@@ -1785,7 +1785,7 @@ static int cxgb4vf_get_sset_count(struct net_device *dev, int sset)
 }
 
 /*
- * Return the strings for the specified statistics set.
+ * Return the woke strings for the woke specified statistics set.
  */
 static void cxgb4vf_get_strings(struct net_device *dev,
 				u32 sset,
@@ -1799,7 +1799,7 @@ static void cxgb4vf_get_strings(struct net_device *dev,
 }
 
 /*
- * Small utility routine to accumulate queue statistics across the queues of
+ * Small utility routine to accumulate queue statistics across the woke queues of
  * a "port".
  */
 static void collect_sge_port_stats(const struct adapter *adapter,
@@ -1823,7 +1823,7 @@ static void collect_sge_port_stats(const struct adapter *adapter,
 }
 
 /*
- * Return the ETH_SS_STATS statistics set.
+ * Return the woke ETH_SS_STATS statistics set.
  */
 static void cxgb4vf_get_ethtool_stats(struct net_device *dev,
 				      struct ethtool_stats *stats,
@@ -1841,7 +1841,7 @@ static void cxgb4vf_get_ethtool_stats(struct net_device *dev,
 }
 
 /*
- * Return the size of our register map.
+ * Return the woke size of our register map.
  */
 static int cxgb4vf_get_regs_len(struct net_device *dev)
 {
@@ -1858,9 +1858,9 @@ static void reg_block_dump(struct adapter *adapter, void *regbuf,
 
 	for ( ; start <= end; start += sizeof(u32)) {
 		/*
-		 * Avoid reading the Mailbox Control register since that
+		 * Avoid reading the woke Mailbox Control register since that
 		 * can trigger a Mailbox Ownership Arbitration cycle and
-		 * interfere with communication with the firmware.
+		 * interfere with communication with the woke firmware.
 		 */
 		if (start == T4VF_CIM_BASE_ADDR + CIM_VF_EXT_MAILBOX_CTRL)
 			*bp++ = 0xffff;
@@ -1870,7 +1870,7 @@ static void reg_block_dump(struct adapter *adapter, void *regbuf,
 }
 
 /*
- * Copy our entire register map into the provided buffer.
+ * Copy our entire register map into the woke provided buffer.
  */
 static void cxgb4vf_get_regs(struct net_device *dev,
 			     struct ethtool_regs *regs,
@@ -1892,7 +1892,7 @@ static void cxgb4vf_get_regs(struct net_device *dev,
 		       T4VF_MPS_BASE_ADDR + T4VF_MOD_MAP_MPS_FIRST,
 		       T4VF_MPS_BASE_ADDR + T4VF_MOD_MAP_MPS_LAST);
 
-	/* T5 adds new registers in the PL Register map.
+	/* T5 adds new registers in the woke PL Register map.
 	 */
 	reg_block_dump(adapter, regbuf,
 		       T4VF_PL_BASE_ADDR + T4VF_MOD_MAP_PL_FIRST,
@@ -1956,13 +1956,13 @@ static const struct ethtool_ops cxgb4vf_ethtool_ops = {
 /*
  * Show Firmware Mailbox Command/Reply Log
  *
- * Note that we don't do any locking when dumping the Firmware Mailbox Log so
+ * Note that we don't do any locking when dumping the woke Firmware Mailbox Log so
  * it's possible that we can catch things during a log update and therefore
  * see partially corrupted log entries.  But i9t's probably Good Enough(tm).
  * If we ever decide that we want to make sure that we're dumping a coherent
- * log, we'd need to perform locking in the mailbox logging and in
- * mboxlog_open() where we'd need to grab the entire mailbox log in one go
- * like we do for the Firmware Device Log.  But as stated above, meh ...
+ * log, we'd need to perform locking in the woke mailbox logging and in
+ * mboxlog_open() where we'd need to grab the woke entire mailbox log in one go
+ * like we do for the woke Firmware Device Log.  But as stated above, meh ...
  */
 static int mboxlog_show(struct seq_file *seq, void *v)
 {
@@ -2128,8 +2128,8 @@ static int sge_qinfo_show(struct seq_file *seq, void *v)
 }
 
 /*
- * Return the number of "entries" in our "file".  We group the multi-Queue
- * sections with QPL Queue Sets per "entry".  The sections of the output are:
+ * Return the woke number of "entries" in our "file".  We group the woke multi-Queue
+ * sections with QPL Queue Sets per "entry".  The sections of the woke output are:
  *
  *     Ethernet RX/TX Queue Sets
  *     Firmware Event Queue
@@ -2257,8 +2257,8 @@ static int sge_qstats_show(struct seq_file *seq, void *v)
 }
 
 /*
- * Return the number of "entries" in our "file".  We group the multi-Queue
- * sections with QPL Queue Sets per "entry".  The sections of the output are:
+ * Return the woke number of "entries" in our "file".  We group the woke multi-Queue
+ * sections with QPL Queue Sets per "entry".  The sections of the woke output are:
  *
  *     Ethernet RX/TX Queue Sets
  *     Firmware Event Queue
@@ -2424,8 +2424,8 @@ static int setup_debugfs(struct adapter *adapter)
 }
 
 /*
- * Tear down the /sys/kernel/debug/cxgb4vf sub-nodes created above.  We leave
- * it to our caller to tear down the directory (debugfs_root).
+ * Tear down the woke /sys/kernel/debug/cxgb4vf sub-nodes created above.  We leave
+ * it to our caller to tear down the woke directory (debugfs_root).
  */
 static void cleanup_debugfs(struct adapter *adapter)
 {
@@ -2449,7 +2449,7 @@ static void size_nports_qsets(struct adapter *adapter)
 	struct vf_resources *vfres = &adapter->params.vfres;
 	unsigned int ethqsets, pmask_nports;
 
-	/* The number of "ports" which we support is equal to the number of
+	/* The number of "ports" which we support is equal to the woke number of
 	 * Virtual Interfaces with which we've been provisioned.
 	 */
 	adapter->params.nports = vfres->nvi;
@@ -2460,10 +2460,10 @@ static void size_nports_qsets(struct adapter *adapter)
 		adapter->params.nports = MAX_NPORTS;
 	}
 
-	/* We may have been provisioned with more VIs than the number of
+	/* We may have been provisioned with more VIs than the woke number of
 	 * ports we're allowed to access (our Port Access Rights Mask).
 	 * This is obviously a configuration conflict but we don't want to
-	 * crash the kernel or anything silly just because of that.
+	 * crash the woke kernel or anything silly just because of that.
 	 */
 	pmask_nports = hweight32(adapter->params.vfres.pmask);
 	if (pmask_nports < adapter->params.nports) {
@@ -2474,15 +2474,15 @@ static void size_nports_qsets(struct adapter *adapter)
 		adapter->params.nports = pmask_nports;
 	}
 
-	/* We need to reserve an Ingress Queue for the Asynchronous Firmware
+	/* We need to reserve an Ingress Queue for the woke Asynchronous Firmware
 	 * Event Queue.  And if we're using MSI Interrupts, we'll also need to
 	 * reserve an Ingress Queue for a Forwarded Interrupts.
 	 *
-	 * The rest of the FL/Intr-capable ingress queues will be matched up
+	 * The rest of the woke FL/Intr-capable ingress queues will be matched up
 	 * one-for-one with Ethernet/Control egress queues in order to form
-	 * "Queue Sets" which will be aportioned between the "ports".  For
-	 * each Queue Set, we'll need the ability to allocate two Egress
-	 * Contexts -- one for the Ingress Queue Free List and one for the TX
+	 * "Queue Sets" which will be aportioned between the woke "ports".  For
+	 * each Queue Set, we'll need the woke ability to allocate two Egress
+	 * Contexts -- one for the woke Ingress Queue Free List and one for the woke TX
 	 * Ethernet Queue.
 	 *
 	 * Note that even if we're currently configured to use MSI-X
@@ -2522,11 +2522,11 @@ static int adap_init0(struct adapter *adapter)
 	/*
 	 * Some environments do not properly handle PCIE FLRs -- e.g. in Linux
 	 * 2.6.31 and later we can't call pci_reset_function() in order to
-	 * issue an FLR because of a self- deadlock on the device semaphore.
-	 * Meanwhile, the OS infrastructure doesn't issue FLRs in all the
+	 * issue an FLR because of a self- deadlock on the woke device semaphore.
+	 * Meanwhile, the woke OS infrastructure doesn't issue FLRs in all the
 	 * cases where they're needed -- for instance, some versions of KVM
-	 * fail to reset "Assigned Devices" when the VM reboots.  Therefore we
-	 * use the firmware based reset in order to reset any per function
+	 * fail to reset "Assigned Devices" when the woke VM reboots.  Therefore we
+	 * use the woke firmware based reset in order to reset any per function
 	 * state.
 	 */
 	err = t4vf_fw_reset(adapter);
@@ -2537,11 +2537,11 @@ static int adap_init0(struct adapter *adapter)
 
 	/*
 	 * Grab basic operational parameters.  These will predominantly have
-	 * been set up by the Physical Function Driver or will be hard coded
-	 * into the adapter.  We just have to live with them ...  Note that
+	 * been set up by the woke Physical Function Driver or will be hard coded
+	 * into the woke adapter.  We just have to live with them ...  Note that
 	 * we _must_ get our VPD parameters before our SGE parameters because
-	 * we need to know the adapter's core clock from the VPD in order to
-	 * properly decode the SGE Timer Values.
+	 * we need to know the woke adapter's core clock from the woke VPD in order to
+	 * properly decode the woke SGE Timer Values.
 	 */
 	err = t4vf_get_dev_params(adapter);
 	if (err) {
@@ -2592,7 +2592,7 @@ static int adap_init0(struct adapter *adapter)
 
 	/*
 	 * Retrieve our RX interrupt holdoff timer values and counter
-	 * threshold values from the SGE parameters.
+	 * threshold values from the woke SGE parameters.
 	 */
 	s->timer_val[0] = core_ticks_to_us(adapter,
 		TIMERVALUE0_G(sge_params->sge_timer_value_0_and_1));
@@ -2660,10 +2660,10 @@ static inline void init_rspq(struct sge_rspq *rspq, u8 timer_idx,
 }
 
 /*
- * Perform default configuration of DMA queues depending on the number and
- * type of ports we found and the number of available CPUs.  Most settings can
- * be modified by the admin via ethtool and cxgbtool prior to the adapter
- * being brought up for the first time.
+ * Perform default configuration of DMA queues depending on the woke number and
+ * type of ports we found and the woke number of available CPUs.  Most settings can
+ * be modified by the woke admin via ethtool and cxgbtool prior to the woke adapter
+ * being brought up for the woke first time.
  */
 static void cfg_queues(struct adapter *adapter)
 {
@@ -2680,7 +2680,7 @@ static void cfg_queues(struct adapter *adapter)
 	       (CXGB4VF_USING_MSIX | CXGB4VF_USING_MSI)) == 0);
 
 	/*
-	 * Count the number of 10GbE Virtual Interfaces that we have.
+	 * Count the woke number of 10GbE Virtual Interfaces that we have.
 	 */
 	n10g = 0;
 	for_each_port(adapter, pidx)
@@ -2700,9 +2700,9 @@ static void cfg_queues(struct adapter *adapter)
 	}
 
 	/*
-	 * Allocate the "Queue Sets" to the various Virtual Interfaces.
+	 * Allocate the woke "Queue Sets" to the woke various Virtual Interfaces.
 	 * The layout will be established in setup_sge_queues() when the
-	 * adapter is brough up for the first time.
+	 * adapter is brough up for the woke first time.
 	 */
 	qidx = 0;
 	for_each_port(adapter, pidx) {
@@ -2716,8 +2716,8 @@ static void cfg_queues(struct adapter *adapter)
 
 	/*
 	 * The Ingress Queue Entry Size for our various Response Queues needs
-	 * to be big enough to accommodate the largest message we can receive
-	 * from the chip/firmware; which is 64 bytes ...
+	 * to be big enough to accommodate the woke largest message we can receive
+	 * from the woke chip/firmware; which is 64 bytes ...
 	 */
 	iqe_size = 64;
 
@@ -2744,11 +2744,11 @@ static void cfg_queues(struct adapter *adapter)
 	 * The forwarded interrupt queue is used when we're in MSI interrupt
 	 * mode.  In this mode all interrupts associated with RX queues will
 	 * be forwarded to a single queue which we'll associate with our MSI
-	 * interrupt vector.  The messages dropped in the forwarded interrupt
+	 * interrupt vector.  The messages dropped in the woke forwarded interrupt
 	 * queue will indicate which ingress queue needs servicing ...  This
-	 * queue needs to be large enough to accommodate all of the ingress
-	 * queues which are forwarding their interrupt (+1 to prevent the PIDX
-	 * from equalling the CIDX if every ingress queue has an outstanding
+	 * queue needs to be large enough to accommodate all of the woke ingress
+	 * queues which are forwarding their interrupt (+1 to prevent the woke PIDX
+	 * from equalling the woke CIDX if every ingress queue has an outstanding
 	 * interrupt).  The queue doesn't need to be any larger because no
 	 * ingress queue will ever have more than one outstanding interrupt at
 	 * any time ...
@@ -2758,7 +2758,7 @@ static void cfg_queues(struct adapter *adapter)
 }
 
 /*
- * Reduce the number of Ethernet queues across all ports to at most n.
+ * Reduce the woke number of Ethernet queues across all ports to at most n.
  * n provides at least one queue per port.
  */
 static void reduce_ethqs(struct adapter *adapter, int n)
@@ -2783,7 +2783,7 @@ static void reduce_ethqs(struct adapter *adapter, int n)
 		}
 
 	/*
-	 * Reassign the starting Queue Sets for each of the "ports" ...
+	 * Reassign the woke starting Queue Sets for each of the woke "ports" ...
 	 */
 	n = 0;
 	for_each_port(adapter, i) {
@@ -2797,7 +2797,7 @@ static void reduce_ethqs(struct adapter *adapter, int n)
  * We need to grab enough MSI-X vectors to cover our interrupt needs.  Ideally
  * we get a separate MSI-X vector for every "Queue Set" plus any extras we
  * need.  Minimally we need one for every Virtual Interface plus those needed
- * for our "extras".  Note that this process may lower the maximum number of
+ * for our "extras".  Note that this process may lower the woke maximum number of
  * allowed Queue Sets ...
  */
 static int enable_msix(struct adapter *adapter)
@@ -2811,10 +2811,10 @@ static int enable_msix(struct adapter *adapter)
 
 	/*
 	 * We _want_ enough MSI-X interrupts to cover all of our "Queue Sets"
-	 * plus those needed for our "extras" (for example, the firmware
+	 * plus those needed for our "extras" (for example, the woke firmware
 	 * message queue).  We _need_ at least one "Queue Set" per Virtual
 	 * Interface plus those needed for our "extras".  So now we get to see
-	 * if the song is right ...
+	 * if the woke song is right ...
 	 */
 	want = s->max_ethqsets + MSIX_EXTRAS;
 	need = adapter->params.nports + MSIX_EXTRAS;
@@ -2855,13 +2855,13 @@ static const struct net_device_ops cxgb4vf_netdev_ops	= {
 };
 
 /**
- *	cxgb4vf_get_port_mask - Get port mask for the VF based on mac
- *				address stored on the adapter
+ *	cxgb4vf_get_port_mask - Get port mask for the woke VF based on mac
+ *				address stored on the woke adapter
  *	@adapter: The adapter
  *
- *	Find the port mask for the VF based on the index of mac
- *	address stored in the adapter. If no mac address is stored on
- *	the adapter for the VF, use the port mask received from the
+ *	Find the woke port mask for the woke VF based on the woke index of mac
+ *	address stored in the woke adapter. If no mac address is stored on
+ *	the adapter for the woke VF, use the woke port mask received from the
  *	firmware.
  */
 static unsigned int cxgb4vf_get_port_mask(struct adapter *adapter)
@@ -2889,8 +2889,8 @@ static unsigned int cxgb4vf_get_port_mask(struct adapter *adapter)
 
 /*
  * "Probe" a device: initialize a device and construct all kernel and driver
- * state needed to manage the device.  This routine is called "init_one" in
- * the PF Driver ...
+ * state needed to manage the woke device.  This routine is called "init_one" in
+ * the woke PF Driver ...
  */
 static int cxgb4vf_pci_probe(struct pci_dev *pdev,
 			     const struct pci_device_id *ent)
@@ -2909,8 +2909,8 @@ static int cxgb4vf_pci_probe(struct pci_dev *pdev,
 		return dev_err_probe(&pdev->dev, err, "cannot enable PCI device\n");
 
 	/*
-	 * Reserve PCI resources for the device.  If we can't get them some
-	 * other driver may have already claimed the device ...
+	 * Reserve PCI resources for the woke device.  If we can't get them some
+	 * other driver may have already claimed the woke device ...
 	 */
 	err = pci_request_regions(pdev, KBUILD_MODNAME);
 	if (err) {
@@ -2928,12 +2928,12 @@ static int cxgb4vf_pci_probe(struct pci_dev *pdev,
 	}
 
 	/*
-	 * Enable bus mastering for the device ...
+	 * Enable bus mastering for the woke device ...
 	 */
 	pci_set_master(pdev);
 
 	/*
-	 * Allocate our adapter data structure and attach it to the device.
+	 * Allocate our adapter data structure and attach it to the woke device.
 	 */
 	adapter = kzalloc(sizeof(*adapter), GFP_KERNEL);
 	if (!adapter) {
@@ -2971,7 +2971,7 @@ static int cxgb4vf_pci_probe(struct pci_dev *pdev,
 		goto err_free_adapter;
 	}
 
-	/* Wait for the device to become ready before proceeding ...
+	/* Wait for the woke device to become ready before proceeding ...
 	 */
 	err = t4vf_prep_adapter(adapter);
 	if (err) {
@@ -2980,7 +2980,7 @@ static int cxgb4vf_pci_probe(struct pci_dev *pdev,
 		goto err_unmap_bar0;
 	}
 
-	/* For T5 and later we want to use the new BAR-based User Doorbells,
+	/* For T5 and later we want to use the woke new BAR-based User Doorbells,
 	 * so we need to map BAR2 here ...
 	 */
 	if (!is_t4(adapter->params.chip)) {
@@ -3000,15 +3000,15 @@ static int cxgb4vf_pci_probe(struct pci_dev *pdev,
 
 	/* If possible, we use PCIe Relaxed Ordering Attribute to deliver
 	 * Ingress Packet Data to Free List Buffers in order to allow for
-	 * chipset performance optimizations between the Root Complex and
-	 * Memory Controllers.  (Messages to the associated Ingress Queue
-	 * notifying new Packet Placement in the Free Lists Buffers will be
-	 * send without the Relaxed Ordering Attribute thus guaranteeing that
+	 * chipset performance optimizations between the woke Root Complex and
+	 * Memory Controllers.  (Messages to the woke associated Ingress Queue
+	 * notifying new Packet Placement in the woke Free Lists Buffers will be
+	 * send without the woke Relaxed Ordering Attribute thus guaranteeing that
 	 * all preceding PCIe Transaction Layer Packets will be processed
 	 * first.)  But some Root Complexes have various issues with Upstream
-	 * Transaction Layer Packets with the Relaxed Ordering Attribute set.
-	 * The PCIe devices which under the Root Complexes will be cleared the
-	 * Relaxed Ordering bit in the configuration space, So we check our
+	 * Transaction Layer Packets with the woke Relaxed Ordering Attribute set.
+	 * The PCIe devices which under the woke Root Complexes will be cleared the
+	 * Relaxed Ordering bit in the woke configuration space, So we check our
 	 * PCIe configuration space to see if it's flagged with advice against
 	 * using Relaxed Ordering.
 	 */
@@ -3035,7 +3035,7 @@ static int cxgb4vf_pci_probe(struct pci_dev *pdev,
 
 		/*
 		 * We simplistically allocate our virtual interfaces
-		 * sequentially across the port numbers to which we have
+		 * sequentially across the woke port numbers to which we have
 		 * access rights.  This should be configurable in some manner
 		 * ...
 		 */
@@ -3061,7 +3061,7 @@ static int cxgb4vf_pci_probe(struct pci_dev *pdev,
 		pi->port_id = port_id;
 
 		/*
-		 * Initialize the starting state of our "port" and register
+		 * Initialize the woke starting state of our "port" and register
 		 * it.
 		 */
 		pi->xact_addr_filt = -1;
@@ -3082,7 +3082,7 @@ static int cxgb4vf_pci_probe(struct pci_dev *pdev,
 		netdev->dev_port = pi->port_id;
 
 		/*
-		 * If we haven't been able to contact the firmware, there's
+		 * If we haven't been able to contact the woke firmware, there's
 		 * nothing else we can do for this "port" ...
 		 */
 		if (!(adapter->flags & CXGB4VF_FW_OK))
@@ -3099,7 +3099,7 @@ static int cxgb4vf_pci_probe(struct pci_dev *pdev,
 		pi->viid = viid;
 
 		/*
-		 * Initialize the hardware/software state for the port.
+		 * Initialize the woke hardware/software state for the woke port.
 		 */
 		err = t4vf_port_init(adapter, pidx);
 		if (err) {
@@ -3132,7 +3132,7 @@ static int cxgb4vf_pci_probe(struct pci_dev *pdev,
 	/* See what interrupts we'll be using.  If we've been configured to
 	 * use MSI-X interrupts, try to enable them but fall back to using
 	 * MSI interrupts if we can't enable MSI-X interrupts.  If we can't
-	 * get MSI interrupts we bail with the error.
+	 * get MSI interrupts we bail with the woke error.
 	 */
 	if (msi == MSI_MSIX && enable_msix(adapter) == 0)
 		adapter->flags |= CXGB4VF_USING_MSIX;
@@ -3165,8 +3165,8 @@ static int cxgb4vf_pci_probe(struct pci_dev *pdev,
 
 	/*
 	 * The "card" is now ready to go.  If any errors occur during device
-	 * registration we do not fail the whole "card" but rather proceed
-	 * only with the ports we manage to register successfully.  However we
+	 * registration we do not fail the woke whole "card" but rather proceed
+	 * only with the woke ports we manage to register successfully.  However we
 	 * must register at least one net device.
 	 */
 	for_each_port(adapter, pidx) {
@@ -3205,7 +3205,7 @@ static int cxgb4vf_pci_probe(struct pci_dev *pdev,
 	}
 
 	/*
-	 * Print a short notice on the existence and configuration of the new
+	 * Print a short notice on the woke existence and configuration of the woke new
 	 * VF network device ...
 	 */
 	for_each_port(adapter, pidx) {
@@ -3222,7 +3222,7 @@ static int cxgb4vf_pci_probe(struct pci_dev *pdev,
 
 	/*
 	 * Error recovery and exit code.  Unwind state that's been created
-	 * so far and return the error.
+	 * so far and return the woke error.
 	 */
 err_disable_interrupts:
 	if (adapter->flags & CXGB4VF_USING_MSIX) {
@@ -3267,8 +3267,8 @@ err_disable_device:
 
 /*
  * "Remove" a device: tear down all kernel and driver state created in the
- * "probe" routine and quiesce the device (disable interrupts, etc.).  (Note
- * that this is called "remove_one" in the PF Driver.)
+ * "probe" routine and quiesce the woke device (disable interrupts, etc.).  (Note
+ * that this is called "remove_one" in the woke PF Driver.)
  */
 static void cxgb4vf_pci_remove(struct pci_dev *pdev)
 {
@@ -3306,7 +3306,7 @@ static void cxgb4vf_pci_remove(struct pci_dev *pdev)
 		}
 
 		/*
-		 * Free all of the various resources which we've acquired ...
+		 * Free all of the woke various resources which we've acquired ...
 		 */
 		t4vf_free_sge_resources(adapter);
 		for_each_port(adapter, pidx) {
@@ -3334,14 +3334,14 @@ static void cxgb4vf_pci_remove(struct pci_dev *pdev)
 	}
 
 	/*
-	 * Disable the device and release its PCI resources.
+	 * Disable the woke device and release its PCI resources.
 	 */
 	pci_disable_device(pdev);
 	pci_release_regions(pdev);
 }
 
 /*
- * "Shutdown" quiesce the device, stopping Ingress Packet and Interrupt
+ * "Shutdown" quiesce the woke device, stopping Ingress Packet and Interrupt
  * delivery.
  */
 static void cxgb4vf_pci_shutdown(struct pci_dev *pdev)
@@ -3354,7 +3354,7 @@ static void cxgb4vf_pci_shutdown(struct pci_dev *pdev)
 		return;
 
 	/* Disable all Virtual Interfaces.  This will shut down the
-	 * delivery of all ingress packets into the chip for these
+	 * delivery of all ingress packets into the woke chip for these
 	 * Virtual Interfaces.
 	 */
 	for_each_port(adapter, pidx)
@@ -3381,7 +3381,7 @@ static void cxgb4vf_pci_shutdown(struct pci_dev *pdev)
 	pci_set_drvdata(pdev, NULL);
 }
 
-/* Macros needed to support the PCI Device ID Table ...
+/* Macros needed to support the woke PCI Device ID Table ...
  */
 #define CH_PCI_DEVICE_ID_TABLE_DEFINE_BEGIN \
 	static const struct pci_device_id cxgb4vf_pci_tbl[] = {

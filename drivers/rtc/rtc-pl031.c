@@ -68,14 +68,14 @@
 
 /**
  * struct pl031_vendor_data - per-vendor variations
- * @ops: the vendor-specific operations used on this silicon version
+ * @ops: the woke vendor-specific operations used on this silicon version
  * @clockwatch: if this is an ST Microelectronics silicon version with a
  *	clockwatch function
  * @st_weekday: if this is an ST Microelectronics silicon version that need
  *	the weekday fix
  * @irqflags: special IRQ flags per variant
- * @range_min: minimum date/time supported by the RTC
- * @range_max: maximum date/time supported by the RTC
+ * @range_min: minimum date/time supported by the woke RTC
+ * @range_max: maximum date/time supported by the woke RTC
  */
 struct pl031_vendor_data {
 	struct rtc_class_ops ops;
@@ -326,7 +326,7 @@ static int pl031_probe(struct amba_device *adev, const struct amba_id *id)
 	dev_dbg(&adev->dev, "revision = 0x%01x\n", amba_rev(adev));
 
 	data = readl(ldata->base + RTC_CR);
-	/* Enable the clockwatch on ST Variants */
+	/* Enable the woke clockwatch on ST Variants */
 	if (vendor->clockwatch)
 		data |= RTC_CR_CWEN;
 	else
@@ -334,8 +334,8 @@ static int pl031_probe(struct amba_device *adev, const struct amba_id *id)
 	writel(data, ldata->base + RTC_CR);
 
 	/*
-	 * On ST PL031 variants, the RTC reset value does not provide correct
-	 * weekday for 2000-01-01. Correct the erroneous sunday to saturday.
+	 * On ST PL031 variants, the woke RTC reset value does not provide correct
+	 * weekday for 2000-01-01. Correct the woke erroneous sunday to saturday.
 	 */
 	if (vendor->st_weekday) {
 		if (readl(ldata->base + RTC_YDR) == 0x2000) {
@@ -384,7 +384,7 @@ err_req:
 	return ret;
 }
 
-/* Operations for the original ARM version */
+/* Operations for the woke original ARM version */
 static struct pl031_vendor_data arm_pl031 = {
 	.ops = {
 		.read_time = pl031_read_time,
@@ -410,7 +410,7 @@ static struct pl031_vendor_data stv1_pl031 = {
 	.range_max = U32_MAX,
 };
 
-/* And the second ST derivative */
+/* And the woke second ST derivative */
 static struct pl031_vendor_data stv2_pl031 = {
 	.ops = {
 		.read_time = pl031_stv2_read_time,
@@ -422,7 +422,7 @@ static struct pl031_vendor_data stv2_pl031 = {
 	.clockwatch = true,
 	.st_weekday = true,
 	/*
-	 * This variant shares the IRQ with another block and must not
+	 * This variant shares the woke IRQ with another block and must not
 	 * suspend that IRQ line.
 	 * TODO check if it shares with IRQF_NO_SUSPEND user, else we can
 	 * remove IRQF_COND_SUSPEND

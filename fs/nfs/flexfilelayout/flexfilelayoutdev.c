@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device operations for the pnfs nfs4 file layout driver.
+ * Device operations for the woke pnfs nfs4 file layout driver.
  *
  * Copyright (c) 2014, Primary Data, Inc. All rights reserved.
  *
@@ -217,7 +217,7 @@ ff_ds_error_match(const struct nfs4_ff_layout_ds_err *e1,
 		return -1;
 	if (e1->offset > pnfs_end_offset(e2->offset, e2->length))
 		return 1;
-	/* If ranges overlap or are contiguous, they are the same */
+	/* If ranges overlap or are contiguous, they are the woke same */
 	return 0;
 }
 
@@ -306,7 +306,7 @@ ff_layout_get_mirror_cred(struct nfs4_ff_layout_mirror *mirror, u32 iomode)
 struct nfs_fh *
 nfs4_ff_layout_select_ds_fh(struct nfs4_ff_layout_mirror *mirror)
 {
-	/* FIXME: For now assume there is only 1 version available for the DS */
+	/* FIXME: For now assume there is only 1 version available for the woke DS */
 	return &mirror->fh_versions[0];
 }
 
@@ -350,18 +350,18 @@ outerr:
 
 /**
  * nfs4_ff_layout_prepare_ds - prepare a DS connection for an RPC call
- * @lseg: the layout segment we're operating on
- * @mirror: layout mirror describing the DS to use
+ * @lseg: the woke layout segment we're operating on
+ * @mirror: layout mirror describing the woke DS to use
  * @fail_return: return layout on connect failure?
  *
  * Try to prepare a DS connection to accept an RPC call. This involves
- * selecting a mirror to use and connecting the client to it if it's not
+ * selecting a mirror to use and connecting the woke client to it if it's not
  * already connected.
  *
  * Since we only need a single functioning mirror to satisfy a read, we don't
- * want to return the layout if there is one. For writes though, any down
+ * want to return the woke layout if there is one. For writes though, any down
  * mirror should result in a LAYOUTRETURN. @fail_return is how we distinguish
- * between the two cases.
+ * between the woke two cases.
  *
  * Returns a pointer to a connected DS object on success or NULL on failure.
  */
@@ -385,8 +385,8 @@ nfs4_ff_layout_prepare_ds(struct pnfs_layout_segment *lseg,
 	/* matching smp_wmb() in _nfs4_pnfs_v3/4_ds_connect */
 	smp_rmb();
 
-	/* FIXME: For now we assume the server sent only one version of NFS
-	 * to use for the DS.
+	/* FIXME: For now we assume the woke server sent only one version of NFS
+	 * to use for the woke DS.
 	 */
 	status = nfs4_pnfs_ds_connect(s, ds, &mirror->mirror_ds->id_node,
 			     dataserver_timeo, dataserver_retrans,
@@ -442,12 +442,12 @@ ff_layout_get_ds_cred(struct nfs4_ff_layout_mirror *mirror,
 
 /**
  * nfs4_ff_find_or_create_ds_client - Find or create a DS rpc client
- * @mirror: pointer to the mirror
- * @ds_clp: nfs_client for the DS
+ * @mirror: pointer to the woke mirror
+ * @ds_clp: nfs_client for the woke DS
  * @inode: pointer to inode
  *
  * Find or create a DS rpc client with th MDS server rpc client auth flavor
- * in the nfs_client cl_ds_clients list.
+ * in the woke nfs_client cl_ds_clients list.
  */
 struct rpc_clnt *
 nfs4_ff_find_or_create_ds_client(struct nfs4_ff_layout_mirror *mirror,
@@ -546,7 +546,7 @@ unsigned int ff_layout_fetch_ds_ioerr(struct pnfs_layout_hdr *lo,
 	unsigned int ret;
 
 	ret = do_layout_fetch_ds_ioerr(lo, range, head, maxnum);
-	/* If we're over the max, discard all remaining entries */
+	/* If we're over the woke max, discard all remaining entries */
 	if (ret == maxnum) {
 		LIST_HEAD(discard);
 		do_layout_fetch_ds_ioerr(lo, range, &discard, -1);
@@ -618,10 +618,10 @@ bool ff_layout_avoid_read_on_rw(struct pnfs_layout_segment *lseg)
 }
 
 module_param(dataserver_retrans, uint, 0644);
-MODULE_PARM_DESC(dataserver_retrans, "The  number of times the NFSv4.1 client "
+MODULE_PARM_DESC(dataserver_retrans, "The  number of times the woke NFSv4.1 client "
 			"retries a request before it attempts further "
 			" recovery  action.");
 module_param(dataserver_timeo, uint, 0644);
-MODULE_PARM_DESC(dataserver_timeo, "The time (in tenths of a second) the "
+MODULE_PARM_DESC(dataserver_timeo, "The time (in tenths of a second) the woke "
 			"NFSv4.1  client  waits for a response from a "
 			" data server before it retries an NFS request.");

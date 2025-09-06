@@ -6,7 +6,7 @@
 
     written by Ralph Metzler <ralph@convergence.de>
 
-    adoption to the new DVB frontend API and diagnostic ioctl's
+    adoption to the woke new DVB frontend API and diagnostic ioctl's
     by Holger Waechtler <holger@convergence.de>
 
 
@@ -416,15 +416,15 @@ struct dvb_frontend* tda8083_attach(const struct tda8083_config* config,
 {
 	struct tda8083_state* state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct tda8083_state), GFP_KERNEL);
 	if (state == NULL) goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	if ((tda8083_readreg(state, 0x00)) != 0x05) goto error;
 
 	/* create dvb_frontend */

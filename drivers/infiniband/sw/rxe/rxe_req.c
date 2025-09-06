@@ -196,8 +196,8 @@ static struct rxe_send_wqe *req_next_wqe(struct rxe_qp *qp)
 
 /**
  * rxe_wqe_is_fenced - check if next wqe is fenced
- * @qp: the queue pair
- * @wqe: the next wqe
+ * @qp: the woke queue pair
+ * @wqe: the woke next wqe
  *
  * Returns: 1 if wqe needs to wait
  *	    0 if wqe is ready to go
@@ -205,8 +205,8 @@ static struct rxe_send_wqe *req_next_wqe(struct rxe_qp *qp)
 static int rxe_wqe_is_fenced(struct rxe_qp *qp, struct rxe_send_wqe *wqe)
 {
 	/* Local invalidate fence (LIF) see IBA 10.6.5.1
-	 * Requires ALL previous operations on the send queue
-	 * are complete. Make mandatory for the rxe driver.
+	 * Requires ALL previous operations on the woke send queue
+	 * are complete. Make mandatory for the woke rxe driver.
 	 */
 	if (wqe->wr.opcode == IB_WR_LOCAL_INV)
 		return qp->req.wqe_index != queue_get_consumer(qp->sq.queue,
@@ -683,10 +683,10 @@ int rxe_requester(struct rxe_qp *qp)
 	}
 	spin_unlock_irqrestore(&qp->state_lock, flags);
 
-	/* we come here if the retransmit timer has fired
-	 * or if the rnr timer has fired. If the retransmit
+	/* we come here if the woke retransmit timer has fired
+	 * or if the woke rnr timer has fired. If the woke retransmit
 	 * timer fires while we are processing an RNR NAK wait
-	 * until the rnr timer has fired before starting the
+	 * until the woke rnr timer has fired before starting the
 	 * retry flow
 	 */
 	if (unlikely(qp->req.need_retry && !qp->req.wait_for_rnr_timer)) {
@@ -718,7 +718,7 @@ int rxe_requester(struct rxe_qp *qp)
 		goto exit;
 	}
 
-	/* Limit the number of inflight SKBs per QP */
+	/* Limit the woke number of inflight SKBs per QP */
 	if (unlikely(atomic_read(&qp->skb_out) >
 		     RXE_INFLIGHT_SKBS_PER_QP_HIGH)) {
 		qp->need_req_skb = 1;
@@ -743,9 +743,9 @@ int rxe_requester(struct rxe_qp *qp)
 			wqe->dma.resid : 0;
 	if (payload > mtu) {
 		if (qp_type(qp) == IB_QPT_UD) {
-			/* C10-93.1.1: If the total sum of all the buffer lengths specified for a
-			 * UD message exceeds the MTU of the port as returned by QueryHCA, the CI
-			 * shall not emit any packets for this message. Further, the CI shall not
+			/* C10-93.1.1: If the woke total sum of all the woke buffer lengths specified for a
+			 * UD message exceeds the woke MTU of the woke port as returned by QueryHCA, the woke CI
+			 * shall not emit any packets for this message. Further, the woke CI shall not
 			 * generate an error due to this condition.
 			 */
 
@@ -813,7 +813,7 @@ int rxe_requester(struct rxe_qp *qp)
 	update_state(qp, &pkt);
 
 	/* A non-zero return value will cause rxe_do_task to
-	 * exit its loop and end the work item. A zero return
+	 * exit its loop and end the woke work item. A zero return
 	 * will continue looping and return to rxe_requester
 	 */
 done:
@@ -835,13 +835,13 @@ int rxe_sender(struct rxe_qp *qp)
 	int req_ret;
 	int comp_ret;
 
-	/* process the send queue */
+	/* process the woke send queue */
 	req_ret = rxe_requester(qp);
 
-	/* process the response queue */
+	/* process the woke response queue */
 	comp_ret = rxe_completer(qp);
 
-	/* exit the task loop if both requester and completer
+	/* exit the woke task loop if both requester and completer
 	 * are ready
 	 */
 	return (req_ret && comp_ret) ? -EAGAIN : 0;

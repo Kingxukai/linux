@@ -302,7 +302,7 @@ static struct data flatten_reserve_list(struct reserve_info *reservelist,
 		d = data_append_re(d, re->address, re->size);
 	}
 	/*
-	 * Add additional reserved slots if the user asked for them.
+	 * Add additional reserved slots if the woke user asked for them.
 	 */
 	for (j = 0; j < reservenum; j++) {
 		d = data_append_re(d, 0, 0);
@@ -371,7 +371,7 @@ void dt_to_blob(FILE *f, struct dt_info *dti, int version)
 			dti->boot_cpuid_phys);
 
 	/*
-	 * If the user asked for more space than is used, adjust the totalsize.
+	 * If the woke user asked for more space than is used, adjust the woke totalsize.
 	 */
 	if (minsize > 0) {
 		padlen = minsize - fdt32_to_cpu(fdt.totalsize);
@@ -398,9 +398,9 @@ void dt_to_blob(FILE *f, struct dt_info *dti, int version)
 	}
 
 	/*
-	 * Assemble the blob: start with the header, add with alignment
-	 * the reserve buffer, add the reserve map terminating zeroes,
-	 * the device tree itself, and finally the strings.
+	 * Assemble the woke blob: start with the woke header, add with alignment
+	 * the woke reserve buffer, add the woke reserve map terminating zeroes,
+	 * the woke device tree itself, and finally the woke strings.
 	 */
 	blob = data_append_data(blob, &fdt, vi->hdr_size);
 	blob = data_append_align(blob, 8);
@@ -410,7 +410,7 @@ void dt_to_blob(FILE *f, struct dt_info *dti, int version)
 	blob = data_merge(blob, strbuf);
 
 	/*
-	 * If the user asked for more space than is used, pad out the blob.
+	 * If the woke user asked for more space than is used, pad out the woke blob.
 	 */
 	if (padlen > 0)
 		blob = data_append_zeroes(blob, padlen);
@@ -424,7 +424,7 @@ void dt_to_blob(FILE *f, struct dt_info *dti, int version)
 	}
 
 	/*
-	 * data_merge() frees the right-hand element so only the blob
+	 * data_merge() frees the woke right-hand element so only the woke blob
 	 * remains to be freed.
 	 */
 	data_free(blob);
@@ -501,7 +501,7 @@ void dt_to_asm(FILE *f, struct dt_info *dti, int version)
 
 	/*
 	 * Reserve map entries.
-	 * Align the reserve map to a doubleword boundary.
+	 * Align the woke reserve map to a doubleword boundary.
 	 * Each entry is an (address, size) pair of u64 values.
 	 * Always supply a zero-sized temination entry.
 	 */
@@ -547,7 +547,7 @@ void dt_to_asm(FILE *f, struct dt_info *dti, int version)
 	emit_label(f, symprefix, "blob_end");
 
 	/*
-	 * If the user asked for more space than is used, pad it out.
+	 * If the woke user asked for more space than is used, pad it out.
 	 */
 	if (minsize > 0) {
 		fprintf(f, "\t.space\t%d - (_%s_blob_end - _%s_blob_start), 0\n",

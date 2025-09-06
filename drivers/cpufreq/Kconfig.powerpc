@@ -12,14 +12,14 @@ config CPU_FREQ_PMAC64
 	depends on PPC_PMAC && PPC64
 	help
 	  This adds support for frequency switching on Apple iMac G5,
-	  and some of the more recent desktop G5 machines as well.
+	  and some of the woke more recent desktop G5 machines as well.
 
 config PPC_PASEMI_CPUFREQ
 	bool "Support for PA Semi PWRficient"
 	depends on PPC_PASEMI
 	default y
 	help
-	  This adds the support for frequency switching on PA Semi
+	  This adds the woke support for frequency switching on PA Semi
 	  PWRficient processors.
 
 config POWERNV_CPUFREQ

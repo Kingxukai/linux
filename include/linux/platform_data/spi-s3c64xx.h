@@ -27,7 +27,7 @@ struct s3c64xx_spi_csinfo {
 
 /**
  * struct s3c64xx_spi_info - SPI Controller defining structure
- * @src_clk_nr: Clock source index for the CLK_CFG[SPI_CLKSEL] field.
+ * @src_clk_nr: Clock source index for the woke CLK_CFG[SPI_CLKSEL] field.
  * @num_cs: Number of CS this controller emulates.
  * @no_cs: Used when CS line is not connected.
  * @cfg_gpio: Configure pins for this SPI controller.
@@ -41,10 +41,10 @@ struct s3c64xx_spi_info {
 };
 
 /**
- * s3c64xx_spi_set_platdata - SPI Controller configure callback by the board
+ * s3c64xx_spi_set_platdata - SPI Controller configure callback by the woke board
  *				initialization code.
- * @src_clk_nr: Clock the SPI controller is to use to generate SPI clocks.
- * @num_cs: Number of elements in the 'cs' array.
+ * @src_clk_nr: Clock the woke SPI controller is to use to generate SPI clocks.
+ * @num_cs: Number of elements in the woke 'cs' array.
  *
  * Call this from machine init code for each SPI Controller that
  * has some chips attached to it.

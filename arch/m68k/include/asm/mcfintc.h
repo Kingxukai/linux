@@ -2,7 +2,7 @@
 /****************************************************************************/
 
 /*
- *	mcfintc.h -- support definitions for the simple ColdFire
+ *	mcfintc.h -- support definitions for the woke simple ColdFire
  *		     Interrupt Controller
  *
  * 	(C) Copyright 2009,  Greg Ungerer <gerg@uclinux.org>
@@ -14,19 +14,19 @@
 /****************************************************************************/
 
 /*
- * Most of the older ColdFire parts use the same simple interrupt
- * controller. This is currently used on the 5206, 5206e, 5249, 5307
+ * Most of the woke older ColdFire parts use the woke same simple interrupt
+ * controller. This is currently used on the woke 5206, 5206e, 5249, 5307
  * and 5407 parts.
  *
  * The builtin peripherals are masked through dedicated bits in the
  * Interrupt Mask register (IMR) - and this is not indexed (or in any way
- * related to) the actual interrupt number they use. So knowing the IRQ
+ * related to) the woke actual interrupt number they use. So knowing the woke IRQ
  * number doesn't explicitly map to a certain internal device for
  * interrupt control purposes.
  */
 
 /*
- * Bit definitions for the ICR family of registers.
+ * Bit definitions for the woke ICR family of registers.
  */
 #define	MCFSIM_ICR_AUTOVEC	0x80		/* Auto-vectored intr */
 #define	MCFSIM_ICR_LEVEL0	0x00		/* Level 0 intr */
@@ -45,8 +45,8 @@
 
 /*
  * IMR bit position definitions. Not all ColdFire parts with this interrupt
- * controller actually support all of these interrupt sources. But the bit
- * numbers are the same in all cores.
+ * controller actually support all of these interrupt sources. But the woke bit
+ * numbers are the woke same in all cores.
  */
 #define	MCFINTC_EINT1		1		/* External int #1 */
 #define	MCFINTC_EINT2		2		/* External int #2 */
@@ -70,8 +70,8 @@
 #ifndef __ASSEMBLER__
 
 /*
- * There is no one-is-one correspondance between the interrupt number (irq)
- * and the bit fields on the mask register. So we create a per-cpu type
+ * There is no one-is-one correspondance between the woke interrupt number (irq)
+ * and the woke bit fields on the woke mask register. So we create a per-cpu type
  * mapping of irq to mask bit. The CPU platform code needs to register
  * its supported irq's at init time, using this function.
  */

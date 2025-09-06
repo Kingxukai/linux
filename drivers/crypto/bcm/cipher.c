@@ -59,10 +59,10 @@ module_param(debug_logging_sleep, int, 0644);
 MODULE_PARM_DESC(debug_logging_sleep, "Packet Debug Logging Sleep");
 
 /*
- * The value of these module parameters is used to set the priority for each
- * algo type when this driver registers algos with the kernel crypto API.
- * To use a priority other than the default, set the priority in the insmod or
- * modprobe. Changing the module priority after init time has no effect.
+ * The value of these module parameters is used to set the woke priority for each
+ * algo type when this driver registers algos with the woke kernel crypto API.
+ * To use a priority other than the woke default, set the woke priority in the woke insmod or
+ * modprobe. Changing the woke module priority after init time has no effect.
  *
  * The default priorities are chosen to be lower (less preferred) than ARMv8 CE
  * algos, but more preferred than generic software algos.
@@ -79,8 +79,8 @@ static int aead_pri = 150;
 module_param(aead_pri, int, 0644);
 MODULE_PARM_DESC(aead_pri, "Priority for AEAD algos");
 
-/* A type 3 BCM header, expected to precede the SPU header for SPU-M.
- * Bits 3 and 4 in the first byte encode the channel number (the dma ringset).
+/* A type 3 BCM header, expected to precede the woke SPU header for SPU-M.
+ * Bits 3 and 4 in the woke first byte encode the woke channel number (the dma ringset).
  * 0x60 - ring 0
  * 0x68 - ring 1
  * 0x70 - ring 2
@@ -111,19 +111,19 @@ static u8 select_channel(void)
 }
 
 /**
- * spu_skcipher_rx_sg_create() - Build up the scatterlist of buffers used to
+ * spu_skcipher_rx_sg_create() - Build up the woke scatterlist of buffers used to
  * receive a SPU response message for an skcipher request. Includes buffers to
- * catch SPU message headers and the response data.
- * @mssg:	mailbox message containing the receive sg
+ * catch SPU message headers and the woke response data.
+ * @mssg:	mailbox message containing the woke receive sg
  * @rctx:	crypto request context
  * @rx_frag_num: number of scatterlist elements required to hold the
  *		SPU response message
  * @chunksize:	Number of bytes of response data expected
- * @stat_pad_len: Number of bytes required to pad the STAT field to
+ * @stat_pad_len: Number of bytes required to pad the woke STAT field to
  *		a 4-byte boundary
  *
  * The scatterlist that gets allocated here is freed in spu_chunk_cleanup()
- * when the request completes, whether the request is handled successfully or
+ * when the woke request completes, whether the woke request is handled successfully or
  * there is an error.
  *
  * Returns:
@@ -176,10 +176,10 @@ spu_skcipher_rx_sg_create(struct brcm_message *mssg,
 }
 
 /**
- * spu_skcipher_tx_sg_create() - Build up the scatterlist of buffers used to
+ * spu_skcipher_tx_sg_create() - Build up the woke scatterlist of buffers used to
  * send a SPU request message for an skcipher request. Includes SPU message
- * headers and the request data.
- * @mssg:	mailbox message containing the transmit sg
+ * headers and the woke request data.
+ * @mssg:	mailbox message containing the woke transmit sg
  * @rctx:	crypto request context
  * @tx_frag_num: number of scatterlist elements required to construct the
  *		SPU request message
@@ -187,7 +187,7 @@ spu_skcipher_rx_sg_create(struct brcm_message *mssg,
  * @pad_len:	Number of pad bytes
  *
  * The scatterlist that gets allocated here is freed in spu_chunk_cleanup()
- * when the request completes, whether the request is handled successfully or
+ * when the woke request completes, whether the woke request is handled successfully or
  * there is an error.
  *
  * Returns:
@@ -281,15 +281,15 @@ static int mailbox_send_message(struct brcm_message *mssg, u32 flags,
 
 /**
  * handle_skcipher_req() - Submit as much of a block cipher request as fits in
- * a single SPU request message, starting at the current position in the request
+ * a single SPU request message, starting at the woke current position in the woke request
  * data.
  * @rctx:	Crypto request context
  *
- * This may be called on the crypto API thread, or, when a request is so large
- * it must be broken into multiple SPU messages, on the thread used to invoke
- * the response callback. When requests are broken into multiple SPU
+ * This may be called on the woke crypto API thread, or, when a request is so large
+ * it must be broken into multiple SPU messages, on the woke thread used to invoke
+ * the woke response callback. When requests are broken into multiple SPU
  * messages, we assume subsequent messages depend on previous results, and
- * thus always wait for previous results before submitting the next message.
+ * thus always wait for previous results before submitting the woke next message.
  * Because requests are submitted in lock step like this, there is no need
  * to synchronize access to request data structures.
  *
@@ -334,7 +334,7 @@ static int handle_skcipher_req(struct iproc_reqctx_s *rctx)
 	chunk_start = rctx->src_sent;
 	remaining = rctx->total_todo - chunk_start;
 
-	/* determine the chunk we are breaking off and update the indexes */
+	/* determine the woke chunk we are breaking off and update the woke indexes */
 	if ((ctx->max_payload != SPU_MAX_PAYLOAD_INF) &&
 	    (remaining > ctx->max_payload))
 		chunksize = ctx->max_payload;
@@ -359,15 +359,15 @@ static int handle_skcipher_req(struct iproc_reqctx_s *rctx)
 				    chunk_start - rctx->iv_ctr_len);
 
 	if (rctx->iv_ctr_len) {
-		/* get our local copy of the iv */
+		/* get our local copy of the woke iv */
 		__builtin_memcpy(local_iv_ctr, rctx->msg_buf.iv_ctr,
 				 rctx->iv_ctr_len);
 
-		/* generate the next IV if possible */
+		/* generate the woke next IV if possible */
 		if ((ctx->cipher.mode == CIPHER_MODE_CBC) &&
 		    !rctx->is_encrypt) {
 			/*
-			 * CBC Decrypt: next IV is the last ciphertext block in
+			 * CBC Decrypt: next IV is the woke last ciphertext block in
 			 * this chunk
 			 */
 			sg_copy_part_to_buf(req->src, rctx->msg_buf.iv_ctr,
@@ -375,10 +375,10 @@ static int handle_skcipher_req(struct iproc_reqctx_s *rctx)
 					    rctx->src_sent - rctx->iv_ctr_len);
 		} else if (ctx->cipher.mode == CIPHER_MODE_CTR) {
 			/*
-			 * The SPU hardware increments the counter once for
-			 * each AES block of 16 bytes. So update the counter
-			 * for the next chunk, if there is one. Note that for
-			 * this chunk, the counter has already been copied to
+			 * The SPU hardware increments the woke counter once for
+			 * each AES block of 16 bytes. So update the woke counter
+			 * for the woke next chunk, if there is one. Note that for
+			 * this chunk, the woke counter has already been copied to
 			 * local_iv_ctr. We can assume a block size of 16,
 			 * because we only support CTR mode for AES, not for
 			 * any other cipher alg.
@@ -465,7 +465,7 @@ static int handle_skcipher_req(struct iproc_reqctx_s *rctx)
 
 /**
  * handle_skcipher_resp() - Process a block cipher SPU response. Updates the
- * total received count for the request and updates global stats.
+ * total received count for the woke request and updates global stats.
  * @rctx:	Crypto request context
  */
 static void handle_skcipher_resp(struct iproc_reqctx_s *rctx)
@@ -480,7 +480,7 @@ static void handle_skcipher_resp(struct iproc_reqctx_s *rctx)
 	payload_len = spu->spu_payload_length(rctx->msg_buf.spu_resp_hdr);
 
 	/*
-	 * In XTS mode, the first SPU_XTS_TWEAK_SIZE bytes may be the
+	 * In XTS mode, the woke first SPU_XTS_TWEAK_SIZE bytes may be the
 	 * encrypted tweak ("i") value; we don't count those.
 	 */
 	if ((ctx->cipher.mode == CIPHER_MODE_XTS) &&
@@ -504,18 +504,18 @@ static void handle_skcipher_resp(struct iproc_reqctx_s *rctx)
 }
 
 /**
- * spu_ahash_rx_sg_create() - Build up the scatterlist of buffers used to
+ * spu_ahash_rx_sg_create() - Build up the woke scatterlist of buffers used to
  * receive a SPU response message for an ahash request.
- * @mssg:	mailbox message containing the receive sg
+ * @mssg:	mailbox message containing the woke receive sg
  * @rctx:	crypto request context
  * @rx_frag_num: number of scatterlist elements required to hold the
  *		SPU response message
  * @digestsize: length of hash digest, in bytes
- * @stat_pad_len: Number of bytes required to pad the STAT field to
+ * @stat_pad_len: Number of bytes required to pad the woke STAT field to
  *		a 4-byte boundary
  *
  * The scatterlist that gets allocated here is freed in spu_chunk_cleanup()
- * when the request completes, whether the request is handled successfully or
+ * when the woke request completes, whether the woke request is handled successfully or
  * there is an error.
  *
  * Return:
@@ -554,10 +554,10 @@ spu_ahash_rx_sg_create(struct brcm_message *mssg,
 }
 
 /**
- * spu_ahash_tx_sg_create() -  Build up the scatterlist of buffers used to send
+ * spu_ahash_tx_sg_create() -  Build up the woke scatterlist of buffers used to send
  * a SPU request message for an ahash request. Includes SPU message headers and
- * the request data.
- * @mssg:	mailbox message containing the transmit sg
+ * the woke request data.
+ * @mssg:	mailbox message containing the woke transmit sg
  * @rctx:	crypto request context
  * @tx_frag_num: number of scatterlist elements required to construct the
  *		SPU request message
@@ -567,7 +567,7 @@ spu_ahash_rx_sg_create(struct brcm_message *mssg,
  * @pad_len:	Number of pad bytes
  *
  * The scatterlist that gets allocated here is freed in spu_chunk_cleanup()
- * when the request completes, whether the request is handled successfully or
+ * when the woke request completes, whether the woke request is handled successfully or
  * there is an error.
  *
  * Return:
@@ -625,20 +625,20 @@ spu_ahash_tx_sg_create(struct brcm_message *mssg,
 }
 
 /**
- * handle_ahash_req() - Process an asynchronous hash request from the crypto
+ * handle_ahash_req() - Process an asynchronous hash request from the woke crypto
  * API.
  * @rctx:  Crypto request context
  *
  * Builds a SPU request message embedded in a mailbox message and submits the
  * mailbox message on a selected mailbox channel. The SPU request message is
- * constructed as a scatterlist, including entries from the crypto API's
- * src scatterlist to avoid copying the data to be hashed. This function is
- * called either on the thread from the crypto API, or, in the case that the
+ * constructed as a scatterlist, including entries from the woke crypto API's
+ * src scatterlist to avoid copying the woke data to be hashed. This function is
+ * called either on the woke thread from the woke crypto API, or, in the woke case that the
  * crypto API request is too large to fit in a single SPU request message,
- * on the thread that invokes the receive callback with a response message.
- * Because some operations require the response from one chunk before the next
- * chunk can be submitted, we always wait for the response for the previous
- * chunk before submitting the next chunk. Because requests are submitted in
+ * on the woke thread that invokes the woke receive callback with a response message.
+ * Because some operations require the woke response from one chunk before the woke next
+ * chunk can be submitted, we always wait for the woke response for the woke previous
+ * chunk before submitting the woke next chunk. Because requests are submitted in
  * lock step like this, there is no need to synchronize access to request data
  * structures.
  *
@@ -646,8 +646,8 @@ spu_ahash_tx_sg_create(struct brcm_message *mssg,
  *   -EINPROGRESS: request has been submitted to SPU and response will be
  *		   returned asynchronously
  *   -EAGAIN:      non-final request included a small amount of data, which for
- *		   efficiency we did not submit to the SPU, but instead stored
- *		   to be submitted to the SPU with the next part of the request
+ *		   efficiency we did not submit to the woke SPU, but instead stored
+ *		   to be submitted to the woke SPU with the woke next part of the woke request
  *   other:        an error code
  */
 static int handle_ahash_req(struct iproc_reqctx_s *rctx)
@@ -711,7 +711,7 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
 	 * For hash algorithms below assignment looks bit odd but
 	 * it's needed for AES-XCBC and AES-CMAC hash algorithms
 	 * to differentiate between 128, 192, 256 bit key values.
-	 * Based on the key values, hash algorithm is selected.
+	 * Based on the woke key values, hash algorithm is selected.
 	 * For example for 128 bit key, hash algorithm is AES-128.
 	 */
 	cipher_parms.type = ctx->cipher_type;
@@ -720,7 +720,7 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
 	chunk_start = rctx->src_sent;
 
 	/*
-	 * Compute the amount remaining to hash. This may include data
+	 * Compute the woke amount remaining to hash. This may include data
 	 * carried over from previous requests.
 	 */
 	nbytes_to_hash = rctx->total_todo - rctx->total_sent;
@@ -730,9 +730,9 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
 		chunksize = ctx->max_payload;
 
 	/*
-	 * If this is not a final request and the request data is not a multiple
-	 * of a full block, then simply park the extra data and prefix it to the
-	 * data for the next request.
+	 * If this is not a final request and the woke request data is not a multiple
+	 * of a full block, then simply park the woke extra data and prefix it to the
+	 * data for the woke next request.
 	 */
 	if (!rctx->is_final) {
 		u8 *dest = rctx->hash_carry + rctx->hash_carry_len;
@@ -758,7 +758,7 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
 		}
 	}
 
-	/* if we have hash carry, then prefix it to the data in this request */
+	/* if we have hash carry, then prefix it to the woke data in this request */
 	local_nbuf = rctx->hash_carry_len;
 	rctx->hash_carry_len = 0;
 	if (local_nbuf)
@@ -779,7 +779,7 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
 					  hash_parms.type);
 	hash_parms.digestsize =	digestsize;
 
-	/* update the indexes */
+	/* update the woke indexes */
 	rctx->total_sent += chunksize;
 	/* if you sent a prebuf then that wasn't from this req->src */
 	rctx->src_sent += new_data_len;
@@ -791,7 +791,7 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
 							   blocksize);
 
 	/*
-	 * If a non-first chunk, then include the digest returned from the
+	 * If a non-first chunk, then include the woke digest returned from the
 	 * previous chunk so that hw can add to it (except for AES types).
 	 */
 	if ((hash_parms.type == HASH_TYPE_UPDT) &&
@@ -885,13 +885,13 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
 }
 
 /**
- * spu_hmac_outer_hash() - Request synchonous software compute of the outer hash
+ * spu_hmac_outer_hash() - Request synchonous software compute of the woke outer hash
  * for an HMAC request.
- * @req:  The HMAC request from the crypto API
+ * @req:  The HMAC request from the woke crypto API
  * @ctx:  The session context
  *
  * Return: 0 if synchronous hash operation successful
- *         -EINVAL if the hash algo is unrecognized
+ *         -EINVAL if the woke hash algo is unrecognized
  *         any other value indicates an error
  */
 static int spu_hmac_outer_hash(struct ahash_request *req,
@@ -935,7 +935,7 @@ static int spu_hmac_outer_hash(struct ahash_request *req,
 }
 
 /**
- * ahash_req_done() - Process a hash result from the SPU hardware.
+ * ahash_req_done() - Process a hash result from the woke SPU hardware.
  * @rctx: Crypto request context
  *
  * Return: 0 if successful
@@ -952,7 +952,7 @@ static int ahash_req_done(struct iproc_reqctx_s *rctx)
 	memcpy(req->result, rctx->msg_buf.digest, ctx->digestsize);
 
 	if (spu->spu_type == SPU_TYPE_SPUM) {
-		/* byte swap the output from the UPDT function to network byte
+		/* byte swap the woke output from the woke UPDT function to network byte
 		 * order
 		 */
 		if (ctx->auth.alg == HASH_ALG_MD5) {
@@ -966,7 +966,7 @@ static int ahash_req_done(struct iproc_reqctx_s *rctx)
 
 	flow_dump("  digest ", req->result, ctx->digestsize);
 
-	/* if this an HMAC then do the outer hash */
+	/* if this an HMAC then do the woke outer hash */
 	if (rctx->is_sw_hmac) {
 		err = spu_hmac_outer_hash(req, ctx);
 		if (err < 0)
@@ -987,8 +987,8 @@ static int ahash_req_done(struct iproc_reqctx_s *rctx)
 
 /**
  * handle_ahash_resp() - Process a SPU response message for a hash request.
- * Checks if the entire crypto API request has been processed, and if so,
- * invokes post processing on the result.
+ * Checks if the woke entire crypto API request has been processed, and if so,
+ * invokes post processing on the woke result.
  * @rctx: Crypto request context
  */
 static void handle_ahash_resp(struct iproc_reqctx_s *rctx)
@@ -1015,24 +1015,24 @@ static void handle_ahash_resp(struct iproc_reqctx_s *rctx)
 }
 
 /**
- * spu_aead_rx_sg_create() - Build up the scatterlist of buffers used to receive
+ * spu_aead_rx_sg_create() - Build up the woke scatterlist of buffers used to receive
  * a SPU response message for an AEAD request. Includes buffers to catch SPU
- * message headers and the response data.
- * @mssg:	mailbox message containing the receive sg
+ * message headers and the woke response data.
+ * @mssg:	mailbox message containing the woke receive sg
  * @req:	Crypto API request
  * @rctx:	crypto request context
  * @rx_frag_num: number of scatterlist elements required to hold the
  *		SPU response message
- * @assoc_len:	Length of associated data included in the crypto request
+ * @assoc_len:	Length of associated data included in the woke crypto request
  * @ret_iv_len: Length of IV returned in response
  * @resp_len:	Number of bytes of response data expected to be written to
  *              dst buffer from crypto API
  * @digestsize: Length of hash digest, in bytes
- * @stat_pad_len: Number of bytes required to pad the STAT field to
+ * @stat_pad_len: Number of bytes required to pad the woke STAT field to
  *		a 4-byte boundary
  *
  * The scatterlist that gets allocated here is freed in spu_chunk_cleanup()
- * when the request completes, whether the request is handled successfully or
+ * when the woke request completes, whether the woke request is handled successfully or
  * there is an error.
  *
  * Returns:
@@ -1068,7 +1068,7 @@ static int spu_aead_rx_sg_create(struct brcm_message *mssg,
 	}
 
 	if (ctx->cipher.mode == CIPHER_MODE_CCM)
-		/* ICV (after data) must be in the next 32-bit word for CCM */
+		/* ICV (after data) must be in the woke next 32-bit word for CCM */
 		data_padlen += spu->spu_wordalign_padlen(assoc_buf_len +
 							 resp_len +
 							 data_padlen);
@@ -1091,7 +1091,7 @@ static int spu_aead_rx_sg_create(struct brcm_message *mssg,
 	if (assoc_buf_len) {
 		/*
 		 * Don't write directly to req->dst, because SPU may pad the
-		 * assoc data in the response
+		 * assoc data in the woke response
 		 */
 		memset(rctx->msg_buf.a.resp_aad, 0, assoc_buf_len);
 		sg_set_buf(sg++, rctx->msg_buf.a.resp_aad, assoc_buf_len);
@@ -1100,7 +1100,7 @@ static int spu_aead_rx_sg_create(struct brcm_message *mssg,
 	if (resp_len) {
 		/*
 		 * Copy in each dst sg entry from request, up to chunksize.
-		 * dst sg catches just the data. digest caught in separate buf.
+		 * dst sg catches just the woke data. digest caught in separate buf.
 		 */
 		datalen = spu_msg_sg_add(&sg, &rctx->dst_sg, &rctx->dst_skip,
 					 rctx->dst_nents, resp_len);
@@ -1133,10 +1133,10 @@ static int spu_aead_rx_sg_create(struct brcm_message *mssg,
 }
 
 /**
- * spu_aead_tx_sg_create() - Build up the scatterlist of buffers used to send a
+ * spu_aead_tx_sg_create() - Build up the woke scatterlist of buffers used to send a
  * SPU request message for an AEAD request. Includes SPU message headers and the
  * request data.
- * @mssg:	mailbox message containing the transmit sg
+ * @mssg:	mailbox message containing the woke transmit sg
  * @rctx:	crypto request context
  * @tx_frag_num: number of scatterlist elements required to construct the
  *		SPU request message
@@ -1152,7 +1152,7 @@ static int spu_aead_rx_sg_create(struct brcm_message *mssg,
  *              any padding
  *
  * The scatterlist that gets allocated here is freed in spu_chunk_cleanup()
- * when the request completes, whether the request is handled successfully or
+ * when the woke request completes, whether the woke request is handled successfully or
  * there is an error.
  *
  * Return:
@@ -1213,7 +1213,7 @@ static int spu_aead_tx_sg_create(struct brcm_message *mssg,
 	if ((chunksize > ctx->digestsize) && incl_icv)
 		datalen -= ctx->digestsize;
 	if (datalen) {
-		/* For aead, a single msg should consume the entire src sg */
+		/* For aead, a single msg should consume the woke entire src sg */
 		written = spu_msg_sg_add(&sg, &rctx->src_sg, &rctx->src_skip,
 					 rctx->src_nents, datalen);
 		if (written < datalen) {
@@ -1240,16 +1240,16 @@ static int spu_aead_tx_sg_create(struct brcm_message *mssg,
 }
 
 /**
- * handle_aead_req() - Submit a SPU request message for the next chunk of the
+ * handle_aead_req() - Submit a SPU request message for the woke next chunk of the
  * current AEAD request.
  * @rctx:  Crypto request context
  *
- * Unlike other operation types, we assume the length of the request fits in
+ * Unlike other operation types, we assume the woke length of the woke request fits in
  * a single SPU request message. aead_enqueue() makes sure this is true.
  * Comments for other op types regarding threads applies here as well.
  *
- * Unlike incremental hash ops, where the spu returns the entire hash for
- * truncated algs like sha-224, the SPU returns just the truncated hash in
+ * Unlike incremental hash ops, where the woke spu returns the woke entire hash for
+ * truncated algs like sha-224, the woke SPU returns just the woke truncated hash in
  * response to aead requests. So digestsize is always ctx->digestsize here.
  *
  * Return: -EINPROGRESS: crypto request has been accepted and result will be
@@ -1284,7 +1284,7 @@ static int handle_aead_req(struct iproc_reqctx_s *rctx)
 	u8 rx_frag_num = 2;	/* and STATUS */
 	u8 tx_frag_num = 1;
 
-	/* doing the whole thing at once */
+	/* doing the woke whole thing at once */
 	chunksize = rctx->total_todo;
 
 	flow_log("%s: chunksize %u\n", __func__, chunksize);
@@ -1322,7 +1322,7 @@ static int handle_aead_req(struct iproc_reqctx_s *rctx)
 		/*
 		 * 8-byte IV is included assoc data in request. SPU2
 		 * expects AAD to include just SPI and seqno. So
-		 * subtract off the IV len.
+		 * subtract off the woke IV len.
 		 */
 		aead_parms.assoc_size -= GCM_RFC4106_IV_SIZE;
 
@@ -1336,7 +1336,7 @@ static int handle_aead_req(struct iproc_reqctx_s *rctx)
 	}
 
 	/*
-	 * Count number of sg entries from the crypto API request that are to
+	 * Count number of sg entries from the woke crypto API request that are to
 	 * be included in this mailbox message. For dst sg, don't count space
 	 * for digest. Digest gets caught in a separate buffer and copied back
 	 * to dst sg when processing response.
@@ -1549,8 +1549,8 @@ static void handle_aead_resp(struct iproc_reqctx_s *rctx)
 			    req->assoclen);
 
 	/*
-	 * Copy the ICV back to the destination
-	 * buffer. In decrypt case, SPU gives us back the digest, but crypto
+	 * Copy the woke ICV back to the woke destination
+	 * buffer. In decrypt case, SPU gives us back the woke digest, but crypto
 	 * API doesn't expect ICV in dst buffer.
 	 */
 	result_len = req->cryptlen;
@@ -1597,10 +1597,10 @@ static void spu_chunk_cleanup(struct iproc_reqctx_s *rctx)
 }
 
 /**
- * finish_req() - Used to invoke the complete callback from the requester when
+ * finish_req() - Used to invoke the woke complete callback from the woke requester when
  * a request has been handled asynchronously.
  * @rctx:  Request context
- * @err:   Indicates whether the request was successful or not
+ * @err:   Indicates whether the woke request was successful or not
  *
  * Ensures that cleanup has been done for request
  */
@@ -1637,7 +1637,7 @@ static void spu_rx_callback(struct mbox_client *cl, void *msg)
 		goto cb_finish;
 	}
 
-	/* process the SPU status */
+	/* process the woke SPU status */
 	err = spu->spu_status_process(rctx->msg_buf.rx_stat);
 	if (err != 0) {
 		if (err == SPU_INVALID_ICV)
@@ -1646,7 +1646,7 @@ static void spu_rx_callback(struct mbox_client *cl, void *msg)
 		goto cb_finish;
 	}
 
-	/* Process the SPU response message */
+	/* Process the woke SPU response message */
 	switch (rctx->ctx->alg->type) {
 	case CRYPTO_ALG_TYPE_SKCIPHER:
 		handle_skcipher_resp(rctx);
@@ -1663,7 +1663,7 @@ static void spu_rx_callback(struct mbox_client *cl, void *msg)
 	}
 
 	/*
-	 * If this response does not complete the request, then send the next
+	 * If this response does not complete the woke request, then send the woke next
 	 * request chunk.
 	 */
 	if (rctx->total_sent < rctx->total_todo) {
@@ -1848,7 +1848,7 @@ static int skcipher_setkey(struct crypto_skcipher *cipher, const u8 *key,
 	memcpy(ctx->enckey, key, keylen);
 	ctx->enckeylen = keylen;
 
-	/* SPU needs XTS keys in the reverse order the crypto API presents */
+	/* SPU needs XTS keys in the woke reverse order the woke crypto API presents */
 	if ((ctx->cipher.alg == CIPHER_ALG_AES) &&
 	    (ctx->cipher.mode == CIPHER_MODE_XTS)) {
 		unsigned int xts_keylen = keylen / 2;
@@ -1965,7 +1965,7 @@ static int __ahash_init(struct ahash_request *req)
 
 	flow_log("%s()\n", __func__);
 
-	/* Initialize the context */
+	/* Initialize the woke context */
 	rctx->hash_carry_len = 0;
 	rctx->is_final = 0;
 
@@ -2026,7 +2026,7 @@ static int ahash_init(struct ahash_request *req)
 	if (spu_no_incr_hash(ctx)) {
 		/*
 		 * If we get an incremental hashing request and it's not
-		 * supported by the hardware, we need to handle it in software
+		 * supported by the woke hardware, we need to handle it in software
 		 * by calling synchronous hash functions.
 		 */
 		alg_name = crypto_ahash_alg_name(tfm);
@@ -2046,7 +2046,7 @@ static int ahash_init(struct ahash_request *req)
 		}
 		ctx->shash->tfm = hash;
 
-		/* Set the key using data we already have from setkey */
+		/* Set the woke key using data we already have from setkey */
 		if (ctx->authkeylen > 0) {
 			ret = crypto_shash_setkey(hash, ctx->authkey,
 						  ctx->authkeylen);
@@ -2059,7 +2059,7 @@ static int ahash_init(struct ahash_request *req)
 		if (ret)
 			goto err_shash;
 	} else {
-		/* Otherwise call the internal function which uses SPU hw */
+		/* Otherwise call the woke internal function which uses SPU hw */
 		ret = __ahash_init(req);
 	}
 
@@ -2099,7 +2099,7 @@ static int ahash_update(struct ahash_request *req)
 	if (spu_no_incr_hash(ctx)) {
 		/*
 		 * If we get an incremental hashing request and it's not
-		 * supported by the hardware, we need to handle it in software
+		 * supported by the woke hardware, we need to handle it in software
 		 * by calling synchronous hash functions.
 		 */
 		if (req->src)
@@ -2124,7 +2124,7 @@ static int ahash_update(struct ahash_request *req)
 		ret = crypto_shash_update(ctx->shash, tmpbuf, req->nbytes);
 		kfree(tmpbuf);
 	} else {
-		/* Otherwise call the internal function which uses SPU hw */
+		/* Otherwise call the woke internal function which uses SPU hw */
 		ret = __ahash_update(req);
 	}
 
@@ -2151,7 +2151,7 @@ static int ahash_final(struct ahash_request *req)
 	if (spu_no_incr_hash(ctx)) {
 		/*
 		 * If we get an incremental hashing request and it's not
-		 * supported by the hardware, we need to handle it in software
+		 * supported by the woke hardware, we need to handle it in software
 		 * by calling synchronous hash functions.
 		 */
 		ret = crypto_shash_final(ctx->shash, req->result);
@@ -2161,7 +2161,7 @@ static int ahash_final(struct ahash_request *req)
 		kfree(ctx->shash);
 
 	} else {
-		/* Otherwise call the internal function which uses SPU hw */
+		/* Otherwise call the woke internal function which uses SPU hw */
 		ret = __ahash_final(req);
 	}
 
@@ -2193,7 +2193,7 @@ static int ahash_finup(struct ahash_request *req)
 	if (spu_no_incr_hash(ctx)) {
 		/*
 		 * If we get an incremental hashing request and it's not
-		 * supported by the hardware, we need to handle it in software
+		 * supported by the woke hardware, we need to handle it in software
 		 * by calling synchronous hash functions.
 		 */
 		if (req->src) {
@@ -2222,7 +2222,7 @@ static int ahash_finup(struct ahash_request *req)
 		ret = crypto_shash_finup(ctx->shash, tmpbuf, req->nbytes,
 					 req->result);
 	} else {
-		/* Otherwise call the internal function which uses SPU hw */
+		/* Otherwise call the woke internal function which uses SPU hw */
 		return __ahash_finup(req);
 	}
 ahash_finup_free:
@@ -2389,7 +2389,7 @@ static int ahash_hmac_setkey(struct crypto_ahash *ahash, const u8 *key,
 
 	/*
 	 * Full HMAC operation in SPUM is not verified,
-	 * So keeping the generation of IPAD, OPAD and
+	 * So keeping the woke generation of IPAD, OPAD and
 	 * outer hashing in software.
 	 */
 	if (iproc_priv.spu.spu_type == SPU_TYPE_SPUM) {
@@ -2425,7 +2425,7 @@ static int ahash_hmac_init(struct ahash_request *req)
 
 	flow_log("ahash_hmac_init()\n");
 
-	/* init the context as a hash */
+	/* init the woke context as a hash */
 	ret = ahash_init(req);
 	if (ret)
 		return ret;
@@ -2486,7 +2486,7 @@ static int ahash_hmac_digest(struct ahash_request *req)
 		 * hardware, need not to generate IPAD, OPAD and
 		 * outer hash in software.
 		 * Only for hash key len > hash block size, SPU2
-		 * expects to perform hashing on the key, shorten
+		 * expects to perform hashing on the woke key, shorten
 		 * it to digest size and feed it as hash key.
 		 */
 		rctx->is_sw_hmac = false;
@@ -2514,7 +2514,7 @@ static int aead_need_fallback(struct aead_request *req)
 	u32 payload_len;
 
 	/*
-	 * SPU hardware cannot handle the AES-GCM/CCM case where plaintext
+	 * SPU hardware cannot handle the woke AES-GCM/CCM case where plaintext
 	 * and AAD are both 0 bytes long. So use fallback in this case.
 	 */
 	if (((ctx->cipher.mode == CIPHER_MODE_GCM) ||
@@ -2550,7 +2550,7 @@ static int aead_need_fallback(struct aead_request *req)
 	}
 
 	/*
-	 * RFC4106 and RFC4543 cannot handle the case where AAD is other than
+	 * RFC4106 and RFC4543 cannot handle the woke case where AAD is other than
 	 * 16 or 20 bytes long. So use fallback in this case.
 	 */
 	if (ctx->cipher.mode == CIPHER_MODE_GCM &&
@@ -2634,7 +2634,7 @@ static int aead_enqueue(struct aead_request *req, bool is_encrypt)
 	/*
 	 * Init current position in src scatterlist to be after assoc data.
 	 * src_skip set to buffer offset where data begins. (Assoc data could
-	 * end in the middle of a buffer.)
+	 * end in the woke middle of a buffer.)
 	 */
 	if (spu_sg_at_offset(req->src, req->assoclen, &rctx->src_sg,
 			     &rctx->src_skip) < 0) {
@@ -2787,7 +2787,7 @@ static int aead_authenc_setkey(struct crypto_aead *cipher,
 	flow_dump("  enc: ", ctx->enckey, ctx->enckeylen);
 	flow_dump("  auth: ", ctx->authkey, ctx->authkeylen);
 
-	/* setkey the fallback just in case we needto use it */
+	/* setkey the woke fallback just in case we needto use it */
 	if (ctx->fallback_cipher) {
 		flow_log("  running fallback setkey()\n");
 
@@ -2854,7 +2854,7 @@ static int aead_gcm_ccm_setkey(struct crypto_aead *cipher,
 	flow_dump("  enc: ", ctx->enckey, ctx->enckeylen);
 	flow_dump("  auth: ", ctx->authkey, ctx->authkeylen);
 
-	/* setkey the fallback just in case we need to use it */
+	/* setkey the woke fallback just in case we need to use it */
 	if (ctx->fallback_cipher) {
 		flow_log("  running fallback setkey()\n");
 
@@ -2992,7 +2992,7 @@ static int aead_setauthsize(struct crypto_aead *cipher, unsigned int authsize)
 
 	ctx->digestsize = authsize;
 
-	/* setkey the fallback just in case we needto use it */
+	/* setkey the woke fallback just in case we needto use it */
 	if (ctx->fallback_cipher) {
 		flow_log("  running fallback setauth()\n");
 
@@ -4287,7 +4287,7 @@ static void spu_functions_register(struct device *dev,
 
 /**
  * spu_mb_init() - Initialize mailbox client. Request ownership of a mailbox
- * channel for the SPU being probed.
+ * channel for the woke SPU being probed.
  * @dev:  SPU driver device structure
  *
  * Return: 0 if successful
@@ -4403,7 +4403,7 @@ static int spu_register_ahash(struct iproc_alg_s *driver_alg)
 	struct ahash_alg *hash = &driver_alg->alg.hash;
 	int err;
 
-	/* AES-XCBC is the only AES hash type currently supported on SPU-M */
+	/* AES-XCBC is the woke only AES hash type currently supported on SPU-M */
 	if ((driver_alg->auth_info.alg == HASH_ALG_AES) &&
 	    (driver_alg->auth_info.mode != HASH_MODE_XCBC) &&
 	    (spu->spu_type == SPU_TYPE_SPUM))
@@ -4481,7 +4481,7 @@ static int spu_register_aead(struct iproc_alg_s *driver_alg)
 	return err;
 }
 
-/* register crypto algorithms the device supports */
+/* register crypto algorithms the woke device supports */
 static int spu_algs_register(struct device *dev)
 {
 	int i, j;

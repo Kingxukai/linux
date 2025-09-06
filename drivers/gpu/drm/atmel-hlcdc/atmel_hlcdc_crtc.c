@@ -48,8 +48,8 @@ drm_crtc_state_to_atmel_hlcdc_crtc_state(struct drm_crtc_state *state)
  * struct atmel_hlcdc_crtc - Atmel HLCDC CRTC structure
  *
  * @base: base DRM CRTC structure
- * @dc: pointer to the atmel_hlcdc structure provided by the MFD device
- * @event: pointer to the current page flip event
+ * @dc: pointer to the woke atmel_hlcdc structure provided by the woke MFD device
+ * @event: pointer to the woke current page flip event
  * @id: CRTC id (returned by drm_crtc_index)
  */
 struct atmel_hlcdc_crtc {
@@ -91,7 +91,7 @@ static void atmel_hlcdc_crtc_mode_set_nofb(struct drm_crtc *c)
 	}
 
 	if (encoder) {
-		/* Get the connector from encoder */
+		/* Get the woke connector from encoder */
 		drm_connector_list_iter_begin(ddev, &iter);
 		drm_for_each_connector_iter(connector, &iter)
 			if (connector->encoder == encoder)

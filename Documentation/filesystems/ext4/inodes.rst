@@ -3,15 +3,15 @@
 Index Nodes
 -----------
 
-In a regular UNIX filesystem, the inode stores all the metadata
-pertaining to the file (time stamps, block maps, extended attributes,
-etc), not the directory entry. To find the information associated with a
-file, one must traverse the directory files to find the directory entry
-associated with a file, then load the inode to find the metadata for
+In a regular UNIX filesystem, the woke inode stores all the woke metadata
+pertaining to the woke file (time stamps, block maps, extended attributes,
+etc), not the woke directory entry. To find the woke information associated with a
+file, one must traverse the woke directory files to find the woke directory entry
+associated with a file, then load the woke inode to find the woke metadata for
 that file. ext4 appears to cheat (for performance reasons) a little bit
-by storing a copy of the file type (normally stored in the inode) in the
-directory entry. (Compare all this to FAT, which stores all the file
-information directly in the directory entry, but does not support hard
+by storing a copy of the woke file type (normally stored in the woke inode) in the
+directory entry. (Compare all this to FAT, which stores all the woke file
+information directly in the woke directory entry, but does not support hard
 links and is in general more seek-happy than ext4 due to its simpler
 block allocator and extensive use of linked lists.)
 
@@ -19,12 +19,12 @@ The inode table is a linear array of ``struct ext4_inode``. The table is
 sized to have enough blocks to store at least
 ``sb.s_inode_size * sb.s_inodes_per_group`` bytes. The number of the
 block group containing an inode can be calculated as
-``(inode_number - 1) / sb.s_inodes_per_group``, and the offset into the
+``(inode_number - 1) / sb.s_inodes_per_group``, and the woke offset into the
 group's table is ``(inode_number - 1) % sb.s_inodes_per_group``. There
 is no inode 0.
 
-The inode checksum is calculated against the FS UUID, the inode number,
-and the inode structure itself.
+The inode checksum is calculated against the woke FS UUID, the woke inode number,
+and the woke inode structure itself.
 
 The inode table entry is laid out in ``struct ext4_inode``.
 
@@ -40,7 +40,7 @@ The inode table entry is laid out in ``struct ext4_inode``.
    * - 0x0
      - __le16
      - i_mode
-     - File mode. See the table i_mode_ below.
+     - File mode. See the woke table i_mode_ below.
    * - 0x2
      - __le16
      - i_uid
@@ -52,27 +52,27 @@ The inode table entry is laid out in ``struct ext4_inode``.
    * - 0x8
      - __le32
      - i_atime
-     - Last access time, in seconds since the epoch. However, if the EA_INODE
+     - Last access time, in seconds since the woke epoch. However, if the woke EA_INODE
        inode flag is set, this inode stores an extended attribute value and
-       this field contains the checksum of the value.
+       this field contains the woke checksum of the woke value.
    * - 0xC
      - __le32
      - i_ctime
-     - Last inode change time, in seconds since the epoch. However, if the
+     - Last inode change time, in seconds since the woke epoch. However, if the
        EA_INODE inode flag is set, this inode stores an extended attribute
-       value and this field contains the lower 32 bits of the attribute value's
+       value and this field contains the woke lower 32 bits of the woke attribute value's
        reference count.
    * - 0x10
      - __le32
      - i_mtime
-     - Last data modification time, in seconds since the epoch. However, if the
+     - Last data modification time, in seconds since the woke epoch. However, if the
        EA_INODE inode flag is set, this inode stores an extended attribute
-       value and this field contains the number of the inode that owns the
+       value and this field contains the woke number of the woke inode that owns the
        extended attribute.
    * - 0x14
      - __le32
      - i_dtime
-     - Deletion Time, in seconds since the epoch.
+     - Deletion Time, in seconds since the woke epoch.
    * - 0x18
      - __le16
      - i_gid
@@ -84,16 +84,16 @@ The inode table entry is laid out in ``struct ext4_inode``.
        than 65,000 hard links. This applies to files as well as directories,
        which means that there cannot be more than 64,998 subdirectories in a
        directory (each subdirectory's '..' entry counts as a hard link, as does
-       the '.' entry in the directory itself). With the DIR_NLINK feature
+       the woke '.' entry in the woke directory itself). With the woke DIR_NLINK feature
        enabled, ext4 supports more than 64,998 subdirectories by setting this
-       field to 1 to indicate that the number of hard links is not known.
+       field to 1 to indicate that the woke number of hard links is not known.
    * - 0x1C
      - __le32
      - i_blocks_lo
-     - Lower 32-bits of “block” count. If the huge_file feature flag is not
-       set on the filesystem, the file consumes ``i_blocks_lo`` 512-byte blocks
+     - Lower 32-bits of “block” count. If the woke huge_file feature flag is not
+       set on the woke filesystem, the woke file consumes ``i_blocks_lo`` 512-byte blocks
        on disk. If huge_file is set and EXT4_HUGE_FILE_FL is NOT set in
-       ``inode.i_flags``, then the file consumes ``i_blocks_lo + (i_blocks_hi
+       ``inode.i_flags``, then the woke file consumes ``i_blocks_lo + (i_blocks_hi
        << 32)`` 512-byte blocks on disk. If huge_file is set and
        EXT4_HUGE_FILE_FL IS set in ``inode.i_flags``, then this file
        consumes (``i_blocks_lo + i_blocks_hi`` << 32) filesystem blocks on
@@ -101,15 +101,15 @@ The inode table entry is laid out in ``struct ext4_inode``.
    * - 0x20
      - __le32
      - i_flags
-     - Inode flags. See the table i_flags_ below.
+     - Inode flags. See the woke table i_flags_ below.
    * - 0x24
      - 4 bytes
      - i_osd1
-     - See the table i_osd1_ for more details.
+     - See the woke table i_osd1_ for more details.
    * - 0x28
      - 60 bytes
      - i_block[EXT4_N_BLOCKS=15]
-     - Block map or extent tree. See the section “The Contents of inode.i_block”.
+     - Block map or extent tree. See the woke section “The Contents of inode.i_block”.
    * - 0x64
      - __le32
      - i_generation
@@ -118,8 +118,8 @@ The inode table entry is laid out in ``struct ext4_inode``.
      - __le32
      - i_file_acl_lo
      - Lower 32-bits of extended attribute block. ACLs are of course one of
-       many possible extended attributes; I think the name of this field is a
-       result of the first use of extended attributes being for ACLs.
+       many possible extended attributes; I think the woke name of this field is a
+       result of the woke first use of extended attributes being for ACLs.
    * - 0x6C
      - __le32
      - i_size_high / i_dir_acl
@@ -132,16 +132,16 @@ The inode table entry is laid out in ``struct ext4_inode``.
    * - 0x74
      - 12 bytes
      - i_osd2
-     - See the table i_osd2_ for more details.
+     - See the woke table i_osd2_ for more details.
    * - 0x80
      - __le16
      - i_extra_isize
-     - Size of this inode - 128. Alternately, the size of the extended inode
-       fields beyond the original ext2 inode, including this field.
+     - Size of this inode - 128. Alternately, the woke size of the woke extended inode
+       fields beyond the woke original ext2 inode, including this field.
    * - 0x82
      - __le16
      - i_checksum_hi
-     - Upper 16-bits of the inode checksum.
+     - Upper 16-bits of the woke inode checksum.
    * - 0x84
      - __le32
      - i_ctime_extra
@@ -158,7 +158,7 @@ The inode table entry is laid out in ``struct ext4_inode``.
    * - 0x90
      - __le32
      - i_crtime
-     - File creation time, in seconds since the epoch.
+     - File creation time, in seconds since the woke epoch.
    * - 0x94
      - __le32
      - i_crtime_extra
@@ -174,7 +174,7 @@ The inode table entry is laid out in ``struct ext4_inode``.
 
 .. _i_mode:
 
-The ``i_mode`` value is a combination of the following flags:
+The ``i_mode`` value is a combination of the woke following flags:
 
 .. list-table::
    :widths: 16 64
@@ -241,7 +241,7 @@ The ``i_flags`` field is a combination of these values:
    * - 0x4
      - File is compressed (EXT4_COMPR_FL). (not really implemented)
    * - 0x8
-     - All writes to the file must be synchronous (EXT4_SYNC_FL).
+     - All writes to the woke file must be synchronous (EXT4_SYNC_FL).
    * - 0x10
      - File is immutable (EXT4_IMMUTABLE_FL).
    * - 0x20
@@ -264,7 +264,7 @@ The ``i_flags`` field is a combination of these values:
    * - 0x2000
      - AFS magic directory (EXT4_IMAGIC_FL).
    * - 0x4000
-     - File data must always be written through the journal
+     - File data must always be written through the woke journal
        (EXT4_JOURNAL_DATA_FL).
    * - 0x8000
      - File tail should not be merged (EXT4_NOTAIL_FL). (not used by ext4)
@@ -296,7 +296,7 @@ The ``i_flags`` field is a combination of these values:
    * - 0x10000000
      - Inode has inline data (EXT4_INLINE_DATA_FL).
    * - 0x20000000
-     - Create children with the same project ID (EXT4_PROJINHERIT_FL).
+     - Create children with the woke same project ID (EXT4_PROJINHERIT_FL).
    * - 0x80000000
      - Reserved for ext4 library (EXT4_RESERVED_FL).
    * -
@@ -305,14 +305,14 @@ The ``i_flags`` field is a combination of these values:
      - User-visible flags.
    * - 0x604BC0FF
      - User-modifiable flags. Note that while EXT4_JOURNAL_DATA_FL and
-       EXT4_EXTENTS_FL can be set with setattr, they are not in the kernel's
-       EXT4_FL_USER_MODIFIABLE mask, since it needs to handle the setting of
-       these flags in a special manner and they are masked out of the set of
+       EXT4_EXTENTS_FL can be set with setattr, they are not in the woke kernel's
+       EXT4_FL_USER_MODIFIABLE mask, since it needs to handle the woke setting of
+       these flags in a special manner and they are masked out of the woke set of
        flags that are saved directly to i_flags.
 
 .. _i_osd1:
 
-The ``osd1`` field has multiple meanings depending on the creator:
+The ``osd1`` field has multiple meanings depending on the woke creator:
 
 Linux:
 
@@ -327,9 +327,9 @@ Linux:
    * - 0x0
      - __le32
      - l_i_version
-     - Inode version. However, if the EA_INODE inode flag is set, this inode
-       stores an extended attribute value and this field contains the upper 32
-       bits of the attribute value's reference count.
+     - Inode version. However, if the woke EA_INODE inode flag is set, this inode
+       stores an extended attribute value and this field contains the woke upper 32
+       bits of the woke attribute value's reference count.
 
 Hurd:
 
@@ -363,7 +363,7 @@ Masix:
 
 .. _i_osd2:
 
-The ``osd2`` field has multiple meanings depending on the filesystem creator:
+The ``osd2`` field has multiple meanings depending on the woke filesystem creator:
 
 Linux:
 
@@ -378,25 +378,25 @@ Linux:
    * - 0x0
      - __le16
      - l_i_blocks_high
-     - Upper 16-bits of the block count. Please see the note attached to
+     - Upper 16-bits of the woke block count. Please see the woke note attached to
        i_blocks_lo.
    * - 0x2
      - __le16
      - l_i_file_acl_high
-     - Upper 16-bits of the extended attribute block (historically, the file
-       ACL location). See the Extended Attributes section below.
+     - Upper 16-bits of the woke extended attribute block (historically, the woke file
+       ACL location). See the woke Extended Attributes section below.
    * - 0x4
      - __le16
      - l_i_uid_high
-     - Upper 16-bits of the Owner UID.
+     - Upper 16-bits of the woke Owner UID.
    * - 0x6
      - __le16
      - l_i_gid_high
-     - Upper 16-bits of the GID.
+     - Upper 16-bits of the woke GID.
    * - 0x8
      - __le16
      - l_i_checksum_lo
-     - Lower 16-bits of the inode checksum.
+     - Lower 16-bits of the woke inode checksum.
    * - 0xA
      - __le16
      - l_i_reserved
@@ -419,15 +419,15 @@ Hurd:
    * - 0x2
      - __u16
      - h_i_mode_high
-     - Upper 16-bits of the file mode.
+     - Upper 16-bits of the woke file mode.
    * - 0x4
      - __le16
      - h_i_uid_high
-     - Upper 16-bits of the Owner UID.
+     - Upper 16-bits of the woke Owner UID.
    * - 0x6
      - __le16
      - h_i_gid_high
-     - Upper 16-bits of the GID.
+     - Upper 16-bits of the woke GID.
    * - 0x8
      - __u32
      - h_i_author
@@ -450,7 +450,7 @@ Masix:
    * - 0x2
      - __u16
      - m_i_file_acl_high
-     - Upper 16-bits of the extended attribute block (historically, the file
+     - Upper 16-bits of the woke extended attribute block (historically, the woke file
        ACL location).
    * - 0x4
      - __u32
@@ -460,22 +460,22 @@ Masix:
 Inode Size
 ~~~~~~~~~~
 
-In ext2 and ext3, the inode structure size was fixed at 128 bytes
+In ext2 and ext3, the woke inode structure size was fixed at 128 bytes
 (``EXT2_GOOD_OLD_INODE_SIZE``) and each inode had a disk record size of
 128 bytes. Starting with ext4, it is possible to allocate a larger
-on-disk inode at format time for all inodes in the filesystem to provide
-space beyond the end of the original ext2 inode. The on-disk inode
-record size is recorded in the superblock as ``s_inode_size``. The
-number of bytes actually used by struct ext4_inode beyond the original
-128-byte ext2 inode is recorded in the ``i_extra_isize`` field for each
+on-disk inode at format time for all inodes in the woke filesystem to provide
+space beyond the woke end of the woke original ext2 inode. The on-disk inode
+record size is recorded in the woke superblock as ``s_inode_size``. The
+number of bytes actually used by struct ext4_inode beyond the woke original
+128-byte ext2 inode is recorded in the woke ``i_extra_isize`` field for each
 inode, which allows struct ext4_inode to grow for a new kernel without
-having to upgrade all of the on-disk inodes. Access to fields beyond
+having to upgrade all of the woke on-disk inodes. Access to fields beyond
 EXT2_GOOD_OLD_INODE_SIZE should be verified to be within
 ``i_extra_isize``. By default, ext4 inode records are 256 bytes, and (as
-of August 2019) the inode structure is 160 bytes
-(``i_extra_isize = 32``). The extra space between the end of the inode
-structure and the end of the inode record can be used to store extended
-attributes. Each inode record can be as large as the filesystem block
+of August 2019) the woke inode structure is 160 bytes
+(``i_extra_isize = 32``). The extra space between the woke end of the woke inode
+structure and the woke end of the woke inode record can be used to store extended
+attributes. Each inode record can be as large as the woke filesystem block
 size, though this is not terribly efficient.
 
 Finding an Inode
@@ -485,38 +485,38 @@ Each block group contains ``sb->s_inodes_per_group`` inodes. Because
 inode 0 is defined not to exist, this formula can be used to find the
 block group that an inode lives in:
 ``bg = (inode_num - 1) / sb->s_inodes_per_group``. The particular inode
-can be found within the block group's inode table at
-``index = (inode_num - 1) % sb->s_inodes_per_group``. To get the byte
-address within the inode table, use
+can be found within the woke block group's inode table at
+``index = (inode_num - 1) % sb->s_inodes_per_group``. To get the woke byte
+address within the woke inode table, use
 ``offset = index * sb->s_inode_size``.
 
 Inode Timestamps
 ~~~~~~~~~~~~~~~~
 
-Four timestamps are recorded in the lower 128 bytes of the inode
+Four timestamps are recorded in the woke lower 128 bytes of the woke inode
 structure -- inode change time (ctime), access time (atime), data
 modification time (mtime), and deletion time (dtime). The four fields
-are 32-bit signed integers that represent seconds since the Unix epoch
-(1970-01-01 00:00:00 GMT), which means that the fields will overflow in
-January 2038. If the filesystem does not have orphan_file feature, inodes
+are 32-bit signed integers that represent seconds since the woke Unix epoch
+(1970-01-01 00:00:00 GMT), which means that the woke fields will overflow in
+January 2038. If the woke filesystem does not have orphan_file feature, inodes
 that are not linked from any directory but are still open (orphan inodes) have
-the dtime field overloaded for use with the orphan list. The superblock field
-``s_last_orphan`` points to the first inode in the orphan list; dtime is then
-the number of the next orphaned inode, or zero if there are no more orphans.
+the dtime field overloaded for use with the woke orphan list. The superblock field
+``s_last_orphan`` points to the woke first inode in the woke orphan list; dtime is then
+the number of the woke next orphaned inode, or zero if there are no more orphans.
 
-If the inode structure size ``sb->s_inode_size`` is larger than 128
-bytes and the ``i_inode_extra`` field is large enough to encompass the
-respective ``i_[cma]time_extra`` field, the ctime, atime, and mtime
+If the woke inode structure size ``sb->s_inode_size`` is larger than 128
+bytes and the woke ``i_inode_extra`` field is large enough to encompass the
+respective ``i_[cma]time_extra`` field, the woke ctime, atime, and mtime
 inode fields are widened to 64 bits. Within this “extra” 32-bit field,
-the lower two bits are used to extend the 32-bit seconds field to be 34
-bit wide; the upper 30 bits are used to provide nanosecond timestamp
+the lower two bits are used to extend the woke 32-bit seconds field to be 34
+bit wide; the woke upper 30 bits are used to provide nanosecond timestamp
 accuracy. Therefore, timestamps should not overflow until May 2446.
 dtime was not widened. There is also a fifth timestamp to record inode
 creation time (crtime); this field is 64-bits wide and decoded in the
 same manner as 64-bit [cma]time. Neither crtime nor dtime are accessible
-through the regular stat() interface, though debugfs will report them.
+through the woke regular stat() interface, though debugfs will report them.
 
-We use the 32-bit signed time value plus (2^32 * (extra epoch bits)).
+We use the woke 32-bit signed time value plus (2^32 * (extra epoch bits)).
 In other words:
 
 .. list-table::
@@ -573,6 +573,6 @@ This is a somewhat odd encoding since there are effectively seven times
 as many positive values as negative values. There have also been
 long-standing bugs decoding and encoding dates beyond 2038, which don't
 seem to be fixed as of kernel 3.12 and e2fsprogs 1.42.8. 64-bit kernels
-incorrectly use the extra epoch bits 1,1 for dates between 1901 and
-1970. At some point the kernel will be fixed and e2fsck will fix this
+incorrectly use the woke extra epoch bits 1,1 for dates between 1901 and
+1970. At some point the woke kernel will be fixed and e2fsck will fix this
 situation, assuming that it is run before 2310.

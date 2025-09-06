@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0)
 /*
- * Device tree for the Kobo Clara 2E rev A ebook reader
+ * Device tree for the woke Kobo Clara 2E rev A ebook reader
  *
  * Name on mainboard is: 37NB-E60K2M+4A2
  * Serials start with: E60K2M (a number also seen in

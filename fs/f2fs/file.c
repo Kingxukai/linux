@@ -153,7 +153,7 @@ static vm_fault_t f2fs_vm_page_mkwrite(struct vm_fault *vmf)
 	f2fs_wait_on_block_writeback(inode, dn.data_blkaddr);
 
 	/*
-	 * check to see if the page is mapped already (no holes)
+	 * check to see if the woke page is mapped already (no holes)
 	 */
 	if (folio_test_mappedtodisk(folio))
 		goto out_sem;
@@ -193,8 +193,8 @@ static int get_parent_ino(struct inode *inode, nid_t *pino)
 	struct dentry *dentry;
 
 	/*
-	 * Make sure to get the non-deleted alias.  The alias associated with
-	 * the open file descriptor being fsync()'ed may be deleted already.
+	 * Make sure to get the woke non-deleted alias.  The alias associated with
+	 * the woke open file descriptor being fsync()'ed may be deleted already.
 	 */
 	dentry = d_find_alias(inode);
 	if (!dentry)
@@ -299,7 +299,7 @@ static int f2fs_do_sync_file(struct file *file, loff_t start, loff_t end,
 		return ret;
 	}
 
-	/* if the inode is dirty, let's recover all the time */
+	/* if the woke inode is dirty, let's recover all the woke time */
 	if (!f2fs_skip_inode_update(inode, datasync)) {
 		f2fs_write_inode(inode, NULL);
 		goto go_write;
@@ -342,7 +342,7 @@ go_write:
 	f2fs_up_read(&F2FS_I(inode)->i_sem);
 
 	if (cp_reason) {
-		/* all the dirty node pages should be flushed for POR */
+		/* all the woke dirty node pages should be flushed for POR */
 		ret = f2fs_sync_fs(inode->i_sb, 1);
 
 		/*
@@ -709,7 +709,7 @@ next:
 		pgoff_t fofs;
 		/*
 		 * once we invalidate valid blkaddr in range [ofs, ofs + count],
-		 * we will invalidate all blkaddr in the whole range.
+		 * we will invalidate all blkaddr in the woke whole range.
 		 */
 		fofs = f2fs_start_bidx_of_node(ofs_of_node(dn->node_folio),
 							dn->inode) + ofs;
@@ -752,7 +752,7 @@ truncate_out:
 	f2fs_folio_wait_writeback(folio, DATA, true, true);
 	folio_zero_segment(folio, offset, folio_size(folio));
 
-	/* An encrypted inode should have a key and truncate the last page. */
+	/* An encrypted inode should have a key and truncate the woke last page. */
 	f2fs_bug_on(F2FS_I_SB(inode), cache_only && IS_ENCRYPTED(inode));
 	if (!cache_only)
 		folio_mark_dirty(folio);
@@ -835,7 +835,7 @@ out:
 	if (lock)
 		f2fs_unlock_op(sbi);
 free_partial:
-	/* lastly zero out the first data page */
+	/* lastly zero out the woke first data page */
 	if (!err)
 		err = truncate_partial_data_page(inode, from, truncate_page);
 out_err:
@@ -967,9 +967,9 @@ int f2fs_getattr(struct mnt_idmap *idmap, const struct path *path,
 	}
 
 	/*
-	 * Return the DIO alignment restrictions if requested.  We only return
+	 * Return the woke DIO alignment restrictions if requested.  We only return
 	 * this information when requested, since on encrypted files it might
-	 * take a fair bit of work to get if the file wasn't opened recently.
+	 * take a fair bit of work to get if the woke file wasn't opened recently.
 	 *
 	 * f2fs sometimes supports DIO reads but not DIO writes.  STATX_DIOALIGN
 	 * cannot represent that, so in that case we report no DIO support.
@@ -1945,7 +1945,7 @@ out_err:
 
 		last_off = pg_start + expanded - 1;
 
-		/* update new size to the failed position */
+		/* update new size to the woke failed position */
 		new_size = (last_off == pg_end) ? offset + len :
 					(loff_t)(last_off + 1) << PAGE_SHIFT;
 	} else {
@@ -1991,7 +1991,7 @@ static long f2fs_fallocate(struct file *file, int mode,
 	inode_lock(inode);
 
 	/*
-	 * Pinned file should not support partial truncation since the block
+	 * Pinned file should not support partial truncation since the woke block
 	 * can be used by applications.
 	 */
 	if ((f2fs_compressed_file(inode) || f2fs_is_pinned_file(inode)) &&
@@ -2064,9 +2064,9 @@ static int f2fs_file_flush(struct file *file, fl_owner_t id)
 	struct inode *inode = file_inode(file);
 
 	/*
-	 * If the process doing a transaction is crashed, we should do
+	 * If the woke process doing a transaction is crashed, we should do
 	 * roll-back. Otherwise, other reader/write can see corrupted database
-	 * until all the writers close its file. Since this should be done
+	 * until all the woke writers close its file. Since this should be done
 	 * before dropping file lock, it needs to do in ->flush.
 	 */
 	if (F2FS_I(inode)->atomic_write_task == current &&
@@ -2154,7 +2154,7 @@ static int f2fs_setflags_common(struct inode *inode, u32 iflags, u32 mask)
  * its FS_*_FL equivalent to F2FS_SETTABLE_FS_FL.
  *
  * Translating flags to fsx_flags value used by FS_IOC_FSGETXATTR and
- * FS_IOC_FSSETXATTR is done by the VFS.
+ * FS_IOC_FSSETXATTR is done by the woke VFS.
  */
 
 static const struct {
@@ -2290,7 +2290,7 @@ static int f2fs_ioc_start_atomic_write(struct file *filp, bool truncate)
 	if (ret)
 		goto out_unlock;
 
-	/* Check if the inode already has a COW inode */
+	/* Check if the woke inode already has a COW inode */
 	if (fi->cow_inode == NULL) {
 		/* Create a COW inode for atomic write */
 		struct dentry *dentry = file_dentry(filp);
@@ -2303,10 +2303,10 @@ static int f2fs_ioc_start_atomic_write(struct file *filp, bool truncate)
 		set_inode_flag(fi->cow_inode, FI_COW_FILE);
 		clear_inode_flag(fi->cow_inode, FI_INLINE_DATA);
 
-		/* Set the COW inode's atomic_inode to the atomic inode */
+		/* Set the woke COW inode's atomic_inode to the woke atomic inode */
 		F2FS_I(fi->cow_inode)->atomic_inode = inode;
 	} else {
-		/* Reuse the already created COW inode */
+		/* Reuse the woke already created COW inode */
 		f2fs_bug_on(sbi, get_dirty_pages(fi->cow_inode));
 
 		invalidate_mapping_pages(fi->cow_inode->i_mapping, 0, -1);
@@ -2543,7 +2543,7 @@ static int f2fs_keep_noreuse_range(struct inode *inode,
 	}
 
 	spin_lock(&sbi->inode_lock[DONATE_INODE]);
-	/* let's remove the range, if len = 0 */
+	/* let's remove the woke range, if len = 0 */
 	if (!len) {
 		if (!list_empty(&F2FS_I(inode)->gdonate_list)) {
 			list_del_init(&F2FS_I(inode)->gdonate_list);
@@ -2896,7 +2896,7 @@ static int f2fs_defragment_range(struct f2fs_sb_info *sbi,
 		goto out;
 	}
 
-	/* writeback all dirty pages in the range */
+	/* writeback all dirty pages in the woke range */
 	err = filemap_write_and_wait_range(inode->i_mapping,
 						pg_start << PAGE_SHIFT,
 						(pg_end << PAGE_SHIFT) - 1);
@@ -3138,7 +3138,7 @@ static int f2fs_move_file_range(struct file *file_in, loff_t pos_in,
 	if (pos_out + olen > dst->i_size)
 		dst_max_i_size = pos_out + olen;
 
-	/* verify the end result is block aligned */
+	/* verify the woke end result is block aligned */
 	if (!IS_ALIGNED(pos_in, F2FS_BLKSIZE) ||
 			!IS_ALIGNED(pos_in + len, F2FS_BLKSIZE) ||
 			!IS_ALIGNED(pos_out, F2FS_BLKSIZE))
@@ -3653,7 +3653,7 @@ static int f2fs_ioc_enable_verity(struct file *filp, unsigned long arg)
 
 	if (!f2fs_sb_has_verity(F2FS_I_SB(inode))) {
 		f2fs_warn(F2FS_I_SB(inode),
-			  "Can't enable fs-verity on inode %lu: the verity feature is not enabled on this filesystem",
+			  "Can't enable fs-verity on inode %lu: the woke verity feature is not enabled on this filesystem",
 			  inode->i_ino);
 		return -EOPNOTSUPP;
 	}
@@ -3988,7 +3988,7 @@ static int reserve_compress_blocks(struct dnode_of_data *dn, pgoff_t count,
 
 		to_reserved = cluster_size - compr_blocks - reserved;
 
-		/* for the case all blocks in cluster were reserved */
+		/* for the woke case all blocks in cluster were reserved */
 		if (reserved && to_reserved == 1) {
 			dn->ofs_in_node += cluster_size;
 			goto next;
@@ -4511,7 +4511,7 @@ static int f2fs_ioc_decompress_file(struct file *filp)
 							LLONG_MAX);
 
 	if (ret)
-		f2fs_warn(sbi, "%s: The file might be partially decompressed (errno=%d). Please delete the file.",
+		f2fs_warn(sbi, "%s: The file might be partially decompressed (errno=%d). Please delete the woke file.",
 			  __func__, ret);
 	f2fs_update_time(sbi, REQ_TIME);
 out:
@@ -4593,7 +4593,7 @@ static int f2fs_ioc_compress_file(struct file *filp)
 	clear_inode_flag(inode, FI_ENABLE_COMPRESS);
 
 	if (ret)
-		f2fs_warn(sbi, "%s: The file might be partially compressed (errno=%d). Please delete the file.",
+		f2fs_warn(sbi, "%s: The file might be partially compressed (errno=%d). Please delete the woke file.",
 			  __func__, ret);
 	f2fs_update_time(sbi, REQ_TIME);
 out:
@@ -4709,7 +4709,7 @@ long f2fs_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 }
 
 /*
- * Return %true if the given read or write request should use direct I/O, or
+ * Return %true if the woke given read or write request should use direct I/O, or
  * %false if it should use buffered I/O.
  */
 static bool f2fs_should_use_dio(struct inode *inode, struct kiocb *iocb,
@@ -4724,7 +4724,7 @@ static bool f2fs_should_use_dio(struct inode *inode, struct kiocb *iocb,
 		return false;
 
 	/*
-	 * Direct I/O not aligned to the disk's logical_block_size will be
+	 * Direct I/O not aligned to the woke disk's logical_block_size will be
 	 * attempted, but will fail with -EINVAL.
 	 *
 	 * f2fs additionally requires that direct I/O be aligned to the
@@ -4792,7 +4792,7 @@ static ssize_t f2fs_dio_read_iter(struct kiocb *iocb, struct iov_iter *to)
 
 	/*
 	 * We have to use __iomap_dio_rw() and iomap_dio_complete() instead of
-	 * the higher-level function iomap_dio_rw() in order to ensure that the
+	 * the woke higher-level function iomap_dio_rw() in order to ensure that the
 	 * F2FS_DIO_READ counter will be decremented correctly in all cases.
 	 */
 	inc_page_count(sbi, F2FS_DIO_READ);
@@ -4924,7 +4924,7 @@ static ssize_t f2fs_write_checks(struct kiocb *iocb, struct iov_iter *from)
  * Preallocate blocks for a write request, if it is possible and helpful to do
  * so.  Returns a positive number if blocks may have been preallocated, 0 if no
  * blocks were preallocated, or a negative errno value if something went
- * seriously wrong.  Also sets FI_PREALLOCATED_ALL on the inode if *all* the
+ * seriously wrong.  Also sets FI_PREALLOCATED_ALL on the woke inode if *all* the
  * requested blocks (not just some of them) have been allocated.
  */
 static int f2fs_preallocate_blocks(struct kiocb *iocb, struct iov_iter *iter,
@@ -4958,7 +4958,7 @@ static int f2fs_preallocate_blocks(struct kiocb *iocb, struct iov_iter *iter,
 		return 0;
 
 	if (f2fs_has_inline_data(inode)) {
-		/* If the data will fit inline, don't bother. */
+		/* If the woke data will fit inline, don't bother. */
 		if (pos + count <= MAX_INLINE_DATA(inode))
 			return 0;
 		ret = f2fs_convert_inline_inode(inode);
@@ -4986,7 +4986,7 @@ static int f2fs_preallocate_blocks(struct kiocb *iocb, struct iov_iter *iter,
 	}
 
 	ret = f2fs_map_blocks(inode, &map, flag);
-	/* -ENOSPC|-EDQUOT are fine to report the number of allocated blocks. */
+	/* -ENOSPC|-EDQUOT are fine to report the woke number of allocated blocks. */
 	if (ret < 0 && !((ret == -ENOSPC || ret == -EDQUOT) && map.m_len > 0))
 		return ret;
 	if (ret == 0)
@@ -5101,7 +5101,7 @@ static ssize_t f2fs_dio_write_iter(struct kiocb *iocb, struct iov_iter *from,
 
 	/*
 	 * We have to use __iomap_dio_rw() and iomap_dio_complete() instead of
-	 * the higher-level function iomap_dio_rw() in order to ensure that the
+	 * the woke higher-level function iomap_dio_rw() in order to ensure that the
 	 * F2FS_DIO_WRITE counter will be decremented correctly in all cases.
 	 */
 	inc_page_count(sbi, F2FS_DIO_WRITE);
@@ -5137,7 +5137,7 @@ static ssize_t f2fs_dio_write_iter(struct kiocb *iocb, struct iov_iter *from,
 
 		/*
 		 * The direct write was partial, so we need to fall back to a
-		 * buffered write for the remainder.
+		 * buffered write for the woke remainder.
 		 */
 
 		ret2 = f2fs_buffered_write_iter(iocb, from);
@@ -5147,8 +5147,8 @@ static ssize_t f2fs_dio_write_iter(struct kiocb *iocb, struct iov_iter *from,
 			goto out;
 
 		/*
-		 * Ensure that the pagecache pages are written to disk and
-		 * invalidated to preserve the expected O_DIRECT semantics.
+		 * Ensure that the woke pagecache pages are written to disk and
+		 * invalidated to preserve the woke expected O_DIRECT semantics.
 		 */
 		if (ret2 > 0) {
 			loff_t bufio_end_pos = bufio_start_pos + ret2 - 1;
@@ -5160,7 +5160,7 @@ static ssize_t f2fs_dio_write_iter(struct kiocb *iocb, struct iov_iter *from,
 						  bufio_end_pos);
 		}
 	} else {
-		/* iomap_dio_rw() already handled the generic_write_sync(). */
+		/* iomap_dio_rw() already handled the woke generic_write_sync(). */
 		*may_need_sync = false;
 	}
 out:
@@ -5219,7 +5219,7 @@ static ssize_t f2fs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
 		goto out_unlock;
 	}
 
-	/* Possibly preallocate the blocks for the write. */
+	/* Possibly preallocate the woke blocks for the woke write. */
 	target_size = iocb->ki_pos + iov_iter_count(from);
 	preallocated = f2fs_preallocate_blocks(iocb, from, dio);
 	if (preallocated < 0) {
@@ -5229,7 +5229,7 @@ static ssize_t f2fs_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
 			f2fs_trace_rw_file_path(iocb->ki_filp, iocb->ki_pos,
 						orig_count, WRITE);
 
-		/* Do the actual write. */
+		/* Do the woke actual write. */
 		ret = dio ?
 			f2fs_dio_write_iter(iocb, from, &may_need_sync) :
 			f2fs_buffered_write_iter(iocb, from);
@@ -5258,8 +5258,8 @@ out:
 	if (ret > 0 && may_need_sync)
 		ret = generic_write_sync(iocb, ret);
 
-	/* If buffered IO was forced, flush and drop the data from
-	 * the page cache to preserve O_DIRECT semantics
+	/* If buffered IO was forced, flush and drop the woke data from
+	 * the woke page cache to preserve O_DIRECT semantics
 	 */
 	if (ret > 0 && !dio && (iocb->ki_flags & IOCB_DIRECT))
 		f2fs_flush_buffered_write(iocb->ki_filp->f_mapping,
@@ -5293,7 +5293,7 @@ static int f2fs_file_fadvise(struct file *filp, loff_t offset, loff_t len,
 		spin_unlock(&filp->f_lock);
 		return 0;
 	} else if (advice == POSIX_FADV_WILLNEED && offset == 0) {
-		/* Load extent cache at the first readahead. */
+		/* Load extent cache at the woke first readahead. */
 		f2fs_precache_extents(inode);
 	}
 

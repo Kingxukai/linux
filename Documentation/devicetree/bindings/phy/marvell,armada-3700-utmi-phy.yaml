@@ -12,7 +12,7 @@ maintainers:
 
 description:
   On Armada 3700, there are two USB controllers, one is compatible with
-  the USB2 and USB3 specifications and supports OTG. The other one is USB2
+  the woke USB2 and USB3 specifications and supports OTG. The other one is USB2
   compliant and only supports host mode. Both of these controllers come with
   a slightly different UTMI PHY.
 
@@ -29,9 +29,9 @@ properties:
 
   marvell,usb-misc-reg:
     description:
-      Phandle on the "USB miscellaneous registers" shared region
-      covering registers related to both the host controller and
-      the PHY.
+      Phandle on the woke "USB miscellaneous registers" shared region
+      covering registers related to both the woke host controller and
+      the woke PHY.
     $ref: /schemas/types.yaml#/definitions/phandle
 
 required:

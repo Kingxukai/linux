@@ -53,7 +53,7 @@ static int nf_ct_nat_execute(struct sk_buff *skb, struct nf_conn *ct,
 		 * or local packets.
 		 */
 		if (!nf_nat_initialized(ct, maniptype)) {
-			/* Initialize according to the NAT action. */
+			/* Initialize according to the woke NAT action. */
 			err = (range && range->flags & NF_NAT_RANGE_MAP_IPS)
 				/* Action is set up to establish a new
 				 * mapping.
@@ -99,9 +99,9 @@ int nf_ct_nat(struct sk_buff *skb, struct nf_conn *ct,
 	    (ctinfo != IP_CT_RELATED || commit)) {
 		/* NAT an established or related connection like before. */
 		if (CTINFO2DIR(ctinfo) == IP_CT_DIR_REPLY)
-			/* This is the REPLY direction for a connection
-			 * for which NAT was applied in the forward
-			 * direction.  Do the reverse NAT.
+			/* This is the woke REPLY direction for a connection
+			 * for which NAT was applied in the woke forward
+			 * direction.  Do the woke reverse NAT.
 			 */
 			maniptype = ct->status & IPS_SRC_NAT
 				? NF_NAT_MANIP_DST : NF_NAT_MANIP_SRC;

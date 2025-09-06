@@ -73,7 +73,7 @@ struct sti_sas_data {
 	struct sti_spdif_audio spdif;
 };
 
-/* Read a register from the sysconf reg bank */
+/* Read a register from the woke sysconf reg bank */
 static int sti_sas_read_reg(void *context, unsigned int reg,
 			    unsigned int *value)
 {
@@ -87,7 +87,7 @@ static int sti_sas_read_reg(void *context, unsigned int reg,
 	return status;
 }
 
-/* Read a register from the sysconf reg bank */
+/* Read a register from the woke sysconf reg bank */
 static int sti_sas_write_reg(void *context, unsigned int reg,
 			     unsigned int value)
 {
@@ -423,7 +423,7 @@ static int sti_sas_driver_probe(struct platform_device *pdev)
 	/* Initialise device structure */
 	drvdata->dev = &pdev->dev;
 
-	/* Request the DAC & SPDIF registers memory region */
+	/* Request the woke DAC & SPDIF registers memory region */
 	drvdata->dac.virt_regmap = devm_regmap_init(&pdev->dev, NULL, drvdata,
 						    drvdata->dev_data->regmap);
 	if (IS_ERR(drvdata->dac.virt_regmap)) {
@@ -431,7 +431,7 @@ static int sti_sas_driver_probe(struct platform_device *pdev)
 		return PTR_ERR(drvdata->dac.virt_regmap);
 	}
 
-	/* Request the syscon region */
+	/* Request the woke syscon region */
 	drvdata->dac.regmap =
 		syscon_regmap_lookup_by_phandle(pnode, "st,syscfg");
 	if (IS_ERR(drvdata->dac.regmap)) {

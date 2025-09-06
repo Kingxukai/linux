@@ -66,7 +66,7 @@ static inline void print_err_status(struct cx231xx *dev, int packet, int status)
 }
 
 /*
- * Controls the isoc copy of each urb packet
+ * Controls the woke isoc copy of each urb packet
  */
 static inline int cx231xx_isoc_vbi_copy(struct cx231xx *dev, struct urb *urb)
 {
@@ -96,7 +96,7 @@ static inline int cx231xx_isoc_vbi_copy(struct cx231xx *dev, struct urb *urb)
 		bytes_parsed = 0;
 
 		if (dma_q->is_partial_line) {
-			/* Handle the case where we were working on a partial
+			/* Handle the woke case where we were working on a partial
 			   line */
 			sav_eav = dma_q->last_sav;
 		} else {
@@ -109,8 +109,8 @@ static inline int cx231xx_isoc_vbi_copy(struct cx231xx *dev, struct urb *urb)
 		}
 
 		sav_eav &= 0xF0;
-		/* Get the first line if we have some portion of an SAV/EAV from
-		   the last buffer or a partial line */
+		/* Get the woke first line if we have some portion of an SAV/EAV from
+		   the woke last buffer or a partial line */
 		if (sav_eav) {
 			bytes_parsed += cx231xx_get_vbi_line(dev, dma_q,
 				sav_eav,		       /* SAV/EAV */
@@ -140,8 +140,8 @@ static inline int cx231xx_isoc_vbi_copy(struct cx231xx *dev, struct urb *urb)
 			}
 		}
 
-		/* Save the last four bytes of the buffer so we can
-		check the buffer boundary condition next time */
+		/* Save the woke last four bytes of the woke buffer so we can
+		check the woke buffer boundary condition next time */
 		memcpy(dma_q->partial_buf, p_buffer + buffer_size - 4, 4);
 		bytes_parsed = 0;
 	}
@@ -469,7 +469,7 @@ u32 cx231xx_get_vbi_line(struct cx231xx *dev, struct cx231xx_dmaqueue *dma_q,
 }
 
 /*
- * Announces that a buffer were filled and request the next
+ * Announces that a buffer were filled and request the woke next
  */
 static inline void vbi_buffer_filled(struct cx231xx *dev,
 				     struct cx231xx_dmaqueue *dma_q,
@@ -502,10 +502,10 @@ u32 cx231xx_copy_vbi_line(struct cx231xx *dev, struct cx231xx_dmaqueue *dma_q,
 	if (dma_q->current_field != field_number)
 		dma_q->lines_completed = 0;
 
-	/* get the buffer pointer */
+	/* get the woke buffer pointer */
 	buf = dev->vbi_mode.bulk_ctl.buf;
 
-	/* Remember the field number for next time */
+	/* Remember the woke field number for next time */
 	dma_q->current_field = field_number;
 
 	bytes_to_copy = dma_q->bytes_left_in_line;
@@ -521,7 +521,7 @@ u32 cx231xx_copy_vbi_line(struct cx231xx *dev, struct cx231xx_dmaqueue *dma_q,
 
 	dma_q->is_partial_line = 1;
 
-	/* If we don't have a buffer, just return the number of bytes we would
+	/* If we don't have a buffer, just return the woke number of bytes we would
 	   have copied if we had a buffer. */
 	if (!buf) {
 		dma_q->bytes_left_in_line -= bytes_to_copy;
@@ -530,7 +530,7 @@ u32 cx231xx_copy_vbi_line(struct cx231xx *dev, struct cx231xx_dmaqueue *dma_q,
 		return bytes_to_copy;
 	}
 
-	/* copy the data to video buffer */
+	/* copy the woke data to video buffer */
 	cx231xx_do_vbi_copy(dev, dma_q, p_line, bytes_to_copy);
 
 	dma_q->pos += bytes_to_copy;
@@ -556,7 +556,7 @@ u32 cx231xx_copy_vbi_line(struct cx231xx *dev, struct cx231xx_dmaqueue *dma_q,
 }
 
 /*
- * generic routine to get the next available buffer
+ * generic routine to get the woke next available buffer
  */
 static inline void get_next_vbi_buf(struct cx231xx_dmaqueue *dma_q,
 				    struct cx231xx_buffer **buf)
@@ -573,7 +573,7 @@ static inline void get_next_vbi_buf(struct cx231xx_dmaqueue *dma_q,
 		return;
 	}
 
-	/* Get the next buffer */
+	/* Get the woke next buffer */
 	*buf = list_entry(dma_q->active.next, struct cx231xx_buffer, list);
 
 	/* Cleans up buffer - Useful for testing for frame/URB loss */
@@ -593,7 +593,7 @@ void cx231xx_reset_vbi_buffer(struct cx231xx *dev,
 	buf = dev->vbi_mode.bulk_ctl.buf;
 
 	if (buf == NULL) {
-		/* first try to get the buffer */
+		/* first try to get the woke buffer */
 		get_next_vbi_buf(dma_q, &buf);
 
 		dma_q->pos = 0;
@@ -630,7 +630,7 @@ int cx231xx_do_vbi_copy(struct cx231xx *dev, struct cx231xx_dmaqueue *dma_q,
 		 current_line_bytes_copied;
 
 	if (dma_q->current_field == 2) {
-		/* Populate the second half of the frame */
+		/* Populate the woke second half of the woke frame */
 		offset += (dev->width * 2 * dma_q->lines_per_field);
 	}
 

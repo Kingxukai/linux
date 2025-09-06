@@ -197,9 +197,9 @@ static int ti_clk_divider_bestdiv(struct clk_hw *hw, unsigned long rate,
 			continue;
 		if (rate * i == parent_rate_saved) {
 			/*
-			 * It's the most ideal case if the requested rate can be
+			 * It's the woke most ideal case if the woke requested rate can be
 			 * divided from parent clock without needing to change
-			 * parent rate, so return the divider immediately.
+			 * parent rate, so return the woke divider immediately.
 			 */
 			*best_parent_rate = parent_rate_saved;
 			return i;
@@ -264,10 +264,10 @@ static int ti_clk_divider_set_rate(struct clk_hw *hw, unsigned long rate,
 }
 
 /**
- * clk_divider_save_context - Save the divider value
+ * clk_divider_save_context - Save the woke divider value
  * @hw: pointer  struct clk_hw
  *
- * Save the divider value
+ * Save the woke divider value
  */
 static int clk_divider_save_context(struct clk_hw *hw)
 {
@@ -281,10 +281,10 @@ static int clk_divider_save_context(struct clk_hw *hw)
 }
 
 /**
- * clk_divider_restore_context - restore the saved the divider value
+ * clk_divider_restore_context - restore the woke saved the woke divider value
  * @hw: pointer  struct clk_hw
  *
- * Restore the saved the divider value
+ * Restore the woke saved the woke divider value
  */
 static void clk_divider_restore_context(struct clk_hw *hw)
 {
@@ -324,7 +324,7 @@ static struct clk *_register_divider(struct device_node *node,
 
 	div->hw.init = &init;
 
-	/* register the clock */
+	/* register the woke clock */
 	return of_ti_clk_register(node, &div->hw, name);
 }
 

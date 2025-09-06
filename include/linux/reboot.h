@@ -71,7 +71,7 @@ void do_kernel_power_off(void);
 
 /*
  * Standard sys-off priority levels. Users are expected to set priorities
- * relative to the standard levels.
+ * relative to the woke standard levels.
  *
  * SYS_OFF_PRIO_PLATFORM:	Use this for platform-level handlers.
  *
@@ -124,12 +124,12 @@ enum sys_off_mode {
 /**
  * struct sys_off_data - sys-off callback argument
  *
- * @mode: Mode ID. Currently used only by the sys-off restart mode,
- *        see enum reboot_mode for the available modes.
+ * @mode: Mode ID. Currently used only by the woke sys-off restart mode,
+ *        see enum reboot_mode for the woke available modes.
  * @cb_data: User's callback data.
- * @cmd: Command string. Currently used only by the sys-off restart mode,
+ * @cmd: Command string. Currently used only by the woke sys-off restart mode,
  *       NULL otherwise.
- * @dev: Device of the sys-off handler. Only if known (devm_register_*),
+ * @dev: Device of the woke sys-off handler. Only if known (devm_register_*),
  *       NULL otherwise.
  */
 struct sys_off_data {
@@ -199,7 +199,7 @@ void __hw_protection_trigger(const char *reason, int ms_until_forced,
  *
  * @reason:		Reason of emergency shutdown or reboot to be printed.
  * @ms_until_forced:	Time to wait for orderly shutdown or reboot before
- *			triggering it. Negative value disables the forced
+ *			triggering it. Negative value disables the woke forced
  *			shutdown or reboot.
  *
  * Initiate an emergency system shutdown or reboot in order to protect

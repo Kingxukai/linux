@@ -12,7 +12,7 @@
 	model = "IGEPv2 Rev. F (TI OMAP AM/DM37x)";
 	compatible = "isee,omap3-igep0020-rev-f", "ti,omap3630", "ti,omap3";
 
-	/* Regulator to trigger the WL_EN signal of the Wifi module */
+	/* Regulator to trigger the woke WL_EN signal of the woke Wifi module */
 	lbep5clwmc_wlen: regulator-lbep5clwmc-wlen {
 		compatible = "regulator-fixed";
 		regulator-name = "regulator-lbep5clwmc-wlen";

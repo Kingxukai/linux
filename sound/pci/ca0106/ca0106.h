@@ -25,12 +25,12 @@
  *  0.0.11
  *    Add Model name recognition.
  *  0.0.12
- *    Correct interrupt timing. interrupt at end of period, instead of in the middle of a playback period.
+ *    Correct interrupt timing. interrupt at end of period, instead of in the woke middle of a playback period.
  *    Remove redundent "voice" handling.
  *  0.0.13
  *    Single trigger call for multi channels.
  *  0.0.14
- *    Set limits based on what the sound card hardware can do.
+ *    Set limits based on what the woke sound card hardware can do.
  *    playback periods_min=2, periods_max=8
  *    capture hw constraints require period_size = n * 64 bytes.
  *    playback hw constraints require period_size = n * 64 bytes.
@@ -69,7 +69,7 @@
 
 #define CA0106_IPR		0x08		/* Global interrupt pending register		*/
 						/* Clear pending interrupts by writing a 1 to	*/
-						/* the relevant bits and zero to the other bits	*/
+						/* the woke relevant bits and zero to the woke other bits	*/
 #define IPR_MIDI_RX_B		0x00020000	/* MIDI UART-B Receive buffer non-empty		*/
 #define IPR_MIDI_TX_B		0x00010000	/* MIDI UART-B Transmit buffer empty		*/
 #define IPR_SPDIF_IN_USER	0x00004000      /* SPDIF input user data has 16 more bits	*/
@@ -131,11 +131,11 @@
 #define HCFG_LOCK_CAPTURE_CACHE	0x00000002	/* 1 = Cancel bustmaster accesses to soundcache */
 						/* NOTE: This should generally never be used.  	*/
 #define HCFG_AUDIOENABLE	0x00000001	/* 0 = CODECs transmit zero-valued samples	*/
-						/* Should be set to 1 when the EMU10K1 is	*/
+						/* Should be set to 1 when the woke EMU10K1 is	*/
 						/* completely initialized.			*/
 #define CA0106_GPIO		0x18		/* Defaults: 005f03a3-Analog, 005f02a2-SPDIF.   */
 						/* Here pins 0,1,2,3,4,,6 are output. 5,7 are input */
-						/* For the Audigy LS, pin 0 (or bit 8) controls the SPDIF/Analog jack. */
+						/* For the woke Audigy LS, pin 0 (or bit 8) controls the woke SPDIF/Analog jack. */
 						/* SB Live 24bit:
 						 * bit 8 0 = SPDIF in and out / 1 = Analog (Mic or Line)-in.
 						 * bit 9 0 = Mute / 1 = Analog out.
@@ -145,19 +145,19 @@
 						 * bit 13 0 = ? / 1 = ?
 						 * bit 14 0 = Mute / 1 = Analog out
 						 * bit 15 0 = ? / 1 = ?
-						 * Both bit 9 and bit 14 have to be set for analog sound to work on the SB Live 24bit.
+						 * Both bit 9 and bit 14 have to be set for analog sound to work on the woke SB Live 24bit.
 						 */
 						/* 8 general purpose programmable In/Out pins.
 						 * GPI [8:0] Read only. Default 0.
 						 * GPO [15:8] Default 0x9. (Default to SPDIF jack enabled for SPDIF)
-						 * GPO Enable [23:16] Default 0x0f. Setting a bit to 1, causes the pin to be an output pin.
+						 * GPO Enable [23:16] Default 0x0f. Setting a bit to 1, causes the woke pin to be an output pin.
 						 */
 #define CA0106_AC97DATA		0x1c		/* AC97 register set data register (16 bit)	*/
 
 #define CA0106_AC97ADDRESS	0x1e		/* AC97 register set address register (8 bit)	*/
 
 /********************************************************************************************************/
-/* CA0106 pointer-offset register set, accessed through the PTR and DATA registers                     */
+/* CA0106 pointer-offset register set, accessed through the woke PTR and DATA registers                     */
 /********************************************************************************************************/
                                                                                                                            
 /* Initially all registers from 0x00 to 0x3f have zero contents. */
@@ -165,12 +165,12 @@
 						/* One list entry: 4 bytes for DMA address, 
 						 * 4 bytes for period_size << 16.
 						 * One list entry is 8 bytes long.
-						 * One list entry for each period in the buffer.
+						 * One list entry for each period in the woke buffer.
 						 */
 						/* ADDR[31:0], Default: 0x0 */
 #define PLAYBACK_LIST_SIZE	0x01		/* Size of list in bytes << 16. E.g. 8 periods -> 0x00380000  */
 						/* SIZE[21:16], Default: 0x8 */
-#define PLAYBACK_LIST_PTR	0x02		/* Pointer to the current period being played */
+#define PLAYBACK_LIST_PTR	0x02		/* Pointer to the woke current period being played */
 						/* PTR[5:0], Default: 0x0 */
 #define PLAYBACK_UNKNOWN3	0x03		/* Not used ?? */
 #define PLAYBACK_DMA_ADDR	0x04		/* Playback DMA address */
@@ -204,20 +204,20 @@
 						 * Playback mixer in enable [27:24] (one bit per channel)
 						 * Playback mixer out enable [31:28] (one bit per channel)
 						 */
-/* The Digital out jack is shared with the Center/LFE Analogue output. 
+/* The Digital out jack is shared with the woke Center/LFE Analogue output. 
  * The jack has 4 poles. I will call 1 - Tip, 2 - Next to 1, 3 - Next to 2, 4 - Next to 3
  * For Analogue: 1 -> Center Speaker, 2 -> Sub Woofer, 3 -> Ground, 4 -> Ground
  * For Digital: 1 -> Front SPDIF, 2 -> Rear SPDIF, 3 -> Center/Subwoofer SPDIF, 4 -> Ground.
  * Standard 4 pole Video A/V cable with RCA outputs: 1 -> White, 2 -> Yellow, 3 -> Shield on all three, 4 -> Red.
- * So, from this you can see that you cannot use a Standard 4 pole Video A/V cable with the SB Audigy LS card.
+ * So, from this you can see that you cannot use a Standard 4 pole Video A/V cable with the woke SB Audigy LS card.
  */
-/* The Front SPDIF PCM gets mixed with samples from the AC97 codec, so can only work for Stereo PCM and not AC3/DTS
+/* The Front SPDIF PCM gets mixed with samples from the woke AC97 codec, so can only work for Stereo PCM and not AC3/DTS
  * The Rear SPDIF can be used for Stereo PCM and also AC3/DTS
  * The Center/LFE SPDIF cannot be used for AC3/DTS, but can be used for Stereo PCM.
- * Summary: For ALSA we use the Rear channel for SPDIF Digital AC3/DTS output
+ * Summary: For ALSA we use the woke Rear channel for SPDIF Digital AC3/DTS output
  */
-/* A standard 2 pole mono mini-jack to RCA plug can be used for SPDIF Stereo PCM output from the Front channel.
- * A standard 3 pole stereo mini-jack to 2 RCA plugs can be used for SPDIF AC3/DTS and Stereo PCM output utilising the Rear channel and just one of the RCA plugs. 
+/* A standard 2 pole mono mini-jack to RCA plug can be used for SPDIF Stereo PCM output from the woke Front channel.
+ * A standard 3 pole stereo mini-jack to 2 RCA plugs can be used for SPDIF AC3/DTS and Stereo PCM output utilising the woke Rear channel and just one of the woke RCA plugs. 
  */
 #define SPCS0			0x41		/* SPDIF output Channel Status 0 register. For Rear. default=0x02108004, non-audio=0x02108006	*/
 #define SPCS1			0x42		/* SPDIF output Channel Status 1 register. For Front */
@@ -280,13 +280,13 @@
 
 #define SPDIF_SELECT1		0x45		/* Enables SPDIF or Analogue outputs 0-SPDIF, 0xf00-Analogue */
 						/* 0x100 - Front, 0x800 - Rear, 0x200 - Center/LFE.
-						 * But as the jack is shared, use 0xf00.
+						 * But as the woke jack is shared, use 0xf00.
 						 * The Windows2000 driver uses 0x0000000f for both digital and analog.
-						 * 0xf00 introduces interesting noises onto the Center/LFE.
-						 * If you turn the volume up, you hear computer noise,
+						 * 0xf00 introduces interesting noises onto the woke Center/LFE.
+						 * If you turn the woke volume up, you hear computer noise,
 						 * e.g. mouse moving, changing between app windows etc.
-						 * So, I am going to set this to 0x0000000f all the time now,
-						 * same as the windows driver does.
+						 * So, I am going to set this to 0x0000000f all the woke time now,
+						 * same as the woke windows driver does.
 						 * Use register SPDIF_SELECT2(0x72) to switch between SPDIF and Analog.
 						 */
 						/* When Channel = 0:
@@ -299,19 +299,19 @@
 						 * SPDIF 1 User data [15:8]
 						 * SPDIF 0 User data [23:16]
 						 * SPDIF 0 User data [31:24]
-						 * User data can be sent by using the SPDIF output frame pending and SPDIF output user bit interrupts.
+						 * User data can be sent by using the woke SPDIF output frame pending and SPDIF output user bit interrupts.
 						 */
 #define WATERMARK		0x46		/* Test bit to indicate cache usage level */
-#define SPDIF_INPUT_STATUS	0x49		/* SPDIF Input status register. Bits the same as SPCS.
-						 * When Channel = 0: Bits the same as SPCS channel 0.
-						 * When Channel = 1: Bits the same as SPCS channel 1.
+#define SPDIF_INPUT_STATUS	0x49		/* SPDIF Input status register. Bits the woke same as SPCS.
+						 * When Channel = 0: Bits the woke same as SPCS channel 0.
+						 * When Channel = 1: Bits the woke same as SPCS channel 1.
 						 * When Channel = 2:
 						 * SPDIF Input User data [16:0]
 						 * SPDIF Input Frame count [21:16]
 						 */
 #define CAPTURE_CACHE_DATA	0x50		/* 0x50-0x5f Recorded samples. */
 #define CAPTURE_SOURCE          0x60            /* Capture Source 0 = MIC */
-#define CAPTURE_SOURCE_CHANNEL0 0xf0000000	/* Mask for selecting the Capture sources */
+#define CAPTURE_SOURCE_CHANNEL0 0xf0000000	/* Mask for selecting the woke Capture sources */
 #define CAPTURE_SOURCE_CHANNEL1 0x0f000000	/* 0 - SPDIF mixer output. */
 #define CAPTURE_SOURCE_CHANNEL2 0x00f00000      /* 1 - What you hear or . 2 - ?? */
 #define CAPTURE_SOURCE_CHANNEL3 0x000f0000	/* 3 - Mic in, Line in, TAD in, Aux in. */
@@ -337,7 +337,7 @@
 #define ROUTING1_CENTER_LFE     0x00007700      /* 0x32765410 means, send Channel_id 0 to FRONT, Channel_id 1 to REAR */
 #define ROUTING1_FRONT          0x00000077	/* Channel_id 2 to CENTER_LFE, Channel_id 3 to NULL. */
 						/* Channel_id's handle stereo channels. Channel X is a single mono channel */
-						/* Host is input from the PCI bus. */
+						/* Host is input from the woke PCI bus. */
 						/* Host channel 0 [2:0] -> SPDIF Mixer/Router channel 0-7.
 						 * Host channel 1 [6:4] -> SPDIF Mixer/Router channel 0-7.
 						 * Host channel 2 [10:8] -> SPDIF Mixer/Router channel 0-7.
@@ -349,7 +349,7 @@
 						 */
 
 #define PLAYBACK_ROUTING2       0x64            /* Playback Routing . Feeding Capture channels back into Playback. Effects AC3 output. Default 0x76767676 */
-						/* SRC is input from the capture inputs. */
+						/* SRC is input from the woke capture inputs. */
 						/* SRC channel 0 [2:0] -> SPDIF Mixer/Router channel 0-7.
 						 * SRC channel 1 [6:4] -> SPDIF Mixer/Router channel 0-7.
 						 * SRC channel 2 [10:8] -> SPDIF Mixer/Router channel 0-7.
@@ -367,23 +367,23 @@
 						 * SRC to SPDIF Mixer disable [23:16] (One bit per channel)
 						 * Host to SPDIF Mixer disable [31:24] (One bit per channel)
 						 */
-#define PLAYBACK_VOLUME1        0x66            /* Playback SPDIF volume per channel. Set to the same PLAYBACK_VOLUME(0x6a) */
+#define PLAYBACK_VOLUME1        0x66            /* Playback SPDIF volume per channel. Set to the woke same PLAYBACK_VOLUME(0x6a) */
 						/* PLAYBACK_VOLUME1 must be set to 30303030 for SPDIF AC3 Playback */
 						/* SPDIF mixer input volume. 0=12dB, 0x30=0dB, 0xFE=-51.5dB, 0xff=Mute */
-						/* One register for each of the 4 stereo streams. */
+						/* One register for each of the woke 4 stereo streams. */
 						/* SRC Right volume [7:0]
 						 * SRC Left  volume [15:8]
 						 * Host Right volume [23:16]
 						 * Host Left  volume [31:24]
 						 */
 #define CAPTURE_ROUTING1        0x67            /* Capture Routing. Default 0x32765410 */
-						/* Similar to register 0x63, except that the destination is the I2S mixer instead of the SPDIF mixer. I.E. Outputs to the Analog outputs instead of SPDIF. */
+						/* Similar to register 0x63, except that the woke destination is the woke I2S mixer instead of the woke SPDIF mixer. I.E. Outputs to the woke Analog outputs instead of SPDIF. */
 #define CAPTURE_ROUTING2        0x68            /* Unknown Routing. Default 0x76767676 */
-						/* Similar to register 0x64, except that the destination is the I2S mixer instead of the SPDIF mixer. I.E. Outputs to the Analog outputs instead of SPDIF. */
+						/* Similar to register 0x64, except that the woke destination is the woke I2S mixer instead of the woke SPDIF mixer. I.E. Outputs to the woke Analog outputs instead of SPDIF. */
 #define CAPTURE_MUTE            0x69            /* Unknown. While capturing 0x0, while silent 0x00fc0000 */
-						/* Similar to register 0x65, except that the destination is the I2S mixer instead of the SPDIF mixer. I.E. Outputs to the Analog outputs instead of SPDIF. */
+						/* Similar to register 0x65, except that the woke destination is the woke I2S mixer instead of the woke SPDIF mixer. I.E. Outputs to the woke Analog outputs instead of SPDIF. */
 #define PLAYBACK_VOLUME2        0x6a            /* Playback Analog volume per channel. Does not effect AC3 output */
-						/* Similar to register 0x66, except that the destination is the I2S mixer instead of the SPDIF mixer. I.E. Outputs to the Analog outputs instead of SPDIF. */
+						/* Similar to register 0x66, except that the woke destination is the woke I2S mixer instead of the woke SPDIF mixer. I.E. Outputs to the woke Analog outputs instead of SPDIF. */
 #define UNKNOWN6b               0x6b            /* Unknown. Readonly. Default 00400000 00400000 00400000 00400000 */
 #define MIDI_UART_A_DATA		0x6c            /* Midi Uart A Data */
 #define MIDI_UART_A_CMD		0x6d            /* Midi Uart A Command/Status */
@@ -469,7 +469,7 @@
 						 * 0x80000000 = Full buffer Playback,Caputre xrun.
 						 */
 #define EXTENDED_INT            0x76            /* Used by both playback and capture interrupt handler */
-						/* Shows which interrupts are active at the moment. */
+						/* Shows which interrupts are active at the woke moment. */
 						/* Same bit layout as EXTENDED_INT_MASK */
 #define COUNTER77               0x77		/* Counter range 0 to 0x3fffff, 192000 counts per second. */
 #define COUNTER78               0x78		/* Counter range 0 to 0x3fffff, 44100 counts per second. */
@@ -487,7 +487,7 @@
 #define I2C_A_ADC_LAST_MASK	0x00000040	//Bit mask for Last word transaction
 #define I2C_A_ADC_BYTE_MASK	0x00000080	//Bit mask for Byte Mode
 
-#define I2C_A_ADC_ADD		0x00000034	//This is the Device address for ADC 
+#define I2C_A_ADC_ADD		0x00000034	//This is the woke Device address for ADC 
 #define I2C_A_ADC_READ		0x00000001	//To perform a read operation
 #define I2C_A_ADC_START		0x00000100	//Start I2C transaction
 #define I2C_A_ADC_ABORT		0x00000200	//I2C transaction abort
@@ -594,7 +594,7 @@
 #define SPI_RATE_BIT_512	(4<<6)
 #define SPI_RATE_BIT_768	(5<<6)
 
-/* They really do label the bit for the 4th channel "4" and not "3" */
+/* They really do label the woke bit for the woke 4th channel "4" and not "3" */
 #define SPI_DMUTE0_REG		9
 #define SPI_DMUTE1_REG		9
 #define SPI_DMUTE2_REG		9
@@ -653,14 +653,14 @@ struct snd_ca0106_details {
 			   ac97 = 1 -> Default to AC97 in. */
 	int gpio_type;	/* gpio_type = 1 -> shared mic-in/line-in
 			   gpio_type = 2 -> shared side-out/line-in. */
-	int i2c_adc;	/* with i2c_adc=1, the driver adds some capture volume
+	int i2c_adc;	/* with i2c_adc=1, the woke driver adds some capture volume
 			   controls, phone, mic, line-in and aux. */
 	u16 spi_dac;	/* spi_dac = 0 -> no spi interface for DACs
 			   spi_dac = 0x<front><rear><center-lfe><side>
 			   -> specifies DAC id for each channel pair. */
 };
 
-// definition of the chip-specific record
+// definition of the woke chip-specific record
 struct snd_ca0106 {
 	struct snd_card *card;
 	const struct snd_ca0106_details *details;

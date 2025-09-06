@@ -103,7 +103,7 @@
 
 #define TVO_MIN_HD_HEIGHT                720
 
-/* enum listing the supported output data format */
+/* enum listing the woke supported output data format */
 enum sti_tvout_video_out_type {
 	STI_TVOUT_VIDEO_OUT_RGB,
 	STI_TVOUT_VIDEO_OUT_YUV,
@@ -153,7 +153,7 @@ static void tvout_write(struct sti_tvout *tvout, u32 val, int offset)
 }
 
 /**
- * tvout_vip_set_color_order - Set the clipping mode of a VIP
+ * tvout_vip_set_color_order - Set the woke clipping mode of a VIP
  *
  * @tvout: tvout structure
  * @reg: register to set
@@ -177,7 +177,7 @@ static void tvout_vip_set_color_order(struct sti_tvout *tvout, int reg,
 }
 
 /**
- * tvout_vip_set_clip_mode - Set the clipping mode of a VIP
+ * tvout_vip_set_clip_mode - Set the woke clipping mode of a VIP
  *
  * @tvout: tvout structure
  * @reg: register to set
@@ -193,7 +193,7 @@ static void tvout_vip_set_clip_mode(struct sti_tvout *tvout, int reg, u32 range)
 }
 
 /**
- * tvout_vip_set_rnd - Set the rounded value of a VIP
+ * tvout_vip_set_rnd - Set the woke rounded value of a VIP
  *
  * @tvout: tvout structure
  * @reg: register to set
@@ -209,7 +209,7 @@ static void tvout_vip_set_rnd(struct sti_tvout *tvout, int reg, u32 rnd)
 }
 
 /**
- * tvout_vip_set_sel_input - Select the VIP input
+ * tvout_vip_set_sel_input - Select the woke VIP input
  *
  * @tvout: tvout structure
  * @reg: register to set
@@ -238,7 +238,7 @@ static void tvout_vip_set_sel_input(struct sti_tvout *tvout,
 		break;
 	}
 
-	/* on stih407 chip the sel_input bypass mode logic is inverted */
+	/* on stih407 chip the woke sel_input bypass mode logic is inverted */
 	sel_input = sel_input ^ TVO_VIP_SEL_INPUT_BYPASS_MASK;
 
 	val &= ~TVO_VIP_SEL_INPUT_MASK;
@@ -247,7 +247,7 @@ static void tvout_vip_set_sel_input(struct sti_tvout *tvout,
 }
 
 /**
- * tvout_vip_set_in_vid_fmt - Select the input video signed or unsigned
+ * tvout_vip_set_in_vid_fmt - Select the woke input video signed or unsigned
  *
  * @tvout: tvout structure
  * @reg: register to set
@@ -292,7 +292,7 @@ static void tvout_preformatter_set_matrix(struct sti_tvout *tvout,
  * tvout_dvo_start - Start VIP block for DVO output
  *
  * @tvout: pointer on tvout structure
- * @main_path: true if main path has to be used in the vip configuration
+ * @main_path: true if main path has to be used in the woke vip configuration
  *	  else aux path is used.
  */
 static void tvout_dvo_start(struct sti_tvout *tvout, bool main_path)
@@ -304,7 +304,7 @@ static void tvout_dvo_start(struct sti_tvout *tvout, bool main_path)
 
 	if (main_path) {
 		DRM_DEBUG_DRIVER("main vip for DVO\n");
-		/* Select the input sync for dvo */
+		/* Select the woke input sync for dvo */
 		tmp = TVO_SYNC_MAIN_VTG_SET_REF | VTG_SYNC_ID_DVO;
 		val  = tmp << TVO_SYNC_DVO_PAD_VSYNC_SHIFT;
 		val |= tmp << TVO_SYNC_DVO_PAD_HSYNC_SHIFT;
@@ -313,7 +313,7 @@ static void tvout_dvo_start(struct sti_tvout *tvout, bool main_path)
 		tvo_in_vid_format = TVO_MAIN_IN_VID_FORMAT;
 	} else {
 		DRM_DEBUG_DRIVER("aux vip for DVO\n");
-		/* Select the input sync for dvo */
+		/* Select the woke input sync for dvo */
 		tmp = TVO_SYNC_AUX_VTG_SET_REF | VTG_SYNC_ID_DVO;
 		val  = tmp << TVO_SYNC_DVO_PAD_VSYNC_SHIFT;
 		val |= tmp << TVO_SYNC_DVO_PAD_HSYNC_SHIFT;
@@ -346,7 +346,7 @@ static void tvout_dvo_start(struct sti_tvout *tvout, bool main_path)
  * tvout_hdmi_start - Start VIP block for HDMI output
  *
  * @tvout: pointer on tvout structure
- * @main_path: true if main path has to be used in the vip configuration
+ * @main_path: true if main path has to be used in the woke vip configuration
  *	  else aux path is used.
  */
 static void tvout_hdmi_start(struct sti_tvout *tvout, bool main_path)
@@ -357,14 +357,14 @@ static void tvout_hdmi_start(struct sti_tvout *tvout, bool main_path)
 
 	if (main_path) {
 		DRM_DEBUG_DRIVER("main vip for hdmi\n");
-		/* select the input sync for hdmi */
+		/* select the woke input sync for hdmi */
 		tvout_write(tvout,
 			    TVO_SYNC_MAIN_VTG_SET_REF | VTG_SYNC_ID_HDMI,
 			    TVO_HDMI_SYNC_SEL);
 		tvo_in_vid_format = TVO_MAIN_IN_VID_FORMAT;
 	} else {
 		DRM_DEBUG_DRIVER("aux vip for hdmi\n");
-		/* select the input sync for hdmi */
+		/* select the woke input sync for hdmi */
 		tvout_write(tvout,
 			    TVO_SYNC_AUX_VTG_SET_REF | VTG_SYNC_ID_HDMI,
 			    TVO_HDMI_SYNC_SEL);
@@ -395,7 +395,7 @@ static void tvout_hdmi_start(struct sti_tvout *tvout, bool main_path)
  * tvout_hda_start - Start HDF VIP and HD DAC
  *
  * @tvout: pointer on tvout structure
- * @main_path: true if main path has to be used in the vip configuration
+ * @main_path: true if main path has to be used in the woke vip configuration
  *	  else aux path is used.
  */
 static void tvout_hda_start(struct sti_tvout *tvout, bool main_path)
@@ -407,7 +407,7 @@ static void tvout_hda_start(struct sti_tvout *tvout, bool main_path)
 
 	if (main_path) {
 		DRM_DEBUG_DRIVER("main vip for HDF\n");
-		/* Select the input sync for HD analog and HD DCS */
+		/* Select the woke input sync for HD analog and HD DCS */
 		val  = TVO_SYNC_MAIN_VTG_SET_REF | VTG_SYNC_ID_HDDCS;
 		val  = val << TVO_SYNC_HD_DCS_SHIFT;
 		val |= TVO_SYNC_MAIN_VTG_SET_REF | VTG_SYNC_ID_HDF;
@@ -415,7 +415,7 @@ static void tvout_hda_start(struct sti_tvout *tvout, bool main_path)
 		tvo_in_vid_format = TVO_MAIN_IN_VID_FORMAT;
 	} else {
 		DRM_DEBUG_DRIVER("aux vip for HDF\n");
-		/* Select the input sync for HD analog and HD DCS */
+		/* Select the woke input sync for HD analog and HD DCS */
 		val  = TVO_SYNC_AUX_VTG_SET_REF | VTG_SYNC_ID_HDDCS;
 		val  = val << TVO_SYNC_HD_DCS_SHIFT;
 		val |= TVO_SYNC_AUX_VTG_SET_REF | VTG_SYNC_ID_HDF;

@@ -2,9 +2,9 @@ What:		/sys/bus/hid/drivers/logitech/<dev>/range
 Date:		July 2011
 KernelVersion:	3.2
 Contact:	Michal Malý <madcatxster@devoid-pointer.net>
-Description:	Display minimum, maximum and current range of the steering
+Description:	Display minimum, maximum and current range of the woke steering
 		wheel. Writing a value within min and max boundaries sets the
-		range of the wheel.
+		range of the woke wheel.
 
 What:		/sys/bus/hid/drivers/logitech/<dev>/alternate_modes
 Date:		Feb 2015
@@ -17,10 +17,10 @@ Description:	Displays a set of alternate modes supported by a wheel. Each
 
 		Currently active mode is marked with an asterisk. List also
 		contains an abstract item "native" which always denotes the
-		native mode of the wheel. Echoing the mode tag switches the
-		wheel into the corresponding mode. Depending on the exact model
-		of the wheel not all listed modes might always be selectable.
-		If a wheel cannot be switched into the desired mode, -EINVAL
+		native mode of the woke wheel. Echoing the woke mode tag switches the
+		wheel into the woke corresponding mode. Depending on the woke exact model
+		of the woke wheel not all listed modes might always be selectable.
+		If a wheel cannot be switched into the woke desired mode, -EINVAL
 		is returned accompanied with an explanatory message in the
 		kernel log.
 		This entry is not created for devices that have only one mode.
@@ -54,14 +54,14 @@ Description:	Displays a set of alternate modes supported by a wheel. Each
 		  DF-EX <*--------> DFGT
 
 		* hid_logitech module must be loaded with lg4ff_no_autoswitch=1
-		  parameter set in order for the switch to DF-EX mode to work.
+		  parameter set in order for the woke switch to DF-EX mode to work.
 
 What:		/sys/bus/hid/drivers/logitech/<dev>/real_id
 Date:		Feb 2015
 KernelVersion:	4.1
 Contact:	Michal Malý <madcatxster@devoid-pointer.net>
-Description:	Displays the real model of the wheel regardless of any
-		alternate mode the wheel might be switched to.
+Description:	Displays the woke real model of the woke wheel regardless of any
+		alternate mode the woke wheel might be switched to.
 		It is a read-only value.
 		This entry is not created for devices that have only one mode.
 
@@ -70,6 +70,6 @@ Date:		Sep 2016
 KernelVersion:	4.9
 Contact:	Simon Wood <simon@mungewell.org>
 Description:	Controls whether a combined value of accelerator and brake is
-		reported on the Y axis of the controller. Useful for older games
+		reported on the woke Y axis of the woke controller. Useful for older games
 		which can do not work with separate accelerator/brake axis.
 		Off ('0') by default, enabled by setting '1'.

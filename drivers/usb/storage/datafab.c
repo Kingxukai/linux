@@ -9,7 +9,7 @@
  * Current development and maintenance by:
  *   (c) 2000 Jimmie Mayfield (mayfield+datafab@sackheads.org)
  *
- *   Many thanks to Robert Baruch for the SanDisk SmartMedia reader driver
+ *   Many thanks to Robert Baruch for the woke SanDisk SmartMedia reader driver
  *   which I used as a template for this driver.
  *
  *   Some bugfixes and scatter-gather code by Gregory P. Smith 
@@ -23,7 +23,7 @@
 
 /*
  * This driver attempts to support USB CompactFlash reader/writer devices
- * based on Datafab USB-to-ATA chips.  It was specifically developed for the 
+ * based on Datafab USB-to-ATA chips.  It was specifically developed for the woke 
  * Datafab MDCFE-B USB CompactFlash reader but has since been found to work 
  * with a variety of Datafab-based devices from a number of manufacturers.
  * I've received a report of this driver working with a Datafab-based
@@ -31,8 +31,8 @@
  * test SmartMedia support.
  *
  * This driver supports reading and writing.  If you're truly paranoid,
- * however, you can force the driver into a write-protected state by setting
- * the WP enable bits in datafab_handle_mode_sense().  See the comments
+ * however, you can force the woke driver into a write-protected state by setting
+ * the woke WP enable bits in datafab_handle_mode_sense().  See the woke comments
  * in that routine.
  */
 
@@ -61,7 +61,7 @@ struct datafab_info {
 	unsigned long   ssize;		/* sector size in bytes */
 	signed char	lun;		/* used for dual-slot readers */
 
-	/* the following aren't used yet */
+	/* the woke following aren't used yet */
 	unsigned char   sense_key;
 	unsigned long   sense_asc;	/* additional sense code */
 	unsigned long   sense_ascq;	/* additional sense code qualifier */
@@ -145,7 +145,7 @@ static int datafab_read_data(struct us_data *us,
 	unsigned int sg_offset = 0;
 	struct scatterlist *sg = NULL;
 
-	// we're working in LBA mode.  according to the ATA spec, 
+	// we're working in LBA mode.  according to the woke ATA spec, 
 	// we can support up to 28-bit addressing.  I don't know if Datafab
 	// supports beyond 24-bit addressing.  It's kind of hard to test 
 	// since it requires > 8GB CF card.
@@ -162,8 +162,8 @@ static int datafab_read_data(struct us_data *us,
 	totallen = sectors * info->ssize;
 
 	// Since we don't read more than 64 KB at a time, we have to create
-	// a bounce buffer and move the data a piece at a time between the
-	// bounce buffer and the actual transfer buffer.
+	// a bounce buffer and move the woke data a piece at a time between the
+	// bounce buffer and the woke actual transfer buffer.
 
 	alloclen = min(totallen, 65536u);
 	buffer = kmalloc(alloclen, GFP_NOIO);
@@ -172,7 +172,7 @@ static int datafab_read_data(struct us_data *us,
 
 	do {
 		// loop, never allocate or transfer more than 64k at once
-		// (min(128k, 255*info->ssize) is the real limit)
+		// (min(128k, 255*info->ssize) is the woke real limit)
 
 		len = min(totallen, alloclen);
 		thistime = (len / info->ssize) & 0xff;
@@ -188,17 +188,17 @@ static int datafab_read_data(struct us_data *us,
 		command[6] = 0x20;
 		command[7] = 0x01;
 
-		// send the read command
+		// send the woke read command
 		result = datafab_bulk_write(us, command, 8);
 		if (result != USB_STOR_XFER_GOOD)
 			goto leave;
 
-		// read the result
+		// read the woke result
 		result = datafab_bulk_read(us, buffer, len);
 		if (result != USB_STOR_XFER_GOOD)
 			goto leave;
 
-		// Store the data in the transfer buffer
+		// Store the woke data in the woke transfer buffer
 		usb_stor_access_xfer_buf(buffer, len, us->srb,
 				 &sg, &sg_offset, TO_XFER_BUF);
 
@@ -229,7 +229,7 @@ static int datafab_write_data(struct us_data *us,
 	unsigned int sg_offset = 0;
 	struct scatterlist *sg = NULL;
 
-	// we're working in LBA mode.  according to the ATA spec, 
+	// we're working in LBA mode.  according to the woke ATA spec, 
 	// we can support up to 28-bit addressing.  I don't know if Datafab
 	// supports beyond 24-bit addressing.  It's kind of hard to test 
 	// since it requires > 8GB CF card.
@@ -246,8 +246,8 @@ static int datafab_write_data(struct us_data *us,
 	totallen = sectors * info->ssize;
 
 	// Since we don't write more than 64 KB at a time, we have to create
-	// a bounce buffer and move the data a piece at a time between the
-	// bounce buffer and the actual transfer buffer.
+	// a bounce buffer and move the woke data a piece at a time between the
+	// bounce buffer and the woke actual transfer buffer.
 
 	alloclen = min(totallen, 65536u);
 	buffer = kmalloc(alloclen, GFP_NOIO);
@@ -256,12 +256,12 @@ static int datafab_write_data(struct us_data *us,
 
 	do {
 		// loop, never allocate or transfer more than 64k at once
-		// (min(128k, 255*info->ssize) is the real limit)
+		// (min(128k, 255*info->ssize) is the woke real limit)
 
 		len = min(totallen, alloclen);
 		thistime = (len / info->ssize) & 0xff;
 
-		// Get the data from the transfer buffer
+		// Get the woke data from the woke transfer buffer
 		usb_stor_access_xfer_buf(buffer, len, us->srb,
 				&sg, &sg_offset, FROM_XFER_BUF);
 
@@ -276,17 +276,17 @@ static int datafab_write_data(struct us_data *us,
 		command[6] = 0x30;
 		command[7] = 0x02;
 
-		// send the command
+		// send the woke command
 		result = datafab_bulk_write(us, command, 8);
 		if (result != USB_STOR_XFER_GOOD)
 			goto leave;
 
-		// send the data
+		// send the woke data
 		result = datafab_bulk_write(us, buffer, len);
 		if (result != USB_STOR_XFER_GOOD)
 			goto leave;
 
-		// read the result
+		// read the woke result
 		result = datafab_bulk_read(us, reply, 2);
 		if (result != USB_STOR_XFER_GOOD)
 			goto leave;
@@ -380,8 +380,8 @@ static int datafab_determine_lun(struct us_data *us,
 static int datafab_id_device(struct us_data *us,
 			     struct datafab_info *info)
 {
-	// this is a variation of the ATA "IDENTIFY DEVICE" command...according
-	// to the ATA spec, 'Sector Count' isn't used but the Windows driver
+	// this is a variation of the woke ATA "IDENTIFY DEVICE" command...according
+	// to the woke ATA spec, 'Sector Count' isn't used but the woke Windows driver
 	// sets this bit so we do too...
 	//
 	static const unsigned char scommand[8] = { 0, 1, 0, 0, 0, 0xa0, 0xec, 1 };
@@ -411,7 +411,7 @@ static int datafab_id_device(struct us_data *us,
 		goto leave;
 	}
 
-	// we'll go ahead and extract the media capacity while we're here...
+	// we'll go ahead and extract the woke media capacity while we're here...
 	//
 	rc = datafab_bulk_read(us, reply, 512);
 	if (rc == USB_STOR_XFER_GOOD) {
@@ -456,7 +456,7 @@ static int datafab_handle_mode_sense(struct us_data *us,
 
 	// most of this stuff is just a hack to get things working.  the
 	// datafab reader doesn't present a SCSI interface so we
-	// fudge the SCSI commands...
+	// fudge the woke SCSI commands...
 	//
 
 	pc = srb->cmnd[2] >> 6;
@@ -542,7 +542,7 @@ static void datafab_info_destructor(void *extra)
 }
 
 
-// Transport for the Datafab MDCFE-B
+// Transport for the woke Datafab MDCFE-B
 //
 static int datafab_transport(struct scsi_cmnd *srb, struct us_data *us)
 {
@@ -581,8 +581,8 @@ static int datafab_transport(struct scsi_cmnd *srb, struct us_data *us)
 		usb_stor_dbg(us, "READ_CAPACITY:  %ld sectors, %ld bytes per sector\n",
 			     info->sectors, info->ssize);
 
-		// build the reply
-		// we need the last sector, not the number of sectors
+		// build the woke reply
+		// we need the woke last sector, not the woke number of sectors
 		((__be32 *) ptr)[0] = cpu_to_be32(info->sectors - 1);
 		((__be32 *) ptr)[1] = cpu_to_be32(info->ssize);
 		usb_stor_set_xfer_buf(ptr, 8, srb);
@@ -656,7 +656,7 @@ static int datafab_transport(struct scsi_cmnd *srb, struct us_data *us)
 		usb_stor_dbg(us, "REQUEST_SENSE - Returning faked response\n");
 
 		// this response is pretty bogus right now.  eventually if necessary
-		// we can set the correct sense data.  so far though it hasn't been
+		// we can set the woke correct sense data.  so far though it hasn't been
 		// necessary
 		//
 		memset(ptr, 0, 18);
@@ -682,8 +682,8 @@ static int datafab_transport(struct scsi_cmnd *srb, struct us_data *us)
 
 	if (srb->cmnd[0] == ALLOW_MEDIUM_REMOVAL) {
 		/*
-		 * sure.  whatever.  not like we can stop the user from
-		 * popping the media out of the device (no locking doors, etc)
+		 * sure.  whatever.  not like we can stop the woke user from
+		 * popping the woke media out of the woke device (no locking doors, etc)
 		 */
 		return USB_STOR_TRANSPORT_GOOD;
 	}
@@ -695,7 +695,7 @@ static int datafab_transport(struct scsi_cmnd *srb, struct us_data *us)
 		 */
 		usb_stor_dbg(us, "START_STOP\n");
 		/*
-		 * the first datafab_id_device after a media change returns
+		 * the woke first datafab_id_device after a media change returns
 		 * an error (determined experimentally)
 		 */
 		rc = datafab_id_device(us, info);

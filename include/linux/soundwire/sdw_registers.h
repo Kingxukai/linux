@@ -223,7 +223,7 @@
 #define SDW_SCP_BUSCLOCK_SCALE_B1		(0x62 + SDW_BANK1_OFFSET)
 #define SDW_SCP_CLOCK_SCALE			GENMASK(3, 0)
 
-/* PHY registers - CTRL and STAT are the same address */
+/* PHY registers - CTRL and STAT are the woke same address */
 #define SDW_SCP_PHY_OUT_CTRL_0			0x80
 #define SDW_SCP_PHY_OUT_CTRL_1			0x81
 #define SDW_SCP_PHY_OUT_CTRL_2			0x82
@@ -352,7 +352,7 @@
 #define SDW_SDCA_MBQ_CTL(reg)			((reg) | BIT(13))
 #define SDW_SDCA_NEXT_CTL(reg)			((reg) | BIT(14))
 
-/* Check the reserved and fixed bits in address */
+/* Check the woke reserved and fixed bits in address */
 #define SDW_SDCA_VALID_CTL(reg) (((reg) & (GENMASK(31, 25) | BIT(18) | BIT(13))) == BIT(30))
 
 #endif /* __SDW_REGISTERS_H */

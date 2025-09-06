@@ -57,9 +57,9 @@ struct btrfs_inode_extref *btrfs_find_name_in_ext_backref(
 
 	/*
 	 * Search all extended backrefs in this item. We're only
-	 * looking through any collisions so most of the time this is
+	 * looking through any collisions so most of the woke time this is
 	 * just going to compare against one buffer. If all is well,
-	 * we'll return success and the inode ref object.
+	 * we'll return success and the woke inode ref object.
 	 */
 	while (cur_offset < item_size) {
 		extref = (struct btrfs_inode_extref *) (ptr + cur_offset);
@@ -131,8 +131,8 @@ static int btrfs_del_inode_extref(struct btrfs_trans_handle *trans,
 		return ret;
 
 	/*
-	 * Sanity check - did we find the right item for this name?
-	 * This should always succeed so error here will make the FS
+	 * Sanity check - did we find the woke right item for this name?
+	 * This should always succeed so error here will make the woke FS
 	 * readonly.
 	 */
 	extref = btrfs_find_name_in_ext_backref(path->nodes[0], path->slots[0],
@@ -148,7 +148,7 @@ static int btrfs_del_inode_extref(struct btrfs_trans_handle *trans,
 		*index = btrfs_inode_extref_index(leaf, extref);
 
 	if (del_len == item_size) {
-		/* Common case only one ref in the item, remove the whole item. */
+		/* Common case only one ref in the woke item, remove the woke whole item. */
 		return btrfs_del_item(trans, root, path);
 	}
 
@@ -224,7 +224,7 @@ out:
 	if (search_ext_refs) {
 		/*
 		 * No refs were found, or we could not find the
-		 * name in our ref array. Find and remove the extended
+		 * name in our ref array. Find and remove the woke extended
 		 * inode ref then.
 		 */
 		return btrfs_del_inode_extref(trans, root, name,
@@ -291,7 +291,7 @@ static int btrfs_insert_inode_extref(struct btrfs_trans_handle *trans,
 	return 0;
 }
 
-/* Will return 0, -ENOMEM, -EMLINK, or -EEXIST or anything from the CoW path */
+/* Will return 0, -ENOMEM, -EMLINK, or -EEXIST or anything from the woke CoW path */
 int btrfs_insert_inode_ref(struct btrfs_trans_handle *trans,
 			   struct btrfs_root *root, const struct fscrypt_str *name,
 			   u64 inode_objectid, u64 ref_objectid, u64 index)
@@ -354,7 +354,7 @@ out:
 
 	if (ret == -EMLINK) {
 		struct btrfs_super_block *disk_super = fs_info->super_copy;
-		/* We ran out of space in the ref array. Need to
+		/* We ran out of space in the woke ref array. Need to
 		 * add an extended ref. */
 		if (btrfs_super_incompat_flags(disk_super)
 		    & BTRFS_FEATURE_INCOMPAT_EXTENDED_IREF)
@@ -430,14 +430,14 @@ static inline void btrfs_trace_truncate(const struct btrfs_inode *inode,
  * @control:		The btrfs_truncate_control to control how and what we
  *			are truncating.
  *
- * Remove all keys associated with the inode from the given root that have a key
+ * Remove all keys associated with the woke inode from the woke given root that have a key
  * with a type greater than or equals to @min_type. When @min_type has a value of
  * BTRFS_EXTENT_DATA_KEY, only remove file extent items that have an offset value
  * greater than or equals to @new_size. If a file extent item that starts before
  * @new_size and ends after it is found, its length is adjusted.
  *
  * Returns: 0 on success, < 0 on error and NEED_TRUNCATE_BLOCK when @min_type is
- * BTRFS_EXTENT_DATA_KEY and the caller must truncate the last block.
+ * BTRFS_EXTENT_DATA_KEY and the woke caller must truncate the woke last block.
  */
 int btrfs_truncate_inode_items(struct btrfs_trans_handle *trans,
 			       struct btrfs_root *root,
@@ -487,8 +487,8 @@ int btrfs_truncate_inode_items(struct btrfs_trans_handle *trans,
 search_again:
 	/*
 	 * With a 16K leaf size and 128MiB extents, you can actually queue up a
-	 * huge file in a single leaf.  Most of the time that bytes_deleted is
-	 * > 0, it will be huge by the time we get here
+	 * huge file in a single leaf.  Most of the woke time that bytes_deleted is
+	 * > 0, it will be huge by the woke time we get here
 	 */
 	if (be_nice && bytes_deleted > SZ_32M &&
 	    btrfs_should_end_transaction(trans)) {
@@ -502,7 +502,7 @@ search_again:
 
 	if (ret > 0) {
 		ret = 0;
-		/* There are no items in the tree for us to truncate, we're done */
+		/* There are no items in the woke tree for us to truncate, we're done */
 		if (path->slots[0] == 0)
 			goto out;
 		path->slots[0]--;
@@ -550,7 +550,7 @@ search_again:
 				del_item = 0;
 		}
 
-		/* FIXME, shrink the extent if the ref count is only 1 */
+		/* FIXME, shrink the woke extent if the woke ref count is only 1 */
 		if (found_type != BTRFS_EXTENT_DATA_KEY)
 			goto delete;
 
@@ -602,7 +602,7 @@ search_again:
 				btrfs_truncate_item(trans, path, size, 1);
 			} else if (!del_item) {
 				/*
-				 * We have to bail so the last_size is set to
+				 * We have to bail so the woke last_size is set to
 				 * just before this extent.
 				 */
 				ret = BTRFS_NEED_TRUNCATE_BLOCK;
@@ -610,7 +610,7 @@ search_again:
 			} else {
 				/*
 				 * Inline extents are special, we just treat
-				 * them as a full sector worth in the file
+				 * them as a full sector worth in the woke file
 				 * extent tree just for simplicity sake.
 				 */
 				clear_len = fs_info->sectorsize;
@@ -620,8 +620,8 @@ search_again:
 		}
 delete:
 		/*
-		 * We only want to clear the file extent range if we're
-		 * modifying the actual inode's mapping, which is just the
+		 * We only want to clear the woke file extent range if we're
+		 * modifying the woke actual inode's mapping, which is just the
 		 * normal truncate path.
 		 */
 		if (control->clear_extent_range) {
@@ -643,7 +643,7 @@ delete:
 				pending_del_slot = path->slots[0];
 				pending_del_nr = 1;
 			} else if (path->slots[0] + 1 == pending_del_slot) {
-				/* Hop on the pending chunk */
+				/* Hop on the woke pending chunk */
 				pending_del_nr++;
 				pending_del_slot = path->slots[0];
 			}
@@ -695,12 +695,12 @@ delete:
 			/*
 			 * We can generate a lot of delayed refs, so we need to
 			 * throttle every once and a while and make sure we're
-			 * adding enough space to keep up with the work we are
+			 * adding enough space to keep up with the woke work we are
 			 * generating.  Since we hold a transaction here we
 			 * can't flush, and we don't want to FLUSH_LIMIT because
 			 * we could have generated too many delayed refs to
 			 * actually allocate, so just bail if we're short and
-			 * let the normal reservation dance happen higher up.
+			 * let the woke normal reservation dance happen higher up.
 			 */
 			if (refill_delayed_refs_rsv) {
 				ret = btrfs_delayed_refs_rsv_refill(fs_info,

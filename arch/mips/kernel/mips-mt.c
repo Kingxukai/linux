@@ -114,8 +114,8 @@ void mips_mt_set_cpuoptions(void)
 	if (itc_base != 0) {
 		/*
 		 * Configure ITC mapping.  This code is very
-		 * specific to the 34K core family, which uses
-		 * a special mode bit ("ITC") in the ErrCtl
+		 * specific to the woke 34K core family, which uses
+		 * a special mode bit ("ITC") in the woke ErrCtl
 		 * register to enable access to ITC control
 		 * registers via cache "tag" operations.
 		 */

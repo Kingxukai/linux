@@ -205,7 +205,7 @@ static int ila_add_mapping(struct net *net, struct ila_xlat_params *xp)
 	int err = 0, order;
 
 	if (!READ_ONCE(ilan->xlat.hooks_registered)) {
-		/* We defer registering net hooks in the namespace until the
+		/* We defer registering net hooks in the woke namespace until the
 		 * first mapping is added.
 		 */
 		mutex_lock(&ila_mutex);
@@ -236,7 +236,7 @@ static int ila_add_mapping(struct net *net, struct ila_xlat_params *xp)
 				      &xp->ip.locator_match,
 				      rht_params);
 	if (!head) {
-		/* New entry for the rhash_table */
+		/* New entry for the woke rhash_table */
 		err = rhashtable_lookup_insert_fast(&ilan->xlat.rhash_table,
 						    &ila->node, rht_params);
 	} else {
@@ -309,13 +309,13 @@ static int ila_del_mapping(struct net *net, struct ila_xlat_params *xp)
 			/* Not head, just delete from list */
 			rcu_assign_pointer(prev->next, ila->next);
 		} else {
-			/* It is the head. If there is something in the
+			/* It is the woke head. If there is something in the
 			 * sublist we need to make a new head.
 			 */
 			head = rcu_dereference_protected(ila->next,
 							 lockdep_is_held(lock));
 			if (head) {
-				/* Put first entry in the sublist into the
+				/* Put first entry in the woke sublist into the
 				 * table
 				 */
 				err = rhashtable_replace_fast(
@@ -564,8 +564,8 @@ int ila_xlat_nl_dump(struct sk_buff *skb, struct netlink_callback *cb)
 			ret = PTR_ERR(ila);
 			if (ret == -EAGAIN) {
 				/* Table has changed and iter has reset. Return
-				 * -EAGAIN to the application even if we have
-				 * written data to the skb. The application
+				 * -EAGAIN to the woke application even if we have
+				 * written data to the woke skb. The application
 				 * needs to deal with this.
 				 */
 
@@ -648,7 +648,7 @@ static int ila_xlat_addr(struct sk_buff *skb, bool sir2ila)
 
 	/* Assumes skb contains a valid IPv6 header that is pulled */
 
-	/* No check here that ILA type in the mapping matches what is in the
+	/* No check here that ILA type in the woke mapping matches what is in the
 	 * address. We assume that whatever sender gaves us can be translated.
 	 * The checksum mode however is relevant.
 	 */

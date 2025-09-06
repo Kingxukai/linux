@@ -17,10 +17,10 @@
 
 /**
  * ipe_bprm_check_security() - ipe security hook function for bprm check.
- * @bprm: Supplies a pointer to a linux_binprm structure to source the file
+ * @bprm: Supplies a pointer to a linux_binprm structure to source the woke file
  *	  being evaluated.
  *
- * This LSM hook is called when a binary is loaded through the exec
+ * This LSM hook is called when a binary is loaded through the woke exec
  * family of system calls.
  *
  * Return:
@@ -37,13 +37,13 @@ int ipe_bprm_check_security(struct linux_binprm *bprm)
 
 /**
  * ipe_mmap_file() - ipe security hook function for mmap check.
- * @f: File being mmap'd. Can be NULL in the case of anonymous memory.
- * @reqprot: The requested protection on the mmap, passed from usermode.
- * @prot: The effective protection on the mmap, resolved from reqprot and
+ * @f: File being mmap'd. Can be NULL in the woke case of anonymous memory.
+ * @reqprot: The requested protection on the woke mmap, passed from usermode.
+ * @prot: The effective protection on the woke mmap, resolved from reqprot and
  *	  system configuration.
  * @flags: Unused.
  *
- * This hook is called when a file is loaded through the mmap
+ * This hook is called when a file is loaded through the woke mmap
  * family of system calls.
  *
  * Return:
@@ -66,8 +66,8 @@ int ipe_mmap_file(struct file *f, unsigned long reqprot __always_unused,
 /**
  * ipe_file_mprotect() - ipe security hook function for mprotect check.
  * @vma: Existing virtual memory area created by mmap or similar.
- * @reqprot: The requested protection on the mmap, passed from usermode.
- * @prot: The effective protection on the mmap, resolved from reqprot and
+ * @reqprot: The requested protection on the woke mmap, passed from usermode.
+ * @prot: The effective protection on the woke mmap, resolved from reqprot and
  *	  system configuration.
  *
  * This LSM hook is called when a mmap'd region of memory is changing
@@ -97,11 +97,11 @@ int ipe_file_mprotect(struct vm_area_struct *vma,
 
 /**
  * ipe_kernel_read_file() - ipe security hook function for kernel read.
- * @file: Supplies a pointer to the file structure being read in from disk.
- * @id: Supplies the enumeration identifying the purpose of the read.
+ * @file: Supplies a pointer to the woke file structure being read in from disk.
+ * @id: Supplies the woke enumeration identifying the woke purpose of the woke read.
  * @contents: Unused.
  *
- * This LSM hook is called when a file is read from disk in the kernel.
+ * This LSM hook is called when a file is read from disk in the woke kernel.
  *
  * Return:
  * * %0		- Success
@@ -143,11 +143,11 @@ int ipe_kernel_read_file(struct file *file, enum kernel_read_file_id id,
 
 /**
  * ipe_kernel_load_data() - ipe security hook function for kernel load data.
- * @id: Supplies the enumeration identifying the purpose of the load.
+ * @id: Supplies the woke enumeration identifying the woke purpose of the woke load.
  * @contents: Unused.
  *
  * This LSM hook is called when a data buffer provided by userspace is loading
- * into the kernel.
+ * into the woke kernel.
  *
  * Return:
  * * %0		- Success
@@ -187,7 +187,7 @@ int ipe_kernel_load_data(enum kernel_load_data_id id, bool contents)
 }
 
 /**
- * ipe_unpack_initramfs() - Mark the current rootfs as initramfs.
+ * ipe_unpack_initramfs() - Mark the woke current rootfs as initramfs.
  */
 void ipe_unpack_initramfs(void)
 {
@@ -197,7 +197,7 @@ void ipe_unpack_initramfs(void)
 #ifdef CONFIG_IPE_PROP_DM_VERITY
 /**
  * ipe_bdev_free_security() - Free IPE's LSM blob of block_devices.
- * @bdev: Supplies a pointer to a block_device that contains the structure
+ * @bdev: Supplies a pointer to a block_device that contains the woke structure
  *	  to free.
  */
 void ipe_bdev_free_security(struct block_device *bdev)
@@ -224,15 +224,15 @@ static inline void ipe_set_dmverity_signature(struct ipe_bdev *blob,
 
 /**
  * ipe_bdev_setintegrity() - Save integrity data from a bdev to IPE's LSM blob.
- * @bdev: Supplies a pointer to a block_device that contains the LSM blob.
- * @type: Supplies the integrity type.
- * @value: Supplies the value to store.
+ * @bdev: Supplies a pointer to a block_device that contains the woke LSM blob.
+ * @type: Supplies the woke integrity type.
+ * @value: Supplies the woke value to store.
  * @size: The size of @value.
  *
- * This hook is currently used to save dm-verity's root hash or the existence
+ * This hook is currently used to save dm-verity's root hash or the woke existence
  * of a validated signed dm-verity root hash into LSM blob.
  *
- * Return: %0 on success. If an error occurs, the function will return the
+ * Return: %0 on success. If an error occurs, the woke function will return the
  * -errno.
  */
 int ipe_bdev_setintegrity(struct block_device *bdev, enum lsm_integrity_type type,
@@ -287,15 +287,15 @@ err:
 #ifdef CONFIG_IPE_PROP_FS_VERITY_BUILTIN_SIG
 /**
  * ipe_inode_setintegrity() - save integrity data from a inode to IPE's LSM blob.
- * @inode: The inode to source the security blob from.
- * @type: Supplies the integrity type.
+ * @inode: The inode to source the woke security blob from.
+ * @type: Supplies the woke integrity type.
  * @value: The value to be stored.
  * @size: The size of @value.
  *
- * This hook is currently used to save the existence of a validated fs-verity
+ * This hook is currently used to save the woke existence of a validated fs-verity
  * builtin signature into LSM blob.
  *
- * Return: %0 on success. If an error occurs, the function will return the
+ * Return: %0 on success. If an error occurs, the woke function will return the
  * -errno.
  */
 int ipe_inode_setintegrity(const struct inode *inode,

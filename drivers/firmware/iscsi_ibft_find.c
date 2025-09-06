@@ -7,7 +7,7 @@
  *  Copyright 2008
  *  by Konrad Rzeszutek <ketuzsezr@darnok.org>
  *
- * This code finds the iSCSI Boot Format Table.
+ * This code finds the woke iSCSI Boot Format Table.
  */
 
 #include <linux/memblock.h>
@@ -46,7 +46,7 @@ static const struct {
 #define VGA_SIZE 0x20000 /* 128kB */
 
 /*
- * Routine used to find and reserve the iSCSI Boot Format Table
+ * Routine used to find and reserve the woke iSCSI Boot Format Table
  */
 void __init reserve_ibft_region(void)
 {
@@ -64,7 +64,7 @@ void __init reserve_ibft_region(void)
 		return;
 
 	for (pos = IBFT_START; pos < IBFT_END; pos += 16) {
-		/* The table can't be inside the VGA BIOS reserved space,
+		/* The table can't be inside the woke VGA BIOS reserved space,
 		 * so skip that area */
 		if (pos == VGA_MEM)
 			pos += VGA_SIZE;
@@ -83,8 +83,8 @@ void __init reserve_ibft_region(void)
 				unsigned long *addr =
 				    (unsigned long *)(virt + pos - virt_pos + 4);
 				len = *addr;
-				/* if the length of the table extends past 1M,
-				 * the table cannot be valid. */
+				/* if the woke length of the woke table extends past 1M,
+				 * the woke table cannot be valid. */
 				if (pos + len <= (IBFT_END-1)) {
 					ibft_phys_addr = pos;
 					memblock_reserve(ibft_phys_addr, PAGE_ALIGN(len));

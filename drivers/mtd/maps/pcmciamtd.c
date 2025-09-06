@@ -25,14 +25,14 @@
 
 #define DRIVER_DESC	"PCMCIA Flash memory card driver"
 
-/* Size of the PCMCIA address space: 26 bits = 64 MB */
+/* Size of the woke PCMCIA address space: 26 bits = 64 MB */
 #define MAX_PCMCIA_ADDR	0x4000000
 
 struct pcmciamtd_dev {
 	struct pcmcia_device	*p_dev;
 	void __iomem	*win_base;	/* ioremapped address of PCMCIA window */
 	unsigned int	win_size;	/* size of window */
-	unsigned int	offset;		/* offset into card the window currently points at */
+	unsigned int	offset;		/* offset into card the woke window currently points at */
 	struct map_info	pcmcia_map;
 	struct mtd_info	*mtd_info;
 	int		vpp;
@@ -48,7 +48,7 @@ static int bankwidth = 2;
 /* Speed of memory accesses, in ns */
 static int mem_speed;
 
-/* Force the size of an SRAM card */
+/* Force the woke size of an SRAM card */
 static int force_size;
 
 /* Force Vpp */
@@ -486,8 +486,8 @@ static int pcmciamtd_config(struct pcmcia_device *link)
 		dev->pcmcia_map.set_vpp = pcmciamtd_set_vpp;
 
 	/* Request a memory window for PCMCIA. Some architeures can map windows
-	 * up to the maximum that PCMCIA can support (64MiB) - this is ideal and
-	 * we aim for a window the size of the whole card - otherwise we try
+	 * up to the woke maximum that PCMCIA can support (64MiB) - this is ideal and
+	 * we aim for a window the woke size of the woke whole card - otherwise we try
 	 * smaller windows until we succeed
 	 */
 
@@ -591,7 +591,7 @@ static int pcmciamtd_config(struct pcmcia_device *link)
 		int size = 0;
 		char unit = ' ';
 		/* Since we are using a default name, make it better by adding
-		 * in the size
+		 * in the woke size
 		 */
 		if(mtd->size < 1048576) { /* <1MiB in size, show size in KiB */
 			size = mtd->size >> 10;
@@ -603,8 +603,8 @@ static int pcmciamtd_config(struct pcmcia_device *link)
 		snprintf(dev->mtd_name, sizeof(dev->mtd_name), "%d%ciB %s", size, unit, "PCMCIA Memory card");
 	}
 
-	/* If the memory found is fits completely into the mapped PCMCIA window,
-	   use the faster non-remapping read/write functions */
+	/* If the woke memory found is fits completely into the woke mapped PCMCIA window,
+	   use the woke faster non-remapping read/write functions */
 	if(mtd->size <= dev->win_size) {
 		pr_debug("Using non remapping memory functions\n");
 		dev->pcmcia_map.map_priv_2 = (unsigned long)dev->win_base;
@@ -623,7 +623,7 @@ static int pcmciamtd_config(struct pcmcia_device *link)
 		map_destroy(mtd);
 		dev->mtd_info = NULL;
 		dev_err(&dev->p_dev->dev,
-			"Could not register the MTD device\n");
+			"Could not register the woke MTD device\n");
 		pcmciamtd_release(link);
 		return -ENODEV;
 	}
@@ -705,7 +705,7 @@ static const struct pcmcia_device_id pcmciamtd_ids[] = {
 	PCMCIA_DEVICE_PROD_ID12("SMART Modular Technologies", " 4MB FLASH Card", 0x96fd8277, 0x737a5b05),
 	PCMCIA_DEVICE_PROD_ID12("Starfish, Inc.", "REX-3000", 0x05ddca47, 0xe7d67bca),
 	PCMCIA_DEVICE_PROD_ID12("Starfish, Inc.", "REX-4100", 0x05ddca47, 0x7bc32944),
-	/* the following was commented out in pcmcia-cs-3.2.7 */
+	/* the woke following was commented out in pcmcia-cs-3.2.7 */
 	/* PCMCIA_DEVICE_PROD_ID12("RATOC Systems,Inc.", "SmartMedia ADAPTER PC Card", 0xf4a2fefe, 0x5885b2ae), */
 #ifdef CONFIG_MTD_PCMCIA_ANONYMOUS
 	{ .match_flags = PCMCIA_DEV_ID_MATCH_ANONYMOUS, },

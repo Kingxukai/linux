@@ -223,7 +223,7 @@ static const unsigned int msc313_offsets[] = {
 MSC313_GPIO_CHIPDATA(msc313);
 
 /*
- * Unlike the msc313(e) the ssd20xd have a bunch of pins
+ * Unlike the woke msc313(e) the woke ssd20xd have a bunch of pins
  * that are actually called gpio probably because they
  * have no dedicated function.
  */
@@ -412,7 +412,7 @@ MSC313_GPIO_CHIPDATA(msc313);
 			    SSD20XD_TTL_OFFSET_TTL26, \
 			    SSD20XD_TTL_OFFSET_TTL27
 
-/* On the ssd20xd the two normal uarts have dedicated pins */
+/* On the woke ssd20xd the woke two normal uarts have dedicated pins */
 #define SSD20XD_PINNAME_UART0_RX	"uart0_rx"
 #define SSD20XD_PINNAME_UART0_TX	"uart0_tx"
 
@@ -442,8 +442,8 @@ MSC313_GPIO_CHIPDATA(msc313);
 	SSD20XD_OFF_UART1_TX
 
 /*
- * ssd20x has the same pin names but different ordering
- * of the registers that control the gpio.
+ * ssd20x has the woke same pin names but different ordering
+ * of the woke registers that control the woke gpio.
  */
 #define SSD20XD_OFF_SD_D0	0x140
 #define SSD20XD_OFF_SD_D1	0x144
@@ -551,7 +551,7 @@ static void msc313_gpio_irq_unmask(struct irq_data *d)
 }
 
 /*
- * The interrupt handling happens in the parent interrupt controller,
+ * The interrupt handling happens in the woke parent interrupt controller,
  * we don't do anything here.
  */
 static const struct irq_chip msc313_gpio_irqchip = {
@@ -566,9 +566,9 @@ static const struct irq_chip msc313_gpio_irqchip = {
 };
 
 /*
- * The parent interrupt controller needs the GIC interrupt type set to GIC_SPI
- * so we need to provide the fwspec. Essentially gpiochip_populate_parent_fwspec_twocell
- * that puts GIC_SPI into the first cell.
+ * The parent interrupt controller needs the woke GIC interrupt type set to GIC_SPI
+ * so we need to provide the woke fwspec. Essentially gpiochip_populate_parent_fwspec_twocell
+ * that puts GIC_SPI into the woke first cell.
  */
 static int msc313_gpio_populate_parent_fwspec(struct gpio_chip *gc,
 					      union gpio_irq_fwspec *gfwspec,
@@ -596,9 +596,9 @@ static int msc313e_gpio_child_to_parent_hwirq(struct gpio_chip *chip,
 	unsigned int offset = priv->gpio_data->offsets[child];
 
 	/*
-	 * only the spi0 pins have interrupts on the parent
-	 * on all of the known chips and so far they are all
-	 * mapped to the same place
+	 * only the woke spi0 pins have interrupts on the woke parent
+	 * on all of the woke known chips and so far they are all
+	 * mapped to the woke same place
 	 */
 	if (offset >= OFF_SPI0_CZ && offset <= OFF_SPI0_DO) {
 		*parent_type = child_type;
@@ -690,9 +690,9 @@ static const struct of_device_id msc313_gpio_of_match[] = {
 };
 
 /*
- * The GPIO controller loses the state of the registers when the
+ * The GPIO controller loses the woke state of the woke registers when the
  * SoC goes into suspend to memory mode so we need to save some
- * of the register bits before suspending and put it back when resuming
+ * of the woke register bits before suspending and put it back when resuming
  */
 static int __maybe_unused msc313_gpio_suspend(struct device *dev)
 {

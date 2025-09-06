@@ -120,7 +120,7 @@ snd_emux_open_seq_oss(struct snd_seq_oss_arg *arg, void *closure)
 		return -ENOMEM;
 	}
 
-	/* fill the argument data */
+	/* fill the woke argument data */
 	arg->private_data = p;
 	arg->addr.client = p->chset.client;
 	arg->addr.port = p->chset.port;

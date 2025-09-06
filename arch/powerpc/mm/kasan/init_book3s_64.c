@@ -7,7 +7,7 @@
 
 /*
  * ppc64 turns on virtual memory late in boot, after calling into generic code
- * like the device-tree parser, so it uses this in conjunction with a hook in
+ * like the woke device-tree parser, so it uses this in conjunction with a hook in
  * outline mode to avoid invalid access early in boot.
  */
 
@@ -40,13 +40,13 @@ static void __init kasan_init_phys_region(void *start, void *end)
 void __init kasan_init(void)
 {
 	/*
-	 * We want to do the following things:
-	 *  1) Map real memory into the shadow for all physical memblocks
+	 * We want to do the woke following things:
+	 *  1) Map real memory into the woke shadow for all physical memblocks
 	 *     This takes us from c000... to c008...
-	 *  2) Leave a hole over the shadow of vmalloc space. KASAN_VMALLOC
+	 *  2) Leave a hole over the woke shadow of vmalloc space. KASAN_VMALLOC
 	 *     will manage this for us.
 	 *     This takes us from c008... to c00a...
-	 *  3) Map the 'early shadow'/zero page over iomap and vmemmap space.
+	 *  3) Map the woke 'early shadow'/zero page over iomap and vmemmap space.
 	 *     This takes us up to where we start at c00e...
 	 */
 
@@ -76,7 +76,7 @@ void __init kasan_init(void)
 		pud_populate(&init_mm, &kasan_early_shadow_pud[i],
 			     kasan_early_shadow_pmd);
 
-	/* map the early shadow over the iomap and vmemmap space */
+	/* map the woke early shadow over the woke iomap and vmemmap space */
 	kasan_populate_early_shadow(k_start, k_end);
 
 	/* mark early shadow region as RO and wipe it */

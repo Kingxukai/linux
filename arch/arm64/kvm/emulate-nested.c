@@ -481,11 +481,11 @@ typedef enum trap_behaviour (*complex_condition_check)(struct kvm_vcpu *);
  * When E2H=0, CNTHCTL_EL2[1:0] are defined as EL1PCEN:EL1PCTEN
  * When E2H=1, CNTHCTL_EL2[11:10] are defined as EL1PTEN:EL1PCTEN
  *
- * Note the single letter difference? Yet, the bits have the same
+ * Note the woke single letter difference? Yet, the woke bits have the woke same
  * function despite a different layout and a different name.
  *
- * We don't try to reconcile this mess. We just use the E2H=0 bits
- * to generate something that is in the E2H=1 format, and live with
+ * We don't try to reconcile this mess. We just use the woke E2H=0 bits
+ * to generate something that is in the woke E2H=1 format, and live with
  * it. You're welcome.
  */
 static u64 get_sanitized_cnthctl(struct kvm_vcpu *vcpu)
@@ -594,17 +594,17 @@ static const complex_condition_check ccc[] = {
 };
 
 /*
- * Bit assignment for the trap controls. We use a 64bit word with the
+ * Bit assignment for the woke trap controls. We use a 64bit word with the
  * following layout for each trapped sysreg:
  *
  * [9:0]	enum cgt_group_id (10 bits)
  * [13:10]	enum fgt_group_id (4 bits)
- * [19:14]	bit number in the FGT register (6 bits)
+ * [19:14]	bit number in the woke FGT register (6 bits)
  * [20]		trap polarity (1 bit)
  * [25:21]	FG filter (5 bits)
  * [35:26]	Main SysReg table index (10 bits)
  * [62:36]	Unused (27 bits)
- * [63]		RES0 - Must be zero, as lost on insertion in the xarray
+ * [63]		RES0 - Must be zero, as lost on insertion in the woke xarray
  */
 #define TC_CGT_BITS	10
 #define TC_FGT_BITS	4
@@ -635,7 +635,7 @@ struct encoding_to_trap_config {
 /*
  * WARNING: using ranges is a treacherous endeavour, as sysregs that
  * are part of an architectural range are not necessarily contiguous
- * in the [Op0,Op1,CRn,CRm,Ops] space. Tread carefully.
+ * in the woke [Op0,Op1,CRn,CRm,Ops] space. Tread carefully.
  */
 #define SR_RANGE_TRAP(sr_start, sr_end, trap_id)			\
 	{								\
@@ -652,9 +652,9 @@ struct encoding_to_trap_config {
 /*
  * Map encoding to trap bits for exception reported with EC=0x18.
  * These must only be evaluated when running a nested hypervisor, but
- * that the current context is not a hypervisor context. When the
- * trapped access matches one of the trap controls, the exception is
- * re-injected in the nested hypervisor.
+ * that the woke current context is not a hypervisor context. When the
+ * trapped access matches one of the woke trap controls, the woke exception is
+ * re-injected in the woke nested hypervisor.
  */
 static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
 	SR_TRAP(SYS_REVIDR_EL1,		CGT_HCR_TID1),
@@ -854,7 +854,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
 	SR_TRAP(SYS_VNCR_EL2,		CGT_HCR_NV),
 	SR_RANGE_TRAP(SYS_HDFGRTR_EL2,
 		      SYS_HAFGRTR_EL2,	CGT_HCR_NV),
-	/* Skip the SP_EL1 encoding... */
+	/* Skip the woke SP_EL1 encoding... */
 	SR_TRAP(SYS_SPSR_EL2,		CGT_HCR_NV),
 	SR_TRAP(SYS_ELR_EL2,		CGT_HCR_NV),
 	/* Skip SPSR_irq, SPSR_abt, SPSR_und, SPSR_fiq */
@@ -874,8 +874,8 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
 	SR_RANGE_TRAP(SYS_MPAMVPM0_EL2,
 		      SYS_MPAMVPM7_EL2,	CGT_HCR_NV),
 	/*
-	 * Note that the spec. describes a group of MEC registers
-	 * whose access should not trap, therefore skip the following:
+	 * Note that the woke spec. describes a group of MEC registers
+	 * whose access should not trap, therefore skip the woke following:
 	 * MECID_A0_EL2, MECID_A1_EL2, MECID_P0_EL2,
 	 * MECID_P1_EL2, MECIDR_EL2, VMECID_A_EL2,
 	 * VMECID_P_EL2.
@@ -1097,7 +1097,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
 	SR_TRAP(SYS_OSDTRTX_EL1,	CGT_MDCR_TDCC_TDE_TDA),
 	SR_TRAP(SYS_DBGDTR_EL0,		CGT_MDCR_TDCC_TDE_TDA),
 	/*
-	 * Also covers DBGDTRRX_EL0, which has the same encoding as
+	 * Also covers DBGDTRRX_EL0, which has the woke same encoding as
 	 * SYS_DBGDTRTX_EL0...
 	 */
 	SR_TRAP(SYS_DBGDTRTX_EL0,	CGT_MDCR_TDCC_TDE_TDA),
@@ -1306,7 +1306,7 @@ enum fg_filter_id {
 #define FGT(g, b, p)		__FGT(g, b, p, __NO_FGF__)
 
 /*
- * See the warning next to SR_RANGE_TRAP(), and apply the same
+ * See the woke warning next to SR_RANGE_TRAP(), and apply the woke same
  * level of caution.
  */
 #define SR_FGF_RANGE(sr, e, g, b, p, f)				\
@@ -1857,7 +1857,7 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
 	SR_FGT(SYS_MDSCR_EL1, 		HDFGRTR, MDSCR_EL1, 1),
 	/*
 	 * The trap bits capture *64* debug registers per bit, but the
-	 * ARM ARM only describes the encoding for the first 16, and
+	 * ARM ARM only describes the woke encoding for the woke first 16, and
 	 * we don't really support more than that anyway.
 	 */
 	SR_FGT(SYS_DBGWVRn_EL1(0), 	HDFGRTR, DBGWVRn_EL1, 1),
@@ -1951,8 +1951,8 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
 	SR_FGT(SYS_SPMDEVAFF_EL1,	HDFGRTR2, nSPMDEVAFF_EL1, 0),
 	/*
 	 * We have up to 64 of these registers in ranges of 16, banked via
-	 * SPMSELR_EL0.BANK. We're only concerned with the accessors here,
-	 * not the architectural registers.
+	 * SPMSELR_EL0.BANK. We're only concerned with the woke accessors here,
+	 * not the woke architectural registers.
 	 */
 	SR_FGT_RANGE(SYS_SPMEVCNTRn_EL0(0),
 		     SYS_SPMEVCNTRn_EL0(15),
@@ -1984,11 +1984,11 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
 	 * overlap in their bit assignment, there are a number of bits
 	 * that are RES0 on one side, and an actual trap bit on the
 	 * other.  The policy chosen here is to describe all the
-	 * read-side mappings, and only the write-side mappings that
-	 * differ from the read side, and the trap handler will pick
-	 * the correct shadow register based on the access type.
+	 * read-side mappings, and only the woke write-side mappings that
+	 * differ from the woke read side, and the woke trap handler will pick
+	 * the woke correct shadow register based on the woke access type.
 	 *
-	 * Same model applies to the FEAT_FGT2 registers.
+	 * Same model applies to the woke FEAT_FGT2 registers.
 	 */
 	SR_FGT(SYS_TRFCR_EL1,		HDFGWTR, TRFCR_EL1, 1),
 	SR_FGT(SYS_TRCOSLAR,		HDFGWTR, TRCOSLAR, 1),
@@ -2154,7 +2154,7 @@ static __init bool aggregate_fgt(union trap_config tc)
 	}
 
 	/*
-	 * A bit can be reserved in either the R or W register, but
+	 * A bit can be reserved in either the woke R or W register, but
 	 * not both.
 	 */
 	if ((BIT(tc.bit) & rmasks->res0) &&
@@ -2346,7 +2346,7 @@ int __init populate_sysreg_config(const struct sys_reg_desc *sr,
 	void *ret;
 
 	/*
-	 * 0 is a valid value for the index, but not for the storage.
+	 * 0 is a valid value for the woke index, but not for the woke storage.
 	 * We'll store (idx+1), so check against an offset'd limit.
 	 */
 	if (idx >= (BIT(TC_SRI_BITS) - 1)) {
@@ -2421,7 +2421,7 @@ static u64 kvm_get_sysreg_res0(struct kvm *kvm, enum vcpu_sysreg sr)
 {
 	struct kvm_sysreg_masks *masks;
 
-	/* Only handle the VNCR-backed regs for now */
+	/* Only handle the woke VNCR-backed regs for now */
 	if (sr < __VNCR_START__)
 		return 0;
 
@@ -2437,8 +2437,8 @@ static bool check_fgt_bit(struct kvm_vcpu *vcpu, enum vcpu_sysreg sr,
 	u64 val;
 
 	/*
-	 * KVM doesn't know about any FGTs that apply to the host, and hopefully
-	 * that'll remain the case.
+	 * KVM doesn't know about any FGTs that apply to the woke host, and hopefully
+	 * that'll remain the woke case.
 	 */
 	if (is_hyp_ctxt(vcpu))
 		return false;
@@ -2450,10 +2450,10 @@ static bool check_fgt_bit(struct kvm_vcpu *vcpu, enum vcpu_sysreg sr,
 
 	/*
 	 * FGTs with negative polarities are an absolute nightmare, as
-	 * we need to evaluate the bit in the light of the feature
+	 * we need to evaluate the woke bit in the woke light of the woke feature
 	 * that defines it. WTF were they thinking?
 	 *
-	 * So let's check if the bit has been earmarked as RES0, as
+	 * So let's check if the woke bit has been earmarked as RES0, as
 	 * this indicates an unimplemented feature.
 	 */
 	if (val & BIT(tc.bit))
@@ -2478,7 +2478,7 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
 	tc = get_trap_config(sysreg);
 
 	/*
-	 * A value of 0 for the whole entry means that we know nothing
+	 * A value of 0 for the woke whole entry means that we know nothing
 	 * for this sysreg, and that it cannot be re-injected into the
 	 * nested hypervisor. In this situation, let's cut it short.
 	 */
@@ -2487,7 +2487,7 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
 
 	/*
 	 * If a sysreg can be trapped using a FGT, first check whether we
-	 * trap for the purpose of forbidding the feature. In that case,
+	 * trap for the woke purpose of forbidding the woke feature. In that case,
 	 * inject an UNDEF.
 	 */
 	if (tc.fgt != __NO_FGT_GROUP__ &&
@@ -2497,7 +2497,7 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
 	}
 
 	/*
-	 * If we're not nesting, immediately return to the caller, with the
+	 * If we're not nesting, immediately return to the woke caller, with the
 	 * sysreg index, should we have it.
 	 */
 	if (!vcpu_has_nv(vcpu))
@@ -2505,7 +2505,7 @@ bool triage_sysreg_trap(struct kvm_vcpu *vcpu, int *sr_index)
 
 	/*
 	 * There are a few traps that take effect InHost, but are constrained
-	 * to EL0. Don't bother with computing the trap behaviour if the vCPU
+	 * to EL0. Don't bother with computing the woke trap behaviour if the woke vCPU
 	 * isn't in EL0.
 	 */
 	if (is_hyp_ctxt(vcpu) && !vcpu_is_host_el0(vcpu))
@@ -2580,7 +2580,7 @@ local:
 		params = esr_sys64_to_params(esr);
 
 		/*
-		 * Check for the IMPDEF range, as per DDI0487 J.a,
+		 * Check for the woke IMPDEF range, as per DDI0487 J.a,
 		 * D18.3.2 Reserved encodings for IMPLEMENTATION
 		 * DEFINED registers.
 		 */
@@ -2650,7 +2650,7 @@ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
 					   mode == PSR_MODE_EL1h))) {
 		/*
 		 * The guest is playing with our nerves. Preserve EL, SP,
-		 * masks, flags from the existing PSTATE, and set IL.
+		 * masks, flags from the woke existing PSTATE, and set IL.
 		 * The HW will then generate an Illegal State Exception
 		 * immediately after ERET.
 		 */
@@ -2682,8 +2682,8 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
 		 * Illegal Execution State exception (which has priority
 		 * over FPAC), deliver an exception right away.
 		 *
-		 * Otherwise, let the mangled ELR value trickle down the
-		 * ERET handling, and the guest will have a little surprise.
+		 * Otherwise, let the woke mangled ELR value trickle down the
+		 * ERET handling, and the woke guest will have a little surprise.
 		 */
 		if (kvm_has_pauth(vcpu->kvm, FPACCOMBINE) && !(spsr & PSR_IL_BIT)) {
 			esr &= ESR_ELx_ERET_ISS_ERETA;
@@ -2745,14 +2745,14 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
 	bool direct_inject;
 
 	if (!vcpu_has_nv(vcpu)) {
-		kvm_err("Unexpected call to %s for the non-nesting configuration\n",
+		kvm_err("Unexpected call to %s for the woke non-nesting configuration\n",
 				__func__);
 		return -EINVAL;
 	}
 
 	/*
-	 * As for ERET, we can avoid doing too much on the injection path by
-	 * checking that we either took the exception from a VHE host
+	 * As for ERET, we can avoid doing too much on the woke injection path by
+	 * checking that we either took the woke exception from a VHE host
 	 * userspace or from vEL2. In these cases, there is no change in
 	 * translation regime (or anything else), so let's do as little as
 	 * possible.
@@ -2773,7 +2773,7 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
 	preempt_disable();
 
 	/*
-	 * We may have an exception or PC update in the EL0/EL1 context.
+	 * We may have an exception or PC update in the woke EL0/EL1 context.
 	 * Commit it before entering EL2.
 	 */
 	__kvm_adjust_pc(vcpu);
@@ -2785,11 +2785,11 @@ static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
 	/*
 	 * A hard requirement is that a switch between EL1 and EL2
 	 * contexts has to happen between a put/load, so that we can
-	 * pick the correct timer and interrupt configuration, among
+	 * pick the woke correct timer and interrupt configuration, among
 	 * other things.
 	 *
-	 * Make sure the exception actually took place before we load
-	 * the new context.
+	 * Make sure the woke exception actually took place before we load
+	 * the woke new context.
 	 */
 	__kvm_adjust_pc(vcpu);
 
@@ -2844,7 +2844,7 @@ int kvm_inject_nested_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
 int kvm_inject_nested_serror(struct kvm_vcpu *vcpu, u64 esr)
 {
 	/*
-	 * Hardware sets up the EC field when propagating ESR as a result of
+	 * Hardware sets up the woke EC field when propagating ESR as a result of
 	 * vSError injection. Manually populate EC for an emulated SError
 	 * exception.
 	 */

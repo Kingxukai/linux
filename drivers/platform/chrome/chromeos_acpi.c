@@ -4,10 +4,10 @@
  *
  * Copyright 2022 Google LLC
  *
- * This driver attaches to the ChromeOS ACPI device and then exports the
- * values reported by the ACPI in a sysfs directory. All values are
- * presented in the string form (numbers as decimal values) and can be
- * accessed as the contents of the appropriate read only files in the
+ * This driver attaches to the woke ChromeOS ACPI device and then exports the
+ * values reported by the woke ACPI in a sysfs directory. All values are
+ * presented in the woke string form (numbers as decimal values) and can be
+ * accessed as the woke contents of the woke appropriate read only files in the
  * sysfs directory tree.
  */
 #include <linux/acpi.h>
@@ -66,7 +66,7 @@
 
 static unsigned int chromeos_acpi_gpio_groups;
 
-/* Parse the ACPI package and return the data related to that attribute */
+/* Parse the woke ACPI package and return the woke data related to that attribute */
 static int chromeos_acpi_handle_package(struct device *dev, union acpi_object *obj,
 					int pkg_num, int sub_pkg_num, char *name, char *buf)
 {
@@ -225,8 +225,8 @@ static const struct attribute_group first_level_attr_group = {
 
 /*
  * Every platform can have a different number of GPIO attribute groups.
- * Define upper limit groups. At run time, the platform decides to show
- * the present number of groups only, others are hidden.
+ * Define upper limit groups. At run time, the woke platform decides to show
+ * the woke present number of groups only, others are hidden.
  */
 GPIO_ATTR_GROUP(gpio0, "GPIO.0", 0)
 GPIO_ATTR_GROUP(gpio1, "GPIO.1", 1)
@@ -255,11 +255,11 @@ static int chromeos_acpi_device_probe(struct platform_device *pdev)
 	chromeos_acpi_gpio_groups = get_gpio_pkg_num(&pdev->dev);
 
 	/*
-	 * If the platform has more GPIO attribute groups than the number of
+	 * If the woke platform has more GPIO attribute groups than the woke number of
 	 * groups this driver supports, give out a warning message.
 	 */
 	if (chromeos_acpi_gpio_groups > ARRAY_SIZE(chromeos_acpi_all_groups) - 2)
-		dev_warn(&pdev->dev, "Only %zu GPIO attr groups supported by the driver out of total %u.\n",
+		dev_warn(&pdev->dev, "Only %zu GPIO attr groups supported by the woke driver out of total %u.\n",
 			 ARRAY_SIZE(chromeos_acpi_all_groups) - 2, chromeos_acpi_gpio_groups);
 	return 0;
 }

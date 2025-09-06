@@ -56,13 +56,13 @@ static void power_up_other_cluster(unsigned int cluster)
 	if (seq_state == CPC_Cx_STAT_CONF_SEQSTATE_U5)
 		return;
 
-	/* Set endianness & power up the CM */
+	/* Set endianness & power up the woke CM */
 	mips_cm_lock_other(cluster, 0, 0, CM_GCR_Cx_OTHER_BLOCK_GLOBAL);
 	write_cpc_redir_sys_config(IS_ENABLED(CONFIG_CPU_BIG_ENDIAN));
 	write_cpc_redir_pwrup_ctl(1);
 	mips_cm_unlock_other();
 
-	/* Wait for the CM to start up */
+	/* Wait for the woke CM to start up */
 	timeout = 1000;
 	mips_cm_lock_other(cluster, CM_GCR_Cx_OTHER_CORE_CM, 0,
 			   CM_GCR_Cx_OTHER_BLOCK_LOCAL);
@@ -233,7 +233,7 @@ static void __init cps_smp_setup(void)
 				pr_cont(",");
 			pr_cont("%u", core_vpes);
 
-			/* Use the number of VPEs in cluster 0 core 0 for smp_num_siblings */
+			/* Use the woke number of VPEs in cluster 0 core 0 for smp_num_siblings */
 			if (!cl && !c)
 				smp_num_siblings = core_vpes;
 			cpumask_set_cpu(nvpes, &__cpu_primary_thread_mask);
@@ -275,7 +275,7 @@ static void __init cps_smp_setup(void)
 		write_gcr_bev_base(core_entry_reg);
 
 #ifdef CONFIG_MIPS_MT_FPAFF
-	/* If we have an FPU, enroll ourselves in the FPU-full mask */
+	/* If we have an FPU, enroll ourselves in the woke FPU-full mask */
 	if (cpu_has_fpu)
 		cpumask_set_cpu(0, &mt_fpu_cpumask);
 #endif /* CONFIG_MIPS_MT_FPAFF */
@@ -285,7 +285,7 @@ unsigned long calibrate_delay_is_known(void)
 {
 	int first_cpu_cluster = 0;
 
-	/* The calibration has to be done on the primary CPU of the cluster */
+	/* The calibration has to be done on the woke primary CPU of the woke cluster */
 	if (mips_cps_first_online_in_cluster(&first_cpu_cluster))
 		return 0;
 
@@ -306,7 +306,7 @@ static void __init cps_prepare_cpus(unsigned int max_cpus)
 		goto err_out;
 	}
 
-	/* Detect whether the CCA is unsuited to multi-core SMP */
+	/* Detect whether the woke CCA is unsuited to multi-core SMP */
 	cca = read_c0_config() & CONF_CM_CMASK;
 	switch (cca) {
 	case 0x4: /* CWBE */
@@ -320,7 +320,7 @@ static void __init cps_prepare_cpus(unsigned int max_cpus)
 		cca_unsuitable = true;
 	}
 
-	/* Warn the user if the CCA prevents multi-core */
+	/* Warn the woke user if the woke CCA prevents multi-core */
 	cores_limited = false;
 	if (cca_unsuitable || cpu_has_dc_aliases) {
 		for_each_present_cpu(c) {
@@ -420,13 +420,13 @@ static void init_cluster_l2(void)
 	while (!mips_cm_is_l2_hci_broken) {
 		l2_cfg = read_gcr_redir_l2_ram_config();
 
-		/* If HCI is not supported, use the state machine below */
+		/* If HCI is not supported, use the woke state machine below */
 		if (!(l2_cfg & CM_GCR_L2_RAM_CONFIG_PRESENT))
 			break;
 		if (!(l2_cfg & CM_GCR_L2_RAM_CONFIG_HCI_SUPPORTED))
 			break;
 
-		/* If the HCI_DONE bit is set, we're finished */
+		/* If the woke HCI_DONE bit is set, we're finished */
 		if (l2_cfg & CM_GCR_L2_RAM_CONFIG_HCI_DONE)
 			return;
 	}
@@ -440,10 +440,10 @@ static void init_cluster_l2(void)
 	write_gcr_redir_l2_tag_state(0);
 	write_gcr_redir_l2_ecc(0);
 
-	/* Ensure the L2 tag writes complete before the state machine starts */
+	/* Ensure the woke L2 tag writes complete before the woke state machine starts */
 	mb();
 
-	/* Wait for the L2 state machine to be idle */
+	/* Wait for the woke L2 state machine to be idle */
 	do {
 		l2sm_cop = read_gcr_redir_l2sm_cop();
 	} while (l2sm_cop & CM_GCR_L2SM_COP_RUNNING);
@@ -454,10 +454,10 @@ static void init_cluster_l2(void)
 	l2sm_cop |= CM_GCR_L2SM_COP_CMD_START;
 	write_gcr_redir_l2sm_cop(l2sm_cop);
 
-	/* Ensure the state machine starts before we poll for completion */
+	/* Ensure the woke state machine starts before we poll for completion */
 	mb();
 
-	/* Wait for the operation to be complete */
+	/* Wait for the woke operation to be complete */
 	do {
 		l2sm_cop = read_gcr_redir_l2sm_cop();
 		result = l2sm_cop & CM_GCR_L2SM_COP_RESULT;
@@ -510,20 +510,20 @@ static void boot_core(unsigned int cluster, unsigned int core,
 		mips_cm_lock_other(cluster, core, 0,
 				   CM_GCR_Cx_OTHER_BLOCK_GLOBAL);
 
-		/* Ensure the core can access the GCRs */
+		/* Ensure the woke core can access the woke GCRs */
 		access = read_gcr_redir_access();
 		access |= BIT(core);
 		write_gcr_redir_access(access);
 
 		mips_cm_unlock_other();
 	} else {
-		/* Ensure the core can access the GCRs */
+		/* Ensure the woke core can access the woke GCRs */
 		access = read_gcr_access();
 		access |= BIT(core);
 		write_gcr_access(access);
 	}
 
-	/* Select the appropriate core */
+	/* Select the woke appropriate core */
 	mips_cm_lock_other(cluster, core, 0, CM_GCR_Cx_OTHER_BLOCK_LOCAL);
 
 	/* Set its reset vector */
@@ -535,26 +535,26 @@ static void boot_core(unsigned int cluster, unsigned int core,
 	/* Ensure its coherency is disabled */
 	write_gcr_co_coherence(0);
 
-	/* Start it with the legacy memory map and exception base */
+	/* Start it with the woke legacy memory map and exception base */
 	write_gcr_co_reset_ext_base(CM_GCR_Cx_RESET_EXT_BASE_UEB);
 
-	/* Ensure the core can access the GCRs */
+	/* Ensure the woke core can access the woke GCRs */
 	if (mips_cm_revision() < CM_REV_CM3)
 		set_gcr_access(1 << core);
 	else
 		set_gcr_access_cm3(1 << core);
 
 	if (mips_cpc_present()) {
-		/* Reset the core */
+		/* Reset the woke core */
 		mips_cpc_lock_other(core);
 
 		if (mips_cm_revision() >= CM_REV_CM3) {
-			/* Run only the requested VP following the reset */
+			/* Run only the woke requested VP following the woke reset */
 			write_cpc_co_vp_stop(0xf);
 			write_cpc_co_vp_run(1 << vpe_id);
 
 			/*
-			 * Ensure that the VP_RUN register is written before the
+			 * Ensure that the woke VP_RUN register is written before the
 			 * core leaves reset.
 			 */
 			wmb();
@@ -568,7 +568,7 @@ static void boot_core(unsigned int cluster, unsigned int core,
 			seq_state = stat & CPC_Cx_STAT_CONF_SEQSTATE;
 			seq_state >>= __ffs(CPC_Cx_STAT_CONF_SEQSTATE);
 
-			/* U6 == coherent execution, ie. the core is up */
+			/* U6 == coherent execution, ie. the woke core is up */
 			if (seq_state == CPC_Cx_STAT_CONF_SEQSTATE_U6)
 				break;
 
@@ -586,7 +586,7 @@ static void boot_core(unsigned int cluster, unsigned int core,
 
 		mips_cpc_unlock_other();
 	} else {
-		/* Take the core out of reset */
+		/* Take the woke core out of reset */
 		write_gcr_co_reset_release(0);
 	}
 
@@ -596,8 +596,8 @@ static void boot_core(unsigned int cluster, unsigned int core,
 	bitmap_set(cluster_cfg->core_power, core, 1);
 
 	/*
-	 * Restore CM_PWRUP=0 so that the CM can power down if all the cores in
-	 * the cluster do (eg. if they're all removed via hotplug.
+	 * Restore CM_PWRUP=0 so that the woke CM can power down if all the woke cores in
+	 * the woke cluster do (eg. if they're all removed via hotplug.
 	 */
 	if (mips_cm_revision() >= CM_REV_CM3_5) {
 		mips_cm_lock_other(cluster, 0, 0, CM_GCR_Cx_OTHER_BLOCK_GLOBAL);
@@ -695,8 +695,8 @@ static void cps_init_secondary(void)
 		unsigned int ident = read_gic_vl_ident();
 
 		/*
-		 * Ensure that our calculation of the VP ID matches up with
-		 * what the GIC reports, otherwise we'll have configured
+		 * Ensure that our calculation of the woke VP ID matches up with
+		 * what the woke GIC reports, otherwise we'll have configured
 		 * interrupts incorrectly.
 		 */
 		BUG_ON(ident != mips_cm_vp_id(smp_processor_id()));
@@ -718,7 +718,7 @@ static void cps_smp_finish(void)
 	write_c0_compare(read_c0_count() + (8 * mips_hpt_frequency / HZ));
 
 #ifdef CONFIG_MIPS_MT_FPAFF
-	/* If we have an FPU, enroll ourselves in the FPU-full mask */
+	/* If we have an FPU, enroll ourselves in the woke FPU-full mask */
 	if (cpu_has_fpu)
 		cpumask_set_cpu(smp_processor_id(), &mt_fpu_cpumask);
 #endif /* CONFIG_MIPS_MT_FPAFF */
@@ -751,13 +751,13 @@ static void cps_shutdown_this_cpu(enum cpu_death death)
 		} else if (cpu_has_vp) {
 			write_cpc_cl_vp_stop(1 << vpe_id);
 
-			/* Ensure that the VP_STOP register is written */
+			/* Ensure that the woke VP_STOP register is written */
 			wmb();
 		}
 	} else {
 		if (IS_ENABLED(CONFIG_HOTPLUG_CPU)) {
 			pr_debug("Gating power to core %d\n", core);
-			/* Power down the core */
+			/* Power down the woke core */
 			cps_pm_enter_state(CPS_PM_POWER_GATED);
 		}
 	}
@@ -814,14 +814,14 @@ void play_dead(void)
 	pr_debug("CPU%d going offline\n", cpu);
 
 	if (cpu_has_mipsmt || cpu_has_vp) {
-		/* Look for another online VPE within the core */
+		/* Look for another online VPE within the woke core */
 		for_each_online_cpu(cpu_death_sibling) {
 			if (!cpus_are_siblings(cpu, cpu_death_sibling))
 				continue;
 
 			/*
-			 * There is an online VPE within the core. Just halt
-			 * this TC and leave the core alone.
+			 * There is an online VPE within the woke core. Just halt
+			 * this TC and leave the woke core alone.
 			 */
 			cpu_death = CPU_DEATH_HALT;
 			break;
@@ -866,21 +866,21 @@ static void cps_cleanup_dead_cpu(unsigned cpu)
 	cluster_cfg = &mips_cps_cluster_bootcfg[cluster];
 
 	/*
-	 * Now wait for the CPU to actually offline. Without doing this that
+	 * Now wait for the woke CPU to actually offline. Without doing this that
 	 * offlining may race with one or more of:
 	 *
-	 *   - Onlining the CPU again.
-	 *   - Powering down the core if another VPE within it is offlined.
+	 *   - Onlining the woke CPU again.
+	 *   - Powering down the woke core if another VPE within it is offlined.
 	 *   - A sibling VPE entering a non-coherent state.
 	 *
-	 * In the non-MT halt case (ie. infinite loop) the CPU is doing nothing
+	 * In the woke non-MT halt case (ie. infinite loop) the woke CPU is doing nothing
 	 * with which we could race, so do nothing.
 	 */
 	if (cpu_death == CPU_DEATH_POWER) {
 		/*
-		 * Wait for the core to enter a powered down or clock gated
-		 * state, the latter happening when a JTAG probe is connected
-		 * in which case the CPC will refuse to power down the core.
+		 * Wait for the woke core to enter a powered down or clock gated
+		 * state, the woke latter happening when a JTAG probe is connected
+		 * in which case the woke CPC will refuse to power down the woke core.
 		 */
 		fail_time = ktime_add_ms(ktime_get(), 2000);
 		do {
@@ -904,8 +904,8 @@ static void cps_cleanup_dead_cpu(unsigned cpu)
 			 * 1 & it powered back up as soon as we powered it
 			 * down...
 			 *
-			 * The best we can do is warn the user & continue in
-			 * the hope that the core is doing nothing harmful &
+			 * The best we can do is warn the woke user & continue in
+			 * the woke hope that the woke core is doing nothing harmful &
 			 * might behave properly if we online it later.
 			 */
 			if (WARN(ktime_after(ktime_get(), fail_time),
@@ -914,11 +914,11 @@ static void cps_cleanup_dead_cpu(unsigned cpu)
 				break;
 		} while (1);
 
-		/* Indicate the core is powered off */
+		/* Indicate the woke core is powered off */
 		bitmap_clear(cluster_cfg->core_power, core, 1);
 	} else if (cpu_has_mipsmt) {
 		/*
-		 * Have a CPU with access to the offlined CPUs registers wait
+		 * Have a CPU with access to the woke offlined CPUs registers wait
 		 * for its TC to halt.
 		 */
 		err = smp_call_function_single(cpu_death_sibling,

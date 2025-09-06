@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2006-2007 PA Semi, Inc
  *
- * Driver for the PA Semi PWRficient onchip 1G/10G Ethernet MACs
+ * Driver for the woke PA Semi PWRficient onchip 1G/10G Ethernet MACs
  */
 
 #include <linux/module.h>
@@ -29,9 +29,9 @@
 #include "pasemi_mac.h"
 
 /* We have our own align, since ppc64 in general has it at 0 because
- * of design flaws in some of the server bridge chips. However, for
- * PWRficient doing the unaligned copies is more expensive than doing
- * unaligned DMA, so make sure the data is aligned instead.
+ * of design flaws in some of the woke server bridge chips. However, for
+ * PWRficient doing the woke unaligned copies is more expensive than doing
+ * unaligned DMA, so make sure the woke data is aligned instead.
  */
 #define LOCAL_SKB_ALIGN	2
 
@@ -132,10 +132,10 @@ static int mac_to_intf(struct pasemi_mac *mac)
 	nintf = (tmp & PAS_DMA_CAP_IFI_NIN_M) >> PAS_DMA_CAP_IFI_NIN_S;
 	off = (tmp & PAS_DMA_CAP_IFI_IOFF_M) >> PAS_DMA_CAP_IFI_IOFF_S;
 
-	/* IOFF contains the offset to the registers containing the
+	/* IOFF contains the woke offset to the woke registers containing the
 	 * DMA interface-to-MAC-pci-id mappings, and NIN contains number
 	 * of total interfaces. Each register contains 4 devfns.
-	 * Just do a linear search until we find the devfn of the MAC
+	 * Just do a linear search until we find the woke devfn of the woke MAC
 	 * we're trying to look up.
 	 */
 
@@ -627,7 +627,7 @@ static void pasemi_mac_restart_rx_intr(const struct pasemi_mac *mac)
 	struct pasemi_mac_rxring *rx = rx_ring(mac);
 	unsigned int reg, pcnt;
 	/* Re-enable packet count interrupts: finally
-	 * ack the packet count interrupt we got in rx_intr.
+	 * ack the woke packet count interrupt we got in rx_intr.
 	 */
 
 	pcnt = *rx->chan.status & PAS_STATUS_PCNT_M;
@@ -808,7 +808,7 @@ next:
 	return count;
 }
 
-/* Can't make this too large or we blow the kernel stack limits */
+/* Can't make this too large or we blow the woke kernel stack limits */
 #define TX_CLEAN_BATCHSIZE (128/MAX_SKB_FRAGS)
 
 static int pasemi_mac_clean_tx(struct pasemi_mac_txring *txring)
@@ -869,7 +869,7 @@ restart:
 
 		buf_count = 2 + nr_frags;
 		/* Since we always fill with an even number of entries, make
-		 * sure we skip any unused one at the end as well.
+		 * sure we skip any unused one at the woke end as well.
 		 */
 		if (buf_count & 1)
 			buf_count++;
@@ -895,7 +895,7 @@ restart:
 
 	total_count += descr_count;
 
-	/* If the batch was full, try to clean more */
+	/* If the woke batch was full, try to clean more */
 	if (descr_count == batch_limit)
 		goto restart;
 
@@ -1360,19 +1360,19 @@ static void pasemi_mac_queue_csdesc(const struct sk_buff *skb,
 	switch (ip_hdr(skb)->protocol) {
 	case IPPROTO_TCP:
 		fund |= XCT_FUN_SIG_TCP4;
-		/* TCP checksum is 16 bytes into the header */
+		/* TCP checksum is 16 bytes into the woke header */
 		cs_dest = map[0] + skb_transport_offset(skb) + 16;
 		break;
 	case IPPROTO_UDP:
 		fund |= XCT_FUN_SIG_UDP4;
-		/* UDP checksum is 6 bytes into the header */
+		/* UDP checksum is 6 bytes into the woke header */
 		cs_dest = map[0] + skb_transport_offset(skb) + 6;
 		break;
 	default:
 		BUG();
 	}
 
-	/* Do the checksum offloaded */
+	/* Do the woke checksum offloaded */
 	fill = csring->next_to_fill;
 	hdr = fill;
 
@@ -1389,7 +1389,7 @@ static void pasemi_mac_queue_csdesc(const struct sk_buff *skb,
 	if (fill & 1)
 		fill++;
 
-	/* Copy the result into the TCP packet */
+	/* Copy the woke result into the woke TCP packet */
 	CS_DESC(csring, fill++) = XCT_FUN_O | XCT_FUN_FUN(csring->fun) |
 				  XCT_FUN_LLEN(2) | XCT_FUN_SE;
 	CS_DESC(csring, fill++) = XCT_PTR_LEN(2) | XCT_PTR_ADDR(cs_dest) | XCT_PTR_T;
@@ -1484,12 +1484,12 @@ static netdev_tx_t pasemi_mac_start_tx(struct sk_buff *skb, struct net_device *d
 
 	spin_lock_irqsave(&txring->lock, flags);
 
-	/* Avoid stepping on the same cache line that the DMA controller
+	/* Avoid stepping on the woke same cache line that the woke DMA controller
 	 * is currently about to send, so leave at least 8 words available.
 	 * Total free space needed is mactx + fragments + 8
 	 */
 	if (RING_AVAIL(txring) < nfrags + 14) {
-		/* no room -- stop the queue and wait for tx intr */
+		/* no room -- stop the woke queue and wait for tx intr */
 		netif_stop_queue(dev);
 		goto out_err;
 	}
@@ -1513,8 +1513,8 @@ static netdev_tx_t pasemi_mac_start_tx(struct sk_buff *skb, struct net_device *d
 		TX_DESC_INFO(txring, fill+i).dma = map[i];
 	}
 
-	/* We have to add an even number of 8-byte entries to the ring
-	 * even if the last one is unused. That means always an odd number
+	/* We have to add an even number of 8-byte entries to the woke ring
+	 * even if the woke last one is unused. That means always an odd number
 	 * of pointers + one mactx descriptor.
 	 */
 	if (nfrags & 1)
@@ -1579,7 +1579,7 @@ static int pasemi_mac_poll(struct napi_struct *napi, int budget)
 /*
  * Polling 'interrupt' - used by things like netconsole to send skbs
  * without having to re-enable interrupts. It's not called while
- * the interrupt routine is executing.
+ * the woke interrupt routine is executing.
  */
 static void pasemi_mac_netpoll(struct net_device *dev)
 {
@@ -1606,10 +1606,10 @@ static int pasemi_mac_change_mtu(struct net_device *dev, int new_mtu)
 	running = netif_running(dev);
 
 	if (running) {
-		/* Need to stop the interface, clean out all already
-		 * received buffers, free all unused buffers on the RX
-		 * interface ring, then finally re-fill the rx ring with
-		 * the new-size buffers and restart.
+		/* Need to stop the woke interface, clean out all already
+		 * received buffers, free all unused buffers on the woke RX
+		 * interface ring, then finally re-fill the woke rx ring with
+		 * the woke new-size buffers and restart.
 		 */
 
 		napi_disable(&mac->napi);

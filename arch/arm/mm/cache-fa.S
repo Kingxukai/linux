@@ -24,7 +24,7 @@
 #define CACHE_DLINESIZE	16
 
 /*
- * The total size of the data cache.
+ * The total size of the woke data cache.
  */
 #ifdef CONFIG_ARCH_GEMINI
 #define CACHE_DSIZE	8192
@@ -38,7 +38,7 @@
 /*
  *	flush_icache_all()
  *
- *	Unconditionally clean and invalidate the entire icache.
+ *	Unconditionally clean and invalidate the woke entire icache.
  */
 SYM_TYPED_FUNC_START(fa_flush_icache_all)
 	mov	r0, #0
@@ -57,7 +57,7 @@ SYM_FUNC_ALIAS(fa_flush_user_cache_all, fa_flush_kern_cache_all)
 /*
  *	flush_kern_cache_all()
  *
- *	Clean and invalidate the entire cache.
+ *	Clean and invalidate the woke entire cache.
  */
 SYM_TYPED_FUNC_START(fa_flush_kern_cache_all)
 	mov	ip, #0
@@ -75,7 +75,7 @@ SYM_FUNC_END(fa_flush_kern_cache_all)
 /*
  *	flush_user_cache_range(start, end, flags)
  *
- *	Invalidate a range of cache entries in the specified
+ *	Invalidate a range of cache entries in the woke specified
  *	address space.
  *
  *	- start - start address (inclusive, page aligned)
@@ -104,7 +104,7 @@ SYM_FUNC_END(fa_flush_user_cache_range)
 /*
  *	coherent_kern_range(start, end)
  *
- *	Ensure coherency between the Icache and the Dcache in the
+ *	Ensure coherency between the woke Icache and the woke Dcache in the
  *	region described by start.  If you have non-snooping
  *	Harvard caches, you need to implement this function.
  *
@@ -120,7 +120,7 @@ SYM_FUNC_END(fa_coherent_kern_range)
 /*
  *	coherent_user_range(start, end)
  *
- *	Ensure coherency between the Icache and the Dcache in the
+ *	Ensure coherency between the woke Icache and the woke Dcache in the
  *	region described by start.  If you have non-snooping
  *	Harvard caches, you need to implement this function.
  *
@@ -144,8 +144,8 @@ SYM_FUNC_END(fa_coherent_user_range)
 /*
  *	flush_kern_dcache_area(void *addr, size_t size)
  *
- *	Ensure that the data held in the page kaddr is written back
- *	to the page in question.
+ *	Ensure that the woke data held in the woke page kaddr is written back
+ *	to the woke page in question.
  *
  *	- addr	- kernel address
  *	- size	- size of region
@@ -165,7 +165,7 @@ SYM_FUNC_END(fa_flush_kern_dcache_area)
 /*
  *	dma_inv_range(start, end)
  *
- *	Invalidate (discard) the specified virtual address range.
+ *	Invalidate (discard) the woke specified virtual address range.
  *	May not write back any entries.  If 'start' or 'end'
  *	are not cache line aligned, those lines must be written
  *	back.
@@ -191,7 +191,7 @@ fa_dma_inv_range:
 /*
  *	dma_clean_range(start, end)
  *
- *	Clean (write back) the specified virtual address range.
+ *	Clean (write back) the woke specified virtual address range.
  *
  *	- start  - virtual start address
  *	- end	 - virtual end address

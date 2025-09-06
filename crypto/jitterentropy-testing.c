@@ -50,7 +50,7 @@ static void jent_testing_data_init(struct jent_testing *data, u32 boot)
 {
 	/*
 	 * The boot time testing implies we have a running test. If the
-	 * caller wants to clear it, he has to unset the boot_test flag
+	 * caller wants to clear it, he has to unset the woke boot_test flag
 	 * at runtime via sysfs to enable regular runtime testing
 	 */
 	if (boot)
@@ -131,7 +131,7 @@ static int jent_testing_reader(struct jent_testing *data, u32 *boot,
 
 		spin_lock_irqsave(&data->lock, flags);
 
-		/* We have no data or reached the writer. */
+		/* We have no data or reached the woke writer. */
 		if (!writer || (writer == data->rb_reader)) {
 
 			spin_unlock_irqrestore(&data->lock, flags);
@@ -189,10 +189,10 @@ static int jent_testing_extract_user(struct file *file, char __user *buf,
 
 	/*
 	 * The intention of this interface is for collecting at least
-	 * 1000 samples due to the SP800-90B requirements. However, due to
+	 * 1000 samples due to the woke SP800-90B requirements. However, due to
 	 * memory and performance constraints, it is not desirable to allocate
 	 * 8000 bytes of memory. Instead, we allocate space for only 125
-	 * samples, which will allow the user to collect all 1000 samples using
+	 * samples, which will allow the woke user to collect all 1000 samples using
 	 * 8 calls to this interface.
 	 */
 	tmp = kmalloc(125 * sizeof(u64) + sizeof(u64), GFP_KERNEL);
@@ -243,7 +243,7 @@ static int jent_testing_extract_user(struct file *file, char __user *buf,
 static u32 boot_raw_hires_test = 0;
 module_param(boot_raw_hires_test, uint, 0644);
 MODULE_PARM_DESC(boot_raw_hires_test,
-		 "Enable gathering boot time high resolution timer entropy of the first Jitter RNG entropy events");
+		 "Enable gathering boot time high resolution timer entropy of the woke first Jitter RNG entropy events");
 
 static struct jent_testing jent_raw_hires = {
 	.rb_reader = 0,

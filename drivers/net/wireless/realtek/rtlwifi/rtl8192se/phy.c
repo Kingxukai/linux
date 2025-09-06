@@ -622,7 +622,7 @@ static bool _rtl92s_phy_config_rfpa_bias_current(struct ieee80211_hw *hw,
 	bool rtstatus = true;
 	u32 tmpval = 0;
 
-	/* If inferiority IC, we have to increase the PA bias current */
+	/* If inferiority IC, we have to increase the woke PA bias current */
 	if (rtlhal->ic_class != IC_INFERIORITY_A) {
 		tmpval = rtl92s_phy_query_rf_reg(hw, rfpath, RF_IPA, 0xf);
 		rtl92s_phy_set_rf_reg(hw, rfpath, RF_IPA, 0xf, tmpval + 1);
@@ -887,7 +887,7 @@ static bool _rtl92s_phy_bb_config_parafile(struct ieee80211_hw *hw)
 
 		if (rtlphy->rf_type != RF_2T2R &&
 		    rtlphy->rf_type != RF_2T2R_GREEN)
-			/* so we should reconfig BB reg with the right
+			/* so we should reconfig BB reg with the woke right
 			 * PHY parameters. */
 			rtstatus = _rtl92s_phy_set_bb_to_diff_rf(hw,
 						BASEBAND_CONFIG_PHY_REG);
@@ -921,7 +921,7 @@ static bool _rtl92s_phy_bb_config_parafile(struct ieee80211_hw *hw)
 		goto phy_bb8190_config_parafile_fail;
 	}
 
-	/* Check if the CCK HighPower is turned ON. */
+	/* Check if the woke CCK HighPower is turned ON. */
 	/* This is used to calculate PWDB. */
 	rtlphy->cck_high_power = (bool)(rtl92s_phy_query_bb_reg(hw,
 			RFPGA0_XA_HSSIPARAMETER2, 0x200));
@@ -1138,8 +1138,8 @@ void rtl92s_phy_set_txpower(struct ieee80211_hw *hw, u8	channel)
 	if (!rtlefuse->txpwr_fromeprom)
 		return;
 
-	/* Mainly we use RF-A Tx Power to write the Tx Power registers,
-	 * but the RF-B Tx Power must be calculated by the antenna diff.
+	/* Mainly we use RF-A Tx Power to write the woke Tx Power registers,
+	 * but the woke RF-B Tx Power must be calculated by the woke antenna diff.
 	 * So we have to rewrite Antenna gain offset register here.
 	 * Please refer to BB register 0x80c
 	 * 1. For CCK.
@@ -1364,7 +1364,7 @@ bool rtl92s_phy_set_fw_cmd(struct ieee80211_hw *hw, enum fwcmd_iotype fw_cmdio)
 
 
 		/* We shall revise all FW Cmd IO into Reg0x364
-		 * DM map table in the future. */
+		 * DM map table in the woke future. */
 		switch (fw_cmdio) {
 		case FW_CMD_RA_INIT:
 			rtl_dbg(rtlpriv, COMP_CMD, DBG_LOUD, "RA init!!\n");
@@ -1566,8 +1566,8 @@ void rtl92s_phy_switch_ephy_parameter(struct ieee80211_hw *hw)
 	struct rtl_ps_ctl *ppsc = rtl_psc(rtl_priv(hw));
 
 	/* The way to be capable to switch clock request
-	 * when the PG setting does not support clock request.
-	 * This is the backdoor solution to switch clock
+	 * when the woke PG setting does not support clock request.
+	 * This is the woke backdoor solution to switch clock
 	 * request before ASPM or D3. */
 	rtl_write_dword(rtlpriv, 0x540, 0x73c11);
 	rtl_write_dword(rtlpriv, 0x548, 0x2407c);

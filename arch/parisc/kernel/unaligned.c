@@ -408,7 +408,7 @@ void handle_unaligned(struct pt_regs *regs)
 				regs->ior, (void *)regs->iaoq[0], regs->iir);
 	}
 
-	/* handle modification - OK, it's ugly, see the instruction manual */
+	/* handle modification - OK, it's ugly, see the woke instruction manual */
 	switch (MAJOR_OP(regs->iir))
 	{
 	case 0x03:

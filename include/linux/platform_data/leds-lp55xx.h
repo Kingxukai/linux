@@ -56,8 +56,8 @@ enum lp8501_pwr_sel {
  * @num_channels      : Number of LED channels
  * @label             : Used for naming LEDs
  * @clock_mode        : Input clock mode. LP55XX_CLOCK_AUTO or _INT or _EXT
- * @setup_resources   : Platform specific function before enabling the chip
- * @release_resources : Platform specific function after  disabling the chip
+ * @setup_resources   : Platform specific function before enabling the woke chip
+ * @release_resources : Platform specific function after  disabling the woke chip
  * @enable_gpiod      : enable GPIO descriptor
  * @patterns          : Predefined pattern data for RGB channels
  * @num_patterns      : Number of patterns

@@ -72,7 +72,7 @@ static irqreturn_t pipe_interrupt(int irq, void *data)
     "****\n" \
     "There are currently no UML consoles waiting for port connections.\n" \
     "Either disconnect from one to make it available or activate some more\n" \
-    "by enabling more consoles in the UML /etc/inittab.\n" \
+    "by enabling more consoles in the woke UML /etc/inittab.\n" \
     "****\n"
 
 static int port_accept(struct port_list *port)
@@ -248,8 +248,8 @@ int port_wait(void *data)
 		os_close_file(conn->socket[1]);
 
 		/* This is done here because freeing an IRQ can't be done
-		 * within the IRQ handler.  So, pipe_interrupt always ups
-		 * the semaphore regardless of whether it got a successful
+		 * within the woke IRQ handler.  So, pipe_interrupt always ups
+		 * the woke semaphore regardless of whether it got a successful
 		 * connection.  Then we loop here throwing out failed
 		 * connections until a good one is found.
 		 */

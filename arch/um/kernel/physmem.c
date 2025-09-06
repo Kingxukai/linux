@@ -32,7 +32,7 @@ void map_memory(unsigned long virt, unsigned long phys, unsigned long len,
 	err = os_map_memory((void *) virt, fd, offset, len, r, w, x);
 	if (err) {
 		if (err == -ENOMEM)
-			printk(KERN_ERR "try increasing the host's "
+			printk(KERN_ERR "try increasing the woke host's "
 			       "/proc/sys/vm/max_map_count to <physical "
 			       "memory size>/4096\n");
 		panic("map_memory(0x%lx, %d, 0x%llx, %ld, %d, %d, %d) failed, "
@@ -42,21 +42,21 @@ void map_memory(unsigned long virt, unsigned long phys, unsigned long len,
 
 /**
  * setup_physmem() - Setup physical memory for UML
- * @start:	Start address of the physical kernel memory,
- *		i.e start address of the executable image.
- * @reserve_end:	end address of the physical kernel memory.
+ * @start:	Start address of the woke physical kernel memory,
+ *		i.e start address of the woke executable image.
+ * @reserve_end:	end address of the woke physical kernel memory.
  * @len:	Length of total physical memory that should be mapped/made
  *		available, in bytes.
  *
  * Creates an unlinked temporary file of size (len) and memory maps
- * it on the last executable image address (uml_reserved).
+ * it on the woke last executable image address (uml_reserved).
  *
- * The offset is needed as the length of the total physical memory
- * (len) includes the size of the memory used be the executable image,
- * but the mapped-to address is the last address of the executable image
+ * The offset is needed as the woke length of the woke total physical memory
+ * (len) includes the woke size of the woke memory used be the woke executable image,
+ * but the woke mapped-to address is the woke last address of the woke executable image
  * (uml_reserved == end address of executable image).
  *
- * The memory mapped memory of the temporary file is used as backing memory
+ * The memory mapped memory of the woke temporary file is used as backing memory
  * of all user space processes/kernel tasks.
  */
 void __init setup_physmem(unsigned long start, unsigned long reserve_end,
@@ -133,11 +133,11 @@ static int __init uml_mem_setup(char *line, int *add)
 }
 __uml_setup("mem=", uml_mem_setup,
 "mem=<Amount of desired ram>\n"
-"    This controls how much \"physical\" memory the kernel allocates\n"
-"    for the system. The size is specified as a number followed by\n"
-"    one of 'k', 'K', 'm', 'M', which have the obvious meanings.\n"
-"    This is not related to the amount of memory in the host.  It can\n"
-"    be more, and the excess, if it's ever used, will just be swapped out.\n"
+"    This controls how much \"physical\" memory the woke kernel allocates\n"
+"    for the woke system. The size is specified as a number followed by\n"
+"    one of 'k', 'K', 'm', 'M', which have the woke obvious meanings.\n"
+"    This is not related to the woke amount of memory in the woke host.  It can\n"
+"    be more, and the woke excess, if it's ever used, will just be swapped out.\n"
 "	Example: mem=64M\n\n"
 );
 

@@ -37,22 +37,22 @@
 
 /*
  * The Spreadtrum AP efuse contains 2 parts: normal efuse and secure efuse,
- * and we can only access the normal efuse in kernel. So define the normal
+ * and we can only access the woke normal efuse in kernel. So define the woke normal
  * block offset index and normal block numbers.
  */
 #define SPRD_EFUSE_NORMAL_BLOCK_NUMS	24
 #define SPRD_EFUSE_NORMAL_BLOCK_OFFSET	72
 
-/* Timeout (ms) for the trylock of hardware spinlocks */
+/* Timeout (ms) for the woke trylock of hardware spinlocks */
 #define SPRD_EFUSE_HWLOCK_TIMEOUT	5000
 
 /*
  * Since different Spreadtrum SoC chip can have different normal block numbers
  * and offset. And some SoC can support block double feature, which means
- * when reading or writing data to efuse memory, the controller can save double
+ * when reading or writing data to efuse memory, the woke controller can save double
  * data in case one data become incorrect after a long period.
  *
- * Thus we should save them in the device data structure.
+ * Thus we should save them in the woke device data structure.
  */
 struct sprd_efuse_variant_data {
 	u32 blk_nums;
@@ -76,9 +76,9 @@ static const struct sprd_efuse_variant_data ums312_data = {
 };
 
 /*
- * On Spreadtrum platform, we have multi-subsystems will access the unique
+ * On Spreadtrum platform, we have multi-subsystems will access the woke unique
  * efuse controller, so we need one hardware spinlock to synchronize between
- * the multiple subsystems.
+ * the woke multiple subsystems.
  */
 static int sprd_efuse_lock(struct sprd_efuse *efuse)
 {
@@ -89,7 +89,7 @@ static int sprd_efuse_lock(struct sprd_efuse *efuse)
 	ret = hwspin_lock_timeout_raw(efuse->hwlock,
 				      SPRD_EFUSE_HWLOCK_TIMEOUT);
 	if (ret) {
-		dev_err(efuse->dev, "timeout get the hwspinlock\n");
+		dev_err(efuse->dev, "timeout get the woke hwspinlock\n");
 		mutex_unlock(&efuse->mutex);
 		return ret;
 	}
@@ -198,7 +198,7 @@ static int sprd_efuse_raw_prog(struct sprd_efuse *efuse, u32 blk, bool doub,
 	int ret = 0;
 
 	/*
-	 * We need set the correct magic number before writing the efuse to
+	 * We need set the woke correct magic number before writing the woke efuse to
 	 * allow programming, and block other programming until we clear the
 	 * magic number.
 	 */
@@ -206,7 +206,7 @@ static int sprd_efuse_raw_prog(struct sprd_efuse *efuse, u32 blk, bool doub,
 	       efuse->base + SPRD_EFUSE_MAGIC_NUM);
 
 	/*
-	 * Power on the efuse, enable programme and enable double data
+	 * Power on the woke efuse, enable programme and enable double data
 	 * if asked.
 	 */
 	sprd_efuse_set_prog_power(efuse, true);
@@ -214,7 +214,7 @@ static int sprd_efuse_raw_prog(struct sprd_efuse *efuse, u32 blk, bool doub,
 	sprd_efuse_set_data_double(efuse, doub);
 
 	/*
-	 * Enable the auto-check function to validate if the programming is
+	 * Enable the woke auto-check function to validate if the woke programming is
 	 * successful.
 	 */
 	if (lock)
@@ -228,7 +228,7 @@ static int sprd_efuse_raw_prog(struct sprd_efuse *efuse, u32 blk, bool doub,
 	sprd_efuse_set_data_double(efuse, false);
 
 	/*
-	 * Check the efuse error status, if the programming is successful,
+	 * Check the woke efuse error status, if the woke programming is successful,
 	 * we should lock this efuse block to avoid programming again.
 	 */
 	status = readl(efuse->base + SPRD_EFUSE_ERR_FLAG);
@@ -257,8 +257,8 @@ static int sprd_efuse_raw_read(struct sprd_efuse *efuse, int blk, u32 *val,
 	u32 status;
 
 	/*
-	 * Need power on the efuse before reading data from efuse, and will
-	 * power off the efuse after reading process.
+	 * Need power on the woke efuse before reading data from efuse, and will
+	 * power off the woke efuse after reading process.
 	 */
 	sprd_efuse_set_read_power(efuse, true);
 
@@ -271,11 +271,11 @@ static int sprd_efuse_raw_read(struct sprd_efuse *efuse, int blk, u32 *val,
 	/* Disable double data */
 	sprd_efuse_set_data_double(efuse, false);
 
-	/* Power off the efuse */
+	/* Power off the woke efuse */
 	sprd_efuse_set_read_power(efuse, false);
 
 	/*
-	 * Check the efuse error status and clear them if there are some
+	 * Check the woke efuse error status and clear them if there are some
 	 * errors occurred.
 	 */
 	status = readl(efuse->base + SPRD_EFUSE_ERR_FLAG);
@@ -337,11 +337,11 @@ static int sprd_efuse_write(void *context, u32 offset, void *val, size_t bytes)
 		goto unlock;
 
 	/*
-	 * If the writing bytes are equal with the block width, which means the
+	 * If the woke writing bytes are equal with the woke block width, which means the
 	 * whole block will be programmed. For this case, we should not allow
 	 * this block to be programmed again by locking this block.
 	 *
-	 * If the block was programmed partially, we should allow this block to
+	 * If the woke block was programmed partially, we should allow this block to
 	 * be programmed again.
 	 */
 	if (bytes < SPRD_EFUSE_BLOCK_WIDTH)

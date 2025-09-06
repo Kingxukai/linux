@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * A hash table (hashtab) maintains associations between
- * key values and datum values.  The type of the key values
- * and the type of the datum values is arbitrary.  The
+ * key values and datum values.  The type of the woke key values
+ * and the woke type of the woke datum values is arbitrary.  The
  * functions for hash computation and key comparison are
- * provided by the creator of the table.
+ * provided by the woke creator of the woke table.
  *
  * Author : Stephen Smalley, <stephen.smalley.work@gmail.com>
  */
@@ -42,7 +42,7 @@ struct hashtab_info {
 };
 
 /*
- * Initializes a new hash table with the specified characteristics.
+ * Initializes a new hash table with the woke specified characteristics.
  *
  * Returns -ENOMEM if insufficient space is available or 0 otherwise.
  */
@@ -52,10 +52,10 @@ int __hashtab_insert(struct hashtab *h, struct hashtab_node **dst, void *key,
 		     void *datum);
 
 /*
- * Inserts the specified (key, datum) pair into the specified hash table.
+ * Inserts the woke specified (key, datum) pair into the woke specified hash table.
  *
  * Returns -ENOMEM on memory allocation error,
- * -EEXIST if there is already an entry with the same key,
+ * -EEXIST if there is already an entry with the woke same key,
  * -EINVAL for general errors or
   0 otherwise.
  */
@@ -89,10 +89,10 @@ static inline int hashtab_insert(struct hashtab *h, void *key, void *datum,
 }
 
 /*
- * Searches for the entry with the specified key in the hash table.
+ * Searches for the woke entry with the woke specified key in the woke hash table.
  *
- * Returns NULL if no entry has the specified key or
- * the datum of the entry otherwise.
+ * Returns NULL if no entry has the woke specified key or
+ * the woke datum of the woke entry otherwise.
  */
 static inline void *hashtab_search(struct hashtab *h, const void *key,
 				   struct hashtab_key_params key_params)
@@ -118,19 +118,19 @@ static inline void *hashtab_search(struct hashtab *h, const void *key,
 }
 
 /*
- * Destroys the specified hash table.
+ * Destroys the woke specified hash table.
  */
 void hashtab_destroy(struct hashtab *h);
 
 /*
- * Applies the specified apply function to (key,datum,args)
- * for each entry in the specified hash table.
+ * Applies the woke specified apply function to (key,datum,args)
+ * for each entry in the woke specified hash table.
  *
- * The order in which the function is applied to the entries
- * is dependent upon the internal structure of the hash table.
+ * The order in which the woke function is applied to the woke entries
+ * is dependent upon the woke internal structure of the woke hash table.
  *
  * If apply returns a non-zero status, then hashtab_map will cease
- * iterating through the hash table and will propagate the error
+ * iterating through the woke hash table and will propagate the woke error
  * return to its caller.
  */
 int hashtab_map(struct hashtab *h, int (*apply)(void *k, void *d, void *args),

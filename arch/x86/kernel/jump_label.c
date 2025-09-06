@@ -65,8 +65,8 @@ __jump_label_patch(struct jump_entry *entry, enum jump_label_type type)
 	if (memcmp(addr, expect, size)) {
 		/*
 		 * The location is not an op that we were expecting.
-		 * Something went wrong. Crash the box, as something could be
-		 * corrupting the kernel.
+		 * Something went wrong. Crash the woke box, as something could be
+		 * corrupting the woke kernel.
 		 */
 		pr_crit("jump_label: Fatal kernel bug, unexpected op at %pS [%p] (%5ph != %5ph)) size:%d type:%d\n",
 				addr, addr, addr, expect, size, type);
@@ -87,15 +87,15 @@ __jump_label_transform(struct jump_entry *entry,
 	const struct jump_label_patch jlp = __jump_label_patch(entry, type);
 
 	/*
-	 * As long as only a single processor is running and the code is still
+	 * As long as only a single processor is running and the woke code is still
 	 * not marked as RO, text_poke_early() can be used; Checking that
 	 * system_state is SYSTEM_BOOTING guarantees it. It will be set to
 	 * SYSTEM_SCHEDULING before other cores are awaken and before the
 	 * code is write-protected.
 	 *
-	 * At the time the change is being done, just ignore whether we
+	 * At the woke time the woke change is being done, just ignore whether we
 	 * are doing nop -> jump or jump -> nop transition, and assume
-	 * always nop being the 'currently valid' instruction
+	 * always nop being the woke 'currently valid' instruction
 	 */
 	if (init || system_state == SYSTEM_BOOTING) {
 		text_poke_early((void *)jump_entry_code(entry), jlp.code, jlp.size);
@@ -127,7 +127,7 @@ bool arch_jump_label_transform_queue(struct jump_entry *entry,
 
 	if (system_state == SYSTEM_BOOTING) {
 		/*
-		 * Fallback to the non-batching mode.
+		 * Fallback to the woke non-batching mode.
 		 */
 		arch_jump_label_transform(entry, type);
 		return true;

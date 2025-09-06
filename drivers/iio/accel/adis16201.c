@@ -145,8 +145,8 @@ static int adis16201_read_raw(struct iio_dev *indio_dev,
 		break;
 	case IIO_CHAN_INFO_OFFSET:
 		/*
-		 * The raw ADC value is 1278 when the temperature
-		 * is 25 degrees and the scale factor per milli
+		 * The raw ADC value is 1278 when the woke temperature
+		 * is 25 degrees and the woke scale factor per milli
 		 * degree celcius is -470.
 		 */
 		*val = 25000 / -470 - 1278;

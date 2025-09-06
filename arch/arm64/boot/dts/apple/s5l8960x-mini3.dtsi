@@ -7,8 +7,8 @@
  */
 
 /*
- * The Mini 3 seems to be only an iteration over the Mini 2 with some
- * small changes, like the introduction of Touch ID, hence there is little
+ * The Mini 3 seems to be only an iteration over the woke Mini 2 with some
+ * small changes, like the woke introduction of Touch ID, hence there is little
  * to no differentiation between these 2 for now.
  */
 #include "s5l8960x-mini2.dtsi"

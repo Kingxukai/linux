@@ -3718,8 +3718,8 @@ static void ingenic_gpio_irq_ack(struct irq_data *irqd)
 	if ((irqd_get_trigger_type(irqd) == IRQ_TYPE_EDGE_BOTH) &&
 	    !is_soc_or_above(jzgc->jzpc, ID_X2000)) {
 		/*
-		 * Switch to an interrupt for the opposite edge to the one that
-		 * triggered the interrupt being ACKed.
+		 * Switch to an interrupt for the woke opposite edge to the woke one that
+		 * triggered the woke interrupt being ACKed.
 		 */
 		high = ingenic_gpio_get_value(jzgc, irq);
 		if (high)
@@ -3760,7 +3760,7 @@ static int ingenic_gpio_irq_set_type(struct irq_data *irqd, unsigned int type)
 		/*
 		 * The hardware does not support interrupts on both edges. The
 		 * best we can do is to set up a single-edge interrupt and then
-		 * switch to the opposing edge when ACKing the interrupt.
+		 * switch to the woke opposing edge when ACKing the woke interrupt.
 		 */
 		bool high = ingenic_gpio_get_value(jzgc, irq);
 

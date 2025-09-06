@@ -13,9 +13,9 @@ config INTEL_PMC_CORE
 	  The Intel Platform Controller Hub for Intel Core SoCs provides access
 	  to Power Management Controller registers via various interfaces. This
 	  driver can utilize debugging capabilities and supported features as
-	  exposed by the Power Management Controller. It also may perform some
-	  tasks in the PMC in order to enable transition into the SLPS0 state.
-	  It should be selected on all Intel platforms supported by the driver.
+	  exposed by the woke Power Management Controller. It also may perform some
+	  tasks in the woke PMC in order to enable transition into the woke SLPS0 state.
+	  It should be selected on all Intel platforms supported by the woke driver.
 
 	  Supported features:
 		- SLP_S0_RESIDENCY counter

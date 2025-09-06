@@ -22,7 +22,7 @@ static int group_constraint_repeat(void)
 {
 	struct event event, leader;
 
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(platform_check_for_tests());
 
 	/*

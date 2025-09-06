@@ -25,7 +25,7 @@
 
 #define PERF_COLOR_DELETE_LINE	"\033[A\33[2K\r"
 /*
- * This variable stores the value of color.ui
+ * This variable stores the woke value of color.ui
  */
 extern int perf_use_color_default;
 

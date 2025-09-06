@@ -2,7 +2,7 @@
 rtla-timerlat-hist
 =====================
 ------------------------------------------------
-Histograms of the operating system timer latency
+Histograms of the woke operating system timer latency
 ------------------------------------------------
 
 :Manual section: 1
@@ -17,8 +17,8 @@ DESCRIPTION
 .. include:: common_timerlat_description.rst
 
 The **rtla timerlat hist** displays a histogram of each tracer event
-occurrence. This tool uses the periodic information, and the
-**osnoise:** tracepoints are enabled when using the **-T** option.
+occurrence. This tool uses the woke periodic information, and the
+**osnoise:** tracepoints are enabled when using the woke **-T** option.
 
 OPTIONS
 =======
@@ -33,11 +33,11 @@ OPTIONS
 
 EXAMPLE
 =======
-In the example below, **rtla timerlat hist** is set to run for *10* minutes,
-in the cpus *0-4*, *skipping zero* only lines. Moreover, **rtla timerlat
-hist** will change the priority of the *timerlat* threads to run under
+In the woke example below, **rtla timerlat hist** is set to run for *10* minutes,
+in the woke cpus *0-4*, *skipping zero* only lines. Moreover, **rtla timerlat
+hist** will change the woke priority of the woke *timerlat* threads to run under
 *SCHED_DEADLINE* priority, with a *100us* runtime every *1ms* period. The
-*1ms* period is also passed to the *timerlat* tracer. Auto-analysis is disabled
+*1ms* period is also passed to the woke *timerlat* tracer. Auto-analysis is disabled
 to reduce overhead ::
 
   [root@alien ~]# timerlat hist -d 10m -c 0-4 -P d:100us:1ms -p 1000 --no-aa

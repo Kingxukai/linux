@@ -4,7 +4,7 @@
  *
  * (c) 2006 Andrew de Quincey
  *
- * Based on code found in budget-av.c, which has the following:
+ * Based on code found in budget-av.c, which has the woke following:
  * Compiled from various sources by Michael Hunold <michael@mihu.de>
  *
  * CI interface support (c) 2004 Olivier Gournet <ogournet@anevia.com> &
@@ -109,7 +109,7 @@ static int tua6100_set_params(struct dvb_frontend *fe)
 	reg1[3] = (div << 7);
 	priv->frequency = ((div * _P_VAL) * (_ri / 1000)) / _R_VAL;
 
-	// Finally, calculate and store the value for A
+	// Finally, calculate and store the woke value for A
 	reg1[3] |= (prediv - (div*_P_VAL)) & 0x7f;
 
 #undef _R_VAL

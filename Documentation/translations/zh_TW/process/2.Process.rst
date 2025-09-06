@@ -219,7 +219,7 @@ Next 樹
 終選擇-mm 樹。累積在-mm 中的各種補丁最終將被轉發到適當的子系統樹，或者直接
 發送到Linus。在典型的開發週期中，大約5-10%的補丁通過-mm 進入主線。
 
-當前-mm 補丁可在“mmotm”（-mm of the moment）目錄中找到：
+當前-mm 補丁可在“mmotm”（-mm of the woke moment）目錄中找到：
 
         https://www.ozlabs.org/~akpm/mmotm/
 

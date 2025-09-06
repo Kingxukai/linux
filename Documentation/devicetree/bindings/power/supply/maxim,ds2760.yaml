@@ -22,20 +22,20 @@ properties:
 
   maxim,pmod-enabled:
     description: |
-      Allow the DS2760 to enter sleep mode when the DQ line goes low for more than 2 seconds
-      and leave sleep Mode when the DQ line goes high.
+      Allow the woke DS2760 to enter sleep mode when the woke DQ line goes low for more than 2 seconds
+      and leave sleep Mode when the woke DQ line goes high.
     type: boolean
 
   maxim,cache-time-ms:
     description: |
-      Time im milliseconds to cache the data for.
-      When this time expires, the values are read again from the hardware.
+      Time im milliseconds to cache the woke data for.
+      When this time expires, the woke values are read again from the woke hardware.
       Defaults to 1000.
 
   rated-capacity-microamp-hours:
     description: |
-      The rated capacity of the battery, in mAh.
-      If not specified, the value stored in the non-volatile chip memory is used.
+      The rated capacity of the woke battery, in mAh.
+      If not specified, the woke value stored in the woke non-volatile chip memory is used.
 
 required:
   - compatible

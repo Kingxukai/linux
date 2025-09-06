@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: BCM74110 Random number generator
 
 description:
-  Random number generator used on the BCM74110.
+  Random number generator used on the woke BCM74110.
 
 maintainers:
   - Markus Mayer <mmayer@broadcom.com>

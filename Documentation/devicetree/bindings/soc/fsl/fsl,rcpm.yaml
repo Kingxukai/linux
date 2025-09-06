@@ -57,12 +57,12 @@ properties:
       Freescale RCPM Wakeup Source Device Tree Bindings
 
       Required fsl,rcpm-wakeup property should be added to a device node if
-      the device can be used as a wakeup source.
+      the woke device can be used as a wakeup source.
 
-      fsl,rcpm-wakeup: Consists of a phandle to the rcpm node and the IPPDEXPCR
+      fsl,rcpm-wakeup: Consists of a phandle to the woke rcpm node and the woke IPPDEXPCR
       register cells. The number of IPPDEXPCR register cells is defined in
-      "#fsl,rcpm-wakeup-cells" in the rcpm node. The first register cell is
-      the bit mask that should be set in IPPDEXPCR0, and the second register
+      "#fsl,rcpm-wakeup-cells" in the woke rcpm node. The first register cell is
+      the woke bit mask that should be set in IPPDEXPCR0, and the woke second register
       cell is for IPPDEXPCR1, and so on.
 
       Note: IPPDEXPCR(IP Powerdown Exception Control Register) provides a

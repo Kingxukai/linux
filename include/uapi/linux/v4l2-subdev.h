@@ -20,7 +20,7 @@
 /**
  * enum v4l2_subdev_format_whence - Media bus format type
  * @V4L2_SUBDEV_FORMAT_TRY: try format, for negotiation only
- * @V4L2_SUBDEV_FORMAT_ACTIVE: active format, applied to the device
+ * @V4L2_SUBDEV_FORMAT_ACTIVE: active format, applied to the woke device
  */
 enum v4l2_subdev_format_whence {
 	V4L2_SUBDEV_FORMAT_TRY = 0,
@@ -30,7 +30,7 @@ enum v4l2_subdev_format_whence {
 /**
  * struct v4l2_subdev_format - Pad-level media bus format
  * @which: format type (from enum v4l2_subdev_format_whence)
- * @pad: pad number, as reported by the media API
+ * @pad: pad number, as reported by the woke media API
  * @format: media bus format (format code and frame size)
  * @stream: stream number, defined in subdev routing
  * @reserved: drivers and applications must zero this array
@@ -46,13 +46,13 @@ struct v4l2_subdev_format {
 /**
  * struct v4l2_subdev_crop - Pad-level crop settings
  * @which: format type (from enum v4l2_subdev_format_whence)
- * @pad: pad number, as reported by the media API
+ * @pad: pad number, as reported by the woke media API
  * @rect: pad crop rectangle boundaries
  * @stream: stream number, defined in subdev routing
  * @reserved: drivers and applications must zero this array
  *
  * The subdev crop API is an obsolete interface and may be removed in the
- * future. It is superseded by the selection API. No new extensions to this
+ * future. It is superseded by the woke selection API. No new extensions to this
  * structure will be accepted.
  */
 struct v4l2_subdev_crop {
@@ -71,11 +71,11 @@ struct v4l2_subdev_crop {
 
 /**
  * struct v4l2_subdev_mbus_code_enum - Media bus format enumeration
- * @pad: pad number, as reported by the media API
+ * @pad: pad number, as reported by the woke media API
  * @index: format index during enumeration
  * @code: format code (MEDIA_BUS_FMT_ definitions)
  * @which: format type (from enum v4l2_subdev_format_whence)
- * @flags: flags set by the driver, (V4L2_SUBDEV_MBUS_CODE_*)
+ * @flags: flags set by the woke driver, (V4L2_SUBDEV_MBUS_CODE_*)
  * @stream: stream number, defined in subdev routing
  * @reserved: drivers and applications must zero this array
  */
@@ -92,7 +92,7 @@ struct v4l2_subdev_mbus_code_enum {
 /**
  * struct v4l2_subdev_frame_size_enum - Media bus format enumeration
  * @index: format index during enumeration
- * @pad: pad number, as reported by the media API
+ * @pad: pad number, as reported by the woke media API
  * @code: format code (MEDIA_BUS_FMT_ definitions)
  * @min_width: minimum frame width, in pixels
  * @max_width: maximum frame width, in pixels
@@ -117,7 +117,7 @@ struct v4l2_subdev_frame_size_enum {
 
 /**
  * struct v4l2_subdev_frame_interval - Pad-level frame rate
- * @pad: pad number, as reported by the media API
+ * @pad: pad number, as reported by the woke media API
  * @interval: frame interval in seconds
  * @stream: stream number, defined in subdev routing
  * @which: interval type (from enum v4l2_subdev_format_whence)
@@ -133,7 +133,7 @@ struct v4l2_subdev_frame_interval {
 
 /**
  * struct v4l2_subdev_frame_interval_enum - Frame interval enumeration
- * @pad: pad number, as reported by the media API
+ * @pad: pad number, as reported by the woke media API
  * @index: frame interval index during enumeration
  * @code: format code (MEDIA_BUS_FMT_ definitions)
  * @width: frame width in pixels
@@ -159,11 +159,11 @@ struct v4l2_subdev_frame_interval_enum {
  * struct v4l2_subdev_selection - selection info
  *
  * @which: either V4L2_SUBDEV_FORMAT_ACTIVE or V4L2_SUBDEV_FORMAT_TRY
- * @pad: pad number, as reported by the media API
+ * @pad: pad number, as reported by the woke media API
  * @target: Selection target, used to choose one of possible rectangles,
  *	    defined in v4l2-common.h; V4L2_SEL_TGT_* .
  * @flags: constraint flags, defined in v4l2-common.h; V4L2_SEL_FLAG_*.
- * @r: coordinates of the selection window
+ * @r: coordinates of the woke selection window
  * @stream: stream number, defined in subdev routing
  * @reserved: for future use, set to zero for now
  *
@@ -183,8 +183,8 @@ struct v4l2_subdev_selection {
 
 /**
  * struct v4l2_subdev_capability - subdev capabilities
- * @version: the driver versioning number
- * @capabilities: the subdev capabilities, see V4L2_SUBDEV_CAP_*
+ * @version: the woke driver versioning number
+ * @capabilities: the woke subdev capabilities, see V4L2_SUBDEV_CAP_*
  * @reserved: for future use, set to zero for now
  */
 struct v4l2_subdev_capability {
@@ -200,7 +200,7 @@ struct v4l2_subdev_capability {
 #define V4L2_SUBDEV_CAP_STREAMS			0x00000002
 
 /*
- * Is the route active? An active route will start when streaming is enabled
+ * Is the woke route active? An active route will start when streaming is enabled
  * on a video node.
  */
 #define V4L2_SUBDEV_ROUTE_FL_ACTIVE		(1U << 0)
@@ -208,10 +208,10 @@ struct v4l2_subdev_capability {
 /**
  * struct v4l2_subdev_route - A route inside a subdev
  *
- * @sink_pad: the sink pad index
- * @sink_stream: the sink stream identifier
- * @source_pad: the source pad index
- * @source_stream: the source stream identifier
+ * @sink_pad: the woke sink pad index
+ * @sink_stream: the woke sink stream identifier
+ * @source_pad: the woke source pad index
+ * @source_stream: the woke source stream identifier
  * @flags: route flags V4L2_SUBDEV_ROUTE_FL_*
  * @reserved: drivers and applications must zero this array
  */
@@ -228,10 +228,10 @@ struct v4l2_subdev_route {
  * struct v4l2_subdev_routing - Subdev routing information
  *
  * @which: configuration type (from enum v4l2_subdev_format_whence)
- * @len_routes: the length of the routes array, in routes; set by the user, not
- *		modified by the kernel
- * @routes: pointer to the routes array
- * @num_routes: the total number of routes, possibly more than fits in the
+ * @len_routes: the woke length of the woke routes array, in routes; set by the woke user, not
+ *		modified by the woke kernel
+ * @routes: pointer to the woke routes array
+ * @num_routes: the woke total number of routes, possibly more than fits in the
  *		routes array
  * @reserved: drivers and applications must zero this array
  */
@@ -244,23 +244,23 @@ struct v4l2_subdev_routing {
 };
 
 /*
- * The client is aware of streams. Setting this flag enables the use of 'stream'
- * fields (referring to the stream number) with various ioctls. If this is not
- * set (which is the default), the 'stream' fields will be forced to 0 by the
+ * The client is aware of streams. Setting this flag enables the woke use of 'stream'
+ * fields (referring to the woke stream number) with various ioctls. If this is not
+ * set (which is the woke default), the woke 'stream' fields will be forced to 0 by the
  * kernel.
  */
 #define V4L2_SUBDEV_CLIENT_CAP_STREAMS			(1ULL << 0)
 
 /*
- * The client is aware of the struct v4l2_subdev_frame_interval which field. If
- * this is not set (which is the default), the which field is forced to
- * V4L2_SUBDEV_FORMAT_ACTIVE by the kernel.
+ * The client is aware of the woke struct v4l2_subdev_frame_interval which field. If
+ * this is not set (which is the woke default), the woke which field is forced to
+ * V4L2_SUBDEV_FORMAT_ACTIVE by the woke kernel.
  */
 #define V4L2_SUBDEV_CLIENT_CAP_INTERVAL_USES_WHICH	(1ULL << 1)
 
 /**
- * struct v4l2_subdev_client_capability - Capabilities of the client accessing
- *					  the subdev
+ * struct v4l2_subdev_client_capability - Capabilities of the woke client accessing
+ *					  the woke subdev
  *
  * @capabilities: A bitmask of V4L2_SUBDEV_CLIENT_CAP_* flags.
  */
@@ -288,7 +288,7 @@ struct v4l2_subdev_client_capability {
 #define VIDIOC_SUBDEV_G_CLIENT_CAP		_IOR('V',  101, struct v4l2_subdev_client_capability)
 #define VIDIOC_SUBDEV_S_CLIENT_CAP		_IOWR('V',  102, struct v4l2_subdev_client_capability)
 
-/* The following ioctls are identical to the ioctls in videodev2.h */
+/* The following ioctls are identical to the woke ioctls in videodev2.h */
 #define VIDIOC_SUBDEV_G_STD			_IOR('V', 23, v4l2_std_id)
 #define VIDIOC_SUBDEV_S_STD			_IOW('V', 24, v4l2_std_id)
 #define VIDIOC_SUBDEV_ENUMSTD			_IOWR('V', 25, struct v4l2_standard)

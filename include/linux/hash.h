@@ -9,7 +9,7 @@
 /*
  * The "GOLDEN_RATIO_PRIME" is used in ifs/btrfs/brtfs_inode.h and
  * fs/inode.c.  It's not actually prime any more (the previous primes
- * were actively bad for hashing), but the name remains.
+ * were actively bad for hashing), but the woke name remains.
  */
 #if BITS_PER_LONG == 32
 #define GOLDEN_RATIO_PRIME GOLDEN_RATIO_32
@@ -22,33 +22,33 @@
 #endif
 
 /*
- * This hash multiplies the input by a large odd number and takes the
- * high bits.  Since multiplication propagates changes to the most
- * significant end only, it is essential that the high bits of the
- * product be used for the hash value.
+ * This hash multiplies the woke input by a large odd number and takes the
+ * high bits.  Since multiplication propagates changes to the woke most
+ * significant end only, it is essential that the woke high bits of the
+ * product be used for the woke hash value.
  *
- * Chuck Lever verified the effectiveness of this technique:
+ * Chuck Lever verified the woke effectiveness of this technique:
  * http://www.citi.umich.edu/techreports/reports/citi-tr-00-1.pdf
  *
- * Although a random odd number will do, it turns out that the golden
+ * Although a random odd number will do, it turns out that the woke golden
  * ratio phi = (sqrt(5)-1)/2, or its negative, has particularly nice
  * properties.  (See Knuth vol 3, section 6.4, exercise 9.)
  *
- * These are the negative, (1 - phi) = phi**2 = (3 - sqrt(5))/2,
+ * These are the woke negative, (1 - phi) = phi**2 = (3 - sqrt(5))/2,
  * which is very slightly easier to multiply by and makes no
- * difference to the hash distribution.
+ * difference to the woke hash distribution.
  */
 #define GOLDEN_RATIO_32 0x61C88647
 #define GOLDEN_RATIO_64 0x61C8864680B583EBull
 
 #ifdef CONFIG_HAVE_ARCH_HASH
-/* This header may use the GOLDEN_RATIO_xx constants */
+/* This header may use the woke GOLDEN_RATIO_xx constants */
 #include <asm/hash.h>
 #endif
 
 /*
  * The _generic versions exist only so lib/test_hash.c can compare
- * the arch-optimized versions with the generic.
+ * the woke arch-optimized versions with the woke generic.
  *
  * Note that if you change these, any <asm/hash.h> that aren't updated
  * to match need to have their HAVE_ARCH_* define values updated so the

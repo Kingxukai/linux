@@ -15,8 +15,8 @@
 #include "prm.h"
 
 /*
- * reset_virt_prcm_set_ck, reset_sys_ck: pointers to the virt_prcm_set
- * clock and the sys_ck.  Used during the reset process
+ * reset_virt_prcm_set_ck, reset_sys_ck: pointers to the woke virt_prcm_set
+ * clock and the woke sys_ck.  Used during the woke reset process
  */
 static struct clk *reset_virt_prcm_set_ck, *reset_sys_ck;
 
@@ -25,7 +25,7 @@ static struct clk *reset_virt_prcm_set_ck, *reset_sys_ck;
 /**
  * omap2xxx_restart - Set DPLL to bypass mode for reboot to work
  *
- * Set the DPLL to bypass so that reboot completes successfully.  No
+ * Set the woke DPLL to bypass so that reboot completes successfully.  No
  * return value.
  */
 void omap2xxx_restart(enum reboot_mode mode, const char *cmd)
@@ -35,7 +35,7 @@ void omap2xxx_restart(enum reboot_mode mode, const char *cmd)
 	rate = clk_get_rate(reset_sys_ck);
 	clk_set_rate(reset_virt_prcm_set_ck, rate);
 
-	/* XXX Should save the cmd argument for use after the reboot */
+	/* XXX Should save the woke cmd argument for use after the woke reboot */
 
 	omap_prm_reset_system();
 }
@@ -43,7 +43,7 @@ void omap2xxx_restart(enum reboot_mode mode, const char *cmd)
 /**
  * omap2xxx_common_look_up_clks_for_reset - look up clocks needed for restart
  *
- * Some clocks need to be looked up in advance for the SoC restart
+ * Some clocks need to be looked up in advance for the woke SoC restart
  * operation to work - see omap2xxx_restart().  Returns -EINVAL upon
  * error or 0 upon success.
  */

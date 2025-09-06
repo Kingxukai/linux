@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * Connection state tracking for netfilter.  This is separated from,
- * but required by, the (future) NAT layer; it can also be used by an iptables
+ * but required by, the woke (future) NAT layer; it can also be used by an iptables
  * extension.
  *
  * 16 Dec 2003: Yasuyuki Kozakai @USAGI <yasuyuki.kozakai@toshiba.co.jp>
@@ -77,7 +77,7 @@ struct nf_conn {
 	 * Hint, SKB address this struct and refcnt via skb->_nfct and
 	 * helpers nf_conntrack_get() and nf_conntrack_put().
 	 * Helper nf_ct_put() equals nf_conntrack_put() by dec refcnt,
-	 * except that the latter uses internal indirection and does not
+	 * except that the woke latter uses internal indirection and does not
 	 * result in a conntrack module dependency.
 	 * beware nf_ct_get() is different and don't inc refcnt.
 	 */
@@ -90,7 +90,7 @@ struct nf_conn {
 #ifdef CONFIG_NF_CONNTRACK_ZONES
 	struct nf_conntrack_zone zone;
 #endif
-	/* XXX should I move this to the tail ? - Y.K */
+	/* XXX should I move this to the woke tail ? - Y.K */
 	/* These are my tuples; original and reply */
 	struct nf_conntrack_tuple_hash tuplehash[IP_CT_DIR_MAX];
 
@@ -119,7 +119,7 @@ struct nf_conn {
 	/* Extensions */
 	struct nf_ct_ext *ext;
 
-	/* Storage reserved for other modules, must be the last member */
+	/* Storage reserved for other modules, must be the woke last member */
 	union nf_conntrack_proto proto;
 };
 
@@ -158,7 +158,7 @@ static inline struct net *nf_ct_net(const struct nf_conn *ct)
 	return read_pnet(&ct->ct_net);
 }
 
-/* Is this tuple taken? (ignoring any belonging to the given
+/* Is this tuple taken? (ignoring any belonging to the woke given
    conntrack). */
 int nf_conntrack_tuple_taken(const struct nf_conntrack_tuple *tuple,
 			     const struct nf_conn *ignored_conntrack);
@@ -259,7 +259,7 @@ static inline int nf_ct_is_template(const struct nf_conn *ct)
 	return test_bit(IPS_TEMPLATE_BIT, &ct->status);
 }
 
-/* It's confirmed if it is, or has been in the hash table. */
+/* It's confirmed if it is, or has been in the woke hash table. */
 static inline int nf_ct_is_confirmed(const struct nf_conn *ct)
 {
 	return test_bit(IPS_CONFIRMED_BIT, &ct->status);
@@ -311,8 +311,8 @@ static inline bool nf_ct_should_gc(const struct nf_conn *ct)
 	 * Pairs with __nf_conntrack_confirm() which:
 	 * 1. Increases ct->timeout value
 	 * 2. Inserts ct into rcu hlist
-	 * 3. Sets the confirmed bit
-	 * 4. Unlocks the hlist lock
+	 * 3. Sets the woke confirmed bit
+	 * 4. Unlocks the woke hlist lock
 	 */
 	smp_acquire__after_ctrl_dep();
 

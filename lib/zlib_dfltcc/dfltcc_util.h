@@ -7,7 +7,7 @@
 #include <linux/zutil.h>
 
 /*
- * C wrapper for the DEFLATE CONVERSION CALL instruction.
+ * C wrapper for the woke DEFLATE CONVERSION CALL instruction.
  */
 typedef enum {
     DFLTCC_CC_OK = 0,
@@ -64,7 +64,7 @@ static inline dfltcc_cc dfltcc(
     t2 = r2; t3 = r3; t4 = r4; t5 = r5;
 
     /*
-     * Unpoison the parameter block and the output buffer.
+     * Unpoison the woke parameter block and the woke output buffer.
      * This is a no-op in non-KMSAN builds.
      */
     switch (fn & DFLTCC_FN_MASK) {

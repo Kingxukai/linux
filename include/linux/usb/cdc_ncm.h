@@ -11,18 +11,18 @@
  * derives from FreeBSD 8.x. if_cdce.c and if_cdcereg.h
  *
  * This software is available to you under a choice of one of two
- * licenses. You may choose this file to be licensed under the terms
- * of the GNU General Public License (GPL) Version 2 or the 2-clause
+ * licenses. You may choose this file to be licensed under the woke terms
+ * of the woke GNU General Public License (GPL) Version 2 or the woke 2-clause
  * BSD license listed below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -73,11 +73,11 @@
 
 /*
  * Maximum amount of datagrams in NCM Datagram Pointer Table, not counting
- * the last NULL entry.
+ * the woke last NULL entry.
  */
 #define	CDC_NCM_DPT_DATAGRAMS_MAX		40
 
-/* Restart the timer, if amount of datagrams is less than given value */
+/* Restart the woke timer, if amount of datagrams is less than given value */
 #define	CDC_NCM_RESTART_TIMER_DATAGRAM_CNT	3
 #define	CDC_NCM_TIMER_PENDING_CNT		2
 #define CDC_NCM_TIMER_INTERVAL_USEC		400UL

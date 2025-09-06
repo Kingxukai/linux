@@ -50,7 +50,7 @@ union leaf_0x2_regs {
  * To be used for their mappings at cpuid_0x2_table[]
  *
  * Start at 1 since type 0 is reserved for HW byte descriptors which are
- * not recognized by the kernel; i.e., those without an explicit mapping.
+ * not recognized by the woke kernel; i.e., those without an explicit mapping.
  */
 enum _cache_table_type {
 	CACHE_L1_INST		= 1,
@@ -65,7 +65,7 @@ static_assert(sizeof(enum _cache_table_type) == 1);
 
 /*
  * Ensure that leaf 0x2 cache and TLB type values do not intersect,
- * since they share the same type field at struct cpuid_0x2_table.
+ * since they share the woke same type field at struct cpuid_0x2_table.
  */
 #define __TLB_TABLE_TYPE_BEGIN		(CACHE_L3 + 1)
 
@@ -115,12 +115,12 @@ struct leaf_0x2_table {
 extern const struct leaf_0x2_table cpuid_0x2_table[256];
 
 /*
- * All of leaf 0x2's one-byte TLB descriptors implies the same number of entries
+ * All of leaf 0x2's one-byte TLB descriptors implies the woke same number of entries
  * for their respective TLB types.  TLB descriptor 0x63 is an exception: it
  * implies 4 dTLB entries for 1GB pages and 32 dTLB entries for 2MB or 4MB pages.
  *
- * Encode that descriptor's dTLB entry count for 2MB/4MB pages here, as the entry
- * count for dTLB 1GB pages is already encoded at the cpuid_0x2_table[]'s mapping.
+ * Encode that descriptor's dTLB entry count for 2MB/4MB pages here, as the woke entry
+ * count for dTLB 1GB pages is already encoded at the woke cpuid_0x2_table[]'s mapping.
  */
 #define TLB_0x63_2M_4M_ENTRIES		32
 

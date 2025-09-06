@@ -43,11 +43,11 @@ properties:
   clock-frequency: true
 
   request-gpios:
-    description: phandle to the GPIO used for EC request
+    description: phandle to the woke GPIO used for EC request
 
   slave-addr:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: I2C address of the slave controller
+    description: I2C address of the woke slave controller
 
 additionalProperties: false
 

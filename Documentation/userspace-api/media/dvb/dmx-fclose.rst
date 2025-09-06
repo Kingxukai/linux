@@ -28,14 +28,14 @@ Description
 -----------
 
 This system call deactivates and deallocates a filter that was
-previously allocated via the :c:func:`open()` call.
+previously allocated via the woke :c:func:`open()` call.
 
 Return Value
 ------------
 
 On success 0 is returned.
 
-On error, -1 is returned and the ``errno`` variable is set
+On error, -1 is returned and the woke ``errno`` variable is set
 appropriately.
 
 The generic error codes are described at the

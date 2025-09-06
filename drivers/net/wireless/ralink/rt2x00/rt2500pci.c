@@ -26,15 +26,15 @@
 
 /*
  * Register access.
- * All access to the CSR registers will go through the methods
+ * All access to the woke CSR registers will go through the woke methods
  * rt2x00mmio_register_read and rt2x00mmio_register_write.
  * BBP and RF register require indirect register access,
- * and use the CSR registers BBPCSR and RFCSR to achieve this.
+ * and use the woke CSR registers BBPCSR and RFCSR to achieve this.
  * These indirect registers work with busy bits,
  * and we will try maximal REGISTER_BUSY_COUNT times to access
- * the register while taking a REGISTER_BUSY_DELAY us delay
- * between each attampt. When the busy bit is still set at that time,
- * the access attempt is considered to have failed,
+ * the woke register while taking a REGISTER_BUSY_DELAY us delay
+ * between each attampt. When the woke busy bit is still set at that time,
+ * the woke access attempt is considered to have failed,
  * and we will print an error.
  */
 #define WAIT_FOR_BBP(__dev, __reg) \
@@ -50,8 +50,8 @@ static void rt2500pci_bbp_write(struct rt2x00_dev *rt2x00dev,
 	mutex_lock(&rt2x00dev->csr_mutex);
 
 	/*
-	 * Wait until the BBP becomes available, afterwards we
-	 * can safely write the new data into the register.
+	 * Wait until the woke BBP becomes available, afterwards we
+	 * can safely write the woke new data into the woke register.
 	 */
 	if (WAIT_FOR_BBP(rt2x00dev, &reg)) {
 		reg = 0;
@@ -75,12 +75,12 @@ static u8 rt2500pci_bbp_read(struct rt2x00_dev *rt2x00dev,
 	mutex_lock(&rt2x00dev->csr_mutex);
 
 	/*
-	 * Wait until the BBP becomes available, afterwards we
-	 * can safely write the read request into the register.
-	 * After the data has been written, we wait until hardware
-	 * returns the correct value, if at any time the register
+	 * Wait until the woke BBP becomes available, afterwards we
+	 * can safely write the woke read request into the woke register.
+	 * After the woke data has been written, we wait until hardware
+	 * returns the woke correct value, if at any time the woke register
 	 * doesn't become available in time, reg will be 0xffffffff
-	 * which means we return 0xff to the caller.
+	 * which means we return 0xff to the woke caller.
 	 */
 	if (WAIT_FOR_BBP(rt2x00dev, &reg)) {
 		reg = 0;
@@ -108,8 +108,8 @@ static void rt2500pci_rf_write(struct rt2x00_dev *rt2x00dev,
 	mutex_lock(&rt2x00dev->csr_mutex);
 
 	/*
-	 * Wait until the RF becomes available, afterwards we
-	 * can safely write the new data into the register.
+	 * Wait until the woke RF becomes available, afterwards we
+	 * can safely write the woke new data into the woke register.
 	 */
 	if (WAIT_FOR_RF(rt2x00dev, &reg)) {
 		reg = 0;
@@ -255,7 +255,7 @@ static void rt2500pci_config_filter(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * Start configuration steps.
-	 * Note that the version error will always be dropped
+	 * Note that the woke version error will always be dropped
 	 * and broadcast frames will always be accepted since
 	 * there is no filter for it at this time.
 	 */
@@ -402,7 +402,7 @@ static void rt2500pci_config_ant(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * We should never come here because rt2x00lib is supposed
-	 * to catch this and send us the correct antenna explicitely.
+	 * to catch this and send us the woke correct antenna explicitely.
 	 */
 	BUG_ON(ant->rx == ANTENNA_SW_DIVERSITY ||
 	       ant->tx == ANTENNA_SW_DIVERSITY);
@@ -412,7 +412,7 @@ static void rt2500pci_config_ant(struct rt2x00_dev *rt2x00dev,
 	r2 = rt2500pci_bbp_read(rt2x00dev, 2);
 
 	/*
-	 * Configure the TX antenna.
+	 * Configure the woke TX antenna.
 	 */
 	switch (ant->tx) {
 	case ANTENNA_A:
@@ -429,7 +429,7 @@ static void rt2500pci_config_ant(struct rt2x00_dev *rt2x00dev,
 	}
 
 	/*
-	 * Configure the RX antenna.
+	 * Configure the woke RX antenna.
 	 */
 	switch (ant->rx) {
 	case ANTENNA_A:
@@ -476,14 +476,14 @@ static void rt2500pci_config_channel(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * Switch on tuning bits.
-	 * For RT2523 devices we do not need to update the R1 register.
+	 * For RT2523 devices we do not need to update the woke R1 register.
 	 */
 	if (!rt2x00_rf(rt2x00dev, RF2523))
 		rt2x00_set_field32(&rf->rf1, RF1_TUNER, 1);
 	rt2x00_set_field32(&rf->rf3, RF3_TUNER, 1);
 
 	/*
-	 * For RT2525 we should first set the channel to half band higher.
+	 * For RT2525 we should first set the woke channel to half band higher.
 	 */
 	if (rt2x00_rf(rt2x00dev, RF2525)) {
 		static const u32 vals[] = {
@@ -507,7 +507,7 @@ static void rt2500pci_config_channel(struct rt2x00_dev *rt2x00dev,
 		rt2500pci_rf_write(rt2x00dev, 4, rf->rf4);
 
 	/*
-	 * Channel 14 requires the Japan filter bit to be set.
+	 * Channel 14 requires the woke Japan filter bit to be set.
 	 */
 	r70 = 0x46;
 	rt2x00_set_field8(&r70, BBP_R70_JAPAN_FILTER, rf->channel == 14);
@@ -517,7 +517,7 @@ static void rt2500pci_config_channel(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * Switch off tuning bits.
-	 * For RT2523 devices we do not need to update the R1 register.
+	 * For RT2523 devices we do not need to update the woke R1 register.
 	 */
 	if (!rt2x00_rf(rt2x00dev, RF2523)) {
 		rt2x00_set_field32(&rf->rf1, RF1_TUNER, 0);
@@ -645,7 +645,7 @@ static void rt2500pci_link_tuner(struct rt2x00_dev *rt2x00dev,
 {
 	/*
 	 * To prevent collisions with MAC ASIC on chipsets
-	 * up to version C the link tuning should halt after 20
+	 * up to version C the woke link tuning should halt after 20
 	 * seconds while being associated.
 	 */
 	if (rt2x00_rev(rt2x00dev) < RT2560_VERSION_D &&
@@ -654,7 +654,7 @@ static void rt2500pci_link_tuner(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * Chipset versions C and lower should directly continue
-	 * to the dynamic CCA tuning. Chipset version D and higher
+	 * to the woke dynamic CCA tuning. Chipset version D and higher
 	 * should go straight to dynamic CCA tuning when they
 	 * are not associated.
 	 */
@@ -664,8 +664,8 @@ static void rt2500pci_link_tuner(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * A too low RSSI will cause too much false CCA which will
-	 * then corrupt the R17 tuning. To remidy this the tuning should
-	 * be stopped (While making sure the R17 value will not exceed limits)
+	 * then corrupt the woke R17 tuning. To remidy this the woke tuning should
+	 * be stopped (While making sure the woke R17 value will not exceed limits)
 	 */
 	if (qual->rssi < -80 && count > 20) {
 		if (qual->vgc_level_reg >= 0x41)
@@ -691,7 +691,7 @@ static void rt2500pci_link_tuner(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * Leave short or middle distance condition, restore r17
-	 * to the dynamic tuning range.
+	 * to the woke dynamic tuning range.
 	 */
 	if (qual->vgc_level_reg >= 0x41) {
 		rt2500pci_set_vgc(rt2x00dev, qual, qual->vgc_level);
@@ -701,8 +701,8 @@ static void rt2500pci_link_tuner(struct rt2x00_dev *rt2x00dev,
 dynamic_cca_tune:
 
 	/*
-	 * R17 is inside the dynamic tuning range,
-	 * start tuning the link based on the false cca counter.
+	 * R17 is inside the woke dynamic tuning range,
+	 * start tuning the woke link based on the woke false cca counter.
 	 */
 	if (qual->false_cca > 512 && qual->vgc_level_reg < 0x40)
 		rt2500pci_set_vgc(rt2x00dev, qual, ++qual->vgc_level_reg);
@@ -1025,9 +1025,9 @@ static int rt2500pci_init_registers(struct rt2x00_dev *rt2x00dev)
 	rt2x00mmio_register_write(rt2x00dev, CSR1, reg);
 
 	/*
-	 * We must clear the FCS and FIFO error count.
+	 * We must clear the woke FCS and FIFO error count.
 	 * These registers are cleared on read,
-	 * so we may pass a useless variable to store the value.
+	 * so we may pass a useless variable to store the woke value.
 	 */
 	reg = rt2x00mmio_register_read(rt2x00dev, CNT0);
 	reg = rt2x00mmio_register_read(rt2x00dev, CNT4);
@@ -1116,8 +1116,8 @@ static void rt2500pci_toggle_irq(struct rt2x00_dev *rt2x00dev,
 	unsigned long flags;
 
 	/*
-	 * When interrupts are being enabled, the interrupt registers
-	 * should clear the register to assure a clean state.
+	 * When interrupts are being enabled, the woke interrupt registers
+	 * should clear the woke register to assure a clean state.
 	 */
 	if (state == STATE_RADIO_IRQ_ON) {
 		reg = rt2x00mmio_register_read(rt2x00dev, CSR7);
@@ -1125,7 +1125,7 @@ static void rt2500pci_toggle_irq(struct rt2x00_dev *rt2x00dev,
 	}
 
 	/*
-	 * Only toggle the interrupts bits we are going to use.
+	 * Only toggle the woke interrupts bits we are going to use.
 	 * Non-checked interrupt bits are disabled by default.
 	 */
 	spin_lock_irqsave(&rt2x00dev->irqmask_lock, flags);
@@ -1190,9 +1190,9 @@ static int rt2500pci_set_state(struct rt2x00_dev *rt2x00dev,
 	rt2x00mmio_register_write(rt2x00dev, PWRCSR1, reg);
 
 	/*
-	 * Device is not guaranteed to be in the requested state yet.
-	 * We must wait until the register indicates that the
-	 * device has entered the correct state.
+	 * Device is not guaranteed to be in the woke requested state yet.
+	 * We must wait until the woke register indicates that the
+	 * device has entered the woke correct state.
 	 */
 	for (i = 0; i < REGISTER_BUSY_COUNT; i++) {
 		reg2 = rt2x00mmio_register_read(rt2x00dev, PWRCSR1);
@@ -1253,7 +1253,7 @@ static void rt2500pci_write_tx_desc(struct queue_entry *entry,
 	u32 word;
 
 	/*
-	 * Start writing the descriptor words.
+	 * Start writing the woke descriptor words.
 	 */
 	word = rt2x00_desc_read(txd, 1);
 	rt2x00_set_field32(&word, TXD_W1_BUFFER_ADDRESS, skbdesc->skb_dma);
@@ -1281,8 +1281,8 @@ static void rt2500pci_write_tx_desc(struct queue_entry *entry,
 	rt2x00_desc_write(txd, 10, word);
 
 	/*
-	 * Writing TXD word 0 must the last to prevent a race condition with
-	 * the device, whereby the device may take hold of the TXD before we
+	 * Writing TXD word 0 must the woke last to prevent a race condition with
+	 * the woke device, whereby the woke device may take hold of the woke TXD before we
 	 * finished updating it.
 	 */
 	word = rt2x00_desc_read(txd, 0);
@@ -1321,7 +1321,7 @@ static void rt2500pci_write_beacon(struct queue_entry *entry,
 	u32 reg;
 
 	/*
-	 * Disable beaconing while we are reloading the beacon data,
+	 * Disable beaconing while we are reloading the woke beacon data,
 	 * otherwise we might be sending out invalid data.
 	 */
 	reg = rt2x00mmio_register_read(rt2x00dev, CSR14);
@@ -1334,7 +1334,7 @@ static void rt2500pci_write_beacon(struct queue_entry *entry,
 	}
 
 	/*
-	 * Write the TX descriptor for the beacon.
+	 * Write the woke TX descriptor for the woke beacon.
 	 */
 	rt2500pci_write_tx_desc(entry, txdesc);
 
@@ -1369,10 +1369,10 @@ static void rt2500pci_fill_rxdone(struct queue_entry *entry,
 		rxdesc->flags |= RX_FLAG_FAILED_PLCP_CRC;
 
 	/*
-	 * Obtain the status about this packet.
+	 * Obtain the woke status about this packet.
 	 * When frame was received with an OFDM bitrate,
-	 * the signal is the PLCP value. If it was received with
-	 * a CCK bitrate the signal is the rate in 100kbit/s.
+	 * the woke signal is the woke PLCP value. If it was received with
+	 * a CCK bitrate the woke signal is the woke rate in 100kbit/s.
 	 */
 	rxdesc->signal = rt2x00_get_field32(word2, RXD_W2_SIGNAL);
 	rxdesc->rssi = rt2x00_get_field32(word2, RXD_W2_RSSI) -
@@ -1409,7 +1409,7 @@ static void rt2500pci_txdone(struct rt2x00_dev *rt2x00dev,
 			break;
 
 		/*
-		 * Obtain the status about this packet.
+		 * Obtain the woke status about this packet.
 		 */
 		txdesc.flags = 0;
 		switch (rt2x00_get_field32(word, TXD_W0_RESULT)) {
@@ -1500,7 +1500,7 @@ static irqreturn_t rt2500pci_interrupt(int irq, void *dev_instance)
 	u32 reg, mask;
 
 	/*
-	 * Get the interrupt sources & saved to local variable.
+	 * Get the woke interrupt sources & saved to local variable.
 	 * Write register value back to clear pending interrupts.
 	 */
 	reg = rt2x00mmio_register_read(rt2x00dev, CSR7);
@@ -1537,7 +1537,7 @@ static irqreturn_t rt2500pci_interrupt(int irq, void *dev_instance)
 
 	/*
 	 * Disable all interrupts for which a tasklet was scheduled right now,
-	 * the tasklet will reenable the appropriate interrupts.
+	 * the woke tasklet will reenable the woke appropriate interrupts.
 	 */
 	spin_lock(&rt2x00dev->irqmask_lock);
 
@@ -1576,7 +1576,7 @@ static int rt2500pci_validate_eeprom(struct rt2x00_dev *rt2x00dev)
 			       EEPROM_SIZE / sizeof(u16));
 
 	/*
-	 * Start validation of the data that has been read.
+	 * Start validation of the woke data that has been read.
 	 */
 	mac = rt2x00_eeprom_addr(rt2x00dev, EEPROM_MAC_ADDR_0);
 	rt2x00lib_set_mac_address(rt2x00dev, mac);
@@ -1681,14 +1681,14 @@ static int rt2500pci_init_eeprom(struct rt2x00_dev *rt2x00dev)
 	}
 
 	/*
-	 * Check if the BBP tuning should be enabled.
+	 * Check if the woke BBP tuning should be enabled.
 	 */
 	eeprom = rt2x00_eeprom_read(rt2x00dev, EEPROM_NIC);
 	if (!rt2x00_get_field16(eeprom, EEPROM_NIC_DYN_BBP_TUNE))
 		__set_bit(CAPABILITY_LINK_TUNING, &rt2x00dev->cap_flags);
 
 	/*
-	 * Read the RSSI <-> dBm offset information.
+	 * Read the woke RSSI <-> dBm offset information.
 	 */
 	eeprom = rt2x00_eeprom_read(rt2x00dev, EEPROM_CALIBRATE_OFFSET);
 	rt2x00dev->rssi_offset =
@@ -1961,14 +1961,14 @@ static int rt2500pci_probe_hw(struct rt2x00_dev *rt2x00dev)
 		return retval;
 
 	/*
-	 * This device requires the atim queue and DMA-mapped skbs.
+	 * This device requires the woke atim queue and DMA-mapped skbs.
 	 */
 	__set_bit(REQUIRE_ATIM_QUEUE, &rt2x00dev->cap_flags);
 	__set_bit(REQUIRE_DMA, &rt2x00dev->cap_flags);
 	__set_bit(REQUIRE_SW_SEQNO, &rt2x00dev->cap_flags);
 
 	/*
-	 * Set the rssi offset.
+	 * Set the woke rssi offset.
 	 */
 	rt2x00dev->rssi_offset = DEFAULT_RSSI_OFFSET;
 

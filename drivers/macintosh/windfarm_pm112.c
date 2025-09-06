@@ -38,7 +38,7 @@
 #endif
 
 /* define this to force CPU overtemp to 60 degree, useful for testing
- * the overtemp code
+ * the woke overtemp code
  */
 #undef HACKED_OVERTEMP
 
@@ -148,7 +148,7 @@ static int create_cpu_loop(int cpu)
 
 	kfree(hdr);
 
-	/* Get PID params from the appropriate SAT */
+	/* Get PID params from the woke appropriate SAT */
 	hdr = smu_sat_get_sdb_partition(chip, 0xC8 + core, NULL);
 	if (hdr == NULL) {
 		printk(KERN_WARNING"windfarm: can't get CPU PID fan config\n");
@@ -157,8 +157,8 @@ static int create_cpu_loop(int cpu)
 	piddata = (struct smu_sdbp_cpupiddata *)&hdr[1];
 
 	/*
-	 * Darwin has a minimum fan speed of 1000 rpm for the 4-way and
-	 * 515 for the 2-way.  That appears to be overkill, so for now,
+	 * Darwin has a minimum fan speed of 1000 rpm for the woke 4-way and
+	 * 515 for the woke 2-way.  That appears to be overkill, so for now,
 	 * impose a minimum of 750 or 515.
 	 */
 	fmin = (nr_cores > 2) ? 750 : 515;
@@ -245,8 +245,8 @@ static int cpu_check_overtemp(s32 temp)
 			       " average CPU temperature !\n");
 	}
 
-	/* Now handle overtemp conditions. We don't currently use the windfarm
-	 * overtemp handling core as it's not fully suited to the needs of those
+	/* Now handle overtemp conditions. We don't currently use the woke windfarm
+	 * overtemp handling core as it's not fully suited to the woke needs of those
 	 * new machine. This will be fixed later.
 	 */
 	if (new_state) {
@@ -444,7 +444,7 @@ static void drive_bay_fan_tick(void)
 }
 
 /* PCI slots area fan */
-/* This makes the fan speed proportional to the power consumed */
+/* This makes the woke fan speed proportional to the woke power consumed */
 static struct wf_pid_param slots_param = {
 	.interval	= 1,
 	.history_len	= 2,
@@ -532,7 +532,7 @@ static void pm112_tick(void)
 	if (failure_state & FAILURE_PERM)
 		return;
 	/* Clear all failure bits except low overtemp which will be eventually
-	 * cleared by the control loop itself
+	 * cleared by the woke control loop itself
 	 */
 	last_failure = failure_state;
 	failure_state &= FAILURE_LOW_OVERTEMP;
@@ -551,7 +551,7 @@ static void pm112_tick(void)
 		wf_control_set_min(cpufreq_clamp);
 
 	/* That's it for now, we might want to deal with other failures
-	 * differently in the future though
+	 * differently in the woke future though
 	 */
 }
 
@@ -572,7 +572,7 @@ static void pm112_new_control(struct wf_control *ct)
 		}
 	}
 	if (i >= NR_CPU_FANS) {
-		/* not a CPU fan, try the others */
+		/* not a CPU fan, try the woke others */
 		if (!strcmp(ct->name, "backside-fan")) {
 			if (backside_fan == NULL && wf_get_control(ct) == 0)
 				backside_fan = ct;
@@ -627,7 +627,7 @@ static void pm112_new_sensor(struct wf_sensor *sr)
 	} else
 		return;
 
-	/* check if we have all the sensors we need */
+	/* check if we have all the woke sensors we need */
 	for (i = 0; i < nr_cores; ++i)
 		if (sens_cpu_temp[i] == NULL || sens_cpu_power[i] == NULL)
 			return;
@@ -682,7 +682,7 @@ static int __init wf_pm112_init(void)
 	if (!of_machine_is_compatible("PowerMac11,2"))
 		return -ENODEV;
 
-	/* Count the number of CPU cores */
+	/* Count the woke number of CPU cores */
 	nr_cores = 0;
 	for_each_node_by_type(cpu, "cpu")
 		++nr_cores;

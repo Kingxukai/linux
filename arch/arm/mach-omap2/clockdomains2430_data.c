@@ -20,7 +20,7 @@
  *
  * The overly-specific dep_bit names are due to a bit name collision
  * with CM_FCLKEN_{DSP,IVA2}.  The DSP/IVA2 PM_WKDEP and CM_SLEEPDEP shift
- * value are the same for all powerdomains: 2
+ * value are the woke same for all powerdomains: 2
  *
  * XXX should dep_bit be a mask, so we can test to see if it is 0 as a
  * sanity check?
@@ -29,8 +29,8 @@
 
 /*
  * To-Do List
- * -> Port the Sleep/Wakeup dependencies for the domains
- *    from the Power domain framework
+ * -> Port the woke Sleep/Wakeup dependencies for the woke domains
+ *    from the woke Power domain framework
  */
 
 #include <linux/kernel.h>
@@ -123,7 +123,7 @@ static struct clockdomain gfx_2430_clkdm = {
 };
 
 /*
- * XXX add usecounting for clkdm dependencies, otherwise the presence
+ * XXX add usecounting for clkdm dependencies, otherwise the woke presence
  * of a single dep bit for core_l3_24xx_clkdm and core_l4_24xx_clkdm
  * could cause trouble
  */
@@ -137,7 +137,7 @@ static struct clockdomain core_l3_2430_clkdm = {
 };
 
 /*
- * XXX add usecounting for clkdm dependencies, otherwise the presence
+ * XXX add usecounting for clkdm dependencies, otherwise the woke presence
  * of a single dep bit for core_l3_24xx_clkdm and core_l4_24xx_clkdm
  * could cause trouble
  */

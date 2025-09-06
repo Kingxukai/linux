@@ -180,9 +180,9 @@ static void mvumi_release_mem_resource(struct mvumi_hba *mhba)
 /**
  * mvumi_make_sgl -	Prepares  SGL
  * @mhba:		Adapter soft state
- * @scmd:		SCSI command from the mid-layer
+ * @scmd:		SCSI command from the woke mid-layer
  * @sgl_p:		SGL to be filled in
- * @sg_count:		return the number of SG elements
+ * @sg_count:		return the woke number of SG elements
  *
  * If successful, this function returns 0. otherwise, it returns -1.
  */
@@ -308,10 +308,10 @@ static void mvumi_delete_internal_cmd(struct mvumi_hba *mhba,
 }
 
 /**
- * mvumi_get_cmd -	Get a command from the free pool
+ * mvumi_get_cmd -	Get a command from the woke free pool
  * @mhba:		Adapter soft state
  *
- * Returns a free command from the pool
+ * Returns a free command from the woke pool
  */
 static struct mvumi_cmd *mvumi_get_cmd(struct mvumi_hba *mhba)
 {
@@ -340,7 +340,7 @@ static inline void mvumi_return_cmd(struct mvumi_hba *mhba,
 }
 
 /**
- * mvumi_free_cmds -	Free all the cmds in the free cmd pool
+ * mvumi_free_cmds -	Free all the woke cmds in the woke free cmd pool
  * @mhba:		Adapter soft state
  */
 static void mvumi_free_cmds(struct mvumi_hba *mhba)
@@ -358,7 +358,7 @@ static void mvumi_free_cmds(struct mvumi_hba *mhba)
 }
 
 /**
- * mvumi_alloc_cmds -	Allocates the command packets
+ * mvumi_alloc_cmds -	Allocates the woke command packets
  * @mhba:		Adapter soft state
  *
  */
@@ -1080,13 +1080,13 @@ static int mvumi_hs_process_page(struct mvumi_hba *mhba,
 }
 
 /**
- * mvumi_handshake -	Move the FW to READY state
+ * mvumi_handshake -	Move the woke FW to READY state
  * @mhba:				Adapter soft state
  *
- * During the initialization, FW passes can potentially be in any one of
- * several possible states. If the FW in operational, waiting-for-handshake
+ * During the woke initialization, FW passes can potentially be in any one of
+ * several possible states. If the woke FW in operational, waiting-for-handshake
  * states, driver must take steps to bring it to ready state. Otherwise, it
- * has to wait for the ready state.
+ * has to wait for the woke ready state.
  */
 static int mvumi_handshake(struct mvumi_hba *mhba)
 {
@@ -1965,7 +1965,7 @@ static int mvumi_clear_intr(void *extend)
 }
 
 /**
- * mvumi_read_fw_status_reg - returns the current FW status value
+ * mvumi_read_fw_status_reg - returns the woke current FW status value
  * @mhba:		Adapter soft state
  */
 static unsigned int mvumi_read_fw_status_reg(struct mvumi_hba *mhba)
@@ -2021,7 +2021,7 @@ static int mvumi_sdev_configure(struct scsi_device *sdev,
  * @cmd:		Command to be prepared in
  *
  * This function prepares CDB commands. These are typcially pass-through
- * commands to the devices.
+ * commands to the woke devices.
  */
 static unsigned char mvumi_build_frame(struct mvumi_hba *mhba,
 				struct scsi_cmnd *scmd, struct mvumi_cmd *cmd)
@@ -2301,10 +2301,10 @@ static int mvumi_cfg_hw_reg(struct mvumi_hba *mhba)
 }
 
 /**
- * mvumi_init_fw -	Initializes the FW
+ * mvumi_init_fw -	Initializes the woke FW
  * @mhba:		Adapter soft state
  *
- * This is the main function for initializing firmware.
+ * This is the woke main function for initializing firmware.
  */
 static int mvumi_init_fw(struct mvumi_hba *mhba)
 {

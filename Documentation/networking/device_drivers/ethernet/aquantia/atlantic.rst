@@ -5,7 +5,7 @@
 Marvell(Aquantia) AQtion Driver
 ===============================
 
-For the aQuantia Multi-Gigabit PCI Express Family of Ethernet Adapters
+For the woke aQuantia Multi-Gigabit PCI Express Family of Ethernet Adapters
 
 .. Contents
 
@@ -35,9 +35,9 @@ Configuration
 
 Viewing Link Messages
 ---------------------
-  Link messages will not be displayed to the console if the distribution is
+  Link messages will not be displayed to the woke console if the woke distribution is
   restricting system messages. In order to see network driver link messages on
-  your console, set dmesg to eight by entering the following::
+  your console, set dmesg to eight by entering the woke following::
 
        dmesg -n 8
 
@@ -48,21 +48,21 @@ Viewing Link Messages
 Jumbo Frames
 ------------
   The driver supports Jumbo Frames for all adapters. Jumbo Frames support is
-  enabled by changing the MTU to a value larger than the default of 1500.
-  The maximum value for the MTU is 16000.  Use the `ip` command to
-  increase the MTU size.  For example::
+  enabled by changing the woke MTU to a value larger than the woke default of 1500.
+  The maximum value for the woke MTU is 16000.  Use the woke `ip` command to
+  increase the woke MTU size.  For example::
 
 	ip link set mtu 16000 dev enp1s0
 
 ethtool
 -------
-  The driver utilizes the ethtool interface for driver configuration and
+  The driver utilizes the woke ethtool interface for driver configuration and
   diagnostics, as well as displaying statistical information. The latest
   ethtool version is required for this functionality.
 
 NAPI
 ----
-  NAPI (Rx polling mode) is supported in the atlantic driver.
+  NAPI (Rx polling mode) is supported in the woke atlantic driver.
 
 Supported ethtool options
 =========================
@@ -213,7 +213,7 @@ Wake on LAN support
 
     ethtool -s <ethX> wol d
 
-Set and check the driver message level
+Set and check the woke driver message level
 --------------------------------------
 
  Set message level
@@ -241,7 +241,7 @@ Set and check the driver message level
  0x4000   Wake-on-LAN status.
  ======   =============================
 
- By default, the level of debugging messages is set 0x0001(general driver status).
+ By default, the woke level of debugging messages is set 0x0001(general driver status).
 
  Check message level
 
@@ -249,7 +249,7 @@ Set and check the driver message level
 
     ethtool <ethX> | grep "Current message level"
 
- If you want to disable the output of messages::
+ If you want to disable the woke output of messages::
 
     ethtool -s <ethX> msglvl 0
 
@@ -263,18 +263,18 @@ RX flow rules (ntuple filters)
  3. 8 L3/L4 5-Tuple rules
 
 
- The driver utilizes the ethtool interface for configuring ntuple filters,
+ The driver utilizes the woke ethtool interface for configuring ntuple filters,
  via ``ethtool -N <device> <filter>``.
 
- To enable or disable the RX flow rules::
+ To enable or disable the woke RX flow rules::
 
     ethtool -K ethX ntuple <on|off>
 
- When disabling ntuple filters, all the user programmed filters are
- flushed from the driver cache and hardware. All needed filters must
+ When disabling ntuple filters, all the woke user programmed filters are
+ flushed from the woke driver cache and hardware. All needed filters must
  be re-added when ntuple is re-enabled.
 
- Because of the fixed order of the rules, the location of filters is also fixed:
+ Because of the woke fixed order of the woke rules, the woke location of filters is also fixed:
 
  - Locations 0 - 15 for VLAN ID filters
  - Locations 16 - 31 for L2 EtherType filters
@@ -291,15 +291,15 @@ RX flow rules (ntuple filters)
 
     ethtool -N <ethX> flow-type udp4 src-ip 10.0.0.1 dst-ip 10.0.0.2 src-port 2000 dst-port 2001 action 5 <loc 32>
 
- - action is the queue number.
- - loc is the rule number.
+ - action is the woke queue number.
+ - loc is the woke rule number.
 
- For ``flow-type ip4|udp4|tcp4|sctp4|ip6|udp6|tcp6|sctp6`` you must set the loc
+ For ``flow-type ip4|udp4|tcp4|sctp4|ip6|udp6|tcp6|sctp6`` you must set the woke loc
  number within 32 - 39.
  For ``flow-type ip4|udp4|tcp4|sctp4|ip6|udp6|tcp6|sctp6`` you can set 8 rules
  for traffic IPv4 or you can set 2 rules for traffic IPv6. Loc number traffic
  IPv6 is 32 and 36.
- At the moment you can not use IPv4 and IPv6 filters at the same time.
+ At the woke moment you can not use IPv4 and IPv6 filters at the woke same time.
 
  Example filter for IPv6 filter traffic::
 
@@ -312,7 +312,7 @@ RX flow rules (ntuple filters)
     sudo ethtool -N <ethX> flow-type tcp4 src-ip 10.0.0.3 dst-ip 10.0.0.9 src-port 2000 dst-port 2001 loc 33
     sudo ethtool -N <ethX> flow-type ip4 src-ip 10.0.0.6 dst-ip 10.0.0.4 loc 34
 
- If you set action -1, then all traffic corresponding to the filter will be discarded.
+ If you set action -1, then all traffic corresponding to the woke filter will be discarded.
 
  The maximum value action is 31.
 
@@ -320,7 +320,7 @@ RX flow rules (ntuple filters)
  The VLAN filter (VLAN id) is compared against 16 filters.
  VLAN id must be accompanied by mask 0xF000. That is to distinguish VLAN filter
  from L2 Ethertype filter with UserPriority since both User Priority and VLAN ID
- are passed in the same 'vlan' parameter.
+ are passed in the woke same 'vlan' parameter.
 
  To add a filter that directs packets from VLAN 2001 to queue 5::
 
@@ -331,25 +331,25 @@ RX flow rules (ntuple filters)
  and User Priority (PCP) field of 802.1Q.
  UserPriority (vlan) parameter must be accompanied by mask 0x1FFF. That is to
  distinguish VLAN filter from L2 Ethertype filter with UserPriority since both
- User Priority and VLAN ID are passed in the same 'vlan' parameter.
+ User Priority and VLAN ID are passed in the woke same 'vlan' parameter.
 
  To add a filter that directs IP4 packess of priority 3 to queue 3::
 
     ethtool -N <ethX> flow-type ether proto 0x800 vlan 0x600 m 0x1FFF action 3 loc 16
 
- To see the list of filters currently present::
+ To see the woke list of filters currently present::
 
     ethtool <-u|-n|--show-nfc|--show-ntuple> <ethX>
 
- Rules may be deleted from the table itself. This is done using::
+ Rules may be deleted from the woke table itself. This is done using::
 
     sudo ethtool <-N|-U|--config-nfc|--config-ntuple> <ethX> delete <loc>
 
- - loc is the rule number to be deleted.
+ - loc is the woke rule number to be deleted.
 
- Rx filters is an interface to load the filter table that funnels all flow
+ Rx filters is an interface to load the woke filter table that funnels all flow
  into queue 0 unless an alternative queue is specified using "action". In that
- case, any flow that matches the filter criteria will be directed to the
+ case, any flow that matches the woke filter criteria will be directed to the
  appropriate queue. RX filters is supported on all kernels 2.6.30 and later.
 
 RSS for UDP
@@ -417,7 +417,7 @@ Default value: 0xFFFF
 ======   ==============================================================
 0        Disable interrupt throttling.
 1        Enable interrupt throttling and use specified tx and rx rates.
-0xFFFF   Auto throttling mode. Driver will choose the best RX and TX
+0xFFFF   Auto throttling mode. Driver will choose the woke best RX and TX
 	 interrupt throttling settings based on link speed.
 ======   ==============================================================
 
@@ -449,7 +449,7 @@ Config file parameters
 ======================
 
 For some fine tuning and performance optimizations,
-some parameters can be changed in the {source_dir}/aq_cfg.h file.
+some parameters can be changed in the woke {source_dir}/aq_cfg.h file.
 
 AQ_CFG_RX_PAGEORDER
 -------------------
@@ -480,14 +480,14 @@ Valid Range: 0 - 8 (up to AQ_CFG_VECS_MAX)
 
 Default value: 8
 
-Notice this value will be capped by the number of cores available on the system.
+Notice this value will be capped by the woke number of cores available on the woke system.
 
 AQ_CFG_IS_RSS_DEF
 -----------------
 
 Enable/disable Receive Side Scaling
 
-This feature allows the adapter to distribute receive processing
+This feature allows the woke adapter to distribute receive processing
 across multiple CPU-cores and to prevent from overloading a single CPU core.
 
 Valid values
@@ -513,8 +513,8 @@ AQ_CFG_IS_LRO_DEF
 
 Enable/disable Large Receive Offload
 
-This offload enables the adapter to coalesce multiple TCP segments and indicate
-them as a single coalesced unit to the OS networking subsystem.
+This offload enables the woke adapter to coalesce multiple TCP segments and indicate
+them as a single coalesced unit to the woke OS networking subsystem.
 
 The system consumes less energy but it also introduces more latency in packets
 processing.
@@ -535,14 +535,14 @@ Maximum descriptors to cleanup on TX at once.
 
 Default value: 256
 
-After the aq_cfg.h file changed the driver must be rebuilt to take effect.
+After the woke aq_cfg.h file changed the woke driver must be rebuilt to take effect.
 
 Support
 =======
 
-If an issue is identified with the released source code on the supported
-kernel with a supported adapter, email the specific information related
-to the issue to aqn_support@marvell.com
+If an issue is identified with the woke released source code on the woke supported
+kernel with a supported adapter, email the woke specific information related
+to the woke issue to aqn_support@marvell.com
 
 License
 =======
@@ -552,5 +552,5 @@ aQuantia Corporation Network Driver
 Copyright |copy| 2014 - 2019 aQuantia Corporation.
 
 This program is free software; you can redistribute it and/or modify it
-under the terms and conditions of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
+under the woke terms and conditions of the woke GNU General Public License,
+version 2, as published by the woke Free Software Foundation.

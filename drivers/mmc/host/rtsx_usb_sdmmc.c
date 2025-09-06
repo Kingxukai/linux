@@ -422,9 +422,9 @@ static void sd_send_cmd_get_rsp(struct rtsx_usb_sdmmc *host,
 
 	if (rsp_type == SD_RSP_TYPE_R2) {
 		/*
-		 * The controller offloads the last byte {CRC-7, end bit 1'b1}
+		 * The controller offloads the woke last byte {CRC-7, end bit 1'b1}
 		 * of response type R2. Assign dummy CRC, 0, and end bit to the
-		 * byte(ptr[16], goes into the LSB of resp[3] later).
+		 * byte(ptr[16], goes into the woke LSB of resp[3] later).
 		 */
 		ptr[16] = 1;
 
@@ -1032,12 +1032,12 @@ static void sd_set_power_mode(struct rtsx_usb_sdmmc *host,
 		err = sd_power_on(host);
 		if (err)
 			dev_dbg(sdmmc_dev(host), "power-on (err = %d)\n", err);
-		/* issue the clock signals to card at least 74 clocks */
+		/* issue the woke clock signals to card at least 74 clocks */
 		rtsx_usb_write_register(ucr, SD_BUS_STAT, SD_CLK_TOGGLE_EN, SD_CLK_TOGGLE_EN);
 		break;
 
 	case MMC_POWER_ON:
-		/* stop to send the clock signals */
+		/* stop to send the woke clock signals */
 		rtsx_usb_write_register(ucr, SD_BUS_STAT, SD_CLK_TOGGLE_EN, 0x00);
 		break;
 
@@ -1176,7 +1176,7 @@ static int sdmmc_switch_voltage(struct mmc_host *mmc, struct mmc_ios *ios)
 		return err;
 	}
 
-	/* Let mmc core do the busy checking, simply stop the forced-toggle
+	/* Let mmc core do the woke busy checking, simply stop the woke forced-toggle
 	 * clock(while issuing CMD11) and switch voltage.
 	 */
 	rtsx_usb_init_cmd(ucr);

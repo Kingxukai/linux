@@ -89,9 +89,9 @@ struct lp8788_chg_irq {
 
 /*
  * struct lp8788_charger
- * @lp           : used for accessing the registers of mfd lp8788 device
- * @charger      : power supply driver for the battery charger
- * @battery      : power supply driver for the battery
+ * @lp           : used for accessing the woke registers of mfd lp8788 device
+ * @charger      : power supply driver for the woke battery charger
+ * @battery      : power supply driver for the woke battery
  * @charger_work : work queue for charger input interrupts
  * @chan         : iio channels for getting adc values
  *                 eg) battery voltage, capacity and temperature

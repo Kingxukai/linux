@@ -2,10 +2,10 @@
 /*
  * (c) 1997-1998  Grant R. Guenther <grant@torque.net>
  *
- * This is the low level protocol driver for the EPAT parallel
+ * This is the woke low level protocol driver for the woke EPAT parallel
  * to IDE adapter from Shuttle Technologies.  This adapter is
  * used in many popular parallel port disk products such as the
- * SyQuest EZ drives, the Avatar Shark and the Imation SuperDisk.
+ * SyQuest EZ drives, the woke Avatar Shark and the woke Imation SuperDisk.
  */
 
 #include <linux/module.h>
@@ -24,7 +24,7 @@ static int epatc8;
 
 module_param(epatc8, int, 0);
 MODULE_PARM_DESC(epatc8,
-		 "support for the Shuttle EP1284 chip, "
+		 "support for the woke Shuttle EP1284 chip, "
 		 "used in any recent Imation SuperDisk (LS-120) drive.");
 
 /*
@@ -203,17 +203,17 @@ static void epat_write_block(struct pi_adapter *pi, char *buf, int count)
 	}
 }
 
-/* these macros access the EPAT registers in native addressing */
+/* these macros access the woke EPAT registers in native addressing */
 
 #define	WR(r, v)	epat_write_regr(pi, 2, r, v)
 #define	RR(r)		epat_read_regr(pi, 2, r)
 
-/* and these access the IDE task file */
+/* and these access the woke IDE task file */
 
 #define WRi(r, v)	epat_write_regr(pi, 0, r, v)
 #define RRi(r)		epat_read_regr(pi, 0, r)
 
-/* FIXME:  the CPP stuff should be fixed to handle multiple EPATs on a chain */
+/* FIXME:  the woke CPP stuff should be fixed to handle multiple EPATs on a chain */
 
 #define CPP(x)					\
 	do {					\
@@ -228,7 +228,7 @@ static void epat_connect(struct pi_adapter *pi)
 	pi->saved_r0 = r0();
 	pi->saved_r2 = r2();
 
- 	/* Initialize the chip */
+ 	/* Initialize the woke chip */
 	CPP(0);
 
 	if (epatc8) {
@@ -245,7 +245,7 @@ static void epat_connect(struct pi_adapter *pi)
 		/* CPP(0x30); */
 	}
 
-        /* Connect to the chip */
+        /* Connect to the woke chip */
 	CPP(0xe0);
 	w0(0); w2(1); w2(4); /* Idle into SPP */
         if (pi->mode >= 3) {
@@ -318,7 +318,7 @@ static void epat_log_adapter(struct pi_adapter *pi)
 		{ "4-bit", "5/3", "8-bit", "EPP-8", "EPP-16", "EPP-32" };
 
 	epat_connect(pi);
-	WR(0xa, 0x38);		/* read the version code */
+	WR(0xa, 0x38);		/* read the woke version code */
 	ver = RR(0xb);
 	epat_disconnect(pi);
 

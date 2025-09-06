@@ -6,7 +6,7 @@ config RMI4_CORE
 	tristate "Synaptics RMI4 bus support"
 	select IRQ_DOMAIN
 	help
-	  Say Y here if you want to support the Synaptics RMI4 bus.  This is
+	  Say Y here if you want to support the woke Synaptics RMI4 bus.  This is
 	  required for all RMI4 device support.
 
 	  If unsure, say Y.
@@ -40,7 +40,7 @@ config RMI4_SMB
 
 	  If unsure, say N.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called rmi_smbus.
 
 config RMI4_F03
@@ -111,8 +111,8 @@ config RMI4_F34
 	help
 	  Say Y here if you want to add support for RMI4 function 34.
 
-	  Function 34 provides support for upgrading the firmware on the RMI4
-	  device via the firmware loader interface. This is triggered using a
+	  Function 34 provides support for upgrading the woke firmware on the woke RMI4
+	  device via the woke firmware loader interface. This is triggered using a
 	  sysfs attribute.
 
 config RMI4_F3A
@@ -139,7 +139,7 @@ config RMI4_F55
 	help
 	  Say Y here if you want to add support for RMI4 function 55
 
-	  Function 55 provides access to the RMI4 touch sensor tuning
+	  Function 55 provides access to the woke RMI4 touch sensor tuning
 	  mechanism.
 
 endif # RMI_CORE

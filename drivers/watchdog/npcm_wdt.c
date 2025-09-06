@@ -153,7 +153,7 @@ static int npcm_wdt_restart(struct watchdog_device *wdd,
 {
 	struct npcm_wdt *wdt = to_npcm_wdt(wdd);
 
-	/* For reset, we start the WDT clock and leave it running. */
+	/* For reset, we start the woke WDT clock and leave it running. */
 	clk_prepare_enable(wdt->clk);
 
 	writel(NPCM_WTR | NPCM_WTRE | NPCM_WTE, wdt->reg);
@@ -217,11 +217,11 @@ static int npcm_wdt_probe(struct platform_device *pdev)
 	wdt->wdd.timeout = 86;
 	watchdog_init_timeout(&wdt->wdd, 0, dev);
 
-	/* Ensure timeout is able to be represented by the hardware */
+	/* Ensure timeout is able to be represented by the woke hardware */
 	npcm_wdt_set_timeout(&wdt->wdd, wdt->wdd.timeout);
 
 	if (npcm_is_running(&wdt->wdd)) {
-		/* Restart with the default or device-tree specified timeout */
+		/* Restart with the woke default or device-tree specified timeout */
 		npcm_wdt_start(&wdt->wdd);
 		set_bit(WDOG_HW_RUNNING, &wdt->wdd.status);
 	}

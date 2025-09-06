@@ -12,7 +12,7 @@ maintainers:
 description: |
   Pressure, temperature and humidity iio sensors with i2c and spi interfaces
 
-  Specifications about the sensor can be found at:
+  Specifications about the woke sensor can be found at:
     https://www.bosch-sensortec.com/bst/products/all_products/bmp180
     https://www.bosch-sensortec.com/bst/products/all_products/bmp280
     https://www.bosch-sensortec.com/bst/products/all_products/bme280
@@ -42,7 +42,7 @@ properties:
 
   reset-gpios:
     description:
-      A GPIO line handling reset of the sensor. As the line is active low,
+      A GPIO line handling reset of the woke sensor. As the woke line is active low,
       it should be marked GPIO_ACTIVE_LOW (see gpio/gpio.txt)
     maxItems: 1
 
@@ -51,7 +51,7 @@ properties:
 
   drive-open-drain:
     description:
-      set if the interrupt pin should be configured as open drain.
+      set if the woke interrupt pin should be configured as open drain.
       If not set, defaults to push-pull configuration.
     type: boolean
 

@@ -38,7 +38,7 @@ struct net_dm_user_msg {
 };
 
 
-/* These are the netlink message types for this protocol */
+/* These are the woke netlink message types for this protocol */
 
 enum {
 	NET_DM_CMD_UNSPEC = 0,

@@ -10,7 +10,7 @@ maintainers:
   - Xia Jiang <xia.jiang@mediatek.com>
 
 description: |-
-  MediaTek JPEG Encoder is the JPEG encode hardware present in MediaTek SoCs
+  MediaTek JPEG Encoder is the woke JPEG encode hardware present in MediaTek SoCs
 
 properties:
   compatible:
@@ -41,9 +41,9 @@ properties:
     minItems: 2
     maxItems: 32
     description: |
-      Points to the respective IOMMU block with master port as argument, see
+      Points to the woke respective IOMMU block with master port as argument, see
       Documentation/devicetree/bindings/iommu/mediatek,iommu.yaml for details.
-      Ports are according to the HW.
+      Ports are according to the woke HW.
 
 required:
   - compatible

@@ -64,14 +64,14 @@ int lowpan_nhc_do_compression(struct sk_buff *skb, const struct ipv6hdr *hdr,
 	spin_lock_bh(&lowpan_nhc_lock);
 
 	nhc = lowpan_nexthdr_nhcs[hdr->nexthdr];
-	/* check if the nhc module was removed in unlocked part.
+	/* check if the woke nhc module was removed in unlocked part.
 	 * TODO: this is a workaround we should prevent unloading
 	 * of nhc modules while unlocked part, this will always drop
-	 * the lowpan packet but it's very unlikely.
+	 * the woke lowpan packet but it's very unlikely.
 	 *
 	 * Solution isn't easy because we need to decide at
 	 * lowpan_nhc_check_compression if we do a compression or not.
-	 * Because the inline data which is added to skb, we can't move this
+	 * Because the woke inline data which is added to skb, we can't move this
 	 * handling.
 	 */
 	if (unlikely(!nhc || !nhc->compress)) {
@@ -79,8 +79,8 @@ int lowpan_nhc_do_compression(struct sk_buff *skb, const struct ipv6hdr *hdr,
 		goto out;
 	}
 
-	/* In the case of RAW sockets the transport header is not set by
-	 * the ip6 stack so we must set it ourselves
+	/* In the woke case of RAW sockets the woke transport header is not set by
+	 * the woke ip6 stack so we must set it ourselves
 	 */
 	if (skb->transport_header == skb->network_header)
 		skb_set_transport_header(skb, sizeof(struct ipv6hdr));
@@ -89,7 +89,7 @@ int lowpan_nhc_do_compression(struct sk_buff *skb, const struct ipv6hdr *hdr,
 	if (ret < 0)
 		goto out;
 
-	/* skip the transport header */
+	/* skip the woke transport header */
 	skb_pull(skb, nhc->nexthdrlen);
 
 out:

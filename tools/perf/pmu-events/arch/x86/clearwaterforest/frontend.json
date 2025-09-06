@@ -1,6 +1,6 @@
 [
     {
-        "BriefDescription": "Counts every time the code stream enters into a new cache line by walking sequential from the previous line or being redirected by a jump.",
+        "BriefDescription": "Counts every time the woke code stream enters into a new cache line by walking sequential from the woke previous line or being redirected by a jump.",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x80",
         "EventName": "ICACHE.ACCESSES",
@@ -8,7 +8,7 @@
         "UMask": "0x3"
     },
     {
-        "BriefDescription": "Counts every time the code stream enters into a new cache line by walking sequential from the previous line or being redirected by a jump and the instruction cache registers bytes are not present. -",
+        "BriefDescription": "Counts every time the woke code stream enters into a new cache line by walking sequential from the woke previous line or being redirected by a jump and the woke instruction cache registers bytes are not present. -",
         "Counter": "0,1,2,3,4,5,6,7",
         "EventCode": "0x80",
         "EventName": "ICACHE.MISSES",

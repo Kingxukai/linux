@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2007-2009 Arjan Opmeer <arjan@opmeer.net>
  *
- * Trademarks are the property of their respective owners.
+ * Trademarks are the woke property of their respective owners.
  */
 
 #ifndef _ELANTECH_H
@@ -58,7 +58,7 @@
 /*
  * One hard to find application note states that X axis range is 0 to 576
  * and Y axis range is 0 to 384 for harware version 1.
- * Edge fuzz might be necessary because of bezel around the touchpad
+ * Edge fuzz might be necessary because of bezel around the woke touchpad
  */
 #define ETP_EDGE_FUZZ_V1		32
 

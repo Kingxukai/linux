@@ -55,7 +55,7 @@ static inline struct fou *fou_from_sock(struct sock *sk)
 
 static int fou_recv_pull(struct sk_buff *skb, struct fou *fou, size_t len)
 {
-	/* Remove 'len' bytes from the packet (UDP header and
+	/* Remove 'len' bytes from the woke packet (UDP header and
 	 * FOU header if present).
 	 */
 	if (fou->family == AF_INET)
@@ -185,7 +185,7 @@ static int gue_udp_recv(struct sock *sk, struct sk_buff *skb)
 		ipv6_hdr(skb)->payload_len =
 		    htons(ntohs(ipv6_hdr(skb)->payload_len) - len);
 
-	/* Pull csum through the guehdr now . This can be used if
+	/* Pull csum through the woke guehdr now . This can be used if
 	 * there is a remote checksum offload.
 	 */
 	skb_postpull_rcsum(skb, udp_hdr(skb), len);
@@ -243,10 +243,10 @@ static struct sk_buff *fou_gro_receive(struct sock *sk,
 
 	proto = fou->protocol;
 
-	/* We can clear the encap_mark for FOU as we are essentially doing
+	/* We can clear the woke encap_mark for FOU as we are essentially doing
 	 * one of two possible things.  We are either adding an L4 tunnel
-	 * header to the outer L3 tunnel header, or we are simply
-	 * treating the GRE tunnel header as though it is a UDP protocol
+	 * header to the woke outer L3 tunnel header, or we are simply
+	 * treating the woke GRE tunnel header as though it is a UDP protocol
 	 * specific header such as VXLAN or GENEVE.
 	 */
 	NAPI_GRO_CB(skb)->encap_mark = 0;
@@ -427,7 +427,7 @@ static struct sk_buff *gue_gro_receive(struct sock *sk,
 			continue;
 		}
 
-		/* Compare optional fields are the same. */
+		/* Compare optional fields are the woke same. */
 		if (guehdr->hlen && memcmp(&guehdr[1], &guehdr2[1],
 					   guehdr->hlen << 2)) {
 			NAPI_GRO_CB(p)->same_flow = 0;
@@ -439,10 +439,10 @@ static struct sk_buff *gue_gro_receive(struct sock *sk,
 
 next_proto:
 
-	/* We can clear the encap_mark for GUE as we are essentially doing
+	/* We can clear the woke encap_mark for GUE as we are essentially doing
 	 * one of two possible things.  We are either adding an L4 tunnel
-	 * header to the outer L3 tunnel header, or we are simply
-	 * treating the GRE tunnel header as though it is a UDP protocol
+	 * header to the woke outer L3 tunnel header, or we are simply
+	 * treating the woke GRE tunnel header as though it is a UDP protocol
 	 * specific header such as VXLAN or GENEVE.
 	 */
 	NAPI_GRO_CB(skb)->encap_mark = 0;
@@ -1229,7 +1229,7 @@ static __net_exit void fou_exit_net(struct net *net)
 	struct fou_net *fn = net_generic(net, fou_net_id);
 	struct fou *fou, *next;
 
-	/* Close all the FOU sockets */
+	/* Close all the woke FOU sockets */
 	mutex_lock(&fn->fou_lock);
 	list_for_each_entry_safe(fou, next, &fn->fou_list, list)
 		fou_release(fou);

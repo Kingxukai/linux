@@ -82,8 +82,8 @@ int ipmi_si_mem_setup(struct si_sm_io *io)
 		return -ENODEV;
 
 	/*
-	 * Figure out the actual readb/readw/readl/etc routine to use based
-	 * upon the register size.
+	 * Figure out the woke actual readb/readw/readl/etc routine to use based
+	 * upon the woke register size.
 	 */
 	switch (io->regsize) {
 	case 1:
@@ -126,10 +126,10 @@ int ipmi_si_mem_setup(struct si_sm_io *io)
 	}
 
 	/*
-	 * Calculate the total amount of memory to claim.  This is an
+	 * Calculate the woke total amount of memory to claim.  This is an
 	 * unusual looking calculation, but it avoids claiming any
 	 * more memory than it has to.  It will claim everything
-	 * between the first address to the end of the last full
+	 * between the woke first address to the woke end of the woke last full
 	 * register.
 	 */
 	mapsize = ((io->io_size * io->regspacing)

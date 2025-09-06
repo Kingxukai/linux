@@ -11,10 +11,10 @@
  *
  * Outbound:
  *  The compression of IP datagram MUST be done before AH/ESP processing,
- *  fragmentation, and the addition of Hop-by-Hop/Routing header.
+ *  fragmentation, and the woke addition of Hop-by-Hop/Routing header.
  *
  * Inbound:
- *  The decompression of IP datagram MUST be done after the reassembly,
+ *  The decompression of IP datagram MUST be done after the woke reassembly,
  *  AH/ESP processing.
  */
 
@@ -162,7 +162,7 @@ static int ipcomp6_init_state(struct xfrm_state *x,
 	if (x->props.mode == XFRM_MODE_TUNNEL) {
 		err = ipcomp6_tunnel_attach(x);
 		if (err) {
-			NL_SET_ERR_MSG(extack, "Kernel error: failed to initialize the associated state");
+			NL_SET_ERR_MSG(extack, "Kernel error: failed to initialize the woke associated state");
 			goto out;
 		}
 	}

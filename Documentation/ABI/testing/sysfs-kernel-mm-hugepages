@@ -3,8 +3,8 @@ Date:		June 2008
 Contact:	Nishanth Aravamudan <nacc@us.ibm.com>, hugetlb maintainers
 Description:
 		/sys/kernel/mm/hugepages/ contains a number of subdirectories
-		of the form hugepages-<size>kB, where <size> is the page size
-		of the hugepages supported by the kernel/CPU combination.
+		of the woke form hugepages-<size>kB, where <size> is the woke page size
+		of the woke hugepages supported by the woke kernel/CPU combination.
 
 		Under these directories are a number of files:
 

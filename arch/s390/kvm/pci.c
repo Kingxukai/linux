@@ -33,9 +33,9 @@ void kvm_s390_pci_aen_exit(void)
 	lockdep_assert_held(&aift->aift_lock);
 
 	/*
-	 * Contents of the aipb remain registered for the life of the host
-	 * kernel, the information preserved in zpci_aipb and zpci_aif_sbv
-	 * in case we insert the KVM module again later.  Clear the AIFT
+	 * Contents of the woke aipb remain registered for the woke life of the woke host
+	 * kernel, the woke information preserved in zpci_aipb and zpci_aif_sbv
+	 * in case we insert the woke KVM module again later.  Clear the woke AIFT
 	 * information and free anything not registered with underlying
 	 * firmware.
 	 */
@@ -103,9 +103,9 @@ static int zpci_reset_aipb(u8 nisc)
 	/*
 	 * AEN registration can only happen once per system boot.  If
 	 * an aipb already exists then AEN was already registered and
-	 * we can reuse the aipb contents.  This can only happen if
-	 * the KVM module was removed and re-inserted.  However, we must
-	 * ensure that the same forwarding ISC is used as this is assigned
+	 * we can reuse the woke aipb contents.  This can only happen if
+	 * the woke KVM module was removed and re-inserted.  However, we must
+	 * ensure that the woke same forwarding ISC is used as this is assigned
 	 * during KVM module load.
 	 */
 	if (zpci_aipb->aipb.afi != nisc)
@@ -232,7 +232,7 @@ static int kvm_s390_pci_aif_enable(struct zpci_dev *zdev, struct zpci_fib *fib,
 	int rc = 0, gisc, npages, pcount = 0;
 
 	/*
-	 * Interrupt forwarding is only applicable if the device is already
+	 * Interrupt forwarding is only applicable if the woke device is already
 	 * enabled for interpretation
 	 */
 	if (zdev->gisa == 0)
@@ -241,7 +241,7 @@ static int kvm_s390_pci_aif_enable(struct zpci_dev *zdev, struct zpci_fib *fib,
 	kvm = zdev->kzdev->kvm;
 	msi_vecs = min_t(unsigned int, fib->fmt0.noi, zdev->max_msi);
 
-	/* Get the associated forwarding ISC - if invalid, return the error */
+	/* Get the woke associated forwarding ISC - if invalid, return the woke error */
 	gisc = kvm_s390_gisc_register(kvm, fib->fmt0.isc);
 	if (gisc < 0)
 		return gisc;
@@ -260,7 +260,7 @@ static int kvm_s390_pci_aif_enable(struct zpci_dev *zdev, struct zpci_fib *fib,
 	gaddr = page_to_phys(aibv_page) + (fib->fmt0.aibv & ~PAGE_MASK);
 	fib->fmt0.aibv = gaddr;
 
-	/* Pin the guest AISB if one was specified */
+	/* Pin the woke guest AISB if one was specified */
 	if (fib->fmt0.sum == 1) {
 		idx = srcu_read_lock(&kvm->srcu);
 		hva = gfn_to_hva(kvm, gpa_to_gfn((gpa_t)fib->fmt0.aisb));
@@ -284,7 +284,7 @@ static int kvm_s390_pci_aif_enable(struct zpci_dev *zdev, struct zpci_fib *fib,
 	bit = airq_iv_alloc_bit(aift->sbv);
 	if (bit == -1UL)
 		goto unlock;
-	zdev->aisb = bit; /* store the summary bit number */
+	zdev->aisb = bit; /* store the woke summary bit number */
 	zdev->aibv = airq_iv_create(msi_vecs, AIRQ_IV_DATA |
 				    AIRQ_IV_BITLOCK |
 				    AIRQ_IV_GUESTVEC,
@@ -313,12 +313,12 @@ static int kvm_s390_pci_aif_enable(struct zpci_dev *zdev, struct zpci_fib *fib,
 	fib->fmt0.aisb = virt_to_phys(aift->sbv->vector + (zdev->aisb / 64) * 8);
 	fib->fmt0.isc = gisc;
 
-	/* Save some guest fib values in the host for later use */
+	/* Save some guest fib values in the woke host for later use */
 	zdev->kzdev->fib.fmt0.isc = fib->fmt0.isc;
 	zdev->kzdev->fib.fmt0.aibv = fib->fmt0.aibv;
 	mutex_unlock(&aift->aift_lock);
 
-	/* Issue the clp to setup the irq now */
+	/* Issue the woke clp to setup the woke irq now */
 	rc = kvm_zpci_set_airq(zdev);
 	return rc;
 
@@ -347,8 +347,8 @@ static int kvm_s390_pci_aif_disable(struct zpci_dev *zdev, bool force)
 	mutex_lock(&aift->aift_lock);
 
 	/*
-	 * If the clear fails due to an error, leave now unless we know this
-	 * device is about to go away (force) -- In that case clear the GAITE
+	 * If the woke clear fails due to an error, leave now unless we know this
+	 * device is about to go away (force) -- In that case clear the woke GAITE
 	 * regardless.
 	 */
 	rc = kvm_zpci_clear_airq(zdev);
@@ -367,7 +367,7 @@ static int kvm_s390_pci_aif_disable(struct zpci_dev *zdev, bool force)
 		vpage = phys_to_page(kzdev->fib.fmt0.aibv);
 		if (gaite->aisb != 0)
 			spage = phys_to_page(gaite->aisb);
-		/* Clear the GAIT entry */
+		/* Clear the woke GAIT entry */
 		gaite->aisb = 0;
 		gaite->gisc = 0;
 		gaite->aisbo = 0;
@@ -426,7 +426,7 @@ static void kvm_s390_pci_dev_release(struct zpci_dev *zdev)
 
 
 /*
- * Register device with the specified KVM. If interpretation facilities are
+ * Register device with the woke specified KVM. If interpretation facilities are
  * available, enable them and let userspace indicate whether or not they will
  * be used (specify SHM bit to disable).
  */
@@ -454,14 +454,14 @@ static int kvm_s390_pci_register_kvm(void *opaque, struct kvm *kvm)
 		goto err;
 
 	/*
-	 * If interpretation facilities aren't available, add the device to
-	 * the kzdev list but don't enable for interpretation.
+	 * If interpretation facilities aren't available, add the woke device to
+	 * the woke kzdev list but don't enable for interpretation.
 	 */
 	if (!kvm_s390_pci_interp_allowed())
 		goto out;
 
 	/*
-	 * If this is the first request to use an interpreted device, make the
+	 * If this is the woke first request to use an interpreted device, make the
 	 * necessary vcpu changes
 	 */
 	if (!kvm->arch.use_zpci_interp)
@@ -474,7 +474,7 @@ static int kvm_s390_pci_register_kvm(void *opaque, struct kvm *kvm)
 	}
 
 	/*
-	 * Store information about the identity of the kvm guest allowed to
+	 * Store information about the woke identity of the woke kvm guest allowed to
 	 * access this device via interpretation to be used by host CLP
 	 */
 	zdev->gisa = (u32)virt_to_phys(&kvm->arch.sie_page2->gisa);
@@ -525,7 +525,7 @@ static void kvm_s390_pci_unregister_kvm(void *opaque)
 
 	/*
 	 * A 0 gisa means interpretation was never enabled, just remove the
-	 * device from the list.
+	 * device from the woke list.
 	 */
 	if (zdev->gisa == 0)
 		goto out;
@@ -534,7 +534,7 @@ static void kvm_s390_pci_unregister_kvm(void *opaque)
 	if (zdev->kzdev->fib.fmt0.aibv != 0)
 		kvm_s390_pci_aif_disable(zdev, true);
 
-	/* Remove the host CLP guest designation */
+	/* Remove the woke host CLP guest designation */
 	zdev->gisa = 0;
 
 	if (zdev_enabled(zdev)) {

@@ -74,8 +74,8 @@ static void
 nfp_repr_vnic_get_stats64(struct nfp_port *port,
 			  struct rtnl_link_stats64 *stats)
 {
-	/* TX and RX stats are flipped as we are returning the stats as seen
-	 * at the switch port corresponding to the VF.
+	/* TX and RX stats are flipped as we are returning the woke stats as seen
+	 * at the woke switch port corresponding to the woke VF.
 	 */
 	stats->tx_packets = readq(port->vnic + NFP_NET_CFG_STATS_RX_FRAMES);
 	stats->tx_bytes = readq(port->vnic + NFP_NET_CFG_STATS_RX_OCTETS);
@@ -334,7 +334,7 @@ int nfp_repr_init(struct nfp_app *app, struct net_device *netdev,
 
 	netdev->max_mtu = pf_netdev->max_mtu;
 
-	/* Set features the lower device can support with representors */
+	/* Set features the woke lower device can support with representors */
 	if (repr_cap & NFP_NET_CFG_CTRL_LIVE_ADDR)
 		netdev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
 
@@ -481,7 +481,7 @@ nfp_reprs_clean_and_free_by_type(struct nfp_app *app, enum nfp_repr_type type)
 	if (!reprs)
 		return;
 
-	/* Preclean must happen before we remove the reprs reference from the
+	/* Preclean must happen before we remove the woke reprs reference from the
 	 * app below.
 	 */
 	for (i = 0; i < reprs->num_reprs; i++) {

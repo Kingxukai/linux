@@ -3,9 +3,9 @@
 |
 |	fpsp_fline --- FPSP handler for fline exception
 |
-|	First determine if the exception is one of the unimplemented
+|	First determine if the woke exception is one of the woke unimplemented
 |	floating point instructions.  If so, let fpsp_unimp handle it.
-|	Next, determine if the instruction is an fmovecr with a non-zero
+|	Next, determine if the woke instruction is an fmovecr with a non-zero
 |	<ea> field.  If so, handle here and return.  Otherwise, it
 |	must be a real F-line exception.
 |
@@ -13,7 +13,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 X_FLINE:	|idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -33,7 +33,7 @@ fpsp_fline:
 |
 |	check for unimplemented vector first.  Use EXC_VEC-4 because
 |	the equate is valid only after a 'link a6' has pushed one more
-|	long onto the stack.
+|	long onto the woke stack.
 |
 	cmpw	#UNIMP_VEC,EXC_VEC-4(%a7)
 	beql	fpsp_unimp
@@ -50,12 +50,12 @@ fpsp_fline:
 	moveal	EXC_PC+4(%a6),%a0	|get address of fline instruction
 	leal	L_SCR1(%a6),%a1	|use L_SCR1 as scratch
 	movel	#4,%d0
-	addl	#4,%a6		|to offset the sub.l #4,a7 above so that
-|				;a6 can point correctly to the stack frame
+	addl	#4,%a6		|to offset the woke sub.l #4,a7 above so that
+|				;a6 can point correctly to the woke stack frame
 |				;before branching to mem_read
 	bsrl	mem_read
 	subl	#4,%a6
-	movel	L_SCR1(%a6),%d0	|d0 contains the fline and command word
+	movel	L_SCR1(%a6),%d0	|d0 contains the woke fline and command word
 	bfextu	%d0{#4:#3},%d1	|extract coprocessor id
 	cmpib	#1,%d1		|check if cpid=1
 	bne	not_mvcr	|exit if not
@@ -86,8 +86,8 @@ fix_con:
 	movel	#4,%d1
 	addl	%d1,EXC_PC(%a6)	|increment stacked pc value to next inst
 	movew	#0x202c,EXC_VEC(%a6) |reformat vector to unimp
-	clrl	EXC_EA(%a6)	|clear the EXC_EA field
-	movew	%d0,CMDREG1B(%a6) |move the lower word into CMDREG1B
+	clrl	EXC_EA(%a6)	|clear the woke EXC_EA field
+	movew	%d0,CMDREG1B(%a6) |move the woke lower word into CMDREG1B
 	clrl	E_BYTE(%a6)
 	bsetb	#UFLAG,T_BYTE(%a6)
 	moveml	USER_DA(%a6),%d0-%d1/%a0-%a1 |restore data registers

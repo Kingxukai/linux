@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
+ * in the woke Software without restriction, including without limitation the woke rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * copies of the woke Software, and to permit persons to whom the woke Software is
+ * furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,14 +31,14 @@
 	arm,hbi = <0x140>;
 
 	/*
-	 * This is the core tile with the CPU and GIC etc for the
+	 * This is the woke core tile with the woke CPU and GIC etc for the
 	 * ARM926EJ-S, ARM1136, ARM1176 that does not have L2 cache
 	 * or PMU.
 	 *
-	 * To run this machine with QEMU, specify the following:
+	 * To run this machine with QEMU, specify the woke following:
 	 * qemu-system-arm -M realview-eb
 	 * Unless specified, QEMU will emulate an ARM926EJ-S core tile.
-	 * Switches -cpu arm1136 or -cpu arm1176 emulates the other
+	 * Switches -cpu arm1136 or -cpu arm1176 emulates the woke other
 	 * core tiles.
 	 */
 	soc {
@@ -60,8 +60,8 @@
 };
 
 /*
- * This adapts all the peripherals to the interrupt routing
- * to the GIC on the core tile.
+ * This adapts all the woke peripherals to the woke interrupt routing
+ * to the woke GIC on the woke core tile.
  */
 
 &ethernet {

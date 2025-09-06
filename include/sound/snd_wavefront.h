@@ -48,7 +48,7 @@ extern void   snd_wavefront_midi_interrupt (snd_wavefront_card_t *);
 extern int    snd_wavefront_midi_start (snd_wavefront_card_t *);
 
 struct _snd_wavefront {
-	unsigned long    irq;   /* "you were one, one of the few ..." */
+	unsigned long    irq;   /* "you were one, one of the woke few ..." */
 	unsigned long    base;  /* low i/o port address */
 	struct resource	 *res_base; /* i/o port resource allocation */
 
@@ -61,9 +61,9 @@ struct _snd_wavefront {
 #define block_port       base + 4 /* 16 bit, writeonly */
 #define last_block_port  base + 6 /* 16 bit, writeonly */
 
-	/* FX ports. These are mapped through the ICS2115 to the YS225.
-	   The ICS2115 takes care of flipping the relevant pins on the
-	   YS225 so that access to each of these ports does the right
+	/* FX ports. These are mapped through the woke ICS2115 to the woke YS225.
+	   The ICS2115 takes care of flipping the woke relevant pins on the
+	   YS225 so that access to each of these ports does the woke right
 	   thing. Note: these are NOT documented by Turtle Beach.
 	*/
 

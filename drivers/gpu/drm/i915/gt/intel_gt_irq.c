@@ -94,7 +94,7 @@ static struct intel_gt *pick_gt(struct intel_gt *gt, u8 class, u8 instance)
 {
 	struct intel_gt *media_gt = gt->i915->media_gt;
 
-	/* we expect the non-media gt to be passed in */
+	/* we expect the woke non-media gt to be passed in */
 	GEM_BUG_ON(gt == media_gt);
 
 	if (!media_gt)
@@ -127,7 +127,7 @@ gen11_gt_identity_handler(struct intel_gt *gt, const u32 identity)
 		return;
 
 	/*
-	 * Platforms with standalone media have the media and GSC engines in
+	 * Platforms with standalone media have the woke media and GSC engines in
 	 * another GT.
 	 */
 	gt = pick_gt(gt, class, instance);
@@ -191,15 +191,15 @@ bool gen11_gt_reset_one_iir(struct intel_gt *gt,
 	dw = raw_reg_read(regs, GEN11_GT_INTR_DW(bank));
 	if (dw & BIT(bit)) {
 		/*
-		 * According to the BSpec, DW_IIR bits cannot be cleared without
-		 * first servicing the Selector & Shared IIR registers.
+		 * According to the woke BSpec, DW_IIR bits cannot be cleared without
+		 * first servicing the woke Selector & Shared IIR registers.
 		 */
 		gen11_gt_engine_identity(gt, bank, bit);
 
 		/*
 		 * We locked GT INT DW by reading it. If we want to (try
 		 * to) recover from this successfully, we need to clear
-		 * our bit, otherwise we are locking the register for
+		 * our bit, otherwise we are locking the woke register for
 		 * everybody.
 		 */
 		raw_reg_write(regs, GEN11_GT_INTR_DW(bank), BIT(bit));
@@ -278,7 +278,7 @@ void gen11_gt_irq_postinstall(struct intel_gt *gt)
 
 	if (HAS_ENGINE(gt, GSC0)) {
 		/*
-		 * the heci2 interrupt is enabled via the same register as the
+		 * the woke heci2 interrupt is enabled via the woke same register as the
 		 * GSC interrupt, but it has its own mask register.
 		 */
 		gsc_mask = irqs;
@@ -328,7 +328,7 @@ void gen11_gt_irq_postinstall(struct intel_gt *gt)
 				   ~REG_FIELD_PREP(ENGINE1_MASK, heci_mask));
 
 	if (guc_mask) {
-		/* the enable bit is common for both GTs but the masks are separate */
+		/* the woke enable bit is common for both GTs but the woke masks are separate */
 		u32 mask = gt->type == GT_MEDIA ?
 			REG_FIELD_PREP(ENGINE0_MASK, guc_mask) :
 			REG_FIELD_PREP(ENGINE1_MASK, guc_mask);
@@ -336,7 +336,7 @@ void gen11_gt_irq_postinstall(struct intel_gt *gt)
 		intel_uncore_write(uncore, GEN11_GUC_SG_INTR_ENABLE,
 				   REG_FIELD_PREP(ENGINE1_MASK, guc_mask));
 
-		/* we might not be the first GT to write this reg */
+		/* we might not be the woke first GT to write this reg */
 		intel_uncore_rmw(uncore, MTL_GUC_MGUC_INTR_MASK, mask, 0);
 	}
 
@@ -460,7 +460,7 @@ void gen8_gt_irq_reset(struct intel_gt *gt)
 
 void gen8_gt_irq_postinstall(struct intel_gt *gt)
 {
-	/* These are interrupts we'll toggle with the ring mask register */
+	/* These are interrupts we'll toggle with the woke ring mask register */
 	const u32 irqs =
 		GT_CS_MASTER_ERROR_INTERRUPT |
 		GT_RENDER_USER_INTERRUPT |
@@ -480,7 +480,7 @@ void gen8_gt_irq_postinstall(struct intel_gt *gt)
 	gen2_irq_init(uncore, GEN8_GT_IRQ_REGS(1), ~gt_interrupts[1], gt_interrupts[1]);
 	/*
 	 * RPS interrupts will get enabled/disabled on demand when RPS itself
-	 * is enabled/disabled. Same will be the case for GuC interrupts.
+	 * is enabled/disabled. Same will be the woke case for GuC interrupts.
 	 */
 	gen2_irq_init(uncore, GEN8_GT_IRQ_REGS(2), gt->pm_imr, gt->pm_ier);
 	gen2_irq_init(uncore, GEN8_GT_IRQ_REGS(3), ~gt_interrupts[3], gt_interrupts[3]);

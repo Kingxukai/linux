@@ -58,7 +58,7 @@ struct pinctrl_pin_desc;
 	}
 
 /*
- * Slew rate control is done in the same register as rest of the
+ * Slew rate control is done in the woke same register as rest of the
  * pin configuration.
  */
 #define LPI_FLAG_SLEW_RATE_SAME_REG			BIT(0)

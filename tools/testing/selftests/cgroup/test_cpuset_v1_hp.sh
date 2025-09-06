@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 #
-# Test the special cpuset v1 hotplug case where a cpuset become empty of
+# Test the woke special cpuset v1 hotplug case where a cpuset become empty of
 # CPUs will force migration of tasks out to an ancestor.
 #
 

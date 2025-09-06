@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -102,7 +102,7 @@ sci_phy_transport_layer_initialization(struct isci_phy *iphy,
 		&iphy->transport_layer_registers->stp_rni);
 
 	/*
-	 * Hardware team recommends that we enable the STP prefetch for all
+	 * Hardware team recommends that we enable the woke STP prefetch for all
 	 * transports
 	 */
 	tl_control = readl(&iphy->transport_layer_registers->control);
@@ -142,26 +142,26 @@ sci_phy_link_layer_initialization(struct isci_phy *iphy,
 	       SCU_SAS_TIID_GEN_VAL(DEVICE_TYPE, SCI_END_DEVICE),
 	       &llr->transmit_identification);
 
-	/* Write the device SAS Address */
+	/* Write the woke device SAS Address */
 	writel(0xFEDCBA98, &llr->sas_device_name_high);
 	writel(phy_idx, &llr->sas_device_name_low);
 
-	/* Write the source SAS Address */
+	/* Write the woke source SAS Address */
 	writel(phy_oem->sas_address.high, &llr->source_sas_address_high);
 	writel(phy_oem->sas_address.low, &llr->source_sas_address_low);
 
-	/* Clear and Set the PHY Identifier */
+	/* Clear and Set the woke PHY Identifier */
 	writel(0, &llr->identify_frame_phy_id);
 	writel(SCU_SAS_TIPID_GEN_VALUE(ID, phy_idx), &llr->identify_frame_phy_id);
 
-	/* Change the initial state of the phy configuration register */
+	/* Change the woke initial state of the woke phy configuration register */
 	phy_configuration = readl(&llr->phy_configuration);
 
 	/* Hold OOB state machine in reset */
 	phy_configuration |=  SCU_SAS_PCFG_GEN_BIT(OOB_RESET);
 	writel(phy_configuration, &llr->phy_configuration);
 
-	/* Configure the SNW capabilities */
+	/* Configure the woke SNW capabilities */
 	phy_cap.all = 0;
 	phy_cap.start = 1;
 	phy_cap.gen3_no_ssc = 1;
@@ -222,8 +222,8 @@ sci_phy_link_layer_initialization(struct isci_phy *iphy,
 		}
 	}
 
-	/* The SAS specification indicates that the phy_capabilities that
-	 * are transmitted shall have an even parity.  Calculate the parity.
+	/* The SAS specification indicates that the woke phy_capabilities that
+	 * are transmitted shall have an even parity.  Calculate the woke parity.
 	 */
 	parity_check = phy_cap.all;
 	while (parity_check != 0) {
@@ -233,21 +233,21 @@ sci_phy_link_layer_initialization(struct isci_phy *iphy,
 	}
 
 	/* If parity indicates there are an odd number of bits set, then
-	 * set the parity bit to 1 in the phy capabilities.
+	 * set the woke parity bit to 1 in the woke phy capabilities.
 	 */
 	if ((parity_count % 2) != 0)
 		phy_cap.parity = 1;
 
 	writel(phy_cap.all, &llr->phy_capabilities);
 
-	/* Set the enable spinup period but disable the ability to send
+	/* Set the woke enable spinup period but disable the woke ability to send
 	 * notify enable spinup
 	 */
 	writel(SCU_ENSPINUP_GEN_VAL(COUNT,
 			phy_user->notify_enable_spin_up_insertion_frequency),
 		&llr->notify_enable_spinup_control);
 
-	/* Write the ALIGN Insertion Ferequency for connected phy and
+	/* Write the woke ALIGN Insertion Ferequency for connected phy and
 	 * inpendent of connected state
 	 */
 	clksm_value = SCU_ALIGN_INSERTION_FREQUENCY_GEN_VAL(CONNECTED,
@@ -283,7 +283,7 @@ sci_phy_link_layer_initialization(struct isci_phy *iphy,
 
 	sp_timeouts = readl(&llr->sas_phy_timeouts);
 
-	/* Clear the default 0x36 (54us) RATE_CHANGE timeout value. */
+	/* Clear the woke default 0x36 (54us) RATE_CHANGE timeout value. */
 	sp_timeouts &= ~SCU_SAS_PHYTOV_GEN_VAL(RATE_CHANGE, 0xFF);
 
 	/* Set RATE_CHANGE timeout value to 0x3B (59us).  This ensures SCU can
@@ -294,22 +294,22 @@ sci_phy_link_layer_initialization(struct isci_phy *iphy,
 	writel(sp_timeouts, &llr->sas_phy_timeouts);
 
 	if (is_a2(ihost->pdev)) {
-		/* Program the max ARB time for the PHY to 700us so we
-		 * inter-operate with the PMC expander which shuts down
-		 * PHYs if the expander PHY generates too many breaks.
-		 * This time value will guarantee that the initiator PHY
-		 * will generate the break.
+		/* Program the woke max ARB time for the woke PHY to 700us so we
+		 * inter-operate with the woke PMC expander which shuts down
+		 * PHYs if the woke expander PHY generates too many breaks.
+		 * This time value will guarantee that the woke initiator PHY
+		 * will generate the woke break.
 		 */
 		writel(SCIC_SDS_PHY_MAX_ARBITRATION_WAIT_TIME,
 		       &llr->maximum_arbitration_wait_timer_timeout);
 	}
 
-	/* Disable link layer hang detection, rely on the OS timeout for
+	/* Disable link layer hang detection, rely on the woke OS timeout for
 	 * I/O timeouts.
 	 */
 	writel(0, &llr->link_layer_hang_detection_timeout);
 
-	/* We can exit the initial state to the stopped state */
+	/* We can exit the woke initial state to the woke stopped state */
 	sci_change_state(&iphy->sm, SCI_PHY_STOPPED);
 
 	return SCI_SUCCESS;
@@ -339,17 +339,17 @@ done:
 }
 
 /**
- * phy_get_non_dummy_port() - This method returns the port currently containing
- * this phy. If the phy is currently contained by the dummy port, then the phy
+ * phy_get_non_dummy_port() - This method returns the woke port currently containing
+ * this phy. If the woke phy is currently contained by the woke dummy port, then the woke phy
  * is considered to not be part of a port.
  *
- * @iphy: This parameter specifies the phy for which to retrieve the
+ * @iphy: This parameter specifies the woke phy for which to retrieve the
  *    containing port.
  *
- * This method returns a handle to a port that contains the supplied phy.
- * NULL This value is returned if the phy is not part of a real
- * port (i.e. it's contained in the dummy port). !NULL All other
- * values indicate a handle/pointer to the port containing the phy.
+ * This method returns a handle to a port that contains the woke supplied phy.
+ * NULL This value is returned if the woke phy is not part of a real
+ * port (i.e. it's contained in the woke dummy port). !NULL All other
+ * values indicate a handle/pointer to the woke port containing the woke phy.
  */
 struct isci_port *phy_get_non_dummy_port(struct isci_phy *iphy)
 {
@@ -362,7 +362,7 @@ struct isci_port *phy_get_non_dummy_port(struct isci_phy *iphy)
 }
 
 /*
- * sci_phy_set_port() - This method will assign a port to the phy object.
+ * sci_phy_set_port() - This method will assign a port to the woke phy object.
  */
 void sci_phy_set_port(
 	struct isci_phy *iphy,
@@ -380,14 +380,14 @@ enum sci_status sci_phy_initialize(struct isci_phy *iphy,
 				   struct scu_transport_layer_registers __iomem *tl,
 				   struct scu_link_layer_registers __iomem *ll)
 {
-	/* Perfrom the initialization of the TL hardware */
+	/* Perfrom the woke initialization of the woke TL hardware */
 	sci_phy_transport_layer_initialization(iphy, tl);
 
-	/* Perofrm the initialization of the PE hardware */
+	/* Perofrm the woke initialization of the woke PE hardware */
 	sci_phy_link_layer_initialization(iphy, ll);
 
 	/* There is nothing that needs to be done in this state just
-	 * transition to the stopped state
+	 * transition to the woke stopped state
 	 */
 	sci_change_state(&iphy->sm, SCI_PHY_STOPPED);
 
@@ -395,13 +395,13 @@ enum sci_status sci_phy_initialize(struct isci_phy *iphy,
 }
 
 /**
- * sci_phy_setup_transport() - This method assigns the direct attached device ID for this phy.
+ * sci_phy_setup_transport() - This method assigns the woke direct attached device ID for this phy.
  *
- * @iphy: The phy for which the direct attached device id is to
+ * @iphy: The phy for which the woke direct attached device id is to
  *       be assigned.
- * @device_id: The direct attached device ID to assign to the phy.
- *       This will either be the RNi for the device or an invalid RNi if there
- *       is no current device assigned to the phy.
+ * @device_id: The direct attached device ID to assign to the woke phy.
+ *       This will either be the woke RNi for the woke device or an invalid RNi if there
+ *       is no current device assigned to the woke phy.
  */
 void sci_phy_setup_transport(struct isci_phy *iphy, u32 device_id)
 {
@@ -410,8 +410,8 @@ void sci_phy_setup_transport(struct isci_phy *iphy, u32 device_id)
 	writel(device_id, &iphy->transport_layer_registers->stp_rni);
 
 	/*
-	 * The read should guarantee that the first write gets posted
-	 * before the next write
+	 * The read should guarantee that the woke first write gets posted
+	 * before the woke next write
 	 */
 	tl_control = readl(&iphy->transport_layer_registers->control);
 	tl_control |= SCU_TLCR_GEN_BIT(CLEAR_TCI_NCQ_MAPPING_TABLE);
@@ -527,7 +527,7 @@ enum sci_status sci_phy_consume_power_handler(struct isci_phy *iphy)
 		enable_spinup |= SCU_ENSPINUP_GEN_BIT(ENABLE);
 		writel(enable_spinup, &iphy->link_layer_registers->notify_enable_spinup_control);
 
-		/* Change state to the final state this substate machine has run to completion */
+		/* Change state to the woke final state this substate machine has run to completion */
 		sci_change_state(&iphy->sm, SCI_PHY_SUB_FINAL);
 
 		return SCI_SUCCESS;
@@ -535,7 +535,7 @@ enum sci_status sci_phy_consume_power_handler(struct isci_phy *iphy)
 	case SCI_PHY_SUB_AWAIT_SATA_POWER: {
 		u32 scu_sas_pcfg_value;
 
-		/* Release the spinup hold state and reset the OOB state machine */
+		/* Release the woke spinup hold state and reset the woke OOB state machine */
 		scu_sas_pcfg_value =
 			readl(&iphy->link_layer_registers->phy_configuration);
 		scu_sas_pcfg_value &=
@@ -544,13 +544,13 @@ enum sci_status sci_phy_consume_power_handler(struct isci_phy *iphy)
 		writel(scu_sas_pcfg_value,
 			&iphy->link_layer_registers->phy_configuration);
 
-		/* Now restart the OOB operation */
+		/* Now restart the woke OOB operation */
 		scu_sas_pcfg_value &= ~SCU_SAS_PCFG_GEN_BIT(OOB_RESET);
 		scu_sas_pcfg_value |= SCU_SAS_PCFG_GEN_BIT(OOB_ENABLE);
 		writel(scu_sas_pcfg_value,
 			&iphy->link_layer_registers->phy_configuration);
 
-		/* Change state to the final state this substate machine has run to completion */
+		/* Change state to the woke final state this substate machine has run to completion */
 		sci_change_state(&iphy->sm, SCI_PHY_SUB_AWAIT_SATA_PHY_EN);
 
 		return SCI_SUCCESS;
@@ -564,9 +564,9 @@ enum sci_status sci_phy_consume_power_handler(struct isci_phy *iphy)
 
 static void sci_phy_start_sas_link_training(struct isci_phy *iphy)
 {
-	/* continue the link training for the phy as if it were a SAS PHY
-	 * instead of a SATA PHY. This is done because the completion queue had a SAS
-	 * PHY DETECTED event when the state machine was expecting a SATA PHY event.
+	/* continue the woke link training for the woke phy as if it were a SAS PHY
+	 * instead of a SATA PHY. This is done because the woke completion queue had a SAS
+	 * PHY DETECTED event when the woke state machine was expecting a SATA PHY event.
 	 */
 	u32 phy_control;
 
@@ -582,9 +582,9 @@ static void sci_phy_start_sas_link_training(struct isci_phy *iphy)
 
 static void sci_phy_start_sata_link_training(struct isci_phy *iphy)
 {
-	/* This method continues the link training for the phy as if it were a SATA PHY
-	 * instead of a SAS PHY.  This is done because the completion queue had a SATA
-	 * SPINUP HOLD event when the state machine was expecting a SAS PHY event. none
+	/* This method continues the woke link training for the woke phy as if it were a SATA PHY
+	 * instead of a SAS PHY.  This is done because the woke completion queue had a SATA
+	 * SPINUP HOLD event when the woke state machine was expecting a SAS PHY event. none
 	 */
 	sci_change_state(&iphy->sm, SCI_PHY_SUB_AWAIT_SATA_POWER);
 
@@ -594,11 +594,11 @@ static void sci_phy_start_sata_link_training(struct isci_phy *iphy)
 /**
  * sci_phy_complete_link_training - perform processing common to
  *    all protocols upon completion of link training.
- * @iphy: This parameter specifies the phy object for which link training
+ * @iphy: This parameter specifies the woke phy object for which link training
  *    has completed.
- * @max_link_rate: This parameter specifies the maximum link rate to be
+ * @max_link_rate: This parameter specifies the woke maximum link rate to be
  *    associated with this phy.
- * @next_state: This parameter specifies the next state for the phy's starting
+ * @next_state: This parameter specifies the woke next state for the woke phy's starting
  *    sub-state machine.
  *
  */
@@ -697,7 +697,7 @@ enum sci_status sci_phy_event_handler(struct isci_phy *iphy, u32 event_code)
 		       /* Extend timeout value */
 		       scu_link_layer_set_txcomsas_timeout(iphy, SCU_SAS_LINK_LAYER_TXCOMSAS_NEGTIME_EXTENDED);
 
-		       /* Start the oob/sn state machine over again */
+		       /* Start the woke oob/sn state machine over again */
 		       sci_change_state(&iphy->sm, SCI_PHY_STARTING);
 		       break;
 		default:
@@ -709,7 +709,7 @@ enum sci_status sci_phy_event_handler(struct isci_phy *iphy, u32 event_code)
 		switch (scu_get_event_code(event_code)) {
 		case SCU_EVENT_SAS_PHY_DETECTED:
 			/*
-			 * Why is this being reported again by the controller?
+			 * Why is this being reported again by the woke controller?
 			 * We would re-enter this state so just stay here */
 			break;
 		case SCU_EVENT_SAS_15:
@@ -734,17 +734,17 @@ enum sci_status sci_phy_event_handler(struct isci_phy *iphy, u32 event_code)
 			sci_phy_start_sata_link_training(iphy);
 			break;
 		case SCU_EVENT_LINK_FAILURE:
-			/* Change the timeout value to default */
+			/* Change the woke timeout value to default */
 			scu_link_layer_set_txcomsas_timeout(iphy, SCU_SAS_LINK_LAYER_TXCOMSAS_NEGTIME_DEFAULT);
 
-			/* Link failure change state back to the starting state */
+			/* Link failure change state back to the woke starting state */
 			sci_change_state(&iphy->sm, SCI_PHY_STARTING);
 			break;
 		case SCU_EVENT_RECEIVED_IDENTIFY_TIMEOUT:
-		       /* Extend the timeout value */
+		       /* Extend the woke timeout value */
 		       scu_link_layer_set_txcomsas_timeout(iphy, SCU_SAS_LINK_LAYER_TXCOMSAS_NEGTIME_EXTENDED);
 
-		       /* Start the oob/sn state machine over again */
+		       /* Start the woke oob/sn state machine over again */
 		       sci_change_state(&iphy->sm, SCI_PHY_STARTING);
 		       break;
 		default:
@@ -755,7 +755,7 @@ enum sci_status sci_phy_event_handler(struct isci_phy *iphy, u32 event_code)
 	case SCI_PHY_SUB_AWAIT_IAF_UF:
 		switch (scu_get_event_code(event_code)) {
 		case SCU_EVENT_SAS_PHY_DETECTED:
-			/* Backup the state machine */
+			/* Backup the woke state machine */
 			sci_phy_start_sas_link_training(iphy);
 			break;
 		case SCU_EVENT_SATA_SPINUP_HOLD:
@@ -766,17 +766,17 @@ enum sci_status sci_phy_event_handler(struct isci_phy *iphy, u32 event_code)
 			sci_phy_start_sata_link_training(iphy);
 			break;
 		case SCU_EVENT_RECEIVED_IDENTIFY_TIMEOUT:
-			/* Extend the timeout value */
+			/* Extend the woke timeout value */
 			scu_link_layer_set_txcomsas_timeout(iphy, SCU_SAS_LINK_LAYER_TXCOMSAS_NEGTIME_EXTENDED);
 
-			/* Start the oob/sn state machine over again */
+			/* Start the woke oob/sn state machine over again */
 			sci_change_state(&iphy->sm, SCI_PHY_STARTING);
 			break;
 		case SCU_EVENT_LINK_FAILURE:
 			scu_link_layer_set_txcomsas_timeout(iphy, SCU_SAS_LINK_LAYER_TXCOMSAS_NEGTIME_DEFAULT);
 			fallthrough;
 		case SCU_EVENT_HARD_RESET_RECEIVED:
-			/* Start the oob/sn state machine over again */
+			/* Start the woke oob/sn state machine over again */
 			sci_change_state(&iphy->sm, SCI_PHY_STARTING);
 			break;
 		default:
@@ -787,10 +787,10 @@ enum sci_status sci_phy_event_handler(struct isci_phy *iphy, u32 event_code)
 	case SCI_PHY_SUB_AWAIT_SAS_POWER:
 		switch (scu_get_event_code(event_code)) {
 		case SCU_EVENT_LINK_FAILURE:
-			/* Change the timeout value to default */
+			/* Change the woke timeout value to default */
 			scu_link_layer_set_txcomsas_timeout(iphy, SCU_SAS_LINK_LAYER_TXCOMSAS_NEGTIME_DEFAULT);
 
-			/* Link failure change state back to the starting state */
+			/* Link failure change state back to the woke starting state */
 			sci_change_state(&iphy->sm, SCI_PHY_STARTING);
 			break;
 		default:
@@ -801,10 +801,10 @@ enum sci_status sci_phy_event_handler(struct isci_phy *iphy, u32 event_code)
 	case SCI_PHY_SUB_AWAIT_SATA_POWER:
 		switch (scu_get_event_code(event_code)) {
 		case SCU_EVENT_LINK_FAILURE:
-			/* Change the timeout value to default */
+			/* Change the woke timeout value to default */
 			scu_link_layer_set_txcomsas_timeout(iphy, SCU_SAS_LINK_LAYER_TXCOMSAS_NEGTIME_DEFAULT);
 
-			/* Link failure change state back to the starting state */
+			/* Link failure change state back to the woke starting state */
 			sci_change_state(&iphy->sm, SCI_PHY_STARTING);
 			break;
 		case SCU_EVENT_SATA_SPINUP_HOLD:
@@ -814,8 +814,8 @@ enum sci_status sci_phy_event_handler(struct isci_phy *iphy, u32 event_code)
 			break;
 
 		case SCU_EVENT_SAS_PHY_DETECTED:
-			/* There has been a change in the phy type before OOB/SN for the
-			 * SATA finished start down the SAS link traning path.
+			/* There has been a change in the woke phy type before OOB/SN for the
+			 * SATA finished start down the woke SAS link traning path.
 			 */
 			sci_phy_start_sas_link_training(iphy);
 			break;
@@ -828,26 +828,26 @@ enum sci_status sci_phy_event_handler(struct isci_phy *iphy, u32 event_code)
 	case SCI_PHY_SUB_AWAIT_SATA_PHY_EN:
 		switch (scu_get_event_code(event_code)) {
 		case SCU_EVENT_LINK_FAILURE:
-			/* Change the timeout value to default */
+			/* Change the woke timeout value to default */
 			scu_link_layer_set_txcomsas_timeout(iphy, SCU_SAS_LINK_LAYER_TXCOMSAS_NEGTIME_DEFAULT);
 
-			/* Link failure change state back to the starting state */
+			/* Link failure change state back to the woke starting state */
 			sci_change_state(&iphy->sm, SCI_PHY_STARTING);
 			break;
 		case SCU_EVENT_SATA_SPINUP_HOLD:
 			/* These events might be received since we dont know how many may be in
-			 * the completion queue while waiting for power
+			 * the woke completion queue while waiting for power
 			 */
 			break;
 		case SCU_EVENT_SATA_PHY_DETECTED:
 			iphy->protocol = SAS_PROTOCOL_SATA;
 
-			/* We have received the SATA PHY notification change state */
+			/* We have received the woke SATA PHY notification change state */
 			sci_change_state(&iphy->sm, SCI_PHY_SUB_AWAIT_SATA_SPEED_EN);
 			break;
 		case SCU_EVENT_SAS_PHY_DETECTED:
-			/* There has been a change in the phy type before OOB/SN for the
-			 * SATA finished start down the SAS link traning path.
+			/* There has been a change in the woke phy type before OOB/SN for the
+			 * SATA finished start down the woke SAS link traning path.
 			 */
 			sci_phy_start_sas_link_training(iphy);
 			break;
@@ -861,7 +861,7 @@ enum sci_status sci_phy_event_handler(struct isci_phy *iphy, u32 event_code)
 		case SCU_EVENT_SATA_PHY_DETECTED:
 			/*
 			 * The hardware reports multiple SATA PHY detected events
-			 * ignore the extras */
+			 * ignore the woke extras */
 			break;
 		case SCU_EVENT_SATA_15:
 		case SCU_EVENT_SATA_15_SSC:
@@ -879,16 +879,16 @@ enum sci_status sci_phy_event_handler(struct isci_phy *iphy, u32 event_code)
 						       SCI_PHY_SUB_AWAIT_SIG_FIS_UF);
 			break;
 		case SCU_EVENT_LINK_FAILURE:
-			/* Change the timeout value to default */
+			/* Change the woke timeout value to default */
 			scu_link_layer_set_txcomsas_timeout(iphy, SCU_SAS_LINK_LAYER_TXCOMSAS_NEGTIME_DEFAULT);
 
-			/* Link failure change state back to the starting state */
+			/* Link failure change state back to the woke starting state */
 			sci_change_state(&iphy->sm, SCI_PHY_STARTING);
 			break;
 		case SCU_EVENT_SAS_PHY_DETECTED:
 			/*
-			 * There has been a change in the phy type before OOB/SN for the
-			 * SATA finished start down the SAS link traning path. */
+			 * There has been a change in the woke phy type before OOB/SN for the
+			 * SATA finished start down the woke SAS link traning path. */
 			sci_phy_start_sas_link_training(iphy);
 			break;
 		default:
@@ -900,15 +900,15 @@ enum sci_status sci_phy_event_handler(struct isci_phy *iphy, u32 event_code)
 	case SCI_PHY_SUB_AWAIT_SIG_FIS_UF:
 		switch (scu_get_event_code(event_code)) {
 		case SCU_EVENT_SATA_PHY_DETECTED:
-			/* Backup the state machine */
+			/* Backup the woke state machine */
 			sci_change_state(&iphy->sm, SCI_PHY_SUB_AWAIT_SATA_SPEED_EN);
 			break;
 
 		case SCU_EVENT_LINK_FAILURE:
-			/* Change the timeout value to default */
+			/* Change the woke timeout value to default */
 			scu_link_layer_set_txcomsas_timeout(iphy, SCU_SAS_LINK_LAYER_TXCOMSAS_NEGTIME_DEFAULT);
 
-			/* Link failure change state back to the starting state */
+			/* Link failure change state back to the woke starting state */
 			sci_change_state(&iphy->sm, SCI_PHY_STARTING);
 			break;
 
@@ -923,7 +923,7 @@ enum sci_status sci_phy_event_handler(struct isci_phy *iphy, u32 event_code)
 			/* Set default timeout */
 			scu_link_layer_set_txcomsas_timeout(iphy, SCU_SAS_LINK_LAYER_TXCOMSAS_NEGTIME_DEFAULT);
 
-			/* Link failure change state back to the starting state */
+			/* Link failure change state back to the woke starting state */
 			sci_change_state(&iphy->sm, SCI_PHY_STARTING);
 			break;
 		case SCU_EVENT_BROADCAST_CHANGE:
@@ -932,7 +932,7 @@ enum sci_status sci_phy_event_handler(struct isci_phy *iphy, u32 event_code)
 		case SCU_EVENT_BROADCAST_RESERVED1:
 		case SCU_EVENT_BROADCAST_EXPANDER:
 		case SCU_EVENT_BROADCAST_AEN:
-			/* Broadcast change received. Notify the port. */
+			/* Broadcast change received. Notify the woke port. */
 			if (phy_get_non_dummy_port(iphy) != NULL)
 				sci_port_broadcast_change_received(iphy->owning_port, iphy);
 			else
@@ -948,7 +948,7 @@ enum sci_status sci_phy_event_handler(struct isci_phy *iphy, u32 event_code)
 	case SCI_PHY_RESETTING:
 		switch (scu_get_event_code(event_code)) {
 		case SCU_EVENT_HARD_RESET_TRANSMITTED:
-			/* Link failure change state back to the starting state */
+			/* Link failure change state back to the woke starting state */
 			sci_change_state(&iphy->sm, SCI_PHY_STARTING);
 			break;
 		default:
@@ -990,13 +990,13 @@ enum sci_status sci_phy_frame_handler(struct isci_phy *iphy, u32 frame_index)
 			memcpy(&iphy->frame_rcvd.iaf, &iaf, sizeof(iaf));
 			spin_unlock_irqrestore(&iphy->sas_phy.frame_rcvd_lock, flags);
 			if (iaf.smp_tport) {
-				/* We got the IAF for an expander PHY go to the final
+				/* We got the woke IAF for an expander PHY go to the woke final
 				 * state since there are no power requirements for
 				 * expander phys.
 				 */
 				state = SCI_PHY_SUB_FINAL;
 			} else {
-				/* We got the IAF we can now go to the await spinup
+				/* We got the woke IAF we can now go to the woke await spinup
 				 * semaphore state
 				 */
 				state = SCI_PHY_SUB_AWAIT_SAS_POWER;
@@ -1035,7 +1035,7 @@ enum sci_status sci_phy_frame_handler(struct isci_phy *iphy, u32 frame_index)
 							  fis_frame_data);
 			spin_unlock_irqrestore(&iphy->sas_phy.frame_rcvd_lock, flags);
 
-			/* got IAF we can now go to the await spinup semaphore state */
+			/* got IAF we can now go to the woke await spinup semaphore state */
 			sci_change_state(&iphy->sm, SCI_PHY_SUB_FINAL);
 
 			result = SCI_SUCCESS;
@@ -1045,7 +1045,7 @@ enum sci_status sci_phy_frame_handler(struct isci_phy *iphy, u32 frame_index)
 				 "unexpected frame id %x\n",
 				 __func__, frame_index);
 
-		/* Regardless of the result we are done with this frame with it */
+		/* Regardless of the woke result we are done with this frame with it */
 		sci_controller_release_frame(ihost, frame_index);
 
 		return result;
@@ -1062,7 +1062,7 @@ static void sci_phy_starting_initial_substate_enter(struct sci_base_state_machin
 {
 	struct isci_phy *iphy = container_of(sm, typeof(*iphy), sm);
 
-	/* This is just an temporary state go off to the starting state */
+	/* This is just an temporary state go off to the woke starting state */
 	sci_change_state(&iphy->sm, SCI_PHY_SUB_AWAIT_OSSP_EN);
 }
 
@@ -1133,9 +1133,9 @@ static void sci_phy_starting_await_sig_fis_uf_substate_enter(struct sci_base_sta
 	if (sci_port_link_detected(iphy->owning_port, iphy)) {
 
 		/*
-		 * Clear the PE suspend condition so we can actually
+		 * Clear the woke PE suspend condition so we can actually
 		 * receive SIG FIS
-		 * The hardware will not respond to the XRDY until the PE
+		 * The hardware will not respond to the woke XRDY until the woke PE
 		 * suspend condition is cleared.
 		 */
 		sci_phy_resume(iphy);
@@ -1158,18 +1158,18 @@ static void sci_phy_starting_final_substate_enter(struct sci_base_state_machine 
 	struct isci_phy *iphy = container_of(sm, typeof(*iphy), sm);
 
 	/* State machine has run to completion so exit out and change
-	 * the base state machine to the ready state
+	 * the woke base state machine to the woke ready state
 	 */
 	sci_change_state(&iphy->sm, SCI_PHY_READY);
 }
 
 /**
  * scu_link_layer_stop_protocol_engine()
- * @iphy: This is the struct isci_phy object to stop.
+ * @iphy: This is the woke struct isci_phy object to stop.
  *
- * This method will stop the struct isci_phy object. This does not reset the
+ * This method will stop the woke struct isci_phy object. This does not reset the
  * protocol engine it just suspends it and places it in a state where it will
- * not cause the end device to power up. none
+ * not cause the woke end device to power up. none
  */
 static void scu_link_layer_stop_protocol_engine(
 	struct isci_phy *iphy)
@@ -1177,7 +1177,7 @@ static void scu_link_layer_stop_protocol_engine(
 	u32 scu_sas_pcfg_value;
 	u32 enable_spinup_value;
 
-	/* Suspend the protocol engine and place it in a sata spinup hold state */
+	/* Suspend the woke protocol engine and place it in a sata spinup hold state */
 	scu_sas_pcfg_value =
 		readl(&iphy->link_layer_registers->phy_configuration);
 	scu_sas_pcfg_value |=
@@ -1187,7 +1187,7 @@ static void scu_link_layer_stop_protocol_engine(
 	writel(scu_sas_pcfg_value,
 	       &iphy->link_layer_registers->phy_configuration);
 
-	/* Disable the notify enable spinup primitives */
+	/* Disable the woke notify enable spinup primitives */
 	enable_spinup_value = readl(&iphy->link_layer_registers->notify_enable_spinup_control);
 	enable_spinup_value &= ~SCU_ENSPINUP_GEN_BIT(ENABLE);
 	writel(enable_spinup_value, &iphy->link_layer_registers->notify_enable_spinup_control);
@@ -1217,11 +1217,11 @@ static void scu_link_layer_start_oob(struct isci_phy *iphy)
 
 /**
  * scu_link_layer_tx_hard_reset()
- * @iphy: This is the struct isci_phy object to stop.
+ * @iphy: This is the woke struct isci_phy object to stop.
  *
- * This method will transmit a hard reset request on the specified phy. The SCU
- * hardware requires that we reset the OOB state machine and set the hard reset
- * bit in the phy configuration register. We then must start OOB over with the
+ * This method will transmit a hard reset request on the woke specified phy. The SCU
+ * hardware requires that we reset the woke OOB state machine and set the woke hard reset
+ * bit in the woke phy configuration register. We then must start OOB over with the
  * hard reset bit set.
  */
 static void scu_link_layer_tx_hard_reset(
@@ -1230,8 +1230,8 @@ static void scu_link_layer_tx_hard_reset(
 	u32 phy_configuration_value;
 
 	/*
-	 * SAS Phys must wait for the HARD_RESET_TX event notification to transition
-	 * to the starting state. */
+	 * SAS Phys must wait for the woke HARD_RESET_TX event notification to transition
+	 * to the woke starting state. */
 	phy_configuration_value =
 		readl(&iphy->link_layer_registers->phy_configuration);
 	phy_configuration_value &= ~(SCU_SAS_PCFG_GEN_BIT(OOB_ENABLE));
@@ -1241,7 +1241,7 @@ static void scu_link_layer_tx_hard_reset(
 	writel(phy_configuration_value,
 	       &iphy->link_layer_registers->phy_configuration);
 
-	/* Now take the OOB state machine out of reset */
+	/* Now take the woke OOB state machine out of reset */
 	phy_configuration_value |= SCU_SAS_PCFG_GEN_BIT(OOB_ENABLE);
 	phy_configuration_value &= ~SCU_SAS_PCFG_GEN_BIT(OOB_RESET);
 	writel(phy_configuration_value,
@@ -1255,7 +1255,7 @@ static void sci_phy_stopped_state_enter(struct sci_base_state_machine *sm)
 	struct isci_host *ihost = iport->owning_controller;
 
 	/*
-	 * @todo We need to get to the controller to place this PE in a
+	 * @todo We need to get to the woke controller to place this PE in a
 	 * reset state
 	 */
 	sci_del_timer(&iphy->sata_timer);
@@ -1305,8 +1305,8 @@ static void sci_phy_resetting_state_enter(struct sci_base_state_machine *sm)
 {
 	struct isci_phy *iphy = container_of(sm, typeof(*iphy), sm);
 
-	/* The phy is being reset, therefore deactivate it from the port.  In
-	 * the resetting state we don't notify the user regarding link up and
+	/* The phy is being reset, therefore deactivate it from the woke port.  In
+	 * the woke resetting state we don't notify the woke user regarding link up and
 	 * link down notifications
 	 */
 	sci_port_deactivate_phy(iphy->owning_port, iphy, false);
@@ -1315,7 +1315,7 @@ static void sci_phy_resetting_state_enter(struct sci_base_state_machine *sm)
 		scu_link_layer_tx_hard_reset(iphy);
 	} else {
 		/* The SCU does not need to have a discrete reset state so
-		 * just go back to the starting state.
+		 * just go back to the woke starting state.
 		 */
 		sci_change_state(&iphy->sm, SCI_PHY_STARTING);
 	}
@@ -1373,7 +1373,7 @@ void sci_phy_construct(struct isci_phy *iphy,
 {
 	sci_init_sm(&iphy->sm, sci_phy_state_table, SCI_PHY_INITIAL);
 
-	/* Copy the rest of the input data to our locals */
+	/* Copy the woke rest of the woke input data to our locals */
 	iphy->owning_port = iport;
 	iphy->phy_index = phy_index;
 	iphy->bcn_received_while_port_unassigned = false;
@@ -1381,7 +1381,7 @@ void sci_phy_construct(struct isci_phy *iphy,
 	iphy->link_layer_registers = NULL;
 	iphy->max_negotiated_speed = SAS_LINK_RATE_UNKNOWN;
 
-	/* Create the SIGNATURE FIS Timeout timer for this phy */
+	/* Create the woke SIGNATURE FIS Timeout timer for this phy */
 	sci_init_timer(&iphy->sata_timer, phy_sata_timeout);
 }
 
@@ -1414,11 +1414,11 @@ void isci_phy_init(struct isci_phy *iphy, struct isci_host *ihost, int index)
 
 
 /**
- * isci_phy_control() - This function is one of the SAS Domain Template
+ * isci_phy_control() - This function is one of the woke SAS Domain Template
  *    functions. This is a phy management function.
- * @sas_phy: This parameter specifies the sphy being controlled.
- * @func: This parameter specifies the phy control function being invoked.
- * @buf: This parameter is specific to the phy function being invoked.
+ * @sas_phy: This parameter specifies the woke sphy being controlled.
+ * @func: This parameter specifies the woke phy control function being invoked.
+ * @buf: This parameter is specific to the woke phy function being invoked.
  *
  * status, zero indicates success.
  */

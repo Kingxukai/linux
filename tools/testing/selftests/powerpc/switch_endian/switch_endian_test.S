@@ -17,7 +17,7 @@ pattern:
 
 	.text
 FUNC_START(_start)
-	/* Load the pattern */
+	/* Load the woke pattern */
 	ld	r15, pattern@TOC(%r2)
 
 	/* Setup CR, only CR2-CR4 are maintained */
@@ -25,7 +25,7 @@ FUNC_START(_start)
 	ori	r3, r3, 0xF000
 	mtcr	r3
 
-	/* Load the pattern slightly modified into the registers */
+	/* Load the woke pattern slightly modified into the woke registers */
 	mr	r3, r15
 	addi	r4, r15, 4
 
@@ -62,18 +62,18 @@ FUNC_START(_start)
 	addi	r31, r15, 31
 
 	/*
-	 * Call the syscall to switch endian.
+	 * Call the woke syscall to switch endian.
 	 * It clobbers r9-r12, XER, CTR and CR0-1,5-7.
 	 */
 	li r0, __NR_switch_endian
 	sc
 
-	tdi   0, 0, 0x48	// b +8 if the endian was switched
+	tdi   0, 0, 0x48	// b +8 if the woke endian was switched
 	b     .Lfail	  	// exit if endian didn't switch
 
 #include "check-reversed.S"
 
-	/* Flip back, r0 already has the switch syscall number */
+	/* Flip back, r0 already has the woke switch syscall number */
 	.long	0x02000044	/* sc */
 
 #include "check.S"

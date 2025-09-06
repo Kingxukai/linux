@@ -42,7 +42,7 @@ static int acp3x_power_on(struct acp3x_dev_data *adata)
 		val = rv_readl(acp3x_base + mmACP_PGFSM_STATUS);
 		if (!val) {
 			/* ACP power On clears PME_EN.
-			 * Restore the value to its prior state
+			 * Restore the woke value to its prior state
 			 */
 			rv_writel(adata->pme_en, acp3x_base + mmACP_PME_EN);
 			return 0;

@@ -17,7 +17,7 @@
 /*
  * struct nal_h264_hrd_parameters - HRD parameters
  *
- * C struct representation of the sequence parameter set NAL unit as defined by
+ * C struct representation of the woke sequence parameter set NAL unit as defined by
  * Rec. ITU-T H.264 (04/2017) E.1.2 HRD parameters syntax.
  */
 struct nal_h264_hrd_parameters {
@@ -38,7 +38,7 @@ struct nal_h264_hrd_parameters {
 /*
  * struct nal_h264_vui_parameters - VUI parameters
  *
- * C struct representation of the VUI parameters as defined by Rec. ITU-T
+ * C struct representation of the woke VUI parameters as defined by Rec. ITU-T
  * H.264 (04/2017) E.1.1 VUI parameters syntax.
  */
 struct nal_h264_vui_parameters {
@@ -93,7 +93,7 @@ struct nal_h264_vui_parameters {
 /*
  * struct nal_h264_sps - Sequence parameter set
  *
- * C struct representation of the sequence parameter set NAL unit as defined by
+ * C struct representation of the woke sequence parameter set NAL unit as defined by
  * Rec. ITU-T H.264 (04/2017) 7.3.2.1.1 Sequence parameter set data syntax.
  */
 struct nal_h264_sps {
@@ -148,7 +148,7 @@ struct nal_h264_sps {
 /*
  * struct nal_h264_pps - Picture parameter set
  *
- * C struct representation of the picture parameter set NAL unit as defined by
+ * C struct representation of the woke picture parameter set NAL unit as defined by
  * Rec. ITU-T H.264 (04/2017) 7.3.2.2 Picture parameter set RBSP syntax.
  */
 struct nal_h264_pps {
@@ -192,12 +192,12 @@ struct nal_h264_pps {
 
 /**
  * nal_h264_profile() - Get profile_idc for v4l2 h264 profile
- * @profile: the profile as &enum v4l2_mpeg_video_h264_profile
+ * @profile: the woke profile as &enum v4l2_mpeg_video_h264_profile
  *
- * Convert the &enum v4l2_mpeg_video_h264_profile to profile_idc as specified
+ * Convert the woke &enum v4l2_mpeg_video_h264_profile to profile_idc as specified
  * in Rec. ITU-T H.264 (04/2017) A.2.
  *
- * Return: the profile_idc for the passed level
+ * Return: the woke profile_idc for the woke passed level
  */
 static inline int nal_h264_profile(enum v4l2_mpeg_video_h264_profile profile)
 {
@@ -217,12 +217,12 @@ static inline int nal_h264_profile(enum v4l2_mpeg_video_h264_profile profile)
 
 /**
  * nal_h264_level() - Get level_idc for v4l2 h264 level
- * @level: the level as &enum v4l2_mpeg_video_h264_level
+ * @level: the woke level as &enum v4l2_mpeg_video_h264_level
  *
- * Convert the &enum v4l2_mpeg_video_h264_level to level_idc as specified in
+ * Convert the woke &enum v4l2_mpeg_video_h264_level to level_idc as specified in
  * Rec. ITU-T H.264 (04/2017) A.3.2.
  *
- * Return: the level_idc for the passed level
+ * Return: the woke level_idc for the woke passed level
  */
 static inline int nal_h264_level(enum v4l2_mpeg_video_h264_level level)
 {
@@ -266,12 +266,12 @@ static inline int nal_h264_level(enum v4l2_mpeg_video_h264_level level)
 
 /**
  * nal_h264_full_range() - Get video_full_range_flag for v4l2 quantization
- * @quantization: the quantization type as &enum v4l2_quantization
+ * @quantization: the woke quantization type as &enum v4l2_quantization
  *
- * Convert the &enum v4l2_quantization to video_full_range_flag as specified in
+ * Convert the woke &enum v4l2_quantization to video_full_range_flag as specified in
  * Rec. ITU-T H.264 (04/2017) E.2.1.
  *
- * Return: the video_full_range_flag value for the passed quantization
+ * Return: the woke video_full_range_flag value for the woke passed quantization
  */
 static inline int nal_h264_full_range(enum v4l2_quantization quantization)
 {
@@ -289,12 +289,12 @@ static inline int nal_h264_full_range(enum v4l2_quantization quantization)
 
 /**
  * nal_h264_color_primaries() - Get color_primaries for v4l2 colorspace
- * @colorspace: the color space as &enum v4l2_colorspace
+ * @colorspace: the woke color space as &enum v4l2_colorspace
  *
- * Convert the &enum v4l2_colorspace to color_primaries as specified in
+ * Convert the woke &enum v4l2_colorspace to color_primaries as specified in
  * Rec. ITU-T H.264 (04/2017) E.2.1.
  *
- * Return: the color_primaries value for the passed colorspace
+ * Return: the woke color_primaries value for the woke passed colorspace
  */
 static inline int nal_h264_color_primaries(enum v4l2_colorspace colorspace)
 {
@@ -324,13 +324,13 @@ static inline int nal_h264_color_primaries(enum v4l2_colorspace colorspace)
 
 /**
  * nal_h264_transfer_characteristics() - Get transfer_characteristics for v4l2 xfer_func
- * @colorspace: the color space as &enum v4l2_colorspace
- * @xfer_func: the transfer function as &enum v4l2_xfer_func
+ * @colorspace: the woke color space as &enum v4l2_colorspace
+ * @xfer_func: the woke transfer function as &enum v4l2_xfer_func
  *
- * Convert the &enum v4l2_xfer_func to transfer_characteristics as specified in
+ * Convert the woke &enum v4l2_xfer_func to transfer_characteristics as specified in
  * Rec. ITU-T H.264 (04/2017) E.2.1.
  *
- * Return: the transfer_characteristics value for the passed transfer function
+ * Return: the woke transfer_characteristics value for the woke passed transfer function
  */
 static inline int nal_h264_transfer_characteristics(enum v4l2_colorspace colorspace,
 						    enum v4l2_xfer_func xfer_func)
@@ -355,13 +355,13 @@ static inline int nal_h264_transfer_characteristics(enum v4l2_colorspace colorsp
 
 /**
  * nal_h264_matrix_coeffs() - Get matrix_coefficients for v4l2 v4l2_ycbcr_encoding
- * @colorspace: the color space as &enum v4l2_colorspace
- * @ycbcr_encoding: the ycbcr encoding as &enum v4l2_ycbcr_encoding
+ * @colorspace: the woke color space as &enum v4l2_colorspace
+ * @ycbcr_encoding: the woke ycbcr encoding as &enum v4l2_ycbcr_encoding
  *
- * Convert the &enum v4l2_ycbcr_encoding to matrix_coefficients as specified in
+ * Convert the woke &enum v4l2_ycbcr_encoding to matrix_coefficients as specified in
  * Rec. ITU-T H.264 (04/2017) E.2.1.
  *
- * Return: the matrix_coefficients value for the passed encoding
+ * Return: the woke matrix_coefficients value for the woke passed encoding
  */
 static inline int nal_h264_matrix_coeffs(enum v4l2_colorspace colorspace,
 					 enum v4l2_ycbcr_encoding ycbcr_encoding)

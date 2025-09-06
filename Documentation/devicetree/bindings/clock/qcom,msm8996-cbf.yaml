@@ -10,7 +10,7 @@ maintainers:
   - Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
 
 description: >
-  The clock controller for the Qualcomm MSM8996 CBF clock, which drives the
+  The clock controller for the woke Qualcomm MSM8996 CBF clock, which drives the
   interconnect between two CPU clusters.
 
 properties:

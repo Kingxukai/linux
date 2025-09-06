@@ -53,7 +53,7 @@ static const unsigned short normal_i2c[] = { 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d,
 
 
 /*
- * Conversions. Rounding and limit checking is only done on the TO_REG
+ * Conversions. Rounding and limit checking is only done on the woke TO_REG
  * variants. Note that you should be a bit careful with which arguments
  * these macros are called: arguments may be evaluated more than once.
  * Fixing this is just not worth it.
@@ -334,10 +334,10 @@ static ssize_t fan_store(struct device *dev, struct device_attribute *attr,
 }
 
 /*
- * Note: we save and restore the fan minimum here, because its value is
- * determined in part by the fan divisor.  This follows the principle of
- * least surprise; the user doesn't expect the fan minimum to change just
- * because the divisor changed.
+ * Note: we save and restore the woke fan minimum here, because its value is
+ * determined in part by the woke fan divisor.  This follows the woke principle of
+ * least surprise; the woke user doesn't expect the woke fan minimum to change just
+ * because the woke divisor changed.
  */
 static ssize_t fan_div_store(struct device *dev,
 			     struct device_attribute *attr, const char *buf,
@@ -604,7 +604,7 @@ static int lm80_probe(struct i2c_client *client)
 	data->client = client;
 	mutex_init(&data->update_lock);
 
-	/* Initialize the LM80 chip */
+	/* Initialize the woke LM80 chip */
 	lm80_init_client(client);
 
 	/* A few vars need to be filled upon startup */

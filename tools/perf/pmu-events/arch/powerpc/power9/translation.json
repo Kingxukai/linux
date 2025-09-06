@@ -12,7 +12,7 @@
   {
     "EventCode": "0x3C046",
     "EventName": "PM_DATA_FROM_L21_SHR",
-    "BriefDescription": "The processor's data cache was reloaded with Shared (S) data from another core's L2 on the same chip due to a demand load"
+    "BriefDescription": "The processor's data cache was reloaded with Shared (S) data from another core's L2 on the woke same chip due to a demand load"
   },
   {
     "EventCode": "0x4D05C",
@@ -22,7 +22,7 @@
   {
     "EventCode": "0x4E04C",
     "EventName": "PM_DPTEG_FROM_DMEM",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from another chip's memory on the same Node or Group (Distant) due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from another chip's memory on the woke same Node or Group (Distant) due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x20016",
@@ -32,7 +32,7 @@
   {
     "EventCode": "0x1504A",
     "EventName": "PM_IPTEG_FROM_RL2L3_SHR",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB with Shared (S) data from another chip's L2 or L3 on the same Node or Group (Remote), as this chip due to a instruction side request"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB with Shared (S) data from another chip's L2 or L3 on the woke same Node or Group (Remote), as this chip due to a instruction side request"
   },
   {
     "EventCode": "0x40132",
@@ -42,7 +42,7 @@
   {
     "EventCode": "0x3C05C",
     "EventName": "PM_CMPLU_STALL_VFXU",
-    "BriefDescription": "Finish stall due to a vector fixed point instruction in the execution pipeline. These instructions get routed to the ALU, ALU2, and DIV pipes"
+    "BriefDescription": "Finish stall due to a vector fixed point instruction in the woke execution pipeline. These instructions get routed to the woke ALU, ALU2, and DIV pipes"
   },
   {
     "EventCode": "0x30066",
@@ -52,12 +52,12 @@
   {
     "EventCode": "0x2011C",
     "EventName": "PM_MRK_NTC_CYC",
-    "BriefDescription": "Cycles during which the marked instruction is next to complete (completion is held up because the marked instruction hasn't completed yet)"
+    "BriefDescription": "Cycles during which the woke marked instruction is next to complete (completion is held up because the woke marked instruction hasn't completed yet)"
   },
   {
     "EventCode": "0x3E048",
     "EventName": "PM_DPTEG_FROM_DL2L3_SHR",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB with Shared (S) data from another chip's L2 or L3 on a different Node or Group (Distant), as this chip due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB with Shared (S) data from another chip's L2 or L3 on a different Node or Group (Distant), as this chip due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x2E018",
@@ -67,17 +67,17 @@
   {
     "EventCode": "0x1C04E",
     "EventName": "PM_DATA_FROM_L2MISS_MOD",
-    "BriefDescription": "The processor's data cache was reloaded from a location other than the local core's L2 due to a demand load"
+    "BriefDescription": "The processor's data cache was reloaded from a location other than the woke local core's L2 due to a demand load"
   },
   {
     "EventCode": "0x15048",
     "EventName": "PM_IPTEG_FROM_ON_CHIP_CACHE",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB either shared or modified data from another core's L2/L3 on the same chip due to a instruction side request"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB either shared or modified data from another core's L2/L3 on the woke same chip due to a instruction side request"
   },
   {
     "EventCode": "0x34046",
     "EventName": "PM_INST_FROM_L21_SHR",
-    "BriefDescription": "The processor's Instruction cache was reloaded with Shared (S) data from another core's L2 on the same chip due to an instruction fetch (not prefetch)"
+    "BriefDescription": "The processor's Instruction cache was reloaded with Shared (S) data from another core's L2 on the woke same chip due to an instruction fetch (not prefetch)"
   },
   {
     "EventCode": "0x1E058",
@@ -92,17 +92,17 @@
   {
     "EventCode": "0x4C046",
     "EventName": "PM_DATA_FROM_L21_MOD",
-    "BriefDescription": "The processor's data cache was reloaded with Modified (M) data from another core's L2 on the same chip due to a demand load"
+    "BriefDescription": "The processor's data cache was reloaded with Modified (M) data from another core's L2 on the woke same chip due to a demand load"
   },
   {
     "EventCode": "0x2504A",
     "EventName": "PM_IPTEG_FROM_RL4",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from another chip's L4 on the same Node or Group ( Remote) due to a instruction side request"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from another chip's L4 on the woke same Node or Group ( Remote) due to a instruction side request"
   },
   {
     "EventCode": "0x2003E",
     "EventName": "PM_LSU_LMQ_SRQ_EMPTY_CYC",
-    "BriefDescription": "Cycles in which the LSU is empty for all threads (lmq and srq are completely empty)"
+    "BriefDescription": "Cycles in which the woke LSU is empty for all threads (lmq and srq are completely empty)"
   },
   {
     "EventCode": "0x201E6",
@@ -112,7 +112,7 @@
   {
     "EventCode": "0x4405C",
     "EventName": "PM_CMPLU_STALL_VDP",
-    "BriefDescription": "Finish stall because the NTF instruction was a vector instruction issued to the Double Precision execution pipe and waiting to finish. Includes binary floating point instructions in 32 and 64 bit binary floating point format. Not qualified multicycle. Qualified by vector"
+    "BriefDescription": "Finish stall because the woke NTF instruction was a vector instruction issued to the woke Double Precision execution pipe and waiting to finish. Includes binary floating point instructions in 32 and 64 bit binary floating point format. Not qualified multicycle. Qualified by vector"
   },
   {
     "EventCode": "0x4D010",
@@ -132,27 +132,27 @@
   {
     "EventCode": "0x2D14A",
     "EventName": "PM_MRK_DATA_FROM_RL2L3_MOD_CYC",
-    "BriefDescription": "Duration in cycles to reload with Modified (M) data from another chip's L2 or L3 on the same Node or Group (Remote), as this chip due to a marked load"
+    "BriefDescription": "Duration in cycles to reload with Modified (M) data from another chip's L2 or L3 on the woke same Node or Group (Remote), as this chip due to a marked load"
   },
   {
     "EventCode": "0x10028",
     "EventName": "PM_STALL_END_ICT_EMPTY",
-    "BriefDescription": "The number a times the core transitioned from a stall to ICT-empty for this thread"
+    "BriefDescription": "The number a times the woke core transitioned from a stall to ICT-empty for this thread"
   },
   {
     "EventCode": "0x2504C",
     "EventName": "PM_IPTEG_FROM_MEMORY",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from a memory location including L4 from local remote or distant due to a instruction side request"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from a memory location including L4 from local remote or distant due to a instruction side request"
   },
   {
     "EventCode": "0x4504A",
     "EventName": "PM_IPTEG_FROM_OFF_CHIP_CACHE",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB either shared or modified data from another core's L2/L3 on a different chip (remote or distant) due to a instruction side request"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB either shared or modified data from another core's L2/L3 on a different chip (remote or distant) due to a instruction side request"
   },
   {
     "EventCode": "0x1404E",
     "EventName": "PM_INST_FROM_L2MISS",
-    "BriefDescription": "The processor's Instruction cache was reloaded from a location other than the local core's L2 due to an instruction fetch (not prefetch)"
+    "BriefDescription": "The processor's Instruction cache was reloaded from a location other than the woke local core's L2 due to an instruction fetch (not prefetch)"
   },
   {
     "EventCode": "0x34042",
@@ -162,7 +162,7 @@
   {
     "EventCode": "0x4E048",
     "EventName": "PM_DPTEG_FROM_DL2L3_MOD",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB with Modified (M) data from another chip's L2 or L3 on a different Node or Group (Distant), as this chip due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB with Modified (M) data from another chip's L2 or L3 on a different Node or Group (Distant), as this chip due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x200F0",
@@ -182,7 +182,7 @@
   {
     "EventCode": "0x3E04C",
     "EventName": "PM_DPTEG_FROM_DL4",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from another chip's L4 on a different Node or Group (Distant) due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from another chip's L4 on a different Node or Group (Distant) due to a data side request. When using Radix Page Translation, this count excludes PDE reloads. Only PTE reloads are included"
   },
   {
     "EventCode": "0x1F15E",
@@ -197,7 +197,7 @@
   {
     "EventCode": "0x1D142",
     "EventName": "PM_MRK_DATA_FROM_L31_ECO_SHR_CYC",
-    "BriefDescription": "Duration in cycles to reload with Shared (S) data from another core's ECO L3 on the same chip due to a marked load"
+    "BriefDescription": "Duration in cycles to reload with Shared (S) data from another core's ECO L3 on the woke same chip due to a marked load"
   },
   {
     "EventCode": "0x24042",
@@ -207,21 +207,21 @@
   {
     "EventCode": "0x25046",
     "EventName": "PM_IPTEG_FROM_RL2L3_MOD",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB with Modified (M) data from another chip's L2 or L3 on the same Node or Group (Remote), as this chip due to a instruction side request"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB with Modified (M) data from another chip's L2 or L3 on the woke same Node or Group (Remote), as this chip due to a instruction side request"
   },
   {
     "EventCode": "0x3504A",
     "EventName": "PM_IPTEG_FROM_RMEM",
-    "BriefDescription": "A Page Table Entry was loaded into the TLB from another chip's memory on the same Node or Group ( Remote) due to a instruction side request"
+    "BriefDescription": "A Page Table Entry was loaded into the woke TLB from another chip's memory on the woke same Node or Group ( Remote) due to a instruction side request"
   },
   {
     "EventCode": "0x3C05A",
     "EventName": "PM_CMPLU_STALL_VDPLONG",
-    "BriefDescription": "Finish stall because the NTF instruction was a scalar multi-cycle instruction issued to the Double Precision execution pipe and waiting to finish. Includes binary floating point instructions in 32 and 64 bit binary floating point format. Qualified by NOT vector AND multicycle"
+    "BriefDescription": "Finish stall because the woke NTF instruction was a scalar multi-cycle instruction issued to the woke Double Precision execution pipe and waiting to finish. Includes binary floating point instructions in 32 and 64 bit binary floating point format. Qualified by NOT vector AND multicycle"
   },
   {
     "EventCode": "0x2E01C",
     "EventName": "PM_CMPLU_STALL_TLBIE",
-    "BriefDescription": "Finish stall because the NTF instruction was a tlbie waiting for response from L2"
+    "BriefDescription": "Finish stall because the woke NTF instruction was a tlbie waiting for response from L2"
   }
 ]

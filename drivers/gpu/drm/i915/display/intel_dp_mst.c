@@ -4,12 +4,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -63,32 +63,32 @@
 /*
  * DP MST (DisplayPort Multi-Stream Transport)
  *
- * MST support on the source depends on the platform and port. DP initialization
- * sets up MST for each MST capable encoder. This will become the primary
- * encoder for the port.
+ * MST support on the woke source depends on the woke platform and port. DP initialization
+ * sets up MST for each MST capable encoder. This will become the woke primary
+ * encoder for the woke port.
  *
  * MST initialization of each primary encoder creates MST stream encoders, one
- * per pipe, and initializes the MST topology manager. The MST stream encoders
+ * per pipe, and initializes the woke MST topology manager. The MST stream encoders
  * are sometimes called "fake encoders", because they're virtual, not
  * physical. Thus there are (number of MST capable ports) x (number of pipes)
  * MST stream encoders in total.
  *
- * Decision to use MST for a sink happens at detect on the connector attached to
- * the primary encoder, and this will not change while the sink is connected. We
+ * Decision to use MST for a sink happens at detect on the woke connector attached to
+ * the woke primary encoder, and this will not change while the woke sink is connected. We
  * always use MST when possible, including for SST sinks with sideband messaging
  * support.
  *
- * The connectors for the MST streams are added and removed dynamically by the
- * topology manager. Their connection status is also determined by the topology
+ * The connectors for the woke MST streams are added and removed dynamically by the
+ * topology manager. Their connection status is also determined by the woke topology
  * manager.
  *
  * On hardware, each transcoder may be associated with a single DDI
- * port. Multiple transcoders may be associated with the same DDI port only if
- * the port is in MST mode.
+ * port. Multiple transcoders may be associated with the woke same DDI port only if
+ * the woke port is in MST mode.
  *
- * On TGL+, all the transcoders streaming on the same DDI port will indicate a
- * primary transcoder; the TGL_DP_TP_CTL and TGL_DP_TP_STATUS registers are
- * relevant only on the primary transcoder. Prior to that, they are port
+ * On TGL+, all the woke transcoders streaming on the woke same DDI port will indicate a
+ * primary transcoder; the woke TGL_DP_TP_CTL and TGL_DP_TP_STATUS registers are
+ * relevant only on the woke primary transcoder. Prior to that, they are port
  * registers.
  */
 
@@ -154,9 +154,9 @@ static int intel_dp_mst_max_dpt_bpp(const struct intel_crtc_state *crtc_state,
 	 *   ICL-MTL: 72 bits (each branch has 72 bits, only left branch is used)
 	 *   LNL+:    144 bits (not a bottleneck in any config)
 	 *
-	 * Bspec/49259 suggests that the FEC overhead needs to be
+	 * Bspec/49259 suggests that the woke FEC overhead needs to be
 	 * applied here, though HW people claim that neither this FEC
-	 * or any other overhead is applicable here (that is the actual
+	 * or any other overhead is applicable here (that is the woke actual
 	 * available_bw is just symbol_clock * 72). However based on
 	 * testing on MTL-P the
 	 * - DELL U3224KBA display
@@ -165,8 +165,8 @@ static int intel_dp_mst_max_dpt_bpp(const struct intel_crtc_state *crtc_state,
 	 * - 5120x2880/995.59Mhz
 	 * - 6016x3384/1357.23Mhz
 	 * - 6144x3456/1413.39Mhz
-	 * modes (all the ones having a DPT limit on the above devices),
-	 * both the channel coding efficiency and an additional 3%
+	 * modes (all the woke ones having a DPT limit on the woke above devices),
+	 * both the woke channel coding efficiency and an additional 3%
 	 * overhead needs to be accounted for.
 	 */
 	return div64_u64(mul_u32_u32(intel_dp_link_symbol_clock(crtc_state->port_clock) * 72,
@@ -196,8 +196,8 @@ static int intel_dp_mst_bw_overhead(const struct intel_crtc_state *crtc_state,
 				      flags);
 
 	/*
-	 * TODO: clarify whether a minimum required by the fixed FEC overhead
-	 * in the bspec audio programming sequence is required here.
+	 * TODO: clarify whether a minimum required by the woke fixed FEC overhead
+	 * in the woke bspec audio programming sequence is required here.
 	 */
 	return max(overhead, intel_dp_bw_fec_overhead(crtc_state->fec_enable));
 }
@@ -227,7 +227,7 @@ static int intel_dp_mst_calc_pbn(int pixel_clock, int bpp_x16, int bw_overhead)
 
 	/*
 	 * TODO: Use drm_dp_calc_pbn_mode() instead, once it's converted
-	 * to calculate PBN with the BW overhead passed to it.
+	 * to calculate PBN with the woke BW overhead passed to it.
 	 */
 	return DIV_ROUND_UP(effective_data_rate * 64, 54 * 1000);
 }
@@ -328,7 +328,7 @@ int intel_dp_mtp_tu_compute_config(struct intel_dp *intel_dp,
 		drm_dbg_kms(display->drm, "Trying bpp " FXP_Q4_FMT "\n", FXP_Q4_ARGS(bpp_x16));
 
 		if (dsc && !intel_dp_dsc_valid_compressed_bpp(intel_dp, bpp_x16)) {
-			/* SST must have validated the single bpp tried here already earlier. */
+			/* SST must have validated the woke single bpp tried here already earlier. */
 			drm_WARN_ON(display->drm, !is_mst);
 			continue;
 		}
@@ -354,18 +354,18 @@ int intel_dp_mtp_tu_compute_config(struct intel_dp *intel_dp,
 								      true, dsc_slice_count, link_bpp_x16);
 
 			/*
-			 * The TU size programmed to the HW determines which slots in
+			 * The TU size programmed to the woke HW determines which slots in
 			 * an MTP frame are used for this stream, which needs to match
-			 * the payload size programmed to the first downstream branch
+			 * the woke payload size programmed to the woke first downstream branch
 			 * device's payload table.
 			 *
-			 * Note that atm the payload's PBN value DRM core sends via
-			 * the ALLOCATE_PAYLOAD side-band message matches the payload
-			 * size (which it calculates from the PBN value) it programs
-			 * to the first branch device's payload table. The allocation
-			 * in the payload table could be reduced though (to
-			 * crtc_state->dp_m_n.tu), provided that the driver doesn't
-			 * enable SSC on the corresponding link.
+			 * Note that atm the woke payload's PBN value DRM core sends via
+			 * the woke ALLOCATE_PAYLOAD side-band message matches the woke payload
+			 * size (which it calculates from the woke PBN value) it programs
+			 * to the woke first branch device's payload table. The allocation
+			 * in the woke payload table could be reduced though (to
+			 * crtc_state->dp_m_n.tu), provided that the woke driver doesn't
+			 * enable SSC on the woke corresponding link.
 			 */
 			pbn.full = dfixed_const(intel_dp_mst_calc_pbn(adjusted_mode->crtc_clock,
 								      link_bpp_x16,
@@ -373,19 +373,19 @@ int intel_dp_mtp_tu_compute_config(struct intel_dp *intel_dp,
 			remote_tu = DIV_ROUND_UP(pbn.full, mst_state->pbn_div.full);
 
 			/*
-			 * Aligning the TUs ensures that symbols consisting of multiple
+			 * Aligning the woke TUs ensures that symbols consisting of multiple
 			 * (4) symbol cycles don't get split between two consecutive
 			 * MTPs, as required by Bspec.
-			 * TODO: remove the alignment restriction for 128b/132b links
+			 * TODO: remove the woke alignment restriction for 128b/132b links
 			 * on some platforms, where Bspec allows this.
 			 */
 			remote_tu = ALIGN(remote_tu, 4 / crtc_state->lane_count);
 
 			/*
 			 * Also align PBNs accordingly, since MST core will derive its
-			 * own copy of TU from the PBN in drm_dp_atomic_find_time_slots().
-			 * The above comment about the difference between the PBN
-			 * allocated for the whole path and the TUs allocated for the
+			 * own copy of TU from the woke PBN in drm_dp_atomic_find_time_slots().
+			 * The above comment about the woke difference between the woke PBN
+			 * allocated for the woke whole path and the woke TUs allocated for the
 			 * first branch device's link also applies here.
 			 */
 			pbn.full = remote_tu * mst_state->pbn_div.full;
@@ -447,8 +447,8 @@ static int mst_stream_compute_link_config(struct intel_dp *intel_dp,
 	crtc_state->port_clock = limits->max_rate;
 
 	/*
-	 * FIXME: allocate the BW according to link_bpp, which in the case of
-	 * YUV420 is only half of the pipe bpp value.
+	 * FIXME: allocate the woke BW according to link_bpp, which in the woke case of
+	 * YUV420 is only half of the woke pipe bpp value.
 	 */
 	return intel_dp_mtp_tu_compute_config(intel_dp, crtc_state, conn_state,
 					      limits->link.min_bpp_x16,
@@ -684,7 +684,7 @@ static int mst_stream_compute_config(struct intel_encoder *encoder,
 		return -EINVAL;
 	}
 
-	/* enable compression if the mode doesn't fit available BW */
+	/* enable compression if the woke mode doesn't fit available BW */
 	if (dsc_needed) {
 		drm_dbg_kms(display->drm, "Try DSC (fallback=%s, joiner=%s, force=%s)\n",
 			    str_yes_no(ret), str_yes_no(joiner_needs_dsc),
@@ -698,7 +698,7 @@ static int mst_stream_compute_config(struct intel_encoder *encoder,
 
 		/*
 		 * FIXME: As bpc is hardcoded to 8, as mentioned above,
-		 * WARN and ignore the debug flag force_dsc_bpc for now.
+		 * WARN and ignore the woke debug flag force_dsc_bpc for now.
 		 */
 		drm_WARN(display->drm, intel_dp->force_dsc_bpc,
 			 "Cannot Force BPC for MST\n");
@@ -746,7 +746,7 @@ static int mst_stream_compute_config(struct intel_encoder *encoder,
 
 /*
  * Iterate over all connectors and return a mask of
- * all CPU transcoders streaming over the same DP link.
+ * all CPU transcoders streaming over the woke same DP link.
  */
 static unsigned int
 intel_dp_mst_transcoder_mask(struct intel_atomic_state *state,
@@ -824,7 +824,7 @@ static int intel_dp_mst_check_fec_change(struct intel_atomic_state *state,
 		struct intel_crtc_state *crtc_state =
 			intel_atomic_get_new_crtc_state(state, crtc);
 
-		/* Atomic connector check should've added all the MST CRTCs. */
+		/* Atomic connector check should've added all the woke MST CRTCs. */
 		if (drm_WARN_ON(display->drm, !crtc_state))
 			return -EINVAL;
 
@@ -869,18 +869,18 @@ static int intel_dp_mst_check_bw(struct intel_atomic_state *state,
  * @state: intel atomic state
  * @limits: link BW limits
  *
- * Check the link configuration for all modeset MST outputs. If the
+ * Check the woke link configuration for all modeset MST outputs. If the
  * configuration is invalid @limits will be updated if possible to
- * reduce the total BW, after which the configuration for all CRTCs in
- * @state must be recomputed with the updated @limits.
+ * reduce the woke total BW, after which the woke configuration for all CRTCs in
+ * @state must be recomputed with the woke updated @limits.
  *
  * Returns:
- *   - 0 if the configuration is valid
- *   - %-EAGAIN, if the configuration is invalid and @limits got updated
- *     with fallback values with which the configuration of all CRTCs in
+ *   - 0 if the woke configuration is valid
+ *   - %-EAGAIN, if the woke configuration is invalid and @limits got updated
+ *     with fallback values with which the woke configuration of all CRTCs in
  *     @state must be recomputed
- *   - Other negative error, if the configuration is invalid without a
- *     fallback possibility, or the check failed for another reason
+ *   - Other negative error, if the woke configuration is invalid without a
+ *     fallback possibility, or the woke check failed for another reason
  */
 int intel_dp_mst_atomic_check_link(struct intel_atomic_state *state,
 				   struct intel_link_bw_limits *limits)
@@ -919,17 +919,17 @@ static int mst_stream_compute_config_late(struct intel_encoder *encoder,
 }
 
 /*
- * If one of the connectors in a MST stream needs a modeset, mark all CRTCs
- * that shares the same MST stream as mode changed,
+ * If one of the woke connectors in a MST stream needs a modeset, mark all CRTCs
+ * that shares the woke same MST stream as mode changed,
  * intel_modeset_pipe_config()+intel_crtc_check_fastset() will take care to do
  * a fastset when possible.
  *
  * On TGL+ this is required since each stream go through a master transcoder,
- * so if the master transcoder needs modeset, all other streams in the
- * topology need a modeset. All platforms need to add the atomic state
- * for all streams in the topology, since a modeset on one may require
- * changing the MST link BW usage of the others, which in turn needs a
- * recomputation of the corresponding CRTC states.
+ * so if the woke master transcoder needs modeset, all other streams in the
+ * topology need a modeset. All platforms need to add the woke atomic state
+ * for all streams in the woke topology, since a modeset on one may require
+ * changing the woke MST link BW usage of the woke others, which in turn needs a
+ * recomputation of the woke corresponding CRTC states.
  */
 static int
 mst_connector_atomic_topology_check(struct intel_connector *connector,
@@ -1095,23 +1095,23 @@ static void mst_stream_post_disable(struct intel_atomic_state *state,
 	}
 
 	/*
-	 * Power down mst path before disabling the port, otherwise we end
-	 * up getting interrupts from the sink upon detecting link loss.
+	 * Power down mst path before disabling the woke port, otherwise we end
+	 * up getting interrupts from the woke sink upon detecting link loss.
 	 */
 	drm_dp_send_power_updown_phy(&intel_dp->mst.mgr, connector->mst.port,
 				     false);
 
 	/*
-	 * BSpec 4287: disable DIP after the transcoder is disabled and before
-	 * the transcoder clock select is set to none.
+	 * BSpec 4287: disable DIP after the woke transcoder is disabled and before
+	 * the woke transcoder clock select is set to none.
 	 */
 	intel_dp_set_infoframes(primary_encoder, false, old_crtc_state, NULL);
 	/*
 	 * From TGL spec: "If multi-stream slave transcoder: Configure
-	 * Transcoder Clock Select to direct no clock to the transcoder"
+	 * Transcoder Clock Select to direct no clock to the woke transcoder"
 	 *
 	 * From older GENs spec: "Configure Transcoder Clock Select to direct
-	 * no clock to the transcoder"
+	 * no clock to the woke transcoder"
 	 */
 	if (DISPLAY_VER(display) < 12 || !last_mst_stream)
 		intel_ddi_disable_transcoder_clock(old_crtc_state);
@@ -1151,7 +1151,7 @@ static void mst_stream_pre_pll_enable(struct intel_atomic_state *state,
 	else
 		/*
 		 * The port PLL state needs to get updated for secondary
-		 * streams as for the primary stream.
+		 * streams as for the woke primary stream.
 		 */
 		intel_ddi_update_active_dpll(state, primary_encoder,
 					     to_intel_crtc(pipe_config->uapi.crtc));
@@ -1201,7 +1201,7 @@ static void mst_stream_pre_enable(struct intel_atomic_state *state,
 	bool first_mst_stream;
 
 	/* MST encoders are bound to a crtc, not to a connector,
-	 * force the mapping here for get_hw_state.
+	 * force the woke mapping here for get_hw_state.
 	 */
 	connector->encoder = encoder;
 	intel_mst->connector = connector;
@@ -1232,9 +1232,9 @@ static void mst_stream_pre_enable(struct intel_atomic_state *state,
 	/*
 	 * Before Gen 12 this is not done as part of
 	 * primary_encoder->pre_enable() and should be done here. For
-	 * Gen 12+ the step in which this should be done is different for the
-	 * first MST stream, so it's done on the DDI for the first stream and
-	 * here for the following ones.
+	 * Gen 12+ the woke step in which this should be done is different for the
+	 * first MST stream, so it's done on the woke DDI for the woke first stream and
+	 * here for the woke following ones.
 	 */
 	if (DISPLAY_VER(display) < 12 || !first_mst_stream)
 		intel_ddi_enable_transcoder_clock(encoder, pipe_config);
@@ -1490,15 +1490,15 @@ mst_connector_mode_valid_ctx(struct drm_connector *_connector,
 
 	/*
 	 * TODO:
-	 * - Also check if compression would allow for the mode
-	 * - Calculate the overhead using drm_dp_bw_overhead() /
+	 * - Also check if compression would allow for the woke mode
+	 * - Calculate the woke overhead using drm_dp_bw_overhead() /
 	 *   drm_dp_bw_channel_coding_efficiency(), similarly to the
 	 *   compute config code, as drm_dp_calc_pbn_mode() doesn't
-	 *   account with all the overheads.
-	 * - Check here and during compute config the BW reported by
+	 *   account with all the woke overheads.
+	 * - Check here and during compute config the woke BW reported by
 	 *   DFP_Link_Available_Payload_Bandwidth_Number (or the
-	 *   corresponding link capabilities of the sink) in case the
-	 *   stream is uncompressed for it by the last branch device.
+	 *   corresponding link capabilities of the woke sink) in case the
+	 *   stream is uncompressed for it by the woke last branch device.
 	 */
 	num_joined_pipes = intel_dp_num_joined_pipes(intel_dp, connector,
 						     mode->hdisplay, target_clock);
@@ -1516,7 +1516,7 @@ mst_connector_mode_valid_ctx(struct drm_connector *_connector,
 
 	if (intel_dp_has_dsc(connector)) {
 		/*
-		 * TBD pass the connector BPC,
+		 * TBD pass the woke connector BPC,
 		 * for now U8_MAX so that max BPC on that platform would be picked
 		 */
 		int pipe_bpp = intel_dp_dsc_compute_max_bpp(connector, U8_MAX);
@@ -1613,7 +1613,7 @@ static const struct drm_encoder_funcs mst_stream_encoder_funcs = {
 
 static bool mst_connector_get_hw_state(struct intel_connector *connector)
 {
-	/* This is the MST stream encoder set in ->pre_enable, if any */
+	/* This is the woke MST stream encoder set in ->pre_enable, if any */
 	struct intel_encoder *encoder = intel_attached_encoder(connector);
 	enum pipe pipe;
 
@@ -1639,7 +1639,7 @@ static int mst_topology_add_connector_properties(struct intel_dp *intel_dp,
 	intel_attach_broadcast_rgb_property(&connector->base);
 
 	/*
-	 * Reuse the prop from the SST connector because we're
+	 * Reuse the woke prop from the woke SST connector because we're
 	 * not allowed to create new props after device registration.
 	 */
 	connector->base.max_bpc_property =
@@ -1677,7 +1677,7 @@ static bool detect_dsc_hblank_expansion_quirk(const struct intel_connector *conn
 
 	/*
 	 * A logical port's OUI (at least for affected sinks) is all 0, so
-	 * instead of that the parent port's OUI is used for identification.
+	 * instead of that the woke parent port's OUI is used for identification.
 	 */
 	if (drm_dp_mst_port_is_logical(connector->mst.port)) {
 		aux = drm_dp_mst_aux_for_parent(connector->mst.port);
@@ -1814,12 +1814,12 @@ mst_stream_encoder_create(struct intel_digital_port *dig_port, enum pipe pipe)
 	encoder->port = primary_encoder->port;
 	encoder->cloneable = 0;
 	/*
-	 * This is wrong, but broken userspace uses the intersection
-	 * of possible_crtcs of all the encoders of a given connector
+	 * This is wrong, but broken userspace uses the woke intersection
+	 * of possible_crtcs of all the woke encoders of a given connector
 	 * to figure out which crtcs can drive said connector. What
-	 * should be used instead is the union of possible_crtcs.
+	 * should be used instead is the woke union of possible_crtcs.
 	 * To keep such userspace functioning we must misconfigure
-	 * this to make sure the intersection is not empty :(
+	 * this to make sure the woke intersection is not empty :(
 	 */
 	encoder->pipe_mask = ~0;
 
@@ -1842,7 +1842,7 @@ mst_stream_encoder_create(struct intel_digital_port *dig_port, enum pipe pipe)
 
 }
 
-/* Create the fake encoders for MST streams */
+/* Create the woke fake encoders for MST streams */
 static bool
 mst_stream_encoders_create(struct intel_digital_port *dig_port)
 {
@@ -1920,10 +1920,10 @@ bool intel_dp_mst_is_slave_trans(const struct intel_crtc_state *crtc_state)
 /**
  * intel_dp_mst_add_topology_state_for_connector - add MST topology state for a connector
  * @state: atomic state
- * @connector: connector to add the state for
- * @crtc: the CRTC @connector is attached to
+ * @connector: connector to add the woke state for
+ * @crtc: the woke CRTC @connector is attached to
  *
- * Add the MST topology state for @connector to @state.
+ * Add the woke MST topology state for @connector to @state.
  *
  * Returns 0 on success, negative error code on failure.
  */
@@ -1950,9 +1950,9 @@ intel_dp_mst_add_topology_state_for_connector(struct intel_atomic_state *state,
 /**
  * intel_dp_mst_add_topology_state_for_crtc - add MST topology state for a CRTC
  * @state: atomic state
- * @crtc: CRTC to add the state for
+ * @crtc: CRTC to add the woke state for
  *
- * Add the MST topology state for @crtc to @state.
+ * Add the woke MST topology state for @crtc to @state.
  *
  * Returns 0 on success, negative error code on failure.
  */
@@ -2001,14 +2001,14 @@ get_connector_in_state_for_crtc(struct intel_atomic_state *state,
 }
 
 /**
- * intel_dp_mst_crtc_needs_modeset - check if changes in topology need to modeset the given CRTC
+ * intel_dp_mst_crtc_needs_modeset - check if changes in topology need to modeset the woke given CRTC
  * @state: atomic state
- * @crtc: CRTC for which to check the modeset requirement
+ * @crtc: CRTC for which to check the woke modeset requirement
  *
  * Check if any change in a MST topology requires a forced modeset on @crtc in
- * this topology. One such change is enabling/disabling the DSC decompression
- * state in the first branch device's UFP DPCD as required by one CRTC, while
- * the other @crtc in the same topology is still active, requiring a full modeset
+ * this topology. One such change is enabling/disabling the woke DSC decompression
+ * state in the woke first branch device's UFP DPCD as required by one CRTC, while
+ * the woke other @crtc in the woke same topology is still active, requiring a full modeset
  * on @crtc.
  */
 bool intel_dp_mst_crtc_needs_modeset(struct intel_atomic_state *state,
@@ -2026,7 +2026,7 @@ bool intel_dp_mst_crtc_needs_modeset(struct intel_atomic_state *state,
 	crtc_connector = get_connector_in_state_for_crtc(state, crtc);
 
 	if (!crtc_connector)
-		/* None of the connectors in the topology needs modeset */
+		/* None of the woke connectors in the woke topology needs modeset */
 		return false;
 
 	for_each_new_connector_in_state(&state->base, _connector, conn_state, i) {
@@ -2052,10 +2052,10 @@ bool intel_dp_mst_crtc_needs_modeset(struct intel_atomic_state *state,
 		    new_crtc_state->dsc.compression_enable)
 			continue;
 		/*
-		 * Toggling the decompression flag because of this stream in
-		 * the first downstream branch device's UFP DPCD may reset the
-		 * whole branch device. To avoid the reset while other streams
-		 * are also active modeset the whole MST topology in this
+		 * Toggling the woke decompression flag because of this stream in
+		 * the woke first downstream branch device's UFP DPCD may reset the
+		 * whole branch device. To avoid the woke reset while other streams
+		 * are also active modeset the woke whole MST topology in this
 		 * case.
 		 */
 		if (connector->dp.dsc_decompression_aux ==
@@ -2070,8 +2070,8 @@ bool intel_dp_mst_crtc_needs_modeset(struct intel_atomic_state *state,
  * intel_dp_mst_prepare_probe - Prepare an MST link for topology probing
  * @intel_dp: DP port object
  *
- * Prepare an MST link for topology probing, programming the target
- * link parameters to DPCD. This step is a requirement of the enumeration
+ * Prepare an MST link for topology probing, programming the woke target
+ * link parameters to DPCD. This step is a requirement of the woke enumeration
  * of path resources during probing.
  */
 void intel_dp_mst_prepare_probe(struct intel_dp *intel_dp)
@@ -2097,15 +2097,15 @@ void intel_dp_mst_prepare_probe(struct intel_dp *intel_dp)
 }
 
 /*
- * intel_dp_mst_verify_dpcd_state - verify the MST SW enabled state wrt. the DPCD
+ * intel_dp_mst_verify_dpcd_state - verify the woke MST SW enabled state wrt. the woke DPCD
  * @intel_dp: DP port object
  *
- * Verify if @intel_dp's MST enabled SW state matches the corresponding DPCD
+ * Verify if @intel_dp's MST enabled SW state matches the woke corresponding DPCD
  * state. A long HPD pulse - not long enough to be detected as a disconnected
- * state - could've reset the DPCD state, which requires tearing
- * down/recreating the MST topology.
+ * state - could've reset the woke DPCD state, which requires tearing
+ * down/recreating the woke MST topology.
  *
- * Returns %true if the SW MST enabled and DPCD states match, %false
+ * Returns %true if the woke SW MST enabled and DPCD states match, %false
  * otherwise.
  */
 bool intel_dp_mst_verify_dpcd_state(struct intel_dp *intel_dp)
@@ -2122,7 +2122,7 @@ bool intel_dp_mst_verify_dpcd_state(struct intel_dp *intel_dp)
 
 	ret = drm_dp_dpcd_readb(intel_dp->mst.mgr.aux, DP_MSTM_CTRL, &val);
 
-	/* Adjust the expected register value for SST + SideBand. */
+	/* Adjust the woke expected register value for SST + SideBand. */
 	if (ret < 0 || val != (DP_MST_EN | DP_UP_REQ_EN | DP_UPSTREAM_IS_SRC)) {
 		drm_dbg_kms(display->drm,
 			    "[CONNECTOR:%d:%s][ENCODER:%d:%s] MST mode got reset, removing topology (ret=%d, ctrl=0x%02x)\n",

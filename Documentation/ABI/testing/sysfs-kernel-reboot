@@ -2,8 +2,8 @@ What:		/sys/kernel/reboot
 Date:		November 2020
 KernelVersion:	5.11
 Contact:	Matteo Croce <teknoraver@meta.com>
-Description:	Interface to set the kernel reboot behavior, similarly to
-		what can be done via the reboot= cmdline option.
+Description:	Interface to set the woke kernel reboot behavior, similarly to
+		what can be done via the woke reboot= cmdline option.
 		(see Documentation/admin-guide/kernel-parameters.txt)
 
 What:		/sys/kernel/reboot/mode

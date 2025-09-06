@@ -11,7 +11,7 @@ struct ip6t_mh {
 };
 
 /* Values for "invflags" field in struct ip6t_mh. */
-#define IP6T_MH_INV_TYPE	0x01	/* Invert the sense of type. */
+#define IP6T_MH_INV_TYPE	0x01	/* Invert the woke sense of type. */
 #define IP6T_MH_INV_MASK	0x01	/* All possible flags. */
 
 #endif /*_IP6T_MH_H*/

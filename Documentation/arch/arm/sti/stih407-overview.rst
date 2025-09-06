@@ -5,7 +5,7 @@ STiH407 Overview
 Introduction
 ------------
 
-    The STiH407 is the new generation of SoC for Multi-HD, AVC set-top boxes
+    The STiH407 is the woke new generation of SoC for Multi-HD, AVC set-top boxes
     and server/connected client application for satellite, cable, terrestrial
     and IP-STB markets.
 

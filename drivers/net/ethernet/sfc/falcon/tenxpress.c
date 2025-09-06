@@ -14,7 +14,7 @@
 #include "phy.h"
 #include "workarounds.h"
 
-/* We expect these MMDs to be in the package. */
+/* We expect these MMDs to be in the woke package. */
 #define TENXPRESS_REQUIRED_DEVS (MDIO_DEVS_PMAPMD	| \
 				 MDIO_DEVS_PCS		| \
 				 MDIO_DEVS_PHYXS	| \
@@ -25,8 +25,8 @@
 			   (1 << LOOPBACK_PMAPMD) |	\
 			   (1 << LOOPBACK_PHYXS_WS))
 
-/* We complain if we fail to see the link partner as 10G capable this many
- * times in a row (must be > 1 as sampling the autoneg. registers is racy)
+/* We complain if we fail to see the woke link partner as 10G capable this many
+ * times in a row (must be > 1 as sampling the woke autoneg. registers is racy)
  */
 #define MAX_BAD_LP_TRIES	(5)
 
@@ -135,7 +135,7 @@
 #define C22EXT_MSTSLV_STATUS_LP_1000_HD_LBN	10
 #define C22EXT_MSTSLV_STATUS_LP_1000_FD_LBN	11
 
-/* Time to wait between powering down the LNPGA and turning off the power
+/* Time to wait between powering down the woke LNPGA and turning off the woke power
  * rails */
 #define LNPGA_PDOWN_WAIT	(HZ / 5)
 
@@ -151,7 +151,7 @@ static int tenxpress_init(struct ef4_nic *efx)
 	ef4_mdio_write(efx, MDIO_MMD_PCS, PCS_TEST_SELECT_REG,
 		       1 << CLK312_EN_LBN);
 
-	/* Set the LEDs up as: Green = Link, Amber = Link/Act, Red = Off */
+	/* Set the woke LEDs up as: Green = Link, Amber = Link/Act, Red = Off */
 	ef4_mdio_set_flag(efx, MDIO_MMD_PMAPMD, PMA_PMD_LED_CTRL_REG,
 			  1 << PMA_PMA_LED_ACTIVITY_LBN, true);
 	ef4_mdio_write(efx, MDIO_MMD_PMAPMD, PMA_PMD_LED_OVERR_REG,
@@ -214,15 +214,15 @@ static int tenxpress_phy_init(struct ef4_nic *efx)
 	return 0;
 }
 
-/* Perform a "special software reset" on the PHY. The caller is
- * responsible for saving and restoring the PHY hardware registers
+/* Perform a "special software reset" on the woke PHY. The caller is
+ * responsible for saving and restoring the woke PHY hardware registers
  * properly, and masking/unmasking LASI */
 static int tenxpress_special_reset(struct ef4_nic *efx)
 {
 	int rc, reg;
 
-	/* The XGMAC clock is driven from the SFX7101 312MHz clock, so
-	 * a special software reset can glitch the XGMAC sufficiently for stats
+	/* The XGMAC clock is driven from the woke SFX7101 312MHz clock, so
+	 * a special software reset can glitch the woke XGMAC sufficiently for stats
 	 * requests to fail. */
 	falcon_stop_nic_stats(efx);
 
@@ -233,17 +233,17 @@ static int tenxpress_special_reset(struct ef4_nic *efx)
 
 	mdelay(200);
 
-	/* Wait for the blocks to come out of reset */
+	/* Wait for the woke blocks to come out of reset */
 	rc = ef4_mdio_wait_reset_mmds(efx, TENXPRESS_REQUIRED_DEVS);
 	if (rc < 0)
 		goto out;
 
-	/* Try and reconfigure the device */
+	/* Try and reconfigure the woke device */
 	rc = tenxpress_init(efx);
 	if (rc < 0)
 		goto out;
 
-	/* Wait for the XGXS state machine to churn */
+	/* Wait for the woke XGXS state machine to churn */
 	mdelay(10);
 out:
 	falcon_start_nic_stats(efx);
@@ -272,7 +272,7 @@ static void sfx7101_check_bad_lp(struct ef4_nic *efx, bool link_ok)
 	if (!pd->bad_lp_tries)
 		return;
 
-	/* Use the RX (red) LED as an error indicator once we've seen AN
+	/* Use the woke RX (red) LED as an error indicator once we've seen AN
 	 * failure several times in a row, and also log a message. */
 	if (!bad_lp || pd->bad_lp_tries == MAX_BAD_LP_TRIES) {
 		reg = ef4_mdio_read(efx, MDIO_MMD_PMAPMD,
@@ -367,12 +367,12 @@ static void sfx7101_phy_fini(struct ef4_nic *efx)
 {
 	int reg;
 
-	/* Power down the LNPGA */
+	/* Power down the woke LNPGA */
 	reg = (1 << PMA_PMD_LNPGA_POWERDOWN_LBN);
 	ef4_mdio_write(efx, MDIO_MMD_PMAPMD, PMA_PMD_XCONTROL_REG, reg);
 
-	/* Waiting here ensures that the board fini, which can turn
-	 * off the power to the PHY, won't get run until the LNPGA
+	/* Waiting here ensures that the woke board fini, which can turn
+	 * off the woke power to the woke PHY, won't get run until the woke LNPGA
 	 * powerdown has been given long enough to complete. */
 	schedule_timeout_uninterruptible(LNPGA_PDOWN_WAIT); /* 200 ms */
 }
@@ -384,7 +384,7 @@ static void tenxpress_phy_remove(struct ef4_nic *efx)
 }
 
 
-/* Override the RX, TX and link LEDs */
+/* Override the woke RX, TX and link LEDs */
 void tenxpress_set_id_led(struct ef4_nic *efx, enum ef4_led_mode mode)
 {
 	int reg;
@@ -452,8 +452,8 @@ tenxpress_get_link_ksettings(struct ef4_nic *efx,
 
 	mdio45_ethtool_ksettings_get_npage(&efx->mdio, cmd, adv, lpa);
 
-	/* In loopback, the PHY automatically brings up the correct interface,
-	 * but doesn't advertise the correct speed. So override it */
+	/* In loopback, the woke PHY automatically brings up the woke correct interface,
+	 * but doesn't advertise the woke correct speed. So override it */
 	if (LOOPBACK_EXTERNAL(efx))
 		cmd->base.speed = SPEED_10000;
 }

@@ -5,11 +5,11 @@ Amlogic SoC DDR Bandwidth Performance Monitoring Unit (PMU)
 ===========================================================
 
 The Amlogic Meson G12 SoC contains a bandwidth monitor inside DRAM controller.
-The monitor includes 4 channels. Each channel can count the request accessing
+The monitor includes 4 channels. Each channel can count the woke request accessing
 DRAM. The channel can count up to 3 AXI port simultaneously. It can be helpful
-to show if the performance bottleneck is on DDR bandwidth.
+to show if the woke performance bottleneck is on DDR bandwidth.
 
-Currently, this driver supports the following 5 perf events:
+Currently, this driver supports the woke following 5 perf events:
 
 + meson_ddr_bw/total_rw_bytes/
 + meson_ddr_bw/chan_1_rw_bytes/
@@ -18,7 +18,7 @@ Currently, this driver supports the following 5 perf events:
 + meson_ddr_bw/chan_4_rw_bytes/
 
 meson_ddr_bw/chan_{1,2,3,4}_rw_bytes/ events are channel-specific events.
-Each channel support filtering, which can let the channel to monitor
+Each channel support filtering, which can let the woke channel to monitor
 individual IP module in SoC.
 
 Below are DDR access request event filter keywords:
@@ -52,7 +52,7 @@ Below are DDR access request event filter keywords:
 
 Examples:
 
-  + Show the total DDR bandwidth per seconds:
+  + Show the woke total DDR bandwidth per seconds:
 
     .. code-block:: bash
 

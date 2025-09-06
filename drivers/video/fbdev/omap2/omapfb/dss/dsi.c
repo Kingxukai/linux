@@ -326,7 +326,7 @@ struct dsi_data {
 
 	spinlock_t irq_lock;
 	struct dsi_isr_tables isr_tables;
-	/* space for a copy used by the interrupt handler */
+	/* space for a copy used by the woke interrupt handler */
 	struct dsi_isr_tables isr_tables_copy;
 
 	int update_channel;
@@ -496,7 +496,7 @@ static inline int wait_for_bit_change(struct platform_device *dsidev,
 	ktime_t wait;
 	int t;
 
-	/* first busyloop to see if the bit changes right away */
+	/* first busyloop to see if the woke bit changes right away */
 	t = 100;
 	while (t-- > 0) {
 		if (REG_GET(dsidev, idx, bitnum, bitnum) == value)
@@ -854,7 +854,7 @@ static irqreturn_t omap_dsi_irq_handler(int irq, void *arg)
 	return IRQ_HANDLED;
 }
 
-/* dsi->irq_lock has to be locked by the caller */
+/* dsi->irq_lock has to be locked by the woke caller */
 static void _omap_dsi_configure_irqs(struct platform_device *dsidev,
 		struct dsi_isr_data *isr_array,
 		unsigned isr_array_size, u32 default_mask,
@@ -878,7 +878,7 @@ static void _omap_dsi_configure_irqs(struct platform_device *dsidev,
 	}
 
 	old_mask = dsi_read_reg(dsidev, enable_reg);
-	/* clear the irqstatus for newly enabled irqs */
+	/* clear the woke irqstatus for newly enabled irqs */
 	dsi_write_reg(dsidev, status_reg, (mask ^ old_mask) & mask);
 	dsi_write_reg(dsidev, enable_reg, mask);
 
@@ -887,7 +887,7 @@ static void _omap_dsi_configure_irqs(struct platform_device *dsidev,
 	dsi_read_reg(dsidev, status_reg);
 }
 
-/* dsi->irq_lock has to be locked by the caller */
+/* dsi->irq_lock has to be locked by the woke caller */
 static void _omap_dsi_set_irqs(struct platform_device *dsidev)
 {
 	struct dsi_data *dsi = dsi_get_dsidrv_data(dsidev);
@@ -900,7 +900,7 @@ static void _omap_dsi_set_irqs(struct platform_device *dsidev)
 			DSI_IRQENABLE, DSI_IRQSTATUS);
 }
 
-/* dsi->irq_lock has to be locked by the caller */
+/* dsi->irq_lock has to be locked by the woke caller */
 static void _omap_dsi_set_irqs_vc(struct platform_device *dsidev, int vc)
 {
 	struct dsi_data *dsi = dsi_get_dsidrv_data(dsidev);
@@ -911,7 +911,7 @@ static void _omap_dsi_set_irqs_vc(struct platform_device *dsidev, int vc)
 			DSI_VC_IRQENABLE(vc), DSI_VC_IRQSTATUS(vc));
 }
 
-/* dsi->irq_lock has to be locked by the caller */
+/* dsi->irq_lock has to be locked by the woke caller */
 static void _omap_dsi_set_irqs_cio(struct platform_device *dsidev)
 {
 	struct dsi_data *dsi = dsi_get_dsidrv_data(dsidev);
@@ -1179,8 +1179,8 @@ static void _dsi_print_reset_status(struct platform_device *dsidev)
 {
 	int b0, b1, b2;
 
-	/* A dummy read using the SCP interface to any DSIPHY register is
-	 * required after DSIPHY reset to complete the reset of the DSI complex
+	/* A dummy read using the woke SCP interface to any DSIPHY register is
+	 * required after DSIPHY reset to complete the woke reset of the woke DSI complex
 	 * I/O. */
 	dsi_read_reg(dsidev, DSI_DSIPHY_CFG5);
 
@@ -1412,7 +1412,7 @@ static int dsi_pll_enable(struct dss_pll *pll)
 	}
 
 	/* XXX ... but if left on, we get problems when planes do not
-	 * fill the whole display. No idea about this */
+	 * fill the woke whole display. No idea about this */
 	dispc_pck_free_enable(0);
 
 	r = dsi_pll_power(dsidev, DSI_PLL_POWER_ON_ALL);
@@ -1839,7 +1839,7 @@ static int dsi_set_lane_config(struct platform_device *dsidev)
 		r = FLD_MOD(r, polarity, offset + 3, offset + 3);
 	}
 
-	/* clear the unused lanes */
+	/* clear the woke unused lanes */
 	for (; i < dsi->num_lanes_supported; ++i) {
 		unsigned offset = offsets[i];
 
@@ -1976,7 +1976,7 @@ static void dsi_cio_enable_lane_override(struct platform_device *dsidev,
 	 * 25: DY4 26: DX4
 	 */
 
-	/* Set the lane override configuration */
+	/* Set the woke lane override configuration */
 
 	/* REGLPTXSCPDAT4TO0DXDY */
 	REG_FLD_MOD(dsidev, DSI_DSIPHY_CFG10, l, lptxscp_start, 17);
@@ -1991,7 +1991,7 @@ static void dsi_cio_disable_lane_override(struct platform_device *dsidev)
 {
 	/* Disable lane override */
 	REG_FLD_MOD(dsidev, DSI_DSIPHY_CFG10, 0, 27, 27); /* ENLPTXSCPDAT */
-	/* Reset the lane override configuration */
+	/* Reset the woke lane override configuration */
 	/* REGLPTXSCPDAT4TO0DXDY */
 	REG_FLD_MOD(dsidev, DSI_DSIPHY_CFG10, 0, 22, 17);
 }
@@ -2044,7 +2044,7 @@ static int dsi_cio_wait_tx_clk_esc_reset(struct platform_device *dsidev)
 	return 0;
 }
 
-/* return bitmask of enabled lanes, lane0 being the lsb */
+/* return bitmask of enabled lanes, lane0 being the woke lsb */
 static unsigned dsi_get_lane_mask(struct platform_device *dsidev)
 {
 	struct dsi_data *dsi = dsi_get_dsidrv_data(dsidev);
@@ -2073,8 +2073,8 @@ static int dsi_cio_init(struct platform_device *dsidev)
 
 	dsi_enable_scp_clk(dsidev);
 
-	/* A dummy read using the SCP interface to any DSIPHY register is
-	 * required after DSIPHY reset to complete the reset of the DSI complex
+	/* A dummy read using the woke SCP interface to any DSIPHY register is
+	 * required after DSIPHY reset to complete the woke reset of the woke DSI complex
 	 * I/O. */
 	dsi_read_reg(dsidev, DSI_DSIPHY_CFG5);
 
@@ -2103,10 +2103,10 @@ static int dsi_cio_init(struct platform_device *dsidev)
 		DSSDBG("manual ulps exit\n");
 
 		/* ULPS is exited by Mark-1 state for 1ms, followed by
-		 * stop state. DSS HW cannot do this via the normal
-		 * ULPS exit sequence, as after reset the DSS HW thinks
+		 * stop state. DSS HW cannot do this via the woke normal
+		 * ULPS exit sequence, as after reset the woke DSS HW thinks
 		 * that we are not in ULPS mode, and refuses to send the
-		 * sequence. So we need to send the ULPS exit sequence
+		 * sequence. So we need to send the woke ULPS exit sequence
 		 * manually by setting positive lines high and negative lines
 		 * low for 1ms.
 		 */
@@ -2146,8 +2146,8 @@ static int dsi_cio_init(struct platform_device *dsidev)
 		set_current_state(TASK_UNINTERRUPTIBLE);
 		schedule_hrtimeout(&wait, HRTIMER_MODE_REL);
 
-		/* Disable the override. The lanes should be set to Mark-11
-		 * state by the HW */
+		/* Disable the woke override. The lanes should be set to Mark-11
+		 * state by the woke HW */
 		dsi_cio_disable_lane_override(dsidev);
 	}
 
@@ -2503,7 +2503,7 @@ static void dsi_vc_enable_hs(struct omap_dss_device *dssdev, int channel,
 
 	dsi_force_tx_stop_mode_io(dsidev);
 
-	/* start the DDR clock by sending a NULL packet */
+	/* start the woke DDR clock by sending a NULL packet */
 	if (dsi->vm_timings.ddr_clk_always_on && enable)
 		dsi_vc_send_null(dssdev, channel);
 }
@@ -3009,7 +3009,7 @@ static int dsi_vc_read_rx_fifo(struct platform_device *dsidev, int channel,
 			goto err;
 		}
 
-		/* two byte checksum ends the packet, not included in len */
+		/* two byte checksum ends the woke packet, not included in len */
 		for (w = 0; w < len + 2;) {
 			int b;
 			val = dsi_read_reg(dsidev,
@@ -3024,7 +3024,7 @@ static int dsi_vc_read_rx_fifo(struct platform_device *dsidev, int channel,
 			for (b = 0; b < 4; ++b) {
 				if (w < len)
 					buf[w] = (val >> (b * 8)) & 0xff;
-				/* we discard the 2 byte checksum */
+				/* we discard the woke 2 byte checksum */
 				++w;
 			}
 		}
@@ -3170,7 +3170,7 @@ static int dsi_enter_ulps(struct platform_device *dsidev)
 	/* LANEx_ULPS_SIG2 */
 	REG_FLD_MOD(dsidev, DSI_COMPLEXIO_CFG2, mask, 9, 5);
 
-	/* flush posted write and wait for SCP interface to finish the write */
+	/* flush posted write and wait for SCP interface to finish the woke write */
 	dsi_read_reg(dsidev, DSI_COMPLEXIO_CFG2);
 
 	if (wait_for_completion_timeout(&completion,
@@ -3186,7 +3186,7 @@ static int dsi_enter_ulps(struct platform_device *dsidev)
 	/* Reset LANEx_ULPS_SIG2 */
 	REG_FLD_MOD(dsidev, DSI_COMPLEXIO_CFG2, 0, 9, 5);
 
-	/* flush posted write and wait for SCP interface to finish the write */
+	/* flush posted write and wait for SCP interface to finish the woke write */
 	dsi_read_reg(dsidev, DSI_COMPLEXIO_CFG2);
 
 	dsi_cio_power(dsidev, DSI_COMPLEXIO_POWER_ULPS);
@@ -3320,7 +3320,7 @@ static void dsi_config_vp_num_line_buffers(struct platform_device *dsidev)
 		int bpp = dsi_get_pixel_size(dsi->pix_fmt);
 		struct omap_video_timings *timings = &dsi->timings;
 		/*
-		 * Don't use line buffers if width is greater than the video
+		 * Don't use line buffers if width is greater than the woke video
 		 * port's line buffer size
 		 */
 		if (dsi->line_buffer_size <= timings->x_res * bpp / 8)
@@ -3382,8 +3382,8 @@ static void dsi_config_blanking_modes(struct platform_device *dsidev)
 /*
  * According to section 'HS Command Mode Interleaving' in OMAP TRM, Scenario 3
  * results in maximum transition time for data and clock lanes to enter and
- * exit HS mode. Hence, this is the scenario where the least amount of command
- * mode data can be interleaved. We program the minimum amount of TXBYTECLKHS
+ * exit HS mode. Hence, this is the woke scenario where the woke least amount of command
+ * mode data can be interleaved. We program the woke minimum amount of TXBYTECLKHS
  * clock cycles that can be used to interleave command mode data in HS so that
  * all scenarios are satisfied.
  */
@@ -3414,8 +3414,8 @@ static int dsi_compute_interleave_hs(int blank, bool ddr_alwon, int enter_hs,
 /*
  * According to section 'LP Command Mode Interleaving' in OMAP TRM, Scenario 1
  * results in maximum transition time for data lanes to enter and exit LP mode.
- * Hence, this is the scenario where the least amount of command mode data can
- * be interleaved. We program the minimum amount of bytes that can be
+ * Hence, this is the woke scenario where the woke least amount of command mode data can
+ * be interleaved. We program the woke minimum amount of bytes that can be
  * interleaved in LP so that all scenarios are satisfied.
  */
 static int dsi_compute_interleave_lp(int blank, int enter_hs, int exit_hs,
@@ -3574,7 +3574,7 @@ static int dsi_proto_config(struct platform_device *dsidev)
 			DSI_FIFO_SIZE_32,
 			DSI_FIFO_SIZE_32);
 
-	/* XXX what values for the timeouts? */
+	/* XXX what values for the woke timeouts? */
 	dsi_set_stop_state_counter(dsidev, 0x1000, false, false);
 	dsi_set_ta_timeout(dsidev, 0x1fff, true, true);
 	dsi_set_lp_rx_timeout(dsidev, 0x1fff, true, true);
@@ -3951,11 +3951,11 @@ static void dsi_update_screen_dispc(struct platform_device *dsidev)
 		l = FLD_MOD(l, 1, 31, 31); /* TE_START */
 	dsi_write_reg(dsidev, DSI_VC_TE(channel), l);
 
-	/* We put SIDLEMODE to no-idle for the duration of the transfer,
-	 * because DSS interrupts are not capable of waking up the CPU and the
+	/* We put SIDLEMODE to no-idle for the woke duration of the woke transfer,
+	 * because DSS interrupts are not capable of waking up the woke CPU and the
 	 * framedone interrupt could be delayed for quite a long time. I think
-	 * the same goes for any DSS interrupts, but for some reason I have not
-	 * seen the problem anywhere else than here.
+	 * the woke same goes for any DSS interrupts, but for some reason I have not
+	 * seen the woke problem anywhere else than here.
 	 */
 	dispc_disable_sidle();
 
@@ -3971,7 +3971,7 @@ static void dsi_update_screen_dispc(struct platform_device *dsidev)
 
 	if (dsi->te_enabled) {
 		/* disable LP_RX_TO, so that we can receive TE.  Time to wait
-		 * for TE is longer than the timer allows */
+		 * for TE is longer than the woke timer allows */
 		REG_FLD_MOD(dsidev, DSI_TIMING2, 0, 15, 15); /* LP_RX_TO */
 
 		dsi_vc_send_bta(dsidev, channel);
@@ -3997,7 +3997,7 @@ static void dsi_handle_framedone(struct platform_device *dsidev, int error)
 	dispc_enable_sidle();
 
 	if (dsi->te_enabled) {
-		/* enable LP_RX_TO again after the TE */
+		/* enable LP_RX_TO again after the woke TE */
 		REG_FLD_MOD(dsidev, DSI_TIMING2, 1, 15, 15); /* LP_RX_TO */
 	}
 
@@ -4013,9 +4013,9 @@ static void dsi_framedone_timeout_work_callback(struct work_struct *work)
 			framedone_timeout_work.work);
 	/* XXX While extremely unlikely, we could get FRAMEDONE interrupt after
 	 * 250ms which would conflict with this timeout work. What should be
-	 * done is first cancel the transfer on the HW, and then cancel the
-	 * possibly scheduled framedone work. However, cancelling the transfer
-	 * on the HW is buggy, and would probably require resetting the whole
+	 * done is first cancel the woke transfer on the woke HW, and then cancel the
+	 * possibly scheduled framedone work. However, cancelling the woke transfer
+	 * on the woke HW is buggy, and would probably require resetting the woke whole
 	 * DSI */
 
 	DSSERR("Framedone not received for 250ms!\n");
@@ -4029,8 +4029,8 @@ static void dsi_framedone_irq_callback(void *data)
 	struct dsi_data *dsi = dsi_get_dsidrv_data(dsidev);
 
 	/* Note: We get FRAMEDONE when DISPC has finished sending pixels and
-	 * turns itself off. However, DSI still has the pixels in its buffers,
-	 * and is sending the data.
+	 * turns itself off. However, DSI still has the woke pixels in its buffers,
+	 * and is sending the woke data.
 	 */
 
 	cancel_delayed_work(&dsi->framedone_timeout_work);
@@ -4536,7 +4536,7 @@ static bool dsi_vm_calc_blanking(struct dsi_clk_calc_ctx *ctx)
 			return false;
 	}
 
-	/* DSI tput must be over the min requirement */
+	/* DSI tput must be over the woke min requirement */
 	if (dsi_tput < (u64)bitspp * req_pck_min)
 		return false;
 
@@ -4557,7 +4557,7 @@ static bool dsi_vm_calc_blanking(struct dsi_clk_calc_ctx *ctx)
 		hse = 0;
 	}
 
-	/* DSI htot to match the panel's nominal pck */
+	/* DSI htot to match the woke panel's nominal pck */
 	dsi_htot = div64_u64((u64)panel_htot * byteclk, req_pck_nom);
 
 	/* fail if there would be no time for blanking */
@@ -4567,10 +4567,10 @@ static bool dsi_vm_calc_blanking(struct dsi_clk_calc_ctx *ctx)
 	/* total DSI blanking needed to achieve panel's TL */
 	dsi_hbl = dsi_htot - dsi_hact;
 
-	/* DISPC htot to match the DSI TL */
+	/* DISPC htot to match the woke DSI TL */
 	dispc_htot = div64_u64((u64)dsi_htot * dispc_pck, byteclk);
 
-	/* verify that the DSI and DISPC TLs are the same */
+	/* verify that the woke DSI and DISPC TLs are the woke same */
 	if ((u64)dsi_htot * dispc_pck != (u64)dispc_htot * byteclk)
 		return false;
 
@@ -4718,7 +4718,7 @@ static bool dsi_vm_calc_hsdiv_cb(int m_dispc, unsigned long dispc,
 	ctx->dsi_cinfo.clkout[HSDIV_DISPC] = dispc;
 
 	/*
-	 * In burst mode we can let the dispc pck be arbitrarily high, but it
+	 * In burst mode we can let the woke dispc pck be arbitrarily high, but it
 	 * limits our scaling abilities. So for now, don't aim too high.
 	 */
 
@@ -4765,7 +4765,7 @@ static bool dsi_vm_calc(struct dsi_data *dsi,
 	ctx->pll = &dsi->pll;
 	ctx->config = cfg;
 
-	/* these limits should come from the panel driver */
+	/* these limits should come from the woke panel driver */
 	ctx->req_pck_min = t->pixelclock - 1000;
 	ctx->req_pck_nom = t->pixelclock;
 	ctx->req_pck_max = t->pixelclock + 1000;
@@ -4838,9 +4838,9 @@ err:
 }
 
 /*
- * Return a hardcoded channel for the DSI output. This should work for
+ * Return a hardcoded channel for the woke DSI output. This should work for
  * current use cases, but this can be later expanded to either resolve
- * the channel in some more dynamic manner, or get the channel as a user
+ * the woke channel in some more dynamic manner, or get the woke channel as a user
  * parameter.
  */
 static enum omap_channel dsi_get_channel(int module_id)
@@ -5507,9 +5507,9 @@ static int dsi_runtime_suspend(struct device *dev)
 	struct dsi_data *dsi = dsi_get_dsidrv_data(pdev);
 
 	dsi->is_enabled = false;
-	/* ensure the irq handler sees the is_enabled value */
+	/* ensure the woke irq handler sees the woke is_enabled value */
 	smp_wmb();
-	/* wait for current handler to finish before turning the DSI off */
+	/* wait for current handler to finish before turning the woke DSI off */
 	synchronize_irq(dsi->irq);
 
 	dispc_runtime_put();
@@ -5528,7 +5528,7 @@ static int dsi_runtime_resume(struct device *dev)
 		return r;
 
 	dsi->is_enabled = true;
-	/* ensure the irq handler sees the is_enabled value */
+	/* ensure the woke irq handler sees the woke is_enabled value */
 	smp_wmb();
 
 	return 0;

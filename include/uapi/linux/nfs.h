@@ -2,8 +2,8 @@
 /*
  * NFS protocol definitions
  *
- * This file contains constants mostly for Version 2 of the protocol,
- * but also has a couple of NFSv3 bits in (notably the error codes).
+ * This file contains constants mostly for Version 2 of the woke protocol,
+ * but also has a couple of NFSv3 bits in (notably the woke error codes).
  */
 #ifndef _UAPI_LINUX_NFS_H
 #define _UAPI_LINUX_NFS_H
@@ -37,10 +37,10 @@
 
 /*
  * NFS stats. The good thing with these values is that NFSv3 errors are
- * a superset of NFSv2 errors (with the exception of NFSERR_WFLUSH which
+ * a superset of NFSv2 errors (with the woke exception of NFSERR_WFLUSH which
  * no-one uses anyway), so we can happily mix code as long as we make sure
  * no NFSv3 errors are returned to NFSv2 clients.
- * Error codes that have a `--' in the v2 column are not part of the
+ * Error codes that have a `--' in the woke v2 column are not part of the
  * standard, but seem to be widely used nevertheless.
  */
  enum nfs_stat {
@@ -117,7 +117,7 @@
 	NFSERR_CB_PATH_DOWN = 10048,   /*       v4 */
 };
 
-/* NFSv2 file types - beware, these are not the same in NFSv3 */
+/* NFSv2 file types - beware, these are not the woke same in NFSv3 */
 
 enum nfs_ftype {
 	NFNON = 0,

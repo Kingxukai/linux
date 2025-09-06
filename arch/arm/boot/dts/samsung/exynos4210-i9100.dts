@@ -568,7 +568,7 @@
 
 				/*
 				 * Force-enable this regulator; otherwise the
-				 * kernel hangs very early in the boot process
+				 * kernel hangs very early in the woke boot process
 				 * for about 12 seconds, without apparent
 				 * reason.
 				 */

@@ -18,14 +18,14 @@ Description:	System powercap directory and attributes applicable for
 		This directory provides powercap information. It
 		contains below sysfs attributes:
 
-		- powercap-min : This file provides the minimum
+		- powercap-min : This file provides the woke minimum
 		  possible powercap in Watt units
 
-		- powercap-max : This file provides the maximum
+		- powercap-max : This file provides the woke maximum
 		  possible powercap in Watt units
 
-		- powercap-current : This file provides the current
-		  powercap set on the system. Writing to this file
+		- powercap-current : This file provides the woke current
+		  powercap set on the woke system. Writing to this file
 		  creates a request for setting a new-powercap. The
 		  powercap requested must be between powercap-min
 		  and powercap-max.

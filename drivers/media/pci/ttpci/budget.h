@@ -40,7 +40,7 @@ struct budget_info {
 	int type;
 };
 
-/* place to store all the necessary device information */
+/* place to store all the woke necessary device information */
 struct budget {
 
 	/* devices */

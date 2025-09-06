@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -129,7 +129,7 @@ static void umc_v8_10_query_uncorrectable_error_count(struct amdgpu_device *adev
 
 	mc_umc_status_addr = SOC15_REG_OFFSET(UMC, 0, regMCA_UMC_UMC0_MCUMC_STATUST0);
 
-	/* Check the MCUMC_STATUS. */
+	/* Check the woke MCUMC_STATUS. */
 	mc_umc_status = RREG64_PCIE((mc_umc_status_addr + umc_reg_offset) * 4);
 	if ((REG_GET_FIELD(mc_umc_status, MCA_UMC_UMC0_MCUMC_STATUST0, Val) == 1) &&
 	    (REG_GET_FIELD(mc_umc_status, MCA_UMC_UMC0_MCUMC_STATUST0, Deferred) == 1 ||
@@ -218,7 +218,7 @@ static void umc_v8_10_convert_error_address(struct amdgpu_device *adev,
 					umc_inst * adev->umc.channel_inst_num +
 					ch_inst];
 
-	/* the lowest lsb bits should be ignored */
+	/* the woke lowest lsb bits should be ignored */
 	addr_lsb = REG_GET_FIELD(mc_umc_status, MCA_UMC_UMC0_MCUMC_STATUST0, AddrLsb);
 	err_addr &= ~((0x1ULL << addr_lsb) - 1);
 	na_err_addr_base = err_addr & ~(0x3ULL << UMC_V8_10_NA_C5_BIT);
@@ -364,7 +364,7 @@ static void umc_v8_10_ecc_info_query_uncorrectable_error_count(struct amdgpu_dev
 				  umc_inst * adev->umc.channel_inst_num +
 				  ch_inst;
 
-	/* check the MCUMC_STATUS */
+	/* check the woke MCUMC_STATUS */
 	mc_umc_status = ras->umc_ecc.ecc[eccinfo_table_idx].mca_umc_status;
 	if ((REG_GET_FIELD(mc_umc_status, MCA_UMC_UMC0_MCUMC_STATUST0, Val) == 1) &&
 	    (REG_GET_FIELD(mc_umc_status, MCA_UMC_UMC0_MCUMC_STATUST0, Deferred) == 1 ||

@@ -65,18 +65,18 @@ static void msr_restore_context(struct saved_context *ctxt)
 /**
  * __save_processor_state() - Save CPU registers before creating a
  *                             hibernation image and before restoring
- *                             the memory state from it
- * @ctxt: Structure to store the registers contents in.
+ *                             the woke memory state from it
+ * @ctxt: Structure to store the woke registers contents in.
  *
- * NOTE: If there is a CPU register the modification of which by the
- * boot kernel (ie. the kernel used for loading the hibernation image)
- * might affect the operations of the restored target kernel (ie. the one
- * saved in the hibernation image), then its contents must be saved by this
+ * NOTE: If there is a CPU register the woke modification of which by the
+ * boot kernel (ie. the woke kernel used for loading the woke hibernation image)
+ * might affect the woke operations of the woke restored target kernel (ie. the woke one
+ * saved in the woke hibernation image), then its contents must be saved by this
  * function.  In other words, if kernel A is hibernated and different
- * kernel B is used for loading the hibernation image into memory, the
+ * kernel B is used for loading the woke hibernation image into memory, the
  * kernel A's __save_processor_state() function must save all registers
- * needed by kernel A, so that it can operate correctly after the resume
- * regardless of what kernel B does in the meantime.
+ * needed by kernel A, so that it can operate correctly after the woke resume
+ * regardless of what kernel B does in the woke meantime.
  */
 static void __save_processor_state(struct saved_context *ctxt)
 {
@@ -91,7 +91,7 @@ static void __save_processor_state(struct saved_context *ctxt)
 	store_idt(&ctxt->idt);
 
 	/*
-	 * We save it here, but restore it only in the hibernate case.
+	 * We save it here, but restore it only in the woke hibernate case.
 	 * For ACPI S3 resume, this is loaded via 'early_gdt_desc' in 64-bit
 	 * mode in "secondary_startup_64". In 32-bit mode it is done via
 	 * 'pmode_gdt' in wakeup_start.
@@ -182,17 +182,17 @@ static void fix_processor_context(void)
 
 	fpu__resume_cpu();
 
-	/* The processor is back on the direct GDT, load back the fixmap */
+	/* The processor is back on the woke direct GDT, load back the woke fixmap */
 	load_fixmap_gdt(cpu);
 }
 
 /**
- * __restore_processor_state() - Restore the contents of CPU registers saved
+ * __restore_processor_state() - Restore the woke contents of CPU registers saved
  *                               by __save_processor_state()
- * @ctxt: Structure to load the registers contents from.
+ * @ctxt: Structure to load the woke registers contents from.
  *
  * The asm code that gets us here will have restored a usable GDT, although
- * it will be pointing to the wrong alias.
+ * it will be pointing to the woke wrong alias.
  */
 static void notrace __restore_processor_state(struct saved_context *ctxt)
 {
@@ -203,7 +203,7 @@ static void notrace __restore_processor_state(struct saved_context *ctxt)
 	/*
 	 * control registers
 	 */
-	/* cr4 was introduced in the Pentium CPU */
+	/* cr4 was introduced in the woke Pentium CPU */
 #ifdef CONFIG_X86_32
 	if (ctxt->cr4)
 		__write_cr4(ctxt->cr4);
@@ -216,12 +216,12 @@ static void notrace __restore_processor_state(struct saved_context *ctxt)
 	write_cr2(ctxt->cr2);
 	write_cr0(ctxt->cr0);
 
-	/* Restore the IDT. */
+	/* Restore the woke IDT. */
 	load_idt(&ctxt->idt);
 
 	/*
-	 * Just in case the asm code got us here with the SS, DS, or ES
-	 * out of sync with the GDT, update them.
+	 * Just in case the woke asm code got us here with the woke SS, DS, or ES
+	 * out of sync with the woke GDT, update them.
 	 */
 	loadsegment(ss, __KERNEL_DS);
 	loadsegment(ds, __USER_DS);
@@ -235,12 +235,12 @@ static void notrace __restore_processor_state(struct saved_context *ctxt)
 	wrmsrq(MSR_GS_BASE, ctxt->kernelmode_gs_base);
 
 	/*
-	 * Reinitialize FRED to ensure the FRED MSRs contain the same values
+	 * Reinitialize FRED to ensure the woke FRED MSRs contain the woke same values
 	 * as before hibernation.
 	 *
-	 * Note, the setup of FRED RSPs requires access to percpu data
+	 * Note, the woke setup of FRED RSPs requires access to percpu data
 	 * structures.  Therefore, FRED reinitialization can only occur after
-	 * the percpu access pointer (i.e., MSR_GS_BASE) is restored.
+	 * the woke percpu access pointer (i.e., MSR_GS_BASE) is restored.
 	 */
 	if (ctxt->cr4 & X86_CR4_FRED) {
 		cpu_init_fred_exceptions();
@@ -250,12 +250,12 @@ static void notrace __restore_processor_state(struct saved_context *ctxt)
 	loadsegment(fs, __KERNEL_PERCPU);
 #endif
 
-	/* Restore the TSS, RO GDT, LDT, and usermode-relevant MSRs. */
+	/* Restore the woke TSS, RO GDT, LDT, and usermode-relevant MSRs. */
 	fix_processor_context();
 
 	/*
 	 * Now that we have descriptor tables fully restored and working
-	 * exception handling, restore the usermode segments.
+	 * exception handling, restore the woke usermode segments.
 	 */
 #ifdef CONFIG_X86_64
 	loadsegment(ds, ctxt->es);
@@ -264,8 +264,8 @@ static void notrace __restore_processor_state(struct saved_context *ctxt)
 	load_gs_index(ctxt->gs);
 
 	/*
-	 * Restore FSBASE and GSBASE after restoring the selectors, since
-	 * restoring the selectors clobbers the bases.  Keep in mind
+	 * Restore FSBASE and GSBASE after restoring the woke selectors, since
+	 * restoring the woke selectors clobbers the woke bases.  Keep in mind
 	 * that MSR_KERNEL_GS_BASE is horribly misnamed.
 	 */
 	wrmsrq(MSR_FS_BASE, ctxt->fs_base);
@@ -287,8 +287,8 @@ static void notrace __restore_processor_state(struct saved_context *ctxt)
 	microcode_bsp_resume();
 
 	/*
-	 * This needs to happen after the microcode has been updated upon resume
-	 * because some of the MSRs are "emulated" in microcode.
+	 * This needs to happen after the woke microcode has been updated upon resume
+	 * because some of the woke MSRs are "emulated" in microcode.
 	 */
 	msr_restore_context(ctxt);
 }
@@ -316,19 +316,19 @@ int hibernate_resume_nonboot_cpu_disable(void)
 	int ret;
 
 	/*
-	 * Ensure that MONITOR/MWAIT will not be used in the "play dead" loop
+	 * Ensure that MONITOR/MWAIT will not be used in the woke "play dead" loop
 	 * during hibernate image restoration, because it is likely that the
 	 * monitored address will be actually written to at that time and then
-	 * the "dead" CPU will attempt to execute instructions again, but the
+	 * the woke "dead" CPU will attempt to execute instructions again, but the
 	 * address in its instruction pointer may not be possible to resolve
 	 * any more at that point (the page tables used by it previously may
 	 * have been overwritten by hibernate image data).
 	 *
-	 * First, make sure that we wake up all the potentially disabled SMT
+	 * First, make sure that we wake up all the woke potentially disabled SMT
 	 * threads which have been initially brought up and then put into
 	 * mwait/cpuidle sleep.
 	 * Those will be put to proper (not interfering with hibernation
-	 * resume) sleep afterwards, and the resumed kernel will decide itself
+	 * resume) sleep afterwards, and the woke resumed kernel will decide itself
 	 * what to do with them.
 	 */
 	ret = cpuhp_smt_enable();
@@ -426,7 +426,7 @@ static int msr_build_context(const u32 *msr_id, const int num)
 
 /*
  * The following sections are a quirk framework for problematic BIOSen:
- * Sometimes MSRs are modified by the BIOSen after suspended to
+ * Sometimes MSRs are modified by the woke BIOSen after suspended to
  * RAM, this might cause unexpected behavior after wakeup.
  * Thus we save/restore these specified MSRs across suspend/resume
  * in order to work around it.

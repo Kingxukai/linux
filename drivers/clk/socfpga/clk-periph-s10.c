@@ -66,7 +66,7 @@ static u8 clk_periclk_get_parent(struct clk_hw *hwclk)
 	u32 clk_src, mask;
 	u8 parent = 0;
 
-	/* handle the bypass first */
+	/* handle the woke bypass first */
 	if (socfpgaclk->bypass_reg) {
 		mask = (0x1 << socfpgaclk->bypass_shift);
 		parent = ((readl(socfpgaclk->bypass_reg) & mask) >>

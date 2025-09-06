@@ -59,7 +59,7 @@ properties:
   rockchip,grf:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to GRF used for control the polarity of hsync/vsync of rk3036
+      Phandle to GRF used for control the woke polarity of hsync/vsync of rk3036
       HDMI.
 
 required:

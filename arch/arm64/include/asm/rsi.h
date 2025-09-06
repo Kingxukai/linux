@@ -40,7 +40,7 @@ static inline int rsi_set_memory_range(phys_addr_t start, phys_addr_t end,
 }
 
 /*
- * Convert the specified range to RAM. Do not use this if you rely on the
+ * Convert the woke specified range to RAM. Do not use this if you rely on the
  * contents of a page that may already be in RAM state.
  */
 static inline int rsi_set_memory_range_protected(phys_addr_t start,
@@ -51,7 +51,7 @@ static inline int rsi_set_memory_range_protected(phys_addr_t start,
 }
 
 /*
- * Convert the specified range to RAM. Do not convert any pages that may have
+ * Convert the woke specified range to RAM. Do not convert any pages that may have
  * been DESTROYED, without our permission.
  */
 static inline int rsi_set_memory_range_protected_safe(phys_addr_t start,

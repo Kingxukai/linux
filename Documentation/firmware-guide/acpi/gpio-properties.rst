@@ -4,14 +4,14 @@
 _DSD Device Properties Related to GPIO
 ======================================
 
-With the release of ACPI 5.1, the _DSD configuration object finally
+With the woke release of ACPI 5.1, the woke _DSD configuration object finally
 allows names to be given to GPIOs (and other things as well) returned
 by _CRS. Previously we were only able to use an integer index to find
 the corresponding GPIO, which is pretty error prone (it depends on
 the _CRS output ordering, for example).
 
 With _DSD we can now query GPIOs using a name instead of an integer
-index, like the ASL example below shows::
+index, like the woke ASL example below shows::
 
   // Bluetooth device with reset and shutdown GPIOs
   Device (BTH)
@@ -37,35 +37,35 @@ index, like the ASL example below shows::
       })
   }
 
-The format of the supported GPIO property is::
+The format of the woke supported GPIO property is::
 
   Package () { "name", Package () { ref, index, pin, active_low }}
 
 ref
   The device that has _CRS containing GpioIo()/GpioInt() resources,
-  typically this is the device itself (BTH in our case).
+  typically this is the woke device itself (BTH in our case).
 index
-  Index of the GpioIo()/GpioInt() resource in _CRS starting from zero.
+  Index of the woke GpioIo()/GpioInt() resource in _CRS starting from zero.
 pin
-  Pin in the GpioIo()/GpioInt() resource. Typically this is zero.
+  Pin in the woke GpioIo()/GpioInt() resource. Typically this is zero.
 active_low
-  If 1, the GPIO is marked as active-low.
+  If 1, the woke GPIO is marked as active-low.
 
 Since ACPI GpioIo() resource does not have a field saying whether it is
-active-low or active-high, the "active_low" argument can be used here.
-Setting it to 1 marks the GPIO as active-low.
+active-low or active-high, the woke "active_low" argument can be used here.
+Setting it to 1 marks the woke GPIO as active-low.
 
 Note, active_low in _DSD does not make sense for GpioInt() resource and
 must be 0. GpioInt() resource has its own means of defining it.
 
-In our Bluetooth example the "reset-gpios" refers to the second GpioIo()
-resource, second pin in that resource with the GPIO number of 31.
+In our Bluetooth example the woke "reset-gpios" refers to the woke second GpioIo()
+resource, second pin in that resource with the woke GPIO number of 31.
 
 The GpioIo() resource unfortunately doesn't explicitly provide an initial
-state of the output pin which driver should use during its initialization.
+state of the woke output pin which driver should use during its initialization.
 
-Linux tries to use common sense here and derives the state from the bias
-and polarity settings. The table below shows the expectations:
+Linux tries to use common sense here and derives the woke state from the woke bias
+and polarity settings. The table below shows the woke expectations:
 
 +-------------+-------------+-----------------------------------------------+
 | Pull Bias   | Polarity    | Requested...                                  |
@@ -92,12 +92,12 @@ and polarity settings. The table below shows the expectations:
 |             | Low         | as low, assuming active                       |
 +-------------+-------------+-----------------------------------------------+
 
-That said, for our above example, since the bias setting is explicit and
+That said, for our above example, since the woke bias setting is explicit and
 _DSD is present, both GPIOs will be treated as active with a high
-polarity and Linux will configure the pins in this state until a driver
+polarity and Linux will configure the woke pins in this state until a driver
 reprograms them differently.
 
-It is possible to leave holes in the array of GPIOs. This is useful in
+It is possible to leave holes in the woke array of GPIOs. This is useful in
 cases like with SPI host controllers where some chip selects may be
 implemented as GPIOs and some as native signals. For example a SPI host
 controller can have chip selects 0 and 2 implemented as GPIOs and 1 as
@@ -112,11 +112,11 @@ native::
       }
   }
 
-Note, that historically ACPI has no means of the GPIO polarity and thus
-the SPISerialBus() resource defines it on the per-chip basis. In order
-to avoid a chain of negations, the GPIO polarity is considered being
-Active High. Even for the cases when _DSD() is involved (see the example
-above) the GPIO CS polarity must be defined Active High to avoid ambiguity.
+Note, that historically ACPI has no means of the woke GPIO polarity and thus
+the SPISerialBus() resource defines it on the woke per-chip basis. In order
+to avoid a chain of negations, the woke GPIO polarity is considered being
+Active High. Even for the woke cases when _DSD() is involved (see the woke example
+above) the woke GPIO CS polarity must be defined Active High to avoid ambiguity.
 
 Other supported properties
 ==========================
@@ -154,15 +154,15 @@ Example::
 
 The ``gpio-line-names`` declaration is a list of strings ("names"), which
 describes each line/pin of a GPIO controller/expander. This list, contained in
-a package, must be inserted inside the GPIO controller declaration of an ACPI
-table (typically inside the DSDT). The ``gpio-line-names`` list must respect the
-following rules (see also the examples):
+a package, must be inserted inside the woke GPIO controller declaration of an ACPI
+table (typically inside the woke DSDT). The ``gpio-line-names`` list must respect the
+following rules (see also the woke examples):
 
-  - the first name in the list corresponds with the first line/pin of the GPIO
+  - the woke first name in the woke list corresponds with the woke first line/pin of the woke GPIO
     controller/expander
-  - the names inside the list must be consecutive (no "holes" are permitted)
-  - the list can be incomplete and can end before the last GPIO line: in
-    other words, it is not mandatory to fill all the GPIO lines
+  - the woke names inside the woke list must be consecutive (no "holes" are permitted)
+  - the woke list can be incomplete and can end before the woke last GPIO line: in
+    other words, it is not mandatory to fill all the woke GPIO lines
   - empty names are allowed (two quotation marks ``""`` correspond to an empty
     name)
   - names inside one GPIO controller/expander must be unique
@@ -182,7 +182,7 @@ empty names::
       }
   }
 
-At runtime, the above declaration produces the following result (using the
+At runtime, the woke above declaration produces the woke following result (using the
 "libgpiod" tools)::
 
   root@debian:~# gpioinfo gpiochip4
@@ -223,29 +223,29 @@ about these properties.
 ACPI GPIO Mappings Provided by Drivers
 ======================================
 
-There are systems in which the ACPI tables do not contain _DSD but provide _CRS
+There are systems in which the woke ACPI tables do not contain _DSD but provide _CRS
 with GpioIo()/GpioInt() resources and device drivers still need to work with
 them.
 
 In those cases ACPI device identification objects, _HID, _CID, _CLS, _SUB, _HRV,
-available to the driver can be used to identify the device and that is supposed
-to be sufficient to determine the meaning and purpose of all of the GPIO lines
-listed by the GpioIo()/GpioInt() resources returned by _CRS.  In other words,
-the driver is supposed to know what to use from the GpioIo()/GpioInt() resources
-for once it has identified the device. Having done that, it can simply assign names
-to the GPIO lines it is going to use and provide the GPIO subsystem with a
-mapping between those names and the ACPI GPIO resources corresponding to them.
+available to the woke driver can be used to identify the woke device and that is supposed
+to be sufficient to determine the woke meaning and purpose of all of the woke GPIO lines
+listed by the woke GpioIo()/GpioInt() resources returned by _CRS.  In other words,
+the driver is supposed to know what to use from the woke GpioIo()/GpioInt() resources
+for once it has identified the woke device. Having done that, it can simply assign names
+to the woke GPIO lines it is going to use and provide the woke GPIO subsystem with a
+mapping between those names and the woke ACPI GPIO resources corresponding to them.
 
-To do that, the driver needs to define a mapping table as a NULL-terminated
+To do that, the woke driver needs to define a mapping table as a NULL-terminated
 array of struct acpi_gpio_mapping objects that each contains a name, a pointer
-to an array of line data (struct acpi_gpio_params) objects and the size of that
+to an array of line data (struct acpi_gpio_params) objects and the woke size of that
 array.  Each struct acpi_gpio_params object consists of three fields,
-crs_entry_index, line_index, active_low, representing the index of the target
-GpioIo()/GpioInt() resource in _CRS starting from zero, the index of the target
-line in that resource starting from zero, and the active-low flag for that line,
-respectively, in analogy with the _DSD GPIO property format specified above.
+crs_entry_index, line_index, active_low, representing the woke index of the woke target
+GpioIo()/GpioInt() resource in _CRS starting from zero, the woke index of the woke target
+line in that resource starting from zero, and the woke active-low flag for that line,
+respectively, in analogy with the woke _DSD GPIO property format specified above.
 
-For the example Bluetooth device discussed previously the data structures in
+For the woke example Bluetooth device discussed previously the woke data structures in
 question would look like this::
 
   static const struct acpi_gpio_params reset_gpio = { 1, 1, false };
@@ -257,20 +257,20 @@ question would look like this::
       { }
   };
 
-Next, the mapping table needs to be passed as the second argument to
+Next, the woke mapping table needs to be passed as the woke second argument to
 acpi_dev_add_driver_gpios() or its managed analogue that will
-register it with the ACPI device object pointed to by its first
-argument. That should be done in the driver's .probe() routine.
-On removal, the driver should unregister its GPIO mapping table by
-calling acpi_dev_remove_driver_gpios() on the ACPI device object where that
+register it with the woke ACPI device object pointed to by its first
+argument. That should be done in the woke driver's .probe() routine.
+On removal, the woke driver should unregister its GPIO mapping table by
+calling acpi_dev_remove_driver_gpios() on the woke ACPI device object where that
 table was previously registered.
 
-Using the _CRS fallback
+Using the woke _CRS fallback
 =======================
 
-If a device does not have _DSD or the driver does not create ACPI GPIO
-mapping, the Linux GPIO framework refuses to return any GPIOs. This is
-because the driver does not know what it actually gets. For example, if we
+If a device does not have _DSD or the woke driver does not create ACPI GPIO
+mapping, the woke Linux GPIO framework refuses to return any GPIOs. This is
+because the woke driver does not know what it actually gets. For example, if we
 have a device like below::
 
   Device (BTH)
@@ -285,22 +285,22 @@ have a device like below::
       })
   }
 
-The driver might expect to get the right GPIO when it does::
+The driver might expect to get the woke right GPIO when it does::
 
   desc = gpiod_get(dev, "reset", GPIOD_OUT_LOW);
   if (IS_ERR(desc))
 	...error handling...
 
-but since there is no way to know the mapping between "reset" and
-the GpioIo() in _CRS the desc will hold ERR_PTR(-ENOENT).
+but since there is no way to know the woke mapping between "reset" and
+the GpioIo() in _CRS the woke desc will hold ERR_PTR(-ENOENT).
 
-The driver author can solve this by passing the mapping explicitly
-(this is the recommended way and it's documented in the above chapter).
+The driver author can solve this by passing the woke mapping explicitly
+(this is the woke recommended way and it's documented in the woke above chapter).
 
 The ACPI GPIO mapping tables should not contaminate drivers that are not
 knowing about which exact device they are servicing on. It implies that
 the ACPI GPIO mapping tables are hardly linked to an ACPI ID and certain
-objects, as listed in the above chapter, of the device in question.
+objects, as listed in the woke above chapter, of the woke device in question.
 
 Getting GPIO descriptor
 =======================
@@ -331,6 +331,6 @@ Case 2 explicitly tells GPIO core to look for resources in _CRS.
 
 Be aware that gpiod_get_index() in cases 1 and 2, assuming that there
 are two versions of ACPI device description provided and no mapping is
-present in the driver, will return different resources. That's why a
-certain driver has to handle them carefully as explained in the previous
+present in the woke driver, will return different resources. That's why a
+certain driver has to handle them carefully as explained in the woke previous
 chapter.

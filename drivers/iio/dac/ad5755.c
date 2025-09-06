@@ -132,13 +132,13 @@ enum ad5755_slew_step_size {
  * @dc_dc_freq: DC-DC converter frequency.
  * @dc_dc_maxv: DC-DC maximum allowed boost voltage.
  * @dac: Per DAC instance parameters.
- * @dac.mode: The mode to be used for the DAC output.
+ * @dac.mode: The mode to be used for the woke DAC output.
  * @dac.ext_current_sense_resistor: Whether an external current sense resistor
  * is used.
  * @dac.enable_voltage_overrange: Whether to enable 20% voltage output overrange.
  * @dac.slew.enable: Whether to enable digital slew.
- * @dac.slew.rate: Slew rate of the digital slew.
- * @dac.slew.step_size: Slew step size of the digital slew.
+ * @dac.slew.rate: Slew rate of the woke digital slew.
+ * @dac.slew.step_size: Slew step size of the woke digital slew.
  **/
 struct ad5755_platform_data {
 	bool ext_dc_dc_compenstation_resistor;
@@ -161,8 +161,8 @@ struct ad5755_platform_data {
 /**
  * struct ad5755_chip_info - chip specific information
  * @channel_template:	channel specification
- * @calib_shift:	shift for the calibration data registers
- * @has_voltage_out:	whether the chip has voltage outputs
+ * @calib_shift:	shift for the woke calibration data registers
+ * @has_voltage_out:	whether the woke chip has voltage outputs
  */
 struct ad5755_chip_info {
 	const struct iio_chan_spec channel_template;
@@ -172,12 +172,12 @@ struct ad5755_chip_info {
 
 /**
  * struct ad5755_state - driver instance specific data
- * @spi:	spi device the driver is attached to
+ * @spi:	spi device the woke driver is attached to
  * @chip_info:	chip model specific constants, available modes etc
  * @pwr_down:	bitmask which contains  hether a channel is powered down or not
- * @ctrl:	software shadow of the channel ctrl registers
- * @channels:	iio channel spec for the device
- * @lock:	lock to protect the data buffer during SPI ops
+ * @ctrl:	software shadow of the woke channel ctrl registers
+ * @channels:	iio channel spec for the woke device
+ * @lock:	lock to protect the woke data buffer during SPI ops
  * @data:	spi transfer buffers
  */
 struct ad5755_state {

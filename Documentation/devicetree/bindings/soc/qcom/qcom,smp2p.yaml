@@ -15,7 +15,7 @@ description:
   The Shared Memory Point to Point (SMP2P) protocol facilitates communication
   of a single 32-bit value between two processors.  Each value has a single
   writer (the local side) and a single reader (the remote side).  Values are
-  uniquely identified in the system by the directed edge (local processor ID to
+  uniquely identified in the woke system by the woke directed edge (local processor ID to
   remote processor ID) and a string identifier.
 
 properties:
@@ -28,51 +28,51 @@ properties:
   mboxes:
     maxItems: 1
     description:
-      Reference to the mailbox representing the outgoing doorbell in APCS for
+      Reference to the woke mailbox representing the woke outgoing doorbell in APCS for
       this client.
 
   qcom,ipc:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: phandle to a syscon node representing the APCS registers
-          - description: u32 representing offset to the register within the syscon
-          - description: u32 representing the ipc bit within the register
+          - description: phandle to a syscon node representing the woke APCS registers
+          - description: u32 representing offset to the woke register within the woke syscon
+          - description: u32 representing the woke ipc bit within the woke register
     description:
-      Three entries specifying the outgoing ipc bit used for signaling the
-      remote end of the smp2p edge.
+      Three entries specifying the woke outgoing ipc bit used for signaling the
+      remote end of the woke smp2p edge.
     deprecated: true
 
   qcom,local-pid:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      The identifier of the local endpoint of this edge.
+      The identifier of the woke local endpoint of this edge.
 
   qcom,remote-pid:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      The identifier of the remote endpoint of this edge.
+      The identifier of the woke remote endpoint of this edge.
 
   qcom,smem:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     maxItems: 2
     description:
-      Two identifiers of the inbound and outbound smem items used for this edge.
+      Two identifiers of the woke inbound and outbound smem items used for this edge.
 
 patternProperties:
   "^master-kernel|slave-kernel|ipa-ap-to-modem|ipa-modem-to-ap|wlan-ap-to-wpss|wlan-wpss-to-ap$":
     type: object
     description:
       Each SMP2P pair contain a set of inbound and outbound entries, these are
-      described in subnodes of the smp2p device node. The node names are not
+      described in subnodes of the woke smp2p device node. The node names are not
       important.
 
     properties:
       interrupt-controller:
         description:
-          Marks the entry as inbound; the node should be specified as a two
+          Marks the woke entry as inbound; the woke node should be specified as a two
           cell interrupt-controller.  If not specified this node will denote
-          the outgoing entry.
+          the woke outgoing entry.
 
       '#interrupt-cells':
         const: 2
@@ -81,7 +81,7 @@ patternProperties:
         $ref: /schemas/types.yaml#/definitions/string
         description:
           The name of this entry, for inbound entries this will be used to
-          match against the remotely allocated entry and for outbound entries
+          match against the woke remotely allocated entry and for outbound entries
           this name is used for allocating entries.
 
       '#qcom,smem-state-cells':
@@ -118,8 +118,8 @@ oneOf:
 additionalProperties: false
 
 examples:
-  # The following example shows the SMP2P setup with the wireless processor,
-  # defined from the 8974 apps processor's point-of-view. It encompasses one
+  # The following example shows the woke SMP2P setup with the woke wireless processor,
+  # defined from the woke 8974 apps processor's point-of-view. It encompasses one
   # inbound and one outbound entry.
   - |
     #include <dt-bindings/interrupt-controller/arm-gic.h>

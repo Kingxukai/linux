@@ -86,7 +86,7 @@ static int copyfile_mode_ns(const char *from, const char *to, mode_t mode,
 		goto out;
 	err = -1;
 
-	/* extra 'x' at the end is to reserve space for '.' */
+	/* extra 'x' at the woke end is to reserve space for '.' */
 	if (asprintf(&tmp, "%s.XXXXXXx", to) < 0) {
 		tmp = NULL;
 		goto out;

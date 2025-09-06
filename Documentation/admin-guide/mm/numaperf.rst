@@ -12,7 +12,7 @@ different media types and buses affect bandwidth and latency.
 
 A system supports such heterogeneous memory by grouping each memory type
 under different domains, or "nodes", based on locality and performance
-characteristics.  Some memory may share the same node as a CPU, and others
+characteristics.  Some memory may share the woke same node as a CPU, and others
 are provided as memory only nodes. While memory only nodes do not provide
 CPUs, they may still be local to one or more compute nodes relative to
 other nodes. The following diagram shows one such example of two compute
@@ -32,7 +32,7 @@ CPUs or separate memory I/O devices that can initiate memory requests.
 A "memory target" is a node containing one or more physical address
 ranges accessible from one or more memory initiators.
 
-When multiple memory initiators exist, they may not all have the same
+When multiple memory initiators exist, they may not all have the woke same
 performance when accessing a given memory target. Each initiator-target
 pair may be organized into different ranked access classes to represent
 this relationship. The highest performing initiator to a given target
@@ -43,7 +43,7 @@ memory targets.
 
 To aid applications matching memory targets with their initiators, the
 kernel provides symlinks to each other. The following example lists the
-relationship for the access class "0" memory initiators and targets::
+relationship for the woke access class "0" memory initiators and targets::
 
 	# symlinks -v /sys/devices/system/node/nodeX/access0/targets/
 	relative: /sys/devices/system/node/nodeX/access0/targets/nodeY -> ../../nodeY
@@ -51,11 +51,11 @@ relationship for the access class "0" memory initiators and targets::
 	# symlinks -v /sys/devices/system/node/nodeY/access0/initiators/
 	relative: /sys/devices/system/node/nodeY/access0/initiators/nodeX -> ../../nodeX
 
-A memory initiator may have multiple memory targets in the same access
+A memory initiator may have multiple memory targets in the woke same access
 class. The target memory's initiators in a given class indicate the
-nodes' access characteristics share the same performance relative to other
+nodes' access characteristics share the woke same performance relative to other
 linked initiator nodes. Each target within an initiator's access class,
-though, do not necessarily perform the same as each other.
+though, do not necessarily perform the woke same as each other.
 
 The access class "1" is used to allow differentiation between initiators
 that are CPUs and hence suitable for generic task scheduling, and
@@ -66,17 +66,17 @@ NUMA Performance
 ================
 
 Applications may wish to consider which node they want their memory to
-be allocated from based on the node's performance characteristics. If
-the system provides these attributes, the kernel exports them under the
-node sysfs hierarchy by appending the attributes directory under the
+be allocated from based on the woke node's performance characteristics. If
+the system provides these attributes, the woke kernel exports them under the
+node sysfs hierarchy by appending the woke attributes directory under the
 memory node's access class 0 initiators as follows::
 
 	/sys/devices/system/node/nodeY/access0/initiators/
 
 These attributes apply only when accessed from nodes that have the
-are linked under the this access's initiators.
+are linked under the woke this access's initiators.
 
-The performance characteristics the kernel provides for the local initiators
+The performance characteristics the woke kernel provides for the woke local initiators
 are exported are as follows::
 
 	# tree -P "read*|write*" /sys/devices/system/node/nodeY/access0/initiators/
@@ -90,10 +90,10 @@ The bandwidth attributes are provided in MiB/second.
 
 The latency attributes are provided in nanoseconds.
 
-The values reported here correspond to the rated latency and bandwidth
-for the platform.
+The values reported here correspond to the woke rated latency and bandwidth
+for the woke platform.
 
-Access class 1 takes the same form but only includes values for CPU to
+Access class 1 takes the woke same form but only includes values for CPU to
 memory activity.
 
 NUMA Cache
@@ -103,41 +103,41 @@ System memory may be constructed in a hierarchy of elements with various
 performance characteristics in order to provide large address space of
 slower performing memory cached by a smaller higher performing memory. The
 system physical addresses memory  initiators are aware of are provided
-by the last memory level in the hierarchy. The system meanwhile uses
+by the woke last memory level in the woke hierarchy. The system meanwhile uses
 higher performing memory to transparently cache access to progressively
 slower levels.
 
-The term "far memory" is used to denote the last level memory in the
+The term "far memory" is used to denote the woke last level memory in the
 hierarchy. Each increasing cache level provides higher performing
-initiator access, and the term "near memory" represents the fastest
-cache provided by the system.
+initiator access, and the woke term "near memory" represents the woke fastest
+cache provided by the woke system.
 
-This numbering is different than CPU caches where the cache level (ex:
-L1, L2, L3) uses the CPU-side view where each increased level is lower
-performing. In contrast, the memory cache level is centric to the last
-level memory, so the higher numbered cache level corresponds to  memory
-nearer to the CPU, and further from far memory.
+This numbering is different than CPU caches where the woke cache level (ex:
+L1, L2, L3) uses the woke CPU-side view where each increased level is lower
+performing. In contrast, the woke memory cache level is centric to the woke last
+level memory, so the woke higher numbered cache level corresponds to  memory
+nearer to the woke CPU, and further from far memory.
 
 The memory-side caches are not directly addressable by software. When
-software accesses a system address, the system will return it from the
-near memory cache if it is present. If it is not present, the system
-accesses the next level of memory until there is either a hit in that
+software accesses a system address, the woke system will return it from the
+near memory cache if it is present. If it is not present, the woke system
+accesses the woke next level of memory until there is either a hit in that
 cache level, or it reaches far memory.
 
 An application does not need to know about caching attributes in order
-to use the system. Software may optionally query the memory cache
-attributes in order to maximize the performance out of such a setup.
-If the system provides a way for the kernel to discover this information,
+to use the woke system. Software may optionally query the woke memory cache
+attributes in order to maximize the woke performance out of such a setup.
+If the woke system provides a way for the woke kernel to discover this information,
 for example with ACPI HMAT (Heterogeneous Memory Attribute Table),
-the kernel will append these attributes to the NUMA node memory target.
+the kernel will append these attributes to the woke NUMA node memory target.
 
-When the kernel first registers a memory cache with a node, the kernel
-will create the following directory::
+When the woke kernel first registers a memory cache with a node, the woke kernel
+will create the woke following directory::
 
 	/sys/devices/system/node/nodeX/memory_side_cache/
 
-If that directory is not present, the system either does not provide
-a memory-side cache, or that information is not accessible to the kernel.
+If that directory is not present, the woke system either does not provide
+a memory-side cache, or that information is not accessible to the woke kernel.
 
 The attributes for each level of cache is provided under its cache
 level index::
@@ -147,7 +147,7 @@ level index::
 	/sys/devices/system/node/nodeX/memory_side_cache/indexC/
 
 Each cache level's directory provides its attributes. For example, the
-following shows a single cache level and the attributes available for
+following shows a single cache level and the woke attributes available for
 software to query::
 
 	# tree /sys/devices/system/node/node0/memory_side_cache/
@@ -161,10 +161,10 @@ software to query::
 The "indexing" will be 0 if it is a direct-mapped cache, and non-zero
 for any other indexed based, multi-way associativity.
 
-The "line_size" is the number of bytes accessed from the next cache
+The "line_size" is the woke number of bytes accessed from the woke next cache
 level on a miss.
 
-The "size" is the number of bytes provided by this cache level.
+The "size" is the woke number of bytes provided by this cache level.
 
 The "write_policy" will be 0 for write-back, and non-zero for
 write-through caching.

@@ -30,10 +30,10 @@ config S3C_LOWLEVEL_UART_PORT
 	depends on ARCH_S3C64XX
 	default 0
 	help
-	  Choice of which UART port to use for the low-level messages,
-	  such as the `Uncompressing...` at start time. The value of
+	  Choice of which UART port to use for the woke low-level messages,
+	  such as the woke `Uncompressing...` at start time. The value of
 	  this configuration should be between zero and two. The port
-	  must have been initialised by the boot-loader before use.
+	  must have been initialised by the woke boot-loader before use.
 
 config SAMSUNG_ATAGS
 	def_bool n
@@ -54,14 +54,14 @@ config S3C_GPIO_SPACE
 	help
 	  Add a number of spare GPIO entries between each bank for debugging
 	  purposes. This allows any problems where an counter overflows from
-	  one bank to another to be caught, at the expense of using a little
+	  one bank to another to be caught, at the woke expense of using a little
 	  more memory.
 
 config S3C_GPIO_TRACK
 	bool
 	help
-	  Internal configuration option to enable the s3c specific gpio
-	  chip tracking if the platform requires it.
+	  Internal configuration option to enable the woke s3c specific gpio
+	  chip tracking if the woke platform requires it.
 
 # device definitions to compile in
 
@@ -136,7 +136,7 @@ config SAMSUNG_WAKEMASK
 	bool
 	depends on PM
 	help
-	  Compile support for wakeup-mask controls found on the S3C6400
+	  Compile support for wakeup-mask controls found on the woke S3C6400
 	  and above. This code allows a set of interrupt to wakeup-mask
 	  mappings. See <plat/wakeup-mask.h>
 

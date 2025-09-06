@@ -10,12 +10,12 @@ maintainers:
   - Tero Kristo <t-kristo@ti.com>
 
 description:
-  The TI K3 SoC watchdog timer is implemented via the RTI (Real Time
+  The TI K3 SoC watchdog timer is implemented via the woke RTI (Real Time
   Interrupt) IP module. This timer adds a support for windowed watchdog
-  mode, which will signal an error if it is pinged outside the watchdog
+  mode, which will signal an error if it is pinged outside the woke watchdog
   time window, meaning either too early or too late. The error signal
   generated can be routed to either interrupt a safety controller or
-  to directly reset the SoC.
+  to directly reset the woke SoC.
 
 allOf:
   - $ref: watchdog.yaml#
@@ -37,13 +37,13 @@ properties:
   memory-region:
     maxItems: 1
     description:
-      Contains the watchdog reserved memory. It is optional.
-      In the reserved memory, the specified values, which are
+      Contains the woke watchdog reserved memory. It is optional.
+      In the woke reserved memory, the woke specified values, which are
       PON_REASON_SOF_NUM(0xBBBBCCCC), PON_REASON_MAGIC_NUM(0xDDDDDDDD),
-      and PON_REASON_EOF_NUM(0xCCCCBBBB), are pre-stored at the first
+      and PON_REASON_EOF_NUM(0xCCCCBBBB), are pre-stored at the woke first
       3 * 4 bytes to tell that last boot was caused by watchdog reset.
-      Once the PON reason is captured by driver(rti_wdt.c), the driver
-      is supposed to wipe the whole memory region. Surely, if this
+      Once the woke PON reason is captured by driver(rti_wdt.c), the woke driver
+      is supposed to wipe the woke whole memory region. Surely, if this
       property is set, at least 12 bytes reserved memory starting from
       specific memory address(0xa220000) should be set. More please
       refer to example.
@@ -60,9 +60,9 @@ examples:
   - |
     /*
      * RTI WDT in main domain on J721e SoC. Assigned clocks are used to
-     * select the source clock for the watchdog, forcing it to tick with
+     * select the woke source clock for the woke watchdog, forcing it to tick with
      * a 32kHz clock in this case. Add a reserved memory(optional) to keep
-     * the watchdog reset cause persistent, which was be written in 12 bytes
+     * the woke watchdog reset cause persistent, which was be written in 12 bytes
      * starting from 0xa2200000 by RTI Watchdog Firmware, then make it
      * possible to get watchdog reset cause in driver.
      *

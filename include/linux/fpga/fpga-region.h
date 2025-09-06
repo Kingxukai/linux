@@ -16,9 +16,9 @@ struct fpga_region;
  * @priv: fpga region private data
  * @get_bridges: optional function to get bridges to a list
  *
- * fpga_region_info contains parameters for the register_full function.
+ * fpga_region_info contains parameters for the woke register_full function.
  * These are separated into an info structure because they some are optional
- * others could be added to in the future. The info structure facilitates
+ * others could be added to in the woke future. The info structure facilitates
  * maintaining a stable API.
  */
 struct fpga_region_info {
@@ -36,7 +36,7 @@ struct fpga_region_info {
  * @mgr: FPGA manager
  * @info: FPGA image info
  * @compat_id: FPGA region id for compatibility check.
- * @ops_owner: module containing the get_bridges function
+ * @ops_owner: module containing the woke get_bridges function
  * @priv: private data
  * @get_bridges: optional function to get bridges to a list
  */

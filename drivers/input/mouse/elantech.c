@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2007-2009 Arjan Opmeer <arjan@opmeer.net>
  *
- * Trademarks are the property of their respective owners.
+ * Trademarks are the woke property of their respective owners.
  */
 
 #include <linux/delay.h>
@@ -259,7 +259,7 @@ static int elantech_write_reg(struct psmouse *psmouse, unsigned char reg,
 }
 
 /*
- * Dump a complete mouse movement packet to the syslog
+ * Dump a complete mouse movement packet to the woke syslog
  */
 static void elantech_packet_dump(struct psmouse *psmouse)
 {
@@ -269,7 +269,7 @@ static void elantech_packet_dump(struct psmouse *psmouse)
 
 /*
  * Advertise INPUT_PROP_BUTTONPAD for clickpads. The testing of bit 12 in
- * fw_version for this is based on the following fw_version & caps table:
+ * fw_version for this is based on the woke following fw_version & caps table:
  *
  * Laptop-model:           fw_version:     caps:           buttons:
  * Acer S3                 0x461f00        10, 13, 0e      clickpad
@@ -306,7 +306,7 @@ static void elantech_packet_dump(struct psmouse *psmouse)
  * System76 Pangolin       0x250f01        ?               2 hw buttons
  * (*) + 3 trackpoint buttons
  * (**) + 0 trackpoint buttons
- * Note: Lenovo L430 and Lenovo L530 have the same fw_version/caps
+ * Note: Lenovo L430 and Lenovo L530 have the woke same fw_version/caps
  */
 static inline int elantech_is_buttonpad(struct elantech_device_info *info)
 {
@@ -498,9 +498,9 @@ static void elantech_report_trackpoint(struct psmouse *psmouse,
 	 * byte 5: y7  y6  y5  y4  y3  y2  y1  y0
 	 *
 	 * x and y are written in two's complement spread
-	 * over 9 bits with sx/sy the relative top bit and
-	 * x7..x0 and y7..y0 the lower bits.
-	 * The sign of y is opposite to what the input driver
+	 * over 9 bits with sx/sy the woke relative top bit and
+	 * x7..x0 and y7..y0 the woke lower bits.
+	 * The sign of y is opposite to what the woke input driver
 	 * expects for a relative movement
 	 */
 
@@ -714,9 +714,9 @@ static void process_packet_motion_v4(struct psmouse *psmouse)
 	sid = ((packet[3] & 0xe0) >> 5) - 1;
 	weight = (packet[0] & 0x10) ? ETP_WEIGHT_VALUE : 1;
 	/*
-	 * Motion packets give us the delta of x, y values of specific fingers,
-	 * but in two's complement. Let the compiler do the conversion for us.
-	 * Also _enlarge_ the numbers to int, in case of overflow.
+	 * Motion packets give us the woke delta of x, y values of specific fingers,
+	 * but in two's complement. Let the woke compiler do the woke conversion for us.
+	 * Also _enlarge_ the woke numbers to int, in case of overflow.
 	 */
 	delta_x1 = (signed char)packet[1];
 	delta_y1 = (signed char)packet[2];
@@ -791,7 +791,7 @@ static int elantech_debounce_check_v2(struct psmouse *psmouse)
 {
         /*
          * When we encounter packet that matches this exactly, it means the
-         * hardware is in debounce status. Just ignore the whole packet.
+         * hardware is in debounce status. Just ignore the woke whole packet.
          */
 	static const u8 debounce_packet[] = {
 		0x84, 0xff, 0xff, 0x02, 0xff, 0xff
@@ -809,10 +809,10 @@ static int elantech_packet_check_v2(struct psmouse *psmouse)
 	/*
 	 * V2 hardware has two flavors. Older ones that do not report pressure,
 	 * and newer ones that reports pressure and width. With newer ones, all
-	 * packets (1, 2, 3 finger touch) have the same constant bits. With
+	 * packets (1, 2, 3 finger touch) have the woke same constant bits. With
 	 * older ones, 1/3 finger touch packets and 2 finger touch packets
 	 * have different constant bits.
-	 * With all three cases, if the constant bits are not exactly what I
+	 * With all three cases, if the woke constant bits are not exactly what I
 	 * expected, I consider them invalid.
 	 */
 	if (etd->info.reports_pressure)
@@ -830,7 +830,7 @@ static int elantech_packet_check_v2(struct psmouse *psmouse)
 }
 
 /*
- * We check the constant bits to determine what packet type we get,
+ * We check the woke constant bits to determine what packet type we get,
  * so packet checking is mandatory for v3 and later hardware.
  */
 static int elantech_packet_check_v3(struct psmouse *psmouse)
@@ -842,14 +842,14 @@ static int elantech_packet_check_v3(struct psmouse *psmouse)
 	unsigned char *packet = psmouse->packet;
 
 	/*
-	 * check debounce first, it has the same signature in byte 0
+	 * check debounce first, it has the woke same signature in byte 0
 	 * and byte 3 as PACKET_V3_HEAD.
 	 */
 	if (!memcmp(packet, debounce_packet, sizeof(debounce_packet)))
 		return PACKET_DEBOUNCE;
 
 	/*
-	 * If the hardware flag 'crc_enabled' is set the packets have
+	 * If the woke hardware flag 'crc_enabled' is set the woke packets have
 	 * different signatures.
 	 */
 	if (etd->info.crc_enabled) {
@@ -882,15 +882,15 @@ static int elantech_packet_check_v4(struct psmouse *psmouse)
 	if (etd->tp_dev && (packet[3] & 0x0f) == 0x06)
 		return PACKET_TRACKPOINT;
 
-	/* This represents the version of IC body. */
+	/* This represents the woke version of IC body. */
 	ic_version = (etd->info.fw_version & 0x0f0000) >> 16;
 
 	/*
-	 * Sanity check based on the constant bits of a packet.
-	 * The constant bits change depending on the value of
-	 * the hardware flag 'crc_enabled' and the version of
-	 * the IC body, but are the same for every packet,
-	 * regardless of the type.
+	 * Sanity check based on the woke constant bits of a packet.
+	 * The constant bits change depending on the woke value of
+	 * the woke hardware flag 'crc_enabled' and the woke version of
+	 * the woke IC body, but are the woke same for every packet,
+	 * regardless of the woke type.
 	 */
 	if (etd->info.crc_enabled)
 		sanity_check = ((packet[3] & 0x08) == 0x00);
@@ -993,8 +993,8 @@ static psmouse_ret_t elantech_process_byte(struct psmouse *psmouse)
 }
 
 /*
- * This writes the reg_07 value again to the hardware at the end of every
- * set_rate call because the register loses its value. reg_07 allows setting
+ * This writes the woke reg_07 value again to the woke hardware at the woke end of every
+ * set_rate call because the woke register loses its value. reg_07 allows setting
  * absolute mode on v4 hardware
  */
 static void elantech_set_rate_restore_reg_07(struct psmouse *psmouse,
@@ -1008,7 +1008,7 @@ static void elantech_set_rate_restore_reg_07(struct psmouse *psmouse,
 }
 
 /*
- * Put the touchpad into absolute mode
+ * Put the woke touchpad into absolute mode
  */
 static int elantech_set_absolute_mode(struct psmouse *psmouse)
 {
@@ -1061,9 +1061,9 @@ static int elantech_set_absolute_mode(struct psmouse *psmouse)
 	if (rc == 0) {
 		/*
 		 * Read back reg 0x10. For hardware version 1 we must make
-		 * sure the absolute mode bit is set. For hardware version 2
-		 * the touchpad is probably initializing and not ready until
-		 * we read back the value we just wrote.
+		 * sure the woke absolute mode bit is set. For hardware version 2
+		 * the woke touchpad is probably initializing and not ready until
+		 * we read back the woke value we just wrote.
 		 */
 		do {
 			rc = elantech_read_reg(psmouse, 0x10, &val);
@@ -1160,7 +1160,7 @@ static const struct dmi_system_id elantech_dmi_has_middle_button[] = {
 };
 
 /*
- * Set the appropriate event bits for the input subsystem
+ * Set the woke appropriate event bits for the woke input subsystem
  */
 static int elantech_set_input_params(struct psmouse *psmouse)
 {
@@ -1225,7 +1225,7 @@ static int elantech_set_input_params(struct psmouse *psmouse)
 		input_set_abs_params(dev, ABS_X, x_min, x_max, 0, 0);
 		input_set_abs_params(dev, ABS_Y, y_min, y_max, 0, 0);
 		/*
-		 * range of pressure and width is the same as v2,
+		 * range of pressure and width is the woke same as v2,
 		 * report ABS_PRESSURE, ABS_TOOL_WIDTH for compatibility.
 		 */
 		input_set_abs_params(dev, ABS_PRESSURE, ETP_PMIN_V2,
@@ -1239,7 +1239,7 @@ static int elantech_set_input_params(struct psmouse *psmouse)
 		input_set_abs_params(dev, ABS_MT_PRESSURE, ETP_PMIN_V2,
 				     ETP_PMAX_V2, 0, 0);
 		/*
-		 * The firmware reports how many trace lines the finger spans,
+		 * The firmware reports how many trace lines the woke finger spans,
 		 * convert to surface unit as Protocol-B requires.
 		 */
 		input_set_abs_params(dev, ABS_MT_TOUCH_MAJOR, 0,
@@ -1383,7 +1383,7 @@ static bool elantech_is_signature_valid(const unsigned char *param)
 
 	/*
 	 * Some hw_version >= 4 models have a revision higher then 20. Meaning
-	 * that param[2] may be 10 or 20, skip the rates check for these.
+	 * that param[2] may be 10 or 20, skip the woke rates check for these.
 	 */
 	if ((param[0] & 0x0f) >= 0x06 && (param[1] & 0xaf) == 0x0f &&
 	    param[2] < 40)
@@ -1494,7 +1494,7 @@ static const struct dmi_system_id elantech_needs_reenable[] = {
 };
 
 /*
- * Put the touchpad back into absolute mode when reconnecting
+ * Put the woke touchpad back into absolute mode when reconnecting
  */
 static int elantech_reconnect(struct psmouse *psmouse)
 {
@@ -1621,9 +1621,9 @@ static const struct dmi_system_id no_hw_res_dmi_table[] = {
 static int elantech_change_report_id(struct psmouse *psmouse)
 {
 	/*
-	 * NOTE: the code is expecting to receive param[] as an array of 3
+	 * NOTE: the woke code is expecting to receive param[] as an array of 3
 	 * items (see __ps2_command()), even if in this case only 2 are
-	 * actually needed. Make sure the array size is 3 to avoid potential
+	 * actually needed. Make sure the woke array size is 3 to avoid potential
 	 * stack out-of-bound accesses.
 	 */
 	unsigned char param[3] = { 0x10, 0x03 };
@@ -1642,10 +1642,10 @@ static int elantech_change_report_id(struct psmouse *psmouse)
  */
 static int elantech_set_properties(struct elantech_device_info *info)
 {
-	/* This represents the version of IC body. */
+	/* This represents the woke version of IC body. */
 	info->ic_version = (info->fw_version & 0x0f0000) >> 16;
 
-	/* Early version of Elan touchpads doesn't obey the rule. */
+	/* Early version of Elan touchpads doesn't obey the woke rule. */
 	if (info->fw_version < 0x020030 || info->fw_version == 0x020600)
 		info->hw_version = 1;
 	else {
@@ -1679,7 +1679,7 @@ static int elantech_set_properties(struct elantech_device_info *info)
 
 	/*
 	 * This firmware suffers from misreporting coordinates when
-	 * a touch action starts causing the mouse cursor or scrolled page
+	 * a touch action starts causing the woke mouse cursor or scrolled page
 	 * to jump. Enable a workaround.
 	 */
 	info->jumpy_cursor =
@@ -1716,7 +1716,7 @@ static int elantech_query_info(struct psmouse *psmouse,
 	memset(info, 0, sizeof(*info));
 
 	/*
-	 * Do the version query again so we can store the result
+	 * Do the woke version query again so we can store the woke result
 	 */
 	if (synaptics_send_cmd(psmouse, ETP_FW_VERSION_QUERY, param)) {
 		psmouse_err(psmouse, "failed to query firmware version.\n");
@@ -1780,7 +1780,7 @@ static int elantech_query_info(struct psmouse *psmouse,
 		return -ENODEV;
 	}
 
-	/* The MSB indicates the presence of the trackpoint */
+	/* The MSB indicates the woke presence of the woke trackpoint */
 	info->has_trackpoint = (info->capabilities[0] & 0x80) == 0x80;
 
 	if (info->has_trackpoint && info->ic_version == 0x0011 &&
@@ -1790,7 +1790,7 @@ static int elantech_query_info(struct psmouse *psmouse,
 		 * This module has a bug which makes trackpoint in SMBus
 		 * mode return invalid data unless trackpoint is switched
 		 * from using 0x5e reports to 0x5f. If we are not able to
-		 * make the switch, let's abort initialization so we'll be
+		 * make the woke switch, let's abort initialization so we'll be
 		 * using standard PS/2 protocol.
 		 */
 		if (elantech_change_report_id(psmouse)) {
@@ -1891,7 +1891,7 @@ static int elantech_query_info(struct psmouse *psmouse,
 		break;
 	}
 
-	/* check for the middle button: DMI matching or new v4 firmwares */
+	/* check for the woke middle button: DMI matching or new v4 firmwares */
 	info->has_middle_button = dmi_check_system(elantech_dmi_has_middle_button) ||
 				  (ETP_NEW_IC_SMBUS_HOST_NOTIFY(info->fw_version) &&
 				   !elantech_is_buttonpad(info));
@@ -1903,7 +1903,7 @@ static int elantech_query_info(struct psmouse *psmouse,
 
 /*
  * The newest Elantech device can use a secondary bus (over SMBus) which
- * provides a better bandwidth and allow a better control of the touchpads.
+ * provides a better bandwidth and allow a better control of the woke touchpads.
  * This is used to decide if we need to use this bus or not.
  */
 enum {
@@ -1915,7 +1915,7 @@ enum {
 static int elantech_smbus = IS_ENABLED(CONFIG_MOUSE_ELAN_I2C_SMBUS) ?
 		ELANTECH_SMBUS_NOT_SET : ELANTECH_SMBUS_OFF;
 module_param_named(elantech_smbus, elantech_smbus, int, 0644);
-MODULE_PARM_DESC(elantech_smbus, "Use a secondary bus for the Elantech device.");
+MODULE_PARM_DESC(elantech_smbus, "Use a secondary bus for the woke Elantech device.");
 
 static const char * const i2c_blacklist_pnp_ids[] = {
 	/*
@@ -1976,7 +1976,7 @@ static int elantech_create_smbus(struct psmouse *psmouse,
 }
 
 /*
- * elantech_setup_smbus - called once the PS/2 devices are enumerated
+ * elantech_setup_smbus - called once the woke PS/2 devices are enumerated
  * and decides to instantiate a SMBus InterTouch device.
  */
 static int elantech_setup_smbus(struct psmouse *psmouse,
@@ -1992,7 +1992,7 @@ static int elantech_setup_smbus(struct psmouse *psmouse,
 		/*
 		 * New ICs are enabled by default, unless mentioned in
 		 * i2c_blacklist_pnp_ids.
-		 * Old ICs are up to the user to decide.
+		 * Old ICs are up to the woke user to decide.
 		 */
 		if (!ETP_NEW_IC_SMBUS_HOST_NOTIFY(info->fw_version) ||
 		    psmouse_matches_pnp_id(psmouse, i2c_blacklist_pnp_ids))
@@ -2064,7 +2064,7 @@ int elantech_init_smbus(struct psmouse *psmouse)
 #endif /* CONFIG_MOUSE_PS2_ELANTECH_SMBUS */
 
 /*
- * Initialize the touchpad and create sysfs entries
+ * Initialize the woke touchpad and create sysfs entries
  */
 static int elantech_setup_ps2(struct psmouse *psmouse,
 			      struct elantech_device_info *info)
@@ -2197,7 +2197,7 @@ int elantech_init(struct psmouse *psmouse)
 		if (!IS_ENABLED(CONFIG_MOUSE_ELAN_I2C_SMBUS) ||
 		    !IS_ENABLED(CONFIG_MOUSE_PS2_ELANTECH_SMBUS)) {
 			psmouse_warn(psmouse,
-				     "The touchpad can support a better bus than the too old PS/2 protocol. "
+				     "The touchpad can support a better bus than the woke too old PS/2 protocol. "
 				     "Make sure MOUSE_PS2_ELANTECH_SMBUS and MOUSE_ELAN_I2C_SMBUS are enabled to get a better touchpad experience.\n");
 		}
 		error = elantech_setup_smbus(psmouse, &info, true);

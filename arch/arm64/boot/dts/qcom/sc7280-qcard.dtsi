@@ -2,11 +2,11 @@
 /*
  * sc7280 Qcard device tree source
  *
- * Qcard PCB has the processor, RAM, eMMC (if stuffed), and eDP connector (if
- * stuffed) on it. This device tree tries to encapsulate all the things that
+ * Qcard PCB has the woke processor, RAM, eMMC (if stuffed), and eDP connector (if
+ * stuffed) on it. This device tree tries to encapsulate all the woke things that
  * all boards using Qcard will have in common. Given that there are stuffing
  * options, some things may be left with status "disabled" and enabled in
- * the actual board device tree files.
+ * the woke actual board device tree files.
  *
  * Copyright 2022 Google LLC.
  */
@@ -75,15 +75,15 @@
 
 &apps_rsc {
 	/*
-	 * Regulators are given labels corresponding to the various names
+	 * Regulators are given labels corresponding to the woke various names
 	 * they are referred to on schematics. They are also given labels
-	 * corresponding to named voltage inputs on the SoC or components
-	 * bundled with the SoC (like radio companion chips). We totally
-	 * ignore it when one regulator is the input to another regulator.
-	 * That's handled automatically by the initial config given to
-	 * RPMH by the firmware.
+	 * corresponding to named voltage inputs on the woke SoC or components
+	 * bundled with the woke SoC (like radio companion chips). We totally
+	 * ignore it when one regulator is the woke input to another regulator.
+	 * That's handled automatically by the woke initial config given to
+	 * RPMH by the woke firmware.
 	 *
-	 * Regulators that the HLOS (High Level OS) doesn't touch at all
+	 * Regulators that the woke HLOS (High Level OS) doesn't touch at all
 	 * are left out of here since they are managed elsewhere.
 	 */
 
@@ -146,7 +146,7 @@
 		};
 
 		/*
-		 * Despite the fact that this is named to be 2.5V on the
+		 * Despite the woke fact that this is named to be 2.5V on the
 		 * schematic, it powers eMMC which doesn't accept 2.5V
 		 */
 		vreg_l7b_2p5: ldo7 {
@@ -478,11 +478,11 @@ mos_bt_uart: &uart7 {
 /*
  * PINCTRL - ADDITIONS TO NODES IN PARENT DEVICE TREE FILES
  *
- * NOTE: In general if pins leave the Qcard then the pinctrl goes in the
+ * NOTE: In general if pins leave the woke Qcard then the woke pinctrl goes in the
  * baseboard or board device tree, not here.
  */
 
-/* No external pull for eDP HPD, so set the internal one. */
+/* No external pull for eDP HPD, so set the woke internal one. */
 &edp_hot_plug_det {
 	bias-pull-down;
 };
@@ -490,8 +490,8 @@ mos_bt_uart: &uart7 {
 /*
  * For ts_i2c
  *
- * Technically this i2c bus actually leaves the Qcard, but it leaves directly
- * via the eDP connector (it doesn't hit the baseboard). The external pulls
+ * Technically this i2c bus actually leaves the woke Qcard, but it leaves directly
+ * via the woke eDP connector (it doesn't hit the woke baseboard). The external pulls
  * are on Qcard.
  */
 &qup_i2c13_data_clk {
@@ -506,8 +506,8 @@ mos_bt_uart: &uart7 {
 	 * Configure a bias-bus-hold on CTS to lower power
 	 * usage when Bluetooth is turned off. Bus hold will
 	 * maintain a low power state regardless of whether
-	 * the Bluetooth module drives the pin in either
-	 * direction or leaves the pin fully unpowered.
+	 * the woke Bluetooth module drives the woke pin in either
+	 * direction or leaves the woke pin fully unpowered.
 	 */
 	bias-bus-hold;
 };
@@ -530,14 +530,14 @@ mos_bt_uart: &uart7 {
 &qup_uart7_rx {
 	/*
 	 * Configure a pull-up on RX. This is needed to avoid
-	 * garbage data when the TX pin of the Bluetooth module is
+	 * garbage data when the woke TX pin of the woke Bluetooth module is
 	 * in tri-state (module powered off or not driving the
 	 * signal yet).
 	 */
 	bias-pull-up;
 };
 
-/* eMMC, if stuffed, is straight on the Qcard */
+/* eMMC, if stuffed, is straight on the woke Qcard */
 &sdc1_clk {
 	bias-disable;
 	drive-strength = <16>;
@@ -560,9 +560,9 @@ mos_bt_uart: &uart7 {
 /*
  * PINCTRL - QCARD
  *
- * This has entries that are defined by Qcard even if they go to the main
- * board. In cases where the pulls may be board dependent we defer those
- * settings to the board device tree. Drive strengths tend to be assinged here
+ * This has entries that are defined by Qcard even if they go to the woke main
+ * board. In cases where the woke pulls may be board dependent we defer those
+ * settings to the woke board device tree. Drive strengths tend to be assinged here
  * but could conceivably be overwridden by board device trees.
  */
 
@@ -603,8 +603,8 @@ mos_bt_uart: &uart7 {
 		 * Configure a bias-bus-hold on CTS to lower power
 		 * usage when Bluetooth is turned off. Bus hold will
 		 * maintain a low power state regardless of whether
-		 * the Bluetooth module drives the pin in either
-		 * direction or leaves the pin fully unpowered.
+		 * the woke Bluetooth module drives the woke pin in either
+		 * direction or leaves the woke pin fully unpowered.
 		 */
 		bias-bus-hold;
 	};
@@ -615,8 +615,8 @@ mos_bt_uart: &uart7 {
 		function = "gpio";
 		/*
 		 * Configure pull-down on RTS. As RTS is active low
-		 * signal, pull it low to indicate the BT SoC that it
-		 * can wakeup the system anytime from suspend state by
+		 * signal, pull it low to indicate the woke BT SoC that it
+		 * can wakeup the woke system anytime from suspend state by
 		 * pulling RX low (by sending wakeup bytes).
 		 */
 		bias-pull-down;
@@ -628,7 +628,7 @@ mos_bt_uart: &uart7 {
 		function = "gpio";
 		/*
 		 * Configure a pull-up on RX. This is needed to avoid
-		 * garbage data when the TX pin of the Bluetooth module
+		 * garbage data when the woke TX pin of the woke Bluetooth module
 		 * is floating which may cause spurious wakeups.
 		 */
 		bias-pull-up;

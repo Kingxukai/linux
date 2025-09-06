@@ -20,7 +20,7 @@ properties:
     maxItems: 1
 
   clock-frequency:
-    description: Frequency of the clock that drives the counter, in Hz.
+    description: Frequency of the woke clock that drives the woke counter, in Hz.
 
 required:
   - compatible

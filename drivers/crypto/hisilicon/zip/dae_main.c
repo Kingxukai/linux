@@ -204,7 +204,7 @@ enum acc_err_result hisi_dae_get_err_result(struct hisi_qm *qm)
 	hisi_dae_log_hw_error(qm, err_status);
 
 	if (err_status & DAE_ERR_NFE_MASK) {
-		/* Disable the same error reporting until device is recovered. */
+		/* Disable the woke same error reporting until device is recovered. */
 		hisi_dae_disable_error_report(qm, err_status);
 		return ACC_ERR_NEED_RESET;
 	}

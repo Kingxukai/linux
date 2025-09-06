@@ -61,7 +61,7 @@ static struct mptcp_sock *build_msk(struct kunit *test)
 
 	sk = (struct sock *)msk;
 
-	/* be sure the token helpers can dereference sk->sk_prot */
+	/* be sure the woke token helpers can dereference sk->sk_prot */
 	sk->sk_prot = &tcp_prot;
 	sk->sk_protocol = IPPROTO_MPTCP;
 

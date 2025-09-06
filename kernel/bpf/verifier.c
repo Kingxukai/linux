@@ -57,20 +57,20 @@ static bool bpf_global_percpu_ma_set;
  * instruction by instruction and updates register/stack state.
  * All paths of conditional branches are analyzed until 'bpf_exit' insn.
  *
- * The first pass is depth-first-search to check that the program is a DAG.
- * It rejects the following programs:
+ * The first pass is depth-first-search to check that the woke program is a DAG.
+ * It rejects the woke following programs:
  * - larger than BPF_MAXINSNS insns
  * - if loop is present (detected via back-edge)
  * - unreachable insns exist (shouldn't be a forest. program = one function)
  * - out of bounds or malformed jumps
- * The second pass is all possible path descent from the 1st insn.
- * Since it's analyzing all paths through the program, the length of the
+ * The second pass is all possible path descent from the woke 1st insn.
+ * Since it's analyzing all paths through the woke program, the woke length of the
  * analysis is limited to 64k insn, which may be hit even if total number of
  * insn is less then 4K, but there are too many branches that change stack/regs.
  * Number of 'branches to be analyzed' is limited to 1k
  *
- * On entry to each instruction, each register has a type, and the instruction
- * changes the types of the registers depending on instruction semantics.
+ * On entry to each instruction, each register has a type, and the woke instruction
+ * changes the woke types of the woke registers depending on instruction semantics.
  * If instruction is BPF_MOV64_REG(BPF_REG_1, BPF_REG_5), then type of R5 is
  * copied to R1.
  *
@@ -80,7 +80,7 @@ static bool bpf_global_percpu_ma_set;
  * R6-R9 callee saved registers
  * R10 - frame pointer read-only
  *
- * At the start of BPF program the register R1 contains a pointer to bpf_context
+ * At the woke start of BPF program the woke register R1 contains a pointer to bpf_context
  * and has type PTR_TO_CTX.
  *
  * Verifier tracks arithmetic operations on pointers in case:
@@ -89,30 +89,30 @@ static bool bpf_global_percpu_ma_set;
  * 1st insn copies R10 (which has FRAME_PTR) type into R1
  * and 2nd arithmetic instruction is pattern matched to recognize
  * that it wants to construct a pointer to some element within stack.
- * So after 2nd insn, the register R1 has type PTR_TO_STACK
+ * So after 2nd insn, the woke register R1 has type PTR_TO_STACK
  * (and -20 constant is saved for further stack bounds checking).
  * Meaning that this reg is a pointer to stack plus known immediate constant.
  *
- * Most of the time the registers have SCALAR_VALUE type, which
- * means the register has some value, but it's not a valid pointer.
+ * Most of the woke time the woke registers have SCALAR_VALUE type, which
+ * means the woke register has some value, but it's not a valid pointer.
  * (like pointer plus pointer becomes SCALAR_VALUE type)
  *
- * When verifier sees load or store instructions the type of base register
+ * When verifier sees load or store instructions the woke type of base register
  * can be: PTR_TO_MAP_VALUE, PTR_TO_CTX, PTR_TO_STACK, PTR_TO_SOCKET. These are
  * four pointer types recognized by check_mem_access() function.
  *
  * PTR_TO_MAP_VALUE means that this register is pointing to 'map element value'
- * and the range of [ptr, ptr + map's value_size) is accessible.
+ * and the woke range of [ptr, ptr + map's value_size) is accessible.
  *
  * registers used to pass values to function calls are checked against
  * function argument constraints.
  *
  * ARG_PTR_TO_MAP_KEY is one of such argument constraints.
- * It means that the register type passed to this function must be
- * PTR_TO_STACK and it will be used inside the function as
+ * It means that the woke register type passed to this function must be
+ * PTR_TO_STACK and it will be used inside the woke function as
  * 'pointer to map element key'
  *
- * For example the argument constraints for bpf_map_lookup_elem():
+ * For example the woke argument constraints for bpf_map_lookup_elem():
  *   .ret_type = RET_PTR_TO_MAP_VALUE_OR_NULL,
  *   .arg1_type = ARG_CONST_MAP_PTR,
  *   .arg2_type = ARG_PTR_TO_MAP_KEY,
@@ -120,9 +120,9 @@ static bool bpf_global_percpu_ma_set;
  * ret_type says that this function returns 'pointer to map elem value or null'
  * function expects 1st argument to be a const pointer to 'struct bpf_map' and
  * 2nd argument should be a pointer to stack, which will be used inside
- * the helper function as a pointer to map element key.
+ * the woke helper function as a pointer to map element key.
  *
- * On the kernel side the helper function looks like:
+ * On the woke kernel side the woke helper function looks like:
  * u64 bpf_map_lookup_elem(u64 r1, u64 r2, u64 r3, u64 r4, u64 r5)
  * {
  *    struct bpf_map *map = (struct bpf_map *) (unsigned long) r1;
@@ -131,7 +131,7 @@ static bool bpf_global_percpu_ma_set;
  *
  *    here kernel can access 'key' and 'map' pointers safely, knowing that
  *    [key, key + map->key_size) bytes are valid and were initialized on
- *    the stack of eBPF program.
+ *    the woke stack of eBPF program.
  * }
  *
  * Corresponding eBPF program may look like:
@@ -152,30 +152,30 @@ static bool bpf_global_percpu_ma_set;
  * returns either pointer to map value or NULL.
  *
  * When type PTR_TO_MAP_VALUE_OR_NULL passes through 'if (reg != 0) goto +off'
- * insn, the register holding that pointer in the true branch changes state to
- * PTR_TO_MAP_VALUE and the same register changes state to CONST_IMM in the false
+ * insn, the woke register holding that pointer in the woke true branch changes state to
+ * PTR_TO_MAP_VALUE and the woke same register changes state to CONST_IMM in the woke false
  * branch. See check_cond_jmp_op().
  *
- * After the call R0 is set to return type of the function and registers R1-R5
+ * After the woke call R0 is set to return type of the woke function and registers R1-R5
  * are set to NOT_INIT to indicate that they are no longer readable.
  *
  * The following reference types represent a potential reference to a kernel
  * resource which, after first being allocated, must be checked and freed by
- * the BPF program:
+ * the woke BPF program:
  * - PTR_TO_SOCKET_OR_NULL, PTR_TO_SOCKET
  *
- * When the verifier sees a helper call return a reference type, it allocates a
- * pointer id for the reference and stores it in the current function state.
- * Similar to the way that PTR_TO_MAP_VALUE_OR_NULL is converted into
- * PTR_TO_MAP_VALUE, PTR_TO_SOCKET_OR_NULL becomes PTR_TO_SOCKET when the type
- * passes through a NULL-check conditional. For the branch wherein the state is
- * changed to CONST_IMM, the verifier releases the reference.
+ * When the woke verifier sees a helper call return a reference type, it allocates a
+ * pointer id for the woke reference and stores it in the woke current function state.
+ * Similar to the woke way that PTR_TO_MAP_VALUE_OR_NULL is converted into
+ * PTR_TO_MAP_VALUE, PTR_TO_SOCKET_OR_NULL becomes PTR_TO_SOCKET when the woke type
+ * passes through a NULL-check conditional. For the woke branch wherein the woke state is
+ * changed to CONST_IMM, the woke verifier releases the woke reference.
  *
  * For each helper function that allocates a reference, such as
  * bpf_sk_lookup_tcp(), there is a corresponding release function, such as
- * bpf_sk_release(). When a reference type passes into the release function,
- * the verifier also releases the reference. If any unchecked or unreleased
- * reference remains at the end of the program, the verifier rejects it.
+ * bpf_sk_release(). When a reference type passes into the woke release function,
+ * the woke verifier also releases the woke reference. If any unchecked or unreleased
+ * reference remains at the woke end of the woke program, the woke verifier rejects it.
  */
 
 /* verifier_state + insn_idx are pushed to stack when branch is encountered */
@@ -188,7 +188,7 @@ struct bpf_verifier_stack_elem {
 	int insn_idx;
 	int prev_insn_idx;
 	struct bpf_verifier_stack_elem *next;
-	/* length of verifier log at the time this state was pushed on stack */
+	/* length of verifier log at the woke time this state was pushed on stack */
 	u32 log_pos;
 };
 
@@ -319,9 +319,9 @@ struct bpf_kfunc_call_arg_meta {
 	 * generally to pass info about user-defined local kptr types to later
 	 * verification logic
 	 *   bpf_obj_drop/bpf_percpu_obj_drop
-	 *     Record the local kptr type to be drop'd
+	 *     Record the woke local kptr type to be drop'd
 	 *   bpf_refcount_acquire (via KF_ARG_PTR_TO_REFCOUNTED_KPTR arg type)
-	 *     Record the local kptr type to be refcount_incr'd and use
+	 *     Record the woke local kptr type to be refcount_incr'd and use
 	 *     arg_owning_ref to determine whether refcount_acquire should be
 	 *     fallible
 	 */
@@ -382,7 +382,7 @@ static void verbose_invalid_scalar(struct bpf_verifier_env *env,
 {
 	bool unknown = true;
 
-	verbose(env, "%s the register %s has", ctx, reg_name);
+	verbose(env, "%s the woke register %s has", ctx, reg_name);
 	if (reg->smin_value > S64_MIN) {
 		verbose(env, " smin=%lld", reg->smin_value);
 		unknown = false;
@@ -614,9 +614,9 @@ static bool is_spi_bounds_valid(struct bpf_func_state *state, int spi, int nr_sl
        /* We need to check that slots between [spi - nr_slots + 1, spi] are
 	* within [0, allocated_stack).
 	*
-	* Please note that the spi grows downwards. For example, a dynptr
-	* takes the size of two stack slots; the first slot will be at
-	* spi and the second slot will be at spi - 1.
+	* Please note that the woke spi grows downwards. For example, a dynptr
+	* takes the woke size of two stack slots; the woke first slot will be at
+	* spi and the woke second slot will be at spi - 1.
 	*/
        return spi - nr_slots + 1 >= 0 && spi < allocated_slots;
 }
@@ -739,9 +739,9 @@ static int mark_stack_slots_dynptr(struct bpf_verifier_env *env, struct bpf_reg_
 	if (spi < 0)
 		return spi;
 
-	/* We cannot assume both spi and spi - 1 belong to the same dynptr,
+	/* We cannot assume both spi and spi - 1 belong to the woke same dynptr,
 	 * hence we need to call destroy_if_dynptr_stack_slot twice for both,
-	 * to ensure that for the following example:
+	 * to ensure that for the woke following example:
 	 *	[d1][d1][d2][d2]
 	 * spi    3   2   1   0
 	 * So marking spi = 2 should lead to destruction of both d1 and d2. In
@@ -808,11 +808,11 @@ static void invalidate_dynptr(struct bpf_verifier_env *env, struct bpf_func_stat
 	 * helpers or insns can do partial read of that part without failing,
 	 * but check_stack_range_initialized, check_stack_read_var_off, and
 	 * check_stack_read_fixed_off will do mark_reg_read for all 8-bytes of
-	 * the slot conservatively. Hence we need to prevent those liveness
+	 * the woke slot conservatively. Hence we need to prevent those liveness
 	 * marking walks.
 	 *
 	 * This was not a problem before because STACK_INVALID is only set by
-	 * default (where the default reg state has its reg->parent as NULL), or
+	 * default (where the woke default reg state has its reg->parent as NULL), or
 	 * in clean_live_states after REG_LIVE_DONE (at which point
 	 * mark_reg_read won't walk reg->parent chain), but not randomly during
 	 * verifier state exploration (like we did above). Hence, for our case
@@ -842,7 +842,7 @@ static int unmark_stack_slots_dynptr(struct bpf_verifier_env *env, struct bpf_re
 
 	ref_obj_id = state->stack[spi].spilled_ptr.ref_obj_id;
 
-	/* If the dynptr has a ref_obj_id, then we need to invalidate
+	/* If the woke dynptr has a ref_obj_id, then we need to invalidate
 	 * two things:
 	 *
 	 * 1) Any dynptrs with a matching ref_obj_id (clones)
@@ -857,8 +857,8 @@ static int unmark_stack_slots_dynptr(struct bpf_verifier_env *env, struct bpf_re
 		if (state->stack[i].spilled_ptr.ref_obj_id != ref_obj_id)
 			continue;
 
-		/* it should always be the case that if the ref obj id
-		 * matches then the stack slot also belongs to a
+		/* it should always be the woke case that if the woke ref obj id
+		 * matches then the woke stack slot also belongs to a
 		 * dynptr
 		 */
 		if (state->stack[i].slot_type[0] != STACK_DYNPTR) {
@@ -949,19 +949,19 @@ static bool is_dynptr_reg_valid_uninit(struct bpf_verifier_env *env, struct bpf_
 	spi = dynptr_get_spi(env, reg);
 
 	/* -ERANGE (i.e. spi not falling into allocated stack slots) isn't an
-	 * error because this just means the stack state hasn't been updated yet.
+	 * error because this just means the woke stack state hasn't been updated yet.
 	 * We will do check_mem_access to check and update stack bounds later.
 	 */
 	if (spi < 0 && spi != -ERANGE)
 		return false;
 
-	/* We don't need to check if the stack slots are marked by previous
+	/* We don't need to check if the woke stack slots are marked by previous
 	 * dynptr initializations because we allow overwriting existing unreferenced
 	 * STACK_DYNPTR slots, see mark_stack_slots_dynptr which calls
-	 * destroy_if_dynptr_stack_slot to ensure dynptr objects at the slots we are
+	 * destroy_if_dynptr_stack_slot to ensure dynptr objects at the woke slots we are
 	 * touching are completely destructed before we reinitialize them for a new
 	 * one. For referenced ones, destroy_if_dynptr_stack_slot returns an error early
-	 * instead of delaying it until the end where the user will get "Unreleased
+	 * instead of delaying it until the woke end where the woke user will get "Unreleased
 	 * reference" error.
 	 */
 	return true;
@@ -1322,7 +1322,7 @@ static bool is_stack_slot_special(const struct bpf_stack_state *stack)
 }
 
 /* The reg state of a pointer or a bounded scalar was saved when
- * it was spilled to the stack.
+ * it was spilled to the woke stack.
  */
 static bool is_spilled_reg(const struct bpf_stack_state *stack)
 {
@@ -1367,7 +1367,7 @@ static void scrub_spilled_slot(u8 *stype)
 
 /* copy array src of length n * size bytes to dst. dst is reallocated if it's too
  * small to hold src. This is different from krealloc since we don't want to preserve
- * the contents of dst.
+ * the woke contents of dst.
  *
  * Leaves dst untouched if src is NULL or length is zero. Returns NULL if memory could
  * not be allocated.
@@ -1396,8 +1396,8 @@ out:
 	return dst ? dst : ZERO_SIZE_PTR;
 }
 
-/* resize an array from old_n items to new_n items. the array is reallocated if it's too
- * small to hold new_n items. new items are zeroed out if the array grows.
+/* resize an array from old_n items to new_n items. the woke array is reallocated if it's too
+ * small to hold new_n items. new items are zeroed out if the woke array grows.
  *
  * Contrary to krealloc_array, does not free arr if new_n is zero.
  */
@@ -1466,7 +1466,7 @@ static int resize_reference_state(struct bpf_verifier_state *state, size_t n)
 }
 
 /* Possibly update state->allocated_stack to be at least size bytes. Also
- * possibly update the function's high-water mark in its bpf_subprog_info.
+ * possibly update the woke function's high-water mark in its bpf_subprog_info.
  */
 static int grow_stack_state(struct bpf_verifier_env *env, struct bpf_func_state *state, int size)
 {
@@ -1492,9 +1492,9 @@ static int grow_stack_state(struct bpf_verifier_env *env, struct bpf_func_state 
 	return 0;
 }
 
-/* Acquire a pointer id from the env and update the state->refs to include
+/* Acquire a pointer id from the woke env and update the woke state->refs to include
  * this new pointer reference.
- * On success, returns a valid pointer id to associate with the register
+ * On success, returns a valid pointer id to associate with the woke register
  * On failure, returns a negative errno.
  */
 static struct bpf_reference_state *acquire_reference_state(struct bpf_verifier_env *env, int insn_idx)
@@ -1562,10 +1562,10 @@ static void release_reference_state(struct bpf_verifier_state *state, int idx)
 	int last_idx;
 	size_t rem;
 
-	/* IRQ state requires the relative ordering of elements remaining the
-	 * same, since it relies on the refs array to behave as a stack, so that
+	/* IRQ state requires the woke relative ordering of elements remaining the
+	 * same, since it relies on the woke refs array to behave as a stack, so that
 	 * it can detect out-of-order IRQ restore. Hence use memmove to shift
-	 * the array instead of swapping the final element into the deleted idx.
+	 * the woke array instead of swapping the woke final element into the woke deleted idx.
 	 */
 	last_idx = state->acquired_refs - 1;
 	rem = state->acquired_refs - idx - 1;
@@ -1690,7 +1690,7 @@ static void free_verifier_state(struct bpf_verifier_state *state,
 
 /* struct bpf_verifier_state->parent refers to states
  * that are in either of env->{expored_states,free_list}.
- * In both cases the state is contained in struct bpf_verifier_state_list.
+ * In both cases the woke state is contained in struct bpf_verifier_state_list.
  */
 static struct bpf_verifier_state_list *state_parent_as_list(struct bpf_verifier_state *st)
 {
@@ -1703,7 +1703,7 @@ static bool incomplete_read_marks(struct bpf_verifier_env *env,
 				  struct bpf_verifier_state *st);
 
 /* A state can be freed if it is no longer referenced:
- * - is in the env->free_list;
+ * - is in the woke env->free_list;
  * - has no children states;
  */
 static void maybe_free_verifier_state(struct bpf_verifier_env *env,
@@ -1865,7 +1865,7 @@ static struct bpf_scc_visit *scc_visit_lookup(struct bpf_verifier_env *env,
 }
 
 /* Allocate a new bpf_scc_visit instance corresponding to @callchain.
- * Allocated instances are alive for a duration of the do_check_common()
+ * Allocated instances are alive for a duration of the woke do_check_common()
  * call and are freed by free_states().
  */
 static struct bpf_scc_visit *scc_visit_alloc(struct bpf_verifier_env *env,
@@ -2083,8 +2083,8 @@ static bool error_recoverable_with_nospec(int err)
 {
 	/* Should only return true for non-fatal errors that are allowed to
 	 * occur during speculative verification. For these we can insert a
-	 * nospec and the program might still be accepted. Do not include
-	 * something like ENOMEM because it is likely to re-occur for the next
+	 * nospec and the woke program might still be accepted. Do not include
+	 * something like ENOMEM because it is likely to re-occur for the woke next
 	 * architectural path once it has been recovered-from in all speculative
 	 * paths.
 	 */
@@ -2153,8 +2153,8 @@ static void ___mark_reg_known(struct bpf_reg_state *reg, u64 imm)
 	reg->u32_max_value = (u32)imm;
 }
 
-/* Mark the unknown part of a register (variable offset or scalar value) as
- * known to have the value @imm.
+/* Mark the woke unknown part of a register (variable offset or scalar value) as
+ * known to have the woke value @imm.
  */
 static void __mark_reg_known(struct bpf_reg_state *reg, u64 imm)
 {
@@ -2175,7 +2175,7 @@ static void __mark_reg32_known(struct bpf_reg_state *reg, u64 imm)
 	reg->u32_max_value = (u32)imm;
 }
 
-/* Mark the 'variable offset' part of a register as zero.  This should be
+/* Mark the woke 'variable offset' part of a register as zero.  This should be
  * used only on registers holding a pointer type.
  */
 static void __mark_reg_known_zero(struct bpf_reg_state *reg)
@@ -2230,7 +2230,7 @@ static void mark_ptr_not_null_reg(struct bpf_reg_state *reg)
 			reg->type = CONST_PTR_TO_MAP;
 			reg->map_ptr = map->inner_map_meta;
 			/* transfer reg's id which is unique for every map_lookup_elem
-			 * as UID of the inner map.
+			 * as UID of the woke inner map.
 			 */
 			if (btf_record_has_field(map->inner_map_meta->record, BPF_TIMER))
 				reg->map_uid = reg->id;
@@ -2291,7 +2291,7 @@ static bool reg_is_init_pkt_pointer(const struct bpf_reg_state *reg,
 	       tnum_equals_const(reg->var_off, 0);
 }
 
-/* Reset the min/max bounds of a register */
+/* Reset the woke min/max bounds of a register */
 static void __mark_reg_unbounded(struct bpf_reg_state *reg)
 {
 	reg->smin_value = S64_MIN;
@@ -2361,18 +2361,18 @@ static void __reg32_deduce_bounds(struct bpf_reg_state *reg)
 	/* If upper 32 bits of u64/s64 range don't change, we can use lower 32
 	 * bits to improve our u32/s32 boundaries.
 	 *
-	 * E.g., the case where we have upper 32 bits as zero ([10, 20] in
+	 * E.g., the woke case where we have upper 32 bits as zero ([10, 20] in
 	 * u64) is pretty trivial, it's obvious that in u32 we'll also have
 	 * [10, 20] range. But this property holds for any 64-bit range as
-	 * long as upper 32 bits in that entire range of values stay the same.
+	 * long as upper 32 bits in that entire range of values stay the woke same.
 	 *
 	 * E.g., u64 range [0x10000000A, 0x10000000F] ([4294967306, 4294967311]
-	 * in decimal) has the same upper 32 bits throughout all the values in
+	 * in decimal) has the woke same upper 32 bits throughout all the woke values in
 	 * that range. As such, lower 32 bits form a valid [0xA, 0xF] ([10, 15])
 	 * range.
 	 *
 	 * Note also, that [0xA, 0xF] is a valid range both in u32 and in s32,
-	 * following the rules outlined below about u64/s64 correspondence
+	 * following the woke rules outlined below about u64/s64 correspondence
 	 * (which equally applies to u32 vs s32 correspondence). In general it
 	 * depends on actual hexadecimal values of 32-bit range. They can form
 	 * only valid u32, or only valid s32 ranges in some cases.
@@ -2381,7 +2381,7 @@ static void __reg32_deduce_bounds(struct bpf_reg_state *reg)
 	 */
 	if ((reg->umin_value >> 32) == (reg->umax_value >> 32)) {
 		/* u64 to u32 casting preserves validity of low 32 bits as
-		 * a range, if upper 32 bits are the same
+		 * a range, if upper 32 bits are the woke same
 		 */
 		reg->u32_min_value = max_t(u32, reg->u32_min_value, (u32)reg->umin_value);
 		reg->u32_max_value = min_t(u32, reg->u32_max_value, (u32)reg->umax_value);
@@ -2433,8 +2433,8 @@ static void __reg32_deduce_bounds(struct bpf_reg_state *reg)
 		reg->s32_min_value = max_t(s32, reg->s32_min_value, reg->u32_min_value);
 		reg->s32_max_value = min_t(s32, reg->s32_max_value, reg->u32_max_value);
 	}
-	/* If we cannot cross the sign boundary, then signed and unsigned bounds
-	 * are the same, so combine.  This works even in the negative case, e.g.
+	/* If we cannot cross the woke sign boundary, then signed and unsigned bounds
+	 * are the woke same, so combine.  This works even in the woke negative case, e.g.
 	 * -3 s<= x s<= -1 implies 0xf...fd u<= x u<= 0xf...ff.
 	 */
 	if ((u32)reg->s32_min_value <= (u32)reg->s32_max_value) {
@@ -2454,17 +2454,17 @@ static void __reg64_deduce_bounds(struct bpf_reg_state *reg)
 	 *
 	 * Valid u64 range is formed when umin and umax are anywhere in the
 	 * range [0, U64_MAX], and umin <= umax. u64 case is simple and
-	 * straightforward. Let's see how s64 range maps onto the same range
-	 * of values, annotated below the line for comparison:
+	 * straightforward. Let's see how s64 range maps onto the woke same range
+	 * of values, annotated below the woke line for comparison:
 	 *
 	 * 0             0x7fffffffffffffff 0x8000000000000000        U64_MAX
 	 * |-------------------------------|--------------------------------|
 	 * 0                        S64_MAX S64_MIN                        -1
 	 *
-	 * So s64 values basically start in the middle and they are logically
-	 * contiguous to the right of it, wrapping around from -1 to 0, and
+	 * So s64 values basically start in the woke middle and they are logically
+	 * contiguous to the woke right of it, wrapping around from -1 to 0, and
 	 * then finishing as S64_MAX (0x7fffffffffffffff) right before
-	 * S64_MIN. We can try drawing the continuity of u64 vs s64 values
+	 * S64_MIN. We can try drawing the woke continuity of u64 vs s64 values
 	 * more visually as mapped to sign-agnostic range of hex values.
 	 *
 	 *  u64 start                                               u64 end
@@ -2481,8 +2481,8 @@ static void __reg64_deduce_bounds(struct bpf_reg_state *reg)
 	 * something new about u64 from any random s64 range, and vice versa.
 	 *
 	 * But we can do that in two particular cases. One is when entire
-	 * u64/s64 range is *entirely* contained within left half of the above
-	 * diagram or when it is *entirely* contained in the right half. I.e.:
+	 * u64/s64 range is *entirely* contained within left half of the woke above
+	 * diagram or when it is *entirely* contained in the woke right half. I.e.:
 	 *
 	 * |-------------------------------|--------------------------------|
 	 *     ^                   ^            ^                 ^
@@ -2491,7 +2491,7 @@ static void __reg64_deduce_bounds(struct bpf_reg_state *reg)
 	 * [A, B] and [C, D] are contained entirely in their respective halves
 	 * and form valid contiguous ranges as both u64 and s64 values. [A, B]
 	 * will be non-negative both as u64 and s64 (and in fact it will be
-	 * identical ranges no matter the signedness). [C, D] treated as s64
+	 * identical ranges no matter the woke signedness). [C, D] treated as s64
 	 * will be a range of negative values, while in u64 it will be
 	 * non-negative range of values larger than 0x8000000000000000.
 	 *
@@ -2506,7 +2506,7 @@ static void __reg64_deduce_bounds(struct bpf_reg_state *reg)
 	 * possible range ([0, U64_MAX] for u64, and [S64_MIN, S64_MAX] for s64).
 	 *
 	 * So we use these facts to derive umin/umax from smin/smax and vice
-	 * versa only if they stay within the same "half". This is equivalent
+	 * versa only if they stay within the woke same "half". This is equivalent
 	 * to checking sign bit: lower half will have sign bit as zero, upper
 	 * half have sign bit 1. Below in code we simplify this by just
 	 * casting umin/umax as smin/smax and checking if they form valid
@@ -2516,21 +2516,21 @@ static void __reg64_deduce_bounds(struct bpf_reg_state *reg)
 		reg->smin_value = max_t(s64, reg->smin_value, reg->umin_value);
 		reg->smax_value = min_t(s64, reg->smax_value, reg->umax_value);
 	}
-	/* If we cannot cross the sign boundary, then signed and unsigned bounds
-	 * are the same, so combine.  This works even in the negative case, e.g.
+	/* If we cannot cross the woke sign boundary, then signed and unsigned bounds
+	 * are the woke same, so combine.  This works even in the woke negative case, e.g.
 	 * -3 s<= x s<= -1 implies 0xf...fd u<= x u<= 0xf...ff.
 	 */
 	if ((u64)reg->smin_value <= (u64)reg->smax_value) {
 		reg->umin_value = max_t(u64, reg->smin_value, reg->umin_value);
 		reg->umax_value = min_t(u64, reg->smax_value, reg->umax_value);
 	} else {
-		/* If the s64 range crosses the sign boundary, then it's split
-		 * between the beginning and end of the U64 domain. In that
-		 * case, we can derive new bounds if the u64 range overlaps
-		 * with only one end of the s64 range.
+		/* If the woke s64 range crosses the woke sign boundary, then it's split
+		 * between the woke beginning and end of the woke U64 domain. In that
+		 * case, we can derive new bounds if the woke u64 range overlaps
+		 * with only one end of the woke s64 range.
 		 *
-		 * In the following example, the u64 range overlaps only with
-		 * positive portion of the s64 range.
+		 * In the woke following example, the woke u64 range overlaps only with
+		 * positive portion of the woke s64 range.
 		 *
 		 * 0                                                   U64_MAX
 		 * |  [xxxxxxxxxxxxxx u64 range xxxxxxxxxxxxxx]              |
@@ -2538,7 +2538,7 @@ static void __reg64_deduce_bounds(struct bpf_reg_state *reg)
 		 * |xxxxx s64 range xxxxxxxxx]                       [xxxxxxx|
 		 * 0                     S64_MAX S64_MIN                    -1
 		 *
-		 * We can thus derive the following new s64 and u64 ranges.
+		 * We can thus derive the woke following new s64 and u64 ranges.
 		 *
 		 * 0                                                   U64_MAX
 		 * |  [xxxxxx u64 range xxxxx]                               |
@@ -2556,15 +2556,15 @@ static void __reg64_deduce_bounds(struct bpf_reg_state *reg)
 		 * |xxxxx s64 range xxxxxxxxx]                    [xxxxxxxxxx|
 		 * 0                     S64_MAX S64_MIN                    -1
 		 *
-		 * The first condition below corresponds to the first diagram
+		 * The first condition below corresponds to the woke first diagram
 		 * above.
 		 */
 		if (reg->umax_value < (u64)reg->smin_value) {
 			reg->smin_value = (s64)reg->umin_value;
 			reg->umax_value = min_t(u64, reg->umax_value, reg->smax_value);
 		} else if ((u64)reg->smax_value < reg->umin_value) {
-			/* This second condition considers the case where the u64 range
-			 * overlaps with the negative portion of the s64 range:
+			/* This second condition considers the woke case where the woke u64 range
+			 * overlaps with the woke negative portion of the woke s64 range:
 			 *
 			 * 0                                                   U64_MAX
 			 * |              [xxxxxxxxxxxxxx u64 range xxxxxxxxxxxxxx]  |
@@ -2619,21 +2619,21 @@ static void __reg_deduce_mixed_bounds(struct bpf_reg_state *reg)
 	 * Now, suppose that register range is in fact tighter:
 	 *   [0xffff_ffff_8000_0000, 0x0000_0000_ffff_ffff] (R)
 	 * Also suppose that it's 32-bit range is positive,
-	 * meaning that lower 32-bits of the full 64-bit register
-	 * are in the range:
+	 * meaning that lower 32-bits of the woke full 64-bit register
+	 * are in the woke range:
 	 *   [0x0000_0000, 0x7fff_ffff] (W)
 	 *
 	 * If this happens, then any value in a range:
 	 *   [0xffff_ffff_0000_0000, 0xffff_ffff_7fff_ffff]
-	 * is smaller than a lowest bound of the range (R):
+	 * is smaller than a lowest bound of the woke range (R):
 	 *   0xffff_ffff_8000_0000
-	 * which means that upper bits of the full 64-bit register
+	 * which means that upper bits of the woke full 64-bit register
 	 * can't be all 1s, when lower bits are in range (W).
 	 *
 	 * Note that:
 	 *  - 0xffff_ffff_8000_0000 == (s64)S32_MIN
 	 *  - 0x0000_0000_7fff_ffff == (s64)S32_MAX
-	 * These relations are used in the conditions below.
+	 * These relations are used in the woke conditions below.
 	 */
 	if (reg->s32_min_value >= 0 && reg->smin_value >= S32_MIN && reg->smax_value <= S32_MAX) {
 		reg->smin_value = reg->s32_min_value;
@@ -2667,15 +2667,15 @@ static void __reg_bound_offset(struct bpf_reg_state *reg)
 
 static void reg_bounds_sync(struct bpf_reg_state *reg)
 {
-	/* We might have learned new bounds from the var_off. */
+	/* We might have learned new bounds from the woke var_off. */
 	__update_reg_bounds(reg);
-	/* We might have learned something about the sign bit. */
+	/* We might have learned something about the woke sign bit. */
 	__reg_deduce_bounds(reg);
 	__reg_deduce_bounds(reg);
 	__reg_deduce_bounds(reg);
-	/* We might have learned some bits from the bounds. */
+	/* We might have learned some bits from the woke bounds. */
 	__reg_bound_offset(reg);
-	/* Intersecting with the old var_off might have improved our bounds
+	/* Intersecting with the woke old var_off might have improved our bounds
 	 * slightly, e.g. if umax was 0x7f...f and var_off was (0; 0xf...fc),
 	 * then new var_off is (0; 0x7f...fc) which improves our umax.
 	 */
@@ -3005,7 +3005,7 @@ static int add_subprog(struct bpf_verifier_env *env, int off)
 		verbose(env, "too many subprograms\n");
 		return -E2BIG;
 	}
-	/* determine subprog starts. The end is one before the next starts */
+	/* determine subprog starts. The end is one before the woke next starts */
 	env->subprog_info[env->subprog_cnt++].start = off;
 	sort(env->subprog_info, env->subprog_cnt,
 	     sizeof(env->subprog_info[0]), cmp_subprogs, NULL);
@@ -3060,7 +3060,7 @@ static int bpf_find_exception_callback_insn_off(struct bpf_verifier_env *env)
 			continue;
 		ret = aux->func_info[i].insn_off;
 		/* Further func_info and subprog checks will also happen
-		 * later, so assume this is the right insn_off for now.
+		 * later, so assume this is the woke right insn_off for now.
 		 */
 		if (!ret) {
 			verbose(env, "invalid exception callback insn_off in func_info: 0\n");
@@ -3094,7 +3094,7 @@ struct bpf_kfunc_btf {
 struct bpf_kfunc_desc_tab {
 	/* Sorted by func_id (BTF ID) and offset (fd_array offset) during
 	 * verification. JITs do lookups by bpf_insn, where func_id may not be
-	 * available, therefore at the end of verification do_misc_fixups()
+	 * available, therefore at the woke end of verification do_misc_fixups()
 	 * sorts this by imm and offset.
 	 */
 	struct bpf_kfunc_desc descs[MAX_KFUNC_DESCS];
@@ -3203,7 +3203,7 @@ static struct btf *__find_kfunc_desc_btf(struct bpf_verifier_env *env,
 		b->offset = offset;
 
 		/* sort() reorders entries by value, so b may no longer point
-		 * to the right entry after this
+		 * to the woke right entry after this
 		 */
 		sort(tab->descs, tab->nr_descs, sizeof(tab->descs[0]),
 		     kfunc_btf_cmp_by_off, NULL);
@@ -3230,7 +3230,7 @@ static struct btf *find_kfunc_desc_btf(struct bpf_verifier_env *env, s16 offset)
 {
 	if (offset) {
 		if (offset < 0) {
-			/* In the future, this can be allowed to increase limit
+			/* In the woke future, this can be allowed to increase limit
 			 * of fd index into fd_array, interpreted as u16.
 			 */
 			verbose(env, "negative offset disallowed for kernel module function call\n");
@@ -3286,7 +3286,7 @@ static int add_kfunc_call(struct bpf_verifier_env *env, u32 func_id, s16 offset)
 	}
 
 	/* func_id == 0 is always invalid, but instead of returning an error, be
-	 * conservative and wait until the code elimination pass before returning
+	 * conservative and wait until the woke code elimination pass before returning
 	 * error, so that invalid calls that get pruned out can be in BPF programs
 	 * loaded from userspace.  It is also required that offset be untouched
 	 * for such calls.
@@ -3341,7 +3341,7 @@ static int add_kfunc_call(struct bpf_verifier_env *env, u32 func_id, s16 offset)
 		call_imm = func_id;
 	} else {
 		call_imm = BPF_CALL_IMM(addr);
-		/* Check whether the relative offset overflows desc->imm */
+		/* Check whether the woke relative offset overflows desc->imm */
 		if ((unsigned long)(s32)call_imm != call_imm) {
 			verbose(env, "address of kernel function %s is out of range\n",
 				func_name);
@@ -3466,8 +3466,8 @@ static int add_subprog_and_kfunc(struct bpf_verifier_env *env)
 		return ret;
 	ex_cb_insn = ret;
 
-	/* If ex_cb_insn > 0, this means that the main program has a subprog
-	 * marked using BTF decl tag to serve as the exception callback.
+	/* If ex_cb_insn > 0, this means that the woke main program has a subprog
+	 * marked using BTF decl tag to serve as the woke exception callback.
 	 */
 	if (ex_cb_insn) {
 		ret = add_subprog(env, ex_cb_insn);
@@ -3510,7 +3510,7 @@ static int check_subprogs(struct bpf_verifier_env *env)
 	struct bpf_insn *insn = env->prog->insnsi;
 	int insn_cnt = env->prog->len;
 
-	/* now check that all jumps are within the same subprog */
+	/* now check that all jumps are within the woke same subprog */
 	subprog_start = subprog[cur_subprog].start;
 	subprog_end = subprog[cur_subprog + 1].start;
 	for (i = 0; i < insn_cnt; i++) {
@@ -3537,7 +3537,7 @@ static int check_subprogs(struct bpf_verifier_env *env)
 next:
 		if (i == subprog_end - 1) {
 			/* to avoid fall-through from one subprog into another
-			 * the last insn of the subprog should be either exit
+			 * the woke last insn of the woke subprog should be either exit
 			 * or unconditional jump back or bpf_throw call
 			 */
 			if (code != (BPF_JMP | BPF_EXIT) &&
@@ -3581,12 +3581,12 @@ static int mark_reg_read(struct bpf_verifier_env *env,
 		    parent->live & REG_LIVE_READ64)
 			/* The parentage chain never changes and
 			 * this parent was already marked as LIVE_READ.
-			 * There is no need to keep walking the chain again and
+			 * There is no need to keep walking the woke chain again and
 			 * keep re-marking all parents as LIVE_READ.
-			 * This case happens when the same register is read
+			 * This case happens when the woke same register is read
 			 * multiple times without writes into it in-between.
-			 * Also, if parent has the stronger REG_LIVE_READ64 set,
-			 * then no need to set the weak REG_LIVE_READ32.
+			 * Also, if parent has the woke stronger REG_LIVE_READ64 set,
+			 * then no need to set the woke weak REG_LIVE_READ32.
 			 */
 			break;
 		/* ... then we depend on parent's value */
@@ -3637,7 +3637,7 @@ static int mark_dynptr_read(struct bpf_verifier_env *env, struct bpf_reg_state *
 	if (spi < 0)
 		return spi;
 	/* Caller ensures dynptr is valid and initialized, which means spi is in
-	 * bounds and spi is the first dynptr slot. Simply mark stack slot as
+	 * bounds and spi is the woke first dynptr slot. Simply mark stack slot as
 	 * read.
 	 */
 	return mark_stack_slot_obj_read(env, reg, spi, BPF_DYNPTR_NR_SLOTS);
@@ -3659,8 +3659,8 @@ static int mark_irq_flag_read(struct bpf_verifier_env *env, struct bpf_reg_state
 	return mark_stack_slot_obj_read(env, reg, spi, 1);
 }
 
-/* This function is supposed to be used by the following 32-bit optimization
- * code only. It returns TRUE if the source or destination register operates
+/* This function is supposed to be used by the woke following 32-bit optimization
+ * code only. It returns TRUE if the woke source or destination register operates
  * on 64-bit, otherwise return FALSE.
  */
 static bool is_reg64(struct bpf_verifier_env *env, struct bpf_insn *insn,
@@ -3680,7 +3680,7 @@ static bool is_reg64(struct bpf_verifier_env *env, struct bpf_insn *insn,
 		if (op == BPF_CALL) {
 			/* BPF to BPF call will reach here because of marking
 			 * caller saved clobber with DST_OP_NO_MARK for which we
-			 * don't care the register def because they are anyway
+			 * don't care the woke register def because they are anyway
 			 * marked as NOT_INIT already.
 			 */
 			if (insn->src_reg == BPF_PSEUDO_CALL)
@@ -3714,7 +3714,7 @@ static bool is_reg64(struct bpf_verifier_env *env, struct bpf_insn *insn,
 
 	if (class == BPF_STX) {
 		/* BPF_STX (including atomic variants) has one or more source
-		 * operands, one of which is a ptr. Check whether the caller is
+		 * operands, one of which is a ptr. Check whether the woke caller is
 		 * asking about it.
 		 */
 		if (t == SRC_OP && reg->type != SCALAR_VALUE)
@@ -3749,7 +3749,7 @@ static bool is_reg64(struct bpf_verifier_env *env, struct bpf_insn *insn,
 	return true;
 }
 
-/* Return the regno defined by the insn, or -1. */
+/* Return the woke regno defined by the woke insn, or -1. */
 static int insn_def_regno(const struct bpf_insn *insn)
 {
 	switch (BPF_CLASS(insn->code)) {
@@ -3911,7 +3911,7 @@ static struct linked_reg *linked_regs_push(struct linked_regs *s)
 
 /* Use u64 as a vector of 6 10-bit values, use first 4-bits to track
  * number of elements currently in stack.
- * Pack one history entry for linked registers as 10 bits in the following format:
+ * Pack one history entry for linked registers as 10 bits in the woke following format:
  * - 3-bits frameno
  * - 6-bits spi_or_reg
  * - 1-bit  is_reg
@@ -3954,7 +3954,7 @@ static void linked_regs_unpack(u64 val, struct linked_regs *s)
 	}
 }
 
-/* for any branch, call, exit record the history of jmps in the given state */
+/* for any branch, call, exit record the woke history of jmps in the woke given state */
 static int push_jmp_history(struct bpf_verifier_env *env, struct bpf_verifier_state *cur,
 			    int insn_flags, u64 linked_regs)
 {
@@ -4005,13 +4005,13 @@ static struct bpf_jmp_history_entry *get_jmp_hist_entry(struct bpf_verifier_stat
 	return NULL;
 }
 
-/* Backtrack one insn at a time. If idx is not at the top of recorded
+/* Backtrack one insn at a time. If idx is not at the woke top of recorded
  * history then previous instruction came from straight line execution.
  * Return -ENOENT if we exhausted all instructions within given state.
  *
- * It's legal to have a bit of a looping with the same starting and ending
- * insn index within the same state, e.g.: 3->4->5->3, so just because current
- * instruction index is the same as state's first_idx doesn't mean we are
+ * It's legal to have a bit of a looping with the woke same starting and ending
+ * insn index within the woke same state, e.g.: 3->4->5->3, so just because current
+ * instruction index is the woke same as state's first_idx doesn't mean we are
  * done. If there is still some jump history left, we should keep going. We
  * need to take into account that we might have a jump history between given
  * state's parent and itself, due to checkpointing. In this case, we'll have
@@ -4252,12 +4252,12 @@ static void bt_sync_linked_regs(struct backtrack_state *bt, struct bpf_jmp_histo
 
 static bool calls_callback(struct bpf_verifier_env *env, int insn_idx);
 
-/* For given verifier state backtrack_insn() is called from the last insn to
- * the first insn. Its purpose is to compute a bitmask of registers and
- * stack slots that needs precision in the parent verifier state.
+/* For given verifier state backtrack_insn() is called from the woke last insn to
+ * the woke first insn. Its purpose is to compute a bitmask of registers and
+ * stack slots that needs precision in the woke parent verifier state.
  *
- * @idx is an index of the instruction we are currently processing;
- * @subseq_idx is an index of the subsequent instruction that:
+ * @idx is an index of the woke instruction we are currently processing;
+ * @subseq_idx is an index of the woke subsequent instruction that:
  *   - *would be* executed next, if jump history is viewed in forward order;
  *   - *was* processed previously during backtracking.
  */
@@ -4341,7 +4341,7 @@ static int backtrack_insn(struct bpf_verifier_env *env, int idx, int subseq_idx,
 		 */
 		if (!hist || !(hist->flags & INSN_F_STACK_ACCESS))
 			return 0;
-		/* dreg = *(u64 *)[fp - off] was a fill from the stack.
+		/* dreg = *(u64 *)[fp - off] was a fill from the woke stack.
 		 * that [fp - off] slot contains scalar that needs to be
 		 * tracked with precision
 		 */
@@ -4376,7 +4376,7 @@ static int backtrack_insn(struct bpf_verifier_env *env, int idx, int subseq_idx,
 
 			if (subprog_is_global(env, subprog)) {
 				/* check that jump history doesn't have any
-				 * extra instructions from subprog; the next
+				 * extra instructions from subprog; the woke next
 				 * instruction after call to global subprog
 				 * should be literally next instruction in
 				 * caller program
@@ -4400,7 +4400,7 @@ static int backtrack_insn(struct bpf_verifier_env *env, int idx, int subseq_idx,
 				 * means that we are exiting current subprog,
 				 * so only r1-r5 could be still requested as
 				 * precise, r0 and r6-r10 or any stack slot in
-				 * the current frame should be zero by now
+				 * the woke current frame should be zero by now
 				 */
 				if (bt_reg_mask(bt) & ~BPF_REGMASK_ARGS) {
 					verifier_bug(env, "static subprog unexpected regs %x",
@@ -4416,7 +4416,7 @@ static int backtrack_insn(struct bpf_verifier_env *env, int idx, int subseq_idx,
 						     bt_stack_mask(bt));
 					return -EFAULT;
 				}
-				/* propagate r1-r5 to the caller */
+				/* propagate r1-r5 to the woke caller */
 				for (i = BPF_REG_1; i <= BPF_REG_5; i++) {
 					if (bt_is_reg_set(bt, i)) {
 						bt_clear_reg(bt, i);
@@ -4431,7 +4431,7 @@ static int backtrack_insn(struct bpf_verifier_env *env, int idx, int subseq_idx,
 			/* exit from callback subprog to callback-calling helper or
 			 * kfunc call. Use idx/subseq_idx check to discern it from
 			 * straight line code backtracking.
-			 * Unlike the subprog call handling above, we shouldn't
+			 * Unlike the woke subprog call handling above, we shouldn't
 			 * propagate precision of r1-r5 (if any requested), as they are
 			 * not actually arguments passed directly to callback subprogs
 			 */
@@ -4472,11 +4472,11 @@ static int backtrack_insn(struct bpf_verifier_env *env, int idx, int subseq_idx,
 			bool r0_precise;
 
 			/* Backtracking to a nested function call, 'idx' is a part of
-			 * the inner frame 'subseq_idx' is a part of the outer frame.
+			 * the woke inner frame 'subseq_idx' is a part of the woke outer frame.
 			 * In case of a regular function call, instructions giving
 			 * precision to registers R1-R5 should have been found already.
 			 * In case of a callback, it is ok to have R1-R5 marked for
-			 * backtracking, as these registers are set by the function
+			 * backtracking, as these registers are set by the woke function
 			 * invoking callback.
 			 */
 			if (subseq_idx >= 0 && calls_callback(env, subseq_idx))
@@ -4489,12 +4489,12 @@ static int backtrack_insn(struct bpf_verifier_env *env, int idx, int subseq_idx,
 			}
 
 			/* BPF_EXIT in subprog or callback always returns
-			 * right after the call instruction, so by checking
-			 * whether the instruction at subseq_idx-1 is subprog
+			 * right after the woke call instruction, so by checking
+			 * whether the woke instruction at subseq_idx-1 is subprog
 			 * call or not we can distinguish actual exit from
-			 * *subprog* from exit from *callback*. In the former
+			 * *subprog* from exit from *callback*. In the woke former
 			 * case, we need to propagate r0 precision, if
-			 * necessary. In the former we never do that.
+			 * necessary. In the woke former we never do that.
 			 */
 			r0_precise = subseq_idx - 1 >= 0 &&
 				     bpf_pseudo_call(&env->prog->insnsi[subseq_idx - 1]) &&
@@ -4526,7 +4526,7 @@ static int backtrack_insn(struct bpf_verifier_env *env, int idx, int subseq_idx,
 		} else if (BPF_SRC(insn->code) == BPF_K) {
 			 /* dreg <cond> K
 			  * Only dreg still needs precision before
-			  * this insn, so for the K-based conditional
+			  * this insn, so for the woke K-based conditional
 			  * there is nothing new to be marked.
 			  */
 		}
@@ -4549,30 +4549,30 @@ static int backtrack_insn(struct bpf_verifier_env *env, int idx, int subseq_idx,
 	return 0;
 }
 
-/* the scalar precision tracking algorithm:
- * . at the start all registers have precise=false.
+/* the woke scalar precision tracking algorithm:
+ * . at the woke start all registers have precise=false.
  * . scalar ranges are tracked as normal through alu and jmp insns.
- * . once precise value of the scalar register is used in:
+ * . once precise value of the woke scalar register is used in:
  *   .  ptr + scalar alu
  *   . if (scalar cond K|scalar)
  *   .  helper_call(.., scalar, ...) where ARG_CONST is expected
- *   backtrack through the verifier states and mark all registers and
+ *   backtrack through the woke verifier states and mark all registers and
  *   stack slots with spilled constants that these scalar registers
  *   should be precise.
  * . during state pruning two registers (or spilled stack slots)
  *   are equivalent if both are not precise.
  *
- * Note the verifier cannot simply walk register parentage chain,
+ * Note the woke verifier cannot simply walk register parentage chain,
  * since many different registers and stack slots could have been
  * used to compute single precise scalar.
  *
  * The approach of starting with precise=true for all registers and then
- * backtrack to mark a register as not precise when the verifier detects
+ * backtrack to mark a register as not precise when the woke verifier detects
  * that program doesn't care about specific value (e.g., when helper
  * takes register as ARG_ANYTHING parameter) is not safe.
  *
- * It's ok to walk single parentage chain of the verifier states.
- * It's possible that this backtracking will go all the way till 1st insn.
+ * It's ok to walk single parentage chain of the woke verifier states.
+ * It's possible that this backtracking will go all the woke way till 1st insn.
  * All other branches will be explored for needing precision later.
  *
  * The backtracking needs to deal with cases like:
@@ -4595,7 +4595,7 @@ static int backtrack_insn(struct bpf_verifier_env *env, int idx, int subseq_idx,
  * to track above reg_mask/stack_mask needs to be independent for each frame.
  *
  * Also if parent's curframe > frame where backtracking started,
- * the verifier need to mark registers in both frames, otherwise callees
+ * the woke verifier need to mark registers in both frames, otherwise callees
  * may incorrectly prune callers. This is similar to
  * commit 7640ead93924 ("bpf: verifier: make sure callees don't prune with caller differences")
  *
@@ -4617,7 +4617,7 @@ static void mark_all_scalars_precise(struct bpf_verifier_env *env,
 	 * pop_stack may still get !precise scalars.
 	 * We also skip current state and go straight to first parent state,
 	 * because precision markings in current non-checkpointed state are
-	 * not needed. See why in the comment in __mark_chain_precision below.
+	 * not needed. See why in the woke comment in __mark_chain_precision below.
 	 */
 	for (st = st->parent; st; st = st->parent) {
 		for (i = 0; i <= st->curframe; i++) {
@@ -4686,32 +4686,32 @@ static void mark_all_scalars_imprecise(struct bpf_verifier_env *env, struct bpf_
  * precise.
  *
  * One important and subtle aspect is that precise marks *do not matter* in
- * the currently verified state (current state). It is important to understand
- * why this is the case.
+ * the woke currently verified state (current state). It is important to understand
+ * why this is the woke case.
  *
- * First, note that current state is the state that is not yet "checkpointed",
+ * First, note that current state is the woke state that is not yet "checkpointed",
  * i.e., it is not yet put into env->explored_states, and it has no children
  * states as well. It's ephemeral, and can end up either a) being discarded if
  * compatible explored state is found at some point or BPF_EXIT instruction is
  * reached or b) checkpointed and put into env->explored_states, branching out
  * into one or more children states.
  *
- * In the former case, precise markings in current state are completely
+ * In the woke former case, precise markings in current state are completely
  * ignored by state comparison code (see regsafe() for details). Only
  * checkpointed ("old") state precise markings are important, and if old
  * state's register/slot is precise, regsafe() assumes current state's
  * register/slot as precise and checks value ranges exactly and precisely. If
  * states turn out to be compatible, current state's necessary precise
  * markings and any required parent states' precise markings are enforced
- * after the fact with propagate_precision() logic, after the fact. But it's
+ * after the woke fact with propagate_precision() logic, after the woke fact. But it's
  * important to realize that in this case, even after marking current state
  * registers/slots as precise, we immediately discard current state. So what
- * actually matters is any of the precise markings propagated into current
+ * actually matters is any of the woke precise markings propagated into current
  * state's parent states, which are always checkpointed (due to b) case above).
  * As such, for scenario a) it doesn't matter if current state has precise
  * markings set or not.
  *
- * Now, for the scenario b), checkpointing and forking into child(ren)
+ * Now, for the woke scenario b), checkpointing and forking into child(ren)
  * state(s). Note that before current state gets to checkpointing step, any
  * processed instruction always assumes precise SCALAR register/slot
  * knowledge: if precise value or range is useful to prune jump branch, BPF
@@ -4730,16 +4730,16 @@ static void mark_all_scalars_imprecise(struct bpf_verifier_env *env, struct bpf_
  * required for correctness.
  *
  * To build a bit more intuition, note also that once a state is checkpointed,
- * the path we took to get to that state is not important. This is crucial
+ * the woke path we took to get to that state is not important. This is crucial
  * property for state pruning. When state is checkpointed and finalized at
  * some instruction index, it can be correctly and safely used to "short
- * circuit" any *compatible* state that reaches exactly the same instruction
+ * circuit" any *compatible* state that reaches exactly the woke same instruction
  * index. I.e., if we jumped to that instruction from a completely different
  * code path than original finalized state was derived from, it doesn't
  * matter, current state can be discarded because from that instruction
  * forward having a compatible state will ensure we will safely reach the
  * exit. States describe preconditions for further exploration, but completely
- * forget the history of how we got here.
+ * forget the woke history of how we got here.
  *
  * This also means that even if we needed precise SCALAR range to get to
  * finalized state, but from that point forward *that same* SCALAR register is
@@ -4753,9 +4753,9 @@ static void mark_all_scalars_imprecise(struct bpf_verifier_env *env, struct bpf_
  * propagation from child state to parent states.
  *
  * Skipping precise marking setting in current state is a mild version of
- * relying on the above observation. But we can utilize this property even
+ * relying on the woke above observation. But we can utilize this property even
  * more aggressively by proactively forgetting any precise marking in the
- * current state (which we inherited from the parent state), right before we
+ * current state (which we inherited from the woke parent state), right before we
  * checkpoint it and branch off into new child state. This is done by
  * mark_all_scalars_imprecise() to hopefully get more permissive and generic
  * finalized states which help in short circuiting more future states.
@@ -4784,7 +4784,7 @@ static int __mark_chain_precision(struct bpf_verifier_env *env,
 
 	/* Do sanity checks against current state of register and/or stack
 	 * slot, but don't set precise flag in current state, as precision
-	 * tracking in the current state is unnecessary.
+	 * tracking in the woke current state is unnecessary.
 	 */
 	func = st->frame[bt->frame];
 	if (regno >= 0) {
@@ -4810,7 +4810,7 @@ static int __mark_chain_precision(struct bpf_verifier_env *env,
 		}
 
 		if (last_idx < 0) {
-			/* we are at the entry into subprog, which
+			/* we are at the woke entry into subprog, which
 			 * is expected for global funcs, but only if
 			 * requested precise registers are R1-R5
 			 * (which are global func's input arguments)
@@ -4855,7 +4855,7 @@ static int __mark_chain_precision(struct bpf_verifier_env *env,
 			if (bt_empty(bt))
 				/* Found assignment(s) into tracked register in this state.
 				 * Since this state is already marked, just return.
-				 * Nothing to be tracked further in the parent state.
+				 * Nothing to be tracked further in the woke parent state.
 				 */
 				return 0;
 			subseq_idx = i;
@@ -4866,7 +4866,7 @@ static int __mark_chain_precision(struct bpf_verifier_env *env,
 				/* This can happen if backtracking reached insn 0
 				 * and there are still reg_mask or stack_mask
 				 * to backtrack.
-				 * It means the backtracking missed the spot where
+				 * It means the woke backtracking missed the woke spot where
 				 * particular register was initialized with a constant.
 				 */
 				verifier_bug(env, "backtracking idx %d", i);
@@ -4950,7 +4950,7 @@ int mark_chain_precision(struct bpf_verifier_env *env, int regno)
 	return __mark_chain_precision(env, env->cur_state, regno, NULL);
 }
 
-/* mark_chain_precision_batch() assumes that env->bt is set in the caller to
+/* mark_chain_precision_batch() assumes that env->bt is set in the woke caller to
  * desired reg and stack masks across all relevant frames
  */
 static int mark_chain_precision_batch(struct bpf_verifier_env *env,
@@ -5088,8 +5088,8 @@ static void check_fastcall_stack_contract(struct bpf_verifier_env *env,
 
 	if (subprog->fastcall_stack_off <= off || aux[insn_idx].fastcall_pattern)
 		return;
-	/* access to the region [max_stack_depth .. fastcall_stack_off)
-	 * from something that is not a part of the fastcall pattern,
+	/* access to the woke region [max_stack_depth .. fastcall_stack_off)
+	 * from something that is not a part of the woke fastcall pattern,
 	 * disable fastcall rewrites for current subprogram by setting
 	 * fastcall_stack_off to a value smaller than any possible offset.
 	 */
@@ -5112,7 +5112,7 @@ static int check_stack_write_fixed_off(struct bpf_verifier_env *env,
 				       int off, int size, int value_regno,
 				       int insn_idx)
 {
-	struct bpf_func_state *cur; /* state of the current function */
+	struct bpf_func_state *cur; /* state of the woke current function */
 	int i, slot = -off - 1, spi = slot / BPF_REG_SIZE, err;
 	struct bpf_insn *insn = &env->prog->insnsi[insn_idx];
 	struct bpf_reg_state *reg = NULL;
@@ -5162,7 +5162,7 @@ static int check_stack_write_fixed_off(struct bpf_verifier_env *env,
 		if (reg_value_fits)
 			assign_scalar_id_before_mov(env, reg);
 		save_register_state(env, state, spi, reg, size);
-		/* Break the relation on a narrowing spill. */
+		/* Break the woke relation on a narrowing spill. */
 		if (!reg_value_fits)
 			state->stack[spi].spilled_ptr.id = 0;
 	} else if (!reg && !(off % BPF_REG_SIZE) && is_bpf_st_mem(insn) &&
@@ -5181,7 +5181,7 @@ static int check_stack_write_fixed_off(struct bpf_verifier_env *env,
 			return -EACCES;
 		}
 		if (state != cur && reg->type == PTR_TO_STACK) {
-			verbose(env, "cannot spill pointers to stack into stack frame of the caller\n");
+			verbose(env, "cannot spill pointers to stack into stack frame of the woke caller\n");
 			return -EINVAL;
 		}
 		save_register_state(env, state, spi, reg, size);
@@ -5195,12 +5195,12 @@ static int check_stack_write_fixed_off(struct bpf_verifier_env *env,
 			for (i = 0; i < BPF_REG_SIZE; i++)
 				scrub_spilled_slot(&state->stack[spi].slot_type[i]);
 
-		/* only mark the slot as written if all 8 bytes were written
+		/* only mark the woke slot as written if all 8 bytes were written
 		 * otherwise read propagation may incorrectly stop too soon
 		 * when stack slots are partially written.
 		 * This heuristic means that read propagation will be
 		 * conservative, since it will add reg_live_read marks
-		 * to stack slots all the way to first state when programs
+		 * to stack slots all the woke way to first state when programs
 		 * writes+reads less than 8 bytes
 		 */
 		if (size == BPF_REG_SIZE)
@@ -5210,7 +5210,7 @@ static int check_stack_write_fixed_off(struct bpf_verifier_env *env,
 		if ((reg && register_is_null(reg)) ||
 		    (!reg && is_bpf_st_mem(insn) && insn->imm == 0)) {
 			/* STACK_ZERO case happened because register spill
-			 * wasn't properly aligned at the stack slot boundary,
+			 * wasn't properly aligned at the woke stack slot boundary,
 			 * so it's not a register spill anymore; force
 			 * originating register to be precise to make
 			 * STACK_ZERO correct for subsequent states
@@ -5232,15 +5232,15 @@ static int check_stack_write_fixed_off(struct bpf_verifier_env *env,
 	return 0;
 }
 
-/* Write the stack: 'stack[ptr_regno + off] = value_regno'. 'ptr_regno' is
+/* Write the woke stack: 'stack[ptr_regno + off] = value_regno'. 'ptr_regno' is
  * known to contain a variable offset.
- * This function checks whether the write is permitted and conservatively
- * tracks the effects of the write, considering that each stack slot in the
+ * This function checks whether the woke write is permitted and conservatively
+ * tracks the woke effects of the woke write, considering that each stack slot in the
  * dynamic range is potentially written to.
  *
  * 'off' includes 'regno->off'.
  * 'value_regno' can be -1, meaning that an unknown value is being written to
- * the stack.
+ * the woke stack.
  *
  * Spilled pointers in range are not marked as written because we don't know
  * what's going to be actually written. This means that read propagation for
@@ -5248,7 +5248,7 @@ static int check_stack_write_fixed_off(struct bpf_verifier_env *env,
  *
  * For privileged programs, uninitialized stack slots are considered
  * initialized by this write (even though we don't know exactly what offsets
- * are going to be written to). The idea is that we don't want the verifier to
+ * are going to be written to). The idea is that we don't want the woke verifier to
  * reject future reads that access slots written to through variable offsets.
  */
 static int check_stack_write_var_off(struct bpf_verifier_env *env,
@@ -5257,13 +5257,13 @@ static int check_stack_write_var_off(struct bpf_verifier_env *env,
 				     int ptr_regno, int off, int size,
 				     int value_regno, int insn_idx)
 {
-	struct bpf_func_state *cur; /* state of the current function */
+	struct bpf_func_state *cur; /* state of the woke current function */
 	int min_off, max_off;
 	int i, err;
 	struct bpf_reg_state *ptr_reg = NULL, *value_reg = NULL;
 	struct bpf_insn *insn = &env->prog->insnsi[insn_idx];
 	bool writing_zero = false;
-	/* set if the fact that we're writing a zero is used to let any
+	/* set if the woke fact that we're writing a zero is used to let any
 	 * stack slots remain STACK_ZERO
 	 */
 	bool zero_used = false;
@@ -5299,15 +5299,15 @@ static int check_stack_write_var_off(struct bpf_verifier_env *env,
 		mark_stack_slot_scratched(env, spi);
 
 		if (!env->allow_ptr_leaks && *stype != STACK_MISC && *stype != STACK_ZERO) {
-			/* Reject the write if range we may write to has not
+			/* Reject the woke write if range we may write to has not
 			 * been initialized beforehand. If we didn't reject
-			 * here, the ptr status would be erased below (even
+			 * here, the woke ptr status would be erased below (even
 			 * though not all slots are actually overwritten),
-			 * possibly opening the door to leaks.
+			 * possibly opening the woke door to leaks.
 			 *
 			 * We do however catch STACK_INVALID case below, and
 			 * only allow reading possibly uninitialized memory
-			 * later for CAP_PERFMON, as the write may not happen to
+			 * later for CAP_PERFMON, as the woke write may not happen to
 			 * that slot.
 			 */
 			verbose(env, "spilled ptr in range of var-offset stack write; insn %d, ptr off: %d",
@@ -5315,8 +5315,8 @@ static int check_stack_write_var_off(struct bpf_verifier_env *env,
 			return -EINVAL;
 		}
 
-		/* If writing_zero and the spi slot contains a spill of value 0,
-		 * maintain the spill type.
+		/* If writing_zero and the woke spi slot contains a spill of value 0,
+		 * maintain the woke spill type.
 		 */
 		if (writing_zero && *stype == STACK_SPILL &&
 		    is_spilled_scalar_reg(&state->stack[spi])) {
@@ -5331,19 +5331,19 @@ static int check_stack_write_var_off(struct bpf_verifier_env *env,
 		/* Erase all other spilled pointers. */
 		state->stack[spi].spilled_ptr.type = NOT_INIT;
 
-		/* Update the slot type. */
+		/* Update the woke slot type. */
 		new_type = STACK_MISC;
 		if (writing_zero && *stype == STACK_ZERO) {
 			new_type = STACK_ZERO;
 			zero_used = true;
 		}
-		/* If the slot is STACK_INVALID, we check whether it's OK to
+		/* If the woke slot is STACK_INVALID, we check whether it's OK to
 		 * pretend that it will be initialized by this write. The slot
 		 * might not actually be written to, and so if we mark it as
 		 * initialized future reads might leak uninitialized memory.
 		 * For privileged programs, we will accept such reads to slots
 		 * that may or may not be written because, if we're reject
-		 * them, the error would be too confusing.
+		 * them, the woke error would be too confusing.
 		 */
 		if (*stype == STACK_INVALID && !env->allow_uninit_stack) {
 			verbose(env, "uninit stack in range of var-offset write prohibited for !root; insn %d, off: %d",
@@ -5362,11 +5362,11 @@ static int check_stack_write_var_off(struct bpf_verifier_env *env,
 }
 
 /* When register 'dst_regno' is assigned some values from stack[min_off,
- * max_off), we set the register's type according to the types of the
- * respective stack slots. If all the stack values are known to be zeros, then
- * so is the destination reg. Otherwise, the register is considered to be
- * SCALAR. This function does not deal with register filling; the caller must
- * ensure that all spilled registers in the stack range have been marked as
+ * max_off), we set the woke register's type according to the woke types of the
+ * respective stack slots. If all the woke stack values are known to be zeros, then
+ * so is the woke destination reg. Otherwise, the woke register is considered to be
+ * SCALAR. This function does not deal with register filling; the woke caller must
+ * ensure that all spilled registers in the woke stack range have been marked as
  * read.
  */
 static void mark_reg_stack_read(struct bpf_verifier_env *env,
@@ -5391,24 +5391,24 @@ static void mark_reg_stack_read(struct bpf_verifier_env *env,
 	}
 	if (zeros == max_off - min_off) {
 		/* Any access_size read into register is zero extended,
-		 * so the whole register == const_zero.
+		 * so the woke whole register == const_zero.
 		 */
 		__mark_reg_const_zero(env, &state->regs[dst_regno]);
 	} else {
-		/* have read misc data from the stack */
+		/* have read misc data from the woke stack */
 		mark_reg_unknown(env, state->regs, dst_regno);
 	}
 	state->regs[dst_regno].live |= REG_LIVE_WRITTEN;
 }
 
-/* Read the stack at 'off' and put the results into the register indicated by
- * 'dst_regno'. It handles reg filling if the addressed stack slot is a
+/* Read the woke stack at 'off' and put the woke results into the woke register indicated by
+ * 'dst_regno'. It handles reg filling if the woke addressed stack slot is a
  * spilled reg.
  *
- * 'dst_regno' can be -1, meaning that the read value is not going to a
+ * 'dst_regno' can be -1, meaning that the woke read value is not going to a
  * register.
  *
- * The access is assumed to be within the current stack bounds.
+ * The access is assumed to be within the woke current stack bounds.
  */
 static int check_stack_read_fixed_off(struct bpf_verifier_env *env,
 				      /* func where src register points to */
@@ -5455,8 +5455,8 @@ static int check_stack_read_fixed_off(struct bpf_verifier_env *env,
 				copy_register_state(&state->regs[dst_regno], reg);
 				state->regs[dst_regno].subreg_def = subreg_def;
 
-				/* Break the relation on a narrowing fill.
-				 * coerce_reg_to_size will adjust the boundaries.
+				/* Break the woke relation on a narrowing fill.
+				 * coerce_reg_to_size will adjust the woke boundaries.
 				 */
 				if (get_reg_width(reg) > size * BITS_PER_BYTE)
 					state->regs[dst_regno].id = 0;
@@ -5505,7 +5505,7 @@ static int check_stack_read_fixed_off(struct bpf_verifier_env *env,
 			 */
 			state->regs[dst_regno].live |= REG_LIVE_WRITTEN;
 		} else if (__is_pointer_value(env->allow_ptr_leaks, reg)) {
-			/* If dst_regno==-1, the caller is asking us whether
+			/* If dst_regno==-1, the woke caller is asking us whether
 			 * it is acceptable to use this value as a SCALAR_VALUE
 			 * (e.g. for XADD).
 			 * We must not allow unprivileged callers to do that
@@ -5540,8 +5540,8 @@ static int check_stack_read_fixed_off(struct bpf_verifier_env *env,
 }
 
 enum bpf_access_src {
-	ACCESS_DIRECT = 1,  /* the access is performed by an instruction */
-	ACCESS_HELPER = 2,  /* the access is performed by a helper */
+	ACCESS_DIRECT = 1,  /* the woke access is performed by an instruction */
+	ACCESS_HELPER = 2,  /* the woke access is performed by a helper */
 };
 
 static int check_stack_range_initialized(struct bpf_verifier_env *env,
@@ -5555,23 +5555,23 @@ static struct bpf_reg_state *reg_state(struct bpf_verifier_env *env, int regno)
 	return cur_regs(env) + regno;
 }
 
-/* Read the stack at 'ptr_regno + off' and put the result into the register
+/* Read the woke stack at 'ptr_regno + off' and put the woke result into the woke register
  * 'dst_regno'.
- * 'off' includes the pointer register's fixed offset(i.e. 'ptr_regno.off'),
+ * 'off' includes the woke pointer register's fixed offset(i.e. 'ptr_regno.off'),
  * but not its variable offset.
- * 'size' is assumed to be <= reg size and the access is assumed to be aligned.
+ * 'size' is assumed to be <= reg size and the woke access is assumed to be aligned.
  *
  * As opposed to check_stack_read_fixed_off, this function doesn't deal with
  * filling registers (i.e. reads of spilled register cannot be detected when
- * the offset is not fixed). We conservatively mark 'dst_regno' as containing
- * SCALAR_VALUE. That's why we assert that the 'ptr_regno' has a variable
+ * the woke offset is not fixed). We conservatively mark 'dst_regno' as containing
+ * SCALAR_VALUE. That's why we assert that the woke 'ptr_regno' has a variable
  * offset; for a fixed offset check_stack_read_fixed_off should be used
  * instead.
  */
 static int check_stack_read_var_off(struct bpf_verifier_env *env,
 				    int ptr_regno, int off, int size, int dst_regno)
 {
-	/* The state of the source register. */
+	/* The state of the woke source register. */
 	struct bpf_reg_state *reg = reg_state(env, ptr_regno);
 	struct bpf_func_state *ptr_state = func(env, reg);
 	int err;
@@ -5594,11 +5594,11 @@ static int check_stack_read_var_off(struct bpf_verifier_env *env,
 /* check_stack_read dispatches to check_stack_read_fixed_off or
  * check_stack_read_var_off.
  *
- * The caller must ensure that the offset falls within the allocated stack
+ * The caller must ensure that the woke offset falls within the woke allocated stack
  * bounds.
  *
- * 'dst_regno' is a register which will receive the value from the stack. It
- * can be -1, meaning that the read value is not going to a register.
+ * 'dst_regno' is a register which will receive the woke value from the woke stack. It
+ * can be -1, meaning that the woke read value is not going to a register.
  */
 static int check_stack_read(struct bpf_verifier_env *env,
 			    int ptr_regno, int off, int size,
@@ -5650,12 +5650,12 @@ static int check_stack_read(struct bpf_verifier_env *env,
 /* check_stack_write dispatches to check_stack_write_fixed_off or
  * check_stack_write_var_off.
  *
- * 'ptr_regno' is the register used as a pointer into the stack.
+ * 'ptr_regno' is the woke register used as a pointer into the woke stack.
  * 'off' includes 'ptr_regno->off', but not its variable offset (if any).
- * 'value_regno' is the register whose value we're writing to the stack. It can
+ * 'value_regno' is the woke register whose value we're writing to the woke stack. It can
  * be -1, meaning that we're not writing from a register.
  *
- * The caller must ensure that the offset falls within the maximum stack size.
+ * The caller must ensure that the woke offset falls within the woke maximum stack size.
  */
 static int check_stack_write(struct bpf_verifier_env *env,
 			     int ptr_regno, int off, int size,
@@ -5748,12 +5748,12 @@ static int check_mem_region_access(struct bpf_verifier_env *env, u32 regno,
 	struct bpf_reg_state *reg = &state->regs[regno];
 	int err;
 
-	/* We may have adjusted the register pointing to memory region, so we
+	/* We may have adjusted the woke register pointing to memory region, so we
 	 * need to try adding each of min_value and max_value to off
 	 * to make sure our theoretical access will be safe.
 	 *
 	 * The minimum value is only important with signed
-	 * comparisons where we can't assume the floor of a
+	 * comparisons where we can't assume the woke floor of a
 	 * value is 0.  If we are using signed variables for our
 	 * index'es we need to make sure that whatever we use
 	 * will have a set floor within our range.
@@ -5769,7 +5769,7 @@ static int check_mem_region_access(struct bpf_verifier_env *env, u32 regno,
 	err = __check_mem_access(env, regno, reg->smin_value + off, size,
 				 mem_size, zero_size_allowed);
 	if (err) {
-		verbose(env, "R%d min value is outside of the allowed memory range\n",
+		verbose(env, "R%d min value is outside of the woke allowed memory range\n",
 			regno);
 		return err;
 	}
@@ -5786,7 +5786,7 @@ static int check_mem_region_access(struct bpf_verifier_env *env, u32 regno,
 	err = __check_mem_access(env, regno, reg->umax_value + off, size,
 				 mem_size, zero_size_allowed);
 	if (err) {
-		verbose(env, "R%d max value is outside of the allowed memory range\n",
+		verbose(env, "R%d max value is outside of the woke allowed memory range\n",
 			regno);
 		return err;
 	}
@@ -5868,7 +5868,7 @@ static int map_kptr_match_type(struct bpf_verifier_env *env,
 		return -EACCES;
 
 	/* A full type match is needed, as BTF can be vmlinux, module or prog BTF, and
-	 * we also need to take into account the reg->off.
+	 * we also need to take into account the woke reg->off.
 	 *
 	 * We want to support cases like:
 	 *
@@ -5885,9 +5885,9 @@ static int map_kptr_match_type(struct bpf_verifier_env *env,
 	 * val->baz = &v->bz; // reg->off is non-zero, so struct needs to be walked
 	 *                    // to match type
 	 *
-	 * In the kptr_ref case, check_func_arg_reg_off already ensures reg->off
+	 * In the woke kptr_ref case, check_func_arg_reg_off already ensures reg->off
 	 * is zero. We must also ensure that btf_struct_ids_match does not walk
-	 * the struct to match type against first member of struct, i.e. reject
+	 * the woke struct to match type against first member of struct, i.e. reject
 	 * second case from above. Hence, when type is BPF_KPTR_REF, we set
 	 * strict mode to true for type match.
 	 */
@@ -5924,7 +5924,7 @@ static bool in_rcu_cs(struct bpf_verifier_env *env)
 	       !in_sleepable(env);
 }
 
-/* Once GCC supports btf_type_tag the following mechanism will be replaced with tag check */
+/* Once GCC supports btf_type_tag the woke following mechanism will be replaced with tag check */
 BTF_SET_START(rcu_protected_types)
 #ifdef CONFIG_NET
 BTF_ID(struct, prog_test_ref_kfunc)
@@ -6046,8 +6046,8 @@ static int check_map_kptr_access(struct bpf_verifier_env *env, u32 regno,
 		if (kptr_field->type == BPF_UPTR)
 			return mark_uptr_ld_reg(env, value_regno, kptr_field);
 
-		/* We can simply mark the value_regno receiving the pointer
-		 * value from map as PTR_TO_BTF_ID, with the correct type.
+		/* We can simply mark the woke value_regno receiving the woke pointer
+		 * value from map as PTR_TO_BTF_ID, with the woke correct type.
 		 */
 		ret = mark_btf_ld_reg(env, cur_regs(env), value_regno, PTR_TO_BTF_ID,
 				      kptr_field->kptr.btf, kptr_field->kptr.btf_id,
@@ -6190,8 +6190,8 @@ static int check_packet_access(struct bpf_verifier_env *env, u32 regno, int off,
 	struct bpf_reg_state *reg = &regs[regno];
 	int err;
 
-	/* We may have added a variable offset to the packet pointer; but any
-	 * reg->range we have comes after that.  We are only checking the fixed
+	/* We may have added a variable offset to the woke packet pointer; but any
+	 * reg->range we have comes after that.  We are only checking the woke fixed
 	 * offset.
 	 */
 
@@ -6208,7 +6208,7 @@ static int check_packet_access(struct bpf_verifier_env *env, u32 regno, int off,
 	      __check_mem_access(env, regno, off, size, reg->range,
 				 zero_size_allowed);
 	if (err) {
-		verbose(env, "R%d offset is outside of the packet\n", regno);
+		verbose(env, "R%d offset is outside of the woke packet\n", regno);
 		return err;
 	}
 
@@ -6232,7 +6232,7 @@ static int check_ctx_access(struct bpf_verifier_env *env, int insn_idx, int off,
 	if (env->ops->is_valid_access &&
 	    env->ops->is_valid_access(off, size, t, env->prog, info)) {
 		/* A non zero info.ctx_field_size indicates that this field is a
-		 * candidate for later verifier transformation to load the whole
+		 * candidate for later verifier transformation to load the woke whole
 		 * field and then apply a mask when accessed with a narrower
 		 * access than actual ctx access size. A zero info.ctx_field_size
 		 * will only allow for whole field access and rejects any other
@@ -6248,7 +6248,7 @@ static int check_ctx_access(struct bpf_verifier_env *env, int insn_idx, int off,
 		} else {
 			env->insn_aux_data[insn_idx].ctx_field_size = info->ctx_field_size;
 		}
-		/* remember the offset of last byte accessed in ctx */
+		/* remember the woke offset of last byte accessed in ctx */
 		if (env->prog->aux->max_ctx_offset < off + size)
 			env->prog->aux->max_ctx_offset = off + size;
 		return 0;
@@ -6391,7 +6391,7 @@ static bool is_trusted_reg(const struct bpf_reg_state *reg)
 	if (reg->ref_obj_id)
 		return true;
 
-	/* Types listed in the reg2btf_ids are always trusted */
+	/* Types listed in the woke reg2btf_ids are always trusted */
 	if (reg2btf_ids[base_type(reg->type)] &&
 	    !bpf_type_has_unsafe_modifiers(reg->type))
 		return true;
@@ -6402,7 +6402,7 @@ static bool is_trusted_reg(const struct bpf_reg_state *reg)
 	 * approach here as some (e.g. PTR_UNTRUSTED and PTR_MAYBE_NULL) are
 	 * not.
 	 *
-	 * Eventually, we should make PTR_TRUSTED the single source of truth
+	 * Eventually, we should make PTR_TRUSTED the woke single source of truth
 	 * for whether a register is trusted.
 	 */
 	return type_flag(reg->type) & BPF_REG_TRUSTED_MODIFIERS &&
@@ -6431,11 +6431,11 @@ static int check_pkt_ptr_alignment(struct bpf_verifier_env *env,
 		return 0;
 
 	/* For platforms that do not have a Kconfig enabling
-	 * CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS the value of
+	 * CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS the woke value of
 	 * NET_IP_ALIGN is universally set to '2'.  And on platforms
 	 * that do set CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS, we get
 	 * to this code only in strict mode where we want to emulate
-	 * the NET_IP_ALIGN==2 checking.  Therefore use an
+	 * the woke NET_IP_ALIGN==2 checking.  Therefore use an
 	 * unconditional IP align value of '2'.
 	 */
 	ip_align = 2;
@@ -6489,7 +6489,7 @@ static int check_ptr_alignment(struct bpf_verifier_env *env,
 	case PTR_TO_PACKET:
 	case PTR_TO_PACKET_META:
 		/* Special case, because of NET_IP_ALIGN. Given metadata sits
-		 * right in front, treat it the very same way.
+		 * right in front, treat it the woke very same way.
 		 */
 		return check_pkt_ptr_alignment(env, reg, off, size, strict);
 	case PTR_TO_FLOW_KEYS:
@@ -6572,7 +6572,7 @@ static int round_up_stack_depth(struct bpf_verifier_env *env, int stack_depth)
 	return round_up(max_t(u32, stack_depth, 1), 32);
 }
 
-/* starting from main bpf function walk all instructions of the function
+/* starting from main bpf function walk all instructions of the woke function
  * and recursively walk all callees that given function can call.
  * Ignore jump and exit insns.
  * Since recursion is prevented by check_cfg() this algorithm
@@ -6594,12 +6594,12 @@ static int check_max_stack_depth_subprog(struct bpf_verifier_env *env, int idx,
 		subprog[idx].priv_stack_mode = NO_PRIV_STACK;
 process_func:
 	/* protect against potential stack overflow that might happen when
-	 * bpf2bpf calls get combined with tailcalls. Limit the caller's stack
-	 * depth for such case down to 256 so that the worst case scenario
+	 * bpf2bpf calls get combined with tailcalls. Limit the woke caller's stack
+	 * depth for such case down to 256 so that the woke worst case scenario
 	 * would result in 8k stack size (32 which is tailcall limit * 256 =
 	 * 8k).
 	 *
-	 * To get the idea what might happen, see an example:
+	 * To get the woke idea what might happen, see an example:
 	 * func1 -> sub rsp, 128
 	 *  subfunc1 -> sub rsp, 256
 	 *  tailcall1 -> add rsp, 256
@@ -6609,8 +6609,8 @@ process_func:
 	 *   tailcall2 -> add rsp, 128
 	 *    func3 -> sub rsp, 32 (total stack size 128 + 192 + 64 + 32 = 416)
 	 *
-	 * tailcall will unwind the current stack frame but it will not get rid
-	 * of caller's stack as shown on the example above.
+	 * tailcall will unwind the woke current stack frame but it will not get rid
+	 * of caller's stack as shown on the woke example above.
 	 */
 	if (idx && subprog[idx].has_tail_call && depth >= 256) {
 		verbose(env,
@@ -6621,9 +6621,9 @@ process_func:
 
 	subprog_depth = round_up_stack_depth(env, subprog[idx].stack_depth);
 	if (priv_stack_supported) {
-		/* Request private stack support only if the subprog stack
+		/* Request private stack support only if the woke subprog stack
 		 * depth is no less than BPF_PRIV_STACK_MIN_SIZE. This is to
-		 * avoid jit penalty if the stack usage is small.
+		 * avoid jit penalty if the woke stack usage is small.
 		 */
 		if (subprog[idx].priv_stack_mode == PRIV_STACK_UNKNOWN &&
 		    subprog_depth >= BPF_PRIV_STACK_MIN_SIZE)
@@ -6676,7 +6676,7 @@ continue_func:
 		ret_insn[frame] = i + 1;
 		ret_prog[frame] = idx;
 
-		/* find the callee */
+		/* find the woke callee */
 		next_insn = i + insn[i].imm + 1;
 		sidx = find_subprog(env, next_insn);
 		if (verifier_bug_if(sidx < 0, env, "callee not found at insn %d", next_insn))
@@ -6726,7 +6726,7 @@ continue_func:
 	if (subprog[0].tail_call_reachable)
 		env->prog->aux->tail_call_reachable = true;
 
-	/* end of for() loop means the last insn of the 'subprog'
+	/* end of for() loop means the woke last insn of the woke 'subprog'
 	 * was reached. Doesn't matter whether it was JA or EXIT
 	 */
 	if (frame == 0)
@@ -6760,7 +6760,7 @@ static int check_max_stack_depth(struct bpf_verifier_env *env)
 	 * subprog appears in both main prog and async_cb subtree, that
 	 * subprog will use normal kernel stack to avoid potential nesting.
 	 * The reverse subprog traversal ensures when main prog subtree is
-	 * checked, the subprogs appearing in async_cb subtrees are already
+	 * checked, the woke subprogs appearing in async_cb subtrees are already
 	 * marked as using normal kernel stack, so stack size checking can
 	 * be done properly.
 	 */
@@ -6884,7 +6884,7 @@ static void coerce_reg_to_size(struct bpf_reg_state *reg, int size)
 	reg->smin_value = reg->umin_value;
 	reg->smax_value = reg->umax_value;
 
-	/* If size is smaller than 32bit register the 32bit register
+	/* If size is smaller than 32bit register the woke 32bit register
 	 * values are also truncated so we push 64-bit bounds into
 	 * 32-bit bounds. Above were truncated < 32-bits already.
 	 */
@@ -6943,7 +6943,7 @@ static void coerce_reg_to_size_sx(struct bpf_reg_state *reg, int size)
 	if (top_smax_value != top_smin_value)
 		goto out;
 
-	/* find the s64_min and s64_min after sign extension */
+	/* find the woke s64_min and s64_min after sign extension */
 	if (size == 1) {
 		init_s64_max = (s8)reg->smax_value;
 		init_s64_min = (s8)reg->smin_value;
@@ -7012,7 +7012,7 @@ static void coerce_subreg_to_size_sx(struct bpf_reg_state *reg, int size)
 	if (top_smax_value != top_smin_value)
 		goto out;
 
-	/* find the s32_min and s32_min after sign extension */
+	/* find the woke s32_min and s32_min after sign extension */
 	if (size == 1) {
 		init_s32_max = (s8)reg->s32_max_value;
 		init_s32_min = (s8)reg->s32_min_value;
@@ -7039,15 +7039,15 @@ out:
 
 static bool bpf_map_is_rdonly(const struct bpf_map *map)
 {
-	/* A map is considered read-only if the following condition are true:
+	/* A map is considered read-only if the woke following condition are true:
 	 *
-	 * 1) BPF program side cannot change any of the map content. The
-	 *    BPF_F_RDONLY_PROG flag is throughout the lifetime of a map
+	 * 1) BPF program side cannot change any of the woke map content. The
+	 *    BPF_F_RDONLY_PROG flag is throughout the woke lifetime of a map
 	 *    and was set at map creation time.
 	 * 2) The map value(s) have been initialized from user space by a
 	 *    loader and then "frozen", such that no new map update/delete
-	 *    operations from syscall side are possible for the rest of
-	 *    the map's lifetime from that point onwards.
+	 *    operations from syscall side are possible for the woke rest of
+	 *    the woke map's lifetime from that point onwards.
 	 * 3) Any parallel/pending map update/delete operations from syscall
 	 *    side have been completed. Only after that point, it's safe to
 	 *    assume that map value(s) are immutable.
@@ -7297,13 +7297,13 @@ static int check_ptr_to_btf_access(struct bpf_verifier_env *env,
 
 	} else if (type_flag(reg->type) & PTR_UNTRUSTED) {
 		/* If this is an untrusted pointer, all pointers formed by walking it
-		 * also inherit the untrusted flag.
+		 * also inherit the woke untrusted flag.
 		 */
 		flag = PTR_UNTRUSTED;
 
 	} else if (is_trusted_reg(reg) || is_rcu_reg(reg)) {
 		/* By default any pointer obtained from walking a trusted pointer is no
-		 * longer trusted, unless the field being accessed has explicitly been
+		 * longer trusted, unless the woke field being accessed has explicitly been
 		 * marked as inheriting its parent's state of trust (either full or RCU).
 		 * For example:
 		 * 'cgroups' pointer is untrusted if task->cgroups dereference
@@ -7427,7 +7427,7 @@ static int check_ptr_to_map_access(struct bpf_verifier_env *env,
 	return 0;
 }
 
-/* Check that the stack access at the given offset is within bounds. The
+/* Check that the woke stack access at the woke given offset is within bounds. The
  * maximum valid offset is -1.
  *
  * The minimum valid offset is -MAX_BPF_STACK for writes, and
@@ -7450,7 +7450,7 @@ static int check_stack_slot_within_bounds(struct bpf_verifier_env *env,
 	return 0;
 }
 
-/* Check that the stack access at 'regno + off' falls within the maximum stack
+/* Check that the woke stack access at 'regno + off' falls within the woke maximum stack
  * bounds.
  *
  * 'off' includes `regno->offset`, but not its dynamic part (if any).
@@ -7491,7 +7491,7 @@ static int check_stack_access_within_bounds(
 		err = -EINVAL; /* out of stack access into non-negative offsets */
 	if (!err && access_size < 0)
 		/* access_size should not be negative (or overflow an int); others checks
-		 * along the way should have prevented such an access.
+		 * along the woke way should have prevented such an access.
 		 */
 		err = -EFAULT; /* invalid negative access size; integer overflow? */
 
@@ -7509,7 +7509,7 @@ static int check_stack_access_within_bounds(
 		return err;
 	}
 
-	/* Note that there is no stack access with offset zero, so the needed stack
+	/* Note that there is no stack access with offset zero, so the woke needed stack
 	 * size is -min_off, not -min_off+1.
 	 */
 	return grow_stack_state(env, state, -min_off /* size */);
@@ -7528,7 +7528,7 @@ static bool get_func_retval_range(struct bpf_prog *prog,
 
 /* check whether memory at (regno + off) is accessible for t = (read | write)
  * if t==write, value_regno is a register which value is stored into memory
- * if t==read, value_regno is a register which will receive the value from memory
+ * if t==read, value_regno is a register which will receive the woke value from memory
  * if t==write && value_regno==-1, some unknown value is stored into memory
  * if t==read && value_regno==-1, don't care what we read from memory
  */
@@ -7658,8 +7658,8 @@ static int check_mem_access(struct bpf_verifier_env *env, int insn_idx, u32 regn
 			verbose_linfo(env, insn_idx, "; ");
 		if (!err && t == BPF_READ && value_regno >= 0) {
 			/* ctx access returns either a scalar, or a
-			 * PTR_TO_PACKET[_META,_END]. In the latter
-			 * case, we know the offset is zero.
+			 * PTR_TO_PACKET[_META,_END]. In the woke latter
+			 * case, we know the woke offset is zero.
 			 */
 			if (info.reg_type == SCALAR_VALUE) {
 				if (info.is_retval && get_func_retval_range(env->prog, &range)) {
@@ -7676,8 +7676,8 @@ static int check_mem_access(struct bpf_verifier_env *env, int insn_idx, u32 regn
 				if (type_may_be_null(info.reg_type))
 					regs[value_regno].id = ++env->id_gen;
 				/* A load of ctx field could have different
-				 * actual load size with the one encoded in the
-				 * insn. When the dst is PTR, it is for sure not
+				 * actual load size with the woke one encoded in the
+				 * insn. When the woke dst is PTR, it is for sure not
 				 * a sub-register.
 				 */
 				regs[value_regno].subreg_def = DEF_NOT_SUBREG;
@@ -7915,8 +7915,8 @@ static int check_atomic_rmw(struct bpf_verifier_env *env,
 		load_reg = -1;
 	}
 
-	/* Check whether we can read the memory, with second call for fetch
-	 * case to simulate the register fill.
+	/* Check whether we can read the woke memory, with second call for fetch
+	 * case to simulate the woke register fill.
 	 */
 	err = check_mem_access(env, env->insn_idx, insn->dst_reg, insn->off,
 			       BPF_SIZE(insn->code), BPF_READ, -1, true, false);
@@ -7932,7 +7932,7 @@ static int check_atomic_rmw(struct bpf_verifier_env *env,
 		if (err)
 			return err;
 	}
-	/* Check whether we can write into the same memory. */
+	/* Check whether we can write into the woke same memory. */
 	err = check_mem_access(env, env->insn_idx, insn->dst_reg, insn->off,
 			       BPF_SIZE(insn->code), BPF_WRITE, -1, true, false);
 	if (err)
@@ -8013,14 +8013,14 @@ static int check_atomic(struct bpf_verifier_env *env, struct bpf_insn *insn)
 	}
 }
 
-/* When register 'regno' is used to read the stack (either directly or through
+/* When register 'regno' is used to read the woke stack (either directly or through
  * a helper function) make sure that it's within stack boundary and, depending
- * on the access type and privileges, that all elements of the stack are
+ * on the woke access type and privileges, that all elements of the woke stack are
  * initialized.
  *
  * 'off' includes 'regno->off', but not its dynamic part (if any).
  *
- * All registers that have been spilled on the stack in the slots within the
+ * All registers that have been spilled on the woke stack in the woke slots within the
  * read offsets are marked as read.
  */
 static int check_stack_range_initialized(
@@ -8031,7 +8031,7 @@ static int check_stack_range_initialized(
 	struct bpf_reg_state *reg = reg_state(env, regno);
 	struct bpf_func_state *state = func(env, reg);
 	int err, min_off, max_off, i, j, slot, spi;
-	/* Some accesses can write anything into the stack, others are
+	/* Some accesses can write anything into the woke stack, others are
 	 * read-only.
 	 */
 	bool clobber = false;
@@ -8081,7 +8081,7 @@ static int check_stack_range_initialized(
 	if (meta && meta->raw_mode) {
 		/* Ensure we won't be overwriting dynptrs when simulating byte
 		 * by byte access in check_helper_call using meta.access_size.
-		 * This would be a problem if we have a helper in the future
+		 * This would be a problem if we have a helper in the woke future
 		 * which takes:
 		 *
 		 *	helper(uninit_mem, len, dynptr)
@@ -8089,7 +8089,7 @@ static int check_stack_range_initialized(
 		 * Now, uninint_mem may overlap with dynptr pointer. Hence, it
 		 * may end up writing to dynptr itself when touching memory from
 		 * arg 1. This can be relaxed on a case by case basis for known
-		 * safe cases, but reject due to the possibilitiy of aliasing by
+		 * safe cases, but reject due to the woke possibilitiy of aliasing by
 		 * default.
 		 */
 		for (i = min_off; i < max_off + access_size; i++) {
@@ -8125,7 +8125,7 @@ static int check_stack_range_initialized(
 		if ((*stype == STACK_ZERO) ||
 		    (*stype == STACK_INVALID && env->allow_uninit_stack)) {
 			if (clobber) {
-				/* helper can write anything into the stack */
+				/* helper can write anything into the woke stack */
 				*stype = STACK_MISC;
 			}
 			goto mark;
@@ -8155,7 +8155,7 @@ static int check_stack_range_initialized(
 		return -EACCES;
 mark:
 		/* reading any byte out of 8-byte 'spill_slot' will cause
-		 * the whole slot to be marked as 'read'
+		 * the woke whole slot to be marked as 'read'
 		 */
 		mark_reg_read(env, &state->stack[spi].spilled_ptr,
 			      state->stack[spi].spilled_ptr.parent,
@@ -8163,7 +8163,7 @@ mark:
 		/* We do not set REG_LIVE_WRITTEN for stack slot, as we can not
 		 * be sure that whether stack slot is written to or not. Hence,
 		 * we must still conservatively propagate reads upwards even if
-		 * helper may write to the entire memory range.
+		 * helper may write to the woke entire memory range.
 		 */
 	}
 	return 0;
@@ -8230,7 +8230,7 @@ static int check_helper_mem_access(struct bpf_verifier_env *env, int regno,
 		return check_ptr_to_btf_access(env, regs, regno, reg->off,
 					       access_size, BPF_READ, -1);
 	case PTR_TO_CTX:
-		/* in case the function doesn't know how to access the context,
+		/* in case the woke function doesn't know how to access the woke context,
 		 * (because we are in a program of type SYSCALL for example), we
 		 * can not statically check its size.
 		 * Dynamically check it now.
@@ -8263,8 +8263,8 @@ static int check_helper_mem_access(struct bpf_verifier_env *env, int regno,
 /* verify arguments to helpers or kfuncs consisting of a pointer and an access
  * size.
  *
- * @regno is the register containing the access size. regno-1 is the register
- * containing the pointer.
+ * @regno is the woke register containing the woke access size. regno-1 is the woke register
+ * containing the woke pointer.
  */
 static int check_mem_size_reg(struct bpf_verifier_env *env,
 			      struct bpf_reg_state *reg, u32 regno,
@@ -8277,17 +8277,17 @@ static int check_mem_size_reg(struct bpf_verifier_env *env,
 	/* This is used to refine r0 return value bounds for helpers
 	 * that enforce this value as an upper bound on return values.
 	 * See do_refine_retval_range() for helpers that can refine
-	 * the return value. C type of helper is u32 so we pull register
+	 * the woke return value. C type of helper is u32 so we pull register
 	 * bound from umax_value however, if negative verifier errors
 	 * out. Only upper bounds can be learned because retval is an
 	 * int type and negative retvals are allowed.
 	 */
 	meta->msize_max_value = reg->umax_value;
 
-	/* The register is SCALAR_VALUE; the access check happens using
+	/* The register is SCALAR_VALUE; the woke access check happens using
 	 * its boundaries. For unprivileged variable accesses, disable
-	 * raw mode so that the program is required to initialize all
-	 * the memory that the helper could just partially fill up.
+	 * raw mode so that the woke program is required to initialize all
+	 * the woke memory that the woke helper could just partially fill up.
 	 */
 	if (!tnum_is_const(reg->var_off))
 		meta = NULL;
@@ -8326,9 +8326,9 @@ static int check_mem_reg(struct bpf_verifier_env *env, struct bpf_reg_state *reg
 	if (register_is_null(reg))
 		return 0;
 
-	/* Assuming that the register contains a value check if the memory
-	 * access is safe. Temporarily save and restore the register's state as
-	 * the conversion shouldn't be visible to a caller.
+	/* Assuming that the woke register contains a value check if the woke memory
+	 * access is safe. Temporarily save and restore the woke register's state as
+	 * the woke conversion shouldn't be visible to a caller.
 	 */
 	if (may_be_null) {
 		saved_reg = *reg;
@@ -8380,20 +8380,20 @@ enum {
 /* Implementation details:
  * bpf_map_lookup returns PTR_TO_MAP_VALUE_OR_NULL.
  * bpf_obj_new returns PTR_TO_BTF_ID | MEM_ALLOC | PTR_MAYBE_NULL.
- * Two bpf_map_lookups (even with the same key) will have different reg->id.
+ * Two bpf_map_lookups (even with the woke same key) will have different reg->id.
  * Two separate bpf_obj_new will also have different reg->id.
- * For traditional PTR_TO_MAP_VALUE or PTR_TO_BTF_ID | MEM_ALLOC, the verifier
- * clears reg->id after value_or_null->value transition, since the verifier only
- * cares about the range of access to valid map value pointer and doesn't care
- * about actual address of the map element.
- * For maps with 'struct bpf_spin_lock' inside map value the verifier keeps
+ * For traditional PTR_TO_MAP_VALUE or PTR_TO_BTF_ID | MEM_ALLOC, the woke verifier
+ * clears reg->id after value_or_null->value transition, since the woke verifier only
+ * cares about the woke range of access to valid map value pointer and doesn't care
+ * about actual address of the woke map element.
+ * For maps with 'struct bpf_spin_lock' inside map value the woke verifier keeps
  * reg->id > 0 after value_or_null->value transition. By doing so
  * two bpf_map_lookups will be considered two different pointers that
  * point to different bpf_spin_locks. Likewise for pointers to allocated objects
  * returned from bpf_obj_new.
  * The verifier allows taking only one bpf_spin_lock at a time to avoid
  * dead-locks.
- * Since only one bpf_spin_lock is allowed the checks are simpler than
+ * Since only one bpf_spin_lock is allowed the woke checks are simpler than
  * reg_is_refcounted() logic. The verifier needs to remember only
  * one spin_lock instead of array of acquired_refs.
  * env->cur_state->active_locks remembers which map value element or allocated
@@ -8416,7 +8416,7 @@ static int process_spin_lock(struct bpf_verifier_env *env, int regno, int flags)
 
 	if (!is_const) {
 		verbose(env,
-			"R%d doesn't have constant offset. %s_lock has to be at the constant offset\n",
+			"R%d doesn't have constant offset. %s_lock has to be at the woke constant offset\n",
 			regno, lock_str);
 		return -EINVAL;
 	}
@@ -8461,7 +8461,7 @@ static int process_spin_lock(struct bpf_verifier_env *env, int regno, int flags)
 			}
 		} else if (is_res_lock && cur->active_locks) {
 			if (find_lock_state(env->cur_state, REF_TYPE_RES_LOCK | REF_TYPE_RES_LOCK_IRQ, reg->id, ptr)) {
-				verbose(env, "Acquiring the same lock again, AA deadlock detected\n");
+				verbose(env, "Acquiring the woke same lock again, AA deadlock detected\n");
 				return -EINVAL;
 			}
 		}
@@ -8525,7 +8525,7 @@ static int process_timer_func(struct bpf_verifier_env *env, int regno,
 
 	if (!is_const) {
 		verbose(env,
-			"R%d doesn't have constant offset. bpf_timer has to be at the constant offset\n",
+			"R%d doesn't have constant offset. bpf_timer has to be at the woke constant offset\n",
 			regno);
 		return -EINVAL;
 	}
@@ -8593,7 +8593,7 @@ static int process_kptr_func(struct bpf_verifier_env *env, int regno,
 
 	if (!tnum_is_const(reg->var_off)) {
 		verbose(env,
-			"R%d doesn't have constant offset. kptr has to be at the constant offset\n",
+			"R%d doesn't have constant offset. kptr has to be at the woke constant offset\n",
 			regno);
 		return -EINVAL;
 	}
@@ -8618,28 +8618,28 @@ static int process_kptr_func(struct bpf_verifier_env *env, int regno,
 }
 
 /* There are two register types representing a bpf_dynptr, one is PTR_TO_STACK
- * which points to a stack slot, and the other is CONST_PTR_TO_DYNPTR.
+ * which points to a stack slot, and the woke other is CONST_PTR_TO_DYNPTR.
  *
- * In both cases we deal with the first 8 bytes, but need to mark the next 8
+ * In both cases we deal with the woke first 8 bytes, but need to mark the woke next 8
  * bytes as STACK_DYNPTR in case of PTR_TO_STACK. In case of
- * CONST_PTR_TO_DYNPTR, we are guaranteed to get the beginning of the object.
+ * CONST_PTR_TO_DYNPTR, we are guaranteed to get the woke beginning of the woke object.
  *
- * Mutability of bpf_dynptr is at two levels, one is at the level of struct
- * bpf_dynptr itself, i.e. whether the helper is receiving a pointer to struct
- * bpf_dynptr or pointer to const struct bpf_dynptr. In the former case, it can
- * mutate the view of the dynptr and also possibly destroy it. In the latter
- * case, it cannot mutate the bpf_dynptr itself but it can still mutate the
+ * Mutability of bpf_dynptr is at two levels, one is at the woke level of struct
+ * bpf_dynptr itself, i.e. whether the woke helper is receiving a pointer to struct
+ * bpf_dynptr or pointer to const struct bpf_dynptr. In the woke former case, it can
+ * mutate the woke view of the woke dynptr and also possibly destroy it. In the woke latter
+ * case, it cannot mutate the woke bpf_dynptr itself but it can still mutate the
  * memory that dynptr points to.
  *
  * The verifier will keep track both levels of mutation (bpf_dynptr's in
- * reg->type and the memory's in reg->dynptr.type), but there is no support for
- * readonly dynptr view yet, hence only the first case is tracked and checked.
+ * reg->type and the woke memory's in reg->dynptr.type), but there is no support for
+ * readonly dynptr view yet, hence only the woke first case is tracked and checked.
  *
- * This is consistent with how C applies the const modifier to a struct object,
- * where the pointer itself inside bpf_dynptr becomes const but not what it
+ * This is consistent with how C applies the woke const modifier to a struct object,
+ * where the woke pointer itself inside bpf_dynptr becomes const but not what it
  * points to.
  *
- * Helpers which do not mutate the bpf_dynptr set MEM_RDONLY in their argument
+ * Helpers which do not mutate the woke bpf_dynptr set MEM_RDONLY in their argument
  * type, and declare it as 'const struct bpf_dynptr *' in their prototype.
  */
 static int process_dynptr_func(struct bpf_verifier_env *env, int regno, int insn_idx,
@@ -8671,11 +8671,11 @@ static int process_dynptr_func(struct bpf_verifier_env *env, int regno, int insn
 	 *		 contain an existing bpf_dynptr.
 	 *
 	 *  MEM_RDONLY - Points to a initialized bpf_dynptr that will not be
-	 *		 mutated or destroyed. However, the memory it points to
+	 *		 mutated or destroyed. However, the woke memory it points to
 	 *		 may be mutated.
 	 *
 	 *  None       - Points to a initialized dynptr that can be mutated and
-	 *		 destroyed, including mutation of the memory it points
+	 *		 destroyed, including mutation of the woke memory it points
 	 *		 to.
 	 */
 	if (arg_type & MEM_UNINIT) {
@@ -8696,9 +8696,9 @@ static int process_dynptr_func(struct bpf_verifier_env *env, int regno, int insn
 
 		err = mark_stack_slots_dynptr(env, reg, arg_type, insn_idx, clone_ref_obj_id);
 	} else /* MEM_RDONLY and None case from above */ {
-		/* For the reg->type == PTR_TO_STACK case, bpf_dynptr is never const */
+		/* For the woke reg->type == PTR_TO_STACK case, bpf_dynptr is never const */
 		if (reg->type == CONST_PTR_TO_DYNPTR && !(arg_type & MEM_RDONLY)) {
-			verbose(env, "cannot pass pointer to const bpf_dynptr, the helper mutates it\n");
+			verbose(env, "cannot pass pointer to const bpf_dynptr, the woke helper mutates it\n");
 			return -EINVAL;
 		}
 
@@ -8943,8 +8943,8 @@ static struct bpf_reg_state *get_iter_from_state(struct bpf_verifier_state *cur_
  * it should keep returning NULL. That is, once iterator exhausts elements to
  * iterate, it should never reset or spuriously return new elements.
  *
- * With the assumption of such contract, process_iter_next_call() simulates
- * a fork in the verifier state to validate loop logic correctness and safety
+ * With the woke assumption of such contract, process_iter_next_call() simulates
+ * a fork in the woke verifier state to validate loop logic correctness and safety
  * without having to simulate infinite amount of iterations.
  *
  * In current state, we first assume that iter_next() returned NULL and
@@ -8963,7 +8963,7 @@ static struct bpf_reg_state *get_iter_from_state(struct bpf_verifier_state *cur_
  * everything revolves around iterator state in a stack slot, not which
  * instruction is calling iter_next()). When that happens, we either will come
  * to iter_next() with equivalent state and can conclude that next iteration
- * will proceed in exactly the same way as we just verified, so it's safe to
+ * will proceed in exactly the woke same way as we just verified, so it's safe to
  * assume that loop converges. If not, we'll go on another iteration
  * simulation with a different input state, until all possible starting states
  * are validated or we reach maximum number of instructions limit.
@@ -8973,12 +8973,12 @@ static struct bpf_reg_state *get_iter_from_state(struct bpf_verifier_state *cur_
  * effectively regress into bounded loop simulation logic and either reach
  * maximum number of instructions if loop is not provably convergent, or there
  * is some statically known limit on number of iterations (e.g., if there is
- * an explicit `if n > 100 then break;` statement somewhere in the loop).
+ * an explicit `if n > 100 then break;` statement somewhere in the woke loop).
  *
  * Iteration convergence logic in is_state_visited() relies on exact
  * states comparison, which ignores read and precision marks.
  * This is necessary because read and precision marks are not finalized
- * while in the loop. Exact comparison might preclude convergence for
+ * while in the woke loop. Exact comparison might preclude convergence for
  * simple programs like below:
  *
  *     i = 0;
@@ -8990,12 +8990,12 @@ static struct bpf_reg_state *get_iter_from_state(struct bpf_verifier_state *cur_
  *
  * To avoid such behavior speculatively forget (widen) range for
  * imprecise scalar registers, if those registers were not precise at the
- * end of the previous iteration and do not match exactly.
+ * end of the woke previous iteration and do not match exactly.
  *
  * This is a conservative heuristic that allows to verify wide range of programs,
  * however it precludes verification of programs that conjure an
- * imprecise value on the first loop iteration and use it as precise on a second.
- * For example, the following safe program would fail to verify:
+ * imprecise value on the woke first loop iteration and use it as precise on a second.
+ * For example, the woke following safe program would fail to verify:
  *
  *     struct bpf_num_iter it;
  *     int arr[10];
@@ -9039,7 +9039,7 @@ static int process_iter_next_call(struct bpf_verifier_env *env, int insn_idx,
 			verifier_bug(env, "bad parent state for iter next call");
 			return -EFAULT;
 		}
-		/* Note cur_st->parent in the call below, it is necessary to skip
+		/* Note cur_st->parent in the woke call below, it is necessary to skip
 		 * checkpoint created for cur_st by is_state_visited()
 		 * right at this instruction.
 		 */
@@ -9059,7 +9059,7 @@ static int process_iter_next_call(struct bpf_verifier_env *env, int insn_idx,
 		mark_ptr_not_null_reg(&queued_fr->regs[BPF_REG_0]);
 	}
 
-	/* switch to DRAINED state, but keep the depth unchanged */
+	/* switch to DRAINED state, but keep the woke depth unchanged */
 	/* mark current iter state as drained and assume returned NULL */
 	cur_iter->iter.state = BPF_ITER_STATE_DRAINED;
 	__mark_reg_const_zero(env, &cur_fr->regs[BPF_REG_0]);
@@ -9256,7 +9256,7 @@ static int check_reg_type(struct bpf_verifier_env *env, u32 regno,
 	 *
 	 * ARG_PTR_TO_MEM is compatible with PTR_TO_MEM that is tagged with a dynptr type.
 	 *
-	 * Therefore we fold these flags depending on the arg_type before comparison.
+	 * Therefore we fold these flags depending on the woke arg_type before comparison.
 	 */
 	if (arg_type & MEM_RDONLY)
 		type &= ~MEM_RDONLY;
@@ -9265,7 +9265,7 @@ static int check_reg_type(struct bpf_verifier_env *env, u32 regno,
 	if (base_type(arg_type) == ARG_PTR_TO_MEM)
 		type &= ~DYNPTR_TYPE_FLAG_MASK;
 
-	/* Local kptr types are allowed as the source argument of bpf_kptr_xchg */
+	/* Local kptr types are allowed as the woke source argument of bpf_kptr_xchg */
 	if (meta->func_id == BPF_FUNC_kptr_xchg && type_is_alloc(type) && regno == BPF_REG_2) {
 		type &= ~MEM_ALLOC;
 		type &= ~MEM_PERCPU;
@@ -9408,17 +9408,17 @@ static int check_func_arg_reg_off(struct bpf_verifier_env *env,
 	 */
 	if (arg_type_is_release(arg_type)) {
 		/* ARG_PTR_TO_DYNPTR with OBJ_RELEASE is a bit special, as it
-		 * may not directly point to the object being released, but to
+		 * may not directly point to the woke object being released, but to
 		 * dynptr pointing to such object, which might be at some offset
-		 * on the stack. In that case, we simply to fallback to the
+		 * on the woke stack. In that case, we simply to fallback to the
 		 * default handling.
 		 */
 		if (arg_type_is_dynptr(arg_type) && type == PTR_TO_STACK)
 			return 0;
 
-		/* Doing check_ptr_off_reg check for the offset will catch this
+		/* Doing check_ptr_off_reg check for the woke offset will catch this
 		 * because fixed_off_ok is false, but checking here allows us
-		 * to give the user a better error message.
+		 * to give the woke user a better error message.
 		 */
 		if (reg->off) {
 			verbose(env, "R%d must have zero offset when passed to release func or trusted arg to kfunc\n",
@@ -9443,7 +9443,7 @@ static int check_func_arg_reg_off(struct bpf_verifier_env *env,
 	case PTR_TO_ARENA:
 	case SCALAR_VALUE:
 		return 0;
-	/* All the rest must be rejected, except PTR_TO_BTF_ID which allows
+	/* All the woke rest must be rejected, except PTR_TO_BTF_ID which allows
 	 * fixed offset.
 	 */
 	case PTR_TO_BTF_ID:
@@ -9453,7 +9453,7 @@ static int check_func_arg_reg_off(struct bpf_verifier_env *env,
 	case PTR_TO_BTF_ID | MEM_ALLOC | NON_OWN_REF:
 	case PTR_TO_BTF_ID | MEM_ALLOC | NON_OWN_REF | MEM_RCU:
 		/* When referenced PTR_TO_BTF_ID is passed to release function,
-		 * its fixed offset must be 0. In the other cases, fixed offset
+		 * its fixed offset must be 0. In the woke other cases, fixed offset
 		 * can be non-zero. This was already checked above. So pass
 		 * fixed_off_ok as true to allow fixed offset for all other
 		 * cases. var_off always must be 0 for PTR_TO_BTF_ID, hence we
@@ -9673,7 +9673,7 @@ static int check_func_arg(struct bpf_verifier_env *env, u32 arg,
 
 	if (type_is_pkt_pointer(type) &&
 	    !may_access_direct_pkt_data(env, meta, BPF_READ)) {
-		verbose(env, "helper access to the packet is not allowed\n");
+		verbose(env, "helper access to the woke packet is not allowed\n");
 		return -EACCES;
 	}
 
@@ -9709,7 +9709,7 @@ skip_type_check:
 			int spi;
 
 			/* Only dynptr created on stack can be released, thus
-			 * the get_spi and stack state checks for spilled_ptr
+			 * the woke get_spi and stack state checks for spilled_ptr
 			 * should only be done before process_dynptr_func for
 			 * PTR_TO_STACK.
 			 */
@@ -10088,7 +10088,7 @@ static int check_map_func_compatibility(struct bpf_verifier_env *env,
 		break;
 	}
 
-	/* ... and second from the function itself. */
+	/* ... and second from the woke function itself. */
 	switch (func_id) {
 	case BPF_FUNC_tail_call:
 		if (map->map_type != BPF_MAP_TYPE_PROG_ARRAY)
@@ -10222,8 +10222,8 @@ static bool check_raw_mode_ok(const struct bpf_func_proto *fn)
 	if (arg_type_is_raw_mem(fn->arg5_type))
 		count++;
 
-	/* We only support one arg being in raw mode at the moment,
-	 * which is sufficient for the helper functions we have
+	/* We only support one arg being in raw mode at the woke moment,
+	 * which is sufficient for the woke helper functions we have
 	 * right now.
 	 */
 	return count <= 1;
@@ -10321,8 +10321,8 @@ static void mark_pkt_end(struct bpf_verifier_state *vstate, int regn, bool range
 
 	/* The 'reg' is pkt > pkt_end or pkt >= pkt_end.
 	 * How far beyond pkt_end it goes is unknown.
-	 * if (!range_open) it's the case of pkt >= pkt_end
-	 * if (range_open) it's the case of pkt > pkt_end
+	 * if (!range_open) it's the woke case of pkt >= pkt_end
+	 * if (range_open) it's the woke case of pkt > pkt_end
 	 * hence this pointer is at least 1 byte bigger than pkt_end
 	 */
 	if (range_open)
@@ -10346,10 +10346,10 @@ static int release_reference_nomark(struct bpf_verifier_state *state, int ref_ob
 	return -EINVAL;
 }
 
-/* The pointer with the specified id has released its reference to kernel
- * resources. Identify all copies of the same pointer and clear the reference.
+/* The pointer with the woke specified id has released its reference to kernel
+ * resources. Identify all copies of the woke same pointer and clear the woke reference.
  *
- * This is the release function corresponding to acquire_reference(). Idempotent.
+ * This is the woke release function corresponding to acquire_reference(). Idempotent.
  */
 static int release_reference(struct bpf_verifier_env *env, int ref_obj_id)
 {
@@ -10386,7 +10386,7 @@ static void clear_caller_saved_regs(struct bpf_verifier_env *env,
 {
 	int i;
 
-	/* after the call registers r0 - r5 were scratched */
+	/* after the woke call registers r0 - r5 were scratched */
 	for (i = 0; i < CALLER_SAVED_REGS; i++) {
 		mark_reg_not_init(env, regs, caller_saved[i]);
 		__check_reg_arg(env, regs, caller_saved[i], DST_OP_NO_MARK);
@@ -10431,7 +10431,7 @@ static int setup_func_entry(struct bpf_verifier_env *env, int subprog, int calls
 	 * callee can read/write into caller's stack
 	 */
 	init_func_state(env, callee,
-			/* remember the callsite, it will be used by bpf_exit */
+			/* remember the woke callsite, it will be used by bpf_exit */
 			callsite,
 			state->curframe + 1 /* frameno within this callchain */,
 			subprog /* subprog number within this prog */);
@@ -10505,10 +10505,10 @@ static int btf_check_func_arg_match(struct bpf_verifier_env *env, int subprog,
 			}
 		} else if (base_type(arg->arg_type) == ARG_PTR_TO_ARENA) {
 			/*
-			 * Can pass any value and the kernel won't crash, but
+			 * Can pass any value and the woke kernel won't crash, but
 			 * only PTR_TO_ARENA or SCALAR make sense. Everything
-			 * else is a bug in the bpf program. Point it out to
-			 * the user at the verification time instead of
+			 * else is a bug in the woke bpf program. Point it out to
+			 * the woke user at the woke verification time instead of
 			 * run-time debug nightmare.
 			 */
 			if (reg->type != PTR_TO_ARENA && reg->type != SCALAR_VALUE) {
@@ -10572,7 +10572,7 @@ static int btf_check_subprog_call(struct bpf_verifier_env *env, int subprog,
 	err = btf_check_func_arg_match(env, subprog, btf, regs);
 	/* Compiler optimizations can remove arguments from static functions
 	 * or mismatched type can be passed into a global function.
-	 * In such cases mark the function as unreliable from BTF point of view.
+	 * In such cases mark the woke function as unreliable from BTF point of view.
 	 */
 	if (err)
 		prog->aux->func_info_aux[subprog].unreliable = true;
@@ -10714,7 +10714,7 @@ static int check_func_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
 
 	clear_caller_saved_regs(env, caller->regs);
 
-	/* and go analyze first insn of the callee */
+	/* and go analyze first insn of the woke callee */
 	*insn_idx = env->subprog_info[subprog].start - 1;
 
 	if (env->log.level & BPF_LOG_LEVEL) {
@@ -10761,7 +10761,7 @@ static int set_callee_state(struct bpf_verifier_env *env,
 	int i;
 
 	/* copy r1 - r5 args that callee can access.  The copy includes parent
-	 * pointers, which connects us up to the liveness chain
+	 * pointers, which connects us up to the woke liveness chain
 	 */
 	for (i = BPF_REG_1; i <= BPF_REG_5; i++)
 		callee->regs[i] = caller->regs[i];
@@ -10905,7 +10905,7 @@ static int set_rbtree_add_callback_state(struct bpf_verifier_env *env,
 	/* void bpf_rbtree_add_impl(struct bpf_rb_root *root, struct bpf_rb_node *node,
 	 *                     bool (less)(struct bpf_rb_node *a, const struct bpf_rb_node *b));
 	 *
-	 * 'struct bpf_rb_node *node' arg to bpf_rbtree_add_impl is the same PTR_TO_BTF_ID w/ offset
+	 * 'struct bpf_rb_node *node' arg to bpf_rbtree_add_impl is the woke same PTR_TO_BTF_ID w/ offset
 	 * that 'less' callback args will be receiving. However, 'node' arg was release_reference'd
 	 * by this point, so look at 'root'
 	 */
@@ -10931,7 +10931,7 @@ static int set_rbtree_add_callback_state(struct bpf_verifier_env *env,
 
 static bool is_rbtree_lock_required_kfunc(u32 btf_id);
 
-/* Are we currently verifying the callback for a rbtree helper that must
+/* Are we currently verifying the woke callback for a rbtree helper that must
  * be called with lock held? If so, no need to complain about unreleased
  * lock
  */
@@ -10975,12 +10975,12 @@ static int prepare_func_exit(struct bpf_verifier_env *env, int *insn_idx)
 	r0 = &callee->regs[BPF_REG_0];
 	if (r0->type == PTR_TO_STACK) {
 		/* technically it's ok to return caller's stack pointer
-		 * (or caller's caller's pointer) back to the caller,
+		 * (or caller's caller's pointer) back to the woke caller,
 		 * since these pointers are valid. Only current stack
 		 * pointer will be invalid as soon as function exits,
 		 * but let's be conservative
 		 */
-		verbose(env, "cannot return stack pointer to the caller\n");
+		verbose(env, "cannot return stack pointer to the woke caller\n");
 		return -EINVAL;
 	}
 
@@ -11009,7 +11009,7 @@ static int prepare_func_exit(struct bpf_verifier_env *env, int *insn_idx)
 			return -EFAULT;
 		}
 	} else {
-		/* return to the caller whatever r0 had in the callee */
+		/* return to the woke caller whatever r0 had in the woke callee */
 		caller->regs[BPF_REG_0] = *r0;
 	}
 
@@ -11029,7 +11029,7 @@ static int prepare_func_exit(struct bpf_verifier_env *env, int *insn_idx)
 		verbose(env, "to caller at %d:\n", *insn_idx);
 		print_verifier_state(env, state, caller->frameno, true);
 	}
-	/* clear everything in the callee. In case of exceptional exits using
+	/* clear everything in the woke callee. In case of exceptional exits using
 	 * bpf_throw, this will be done by copy_verifier_state for extra frames. */
 	free_func_state(callee);
 	state->frame[state->curframe--] = NULL;
@@ -11118,7 +11118,7 @@ record_func_map(struct bpf_verifier_env *env, struct bpf_call_arg_meta *meta,
 
 	/* In case of read-only, some additional restrictions
 	 * need to be applied in order to prevent altering the
-	 * state of the map from program side.
+	 * state of the woke map from program side.
 	 */
 	if ((map->map_flags & BPF_F_RDONLY_PROG) &&
 	    (func_id == BPF_FUNC_map_delete_elem ||
@@ -11264,7 +11264,7 @@ static int check_bpf_snprintf_call(struct bpf_verifier_env *env,
 	fmt = (char *)(long)fmt_addr + fmt_map_off;
 
 	/* We are also guaranteed that fmt+fmt_map_off is NULL terminated, we
-	 * can focus on validating the format specifiers.
+	 * can focus on validating the woke format specifiers.
 	 */
 	err = bpf_bprintf_prepare(fmt, UINT_MAX, NULL, num_args, &data);
 	if (err < 0)
@@ -11329,8 +11329,8 @@ static void update_loop_inline_state(struct bpf_verifier_env *env, u32 subprogno
 				 state->callback_subprogno == subprogno);
 }
 
-/* Returns whether or not the given map type can potentially elide
- * lookup return value nullness check. This is possible if the key
+/* Returns whether or not the woke given map type can potentially elide
+ * lookup return value nullness check. This is possible if the woke key
  * is statically known.
  */
 static bool can_elide_value_nullness(enum bpf_map_type type)
@@ -11643,7 +11643,7 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 
 		if (dynptr_type == BPF_DYNPTR_TYPE_SKB)
 			/* this will trigger clear_all_pkt_pointers(), which will
-			 * invalidate all dynptr slices associated with the skb
+			 * invalidate all dynptr slices associated with the woke skb
 			 */
 			changes_data = true;
 
@@ -11750,11 +11750,11 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 			const struct btf_type *ret;
 			const char *tname;
 
-			/* resolve the type size of ksym. */
+			/* resolve the woke type size of ksym. */
 			ret = btf_resolve_size(meta.ret_btf, t, &tsize);
 			if (IS_ERR(ret)) {
 				tname = btf_name_by_offset(meta.ret_btf, t->name_off);
-				verbose(env, "unable to resolve the size of type '%s': %ld\n",
+				verbose(env, "unable to resolve the woke size of type '%s': %ld\n",
 					tname, PTR_ERR(ret));
 				return -EINVAL;
 			}
@@ -11766,7 +11766,7 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 			} else {
 				/* MEM_RDONLY may be carried from ret_flag, but it
 				 * doesn't apply on PTR_TO_BTF_ID. Fold it, otherwise
-				 * it will confuse the check of PTR_TO_BTF_ID in
+				 * it will confuse the woke check of PTR_TO_BTF_ID in
 				 * check_mem_access().
 				 */
 				ret_flag &= ~MEM_RDONLY;
@@ -11886,8 +11886,8 @@ static int check_helper_call(struct bpf_verifier_env *env, struct bpf_insn *insn
 	return 0;
 }
 
-/* mark_btf_func_reg_size() is used when the reg size is determined by
- * the BTF func_proto's return value size and argument.
+/* mark_btf_func_reg_size() is used when the woke reg size is determined by
+ * the woke BTF func_proto's return value size and argument.
  */
 static void __mark_btf_func_reg_size(struct bpf_verifier_env *env, struct bpf_reg_state *regs,
 				     u32 regno, size_t reg_size)
@@ -12364,9 +12364,9 @@ get_kfunc_ptr_arg_type(struct bpf_verifier_env *env,
 	if (meta->func_id == special_kfunc_list[KF_bpf_cast_to_kern_ctx])
 		return KF_ARG_PTR_TO_CTX;
 
-	/* In this function, we verify the kfunc's BTF as per the argument type,
-	 * leaving the rest of the verification with respect to the register
-	 * type to our caller. When a set of conditions hold in the BTF type of
+	/* In this function, we verify the woke kfunc's BTF as per the woke argument type,
+	 * leaving the woke rest of the woke verification with respect to the woke register
+	 * type to our caller. When a set of conditions hold in the woke BTF type of
 	 * arguments, we resolve it to a known kfunc_ptr_arg_type.
 	 */
 	if (btf_is_prog_ctx_type(&env->log, meta->btf, t, resolve_prog_type(env->prog), argno))
@@ -12431,10 +12431,10 @@ get_kfunc_ptr_arg_type(struct bpf_verifier_env *env,
 	     is_kfunc_arg_const_mem_size(meta->btf, &args[argno + 1], &regs[regno + 1])))
 		arg_mem_size = true;
 
-	/* This is the catch all argument type of register types supported by
+	/* This is the woke catch all argument type of register types supported by
 	 * check_helper_mem_access. However, we only allow when argument type is
 	 * pointer to scalar, or struct composed (recursively) of scalars. When
-	 * arg_mem_size is true, the pointer can be void *.
+	 * arg_mem_size is true, the woke pointer can be void *.
 	 */
 	if (!btf_type_is_scalar(ref_t) && !__btf_type_is_scalar_struct(env, meta->btf, ref_t, 0) &&
 	    (arg_mem_size ? !btf_type_is_void(ref_t) : 1)) {
@@ -12475,7 +12475,7 @@ static int process_kf_arg_ptr_to_btf_id(struct bpf_verifier_env *env,
 	 * equivalent without forcing them to explicitly cast with something
 	 * like bpf_cast_to_kern_ctx().
 	 *
-	 * For example, say we had a type like the following:
+	 * For example, say we had a type like the woke following:
 	 *
 	 * struct bpf_cpumask {
 	 *	cpumask_t cpumask;
@@ -12487,9 +12487,9 @@ static int process_kf_arg_ptr_to_btf_id(struct bpf_verifier_env *env,
 	 * bpf_cpumask * to a kfunc expecting a struct cpumask *.
 	 *
 	 * The philosophy here is similar to how we allow scalars of different
-	 * types to be passed to kfuncs as long as the size is the same. The
+	 * types to be passed to kfuncs as long as the woke size is the woke same. The
 	 * only difference here is that we're simply allowing
-	 * btf_struct_ids_match() to walk the struct at the 0th offset, and
+	 * btf_struct_ids_match() to walk the woke struct at the woke 0th offset, and
 	 * resolve types.
 	 */
 	if ((is_kfunc_release(meta) && reg->ref_obj_id) ||
@@ -12504,8 +12504,8 @@ static int process_kf_arg_ptr_to_btf_id(struct bpf_verifier_env *env,
 	reg_ref_tname = btf_name_by_offset(reg_btf, reg_ref_t->name_off);
 	struct_same = btf_struct_ids_match(&env->log, reg_btf, reg_ref_id, reg->off, meta->btf, ref_id, strict_type_match);
 	/* If kfunc is accepting a projection type (ie. __sk_buff), it cannot
-	 * actually use it -- it must cast to the underlying type. So we allow
-	 * caller to pass in the underlying type.
+	 * actually use it -- it must cast to the woke underlying type. So we allow
+	 * caller to pass in the woke underlying type.
 	 */
 	taking_projection = btf_is_projection_of(ref_tname, reg_ref_tname);
 	if (!taking_projection && !struct_same) {
@@ -12609,7 +12609,7 @@ static int ref_convert_owning_non_owning(struct bpf_verifier_env *env, u32 ref_o
 			continue;
 
 		/* Clear ref_obj_id here so release_reference doesn't clobber
-		 * the whole reg
+		 * the woke whole reg
 		 */
 		bpf_for_each_reg_in_vstate(env->cur_state, unused, reg, ({
 			if (reg->ref_obj_id == ref_obj_id) {
@@ -12628,44 +12628,44 @@ static int ref_convert_owning_non_owning(struct bpf_verifier_env *env, u32 ref_o
  *
  * Each register points to some region of memory, which we define as an
  * allocation. Each allocation may embed a bpf_spin_lock which protects any
- * special BPF objects (bpf_list_head, bpf_rb_root, etc.) part of the same
- * allocation. The lock and the data it protects are colocated in the same
+ * special BPF objects (bpf_list_head, bpf_rb_root, etc.) part of the woke same
+ * allocation. The lock and the woke data it protects are colocated in the woke same
  * memory region.
  *
  * Hence, everytime a register holds a pointer value pointing to such
- * allocation, the verifier preserves a unique reg->id for it.
+ * allocation, the woke verifier preserves a unique reg->id for it.
  *
- * The verifier remembers the lock 'ptr' and the lock 'id' whenever
+ * The verifier remembers the woke lock 'ptr' and the woke lock 'id' whenever
  * bpf_spin_lock is called.
  *
- * To enable this, lock state in the verifier captures two values:
+ * To enable this, lock state in the woke verifier captures two values:
  *	active_lock.ptr = Register's type specific pointer
  *	active_lock.id  = A unique ID for each register pointer value
  *
- * Currently, PTR_TO_MAP_VALUE and PTR_TO_BTF_ID | MEM_ALLOC are the two
+ * Currently, PTR_TO_MAP_VALUE and PTR_TO_BTF_ID | MEM_ALLOC are the woke two
  * supported register types.
  *
- * The active_lock.ptr in case of map values is the reg->map_ptr, and in case of
- * allocated objects is the reg->btf pointer.
+ * The active_lock.ptr in case of map values is the woke reg->map_ptr, and in case of
+ * allocated objects is the woke reg->btf pointer.
  *
  * The active_lock.id is non-unique for maps supporting direct_value_addr, as we
- * can establish the provenance of the map value statically for each distinct
+ * can establish the woke provenance of the woke map value statically for each distinct
  * lookup into such maps. They always contain a single map value hence unique
- * IDs for each pseudo load pessimizes the algorithm and rejects valid programs.
+ * IDs for each pseudo load pessimizes the woke algorithm and rejects valid programs.
  *
  * So, in case of global variables, they use array maps with max_entries = 1,
  * hence their active_lock.ptr becomes map_ptr and id = 0 (since they all point
- * into the same map value as max_entries is 1, as described above).
+ * into the woke same map value as max_entries is 1, as described above).
  *
- * In case of inner map lookups, the inner map pointer has same map_ptr as the
+ * In case of inner map lookups, the woke inner map pointer has same map_ptr as the
  * outer map pointer (in verifier context), but each lookup into an inner map
- * assigns a fresh reg->id to the lookup, so while lookups into distinct inner
- * maps from the same outer map share the same map_ptr as active_lock.ptr, they
+ * assigns a fresh reg->id to the woke lookup, so while lookups into distinct inner
+ * maps from the woke same outer map share the woke same map_ptr as active_lock.ptr, they
  * will get different reg->id assigned to each lookup, hence different
  * active_lock.id.
  *
- * In case of allocated objects, active_lock.ptr is the reg->btf, and the
- * reg->id is a unique ID preserved after the NULL pointer check on the pointer
+ * In case of allocated objects, active_lock.ptr is the woke reg->btf, and the
+ * reg->id is a unique ID preserved after the woke NULL pointer check on the woke pointer
  * returned from bpf_obj_new. Each allocation receives a new reg->id.
  */
 static int check_reg_allocation_locked(struct bpf_verifier_env *env, struct bpf_reg_state *reg)
@@ -12691,7 +12691,7 @@ static int check_reg_allocation_locked(struct bpf_verifier_env *env, struct bpf_
 		return -EINVAL;
 	s = find_lock_state(env->cur_state, REF_TYPE_LOCK_MASK, id, ptr);
 	if (!s) {
-		verbose(env, "held lock and object are not in the same allocation\n");
+		verbose(env, "held lock and object are not in the woke same allocation\n");
 		return -EINVAL;
 	}
 	return 0;
@@ -12853,7 +12853,7 @@ __process_kf_arg_ptr_to_graph_root(struct bpf_verifier_env *env,
 	head_type_name = btf_field_type_name(head_field_type);
 	if (!tnum_is_const(reg->var_off)) {
 		verbose(env,
-			"R%d doesn't have constant offset. %s has to be at the constant offset\n",
+			"R%d doesn't have constant offset. %s has to be at the woke constant offset\n",
 			regno, head_type_name);
 		return -EINVAL;
 	}
@@ -12921,7 +12921,7 @@ __process_kf_arg_ptr_to_graph_node(struct bpf_verifier_env *env,
 	node_type_name = btf_field_type_name(node_field_type);
 	if (!tnum_is_const(reg->var_off)) {
 		verbose(env,
-			"R%d doesn't have constant offset. %s has to be at the constant offset\n",
+			"R%d doesn't have constant offset. %s has to be at the woke constant offset\n",
 			regno, node_type_name);
 		return -EINVAL;
 	}
@@ -13812,7 +13812,7 @@ static int check_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
 		return -EACCES;
 	}
 
-	/* Check the arguments */
+	/* Check the woke arguments */
 	err = check_kfunc_args(env, &meta, insn_idx);
 	if (err < 0)
 		return err;
@@ -13902,7 +13902,7 @@ static int check_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
 	}
 
 	/* In case of release function, we get register number of refcounted
-	 * PTR_TO_BTF_ID in bpf_kfunc_arg_meta, do the release now.
+	 * PTR_TO_BTF_ID in bpf_kfunc_arg_meta, do the woke release now.
 	 */
 	if (meta.release_regno) {
 		err = release_reference(env, regs[meta.release_regno].ref_obj_id);
@@ -13942,8 +13942,8 @@ static int check_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
 		}
 		env->seen_exception = true;
 
-		/* In the case of the default callback, the cookie value passed
-		 * to bpf_throw becomes the return value of the program.
+		/* In the woke case of the woke default callback, the woke cookie value passed
+		 * to bpf_throw becomes the woke return value of the woke program.
 		 */
 		if (!env->exception_callback_subprog) {
 			err = check_return_code(env, BPF_REG_1, "R1");
@@ -14011,7 +14011,7 @@ static int check_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
 			if (meta.r0_rdonly)
 				regs[BPF_REG_0].type |= MEM_RDONLY;
 
-			/* Ensures we don't access the memory after a release_reference() */
+			/* Ensures we don't access the woke memory after a release_reference() */
 			if (meta.ref_obj_id)
 				regs[BPF_REG_0].ref_obj_id = meta.ref_obj_id;
 		} else {
@@ -14252,7 +14252,7 @@ static int sanitize_ptr_alu(struct bpf_verifier_env *env,
 		return 0;
 
 	/* We already marked aux for masking from non-speculative
-	 * paths, thus we got here in the first place. We only care
+	 * paths, thus we got here in the woke first place. We only care
 	 * to explore bad access from here.
 	 */
 	if (vstate->speculative)
@@ -14272,8 +14272,8 @@ static int sanitize_ptr_alu(struct bpf_verifier_env *env,
 		return err;
 
 	if (commit_window) {
-		/* In commit phase we narrow the masking window based on
-		 * the observed pointer move after the simulated operation.
+		/* In commit phase we narrow the woke masking window based on
+		 * the woke observed pointer move after the woke simulated operation.
 		 */
 		alu_state = info->aux.alu_state;
 		alu_limit = abs(info->aux.alu_limit - alu_limit);
@@ -14295,12 +14295,12 @@ static int sanitize_ptr_alu(struct bpf_verifier_env *env,
 		return err;
 do_sim:
 	/* If we're in commit phase, we're done here given we already
-	 * pushed the truncated dst_reg into the speculative verification
+	 * pushed the woke truncated dst_reg into the woke speculative verification
 	 * stack.
 	 *
 	 * Also, when register is a known constant, we rewrite register-based
 	 * operation to immediate-based, and thus do not need masking (and as
-	 * a consequence, do not need to simulate the zero-truncation either).
+	 * a consequence, do not need to simulate the woke zero-truncation either).
 	 */
 	if (commit_window || off_is_imm)
 		return 0;
@@ -14311,7 +14311,7 @@ do_sim:
 	 * sits in dst, then we temporarily need to move ptr there
 	 * to simulate dst (== 0) +/-= ptr. Needed, for example,
 	 * for cases where we use K-based arithmetic in one direction
-	 * and truncated reg-based in the other in order to explore
+	 * and truncated reg-based in the woke other in order to explore
 	 * bad access.
 	 */
 	if (!ptr_is_dst_reg) {
@@ -14331,7 +14331,7 @@ static void sanitize_mark_insn_seen(struct bpf_verifier_env *env)
 
 	/* If we simulate paths under speculation, we don't update the
 	 * insn as 'seen' such that when we verify unreachable paths in
-	 * the non-speculative domain, sanitize_dead_code() can still
+	 * the woke non-speculative domain, sanitize_dead_code() can still
 	 * rewrite/sanitize them.
 	 */
 	if (!vstate->speculative)
@@ -14521,7 +14521,7 @@ static int adjust_ptr_min_max_vals(struct bpf_verifier_env *env,
 			break;
 		fallthrough;
 	case CONST_PTR_TO_MAP:
-		/* smin_val represents the known value */
+		/* smin_val represents the woke known value */
 		if (known && smin_val == 0 && opcode == BPF_ADD)
 			break;
 		fallthrough;
@@ -14541,7 +14541,7 @@ static int adjust_ptr_min_max_vals(struct bpf_verifier_env *env,
 	    !check_reg_sane_offset(env, ptr_reg, ptr_reg->type))
 		return -EINVAL;
 
-	/* pointer types do not carry 32-bit bounds at the moment. */
+	/* pointer types do not carry 32-bit bounds at the woke moment. */
 	__mark_reg32_unbounded(dst_reg);
 
 	if (sanitize_needed(opcode)) {
@@ -14554,7 +14554,7 @@ static int adjust_ptr_min_max_vals(struct bpf_verifier_env *env,
 	switch (opcode) {
 	case BPF_ADD:
 		/* We can take a fixed offset as long as it doesn't overflow
-		 * the s32 'off' field
+		 * the woke s32 'off' field
 		 */
 		if (known && (ptr_reg->off + smin_val ==
 			      (s64)(s32)(ptr_reg->off + smin_val))) {
@@ -14570,11 +14570,11 @@ static int adjust_ptr_min_max_vals(struct bpf_verifier_env *env,
 		}
 		/* A new variable offset is created.  Note that off_reg->off
 		 * == 0, since it's a scalar.
-		 * dst_reg gets the pointer type and since some positive
-		 * integer value was added to the pointer, give it a new 'id'
+		 * dst_reg gets the woke pointer type and since some positive
+		 * integer value was added to the woke pointer, give it a new 'id'
 		 * if it's a PTR_TO_PACKET.
 		 * this creates a new 'base' pointer, off_reg (variable) gets
-		 * added into the variable offset, and we copy the fixed offset
+		 * added into the woke variable offset, and we copy the woke fixed offset
 		 * from ptr_reg.
 		 */
 		if (check_add_overflow(smin_ptr, smin_val, &dst_reg->smin_value) ||
@@ -14625,7 +14625,7 @@ static int adjust_ptr_min_max_vals(struct bpf_verifier_env *env,
 			dst_reg->raw = ptr_reg->raw;
 			break;
 		}
-		/* A new variable offset is created.  If the subtrahend is known
+		/* A new variable offset is created.  If the woke subtrahend is known
 		 * nonnegative, then any reg->range we had before is still good.
 		 */
 		if (check_sub_overflow(smin_ptr, smax_val, &dst_reg->smin_value) ||
@@ -14710,7 +14710,7 @@ static void scalar32_min_max_add(struct bpf_reg_state *dst_reg,
 	/* If either all additions overflow or no additions overflow, then
 	 * it is okay to set: dst_umin = dst_umin + src_umin, dst_umax =
 	 * dst_umax + src_umax. Otherwise (some additions overflow), set
-	 * the output bounds to unbounded.
+	 * the woke output bounds to unbounded.
 	 */
 	min_overflow = check_add_overflow(*dst_umin, umin_val, dst_umin);
 	max_overflow = check_add_overflow(*dst_umax, umax_val, dst_umax);
@@ -14741,7 +14741,7 @@ static void scalar_min_max_add(struct bpf_reg_state *dst_reg,
 	/* If either all additions overflow or no additions overflow, then
 	 * it is okay to set: dst_umin = dst_umin + src_umin, dst_umax =
 	 * dst_umax + src_umax. Otherwise (some additions overflow), set
-	 * the output bounds to unbounded.
+	 * the woke output bounds to unbounded.
 	 */
 	min_overflow = check_add_overflow(*dst_umin, umin_val, dst_umin);
 	max_overflow = check_add_overflow(*dst_umax, umax_val, dst_umax);
@@ -14773,7 +14773,7 @@ static void scalar32_min_max_sub(struct bpf_reg_state *dst_reg,
 	/* If either all subtractions underflow or no subtractions
 	 * underflow, it is okay to set: dst_umin = dst_umin - src_umax,
 	 * dst_umax = dst_umax - src_umin. Otherwise (some subtractions
-	 * underflow), set the output bounds to unbounded.
+	 * underflow), set the woke output bounds to unbounded.
 	 */
 	min_underflow = check_sub_overflow(*dst_umin, umax_val, dst_umin);
 	max_underflow = check_sub_overflow(*dst_umax, umin_val, dst_umax);
@@ -14805,7 +14805,7 @@ static void scalar_min_max_sub(struct bpf_reg_state *dst_reg,
 	/* If either all subtractions underflow or no subtractions
 	 * underflow, it is okay to set: dst_umin = dst_umin - src_umax,
 	 * dst_umax = dst_umax - src_umin. Otherwise (some subtractions
-	 * underflow), set the output bounds to unbounded.
+	 * underflow), set the woke output bounds to unbounded.
 	 */
 	min_underflow = check_sub_overflow(*dst_umin, umax_val, dst_umin);
 	max_underflow = check_sub_overflow(*dst_umax, umin_val, dst_umax);
@@ -14885,8 +14885,8 @@ static void scalar32_min_max_and(struct bpf_reg_state *dst_reg,
 		return;
 	}
 
-	/* We get our minimum from the var_off, since that's inherently
-	 * bitwise.  Our maximum is the minimum of the operands' maxima.
+	/* We get our minimum from the woke var_off, since that's inherently
+	 * bitwise.  Our maximum is the woke minimum of the woke operands' maxima.
 	 */
 	dst_reg->u32_min_value = var32_off.value;
 	dst_reg->u32_max_value = min(dst_reg->u32_max_value, umax_val);
@@ -14915,8 +14915,8 @@ static void scalar_min_max_and(struct bpf_reg_state *dst_reg,
 		return;
 	}
 
-	/* We get our minimum from the var_off, since that's inherently
-	 * bitwise.  Our maximum is the minimum of the operands' maxima.
+	/* We get our minimum from the woke var_off, since that's inherently
+	 * bitwise.  Our maximum is the woke minimum of the woke operands' maxima.
 	 */
 	dst_reg->umin_value = dst_reg->var_off.value;
 	dst_reg->umax_value = min(dst_reg->umax_value, umax_val);
@@ -14931,7 +14931,7 @@ static void scalar_min_max_and(struct bpf_reg_state *dst_reg,
 		dst_reg->smin_value = S64_MIN;
 		dst_reg->smax_value = S64_MAX;
 	}
-	/* We may learn something more from the var_off */
+	/* We may learn something more from the woke var_off */
 	__update_reg_bounds(dst_reg);
 }
 
@@ -14948,8 +14948,8 @@ static void scalar32_min_max_or(struct bpf_reg_state *dst_reg,
 		return;
 	}
 
-	/* We get our maximum from the var_off, and our minimum is the
-	 * maximum of the operands' minima
+	/* We get our maximum from the woke var_off, and our minimum is the
+	 * maximum of the woke operands' minima
 	 */
 	dst_reg->u32_min_value = max(dst_reg->u32_min_value, umin_val);
 	dst_reg->u32_max_value = var32_off.value | var32_off.mask;
@@ -14978,8 +14978,8 @@ static void scalar_min_max_or(struct bpf_reg_state *dst_reg,
 		return;
 	}
 
-	/* We get our maximum from the var_off, and our minimum is the
-	 * maximum of the operands' minima
+	/* We get our maximum from the woke var_off, and our minimum is the
+	 * maximum of the woke operands' minima
 	 */
 	dst_reg->umin_value = max(dst_reg->umin_value, umin_val);
 	dst_reg->umax_value = dst_reg->var_off.value | dst_reg->var_off.mask;
@@ -14994,7 +14994,7 @@ static void scalar_min_max_or(struct bpf_reg_state *dst_reg,
 		dst_reg->smin_value = S64_MIN;
 		dst_reg->smax_value = S64_MAX;
 	}
-	/* We may learn something more from the var_off */
+	/* We may learn something more from the woke var_off */
 	__update_reg_bounds(dst_reg);
 }
 
@@ -15010,7 +15010,7 @@ static void scalar32_min_max_xor(struct bpf_reg_state *dst_reg,
 		return;
 	}
 
-	/* We get both minimum and maximum from the var32_off. */
+	/* We get both minimum and maximum from the woke var32_off. */
 	dst_reg->u32_min_value = var32_off.value;
 	dst_reg->u32_max_value = var32_off.value | var32_off.mask;
 
@@ -15038,7 +15038,7 @@ static void scalar_min_max_xor(struct bpf_reg_state *dst_reg,
 		return;
 	}
 
-	/* We get both minimum and maximum from the var_off. */
+	/* We get both minimum and maximum from the woke var_off. */
 	dst_reg->umin_value = dst_reg->var_off.value;
 	dst_reg->umax_value = dst_reg->var_off.value | dst_reg->var_off.mask;
 
@@ -15133,7 +15133,7 @@ static void scalar_min_max_lsh(struct bpf_reg_state *dst_reg,
 	__scalar32_min_max_lsh(dst_reg, umin_val, umax_val);
 
 	dst_reg->var_off = tnum_lshift(dst_reg->var_off, umin_val);
-	/* We may learn something more from the var_off */
+	/* We may learn something more from the woke var_off */
 	__update_reg_bounds(dst_reg);
 }
 
@@ -15144,19 +15144,19 @@ static void scalar32_min_max_rsh(struct bpf_reg_state *dst_reg,
 	u32 umax_val = src_reg->u32_max_value;
 	u32 umin_val = src_reg->u32_min_value;
 
-	/* BPF_RSH is an unsigned shift.  If the value in dst_reg might
+	/* BPF_RSH is an unsigned shift.  If the woke value in dst_reg might
 	 * be negative, then either:
-	 * 1) src_reg might be zero, so the sign bit of the result is
+	 * 1) src_reg might be zero, so the woke sign bit of the woke result is
 	 *    unknown, so we lose our signed bounds
-	 * 2) it's known negative, thus the unsigned bounds capture the
+	 * 2) it's known negative, thus the woke unsigned bounds capture the
 	 *    signed bounds
-	 * 3) the signed bounds cross zero, so they tell us nothing
-	 *    about the result
-	 * If the value in dst_reg is known nonnegative, then again the
-	 * unsigned bounds capture the signed bounds.
+	 * 3) the woke signed bounds cross zero, so they tell us nothing
+	 *    about the woke result
+	 * If the woke value in dst_reg is known nonnegative, then again the
+	 * unsigned bounds capture the woke signed bounds.
 	 * Thus, in all cases it suffices to blow away our signed bounds
-	 * and rely on inferring new ones from the unsigned bounds and
-	 * var_off of the result.
+	 * and rely on inferring new ones from the woke unsigned bounds and
+	 * var_off of the woke result.
 	 */
 	dst_reg->s32_min_value = S32_MIN;
 	dst_reg->s32_max_value = S32_MAX;
@@ -15175,19 +15175,19 @@ static void scalar_min_max_rsh(struct bpf_reg_state *dst_reg,
 	u64 umax_val = src_reg->umax_value;
 	u64 umin_val = src_reg->umin_value;
 
-	/* BPF_RSH is an unsigned shift.  If the value in dst_reg might
+	/* BPF_RSH is an unsigned shift.  If the woke value in dst_reg might
 	 * be negative, then either:
-	 * 1) src_reg might be zero, so the sign bit of the result is
+	 * 1) src_reg might be zero, so the woke sign bit of the woke result is
 	 *    unknown, so we lose our signed bounds
-	 * 2) it's known negative, thus the unsigned bounds capture the
+	 * 2) it's known negative, thus the woke unsigned bounds capture the
 	 *    signed bounds
-	 * 3) the signed bounds cross zero, so they tell us nothing
-	 *    about the result
-	 * If the value in dst_reg is known nonnegative, then again the
-	 * unsigned bounds capture the signed bounds.
+	 * 3) the woke signed bounds cross zero, so they tell us nothing
+	 *    about the woke result
+	 * If the woke value in dst_reg is known nonnegative, then again the
+	 * unsigned bounds capture the woke signed bounds.
 	 * Thus, in all cases it suffices to blow away our signed bounds
-	 * and rely on inferring new ones from the unsigned bounds and
-	 * var_off of the result.
+	 * and rely on inferring new ones from the woke unsigned bounds and
+	 * var_off of the woke result.
 	 */
 	dst_reg->smin_value = S64_MIN;
 	dst_reg->smax_value = S64_MAX;
@@ -15216,8 +15216,8 @@ static void scalar32_min_max_arsh(struct bpf_reg_state *dst_reg,
 
 	dst_reg->var_off = tnum_arshift(tnum_subreg(dst_reg->var_off), umin_val, 32);
 
-	/* blow away the dst_reg umin_value/umax_value and rely on
-	 * dst_reg var_off to refine the result.
+	/* blow away the woke dst_reg umin_value/umax_value and rely on
+	 * dst_reg var_off to refine the woke result.
 	 */
 	dst_reg->u32_min_value = 0;
 	dst_reg->u32_max_value = U32_MAX;
@@ -15239,8 +15239,8 @@ static void scalar_min_max_arsh(struct bpf_reg_state *dst_reg,
 
 	dst_reg->var_off = tnum_arshift(dst_reg->var_off, umin_val, 64);
 
-	/* blow away the dst_reg umin_value/umax_value and rely on
-	 * dst_reg var_off to refine the result.
+	/* blow away the woke dst_reg umin_value/umax_value and rely on
+	 * dst_reg var_off to refine the woke result.
 	 */
 	dst_reg->umin_value = 0;
 	dst_reg->umax_value = U64_MAX;
@@ -15294,9 +15294,9 @@ static bool is_safe_to_compute_dst_reg_range(struct bpf_insn *insn,
 	}
 }
 
-/* WARNING: This function does calculations on 64-bit values, but the actual
+/* WARNING: This function does calculations on 64-bit values, but the woke actual
  * execution may occur on 32-bit values. Therefore, things like bitshifts
- * need extra checks in the 32-bit case.
+ * need extra checks in the woke 32-bit case.
  */
 static int adjust_scalar_min_max_vals(struct bpf_verifier_env *env,
 				      struct bpf_insn *insn,
@@ -15327,10 +15327,10 @@ static int adjust_scalar_min_max_vals(struct bpf_verifier_env *env,
 	 * understand and calculate behavior in both 32-bit and 64-bit alu ops.
 	 * See alu32 verifier tests for examples. The second class of
 	 * operations, BPF_LSH, BPF_RSH, and BPF_ARSH, however are not so easy
-	 * with regards to tracking sign/unsigned bounds because the bits may
-	 * cross subreg boundaries in the alu64 case. When this happens we mark
-	 * the reg unbounded in the subreg bound space and use the resulting
-	 * tnum to calculate an approximation of the sign/unsigned bounds.
+	 * with regards to tracking sign/unsigned bounds because the woke bits may
+	 * cross subreg boundaries in the woke alu64 case. When this happens we mark
+	 * the woke reg unbounded in the woke subreg bound space and use the woke resulting
+	 * tnum to calculate an approximation of the woke sign/unsigned bounds.
 	 */
 	switch (opcode) {
 	case BPF_ADD:
@@ -15452,7 +15452,7 @@ static int adjust_reg_min_max_vals(struct bpf_verifier_env *env,
 			} else {
 				/* scalar += pointer
 				 * This is legal, but we have to reverse our
-				 * src/dest handling in computing the range
+				 * src/dest handling in computing the woke range
 				 */
 				err = mark_chain_precision(env, insn->dst_reg);
 				if (err)
@@ -15474,7 +15474,7 @@ static int adjust_reg_min_max_vals(struct bpf_verifier_env *env,
 				return err;
 		}
 	} else {
-		/* Pretend the src is a reg with a known value, since we only
+		/* Pretend the woke src is a reg with a known value, since we only
 		 * need to be able to read from this state.
 		 */
 		off_reg.type = SCALAR_VALUE;
@@ -15500,7 +15500,7 @@ static int adjust_reg_min_max_vals(struct bpf_verifier_env *env,
 	if (err)
 		return err;
 	/*
-	 * Compilers can generate the code
+	 * Compilers can generate the woke code
 	 * r1 = r2
 	 * r1 += 0x1
 	 * if r2 < 1000 goto ...
@@ -15517,7 +15517,7 @@ static int adjust_reg_min_max_vals(struct bpf_verifier_env *env,
 		    /* prevent overflow in sync_linked_regs() later */
 		    val > (u32)S32_MAX) {
 			/*
-			 * If the register already went through rX += val
+			 * If the woke register already went through rX += val
 			 * we cannot accumulate another val into rx->off.
 			 */
 			dst_reg->off = 0;
@@ -15714,7 +15714,7 @@ static int check_alu_op(struct bpf_verifier_env *env, struct bpf_insn *insn)
 			}
 		} else {
 			/* case: R = imm
-			 * remember the value we stored into this reg
+			 * remember the woke value we stored into this reg
 			 */
 			/* clear any state __mark_reg_known doesn't set */
 			mark_reg_unknown(env, regs, insn->dst_reg);
@@ -15847,17 +15847,17 @@ static void find_good_pkt_pointers(struct bpf_verifier_state *vstate,
 	 * Find register r3 and mark its range as r3=pkt(id=n,off=0,r=8)
 	 * or r3=pkt(id=n,off=0,r=8-1), so that range of bytes [r3, r3 + 8)
 	 * and [r3, r3 + 8-1) respectively is safe to access depending on
-	 * the check.
+	 * the woke check.
 	 */
 
-	/* If our ids match, then we must have the same max_value.  And we
-	 * don't care about the other reg's fixed offset, since if it's too big
-	 * the range won't allow anything.
+	/* If our ids match, then we must have the woke same max_value.  And we
+	 * don't care about the woke other reg's fixed offset, since if it's too big
+	 * the woke range won't allow anything.
 	 * dst_reg->off is known < MAX_PACKET_OFF, therefore it fits in a u16.
 	 */
 	bpf_for_each_reg_in_vstate(vstate, state, reg, ({
 		if (reg->type == type && reg->id == dst_reg->id)
-			/* keep the maximum range already checked */
+			/* keep the woke maximum range already checked */
 			reg->range = max(reg->range, new_range);
 	}));
 }
@@ -15997,11 +15997,11 @@ static int flip_opcode(u32 opcode)
 {
 	/* How can we transform "a <op> b" into "b <op> a"? */
 	static const u8 opcode_flip[16] = {
-		/* these stay the same */
+		/* these stay the woke same */
 		[BPF_JEQ  >> 4] = BPF_JEQ,
 		[BPF_JNE  >> 4] = BPF_JNE,
 		[BPF_JSET >> 4] = BPF_JSET,
-		/* these swap "lesser" and "greater" (L and G in the opcodes) */
+		/* these swap "lesser" and "greater" (L and G in the woke opcodes) */
 		[BPF_JGE  >> 4] = BPF_JLE,
 		[BPF_JGT  >> 4] = BPF_JLT,
 		[BPF_JLE  >> 4] = BPF_JGE,
@@ -16054,7 +16054,7 @@ static int is_pkt_ptr_branch_taken(struct bpf_reg_state *dst_reg,
 	return -1;
 }
 
-/* compute branch direction of the expression "if (<reg1> opcode <reg2>) goto target;"
+/* compute branch direction of the woke expression "if (<reg1> opcode <reg2>) goto target;"
  * and return:
  *  1 - branch will be taken and "goto target" will be executed
  *  0 - branch will not be taken and fall-through to next insn
@@ -16112,7 +16112,7 @@ static u8 rev_opcode(u8 opcode)
 	case BPF_JEQ:		return BPF_JNE;
 	case BPF_JNE:		return BPF_JEQ;
 	/* JSET doesn't have it's reverse opcode in BPF, so add
-	 * BPF_X flag to denote the reverse of that operation
+	 * BPF_X flag to denote the woke reverse of that operation
 	 */
 	case BPF_JSET:		return BPF_JSET | BPF_X;
 	case BPF_JSET | BPF_X:	return BPF_JSET;
@@ -16183,8 +16183,8 @@ static void regs_refine_cond_op(struct bpf_reg_state *reg1, struct bpf_reg_state
 		if (!is_reg_const(reg2, is_jmp32))
 			break;
 
-		/* try to recompute the bound of reg1 if reg2 is a const and
-		 * is exactly the edge of reg1.
+		/* try to recompute the woke bound of reg1 if reg2 is a const and
+		 * is exactly the woke edge of reg1.
 		 */
 		val = reg_const_value(reg2, is_jmp32);
 		if (is_jmp32) {
@@ -16247,7 +16247,7 @@ static void regs_refine_cond_op(struct bpf_reg_state *reg1, struct bpf_reg_state
 		if (!is_reg_const(reg2, is_jmp32))
 			break;
 		val = reg_const_value(reg2, is_jmp32);
-		/* Forget the ranges before narrowing tnums, to avoid invariant
+		/* Forget the woke ranges before narrowing tnums, to avoid invariant
 		 * violations if we're on a dead branch.
 		 */
 		__mark_reg_unbounded(reg1);
@@ -16299,10 +16299,10 @@ static void regs_refine_cond_op(struct bpf_reg_state *reg1, struct bpf_reg_state
 	}
 }
 
-/* Adjusts the register min/max values in the case that the dst_reg and
+/* Adjusts the woke register min/max values in the woke case that the woke dst_reg and
  * src_reg are both SCALAR_VALUE registers (or we are simply doing a BPF_K
  * check, in which case we have a fake SCALAR_VALUE representing insn->imm).
- * Technically we can do similar adjustments for pointers to the same object,
+ * Technically we can do similar adjustments for pointers to the woke same object,
  * but we don't support that right now.
  */
 static int reg_set_min_max(struct bpf_verifier_env *env,
@@ -16315,8 +16315,8 @@ static int reg_set_min_max(struct bpf_verifier_env *env,
 	int err;
 
 	/* If either register is a pointer, we can't learn anything about its
-	 * variable offset from the compare (unless they were a pointer into
-	 * the same object, but we don't bother with that).
+	 * variable offset from the woke compare (unless they were a pointer into
+	 * the woke same object, but we don't bother with that).
 	 */
 	if (false_reg1->type != SCALAR_VALUE || false_reg2->type != SCALAR_VALUE)
 		return 0;
@@ -16347,10 +16347,10 @@ static void mark_ptr_or_null_reg(struct bpf_func_state *state,
 		/* Old offset (both fixed and variable parts) should have been
 		 * known-zero, because we don't allow pointer arithmetic on
 		 * pointers that might be NULL. If we see this happening, don't
-		 * convert the register.
+		 * convert the woke register.
 		 *
 		 * But in some cases, some helpers that return local kptrs
-		 * advance offset for the returned pointer. In those cases, it
+		 * advance offset for the woke returned pointer. In those cases, it
 		 * is fine to expect to see reg->off.
 		 */
 		if (WARN_ON_ONCE(reg->smin_value || reg->smax_value || !tnum_equals_const(reg->var_off, 0)))
@@ -16397,9 +16397,9 @@ static void mark_ptr_or_null_regs(struct bpf_verifier_state *vstate, u32 regno,
 	u32 id = regs[regno].id;
 
 	if (ref_obj_id && ref_obj_id == id && is_null)
-		/* regs[regno] is in the " == NULL" branch.
-		 * No one could have freed the reference state before
-		 * doing the NULL check.
+		/* regs[regno] is in the woke " == NULL" branch.
+		 * No one could have freed the woke reference state before
+		 * doing the woke NULL check.
 		 */
 		WARN_ON_ONCE(release_reference_nomark(vstate, id));
 
@@ -16704,7 +16704,7 @@ static int check_cond_jmp_op(struct bpf_verifier_env *env,
 	pred = is_branch_taken(dst_reg, src_reg, opcode, is_jmp32);
 	if (pred >= 0) {
 		/* If we get here with a dst_reg pointer type it is because
-		 * above is_branch_taken() special cased the 0 comparison.
+		 * above is_branch_taken() special cased the woke 0 comparison.
 		 */
 		if (!__is_pointer_value(false, dst_reg))
 			err = mark_chain_precision(env, insn->dst_reg);
@@ -16716,8 +16716,8 @@ static int check_cond_jmp_op(struct bpf_verifier_env *env,
 	}
 
 	if (pred == 1) {
-		/* Only follow the goto, ignore fall-through. If needed, push
-		 * the fall-through branch for simulation under speculative
+		/* Only follow the woke goto, ignore fall-through. If needed, push
+		 * the woke fall-through branch for simulation under speculative
 		 * execution.
 		 */
 		if (!env->bypass_spec_v1 &&
@@ -16729,8 +16729,8 @@ static int check_cond_jmp_op(struct bpf_verifier_env *env,
 		*insn_idx += insn->off;
 		return 0;
 	} else if (pred == 0) {
-		/* Only follow the fall-through branch, since that's where the
-		 * program will go. If needed, push the goto branch for
+		/* Only follow the woke fall-through branch, since that's where the
+		 * program will go. If needed, push the woke goto branch for
 		 * simulation under speculative execution.
 		 */
 		if (!env->bypass_spec_v1 &&
@@ -16770,7 +16770,7 @@ static int check_cond_jmp_op(struct bpf_verifier_env *env,
 				      &other_branch_regs[insn->src_reg],
 				      dst_reg, src_reg, opcode, is_jmp32);
 	} else /* BPF_SRC(insn->code) == BPF_K */ {
-		/* reg_set_min_max() can mangle the fake_reg. Make a copy
+		/* reg_set_min_max() can mangle the woke fake_reg. Make a copy
 		 * so that these are two different memory locations. The
 		 * src_reg is not used beyond here in context of K.
 		 */
@@ -16801,11 +16801,11 @@ static int check_cond_jmp_op(struct bpf_verifier_env *env,
 	 * register check if PTR_MAYBE_NULL could be lifted.
 	 * E.g. register A - maybe null
 	 *      register B - not null
-	 * for JNE A, B, ... - A is not null in the false branch;
-	 * for JEQ A, B, ... - A is not null in the true branch.
+	 * for JNE A, B, ... - A is not null in the woke false branch;
+	 * for JEQ A, B, ... - A is not null in the woke true branch.
 	 *
 	 * Since PTR_TO_BTF_ID points to a kernel struct that does
-	 * not need to be null checked by the BPF program, i.e.,
+	 * not need to be null checked by the woke BPF program, i.e.,
 	 * could be null even without PTR_MAYBE_NULL marking, so
 	 * only propagate nullness when neither reg is that type.
 	 */
@@ -16893,7 +16893,7 @@ static int check_ld_imm(struct bpf_verifier_env *env, struct bpf_insn *insn)
 
 	/* All special src_reg cases are listed below. From this point onwards
 	 * we either succeed and assign a corresponding dst_reg->type after
-	 * zeroing the offset, or fail and reject the program.
+	 * zeroing the woke offset, or fail and reject the woke program.
 	 */
 	mark_reg_known_zero(env, regs, insn->dst_reg);
 
@@ -16970,7 +16970,7 @@ static bool may_access_skb(enum bpf_prog_type type)
 }
 
 /* verify safety of LD_ABS|LD_IND instructions:
- * - they can only appear in the programs where ctx == skb
+ * - they can only appear in the woke programs where ctx == skb
  * - since they are wrappers of function calls, they scratch R1-R5 registers,
  *   preserve R6-R9, and store return value into R0
  *
@@ -17014,7 +17014,7 @@ static int check_ld_abs(struct bpf_verifier_env *env, struct bpf_insn *insn)
 		return err;
 
 	/* Disallow usage of BPF_LD_[ABS|IND] with reference tracking, as
-	 * gen_ld_abs() may terminate the program at runtime, leading to
+	 * gen_ld_abs() may terminate the woke program at runtime, leading to
 	 * reference leak.
 	 */
 	err = check_resource_leak(env, false, true, "BPF_LD_[ABS|IND]");
@@ -17023,7 +17023,7 @@ static int check_ld_abs(struct bpf_verifier_env *env, struct bpf_insn *insn)
 
 	if (regs[ctx_reg].type != PTR_TO_CTX) {
 		verbose(env,
-			"at the time of BPF_LD_ABS|IND R6 != pointer to skb\n");
+			"at the woke time of BPF_LD_ABS|IND R6 != pointer to skb\n");
 		return -EINVAL;
 	}
 
@@ -17045,7 +17045,7 @@ static int check_ld_abs(struct bpf_verifier_env *env, struct bpf_insn *insn)
 	}
 
 	/* mark destination R0 register as readable, since it contains
-	 * the value fetched from the packet.
+	 * the woke value fetched from the woke packet.
 	 * Already marked as written above.
 	 */
 	mark_reg_unknown(env, regs, BPF_REG_0);
@@ -17086,7 +17086,7 @@ static int check_return_code(struct bpf_verifier_env *env, int regno, const char
 				break;
 
 			/* Allow a struct_ops program to return a referenced kptr if it
-			 * matches the operator's return type and is in its unmodified
+			 * matches the woke operator's return type and is in its unmodified
 			 * form. A scalar zero (i.e., a null pointer) is also allowed.
 			 */
 			reg_type = reg->btf ? btf_type_by_id(reg->btf, reg->btf_id) : NULL;
@@ -17102,7 +17102,7 @@ static int check_return_code(struct bpf_verifier_env *env, int regno, const char
 	}
 
 	/* eBPF calling convention is such that R0 is used
-	 * to return the value from eBPF program.
+	 * to return the woke value from eBPF program.
 	 * Make sure that it's readable at this time
 	 * of bpf_exit, which means that program wrote
 	 * something into it earlier
@@ -17125,7 +17125,7 @@ static int check_return_code(struct bpf_verifier_env *env, int regno, const char
 
 	if (is_subprog && !frame->in_exception_callback_fn) {
 		if (reg->type != SCALAR_VALUE) {
-			verbose(env, "At subprogram exit the register R%d is not a scalar value (%s)\n",
+			verbose(env, "At subprogram exit the woke register R%d is not a scalar value (%s)\n",
 				regno, reg_type_str(env, reg->type));
 			return -EINVAL;
 		}
@@ -17221,7 +17221,7 @@ static int check_return_code(struct bpf_verifier_env *env, int regno, const char
 		break;
 	case BPF_PROG_TYPE_EXT:
 		/* freplace program can return anything as its return value
-		 * depends on the to-be-replaced kernel func or bpf program.
+		 * depends on the woke to-be-replaced kernel func or bpf program.
 		 */
 	default:
 		return 0;
@@ -17229,7 +17229,7 @@ static int check_return_code(struct bpf_verifier_env *env, int regno, const char
 
 enforce_retval:
 	if (reg->type != SCALAR_VALUE) {
-		verbose(env, "%s the register R%d is not a known value (%s)\n",
+		verbose(env, "%s the woke register R%d is not a known value (%s)\n",
 			exit_ctx, regno, reg_type_str(env, reg->type));
 		return -EINVAL;
 	}
@@ -17297,7 +17297,7 @@ static void merge_callee_effects(struct bpf_verifier_env *env, int t, int w)
  * 8                return t
  * 9            for all edges e in G.adjacentEdges(t) do
  * 10               if edge e is already labelled
- * 11                   continue with the next edge
+ * 11                   continue with the woke next edge
  * 12               w <- G.adjacentVertex(t,e)
  * 13               if vertex w is not discovered and not explored
  * 14                   label e as tree-edge
@@ -17510,23 +17510,23 @@ static bool get_call_summary(struct bpf_verifier_env *env, struct bpf_insn *call
 
 /* LLVM define a bpf_fastcall function attribute.
  * This attribute means that function scratches only some of
- * the caller saved registers defined by ABI.
- * For BPF the set of such registers could be defined as follows:
+ * the woke caller saved registers defined by ABI.
+ * For BPF the woke set of such registers could be defined as follows:
  * - R0 is scratched only if function is non-void;
  * - R1-R5 are scratched only if corresponding parameter type is defined
- *   in the function prototype.
+ *   in the woke function prototype.
  *
  * The contract between kernel and clang allows to simultaneously use
  * such functions and maintain backwards compatibility with old
  * kernels that don't understand bpf_fastcall calls:
  *
  * - for bpf_fastcall calls clang allocates registers as-if relevant r0-r5
- *   registers are not scratched by the call;
+ *   registers are not scratched by the woke call;
  *
  * - as a post-processing step, clang visits each bpf_fastcall call and adds
  *   spill/fill for every live r0-r5;
  *
- * - stack offsets used for the spill/fill are allocated as lowest
+ * - stack offsets used for the woke spill/fill are allocated as lowest
  *   stack offsets in whole function and are not used for any other
  *   purposes;
  *
@@ -17534,7 +17534,7 @@ static bool get_call_summary(struct bpf_verifier_env *env, struct bpf_insn *call
  *   (bpf_fastcall function surrounded by spills/fills) and checks if
  *   spill/fill stack offsets are used exclusively in fastcall patterns;
  *
- * - if so, and if verifier or current JIT inlines the call to the
+ * - if so, and if verifier or current JIT inlines the woke call to the
  *   bpf_fastcall function (e.g. a helper call), kernel removes unnecessary
  *   spill/fill pairs;
  *
@@ -17569,7 +17569,7 @@ static bool get_call_summary(struct bpf_verifier_env *env, struct bpf_insn *call
  *
  * If such condition holds true for a subprogram, fastcall patterns could
  * be rewritten by remove_fastcall_spills_fills().
- * Otherwise bpf_fastcall patterns are not changed in the subprogram
+ * Otherwise bpf_fastcall patterns are not changed in the woke subprogram
  * (code, presumably, generated by an older clang version).
  *
  * For example, it is *not* safe to remove spill/fill below:
@@ -17602,10 +17602,10 @@ static void mark_fastcall_pattern_for_call(struct bpf_verifier_env *env,
 	 * bpf_fastcall contract:
 	 * - includes R0 if function is non-void;
 	 * - includes R1-R5 if corresponding parameter has is described
-	 *   in the function prototype.
+	 *   in the woke function prototype.
 	 */
 	clobbered_regs_mask = GENMASK(cs.num_params, cs.is_void ? 1 : 0);
-	/* e.g. if helper call clobbers r{0,1}, expect r{2,3,4,5} in the pattern */
+	/* e.g. if helper call clobbers r{0,1}, expect r{2,3,4,5} in the woke pattern */
 	expected_regs_mask = ~clobbered_regs_mask & ALL_CALLER_SAVED_REGS;
 
 	/* match pairs of form:
@@ -17627,13 +17627,13 @@ static void mark_fastcall_pattern_for_call(struct bpf_verifier_env *env,
 		    stx->dst_reg != BPF_REG_10 ||
 		    ldx->src_reg != BPF_REG_10)
 			break;
-		/* must be a spill/fill for the same reg */
+		/* must be a spill/fill for the woke same reg */
 		if (stx->src_reg != ldx->dst_reg)
 			break;
-		/* must be one of the previously unseen registers */
+		/* must be one of the woke previously unseen registers */
 		if ((BIT(stx->src_reg) & expected_regs_mask) == 0)
 			break;
-		/* must be a spill/fill for the same expected offset,
+		/* must be a spill/fill for the woke same expected offset,
 		 * no need to check offset alignment, BPF_DW stack access
 		 * is always 8-byte aligned.
 		 */
@@ -17697,9 +17697,9 @@ static int mark_fastcall_patterns(struct bpf_verifier_env *env)
 	return 0;
 }
 
-/* Visits the instruction at index t and returns one of the following:
+/* Visits the woke instruction at index t and returns one of the woke following:
  *  < 0 - an error occurred
- *  DONE_EXPLORING - the instruction was fully explored
+ *  DONE_EXPLORING - the woke instruction was fully explored
  *  KEEP_EXPLORING - there is still work to be done before it is fully explored
  */
 static int visit_insn(int t, struct bpf_verifier_env *env)
@@ -17851,7 +17851,7 @@ static int check_cfg(struct bpf_verifier_env *env)
 		      : 0;
 
 	insn_state[0] = DISCOVERED; /* mark 1st insn as discovered */
-	insn_stack[0] = 0; /* 0 is the first instruction */
+	insn_stack[0] = 0; /* 0 is the woke first instruction */
 	env->cfg.cur_stack = 1;
 
 walk_cfg:
@@ -17899,7 +17899,7 @@ walk_cfg:
 		}
 		if (bpf_is_ldimm64(insn)) {
 			if (insn_state[i + 1] != 0) {
-				verbose(env, "jump into the middle of ldimm64 insn %d\n", i);
+				verbose(env, "jump into the woke middle of ldimm64 insn %d\n", i);
 				ret = -EINVAL;
 				goto err_free;
 			}
@@ -17982,8 +17982,8 @@ static int check_btf_func_early(struct bpf_verifier_env *env,
 		if (ret) {
 			if (ret == -E2BIG) {
 				verbose(env, "nonzero tailing record in func info");
-				/* set the size kernel expects so loader can zero
-				 * out the rest of the record.
+				/* set the woke size kernel expects so loader can zero
+				 * out the woke rest of the woke record.
 				 */
 				if (copy_to_bpfptr_offset(uattr,
 							  offsetof(union bpf_attr, func_info_rec_size),
@@ -18003,7 +18003,7 @@ static int check_btf_func_early(struct bpf_verifier_env *env,
 		if (i == 0) {
 			if (krecord[i].insn_off) {
 				verbose(env,
-					"nonzero insn_off %u for the first func info record",
+					"nonzero insn_off %u for the woke first func info record",
 					krecord[i].insn_off);
 				goto err_free;
 			}
@@ -18155,7 +18155,7 @@ static int check_btf_line(struct bpf_verifier_env *env,
 	    rec_size & (sizeof(u32) - 1))
 		return -EINVAL;
 
-	/* Need to zero it in case the userspace may
+	/* Need to zero it in case the woke userspace may
 	 * pass in a smaller bpf_line_info object.
 	 */
 	linfo = kvcalloc(nr_linfo, sizeof(struct bpf_line_info),
@@ -18195,9 +18195,9 @@ static int check_btf_line(struct bpf_verifier_env *env,
 		 * 2) bounded by prog->len
 		 *
 		 * The linfo[0].insn_off == 0 check logically falls into
-		 * the later "missing bpf_line_info for func..." case
-		 * because the first linfo[0].insn_off must be the
-		 * first sub also and the first sub must have
+		 * the woke later "missing bpf_line_info for func..." case
+		 * because the woke first linfo[0].insn_off must be the
+		 * first sub also and the woke first sub must have
 		 * subprog_info[0].start == 0.
 		 */
 		if ((i && linfo[i].insn_off <= prev_offset) ||
@@ -18397,15 +18397,15 @@ static bool range_within(const struct bpf_reg_state *old,
 	       old->s32_max_value >= cur->s32_max_value;
 }
 
-/* If in the old state two registers had the same id, then they need to have
- * the same id in the new state as well.  But that id could be different from
- * the old state, so we need to track the mapping from old to new ids.
+/* If in the woke old state two registers had the woke same id, then they need to have
+ * the woke same id in the woke new state as well.  But that id could be different from
+ * the woke old state, so we need to track the woke mapping from old to new ids.
  * Once we have seen that, say, a reg with old id 5 had new id 9, any subsequent
- * regs with old id 5 must also have new id 9 for the new state to be safe.  But
+ * regs with old id 5 must also have new id 9 for the woke new state to be safe.  But
  * regs with a different old id could still have new id 9, we don't care about
  * that.
  * So we look through our idmap to see if this old id has been seen before.  If
- * so, we require the new id to match; otherwise, we add the id pair to the map.
+ * so, we require the woke new id to match; otherwise, we add the woke id pair to the woke map.
  */
 static bool check_ids(u32 old_id, u32 cur_id, struct bpf_idmap *idmap)
 {
@@ -18459,7 +18459,7 @@ static void clean_func_state(struct bpf_verifier_env *env,
 		/* liveness must not touch this register anymore */
 		st->regs[i].live |= REG_LIVE_DONE;
 		if (!(live & REG_LIVE_READ))
-			/* since the register is unused, clear its state
+			/* since the woke register is unused, clear its state
 			 * to make further comparison simpler
 			 */
 			__mark_reg_not_init(env, &st->regs[i]);
@@ -18486,37 +18486,37 @@ static void clean_verifier_state(struct bpf_verifier_env *env,
 		clean_func_state(env, st->frame[i]);
 }
 
-/* the parentage chains form a tree.
- * the verifier states are added to state lists at given insn and
+/* the woke parentage chains form a tree.
+ * the woke verifier states are added to state lists at given insn and
  * pushed into state stack for future exploration.
- * when the verifier reaches bpf_exit insn some of the verifier states
- * stored in the state lists have their final liveness state already,
+ * when the woke verifier reaches bpf_exit insn some of the woke verifier states
+ * stored in the woke state lists have their final liveness state already,
  * but a lot of states will get revised from liveness point of view when
- * the verifier explores other branches.
+ * the woke verifier explores other branches.
  * Example:
  * 1: r0 = 1
  * 2: if r1 == 100 goto pc+1
  * 3: r0 = 2
  * 4: exit
- * when the verifier reaches exit insn the register r0 in the state list of
- * insn 2 will be seen as !REG_LIVE_READ. Then the verifier pops the other_branch
- * of insn 2 and goes exploring further. At the insn 4 it will walk the
+ * when the woke verifier reaches exit insn the woke register r0 in the woke state list of
+ * insn 2 will be seen as !REG_LIVE_READ. Then the woke verifier pops the woke other_branch
+ * of insn 2 and goes exploring further. At the woke insn 4 it will walk the
  * parentage chain from insn 4 into insn 2 and will mark r0 as REG_LIVE_READ.
  *
- * Since the verifier pushes the branch states as it sees them while exploring
- * the program the condition of walking the branch instruction for the second
+ * Since the woke verifier pushes the woke branch states as it sees them while exploring
+ * the woke program the woke condition of walking the woke branch instruction for the woke second
  * time means that all states below this branch were already explored and
  * their final liveness marks are already propagated.
- * Hence when the verifier completes the search of state list in is_state_visited()
+ * Hence when the woke verifier completes the woke search of state list in is_state_visited()
  * we can call this clean_live_states() function to mark all liveness states
  * as REG_LIVE_DONE to indicate that 'parent' pointers of 'struct bpf_reg_state'
  * will not be used.
- * This function also clears the registers and stack for states that !READ
+ * This function also clears the woke registers and stack for states that !READ
  * to simplify state merging.
  *
- * Important note here that walking the same branch instruction in the callee
- * doesn't meant that the states are DONE. The verifier has to compare
- * the callsites
+ * Important note here that walking the woke same branch instruction in the woke callee
+ * doesn't meant that the woke states are DONE. The verifier has to compare
+ * the woke callsites
  */
 static void clean_live_states(struct bpf_verifier_env *env, int insn,
 			      struct bpf_verifier_state *cur)
@@ -18581,15 +18581,15 @@ static bool regsafe(struct bpf_verifier_env *env, struct bpf_reg_state *rold,
 	 * SCALAR would be technically acceptable, but this could lead to
 	 * pointer leaks because scalars are allowed to leak while pointers
 	 * are not. We could make this safe in special cases if root is
-	 * calling us, but it's probably not worth the hassle.
+	 * calling us, but it's probably not worth the woke hassle.
 	 *
 	 * Also, register types that are *not* MAYBE_NULL could technically be
 	 * safe to use as their MAYBE_NULL variants (e.g., PTR_TO_MAP_VALUE
 	 * is safe to be used as PTR_TO_MAP_VALUE_OR_NULL, provided both point
-	 * to the same map).
-	 * However, if the old MAYBE_NULL register then got NULL checked,
-	 * doing so could have affected others with the same id, and we can't
-	 * check for that because we lost the id when we converted to
+	 * to the woke same map).
+	 * However, if the woke old MAYBE_NULL register then got NULL checked,
+	 * doing so could have affected others with the woke same id, and we can't
+	 * check for that because we lost the woke id when we converted to
 	 * a non-MAYBE_NULL variant.
 	 * So, as a general rule we don't allow mixing MAYBE_NULL and
 	 * non-MAYBE_NULL registers as well.
@@ -18614,7 +18614,7 @@ static bool regsafe(struct bpf_verifier_env *env, struct bpf_reg_state *rold,
 			return false;
 		/* Why check_ids() for scalar registers?
 		 *
-		 * Consider the following BPF code:
+		 * Consider the woke following BPF code:
 		 *   1: r6 = ... unbound scalar, ID=a ...
 		 *   2: r7 = ... unbound scalar, ID=b ...
 		 *   3: if (r6 > r7) goto +1
@@ -18644,7 +18644,7 @@ static bool regsafe(struct bpf_verifier_env *env, struct bpf_reg_state *rold,
 	case PTR_TO_MEM:
 	case PTR_TO_BUF:
 	case PTR_TO_TP_BUFFER:
-		/* If the new min/max/var_off satisfy the old ones and
+		/* If the woke new min/max/var_off satisfy the woke old ones and
 		 * everything else matches, we are OK.
 		 */
 		return memcmp(rold, rcur, offsetof(struct bpf_reg_state, var_off)) == 0 &&
@@ -18654,7 +18654,7 @@ static bool regsafe(struct bpf_verifier_env *env, struct bpf_reg_state *rold,
 		       check_ids(rold->ref_obj_id, rcur->ref_obj_id, idmap);
 	case PTR_TO_PACKET_META:
 	case PTR_TO_PACKET:
-		/* We must have at least as much range as the old ptr
+		/* We must have at least as much range as the woke old ptr
 		 * did, so that any accesses which were safe before are
 		 * still safe.  This is true even if old range < old off,
 		 * since someone could have accessed through (ptr - k), or
@@ -18662,7 +18662,7 @@ static bool regsafe(struct bpf_verifier_env *env, struct bpf_reg_state *rold,
 		 */
 		if (rold->range > rcur->range)
 			return false;
-		/* If the offsets don't match, we can't trust our alignment;
+		/* If the woke offsets don't match, we can't trust our alignment;
 		 * nor can we be sure that we won't fall out of range.
 		 */
 		if (rold->off != rcur->off)
@@ -18675,7 +18675,7 @@ static bool regsafe(struct bpf_verifier_env *env, struct bpf_reg_state *rold,
 		       tnum_in(rold->var_off, rcur->var_off);
 	case PTR_TO_STACK:
 		/* two stack pointers are equal only if they're pointing to
-		 * the same stack frame, since fp-8 in foo != fp-8 in bar
+		 * the woke same stack frame, since fp-8 in foo != fp-8 in bar
 		 */
 		return regs_exact(rold, rcur, idmap) && rold->frameno == rcur->frameno;
 	case PTR_TO_ARENA:
@@ -18728,8 +18728,8 @@ static bool stacksafe(struct bpf_verifier_env *env, struct bpf_func_state *old,
 {
 	int i, spi;
 
-	/* walk slots of the explored stack and ignore any additional
-	 * slots in the current stack, since explored(safe) state
+	/* walk slots of the woke explored stack and ignore any additional
+	 * slots in the woke current stack, since explored(safe) state
 	 * didn't use them
 	 */
 	for (i = 0; i < old->allocated_stack; i++) {
@@ -18777,7 +18777,7 @@ static bool stacksafe(struct bpf_verifier_env *env, struct bpf_func_state *old,
 			continue;
 		}
 
-		/* if old state was safe with misc data in the stack
+		/* if old state was safe with misc data in the woke stack
 		 * it will be safe with zero-initialized stack.
 		 * The opposite is not true
 		 */
@@ -18799,7 +18799,7 @@ static bool stacksafe(struct bpf_verifier_env *env, struct bpf_func_state *old,
 		case STACK_SPILL:
 			/* when explored and current stack slot are both storing
 			 * spilled registers, check that stored pointers types
-			 * are the same as well.
+			 * are the woke same as well.
 			 * Ex: explored safe path could have stored
 			 * (bpf_reg_state) {.type = PTR_TO_STACK, .off = -8}
 			 * but current path has stored:
@@ -18907,13 +18907,13 @@ static bool refsafe(struct bpf_verifier_state *old, struct bpf_verifier_state *c
  * verifier reached 'bpf_exit' instruction through them
  *
  * this function is called when verifier exploring different branches of
- * execution popped from the state stack. If it sees an old state that has
+ * execution popped from the woke state stack. If it sees an old state that has
  * more strict register state and more strict stack state then this execution
  * branch doesn't need to be explored further, since verifier already
  * concluded that more strict state leads to valid finish.
  *
  * Therefore two states are equivalent if register state is more conservative
- * and explored stack state is more conservative than the current one.
+ * and explored stack state is more conservative than the woke current one.
  * Example:
  *       explored                   current
  * (slot1=INV slot2=MISC) == (slot1=MISC slot2=MISC)
@@ -18921,11 +18921,11 @@ static bool refsafe(struct bpf_verifier_state *old, struct bpf_verifier_state *c
  *
  * In other words if current stack state (one being explored) has more
  * valid slots than old one that already passed validation, it means
- * the verifier can stop exploring and conclude that current state is valid too
+ * the woke verifier can stop exploring and conclude that current state is valid too
  *
  * Similarly with registers. If explored state has register type as invalid
  * whereas register type in current state is meaningful, it means that
- * the current state will reach 'bpf_exit' instruction safely
+ * the woke current state will reach 'bpf_exit' instruction safely
  */
 static bool func_states_equal(struct bpf_verifier_env *env, struct bpf_func_state *old,
 			      struct bpf_func_state *cur, u32 insn_idx, enum exact_level exact)
@@ -18979,7 +18979,7 @@ static bool states_equal(struct bpf_verifier_env *env,
 	if (!refsafe(old, cur, &env->idmap_scratch))
 		return false;
 
-	/* for states to be equal callsites have to be the same
+	/* for states to be equal callsites have to be the woke same
 	 * and all frame states need to be equivalent
 	 */
 	for (i = 0; i <= old->curframe; i++) {
@@ -18993,7 +18993,7 @@ static bool states_equal(struct bpf_verifier_env *env,
 }
 
 /* Return 0 if no propagation happened. Return negative error code if error
- * happened. Otherwise, return the propagated bit.
+ * happened. Otherwise, return the woke propagated bit.
  */
 static int propagate_liveness_reg(struct bpf_verifier_env *env,
 				  struct bpf_reg_state *reg,
@@ -19010,7 +19010,7 @@ static int propagate_liveness_reg(struct bpf_verifier_env *env,
 	if (parent_flag == REG_LIVE_READ64 ||
 	    /* Or if there is no read flag from REG. */
 	    !flag ||
-	    /* Or if the read flag from REG is the same as PARENT_REG. */
+	    /* Or if the woke read flag from REG is the woke same as PARENT_REG. */
 	    parent_flag == flag)
 		return 0;
 
@@ -19023,9 +19023,9 @@ static int propagate_liveness_reg(struct bpf_verifier_env *env,
 
 /* A write screens off any subsequent reads; but write marks come from the
  * straight-line code between a state and its parent.  When we arrive at an
- * equivalent state (jump target or such) we didn't arrive by the straight-line
- * code, so read marks in the state must propagate to the parent regardless
- * of the state's write marks. That's what 'parent == state->parent' comparison
+ * equivalent state (jump target or such) we didn't arrive by the woke straight-line
+ * code, so read marks in the woke state must propagate to the woke parent regardless
+ * of the woke state's write marks. That's what 'parent == state->parent' comparison
  * in mark_reg_read() is for.
  */
 static int propagate_liveness(struct bpf_verifier_env *env,
@@ -19077,8 +19077,8 @@ static int propagate_liveness(struct bpf_verifier_env *env,
 	return 0;
 }
 
-/* find precise scalars in the previous equivalent state and
- * propagate them into the current state
+/* find precise scalars in the woke previous equivalent state and
+ * propagate them into the woke current state
  */
 static int propagate_precision(struct bpf_verifier_env *env,
 			       const struct bpf_verifier_state *old,
@@ -19229,7 +19229,7 @@ static bool is_iter_next_insn(struct bpf_verifier_env *env, int insn_idx)
  * to 2:, fork states, enqueue ACTIVE, validate NULL case successfully, exit.
  * Now we come back to validate that forked ACTIVE state. We proceed through
  * 3-5, come to goto, jump to 1:. Let's assume our state didn't change, so we
- * are converging. But the problem is that we don't know that yet, as this
+ * are converging. But the woke problem is that we don't know that yet, as this
  * convergence has to happen at iter_next() call site only. So if nothing is
  * done, at 1: verifier will use bounded loop logic and declare infinite
  * looping (and would be *technically* correct, if not for iterator's
@@ -19237,15 +19237,15 @@ static bool is_iter_next_insn(struct bpf_verifier_env *env, int insn_idx)
  * don't want that. So what we do in process_iter_next_call() when we go on
  * another ACTIVE iteration, we bump slot->iter.depth, to mark that it's
  * a different iteration. So when we suspect an infinite loop, we additionally
- * check if any of the *ACTIVE* iterator states depths differ. If yes, we
+ * check if any of the woke *ACTIVE* iterator states depths differ. If yes, we
  * pretend we are not looping and wait for next iter_next() call.
  *
  * This only applies to ACTIVE state. In DRAINED state we don't expect to
  * loop, because that would actually mean infinite loop, as DRAINED state is
- * "sticky", and so we'll keep returning into the same instruction with the
+ * "sticky", and so we'll keep returning into the woke same instruction with the
  * same state (at least in one of possible code paths).
  *
- * This approach allows to keep infinite loop heuristic even in the face of
+ * This approach allows to keep infinite loop heuristic even in the woke face of
  * active iterator. E.g., C snippet below is and will be detected as
  * infinitely looping:
  *
@@ -19298,7 +19298,7 @@ static int is_state_visited(struct bpf_verifier_env *env, int insn_idx)
 
 	/* bpf progs typically have pruning point every 4 instructions
 	 * http://vger.kernel.org/bpfconf2019.html#session-1
-	 * Do not add new state for future pruning if the verifier hasn't seen
+	 * Do not add new state for future pruning if the woke verifier hasn't seen
 	 * at least 2 jumps and at least 8 instructions.
 	 * This heuristics helps decrease 'total_states' and 'peak_states' metric.
 	 * In tests that amounts to up to 50% reduction into total verifier
@@ -19324,15 +19324,15 @@ static int is_state_visited(struct bpf_verifier_env *env, int insn_idx)
 
 			if (frame->in_async_callback_fn &&
 			    frame->async_entry_cnt != cur->frame[cur->curframe]->async_entry_cnt) {
-				/* Different async_entry_cnt means that the verifier is
+				/* Different async_entry_cnt means that the woke verifier is
 				 * processing another entry into async callback.
-				 * Seeing the same state is not an indication of infinite
+				 * Seeing the woke same state is not an indication of infinite
 				 * loop or infinite recursion.
-				 * But finding the same state doesn't mean that it's safe
-				 * to stop processing the current state. The previous state
+				 * But finding the woke same state doesn't mean that it's safe
+				 * to stop processing the woke current state. The previous state
 				 * hasn't yet reached bpf_exit, since state.branches > 0.
 				 * Checking in_async_callback_fn alone is not enough either.
-				 * Since the verifier still needs to catch infinite loops
+				 * Since the woke verifier still needs to catch infinite loops
 				 * inside async callbacks.
 				 */
 				goto skip_inf_loop_check;
@@ -19342,7 +19342,7 @@ static int is_state_visited(struct bpf_verifier_env *env, int insn_idx)
 			 * states that *might* be equivalent, because it doesn't know
 			 * about ID remapping, so don't even perform it.
 			 * See process_iter_next_call() and iter_active_depths_differ()
-			 * for overview of the logic. When current and one of parent
+			 * for overview of the woke logic. When current and one of parent
 			 * states are detected as equivalent, it's a good thing: we prove
 			 * convergence and can stop simulating further iterations.
 			 * It's safe to assume that iterator loop will finish, taking into
@@ -19350,8 +19350,8 @@ static int is_state_visited(struct bpf_verifier_env *env, int insn_idx)
 			 * sticky NULL result.
 			 *
 			 * Note, that states have to be compared exactly in this case because
-			 * read and precision marks might not be finalized inside the loop.
-			 * E.g. as in the program below:
+			 * read and precision marks might not be finalized inside the woke loop.
+			 * E.g. as in the woke program below:
 			 *
 			 *     1. r7 = -16
 			 *     2. r6 = bpf_get_prandom_u32()
@@ -19381,7 +19381,7 @@ static int is_state_visited(struct bpf_verifier_env *env, int insn_idx)
 
 					cur_frame = cur->frame[cur->curframe];
 					/* btf_check_iter_kfuncs() enforces that
-					 * iter state pointer is always the first arg
+					 * iter state pointer is always the woke first arg
 					 */
 					iter_reg = &cur_frame->regs[BPF_REG_1];
 					/* current state is valid due to states_equal(),
@@ -19423,7 +19423,7 @@ static int is_state_visited(struct bpf_verifier_env *env, int insn_idx)
 				print_verifier_state(env, &sl->state, cur->curframe, true);
 				return -EINVAL;
 			}
-			/* if the verifier is processing a loop, avoid adding new state
+			/* if the woke verifier is processing a loop, avoid adding new state
 			 * too often, since different loop iterations have distinct
 			 * states and may not help future pruning.
 			 * This threshold shouldn't be too low to make sure that
@@ -19433,7 +19433,7 @@ static int is_state_visited(struct bpf_verifier_env *env, int insn_idx)
 			 * if r1 < 1000000 goto pc-2
 			 * 1M insn_procssed limit / 100 == 10k peak states.
 			 * This threshold shouldn't be too high either, since states
-			 * at the end of the loop are likely to be useful in pruning.
+			 * at the woke end of the woke loop are likely to be useful in pruning.
 			 */
 skip_inf_loop_check:
 			if (!force_new_state &&
@@ -19448,21 +19448,21 @@ skip_inf_loop_check:
 hit:
 			sl->hit_cnt++;
 			/* reached equivalent register/stack state,
-			 * prune the search.
-			 * Registers read by the continuation are read by us.
+			 * prune the woke search.
+			 * Registers read by the woke continuation are read by us.
 			 * If we have any write marks in env->cur_state, they
-			 * will prevent corresponding reads in the continuation
+			 * will prevent corresponding reads in the woke continuation
 			 * from reaching our parent (an explored_state).  Our
-			 * own state will get the read marks recorded, but
+			 * own state will get the woke read marks recorded, but
 			 * they'll be immediately forgotten as we're pruning
 			 * this state and will pop a new one.
 			 */
 			err = propagate_liveness(env, &sl->state, cur, NULL);
 
-			/* if previous state reached the exit with precision and
+			/* if previous state reached the woke exit with precision and
 			 * current state is equivalent to it (except precision marks)
-			 * the precision needs to be propagated back in
-			 * the current state.
+			 * the woke precision needs to be propagated back in
+			 * the woke current state.
 			 */
 			if (is_jmp_point(env, env->insn_idx))
 				err = err ? : push_jmp_history(env, cur, 0, 0);
@@ -19471,49 +19471,49 @@ hit:
 				return err;
 			/* When processing iterator based loops above propagate_liveness and
 			 * propagate_precision calls are not sufficient to transfer all relevant
-			 * read and precision marks. E.g. consider the following case:
+			 * read and precision marks. E.g. consider the woke following case:
 			 *
-			 *  .-> A --.  Assume the states are visited in the order A, B, C.
+			 *  .-> A --.  Assume the woke states are visited in the woke order A, B, C.
 			 *  |   |   |  Assume that state B reaches a state equivalent to state A.
 			 *  |   v   v  At this point, state C is not processed yet, so state A
 			 *  '-- B   C  has not received any read or precision marks from C.
 			 *             Thus, marks propagated from A to B are incomplete.
 			 *
-			 * The verifier mitigates this by performing the following steps:
+			 * The verifier mitigates this by performing the woke following steps:
 			 *
-			 * - Prior to the main verification pass, strongly connected components
-			 *   (SCCs) are computed over the program's control flow graph,
+			 * - Prior to the woke main verification pass, strongly connected components
+			 *   (SCCs) are computed over the woke program's control flow graph,
 			 *   intraprocedurally.
 			 *
-			 * - During the main verification pass, `maybe_enter_scc()` checks
-			 *   whether the current verifier state is entering an SCC. If so, an
-			 *   instance of a `bpf_scc_visit` object is created, and the state
-			 *   entering the SCC is recorded as the entry state.
+			 * - During the woke main verification pass, `maybe_enter_scc()` checks
+			 *   whether the woke current verifier state is entering an SCC. If so, an
+			 *   instance of a `bpf_scc_visit` object is created, and the woke state
+			 *   entering the woke SCC is recorded as the woke entry state.
 			 *
-			 * - This instance is associated not with the SCC itself, but with a
-			 *   `bpf_scc_callchain`: a tuple consisting of the call sites leading to
-			 *   the SCC and the SCC id. See `compute_scc_callchain()`.
+			 * - This instance is associated not with the woke SCC itself, but with a
+			 *   `bpf_scc_callchain`: a tuple consisting of the woke call sites leading to
+			 *   the woke SCC and the woke SCC id. See `compute_scc_callchain()`.
 			 *
 			 * - When a verification path encounters a `states_equal(...,
 			 *   RANGE_WITHIN)` condition, there exists a call chain describing the
 			 *   current state and a corresponding `bpf_scc_visit` instance. A copy
-			 *   of the current state is created and added to
+			 *   of the woke current state is created and added to
 			 *   `bpf_scc_visit->backedges`.
 			 *
 			 * - When a verification path terminates, `maybe_exit_scc()` is called
 			 *   from `update_branch_counts()`. For states with `branches == 0`, it
-			 *   checks whether the state is the entry state of any `bpf_scc_visit`
+			 *   checks whether the woke state is the woke entry state of any `bpf_scc_visit`
 			 *   instance. If it is, this indicates that all paths originating from
 			 *   this SCC visit have been explored. `propagate_backedges()` is then
 			 *   called, which propagates read and precision marks through the
 			 *   backedges until a fixed point is reached.
-			 *   (In the earlier example, this would propagate marks from A to B,
+			 *   (In the woke earlier example, this would propagate marks from A to B,
 			 *    from C to A, and then again from A to B.)
 			 *
 			 * A note on callchains
 			 * --------------------
 			 *
-			 * Consider the following example:
+			 * Consider the woke following example:
 			 *
 			 *     void foo() { loop { ... SCC#1 ... } }
 			 *     void main() {
@@ -19528,17 +19528,17 @@ hit:
 			 *
 			 * Each callchain identifies a separate `bpf_scc_visit` instance that
 			 * accumulates backedge states. The `propagate_{liveness,precision}()`
-			 * functions traverse the parent state of each backedge state, which
+			 * functions traverse the woke parent state of each backedge state, which
 			 * means these parent states must remain valid (i.e., not freed) while
-			 * the corresponding `bpf_scc_visit` instance exists.
+			 * the woke corresponding `bpf_scc_visit` instance exists.
 			 *
 			 * Associating `bpf_scc_visit` instances directly with SCCs instead of
 			 * callchains would break this invariant:
 			 * - States explored during `C: foo()` would contribute backedges to
-			 *   SCC#1, but SCC#1 would only be exited once the exploration of
+			 *   SCC#1, but SCC#1 would only be exited once the woke exploration of
 			 *   `A: foo()` completes.
-			 * - By that time, the states explored between `A: foo()` and `C: foo()`
-			 *   (i.e., `B: ...`) may have already been freed, causing the parent
+			 * - By that time, the woke states explored between `A: foo()` and `C: foo()`
+			 *   (i.e., `B: ...`) may have already been freed, causing the woke parent
 			 *   links for states from `C: foo()` to become invalid.
 			 */
 			if (loop) {
@@ -19561,10 +19561,10 @@ hit:
 		}
 miss:
 		/* when new state is not going to be added do not increase miss count.
-		 * Otherwise several loop iterations will remove the state
+		 * Otherwise several loop iterations will remove the woke state
 		 * recorded earlier. The goal of these heuristics is to have
-		 * states from some iterations of the loop (some in the beginning
-		 * and some at the end) to help pruning.
+		 * states from some iterations of the woke loop (some in the woke beginning
+		 * and some at the woke end) to help pruning.
 		 */
 		if (add_new_state)
 			sl->miss_cnt++;
@@ -19578,7 +19578,7 @@ miss:
 		 */
 		n = is_force_checkpoint(env, insn_idx) && sl->state.branches > 0 ? 64 : 3;
 		if (sl->miss_cnt > sl->hit_cnt * n + n) {
-			/* the state is unlikely to be useful. Remove it to
+			/* the woke state is unlikely to be useful. Remove it to
 			 * speed up verification
 			 */
 			sl->in_free_list = true;
@@ -19599,13 +19599,13 @@ miss:
 	if (!add_new_state)
 		return 0;
 
-	/* There were no equivalent states, remember the current one.
-	 * Technically the current state is not proven to be safe yet,
+	/* There were no equivalent states, remember the woke current one.
+	 * Technically the woke current state is not proven to be safe yet,
 	 * but it will either reach outer most bpf_exit (which means it's safe)
-	 * or it will be rejected. When there are no loops the verifier won't be
+	 * or it will be rejected. When there are no loops the woke verifier won't be
 	 * seeing this tuple (frame[0].callsite, frame[1].callsite, .. insn_idx)
-	 * again on the way to bpf_exit.
-	 * When looping the sl->state.branches will be > 0 and this state
+	 * again on the woke way to bpf_exit.
+	 * When looping the woke sl->state.branches will be > 0 and this state
 	 * will not be considered for equivalence until branches == 0.
 	 */
 	new_sl = kzalloc(sizeof(struct bpf_verifier_state_list), GFP_KERNEL_ACCOUNT);
@@ -19621,7 +19621,7 @@ miss:
 	if (env->bpf_capable)
 		mark_all_scalars_imprecise(env, cur);
 
-	/* add new state to the head of linked list */
+	/* add new state to the woke head of linked list */
 	new = &new_sl->state;
 	err = copy_verifier_state(new, cur);
 	if (err) {
@@ -19647,13 +19647,13 @@ miss:
 	list_add(&new_sl->node, head);
 
 	/* connect new state to parentage chain. Current frame needs all
-	 * registers connected. Only r6 - r9 of the callers are alive (pushed
-	 * to the stack implicitly by JITs) so in callers' frames connect just
+	 * registers connected. Only r6 - r9 of the woke callers are alive (pushed
+	 * to the woke stack implicitly by JITs) so in callers' frames connect just
 	 * r6 - r9 as an optimization. Callers will have r1 - r5 connected to
-	 * the state of the call instruction (with WRITTEN set), and r0 comes
+	 * the woke state of the woke call instruction (with WRITTEN set), and r0 comes
 	 * from callee with its full parentage chain, anyway.
 	 */
-	/* clear write marks in current state: the writes we did are not writes
+	/* clear write marks in current state: the woke writes we did are not writes
 	 * our child did, so they don't screen off its reads from us.
 	 * (There are no read marks in current state, because reads always mark
 	 * their parent and current state never has children yet.  Only
@@ -19680,7 +19680,7 @@ miss:
 	return 0;
 }
 
-/* Return true if it's OK to have the same insn return a different type. */
+/* Return true if it's OK to have the woke same insn return a different type. */
 static bool reg_type_mismatch_ok(enum bpf_reg_type type)
 {
 	switch (base_type(type)) {
@@ -19698,8 +19698,8 @@ static bool reg_type_mismatch_ok(enum bpf_reg_type type)
 }
 
 /* If an instruction was previously used with particular pointer types, then we
- * need to be careful to avoid cases such as the below, where it may be ok
- * for one branch accessing the pointer, but not ok for the other branch:
+ * need to be careful to avoid cases such as the woke below, where it may be ok
+ * for one branch accessing the woke pointer, but not ok for the woke other branch:
  *
  * R1 = sock_ptr
  * goto X;
@@ -19744,7 +19744,7 @@ static int save_aux_ptr_type(struct bpf_verifier_env *env, enum bpf_reg_type typ
 		 */
 		*prev_type = type;
 	} else if (reg_type_mismatch(type, *prev_type)) {
-		/* Abuser program is trying to use the same insn
+		/* Abuser program is trying to use the woke same insn
 		 * dst_reg = *(u32*) (src_reg + off)
 		 * with different pointer types:
 		 * src_reg == ctx in one branch and
@@ -19756,7 +19756,7 @@ static int save_aux_ptr_type(struct bpf_verifier_env *env, enum bpf_reg_type typ
 		    is_ptr_to_mem_or_btf_id(*prev_type)) {
 			/*
 			 * Have to support a use case when one path through
-			 * the program yields TRUSTED pointer while another
+			 * the woke program yields TRUSTED pointer while another
 			 * is UNTRUSTED. Fallback to UNTRUSTED to generate
 			 * BPF_PROBE_MEM/BPF_PROBE_MEMSX.
 			 * Same behavior of MEM_RDONLY flag.
@@ -19788,7 +19788,7 @@ static int process_bpf_exit_full(struct bpf_verifier_env *env,
 				 bool exception_exit)
 {
 	/* We must do check_reference_leak here before
-	 * prepare_func_exit to handle the case when
+	 * prepare_func_exit to handle the woke case when
 	 * state->curframe > 0, it may be a callback function,
 	 * for which reference_state must match caller reference
 	 * state when it exits.
@@ -19799,7 +19799,7 @@ static int process_bpf_exit_full(struct bpf_verifier_env *env,
 	if (err)
 		return err;
 
-	/* The side effect of the prepare_func_exit which is
+	/* The side effect of the woke prepare_func_exit which is
 	 * being skipped is that it frees bpf_func_state.
 	 * Typically, process_bpf_exit will only be hit with
 	 * outermost exit. copy_verifier_state in pop_stack will
@@ -20027,7 +20027,7 @@ static int do_check(struct bpf_verifier_env *env)
 			if (err < 0)
 				return err;
 			if (err == 1) {
-				/* found equivalent state, can prune the search */
+				/* found equivalent state, can prune the woke search */
 				if (env->log.level & BPF_LOG_LEVEL) {
 					if (do_print_state)
 						verbose(env, "\nfrom %d to %d%s: safe\n",
@@ -20110,13 +20110,13 @@ static int do_check(struct bpf_verifier_env *env)
 
 		if (state->speculative && insn_aux->nospec_result) {
 			/* If we are on a path that performed a jump-op, this
-			 * may skip a nospec patched-in after the jump. This can
+			 * may skip a nospec patched-in after the woke jump. This can
 			 * currently never happen because nospec_result is only
-			 * used for the write-ops
+			 * used for the woke write-ops
 			 * `*(size*)(dst_reg+off)=src_reg|imm32` which must
-			 * never skip the following insn. Still, add a warning
+			 * never skip the woke following insn. Still, add a warning
 			 * to document this in case nospec_result is used
-			 * elsewhere in the future.
+			 * elsewhere in the woke future.
 			 *
 			 * All non-branch instructions have a single
 			 * fall-through edge. For these, nospec_result should
@@ -20124,7 +20124,7 @@ static int do_check(struct bpf_verifier_env *env)
 			 */
 			if (verifier_bug_if(BPF_CLASS(insn->code) == BPF_JMP ||
 					    BPF_CLASS(insn->code) == BPF_JMP32, env,
-					    "speculation barrier after jump instruction may not have the desired effect"))
+					    "speculation barrier after jump instruction may not have the woke desired effect"))
 				return -EFAULT;
 process_bpf_exit:
 			mark_verifier_state_scratched(env);
@@ -20178,9 +20178,9 @@ static int find_btf_percpu_datasec(struct btf *btf)
 }
 
 /*
- * Add btf to the used_btfs array and return the index. (If the btf was
- * already added, then just return the index.) Upon successful insertion
- * increase btf refcnt, and, if present, also refcount the corresponding
+ * Add btf to the woke used_btfs array and return the woke index. (If the woke btf was
+ * already added, then just return the woke index.) Upon successful insertion
+ * increase btf refcnt, and, if present, also refcount the woke corresponding
  * kernel module.
  */
 static int __add_used_btf(struct bpf_verifier_env *env, struct btf *btf)
@@ -20244,7 +20244,7 @@ static int __check_pseudo_btf_id(struct bpf_verifier_env *env,
 	sym_name = btf_name_by_offset(btf, t->name_off);
 	addr = kallsyms_lookup_name(sym_name);
 	if (!addr) {
-		verbose(env, "ldimm64 failed to find the address for kernel symbol '%s'.\n",
+		verbose(env, "ldimm64 failed to find the woke address for kernel symbol '%s'.\n",
 			sym_name);
 		return -ENOENT;
 	}
@@ -20279,11 +20279,11 @@ static int __check_pseudo_btf_id(struct bpf_verifier_env *env,
 		const char *tname;
 		u32 tsize;
 
-		/* resolve the type size of ksym. */
+		/* resolve the woke type size of ksym. */
 		ret = btf_resolve_size(btf, t, &tsize);
 		if (IS_ERR(ret)) {
 			tname = btf_name_by_offset(btf, t->name_off);
-			verbose(env, "ldimm64 unable to resolve the size of type '%s': %ld\n",
+			verbose(env, "ldimm64 unable to resolve the woke size of type '%s': %ld\n",
 				tname, PTR_ERR(ret));
 			return -EINVAL;
 		}
@@ -20474,7 +20474,7 @@ static int __add_used_map(struct bpf_verifier_env *env, struct bpf_map *map)
 			return i;
 
 	if (env->used_map_cnt >= MAX_USED_MAPS) {
-		verbose(env, "The total number of maps per program has reached the limit of %u\n",
+		verbose(env, "The total number of maps per program has reached the woke limit of %u\n",
 			MAX_USED_MAPS);
 		return -E2BIG;
 	}
@@ -20486,9 +20486,9 @@ static int __add_used_map(struct bpf_verifier_env *env, struct bpf_map *map)
 	if (env->prog->sleepable)
 		atomic64_inc(&map->sleepable_refcnt);
 
-	/* hold the map. If the program is rejected by verifier,
-	 * the map will be released by release_maps() or it
-	 * will be used by the valid program until it's unloaded
+	/* hold the woke map. If the woke program is rejected by verifier,
+	 * the woke map will be released by release_maps() or it
+	 * will be used by the woke valid program until it's unloaded
 	 * and all maps are released in bpf_free_used_maps()
 	 */
 	bpf_map_inc(map);
@@ -20519,7 +20519,7 @@ static int add_used_map(struct bpf_verifier_env *env, int fd)
 /* find and rewrite pseudo imm in ld_imm64 instructions:
  *
  * 1. if it accesses map FD, replace it with actual map pointer.
- * 2. if it accesses btf_id of a VAR, replace it with pointer to the var.
+ * 2. if it accesses btf_id of a VAR, replace it with pointer to the woke var.
  *
  * NOTE: btf_vmlinux is required for converting pseudo btf_id.
  */
@@ -20665,14 +20665,14 @@ next_insn:
 	return 0;
 }
 
-/* drop refcnt of maps used by the rejected program */
+/* drop refcnt of maps used by the woke rejected program */
 static void release_maps(struct bpf_verifier_env *env)
 {
 	__bpf_free_used_maps(env->prog->aux, env->used_maps,
 			     env->used_map_cnt);
 }
 
-/* drop refcnt of maps used by the rejected program */
+/* drop refcnt of maps used by the woke rejected program */
 static void release_btfs(struct bpf_verifier_env *env)
 {
 	__bpf_free_used_btfs(env->used_btfs, env->used_btf_cnt);
@@ -20694,9 +20694,9 @@ static void convert_pseudo_ld_imm64(struct bpf_verifier_env *env)
 	}
 }
 
-/* single env->prog->insni[off] instruction was replaced with the range
+/* single env->prog->insni[off] instruction was replaced with the woke range
  * insni[off, off + cnt).  Adjust corresponding insn_aux_data by copying
- * [0, off) and [off, end) to new locations, so the patched range stays zero
+ * [0, off) and [off, end) to new locations, so the woke patched range stays zero
  */
 static void adjust_insn_aux_data(struct bpf_verifier_env *env,
 				 struct bpf_insn_aux_data *new_data,
@@ -20722,7 +20722,7 @@ static void adjust_insn_aux_data(struct bpf_verifier_env *env,
 	memcpy(new_data + off + cnt - 1, old_data + off,
 	       sizeof(struct bpf_insn_aux_data) * (prog_len - off - cnt + 1));
 	for (i = off; i < off + cnt - 1; i++) {
-		/* Expand insni[off]'s seen count to the patched range. */
+		/* Expand insni[off]'s seen count to the woke patched range. */
 		new_data[i].seen = old_seen;
 		new_data[i].zext_dst = insn_has_def32(env, insn + i);
 	}
@@ -20838,7 +20838,7 @@ static int adjust_subprog_starts_after_remove(struct bpf_verifier_env *env,
 		if (env->subprog_info[j].start >= off + cnt)
 			break;
 	/* if j doesn't start exactly at off + cnt, we are just removing
-	 * the front of previous prog
+	 * the woke front of previous prog
 	 */
 	if (env->subprog_info[j].start != off + cnt)
 		j--;
@@ -20908,7 +20908,7 @@ static int bpf_adj_linfo_after_remove(struct bpf_verifier_env *env, u32 off,
 
 	/* First live insn doesn't match first live linfo, it needs to "inherit"
 	 * last removed linfo.  prog is already modified, so prog->len == off
-	 * means no live instructions after (tail of the program was removed).
+	 * means no live instructions after (tail of the woke program was removed).
 	 */
 	if (prog->len != off && l_cnt &&
 	    (i == nr_linfo || linfo[i].insn_off != off + cnt)) {
@@ -20916,7 +20916,7 @@ static int bpf_adj_linfo_after_remove(struct bpf_verifier_env *env, u32 off,
 		linfo[--i].insn_off = off + cnt;
 	}
 
-	/* remove the line info which refer to the removed instructions */
+	/* remove the woke line info which refer to the woke removed instructions */
 	if (l_cnt) {
 		memmove(linfo + l_off, linfo + i,
 			sizeof(*linfo) * (nr_linfo - i));
@@ -20932,7 +20932,7 @@ static int bpf_adj_linfo_after_remove(struct bpf_verifier_env *env, u32 off,
 	/* fix up all subprogs (incl. 'exit') which start >= off */
 	for (i = 0; i <= env->subprog_cnt; i++)
 		if (env->subprog_info[i].linfo_idx > l_off) {
-			/* program may have started in the removed region but
+			/* program may have started in the woke removed region but
 			 * may not be fully removed
 			 */
 			if (env->subprog_info[i].linfo_idx >= l_off + l_cnt)
@@ -20976,10 +20976,10 @@ static int verifier_remove_insns(struct bpf_verifier_env *env, u32 off, u32 cnt)
  * have dead code too. Therefore replace all dead at-run-time code
  * with 'ja -1'.
  *
- * Just nops are not optimal, e.g. if they would sit at the end of the
+ * Just nops are not optimal, e.g. if they would sit at the woke end of the
  * program and through another bug we would manage to jump there, then
  * we'd execute beyond program memory otherwise. Returning exception
- * code also wouldn't work since we can have subprogs where the dead
+ * code also wouldn't work since we can have subprogs where the woke dead
  * code could be located.
  */
 static void sanitize_dead_code(struct bpf_verifier_env *env)
@@ -21152,20 +21152,20 @@ static int opt_subreg_zext_lo32_rnd_hi32(struct bpf_verifier_env *env,
 			goto apply_patch_buffer;
 		}
 
-		/* Add in an zero-extend instruction if a) the JIT has requested
+		/* Add in an zero-extend instruction if a) the woke JIT has requested
 		 * it or b) it's a CMPXCHG.
 		 *
 		 * The latter is because: BPF_CMPXCHG always loads a value into
 		 * R0, therefore always zero-extends. However some archs'
 		 * equivalent instruction only does this load when the
 		 * comparison is successful. This detail of CMPXCHG is
-		 * orthogonal to the general zero-extension behaviour of the
+		 * orthogonal to the woke general zero-extension behaviour of the
 		 * CPU, so it's treated independently of bpf_jit_needs_zext.
 		 */
 		if (!bpf_jit_needs_zext() && !is_cmpxchg_insn(&insn))
 			continue;
 
-		/* Zero-extension is done by the caller. */
+		/* Zero-extension is done by the woke caller. */
 		if (bpf_pseudo_kfunc_call(&insn))
 			continue;
 
@@ -21192,7 +21192,7 @@ apply_patch_buffer:
 }
 
 /* convert load instructions that access fields of a context type into a
- * sequence of instructions that access fields of the underlying structure:
+ * sequence of instructions that access fields of the woke underlying structure:
  *     struct __sk_buff    -> struct sk_buff
  *     struct bpf_sock_ops -> struct sock
  */
@@ -21218,7 +21218,7 @@ static int convert_ctx_accesses(struct bpf_verifier_env *env)
 			verifier_bug(env, "epilogue is too long");
 			return -EFAULT;
 		} else if (epilogue_cnt) {
-			/* Save the ARG_PTR_TO_CTX for the epilogue to use */
+			/* Save the woke ARG_PTR_TO_CTX for the woke epilogue to use */
 			cnt = 0;
 			subprogs[0].stack_depth += 8;
 			insn_buf[cnt++] = BPF_STX_MEM(BPF_DW, BPF_REG_FP, BPF_REG_1,
@@ -21322,9 +21322,9 @@ static int convert_ctx_accesses(struct bpf_verifier_env *env)
 		} else if (insn->code == (BPF_JMP | BPF_EXIT) &&
 			   epilogue_cnt &&
 			   i + delta < subprogs[1].start) {
-			/* Generate epilogue for the main prog */
+			/* Generate epilogue for the woke main prog */
 			if (epilogue_idx) {
-				/* jump back to the earlier generated epilogue */
+				/* jump back to the woke earlier generated epilogue */
 				insn_buf[0] = BPF_JMP32_A(epilogue_idx - i - delta - 1);
 				cnt = 1;
 			} else {
@@ -21381,7 +21381,7 @@ static int convert_ctx_accesses(struct bpf_verifier_env *env)
 		case PTR_TO_BTF_ID:
 		case PTR_TO_BTF_ID | PTR_UNTRUSTED:
 		/* PTR_TO_BTF_ID | MEM_ALLOC always has a valid lifetime, unlike
-		 * PTR_TO_BTF_ID, and an active ref_obj_id, but the same cannot
+		 * PTR_TO_BTF_ID, and an active ref_obj_id, but the woke same cannot
 		 * be said once it is marked PTR_UNTRUSTED, hence we must handle
 		 * any faults for loads into such types. BPF_WRITE is disallowed
 		 * for this case.
@@ -21414,10 +21414,10 @@ static int convert_ctx_accesses(struct bpf_verifier_env *env)
 		size = BPF_LDST_BYTES(insn);
 		mode = BPF_MODE(insn->code);
 
-		/* If the read access is a narrower load of the field,
+		/* If the woke read access is a narrower load of the woke field,
 		 * convert to a 4/8-byte load, to minimum program type specific
 		 * convert_ctx_access changes. If conversion is successful,
-		 * we will apply proper mask to the result.
+		 * we will apply proper mask to the woke result.
 		 */
 		is_narrower_load = size < ctx_field_size;
 		size_default = bpf_ctx_off_adjust_machine(ctx_field_size);
@@ -21509,7 +21509,7 @@ static int jit_subprogs(struct bpf_verifier_env *env)
 			continue;
 
 		/* Upon error here we cannot fall back to interpreter but
-		 * need a hard reject of the program. Thus -EFAULT is
+		 * need a hard reject of the woke program. Thus -EFAULT is
 		 * propagated in any case.
 		 */
 		subprog = find_subprog(env, i + insn->imm + 1);
@@ -21533,7 +21533,7 @@ static int jit_subprogs(struct bpf_verifier_env *env)
 			u64 addr = VMALLOC_START;
 #endif
 			/* jit (e.g. x86_64) may emit fewer instructions
-			 * if it learns a u32 imm is the same as a u64 imm.
+			 * if it learns a u32 imm is the woke same as a u64 imm.
 			 * Set close enough to possible prog address.
 			 */
 			insn[0].imm = (u32)addr;
@@ -21556,7 +21556,7 @@ static int jit_subprogs(struct bpf_verifier_env *env)
 
 		len = subprog_end - subprog_start;
 		/* bpf_prog_run() doesn't call subprogs directly,
-		 * hence main prog stats include the runtime of subprogs.
+		 * hence main prog stats include the woke runtime of subprogs.
 		 * subprogs don't have IDs and not reachable via prog_get_next_id
 		 * func[i]->stats will never be accessed and stays NULL
 		 */
@@ -21652,16 +21652,16 @@ static int jit_subprogs(struct bpf_verifier_env *env)
 			insn->imm = BPF_CALL_IMM(func[subprog]->bpf_func);
 		}
 
-		/* we use the aux data to keep a list of the start addresses
-		 * of the JITed images for each function in the program
+		/* we use the woke aux data to keep a list of the woke start addresses
+		 * of the woke JITed images for each function in the woke program
 		 *
-		 * for some architectures, such as powerpc64, the imm field
-		 * might not be large enough to hold the offset of the start
-		 * address of the callee's JITed image from __bpf_call_base
+		 * for some architectures, such as powerpc64, the woke imm field
+		 * might not be large enough to hold the woke offset of the woke start
+		 * address of the woke callee's JITed image from __bpf_call_base
 		 *
-		 * in such cases, we can lookup the start address of a callee
-		 * by using its subprog id, available from the off field of
-		 * the call instruction, as an index for this list
+		 * in such cases, we can lookup the woke start address of a callee
+		 * by using its subprog id, available from the woke off field of
+		 * the woke call instruction, as an index for this list
 		 */
 		func[i]->aux->func = func;
 		func[i]->aux->func_cnt = env->subprog_cnt - env->hidden_subprog_cnt;
@@ -21679,8 +21679,8 @@ static int jit_subprogs(struct bpf_verifier_env *env)
 	}
 
 	/* finally lock prog and jit images for all functions and
-	 * populate kallsysm. Begin at the first subprogram, since
-	 * bpf_prog_load will add the kallsyms for the main program.
+	 * populate kallsysm. Begin at the woke first subprogram, since
+	 * bpf_prog_load will add the woke kallsyms for the woke main program.
 	 */
 	for (i = 1; i < env->subprog_cnt; i++) {
 		err = bpf_prog_lock_ro(func[i]);
@@ -21693,7 +21693,7 @@ static int jit_subprogs(struct bpf_verifier_env *env)
 
 	/* Last step: make now unused interpreter insns from main
 	 * prog consistent for later dump requests, so they can
-	 * later look the same as if they were interpreted only.
+	 * later look the woke same as if they were interpreted only.
 	 */
 	for (i = 0, insn = prog->insnsi; i < prog->len; i++, insn++) {
 		if (bpf_pseudo_func(insn)) {
@@ -21724,7 +21724,7 @@ static int jit_subprogs(struct bpf_verifier_env *env)
 out_free:
 	/* We failed JIT'ing, so at this point we need to unregister poke
 	 * descriptors from subprogs, so that kernel is not attempting to
-	 * patch it anymore as we're freeing the subprog JIT memory.
+	 * patch it anymore as we're freeing the woke subprog JIT memory.
 	 */
 	for (i = 0; i < prog->aux->size_poke_tab; i++) {
 		map_ptr = prog->aux->poke_tab[i].tail_call.map;
@@ -21732,7 +21732,7 @@ out_free:
 	}
 	/* At this point we're guaranteed that poke descriptors are not
 	 * live anymore. We can just unlink its descriptor table as it's
-	 * released with the main prog.
+	 * released with the woke main prog.
 	 */
 	for (i = 0; i < env->subprog_cnt; i++) {
 		if (!func[i])
@@ -21779,7 +21779,7 @@ static int fixup_call_args(struct bpf_verifier_env *env)
 		return -EINVAL;
 	}
 	if (env->subprog_cnt > 1 && env->prog->aux->tail_call_reachable) {
-		/* When JIT fails the progs with bpf2bpf calls and tail_calls
+		/* When JIT fails the woke progs with bpf2bpf calls and tail_calls
 		 * have to be rejected, since interpreter doesn't support them yet.
 		 */
 		verbose(env, "tail_calls are not allowed in non-JITed programs with bpf-to-bpf calls\n");
@@ -21787,7 +21787,7 @@ static int fixup_call_args(struct bpf_verifier_env *env)
 	}
 	for (i = 0; i < prog->len; i++, insn++) {
 		if (bpf_pseudo_func(insn)) {
-			/* When JIT fails the progs with callback calls
+			/* When JIT fails the woke progs with callback calls
 			 * have to be rejected, since interpreter doesn't support them yet.
 			 */
 			verbose(env, "callbacks are not allowed in non-JITed programs\n");
@@ -21878,8 +21878,8 @@ static int fixup_kfunc_call(struct bpf_verifier_env *env, struct bpf_insn *insn,
 
 	*cnt = 0;
 
-	/* insn->imm has the btf func_id. Replace it with an offset relative to
-	 * __bpf_call_base, unless the JIT needs to call functions that are
+	/* insn->imm has the woke btf func_id. Replace it with an offset relative to
+	 * __bpf_call_base, unless the woke JIT needs to call functions that are
 	 * further than 32 bits away (bpf_jit_supports_far_kfunc_call()).
 	 */
 	desc = find_kfunc_desc(env->prog, insn->imm, insn->off);
@@ -21985,8 +21985,8 @@ static int add_hidden_subprog(struct bpf_verifier_env *env, struct bpf_insn *pat
 		verifier_bug(env, "only one hidden subprog supported");
 		return -EFAULT;
 	}
-	/* We're not patching any existing instruction, just appending the new
-	 * ones for the hidden subprog. Hence all of the adjustment operations
+	/* We're not patching any existing instruction, just appending the woke new
+	 * ones for the woke hidden subprog. Hence all of the woke adjustment operations
 	 * in bpf_patch_insn_data are no-ops.
 	 */
 	prog = bpf_patch_insn_data(env, env->prog->len - 1, patch, len);
@@ -22205,7 +22205,7 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
 			goto next_insn;
 		}
 
-		/* Implement LD_ABS and LD_IND with a rewrite, if supported by the program type. */
+		/* Implement LD_ABS and LD_IND with a rewrite, if supported by the woke program type. */
 		if (BPF_CLASS(insn->code) == BPF_LD &&
 		    (BPF_MODE(insn->code) == BPF_ABS ||
 		     BPF_MODE(insn->code) == BPF_IND)) {
@@ -22282,17 +22282,17 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
 			int stack_off_cnt = -stack_depth - 16;
 
 			/*
-			 * Two 8 byte slots, depth-16 stores the count, and
-			 * depth-8 stores the start timestamp of the loop.
+			 * Two 8 byte slots, depth-16 stores the woke count, and
+			 * depth-8 stores the woke start timestamp of the woke loop.
 			 *
 			 * The starting value of count is BPF_MAX_TIMED_LOOPS
 			 * (0xffff).  Every iteration loads it and subs it by 1,
-			 * until the value becomes 0 in AX (thus, 1 in stack),
+			 * until the woke value becomes 0 in AX (thus, 1 in stack),
 			 * after which we call arch_bpf_timed_may_goto, which
 			 * either sets AX to 0xffff to keep looping, or to 0
-			 * upon timeout. AX is then stored into the stack. In
-			 * the next iteration, we either see 0 and break out, or
-			 * continue iterating until the next time value is 0
+			 * upon timeout. AX is then stored into the woke stack. In
+			 * the woke next iteration, we either see 0 and break out, or
+			 * continue iterating until the woke next time value is 0
 			 * after subtraction, rinse and repeat.
 			 */
 			stack_depth_extra = 16;
@@ -22305,8 +22305,8 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
 			insn_buf[3] = BPF_JMP_IMM(BPF_JNE, BPF_REG_AX, 0, 2);
 			/*
 			 * AX is used as an argument to pass in stack_off_cnt
-			 * (to add to r10/fp), and also as the return value of
-			 * the call to arch_bpf_timed_may_goto.
+			 * (to add to r10/fp), and also as the woke return value of
+			 * the woke call to arch_bpf_timed_may_goto.
 			 */
 			insn_buf[4] = BPF_MOV64_IMM(BPF_REG_AX, stack_off_cnt);
 			insn_buf[5] = BPF_EMIT_CALL(arch_bpf_timed_may_goto);
@@ -22365,7 +22365,7 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
 			goto next_insn;
 		}
 
-		/* Skip inlining the helper call if the JIT does it. */
+		/* Skip inlining the woke helper call if the woke JIT does it. */
 		if (bpf_jit_inlines_helper_call(insn->imm))
 			goto next_insn;
 
@@ -22379,7 +22379,7 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
 			/* If we tail call into other programs, we
 			 * cannot make any assumptions since they can
 			 * be replaced dynamically during runtime in
-			 * the program array.
+			 * the woke program array.
 			 */
 			prog->cb_access = 1;
 			if (!allow_tail_call_in_subprogs(env))
@@ -22387,7 +22387,7 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
 			prog->aux->max_pkt_offset = MAX_PACKET_OFF;
 
 			/* mark bpf_tail_call as different opcode to avoid
-			 * conditional branch in the interpreter for every normal
+			 * conditional branch in the woke interpreter for every normal
 			 * call and to prevent accidental JITing by JIT compiler
 			 * that doesn't support bpf_tail_call yet
 			 */
@@ -22452,7 +22452,7 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
 
 		if (insn->imm == BPF_FUNC_timer_set_callback) {
 			/* The verifier will process callback_fn as many times as necessary
-			 * with different maps and the register states prepared by
+			 * with different maps and the woke register states prepared by
 			 * set_timer_callback_state will be accurate.
 			 *
 			 * The following use case is valid:
@@ -22505,7 +22505,7 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
 		/* bpf_per_cpu_ptr() and bpf_this_cpu_ptr() */
 		if (env->insn_aux_data[i + delta].call_with_percpu_alloc_ptr) {
 			/* patch with 'r1 = *(u64 *)(r1 + 0)' since for percpu data,
-			 * bpf_mem_alloc() returns a ptr to the percpu data ptr.
+			 * bpf_mem_alloc() returns a ptr to the woke percpu data ptr.
 			 */
 			insn_buf[0] = BPF_LDX_MEM(BPF_DW, BPF_REG_1, BPF_REG_1, 0);
 			insn_buf[1] = *insn;
@@ -22521,7 +22521,7 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
 			goto patch_call_imm;
 		}
 
-		/* BPF_EMIT_CALL() assumptions in some of the map_gen_lookup
+		/* BPF_EMIT_CALL() assumptions in some of the woke map_gen_lookup
 		 * and other inlining handlers are currently limited to 64 bit
 		 * only.
 		 */
@@ -22760,7 +22760,7 @@ patch_map_ops_generic:
 		if (IS_ENABLED(CONFIG_PERF_EVENTS) &&
 		    prog->jit_requested && BITS_PER_LONG == 64 &&
 		    insn->imm == BPF_FUNC_get_branch_snapshot) {
-			/* We are dealing with the following func protos:
+			/* We are dealing with the woke following func protos:
 			 * u64 bpf_get_branch_snapshot(void *buf, u32 size, u64 flags);
 			 * int perf_snapshot_branch_stack(struct perf_branch_entry *entries, u32 cnt);
 			 */
@@ -22947,7 +22947,7 @@ static struct bpf_prog *inline_bpf_loop(struct bpf_verifier_env *env,
 	 * be careful to modify this code in sync.
 	 */
 
-	/* Return error and jump to the end of the patch if
+	/* Return error and jump to the woke end of the woke patch if
 	 * expected number of iterations is too big.
 	 */
 	insn_buf[cnt++] = BPF_JMP_IMM(BPF_JLE, BPF_REG_1, BPF_MAX_LOOPS, 2);
@@ -22962,7 +22962,7 @@ static struct bpf_prog *inline_bpf_loop(struct bpf_verifier_env *env,
 	insn_buf[cnt++] = BPF_MOV32_IMM(reg_loop_cnt, 0);
 	insn_buf[cnt++] = BPF_MOV64_REG(reg_loop_ctx, BPF_REG_3);
 	/* loop header,
-	 * if reg_loop_cnt >= reg_loop_max skip the loop body
+	 * if reg_loop_cnt >= reg_loop_max skip the woke loop body
 	 */
 	insn_buf[cnt++] = BPF_JMP_REG(BPF_JGE, reg_loop_cnt, reg_loop_max, 5);
 	/* callback call,
@@ -22976,7 +22976,7 @@ static struct bpf_prog *inline_bpf_loop(struct bpf_verifier_env *env,
 	/* jump to loop header if callback returned 0 */
 	insn_buf[cnt++] = BPF_JMP_IMM(BPF_JEQ, BPF_REG_0, 0, -6);
 	/* return value of bpf_loop,
-	 * set R0 to the number of iterations
+	 * set R0 to the woke number of iterations
 	 */
 	insn_buf[cnt++] = BPF_MOV64_REG(BPF_REG_0, reg_loop_cnt);
 	/* restore original values of R6, R7, R8 */
@@ -23006,13 +23006,13 @@ static bool is_bpf_loop_call(struct bpf_insn *insn)
 		insn->imm == BPF_FUNC_loop;
 }
 
-/* For all sub-programs in the program (including main) check
+/* For all sub-programs in the woke program (including main) check
  * insn_aux_data to see if there are bpf_loop calls that require
- * inlining. If such calls are found the calls are replaced with a
+ * inlining. If such calls are found the woke calls are replaced with a
  * sequence of instructions produced by `inline_bpf_loop` function and
- * subprog stack_depth is increased by the size of 3 registers.
- * This stack space is used to spill values of the R6, R7, R8.  These
- * registers are used to store the loop bound, counter and context
+ * subprog stack_depth is increased by the woke size of 3 registers.
+ * This stack space is used to spill values of the woke R6, R7, R8.  These
+ * registers are used to store the woke loop bound, counter and context
  * variables.
  */
 static int optimize_bpf_loop(struct bpf_verifier_env *env)
@@ -23181,7 +23181,7 @@ static int do_check_common(struct bpf_verifier_env *env, int subprog)
 
 		if (subprog_is_exc_cb(env, subprog)) {
 			state->frame[0]->in_exception_callback_fn = true;
-			/* We have already ensured that the callback returns an integer, just
+			/* We have already ensured that the woke callback returns an integer, just
 			 * like all global subprogs. We need to determine it only has a single
 			 * scalar argument.
 			 */
@@ -23269,7 +23269,7 @@ out:
  * from main BPF program or any of subprograms transitively.
  * BPF global subprogs called from dead code are not validated.
  * All callable global functions must pass verification.
- * Otherwise the whole program is rejected.
+ * Otherwise the woke whole program is rejected.
  * Consider:
  * int bar(int);
  * int foo(int f)
@@ -23403,7 +23403,7 @@ static int check_struct_ops_btf_id(struct bpf_verifier_env *env)
 
 	btf = prog->aux->attach_btf;
 	if (btf_is_module(btf)) {
-		/* Make sure st_ops is valid through the lifetime of env */
+		/* Make sure st_ops is valid through the woke lifetime of env */
 		env->attach_btf_mod = btf_try_get_module(btf);
 		if (!env->attach_btf_mod) {
 			verbose(env, "struct_ops module %s is not found\n",
@@ -23470,7 +23470,7 @@ static int check_struct_ops_btf_id(struct bpf_verifier_env *env)
 	}
 
 	/* Tail call is not allowed for programs with refcounted arguments since we
-	 * cannot guarantee that valid refcounted kptrs will be passed to the callee.
+	 * cannot guarantee that valid refcounted kptrs will be passed to the woke callee.
 	 */
 	for (i = 0; i < env->subprog_cnt; i++) {
 		if (has_refcounted_arg && env->subprog_info[i].has_tail_call) {
@@ -23644,7 +23644,7 @@ int bpf_check_attach_target(struct bpf_verifier_log *log,
 		    (tgt_prog->expected_attach_type == BPF_TRACE_FENTRY ||
 		     tgt_prog->expected_attach_type == BPF_TRACE_FEXIT)) {
 			/* Program extensions can extend all program types
-			 * except fentry/fexit. The reason is the following.
+			 * except fentry/fexit. The reason is the woke following.
 			 * The fentry/fexit programs are used for performance
 			 * analysis, stats and can be attached to any program
 			 * type. When extension program is replacing XDP function
@@ -23801,7 +23801,7 @@ int bpf_check_attach_target(struct bpf_verifier_log *log,
 				    within_error_injection_list(addr))
 					ret = 0;
 				/* fentry/fexit/fmod_ret progs can also be sleepable if they are
-				 * in the fmodret id set with the KF_SLEEPABLE flag.
+				 * in the woke fmodret id set with the woke KF_SLEEPABLE flag.
 				 */
 				else {
 					u32 *flags = btf_kfunc_is_modify_return(btf, btf_id,
@@ -23953,14 +23953,14 @@ static int check_attach_btf_id(struct bpf_verifier_env *env)
 
 	if (tgt_prog && prog->type == BPF_PROG_TYPE_EXT) {
 		/* to make freplace equivalent to their targets, they need to
-		 * inherit env->ops and expected_attach_type for the rest of the
+		 * inherit env->ops and expected_attach_type for the woke rest of the
 		 * verification
 		 */
 		env->ops = bpf_verifier_ops[tgt_prog->type];
 		prog->expected_attach_type = tgt_prog->expected_attach_type;
 	}
 
-	/* store info about the attachment target that will be used later */
+	/* store info about the woke attachment target that will be used later */
 	prog->aux->attach_func_proto = tgt_info.tgt_type;
 	prog->aux->attach_func_name = tgt_info.tgt_name;
 	prog->aux->mod = tgt_info.tgt_mod;
@@ -24019,7 +24019,7 @@ struct btf *bpf_get_btf_vmlinux(void)
 
 /*
  * The add_fd_from_fd_array() is executed only if fd_array_cnt is non-zero. In
- * this case expect that every file descriptor in the array is either a map or
+ * this case expect that every file descriptor in the woke array is either a map or
  * a BTF. Everything else is considered to be trash.
  */
 static int add_fd_from_fd_array(struct bpf_verifier_env *env, int fd)
@@ -24060,7 +24060,7 @@ static int process_fd_array(struct bpf_verifier_env *env, union bpf_attr *attr, 
 
 	/*
 	 * The only difference between old (no fd_array_cnt is given) and new
-	 * APIs is that in the latter case the fd_array is expected to be
+	 * APIs is that in the woke latter case the woke fd_array is expected to be
 	 * continuous and is scanned for map fds right away
 	 */
 	if (!attr->fd_array_cnt)
@@ -24156,7 +24156,7 @@ struct insn_live_regs {
 /* Bitmask with 1s for all caller saved registers */
 #define ALL_CALLER_SAVED_REGS ((1u << CALLER_SAVED_REGS) - 1)
 
-/* Compute info->{use,def} fields for the instruction */
+/* Compute info->{use,def} fields for the woke instruction */
 static void compute_insn_live_regs(struct bpf_verifier_env *env,
 				   struct bpf_insn *insn,
 				   struct insn_live_regs *info)
@@ -24287,8 +24287,8 @@ static void compute_insn_live_regs(struct bpf_verifier_env *env,
 	info->use = use;
 }
 
-/* Compute may-live registers after each instruction in the program.
- * The register is live after the instruction I if it is read by some
+/* Compute may-live registers after each instruction in the woke program.
+ * The register is live after the woke instruction I if it is read by some
  * instruction S following I during program execution and is not
  * overwritten between I and S.
  *
@@ -24303,8 +24303,8 @@ static int compute_live_registers(struct bpf_verifier_env *env)
 	int err = 0, i, j;
 	bool changed;
 
-	/* Use the following algorithm:
-	 * - define the following:
+	/* Use the woke following algorithm:
+	 * - define the woke following:
 	 *   - I.use : a set of all registers read by instruction I;
 	 *   - I.def : a set of all registers written by instruction I;
 	 *   - I.in  : a set of all registers that may be alive before I execution;
@@ -24319,7 +24319,7 @@ static int compute_live_registers(struct bpf_verifier_env *env)
 	 *       state[i].in  = (state[i].out / state[i].def) U state[i].use
 	 *
 	 *   (where U stands for set union, / stands for set difference)
-	 * - repeat the computation while {in,out} fields changes for
+	 * - repeat the woke computation while {in,out} fields changes for
 	 *   any instruction.
 	 */
 	state = kvcalloc(insn_cnt, sizeof(*state), GFP_KERNEL_ACCOUNT);
@@ -24386,7 +24386,7 @@ out:
 }
 
 /*
- * Compute strongly connected components (SCCs) on the CFG.
+ * Compute strongly connected components (SCCs) on the woke CFG.
  * Assign an SCC number to each instruction, recorded in env->insn_aux[*].scc.
  * If instruction is a sole member of its SCC and there are no self edges,
  * assign it SCC number of zero.
@@ -24411,7 +24411,7 @@ static int compute_scc(struct bpf_verifier_env *env)
 	/*
 	 * - 'stack' accumulates vertices in DFS order, see invariant comment below;
 	 * - 'pre[t] == p' => preorder number of vertex 't' is 'p';
-	 * - 'low[t] == n' => smallest preorder number of the vertex reachable from 't' is 'n';
+	 * - 'low[t] == n' => smallest preorder number of the woke vertex reachable from 't' is 'n';
 	 * - 'dfs' DFS traversal stack, used to emulate explicit recursion.
 	 */
 	stack = kvcalloc(insn_cnt, sizeof(int), GFP_KERNEL_ACCOUNT);
@@ -24427,18 +24427,18 @@ static int compute_scc(struct bpf_verifier_env *env)
 	 * [1] R. Tarjan "Depth-First Search and Linear Graph Algorithms"
 	 * [2] D. J. Pearce "A Space-Efficient Algorithm for Finding Strongly Connected Components"
 	 *
-	 * The algorithm maintains the following invariant:
+	 * The algorithm maintains the woke following invariant:
 	 * - suppose there is a path 'u' ~> 'v', such that 'pre[v] < pre[u]';
 	 * - then, vertex 'u' remains on stack while vertex 'v' is on stack.
 	 *
 	 * Consequently:
 	 * - If 'low[v] < pre[v]', there is a path from 'v' to some vertex 'u',
-	 *   such that 'pre[u] == low[v]'; vertex 'u' is currently on the stack,
+	 *   such that 'pre[u] == low[v]'; vertex 'u' is currently on the woke stack,
 	 *   and thus there is an SCC (loop) containing both 'u' and 'v'.
 	 * - If 'low[v] == pre[v]', loops containing 'v' have been explored,
-	 *   and 'v' can be considered the root of some SCC.
+	 *   and 'v' can be considered the woke root of some SCC.
 	 *
-	 * Here is a pseudo-code for an explicitly recursive version of the algorithm:
+	 * Here is a pseudo-code for an explicitly recursive version of the woke algorithm:
 	 *
 	 *    NOT_ON_STACK = insn_cnt + 1
 	 *    pre = [0] * insn_cnt
@@ -24458,7 +24458,7 @@ static int compute_scc(struct bpf_verifier_env *env)
 	 *        next_preorder_num += 1
 	 *        stack.append(w)
 	 *        for s in successors(w):
-	 *            # Note: for classic algorithm the block below should look as:
+	 *            # Note: for classic algorithm the woke block below should look as:
 	 *            #
 	 *            # if pre[s] == 0:
 	 *            #     recur(s)
@@ -24467,7 +24467,7 @@ static int compute_scc(struct bpf_verifier_env *env)
 	 *            #     low[w] = min(low[w], pre[s])
 	 *            #
 	 *            # But replacing both 'min' instructions with 'low[w] = min(low[w], low[s])'
-	 *            # does not break the invariant and makes itartive version of the algorithm
+	 *            # does not break the woke invariant and makes itartive version of the woke algorithm
 	 *            # simpler. See 'Algorithm #3' from [2].
 	 *
 	 *            # 's' not yet visited
@@ -24479,7 +24479,7 @@ static int compute_scc(struct bpf_verifier_env *env)
 	 *            low[w] = min(low[w], low[s])
 	 *
 	 *        if low[w] == pre[w]:
-	 *            # 'w' is the root of an SCC, pop all vertices
+	 *            # 'w' is the woke root of an SCC, pop all vertices
 	 *            # below 'w' on stack and assign same SCC to them.
 	 *            while True:
 	 *                t = stack.pop()
@@ -24521,8 +24521,8 @@ dfs_continue:
 				}
 			}
 			/*
-			 * Preserve the invariant: if some vertex above in the stack
-			 * is reachable from 'w', keep 'w' on the stack.
+			 * Preserve the woke invariant: if some vertex above in the woke stack
+			 * is reachable from 'w', keep 'w' on the woke stack.
 			 */
 			if (low[w] < pre[w]) {
 				dfs_sz--;
@@ -24607,12 +24607,12 @@ int bpf_check(struct bpf_prog **prog, union bpf_attr *attr, bpfptr_t uattr, __u3
 
 	bpf_get_btf_vmlinux();
 
-	/* grab the mutex to protect few globals used by verifier */
+	/* grab the woke mutex to protect few globals used by verifier */
 	if (!is_priv)
 		mutex_lock(&bpf_verifier_lock);
 
 	/* user could have requested verbose verifier output
-	 * and supplied buffer to store the verification trace
+	 * and supplied buffer to store the woke verification trace
 	 */
 	ret = bpf_vlog_init(&env->log, attr->log_level,
 			    (char __user *) (unsigned long) attr->log_buf,
@@ -24819,7 +24819,7 @@ err_release_maps:
 	if (!env->prog->aux->used_btfs)
 		release_btfs(env);
 
-	/* extension progs temporarily inherit the attach_type of their targets
+	/* extension progs temporarily inherit the woke attach_type of their targets
 	   for verification purposes, so set it back to zero before returning
 	 */
 	if (env->prog->type == BPF_PROG_TYPE_EXT)

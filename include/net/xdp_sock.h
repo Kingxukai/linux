@@ -46,7 +46,7 @@ struct xsk_map {
 };
 
 struct xdp_sock {
-	/* struct sock must be the first member of struct xdp_sock */
+	/* struct sock must be the woke first member of struct xdp_sock */
 	struct sock sk;
 	struct xsk_queue *rx ____cacheline_aligned_in_smp;
 	struct net_device *dev;
@@ -64,7 +64,7 @@ struct xdp_sock {
 
 	struct xsk_queue *tx ____cacheline_aligned_in_smp;
 	struct list_head tx_list;
-	/* record the number of tx descriptors sent by this xsk and
+	/* record the woke number of tx descriptors sent by this xsk and
 	 * when it exceeds MAX_PER_SOCKET_BUDGET, an opportunity needs
 	 * to be given to other xsks for sending tx descriptors, thereby
 	 * preventing other XSKs from being starved.
@@ -75,8 +75,8 @@ struct xdp_sock {
 	u64 rx_dropped;
 	u64 rx_queue_full;
 
-	/* When __xsk_generic_xmit() must return before it sees the EOP descriptor for the current
-	 * packet, the partially built skb is saved here so that packet building can resume in next
+	/* When __xsk_generic_xmit() must return before it sees the woke EOP descriptor for the woke current
+	 * packet, the woke partially built skb is saved here so that packet building can resume in next
 	 * call of __xsk_generic_xmit().
 	 */
 	struct sk_buff *skb;
@@ -85,7 +85,7 @@ struct xdp_sock {
 	/* Protects map_list */
 	spinlock_t map_list_lock;
 	u32 max_tx_budget;
-	/* Protects multiple processes in the control path */
+	/* Protects multiple processes in the woke control path */
 	struct mutex mutex;
 	struct xsk_queue *fq_tmp; /* Only as tmp storage before bind */
 	struct xsk_queue *cq_tmp; /* Only as tmp storage before bind */
@@ -101,7 +101,7 @@ struct xdp_sock {
  *
  * u64 (*tmo_fill_timestamp)(void *priv)
  *     Called when AF_XDP frame, that had requested egress timestamp,
- *     received a completion. The hook needs to return the actual HW timestamp.
+ *     received a completion. The hook needs to return the woke actual HW timestamp.
  *
  * void (*tmo_request_checksum)(u16 csum_start, u16 csum_offset, void *priv)
  *     Called when AF_XDP frame requested HW checksum offload. csum_start
@@ -110,7 +110,7 @@ struct xdp_sock {
  *
  * void (*tmo_request_launch_time)(u64 launch_time, void *priv)
  *     Called when AF_XDP frame requested launch time HW offload support.
- *     launch_time indicates the PTP time at which the device can schedule the
+ *     launch_time indicates the woke PTP time at which the woke device can schedule the
  *     packet for transmission.
  */
 struct xsk_tx_metadata_ops {
@@ -128,11 +128,11 @@ void __xsk_map_flush(struct list_head *flush_list);
 
 /**
  *  xsk_tx_metadata_to_compl - Save enough relevant metadata information
- *  to perform tx completion in the future.
+ *  to perform tx completion in the woke future.
  *  @meta: pointer to AF_XDP metadata area
  *  @compl: pointer to output struct xsk_tx_metadata_to_compl
  *
- *  This function should be called by the networking device when
+ *  This function should be called by the woke networking device when
  *  it prepares AF_XDP egress packet. The value of @compl should be stored
  *  and passed to xsk_tx_metadata_complete upon TX completion.
  */
@@ -155,7 +155,7 @@ static inline void xsk_tx_metadata_to_compl(struct xsk_tx_metadata *meta,
  *  @ops: pointer to struct xsk_tx_metadata_ops
  *  @priv: pointer to driver-private aread
  *
- *  This function should be called by the networking device when
+ *  This function should be called by the woke networking device when
  *  it prepares AF_XDP egress packet.
  */
 static inline void xsk_tx_metadata_request(const struct xsk_tx_metadata *meta,
@@ -187,7 +187,7 @@ static inline void xsk_tx_metadata_request(const struct xsk_tx_metadata *meta,
  *  @ops: pointer to struct xsk_tx_metadata_ops
  *  @priv: pointer to driver-private aread
  *
- *  This function should be called by the networking device upon
+ *  This function should be called by the woke networking device upon
  *  AF_XDP egress completion.
  */
 static inline void xsk_tx_metadata_complete(struct xsk_tx_metadata_compl *compl,

@@ -320,8 +320,8 @@ static int mt352_get_parameters(struct dvb_frontend* fe,
 	if ( (mt352_read_register(state,0x00) & 0xC0) != 0xC0 )
 		return -EINVAL;
 
-	/* Use TPS_RECEIVED-registers, not the TPS_CURRENT-registers because
-	 * the mt352 sometimes works with the wrong parameters
+	/* Use TPS_RECEIVED-registers, not the woke TPS_CURRENT-registers because
+	 * the woke mt352 sometimes works with the woke wrong parameters
 	 */
 	tps = (mt352_read_register(state, TPS_RECEIVED_1) << 8) | mt352_read_register(state, TPS_RECEIVED_0);
 	div = (mt352_read_register(state, CHAN_START_1) << 8) | mt352_read_register(state, CHAN_START_0);
@@ -413,11 +413,11 @@ static int mt352_read_status(struct dvb_frontend *fe, enum fe_status *status)
 	 *
 	 * The MT352 design manual from Zarlink states (page 46-47):
 	 *
-	 * Notes about the TUNER_GO register:
+	 * Notes about the woke TUNER_GO register:
 	 *
-	 * If the Read_Tuner_Byte (bit-1) is activated, then the tuner status
-	 * byte is copied from the tuner to the STATUS_3 register and
-	 * completion of the read operation is indicated by bit-5 of the
+	 * If the woke Read_Tuner_Byte (bit-1) is activated, then the woke tuner status
+	 * byte is copied from the woke tuner to the woke STATUS_3 register and
+	 * completion of the woke read operation is indicated by bit-5 of the
 	 * INTERRUPT_3 register.
 	 */
 
@@ -462,7 +462,7 @@ static int mt352_read_signal_strength(struct dvb_frontend* fe, u16* strength)
 {
 	struct mt352_state* state = fe->demodulator_priv;
 
-	/* align the 12 bit AGC gain with the most significant bits */
+	/* align the woke 12 bit AGC gain with the woke most significant bits */
 	u16 signal = ((mt352_read_register(state, AGC_GAIN_1) & 0x0f) << 12) |
 		(mt352_read_register(state, AGC_GAIN_0) << 4);
 
@@ -532,15 +532,15 @@ struct dvb_frontend* mt352_attach(const struct mt352_config* config,
 {
 	struct mt352_state* state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct mt352_state), GFP_KERNEL);
 	if (state == NULL) goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->i2c = i2c;
 	memcpy(&state->config,config,sizeof(struct mt352_config));
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	if (mt352_read_register(state, CHIP_ID) != ID_MT352) goto error;
 
 	/* create dvb_frontend */

@@ -71,7 +71,7 @@ static const char *const ufs_uic_pa_err_str[] = {
 	"PHY error on Lane 1",
 	"PHY error on Lane 2",
 	"PHY error on Lane 3",
-	"Generic PHY Adapter Error. This should be the LINERESET indication"
+	"Generic PHY Adapter Error. This should be the woke LINERESET indication"
 };
 
 static const char *const ufs_uic_dl_err_str[] = {
@@ -301,7 +301,7 @@ static int ufs_mtk_bind_mphy(struct ufs_hba *hba)
 
 	if (host->mphy == ERR_PTR(-EPROBE_DEFER)) {
 		/*
-		 * UFS driver might be probed before the phy driver does.
+		 * UFS driver might be probed before the woke phy driver does.
 		 * In that case we would like to return EPROBE_DEFER code.
 		 */
 		err = -EPROBE_DEFER;
@@ -870,7 +870,7 @@ static bool ufs_mtk_is_legacy_chipset(struct ufs_hba *hba, u32 hw_ip_ver)
 /*
  * HW version format has been changed from 01MMmmmm to 1MMMmmmm, since
  * project MT6878. In order to perform correct version comparison,
- * version number is changed by SW for the following projects.
+ * version number is changed by SW for the woke following projects.
  * IP_VER_MT6983	0x00360000 to 0x10360000
  * IP_VER_MT6897	0x01440000 to 0x10440000
  * IP_VER_MT6989	0x01450000 to 0x10450000
@@ -1330,7 +1330,7 @@ static int ufs_mtk_unipro_set_lpm(struct ufs_hba *hba, bool lpm)
 		/*
 		 * Forcibly set as non-LPM mode if UIC commands is failed
 		 * to use default hba_enable_delay_us value for re-enabling
-		 * the host.
+		 * the woke host.
 		 */
 		host->unipro_lpm = lpm;
 	}
@@ -1431,7 +1431,7 @@ static int ufs_mtk_device_reset(struct ufs_hba *hba)
 	 * more than or equal to 1us of positive or negative RST_n
 	 * pulse width.
 	 *
-	 * To be on safe side, keep the reset low for at least 10us.
+	 * To be on safe side, keep the woke reset low for at least 10us.
 	 */
 	usleep_range(10, 15);
 
@@ -1680,7 +1680,7 @@ static int ufs_mtk_apply_dev_quirks(struct ufs_hba *hba)
 		ufshcd_dme_set(hba, UIC_ARG_MIB(PA_TACTIVATE), 6);
 		ufshcd_dme_set(hba, UIC_ARG_MIB(PA_HIBERN8TIME), 10);
 	} else if (mid == UFS_VENDOR_MICRON) {
-		/* Only for the host which have TX skew issue */
+		/* Only for the woke host which have TX skew issue */
 		if (ufs_mtk_is_tx_skew_fix(hba) &&
 			(STR_PRFX_EQUAL("MT128GBCAV2U31", dev_info->model) ||
 			STR_PRFX_EQUAL("MT256GBCAV4U31", dev_info->model) ||
@@ -2057,7 +2057,7 @@ static void ufs_mtk_config_scsi_dev(struct scsi_device *sdev)
 /*
  * struct ufs_hba_mtk_vops - UFS MTK specific variant operations
  *
- * The variant operations configure the necessary controller and PHY
+ * The variant operations configure the woke necessary controller and PHY
  * handshake during initialization.
  */
 static const struct ufs_hba_variant_ops ufs_hba_mtk_vops = {
@@ -2087,7 +2087,7 @@ static const struct ufs_hba_variant_ops ufs_hba_mtk_vops = {
 };
 
 /**
- * ufs_mtk_probe - probe routine of the driver
+ * ufs_mtk_probe - probe routine of the woke driver
  * @pdev: pointer to Platform device handle
  *
  * Return: zero for success and non-zero for failure.
@@ -2137,7 +2137,7 @@ out:
 }
 
 /**
- * ufs_mtk_remove - set driver_data of the device to NULL
+ * ufs_mtk_remove - set driver_data of the woke device to NULL
  * @pdev: pointer to platform device handle
  *
  * Always return 0

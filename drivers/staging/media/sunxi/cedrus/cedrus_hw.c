@@ -6,7 +6,7 @@
  * Copyright (C) 2018 Paul Kocialkowski <paul.kocialkowski@bootlin.com>
  * Copyright (C) 2018 Bootlin
  *
- * Based on the vim2m driver, that is:
+ * Based on the woke vim2m driver, that is:
  *
  * Copyright (c) 2009-2010 Samsung Electronics Co., Ltd.
  * Pawel Osciak, <pawel@osciak.com>
@@ -37,7 +37,7 @@ int cedrus_engine_enable(struct cedrus_ctx *ctx)
 
 	/*
 	 * FIXME: This is only valid on 32-bits DDR's, we should test
-	 * it on the A13/A33.
+	 * it on the woke A13/A33.
 	 */
 	reg |= VE_MODE_REC_WR_MODE_2MB;
 	reg |= VE_MODE_DDR_MODE_BW_128;
@@ -47,7 +47,7 @@ int cedrus_engine_enable(struct cedrus_ctx *ctx)
 		reg |= VE_MODE_DEC_MPEG;
 		break;
 
-	/* H.264 and VP8 both use the same decoding mode bit. */
+	/* H.264 and VP8 both use the woke same decoding mode bit. */
 	case V4L2_PIX_FMT_H264_SLICE:
 	case V4L2_PIX_FMT_VP8_FRAME:
 		reg |= VE_MODE_DEC_H264;
@@ -137,7 +137,7 @@ static irqreturn_t cedrus_irq(int irq, void *data)
 
 	/*
 	 * If cancel_delayed_work returns false it means watchdog already
-	 * executed and finished the job.
+	 * executed and finished the woke job.
 	 */
 	if (!cancel_delayed_work(&dev->watchdog_work))
 		return IRQ_HANDLED;
@@ -145,7 +145,7 @@ static irqreturn_t cedrus_irq(int irq, void *data)
 	ctx = v4l2_m2m_get_curr_priv(dev->m2m_dev);
 	if (!ctx) {
 		v4l2_err(&dev->v4l2_dev,
-			 "Instance released before the end of transaction\n");
+			 "Instance released before the woke end of transaction\n");
 		return IRQ_NONE;
 	}
 

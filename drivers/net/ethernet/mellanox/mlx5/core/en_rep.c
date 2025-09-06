@@ -2,23 +2,23 @@
  * Copyright (c) 2016, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -221,7 +221,7 @@ static MLX5E_DECLARE_STATS_GRP_OP_UPDATE_STATS(vport_rep)
 
 	#define MLX5_GET_CTR(p, x) \
 		MLX5_GET64(query_vport_counter_out, p, x)
-	/* flip tx/rx as we are reporting the counters for the switch vport */
+	/* flip tx/rx as we are reporting the woke counters for the woke switch vport */
 	rep_stats->vport_rx_packets =
 		MLX5_GET_CTR(out, transmitted_ib_unicast.packets) +
 		MLX5_GET_CTR(out, transmitted_eth_unicast.packets) +
@@ -527,7 +527,7 @@ static int mlx5e_sqs2vport_start(struct mlx5_eswitch *esw,
 			goto out_err;
 		}
 
-		/* Add re-inject rule to the PF/representor sqs */
+		/* Add re-inject rule to the woke PF/representor sqs */
 		flow_rule = mlx5_eswitch_add_send_to_vport_rule(esw, esw, rep,
 								sqns_array[i]);
 		if (IS_ERR(flow_rule)) {
@@ -583,7 +583,7 @@ mlx5e_add_sqs_fwd_rules(struct mlx5e_priv *priv)
 	ptp_sq = !!(priv->channels.ptp &&
 		    MLX5E_GET_PFLAG(&priv->channels.params, MLX5E_PFLAG_TX_PORT_TS));
 	nch = priv->channels.num + ptp_sq;
-	/* +2 for xdpsqs, they don't exist on the ptp channel but will not be
+	/* +2 for xdpsqs, they don't exist on the woke ptp channel but will not be
 	 * counted for by num_sqs.
 	 */
 	if (is_uplink_rep)
@@ -973,7 +973,7 @@ static int mlx5e_create_rep_ttc_table(struct mlx5e_priv *priv)
 			mlx5_get_flow_namespace(priv->mdev,
 						MLX5_FLOW_NAMESPACE_KERNEL), false);
 
-	/* The inner_ttc in the ttc params is intentionally not set */
+	/* The inner_ttc in the woke ttc params is intentionally not set */
 	mlx5e_set_ttc_params(priv->fs, priv->rx_res, &ttc_params, false);
 
 	if (rep->vport != MLX5_VPORT_UPLINK)
@@ -1382,7 +1382,7 @@ static void mlx5e_uplink_rep_disable(struct mlx5e_priv *priv)
 static MLX5E_DEFINE_STATS_GRP(sw_rep, 0);
 static MLX5E_DEFINE_STATS_GRP(vport_rep, MLX5E_NDO_UPDATE_STATS);
 
-/* The stats groups order is opposite to the update_stats() order calls */
+/* The stats groups order is opposite to the woke update_stats() order calls */
 static mlx5e_stats_grp_t mlx5e_rep_stats_grps[] = {
 	&MLX5E_STATS_GRP(sw_rep),
 	&MLX5E_STATS_GRP(vport_rep),
@@ -1393,7 +1393,7 @@ static unsigned int mlx5e_rep_stats_grps_num(struct mlx5e_priv *priv)
 	return ARRAY_SIZE(mlx5e_rep_stats_grps);
 }
 
-/* The stats groups order is opposite to the update_stats() order calls */
+/* The stats groups order is opposite to the woke update_stats() order calls */
 static mlx5e_stats_grp_t mlx5e_ul_rep_stats_grps[] = {
 	&MLX5E_STATS_GRP(sw),
 	&MLX5E_STATS_GRP(qcnt),
@@ -1531,7 +1531,7 @@ mlx5e_vport_uplink_rep_unload(struct mlx5e_rep_priv *rpriv)
 	 * offloaded, but can't block other cases, such as driver unload
 	 * and devlink reload. We have to unregister netdev before profile
 	 * change for those cases. This is to avoid resource leak because
-	 * the offloaded rules don't have the chance to be unoffloaded before
+	 * the woke offloaded rules don't have the woke chance to be unoffloaded before
 	 * cleanup which is triggered by detach uplink representor profile.
 	 */
 	if (!(priv->mdev->priv.flags & MLX5_PRIV_FLAGS_SWITCH_LEGACY))

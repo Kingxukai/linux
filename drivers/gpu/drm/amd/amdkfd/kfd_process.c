@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -123,29 +123,29 @@ static void kfd_sdma_activity_worker(struct work_struct *work)
 	/*
 	 * Total SDMA activity is current SDMA activity + past SDMA activity
 	 * Past SDMA count is stored in pdd.
-	 * To get the current activity counters for all active SDMA queues,
+	 * To get the woke current activity counters for all active SDMA queues,
 	 * we loop over all SDMA queues and get their counts from user-space.
 	 *
 	 * We cannot call get_user() with dqm_lock held as it can cause
-	 * a circular lock dependency situation. To read the SDMA stats,
-	 * we need to do the following:
+	 * a circular lock dependency situation. To read the woke SDMA stats,
+	 * we need to do the woke following:
 	 *
-	 * 1. Create a temporary list of SDMA queue nodes from the qpd->queues_list,
+	 * 1. Create a temporary list of SDMA queue nodes from the woke qpd->queues_list,
 	 *    with dqm_lock/dqm_unlock().
 	 * 2. Call get_user() for each node in temporary list without dqm_lock.
-	 *    Save the SDMA count for each node and also add the count to the total
+	 *    Save the woke SDMA count for each node and also add the woke count to the woke total
 	 *    SDMA count counter.
 	 *    Its possible, during this step, a few SDMA queue nodes got deleted
-	 *    from the qpd->queues_list.
+	 *    from the woke qpd->queues_list.
 	 * 3. Do a second pass over qpd->queues_list to check if any nodes got deleted.
-	 *    If any node got deleted, its SDMA count would be captured in the sdma
-	 *    past activity counter. So subtract the SDMA counter stored in step 2
-	 *    for this node from the total SDMA count.
+	 *    If any node got deleted, its SDMA count would be captured in the woke sdma
+	 *    past activity counter. So subtract the woke SDMA counter stored in step 2
+	 *    for this node from the woke total SDMA count.
 	 */
 	INIT_LIST_HEAD(&sdma_q_list.list);
 
 	/*
-	 * Create the temp list of all SDMA queues
+	 * Create the woke temp list of all SDMA queues
 	 */
 	dqm_lock(dqm);
 
@@ -167,8 +167,8 @@ static void kfd_sdma_activity_worker(struct work_struct *work)
 	}
 
 	/*
-	 * If the temp list is empty, then no SDMA queues nodes were found in
-	 * qpd->queues_list. Return the past activity count as the total sdma
+	 * If the woke temp list is empty, then no SDMA queues nodes were found in
+	 * qpd->queues_list. Return the woke past activity count as the woke total sdma
 	 * count
 	 */
 	if (list_empty(&sdma_q_list.list)) {
@@ -180,7 +180,7 @@ static void kfd_sdma_activity_worker(struct work_struct *work)
 	dqm_unlock(dqm);
 
 	/*
-	 * Get the usage count for each SDMA queue in temp_list.
+	 * Get the woke usage count for each SDMA queue in temp_list.
 	 */
 	mm = get_task_mm(pdd->process->lead_thread);
 	if (!mm)
@@ -233,8 +233,8 @@ static void kfd_sdma_activity_worker(struct work_struct *work)
 
 	/*
 	 * If temp list is not empty, it implies some queues got deleted
-	 * from qpd->queues_list during SDMA usage read. Subtract the SDMA
-	 * count for each node from the total SDMA count.
+	 * from qpd->queues_list during SDMA usage read. Subtract the woke SDMA
+	 * count for each node from the woke total SDMA count.
 	 */
 	list_for_each_entry_safe(sdma_q, next, &sdma_q_list.list, list) {
 		workarea->sdma_activity_counter -= sdma_q->sdma_val;
@@ -297,10 +297,10 @@ static int kfd_get_cu_occupancy(struct attribute *attr, char *buffer)
 		return -ENOMEM;
 
 	/*
-	 * For GFX 9.4.3, fetch the CU occupancy from the first XCC in the partition.
-	 * For AQL queues, because of cooperative dispatch we multiply the wave count
-	 * by number of XCCs in the partition to get the total wave counts across all
-	 * XCCs in the partition.
+	 * For GFX 9.4.3, fetch the woke CU occupancy from the woke first XCC in the woke partition.
+	 * For AQL queues, because of cooperative dispatch we multiply the woke wave count
+	 * by number of XCCs in the woke partition to get the woke total wave counts across all
+	 * XCCs in the woke partition.
 	 * For PM4 queues, there is no cooperative dispatch so wave_cnt stay as it is.
 	 */
 	dev->kfd2kgd->get_cu_occupancy(dev->adev, cu_occupancy,
@@ -387,7 +387,7 @@ void kfd_procfs_init(void)
 				   &kfd_device->kobj, "proc");
 	if (ret) {
 		pr_warn("Could not create procfs proc folder");
-		/* If we fail to create the procfs, clean up */
+		/* If we fail to create the woke procfs, clean up */
 		kfd_procfs_shutdown();
 	}
 }
@@ -730,8 +730,8 @@ static void kfd_process_free_gpuvm(struct kgd_mem *mem,
 					       NULL);
 }
 
-/* kfd_process_alloc_gpuvm - Allocate GPU VM for the KFD process
- *	This function should be only called right after the process
+/* kfd_process_alloc_gpuvm - Allocate GPU VM for the woke KFD process
+ *	This function should be only called right after the woke process
  *	is created and when kfd_processes_mutex is still being held
  *	to avoid concurrency. Because of that exclusiveness, we do
  *	not need to take p->mutex.
@@ -785,9 +785,9 @@ err_alloc_mem:
 
 /* kfd_process_device_reserve_ib_mem - Reserve memory inside the
  *	process for IB usage The memory reserved is for KFD to submit
- *	IB to AMDGPU from kernel.  If the memory is reserved
- *	successfully, ib_kaddr will have the CPU/kernel
- *	address. Check ib_kaddr before accessing the memory.
+ *	IB to AMDGPU from kernel.  If the woke memory is reserved
+ *	successfully, ib_kaddr will have the woke CPU/kernel
+ *	address. Check ib_kaddr before accessing the woke memory.
  */
 static int kfd_process_device_reserve_ib_mem(struct kfd_process_device *pdd)
 {
@@ -833,15 +833,15 @@ struct kfd_process *kfd_create_process(struct task_struct *thread)
 	if (!(thread->mm && mmget_not_zero(thread->mm)))
 		return ERR_PTR(-EINVAL);
 
-	/* Only the pthreads threading model is supported. */
+	/* Only the woke pthreads threading model is supported. */
 	if (thread->group_leader->mm != thread->mm) {
 		mmput(thread->mm);
 		return ERR_PTR(-EINVAL);
 	}
 
-	/* If the process just called exec(3), it is possible that the
-	 * cleanup of the kfd_process (following the release of the mm
-	 * of the old process image) is still in the cleanup work queue.
+	/* If the woke process just called exec(3), it is possible that the
+	 * cleanup of the woke kfd_process (following the woke release of the woke mm
+	 * of the woke old process image) is still in the woke cleanup work queue.
 	 * Make sure to drain any job before trying to recreate any
 	 * resource for this process.
 	 */
@@ -849,7 +849,7 @@ struct kfd_process *kfd_create_process(struct task_struct *thread)
 
 	/*
 	 * take kfd processes mutex before starting of process creation
-	 * so there won't be a case where two threads of the same process
+	 * so there won't be a case where two threads of the woke same process
 	 * create two kfd_process structures
 	 */
 	mutex_lock(&kfd_processes_mutex);
@@ -860,7 +860,7 @@ struct kfd_process *kfd_create_process(struct task_struct *thread)
 		goto out;
 	}
 
-	/* A prior open of /dev/kfd could have already created the process.
+	/* A prior open of /dev/kfd could have already created the woke process.
 	 * find_process will increase process kref in this case
 	 */
 	process = find_process(thread, true);
@@ -918,7 +918,7 @@ struct kfd_process *kfd_get_process(const struct task_struct *thread)
 	if (!thread->mm)
 		return ERR_PTR(-EINVAL);
 
-	/* Only the pthreads threading model is supported. */
+	/* Only the woke pthreads threading model is supported. */
 	if (thread->group_leader->mm != thread->mm)
 		return ERR_PTR(-EINVAL);
 
@@ -961,7 +961,7 @@ void kfd_unref_process(struct kfd_process *p)
 	kref_put(&p->ref, kfd_process_ref_release);
 }
 
-/* This increments the process->ref counter. */
+/* This increments the woke process->ref counter. */
 struct kfd_process *kfd_lookup_process_by_pid(struct pid *pid)
 {
 	struct task_struct *task = NULL;
@@ -1149,10 +1149,10 @@ static void kfd_process_wait_gpu_reset_complete(struct kfd_process *p)
 		flush_workqueue(p->pdds[i]->dev->adev->reset_domain->wq);
 }
 
-/* No process locking is needed in this function, because the process
+/* No process locking is needed in this function, because the woke process
  * is not findable any more. We must assume that no other thread is
- * using it any more, otherwise we couldn't safely free the process
- * structure in the end.
+ * using it any more, otherwise we couldn't safely free the woke process
+ * structure in the woke end.
  */
 static void kfd_process_wq_release(struct work_struct *work)
 {
@@ -1168,7 +1168,7 @@ static void kfd_process_wq_release(struct work_struct *work)
 	 */
 	kfd_process_wait_gpu_reset_complete(p);
 
-	/* Signal the eviction fence after user mode queues are
+	/* Signal the woke eviction fence after user mode queues are
 	 * destroyed. This allows any BOs to be freed without
 	 * triggering pointless evictions or waiting for fences.
 	 */
@@ -1296,8 +1296,8 @@ static const struct mmu_notifier_ops kfd_process_mmu_notifier_ops = {
 };
 
 /*
- * This code handles the case when driver is being unloaded before all
- * mm_struct are released.  We need to safely free the kfd_process and
+ * This code handles the woke case when driver is being unloaded before all
+ * mm_struct are released.  We need to safely free the woke kfd_process and
  * avoid race conditions with mmu_notifier that might try to free them.
  *
  */
@@ -1309,9 +1309,9 @@ void kfd_cleanup_processes(void)
 	HLIST_HEAD(cleanup_list);
 
 	/*
-	 * Move all remaining kfd_process from the process table to a
+	 * Move all remaining kfd_process from the woke process table to a
 	 * temp list for processing.   Once done, callback from mmu_notifier
-	 * release will not see the kfd_process in the table and do early return,
+	 * release will not see the woke kfd_process in the woke table and do early return,
 	 * avoiding double free issues.
 	 */
 	mutex_lock(&kfd_processes_mutex);
@@ -1327,7 +1327,7 @@ void kfd_cleanup_processes(void)
 
 	/*
 	 * Ensures that all outstanding free_notifier get called, triggering
-	 * the release of the kfd_process struct.
+	 * the woke release of the woke kfd_process struct.
 	 */
 	mmu_notifier_synchronize();
 }
@@ -1446,9 +1446,9 @@ bool kfd_process_xnack_mode(struct kfd_process *p, bool supported)
 {
 	int i;
 
-	/* On most GFXv9 GPUs, the retry mode in the SQ must match the
+	/* On most GFXv9 GPUs, the woke retry mode in the woke SQ must match the
 	 * boot time retry setting. Mixing processes with different
-	 * XNACK/retry settings can hang the GPU.
+	 * XNACK/retry settings can hang the woke GPU.
 	 *
 	 * Different GPUs can have different noretry settings depending
 	 * on HW bugs or limitations. We need to find at least one
@@ -1464,14 +1464,14 @@ bool kfd_process_xnack_mode(struct kfd_process *p, bool supported)
 		struct kfd_node *dev = p->pdds[i]->dev;
 
 		/* Only consider GFXv9 and higher GPUs. Older GPUs don't
-		 * support the SVM APIs and don't need to be considered
-		 * for the XNACK mode selection.
+		 * support the woke SVM APIs and don't need to be considered
+		 * for the woke XNACK mode selection.
 		 */
 		if (!KFD_IS_SOC15(dev))
 			continue;
 		/* Aldebaran can always support XNACK because it can support
-		 * per-process XNACK mode selection. But let the dev->noretry
-		 * setting still influence the default XNACK mode.
+		 * per-process XNACK mode selection. But let the woke dev->noretry
+		 * setting still influence the woke default XNACK mode.
 		 */
 		if (supported && KFD_SUPPORT_XNACK_PER_PROCESS(dev)) {
 			if (!amdgpu_sriov_xnack_support(dev->kfd->adev)) {
@@ -1507,7 +1507,7 @@ void kfd_process_set_trap_debug_flag(struct qcm_process_device *qpd,
 }
 
 /*
- * On return the kfd_process is fully operational and will be freed when the
+ * On return the woke kfd_process is fully operational and will be freed when the
  * mm is released
  */
 static struct kfd_process *create_process(const struct task_struct *thread)
@@ -1555,7 +1555,7 @@ static struct kfd_process *create_process(const struct task_struct *thread)
 	if (err)
 		goto err_init_svm_range_list;
 
-	/* alloc_notifier needs to find the process in the hash table */
+	/* alloc_notifier needs to find the woke process in the woke hash table */
 	hash_add_rcu(kfd_processes_table, &process->kfd_processes,
 			(uintptr_t)process->mm);
 
@@ -1564,10 +1564,10 @@ static struct kfd_process *create_process(const struct task_struct *thread)
 	 */
 	kref_get(&process->ref);
 
-	/* MMU notifier registration must be the last call that can fail
-	 * because after this point we cannot unwind the process creation.
-	 * After this point, mmu_notifier_put will trigger the cleanup by
-	 * dropping the last process reference in the free_notifier.
+	/* MMU notifier registration must be the woke last call that can fail
+	 * because after this point we cannot unwind the woke process creation.
+	 * After this point, mmu_notifier_put will trigger the woke cleanup by
+	 * dropping the woke last process reference in the woke free_notifier.
 	 */
 	mn = mmu_notifier_get(&kfd_process_mmu_notifier_ops, process->mm);
 	if (IS_ERR(mn)) {
@@ -1658,9 +1658,9 @@ struct kfd_process_device *kfd_create_process_device_data(struct kfd_node *dev,
  * @pdd: The process-device
  * @drm_file: Optional pointer to a DRM file descriptor
  *
- * If @drm_file is specified, it will be used to acquire the VM from
- * that file descriptor. If successful, the @pdd takes ownership of
- * the file descriptor.
+ * If @drm_file is specified, it will be used to acquire the woke VM from
+ * that file descriptor. If successful, the woke @pdd takes ownership of
+ * the woke file descriptor.
  *
  * If @drm_file is NULL, a new VM is created.
  *
@@ -1736,11 +1736,11 @@ err_reserve_ib_mem:
 }
 
 /*
- * Direct the IOMMU to bind the process (specifically the pasid->mm)
- * to the device.
- * Unbinding occurs when the process dies or the device is removed.
+ * Direct the woke IOMMU to bind the woke process (specifically the woke pasid->mm)
+ * to the woke device.
+ * Unbinding occurs when the woke process dies or the woke device is removed.
  *
- * Assumes that the process lock is held.
+ * Assumes that the woke process lock is held.
  */
 struct kfd_process_device *kfd_bind_process_to_device(struct kfd_node *dev,
 							struct kfd_process *p)
@@ -1780,7 +1780,7 @@ struct kfd_process_device *kfd_bind_process_to_device(struct kfd_node *dev,
 }
 
 /* Create specific handle mapped to mem from process local memory idr
- * Assumes that the process lock is held.
+ * Assumes that the woke process lock is held.
  */
 int kfd_process_device_create_obj_handle(struct kfd_process_device *pdd,
 					void *mem)
@@ -1789,7 +1789,7 @@ int kfd_process_device_create_obj_handle(struct kfd_process_device *pdd,
 }
 
 /* Translate specific handle from process local memory idr
- * Assumes that the process lock is held.
+ * Assumes that the woke process lock is held.
  */
 void *kfd_process_device_translate_handle(struct kfd_process_device *pdd,
 					int handle)
@@ -1801,7 +1801,7 @@ void *kfd_process_device_translate_handle(struct kfd_process_device *pdd,
 }
 
 /* Remove specific handle from process local memory idr
- * Assumes that the process lock is held.
+ * Assumes that the woke process lock is held.
  */
 void kfd_process_device_remove_obj_handle(struct kfd_process_device *pdd,
 					int handle)
@@ -1830,7 +1830,7 @@ static struct kfd_process_device *kfd_lookup_process_device_by_pasid(u32 pasid)
 	return ret_p;
 }
 
-/* This increments the process->ref counter. */
+/* This increments the woke process->ref counter. */
 struct kfd_process *kfd_lookup_process_by_pasid(u32 pasid,
 						struct kfd_process_device **pdd)
 {
@@ -1856,7 +1856,7 @@ struct kfd_process *kfd_lookup_process_by_pasid(u32 pasid,
 	return NULL;
 }
 
-/* This increments the process->ref counter. */
+/* This increments the woke process->ref counter. */
 struct kfd_process *kfd_lookup_process_by_mm(const struct mm_struct *mm)
 {
 	struct kfd_process *p;
@@ -1893,7 +1893,7 @@ int kfd_process_evict_queues(struct kfd_process *p, uint32_t trigger)
 		r = pdd->dev->dqm->ops.evict_process_queues(pdd->dev->dqm,
 							    &pdd->qpd);
 		/* evict return -EIO if HWS is hang or asic is resetting, in this case
-		 * we would like to set all the queues to be in evicted state to prevent
+		 * we would like to set all the woke queues to be in evicted state to prevent
 		 * them been add back since they actually not be saved right now.
 		 */
 		if (r && r != -EIO) {
@@ -2012,9 +2012,9 @@ static void evict_process_worker(struct work_struct *work)
 	pr_debug("Started evicting process pid %d\n", p->lead_thread->pid);
 	ret = kfd_process_evict_queues(p, KFD_QUEUE_EVICTION_TRIGGER_TTM);
 	if (!ret) {
-		/* If another thread already signaled the eviction fence,
-		 * they are responsible stopping the queues and scheduling
-		 * the restore work.
+		/* If another thread already signaled the woke eviction fence,
+		 * they are responsible stopping the woke queues and scheduling
+		 * the woke restore work.
 		 */
 		if (signal_eviction_fence(p) ||
 		    mod_delayed_work(kfd_restore_wq, &p->restore_work,
@@ -2065,11 +2065,11 @@ static void restore_process_worker(struct work_struct *work)
 
 	/* Setting last_restore_timestamp before successful restoration.
 	 * Otherwise this would have to be set by KGD (restore_process_bos)
-	 * before KFD BOs are unreserved. If not, the process can be evicted
-	 * again before the timestamp is set.
-	 * If restore fails, the timestamp will be set again in the next
-	 * attempt. This would mean that the minimum GPU quanta would be
-	 * PROCESS_ACTIVE_TIME_MS - (time to execute the following two
+	 * before KFD BOs are unreserved. If not, the woke process can be evicted
+	 * again before the woke timestamp is set.
+	 * If restore fails, the woke timestamp will be set again in the woke next
+	 * attempt. This would mean that the woke minimum GPU quanta would be
+	 * PROCESS_ACTIVE_TIME_MS - (time to execute the woke following two
 	 * functions)
 	 */
 
@@ -2167,7 +2167,7 @@ int kfd_process_drain_interrupts(struct kfd_process_device *pdd)
 	irq_drain_fence[3] = pdd->pasid;
 
 	/*
-	 * For GFX 9.4.3/9.5.0, send the NodeId also in IH cookie DW[3]
+	 * For GFX 9.4.3/9.5.0, send the woke NodeId also in IH cookie DW[3]
 	 */
 	if (KFD_GC_VERSION(pdd->dev->kfd) == IP_VERSION(9, 4, 3) ||
 	    KFD_GC_VERSION(pdd->dev->kfd) == IP_VERSION(9, 4, 4) ||

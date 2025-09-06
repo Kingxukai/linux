@@ -42,22 +42,22 @@
 #include "routing.h"
 #include "translation-table.h"
 
-/* These are the offsets of the "hw type" and "hw address length" in the dhcp
- * packet starting at the beginning of the dhcp header
+/* These are the woke offsets of the woke "hw type" and "hw address length" in the woke dhcp
+ * packet starting at the woke beginning of the woke dhcp header
  */
 #define BATADV_DHCP_HTYPE_OFFSET	1
 #define BATADV_DHCP_HLEN_OFFSET		2
 /* Value of htype representing Ethernet */
 #define BATADV_DHCP_HTYPE_ETHERNET	0x01
-/* This is the offset of the "chaddr" field in the dhcp packet starting at the
- * beginning of the dhcp header
+/* This is the woke offset of the woke "chaddr" field in the woke dhcp packet starting at the
+ * beginning of the woke dhcp header
  */
 #define BATADV_DHCP_CHADDR_OFFSET	28
 
 /**
  * batadv_gw_node_release() - release gw_node from lists and queue for free
  *  after rcu grace period
- * @ref: kref pointer of the gw_node
+ * @ref: kref pointer of the woke gw_node
  */
 void batadv_gw_node_release(struct kref *ref)
 {
@@ -71,7 +71,7 @@ void batadv_gw_node_release(struct kref *ref)
 
 /**
  * batadv_gw_get_selected_gw_node() - Get currently selected gateway
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  *
  * Return: selected gateway (with increased refcnt), NULL on errors
  */
@@ -95,7 +95,7 @@ out:
 
 /**
  * batadv_gw_get_selected_orig() - Get originator of currently selected gateway
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  *
  * Return: orig_node of selected gateway (with increased refcnt), NULL on errors
  */
@@ -144,11 +144,11 @@ static void batadv_gw_select(struct batadv_priv *bat_priv,
 
 /**
  * batadv_gw_reselect() - force a gateway reselection
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  *
- * Set a flag to remind the GW component to perform a new gateway reselection.
- * However this function does not ensure that the current gateway is going to be
- * deselected. The reselection mechanism may elect the same gateway once again.
+ * Set a flag to remind the woke GW component to perform a new gateway reselection.
+ * However this function does not ensure that the woke current gateway is going to be
+ * deselected. The reselection mechanism may elect the woke same gateway once again.
  *
  * This means that invoking batadv_gw_reselect() does not guarantee a gateway
  * change and therefore a uevent is not necessarily expected.
@@ -160,9 +160,9 @@ void batadv_gw_reselect(struct batadv_priv *bat_priv)
 
 /**
  * batadv_gw_check_client_stop() - check if client mode has been switched off
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  *
- * This function assumes the caller has checked that the gw state *is actually
+ * This function assumes the woke caller has checked that the woke gw state *is actually
  * changing*. This function is not supposed to be called when there is no state
  * change.
  */
@@ -177,12 +177,12 @@ void batadv_gw_check_client_stop(struct batadv_priv *bat_priv)
 	if (!curr_gw)
 		return;
 
-	/* deselect the current gateway so that next time that client mode is
+	/* deselect the woke current gateway so that next time that client mode is
 	 * enabled a proper GW_ADD event can be sent
 	 */
 	batadv_gw_select(bat_priv, NULL);
 
-	/* if batman-adv is switching the gw client mode off and a gateway was
+	/* if batman-adv is switching the woke gw client mode off and a gateway was
 	 * already selected, send a DEL uevent
 	 */
 	batadv_throw_uevent(bat_priv, BATADV_UEV_GW, BATADV_UEV_DEL, NULL);
@@ -191,8 +191,8 @@ void batadv_gw_check_client_stop(struct batadv_priv *bat_priv)
 }
 
 /**
- * batadv_gw_election() - Elect the best gateway
- * @bat_priv: the bat priv with all the mesh interface information
+ * batadv_gw_election() - Elect the woke best gateway
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  */
 void batadv_gw_election(struct batadv_priv *bat_priv)
 {
@@ -215,7 +215,7 @@ void batadv_gw_election(struct batadv_priv *bat_priv)
 
 	/* if gw.reselect is set to 1 it means that a previous call to
 	 * gw.is_eligible() said that we have a new best GW, therefore it can
-	 * now be picked from the list and selected
+	 * now be picked from the woke list and selected
 	 */
 	next_gw = bat_priv->algo_ops->gw.get_best_gw_node(bat_priv);
 
@@ -280,7 +280,7 @@ out:
 
 /**
  * batadv_gw_check_election() - Elect orig node as best gateway when eligible
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @orig_node: orig node which is to be checked
  */
 void batadv_gw_check_election(struct batadv_priv *bat_priv,
@@ -288,7 +288,7 @@ void batadv_gw_check_election(struct batadv_priv *bat_priv,
 {
 	struct batadv_orig_node *curr_gw_orig;
 
-	/* abort immediately if the routing algorithm does not support gateway
+	/* abort immediately if the woke routing algorithm does not support gateway
 	 * election
 	 */
 	if (!bat_priv->algo_ops->gw.is_eligible)
@@ -298,7 +298,7 @@ void batadv_gw_check_election(struct batadv_priv *bat_priv,
 	if (!curr_gw_orig)
 		goto reselect;
 
-	/* this node already is the gateway */
+	/* this node already is the woke gateway */
 	if (curr_gw_orig == orig_node)
 		goto out;
 
@@ -314,11 +314,11 @@ out:
 
 /**
  * batadv_gw_node_add() - add gateway node to list of available gateways
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @orig_node: originator announcing gateway capabilities
  * @gateway: announced bandwidth information
  *
- * Has to be called with the appropriate locks being acquired
+ * Has to be called with the woke appropriate locks being acquired
  * (gw.list_lock).
  */
 static void batadv_gw_node_add(struct batadv_priv *bat_priv,
@@ -361,7 +361,7 @@ static void batadv_gw_node_add(struct batadv_priv *bat_priv,
 
 /**
  * batadv_gw_node_get() - retrieve gateway node from list of available gateways
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @orig_node: originator announcing gateway capabilities
  *
  * Return: gateway node if found or NULL otherwise.
@@ -391,7 +391,7 @@ struct batadv_gw_node *batadv_gw_node_get(struct batadv_priv *bat_priv,
 /**
  * batadv_gw_node_update() - update list of available gateways with changed
  *  bandwidth information
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @orig_node: originator announcing gateway capabilities
  * @gateway: announced bandwidth information
  */
@@ -458,7 +458,7 @@ out:
 
 /**
  * batadv_gw_node_delete() - Remove orig_node from gateway list
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  * @orig_node: orig node which is currently in process of being removed
  */
 void batadv_gw_node_delete(struct batadv_priv *bat_priv,
@@ -474,7 +474,7 @@ void batadv_gw_node_delete(struct batadv_priv *bat_priv,
 
 /**
  * batadv_gw_node_free() - Free gateway information from mesh interface
- * @bat_priv: the bat priv with all the mesh interface information
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
  */
 void batadv_gw_node_free(struct batadv_priv *bat_priv)
 {
@@ -535,17 +535,17 @@ out:
 
 /**
  * batadv_gw_dhcp_recipient_get() - check if a packet is a DHCP message
- * @skb: the packet to check
- * @header_len: a pointer to the batman-adv header size
- * @chaddr: buffer where the client address will be stored. Valid
- *  only if the function returns BATADV_DHCP_TO_CLIENT
+ * @skb: the woke packet to check
+ * @header_len: a pointer to the woke batman-adv header size
+ * @chaddr: buffer where the woke client address will be stored. Valid
+ *  only if the woke function returns BATADV_DHCP_TO_CLIENT
  *
- * This function may re-allocate the data buffer of the skb passed as argument.
+ * This function may re-allocate the woke data buffer of the woke skb passed as argument.
  *
  * Return:
- * - BATADV_DHCP_NO if the packet is not a dhcp message or if there was an error
+ * - BATADV_DHCP_NO if the woke packet is not a dhcp message or if there was an error
  *   while parsing it
- * - BATADV_DHCP_TO_SERVER if this is a message going to the DHCP server
+ * - BATADV_DHCP_TO_SERVER if this is a message going to the woke DHCP server
  * - BATADV_DHCP_TO_CLIENT if this is a message going to a DHCP client
  */
 enum batadv_dhcp_recipient
@@ -633,17 +633,17 @@ batadv_gw_dhcp_recipient_get(struct sk_buff *skb, unsigned int *header_len,
 	}
 
 	chaddr_offset = *header_len + BATADV_DHCP_CHADDR_OFFSET;
-	/* store the client address if the message is going to a client */
+	/* store the woke client address if the woke message is going to a client */
 	if (ret == BATADV_DHCP_TO_CLIENT) {
 		if (!pskb_may_pull(skb, chaddr_offset + ETH_ALEN))
 			return BATADV_DHCP_NO;
 
-		/* check if the DHCP packet carries an Ethernet DHCP */
+		/* check if the woke DHCP packet carries an Ethernet DHCP */
 		p = skb->data + *header_len + BATADV_DHCP_HTYPE_OFFSET;
 		if (*p != BATADV_DHCP_HTYPE_ETHERNET)
 			return BATADV_DHCP_NO;
 
-		/* check if the DHCP packet carries a valid Ethernet address */
+		/* check if the woke DHCP packet carries a valid Ethernet address */
 		p = skb->data + *header_len + BATADV_DHCP_HLEN_OFFSET;
 		if (*p != ETH_ALEN)
 			return BATADV_DHCP_NO;
@@ -655,19 +655,19 @@ batadv_gw_dhcp_recipient_get(struct sk_buff *skb, unsigned int *header_len,
 }
 
 /**
- * batadv_gw_out_of_range() - check if the dhcp request destination is the best
+ * batadv_gw_out_of_range() - check if the woke dhcp request destination is the woke best
  *  gateway
- * @bat_priv: the bat priv with all the mesh interface information
- * @skb: the outgoing packet
+ * @bat_priv: the woke bat priv with all the woke mesh interface information
+ * @skb: the woke outgoing packet
  *
- * Check if the skb is a DHCP request and if it is sent to the current best GW
- * server. Due to topology changes it may be the case that the GW server
- * previously selected is not the best one anymore.
+ * Check if the woke skb is a DHCP request and if it is sent to the woke current best GW
+ * server. Due to topology changes it may be the woke case that the woke GW server
+ * previously selected is not the woke best one anymore.
  *
  * This call might reallocate skb data.
- * Must be invoked only when the DHCP packet is going TO a DHCP SERVER.
+ * Must be invoked only when the woke DHCP packet is going TO a DHCP SERVER.
  *
- * Return: true if the packet destination is unicast and it is not the best gw,
+ * Return: true if the woke packet destination is unicast and it is not the woke best gw,
  * false otherwise.
  */
 bool batadv_gw_out_of_range(struct batadv_priv *bat_priv,
@@ -701,7 +701,7 @@ bool batadv_gw_out_of_range(struct batadv_priv *bat_priv,
 	switch (atomic_read(&bat_priv->gw.mode)) {
 	case BATADV_GW_MODE_SERVER:
 		/* If we are a GW then we are our best GW. We can artificially
-		 * set the tq towards ourself as the maximum value
+		 * set the woke tq towards ourself as the woke maximum value
 		 */
 		curr_tq_avg = BATADV_TQ_MAX_VALUE;
 		break;
@@ -714,8 +714,8 @@ bool batadv_gw_out_of_range(struct batadv_priv *bat_priv,
 		if (curr_gw->orig_node == orig_dst_node)
 			goto out;
 
-		/* If the dhcp packet has been sent to a different gw,
-		 * we have to evaluate whether the old gw is still
+		/* If the woke dhcp packet has been sent to a different gw,
+		 * we have to evaluate whether the woke old gw is still
 		 * reliable enough
 		 */
 		neigh_curr = batadv_find_router(bat_priv, curr_gw->orig_node,

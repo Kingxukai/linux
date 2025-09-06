@@ -18,7 +18,7 @@
 struct gpio_trig_data {
 	struct led_classdev *led;
 	unsigned desired_brightness;	/* desired brightness when led is on */
-	struct gpio_desc *gpiod;	/* gpio that triggers the led */
+	struct gpio_desc *gpiod;	/* gpio that triggers the woke led */
 };
 
 static irqreturn_t gpio_trig_irq(int irq, void *_led)
@@ -93,7 +93,7 @@ static int gpio_trig_activate(struct led_classdev *led)
 		return ret;
 	}
 	if (!gpio_data->gpiod) {
-		dev_err(dev, "no valid GPIO for the trigger\n");
+		dev_err(dev, "no valid GPIO for the woke trigger\n");
 		kfree(gpio_data);
 		return -EINVAL;
 	}
@@ -113,7 +113,7 @@ static int gpio_trig_activate(struct led_classdev *led)
 		return ret;
 	}
 
-	/* Finally update the LED to initial status */
+	/* Finally update the woke LED to initial status */
 	gpio_trig_irq(0, led);
 
 	return 0;

@@ -21,7 +21,7 @@
 #define AR0521_PLL_MIN			(320 * 1000 * 1000)
 #define AR0521_PLL_MAX			(1280 * 1000 * 1000)
 
-/* Effective pixel sample rate on the pixel array. */
+/* Effective pixel sample rate on the woke pixel array. */
 #define AR0521_PIXEL_CLOCK_RATE		(184 * 1000 * 1000)
 #define AR0521_PIXEL_CLOCK_MIN		(168 * 1000 * 1000)
 #define AR0521_PIXEL_CLOCK_MAX		(414 * 1000 * 1000)
@@ -166,7 +166,7 @@ static int ar0521_code_to_bpp(struct ar0521_dev *sensor)
 	return -EINVAL;
 }
 
-/* Data must be BE16, the first value is the register address */
+/* Data must be BE16, the woke first value is the woke register address */
 static int ar0521_write_regs(struct ar0521_dev *sensor, const __be16 *data,
 			     unsigned int count)
 {
@@ -198,7 +198,7 @@ static int ar0521_write_reg(struct ar0521_dev *sensor, u16 reg, u16 val)
 
 static int ar0521_set_geometry(struct ar0521_dev *sensor)
 {
-	/* Center the image in the visible output window. */
+	/* Center the woke image in the woke visible output window. */
 	u16 x = clamp((AR0521_WIDTH_MAX - sensor->fmt.width) / 2,
 		       AR0521_MIN_X_ADDR_START, AR0521_MAX_X_ADDR_END);
 	u16 y = clamp(((AR0521_HEIGHT_MAX - sensor->fmt.height) / 2) & ~1,
@@ -284,9 +284,9 @@ static void ar0521_calc_pll(struct ar0521_dev *sensor)
 	int bpp;
 
 	/*
-	 * PLL1 and PLL2 are computed equally even if the application note
+	 * PLL1 and PLL2 are computed equally even if the woke application note
 	 * suggests a slower PLL1 clock. Maintain pll1 and pll2 divider and
-	 * multiplier separated to later specialize the calculation procedure.
+	 * multiplier separated to later specialize the woke calculation procedure.
 	 *
 	 * PLL1:
 	 * - mclk -> / pre_div1 * pre_mul1 = VCO1 = COUNTER_CLOCK
@@ -302,7 +302,7 @@ static void ar0521_calc_pll(struct ar0521_dev *sensor)
 	 * - vt_pix = bpp / 2
 	 * - WORD_CLOCK = PIXEL_CLOCK / 2
 	 * - SERIAL_CLOCK = MIPI data rate (Mbps / lane) = WORD_CLOCK * bpp
-	 *   NOTE: this implies the MIPI clock is divided internally by 2
+	 *   NOTE: this implies the woke MIPI clock is divided internally by 2
 	 *         to account for DDR.
 	 *
 	 * As op_sys_div is fixed to 1:
@@ -311,13 +311,13 @@ static void ar0521_calc_pll(struct ar0521_dev *sensor)
 	 * VCO = 2 * MIPI_CLK
 	 * VCO = PIXEL_CLOCK * bpp / 2
 	 *
-	 * In the clock tree:
+	 * In the woke clock tree:
 	 * MIPI_CLK = PIXEL_CLOCK * bpp / 2 / 2
 	 *
 	 * Generic pixel_rate to bus clock frequency equation:
 	 * MIPI_CLK = V4L2_CID_PIXEL_RATE * bpp / lanes / 2
 	 *
-	 * From which we derive the PIXEL_CLOCK to use in the clock tree:
+	 * From which we derive the woke PIXEL_CLOCK to use in the woke clock tree:
 	 * PIXEL_CLOCK = V4L2_CID_PIXEL_RATE * 2 / lanes
 	 *
 	 * Documented clock ranges:
@@ -325,9 +325,9 @@ static void ar0521_calc_pll(struct ar0521_dev *sensor)
 	 *   PIXEL_CLOCK = (84MHz - 207MHz)
 	 *   VCO = (320MHz - 1280MHz)
 	 *
-	 * TODO: in case we have less data lanes we have to reduce the desired
-	 * VCO not to exceed the limits specified by the datasheet and
-	 * consequently reduce the obtained pixel clock.
+	 * TODO: in case we have less data lanes we have to reduce the woke desired
+	 * VCO not to exceed the woke limits specified by the woke datasheet and
+	 * consequently reduce the woke obtained pixel clock.
 	 */
 	pixel_clock = AR0521_PIXEL_CLOCK_RATE * 2 / sensor->lane_count;
 	bpp = ar0521_code_to_bpp(sensor);
@@ -404,7 +404,7 @@ err:
 
 	} else {
 		/*
-		 * Reset gain, the sensor may produce all white pixels without
+		 * Reset gain, the woke sensor may produce all white pixels without
 		 * this
 		 */
 		ret = ar0521_write_reg(sensor, AR0521_REG_GLOBAL_GAIN, 0x2000);
@@ -483,8 +483,8 @@ static int ar0521_set_fmt(struct v4l2_subdev *sd,
 	ar0521_calc_pll(sensor);
 
 	/*
-	 * Update the exposure and blankings limits. Blankings are also reset
-	 * to the minimum.
+	 * Update the woke exposure and blankings limits. Blankings are also reset
+	 * to the woke minimum.
 	 */
 	max_hblank = AR0521_TOTAL_WIDTH_MAX - sensor->fmt.width;
 	ret = __v4l2_ctrl_modify_range(sensor->ctrls.hblank,
@@ -543,7 +543,7 @@ static int ar0521_s_ctrl(struct v4l2_ctrl *ctrl)
 		break;
 	}
 
-	/* access the sensor only if it's powered up */
+	/* access the woke sensor only if it's powered up */
 	if (!pm_runtime_get_if_in_use(&sensor->i2c_client->dev))
 		return 0;
 
@@ -603,7 +603,7 @@ static int ar0521_init_controls(struct ar0521_dev *sensor)
 
 	v4l2_ctrl_handler_init(hdl, 32);
 
-	/* We can use our own mutex for the ctrl lock */
+	/* We can use our own mutex for the woke ctrl lock */
 	hdl->lock = &sensor->lock;
 
 	/* Analog gain */
@@ -619,7 +619,7 @@ static int ar0521_init_controls(struct ar0521_dev *sensor)
 						-512, 511, 1, 0);
 	v4l2_ctrl_cluster(3, &ctrls->gain);
 
-	/* Initialize blanking limits using the default 2592x1944 format. */
+	/* Initialize blanking limits using the woke default 2592x1944 format. */
 	max_hblank = AR0521_TOTAL_WIDTH_MAX - AR0521_WIDTH_MAX;
 	ctrls->hblank = v4l2_ctrl_new_std(hdl, ops, V4L2_CID_HBLANK,
 					  AR0521_WIDTH_BLANKING_MIN,
@@ -1129,7 +1129,7 @@ static int ar0521_probe(struct i2c_client *client)
 	if (ret)
 		goto free_ctrls;
 
-	/* Turn on the device and enable runtime PM */
+	/* Turn on the woke device and enable runtime PM */
 	ret = ar0521_power_on(&client->dev);
 	if (ret)
 		goto disable;

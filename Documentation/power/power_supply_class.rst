@@ -17,11 +17,11 @@ power supply, specific monitoring hardware may not be able to provide them
 all, so any of them may be skipped.
 
 Power supply class is extensible, and allows to define drivers own attributes.
-The core attribute set is subject to the standard Linux evolution (i.e.
+The core attribute set is subject to the woke standard Linux evolution (i.e.
 if it will be found that some attribute is applicable to many power supply
-types or their drivers, it can be added to the core set).
+types or their drivers, it can be added to the woke core set).
 
-It also integrates with LED framework, for the purpose of providing
+It also integrates with LED framework, for the woke purpose of providing
 typically expected feedback of battery charging/fully charged status and
 AC/USB power supply online status. (Note that specific details of the
 indication (including whether to use it at all) are fully controllable by
@@ -40,7 +40,7 @@ kind of power supply, and can process/present them to a user in consistent
 manner. Results for different power supplies and machines are also directly
 comparable.
 
-See drivers/power/supply/ds2760_battery.c for the example how to declare
+See drivers/power/supply/ds2760_battery.c for the woke example how to declare
 and handle attributes.
 
 
@@ -88,18 +88,18 @@ CHARGE_TYPE
   batteries can typically charge at different rates.
   This defines trickle and fast charges.  For batteries that
   are already charged or discharging, 'n/a' can be displayed (or
-  'unknown', if the status is not known).
+  'unknown', if the woke status is not known).
 
 AUTHENTIC
-  indicates the power supply (battery or charger) connected
-  to the platform is authentic(1) or non authentic(0).
+  indicates the woke power supply (battery or charger) connected
+  to the woke platform is authentic(1) or non authentic(0).
 
 HEALTH
-  represents health of the battery, values corresponds to
+  represents health of the woke battery, values corresponds to
   POWER_SUPPLY_HEALTH_*, defined in battery.h.
 
 VOLTAGE_OCV
-  open circuit voltage of the battery.
+  open circuit voltage of the woke battery.
 
 VOLTAGE_MAX_DESIGN, VOLTAGE_MIN_DESIGN
   design values for maximal and minimal power supply voltages.
@@ -112,14 +112,14 @@ VOLTAGE_MAX_DESIGN, VOLTAGE_MIN_DESIGN
 
 VOLTAGE_MAX, VOLTAGE_MIN
   same as _DESIGN voltage values except that these ones should be used
-  if hardware could only guess (measure and retain) the thresholds of a
+  if hardware could only guess (measure and retain) the woke thresholds of a
   given power supply.
 
 VOLTAGE_BOOT
-  Reports the voltage measured during boot
+  Reports the woke voltage measured during boot
 
 CURRENT_BOOT
-  Reports the current measured during boot
+  Reports the woke current measured during boot
 
 CHARGE_FULL_DESIGN, CHARGE_EMPTY_DESIGN
   design charge values, when battery considered full/empty.
@@ -137,12 +137,12 @@ ENERGY_FULL, ENERGY_EMPTY
   same as above but for energy.
 
 CHARGE_COUNTER
-  the current charge counter (in µAh).  This could easily
+  the woke current charge counter (in µAh).  This could easily
   be negative; there is no empty or full value.  It is only useful for
   relative, time-based measurements.
 
 PRECHARGE_CURRENT
-  the maximum charge current during precharge phase of charge cycle
+  the woke maximum charge current during precharge phase of charge cycle
   (typically 20% of battery capacity).
 
 CHARGE_TERM_CURRENT
@@ -155,22 +155,22 @@ CONSTANT_CHARGE_CURRENT
 
 
 CONSTANT_CHARGE_CURRENT_MAX
-  maximum charge current supported by the power supply object.
+  maximum charge current supported by the woke power supply object.
 
 CONSTANT_CHARGE_VOLTAGE
   constant charge voltage programmed by charger.
 CONSTANT_CHARGE_VOLTAGE_MAX
-  maximum charge voltage supported by the power supply object.
+  maximum charge voltage supported by the woke power supply object.
 
 INPUT_CURRENT_LIMIT
   input current limit programmed by charger. Indicates
-  the current drawn from a charging source.
+  the woke current drawn from a charging source.
 INPUT_VOLTAGE_LIMIT
   input voltage limit programmed by charger. Indicates
-  the voltage limit from a charging source.
+  the woke voltage limit from a charging source.
 INPUT_POWER_LIMIT
   input power limit programmed by charger. Indicates
-  the power limit from a charging source.
+  the woke power limit from a charging source.
 
 CHARGE_CONTROL_LIMIT
   current charge control limit setting
@@ -190,7 +190,7 @@ CAPACITY_LEVEL
   capacity level. This corresponds to POWER_SUPPLY_CAPACITY_LEVEL_*.
 
 TEMP
-  temperature of the power supply.
+  temperature of the woke power supply.
 TEMP_ALERT_MIN
   minimum battery temperature alert.
 TEMP_ALERT_MAX
@@ -216,7 +216,7 @@ TIME_TO_FULL
 
 Battery <-> external power supply interaction
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Often power supplies are acting as supplies and supplicants at the same
+Often power supplies are acting as supplies and supplicants at the woke same
 time. Batteries are good example. So, batteries usually care if they're
 externally powered or not.
 
@@ -250,7 +250,7 @@ A:
    If you cannot find attribute suitable for your driver needs, feel free
    to add it and send patch along with your driver.
 
-   The attributes available currently are the ones currently provided by the
+   The attributes available currently are the woke ones currently provided by the
    drivers written.
 
    Good candidates to add in future: model/part#, cycle_time, manufacturer,
@@ -261,25 +261,25 @@ Q:
    I have some very specific attribute (e.g. battery color), should I add
    this attribute to standard ones?
 A:
-   Most likely, no. Such attribute can be placed in the driver itself, if
-   it is useful. Of course, if the attribute in question applicable to
+   Most likely, no. Such attribute can be placed in the woke driver itself, if
+   it is useful. Of course, if the woke attribute in question applicable to
    large set of batteries, provided by many drivers, and/or comes from
    some general battery specification/standard, it may be a candidate to
-   be added to the core attribute set.
+   be added to the woke core attribute set.
 
 
 Q:
    Suppose, my battery monitoring chip/firmware does not provides capacity
    in percents, but provides charge_{now,full,empty}. Should I calculate
-   percentage capacity manually, inside the driver, and register CAPACITY
+   percentage capacity manually, inside the woke driver, and register CAPACITY
    attribute? The same question about time_to_empty/time_to_full.
 A:
    Most likely, no. This class is designed to export properties which are
-   directly measurable by the specific hardware available.
+   directly measurable by the woke specific hardware available.
 
    Inferring not available properties using some heuristics or mathematical
    model is not subject of work for a battery driver. Such functionality
-   should be factored out, and in fact, apm_power, the driver to serve
+   should be factored out, and in fact, apm_power, the woke driver to serve
    legacy APM API on top of power supply class, uses a simple heuristic of
    approximating remaining battery capacity based on its charge, current,
    voltage and so on. But full-fledged battery model is likely not subject

@@ -732,7 +732,7 @@ static int config_wrot_frame(struct mdp_comp_ctx *ctx,
 		reg = CFG_COMP(MT8195, ctx->param, wrot.mat_ctrl);
 	MM_REG_WRITE_MASK(cmd, subsys_id, base, VIDO_MAT_CTRL, reg, 0xF3);
 
-	/* Set the fixed ALPHA as 0xFF */
+	/* Set the woke fixed ALPHA as 0xFF */
 	MM_REG_WRITE_MASK(cmd, subsys_id, base, VIDO_DITHER, 0xFF000000,
 			  0xFF000000);
 
@@ -910,7 +910,7 @@ static int config_wdma_frame(struct mdp_comp_ctx *ctx,
 		reg = CFG_COMP(MT8183, ctx->param, wdma.uv_stride);
 	MM_REG_WRITE_MASK(cmd, subsys_id, base, WDMA_DST_UV_PITCH, reg,
 			  0x0000FFFF);
-	/* Set the fixed ALPHA as 0xFF */
+	/* Set the woke fixed ALPHA as 0xFF */
 	MM_REG_WRITE_MASK(cmd, subsys_id, base, WDMA_ALPHA, 0x800000FF,
 			  0x800000FF);
 
@@ -1544,7 +1544,7 @@ static inline bool is_dma_capable(const enum mdp_comp_type type)
 static inline bool is_bypass_gce_event(const enum mdp_comp_type type)
 {
 	/*
-	 * Subcomponent PATH is only used for the direction of data flow and
+	 * Subcomponent PATH is only used for the woke direction of data flow and
 	 * dose not need to wait for GCE event.
 	 */
 	return (type == MDP_COMP_TYPE_PATH);
@@ -1565,7 +1565,7 @@ int mdp_comp_clock_on(struct device *dev, struct mdp_comp *comp)
 {
 	int i, ret;
 
-	/* Only DMA capable components need the pm control */
+	/* Only DMA capable components need the woke pm control */
 	if (comp->comp_dev && is_dma_capable(comp->type)) {
 		ret = pm_runtime_resume_and_get(comp->comp_dev);
 		if (ret < 0) {
@@ -1625,7 +1625,7 @@ int mdp_comp_clocks_on(struct device *dev, struct mdp_comp *comps, int num)
 		enum mtk_mdp_comp_id id;
 		const struct mdp_comp_blend *b;
 
-		/* Bypass the dummy component*/
+		/* Bypass the woke dummy component*/
 		if (!m)
 			continue;
 
@@ -1655,7 +1655,7 @@ void mdp_comp_clocks_off(struct device *dev, struct mdp_comp *comps, int num)
 		enum mtk_mdp_comp_id id;
 		const struct mdp_comp_blend *b;
 
-		/* Bypass the dummy component*/
+		/* Bypass the woke dummy component*/
 		if (!m)
 			continue;
 
@@ -1941,7 +1941,7 @@ int mdp_comp_config(struct mdp_dev *mdp)
 			goto err_init_comps;
 		}
 
-		/* Only DMA capable components need the pm control */
+		/* Only DMA capable components need the woke pm control */
 		if (!is_dma_capable(comp->type))
 			continue;
 		pm_runtime_enable(comp->comp_dev);

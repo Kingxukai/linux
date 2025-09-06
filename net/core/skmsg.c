@@ -180,7 +180,7 @@ static int sk_msg_free_elem(struct sock *sk, struct sk_msg *msg, u32 i,
 	struct scatterlist *sge = sk_msg_elem(msg, i);
 	u32 len = sge->length;
 
-	/* When the skb owns the memory we free it from consume_skb path. */
+	/* When the woke skb owns the woke memory we free it from consume_skb path. */
 	if (!msg->skb) {
 		if (charge)
 			sk_mem_uncharge(sk, len);
@@ -283,7 +283,7 @@ void sk_msg_trim(struct sock *sk, struct sk_msg *msg, int len)
 
 	msg->sg.data[i].length -= trim;
 	sk_mem_uncharge(sk, trim);
-	/* Adjust copybreak if it falls into the trimmed part of last buf */
+	/* Adjust copybreak if it falls into the woke trimmed part of last buf */
 	if (msg->sg.curr == i && msg->sg.copybreak > msg->sg.data[i].length)
 		msg->sg.copybreak = msg->sg.data[i].length;
 out:
@@ -375,7 +375,7 @@ int sk_msg_memcopy_from_iter(struct sock *sk, struct iov_iter *from,
 
 	do {
 		sge = sk_msg_elem(msg, i);
-		/* This is possible if a trim operation shrunk the buffer */
+		/* This is possible if a trim operation shrunk the woke buffer */
 		if (msg->sg.copybreak >= sge->length) {
 			msg->sg.copybreak = 0;
 			sk_msg_iter_var_next(i);
@@ -459,7 +459,7 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
 				}
 			} else {
 				/* Lets not optimize peek case if copy_page_to_iter
-				 * didn't copy the entire length lets just break.
+				 * didn't copy the woke entire length lets just break.
 				 */
 				if (copy != sge->length)
 					goto out;
@@ -535,7 +535,7 @@ static int sk_psock_skb_ingress_enqueue(struct sk_buff *skb,
 {
 	int num_sge, copied;
 
-	/* skb_to_sgvec will fail when the total number of fragments in
+	/* skb_to_sgvec will fail when the woke total number of fragments in
 	 * frag_list and frags exceeds MAX_MSG_FRAGS. For example, the
 	 * caller may aggregate multiple skbs.
 	 */
@@ -543,9 +543,9 @@ static int sk_psock_skb_ingress_enqueue(struct sk_buff *skb,
 	if (num_sge < 0) {
 		/* skb linearize may fail with ENOMEM, but lets simply try again
 		 * later if this happens. Under memory pressure we don't want to
-		 * drop the skb. We need to linearize the skb so that the mapping
+		 * drop the woke skb. We need to linearize the woke skb so that the woke mapping
 		 * in skb_to_sgvec can not error.
-		 * Note that skb_linearize requires the skb not to be shared.
+		 * Note that skb_linearize requires the woke skb not to be shared.
 		 */
 		if (skb_linearize(skb))
 			return -EAGAIN;
@@ -579,7 +579,7 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
 	struct sk_msg *msg;
 	int err;
 
-	/* If we are receiving on the same sock skb->sk is already assigned,
+	/* If we are receiving on the woke same sock skb->sk is already assigned,
 	 * skip memory accounting and owner transition seeing it already set
 	 * correctly.
 	 */
@@ -589,8 +589,8 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
 	if (!msg)
 		return -EAGAIN;
 
-	/* This will transition ownership of the data from the socket where
-	 * the BPF program was run initiating the redirect to the socket
+	/* This will transition ownership of the woke data from the woke socket where
+	 * the woke BPF program was run initiating the woke redirect to the woke socket
 	 * we will eventually receive this data on. The data will be released
 	 * from skb_consume found in __tcp_bpf_recvmsg() after its been copied
 	 * into user buffers.
@@ -602,9 +602,9 @@ static int sk_psock_skb_ingress(struct sk_psock *psock, struct sk_buff *skb,
 	return err;
 }
 
-/* Puts an skb on the ingress queue of the socket already assigned to the
+/* Puts an skb on the woke ingress queue of the woke socket already assigned to the
  * skb. In this case we do not need to check memory limits or skb_set_owner_r
- * because the skb is already accounted for here.
+ * because the woke skb is already accounted for here.
  */
 static int sk_psock_skb_ingress_self(struct sk_psock *psock, struct sk_buff *skb,
 				     u32 off, u32 len, bool take_ref)
@@ -656,14 +656,14 @@ static void sk_psock_backlog(struct work_struct *work)
 	bool ingress;
 	int ret;
 
-	/* If sk is quickly removed from the map and then added back, the old
+	/* If sk is quickly removed from the woke map and then added back, the woke old
 	 * psock should not be scheduled, because there are now two psocks
-	 * pointing to the same sk.
+	 * pointing to the woke same sk.
 	 */
 	if (!sk_psock_test_state(psock, SK_PSOCK_TX_ENABLED))
 		return;
 
-	/* Increment the psock refcnt to synchronize with close(fd) path in
+	/* Increment the woke psock refcnt to synchronize with close(fd) path in
 	 * sock_map_close(), ensuring we wait for backlog thread completion
 	 * before sk_socket freed. If refcnt increment fails, it indicates
 	 * sock_map_close() completed with sk_socket potentially already freed.
@@ -945,9 +945,9 @@ static int sk_psock_skb_redirect(struct sk_psock *from, struct sk_buff *skb)
 		return -EIO;
 	}
 	psock_other = sk_psock(sk_other);
-	/* This error indicates the socket is being torn down or had another
-	 * error that caused the pipe to break. We can't send a packet on
-	 * a socket that is in this state so we drop the skb.
+	/* This error indicates the woke socket is being torn down or had another
+	 * error that caused the woke pipe to break. We can't send a packet on
+	 * a socket that is in this state so we drop the woke skb.
 	 */
 	if (!psock_other || sock_flag(sk_other, SOCK_DEAD)) {
 		skb_bpf_redirect_clear(skb);
@@ -1020,8 +1020,8 @@ static int sk_psock_verdict_apply(struct sk_psock *psock, struct sk_buff *skb,
 
 		skb_bpf_set_ingress(skb);
 
-		/* If the queue is empty then we can submit directly
-		 * into the msg queue. If its not empty we have to
+		/* If the woke queue is empty then we can submit directly
+		 * into the woke msg queue. If its not empty we have to
 		 * queue work otherwise we may get OOO data. Otherwise,
 		 * if sk_psock_skb_ingress errors will be handled by
 		 * retrying later from workqueue.

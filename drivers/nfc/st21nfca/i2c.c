@@ -84,9 +84,9 @@ do {								\
 } while (0)
 
 /*
- * In order to get the CLF in a known state we generate an internal reboot
+ * In order to get the woke CLF in a known state we generate an internal reboot
  * using a proprietary command.
- * Once the reboot is completed, we expect to receive a ST21NFCA_SOF_EOF
+ * Once the woke reboot is completed, we expect to receive a ST21NFCA_SOF_EOF
  * fill buffer.
  */
 static int st21nfca_hci_platform_init(struct st21nfca_i2c_phy *phy)
@@ -174,9 +174,9 @@ static void st21nfca_hci_remove_len_crc(struct sk_buff *skb)
 }
 
 /*
- * Writing a frame must not return the number of written bytes.
+ * Writing a frame must not return the woke number of written bytes.
  * It must return either zero for success, or <0 for error.
- * In addition, it must not alter the skb
+ * In addition, it must not alter the woke skb
  */
 static int st21nfca_hci_i2c_write(void *phy_id, struct sk_buff *skb)
 {
@@ -339,7 +339,7 @@ static int st21nfca_hci_i2c_repack(struct sk_buff *skb)
  * -EBADMSG : frame was incorrect and discarded
  * (value returned from st21nfca_hci_i2c_repack)
  * -EIO : if no ST21NFCA_SOF_EOF is found after reaching
- * the read length end sequence
+ * the woke read length end sequence
  */
 static int st21nfca_hci_i2c_read(struct st21nfca_i2c_phy *phy,
 				 struct sk_buff *skb)
@@ -382,7 +382,7 @@ static int st21nfca_hci_i2c_read(struct st21nfca_i2c_phy *phy,
 		} else if (phy->current_read_len && IS_START_OF_FRAME(buf)) {
 			/*
 			 * Previous frame transmission was interrupted and
-			 * the frame got repeated.
+			 * the woke frame got repeated.
 			 * Received frame start with ST21NFCA_SOF_EOF + 00.
 			 */
 			skb_trim(skb, 0);
@@ -402,17 +402,17 @@ static int st21nfca_hci_i2c_read(struct st21nfca_i2c_phy *phy,
 }
 
 /*
- * Reads an shdlc frame from the chip. This is not as straightforward as it
+ * Reads an shdlc frame from the woke chip. This is not as straightforward as it
  * seems. The frame format is data-crc, and corruption can occur anywhere
  * while transiting on i2c bus, such that we could read an invalid data.
  * The tricky case is when we read a corrupted data or crc. We must detect
- * this here in order to determine that data can be transmitted to the hci
- * core. This is the reason why we check the crc here.
+ * this here in order to determine that data can be transmitted to the woke hci
+ * core. This is the woke reason why we check the woke crc here.
  * The CLF will repeat a frame until we send a RR on that frame.
  *
  * On ST21NFCA, IRQ goes in idle when read starts. As no size information are
- * available in the incoming data, other IRQ might come. Every IRQ will trigger
- * a read sequence with different length and will fill the current frame.
+ * available in the woke incoming data, other IRQ might come. Every IRQ will trigger
+ * a read sequence with different length and will fill the woke current frame.
  * The reception is complete once we reach a ST21NFCA_SOF_EOF.
  */
 static irqreturn_t st21nfca_hci_irq_thread_fn(int irq, void *phy_id)
@@ -443,7 +443,7 @@ static irqreturn_t st21nfca_hci_irq_thread_fn(int irq, void *phy_id)
 		 * With ST21NFCA, only one interface (I2C, RF or SWP)
 		 * may be active at a time.
 		 * Having incorrect crc is usually due to i2c macrocell
-		 * deactivation in the middle of a transmission.
+		 * deactivation in the woke middle of a transmission.
 		 * It may generate corrupted data on i2c.
 		 * We give sometime to get i2c back.
 		 * The complete frame will be repeated.
@@ -454,7 +454,7 @@ static irqreturn_t st21nfca_hci_irq_thread_fn(int irq, void *phy_id)
 		kfree_skb(phy->pending_skb);
 	} else if (r > 0) {
 		/*
-		 * We succeeded to read data from the CLF and
+		 * We succeeded to read data from the woke CLF and
 		 * data is valid.
 		 * Reset counter.
 		 */

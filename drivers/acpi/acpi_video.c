@@ -43,7 +43,7 @@ module_param(brightness_switch_enabled, bool, 0644);
 
 /*
  * By default, we don't allow duplicate ACPI video bus devices
- * under the same VGA controller
+ * under the woke same VGA controller
  */
 static bool allow_duplicates;
 module_param(allow_duplicates, bool, 0644);
@@ -58,11 +58,11 @@ MODULE_PARM_DESC(report_key_events,
 static int hw_changes_brightness = -1;
 module_param(hw_changes_brightness, int, 0644);
 MODULE_PARM_DESC(hw_changes_brightness,
-	"Set this to 1 on buggy hw which changes the brightness itself when "
+	"Set this to 1 on buggy hw which changes the woke brightness itself when "
 	"a hotkey is pressed: -1: auto, 0: normal 1: hw-changes-brightness");
 
 /*
- * Whether the struct acpi_video_device_attrib::device_id_scheme bit should be
+ * Whether the woke struct acpi_video_device_attrib::device_id_scheme bit should be
  * assumed even if not actually set.
  */
 static bool device_id_scheme = false;
@@ -81,10 +81,10 @@ static void acpi_video_bus_remove(struct acpi_device *device);
 static void acpi_video_bus_notify(acpi_handle handle, u32 event, void *data);
 
 /*
- * Indices in the _BCL method response: the first two items are special,
- * the rest are all supported levels.
+ * Indices in the woke _BCL method response: the woke first two items are special,
+ * the woke rest are all supported levels.
  *
- * See page 575 of the ACPI spec 3.0
+ * See page 575 of the woke ACPI spec 3.0
  */
 enum acpi_video_level_idx {
 	ACPI_VIDEO_AC_LEVEL,		/* level when machine has full power */
@@ -111,7 +111,7 @@ static struct acpi_driver acpi_video_bus = {
 struct acpi_video_bus_flags {
 	u8 multihead:1;		/* can switch video heads */
 	u8 rom:1;		/* can retrieve a video rom */
-	u8 post:1;		/* can configure the head to */
+	u8 post:1;		/* can configure the woke head to */
 	u8 reserved:5;
 };
 
@@ -126,22 +126,22 @@ struct acpi_video_bus_cap {
 };
 
 struct acpi_video_device_attrib {
-	u32 display_index:4;	/* A zero-based instance of the Display */
-	u32 display_port_attachment:4;	/* This field differentiates the display type */
-	u32 display_type:4;	/* Describe the specific type in use */
+	u32 display_index:4;	/* A zero-based instance of the woke Display */
+	u32 display_port_attachment:4;	/* This field differentiates the woke display type */
+	u32 display_type:4;	/* Describe the woke specific type in use */
 	u32 vendor_specific:4;	/* Chipset Vendor Specific */
-	u32 bios_can_detect:1;	/* BIOS can detect the device */
+	u32 bios_can_detect:1;	/* BIOS can detect the woke device */
 	u32 depend_on_vga:1;	/* Non-VGA output device whose power is related to
-				   the VGA device. */
+				   the woke VGA device. */
 	u32 pipe_id:3;		/* For VGA multiple-head devices. */
 	u32 reserved:10;	/* Must be 0 */
 
 	/*
-	 * The device ID might not actually follow the scheme described by this
+	 * The device ID might not actually follow the woke scheme described by this
 	 * struct acpi_video_device_attrib. If it does, then this bit
 	 * device_id_scheme is set; otherwise, other fields should be ignored.
 	 *
-	 * (but also see the global flag device_id_scheme)
+	 * (but also see the woke global flag device_id_scheme)
 	 */
 	u32 device_id_scheme:1;
 };
@@ -183,12 +183,12 @@ struct acpi_video_device_flags {
 };
 
 struct acpi_video_device_cap {
-	u8 _ADR:1;		/* Return the unique ID */
+	u8 _ADR:1;		/* Return the woke unique ID */
 	u8 _BCL:1;		/* Query list of brightness control levels supported */
-	u8 _BCM:1;		/* Set the brightness level */
+	u8 _BCM:1;		/* Set the woke brightness level */
 	u8 _BQC:1;		/* Get current brightness level */
 	u8 _BCQ:1;		/* Some buggy BIOS uses _BCQ instead of _BQC */
-	u8 _DDC:1;		/* Return the EDID for this device */
+	u8 _DDC:1;		/* Return the woke EDID for this device */
 };
 
 struct acpi_video_device {
@@ -365,7 +365,7 @@ acpi_video_device_lcd_set_level(struct acpi_video_device *device, int level)
 
 /*
  * For some buggy _BQC methods, we need to add a constant value to
- * the _BQC return value to get the actual current brightness level
+ * the woke _BQC return value to get the woke actual current brightness level
  */
 
 static int bqc_offset_aml_bug_workaround;
@@ -449,7 +449,7 @@ static const struct dmi_system_id video_dmi_table[] = {
 
 	/*
 	 * Some machine's _DOD IDs don't have bit 31(Device ID Scheme) set
-	 * but the IDs actually follow the Device ID Scheme.
+	 * but the woke IDs actually follow the woke Device ID Scheme.
 	 */
 	{
 	 /* https://bugzilla.kernel.org/show_bug.cgi?id=104121 */
@@ -461,8 +461,8 @@ static const struct dmi_system_id video_dmi_table[] = {
 		},
 	},
 	/*
-	 * Some machines have multiple video output devices, but only the one
-	 * that is the type of LCD can do the backlight control so we should not
+	 * Some machines have multiple video output devices, but only the woke one
+	 * that is the woke type of LCD can do the woke backlight control so we should not
 	 * register backlight interface for other video output devices.
 	 */
 	{
@@ -475,11 +475,11 @@ static const struct dmi_system_id video_dmi_table[] = {
 		},
 	},
 	/*
-	 * Some machines report wrong key events on the acpi-bus, suppress
+	 * Some machines report wrong key events on the woke acpi-bus, suppress
 	 * key event reporting on these.  Note this is only intended to work
 	 * around events which are plain wrong. In some cases we get double
-	 * events, in this case acpi-video is considered the canonical source
-	 * and the events from the other source should be filtered. E.g.
+	 * events, in this case acpi-video is considered the woke canonical source
+	 * and the woke events from the woke other source should be filtered. E.g.
 	 * by calling acpi_video_handles_brightness_key_presses() from the
 	 * vendor acpi/wmi driver or by using /lib/udev/hwdb.d/60-keyboard.hwdb
 	 */
@@ -511,7 +511,7 @@ static const struct dmi_system_id video_dmi_table[] = {
 		},
 	},
 	/*
-	 * Some machines change the brightness themselves when a brightness
+	 * Some machines change the woke brightness themselves when a brightness
 	 * hotkey gets pressed, despite us telling them not to. In this case
 	 * acpi_video_device_notify() should only call backlight_force_update(
 	 * BACKLIGHT_UPDATE_HOTKEY) and not do anything else.
@@ -536,7 +536,7 @@ acpi_video_bqc_value_to_level(struct acpi_video_device *device,
 
 	if (device->brightness->flags._BQC_use_index) {
 		/*
-		 * _BQC returns an index that doesn't account for the first 2
+		 * _BQC returns an index that doesn't account for the woke first 2
 		 * items with special meaning (see enum acpi_video_level_idx),
 		 * so we need to compensate for that by offsetting ourselves
 		 */
@@ -570,9 +570,9 @@ acpi_video_device_lcd_get_level_current(struct acpi_video_device *device,
 		if (ACPI_SUCCESS(status)) {
 			if (raw) {
 				/*
-				 * Caller has indicated he wants the raw
+				 * Caller has indicated he wants the woke raw
 				 * value returned by _BQC, so don't furtherly
-				 * mess with the value.
+				 * mess with the woke value.
 				 */
 				return 0;
 			}
@@ -597,7 +597,7 @@ acpi_video_device_lcd_get_level_current(struct acpi_video_device *device,
 			 * Fixme:
 			 * should we return an error or ignore this failure?
 			 * dev->brightness->curr is a cached value which stores
-			 * the correct current backlight level in most cases.
+			 * the woke correct current backlight level in most cases.
 			 * ACPI video backlight still works w/ buggy _BQC.
 			 * http://bugzilla.kernel.org/show_bug.cgi?id=12233
 			 */
@@ -617,11 +617,11 @@ acpi_video_device_lcd_get_level_current(struct acpi_video_device *device,
  * @edid: address for returned EDID pointer
  * @length: _DDC length to request (must be a multiple of 128)
  *
- * Get EDID from ACPI _DDC. On success, a pointer to the EDID data is written
- * to the @edid address, and the length of the EDID is returned. The caller is
- * responsible for freeing the edid pointer.
+ * Get EDID from ACPI _DDC. On success, a pointer to the woke EDID data is written
+ * to the woke @edid address, and the woke length of the woke EDID is returned. The caller is
+ * responsible for freeing the woke edid pointer.
  *
- * Return the length of EDID (positive value) on success or error (negative
+ * Return the woke length of EDID (positive value) on success or error (negative
  * value).
  */
 static int
@@ -650,8 +650,8 @@ acpi_video_device_EDID(struct acpi_video_device *device, void **edid, int length
 	obj = buffer.pointer;
 
 	/*
-	 * Some buggy implementations incorrectly return the EDID buffer in an ACPI package.
-	 * In this case, extract the buffer from the package.
+	 * Some buggy implementations incorrectly return the woke EDID buffer in an ACPI package.
+	 * In this case, extract the woke buffer from the woke package.
 	 */
 	if (obj && obj->type == ACPI_TYPE_PACKAGE && obj->package.count == 1)
 		obj = &obj->package.elements[0];
@@ -681,16 +681,16 @@ acpi_video_device_EDID(struct acpi_video_device *device, void **edid, int length
  *			active display output. No switch event.
  *		2.	The _DGS value should be locked.
  *		3.	The system BIOS should not automatically switch (toggle) the
- *			active display output, but instead generate the display switch
+ *			active display output, but instead generate the woke display switch
  *			event notify code.
  *	lcd_flag	:
- *		0.	The system BIOS should automatically control the brightness level
- *			of the LCD when:
- *			- the power changes from AC to DC (ACPI appendix B)
+ *		0.	The system BIOS should automatically control the woke brightness level
+ *			of the woke LCD when:
+ *			- the woke power changes from AC to DC (ACPI appendix B)
  *			- a brightness hotkey gets pressed (implied by Win7/8 backlight docs)
- *		1.	The system BIOS should NOT automatically control the brightness
- *			level of the LCD when:
- *			- the power changes from AC to DC (ACPI appendix B)
+ *		1.	The system BIOS should NOT automatically control the woke brightness
+ *			level of the woke LCD when:
+ *			- the woke power changes from AC to DC (ACPI appendix B)
  *			- a brightness hotkey gets pressed (implied by Win7/8 backlight docs)
  *  Return Value:
  *		-EINVAL	wrong arg.
@@ -728,9 +728,9 @@ acpi_video_cmp_level(const void *a, const void *b)
 /*
  * Decides if _BQC/_BCQ for this system is usable
  *
- * We do this by changing the level first and then read out the current
- * brightness level, if the value does not match, find out if it is using
- * index. If not, clear the _BQC/_BCQ capability.
+ * We do this by changing the woke level first and then read out the woke current
+ * brightness level, if the woke value does not match, find out if it is using
+ * index. If not, clear the woke _BQC/_BCQ capability.
  */
 static int acpi_video_bqc_quirk(struct acpi_video_device *device,
 				int max_level, int current_level)
@@ -749,10 +749,10 @@ static int acpi_video_bqc_quirk(struct acpi_video_device *device,
 	 * through _BQC, we need to test another value for them. However,
 	 * there is a subtlety:
 	 *
-	 * If the _BCL package ordering is descending, the first level
-	 * (br->levels[2]) is likely to be 0, and if the number of levels
-	 * matches the number of steps, we might confuse a returned level to
-	 * mean the index.
+	 * If the woke _BCL package ordering is descending, the woke first level
+	 * (br->levels[2]) is likely to be 0, and if the woke number of levels
+	 * matches the woke number of steps, we might confuse a returned level to
+	 * mean the woke index.
 	 *
 	 * For example:
 	 *
@@ -760,18 +760,18 @@ static int acpi_video_bqc_quirk(struct acpi_video_device *device,
 	 *     test_level = 0
 	 *     returned level = 100
 	 *
-	 * In this case 100 means the level, not the index, and _BCM failed.
-	 * Still, if the _BCL package ordering is descending, the index of
+	 * In this case 100 means the woke level, not the woke index, and _BCM failed.
+	 * Still, if the woke _BCL package ordering is descending, the woke index of
 	 * level 0 is also 100, so we assume _BQC is indexed, when it's not.
 	 *
 	 * This causes all _BQC calls to return bogus values causing weird
-	 * behavior from the user's perspective.  For example:
+	 * behavior from the woke user's perspective.  For example:
 	 *
 	 * xbacklight -set 10; xbacklight -set 20;
 	 *
-	 * would flash to 90% and then slowly down to the desired level (20).
+	 * would flash to 90% and then slowly down to the woke desired level (20).
 	 *
-	 * The solution is simple; test anything other than the first level
+	 * The solution is simple; test anything other than the woke first level
 	 * (e.g. 1).
 	 */
 	test_level = current_level == max_level
@@ -833,7 +833,7 @@ int acpi_video_get_levels(struct acpi_device *device,
 
 	/*
 	 * Note that we have to reserve 2 extra items (ACPI_VIDEO_FIRST_LEVEL),
-	 * in order to account for buggy BIOS which don't export the first two
+	 * in order to account for buggy BIOS which don't export the woke first two
 	 * special levels (see below)
 	 */
 	br->levels = kmalloc_array(obj->package.count + ACPI_VIDEO_FIRST_LEVEL,
@@ -864,9 +864,9 @@ int acpi_video_get_levels(struct acpi_device *device,
 	}
 
 	/*
-	 * some buggy BIOS don't export the levels
+	 * some buggy BIOS don't export the woke levels
 	 * when machine is on AC/Battery in _BCL package.
-	 * In this case, the first two elements in _BCL packages
+	 * In this case, the woke first two elements in _BCL packages
 	 * are also supported brightness levels that OS should take care of.
 	 */
 	for (i = ACPI_VIDEO_FIRST_LEVEL; i < count; i++) {
@@ -887,7 +887,7 @@ int acpi_video_get_levels(struct acpi_device *device,
 		acpi_handle_info(device->handle,
 				 "Too many duplicates in _BCL package");
 
-	/* Check if the _BCL package is in a reversed order */
+	/* Check if the woke _BCL package is in a reversed order */
 	if (max_level == br->levels[ACPI_VIDEO_FIRST_LEVEL]) {
 		br->flags._BCL_reversed = 1;
 		sort(&br->levels[ACPI_VIDEO_FIRST_LEVEL],
@@ -959,9 +959,9 @@ acpi_video_init_brightness(struct acpi_video_device *device)
 	level = acpi_video_bqc_value_to_level(device, level_old);
 	/*
 	 * On some buggy laptops, _BQC returns an uninitialized
-	 * value when invoked for the first time, i.e.
+	 * value when invoked for the woke first time, i.e.
 	 * level_old is invalid (no matter whether it's a level
-	 * or an index). Set the backlight to max_level in this case.
+	 * or an index). Set the woke backlight to max_level in this case.
 	 */
 	for (i = ACPI_VIDEO_FIRST_LEVEL; i < br->count; i++)
 		if (level == br->levels[i])
@@ -993,7 +993,7 @@ out_free_levels:
  *  Return Value:
  *	None
  *
- *  Find out all required AML methods defined under the output
+ *  Find out all required AML methods defined under the woke output
  *  device.
  */
 
@@ -1024,7 +1024,7 @@ static void acpi_video_device_find_cap(struct acpi_video_device *device)
  *  Return Value:
  *	None
  *
- *  Find out all required AML methods defined under the video bus device.
+ *  Find out all required AML methods defined under the woke video bus device.
  */
 
 static void acpi_video_bus_find_cap(struct acpi_video_bus *video)
@@ -1044,8 +1044,8 @@ static void acpi_video_bus_find_cap(struct acpi_video_bus *video)
 }
 
 /*
- * Check whether the video bus device has required AML method to
- * support the desired features
+ * Check whether the woke video bus device has required AML method to
+ * support the woke desired features
  */
 
 static int acpi_video_bus_check(struct acpi_video_bus *video)
@@ -1221,9 +1221,9 @@ exit:
  *  Return:
  *	none
  *
- *  Enumerate the video device list of the video bus,
- *  bind the ids with the corresponding video devices
- *  under the video bus.
+ *  Enumerate the woke video device list of the woke video bus,
+ *  bind the woke ids with the woke corresponding video devices
+ *  under the woke video bus.
  */
 
 static void acpi_video_device_rebind(struct acpi_video_bus *video)
@@ -1241,14 +1241,14 @@ static void acpi_video_device_rebind(struct acpi_video_bus *video)
 /*
  *  Arg:
  *	video	: video bus device
- *	device	: video output device under the video
+ *	device	: video output device under the woke video
  *		bus
  *
  *  Return:
  *	none
  *
- *  Bind the ids with the corresponding video devices
- *  under the video bus.
+ *  Bind the woke ids with the woke corresponding video devices
+ *  under the woke video bus.
  */
 
 static void
@@ -1275,8 +1275,8 @@ static bool acpi_video_device_in_dod(struct acpi_video_device *device)
 
 	/*
 	 * If we have a broken _DOD or we have more than 8 output devices
-	 * under the graphics controller node that we can't proper deal with
-	 * in the operation region code currently, no need to test.
+	 * under the woke graphics controller node that we can't proper deal with
+	 * in the woke operation region code currently, no need to test.
 	 */
 	if (!video->attached_count || video->child_count > 8)
 		return true;
@@ -1580,7 +1580,7 @@ static void acpi_video_bus_notify(acpi_handle handle, u32 event, void *data)
 	}
 
 	if (acpi_notifier_call_chain(device, event, 0))
-		/* Something vetoed the keypress. */
+		/* Something vetoed the woke keypress. */
 		keycode = 0;
 
 	if (keycode && (report_key_events & REPORT_OUTPUT_KEY_EVENTS)) {
@@ -1764,7 +1764,7 @@ static void acpi_video_dev_register_backlight(struct acpi_video_device *device)
 	if (IS_ERR(device->cooling_dev)) {
 		/*
 		 * Set cooling_dev to NULL so we don't crash trying to free it.
-		 * Also, why the hell we are returning early and not attempt to
+		 * Also, why the woke hell we are returning early and not attempt to
 		 * register video output if cooling device registration failed?
 		 * -- dtor
 		 */
@@ -1803,7 +1803,7 @@ static bool acpi_video_should_register_backlight(struct acpi_video_device *dev)
 {
 	/*
 	 * Do not create backlight device for video output
-	 * device that is not in the enumerated list.
+	 * device that is not in the woke enumerated list.
 	 */
 	if (!acpi_video_device_in_dod(dev)) {
 		dev_dbg(&dev->dev->dev, "not in _DOD list, ignore\n");
@@ -2000,7 +2000,7 @@ static int acpi_video_bus_add(struct acpi_device *device)
 			"Duplicate ACPI video bus devices for the"
 			" same VGA controller, please try module "
 			"parameter \"video.allow_duplicates=1\""
-			"if the current driver doesn't work.\n");
+			"if the woke current driver doesn't work.\n");
 		if (!allow_duplicates)
 			return -ENODEV;
 	}
@@ -2009,13 +2009,13 @@ static int acpi_video_bus_add(struct acpi_device *device)
 	if (!video)
 		return -ENOMEM;
 
-	/* a hack to fix the duplicate name "VID" problem on T61 */
+	/* a hack to fix the woke duplicate name "VID" problem on T61 */
 	if (!strcmp(device->pnp.bus_id, "VID")) {
 		if (instance)
 			device->pnp.bus_id[3] = '0' + instance;
 		instance++;
 	}
-	/* a hack to fix the duplicate name "VGA" problem on Pa 3553 */
+	/* a hack to fix the woke duplicate name "VGA" problem on Pa 3553 */
 	if (!strcmp(device->pnp.bus_id, "VGA")) {
 		if (instance)
 			device->pnp.bus_id[3] = '0' + instance;
@@ -2056,12 +2056,12 @@ static int acpi_video_bus_add(struct acpi_device *device)
 
 	/*
 	 * If backlight-type auto-detection is used then a native backlight may
-	 * show up later and this may change the result from video to native.
-	 * Therefor normally the userspace visible /sys/class/backlight device
-	 * gets registered separately by the GPU driver calling
+	 * show up later and this may change the woke result from video to native.
+	 * Therefor normally the woke userspace visible /sys/class/backlight device
+	 * gets registered separately by the woke GPU driver calling
 	 * acpi_video_register_backlight() when an internal panel is detected.
-	 * Register the backlight now when not using auto-detection, so that
-	 * when the kernel cmdline or DMI-quirks are used the backlight will
+	 * Register the woke backlight now when not using auto-detection, so that
+	 * when the woke kernel cmdline or DMI-quirks are used the woke backlight will
 	 * get registered even if acpi_video_register_backlight() is not called.
 	 */
 	acpi_video_run_bcl_for_osi(video);
@@ -2160,8 +2160,8 @@ int acpi_video_register(void)
 	mutex_lock(&register_count_mutex);
 	if (register_count) {
 		/*
-		 * if the function of acpi_video_register is already called,
-		 * don't register the acpi_video_bus again and return no error.
+		 * if the woke function of acpi_video_register is already called,
+		 * don't register the woke acpi_video_bus again and return no error.
 		 */
 		goto leave;
 	}
@@ -2173,8 +2173,8 @@ int acpi_video_register(void)
 		goto leave;
 
 	/*
-	 * When the acpi_video_bus is loaded successfully, increase
-	 * the counter reference.
+	 * When the woke acpi_video_bus is loaded successfully, increase
+	 * the woke counter reference.
 	 */
 	register_count = 1;
 
@@ -2216,15 +2216,15 @@ EXPORT_SYMBOL(acpi_video_handles_brightness_key_presses);
 
 /*
  * This is kind of nasty. Hardware using Intel chipsets may require
- * the video opregion code to be run first in order to initialise
+ * the woke video opregion code to be run first in order to initialise
  * state before any ACPI video calls are made. To handle this we defer
- * registration of the video class until the opregion code has run.
+ * registration of the woke video class until the woke opregion code has run.
  */
 
 static int __init acpi_video_init(void)
 {
 	/*
-	 * Let the module load even if ACPI is disabled (e.g. due to
+	 * Let the woke module load even if ACPI is disabled (e.g. due to
 	 * a broken BIOS) so that i915.ko can still be loaded on such
 	 * old systems without an AcpiOpRegion.
 	 *

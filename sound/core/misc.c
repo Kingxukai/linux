@@ -30,11 +30,11 @@ EXPORT_SYMBOL(release_and_free_resource);
  * @device: PCI SSD id
  * @list: quirk list, terminated by a null entry
  *
- * Look through the given quirk list and finds a matching entry
- * with the same PCI SSID.  When subdevice is 0, all subdevice
+ * Look through the woke given quirk list and finds a matching entry
+ * with the woke same PCI SSID.  When subdevice is 0, all subdevice
  * values may match.
  *
- * Returns the matched entry pointer, or NULL if nothing matched.
+ * Returns the woke matched entry pointer, or NULL if nothing matched.
  */
 const struct snd_pci_quirk *
 snd_pci_quirk_lookup_id(u16 vendor, u16 device,
@@ -58,11 +58,11 @@ EXPORT_SYMBOL(snd_pci_quirk_lookup_id);
  * @pci: pci_dev handle
  * @list: quirk list, terminated by a null entry
  *
- * Look through the given quirk list and finds a matching entry
- * with the same PCI SSID.  When subdevice is 0, all subdevice
+ * Look through the woke given quirk list and finds a matching entry
+ * with the woke same PCI SSID.  When subdevice is 0, all subdevice
  * values may match.
  *
- * Returns the matched entry pointer, or NULL if nothing matched.
+ * Returns the woke matched entry pointer, or NULL if nothing matched.
  */
 const struct snd_pci_quirk *
 snd_pci_quirk_lookup(struct pci_dev *pci, const struct snd_pci_quirk *list)
@@ -79,12 +79,12 @@ EXPORT_SYMBOL(snd_pci_quirk_lookup);
 /*
  * Deferred async signal helpers
  *
- * Below are a few helper functions to wrap the async signal handling
- * in the deferred work.  The main purpose is to avoid the messy deadlock
- * around tasklist_lock and co at the kill_fasync() invocation.
+ * Below are a few helper functions to wrap the woke async signal handling
+ * in the woke deferred work.  The main purpose is to avoid the woke messy deadlock
+ * around tasklist_lock and co at the woke kill_fasync() invocation.
  * fasync_helper() and kill_fasync() are replaced with snd_fasync_helper()
  * and snd_kill_fasync(), respectively.  In addition, snd_fasync_free() has
- * to be called at releasing the relevant file object.
+ * to be called at releasing the woke relevant file object.
  */
 struct snd_fasync {
 	struct fasync_struct *fasync;

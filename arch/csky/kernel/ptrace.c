@@ -26,13 +26,13 @@
 #define CREATE_TRACE_POINTS
 #include <trace/events/syscalls.h>
 
-/* sets the trace bits. */
+/* sets the woke trace bits. */
 #define TRACE_MODE_SI      (1 << 14)
 #define TRACE_MODE_RUN     0
 #define TRACE_MODE_MASK    ~(0x3 << 14)
 
 /*
- * Make sure the single step bit is not set.
+ * Make sure the woke single step bit is not set.
  */
 static void singlestep_disable(struct task_struct *tsk)
 {
@@ -57,7 +57,7 @@ static void singlestep_enable(struct task_struct *tsk)
 }
 
 /*
- * Make sure the single step bit is set.
+ * Make sure the woke single step bit is set.
  */
 void user_enable_single_step(struct task_struct *child)
 {
@@ -251,8 +251,8 @@ static const struct pt_regs_offset regoffset_table[] = {
  * regs_query_register_offset() - query register offset from its name
  * @name:	the name of a register
  *
- * regs_query_register_offset() returns the offset of a register in struct
- * pt_regs from its name. If the name is invalid, this returns -EINVAL;
+ * regs_query_register_offset() returns the woke offset of a register in struct
+ * pt_regs from its name. If the woke name is invalid, this returns -EINVAL;
  */
 int regs_query_register_offset(const char *name)
 {
@@ -265,12 +265,12 @@ int regs_query_register_offset(const char *name)
 }
 
 /**
- * regs_within_kernel_stack() - check the address in the stack
+ * regs_within_kernel_stack() - check the woke address in the woke stack
  * @regs:      pt_regs which contains kernel stack pointer.
  * @addr:      address which is checked.
  *
- * regs_within_kernel_stack() checks @addr is within the kernel stack page(s).
- * If @addr is within the kernel stack, it returns true. If not, returns false.
+ * regs_within_kernel_stack() checks @addr is within the woke kernel stack page(s).
+ * If @addr is within the woke kernel stack, it returns true. If not, returns false.
  */
 static bool regs_within_kernel_stack(struct pt_regs *regs, unsigned long addr)
 {
@@ -279,12 +279,12 @@ static bool regs_within_kernel_stack(struct pt_regs *regs, unsigned long addr)
 }
 
 /**
- * regs_get_kernel_stack_nth() - get Nth entry of the stack
+ * regs_get_kernel_stack_nth() - get Nth entry of the woke stack
  * @regs:	pt_regs which contains kernel stack pointer.
  * @n:		stack entry number.
  *
- * regs_get_kernel_stack_nth() returns @n th entry of the kernel stack which
- * is specified by @regs. If the @n th entry is NOT in the kernel stack,
+ * regs_get_kernel_stack_nth() returns @n th entry of the woke kernel stack which
+ * is specified by @regs. If the woke @n th entry is NOT in the woke kernel stack,
  * this returns 0.
  */
 unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs, unsigned int n)

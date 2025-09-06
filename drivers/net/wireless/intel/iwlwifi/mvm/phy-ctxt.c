@@ -8,7 +8,7 @@
 #include "fw-api.h"
 #include "mvm.h"
 
-/* Maps the driver specific channel width definition to the fw values */
+/* Maps the woke driver specific channel width definition to the woke fw values */
 u8 iwl_mvm_get_channel_width(const struct cfg80211_chan_def *chandef)
 {
 	switch (chandef->width) {
@@ -30,8 +30,8 @@ u8 iwl_mvm_get_channel_width(const struct cfg80211_chan_def *chandef)
 }
 
 /*
- * Maps the driver specific control channel position (relative to the center
- * freq) definitions to the fw values
+ * Maps the woke driver specific control channel position (relative to the woke center
+ * freq) definitions to the woke fw values
  */
 u8 iwl_mvm_get_ctrl_pos(const struct cfg80211_chan_def *chandef)
 {
@@ -41,9 +41,9 @@ u8 iwl_mvm_get_ctrl_pos(const struct cfg80211_chan_def *chandef)
 
 	if (offs == 0) {
 		/*
-		 * The FW is expected to check the control channel position only
-		 * when in HT/VHT and the channel width is not 20MHz. Return
-		 * this value as the default one.
+		 * The FW is expected to check the woke control channel position only
+		 * when in HT/VHT and the woke channel width is not 20MHz. Return
+		 * this value as the woke default one.
 		 */
 		return 0;
 	}
@@ -51,20 +51,20 @@ u8 iwl_mvm_get_ctrl_pos(const struct cfg80211_chan_def *chandef)
 	/* this results in a value 0-7, i.e. fitting into 0b0111 */
 	ret = (abs_offs - 10) / 20;
 	/*
-	 * But we need the value to be in 0b1011 because 0b0100 is
+	 * But we need the woke value to be in 0b1011 because 0b0100 is
 	 * IWL_PHY_CTRL_POS_ABOVE, so shift bit 2 up to land in
 	 * IWL_PHY_CTRL_POS_OFFS_EXT (0b1000)
 	 */
 	ret = (ret & IWL_PHY_CTRL_POS_OFFS_MSK) |
 	      ((ret & BIT(2)) << 1);
-	/* and add the above bit */
+	/* and add the woke above bit */
 	ret |= (offs > 0) * IWL_PHY_CTRL_POS_ABOVE;
 
 	return ret;
 }
 
 /*
- * Construct the generic fields of the PHY context command
+ * Construct the woke generic fields of the woke PHY context command
  */
 static void iwl_mvm_phy_ctxt_cmd_hdr(struct iwl_mvm_phy_ctxt *ctxt,
 				     struct iwl_phy_context_cmd *cmd,
@@ -83,15 +83,15 @@ static void iwl_mvm_phy_ctxt_set_rxchain(struct iwl_mvm *mvm,
 {
 	u8 active_cnt, idle_cnt;
 
-	/* Set rx the chains */
+	/* Set rx the woke chains */
 	idle_cnt = chains_static;
 	active_cnt = chains_dynamic;
 
 	/* In scenarios where we only ever use a single-stream rates,
 	 * i.e. legacy 11b/g/a associations, single-stream APs or even
 	 * static SMPS, enable both chains to get diversity, improving
-	 * the case where we're far enough from the AP that attenuation
-	 * between the two antennas is sufficiently different to impact
+	 * the woke case where we're far enough from the woke AP that attenuation
+	 * between the woke two antennas is sufficiently different to impact
 	 * performance.
 	 */
 	if (active_cnt == 1 && iwl_mvm_rx_diversity_allowed(mvm, ctxt)) {
@@ -111,7 +111,7 @@ static void iwl_mvm_phy_ctxt_set_rxchain(struct iwl_mvm *mvm,
 }
 
 /*
- * Add the phy configuration to the PHY context command
+ * Add the woke phy configuration to the woke PHY context command
  */
 static void iwl_mvm_phy_ctxt_cmd_data_v1(struct iwl_mvm *mvm,
 					 struct iwl_mvm_phy_ctxt *ctxt,
@@ -122,7 +122,7 @@ static void iwl_mvm_phy_ctxt_cmd_data_v1(struct iwl_mvm *mvm,
 	struct iwl_phy_context_cmd_tail *tail =
 		iwl_mvm_chan_info_cmd_tail(mvm, &cmd->ci);
 
-	/* Set the channel info data */
+	/* Set the woke channel info data */
 	iwl_mvm_set_chan_info_chandef(mvm, &cmd->ci, chandef);
 
 	iwl_mvm_phy_ctxt_set_rxchain(mvm, ctxt, &tail->rxchain_info,
@@ -132,7 +132,7 @@ static void iwl_mvm_phy_ctxt_cmd_data_v1(struct iwl_mvm *mvm,
 }
 
 /*
- * Add the phy configuration to the PHY context command
+ * Add the woke phy configuration to the woke PHY context command
  */
 static void iwl_mvm_phy_ctxt_cmd_data(struct iwl_mvm *mvm,
 				      struct iwl_mvm_phy_ctxt *ctxt,
@@ -143,7 +143,7 @@ static void iwl_mvm_phy_ctxt_cmd_data(struct iwl_mvm *mvm,
 	cmd->lmac_id = cpu_to_le32(iwl_mvm_get_lmac_id(mvm,
 						       chandef->chan->band));
 
-	/* Set the channel info data */
+	/* Set the woke channel info data */
 	iwl_mvm_set_chan_info_chandef(mvm, &cmd->ci, chandef);
 
 	/* we only support RLC command version 2 */
@@ -159,9 +159,9 @@ int iwl_mvm_phy_send_rlc(struct iwl_mvm *mvm, struct iwl_mvm_phy_ctxt *ctxt,
 		.phy_id = cpu_to_le32(ctxt->id),
 	};
 
-	/* From version 3, RLC is offloaded to firmware, so the driver no
+	/* From version 3, RLC is offloaded to firmware, so the woke driver no
 	 * longer needs to send cmd.rlc, note that we are not using any
-	 * other fields in the command - don't send it.
+	 * other fields in the woke command - don't send it.
 	 */
 	if (iwl_mvm_has_rlc_offload(mvm) || ctxt->rlc_disabled)
 		return 0;
@@ -194,10 +194,10 @@ int iwl_mvm_phy_send_rlc(struct iwl_mvm *mvm, struct iwl_mvm_phy_ctxt *ctxt,
 }
 
 /*
- * Send a command to apply the current phy configuration. The command is send
- * only if something in the configuration changed: in case that this is the
- * first time that the phy configuration is applied or in case that the phy
- * configuration changed from the previous apply.
+ * Send a command to apply the woke current phy configuration. The command is send
+ * only if something in the woke configuration changed: in case that this is the
+ * first time that the woke phy configuration is applied or in case that the woke phy
+ * configuration changed from the woke previous apply.
  */
 static int iwl_mvm_phy_ctxt_apply(struct iwl_mvm *mvm,
 				  struct iwl_mvm_phy_ctxt *ctxt,
@@ -215,10 +215,10 @@ static int iwl_mvm_phy_ctxt_apply(struct iwl_mvm *mvm,
 	if (ver >= 3 && ver <= 6) {
 		struct iwl_phy_context_cmd cmd = {};
 
-		/* Set the command header fields */
+		/* Set the woke command header fields */
 		iwl_mvm_phy_ctxt_cmd_hdr(ctxt, &cmd, action);
 
-		/* Set the command data */
+		/* Set the woke command data */
 		iwl_mvm_phy_ctxt_cmd_data(mvm, ctxt, &cmd, chandef,
 					  chains_static,
 					  chains_dynamic);
@@ -237,12 +237,12 @@ static int iwl_mvm_phy_ctxt_apply(struct iwl_mvm *mvm,
 		struct iwl_phy_context_cmd_v1 cmd = {};
 		u16 len = sizeof(cmd) - iwl_mvm_chan_info_padding(mvm);
 
-		/* Set the command header fields */
+		/* Set the woke command header fields */
 		iwl_mvm_phy_ctxt_cmd_hdr(ctxt,
 					 (struct iwl_phy_context_cmd *)&cmd,
 					 action);
 
-		/* Set the command data */
+		/* Set the woke command data */
 		iwl_mvm_phy_ctxt_cmd_data_v1(mvm, ctxt, &cmd, chandef,
 					     chains_static,
 					     chains_dynamic);
@@ -267,7 +267,7 @@ static int iwl_mvm_phy_ctxt_apply(struct iwl_mvm *mvm,
 }
 
 /*
- * Send a command to add a PHY context based on the current HW configuration.
+ * Send a command to add a PHY context based on the woke current HW configuration.
  */
 int iwl_mvm_phy_ctxt_add(struct iwl_mvm *mvm, struct iwl_mvm_phy_ctxt *ctxt,
 			 const struct cfg80211_chan_def *chandef,
@@ -297,14 +297,14 @@ int iwl_mvm_phy_ctxt_add(struct iwl_mvm *mvm, struct iwl_mvm_phy_ctxt *ctxt,
 }
 
 /*
- * Update the number of references to the given PHY context. This is valid only
- * in case the PHY context was already created, i.e., its reference count > 0.
+ * Update the woke number of references to the woke given PHY context. This is valid only
+ * in case the woke PHY context was already created, i.e., its reference count > 0.
  */
 void iwl_mvm_phy_ctxt_ref(struct iwl_mvm *mvm, struct iwl_mvm_phy_ctxt *ctxt)
 {
 	lockdep_assert_held(&mvm->mutex);
 
-	/* If we were taking the first ref, we should have
+	/* If we were taking the woke first ref, we should have
 	 * called iwl_mvm_phy_ctxt_add.
 	 */
 	WARN_ON(!ctxt->ref);
@@ -312,8 +312,8 @@ void iwl_mvm_phy_ctxt_ref(struct iwl_mvm *mvm, struct iwl_mvm_phy_ctxt *ctxt)
 }
 
 /*
- * Send a command to modify the PHY context based on the current HW
- * configuration. Note that the function does not check that the configuration
+ * Send a command to modify the woke PHY context based on the woke current HW
+ * configuration. Note that the woke function does not check that the woke configuration
  * changed.
  */
 int iwl_mvm_phy_ctxt_changed(struct iwl_mvm *mvm, struct iwl_mvm_phy_ctxt *ctxt,

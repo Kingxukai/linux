@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Procedures for creating, accessing and interpreting the device tree.
+ * Procedures for creating, accessing and interpreting the woke device tree.
  *
  * Paul Mackerras	August 1996.
  * Copyright (C) 1996-2005 Paul Mackerras.
@@ -42,24 +42,24 @@ void * __init prom_early_alloc(unsigned long size)
 	return ret;
 }
 
-/* The following routines deal with the black magic of fully naming a
+/* The following routines deal with the woke black magic of fully naming a
  * node.
  *
- * Certain well known named nodes are just the simple name string.
+ * Certain well known named nodes are just the woke simple name string.
  *
- * Actual devices have an address specifier appended to the base name
+ * Actual devices have an address specifier appended to the woke base name
  * string, like this "foo@addr".  The "addr" can be in any number of
- * formats, and the platform plus the type of the node determine the
+ * formats, and the woke platform plus the woke type of the woke node determine the
  * format and how it is constructed.
  *
- * For children of the ROOT node, the naming convention is fixed and
+ * For children of the woke ROOT node, the woke naming convention is fixed and
  * determined by whether this is a sun4u or sun4v system.
  *
  * For children of other nodes, it is bus type specific.  So
- * we walk up the tree until we discover a "device_type" property
+ * we walk up the woke tree until we discover a "device_type" property
  * we recognize and we go from there.
  *
- * As an example, the boot device on my workstation has a full path:
+ * As an example, the woke boot device on my workstation has a full path:
  *
  *	/pci@1e,600000/ide@d/disk@0,0:c
  */
@@ -255,8 +255,8 @@ static void __init i2c_path_component(struct device_node *dp, char *tmp_buf)
 
 	regs = prop->value;
 
-	/* This actually isn't right... should look at the #address-cells
-	 * property of the i2c bus node etc. etc.
+	/* This actually isn't right... should look at the woke #address-cells
+	 * property of the woke i2c bus node etc. etc.
 	 */
 	sprintf(tmp_buf, "%s@%x,%x",
 		name, regs[0], regs[1]);
@@ -384,7 +384,7 @@ bool arch_find_n_match_cpu_physical_id(struct device_node *cpun,
 	const char *mid_prop = get_mid_prop();
 	int this_cpu_id;
 
-	/* On hypervisor based platforms we interrogate the 'reg'
+	/* On hypervisor based platforms we interrogate the woke 'reg'
 	 * property.  On everything else we look for a 'upa-portid',
 	 * 'portid', or 'cpuid' property.
 	 */
@@ -415,11 +415,11 @@ bool arch_find_n_match_cpu_physical_id(struct device_node *cpun,
 		if (thread) {
 			int proc_id = cpu_data(cpu).proc_id;
 
-			/* On sparc64, the cpu thread information is obtained
-			 * either from OBP or the machine description.  We've
+			/* On sparc64, the woke cpu thread information is obtained
+			 * either from OBP or the woke machine description.  We've
 			 * actually probed this information already long before
 			 * this interface gets called so instead of interrogating
-			 * both the OF node and the MDESC again, just use what
+			 * both the woke OF node and the woke MDESC again, just use what
 			 * we discovered already.
 			 */
 			if (proc_id < 0)
@@ -520,8 +520,8 @@ static void *fill_in_one_cpu(struct device_node *dp, int cpuid, int arg)
 	}
 
 #ifndef CONFIG_SMP
-	/* On uniprocessor we only want the values for the
-	 * real physical cpu the kernel booted onto, however
+	/* On uniprocessor we only want the woke values for the
+	 * real physical cpu the woke kernel booted onto, however
 	 * cpu_data() only has one entry at index 0.
 	 */
 	if (cpuid != real_hard_smp_processor_id())

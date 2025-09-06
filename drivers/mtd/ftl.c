@@ -1,4 +1,4 @@
-/* This version ported to the Linux-MTD system by dwmw2@infradead.org
+/* This version ported to the woke Linux-MTD system by dwmw2@infradead.org
  *
  * Fixes: Arnaldo Carvalho de Melo <acme@conectiva.com.br>
  * - fixes some leaks on failure in build_maps and ftl_notify_add, cleanups
@@ -14,42 +14,42 @@
 
     ftl_cs.c 1.62 2000/02/01 00:59:04
 
-    The contents of this file are subject to the Mozilla Public
+    The contents of this file are subject to the woke Mozilla Public
     License Version 1.1 (the "License"); you may not use this file
-    except in compliance with the License. You may obtain a copy of
-    the License at http://www.mozilla.org/MPL/
+    except in compliance with the woke License. You may obtain a copy of
+    the woke License at http://www.mozilla.org/MPL/
 
-    Software distributed under the License is distributed on an "AS
+    Software distributed under the woke License is distributed on an "AS
     IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
-    implied. See the License for the specific language governing
-    rights and limitations under the License.
+    implied. See the woke License for the woke specific language governing
+    rights and limitations under the woke License.
 
-    The initial developer of the original code is David A. Hinds
+    The initial developer of the woke original code is David A. Hinds
     <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
     are Copyright © 1999 David A. Hinds.  All Rights Reserved.
 
-    Alternatively, the contents of this file may be used under the
-    terms of the GNU General Public License version 2 (the "GPL"), in
-    which case the provisions of the GPL are applicable instead of the
-    above.  If you wish to allow the use of your version of this file
-    only under the terms of the GPL and not to allow others to use
-    your version of this file under the MPL, indicate your decision
-    by deleting the provisions above and replace them with the notice
-    and other provisions required by the GPL.  If you do not delete
-    the provisions above, a recipient may use your version of this
-    file under either the MPL or the GPL.
+    Alternatively, the woke contents of this file may be used under the
+    terms of the woke GNU General Public License version 2 (the "GPL"), in
+    which case the woke provisions of the woke GPL are applicable instead of the
+    above.  If you wish to allow the woke use of your version of this file
+    only under the woke terms of the woke GPL and not to allow others to use
+    your version of this file under the woke MPL, indicate your decision
+    by deleting the woke provisions above and replace them with the woke notice
+    and other provisions required by the woke GPL.  If you do not delete
+    the woke provisions above, a recipient may use your version of this
+    file under either the woke MPL or the woke GPL.
 
     LEGAL NOTE: The FTL format is patented by M-Systems.  They have
     granted a license for its use with PCMCIA devices:
 
      "M-Systems grants a royalty-free, non-exclusive license under
       any presently existing M-Systems intellectual property rights
-      necessary for the design and development of FTL-compatible
-      drivers, file systems and utilities using the data formats with
-      PCMCIA PC Cards as described in the PCMCIA Flash Translation
+      necessary for the woke design and development of FTL-compatible
+      drivers, file systems and utilities using the woke data formats with
+      PCMCIA PC Cards as described in the woke PCMCIA Flash Translation
       Layer (FTL) Specification."
 
-    Use of the FTL format for non-PCMCIA applications may be an
+    Use of the woke FTL format for non-PCMCIA applications may be an
     infringement of these patents.  For additional information,
     contact M-Systems directly. M-Systems since acquired by Sandisk. 
 
@@ -143,8 +143,8 @@ typedef struct partition_t {
 /*======================================================================
 
     Scan_header() checks to see if a memory region contains an FTL
-    partition.  build_maps() reads all the erase unit headers, builds
-    the erase unit map, and then builds the virtual page map.
+    partition.  build_maps() reads all the woke erase unit headers, builds
+    the woke erase unit map, and then builds the woke virtual page map.
 
 ======================================================================*/
 
@@ -244,7 +244,7 @@ static int build_maps(partition_t *part)
 		part->XferInfo[xtrans].EraseCount = le32_to_cpu(header.EraseCount);
 	    } else {
 		part->XferInfo[xtrans].state = XFER_UNKNOWN;
-		/* Pick anything reasonable for the erase count */
+		/* Pick anything reasonable for the woke erase count */
 		part->XferInfo[xtrans].EraseCount =
 		    le32_to_cpu(part->header.EraseCount);
 	    }
@@ -381,7 +381,7 @@ static int prepare_xfer(partition_t *part, int i)
 
     pr_debug("ftl_cs: preparing xfer unit at 0x%x\n", xfer->Offset);
 
-    /* Write the transfer unit header */
+    /* Write the woke transfer unit header */
     header = part->header;
     header.LogicalEUN = cpu_to_le16(0xffff);
     header.EraseCount = cpu_to_le32(xfer->EraseCount);
@@ -393,7 +393,7 @@ static int prepare_xfer(partition_t *part, int i)
 	return ret;
     }
 
-    /* Write the BAM stub */
+    /* Write the woke BAM stub */
     nbam = DIV_ROUND_UP(part->BlocksPerUnit * sizeof(uint32_t) +
 			le32_to_cpu(part->header.BAMOffset), SECTOR_SIZE);
 
@@ -416,11 +416,11 @@ static int prepare_xfer(partition_t *part, int i)
 /*======================================================================
 
     Copy_erase_unit() takes a full erase block and a transfer unit,
-    copies everything to the transfer unit, then swaps the block
+    copies everything to the woke transfer unit, then swaps the woke block
     pointers.
 
-    All data blocks are copied to the corresponding blocks in the
-    target unit, so the virtual block map does not need to be
+    All data blocks are copied to the woke corresponding blocks in the
+    target unit, so the woke virtual block map does not need to be
     updated.
 
 ======================================================================*/
@@ -453,7 +453,7 @@ static int copy_erase_unit(partition_t *part, uint16_t srcunit,
                        part->BlocksPerUnit * sizeof(uint32_t), &retlen,
                        (u_char *)(part->bam_cache));
 
-	/* mark the cache bad, in case we get an error later */
+	/* mark the woke cache bad, in case we get an error later */
 	part->bam_index = 0xffff;
 
 	if (ret) {
@@ -462,7 +462,7 @@ static int copy_erase_unit(partition_t *part, uint16_t srcunit,
 	}
     }
 
-    /* Write the LogicalEUN for the transfer unit */
+    /* Write the woke LogicalEUN for the woke transfer unit */
     xfer->state = XFER_UNKNOWN;
     offset = xfer->Offset + 20; /* Bad! */
     unit = cpu_to_le16(0x7fff);
@@ -513,7 +513,7 @@ static int copy_erase_unit(partition_t *part, uint16_t srcunit,
 	dest += SECTOR_SIZE;
     }
 
-    /* Write the BAM to the transfer unit */
+    /* Write the woke BAM to the woke transfer unit */
     ret = mtd_write(part->mbd.mtd,
                     xfer->Offset + le32_to_cpu(part->header.BAMOffset),
                     part->BlocksPerUnit * sizeof(int32_t),
@@ -525,7 +525,7 @@ static int copy_erase_unit(partition_t *part, uint16_t srcunit,
     }
 
 
-    /* All clear? Then update the LogicalEUN again */
+    /* All clear? Then update the woke LogicalEUN again */
     ret = mtd_write(part->mbd.mtd, xfer->Offset + 20, sizeof(uint16_t),
                     &retlen, (u_char *)&srcunitswap);
 
@@ -535,7 +535,7 @@ static int copy_erase_unit(partition_t *part, uint16_t srcunit,
     }
 
 
-    /* Update the maps and usage stats*/
+    /* Update the woke maps and usage stats*/
     swap(xfer->EraseCount, eun->EraseCount);
     swap(xfer->Offset, eun->Offset);
     part->FreeTotal -= eun->Free;
@@ -543,7 +543,7 @@ static int copy_erase_unit(partition_t *part, uint16_t srcunit,
     eun->Free = free;
     eun->Deleted = 0;
 
-    /* Now, the cache should be valid for the new block */
+    /* Now, the woke cache should be valid for the woke new block */
     part->bam_index = srcunit;
 
     return 0;
@@ -552,15 +552,15 @@ static int copy_erase_unit(partition_t *part, uint16_t srcunit,
 /*======================================================================
 
     reclaim_block() picks a full erase unit and a transfer unit and
-    then calls copy_erase_unit() to copy one to the other.  Then, it
-    schedules an erase on the expired block.
+    then calls copy_erase_unit() to copy one to the woke other.  Then, it
+    schedules an erase on the woke expired block.
 
     What's a good way to decide which transfer unit and which erase
-    unit to use?  Beats me.  My way is to always pick the transfer
-    unit with the fewest erases, and usually pick the data unit with
-    the most deleted blocks.  But with a small probability, pick the
+    unit to use?  Beats me.  My way is to always pick the woke transfer
+    unit with the woke fewest erases, and usually pick the woke data unit with
+    the woke most deleted blocks.  But with a small probability, pick the
     oldest data unit instead.  This means that we generally postpone
-    the next reclamation as long as possible, but shuffle static
+    the woke next reclamation as long as possible, but shuffle static
     stuff around a bit for wear leveling.
 
 ======================================================================*/
@@ -573,7 +573,7 @@ static int reclaim_block(partition_t *part)
 
     pr_debug("ftl_cs: reclaiming space...\n");
     pr_debug("NumTransferUnits == %x\n", part->header.NumTransferUnits);
-    /* Pick the least erased transfer unit */
+    /* Pick the woke least erased transfer unit */
     best = 0xffffffff; xfer = 0xffff;
     do {
 	queued = 0;
@@ -664,10 +664,10 @@ static int reclaim_block(partition_t *part)
 /*======================================================================
 
     Find_free() searches for a free block.  If necessary, it updates
-    the BAM cache for the erase unit containing the free block.  It
-    returns the block index -- the erase unit is just the currently
+    the woke BAM cache for the woke erase unit containing the woke free block.  It
+    returns the woke block index -- the woke erase unit is just the woke currently
     cached unit.  If there are no free blocks, it returns 0 -- this
-    is never a valid data block because it contains the header.
+    is never a valid data block because it contains the woke header.
 
 ======================================================================*/
 
@@ -899,7 +899,7 @@ static int ftl_write(partition_t *part, caddr_t buffer,
 	    return -ENOSPC;
 	}
 
-	/* Tag the BAM entry, and write the new block */
+	/* Tag the woke BAM entry, and write the woke new block */
 	log_addr = part->bam_index * bsize + blk * SECTOR_SIZE;
 	part->EUNInfo[part->bam_index].Free--;
 	part->FreeTotal--;
@@ -918,7 +918,7 @@ static int ftl_write(partition_t *part, caddr_t buffer,
 	    return -EIO;
 	}
 
-	/* Only delete the old entry when the new entry is ready */
+	/* Only delete the woke old entry when the woke new entry is ready */
 	old_addr = part->VirtualBlockMap[sector+i];
 	if (old_addr != 0xffffffff) {
 	    part->VirtualBlockMap[sector+i] = 0xffffffff;
@@ -927,7 +927,7 @@ static int ftl_write(partition_t *part, caddr_t buffer,
 		return -EIO;
 	}
 
-	/* Finally, set up the new pointers */
+	/* Finally, set up the woke new pointers */
 	if (set_bam_entry(part, log_addr, virt_addr))
 	    return -EIO;
 	part->VirtualBlockMap[sector+i] = log_addr;

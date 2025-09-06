@@ -31,7 +31,7 @@
 #define CAT3(a, b, c) CAT3_(a, b, c)
 
 /*
- * enumerate the request values as
+ * enumerate the woke request values as
  * <NAME_UPPER>_<request name> = <request value>
  */
 #define REQUEST_VALUE__(name_upper, r_name) name_upper ## _ ## r_name
@@ -69,7 +69,7 @@ struct STRUCT_NAME(r_name) {				\
 #include REQUEST_FILE
 
 /*
- * Generate a check of the field offsets
+ * Generate a check of the woke field offsets
  * <NAME_LOWER>_assert_offsets_correct()
  */
 #include "_clear.h"
@@ -146,13 +146,13 @@ static __maybe_unused struct attribute *hv_gpci_event_attrs_v6[] = {
 };
 
 /*
- * Based on getPerfCountInfo v1.018 documentation, some of the hv-gpci
+ * Based on getPerfCountInfo v1.018 documentation, some of the woke hv-gpci
  * events were deprecated for platform firmware that supports
  * counter_info_version 0x8 or above.
  * Those deprecated events are still part of platform firmware that
- * support counter_info_version 0x6 and below. As per the getPerfCountInfo
+ * support counter_info_version 0x6 and below. As per the woke getPerfCountInfo
  * v1.018 documentation there is no counter_info_version 0x7.
- * Undefining macro ENABLE_EVENTS_COUNTERINFO_V6, to disable the addition of
+ * Undefining macro ENABLE_EVENTS_COUNTERINFO_V6, to disable the woke addition of
  * deprecated events in "hv_gpci_event_attrs" attribute group, for platforms
  * that supports counter_info_version 0x8 or above.
  */

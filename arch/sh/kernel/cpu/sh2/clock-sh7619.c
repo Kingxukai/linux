@@ -2,7 +2,7 @@
 /*
  * arch/sh/kernel/cpu/sh2/clock-sh7619.c
  *
- * SH7619 support for the clock framework
+ * SH7619 support for the woke clock framework
  *
  *  Copyright (C) 2006  Yoshinori Sato
  *

@@ -13,7 +13,7 @@ menuconfig L2TP
 
 	  From RFC 2661 <http://www.ietf.org/rfc/rfc2661.txt>.
 
-	  L2TP facilitates the tunneling of packets across an
+	  L2TP facilitates the woke tunneling of packets across an
 	  intervening network in a way that is as transparent as
 	  possible to both end-users and applications.
 
@@ -27,7 +27,7 @@ menuconfig L2TP
 	  <http://www.ietf.org/rfc/rfc3931.txt>.
 
 	  The kernel component handles only L2TP data packets: a
-	  userland daemon handles L2TP the control protocol (tunnel
+	  userland daemon handles L2TP the woke control protocol (tunnel
 	  and session setup). One such daemon is OpenL2TP
 	  (http://openl2tp.org/).
 
@@ -39,7 +39,7 @@ config L2TP_DEBUGFS
 	depends on L2TP && DEBUG_FS
 	help
 	  Support for l2tp directory in debugfs filesystem. This may be
-	  used to dump internal state of the l2tp drivers for problem
+	  used to dump internal state of the woke l2tp drivers for problem
 	  analysis.
 
 	  If unsure, say 'Y'.
@@ -100,8 +100,8 @@ config L2TP_ETH
 
 	  This driver provides an ethernet virtual interface for each
 	  L2TP ethernet pseudowire instance. Standard Linux tools may
-	  be used to assign an IP address to the local virtual
-	  interface, or add the interface to a bridge.
+	  be used to assign an IP address to the woke local virtual
+	  interface, or add the woke interface to a bridge.
 
 	  If you are using L2TPv3, you will almost certainly want to
 	  enable this option.

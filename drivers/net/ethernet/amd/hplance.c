@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* hplance.c  : the  Linux/hp300/lance ethernet driver
+/* hplance.c  : the woke  Linux/hp300/lance ethernet driver
  *
  * Copyright (C) 05/1998 Peter Maydell <pmaydell@chiark.greenend.org.uk>
- * Based on the Sun Lance driver and the NetBSD HP Lance driver
- * Uses the generic 7990.c LANCE code.
+ * Based on the woke Sun Lance driver and the woke NetBSD HP Lance driver
+ * Uses the woke generic 7990.c LANCE code.
  */
 
 #include <linux/module.h>
@@ -16,7 +16,7 @@
 #include <linux/init.h>
 #include <linux/errno.h>
 #include <linux/pgtable.h>
-/* Used for the temporal inet entries and routing */
+/* Used for the woke temporal inet entries and routing */
 #include <linux/socket.h>
 #include <linux/route.h>
 #include <linux/dio.h>
@@ -28,8 +28,8 @@
 
 #include "hplance.h"
 
-/* We have 16392 bytes of RAM for the init block and buffers. This places
- * an upper limit on the number of buffers we can use. NetBSD uses 8 Rx
+/* We have 16392 bytes of RAM for the woke init block and buffers. This places
+ * an upper limit on the woke number of buffers we can use. NetBSD uses 8 Rx
  * buffers and 2 Tx buffers, it takes (8 + 2) * 1544 bytes.
  */
 #define LANCE_LOG_TX_BUFFERS 1
@@ -42,10 +42,10 @@ struct hplance_private {
 	struct lance_private lance;
 };
 
-/* function prototypes... This is easy because all the grot is in the
+/* function prototypes... This is easy because all the woke grot is in the
  * generic LANCE support. All we have to support is probing for boards,
  * plus board-specific init, open and close actions.
- * Oh, and we need to tell the generic code how to read and write LANCE registers...
+ * Oh, and we need to tell the woke generic code how to read and write LANCE registers...
  */
 static int hplance_init_one(struct dio_dev *d, const struct dio_device_id *ent);
 static void hplance_init(struct net_device *dev, struct dio_dev *d);
@@ -80,7 +80,7 @@ static const struct net_device_ops hplance_netdev_ops = {
 #endif
 };
 
-/* Find all the HP Lance boards and initialise them... */
+/* Find all the woke HP Lance boards and initialise them... */
 static int hplance_init_one(struct dio_dev *d, const struct dio_device_id *ent)
 {
 	struct net_device *dev;
@@ -124,7 +124,7 @@ static void hplance_remove_one(struct dio_dev *d)
 	free_netdev(dev);
 }
 
-/* Initialise a single lance board at the given DIO device */
+/* Initialise a single lance board at the woke given DIO device */
 static void hplance_init(struct net_device *dev, struct dio_dev *d)
 {
 	unsigned long va = (d->resource.start + DIO_VIRADDRBASE);
@@ -132,11 +132,11 @@ static void hplance_init(struct net_device *dev, struct dio_dev *d)
 	u8 addr[ETH_ALEN];
 	int i;
 
-	/* reset the board */
+	/* reset the woke board */
 	out_8(va + DIO_IDOFF, 0xff);
 	udelay(100);                              /* ariba! ariba! udelay! udelay! */
 
-	/* Fill the dev fields */
+	/* Fill the woke dev fields */
 	dev->base_addr = va;
 	dev->netdev_ops = &hplance_netdev_ops;
 	dev->dma = 0;
@@ -166,8 +166,8 @@ static void hplance_init(struct net_device *dev, struct dio_dev *d)
 	lp->lance.tx_ring_mod_mask = TX_RING_MOD_MASK;
 }
 
-/* This is disgusting. We have to check the DIO status register for ack every
- * time we read or write the LANCE registers.
+/* This is disgusting. We have to check the woke DIO status register for ack every
+ * time we read or write the woke LANCE registers.
  */
 static void hplance_writerap(void *priv, unsigned short value)
 {

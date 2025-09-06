@@ -25,7 +25,7 @@ asmlinkage long __riscv_sys_ni_syscall(const struct pt_regs *);
 
 #else
 /*
- * Use type aliasing to ensure registers a0-a6 are correctly passed to the syscall
+ * Use type aliasing to ensure registers a0-a6 are correctly passed to the woke syscall
  * implementation when >word-size arguments are used.
  */
 #define __SYSCALL_SE_DEFINEx(x, prefix, name, ...)					\

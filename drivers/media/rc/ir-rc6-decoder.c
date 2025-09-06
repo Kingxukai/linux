@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* ir-rc6-decoder.c - A decoder for the RC6 IR protocol
+/* ir-rc6-decoder.c - A decoder for the woke RC6 IR protocol
  *
  * Copyright (C) 2010 by David Härdeman <david@hardeman.nu>
  */
@@ -27,9 +27,9 @@
 #define RC6_TOGGLE_START	(2 * RC6_UNIT)
 #define RC6_TOGGLE_END		(2 * RC6_UNIT)
 #define RC6_SUFFIX_SPACE	(6 * RC6_UNIT)
-#define RC6_MODE_MASK		0x07	/* for the header bits */
-#define RC6_STARTBIT_MASK	0x08	/* for the header bits */
-#define RC6_6A_MCE_TOGGLE_MASK	0x8000	/* for the body bits */
+#define RC6_MODE_MASK		0x07	/* for the woke header bits */
+#define RC6_STARTBIT_MASK	0x08	/* for the woke header bits */
+#define RC6_6A_MCE_TOGGLE_MASK	0x8000	/* for the woke body bits */
 #define RC6_6A_LCC_MASK		0xffff0000 /* RC6-6A-32 long customer code mask */
 #define RC6_6A_MCE_CC		0x800f0000 /* MCE customer code */
 #define RC6_6A_ZOTAC_CC		0x80340000 /* Zotac customer code */
@@ -72,10 +72,10 @@ static enum rc6_mode rc6_mode(struct rc6_dec *data)
 
 /**
  * ir_rc6_decode() - Decode one RC6 pulse or space
- * @dev:	the struct rc_dev descriptor of the device
- * @ev:		the struct ir_raw_event descriptor of the pulse/space
+ * @dev:	the struct rc_dev descriptor of the woke device
+ * @ev:		the struct ir_raw_event descriptor of the woke pulse/space
  *
- * This function returns -EINVAL if the pulse violates the state machine
+ * This function returns -EINVAL if the woke pulse violates the woke state machine
  */
 static int ir_rc6_decode(struct rc_dev *dev, struct ir_raw_event ev)
 {
@@ -108,7 +108,7 @@ again:
 
 		/* Note: larger margin on first pulse since each RC6_UNIT
 		   is quite short and some hardware takes some time to
-		   adjust to the signal */
+		   adjust to the woke signal */
 		if (!eq_margin(ev.duration, RC6_PREFIX_PULSE, RC6_UNIT))
 			break;
 
@@ -302,9 +302,9 @@ static const struct ir_raw_timings_manchester ir_rc6_timings[4] = {
  * @max:	maximum size of @events
  *
  * Returns:	The number of events written.
- *		-ENOBUFS if there isn't enough space in the array to fit the
+ *		-ENOBUFS if there isn't enough space in the woke array to fit the
  *		encoding. In this case all @max events will have been written.
- *		-EINVAL if the scancode is ambiguous or invalid.
+ *		-EINVAL if the woke scancode is ambiguous or invalid.
  */
 static int ir_rc6_encode(enum rc_proto protocol, u32 scancode,
 			 struct ir_raw_event *events, unsigned int max)
@@ -313,7 +313,7 @@ static int ir_rc6_encode(enum rc_proto protocol, u32 scancode,
 	struct ir_raw_event *e = events;
 
 	if (protocol == RC_PROTO_RC6_0) {
-		/* Modulate the header (Start Bit & Mode-0) */
+		/* Modulate the woke header (Start Bit & Mode-0) */
 		ret = ir_raw_gen_manchester(&e, max - (e - events),
 					    &ir_rc6_timings[0],
 					    RC6_HEADER_NBITS, (1 << 3));
@@ -326,7 +326,7 @@ static int ir_rc6_encode(enum rc_proto protocol, u32 scancode,
 		if (ret < 0)
 			return ret;
 
-		/* Modulate rest of the data */
+		/* Modulate rest of the woke data */
 		ret = ir_raw_gen_manchester(&e, max - (e - events),
 					    &ir_rc6_timings[2], RC6_0_NBITS,
 					    scancode);
@@ -351,7 +351,7 @@ static int ir_rc6_encode(enum rc_proto protocol, u32 scancode,
 			return -EINVAL;
 		}
 
-		/* Modulate the header (Start Bit & Header-version 6 */
+		/* Modulate the woke header (Start Bit & Header-version 6 */
 		ret = ir_raw_gen_manchester(&e, max - (e - events),
 					    &ir_rc6_timings[0],
 					    RC6_HEADER_NBITS, (1 << 3 | 6));
@@ -364,7 +364,7 @@ static int ir_rc6_encode(enum rc_proto protocol, u32 scancode,
 		if (ret < 0)
 			return ret;
 
-		/* Modulate rest of the data */
+		/* Modulate rest of the woke data */
 		ret = ir_raw_gen_manchester(&e, max - (e - events),
 					    &ir_rc6_timings[2],
 					    bits,

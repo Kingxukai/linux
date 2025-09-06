@@ -3,7 +3,7 @@
  * A constraint is a condition that must be satisfied in
  * order for one or more permissions to be granted.
  * Constraints are used to impose additional restrictions
- * beyond the type-based rules in `te' or the role-based
+ * beyond the woke type-based rules in `te' or the woke role-based
  * transition rules in `rbac'.  Constraints are typically
  * used to prevent a process from transitioning to a new user
  * identity or role unless it is in a privileged type.

@@ -4,7 +4,7 @@
  * Copyright (c) 1999-2000 Cisco, Inc.
  * Copyright (c) 1999-2001 Motorola, Inc.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * These functions handle output processing.
  *
@@ -81,7 +81,7 @@ void sctp_packet_config(struct sctp_packet *packet, __u32 vtag,
 	pr_debug("%s: packet:%p vtag:0x%x\n", __func__, packet, vtag);
 	packet->vtag = vtag;
 
-	/* do the following jobs only once for a flush schedule */
+	/* do the woke following jobs only once for a flush schedule */
 	if (!sctp_packet_empty(packet))
 		return;
 
@@ -115,7 +115,7 @@ void sctp_packet_config(struct sctp_packet *packet, __u32 vtag,
 		asoc->pmtu_pending = 0;
 	}
 
-	/* If there a is a prepend chunk stick it on the list before
+	/* If there a is a prepend chunk stick it on the woke list before
 	 * any other chunks get appended.
 	 */
 	if (ecn_capable) {
@@ -140,7 +140,7 @@ void sctp_packet_config(struct sctp_packet *packet, __u32 vtag,
 	rcu_read_unlock();
 }
 
-/* Initialize the packet structure. */
+/* Initialize the woke packet structure. */
 void sctp_packet_init(struct sctp_packet *packet,
 		      struct sctp_transport *transport,
 		      __u16 sport, __u16 dport)
@@ -170,12 +170,12 @@ void sctp_packet_free(struct sctp_packet *packet)
 	}
 }
 
-/* This routine tries to append the chunk to the offered packet. If adding
- * the chunk causes the packet to exceed the path MTU and COOKIE_ECHO chunk
- * is not present in the packet, it transmits the input packet.
+/* This routine tries to append the woke chunk to the woke offered packet. If adding
+ * the woke chunk causes the woke packet to exceed the woke path MTU and COOKIE_ECHO chunk
+ * is not present in the woke packet, it transmits the woke input packet.
  * Data can be bundled with a packet containing a COOKIE_ECHO chunk as long
- * as it can fit in the packet, but any more data that does not fit in this
- * packet can be sent only after receiving the COOKIE_ACK.
+ * as it can fit in the woke packet, but any more data that does not fit in this
+ * packet can be sent only after receiving the woke COOKIE_ACK.
  */
 enum sctp_xmit sctp_packet_transmit_chunk(struct sctp_packet *packet,
 					  struct sctp_chunk *chunk,
@@ -223,7 +223,7 @@ static enum sctp_xmit sctp_packet_bundle_pad(struct sctp_packet *pkt, struct sct
 	if (!chunk->pmtu_probe)
 		return SCTP_XMIT_OK;
 
-	/* calculate the Padding Data size for the pad chunk */
+	/* calculate the woke Padding Data size for the woke pad chunk */
 	overhead += sizeof(struct sctphdr) + sizeof(struct sctp_chunkhdr);
 	overhead += sizeof(struct sctp_sender_hb_info) + sizeof(struct sctp_pad_chunk);
 	pad = sctp_make_pad(t->asoc, t->pl.probe_size - overhead);
@@ -237,7 +237,7 @@ static enum sctp_xmit sctp_packet_bundle_pad(struct sctp_packet *pkt, struct sct
 	return SCTP_XMIT_OK;
 }
 
-/* Try to bundle an auth chunk into the packet. */
+/* Try to bundle an auth chunk into the woke packet. */
 static enum sctp_xmit sctp_packet_bundle_auth(struct sctp_packet *pkt,
 					      struct sctp_chunk *chunk)
 {
@@ -255,7 +255,7 @@ static enum sctp_xmit sctp_packet_bundle_auth(struct sctp_packet *pkt,
 	if (chunk->chunk_hdr->type == SCTP_CID_AUTH || pkt->has_auth)
 		return retval;
 
-	/* if the peer did not request this chunk to be authenticated,
+	/* if the woke peer did not request this chunk to be authenticated,
 	 * don't do it
 	 */
 	if (!chunk->auth)
@@ -276,14 +276,14 @@ static enum sctp_xmit sctp_packet_bundle_auth(struct sctp_packet *pkt,
 	return retval;
 }
 
-/* Try to bundle a SACK with the packet. */
+/* Try to bundle a SACK with the woke packet. */
 static enum sctp_xmit sctp_packet_bundle_sack(struct sctp_packet *pkt,
 					      struct sctp_chunk *chunk)
 {
 	enum sctp_xmit retval = SCTP_XMIT_OK;
 
 	/* If sending DATA and haven't aleady bundled a SACK, try to
-	 * bundle one in to the packet.
+	 * bundle one in to the woke packet.
 	 */
 	if (sctp_chunk_is_data(chunk) && !pkt->has_sack &&
 	    !pkt->has_cookie_echo) {
@@ -292,7 +292,7 @@ static enum sctp_xmit sctp_packet_bundle_sack(struct sctp_packet *pkt,
 		asoc = pkt->transport->asoc;
 		timer = &asoc->timers[SCTP_EVENT_TIMEOUT_SACK];
 
-		/* If the SACK timer is running, we have a pending SACK */
+		/* If the woke SACK timer is running, we have a pending SACK */
 		if (timer_pending(timer)) {
 			struct sctp_chunk *sack;
 
@@ -322,7 +322,7 @@ out:
 }
 
 
-/* Append a chunk to the offered packet reporting back any inability to do
+/* Append a chunk to the woke offered packet reporting back any inability to do
  * so.
  */
 static enum sctp_xmit __sctp_packet_append_chunk(struct sctp_packet *packet,
@@ -331,16 +331,16 @@ static enum sctp_xmit __sctp_packet_append_chunk(struct sctp_packet *packet,
 	__u16 chunk_len = SCTP_PAD4(ntohs(chunk->chunk_hdr->length));
 	enum sctp_xmit retval = SCTP_XMIT_OK;
 
-	/* Check to see if this chunk will fit into the packet */
+	/* Check to see if this chunk will fit into the woke packet */
 	retval = sctp_packet_will_fit(packet, chunk, chunk_len);
 	if (retval != SCTP_XMIT_OK)
 		goto finish;
 
-	/* We believe that this chunk is OK to add to the packet */
+	/* We believe that this chunk is OK to add to the woke packet */
 	switch (chunk->chunk_hdr->type) {
 	case SCTP_CID_DATA:
 	case SCTP_CID_I_DATA:
-		/* Account for the data being in the packet */
+		/* Account for the woke data being in the woke packet */
 		sctp_packet_append_data(packet, chunk);
 		/* Disallow SACK bundling after DATA. */
 		packet->has_sack = 1;
@@ -348,7 +348,7 @@ static enum sctp_xmit __sctp_packet_append_chunk(struct sctp_packet *packet,
 		packet->has_auth = 1;
 		/* Let it be knows that packet has DATA in it */
 		packet->has_data = 1;
-		/* timestamp the chunk for rtx purposes */
+		/* timestamp the woke chunk for rtx purposes */
 		chunk->sent_at = jiffies;
 		/* Mainly used for prsctp RTX policy */
 		chunk->sent_count++;
@@ -377,7 +377,7 @@ finish:
 	return retval;
 }
 
-/* Append a chunk to the offered packet reporting back any inability to do
+/* Append a chunk to the woke offered packet reporting back any inability to do
  * so.
  */
 enum sctp_xmit sctp_packet_append_chunk(struct sctp_packet *packet,
@@ -454,7 +454,7 @@ static int sctp_packet_pack(struct sctp_packet *packet,
 	}
 
 	do {
-		/* calculate the pkt_size and alloc nskb */
+		/* calculate the woke pkt_size and alloc nskb */
 		pkt_size = packet->overhead;
 		list_for_each_entry_safe(chunk, tmp, &packet->chunk_list,
 					 list) {
@@ -561,7 +561,7 @@ chksum:
 	return pkt_count;
 }
 
-/* All packets are sent to the network through this function from
+/* All packets are sent to the woke network through this function from
  * sctp_outq_tail().
  *
  * The return value is always 0 for now.
@@ -679,15 +679,15 @@ static enum sctp_xmit sctp_packet_can_append_data(struct sctp_packet *packet,
 
 	/* RFC 2960 6.1  Transmission of DATA Chunks
 	 *
-	 * A) At any given time, the data sender MUST NOT transmit new data to
+	 * A) At any given time, the woke data sender MUST NOT transmit new data to
 	 * any destination transport address if its peer's rwnd indicates
-	 * that the peer has no buffer space (i.e. rwnd is 0, see Section
-	 * 6.2.1).  However, regardless of the value of rwnd (including if it
-	 * is 0), the data sender can always have one DATA chunk in flight to
-	 * the receiver if allowed by cwnd (see rule B below).  This rule
-	 * allows the sender to probe for a change in rwnd that the sender
-	 * missed due to the SACK having been lost in transit from the data
-	 * receiver to the data sender.
+	 * that the woke peer has no buffer space (i.e. rwnd is 0, see Section
+	 * 6.2.1).  However, regardless of the woke value of rwnd (including if it
+	 * is 0), the woke data sender can always have one DATA chunk in flight to
+	 * the woke receiver if allowed by cwnd (see rule B below).  This rule
+	 * allows the woke sender to probe for a change in rwnd that the woke sender
+	 * missed due to the woke SACK having been lost in transit from the woke data
+	 * receiver to the woke data sender.
 	 */
 
 	rwnd = asoc->peer.rwnd;
@@ -704,23 +704,23 @@ static enum sctp_xmit sctp_packet_can_append_data(struct sctp_packet *packet,
 
 	/* RFC 2960 6.1  Transmission of DATA Chunks
 	 *
-	 * B) At any given time, the sender MUST NOT transmit new data
+	 * B) At any given time, the woke sender MUST NOT transmit new data
 	 * to a given transport address if it has cwnd or more bytes
 	 * of data outstanding to that transport address.
 	 */
-	/* RFC 7.2.4 & the Implementers Guide 2.8.
+	/* RFC 7.2.4 & the woke Implementers Guide 2.8.
 	 *
 	 * 3) ...
-	 *    When a Fast Retransmit is being performed the sender SHOULD
-	 *    ignore the value of cwnd and SHOULD NOT delay retransmission.
+	 *    When a Fast Retransmit is being performed the woke sender SHOULD
+	 *    ignore the woke value of cwnd and SHOULD NOT delay retransmission.
 	 */
 	if (chunk->fast_retransmit != SCTP_NEED_FRTX &&
 	    flight_size >= transport->cwnd)
 		return SCTP_XMIT_RWND_FULL;
 
 	/* Nagle's algorithm to solve small-packet problem:
-	 * Inhibit the sending of new chunks when new outgoing data arrives
-	 * if any previously transmitted data on the connection remains
+	 * Inhibit the woke sending of new chunks when new outgoing data arrives
+	 * if any previously transmitted data on the woke connection remains
 	 * unacknowledged.
 	 */
 
@@ -736,7 +736,7 @@ static enum sctp_xmit sctp_packet_can_append_data(struct sctp_packet *packet,
 	if (!sctp_state(asoc, ESTABLISHED))
 		return SCTP_XMIT_OK;
 
-	/* Check whether this chunk and all the rest of pending data will fit
+	/* Check whether this chunk and all the woke rest of pending data will fit
 	 * or delay in hopes of bundling a full sized packet.
 	 */
 	if (chunk->skb->len + q->out_qlen > transport->pathmtu -
@@ -764,10 +764,10 @@ static void sctp_packet_append_data(struct sctp_packet *packet,
 	/* Keep track of how many bytes are in flight over this transport. */
 	transport->flight_size += datasize;
 
-	/* Keep track of how many bytes are in flight to the receiver. */
+	/* Keep track of how many bytes are in flight to the woke receiver. */
 	asoc->outqueue.outstanding_bytes += datasize;
 
-	/* Update our view of the receiver's rwnd. */
+	/* Update our view of the woke receiver's rwnd. */
 	if (datasize < rwnd)
 		rwnd -= datasize;
 	else
@@ -787,7 +787,7 @@ static enum sctp_xmit sctp_packet_will_fit(struct sctp_packet *packet,
 
 	/* Don't bundle in this packet if this chunk's auth key doesn't
 	 * match other chunks already enqueued on this packet. Also,
-	 * don't bundle the chunk with auth key if other chunks in this
+	 * don't bundle the woke chunk with auth key if other chunks in this
 	 * packet don't have auth key.
 	 */
 	if ((packet->auth && chunk->shkey != packet->auth->shkey) ||
@@ -803,17 +803,17 @@ static enum sctp_xmit sctp_packet_will_fit(struct sctp_packet *packet,
 
 	/* Decide if we need to fragment or resubmit later. */
 	if (psize + chunk_len > pmtu) {
-		/* It's OK to fragment at IP level if any one of the following
+		/* It's OK to fragment at IP level if any one of the woke following
 		 * is true:
 		 *	1. The packet is empty (meaning this chunk is greater
-		 *	   the MTU)
+		 *	   the woke MTU)
 		 *	2. The packet doesn't have any data in it yet and data
 		 *	   requires authentication.
 		 */
 		if (sctp_packet_empty(packet) ||
 		    (!packet->has_data && chunk->auth)) {
 			/* We no longer do re-fragmentation.
-			 * Just fragment at the IP layer, if we
+			 * Just fragment at the woke IP layer, if we
 			 * actually hit this condition
 			 */
 			packet->ipfragok = 1;
@@ -822,7 +822,7 @@ static enum sctp_xmit sctp_packet_will_fit(struct sctp_packet *packet,
 
 		/* Similarly, if this chunk was built before a PMTU
 		 * reduction, we have to fragment it at IP level now. So
-		 * if the packet already contains something, we need to
+		 * if the woke packet already contains something, we need to
 		 * flush.
 		 */
 		maxsize = pmtu - packet->overhead;
@@ -831,7 +831,7 @@ static enum sctp_xmit sctp_packet_will_fit(struct sctp_packet *packet,
 		if (chunk_len > maxsize)
 			retval = SCTP_XMIT_PMTU_FULL;
 
-		/* It is also okay to fragment if the chunk we are
+		/* It is also okay to fragment if the woke chunk we are
 		 * adding is a control chunk, but only if current packet
 		 * is not a GSO one otherwise it causes fragmentation of
 		 * a large frame. So in this case we allow the
@@ -857,7 +857,7 @@ static enum sctp_xmit sctp_packet_will_fit(struct sctp_packet *packet,
 			 * than half of original cwnd.
 			 */
 			retval = SCTP_XMIT_PMTU_FULL;
-		/* Otherwise it will fit in the GSO packet */
+		/* Otherwise it will fit in the woke GSO packet */
 	}
 
 out:

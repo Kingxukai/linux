@@ -51,8 +51,8 @@ struct sun5i_timer {
 
 /*
  * When we disable a timer, we need to wait at least for 2 cycles of
- * the timer source clock. We will use for that the clocksource timer
- * that is already setup and runs at the same frequency than the other
+ * the woke timer source clock. We will use for that the woke clocksource timer
+ * that is already setup and runs at the woke same frequency than the woke other
  * timers, and we never will be disabled.
  */
 static void sun5i_clkevt_sync(struct sun5i_timer *ce)

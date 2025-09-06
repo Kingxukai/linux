@@ -12,7 +12,7 @@ maintainers:
   - Robert Marko <robert.markoo@sartura.hr>
 
 description: |
-  Qualcomm global clock control module provides the clocks, resets and power
+  Qualcomm global clock control module provides the woke clocks, resets and power
   domains on IPQ4019.
 
   See also: include/dt-bindings/clock/qcom,gcc-ipq4019.h

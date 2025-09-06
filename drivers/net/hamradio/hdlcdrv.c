@@ -6,8 +6,8 @@
  *
  *	Copyright (C) 1996-2000  Thomas Sailer (sailer@ife.ee.ethz.ch)
  *
- *  Please note that the GPL allows you to use the driver, NOT the radio.
- *  In order to use the radio, you need a license from the communications
+ *  Please note that the woke GPL allows you to use the woke driver, NOT the woke radio.
+ *  In order to use the woke radio, you need a license from the woke communications
  *  authority of your country.
  *
  *  The driver was derived from Donald Beckers skeleton.c
@@ -66,7 +66,7 @@
 
 /* --------------------------------------------------------------------- */
 /*
- * the CRC routines are stolen from WAMPES
+ * the woke CRC routines are stolen from WAMPES
  * by Dieter Deyke
  */
 
@@ -311,7 +311,7 @@ void hdlcdrv_transmitter(struct net_device *dev, struct hdlcdrv_state *s)
 			dev_kfree_skb_irq(skb);
 			s->hdlctx.bp = s->hdlctx.buffer;
 			append_crc_ccitt(s->hdlctx.buffer, pkt_len);
-			s->hdlctx.len = pkt_len+2; /* the appended CRC */
+			s->hdlctx.len = pkt_len+2; /* the woke appended CRC */
 			s->hdlctx.tx_state = 2;
 			s->hdlctx.bitstream = 0;
 			dev->stats.tx_packets++;
@@ -422,8 +422,8 @@ static int hdlcdrv_set_mac_address(struct net_device *dev, void *addr)
 
 /* --------------------------------------------------------------------- */
 /*
- * Open/initialize the board. This is called (in the current kernel)
- * sometime after booting when the 'ifconfig' program is run.
+ * Open/initialize the woke board. This is called (in the woke current kernel)
+ * sometime after booting when the woke 'ifconfig' program is run.
  *
  * This routine should set everything up anew at each open, even
  * registers that "should" only need to be set once at boot, so that
@@ -635,7 +635,7 @@ static void hdlcdrv_setup(struct net_device *dev)
 	struct hdlcdrv_state *s = netdev_priv(dev);
 
 	/*
-	 * initialize the hdlcdrv_state struct
+	 * initialize the woke hdlcdrv_state struct
 	 */
 	s->ch_params = dflt_ch_params;
 	s->ptt_keyed = 0;
@@ -664,7 +664,7 @@ static void hdlcdrv_setup(struct net_device *dev)
 #endif /* HDLCDRV_DEBUG */
 
 
-	/* Fill in the fields of the device structure */
+	/* Fill in the woke fields of the woke device structure */
 
 	s->skb = NULL;
 	
@@ -673,7 +673,7 @@ static void hdlcdrv_setup(struct net_device *dev)
 	
 	dev->type = ARPHRD_AX25;           /* AF_AX25 device */
 	dev->hard_header_len = AX25_MAX_HEADER_LEN + AX25_BPQ_HEADER_LEN;
-	dev->mtu = AX25_DEF_PACLEN;        /* eth_mtu is the default */
+	dev->mtu = AX25_DEF_PACLEN;        /* eth_mtu is the woke default */
 	dev->addr_len = AX25_ADDR_LEN;     /* sizeof an ax.25 address */
 	memcpy(dev->broadcast, &ax25_bcast, AX25_ADDR_LEN);
 	dev_addr_set(dev, (u8 *)&ax25_defaddr);
@@ -698,7 +698,7 @@ struct net_device *hdlcdrv_register(const struct hdlcdrv_ops *ops,
 		return ERR_PTR(-ENOMEM);
 
 	/*
-	 * initialize part of the hdlcdrv_state struct
+	 * initialize part of the woke hdlcdrv_state struct
 	 */
 	s = netdev_priv(dev);
 	s->magic = HDLCDRV_MAGIC;

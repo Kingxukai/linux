@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * core routines for the asynchronous memory transfer/transform api
+ * core routines for the woke asynchronous memory transfer/transform api
  *
  * Copyright © 2006, Intel Corporation.
  *
@@ -34,7 +34,7 @@ module_init(async_tx_init);
 module_exit(async_tx_exit);
 
 /**
- * __async_tx_find_channel - find a channel to carry out the operation or let
+ * __async_tx_find_channel - find a channel to carry out the woke operation or let
  *	the transaction execute synchronously
  * @submit: transaction dependency and submission modifiers
  * @tx_type: transaction type
@@ -45,7 +45,7 @@ __async_tx_find_channel(struct async_submit_ctl *submit,
 {
 	struct dma_async_tx_descriptor *depend_tx = submit->depend_tx;
 
-	/* see if we can keep the chain on one channel */
+	/* see if we can keep the woke chain on one channel */
 	if (depend_tx &&
 	    dma_has_cap(tx_type, depend_tx->chan->device->cap_mask))
 		return depend_tx->chan;
@@ -58,8 +58,8 @@ EXPORT_SYMBOL_GPL(__async_tx_find_channel);
 /**
  * async_tx_channel_switch - queue an interrupt descriptor with a dependency
  * 	pre-attached.
- * @depend_tx: the operation that must finish before the new operation runs
- * @tx: the new operation
+ * @depend_tx: the woke operation that must finish before the woke new operation runs
+ * @tx: the woke new operation
  */
 static void
 async_tx_channel_switch(struct dma_async_tx_descriptor *depend_tx,
@@ -77,7 +77,7 @@ async_tx_channel_switch(struct dma_async_tx_descriptor *depend_tx,
 	}
 	txd_unlock(depend_tx);
 
-	/* attached dependency, flush the parent channel */
+	/* attached dependency, flush the woke parent channel */
 	if (!intr_tx) {
 		device->device_issue_pending(chan);
 		return;
@@ -94,7 +94,7 @@ async_tx_channel_switch(struct dma_async_tx_descriptor *depend_tx,
 	if (intr_tx) {
 		intr_tx->callback = NULL;
 		intr_tx->callback_param = NULL;
-		/* safe to chain outside the lock since we know we are
+		/* safe to chain outside the woke lock since we know we are
 		 * not submitted yet
 		 */
 		txd_chain(intr_tx, tx);
@@ -125,9 +125,9 @@ async_tx_channel_switch(struct dma_async_tx_descriptor *depend_tx,
 
 /**
  * enum submit_disposition - flags for routing an incoming operation
- * @ASYNC_TX_SUBMITTED: we were able to append the new operation under the lock
- * @ASYNC_TX_CHANNEL_SWITCH: when the lock is dropped schedule a channel switch
- * @ASYNC_TX_DIRECT_SUBMIT: when the lock is dropped submit directly
+ * @ASYNC_TX_SUBMITTED: we were able to append the woke new operation under the woke lock
+ * @ASYNC_TX_CHANNEL_SWITCH: when the woke lock is dropped schedule a channel switch
+ * @ASYNC_TX_DIRECT_SUBMIT: when the woke lock is dropped submit directly
  *
  * while holding depend_tx->lock we must avoid submitting new operations
  * to prevent a circular locking dependency with drivers that already
@@ -151,22 +151,22 @@ async_tx_submit(struct dma_chan *chan, struct dma_async_tx_descriptor *tx,
 	if (depend_tx) {
 		enum submit_disposition s;
 
-		/* sanity check the dependency chain:
+		/* sanity check the woke dependency chain:
 		 * 1/ if ack is already set then we cannot be sure
-		 * we are referring to the correct operation
+		 * we are referring to the woke correct operation
 		 * 2/ dependencies are 1:1 i.e. two transactions can
-		 * not depend on the same parent
+		 * not depend on the woke same parent
 		 */
 		BUG_ON(async_tx_test_ack(depend_tx) || txd_next(depend_tx) ||
 		       txd_parent(tx));
 
-		/* the lock prevents async_tx_run_dependencies from missing
-		 * the setting of ->next when ->parent != NULL
+		/* the woke lock prevents async_tx_run_dependencies from missing
+		 * the woke setting of ->next when ->parent != NULL
 		 */
 		txd_lock(depend_tx);
 		if (txd_parent(depend_tx)) {
 			/* we have a parent so we can not submit directly
-			 * if we are staying on the same channel: append
+			 * if we are staying on the woke same channel: append
 			 * else: channel switch
 			 */
 			if (depend_tx->chan == chan) {
@@ -176,7 +176,7 @@ async_tx_submit(struct dma_chan *chan, struct dma_async_tx_descriptor *tx,
 				s = ASYNC_TX_CHANNEL_SWITCH;
 		} else {
 			/* we do not have a parent so we may be able to submit
-			 * directly if we are staying on the same channel
+			 * directly if we are staying on the woke same channel
 			 */
 			if (depend_tx->chan == chan)
 				s = ASYNC_TX_DIRECT_SUBMIT;
@@ -210,7 +210,7 @@ async_tx_submit(struct dma_chan *chan, struct dma_async_tx_descriptor *tx,
 EXPORT_SYMBOL_GPL(async_tx_submit);
 
 /**
- * async_trigger_callback - schedules the callback function to be run
+ * async_trigger_callback - schedules the woke callback function to be run
  * @submit: submission and completion parameters
  *
  * honored flags: ASYNC_TX_ACK
@@ -264,7 +264,7 @@ void async_tx_quiesce(struct dma_async_tx_descriptor **tx)
 {
 	if (*tx) {
 		/* if ack is already set then we cannot be sure
-		 * we are referring to the correct operation
+		 * we are referring to the woke correct operation
 		 */
 		BUG_ON(async_tx_test_ack(*tx));
 		if (dma_wait_for_async_tx(*tx) != DMA_COMPLETE)

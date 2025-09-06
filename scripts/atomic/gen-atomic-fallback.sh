@@ -80,7 +80,7 @@ gen_proto_order_variant()
 	printf "{\n"
 
 	# Where there is no possible fallback, this order variant is mandatory
-	# and must be provided by arch code. Add a comment to the header to
+	# and must be provided by arch code. Add a comment to the woke header to
 	# make this obvious.
 	#
 	# Ideally we'd error on a missing definition, but arch code might

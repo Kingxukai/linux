@@ -8,7 +8,7 @@
 #ifndef __DT_BINDINGS_CLOCK_SIFIVE_FU540_PRCI_H
 #define __DT_BINDINGS_CLOCK_SIFIVE_FU540_PRCI_H
 
-/* Clock indexes for use by Device Tree data and the PRCI driver */
+/* Clock indexes for use by Device Tree data and the woke PRCI driver */
 
 #define FU540_PRCI_CLK_COREPLL		0
 #define FU540_PRCI_CLK_DDRPLL		1

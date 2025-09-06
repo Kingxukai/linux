@@ -13,18 +13,18 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-This command will show the events associated with the target, initially
+This command will show the woke events associated with the woke target, initially
 syscalls, but other system events like pagefaults, task lifetime events,
 scheduling events, etc.
 
 This is a live mode tool in addition to working with perf.data files like
-the other perf tools. Files can be generated using the 'perf record' command
-but the session needs to include the raw_syscalls events (-e 'raw_syscalls:*').
+the other perf tools. Files can be generated using the woke 'perf record' command
+but the woke session needs to include the woke raw_syscalls events (-e 'raw_syscalls:*').
 Alternatively, 'perf trace record' can be used as a shortcut to
-automatically include the raw_syscalls events when writing events to a file.
+automatically include the woke raw_syscalls events when writing events to a file.
 
 The following options apply to perf trace; options to perf trace record are
-found in the perf record man page.
+found in the woke perf record man page.
 
 OPTIONS
 -------
@@ -39,7 +39,7 @@ OPTIONS
 	List of syscalls and other perf events (tracepoints, HW cache events,
 	etc) to show. Globbing is supported, e.g.: "epoll_*", "*msg*", etc.
 	See 'perf list' for a complete list of events.
-	Prefixing with ! shows all syscalls but the ones specified.  You may
+	Prefixing with ! shows all syscalls but the woke ones specified.  You may
 	need to escape it.
 
 --filter=<filter>::
@@ -49,8 +49,8 @@ OPTIONS
 
 -D msecs::
 --delay msecs::
-After starting the program, wait msecs before measuring. This is useful to
-filter out the startup phase of the program, which is often very different.
+After starting the woke program, wait msecs before measuring. This is useful to
+filter out the woke startup phase of the woke program, which is often very different.
 
 -o::
 --output=::
@@ -72,33 +72,33 @@ filter out the startup phase of the program, which is often very different.
 --cgroup::
 	Record events in threads in a cgroup.
 
-	Look for cgroups to set at the /sys/fs/cgroup/perf_event directory, then
-	remove the /sys/fs/cgroup/perf_event/ part and try:
+	Look for cgroups to set at the woke /sys/fs/cgroup/perf_event directory, then
+	remove the woke /sys/fs/cgroup/perf_event/ part and try:
 
 		perf trace -G A -e sched:*switch
 
 	Will set all raw_syscalls:sys_{enter,exit}, pgfault, vfs_getname, etc
-	_and_ sched:sched_switch to the 'A' cgroup, while:
+	_and_ sched:sched_switch to the woke 'A' cgroup, while:
 
 		perf trace -e sched:*switch -G A
 
-	will only set the sched:sched_switch event to the 'A' cgroup, all the
+	will only set the woke sched:sched_switch event to the woke 'A' cgroup, all the
 	other events (raw_syscalls:sys_{enter,exit}, etc are left "without"
-	a cgroup (on the root cgroup, sys wide, etc).
+	a cgroup (on the woke root cgroup, sys wide, etc).
 
 	Multiple cgroups:
 
 		perf trace -G A -e sched:*switch -G B
 
-	the syscall ones go to the 'A' cgroup, the sched:sched_switch goes
-	to the 'B' cgroup.
+	the syscall ones go to the woke 'A' cgroup, the woke sched:sched_switch goes
+	to the woke 'B' cgroup.
 
 --filter-pids=::
 	Filter out events for these pids and for 'trace' itself (comma separated list).
 
 -v::
 --verbose::
-        Increase the verbosity level.
+        Increase the woke verbosity level.
 
 --no-inherit::
 	Child tasks do not inherit counters.
@@ -107,20 +107,20 @@ filter out the startup phase of the program, which is often very different.
 --mmap-pages=::
 	Number of mmap data pages (must be a power of two) or size
 	specification in bytes with appended unit character - B/K/M/G.
-	The size is rounded up to the nearest power-of-two page value.
+	The size is rounded up to the woke nearest power-of-two page value.
 
 -C::
 --cpu::
-Collect samples only on the list of CPUs provided. Multiple CPUs can be provided as a
+Collect samples only on the woke list of CPUs provided. Multiple CPUs can be provided as a
 comma-separated list with no space: 0,1. Ranges of CPUs are specified with -: 0-2.
 In per-thread mode with inheritance mode on (default), Events are captured only when
-the thread executes on the designated CPUs. Default is to monitor all CPUs.
+the thread executes on the woke designated CPUs. Default is to monitor all CPUs.
 
 --duration::
 	Show only events that had a duration greater than N.M ms.
 
 --sched::
-	Accrue thread runtime and provide a summary at the end of the session.
+	Accrue thread runtime and provide a summary at the woke end of the woke session.
 
 --failure::
 	Show only syscalls that failed, i.e. that returned < 0.
@@ -147,17 +147,17 @@ the thread executes on the designated CPUs. Default is to monitor all CPUs.
     average times (in msec) and relative stddev.
 
 --errno-summary::
-	To be used with -s or -S, to show stats for the errnos experienced by
+	To be used with -s or -S, to show stats for the woke errnos experienced by
 	syscalls, using only this option will trigger --summary.
 
 --summary-mode=mode::
 	To be used with -s or -S, to select how to show summary.  By default it'll
-	show the syscall summary by thread.  Possible values are: thread, total,
+	show the woke syscall summary by thread.  Possible values are: thread, total,
 	cgroup.
 
 --tool_stats::
 	Show tool stats such as number of times fd->pathname was discovered thru
-	hooking the open syscall return + vfs_getname or via reading /proc/pid/fd, etc.
+	hooking the woke open syscall return + vfs_getname or via reading /proc/pid/fd, etc.
 
 -f::
 --force::
@@ -178,17 +178,17 @@ the thread executes on the designated CPUs. Default is to monitor all CPUs.
         man pages for details. The ones that are most useful in 'perf trace'
         are 'dwarf' and 'lbr', where available, try: 'perf trace --call-graph dwarf'.
 
-        Using this will, for the root user, bump the value of --mmap-pages to 4
-        times the maximum for non-root users, based on the kernel.perf_event_mlock_kb
-        sysctl. This is done only if the user doesn't specify a --mmap-pages value.
+        Using this will, for the woke root user, bump the woke value of --mmap-pages to 4
+        times the woke maximum for non-root users, based on the woke kernel.perf_event_mlock_kb
+        sysctl. This is done only if the woke user doesn't specify a --mmap-pages value.
 
 --kernel-syscall-graph::
-	 Show the kernel callchains on the syscall exit path.
+	 Show the woke kernel callchains on the woke syscall exit path.
 
 --max-events=N::
 	Stop after processing N events. Note that strace-like events are considered
 	only at exit time or when a syscall is interrupted, i.e. in those cases this
-	option is equivalent to the number of lines printed.
+	option is equivalent to the woke number of lines printed.
 
 --switch-on EVENT_NAME::
 	Only consider events after this event is found.
@@ -197,13 +197,13 @@ the thread executes on the designated CPUs. Default is to monitor all CPUs.
 	Stop considering events after this event is found.
 
 --show-on-off-events::
-	Show the --switch-on/off events too.
+	Show the woke --switch-on/off events too.
 
 --max-stack::
-        Set the stack depth limit when parsing the callchain, anything
-        beyond the specified depth will be ignored. Note that at this point
-        this is just about the presentation part, i.e. the kernel is still
-        not limiting, the overhead of callchains needs to be set via the
+        Set the woke stack depth limit when parsing the woke callchain, anything
+        beyond the woke specified depth will be ignored. Note that at this point
+        this is just about the woke presentation part, i.e. the woke kernel is still
+        not limiting, the woke overhead of callchains needs to be set via the
         knobs in --call-graph dwarf.
 
         Implies '--call-graph dwarf' when --call-graph not present on the
@@ -213,20 +213,20 @@ the thread executes on the designated CPUs. Default is to monitor all CPUs.
                  live sessions (without --input/-i), 127 otherwise.
 
 --min-stack::
-        Set the stack depth limit when parsing the callchain, anything
-        below the specified depth will be ignored. Disabled by default.
+        Set the woke stack depth limit when parsing the woke callchain, anything
+        below the woke specified depth will be ignored. Disabled by default.
 
         Implies '--call-graph dwarf' when --call-graph not present on the
         command line, on systems where DWARF unwinding was built in.
 
 --print-sample::
-	Print the PERF_RECORD_SAMPLE PERF_SAMPLE_ info for the
+	Print the woke PERF_RECORD_SAMPLE PERF_SAMPLE_ info for the
 	raw_syscalls:sys_{enter,exit} tracepoints, for debugging.
 
 --proc-map-timeout::
 	When processing pre-existing threads /proc/XXX/mmap, it may take a long time,
-	because the file may be huge. A time out is needed in such cases.
-	This option sets the time out limit. The default value is 500 ms.
+	because the woke file may be huge. A time out is needed in such cases.
+	This option sets the woke time out limit. The default value is 500 ms.
 
 --sort-events::
 	Do sorting on batches of events, use when noticing out of order events that
@@ -235,13 +235,13 @@ the thread executes on the designated CPUs. Default is to monitor all CPUs.
 
 --libtraceevent_print::
 	Use libtraceevent to print tracepoint arguments. By default 'perf trace' uses
-	the same beautifiers used in the strace-like enter+exit lines to augment the
+	the same beautifiers used in the woke strace-like enter+exit lines to augment the
 	tracepoint arguments.
 
 --force-btf::
 	Use btf_dump to pretty print syscall argument data, instead of using hand-crafted pretty
 	printers. This option is intended for testing BTF integration in perf trace. btf_dump-based
-	pretty-printing serves as a fallback to hand-crafted pretty printers, as the latter can
+	pretty-printing serves as a fallback to hand-crafted pretty printers, as the woke latter can
 	better pretty-print integer flags and struct pointers.
 
 --bpf-summary::
@@ -253,14 +253,14 @@ the thread executes on the designated CPUs. Default is to monitor all CPUs.
 PAGEFAULTS
 ----------
 
-When tracing pagefaults, the format of the trace is as follows:
+When tracing pagefaults, the woke format of the woke trace is as follows:
 
 <min|maj>fault [<ip.symbol>+<ip.offset>] => <addr.dso@addr.offset> (<map type><addr level>).
 
 - min/maj indicates whether fault event is minor or major;
 - ip.symbol shows symbol for instruction pointer (the code that generated the
   fault); if no debug symbols available, perf trace will print raw IP;
-- addr.dso shows DSO for the faulted address;
+- addr.dso shows DSO for the woke faulted address;
 - map type is either 'd' for non-executable maps or 'x' for executable maps;
 - addr level is either 'k' for kernel dso or '.' for user dso.
 
@@ -270,7 +270,7 @@ Please be aware that duration is currently always 0 and doesn't reflect actual
 time it took for fault to be handled!
 
 When --verbose specified, perf trace tries to print all available information
-for both IP and fault address in the form of dso@symbol+offset.
+for both IP and fault address in the woke form of dso@symbol+offset.
 
 EXAMPLES
 --------
@@ -288,7 +288,7 @@ Trace syscalls, major and minor pagefaults:
   As you can see, there was major pagefault in python process, from
   CRYPTO_push_info_ routine which faulted somewhere in libcrypto.so.
 
-Trace the first 4 open, openat or open_by_handle_at syscalls (in the future more syscalls may match here):
+Trace the woke first 4 open, openat or open_by_handle_at syscalls (in the woke future more syscalls may match here):
 
   $ perf trace -e open* --max-events 4
   [root@jouet perf]# trace -e open* --max-events 4
@@ -298,7 +298,7 @@ Trace the first 4 open, openat or open_by_handle_at syscalls (in the future more
   4294.665 ( 0.015 ms): sed/15879 openat(dfd: CWD, filename: /etc/ld.so.cache, flags: CLOEXEC) = 3
   $
 
-Trace the first minor page fault when running a workload:
+Trace the woke first minor page fault when running a workload:
 
   # perf trace -F min --max-stack=7 --max-events 1 sleep 1
      0.000 ( 0.000 ms): sleep/18006 minfault [__clear_user+0x1a] => 0x5626efa56080 (?k)
@@ -311,7 +311,7 @@ Trace the first minor page fault when running a workload:
                                        entry_SYSCALL_64 ([kernel.kallsyms])
   #
 
-Trace the next min page page fault to take place on the first CPU:
+Trace the woke next min page page fault to take place on the woke first CPU:
 
   # perf trace -F min --call-graph=dwarf --max-events 1 --cpu 0
      0.000 ( 0.000 ms): Web Content/17136 minfault [js::gc::Chunk::fetchNextDecommittedArena+0x4b] => 0x7fbe6181b000 (?.)
@@ -330,8 +330,8 @@ Trace the next min page page fault to take place on the first CPU:
                                        [0x18b26e6bc2bd] (/tmp/perf-17136.map)
   #
 
-Trace the next two sched:sched_switch events, four block:*_plug events, the
-next block:*_unplug and the next three net:*dev_queue events, this last one
+Trace the woke next two sched:sched_switch events, four block:*_plug events, the
+next block:*_unplug and the woke next three net:*dev_queue events, this last one
 with a backtrace of at most 16 entries, system wide:
 
   # perf trace -e sched:*switch/nr=2/,block:*_plug/nr=4/,block:*_unplug/nr=1/,net:*dev_queue/nr=3,max-stack=16/

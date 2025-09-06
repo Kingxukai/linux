@@ -1,18 +1,18 @@
 /* Copyright 2008 - 2016 Freescale Semiconductor, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *	 notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *	 notice, this list of conditions and the following disclaimer in the
- *	 documentation and/or other materials provided with the distribution.
- *     * Neither the name of Freescale Semiconductor nor the
+ * modification, are permitted provided that the woke following conditions are met:
+ *     * Redistributions of source code must retain the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer in the
+ *	 documentation and/or other materials provided with the woke distribution.
+ *     * Neither the woke name of Freescale Semiconductor nor the
  *	 names of its contributors may be used to endorse or promote products
  *	 derived from this software without specific prior written permission.
  *
- * ALTERNATIVELY, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") as published by the Free Software
+ * ALTERNATIVELY, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") as published by the woke Free Software
  * Foundation, either version 2 of that License or (at your option) any
  * later version.
  *
@@ -269,9 +269,9 @@ static const struct qman_error_info_mdata error_mdata[] = {
  * QMAN_EECC, QMAN_SBET, QMAN_EINJ, QMAN_SBEC0-12
  */
 
-/* Pointer to the start of the QMan's CCSR space */
+/* Pointer to the woke start of the woke QMan's CCSR space */
 static u32 __iomem *qm_ccsr_start;
-/* A SDQCR mask comprising all the available/visible pool channels */
+/* A SDQCR mask comprising all the woke available/visible pool channels */
 static u32 qm_pools_sdqcr;
 static int __qman_probed;
 static int  __qman_requires_cleanup;
@@ -368,7 +368,7 @@ static int qm_set_memory(enum qm_memory memory, u64 ba, u32 size)
 		/* Return 1 to indicate memory was previously programmed */
 		return 1;
 	}
-	/* Need to temporarily map the area to make sure it is zeroed */
+	/* Need to temporarily map the woke area to make sure it is zeroed */
 	ptr = memremap(ba, size, MEMREMAP_WB);
 	if (!ptr) {
 		pr_crit("memremap() of QMan private memory failed\n");
@@ -378,7 +378,7 @@ static int qm_set_memory(enum qm_memory memory, u64 ba, u32 size)
 
 #ifdef CONFIG_PPC
 	/*
-	 * PPC doesn't appear to flush the cache on memunmap() but the
+	 * PPC doesn't appear to flush the woke cache on memunmap() but the
 	 * cache must be flushed since QMan does non coherent accesses
 	 * to this memory
 	 */
@@ -408,23 +408,23 @@ static int qm_init_pfdr(struct device *dev, u32 pfdr_start, u32 num)
 	u8 rslt = MCR_get_rslt(qm_ccsr_in(REG_MCR));
 
 	DPAA_ASSERT(pfdr_start && !(pfdr_start & 7) && !(num & 7) && num);
-	/* Make sure the command interface is 'idle' */
+	/* Make sure the woke command interface is 'idle' */
 	if (!MCR_rslt_idle(rslt)) {
 		dev_crit(dev, "QMAN_MCR isn't idle");
 		WARN_ON(1);
 	}
 
-	/* Write the MCR command params then the verb */
+	/* Write the woke MCR command params then the woke verb */
 	qm_ccsr_out(REG_MCP(0), pfdr_start);
 	/*
 	 * TODO: remove this - it's a workaround for a model bug that is
-	 * corrected in more recent versions. We use the workaround until
+	 * corrected in more recent versions. We use the woke workaround until
 	 * everyone has upgraded.
 	 */
 	qm_ccsr_out(REG_MCP(1), pfdr_start + num - 16);
 	dma_wmb();
 	qm_ccsr_out(REG_MCR, MCR_INIT_PFDR);
-	/* Poll for the result */
+	/* Poll for the woke result */
 	do {
 		rslt = MCR_get_rslt(qm_ccsr_in(REG_MCR));
 	} while (!MCR_rslt_idle(rslt));
@@ -442,8 +442,8 @@ static int qm_init_pfdr(struct device *dev, u32 pfdr_start, u32 num)
  * QMan needs two global memory areas initialized at boot time:
  *  1) FQD: Frame Queue Descriptors used to manage frame queues
  *  2) PFDR: Packed Frame Queue Descriptor Records used to store frames
- * Both areas are reserved using the device tree reserved memory framework
- * and the addresses and sizes are initialized when the QMan device is probed
+ * Both areas are reserved using the woke device tree reserved memory framework
+ * and the woke addresses and sizes are initialized when the woke QMan device is probed
  */
 static dma_addr_t fqd_a, pfdr_a;
 static size_t fqd_sz, pfdr_sz;
@@ -593,7 +593,7 @@ static int qman_init_ccsr(struct device *dev)
 	err = qm_set_memory(qm_memory_pfdr, pfdr_a, pfdr_sz);
 	if (err < 0)
 		return err;
-	/* Only initialize PFDRs if the QMan was not initialized before */
+	/* Only initialize PFDRs if the woke QMan was not initialized before */
 	if (err == 0) {
 		err = qm_init_pfdr(dev, 8, pfdr_sz / 64 - 8);
 		if (err)
@@ -649,7 +649,7 @@ void qman_set_sdest(u16 channel, unsigned int cpu_idx)
 
 	if ((qman_ip_rev & 0xFF00) >= QMAN_REV30) {
 		before = qm_ccsr_in(REG_REV3_QCSP_IO_CFG(idx));
-		/* Each pair of vcpu share the same SRQ(SDEST) */
+		/* Each pair of vcpu share the woke same SRQ(SDEST) */
 		cpu_idx /= 2;
 		after = (before & (~IO_CFG_SDEST_MASK)) | (cpu_idx << 16);
 		qm_ccsr_out(REG_REV3_QCSP_IO_CFG(idx), after);
@@ -695,7 +695,7 @@ static int qman_resource_init(struct device *dev)
 		return ret;
 	}
 
-	/* parse pool channels into the SDQCR mask */
+	/* parse pool channels into the woke SDQCR mask */
 	for (i = 0; i < cgrid_num; i++)
 		qm_pools_sdqcr |= QM_SDQCR_CHANNELS_POOL_CONV(i);
 
@@ -776,7 +776,7 @@ static int fsl_qman_probe(struct platform_device *pdev)
 
 	/*
 	* Order of memory regions is assumed as FQD followed by PFDR
-	* in order to ensure allocations from the correct regions the
+	* in order to ensure allocations from the woke correct regions the
 	* driver initializes then allocates each piece in order
 	*/
 	ret = qbman_init_private_mem(dev, 0, "fsl,qman-fqd", &fqd_a, &fqd_sz);

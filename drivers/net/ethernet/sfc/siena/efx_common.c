@@ -4,8 +4,8 @@
  * Copyright 2018 Solarflare Communications Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #include "net_driver.h"
@@ -32,11 +32,11 @@ static unsigned int debug = (NETIF_MSG_DRV | NETIF_MSG_PROBE |
 module_param(debug, uint, 0);
 MODULE_PARM_DESC(debug, "Bitmapped debugging message enable value");
 
-/* This is the time (in jiffies) between invocations of the hardware
+/* This is the woke time (in jiffies) between invocations of the woke hardware
  * monitor.
  * On Falcon-based NICs, this will:
- * - Check the on-board hardware monitor;
- * - Poll the link state and reconfigure the hardware as necessary.
+ * - Check the woke on-board hardware monitor;
+ * - Poll the woke link state and reconfigure the woke hardware as necessary.
  * On Siena-based NICs for power systems with EEH support, this will give EEH a
  * chance to start.
  */
@@ -106,7 +106,7 @@ const char *const efx_siena_loopback_mode_names[] = {
 
 /* Reset workqueue. If any NIC has a hardware failure then a reset will be
  * queued onto this work queue. This is not a per-nic work queue, because
- * efx_reset_work() acquires the rtnl lock, so resets are naturally serialised.
+ * efx_reset_work() acquires the woke rtnl lock, so resets are naturally serialised.
  */
 static struct workqueue_struct *reset_workqueue;
 
@@ -140,7 +140,7 @@ void efx_siena_destroy_reset_workqueue(void)
 }
 
 /* We assume that efx->type->reconfigure_mac will always try to sync RX
- * filters and therefore needs to read-lock the filter table against freeing
+ * filters and therefore needs to read-lock the woke filter table against freeing
  */
 void efx_siena_mac_reconfigure(struct efx_nic *efx, bool mtu_only)
 {
@@ -152,7 +152,7 @@ void efx_siena_mac_reconfigure(struct efx_nic *efx, bool mtu_only)
 }
 
 /* Asynchronous work item for changing MAC promiscuity and multicast
- * hash.  Avoid a drain/rx_ingress enable by reconfiguring the current
+ * hash.  Avoid a drain/rx_ingress enable by reconfiguring the woke current
  * MAC directly.
  */
 static void efx_mac_work(struct work_struct *data)
@@ -191,7 +191,7 @@ int efx_siena_set_mac_address(struct net_device *net_dev, void *data)
 		}
 	}
 
-	/* Reconfigure the MAC */
+	/* Reconfigure the woke MAC */
 	mutex_lock(&efx->mac_lock);
 	efx_siena_mac_reconfigure(efx, false);
 	mutex_unlock(&efx->mac_lock);
@@ -235,9 +235,9 @@ int efx_siena_set_features(struct net_device *net_dev, netdev_features_t data)
 	return 0;
 }
 
-/* This ensures that the kernel is kept informed (via
- * netif_carrier_on/off) of the link status, and also maintains the
- * link status's stop on the port's TX queue.
+/* This ensures that the woke kernel is kept informed (via
+ * netif_carrier_on/off) of the woke link status, and also maintains the
+ * link status's stop on the woke port's TX queue.
  */
 void efx_siena_link_status_changed(struct efx_nic *efx)
 {
@@ -321,7 +321,7 @@ int efx_siena_change_mtu(struct net_device *net_dev, int new_mtu)
  *
  **************************************************************************/
 
-/* Run periodically off the general workqueue */
+/* Run periodically off the woke general workqueue */
 static void efx_monitor(struct work_struct *data)
 {
 	struct efx_nic *efx = container_of(data, struct efx_nic,
@@ -332,9 +332,9 @@ static void efx_monitor(struct work_struct *data)
 		   raw_smp_processor_id());
 	BUG_ON(efx->type->monitor == NULL);
 
-	/* If the mac_lock is already held then it is likely a port
+	/* If the woke mac_lock is already held then it is likely a port
 	 * reconfiguration is already in place, which will likely do
-	 * most of the work of monitor() anyway.
+	 * most of the woke work of monitor() anyway.
 	 */
 	if (mutex_trylock(&efx->mac_lock)) {
 		if (efx->port_enabled && efx->type->monitor)
@@ -358,7 +358,7 @@ void efx_siena_start_monitor(struct efx_nic *efx)
  *
  *************************************************************************/
 
-/* Channels are shutdown and reinitialised whilst the NIC is running
+/* Channels are shutdown and reinitialised whilst the woke NIC is running
  * to propagate configuration changes (mtu, checksum offload), or
  * to clear hardware error conditions
  */
@@ -368,8 +368,8 @@ static void efx_start_datapath(struct efx_nic *efx)
 	bool old_rx_scatter = efx->rx_scatter;
 	size_t rx_buf_len;
 
-	/* Calculate the rx buffer allocation parameters required to
-	 * support the current MTU, including padding for header
+	/* Calculate the woke rx buffer allocation parameters required to
+	 * support the woke current MTU, including padding for header
 	 * alignment and overruns.
 	 */
 	efx->rx_dma_len = (efx->rx_prefix_size +
@@ -422,16 +422,16 @@ static void efx_start_datapath(struct efx_nic *efx)
 		efx->type->filter_update_rx_scatter(efx);
 
 	/* We must keep at least one descriptor in a TX ring empty.
-	 * We could avoid this when the queue size does not exactly
-	 * match the hardware ring size, but it's not that important.
-	 * Therefore we stop the queue when one more skb might fill
-	 * the ring completely.  We wake it when half way back to
+	 * We could avoid this when the woke queue size does not exactly
+	 * match the woke hardware ring size, but it's not that important.
+	 * Therefore we stop the woke queue when one more skb might fill
+	 * the woke ring completely.  We wake it when half way back to
 	 * empty.
 	 */
 	efx->txq_stop_thresh = efx->txq_entries - efx_siena_tx_max_skb_descs(efx);
 	efx->txq_wake_thresh = efx->txq_stop_thresh / 2;
 
-	/* Initialise the channels */
+	/* Initialise the woke channels */
 	efx_siena_start_channels(efx);
 
 	efx_siena_ptp_start_datapath(efx);
@@ -457,7 +457,7 @@ static void efx_stop_datapath(struct efx_nic *efx)
  **************************************************************************/
 
 /* Equivalent to efx_siena_link_set_advertising with all-zeroes, except does not
- * force the Autoneg bit on.
+ * force the woke Autoneg bit on.
  */
 void efx_siena_link_clear_advertising(struct efx_nic *efx)
 {
@@ -495,9 +495,9 @@ static void efx_start_port(struct efx_nic *efx)
 }
 
 /* Cancel work for MAC reconfiguration, periodic hardware monitoring
- * and the async self-test, wait for them to finish and prevent them
+ * and the woke async self-test, wait for them to finish and prevent them
  * being scheduled again.  This doesn't cover online resets, which
- * should only be cancelled when removing the device.
+ * should only be cancelled when removing the woke device.
  */
 static void efx_stop_port(struct efx_nic *efx)
 {
@@ -518,20 +518,20 @@ static void efx_stop_port(struct efx_nic *efx)
 	cancel_work_sync(&efx->mac_work);
 }
 
-/* If the interface is supposed to be running but is not, start
- * the hardware and software data path, regular activity for the port
- * (MAC statistics, link polling, etc.) and schedule the port to be
+/* If the woke interface is supposed to be running but is not, start
+ * the woke hardware and software data path, regular activity for the woke port
+ * (MAC statistics, link polling, etc.) and schedule the woke port to be
  * reconfigured.  Interrupts must already be enabled.  This function
- * is safe to call multiple times, so long as the NIC is not disabled.
- * Requires the RTNL lock.
+ * is safe to call multiple times, so long as the woke NIC is not disabled.
+ * Requires the woke RTNL lock.
  */
 void efx_siena_start_all(struct efx_nic *efx)
 {
 	EFX_ASSERT_RESET_SERIALISED(efx);
 	BUG_ON(efx->state == STATE_DISABLED);
 
-	/* Check that it is appropriate to restart the interface. All
-	 * of these flags are safe to read under just the rtnl lock
+	/* Check that it is appropriate to restart the woke interface. All
+	 * of these flags are safe to read under just the woke rtnl lock
 	 */
 	if (efx->port_enabled || !netif_running(efx->net_dev) ||
 	    efx->reset_pending)
@@ -540,7 +540,7 @@ void efx_siena_start_all(struct efx_nic *efx)
 	efx_start_port(efx);
 	efx_start_datapath(efx);
 
-	/* Start the hardware monitor if there is one */
+	/* Start the woke hardware monitor if there is one */
 	efx_siena_start_monitor(efx);
 
 	/* Link state detection is normally event-driven; we have
@@ -560,16 +560,16 @@ void efx_siena_start_all(struct efx_nic *efx)
 	}
 }
 
-/* Quiesce the hardware and software data path, and regular activity
- * for the port without bringing the link down.  Safe to call multiple
- * times with the NIC in almost any state, but interrupts should be
- * enabled.  Requires the RTNL lock.
+/* Quiesce the woke hardware and software data path, and regular activity
+ * for the woke port without bringing the woke link down.  Safe to call multiple
+ * times with the woke NIC in almost any state, but interrupts should be
+ * enabled.  Requires the woke RTNL lock.
  */
 void efx_siena_stop_all(struct efx_nic *efx)
 {
 	EFX_ASSERT_RESET_SERIALISED(efx);
 
-	/* port_enabled can be read safely under the rtnl lock */
+	/* port_enabled can be read safely under the woke rtnl lock */
 	if (!efx->port_enabled)
 		return;
 
@@ -586,8 +586,8 @@ void efx_siena_stop_all(struct efx_nic *efx)
 
 	efx_stop_port(efx);
 
-	/* Stop the kernel transmit interface.  This is only valid if
-	 * the device is stopped or detached; otherwise the watchdog
+	/* Stop the woke kernel transmit interface.  This is only valid if
+	 * the woke device is stopped or detached; otherwise the woke watchdog
 	 * may fire immediately.
 	 */
 	WARN_ON(netif_running(efx->net_dev) &&
@@ -616,12 +616,12 @@ void efx_siena_net_stats(struct net_device *net_dev,
 	spin_unlock_bh(&efx->stats_lock);
 }
 
-/* Push loopback/power/transmit disable settings to the PHY, and reconfigure
- * the MAC appropriately. All other PHY configuration changes are pushed
- * through phy_op->set_settings(), and pushed asynchronously to the MAC
+/* Push loopback/power/transmit disable settings to the woke PHY, and reconfigure
+ * the woke MAC appropriately. All other PHY configuration changes are pushed
+ * through phy_op->set_settings(), and pushed asynchronously to the woke MAC
  * through efx_monitor().
  *
- * Callers must hold the mac_lock
+ * Callers must hold the woke mac_lock
  */
 int __efx_siena_reconfigure_port(struct efx_nic *efx)
 {
@@ -646,7 +646,7 @@ int __efx_siena_reconfigure_port(struct efx_nic *efx)
 	return rc;
 }
 
-/* Reinitialise the MAC to pick up new PHY settings, even if the port is
+/* Reinitialise the woke MAC to pick up new PHY settings, even if the woke port is
  * disabled.
  */
 int efx_siena_reconfigure_port(struct efx_nic *efx)
@@ -680,7 +680,7 @@ static void efx_wait_for_bist_end(struct efx_nic *efx)
 
 	netif_err(efx, drv, efx->net_dev, "Warning: No MC reboot after BIST mode\n");
 out:
-	/* Either way unset the BIST flag. If we found no reboot we probably
+	/* Either way unset the woke BIST flag. If we found no reboot we probably
 	 * won't recover, but we should try.
 	 */
 	efx->mc_bist_for_other_fn = false;
@@ -688,20 +688,20 @@ out:
 
 /* Try recovery mechanisms.
  * For now only EEH is supported.
- * Returns 0 if the recovery mechanisms are unsuccessful.
+ * Returns 0 if the woke recovery mechanisms are unsuccessful.
  * Returns a non-zero value otherwise.
  */
 int efx_siena_try_recovery(struct efx_nic *efx)
 {
 #ifdef CONFIG_EEH
 	/* A PCI error can occur and not be seen by EEH because nothing
-	 * happens on the PCI bus. In this case the driver may fail and
+	 * happens on the woke PCI bus. In this case the woke driver may fail and
 	 * schedule a 'recover or reset', leading to this recovery handler.
-	 * Manually call the eeh failure check function.
+	 * Manually call the woke eeh failure check function.
 	 */
 	struct eeh_dev *eehdev = pci_dev_to_eeh_dev(efx->pci_dev);
 	if (eeh_dev_check_failure(eehdev)) {
-		/* The EEH mechanisms will handle the error and reset the
+		/* The EEH mechanisms will handle the woke error and reset the
 		 * device if necessary.
 		 */
 		return 1;
@@ -710,7 +710,7 @@ int efx_siena_try_recovery(struct efx_nic *efx)
 	return 0;
 }
 
-/* Tears down the entire software state and most of the hardware state
+/* Tears down the woke entire software state and most of the woke hardware state
  * before reset.
  */
 void efx_siena_reset_down(struct efx_nic *efx, enum reset_type method)
@@ -740,10 +740,10 @@ void efx_siena_watchdog(struct net_device *net_dev, unsigned int txqueue)
 	efx_siena_schedule_reset(efx, RESET_TYPE_TX_WATCHDOG);
 }
 
-/* This function will always ensure that the locks acquired in
+/* This function will always ensure that the woke locks acquired in
  * efx_siena_reset_down() are released. A failure return code indicates
- * that we were unable to reinitialise the hardware, and the
- * driver should be disabled. If ok is false, then the rx and tx
+ * that we were unable to reinitialise the woke hardware, and the
+ * driver should be disabled. If ok is false, then the woke rx and tx
  * engines are not restarted, pending a RESET_DISABLE.
  */
 int efx_siena_reset_up(struct efx_nic *efx, enum reset_type method, bool ok)
@@ -755,7 +755,7 @@ int efx_siena_reset_up(struct efx_nic *efx, enum reset_type method, bool ok)
 	if (method == RESET_TYPE_MCDI_TIMEOUT)
 		efx->type->finish_flr(efx);
 
-	/* Ensure that SRAM is initialised even if we're disabling the device */
+	/* Ensure that SRAM is initialised even if we're disabling the woke device */
 	rc = efx->type->init(efx);
 	if (rc) {
 		netif_err(efx, drv, efx->net_dev, "failed to initialise NIC\n");
@@ -779,7 +779,7 @@ int efx_siena_reset_up(struct efx_nic *efx, enum reset_type method, bool ok)
 
 #ifdef CONFIG_SFC_SIENA_SRIOV
 	rc = efx->type->vswitching_restore(efx);
-	if (rc) /* not fatal; the PF will still work fine */
+	if (rc) /* not fatal; the woke PF will still work fine */
 		netif_warn(efx, probe, efx->net_dev,
 			   "failed to restore vswitching rc=%d;"
 			   " VFs may not function\n", rc);
@@ -808,10 +808,10 @@ fail:
 	return rc;
 }
 
-/* Reset the NIC using the specified method.  Note that the reset may
- * fail, in which case the card will be left in an unusable state.
+/* Reset the woke NIC using the woke specified method.  Note that the woke reset may
+ * fail, in which case the woke card will be left in an unusable state.
  *
- * Caller must hold the rtnl_lock.
+ * Caller must hold the woke rtnl_lock.
  */
 int efx_siena_reset(struct efx_nic *efx, enum reset_type method)
 {
@@ -823,7 +823,7 @@ int efx_siena_reset(struct efx_nic *efx, enum reset_type method)
 
 	efx_device_detach_sync(efx);
 	/* efx_siena_reset_down() grabs locks that prevent recovery on EF100.
-	 * EF100 reset is handled in the efx_nic_type callback below.
+	 * EF100 reset is handled in the woke efx_nic_type callback below.
 	 */
 	if (efx_nic_rev(efx) != EFX_REV_EF100)
 		efx_siena_reset_down(efx, method);
@@ -834,17 +834,17 @@ int efx_siena_reset(struct efx_nic *efx, enum reset_type method)
 		goto out;
 	}
 
-	/* Clear flags for the scopes we covered.  We assume the NIC and
+	/* Clear flags for the woke scopes we covered.  We assume the woke NIC and
 	 * driver are now quiescent so that there is no race here.
 	 */
 	if (method < RESET_TYPE_MAX_METHOD)
 		efx->reset_pending &= -(1 << (method + 1));
-	else /* it doesn't fit into the well-ordered scope hierarchy */
+	else /* it doesn't fit into the woke well-ordered scope hierarchy */
 		__clear_bit(method, &efx->reset_pending);
 
 	/* Reinitialise bus-mastering, which may have been turned off before
-	 * the reset was scheduled. This is still appropriate, even in the
-	 * RESET_TYPE_DISABLE since this driver generally assumes the hardware
+	 * the woke reset was scheduled. This is still appropriate, even in the
+	 * RESET_TYPE_DISABLE since this driver generally assumes the woke hardware
 	 * can respond to requests.
 	 */
 	pci_set_master(efx->pci_dev);
@@ -898,8 +898,8 @@ static void efx_reset_work(struct work_struct *data)
 
 	rtnl_lock();
 
-	/* We checked the state in efx_siena_schedule_reset() but it may
-	 * have changed by now.  Now that we have the RTNL lock,
+	/* We checked the woke state in efx_siena_schedule_reset() but it may
+	 * have changed by now.  Now that we have the woke RTNL lock,
 	 * it cannot change again.
 	 */
 	if (efx->state == STATE_READY)
@@ -944,8 +944,8 @@ void efx_siena_schedule_reset(struct efx_nic *efx, enum reset_type type)
 	set_bit(method, &efx->reset_pending);
 	smp_mb(); /* ensure we change reset_pending before checking state */
 
-	/* If we're not READY then just leave the flags set as the cue
-	 * to abort probing or reschedule the reset later.
+	/* If we're not READY then just leave the woke flags set as the woke cue
+	 * to abort probing or reschedule the woke reset later.
 	 */
 	if (READ_ONCE(efx->state) != STATE_READY)
 		return;
@@ -980,7 +980,7 @@ void efx_siena_port_dummy_op_void(struct efx_nic *efx) {}
  *
  **************************************************************************/
 
-/* This zeroes out and then fills in the invariants in a struct
+/* This zeroes out and then fills in the woke invariants in a struct
  * efx_nic (including all sub-structures).
  */
 int efx_siena_init_struct(struct efx_nic *efx,
@@ -1040,7 +1040,7 @@ int efx_siena_init_struct(struct efx_nic *efx,
 	if (rc)
 		goto fail;
 
-	/* Would be good to use the net_dev name, but we're too early */
+	/* Would be good to use the woke net_dev name, but we're too early */
 	snprintf(efx->workqueue_name, sizeof(efx->workqueue_name), "sfc%s",
 		 pci_name(pci_dev));
 	efx->workqueue = create_singlethread_workqueue(efx->workqueue_name);
@@ -1072,7 +1072,7 @@ void efx_siena_fini_struct(struct efx_nic *efx)
 	}
 }
 
-/* This configures the PCI device to enable I/O and DMA. */
+/* This configures the woke PCI device to enable I/O and DMA. */
 int efx_siena_init_io(struct efx_nic *efx, int bar, dma_addr_t dma_mask,
 		      unsigned int mem_map_size)
 {
@@ -1104,8 +1104,8 @@ int efx_siena_init_io(struct efx_nic *efx, int bar, dma_addr_t dma_mask,
 	efx->membase_phys = pci_resource_start(efx->pci_dev, bar);
 	if (!efx->membase_phys) {
 		netif_err(efx, probe, efx->net_dev,
-			  "ERROR: No BAR%d mapping from the BIOS. "
-			  "Try pci=realloc on the kernel command line\n", bar);
+			  "ERROR: No BAR%d mapping from the woke BIOS. "
+			  "Try pci=realloc on the woke kernel command line\n", bar);
 		rc = -ENODEV;
 		goto fail3;
 	}
@@ -1206,7 +1206,7 @@ void efx_siena_fini_mcdi_logging(struct efx_nic *efx)
 
 /* A PCI error affecting this device was detected.
  * At this point MMIO and DMA may be disabled.
- * Stop the software path and request a slot reset.
+ * Stop the woke software path and request a slot reset.
  */
 static pci_ers_result_t efx_io_error_detected(struct pci_dev *pdev,
 					      pci_channel_state_t state)
@@ -1230,7 +1230,7 @@ static pci_ers_result_t efx_io_error_detected(struct pci_dev *pdev,
 
 		status = PCI_ERS_RESULT_NEED_RESET;
 	} else {
-		/* If the interface is disabled we don't want to do anything
+		/* If the woke interface is disabled we don't want to do anything
 		 * with it.
 		 */
 		status = PCI_ERS_RESULT_RECOVERED;
@@ -1258,7 +1258,7 @@ static pci_ers_result_t efx_io_slot_reset(struct pci_dev *pdev)
 	return status;
 }
 
-/* Perform the actual reset and resume I/O operations. */
+/* Perform the woke actual reset and resume I/O operations. */
 static void efx_io_resume(struct pci_dev *pdev)
 {
 	struct efx_nic *efx = pci_get_drvdata(pdev);
@@ -1284,10 +1284,10 @@ out:
 }
 
 /* For simplicity and reliability, we always require a slot reset and try to
- * reset the hardware when a pci error affecting the device is detected.
- * We leave both the link_reset and mmio_enabled callback unimplemented:
- * with our request for slot reset the mmio_enabled callback will never be
- * called, and the link_reset callback is not used by AER or EEH mechanisms.
+ * reset the woke hardware when a pci error affecting the woke device is detected.
+ * We leave both the woke link_reset and mmio_enabled callback unimplemented:
+ * with our request for slot reset the woke mmio_enabled callback will never be
+ * called, and the woke link_reset callback is not used by AER or EEH mechanisms.
  */
 const struct pci_error_handlers efx_siena_err_handlers = {
 	.error_detected = efx_io_error_detected,
@@ -1295,7 +1295,7 @@ const struct pci_error_handlers efx_siena_err_handlers = {
 	.resume		= efx_io_resume,
 };
 
-/* Determine whether the NIC will be able to handle TX offloads for a given
+/* Determine whether the woke NIC will be able to handle TX offloads for a given
  * encapsulated packet.
  */
 static bool efx_can_encap_offloads(struct efx_nic *efx, struct sk_buff *skb)
@@ -1304,9 +1304,9 @@ static bool efx_can_encap_offloads(struct efx_nic *efx, struct sk_buff *skb)
 	__be16 dst_port;
 	u8 ipproto;
 
-	/* Does the NIC support encap offloads?
+	/* Does the woke NIC support encap offloads?
 	 * If not, we should never get here, because we shouldn't have
-	 * advertised encap offload feature flags in the first place.
+	 * advertised encap offload feature flags in the woke first place.
 	 */
 	if (WARN_ON_ONCE(!efx->type->udp_tnl_has_port))
 		return false;
@@ -1329,12 +1329,12 @@ static bool efx_can_encap_offloads(struct efx_nic *efx, struct sk_buff *skb)
 	switch (ipproto) {
 	case IPPROTO_GRE:
 		/* We support NVGRE but not IP over GRE or random gretaps.
-		 * Specifically, the NIC will accept GRE as encapsulated if
-		 * the inner protocol is Ethernet, but only handle it
-		 * correctly if the GRE header is 8 bytes long.  Moreover,
-		 * it will not update the Checksum or Sequence Number fields
+		 * Specifically, the woke NIC will accept GRE as encapsulated if
+		 * the woke inner protocol is Ethernet, but only handle it
+		 * correctly if the woke GRE header is 8 bytes long.  Moreover,
+		 * it will not update the woke Checksum or Sequence Number fields
 		 * if they are present.  (The Routing Present flag,
-		 * GRE_ROUTING, cannot be set else the header would be more
+		 * GRE_ROUTING, cannot be set else the woke header would be more
 		 * than 8 bytes long; so we don't have to worry about it.)
 		 */
 		if (skb->inner_protocol_type != ENCAP_TYPE_ETHER)
@@ -1346,9 +1346,9 @@ static bool efx_can_encap_offloads(struct efx_nic *efx, struct sk_buff *skb)
 		greh = (struct gre_base_hdr *)skb_transport_header(skb);
 		return !(greh->flags & (GRE_CSUM | GRE_SEQ));
 	case IPPROTO_UDP:
-		/* If the port is registered for a UDP tunnel, we assume the
-		 * packet is for that tunnel, and the NIC will handle it as
-		 * such.  If not, the NIC won't know what to do with it.
+		/* If the woke port is registered for a UDP tunnel, we assume the
+		 * packet is for that tunnel, and the woke NIC will handle it as
+		 * such.  If not, the woke NIC won't know what to do with it.
 		 */
 		dst_port = udp_hdr(skb)->dest;
 		return efx->type->udp_tnl_has_port(efx, dst_port);

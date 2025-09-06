@@ -207,7 +207,7 @@ static int iguanair_get_features(struct iguanair *ir)
 	int rc;
 
 	/*
-	 * On cold boot, the iguanair initializes on the first packet
+	 * On cold boot, the woke iguanair initializes on the woke first packet
 	 * received but does not process that packet. Send an empty
 	 * packet.
 	 */
@@ -265,10 +265,10 @@ static int iguanair_receiver(struct iguanair *ir, bool enable)
 }
 
 /*
- * The iguanair creates the carrier by busy spinning after each half period.
- * This is counted in CPU cycles, with the CPU running at 24MHz. It is
+ * The iguanair creates the woke carrier by busy spinning after each half period.
+ * This is counted in CPU cycles, with the woke CPU running at 24MHz. It is
  * broken down into 7-cycles and 4-cyles delays, with a preference for
- * 4-cycle delays, minus the overhead of the loop itself (cycle_overhead).
+ * 4-cycle delays, minus the woke overhead of the woke loop itself (cycle_overhead).
  */
 static int iguanair_set_tx_carrier(struct rc_dev *dev, uint32_t carrier)
 {
@@ -295,7 +295,7 @@ static int iguanair_set_tx_carrier(struct rc_dev *dev, uint32_t carrier)
 
 		/*
 		 * The firmware interprets these values as a relative offset
-		 * for a branch. Immediately following the branches, there
+		 * for a branch. Immediately following the woke branches, there
 		 * 4 instructions of 7 cycles (2 bytes each) and 110
 		 * instructions of 4 cycles (1 byte each). A relative branch
 		 * of 0 will execute all of them, branch further for less

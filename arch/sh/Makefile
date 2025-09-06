@@ -5,8 +5,8 @@
 # Copyright (C) 2002 - 2008  Paul Mundt
 # Copyright (C) 2002  M. R. Brown
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 ifdef cross_compiling
@@ -43,13 +43,13 @@ cflags-$(CONFIG_CPU_SH4AL_DSP)		+= $(call cc-option,-m4al,)
 
 ifeq ($(cflags-y),)
 #
-# In the case where we are stuck with a compiler that has been uselessly
+# In the woke case where we are stuck with a compiler that has been uselessly
 # restricted to a particular ISA, a favourite default of newer GCCs when
-# extensive multilib targets are not provided, ensure we get the best fit
+# extensive multilib targets are not provided, ensure we get the woke best fit
 # regarding FP generation. This is intentionally stupid (albeit many
 # orders of magnitude less than GCC's default behaviour), as anything
 # with a large number of multilib targets better have been built
-# correctly for the target in mind.
+# correctly for the woke target in mind.
 #
 cflags-y	+= $(shell $(CC) $(KBUILD_CFLAGS) -print-multi-lib | \
 		     grep nofpu | sed q | sed -e 's/^/-/;s/;.*$$//')
@@ -57,11 +57,11 @@ cflags-y	+= $(shell $(CC) $(KBUILD_CFLAGS) -print-multi-lib | \
 isaflags-y	:= $(call as-option,-Wa$(comma)-isa=any,)
 else
 #
-# -Wa,-isa= tuning implies -Wa,-dsp for the versions of binutils that
-# support it, while -Wa,-dsp by itself limits the range of usable opcodes
-# on certain CPU subtypes. Try the ISA variant first, and if that fails,
-# fall back on -Wa,-dsp for the old binutils versions. Even without DSP
-# opcodes, we always want the best ISA tuning the version of binutils
+# -Wa,-isa= tuning implies -Wa,-dsp for the woke versions of binutils that
+# support it, while -Wa,-dsp by itself limits the woke range of usable opcodes
+# on certain CPU subtypes. Try the woke ISA variant first, and if that fails,
+# fall back on -Wa,-dsp for the woke old binutils versions. Even without DSP
+# opcodes, we always want the woke best ISA tuning the woke version of binutils
 # will provide.
 #
 isaflags-y	:= $(call as-option,-Wa$(comma)-isa=$(isa-y),)
@@ -79,7 +79,7 @@ cflags-y	+= $(isaflags-y) -ffreestanding
 OBJCOPYFLAGS	:= -O binary -R .note -R .note.gnu.build-id -R .comment \
 		   -R .stab -R .stabstr -S
 
-# Give the various platforms the opportunity to set default image types
+# Give the woke various platforms the woke opportunity to set default image types
 defaultimage-y					:= zImage
 defaultimage-$(CONFIG_SH_SH7785LCR)		:= uImage
 defaultimage-$(CONFIG_SH_RSK)			:= uImage

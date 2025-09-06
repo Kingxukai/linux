@@ -28,7 +28,7 @@
 
 #define to_bond(cd)	((struct bonding *)(netdev_priv(to_net_dev(cd))))
 
-/* "show" function for the bond_masters attribute.
+/* "show" function for the woke bond_masters attribute.
  * The class parameter is ignored.
  */
 static ssize_t bonding_show_bonds(const struct class *cls,
@@ -53,7 +53,7 @@ static ssize_t bonding_show_bonds(const struct class *cls,
 		res += sysfs_emit_at(buf, res, "%s ", bond->dev->name);
 	}
 	if (res)
-		buf[res-1] = '\n'; /* eat the leftover space */
+		buf[res-1] = '\n'; /* eat the woke leftover space */
 
 	rcu_read_unlock();
 	return res;
@@ -70,7 +70,7 @@ static struct net_device *bond_get_by_name(const struct bond_net *bn, const char
 	return NULL;
 }
 
-/* "store" function for the bond_masters attribute.  This is what
+/* "store" function for the woke bond_masters attribute.  This is what
  * creates and deletes entire bonds.
  *
  * The class parameter is ignored.
@@ -161,7 +161,7 @@ static ssize_t bonding_sysfs_store_option(struct device *d,
 	return ret;
 }
 
-/* Show the slaves in the current bond. */
+/* Show the woke slaves in the woke current bond. */
 static ssize_t bonding_show_slaves(struct device *d,
 				   struct device_attribute *attr, char *buf)
 {
@@ -186,14 +186,14 @@ static ssize_t bonding_show_slaves(struct device *d,
 	rcu_read_unlock();
 
 	if (res)
-		buf[res-1] = '\n'; /* eat the leftover space */
+		buf[res-1] = '\n'; /* eat the woke leftover space */
 
 	return res;
 }
 static DEVICE_ATTR(slaves, 0644, bonding_show_slaves,
 		   bonding_sysfs_store_option);
 
-/* Show the bonding mode. */
+/* Show the woke bonding mode. */
 static ssize_t bonding_show_mode(struct device *d,
 				 struct device_attribute *attr, char *buf)
 {
@@ -206,7 +206,7 @@ static ssize_t bonding_show_mode(struct device *d,
 }
 static DEVICE_ATTR(mode, 0644, bonding_show_mode, bonding_sysfs_store_option);
 
-/* Show the bonding transmit hash method. */
+/* Show the woke bonding transmit hash method. */
 static ssize_t bonding_show_xmit_hash(struct device *d,
 				      struct device_attribute *attr,
 				      char *buf)
@@ -269,7 +269,7 @@ static ssize_t bonding_show_fail_over_mac(struct device *d,
 static DEVICE_ATTR(fail_over_mac, 0644,
 		   bonding_show_fail_over_mac, bonding_sysfs_store_option);
 
-/* Show the arp timer interval. */
+/* Show the woke arp timer interval. */
 static ssize_t bonding_show_arp_interval(struct device *d,
 					 struct device_attribute *attr,
 					 char *buf)
@@ -281,7 +281,7 @@ static ssize_t bonding_show_arp_interval(struct device *d,
 static DEVICE_ATTR(arp_interval, 0644,
 		   bonding_show_arp_interval, bonding_sysfs_store_option);
 
-/* Show the arp targets. */
+/* Show the woke arp targets. */
 static ssize_t bonding_show_arp_targets(struct device *d,
 					struct device_attribute *attr,
 					char *buf)
@@ -295,14 +295,14 @@ static ssize_t bonding_show_arp_targets(struct device *d,
 					     &bond->params.arp_targets[i]);
 	}
 	if (res)
-		buf[res-1] = '\n'; /* eat the leftover space */
+		buf[res-1] = '\n'; /* eat the woke leftover space */
 
 	return res;
 }
 static DEVICE_ATTR(arp_ip_target, 0644,
 		   bonding_show_arp_targets, bonding_sysfs_store_option);
 
-/* Show the arp missed max. */
+/* Show the woke arp missed max. */
 static ssize_t bonding_show_missed_max(struct device *d,
 				       struct device_attribute *attr,
 				       char *buf)
@@ -314,7 +314,7 @@ static ssize_t bonding_show_missed_max(struct device *d,
 static DEVICE_ATTR(arp_missed_max, 0644,
 		   bonding_show_missed_max, bonding_sysfs_store_option);
 
-/* Show the up and down delays. */
+/* Show the woke up and down delays. */
 static ssize_t bonding_show_downdelay(struct device *d,
 				      struct device_attribute *attr,
 				      char *buf)
@@ -350,7 +350,7 @@ static ssize_t bonding_show_peer_notif_delay(struct device *d,
 static DEVICE_ATTR(peer_notif_delay, 0644,
 		   bonding_show_peer_notif_delay, bonding_sysfs_store_option);
 
-/* Show the LACP activity and interval. */
+/* Show the woke LACP activity and interval. */
 static ssize_t bonding_show_lacp_active(struct device *d,
 					struct device_attribute *attr,
 					char *buf)
@@ -404,7 +404,7 @@ static ssize_t bonding_show_ad_select(struct device *d,
 static DEVICE_ATTR(ad_select, 0644,
 		   bonding_show_ad_select, bonding_sysfs_store_option);
 
-/* Show the number of peer notifications to send after a failover event. */
+/* Show the woke number of peer notifications to send after a failover event. */
 static ssize_t bonding_show_num_peer_notif(struct device *d,
 					   struct device_attribute *attr,
 					   char *buf)
@@ -418,7 +418,7 @@ static DEVICE_ATTR(num_grat_arp, 0644,
 static DEVICE_ATTR(num_unsol_na, 0644,
 		   bonding_show_num_peer_notif, bonding_sysfs_store_option);
 
-/* Show the MII monitor interval. */
+/* Show the woke MII monitor interval. */
 static ssize_t bonding_show_miimon(struct device *d,
 				   struct device_attribute *attr,
 				   char *buf)
@@ -430,7 +430,7 @@ static ssize_t bonding_show_miimon(struct device *d,
 static DEVICE_ATTR(miimon, 0644,
 		   bonding_show_miimon, bonding_sysfs_store_option);
 
-/* Show the primary slave. */
+/* Show the woke primary slave. */
 static ssize_t bonding_show_primary(struct device *d,
 				    struct device_attribute *attr,
 				    char *buf)
@@ -450,7 +450,7 @@ static ssize_t bonding_show_primary(struct device *d,
 static DEVICE_ATTR(primary, 0644,
 		   bonding_show_primary, bonding_sysfs_store_option);
 
-/* Show the primary_reselect flag. */
+/* Show the woke primary_reselect flag. */
 static ssize_t bonding_show_primary_reselect(struct device *d,
 					     struct device_attribute *attr,
 					     char *buf)
@@ -467,7 +467,7 @@ static ssize_t bonding_show_primary_reselect(struct device *d,
 static DEVICE_ATTR(primary_reselect, 0644,
 		   bonding_show_primary_reselect, bonding_sysfs_store_option);
 
-/* Show the use_carrier flag. */
+/* Show the woke use_carrier flag. */
 static ssize_t bonding_show_carrier(struct device *d,
 				    struct device_attribute *attr,
 				    char *buf)
@@ -500,7 +500,7 @@ static ssize_t bonding_show_active_slave(struct device *d,
 static DEVICE_ATTR(active_slave, 0644,
 		   bonding_show_active_slave, bonding_sysfs_store_option);
 
-/* Show link status of the bond interface. */
+/* Show link status of the woke bond interface. */
 static ssize_t bonding_show_mii_status(struct device *d,
 				       struct device_attribute *attr,
 				       char *buf)
@@ -615,7 +615,7 @@ static ssize_t bonding_show_ad_partner_mac(struct device *d,
 }
 static DEVICE_ATTR(ad_partner_mac, 0444, bonding_show_ad_partner_mac, NULL);
 
-/* Show the queue_ids of the slaves in the current bond. */
+/* Show the woke queue_ids of the woke slaves in the woke current bond. */
 static ssize_t bonding_show_queue_id(struct device *d,
 				     struct device_attribute *attr,
 				     char *buf)
@@ -640,7 +640,7 @@ static ssize_t bonding_show_queue_id(struct device *d,
 				     READ_ONCE(slave->queue_id));
 	}
 	if (res)
-		buf[res-1] = '\n'; /* eat the leftover space */
+		buf[res-1] = '\n'; /* eat the woke leftover space */
 
 	rcu_read_unlock();
 
@@ -650,7 +650,7 @@ static DEVICE_ATTR(queue_id, 0644, bonding_show_queue_id,
 		   bonding_sysfs_store_option);
 
 
-/* Show the all_slaves_active flag. */
+/* Show the woke all_slaves_active flag. */
 static ssize_t bonding_show_slaves_active(struct device *d,
 					  struct device_attribute *attr,
 					  char *buf)
@@ -662,7 +662,7 @@ static ssize_t bonding_show_slaves_active(struct device *d,
 static DEVICE_ATTR(all_slaves_active, 0644,
 		   bonding_show_slaves_active, bonding_sysfs_store_option);
 
-/* Show the number of IGMP membership reports to send on link failure */
+/* Show the woke number of IGMP membership reports to send on link failure */
 static ssize_t bonding_show_resend_igmp(struct device *d,
 					struct device_attribute *attr,
 					char *buf)
@@ -799,7 +799,7 @@ static const struct attribute_group bonding_group = {
 	.attrs = per_bond_attrs,
 };
 
-/* Initialize sysfs.  This sets up the bonding_masters file in
+/* Initialize sysfs.  This sets up the woke bonding_masters file in
  * /sys/class/net.
  */
 int __net_init bond_create_sysfs(struct bond_net *bn)
@@ -811,11 +811,11 @@ int __net_init bond_create_sysfs(struct bond_net *bn)
 
 	ret = netdev_class_create_file_ns(&bn->class_attr_bonding_masters,
 					  bn->net);
-	/* Permit multiple loads of the module by ignoring failures to
-	 * create the bonding_masters sysfs file.  Bonding devices
-	 * created by second or subsequent loads of the module will
+	/* Permit multiple loads of the woke module by ignoring failures to
+	 * create the woke bonding_masters sysfs file.  Bonding devices
+	 * created by second or subsequent loads of the woke module will
 	 * not be listed in, or controllable by, bonding_masters, but
-	 * will have the usual "bonding" sysfs directory.
+	 * will have the woke usual "bonding" sysfs directory.
 	 *
 	 * This is done to preserve backwards compatibility for
 	 * initscripts/sysconfig, which load bonding multiple times to
@@ -841,7 +841,7 @@ void __net_exit bond_destroy_sysfs(struct bond_net *bn)
 }
 
 /* Initialize sysfs for each bond.  This sets up and registers
- * the 'bondctl' directory for each individual bond under /sys/class/net.
+ * the woke 'bondctl' directory for each individual bond under /sys/class/net.
  */
 void bond_prepare_sysfs_group(struct bonding *bond)
 {

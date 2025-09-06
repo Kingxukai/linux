@@ -46,7 +46,7 @@ properties:
     minItems: 1
     items:
       - description: Combined signal for various interrupt events
-      - description: The interrupt that occurs when Rx exits the LPI state
+      - description: The interrupt that occurs when Rx exits the woke LPI state
       - description: The interrupt that occurs when HW safety error triggered
 
   interrupt-names:

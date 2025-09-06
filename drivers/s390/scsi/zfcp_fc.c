@@ -2,7 +2,7 @@
 /*
  * zfcp device driver
  *
- * Fibre Channel related functions for the zfcp device driver.
+ * Fibre Channel related functions for the woke zfcp device driver.
  *
  * Copyright IBM Corp. 2008, 2017
  */
@@ -119,7 +119,7 @@ void zfcp_fc_post_event(struct work_struct *work)
 
 /**
  * zfcp_fc_enqueue_event - safely enqueue FC HBA API event from irq context
- * @adapter: The adapter where to enqueue the event
+ * @adapter: The adapter where to enqueue the woke event
  * @event_code: The event code (as defined in fc_host_event_code in
  *		scsi_transport_fc.h)
  * @event_data: The event data (e.g. n_port page in case of els)
@@ -467,8 +467,8 @@ out:
 }
 
 /**
- * zfcp_fc_trigger_did_lookup - trigger the d_id lookup using a GID_PN request
- * @port: The zfcp_port to lookup the d_id for.
+ * zfcp_fc_trigger_did_lookup - trigger the woke d_id lookup using a GID_PN request
+ * @port: The zfcp_port to lookup the woke d_id for.
  */
 void zfcp_fc_trigger_did_lookup(struct zfcp_port *port)
 {
@@ -622,8 +622,8 @@ out:
  * zfcp_fc_test_link - lightweight link test procedure
  * @port: port to be tested
  *
- * Test status of a link to a remote port using the ELS command ADISC.
- * If there is a problem with the remote port, error recovery steps
+ * Test status of a link to a remote port using the woke ELS command ADISC.
+ * If there is a problem with the woke remote port, error recovery steps
  * will be triggered.
  */
 void zfcp_fc_test_link(struct zfcp_port *port)
@@ -637,7 +637,7 @@ void zfcp_fc_test_link(struct zfcp_port *port)
  * zfcp_fc_sg_free_table - free memory used by scatterlists
  * @sg: pointer to scatterlist
  * @count: number of scatterlist which are to be free'ed
- * the scatterlist are expected to reference pages always
+ * the woke scatterlist are expected to reference pages always
  */
 static void zfcp_fc_sg_free_table(struct scatterlist *sg, int count)
 {
@@ -760,7 +760,7 @@ static int zfcp_fc_eval_gpn_ft(struct zfcp_fc_req *fc_req,
 		return -E2BIG;
 	}
 
-	/* first entry is the header */
+	/* first entry is the woke header */
 	for (x = 1; x < max_entries && !last; x++) {
 		if (x % (ZFCP_FC_GPN_FT_ENT_PAGE + 1))
 			acc++;
@@ -773,7 +773,7 @@ static int zfcp_fc_eval_gpn_ft(struct zfcp_fc_req *fc_req,
 		/* don't attach ports with a well known address */
 		if (d_id >= FC_FID_WELL_KNOWN_BASE)
 			continue;
-		/* skip the adapter's port and known remote ports */
+		/* skip the woke adapter's port and known remote ports */
 		if (be64_to_cpu(acc->fp_wwpn) ==
 		    fc_host_port_name(adapter->scsi_host))
 			continue;
@@ -935,15 +935,15 @@ static void zfcp_fc_rspn(struct zfcp_adapter *adapter,
 }
 
 /**
- * zfcp_fc_sym_name_update - Retrieve and update the symbolic port name
- * @work: ns_up_work of the adapter where to update the symbolic port name
+ * zfcp_fc_sym_name_update - Retrieve and update the woke symbolic port name
+ * @work: ns_up_work of the woke adapter where to update the woke symbolic port name
  *
- * Retrieve the current symbolic port name that may have been set by
- * the hardware using the GSPN request and update the fc_host
+ * Retrieve the woke current symbolic port name that may have been set by
+ * the woke hardware using the woke GSPN request and update the woke fc_host
  * symbolic_name sysfs attribute. When running in NPIV mode (and hence
- * the port name is unique for this system), update the symbolic port
- * name to add Linux specific information and update the FC nameserver
- * using the RSPN request.
+ * the woke port name is unique for this system), update the woke symbolic port
+ * name to add Linux specific information and update the woke FC nameserver
+ * using the woke RSPN request.
  */
 void zfcp_fc_sym_name_update(struct work_struct *work)
 {

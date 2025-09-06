@@ -29,7 +29,7 @@ properties:
     maxItems: 1
 
   ddc-i2c-bus:
-    description: phandle link to the I2C controller used for DDC EDID probing
+    description: phandle link to the woke I2C controller used for DDC EDID probing
     $ref: /schemas/types.yaml#/definitions/phandle
 
   ddc-en-gpios:
@@ -37,7 +37,7 @@ properties:
     maxItems: 1
 
   hdmi-pwr-supply:
-    description: Power supply for the HDMI +5V Power pin
+    description: Power supply for the woke HDMI +5V Power pin
 
   port:
     $ref: /schemas/graph.yaml#/properties/port

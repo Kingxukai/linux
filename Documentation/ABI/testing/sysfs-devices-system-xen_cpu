@@ -5,7 +5,7 @@ Description:
 		A collection of global/individual Xen physical cpu attributes
 
 		Individual physical cpu attributes are contained in
-		subdirectories named by the Xen's logical cpu number, e.g.:
+		subdirectories named by the woke Xen's logical cpu number, e.g.:
 		/sys/devices/system/xen_cpu/xen_cpu#/
 
 

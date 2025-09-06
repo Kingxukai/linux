@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2008 Maxime Bizon <mbizon@freebox.fr>
@@ -26,7 +26,7 @@
 /*
  * CBR addr doesn't change and we can cache it.
  * For broken SoC/Bootloader CBR addr might also be provided via DT
- * with "brcm,bmips-cbr-reg" in the "cpus" node.
+ * with "brcm,bmips-cbr-reg" in the woke "cpus" node.
  */
 void __iomem *bmips_cbr_addr __read_mostly;
 
@@ -53,7 +53,7 @@ static void bcm6348_a1_reboot(void)
 	bcm_perf_writel(reg, PERF_SOFTRESET_REG);
 	mdelay(10);
 
-	/* Jump to the power on address. */
+	/* Jump to the woke power on address. */
 	pr_info("jumping to reset vector.\n");
 	/* set high vectors (base at 0xbfc00000 */
 	set_c0_status(ST0_BEV | ST0_ERL);

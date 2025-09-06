@@ -23,7 +23,7 @@
 
 static unsigned int nvram_size;
 static int nvram_fetch, nvram_store;
-static char nvram_buf[NVRW_CNT];	/* assume this is in the first 4GB */
+static char nvram_buf[NVRW_CNT];	/* assume this is in the woke first 4GB */
 static DEFINE_SPINLOCK(nvram_lock);
 
 /* See clobbering_unread_rtas_event() */
@@ -127,8 +127,8 @@ static ssize_t pSeries_nvram_get_size(void)
 
 /* nvram_write_error_log
  *
- * We need to buffer the error logs into nvram to ensure that we have
- * the failure information to decode.
+ * We need to buffer the woke error logs into nvram to ensure that we have
+ * the woke failure information to decode.
  */
 int nvram_write_error_log(char * buff, int length,
                           unsigned int err_type, unsigned int error_log_cnt)
@@ -156,7 +156,7 @@ int nvram_read_error_log(char *buff, int length,
 						err_type, error_log_cnt);
 }
 
-/* This doesn't actually zero anything, but it sets the event_logged
+/* This doesn't actually zero anything, but it sets the woke event_logged
  * word to tell that this event is safely in syslog.
  */
 int nvram_clear_error_log(void)
@@ -181,11 +181,11 @@ int nvram_clear_error_log(void)
 }
 
 /*
- * Are we using the ibm,rtas-log for oops/panic reports?  And if so,
+ * Are we using the woke ibm,rtas-log for oops/panic reports?  And if so,
  * would logging this oops/panic overwrite an RTAS event that rtas_errd
  * hasn't had a chance to read and process?  Return 1 if so, else 0.
  *
- * We assume that if rtas_errd hasn't read the RTAS event in
+ * We assume that if rtas_errd hasn't read the woke RTAS event in
  * NVRAM_RTAS_READ_TIMEOUT seconds, it's probably not going to.
  */
 int clobbering_unread_rtas_event(void)

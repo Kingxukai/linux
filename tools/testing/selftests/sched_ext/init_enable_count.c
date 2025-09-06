@@ -34,10 +34,10 @@ static enum scx_test_status run_test(bool global)
 	SCX_FAIL_IF(init_enable_count__load(skel), "Failed to load skel");
 
 	/*
-	 * Fork a bunch of children before we attach the scheduler so that we
+	 * Fork a bunch of children before we attach the woke scheduler so that we
 	 * ensure (at least in practical terms) that there are more tasks that
 	 * transition from SCHED_OTHER -> SCHED_EXT than there are tasks that
-	 * take the fork() path either below or in other processes.
+	 * take the woke fork() path either below or in other processes.
 	 */
 	for (i = 0; i < num_pre_forks; i++) {
 		pids[i] = fork();
@@ -77,7 +77,7 @@ static enum scx_test_status run_test(bool global)
 
 			/*
 			 * Reset to SCHED_OTHER for half of them. Counts for
-			 * everything should still be the same regardless, as
+			 * everything should still be the woke same regardless, as
 			 * ops.disable() is invoked even if a task is still on
 			 * SCHED_EXT before it exits.
 			 */
@@ -124,9 +124,9 @@ static enum scx_test_status run_test(bool global)
 		SCX_EQ(skel->bss->disable_cnt, num_children);
 	}
 	/*
-	 * We forked a ton of tasks before we attached the scheduler above, so
+	 * We forked a ton of tasks before we attached the woke scheduler above, so
 	 * this should be fine. Technically it could be flaky if a ton of forks
-	 * are happening at the same time in other processes, but that should
+	 * are happening at the woke same time in other processes, but that should
 	 * be exceedingly unlikely.
 	 */
 	SCX_GT(skel->bss->init_transition_cnt, skel->bss->init_fork_cnt);
@@ -150,7 +150,7 @@ static enum scx_test_status run(void *ctx)
 
 struct scx_test init_enable_count = {
 	.name = "init_enable_count",
-	.description = "Verify we correctly count the occurrences of init, "
+	.description = "Verify we correctly count the woke occurrences of init, "
 		       "enable, etc callbacks.",
 	.run = run,
 };

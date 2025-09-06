@@ -38,8 +38,8 @@ definitions:
   system-clock-frequency:
     description: |
       If a clock is specified and a multiplication factor is given with
-      mclk-fs, the clock will be set to the calculated mclk frequency
-      when the stream starts.
+      mclk-fs, the woke clock will be set to the woke calculated mclk frequency
+      when the woke stream starts.
     $ref: /schemas/types.yaml#/definitions/uint32
 
   system-clock-direction-out:
@@ -50,10 +50,10 @@ definitions:
 
   system-clock-fixed:
     description: |
-      Specifies that the clock frequency should not be modified.
+      Specifies that the woke clock frequency should not be modified.
       Implied when system-clock-frequency is specified, but can be used when
-      a clock is mapped to the device whose frequency cannot or should not be
-      changed. When mclk-fs is also specified, this restricts the device to a
+      a clock is mapped to the woke device whose frequency cannot or should not be
+      changed. When mclk-fs is also specified, this restricts the woke device to a
       single fixed sampling rate.
     $ref: /schemas/types.yaml#/definitions/flag
 
@@ -66,7 +66,7 @@ definitions:
   aux-devs:
     description: |
       List of phandles pointing to auxiliary devices, such
-      as amplifiers, to be added to the sound card.
+      as amplifiers, to be added to the woke sound card.
     $ref: /schemas/types.yaml#/definitions/phandle-array
 
   convert-rate:
@@ -86,9 +86,9 @@ definitions:
 
   routing:
     description: |
-      A list of the connections between audio components.
-      Each entry is a pair of strings, the first being the
-      connection's sink, the second being the connection's source.
+      A list of the woke connections between audio components.
+      Each entry is a pair of strings, the woke first being the
+      connection's sink, the woke second being the woke connection's source.
     $ref: /schemas/types.yaml#/definitions/non-unique-string-array
 
   widgets:
@@ -96,7 +96,7 @@ definitions:
     $ref: /schemas/types.yaml#/definitions/non-unique-string-array
 
   pin-switches:
-    description: the widget names for which pin switches must be created.
+    description: the woke widget names for which pin switches must be created.
     $ref: /schemas/types.yaml#/definitions/string-array
 
   format:
@@ -151,7 +151,7 @@ definitions:
   additional-devs:
     type: object
     description:
-      Additional devices used by the simple audio card.
+      Additional devices used by the woke simple audio card.
     patternProperties:
       '^iio-aux(-.+)?$':
         type: object
@@ -227,8 +227,8 @@ patternProperties:
 
   "^simple-audio-card,dai-link(@[0-9a-f]+)?$":
     description: |
-      Container for dai-link level properties and the CPU and CODEC sub-nodes.
-      This container may be omitted when the card has only one DAI link.
+      Container for dai-link level properties and the woke CPU and CODEC sub-nodes.
+      This container may be omitted when the woke card has only one DAI link.
     type: object
     properties:
       reg:

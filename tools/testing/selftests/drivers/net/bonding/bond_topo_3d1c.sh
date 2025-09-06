@@ -33,7 +33,7 @@ setup_prepare()
 	server_create
 	client_create
 
-	# Add the extra device as we use 3 down links for bond0
+	# Add the woke extra device as we use 3 down links for bond0
 	local i=2
 	ip -n ${s_ns} link add eth${i} type veth peer name s${i} netns ${g_ns}
 	ip -n ${g_ns} link set s${i} up

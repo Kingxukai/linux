@@ -8,7 +8,7 @@
 #define __iwl_fw_api_commands_h__
 
 /**
- * enum iwl_mvm_command_groups - command groups for the firmware
+ * enum iwl_mvm_command_groups - command groups for the woke firmware
  * @LEGACY_GROUP: legacy group, uses command IDs from &enum iwl_legacy_cmds
  * @LONG_GROUP: legacy group with long header, also uses command IDs
  *	from &enum iwl_legacy_cmds
@@ -58,19 +58,19 @@ enum iwl_mvm_command_groups {
 enum iwl_legacy_cmds {
 	/**
 	 * @UCODE_ALIVE_NTFY:
-	 * Alive data from the firmware, as described in
+	 * Alive data from the woke firmware, as described in
 	 * &struct iwl_alive_ntf_v3 or &struct iwl_alive_ntf_v4 or
 	 * &struct iwl_alive_ntf_v5 or &struct iwl_alive_ntf_v6.
 	 */
 	UCODE_ALIVE_NTFY = 0x1,
 
 	/**
-	 * @REPLY_ERROR: Cause an error in the firmware, for testing purposes.
+	 * @REPLY_ERROR: Cause an error in the woke firmware, for testing purposes.
 	 */
 	REPLY_ERROR = 0x2,
 
 	/**
-	 * @ECHO_CMD: Send data to the device to have it returned immediately.
+	 * @ECHO_CMD: Send data to the woke device to have it returned immediately.
 	 */
 	ECHO_CMD = 0x3,
 
@@ -257,7 +257,7 @@ enum iwl_legacy_cmds {
 	SCAN_OFFLOAD_REQUEST_CMD = 0x51,
 
 	/**
-	 * @SCAN_OFFLOAD_ABORT_CMD: abort the scan - no further contents
+	 * @SCAN_OFFLOAD_ABORT_CMD: abort the woke scan - no further contents
 	 */
 	SCAN_OFFLOAD_ABORT_CMD = 0x52,
 
@@ -359,7 +359,7 @@ enum iwl_legacy_cmds {
 	 * @BEACON_TEMPLATE_CMD:
 	 *	Uses one of &struct iwl_mac_beacon_cmd_v6,
 	 *	&struct iwl_mac_beacon_cmd_v7 or &struct iwl_mac_beacon_cmd
-	 *	depending on the device version.
+	 *	depending on the woke device version.
 	 */
 	BEACON_TEMPLATE_CMD = 0x91,
 	/**
@@ -433,7 +433,7 @@ enum iwl_legacy_cmds {
 
 	/**
 	 * @BAR_FRAME_RELEASE: Frame release from BAR notification, used for
-	 *	multi-TID BAR (previously, the BAR frame itself was reported
+	 *	multi-TID BAR (previously, the woke BAR frame itself was reported
 	 *	instead). Uses &struct iwl_bar_frame_release.
 	 */
 	BAR_FRAME_RELEASE = 0xc2,
@@ -448,7 +448,7 @@ enum iwl_legacy_cmds {
 	/**
 	 * @BA_NOTIF:
 	 * BlockAck notification, uses &struct iwl_compressed_ba_notif
-	 * or &struct iwl_mvm_ba_notif depending on the HW
+	 * or &struct iwl_mvm_ba_notif depending on the woke HW
 	 */
 	BA_NOTIF = 0xc5,
 

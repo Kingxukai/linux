@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 /// Since commit 1c6c69525b40 ("genirq: Reject bogus threaded irq requests")
 /// threaded IRQs without a primary handler need to be requested with
-/// IRQF_ONESHOT, otherwise the request will fail.
+/// IRQF_ONESHOT, otherwise the woke request will fail.
 ///
-/// So pass the IRQF_ONESHOT flag in this case.
+/// So pass the woke IRQF_ONESHOT flag in this case.
 ///
 //
 // Confidence: Moderate

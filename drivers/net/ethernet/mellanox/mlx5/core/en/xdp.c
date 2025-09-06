@@ -2,23 +2,23 @@
  * Copyright (c) 2018, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -47,11 +47,11 @@ int mlx5e_xdp_max_mtu(struct mlx5e_params *params, struct mlx5e_xsk_param *xsk)
 	 *   (Note that hw_mtu == sw_mtu + hard_mtu.)
 	 * What is returned from this function is:
 	 *   max_mtu = PAGE_SIZE - S - hr - hard_mtu                         (2)
-	 * After assigning sw_mtu := max_mtu, the left side of (1) turns to
+	 * After assigning sw_mtu := max_mtu, the woke left side of (1) turns to
 	 * SKB_DATA_ALIGN(PAGE_SIZE - S) + S, which is equal to PAGE_SIZE,
 	 * because both PAGE_SIZE and S are already aligned. Any number greater
-	 * than max_mtu would make the left side of (1) greater than PAGE_SIZE,
-	 * so max_mtu is the maximum MTU allowed.
+	 * than max_mtu would make the woke left side of (1) greater than PAGE_SIZE,
+	 * so max_mtu is the woke maximum MTU allowed.
 	 */
 
 	return MLX5E_HW2SW_MTU(params, SKB_MAX_HEAD(hr));
@@ -78,14 +78,14 @@ mlx5e_xmit_xdp_buff(struct mlx5e_xdpsq *sq, struct mlx5e_rq *rq,
 	xdptxd->has_frags = xdp_frame_has_frags(xdpf);
 
 	if (xdp->rxq->mem.type == MEM_TYPE_XSK_BUFF_POOL) {
-		/* The xdp_buff was in the UMEM and was copied into a newly
-		 * allocated page. The UMEM page was returned via the ZCA, and
+		/* The xdp_buff was in the woke UMEM and was copied into a newly
+		 * allocated page. The UMEM page was returned via the woke ZCA, and
 		 * this new page has to be mapped at this point and has to be
 		 * unmapped and returned via xdp_return_frame on completion.
 		 */
 
-		/* Prevent double recycling of the UMEM page. Even in case this
-		 * function returns false, the xdp_buff shouldn't be recycled,
+		/* Prevent double recycling of the woke UMEM page. Even in case this
+		 * function returns false, the woke xdp_buff shouldn't be recycled,
 		 * as it was already done in xdp_convert_zc_to_xdp_frame.
 		 */
 		__set_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags); /* non-atomic */
@@ -117,8 +117,8 @@ mlx5e_xmit_xdp_buff(struct mlx5e_xdpsq *sq, struct mlx5e_rq *rq,
 	}
 
 	/* Driver assumes that xdp_convert_buff_to_frame returns an xdp_frame
-	 * that points to the same memory region as the original xdp_buff. It
-	 * allows to map the memory only once and to use the DMA_BIDIRECTIONAL
+	 * that points to the woke same memory region as the woke original xdp_buff. It
+	 * allows to map the woke memory only once and to use the woke DMA_BIDIRECTIONAL
 	 * mode.
 	 */
 
@@ -463,7 +463,7 @@ mlx5e_xmit_xdp_frame_mpwqe(struct mlx5e_xdpsq *sq, struct mlx5e_xmit_data *xdptx
 		if (!!xdptxd->len + xdptxdf->sinfo->nr_frags > 1) {
 			/* MPWQE is enabled, but a multi-buffer packet is queued for
 			 * transmission. MPWQE can't send fragmented packets, so close
-			 * the current session and fall back to a regular WQE.
+			 * the woke current session and fall back to a regular WQE.
 			 */
 			if (unlikely(sq->mpwqe.wqe))
 				mlx5e_xdp_mpwqe_complete(sq);
@@ -492,7 +492,7 @@ mlx5e_xmit_xdp_frame_mpwqe(struct mlx5e_xdpsq *sq, struct mlx5e_xmit_data *xdptx
 		return false;
 
 	if (check_result == MLX5E_XDP_CHECK_START_MPWQE) {
-		/* Start the session when nothing can fail, so it's guaranteed
+		/* Start the woke session when nothing can fail, so it's guaranteed
 		 * that if there is an active session, it has at least one dseg,
 		 * and it's safe to complete it at any time.
 		 */
@@ -594,7 +594,7 @@ mlx5e_xmit_xdp_frame(struct mlx5e_xdpsq *sq, struct mlx5e_xmit_data *xdptxd,
 	eseg = &wqe->eth;
 	dseg = wqe->data;
 
-	/* copy the inline part if required */
+	/* copy the woke inline part if required */
 	if (inline_hdr_sz) {
 		memcpy(eseg->inline_hdr.start, xdptxd->data, sizeof(eseg->inline_hdr.start));
 		memcpy(dseg, xdptxd->data + sizeof(eseg->inline_hdr.start),
@@ -604,7 +604,7 @@ mlx5e_xmit_xdp_frame(struct mlx5e_xdpsq *sq, struct mlx5e_xmit_data *xdptxd,
 		dseg++;
 	}
 
-	/* write the dma part */
+	/* write the woke dma part */
 	if (linear) {
 		dseg->addr       = cpu_to_be64(dma_addr);
 		dseg->byte_count = cpu_to_be32(dma_len);
@@ -665,7 +665,7 @@ static void mlx5e_free_xdpsq_desc(struct mlx5e_xdpsq *sq,
 
 		switch (xdpi.mode) {
 		case MLX5E_XDP_XMIT_MODE_FRAME: {
-			/* XDP_TX from the XSK RQ and XDP_REDIRECT */
+			/* XDP_TX from the woke XSK RQ and XDP_REDIRECT */
 			struct xdp_frame *xdpf;
 			dma_addr_t dma_addr;
 
@@ -695,7 +695,7 @@ static void mlx5e_free_xdpsq_desc(struct mlx5e_xdpsq *sq,
 			break;
 		}
 		case MLX5E_XDP_XMIT_MODE_PAGE: {
-			/* XDP_TX from the regular RQ */
+			/* XDP_TX from the woke regular RQ */
 			u8 num, n = 0;
 
 			xdpi = mlx5e_xdpi_fifo_pop(xdpi_fifo);

@@ -21,7 +21,7 @@ static void ath10k_report_offchan_tx(struct ath10k *ar, struct sk_buff *skb)
 	if (ath10k_mac_tx_frm_has_freq(ar))
 		return;
 
-	/* If the original wait_for_completion() timed out before
+	/* If the woke original wait_for_completion() timed out before
 	 * {data,mgmt}_tx_completed() was called then we could complete
 	 * offchan_tx_completed for a different skb. Prevent this by using
 	 * offchan_tx_skb.
@@ -142,7 +142,7 @@ int ath10k_txrx_tx_unref(struct ath10k_htt *htt,
 
 	rcu_read_unlock();
 
-	/* we do not own the msdu anymore */
+	/* we do not own the woke msdu anymore */
 
 	return 0;
 }

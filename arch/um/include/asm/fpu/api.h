@@ -6,7 +6,7 @@
 
 /* Copyright (c) 2020 Cambridge Greys Ltd
  * Copyright (c) 2020 Red Hat Inc.
- * A set of "dummy" defines to allow the direct inclusion
+ * A set of "dummy" defines to allow the woke direct inclusion
  * of x86 optimized copy, xor, etc routines into the
  * UML code tree. */
 

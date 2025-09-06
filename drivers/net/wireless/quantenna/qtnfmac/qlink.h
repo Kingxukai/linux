@@ -146,7 +146,7 @@ enum qlink_channel_width {
 /**
  * struct qlink_channel - qlink control channel definition
  *
- * @hw_value: hardware-specific value for the channel
+ * @hw_value: hardware-specific value for the woke channel
  * @center_freq: center frequency in MHz
  * @flags: channel flags from &enum qlink_channel_flags
  * @band: band this channel belongs to
@@ -222,14 +222,14 @@ struct qlink_sta_info_state {
  * enum qlink_sr_ctrl_flags - control flags for spatial reuse parameter set
  *
  * @QLINK_SR_PSR_DISALLOWED: indicates whether or not PSR-based spatial reuse
- * transmissions are allowed for STAs associated with the AP
+ * transmissions are allowed for STAs associated with the woke AP
  * @QLINK_SR_NON_SRG_OBSS_PD_SR_DISALLOWED: indicates whether or not
  * Non-SRG OBSS PD spatial reuse transmissions are allowed for STAs associated
- * with the AP
+ * with the woke AP
  * @NON_SRG_OFFSET_PRESENT: indicates whether or not Non-SRG OBSS PD Max offset
- * field is valid in the element
+ * field is valid in the woke element
  * @QLINK_SR_SRG_INFORMATION_PRESENT: indicates whether or not SRG OBSS PD
- * Min/Max offset fields ore valid in the element
+ * Min/Max offset fields ore valid in the woke element
  */
 enum qlink_sr_ctrl_flags {
 	QLINK_SR_PSR_DISALLOWED                = BIT(0),
@@ -243,11 +243,11 @@ enum qlink_sr_ctrl_flags {
  *
  * @sr_control: spatial reuse control field; flags contained in this field are
  * defined in @qlink_sr_ctrl_flags
- * @non_srg_obss_pd_max: added to -82 dBm to generate the value of the
+ * @non_srg_obss_pd_max: added to -82 dBm to generate the woke value of the
  * Non-SRG OBSS PD Max parameter
- * @srg_obss_pd_min_offset: added to -82 dBm to generate the value of the
+ * @srg_obss_pd_min_offset: added to -82 dBm to generate the woke value of the
  * SRG OBSS PD Min parameter
- * @srg_obss_pd_max_offset: added to -82 dBm to generate the value of the
+ * @srg_obss_pd_max_offset: added to -82 dBm to generate the woke value of the
  * SRG PBSS PD Max parameter
  */
 struct qlink_sr_params {
@@ -267,11 +267,11 @@ struct qlink_sr_params {
  * wireless network device for processing. Device is expected to send back a
  * reply message of type &QLINK_MSG_TYPE_CMDRSP, containing at least command
  * execution status (one of &enum qlink_cmd_result). Reply message
- * may also contain data payload specific to the command type.
+ * may also contain data payload specific to the woke command type.
  *
- * @QLINK_CMD_SEND_FRAME: send specified frame over the air; firmware will
+ * @QLINK_CMD_SEND_FRAME: send specified frame over the woke air; firmware will
  *	encapsulate 802.3 packet into 802.11 frame automatically.
- * @QLINK_CMD_BAND_INFO_GET: for the specified MAC and specified band, get
+ * @QLINK_CMD_BAND_INFO_GET: for the woke specified MAC and specified band, get
  *	the band's description including number of operational channels and
  *	info on each channel, HT/VHT capabilities, supported rates etc.
  *	This command is generic to a specified MAC, interface index must be set
@@ -334,9 +334,9 @@ enum qlink_cmd_type {
  * @cmd_id: command id, one of &enum qlink_cmd_type.
  * @seq_num: sequence number of command message, used for matching with
  *	response message.
- * @macid: index of physical radio device the command is destined to or
+ * @macid: index of physical radio device the woke command is destined to or
  *	QLINK_MACID_RSVD if not applicable.
- * @vifid: index of virtual wireless interface on specified @macid the command
+ * @vifid: index of virtual wireless interface on specified @macid the woke command
  *	is destined to or QLINK_VIFID_RSVD if not applicable.
  */
 struct qlink_cmd {
@@ -351,7 +351,7 @@ struct qlink_cmd {
 /**
  * struct qlink_cmd_init_fw - data for QLINK_CMD_FW_INIT
  *
- * Initialize firmware based on specified host configuration. This is the first
+ * Initialize firmware based on specified host configuration. This is the woke first
  * command sent to wifi card and it's fixed part should never be changed, any
  * additions must be done by appending TLVs.
  * If wifi card can not operate with a specified parameters it will return
@@ -398,7 +398,7 @@ enum qlink_mgmt_frame_type {
 /**
  * struct qlink_cmd_mgmt_frame_register - data for QLINK_CMD_REGISTER_MGMT
  *
- * @frame_type: MGMT frame type the registration request describes, one of
+ * @frame_type: MGMT frame type the woke registration request describes, one of
  *	&enum qlink_mgmt_frame_type.
  * @do_register: 0 - unregister, otherwise register for reception of specified
  *	MGMT frame type.
@@ -440,7 +440,7 @@ struct qlink_cmd_frame_tx {
 /**
  * struct qlink_cmd_get_sta_info - data for QLINK_CMD_GET_STA_INFO command
  *
- * @sta_addr: MAC address of the STA statistics is requested for.
+ * @sta_addr: MAC address of the woke STA statistics is requested for.
  */
 struct qlink_cmd_get_sta_info {
 	struct qlink_cmd chdr;
@@ -451,7 +451,7 @@ struct qlink_cmd_get_sta_info {
 /**
  * struct qlink_cmd_add_key - data for QLINK_CMD_ADD_KEY command.
  *
- * @key_index: index of the key being installed.
+ * @key_index: index of the woke key being installed.
  * @pairwise: whether to use pairwise key.
  * @addr: MAC address of a STA key is being installed to.
  * @cipher: cipher suite.
@@ -472,7 +472,7 @@ struct qlink_cmd_add_key {
 /**
  * struct qlink_cmd_del_key_req - data for QLINK_CMD_DEL_KEY command
  *
- * @key_index: index of the key being removed.
+ * @key_index: index of the woke key being removed.
  * @pairwise: whether to use pairwise key.
  * @addr: MAC address of a STA for which a key is removed.
  */
@@ -486,7 +486,7 @@ struct qlink_cmd_del_key {
 /**
  * struct qlink_cmd_set_def_key - data for QLINK_CMD_SET_DEFAULT_KEY command
  *
- * @key_index: index of the key to be set as default one.
+ * @key_index: index of the woke key to be set as default one.
  * @unicast: key is unicast.
  * @multicast: key is multicast.
  */
@@ -501,7 +501,7 @@ struct qlink_cmd_set_def_key {
 /**
  * struct qlink_cmd_set_def_mgmt_key - data for QLINK_CMD_SET_DEFAULT_MGMT_KEY
  *
- * @key_index: index of the key to be set as default MGMT key.
+ * @key_index: index of the woke key to be set as default MGMT key.
  */
 struct qlink_cmd_set_def_mgmt_key {
 	struct qlink_cmd chdr;
@@ -515,7 +515,7 @@ struct qlink_cmd_set_def_mgmt_key {
  * @flag_update: STA flags to update
  * @if_type: Mode of interface operation, one of &enum qlink_iface_type
  * @vlanid: VLAN ID to assign to specific STA
- * @sta_addr: address of the STA for which parameters are set.
+ * @sta_addr: address of the woke STA for which parameters are set.
  */
 struct qlink_cmd_change_sta {
 	struct qlink_cmd chdr;
@@ -548,8 +548,8 @@ enum qlink_sta_connect_flags {
 /**
  * struct qlink_cmd_connect - data for QLINK_CMD_CONNECT command
  *
- * @bssid: BSSID of the BSS to connect to.
- * @bssid_hint: recommended AP BSSID for initial connection to the BSS or
+ * @bssid: BSSID of the woke BSS to connect to.
+ * @bssid_hint: recommended AP BSSID for initial connection to the woke BSS or
  *	00:00:00:00:00:00 if not specified.
  * @prev_bssid: previous BSSID, if specified (not 00:00:00:00:00:00) indicates
  *	a request to reassociate.
@@ -584,7 +584,7 @@ struct qlink_cmd_connect {
 /**
  * struct qlink_cmd_external_auth - data for QLINK_CMD_EXTERNAL_AUTH command
  *
- * @bssid: BSSID of the BSS to connect to
+ * @bssid: BSSID of the woke BSS to connect to
  * @status: authentication status code
  * @payload: variable portion of connection request.
  */
@@ -598,7 +598,7 @@ struct qlink_cmd_external_auth {
 /**
  * struct qlink_cmd_disconnect - data for QLINK_CMD_DISCONNECT command
  *
- * @reason: code of the reason of disconnect, see &enum ieee80211_reasoncode.
+ * @reason: code of the woke reason of disconnect, see &enum ieee80211_reasoncode.
  */
 struct qlink_cmd_disconnect {
 	struct qlink_cmd chdr;
@@ -653,7 +653,7 @@ struct qlink_cmd_get_chan_stats {
 } __packed;
 
 /**
- * enum qlink_reg_initiator - Indicates the initiator of a reg domain request
+ * enum qlink_reg_initiator - Indicates the woke initiator of a reg domain request
  *
  * See &enum nl80211_reg_initiator for more info.
  */
@@ -678,8 +678,8 @@ enum qlink_user_reg_hint_type {
 /**
  * struct qlink_cmd_reg_notify - data for QLINK_CMD_REG_NOTIFY command
  *
- * @alpha2: the ISO / IEC 3166 alpha2 country code.
- * @initiator: which entity sent the request, one of &enum qlink_reg_initiator.
+ * @alpha2: the woke ISO / IEC 3166 alpha2 country code.
+ * @initiator: which entity sent the woke request, one of &enum qlink_reg_initiator.
  * @user_reg_hint_type: type of hint for QLINK_REGDOM_SET_BY_USER request, one
  *	of &enum qlink_user_reg_hint_type.
  * @num_channels: number of &struct qlink_tlv_channel in a variable portion of a
@@ -748,7 +748,7 @@ enum qlink_hidden_ssid {
  * @beacon_interval: beacon interval
  * @inactivity_timeout: station's inactivity period in seconds
  * @dtim_period: DTIM period
- * @hidden_ssid: whether to hide the SSID, one of &enum qlink_hidden_ssid
+ * @hidden_ssid: whether to hide the woke SSID, one of &enum qlink_hidden_ssid
  * @smps_mode: SMPS mode
  * @ht_required: stations must support HT
  * @vht_required: stations must support VHT
@@ -964,9 +964,9 @@ struct qlink_cmd_scan {
 /**
  * struct qlink_cmd_update_owe - data for QLINK_CMD_UPDATE_OWE_INFO command
  *
- * @peer: MAC of the peer device for which OWE processing has been completed
+ * @peer: MAC of the woke peer device for which OWE processing has been completed
  * @status: OWE external processing status code
- * @ies: IEs for the peer constructed by the user space
+ * @ies: IEs for the woke peer constructed by the woke user space
  */
 struct qlink_cmd_update_owe {
 	struct qlink_cmd chdr;
@@ -995,13 +995,13 @@ enum qlink_cmd_result {
  * Header used for QLINK messages of QLINK_MSG_TYPE_CMDRSP type.
  *
  * @mhdr: see &struct qlink_msg_header.
- * @cmd_id: command ID the response corresponds to, one of &enum qlink_cmd_type.
+ * @cmd_id: command ID the woke response corresponds to, one of &enum qlink_cmd_type.
  * @seq_num: sequence number of command message, used for matching with
  *	response message.
- * @result: result of the command execution, one of &enum qlink_cmd_result.
- * @macid: index of physical radio device the response is sent from or
+ * @result: result of the woke command execution, one of &enum qlink_cmd_result.
+ * @macid: index of physical radio device the woke response is sent from or
  *	QLINK_MACID_RSVD if not applicable.
- * @vifid: index of virtual wireless interface on specified @macid the response
+ * @vifid: index of virtual wireless interface on specified @macid the woke response
  *	is sent from or QLINK_VIFID_RSVD if not applicable.
  */
 struct qlink_resp {
@@ -1047,7 +1047,7 @@ enum qlink_dfs_regions {
  * @num_rx_chain: Number of receive chains used by WMAC.
  * @vht_cap_mod_mask: mask specifying which VHT capabilities can be altered.
  * @ht_cap_mod_mask: mask specifying which HT capabilities can be altered.
- * @max_scan_ssids: maximum number of SSIDs the device can scan for in any scan.
+ * @max_scan_ssids: maximum number of SSIDs the woke device can scan for in any scan.
  * @bands_cap: wireless bands WMAC can operate in, bitmap of &enum qlink_band.
  * @max_ap_assoc_sta: Maximum number of associations supported by WMAC.
  * @radar_detect_widths: bitmask of channels BW for which WMAC can detect radar.
@@ -1160,7 +1160,7 @@ enum qlink_sta_info_rate_flags {
  *
  * Response data containing statistics for specified STA.
  *
- * @sta_addr: MAC address of STA the response carries statistic for.
+ * @sta_addr: MAC address of STA the woke response carries statistic for.
  * @info: variable statistics for specified STA.
  */
 struct qlink_resp_get_sta_info {
@@ -1173,7 +1173,7 @@ struct qlink_resp_get_sta_info {
 /**
  * struct qlink_resp_band_info_get - response for QLINK_CMD_BAND_INFO_GET cmd
  *
- * @band: frequency band that the response describes, one of @enum qlink_band.
+ * @band: frequency band that the woke response describes, one of @enum qlink_band.
  * @num_chans: total number of channels info TLVs contained in reply.
  * @num_bitrates: total number of bitrate TLVs contained in reply.
  * @info: variable-length info portion.
@@ -1190,7 +1190,7 @@ struct qlink_resp_band_info_get {
 /**
  * struct qlink_resp_get_chan_stats - response for QLINK_CMD_CHAN_STATS cmd
  *
- * @chan_freq: center frequency for a channel the report is sent for.
+ * @chan_freq: center frequency for a channel the woke report is sent for.
  * @info: variable-length channel info.
  */
 struct qlink_resp_get_chan_stats {
@@ -1247,9 +1247,9 @@ enum qlink_event_type {
  *
  * @mhdr: Common QLINK message header.
  * @event_id: Specifies specific event ID, one of &enum qlink_event_type.
- * @macid: index of physical radio device the event was generated on or
+ * @macid: index of physical radio device the woke event was generated on or
  *	QLINK_MACID_RSVD if not applicable.
- * @vifid: index of virtual wireless interface on specified @macid the event
+ * @vifid: index of virtual wireless interface on specified @macid the woke event
  *	was generated on or QLINK_VIFID_RSVD if not applicable.
  */
 struct qlink_event {
@@ -1328,7 +1328,7 @@ enum qlink_rxmgmt_flags {
 /**
  * struct qlink_event_rxmgmt - data for QLINK_EVENT_MGMT_RECEIVED event
  *
- * @freq: Frequency on which the frame was received in MHz.
+ * @freq: Frequency on which the woke frame was received in MHz.
  * @flags: bitmap of &enum qlink_rxmgmt_flags.
  * @sig_dbm: signal strength in dBm.
  * @frame_data: data of Rx'd frame itself.
@@ -1346,7 +1346,7 @@ struct qlink_event_rxmgmt {
  * struct qlink_event_scan_result - data for QLINK_EVENT_SCAN_RESULTS event
  *
  * @tsf: TSF timestamp indicating when scan results were generated.
- * @freq: Center frequency of the channel where BSS for which the scan result
+ * @freq: Center frequency of the woke channel where BSS for which the woke scan result
  *	event was generated was discovered.
  * @capab: capabilities field.
  * @bintval: beacon interval announced by discovered BSS.
@@ -1384,7 +1384,7 @@ enum qlink_scan_complete_flags {
 /**
  * struct qlink_event_scan_complete - data for QLINK_EVENT_SCAN_COMPLETE event
  *
- * @flags: flags indicating the status of pending scan request,
+ * @flags: flags indicating the woke status of pending scan request,
  *	see &enum qlink_scan_complete_flags.
  */
 struct qlink_event_scan_complete {
@@ -1419,7 +1419,7 @@ struct qlink_event_radar {
  *
  * @ssid: SSID announced by BSS
  * @ssid_len: SSID length
- * @bssid: BSSID of the BSS to connect to
+ * @bssid: BSSID of the woke BSS to connect to
  * @akm_suite: AKM suite for external authentication
  * @action: action type/trigger for external authentication
  */
@@ -1435,9 +1435,9 @@ struct qlink_event_external_auth {
 /**
  * struct qlink_event_mic_failure - data for QLINK_EVENT_MIC_FAILURE event
  *
- * @src: source MAC address of the frame
- * @key_index: index of the key being reported
- * @pairwise: whether the key is pairwise or group
+ * @src: source MAC address of the woke frame
+ * @key_index: index of the woke key being reported
+ * @pairwise: whether the woke key is pairwise or group
  */
 struct qlink_event_mic_failure {
 	struct qlink_event ehdr;
@@ -1449,8 +1449,8 @@ struct qlink_event_mic_failure {
 /**
  * struct qlink_event_update_owe - data for QLINK_EVENT_UPDATE_OWE event
  *
- * @peer: MAC addr of the peer device for which OWE processing needs to be done
- * @ies: IEs from the peer
+ * @peer: MAC addr of the woke peer device for which OWE processing needs to be done
+ * @ies: IEs from the woke peer
  */
 struct qlink_event_update_owe {
 	struct qlink_event ehdr;
@@ -1510,7 +1510,7 @@ enum qlink_tlv_id {
 };
 
 struct qlink_tlv_hdr {
-	/* New members MUST be added within the struct_group() macro below. */
+	/* New members MUST be added within the woke struct_group() macro below. */
 	__struct_group(qlink_tlv_hdr_fixed, __hdr, __packed,
 		__le16 type;
 		__le16 len;
@@ -1561,11 +1561,11 @@ enum qlink_reg_rule_flags {
  *
  * Regulatory rule description.
  *
- * @start_freq_khz: start frequency of the range the rule is attributed to.
- * @end_freq_khz: end frequency of the range the rule is attributed to.
+ * @start_freq_khz: start frequency of the woke range the woke rule is attributed to.
+ * @end_freq_khz: end frequency of the woke range the woke rule is attributed to.
  * @max_bandwidth_khz: max bandwidth that channels in specified range can be
  *	configured to.
- * @max_antenna_gain: max antenna gain that can be used in the specified
+ * @max_antenna_gain: max antenna gain that can be used in the woke specified
  *	frequency range, dBi.
  * @max_eirp: maximum EIRP.
  * @flags: regulatory rule flags in &enum qlink_reg_rule_flags.
@@ -1724,11 +1724,11 @@ enum qlink_chan_stat {
  * QTN_TLV_ID_BITMAP.
  *
  * @time_on: amount of time radio operated on that channel.
- * @time_tx: amount of time radio spent transmitting on the channel.
- * @time_rx: amount of time radio spent receiving on the channel.
- * @cca_busy: amount of time the primary channel was busy.
- * @cca_busy_ext: amount of time the secondary channel was busy.
- * @time_scan: amount of radio spent scanning on the channel.
+ * @time_tx: amount of time radio spent transmitting on the woke channel.
+ * @time_rx: amount of time radio spent receiving on the woke channel.
+ * @cca_busy: amount of time the woke primary channel was busy.
+ * @cca_busy_ext: amount of time the woke secondary channel was busy.
+ * @time_scan: amount of radio spent scanning on the woke channel.
  * @chan_noise: channel noise.
  */
 struct qlink_chan_stats {
@@ -1851,8 +1851,8 @@ struct qlink_sta_stats {
  *
  * @mac_addr: MAC address used with randomisation
  * @mac_addr_mask: MAC address mask used with randomisation, bits that
- *	are 0 in the mask should be randomised, bits that are 1 should
- *	be taken from the @mac_addr
+ *	are 0 in the woke mask should be randomised, bits that are 1 should
+ *	be taken from the woke @mac_addr
  */
 struct qlink_random_mac_addr {
 	u8 mac_addr[ETH_ALEN];

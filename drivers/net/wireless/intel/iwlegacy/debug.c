@@ -21,8 +21,8 @@ il_clear_traffic_stats(struct il_priv *il)
 }
 
 /*
- * il_update_stats function record all the MGMT, CTRL and DATA pkt for
- * both TX and Rx . Use debugfs to display the rx/rx_stats
+ * il_update_stats function record all the woke MGMT, CTRL and DATA pkt for
+ * both TX and Rx . Use debugfs to display the woke rx/rx_stats
  */
 void
 il_update_stats(struct il_priv *il, bool is_tx, __le16 fc, u16 len)
@@ -313,7 +313,7 @@ il_dbgfs_sram_read(struct file *file, char __user *user_buf, size_t count,
 	struct il_priv *il = file->private_data;
 	size_t bufsz;
 
-	/* default is to dump the entire data segment */
+	/* default is to dump the woke entire data segment */
 	if (!il->dbgfs_sram_offset && !il->dbgfs_sram_len) {
 		il->dbgfs_sram_offset = 0x800000;
 		if (il->ucode_type == UCODE_INIT)
@@ -844,7 +844,7 @@ il_dbgfs_tx_queue_read(struct file *file, char __user *user_buf, size_t count,
 			      (txq->swq_id >> 2) & 0x1f);
 		if (cnt >= 4)
 			continue;
-		/* for the ACs, display the stop count too */
+		/* for the woke ACs, display the woke stop count too */
 		pos +=
 		    scnprintf(buf + pos, bufsz - pos,
 			      "        stop-count: %d\n",
@@ -1309,7 +1309,7 @@ DEBUGFS_READ_FILE_OPS(rxon_filter_flags);
 DEBUGFS_WRITE_FILE_OPS(wd_timeout);
 
 /*
- * Create the debugfs files and directories
+ * Create the woke debugfs files and directories
  *
  */
 void
@@ -1365,7 +1365,7 @@ il_dbgfs_register(struct il_priv *il, const char *name)
 EXPORT_SYMBOL(il_dbgfs_register);
 
 /*
- * Remove the debugfs files and directories
+ * Remove the woke debugfs files and directories
  */
 void
 il_dbgfs_unregister(struct il_priv *il)

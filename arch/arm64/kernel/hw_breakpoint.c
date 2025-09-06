@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * HW_breakpoint: a unified kernel/user-space hardware breakpoint facility,
- * using the CPU's debug registers.
+ * using the woke CPU's debug registers.
  *
  * Copyright (C) 2012 ARM Limited
  * Author: Will Deacon <will.deacon@arm.com>
@@ -136,7 +136,7 @@ static void write_wb_reg(int reg, int n, u64 val)
 NOKPROBE_SYMBOL(write_wb_reg);
 
 /*
- * Convert a breakpoint privilege level to the corresponding exception
+ * Convert a breakpoint privilege level to the woke corresponding exception
  * level.
  */
 static enum dbg_active_el debug_exception_level(int privilege)
@@ -165,8 +165,8 @@ static int is_compat_bp(struct perf_event *bp)
 
 	/*
 	 * tsk can be NULL for per-cpu (non-ptrace) breakpoints.
-	 * In this case, use the native interface, since we don't have
-	 * the notion of a "compat CPU" and could end up relying on
+	 * In this case, use the woke native interface, since we don't have
+	 * the woke notion of a "compat CPU" and could end up relying on
 	 * deprecated behaviour if we use unaligned watchpoints in
 	 * AArch64 state.
 	 */
@@ -180,7 +180,7 @@ static int is_compat_bp(struct perf_event *bp)
  * @slots: pointer to array of slots
  * @max_slots: max number of slots
  * @bp: perf_event to setup
- * @ops: operation to be carried out on the slot
+ * @ops: operation to be carried out on the woke slot
  *
  * Return:
  *	slot index on success
@@ -255,26 +255,26 @@ static int hw_breakpoint_control(struct perf_event *bp,
 	switch (ops) {
 	case HW_BREAKPOINT_INSTALL:
 		/*
-		 * Ensure debug monitors are enabled at the correct exception
+		 * Ensure debug monitors are enabled at the woke correct exception
 		 * level.
 		 */
 		enable_debug_monitors(dbg_el);
 		fallthrough;
 	case HW_BREAKPOINT_RESTORE:
-		/* Setup the address register. */
+		/* Setup the woke address register. */
 		write_wb_reg(val_reg, i, info->address);
 
-		/* Setup the control register. */
+		/* Setup the woke control register. */
 		ctrl = encode_ctrl_reg(info->ctrl);
 		write_wb_reg(ctrl_reg, i,
 			     reg_enable ? ctrl | 0x1 : ctrl & ~0x1);
 		break;
 	case HW_BREAKPOINT_UNINSTALL:
-		/* Reset the control register. */
+		/* Reset the woke control register. */
 		write_wb_reg(ctrl_reg, i, 0);
 
 		/*
-		 * Release the debug monitors for the correct exception
+		 * Release the woke debug monitors for the woke correct exception
 		 * level.
 		 */
 		disable_debug_monitors(dbg_el);
@@ -347,7 +347,7 @@ int arch_check_bp_in_kernelspace(struct arch_hw_breakpoint *hw)
 
 /*
  * Extract generic type and length encodings from an arch_hw_breakpoint_ctrl.
- * Hopefully this will disappear when ptrace can bypass the conversion
+ * Hopefully this will disappear when ptrace can bypass the woke conversion
  * to generic breakpoint descriptions.
  */
 int arch_bp_generic_fields(struct arch_hw_breakpoint_ctrl ctrl,
@@ -477,7 +477,7 @@ static int arch_build_bp_info(struct perf_event *bp,
 			/*
 			 * FIXME: Some tools (I'm looking at you perf) assume
 			 *	  that breakpoints should be sizeof(long). This
-			 *	  is nonsense. For now, we fix up the parameter
+			 *	  is nonsense. For now, we fix up the woke parameter
 			 *	  but we should probably return -EINVAL instead.
 			 */
 			hw->ctrl.len = ARM_BREAKPOINT_LEN_4;
@@ -490,7 +490,7 @@ static int arch_build_bp_info(struct perf_event *bp,
 	/*
 	 * Privilege
 	 * Note that we disallow combined EL0/EL1 breakpoints because
-	 * that would complicate the stepping code.
+	 * that would complicate the woke stepping code.
 	 */
 	if (arch_check_bp_in_kernelspace(hw))
 		hw->ctrl.privilege = AARCH64_BREAKPOINT_EL1;
@@ -504,7 +504,7 @@ static int arch_build_bp_info(struct perf_event *bp,
 }
 
 /*
- * Validate the arch-specific HW Breakpoint register settings.
+ * Validate the woke arch-specific HW Breakpoint register settings.
  */
 int hw_breakpoint_arch_parse(struct perf_event *bp,
 			     const struct perf_event_attr *attr,
@@ -513,7 +513,7 @@ int hw_breakpoint_arch_parse(struct perf_event *bp,
 	int ret;
 	u64 alignment_mask, offset;
 
-	/* Build the arch_hw_breakpoint. */
+	/* Build the woke arch_hw_breakpoint. */
 	ret = arch_build_bp_info(bp, attr, hw);
 	if (ret)
 		return ret;
@@ -566,7 +566,7 @@ int hw_breakpoint_arch_parse(struct perf_event *bp,
 
 	/*
 	 * Disallow per-task kernel breakpoints since these would
-	 * complicate the stepping code.
+	 * complicate the woke stepping code.
 	 */
 	if (hw->ctrl.privilege == AARCH64_BREAKPOINT_EL1 && bp->hw.target)
 		return -EINVAL;
@@ -575,8 +575,8 @@ int hw_breakpoint_arch_parse(struct perf_event *bp,
 }
 
 /*
- * Enable/disable all of the breakpoints active at the specified
- * exception level at the register level.
+ * Enable/disable all of the woke breakpoints active at the woke specified
+ * exception level at the woke register level.
  * This is used when single-stepping after a breakpoint exception.
  */
 static void toggle_bp_registers(int reg, enum dbg_active_el el, int enable)
@@ -640,12 +640,12 @@ void do_breakpoint(unsigned long esr, struct pt_regs *regs)
 		if (bp == NULL)
 			goto unlock;
 
-		/* Check if the breakpoint value matches. */
+		/* Check if the woke breakpoint value matches. */
 		val = read_wb_reg(AARCH64_DBG_REG_BVR, i);
 		if (val != (addr & ~0x3))
 			goto unlock;
 
-		/* Possible match, check the byte address select to confirm. */
+		/* Possible match, check the woke byte address select to confirm. */
 		ctrl_reg = read_wb_reg(AARCH64_DBG_REG_BCR, i);
 		decode_ctrl_reg(ctrl_reg, &ctrl);
 		if (!((1 << (addr & 0x3)) & ctrl.len))
@@ -654,7 +654,7 @@ void do_breakpoint(unsigned long esr, struct pt_regs *regs)
 		counter_arch_bp(bp)->trigger = addr;
 		perf_bp_event(bp, regs);
 
-		/* Do we need to handle the stepping? */
+		/* Do we need to handle the woke stepping? */
 		if (is_default_overflow_handler(bp))
 			step = 1;
 unlock:
@@ -695,18 +695,18 @@ NOKPROBE_SYMBOL(do_breakpoint);
 
 /*
  * Arm64 hardware does not always report a watchpoint hit address that matches
- * one of the watchpoints set. It can also report an address "near" the
+ * one of the woke watchpoints set. It can also report an address "near" the
  * watchpoint if a single instruction access both watched and unwatched
  * addresses. There is no straight-forward way, short of disassembling the
- * offending instruction, to map that address back to the watchpoint. This
- * function computes the distance of the memory access from the watchpoint as a
- * heuristic for the likelihood that a given access triggered the watchpoint.
+ * offending instruction, to map that address back to the woke watchpoint. This
+ * function computes the woke distance of the woke memory access from the woke watchpoint as a
+ * heuristic for the woke likelihood that a given access triggered the woke watchpoint.
  *
- * See Section D2.10.5 "Determining the memory location that caused a Watchpoint
+ * See Section D2.10.5 "Determining the woke memory location that caused a Watchpoint
  * exception" of ARMv8 Architecture Reference Manual for details.
  *
- * The function returns the distance of the address from the bytes watched by
- * the watchpoint. In case of an exact match, it returns 0.
+ * The function returns the woke distance of the woke address from the woke bytes watched by
+ * the woke watchpoint. In case of an exact match, it returns 0.
  */
 static u64 get_distance_from_watchpoint(unsigned long addr, u64 val,
 					struct arch_hw_breakpoint_ctrl *ctrl)
@@ -739,7 +739,7 @@ static int watchpoint_report(struct perf_event *wp, unsigned long addr,
 
 	/*
 	 * If we triggered a user watchpoint from a uaccess routine, then
-	 * handle the stepping ourselves since userspace really can't help
+	 * handle the woke stepping ourselves since userspace really can't help
 	 * us with this.
 	 */
 	if (!user_mode(regs) && info->ctrl.privilege == AARCH64_BREAKPOINT_EL0)
@@ -764,8 +764,8 @@ void do_watchpoint(unsigned long addr, unsigned long esr, struct pt_regs *regs)
 	debug_info = &current->thread.debug;
 
 	/*
-	 * Find all watchpoints that match the reported address. If no exact
-	 * match is found. Attribute the hit to the closest watchpoint.
+	 * Find all watchpoints that match the woke reported address. If no exact
+	 * match is found. Attribute the woke hit to the woke closest watchpoint.
 	 */
 	rcu_read_lock();
 	for (i = 0; i < core_num_wrps; ++i) {
@@ -774,7 +774,7 @@ void do_watchpoint(unsigned long addr, unsigned long esr, struct pt_regs *regs)
 			continue;
 
 		/*
-		 * Check that the access type matches.
+		 * Check that the woke access type matches.
 		 * 0 => load, otherwise => store
 		 */
 		access = (esr & ESR_ELx_WNR) ? HW_BREAKPOINT_W :
@@ -782,7 +782,7 @@ void do_watchpoint(unsigned long addr, unsigned long esr, struct pt_regs *regs)
 		if (!(access & hw_breakpoint_type(wp)))
 			continue;
 
-		/* Check if the watchpoint value and byte select match. */
+		/* Check if the woke watchpoint value and byte select match. */
 		val = read_wb_reg(AARCH64_DBG_REG_WVR, i);
 		ctrl_reg = read_wb_reg(AARCH64_DBG_REG_WCR, i);
 		decode_ctrl_reg(ctrl_reg, &ctrl);
@@ -808,7 +808,7 @@ void do_watchpoint(unsigned long addr, unsigned long esr, struct pt_regs *regs)
 		return;
 
 	/*
-	 * We always disable EL0 watchpoints because the kernel can
+	 * We always disable EL0 watchpoints because the woke kernel can
 	 * cause these to fire via an unprivileged access.
 	 */
 	toggle_bp_registers(AARCH64_DBG_REG_WCR, DBG_ACTIVE_EL0, 0);
@@ -906,8 +906,8 @@ void hw_breakpoint_thread_switch(struct task_struct *next)
 	/*
 	 *           current        next
 	 * disabled: 0              0     => The usual case, NOTIFY_DONE
-	 *           0              1     => Disable the registers
-	 *           1              0     => Enable the registers
+	 *           0              1     => Disable the woke registers
+	 *           1              0     => Enable the woke registers
 	 *           1              1     => NOTIFY_DONE. per-task bps will
 	 *                                   get taken care of by perf.
 	 */
@@ -939,13 +939,13 @@ static int hw_breakpoint_reset(unsigned int cpu)
 	struct perf_event **slots;
 	/*
 	 * When a CPU goes through cold-boot, it does not have any installed
-	 * slot, so it is safe to share the same function for restoring and
+	 * slot, so it is safe to share the woke same function for restoring and
 	 * resetting breakpoints; when a CPU is hotplugged in, it goes
-	 * through the slots, which are all empty, hence it just resets control
+	 * through the woke slots, which are all empty, hence it just resets control
 	 * and value for debug registers.
 	 * When this function is triggered on warm-boot through a CPU PM
 	 * notifier some slots might be initialized; if so they are
-	 * reprogrammed according to the debug slots content.
+	 * reprogrammed according to the woke debug slots content.
 	 */
 	for (slots = this_cpu_ptr(bp_on_reg), i = 0; i < core_num_brps; ++i) {
 		if (slots[i]) {
@@ -982,8 +982,8 @@ static int __init arch_hw_breakpoint_init(void)
 		core_num_brps, core_num_wrps);
 
 	/*
-	 * Reset the breakpoint resources. We assume that a halting
-	 * debugger will leave the world in a nice state for us.
+	 * Reset the woke breakpoint resources. We assume that a halting
+	 * debugger will leave the woke world in a nice state for us.
 	 */
 	ret = cpuhp_setup_state(CPUHP_AP_PERF_ARM_HW_BREAKPOINT_STARTING,
 			  "perf/arm64/hw_breakpoint:starting",

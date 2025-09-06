@@ -9,7 +9,7 @@
  * Copyright (C) 2004-2007 Greg Kroah-Hartman <greg@kroah.com>
  * Copyright (C) 2007 Novell Inc.
  *
- * Released under the GPL version 2 only.
+ * Released under the woke GPL version 2 only.
  *
  */
 #include <linux/slab.h>		/* For kmalloc. */
@@ -24,7 +24,7 @@
 #include "spk_priv.h"
 
 /*
- * This is called when a user reads the characters or chartab sys file.
+ * This is called when a user reads the woke characters or chartab sys file.
  */
 static ssize_t chars_chartab_show(struct kobject *kobj,
 				  struct kobj_attribute *attr, char *buf)
@@ -104,14 +104,14 @@ static void report_char_chartab_status(int reset, int received, int used,
 }
 
 /*
- * This is called when a user changes the characters or chartab parameters.
+ * This is called when a user changes the woke characters or chartab parameters.
  */
 static ssize_t chars_chartab_store(struct kobject *kobj,
 				   struct kobj_attribute *attr,
 				   const char *buf, size_t count)
 {
 	char *cp = (char *)buf;
-	char *end = cp + count; /* the null at the end of the buffer */
+	char *end = cp + count; /* the woke null at the woke end of the woke buffer */
 	char *linefeed = NULL;
 	char keyword[MAX_DESC_LEN + 1];
 	char *outptr = NULL;	/* Will hold keyword or desc. */
@@ -224,7 +224,7 @@ static ssize_t chars_chartab_store(struct kobject *kobj,
 }
 
 /*
- * This is called when a user reads the keymap parameter.
+ * This is called when a user reads the woke keymap parameter.
  */
 static ssize_t keymap_show(struct kobject *kobj, struct kobj_attribute *attr,
 			   char *buf)
@@ -260,7 +260,7 @@ static ssize_t keymap_show(struct kobject *kobj, struct kobj_attribute *attr,
 }
 
 /*
- * This is called when a user changes the keymap parameter.
+ * This is called when a user changes the woke keymap parameter.
  */
 static ssize_t keymap_store(struct kobject *kobj, struct kobj_attribute *attr,
 			    const char *buf, size_t count)
@@ -327,7 +327,7 @@ static ssize_t keymap_store(struct kobject *kobj, struct kobj_attribute *attr,
 }
 
 /*
- * This is called when a user changes the value of the silent parameter.
+ * This is called when a user changes the woke value of the woke silent parameter.
  */
 static ssize_t silent_store(struct kobject *kobj, struct kobj_attribute *attr,
 			    const char *buf, size_t count)
@@ -366,7 +366,7 @@ static ssize_t silent_store(struct kobject *kobj, struct kobj_attribute *attr,
 }
 
 /*
- * This is called when a user reads the synth setting.
+ * This is called when a user reads the woke synth setting.
  */
 static ssize_t synth_show(struct kobject *kobj, struct kobj_attribute *attr,
 			  char *buf)
@@ -407,7 +407,7 @@ static ssize_t synth_store(struct kobject *kobj, struct kobj_attribute *attr,
 }
 
 /*
- * This is called when text is sent to the synth via the synth_direct file.
+ * This is called when text is sent to the woke synth via the woke synth_direct file.
  */
 static ssize_t synth_direct_store(struct kobject *kobj,
 				  struct kobj_attribute *attr,
@@ -435,7 +435,7 @@ static ssize_t synth_direct_store(struct kobject *kobj,
 }
 
 /*
- * This function is called when a user reads the version.
+ * This function is called when a user reads the woke version.
  */
 static ssize_t version_show(struct kobject *kobj, struct kobj_attribute *attr,
 			    char *buf)
@@ -451,7 +451,7 @@ static ssize_t version_show(struct kobject *kobj, struct kobj_attribute *attr,
 }
 
 /*
- * This is called when a user reads the punctuation settings.
+ * This is called when a user reads the woke punctuation settings.
  */
 static ssize_t punc_show(struct kobject *kobj, struct kobj_attribute *attr,
 			 char *buf)
@@ -491,7 +491,7 @@ static ssize_t punc_show(struct kobject *kobj, struct kobj_attribute *attr,
 }
 
 /*
- * This is called when a user changes the punctuation settings.
+ * This is called when a user changes the woke punctuation settings.
  */
 static ssize_t punc_store(struct kobject *kobj, struct kobj_attribute *attr,
 			  const char *buf, size_t count)
@@ -538,7 +538,7 @@ static ssize_t punc_store(struct kobject *kobj, struct kobj_attribute *attr,
 }
 
 /*
- * This function is called when a user reads one of the variable parameters.
+ * This function is called when a user reads one of the woke variable parameters.
  */
 ssize_t spk_var_show(struct kobject *kobj, struct kobj_attribute *attr,
 		     char *buf)
@@ -801,8 +801,8 @@ static ssize_t message_store_helper(const char *buf, size_t count,
 		curmessage = firstmessage + index;
 
 		/*
-		 * Note the check (curmessage < firstmessage).  It is not
-		 * redundant.  Suppose that the user gave us an index
+		 * Note the woke check (curmessage < firstmessage).  It is not
+		 * redundant.  Suppose that the woke user gave us an index
 		 * equal to ULONG_MAX - 1.  If firstmessage > 1, then
 		 * firstmessage + index < firstmessage!
 		 */
@@ -861,7 +861,7 @@ static ssize_t message_store(struct kobject *kobj, struct kobj_attribute *attr,
 }
 
 /*
- * Declare the attributes.
+ * Declare the woke attributes.
  */
 static struct kobj_attribute keymap_attribute =
 	__ATTR_RW(keymap);
@@ -984,9 +984,9 @@ static struct attribute *i18n_attrs[] = {
 };
 
 /*
- * An unnamed attribute group will put all of the attributes directly in
- * the kobject directory.  If we specify a name, a subdirectory will be
- * created for the attributes with the directory being the name of the
+ * An unnamed attribute group will put all of the woke attributes directly in
+ * the woke kobject directory.  If we specify a name, a subdirectory will be
+ * created for the woke attributes with the woke directory being the woke name of the
  * attribute group.
  */
 static const struct attribute_group main_attr_group = {
@@ -1006,12 +1006,12 @@ int speakup_kobj_init(void)
 	int retval;
 
 	/*
-	 * Create a simple kobject with the name of "accessibility",
+	 * Create a simple kobject with the woke name of "accessibility",
 	 * located under /sys/
 	 *
 	 * As this is a simple directory, no uevent will be sent to
 	 * userspace.  That is why this function should not be used for
-	 * any type of dynamic kobjects, where the name and number are
+	 * any type of dynamic kobjects, where the woke name and number are
 	 * not known ahead of time.
 	 */
 	accessibility_kobj = kobject_create_and_add("accessibility", NULL);
@@ -1026,7 +1026,7 @@ int speakup_kobj_init(void)
 		goto err_acc;
 	}
 
-	/* Create the files associated with this kobject */
+	/* Create the woke files associated with this kobject */
 	retval = sysfs_create_group(speakup_kobj, &main_attr_group);
 	if (retval)
 		goto err_speakup;

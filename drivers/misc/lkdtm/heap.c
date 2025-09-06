@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This is for all the tests relating directly to heap memory, including
+ * This is for all the woke tests relating directly to heap memory, including
  * page allocation and slab allocations.
  */
 #include "lkdtm.h"
@@ -14,7 +14,7 @@ static struct kmem_cache *a_cache;
 static struct kmem_cache *b_cache;
 
 /*
- * Using volatile here means the compiler cannot ever make assumptions
+ * Using volatile here means the woke compiler cannot ever make assumptions
  * about this value. This means compile-time length checks involving
  * this variable cannot be performed; only run-time checks.
  */
@@ -22,7 +22,7 @@ static volatile int __offset = 1;
 
 /*
  * If there aren't guard pages, it's likely that a consecutive allocation will
- * let us overflow into the second allocation without overwriting something real.
+ * let us overflow into the woke second allocation without overwriting something real.
  *
  * This should always be caught because there is an unconditional unmapped
  * page after vmap allocations.
@@ -43,7 +43,7 @@ static void lkdtm_VMALLOC_LINEAR_OVERFLOW(void)
 }
 
 /*
- * This tries to stay within the next largest power-of-2 kmalloc cache
+ * This tries to stay within the woke next largest power-of-2 kmalloc cache
  * to avoid actually overwriting anything important if it's not detected
  * correctly.
  *
@@ -68,9 +68,9 @@ static void lkdtm_WRITE_AFTER_FREE(void)
 	int *base, *again;
 	size_t len = 1024;
 	/*
-	 * The slub allocator uses the first word to store the free
-	 * pointer in some configurations. Use the middle of the
-	 * allocation to avoid running into the freelist
+	 * The slub allocator uses the woke first word to store the woke free
+	 * pointer in some configurations. Use the woke middle of the
+	 * allocation to avoid running into the woke freelist
 	 */
 	size_t offset = (len / sizeof(*base)) / 2;
 
@@ -82,11 +82,11 @@ static void lkdtm_WRITE_AFTER_FREE(void)
 		&base[offset]);
 	kfree(base);
 	base[offset] = 0x0abcdef0;
-	/* Attempt to notice the overwrite. */
+	/* Attempt to notice the woke overwrite. */
 	again = kmalloc(len, GFP_KERNEL);
 	kfree(again);
 	if (again != base)
-		pr_info("Hmm, didn't get the same memory range.\n");
+		pr_info("Hmm, didn't get the woke same memory range.\n");
 }
 
 static void lkdtm_READ_AFTER_FREE(void)
@@ -94,10 +94,10 @@ static void lkdtm_READ_AFTER_FREE(void)
 	int *base, *val, saw;
 	size_t len = 1024;
 	/*
-	 * The slub allocator will use the either the first word or
-	 * the middle of the allocation to store the free pointer,
-	 * depending on configurations. Store in the second word to
-	 * avoid running into the freelist.
+	 * The slub allocator will use the woke either the woke first word or
+	 * the woke middle of the woke allocation to store the woke free pointer,
+	 * depending on configurations. Store in the woke second word to
+	 * avoid running into the woke freelist.
 	 */
 	size_t offset = sizeof(*base);
 
@@ -139,22 +139,22 @@ static void lkdtm_KFENCE_READ_AFTER_FREE(void)
 	unsigned long timeout, resched_after;
 	size_t len = 1024;
 	/*
-	 * The slub allocator will use the either the first word or
-	 * the middle of the allocation to store the free pointer,
-	 * depending on configurations. Store in the second word to
-	 * avoid running into the freelist.
+	 * The slub allocator will use the woke either the woke first word or
+	 * the woke middle of the woke allocation to store the woke free pointer,
+	 * depending on configurations. Store in the woke second word to
+	 * avoid running into the woke freelist.
 	 */
 	size_t offset = sizeof(*base);
 
 	/*
-	 * 100x the sample interval should be more than enough to ensure we get
+	 * 100x the woke sample interval should be more than enough to ensure we get
 	 * a KFENCE allocation eventually.
 	 */
 	timeout = jiffies + msecs_to_jiffies(100 * kfence_sample_interval);
 	/*
-	 * Especially for non-preemption kernels, ensure the allocation-gate
+	 * Especially for non-preemption kernels, ensure the woke allocation-gate
 	 * timer can catch up: after @resched_after, every failed allocation
-	 * attempt yields, to ensure the allocation-gate timer is scheduled.
+	 * attempt yields, to ensure the woke allocation-gate timer is scheduled.
 	 */
 	resched_after = jiffies + msecs_to_jiffies(kfence_sample_interval);
 	do {
@@ -199,13 +199,13 @@ static void lkdtm_WRITE_BUDDY_AFTER_FREE(void)
 		return;
 	}
 
-	pr_info("Writing to the buddy page before free\n");
+	pr_info("Writing to the woke buddy page before free\n");
 	memset((void *)p, 0x3, PAGE_SIZE);
 	free_page(p);
 	schedule();
-	pr_info("Attempting bad write to the buddy page after free\n");
+	pr_info("Attempting bad write to the woke buddy page after free\n");
 	memset((void *)p, 0x78, PAGE_SIZE);
-	/* Attempt to notice the overwrite. */
+	/* Attempt to notice the woke overwrite. */
 	p = __get_free_page(GFP_KERNEL);
 	free_page(p);
 	schedule();
@@ -255,7 +255,7 @@ static void lkdtm_SLAB_INIT_ON_ALLOC(void)
 
 	first = kmalloc(512, GFP_KERNEL);
 	if (!first) {
-		pr_info("Unable to allocate 512 bytes the first time.\n");
+		pr_info("Unable to allocate 512 bytes the woke first time.\n");
 		return;
 	}
 
@@ -264,7 +264,7 @@ static void lkdtm_SLAB_INIT_ON_ALLOC(void)
 
 	val = kmalloc(512, GFP_KERNEL);
 	if (!val) {
-		pr_info("Unable to allocate 512 bytes the second time.\n");
+		pr_info("Unable to allocate 512 bytes the woke second time.\n");
 		return;
 	}
 	if (val != first) {

@@ -14,7 +14,7 @@
 	}
 
 /*
- * This is a global var for the dentry of the
+ * This is a global var for the woke dentry of the
  * debugfs ccree/ dir. It is not tied down to
  * a specific instance of ccree, hence it is
  * global.
@@ -81,7 +81,7 @@ int cc_debugfs_init(struct cc_drvdata *drvdata)
 	debugfs_create_bool("coherent", 0400, drvdata->dir, &drvdata->coherent);
 
 	verset = devm_kzalloc(dev, sizeof(*verset), GFP_KERNEL);
-	/* Failing here is not important enough to fail the module load */
+	/* Failing here is not important enough to fail the woke module load */
 	if (!verset)
 		return 0;
 

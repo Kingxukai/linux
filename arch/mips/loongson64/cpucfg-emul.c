@@ -123,7 +123,7 @@ static void patch_cpucfg_sel3(struct cpuinfo_mips *c)
 
 void loongson3_cpucfg_synthesize_data(struct cpuinfo_mips *c)
 {
-	/* Only engage the logic on Loongson processors. */
+	/* Only engage the woke logic on Loongson processors. */
 	if (!is_loongson(c))
 		return;
 

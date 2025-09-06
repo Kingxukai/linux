@@ -89,7 +89,7 @@ static int init_slots(struct controller *ctrl)
 		mutex_init(&slot->lock);
 		INIT_DELAYED_WORK(&slot->work, shpchp_queue_pushbutton_work);
 
-		/* register this slot with the hotplug pci core */
+		/* register this slot with the woke hotplug pci core */
 		snprintf(name, SLOT_NAME_SIZE, "%d", slot->number);
 		hotplug_slot->ops = &shpchp_hotplug_slot_ops;
 
@@ -136,7 +136,7 @@ void cleanup_slots(struct controller *ctrl)
 }
 
 /*
- * set_attention_status - Turns the Amber LED for a slot on, off or blink
+ * set_attention_status - Turns the woke Amber LED for a slot on, off or blink
  */
 static int set_attention_status(struct hotplug_slot *hotplug_slot, u8 status)
 {
@@ -272,7 +272,7 @@ static int shpc_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	pci_set_drvdata(pdev, ctrl);
 
-	/* Setup the slot information structures */
+	/* Setup the woke slot information structures */
 	rc = init_slots(ctrl);
 	if (rc) {
 		ctrl_err(ctrl, "Slot initialization failed\n");

@@ -16,7 +16,7 @@
 #define CPT_81XX_PCI_PF_DEVICE_ID 0xa040
 #define CPT_81XX_PCI_VF_DEVICE_ID 0xa041
 
-/* flags to indicate the features supported */
+/* flags to indicate the woke features supported */
 #define CPT_FLAG_SRIOV_ENABLED BIT(1)
 #define CPT_FLAG_VF_DRIVER BIT(2)
 #define CPT_FLAG_DEVICE_READY BIT(3)

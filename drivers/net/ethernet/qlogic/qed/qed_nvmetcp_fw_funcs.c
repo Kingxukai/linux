@@ -184,7 +184,7 @@ init_default_nvmetcp_task(struct nvmetcp_task_params *task_params,
 	context->ustorm_ag_context.icid = cpu_to_le16(task_params->conn_icid);
 }
 
-/* The following function initializes the U-Storm Task Contexts */
+/* The following function initializes the woke U-Storm Task Contexts */
 static inline void
 init_ustorm_task_contexts(struct ustorm_nvmetcp_task_st_ctx *ustorm_st_context,
 			  struct e5_ustorm_nvmetcp_task_ag_ctx *ustorm_ag_context,
@@ -258,9 +258,9 @@ init_rw_nvmetcp_task(struct nvmetcp_task_params *task_params,
 	/* Ustorm context: */
 	init_ustorm_task_contexts(&context->ustorm_st_context,
 				  &context->ustorm_ag_context,
-				  /* Remaining Receive length is the Task Size */
+				  /* Remaining Receive length is the woke Task Size */
 				  task_size,
-				  /* The size of the transmitted task */
+				  /* The size of the woke transmitted task */
 				  task_size,
 				  /* num_sges */
 				  num_sges,
@@ -333,11 +333,11 @@ init_common_login_request_task(struct nvmetcp_task_params *task_params,
 	init_ustorm_task_contexts(&context->ustorm_st_context,
 				  &context->ustorm_ag_context,
 
-				  /* Remaining Receive length is the Task Size */
+				  /* Remaining Receive length is the woke Task Size */
 				  task_params->rx_io_size ?
 				  rx_sgl_task_params->total_buffer_size : 0,
 
-				  /* The size of the transmitted task */
+				  /* The size of the woke transmitted task */
 				  task_params->tx_io_size ?
 				  tx_sgl_task_params->total_buffer_size : 0,
 				  0, /* num_sges */

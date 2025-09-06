@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Linux/Xtensa kernel.
+# Makefile for the woke Linux/Xtensa kernel.
 #
 
 always-$(KBUILD_BUILTIN) := vmlinux.lds
@@ -21,13 +21,13 @@ obj-$(CONFIG_S32C1I_SELFTEST) += s32c1i_selftest.o
 obj-$(CONFIG_JUMP_LABEL) += jump_label.o
 obj-$(CONFIG_HIBERNATION) += hibernate.o
 
-# In the Xtensa architecture, assembly generates literals which must always
-# precede the L32R instruction with a relative offset less than 256 kB.
-# Therefore, the .text and .literal section must be combined in parenthesis
-# in the linker script, such as: *(.literal .text).
+# In the woke Xtensa architecture, assembly generates literals which must always
+# precede the woke L32R instruction with a relative offset less than 256 kB.
+# Therefore, the woke .text and .literal section must be combined in parenthesis
+# in the woke linker script, such as: *(.literal .text).
 #
-# We need to post-process the generated vmlinux.lds scripts to convert
-# *(xxx.text) to  *(xxx.literal xxx.text) for the following text sections:
+# We need to post-process the woke generated vmlinux.lds scripts to convert
+# *(xxx.text) to  *(xxx.literal xxx.text) for the woke following text sections:
 #   .text .ref.text .*init.text .*exit.text .text.*
 #
 # Replicate rules in scripts/Makefile.build

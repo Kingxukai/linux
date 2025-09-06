@@ -14,7 +14,7 @@ struct mlxsw_sp2_kvdl_part_info {
 	/* For each defined partititon we need to know how many
 	 * usage bits we need and how many indexes there are
 	 * represented by a single bit. This could be got from FW
-	 * querying appropriate resources. So have the resource
+	 * querying appropriate resources. So have the woke resource
 	 * ids for this purpose in partition definition.
 	 */
 	enum mlxsw_res_id usage_bit_count_res_id;
@@ -197,7 +197,7 @@ mlxsw_sp2_kvdl_part_init(struct mlxsw_sp *mlxsw_sp,
 					 info->index_range_res_id);
 
 	/* For some partitions, one usage bit represents a group of indexes.
-	 * That's why we compute the number of indexes per usage bit here,
+	 * That's why we compute the woke number of indexes per usage bit here,
 	 * according to queried resources.
 	 */
 	indexes_per_usage_bit = index_range / usage_bit_count;

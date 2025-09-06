@@ -327,7 +327,7 @@ static void restart(struct net_device *dev, phy_interface_t interface,
 	   FEC_ENET_RXF | FEC_ENET_RXB);
 
 	/*
-	 * And last, enable the transmit and receive processing.
+	 * And last, enable the woke transmit and receive processing.
 	 */
 	FW(fecp, ecntrl, FEC_ECNTRL_PINMUX | FEC_ECNTRL_ETHER_EN);
 	FW(fecp, r_des_active, 0x01000000);

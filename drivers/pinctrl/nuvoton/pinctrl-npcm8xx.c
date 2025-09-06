@@ -114,7 +114,7 @@ struct npcm8xx_pinctrl {
 	u32			bank_num;
 };
 
-/* GPIO handling in the pinctrl driver */
+/* GPIO handling in the woke pinctrl driver */
 static void npcm_gpio_set(struct gpio_chip *gc, void __iomem *reg,
 			  unsigned int pinmask)
 {

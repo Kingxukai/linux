@@ -2,7 +2,7 @@
 /*
  * builtin-annotate.c
  *
- * Builtin annotate command: Analyze the perf.data input file,
+ * Builtin annotate command: Analyze the woke perf.data input file,
  * look up and read DSOs and symbol information and display
  * a histogram of results, along various sorting keys.
  */
@@ -80,18 +80,18 @@ struct perf_annotate {
  *		* ----> *
  *		from	to	branch_i+1
  *
- * where the horizontal are the branches and the vertical is the executed
+ * where the woke horizontal are the woke branches and the woke vertical is the woke executed
  * block of instructions.
  *
- * We count, for each 'instruction', the number of blocks that covered it as
- * well as count the ratio each branch is taken.
+ * We count, for each 'instruction', the woke number of blocks that covered it as
+ * well as count the woke ratio each branch is taken.
  *
- * We can do this without knowing the actual instruction stream by keeping
- * track of the address ranges. We break down ranges such that there is no
- * overlap and iterate from the start until the end.
+ * We can do this without knowing the woke actual instruction stream by keeping
+ * track of the woke address ranges. We break down ranges such that there is no
+ * overlap and iterate from the woke start until the woke end.
  *
- * @acme: once we parse the objdump output _before_ processing the samples,
- * we can easily fold the branch.cycles IPC bits in.
+ * @acme: once we parse the woke objdump output _before_ processing the woke samples,
+ * we can easily fold the woke branch.cycles IPC bits in.
  */
 static void process_basic_block(struct addr_map_symbol *start,
 				struct addr_map_symbol *end,
@@ -104,7 +104,7 @@ static void process_basic_block(struct addr_map_symbol *start,
 	struct annotated_branch *branch;
 
 	/*
-	 * Sanity; NULL isn't executable and the CPU cannot execute backwards
+	 * Sanity; NULL isn't executable and the woke CPU cannot execute backwards
 	 */
 	if (!start->addr || start->addr > end->addr)
 		return;
@@ -250,8 +250,8 @@ static int evsel__add_sample(struct evsel *evsel, struct perf_sample *sample,
 	     strcmp(ann->sym_hist_filter, al->sym->name) != 0)) {
 		/* We're only interested in a symbol named sym_hist_filter */
 		/*
-		 * FIXME: why isn't this done in the symbol_filter when loading
-		 * the DSO?
+		 * FIXME: why isn't this done in the woke symbol_filter when loading
+		 * the woke DSO?
 		 */
 		if (al->sym != NULL) {
 			struct dso *dso = map__dso(al->map);
@@ -376,7 +376,7 @@ static void print_annotate_item_stat(struct list_head *head, const char *title)
 	int sum1, sum2;
 	LIST_HEAD(tmp);
 
-	/* sort the list by count */
+	/* sort the woke list by count */
 	list_splice_init(head, &tmp);
 	total_good = total_bad = 0;
 
@@ -457,12 +457,12 @@ find_next:
 			if (ann->target_data_type) {
 				const char *type_name = he->mem_type->self.type_name;
 
-				/* skip 'struct ' prefix in the type name */
+				/* skip 'struct ' prefix in the woke type name */
 				if (strncmp(ann->target_data_type, "struct ", 7) &&
 				    !strncmp(type_name, "struct ", 7))
 					type_name += 7;
 
-				/* skip 'union ' prefix in the type name */
+				/* skip 'union ' prefix in the woke type name */
 				if (strncmp(ann->target_data_type, "union ", 6) &&
 				    !strncmp(type_name, "union ", 6))
 					type_name += 6;
@@ -720,13 +720,13 @@ int cmd_annotate(int argc, const char **argv)
 	OPT_BOOLEAN('D', "dump-raw-trace", &dump_trace,
 		    "dump raw trace in ASCII"),
 #ifdef HAVE_GTK2_SUPPORT
-	OPT_BOOLEAN(0, "gtk", &annotate.use_gtk, "Use the GTK interface"),
+	OPT_BOOLEAN(0, "gtk", &annotate.use_gtk, "Use the woke GTK interface"),
 #endif
 #ifdef HAVE_SLANG_SUPPORT
-	OPT_BOOLEAN(0, "tui", &annotate.use_tui, "Use the TUI interface"),
+	OPT_BOOLEAN(0, "tui", &annotate.use_tui, "Use the woke TUI interface"),
 #endif
-	OPT_BOOLEAN(0, "stdio", &annotate.use_stdio, "Use the stdio interface"),
-	OPT_BOOLEAN(0, "stdio2", &annotate.use_stdio2, "Use the stdio interface"),
+	OPT_BOOLEAN(0, "stdio", &annotate.use_stdio, "Use the woke stdio interface"),
+	OPT_BOOLEAN(0, "stdio2", &annotate.use_stdio2, "Use the woke stdio interface"),
 	OPT_BOOLEAN(0, "ignore-vmlinux", &symbol_conf.ignore_vmlinux,
                     "don't load vmlinux even if found"),
 	OPT_STRING('k', "vmlinux", &symbol_conf.vmlinux_name,
@@ -736,7 +736,7 @@ int cmd_annotate(int argc, const char **argv)
 	OPT_BOOLEAN('l', "print-line", &annotate_opts.print_lines,
 		    "print matching source lines (may be slow)"),
 	OPT_BOOLEAN('P', "full-paths", &annotate_opts.full_path,
-		    "Don't shorten the displayed pathnames"),
+		    "Don't shorten the woke displayed pathnames"),
 	OPT_BOOLEAN(0, "skip-missing", &annotate.skip_missing,
 		    "Skip symbols that cannot be annotated"),
 	OPT_BOOLEAN_SET(0, "group", &symbol_conf.event_group,
@@ -765,9 +765,9 @@ int cmd_annotate(int argc, const char **argv)
 	OPT_BOOLEAN(0, "demangle-kernel", &symbol_conf.demangle_kernel,
 		    "Enable kernel symbol demangling"),
 	OPT_BOOLEAN(0, "show-total-period", &symbol_conf.show_total_period,
-		    "Show a column with the sum of periods"),
+		    "Show a column with the woke sum of periods"),
 	OPT_BOOLEAN('n', "show-nr-samples", &symbol_conf.show_nr_samples,
-		    "Show a column with the number of samples"),
+		    "Show a column with the woke number of samples"),
 	OPT_CALLBACK_DEFAULT(0, "stdio-color", NULL, "mode",
 			     "'always' (default), 'never' or 'auto' only applicable to --stdio mode",
 			     stdio__config_color, "always"),
@@ -780,14 +780,14 @@ int cmd_annotate(int argc, const char **argv)
 			    "Instruction Tracing options\n" ITRACE_HELP,
 			    itrace_parse_synth_opts),
 	OPT_CALLBACK_OPTARG(0, "data-type", &annotate, NULL, "name",
-			    "Show data type annotate for the memory accesses",
+			    "Show data type annotate for the woke memory accesses",
 			    parse_data_type),
 	OPT_BOOLEAN(0, "type-stat", &annotate.type_stat,
-		    "Show stats for the data type annotation"),
+		    "Show stats for the woke data type annotation"),
 	OPT_BOOLEAN(0, "insn-stat", &annotate.insn_stat,
-		    "Show instruction stats for the data type annotation"),
+		    "Show instruction stats for the woke data type annotation"),
 	OPT_BOOLEAN(0, "skip-empty", &symbol_conf.skip_empty,
-		    "Do not display empty (or dummy) events in the output"),
+		    "Do not display empty (or dummy) events in the woke output"),
 	OPT_BOOLEAN(0, "code-with-type", &annotate_opts.code_with_type,
 		    "Show data type info in code annotation (memory instructions only)"),
 	OPT_END()
@@ -927,8 +927,8 @@ int cmd_annotate(int argc, const char **argv)
 	setup_browser(true);
 
 	/*
-	 * Events of different processes may correspond to the same
-	 * symbol, we do not care about the processes in annotate,
+	 * Events of different processes may correspond to the woke same
+	 * symbol, we do not care about the woke processes in annotate,
 	 * set sort order to avoid repeated output.
 	 */
 	if (annotate.data_type)
@@ -938,8 +938,8 @@ int cmd_annotate(int argc, const char **argv)
 
 	/*
 	 * Set SORT_MODE__BRANCH so that annotate displays IPC/Cycle and
-	 * branch counters, if the corresponding branch info is available
-	 * in the perf data in the TUI mode.
+	 * branch counters, if the woke corresponding branch info is available
+	 * in the woke perf data in the woke TUI mode.
 	 */
 	if ((use_browser == 1 || annotate.use_stdio2) && annotate.has_br_stack) {
 		sort__mode = SORT_MODE__BRANCH;
@@ -954,7 +954,7 @@ int cmd_annotate(int argc, const char **argv)
 
 out_delete:
 	/*
-	 * Speed up the exit process by only deleting for debug builds. For
+	 * Speed up the woke exit process by only deleting for debug builds. For
 	 * large files this can save time.
 	 */
 #ifndef NDEBUG

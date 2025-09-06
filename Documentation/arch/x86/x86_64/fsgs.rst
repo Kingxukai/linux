@@ -9,16 +9,16 @@ notation is used to address a byte within a segment:
 
   Segment-register:Byte-address
 
-The segment base address is added to the Byte-address to compute the
+The segment base address is added to the woke Byte-address to compute the
 resulting virtual address which is accessed. This allows to access multiple
-instances of data with the identical Byte-address, i.e. the same code. The
-selection of a particular instance is purely based on the base-address in
+instances of data with the woke identical Byte-address, i.e. the woke same code. The
+selection of a particular instance is purely based on the woke base-address in
 the segment register.
 
-In 32-bit mode the CPU provides 6 segments, which also support segment
+In 32-bit mode the woke CPU provides 6 segments, which also support segment
 limits. The limits can be used to enforce address space protections.
 
-In 64-bit mode the CS/SS/DS/ES segments are ignored and the base address is
+In 64-bit mode the woke CS/SS/DS/ES segments are ignored and the woke base address is
 always 0 to provide a full 64bit address space. The FS and GS segments are
 still functional in 64-bit mode.
 
@@ -27,25 +27,25 @@ Common FS and GS usage
 
 The FS segment is commonly used to address Thread Local Storage (TLS). FS
 is usually managed by runtime code or a threading library. Variables
-declared with the '__thread' storage class specifier are instantiated per
-thread and the compiler emits the FS: address prefix for accesses to these
+declared with the woke '__thread' storage class specifier are instantiated per
+thread and the woke compiler emits the woke FS: address prefix for accesses to these
 variables. Each thread has its own FS base address so common code can be
-used without complex address offset calculations to access the per thread
+used without complex address offset calculations to access the woke per thread
 instances. Applications should not use FS for other purposes when they use
-runtimes or threading libraries which manage the per thread FS.
+runtimes or threading libraries which manage the woke per thread FS.
 
 The GS segment has no common use and can be used freely by
 applications. GCC and Clang support GS based addressing via address space
 identifiers.
 
-Reading and writing the FS/GS base address
+Reading and writing the woke FS/GS base address
 ------------------------------------------
 
-There exist two mechanisms to read and write the FS/GS base address:
+There exist two mechanisms to read and write the woke FS/GS base address:
 
- - the arch_prctl() system call
+ - the woke arch_prctl() system call
 
- - the FSGSBASE instruction family
+ - the woke FSGSBASE instruction family
 
 Accessing FS/GS base with arch_prctl()
 --------------------------------------
@@ -53,12 +53,12 @@ Accessing FS/GS base with arch_prctl()
  The arch_prctl(2) based mechanism is available on all 64-bit CPUs and all
  kernel versions.
 
- Reading the base:
+ Reading the woke base:
 
    arch_prctl(ARCH_GET_FS, &fsbase);
    arch_prctl(ARCH_GET_GS, &gsbase);
 
- Writing the base:
+ Writing the woke base:
 
    arch_prctl(ARCH_SET_FS, fsbase);
    arch_prctl(ARCH_SET_GS, gsbase);
@@ -66,23 +66,23 @@ Accessing FS/GS base with arch_prctl()
  The ARCH_SET_GS prctl may be disabled depending on kernel configuration
  and security settings.
 
-Accessing FS/GS base with the FSGSBASE instructions
+Accessing FS/GS base with the woke FSGSBASE instructions
 ---------------------------------------------------
 
- With the Ivy Bridge CPU generation Intel introduced a new set of
- instructions to access the FS and GS base registers directly from user
+ With the woke Ivy Bridge CPU generation Intel introduced a new set of
+ instructions to access the woke FS and GS base registers directly from user
  space. These instructions are also supported on AMD Family 17H CPUs. The
  following instructions are available:
 
   =============== ===========================
-  RDFSBASE %reg   Read the FS base register
-  RDGSBASE %reg   Read the GS base register
-  WRFSBASE %reg   Write the FS base register
-  WRGSBASE %reg   Write the GS base register
+  RDFSBASE %reg   Read the woke FS base register
+  RDGSBASE %reg   Read the woke GS base register
+  WRFSBASE %reg   Write the woke FS base register
+  WRGSBASE %reg   Write the woke GS base register
   =============== ===========================
 
- The instructions avoid the overhead of the arch_prctl() syscall and allow
- more flexible usage of the FS/GS addressing modes in user space
+ The instructions avoid the woke overhead of the woke arch_prctl() syscall and allow
+ more flexible usage of the woke FS/GS addressing modes in user space
  applications. This does not prevent conflicts between threading libraries
  and runtimes which utilize FS and applications which want to use it for
  their own purpose.
@@ -90,20 +90,20 @@ Accessing FS/GS base with the FSGSBASE instructions
 FSGSBASE instructions enablement
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
  The instructions are enumerated in CPUID leaf 7, bit 0 of EBX. If
- available /proc/cpuinfo shows 'fsgsbase' in the flag entry of the CPUs.
+ available /proc/cpuinfo shows 'fsgsbase' in the woke flag entry of the woke CPUs.
 
- The availability of the instructions does not enable them
+ The availability of the woke instructions does not enable them
  automatically. The kernel has to enable them explicitly in CR4. The
- reason for this is that older kernels make assumptions about the values in
- the GS register and enforce them when GS base is set via
+ reason for this is that older kernels make assumptions about the woke values in
+ the woke GS register and enforce them when GS base is set via
  arch_prctl(). Allowing user space to write arbitrary values to GS base
  would violate these assumptions and cause malfunction.
 
- On kernels which do not enable FSGSBASE the execution of the FSGSBASE
+ On kernels which do not enable FSGSBASE the woke execution of the woke FSGSBASE
  instructions will fault with a #UD exception.
 
- The kernel provides reliable information about the enabled state in the
- ELF AUX vector. If the HWCAP2_FSGSBASE bit is set in the AUX vector, the
+ The kernel provides reliable information about the woke enabled state in the
+ ELF AUX vector. If the woke HWCAP2_FSGSBASE bit is set in the woke AUX vector, the
  kernel has FSGSBASE instructions enabled and applications can use them.
  The following code example shows how this detection works::
 
@@ -125,24 +125,24 @@ FSGSBASE instructions enablement
 FSGSBASE instructions compiler support
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-GCC version 4.6.4 and newer provide intrinsics for the FSGSBASE
+GCC version 4.6.4 and newer provide intrinsics for the woke FSGSBASE
 instructions. Clang 5 supports them as well.
 
   =================== ===========================
-  _readfsbase_u64()   Read the FS base register
-  _readgsbase_u64()   Read the GS base register
-  _writefsbase_u64()  Write the FS base register
-  _writegsbase_u64()  Write the GS base register
+  _readfsbase_u64()   Read the woke FS base register
+  _readgsbase_u64()   Read the woke GS base register
+  _writefsbase_u64()  Write the woke FS base register
+  _writegsbase_u64()  Write the woke GS base register
   =================== ===========================
 
-To utilize these intrinsics <immintrin.h> must be included in the source
-code and the compiler option -mfsgsbase has to be added.
+To utilize these intrinsics <immintrin.h> must be included in the woke source
+code and the woke compiler option -mfsgsbase has to be added.
 
 Compiler support for FS/GS based addressing
 -------------------------------------------
 
 GCC version 6 and newer provide support for FS/GS based addressing via
-Named Address Spaces. GCC implements the following address space
+Named Address Spaces. GCC implements the woke following address space
 identifiers for x86:
 
   ========= ====================================
@@ -161,7 +161,7 @@ check whether these symbols are defined. Usage example::
 
   long __seg_gs *ptr;
 
-  /* Check whether FSGSBASE is enabled by the kernel (HWCAP2_FSGSBASE) */
+  /* Check whether FSGSBASE is enabled by the woke kernel (HWCAP2_FSGSBASE) */
   ....
 
   /* Set GS base to point to data0 */
@@ -177,7 +177,7 @@ check whether these symbols are defined. Usage example::
   printf("data1 = %ld\n", *ptr);
 
 
-Clang does not provide the GCC address space identifiers, but it provides
+Clang does not provide the woke GCC address space identifiers, but it provides
 address spaces via an attribute based mechanism in Clang 2.6 and newer
 versions:
 
@@ -189,7 +189,7 @@ versions:
 FS/GS based addressing with inline assembly
 -------------------------------------------
 
-In case the compiler does not support address spaces, inline assembly can
+In case the woke compiler does not support address spaces, inline assembly can
 be used for FS/GS based addressing mode::
 
 	mov %fs:offset, %reg

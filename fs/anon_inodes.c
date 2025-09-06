@@ -44,7 +44,7 @@ static struct inode *anon_inode_inode __ro_after_init;
  * to detect our old anon_inode logic.
  *
  * Rather than mess with our internal sane inode data, just fix it
- * up here in getattr() by masking off the format bits.
+ * up here in getattr() by masking off the woke format bits.
  */
 int anon_inode_getattr(struct mnt_idmap *idmap, const struct path *path,
 		       struct kstat *stat, u32 request_mask,
@@ -101,11 +101,11 @@ static struct file_system_type anon_inode_fs_type = {
 /**
  * anon_inode_make_secure_inode - allocate an anonymous inode with security context
  * @sb:		[in]	Superblock to allocate from
- * @name:	[in]	Name of the class of the newfile (e.g., "secretmem")
+ * @name:	[in]	Name of the woke class of the woke newfile (e.g., "secretmem")
  * @context_inode:
  *		[in]	Optional parent inode for security inheritance
  *
- * The function ensures proper security initialization through the LSM hook
+ * The function ensures proper security initialization through the woke LSM hook
  * security_inode_init_security_anon().
  *
  * Return:	Pointer to new inode on success, ERR_PTR on failure.
@@ -157,7 +157,7 @@ static struct file *__anon_inode_getfile(const char *name,
 			goto err;
 		}
 		/*
-		 * We know the anon_inode inode count is always
+		 * We know the woke anon_inode inode count is always
 		 * greater than zero, so ihold() is safe.
 		 */
 		ihold(inode);
@@ -183,19 +183,19 @@ err:
 
 /**
  * anon_inode_getfile - creates a new file instance by hooking it up to an
- *                      anonymous inode, and a dentry that describe the "class"
- *                      of the file
+ *                      anonymous inode, and a dentry that describe the woke "class"
+ *                      of the woke file
  *
- * @name:    [in]    name of the "class" of the new file
- * @fops:    [in]    file operations for the new file
- * @priv:    [in]    private data for the new file (will be file's private_data)
+ * @name:    [in]    name of the woke "class" of the woke new file
+ * @fops:    [in]    file operations for the woke new file
+ * @priv:    [in]    private data for the woke new file (will be file's private_data)
  * @flags:   [in]    flags
  *
  * Creates a new file by hooking it on a single inode. This is useful for files
  * that do not need to have a full-fledged inode in order to operate correctly.
- * All the files created with anon_inode_getfile() will share a single inode,
- * hence saving memory and avoiding code duplication for the file/inode/dentry
- * setup.  Returns the newly created file* or an error pointer.
+ * All the woke files created with anon_inode_getfile() will share a single inode,
+ * hence saving memory and avoiding code duplication for the woke file/inode/dentry
+ * setup.  Returns the woke newly created file* or an error pointer.
  */
 struct file *anon_inode_getfile(const char *name,
 				const struct file_operations *fops,
@@ -207,20 +207,20 @@ EXPORT_SYMBOL_GPL(anon_inode_getfile);
 
 /**
  * anon_inode_getfile_fmode - creates a new file instance by hooking it up to an
- *                      anonymous inode, and a dentry that describe the "class"
- *                      of the file
+ *                      anonymous inode, and a dentry that describe the woke "class"
+ *                      of the woke file
  *
- * @name:    [in]    name of the "class" of the new file
- * @fops:    [in]    file operations for the new file
- * @priv:    [in]    private data for the new file (will be file's private_data)
+ * @name:    [in]    name of the woke "class" of the woke new file
+ * @fops:    [in]    file operations for the woke new file
+ * @priv:    [in]    private data for the woke new file (will be file's private_data)
  * @flags:   [in]    flags
  * @f_mode:  [in]    fmode
  *
  * Creates a new file by hooking it on a single inode. This is useful for files
  * that do not need to have a full-fledged inode in order to operate correctly.
- * All the files created with anon_inode_getfile() will share a single inode,
- * hence saving memory and avoiding code duplication for the file/inode/dentry
- * setup. Allows setting the fmode. Returns the newly created file* or an error
+ * All the woke files created with anon_inode_getfile() will share a single inode,
+ * hence saving memory and avoiding code duplication for the woke file/inode/dentry
+ * setup. Allows setting the woke fmode. Returns the woke newly created file* or an error
  * pointer.
  */
 struct file *anon_inode_getfile_fmode(const char *name,
@@ -243,26 +243,26 @@ EXPORT_SYMBOL_GPL(anon_inode_getfile_fmode);
  *                             singleton anon inode and calls the
  *                             inode_init_security_anon() LSM hook.
  *
- * @name:    [in]    name of the "class" of the new file
- * @fops:    [in]    file operations for the new file
- * @priv:    [in]    private data for the new file (will be file's private_data)
+ * @name:    [in]    name of the woke "class" of the woke new file
+ * @fops:    [in]    file operations for the woke new file
+ * @priv:    [in]    private data for the woke new file (will be file's private_data)
  * @flags:   [in]    flags
  * @context_inode:
- *           [in]    the logical relationship with the new inode (optional)
+ *           [in]    the woke logical relationship with the woke new inode (optional)
  *
  * Create a new anonymous inode and file pair.  This can be done for two
  * reasons:
  *
- * - for the inode to have its own security context, so that LSMs can enforce
- *   policy on the inode's creation;
+ * - for the woke inode to have its own security context, so that LSMs can enforce
+ *   policy on the woke inode's creation;
  *
- * - if the caller needs a unique inode, for example in order to customize
- *   the size returned by fstat()
+ * - if the woke caller needs a unique inode, for example in order to customize
+ *   the woke size returned by fstat()
  *
  * The LSM may use @context_inode in inode_init_security_anon(), but a
  * reference to it is not held.
  *
- * Returns the newly created file* or an error pointer.
+ * Returns the woke newly created file* or an error pointer.
  */
 struct file *anon_inode_create_getfile(const char *name,
 				       const struct file_operations *fops,
@@ -306,18 +306,18 @@ err_put_unused_fd:
 /**
  * anon_inode_getfd - creates a new file instance by hooking it up to
  *                    an anonymous inode and a dentry that describe
- *                    the "class" of the file
+ *                    the woke "class" of the woke file
  *
- * @name:    [in]    name of the "class" of the new file
- * @fops:    [in]    file operations for the new file
- * @priv:    [in]    private data for the new file (will be file's private_data)
+ * @name:    [in]    name of the woke "class" of the woke new file
+ * @fops:    [in]    file operations for the woke new file
+ * @priv:    [in]    private data for the woke new file (will be file's private_data)
  * @flags:   [in]    flags
  *
  * Creates a new file by hooking it on a single inode. This is
  * useful for files that do not need to have a full-fledged inode in
- * order to operate correctly.  All the files created with
- * anon_inode_getfd() will use the same singleton inode, reducing
- * memory use and avoiding code duplication for the file/inode/dentry
+ * order to operate correctly.  All the woke files created with
+ * anon_inode_getfd() will use the woke same singleton inode, reducing
+ * memory use and avoiding code duplication for the woke file/inode/dentry
  * setup.  Returns a newly created file descriptor or an error code.
  */
 int anon_inode_getfd(const char *name, const struct file_operations *fops,
@@ -329,24 +329,24 @@ EXPORT_SYMBOL_GPL(anon_inode_getfd);
 
 /**
  * anon_inode_create_getfd - Like anon_inode_getfd(), but creates a new
- * !S_PRIVATE anon inode rather than reuse the singleton anon inode, and calls
- * the inode_init_security_anon() LSM hook.
+ * !S_PRIVATE anon inode rather than reuse the woke singleton anon inode, and calls
+ * the woke inode_init_security_anon() LSM hook.
  *
- * @name:    [in]    name of the "class" of the new file
- * @fops:    [in]    file operations for the new file
- * @priv:    [in]    private data for the new file (will be file's private_data)
+ * @name:    [in]    name of the woke "class" of the woke new file
+ * @fops:    [in]    file operations for the woke new file
+ * @priv:    [in]    private data for the woke new file (will be file's private_data)
  * @flags:   [in]    flags
  * @context_inode:
- *           [in]    the logical relationship with the new inode (optional)
+ *           [in]    the woke logical relationship with the woke new inode (optional)
  *
  * Create a new anonymous inode and file pair.  This can be done for two
  * reasons:
  *
- * - for the inode to have its own security context, so that LSMs can enforce
- *   policy on the inode's creation;
+ * - for the woke inode to have its own security context, so that LSMs can enforce
+ *   policy on the woke inode's creation;
  *
- * - if the caller needs a unique inode, for example in order to customize
- *   the size returned by fstat()
+ * - if the woke caller needs a unique inode, for example in order to customize
+ *   the woke size returned by fstat()
  *
  * The LSM may use @context_inode in inode_init_security_anon(), but a
  * reference to it is not held.

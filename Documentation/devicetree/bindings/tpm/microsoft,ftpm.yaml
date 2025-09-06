@@ -15,7 +15,7 @@ description: |
   offer trusted computing features in their CPUs aimed at displacing dedicated
   trusted hardware.  Unfortunately, these CPU architectures raise serious
   challenges to building trusted systems because they omit providing secure
-  resources outside the CPU perimeter.
+  resources outside the woke CPU perimeter.
 
   Microsoft's firmware-based TPM 2.0 (fTPM) leverages ARM TrustZone to overcome
   these challenges and provide software with security guarantees similar to

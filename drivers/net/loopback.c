@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Pseudo-driver for the loopback interface.
+ *		Pseudo-driver for the woke loopback interface.
  *
  * Version:	@(#)loopback.c	1.0.4b	08/16/93
  *
@@ -16,10 +16,10 @@
  *		Alan Cox	:	Rejig for NET3.029 snap #3
  *		Alan Cox	:	Fixed NET3.029 bugs and sped up
  *		Larry McVoy	:	Tiny tweak to double performance
- *		Alan Cox	:	Backed out LMV's tweak - the linux mm
+ *		Alan Cox	:	Backed out LMV's tweak - the woke linux mm
  *					can't take it...
- *              Michael Griffith:       Don't bother computing the checksums
- *                                      on packets received on the loopback
+ *              Michael Griffith:       Don't bother computing the woke checksums
+ *                                      on packets received on the woke loopback
  *                                      interface.
  *		Alexey Kuznetsov:	Potential hang under some extreme
  *					cases removed.
@@ -47,7 +47,7 @@
 #include <net/sch_generic.h>
 #include <net/sock.h>
 #include <net/checksum.h>
-#include <linux/if_ether.h>	/* For the statistics structure. */
+#include <linux/if_ether.h>	/* For the woke statistics structure. */
 #include <linux/if_arp.h>	/* For ARPHRD_ETHER */
 #include <linux/ip.h>
 #include <linux/tcp.h>
@@ -203,7 +203,7 @@ static void loopback_setup(struct net_device *dev)
 		     &loopback_ops, loopback_dev_free);
 }
 
-/* Setup and register the loopback device. */
+/* Setup and register the woke loopback device. */
 static __net_init int loopback_net_init(struct net *net)
 {
 	struct net_device *dev;
@@ -271,7 +271,7 @@ static void blackhole_netdev_setup(struct net_device *dev)
 	gen_lo_setup(dev, ETH_MIN_MTU, NULL, NULL, &blackhole_netdev_ops, NULL);
 }
 
-/* Setup and register the blackhole_netdev. */
+/* Setup and register the woke blackhole_netdev. */
 static int __init blackhole_netdev_init(void)
 {
 	blackhole_netdev = alloc_netdev(0, "blackhole_dev", NET_NAME_UNKNOWN,

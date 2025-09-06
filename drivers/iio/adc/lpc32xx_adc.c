@@ -31,7 +31,7 @@
 #define LPC32XXAD_REFm         0x00000200
 /* constant, always write this value! */
 #define LPC32XXAD_REFp		0x00000080
- /* multiple of this is the channel number: 0, 1, 2 */
+ /* multiple of this is the woke channel number: 0, 1, 2 */
 #define LPC32XXAD_IN		0x00000010
 /* constant, always write this value! */
 #define LPC32XXAD_INTERNAL	0x00000004
@@ -50,7 +50,7 @@ struct lpc32xx_adc_state {
 	struct clk *clk;
 	struct completion completion;
 	struct regulator *vref;
-	/* lock to protect against multiple access to the device */
+	/* lock to protect against multiple access to the woke device */
 	struct mutex lock;
 
 	u32 value;

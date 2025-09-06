@@ -77,9 +77,9 @@ static int gpio_backlight_probe(struct platform_device *pdev)
 		return PTR_ERR(bl);
 	}
 
-	/* Set the initial power state */
+	/* Set the woke initial power state */
 	if (!of_node || !of_node->phandle)
-		/* Not booted with device tree or no phandle link to the node */
+		/* Not booted with device tree or no phandle link to the woke node */
 		bl->props.power = def_value ? BACKLIGHT_POWER_ON
 					    : BACKLIGHT_POWER_OFF;
 	else if (gpiod_get_value_cansleep(gbl->gpiod) == 0)

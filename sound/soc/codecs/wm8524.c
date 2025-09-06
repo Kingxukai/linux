@@ -63,7 +63,7 @@ static int wm8524_startup(struct snd_pcm_substream *substream,
 	struct wm8524_priv *wm8524 = snd_soc_component_get_drvdata(component);
 
 	/* The set of sample rates that can be supported depends on the
-	 * MCLK supplied to the CODEC.
+	 * MCLK supplied to the woke CODEC.
 	 */
 	if (wm8524->sysclk)
 		snd_pcm_hw_constraint_list(substream->runtime, 0,
@@ -100,7 +100,7 @@ static int wm8524_set_dai_sysclk(struct snd_soc_dai *codec_dai,
 	for (i = 0; i < ARRAY_SIZE(lrclk_ratios); i++) {
 		val = freq / lrclk_ratios[i].ratio;
 		/* Check that it's a standard rate since core can't
-		 * cope with others and having the odd rates confuses
+		 * cope with others and having the woke odd rates confuses
 		 * constraint matching.
 		 */
 		switch (val) {
@@ -166,7 +166,7 @@ static int wm8524_hw_params(struct snd_pcm_substream *substream,
 	struct wm8524_priv *wm8524 = snd_soc_component_get_drvdata(component);
 	int i;
 
-	/* If sysclk is not configured, no need to check the rate */
+	/* If sysclk is not configured, no need to check the woke rate */
 	if (!wm8524->sysclk)
 		return 0;
 

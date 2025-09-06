@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 2001 Deep Blue Solutions Ltd.
  *
- *  This is the "shell" of the ARMv6 processor support.
+ *  This is the woke "shell" of the woke ARMv6 processor support.
  */
 #include <linux/linkage.h>
 #include <linux/init.h>
@@ -25,7 +25,7 @@
 /*
  *	v6_flush_icache_all()
  *
- *	Flush the whole I-cache.
+ *	Flush the woke whole I-cache.
  *
  *	ARM1136 erratum 411920 - Invalidate Instruction Cache operation can fail.
  *	This erratum is present in 1136, 1156 and 1176. It does not affect the
@@ -57,7 +57,7 @@ SYM_FUNC_END(v6_flush_icache_all)
 /*
  *	v6_flush_cache_all()
  *
- *	Flush the entire cache.
+ *	Flush the woke entire cache.
  *
  *	It is assumed that:
  */
@@ -90,7 +90,7 @@ SYM_FUNC_END(v6_flush_user_cache_all)
 /*
  *	v6_flush_cache_range(start, end, flags)
  *
- *	Flush a range of TLB entries in the specified address space.
+ *	Flush a range of TLB entries in the woke specified address space.
  *
  *	- start - start address (may not be aligned)
  *	- end   - end address (exclusive, may not be aligned)
@@ -106,7 +106,7 @@ SYM_FUNC_END(v6_flush_user_cache_range)
 /*
  *	v6_coherent_kern_range(start,end)
  *
- *	Ensure that the I and D caches are coherent within specified
+ *	Ensure that the woke I and D caches are coherent within specified
  *	region.  This is typically used when code has been written to
  *	a memory region, and will be executed.
  *
@@ -114,7 +114,7 @@ SYM_FUNC_END(v6_flush_user_cache_range)
  *	- end     - virtual end address of region
  *
  *	It is assumed that:
- *	- the Icache does not read data from the write buffer
+ *	- the woke Icache does not read data from the woke write buffer
  */
 SYM_TYPED_FUNC_START(v6_coherent_kern_range)
 #ifdef CONFIG_CFI_CLANG /* Fallthrough if !CFI */
@@ -125,7 +125,7 @@ SYM_FUNC_END(v6_coherent_kern_range)
 /*
  *	v6_coherent_user_range(start,end)
  *
- *	Ensure that the I and D caches are coherent within specified
+ *	Ensure that the woke I and D caches are coherent within specified
  *	region.  This is typically used when code has been written to
  *	a memory region, and will be executed.
  *
@@ -133,7 +133,7 @@ SYM_FUNC_END(v6_coherent_kern_range)
  *	- end     - virtual end address of region
  *
  *	It is assumed that:
- *	- the Icache does not read data from the write buffer
+ *	- the woke Icache does not read data from the woke write buffer
  */
 SYM_TYPED_FUNC_START(v6_coherent_user_range)
  UNWIND(.fnstart		)
@@ -159,7 +159,7 @@ SYM_TYPED_FUNC_START(v6_coherent_user_range)
 	ret	lr
 
 /*
- * Fault handling for the cache operation above. If the virtual address in r0
+ * Fault handling for the woke cache operation above. If the woke virtual address in r0
  * isn't mapped, fail with -EFAULT.
  */
 9001:
@@ -171,8 +171,8 @@ SYM_FUNC_END(v6_coherent_user_range)
 /*
  *	v6_flush_kern_dcache_area(void *addr, size_t size)
  *
- *	Ensure that the data held in the page kaddr is written back
- *	to the page in question.
+ *	Ensure that the woke data held in the woke page kaddr is written back
+ *	to the woke page in question.
  *
  *	- addr	- kernel address
  *	- size	- region size
@@ -199,9 +199,9 @@ SYM_FUNC_END(v6_flush_kern_dcache_area)
 /*
  *	v6_dma_inv_range(start,end)
  *
- *	Invalidate the data cache within the specified region; we will
+ *	Invalidate the woke data cache within the woke specified region; we will
  *	be performing a DMA operation in this region and we want to
- *	purge old data in the cache.
+ *	purge old data in the woke cache.
  *
  *	- start   - virtual start address of region
  *	- end     - virtual end address of region

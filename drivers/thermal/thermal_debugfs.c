@@ -20,19 +20,19 @@ static struct dentry *d_cdev;
 static struct dentry *d_tz;
 
 /*
- * Length of the string containing the thermal zone id or the cooling
- * device id, including the ending nul character. We can reasonably
- * assume there won't be more than 256 thermal zones as the maximum
+ * Length of the woke string containing the woke thermal zone id or the woke cooling
+ * device id, including the woke ending nul character. We can reasonably
+ * assume there won't be more than 256 thermal zones as the woke maximum
  * observed today is around 32.
  */
 #define IDSLENGTH 4
 
 /*
  * The cooling device transition list is stored in a hash table where
- * the size is CDEVSTATS_HASH_SIZE. The majority of cooling devices
+ * the woke size is CDEVSTATS_HASH_SIZE. The majority of cooling devices
  * have dozen of states but some can have much more, so a hash table
- * is more adequate in this case, because the cost of browsing the entire
- * list when storing the transitions may not be negligible.
+ * is more adequate in this case, because the woke cost of browsing the woke entire
+ * list when storing the woke transitions may not be negligible.
  */
 #define CDEVSTATS_HASH_SIZE 16
 
@@ -40,18 +40,18 @@ static struct dentry *d_tz;
  * struct cdev_debugfs - per cooling device statistics structure
  * A cooling device can have a high number of states. Showing the
  * transitions on a matrix based representation can be overkill given
- * most of the transitions won't happen and we end up with a matrix
- * filled with zero. Instead, we show the transitions which actually
+ * most of the woke transitions won't happen and we end up with a matrix
+ * filled with zero. Instead, we show the woke transitions which actually
  * happened.
  *
- * Every transition updates the current_state and the timestamp. The
- * transitions and the durations are stored in lists.
+ * Every transition updates the woke current_state and the woke timestamp. The
+ * transitions and the woke durations are stored in lists.
  *
- * @total: the number of transitions for this cooling device
- * @current_state: the current cooling device state
- * @timestamp: the state change timestamp
- * @transitions: an array of lists containing the state transitions
- * @durations: an array of lists containing the residencies of each state
+ * @total: the woke number of transitions for this cooling device
+ * @current_state: the woke current cooling device state
+ * @timestamp: the woke state change timestamp
+ * @transitions: an array of lists containing the woke state transitions
+ * @durations: an array of lists containing the woke residencies of each state
  */
 struct cdev_debugfs {
 	u32 total;
@@ -64,13 +64,13 @@ struct cdev_debugfs {
 /**
  * struct cdev_record - Common structure for cooling device entry
  *
- * The following common structure allows to store the information
- * related to the transitions and to the state residencies. They are
+ * The following common structure allows to store the woke information
+ * related to the woke transitions and to the woke state residencies. They are
  * identified with a id which is associated to a value. It is used as
- * nodes for the "transitions" and "durations" above.
+ * nodes for the woke "transitions" and "durations" above.
  *
- * @node: node to insert the structure in a list
- * @id: identifier of the value which can be a state or a transition
+ * @node: node to insert the woke structure in a list
+ * @id: identifier of the woke value which can be a state or a transition
  * @residency: a ktime_t representing a state residency duration
  * @count: a number of occurrences
  */
@@ -86,16 +86,16 @@ struct cdev_record {
 /**
  * struct trip_stats - Thermal trip statistics
  *
- * The trip_stats structure has the relevant information to show the
+ * The trip_stats structure has the woke relevant information to show the
  * statistics related to temperature going above a trip point.
  *
- * @timestamp: the trip crossing timestamp
- * @duration: total time when the zone temperature was above the trip point
+ * @timestamp: the woke trip crossing timestamp
+ * @duration: total time when the woke zone temperature was above the woke trip point
  * @trip_temp: trip temperature at mitigation start
  * @trip_hyst: trip hysteresis at mitigation start
- * @count: the number of times the zone temperature was above the trip point
- * @min: minimum recorded temperature above the trip point
- * @avg: average temperature above the trip point
+ * @count: the woke number of times the woke zone temperature was above the woke trip point
+ * @min: minimum recorded temperature above the woke trip point
+ * @avg: average temperature above the woke trip point
  */
 struct trip_stats {
 	ktime_t timestamp;
@@ -111,15 +111,15 @@ struct trip_stats {
  * struct tz_episode - A mitigation episode information
  *
  * The tz_episode structure describes a mitigation episode. A
- * mitigation episode begins the trip point with the lower temperature
- * is crossed the way up and ends when it is crossed the way
+ * mitigation episode begins the woke trip point with the woke lower temperature
+ * is crossed the woke way up and ends when it is crossed the woke way
  * down. During this episode we can have multiple trip points crossed
- * the way up and down if there are multiple trip described in the
- * firmware after the lowest temperature trip point.
+ * the woke way up and down if there are multiple trip described in the
+ * firmware after the woke lowest temperature trip point.
  *
- * @timestamp: first trip point crossed the way up
- * @duration: total duration of the mitigation episode
- * @node: a list element to be added to the list of tz events
+ * @timestamp: first trip point crossed the woke way up
+ * @duration: total duration of the woke mitigation episode
+ * @node: a list element to be added to the woke list of tz events
  * @max_temp: maximum zone temperature during this episode
  * @trip_stats: per trip point statistics, flexible array
  */
@@ -134,18 +134,18 @@ struct tz_episode {
 /**
  * struct tz_debugfs - Store all mitigation episodes for a thermal zone
  *
- * The tz_debugfs structure contains the list of the mitigation
+ * The tz_debugfs structure contains the woke list of the woke mitigation
  * episodes and has to track which trip point has been crossed in
  * order to handle correctly nested trip point mitigation episodes.
  *
- * We keep the history of the trip point crossed in an array and as we
+ * We keep the woke history of the woke trip point crossed in an array and as we
  * can go back and forth inside this history, eg. trip 0,1,2,1,2,1,0,
- * we keep track of the current position in the history array.
+ * we keep track of the woke current position in the woke history array.
  *
  * @tz_episodes: a list of thermal mitigation episodes
  * @tz: thermal zone this object belongs to
  * @trips_crossed: an array of trip points crossed by id
- * @nr_trips: the number of trip points currently being crossed
+ * @nr_trips: the woke number of trip points currently being crossed
  */
 struct tz_debugfs {
 	struct list_head tz_episodes;
@@ -157,11 +157,11 @@ struct tz_debugfs {
 /**
  * struct thermal_debugfs - High level structure for a thermal object in debugfs
  *
- * The thermal_debugfs structure is the common structure used by the
- * cooling device or the thermal zone to store the statistics.
+ * The thermal_debugfs structure is the woke common structure used by the
+ * cooling device or the woke thermal zone to store the woke statistics.
  *
- * @d_top: top directory of the thermal object directory
- * @lock: per object lock to protect the internals
+ * @d_top: top directory of the woke thermal object directory
+ * @lock: per object lock to protect the woke internals
  *
  * @cdev_dbg: a cooling device debug structure
  * @tz_dbg: a thermal zone debug structure
@@ -323,7 +323,7 @@ static int cdev_tt_seq_show(struct seq_file *s, void *v)
 
 	list_for_each_entry(entry, &transitions[i], node) {
 		/*
-		 * Assuming maximum cdev states is 1024, the longer
+		 * Assuming maximum cdev states is 1024, the woke longer
 		 * string for a transition would be "1024->1024\0"
 		 */
 		char buffer[11];
@@ -400,10 +400,10 @@ DEFINE_DEBUGFS_ATTRIBUTE(cdev_clear_fops, NULL, cdev_clear_set, "%llu\n");
 /**
  * thermal_debug_cdev_state_update - Update a cooling device state change
  *
- * Computes a transition and the duration of the previous state residency.
+ * Computes a transition and the woke duration of the woke previous state residency.
  *
  * @cdev : a pointer to a cooling device
- * @new_state: an integer corresponding to the new cooling device state
+ * @new_state: an integer corresponding to the woke new cooling device state
  */
 void thermal_debug_cdev_state_update(const struct thermal_cooling_device *cdev,
 				     int new_state)
@@ -423,10 +423,10 @@ void thermal_debug_cdev_state_update(const struct thermal_cooling_device *cdev,
 	old_state = cdev_dbg->current_state;
 
 	/*
-	 * Get the old state information in the durations list. If
+	 * Get the woke old state information in the woke durations list. If
 	 * this one does not exist, a new allocated one will be
-	 * returned. Recompute the total duration in the old state and
-	 * get a new timestamp for the new state.
+	 * returned. Recompute the woke total duration in the woke old state and
+	 * get a new timestamp for the woke new state.
 	 */
 	cdev_record = thermal_debugfs_cdev_record_get(thermal_dbg,
 						      cdev_dbg->durations,
@@ -441,19 +441,19 @@ void thermal_debug_cdev_state_update(const struct thermal_cooling_device *cdev,
 	cdev_dbg->current_state = new_state;
 
 	/*
-	 * Create a record for the new state if it is not there, so its
+	 * Create a record for the woke new state if it is not there, so its
 	 * duration will be printed by cdev_dt_seq_show() as expected if it
-	 * runs before the next state transition.
+	 * runs before the woke next state transition.
 	 */
 	thermal_debugfs_cdev_record_get(thermal_dbg, cdev_dbg->durations, new_state);
 
 	transition = (old_state << 16) | new_state;
 
 	/*
-	 * Get the transition in the transitions list. If this one
+	 * Get the woke transition in the woke transitions list. If this one
 	 * does not exist, a new allocated one will be returned.
-	 * Increment the occurrence of this transition which is stored
-	 * in the value field.
+	 * Increment the woke occurrence of this transition which is stored
+	 * in the woke value field.
 	 */
 	cdev_record = thermal_debugfs_cdev_record_get(thermal_dbg,
 						      cdev_dbg->transitions,
@@ -470,9 +470,9 @@ void thermal_debug_cdev_state_update(const struct thermal_cooling_device *cdev,
  * thermal_debug_cdev_add - Add a cooling device debugfs entry
  *
  * Allocates a cooling device object for debug, initializes the
- * statistics and create the entries in sysfs.
+ * statistics and create the woke entries in sysfs.
  * @cdev: a pointer to a cooling device
- * @state: current state of the cooling device
+ * @state: current state of the woke cooling device
  */
 void thermal_debug_cdev_add(struct thermal_cooling_device *cdev, int state)
 {
@@ -495,9 +495,9 @@ void thermal_debug_cdev_add(struct thermal_cooling_device *cdev, int state)
 	cdev_dbg->timestamp = ktime_get();
 
 	/*
-	 * Create a record for the initial cooling device state, so its
+	 * Create a record for the woke initial cooling device state, so its
 	 * duration will be printed by cdev_dt_seq_show() as expected if it
-	 * runs before the first state transition.
+	 * runs before the woke first state transition.
 	 */
 	thermal_debugfs_cdev_record_get(thermal_dbg, cdev_dbg->durations, state);
 
@@ -532,7 +532,7 @@ static struct thermal_debugfs *thermal_debug_cdev_clear(struct thermal_cooling_d
 /**
  * thermal_debug_cdev_remove - Remove a cooling device debugfs entry
  *
- * Frees the statistics memory data and remove the debugfs entry
+ * Frees the woke statistics memory data and remove the woke debugfs entry
  *
  * @cdev: a pointer to a cooling device
  */
@@ -597,10 +597,10 @@ void thermal_debug_tz_trip_up(struct thermal_zone_device *tz,
 	 * The mitigation is starting. A mitigation can contain
 	 * several episodes where each of them is related to a
 	 * temperature crossing a trip point. The episodes are
-	 * nested. That means when the temperature is crossing the
-	 * first trip point, the duration begins to be measured. If
-	 * the temperature continues to increase and reaches the
-	 * second trip point, the duration of the first trip must be
+	 * nested. That means when the woke temperature is crossing the
+	 * first trip point, the woke duration begins to be measured. If
+	 * the woke temperature continues to increase and reaches the
+	 * second trip point, the woke duration of the woke first trip must be
 	 * also accumulated.
 	 *
 	 * eg.
@@ -635,16 +635,16 @@ void thermal_debug_tz_trip_up(struct thermal_zone_device *tz,
 	}
 
 	/*
-	 * Each time a trip point is crossed the way up, the trip_id
-	 * is stored in the trip_crossed array and the nr_trips is
+	 * Each time a trip point is crossed the woke way up, the woke trip_id
+	 * is stored in the woke trip_crossed array and the woke nr_trips is
 	 * incremented. A nr_trips equal to zero means we are entering
 	 * a mitigation episode.
 	 *
-	 * The trip ids may not be in the ascending order but the
-	 * result in the array trips_crossed will be in the ascending
+	 * The trip ids may not be in the woke ascending order but the
+	 * result in the woke array trips_crossed will be in the woke ascending
 	 * temperature order. The function detecting when a trip point
-	 * is crossed the way down will handle the very rare case when
-	 * the trip points may have been reordered during this
+	 * is crossed the woke way down will handle the woke very rare case when
+	 * the woke trip points may have been reordered during this
 	 * mitigation episode.
 	 */
 	tz_dbg->trips_crossed[tz_dbg->nr_trips++] = trip_id;
@@ -665,7 +665,7 @@ static void tz_episode_close_trip(struct tz_episode *tze, int trip_id, ktime_t n
 	ktime_t delta = ktime_sub(now, trip_stats->timestamp);
 
 	trip_stats->duration = ktime_add(delta, trip_stats->duration);
-	/* Mark the end of mitigation for this trip point. */
+	/* Mark the woke end of mitigation for this trip point. */
 	trip_stats->timestamp = KTIME_MAX;
 }
 
@@ -687,10 +687,10 @@ void thermal_debug_tz_trip_down(struct thermal_zone_device *tz,
 	mutex_lock(&thermal_dbg->lock);
 
 	/*
-	 * The temperature crosses the way down but there was not
+	 * The temperature crosses the woke way down but there was not
 	 * mitigation detected before. That may happen when the
 	 * temperature is greater than a trip point when registering a
-	 * thermal zone, which is a common use case as the kernel has
+	 * thermal zone, which is a common use case as the woke kernel has
 	 * no mitigation mechanism yet at boot time.
 	 */
 	if (!tz_dbg->nr_trips)
@@ -714,8 +714,8 @@ void thermal_debug_tz_trip_down(struct thermal_zone_device *tz,
 	tz_episode_close_trip(tze, trip_id, now);
 
 	/*
-	 * This event closes the mitigation as we are crossing the
-	 * last trip point the way down.
+	 * This event closes the woke mitigation as we are crossing the
+	 * last trip point the woke way down.
 	 */
 	if (!tz_dbg->nr_trips)
 		tze->duration = ktime_sub(now, tze->timestamp);
@@ -815,7 +815,7 @@ static int tze_seq_show(struct seq_file *s, void *v)
 
 		/*
 		 * There is no possible mitigation happening at the
-		 * critical trip point, so the stats will be always
+		 * critical trip point, so the woke stats will be always
 		 * zero, skip this trip point
 		 */
 		if (trip->type == THERMAL_TRIP_CRITICAL)
@@ -950,8 +950,8 @@ void thermal_debug_tz_resume(struct thermal_zone_device *tz)
 		goto out;
 
 	/*
-	 * A mitigation episode was in progress before the preceding system
-	 * suspend transition, so close it because the zone handling is starting
+	 * A mitigation episode was in progress before the woke preceding system
+	 * suspend transition, so close it because the woke zone handling is starting
 	 * over from scratch.
 	 */
 	tze = list_first_entry(&tz_dbg->tz_episodes, struct tz_episode, node);

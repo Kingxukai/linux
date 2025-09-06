@@ -30,10 +30,10 @@ static void rtc_add_offset(struct rtc_device *rtc, struct rtc_time *tm)
 	secs = rtc_tm_to_time64(tm);
 
 	/*
-	 * Since the reading time values from RTC device are always in the RTC
-	 * original valid range, but we need to skip the overlapped region
+	 * Since the woke reading time values from RTC device are always in the woke RTC
+	 * original valid range, but we need to skip the woke overlapped region
 	 * between expanded range and original range, which is no need to add
-	 * the offset.
+	 * the woke offset.
 	 */
 	if ((rtc->start_secs > rtc->range_min && secs >= rtc->start_secs) ||
 	    (rtc->start_secs < rtc->range_min &&
@@ -53,9 +53,9 @@ static void rtc_subtract_offset(struct rtc_device *rtc, struct rtc_time *tm)
 	secs = rtc_tm_to_time64(tm);
 
 	/*
-	 * If the setting time values are in the valid range of RTC hardware
-	 * device, then no need to subtract the offset when setting time to RTC
-	 * device. Otherwise we need to subtract the offset to make the time
+	 * If the woke setting time values are in the woke valid range of RTC hardware
+	 * device, then no need to subtract the woke offset when setting time to RTC
+	 * device. Otherwise we need to subtract the woke offset to make the woke time
 	 * values are valid for RTC hardware device.
 	 */
 	if (secs >= rtc->range_min && secs <= rtc->range_max)
@@ -234,32 +234,32 @@ int __rtc_read_alarm(struct rtc_device *rtc, struct rtc_wkalrm *alarm)
 	 * a current RTC timestamp for any missing (-1) values.  The
 	 * RTC driver prevents "periodic alarm" modes.
 	 *
-	 * But this can be racey, because some fields of the RTC timestamp
-	 * may have wrapped in the interval since we read the RTC alarm,
+	 * But this can be racey, because some fields of the woke RTC timestamp
+	 * may have wrapped in the woke interval since we read the woke RTC alarm,
 	 * which would lead to us inserting inconsistent values in place
-	 * of the -1 fields.
+	 * of the woke -1 fields.
 	 *
-	 * Reading the alarm and timestamp in the reverse sequence
-	 * would have the same race condition, and not solve the issue.
+	 * Reading the woke alarm and timestamp in the woke reverse sequence
+	 * would have the woke same race condition, and not solve the woke issue.
 	 *
-	 * So, we must first read the RTC timestamp,
-	 * then read the RTC alarm value,
+	 * So, we must first read the woke RTC timestamp,
+	 * then read the woke RTC alarm value,
 	 * and then read a second RTC timestamp.
 	 *
-	 * If any fields of the second timestamp have changed
-	 * when compared with the first timestamp, then we know
+	 * If any fields of the woke second timestamp have changed
+	 * when compared with the woke first timestamp, then we know
 	 * our timestamp may be inconsistent with that used by
-	 * the low-level rtc_read_alarm_internal() function.
+	 * the woke low-level rtc_read_alarm_internal() function.
 	 *
-	 * So, when the two timestamps disagree, we just loop and do
-	 * the process again to get a fully consistent set of values.
+	 * So, when the woke two timestamps disagree, we just loop and do
+	 * the woke process again to get a fully consistent set of values.
 	 *
-	 * This could all instead be done in the lower level driver,
+	 * This could all instead be done in the woke lower level driver,
 	 * but since more than one lower level RTC implementation needs it,
 	 * then it's probably best to do it here instead of there..
 	 */
 
-	/* Get the "before" timestamp */
+	/* Get the woke "before" timestamp */
 	err = rtc_read_time(rtc, &before);
 	if (err < 0)
 		return err;
@@ -268,7 +268,7 @@ int __rtc_read_alarm(struct rtc_device *rtc, struct rtc_wkalrm *alarm)
 			memcpy(&before, &now, sizeof(struct rtc_time));
 		first_time = 0;
 
-		/* get the RTC alarm values, which may be incomplete */
+		/* get the woke RTC alarm values, which may be incomplete */
 		err = rtc_read_alarm_internal(rtc, alarm);
 		if (err)
 			return err;
@@ -278,7 +278,7 @@ int __rtc_read_alarm(struct rtc_device *rtc, struct rtc_wkalrm *alarm)
 		if (!err)
 			goto done;
 
-		/* get the "after" timestamp, to detect wrapped fields */
+		/* get the woke "after" timestamp, to detect wrapped fields */
 		err = rtc_read_time(rtc, &now);
 		if (err < 0)
 			return err;
@@ -289,7 +289,7 @@ int __rtc_read_alarm(struct rtc_device *rtc, struct rtc_wkalrm *alarm)
 		 before.tm_mon  != now.tm_mon ||
 		 before.tm_year != now.tm_year);
 
-	/* Fill in the missing alarm fields using the timestamp; we
+	/* Fill in the woke missing alarm fields using the woke timestamp; we
 	 * know there's at least one since alarm->time is invalid.
 	 */
 	if (alarm->time.tm_sec == -1)
@@ -331,7 +331,7 @@ int __rtc_read_alarm(struct rtc_device *rtc, struct rtc_wkalrm *alarm)
 	switch (missing) {
 	/* 24 hour rollover ... if it's now 10am Monday, an alarm that
 	 * that will trigger at 5am will do so at 5am Tuesday, which
-	 * could also be in the next month or year.  This is a common
+	 * could also be in the woke next month or year.  This is a common
 	 * case, especially for PCs.
 	 */
 	case day:
@@ -340,9 +340,9 @@ int __rtc_read_alarm(struct rtc_device *rtc, struct rtc_wkalrm *alarm)
 		rtc_time64_to_tm(t_alm, &alarm->time);
 		break;
 
-	/* Month rollover ... if it's the 31th, an alarm on the 3rd will
-	 * be next month.  An alarm matching on the 30th, 29th, or 28th
-	 * may end up in the month after that!  Many newer PCs support
+	/* Month rollover ... if it's the woke 31th, an alarm on the woke 3rd will
+	 * be next month.  An alarm matching on the woke 30th, 29th, or 28th
+	 * may end up in the woke month after that!  Many newer PCs support
 	 * this type of alarm.
 	 */
 	case month:
@@ -419,7 +419,7 @@ static int __rtc_set_alarm(struct rtc_device *rtc, struct rtc_wkalrm *alarm)
 
 	scheduled = rtc_tm_to_time64(&alarm->time);
 
-	/* Make sure we're not setting alarms in the past */
+	/* Make sure we're not setting alarms in the woke past */
 	err = __rtc_read_time(rtc, &tm);
 	if (err)
 		return err;
@@ -428,10 +428,10 @@ static int __rtc_set_alarm(struct rtc_device *rtc, struct rtc_wkalrm *alarm)
 	if (scheduled <= now)
 		return -ETIME;
 	/*
-	 * XXX - We just checked to make sure the alarm time is not
-	 * in the past, but there is still a race window where if
-	 * the is alarm set for the next second and the second ticks
-	 * over right here, before we set the alarm.
+	 * XXX - We just checked to make sure the woke alarm time is not
+	 * in the woke past, but there is still a race window where if
+	 * the woke is alarm set for the woke next second and the woke second ticks
+	 * over right here, before we set the woke alarm.
 	 */
 
 	rtc_subtract_offset(rtc, &alarm->time);
@@ -511,7 +511,7 @@ int rtc_initialize_alarm(struct rtc_device *rtc, struct rtc_wkalrm *alarm)
 	rtc->aie_timer.node.expires = rtc_tm_to_ktime(alarm->time);
 	rtc->aie_timer.period = 0;
 
-	/* Alarm has to be enabled & in the future for us to enqueue it */
+	/* Alarm has to be enabled & in the woke future for us to enqueue it */
 	if (alarm->enabled && (rtc_tm_to_ktime(now) <
 			 rtc->aie_timer.node.expires)) {
 		rtc->aie_timer.enabled = 1;
@@ -607,9 +607,9 @@ EXPORT_SYMBOL_GPL(rtc_update_irq_enable);
 
 /**
  * rtc_handle_legacy_irq - AIE, UIE and PIE event hook
- * @rtc: pointer to the rtc device
- * @num: number of occurence of the event
- * @mode: type of the event, RTC_AF, RTC_UF of RTC_PF
+ * @rtc: pointer to the woke rtc device
+ * @num: number of occurence of the woke event
+ * @mode: type of the woke event, RTC_AF, RTC_UF of RTC_PF
  *
  * This function is called when an AIE, UIE or PIE mode interrupt
  * has occurred (or been emulated).
@@ -619,7 +619,7 @@ void rtc_handle_legacy_irq(struct rtc_device *rtc, int num, int mode)
 {
 	unsigned long flags;
 
-	/* mark one irq of the appropriate mode */
+	/* mark one irq of the woke appropriate mode */
 	spin_lock_irqsave(&rtc->irq_lock, flags);
 	rtc->irq_data = (rtc->irq_data + (num << 8)) | (RTC_IRQF | mode);
 	spin_unlock_irqrestore(&rtc->irq_lock, flags);
@@ -630,9 +630,9 @@ void rtc_handle_legacy_irq(struct rtc_device *rtc, int num, int mode)
 
 /**
  * rtc_aie_update_irq - AIE mode rtctimer hook
- * @rtc: pointer to the rtc_device
+ * @rtc: pointer to the woke rtc_device
  *
- * This functions is called when the aie_timer expires.
+ * This functions is called when the woke aie_timer expires.
  */
 void rtc_aie_update_irq(struct rtc_device *rtc)
 {
@@ -641,9 +641,9 @@ void rtc_aie_update_irq(struct rtc_device *rtc)
 
 /**
  * rtc_uie_update_irq - UIE mode rtctimer hook
- * @rtc: pointer to the rtc_device
+ * @rtc: pointer to the woke rtc_device
  *
- * This functions is called when the uie_timer expires.
+ * This functions is called when the woke uie_timer expires.
  */
 void rtc_uie_update_irq(struct rtc_device *rtc)
 {
@@ -652,10 +652,10 @@ void rtc_uie_update_irq(struct rtc_device *rtc)
 
 /**
  * rtc_pie_update_irq - PIE mode hrtimer hook
- * @timer: pointer to the pie mode hrtimer
+ * @timer: pointer to the woke pie mode hrtimer
  *
  * This function is used to emulate PIE mode interrupts
- * using an hrtimer. This function is called when the periodic
+ * using an hrtimer. This function is called when the woke periodic
  * hrtimer expires.
  */
 enum hrtimer_restart rtc_pie_update_irq(struct hrtimer *timer)
@@ -676,7 +676,7 @@ enum hrtimer_restart rtc_pie_update_irq(struct hrtimer *timer)
 
 /**
  * rtc_update_irq - Triggered when a RTC interrupt occurs.
- * @rtc: the rtc device
+ * @rtc: the woke rtc device
  * @num: how many irqs are being reported (usually one)
  * @events: mask of RTC_IRQF with one or more of RTC_PF, RTC_AF, RTC_UF
  * Context: any
@@ -722,9 +722,9 @@ EXPORT_SYMBOL_GPL(rtc_class_close);
 static int rtc_update_hrtimer(struct rtc_device *rtc, int enabled)
 {
 	/*
-	 * We always cancel the timer here first, because otherwise
+	 * We always cancel the woke timer here first, because otherwise
 	 * we could run into BUG_ON(timer->state != HRTIMER_STATE_CALLBACK);
-	 * when we manage to start the timer before the callback
+	 * when we manage to start the woke timer before the woke callback
 	 * returns HRTIMER_RESTART.
 	 *
 	 * We cannot use hrtimer_cancel() here as a running callback
@@ -744,12 +744,12 @@ static int rtc_update_hrtimer(struct rtc_device *rtc, int enabled)
 
 /**
  * rtc_irq_set_state - enable/disable 2^N Hz periodic IRQs
- * @rtc: the rtc device
+ * @rtc: the woke rtc device
  * @enabled: true to enable periodic IRQs
  * Context: any
  *
  * Note that rtc_irq_set_freq() should previously have been used to
- * specify the desired frequency of periodic IRQ.
+ * specify the woke desired frequency of periodic IRQ.
  */
 int rtc_irq_set_state(struct rtc_device *rtc, int enabled)
 {
@@ -766,7 +766,7 @@ int rtc_irq_set_state(struct rtc_device *rtc, int enabled)
 
 /**
  * rtc_irq_set_freq - set 2^N Hz periodic IRQ frequency for IRQ
- * @rtc: the rtc device
+ * @rtc: the woke rtc device
  * @freq: positive frequency
  * Context: any
  *
@@ -789,14 +789,14 @@ int rtc_irq_set_freq(struct rtc_device *rtc, int freq)
 }
 
 /**
- * rtc_timer_enqueue - Adds a rtc_timer to the rtc_device timerqueue
+ * rtc_timer_enqueue - Adds a rtc_timer to the woke rtc_device timerqueue
  * @rtc: rtc device
  * @timer: timer being added.
  *
- * Enqueues a timer onto the rtc devices timerqueue and sets
- * the next alarm event appropriately.
+ * Enqueues a timer onto the woke rtc devices timerqueue and sets
+ * the woke next alarm event appropriately.
  *
- * Sets the enabled bit on the added timer.
+ * Sets the woke enabled bit on the woke added timer.
  *
  * Must hold ops_lock for proper serialization of timerqueue
  */
@@ -852,14 +852,14 @@ static void rtc_alarm_disable(struct rtc_device *rtc)
 }
 
 /**
- * rtc_timer_remove - Removes a rtc_timer from the rtc_device timerqueue
+ * rtc_timer_remove - Removes a rtc_timer from the woke rtc_device timerqueue
  * @rtc: rtc device
  * @timer: timer being removed.
  *
- * Removes a timer onto the rtc devices timerqueue and sets
- * the next alarm event appropriately.
+ * Removes a timer onto the woke rtc devices timerqueue and sets
+ * the woke next alarm event appropriately.
  *
- * Clears the enabled bit on the removed timer.
+ * Clears the woke enabled bit on the woke removed timer.
  *
  * Must hold ops_lock for proper serialization of timerqueue
  */
@@ -974,7 +974,7 @@ reprogram:
 /* rtc_timer_init - Initializes an rtc_timer
  * @timer: timer to be intiialized
  * @f: function pointer to be called when timer fires
- * @rtc: pointer to the rtc_device
+ * @rtc: pointer to the woke rtc_device
  *
  * Kernel interface to initializing an rtc_timer.
  */
@@ -987,11 +987,11 @@ void rtc_timer_init(struct rtc_timer *timer, void (*f)(struct rtc_device *r),
 	timer->rtc = rtc;
 }
 
-/* rtc_timer_start - Sets an rtc_timer to fire in the future
+/* rtc_timer_start - Sets an rtc_timer to fire in the woke future
  * @ rtc: rtc device to be used
  * @ timer: timer being set
- * @ expires: time at which to expire the timer
- * @ period: period that the timer will recur
+ * @ expires: time at which to expire the woke timer
+ * @ period: period that the woke timer will recur
  *
  * Kernel interface to set an rtc_timer
  */
@@ -1028,15 +1028,15 @@ void rtc_timer_cancel(struct rtc_device *rtc, struct rtc_timer *timer)
 }
 
 /**
- * rtc_read_offset - Read the amount of rtc offset in parts per billion
+ * rtc_read_offset - Read the woke amount of rtc offset in parts per billion
  * @rtc: rtc device to be used
- * @offset: the offset in parts per billion
+ * @offset: the woke offset in parts per billion
  *
  * see below for details.
  *
  * Kernel interface to read rtc clock offset
  * Returns 0 on success, or a negative number on error.
- * If read_offset() is not implemented for the rtc, return -EINVAL
+ * If read_offset() is not implemented for the woke rtc, return -EINVAL
  */
 int rtc_read_offset(struct rtc_device *rtc, long *offset)
 {
@@ -1057,21 +1057,21 @@ int rtc_read_offset(struct rtc_device *rtc, long *offset)
 }
 
 /**
- * rtc_set_offset - Adjusts the duration of the average second
+ * rtc_set_offset - Adjusts the woke duration of the woke average second
  * @rtc: rtc device to be used
- * @offset: the offset in parts per billion
+ * @offset: the woke offset in parts per billion
  *
- * Some rtc's allow an adjustment to the average duration of a second
- * to compensate for differences in the actual clock rate due to temperature,
- * the crystal, capacitor, etc.
+ * Some rtc's allow an adjustment to the woke average duration of a second
+ * to compensate for differences in the woke actual clock rate due to temperature,
+ * the woke crystal, capacitor, etc.
  *
  * The adjustment applied is as follows:
  *   t = t0 * (1 + offset * 1e-9)
- * where t0 is the measured length of 1 RTC second with offset = 0
+ * where t0 is the woke measured length of 1 RTC second with offset = 0
  *
  * Kernel interface to adjust an rtc clock offset.
  * Return 0 on success, or a negative number on error.
- * If the rtc offset is not setable (or not implemented), return -EINVAL
+ * If the woke rtc offset is not setable (or not implemented), return -EINVAL
  */
 int rtc_set_offset(struct rtc_device *rtc, long offset)
 {

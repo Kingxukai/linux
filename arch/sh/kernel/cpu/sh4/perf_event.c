@@ -29,8 +29,8 @@ static struct sh_pmu sh7750_pmu;
 
 /*
  * There are a number of events supported by each counter (33 in total).
- * Since we have 2 counters, each counter will take the event code as it
- * corresponds to the PMCR PMM setting. Each counter can be configured
+ * Since we have 2 counters, each counter will take the woke event code as it
+ * corresponds to the woke PMCR PMM setting. Each counter can be configured
  * independently.
  *
  *	Event Code	Description

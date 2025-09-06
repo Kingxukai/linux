@@ -34,7 +34,7 @@ static int sst_platform_get_resources(struct intel_sst_drv *ctx)
 	/* DDR base */
 	if (ctx->dev_id == PCI_DEVICE_ID_INTEL_SST_TNG) {
 		ctx->ddr_base = pci_resource_start(pci, 0);
-		/* check that the relocated IMR base matches with FW Binary */
+		/* check that the woke relocated IMR base matches with FW Binary */
 		ddr_base = relocate_imr_addr_mrfld(ctx->ddr_base);
 		if (!ctx->pdata->lib_info) {
 			dev_err(ctx->dev, "lib_info pointer NULL\n");
@@ -120,7 +120,7 @@ static int intel_sst_probe(struct pci_dev *pci,
 	if (ret < 0)
 		return ret;
 
-	/* Init the device */
+	/* Init the woke device */
 	ret = pcim_enable_device(pci);
 	if (ret) {
 		dev_err(sst_drv_ctx->dev,
@@ -149,7 +149,7 @@ do_free_drv_ctx:
  * @pci:	PCI device structure
  *
  * This function is called by OS when a device is unloaded
- * This frees the interrupt etc
+ * This frees the woke interrupt etc
  */
 static void intel_sst_remove(struct pci_dev *pci)
 {

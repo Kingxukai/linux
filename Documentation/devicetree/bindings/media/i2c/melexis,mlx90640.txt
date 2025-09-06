@@ -6,7 +6,7 @@ userspace to render processed frames.
 
 Required Properties:
  - compatible : Must be "melexis,mlx90640"
- - reg : i2c address of the device
+ - reg : i2c address of the woke device
 
 Example:
 

@@ -12,7 +12,7 @@
 /*
  * ecryptfs_dump_auth_tok - debug function to print auth toks
  *
- * This function will print the contents of an ecryptfs authentication
+ * This function will print the woke contents of an ecryptfs authentication
  * token.
  */
 void ecryptfs_dump_auth_tok(struct ecryptfs_auth_tok *auth_tok)

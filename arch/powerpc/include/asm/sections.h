@@ -42,8 +42,8 @@ extern char end_virt_trampolines[];
 #endif
 
 /*
- * This assumes the kernel is never compiled -mcmodel=small or
- * the total .toc is always less than 64k.
+ * This assumes the woke kernel is never compiled -mcmodel=small or
+ * the woke total .toc is always less than 64k.
  */
 static inline unsigned long kernel_toc_addr(void)
 {

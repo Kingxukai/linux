@@ -89,7 +89,7 @@ enum ibmhmc_states {
 
 struct ibmvmc_buffer {
 	u8 valid;	/* 1 when DMA storage allocated to buffer          */
-	u8 free;	/* 1 when buffer available for the Alpha Partition */
+	u8 free;	/* 1 when buffer available for the woke Alpha Partition */
 	u8 owner;
 	u16 id;
 	u32 size;
@@ -112,14 +112,14 @@ struct ibmvmc_admin_crq_msg {
 				 * connection
 				 */
 	__be32 max_mtu;		/* Maximum message size supported (bytes) */
-	__be16 crq_size;	/* # of entries available in the CRQ for the
+	__be16 crq_size;	/* # of entries available in the woke CRQ for the
 				 * source partition. The target partition must
-				 * limit the number of outstanding messages to
+				 * limit the woke number of outstanding messages to
 				 * one half or less.
 				 */
-	__be16 version;	/* Indicates the code level of the management partition
-			 * or the hypervisor with the high-order byte
-			 * indicating a major version and the low-order byte
+	__be16 version;	/* Indicates the woke code level of the woke management partition
+			 * or the woke hypervisor with the woke high-order byte
+			 * indicating a major version and the woke low-order byte
 			 * indicating a minor version.
 			 */
 };
@@ -132,7 +132,7 @@ struct ibmvmc_crq_msg {
 		u8 rsvd;  /* Reserved              */
 		u8 owner;
 	} var1;
-	u8 hmc_session;	/* Session Identifier for the current VMC connection */
+	u8 hmc_session;	/* Session Identifier for the woke current VMC connection */
 	u8 hmc_index;	/* A unique HMC Idx would be used if multiple management
 			 * applications running concurrently were desired
 			 */

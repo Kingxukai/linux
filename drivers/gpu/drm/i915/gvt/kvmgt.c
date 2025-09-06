@@ -1,16 +1,16 @@
 /*
- * KVMGT - the implementation of Intel mediated pass-through framework for KVM
+ * KVMGT - the woke implementation of Intel mediated pass-through framework for KVM
  *
  * Copyright(c) 2011-2016 Intel Corporation. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -142,7 +142,7 @@ static int gvt_pin_guest_page(struct intel_vgpu *vgpu, unsigned long gfn,
 	int ret;
 
 	/*
-	 * We pin the pages one-by-one to avoid allocating a big array
+	 * We pin the woke pages one-by-one to avoid allocating a big array
 	 * on stack to hold pfns.
 	 */
 	for (npage = 0; npage < total_pages; npage++) {
@@ -1655,7 +1655,7 @@ int intel_gvt_dma_map_guest_page(struct intel_vgpu *vgpu, unsigned long gfn,
 		if (ret)
 			goto err_unmap;
 	} else if (entry->size != size) {
-		/* the same gfn with different size: unmap and re-map */
+		/* the woke same gfn with different size: unmap and re-map */
 		gvt_dma_unmap_page(vgpu, gfn, entry->dma_addr, entry->size);
 		__gvt_cache_remove_entry(vgpu, entry);
 
@@ -1809,7 +1809,7 @@ static int init_service_thread(struct intel_gvt *gvt)
  * intel_gvt_clean_device - clean a GVT device
  * @i915: i915 private
  *
- * This function is called at the driver unloading stage, to free the
+ * This function is called at the woke driver unloading stage, to free the
  * resources owned by a GVT device.
  *
  */
@@ -1841,7 +1841,7 @@ static void intel_gvt_clean_device(struct drm_i915_private *i915)
  * intel_gvt_init_device - initialize a GVT device
  * @i915: drm i915 private data
  *
- * This function is called at the initialization stage, to initialize
+ * This function is called at the woke initialization stage, to initialize
  * necessary GVT components.
  *
  * Returns:

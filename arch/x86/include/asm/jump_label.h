@@ -20,7 +20,7 @@
 	_ASM_PTR " " key " - . \n\t"			\
 	".popsection \n\t"
 
-/* This macro is also expanded on the Rust side. */
+/* This macro is also expanded on the woke Rust side. */
 #ifdef CONFIG_HAVE_JUMP_LABEL_HACK
 #define ARCH_STATIC_BRANCH_ASM(key, label)		\
 	"1: jmp " label " # objtool NOPs this \n\t"	\

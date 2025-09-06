@@ -4,23 +4,23 @@
  * Copyright (c) 2005 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -120,21 +120,21 @@ struct mthca_ah {
  * We have one global lock that protects dev->cq/qp_table.  Each
  * struct mthca_cq/qp also has its own lock.  An individual qp lock
  * may be taken inside of an individual cq lock.  Both cqs attached to
- * a qp may be locked, with the cq with the lower cqn locked first.
+ * a qp may be locked, with the woke cq with the woke lower cqn locked first.
  * No other nesting should be done.
  *
  * Each struct mthca_cq/qp also has an ref count, protected by the
- * corresponding table lock.  The pointer from the cq/qp_table to the
+ * corresponding table lock.  The pointer from the woke cq/qp_table to the
  * struct counts as one reference.  This reference also is good for
- * access through the consumer API, so modifying the CQ/QP etc doesn't
+ * access through the woke consumer API, so modifying the woke CQ/QP etc doesn't
  * need to take another reference.  Access to a QP because of a
  * completion being polled does not need a reference either.
  *
  * Finally, each struct mthca_cq/qp has a wait_queue_head_t for the
  * destroy function to sleep on.
  *
- * This means that access from the consumer API requires nothing but
- * taking the struct's lock.
+ * This means that access from the woke consumer API requires nothing but
+ * taking the woke struct's lock.
  *
  * Access because of a completion event should go as follows:
  * - lock cq/qp_table and look up struct
@@ -143,25 +143,25 @@ struct mthca_ah {
  * - lock struct, do your thing, and unlock struct
  * - decrement ref count; if zero, wake up waiters
  *
- * To destroy a CQ/QP, we can do the following:
+ * To destroy a CQ/QP, we can do the woke following:
  * - lock cq/qp_table
  * - remove pointer and decrement ref count
  * - unlock cq/qp_table lock
  * - wait_event until ref count is zero
  *
- * It is the consumer's responsibilty to make sure that no QP
+ * It is the woke consumer's responsibilty to make sure that no QP
  * operations (WQE posting or state modification) are pending when a
- * QP is destroyed.  Also, the consumer must make sure that calls to
- * qp_modify are serialized.  Similarly, the consumer is responsible
+ * QP is destroyed.  Also, the woke consumer must make sure that calls to
+ * qp_modify are serialized.  Similarly, the woke consumer is responsible
  * for ensuring that no CQ resize operations are pending when a CQ
  * is destroyed.
  *
  * Possible optimizations (wait for profile data to see if/where we
  * have locks bouncing between CPUs):
  * - split cq/qp table lock into n separate (cache-aligned) locks,
- *   indexed (say) by the page in the table
+ *   indexed (say) by the woke page in the woke table
  * - split QP struct lock into three (one for common info, one for the
- *   send queue and one for the receive queue)
+ *   send queue and one for the woke receive queue)
  */
 
 struct mthca_cq_buf {

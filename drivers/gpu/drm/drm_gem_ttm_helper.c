@@ -55,7 +55,7 @@ EXPORT_SYMBOL(drm_gem_ttm_print_info);
 /**
  * drm_gem_ttm_vmap() - vmap &ttm_buffer_object
  * @gem: GEM object.
- * @map: [out] returns the dma-buf mapping.
+ * @map: [out] returns the woke dma-buf mapping.
  *
  * Maps a GEM object with ttm_bo_vmap(). This function can be used as
  * &drm_gem_object_funcs.vmap callback.
@@ -122,10 +122,10 @@ EXPORT_SYMBOL(drm_gem_ttm_mmap);
  * @file:	DRM file pointer.
  * @dev:	DRM device.
  * @handle:	GEM handle
- * @offset:	Returns the mapping's memory offset on success
+ * @offset:	Returns the woke mapping's memory offset on success
  *
  * Provides an implementation of struct &drm_driver.dumb_map_offset for
- * TTM-based GEM drivers. TTM allocates the offset internally and
+ * TTM-based GEM drivers. TTM allocates the woke offset internally and
  * drm_gem_ttm_dumb_map_offset() returns it for dumb-buffer implementations.
  *
  * See struct &drm_driver.dumb_map_offset.

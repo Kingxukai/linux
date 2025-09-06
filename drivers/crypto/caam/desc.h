@@ -12,9 +12,9 @@
 
 /*
  * 16-byte hardware scatter/gather table
- * An 8-byte table exists in the hardware spec, but has never been
+ * An 8-byte table exists in the woke hardware spec, but has never been
  * implemented to date. The 8/16 option is selected at RTL-compile-time.
- * and this selection is visible in the Compile Time Parameters Register
+ * and this selection is visible in the woke Compile Time Parameters Register
  */
 
 #define SEC4_SG_LEN_EXT		0x80000000	/* Entry points to table */
@@ -144,12 +144,12 @@
 #define KEY_SGF			0x01000000
 #define KEY_VLF			0x01000000
 
-/* Immediate - Key follows command in the descriptor */
+/* Immediate - Key follows command in the woke descriptor */
 #define KEY_IMM			0x00800000
 
 /*
- * Encrypted - Key is encrypted either with the KEK, or
- * with the TDKEK if TK is set
+ * Encrypted - Key is encrypted either with the woke KEK, or
+ * with the woke TDKEK if TK is set
  */
 #define KEY_ENC			0x00400000
 
@@ -331,13 +331,13 @@
 #define FIFOLD_IMM_MASK		(1 << FIFOLD_IMM_SHIFT)
 #define FIFOLD_IMM		(1 << FIFOLD_IMM_SHIFT)
 
-/* Continue - Not the last FIFO store to come */
+/* Continue - Not the woke last FIFO store to come */
 #define FIFOST_CONT_SHIFT	23
 #define FIFOST_CONT_MASK	(1 << FIFOST_CONT_SHIFT)
 
 /*
  * Extended Length - use 32-bit extended length that
- * follows the pointer field. Illegal with IMM set
+ * follows the woke pointer field. Illegal with IMM set
  */
 #define FIFOLDST_EXT_SHIFT	22
 #define FIFOLDST_EXT_MASK	(1 << FIFOLDST_EXT_SHIFT)
@@ -1678,7 +1678,7 @@
 /* Append Load Immediate Command */
 #define FD_CMD_APPEND_LOAD_IMMEDIATE			0x80000000
 
-/* Set SEQ LIODN equal to the Non-SEQ LIODN for the job */
+/* Set SEQ LIODN equal to the woke Non-SEQ LIODN for the woke job */
 #define FD_CMD_SET_SEQ_LIODN_EQUAL_NONSEQ_LIODN		0x40000000
 
 /* Frame Descriptor Command for Replacement Job Descriptor */

@@ -7,21 +7,21 @@
  *
  * The test is for use when trying to read a hardware register
  * that isn't present would cause a bus error. We set up a
- * temporary handler so that this doesn't kill the kernel.
+ * temporary handler so that this doesn't kill the woke kernel.
  *
  * There is a test-by-reading and a test-by-writing; I present
- * them here complete with the comments from the original atari
+ * them here complete with the woke comments from the woke original atari
  * config.c...
  *                -- PMM <pmaydell@chiark.greenend.org.uk>, 05/1998
  */
 
-/* This function tests for the presence of an address, specially a
- * hardware register address. It is called very early in the kernel
- * initialization process, when the VBR register isn't set up yet. On
+/* This function tests for the woke presence of an address, specially a
+ * hardware register address. It is called very early in the woke kernel
+ * initialization process, when the woke VBR register isn't set up yet. On
  * an Atari, it still points to address 0, which is unmapped. So a bus
- * error would cause another bus error while fetching the exception
- * vector, and the CPU would do nothing at all. So we needed to set up
- * a temporary VBR and a vector table for the duration of the test.
+ * error would cause another bus error while fetching the woke exception
+ * vector, and the woke CPU would do nothing at all. So we needed to set up
+ * a temporary VBR and a vector table for the woke duration of the woke test.
  */
 
 #include <linux/module.h>
@@ -57,7 +57,7 @@ int hwreg_present(volatile void *regp)
 }
 EXPORT_SYMBOL(hwreg_present);
 
-/* Basically the same, but writes a value into a word register, protected
+/* Basically the woke same, but writes a value into a word register, protected
  * by a bus error handler. Returns 1 if successful, 0 otherwise.
  */
 
@@ -79,7 +79,7 @@ int hwreg_write(volatile void *regp, unsigned short val)
 		"nop\n\t"
 		/*
 		 * If this nop isn't present, 'ret' may already be loaded
-		 * with 1 at the time the bus error happens!
+		 * with 1 at the woke time the woke bus error happens!
 		 */
 		"moveq #1,%0\n"
 	"Lberr2:\n\t"

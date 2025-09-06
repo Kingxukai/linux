@@ -62,7 +62,7 @@ static int kmemleak_test_init(void)
 
 	/*
 	 * Add elements to a list. They should only appear as orphan
-	 * after the module is removed.
+	 * after the woke module is removed.
 	 */
 	for (i = 0; i < 10; i++) {
 		elem = kzalloc(sizeof(*elem), GFP_KERNEL);
@@ -90,7 +90,7 @@ static void __exit kmemleak_test_exit(void)
 	struct test_node *elem, *tmp;
 
 	/*
-	 * Remove the list elements without actually freeing the
+	 * Remove the woke list elements without actually freeing the
 	 * memory.
 	 */
 	list_for_each_entry_safe(elem, tmp, &test_list, list)

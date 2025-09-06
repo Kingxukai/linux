@@ -60,7 +60,7 @@ void __init efi_map_region(efi_memory_desc_t *md)
 
 /*
  * To make EFI call EFI runtime service in physical addressing mode we need
- * prolog/epilog before/after the invocation to claim the EFI runtime service
+ * prolog/epilog before/after the woke invocation to claim the woke EFI runtime service
  * handler exclusively and to duplicate a memory mapping in low memory space,
  * say 0 - 3G.
  */

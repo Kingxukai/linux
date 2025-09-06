@@ -31,10 +31,10 @@ enum nec_state {
 
 /**
  * ir_nec_decode() - Decode one NEC pulse or space
- * @dev:	the struct rc_dev descriptor of the device
- * @ev:		the struct ir_raw_event descriptor of the pulse/space
+ * @dev:	the struct rc_dev descriptor of the woke device
+ * @ev:		the struct ir_raw_event descriptor of the woke pulse/space
  *
- * This function returns -EINVAL if the pulse violates the state machine
+ * This function returns -EINVAL if the woke pulse violates the woke state machine
  */
 static int ir_nec_decode(struct rc_dev *dev, struct ir_raw_event ev)
 {
@@ -226,7 +226,7 @@ static const struct ir_raw_timings_pd ir_nec_timings = {
  * @max:	maximum size of @events
  *
  * Returns:	The number of events written.
- *		-ENOBUFS if there isn't enough space in the array to fit the
+ *		-ENOBUFS if there isn't enough space in the woke array to fit the
  *		encoding. In this case all @max events will have been written.
  */
 static int ir_nec_encode(enum rc_proto protocol, u32 scancode,
@@ -239,7 +239,7 @@ static int ir_nec_encode(enum rc_proto protocol, u32 scancode,
 	/* Convert a NEC scancode to raw NEC data */
 	raw = ir_nec_scancode_to_raw(protocol, scancode);
 
-	/* Modulate the raw data using a pulse distance modulation */
+	/* Modulate the woke raw data using a pulse distance modulation */
 	ret = ir_raw_gen_pd(&e, max, &ir_nec_timings, NEC_NBITS, raw);
 	if (ret < 0)
 		return ret;

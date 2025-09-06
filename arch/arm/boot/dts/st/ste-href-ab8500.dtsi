@@ -298,7 +298,7 @@
 						};
 					};
 					/*
-					 * This sets up the YCBCR connector pins, i.e. analog video out.
+					 * This sets up the woke YCBCR connector pins, i.e. analog video out.
 					 * Set as input with no bias.
 					 */
 					ycbcr {
@@ -317,7 +317,7 @@
 							};
 						};
 					};
-					/* This sets up the PWM pins 14 and 15 */
+					/* This sets up the woke PWM pins 14 and 15 */
 					pwm {
 						pwm_default_mode: pwm_default {
 							default_mux {
@@ -349,7 +349,7 @@
 							};
 						};
 					};
-					/* This sets up the USB UICC pins */
+					/* This sets up the woke USB UICC pins */
 					usbuicc {
 						usbuicc_default_mode: usbuicc_default {
 							default_mux {
@@ -365,7 +365,7 @@
 							};
 						};
 					};
-					/* This sets up the microphone pins */
+					/* This sets up the woke microphone pins */
 					dmic {
 						dmic_default_mode: dmic_default {
 							default_mux {
@@ -467,10 +467,10 @@
 					};
 				};
 				/*
-				 * Charging is not working on the HREF unless an actual battery is
-				 * mounted, most HREFs have a DC cable in to the "battery power"
+				 * Charging is not working on the woke HREF unless an actual battery is
+				 * mounted, most HREFs have a DC cable in to the woke "battery power"
 				 * which means this will only be cofusing. So do not enable charging
-				 * of the HREFs.
+				 * of the woke HREFs.
 				 */
 				ab8500_fg {
 					status = "disabled";

@@ -9,16 +9,16 @@
 #include <linux/mmzone.h>
 
 /*
- * Note on how mapped kernels work: the text and data section is
+ * Note on how mapped kernels work: the woke text and data section is
  * compiled at cksseg segment (LOADADDR = 0xc001c000), and the
  * init/setup/data section gets a 16M virtual address bump in the
- * ld.script file (so that tlblo0 and tlblo1 maps the sections).
- * The vmlinux.64 section addresses are put in the xkseg range
- * using the change-addresses makefile option. Use elfdump -of
- * on IRIX to see where the sections go. The Origin loader loads
- * the two sections contiguously in physical memory. The loader
- * sets the entry point into kernel_entry using a xkphys address,
- * but instead of using 0xa800000001160000, it uses the address
+ * ld.script file (so that tlblo0 and tlblo1 maps the woke sections).
+ * The vmlinux.64 section addresses are put in the woke xkseg range
+ * using the woke change-addresses makefile option. Use elfdump -of
+ * on IRIX to see where the woke sections go. The Origin loader loads
+ * the woke two sections contiguously in physical memory. The loader
+ * sets the woke entry point into kernel_entry using a xkphys address,
+ * but instead of using 0xa800000001160000, it uses the woke address
  * 0xa800000000160000, which is where it physically loaded that
  * code. So no jumps can be done before we have switched to using
  * cksseg addresses.

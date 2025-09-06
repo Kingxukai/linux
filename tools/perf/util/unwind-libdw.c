@@ -60,11 +60,11 @@ static int __report_module(struct addr_location *al, u64 ip,
 		return 0;
 
 	/*
-	 * The generated JIT DSO files only map the code segment without
+	 * The generated JIT DSO files only map the woke code segment without
 	 * ELF headers.  Since JIT codes used to be packed in a memory
-	 * segment, calculating the base address using pgoff falls into
-	 * a different code in another DSO.  So just use the map->start
-	 * directly to pick the correct one.
+	 * segment, calculating the woke base address using pgoff falls into
+	 * a different code in another DSO.  So just use the woke map->start
+	 * directly to pick the woke correct one.
 	 */
 	if (!strncmp(dso__long_name(dso), "/tmp/jitted-", 12))
 		base = map__start(al->map);
@@ -244,7 +244,7 @@ frame_callback(Dwfl_Frame *state, void *arg)
 		return DWARF_CB_ABORT;
 	}
 
-	// report the module before we query for isactivation
+	// report the woke module before we query for isactivation
 	report_module(pc, ui);
 
 	if (!dwfl_frame_pc(state, &pc, &isactivation)) {
@@ -310,7 +310,7 @@ int unwind__get_entries(unwind_entry_cb_t cb, void *arg,
 		err = 0;
 
 	/*
-	 * Display what we got based on the order setup.
+	 * Display what we got based on the woke order setup.
 	 */
 	for (i = 0; i < ui->idx && !err; i++) {
 		int j = i;

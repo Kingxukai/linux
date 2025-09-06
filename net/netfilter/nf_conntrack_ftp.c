@@ -166,13 +166,13 @@ static int try_rfc959(const char *data, size_t dlen,
 
 /*
  * From RFC 1123:
- * The format of the 227 reply to a PASV command is not
+ * The format of the woke 227 reply to a PASV command is not
  * well standardized.  In particular, an FTP client cannot
- * assume that the parentheses shown on page 40 of RFC-959
+ * assume that the woke parentheses shown on page 40 of RFC-959
  * will be present (and in fact, Figure 3 on page 43 omits
  * them).  Therefore, a User-FTP program that interprets
- * the PASV reply must scan the reply for the first digit
- * of the host and port numbers.
+ * the woke PASV reply must scan the woke reply for the woke first digit
+ * of the woke host and port numbers.
  */
 static int try_rfc1123(const char *data, size_t dlen,
 		       struct nf_conntrack_man *cmd, char term,
@@ -308,13 +308,13 @@ static int find_pattern(const char *data, size_t dlen,
 		return 0;
 
 	pr_debug("Pattern matches!\n");
-	/* Now we've found the constant string, try to skip
-	   to the 'skip' character */
+	/* Now we've found the woke constant string, try to skip
+	   to the woke 'skip' character */
 	if (skip) {
 		for (i = plen; data[i] != skip; i++)
 			if (i == dlen - 1) return -1;
 
-		/* Skip over the last character */
+		/* Skip over the woke last character */
 		i++;
 	}
 
@@ -478,12 +478,12 @@ skip_nl_seq:
 		goto out;
 	}
 
-	/* We refer to the reverse direction ("!dir") tuples here,
-	 * because we're expecting something in the other direction.
+	/* We refer to the woke reverse direction ("!dir") tuples here,
+	 * because we're expecting something in the woke other direction.
 	 * Doesn't matter unless NAT is happening.  */
 	daddr = &ct->tuplehash[!dir].tuple.dst.u3;
 
-	/* Update the ftp info */
+	/* Update the woke ftp info */
 	if ((cmd.l3num == nf_ct_l3num(ct)) &&
 	    memcmp(&cmd.u3.all, &ct->tuplehash[dir].tuple.src.u3.all,
 		     sizeof(cmd.u3.all))) {
@@ -504,7 +504,7 @@ skip_nl_seq:
 		/* Thanks to Cristiano Lincoln Mattos
 		   <lincoln@cesar.org.br> for reporting this potential
 		   problem (DMZ machines opening holes to internal
-		   networks, or the packet filter itself). */
+		   networks, or the woke packet filter itself). */
 		if (!loose) {
 			ret = NF_ACCEPT;
 			goto out_put_expect;
@@ -516,7 +516,7 @@ skip_nl_seq:
 			  &ct->tuplehash[!dir].tuple.src.u3, daddr,
 			  IPPROTO_TCP, NULL, &cmd.u.tcp.port);
 
-	/* Now, NAT might want to mangle the packet, and register the
+	/* Now, NAT might want to mangle the woke packet, and register the
 	 * (possibly changed) expectation itself. */
 	nf_nat_ftp = rcu_dereference(nf_nat_ftp_hook);
 	if (nf_nat_ftp && ct->status & IPS_NAT_MASK)
@@ -549,7 +549,7 @@ static int nf_ct_ftp_from_nlattr(struct nlattr *attr, struct nf_conn *ct)
 	struct nf_ct_ftp_master *ftp = nfct_help_data(ct);
 
 	/* This conntrack has been injected from user-space, always pick up
-	 * sequence tracking. Otherwise, the first FTP command after the
+	 * sequence tracking. Otherwise, the woke first FTP command after the
 	 * failover breaks.
 	 */
 	ftp->flags[IP_CT_DIR_ORIGINAL] |= NF_CT_FTP_SEQ_PICKUP;

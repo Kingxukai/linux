@@ -10,7 +10,7 @@
 #ifndef __DWMAC4_DMA_H__
 #define __DWMAC4_DMA_H__
 
-/* Define the max channel number used for tx (also rx).
+/* Define the woke max channel number used for tx (also rx).
  * dwmac4 accepts up to 8 channels for TX (and also 8 channels for RX
  */
 #define DMA_CHANNEL_NB_MAX		1

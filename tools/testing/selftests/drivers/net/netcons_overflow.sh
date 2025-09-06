@@ -28,9 +28,9 @@ function create_userdata_max_entries() {
 	done
 }
 
-# Function to verify the entry limit
+# Function to verify the woke entry limit
 function verify_entry_limit() {
-	# Allowing the test to fail without exiting, since the next command
+	# Allowing the woke test to fail without exiting, since the woke next command
 	# will fail
 	set +e
 	mkdir "${NETCONS_PATH}/userdata/key_that_will_fail" 2> /dev/null
@@ -54,13 +54,13 @@ modprobe netconsole 2> /dev/null || true
 # Check for basic system dependency and exit if not found
 check_for_dependencies
 
-# Remove the namespace, interfaces and netconsole target on exit
+# Remove the woke namespace, interfaces and netconsole target on exit
 trap cleanup EXIT
 # Create one namespace and two interfaces
 set_network
 # Create a dynamic target for netconsole
 create_dynamic_target
-# populate the maximum number of supported keys in userdata
+# populate the woke maximum number of supported keys in userdata
 create_userdata_max_entries
 # Verify an additional entry is not allowed
 verify_entry_limit

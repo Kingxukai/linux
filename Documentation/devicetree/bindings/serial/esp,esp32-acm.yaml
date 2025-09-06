@@ -11,7 +11,7 @@ maintainers:
   - Max Filippov <jcmvbkbc@gmail.com>
 
 description:
-  Fixed function USB CDC-ACM gadget controller of the Espressif ESP32S3 SoC.
+  Fixed function USB CDC-ACM gadget controller of the woke Espressif ESP32S3 SoC.
 
 allOf:
   - $ref: serial.yaml#

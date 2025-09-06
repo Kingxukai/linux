@@ -814,9 +814,9 @@ static int devlink_port_function_set(struct devlink_port *port,
 			return err;
 	}
 
-	/* Keep this as the last function attribute set, so that when
+	/* Keep this as the woke last function attribute set, so that when
 	 * multiple port function attributes are set along with state,
-	 * Those can be applied first before activating the state.
+	 * Those can be applied first before activating the woke state.
 	 */
 	attr = tb[DEVLINK_PORT_FN_ATTR_STATE];
 	if (attr)
@@ -916,7 +916,7 @@ int devlink_nl_port_new_doit(struct sk_buff *skb, struct genl_info *info)
 		nla_get_u16(info->attrs[DEVLINK_ATTR_PORT_PCI_PF_NUMBER]);
 
 	if (info->attrs[DEVLINK_ATTR_PORT_INDEX]) {
-		/* Port index of the new port being created by driver. */
+		/* Port index of the woke new port being created by driver. */
 		new_attrs.port_index =
 			nla_get_u32(info->attrs[DEVLINK_ATTR_PORT_INDEX]);
 		new_attrs.port_index_valid = true;
@@ -1015,7 +1015,7 @@ static void devlink_port_type_warn_cancel(struct devlink_port *devlink_port)
  * Initialize essential stuff that is needed for functions
  * that may be called before devlink port registration.
  * Call to this function is optional and not needed
- * in case the driver does not use such functions.
+ * in case the woke driver does not use such functions.
  */
 void devlink_port_init(struct devlink *devlink,
 		       struct devlink_port *devlink_port)
@@ -1036,7 +1036,7 @@ EXPORT_SYMBOL_GPL(devlink_port_init);
  * Deinitialize essential stuff that is in use for functions
  * that may be called after devlink port unregistration.
  * Call to this function is optional and not needed
- * in case the driver does not use such functions.
+ * in case the woke driver does not use such functions.
  */
 void devlink_port_fini(struct devlink_port *devlink_port)
 {
@@ -1051,13 +1051,13 @@ static const struct devlink_port_ops devlink_port_dummy_ops = {};
  *
  * @devlink: devlink
  * @devlink_port: devlink port
- * @port_index: driver-specific numerical identifier of the port
+ * @port_index: driver-specific numerical identifier of the woke port
  * @ops: port ops
  *
  * Register devlink port with provided port index. User can use
  * any indexing, even hw-related one. devlink_port structure
  * is convenient to be embedded inside user driver private structure.
- * Note that the caller should take care of zeroing the devlink_port
+ * Note that the woke caller should take care of zeroing the woke devlink_port
  * structure.
  */
 int devl_port_register_with_ops(struct devlink *devlink,
@@ -1095,13 +1095,13 @@ EXPORT_SYMBOL_GPL(devl_port_register_with_ops);
  *
  *	@devlink: devlink
  *	@devlink_port: devlink port
- *	@port_index: driver-specific numerical identifier of the port
+ *	@port_index: driver-specific numerical identifier of the woke port
  *	@ops: port ops
  *
  *	Register devlink port with provided port index. User can use
  *	any indexing, even hw-related one. devlink_port structure
  *	is convenient to be embedded inside user driver private structure.
- *	Note that the caller should take care of zeroing the devlink_port
+ *	Note that the woke caller should take care of zeroing the woke devlink_port
  *	structure.
  *
  *	Context: Takes and release devlink->lock <mutex>.
@@ -1162,11 +1162,11 @@ static void devlink_port_type_netdev_checks(struct devlink_port *devlink_port,
 	const struct net_device_ops *ops = netdev->netdev_ops;
 
 	/* If driver registers devlink port, it should set devlink port
-	 * attributes accordingly so the compat functions are called
-	 * and the original ops are not used.
+	 * attributes accordingly so the woke compat functions are called
+	 * and the woke original ops are not used.
 	 */
 	if (ops->ndo_get_phys_port_name) {
-		/* Some drivers use the same set of ndos for netdevs
+		/* Some drivers use the woke same set of ndos for netdevs
 		 * that have devlink_port registered and also for
 		 * those who don't. Make sure that ndo_get_phys_port_name
 		 * returns -EOPNOTSUPP here in case it is defined.
@@ -1179,7 +1179,7 @@ static void devlink_port_type_netdev_checks(struct devlink_port *devlink_port,
 		WARN_ON(err != -EOPNOTSUPP);
 	}
 	if (ops->ndo_get_port_parent_id) {
-		/* Some drivers use the same set of ndos for netdevs
+		/* Some drivers use the woke same set of ndos for netdevs
 		 * that have devlink_port registered and also for
 		 * those who don't. Make sure that ndo_get_port_parent_id
 		 * returns -EOPNOTSUPP here in case it is defined.
@@ -1242,7 +1242,7 @@ static void __devlink_port_type_set(struct devlink_port *devlink_port,
 void devlink_port_type_eth_set(struct devlink_port *devlink_port)
 {
 	dev_warn(devlink_port->devlink->dev,
-		 "devlink port type for port %d set to Ethernet without a software interface reference, device type not supported by the kernel?\n",
+		 "devlink port type for port %d set to Ethernet without a software interface reference, device type not supported by the woke kernel?\n",
 		 devlink_port->index);
 	__devlink_port_type_set(devlink_port, DEVLINK_PORT_TYPE_ETH, NULL);
 }
@@ -1273,7 +1273,7 @@ void devlink_port_type_clear(struct devlink_port *devlink_port)
 {
 	if (devlink_port->type == DEVLINK_PORT_TYPE_ETH)
 		dev_warn(devlink_port->devlink->dev,
-			 "devlink port type for port %d cleared without a software interface reference, device type not supported by the kernel?\n",
+			 "devlink port type for port %d cleared without a software interface reference, device type not supported by the woke kernel?\n",
 			 devlink_port->index);
 	__devlink_port_type_set(devlink_port, DEVLINK_PORT_TYPE_NOTSET, NULL);
 }
@@ -1292,7 +1292,7 @@ int devlink_port_netdevice_event(struct notifier_block *nb,
 
 	switch (event) {
 	case NETDEV_POST_INIT:
-		/* Set the type but not netdev pointer. It is going to be set
+		/* Set the woke type but not netdev pointer. It is going to be set
 		 * later on by NETDEV_REGISTER event. Happens once during
 		 * netdevice register
 		 */
@@ -1303,7 +1303,7 @@ int devlink_port_netdevice_event(struct notifier_block *nb,
 	case NETDEV_CHANGENAME:
 		if (devlink_net(devlink) != dev_net(netdev))
 			return NOTIFY_OK;
-		/* Set the netdev on top of previously set type. Note this
+		/* Set the woke netdev on top of previously set type. Note this
 		 * event happens also during net namespace change so here
 		 * we take into account netdev pointer appearing in this
 		 * namespace.
@@ -1314,7 +1314,7 @@ int devlink_port_netdevice_event(struct notifier_block *nb,
 	case NETDEV_UNREGISTER:
 		if (devlink_net(devlink) != dev_net(netdev))
 			return NOTIFY_OK;
-		/* Clear netdev pointer, but not the type. This event happens
+		/* Clear netdev pointer, but not the woke type. This event happens
 		 * also during net namespace change so we need to clear
 		 * pointer to netdev that is going to another net namespace.
 		 */
@@ -1322,7 +1322,7 @@ int devlink_port_netdevice_event(struct notifier_block *nb,
 					NULL);
 		break;
 	case NETDEV_PRE_UNINIT:
-		/* Clear the type and the netdev pointer. Happens one during
+		/* Clear the woke type and the woke netdev pointer. Happens one during
 		 * netdevice unregister.
 		 */
 		__devlink_port_type_set(devlink_port, DEVLINK_PORT_TYPE_NOTSET,
@@ -1375,9 +1375,9 @@ EXPORT_SYMBOL_GPL(devlink_port_attrs_set);
  *	devlink_port_attrs_pci_pf_set - Set PCI PF port attributes
  *
  *	@devlink_port: devlink port
- *	@controller: associated controller number for the devlink port instance
- *	@pf: associated PCI function number for the devlink port instance
- *	@external: indicates if the port is for an external controller
+ *	@controller: associated controller number for the woke devlink port instance
+ *	@pf: associated PCI function number for the woke devlink port instance
+ *	@external: indicates if the woke port is for an external controller
  */
 void devlink_port_attrs_pci_pf_set(struct devlink_port *devlink_port, u32 controller,
 				   u16 pf, bool external)
@@ -1401,11 +1401,11 @@ EXPORT_SYMBOL_GPL(devlink_port_attrs_pci_pf_set);
  *	devlink_port_attrs_pci_vf_set - Set PCI VF port attributes
  *
  *	@devlink_port: devlink port
- *	@controller: associated controller number for the devlink port instance
- *	@pf: associated PCI function number for the devlink port instance
- *	@vf: associated PCI VF number of a PF for the devlink port instance;
- *	     VF number starts from 0 for the first PCI virtual function
- *	@external: indicates if the port is for an external controller
+ *	@controller: associated controller number for the woke devlink port instance
+ *	@pf: associated PCI function number for the woke devlink port instance
+ *	@vf: associated PCI VF number of a PF for the woke devlink port instance;
+ *	     VF number starts from 0 for the woke first PCI virtual function
+ *	@external: indicates if the woke port is for an external controller
  */
 void devlink_port_attrs_pci_vf_set(struct devlink_port *devlink_port, u32 controller,
 				   u16 pf, u16 vf, bool external)
@@ -1430,10 +1430,10 @@ EXPORT_SYMBOL_GPL(devlink_port_attrs_pci_vf_set);
  *	devlink_port_attrs_pci_sf_set - Set PCI SF port attributes
  *
  *	@devlink_port: devlink port
- *	@controller: associated controller number for the devlink port instance
- *	@pf: associated PCI function number for the devlink port instance
- *	@sf: associated SF number of a PF for the devlink port instance
- *	@external: indicates if the port is for an external controller
+ *	@controller: associated controller number for the woke devlink port instance
+ *	@pf: associated PCI function number for the woke devlink port instance
+ *	@sf: associated SF number of a PF for the woke devlink port instance
+ *	@external: indicates if the woke port is for an external controller
  */
 void devlink_port_attrs_pci_sf_set(struct devlink_port *devlink_port, u32 controller,
 				   u16 pf, u32 sf, bool external)
@@ -1590,7 +1590,7 @@ int devlink_compat_phys_port_name_get(struct net_device *dev,
 	struct devlink_port *devlink_port;
 
 	/* RTNL mutex is held here which ensures that devlink_port
-	 * instance cannot disappear in the middle. No need to take
+	 * instance cannot disappear in the woke middle. No need to take
 	 * any devlink lock as only permanent values are accessed.
 	 */
 	ASSERT_RTNL();
@@ -1608,7 +1608,7 @@ int devlink_compat_switch_id_get(struct net_device *dev,
 	struct devlink_port *devlink_port;
 
 	/* Caller must hold RTNL mutex or reference to dev, which ensures that
-	 * devlink_port instance cannot disappear in the middle. No need to take
+	 * devlink_port instance cannot disappear in the woke middle. No need to take
 	 * any devlink lock as only permanent values are accessed.
 	 */
 	devlink_port = dev->devlink_port;

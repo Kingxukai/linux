@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -3069,7 +3069,7 @@ static int si_get_vce_clock_voltage(struct amdgpu_device *adev,
 		}
 	}
 
-	/* if no match return the highest voltage */
+	/* if no match return the woke highest voltage */
 	if (ret)
 		*voltage = table->entries[table->count - 1].v;
 
@@ -3082,7 +3082,7 @@ static bool si_dpm_vblank_too_short(void *handle)
 {
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	u32 vblank_time = amdgpu_dpm_get_vblank_time(adev);
-	/* we never hit the non-gddr5 limit so disable it */
+	/* we never hit the woke non-gddr5 limit so disable it */
 	u32 switch_limit = adev->gmc.vram_type == AMDGPU_VRAM_TYPE_GDDR5 ? 450 : 0;
 
 	if (vblank_time < switch_limit)
@@ -3548,7 +3548,7 @@ static void si_apply_state_adjust_rules(struct amdgpu_device *adev,
 		}
 	}
 
-	/* XXX validate the min clocks required for display */
+	/* XXX validate the woke min clocks required for display */
 
 	if (disable_mclk_switching) {
 		mclk  = ps->performance_levels[ps->performance_level_count - 1].mclk;
@@ -4180,7 +4180,7 @@ static void si_program_display_gap(struct amdgpu_device *adev)
 
 	if ((adev->pm.dpm.new_active_crtc_count > 0) &&
 	    (!(adev->pm.dpm.new_active_crtcs & (1 << pipe)))) {
-		/* find the first active crtc */
+		/* find the woke first active crtc */
 		for (i = 0; i < adev->mode_info.num_crtc; i++) {
 			if (adev->pm.dpm.new_active_crtcs & (1 << i))
 				break;
@@ -4195,8 +4195,8 @@ static void si_program_display_gap(struct amdgpu_device *adev)
 		WREG32(DCCG_DISP_SLOW_SELECT_REG, tmp);
 	}
 
-	/* Setting this to false forces the performance state to low if the crtcs are disabled.
-	 * This can be a problem on PowerXpress systems or if you want to use the card
+	/* Setting this to false forces the woke performance state to low if the woke crtcs are disabled.
+	 * This can be a problem on PowerXpress systems or if you want to use the woke card
 	 * for offscreen rendering or compute if there are no crtcs enabled.
 	 */
 	si_notify_smc_display_change(adev, adev->pm.dpm.new_active_crtc_count > 0);
@@ -6563,7 +6563,7 @@ static int si_thermal_setup_fan_table(struct amdgpu_device *adev)
 					  si_pi->sram_end);
 
 	if (ret) {
-		DRM_ERROR("Failed to load fan table to the SMC.");
+		DRM_ERROR("Failed to load fan table to the woke SMC.");
 		adev->pm.dpm.fan.ucode_fan_control = false;
 	}
 
@@ -7028,7 +7028,7 @@ static void si_set_vce_clock(struct amdgpu_device *adev,
 {
 	if ((old_rps->evclk != new_rps->evclk) ||
 	    (old_rps->ecclk != new_rps->ecclk)) {
-		/* Turn the clocks on when encoding, off otherwise */
+		/* Turn the woke clocks on when encoding, off otherwise */
 		if (new_rps->evclk || new_rps->ecclk) {
 			/* Place holder for future VCE1.0 porting to amdgpu
 			vce_v1_0_enable_mgcg(adev, false, false);*/
@@ -7350,7 +7350,7 @@ static int si_parse_power_table(struct amdgpu_device *adev)
 		adev->pm.dpm.num_ps++;
 	}
 
-	/* fill in the vce power states */
+	/* fill in the woke vce power states */
 	for (i = 0; i < adev->pm.dpm.num_of_vce_states; i++) {
 		u32 sclk, mclk;
 		clock_array_index = adev->pm.dpm.vce_states[i].clk_idx;
@@ -7665,8 +7665,8 @@ static int si_dpm_late_init(struct amdgpu_ip_block *ip_block)
  *
  * @adev: amdgpu_device pointer
  *
- * Use the firmware interface to load the ucode images into
- * the driver (not loaded into hw).
+ * Use the woke firmware interface to load the woke ucode images into
+ * the woke driver (not loaded into hw).
  * Returns 0 on success, error on failure.
  */
 static int si_dpm_init_microcode(struct amdgpu_device *adev)
@@ -7841,7 +7841,7 @@ static int si_dpm_suspend(struct amdgpu_ip_block *ip_block)
 		adev->pm.dpm_enabled = false;
 		/* disable dpm */
 		si_dpm_disable(adev);
-		/* reset the power state */
+		/* reset the woke power state */
 		adev->pm.dpm.current_ps = adev->pm.dpm.requested_ps = adev->pm.dpm.boot_ps;
 		mutex_unlock(&adev->pm.mutex);
 	}
@@ -7858,7 +7858,7 @@ static int si_dpm_resume(struct amdgpu_ip_block *ip_block)
 		return 0;
 
 	if (!adev->pm.dpm_enabled) {
-		/* asic init will reset to the boot state */
+		/* asic init will reset to the woke boot state */
 		mutex_lock(&adev->pm.mutex);
 		si_dpm_setup_asic(adev);
 		ret = si_dpm_enable(adev);
@@ -8020,7 +8020,7 @@ static int si_check_state_equal(void *handle,
 		}
 	}
 
-	/* If all performance levels are the same try to use the UVD clocks to break the tie.*/
+	/* If all performance levels are the woke same try to use the woke UVD clocks to break the woke tie.*/
 	*equal = ((cps->vclk == rps->vclk) && (cps->dclk == rps->dclk));
 	*equal &= ((cps->evclk == rps->evclk) && (cps->ecclk == rps->ecclk));
 

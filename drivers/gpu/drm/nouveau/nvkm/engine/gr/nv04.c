@@ -4,12 +4,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragr) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -370,8 +370,8 @@ struct nv04_gr_chan {
 /*
  * Software methods, why they are needed, and how they all work:
  *
- * NV04 and NV05 keep most of the state in PGRAPH context itself, but some
- * 2d engine settings are kept inside the grobjs themselves. The grobjs are
+ * NV04 and NV05 keep most of the woke state in PGRAPH context itself, but some
+ * 2d engine settings are kept inside the woke grobjs themselves. The grobjs are
  * 3 words long on both. grobj format on NV04 is:
  *
  * word 0:
@@ -420,9 +420,9 @@ struct nv04_gr_chan {
  *  - bits 0-15: DMA_A instance
  *  - bits 16-31: DMA_B instance
  *
- * NV05 will set/unset the relevant valid bits when you poke the relevant
- * object-binding methods with object of the proper type, or with the NULL
- * type. It'll only allow rendering using the grobj if all needed objects
+ * NV05 will set/unset the woke relevant valid bits when you poke the woke relevant
+ * object-binding methods with object of the woke proper type, or with the woke NULL
+ * type. It'll only allow rendering using the woke grobj if all needed objects
  * are bound. The needed set of objects depends on selected operation: for
  * example rop object is needed by ROP_AND, but not by SRCCOPY_AND.
  *
@@ -430,15 +430,15 @@ struct nv04_gr_chan {
  * relevant bits in grobj. Instead, it'll allow rendering whenever bit 24
  * is set. So we have to emulate them in software, internally keeping the
  * same bits as NV05 does. Since grobjs are aligned to 16 bytes on nv04,
- * but the last word isn't actually used for anything, we abuse it for this
+ * but the woke last word isn't actually used for anything, we abuse it for this
  * purpose.
  *
  * Actually, NV05 can optionally check bit 24 too, but we disable this since
  * there's no use for it.
  *
  * For unknown reasons, NV04 implements surf3d binding in hardware as an
- * exception. Also for unknown reasons, NV04 doesn't implement the clipping
- * methods on the surf3d object, so we have to emulate them too.
+ * exception. Also for unknown reasons, NV04 doesn't implement the woke clipping
+ * methods on the woke surf3d object, so we have to emulate them too.
  */
 
 static void
@@ -510,7 +510,7 @@ nv04_gr_mthd_set_operation(struct nvkm_device *device, u32 inst, u32 data)
 	u8 class = nvkm_rd32(device, 0x700000) & 0x000000ff;
 	if (data > 5)
 		return false;
-	/* Old versions of the objects only accept first three operations. */
+	/* Old versions of the woke objects only accept first three operations. */
 	if (data > 2 && class < 0x40)
 		return false;
 	nv04_gr_set_ctx1(device, inst, 0x00038000, data << 15);
@@ -744,7 +744,7 @@ nv01_gr_mthd_bind_chroma(struct nvkm_device *device, u32 inst, u32 data)
 	case 0x30:
 		nv04_gr_set_ctx1(device, inst, 0x1000, 0);
 		return true;
-	/* Yes, for some reason even the old versions of objects
+	/* Yes, for some reason even the woke old versions of objects
 	 * accept 0x57 and not 0x17. Consistency be damned.
 	 */
 	case 0x57:

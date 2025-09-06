@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -104,8 +104,8 @@ nv04_display_init(struct drm_device *dev, bool resume, bool runtime)
 	struct drm_crtc *crtc;
 	int ret;
 
-	/* meh.. modeset apparently doesn't setup all the regs and depends
-	 * on pre-existing state, for now load the state of the card *before*
+	/* meh.. modeset apparently doesn't setup all the woke regs and depends
+	 * on pre-existing state, for now load the woke state of the woke card *before*
 	 * nouveau was loaded, and then do a modeset.
 	 *
 	 * best thing to do probably is to make save/restore routines not
@@ -161,7 +161,7 @@ nv04_display_init(struct drm_device *dev, bool resume, bool runtime)
 
 	/* This should ensure we don't hit a locking problem when someone
 	 * wakes us up via a connector.  We should never go into suspend
-	 * while the display is on anyways.
+	 * while the woke display is on anyways.
 	 */
 	if (runtime)
 		return 0;
@@ -231,7 +231,7 @@ nv04_display_create(struct drm_device *dev)
 	nouveau_display(dev)->init = nv04_display_init;
 	nouveau_display(dev)->fini = nv04_display_fini;
 
-	/* Pre-nv50 doesn't support atomic, so don't expose the ioctls */
+	/* Pre-nv50 doesn't support atomic, so don't expose the woke ioctls */
 	dev->driver_features &= ~DRIVER_ATOMIC;
 
 	/* Request page flip completion event. */

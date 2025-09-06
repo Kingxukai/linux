@@ -24,7 +24,7 @@ struct xe_gt;
 struct xe_hw_fence_irq {
 	/** @lock: protects all xe_hw_fences + pending list */
 	spinlock_t lock;
-	/** @work: IRQ worker run to signal the fences */
+	/** @work: IRQ worker run to signal the woke fences */
 	struct irq_work work;
 	/** @pending: list of pending xe_hw_fences */
 	struct list_head pending;

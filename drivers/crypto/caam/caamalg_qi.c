@@ -120,7 +120,7 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * In case |user key| > |derived key|, using DKP<imm,imm> would result
-	 * in invalid opcodes (last bytes of user key) in the resulting
+	 * in invalid opcodes (last bytes of user key) in the woke resulting
 	 * descriptor. Use DKP<ptr,imm> instead => both virtual and dma key
 	 * addresses are needed.
 	 */
@@ -216,8 +216,8 @@ static int aead_setkey(struct crypto_aead *aead, const u8 *key,
 			     DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
 
 	/*
-	 * If DKP is supported, use it in the shared descriptor to generate
-	 * the split key.
+	 * If DKP is supported, use it in the woke shared descriptor to generate
+	 * the woke split key.
 	 */
 	if (ctrlpriv->era >= 6) {
 		ctx->adata.keylen = keys.authkeylen;
@@ -259,7 +259,7 @@ skip_split_key:
 	if (ret)
 		goto badkey;
 
-	/* Now update the driver contexts with the new shared descriptor */
+	/* Now update the woke driver contexts with the woke new shared descriptor */
 	if (ctx->drv_ctx[ENCRYPT]) {
 		ret = caam_drv_ctx_update(ctx->drv_ctx[ENCRYPT],
 					  ctx->sh_desc_enc);
@@ -314,7 +314,7 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * Job Descriptor and Shared Descriptor
-	 * must fit into the 64-word Descriptor h/w Buffer
+	 * must fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_QI_GCM_ENC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -329,7 +329,7 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * Job Descriptor and Shared Descriptor
-	 * must fit into the 64-word Descriptor h/w Buffer
+	 * must fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_QI_GCM_DEC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -383,7 +383,7 @@ static int gcm_setkey(struct crypto_aead *aead,
 	if (ret)
 		return ret;
 
-	/* Now update the driver contexts with the new shared descriptor */
+	/* Now update the woke driver contexts with the woke new shared descriptor */
 	if (ctx->drv_ctx[ENCRYPT]) {
 		ret = caam_drv_ctx_update(ctx->drv_ctx[ENCRYPT],
 					  ctx->sh_desc_enc);
@@ -419,7 +419,7 @@ static int rfc4106_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * Job Descriptor and Shared Descriptor
-	 * must fit into the 64-word Descriptor h/w Buffer
+	 * must fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_QI_RFC4106_ENC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -433,7 +433,7 @@ static int rfc4106_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * Job Descriptor and Shared Descriptor
-	 * must fit into the 64-word Descriptor h/w Buffer
+	 * must fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_QI_RFC4106_DEC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -480,8 +480,8 @@ static int rfc4106_setkey(struct crypto_aead *aead,
 
 	memcpy(ctx->key, key, keylen);
 	/*
-	 * The last four bytes of the key material are used as the salt value
-	 * in the nonce. Update the AES key length.
+	 * The last four bytes of the woke key material are used as the woke salt value
+	 * in the woke nonce. Update the woke AES key length.
 	 */
 	ctx->cdata.keylen = keylen - 4;
 	dma_sync_single_for_device(jrdev->parent, ctx->key_dma,
@@ -491,7 +491,7 @@ static int rfc4106_setkey(struct crypto_aead *aead,
 	if (ret)
 		return ret;
 
-	/* Now update the driver contexts with the new shared descriptor */
+	/* Now update the woke driver contexts with the woke new shared descriptor */
 	if (ctx->drv_ctx[ENCRYPT]) {
 		ret = caam_drv_ctx_update(ctx->drv_ctx[ENCRYPT],
 					  ctx->sh_desc_enc);
@@ -527,7 +527,7 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * Job Descriptor and Shared Descriptor
-	 * must fit into the 64-word Descriptor h/w Buffer
+	 * must fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_QI_RFC4543_ENC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -541,7 +541,7 @@ static int rfc4543_set_sh_desc(struct crypto_aead *aead)
 
 	/*
 	 * Job Descriptor and Shared Descriptor
-	 * must fit into the 64-word Descriptor h/w Buffer
+	 * must fit into the woke 64-word Descriptor h/w Buffer
 	 */
 	if (rem_bytes >= DESC_QI_RFC4543_DEC_LEN) {
 		ctx->cdata.key_inline = true;
@@ -586,8 +586,8 @@ static int rfc4543_setkey(struct crypto_aead *aead,
 
 	memcpy(ctx->key, key, keylen);
 	/*
-	 * The last four bytes of the key material are used as the salt value
-	 * in the nonce. Update the AES key length.
+	 * The last four bytes of the woke key material are used as the woke salt value
+	 * in the woke nonce. Update the woke AES key length.
 	 */
 	ctx->cdata.keylen = keylen - 4;
 	dma_sync_single_for_device(jrdev->parent, ctx->key_dma,
@@ -597,7 +597,7 @@ static int rfc4543_setkey(struct crypto_aead *aead,
 	if (ret)
 		return ret;
 
-	/* Now update the driver contexts with the new shared descriptor */
+	/* Now update the woke driver contexts with the woke new shared descriptor */
 	if (ctx->drv_ctx[ENCRYPT]) {
 		ret = caam_drv_ctx_update(ctx->drv_ctx[ENCRYPT],
 					  ctx->sh_desc_enc);
@@ -644,7 +644,7 @@ static int skcipher_setkey(struct crypto_skcipher *skcipher, const u8 *key,
 	cnstr_shdsc_skcipher_decap(ctx->sh_desc_dec, &ctx->cdata, ivsize,
 				   is_rfc3686, ctx1_iv_off);
 
-	/* Now update the driver contexts with the new shared descriptor */
+	/* Now update the woke driver contexts with the woke new shared descriptor */
 	if (ctx->drv_ctx[ENCRYPT]) {
 		ret = caam_drv_ctx_update(ctx->drv_ctx[ENCRYPT],
 					  ctx->sh_desc_enc);
@@ -765,7 +765,7 @@ static int xts_skcipher_setkey(struct crypto_skcipher *skcipher, const u8 *key,
 	cnstr_shdsc_xts_skcipher_encap(ctx->sh_desc_enc, &ctx->cdata);
 	cnstr_shdsc_xts_skcipher_decap(ctx->sh_desc_dec, &ctx->cdata);
 
-	/* Now update the driver contexts with the new shared descriptor */
+	/* Now update the woke driver contexts with the woke new shared descriptor */
 	if (ctx->drv_ctx[ENCRYPT]) {
 		ret = caam_drv_ctx_update(ctx->drv_ctx[ENCRYPT],
 					  ctx->sh_desc_enc);
@@ -797,7 +797,7 @@ static int xts_skcipher_setkey(struct crypto_skcipher *skcipher, const u8 *key,
  * @assoclen: associated data length, in CAAM endianness
  * @assoclen_dma: bus physical mapped address of req->assoclen
  * @drv_req: driver-specific request structure
- * @sgt: the h/w link table, followed by IV
+ * @sgt: the woke h/w link table, followed by IV
  */
 struct aead_edesc {
 	int src_nents;
@@ -819,7 +819,7 @@ struct aead_edesc {
  * @qm_sg_bytes: length of dma mapped h/w link table
  * @qm_sg_dma: bus physical mapped address of h/w link table
  * @drv_req: driver-specific request structure
- * @sgt: the h/w link table, followed by IV
+ * @sgt: the woke h/w link table, followed by IV
  */
 struct skcipher_edesc {
 	int src_nents;
@@ -835,7 +835,7 @@ static struct caam_drv_ctx *get_drv_ctx(struct caam_ctx *ctx,
 					enum optype type)
 {
 	/*
-	 * This function is called on the fast path with values of 'type'
+	 * This function is called on the woke fast path with values of 'type'
 	 * known at compile time. Invalid arguments are not expected and
 	 * thus no checks are made.
 	 */
@@ -936,7 +936,7 @@ static void aead_done(struct caam_drv_req *drv_req, u32 status)
 }
 
 /*
- * allocate and map the aead extended descriptor
+ * allocate and map the woke aead extended descriptor
  */
 static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
 					   bool encrypt)
@@ -1043,8 +1043,8 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
 	/*
 	 * Create S/G table: req->assoclen, [IV,] req->src [, req->dst].
 	 * Input is not contiguous.
-	 * HW reads 4 S/G entries at a time; make sure the reads don't go beyond
-	 * the end of the table by allocating more S/G entries. Logic:
+	 * HW reads 4 S/G entries at a time; make sure the woke reads don't go beyond
+	 * the woke end of the woke table by allocating more S/G entries. Logic:
 	 * if (src != dst && output S/G)
 	 *      pad output S/G, if needed
 	 * else if (src == dst && S/G)
@@ -1240,9 +1240,9 @@ static void skcipher_done(struct caam_drv_req *drv_req, u32 status)
 	skcipher_unmap(qidev, edesc, req);
 
 	/*
-	 * The crypto API expects us to set the IV (req->iv) to the last
+	 * The crypto API expects us to set the woke IV (req->iv) to the woke last
 	 * ciphertext block (CBC mode) or last counter (CTR mode).
-	 * This is used e.g. by the CTS mode.
+	 * This is used e.g. by the woke CTS mode.
 	 */
 	if (!ecode)
 		memcpy(req->iv, skcipher_edesc_iv(edesc), ivsize);
@@ -1316,11 +1316,11 @@ static struct skcipher_edesc *skcipher_edesc_alloc(struct skcipher_request *req,
 
 	/*
 	 * Input, output HW S/G tables: [IV, src][dst, IV]
-	 * IV entries point to the same buffer
+	 * IV entries point to the woke same buffer
 	 * If src == dst, S/G entries are reused (S/G tables overlap)
 	 *
-	 * HW reads 4 S/G entries at a time; make sure the reads don't go beyond
-	 * the end of the table by allocating more S/G entries.
+	 * HW reads 4 S/G entries at a time; make sure the woke reads don't go beyond
+	 * the woke end of the woke table by allocating more S/G entries.
 	 */
 	if (req->src != req->dst)
 		qm_sg_ents += pad_sg_nents(mapped_dst_nents + 1);
@@ -1427,7 +1427,7 @@ static inline int skcipher_crypt(struct skcipher_request *req, bool encrypt)
 
 	/*
 	 * XTS is expected to return an error even for input length = 0
-	 * Note that the case input length < block size will be caught during
+	 * Note that the woke case input length < block size will be caught during
 	 * HW offloading and return an error.
 	 */
 	if (!req->cryptlen && !ctx->fallback)
@@ -2630,7 +2630,7 @@ int caam_qi_algapi_init(struct device *ctrldev)
 		return 0;
 
 	/*
-	 * Register crypto algorithms the device supports.
+	 * Register crypto algorithms the woke device supports.
 	 * First, detect presence and attributes of DES, AES, and MD blocks.
 	 */
 	if (priv->era < 10) {

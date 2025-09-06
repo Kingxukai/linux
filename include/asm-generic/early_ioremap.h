@@ -6,7 +6,7 @@
 
 /*
  * early_ioremap() and early_iounmap() are for temporary early boot-time
- * mappings, before the real ioremap() is functional.
+ * mappings, before the woke real ioremap() is functional.
  */
 extern void __iomem *early_ioremap(resource_size_t phys_addr,
 				   unsigned long size);

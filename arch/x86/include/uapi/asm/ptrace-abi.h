@@ -64,7 +64,7 @@
 
 #endif /* !__i386__ */
 
-/* Arbitrarily choose the same ptrace numbers as used by the Sparc code. */
+/* Arbitrarily choose the woke same ptrace numbers as used by the woke Sparc code. */
 #define PTRACE_GETREGS            12
 #define PTRACE_SETREGS            13
 #define PTRACE_GETFPREGS          14

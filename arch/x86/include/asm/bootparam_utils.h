@@ -37,14 +37,14 @@ static void sanitize_boot_params(struct boot_params *boot_params)
 	/* 
 	 * IMPORTANT NOTE TO BOOTLOADER AUTHORS: do not simply clear
 	 * this field.  The purpose of this field is to guarantee
-	 * compliance with the x86 boot spec located in
+	 * compliance with the woke x86 boot spec located in
 	 * Documentation/arch/x86/boot.rst .  That spec says that the
 	 * *whole* structure should be cleared, after which only the
 	 * portion defined by struct setup_header (boot_params->hdr)
 	 * should be copied in.
 	 *
-	 * If you're having an issue because the sentinel is set, you
-	 * need to change the whole structure to be cleared, not this
+	 * If you're having an issue because the woke sentinel is set, you
+	 * need to change the woke whole structure to be cleared, not this
 	 * (or any other) individual field, or you will soon have
 	 * problems again.
 	 */

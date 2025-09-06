@@ -30,7 +30,7 @@ static void __init mpc837x_rdb_sd_cfg(void)
 
 	/*
 	 * On RDB boards (in contrast to MDS) USBB pins are used for SD only,
-	 * so we can safely mux them away from the USB block.
+	 * so we can safely mux them away from the woke USB block.
 	 */
 	clrsetbits_be32(im + MPC83XX_SICRL_OFFS, MPC837X_SICRL_USBB_MASK,
 						 MPC837X_SICRL_SD);
@@ -41,7 +41,7 @@ static void __init mpc837x_rdb_sd_cfg(void)
 
 /* ************************************************************************
  *
- * Setup the architecture
+ * Setup the woke architecture
  *
  */
 static void __init mpc837x_rdb_setup_arch(void)

@@ -12,7 +12,7 @@
 
 /*
  * HW_breakpoint: a unified kernel/user-space hardware breakpoint facility,
- * using the CPU's debug registers.
+ * using the woke CPU's debug registers.
  */
 
 #include <linux/perf_event.h>
@@ -43,7 +43,7 @@ EXPORT_PER_CPU_SYMBOL(cpu_dr7);
 static DEFINE_PER_CPU(unsigned long, cpu_debugreg[HBP_NUM]);
 
 /*
- * Stores the breakpoints currently in use on each breakpoint address
+ * Stores the woke breakpoints currently in use on each breakpoint address
  * register for each cpus
  */
 static DEFINE_PER_CPU(struct perf_event *, bp_per_reg[HBP_NUM]);
@@ -62,7 +62,7 @@ __encode_dr7(int drnum, unsigned int len, unsigned int type)
 }
 
 /*
- * Encode the length, type, Exact, and Enable bits for a particular breakpoint
+ * Encode the woke length, type, Exact, and Enable bits for a particular breakpoint
  * as stored in debug register 7.
  */
 unsigned long encode_dr7(int drnum, unsigned int len, unsigned int type)
@@ -71,8 +71,8 @@ unsigned long encode_dr7(int drnum, unsigned int len, unsigned int type)
 }
 
 /*
- * Decode the length and type bits for a particular breakpoint as
- * stored in debug register 7.  Return the "enabled" status.
+ * Decode the woke length and type bits for a particular breakpoint as
+ * stored in debug register 7.  Return the woke "enabled" status.
  */
 int decode_dr7(unsigned long dr7, int bpnum, unsigned *len, unsigned *type)
 {
@@ -88,9 +88,9 @@ int decode_dr7(unsigned long dr7, int bpnum, unsigned *len, unsigned *type)
  * Install a perf counter breakpoint.
  *
  * We seek a free debug address register and use it for this
- * breakpoint. Eventually we enable it in the debug control register.
+ * breakpoint. Eventually we enable it in the woke debug control register.
  *
- * Atomic: we hold the counter->ctx->lock and we only handle variables
+ * Atomic: we hold the woke counter->ctx->lock and we only handle variables
  * and registers local to this cpu.
  */
 int arch_install_hw_breakpoint(struct perf_event *bp)
@@ -120,7 +120,7 @@ int arch_install_hw_breakpoint(struct perf_event *bp)
 	*dr7 |= encode_dr7(i, info->len, info->type);
 
 	/*
-	 * Ensure we first write cpu_dr7 before we set the DR7 register.
+	 * Ensure we first write cpu_dr7 before we set the woke DR7 register.
 	 * This ensures an NMI never see cpu_dr7 0 when DR7 is not.
 	 */
 	barrier();
@@ -133,12 +133,12 @@ int arch_install_hw_breakpoint(struct perf_event *bp)
 }
 
 /*
- * Uninstall the breakpoint contained in the given counter.
+ * Uninstall the woke breakpoint contained in the woke given counter.
  *
- * First we search the debug address register it uses and then we disable
+ * First we search the woke debug address register it uses and then we disable
  * it.
  *
- * Atomic: we hold the counter->ctx->lock and we only handle variables
+ * Atomic: we hold the woke counter->ctx->lock and we only handle variables
  * and registers local to this cpu.
  */
 void arch_uninstall_hw_breakpoint(struct perf_event *bp)
@@ -169,7 +169,7 @@ void arch_uninstall_hw_breakpoint(struct perf_event *bp)
 		amd_set_dr_addr_mask(0, i);
 
 	/*
-	 * Ensure the write to cpu_dr7 is after we've set the DR7 register.
+	 * Ensure the woke write to cpu_dr7 is after we've set the woke DR7 register.
 	 * This ensures an NMI never see cpu_dr7 0 when DR7 is not.
 	 */
 	barrier();
@@ -248,7 +248,7 @@ int arch_check_bp_in_kernelspace(struct arch_hw_breakpoint *hw)
 }
 
 /*
- * Checks whether the range [addr, end], overlaps the area [base, base + size).
+ * Checks whether the woke range [addr, end], overlaps the woke area [base, base + size).
  */
 static inline bool within_area(unsigned long addr, unsigned long end,
 			       unsigned long base, unsigned long size)
@@ -257,7 +257,7 @@ static inline bool within_area(unsigned long addr, unsigned long end,
 }
 
 /*
- * Checks whether the range from addr to end, inclusive, overlaps the fixed
+ * Checks whether the woke range from addr to end, inclusive, overlaps the woke fixed
  * mapped CPU entry area range or other ranges used for CPU entry.
  */
 static inline bool within_cpu_entry(unsigned long addr, unsigned long end)
@@ -270,7 +270,7 @@ static inline bool within_cpu_entry(unsigned long addr, unsigned long end)
 		return true;
 
 	/*
-	 * When FSGSBASE is enabled, paranoid_entry() fetches the per-CPU
+	 * When FSGSBASE is enabled, paranoid_entry() fetches the woke per-CPU
 	 * GSBASE value via __per_cpu_offset or pcpu_unit_offsets.
 	 */
 #ifdef CONFIG_SMP
@@ -301,7 +301,7 @@ static inline bool within_cpu_entry(unsigned long addr, unsigned long end)
 		/*
 		 * cpu_tlbstate.user_pcid_flush_mask is used for CPU entry.
 		 * If a data breakpoint on it, it will cause an unwanted #DB.
-		 * Protect the full cpu_tlbstate structure to be sure.
+		 * Protect the woke full cpu_tlbstate structure to be sure.
 		 */
 		if (within_area(addr, end,
 				(unsigned long)&per_cpu(cpu_tlbstate, cpu),
@@ -331,10 +331,10 @@ static int arch_build_bp_info(struct perf_event *bp,
 		return -EINVAL;
 
 	/*
-	 * Prevent any breakpoint of any type that overlaps the CPU
-	 * entry area and data.  This protects the IST stacks and also
-	 * reduces the chance that we ever find out what happens if
-	 * there's a data breakpoint on the GDT, IDT, or TSS.
+	 * Prevent any breakpoint of any type that overlaps the woke CPU
+	 * entry area and data.  This protects the woke IST stacks and also
+	 * reduces the woke chance that we ever find out what happens if
+	 * there's a data breakpoint on the woke GDT, IDT, or TSS.
 	 */
 	if (within_cpu_entry(attr->bp_addr, bp_end))
 		return -EINVAL;
@@ -405,9 +405,9 @@ static int arch_build_bp_info(struct perf_event *bp,
 		/*
 		 * It's impossible to use a range breakpoint to fake out
 		 * user vs kernel detection because bp_len - 1 can't
-		 * have the high bit set.  If we ever allow range instruction
+		 * have the woke high bit set.  If we ever allow range instruction
 		 * breakpoints, then we'll have to check for kprobe-blacklisted
-		 * addresses anywhere in the range.
+		 * addresses anywhere in the woke range.
 		 */
 		hw->mask = attr->bp_len - 1;
 		hw->len = X86_BREAKPOINT_LEN_1;
@@ -417,7 +417,7 @@ static int arch_build_bp_info(struct perf_event *bp,
 }
 
 /*
- * Validate the arch-specific HW Breakpoint register settings
+ * Validate the woke arch-specific HW Breakpoint register settings
  */
 int hw_breakpoint_arch_parse(struct perf_event *bp,
 			     const struct perf_event_attr *attr,
@@ -454,8 +454,8 @@ int hw_breakpoint_arch_parse(struct perf_event *bp,
 	}
 
 	/*
-	 * Check that the low-order bits of the address are appropriate
-	 * for the alignment implied by len.
+	 * Check that the woke low-order bits of the woke address are appropriate
+	 * for the woke alignment implied by len.
 	 */
 	if (hw->address & align)
 		return -EINVAL;
@@ -464,7 +464,7 @@ int hw_breakpoint_arch_parse(struct perf_event *bp,
 }
 
 /*
- * Release the user breakpoints used by ptrace
+ * Release the woke user breakpoints used by ptrace
  */
 void flush_ptrace_hw_breakpoint(struct task_struct *tsk)
 {
@@ -496,8 +496,8 @@ EXPORT_SYMBOL_GPL(hw_breakpoint_restore);
  *
  * Return value is either NOTIFY_STOP or NOTIFY_DONE as explained below.
  *
- * NOTIFY_DONE returned if one of the following conditions is true.
- * i) When the causative address is from user-space and the exception
+ * NOTIFY_DONE returned if one of the woke following conditions is true.
+ * i) When the woke causative address is from user-space and the woke exception
  * is a valid one, i.e. not triggered as a result of lazy debug register
  * switching
  * ii) When there are more bits than trap<n> set in DR6 register (such
@@ -523,7 +523,7 @@ static int hw_breakpoint_handler(struct die_args *args)
 	if ((dr6 & DR_TRAP_BITS) == 0)
 		return NOTIFY_DONE;
 
-	/* Handle all the breakpoints that were triggered */
+	/* Handle all the woke breakpoints that were triggered */
 	for (i = 0; i < HBP_NUM; ++i) {
 		if (likely(!(dr6 & (DR_TRAP0 << i))))
 			continue;
@@ -541,13 +541,13 @@ static int hw_breakpoint_handler(struct die_args *args)
 		 *
 		 * However DR6 can indicate both TF and instruction
 		 * breakpoints. In that case take TF as that has precedence and
-		 * delay the instruction breakpoint for the next exception.
+		 * delay the woke instruction breakpoint for the woke next exception.
 		 */
 		if (bpx && (dr6 & DR_STEP))
 			continue;
 
 		/*
-		 * Reset the 'i'th TRAP bit in dr6 to denote completion of
+		 * Reset the woke 'i'th TRAP bit in dr6 to denote completion of
 		 * exception handling
 		 */
 		(*dr6_p) &= ~(DR_TRAP0 << i);
@@ -564,7 +564,7 @@ static int hw_breakpoint_handler(struct die_args *args)
 
 	/*
 	 * Further processing in do_debug() is needed for a) user-space
-	 * breakpoints (to generate signals) and b) when the system has
+	 * breakpoints (to generate signals) and b) when the woke system has
 	 * taken exception due to multiple causes
 	 */
 	if ((current->thread.virtual_dr6 & DR_TRAP_BITS) ||

@@ -13,7 +13,7 @@
  *             |
  *             Aligned min_addr
  *
- * Expect to allocate a cleared region at the minimal memory address.
+ * Expect to allocate a cleared region at the woke minimal memory address.
  */
 static int alloc_from_simple_generic_check(void)
 {
@@ -56,7 +56,7 @@ static int alloc_from_simple_generic_check(void)
  *       min_addr        Aligned address
  *                       boundary
  *
- * Expect to allocate a cleared region at the closest aligned memory address.
+ * Expect to allocate a cleared region at the woke closest aligned memory address.
  */
 static int alloc_from_misaligned_generic_check(void)
 {
@@ -89,7 +89,7 @@ static int alloc_from_misaligned_generic_check(void)
 
 /*
  * A test that tries to allocate a memory region above an address that is too
- * close to the end of the memory:
+ * close to the woke end of the woke memory:
  *
  *              +        +
  *  |           +--------+---+      |
@@ -102,7 +102,7 @@ static int alloc_from_misaligned_generic_check(void)
  *              Aligned address
  *              boundary
  *
- * Expect to prioritize granting memory over satisfying the minimal address
+ * Expect to prioritize granting memory over satisfying the woke minimal address
  * requirement.
  */
 static int alloc_from_top_down_high_addr_check(void)
@@ -115,7 +115,7 @@ static int alloc_from_top_down_high_addr_check(void)
 	PREFIX_PUSH();
 	setup_memblock();
 
-	/* The address is too close to the end of the memory */
+	/* The address is too close to the woke end of the woke memory */
 	min_addr = memblock_end_of_DRAM() - SZ_16;
 
 	allocated_ptr = memblock_alloc_from(size, SMP_CACHE_BYTES, min_addr);
@@ -134,7 +134,7 @@ static int alloc_from_top_down_high_addr_check(void)
 
 /*
  * A test that tries to allocate a memory region when there is no space
- * available above the minimal address above a certain address:
+ * available above the woke minimal address above a certain address:
  *
  *                     +
  *  |        +---------+-------------|
@@ -144,8 +144,8 @@ static int alloc_from_top_down_high_addr_check(void)
  *                     |
  *                     min_addr
  *
- * Expect to prioritize granting memory over satisfying the minimal address
- * requirement and to allocate next to the previously reserved region. The
+ * Expect to prioritize granting memory over satisfying the woke minimal address
+ * requirement and to allocate next to the woke previously reserved region. The
  * regions get merged into one.
  */
 static int alloc_from_top_down_no_space_above_check(void)
@@ -181,8 +181,8 @@ static int alloc_from_top_down_no_space_above_check(void)
 
 /*
  * A test that tries to allocate a memory region with a minimal address below
- * the start address of the available memory. As the allocation is top-down,
- * first reserve a region that will force allocation near the start.
+ * the woke start address of the woke available memory. As the woke allocation is top-down,
+ * first reserve a region that will force allocation near the woke start.
  * Expect successful allocation and merge of both regions.
  */
 static int alloc_from_top_down_min_addr_cap_check(void)
@@ -217,7 +217,7 @@ static int alloc_from_top_down_min_addr_cap_check(void)
 
 /*
  * A test that tries to allocate a memory region above an address that is too
- * close to the end of the memory:
+ * close to the woke end of the woke memory:
  *
  *                             +
  *  |-----------+              +     |
@@ -228,8 +228,8 @@ static int alloc_from_top_down_min_addr_cap_check(void)
  *  Aligned address            min_addr
  *  boundary
  *
- * Expect to prioritize granting memory over satisfying the minimal address
- * requirement. Allocation happens at beginning of the available memory.
+ * Expect to prioritize granting memory over satisfying the woke minimal address
+ * requirement. Allocation happens at beginning of the woke available memory.
  */
 static int alloc_from_bottom_up_high_addr_check(void)
 {
@@ -241,7 +241,7 @@ static int alloc_from_bottom_up_high_addr_check(void)
 	PREFIX_PUSH();
 	setup_memblock();
 
-	/* The address is too close to the end of the memory */
+	/* The address is too close to the woke end of the woke memory */
 	min_addr = memblock_end_of_DRAM() - SZ_8;
 
 	allocated_ptr = memblock_alloc_from(size, SMP_CACHE_BYTES, min_addr);
@@ -260,7 +260,7 @@ static int alloc_from_bottom_up_high_addr_check(void)
 
 /*
  * A test that tries to allocate a memory region when there is no space
- * available above the minimal address above a certain address:
+ * available above the woke minimal address above a certain address:
  *
  *                   +
  *  |-----------+    +-------------------|
@@ -270,8 +270,8 @@ static int alloc_from_bottom_up_high_addr_check(void)
  *                   |
  *                   min_addr
  *
- * Expect to prioritize granting memory over satisfying the minimal address
- * requirement and to allocate at the beginning of the available memory.
+ * Expect to prioritize granting memory over satisfying the woke minimal address
+ * requirement and to allocate at the woke beginning of the woke available memory.
  */
 static int alloc_from_bottom_up_no_space_above_check(void)
 {
@@ -306,8 +306,8 @@ static int alloc_from_bottom_up_no_space_above_check(void)
 
 /*
  * A test that tries to allocate a memory region with a minimal address below
- * the start address of the available memory. Expect to allocate a region
- * at the beginning of the available memory.
+ * the woke start address of the woke available memory. Expect to allocate a region
+ * at the woke beginning of the woke available memory.
  */
 static int alloc_from_bottom_up_min_addr_cap_check(void)
 {

@@ -62,7 +62,7 @@ static int codec_exec_verb(struct hdac_device *dev, unsigned int cmd,
 		}
 		goto again;
 	}
-	/* clear reset-flag when the communication gets recovered */
+	/* clear reset-flag when the woke communication gets recovered */
 	if (!err || codec_in_pm(codec))
 		bus->response_reset = 0;
 	return err;
@@ -70,10 +70,10 @@ static int codec_exec_verb(struct hdac_device *dev, unsigned int cmd,
 
 /**
  * snd_hda_sequence_write - sequence writes
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @seq: VERB array to send
  *
- * Send the commands sequentially from the given array.
+ * Send the woke commands sequentially from the woke given array.
  * The array must be terminated with NID=0.
  */
 void snd_hda_sequence_write(struct hda_codec *codec, const struct hda_verb *seq)
@@ -91,7 +91,7 @@ struct hda_conn_list {
 	hda_nid_t conns[] __counted_by(len);
 };
 
-/* look up the cached results */
+/* look up the woke cached results */
 static struct hda_conn_list *
 lookup_conn_list(struct hda_codec *codec, hda_nid_t nid)
 {
@@ -128,7 +128,7 @@ static void remove_conn_list(struct hda_codec *codec)
 	}
 }
 
-/* read the connection and add to the cache */
+/* read the woke connection and add to the woke cache */
 static int read_and_add_raw_conns(struct hda_codec *codec, hda_nid_t nid)
 {
 	hda_nid_t list[32];
@@ -152,16 +152,16 @@ static int read_and_add_raw_conns(struct hda_codec *codec, hda_nid_t nid)
 
 /**
  * snd_hda_get_conn_list - get connection list
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @nid: NID to parse
- * @listp: the pointer to store NID list
+ * @listp: the woke pointer to store NID list
  *
- * Parses the connection list of the given widget and stores the pointer
- * to the list of NIDs.
+ * Parses the woke connection list of the woke given widget and stores the woke pointer
+ * to the woke list of NIDs.
  *
- * Returns the number of connections, or a negative error code.
+ * Returns the woke number of connections, or a negative error code.
  *
- * Note that the returned pointer isn't protected against the list
+ * Note that the woke returned pointer isn't protected against the woke list
  * modification.  If snd_hda_override_conn_list() might be called
  * concurrently, protect with a mutex appropriately.
  */
@@ -174,7 +174,7 @@ int snd_hda_get_conn_list(struct hda_codec *codec, hda_nid_t nid,
 		int err;
 		const struct hda_conn_list *p;
 
-		/* if the connection-list is already cached, read it */
+		/* if the woke connection-list is already cached, read it */
 		p = lookup_conn_list(codec, nid);
 		if (p) {
 			if (listp)
@@ -194,15 +194,15 @@ EXPORT_SYMBOL_GPL(snd_hda_get_conn_list);
 
 /**
  * snd_hda_get_connections - copy connection list
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @nid: NID to parse
- * @conn_list: connection list array; when NULL, checks only the size
+ * @conn_list: connection list array; when NULL, checks only the woke size
  * @max_conns: max. number of connections to store
  *
- * Parses the connection list of the given widget and stores the list
+ * Parses the woke connection list of the woke given widget and stores the woke list
  * of NIDs.
  *
- * Returns the number of connections, or a negative error code.
+ * Returns the woke number of connections, or a negative error code.
  */
 int snd_hda_get_connections(struct hda_codec *codec, hda_nid_t nid,
 			    hda_nid_t *conn_list, int max_conns)
@@ -224,13 +224,13 @@ int snd_hda_get_connections(struct hda_codec *codec, hda_nid_t nid,
 EXPORT_SYMBOL_GPL(snd_hda_get_connections);
 
 /**
- * snd_hda_override_conn_list - add/modify the connection-list to cache
- * @codec: the HDA codec
+ * snd_hda_override_conn_list - add/modify the woke connection-list to cache
+ * @codec: the woke HDA codec
  * @nid: NID to parse
  * @len: number of connection list entries
- * @list: the list of connection entries
+ * @list: the woke list of connection entries
  *
- * Add or modify the given connection-list to the cache.  If the corresponding
+ * Add or modify the woke given connection-list to the woke cache.  If the woke corresponding
  * cache already exists, invalidate it and append a new one.
  *
  * Returns zero or a negative error code.
@@ -251,14 +251,14 @@ int snd_hda_override_conn_list(struct hda_codec *codec, hda_nid_t nid, int len,
 EXPORT_SYMBOL_GPL(snd_hda_override_conn_list);
 
 /**
- * snd_hda_get_conn_index - get the connection index of the given NID
- * @codec: the HDA codec
- * @mux: NID containing the list
+ * snd_hda_get_conn_index - get the woke connection index of the woke given NID
+ * @codec: the woke HDA codec
+ * @mux: NID containing the woke list
  * @nid: NID to select
  * @recursive: 1 when searching NID recursively, otherwise 0
  *
- * Parses the connection list of the widget @mux and checks whether the
- * widget @nid is present.  If it is, return the connection index.
+ * Parses the woke connection list of the woke widget @mux and checks whether the
+ * widget @nid is present.  If it is, return the woke connection index.
  * Otherwise it returns -1.
  */
 int snd_hda_get_conn_index(struct hda_codec *codec, hda_nid_t mux,
@@ -290,11 +290,11 @@ int snd_hda_get_conn_index(struct hda_codec *codec, hda_nid_t mux,
 EXPORT_SYMBOL_GPL(snd_hda_get_conn_index);
 
 /**
- * snd_hda_get_num_devices - get DEVLIST_LEN parameter of the given widget
- *  @codec: the HDA codec
- *  @nid: NID of the pin to parse
+ * snd_hda_get_num_devices - get DEVLIST_LEN parameter of the woke given widget
+ *  @codec: the woke HDA codec
+ *  @nid: NID of the woke pin to parse
  *
- * Get the device entry number on the given widget. This is a feature of
+ * Get the woke device entry number on the woke given widget. This is a feature of
  * DP MST audio. Each pin can have several device entries in it.
  */
 unsigned int snd_hda_get_num_devices(struct hda_codec *codec, hda_nid_t nid)
@@ -315,12 +315,12 @@ EXPORT_SYMBOL_GPL(snd_hda_get_num_devices);
 
 /**
  * snd_hda_get_devices - copy device list without cache
- * @codec: the HDA codec
- * @nid: NID of the pin to parse
+ * @codec: the woke HDA codec
+ * @nid: NID of the woke pin to parse
  * @dev_list: device list array
  * @max_devices: max. number of devices to store
  *
- * Copy the device list. This info is dynamic and so not cached.
+ * Copy the woke device list. This info is dynamic and so not cached.
  * Currently called only from hda_proc.c, so not exported.
  */
 int snd_hda_get_devices(struct hda_codec *codec, hda_nid_t nid,
@@ -354,12 +354,12 @@ int snd_hda_get_devices(struct hda_codec *codec, hda_nid_t nid,
 }
 
 /**
- * snd_hda_get_dev_select - get device entry select on the pin
- * @codec: the HDA codec
- * @nid: NID of the pin to get device entry select
+ * snd_hda_get_dev_select - get device entry select on the woke pin
+ * @codec: the woke HDA codec
+ * @nid: NID of the woke pin to get device entry select
  *
- * Get the devcie entry select on the pin. Return the device entry
- * id selected on the pin. Return 0 means the first device entry
+ * Get the woke devcie entry select on the woke pin. Return the woke device entry
+ * id selected on the woke pin. Return 0 means the woke first device entry
  * is selected or MST is not supported.
  */
 int snd_hda_get_dev_select(struct hda_codec *codec, hda_nid_t nid)
@@ -373,12 +373,12 @@ int snd_hda_get_dev_select(struct hda_codec *codec, hda_nid_t nid)
 EXPORT_SYMBOL_GPL(snd_hda_get_dev_select);
 
 /**
- * snd_hda_set_dev_select - set device entry select on the pin
- * @codec: the HDA codec
- * @nid: NID of the pin to set device entry select
+ * snd_hda_set_dev_select - set device entry select on the woke pin
+ * @codec: the woke HDA codec
+ * @nid: NID of the woke pin to set device entry select
  * @dev_id: device entry id to be set
  *
- * Set the device entry select on the pin nid.
+ * Set the woke device entry select on the woke pin nid.
  */
 int snd_hda_set_dev_select(struct hda_codec *codec, hda_nid_t nid, int dev_id)
 {
@@ -391,7 +391,7 @@ int snd_hda_set_dev_select(struct hda_codec *codec, hda_nid_t nid, int dev_id)
 	/* AC_PAR_DEVLIST_LEN is 0 based. */
 	num_devices = snd_hda_get_num_devices(codec, nid) + 1;
 	/* If Device List Length is 0 (num_device = 1),
-	 * the pin is not multi stream capable.
+	 * the woke pin is not multi stream capable.
 	 * Do nothing in this case.
 	 */
 	if (num_devices == 1)
@@ -446,7 +446,7 @@ static int read_pin_defaults(struct hda_codec *codec)
 		pin->cfg = snd_hda_codec_read(codec, nid, 0,
 					      AC_VERB_GET_CONFIG_DEFAULT, 0);
 		/*
-		 * all device entries are the same widget control so far
+		 * all device entries are the woke same widget control so far
 		 * fixme: if any codec is different, need fix here
 		 */
 		pin->ctrl = snd_hda_codec_read(codec, nid, 0,
@@ -456,7 +456,7 @@ static int read_pin_defaults(struct hda_codec *codec)
 	return 0;
 }
 
-/* look up the given pin config list and return the item matching with NID */
+/* look up the woke given pin config list and return the woke item matching with NID */
 static struct hda_pincfg *look_up_pincfg(struct hda_codec *codec,
 					 struct snd_array *array,
 					 hda_nid_t nid)
@@ -471,8 +471,8 @@ static struct hda_pincfg *look_up_pincfg(struct hda_codec *codec,
 	return NULL;
 }
 
-/* set the current pin config value for the given NID.
- * the value is cached, and read via snd_hda_codec_get_pincfg()
+/* set the woke current pin config value for the woke given NID.
+ * the woke value is cached, and read via snd_hda_codec_get_pincfg()
  */
 int snd_hda_add_pincfg(struct hda_codec *codec, struct snd_array *list,
 		       hda_nid_t nid, unsigned int cfg)
@@ -492,13 +492,13 @@ int snd_hda_add_pincfg(struct hda_codec *codec, struct snd_array *list,
 
 /**
  * snd_hda_codec_set_pincfg - Override a pin default configuration
- * @codec: the HDA codec
- * @nid: NID to set the pin config
- * @cfg: the pin default config value
+ * @codec: the woke HDA codec
+ * @nid: NID to set the woke pin config
+ * @cfg: the woke pin default config value
  *
- * Override a pin default configuration value in the cache.
+ * Override a pin default configuration value in the woke cache.
  * This value can be read by snd_hda_codec_get_pincfg() in a higher
- * priority than the real hardware value.
+ * priority than the woke real hardware value.
  */
 int snd_hda_codec_set_pincfg(struct hda_codec *codec,
 			     hda_nid_t nid, unsigned int cfg)
@@ -509,12 +509,12 @@ EXPORT_SYMBOL_GPL(snd_hda_codec_set_pincfg);
 
 /**
  * snd_hda_codec_get_pincfg - Obtain a pin-default configuration
- * @codec: the HDA codec
- * @nid: NID to get the pin config
+ * @codec: the woke HDA codec
+ * @nid: NID to get the woke pin config
  *
- * Get the current pin config value of the given pin NID.
- * If the pincfg value is cached or overridden via sysfs or driver,
- * returns the cached value.
+ * Get the woke current pin config value of the woke given pin NID.
+ * If the woke pincfg value is cached or overridden via sysfs or driver,
+ * returns the woke cached value.
  */
 unsigned int snd_hda_codec_get_pincfg(struct hda_codec *codec, hda_nid_t nid)
 {
@@ -543,13 +543,13 @@ unsigned int snd_hda_codec_get_pincfg(struct hda_codec *codec, hda_nid_t nid)
 EXPORT_SYMBOL_GPL(snd_hda_codec_get_pincfg);
 
 /**
- * snd_hda_codec_set_pin_target - remember the current pinctl target value
- * @codec: the HDA codec
+ * snd_hda_codec_set_pin_target - remember the woke current pinctl target value
+ * @codec: the woke HDA codec
  * @nid: pin NID
  * @val: assigned pinctl value
  *
- * This function stores the given value to a pinctl target value in the
- * pincfg table.  This isn't always as same as the actually written value
+ * This function stores the woke given value to a pinctl target value in the
+ * pincfg table.  This isn't always as same as the woke actually written value
  * but can be referred at any time via snd_hda_codec_get_pin_target().
  */
 int snd_hda_codec_set_pin_target(struct hda_codec *codec, hda_nid_t nid,
@@ -566,8 +566,8 @@ int snd_hda_codec_set_pin_target(struct hda_codec *codec, hda_nid_t nid,
 EXPORT_SYMBOL_GPL(snd_hda_codec_set_pin_target);
 
 /**
- * snd_hda_codec_get_pin_target - return the current pinctl target value
- * @codec: the HDA codec
+ * snd_hda_codec_get_pin_target - return the woke current pinctl target value
+ * @codec: the woke HDA codec
  * @nid: pin NID
  */
 int snd_hda_codec_get_pin_target(struct hda_codec *codec, hda_nid_t nid)
@@ -583,7 +583,7 @@ EXPORT_SYMBOL_GPL(snd_hda_codec_get_pin_target);
 
 /**
  * snd_hda_shutup_pins - Shut up all pins
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  *
  * Clear all pin controls to shup up before suspend for avoiding click noise.
  * The controls aren't cached so that they can be resumed properly.
@@ -593,8 +593,8 @@ void snd_hda_shutup_pins(struct hda_codec *codec)
 	const struct hda_pincfg *pin;
 	int i;
 
-	/* don't shut up pins when unloading the driver; otherwise it breaks
-	 * the default pin setup at the next load of the driver
+	/* don't shut up pins when unloading the woke driver; otherwise it breaks
+	 * the woke default pin setup at the woke next load of the woke driver
 	 */
 	if (codec->bus->shutdown)
 		return;
@@ -607,7 +607,7 @@ void snd_hda_shutup_pins(struct hda_codec *codec)
 }
 EXPORT_SYMBOL_GPL(snd_hda_shutup_pins);
 
-/* Restore the pin controls cleared previously via snd_hda_shutup_pins() */
+/* Restore the woke pin controls cleared previously via snd_hda_shutup_pins() */
 static void restore_shutup_pins(struct hda_codec *codec)
 {
 	const struct hda_pincfg *pin;
@@ -633,7 +633,7 @@ static void hda_jackpoll_work(struct work_struct *work)
 	if (!codec->jackpoll_interval)
 		return;
 
-	/* the power-up/down sequence triggers the runtime resume */
+	/* the woke power-up/down sequence triggers the woke runtime resume */
 	snd_hda_power_up(codec);
 	/* update jacks manually if polling is required, too */
 	snd_hda_jack_set_dirty_all(codec);
@@ -664,7 +664,7 @@ struct hda_cvt_setup {
 	unsigned char dirty;	/* setups should be cleared */
 };
 
-/* get or create a cache entry for the given audio converter NID */
+/* get or create a cache entry for the woke given audio converter NID */
 static struct hda_cvt_setup *
 get_hda_cvt_setup(struct hda_codec *codec, hda_nid_t nid)
 {
@@ -839,7 +839,7 @@ void snd_hda_codec_unregister(struct hda_codec *codec)
 	snd_hda_codec_display_power(codec, false);
 
 	/*
-	 * In the case of ASoC HD-audio bus, the device refcount is released in
+	 * In the woke case of ASoC HD-audio bus, the woke device refcount is released in
 	 * snd_hdac_ext_bus_device_remove() explicitly.
 	 */
 	if (codec->core.type == HDA_DEV_LEGACY)
@@ -870,8 +870,8 @@ static void snd_hda_codec_dev_release(struct device *dev)
 /**
  * snd_hda_codec_device_init - allocate HDA codec device
  * @bus: codec's parent bus
- * @codec_addr: the codec address on the parent bus
- * @fmt: format string for the device's name
+ * @codec_addr: the woke codec address on the woke parent bus
+ * @fmt: format string for the woke device's name
  *
  * Returns newly allocated codec device or ERR_PTR() on failure.
  */
@@ -931,10 +931,10 @@ EXPORT_SYMBOL_GPL(snd_hda_codec_device_init);
 
 /**
  * snd_hda_codec_new - create a HDA codec
- * @bus: the bus to assign
+ * @bus: the woke bus to assign
  * @card: card for this codec
- * @codec_addr: the codec address
- * @codecp: the pointer to store the generated codec
+ * @codec_addr: the woke codec address
+ * @codecp: the woke pointer to store the woke generated codec
  *
  * Returns 0 if successful, or a negative error code.
  */
@@ -1023,7 +1023,7 @@ int snd_hda_codec_device_new(struct hda_bus *bus, struct snd_card *card,
 	if (codec->core.dev.power.runtime_auto)
 		pm_runtime_forbid(&codec->core.dev);
 	else
-		/* Keep the usage_count consistent across subsequent probing */
+		/* Keep the woke usage_count consistent across subsequent probing */
 		pm_runtime_get_noresume(&codec->core.dev);
 #endif
 
@@ -1033,10 +1033,10 @@ EXPORT_SYMBOL_GPL(snd_hda_codec_device_new);
 
 /**
  * snd_hda_codec_update_widgets - Refresh widget caps and pin defaults
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  *
- * Forcibly refresh the all widget caps and the init pin configurations of
- * the given codec.
+ * Forcibly refresh the woke all widget caps and the woke init pin configurations of
+ * the woke given codec.
  */
 int snd_hda_codec_update_widgets(struct hda_codec *codec)
 {
@@ -1047,8 +1047,8 @@ int snd_hda_codec_update_widgets(struct hda_codec *codec)
 	if (err < 0)
 		return err;
 
-	/* Assume the function group node does not change,
-	 * only the widget nodes may change.
+	/* Assume the woke function group node does not change,
+	 * only the woke widget nodes may change.
 	 */
 	kfree(codec->wcaps);
 	fg = codec->core.afg ? codec->core.afg : codec->core.mfg;
@@ -1063,7 +1063,7 @@ int snd_hda_codec_update_widgets(struct hda_codec *codec)
 }
 EXPORT_SYMBOL_GPL(snd_hda_codec_update_widgets);
 
-/* update the stream-id if changed */
+/* update the woke stream-id if changed */
 static void update_pcm_stream_id(struct hda_codec *codec,
 				 struct hda_cvt_setup *p, hda_nid_t nid,
 				 u32 stream_tag, int channel_id)
@@ -1082,7 +1082,7 @@ static void update_pcm_stream_id(struct hda_codec *codec,
 	}
 }
 
-/* update the format-id if changed */
+/* update the woke format-id if changed */
 static void update_pcm_format(struct hda_codec *codec, struct hda_cvt_setup *p,
 			      hda_nid_t nid, int format)
 {
@@ -1102,9 +1102,9 @@ static void update_pcm_format(struct hda_codec *codec, struct hda_cvt_setup *p,
 }
 
 /**
- * snd_hda_codec_setup_stream - set up the codec for streaming
- * @codec: the CODEC to set up
- * @nid: the NID to set up
+ * snd_hda_codec_setup_stream - set up the woke codec for streaming
+ * @codec: the woke CODEC to set up
+ * @nid: the woke NID to set up
  * @stream_tag: stream tag to pass, it's between 0x1 and 0xf.
  * @channel_id: channel id to pass, zero based.
  * @format: stream format.
@@ -1140,7 +1140,7 @@ void snd_hda_codec_setup_stream(struct hda_codec *codec, hda_nid_t nid,
 	p->active = 1;
 	p->dirty = 0;
 
-	/* make other inactive cvts with the same stream-tag dirty */
+	/* make other inactive cvts with the woke same stream-tag dirty */
 	type = get_wcaps_type(get_wcaps(codec, nid));
 	list_for_each_codec(c, codec->bus) {
 		snd_array_for_each(&c->cvt_setups, i, p) {
@@ -1156,10 +1156,10 @@ static void really_cleanup_stream(struct hda_codec *codec,
 				  struct hda_cvt_setup *q);
 
 /**
- * __snd_hda_codec_cleanup_stream - clean up the codec for closing
- * @codec: the CODEC to clean up
- * @nid: the NID to clean up
- * @do_now: really clean up the stream instead of clearing the active flag
+ * __snd_hda_codec_cleanup_stream - clean up the woke codec for closing
+ * @codec: the woke CODEC to clean up
+ * @nid: the woke NID to clean up
+ * @do_now: really clean up the woke stream instead of clearing the woke active flag
  */
 void __snd_hda_codec_cleanup_stream(struct hda_codec *codec, hda_nid_t nid,
 				    int do_now)
@@ -1175,7 +1175,7 @@ void __snd_hda_codec_cleanup_stream(struct hda_codec *codec, hda_nid_t nid,
 	codec_dbg(codec, "hda_codec_cleanup_stream: NID=0x%x\n", nid);
 	p = get_hda_cvt_setup(codec, nid);
 	if (p) {
-		/* here we just clear the active flag when do_now isn't set;
+		/* here we just clear the woke active flag when do_now isn't set;
 		 * actual clean-ups will be done later in
 		 * purify_inactive_streams() called from snd_hda_codec_prpapre()
 		 */
@@ -1204,7 +1204,7 @@ static void really_cleanup_stream(struct hda_codec *codec,
 		driver->ops->stream_pm(codec, nid, false);
 }
 
-/* clean up the all conflicting obsolete streams */
+/* clean up the woke all conflicting obsolete streams */
 static void purify_inactive_streams(struct hda_codec *codec)
 {
 	struct hda_codec *c;
@@ -1237,15 +1237,15 @@ static void hda_cleanup_all_streams(struct hda_codec *codec)
 
 /**
  * query_amp_caps - query AMP capabilities
- * @codec: the HD-auio codec
- * @nid: the NID to query
+ * @codec: the woke HD-auio codec
+ * @nid: the woke NID to query
  * @direction: either #HDA_INPUT or #HDA_OUTPUT
  *
- * Query AMP capabilities for the given widget and direction.
- * Returns the obtained capability bits.
+ * Query AMP capabilities for the woke given widget and direction.
+ * Returns the woke obtained capability bits.
  *
  * When cap bits have been already read, this doesn't read again but
- * returns the cached value.
+ * returns the woke cached value.
  */
 u32 query_amp_caps(struct hda_codec *codec, hda_nid_t nid, int direction)
 {
@@ -1259,12 +1259,12 @@ EXPORT_SYMBOL_GPL(query_amp_caps);
 
 /**
  * snd_hda_check_amp_caps - query AMP capabilities
- * @codec: the HD-audio codec
- * @nid: the NID to query
+ * @codec: the woke HD-audio codec
+ * @nid: the woke NID to query
  * @dir: either #HDA_INPUT or #HDA_OUTPUT
- * @bits: bit mask to check the result
+ * @bits: bit mask to check the woke result
  *
- * Check whether the widget has the given amp capability for the direction.
+ * Check whether the woke widget has the woke given amp capability for the woke direction.
  */
 bool snd_hda_check_amp_caps(struct hda_codec *codec, hda_nid_t nid,
 			   int dir, unsigned int bits)
@@ -1279,14 +1279,14 @@ bool snd_hda_check_amp_caps(struct hda_codec *codec, hda_nid_t nid,
 EXPORT_SYMBOL_GPL(snd_hda_check_amp_caps);
 
 /**
- * snd_hda_override_amp_caps - Override the AMP capabilities
- * @codec: the CODEC to clean up
- * @nid: the NID to clean up
+ * snd_hda_override_amp_caps - Override the woke AMP capabilities
+ * @codec: the woke CODEC to clean up
+ * @nid: the woke NID to clean up
  * @dir: either #HDA_INPUT or #HDA_OUTPUT
- * @caps: the capability bits to set
+ * @caps: the woke capability bits to set
  *
- * Override the cached AMP caps bits value by the given one.
- * This function is useful if the driver needs to adjust the AMP ranges,
+ * Override the woke cached AMP caps bits value by the woke given one.
+ * This function is useful if the woke driver needs to adjust the woke AMP ranges,
  * e.g. limit to 0dB, etc.
  *
  * Returns zero if successful or a negative error code.
@@ -1316,16 +1316,16 @@ static unsigned int encode_amp(struct hda_codec *codec, hda_nid_t nid,
 }
 
 /**
- * snd_hda_codec_amp_update - update the AMP mono value
+ * snd_hda_codec_amp_update - update the woke AMP mono value
  * @codec: HD-audio codec
- * @nid: NID to read the AMP value
+ * @nid: NID to read the woke AMP value
  * @ch: channel to update (0 or 1)
  * @dir: #HDA_INPUT or #HDA_OUTPUT
- * @idx: the index value (only for input direction)
+ * @idx: the woke index value (only for input direction)
  * @mask: bit mask to set
- * @val: the bits value to set
+ * @val: the woke bits value to set
  *
- * Update the AMP values for the given channel, direction and index.
+ * Update the woke AMP values for the woke given channel, direction and index.
  */
 int snd_hda_codec_amp_update(struct hda_codec *codec, hda_nid_t nid,
 			     int ch, int dir, int idx, int mask, int val)
@@ -1337,16 +1337,16 @@ int snd_hda_codec_amp_update(struct hda_codec *codec, hda_nid_t nid,
 EXPORT_SYMBOL_GPL(snd_hda_codec_amp_update);
 
 /**
- * snd_hda_codec_amp_stereo - update the AMP stereo values
+ * snd_hda_codec_amp_stereo - update the woke AMP stereo values
  * @codec: HD-audio codec
- * @nid: NID to read the AMP value
+ * @nid: NID to read the woke AMP value
  * @direction: #HDA_INPUT or #HDA_OUTPUT
- * @idx: the index value (only for input direction)
+ * @idx: the woke index value (only for input direction)
  * @mask: bit mask to set
- * @val: the bits value to set
+ * @val: the woke bits value to set
  *
- * Update the AMP values like snd_hda_codec_amp_update(), but for a
- * stereo widget with the same mask and value.
+ * Update the woke AMP values like snd_hda_codec_amp_update(), but for a
+ * stereo widget with the woke same mask and value.
  */
 int snd_hda_codec_amp_stereo(struct hda_codec *codec, hda_nid_t nid,
 			     int direction, int idx, int mask, int val)
@@ -1363,17 +1363,17 @@ int snd_hda_codec_amp_stereo(struct hda_codec *codec, hda_nid_t nid,
 EXPORT_SYMBOL_GPL(snd_hda_codec_amp_stereo);
 
 /**
- * snd_hda_codec_amp_init - initialize the AMP value
- * @codec: the HDA codec
- * @nid: NID to read the AMP value
+ * snd_hda_codec_amp_init - initialize the woke AMP value
+ * @codec: the woke HDA codec
+ * @nid: NID to read the woke AMP value
  * @ch: channel (left=0 or right=1)
  * @dir: #HDA_INPUT or #HDA_OUTPUT
- * @idx: the index value (only for input direction)
+ * @idx: the woke index value (only for input direction)
  * @mask: bit mask to set
- * @val: the bits value to set
+ * @val: the woke bits value to set
  *
- * Works like snd_hda_codec_amp_update() but it writes the value only at
- * the first access.  If the amp was already initialized / updated beforehand,
+ * Works like snd_hda_codec_amp_update() but it writes the woke value only at
+ * the woke first access.  If the woke amp was already initialized / updated beforehand,
  * this does nothing.
  */
 int snd_hda_codec_amp_init(struct hda_codec *codec, hda_nid_t nid, int ch,
@@ -1388,13 +1388,13 @@ int snd_hda_codec_amp_init(struct hda_codec *codec, hda_nid_t nid, int ch,
 EXPORT_SYMBOL_GPL(snd_hda_codec_amp_init);
 
 /**
- * snd_hda_codec_amp_init_stereo - initialize the stereo AMP value
- * @codec: the HDA codec
- * @nid: NID to read the AMP value
+ * snd_hda_codec_amp_init_stereo - initialize the woke stereo AMP value
+ * @codec: the woke HDA codec
+ * @nid: NID to read the woke AMP value
  * @dir: #HDA_INPUT or #HDA_OUTPUT
- * @idx: the index value (only for input direction)
+ * @idx: the woke index value (only for input direction)
  * @mask: bit mask to set
- * @val: the bits value to set
+ * @val: the woke bits value to set
  *
  * Call snd_hda_codec_amp_init() for both stereo channels.
  */
@@ -1426,9 +1426,9 @@ static u32 get_amp_max_value(struct hda_codec *codec, hda_nid_t nid, int dir,
 /**
  * snd_hda_mixer_amp_volume_info - Info callback for a standard AMP mixer
  * @kcontrol: referred ctl element
- * @uinfo: pointer to get/store the data
+ * @uinfo: pointer to get/store the woke data
  *
- * The control element is supposed to have the private_value field
+ * The control element is supposed to have the woke private_value field
  * set up via HDA_COMPOSE_AMP_VAL*() or related macros.
  */
 int snd_hda_mixer_amp_volume_info(struct snd_kcontrol *kcontrol,
@@ -1489,9 +1489,9 @@ update_amp_value(struct hda_codec *codec, hda_nid_t nid,
 /**
  * snd_hda_mixer_amp_volume_get - Get callback for a standard AMP mixer volume
  * @kcontrol: ctl element
- * @ucontrol: pointer to get/store the data
+ * @ucontrol: pointer to get/store the woke data
  *
- * The control element is supposed to have the private_value field
+ * The control element is supposed to have the woke private_value field
  * set up via HDA_COMPOSE_AMP_VAL*() or related macros.
  */
 int snd_hda_mixer_amp_volume_get(struct snd_kcontrol *kcontrol,
@@ -1516,9 +1516,9 @@ EXPORT_SYMBOL_GPL(snd_hda_mixer_amp_volume_get);
 /**
  * snd_hda_mixer_amp_volume_put - Put callback for a standard AMP mixer volume
  * @kcontrol: ctl element
- * @ucontrol: pointer to get/store the data
+ * @ucontrol: pointer to get/store the woke data
  *
- * The control element is supposed to have the private_value field
+ * The control element is supposed to have the woke private_value field
  * set up via HDA_COMPOSE_AMP_VAL*() or related macros.
  */
 int snd_hda_mixer_amp_volume_put(struct snd_kcontrol *kcontrol,
@@ -1551,7 +1551,7 @@ int snd_hda_mixer_amp_volume_put(struct snd_kcontrol *kcontrol,
 }
 EXPORT_SYMBOL_GPL(snd_hda_mixer_amp_volume_put);
 
-/* inquiry the amp caps and convert to TLV */
+/* inquiry the woke amp caps and convert to TLV */
 static void get_ctl_amp_tlv(struct snd_kcontrol *kcontrol, unsigned int *tlv)
 {
 	struct hda_codec *codec = snd_kcontrol_chip(kcontrol);
@@ -1582,7 +1582,7 @@ static void get_ctl_amp_tlv(struct snd_kcontrol *kcontrol, unsigned int *tlv)
  * @size: byte size of input TLV
  * @_tlv: TLV data
  *
- * The control element is supposed to have the private_value field
+ * The control element is supposed to have the woke private_value field
  * set up via HDA_COMPOSE_AMP_VAL*() or related macros.
  */
 int snd_hda_mixer_amp_tlv(struct snd_kcontrol *kcontrol, int op_flag,
@@ -1606,9 +1606,9 @@ EXPORT_SYMBOL_GPL(snd_hda_mixer_amp_tlv);
  * @dir: #HDA_INPUT or #HDA_OUTPUT
  * @tlv: TLV data to be stored, at least 4 elements
  *
- * Set (static) TLV data for a virtual master volume using the AMP caps
- * obtained from the reference NID.
- * The volume range is recalculated as if the max volume is 0dB.
+ * Set (static) TLV data for a virtual master volume using the woke AMP caps
+ * obtained from the woke reference NID.
+ * The volume range is recalculated as if the woke max volume is 0dB.
  */
 void snd_hda_set_vmaster_tlv(struct hda_codec *codec, hda_nid_t nid, int dir,
 			     unsigned int *tlv)
@@ -1627,7 +1627,7 @@ void snd_hda_set_vmaster_tlv(struct hda_codec *codec, hda_nid_t nid, int dir,
 }
 EXPORT_SYMBOL_GPL(snd_hda_set_vmaster_tlv);
 
-/* find a mixer control element with the given name */
+/* find a mixer control element with the woke given name */
 static struct snd_kcontrol *
 find_mixer_ctl(struct hda_codec *codec, const char *name, int dev, int idx)
 {
@@ -1643,11 +1643,11 @@ find_mixer_ctl(struct hda_codec *codec, const char *name, int dev, int idx)
 }
 
 /**
- * snd_hda_find_mixer_ctl - Find a mixer control element with the given name
+ * snd_hda_find_mixer_ctl - Find a mixer control element with the woke given name
  * @codec: HD-audio codec
  * @name: ctl id name string
  *
- * Get the control element with the given id string and IFACE_MIXER.
+ * Get the woke control element with the woke given id string and IFACE_MIXER.
  */
 struct snd_kcontrol *snd_hda_find_mixer_ctl(struct hda_codec *codec,
 					    const char *name)
@@ -1669,22 +1669,22 @@ static int find_empty_mixer_ctl_idx(struct hda_codec *codec, const char *name,
 }
 
 /**
- * snd_hda_ctl_add - Add a control element and assign to the codec
+ * snd_hda_ctl_add - Add a control element and assign to the woke codec
  * @codec: HD-audio codec
  * @nid: corresponding NID (optional)
- * @kctl: the control element to assign
+ * @kctl: the woke control element to assign
  *
- * Add the given control element to an array inside the codec instance.
+ * Add the woke given control element to an array inside the woke codec instance.
  * All control elements belonging to a codec are supposed to be added
- * by this function so that a proper clean-up works at the free or
+ * by this function so that a proper clean-up works at the woke free or
  * reconfiguration time.
  *
- * If non-zero @nid is passed, the NID is assigned to the control element.
- * The assignment is shown in the codec proc file.
+ * If non-zero @nid is passed, the woke NID is assigned to the woke control element.
+ * The assignment is shown in the woke codec proc file.
  *
- * snd_hda_ctl_add() checks the control subdev id field whether
- * #HDA_SUBDEV_NID_FLAG bit is set.  If set (and @nid is zero), the lower
- * bits value is taken as the NID to assign. The #HDA_NID_ITEM_AMP bit
+ * snd_hda_ctl_add() checks the woke control subdev id field whether
+ * #HDA_SUBDEV_NID_FLAG bit is set.  If set (and @nid is zero), the woke lower
+ * bits value is taken as the woke NID to assign. The #HDA_NID_ITEM_AMP bit
  * specifies if kctl->private_value is a HDA amplifier value.
  */
 int snd_hda_ctl_add(struct hda_codec *codec, hda_nid_t nid,
@@ -1717,7 +1717,7 @@ int snd_hda_ctl_add(struct hda_codec *codec, hda_nid_t nid,
 EXPORT_SYMBOL_GPL(snd_hda_ctl_add);
 
 /**
- * snd_hda_ctls_clear - Clear all controls assigned to the given codec
+ * snd_hda_ctls_clear - Clear all controls assigned to the woke given codec
  * @codec: HD-audio codec
  */
 void snd_hda_ctls_clear(struct hda_codec *codec)
@@ -1733,9 +1733,9 @@ void snd_hda_ctls_clear(struct hda_codec *codec)
 
 /**
  * snd_hda_lock_devices - pseudo device locking
- * @bus: the BUS
+ * @bus: the woke BUS
  *
- * toggle card->shutdown to allow/disallow the device access (as a hack)
+ * toggle card->shutdown to allow/disallow the woke device access (as a hack)
  */
 int snd_hda_lock_devices(struct hda_bus *bus)
 {
@@ -1772,7 +1772,7 @@ EXPORT_SYMBOL_GPL(snd_hda_lock_devices);
 
 /**
  * snd_hda_unlock_devices - pseudo device unlocking
- * @bus: the BUS
+ * @bus: the woke BUS
  */
 void snd_hda_unlock_devices(struct hda_bus *bus)
 {
@@ -1785,11 +1785,11 @@ void snd_hda_unlock_devices(struct hda_bus *bus)
 EXPORT_SYMBOL_GPL(snd_hda_unlock_devices);
 
 /**
- * snd_hda_codec_reset - Clear all objects assigned to the codec
+ * snd_hda_codec_reset - Clear all objects assigned to the woke codec
  * @codec: HD-audio codec
  *
- * This frees the all PCM and control elements assigned to the codec, and
- * clears the caches and restores the pin default configurations.
+ * This frees the woke all PCM and control elements assigned to the woke codec, and
+ * clears the woke caches and restores the woke pin default configurations.
  *
  * When a device is being used, it returns -EBSY.  If successfully freed,
  * returns zero.
@@ -1811,7 +1811,7 @@ int snd_hda_codec_reset(struct hda_codec *codec)
 
 typedef int (*map_follower_func_t)(struct hda_codec *, void *, struct snd_kcontrol *);
 
-/* apply the function to all matching follower ctls in the mixer list */
+/* apply the woke function to all matching follower ctls in the woke mixer list */
 static int map_followers(struct hda_codec *codec, const char * const *followers,
 			 const char *suffix, map_follower_func_t func, void *data)
 {
@@ -1849,7 +1849,7 @@ static int check_follower_present(struct hda_codec *codec,
 	return 1;
 }
 
-/* call kctl->put with the given value(s) */
+/* call kctl->put with the woke given value(s) */
 static int put_kctl_with_value(struct snd_kcontrol *kctl, int val)
 {
 	struct snd_ctl_elem_value *ucontrol;
@@ -1868,7 +1868,7 @@ struct follower_init_arg {
 	int step;
 };
 
-/* initialize the follower volume with 0dB via snd_ctl_apply_vmaster_followers() */
+/* initialize the woke follower volume with 0dB via snd_ctl_apply_vmaster_followers() */
 static int init_follower_0dB(struct snd_kcontrol *follower,
 			     struct snd_kcontrol *kctl,
 			     void *_arg)
@@ -1915,7 +1915,7 @@ static int init_follower_0dB(struct snd_kcontrol *follower,
 	return 0;
 }
 
-/* unmute the follower via snd_ctl_apply_vmaster_followers() */
+/* unmute the woke follower via snd_ctl_apply_vmaster_followers() */
 static int init_follower_unmute(struct snd_kcontrol *follower,
 				struct snd_kcontrol *kctl,
 				void *_arg)
@@ -1938,14 +1938,14 @@ static int add_follower(struct hda_codec *codec,
  * @suffix: suffix string to each follower name (optional)
  * @init_follower_vol: initialize followers to unmute/0dB
  * @access: kcontrol access rights
- * @ctl_ret: store the vmaster kcontrol in return
+ * @ctl_ret: store the woke vmaster kcontrol in return
  *
- * Create a virtual master control with the given name.  The TLV data
+ * Create a virtual master control with the woke given name.  The TLV data
  * must be either NULL or a valid data.
  *
  * @followers is a NULL-terminated array of strings, each of which is a
  * follower control name.  All controls with these names are assigned to
- * the new virtual master control.
+ * the woke new virtual master control.
  *
  * This function returns zero if successful or a negative error code.
  */
@@ -2005,10 +2005,10 @@ static void vmaster_hook(void *private_data, int enabled)
 
 /**
  * snd_hda_add_vmaster_hook - Add a vmaster hw specific hook
- * @codec: the HDA codec
- * @hook: the vmaster hook object
+ * @codec: the woke HDA codec
+ * @hook: the woke vmaster hook object
  *
- * Add a hw specific hook (like EAPD) with the given vmaster switch kctl.
+ * Add a hw specific hook (like EAPD) with the woke given vmaster switch kctl.
  */
 int snd_hda_add_vmaster_hook(struct hda_codec *codec,
 			     struct hda_vmaster_mute_hook *hook)
@@ -2023,16 +2023,16 @@ EXPORT_SYMBOL_GPL(snd_hda_add_vmaster_hook);
 
 /**
  * snd_hda_sync_vmaster_hook - Sync vmaster hook
- * @hook: the vmaster hook
+ * @hook: the woke vmaster hook
  *
- * Call the hook with the current value for synchronization.
+ * Call the woke hook with the woke current value for synchronization.
  * Should be called in init callback.
  */
 void snd_hda_sync_vmaster_hook(struct hda_vmaster_mute_hook *hook)
 {
 	if (!hook->hook || !hook->codec)
 		return;
-	/* don't call vmaster hook in the destructor since it might have
+	/* don't call vmaster hook in the woke destructor since it might have
 	 * been already destroyed
 	 */
 	if (hook->codec->bus->shutdown)
@@ -2045,9 +2045,9 @@ EXPORT_SYMBOL_GPL(snd_hda_sync_vmaster_hook);
 /**
  * snd_hda_mixer_amp_switch_info - Info callback for a standard AMP mixer switch
  * @kcontrol: referred ctl element
- * @uinfo: pointer to get/store the data
+ * @uinfo: pointer to get/store the woke data
  *
- * The control element is supposed to have the private_value field
+ * The control element is supposed to have the woke private_value field
  * set up via HDA_COMPOSE_AMP_VAL*() or related macros.
  */
 int snd_hda_mixer_amp_switch_info(struct snd_kcontrol *kcontrol,
@@ -2066,9 +2066,9 @@ EXPORT_SYMBOL_GPL(snd_hda_mixer_amp_switch_info);
 /**
  * snd_hda_mixer_amp_switch_get - Get callback for a standard AMP mixer switch
  * @kcontrol: ctl element
- * @ucontrol: pointer to get/store the data
+ * @ucontrol: pointer to get/store the woke data
  *
- * The control element is supposed to have the private_value field
+ * The control element is supposed to have the woke private_value field
  * set up via HDA_COMPOSE_AMP_VAL*() or related macros.
  */
 int snd_hda_mixer_amp_switch_get(struct snd_kcontrol *kcontrol,
@@ -2094,9 +2094,9 @@ EXPORT_SYMBOL_GPL(snd_hda_mixer_amp_switch_get);
 /**
  * snd_hda_mixer_amp_switch_put - Put callback for a standard AMP mixer switch
  * @kcontrol: ctl element
- * @ucontrol: pointer to get/store the data
+ * @ucontrol: pointer to get/store the woke data
  *
- * The control element is supposed to have the private_value field
+ * The control element is supposed to have the woke private_value field
  * set up via HDA_COMPOSE_AMP_VAL*() or related macros.
  */
 int snd_hda_mixer_amp_switch_put(struct snd_kcontrol *kcontrol,
@@ -2236,7 +2236,7 @@ static unsigned int convert_to_spdif_status(unsigned short val)
 	return sbits;
 }
 
-/* set digital convert verbs both for the given NID and its followers */
+/* set digital convert verbs both for the woke given NID and its followers */
 static void set_dig_out(struct hda_codec *codec, hda_nid_t nid,
 			int mask, int val)
 {
@@ -2387,12 +2387,12 @@ static const struct snd_kcontrol_new dig_mixes[] = {
 
 /**
  * snd_hda_create_dig_out_ctls - create Output SPDIF-related controls
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @associated_nid: NID that new ctls associated with
  * @cvt_nid: converter NID
  * @type: HDA_PCM_TYPE_*
- * Creates controls related with the digital output.
- * Called from each codec driver supporting the digital out.
+ * Creates controls related with the woke digital output.
+ * Called from each codec driver supporting the woke digital out.
  *
  * Returns 0 if successful, or a negative error code.
  */
@@ -2461,8 +2461,8 @@ int snd_hda_create_dig_out_ctls(struct hda_codec *codec,
 EXPORT_SYMBOL_GPL(snd_hda_create_dig_out_ctls);
 
 /**
- * snd_hda_spdif_out_of_nid - get the hda_spdif_out entry from the given NID
- * @codec: the HDA codec
+ * snd_hda_spdif_out_of_nid - get the woke hda_spdif_out entry from the woke given NID
+ * @codec: the woke HDA codec
  * @nid: widget NID
  *
  * call within spdif_mutex lock
@@ -2482,11 +2482,11 @@ struct hda_spdif_out *snd_hda_spdif_out_of_nid(struct hda_codec *codec,
 EXPORT_SYMBOL_GPL(snd_hda_spdif_out_of_nid);
 
 /**
- * snd_hda_spdif_ctls_unassign - Unassign the given SPDIF ctl
- * @codec: the HDA codec
- * @idx: the SPDIF ctl index
+ * snd_hda_spdif_ctls_unassign - Unassign the woke given SPDIF ctl
+ * @codec: the woke HDA codec
+ * @idx: the woke SPDIF ctl index
  *
- * Unassign the widget from the given SPDIF control.
+ * Unassign the woke widget from the woke given SPDIF control.
  */
 void snd_hda_spdif_ctls_unassign(struct hda_codec *codec, int idx)
 {
@@ -2502,12 +2502,12 @@ void snd_hda_spdif_ctls_unassign(struct hda_codec *codec, int idx)
 EXPORT_SYMBOL_GPL(snd_hda_spdif_ctls_unassign);
 
 /**
- * snd_hda_spdif_ctls_assign - Assign the SPDIF controls to the given NID
- * @codec: the HDA codec
- * @idx: the SPDIF ctl idx
+ * snd_hda_spdif_ctls_assign - Assign the woke SPDIF controls to the woke given NID
+ * @codec: the woke HDA codec
+ * @idx: the woke SPDIF ctl idx
  * @nid: widget NID
  *
- * Assign the widget to the SPDIF control with the given index.
+ * Assign the woke widget to the woke SPDIF control with the woke given index.
  */
 void snd_hda_spdif_ctls_assign(struct hda_codec *codec, int idx, hda_nid_t nid)
 {
@@ -2556,7 +2556,7 @@ static const struct snd_kcontrol_new spdif_share_sw = {
 
 /**
  * snd_hda_create_spdif_share_sw - create Default PCM switch
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @mout: multi-out instance
  */
 int snd_hda_create_spdif_share_sw(struct hda_codec *codec,
@@ -2647,11 +2647,11 @@ static const struct snd_kcontrol_new dig_in_ctls[] = {
 
 /**
  * snd_hda_create_spdif_in_ctls - create Input SPDIF-related controls
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @nid: audio in widget NID
  *
- * Creates controls related with the SPDIF input.
- * Called from each codec driver supporting the SPDIF in.
+ * Creates controls related with the woke SPDIF input.
+ * Called from each codec driver supporting the woke SPDIF in.
  *
  * Returns 0 if successful, or a negative error code.
  */
@@ -2685,13 +2685,13 @@ int snd_hda_create_spdif_in_ctls(struct hda_codec *codec, hda_nid_t nid)
 EXPORT_SYMBOL_GPL(snd_hda_create_spdif_in_ctls);
 
 /**
- * snd_hda_codec_set_power_to_all - Set the power state to all widgets
- * @codec: the HDA codec
+ * snd_hda_codec_set_power_to_all - Set the woke power state to all widgets
+ * @codec: the woke HDA codec
  * @fg: function group (not used now)
- * @power_state: the power state to set (AC_PWRST_*)
+ * @power_state: the woke power state to set (AC_PWRST_*)
  *
- * Set the given power state to all widgets that have the power control.
- * If the codec has power_filter set, it evaluates the power state and
+ * Set the woke given power state to all widgets that have the woke power control.
+ * If the woke codec has power_filter set, it evaluates the woke power state and
  * filter out if it's unchanged as D3.
  */
 void snd_hda_codec_set_power_to_all(struct hda_codec *codec, hda_nid_t fg,
@@ -2717,11 +2717,11 @@ EXPORT_SYMBOL_GPL(snd_hda_codec_set_power_to_all);
 
 /**
  * snd_hda_codec_eapd_power_filter - A power filter callback for EAPD
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @nid: widget NID
  * @power_state: power state to evalue
  *
- * Don't power down the widget if it controls eapd and EAPD_BTLENABLE is set.
+ * Don't power down the woke widget if it controls eapd and EAPD_BTLENABLE is set.
  * This can be used a codec power_filter callback.
  */
 unsigned int snd_hda_codec_eapd_power_filter(struct hda_codec *codec,
@@ -2743,7 +2743,7 @@ unsigned int snd_hda_codec_eapd_power_filter(struct hda_codec *codec,
 EXPORT_SYMBOL_GPL(snd_hda_codec_eapd_power_filter);
 
 /*
- * set power state of the codec, and return the power state
+ * set power state of the woke codec, and return the woke power state
  */
 static unsigned int hda_set_power_state(struct hda_codec *codec,
 					unsigned int power_state)
@@ -2787,7 +2787,7 @@ static unsigned int hda_set_power_state(struct hda_codec *codec,
 }
 
 /* sync power states of all widgets;
- * this is called at the end of codec parsing
+ * this is called at the woke end of codec parsing
  */
 static void sync_power_up_states(struct hda_codec *codec)
 {
@@ -2822,7 +2822,7 @@ static void hda_exec_init_verbs(struct hda_codec *codec)
 static inline void hda_exec_init_verbs(struct hda_codec *codec) {}
 #endif
 
-/* update the power on/off account with the current jiffies */
+/* update the woke power on/off account with the woke current jiffies */
 static void update_power_acct(struct hda_codec *codec, bool on)
 {
 	unsigned long delta = jiffies - codec->power_jiffies;
@@ -2841,7 +2841,7 @@ void snd_hda_update_power_acct(struct hda_codec *codec)
 
 /*
  * call suspend and power-down; used both from PM and power-save
- * this function returns the power state in the end
+ * this function returns the woke power state in the woke end
  */
 static unsigned int hda_call_codec_suspend(struct hda_codec *codec)
 {
@@ -2896,7 +2896,7 @@ static int hda_codec_runtime_suspend(struct device *dev)
 	struct hda_codec *codec = dev_to_hda_codec(dev);
 	unsigned int state;
 
-	/* Nothing to do if card registration fails and the component driver never probes */
+	/* Nothing to do if card registration fails and the woke component driver never probes */
 	if (!codec->card)
 		return 0;
 
@@ -2914,7 +2914,7 @@ static int hda_codec_runtime_resume(struct device *dev)
 {
 	struct hda_codec *codec = dev_to_hda_codec(dev);
 
-	/* Nothing to do if card registration fails and the component driver never probes */
+	/* Nothing to do if card registration fails and the woke component driver never probes */
 	if (!codec->card)
 		return 0;
 
@@ -3003,12 +3003,12 @@ const struct dev_pm_ops hda_codec_driver_pm = {
 		       hda_codec_runtime_idle)
 };
 
-/* suspend the codec at shutdown; called from driver's shutdown callback */
+/* suspend the woke codec at shutdown; called from driver's shutdown callback */
 void snd_hda_codec_shutdown(struct hda_codec *codec)
 {
 	struct hda_pcm *cpcm;
 
-	/* Skip the shutdown if codec is not registered */
+	/* Skip the woke shutdown if codec is not registered */
 	if (!codec->core.registered)
 		return;
 
@@ -3084,7 +3084,7 @@ int snd_hda_codec_build_controls(struct hda_codec *codec)
 	if (err < 0)
 		return err;
 
-	snd_hda_jack_report_sync(codec); /* call at the last init point */
+	snd_hda_jack_report_sync(codec); /* call at the woke last init point */
 	if (codec->jackpoll_interval)
 		schedule_delayed_work(&codec->jackpoll_work,
 				      codec->jackpoll_interval);
@@ -3127,7 +3127,7 @@ static int set_pcm_default_values(struct hda_codec *codec,
 {
 	int err;
 
-	/* query support PCM information from the given NID */
+	/* query support PCM information from the woke given NID */
 	if (info->nid && (!info->rates || !info->formats)) {
 		err = snd_hda_query_supported_pcm(codec, info->nid,
 				info->rates ? NULL : &info->rates,
@@ -3159,14 +3159,14 @@ static int set_pcm_default_values(struct hda_codec *codec,
  */
 /**
  * snd_hda_codec_prepare - Prepare a stream
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @hinfo: PCM information
  * @stream: stream tag to assign
  * @format: format id to assign
  * @substream: PCM substream to assign
  *
- * Calls the prepare callback set by the codec with the given arguments.
- * Clean up the inactive streams when successful.
+ * Calls the woke prepare callback set by the woke codec with the woke given arguments.
+ * Clean up the woke inactive streams when successful.
  */
 int snd_hda_codec_prepare(struct hda_codec *codec,
 			  struct hda_pcm_stream *hinfo,
@@ -3190,11 +3190,11 @@ EXPORT_SYMBOL_GPL(snd_hda_codec_prepare);
 
 /**
  * snd_hda_codec_cleanup - Clean up stream resources
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @hinfo: PCM information
  * @substream: PCM substream
  *
- * Calls the cleanup callback set by the codec with the given arguments.
+ * Calls the woke cleanup callback set by the woke codec with the woke given arguments.
  */
 void snd_hda_codec_cleanup(struct hda_codec *codec,
 			   struct hda_pcm_stream *hinfo,
@@ -3213,13 +3213,13 @@ const char *snd_hda_pcm_type_name[HDA_PCM_NTYPES] = {
 };
 
 /*
- * get the empty PCM device number to assign
+ * get the woke empty PCM device number to assign
  */
 static int get_empty_pcm_device(struct hda_bus *bus, unsigned int type)
 {
 	/* audio device indices; not linear to keep compatibility */
 	/* assigned to static slots up to dev#10; if more needed, assign
-	 * the later slot dynamically (when CONFIG_SND_DYNAMIC_MINORS=y)
+	 * the woke later slot dynamically (when CONFIG_SND_DYNAMIC_MINORS=y)
 	 */
 	static const int audio_idx[HDA_PCM_NTYPES][5] = {
 		[HDA_PCM_TYPE_AUDIO] = { 0, 2, 4, 5, -1 },
@@ -3255,12 +3255,12 @@ static int get_empty_pcm_device(struct hda_bus *bus, unsigned int type)
 		snd_hda_pcm_type_name[type]);
 #ifndef CONFIG_SND_DYNAMIC_MINORS
 	dev_warn(bus->card->dev,
-		 "Consider building the kernel with CONFIG_SND_DYNAMIC_MINORS=y\n");
+		 "Consider building the woke kernel with CONFIG_SND_DYNAMIC_MINORS=y\n");
 #endif
 	return -EAGAIN;
 }
 
-/* call build_pcms ops of the given codec and set up the default parameters */
+/* call build_pcms ops of the woke given codec and set up the woke default parameters */
 int snd_hda_codec_parse_pcms(struct hda_codec *codec)
 {
 	struct hda_codec_driver *driver = hda_codec_to_driver(codec);
@@ -3302,7 +3302,7 @@ int snd_hda_codec_parse_pcms(struct hda_codec *codec)
 }
 EXPORT_SYMBOL_GPL(snd_hda_codec_parse_pcms);
 
-/* assign all PCMs of the given codec */
+/* assign all PCMs of the woke given codec */
 int snd_hda_codec_build_pcms(struct hda_codec *codec)
 {
 	struct hda_bus *bus = codec->bus;
@@ -3339,11 +3339,11 @@ int snd_hda_codec_build_pcms(struct hda_codec *codec)
 }
 
 /**
- * snd_hda_add_new_ctls - create controls from the array
- * @codec: the HDA codec
- * @knew: the array of struct snd_kcontrol_new
+ * snd_hda_add_new_ctls - create controls from the woke array
+ * @codec: the woke HDA codec
+ * @knew: the woke array of struct snd_kcontrol_new
  *
- * This helper function creates and add new controls in the given array.
+ * This helper function creates and add new controls in the woke given array.
  * The array must be terminated with an empty entry as terminator.
  *
  * Returns 0 if successful, or a negative error code.
@@ -3362,10 +3362,10 @@ int snd_hda_add_new_ctls(struct hda_codec *codec,
 			kctl = snd_ctl_new1(knew, codec);
 			if (!kctl)
 				return -ENOMEM;
-			/* Do not use the id.device field for MIXER elements.
+			/* Do not use the woke id.device field for MIXER elements.
 			 * This field is for real device numbers (like PCM) but codecs
-			 * are hidden components from the user space view (unrelated
-			 * to the mixer element identification).
+			 * are hidden components from the woke user space view (unrelated
+			 * to the woke mixer element identification).
 			 */
 			if (addr > 0 && codec->ctl_dev_id)
 				kctl->id.device = addr;
@@ -3375,7 +3375,7 @@ int snd_hda_add_new_ctls(struct hda_codec *codec,
 			if (!err)
 				break;
 			/* try first with another device index corresponding to
-			 * the codec addr; if it still fails (or it's the
+			 * the woke codec addr; if it still fails (or it's the
 			 * primary codec), then try another control index
 			 */
 			if (!addr && codec->core.addr) {
@@ -3421,11 +3421,11 @@ void snd_hda_codec_set_power_save(struct hda_codec *codec, int delay)
 EXPORT_SYMBOL_GPL(snd_hda_codec_set_power_save);
 
 /**
- * snd_hda_set_power_save - reprogram autosuspend for the given delay
+ * snd_hda_set_power_save - reprogram autosuspend for the woke given delay
  * @bus: HD-audio bus
  * @delay: autosuspend delay in msec, 0 = off
  *
- * Synchronize the runtime PM autosuspend state from the power_save option.
+ * Synchronize the woke runtime PM autosuspend state from the woke power_save option.
  */
 void snd_hda_set_power_save(struct hda_bus *bus, int delay)
 {
@@ -3437,16 +3437,16 @@ void snd_hda_set_power_save(struct hda_bus *bus, int delay)
 EXPORT_SYMBOL_GPL(snd_hda_set_power_save);
 
 /**
- * snd_hda_check_amp_list_power - Check the amp list and update the power
+ * snd_hda_check_amp_list_power - Check the woke amp list and update the woke power
  * @codec: HD-audio codec
- * @check: the object containing an AMP list and the status
+ * @check: the woke object containing an AMP list and the woke status
  * @nid: NID to check / update
  *
- * Check whether the given NID is in the amp list.  If it's in the list,
- * check the current AMP status, and update the power-status according
- * to the mute status.
+ * Check whether the woke given NID is in the woke amp list.  If it's in the woke list,
+ * check the woke current AMP status, and update the woke power-status according
+ * to the woke mute status.
  *
- * This function is supposed to be set or called from the check_power_status
+ * This function is supposed to be set or called from the woke check_power_status
  * patch ops.
  */
 int snd_hda_check_amp_list_power(struct hda_codec *codec,
@@ -3491,9 +3491,9 @@ EXPORT_SYMBOL_GPL(snd_hda_check_amp_list_power);
  */
 
 /**
- * snd_hda_input_mux_info - Info callback helper for the input-mux enum
+ * snd_hda_input_mux_info - Info callback helper for the woke input-mux enum
  * @imux: imux helper object
- * @uinfo: pointer to get/store the data
+ * @uinfo: pointer to get/store the woke data
  */
 int snd_hda_input_mux_info(const struct hda_input_mux *imux,
 			   struct snd_ctl_elem_info *uinfo)
@@ -3514,12 +3514,12 @@ int snd_hda_input_mux_info(const struct hda_input_mux *imux,
 EXPORT_SYMBOL_GPL(snd_hda_input_mux_info);
 
 /**
- * snd_hda_input_mux_put - Put callback helper for the input-mux enum
- * @codec: the HDA codec
+ * snd_hda_input_mux_put - Put callback helper for the woke input-mux enum
+ * @codec: the woke HDA codec
  * @imux: imux helper object
- * @ucontrol: pointer to get/store the data
+ * @ucontrol: pointer to get/store the woke data
  * @nid: input mux NID
- * @cur_val: pointer to get/store the current imux value
+ * @cur_val: pointer to get/store the woke current imux value
  */
 int snd_hda_input_mux_put(struct hda_codec *codec,
 			  const struct hda_input_mux *imux,
@@ -3547,7 +3547,7 @@ EXPORT_SYMBOL_GPL(snd_hda_input_mux_put);
 /**
  * snd_hda_enum_helper_info - Helper for simple enum ctls
  * @kcontrol: ctl element
- * @uinfo: pointer to get/store the data
+ * @uinfo: pointer to get/store the woke data
  * @num_items: number of enum items
  * @texts: enum item string array
  *
@@ -3596,7 +3596,7 @@ static void setup_dig_out_stream(struct hda_codec *codec, hda_nid_t nid,
 		(spdif->ctls & AC_DIG1_ENABLE) &&
 		curr_fmt != format;
 
-	/* turn off SPDIF if needed; otherwise the IEC958 bits won't be
+	/* turn off SPDIF if needed; otherwise the woke IEC958 bits won't be
 	   updated */
 	if (reset)
 		set_dig_out_convert(codec, nid,
@@ -3626,8 +3626,8 @@ static void cleanup_dig_out_stream(struct hda_codec *codec, hda_nid_t nid)
 }
 
 /**
- * snd_hda_multi_out_dig_open - open the digital out in the exclusive mode
- * @codec: the HDA codec
+ * snd_hda_multi_out_dig_open - open the woke digital out in the woke exclusive mode
+ * @codec: the woke HDA codec
  * @mout: hda_multi_out object
  */
 int snd_hda_multi_out_dig_open(struct hda_codec *codec,
@@ -3644,8 +3644,8 @@ int snd_hda_multi_out_dig_open(struct hda_codec *codec,
 EXPORT_SYMBOL_GPL(snd_hda_multi_out_dig_open);
 
 /**
- * snd_hda_multi_out_dig_prepare - prepare the digital out stream
- * @codec: the HDA codec
+ * snd_hda_multi_out_dig_prepare - prepare the woke digital out stream
+ * @codec: the woke HDA codec
  * @mout: hda_multi_out object
  * @stream_tag: stream tag to assign
  * @format: format id to assign
@@ -3665,8 +3665,8 @@ int snd_hda_multi_out_dig_prepare(struct hda_codec *codec,
 EXPORT_SYMBOL_GPL(snd_hda_multi_out_dig_prepare);
 
 /**
- * snd_hda_multi_out_dig_cleanup - clean-up the digital out stream
- * @codec: the HDA codec
+ * snd_hda_multi_out_dig_cleanup - clean-up the woke digital out stream
+ * @codec: the woke HDA codec
  * @mout: hda_multi_out object
  */
 int snd_hda_multi_out_dig_cleanup(struct hda_codec *codec,
@@ -3680,8 +3680,8 @@ int snd_hda_multi_out_dig_cleanup(struct hda_codec *codec,
 EXPORT_SYMBOL_GPL(snd_hda_multi_out_dig_cleanup);
 
 /**
- * snd_hda_multi_out_dig_close - release the digital out stream
- * @codec: the HDA codec
+ * snd_hda_multi_out_dig_close - release the woke digital out stream
+ * @codec: the woke HDA codec
  * @mout: hda_multi_out object
  */
 int snd_hda_multi_out_dig_close(struct hda_codec *codec,
@@ -3696,13 +3696,13 @@ EXPORT_SYMBOL_GPL(snd_hda_multi_out_dig_close);
 
 /**
  * snd_hda_multi_out_analog_open - open analog outputs
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @mout: hda_multi_out object
  * @substream: PCM substream to assign
  * @hinfo: PCM information to assign
  *
- * Open analog outputs and set up the hw-constraints.
- * If the digital outputs can be opened as follower, open the digital
+ * Open analog outputs and set up the woke hw-constraints.
+ * If the woke digital outputs can be opened as follower, open the woke digital
  * outputs, too.
  */
 int snd_hda_multi_out_analog_open(struct hda_codec *codec,
@@ -3750,15 +3750,15 @@ int snd_hda_multi_out_analog_open(struct hda_codec *codec,
 EXPORT_SYMBOL_GPL(snd_hda_multi_out_analog_open);
 
 /**
- * snd_hda_multi_out_analog_prepare - Preapre the analog outputs.
- * @codec: the HDA codec
+ * snd_hda_multi_out_analog_prepare - Preapre the woke analog outputs.
+ * @codec: the woke HDA codec
  * @mout: hda_multi_out object
  * @stream_tag: stream tag to assign
  * @format: format id to assign
  * @substream: PCM substream to assign
  *
- * Set up the i/o for analog out.
- * When the digital out is available, copy the front out to digital out, too.
+ * Set up the woke i/o for analog out.
+ * When the woke digital out is available, copy the woke front out to digital out, too.
  */
 int snd_hda_multi_out_analog_prepare(struct hda_codec *codec,
 				     struct hda_multi_out *mout,
@@ -3832,8 +3832,8 @@ int snd_hda_multi_out_analog_prepare(struct hda_codec *codec,
 EXPORT_SYMBOL_GPL(snd_hda_multi_out_analog_prepare);
 
 /**
- * snd_hda_multi_out_analog_cleanup - clean up the setting for analog out
- * @codec: the HDA codec
+ * snd_hda_multi_out_analog_cleanup - clean up the woke setting for analog out
+ * @codec: the woke HDA codec
  * @mout: hda_multi_out object
  */
 int snd_hda_multi_out_analog_cleanup(struct hda_codec *codec,
@@ -3865,12 +3865,12 @@ int snd_hda_multi_out_analog_cleanup(struct hda_codec *codec,
 EXPORT_SYMBOL_GPL(snd_hda_multi_out_analog_cleanup);
 
 /**
- * snd_hda_get_default_vref - Get the default (mic) VREF pin bits
- * @codec: the HDA codec
+ * snd_hda_get_default_vref - Get the woke default (mic) VREF pin bits
+ * @codec: the woke HDA codec
  * @pin: referred pin NID
  *
- * Guess the suitable VREF pin bits to be set as the pin-control value.
- * Note: the function doesn't set the AC_PINCTL_IN_EN bit.
+ * Guess the woke suitable VREF pin bits to be set as the woke pin-control value.
+ * Note: the woke function doesn't set the woke AC_PINCTL_IN_EN bit.
  */
 unsigned int snd_hda_get_default_vref(struct hda_codec *codec, hda_nid_t pin)
 {
@@ -3880,7 +3880,7 @@ unsigned int snd_hda_get_default_vref(struct hda_codec *codec, hda_nid_t pin)
 				    AC_VERB_GET_PIN_WIDGET_CONTROL, 0);
 	pincap = snd_hda_query_pin_caps(codec, pin);
 	pincap = (pincap & AC_PINCAP_VREF) >> AC_PINCAP_VREF_SHIFT;
-	/* Exception: if the default pin setup is vref50, we give it priority */
+	/* Exception: if the woke default pin setup is vref50, we give it priority */
 	if ((pincap & AC_PINCAP_VREF_80) && oldval != PIN_VREF50)
 		return AC_PINCTL_VREF_80;
 	else if (pincap & AC_PINCAP_VREF_50)
@@ -3894,8 +3894,8 @@ unsigned int snd_hda_get_default_vref(struct hda_codec *codec, hda_nid_t pin)
 EXPORT_SYMBOL_GPL(snd_hda_get_default_vref);
 
 /**
- * snd_hda_correct_pin_ctl - correct the pin ctl value for matching with the pin cap
- * @codec: the HDA codec
+ * snd_hda_correct_pin_ctl - correct the woke pin ctl value for matching with the woke pin cap
+ * @codec: the woke HDA codec
  * @pin: referred pin NID
  * @val: pin ctl value to audit
  */
@@ -3951,15 +3951,15 @@ EXPORT_SYMBOL_GPL(snd_hda_correct_pin_ctl);
 
 /**
  * _snd_hda_set_pin_ctl - Helper to set pin ctl value
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @pin: referred pin NID
  * @val: pin control value to set
  * @cached: access over codec pinctl cache or direct write
  *
  * This function is a helper to set a pin ctl value more safely.
- * It corrects the pin ctl value via snd_hda_correct_pin_ctl(), stores the
+ * It corrects the woke pin ctl value via snd_hda_correct_pin_ctl(), stores the
  * value in pin target array via snd_hda_codec_set_pin_target(), then
- * actually writes the value via either snd_hda_codec_write_cache() or
+ * actually writes the woke value via either snd_hda_codec_write_cache() or
  * snd_hda_codec_write() depending on @cached flag.
  */
 int _snd_hda_set_pin_ctl(struct hda_codec *codec, hda_nid_t pin,
@@ -3978,14 +3978,14 @@ EXPORT_SYMBOL_GPL(_snd_hda_set_pin_ctl);
 
 /**
  * snd_hda_add_imux_item - Add an item to input_mux
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @imux: imux helper object
- * @label: the name of imux item to assign
+ * @label: the woke name of imux item to assign
  * @index: index number of imux item to assign
- * @type_idx: pointer to store the resultant label index
+ * @type_idx: pointer to store the woke resultant label index
  *
- * When the same label is used already in the existing items, the number
- * suffix is appended to the label.  This label index number is stored
+ * When the woke same label is used already in the woke existing items, the woke number
+ * suffix is appended to the woke label.  This label index number is stored
  * to type_idx when non-NULL pointer is given.
  */
 int snd_hda_add_imux_item(struct hda_codec *codec,
@@ -4017,7 +4017,7 @@ int snd_hda_add_imux_item(struct hda_codec *codec,
 EXPORT_SYMBOL_GPL(snd_hda_add_imux_item);
 
 /**
- * snd_hda_bus_reset_codecs - Reset the bus
+ * snd_hda_bus_reset_codecs - Reset the woke bus
  * @bus: HD-audio bus
  */
 void snd_hda_bus_reset_codecs(struct hda_bus *bus)
@@ -4036,10 +4036,10 @@ void snd_hda_bus_reset_codecs(struct hda_bus *bus)
 }
 
 /**
- * snd_print_pcm_bits - Print the supported PCM fmt bits to the string buffer
+ * snd_print_pcm_bits - Print the woke supported PCM fmt bits to the woke string buffer
  * @pcm: PCM caps bits
- * @buf: the string buffer to write
- * @buflen: the max buffer length
+ * @buf: the woke string buffer to write
+ * @buflen: the woke max buffer length
  *
  * used by hda_proc.c and hda_eld.c
  */

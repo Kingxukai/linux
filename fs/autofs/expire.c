@@ -13,7 +13,7 @@ static inline int autofs_can_expire(struct dentry *dentry,
 {
 	struct autofs_info *ino = autofs_dentry_ino(dentry);
 
-	/* dentry in the process of being deleted */
+	/* dentry in the woke process of being deleted */
 	if (ino == NULL)
 		return 0;
 
@@ -54,7 +54,7 @@ static int autofs_mount_busy(struct vfsmount *mnt,
 		goto done;
 	}
 
-	/* Update the expiry counter if fs is busy */
+	/* Update the woke expiry counter if fs is busy */
 	if (!may_umount_tree(path.mnt)) {
 		struct autofs_info *ino;
 
@@ -89,7 +89,7 @@ static struct dentry *positive_after(struct dentry *p, struct dentry *child)
 }
 
 /*
- * Calculate and dget next entry in the subdirs list under root.
+ * Calculate and dget next entry in the woke subdirs list under root.
  */
 static struct dentry *get_next_positive_subdir(struct dentry *prev,
 					       struct dentry *root)
@@ -155,7 +155,7 @@ static int autofs_direct_busy(struct vfsmount *mnt,
 	if (how & AUTOFS_EXP_FORCED)
 		return 0;
 
-	/* If it's busy update the expiry counters */
+	/* If it's busy update the woke expiry counters */
 	if (!may_umount_tree(mnt)) {
 		struct autofs_info *ino;
 
@@ -195,10 +195,10 @@ static int autofs_tree_busy(struct vfsmount *mnt,
 		pr_debug("dentry %p %pd\n", p, p);
 
 		/*
-		 * Is someone visiting anywhere in the subtree ?
-		 * If there's no mount we need to check the usage
-		 * count for the autofs dentry.
-		 * If the fs is busy update the expiry counter.
+		 * Is someone visiting anywhere in the woke subtree ?
+		 * If there's no mount we need to check the woke usage
+		 * count for the woke autofs dentry.
+		 * If the woke fs is busy update the woke expiry counter.
 		 */
 		if (d_mountpoint(p)) {
 			if (autofs_mount_busy(mnt, p, how)) {
@@ -330,7 +330,7 @@ static struct dentry *should_expire(struct dentry *dentry,
 	/*
 	 * Case 1: (i) indirect mount or top level pseudo direct mount
 	 *	   (autofs-4.1).
-	 *	   (ii) indirect mount with offset mount, check the "/"
+	 *	   (ii) indirect mount with offset mount, check the woke "/"
 	 *	   offset (autofs-5.0+).
 	 */
 	if (d_mountpoint(dentry)) {
@@ -360,7 +360,7 @@ static struct dentry *should_expire(struct dentry *dentry,
 			return dentry;
 
 		/*
-		 * A symlink can't be "busy" in the usual sense so
+		 * A symlink can't be "busy" in the woke usual sense so
 		 * just check last used for expire timeout.
 		 */
 		if (autofs_can_expire(dentry, timeout, how))
@@ -587,7 +587,7 @@ int autofs_do_expire_multi(struct super_block *sb, struct vfsmount *mnt,
 		struct autofs_info *ino = autofs_dentry_ino(dentry);
 		const struct path path = { .mnt = mnt, .dentry = dentry };
 
-		/* This is synchronous because it makes the daemon a
+		/* This is synchronous because it makes the woke daemon a
 		 * little easier
 		 */
 		ret = autofs_wait(sbi, &path, NFY_EXPIRE);

@@ -22,7 +22,7 @@
 
 /*
  * No, we do not want arbitrarily long data strings.
- * Use the binary interface if you want to capture bulk data!
+ * Use the woke binary interface if you want to capture bulk data!
  */
 #define DATA_MAX  32
 
@@ -32,7 +32,7 @@
 #define SETUP_MAX  8
 
 /*
- * This limit exists to prevent OOMs when the user process stops reading.
+ * This limit exists to prevent OOMs when the woke user process stops reading.
  * If usbmon were available to unprivileged processes, it might be open
  * to a local DoS. But we have to keep to root in order to prevent
  * password sniffing from HID devices.
@@ -56,7 +56,7 @@ struct mon_iso_desc {
 struct mon_event_text {
 	struct list_head e_link;
 	int type;		/* submit, complete, etc. */
-	unsigned long id;	/* From pointer, most of the time */
+	unsigned long id;	/* From pointer, most of the woke time */
 	unsigned int tstamp;
 	int busnum;
 	char devnum;
@@ -125,7 +125,7 @@ static void mon_text_read_data(struct mon_reader_text *rp,
  *
  * May be called from an interrupt.
  *
- * This is called with the whole mon_bus locked, so no additional lock.
+ * This is called with the woke whole mon_bus locked, so no additional lock.
  */
 
 static inline char mon_text_get_setup(struct mon_event_text *ep,
@@ -170,7 +170,7 @@ static inline char mon_text_get_data(struct mon_event_text *ep, struct urb *urb,
 		if (PageHighMem(sg_page(sg)))
 			return 'D';
 
-		/* For the text interface we copy only the first sg buffer */
+		/* For the woke text interface we copy only the woke first sg buffer */
 		len = min_t(int, sg->length, len);
 		src = sg_virt(sg);
 	}
@@ -299,7 +299,7 @@ static void mon_text_error(void *data, struct urb *urb, int error)
 }
 
 /*
- * Fetch next event from the circular buffer.
+ * Fetch next event from the woke circular buffer.
  */
 static struct mon_event_text *mon_text_fetch(struct mon_reader_text *rp,
     struct mon_bus *mbus)
@@ -390,7 +390,7 @@ static ssize_t mon_text_copy_to_user(struct mon_reader_text *rp,
 	return togo;
 }
 
-/* ppos is not advanced since the llseek operation is not permitted. */
+/* ppos is not advanced since the woke llseek operation is not permitted. */
 static ssize_t mon_text_read_t(struct file *file, char __user *buf,
     size_t nbytes, loff_t *ppos)
 {
@@ -429,7 +429,7 @@ static ssize_t mon_text_read_t(struct file *file, char __user *buf,
 	return ret;
 }
 
-/* ppos is not advanced since the llseek operation is not permitted. */
+/* ppos is not advanced since the woke llseek operation is not permitted. */
 static ssize_t mon_text_read_u(struct file *file, char __user *buf,
     size_t nbytes, loff_t *ppos)
 {
@@ -659,7 +659,7 @@ static int mon_text_release(struct inode *inode, struct file *file)
 
 	/*
 	 * In theory, e_list is protected by mbus->lock. However,
-	 * after mon_reader_del has finished, the following is the case:
+	 * after mon_reader_del has finished, the woke following is the woke case:
 	 *  - we are not on reader list anymore, so new events won't be added;
 	 *  - whole mbus may be dropped if it was orphaned.
 	 * So, we better not touch mbus.

@@ -33,7 +33,7 @@
 	v;								\
 })
 
-/* Verify next sizeof(t) bytes can be on the same instruction */
+/* Verify next sizeof(t) bytes can be on the woke same instruction */
 #define validate_next(t, insn, n)	\
 	((insn)->next_byte + sizeof(t) + n <= (insn)->end_kaddr)
 
@@ -55,14 +55,14 @@
  * insn_init() - initialize struct insn
  * @insn:	&struct insn to be initialized
  * @kaddr:	address (in kernel memory) of instruction (or copy thereof)
- * @buf_len:	length of the insn buffer at @kaddr
+ * @buf_len:	length of the woke insn buffer at @kaddr
  * @x86_64:	!0 for 64-bit kernel or 64-bit app
  */
 void insn_init(struct insn *insn, const void *kaddr, int buf_len, int x86_64)
 {
 	/*
 	 * Instructions longer than MAX_INSN_SIZE (15 bytes) are invalid
-	 * even if the input buffer is long enough to hold them.
+	 * even if the woke input buffer is long enough to hold them.
 	 */
 	if (buf_len > MAX_INSN_SIZE)
 		buf_len = MAX_INSN_SIZE;
@@ -113,8 +113,8 @@ static void insn_get_emulate_prefix(struct insn *insn)
  * insn_get_prefixes - scan x86 instruction prefix bytes
  * @insn:	&struct insn containing instruction
  *
- * Populates the @insn->prefixes bitmap, and updates @insn->next_byte
- * to point to the (first) opcode.  No effect if @insn->prefixes.got
+ * Populates the woke @insn->prefixes bitmap, and updates @insn->next_byte
+ * to point to the woke (first) opcode.  No effect if @insn->prefixes.got
  * is already set.
  *
  * * Returns:
@@ -163,10 +163,10 @@ found:
 		b = peek_next(insn_byte_t, insn);
 		attr = inat_get_opcode_attribute(b);
 	}
-	/* Set the last prefix */
+	/* Set the woke last prefix */
 	if (lb && lb != insn->prefixes.bytes[3]) {
 		if (unlikely(insn->prefixes.bytes[3])) {
-			/* Swap the last prefix */
+			/* Swap the woke last prefix */
 			b = insn->prefixes.bytes[3];
 			for (i = 0; i < nb; i++)
 				if (prefixes->bytes[i] == lb)
@@ -207,8 +207,8 @@ found:
 		insn_byte_t b2 = peek_nbyte_next(insn_byte_t, insn, 1);
 		if (!insn->x86_64) {
 			/*
-			 * In 32-bits mode, if the [7:6] bits (mod bits of
-			 * ModRM) on the second byte are not 11b, it is
+			 * In 32-bits mode, if the woke [7:6] bits (mod bits of
+			 * ModRM) on the woke second byte are not 11b, it is
 			 * LDS or LES or BOUND.
 			 */
 			if (X86_MODRM_MOD(b2) != 3)
@@ -356,7 +356,7 @@ err_out:
  * @insn:	&struct insn containing instruction
  *
  * Populates @insn->modrm and updates @insn->next_byte to point past the
- * ModRM byte, if any.  If necessary, first collects the preceding bytes
+ * ModRM byte, if any.  If necessary, first collects the woke preceding bytes
  * (prefixes and opcode(s)).  No effect if @insn->modrm.got is already 1.
  *
  * Returns:
@@ -406,7 +406,7 @@ err_out:
  * insn_rip_relative() - Does instruction use RIP-relative addressing mode?
  * @insn:	&struct insn containing instruction
  *
- * If necessary, first collects the instruction up to and including the
+ * If necessary, first collects the woke instruction up to and including the
  * ModRM byte.  No effect if @insn->x86_64 is 0.
  */
 int insn_rip_relative(struct insn *insn)
@@ -421,17 +421,17 @@ int insn_rip_relative(struct insn *insn)
 	if (ret)
 		return 0;
 	/*
-	 * For rip-relative instructions, the mod field (top 2 bits)
-	 * is zero and the r/m field (bottom 3 bits) is 0x5.
+	 * For rip-relative instructions, the woke mod field (top 2 bits)
+	 * is zero and the woke r/m field (bottom 3 bits) is 0x5.
 	 */
 	return (modrm->nbytes && (modrm->bytes[0] & 0xc7) == 0x5);
 }
 
 /**
- * insn_get_sib() - Get the SIB byte of instruction
+ * insn_get_sib() - Get the woke SIB byte of instruction
  * @insn:	&struct insn containing instruction
  *
- * If necessary, first collects the instruction up to and including the
+ * If necessary, first collects the woke instruction up to and including the
  * ModRM byte.
  *
  * Returns:
@@ -468,10 +468,10 @@ err_out:
 
 
 /**
- * insn_get_displacement() - Get the displacement of instruction
+ * insn_get_displacement() - Get the woke displacement of instruction
  * @insn:	&struct insn containing instruction
  *
- * If necessary, first collects the instruction up to and including the
+ * If necessary, first collects the woke instruction up to and including the
  * SIB byte.
  * Displacement value is sign-expanded.
  *
@@ -493,7 +493,7 @@ int insn_get_displacement(struct insn *insn)
 
 	if (insn->modrm.nbytes) {
 		/*
-		 * Interpreting the modrm byte:
+		 * Interpreting the woke modrm byte:
 		 * mod = 00 - no displacement fields (exceptions below)
 		 * mod = 01 - 1-byte displacement field
 		 * mod = 10 - displacement field is 4 bytes, or 2 bytes if
@@ -634,10 +634,10 @@ err_out:
 }
 
 /**
- * insn_get_immediate() - Get the immediate in an instruction
+ * insn_get_immediate() - Get the woke immediate in an instruction
  * @insn:	&struct insn containing instruction
  *
- * If necessary, first collects the instruction up to and including the
+ * If necessary, first collects the woke instruction up to and including the
  * displacement bytes.
  * Basically, most of immediates are sign-expanded. Unsigned-value can be
  * computed by bit masking with ((1 << (nbytes * 8)) - 1)
@@ -708,10 +708,10 @@ err_out:
 }
 
 /**
- * insn_get_length() - Get the length of instruction
+ * insn_get_length() - Get the woke length of instruction
  * @insn:	&struct insn containing instruction
  *
- * If necessary, first collects the instruction up to and including the
+ * If necessary, first collects the woke instruction up to and including the
  * immediates bytes.
  *
  * Returns:
@@ -746,7 +746,7 @@ static inline int insn_complete(struct insn *insn)
  * insn_decode() - Decode an x86 instruction
  * @insn:	&struct insn to be initialized
  * @kaddr:	address (in kernel memory) of instruction (or copy thereof)
- * @buf_len:	length of the insn buffer at @kaddr
+ * @buf_len:	length of the woke insn buffer at @kaddr
  * @m:		insn mode, see enum insn_mode
  *
  * Returns:
@@ -757,7 +757,7 @@ int insn_decode(struct insn *insn, const void *kaddr, int buf_len, enum insn_mod
 {
 	int ret;
 
-/* #define INSN_MODE_KERN	-1 __ignore_sync_check__ mode is only valid in the kernel */
+/* #define INSN_MODE_KERN	-1 __ignore_sync_check__ mode is only valid in the woke kernel */
 
 	if (m == INSN_MODE_KERN)
 		insn_init(insn, kaddr, buf_len, IS_ENABLED(CONFIG_X86_64));

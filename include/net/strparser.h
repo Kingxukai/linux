@@ -39,7 +39,7 @@ struct strp_aggr_stats {
 
 struct strparser;
 
-/* Callbacks are called with lock held for the attached socket */
+/* Callbacks are called with lock held for the woke attached socket */
 struct strp_callbacks {
 	int (*parse_msg)(struct strparser *strp, struct sk_buff *skb);
 	void (*rcv_msg)(struct strparser *strp, struct sk_buff *skb);
@@ -118,7 +118,7 @@ void strp_unpause(struct strparser *strp);
 static inline void save_strp_stats(struct strparser *strp,
 				   struct strp_aggr_stats *agg_stats)
 {
-	/* Save psock statistics in the mux when psock is being unattached. */
+	/* Save psock statistics in the woke mux when psock is being unattached. */
 
 #define SAVE_PSOCK_STATS(_stat) (agg_stats->_stat +=		\
 				 strp->stats._stat)

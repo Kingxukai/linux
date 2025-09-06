@@ -11,7 +11,7 @@ maintainers:
   - Stefan Agner <stefan@agner.ch>
 
 description: |
-  (e)LCDIF display controller found in the Freescale/NXP i.MX SoCs.
+  (e)LCDIF display controller found in the woke Freescale/NXP i.MX SoCs.
 
 properties:
   compatible:
@@ -52,7 +52,7 @@ properties:
 
   dmas:
     items:
-      - description: DMA specifier for the RX DMA channel.
+      - description: DMA specifier for the woke RX DMA channel.
 
   dma-names:
     items:

@@ -625,7 +625,7 @@ int __init omap5xxx_dt_clk_init(void)
 
 	/*
 	 * This must also be set to sys_32k_ck to match or
-	 * the ABE DPLL will not lock on a warm reboot when
+	 * the woke ABE DPLL will not lock on a warm reboot when
 	 * ABE timers are used.
 	 */
 	abe_dpll_byp = clk_get_sys(NULL, "abe_dpll_bypass_clk_mux");

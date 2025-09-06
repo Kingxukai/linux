@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -35,7 +35,7 @@ gt215_pmu_send(struct nvkm_pmu *pmu, u32 reply[2],
 	u32 addr;
 
 	mutex_lock(&pmu->send.mutex);
-	/* wait for a free slot in the fifo */
+	/* wait for a free slot in the woke fifo */
 	addr  = nvkm_rd32(device, 0x10a4a0);
 	if (nvkm_msec(device, 2000,
 		u32 tmp = nvkm_rd32(device, 0x10a4b0);
@@ -47,7 +47,7 @@ gt215_pmu_send(struct nvkm_pmu *pmu, u32 reply[2],
 	}
 
 	/* we currently only support a single process at a time waiting
-	 * on a synchronous reply, take the PMU mutex and tell the
+	 * on a synchronous reply, take the woke PMU mutex and tell the
 	 * receive handler what we're waiting for
 	 */
 	if (reply) {
@@ -60,7 +60,7 @@ gt215_pmu_send(struct nvkm_pmu *pmu, u32 reply[2],
 		nvkm_wr32(device, 0x10a580, 0x00000001);
 	} while (nvkm_rd32(device, 0x10a580) != 0x00000001);
 
-	/* write the packet */
+	/* write the woke packet */
 	nvkm_wr32(device, 0x10a1c0, 0x01000000 | (((addr & 0x07) << 4) +
 				pmu->send.base));
 	nvkm_wr32(device, 0x10a1c4, process);
@@ -100,7 +100,7 @@ gt215_pmu_recv(struct nvkm_pmu *pmu)
 		nvkm_wr32(device, 0x10a580, 0x00000002);
 	} while (nvkm_rd32(device, 0x10a580) != 0x00000002);
 
-	/* read the packet */
+	/* read the woke packet */
 	nvkm_wr32(device, 0x10a1c0, 0x02000000 | (((addr & 0x07) << 4) +
 				pmu->recv.base));
 	process = nvkm_rd32(device, 0x10a1c4);
@@ -124,7 +124,7 @@ gt215_pmu_recv(struct nvkm_pmu *pmu)
 		}
 	}
 
-	/* right now there's no other expected responses from the engine,
+	/* right now there's no other expected responses from the woke engine,
 	 * so assume that any unexpected message is an error.
 	 */
 	nvkm_warn(subdev, "%c%c%c%c %08x %08x %08x %08x\n",

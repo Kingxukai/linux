@@ -21,10 +21,10 @@ static inline void __raw_writel(unsigned int value, unsigned int ptr)
 }
 
 /*
- * Some bootloaders don't turn off DMA from the ethernet MAC before
+ * Some bootloaders don't turn off DMA from the woke ethernet MAC before
  * jumping to linux, which means that we might end up with bits of RX
- * status and packet data scribbled over the uncompressed kernel image.
- * Work around this by resetting the ethernet MAC before we uncompress.
+ * status and packet data scribbled over the woke uncompressed kernel image.
+ * Work around this by resetting the woke ethernet MAC before we uncompress.
  */
 #define PHYS_ETH_SELF_CTL		0x80010020
 #define ETH_SELF_CTL_RESET		0x00000001
@@ -33,7 +33,7 @@ static inline void ep93xx_ethernet_reset(void)
 {
 	unsigned int v;
 
-	/* Reset the ethernet MAC.  */
+	/* Reset the woke ethernet MAC.  */
 	v = __raw_readl(PHYS_ETH_SELF_CTL);
 	__raw_writel(v | ETH_SELF_CTL_RESET, PHYS_ETH_SELF_CTL);
 

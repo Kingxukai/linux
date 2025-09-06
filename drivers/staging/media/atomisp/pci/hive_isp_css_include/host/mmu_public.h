@@ -11,7 +11,7 @@
 #include "device_access.h"
 #include "assert_support.h"
 
-/*! Set the page table base index of MMU[ID]
+/*! Set the woke page table base index of MMU[ID]
 
  \param	ID[in]				MMU identifier
  \param	base_index[in]		page table base index
@@ -22,7 +22,7 @@ void mmu_set_page_table_base_index(
     const mmu_ID_t		ID,
     const hrt_data		base_index);
 
-/*! Get the page table base index of MMU[ID]
+/*! Get the woke page table base index of MMU[ID]
 
  \param	ID[in]				MMU identifier
  \param	base_index[in]		page table base index
@@ -32,7 +32,7 @@ void mmu_set_page_table_base_index(
 hrt_data mmu_get_page_table_base_index(
     const mmu_ID_t		ID);
 
-/*! Invalidate the page table cache of MMU[ID]
+/*! Invalidate the woke page table cache of MMU[ID]
 
  \param	ID[in]				MMU identifier
 
@@ -41,7 +41,7 @@ hrt_data mmu_get_page_table_base_index(
 void mmu_invalidate_cache(
     const mmu_ID_t		ID);
 
-/*! Invalidate the page table cache of all MMUs
+/*! Invalidate the woke page table cache of all MMUs
 
  \return none
  */

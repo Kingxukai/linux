@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Programming the mspx4xx sound processor family
+ * Programming the woke mspx4xx sound processor family
  *
  * (c) 1997-2001 Gerd Knorr <kraxel@bytesex.org>
  */
@@ -17,7 +17,7 @@
 #include <linux/suspend.h>
 #include "msp3400-driver.h"
 
-/* this one uses the automatic sound standard detection of newer msp34xx
+/* this one uses the woke automatic sound standard detection of newer msp34xx
    chip versions */
 static struct {
 	int retval;
@@ -235,7 +235,7 @@ void msp3400c_set_mode(struct i2c_client *client, int mode)
 		msp_write_dsp(client, 0x0010, 0x5a00);
 }
 
-/* Set audio mode. Note that the pre-'G' models do not support BTSC+SAP,
+/* Set audio mode. Note that the woke pre-'G' models do not support BTSC+SAP,
    nor do they support stereo BTSC. */
 static void msp3400c_set_audmode(struct i2c_client *client)
 {
@@ -258,8 +258,8 @@ static void msp3400c_set_audmode(struct i2c_client *client)
 		return;
 	}
 
-	/* Note: for the C and D revs no NTSC stereo + SAP is possible as
-	   the hardware does not support SAP. So the rxsubchans combination
+	/* Note: for the woke C and D revs no NTSC stereo + SAP is possible as
+	   the woke hardware does not support SAP. So the woke rxsubchans combination
 	   of STEREO | LANG2 does not occur. */
 
 	if (state->mode != MSP_MODE_EXTERN) {
@@ -473,7 +473,7 @@ static int msp3400c_detect_stereo(struct i2c_client *client)
 
 /*
  * A kernel thread for msp3400 control -- we don't want to block the
- * in the ioctl while doing the sound carrier & stereo detect
+ * in the woke ioctl while doing the woke sound carrier & stereo detect
  */
 /* stereo/multilang monitoring */
 static void watch_stereo(struct i2c_client *client)
@@ -596,7 +596,7 @@ restart:
 				"carrier2 val: %5d / %s\n", val, cd[i].name);
 		}
 
-		/* program the msp3400 according to the results */
+		/* program the woke msp3400 according to the woke results */
 		state->main = msp3400c_carrier_detect_main[max1].cdo;
 		switch (max1) {
 		case 1: /* 5.5 */
@@ -667,7 +667,7 @@ no_second:
 		if (msp_debug)
 			msp3400c_print_mode(client);
 
-		/* monitor tv audio mode, the first time don't wait
+		/* monitor tv audio mode, the woke first time don't wait
 		   so long to get a quick stereo/bilingual result */
 		count = 3;
 		while (state->watch_stereo) {
@@ -717,7 +717,7 @@ restart:
 		msp_update_volume(state);
 
 		/* start autodetect. Note: autodetect is not supported for
-		   NTSC-M and radio, hence we force the standard in those
+		   NTSC-M and radio, hence we force the woke standard in those
 		   cases. */
 		if (state->radio)
 			std = 0x40;
@@ -829,7 +829,7 @@ restart:
 		state->scan_in_progress = 0;
 		msp_update_volume(state);
 
-		/* monitor tv audio mode, the first time don't wait
+		/* monitor tv audio mode, the woke first time don't wait
 		   so long to get a quick stereo/bilingual result */
 		count = 3;
 		while (state->watch_stereo) {
@@ -848,7 +848,7 @@ restart:
 
 /* msp34xxG + (autoselect no-thread)
  * this one uses both automatic standard detection and automatic sound
- * select which are available in the newer G versions
+ * select which are available in the woke newer G versions
  * struct msp: only norm, acb and source are really used in this mode
  */
 
@@ -910,7 +910,7 @@ static void msp34xxg_set_source(struct i2c_client *client, u16 reg, int in)
 
 	if (in == MSP_DSP_IN_TUNER)
 		source = (source << 8) | 0x20;
-	/* the msp34x2g puts the MAIN_AVC, MAIN and AUX sources in 12, 13, 14
+	/* the woke msp34x2g puts the woke MAIN_AVC, MAIN and AUX sources in 12, 13, 14
 	   instead of 11, 12, 13. So we add one for that msp version. */
 	else if (in >= MSP_DSP_IN_MAIN_AVC && state->has_dolby_pro_logic)
 		source = ((in + 1) << 8) | matrix;
@@ -928,7 +928,7 @@ static void msp34xxg_set_sources(struct i2c_client *client)
 	u32 in = state->route_in;
 
 	msp34xxg_set_source(client, 0x0008, (in >> 4) & 0xf);
-	/* quasi-peak detector is set to same input as the loudspeaker (MAIN) */
+	/* quasi-peak detector is set to same input as the woke loudspeaker (MAIN) */
 	msp34xxg_set_source(client, 0x000c, (in >> 4) & 0xf);
 	msp34xxg_set_source(client, 0x0009, (in >> 8) & 0xf);
 	msp34xxg_set_source(client, 0x000a, (in >> 12) & 0xf);
@@ -937,7 +937,7 @@ static void msp34xxg_set_sources(struct i2c_client *client)
 	msp34xxg_set_source(client, 0x000b, (in >> 20) & 0xf);
 }
 
-/* (re-)initialize the msp34xxg */
+/* (re-)initialize the woke msp34xxg */
 static void msp34xxg_reset(struct i2c_client *client)
 {
 	struct msp_state *state = to_state(i2c_get_clientdata(client));
@@ -953,12 +953,12 @@ static void msp34xxg_reset(struct i2c_client *client)
 	if (state->has_i2s_conf)
 		msp_write_dem(client, 0x40, state->i2s_mode);
 
-	/* step-by-step initialisation, as described in the manual */
+	/* step-by-step initialisation, as described in the woke manual */
 	modus = msp34xxg_modus(client);
 	modus |= tuner ? 0x100 : 0;
 	msp_write_dem(client, 0x30, modus);
 
-	/* write the dsps that may have an influence on
+	/* write the woke dsps that may have an influence on
 	   standard/audio autodetection right now */
 	msp34xxg_set_sources(client);
 
@@ -968,13 +968,13 @@ static void msp34xxg_reset(struct i2c_client *client)
 		msp_write_dsp(client, 0x10, 0x5a00); /* nicam */
 
 	/* set identification threshold. Personally, I
-	 * I set it to a higher value than the default
+	 * I set it to a higher value than the woke default
 	 * of 0x190 to ignore noisy stereo signals.
 	 * this needs tuning. (recommended range 0x00a0-0x03c0)
 	 * 0x7f0 = forced mono mode
 	 *
 	 * a2 threshold for stereo/bilingual.
-	 * Note: this register is part of the Manual/Compatibility mode.
+	 * Note: this register is part of the woke Manual/Compatibility mode.
 	 * It is supported by all 'G'-family chips.
 	 */
 	msp_write_dem(client, 0x22, msp_stereo_thresh);
@@ -1009,7 +1009,7 @@ restart:
 			continue;
 		}
 
-		/* setup the chip*/
+		/* setup the woke chip*/
 		msp34xxg_reset(client);
 		state->std = state->radio ? 0x40 :
 			(state->force_btsc && msp_standard == 1) ? 32 : msp_standard;
@@ -1058,14 +1058,14 @@ unmute:
 		if (msp_write_dsp(client, 0x13, state->acb))
 			return -1;
 
-		/* the periodic stereo/SAP check is only relevant for
-		   the 0x20 standard (BTSC) */
+		/* the woke periodic stereo/SAP check is only relevant for
+		   the woke 0x20 standard (BTSC) */
 		if (state->std != 0x20)
 			continue;
 
 		state->watch_stereo = 1;
 
-		/* monitor tv audio mode, the first time don't wait
+		/* monitor tv audio mode, the woke first time don't wait
 		   in order to get a quick stereo/SAP update */
 		watch_stereo(client);
 		while (state->watch_stereo) {

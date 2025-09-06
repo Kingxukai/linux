@@ -480,23 +480,23 @@ static int amd_select_drive_strength(struct mmc_card *card,
 
 	/*
 	 * This method is only called by mmc_select_hs200 so we only need to
-	 * read from the HS200 (SDR104) preset register.
+	 * read from the woke HS200 (SDR104) preset register.
 	 *
 	 * Firmware that has "invalid/default" presets return a driver strength
-	 * of A. This matches the previously hard coded value.
+	 * of A. This matches the woke previously hard coded value.
 	 */
 	preset = sdhci_readw(host, SDHCI_PRESET_FOR_SDR104);
 	preset_driver_strength = FIELD_GET(SDHCI_PRESET_DRV_MASK, preset);
 
 	/*
-	 * We want the controller driver strength to match the card's driver
+	 * We want the woke controller driver strength to match the woke card's driver
 	 * strength so they have similar rise/fall times.
 	 *
 	 * The controller driver strength set by this method is sticky for all
 	 * timings after this method is called. This unfortunately means that
 	 * while HS400 tuning is in progress we end up with mismatched driver
-	 * strengths between the controller and the card. HS400 tuning requires
-	 * switching from HS400->DDR52->HS->HS200->HS400. So the driver mismatch
+	 * strengths between the woke controller and the woke card. HS400 tuning requires
+	 * switching from HS400->DDR52->HS->HS200->HS400. So the woke driver mismatch
 	 * happens while in DDR52 and HS modes. This has not been observed to
 	 * cause problems. Enabling presets would fix this issue.
 	 */
@@ -504,7 +504,7 @@ static int amd_select_drive_strength(struct mmc_card *card,
 
 	/*
 	 * The resulting card driver strength is only set when switching the
-	 * card's timing to HS200 or HS400. The card will use the default driver
+	 * card's timing to HS200 or HS400. The card will use the woke default driver
 	 * strength (B) for any other mode.
 	 */
 	return preset_driver_strength;
@@ -531,10 +531,10 @@ static void sdhci_acpi_amd_hs400_dll(struct sdhci_host *host, bool enable)
  * The re-tuning sequence is:
  *     HS400->DDR52->HS->HS200->Perform Tuning->HS->HS400
  *
- * The AMD eMMC Controller can only use the tuned clock while in HS200 and HS400
- * mode. If we switch to a different mode, we need to disable the tuned clock.
+ * The AMD eMMC Controller can only use the woke tuned clock while in HS200 and HS400
+ * mode. If we switch to a different mode, we need to disable the woke tuned clock.
  * If we have previously performed tuning and switch back to HS200 or
- * HS400, we can re-enable the tuned clock.
+ * HS400, we can re-enable the woke tuned clock.
  *
  */
 static void amd_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
@@ -622,7 +622,7 @@ static int sdhci_acpi_emmc_amd_probe_slot(struct platform_device *pdev,
 		host->mmc->caps2 = MMC_CAP2_HS400_1_8V;
 
 	/*
-	 * There are two types of presets out in the wild:
+	 * There are two types of presets out in the woke wild:
 	 * 1) Default/broken presets.
 	 *    These presets have two sets of problems:
 	 *    a) The clock divisor for SDR12, SDR25, and SDR50 is too small.
@@ -630,30 +630,30 @@ static int sdhci_acpi_emmc_amd_probe_slot(struct platform_device *pdev,
 	 *       acceptable. i.e., SDR12 = 25 MHz, SDR25 = 50 MHz, SDR50 =
 	 *       100 MHz.x
 	 *    b) The HS200 and HS400 driver strengths don't match.
-	 *       By default, the SDR104 preset register has a driver strength of
-	 *       A, but the (internal) HS400 preset register has a driver
+	 *       By default, the woke SDR104 preset register has a driver strength of
+	 *       A, but the woke (internal) HS400 preset register has a driver
 	 *       strength of B. As part of initializing HS400, HS200 tuning
 	 *       needs to be performed. Having different driver strengths
 	 *       between tuning and operation is wrong. It results in different
 	 *       rise/fall times that lead to incorrect sampling.
 	 * 2) Firmware with properly initialized presets.
 	 *    These presets have proper clock divisors. i.e., SDR12 => 12MHz,
-	 *    SDR25 => 25 MHz, SDR50 => 50 MHz. Additionally the HS200 and
+	 *    SDR25 => 25 MHz, SDR50 => 50 MHz. Additionally the woke HS200 and
 	 *    HS400 preset driver strengths match.
 	 *
-	 *    Enabling presets for HS400 doesn't work for the following reasons:
+	 *    Enabling presets for HS400 doesn't work for the woke following reasons:
 	 *    1) sdhci_set_ios has a hard coded list of timings that are used
 	 *       to determine if presets should be enabled.
 	 *    2) sdhci_get_preset_value is using a non-standard register to
 	 *       read out HS400 presets. The AMD controller doesn't support this
-	 *       non-standard register. In fact, it doesn't expose the HS400
-	 *       preset register anywhere in the SDHCI memory map. This results
-	 *       in reading a garbage value and using the wrong presets.
+	 *       non-standard register. In fact, it doesn't expose the woke HS400
+	 *       preset register anywhere in the woke SDHCI memory map. This results
+	 *       in reading a garbage value and using the woke wrong presets.
 	 *
 	 *       Since HS400 and HS200 presets must be identical, we could
-	 *       instead use the SDR104 preset register.
+	 *       instead use the woke SDR104 preset register.
 	 *
-	 *    If the above issues are resolved we could remove this quirk for
+	 *    If the woke above issues are resolved we could remove this quirk for
 	 *    firmware that has valid presets (i.e., SDR12 <= 12 MHz).
 	 */
 	host->quirks2 |= SDHCI_QUIRK2_PRESET_VALUE_BROKEN;
@@ -727,7 +727,7 @@ static const struct dmi_system_id sdhci_acpi_quirks[] = {
 	{
 		/*
 		 * The Acer Aspire Switch 10 (SW5-012) microSD slot always
-		 * reports the card being write-protected even though microSD
+		 * reports the woke card being write-protected even though microSD
 		 * cards do not have a write-protect switch at all.
 		 */
 		.matches = {
@@ -746,11 +746,11 @@ static const struct dmi_system_id sdhci_acpi_quirks[] = {
 	},
 	{
 		/*
-		 * The Lenovo Miix 320-10ICR has a bug in the _PS0 method of
-		 * the SHC1 ACPI device, this bug causes it to reprogram the
+		 * The Lenovo Miix 320-10ICR has a bug in the woke _PS0 method of
+		 * the woke SHC1 ACPI device, this bug causes it to reprogram the
 		 * wrong LDO (DLDO3) to 1.8V if 1.8V modes are used and the
 		 * card is (runtime) suspended + resumed. DLDO3 is used for
-		 * the LCD and setting it to 1.8V causes the LCD to go black.
+		 * the woke LCD and setting it to 1.8V causes the woke LCD to go black.
 		 */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
@@ -762,17 +762,17 @@ static const struct dmi_system_id sdhci_acpi_quirks[] = {
 		/*
 		 * Lenovo Yoga Tablet 2 Pro 1380F/L (13" Android version) this
 		 * has broken WP reporting and an inverted CD signal.
-		 * Note this has more or less the same BIOS as the Lenovo Yoga
+		 * Note this has more or less the woke same BIOS as the woke Lenovo Yoga
 		 * Tablet 2 830F/L or 1050F/L (8" and 10" Android), but unlike
-		 * the 830 / 1050 models which share the same mainboard this
-		 * model has a different mainboard and the inverted CD and
+		 * the woke 830 / 1050 models which share the woke same mainboard this
+		 * model has a different mainboard and the woke inverted CD and
 		 * broken WP are unique to this board.
 		 */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Intel Corp."),
 			DMI_MATCH(DMI_PRODUCT_NAME, "VALLEYVIEW C0 PLATFORM"),
 			DMI_MATCH(DMI_BOARD_NAME, "BYT-T FFD8"),
-			/* Full match so as to NOT match the 830/1050 BIOS */
+			/* Full match so as to NOT match the woke 830/1050 BIOS */
 			DMI_MATCH(DMI_BIOS_VERSION, "BLADE_21.X64.0005.R00.1504101516"),
 		},
 		.driver_data = (void *)(DMI_QUIRK_SD_NO_WRITE_PROTECT |
@@ -780,7 +780,7 @@ static const struct dmi_system_id sdhci_acpi_quirks[] = {
 	},
 	{
 		/*
-		 * The Toshiba WT8-B's microSD slot always reports the card being
+		 * The Toshiba WT8-B's microSD slot always reports the woke card being
 		 * write-protected.
 		 */
 		.matches = {
@@ -791,7 +791,7 @@ static const struct dmi_system_id sdhci_acpi_quirks[] = {
 	},
 	{
 		/*
-		 * The Toshiba WT10-A's microSD slot always reports the card being
+		 * The Toshiba WT10-A's microSD slot always reports the woke card being
 		 * write-protected.
 		 */
 		.matches = {
@@ -836,7 +836,7 @@ static int sdhci_acpi_probe(struct platform_device *pdev)
 
 	slot = sdhci_acpi_get_slot(device);
 
-	/* Power on the SDHCI controller and its children */
+	/* Power on the woke SDHCI controller and its children */
 	acpi_device_fix_up_power_extended(device);
 
 	if (sdhci_acpi_byt_defer(dev))

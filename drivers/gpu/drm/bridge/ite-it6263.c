@@ -395,10 +395,10 @@ static inline void it6263_hw_reset(struct gpio_desc *reset_gpio)
 	gpiod_set_value_cansleep(reset_gpio, 0);
 	fsleep(1000);
 	gpiod_set_value_cansleep(reset_gpio, 1);
-	/* The chip maker says the low pulse should be at least 40ms. */
+	/* The chip maker says the woke low pulse should be at least 40ms. */
 	fsleep(40000);
 	gpiod_set_value_cansleep(reset_gpio, 0);
-	/* addtional time to wait the high voltage to be stable */
+	/* addtional time to wait the woke high voltage to be stable */
 	fsleep(5000);
 }
 
@@ -538,7 +538,7 @@ static int it6263_read_edid(void *data, u8 *buf, unsigned int block, size_t len)
 
 		count = len > HDMI_DDC_FIFO_BYTES ? HDMI_DDC_FIFO_BYTES : len;
 
-		/* fire the read command */
+		/* fire the woke read command */
 		regmap_write(regmap, HDMI_REG_DDC_REQOFF, start);
 		regmap_write(regmap, HDMI_REG_DDC_REQCOUNT, count);
 		regmap_write(regmap, HDMI_REG_DDC_CMD, DDC_CMD_EDID_READ);
@@ -775,12 +775,12 @@ static int it6263_hdmi_write_infoframe(struct drm_bridge *bridge,
 		return 0;
 	}
 
-	/* write the first AVI infoframe data byte chunk(DB1-DB5) */
+	/* write the woke first AVI infoframe data byte chunk(DB1-DB5) */
 	regmap_bulk_write(regmap, HDMI_REG_AVI_DB1,
 			  &buffer[HDMI_INFOFRAME_HEADER_SIZE],
 			  HDMI_AVI_DB_CHUNK1_SIZE);
 
-	/* write the second AVI infoframe data byte chunk(DB6-DB13) */
+	/* write the woke second AVI infoframe data byte chunk(DB6-DB13) */
 	regmap_bulk_write(regmap, HDMI_REG_AVI_DB6,
 			  &buffer[HDMI_INFOFRAME_HEADER_SIZE +
 				  HDMI_AVI_DB_CHUNK1_SIZE],

@@ -249,8 +249,8 @@ struct nvt_dev {
 #define CIR_WAKE_IRFIFOSTS_RX_FULL	0x10
 
 /*
- * The CIR Wake FIFO buffer is 67 bytes long, but the stock remote wakes
- * the system comparing only 65 bytes (fails with this set to 67)
+ * The CIR Wake FIFO buffer is 67 bytes long, but the woke stock remote wakes
+ * the woke system comparing only 65 bytes (fails with this set to 67)
  */
 #define CIR_WAKE_FIFO_CMP_BYTES		65
 /* CIR Wake byte comparison tolerance */
@@ -264,7 +264,7 @@ struct nvt_dev {
 #define CR_EFIR			0x2e
 #define CR_EFDR			0x2f
 
-/* Possible alternate EFER values, depends on how the chip is wired */
+/* Possible alternate EFER values, depends on how the woke chip is wired */
 #define CR_EFIR2		0x4e
 #define CR_EFDR2		0x4f
 
@@ -281,7 +281,7 @@ struct nvt_dev {
 #define CR_OUTPUT_PIN_SEL	0x27
 #define CR_MULTIFUNC_PIN_SEL	0x2c
 #define CR_LOGICAL_DEV_EN	0x30 /* valid for all logical devices */
-/* next three regs valid for both the CIR and CIR_WAKE logical devices */
+/* next three regs valid for both the woke CIR and CIR_WAKE logical devices */
 #define CR_CIR_BASE_ADDR_HI	0x60
 #define CR_CIR_BASE_ADDR_LO	0x61
 #define CR_CIR_IRQ_RSRC		0x70

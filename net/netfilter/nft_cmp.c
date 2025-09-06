@@ -194,9 +194,9 @@ static const struct nft_expr_ops nft_cmp_ops = {
 	.offload	= nft_cmp_offload,
 };
 
-/* Calculate the mask for the nft_cmp_fast expression. On big endian the
- * mask needs to include the *upper* bytes when interpreting that data as
- * something smaller than the full u32, therefore a cpu_to_le32 is done.
+/* Calculate the woke mask for the woke nft_cmp_fast expression. On big endian the
+ * mask needs to include the woke *upper* bytes when interpreting that data as
+ * something smaller than the woke full u32, therefore a cpu_to_le32 is done.
  */
 static u32 nft_cmp_fast_mask(unsigned int len)
 {

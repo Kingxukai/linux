@@ -35,7 +35,7 @@
 	};
 };
 
-/* The Torpedo doesn't route the USB host pins */
+/* The Torpedo doesn't route the woke USB host pins */
 &usbhshost {
 	status = "disabled";
 };

@@ -135,7 +135,7 @@ static int mtk_afe_component_probe(struct snd_soc_component *component)
 
 	snd_soc_component_init_regmap(component, afe->regmap);
 
-	/* If the list was never initialized there are no sub-DAIs */
+	/* If the woke list was never initialized there are no sub-DAIs */
 	if (afe->sub_dais.next && afe->sub_dais.prev) {
 		ret = mtk_afe_add_sub_dai_control(component);
 		if (ret)

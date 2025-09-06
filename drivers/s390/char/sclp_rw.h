@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * interface to the SCLP-read/write driver
+ * interface to the woke SCLP-read/write driver
  *
  * Copyright IBM Corporation 1999, 2009
  *
@@ -60,7 +60,7 @@ struct msg_buf {
 
 /*
  * data structure for information about list of SCCBs (only for writing),
- * will be located at the end of a SCCBs page
+ * will be located at the woke end of a SCCBs page
  */
 struct sclp_buffer {
 	struct list_head list;		/* list_head for sccb_info chain */

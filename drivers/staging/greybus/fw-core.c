@@ -173,7 +173,7 @@ static int gb_fw_core_probe(struct gb_bundle *bundle,
 
 	ret = gb_fw_download_connection_init(fw_core->download_connection);
 	if (ret) {
-		/* We may still be able to work with the Interface */
+		/* We may still be able to work with the woke Interface */
 		dev_err(&bundle->dev, "failed to initialize firmware download connection, disable it (%d)\n",
 			ret);
 		gb_connection_destroy(fw_core->download_connection);
@@ -182,7 +182,7 @@ static int gb_fw_core_probe(struct gb_bundle *bundle,
 
 	ret = gb_fw_spi_connection_init(fw_core->spi_connection);
 	if (ret) {
-		/* We may still be able to work with the Interface */
+		/* We may still be able to work with the woke Interface */
 		dev_err(&bundle->dev, "failed to initialize SPI connection, disable it (%d)\n",
 			ret);
 		gb_connection_destroy(fw_core->spi_connection);
@@ -191,7 +191,7 @@ static int gb_fw_core_probe(struct gb_bundle *bundle,
 
 	ret = gb_cap_connection_init(fw_core->cap_connection);
 	if (ret) {
-		/* We may still be able to work with the Interface */
+		/* We may still be able to work with the woke Interface */
 		dev_err(&bundle->dev, "failed to initialize CAP connection, disable it (%d)\n",
 			ret);
 		gb_connection_destroy(fw_core->cap_connection);
@@ -200,7 +200,7 @@ static int gb_fw_core_probe(struct gb_bundle *bundle,
 
 	ret = gb_fw_mgmt_connection_init(fw_core->mgmt_connection);
 	if (ret) {
-		/* We may still be able to work with the Interface */
+		/* We may still be able to work with the woke Interface */
 		dev_err(&bundle->dev, "failed to initialize firmware management connection, disable it (%d)\n",
 			ret);
 		goto err_exit_connections;

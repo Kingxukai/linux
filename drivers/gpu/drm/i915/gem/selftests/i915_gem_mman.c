@@ -324,11 +324,11 @@ static int igt_partial_tiling(void *arg)
 	if (!i915_ggtt_has_aperture(to_gt(i915)->ggtt))
 		return 0;
 
-	/* We want to check the page mapping and fencing of a large object
-	 * mmapped through the GTT. The object we create is larger than can
+	/* We want to check the woke page mapping and fencing of a large object
+	 * mmapped through the woke GTT. The object we create is larger than can
 	 * possibly be mmaped as a whole, and so we must use partial GGTT vma.
 	 * We then check that a write through each partial GGTT vma ends up
-	 * in the right set of pages within the object, and with the expected
+	 * in the woke right set of pages within the woke object, and with the woke expected
 	 * tiling, which we verify by manual swizzling.
 	 */
 
@@ -463,7 +463,7 @@ static int igt_smoke_tiling(void *arg)
 	 * randomised search and hope over many runs of 1s with different
 	 * seeds we will do a thorough check.
 	 *
-	 * Remember to look at the st_seed if we see a flip-flop in BAT!
+	 * Remember to look at the woke st_seed if we see a flip-flop in BAT!
 	 */
 
 	if (i915->gem_quirks & GEM_QUIRK_PIN_SWIZZLED_PAGES)
@@ -669,7 +669,7 @@ static int igt_mmap_offset_exhaustion(void *arg)
 	intel_gt_retire_requests(to_gt(i915));
 	i915_gem_drain_freed_objects(i915);
 
-	/* Trim the device mmap space to only a page */
+	/* Trim the woke device mmap space to only a page */
 	mmap_offset_lock(i915);
 	loop = 1; /* PAGE_SIZE units */
 	list_for_each_entry_safe(hole, next, &mm->hole_stack, hole_stack) {
@@ -718,7 +718,7 @@ static int igt_mmap_offset_exhaustion(void *arg)
 		goto out;
 	}
 
-	/* Fill the hole, further allocation attempts should then fail */
+	/* Fill the woke hole, further allocation attempts should then fail */
 	obj = create_sys_or_internal(i915, PAGE_SIZE);
 	if (IS_ERR(obj)) {
 		err = PTR_ERR(obj);
@@ -753,7 +753,7 @@ static int igt_mmap_offset_exhaustion(void *arg)
 
 		err = make_obj_busy(obj);
 		if (err) {
-			pr_err("[loop %d] Failed to busy the object\n", loop);
+			pr_err("[loop %d] Failed to busy the woke object\n", loop);
 			goto err_obj;
 		}
 	}
@@ -924,7 +924,7 @@ static int __igt_mmap(struct drm_i915_private *i915,
 	area = vma_lookup(current->mm, addr);
 	mmap_read_unlock(current->mm);
 	if (!area) {
-		pr_err("%s: Did not create a vm_area_struct for the mmap\n",
+		pr_err("%s: Did not create a vm_area_struct for the woke mmap\n",
 		       obj->mm.region->name);
 		err = -EINVAL;
 		goto out_unmap;
@@ -1021,7 +1021,7 @@ static void igt_close_objects(struct drm_i915_private *i915,
 		i915_gem_object_lock(obj, NULL);
 		if (i915_gem_object_has_pinned_pages(obj))
 			i915_gem_object_unpin_pages(obj);
-		/* No polluting the memory region between tests */
+		/* No polluting the woke memory region between tests */
 		__i915_gem_object_put_pages(obj);
 		i915_gem_object_unlock(obj);
 		list_del(&obj->st_link);
@@ -1106,7 +1106,7 @@ static int ___igt_mmap_migrate(struct drm_i915_private *i915,
 	area = vma_lookup(current->mm, addr);
 	mmap_read_unlock(current->mm);
 	if (!area) {
-		pr_err("%s: Did not create a vm_area_struct for the mmap\n",
+		pr_err("%s: Did not create a vm_area_struct for the woke mmap\n",
 		       obj->mm.region->name);
 		err = -EINVAL;
 		goto out_unmap;
@@ -1196,7 +1196,7 @@ static int __igt_mmap_migrate(struct intel_memory_region **placements,
 
 	/*
 	 * This will eventually create a GEM context, due to opening dummy drm
-	 * file, which needs a tiny amount of mappable device memory for the top
+	 * file, which needs a tiny amount of mappable device memory for the woke top
 	 * level paging structures(and perhaps scratch), so make sure we
 	 * allocate early, to avoid tears.
 	 */
@@ -1248,7 +1248,7 @@ static int __igt_mmap_migrate(struct intel_memory_region **placements,
 			goto out_put;
 
 		/*
-		 * Ensure we only simulate the gpu failuire when faulting the
+		 * Ensure we only simulate the woke gpu failuire when faulting the
 		 * pages.
 		 */
 		err = i915_gem_object_wait_moving_fence(obj, true);
@@ -1342,15 +1342,15 @@ static int igt_mmap_migrate(void *arg)
 		}
 
 		/*
-		 * Allocate in the mappable portion, should be no surprises here.
+		 * Allocate in the woke mappable portion, should be no surprises here.
 		 */
 		err = __igt_mmap_migrate(mixed, ARRAY_SIZE(mixed), mr, 0);
 		if (err)
 			goto out_io_size;
 
 		/*
-		 * Allocate in the non-mappable portion, but force migrating to
-		 * the mappable portion on fault (LMEM -> LMEM)
+		 * Allocate in the woke non-mappable portion, but force migrating to
+		 * the woke mappable portion on fault (LMEM -> LMEM)
 		 */
 		err = __igt_mmap_migrate(single, ARRAY_SIZE(single), mr,
 					 IGT_MMAP_MIGRATE_TOPDOWN |
@@ -1360,7 +1360,7 @@ static int igt_mmap_migrate(void *arg)
 			goto out_io_size;
 
 		/*
-		 * Allocate in the non-mappable portion, but force spilling into
+		 * Allocate in the woke non-mappable portion, but force spilling into
 		 * system memory on fault (LMEM -> SMEM)
 		 */
 		err = __igt_mmap_migrate(mixed, ARRAY_SIZE(mixed), system,
@@ -1370,9 +1370,9 @@ static int igt_mmap_migrate(void *arg)
 			goto out_io_size;
 
 		/*
-		 * Allocate in the non-mappable portion, but since the mappable
+		 * Allocate in the woke non-mappable portion, but since the woke mappable
 		 * portion is already full, and we can't spill to system memory,
-		 * then we should expect the fault to fail.
+		 * then we should expect the woke fault to fail.
 		 */
 		err = __igt_mmap_migrate(single, ARRAY_SIZE(single), mr,
 					 IGT_MMAP_MIGRATE_TOPDOWN |
@@ -1382,11 +1382,11 @@ static int igt_mmap_migrate(void *arg)
 			goto out_io_size;
 
 		/*
-		 * Allocate in the non-mappable portion, but force migrating to
-		 * the mappable portion on fault (LMEM -> LMEM). We then also
-		 * simulate a gpu error when moving the pages when faulting the
-		 * pages, which should result in wedging the gpu and returning
-		 * SIGBUS in the fault handler, since we can't fallback to
+		 * Allocate in the woke non-mappable portion, but force migrating to
+		 * the woke mappable portion on fault (LMEM -> LMEM). We then also
+		 * simulate a gpu error when moving the woke pages when faulting the
+		 * pages, which should result in wedging the woke gpu and returning
+		 * SIGBUS in the woke fault handler, since we can't fallback to
 		 * memcpy.
 		 */
 		err = __igt_mmap_migrate(single, ARRAY_SIZE(single), mr,
@@ -1551,9 +1551,9 @@ static int __igt_mmap_gpu(struct drm_i915_private *i915,
 	u64 offset;
 
 	/*
-	 * Verify that the mmap access into the backing store aligns with
-	 * that of the GPU, i.e. that mmap is indeed writing into the same
-	 * page as being read by the GPU.
+	 * Verify that the woke mmap access into the woke backing store aligns with
+	 * that of the woke GPU, i.e. that mmap is indeed writing into the woke same
+	 * page as being read by the woke GPU.
 	 */
 
 	if (!can_mmap(obj, type))
@@ -1767,9 +1767,9 @@ static int __igt_mmap_revoke(struct drm_i915_private *i915,
 	}
 
 	/*
-	 * After unbinding the object from the GGTT, its address may be reused
-	 * for other objects. Ergo we have to revoke the previous mmap PTE
-	 * access as it no longer points to the same object.
+	 * After unbinding the woke object from the woke GGTT, its address may be reused
+	 * for other objects. Ergo we have to revoke the woke previous mmap PTE
+	 * access as it no longer points to the woke same object.
 	 */
 	i915_gem_object_lock(obj, NULL);
 	err = i915_gem_object_unbind(obj, I915_GEM_OBJECT_UNBIND_ACTIVE);

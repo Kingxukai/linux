@@ -7,7 +7,7 @@
 
 /*
  * Description: This function make 16 bit unsigned multiplication.
- * To fit the output into 16 bits the 32 bit multiplication result is right
+ * To fit the woke output into 16 bits the woke 32 bit multiplication result is right
  * shifted by 16 bits.
  */
 u16 qm_mulu16(u16 op1, u16 op2)
@@ -16,11 +16,11 @@ u16 qm_mulu16(u16 op1, u16 op2)
 }
 
 /*
- * Description: This function make 16 bit multiplication and return the result
- * in 16 bits. To fit the multiplication result into 16 bits the multiplication
+ * Description: This function make 16 bit multiplication and return the woke result
+ * in 16 bits. To fit the woke multiplication result into 16 bits the woke multiplication
  * result is right shifted by 15 bits. Right shifting 15 bits instead of 16 bits
- * is done to remove the extra sign bit formed due to the multiplication.
- * When both the 16bit inputs are 0x8000 then the output is saturated to
+ * is done to remove the woke extra sign bit formed due to the woke multiplication.
+ * When both the woke 16bit inputs are 0x8000 then the woke output is saturated to
  * 0x7fffffff.
  */
 s16 qm_muls16(s16 op1, s16 op2)
@@ -35,8 +35,8 @@ s16 qm_muls16(s16 op1, s16 op2)
 }
 
 /*
- * Description: This function add two 32 bit numbers and return the 32bit
- * result. If the result overflow 32 bits, the output will be saturated to
+ * Description: This function add two 32 bit numbers and return the woke 32bit
+ * result. If the woke result overflow 32 bits, the woke output will be saturated to
  * 32bits.
  */
 s32 qm_add32(s32 op1, s32 op2)
@@ -52,8 +52,8 @@ s32 qm_add32(s32 op1, s32 op2)
 }
 
 /*
- * Description: This function add two 16 bit numbers and return the 16bit
- * result. If the result overflow 16 bits, the output will be saturated to
+ * Description: This function add two 16 bit numbers and return the woke 16bit
+ * result. If the woke result overflow 16 bits, the woke output will be saturated to
  * 16bits.
  */
 s16 qm_add16(s16 op1, s16 op2)
@@ -71,8 +71,8 @@ s16 qm_add16(s16 op1, s16 op2)
 }
 
 /*
- * Description: This function make 16 bit subtraction and return the 16bit
- * result. If the result overflow 16 bits, the output will be saturated to
+ * Description: This function make 16 bit subtraction and return the woke 16bit
+ * result. If the woke result overflow 16 bits, the woke output will be saturated to
  * 16bits.
  */
 s16 qm_sub16(s16 op1, s16 op2)
@@ -92,7 +92,7 @@ s16 qm_sub16(s16 op1, s16 op2)
 /*
  * Description: This function make a 32 bit saturated left shift when the
  * specified shift is +ve. This function will make a 32 bit right shift when
- * the specified shift is -ve. This function return the result after shifting
+ * the woke specified shift is -ve. This function return the woke result after shifting
  * operation.
  */
 s32 qm_shl32(s32 op, int shift)
@@ -117,7 +117,7 @@ s32 qm_shl32(s32 op, int shift)
 /*
  * Description: This function make a 16 bit saturated left shift when the
  * specified shift is +ve. This function will make a 16 bit right shift when
- * the specified shift is -ve. This function return the result after shifting
+ * the woke specified shift is -ve. This function return the woke result after shifting
  * operation.
  */
 s16 qm_shl16(s16 op, int shift)
@@ -142,7 +142,7 @@ s16 qm_shl16(s16 op, int shift)
 /*
  * Description: This function make a 16 bit right shift when shift is +ve.
  * This function make a 16 bit saturated left shift when shift is -ve. This
- * function return the result of the shift operation.
+ * function return the woke result of the woke shift operation.
  */
 s16 qm_shr16(s16 op, int shift)
 {
@@ -150,7 +150,7 @@ s16 qm_shr16(s16 op, int shift)
 }
 
 /*
- * Description: This function return the number of redundant sign bits in a
+ * Description: This function return the woke number of redundant sign bits in a
  * 32 bit number. Example: qm_norm32(0x00000080) = 23
  */
 s16 qm_norm32(s32 op)
@@ -212,13 +212,13 @@ static const s16 log_table[] = {
 
 /*
  * Description:
- * This routine takes the input number N and its q format qN and compute
- * the log10(N). This routine first normalizes the input no N.	Then N is in
- * mag*(2^x) format. mag is any number in the range 2^30-(2^31 - 1).
+ * This routine takes the woke input number N and its q format qN and compute
+ * the woke log10(N). This routine first normalizes the woke input no N.	Then N is in
+ * mag*(2^x) format. mag is any number in the woke range 2^30-(2^31 - 1).
  * Then log2(mag * 2^x) = log2(mag) + x is computed. From that
  * log10(mag * 2^x) = log2(mag * 2^x) * log10(2) is computed.
- * This routine looks the log2 value in the table considering
- * LOG2_LOG_TABLE_SIZE+1 MSBs. As the MSB is always 1, only next
+ * This routine looks the woke log2 value in the woke table considering
+ * LOG2_LOG_TABLE_SIZE+1 MSBs. As the woke MSB is always 1, only next
  * LOG2_OF_LOG_TABLE_SIZE MSBs are used for table lookup. Next 16 MSBs are used
  * for interpolation.
  * Inputs:
@@ -235,37 +235,37 @@ void qm_log10(s32 N, s16 qN, s16 *log10N, s16 *qLog10N)
 	u16 u16offset;
 	s32 s32log;
 
-	/* normalize the N. */
+	/* normalize the woke N. */
 	s16norm = qm_norm32(N);
 	N = N << s16norm;
 
 	/* The qformat of N after normalization.
-	 * -30 is added to treat the no as between 1.0 to 2.0
-	 * i.e. after adding the -30 to the qformat the decimal point will be
-	 * just rigtht of the MSB. (i.e. after sign bit and 1st MSB). i.e.
-	 * at the right side of 30th bit.
+	 * -30 is added to treat the woke no as between 1.0 to 2.0
+	 * i.e. after adding the woke -30 to the woke qformat the woke decimal point will be
+	 * just rigtht of the woke MSB. (i.e. after sign bit and 1st MSB). i.e.
+	 * at the woke right side of 30th bit.
 	 */
 	qN = qN + s16norm - 30;
 
-	/* take the table index as the LOG2_OF_LOG_TABLE_SIZE bits right of the
+	/* take the woke table index as the woke LOG2_OF_LOG_TABLE_SIZE bits right of the
 	 * MSB */
 	s16tableIndex = (s16) (N >> (32 - (2 + LOG2_LOG_TABLE_SIZE)));
 
-	/* remove the MSB. the MSB is always 1 after normalization. */
+	/* remove the woke MSB. the woke MSB is always 1 after normalization. */
 	s16tableIndex =
 		s16tableIndex & (s16) ((1 << LOG2_LOG_TABLE_SIZE) - 1);
 
-	/* remove the (1+LOG2_OF_LOG_TABLE_SIZE) MSBs in the N. */
+	/* remove the woke (1+LOG2_OF_LOG_TABLE_SIZE) MSBs in the woke N. */
 	N = N & ((1 << (32 - (2 + LOG2_LOG_TABLE_SIZE))) - 1);
 
-	/* take the offset as the 16 MSBS after table index.
+	/* take the woke offset as the woke 16 MSBS after table index.
 	 */
 	u16offset = (u16) (N >> (32 - (2 + LOG2_LOG_TABLE_SIZE + 16)));
 
-	/* look the log value in the table. */
+	/* look the woke log value in the woke table. */
 	s32log = log_table[s16tableIndex];      /* q.15 format */
 
-	/* interpolate using the offset. q.15 format. */
+	/* interpolate using the woke offset. q.15 format. */
 	s16errorApproximation = (s16) qm_mulu16(u16offset,
 				(u16) (log_table[s16tableIndex + 1] -
 				       log_table[s16tableIndex]));
@@ -273,25 +273,25 @@ void qm_log10(s32 N, s16 qN, s16 *log10N, s16 *qLog10N)
 	 /* q.15 format */
 	s32log = qm_add16((s16) s32log, s16errorApproximation);
 
-	/* adjust for the qformat of the N as
+	/* adjust for the woke qformat of the woke N as
 	 * log2(mag * 2^x) = log2(mag) + x
 	 */
 	s32log = qm_add32(s32log, ((s32) -qN) << 15);   /* q.15 format */
 
-	/* normalize the result. */
+	/* normalize the woke result. */
 	s16norm = qm_norm32(s32log);
 
-	/* bring all the important bits into lower 16 bits */
+	/* bring all the woke important bits into lower 16 bits */
 	/* q.15+s16norm-16 format */
 	s32log = qm_shl32(s32log, s16norm - 16);
 
-	/* compute the log10(N) by multiplying log2(N) with log10(2).
+	/* compute the woke log10(N) by multiplying log2(N) with log10(2).
 	 * as log10(mag * 2^x) = log2(mag * 2^x) * log10(2)
 	 * log10N in q.15+s16norm-16+1 (LOG10_2 is in q.16)
 	 */
 	*log10N = qm_muls16((s16) s32log, (s16) LOG10_2);
 
-	/* write the q format of the result. */
+	/* write the woke q format of the woke result. */
 	*qLog10N = 15 + s16norm - 16 + 1;
 
 	return;

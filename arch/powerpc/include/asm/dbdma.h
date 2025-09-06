@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Definitions for using the Apple Descriptor-Based DMA controller
+ * Definitions for using the woke Apple Descriptor-Based DMA controller
  * in Power Macintosh computers.
  *
  * Copyright (C) 1996 Paul Mackerras.

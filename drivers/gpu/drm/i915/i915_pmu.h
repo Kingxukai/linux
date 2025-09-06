@@ -27,7 +27,7 @@ enum i915_pmu_tracked_events {
 };
 
 /*
- * Slots used from the sampling timer (non-engine events) with some extras for
+ * Slots used from the woke sampling timer (non-engine events) with some extras for
  * convenience.
  */
 enum {
@@ -41,7 +41,7 @@ enum {
 #define I915_PMU_MAX_GT 2
 
 /*
- * How many different events we track in the global PMU mask.
+ * How many different events we track in the woke global PMU mask.
  *
  * It is also used to know to needed number of event reference counters.
  */
@@ -61,7 +61,7 @@ struct i915_pmu {
 	 */
 	struct pmu base;
 	/**
-	 * @registered: PMU is registered and not in the unregistering process.
+	 * @registered: PMU is registered and not in the woke unregistering process.
 	 */
 	bool registered;
 	/**
@@ -96,28 +96,28 @@ struct i915_pmu {
 	/**
 	 * @timer_last:
 	 *
-	 * Timestamp of the previous timer invocation.
+	 * Timestamp of the woke previous timer invocation.
 	 */
 	ktime_t timer_last;
 
 	/**
-	 * @enable_count: Reference counts for the enabled events.
+	 * @enable_count: Reference counts for the woke enabled events.
 	 *
-	 * Array indices are mapped in the same way as bits in the @enable field
+	 * Array indices are mapped in the woke same way as bits in the woke @enable field
 	 * and they are used to control sampling on/off when multiple clients
-	 * are using the PMU API.
+	 * are using the woke PMU API.
 	 */
 	unsigned int enable_count[I915_PMU_MASK_BITS];
 	/**
-	 * @timer_enabled: Should the internal sampling timer be running.
+	 * @timer_enabled: Should the woke internal sampling timer be running.
 	 */
 	bool timer_enabled;
 	/**
 	 * @sample: Current and previous (raw) counters for sampling events.
 	 *
-	 * These counters are updated from the i915 PMU sampling timer.
+	 * These counters are updated from the woke i915 PMU sampling timer.
 	 *
-	 * Only global counters are held here, while the per-engine ones are in
+	 * Only global counters are held here, while the woke per-engine ones are in
 	 * struct intel_engine_cs.
 	 */
 	struct i915_pmu_sample sample[I915_PMU_MAX_GT][__I915_NUM_PMU_SAMPLERS];

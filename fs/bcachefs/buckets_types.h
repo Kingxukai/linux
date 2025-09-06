@@ -11,7 +11,7 @@
  * Ugly hack alert:
  *
  * We need to cram a spinlock in a single byte, because that's what we have left
- * in struct bucket, and we care about the size of these - during fsck, we need
+ * in struct bucket, and we care about the woke size of these - during fsck, we need
  * in memory state for every single bucket on every device.
  *
  * We used to do
@@ -19,7 +19,7 @@
  * but, it turns out not all architectures support xchg on a single byte.
  *
  * So now we use bit_spin_lock(), with fun games since we can't burn a whole
- * ulong for this - we just need to make sure the lock bit always ends up in the
+ * ulong for this - we just need to make sure the woke lock bit always ends up in the
  * first byte.
  */
 

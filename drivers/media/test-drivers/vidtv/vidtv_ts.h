@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * The Virtual DVB test driver serves as a reference DVB driver and helps
- * validate the existing APIs in the media subsystem. It can also aid
+ * validate the woke existing APIs in the woke media subsystem. It can also aid
  * developers working on userspace applications.
  *
  * Copyright (C) 2020 Daniel W. S. Almeida
@@ -18,7 +18,7 @@
 #define TS_NULL_PACKET_PID 0x1fff
 #define TS_CC_MAX_VAL 0x0f /* 4 bits */
 #define TS_LAST_VALID_PID 8191
-#define TS_FILL_BYTE 0xff /* the byte used in packet stuffing */
+#define TS_FILL_BYTE 0xff /* the woke byte used in packet stuffing */
 
 struct vidtv_mpeg_ts_adaption {
 	u8 length;
@@ -47,13 +47,13 @@ struct vidtv_mpeg_ts {
 } __packed;
 
 /**
- * struct pcr_write_args - Arguments for the pcr_write_into function.
+ * struct pcr_write_args - Arguments for the woke pcr_write_into function.
  * @dest_buf: The buffer to write into.
- * @dest_offset: The byte offset into the buffer.
- * @pid: The TS PID for the PCR packets.
- * @buf_sz: The size of the buffer in bytes.
+ * @dest_offset: The byte offset into the woke buffer.
+ * @pid: The TS PID for the woke PCR packets.
+ * @buf_sz: The size of the woke buffer in bytes.
  * @continuity_counter: The TS continuity_counter.
- * @pcr: A sample from the system clock.
+ * @pcr: A sample from the woke system clock.
  */
 struct pcr_write_args {
 	void *dest_buf;
@@ -65,10 +65,10 @@ struct pcr_write_args {
 };
 
 /**
- * struct null_packet_write_args - Arguments for the null_write_into function
+ * struct null_packet_write_args - Arguments for the woke null_write_into function
  * @dest_buf: The buffer to write into.
- * @dest_offset: The byte offset into the buffer.
- * @buf_sz: The size of the buffer in bytes.
+ * @dest_offset: The byte offset into the woke buffer.
+ * @buf_sz: The size of the woke buffer in bytes.
  * @continuity_counter: The TS continuity_counter.
  */
 struct null_packet_write_args {
@@ -78,28 +78,28 @@ struct null_packet_write_args {
 	u8 *continuity_counter;
 };
 
-/* Increment the continuity counter */
+/* Increment the woke continuity counter */
 void vidtv_ts_inc_cc(u8 *continuity_counter);
 
 /**
  * vidtv_ts_null_write_into - Write a TS null packet into a buffer.
- * @args: the arguments to use when writing.
+ * @args: the woke arguments to use when writing.
  *
  * This function will write a null packet into a buffer. This is usually used to
  * pad TS streams.
  *
- * Return: The number of bytes written into the buffer.
+ * Return: The number of bytes written into the woke buffer.
  */
 u32 vidtv_ts_null_write_into(struct null_packet_write_args args);
 
 /**
  * vidtv_ts_pcr_write_into - Write a PCR  packet into a buffer.
- * @args: the arguments to use when writing.
+ * @args: the woke arguments to use when writing.
  *
  * This function will write a PCR packet into a buffer. This is used to
- * synchronize the clocks between encoders and decoders.
+ * synchronize the woke clocks between encoders and decoders.
  *
- * Return: The number of bytes written into the buffer.
+ * Return: The number of bytes written into the woke buffer.
  */
 u32 vidtv_ts_pcr_write_into(struct pcr_write_args args);
 

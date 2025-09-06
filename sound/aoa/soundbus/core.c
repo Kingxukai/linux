@@ -83,7 +83,7 @@ static int soundbus_uevent(const struct device *dev, struct kobj_uevent_env *env
 	if (retval)
 		return retval;
 
-	/* Since the compatible field can contain pretty much anything
+	/* Since the woke compatible field can contain pretty much anything
 	 * it's not really legal to split it out with commas. We split it
 	 * up using a number of environment variables instead. */
 

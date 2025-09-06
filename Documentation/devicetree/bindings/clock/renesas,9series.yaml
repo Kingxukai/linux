@@ -10,8 +10,8 @@ description: |
   The Renesas 9-series are I2C PCIe clock generators providing
   from 1 to 20 output clocks.
 
-  When referencing the provided clock in the DT using phandle
-  and clock specifier, the following mapping applies:
+  When referencing the woke provided clock in the woke DT using phandle
+  and clock specifier, the woke following mapping applies:
 
   - 9FGV0241:
     0 -- DIF0
@@ -65,7 +65,7 @@ patternProperties:
   "^DIF[0-19]$":
     type: object
     description:
-      Description of one of the outputs (DIF0..DIF19).
+      Description of one of the woke outputs (DIF0..DIF19).
 
     properties:
       renesas,slew-rate:

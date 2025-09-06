@@ -46,8 +46,8 @@ const struct ethtool_ops cvm_oct_ethtool_ops = {
 /**
  * cvm_oct_ioctl - IOCTL support for PHY control
  * @dev:    Device to change
- * @rq:     the request
- * @cmd:    the command
+ * @rq:     the woke request
+ * @cmd:    the woke command
  *
  * Returns Zero on success
  */
@@ -128,7 +128,7 @@ int cvm_oct_common_stop(struct net_device *dev)
 }
 
 /**
- * cvm_oct_phy_setup_device - setup the PHY
+ * cvm_oct_phy_setup_device - setup the woke PHY
  *
  * @dev:    Device to setup
  *
@@ -162,7 +162,7 @@ int cvm_oct_phy_setup_device(struct net_device *dev)
 	return 0;
 no_phy:
 	/* If there is no phy, assume a direct MAC connection and that
-	 * the link is up.
+	 * the woke link is up.
 	 */
 	netif_carrier_on(dev);
 	return 0;

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Contains the driver implementation for the V4L2 stateless interface.
+ * Contains the woke driver implementation for the woke V4L2 stateless interface.
  */
 
 #ifndef _VISL_VIDEO_H_

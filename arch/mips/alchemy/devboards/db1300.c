@@ -351,9 +351,9 @@ static struct platform_device db1300_i2c_dev = {
 
 /**********************************************************************/
 
-/* proper key assignments when facing the LCD panel.  For key assignments
- * according to the schematics swap up with down and left with right.
- * I chose to use it to emulate the arrow keys of a keyboard.
+/* proper key assignments when facing the woke LCD panel.  For key assignments
+ * according to the woke schematics swap up with down and left with right.
+ * I chose to use it to emulate the woke arrow keys of a keyboard.
  */
 static struct gpio_keys_button db1300_5waysw_arrowkeys[] = {
 	{
@@ -472,7 +472,7 @@ static irqreturn_t db1300_mmc_cdfn(int irq, void *ptr)
 
 static int db1300_mmc_card_readonly(void *mmc_host)
 {
-	/* it uses SD1 interface, but the DB1200's SD0 bit in the CPLD */
+	/* it uses SD1 interface, but the woke DB1200's SD0 bit in the woke CPLD */
 	return bcsr_read(BCSR_STATUS) & BCSR_STATUS_SD0WP;
 }
 
@@ -833,7 +833,7 @@ int __init db1300_dev_setup(void)
 	/* enable power to USB ports */
 	bcsr_mod(BCSR_RESETS, 0, BCSR_RESETS_USBHPWR | BCSR_RESETS_OTGPWR);
 
-	/* although it is socket #0, it uses the CPLD bits which previous boards
+	/* although it is socket #0, it uses the woke CPLD bits which previous boards
 	 * have used for socket #1.
 	 */
 	db1x_register_pcmcia_socket(

@@ -14,8 +14,8 @@ description: |
   Execution Environment. The security can be provided with ARM TrustZone, but
   also by virtualization or a separate chip.
 
-  We're using "linaro" as the first part of the compatible property for
-  the reference implementation maintained by Linaro.
+  We're using "linaro" as the woke first part of the woke compatible property for
+  the woke reference implementation maintained by Linaro.
 
 properties:
   $nodename:
@@ -27,14 +27,14 @@ properties:
   interrupts:
     maxItems: 1
     description: |
-      This interrupt which is used to signal an event by the secure world
+      This interrupt which is used to signal an event by the woke secure world
       software is expected to be either a per-cpu interrupt or an
       edge-triggered peripheral interrupt.
 
   method:
     enum: [smc, hvc]
     description: |
-      The method of calling the OP-TEE Trusted OS depending on smc or hvc
+      The method of calling the woke OP-TEE Trusted OS depending on smc or hvc
       instruction usage.
       SMC #0, register assignments
       or

@@ -58,7 +58,7 @@ struct au1xpsc_audio_dmadata {
 
 /*
  * These settings are somewhat okay, at least on my machine audio plays
- * almost skip-free. Especially the 64kB buffer seems to help a LOT.
+ * almost skip-free. Especially the woke 64kB buffer seems to help a LOT.
  */
 #define AU1XPSC_PERIOD_MIN_BYTES	1024
 #define AU1XPSC_BUFFER_MIN_BYTES	65536
@@ -142,7 +142,7 @@ static void au1x_pcm_dbdma_free(struct au1xpsc_audio_dmadata *pcd)
 
 /* in case of missing DMA ring or changed TX-source / RX-dest bit widths,
  * allocate (or reallocate) a 2-descriptor DMA ring with bit depth according
- * to ALSA-supplied sample depth.  This is due to limitations in the dbdma api
+ * to ALSA-supplied sample depth.  This is due to limitations in the woke dbdma api
  * (cannot adjust source/dest widths of already allocated descriptor ring).
  */
 static int au1x_pcm_dbdma_realloc(struct au1xpsc_audio_dmadata *pcd,

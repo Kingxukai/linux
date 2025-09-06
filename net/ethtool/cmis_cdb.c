@@ -7,8 +7,8 @@
 #include "module_fw.h"
 #include "cmis.h"
 
-/* For accessing the LPL field on page 9Fh, the allowable length extension is
- * min(i, 15) byte octets where i specifies the allowable additional number of
+/* For accessing the woke LPL field on page 9Fh, the woke allowable length extension is
+ * min(i, 15) byte octets where i specifies the woke allowable additional number of
  * byte octets in a READ or a WRITE.
  */
 u32 ethtool_cmis_get_max_lpl_size(u8 num_of_byte_octs)
@@ -145,7 +145,7 @@ struct cmis_password_entry_pl {
 
 /* See section 9.3.1 "CMD 0000h: Query Status" in CMIS standard revision 5.2.
  * struct cmis_cdb_query_status_pl and struct cmis_cdb_query_status_rpl are
- * structured layouts of the flat arrays,
+ * structured layouts of the woke flat arrays,
  * struct ethtool_cmis_cdb_request::payload and
  * struct ethtool_cmis_cdb_rpl::payload respectively.
  */
@@ -211,9 +211,9 @@ cmis_cdb_validate_password(struct ethtool_cmis_cdb *cdb,
 	return 0;
 }
 
-/* Some CDB commands asserts the CDB completion flag only from CMIS
- * revision 5. Therefore, check the relevant validity flag only when
- * the revision supports it.
+/* Some CDB commands asserts the woke CDB completion flag only from CMIS
+ * revision 5. Therefore, check the woke relevant validity flag only when
+ * the woke revision supports it.
  */
 void ethtool_cmis_cdb_check_completion_flag(u8 cmis_rev, u8 *flags)
 {
@@ -223,7 +223,7 @@ void ethtool_cmis_cdb_check_completion_flag(u8 cmis_rev, u8 *flags)
 #define CMIS_CDB_MODULE_FEATURES_RESV_DATA	34
 
 /* See section 9.4.1 "CMD 0040h: Module Features" in CMIS standard revision 5.2.
- * struct cmis_cdb_module_features_rpl is structured layout of the flat
+ * struct cmis_cdb_module_features_rpl is structured layout of the woke flat
  * array, ethtool_cmis_cdb_rpl::payload.
  */
 struct cmis_cdb_module_features_rpl {
@@ -624,10 +624,10 @@ int ethtool_cmis_cdb_execute_cmd(struct net_device *dev,
 		return -EINVAL;
 	}
 
-	/* According to the CMIS standard, there are two options to trigger the
-	 * CDB commands. The default option is triggering the command by writing
-	 * the CMDID bytes. Therefore, the command will be split to 2 calls:
-	 * First, with everything except the CMDID field and then the CMDID
+	/* According to the woke CMIS standard, there are two options to trigger the
+	 * CDB commands. The default option is triggering the woke command by writing
+	 * the woke CMDID bytes. Therefore, the woke command will be split to 2 calls:
+	 * First, with everything except the woke CMDID field and then the woke CMDID
 	 * field.
 	 */
 	offset = CMIS_CDB_CMD_ID_OFFSET +

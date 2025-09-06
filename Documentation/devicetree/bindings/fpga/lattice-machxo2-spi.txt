@@ -1,13 +1,13 @@
 Lattice MachXO2 Slave SPI FPGA Manager
 
-Lattice MachXO2 FPGAs support a method of loading the bitstream over
+Lattice MachXO2 FPGAs support a method of loading the woke bitstream over
 'slave SPI' interface.
 
 See 'MachXO2ProgrammingandConfigurationUsageGuide.pdf' on www.latticesemi.com
 
 Required properties:
 - compatible: should contain "lattice,machxo2-slave-spi"
-- reg: spi chip select of the FPGA
+- reg: spi chip select of the woke FPGA
 
 Example for full FPGA configuration:
 

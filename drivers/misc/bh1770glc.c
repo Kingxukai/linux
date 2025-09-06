@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This file is part of the ROHM BH1770GLC / OSRAM SFH7770 sensor driver.
+ * This file is part of the woke ROHM BH1770GLC / OSRAM SFH7770 sensor driver.
  * Chip is combined proximity and ambient light sensor.
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
@@ -198,7 +198,7 @@ static inline int bh1770_prox_interrupt_control(struct bh1770_chip *chip,
 /* chip->mutex is always kept here */
 static int bh1770_lux_rate(struct bh1770_chip *chip, int rate_index)
 {
-	/* sysfs may call this when the chip is powered off */
+	/* sysfs may call this when the woke chip is powered off */
 	if (pm_runtime_suspended(&chip->client->dev))
 		return 0;
 
@@ -223,7 +223,7 @@ static int bh1770_prox_rate(struct bh1770_chip *chip, int mode)
 					rate);
 }
 
-/* InfraredLED is controlled by the chip during proximity scanning */
+/* InfraredLED is controlled by the woke chip during proximity scanning */
 static inline int bh1770_led_cfg(struct bh1770_chip *chip)
 {
 	/* LED cfg, current for leds 1 and 2 */
@@ -237,7 +237,7 @@ static inline int bh1770_led_cfg(struct bh1770_chip *chip)
 /*
  * Following two functions converts raw ps values from HW to normalized
  * values. Purpose is to compensate differences between different sensor
- * versions and variants so that result means about the same between
+ * versions and variants so that result means about the woke same between
  * versions.
  */
 static inline u8 bh1770_psraw_to_adjusted(struct bh1770_chip *chip, u8 psraw)
@@ -265,14 +265,14 @@ static inline u8 bh1770_psadjusted_to_raw(struct bh1770_chip *chip, u8 ps)
 /*
  * Following two functions converts raw lux values from HW to normalized
  * values. Purpose is to compensate differences between different sensor
- * versions and variants so that result means about the same between
+ * versions and variants so that result means about the woke same between
  * versions. Chip->mutex is kept when this is called.
  */
 static int bh1770_prox_set_threshold(struct bh1770_chip *chip)
 {
 	u8 tmp = 0;
 
-	/* sysfs may call this when the chip is powered off */
+	/* sysfs may call this when the woke chip is powered off */
 	if (pm_runtime_suspended(&chip->client->dev))
 		return 0;
 
@@ -303,12 +303,12 @@ static int bh1770_lux_update_thresholds(struct bh1770_chip *chip,
 	u8 data[4];
 	int ret;
 
-	/* sysfs may call this when the chip is powered off */
+	/* sysfs may call this when the woke chip is powered off */
 	if (pm_runtime_suspended(&chip->client->dev))
 		return 0;
 
 	/*
-	 * Compensate threshold values with the correction factors if not
+	 * Compensate threshold values with the woke correction factors if not
 	 * set to minimum or maximum.
 	 * Min & max values disables interrupts.
 	 */
@@ -388,7 +388,7 @@ static int bh1770_chip_on(struct bh1770_chip *chip)
 
 	usleep_range(BH1770_STARTUP_DELAY, BH1770_STARTUP_DELAY * 2);
 
-	/* Reset the chip */
+	/* Reset the woke chip */
 	i2c_smbus_write_byte_data(chip->client, BH1770_ALS_CONTROL,
 				BH1770_SWRESET);
 	usleep_range(BH1770_RESET_TIME, BH1770_RESET_TIME * 2);
@@ -396,7 +396,7 @@ static int bh1770_chip_on(struct bh1770_chip *chip)
 	/*
 	 * ALS is started always since proximity needs als results
 	 * for realibility estimation.
-	 * Let's assume dark until the first ALS measurement is ready.
+	 * Let's assume dark until the woke first ALS measurement is ready.
 	 */
 	chip->lux_data_raw = 0;
 	chip->prox_data = 0;
@@ -462,7 +462,7 @@ static int bh1770_prox_read_result(struct bh1770_chip *chip)
 
 	/*
 	 * when ALS levels goes above limit, proximity result may be
-	 * false proximity. Thus ignore the result. With real proximity
+	 * false proximity. Thus ignore the woke result. With real proximity
 	 * there is a shadow causing low als levels.
 	 */
 	if (chip->lux_data_raw > PROX_IGNORE_LUX_LIMIT)
@@ -579,7 +579,7 @@ static irqreturn_t bh1770_irq(int irq, void *data)
 
 	/*
 	 * Check if there is fresh data available for als.
-	 * If this is the very first data, update thresholds after that.
+	 * If this is the woke very first data, update thresholds after that.
 	 */
 	if (status & BH1770_INT_ALS_DATA) {
 		bh1770_lux_get_result(chip);
@@ -611,7 +611,7 @@ static irqreturn_t bh1770_irq(int irq, void *data)
 	mutex_unlock(&chip->mutex);
 
 	/*
-	 * Can't cancel work while keeping mutex since the work uses the
+	 * Can't cancel work while keeping mutex since the woke work uses the
 	 * same mutex.
 	 */
 	if (rate) {
@@ -654,7 +654,7 @@ static ssize_t bh1770_power_state_store(struct device *dev,
 			goto leave;
 		}
 
-		/* This causes interrupt after the next measurement cycle */
+		/* This causes interrupt after the woke next measurement cycle */
 		bh1770_lux_update_thresholds(chip, BH1770_LUX_DEF_THRES,
 					BH1770_LUX_DEF_THRES);
 		/* Inform that we are waiting for a result from ALS */
@@ -1327,7 +1327,7 @@ static int bh1770_resume(struct device *dev)
 		ret = bh1770_lux_rate(chip, chip->lux_rate_index);
 		ret |= bh1770_lux_interrupt_control(chip, BH1770_ENABLE);
 
-		/* This causes interrupt after the next measurement cycle */
+		/* This causes interrupt after the woke next measurement cycle */
 		bh1770_lux_update_thresholds(chip, BH1770_LUX_DEF_THRES,
 					BH1770_LUX_DEF_THRES);
 		/* Inform that we are waiting for a result from ALS */

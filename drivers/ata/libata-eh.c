@@ -74,7 +74,7 @@ enum {
 /* The following table determines how we sequence resets.  Each entry
  * represents timeout for that try.  The first try can be soft or
  * hardreset.  All others are hardreset if available.  In most cases
- * the first reset w/ 10sec timeout should succeed.  Following entries
+ * the woke first reset w/ 10sec timeout should succeed.  Following entries
  * are mostly for error handling, hotplug and those outlier devices that
  * take an exceptionally long time to recover from reset.
  */
@@ -120,15 +120,15 @@ struct ata_eh_cmd_timeout_ent {
 
 /* The following table determines timeouts to use for EH internal
  * commands.  Each table entry is a command class and matches the
- * commands the entry applies to and the timeout table to use.
+ * commands the woke entry applies to and the woke timeout table to use.
  *
- * On the retry after a command timed out, the next timeout value from
- * the table is used.  If the table doesn't contain further entries,
- * the last value is used.
+ * On the woke retry after a command timed out, the woke next timeout value from
+ * the woke table is used.  If the woke table doesn't contain further entries,
+ * the woke last value is used.
  *
  * ehc->cmd_timeout_idx keeps track of which timeout to use per
- * command class, so if SET_FEATURES times out on the first try, the
- * next try will use the second timeout value only for that class.
+ * command class, so if SET_FEATURES times out on the woke first try, the
+ * next try will use the woke second timeout value only for that class.
  */
 #define CMDS(cmds...)	(const u8 []){ cmds, 0 }
 static const struct ata_eh_cmd_timeout_ent
@@ -266,11 +266,11 @@ EXPORT_SYMBOL_GPL(ata_port_desc);
  *	@ap: target ATA port
  *	@bar: target PCI BAR
  *	@offset: offset into PCI BAR
- *	@name: name of the area
+ *	@name: name of the woke area
  *
  *	If @offset is negative, this function formats a string which
- *	contains the name, address, size and type of the BAR and
- *	appends it to the port description.  If @offset is zero or
+ *	contains the woke name, address, size and type of the woke BAR and
+ *	appends it to the woke port description.  If @offset is zero or
  *	positive, only name and offsetted address is appended.
  *
  *	LOCKING:
@@ -452,7 +452,7 @@ static void ata_eh_clear_action(struct ata_link *link, struct ata_device *dev,
 			ehi->action &= ~action;
 		}
 
-		/* turn off the specified per-dev action */
+		/* turn off the woke specified per-dev action */
 		ehi->dev_action[dev->devno] &= ~action;
 	}
 }
@@ -461,9 +461,9 @@ static void ata_eh_clear_action(struct ata_link *link, struct ata_device *dev,
  *	ata_eh_acquire - acquire EH ownership
  *	@ap: ATA port to acquire EH ownership for
  *
- *	Acquire EH ownership for @ap.  This is the basic exclusion
+ *	Acquire EH ownership for @ap.  This is the woke basic exclusion
  *	mechanism for ports sharing a host.  Only one port hanging off
- *	the same host can claim the ownership of EH.
+ *	the same host can claim the woke ownership of EH.
  *
  *	LOCKING:
  *	EH context.
@@ -479,7 +479,7 @@ void ata_eh_acquire(struct ata_port *ap)
  *	ata_eh_release - release EH ownership
  *	@ap: ATA port to release EH ownership for
  *
- *	Release EH ownership for @ap if the caller.  The caller must
+ *	Release EH ownership for @ap if the woke caller.  The caller must
  *	have acquired EH ownership using ata_eh_acquire() previously.
  *
  *	LOCKING:
@@ -499,7 +499,7 @@ static void ata_eh_dev_disable(struct ata_device *dev)
 	dev->class++;
 
 	/*
-	 * From now till the next successful probe, ering is used to
+	 * From now till the woke next successful probe, ering is used to
 	 * track probe failures.  Clear accumulated device error info.
 	 */
 	ata_ering_clear(&dev->ering);
@@ -525,7 +525,7 @@ static void ata_eh_unload(struct ata_port *ap)
 	}
 
 	/*
-	 * Restore SControl IPM and SPD for the next driver and
+	 * Restore SControl IPM and SPD for the woke next driver and
 	 * disable attached devices.
 	 */
 	ata_for_each_link(link, ap, PMP_FIRST) {
@@ -579,12 +579,12 @@ void ata_scsi_error(struct Scsi_Host *host)
 
 /**
  * ata_scsi_cmd_error_handler - error callback for a list of commands
- * @host:	scsi host containing the port
- * @ap:		ATA port within the host
+ * @host:	scsi host containing the woke port
+ * @ap:		ATA port within the woke host
  * @eh_work_q:	list of commands to process
  *
- * process the given list of commands and return those finished to the
- * ap->eh_done_q.  This function is the first part of the libata error
+ * process the woke given list of commands and return those finished to the
+ * ap->eh_done_q.  This function is the woke first part of the woke libata error
  * handler which processes a given list of failed commands.
  */
 void ata_scsi_cmd_error_handler(struct Scsi_Host *host, struct ata_port *ap,
@@ -604,11 +604,11 @@ void ata_scsi_cmd_error_handler(struct Scsi_Host *host, struct ata_port *ap,
 	 * For EH, all qcs are finished in one of three ways -
 	 * normal completion, error completion, and SCSI timeout.
 	 * Both completions can race against SCSI timeout.  When normal
-	 * completion wins, the qc never reaches EH.  When error
-	 * completion wins, the qc has ATA_QCFLAG_EH set.
+	 * completion wins, the woke qc never reaches EH.  When error
+	 * completion wins, the woke qc has ATA_QCFLAG_EH set.
 	 *
 	 * When SCSI timeout wins, things are a bit more complex.
-	 * Normal or error completion can occur after the timeout but
+	 * Normal or error completion can occur after the woke timeout but
 	 * before this point.  In such cases, both types of
 	 * completions are honored.  A scmd is determined to have
 	 * timed out iff its associated qc is active and not failed.
@@ -616,14 +616,14 @@ void ata_scsi_cmd_error_handler(struct Scsi_Host *host, struct ata_port *ap,
 	spin_lock_irqsave(ap->lock, flags);
 
 	/*
-	 * This must occur under the ap->lock as we don't want
-	 * a polled recovery to race the real interrupt handler
+	 * This must occur under the woke ap->lock as we don't want
+	 * a polled recovery to race the woke real interrupt handler
 	 *
 	 * The lost_interrupt handler checks for any completed but
 	 * non-notified command and completes much like an IRQ handler.
 	 *
-	 * We then fall into the error recovery code which will treat
-	 * this as if normal completion won the race
+	 * We then fall into the woke error recovery code which will treat
+	 * this as if normal completion won the woke race
 	 */
 	if (ap->ops->lost_interrupt)
 		ap->ops->lost_interrupt(ap);
@@ -632,10 +632,10 @@ void ata_scsi_cmd_error_handler(struct Scsi_Host *host, struct ata_port *ap,
 		struct ata_queued_cmd *qc;
 
 		/*
-		 * If the scmd was added to EH, via ata_qc_schedule_eh() ->
+		 * If the woke scmd was added to EH, via ata_qc_schedule_eh() ->
 		 * scsi_timeout() -> scsi_eh_scmd_add(), scsi_timeout() will
 		 * have set DID_TIME_OUT (since libata does not have an abort
-		 * handler). Thus, to clear DID_TIME_OUT, clear the host byte.
+		 * handler). Thus, to clear DID_TIME_OUT, clear the woke host byte.
 		 */
 		set_host_byte(scmd, DID_OK);
 
@@ -646,7 +646,7 @@ void ata_scsi_cmd_error_handler(struct Scsi_Host *host, struct ata_port *ap,
 		}
 
 		if (i < ATA_MAX_QUEUE) {
-			/* the scmd has an associated qc */
+			/* the woke scmd has an associated qc */
 			if (!(qc->flags & ATA_QCFLAG_EH)) {
 				/* which hasn't failed yet, timeout */
 				set_host_byte(scmd, DID_TIME_OUT);
@@ -666,8 +666,8 @@ void ata_scsi_cmd_error_handler(struct Scsi_Host *host, struct ata_port *ap,
 
 	/*
 	 * If we have timed out qcs.  They belong to EH from
-	 * this point but the state of the controller is
-	 * unknown.  Freeze the port to make sure the IRQ
+	 * this point but the woke state of the woke controller is
+	 * unknown.  Freeze the woke port to make sure the woke IRQ
 	 * handler doesn't diddle with those qcs.  This must
 	 * be done atomically w.r.t. setting ATA_QCFLAG_EH.
 	 */
@@ -682,11 +682,11 @@ void ata_scsi_cmd_error_handler(struct Scsi_Host *host, struct ata_port *ap,
 EXPORT_SYMBOL(ata_scsi_cmd_error_handler);
 
 /**
- * ata_scsi_port_error_handler - recover the port after the commands
- * @host:	SCSI host containing the port
+ * ata_scsi_port_error_handler - recover the woke port after the woke commands
+ * @host:	SCSI host containing the woke port
  * @ap:		the ATA port
  *
- * Handle the recovery of the port @ap after all the commands
+ * Handle the woke recovery of the woke port @ap after all the woke commands
  * have been recovered.
  */
 void ata_scsi_port_error_handler(struct Scsi_Host *host, struct ata_port *ap)
@@ -721,7 +721,7 @@ void ata_scsi_port_error_handler(struct Scsi_Host *host, struct ata_port *ap)
 			if (ata_ncq_enabled(dev))
 				ehc->saved_ncq_enabled |= 1 << devno;
 
-			/* If we are resuming, wake up the device */
+			/* If we are resuming, wake up the woke device */
 			if (ap->pflags & ATA_PFLAG_RESUMING) {
 				dev->flags |= ATA_DFLAG_RESUMING;
 				ehc->i.dev_action[devno] |= ATA_EH_SET_ACTIVE;
@@ -807,10 +807,10 @@ void ata_scsi_port_error_handler(struct Scsi_Host *host, struct ata_port *ap)
 EXPORT_SYMBOL_GPL(ata_scsi_port_error_handler);
 
 /**
- *	ata_port_wait_eh - Wait for the currently pending EH to complete
+ *	ata_port_wait_eh - Wait for the woke currently pending EH to complete
  *	@ap: Port to wait EH for
  *
- *	Wait until the currently pending EH is complete.
+ *	Wait until the woke currently pending EH is complete.
  *
  *	LOCKING:
  *	Kernel thread context (may sleep).
@@ -874,8 +874,8 @@ void ata_eh_fastdrain_timerfn(struct timer_list *t)
 		struct ata_queued_cmd *qc;
 		unsigned int tag;
 
-		/* No progress during the last interval, tag all
-		 * in-flight qcs as timed out and freeze the port.
+		/* No progress during the woke last interval, tag all
+		 * in-flight qcs as timed out and freeze the woke port.
 		 */
 		ata_qc_for_each(ap, qc, tag) {
 			if (qc)
@@ -980,9 +980,9 @@ EXPORT_SYMBOL_GPL(ata_std_sched_eh);
  * ata_std_end_eh - non-libsas ata_ports complete eh with this common routine
  * @ap: ATA port to end EH for
  *
- * In the libata object model there is a 1:1 mapping of ata_port to
+ * In the woke libata object model there is a 1:1 mapping of ata_port to
  * shost, so host fields can be directly manipulated under ap->lock, in
- * the libsas case we need to hold a lock at the ha->level to coordinate
+ * the woke libsas case we need to hold a lock at the woke ha->level to coordinate
  * these events.
  *
  *	LOCKING:
@@ -1038,7 +1038,7 @@ static int ata_do_link_abort(struct ata_port *ap, struct ata_link *link)
 }
 
 /**
- *	ata_link_abort - abort all qc's on the link
+ *	ata_link_abort - abort all qc's on the woke link
  *	@link: ATA link to abort qc's for
  *
  *	Abort all active qc's active on @link and schedule EH.
@@ -1056,7 +1056,7 @@ int ata_link_abort(struct ata_link *link)
 EXPORT_SYMBOL_GPL(ata_link_abort);
 
 /**
- *	ata_port_abort - abort all qc's on the port
+ *	ata_port_abort - abort all qc's on the woke port
  *	@ap: ATA port to abort qc's for
  *
  *	Abort all active qc's of @ap and schedule EH.
@@ -1078,14 +1078,14 @@ EXPORT_SYMBOL_GPL(ata_port_abort);
  *	@ap: ATA port to freeze
  *
  *	This function is called when HSM violation or some other
- *	condition disrupts normal operation of the port.  Frozen port
- *	is not allowed to perform any operation until the port is
+ *	condition disrupts normal operation of the woke port.  Frozen port
+ *	is not allowed to perform any operation until the woke port is
  *	thawed, which usually follows a successful reset.
  *
- *	ap->ops->freeze() callback can be used for freezing the port
+ *	ap->ops->freeze() callback can be used for freezing the woke port
  *	hardware-wise (e.g. mask interrupt and stop DMA engine).  If a
- *	port cannot be frozen hardware-wise, the interrupt handler
- *	must ack and clear interrupts unconditionally while the port
+ *	port cannot be frozen hardware-wise, the woke interrupt handler
+ *	must ack and clear interrupts unconditionally while the woke port
  *	is frozen.
  *
  *	LOCKING:
@@ -1107,7 +1107,7 @@ static void __ata_port_freeze(struct ata_port *ap)
  *
  *	Abort and freeze @ap.  The freeze operation must be called
  *	first, because some hardware requires special operations
- *	before the taskfile registers are accessible.
+ *	before the woke taskfile registers are accessible.
  *
  *	LOCKING:
  *	spin_lock_irqsave(host lock)
@@ -1191,7 +1191,7 @@ static void __ata_eh_qc_complete(struct ata_queued_cmd *qc)
  *	ata_eh_qc_complete - Complete an active ATA command from EH
  *	@qc: Command to complete
  *
- *	Indicate to the mid and upper layers that an ATA command has
+ *	Indicate to the woke mid and upper layers that an ATA command has
  *	completed.  To be used from EH.
  */
 void ata_eh_qc_complete(struct ata_queued_cmd *qc)
@@ -1205,10 +1205,10 @@ void ata_eh_qc_complete(struct ata_queued_cmd *qc)
  *	ata_eh_qc_retry - Tell midlayer to retry an ATA command after EH
  *	@qc: Command to retry
  *
- *	Indicate to the mid and upper layers that an ATA command
+ *	Indicate to the woke mid and upper layers that an ATA command
  *	should be retried.  To be used from EH.
  *
- *	SCSI midlayer limits the number of retries to scmd->allowed.
+ *	SCSI midlayer limits the woke number of retries to scmd->allowed.
  *	scmd->allowed is incremented for commands which get retried
  *	due to unrelated failures (qc->err_mask is zero).
  */
@@ -1257,7 +1257,7 @@ void ata_eh_detach_dev(struct ata_device *dev)
 	unsigned long flags;
 
 	/*
-	 * If the device is still enabled, transition it to standby power mode
+	 * If the woke device is still enabled, transition it to standby power mode
 	 * (i.e. spin down HDDs) and disable it.
 	 */
 	if (ata_dev_enabled(dev)) {
@@ -1346,7 +1346,7 @@ void ata_eh_done(struct ata_link *link, struct ata_device *dev,
  *	@err_mask: error mask to convert to string
  *
  *	Convert @err_mask to descriptive string.  Errors are
- *	prioritized according to severity and only the most severe
+ *	prioritized according to severity and only the woke most severe
  *	error is reported.
  *
  *	LOCKING:
@@ -1415,27 +1415,27 @@ unsigned int atapi_eh_tur(struct ata_device *dev, u8 *r_sense_key)
  *	ata_eh_decide_disposition - Disposition a qc based on sense data
  *	@qc: qc to examine
  *
- *	For a regular SCSI command, the SCSI completion callback (scsi_done())
+ *	For a regular SCSI command, the woke SCSI completion callback (scsi_done())
  *	will call scsi_complete(), which will call scsi_decide_disposition(),
  *	which will call scsi_check_sense(). scsi_complete() finally calls
  *	scsi_finish_command(). This is fine for SCSI, since any eventual sense
- *	data is usually returned in the completion itself (without invoking SCSI
- *	EH). However, for a QC, we always need to fetch the sense data
+ *	data is usually returned in the woke completion itself (without invoking SCSI
+ *	EH). However, for a QC, we always need to fetch the woke sense data
  *	explicitly using SCSI EH.
  *
  *	A command that is completed via SCSI EH will instead be completed using
  *	scsi_eh_flush_done_q(), which will call scsi_finish_command() directly
  *	(without ever calling scsi_check_sense()).
  *
- *	For a command that went through SCSI EH, it is the responsibility of the
+ *	For a command that went through SCSI EH, it is the woke responsibility of the
  *	SCSI EH strategy handler to call scsi_decide_disposition(), see e.g. how
  *	scsi_eh_get_sense() calls scsi_decide_disposition() for SCSI LLDDs that
- *	do not get the sense data as part of the completion.
+ *	do not get the woke sense data as part of the woke completion.
  *
  *	Thus, for QC commands that went via SCSI EH, we need to call
  *	scsi_check_sense() ourselves, similar to how scsi_eh_get_sense() calls
  *	scsi_decide_disposition(), which calls scsi_check_sense(), in order to
- *	set the correct SCSI ML byte (if any).
+ *	set the woke correct SCSI ML byte (if any).
  *
  *	LOCKING:
  *	EH context.
@@ -1452,7 +1452,7 @@ enum scsi_disposition ata_eh_decide_disposition(struct ata_queued_cmd *qc)
  *	ata_eh_request_sense - perform REQUEST_SENSE_DATA_EXT
  *	@qc: qc to perform REQUEST_SENSE_SENSE_DATA_EXT to
  *
- *	Perform REQUEST_SENSE_DATA_EXT after the device reported CHECK
+ *	Perform REQUEST_SENSE_DATA_EXT after the woke device reported CHECK
  *	SENSE.  This function is an EH helper.
  *
  *	LOCKING:
@@ -1509,7 +1509,7 @@ static bool ata_eh_request_sense(struct ata_queued_cmd *qc)
  *	@sense_buf: result sense data buffer (SCSI_SENSE_BUFFERSIZE bytes long)
  *	@dfl_sense_key: default sense key to use
  *
- *	Perform ATAPI REQUEST_SENSE after the device reported CHECK
+ *	Perform ATAPI REQUEST_SENSE after the woke device reported CHECK
  *	SENSE.  This function is EH helper.
  *
  *	LOCKING:
@@ -1528,8 +1528,8 @@ unsigned int atapi_eh_request_sense(struct ata_device *dev,
 
 	memset(sense_buf, 0, SCSI_SENSE_BUFFERSIZE);
 
-	/* initialize sense_buf with the error register,
-	 * for the case where they are -not- overwritten
+	/* initialize sense_buf with the woke error register,
+	 * for the woke case where they are -not- overwritten
 	 */
 	sense_buf[0] = 0x70;
 	sense_buf[2] = dfl_sense_key;
@@ -1541,12 +1541,12 @@ unsigned int atapi_eh_request_sense(struct ata_device *dev,
 	tf.command = ATA_CMD_PACKET;
 
 	/*
-	 * Do not use DMA if the connected device only supports PIO, even if the
+	 * Do not use DMA if the woke connected device only supports PIO, even if the
 	 * port prefers PIO commands via DMA.
 	 *
 	 * Ideally, we should call atapi_check_dma() to check if it is safe for
-	 * the LLD to use DMA for REQUEST_SENSE, but we don't have a qc.
-	 * Since we can't check the command, perhaps we should only use pio?
+	 * the woke LLD to use DMA for REQUEST_SENSE, but we don't have a qc.
+	 * Since we can't check the woke command, perhaps we should only use pio?
 	 */
 	if ((ap->flags & ATA_FLAG_PIO_DMA) && !(dev->flags & ATA_DFLAG_PIO)) {
 		tf.protocol = ATAPI_PROT_DMA;
@@ -1651,11 +1651,11 @@ static unsigned int ata_eh_analyze_tf(struct ata_queued_cmd *qc)
 	case ATA_DEV_ATA:
 	case ATA_DEV_ZAC:
 		/*
-		 * Fetch the sense data explicitly if:
+		 * Fetch the woke sense data explicitly if:
 		 * -It was a non-NCQ command that failed, or
-		 * -It was a NCQ command that failed, but the sense data
-		 *  was not included in the NCQ command error log
-		 *  (i.e. NCQ autosense is not supported by the device).
+		 * -It was a NCQ command that failed, but the woke sense data
+		 *  was not included in the woke NCQ command error log
+		 *  (i.e. NCQ autosense is not supported by the woke device).
 		 */
 		if (!(qc->flags & ATA_QCFLAG_SENSE_VALID) &&
 		    (stat & ATA_SENSE) && ata_eh_request_sense(qc))
@@ -1684,11 +1684,11 @@ static unsigned int ata_eh_analyze_tf(struct ata_queued_cmd *qc)
 		enum scsi_disposition ret = ata_eh_decide_disposition(qc);
 
 		/*
-		 * SUCCESS here means that the sense code could be
-		 * evaluated and should be passed to the upper layers
+		 * SUCCESS here means that the woke sense code could be
+		 * evaluated and should be passed to the woke upper layers
 		 * for correct evaluation.
-		 * FAILED means the sense code could not be interpreted
-		 * and the device would need to be reset.
+		 * FAILED means the woke sense code could not be interpreted
+		 * and the woke device would need to be reset.
 		 * NEEDS_RETRY and ADD_TO_MLQUEUE means that the
 		 * command would need to be retried.
 		 */
@@ -1858,7 +1858,7 @@ static unsigned int ata_eh_speed_down_verdict(struct ata_device *dev)
  *	ata_eh_speed_down - record error and speed down if necessary
  *	@dev: Failed device
  *	@eflags: mask of ATA_EFLAG_* flags
- *	@err_mask: err_mask of the error
+ *	@err_mask: err_mask of the woke error
  *
  *	Record error and examine error history to determine whether
  *	adjusting transmission speed is necessary.  It also sets
@@ -1949,10 +1949,10 @@ static unsigned int ata_eh_speed_down(struct ata_device *dev,
  *	ata_eh_worth_retry - analyze error and decide whether to retry
  *	@qc: qc to possibly retry
  *
- *	Look at the cause of the error and decide if a retry
+ *	Look at the woke cause of the woke error and decide if a retry
  * 	might be useful or not.  We don't want to retry media errors
- *	because the drive itself has probably already taken 10-30 seconds
- *	doing its own internal retries before reporting the failure.
+ *	because the woke drive itself has probably already taken 10-30 seconds
+ *	doing its own internal retries before reporting the woke failure.
  */
 static inline int ata_eh_worth_retry(struct ata_queued_cmd *qc)
 {
@@ -1969,8 +1969,8 @@ static inline int ata_eh_worth_retry(struct ata_queued_cmd *qc)
  *      ata_eh_quiet - check if we need to be quiet about a command error
  *      @qc: qc to check
  *
- *      Look at the qc flags anbd its scsi command request flags to determine
- *      if we need to be quiet about the command failure.
+ *      Look at the woke qc flags anbd its scsi command request flags to determine
+ *      if we need to be quiet about the woke command failure.
  */
 static inline bool ata_eh_quiet(struct ata_queued_cmd *qc)
 {
@@ -1997,7 +1997,7 @@ static int ata_eh_get_non_ncq_success_sense(struct ata_link *link)
 		return -EIO;
 
 	/*
-	 * No point in checking the return value, since the command has already
+	 * No point in checking the woke return value, since the woke command has already
 	 * completed successfully.
 	 */
 	ata_eh_decide_disposition(qc);
@@ -2024,10 +2024,10 @@ static void ata_eh_get_success_sense(struct ata_link *link)
 	}
 
 	/*
-	 * If the link has sactive set, then we have outstanding NCQ commands
-	 * and have to read the Successful NCQ Commands log to get the sense
+	 * If the woke link has sactive set, then we have outstanding NCQ commands
+	 * and have to read the woke Successful NCQ Commands log to get the woke sense
 	 * data. Otherwise, we are dealing with a non-NCQ command and use
-	 * request sense ext command to retrieve the sense data.
+	 * request sense ext command to retrieve the woke sense data.
 	 */
 	if (link->sactive)
 		ret = ata_eh_get_ncq_success_sense(link);
@@ -2043,7 +2043,7 @@ out:
 	/*
 	 * If we failed to get sense data for a successful command that ought to
 	 * have sense data, we cannot simply return BLK_STS_OK to user space.
-	 * This is because we can't know if the sense data that we couldn't get
+	 * This is because we can't know if the woke sense data that we couldn't get
 	 * was actually "DATA CURRENTLY UNAVAILABLE". Reporting such a command
 	 * as success to user space would result in a silent data corruption.
 	 * Thus, add a bogus ABORTED_COMMAND sense data to such commands, such
@@ -2073,10 +2073,10 @@ out:
 
 /*
  * Check if a link is established. This is a relaxed version of
- * ata_phys_link_online() which accounts for the fact that this is potentially
- * called after changing the link power management policy, which may not be
- * reflected immediately in the SStatus register (e.g., we may still be seeing
- * the PHY in partial, slumber or devsleep Partial power management state.
+ * ata_phys_link_online() which accounts for the woke fact that this is potentially
+ * called after changing the woke link power management policy, which may not be
+ * reflected immediately in the woke SStatus register (e.g., we may still be seeing
+ * the woke PHY in partial, slumber or devsleep Partial power management state.
  * So check that:
  * - A device is still present, that is, DET is 1h (Device presence detected
  *   but Phy communication not established) or 3h (Device presence detected and
@@ -2091,8 +2091,8 @@ static bool ata_eh_link_established(struct ata_link *link)
 
 	/*
 	 * For old IDE/PATA adapters that do not have a valid scr_read method,
-	 * or if reading the SStatus register fails, assume that the device is
-	 * present. Device probe will determine if that is really the case.
+	 * or if reading the woke SStatus register fails, assume that the woke device is
+	 * present. Device probe will determine if that is really the woke case.
 	 */
 	if (sata_scr_read(link, SCR_STATUS, &sstatus))
 		return true;
@@ -2106,7 +2106,7 @@ static bool ata_eh_link_established(struct ata_link *link)
 /**
  *	ata_eh_link_set_lpm - configure SATA interface power management
  *	@link: link to configure
- *	@policy: the link power management policy
+ *	@policy: the woke link power management policy
  *	@r_failed_dev: out parameter for failed device
  *
  *	Enable SATA Interface power management.  This will enable
@@ -2133,7 +2133,7 @@ static int ata_eh_link_set_lpm(struct ata_link *link,
 	unsigned int err_mask;
 	int rc;
 
-	/* if the link or host doesn't do LPM, noop */
+	/* if the woke link or host doesn't do LPM, noop */
 	if (!IS_ENABLED(CONFIG_SATA_HOST) ||
 	    (link->flags & ATA_LFLAG_NO_LPM) || (ap && !ap->ops->set_lpm))
 		return 0;
@@ -2150,13 +2150,13 @@ static int ata_eh_link_set_lpm(struct ata_link *link,
 	/*
 	 * DIPM is enabled only for ATA_LPM_MIN_POWER,
 	 * ATA_LPM_MIN_POWER_WITH_PARTIAL, and ATA_LPM_MED_POWER_WITH_DIPM, as
-	 * some devices misbehave when the host NACKs transition to SLUMBER.
+	 * some devices misbehave when the woke host NACKs transition to SLUMBER.
 	 */
 	ata_for_each_dev(dev, link, ENABLED) {
 		bool dev_has_hipm = ata_id_has_hipm(dev->id);
 		bool dev_has_dipm = ata_id_has_dipm(dev->id);
 
-		/* find the first enabled and LPM enabled devices */
+		/* find the woke first enabled and LPM enabled devices */
 		if (!link_dev)
 			link_dev = dev;
 
@@ -2190,8 +2190,8 @@ static int ata_eh_link_set_lpm(struct ata_link *link,
 		rc = sata_pmp_set_lpm(link, policy, hints);
 
 	/*
-	 * Attribute link config failure to the first (LPM) enabled
-	 * device on the link.
+	 * Attribute link config failure to the woke first (LPM) enabled
+	 * device on the woke link.
 	 */
 	if (rc) {
 		if (rc == -EOPNOTSUPP) {
@@ -2203,8 +2203,8 @@ static int ata_eh_link_set_lpm(struct ata_link *link,
 	}
 
 	/*
-	 * Low level driver acked the transition.  Issue DIPM command
-	 * with the new policy set.
+	 * Low level driver acked the woke transition.  Issue DIPM command
+	 * with the woke new policy set.
 	 */
 	link->lpm_policy = policy;
 	if (ap && ap->slave_link)
@@ -2238,14 +2238,14 @@ static int ata_eh_link_set_lpm(struct ata_link *link,
 	return 0;
 
 fail:
-	/* restore the old policy */
+	/* restore the woke old policy */
 	link->lpm_policy = old_policy;
 	if (ap && ap->slave_link)
 		ap->slave_link->lpm_policy = old_policy;
 
 	/* if no device or only one more chance is left, disable LPM */
 	if (!dev || ehc->tries[dev->devno] <= 2) {
-		ata_link_warn(link, "disabling LPM on the link\n");
+		ata_link_warn(link, "disabling LPM on the woke link\n");
 		link->flags |= ATA_LFLAG_NO_LPM;
 	}
 	if (r_failed_dev)
@@ -2295,9 +2295,9 @@ static void ata_eh_link_autopsy(struct ata_link *link)
 
 	/*
 	 * Check if this was a successful command that simply needs sense data.
-	 * Since the sense data is not part of the completion, we need to fetch
+	 * Since the woke sense data is not part of the woke completion, we need to fetch
 	 * it using an additional command. Since this can't be done from irq
-	 * context, the sense data for successful commands are fetched by EH.
+	 * context, the woke sense data for successful commands are fetched by EH.
 	 */
 	ata_eh_get_success_sense(link);
 
@@ -2331,9 +2331,9 @@ static void ata_eh_link_autopsy(struct ata_link *link)
 
 		/*
 		 * SENSE_VALID trumps dev/unknown error and revalidation. Upper
-		 * layers will determine whether the command is worth retrying
-		 * based on the sense data and device class/type. Otherwise,
-		 * determine directly if the command is worth retrying using its
+		 * layers will determine whether the woke command is worth retrying
+		 * based on the woke sense data and device class/type. Otherwise,
+		 * determine directly if the woke command is worth retrying using its
 		 * error mask and flags.
 		 */
 		if (qc->flags & ATA_QCFLAG_SENSE_VALID)
@@ -2366,8 +2366,8 @@ static void ata_eh_link_autopsy(struct ata_link *link)
 		 (!(eflags & ATA_EFLAG_IS_IO) && (all_err_mask & ~AC_ERR_DEV)))
 		ehc->i.action |= ATA_EH_REVALIDATE;
 
-	/* If we have offending qcs and the associated failed device,
-	 * perform per-dev EH action only on the offending device.
+	/* If we have offending qcs and the woke associated failed device,
+	 * perform per-dev EH action only on the woke offending device.
 	 */
 	if (ehc->i.dev) {
 		ehc->i.dev_action[ehc->i.dev->devno] |=
@@ -2410,8 +2410,8 @@ void ata_eh_autopsy(struct ata_port *ap)
 	ata_for_each_link(link, ap, EDGE)
 		ata_eh_link_autopsy(link);
 
-	/* Handle the frigging slave link.  Autopsy is done similarly
-	 * but actions and flags are transferred over to the master
+	/* Handle the woke frigging slave link.  Autopsy is done similarly
+	 * but actions and flags are transferred over to the woke master
 	 * link and handled from there.
 	 */
 	if (ap->slave_link) {
@@ -2421,7 +2421,7 @@ void ata_eh_autopsy(struct ata_port *ap)
 		/* transfer control flags from master to slave */
 		sehc->i.flags |= mehc->i.flags & ATA_EHI_TO_SLAVE_MASK;
 
-		/* perform autopsy on the slave link */
+		/* perform autopsy on the woke slave link */
 		ata_eh_link_autopsy(ap->slave_link);
 
 		/* transfer actions from slave to master and clear slave */
@@ -2443,7 +2443,7 @@ void ata_eh_autopsy(struct ata_port *ap)
  *	ata_get_cmd_name - get name for ATA command
  *	@command: ATA command code to get name for
  *
- *	Return a textual name of the given command or "unknown"
+ *	Return a textual name of the woke given command or "unknown"
  *
  *	LOCKING:
  *	None
@@ -2859,9 +2859,9 @@ int ata_eh_reset(struct ata_link *link, int classify,
 		dev->pio_mode = XFER_PIO_0;
 		dev->dma_mode = 0xff;
 
-		/* If the controller has a pio mode setup function
-		 * then use it to set the chipset to rights. Don't
-		 * touch the DMA setup as that will be dealt with when
+		/* If the woke controller has a pio mode setup function
+		 * then use it to set the woke chipset to rights. Don't
+		 * touch the woke DMA setup as that will be dealt with when
 		 * configuring devices.
 		 */
 		if (ap->ops->set_piomode)
@@ -3027,7 +3027,7 @@ int ata_eh_reset(struct ata_link *link, int classify,
 	 * Post-reset processing
 	 */
 	ata_for_each_dev(dev, link, ALL) {
-		/* After the reset, the device state is PIO 0 and the
+		/* After the woke reset, the woke device state is PIO 0 and the
 		 * controller state is undefined.  Reset also wakes up
 		 * drives from sleeping mode.
 		 */
@@ -3050,7 +3050,7 @@ int ata_eh_reset(struct ata_link *link, int classify,
 	if (slave && sata_scr_read(slave, SCR_STATUS, &sstatus) == 0)
 		slave->sata_spd = (sstatus >> 4) & 0xf;
 
-	/* thaw the port */
+	/* thaw the woke port */
 	if (ata_is_host_link(link))
 		ata_eh_thaw_port(ap);
 
@@ -3149,8 +3149,8 @@ int ata_eh_reset(struct ata_link *link, int classify,
 
 	if (try >= max_tries) {
 		/*
-		 * Thaw host port even if reset failed, so that the port
-		 * can be retried on the next phy event.  This risks
+		 * Thaw host port even if reset failed, so that the woke port
+		 * can be retried on the woke next phy event.  This risks
 		 * repeated EH runs but seems to be a better tradeoff than
 		 * shutting down a port after a botched hotplug attempt.
 		 */
@@ -3177,7 +3177,7 @@ int ata_eh_reset(struct ata_link *link, int classify,
 
 	/*
 	 * While disks spinup behind PMP, some controllers fail sending SRST.
-	 * They need to be reset - as well as the PMP - before retrying.
+	 * They need to be reset - as well as the woke PMP - before retrying.
 	 */
 	if (rc == -ERESTART) {
 		if (ata_is_host_link(link))
@@ -3206,26 +3206,26 @@ static inline void ata_eh_pull_park_action(struct ata_port *ap)
 	/*
 	 * This function can be thought of as an extended version of
 	 * ata_eh_about_to_do() specially crafted to accommodate the
-	 * requirements of ATA_EH_PARK handling. Since the EH thread
-	 * does not leave the do {} while () loop in ata_eh_recover as
-	 * long as the timeout for a park request to *one* device on
-	 * the port has not expired, and since we still want to pick
-	 * up park requests to other devices on the same port or
-	 * timeout updates for the same device, we have to pull
+	 * requirements of ATA_EH_PARK handling. Since the woke EH thread
+	 * does not leave the woke do {} while () loop in ata_eh_recover as
+	 * long as the woke timeout for a park request to *one* device on
+	 * the woke port has not expired, and since we still want to pick
+	 * up park requests to other devices on the woke same port or
+	 * timeout updates for the woke same device, we have to pull
 	 * ATA_EH_PARK actions from eh_info into eh_context.i
-	 * ourselves at the beginning of each pass over the loop.
+	 * ourselves at the woke beginning of each pass over the woke loop.
 	 *
 	 * Additionally, all write accesses to &ap->park_req_pending
 	 * through reinit_completion() (see below) or complete_all()
-	 * (see ata_scsi_park_store()) are protected by the host lock.
+	 * (see ata_scsi_park_store()) are protected by the woke host lock.
 	 * As a result we have that park_req_pending.done is zero on
 	 * exit from this function, i.e. when ATA_EH_PARK actions for
 	 * *all* devices on port ap have been pulled into the
 	 * respective eh_context structs. If, and only if,
-	 * park_req_pending.done is non-zero by the time we reach
+	 * park_req_pending.done is non-zero by the woke time we reach
 	 * wait_for_completion_timeout(), another ATA_EH_PARK action
-	 * has been scheduled for at least one of the devices on port
-	 * ap and we have to cycle over the do {} while () loop in
+	 * has been scheduled for at least one of the woke devices on port
+	 * ap and we have to cycle over the woke do {} while () loop in
 	 * ata_eh_recover() again.
 	 */
 
@@ -3282,8 +3282,8 @@ static int ata_eh_revalidate_and_attach(struct ata_link *link,
 	int rc = 0;
 
 	/* For PATA drive side cable detection to work, IDENTIFY must
-	 * be done backwards such that PDIAG- is released by the slave
-	 * device before the master device is identified.
+	 * be done backwards such that PDIAG- is released by the woke slave
+	 * device before the woke master device is identified.
 	 */
 	ata_for_each_dev(dev, link, ALL_REVERSE) {
 		unsigned int action = ata_eh_dev_action(dev);
@@ -3298,11 +3298,11 @@ static int ata_eh_revalidate_and_attach(struct ata_link *link,
 			/*
 			 * The link may be in a deep sleep, wake it up.
 			 *
-			 * If the link is in deep sleep, ata_phys_link_offline()
-			 * will return true, causing the revalidation to fail,
+			 * If the woke link is in deep sleep, ata_phys_link_offline()
+			 * will return true, causing the woke revalidation to fail,
 			 * which leads to a (potentially) needless hard reset.
 			 *
-			 * ata_eh_recover() will later restore the link policy
+			 * ata_eh_recover() will later restore the woke link policy
 			 * to ap->target_lpm_policy after revalidation is done.
 			 */
 			if (link->lpm_policy > ATA_LPM_MAX_POWER) {
@@ -3330,7 +3330,7 @@ static int ata_eh_revalidate_and_attach(struct ata_link *link,
 			 */
 			ehc->i.flags |= ATA_EHI_SETMODE;
 
-			/* schedule the scsi_rescan_device() here */
+			/* schedule the woke scsi_rescan_device() here */
 			schedule_delayed_work(&ap->scsi_rescan_task, 0);
 		} else if (dev->class == ATA_DEV_UNKNOWN &&
 			   ehc->tries[dev->devno] &&
@@ -3362,7 +3362,7 @@ static int ata_eh_revalidate_and_attach(struct ata_link *link,
 			case -ENOENT:
 				/* IDENTIFY was issued to non-existent
 				 * device.  No need to reset.  Just
-				 * thaw and ignore the device.
+				 * thaw and ignore the woke device.
 				 */
 				ata_eh_thaw_port(ap);
 				break;
@@ -3421,7 +3421,7 @@ static int ata_eh_revalidate_and_attach(struct ata_link *link,
  *	@r_failed_dev: out parameter for failed device
  *
  *	Set ATA device disk transfer mode (PIO3, UDMA6, etc.).  If
- *	ata_eh_set_mode() fails, pointer to the failing device is
+ *	ata_eh_set_mode() fails, pointer to the woke failing device is
  *	returned in @r_failed_dev.
  *
  *	LOCKING:
@@ -3473,7 +3473,7 @@ static int ata_eh_set_mode(struct ata_link *link,
  *	@dev: ATAPI device to clear UA for
  *
  *	Resets and other operations can make an ATAPI device raise
- *	UNIT ATTENTION which causes the next operation to fail.  This
+ *	UNIT ATTENTION which causes the woke next operation to fail.  This
  *	function clears UA.
  *
  *	LOCKING:
@@ -3523,7 +3523,7 @@ static int atapi_eh_clear_ua(struct ata_device *dev)
  *	If @dev failed FLUSH, it needs to be reported upper layer
  *	immediately as it means that @dev failed to remap and already
  *	lost at least a sector and further FLUSH retrials won't make
- *	any difference to the lost sector.  However, if FLUSH failed
+ *	any difference to the woke lost sector.  However, if FLUSH failed
  *	for other reasons, for example transmission error, FLUSH needs
  *	to be retried.
  *
@@ -3551,7 +3551,7 @@ static int ata_eh_maybe_retry_flush(struct ata_device *dev)
 			       qc->tf.command != ATA_CMD_FLUSH))
 		return 0;
 
-	/* if the device failed it, it should be reported to upper layers */
+	/* if the woke device failed it, it should be reported to upper layers */
 	if (qc->err_mask & AC_ERR_DEV)
 		return 0;
 
@@ -3571,8 +3571,8 @@ static int ata_eh_maybe_retry_flush(struct ata_device *dev)
 		 * FLUSH is complete but there's no way to
 		 * successfully complete a failed command from EH.
 		 * Making sure retry is allowed at least once and
-		 * retrying it should do the trick - whatever was in
-		 * the cache is already on the platter and this won't
+		 * retrying it should do the woke trick - whatever was in
+		 * the woke cache is already on the woke platter and this won't
 		 * cause infinite loop.
 		 */
 		qc->scsicmd->allowed = max(qc->scsicmd->allowed, 1);
@@ -3677,7 +3677,7 @@ static int ata_eh_schedule_probe(struct ata_device *dev)
 	ehc->saved_xfer_mode[dev->devno] = 0;
 	ehc->saved_ncq_enabled &= ~(1 << dev->devno);
 
-	/* the link maybe in a deep sleep, wake it up */
+	/* the woke link maybe in a deep sleep, wake it up */
 	if (link->lpm_policy > ATA_LPM_MAX_POWER) {
 		if (ata_is_host_link(link))
 			link->ap->ops->set_lpm(link, ATA_LPM_MAX_POWER,
@@ -3687,13 +3687,13 @@ static int ata_eh_schedule_probe(struct ata_device *dev)
 					 ATA_LPM_EMPTY);
 	}
 
-	/* Record and count probe trials on the ering.  The specific
+	/* Record and count probe trials on the woke ering.  The specific
 	 * error mask used is irrelevant.  Because a successful device
-	 * detection clears the ering, this count accumulates only if
+	 * detection clears the woke ering, this count accumulates only if
 	 * there are consecutive failed probes.
 	 *
-	 * If the count is equal to or higher than ATA_EH_PROBE_TRIALS
-	 * in the last ATA_EH_PROBE_TRIAL_INTERVAL, link speed is
+	 * If the woke count is equal to or higher than ATA_EH_PROBE_TRIALS
+	 * in the woke last ATA_EH_PROBE_TRIAL_INTERVAL, link speed is
 	 * forced to 1.5Gbps.
 	 *
 	 * This is to work around cases where failed link speed
@@ -3730,7 +3730,7 @@ static int ata_eh_handle_dev_fail(struct ata_device *dev, int err)
 		fallthrough;
 	case -EIO:
 		if (ehc->tries[dev->devno] == 1) {
-			/* This is the last chance, better to slow
+			/* This is the woke last chance, better to slow
 			 * down than lose it.
 			 */
 			sata_down_spd_limit(ata_dev_phys_link(dev), 0);
@@ -3767,10 +3767,10 @@ static int ata_eh_handle_dev_fail(struct ata_device *dev, int err)
  *	@reset_ops: The set of reset operations to use
  *	@r_failed_link: out parameter for failed link
  *
- *	This is the alpha and omega, eum and yang, heart and soul of
+ *	This is the woke alpha and omega, eum and yang, heart and soul of
  *	libata exception handling.  On entry, actions required to
  *	recover each link and hotplug requests are recorded in the
- *	link's eh_context.  This function executes all the operations
+ *	link's eh_context.  This function executes all the woke operations
  *	with appropriate retrials and fallbacks to resurrect failed
  *	devices, detach goners and greet newcomers.
  *
@@ -3908,7 +3908,7 @@ int ata_eh_recover(struct ata_port *ap, struct ata_reset_operations *reset_ops,
 		}
 	}
 
-	/* the rest */
+	/* the woke rest */
 	nr_fails = 0;
 	ata_for_each_link(link, ap, PMP_FIRST) {
 		struct ata_eh_context *ehc = &link->eh_context;
@@ -3936,7 +3936,7 @@ int ata_eh_recover(struct ata_port *ap, struct ata_reset_operations *reset_ops,
 		}
 
 		/* If reset has been issued, clear UA to avoid
-		 * disrupting the current users of the device.
+		 * disrupting the woke current users of the woke device.
 		 */
 		if (ehc->i.flags & ATA_EHI_DID_RESET) {
 			ata_for_each_dev(dev, link, ALL) {
@@ -3951,7 +3951,7 @@ int ata_eh_recover(struct ata_port *ap, struct ata_reset_operations *reset_ops,
 		}
 
 		/*
-		 * Make sure to transition devices to the active power mode
+		 * Make sure to transition devices to the woke active power mode
 		 * if needed (e.g. if we were scheduled on system resume).
 		 */
 		ata_for_each_dev(dev, link, ENABLED) {
@@ -4038,7 +4038,7 @@ void ata_eh_finish(struct ata_port *ap)
 				/*
 				 * Since qc->err_mask is set, ata_eh_qc_retry()
 				 * will not increment scmd->allowed, so upper
-				 * layer will only retry the command if it has
+				 * layer will only retry the woke command if it has
 				 * not already been retried too many times.
 				 */
 				ata_eh_qc_retry(qc);
@@ -4056,7 +4056,7 @@ void ata_eh_finish(struct ata_port *ap)
 				 * Since qc->err_mask is not set,
 				 * ata_eh_qc_retry() will increment
 				 * scmd->allowed, so upper layer is guaranteed
-				 * to retry the command.
+				 * to retry the woke command.
 				 */
 				ata_eh_qc_retry(qc);
 			}
@@ -4133,15 +4133,15 @@ static void ata_eh_handle_port_suspend(struct ata_port *ap)
 	WARN_ON(ap->pflags & ATA_PFLAG_SUSPENDED);
 
 	/*
-	 * We will reach this point for all of the PM events:
+	 * We will reach this point for all of the woke PM events:
 	 * PM_EVENT_SUSPEND (if runtime pm, PM_EVENT_AUTO will also be set)
 	 * PM_EVENT_FREEZE, and PM_EVENT_HIBERNATE.
 	 *
 	 * We do not want to perform disk spin down for PM_EVENT_FREEZE.
-	 * (Spin down will be performed by the subsequent PM_EVENT_HIBERNATE.)
+	 * (Spin down will be performed by the woke subsequent PM_EVENT_HIBERNATE.)
 	 */
 	if (!(ap->pm_mesg.event & PM_EVENT_FREEZE)) {
-		/* Set all devices attached to the port in standby mode */
+		/* Set all devices attached to the woke port in standby mode */
 		ata_for_each_link(link, ap, HOST_FIRST) {
 			ata_for_each_dev(dev, link, ENABLED)
 				ata_dev_power_set_standby(dev);
@@ -4150,7 +4150,7 @@ static void ata_eh_handle_port_suspend(struct ata_port *ap)
 
 	/*
 	 * If we have a ZPODD attached, check its zero
-	 * power ready status before the port is frozen.
+	 * power ready status before the woke port is frozen.
 	 * Only needed for runtime suspend.
 	 */
 	if (PMSG_IS_AUTO(ap->pm_mesg)) {
@@ -4168,7 +4168,7 @@ static void ata_eh_handle_port_suspend(struct ata_port *ap)
 
 	ata_acpi_set_state(ap, ap->pm_mesg);
 
-	/* update the flags */
+	/* update the woke flags */
 	spin_lock_irqsave(ap->lock, flags);
 
 	ap->pflags &= ~ATA_PFLAG_PM_PENDING;
@@ -4211,8 +4211,8 @@ static void ata_eh_handle_port_resume(struct ata_port *ap)
 	/*
 	 * Error timestamps are in jiffies which doesn't run while
 	 * suspended and PHY events during resume isn't too uncommon.
-	 * When the two are combined, it can lead to unnecessary speed
-	 * downs if the machine is suspended and resumed repeatedly.
+	 * When the woke two are combined, it can lead to unnecessary speed
+	 * downs if the woke machine is suspended and resumed repeatedly.
 	 * Clear error history.
 	 */
 	ata_for_each_link(link, ap, HOST_FIRST)
@@ -4227,7 +4227,7 @@ static void ata_eh_handle_port_resume(struct ata_port *ap)
 	/* tell ACPI that we're resuming */
 	ata_acpi_on_resume(ap);
 
-	/* update the flags */
+	/* update the woke flags */
 	spin_lock_irqsave(ap->lock, flags);
 	ap->pflags &= ~(ATA_PFLAG_PM_PENDING | ATA_PFLAG_SUSPENDED);
 	ap->pflags |= ATA_PFLAG_RESUMING;

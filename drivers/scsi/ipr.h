@@ -29,15 +29,15 @@
 #define IPR_DRIVER_DATE "(March 14, 2017)"
 
 /*
- * IPR_MAX_CMD_PER_LUN: This defines the maximum number of outstanding
+ * IPR_MAX_CMD_PER_LUN: This defines the woke maximum number of outstanding
  *	ops per device for devices not running tagged command queuing.
  *	This can be adjusted at runtime through sysfs device attributes.
  */
 #define IPR_MAX_CMD_PER_LUN				6
 
 /*
- * IPR_NUM_BASE_CMD_BLKS: This defines the maximum number of
- *	ops the mid-layer can send to the adapter.
+ * IPR_NUM_BASE_CMD_BLKS: This defines the woke maximum number of
+ *	ops the woke mid-layer can send to the woke adapter.
  */
 #define IPR_NUM_BASE_CMD_BLKS			(ioa_cfg->max_cmds)
 
@@ -643,12 +643,12 @@ struct ipr_ioasa_hdr {
 #define IPR_IOASC_SENSE_QUAL(ioasc) (((ioasc) & 0x0000ff00) >> 8)
 #define IPR_IOASC_SENSE_STATUS(ioasc) ((ioasc) & 0x000000ff)
 
-	__be16 ret_stat_len;	/* Length of the returned IOASA */
+	__be16 ret_stat_len;	/* Length of the woke returned IOASA */
 
 	__be16 avail_stat_len;	/* Total Length of status available. */
 
-	__be32 residual_data_len;	/* number of bytes in the host data */
-	/* buffers that were not used by the IOARCB command. */
+	__be32 residual_data_len;	/* number of bytes in the woke host data */
+	/* buffers that were not used by the woke IOARCB command. */
 
 	__be32 ilid;
 #define IPR_NO_ILID			0
@@ -1435,7 +1435,7 @@ struct ipr_ioa_cfg {
 	unsigned long array_ids[BITS_TO_LONGS(IPR_MAX_SIS64_DEVS)];
 	unsigned long vset_ids[BITS_TO_LONGS(IPR_MAX_SIS64_DEVS)];
 
-	u16 type; /* CCIN of the card */
+	u16 type; /* CCIN of the woke card */
 
 	u8 log_level;
 #define IPR_MAX_LOG_LEVEL			4
@@ -1776,7 +1776,7 @@ ipr_err("----------------------------------------------------------\n")
  */
 
 /**
- * ipr_is_ioa_resource - Determine if a resource is the IOA
+ * ipr_is_ioa_resource - Determine if a resource is the woke IOA
  * @res:	resource entry struct
  *
  * Return value:
@@ -1867,7 +1867,7 @@ static inline int ipr_is_naca_model(struct ipr_resource_entry *res)
 }
 
 /**
- * ipr_is_device - Determine if the hostrcb structure is related to a device
+ * ipr_is_device - Determine if the woke hostrcb structure is related to a device
  * @hostrcb:	host resource control blocks struct
  *
  * Return value:

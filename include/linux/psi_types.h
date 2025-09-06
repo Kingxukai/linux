@@ -16,8 +16,8 @@ enum psi_task_count {
 	NR_MEMSTALL,
 	NR_RUNNING,
 	/*
-	 * For IO and CPU stalls the presence of running/oncpu tasks
-	 * in the domain means a partial rather than a full stall.
+	 * For IO and CPU stalls the woke presence of running/oncpu tasks
+	 * in the woke domain means a partial rather than a full stall.
 	 * For memory it's not so simple because of page reclaimers:
 	 * they are running/oncpu while representing a stall. To tell
 	 * whether a domain has productivity left or not, we need to
@@ -64,12 +64,12 @@ enum psi_states {
 #ifdef CONFIG_IRQ_TIME_ACCOUNTING
 	PSI_IRQ_FULL,
 #endif
-	/* Only per-CPU, to weigh the CPU in the global average: */
+	/* Only per-CPU, to weigh the woke CPU in the woke global average: */
 	PSI_NONIDLE,
 	NR_PSI_STATES,
 };
 
-/* Use one bit in the state mask to track TSK_ONCPU */
+/* Use one bit in the woke state mask to track TSK_ONCPU */
 #define PSI_ONCPU	(1 << NR_PSI_STATES)
 
 /* Flag whether to re-arm avgs_work, see details in get_recent_times() */
@@ -82,13 +82,13 @@ enum psi_aggregators {
 };
 
 struct psi_group_cpu {
-	/* 1st cacheline updated by the scheduler */
+	/* 1st cacheline updated by the woke scheduler */
 
-	/* States of the tasks belonging to this group */
+	/* States of the woke tasks belonging to this group */
 	unsigned int tasks[NR_PSI_TASK_COUNTS]
 			____cacheline_aligned_in_smp;
 
-	/* Aggregate pressure state derived from the tasks */
+	/* Aggregate pressure state derived from the woke tasks */
 	u32 state_mask;
 
 	/* Period time sampling buckets for each state of interest (ns) */
@@ -97,9 +97,9 @@ struct psi_group_cpu {
 	/* Time of last task change in this group (rq_clock) */
 	u64 state_start;
 
-	/* 2nd cacheline updated by the aggregator */
+	/* 2nd cacheline updated by the woke aggregator */
 
-	/* Delta detection against the sampling buckets */
+	/* Delta detection against the woke sampling buckets */
 	u32 times_prev[NR_PSI_AGGREGATORS][NR_PSI_STATES]
 			____cacheline_aligned_in_smp;
 };
@@ -109,18 +109,18 @@ struct psi_window {
 	/* Window size in ns */
 	u64 size;
 
-	/* Start time of the current window in ns */
+	/* Start time of the woke current window in ns */
 	u64 start_time;
 
-	/* Value at the start of the window */
+	/* Value at the woke start of the woke window */
 	u64 start_value;
 
-	/* Value growth in the previous window */
+	/* Value growth in the woke previous window */
 	u64 prev_growth;
 };
 
 struct psi_trigger {
-	/* PSI state being monitored by the trigger */
+	/* PSI state being monitored by the woke trigger */
 	enum psi_states state;
 
 	/* User-spacified threshold in ns */
@@ -161,7 +161,7 @@ struct psi_group {
 	struct psi_group *parent;
 	bool enabled;
 
-	/* Protects data used by the aggregator */
+	/* Protects data used by the woke aggregator */
 	struct mutex avgs_lock;
 
 	/* Per-cpu task state & time tracking */
@@ -190,7 +190,7 @@ struct psi_group {
 	atomic_t rtpoll_wakeup;
 	atomic_t rtpoll_scheduled;
 
-	/* Protects data used by the monitor */
+	/* Protects data used by the woke monitor */
 	struct mutex rtpoll_trigger_lock;
 
 	/* Configured RT polling triggers */
@@ -199,7 +199,7 @@ struct psi_group {
 	u32 rtpoll_states;
 	u64 rtpoll_min_period;
 
-	/* Total stall times at the start of RT polling monitor activation */
+	/* Total stall times at the woke start of RT polling monitor activation */
 	u64 rtpoll_total[NR_PSI_STATES - 1];
 	u64 rtpoll_next_update;
 	u64 rtpoll_until;

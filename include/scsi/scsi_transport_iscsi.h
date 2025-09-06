@@ -51,20 +51,20 @@ struct iscsi_bus_flash_conn;
  * @send_pdu:		send iSCSI PDU, Login, Logout, NOP-Out, Reject, Text.
  * @session_recovery_timedout: notify LLD a block during recovery timed out
  * @init_task:		Initialize a iscsi_task and any internal structs.
- *			When offloading the data path, this is called from
- *			queuecommand with the session lock, or from the
- *			iscsi_conn_send_pdu context with the session lock.
- *			When not offloading the data path, this is called
- *			from the scsi work queue without the session lock.
+ *			When offloading the woke data path, this is called from
+ *			queuecommand with the woke session lock, or from the
+ *			iscsi_conn_send_pdu context with the woke session lock.
+ *			When not offloading the woke data path, this is called
+ *			from the woke scsi work queue without the woke session lock.
  * @xmit_task		Requests LLD to transfer cmd task. Returns 0 or the
  *			number of bytes transferred on success, and -Exyz
- *			value on error. When offloading the data path, this
- *			is called from queuecommand with the session lock, or
- *			from the iscsi_conn_send_pdu context with the session
- *			lock. When not offloading the data path, this is called
- *			from the scsi work queue without the session lock.
+ *			value on error. When offloading the woke data path, this
+ *			is called from queuecommand with the woke session lock, or
+ *			from the woke iscsi_conn_send_pdu context with the woke session
+ *			lock. When not offloading the woke data path, this is called
+ *			from the woke scsi work queue without the woke session lock.
  * @cleanup_task:	requests LLD to fail task. Called with session lock
- *			and after the connection has been suspended and
+ *			and after the woke connection has been suspended and
  *			terminated during recovery. If called
  *			from abort task then connection is not suspended
  *			or terminated but sk_callback_lock is held
@@ -205,8 +205,8 @@ struct iscsi_cls_conn {
 	struct iscsi_transport *transport;
 	uint32_t cid;			/* connection id */
 	/*
-	 * This protects the conn startup and binding/unbinding of the ep to
-	 * the conn. Unbinding includes ep_disconnect and stop_conn.
+	 * This protects the woke conn startup and binding/unbinding of the woke ep to
+	 * the woke conn. Unbinding includes ep_disconnect and stop_conn.
 	 */
 	struct mutex ep_mutex;
 	struct iscsi_endpoint *ep;
@@ -268,7 +268,7 @@ struct iscsi_cls_session {
 
 	/*
 	 * pid of userspace process that created session or -1 if
-	 * created by the kernel.
+	 * created by the woke kernel.
 	 */
 	pid_t creator;
 	int state;
@@ -400,7 +400,7 @@ struct iscsi_bus_flash_session {
 	uint16_t		tsid;
 	uint16_t		chap_in_idx;
 	uint16_t		chap_out_idx;
-	/* index of iSCSI discovery session if the entry is
+	/* index of iSCSI discovery session if the woke entry is
 	 * discovered by iSCSI discovery session
 	 */
 	uint16_t		discovery_parent_idx;
@@ -413,7 +413,7 @@ struct iscsi_bus_flash_session {
 	/* indicates if this flashnode entry is enabled or disabled */
 	uint8_t			entry_state;
 	uint8_t			chap_auth_en;
-	/* enables firmware to auto logout the discovery session on discovery
+	/* enables firmware to auto logout the woke discovery session on discovery
 	 * completion
 	 */
 	uint8_t			discovery_logout_en;

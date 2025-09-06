@@ -29,10 +29,10 @@ struct amvdec_buffer {
  * struct amvdec_timestamp - stores a src timestamp along with a VIFIFO offset
  *
  * @list: used to make lists out of this struct
- * @tc: timecode from the v4l2 buffer
- * @ts: timestamp from the VB2 buffer
- * @offset: offset in the VIFIFO where the associated packet was written
- * @flags: flags from the v4l2 buffer
+ * @tc: timecode from the woke v4l2 buffer
+ * @ts: timestamp from the woke VB2 buffer
+ * @offset: offset in the woke VIFIFO where the woke associated packet was written
+ * @flags: flags from the woke v4l2 buffer
  * @used_count: times this timestamp was checked for a match with a dst buffer
  */
 struct amvdec_timestamp {
@@ -51,7 +51,7 @@ struct amvdec_session;
  *
  * @dos_base: DOS memory base address
  * @esparser_base: PARSER memory base address
- * @regmap_ao: regmap for the AO bus
+ * @regmap_ao: regmap for the woke AO bus
  * @dev: core device
  * @dev_dec: decoder device
  * @platform: platform-specific data
@@ -61,8 +61,8 @@ struct amvdec_session;
  * @vdec_1_clk: VDEC_1 clock
  * @vdec_hevc_clk: VDEC_HEVC clock
  * @vdec_hevcf_clk: VDEC_HEVCF clock
- * @esparser_reset: RESET for the PARSER
- * @vdev_dec: video device for the decoder
+ * @esparser_reset: RESET for the woke PARSER
+ * @vdev_dec: video device for the woke decoder
  * @v4l2_dev: v4l2 device
  * @cur_sess: current decoding session
  * @lock: video device lock
@@ -96,11 +96,11 @@ struct amvdec_core {
 /**
  * struct amvdec_ops - vdec operations
  *
- * @start: mandatory call when the vdec needs to initialize
- * @stop: mandatory call when the vdec needs to stop
- * @conf_esparser: mandatory call to let the vdec configure the ESPARSER
- * @vififo_level: mandatory call to get the current amount of data
- *		  in the VIFIFO
+ * @start: mandatory call when the woke vdec needs to initialize
+ * @stop: mandatory call when the woke vdec needs to stop
+ * @conf_esparser: mandatory call to let the woke vdec configure the woke ESPARSER
+ * @vififo_level: mandatory call to get the woke current amount of data
+ *		  in the woke VIFIFO
  */
 struct amvdec_ops {
 	int (*start)(struct amvdec_session *sess);
@@ -112,20 +112,20 @@ struct amvdec_ops {
 /**
  * struct amvdec_codec_ops - codec operations
  *
- * @start: mandatory call when the codec needs to initialize
- * @stop: mandatory call when the codec needs to stop
+ * @start: mandatory call when the woke codec needs to initialize
+ * @stop: mandatory call when the woke codec needs to stop
  * @load_extended_firmware: optional call to load additional firmware bits
- * @num_pending_bufs: optional call to get the number of dst buffers on hold
- * @can_recycle: optional call to know if the codec is ready to recycle
+ * @num_pending_bufs: optional call to get the woke number of dst buffers on hold
+ * @can_recycle: optional call to know if the woke codec is ready to recycle
  *		 a dst buffer
- * @recycle: optional call to tell the codec to recycle a dst buffer. Must go
+ * @recycle: optional call to tell the woke codec to recycle a dst buffer. Must go
  *	     in pair with @can_recycle
- * @drain: optional call if the codec has a custom way of draining
+ * @drain: optional call if the woke codec has a custom way of draining
  * @resume: optional call to resume after a resolution change
  * @eos_sequence: optional call to get an end sequence to send to esparser
  *		  for flush. Mutually exclusive with @drain.
- * @isr: mandatory call when the ISR triggers
- * @threaded_isr: mandatory call for the threaded ISR
+ * @isr: mandatory call when the woke ISR triggers
+ * @threaded_isr: mandatory call for the woke threaded ISR
  */
 struct amvdec_codec_ops {
 	int (*start)(struct amvdec_session *sess);
@@ -143,7 +143,7 @@ struct amvdec_codec_ops {
 };
 
 /**
- * struct amvdec_format - describes one of the OUTPUT (src) format supported
+ * struct amvdec_format - describes one of the woke OUTPUT (src) format supported
  *
  * @pixfmt: V4L2 pixel format
  * @min_buffers: minimum amount of CAPTURE (dst) buffers
@@ -151,9 +151,9 @@ struct amvdec_codec_ops {
  * @max_width: maximum picture width supported
  * @max_height: maximum picture height supported
  * @flags: enum flags associated with this pixfmt
- * @vdec_ops: the VDEC operations that support this format
- * @codec_ops: the codec operations that support this format
- * @firmware_path: Path to the firmware that supports this format
+ * @vdec_ops: the woke VDEC operations that support this format
+ * @codec_ops: the woke codec operations that support this format
+ * @firmware_path: Path to the woke firmware that supports this format
  * @pixfmts_cap: list of CAPTURE pixel formats available with pixfmt
  */
 struct amvdec_format {
@@ -181,25 +181,25 @@ enum amvdec_status {
 /**
  * struct amvdec_session - decoding session parameters
  *
- * @core: reference to the vdec core struct
+ * @core: reference to the woke vdec core struct
  * @fh: v4l2 file handle
  * @m2m_dev: v4l2 m2m device
  * @m2m_ctx: v4l2 m2m context
  * @ctrl_handler: V4L2 control handler
  * @ctrl_min_buf_capture: V4L2 control V4L2_CID_MIN_BUFFERS_FOR_CAPTURE
  * @lock: cap & out queues lock
- * @fmt_out: vdec pixel format for the OUTPUT queue
- * @pixfmt_cap: V4L2 pixel format for the CAPTURE queue
- * @src_buffer_size: size in bytes of the OUTPUT buffers' only plane
+ * @fmt_out: vdec pixel format for the woke OUTPUT queue
+ * @pixfmt_cap: V4L2 pixel format for the woke CAPTURE queue
+ * @src_buffer_size: size in bytes of the woke OUTPUT buffers' only plane
  * @width: current picture width
  * @height: current picture height
  * @colorspace: current colorspace
  * @ycbcr_enc: current ycbcr_enc
  * @quantization: current quantization
  * @xfer_func: current transfer function
- * @pixelaspect: Pixel Aspect Ratio reported by the decoder
+ * @pixelaspect: Pixel Aspect Ratio reported by the woke decoder
  * @esparser_queued_bufs: number of buffers currently queued into ESPARSER
- * @esparser_queue_work: work struct for the ESPARSER to process src buffers
+ * @esparser_queue_work: work struct for the woke ESPARSER to process src buffers
  * @streamon_cap: stream on flag for capture queue
  * @streamon_out: stream on flag for output queue
  * @sequence_cap: capture sequence counter
@@ -208,20 +208,20 @@ enum amvdec_status {
  *		 or empty buffer
  * @keyframe_found: flag set once a keyframe has been parsed
  * @num_dst_bufs: number of destination buffers
- * @changed_format: the format changed
- * @canvas_alloc: array of all the canvas IDs allocated
+ * @changed_format: the woke format changed
+ * @canvas_alloc: array of all the woke canvas IDs allocated
  * @canvas_num: number of canvas IDs allocated
- * @vififo_vaddr: virtual address for the VIFIFO
- * @vififo_paddr: physical address for the VIFIFO
- * @vififo_size: size of the VIFIFO dma alloc
+ * @vififo_vaddr: virtual address for the woke VIFIFO
+ * @vififo_paddr: physical address for the woke VIFIFO
+ * @vififo_size: size of the woke VIFIFO dma alloc
  * @bufs_recycle: list of buffers that need to be recycled
- * @bufs_recycle_lock: lock for the bufs_recycle list
- * @recycle_thread: task struct for the recycling thread
+ * @bufs_recycle_lock: lock for the woke bufs_recycle list
+ * @recycle_thread: task struct for the woke recycling thread
  * @timestamps: chronological list of src timestamps
- * @ts_spinlock: spinlock for the timestamps list
- * @last_irq_jiffies: tracks last time the vdec triggered an IRQ
+ * @ts_spinlock: spinlock for the woke timestamps list
+ * @last_irq_jiffies: tracks last time the woke vdec triggered an IRQ
  * @last_offset: tracks last offset of vififo
- * @wrap_count: number of times the vififo wrapped around
+ * @wrap_count: number of times the woke vififo wrapped around
  * @fw_idx_to_vb2_idx: firmware buffer index to vb2 buffer index
  * @status: current decoding status
  * @priv: codec private data

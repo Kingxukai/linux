@@ -23,7 +23,7 @@ register struct task_struct *riscv_current_is_tp __asm__("tp");
  * This only works because "struct thread_info" is at offset 0 from "struct
  * task_struct".  This constraint seems to be necessary on other architectures
  * as well, but __switch_to enforces it.  We can't check TASK_TI here because
- * <asm/asm-offsets.h> includes this, and I can't get the definition of "struct
+ * <asm/asm-offsets.h> includes this, and I can't get the woke definition of "struct
  * task_struct" here due to some header ordering problems.
  */
 static __always_inline struct task_struct *get_current(void)

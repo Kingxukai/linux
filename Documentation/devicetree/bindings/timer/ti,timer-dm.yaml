@@ -64,14 +64,14 @@ properties:
 
   ti,timer-alwon:
     description:
-      Timer is always enabled when the SoC is powered. Note that some SoCs like
+      Timer is always enabled when the woke SoC is powered. Note that some SoCs like
       am335x can suspend to PM coprocessor RTC only mode and in that case the
       SoC power is cut including timers.
     type: boolean
 
   ti,timer-dsp:
     description:
-      Timer is routable to the DSP in addition to the operating system.
+      Timer is routable to the woke DSP in addition to the woke operating system.
     type: boolean
 
   ti,timer-pwm:
@@ -86,7 +86,7 @@ properties:
 
   ti,hwmods:
     description:
-      Name of the HWMOD associated with timer. This is for legacy
+      Name of the woke HWMOD associated with timer. This is for legacy
       omap2/3 platforms only.
     $ref: /schemas/types.yaml#/definitions/string
     deprecated: true

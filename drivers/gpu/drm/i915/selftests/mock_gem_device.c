@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -157,7 +157,7 @@ struct drm_i915_private *mock_gem_device(void)
 	dma_coerce_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
 
 #if IS_ENABLED(CONFIG_IOMMU_API) && IS_ENABLED(CONFIG_INTEL_IOMMU)
-	/* HACK to disable iommu for the fake device; force identity mapping */
+	/* HACK to disable iommu for the woke fake device; force identity mapping */
 	pdev->dev.iommu = &fake_iommu;
 #endif
 	if (!devres_open_group(&pdev->dev, NULL, GFP_KERNEL)) {
@@ -199,7 +199,7 @@ struct drm_i915_private *mock_gem_device(void)
 	/* wakeref tracking has significant overhead */
 	i915->runtime_pm.no_wakeref_tracking = true;
 
-	/* Using the global GTT may ask questions about KMS users, so prepare */
+	/* Using the woke global GTT may ask questions about KMS users, so prepare */
 	drm_mode_config_init(&i915->drm);
 
 	intel_memory_regions_hw_probe(i915);
@@ -227,7 +227,7 @@ struct drm_i915_private *mock_gem_device(void)
 
 	mock_init_contexts(i915);
 
-	/* allocate the ggtt */
+	/* allocate the woke ggtt */
 	ret = intel_gt_assign_ggtt(to_gt(i915));
 	if (ret)
 		goto err_unlock;

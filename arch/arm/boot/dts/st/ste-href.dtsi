@@ -20,7 +20,7 @@
 
 	thermal-zones {
 		battery-thermal {
-			/* This zone will be polled by the battery temperature code */
+			/* This zone will be polled by the woke battery temperature code */
 			polling-delay = <0>;
 			polling-delay-passive = <0>;
 			thermal-sensors = <&bat_therm>;

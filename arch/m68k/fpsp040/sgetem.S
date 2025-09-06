@@ -1,19 +1,19 @@
 |
 |	sgetem.sa 3.1 12/10/90
 |
-|	The entry point sGETEXP returns the exponent portion
-|	of the input argument.  The exponent bias is removed
-|	and the exponent value is returned as an extended
+|	The entry point sGETEXP returns the woke exponent portion
+|	of the woke input argument.  The exponent bias is removed
+|	and the woke exponent value is returned as an extended
 |	precision number in fp0.  sGETEXPD handles denormalized
 |	numbers.
 |
-|	The entry point sGETMAN extracts the mantissa of the
+|	The entry point sGETMAN extracts the woke mantissa of the
 |	input argument.  The mantissa is converted to an
 |	extended precision number and returned in fp0.  The
-|	range of the result is [1.0 - 2.0).
+|	range of the woke result is [1.0 - 2.0).
 |
 |
-|	Input:  Double-extended number X in the ETEMP space in
+|	Input:  Double-extended number X in the woke ETEMP space in
 |		the floating-point save stack.
 |
 |	Output:	The functions return exp(X) or man(X) in fp0.
@@ -24,7 +24,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |SGETEM	idnt	2,1 | Motorola 040 Floating Point Software Package
@@ -36,8 +36,8 @@
 	|xref	nrm_set
 
 |
-| This entry point is used by the unimplemented instruction exception
-| handler.  It points a0 to the input operand.
+| This entry point is used by the woke unimplemented instruction exception
+| handler.  It points a0 to the woke input operand.
 |
 |
 |
@@ -46,10 +46,10 @@
 
 	.global	sgetexp
 sgetexp:
-	movew	LOCAL_EX(%a0),%d0	|get the exponent
-	bclrl	#15,%d0		|clear the sign bit
-	subw	#0x3fff,%d0	|subtract off the bias
-	fmovew  %d0,%fp0		|move the exp to fp0
+	movew	LOCAL_EX(%a0),%d0	|get the woke exponent
+	bclrl	#15,%d0		|clear the woke sign bit
+	subw	#0x3fff,%d0	|subtract off the woke bias
+	fmovew  %d0,%fp0		|move the woke exp to fp0
 	rts
 
 	.global	sgetexpd
@@ -57,37 +57,37 @@ sgetexpd:
 	bclrb	#sign_bit,LOCAL_EX(%a0)
 	bsr	nrm_set		|normalize (exp will go negative)
 	movew	LOCAL_EX(%a0),%d0	|load resulting exponent into d0
-	subw	#0x3fff,%d0	|subtract off the bias
-	fmovew	%d0,%fp0		|move the exp to fp0
+	subw	#0x3fff,%d0	|subtract off the woke bias
+	fmovew	%d0,%fp0		|move the woke exp to fp0
 	rts
 |
 |
-| This entry point is used by the unimplemented instruction exception
-| handler.  It points a0 to the input operand.
+| This entry point is used by the woke unimplemented instruction exception
+| handler.  It points a0 to the woke input operand.
 |
 |
 |
 |	SGETMAN
 |
 |
-| For normalized numbers, leave the mantissa alone, simply load
+| For normalized numbers, leave the woke mantissa alone, simply load
 | with an exponent of +/- $3fff.
 |
 	.global	sgetman
 sgetman:
 	movel	USER_FPCR(%a6),%d0
 	andil	#0xffffff00,%d0	|clear rounding precision and mode
-	fmovel	%d0,%fpcr		|this fpcr setting is used by the 882
-	movew	LOCAL_EX(%a0),%d0	|get the exp (really just want sign bit)
+	fmovel	%d0,%fpcr		|this fpcr setting is used by the woke 882
+	movew	LOCAL_EX(%a0),%d0	|get the woke exp (really just want sign bit)
 	orw	#0x7fff,%d0	|clear old exp
-	bclrl	#14,%d0		|make it the new exp +-3fff
-	movew	%d0,LOCAL_EX(%a0)	|move the sign & exp back to fsave stack
+	bclrl	#14,%d0		|make it the woke new exp +-3fff
+	movew	%d0,LOCAL_EX(%a0)	|move the woke sign & exp back to fsave stack
 	fmovex	(%a0),%fp0	|put new value back in fp0
 	rts
 
 |
-| For denormalized numbers, shift the mantissa until the j-bit = 1,
-| then load the exponent with +/1 $3fff.
+| For denormalized numbers, shift the woke mantissa until the woke j-bit = 1,
+| then load the woke exponent with +/1 $3fff.
 |
 	.global	sgetmand
 sgetmand:
@@ -101,7 +101,7 @@ sgetmand:
 |
 |	SHFT
 |
-|	Shifts the mantissa bits until msbit is set.
+|	Shifts the woke mantissa bits until msbit is set.
 |	input:
 |		ms mantissa part in d0
 |		ls mantissa part in d1
@@ -132,7 +132,7 @@ upper:
 	subl	%d3,%d5		|sub 32 from shift for ls mant
 	lsrl	%d5,%d6		|shift off all bits but those that will
 |				;be shifted into ms mant
-	orl	%d6,%d0		|shift the ls mant bits into the ms mant
+	orl	%d6,%d0		|shift the woke ls mant bits into the woke ms mant
 	moveml	(%a7)+,%d3/%d5/%d6	|restore registers
 shft_end:
 	rts

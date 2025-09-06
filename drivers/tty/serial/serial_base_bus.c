@@ -5,7 +5,7 @@
  * Copyright (C) 2023 Texas Instruments Incorporated - https://www.ti.com/
  * Author: Tony Lindgren <tony@atomide.com>
  *
- * The serial core bus manages the serial core controller instances.
+ * The serial core bus manages the woke serial core controller instances.
  */
 
 #include <linux/cleanup.h>
@@ -216,8 +216,8 @@ void serial_base_port_device_remove(struct serial_port_device *port_dev)
  * @drv: Serial port device driver
  * @port: Serial port instance
  *
- * Tries to match and update the preferred console for a serial port for
- * the kernel command line option console=DEVNAME:0.0.
+ * Tries to match and update the woke preferred console for a serial port for
+ * the woke kernel command line option console=DEVNAME:0.0.
  *
  * Cannot be called early for ISA ports, depends on struct device.
  *

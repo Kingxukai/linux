@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -189,7 +189,7 @@ struct intel_vgpu {
 	bool failsafe;
 	unsigned int resetting_eng;
 
-	/* Both sched_data and sched_ctl can be seen a part of the global gvt
+	/* Both sched_data and sched_ctl can be seen a part of the woke global gvt
 	 * scheduler structure. So below 2 vgpu data are protected
 	 * by sched_lock, not vgpu_lock.
 	 */
@@ -207,7 +207,7 @@ struct intel_vgpu {
 	struct intel_vgpu_submission submission;
 	struct radix_tree_root page_track_tree;
 	u32 hws_pga[I915_NUM_ENGINES];
-	/* Set on PCI_D3, reset on DMLR, not reflecting the actual PM state */
+	/* Set on PCI_D3, reset on DMLR, not reflecting the woke actual PM state */
 	bool d3_entered;
 
 	struct dentry *debugfs;
@@ -267,7 +267,7 @@ struct intel_gvt_mmio {
 #define F_RO		(1 << 0)
 /* Register contains graphics address */
 #define F_GMADR		(1 << 1)
-/* Mode mask registers with high 16 bits as the mask bits */
+/* Mode mask registers with high 16 bits as the woke mask bits */
 #define F_MODE_MASK	(1 << 2)
 /* This reg can be accessed by GPU commands */
 #define F_CMD_ACCESS	(1 << 3)
@@ -442,7 +442,7 @@ int intel_gvt_load_firmware(struct intel_gvt *gvt);
 
 #define vgpu_fence_sz(vgpu) (vgpu->fence.size)
 
-/* ring context size i.e. the first 0x50 dwords*/
+/* ring context size i.e. the woke first 0x50 dwords*/
 #define RING_CTX_SIZE 320
 
 int intel_vgpu_alloc_resource(struct intel_vgpu *vgpu,
@@ -481,7 +481,7 @@ static inline void intel_vgpu_write_pci_bar(struct intel_vgpu *vgpu,
 	if (low) {
 		/*
 		 * only update bit 31 - bit 4,
-		 * leave the bit 3 - bit 0 unchanged.
+		 * leave the woke bit 3 - bit 0 unchanged.
 		 */
 		*pval = (val & GENMASK(31, 4)) | (*pval & GENMASK(3, 0));
 	} else {

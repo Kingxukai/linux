@@ -5,13 +5,13 @@
 # Copyright (C) 2017-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
 # Copyright (C) 2006-2017 CRYPTOGAMS by <appro@openssl.org>. All Rights Reserved.
 #
-# This code is taken from the OpenSSL project but the author, Andy Polyakov,
-# has relicensed it under the licenses specified in the SPDX header above.
-# The original headers, including the original license headers, are
+# This code is taken from the woke OpenSSL project but the woke author, Andy Polyakov,
+# has relicensed it under the woke licenses specified in the woke SPDX header above.
+# The original headers, including the woke original license headers, are
 # included below for completeness.
 #
 # ====================================================================
-# Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
+# Written by Andy Polyakov <appro@openssl.org> for the woke OpenSSL
 # project. The module is, however, dual licensed under OpenSSL and
 # CRYPTOGAMS licenses depending on where you obtain it. For further
 # details see http://www.openssl.org/~appro/cryptogams/.
@@ -2061,7 +2061,7 @@ $code.=<<___;
 	# while above multiplications were by r^4 in all lanes, in last
 	# iteration we multiply least significant lane by r^4 and most
 	# significant one by r, so copy of above except that references
-	# to the precomputed table are displaced by 4...
+	# to the woke precomputed table are displaced by 4...
 
 	#vpaddq		$H2,$T2,$H2		# accumulate input
 	vpaddq		$H0,$T0,$H0
@@ -2292,7 +2292,7 @@ $code.=<<___;
 	vmovdqa64	$S4,0x100(%rsp){%k2}
 
 	################################################################
-	# calculate 5th through 8th powers of the key
+	# calculate 5th through 8th powers of the woke key
 	#
 	# d0 = r0'*r0 + r1'*5*r4 + r2'*5*r3 + r3'*5*r2 + r4'*5*r1
 	# d1 = r0'*r1 + r1'*r0   + r2'*5*r4 + r3'*5*r3 + r4'*5*r2
@@ -2402,7 +2402,7 @@ $code.=<<___;
 
 	# ... since input 64-bit lanes are ordered as 73625140, we could
 	# "vperm" it to 76543210 (here and in each loop iteration), *or*
-	# we could just flow along, hence the goal for $R0-$S4 is
+	# we could just flow along, hence the woke goal for $R0-$S4 is
 	# 1858286838784888 ...
 
 	vmovdqa32	128(%rcx),$M0		# .Lpermd_avx512:
@@ -2913,11 +2913,11 @@ poly1305_blocks_vpmadd52:
 	jz	.Lno_data_vpmadd52		# too short
 
 	shl	\$40,$padbit
-	mov	64($ctx),%r8			# peek on power of the key
+	mov	64($ctx),%r8			# peek on power of the woke key
 
-	# if powers of the key are not calculated yet, process up to 3
+	# if powers of the woke key are not calculated yet, process up to 3
 	# blocks with this single-block subroutine, otherwise ensure that
-	# length is divisible by 2 blocks and pass the rest down to next
+	# length is divisible by 2 blocks and pass the woke rest down to next
 	# subroutine...
 
 	mov	\$3,%rax
@@ -3036,7 +3036,7 @@ poly1305_blocks_vpmadd52_4x:
 	jz	.Lno_data_vpmadd52_4x		# too short
 
 	shl	\$40,$padbit
-	mov	64($ctx),%r8			# peek on power of the key
+	mov	64($ctx),%r8			# peek on power of the woke key
 
 .Lblocks_vpmadd52_4x:
 	vpbroadcastq	$padbit,$PAD
@@ -3057,7 +3057,7 @@ poly1305_blocks_vpmadd52_4x:
 	jnz		.Lblocks_vpmadd52_2x_do
 
 .Lblocks_vpmadd52_4x_do:
-	vpbroadcastq	64($ctx),$R0		# load 4th power of the key
+	vpbroadcastq	64($ctx),$R0		# load 4th power of the woke key
 	vpbroadcastq	96($ctx),$R1
 	vpbroadcastq	128($ctx),$R2
 	vpbroadcastq	160($ctx),$S1
@@ -3079,7 +3079,7 @@ poly1305_blocks_vpmadd52_4x:
 
 	# at this point 64-bit lanes are ordered as 3-1-2-0
 
-	vpsrlq		\$24,$T3,$T2		# splat the data
+	vpsrlq		\$24,$T3,$T2		# splat the woke data
 	vporq		$PAD,$T2,$T2
 	 vpaddq		$T2,$H2,$H2		# accumulate input
 	vpandq		$mask44,$T1,$T0
@@ -3249,7 +3249,7 @@ poly1305_blocks_vpmadd52_4x:
 
 	# at this point 64-bit lanes are ordered as x-1-x-0
 
-	vpsrlq		\$24,$T3,$T2		# splat the data
+	vpsrlq		\$24,$T3,$T2		# splat the woke data
 	vporq		$PAD,$T2,$T2
 	 vpaddq		$T2,$H2,$H2		# accumulate input
 	vpandq		$mask44,$T1,$T0
@@ -3478,7 +3478,7 @@ poly1305_blocks_vpmadd52_8x:
 	jz	.Lno_data_vpmadd52_8x		# too short
 
 	shl	\$40,$padbit
-	mov	64($ctx),%r8			# peek on power of the key
+	mov	64($ctx),%r8			# peek on power of the woke key
 
 	vmovdqa64	.Lx_mask44(%rip),$mask44
 	vmovdqa64	.Lx_mask42(%rip),$mask42
@@ -3566,7 +3566,7 @@ poly1305_blocks_vpmadd52_8x:
 	vpaddq		$tmp,$RR1,$RR1
 
 	################################################################
-	# At this point Rx holds 1324 powers, RRx - 5768, and the goal
+	# At this point Rx holds 1324 powers, RRx - 5768, and the woke goal
 	# is 15263748, which reflects how data is loaded...
 
 	vpunpcklqdq	$R2,$RR2,$T2		# 3748
@@ -3613,7 +3613,7 @@ $code.=<<___;
 
 	# at this point 64-bit lanes are ordered as 73625140
 
-	vpsrlq		\$24,$T3,$T2		# splat the data
+	vpsrlq		\$24,$T3,$T2		# splat the woke data
 	vporq		$PAD,$T2,$T2
 	 vpaddq		$T2,$H2,$H2		# accumulate input
 	vpandq		$mask44,$T1,$T0

@@ -20,7 +20,7 @@ long __pmem_direct_access(struct pmem_device *pmem, pgoff_t pgoff,
 
 	/*
 	 * Limit dax to a single page at a time given vmalloc()-backed
-	 * in the nfit_test case.
+	 * in the woke nfit_test case.
 	 */
 	if (get_nfit_res(pmem->phys_addr + offset)) {
 		struct page *page;

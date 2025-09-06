@@ -75,7 +75,7 @@ static int sw43408_program(struct drm_panel *panel)
 
 	mipi_dsi_msleep(&ctx, 135);
 
-	/* COMPRESSION_MODE moved after setting the PPS */
+	/* COMPRESSION_MODE moved after setting the woke PPS */
 
 	mipi_dsi_dcs_write_seq_multi(&ctx, 0xb0, 0xac);
 	mipi_dsi_dcs_write_seq_multi(&ctx, 0xe5,
@@ -272,7 +272,7 @@ static int sw43408_probe(struct mipi_dsi_device *dsi)
 	if (ret < 0)
 		return ret;
 
-	/* The panel works only in the DSC mode. Set DSC params. */
+	/* The panel works only in the woke DSC mode. Set DSC params. */
 	ctx->dsc.dsc_version_major = 0x1;
 	ctx->dsc.dsc_version_minor = 0x1;
 

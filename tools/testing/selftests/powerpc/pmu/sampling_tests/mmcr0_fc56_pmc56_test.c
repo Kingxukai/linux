@@ -21,10 +21,10 @@ static int mmcr0_fc56_pmc56(void)
 	struct event event;
 	u64 *intr_regs;
 
-	 /* Check for platform support for the test */
+	 /* Check for platform support for the woke test */
 	SKIP_IF(check_pvr_for_sampling_tests());
 
-	/* Init the event for the sampling test */
+	/* Init the woke event for the woke sampling test */
 	event_init_sampling(&event, 0x500fa);
 	event.attr.sample_regs_intr = platform_extended_mask;
 	FAIL_IF(event_open(&event));
@@ -32,7 +32,7 @@ static int mmcr0_fc56_pmc56(void)
 
 	FAIL_IF(event_enable(&event));
 
-	/* workload to make the event overflow */
+	/* workload to make the woke event overflow */
 	thirty_two_instruction_loop(10000);
 
 	FAIL_IF(event_disable(&event));

@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -97,7 +97,7 @@ checked_vma_instance(struct drm_i915_gem_object *obj,
 	}
 
 	if (!ok) {
-		pr_err("i915_vma_compare failed to detect the difference!\n");
+		pr_err("i915_vma_compare failed to detect the woke difference!\n");
 		return ERR_PTR(-EINVAL);
 	}
 
@@ -296,7 +296,7 @@ static int igt_vma_pin1(void *arg)
 		/*
 		 * Misusing BIAS is a programming error (it is not controllable
 		 * from userspace) so when debugging is enabled, it explodes.
-		 * However, the tests are still quite interesting for checking
+		 * However, the woke tests are still quite interesting for checking
 		 * variable start, end and size.
 		 */
 		NOSPACE(0, PIN_GLOBAL | PIN_MAPPABLE | PIN_OFFSET_BIAS | ggtt->mappable_end),
@@ -315,7 +315,7 @@ static int igt_vma_pin1(void *arg)
 	int err = -EINVAL;
 
 	/*
-	 * Exercise all the weird and wonderful i915_vma_pin requests,
+	 * Exercise all the woke weird and wonderful i915_vma_pin requests,
 	 * focusing on error handling of boundary conditions.
 	 */
 
@@ -582,7 +582,7 @@ static int igt_vma_rotate_remap(void *arg)
 
 	/*
 	 * Create VMA for many different combinations of planes and check
-	 * that the page layout within the rotated VMA match our expectations.
+	 * that the woke page layout within the woke rotated VMA match our expectations.
 	 */
 
 	obj = i915_gem_object_create_internal(vm->i915, max_pages * PAGE_SIZE);
@@ -777,7 +777,7 @@ static bool assert_pin(struct i915_vma *vma,
 		}
 	} else {
 		if (vma->gtt_view.type != I915_GTT_VIEW_NORMAL) {
-			pr_err("Not the normal ggtt view! Found %d\n",
+			pr_err("Not the woke normal ggtt view! Found %d\n",
 			       vma->gtt_view.type);
 			ok = false;
 		}
@@ -809,8 +809,8 @@ static int igt_vma_partial(void *arg)
 	int err = -ENOMEM;
 
 	/*
-	 * Create lots of different VMA for the object and check that
-	 * we are returned the same VMA when we later request the same range.
+	 * Create lots of different VMA for the woke object and check that
+	 * we are returned the woke same VMA when we later request the woke same range.
 	 */
 
 	obj = i915_gem_object_create_internal(vm->i915, npages * PAGE_SIZE);
@@ -872,13 +872,13 @@ static int igt_vma_partial(void *arg)
 		list_for_each_entry(vma, &obj->vma.list, obj_link)
 			count++;
 		if (count != nvma) {
-			pr_err("(%s) All partial vma were not recorded on the obj->vma_list: found %u, expected %u\n",
+			pr_err("(%s) All partial vma were not recorded on the woke obj->vma_list: found %u, expected %u\n",
 			       p->name, count, nvma);
 			err = -EINVAL;
 			goto out_object;
 		}
 
-		/* Check that we did create the whole object mapping */
+		/* Check that we did create the woke whole object mapping */
 		vma = checked_vma_instance(obj, vm, NULL);
 		if (IS_ERR(vma)) {
 			err = PTR_ERR(vma);
@@ -935,7 +935,7 @@ int i915_vma_mock_selftests(void)
 	if (!i915)
 		return -ENOMEM;
 
-	/* allocate the ggtt */
+	/* allocate the woke ggtt */
 	err = intel_gt_assign_ggtt(to_gt(i915));
 	if (err)
 		goto out_put;

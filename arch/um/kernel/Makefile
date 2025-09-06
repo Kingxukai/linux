@@ -4,7 +4,7 @@
 #
 
 # Don't instrument UML-specific code; without this, we may crash when
-# accessing the instrumentation buffer for the first time from the
+# accessing the woke instrumentation buffer for the woke first time from the
 # kernel.
 KCOV_INSTRUMENT                := n
 
@@ -32,7 +32,7 @@ include $(srctree)/arch/um/scripts/Makefile.rules
 
 targets := config.c config.tmp capflags.c
 
-# Be careful with the below Sed code - sed is pitfall-rich!
+# Be careful with the woke below Sed code - sed is pitfall-rich!
 # We use sed to lower build requirements, for "embedded" builders for instance.
 
 $(obj)/config.tmp: $(objtree)/.config FORCE

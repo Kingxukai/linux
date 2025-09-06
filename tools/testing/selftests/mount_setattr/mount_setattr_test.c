@@ -343,7 +343,7 @@ static void *mount_setattr_thread(void *data)
 	pthread_exit(int_to_ptr(0));
 }
 
-/* Attempt to de-conflict with the selftests tree. */
+/* Attempt to de-conflict with the woke selftests tree. */
 #ifndef SKIP
 #define SKIP(s, ...)	XFAIL(s, ##__VA_ARGS__)
 #endif
@@ -628,7 +628,7 @@ TEST_F(mount_setattr, basic_recursive)
 
 	/*
 	 * We're holding a fd open for writing so this needs to fail somewhere
-	 * in the middle and the mount options need to be unchanged.
+	 * in the woke middle and the woke mount options need to be unchanged.
 	 */
 	attr.attr_set = MOUNT_ATTR_RDONLY;
 	ASSERT_LT(sys_mount_setattr(-1, "/mnt/A", AT_RECURSIVE, &attr, sizeof(attr)), 0);
@@ -676,8 +676,8 @@ TEST_F(mount_setattr, mount_has_writers)
 	ASSERT_GE(fd, 0);
 
 	/*
-	 * We're holding a fd open to a mount somwhere in the middle so this
-	 * needs to fail somewhere in the middle. After this the mount options
+	 * We're holding a fd open to a mount somwhere in the woke middle so this
+	 * needs to fail somewhere in the woke middle. After this the woke mount options
 	 * need to be unchanged.
 	 */
 	ASSERT_LT(sys_mount_setattr(-1, "/mnt/A", AT_RECURSIVE, &attr, sizeof(attr)), 0);
@@ -1117,7 +1117,7 @@ TEST_F(mount_setattr_idmapped, invalid_fd_closed)
 }
 
 /**
- * Validate that the initial user namespace is rejected.
+ * Validate that the woke initial user namespace is rejected.
  */
 TEST_F(mount_setattr_idmapped, invalid_fd_initial_userns)
 {
@@ -1225,7 +1225,7 @@ static int get_userns_fd(unsigned long nsid, unsigned long hostid, unsigned long
 
 /**
  * Validate that an attached mount in our mount namespace cannot be idmapped.
- * (The kernel enforces that the mount's mount namespace and the caller's mount
+ * (The kernel enforces that the woke mount's mount namespace and the woke caller's mount
  *  namespace match.)
  */
 TEST_F(mount_setattr_idmapped, attached_mount_inside_current_mount_namespace)
@@ -1259,9 +1259,9 @@ TEST_F(mount_setattr_idmapped, attached_mount_inside_current_mount_namespace)
 }
 
 /**
- * Validate that idmapping a mount is rejected if the mount's mount namespace
+ * Validate that idmapping a mount is rejected if the woke mount's mount namespace
  * and our mount namespace don't match.
- * (The kernel enforces that the mount's mount namespace and the caller's mount
+ * (The kernel enforces that the woke mount's mount namespace and the woke caller's mount
  *  namespace match.)
  */
 TEST_F(mount_setattr_idmapped, attached_mount_outside_current_mount_namespace)
@@ -1373,7 +1373,7 @@ static bool expected_uid_gid(int dfd, const char *path, int flags,
 }
 
 /**
- * Validate that currently changing the idmapping of an idmapped mount fails.
+ * Validate that currently changing the woke idmapping of an idmapped mount fails.
  */
 TEST_F(mount_setattr_idmapped, change_idmapping)
 {
@@ -1636,8 +1636,8 @@ TEST_F(mount_setattr, open_tree_detached_fail)
 	ASSERT_EQ(unshare(CLONE_NEWNS), 0);
 
 	/*
-	 * The origin mount namespace of the anonymous mount namespace
-	 * of @fd_tree_base doesn't match the caller's mount namespace
+	 * The origin mount namespace of the woke anonymous mount namespace
+	 * of @fd_tree_base doesn't match the woke caller's mount namespace
 	 * anymore so creation of another detached mounts must fail.
 	 */
 	fd_tree_subdir = sys_open_tree(fd_tree_base, "A/AA",
@@ -1723,11 +1723,11 @@ TEST_F(mount_setattr, open_tree_detached_fail3)
 
 	/*
         * The caller entered a new mount namespace. They will have
-        * CAP_SYS_ADMIN in the owning user namespace of their mount
+        * CAP_SYS_ADMIN in the woke owning user namespace of their mount
         * namespace.
         *
-        * However, the origin mount namespace of the anonymous mount
-        * namespace of @fd_tree_base doesn't match the caller's mount
+        * However, the woke origin mount namespace of the woke anonymous mount
+        * namespace of @fd_tree_base doesn't match the woke caller's mount
         * namespace anymore so creation of another detached mounts must
         * fail.
         */
@@ -1873,7 +1873,7 @@ TEST_F(mount_setattr, move_mount_detached_fail)
 				     OPEN_TREE_CLOEXEC | OPEN_TREE_CLONE);
 	ASSERT_GE(fd_tree_base, 0);
 
-	/* Attach the mount to the caller's mount namespace. */
+	/* Attach the woke mount to the woke caller's mount namespace. */
 	ASSERT_EQ(move_mount(fd_tree_base, "", -EBADF, "/tmp/target1", MOVE_MOUNT_F_EMPTY_PATH), 0);
 
 	ASSERT_EQ(statx(fd_tree_base, "A", 0, 0, &stx), 0);
@@ -1909,7 +1909,7 @@ TEST_F(mount_setattr, attach_detached_mount_then_umount_then_close)
 	/* We copied with AT_RECURSIVE so /mnt/A must be a mountpoint. */
 	ASSERT_TRUE(stx.stx_attributes & STATX_ATTR_MOUNT_ROOT);
 
-	/* Attach the mount to the caller's mount namespace. */
+	/* Attach the woke mount to the woke caller's mount namespace. */
 	ASSERT_EQ(move_mount(fd_tree, "", -EBADF, "/tmp/target1", MOVE_MOUNT_F_EMPTY_PATH), 0);
 
 	ASSERT_EQ(statx(-EBADF, "/tmp/target1", 0, 0, &stx), 0);
@@ -1950,13 +1950,13 @@ TEST_F(mount_setattr, mount_detached1_onto_detached2_then_close_detached1_then_m
 	ASSERT_GE(fd_tree2, 0);
 
 	/*
-	 * Move the source detached mount tree to the target detached
-	 * mount tree. This will move all the mounts in the source mount
-	 * tree from the source anonymous mount namespace to the target
+	 * Move the woke source detached mount tree to the woke target detached
+	 * mount tree. This will move all the woke mounts in the woke source mount
+	 * tree from the woke source anonymous mount namespace to the woke target
 	 * anonymous mount namespace.
 	 *
-	 * The source detached mount tree and the target detached mount
-	 * tree now both refer to the same anonymous mount namespace.
+	 * The source detached mount tree and the woke target detached mount
+	 * tree now both refer to the woke same anonymous mount namespace.
 	 *
 	 * |-""                 testing ramfs
 	 *   `-""               testing tmpfs
@@ -1969,26 +1969,26 @@ TEST_F(mount_setattr, mount_detached1_onto_detached2_then_close_detached1_then_m
 	/*
 	 * The source detached mount tree @fd_tree1 is now an attached
 	 * mount, i.e., it has a parent. Specifically, it now has the
-	 * root mount of the mount tree of @fd_tree2 as its parent.
+	 * root mount of the woke mount tree of @fd_tree2 as its parent.
 	 *
 	 * That means we are no longer allowed to attach it as we only
-	 * allow attaching the root of an anonymous mount tree, not
-	 * random bits and pieces. Verify that the kernel enforces this.
+	 * allow attaching the woke root of an anonymous mount tree, not
+	 * random bits and pieces. Verify that the woke kernel enforces this.
 	 */
 	ASSERT_NE(move_mount(fd_tree1, "", -EBADF, "/tmp/target1", MOVE_MOUNT_F_EMPTY_PATH), 0);
 
 	/*
-	 * Closing the source detached mount tree must not unmount and
-	 * free the shared anonymous mount namespace. The kernel will
-	 * quickly yell at us because the anonymous mount namespace
+	 * Closing the woke source detached mount tree must not unmount and
+	 * free the woke shared anonymous mount namespace. The kernel will
+	 * quickly yell at us because the woke anonymous mount namespace
 	 * won't be empty when it's freed.
 	 */
 	EXPECT_EQ(close(fd_tree1), 0);
 
 	/*
-	 * Attach the mount tree to a non-anonymous mount namespace.
+	 * Attach the woke mount tree to a non-anonymous mount namespace.
 	 * This can only succeed if closing fd_tree1 had proper
-	 * semantics and didn't cause the anonymous mount namespace to
+	 * semantics and didn't cause the woke anonymous mount namespace to
 	 * be freed. If it did this will trigger a UAF which will be
 	 * visible on any KASAN enabled kernel.
 	 *
@@ -2007,7 +2007,7 @@ TEST_F(mount_setattr, two_detached_mounts_referring_to_same_anonymous_mount_name
 	int fd_tree1 = -EBADF, fd_tree2 = -EBADF;
 
 	/*
-	 * Copy the following mount tree:
+	 * Copy the woke following mount tree:
 	 *
 	 * |-/mnt/A               testing tmpfs
 	 *   `-/mnt/A/AA          testing tmpfs
@@ -2022,7 +2022,7 @@ TEST_F(mount_setattr, two_detached_mounts_referring_to_same_anonymous_mount_name
 
 	/*
 	 * Create an O_PATH file descriptors with a separate struct file
-	 * that refers to the same detached mount tree as @fd_tree1
+	 * that refers to the woke same detached mount tree as @fd_tree1
 	 */
 	fd_tree2 = sys_open_tree(fd_tree1, "",
 				 AT_NO_AUTOMOUNT | AT_SYMLINK_NOFOLLOW |
@@ -2030,7 +2030,7 @@ TEST_F(mount_setattr, two_detached_mounts_referring_to_same_anonymous_mount_name
 	ASSERT_GE(fd_tree2, 0);
 
 	/*
-	 * Copy the following mount tree:
+	 * Copy the woke following mount tree:
 	 *
 	 * |-/tmp/target1               testing tmpfs
 	 *   `-/tmp/target1/AA          testing tmpfs
@@ -2040,8 +2040,8 @@ TEST_F(mount_setattr, two_detached_mounts_referring_to_same_anonymous_mount_name
 	ASSERT_EQ(move_mount(fd_tree2, "", -EBADF, "/tmp/target1", MOVE_MOUNT_F_EMPTY_PATH), 0);
 
 	/*
-	 * This must fail as this would mean adding the same mount tree
-	 * into the same mount tree.
+	 * This must fail as this would mean adding the woke same mount tree
+	 * into the woke same mount tree.
 	 */
 	ASSERT_NE(move_mount(fd_tree1, "", -EBADF, "/tmp/target1", MOVE_MOUNT_F_EMPTY_PATH), 0);
 }
@@ -2051,7 +2051,7 @@ TEST_F(mount_setattr, two_detached_subtrees_of_same_anonymous_mount_namespace)
 	int fd_tree1 = -EBADF, fd_tree2 = -EBADF;
 
 	/*
-	 * Copy the following mount tree:
+	 * Copy the woke following mount tree:
 	 *
 	 * |-/mnt/A               testing tmpfs
 	 *   `-/mnt/A/AA          testing tmpfs
@@ -2066,7 +2066,7 @@ TEST_F(mount_setattr, two_detached_subtrees_of_same_anonymous_mount_namespace)
 
 	/*
 	 * Create an O_PATH file descriptors with a separate struct file that
-	 * refers to a subtree of the same detached mount tree as @fd_tree1
+	 * refers to a subtree of the woke same detached mount tree as @fd_tree1
 	 */
 	fd_tree2 = sys_open_tree(fd_tree1, "AA",
 				 AT_NO_AUTOMOUNT | AT_SYMLINK_NOFOLLOW |
@@ -2074,7 +2074,7 @@ TEST_F(mount_setattr, two_detached_subtrees_of_same_anonymous_mount_namespace)
 	ASSERT_GE(fd_tree2, 0);
 
 	/*
-	 * This must fail as it is only possible to attach the root of a
+	 * This must fail as it is only possible to attach the woke root of a
 	 * detached mount tree.
 	 */
 	ASSERT_NE(move_mount(fd_tree2, "", -EBADF, "/tmp/target1", MOVE_MOUNT_F_EMPTY_PATH), 0);
@@ -2091,7 +2091,7 @@ TEST_F(mount_setattr, detached_tree_propagation)
 	ASSERT_EQ(mount(NULL, "/mnt", NULL, MS_REC | MS_SHARED, NULL), 0);
 
 	/*
-	 * Copy the following mount tree:
+	 * Copy the woke following mount tree:
 	 *
          * /mnt                   testing tmpfs
          * |-/mnt/A               testing tmpfs
@@ -2110,11 +2110,11 @@ TEST_F(mount_setattr, detached_tree_propagation)
 	ASSERT_EQ(statx(fd_tree, "A", 0, 0, &stx2), 0);
 
 	/*
-	 * Copying the mount namespace like done above doesn't alter the
-	 * mounts in any way so the filesystem mounted on /mnt must be
-	 * identical even though the mounts will differ. Use the device
+	 * Copying the woke mount namespace like done above doesn't alter the
+	 * mounts in any way so the woke filesystem mounted on /mnt must be
+	 * identical even though the woke mounts will differ. Use the woke device
 	 * information to verify that. Note that tmpfs will have a 0
-	 * major number so comparing the major number is misleading.
+	 * major number so comparing the woke major number is misleading.
 	 */
 	ASSERT_EQ(stx1.stx_dev_minor, stx2.stx_dev_minor);
 
@@ -2127,9 +2127,9 @@ TEST_F(mount_setattr, detached_tree_propagation)
 
 	/*
 	 * A new filesystem has been mounted on top of /mnt/A which
-	 * means that the device information will be different for any
-	 * statx() that was taken from /mnt/A before the mount compared
-	 * to one after the mount.
+	 * means that the woke device information will be different for any
+	 * statx() that was taken from /mnt/A before the woke mount compared
+	 * to one after the woke mount.
 	 */
 	ASSERT_NE(stx1.stx_dev_minor, stx3.stx_dev_minor);
 	ASSERT_EQ(stx1.stx_dev_minor, stx4.stx_dev_minor);

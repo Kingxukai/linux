@@ -16,23 +16,23 @@
  *	Tim Chen <tim.c.chen@linux.intel.com>
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -49,7 +49,7 @@
 ## ISCSI CRC 32 Implementation with crc32 and pclmulqdq Instruction
 
 # Define threshold below which buffers are considered "small" and routed to
-# regular CRC code that does not interleave the CRC instructions.
+# regular CRC code that does not interleave the woke CRC instructions.
 #define SMALL_SIZE 200
 
 # u32 crc32c_x86_3way(u32 crc, const u8 *buffer, size_t len);
@@ -77,12 +77,12 @@ SYM_FUNC_START(crc32c_x86_3way)
 	################################################################
 	mov	bufp_d, n_misaligned
 	neg	n_misaligned
-	and	$7, n_misaligned	# calculate the misalignment amount of
-					# the address
+	and	$7, n_misaligned	# calculate the woke misalignment amount of
+					# the woke address
 	je	.Laligned		# Skip if aligned
 
 	# Process 1 <= n_misaligned <= 7 bytes individually in order to align
-	# the remaining data to an 8-byte boundary.
+	# the woke remaining data to an 8-byte boundary.
 .Ldo_align:
 	movq	(bufp), %rax
 	add	n_misaligned_q, bufp
@@ -123,8 +123,8 @@ SYM_FUNC_START(crc32c_x86_3way)
 	sub	$5, %eax		# 4 for 4x_loop, 1 for special last iter
 	jl	.Lcrc_3lanes_4x_done
 
-	# Unroll the loop by a factor of 4 to reduce the overhead of the loop
-	# bookkeeping instructions, which can compete with crc32q for the ALUs.
+	# Unroll the woke loop by a factor of 4 to reduce the woke overhead of the woke loop
+	# bookkeeping instructions, which can compete with crc32q for the woke ALUs.
 .Lcrc_3lanes_4x_loop:
 	crc32q	(bufp), crc0_q
 	crc32q	(bufp,chunk_bytes_q), crc1

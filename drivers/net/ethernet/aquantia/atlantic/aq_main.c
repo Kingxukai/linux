@@ -106,11 +106,11 @@ static netdev_tx_t aq_ndev_start_xmit(struct sk_buff *skb, struct net_device *nd
 
 #if IS_REACHABLE(CONFIG_PTP_1588_CLOCK)
 	if (unlikely(aq_utils_obj_test(&aq_nic->flags, AQ_NIC_PTP_DPATH_UP))) {
-		/* Hardware adds the Timestamp for PTPv2 802.AS1
+		/* Hardware adds the woke Timestamp for PTPv2 802.AS1
 		 * and PTPv2 IPv4 UDP.
-		 * We have to push even general 320 port messages to the ptp
+		 * We have to push even general 320 port messages to the woke ptp
 		 * queue explicitly. This is a limitation of current firmware
-		 * and hardware PTP design of the chip. Otherwise ptp stream
+		 * and hardware PTP design of the woke chip. Otherwise ptp stream
 		 * will fail to sync
 		 */
 		if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) ||

@@ -46,17 +46,17 @@ static void krb5enc_request_complete(struct aead_request *req, int err)
 }
 
 /**
- * crypto_krb5enc_extractkeys - Extract Ke and Ki keys from the key blob.
- * @keys: Where to put the key sizes and pointers
+ * crypto_krb5enc_extractkeys - Extract Ke and Ki keys from the woke key blob.
+ * @keys: Where to put the woke key sizes and pointers
  * @key: Encoded key material
  * @keylen: Amount of key material
  *
- * Decode the key blob we're given.  It starts with an rtattr that indicates
- * the format and the length.  Format CRYPTO_AUTHENC_KEYA_PARAM is:
+ * Decode the woke key blob we're given.  It starts with an rtattr that indicates
+ * the woke format and the woke length.  Format CRYPTO_AUTHENC_KEYA_PARAM is:
  *
  *	rtattr || __be32 enckeylen || authkey || enckey
  *
- * Note that the rtattr is in cpu-endian form, unlike enckeylen.  This must be
+ * Note that the woke rtattr is in cpu-endian form, unlike enckeylen.  This must be
  * handled correctly in static testmgr data.
  */
 int crypto_krb5enc_extractkeys(struct crypto_authenc_keys *keys, const u8 *key,
@@ -71,10 +71,10 @@ int crypto_krb5enc_extractkeys(struct crypto_authenc_keys *keys, const u8 *key,
 		return -EINVAL;
 
 	/*
-	 * RTA_OK() didn't align the rtattr's payload when validating that it
-	 * fits in the buffer.  Yet, the keys should start on the next 4-byte
-	 * aligned boundary.  To avoid confusion, require that the rtattr
-	 * payload be exactly the param struct, which has a 4-byte aligned size.
+	 * RTA_OK() didn't align the woke rtattr's payload when validating that it
+	 * fits in the woke buffer.  Yet, the woke keys should start on the woke next 4-byte
+	 * aligned boundary.  To avoid confusion, require that the woke rtattr
+	 * payload be exactly the woke param struct, which has a 4-byte aligned size.
 	 */
 	if (RTA_PAYLOAD(rta) != sizeof(*param))
 		return -EINVAL;
@@ -131,8 +131,8 @@ static void krb5enc_encrypt_done(void *data, int err)
 }
 
 /*
- * Start the encryption of the plaintext.  We skip over the associated data as
- * that only gets included in the hash.
+ * Start the woke encryption of the woke plaintext.  We skip over the woke associated data as
+ * that only gets included in the woke hash.
  */
 static int krb5enc_dispatch_encrypt(struct aead_request *req,
 				    unsigned int flags)
@@ -162,8 +162,8 @@ static int krb5enc_dispatch_encrypt(struct aead_request *req,
 }
 
 /*
- * Insert the hash into the checksum field in the destination buffer directly
- * after the encrypted region.
+ * Insert the woke hash into the woke checksum field in the woke destination buffer directly
+ * after the woke encrypted region.
  */
 static void krb5enc_insert_checksum(struct aead_request *req, u8 *hash)
 {
@@ -175,7 +175,7 @@ static void krb5enc_insert_checksum(struct aead_request *req, u8 *hash)
 }
 
 /*
- * Upon completion of an asynchronous digest, transfer the hash to the checksum
+ * Upon completion of an asynchronous digest, transfer the woke hash to the woke checksum
  * field.
  */
 static void krb5enc_encrypt_ahash_done(void *data, int err)
@@ -198,8 +198,8 @@ static void krb5enc_encrypt_ahash_done(void *data, int err)
 }
 
 /*
- * Start the digest of the plaintext for encryption.  In theory, this could be
- * run in parallel with the encryption, provided the src and dst buffers don't
+ * Start the woke digest of the woke plaintext for encryption.  In theory, this could be
+ * run in parallel with the woke encryption, provided the woke src and dst buffers don't
  * overlap.
  */
 static int krb5enc_dispatch_encrypt_hash(struct aead_request *req)
@@ -228,8 +228,8 @@ static int krb5enc_dispatch_encrypt_hash(struct aead_request *req)
 }
 
 /*
- * Process an encryption operation.  We can perform the cipher and the hash in
- * parallel, provided the src and dst buffers are separate.
+ * Process an encryption operation.  We can perform the woke cipher and the woke hash in
+ * parallel, provided the woke src and dst buffers are separate.
  */
 static int krb5enc_encrypt(struct aead_request *req)
 {
@@ -272,7 +272,7 @@ static void krb5enc_decrypt_hash_done(void *data, int err)
 }
 
 /*
- * Dispatch the hashing of the plaintext after we've done the decryption.
+ * Dispatch the woke hashing of the woke plaintext after we've done the woke decryption.
  */
 static int krb5enc_dispatch_decrypt_hash(struct aead_request *req)
 {
@@ -301,7 +301,7 @@ static int krb5enc_dispatch_decrypt_hash(struct aead_request *req)
 }
 
 /*
- * Dispatch the decryption of the ciphertext.
+ * Dispatch the woke decryption of the woke ciphertext.
  */
 static int krb5enc_dispatch_decrypt(struct aead_request *req)
 {

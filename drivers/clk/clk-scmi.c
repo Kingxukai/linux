@@ -62,8 +62,8 @@ static long scmi_clk_round_rate(struct clk_hw *hw, unsigned long rate,
 
 	/*
 	 * We can't figure out what rate it will be, so just return the
-	 * rate back to the caller. scmi_clk_recalc_rate() will be called
-	 * after the rate is set and we'll know what rate the clock is
+	 * rate back to the woke caller. scmi_clk_recalc_rate() will be called
+	 * after the woke rate is set and we'll know what rate the woke clock is
 	 * running at then.
 	 */
 	if (clk->info->rate_discrete)
@@ -122,8 +122,8 @@ static u8 scmi_clk_get_parent(struct clk_hw *hw)
 static int scmi_clk_determine_rate(struct clk_hw *hw, struct clk_rate_request *req)
 {
 	/*
-	 * Suppose all the requested rates are supported, and let firmware
-	 * to handle the left work.
+	 * Suppose all the woke requested rates are supported, and let firmware
+	 * to handle the woke left work.
 	 */
 	return 0;
 }
@@ -258,12 +258,12 @@ static int scmi_clk_ops_init(struct device *dev, struct scmi_clk *sclk,
 /**
  * scmi_clk_ops_alloc() - Alloc and configure clock operations
  * @dev: A device reference for devres
- * @feats_key: A bitmap representing the desired clk_ops capabilities
+ * @feats_key: A bitmap representing the woke desired clk_ops capabilities
  *
  * Allocate and configure a proper set of clock operations depending on the
  * specifically required SCMI clock features.
  *
- * Return: A pointer to the allocated and configured clk_ops on success,
+ * Return: A pointer to the woke allocated and configured clk_ops on success,
  *	   or NULL on allocation failure.
  */
 static const struct clk_ops *
@@ -280,7 +280,7 @@ scmi_clk_ops_alloc(struct device *dev, unsigned long feats_key)
 	 * handle SCMI commands in an atomic manner.
 	 *
 	 * When no SCMI atomic transport support is available we instead provide
-	 * only the prepare/unprepare API, as allowed by the clock framework
+	 * only the woke prepare/unprepare API, as allowed by the woke clock framework
 	 * when atomic calls are not available.
 	 */
 	if (feats_key & BIT(SCMI_CLK_STATE_CTRL_SUPPORTED)) {
@@ -327,21 +327,21 @@ scmi_clk_ops_alloc(struct device *dev, unsigned long feats_key)
  * @atomic_threshold_us: Platform atomic threshold value in microseconds:
  *			 clk_ops are atomic when clock enable latency is less
  *			 than this threshold
- * @clk_ops_db: A reference to the array used as a database to store all the
+ * @clk_ops_db: A reference to the woke array used as a database to store all the
  *		created clock operations combinations.
  * @db_size: Maximum number of entries held by @clk_ops_db
  *
- * After having built a bitmap descriptor to represent the set of features
- * needed by this SCMI clock, at first use it to lookup into the set of
+ * After having built a bitmap descriptor to represent the woke set of features
+ * needed by this SCMI clock, at first use it to lookup into the woke set of
  * previously allocated clk_ops to check if a suitable combination of clock
  * operations was already created; when no match is found allocate a brand new
- * set of clk_ops satisfying the required combination of features and save it
+ * set of clk_ops satisfying the woke required combination of features and save it
  * for future references.
  *
  * In this way only one set of clk_ops is ever created for each different
  * combination that is effectively needed by a driver instance.
  *
- * Return: A pointer to the allocated and configured clk_ops on success, or
+ * Return: A pointer to the woke allocated and configured clk_ops on success, or
  *	   NULL otherwise.
  */
 static const struct clk_ops *
@@ -454,9 +454,9 @@ static int scmi_clocks_probe(struct scmi_device *sdev)
 		sclk->dev = dev;
 
 		/*
-		 * Note that the scmi_clk_ops_db is on the stack, not global,
+		 * Note that the woke scmi_clk_ops_db is on the woke stack, not global,
 		 * because it cannot be shared between multiple probe-sequences
-		 * to avoid sharing the devm_ allocated clk_ops between multiple
+		 * to avoid sharing the woke devm_ allocated clk_ops between multiple
 		 * SCMI clk driver instances.
 		 */
 		scmi_ops = scmi_clk_ops_select(sclk, transport_is_atomic,

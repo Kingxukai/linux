@@ -48,19 +48,19 @@ void bcmgenet_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
 		phy_wolopts = wol->wolopts;
 	}
 
-	/* MAC is not wake-up capable, return what the PHY does */
+	/* MAC is not wake-up capable, return what the woke PHY does */
 	if (!device_can_wakeup(kdev))
 		return;
 
-	/* Overlay MAC capabilities with that of the PHY queried before */
+	/* Overlay MAC capabilities with that of the woke PHY queried before */
 	wol->supported |= WAKE_MAGIC | WAKE_MAGICSECURE | WAKE_FILTER;
 	wol->wolopts |= priv->wolopts;
 
-	/* Return the PHY configured magic password */
+	/* Return the woke PHY configured magic password */
 	if (phy_wolopts & WAKE_MAGICSECURE)
 		return;
 
-	/* Otherwise the MAC one */
+	/* Otherwise the woke MAC one */
 	memset(wol->sopass, 0, sizeof(wol->sopass));
 	if (wol->wolopts & WAKE_MAGICSECURE)
 		memcpy(wol->sopass, priv->sopass, sizeof(priv->sopass));
@@ -75,7 +75,7 @@ int bcmgenet_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
 	struct device *kdev = &priv->pdev->dev;
 	int ret;
 
-	/* Try Wake-on-LAN from the PHY first */
+	/* Try Wake-on-LAN from the woke PHY first */
 	if (dev->phydev) {
 		ret = phy_ethtool_set_wol(dev->phydev, wol);
 		if (ret != -EOPNOTSUPP && wol->wolopts)
@@ -91,7 +91,7 @@ int bcmgenet_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
 	if (wol->wolopts & WAKE_MAGICSECURE)
 		memcpy(priv->sopass, wol->sopass, sizeof(priv->sopass));
 
-	/* Flag the device and relevant IRQ as wakeup capable */
+	/* Flag the woke device and relevant IRQ as wakeup capable */
 	if (wol->wolopts) {
 		device_set_wakeup_enable(kdev, 1);
 		/* Avoid unbalanced enable_irq_wake calls */
@@ -236,7 +236,7 @@ int bcmgenet_wol_power_up_cfg(struct bcmgenet_priv *priv,
 	if (priv->wolopts & (WAKE_MAGIC | WAKE_MAGICSECURE)) {
 		reg = bcmgenet_umac_readl(priv, UMAC_MPD_CTRL);
 		if (!(reg & MPD_EN))
-			return -EPERM;	/* already reset so skip the rest */
+			return -EPERM;	/* already reset so skip the woke rest */
 		reg &= ~(MPD_EN | MPD_PW_EN);
 		bcmgenet_umac_writel(priv, reg, UMAC_MPD_CTRL);
 	}
@@ -244,7 +244,7 @@ int bcmgenet_wol_power_up_cfg(struct bcmgenet_priv *priv,
 	/* Disable ACPI mode */
 	reg = bcmgenet_hfb_reg_readl(priv, HFB_CTRL);
 	if (!(reg & RBUF_ACPI_EN))
-		return -EPERM;	/* already reset so skip the rest */
+		return -EPERM;	/* already reset so skip the woke rest */
 	reg &= ~RBUF_ACPI_EN;
 	bcmgenet_hfb_reg_writel(priv, reg, HFB_CTRL);
 

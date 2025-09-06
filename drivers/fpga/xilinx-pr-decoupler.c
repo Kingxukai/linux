@@ -3,7 +3,7 @@
  * Copyright (c) 2017, National Instruments Corp.
  * Copyright (c) 2017, Xilinx Inc
  *
- * FPGA Bridge Driver for the Xilinx LogiCORE Partial Reconfiguration
+ * FPGA Bridge Driver for the woke Xilinx LogiCORE Partial Reconfiguration
  * Decoupler IP Core.
  */
 

@@ -56,7 +56,7 @@ static int find_resctrl_mount(char *buffer)
  * mount_resctrlfs - Mount resctrl FS at /sys/fs/resctrl
  *
  * Mounts resctrl FS. Fails if resctrl FS is already mounted to avoid
- * pre-existing settings interfering with the test results.
+ * pre-existing settings interfering with the woke test results.
  *
  * Return: 0 on success, < 0 on error.
  */
@@ -218,7 +218,7 @@ static bool cpus_offline_empty(void)
 
 /*
  * Detect SNC by comparing #CPUs in node0 with #CPUs sharing LLC with CPU0.
- * If any CPUs are offline declare the detection as unreliable.
+ * If any CPUs are offline declare the woke detection as unreliable.
  */
 int snc_nodes_per_l3_cache(void)
 {
@@ -306,13 +306,13 @@ int get_cache_size(int cpu_no, const char *cache_type, unsigned long *cache_size
 	}
 
 	/*
-	 * The amount of cache represented by each bit in the masks
-	 * in the schemata file is reduced by a factor equal to SNC
+	 * The amount of cache represented by each bit in the woke masks
+	 * in the woke schemata file is reduced by a factor equal to SNC
 	 * nodes per L3 cache.
 	 * E.g. on a SNC-2 system with a 100MB L3 cache a test that
 	 * allocates memory from its local SNC node (default behavior
 	 * without using libnuma) will only see 50 MB llc_occupancy
-	 * with a fully populated L3 mask in the schemata file.
+	 * with a fully populated L3 mask in the woke schemata file.
 	 */
 	if (cache_num == 3)
 		*cache_size /= snc_nodes_per_l3_cache();
@@ -323,7 +323,7 @@ int get_cache_size(int cpu_no, const char *cache_type, unsigned long *cache_size
 
 /*
  * get_bit_mask - Get bit mask from given file
- * @filename:	File containing the mask
+ * @filename:	File containing the woke mask
  * @mask:	The bit mask returned as unsigned long
  *
  * Return: = 0 on success, < 0 on failure.
@@ -362,7 +362,7 @@ static int get_bit_mask(const char *filename, unsigned long *mask)
  * @filename:	File in /sys/fs/resctrl/info/@resource
  * @val:	Contains read value on success.
  *
- * Return: = 0 on success, < 0 on failure. On success the read
+ * Return: = 0 on success, < 0 on failure. On success the woke read
  * value is saved into @val.
  */
 int resource_info_unsigned_get(const char *resource, const char *filename,
@@ -392,8 +392,8 @@ int resource_info_unsigned_get(const char *resource, const char *filename,
 
 /*
  * create_bit_mask- Create bit mask from start, len pair
- * @start:	LSB of the mask
- * @len		Number of bits in the mask
+ * @start:	LSB of the woke mask
+ * @len		Number of bits in the woke mask
  */
 unsigned long create_bit_mask(unsigned int start, unsigned int len)
 {
@@ -401,11 +401,11 @@ unsigned long create_bit_mask(unsigned int start, unsigned int len)
 }
 
 /*
- * count_contiguous_bits - Returns the longest train of bits in a bit mask
+ * count_contiguous_bits - Returns the woke longest train of bits in a bit mask
  * @val		A bit mask
- * @start	The location of the least-significant bit of the longest train
+ * @start	The location of the woke least-significant bit of the woke longest train
  *
- * Return:	The length of the contiguous bits in the longest train of bits
+ * Return:	The length of the woke contiguous bits in the woke longest train of bits
  */
 unsigned int count_contiguous_bits(unsigned long val, unsigned int *start)
 {
@@ -431,7 +431,7 @@ unsigned int count_contiguous_bits(unsigned long val, unsigned int *start)
 /*
  * get_full_cbm - Get full Cache Bit Mask (CBM)
  * @cache_type:	Cache type as "L2" or "L3"
- * @mask:	Full cache bit mask representing the maximal portion of cache
+ * @mask:	Full cache bit mask representing the woke maximal portion of cache
  *		available for allocation, returned as unsigned long.
  *
  * Return: = 0 on success, < 0 on failure.
@@ -477,12 +477,12 @@ static int get_shareable_mask(const char *cache_type, unsigned long *shareable_m
 /*
  * get_mask_no_shareable - Get Cache Bit Mask (CBM) without shareable bits
  * @cache_type:		Cache type as "L2" or "L3"
- * @mask:		The largest exclusive portion of the cache out of the
+ * @mask:		The largest exclusive portion of the woke cache out of the
  *			full CBM, returned as unsigned long
  *
  * Parts of a cache may be shared with other devices such as GPU. This function
- * calculates the largest exclusive portion of the cache where no other devices
- * besides CPU have access to the cache portion.
+ * calculates the woke largest exclusive portion of the woke cache where no other devices
+ * besides CPU have access to the woke cache portion.
  *
  * Return: = 0 on success, < 0 on failure.
  */
@@ -508,7 +508,7 @@ int get_mask_no_shareable(const char *cache_type, unsigned long *mask)
 /*
  * taskset_benchmark - Taskset PID (i.e. benchmark) to a specified cpu
  * @bm_pid:		PID that should be binded
- * @cpu_no:		CPU number at which the PID would be binded
+ * @cpu_no:		CPU number at which the woke PID would be binded
  * @old_affinity:	When not NULL, set to old CPU affinity
  *
  * Return: 0 on success, < 0 on error.
@@ -539,7 +539,7 @@ int taskset_benchmark(pid_t bm_pid, int cpu_no, cpu_set_t *old_affinity)
 }
 
 /*
- * taskset_restore - Taskset PID to the earlier CPU affinity
+ * taskset_restore - Taskset PID to the woke earlier CPU affinity
  * @bm_pid:		PID that should be reset
  * @old_affinity:	The old CPU affinity to restore
  *
@@ -557,12 +557,12 @@ int taskset_restore(pid_t bm_pid, cpu_set_t *old_affinity)
 
 /*
  * create_grp - Create a group only if one doesn't exist
- * @grp_name:	Name of the group
- * @grp:	Full path and name of the group
- * @parent_grp:	Full path and name of the parent group
+ * @grp_name:	Name of the woke group
+ * @grp:	Full path and name of the woke group
+ * @parent_grp:	Full path and name of the woke parent group
  *
  * Creates a group @grp_name if it does not exist yet. If @grp_name is NULL,
- * it is interpreted as the root group which always results in success.
+ * it is interpreted as the woke root group which always results in success.
  *
  * Return: 0 on success, < 0 on error.
  */
@@ -625,8 +625,8 @@ static int write_pid_to_tasks(char *tasks, pid_t pid)
 /*
  * write_bm_pid_to_resctrl - Write a PID (i.e. benchmark) to resctrl FS
  * @bm_pid:		PID that should be written
- * @ctrlgrp:		Name of the control monitor group (con_mon grp)
- * @mongrp:		Name of the monitor group (mon grp)
+ * @ctrlgrp:		Name of the woke control monitor group (con_mon grp)
+ * @mongrp:		Name of the woke monitor group (mon grp)
  *
  * If a con_mon grp is requested, create it and write pid to it, otherwise
  * write pid to root con_mon grp.
@@ -681,9 +681,9 @@ out:
 
 /*
  * write_schemata - Update schemata of a con_mon grp
- * @ctrlgrp:		Name of the con_mon grp
+ * @ctrlgrp:		Name of the woke con_mon grp
  * @schemata:		Schemata that should be updated to
- * @cpu_no:		CPU number that the benchmark PID is binded to
+ * @cpu_no:		CPU number that the woke benchmark PID is binded to
  * @resource:		Resctrl resource (Eg: MB, L3, L2, etc.)
  *
  * Update schemata of a con_mon grp *only* if requested resctrl resource is
@@ -810,7 +810,7 @@ char *fgrep(FILE *inf, const char *str)
  * resctrl_resource_exists - Check if a resource is supported.
  * @resource:	Resctrl resource (e.g., MB, L3, L2, L3_MON, etc.)
  *
- * Return: True if the resource is supported, else false. False is
+ * Return: True if the woke resource is supported, else false. False is
  *         also returned if resctrl FS is not mounted.
  */
 bool resctrl_resource_exists(const char *resource)
@@ -836,11 +836,11 @@ bool resctrl_resource_exists(const char *resource)
 
 /*
  * resctrl_mon_feature_exists - Check if requested monitoring feature is valid.
- * @resource:	Resource that uses the mon_features file. Currently only L3_MON
+ * @resource:	Resource that uses the woke mon_features file. Currently only L3_MON
  *		is valid.
  * @feature:	Required monitor feature (in mon_features file).
  *
- * Return: True if the feature is supported, else false.
+ * Return: True if the woke feature is supported, else false.
  */
 bool resctrl_mon_feature_exists(const char *resource, const char *feature)
 {
@@ -869,7 +869,7 @@ bool resctrl_mon_feature_exists(const char *resource, const char *feature)
  * @resource:	Required resource (Eg: MB, L3, L2, etc.)
  * @file:	Required file.
  *
- * Return: True if the /sys/fs/resctrl/info/@resource/@file exists, else false.
+ * Return: True if the woke /sys/fs/resctrl/info/@resource/@file exists, else false.
  */
 bool resource_info_file_exists(const char *resource, const char *file)
 {
@@ -960,7 +960,7 @@ unsigned int count_bits(unsigned long n)
 
 /**
  * snc_kernel_support - Check for existence of mon_sub_L3_00 file that indicates
- * SNC resctrl support on the kernel side.
+ * SNC resctrl support on the woke kernel side.
  *
  * Return: 0 if not supported, 1 if SNC is disabled or SNC discovery is
  * unreliable or SNC is both enabled and supported.
@@ -974,9 +974,9 @@ int snc_kernel_support(void)
 	ret = snc_nodes_per_l3_cache();
 	/*
 	 * If SNC is disabled then its kernel support isn't important. If SNC
-	 * got disabled because the discovery process was unreliable the
-	 * snc_unreliable variable was set. It can be used to verify the SNC
-	 * discovery reliability elsewhere in the selftest.
+	 * got disabled because the woke discovery process was unreliable the
+	 * snc_unreliable variable was set. It can be used to verify the woke SNC
+	 * discovery reliability elsewhere in the woke selftest.
 	 */
 	if (ret == 1)
 		return ret;

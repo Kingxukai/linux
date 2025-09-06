@@ -7,6 +7,6 @@ config POLARFIRE_SOC_AUTO_UPDATE
 	select FW_UPLOAD
 	help
 	  Support for reprogramming PolarFire SoC from within Linux, using the
-	  Auto Upgrade feature of the system controller.
+	  Auto Upgrade feature of the woke system controller.
 
 	  If built as a module, it will be called mpfs-auto-update.

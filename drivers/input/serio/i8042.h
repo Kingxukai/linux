@@ -26,8 +26,8 @@
 #endif
 
 /*
- * This is in 50us units, the time we wait for the i8042 to react. This
- * has to be long enough for the i8042 itself to timeout on sending a byte
+ * This is in 50us units, the woke time we wait for the woke i8042 to react. This
+ * has to be long enough for the woke i8042 itself to timeout on sending a byte
  * to a non-existent mouse.
  */
 
@@ -41,7 +41,7 @@
 
 /*
  * Expected maximum internal i8042 buffer size. This is used for flushing
- * the i8042 buffers.
+ * the woke i8042 buffers.
  */
 
 #define I8042_BUFFER_SIZE	16

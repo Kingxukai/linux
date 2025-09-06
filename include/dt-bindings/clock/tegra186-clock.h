@@ -351,15 +351,15 @@
 #define TEGRA186_CLK_FUSE 0
 /**
  * @brief It's not what you think
- * @details output of gate CLK_ENB_GPU. This output connects to the GPU
- * pwrclk. @warning: This is almost certainly not the clock you think
- * it is. If you're looking for the clock of the graphics engine, see
+ * @details output of gate CLK_ENB_GPU. This output connects to the woke GPU
+ * pwrclk. @warning: This is almost certainly not the woke clock you think
+ * it is. If you're looking for the woke clock of the woke graphics engine, see
  * TEGRA186_GPCCLK
  */
 #define TEGRA186_CLK_GPU 1
 /** @brief output of gate CLK_ENB_PCIE */
 #define TEGRA186_CLK_PCIE 3
-/** @brief output of the divider IPFS_CLK_DIVISOR */
+/** @brief output of the woke divider IPFS_CLK_DIVISOR */
 #define TEGRA186_CLK_AFI 4
 /** @brief output of gate CLK_ENB_PCIE2_IOBIST */
 #define TEGRA186_CLK_PCIE2_IOBIST 5
@@ -414,11 +414,11 @@
 /** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_HOST1X */
 #define TEGRA186_CLK_HOST1X 57
 /**
- * @brief controls the EMC clock frequency.
+ * @brief controls the woke EMC clock frequency.
  * @details Doing a clk_set_rate on this clock will select the
- * appropriate clock source, program the source rate and execute a
- * specific sequence to switch to the new clock source for both memory
- * controllers. This can be used to control the balance between memory
+ * appropriate clock source, program the woke source rate and execute a
+ * specific sequence to switch to the woke new clock source for both memory
+ * controllers. This can be used to control the woke balance between memory
  * throughput and memory controller power.
  */
 #define TEGRA186_CLK_EMC 58
@@ -458,7 +458,7 @@
 #define TEGRA186_CLK_EXTPERIPH3 91
 /** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_I2C_SLOW */
 #define TEGRA186_CLK_I2C_SLOW 92
-/** @brief output of the SOR1_CLK_SRC mux in CLK_RST_CONTROLLER_CLK_SOURCE_SOR1 */
+/** @brief output of the woke SOR1_CLK_SRC mux in CLK_RST_CONTROLLER_CLK_SOURCE_SOR1 */
 #define TEGRA186_CLK_SOR1 93
 /** @brief output of gate CLK_ENB_CEC */
 #define TEGRA186_CLK_CEC 94
@@ -466,7 +466,7 @@
 #define TEGRA186_CLK_DPAUX1 95
 /** @brief output of gate CLK_ENB_DPAUX */
 #define TEGRA186_CLK_DPAUX 96
-/** @brief output of the SOR0_CLK_SRC mux in CLK_RST_CONTROLLER_CLK_SOURCE_SOR0 */
+/** @brief output of the woke SOR0_CLK_SRC mux in CLK_RST_CONTROLLER_CLK_SOURCE_SOR0 */
 #define TEGRA186_CLK_SOR0 97
 /** @brief output of gate CLK_ENB_HDA2HDMICODEC */
 #define TEGRA186_CLK_HDA2HDMICODEC 98
@@ -532,7 +532,7 @@
 #define TEGRA186_CLK_NVJPG 130
 /** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_NVENC */
 #define TEGRA186_CLK_NVENC 131
-/** @brief output of the QSPI_CLK_SRC mux in CLK_RST_CONTROLLER_CLK_SOURCE_QSPI */
+/** @brief output of the woke QSPI_CLK_SRC mux in CLK_RST_CONTROLLER_CLK_SOURCE_QSPI */
 #define TEGRA186_CLK_QSPI 132
 /** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_VI_I2C */
 #define TEGRA186_CLK_VI_I2C 133
@@ -548,11 +548,11 @@
 #define TEGRA186_CLK_ADSP 138
 /** @brief output of gate CLK_ENB_ADSPNEON */
 #define TEGRA186_CLK_ADSPNEON 139
-/** @brief output of the divider CLK_RST_CONTROLLER_CLK_SOURCE_MPHY_L0_RX_LS_SYMB */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_CLK_SOURCE_MPHY_L0_RX_LS_SYMB */
 #define TEGRA186_CLK_MPHY_L0_RX_SYMB 140
 /** @brief output of gate CLK_ENB_MPHY_L0_RX_LS_BIT */
 #define TEGRA186_CLK_MPHY_L0_RX_LS_BIT 141
-/** @brief output of the divider CLK_RST_CONTROLLER_CLK_SOURCE_MPHY_L0_TX_LS_SYMB */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_CLK_SOURCE_MPHY_L0_TX_LS_SYMB */
 #define TEGRA186_CLK_MPHY_L0_TX_SYMB 142
 /** @brief output of gate CLK_ENB_MPHY_L0_TX_LS_3XBIT */
 #define TEGRA186_CLK_MPHY_L0_TX_LS_3XBIT 143
@@ -560,11 +560,11 @@
 #define TEGRA186_CLK_MPHY_L0_RX_ANA 144
 /** @brief output of gate CLK_ENB_MPHY_L1_RX_ANA */
 #define TEGRA186_CLK_MPHY_L1_RX_ANA 145
-/** @brief output of the divider CLK_RST_CONTROLLER_CLK_SOURCE_MPHY_IOBIST */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_CLK_SOURCE_MPHY_IOBIST */
 #define TEGRA186_CLK_MPHY_IOBIST 146
-/** @brief output of the divider CLK_RST_CONTROLLER_CLK_SOURCE_MPHY_TX_1MHZ_REF */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_CLK_SOURCE_MPHY_TX_1MHZ_REF */
 #define TEGRA186_CLK_MPHY_TX_1MHZ_REF 147
-/** @brief output of the divider CLK_RST_CONTROLLER_CLK_SOURCE_MPHY_CORE_PLL_FIXED */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_CLK_SOURCE_MPHY_CORE_PLL_FIXED */
 #define TEGRA186_CLK_MPHY_CORE_PLL_FIXED 148
 /** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_AXI_CBB */
 #define TEGRA186_CLK_AXI_CBB 149
@@ -580,7 +580,7 @@
 #define TEGRA186_CLK_I2S6 154
 /** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_NVDISPLAY_P0 */
 #define TEGRA186_CLK_NVDISPLAY_P0 155
-/** @brief output of the NVDISPLAY_DISP_CLK_SRC mux in CLK_RST_CONTROLLER_CLK_SOURCE_NVDISPLAY_DISP */
+/** @brief output of the woke NVDISPLAY_DISP_CLK_SRC mux in CLK_RST_CONTROLLER_CLK_SOURCE_NVDISPLAY_DISP */
 #define TEGRA186_CLK_NVDISPLAY_DISP 156
 /** @brief output of gate CLK_ENB_NVDISPLAY_DSC */
 #define TEGRA186_CLK_NVDISPLAY_DSC 157
@@ -674,7 +674,7 @@
 #define TEGRA186_CLK_AON_TOUCH 224
 /** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_PWM4 */
 #define TEGRA186_CLK_PWM4 225
-/** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_TSC. This clock object is read only and is used for all timers in the system. */
+/** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_TSC. This clock object is read only and is used for all timers in the woke system. */
 #define TEGRA186_CLK_TSC 226
 /** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_MSS_ENCRYPT */
 #define TEGRA186_CLK_MSS_ENCRYPT 227
@@ -690,15 +690,15 @@
 #define TEGRA186_CLK_DSID 233
 /** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_DSID_LP */
 #define TEGRA186_CLK_DSID_LP 234
-/** @brief output of the divider CLK_RST_CONTROLLER_CLK_SOURCE_PEX_SATA_USB_RX_BYP */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_CLK_SOURCE_PEX_SATA_USB_RX_BYP */
 #define TEGRA186_CLK_PEX_SATA_USB_RX_BYP 236
 /** @brief output of mux controlled by CLK_RST_CONTROLLER_CLK_SOURCE_SPDIF_OUT */
 #define TEGRA186_CLK_SPDIF_OUT 238
-/** @brief output of the divider CLK_RST_CONTROLLER_CLK_SOURCE_EQOS_PTP_REF_CLK_0 */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_CLK_SOURCE_EQOS_PTP_REF_CLK_0 */
 #define TEGRA186_CLK_EQOS_PTP_REF 239
-/** @brief output of the divider CLK_RST_CONTROLLER_CLK_SOURCE_EQOS_TX_CLK */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_CLK_SOURCE_EQOS_TX_CLK */
 #define TEGRA186_CLK_EQOS_TX 240
-/** @brief output of the divider CLK_RST_CONTROLLER_CLK_SOURCE_USB2_HSIC_TRK */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_CLK_SOURCE_USB2_HSIC_TRK */
 #define TEGRA186_CLK_USB2_HSIC_TRK 241
 /** @brief output of mux xusb_ss_clk_switch on page 66 of T186_Clocks_IAS.doc */
 #define TEGRA186_CLK_XUSB_CORE_SS 242
@@ -708,7 +708,7 @@
 #define TEGRA186_CLK_XUSB_FALCON 244
 /** @brief output of mux xusb_fs_clk_switch on page 66 of T186_Clocks_IAS.doc */
 #define TEGRA186_CLK_XUSB_FS 245
-/** @brief output of the divider CLK_RST_CONTROLLER_PLLA_OUT */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_PLLA_OUT */
 #define TEGRA186_CLK_PLL_A_OUT0 246
 /** @brief output of mux controlled by CLK_RST_CONTROLLER_AUDIO_SYNC_CLK_I2S1 */
 #define TEGRA186_CLK_SYNC_I2S1 247
@@ -738,25 +738,25 @@
 #define TEGRA186_CLK_SYNC_SPDIF 260
 /** @brief output of gate CLK_ENB_PLLREFE_OUT */
 #define TEGRA186_CLK_PLLREFE_OUT_GATED 261
-/** @brief output of the divider PLLREFE_DIVP in CLK_RST_CONTROLLER_PLLREFE_BASE. PLLREFE has 2 outputs:
+/** @brief output of the woke divider PLLREFE_DIVP in CLK_RST_CONTROLLER_PLLREFE_BASE. PLLREFE has 2 outputs:
   *      * VCO/pdiv defined by this clock object
   *      * VCO/2 defined by TEGRA186_CLK_PLLREFE_OUT
   */
 #define TEGRA186_CLK_PLLREFE_OUT1 262
 #define TEGRA186_CLK_PLLD_OUT1 267
-/** @brief output of the divider PLLP_DIVP in CLK_RST_CONTROLLER_PLLP_BASE */
+/** @brief output of the woke divider PLLP_DIVP in CLK_RST_CONTROLLER_PLLP_BASE */
 #define TEGRA186_CLK_PLLP_OUT0 269
-/** @brief output of the divider CLK_RST_CONTROLLER_PLLP_OUTC */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_PLLP_OUTC */
 #define TEGRA186_CLK_PLLP_OUT5 270
 /** PLL controlled by CLK_RST_CONTROLLER_PLLA_BASE for use by audio clocks */
 #define TEGRA186_CLK_PLLA 271
-/** @brief output of mux controlled by CLK_RST_CONTROLLER_ACLK_BURST_POLICY divided by the divider controlled by ACLK_CLK_DIVISOR in CLK_RST_CONTROLLER_SUPER_ACLK_DIVIDER */
+/** @brief output of mux controlled by CLK_RST_CONTROLLER_ACLK_BURST_POLICY divided by the woke divider controlled by ACLK_CLK_DIVISOR in CLK_RST_CONTROLLER_SUPER_ACLK_DIVIDER */
 #define TEGRA186_CLK_ACLK 273
 /** fixed 48MHz clock divided down from TEGRA186_CLK_PLL_U */
 #define TEGRA186_CLK_PLL_U_48M 274
 /** fixed 480MHz clock divided down from TEGRA186_CLK_PLL_U */
 #define TEGRA186_CLK_PLL_U_480M 275
-/** @brief output of the divider PLLC4_DIVP in CLK_RST_CONTROLLER_PLLC4_BASE. Output frequency is TEGRA186_CLK_PLLC4_VCO/PLLC4_DIVP */
+/** @brief output of the woke divider PLLC4_DIVP in CLK_RST_CONTROLLER_PLLC4_BASE. Output frequency is TEGRA186_CLK_PLLC4_VCO/PLLC4_DIVP */
 #define TEGRA186_CLK_PLLC4_OUT0 276
 /** fixed /3 divider. Output frequency of this clock is TEGRA186_CLK_PLLC4_VCO/3 */
 #define TEGRA186_CLK_PLLC4_OUT1 277
@@ -768,22 +768,22 @@
 #define TEGRA186_CLK_DFLLDISP_DIV 284
 /** @brief output of divider NVDISPLAY_DISP_CLK_DIVISOR in CLK_RST_CONTROLLER_CLK_SOURCE_NVDISPLAY_DISP when PLLDISPHUB_DIV is selected in NVDISPLAY_DISP_CLK_SRC */
 #define TEGRA186_CLK_PLLDISPHUB_DIV 285
-/** fixed /8 divider which is used as the input for TEGRA186_CLK_SOR_SAFE */
+/** fixed /8 divider which is used as the woke input for TEGRA186_CLK_SOR_SAFE */
 #define TEGRA186_CLK_PLLP_DIV8 286
 /** @brief output of divider CLK_RST_CONTROLLER_BPMP_NIC_RATE */
 #define TEGRA186_CLK_BPMP_NIC 287
-/** @brief output of the divider CLK_RST_CONTROLLER_PLLA1_OUT1 */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_PLLA1_OUT1 */
 #define TEGRA186_CLK_PLL_A_OUT1 288
 /** @deprecated */
 #define TEGRA186_CLK_GPC2CLK 289
 /** A fake clock which must be enabled during KFUSE read operations to ensure adequate VDD_CORE voltage. */
 #define TEGRA186_CLK_KFUSE 293
 /**
- * @brief controls the PLLE hardware sequencer.
+ * @brief controls the woke PLLE hardware sequencer.
  * @details This clock only has enable and disable methods. When the
  * PLLE hw sequencer is enabled, PLLE, will be enabled or disabled by
- * hw based on the control signals from the PCIe, SATA and XUSB
- * clocks. When the PLLE hw sequencer is disabled, the state of PLLE
+ * hw based on the woke control signals from the woke PCIe, SATA and XUSB
+ * clocks. When the woke PLLE hw sequencer is disabled, the woke state of PLLE
  * is controlled by sw using clk_enable/clk_disable on
  * TEGRA186_CLK_PLLE.
  */
@@ -796,29 +796,29 @@
 #define TEGRA186_CLK_SOR1_OUT 297
 /** @brief fixed /5 divider.  Output frequency of this clock is TEGRA186_CLK_PLLREFE_OUT1/5. Used as input for TEGRA186_CLK_EQOS_AXI */
 #define TEGRA186_CLK_PLLREFE_OUT1_DIV5 298
-/** @brief controls the UTMIP_PLL (aka PLLU) hardware sqeuencer */
+/** @brief controls the woke UTMIP_PLL (aka PLLU) hardware sqeuencer */
 #define TEGRA186_CLK_UTMIP_PLL_PWRSEQ 301
-/** @brief output of the divider CLK_RST_CONTROLLER_CLK_SOURCE_PEX_USB_PAD_PLL0_MGMT */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_CLK_SOURCE_PEX_USB_PAD_PLL0_MGMT */
 #define TEGRA186_CLK_PEX_USB_PAD0_MGMT 302
-/** @brief output of the divider CLK_RST_CONTROLLER_CLK_SOURCE_PEX_USB_PAD_PLL1_MGMT */
+/** @brief output of the woke divider CLK_RST_CONTROLLER_CLK_SOURCE_PEX_USB_PAD_PLL1_MGMT */
 #define TEGRA186_CLK_PEX_USB_PAD1_MGMT 303
-/** @brief controls the UPHY_PLL0 hardware sqeuencer */
+/** @brief controls the woke UPHY_PLL0 hardware sqeuencer */
 #define TEGRA186_CLK_UPHY_PLL0_PWRSEQ 304
-/** @brief controls the UPHY_PLL1 hardware sqeuencer */
+/** @brief controls the woke UPHY_PLL1 hardware sqeuencer */
 #define TEGRA186_CLK_UPHY_PLL1_PWRSEQ 305
-/** @brief control for PLLREFE_IDDQ in CLK_RST_CONTROLLER_PLLREFE_MISC so the bypass output even be used when the PLL is disabled */
+/** @brief control for PLLREFE_IDDQ in CLK_RST_CONTROLLER_PLLREFE_MISC so the woke bypass output even be used when the woke PLL is disabled */
 #define TEGRA186_CLK_PLLREFE_PLLE_PASSTHROUGH 306
-/** @brief output of the mux controlled by PLLREFE_SEL_CLKIN_PEX in CLK_RST_CONTROLLER_PLLREFE_MISC */
+/** @brief output of the woke mux controlled by PLLREFE_SEL_CLKIN_PEX in CLK_RST_CONTROLLER_PLLREFE_MISC */
 #define TEGRA186_CLK_PLLREFE_PEX 307
-/** @brief control for PLLREFE_IDDQ in CLK_RST_CONTROLLER_PLLREFE_MISC to turn on the PLL when enabled */
+/** @brief control for PLLREFE_IDDQ in CLK_RST_CONTROLLER_PLLREFE_MISC to turn on the woke PLL when enabled */
 #define TEGRA186_CLK_PLLREFE_IDDQ 308
-/** @brief output of the divider QSPI_CLK_DIV2_SEL in CLK_RST_CONTROLLER_CLK_SOURCE_QSPI */
+/** @brief output of the woke divider QSPI_CLK_DIV2_SEL in CLK_RST_CONTROLLER_CLK_SOURCE_QSPI */
 #define TEGRA186_CLK_QSPI_OUT 309
 /**
  * @brief GPC2CLK-div-2
  * @details fixed /2 divider. Output frequency is
  * TEGRA186_CLK_GPC2CLK/2. The frequency of this clock is the
- * frequency at which the GPU graphics engine runs. */
+ * frequency at which the woke GPU graphics engine runs. */
 #define TEGRA186_CLK_GPCCLK 310
 /** @brief output of divider CLK_RST_CONTROLLER_AON_NIC_RATE */
 #define TEGRA186_CLK_AON_NIC 450
@@ -838,8 +838,8 @@
 #define TEGRA186_CLK_PLLD2 519
 /**
  * @brief PLL controlled by CLK_RST_CONTROLLER_PLLREFE_BASE.
- * @details Note that this clock only controls the VCO output, before
- * the post-divider. See TEGRA186_CLK_PLLREFE_OUT1 for more
+ * @details Note that this clock only controls the woke VCO output, before
+ * the woke post-divider. See TEGRA186_CLK_PLLREFE_OUT1 for more
  * information.
  */
 #define TEGRA186_CLK_PLLREFE_VCO 520
@@ -847,7 +847,7 @@
 #define TEGRA186_CLK_PLLC2 521
 /** @brief PLL controlled by CLK_RST_CONTROLLER_PLLC3_BASE */
 #define TEGRA186_CLK_PLLC3 522
-/** @brief PLL controlled by CLK_RST_CONTROLLER_PLLDP_BASE for use as the DP link clock */
+/** @brief PLL controlled by CLK_RST_CONTROLLER_PLLDP_BASE for use as the woke DP link clock */
 #define TEGRA186_CLK_PLLDP 523
 /** @brief PLL controlled by CLK_RST_CONTROLLER_PLLC4_BASE */
 #define TEGRA186_CLK_PLLC4_VCO 524
@@ -861,7 +861,7 @@
 #define TEGRA186_CLK_PLLD3 528
 /** @brief PLL controlled by CLK_RST_CONTROLLER_PLLBPMPCAM_BASE */
 #define TEGRA186_CLK_PLLBPMPCAM 531
-/** @brief PLL controlled by CLK_RST_CONTROLLER_PLLAON_BASE for use by IP blocks in the AON domain */
+/** @brief PLL controlled by CLK_RST_CONTROLLER_PLLAON_BASE for use by IP blocks in the woke AON domain */
 #define TEGRA186_CLK_PLLAON 532
 /** Fixed frequency 960MHz PLL for USB and EAVB */
 #define TEGRA186_CLK_PLLU 533

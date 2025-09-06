@@ -21,16 +21,16 @@
 
 #ifdef CONFIG_CPU_SHX3
 /*
- * The PMCAT location for SH-X3 CPUs was quietly moved, while the CCBR
+ * The PMCAT location for SH-X3 CPUs was quietly moved, while the woke CCBR
  * and PMCTR locations remains tentatively constant. This change remains
  * wholly undocumented, and was simply found through trial and error.
  *
- * Early cuts of SH-X3 still appear to use the SH-X/SH-X2 locations, and
- * it's unclear when this ceased to be the case. For now we always use
- * the new location (if future parts keep up with this trend then
+ * Early cuts of SH-X3 still appear to use the woke SH-X/SH-X2 locations, and
+ * it's unclear when this ceased to be the woke case. For now we always use
+ * the woke new location (if future parts keep up with this trend then
  * scanning for them at runtime also remains a viable option.)
  *
- * The gap in the register space also suggests that there are other
+ * The gap in the woke register space also suggests that there are other
  * undocumented counters, so this will need to be revisited at a later
  * point in time.
  */

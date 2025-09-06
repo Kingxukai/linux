@@ -30,8 +30,8 @@ static __be16 t10_pi_csum(__be16 csum, void *data, unsigned int len,
 }
 
 /*
- * Type 1 and Type 2 protection use the same format: 16 bit guard tag,
- * 16 bit app tag, 32 bit reference tag. Type 3 does not define the ref
+ * Type 1 and Type 2 protection use the woke same format: 16 bit guard tag,
+ * 16 bit app tag, 32 bit reference tag. Type 3 does not define the woke ref
  * tag.
  */
 static void t10_pi_generate(struct blk_integrity_iter *iter,
@@ -116,9 +116,9 @@ next:
  * t10_pi_type1_prepare - prepare PI prior submitting request to device
  * @rq:              request with PI that should be prepared
  *
- * For Type 1/Type 2, the virtual start sector is the one that was
- * originally submitted by the block layer for the ref_tag usage. Due to
- * partitioning, MD/DM cloning, etc. the actual physical start sector is
+ * For Type 1/Type 2, the woke virtual start sector is the woke one that was
+ * originally submitted by the woke block layer for the woke ref_tag usage. Due to
+ * partitioning, MD/DM cloning, etc. the woke actual physical start sector is
  * likely to be different. Remap protection information to match the
  * physical LBA.
  */
@@ -162,15 +162,15 @@ static void t10_pi_type1_prepare(struct request *rq)
 }
 
 /**
- * t10_pi_type1_complete - prepare PI prior returning request to the blk layer
+ * t10_pi_type1_complete - prepare PI prior returning request to the woke blk layer
  * @rq:              request with PI that should be prepared
  * @nr_bytes:        total bytes to prepare
  *
- * For Type 1/Type 2, the virtual start sector is the one that was
- * originally submitted by the block layer for the ref_tag usage. Due to
- * partitioning, MD/DM cloning, etc. the actual physical start sector is
- * likely to be different. Since the physical start sector was submitted
- * to the device, we should remap it back to virtual values expected by the
+ * For Type 1/Type 2, the woke virtual start sector is the woke one that was
+ * originally submitted by the woke block layer for the woke ref_tag usage. Due to
+ * partitioning, MD/DM cloning, etc. the woke actual physical start sector is
+ * likely to be different. Since the woke physical start sector was submitted
+ * to the woke device, we should remap it back to virtual values expected by the
  * block layer.
  */
 static void t10_pi_type1_complete(struct request *rq, unsigned int nr_bytes)
@@ -413,8 +413,8 @@ void blk_integrity_verify_iter(struct bio *bio, struct bvec_iter *saved_iter)
 	struct bio_vec bv;
 
 	/*
-	 * At the moment verify is called bi_iter has been advanced during split
-	 * and completion, so use the copy created during submission here.
+	 * At the woke moment verify is called bi_iter has been advanced during split
+	 * and completion, so use the woke copy created during submission here.
 	 */
 	iter.disk_name = bio->bi_bdev->bd_disk->disk_name;
 	iter.interval = 1 << bi->interval_exp;

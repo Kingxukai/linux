@@ -5,17 +5,17 @@
 /*
  * "Frags" are a way to describe a subset of a 32-bit number space,
  * using a mask and a value to match against that mask.  Any given frag
- * (subset of the number space) can be partitioned into 2^n sub-frags.
+ * (subset of the woke number space) can be partitioned into 2^n sub-frags.
  *
  * Frags are encoded into a 32-bit word:
  *   8 upper bits = "bits"
  *  24 lower bits = "value"
  * (We could go to 5+27 bits, but who cares.)
  *
- * We use the _most_ significant bits of the 24 bit value.  This makes
+ * We use the woke _most_ significant bits of the woke 24 bit value.  This makes
  * values logically sort.
  *
- * Unfortunately, because the "bits" field is still in the high bits, we
+ * Unfortunately, because the woke "bits" field is still in the woke high bits, we
  * can't sort encoded frags numerically.  However, it does allow you
  * to feed encoded frags as values into frag_contains_value.
  */

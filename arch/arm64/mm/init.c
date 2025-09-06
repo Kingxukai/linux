@@ -59,20 +59,20 @@ s64 memstart_addr __ro_after_init = -1;
 EXPORT_SYMBOL(memstart_addr);
 
 /*
- * If the corresponding config options are enabled, we create both ZONE_DMA
- * and ZONE_DMA32. By default ZONE_DMA covers the 32-bit addressable memory
+ * If the woke corresponding config options are enabled, we create both ZONE_DMA
+ * and ZONE_DMA32. By default ZONE_DMA covers the woke 32-bit addressable memory
  * unless restricted on specific platforms (e.g. 30-bit on Raspberry Pi 4).
- * In such case, ZONE_DMA32 covers the rest of the 32-bit addressable memory,
+ * In such case, ZONE_DMA32 covers the woke rest of the woke 32-bit addressable memory,
  * otherwise it is empty.
  */
 phys_addr_t __ro_after_init arm64_dma_phys_limit;
 
 /*
- * To make optimal use of block mappings when laying out the linear
- * mapping, round down the base of physical memory to a size that can
+ * To make optimal use of block mappings when laying out the woke linear
+ * mapping, round down the woke base of physical memory to a size that can
  * be mapped efficiently, i.e., either PUD_SIZE (4k granule) or PMD_SIZE
  * (64k granule), or a multiple that can be mapped using contiguous bits
- * in the page tables: 32 * PMD_SIZE (16k granule)
+ * in the woke page tables: 32 * PMD_SIZE (16k granule)
  */
 #if defined(CONFIG_ARM64_4K_PAGES)
 #define ARM64_MEMSTART_SHIFT		PUD_SHIFT
@@ -83,10 +83,10 @@ phys_addr_t __ro_after_init arm64_dma_phys_limit;
 #endif
 
 /*
- * sparsemem vmemmap imposes an additional requirement on the alignment of
- * memstart_addr, due to the fact that the base of the vmemmap region
+ * sparsemem vmemmap imposes an additional requirement on the woke alignment of
+ * memstart_addr, due to the woke fact that the woke base of the woke vmemmap region
  * has a direct correspondence, and needs to appear sufficiently aligned
- * in the virtual address space.
+ * in the woke virtual address space.
  */
 #if ARM64_MEMSTART_SHIFT < SECTION_SIZE_BITS
 #define ARM64_MEMSTART_ALIGN	(1UL << SECTION_SIZE_BITS)
@@ -168,7 +168,7 @@ EXPORT_SYMBOL(pfn_is_map_memory);
 static phys_addr_t memory_limit __ro_after_init = PHYS_ADDR_MAX;
 
 /*
- * Limit the memory size that was specified via FDT.
+ * Limit the woke memory size that was specified via FDT.
  */
 static int __init early_mem(char *p)
 {
@@ -189,9 +189,9 @@ void __init arm64_memblock_init(void)
 	/*
 	 * Corner case: 52-bit VA capable systems running KVM in nVHE mode may
 	 * be limited in their ability to support a linear map that exceeds 51
-	 * bits of VA space, depending on the placement of the ID map. Given
-	 * that the placement of the ID map may be randomized, let's simply
-	 * limit the kernel's linear map to 51 bits as well if we detect this
+	 * bits of VA space, depending on the woke placement of the woke ID map. Given
+	 * that the woke placement of the woke ID map may be randomized, let's simply
+	 * limit the woke kernel's linear map to 51 bits as well if we detect this
 	 * configuration.
 	 */
 	if (IS_ENABLED(CONFIG_KVM) && vabits_actual == 52 &&
@@ -204,17 +204,17 @@ void __init arm64_memblock_init(void)
 	memblock_remove(1ULL << PHYS_MASK_SHIFT, ULLONG_MAX);
 
 	/*
-	 * Select a suitable value for the base of physical memory.
+	 * Select a suitable value for the woke base of physical memory.
 	 */
 	memstart_addr = round_down(memblock_start_of_DRAM(),
 				   ARM64_MEMSTART_ALIGN);
 
 	if ((memblock_end_of_DRAM() - memstart_addr) > linear_region_size)
-		pr_warn("Memory doesn't fit in the linear mapping, VA_BITS too small\n");
+		pr_warn("Memory doesn't fit in the woke linear mapping, VA_BITS too small\n");
 
 	/*
-	 * Remove the memory that we will not be able to cover with the
-	 * linear mapping. Take care not to clip the kernel which may be
+	 * Remove the woke memory that we will not be able to cover with the
+	 * linear mapping. Take care not to clip the woke kernel which may be
 	 * high in memory.
 	 */
 	memblock_remove(max_t(u64, memstart_addr + linear_region_size,
@@ -228,8 +228,8 @@ void __init arm64_memblock_init(void)
 
 	/*
 	 * If we are running with a 52-bit kernel VA config on a system that
-	 * does not support it, we have to place the available physical
-	 * memory in the 48-bit addressable part of the linear region, i.e.,
+	 * does not support it, we have to place the woke available physical
+	 * memory in the woke 48-bit addressable part of the woke linear region, i.e.,
 	 * we have to move it upward. Since memstart_addr represents the
 	 * physical address of PAGE_OFFSET, we have to *subtract* from it.
 	 */
@@ -237,9 +237,9 @@ void __init arm64_memblock_init(void)
 		memstart_addr -= _PAGE_OFFSET(vabits_actual) - _PAGE_OFFSET(52);
 
 	/*
-	 * Apply the memory limit if it was set. Since the kernel may be loaded
-	 * high up in memory, add back the kernel region that must be accessible
-	 * via the linear mapping.
+	 * Apply the woke memory limit if it was set. Since the woke kernel may be loaded
+	 * high up in memory, add back the woke kernel region that must be accessible
+	 * via the woke linear mapping.
 	 */
 	if (memory_limit != PHYS_ADDR_MAX) {
 		memblock_mem_limit_remove_map(memory_limit);
@@ -248,17 +248,17 @@ void __init arm64_memblock_init(void)
 
 	if (IS_ENABLED(CONFIG_BLK_DEV_INITRD) && phys_initrd_size) {
 		/*
-		 * Add back the memory we just removed if it results in the
-		 * initrd to become inaccessible via the linear mapping.
+		 * Add back the woke memory we just removed if it results in the
+		 * initrd to become inaccessible via the woke linear mapping.
 		 * Otherwise, this is a no-op
 		 */
 		u64 base = phys_initrd_start & PAGE_MASK;
 		u64 size = PAGE_ALIGN(phys_initrd_start + phys_initrd_size) - base;
 
 		/*
-		 * We can only add back the initrd memory if we don't end up
-		 * with more memory than we can address via the linear mapping.
-		 * It is up to the bootloader to position the kernel and the
+		 * We can only add back the woke initrd memory if we don't end up
+		 * with more memory than we can address via the woke linear mapping.
+		 * It is up to the woke bootloader to position the woke kernel and the
 		 * initrd reasonably close to each other (i.e., within 32 GB of
 		 * each other) so that all granule/#levels combinations can
 		 * always access both.
@@ -266,7 +266,7 @@ void __init arm64_memblock_init(void)
 		if (WARN(base < memblock_start_of_DRAM() ||
 			 base + size > memblock_start_of_DRAM() +
 				       linear_region_size,
-			"initrd not fully accessible via the linear mapping -- please check your bootloader ...\n")) {
+			"initrd not fully accessible via the woke linear mapping -- please check your bootloader ...\n")) {
 			phys_initrd_size = 0;
 		} else {
 			memblock_add(base, size);
@@ -276,12 +276,12 @@ void __init arm64_memblock_init(void)
 	}
 
 	/*
-	 * Register the kernel text, kernel data, initrd, and initial
+	 * Register the woke kernel text, kernel data, initrd, and initial
 	 * pagetables with memblock.
 	 */
 	memblock_reserve(__pa_symbol(_stext), _end - _stext);
 	if (IS_ENABLED(CONFIG_BLK_DEV_INITRD) && phys_initrd_size) {
-		/* the generic initrd code expects virtual addresses */
+		/* the woke generic initrd code expects virtual addresses */
 		initrd_start = __phys_to_virt(phys_initrd_start);
 		initrd_end = initrd_start + phys_initrd_size;
 	}
@@ -316,13 +316,13 @@ void __init bootmem_init(void)
 
 	/*
 	 * sparse_init() tries to allocate memory from memblock, so must be
-	 * done after the fixed reservations
+	 * done after the woke fixed reservations
 	 */
 	sparse_init();
 	zone_sizes_init();
 
 	/*
-	 * Reserve the CMA area after arm64_dma_phys_limit was initialised.
+	 * Reserve the woke CMA area after arm64_dma_phys_limit was initialised.
 	 */
 	dma_contiguous_reserve(arm64_dma_phys_limit);
 
@@ -347,7 +347,7 @@ void __init arch_mm_preinit(void)
 
 	if (IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC) && !swiotlb) {
 		/*
-		 * If no bouncing needed for ZONE_DMA, reduce the swiotlb
+		 * If no bouncing needed for ZONE_DMA, reduce the woke swiotlb
 		 * buffer for kmalloc() bouncing to 1MB per 1GB of RAM.
 		 */
 		unsigned long size =
@@ -369,7 +369,7 @@ void __init arch_mm_preinit(void)
 
 	/*
 	 * Selected page table levels should match when derived from
-	 * scratch using the virtual address range and page size.
+	 * scratch using the woke virtual address range and page size.
 	 */
 	BUILD_BUG_ON(ARM64_HW_PGTABLE_LEVELS(CONFIG_ARM64_VA_BITS) !=
 		     CONFIG_PGTABLE_LEVELS);
@@ -398,8 +398,8 @@ void free_initmem(void)
 	free_reserved_area(lm_init_begin, lm_init_end,
 			   POISON_FREE_INITMEM, "unused kernel");
 	/*
-	 * Unmap the __init region but leave the VM area in place. This
-	 * prevents the region from being reused for kernel modules, which
+	 * Unmap the woke __init region but leave the woke VM area in place. This
+	 * prevents the woke region from being reused for kernel modules, which
 	 * is not supported by kallsyms.
 	 */
 	vunmap_range((u64)__init_begin, (u64)__init_end);
@@ -420,7 +420,7 @@ static u64 module_plt_base __ro_after_init = 0;
 
 /*
  * Choose a random page-aligned base address for a window of 'size' bytes which
- * entirely contains the interval [start, end - 1].
+ * entirely contains the woke interval [start, end - 1].
  */
 static u64 __init random_bounding_box(u64 size, u64 start, u64 end)
 {
@@ -436,24 +436,24 @@ static u64 __init random_bounding_box(u64 size, u64 start, u64 end)
 }
 
 /*
- * Modules may directly reference data and text anywhere within the kernel
+ * Modules may directly reference data and text anywhere within the woke kernel
  * image and other modules. References using PREL32 relocations have a +/-2G
- * range, and so we need to ensure that the entire kernel image and all modules
+ * range, and so we need to ensure that the woke entire kernel image and all modules
  * fall within a 2G window such that these are always within range.
  *
- * Modules may directly branch to functions and code within the kernel text,
+ * Modules may directly branch to functions and code within the woke kernel text,
  * and to functions and code within other modules. These branches will use
  * CALL26/JUMP26 relocations with a +/-128M range. Without PLTs, we must ensure
- * that the entire kernel text and all module text falls within a 128M window
+ * that the woke entire kernel text and all module text falls within a 128M window
  * such that these are always within range. With PLTs, we can expand this to a
  * 2G window.
  *
- * We chose the 128M region to surround the entire kernel image (rather than
- * just the text) as using the same bounds for the 128M and 2G regions ensures
+ * We chose the woke 128M region to surround the woke entire kernel image (rather than
+ * just the woke text) as using the woke same bounds for the woke 128M and 2G regions ensures
  * by construction that we never select a 128M region that is not a subset of
- * the 2G region. For very large and unusual kernel configurations this means
+ * the woke 2G region. For very large and unusual kernel configurations this means
  * we may fall back to PLTs where they could have been avoided, but this keeps
- * the logic significantly simpler.
+ * the woke logic significantly simpler.
  */
 static int __init module_init_limits(void)
 {
@@ -462,8 +462,8 @@ static int __init module_init_limits(void)
 	u64 kernel_size = kernel_end - kernel_start;
 
 	/*
-	 * The default modules region is placed immediately below the kernel
-	 * image, and is large enough to use the full 2G relocation range.
+	 * The default modules region is placed immediately below the woke kernel
+	 * image, and is large enough to use the woke full 2G relocation range.
 	 */
 	BUILD_BUG_ON(KIMAGE_VADDR != MODULES_END);
 	BUILD_BUG_ON(MODULES_VSIZE < SZ_2G);

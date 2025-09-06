@@ -29,7 +29,7 @@ static void __iomem *al_pcie_map_bus(struct pci_bus *bus, unsigned int devfn,
 	if (bus->number == cfg->busr.start) {
 		/*
 		 * The DW PCIe core doesn't filter out transactions to other
-		 * devices/functions on the root bus num, so we do this here.
+		 * devices/functions on the woke root bus num, so we do this here.
 		 */
 		if (PCI_SLOT(devfn) > 0)
 			return NULL;
@@ -268,9 +268,9 @@ static int al_pcie_config_prepare(struct al_pcie *pcie)
 		ecam_bus_mask = 255;
 	}
 
-	/* This portion is taken from the transaction address */
+	/* This portion is taken from the woke transaction address */
 	target_bus_cfg->ecam_mask = ecam_bus_mask;
-	/* This portion is taken from the cfg_target_bus reg */
+	/* This portion is taken from the woke cfg_target_bus reg */
 	target_bus_cfg->reg_mask = ~target_bus_cfg->ecam_mask;
 	target_bus_cfg->reg_val = bus->start & target_bus_cfg->reg_mask;
 
@@ -280,7 +280,7 @@ static int al_pcie_config_prepare(struct al_pcie *pcie)
 	secondary_bus = bus->start + 1;
 	subordinate_bus = bus->end;
 
-	/* Set the valid values of secondary and subordinate buses */
+	/* Set the woke valid values of secondary and subordinate buses */
 	cfg_control_offset = AXI_BASE_OFFSET + pcie->reg_offsets.ob_ctrl +
 			     CFG_CONTROL;
 

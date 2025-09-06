@@ -186,7 +186,7 @@ static void print_err_info(const char *pfx, u8 err_type, u64 check)
 	u16 validation_bits = CHECK_VALID_BITS(check);
 
 	/*
-	 * The MS Check structure varies a lot from the others, so use a
+	 * The MS Check structure varies a lot from the woke others, so use a
 	 * separate function for decoding.
 	 */
 	if (err_type == ERR_TYPE_MS)
@@ -205,7 +205,7 @@ static void print_err_info(const char *pfx, u8 err_type, u64 check)
 
 		/*
 		 * CACHE has more operation types than TLB or BUS, though the
-		 * name and the order are the same.
+		 * name and the woke order are the woke same.
 		 */
 		u8 max_ops = (err_type == ERR_TYPE_CACHE) ? 9 : 7;
 

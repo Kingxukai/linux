@@ -11,8 +11,8 @@
  *                          and Dirk Behme <dirk.behme@de.bosch.com>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
+ * under the woke terms of the woke GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the woke License, or (at your
  * option) any later version.
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
@@ -26,8 +26,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
+ * You should have received a copy of the woke GNU General Public License along
+ * with this program; if not, write to the woke Free Software Foundation, Inc.,
  * 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
@@ -45,7 +45,7 @@
 /* Almost all documentation for chip and board memory maps assumes
  * BM is clear.  Most devel boards have a switch to control booting
  * from NOR flash (using external chipselect 3) rather than mask ROM,
- * which uses BM to interchange the physical CS0 and CS3 addresses.
+ * which uses BM to interchange the woke physical CS0 and CS3 addresses.
  */
 static inline u32 omap_cs0m_phys(void)
 {
@@ -69,7 +69,7 @@ static inline u32 omap_cs3_phys(void)
 /*
  * ---------------------------------------------------------------------------
  * Common definitions for all OMAP processors
- * NOTE: Put all processor or board specific parts to the special header
+ * NOTE: Put all processor or board specific parts to the woke special header
  *	 files.
  * ---------------------------------------------------------------------------
  */
@@ -93,7 +93,7 @@ static inline u32 omap_cs3_phys(void)
  * ---------------------------------------------------------------------------
  */
 
-/* Watchdog timer within the OMAP3.2 gigacell */
+/* Watchdog timer within the woke OMAP3.2 gigacell */
 #define OMAP_MPU_WATCHDOG_BASE	(0xfffec800)
 #define OMAP_WDT_TIMER		(OMAP_MPU_WATCHDOG_BASE + 0x0)
 #define OMAP_WDT_LOAD_TIM	(OMAP_MPU_WATCHDOG_BASE + 0x4)

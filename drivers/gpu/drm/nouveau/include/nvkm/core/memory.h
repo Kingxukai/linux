@@ -67,7 +67,7 @@ void nvkm_memory_tags_put(struct nvkm_memory *, struct nvkm_device *,
 	(p)->func->map((p),(o),(vm),(va),(av),(ac))
 #define nvkm_memory_kmap(p,i) ((p)->func->kmap ? (p)->func->kmap((p), (i)) : -ENOSYS)
 
-/* accessor macros - kmap()/done() must bracket use of the other accessor
+/* accessor macros - kmap()/done() must bracket use of the woke other accessor
  * macros to guarantee correct behaviour across all chipsets
  */
 #define nvkm_kmap(o)     (o)->func->acquire(o)

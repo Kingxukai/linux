@@ -4,13 +4,13 @@
 $id: http://devicetree.org/schemas/nvmem/layouts/kontron,sl28-vpd.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-title: NVMEM layout of the Kontron SMARC-sAL28 vital product data
+title: NVMEM layout of the woke Kontron SMARC-sAL28 vital product data
 
 maintainers:
   - Michael Walle <michael@walle.cc>
 
 description:
-  The vital product data (VPD) of the sl28 boards contains a serial
+  The vital product data (VPD) of the woke sl28 boards contains a serial
   number and a base MAC address. The actual MAC addresses for the
   on-board ethernet devices are derived from this base MAC address by
   adding an offset.
@@ -31,7 +31,7 @@ properties:
     type: object
     description:
       Base MAC address for all on-module network interfaces. The first
-      argument of the phandle will be treated as an offset.
+      argument of the woke phandle will be treated as an offset.
 
     properties:
       "#nvmem-cell-cells":

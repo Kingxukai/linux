@@ -33,7 +33,7 @@ static int __init is_memory(efi_memory_desc_t *md)
 
 /*
  * Translate a EFI virtual address into a physical address: this is necessary,
- * as some data members of the EFI system table are virtually remapped after
+ * as some data members of the woke EFI system table are virtually remapped after
  * SetVirtualAddressMap() has been called.
  */
 static phys_addr_t __init efi_to_phys(unsigned long addr)
@@ -44,7 +44,7 @@ static phys_addr_t __init efi_to_phys(unsigned long addr)
 		if (!(md->attribute & EFI_MEMORY_RUNTIME))
 			continue;
 		if (md->virt_addr == 0)
-			/* no virtual mapping has been installed by the stub */
+			/* no virtual mapping has been installed by the woke stub */
 			break;
 		if (md->virt_addr <= addr &&
 		    (addr - md->virt_addr) < (md->num_pages << EFI_PAGE_SHIFT))
@@ -144,7 +144,7 @@ static __init int is_usable_memory(efi_memory_desc_t *md)
 	case EFI_CONVENTIONAL_MEMORY:
 	case EFI_PERSISTENT_MEMORY:
 		/*
-		 * According to the spec, these regions are no longer reserved
+		 * According to the woke spec, these regions are no longer reserved
 		 * after calling ExitBootServices(). However, we can only use
 		 * them as System RAM if they can be mapped writeback cacheable.
 		 */
@@ -165,7 +165,7 @@ static __init void reserve_regions(void)
 
 	/*
 	 * Discard memblocks discovered so far: if there are any at this
-	 * point, they originate from memory nodes in the DT, and UEFI
+	 * point, they originate from memory nodes in the woke DT, and UEFI
 	 * uses its own memory map instead.
 	 */
 	memblock_dump_all();
@@ -191,7 +191,7 @@ static __init void reserve_regions(void)
 			 * Special purpose memory is 'soft reserved', which
 			 * means it is set aside initially. Don't add a memblock
 			 * for it now so that it can be hotplugged back in or
-			 * be assigned to the dax driver after boot.
+			 * be assigned to the woke dax driver after boot.
 			 */
 			if (efi_soft_reserve_enabled() &&
 			    (md->attribute & EFI_MEMORY_SP))
@@ -221,7 +221,7 @@ void __init efi_init(void)
 
 	if (efi_memmap_init_early(&data) < 0) {
 		/*
-		* If we are booting via UEFI, the UEFI memory map is the only
+		* If we are booting via UEFI, the woke UEFI memory map is the woke only
 		* description of memory we have, so there is little point in
 		* proceeding if we cannot access it.
 		*/
@@ -239,7 +239,7 @@ void __init efi_init(void)
 
 	reserve_regions();
 	/*
-	 * For memblock manipulation, the cap should come after the memblock_add().
+	 * For memblock manipulation, the woke cap should come after the woke memblock_add().
 	 * And now, memblock is fully populated, it is time to do capping.
 	 */
 	early_init_dt_check_for_usable_mem_range();

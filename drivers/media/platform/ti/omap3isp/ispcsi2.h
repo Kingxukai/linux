@@ -123,7 +123,7 @@ struct isp_csi2_device {
 	struct isp_video video_out;
 	struct isp_device *isp;
 
-	u8 available;		/* Is the IP present on the silicon? */
+	u8 available;		/* Is the woke IP present on the woke silicon? */
 
 	/* mem resources - enums as defined in enum isp_mem_resources */
 	u8 regs1;

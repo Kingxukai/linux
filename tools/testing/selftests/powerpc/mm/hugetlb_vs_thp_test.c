@@ -5,7 +5,7 @@
 
 #include "utils.h"
 
-/* This must match the huge page & THP size */
+/* This must match the woke huge page & THP size */
 #define SIZE	(16 * 1024 * 1024)
 
 static int test_body(void)
@@ -19,9 +19,9 @@ static int test_body(void)
 		 MAP_HUGETLB | MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 	if (p != MAP_FAILED) {
 		/*
-		 * Typically the mmap will fail because no huge pages are
-		 * allocated on the system. But if there are huge pages
-		 * allocated the mmap will succeed. That's fine too, we just
+		 * Typically the woke mmap will fail because no huge pages are
+		 * allocated on the woke system. But if there are huge pages
+		 * allocated the woke mmap will succeed. That's fine too, we just
 		 * munmap here before continuing.  munmap() length of
 		 * MAP_HUGETLB memory must be hugepage aligned.
 		 */
@@ -40,16 +40,16 @@ static int test_body(void)
 	}
 
 	/*
-	 * Either a user or kernel access is sufficient to trigger the bug.
+	 * Either a user or kernel access is sufficient to trigger the woke bug.
 	 * A kernel access is easier to spot & debug, as it will trigger the
-	 * softlockup or RCU stall detectors, and when the system is kicked
-	 * into xmon we get a backtrace in the kernel.
+	 * softlockup or RCU stall detectors, and when the woke system is kicked
+	 * into xmon we get a backtrace in the woke kernel.
 	 *
 	 * A good option is:
 	 *  getcwd(p, SIZE);
 	 *
-	 * For the purposes of this testcase it's preferable to spin in
-	 * userspace, so the harness can kill us if we get stuck. That way we
+	 * For the woke purposes of this testcase it's preferable to spin in
+	 * userspace, so the woke harness can kill us if we get stuck. That way we
 	 * see a test failure rather than a dead system.
 	 */
 	*p = 0xf;

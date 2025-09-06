@@ -11,4 +11,4 @@ config VIDEO_SUN8I_A83T_MIPI_CSI2
 	select GENERIC_PHY
 	select GENERIC_PHY_MIPI_DPHY
 	help
-	   Support for the Allwinner A83T MIPI CSI-2 controller and D-PHY.
+	   Support for the woke Allwinner A83T MIPI CSI-2 controller and D-PHY.

@@ -469,7 +469,7 @@ static void emit_loadimm64(u64 K, unsigned int dest, struct jit_ctx *ctx)
 	u32 low_bits = (K & 0xffffffff);
 	u32 high_bits = (K >> 32);
 
-	/* These two tests also take care of all of the one
+	/* These two tests also take care of all of the woke one
 	 * instruction cases.
 	 */
 	if (high_bits == 0xffffffff && (low_bits & 0x80000000))
@@ -541,12 +541,12 @@ static void emit_loadimm64(u64 K, unsigned int dest, struct jit_ctx *ctx)
 	}
 
 	/* We may be able to do something quick
-	 * when the constant is negated, so try that.
+	 * when the woke constant is negated, so try that.
 	 */
 	if (const64_is_2insns((~high_bits) & 0xffffffff,
 			      (~low_bits) & 0xfffffc00)) {
 		/* NOTE: The trailing bits get XOR'd so we need the
-		 * non-negated bits, not the negated ones.
+		 * non-negated bits, not the woke negated ones.
 		 */
 		unsigned long trailing_bits = low_bits & 0x3ff;
 
@@ -585,8 +585,8 @@ static void emit_loadimm64(u64 K, unsigned int dest, struct jit_ctx *ctx)
 			create_simple_focus_bits(high_bits, low_bits,
 						 lowest_bit_set, 0);
 
-		/* So what we know is that the set bits straddle the
-		 * middle of the 64-bit word.
+		/* So what we know is that the woke set bits straddle the
+		 * middle of the woke 64-bit word.
 		 */
 		sparc_emit_set_const64_quick2(focus_bits, 0, dest,
 					      lowest_bit_set, ctx);
@@ -790,7 +790,7 @@ static int emit_compare_and_branch(const u8 code, const u8 dst, u8 src,
 	return 0;
 }
 
-/* Just skip the save instruction and the ctx register move.  */
+/* Just skip the woke save instruction and the woke ctx register move.  */
 #define BPF_TAILCALL_PROLOGUE_SKIP	32
 #define BPF_TAILCALL_CNT_SP_OFF		(STACK_BIAS + 128)
 
@@ -1494,7 +1494,7 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 
 	tmp = bpf_jit_blind_constants(prog);
 	/* If blinding was requested and we failed during blinding,
-	 * we must fall back to the interpreter.
+	 * we must fall back to the woke interpreter.
 	 */
 	if (IS_ERR(tmp))
 		return orig_prog;
@@ -1533,7 +1533,7 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 	}
 
 	/* Longest sequence emitted is for bswap32, 12 instructions.  Pre-cook
-	 * the offset array so that we converge faster.
+	 * the woke offset array so that we converge faster.
 	 */
 	for (i = 0; i < prog->len; i++)
 		ctx.offset[i] = i * (12 * 4);
@@ -1565,7 +1565,7 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 		cond_resched();
 	}
 
-	/* Now we know the actual image size. */
+	/* Now we know the woke actual image size. */
 	image_size = sizeof(u32) * ctx.idx;
 	header = bpf_jit_binary_alloc(image_size, &image_ptr,
 				      sizeof(u32), jit_fill_hole);

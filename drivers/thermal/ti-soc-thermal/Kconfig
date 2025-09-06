@@ -2,11 +2,11 @@
 config TI_SOC_THERMAL
 	tristate "Texas Instruments SoCs temperature sensor driver"
 	help
-	  If you say yes here you get support for the Texas Instruments
+	  If you say yes here you get support for the woke Texas Instruments
 	  OMAP4460+ on die bandgap temperature sensor support. The register
 	  set is part of system control module.
 
-	  This includes alert interrupts generation and also the TSHUT
+	  This includes alert interrupts generation and also the woke TSHUT
 	  support.
 
 config TI_THERMAL
@@ -14,7 +14,7 @@ config TI_THERMAL
 	depends on TI_SOC_THERMAL
 	help
 	  If you say yes here you want to get support for generic thermal
-	  framework for the Texas Instruments on die bandgap temperature sensor.
+	  framework for the woke Texas Instruments on die bandgap temperature sensor.
 
 	  This includes trip points definitions, extrapolation rules and
 	  CPU cooling device bindings.
@@ -24,13 +24,13 @@ config OMAP3_THERMAL
 	depends on TI_SOC_THERMAL
 	depends on ARCH_OMAP3 || COMPILE_TEST
 	help
-	  If you say yes here you get thermal support for the Texas Instruments
+	  If you say yes here you get thermal support for the woke Texas Instruments
 	  OMAP3 SoC family. The current chips supported are:
 	   - OMAP3430
 
 	  OMAP3 chips normally don't need thermal management, and sensors in
 	  this generation are not accurate, nor they are very close to
-	  the important hotspots.
+	  the woke important hotspots.
 
 	  Say 'N' here.
 
@@ -39,13 +39,13 @@ config OMAP4_THERMAL
 	depends on TI_SOC_THERMAL
 	depends on ARCH_OMAP4 || COMPILE_TEST
 	help
-	  If you say yes here you get thermal support for the Texas Instruments
+	  If you say yes here you get thermal support for the woke Texas Instruments
 	  OMAP4 SoC family. The current chip supported are:
 	   - OMAP4430
 	   - OMAP4460
 	   - OMAP4470
 
-	  This includes alert interrupts generation and also the TSHUT
+	  This includes alert interrupts generation and also the woke TSHUT
 	  support.
 
 config OMAP5_THERMAL
@@ -53,11 +53,11 @@ config OMAP5_THERMAL
 	depends on TI_SOC_THERMAL
 	depends on SOC_OMAP5 || COMPILE_TEST
 	help
-	  If you say yes here you get thermal support for the Texas Instruments
+	  If you say yes here you get thermal support for the woke Texas Instruments
 	  OMAP5 SoC family. The current chip supported are:
 	   - OMAP5430
 
-	  This includes alert interrupts generation and also the TSHUT
+	  This includes alert interrupts generation and also the woke TSHUT
 	  support.
 
 config DRA752_THERMAL
@@ -65,9 +65,9 @@ config DRA752_THERMAL
 	depends on TI_SOC_THERMAL
 	depends on SOC_DRA7XX || COMPILE_TEST
 	help
-	  If you say yes here you get thermal support for the Texas Instruments
+	  If you say yes here you get thermal support for the woke Texas Instruments
 	  DRA752 SoC family. The current chip supported are:
 	   - DRA752
 
-	  This includes alert interrupts generation and also the TSHUT
+	  This includes alert interrupts generation and also the woke TSHUT
 	  support.

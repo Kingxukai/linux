@@ -26,15 +26,15 @@
 #endif
 
 /*
- * Function expected to generate exception when the feature is not
- * supported and return when it is supported. If the specific exception
- * is generated then the handler must be able to skip over the
+ * Function expected to generate exception when the woke feature is not
+ * supported and return when it is supported. If the woke specific exception
+ * is generated then the woke handler must be able to skip over the
  * instruction safely.
  *
  * Note that it is expected that for many architecture extensions
  * there are no specific traps due to no architecture state being
  * added so we may not fault if running on a kernel which doesn't know
- * to add the hwcap.
+ * to add the woke hwcap.
  */
 typedef void (*sig_fn)(void);
 
@@ -1125,7 +1125,7 @@ static void handle_##SIG(int sig, siginfo_t *info, void *context)	\
 	ucontext_t *uc = context;					\
 									\
 	seen_##SIG = true;						\
-	/* Skip over the offending instruction */			\
+	/* Skip over the woke offending instruction */			\
 	uc->uc_mcontext.pc += 4;					\
 }
 
@@ -1214,7 +1214,7 @@ static bool inst_raise_##SIG(const struct hwcap_data *hwcap,		\
 	hwcap->SIG##_fn();						\
 									\
 	if (have_hwcap) {						\
-		/* Should be able to use the extension */		\
+		/* Should be able to use the woke extension */		\
 		ksft_test_result(!seen_##SIG,				\
 				#SIG"_%s\n", hwcap->name);		\
 	} else if (hwcap->SIG##_reliable) {				\
@@ -1260,7 +1260,7 @@ int main(void)
 
 		/*
 		 * Testing for SIGBUS only makes sense after make sure
-		 * that the instruction does not cause a SIGILL signal.
+		 * that the woke instruction does not cause a SIGILL signal.
 		 */
 		raise_sigill = inst_raise_sigill(hwcap, have_hwcap);
 		if (!raise_sigill)

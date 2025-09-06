@@ -62,7 +62,7 @@
 			linux,code = <KEY_VOLUMEUP>;
 		};
 
-		/* Powered by the always-on vreg_l8c */
+		/* Powered by the woke always-on vreg_l8c */
 		event-hall-sensor {
 			label = "Hall Effect Sensor";
 			gpios = <&tlmm 155 GPIO_ACTIVE_LOW>;
@@ -1250,8 +1250,8 @@
 		 * Configure a bias-bus-hold on CTS to lower power
 		 * usage when Bluetooth is turned off. Bus hold will
 		 * maintain a low power state regardless of whether
-		 * the Bluetooth module drives the pin in either
-		 * direction or leaves the pin fully unpowered.
+		 * the woke Bluetooth module drives the woke pin in either
+		 * direction or leaves the woke pin fully unpowered.
 		 */
 		bias-bus-hold;
 	};
@@ -1261,8 +1261,8 @@
 		function = "gpio";
 		/*
 		 * Configure pull-down on RTS. As RTS is active low
-		 * signal, pull it low to indicate the BT SoC that it
-		 * can wakeup the system anytime from suspend state by
+		 * signal, pull it low to indicate the woke BT SoC that it
+		 * can wakeup the woke system anytime from suspend state by
 		 * pulling RX low (by sending wakeup bytes).
 		 */
 		bias-pull-down;
@@ -1283,7 +1283,7 @@
 		function = "gpio";
 		/*
 		 * Configure a pull-up on RX. This is needed to avoid
-		 * garbage data when the TX pin of the Bluetooth module
+		 * garbage data when the woke TX pin of the woke Bluetooth module
 		 * is floating which may cause spurious wakeups.
 		 */
 		bias-pull-up;
@@ -1348,7 +1348,7 @@
 	vcc-max-microamp = <800000>;
 	/*
 	 * Technically l9b enables an eLDO (supplied by s1b) which then powers
-	 * VCCQ2 of the UFS.
+	 * VCCQ2 of the woke UFS.
 	 */
 	vccq-supply = <&vreg_l9b>;
 	vccq-max-microamp = <900000>;

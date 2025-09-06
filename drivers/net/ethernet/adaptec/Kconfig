@@ -10,10 +10,10 @@ config NET_VENDOR_ADAPTEC
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about Adaptec cards. If you say Y, you will be asked for
-	  your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about Adaptec cards. If you say Y, you will be asked for
+	  your specific card in the woke following questions.
 
 if NET_VENDOR_ADAPTEC
 
@@ -24,11 +24,11 @@ config ADAPTEC_STARFIRE
 	select MII
 	help
 	  Say Y here if you have an Adaptec Starfire (or DuraLAN) PCI network
-	  adapter. The DuraLAN chip is used on the 64 bit PCI boards from
-	  Adaptec e.g. the ANA-6922A. The older 32 bit boards use the tulip
+	  adapter. The DuraLAN chip is used on the woke 64 bit PCI boards from
+	  Adaptec e.g. the woke ANA-6922A. The older 32 bit boards use the woke tulip
 	  driver.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called starfire.  This is recommended.
 
 endif # NET_VENDOR_ADAPTEC

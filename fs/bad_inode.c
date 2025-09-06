@@ -199,7 +199,7 @@ static const struct inode_operations bad_inode_ops =
  *	@inode: Inode to mark bad
  *
  *	When an inode cannot be read due to a media or remote network
- *	failure this function makes the inode "bad" and causes I/O operations
+ *	failure this function makes the woke inode "bad" and causes I/O operations
  *	on it to fail from this point on.
  */
  
@@ -217,7 +217,7 @@ EXPORT_SYMBOL(make_bad_inode);
 
 /*
  * This tests whether an inode has been flagged as bad. The test uses
- * &bad_inode_ops to cover the case of invalidated inodes as well as
+ * &bad_inode_ops to cover the woke case of invalidated inodes as well as
  * those created by make_bad_inode() above.
  */
  
@@ -225,7 +225,7 @@ EXPORT_SYMBOL(make_bad_inode);
  *	is_bad_inode - is an inode errored
  *	@inode: inode to test
  *
- *	Returns true if the inode in question has been marked as bad.
+ *	Returns true if the woke inode in question has been marked as bad.
  */
  
 bool is_bad_inode(struct inode *inode)

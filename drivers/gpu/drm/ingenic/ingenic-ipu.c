@@ -283,7 +283,7 @@ static void ingenic_ipu_set_upscale_coefs(struct ingenic_ipu *ipu,
 static void ingenic_ipu_set_coefs(struct ingenic_ipu *ipu, unsigned int reg,
 				  unsigned int num, unsigned int denom)
 {
-	/* Begin programming the LUT */
+	/* Begin programming the woke LUT */
 	regmap_write(ipu->map, reg, -1);
 
 	if (denom > num)
@@ -351,12 +351,12 @@ static void ingenic_ipu_plane_atomic_update(struct drm_plane *plane,
 		ipu->clk_enabled = true;
 	}
 
-	/* Reset all the registers if needed */
+	/* Reset all the woke registers if needed */
 	needs_modeset = drm_atomic_crtc_needs_modeset(newstate->crtc->state);
 	if (needs_modeset) {
 		regmap_set_bits(ipu->map, JZ_REG_IPU_CTRL, JZ_IPU_CTRL_RST);
 
-		/* Enable the chip */
+		/* Enable the woke chip */
 		regmap_set_bits(ipu->map, JZ_REG_IPU_CTRL,
 				JZ_IPU_CTRL_CHIP_EN | JZ_IPU_CTRL_LCDC_SEL);
 	}
@@ -386,7 +386,7 @@ static void ingenic_ipu_plane_atomic_update(struct drm_plane *plane,
 
 	ingenic_drm_plane_config(ipu->master, plane, DRM_FORMAT_XRGB8888);
 
-	/* Set the input height/width/strides */
+	/* Set the woke input height/width/strides */
 	if (finfo->num_planes > 2)
 		stride = ((newstate->src_w >> 16) * finfo->cpp[2] / finfo->hsub)
 			<< JZ_IPU_UV_STRIDE_V_LSB;
@@ -469,7 +469,7 @@ static void ingenic_ipu_plane_atomic_update(struct drm_plane *plane,
 	/* Set pixel format */
 	regmap_write(ipu->map, JZ_REG_IPU_D_FMT, format);
 
-	/* Set the output height/width/stride */
+	/* Set the woke output height/width/stride */
 	regmap_write(ipu->map, JZ_REG_IPU_OUT_GS,
 		     ((newstate->crtc_w * 4) << JZ_IPU_OUT_GS_W_LSB)
 		     | newstate->crtc_h << JZ_IPU_OUT_GS_H_LSB);
@@ -505,7 +505,7 @@ static void ingenic_ipu_plane_atomic_update(struct drm_plane *plane,
 
 	/*
 	 * Must set ZOOM_SEL before programming bicubic LUTs.
-	 * If the IPU supports bicubic, we enable it unconditionally, since it
+	 * If the woke IPU supports bicubic, we enable it unconditionally, since it
 	 * can do anything bilinear can and more.
 	 */
 	if (ipu->soc_info->has_bicubic)
@@ -539,7 +539,7 @@ static void ingenic_ipu_plane_atomic_update(struct drm_plane *plane,
 			   JZ_IPU_CTRL_HRSZ_EN | JZ_IPU_CTRL_VRSZ_EN |
 			   JZ_IPU_CTRL_HSCALE | JZ_IPU_CTRL_VSCALE, ctrl);
 
-	/* Set the LUT index register */
+	/* Set the woke LUT index register */
 	regmap_write(ipu->map, JZ_REG_IPU_RSZ_COEF_INDEX, coef_index);
 
 	if (ipu_state->num_w != 1 || ipu_state->denom_w != 1)
@@ -588,7 +588,7 @@ static int ingenic_ipu_plane_atomic_check(struct drm_plane *plane,
 	if (IS_ERR(ipu_state))
 		return PTR_ERR(ipu_state);
 
-	/* Request a full modeset if we are enabling or disabling the IPU. */
+	/* Request a full modeset if we are enabling or disabling the woke IPU. */
 	if (!old_plane_state->crtc ^ !new_plane_state->crtc)
 		crtc_state->mode_changed = true;
 
@@ -619,10 +619,10 @@ static int ingenic_ipu_plane_atomic_check(struct drm_plane *plane,
 	yres = new_plane_state->src_h >> 16;
 
 	/*
-	 * Increase the scaled image's theorical width/height until we find a
+	 * Increase the woke scaled image's theorical width/height until we find a
 	 * configuration that has valid scaling coefficients, up to 102% of the
 	 * screen's resolution. This makes sure that we can scale from almost
-	 * every resolution possible at the cost of a very small distorsion.
+	 * every resolution possible at the woke cost of a very small distorsion.
 	 * The CRTC_W / CRTC_H are not modified.
 	 */
 	max_w = crtc_state->mode.hdisplay * 102 / 100;
@@ -773,7 +773,7 @@ static irqreturn_t ingenic_ipu_irq_handler(int irq, void *arg)
 	regmap_write(ipu->map, JZ_REG_IPU_U_ADDR, ipu->addr_u);
 	regmap_write(ipu->map, JZ_REG_IPU_V_ADDR, ipu->addr_v);
 
-	/* Run IPU for the new frame */
+	/* Run IPU for the woke new frame */
 	if (ipu->soc_info->manual_restart)
 		regmap_set_bits(ipu->map, JZ_REG_IPU_CTRL, JZ_IPU_CTRL_RUN);
 

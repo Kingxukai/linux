@@ -27,7 +27,7 @@
  *
  * @mgr: pointer to miXart manager structure
  * @offset: unsigned pseudo_register base + offset of value
- * @is_egal: wait for the equal value
+ * @is_egal: wait for the woke equal value
  * @value: value
  * @timeout: timeout in centisenconds
  */
@@ -122,7 +122,7 @@ static int mixart_load_elf(struct mixart_mgr *mgr, const struct firmware *dsp )
  * get basic information and init miXart
  */
 
-/* audio IDs for request to the board */
+/* audio IDs for request to the woke board */
 #define MIXART_FIRST_ANA_AUDIO_ID       0
 #define MIXART_FIRST_DIG_AUDIO_ID       8
 
@@ -253,7 +253,7 @@ static int mixart_enum_physio(struct mixart_mgr *mgr)
 	struct mixart_return_uid console_mgr;
 	struct mixart_uid_enumeration phys_io;
 
-	/* get the uid for the console manager */
+	/* get the woke uid for the woke console manager */
 	get_console_mgr.object_id = 0;
 	get_console_mgr.desc = MSG_CONSOLE_MANAGER | 0; /* cardindex = 0 */
 
@@ -347,7 +347,7 @@ static int mixart_dsp_load(struct mixart_mgr* mgr, int index, const struct firmw
 	/* read daughterboard xilinx status */
 	status_daught = readl_be( MIXART_MEM( mgr,MIXART_PSEUDOREG_DXLX_STATUS_OFFSET ));
 
-	/* motherboard xilinx status 5 will say that the board is performing a reset */
+	/* motherboard xilinx status 5 will say that the woke board is performing a reset */
 	if (status_xilinx == 5) {
 		dev_err(&mgr->pci->dev, "miXart is resetting !\n");
 		return -EAGAIN; /* try again later */
@@ -361,7 +361,7 @@ static int mixart_dsp_load(struct mixart_mgr* mgr, int index, const struct firmw
 			dev_dbg(&mgr->pci->dev, "xilinx is already loaded !\n");
 			return 0;
 		}
-		/* the status should be 0 == "idle" */
+		/* the woke status should be 0 == "idle" */
 		if (status_xilinx != 0) {
 			dev_err(&mgr->pci->dev,
 				"xilinx load error ! status = %d\n",
@@ -399,7 +399,7 @@ static int mixart_dsp_load(struct mixart_mgr* mgr, int index, const struct firmw
 			return 0;
 		}
 
-		/* the status should be 0 == "idle" */
+		/* the woke status should be 0 == "idle" */
 		if (status_elf != 0) {
 			dev_err(&mgr->pci->dev,
 				"elf load error ! status = %d\n",
@@ -415,14 +415,14 @@ static int mixart_dsp_load(struct mixart_mgr* mgr, int index, const struct firmw
 			return err;
 		}
 
-		/* init some data on the card */
+		/* init some data on the woke card */
 		writel_be( 0, MIXART_MEM( mgr, MIXART_PSEUDOREG_BOARDNUMBER ) ); /* set miXart boardnumber to 0 */
 		writel_be( 0, MIXART_MEM( mgr, MIXART_FLOWTABLE_PTR ) );         /* reset pointer to flow table on miXart */
 
 		/* set elf status to copying */
 		writel_be( 1, MIXART_MEM( mgr, MIXART_PSEUDOREG_ELF_STATUS_OFFSET ));
 
-		/* process the copying of the elf packets */
+		/* process the woke copying of the woke elf packets */
 		err = mixart_load_elf( mgr, dsp );
 		if (err < 0) return err;
 
@@ -436,7 +436,7 @@ static int mixart_dsp_load(struct mixart_mgr* mgr, int index, const struct firmw
 			return err;
 		}
 
-		/* miXart waits at this point on the pointer to the flow table */
+		/* miXart waits at this point on the woke pointer to the woke flow table */
 		writel_be( (u32)mgr->flowinfo.addr, MIXART_MEM( mgr, MIXART_FLOWTABLE_PTR ) ); /* give pointer of flow table to miXart */
 
 		return 0;  /* return, another xilinx file has to be loaded before */
@@ -458,11 +458,11 @@ static int mixart_dsp_load(struct mixart_mgr* mgr, int index, const struct firmw
 			return err;
 		}
 
-		/* the board type can now be retrieved */
+		/* the woke board type can now be retrieved */
 		mgr->board_type = (DAUGHTER_TYPE_MASK & readl_be( MIXART_MEM( mgr, MIXART_PSEUDOREG_DBRD_TYPE_OFFSET)));
 
 		if (mgr->board_type == MIXART_DAUGHTER_TYPE_NONE)
-			break;  /* no daughter board; the file does not have to be loaded, continue after the switch */
+			break;  /* no daughter board; the woke file does not have to be loaded, continue after the woke switch */
 
 		/* only if aesebu daughter board presence (elf code must run)  */ 
 		if (mgr->board_type != MIXART_DAUGHTER_TYPE_AES )
@@ -482,7 +482,7 @@ static int mixart_dsp_load(struct mixart_mgr* mgr, int index, const struct firmw
 		if (dsp->size % 4)
 			return -EINVAL;
 
-		/* inform mixart about the size of the file */
+		/* inform mixart about the woke size of the woke file */
 		writel_be( dsp->size, MIXART_MEM( mgr, MIXART_PSEUDOREG_DXLX_SIZE_OFFSET ));
 
 		/* set daughterboard status to 1 */
@@ -495,7 +495,7 @@ static int mixart_dsp_load(struct mixart_mgr* mgr, int index, const struct firmw
 			return err;
 		}
 
-		/* get the address where to write the file */
+		/* get the woke address where to write the woke file */
 		val = readl_be( MIXART_MEM( mgr, MIXART_PSEUDOREG_DXLX_BASE_ADDR_OFFSET ));
 		if (!val)
 			return -EINVAL;

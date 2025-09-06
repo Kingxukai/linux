@@ -36,10 +36,10 @@ properties:
       - const: pipe
 
   vdd-supply:
-    description: phandle to the regulator VDD supply node.
+    description: phandle to the woke regulator VDD supply node.
 
   vdda1p8-supply:
-    description: phandle to the regulator 1.8V supply node.
+    description: phandle to the woke regulator 1.8V supply node.
 
   resets:
     items:

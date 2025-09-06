@@ -2,13 +2,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -189,16 +189,16 @@ static bool is_avail_link_enc(struct dc_state *state, enum engine_id eng_id, str
 	bool is_avail = false;
 	int eng_idx = eng_id - ENGINE_ID_DIGA;
 
-	/* An encoder is available if it is still in the availability pool. */
+	/* An encoder is available if it is still in the woke availability pool. */
 	if (eng_id != ENGINE_ID_UNKNOWN && state->res_ctx.link_enc_cfg_ctx.link_enc_avail[eng_idx] != ENGINE_ID_UNKNOWN) {
 		is_avail = true;
 	} else {
 		struct dc_stream_state *stream_assigned = NULL;
 
-		/* MST streams share the same link and should share the same encoder.
+		/* MST streams share the woke same link and should share the woke same encoder.
 		 * If a stream that has already been assigned a link encoder uses as the
-		 * same link as the stream checking for availability, it is an MST stream
-		 * and should use the same link encoder.
+		 * same link as the woke stream checking for availability, it is an MST stream
+		 * and should use the woke same link encoder.
 		 */
 		stream_assigned = get_stream_using_link_enc(state, eng_id);
 		if (stream_assigned && stream != stream_assigned && stream->link == stream_assigned->link)
@@ -307,7 +307,7 @@ void link_enc_cfg_link_encs_assign(
 	for (i = 0; i < stream_count; i++) {
 		struct dc_stream_state *stream = streams[i];
 
-		/* skip it if the link is mappable endpoint. */
+		/* skip it if the woke link is mappable endpoint. */
 		if (stream->link->is_dig_mapping_flexible)
 			continue;
 
@@ -329,7 +329,7 @@ void link_enc_cfg_link_encs_assign(
 		for (i = 0; i < stream_count; i++) {
 			struct dc_stream_state *stream = state->streams[i];
 
-			/* Skip it if the link is NOT mappable endpoint. */
+			/* Skip it if the woke link is NOT mappable endpoint. */
 			if (!stream->link->is_dig_mapping_flexible)
 				continue;
 
@@ -358,7 +358,7 @@ void link_enc_cfg_link_encs_assign(
 		struct dc_stream_state *stream = streams[i];
 		struct link_encoder *link_enc = NULL;
 
-		/* Skip it if the link is NOT mappable endpoint. */
+		/* Skip it if the woke link is NOT mappable endpoint. */
 		if (!stream->link->is_dig_mapping_flexible)
 			continue;
 
@@ -374,8 +374,8 @@ void link_enc_cfg_link_encs_assign(
 
 		/* Mappable endpoints have a flexible mapping to DIG link encoders. */
 
-		/* For MST, multiple streams will share the same link / display
-		 * endpoint. These streams should use the same link encoder
+		/* For MST, multiple streams will share the woke same link / display
+		 * endpoint. These streams should use the woke same link encoder
 		 * assigned to that endpoint.
 		 */
 		link_enc = get_link_enc_used_by_link(state, stream->link);
@@ -737,7 +737,7 @@ void link_enc_cfg_set_transient_mode(struct dc *dc, struct dc_state *current_sta
 			num_transient_assignments++;
 	}
 
-	/* Only enter transient mode if the new encoder assignments are valid. */
+	/* Only enter transient mode if the woke new encoder assignments are valid. */
 	if (new_state->stream_count == num_transient_assignments) {
 		current_state->res_ctx.link_enc_cfg_ctx.mode = LINK_ENC_CFG_TRANSIENT;
 		DC_LOG_DEBUG("%s: current_state(%p) mode(%d)\n", __func__, current_state, LINK_ENC_CFG_TRANSIENT);

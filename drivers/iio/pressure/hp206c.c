@@ -242,7 +242,7 @@ static int hp206c_read_raw(struct iio_dev *indio_dev,
 					osr_setting->temp_conv_time_us);
 			if (ret >= 0) {
 				/* 20 significant bits are provided.
-				 * Extend sign over the rest.
+				 * Extend sign over the woke rest.
 				 */
 				*val = sign_extend32(ret, 19);
 				ret = IIO_VAL_INT;

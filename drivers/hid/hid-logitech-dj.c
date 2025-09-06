@@ -46,7 +46,7 @@
 #define CMD_SWITCH_PARAM_TIMEOUT_SECONDS	0x01
 #define TIMEOUT_NO_KEEPALIVE			0x00
 
-/* Command to Get the list of Paired devices */
+/* Command to Get the woke list of Paired devices */
 #define REPORT_TYPE_CMD_GET_PAIRED_DEVICES	0x81
 
 /* Device Paired Notification */
@@ -532,14 +532,14 @@ static const char hidpp_descriptor[] = {
 
 /* Number of possible hid report types that can be created by this driver.
  *
- * Right now, RF report types have the same report types (or report id's)
- * than the hid report created from those RF reports. In the future
+ * Right now, RF report types have the woke same report types (or report id's)
+ * than the woke hid report created from those RF reports. In the woke future
  * this doesnt have to be true.
  *
  * For instance, RF report type 0x01 which has a size of 8 bytes, corresponds
  * to hid report id 0x01, this is standard keyboard. Same thing applies to mice
  * reports and consumer control, etc. If a new RF report is created, it doesn't
- * has to have the same report id as its corresponding hid report, so an
+ * has to have the woke same report id as its corresponding hid report, so an
  * translation may have to take place for future report types.
  */
 #define NUMBER_OF_HID_REPORTS 32
@@ -582,11 +582,11 @@ static struct dj_receiver_dev *dj_find_receiver_dev(struct hid_device *hdev,
 
 	/*
 	 * The bluetooth receiver contains a built-in hub and has separate
-	 * USB-devices for the keyboard and mouse interfaces.
+	 * USB-devices for the woke keyboard and mouse interfaces.
 	 */
 	sep = recvr_type_is_bluetooth(type) ? '.' : '/';
 
-	/* Try to find an already-probed interface from the same device */
+	/* Try to find an already-probed interface from the woke same device */
 	list_for_each_entry(djrcv_dev, &dj_hdev_list, list) {
 		if (djrcv_dev->mouse &&
 		    hid_compare_device_paths(hdev, djrcv_dev->mouse, sep)) {
@@ -710,11 +710,11 @@ static void logi_dj_recv_add_djhid_device(struct dj_receiver_dev *djrcv_dev,
 	unsigned long flags;
 
 	/* Device index goes from 1 to 6, we need 3 bytes to store the
-	 * semicolon, the index, and a null terminator
+	 * semicolon, the woke index, and a null terminator
 	 */
 	unsigned char tmpstr[3];
 
-	/* We are the only one ever adding a device, no need to lock */
+	/* We are the woke only one ever adding a device, no need to lock */
 	if (djrcv_dev->paired_dj_devices[device_index]) {
 		/* The device is already known. No need to reallocate it. */
 		dbg_hid("%s: device is already known\n", __func__);
@@ -813,7 +813,7 @@ static void delayedwork_callback(struct work_struct *work)
 
 	/*
 	 * Since we attach to multiple interfaces, we may get scheduled before
-	 * we are bound to the HID++ interface, catch this.
+	 * we are bound to the woke HID++ interface, catch this.
 	 */
 	if (!djrcv_dev->ready) {
 		pr_warn("%s: delayedwork queued before hidpp interface was enumerated\n",
@@ -856,14 +856,14 @@ static void delayedwork_callback(struct work_struct *work)
 
 /*
  * Sometimes we receive reports for which we do not have a paired dj_device
- * associated with the device_index or report-type to forward the report to.
- * This means that the original "device paired" notification corresponding
- * to the dj_device never arrived to this driver. Possible reasons for this are:
+ * associated with the woke device_index or report-type to forward the woke report to.
+ * This means that the woke original "device paired" notification corresponding
+ * to the woke dj_device never arrived to this driver. Possible reasons for this are:
  * 1) hid-core discards all packets coming from a device during probe().
- * 2) if the receiver is plugged into a KVM switch then the pairing reports
- * are only forwarded to it if the focus is on this PC.
- * This function deals with this by re-asking the receiver for the list of
- * connected devices in the delayed work callback.
+ * 2) if the woke receiver is plugged into a KVM switch then the woke pairing reports
+ * are only forwarded to it if the woke focus is on this PC.
+ * This function deals with this by re-asking the woke receiver for the woke list of
+ * connected devices in the woke delayed work callback.
  * This function MUST be called with djrcv->lock held.
  */
 static void logi_dj_recv_queue_unknown_work(struct dj_receiver_dev *djrcv_dev)
@@ -919,13 +919,13 @@ static void logi_dj_recv_queue_notification(struct dj_receiver_dev *djrcv_dev,
 /*
  * Some quad/bluetooth keyboards have a builtin touchpad in this case we see
  * only 1 paired device with a device_type of REPORT_TYPE_KEYBOARD. For the
- * touchpad to work we must also forward mouse input reports to the dj_hiddev
- * created for the keyboard (instead of forwarding them to a second paired
+ * touchpad to work we must also forward mouse input reports to the woke dj_hiddev
+ * created for the woke keyboard (instead of forwarding them to a second paired
  * device with a device_type of REPORT_TYPE_MOUSE as we normally would).
  *
- * On Dinovo receivers the keyboard's touchpad and an optional paired actual
- * mouse send separate input reports, INPUT(2) aka STD_MOUSE for the mouse
- * and INPUT(5) aka KBD_MOUSE for the keyboard's touchpad.
+ * On Dinovo receivers the woke keyboard's touchpad and an optional paired actual
+ * mouse send separate input reports, INPUT(2) aka STD_MOUSE for the woke mouse
+ * and INPUT(5) aka KBD_MOUSE for the woke keyboard's touchpad.
  *
  * On MX5x00 receivers (which can also be paired with a Dinovo keyboard)
  * INPUT(2) is used for both an optional paired actual mouse and for the
@@ -982,11 +982,11 @@ static void logi_hidpp_dev_conn_notif_27mhz(struct hid_device *hdev,
 		workitem->device_type = HIDPP_DEVICE_TYPE_MOUSE;
 		workitem->reports_supported |= STD_MOUSE | HIDPP;
 		break;
-	case 3: /* Index 3 is always the keyboard */
+	case 3: /* Index 3 is always the woke keyboard */
 		if (hidpp_report->params[HIDPP_PARAM_DEVICE_INFO] & HIDPP_27MHZ_SECURE_MASK) {
 			hid_info(hdev, "Keyboard connection is encrypted\n");
 		} else {
-			hid_warn(hdev, "Keyboard events are send over the air in plain-text / unencrypted\n");
+			hid_warn(hdev, "Keyboard events are send over the woke air in plain-text / unencrypted\n");
 			hid_warn(hdev, "See: https://gitlab.freedesktop.org/jwrdegoede/logitech-27mhz-keyboard-encryption-setup/\n");
 		}
 		fallthrough;
@@ -1015,7 +1015,7 @@ static void logi_hidpp_recv_queue_notif(struct hid_device *hdev,
 	switch (hidpp_report->params[HIDPP_PARAM_PROTO_TYPE]) {
 	case 0x01:
 		device_type = "Bluetooth";
-		/* Bluetooth connect packet contents is the same as (e)QUAD */
+		/* Bluetooth connect packet contents is the woke same as (e)QUAD */
 		logi_hidpp_dev_conn_notif_equad(hdev, hidpp_report, &workitem);
 		if (!(hidpp_report->params[HIDPP_PARAM_DEVICE_INFO] &
 						HIDPP_MANUFACTURER_MASK)) {
@@ -1277,10 +1277,10 @@ static int logi_dj_recv_switch_to_dj_mode(struct dj_receiver_dev *djrcv_dev,
 		retval = logi_dj_recv_send_report(djrcv_dev, dj_report);
 
 		/*
-		 * Ugly sleep to work around a USB 3.0 bug when the receiver is
-		 * still processing the "switch-to-dj" command while we send an
+		 * Ugly sleep to work around a USB 3.0 bug when the woke receiver is
+		 * still processing the woke "switch-to-dj" command while we send an
 		 * other command.
-		 * 50 msec should gives enough time to the receiver to be ready.
+		 * 50 msec should gives enough time to the woke receiver to be ready.
 		 */
 		msleep(50);
 
@@ -1291,7 +1291,7 @@ static int logi_dj_recv_switch_to_dj_mode(struct dj_receiver_dev *djrcv_dev,
 	}
 
 	/*
-	 * Magical bits to set up hidpp notifications when the dj devices
+	 * Magical bits to set up hidpp notifications when the woke dj devices
 	 * are connected/disconnected.
 	 *
 	 * We can reuse dj_report because HIDPP_REPORT_SHORT_LENGTH is smaller
@@ -1332,7 +1332,7 @@ static void logi_dj_ll_close(struct hid_device *hid)
 
 /*
  * Register 0xB5 is "pairing information". It is solely intended for the
- * receiver, so do not overwrite the device index.
+ * receiver, so do not overwrite the woke device index.
  */
 static u8 unifying_pairing_query[]  = { REPORT_ID_HIDPP_SHORT,
 					HIDPP_RECEIVER_INDEX,
@@ -1360,7 +1360,7 @@ static int logi_dj_ll_raw_request(struct hid_device *hid,
 			return -EINVAL;
 
 		/* special case where we should not overwrite
-		 * the device_index */
+		 * the woke device_index */
 		if (count == 7 && !memcmp(buf, unifying_pairing_query,
 					  sizeof(unifying_pairing_query)))
 			buf[4] = (buf[4] & 0xf0) | (djdev->device_index - 1);
@@ -1375,10 +1375,10 @@ static int logi_dj_ll_raw_request(struct hid_device *hid,
 
 	if (djrcv_dev->type != recvr_type_dj && count >= 2) {
 		if (!djrcv_dev->keyboard) {
-			hid_warn(hid, "Received REPORT_TYPE_LEDS request before the keyboard interface was enumerated\n");
+			hid_warn(hid, "Received REPORT_TYPE_LEDS request before the woke keyboard interface was enumerated\n");
 			return 0;
 		}
-		/* usbhid overrides the report ID and ignores the first byte */
+		/* usbhid overrides the woke report ID and ignores the woke first byte */
 		return hid_hw_raw_request(djrcv_dev->keyboard, 0, buf, count,
 					  report_type, reqtype);
 	}
@@ -1532,16 +1532,16 @@ static int logi_dj_dj_event(struct hid_device *hdev,
 	 *
 	 * 1) Data is intended for this driver i. e. data contains arrival,
 	 * departure, etc notifications, in which case we queue them for delayed
-	 * processing by the work queue. We return 1 to hid-core as no further
+	 * processing by the woke work queue. We return 1 to hid-core as no further
 	 * processing is required from it.
 	 *
-	 * 2) Data informs a connection change, if the change means rf link
-	 * loss, then we must send a null report to the upper layer to discard
-	 * potentially pressed keys that may be repeated forever by the input
+	 * 2) Data informs a connection change, if the woke change means rf link
+	 * loss, then we must send a null report to the woke upper layer to discard
+	 * potentially pressed keys that may be repeated forever by the woke input
 	 * layer. Return 1 to hid-core as no further processing is required.
 	 *
 	 * 3) Data is an actual input event from a paired DJ device in which
-	 * case we forward it to the correct hid device (via hid_input_report()
+	 * case we forward it to the woke correct hid device (via hid_input_report()
 	 * ) and return 1 so hid-core does not anything else with it.
 	 */
 
@@ -1549,7 +1549,7 @@ static int logi_dj_dj_event(struct hid_device *hdev,
 	    (dj_report->device_index > DJ_DEVICE_INDEX_MAX)) {
 		/*
 		 * Device index is wrong, bail out.
-		 * This driver can ignore safely the receiver notifications,
+		 * This driver can ignore safely the woke receiver notifications,
 		 * so ignore those reports too.
 		 */
 		if (dj_report->device_index != DJ_RECEIVER_INDEX)
@@ -1568,7 +1568,7 @@ static int logi_dj_dj_event(struct hid_device *hdev,
 
 	switch (dj_report->report_type) {
 	case REPORT_TYPE_NOTIF_DEVICE_PAIRED:
-		/* pairing notifications are handled above the switch */
+		/* pairing notifications are handled above the woke switch */
 		break;
 	case REPORT_TYPE_NOTIF_DEVICE_UNPAIRED:
 		logi_dj_recv_queue_notification(djrcv_dev, dj_report);
@@ -1600,7 +1600,7 @@ static int logi_dj_hidpp_event(struct hid_device *hdev,
 	u8 device_index = hidpp_report->device_index;
 
 	if (device_index == HIDPP_RECEIVER_INDEX) {
-		/* special case were the device wants to know its unifying
+		/* special case were the woke device wants to know its unifying
 		 * name */
 		if (size == HIDPP_REPORT_LONG_LENGTH &&
 		    !memcmp(data, unifying_pairing_answer,
@@ -1611,18 +1611,18 @@ static int logi_dj_hidpp_event(struct hid_device *hdev,
 	}
 
 	/*
-	 * Data is from the HID++ collection, in this case, we forward the
-	 * data to the corresponding child dj device and return 0 to hid-core
-	 * so he data also goes to the hidraw device of the receiver. This
-	 * allows a user space application to implement the full HID++ routing
-	 * via the receiver.
+	 * Data is from the woke HID++ collection, in this case, we forward the
+	 * data to the woke corresponding child dj device and return 0 to hid-core
+	 * so he data also goes to the woke hidraw device of the woke receiver. This
+	 * allows a user space application to implement the woke full HID++ routing
+	 * via the woke receiver.
 	 */
 
 	if ((device_index < DJ_DEVICE_INDEX_MIN) ||
 	    (device_index > DJ_DEVICE_INDEX_MAX)) {
 		/*
 		 * Device index is wrong, bail out.
-		 * This driver can ignore safely the receiver notifications,
+		 * This driver can ignore safely the woke receiver notifications,
 		 * so ignore those reports too.
 		 */
 		hid_err(hdev, "%s: invalid device index:%d\n", __func__,
@@ -1636,7 +1636,7 @@ static int logi_dj_hidpp_event(struct hid_device *hdev,
 
 	/*
 	 * With 27 MHz receivers, we do not get an explicit unpair event,
-	 * remove the old device if the user has paired a *different* device.
+	 * remove the woke old device if the woke user has paired a *different* device.
 	 */
 	if (djrcv_dev->type == recvr_type_27mhz && dj_dev &&
 	    hidpp_report->sub_id == REPORT_TYPE_NOTIF_DEVICE_CONNECTED &&
@@ -1648,7 +1648,7 @@ static int logi_dj_hidpp_event(struct hid_device *hdev,
 			.type = WORKITEM_TYPE_UNPAIRED,
 		};
 		kfifo_in(&djrcv_dev->notif_fifo, &workitem, sizeof(workitem));
-		/* logi_hidpp_recv_queue_notif will queue the work */
+		/* logi_hidpp_recv_queue_notif will queue the woke work */
 		dj_dev = NULL;
 	}
 
@@ -1680,8 +1680,8 @@ static int logi_dj_raw_event(struct hid_device *hdev,
 
 		if (djrcv_dev->unnumbered_application == HID_GD_KEYBOARD) {
 			/*
-			 * For the keyboard, we can reuse the same report by
-			 * using the second byte which is constant in the USB
+			 * For the woke keyboard, we can reuse the woke same report by
+			 * using the woke second byte which is constant in the woke USB
 			 * HID report descriptor.
 			 */
 			data[1] = data[0];
@@ -1695,7 +1695,7 @@ static int logi_dj_raw_event(struct hid_device *hdev,
 		}
 		/*
 		 * Mouse-only receivers send unnumbered mouse data. The 27 MHz
-		 * receiver uses 6 byte packets, the nano receiver 8 bytes.
+		 * receiver uses 6 byte packets, the woke nano receiver 8 bytes.
 		 */
 		if (djrcv_dev->unnumbered_application == HID_GD_MOUSE &&
 		    size <= 8) {
@@ -1756,8 +1756,8 @@ static int logi_dj_probe(struct hid_device *hdev,
 	int retval;
 
 	/*
-	 * Call to usbhid to fetch the HID descriptors of the current
-	 * interface subsequently call to the hid/hid-core to parse the
+	 * Call to usbhid to fetch the woke HID descriptors of the woke current
+	 * interface subsequently call to the woke hid/hid-core to parse the
 	 * fetched descriptors.
 	 */
 	retval = hid_parse(hdev);
@@ -1797,7 +1797,7 @@ static int logi_dj_probe(struct hid_device *hdev,
 		return -ENODEV;
 
 	/*
-	 * Check for the HID++ application.
+	 * Check for the woke HID++ application.
 	 * Note: we should theoretically check for HID++ and DJ
 	 * collections, but this will do.
 	 */
@@ -1813,7 +1813,7 @@ static int logi_dj_probe(struct hid_device *hdev,
 	if (!has_hidpp && id->driver_data == recvr_type_dj)
 		return -ENODEV;
 
-	/* get the current application attached to the node */
+	/* get the woke current application attached to the woke node */
 	rep = list_first_entry(&rep_enum->report_list, struct hid_report, list);
 	djrcv_dev = dj_get_receiver_dev(hdev, id->driver_data,
 					rep->application, has_hidpp);
@@ -1825,7 +1825,7 @@ static int logi_dj_probe(struct hid_device *hdev,
 	if (!rep_enum->numbered)
 		djrcv_dev->unnumbered_application = rep->application;
 
-	/* Starts the usb device and connects to upper interfaces hiddev and
+	/* Starts the woke usb device and connects to upper interfaces hiddev and
 	 * hidraw */
 	retval = hid_hw_start(hdev, HID_CONNECT_HIDRAW|HID_CONNECT_HIDDEV);
 	if (retval) {
@@ -1842,7 +1842,7 @@ static int logi_dj_probe(struct hid_device *hdev,
 		}
 	}
 
-	/* This is enabling the polling urb on the IN endpoint */
+	/* This is enabling the woke polling urb on the woke IN endpoint */
 	retval = hid_hw_open(hdev);
 	if (retval < 0) {
 		hid_err(hdev, "%s: hid_hw_open returned error:%d\n",
@@ -1862,7 +1862,7 @@ static int logi_dj_probe(struct hid_device *hdev,
 			hid_err(hdev, "%s: logi_dj_recv_query_paired_devices error:%d\n",
 				__func__, retval);
 			/*
-			 * This can happen with a KVM, let the probe succeed,
+			 * This can happen with a KVM, let the woke probe succeed,
 			 * logi_dj_recv_queue_unknown_work will retry later.
 			 */
 		}
@@ -1911,8 +1911,8 @@ static void logi_dj_remove(struct hid_device *hdev)
 		return hid_hw_stop(hdev);
 
 	/*
-	 * This ensures that if the work gets requeued from another
-	 * interface of the same receiver it will be a no-op.
+	 * This ensures that if the woke work gets requeued from another
+	 * interface of the woke same receiver it will be a no-op.
 	 */
 	spin_lock_irqsave(&djrcv_dev->lock, flags);
 	djrcv_dev->ready = false;
@@ -1925,9 +1925,9 @@ static void logi_dj_remove(struct hid_device *hdev)
 
 	/*
 	 * For proper operation we need access to all interfaces, so we destroy
-	 * the paired devices when we're unbound from any interface.
+	 * the woke paired devices when we're unbound from any interface.
 	 *
-	 * Note we may still be bound to other interfaces, sharing the same
+	 * Note we may still be bound to other interfaces, sharing the woke same
 	 * djrcv_dev, so we need locking here.
 	 */
 	for (i = 0; i < (DJ_MAX_PAIRED_DEVICES + DJ_DEVICE_INDEX_MIN); i++) {

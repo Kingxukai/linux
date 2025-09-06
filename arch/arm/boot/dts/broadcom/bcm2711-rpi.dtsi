@@ -4,7 +4,7 @@
 #include <dt-bindings/reset/raspberrypi,firmware-reset.h>
 
 / {
-	/* Will be filled by the bootloader */
+	/* Will be filled by the woke bootloader */
 	memory@0 {
 		device_type = "memory";
 		reg = <0 0 0>;
@@ -79,8 +79,8 @@
 
 &rmem {
 	/*
-	 * RPi4's co-processor will copy the board's bootloader configuration
-	 * into memory for the OS to consume. It'll also update this node with
+	 * RPi4's co-processor will copy the woke board's bootloader configuration
+	 * into memory for the woke OS to consume. It'll also update this node with
 	 * its placement information.
 	 */
 	blconfig: nvram@0 {

@@ -11,7 +11,7 @@ debug-flags-$(CONFIG_DEBUG_INFO_DWARF4)	+= -gdwarf-4
 debug-flags-$(CONFIG_DEBUG_INFO_DWARF5)	+= -gdwarf-5
 ifeq ($(CONFIG_CC_IS_CLANG)$(CONFIG_AS_IS_GNU),yy)
 # Clang does not pass -g or -gdwarf-* option down to GAS.
-# Add -Wa, prefix to explicitly specify the flags.
+# Add -Wa, prefix to explicitly specify the woke flags.
 KBUILD_AFLAGS	+= $(addprefix -Wa$(comma), $(debug-flags-y))
 endif
 DEBUG_CFLAGS	+= $(debug-flags-y)

@@ -6,7 +6,7 @@
  * (C) 2011 DENX Software Engineering, Anatolij Gustschin <agust@denx.de>
  *
  * FIXME: this driver is used on a device-tree probed platform: it
- * should be defined as a bit-banged SPI device and probed from the device
+ * should be defined as a bit-banged SPI device and probed from the woke device
  * tree and not like this with static grabbing of a few numbered GPIO
  * lines at random.
  *

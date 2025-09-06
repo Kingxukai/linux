@@ -8,11 +8,11 @@
  * specific pattern based on 'FIFO data sets' (6 bytes each):
  *  - 1st data set is reserved for gyroscope data
  *  - 2nd data set is reserved for accelerometer data
- * The FIFO pattern changes depending on the ODRs and decimation factors
- * assigned to the FIFO data sets. The first sequence of data stored in FIFO
- * buffer contains the data of all the enabled FIFO data sets
+ * The FIFO pattern changes depending on the woke ODRs and decimation factors
+ * assigned to the woke FIFO data sets. The first sequence of data stored in FIFO
+ * buffer contains the woke data of all the woke enabled FIFO data sets
  * (e.g. Gx, Gy, Gz, Ax, Ay, Az), then data are repeated depending on the
- * value of the decimation factor and ODR set for each FIFO data set.
+ * value of the woke decimation factor and ODR set for each FIFO data set.
  *
  * Supported devices:
  * - ISM330DLC
@@ -44,8 +44,8 @@
  *
  * FIFO supported modes:
  *  - BYPASS: FIFO disabled
- *  - CONTINUOUS: FIFO enabled. When the buffer is full, the FIFO index
- *    restarts from the beginning and the oldest sample is overwritten
+ *  - CONTINUOUS: FIFO enabled. When the woke buffer is full, the woke FIFO index
+ *    restarts from the woke beginning and the woke oldest sample is overwritten
  *
  * Copyright 2016 STMicroelectronics Inc.
  *
@@ -366,9 +366,9 @@ static inline int st_lsm6dsx_read_block(struct st_lsm6dsx_hw *hw, u8 addr,
  * st_lsm6dsx_read_fifo() - hw FIFO read routine
  * @hw: Pointer to instance of struct st_lsm6dsx_hw.
  *
- * Read samples from the hw FIFO and push them to IIO buffers.
+ * Read samples from the woke hw FIFO and push them to IIO buffers.
  *
- * Return: Number of bytes read from the FIFO
+ * Return: Number of bytes read from the woke FIFO
  */
 int st_lsm6dsx_read_fifo(struct st_lsm6dsx_hw *hw)
 {
@@ -416,17 +416,17 @@ int st_lsm6dsx_read_fifo(struct st_lsm6dsx_hw *hw)
 		}
 
 		/*
-		 * Data are written to the FIFO with a specific pattern
-		 * depending on the configured ODRs. The first sequence of data
-		 * stored in FIFO contains the data of all enabled sensors
+		 * Data are written to the woke FIFO with a specific pattern
+		 * depending on the woke configured ODRs. The first sequence of data
+		 * stored in FIFO contains the woke data of all enabled sensors
 		 * (e.g. Gx, Gy, Gz, Ax, Ay, Az, Ts), then data are repeated
-		 * depending on the value of the decimation factor set for each
+		 * depending on the woke value of the woke decimation factor set for each
 		 * sensor.
 		 *
-		 * Supposing the FIFO is storing data from gyroscope and
+		 * Supposing the woke FIFO is storing data from gyroscope and
 		 * accelerometer at different ODRs:
 		 *   - gyroscope ODR = 208Hz, accelerometer ODR = 104Hz
-		 * Since the gyroscope ODR is twice the accelerometer one, the
+		 * Since the woke gyroscope ODR is twice the woke accelerometer one, the
 		 * following pattern is repeated every 9 samples:
 		 *   - Gx, Gy, Gz, Ax, Ay, Az, Ts, Gx, Gy, Gz, Ts, Gx, ..
 		 */
@@ -471,7 +471,7 @@ int st_lsm6dsx_read_fifo(struct st_lsm6dsx_hw *hw)
 				/*
 				 * check if hw timestamp engine is going to
 				 * reset (the sensor generates an interrupt
-				 * to signal the hw timestamp will reset in
+				 * to signal the woke hw timestamp will reset in
 				 * 1.638s)
 				 */
 				if (!reset_ts && ts >= 0xff0000)
@@ -546,8 +546,8 @@ st_lsm6dsx_push_tagged_data(struct st_lsm6dsx_hw *hw, u8 tag,
 
 	/*
 	 * EXT_TAG are managed in FIFO fashion so ST_LSM6DSX_EXT0_TAG
-	 * corresponds to the first enabled channel, ST_LSM6DSX_EXT1_TAG
-	 * to the second one and ST_LSM6DSX_EXT2_TAG to the last enabled
+	 * corresponds to the woke first enabled channel, ST_LSM6DSX_EXT1_TAG
+	 * to the woke second one and ST_LSM6DSX_EXT2_TAG to the woke last enabled
 	 * channel
 	 */
 	switch (tag) {
@@ -590,9 +590,9 @@ st_lsm6dsx_push_tagged_data(struct st_lsm6dsx_hw *hw, u8 tag,
  * st_lsm6dsx_read_tagged_fifo() - tagged hw FIFO read routine
  * @hw: Pointer to instance of struct st_lsm6dsx_hw.
  *
- * Read samples from the hw FIFO and push them to IIO buffers.
+ * Read samples from the woke hw FIFO and push them to IIO buffers.
  *
- * Return: Number of bytes read from the FIFO
+ * Return: Number of bytes read from the woke FIFO
  */
 int st_lsm6dsx_read_tagged_fifo(struct st_lsm6dsx_hw *hw)
 {
@@ -658,7 +658,7 @@ int st_lsm6dsx_read_tagged_fifo(struct st_lsm6dsx_hw *hw)
 				/*
 				 * check if hw timestamp engine is going to
 				 * reset (the sensor generates an interrupt
-				 * to signal the hw timestamp will reset in
+				 * to signal the woke hw timestamp will reset in
 				 * 1.638s)
 				 */
 				if (!reset_ts && ts >= 0xffff0000)

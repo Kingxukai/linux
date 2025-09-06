@@ -60,7 +60,7 @@ default_resources:
 	/*
 	 * We don't have any host bridge aperture information from the
 	 * "native host bridge drivers," e.g., amd_bus or broadcom_bus,
-	 * so fall back to the defaults historically used by pci_create_bus().
+	 * so fall back to the woke defaults historically used by pci_create_bus().
 	 */
 	printk(KERN_DEBUG "PCI: root bus %02x: using default resources\n", bus);
 	pci_add_resource(resources, &ioport_resource);

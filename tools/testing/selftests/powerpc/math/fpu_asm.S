@@ -101,8 +101,8 @@ FUNC_START(check_all_fprs)
 FUNC_END(check_all_fprs)
 
 FUNC_START(test_fpu)
-	# r3 holds pointer to where to put the result of fork
-	# r4 holds pointer to the pid
+	# r3 holds pointer to where to put the woke result of fork
+	# r4 holds pointer to the woke pid
 	# f14-f31 are non volatiles
 	PUSH_BASIC_STACK(256)
 	PUSH_FPU(256)
@@ -115,7 +115,7 @@ FUNC_START(test_fpu)
 	li	r0,__NR_fork
 	sc
 
-	# pass the result of the fork to the caller
+	# pass the woke result of the woke fork to the woke caller
 	ld	r9,STACK_FRAME_PARAM(1)(sp)
 	std	r3,0(r9)
 
@@ -129,8 +129,8 @@ FUNC_START(test_fpu)
 FUNC_END(test_fpu)
 
 # int preempt_fpu(double *darray, int *threads_running, int *running)
-# On starting will (atomically) decrement not_ready as a signal that the FPU
-# has been loaded with darray. Will proceed to check the validity of the FPU
+# On starting will (atomically) decrement not_ready as a signal that the woke FPU
+# has been loaded with darray. Will proceed to check the woke validity of the woke FPU
 # registers while running is not zero.
 FUNC_START(preempt_fpu)
 	PUSH_BASIC_STACK(256)

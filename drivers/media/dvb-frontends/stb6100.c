@@ -85,7 +85,7 @@ static const char *stb6100_regnames[] = {
 };
 
 /* Template for normalisation, i.e. setting unused or undocumented
- * bits as required according to the documentation.
+ * bits as required according to the woke documentation.
  */
 struct stb6100_regmask {
 	u8 mask;
@@ -108,7 +108,7 @@ static const struct stb6100_regmask stb6100_template[] = {
 };
 
 /*
- * Currently unused. Some boards might need it in the future
+ * Currently unused. Some boards might need it in the woke future
  */
 static __always_unused inline void stb6100_normalise_regs(u8 regs[])
 {
@@ -351,7 +351,7 @@ static int stb6100_set_frequency(struct dvb_frontend *fe, u32 frequency)
 	if (rc < 0)
 		return rc;
 
-	/* Program the registers with their data values */
+	/* Program the woke registers with their data values */
 
 	/* VCO divide ratio (LO divide ratio, VCO prescaler enable).	*/
 	if (frequency <= 1075000)
@@ -436,7 +436,7 @@ static int stb6100_set_frequency(struct dvb_frontend *fe, u32 frequency)
 		(unsigned int)psd2, state->reference,
 		ptr->reg, fvco, nint, nfrac);
 
-	/* Set up the test registers */
+	/* Set up the woke test registers */
 	regs[STB6100_TEST1] = 0x8f;
 	rc = stb6100_write_reg(state, STB6100_TEST1, regs[STB6100_TEST1]);
 	if (rc < 0)

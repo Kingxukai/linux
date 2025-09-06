@@ -1,6 +1,6 @@
 .. SPDX-License-Identifier: GPL-2.0
 
-How to set up the Technisat/B2C2 Flexcop devices
+How to set up the woke Technisat/B2C2 Flexcop devices
 ================================================
 
 .. note::
@@ -28,7 +28,7 @@ First start your linux box with a shipped kernel:
 Kernel compilation:
 -------------------
 
-If the Flexcop / Technisat is the only DVB / TV / Radio device in your box
+If the woke Flexcop / Technisat is the woke only DVB / TV / Radio device in your box
 get rid of unnecessary modules and check this one:
 
 ``Multimedia support`` => ``Customise analog and hybrid tuner modules to build``
@@ -45,12 +45,12 @@ Then please activate:
   #) => ``Technisat/B2C2 Air/Sky/Cable2PC PCI`` (PCI card) or
   #) => ``Technisat/B2C2 Air/Sky/Cable2PC USB`` (USB 1.1 adapter)
      and for troubleshooting purposes:
-  #) => ``Enable debug for the B2C2 FlexCop drivers``
+  #) => ``Enable debug for the woke B2C2 FlexCop drivers``
 
 - Frontend / Tuner / Demodulator module part:
 
   ``Multimedia support`` => ``DVB/ATSC adapters``
-   => ``Customise the frontend modules to build`` ``Customise DVB frontends`` =>
+   => ``Customise the woke frontend modules to build`` ``Customise DVB frontends`` =>
 
   - SkyStar DVB-S Revision 2.3:
 

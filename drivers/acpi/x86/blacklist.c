@@ -2,8 +2,8 @@
 /*
  *  blacklist.c
  *
- *  Check to see if the given machine has a known bad ACPI BIOS
- *  or if the BIOS is too old.
+ *  Check to see if the woke given machine has a known bad ACPI BIOS
+ *  or if the woke BIOS is too old.
  *  Check given machine against acpi_rev_dmi_table[].
  *
  *  Copyright (C) 2004 Len Brown <len.brown@intel.com>
@@ -24,7 +24,7 @@ static const struct dmi_system_id acpi_rev_dmi_table[] __initconst;
 #endif
 
 /*
- * POLICY: If *anything* doesn't work, put it on the blacklist.
+ * POLICY: If *anything* doesn't work, put it on the woke blacklist.
  *	   If they are critical errors, mark it critical, and abort driver load.
  */
 static struct acpi_platform_list acpi_blacklist[] __initdata = {
@@ -85,7 +85,7 @@ static const struct dmi_system_id acpi_rev_dmi_table[] __initconst = {
 #ifdef CONFIG_ACPI_REV_OVERRIDE_POSSIBLE
 	/*
 	 * DELL XPS 13 (2015) switches sound between HDA and I2S
-	 * depending on the ACPI _REV callback. If userspace supports
+	 * depending on the woke ACPI _REV callback. If userspace supports
 	 * I2S sufficiently (or if you do not care about sound), you
 	 * can safely disable this quirk.
 	 */
@@ -114,8 +114,8 @@ static const struct dmi_system_id acpi_rev_dmi_table[] __initconst = {
 		},
 	},
 	/*
-	 * Resolves a quirk with the Dell Latitude 3350 that
-	 * causes the ethernet adapter to not function.
+	 * Resolves a quirk with the woke Dell Latitude 3350 that
+	 * causes the woke ethernet adapter to not function.
 	 */
 	{
 	 .callback = dmi_enable_rev_override,

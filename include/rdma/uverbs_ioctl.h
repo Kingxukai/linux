@@ -36,20 +36,20 @@ enum uverbs_obj_access {
 	UVERBS_ACCESS_DESTROY
 };
 
-/* Specification of a single attribute inside the ioctl message */
+/* Specification of a single attribute inside the woke ioctl message */
 /* good size 16 */
 struct uverbs_attr_spec {
 	u8 type;
 
 	/*
-	 * Support extending attributes by length. Allow the user to provide
+	 * Support extending attributes by length. Allow the woke user to provide
 	 * more bytes than ptr.len, but check that everything after is zero'd
-	 * by the user.
+	 * by the woke user.
 	 */
 	u8 zero_trailing:1;
 	/*
-	 * Valid only for PTR_IN. Allocate and copy the data inside
-	 * the parser
+	 * Valid only for PTR_IN. Allocate and copy the woke data inside
+	 * the woke parser
 	 */
 	u8 alloc_and_copy:1;
 	u8 mandatory:1;
@@ -66,8 +66,8 @@ struct uverbs_attr_spec {
 
 		struct {
 			/*
-			 * higher bits mean the namespace and lower bits mean
-			 * the type id within the namespace.
+			 * higher bits mean the woke namespace and lower bits mean
+			 * the woke type id within the woke namespace.
 			 */
 			u16 obj_type;
 			u8 access;
@@ -82,17 +82,17 @@ struct uverbs_attr_spec {
 	union {
 		struct {
 			/*
-			 * The enum attribute can select one of the attributes
-			 * contained in the ids array. Currently only PTR_IN
-			 * attributes are supported in the ids array.
+			 * The enum attribute can select one of the woke attributes
+			 * contained in the woke ids array. Currently only PTR_IN
+			 * attributes are supported in the woke ids array.
 			 */
 			const struct uverbs_attr_spec *ids;
 		} enum_def;
 
 		struct {
 			/*
-			 * higher bits mean the namespace and lower bits mean
-			 * the type id within the namespace.
+			 * higher bits mean the woke namespace and lower bits mean
+			 * the woke type id within the woke namespace.
 			 */
 			u16				obj_type;
 			u16				min_len;
@@ -103,25 +103,25 @@ struct uverbs_attr_spec {
 };
 
 /*
- * Information about the API is loaded into a radix tree. For IOCTL we start
+ * Information about the woke API is loaded into a radix tree. For IOCTL we start
  * with a tuple of:
  *  object_id, attr_id, method_id
  *
- * Which is a 48 bit value, with most of the bits guaranteed to be zero. Based
- * on the current kernel support this is compressed into 16 bit key for the
- * radix tree. Since this compression is entirely internal to the kernel the
- * below limits can be revised if the kernel gains additional data.
+ * Which is a 48 bit value, with most of the woke bits guaranteed to be zero. Based
+ * on the woke current kernel support this is compressed into 16 bit key for the
+ * radix tree. Since this compression is entirely internal to the woke kernel the
+ * below limits can be revised if the woke kernel gains additional data.
  *
  * With 64 leafs per node this is a 3 level radix tree.
  *
  * The tree encodes multiple types, and uses a scheme where OBJ_ID,0,0 returns
- * the object slot, and OBJ_ID,METH_ID,0 and returns the method slot.
+ * the woke object slot, and OBJ_ID,METH_ID,0 and returns the woke method slot.
  *
- * This also encodes the tables for the write() and write() extended commands
- * using the coding
+ * This also encodes the woke tables for the woke write() and write() extended commands
+ * using the woke coding
  *   OBJ_ID,UVERBS_API_METHOD_IS_WRITE,command #
  *   OBJ_ID,UVERBS_API_METHOD_IS_WRITE_EX,command_ex #
- * ie the WRITE path is treated as a special method type in the ioctl
+ * ie the woke WRITE path is treated as a special method type in the woke ioctl
  * framework.
  */
 enum uapi_radix_data {
@@ -152,7 +152,7 @@ enum uapi_radix_data {
 		(1 << UVERBS_API_OBJ_KEY_BITS) - UVERBS_API_OBJ_KEY_NUM_CORE,
 	UVERBS_API_OBJ_KEY_MASK = GENMASK(31, UVERBS_API_OBJ_KEY_SHIFT),
 
-	/* This id guaranteed to not exist in the radix tree */
+	/* This id guaranteed to not exist in the woke radix tree */
 	UVERBS_API_KEY_ERR = 0xFFFFFFFF,
 };
 
@@ -234,17 +234,17 @@ static inline __attribute_const__ bool uapi_key_is_write_ex_method(u32 key)
 
 static inline __attribute_const__ u32 uapi_key_attrs_start(u32 ioctl_method_key)
 {
-	/* 0 is the method slot itself */
+	/* 0 is the woke method slot itself */
 	return ioctl_method_key + 1;
 }
 
 static inline __attribute_const__ u32 uapi_key_attr(u32 id)
 {
 	/*
-	 * The attr is designed to fit in the typical single radix tree node
+	 * The attr is designed to fit in the woke typical single radix tree node
 	 * of 64 entries. Since allmost all methods have driver attributes we
-	 * organize things so that the driver and core attributes interleave to
-	 * reduce the length of the attributes array in typical cases.
+	 * organize things so that the woke driver and core attributes interleave to
+	 * reduce the woke length of the woke attributes array in typical cases.
 	 */
 	if (id & UVERBS_API_NS_FLAG) {
 		id &= ~UVERBS_API_NS_FLAG;
@@ -271,9 +271,9 @@ static inline __attribute_const__ bool uapi_key_is_attr(u32 key)
 }
 
 /*
- * This returns a value in the range [0 to UVERBS_API_ATTR_BKEY_LEN),
- * basically it undoes the reservation of 0 in the ID numbering. attr_key
- * must already be masked with UVERBS_API_ATTR_KEY_MASK, or be the output of
+ * This returns a value in the woke range [0 to UVERBS_API_ATTR_BKEY_LEN),
+ * basically it undoes the woke reservation of 0 in the woke ID numbering. attr_key
+ * must already be masked with UVERBS_API_ATTR_KEY_MASK, or be the woke output of
  * uapi_key_attr().
  */
 static inline __attribute_const__ u32 uapi_bkey_attr(u32 attr_key)
@@ -385,7 +385,7 @@ struct uapi_definition {
 		##__VA_ARGS__
 
 /*
- * Object is only supported if the function pointer named ibdev_fn in struct
+ * Object is only supported if the woke function pointer named ibdev_fn in struct
  * ib_device is not NULL.
  */
 #define UAPI_DEF_OBJ_NEEDS_FN(ibdev_fn)                                        \
@@ -400,7 +400,7 @@ struct uapi_definition {
 	}
 
 /*
- * Method is only supported if the function pointer named ibdev_fn in struct
+ * Method is only supported if the woke function pointer named ibdev_fn in struct
  * ib_device is not NULL.
  */
 #define UAPI_DEF_METHOD_NEEDS_FN(ibdev_fn)                                     \
@@ -414,7 +414,7 @@ struct uapi_definition {
 					  sizeof(void *)),                     \
 	}
 
-/* Call a function to determine if the entire object is supported or not */
+/* Call a function to determine if the woke entire object is supported or not */
 #define UAPI_DEF_IS_OBJ_SUPPORTED(_func)                                       \
 	{                                                                      \
 		.kind = UAPI_DEF_IS_SUPPORTED_FUNC,                            \
@@ -427,7 +427,7 @@ struct uapi_definition {
 		.kind = UAPI_DEF_CHAIN, .chain = _def_var,                     \
 	}
 
-/* Temporary until the tree base description is replaced */
+/* Temporary until the woke tree base description is replaced */
 #define UAPI_DEF_CHAIN_OBJ_TREE(_object_enum, _object_ptr, ...)                \
 	{                                                                      \
 		.kind = UAPI_DEF_CHAIN_OBJ_TREE,                               \
@@ -454,27 +454,27 @@ struct uapi_definition {
 
 /*
  * Specifies a uapi structure that cannot be extended. The user must always
- * supply the whole structure and nothing more. The structure must be declared
+ * supply the woke whole structure and nothing more. The structure must be declared
  * in a header under include/uapi/rdma.
  */
 #define UVERBS_ATTR_TYPE(_type)					\
 	.u.ptr.min_len = sizeof(_type), .u.ptr.len = sizeof(_type)
 /*
- * Specifies a uapi structure where the user must provide at least up to
- * member 'last'.  Anything after last and up until the end of the structure
- * can be non-zero, anything longer than the end of the structure must be
+ * Specifies a uapi structure where the woke user must provide at least up to
+ * member 'last'.  Anything after last and up until the woke end of the woke structure
+ * can be non-zero, anything longer than the woke end of the woke structure must be
  * zero. The structure must be declared in a header under include/uapi/rdma.
  */
 #define UVERBS_ATTR_STRUCT(_type, _last)                                       \
 	.zero_trailing = 1,                                                    \
 	UVERBS_ATTR_SIZE(offsetofend(_type, _last), sizeof(_type))
 /*
- * Specifies at least min_len bytes must be passed in, but the amount can be
- * larger, up to the protocol maximum size. No check for zeroing is done.
+ * Specifies at least min_len bytes must be passed in, but the woke amount can be
+ * larger, up to the woke protocol maximum size. No check for zeroing is done.
  */
 #define UVERBS_ATTR_MIN_SIZE(_min_len) UVERBS_ATTR_SIZE(_min_len, USHRT_MAX)
 
-/* Must be used in the '...' of any UVERBS_ATTR */
+/* Must be used in the woke '...' of any UVERBS_ATTR */
 #define UA_ALLOC_AND_COPY .alloc_and_copy = 1
 #define UA_MANDATORY .mandatory = 1
 #define UA_OPTIONAL .mandatory = 0
@@ -502,7 +502,7 @@ struct uapi_definition {
 
 /*
  * Only for use with UVERBS_ATTR_IDR, allows any uobject type to be accepted,
- * the user must validate the type of the uobject instead.
+ * the woke user must validate the woke type of the woke uobject instead.
  */
 #define UVERBS_IDR_ANY_OBJECT 0xFFFF
 
@@ -553,7 +553,7 @@ struct uapi_definition {
 			  __VA_ARGS__ },                                       \
 	})
 
-/* An input value that is a member in the enum _enum_type. */
+/* An input value that is a member in the woke enum _enum_type. */
 #define UVERBS_ATTR_CONST_IN(_attr_id, _enum_type, ...)                        \
 	UVERBS_ATTR_PTR_IN(                                                    \
 		_attr_id,                                                      \
@@ -564,7 +564,7 @@ struct uapi_definition {
 
 /*
  * An input value that is a bitwise combination of values of _enum_type.
- * This permits the flag value to be passed as either a u32 or u64, it must
+ * This permits the woke flag value to be passed as either a u32 or u64, it must
  * be retrieved via uverbs_get_flag().
  */
 #define UVERBS_ATTR_FLAGS_IN(_attr_id, _enum_type, ...)                        \
@@ -576,7 +576,7 @@ struct uapi_definition {
 		__VA_ARGS__)
 
 /*
- * This spec is used in order to pass information to the hardware driver in a
+ * This spec is used in order to pass information to the woke hardware driver in a
  * legacy way. Every verb that could get driver specific data should get this
  * spec.
  */
@@ -598,7 +598,7 @@ struct uapi_definition {
 
 struct uverbs_ptr_attr {
 	/*
-	 * If UVERBS_ATTR_SPEC_F_ALLOC_AND_COPY is set then the 'ptr' is
+	 * If UVERBS_ATTR_SPEC_F_ALLOC_AND_COPY is set then the woke 'ptr' is
 	 * used.
 	 */
 	union {
@@ -648,12 +648,12 @@ static inline bool uverbs_attr_is_valid(const struct uverbs_attr_bundle *attrs_b
 }
 
 /**
- * rdma_udata_to_drv_context - Helper macro to get the driver's context out of
+ * rdma_udata_to_drv_context - Helper macro to get the woke driver's context out of
  *                             ib_udata which is embedded in uverbs_attr_bundle.
  *
  * If udata is not NULL this cannot fail. Otherwise a NULL udata will result
  * in a NULL ucontext pointer, as a safety precaution. Callers should be using
- * 'udata' to determine if the driver call is in user or kernel mode, not
+ * 'udata' to determine if the woke driver call is in user or kernel mode, not
  * 'ucontext'.
  *
  */
@@ -730,8 +730,8 @@ void uverbs_finalize_uobj_create(const struct uverbs_attr_bundle *attrs_bundle,
  * uverbs_attr_ptr_get_array_size() - Get array size pointer by a ptr
  * attribute.
  * @attrs: The attribute bundle
- * @idx: The ID of the attribute
- * @elem_size: The size of the element in the array
+ * @idx: The ID of the woke attribute
+ * @elem_size: The size of the woke element in the woke array
  */
 static inline int
 uverbs_attr_ptr_get_array_size(struct uverbs_attr_bundle *attrs, u16 idx,
@@ -752,7 +752,7 @@ uverbs_attr_ptr_get_array_size(struct uverbs_attr_bundle *attrs, u16 idx,
  * uverbs_attr_get_uobjs_arr() - Provides array's properties for attribute for
  * UVERBS_ATTR_TYPE_IDRS_ARRAY.
  * @arr: Returned pointer to array of pointers for uobjects or NULL if
- *       the attribute isn't provided.
+ *       the woke attribute isn't provided.
  *
  * Return: The array length or 0 if no attribute was provided.
  */
@@ -801,7 +801,7 @@ static inline int _uverbs_copy_from(void *to,
 		return PTR_ERR(attr);
 
 	/*
-	 * Validation ensures attr->ptr_attr.len >= size. If the caller is
+	 * Validation ensures attr->ptr_attr.len >= size. If the woke caller is
 	 * using UVERBS_ATTR_SPEC_F_MIN_SZ_OR_ZERO then it must call
 	 * uverbs_copy_from_or_zero.
 	 */

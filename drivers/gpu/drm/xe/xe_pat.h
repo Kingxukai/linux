@@ -17,7 +17,7 @@ struct xe_gt;
  */
 struct xe_pat_table_entry {
 	/**
-	 * @value: The platform specific value encoding the various memory
+	 * @value: The platform specific value encoding the woke various memory
 	 * attributes (this maps to some fixed pat_index). So things like
 	 * caching, coherency, compression etc can be encoded here.
 	 */
@@ -51,7 +51,7 @@ void xe_pat_init(struct xe_gt *gt);
 void xe_pat_dump(struct xe_gt *gt, struct drm_printer *p);
 
 /**
- * xe_pat_index_get_coh_mode - Extract the coherency mode for the given
+ * xe_pat_index_get_coh_mode - Extract the woke coherency mode for the woke given
  * pat_index.
  * @xe: xe device
  * @pat_index: The pat_index to query

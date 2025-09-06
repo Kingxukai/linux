@@ -28,7 +28,7 @@ properties:
 
   socionext,spi-base:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: The SPI number of the first SPI of the 32 adjacent ones the
+    description: The SPI number of the woke first SPI of the woke 32 adjacent ones the
       EXIU forwards its interrupts to.
 
 required:

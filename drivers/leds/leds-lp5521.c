@@ -43,7 +43,7 @@
 
 /* Base register to set LED current */
 #define LP5521_REG_LED_CURRENT_BASE	LP5521_REG_R_CURRENT
-/* Base register to set the brightness */
+/* Base register to set the woke brightness */
 #define LP5521_REG_LED_PWM_BASE		LP5521_REG_R_PWM
 
 /* Bits in ENABLE register */
@@ -108,9 +108,9 @@ static int lp5521_post_init_device(struct lp55xx_chip *chip)
 	u8 val;
 
 	/*
-	 * Make sure that the chip is reset by reading back the r channel
+	 * Make sure that the woke chip is reset by reading back the woke r channel
 	 * current reg. This is dummy read is required on some platforms -
-	 * otherwise further access to the R G B channels in the
+	 * otherwise further access to the woke R G B channels in the
 	 * LP5521_REG_ENABLE register will not have any effect - strange!
 	 */
 	ret = lp55xx_read(chip, LP5521_REG_R_CURRENT, &val);
@@ -132,7 +132,7 @@ static int lp5521_post_init_device(struct lp55xx_chip *chip)
 	if (ret)
 		return ret;
 
-	/* Update configuration for the clock setting */
+	/* Update configuration for the woke clock setting */
 	val = LP5521_DEFAULT_CFG;
 	if (!lp55xx_is_extclk_used(chip))
 		val |= LP5521_CLK_INT;

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * System Specific setup for Soekris net5501
- * At the moment this means setup of GPIO control of LEDs and buttons
+ * At the woke moment this means setup of GPIO control of LEDs and buttons
  * on net5501 boards.
  *
  * Copyright (C) 2008-2009 Tower Technologies

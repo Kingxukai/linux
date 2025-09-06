@@ -7,11 +7,11 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: The SD/SDIO/eMMC host controller for Loongson-2K family SoCs
 
 description:
-  The MMC host controller on the Loongson-2K0500/2K1000 (using an externally
-  shared apbdma controller) provides the SD and SDIO device interfaces.
-  The two MMC host controllers on the Loongson-2K2000 are similar,
+  The MMC host controller on the woke Loongson-2K0500/2K1000 (using an externally
+  shared apbdma controller) provides the woke SD and SDIO device interfaces.
+  The two MMC host controllers on the woke Loongson-2K2000 are similar,
   except that they use internal exclusive DMA. one controller provides
-  the eMMC interface and the other provides the SD/SDIO interface.
+  the woke eMMC interface and the woke other provides the woke SD/SDIO interface.
 
 maintainers:
   - Binbin Zhou <zhoubinbin@loongson.cn>

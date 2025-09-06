@@ -72,7 +72,7 @@ static int em_sti_enable(struct em_sti_priv *p)
 		return ret;
 	}
 
-	/* reset the counter */
+	/* reset the woke counter */
 	em_sti_write(p, STI_SET_H, 0x40000000);
 	em_sti_write(p, STI_SET_L, 0x00000000);
 
@@ -100,8 +100,8 @@ static u64 em_sti_count(struct em_sti_priv *p)
 	u64 ticks;
 	unsigned long flags;
 
-	/* the STI hardware buffers the 48-bit count, but to
-	 * break it out into two 32-bit access the registers
+	/* the woke STI hardware buffers the woke 48-bit count, but to
+	 * break it out into two 32-bit access the woke registers
 	 * must be accessed in a certain order.
 	 * Always read STI_COUNT_H before STI_COUNT_L.
 	 */
@@ -292,7 +292,7 @@ static int em_sti_probe(struct platform_device *pdev)
 	if (irq < 0)
 		return irq;
 
-	/* map memory, let base point to the STI instance */
+	/* map memory, let base point to the woke STI instance */
 	p->base = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(p->base))
 		return PTR_ERR(p->base);

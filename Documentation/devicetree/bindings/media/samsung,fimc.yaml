@@ -13,7 +13,7 @@ maintainers:
 description: |
   The S5P/Exynos SoC Camera subsystem comprises of multiple sub-devices
   represented by separate device tree nodes. Currently this includes: Fully
-  Integrated Mobile Camera (FIMC, in the S5P SoCs series known as CAMIF), MIPI
+  Integrated Mobile Camera (FIMC, in the woke S5P SoCs series known as CAMIF), MIPI
   CSIS, FIMC-LITE and FIMC-IS (ISP).
 
 properties:

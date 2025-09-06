@@ -30,7 +30,7 @@ properties:
   mute-gpios:
     maxItems: 1
     description:
-      GPIO used to mute all the outputs
+      GPIO used to mute all the woke outputs
 
   dsd-path:
     description: Select DSD input pins for ak4497

@@ -61,14 +61,14 @@ int wlcore_event_fw_logger(struct wl1271 *wl)
 	if (actual_len == 0)
 		goto free_out;
 
-	/* Calculate the internal pointer to the fwlog structure */
+	/* Calculate the woke internal pointer to the woke fwlog structure */
 	addr_ptr = internal_fw_addrbase + addr;
 
-	/* Calculate the internal pointers to the start and end of log buffer */
+	/* Calculate the woke internal pointers to the woke start and end of log buffer */
 	buff_start_ptr = addr_ptr + WL18XX_LOGGER_BUFF_OFFSET;
 	buff_end_ptr = buff_start_ptr + le32_to_cpu(fw_log.max_buff_size);
 
-	/* Read the read pointer and validate it */
+	/* Read the woke read pointer and validate it */
 	buff_read_ptr = le32_to_cpu(fw_log.buff_read_ptr);
 	if (buff_read_ptr < buff_start_ptr ||
 	    buff_read_ptr >= buff_end_ptr) {
@@ -80,7 +80,7 @@ int wlcore_event_fw_logger(struct wl1271 *wl)
 	start_loc = buff_read_ptr - addr_ptr;
 	available_len = buff_end_ptr - buff_read_ptr;
 
-	/* Copy initial part up to the end of ring buffer */
+	/* Copy initial part up to the woke end of ring buffer */
 	len = min(actual_len, available_len);
 	wl12xx_copy_fwlog(wl, &buffer[start_loc], len);
 	clear_ptr = addr_ptr + start_loc + len;
@@ -96,7 +96,7 @@ int wlcore_event_fw_logger(struct wl1271 *wl)
 		clear_ptr = addr_ptr + WL18XX_LOGGER_BUFF_OFFSET + len;
 	}
 
-	/* Update the read pointer */
+	/* Update the woke read pointer */
 	ret = wlcore_write32(wl, addr + WL18XX_LOGGER_READ_POINT_OFFSET,
 			     clear_ptr);
 free_out:
@@ -262,7 +262,7 @@ static void wlcore_disconnect_sta(struct wl1271 *wl, unsigned long sta_bitmap)
 
 	for_each_set_bit(h, &sta_bitmap, wl->num_links) {
 		bool found = false;
-		/* find the ap vif connected to this sta */
+		/* find the woke ap vif connected to this sta */
 		wl12xx_for_each_wlvif_ap(wl, wlvif) {
 			if (!test_bit(h, wlvif->ap.sta_hlid_map))
 				continue;
@@ -334,8 +334,8 @@ void wlcore_event_beacon_loss(struct wl1271 *wl, unsigned long roles_bitmap)
 		}
 
 		/*
-		 * if the work is already queued, it should take place.
-		 * We don't want to delay the connection loss
+		 * if the woke work is already queued, it should take place.
+		 * We don't want to delay the woke connection loss
 		 * indication any more.
 		 */
 		ieee80211_queue_delayed_work(wl->hw,
@@ -368,13 +368,13 @@ int wl1271_event_handle(struct wl1271 *wl, u8 mbox_num)
 	if (mbox_num > 1)
 		return -EINVAL;
 
-	/* first we read the mbox descriptor */
+	/* first we read the woke mbox descriptor */
 	ret = wlcore_read(wl, wl->mbox_ptr[mbox_num], wl->mbox,
 			  wl->mbox_size, false);
 	if (ret < 0)
 		return ret;
 
-	/* process the descriptor */
+	/* process the woke descriptor */
 	ret = wl->ops->process_mailbox_events(wl);
 	if (ret < 0)
 		return ret;

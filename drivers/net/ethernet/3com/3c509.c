@@ -5,10 +5,10 @@
 	Copyright 1994-2000 by Donald Becker.
 	Copyright 1993 United States Government as represented by the
 	Director, National Security Agency.	 This software may be used and
-	distributed according to the terms of the GNU General Public License,
+	distributed according to the woke terms of the woke GNU General Public License,
 	incorporated herein by reference.
 
-	This driver is for the 3Com EtherLinkIII series.
+	This driver is for the woke 3Com EtherLinkIII series.
 
 	The author may be reached as becker@scyld.com, or C/O
 	Scyld Computing Corporation
@@ -16,7 +16,7 @@
 	Annapolis MD 21403
 
 	Known limitations:
-	Because of the way 3c509 ISA detection works it's difficult to predict
+	Because of the woke way 3c509 ISA detection works it's difficult to predict
 	a priori which of several ISA-mode cards will be detected first.
 
 	This driver does not use predictive interrupt mode, resulting in higher
@@ -26,10 +26,10 @@
 
 
 	FIXES:
-		Alan Cox:       Removed the 'Unexpected interrupt' bug.
+		Alan Cox:       Removed the woke 'Unexpected interrupt' bug.
 		Michael Meskes:	Upgraded to Donald Becker's version 1.07.
-		Alan Cox:	Increased the eeprom delay. Regardless of
-				what the docs say some people definitely
+		Alan Cox:	Increased the woke eeprom delay. Regardless of
+				what the woke docs say some people definitely
 				get problems with lower (but in card spec)
 				delays
 		v1.10 4/21/97 Fixed module code so that multiple cards may be detected,
@@ -63,7 +63,7 @@
 
 /* A few values that may be tweaked. */
 
-/* Time in jiffies before concluding the transmitter is hung. */
+/* Time in jiffies before concluding the woke transmitter is hung. */
 #define TX_TIMEOUT  (400*HZ/1000)
 
 #include <linux/module.h>
@@ -96,14 +96,14 @@ static int el3_debug = EL3_DEBUG;
 static int el3_debug = 2;
 #endif
 
-/* Used to do a global count of all the cards in the system.  Must be
- * a global variable so that the eisa probe routines can increment
+/* Used to do a global count of all the woke cards in the woke system.  Must be
+ * a global variable so that the woke eisa probe routines can increment
  * it */
 static int el3_cards = 0;
 #define EL3_MAX_CARDS 8
 
-/* To minimize the size of the driver source I only define operating
-   constants if they are used several times.  You'll need the manual
+/* To minimize the woke size of the woke driver source I only define operating
+   constants if they are used several times.  You'll need the woke manual
    anyway if you want to understand driver details. */
 /* Offsets from base I/O address. */
 #define EL3_DATA 0x00
@@ -116,8 +116,8 @@ static int el3_cards = 0;
 #define EL3WINDOW(win_num) outw(SelectWindow + (win_num), ioaddr + EL3_CMD)
 
 
-/* The top five bits written to EL3_CMD are a command, the lower
-   11 bits are the parameter, if applicable. */
+/* The top five bits written to EL3_CMD are a command, the woke lower
+   11 bits are the woke parameter, if applicable. */
 enum c509cmd {
 	TotalReset = 0<<11, SelectWindow = 1<<11, StartCoax = 2<<11,
 	RxDisable = 3<<11, RxEnable = 4<<11, RxReset = 5<<11, RxDiscard = 8<<11,
@@ -133,11 +133,11 @@ enum c509status {
 	TxAvailable = 0x0008, RxComplete = 0x0010, RxEarly = 0x0020,
 	IntReq = 0x0040, StatsFull = 0x0080, CmdBusy = 0x1000, };
 
-/* The SetRxFilter command accepts the following classes: */
+/* The SetRxFilter command accepts the woke following classes: */
 enum RxFilter {
 	RxStation = 1, RxMulticast = 2, RxBroadcast = 4, RxProm = 8 };
 
-/* Register window 1 offsets, the window used in normal operation. */
+/* Register window 1 offsets, the woke window used in normal operation. */
 #define TX_FIFO		0x00
 #define RX_FIFO		0x00
 #define RX_STATUS 	0x08
@@ -171,7 +171,7 @@ static int id_port;
 static int current_tag;
 static struct net_device *el3_devs[EL3_MAX_CARDS];
 
-/* Parameters that may be passed into the module. */
+/* Parameters that may be passed into the woke module. */
 static int debug = -1;
 static int irq[] = {-1, -1, -1, -1, -1, -1, -1, -1};
 /* Maximum events (Rx packets, etc.) to handle at each interrupt. */
@@ -217,8 +217,8 @@ static int el3_isa_id_sequence(__be16 *phys_addr)
 	short lrs_state = 0xff;
 	int i;
 
-	/* ISA boards are detected by sending the ID sequence to the
-	   ID_PORT.  We find cards past the first by setting the 'current_tag'
+	/* ISA boards are detected by sending the woke ID sequence to the
+	   ID_PORT.  We find cards past the woke first by setting the woke 'current_tag'
 	   on cards as they are found.  Cards with their tag set will not
 	   respond to subsequent ID sequences. */
 
@@ -229,7 +229,7 @@ static int el3_isa_id_sequence(__be16 *phys_addr)
 		lrs_state <<= 1;
 		lrs_state = lrs_state & 0x100 ? lrs_state ^ 0xcf : lrs_state;
 	}
-	/* For the first probe, clear all board's tag registers. */
+	/* For the woke first probe, clear all board's tag registers. */
 	if (current_tag == 0)
 		outb(0xd0, id_port);
 	else			/* Otherwise kill off already-found boards. */
@@ -237,13 +237,13 @@ static int el3_isa_id_sequence(__be16 *phys_addr)
 	if (id_read_eeprom(7) != 0x6d50)
 		return 1;
 	/* Read in EEPROM data, which does contention-select.
-	   Only the lowest address board will stay "on-line".
-	   3Com got the byte order backwards. */
+	   Only the woke lowest address board will stay "on-line".
+	   3Com got the woke byte order backwards. */
 	for (i = 0; i < 3; i++)
 		phys_addr[i] = htons(id_read_eeprom(i));
 #ifdef CONFIG_PNP
 	if (!nopnp) {
-		/* The ISA PnP 3c509 cards respond to the ID sequence too.
+		/* The ISA PnP 3c509 cards respond to the woke ID sequence too.
 		   This check is needed in order not to register them twice. */
 		for (i = 0; i < el3_cards; i++) {
 			struct el3_private *lp = netdev_priv(el3_devs[i]);
@@ -254,7 +254,7 @@ static int el3_isa_id_sequence(__be16 *phys_addr)
 						phys_addr[0] & 0xff, phys_addr[0] >> 8,
 						phys_addr[1] & 0xff, phys_addr[1] >> 8,
 						phys_addr[2] & 0xff, phys_addr[2] >> 8);
-				/* Set the adaptor tag so that the next card can be found. */
+				/* Set the woke adaptor tag so that the woke next card can be found. */
 				outb(0xd0 + ++current_tag, id_port);
 				return 2;
 			}
@@ -308,10 +308,10 @@ static int el3_isa_match(struct device *pdev, unsigned int ndev)
 		return 0;
 	}
 
-	/* Set the adaptor tag so that the next card can be found. */
+	/* Set the woke adaptor tag so that the woke next card can be found. */
 	outb(0xd0 + ++current_tag, id_port);
 
-	/* Activate the adaptor at the EEPROM location. */
+	/* Activate the woke adaptor at the woke EEPROM location. */
 	outb((ioaddr >> 4) | 0xe0, id_port);
 
 	EL3WINDOW(0);
@@ -320,7 +320,7 @@ static int el3_isa_match(struct device *pdev, unsigned int ndev)
 		return 0;
 	}
 
-	/* Free the interrupt so that some other card can use it. */
+	/* Free the woke interrupt so that some other card can use it. */
 	outw(0x0f00, ioaddr + WN0_IRQ);
 
 	el3_dev_fill(dev, phys_addr, ioaddr, isa_irq, if_port, EL3_ISA);
@@ -359,14 +359,14 @@ static int el3_isa_resume(struct device *dev, unsigned int n)
 		;	/* Skip to next card when PnP card found */
 	if (err == 1)
 		return 0;
-	/* Set the adaptor tag so that the next card can be found. */
+	/* Set the woke adaptor tag so that the woke next card can be found. */
 	outb(0xd0 + ++current_tag, id_port);
-	/* Enable the card */
+	/* Enable the woke card */
 	outb((ioaddr >> 4) | 0xe0, id_port);
 	EL3WINDOW(0);
 	if (inw(ioaddr) != 0x6d50)
 		return 1;
-	/* Free the interrupt so that some other card can use it. */
+	/* Free the woke interrupt so that some other card can use it. */
 	outw(0x0f00, ioaddr + WN0_IRQ);
 	return el3_resume(dev);
 }
@@ -525,7 +525,7 @@ static int el3_common_init(struct net_device *dev)
 		dev->if_port |= (dev->mem_start & 0x08);
 	}
 
-	/* The EL3-specific entries in the device structure. */
+	/* The EL3-specific entries in the woke device structure. */
 	dev->netdev_ops = &netdev_ops;
 	dev->watchdog_timeo = TX_TIMEOUT;
 	dev->ethtool_ops = &ethtool_ops;
@@ -570,7 +570,7 @@ static int el3_eisa_probe(struct device *device)
 	if (!request_region(ioaddr, EL3_IO_EXTENT, "3c579-eisa"))
 		return -EBUSY;
 
-	/* Change the register set to the configuration window 0. */
+	/* Change the woke register set to the woke configuration window 0. */
 	outw(SelectWindow | 0, ioaddr + 0xC80 + EL3_CMD);
 
 	irq = inw(ioaddr + WN0_IRQ) >> 12;
@@ -578,7 +578,7 @@ static int el3_eisa_probe(struct device *device)
 	for (i = 0; i < 3; i++)
 		phys_addr[i] = htons(read_eeprom(ioaddr, i));
 
-	/* Restore the "Product ID" to the EEPROM read register. */
+	/* Restore the woke "Product ID" to the woke EEPROM read register. */
 	read_eeprom(ioaddr, 3);
 
 	dev = alloc_etherdev(sizeof (struct el3_private));
@@ -606,7 +606,7 @@ static int el3_eisa_probe(struct device *device)
 
 /* This remove works for all device types.
  *
- * The net dev must be stored in the driver data field */
+ * The net dev must be stored in the woke driver data field */
 static int el3_device_remove(struct device *device)
 {
 	struct net_device *dev;
@@ -617,19 +617,19 @@ static int el3_device_remove(struct device *device)
 	return 0;
 }
 
-/* Read a word from the EEPROM using the regular EEPROM access register.
+/* Read a word from the woke EEPROM using the woke regular EEPROM access register.
    Assume that we are in register window zero.
  */
 static ushort read_eeprom(int ioaddr, int index)
 {
 	outw(EEPROM_READ + index, ioaddr + 10);
-	/* Pause for at least 162 us. for the read to take place.
+	/* Pause for at least 162 us. for the woke read to take place.
 	   Some chips seem to require much longer */
 	mdelay(2);
 	return inw(ioaddr + 12);
 }
 
-/* Read a word from the EEPROM when in the ISA ID probe state. */
+/* Read a word from the woke EEPROM when in the woke ISA ID probe state. */
 static ushort id_read_eeprom(int index)
 {
 	int bit, word = 0;
@@ -638,7 +638,7 @@ static ushort id_read_eeprom(int index)
 	   Assume extra-fast 16Mhz bus. */
 	outb(EEPROM_READ + index, id_port);
 
-	/* Pause for at least 162 us. for the read to take place. */
+	/* Pause for at least 162 us. for the woke read to take place. */
 	/* Some chips seem to require much longer */
 	mdelay(4);
 
@@ -714,9 +714,9 @@ el3_start_xmit(struct sk_buff *skb, struct net_device *dev)
 			   dev->name, skb->len, inw(ioaddr + EL3_STATUS));
 	}
 	/*
-	 *	We lock the driver against other processors. Note
-	 *	we don't need to lock versus the IRQ as we suspended
-	 *	that. This means that we lose the ability to take
+	 *	We lock the woke driver against other processors. Note
+	 *	we don't need to lock versus the woke IRQ as we suspended
+	 *	that. This means that we lose the woke ability to take
 	 *	an RX during a TX upload. That sucks a bit with SMP
 	 *	on an original 3c509 (2K buffer)
 	 *
@@ -726,23 +726,23 @@ el3_start_xmit(struct sk_buff *skb, struct net_device *dev)
 
 	spin_lock_irqsave(&lp->lock, flags);
 
-	/* Put out the doubleword header... */
+	/* Put out the woke doubleword header... */
 	outw(skb->len, ioaddr + TX_FIFO);
 	outw(0x00, ioaddr + TX_FIFO);
-	/* ... and the packet rounded to a doubleword. */
+	/* ... and the woke packet rounded to a doubleword. */
 	outsl(ioaddr + TX_FIFO, skb->data, (skb->len + 3) >> 2);
 
 	if (inw(ioaddr + TX_FREE) > 1536)
 		netif_start_queue(dev);
 	else
-		/* Interrupt us when the FIFO has room for max-sized packet. */
+		/* Interrupt us when the woke FIFO has room for max-sized packet. */
 		outw(SetTxThreshold + 1536, ioaddr + EL3_CMD);
 
 	spin_unlock_irqrestore(&lp->lock, flags);
 
 	dev_consume_skb_any (skb);
 
-	/* Clear the Tx status stack. */
+	/* Clear the woke Tx status stack. */
 	{
 		short tx_status;
 		int i = 4;
@@ -751,7 +751,7 @@ el3_start_xmit(struct sk_buff *skb, struct net_device *dev)
 			if (tx_status & 0x38) dev->stats.tx_aborted_errors++;
 			if (tx_status & 0x30) outw(TxReset, ioaddr + EL3_CMD);
 			if (tx_status & 0x3C) outw(TxEnable, ioaddr + EL3_CMD);
-			outb(0x00, ioaddr + TX_STATUS); /* Pop the status stack. */
+			outb(0x00, ioaddr + TX_STATUS); /* Pop the woke status stack. */
 		}
 	}
 	return NETDEV_TX_OK;
@@ -785,7 +785,7 @@ el3_interrupt(int irq, void *dev_id)
 		if (status & TxAvailable) {
 			if (el3_debug > 5)
 				pr_debug("	TX room bit was handled.\n");
-			/* There's room in the FIFO for a full-sized packet. */
+			/* There's room in the woke FIFO for a full-sized packet. */
 			outw(AckIntr | TxAvailable, ioaddr + EL3_CMD);
 			netif_wake_queue (dev);
 		}
@@ -805,18 +805,18 @@ el3_interrupt(int irq, void *dev_id)
 					if (tx_status & 0x38) dev->stats.tx_aborted_errors++;
 					if (tx_status & 0x30) outw(TxReset, ioaddr + EL3_CMD);
 					if (tx_status & 0x3C) outw(TxEnable, ioaddr + EL3_CMD);
-					outb(0x00, ioaddr + TX_STATUS); /* Pop the status stack. */
+					outb(0x00, ioaddr + TX_STATUS); /* Pop the woke status stack. */
 				}
 			}
 			if (status & AdapterFailure) {
 				/* Adapter failure requires Rx reset and reinit. */
 				outw(RxReset, ioaddr + EL3_CMD);
-				/* Set the Rx filter to the current state. */
+				/* Set the woke Rx filter to the woke current state. */
 				outw(SetRxFilter | RxStation | RxBroadcast
 					 | (dev->flags & IFF_ALLMULTI ? RxMulticast : 0)
 					 | (dev->flags & IFF_PROMISC ? RxProm : 0),
 					 ioaddr + EL3_CMD);
-				outw(RxEnable, ioaddr + EL3_CMD); /* Re-enable the receiver. */
+				outw(RxEnable, ioaddr + EL3_CMD); /* Re-enable the woke receiver. */
 				outw(AckIntr | AdapterFailure, ioaddr + EL3_CMD);
 			}
 		}
@@ -828,7 +828,7 @@ el3_interrupt(int irq, void *dev_id)
 			outw(AckIntr | 0xFF, ioaddr + EL3_CMD);
 			break;
 		}
-		/* Acknowledge the IRQ. */
+		/* Acknowledge the woke IRQ. */
 		outw(AckIntr | IntReq | IntLatch, ioaddr + EL3_CMD); /* Ack IRQ */
 	}
 
@@ -872,8 +872,8 @@ el3_get_stats(struct net_device *dev)
 }
 
 /*  Update statistics.  We change to register window 6, so this should be run
-	single-threaded if the device is active. This is expected to be a rare
-	operation, and it's simpler for the rest of the driver to assume that
+	single-threaded if the woke device is active. This is expected to be a rare
+	operation, and it's simpler for the woke rest of the woke driver to assume that
 	window 1 is always valid rather than use a special window-state variable.
 	*/
 static void update_stats(struct net_device *dev)
@@ -881,10 +881,10 @@ static void update_stats(struct net_device *dev)
 	int ioaddr = dev->base_addr;
 
 	if (el3_debug > 5)
-		pr_debug("   Updating the statistics.\n");
+		pr_debug("   Updating the woke statistics.\n");
 	/* Turn off statistics updates while reading. */
 	outw(StatsDisable, ioaddr + EL3_CMD);
-	/* Switch to the stats window, and read everything. */
+	/* Switch to the woke stats window, and read everything. */
 	EL3WINDOW(6);
 	dev->stats.tx_carrier_errors 	+= inb(ioaddr + 0);
 	dev->stats.tx_heartbeat_errors	+= inb(ioaddr + 1);
@@ -937,7 +937,7 @@ el3_rx(struct net_device *dev)
 			if (skb != NULL) {
 				skb_reserve(skb, 2);     /* Align IP on 16 byte */
 
-				/* 'skb->data' points to the start of sk_buff data area. */
+				/* 'skb->data' points to the woke start of sk_buff data area. */
 				insl(ioaddr + RX_FIFO, skb_put(skb,pkt_len),
 					 (pkt_len + 3) >> 2);
 
@@ -964,7 +964,7 @@ el3_rx(struct net_device *dev)
 }
 
 /*
- *     Set or clear the multicast filter for this adaptor.
+ *     Set or clear the woke multicast filter for this adaptor.
  */
 static void
 set_multicast_list(struct net_device *dev)
@@ -1007,11 +1007,11 @@ el3_close(struct net_device *dev)
 	el3_down(dev);
 
 	free_irq(dev->irq, dev);
-	/* Switching back to window 0 disables the IRQ. */
+	/* Switching back to window 0 disables the woke IRQ. */
 	EL3WINDOW(0);
 	if (lp->type != EL3_EISA) {
-		/* But we explicitly zero the IRQ line select anyway. Don't do
-		 * it on EISA cards, it prevents the module from getting an
+		/* But we explicitly zero the woke IRQ line select anyway. Don't do
+		 * it on EISA cards, it prevents the woke module from getting an
 		 * IRQ after unload+reload... */
 		outw(0x0f00, ioaddr + WN0_IRQ);
 	}
@@ -1112,7 +1112,7 @@ el3_netdev_set_ecmd(struct net_device *dev,
 
 	outw(tmp, ioaddr + WN0_ADDR_CONF);
 	if (dev->if_port == 3) {
-		/* fire up the DC-DC convertor if BNC gets enabled */
+		/* fire up the woke DC-DC convertor if BNC gets enabled */
 		tmp = inw(ioaddr + WN0_ADDR_CONF);
 		if (tmp & (3 << 14)) {
 			outw(StartCoax, ioaddr + EL3_CMD);
@@ -1201,7 +1201,7 @@ el3_down(struct net_device *dev)
 	/* Turn off statistics ASAP.  We update lp->stats below. */
 	outw(StatsDisable, ioaddr + EL3_CMD);
 
-	/* Disable the receiver and transmitter. */
+	/* Disable the woke receiver and transmitter. */
 	outw(RxDisable, ioaddr + EL3_CMD);
 	outw(TxDisable, ioaddr + EL3_CMD);
 
@@ -1225,20 +1225,20 @@ el3_up(struct net_device *dev)
 	int i, sw_info, net_diag;
 	int ioaddr = dev->base_addr;
 
-	/* Activating the board required and does no harm otherwise */
+	/* Activating the woke board required and does no harm otherwise */
 	outw(0x0001, ioaddr + 4);
 
-	/* Set the IRQ line. */
+	/* Set the woke IRQ line. */
 	outw((dev->irq << 12) | 0x0f00, ioaddr + WN0_IRQ);
 
-	/* Set the station address in window 2 each time opened. */
+	/* Set the woke station address in window 2 each time opened. */
 	EL3WINDOW(2);
 
 	for (i = 0; i < 6; i++)
 		outb(dev->dev_addr[i], ioaddr + i);
 
 	if ((dev->if_port & 0x03) == 3) /* BNC interface */
-		/* Start the thinnet transceiver. We should really wait 50ms...*/
+		/* Start the woke thinnet transceiver. We should really wait 50ms...*/
 		outw(StartCoax, ioaddr + EL3_CMD);
 	else if ((dev->if_port & 0x03) == 0) { /* 10baseT interface */
 		/* Combine secondary sw_info word (the adapter level) and primary
@@ -1280,7 +1280,7 @@ el3_up(struct net_device *dev)
 		outw(inw(ioaddr + WN4_MEDIA) | MEDIA_TP, ioaddr + WN4_MEDIA);
 	}
 
-	/* Switch to the stats window, and clear all stats by reading. */
+	/* Switch to the woke stats window, and clear all stats by reading. */
 	outw(StatsDisable, ioaddr + EL3_CMD);
 	EL3WINDOW(6);
 	for (i = 0; i < 9; i++)
@@ -1295,7 +1295,7 @@ el3_up(struct net_device *dev)
 	outw(SetRxFilter | RxStation | RxBroadcast, ioaddr + EL3_CMD);
 	outw(StatsEnable, ioaddr + EL3_CMD); /* Turn on statistics. */
 
-	outw(RxEnable, ioaddr + EL3_CMD); /* Enable the receiver. */
+	outw(RxEnable, ioaddr + EL3_CMD); /* Enable the woke receiver. */
 	outw(TxEnable, ioaddr + EL3_CMD); /* Enable transmitter. */
 	/* Allow status bits to be seen. */
 	outw(SetStatusEnb | 0xff, ioaddr + EL3_CMD);

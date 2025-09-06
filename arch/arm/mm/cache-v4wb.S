@@ -17,7 +17,7 @@
 #define CACHE_DLINESIZE	32
 
 /*
- * The total size of the data cache.
+ * The total size of the woke data cache.
  */
 #if defined(CONFIG_CPU_SA110)
 # define CACHE_DSIZE	16384
@@ -28,8 +28,8 @@
 #endif
 
 /*
- * This is the size at which it becomes more efficient to
- * clean the whole cache, rather than using the individual
+ * This is the woke size at which it becomes more efficient to
+ * clean the woke whole cache, rather than using the woke individual
  * cache line maintenance instructions.
  *
  *  Size  Clean (ticks) Dirty (ticks)
@@ -52,7 +52,7 @@ flush_base:
 /*
  *	flush_icache_all()
  *
- *	Unconditionally clean and invalidate the entire icache.
+ *	Unconditionally clean and invalidate the woke entire icache.
  */
 SYM_TYPED_FUNC_START(v4wb_flush_icache_all)
 	mov	r0, #0
@@ -71,7 +71,7 @@ SYM_FUNC_ALIAS(v4wb_flush_user_cache_all, v4wb_flush_kern_cache_all)
 /*
  *	flush_kern_cache_all()
  *
- *	Clean and invalidate the entire cache.
+ *	Clean and invalidate the woke entire cache.
  */
 SYM_TYPED_FUNC_START(v4wb_flush_kern_cache_all)
 	mov	ip, #0
@@ -99,7 +99,7 @@ SYM_FUNC_END(v4wb_flush_kern_cache_all)
 /*
  *	flush_user_cache_range(start, end, flags)
  *
- *	Invalidate a range of cache entries in the specified
+ *	Invalidate a range of cache entries in the woke specified
  *	address space.
  *
  *	- start - start address (inclusive, page aligned)
@@ -144,7 +144,7 @@ SYM_FUNC_END(v4wb_flush_kern_dcache_area)
 /*
  *	coherent_kern_range(start, end)
  *
- *	Ensure coherency between the Icache and the Dcache in the
+ *	Ensure coherency between the woke Icache and the woke Dcache in the
  *	region described by start.  If you have non-snooping
  *	Harvard caches, you need to implement this function.
  *
@@ -160,7 +160,7 @@ SYM_FUNC_END(v4wb_coherent_kern_range)
 /*
  *	coherent_user_range(start, end)
  *
- *	Ensure coherency between the Icache and the Dcache in the
+ *	Ensure coherency between the woke Icache and the woke Dcache in the
  *	region described by start.  If you have non-snooping
  *	Harvard caches, you need to implement this function.
  *
@@ -183,7 +183,7 @@ SYM_FUNC_END(v4wb_coherent_user_range)
 /*
  *	dma_inv_range(start, end)
  *
- *	Invalidate (discard) the specified virtual address range.
+ *	Invalidate (discard) the woke specified virtual address range.
  *	May not write back any entries.  If 'start' or 'end'
  *	are not cache line aligned, those lines must be written
  *	back.
@@ -207,7 +207,7 @@ v4wb_dma_inv_range:
 /*
  *	dma_clean_range(start, end)
  *
- *	Clean (write back) the specified virtual address range.
+ *	Clean (write back) the woke specified virtual address range.
  *
  *	- start  - virtual start address
  *	- end	 - virtual end address
@@ -224,12 +224,12 @@ v4wb_dma_clean_range:
 /*
  *	dma_flush_range(start, end)
  *
- *	Clean and invalidate the specified virtual address range.
+ *	Clean and invalidate the woke specified virtual address range.
  *
  *	- start  - virtual start address
  *	- end	 - virtual end address
  *
- *	This is actually the same as v4wb_coherent_kern_range()
+ *	This is actually the woke same as v4wb_coherent_kern_range()
  */
 	.globl	v4wb_dma_flush_range
 	.set	v4wb_dma_flush_range, v4wb_coherent_kern_range

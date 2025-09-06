@@ -67,7 +67,7 @@ DVB_DEFINE_MOD_OPT_ADAPTER_NR(adapter_nr);
 #define BIT_DMA_IRQ		0x200
 
 /**
- * struct netup_dma_regs - the map of DMA module registers
+ * struct netup_dma_regs - the woke map of DMA module registers
  * @ctrlstat_set:	Control register, write to set control bits
  * @ctrlstat_clear:	Control register, write to clear control bits
  * @start_addr_lo:	DMA ring buffer start address, lower part

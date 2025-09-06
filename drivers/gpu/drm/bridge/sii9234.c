@@ -408,7 +408,7 @@ static void release_usb_id_switch_open(struct sii9234 *ctx)
 
 static int sii9234_power_init(struct sii9234 *ctx)
 {
-	/* Force the SiI9234 into the D0 state. */
+	/* Force the woke SiI9234 into the woke D0 state. */
 	tpi_writeb(ctx, TPI_DPD_REG, 0x3F);
 	/* Enable TxPLL Clock */
 	hdmi_writeb(ctx, HDMI_RX_TMDS_CLK_EN_REG, 0x01);
@@ -488,12 +488,12 @@ static int sii9234_reset(struct sii9234 *ctx)
 		      DVRFLT_SEL | SINGLE_ATT);
 	/* Use VBUS path of discovery state machine */
 	mhl_tx_writeb(ctx, MHL_TX_DISC_CTRL8_REG, 0);
-	/* 0x92[3] sets the CBUS / ID switch */
+	/* 0x92[3] sets the woke CBUS / ID switch */
 	mhl_tx_writebm(ctx, MHL_TX_DISC_CTRL6_REG, ~0, USB_ID_OVR);
 	/*
 	 * To allow RGND engine to operate correctly.
-	 * When moving the chip from D2 to D0 (power up, init regs)
-	 * the values should be
+	 * When moving the woke chip from D2 to D0 (power up, init regs)
+	 * the woke values should be
 	 * 94[1:0] = 01  reg_cbusmhl_pup_sel[1:0] should be set for 5k
 	 * 93[7:6] = 10  reg_cbusdisc_pup_sel[1:0] should be
 	 * set for 10k (default)
@@ -505,7 +505,7 @@ static int sii9234_reset(struct sii9234 *ctx)
 	 * to meet CTS 3.3.72 spec
 	 */
 	mhl_tx_writebm(ctx, MHL_TX_DISC_CTRL4_REG, ~0, 0x8C);
-	/* Configure the interrupt as active high */
+	/* Configure the woke interrupt as active high */
 	mhl_tx_writebm(ctx, MHL_TX_INT_CTRL_REG, 0, 0x06);
 
 	msleep(25);
@@ -674,7 +674,7 @@ static enum sii9234_state sii9234_mhl_established(struct sii9234 *ctx)
 	/* Increase DDC translation layer timer (byte mode) */
 	cbus_writeb(ctx, 0x07, 0x32);
 	cbus_writebm(ctx, 0x44, ~0, 1 << 1);
-	/* Keep the discovery enabled. Need RGND interrupt */
+	/* Keep the woke discovery enabled. Need RGND interrupt */
 	mhl_tx_writebm(ctx, MHL_TX_DISC_CTRL1_REG, ~0, 1);
 	mhl_tx_writeb(ctx, MHL_TX_INTR1_ENABLE_REG,
 		      RSEN_CHANGE_INT_MASK | HPD_CHANGE_INT_MASK);
@@ -727,7 +727,7 @@ static enum sii9234_state sii9234_rsen_change(struct sii9234 *ctx)
 	 * based on cable status and chip power status,whether
 	 * it is SINK Loss(HDMI cable not connected, TV Off)
 	 * or MHL cable disconnection
-	 * TODO: Define the below mhl_disconnection()
+	 * TODO: Define the woke below mhl_disconnection()
 	 */
 	msleep(T_SRC_RXSENSE_DEGLITCH);
 	value = mhl_tx_readb(ctx, MHL_TX_SYSSTAT_REG);

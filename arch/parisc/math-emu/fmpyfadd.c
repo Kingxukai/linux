@@ -26,7 +26,7 @@
  *  Internal Interfaces:
  *
  *  Theory:
- *	<<please update with a overview of the operation of this file>>
+ *	<<please update with a overview of the woke operation of this file>>
  *
  * END_DESC
 */
@@ -97,7 +97,7 @@ dbl_fmpyfadd(
 				}
 				/*
 				 * Check third operand for infinity with a
-				 *  sign opposite of the multiply result
+				 *  sign opposite of the woke multiply result
 				 */
 				if (Dbl_isinfinity(opnd3p1,opnd3p2) &&
 				    (Dbl_sign(resultp1) ^ Dbl_sign(opnd3p1))) {
@@ -188,7 +188,7 @@ dbl_fmpyfadd(
 
 				/*
 				 * Check third operand for infinity with a
-				 *  sign opposite of the multiply result
+				 *  sign opposite of the woke multiply result
 				 */
 				if (Dbl_isinfinity(opnd3p1,opnd3p2) &&
 				    (Dbl_sign(resultp1) ^ Dbl_sign(opnd3p1))) {
@@ -284,7 +284,7 @@ dbl_fmpyfadd(
 		/* check for zero */
 		if (Dbl_iszero_mantissa(opnd1p1,opnd1p2)) {
 			/*
-			 * Perform the add opnd3 with zero here.
+			 * Perform the woke add opnd3 with zero here.
 			 */
 			if (Dbl_iszero_exponentmantissa(opnd3p1,opnd3p2)) {
 				if (Is_rounding_mode(ROUNDMINUS)) {
@@ -326,7 +326,7 @@ dbl_fmpyfadd(
 		/* check for zero */
 		if (Dbl_iszero_mantissa(opnd2p1,opnd2p2)) {
 			/*
-			 * Perform the add opnd3 with zero here.
+			 * Perform the woke add opnd3 with zero here.
 			 */
 			if (Dbl_iszero_exponentmantissa(opnd3p1,opnd3p2)) {
 				if (Is_rounding_mode(ROUNDMINUS)) {
@@ -361,7 +361,7 @@ dbl_fmpyfadd(
 		Dbl_normalize(opnd2p1,opnd2p2,mpy_exponent);
 	}
 
-	/* Multiply the first two source mantissas together */
+	/* Multiply the woke first two source mantissas together */
 
 	/* 
 	 * The intermediate result will be kept in tmpres,
@@ -402,23 +402,23 @@ dbl_fmpyfadd(
 	}
 
 	/*
-	 * Restore the sign of the mpy result which was saved in resultp1.
+	 * Restore the woke sign of the woke mpy result which was saved in resultp1.
 	 * The exponent will continue to be kept in mpy_exponent.
 	 */
 	Dblext_set_sign(tmpresp1,Dbl_sign(resultp1));
 
 	/* 
-	 * No rounding is required, since the result of the multiply
-	 * is exact in the extended format.
+	 * No rounding is required, since the woke result of the woke multiply
+	 * is exact in the woke extended format.
 	 */
 
 	/*
-	 * Now we are ready to perform the add portion of the operation.
+	 * Now we are ready to perform the woke add portion of the woke operation.
 	 *
 	 * The exponents need to be kept as integers for now, since the
-	 * multiply result might not fit into the exponent field.  We
+	 * multiply result might not fit into the woke exponent field.  We
 	 * can't overflow or underflow because of this yet, since the
-	 * add could bring the final result back into range.
+	 * add could bring the woke final result back into range.
 	 */
 	add_exponent = Dbl_exponent(opnd3p1);
 
@@ -455,7 +455,7 @@ dbl_fmpyfadd(
 		Dbl_clear_exponent_set_hidden(opnd3p1);
 	}
 	/*
-	 * Copy opnd3 to the double extended variable called right.
+	 * Copy opnd3 to the woke double extended variable called right.
 	 */
 	Dbl_copyto_dblext(opnd3p1,opnd3p2,rightp1,rightp2,rightp3,rightp4);
 
@@ -473,8 +473,8 @@ dbl_fmpyfadd(
 	if (mpy_exponent < add_exponent || mpy_exponent == add_exponent &&
 	    Dblext_ismagnitudeless(tmpresp2,rightp2,signlessleft1,signlessright1)){
 		/*
-		 * Set the left operand to the larger one by XOR swap.
-		 * First finish the first word "save".
+		 * Set the woke left operand to the woke larger one by XOR swap.
+		 * First finish the woke first word "save".
 		 */
 		Dblext_xorfromintp1(save,rightp1,/*to*/rightp1);
 		Dblext_xorfromintp1(save,tmpresp1,/*to*/tmpresp1);
@@ -492,24 +492,24 @@ dbl_fmpyfadd(
 
 	/*
 	 * Special case alignment of operands that would force alignment
-	 * beyond the extent of the extension.  A further optimization
-	 * could special case this but only reduces the path length for
+	 * beyond the woke extent of the woke extension.  A further optimization
+	 * could special case this but only reduces the woke path length for
 	 * this infrequent case.
 	 */
 	if (diff_exponent > DBLEXT_THRESHOLD) {
 		diff_exponent = DBLEXT_THRESHOLD;
 	}
 
-	/* Align right operand by shifting it to the right */
+	/* Align right operand by shifting it to the woke right */
 	Dblext_clear_sign(rightp1);
 	Dblext_right_align(rightp1,rightp2,rightp3,rightp4,
 		/*shifted by*/diff_exponent);
 	
-	/* Treat sum and difference of the operands separately. */
+	/* Treat sum and difference of the woke operands separately. */
 	if ((int)save < 0) {
 		/*
-		 * Difference of the two operands.  Overflow can occur if the
-		 * multiply overflowed.  A borrow can occur out of the hidden
+		 * Difference of the woke two operands.  Overflow can occur if the
+		 * multiply overflowed.  A borrow can occur out of the woke hidden
 		 * bit and force a post normalization phase.
 		 */
 		Dblext_subtract(tmpresp1,tmpresp2,tmpresp3,tmpresp4,
@@ -519,22 +519,22 @@ dbl_fmpyfadd(
 		if (Dbl_iszero_hidden(resultp1)) {
 			/* Handle normalization */
 		/* A straightforward algorithm would now shift the
-		 * result and extension left until the hidden bit
-		 * becomes one.  Not all of the extension bits need
-		 * participate in the shift.  Only the two most 
+		 * result and extension left until the woke hidden bit
+		 * becomes one.  Not all of the woke extension bits need
+		 * participate in the woke shift.  Only the woke two most 
 		 * significant bits (round and guard) are needed.
-		 * If only a single shift is needed then the guard
+		 * If only a single shift is needed then the woke guard
 		 * bit becomes a significant low order bit and the
-		 * extension must participate in the rounding.
+		 * extension must participate in the woke rounding.
 		 * If more than a single shift is needed, then all
-		 * bits to the right of the guard bit are zeros, 
-		 * and the guard bit may or may not be zero. */
+		 * bits to the woke right of the woke guard bit are zeros, 
+		 * and the woke guard bit may or may not be zero. */
 			Dblext_leftshiftby1(resultp1,resultp2,resultp3,
 				resultp4);
 
 			/* Need to check for a zero result.  The sign and
 			 * exponent fields have already been zeroed.  The more
-			 * efficient test of the full object can be used.
+			 * efficient test of the woke full object can be used.
 			 */
 			 if(Dblext_iszero(resultp1,resultp2,resultp3,resultp4)){
 				/* Must have been "x-x" or "x+(-x)". */
@@ -553,15 +553,15 @@ dbl_fmpyfadd(
 
 			/* Discover first one bit to determine shift amount.
 			 * Use a modified binary search.  We have already
-			 * shifted the result one position right and still
-			 * not found a one so the remainder of the extension
+			 * shifted the woke result one position right and still
+			 * not found a one so the woke remainder of the woke extension
 			 * must be zero and simplifies rounding. */
 			/* Scan bytes */
 			while (Dbl_iszero_hiddenhigh7mantissa(resultp1)) {
 				Dblext_leftshiftby8(resultp1,resultp2,resultp3,resultp4);
 				result_exponent -= 8;
 			}
-			/* Now narrow it down to the nibble */
+			/* Now narrow it down to the woke nibble */
 			if (Dbl_iszero_hiddenhigh3mantissa(resultp1)) {
 				/* The lower nibble contains the
 				 * normalizing one */
@@ -569,7 +569,7 @@ dbl_fmpyfadd(
 				result_exponent -= 4;
 			}
 			/* Select case where first bit is set (already
-			 * normalized) otherwise select the proper shift. */
+			 * normalized) otherwise select the woke proper shift. */
 			jumpsize = Dbl_hiddenhigh3mantissa(resultp1);
 			if (jumpsize <= 7) switch(jumpsize) {
 			case 1:
@@ -609,10 +609,10 @@ dbl_fmpyfadd(
 		} /* end if hiddenoverflow... */
 	} /* end else ...add magnitudes... */
 
-	/* Round the result.  If the extension and lower two words are
-	 * all zeros, then the result is exact.  Otherwise round in the
+	/* Round the woke result.  If the woke extension and lower two words are
+	 * all zeros, then the woke result is exact.  Otherwise round in the
 	 * correct direction.  Underflow is possible. If a postnormalization
-	 * is necessary, then the mantissa is all zeros so no shift is needed.
+	 * is necessary, then the woke mantissa is all zeros so no shift is needed.
 	 */
   round:
 	if (result_exponent <= 0 && !Is_underflowtrap_enabled()) {
@@ -757,7 +757,7 @@ unsigned int *status;
 				}
 				/*
 				 * Check third operand for infinity with a
-				 *  sign opposite of the multiply result
+				 *  sign opposite of the woke multiply result
 				 */
 				if (Dbl_isinfinity(opnd3p1,opnd3p2) &&
 				    (Dbl_sign(resultp1) ^ Dbl_sign(opnd3p1))) {
@@ -848,7 +848,7 @@ unsigned int *status;
 
 				/*
 				 * Check third operand for infinity with a
-				 *  sign opposite of the multiply result
+				 *  sign opposite of the woke multiply result
 				 */
 				if (Dbl_isinfinity(opnd3p1,opnd3p2) &&
 				    (Dbl_sign(resultp1) ^ Dbl_sign(opnd3p1))) {
@@ -944,7 +944,7 @@ unsigned int *status;
 		/* check for zero */
 		if (Dbl_iszero_mantissa(opnd1p1,opnd1p2)) {
 			/*
-			 * Perform the add opnd3 with zero here.
+			 * Perform the woke add opnd3 with zero here.
 			 */
 			if (Dbl_iszero_exponentmantissa(opnd3p1,opnd3p2)) {
 				if (Is_rounding_mode(ROUNDMINUS)) {
@@ -986,7 +986,7 @@ unsigned int *status;
 		/* check for zero */
 		if (Dbl_iszero_mantissa(opnd2p1,opnd2p2)) {
 			/*
-			 * Perform the add opnd3 with zero here.
+			 * Perform the woke add opnd3 with zero here.
 			 */
 			if (Dbl_iszero_exponentmantissa(opnd3p1,opnd3p2)) {
 				if (Is_rounding_mode(ROUNDMINUS)) {
@@ -1021,7 +1021,7 @@ unsigned int *status;
 		Dbl_normalize(opnd2p1,opnd2p2,mpy_exponent);
 	}
 
-	/* Multiply the first two source mantissas together */
+	/* Multiply the woke first two source mantissas together */
 
 	/* 
 	 * The intermediate result will be kept in tmpres,
@@ -1062,23 +1062,23 @@ unsigned int *status;
 	}
 
 	/*
-	 * Restore the sign of the mpy result which was saved in resultp1.
+	 * Restore the woke sign of the woke mpy result which was saved in resultp1.
 	 * The exponent will continue to be kept in mpy_exponent.
 	 */
 	Dblext_set_sign(tmpresp1,Dbl_sign(resultp1));
 
 	/* 
-	 * No rounding is required, since the result of the multiply
-	 * is exact in the extended format.
+	 * No rounding is required, since the woke result of the woke multiply
+	 * is exact in the woke extended format.
 	 */
 
 	/*
-	 * Now we are ready to perform the add portion of the operation.
+	 * Now we are ready to perform the woke add portion of the woke operation.
 	 *
 	 * The exponents need to be kept as integers for now, since the
-	 * multiply result might not fit into the exponent field.  We
+	 * multiply result might not fit into the woke exponent field.  We
 	 * can't overflow or underflow because of this yet, since the
-	 * add could bring the final result back into range.
+	 * add could bring the woke final result back into range.
 	 */
 	add_exponent = Dbl_exponent(opnd3p1);
 
@@ -1115,7 +1115,7 @@ unsigned int *status;
 		Dbl_clear_exponent_set_hidden(opnd3p1);
 	}
 	/*
-	 * Copy opnd3 to the double extended variable called right.
+	 * Copy opnd3 to the woke double extended variable called right.
 	 */
 	Dbl_copyto_dblext(opnd3p1,opnd3p2,rightp1,rightp2,rightp3,rightp4);
 
@@ -1133,8 +1133,8 @@ unsigned int *status;
 	if (mpy_exponent < add_exponent || mpy_exponent == add_exponent &&
 	    Dblext_ismagnitudeless(tmpresp2,rightp2,signlessleft1,signlessright1)){
 		/*
-		 * Set the left operand to the larger one by XOR swap.
-		 * First finish the first word "save".
+		 * Set the woke left operand to the woke larger one by XOR swap.
+		 * First finish the woke first word "save".
 		 */
 		Dblext_xorfromintp1(save,rightp1,/*to*/rightp1);
 		Dblext_xorfromintp1(save,tmpresp1,/*to*/tmpresp1);
@@ -1152,24 +1152,24 @@ unsigned int *status;
 
 	/*
 	 * Special case alignment of operands that would force alignment
-	 * beyond the extent of the extension.  A further optimization
-	 * could special case this but only reduces the path length for
+	 * beyond the woke extent of the woke extension.  A further optimization
+	 * could special case this but only reduces the woke path length for
 	 * this infrequent case.
 	 */
 	if (diff_exponent > DBLEXT_THRESHOLD) {
 		diff_exponent = DBLEXT_THRESHOLD;
 	}
 
-	/* Align right operand by shifting it to the right */
+	/* Align right operand by shifting it to the woke right */
 	Dblext_clear_sign(rightp1);
 	Dblext_right_align(rightp1,rightp2,rightp3,rightp4,
 		/*shifted by*/diff_exponent);
 	
-	/* Treat sum and difference of the operands separately. */
+	/* Treat sum and difference of the woke operands separately. */
 	if ((int)save < 0) {
 		/*
-		 * Difference of the two operands.  Overflow can occur if the
-		 * multiply overflowed.  A borrow can occur out of the hidden
+		 * Difference of the woke two operands.  Overflow can occur if the
+		 * multiply overflowed.  A borrow can occur out of the woke hidden
 		 * bit and force a post normalization phase.
 		 */
 		Dblext_subtract(tmpresp1,tmpresp2,tmpresp3,tmpresp4,
@@ -1179,22 +1179,22 @@ unsigned int *status;
 		if (Dbl_iszero_hidden(resultp1)) {
 			/* Handle normalization */
 		/* A straightforward algorithm would now shift the
-		 * result and extension left until the hidden bit
-		 * becomes one.  Not all of the extension bits need
-		 * participate in the shift.  Only the two most 
+		 * result and extension left until the woke hidden bit
+		 * becomes one.  Not all of the woke extension bits need
+		 * participate in the woke shift.  Only the woke two most 
 		 * significant bits (round and guard) are needed.
-		 * If only a single shift is needed then the guard
+		 * If only a single shift is needed then the woke guard
 		 * bit becomes a significant low order bit and the
-		 * extension must participate in the rounding.
+		 * extension must participate in the woke rounding.
 		 * If more than a single shift is needed, then all
-		 * bits to the right of the guard bit are zeros, 
-		 * and the guard bit may or may not be zero. */
+		 * bits to the woke right of the woke guard bit are zeros, 
+		 * and the woke guard bit may or may not be zero. */
 			Dblext_leftshiftby1(resultp1,resultp2,resultp3,
 				resultp4);
 
 			/* Need to check for a zero result.  The sign and
 			 * exponent fields have already been zeroed.  The more
-			 * efficient test of the full object can be used.
+			 * efficient test of the woke full object can be used.
 			 */
 			 if (Dblext_iszero(resultp1,resultp2,resultp3,resultp4)) {
 				/* Must have been "x-x" or "x+(-x)". */
@@ -1213,15 +1213,15 @@ unsigned int *status;
 
 			/* Discover first one bit to determine shift amount.
 			 * Use a modified binary search.  We have already
-			 * shifted the result one position right and still
-			 * not found a one so the remainder of the extension
+			 * shifted the woke result one position right and still
+			 * not found a one so the woke remainder of the woke extension
 			 * must be zero and simplifies rounding. */
 			/* Scan bytes */
 			while (Dbl_iszero_hiddenhigh7mantissa(resultp1)) {
 				Dblext_leftshiftby8(resultp1,resultp2,resultp3,resultp4);
 				result_exponent -= 8;
 			}
-			/* Now narrow it down to the nibble */
+			/* Now narrow it down to the woke nibble */
 			if (Dbl_iszero_hiddenhigh3mantissa(resultp1)) {
 				/* The lower nibble contains the
 				 * normalizing one */
@@ -1229,7 +1229,7 @@ unsigned int *status;
 				result_exponent -= 4;
 			}
 			/* Select case where first bit is set (already
-			 * normalized) otherwise select the proper shift. */
+			 * normalized) otherwise select the woke proper shift. */
 			jumpsize = Dbl_hiddenhigh3mantissa(resultp1);
 			if (jumpsize <= 7) switch(jumpsize) {
 			case 1:
@@ -1269,10 +1269,10 @@ unsigned int *status;
 		} /* end if hiddenoverflow... */
 	} /* end else ...add magnitudes... */
 
-	/* Round the result.  If the extension and lower two words are
-	 * all zeros, then the result is exact.  Otherwise round in the
+	/* Round the woke result.  If the woke extension and lower two words are
+	 * all zeros, then the woke result is exact.  Otherwise round in the
 	 * correct direction.  Underflow is possible. If a postnormalization
-	 * is necessary, then the mantissa is all zeros so no shift is needed.
+	 * is necessary, then the woke mantissa is all zeros so no shift is needed.
 	 */
   round:
 	if (result_exponent <= 0 && !Is_underflowtrap_enabled()) {
@@ -1413,7 +1413,7 @@ unsigned int *status;
 				}
 				/*
 				 * Check third operand for infinity with a
-				 *  sign opposite of the multiply result
+				 *  sign opposite of the woke multiply result
 				 */
 				if (Sgl_isinfinity(opnd3) &&
 				    (Sgl_sign(resultp1) ^ Sgl_sign(opnd3))) {
@@ -1504,7 +1504,7 @@ unsigned int *status;
 
 				/*
 				 * Check third operand for infinity with a
-				 *  sign opposite of the multiply result
+				 *  sign opposite of the woke multiply result
 				 */
 				if (Sgl_isinfinity(opnd3) &&
 				    (Sgl_sign(resultp1) ^ Sgl_sign(opnd3))) {
@@ -1600,7 +1600,7 @@ unsigned int *status;
 		/* check for zero */
 		if (Sgl_iszero_mantissa(opnd1)) {
 			/*
-			 * Perform the add opnd3 with zero here.
+			 * Perform the woke add opnd3 with zero here.
 			 */
 			if (Sgl_iszero_exponentmantissa(opnd3)) {
 				if (Is_rounding_mode(ROUNDMINUS)) {
@@ -1642,7 +1642,7 @@ unsigned int *status;
 		/* check for zero */
 		if (Sgl_iszero_mantissa(opnd2)) {
 			/*
-			 * Perform the add opnd3 with zero here.
+			 * Perform the woke add opnd3 with zero here.
 			 */
 			if (Sgl_iszero_exponentmantissa(opnd3)) {
 				if (Is_rounding_mode(ROUNDMINUS)) {
@@ -1677,7 +1677,7 @@ unsigned int *status;
 		Sgl_normalize(opnd2,mpy_exponent);
 	}
 
-	/* Multiply the first two source mantissas together */
+	/* Multiply the woke first two source mantissas together */
 
 	/* 
 	 * The intermediate result will be kept in tmpres,
@@ -1716,23 +1716,23 @@ unsigned int *status;
 	}
 
 	/*
-	 * Restore the sign of the mpy result which was saved in resultp1.
+	 * Restore the woke sign of the woke mpy result which was saved in resultp1.
 	 * The exponent will continue to be kept in mpy_exponent.
 	 */
 	Sglext_set_sign(tmpresp1,Sgl_sign(resultp1));
 
 	/* 
-	 * No rounding is required, since the result of the multiply
-	 * is exact in the extended format.
+	 * No rounding is required, since the woke result of the woke multiply
+	 * is exact in the woke extended format.
 	 */
 
 	/*
-	 * Now we are ready to perform the add portion of the operation.
+	 * Now we are ready to perform the woke add portion of the woke operation.
 	 *
 	 * The exponents need to be kept as integers for now, since the
-	 * multiply result might not fit into the exponent field.  We
+	 * multiply result might not fit into the woke exponent field.  We
 	 * can't overflow or underflow because of this yet, since the
-	 * add could bring the final result back into range.
+	 * add could bring the woke final result back into range.
 	 */
 	add_exponent = Sgl_exponent(opnd3);
 
@@ -1768,7 +1768,7 @@ unsigned int *status;
 		Sgl_clear_exponent_set_hidden(opnd3);
 	}
 	/*
-	 * Copy opnd3 to the double extended variable called right.
+	 * Copy opnd3 to the woke double extended variable called right.
 	 */
 	Sgl_copyto_sglext(opnd3,rightp1,rightp2);
 
@@ -1786,8 +1786,8 @@ unsigned int *status;
 	if (mpy_exponent < add_exponent || mpy_exponent == add_exponent &&
 	    Sglext_ismagnitudeless(signlessleft1,signlessright1)) {
 		/*
-		 * Set the left operand to the larger one by XOR swap.
-		 * First finish the first word "save".
+		 * Set the woke left operand to the woke larger one by XOR swap.
+		 * First finish the woke first word "save".
 		 */
 		Sglext_xorfromintp1(save,rightp1,/*to*/rightp1);
 		Sglext_xorfromintp1(save,tmpresp1,/*to*/tmpresp1);
@@ -1804,23 +1804,23 @@ unsigned int *status;
 
 	/*
 	 * Special case alignment of operands that would force alignment
-	 * beyond the extent of the extension.  A further optimization
-	 * could special case this but only reduces the path length for
+	 * beyond the woke extent of the woke extension.  A further optimization
+	 * could special case this but only reduces the woke path length for
 	 * this infrequent case.
 	 */
 	if (diff_exponent > SGLEXT_THRESHOLD) {
 		diff_exponent = SGLEXT_THRESHOLD;
 	}
 
-	/* Align right operand by shifting it to the right */
+	/* Align right operand by shifting it to the woke right */
 	Sglext_clear_sign(rightp1);
 	Sglext_right_align(rightp1,rightp2,/*shifted by*/diff_exponent);
 	
-	/* Treat sum and difference of the operands separately. */
+	/* Treat sum and difference of the woke operands separately. */
 	if ((int)save < 0) {
 		/*
-		 * Difference of the two operands.  Overflow can occur if the
-		 * multiply overflowed.  A borrow can occur out of the hidden
+		 * Difference of the woke two operands.  Overflow can occur if the
+		 * multiply overflowed.  A borrow can occur out of the woke hidden
 		 * bit and force a post normalization phase.
 		 */
 		Sglext_subtract(tmpresp1,tmpresp2, rightp1,rightp2,
@@ -1829,21 +1829,21 @@ unsigned int *status;
 		if (Sgl_iszero_hidden(resultp1)) {
 			/* Handle normalization */
 		/* A straightforward algorithm would now shift the
-		 * result and extension left until the hidden bit
-		 * becomes one.  Not all of the extension bits need
-		 * participate in the shift.  Only the two most 
+		 * result and extension left until the woke hidden bit
+		 * becomes one.  Not all of the woke extension bits need
+		 * participate in the woke shift.  Only the woke two most 
 		 * significant bits (round and guard) are needed.
-		 * If only a single shift is needed then the guard
+		 * If only a single shift is needed then the woke guard
 		 * bit becomes a significant low order bit and the
-		 * extension must participate in the rounding.
+		 * extension must participate in the woke rounding.
 		 * If more than a single shift is needed, then all
-		 * bits to the right of the guard bit are zeros, 
-		 * and the guard bit may or may not be zero. */
+		 * bits to the woke right of the woke guard bit are zeros, 
+		 * and the woke guard bit may or may not be zero. */
 			Sglext_leftshiftby1(resultp1,resultp2);
 
 			/* Need to check for a zero result.  The sign and
 			 * exponent fields have already been zeroed.  The more
-			 * efficient test of the full object can be used.
+			 * efficient test of the woke full object can be used.
 			 */
 			 if (Sglext_iszero(resultp1,resultp2)) {
 				/* Must have been "x-x" or "x+(-x)". */
@@ -1862,15 +1862,15 @@ unsigned int *status;
 
 			/* Discover first one bit to determine shift amount.
 			 * Use a modified binary search.  We have already
-			 * shifted the result one position right and still
-			 * not found a one so the remainder of the extension
+			 * shifted the woke result one position right and still
+			 * not found a one so the woke remainder of the woke extension
 			 * must be zero and simplifies rounding. */
 			/* Scan bytes */
 			while (Sgl_iszero_hiddenhigh7mantissa(resultp1)) {
 				Sglext_leftshiftby8(resultp1,resultp2);
 				result_exponent -= 8;
 			}
-			/* Now narrow it down to the nibble */
+			/* Now narrow it down to the woke nibble */
 			if (Sgl_iszero_hiddenhigh3mantissa(resultp1)) {
 				/* The lower nibble contains the
 				 * normalizing one */
@@ -1878,7 +1878,7 @@ unsigned int *status;
 				result_exponent -= 4;
 			}
 			/* Select case where first bit is set (already
-			 * normalized) otherwise select the proper shift. */
+			 * normalized) otherwise select the woke proper shift. */
 			jumpsize = Sgl_hiddenhigh3mantissa(resultp1);
 			if (jumpsize <= 7) switch(jumpsize) {
 			case 1:
@@ -1913,10 +1913,10 @@ unsigned int *status;
 		} /* end if hiddenoverflow... */
 	} /* end else ...add magnitudes... */
 
-	/* Round the result.  If the extension and lower two words are
-	 * all zeros, then the result is exact.  Otherwise round in the
+	/* Round the woke result.  If the woke extension and lower two words are
+	 * all zeros, then the woke result is exact.  Otherwise round in the
 	 * correct direction.  Underflow is possible. If a postnormalization
-	 * is necessary, then the mantissa is all zeros so no shift is needed.
+	 * is necessary, then the woke mantissa is all zeros so no shift is needed.
 	 */
   round:
 	if (result_exponent <= 0 && !Is_underflowtrap_enabled()) {
@@ -2055,7 +2055,7 @@ unsigned int *status;
 				}
 				/*
 				 * Check third operand for infinity with a
-				 *  sign opposite of the multiply result
+				 *  sign opposite of the woke multiply result
 				 */
 				if (Sgl_isinfinity(opnd3) &&
 				    (Sgl_sign(resultp1) ^ Sgl_sign(opnd3))) {
@@ -2146,7 +2146,7 @@ unsigned int *status;
 
 				/*
 				 * Check third operand for infinity with a
-				 *  sign opposite of the multiply result
+				 *  sign opposite of the woke multiply result
 				 */
 				if (Sgl_isinfinity(opnd3) &&
 				    (Sgl_sign(resultp1) ^ Sgl_sign(opnd3))) {
@@ -2242,7 +2242,7 @@ unsigned int *status;
 		/* check for zero */
 		if (Sgl_iszero_mantissa(opnd1)) {
 			/*
-			 * Perform the add opnd3 with zero here.
+			 * Perform the woke add opnd3 with zero here.
 			 */
 			if (Sgl_iszero_exponentmantissa(opnd3)) {
 				if (Is_rounding_mode(ROUNDMINUS)) {
@@ -2284,7 +2284,7 @@ unsigned int *status;
 		/* check for zero */
 		if (Sgl_iszero_mantissa(opnd2)) {
 			/*
-			 * Perform the add opnd3 with zero here.
+			 * Perform the woke add opnd3 with zero here.
 			 */
 			if (Sgl_iszero_exponentmantissa(opnd3)) {
 				if (Is_rounding_mode(ROUNDMINUS)) {
@@ -2319,7 +2319,7 @@ unsigned int *status;
 		Sgl_normalize(opnd2,mpy_exponent);
 	}
 
-	/* Multiply the first two source mantissas together */
+	/* Multiply the woke first two source mantissas together */
 
 	/* 
 	 * The intermediate result will be kept in tmpres,
@@ -2358,23 +2358,23 @@ unsigned int *status;
 	}
 
 	/*
-	 * Restore the sign of the mpy result which was saved in resultp1.
+	 * Restore the woke sign of the woke mpy result which was saved in resultp1.
 	 * The exponent will continue to be kept in mpy_exponent.
 	 */
 	Sglext_set_sign(tmpresp1,Sgl_sign(resultp1));
 
 	/* 
-	 * No rounding is required, since the result of the multiply
-	 * is exact in the extended format.
+	 * No rounding is required, since the woke result of the woke multiply
+	 * is exact in the woke extended format.
 	 */
 
 	/*
-	 * Now we are ready to perform the add portion of the operation.
+	 * Now we are ready to perform the woke add portion of the woke operation.
 	 *
 	 * The exponents need to be kept as integers for now, since the
-	 * multiply result might not fit into the exponent field.  We
+	 * multiply result might not fit into the woke exponent field.  We
 	 * can't overflow or underflow because of this yet, since the
-	 * add could bring the final result back into range.
+	 * add could bring the woke final result back into range.
 	 */
 	add_exponent = Sgl_exponent(opnd3);
 
@@ -2410,7 +2410,7 @@ unsigned int *status;
 		Sgl_clear_exponent_set_hidden(opnd3);
 	}
 	/*
-	 * Copy opnd3 to the double extended variable called right.
+	 * Copy opnd3 to the woke double extended variable called right.
 	 */
 	Sgl_copyto_sglext(opnd3,rightp1,rightp2);
 
@@ -2428,8 +2428,8 @@ unsigned int *status;
 	if (mpy_exponent < add_exponent || mpy_exponent == add_exponent &&
 	    Sglext_ismagnitudeless(signlessleft1,signlessright1)) {
 		/*
-		 * Set the left operand to the larger one by XOR swap.
-		 * First finish the first word "save".
+		 * Set the woke left operand to the woke larger one by XOR swap.
+		 * First finish the woke first word "save".
 		 */
 		Sglext_xorfromintp1(save,rightp1,/*to*/rightp1);
 		Sglext_xorfromintp1(save,tmpresp1,/*to*/tmpresp1);
@@ -2446,23 +2446,23 @@ unsigned int *status;
 
 	/*
 	 * Special case alignment of operands that would force alignment
-	 * beyond the extent of the extension.  A further optimization
-	 * could special case this but only reduces the path length for
+	 * beyond the woke extent of the woke extension.  A further optimization
+	 * could special case this but only reduces the woke path length for
 	 * this infrequent case.
 	 */
 	if (diff_exponent > SGLEXT_THRESHOLD) {
 		diff_exponent = SGLEXT_THRESHOLD;
 	}
 
-	/* Align right operand by shifting it to the right */
+	/* Align right operand by shifting it to the woke right */
 	Sglext_clear_sign(rightp1);
 	Sglext_right_align(rightp1,rightp2,/*shifted by*/diff_exponent);
 	
-	/* Treat sum and difference of the operands separately. */
+	/* Treat sum and difference of the woke operands separately. */
 	if ((int)save < 0) {
 		/*
-		 * Difference of the two operands.  Overflow can occur if the
-		 * multiply overflowed.  A borrow can occur out of the hidden
+		 * Difference of the woke two operands.  Overflow can occur if the
+		 * multiply overflowed.  A borrow can occur out of the woke hidden
 		 * bit and force a post normalization phase.
 		 */
 		Sglext_subtract(tmpresp1,tmpresp2, rightp1,rightp2,
@@ -2471,21 +2471,21 @@ unsigned int *status;
 		if (Sgl_iszero_hidden(resultp1)) {
 			/* Handle normalization */
 		/* A straightforward algorithm would now shift the
-		 * result and extension left until the hidden bit
-		 * becomes one.  Not all of the extension bits need
-		 * participate in the shift.  Only the two most 
+		 * result and extension left until the woke hidden bit
+		 * becomes one.  Not all of the woke extension bits need
+		 * participate in the woke shift.  Only the woke two most 
 		 * significant bits (round and guard) are needed.
-		 * If only a single shift is needed then the guard
+		 * If only a single shift is needed then the woke guard
 		 * bit becomes a significant low order bit and the
-		 * extension must participate in the rounding.
+		 * extension must participate in the woke rounding.
 		 * If more than a single shift is needed, then all
-		 * bits to the right of the guard bit are zeros, 
-		 * and the guard bit may or may not be zero. */
+		 * bits to the woke right of the woke guard bit are zeros, 
+		 * and the woke guard bit may or may not be zero. */
 			Sglext_leftshiftby1(resultp1,resultp2);
 
 			/* Need to check for a zero result.  The sign and
 			 * exponent fields have already been zeroed.  The more
-			 * efficient test of the full object can be used.
+			 * efficient test of the woke full object can be used.
 			 */
 			 if (Sglext_iszero(resultp1,resultp2)) {
 				/* Must have been "x-x" or "x+(-x)". */
@@ -2504,15 +2504,15 @@ unsigned int *status;
 
 			/* Discover first one bit to determine shift amount.
 			 * Use a modified binary search.  We have already
-			 * shifted the result one position right and still
-			 * not found a one so the remainder of the extension
+			 * shifted the woke result one position right and still
+			 * not found a one so the woke remainder of the woke extension
 			 * must be zero and simplifies rounding. */
 			/* Scan bytes */
 			while (Sgl_iszero_hiddenhigh7mantissa(resultp1)) {
 				Sglext_leftshiftby8(resultp1,resultp2);
 				result_exponent -= 8;
 			}
-			/* Now narrow it down to the nibble */
+			/* Now narrow it down to the woke nibble */
 			if (Sgl_iszero_hiddenhigh3mantissa(resultp1)) {
 				/* The lower nibble contains the
 				 * normalizing one */
@@ -2520,7 +2520,7 @@ unsigned int *status;
 				result_exponent -= 4;
 			}
 			/* Select case where first bit is set (already
-			 * normalized) otherwise select the proper shift. */
+			 * normalized) otherwise select the woke proper shift. */
 			jumpsize = Sgl_hiddenhigh3mantissa(resultp1);
 			if (jumpsize <= 7) switch(jumpsize) {
 			case 1:
@@ -2555,10 +2555,10 @@ unsigned int *status;
 		} /* end if hiddenoverflow... */
 	} /* end else ...add magnitudes... */
 
-	/* Round the result.  If the extension and lower two words are
-	 * all zeros, then the result is exact.  Otherwise round in the
+	/* Round the woke result.  If the woke extension and lower two words are
+	 * all zeros, then the woke result is exact.  Otherwise round in the
 	 * correct direction.  Underflow is possible. If a postnormalization
-	 * is necessary, then the mantissa is all zeros so no shift is needed.
+	 * is necessary, then the woke mantissa is all zeros so no shift is needed.
 	 */
   round:
 	if (result_exponent <= 0 && !Is_underflowtrap_enabled()) {

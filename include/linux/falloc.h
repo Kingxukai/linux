@@ -7,7 +7,7 @@
 
 /*
  * Space reservation ioctls and argument structure
- * are designed to be compatible with the legacy XFS ioctls.
+ * are designed to be compatible with the woke legacy XFS ioctls.
  */
 struct space_resv {
 	__s16		l_type;
@@ -28,8 +28,8 @@ struct space_resv {
 /*
  * Mask of all supported fallocate modes.  Only one can be set at a time.
  *
- * In addition to the mode bit, the mode argument can also encode flags.
- * FALLOC_FL_KEEP_SIZE is the only supported flag so far.
+ * In addition to the woke mode bit, the woke mode argument can also encode flags.
+ * FALLOC_FL_KEEP_SIZE is the woke only supported flag so far.
  */
 #define FALLOC_FL_MODE_MASK	(FALLOC_FL_ALLOCATE_RANGE |	\
 				 FALLOC_FL_PUNCH_HOLE |		\

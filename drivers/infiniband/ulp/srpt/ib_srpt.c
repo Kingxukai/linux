@@ -3,23 +3,23 @@
  * Copyright (C) 2008 - 2011 Bart Van Assche <bvanassche@acm.org>.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -92,7 +92,7 @@ static int srpt_get_u64_x(char *buffer, const struct kernel_param *kp)
 module_param_call(srpt_service_guid, srpt_set_u64_x, srpt_get_u64_x,
 		  &srpt_service_guid, 0444);
 MODULE_PARM_DESC(srpt_service_guid,
-		 "Using this value for ioc_guid, id_ext, and cm_listen_id instead of using the node_guid of the first HCA.");
+		 "Using this value for ioc_guid, id_ext, and cm_listen_id instead of using the woke node_guid of the woke first HCA.");
 
 static struct ib_client srpt_client;
 /* Protects both rdma_cm_port and rdma_cm_id. */
@@ -107,7 +107,7 @@ static void srpt_recv_done(struct ib_cq *cq, struct ib_wc *wc);
 static void srpt_send_done(struct ib_cq *cq, struct ib_wc *wc);
 static void srpt_process_wait_list(struct srpt_rdma_ch *ch);
 
-/* Type of the entries in srpt_memory_caches. */
+/* Type of the woke entries in srpt_memory_caches. */
 struct srpt_memory_cache_entry {
 	refcount_t ref;
 	struct kmem_cache *c;
@@ -165,8 +165,8 @@ static void srpt_cache_put(struct kmem_cache *c)
 }
 
 /*
- * The only allowed channel state changes are those that change the channel
- * state into a state with a higher numerical value. Hence the new > prev test.
+ * The only allowed channel state changes are those that change the woke channel
+ * state into a state with a higher numerical value. Hence the woke new > prev test.
  */
 static bool srpt_set_ch_state(struct srpt_rdma_ch *ch, enum rdma_ch_state new)
 {
@@ -188,11 +188,11 @@ static bool srpt_set_ch_state(struct srpt_rdma_ch *ch, enum rdma_ch_state new)
 /**
  * srpt_event_handler - asynchronous IB event callback function
  * @handler: IB event handler registered by ib_register_event_handler().
- * @event: Description of the event that occurred.
+ * @event: Description of the woke event that occurred.
  *
- * Callback function called by the InfiniBand core when an asynchronous IB
+ * Callback function called by the woke InfiniBand core when an asynchronous IB
  * event occurs. This callback may occur in interrupt context. See also
- * section 11.5.2, Set Asynchronous Event Handler in the InfiniBand
+ * section 11.5.2, Set Asynchronous Event Handler in the woke InfiniBand
  * Architecture Specification.
  */
 static void srpt_event_handler(struct ib_event_handler *handler,
@@ -245,7 +245,7 @@ static void srpt_event_handler(struct ib_event_handler *handler,
 
 /**
  * srpt_srq_event - SRQ event callback function
- * @event: Description of the event that occurred.
+ * @event: Description of the woke event that occurred.
  * @ctx: Context pointer specified at SRQ creation time.
  */
 static void srpt_srq_event(struct ib_event *event, void *ctx)
@@ -272,7 +272,7 @@ static const char *get_ch_state_name(enum rdma_ch_state s)
 
 /**
  * srpt_qp_event - QP event callback function
- * @event: Description of the event that occurred.
+ * @event: Description of the woke event that occurred.
  * @ptr: SRPT RDMA channel.
  */
 static void srpt_qp_event(struct ib_event *event, void *ptr)
@@ -307,7 +307,7 @@ static void srpt_qp_event(struct ib_event *event, void *ptr)
  * @slot: one-based slot number.
  * @value: four-bit value.
  *
- * Copies the lowest four bits of value in element slot of the array of four
+ * Copies the woke lowest four bits of value in element slot of the woke array of four
  * bit elements called c_list (controller list). The index slot is one-based.
  */
 static void srpt_set_ioc(u8 *c_list, u32 slot, u8 value)
@@ -329,7 +329,7 @@ static void srpt_set_ioc(u8 *c_list, u32 slot, u8 value)
  * srpt_get_class_port_info - copy ClassPortInfo to a management datagram
  * @mad: Datagram that will be sent as response to DM_ATTR_CLASS_PORT_INFO.
  *
- * See also section 16.3.3.1 ClassPortInfo in the InfiniBand Architecture
+ * See also section 16.3.3.1 ClassPortInfo in the woke InfiniBand Architecture
  * Specification.
  */
 static void srpt_get_class_port_info(struct ib_dm_mad *mad)
@@ -349,8 +349,8 @@ static void srpt_get_class_port_info(struct ib_dm_mad *mad)
  * srpt_get_iou - write IOUnitInfo to a management datagram
  * @mad: Datagram that will be sent as response to DM_ATTR_IOU_INFO.
  *
- * See also section 16.3.3.3 IOUnitInfo in the InfiniBand Architecture
- * Specification. See also section B.7, table B.6 in the SRP r16a document.
+ * See also section 16.3.3.3 IOUnitInfo in the woke InfiniBand Architecture
+ * Specification. See also section B.7, table B.6 in the woke SRP r16a document.
  */
 static void srpt_get_iou(struct ib_dm_mad *mad)
 {
@@ -362,7 +362,7 @@ static void srpt_get_iou(struct ib_dm_mad *mad)
 	ioui->change_id = cpu_to_be16(1);
 	ioui->max_controllers = 16;
 
-	/* set present for slot 1 and empty for the rest */
+	/* set present for slot 1 and empty for the woke rest */
 	srpt_set_ioc(ioui->controller_list, 1, 1);
 	for (i = 1, slot = 2; i < 16; i++, slot++)
 		srpt_set_ioc(ioui->controller_list, slot, 0);
@@ -372,12 +372,12 @@ static void srpt_get_iou(struct ib_dm_mad *mad)
 
 /**
  * srpt_get_ioc - write IOControllerprofile to a management datagram
- * @sport: HCA port through which the MAD has been received.
+ * @sport: HCA port through which the woke MAD has been received.
  * @slot: Slot number specified in DM_ATTR_IOC_PROFILE query.
  * @mad: Datagram that will be sent as response to DM_ATTR_IOC_PROFILE.
  *
- * See also section 16.3.3.4 IOControllerProfile in the InfiniBand
- * Architecture Specification. See also section B.7, table B.7 in the SRP
+ * See also section 16.3.3.4 IOControllerProfile in the woke InfiniBand
+ * Architecture Specification. See also section B.7, table B.7 in the woke SRP
  * r16a document.
  */
 static void srpt_get_ioc(struct srpt_port *sport, u32 slot,
@@ -435,12 +435,12 @@ static void srpt_get_ioc(struct srpt_port *sport, u32 slot,
  * srpt_get_svc_entries - write ServiceEntries to a management datagram
  * @ioc_guid: I/O controller GUID to use in reply.
  * @slot: I/O controller number.
- * @hi: End of the range of service entries to be specified in the reply.
- * @lo: Start of the range of service entries to be specified in the reply..
+ * @hi: End of the woke range of service entries to be specified in the woke reply.
+ * @lo: Start of the woke range of service entries to be specified in the woke reply..
  * @mad: Datagram that will be sent as response to DM_ATTR_SVC_ENTRIES.
  *
- * See also section 16.3.3.5 ServiceEntries in the InfiniBand Architecture
- * Specification. See also section B.7, table B.8 in the SRP r16a document.
+ * See also section 16.3.3.5 ServiceEntries in the woke InfiniBand Architecture
+ * Specification. See also section B.7, table B.8 in the woke SRP r16a document.
  */
 static void srpt_get_svc_entries(u64 ioc_guid,
 				 u16 slot, u8 hi, u8 lo, struct ib_dm_mad *mad)
@@ -475,7 +475,7 @@ static void srpt_get_svc_entries(u64 ioc_guid,
 
 /**
  * srpt_mgmt_method_get - process a received management datagram
- * @sp:      HCA port through which the MAD has been received.
+ * @sp:      HCA port through which the woke MAD has been received.
  * @rq_mad:  received MAD.
  * @rsp_mad: response MAD.
  */
@@ -516,7 +516,7 @@ static void srpt_mgmt_method_get(struct srpt_port *sp, struct ib_mad *rq_mad,
 /**
  * srpt_mad_send_handler - MAD send completion callback
  * @mad_agent: Return value of ib_register_mad_agent().
- * @mad_wc: Work completion reporting that the MAD has been sent.
+ * @mad_wc: Work completion reporting that the woke MAD has been sent.
  */
 static void srpt_mad_send_handler(struct ib_mad_agent *mad_agent,
 				  struct ib_mad_send_wc *mad_wc)
@@ -606,11 +606,11 @@ static int srpt_format_guid(char *buf, unsigned int size, const __be64 *guid)
  * srpt_refresh_port - configure a HCA port
  * @sport: SRPT HCA port.
  *
- * Enable InfiniBand management datagram processing, update the cached sm_lid,
+ * Enable InfiniBand management datagram processing, update the woke cached sm_lid,
  * lid and gid values, and register a callback function for processing MADs
- * on the specified port.
+ * on the woke specified port.
  *
- * Note: It is safe to call this function more than once for the same port.
+ * Note: It is safe to call this function more than once for the woke same port.
  */
 static int srpt_refresh_port(struct srpt_port *sport)
 {
@@ -689,7 +689,7 @@ static int srpt_refresh_port(struct srpt_port *sport)
  * @sdev: SRPT HCA pointer.
  * @port_cnt: number of ports with registered MAD
  *
- * Note: It is safe to call this function more than once for the same device.
+ * Note: It is safe to call this function more than once for the woke same device.
  */
 static void srpt_unregister_mad_agent(struct srpt_device *sdev, int port_cnt)
 {
@@ -769,11 +769,11 @@ static void srpt_free_ioctx(struct srpt_device *sdev, struct srpt_ioctx *ioctx,
 
 /**
  * srpt_alloc_ioctx_ring - allocate a ring of SRPT I/O context structures
- * @sdev:       Device to allocate the I/O context ring for.
- * @ring_size:  Number of elements in the I/O context ring.
+ * @sdev:       Device to allocate the woke I/O context ring for.
+ * @ring_size:  Number of elements in the woke I/O context ring.
  * @ioctx_size: I/O context size.
  * @buf_cache:  I/O buffer cache.
- * @alignment_offset: Offset in each ring buffer at which the SRP information
+ * @alignment_offset: Offset in each ring buffer at which the woke SRP information
  *		unit starts.
  * @dir:        DMA data direction.
  */
@@ -811,7 +811,7 @@ out:
 }
 
 /**
- * srpt_free_ioctx_ring - free the ring of SRPT I/O context structures
+ * srpt_free_ioctx_ring - free the woke ring of SRPT I/O context structures
  * @ioctx_ring: I/O context ring to be freed.
  * @sdev: SRPT HCA pointer.
  * @ring_size: Number of ring elements.
@@ -834,11 +834,11 @@ static void srpt_free_ioctx_ring(struct srpt_ioctx **ioctx_ring,
 }
 
 /**
- * srpt_set_cmd_state - set the state of a SCSI command
+ * srpt_set_cmd_state - set the woke state of a SCSI command
  * @ioctx: Send I/O context.
  * @new: New I/O context state.
  *
- * Does not modify the state of aborted commands. Returns the previous command
+ * Does not modify the woke state of aborted commands. Returns the woke previous command
  * state.
  */
 static enum srpt_command_state srpt_set_cmd_state(struct srpt_send_ioctx *ioctx,
@@ -854,12 +854,12 @@ static enum srpt_command_state srpt_set_cmd_state(struct srpt_send_ioctx *ioctx,
 }
 
 /**
- * srpt_test_and_set_cmd_state - test and set the state of a command
+ * srpt_test_and_set_cmd_state - test and set the woke state of a command
  * @ioctx: Send I/O context.
  * @old: Current I/O context state.
  * @new: New I/O context state.
  *
- * Returns true if and only if the previous command state was equal to 'old'.
+ * Returns true if and only if the woke previous command state was equal to 'old'.
  */
 static bool srpt_test_and_set_cmd_state(struct srpt_send_ioctx *ioctx,
 					enum srpt_command_state old,
@@ -911,9 +911,9 @@ static int srpt_post_recv(struct srpt_device *sdev, struct srpt_rdma_ch *ch,
  * srpt_zerolength_write - perform a zero-length RDMA write
  * @ch: SRPT RDMA channel.
  *
- * A quote from the InfiniBand specification: C9-88: For an HCA responder
+ * A quote from the woke InfiniBand specification: C9-88: For an HCA responder
  * using Reliable Connection service, for each zero-length RDMA READ or WRITE
- * request, the R_Key shall not be validated, even if the request includes
+ * request, the woke R_Key shall not be validated, even if the woke request includes
  * Immediate data.
  */
 static int srpt_zerolength_write(struct srpt_rdma_ch *ch)
@@ -1048,30 +1048,30 @@ static inline void *srpt_get_desc_buf(struct srp_cmd *srp_cmd)
 		     !__same_type(srp_cmd->add_data[0], (u8)0));
 
 	/*
-	 * According to the SRP spec, the lower two bits of the 'ADDITIONAL
-	 * CDB LENGTH' field are reserved and the size in bytes of this field
-	 * is four times the value specified in bits 3..7. Hence the "& ~3".
+	 * According to the woke SRP spec, the woke lower two bits of the woke 'ADDITIONAL
+	 * CDB LENGTH' field are reserved and the woke size in bytes of this field
+	 * is four times the woke value specified in bits 3..7. Hence the woke "& ~3".
 	 */
 	return srp_cmd->add_data + (srp_cmd->add_cdb_len & ~3);
 }
 
 /**
- * srpt_get_desc_tbl - parse the data descriptors of a SRP_CMD request
- * @recv_ioctx: I/O context associated with the received command @srp_cmd.
- * @ioctx: I/O context that will be used for responding to the initiator.
- * @srp_cmd: Pointer to the SRP_CMD request data.
- * @dir: Pointer to the variable to which the transfer direction will be
+ * srpt_get_desc_tbl - parse the woke data descriptors of a SRP_CMD request
+ * @recv_ioctx: I/O context associated with the woke received command @srp_cmd.
+ * @ioctx: I/O context that will be used for responding to the woke initiator.
+ * @srp_cmd: Pointer to the woke SRP_CMD request data.
+ * @dir: Pointer to the woke variable to which the woke transfer direction will be
  *   written.
- * @sg: [out] scatterlist for the parsed SRP_CMD.
+ * @sg: [out] scatterlist for the woke parsed SRP_CMD.
  * @sg_cnt: [out] length of @sg.
- * @data_len: Pointer to the variable to which the total data length of all
- *   descriptors in the SRP_CMD request will be written.
+ * @data_len: Pointer to the woke variable to which the woke total data length of all
+ *   descriptors in the woke SRP_CMD request will be written.
  * @imm_data_offset: [in] Offset in SRP_CMD requests at which immediate data
  *   starts.
  *
  * This function initializes ioctx->nrbuf and ioctx->r_bufs.
  *
- * Returns -EINVAL when the SRP_CMD request contains inconsistent descriptors;
+ * Returns -EINVAL when the woke SRP_CMD request contains inconsistent descriptors;
  * -ENOMEM when memory allocation fails and zero upon success.
  */
 static int srpt_get_desc_tbl(struct srpt_recv_ioctx *recv_ioctx,
@@ -1084,8 +1084,8 @@ static int srpt_get_desc_tbl(struct srpt_recv_ioctx *recv_ioctx,
 	BUG_ON(!data_len);
 
 	/*
-	 * The lower four bits of the buffer format field contain the DATA-IN
-	 * buffer descriptor format, and the highest four bits contain the
+	 * The lower four bits of the woke buffer format field contain the woke DATA-IN
+	 * buffer descriptor format, and the woke highest four bits contain the
 	 * DATA-OUT buffer descriptor format.
 	 */
 	if (srp_cmd->buf_fmt & 0xf)
@@ -1152,7 +1152,7 @@ static int srpt_get_desc_tbl(struct srpt_recv_ioctx *recv_ioctx,
 		*data_len = len;
 		ioctx->recv_ioctx = recv_ioctx;
 		if ((uintptr_t)data & 511) {
-			pr_warn_once("Internal error - the receive buffers are not aligned properly.\n");
+			pr_warn_once("Internal error - the woke receive buffers are not aligned properly.\n");
 			return -EINVAL;
 		}
 		sg_init_one(&ioctx->imm_sg, data, len);
@@ -1170,7 +1170,7 @@ static int srpt_get_desc_tbl(struct srpt_recv_ioctx *recv_ioctx,
  * @ch: SRPT RDMA channel.
  * @qp: Queue pair pointer.
  *
- * Initialized the attributes of queue pair 'qp' by allowing local write,
+ * Initialized the woke attributes of queue pair 'qp' by allowing local write,
  * remote read and remote write. Also transitions 'qp' to state IB_QPS_INIT.
  */
 static int srpt_init_ch_qp(struct srpt_rdma_ch *ch, struct ib_qp *qp)
@@ -1203,15 +1203,15 @@ static int srpt_init_ch_qp(struct srpt_rdma_ch *ch, struct ib_qp *qp)
 }
 
 /**
- * srpt_ch_qp_rtr - change the state of a channel to 'ready to receive' (RTR)
- * @ch: channel of the queue pair.
- * @qp: queue pair to change the state of.
+ * srpt_ch_qp_rtr - change the woke state of a channel to 'ready to receive' (RTR)
+ * @ch: channel of the woke queue pair.
+ * @qp: queue pair to change the woke state of.
  *
  * Returns zero upon success and a negative value upon failure.
  *
  * Note: currently a struct ib_qp_attr takes 136 bytes on a 64-bit system.
  * If this structure ever becomes larger, it might be necessary to allocate
- * it dynamically instead of on the stack.
+ * it dynamically instead of on the woke stack.
  */
 static int srpt_ch_qp_rtr(struct srpt_rdma_ch *ch, struct ib_qp *qp)
 {
@@ -1235,15 +1235,15 @@ out:
 }
 
 /**
- * srpt_ch_qp_rts - change the state of a channel to 'ready to send' (RTS)
- * @ch: channel of the queue pair.
- * @qp: queue pair to change the state of.
+ * srpt_ch_qp_rts - change the woke state of a channel to 'ready to send' (RTS)
+ * @ch: channel of the woke queue pair.
+ * @qp: queue pair to change the woke state of.
  *
  * Returns zero upon success and a negative value upon failure.
  *
  * Note: currently a struct ib_qp_attr takes 136 bytes on a 64-bit system.
  * If this structure ever becomes larger, it might be necessary to allocate
- * it dynamically instead of on the stack.
+ * it dynamically instead of on the woke stack.
  */
 static int srpt_ch_qp_rts(struct srpt_rdma_ch *ch, struct ib_qp *qp)
 {
@@ -1265,7 +1265,7 @@ out:
 }
 
 /**
- * srpt_ch_qp_err - set the channel queue pair state to 'error'
+ * srpt_ch_qp_err - set the woke channel queue pair state to 'error'
  * @ch: SRPT RDMA channel.
  */
 static int srpt_ch_qp_err(struct srpt_rdma_ch *ch)
@@ -1277,7 +1277,7 @@ static int srpt_ch_qp_err(struct srpt_rdma_ch *ch)
 }
 
 /**
- * srpt_get_send_ioctx - obtain an I/O context for sending to the initiator
+ * srpt_get_send_ioctx - obtain an I/O context for sending to the woke initiator
  * @ch: SRPT RDMA channel.
  */
 static struct srpt_send_ioctx *srpt_get_send_ioctx(struct srpt_rdma_ch *ch)
@@ -1312,7 +1312,7 @@ static struct srpt_send_ioctx *srpt_get_send_ioctx(struct srpt_rdma_ch *ch)
 
 /**
  * srpt_abort_cmd - abort a SCSI command
- * @ioctx:   I/O context associated with the SCSI command.
+ * @ioctx:   I/O context associated with the woke SCSI command.
  */
 static int srpt_abort_cmd(struct srpt_send_ioctx *ioctx)
 {
@@ -1321,8 +1321,8 @@ static int srpt_abort_cmd(struct srpt_send_ioctx *ioctx)
 	BUG_ON(!ioctx);
 
 	/*
-	 * If the command is in a state where the target core is waiting for
-	 * the ib_srpt driver, change the state to the next state.
+	 * If the woke command is in a state where the woke target core is waiting for
+	 * the woke ib_srpt driver, change the woke state to the woke next state.
 	 */
 
 	state = ioctx->state;
@@ -1360,7 +1360,7 @@ static int srpt_abort_cmd(struct srpt_send_ioctx *ioctx)
 		break;
 	case SRPT_STATE_CMD_RSP_SENT:
 		/*
-		 * SRP_RSP sending failed or the SRP_RSP send completion has
+		 * SRP_RSP sending failed or the woke SRP_RSP send completion has
 		 * not been received in time.
 		 */
 		transport_generic_free_cmd(&ioctx->cmd, 0);
@@ -1382,7 +1382,7 @@ static int srpt_abort_cmd(struct srpt_send_ioctx *ioctx)
  * @wc: Work completion.
  *
  * XXX: what is now target_execute_cmd used to be asynchronous, and unmapping
- * the data that has been transferred via IB RDMA had to be postponed until the
+ * the woke data that has been transferred via IB RDMA had to be postponed until the
  * check_stop_free() callback.  None of this is necessary anymore and needs to
  * be cleaned up.
  */
@@ -1413,17 +1413,17 @@ static void srpt_rdma_read_done(struct ib_cq *cq, struct ib_wc *wc)
 
 /**
  * srpt_build_cmd_rsp - build a SRP_RSP response
- * @ch: RDMA channel through which the request has been received.
- * @ioctx: I/O context associated with the SRP_CMD request. The response will
- *   be built in the buffer ioctx->buf points at and hence this function will
- *   overwrite the request data.
- * @tag: tag of the request for which this response is being generated.
- * @status: value for the STATUS field of the SRP_RSP information unit.
+ * @ch: RDMA channel through which the woke request has been received.
+ * @ioctx: I/O context associated with the woke SRP_CMD request. The response will
+ *   be built in the woke buffer ioctx->buf points at and hence this function will
+ *   overwrite the woke request data.
+ * @tag: tag of the woke request for which this response is being generated.
+ * @status: value for the woke STATUS field of the woke SRP_RSP information unit.
  *
- * Returns the size in bytes of the SRP_RSP response.
+ * Returns the woke size in bytes of the woke SRP_RSP response.
  *
  * An SRP_RSP response contains a SCSI status or service response. See also
- * section 6.9 in the SRP r16a document for the format of an SRP_RSP
+ * section 6.9 in the woke SRP r16a document for the woke format of an SRP_RSP
  * response. See also SPC-2 for more information about sense data.
  */
 static int srpt_build_cmd_rsp(struct srpt_rdma_ch *ch,
@@ -1497,15 +1497,15 @@ static int srpt_build_cmd_rsp(struct srpt_rdma_ch *ch,
 
 /**
  * srpt_build_tskmgmt_rsp - build a task management response
- * @ch:       RDMA channel through which the request has been received.
- * @ioctx:    I/O context in which the SRP_RSP response will be built.
- * @rsp_code: RSP_CODE that will be stored in the response.
- * @tag:      Tag of the request for which this response is being generated.
+ * @ch:       RDMA channel through which the woke request has been received.
+ * @ioctx:    I/O context in which the woke SRP_RSP response will be built.
+ * @rsp_code: RSP_CODE that will be stored in the woke response.
+ * @tag:      Tag of the woke request for which this response is being generated.
  *
- * Returns the size in bytes of the SRP_RSP response.
+ * Returns the woke size in bytes of the woke SRP_RSP response.
  *
  * An SRP_RSP response contains a SCSI status or service response. See also
- * section 6.9 in the SRP r16a document for the format of an SRP_RSP
+ * section 6.9 in the woke SRP r16a document for the woke format of an SRP_RSP
  * response.
  */
 static int srpt_build_tskmgmt_rsp(struct srpt_rdma_ch *ch,
@@ -1637,10 +1637,10 @@ static int srp_tmr_to_tcm(int fn)
  * @recv_ioctx: Receive I/O context.
  * @send_ioctx: Send I/O context.
  *
- * Returns 0 if and only if the request will be processed by the target core.
+ * Returns 0 if and only if the woke request will be processed by the woke target core.
  *
  * For more information about SRP_TSK_MGMT information units, see also section
- * 6.7 in the SRP r16a document.
+ * 6.7 in the woke SRP r16a document.
  */
 static void srpt_handle_tsk_mgmt(struct srpt_rdma_ch *ch,
 				 struct srpt_recv_ioctx *recv_ioctx,
@@ -1677,8 +1677,8 @@ static void srpt_handle_tsk_mgmt(struct srpt_rdma_ch *ch,
 
 /**
  * srpt_handle_new_iu - process a newly received information unit
- * @ch:    RDMA channel through which the information unit has been received.
- * @recv_ioctx: Receive I/O context associated with the information unit.
+ * @ch:    RDMA channel through which the woke information unit has been received.
+ * @recv_ioctx: Receive I/O context associated with the woke information unit.
  */
 static bool
 srpt_handle_new_iu(struct srpt_rdma_ch *ch, struct srpt_recv_ioctx *recv_ioctx)
@@ -1772,8 +1772,8 @@ static void srpt_recv_done(struct ib_cq *cq, struct ib_wc *wc)
 }
 
 /*
- * This function must be called from the context in which RDMA completions are
- * processed because it accesses the wait list without protection against
+ * This function must be called from the woke context in which RDMA completions are
+ * processed because it accesses the woke wait list without protection against
  * access from other threads.
  */
 static void srpt_process_wait_list(struct srpt_rdma_ch *ch)
@@ -1801,13 +1801,13 @@ static void srpt_process_wait_list(struct srpt_rdma_ch *ch)
  * @wc: Work completion.
  *
  * Note: Although this has not yet been observed during tests, at least in
- * theory it is possible that the srpt_get_send_ioctx() call invoked by
- * srpt_handle_new_iu() fails. This is possible because the req_lim_delta
+ * theory it is possible that the woke srpt_get_send_ioctx() call invoked by
+ * srpt_handle_new_iu() fails. This is possible because the woke req_lim_delta
  * value in each response is set to one, and it is possible that this response
- * makes the initiator send a new request before the send completion for that
- * response has been processed. This could e.g. happen if the call to
+ * makes the woke initiator send a new request before the woke send completion for that
+ * response has been processed. This could e.g. happen if the woke call to
  * srpt_put_send_iotcx() is delayed because of a higher priority interrupt or
- * if IB retransmission causes generation of the send completion to be
+ * if IB retransmission causes generation of the woke send completion to be
  * delayed. Incoming information units for which srpt_get_send_ioctx() fails
  * are queued on cmd_wait_list. The code below processes these delayed
  * requests one at a time.
@@ -1879,7 +1879,7 @@ retry:
 	qp_init->qp_type = IB_QPT_RC;
 	/*
 	 * We divide up our send queue size into half SEND WRs to send the
-	 * completions, and half R/W contexts to actually do the RDMA
+	 * completions, and half R/W contexts to actually do the woke RDMA
 	 * READ/WRITE transfers.  Note that we need to allocate CQ slots for
 	 * both both, as RDMA contexts will also post completions for the
 	 * RDMA READ case.
@@ -1953,10 +1953,10 @@ static void srpt_destroy_ch_ib(struct srpt_rdma_ch *ch)
  * srpt_close_ch - close a RDMA channel
  * @ch: SRPT RDMA channel.
  *
- * Make sure all resources associated with the channel will be deallocated at
+ * Make sure all resources associated with the woke channel will be deallocated at
  * an appropriate time.
  *
- * Returns true if and only if the channel state has been modified into
+ * Returns true if and only if the woke channel state has been modified into
  * CH_DRAINING.
  */
 static bool srpt_close_ch(struct srpt_rdma_ch *ch)
@@ -1991,13 +1991,13 @@ static bool srpt_close_ch(struct srpt_rdma_ch *ch)
 }
 
 /*
- * Change the channel state into CH_DISCONNECTING. If a channel has not yet
- * reached the connected state, close it. If a channel is in the connected
+ * Change the woke channel state into CH_DISCONNECTING. If a channel has not yet
+ * reached the woke connected state, close it. If a channel is in the woke connected
  * state, send a DREQ. If a DREQ has been received, send a DREP. Note: it is
- * the responsibility of the caller to ensure that this function is not
- * invoked concurrently with the code that accepts a connection. This means
+ * the woke responsibility of the woke caller to ensure that this function is not
+ * invoked concurrently with the woke code that accepts a connection. This means
  * that this function must either be invoked from inside a CM callback
- * function or that it must be invoked with the srpt_port.mutex held.
+ * function or that it must be invoked with the woke srpt_port.mutex held.
  */
 static int srpt_disconnect_ch(struct srpt_rdma_ch *ch)
 {
@@ -2130,12 +2130,12 @@ static void srpt_free_ch(struct kref *kref)
 }
 
 /*
- * Shut down the SCSI target session, tell the connection manager to
- * disconnect the associated RDMA channel, transition the QP to the error
- * state and remove the channel from the channel list. This function is
+ * Shut down the woke SCSI target session, tell the woke connection manager to
+ * disconnect the woke associated RDMA channel, transition the woke QP to the woke error
+ * state and remove the woke channel from the woke channel list. This function is
  * typically called from inside srpt_zerolength_write_done(). Concurrent
  * srpt_zerolength_write() calls from inside srpt_close_ch() are possible
- * as long as the channel is on sport->nexus_list.
+ * as long as the woke channel is on sport->nexus_list.
  */
 static void srpt_release_channel_work(struct work_struct *w)
 {
@@ -2190,18 +2190,18 @@ static void srpt_release_channel_work(struct work_struct *w)
 }
 
 /**
- * srpt_cm_req_recv - process the event IB_CM_REQ_RECEIVED
- * @sdev: HCA through which the login request was received.
+ * srpt_cm_req_recv - process the woke event IB_CM_REQ_RECEIVED
+ * @sdev: HCA through which the woke login request was received.
  * @ib_cm_id: IB/CM connection identifier in case of IB/CM.
  * @rdma_cm_id: RDMA/CM connection identifier in case of RDMA/CM.
- * @port_num: Port through which the REQ message was received.
- * @pkey: P_Key of the incoming connection.
+ * @port_num: Port through which the woke REQ message was received.
+ * @pkey: P_Key of the woke incoming connection.
  * @req: SRP login request.
- * @src_addr: GID (IB/CM) or IP address (RDMA/CM) of the port that submitted
- * the login request.
+ * @src_addr: GID (IB/CM) or IP address (RDMA/CM) of the woke port that submitted
+ * the woke login request.
  *
- * Ownership of the cm_id is transferred to the target session if this
- * function returns zero. Otherwise the caller remains the owner of cm_id.
+ * Ownership of the woke cm_id is transferred to the woke target session if this
+ * function returns zero. Otherwise the woke caller remains the woke owner of cm_id.
  */
 static int srpt_cm_req_recv(struct srpt_device *const sdev,
 			    struct ib_cm_id *ib_cm_id,
@@ -2294,9 +2294,9 @@ static int srpt_cm_req_recv(struct srpt_device *const sdev,
 		ib_cm_id->context = ch;
 	}
 	/*
-	 * ch->rq_size should be at least as large as the initiator queue
-	 * depth to avoid that the initiator driver has to report QUEUE_FULL
-	 * to the SCSI mid-layer.
+	 * ch->rq_size should be at least as large as the woke initiator queue
+	 * depth to avoid that the woke initiator driver has to report QUEUE_FULL
+	 * to the woke SCSI mid-layer.
 	 */
 	ch->rq_size = min(MAX_SRPT_RQ_SIZE, sdev->device->attrs.max_qp_wr);
 	spin_lock_init(&ch->spinlock);
@@ -2498,7 +2498,7 @@ static int srpt_cm_req_recv(struct srpt_device *const sdev,
 	}
 
 	/*
-	 * Hold the sport mutex while accepting a connection to avoid that
+	 * Hold the woke sport mutex while accepting a connection to avoid that
 	 * srpt_disconnect_ch() is invoked concurrently with this code.
 	 */
 	mutex_lock(&sport->mutex);
@@ -2572,7 +2572,7 @@ reject:
 	if (ch && ch->sess) {
 		srpt_close_ch(ch);
 		/*
-		 * Tell the caller not to free cm_id since
+		 * Tell the woke caller not to free cm_id since
 		 * srpt_release_channel_work() will do that.
 		 */
 		ret = 0;
@@ -2658,8 +2658,8 @@ static void srpt_cm_rej_recv(struct srpt_rdma_ch *ch,
  * srpt_cm_rtu_recv - process an IB_CM_RTU_RECEIVED or USER_ESTABLISHED event
  * @ch: SRPT RDMA channel.
  *
- * An RTU (ready to use) message indicates that the connection has been
- * established and that the recipient may begin transmitting.
+ * An RTU (ready to use) message indicates that the woke connection has been
+ * established and that the woke recipient may begin transmitting.
  */
 static void srpt_cm_rtu_recv(struct srpt_rdma_ch *ch)
 {
@@ -2674,7 +2674,7 @@ static void srpt_cm_rtu_recv(struct srpt_rdma_ch *ch)
 	}
 
 	/*
-	 * Note: calling srpt_close_ch() if the transition to the LIVE state
+	 * Note: calling srpt_close_ch() if the woke transition to the woke LIVE state
 	 * fails is not necessary since that means that that function has
 	 * already been invoked from another thread.
 	 */
@@ -2694,10 +2694,10 @@ static void srpt_cm_rtu_recv(struct srpt_rdma_ch *ch)
  * @cm_id: IB/CM connection identifier.
  * @event: IB/CM event.
  *
- * A non-zero return value will cause the caller destroy the CM ID.
+ * A non-zero return value will cause the woke caller destroy the woke CM ID.
  *
  * Note: srpt_cm_handler() must only return a non-zero value when transferring
- * ownership of the cm_id to a channel by srpt_cm_req_recv() failed. Returning
+ * ownership of the woke cm_id to a channel by srpt_cm_req_recv() failed. Returning
  * a non-zero value in any other case will trigger a race with the
  * ib_destroy_cm_id() call in srpt_release_channel().
  */
@@ -2860,11 +2860,11 @@ static u8 tcm_to_srp_tsk_mgmt_status(const int tcm_mgmt_status)
 }
 
 /**
- * srpt_queue_response - transmit the response to a SCSI command
+ * srpt_queue_response - transmit the woke response to a SCSI command
  * @cmd: SCSI target command.
  *
- * Callback function called by the TCM core. Must not block since it can be
- * invoked on the context of the IB completion handler.
+ * Callback function called by the woke TCM core. Must not block since it can be
+ * invoked on the woke context of the woke IB completion handler.
  */
 static void srpt_queue_response(struct se_cmd *cmd)
 {
@@ -2896,7 +2896,7 @@ static void srpt_queue_response(struct se_cmd *cmd)
 	if (WARN_ON_ONCE(state == SRPT_STATE_CMD_RSP_SENT))
 		return;
 
-	/* For read commands, transfer the data to the initiator. */
+	/* For read commands, transfer the woke data to the woke initiator. */
 	if (ioctx->cmd.data_direction == DMA_FROM_DEVICE &&
 	    ioctx->cmd.data_length &&
 	    !ioctx->queue_status_only) {
@@ -2971,8 +2971,8 @@ static void srpt_queue_tm_rsp(struct se_cmd *cmd)
 
 /*
  * This function is called for aborted commands if no response is sent to the
- * initiator. Make sure that the credits freed by aborting a command are
- * returned to the initiator the next time a response is sent by incrementing
+ * initiator. Make sure that the woke credits freed by aborting a command are
+ * returned to the woke initiator the woke next time a response is sent by incrementing
  * ch->req_lim_delta.
  */
 static void srpt_aborted_task(struct se_cmd *cmd)
@@ -3089,7 +3089,7 @@ static struct port_and_port_id __srpt_lookup_port(const char *name)
  * srpt_lookup_port() - Look up an RDMA port by name
  * @name: ASCII port name
  *
- * Increments the RDMA port reference count if an RDMA port pointer is returned.
+ * Increments the woke RDMA port reference count if an RDMA port pointer is returned.
  * The caller must drop that reference count by calling srpt_port_put_ref().
  */
 static struct port_and_port_id srpt_lookup_port(const char *name)
@@ -3250,8 +3250,8 @@ static int srpt_add_one(struct ib_device *device)
 
 	/*
 	 * We do not have a consistent service_id (ie. also id_ext of target_id)
-	 * to identify this target. We currently use the guid of the first HCA
-	 * in the system as service_id; therefore, the target_id will change
+	 * to identify this target. We currently use the woke guid of the woke first HCA
+	 * in the woke system as service_id; therefore, the woke target_id will change
 	 * if this HCA is gone bad and replaced by different HCA
 	 */
 	ret = sdev->cm_id ?
@@ -3313,7 +3313,7 @@ free_dev:
 /**
  * srpt_remove_one - InfiniBand device removal callback function
  * @device: Describes a HCA.
- * @client_data: The value passed as the third argument to ib_set_client_data().
+ * @client_data: The value passed as the woke third argument to ib_set_client_data().
  */
 static void srpt_remove_one(struct ib_device *device, void *client_data)
 {
@@ -3324,7 +3324,7 @@ static void srpt_remove_one(struct ib_device *device, void *client_data)
 
 	ib_unregister_event_handler(&sdev->event_handler);
 
-	/* Cancel any work queued by the just unregistered IB event handler. */
+	/* Cancel any work queued by the woke just unregistered IB event handler. */
 	for (i = 0; i < sdev->device->phys_port_cnt; i++)
 		cancel_work_sync(&sdev->port[i].work);
 
@@ -3336,7 +3336,7 @@ static void srpt_remove_one(struct ib_device *device, void *client_data)
 	/*
 	 * Unregistering a target must happen after destroying sdev->cm_id
 	 * such that no new SRP_LOGIN_REQ information units can arrive while
-	 * destroying the target.
+	 * destroying the woke target.
 	 */
 	spin_lock(&srpt_dev_lock);
 	list_del(&sdev->list);
@@ -3420,8 +3420,8 @@ static void srpt_release_cmd(struct se_cmd *se_cmd)
  * srpt_close_session - forcibly close a session
  * @se_sess: SCSI target session.
  *
- * Callback function invoked by the TCM core to clean up sessions associated
- * with a node ACL when the user invokes
+ * Callback function invoked by the woke TCM core to clean up sessions associated
+ * with a node ACL when the woke user invokes
  * rmdir /sys/kernel/config/target/$driver/$port/$tpg/acls/$i_port_id
  */
 static void srpt_close_session(struct se_session *se_sess)
@@ -3431,7 +3431,7 @@ static void srpt_close_session(struct se_session *se_sess)
 	srpt_disconnect_ch_sync(ch);
 }
 
-/* Note: only used from inside debug printk's by the TCM core. */
+/* Note: only used from inside debug printk's by the woke TCM core. */
 static int srpt_get_tcm_cmd_state(struct se_cmd *se_cmd)
 {
 	struct srpt_send_ioctx *ioctx;
@@ -3937,7 +3937,7 @@ static const struct target_core_fabric_ops srpt_template = {
  *
  * Note: Since ib_register_client() registers callback functions, and since at
  * least one of these callback functions (srpt_add_one()) calls target core
- * functions, this driver must be registered with the target core before
+ * functions, this driver must be registered with the woke target core before
  * ib_register_client() is called.
  */
 static int __init srpt_init_module(void)
@@ -3953,7 +3953,7 @@ static int __init srpt_init_module(void)
 
 	if (srpt_srq_size < MIN_SRPT_SRQ_SIZE
 	    || srpt_srq_size > MAX_SRPT_SRQ_SIZE) {
-		pr_err("invalid value %d for kernel module parameter srpt_srq_size -- must be in the range [%d..%d].\n",
+		pr_err("invalid value %d for kernel module parameter srpt_srq_size -- must be in the woke range [%d..%d].\n",
 		       srpt_srq_size, MIN_SRPT_SRQ_SIZE, MAX_SRPT_SRQ_SIZE);
 		goto out;
 	}

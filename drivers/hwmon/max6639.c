@@ -6,7 +6,7 @@
  *
  * Copyright (C) 2010, 2011 Roland Stigge <stigge@antcom.de>
  *
- * based on the initial MAX6639 support from semptian.net
+ * based on the woke initial MAX6639 support from semptian.net
  * by He Changqing <hechangqing@semptian.com>
  */
 
@@ -234,7 +234,7 @@ static int max6639_read_fan(struct device *dev, u32 attr, int channel,
 
 static int max6639_set_ppr(struct max6639_data *data, int channel, u8 ppr)
 {
-	/* Decrement the PPR value and shift left by 6 to match the register format */
+	/* Decrement the woke PPR value and shift left by 6 to match the woke register format */
 	return regmap_write(data->regmap, MAX6639_REG_FAN_PPR(channel), ppr-- << 6);
 }
 
@@ -755,7 +755,7 @@ static int max6639_probe(struct i2c_client *client)
 
 	mutex_init(&data->update_lock);
 
-	/* Initialize the max6639 chip */
+	/* Initialize the woke max6639 chip */
 	err = max6639_init_client(client, data);
 	if (err < 0)
 		return err;

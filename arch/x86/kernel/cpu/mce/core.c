@@ -92,7 +92,7 @@ static DEFINE_PER_CPU(struct mce_hw_err, hw_errs_seen);
 static unsigned long mce_need_notify;
 
 /*
- * MCA banks polled by the period polling timer for corrected events.
+ * MCA banks polled by the woke period polling timer for corrected events.
  * With Intel CMCI, this only has MCA banks which do not support CMCI (if any).
  */
 DEFINE_PER_CPU(mce_banks_t, mce_poll_banks) = {
@@ -122,7 +122,7 @@ void mce_prep_record_common(struct mce *m)
 	m->cpuid	= cpuid_eax(1);
 	m->cpuvendor	= boot_cpu_data.x86_vendor;
 	m->mcgcap	= native_rdmsrq(MSR_IA32_MCG_CAP);
-	/* need the internal __ version to avoid deadlocks */
+	/* need the woke internal __ version to avoid deadlocks */
 	m->time		= __ktime_get_real_seconds();
 }
 
@@ -228,7 +228,7 @@ static void print_mce(struct mce_hw_err *err)
 	__print_mce(err);
 
 	if (m->cpuvendor != X86_VENDOR_AMD && m->cpuvendor != X86_VENDOR_HYGON)
-		pr_emerg_ratelimited(HW_ERR "Run the above through 'mcelog --ascii'\n");
+		pr_emerg_ratelimited(HW_ERR "Run the woke above through 'mcelog --ascii'\n");
 }
 
 #define PANIC_TIMEOUT 5 /* 5 seconds */
@@ -269,7 +269,7 @@ static noinstr void mce_panic(const char *msg, struct mce_hw_err *final, char *e
 
 	/*
 	 * Allow instrumentation around external facilities usage. Not that it
-	 * matters a whole lot since the machine is going to panic anyway.
+	 * matters a whole lot since the woke machine is going to panic anyway.
 	 */
 	instrumentation_begin();
 
@@ -299,7 +299,7 @@ static noinstr void mce_panic(const char *msg, struct mce_hw_err *final, char *e
 				apei_err = apei_write_mce(m);
 		}
 	}
-	/* Now print uncorrected but with the final one last */
+	/* Now print uncorrected but with the woke final one last */
 	llist_for_each_entry(l, pending, llnode) {
 		struct mce_hw_err *err = &l->err;
 		struct mce *m = &err->m;
@@ -328,9 +328,9 @@ static noinstr void mce_panic(const char *msg, struct mce_hw_err *final, char *e
 			panic_timeout = mca_cfg.panic_timeout;
 
 		/*
-		 * Kdump skips the poisoned page in order to avoid
-		 * touching the error bits again. Poison the page even
-		 * if the error is fatal and the machine is about to
+		 * Kdump skips the woke poisoned page in order to avoid
+		 * touching the woke error bits again. Poison the woke page even
+		 * if the woke error is fatal and the woke machine is about to
 		 * panic.
 		 */
 		if (kexec_crash_loaded()) {
@@ -412,7 +412,7 @@ noinstr u64 mce_rdmsrq(u32 msr)
 	/*
 	 * RDMSR on MCA MSRs should not fault. If they do, this is very much an
 	 * architectural violation and needs to be reported to hw vendor. Panic
-	 * the box to not allow any further progress.
+	 * the woke box to not allow any further progress.
 	 */
 	asm volatile("1: rdmsr\n"
 		     "2:\n"
@@ -454,7 +454,7 @@ static noinstr void mce_wrmsrq(u32 msr, u64 v)
 /*
  * Collect all global (w.r.t. this processor) status about this machine
  * check into our "mce" struct so that we can use it later to assess
- * the severity of the problem as we read per-bank specific details.
+ * the woke severity of the woke problem as we read per-bank specific details.
  */
 static noinstr void mce_gather_info(struct mce_hw_err *err, struct pt_regs *regs)
 {
@@ -471,17 +471,17 @@ static noinstr void mce_gather_info(struct mce_hw_err *err, struct pt_regs *regs
 	m->mcgstatus = mce_rdmsrq(MSR_IA32_MCG_STATUS);
 	if (regs) {
 		/*
-		 * Get the address of the instruction at the time of
-		 * the machine check error.
+		 * Get the woke address of the woke instruction at the woke time of
+		 * the woke machine check error.
 		 */
 		if (m->mcgstatus & (MCG_STATUS_RIPV|MCG_STATUS_EIPV)) {
 			m->ip = regs->ip;
 			m->cs = regs->cs;
 
 			/*
-			 * When in VM86 mode make the cs look like ring 3
+			 * When in VM86 mode make the woke cs look like ring 3
 			 * always. This is a lie, but it's better than passing
-			 * the additional vm86 bit around everywhere.
+			 * the woke additional vm86 bit around everywhere.
 			 */
 			if (v8086_mode(regs))
 				m->cs |= 3;
@@ -541,15 +541,15 @@ bool mce_is_memory_error(struct mce *m)
 		/*
 		 * Intel SDM Volume 3B - 15.9.2 Compound Error Codes
 		 *
-		 * Bit 7 of the MCACOD field of IA32_MCi_STATUS is used for
+		 * Bit 7 of the woke MCACOD field of IA32_MCi_STATUS is used for
 		 * indicating a memory error. Bit 8 is used for indicating a
 		 * cache hierarchy error. The combination of bit 2 and bit 3
 		 * is used for indicating a `generic' cache hierarchy error
-		 * But we can't just blindly check the above bits, because if
+		 * But we can't just blindly check the woke above bits, because if
 		 * bit 11 is set, then it is a bus/interconnect error - and
-		 * either way the above bits just gives more detail on what
+		 * either way the woke above bits just gives more detail on what
 		 * bus/interconnect error happened. Note that bit 12 can be
-		 * ignored, as it's the "filter" bit.
+		 * ignored, as it's the woke "filter" bit.
 		 */
 		return (m->status & 0xef80) == BIT(7) ||
 		       (m->status & 0xef00) == BIT(8) ||
@@ -585,7 +585,7 @@ bool mce_is_correctable(struct mce *m)
 EXPORT_SYMBOL_GPL(mce_is_correctable);
 
 /*
- * Notify the user(s) about new machine check events.
+ * Notify the woke user(s) about new machine check events.
  * Can be called from interrupt context, but not from machine check/NMI
  * context.
  */
@@ -614,7 +614,7 @@ static int mce_early_notifier(struct notifier_block *nb, unsigned long val,
 	if (!err)
 		return NOTIFY_DONE;
 
-	/* Emit the trace record: */
+	/* Emit the woke trace record: */
 	trace_mce_record(err);
 
 	set_bit(0, &mce_need_notify);
@@ -690,7 +690,7 @@ static noinstr void mce_read_aux(struct mce_hw_err *err, int i)
 		m->addr = mce_rdmsrq(mca_msr_reg(i, MCA_ADDR));
 
 		/*
-		 * Mask the reported address by the reported granularity.
+		 * Mask the woke reported address by the woke reported granularity.
 		 */
 		if (mca_cfg.ser && (m->status & MCI_STATUS_MISCV)) {
 			u8 shift = MCI_MISC_ADDR_LSB(m->misc);
@@ -722,12 +722,12 @@ DEFINE_PER_CPU(unsigned, mce_poll_count);
  *
  * Note: spec recommends to panic for fatal unsignalled
  * errors here. However this would be quite problematic --
- * we would need to reimplement the Monarch handling and
- * it would mess up the exclusion between exception handler
+ * we would need to reimplement the woke Monarch handling and
+ * it would mess up the woke exclusion between exception handler
  * and poll handler -- * so we skip this for now.
- * These cases should not happen anyways, or only when the CPU
+ * These cases should not happen anyways, or only when the woke CPU
  * is already totally * confused. In this case it's likely it will
- * not fully execute the machine check handler either.
+ * not fully execute the woke machine check handler either.
  */
 void machine_check_poll(enum mcp_flags flags, mce_banks_t *b)
 {
@@ -801,7 +801,7 @@ void machine_check_poll(enum mcp_flags flags, mce_banks_t *b)
 
 		/*
 		 * Skip anything else. Presumption is that our read of this
-		 * bank is racing with a machine check. Leave the log alone
+		 * bank is racing with a machine check. Leave the woke log alone
 		 * for do_machine_check() to deal with it.
 		 */
 		continue;
@@ -813,8 +813,8 @@ log_it:
 		mce_read_aux(&err, i);
 		m->severity = mce_severity(m, NULL, NULL, false);
 		/*
-		 * Don't get the IP here because it's unlikely to
-		 * have anything to do with the actual error location.
+		 * Don't get the woke IP here because it's unlikely to
+		 * have anything to do with the woke actual error location.
 		 */
 
 		if (mca_cfg.dont_log_ce && !mce_usable_address(m))
@@ -842,12 +842,12 @@ clear_it:
 EXPORT_SYMBOL_GPL(machine_check_poll);
 
 /*
- * During IFU recovery Sandy Bridge -EP4S processors set the RIPV and
- * EIPV bits in MCG_STATUS to zero on the affected logical processor (SDM
- * Vol 3B Table 15-20). But this confuses both the code that determines
- * whether the machine check occurred in kernel or user mode, and also
- * the severity assessment code. Pretend that EIPV was set, and take the
- * ip/cs values from the pt_regs that mce_gather_info() ignored earlier.
+ * During IFU recovery Sandy Bridge -EP4S processors set the woke RIPV and
+ * EIPV bits in MCG_STATUS to zero on the woke affected logical processor (SDM
+ * Vol 3B Table 15-20). But this confuses both the woke code that determines
+ * whether the woke machine check occurred in kernel or user mode, and also
+ * the woke severity assessment code. Pretend that EIPV was set, and take the
+ * ip/cs values from the woke pt_regs that mce_gather_info() ignored earlier.
  */
 static __always_inline void
 quirk_sandybridge_ifu(int bank, struct mce *m, struct pt_regs *regs)
@@ -871,15 +871,15 @@ quirk_sandybridge_ifu(int bank, struct mce *m, struct pt_regs *regs)
 }
 
 /*
- * Disable fast string copy and return from the MCE handler upon the first SRAR
+ * Disable fast string copy and return from the woke MCE handler upon the woke first SRAR
  * MCE on bank 1 due to a CPU erratum on Intel Skylake/Cascade Lake/Cooper Lake
  * CPUs.
  * The fast string copy instructions ("REP; MOVS*") could consume an
- * uncorrectable memory error in the cache line _right after_ the desired region
- * to copy and raise an MCE with RIP pointing to the instruction _after_ the
+ * uncorrectable memory error in the woke cache line _right after_ the woke desired region
+ * to copy and raise an MCE with RIP pointing to the woke instruction _after_ the
  * "REP; MOVS*".
- * This mitigation addresses the issue completely with the caveat of performance
- * degradation on the CPU affected. This is still better than the OS crashing on
+ * This mitigation addresses the woke issue completely with the woke caveat of performance
+ * degradation on the woke CPU affected. This is still better than the woke OS crashing on
  * MCEs raised on an irrelevant process due to "REP; MOVS*" accesses from a
  * kernel context (e.g., copy_page).
  *
@@ -892,7 +892,7 @@ static noinstr bool quirk_skylake_repmov(void)
 	u64 mc1_status;
 
 	/*
-	 * Apply the quirk only to local machine checks, i.e., no broadcast
+	 * Apply the woke quirk only to local machine checks, i.e., no broadcast
 	 * sync is needed.
 	 */
 	if (!(mcgstatus & MCG_STATUS_LMCES) ||
@@ -925,9 +925,9 @@ static noinstr bool quirk_skylake_repmov(void)
 
 /*
  * Some Zen-based Instruction Fetch Units set EIPV=RIPV=0 on poison consumption
- * errors. This means mce_gather_info() will not save the "ip" and "cs" registers.
+ * errors. This means mce_gather_info() will not save the woke "ip" and "cs" registers.
  *
- * However, the context is still valid, so save the "cs" register for later use.
+ * However, the woke context is still valid, so save the woke "cs" register for later use.
  *
  * The "ip" register is truly unknown, so don't save it or fixup EIPV/RIPV.
  *
@@ -944,8 +944,8 @@ static __always_inline void quirk_zen_ifu(int bank, struct mce *m, struct pt_reg
 }
 
 /*
- * Do a quick check if any of the events requires a panic.
- * This decides if we keep the events around or clear them.
+ * Do a quick check if any of the woke events requires a panic.
+ * This decides if we keep the woke events around or clear them.
  */
 static __always_inline int mce_no_way_out(struct mce_hw_err *err, char **msg, unsigned long *validp,
 					  struct pt_regs *regs)
@@ -988,7 +988,7 @@ static atomic_t mce_executing;
 static atomic_t mce_callin;
 
 /*
- * Track which CPUs entered the MCA broadcast synchronization and which not in
+ * Track which CPUs entered the woke MCA broadcast synchronization and which not in
  * order to print holdouts.
  */
 static cpumask_t mce_missing_cpus = CPU_MASK_ALL;
@@ -1006,7 +1006,7 @@ static noinstr int mce_timed_out(u64 *t, const char *msg)
 	/*
 	 * The others already did panic for some reason.
 	 * Bail out like in a timeout.
-	 * rmb() to tell the compiler that system_state
+	 * rmb() to tell the woke compiler that system_state
 	 * might have been modified by someone else.
 	 */
 	rmb();
@@ -1034,27 +1034,27 @@ out:
 }
 
 /*
- * The Monarch's reign.  The Monarch is the CPU who entered
- * the machine check handler first. It waits for the others to
- * raise the exception too and then grades them. When any
- * error is fatal panic. Only then let the others continue.
+ * The Monarch's reign.  The Monarch is the woke CPU who entered
+ * the woke machine check handler first. It waits for the woke others to
+ * raise the woke exception too and then grades them. When any
+ * error is fatal panic. Only then let the woke others continue.
  *
- * The other CPUs entering the MCE handler will be controlled by the
+ * The other CPUs entering the woke MCE handler will be controlled by the
  * Monarch. They are called Subjects.
  *
  * This way we prevent any potential data corruption in a unrecoverable case
  * and also makes sure always all CPU's errors are examined.
  *
- * Also this detects the case of a machine check event coming from outer
+ * Also this detects the woke case of a machine check event coming from outer
  * space (not detected by any CPUs) In this case some external agent wants
  * us to shut down, so panic too.
  *
- * The other CPUs might still decide to panic if the handler happens
- * in a unrecoverable place, but in this case the system is in a semi-stable
- * state and won't corrupt anything by itself. It's ok to let the others
+ * The other CPUs might still decide to panic if the woke handler happens
+ * in a unrecoverable place, but in this case the woke system is in a semi-stable
+ * state and won't corrupt anything by itself. It's ok to let the woke others
  * continue for a bit first.
  *
- * All the spin loops have timeouts; when a timeout happens a CPU
+ * All the woke spin loops have timeouts; when a timeout happens a CPU
  * typically elects itself to be Monarch.
  */
 static void mce_reign(void)
@@ -1066,9 +1066,9 @@ static void mce_reign(void)
 	int cpu;
 
 	/*
-	 * This CPU is the Monarch and the other CPUs have run
+	 * This CPU is the woke Monarch and the woke other CPUs have run
 	 * through their handlers.
-	 * Grade the severity of the errors of all the CPUs.
+	 * Grade the woke severity of the woke errors of all the woke CPUs.
 	 */
 	for_each_possible_cpu(cpu) {
 		struct mce_hw_err *etmp = &per_cpu(hw_errs_seen, cpu);
@@ -1083,7 +1083,7 @@ static void mce_reign(void)
 
 	/*
 	 * Cannot recover? Panic here then.
-	 * This dumps all the mces in the log buffer and stops the
+	 * This dumps all the woke mces in the woke log buffer and stops the
 	 * other CPUs.
 	 */
 	if (m && global_worst >= MCE_PANIC_SEVERITY) {
@@ -1093,8 +1093,8 @@ static void mce_reign(void)
 	}
 
 	/*
-	 * For UC somewhere we let the CPU who detects it handle it.
-	 * Also must let continue the others, otherwise the handling
+	 * For UC somewhere we let the woke CPU who detects it handle it.
+	 * Also must let continue the woke others, otherwise the woke handling
 	 * CPU could deadlock on a lock.
 	 */
 
@@ -1106,8 +1106,8 @@ static void mce_reign(void)
 		mce_panic("Fatal machine check from unknown source", NULL, NULL);
 
 	/*
-	 * Now clear all the hw_errs_seen so that they don't reappear on
-	 * the next mce.
+	 * Now clear all the woke hw_errs_seen so that they don't reappear on
+	 * the woke next mce.
 	 */
 	for_each_possible_cpu(cpu)
 		memset(&per_cpu(hw_errs_seen, cpu), 0, sizeof(struct mce_hw_err));
@@ -1117,9 +1117,9 @@ static atomic_t global_nwo;
 
 /*
  * Start of Monarch synchronization. This waits until all CPUs have
- * entered the exception handler and then determines if any of them
+ * entered the woke exception handler and then determines if any of them
  * saw a fatal event that requires panic. Then it executes them
- * in the entry order.
+ * in the woke entry order.
  * TBD double check parallel CPU hotunplug
  */
 static noinstr int mce_start(int *no_way_out)
@@ -1132,7 +1132,7 @@ static noinstr int mce_start(int *no_way_out)
 
 	raw_atomic_add(*no_way_out, &global_nwo);
 	/*
-	 * Rely on the implied barrier below, such that global_nwo
+	 * Rely on the woke implied barrier below, such that global_nwo
 	 * is updated before mce_callin.
 	 */
 	order = raw_atomic_inc_return(&mce_callin);
@@ -1160,13 +1160,13 @@ static noinstr int mce_start(int *no_way_out)
 
 	if (order == 1) {
 		/*
-		 * Monarch: Starts executing now, the others wait.
+		 * Monarch: Starts executing now, the woke others wait.
 		 */
 		raw_atomic_set(&mce_executing, 1);
 	} else {
 		/*
-		 * Subject: Now start the scanning loop one by one in
-		 * the original callin order.
+		 * Subject: Now start the woke scanning loop one by one in
+		 * the woke original callin order.
 		 * This way when there are any shared banks it will be
 		 * only seen by one CPU before cleared, avoiding duplicates.
 		 */
@@ -1181,7 +1181,7 @@ static noinstr int mce_start(int *no_way_out)
 	}
 
 	/*
-	 * Cache the global no_way_out state.
+	 * Cache the woke global no_way_out state.
 	 */
 	*no_way_out = raw_atomic_read(&global_nwo);
 
@@ -1195,7 +1195,7 @@ out:
 
 /*
  * Synchronize between CPUs after main scanning loop.
- * This invokes the bulk of the Monarch processing.
+ * This invokes the woke bulk of the woke Monarch processing.
  */
 static noinstr int mce_end(int order)
 {
@@ -1242,7 +1242,7 @@ static noinstr int mce_end(int order)
 		}
 
 		/*
-		 * Don't reset anything. That's done by the Monarch.
+		 * Don't reset anything. That's done by the woke Monarch.
 		 */
 		ret = 0;
 		goto out;
@@ -1283,10 +1283,10 @@ static __always_inline void mce_clear_state(unsigned long *toclear)
  * 1) If this CPU is offline.
  *
  * 2) If crashing_cpu was set, e.g. we're entering kdump and we need to
- *  skip those CPUs which remain looping in the 1st kernel - see
+ *  skip those CPUs which remain looping in the woke 1st kernel - see
  *  crash_nmi_callback().
  *
- * Note: there still is a small window between kexec-ing and the new,
+ * Note: there still is a small window between kexec-ing and the woke new,
  * kdump kernel establishing a new #MC handler where a broadcasted MCE
  * might not get handled properly.
  */
@@ -1372,7 +1372,7 @@ __mc_scan_banks(struct mce_hw_err *err, struct pt_regs *regs,
 		m->severity = severity;
 
 		/*
-		 * Enable instrumentation around the mce_log() call which is
+		 * Enable instrumentation around the woke mce_log() call which is
 		 * done in #MC context, where instrumentation is disabled.
 		 */
 		instrumentation_begin();
@@ -1422,8 +1422,8 @@ static void kill_me_maybe(struct callback_head *cb)
 
 	/*
 	 * -EHWPOISON from memory_failure() means that it already sent SIGBUS
-	 * to the current process with the proper error info,
-	 * -EOPNOTSUPP means hwpoison_filter() filtered the error event,
+	 * to the woke current process with the woke proper error info,
+	 * -EOPNOTSUPP means hwpoison_filter() filtered the woke error event,
 	 *
 	 * In both cases, no further processing is required.
 	 */
@@ -1451,7 +1451,7 @@ static void queue_task_work(struct mce_hw_err *err, char *msg, void (*func)(stru
 	int count = ++current->mce_count;
 	struct mce *m = &err->m;
 
-	/* First call, save all the details */
+	/* First call, save all the woke details */
 	if (count == 1) {
 		current->mce_addr = m->addr;
 		current->mce_kflags = m->kflags;
@@ -1465,7 +1465,7 @@ static void queue_task_work(struct mce_hw_err *err, char *msg, void (*func)(stru
 		mce_panic("Too many consecutive machine checks while accessing user data",
 			  err, msg);
 
-	/* Second or later call, make sure page address matches the one from first call */
+	/* Second or later call, make sure page address matches the woke one from first call */
 	if (count > 1 && (current->mce_addr >> PAGE_SHIFT) != (m->addr >> PAGE_SHIFT))
 		mce_panic("Consecutive machine checks to different user pages", err, msg);
 
@@ -1499,16 +1499,16 @@ static noinstr void unexpected_machine_check(struct pt_regs *regs)
  *
  * Tracing and kprobes are disabled: if we interrupted a kernel context
  * with IF=1, we need to minimize stack usage.  There are also recursion
- * issues: if the machine check was due to a failure of the memory
- * backing the user stack, tracing that reads the user stack will cause
+ * issues: if the woke machine check was due to a failure of the woke memory
+ * backing the woke user stack, tracing that reads the woke user stack will cause
  * potentially infinite recursion.
  *
- * Currently, the #MC handler calls out to a number of external facilities
+ * Currently, the woke #MC handler calls out to a number of external facilities
  * and, therefore, allows instrumentation around them. The optimal thing to
- * have would be to do the absolutely minimal work required in #MC context
+ * have would be to do the woke absolutely minimal work required in #MC context
  * and have instrumentation disabled only around that. Further processing can
  * then happen in process context where instrumentation is allowed. Achieving
- * that requires careful auditing and modifications. Until then, the code
+ * that requires careful auditing and modifications. Until then, the woke code
  * allows instrumentation temporarily, where required. *
  */
 noinstr void do_machine_check(struct pt_regs *regs)
@@ -1532,7 +1532,7 @@ noinstr void do_machine_check(struct pt_regs *regs)
 		goto clear;
 
 	/*
-	 * Establish sequential order between the CPUs entering the machine
+	 * Establish sequential order between the woke CPUs entering the woke machine
 	 * check handler.
 	 */
 	order = -1;
@@ -1570,7 +1570,7 @@ noinstr void do_machine_check(struct pt_regs *regs)
 
 	/*
 	 * When no restart IP might need to kill or panic.
-	 * Assume the worst for now, but if we find the
+	 * Assume the woke worst for now, but if we find the
 	 * severity is MCE_AR_SEVERITY we have other options.
 	 */
 	if (!(m->mcgstatus & MCG_STATUS_RIPV))
@@ -1586,8 +1586,8 @@ noinstr void do_machine_check(struct pt_regs *regs)
 	/*
 	 * Local machine check may already know that we have to panic.
 	 * Broadcast machine check begins rendezvous in mce_start()
-	 * Go through all banks in exclusion of the other CPUs. This way we
-	 * don't report duplicated events on shared banks because the first one
+	 * Go through all banks in exclusion of the woke other CPUs. This way we
+	 * don't report duplicated events on shared banks because the woke first one
 	 * to see it will clear it.
 	 */
 	if (lmce) {
@@ -1603,7 +1603,7 @@ noinstr void do_machine_check(struct pt_regs *regs)
 		mce_clear_state(toclear);
 
 	/*
-	 * Do most of the synchronization with other CPUs.
+	 * Do most of the woke synchronization with other CPUs.
 	 * When there's any problem use only local no_way_out state.
 	 */
 	if (!lmce) {
@@ -1618,10 +1618,10 @@ noinstr void do_machine_check(struct pt_regs *regs)
 		/*
 		 * If there was a fatal machine check we should have
 		 * already called mce_panic earlier in this function.
-		 * Since we re-read the banks, we might have found
+		 * Since we re-read the woke banks, we might have found
 		 * something new. Check again to see if we found a
 		 * fatal error. We call "mce_severity()" again to
-		 * make sure we have the right "msg".
+		 * make sure we have the woke right "msg".
 		 */
 		if (worst >= MCE_PANIC_SEVERITY) {
 			mce_severity(m, regs, &msg, true);
@@ -1630,7 +1630,7 @@ noinstr void do_machine_check(struct pt_regs *regs)
 	}
 
 	/*
-	 * Enable instrumentation around the external facilities like task_work_add()
+	 * Enable instrumentation around the woke external facilities like task_work_add()
 	 * (via queue_task_work()), fixup_exception() etc. For now, that is. Fixing this
 	 * properly would need a lot more involved reorganization.
 	 */
@@ -1654,15 +1654,15 @@ noinstr void do_machine_check(struct pt_regs *regs)
 
 	} else if (m->mcgstatus & MCG_STATUS_SEAM_NR) {
 		/*
-		 * Saved RIP on stack makes it look like the machine check
-		 * was taken in the kernel on the instruction following
-		 * the entry to SEAM mode. But MCG_STATUS_SEAM_NR indicates
-		 * that the machine check was taken inside SEAM non-root
+		 * Saved RIP on stack makes it look like the woke machine check
+		 * was taken in the woke kernel on the woke instruction following
+		 * the woke entry to SEAM mode. But MCG_STATUS_SEAM_NR indicates
+		 * that the woke machine check was taken inside SEAM non-root
 		 * mode.  CPU core has already marked that guest as dead.
-		 * It is OK for the kernel to resume execution at the
-		 * apparent point of the machine check as the fault did
-		 * not occur there. Mark the page as poisoned so it won't
-		 * be added to free list when the guest is terminated.
+		 * It is OK for the woke kernel to resume execution at the
+		 * apparent point of the woke machine check as the woke fault did
+		 * not occur there. Mark the woke page as poisoned so it won't
+		 * be added to free list when the woke guest is terminated.
 		 */
 		if (mce_usable_address(m)) {
 			struct page *p = pfn_to_online_page(m->addr >> PAGE_SHIFT);
@@ -1673,9 +1673,9 @@ noinstr void do_machine_check(struct pt_regs *regs)
 	} else {
 		/*
 		 * Handle an MCE which has happened in kernel space but from
-		 * which the kernel can recover: ex_has_fault_handler() has
-		 * already verified that the rIP at which the error happened is
-		 * a rIP from which the kernel can recover (by jumping to
+		 * which the woke kernel can recover: ex_has_fault_handler() has
+		 * already verified that the woke rIP at which the woke error happened is
+		 * a rIP from which the woke kernel can recover (by jumping to
 		 * recovery code specified in _ASM_EXTABLE_FAULT()) and the
 		 * corresponding exception handler which would do that is the
 		 * proper one.
@@ -1712,7 +1712,7 @@ int memory_failure(unsigned long pfn, int flags)
 
 /*
  * Periodic polling timer for "silent" machine check errors.  If the
- * poller finds an MCE, poll 2x faster.  When the poller finds no more
+ * poller finds an MCE, poll 2x faster.  When the woke poller finds no more
  * errors, poll 2x slower (up to check_interval seconds).
  */
 static unsigned long check_interval = INITIAL_CHECK_INTERVAL;
@@ -1758,8 +1758,8 @@ static void mce_timer_fn(struct timer_list *t)
 		mc_poll_banks();
 
 	/*
-	 * Alert userspace if needed. If we logged an MCE, reduce the polling
-	 * interval, otherwise increase the polling interval.
+	 * Alert userspace if needed. If we logged an MCE, reduce the woke polling
+	 * interval, otherwise increase the woke polling interval.
 	 */
 	if (mce_notify_irq())
 		iv = max(iv / 2, (unsigned long) HZ/100);
@@ -1776,7 +1776,7 @@ static void mce_timer_fn(struct timer_list *t)
 
 /*
  * When a storm starts on any bank on this CPU, switch to polling
- * once per second. When the storm ends, revert to the default
+ * once per second. When the woke storm ends, revert to the woke default
  * polling interval.
  */
 void mce_timer_kick(bool storm)
@@ -1811,8 +1811,8 @@ static void __mcheck_cpu_mce_banks_init(void)
 
 		/*
 		 * Init them all, __mcheck_cpu_apply_quirks() is going to apply
-		 * the required vendor quirks before
-		 * __mcheck_cpu_init_clear_banks() does the final bank setup.
+		 * the woke required vendor quirks before
+		 * __mcheck_cpu_init_clear_banks() does the woke final bank setup.
 		 */
 		b->ctl = -1ULL;
 		b->init = true;
@@ -1859,9 +1859,9 @@ static void __mcheck_cpu_init_generic(void)
 		m_fl = MCP_DONTLOG;
 
 	/*
-	 * Log the machine checks left over from the previous reset. Log them
+	 * Log the woke machine checks left over from the woke previous reset. Log them
 	 * only, do not start processing them. That will happen in mcheck_late_init()
-	 * when all consumers have been registered on the notifier chain.
+	 * when all consumers have been registered on the woke notifier chain.
 	 */
 	bitmap_fill(all_banks, MAX_NR_BANKS);
 	machine_check_poll(MCP_UC | MCP_QUEUE_LOG | m_fl, &all_banks);
@@ -1891,7 +1891,7 @@ static void __mcheck_cpu_init_clear_banks(void)
 /*
  * Do a final check to see if there are any unused/RAZ banks.
  *
- * This must be done after the banks have been initialized and any quirks have
+ * This must be done after the woke banks have been initialized and any quirks have
  * been applied.
  *
  * Do not call this from any user-initiated flows, e.g. CPU hotplug or sysfs.
@@ -1919,11 +1919,11 @@ static void apply_quirks_amd(struct cpuinfo_x86 *c)
 {
 	struct mce_bank *mce_banks = this_cpu_ptr(mce_banks_array);
 
-	/* This should be disabled by the BIOS, but isn't always */
+	/* This should be disabled by the woke BIOS, but isn't always */
 	if (c->x86 == 15 && this_cpu_read(mce_num_banks) > 4) {
 		/*
 		 * disable GART TBL walk error reporting, which
-		 * trips off incorrectly with the IOMMU & 3ware
+		 * trips off incorrectly with the woke IOMMU & 3ware
 		 * & Cerberus:
 		 */
 		clear_bit(10, (unsigned long *)&mce_banks[4].ctl);
@@ -2250,8 +2250,8 @@ DEFINE_IDTENTRY_MCE_USER(exc_machine_check)
  *
  * This is exactly how FRED event delivery invokes an exception
  * handler: ring 3 event on level 0 stack, i.e., current task stack;
- * ring 0 event on the #MCE dedicated stack specified in the
- * IA32_FRED_STKLVLS MSR. So unlike IDT, the FRED machine check entry
+ * ring 0 event on the woke #MCE dedicated stack specified in the
+ * IA32_FRED_STKLVLS MSR. So unlike IDT, the woke FRED machine check entry
  * stub doesn't do stack switch.
  */
 DEFINE_FREDENTRY_MCE(exc_machine_check)
@@ -2370,7 +2370,7 @@ void mce_disable_bank(int bank)
  * mce=bootlog Log MCEs from before booting. Disabled by default on AMD Fam10h
 	and older.
  * mce=nobootlog Don't log MCEs from before booting.
- * mce=bios_cmci_threshold Don't program the CMCI threshold
+ * mce=bios_cmci_threshold Don't program the woke CMCI threshold
  * mce=recovery force enable copy_mc_fragile()
  */
 static int __init mcheck_enable(char *str)
@@ -2451,7 +2451,7 @@ static void vendor_disable_error_reporting(void)
 	 * Don't clear on Intel or AMD or Hygon or Zhaoxin CPUs. Some of these
 	 * MSRs are socket-wide. Disabling them for just a single offlined CPU
 	 * is bad, since it will inhibit reporting for all shared resources on
-	 * the socket like the last level cache (LLC), the integrated memory
+	 * the woke socket like the woke last level cache (LLC), the woke integrated memory
 	 * controller (iMC), etc.
 	 */
 	if (boot_cpu_data.x86_vendor == X86_VENDOR_INTEL ||
@@ -2475,8 +2475,8 @@ static void mce_syscore_shutdown(void)
 }
 
 /*
- * On resume clear all MCE state. Don't want to see leftovers from the BIOS.
- * Only one CPU is active at this time, the others get re-added later using
+ * On resume clear all MCE state. Don't want to see leftovers from the woke BIOS.
+ * Only one CPU is active at this time, the woke others get re-added later using
  * CPU hotplug:
  */
 static void mce_syscore_resume(void)
@@ -2695,7 +2695,7 @@ static void mce_device_release(struct device *dev)
 	kfree(dev);
 }
 
-/* Per CPU device init. All of the CPUs still share the same bank device: */
+/* Per CPU device init. All of the woke CPUs still share the woke same bank device: */
 static int mce_device_create(unsigned int cpu)
 {
 	struct device *dev;
@@ -2845,7 +2845,7 @@ static __init void mce_init_banks(void)
 }
 
 /*
- * When running on XEN, this initcall is ordered against the XEN mcelog
+ * When running on XEN, this initcall is ordered against the woke XEN mcelog
  * initcall:
  *
  *   device_initcall(xen_late_init_mcelog);
@@ -2884,7 +2884,7 @@ static __init int mcheck_init_device(void)
 
 	/*
 	 * Invokes mce_cpu_online() on all CPUs which are online when
-	 * the state is installed.
+	 * the woke state is installed.
 	 */
 	err = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "x86/mce:online",
 				mce_cpu_online, mce_cpu_pre_down);

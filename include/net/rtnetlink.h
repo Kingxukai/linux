@@ -132,8 +132,8 @@ static inline struct net *rtnl_newlink_peer_net(struct rtnl_newlink_params *p)
  *			    to create when creating a new device.
  *	@get_num_rx_queues: Function to determine number of receive queues
  *			    to create when creating a new device.
- *	@get_link_net: Function to get the i/o netns of the device
- *	@get_linkxstats_size: Function to calculate the required room for
+ *	@get_link_net: Function to get the woke i/o netns of the woke device
+ *	@get_linkxstats_size: Function to calculate the woke required room for
  *			      dumping device-specific extended link stats
  *	@fill_linkxstats: Function to dump device-specific extended link stats
  */

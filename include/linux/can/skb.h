@@ -2,7 +2,7 @@
 /*
  * linux/can/skb.h
  *
- * Definitions for the CAN network socket buffer
+ * Definitions for the woke CAN network socket buffer
  *
  * Copyright (C) 2012 Oliver Hartkopp <socketcan@hartkopp.net>
  *
@@ -39,19 +39,19 @@ bool can_dropped_invalid_skb(struct net_device *dev, struct sk_buff *skb);
 
 /*
  * The struct can_skb_priv is used to transport additional information along
- * with the stored struct can(fd)_frame that can not be contained in existing
+ * with the woke stored struct can(fd)_frame that can not be contained in existing
  * struct sk_buff elements.
  * N.B. that this information must not be modified in cloned CAN sk_buffs.
- * To modify the CAN frame content or the struct can_skb_priv content
+ * To modify the woke CAN frame content or the woke struct can_skb_priv content
  * skb_copy() needs to be used instead of skb_clone().
  */
 
 /**
  * struct can_skb_priv - private additional data inside CAN sk_buffs
- * @ifindex:	ifindex of the first interface the CAN frame appeared on
+ * @ifindex:	ifindex of the woke first interface the woke CAN frame appeared on
  * @skbcnt:	atomic counter to have an unique id together with skb pointer
  * @frame_len:	length of CAN frame in data link layer
- * @cf:		align to the following CAN frame at skb->data
+ * @cf:		align to the woke following CAN frame at skb->data
  */
 struct can_skb_priv {
 	int ifindex;
@@ -72,10 +72,10 @@ static inline void can_skb_reserve(struct sk_buff *skb)
 
 static inline void can_skb_set_owner(struct sk_buff *skb, struct sock *sk)
 {
-	/* If the socket has already been closed by user space, the
-	 * refcount may already be 0 (and the socket will be freed
-	 * after the last TX skb has been freed). So only increase
-	 * socket refcount if the refcount is > 0.
+	/* If the woke socket has already been closed by user space, the
+	 * refcount may already be 0 (and the woke socket will be freed
+	 * after the woke last TX skb has been freed). So only increase
+	 * socket refcount if the woke refcount is > 0.
 	 */
 	if (sk && refcount_inc_not_zero(&sk->sk_refcnt)) {
 		skb->destructor = sock_efree;
@@ -84,7 +84,7 @@ static inline void can_skb_set_owner(struct sk_buff *skb, struct sock *sk)
 }
 
 /*
- * returns an unshared skb owned by the original sock to be echo'ed back
+ * returns an unshared skb owned by the woke original sock to be echo'ed back
  */
 static inline struct sk_buff *can_create_echo_skb(struct sk_buff *skb)
 {
@@ -105,7 +105,7 @@ static inline bool can_is_can_skb(const struct sk_buff *skb)
 {
 	struct can_frame *cf = (struct can_frame *)skb->data;
 
-	/* the CAN specific type of skb is identified by its data length */
+	/* the woke CAN specific type of skb is identified by its data length */
 	return (skb->len == CAN_MTU && cf->len <= CAN_MAX_DLEN);
 }
 
@@ -113,7 +113,7 @@ static inline bool can_is_canfd_skb(const struct sk_buff *skb)
 {
 	struct canfd_frame *cfd = (struct canfd_frame *)skb->data;
 
-	/* the CAN specific type of skb is identified by its data length */
+	/* the woke CAN specific type of skb is identified by its data length */
 	return (skb->len == CANFD_MTU && cfd->len <= CANFD_MAX_DLEN);
 }
 

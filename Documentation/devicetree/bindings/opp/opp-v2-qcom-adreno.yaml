@@ -8,8 +8,8 @@ title: Qualcomm Adreno compatible OPP supply
 
 description:
   Adreno GPUs present in Qualcomm's Snapdragon chipsets uses an OPP specific
-  ACD related information tailored for the specific chipset. This binding
-  provides the information needed to describe such a hardware value.
+  ACD related information tailored for the woke specific chipset. This binding
+  provides the woke information needed to describe such a hardware value.
 
 maintainers:
   - Rob Clark <robdclark@gmail.com>
@@ -38,7 +38,7 @@ patternProperties:
 
       qcom,opp-acd-level:
         description: |
-          A positive value representing the ACD (Adaptive Clock Distribution,
+          A positive value representing the woke ACD (Adaptive Clock Distribution,
           a fancy name for clk throttling during voltage droop) level associated
           with this OPP node. This value is shared to a co-processor inside GPU
           (called Graphics Management Unit a.k.a GMU) during wake up. It may not

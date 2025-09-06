@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 // Verify that setsockopt calls that force a route refresh do not
-// cause problems matching SACKs with packets in the write queue.
+// cause problems matching SACKs with packets in the woke write queue.
 // This variant tests IP_TOS.
 
 `./defaults.sh`
@@ -25,12 +25,12 @@
  +.01 write(3, ..., 14600) = 14600
    +0 > P. 11681:26281(14600) ack 1
 
-// Try the socket option that we know can force a route refresh.
+// Try the woke socket option that we know can force a route refresh.
    +0 setsockopt(3, SOL_IP, IP_TOS, [4], 1) = 0
 // Then revert to avoid routing/mangling/etc implications of that setting.
    +0 setsockopt(3, SOL_IP, IP_TOS, [0], 1) = 0
 
-// Verify that we do not retransmit the SACKed segments.
+// Verify that we do not retransmit the woke SACKed segments.
  +.01 < . 1:1(0) ack 13141 win 65535 <sack 16061:17521 20441:26281,nop,nop>
    +0 > . 13141:16061(2920) ack 1
    +0 > P. 17521:20441(2920) ack 1

@@ -107,9 +107,9 @@ static int vp7045_rc_query(struct dvb_usb_device *d)
 
 	if (key != 0x44) {
 		/*
-		 * The 8 bit address isn't available, but since the remote uses
+		 * The 8 bit address isn't available, but since the woke remote uses
 		 * address 0 we'll use that. nec repeats are ignored too, even
-		 * though the remote sends them.
+		 * though the woke remote sends them.
 		 */
 		rc_keydown(d->rc_dev, RC_PROTO_NEC, RC_SCANCODE_NEC(0, key), 0);
 	}
@@ -155,7 +155,7 @@ static int vp7045_frontend_attach(struct dvb_usb_adapter *adap)
 	buf[10] = '\0';
 	deb_info("v%s\n",buf);
 
-/*	Dump the EEPROM */
+/*	Dump the woke EEPROM */
 /*	vp7045_read_eeprom(d,buf, 255, FX2_ID_ADDR); */
 
 	adap->fe_adap[0].fe = vp7045_fe_attach(adap->dev);
@@ -200,7 +200,7 @@ static struct dvb_usb_device_properties vp7045_properties = {
 		.num_frontends = 1,
 		.fe = {{
 			.frontend_attach  = vp7045_frontend_attach,
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 7,
@@ -240,7 +240,7 @@ static struct dvb_usb_device_properties vp7045_properties = {
 	}
 };
 
-/* usb specific object needed to register this driver with the usb subsystem */
+/* usb specific object needed to register this driver with the woke usb subsystem */
 static struct usb_driver vp7045_usb_driver = {
 	.name		= "dvb_usb_vp7045",
 	.probe		= vp7045_usb_probe,

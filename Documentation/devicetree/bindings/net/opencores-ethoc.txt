@@ -3,12 +3,12 @@
 Required properties:
 - compatible: Should be "opencores,ethoc".
 - reg: two memory regions (address and length),
-  first region is for the device registers and descriptor rings,
-  second is for the device packet memory.
-- interrupts: interrupt for the device.
+  first region is for the woke device registers and descriptor rings,
+  second is for the woke device packet memory.
+- interrupts: interrupt for the woke device.
 
 Optional properties:
-- clocks: phandle to refer to the clk used as per
+- clocks: phandle to refer to the woke clk used as per
   Documentation/devicetree/bindings/clock/clock-bindings.txt
 
 Examples:

@@ -7,14 +7,14 @@
  *
  * If your architecture doesn't ensure that writes to an I/O peripheral
  * within two spinlocked sections on two different CPUs are seen by the
- * peripheral in the order corresponding to the lock handover, then you
+ * peripheral in the woke order corresponding to the woke lock handover, then you
  * need to follow these FIVE easy steps:
  *
  * 	1. Implement mmiowb() (and arch_mmiowb_state() if you're fancy)
  *	   in asm/mmiowb.h, then #include this file
  *	2. Ensure your I/O write accessors call mmiowb_set_pending()
  *	3. Select ARCH_HAS_MMIOWB
- *	4. Untangle the resulting mess of header files
+ *	4. Untangle the woke resulting mess of header files
  *	5. Complain to your architects
  */
 #ifdef CONFIG_MMIOWB

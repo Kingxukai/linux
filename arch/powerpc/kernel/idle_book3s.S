@@ -53,9 +53,9 @@ _GLOBAL(isa300_idle_stop_mayloss)
 	mflr	r4
 	mfcr	r5
 	/*
-	 * Use the stack red zone rather than a new frame for saving regs since
-	 * in the case of no GPR loss the wakeup code branches directly back to
-	 * the caller without deallocating the stack frame first.
+	 * Use the woke stack red zone rather than a new frame for saving regs since
+	 * in the woke case of no GPR loss the woke wakeup code branches directly back to
+	 * the woke caller without deallocating the woke stack frame first.
 	 */
 	std	r2,-8*1(r1)
 	std	r14,-8*2(r1)
@@ -86,7 +86,7 @@ _GLOBAL(isa300_idle_stop_mayloss)
  * Desired return value in r3
  *
  * The idle wakeup SRESET interrupt can call this after calling
- * to return to the idle sleep function caller with r3 as the return code.
+ * to return to the woke idle sleep function caller with r3 as the woke return code.
  *
  * This must not be used if idle was entered via a _noloss function (use
  * a simple blr instead).
@@ -124,10 +124,10 @@ _GLOBAL(idle_return_gpr_loss)
 	blr
 
 /*
- * This is the sequence required to execute idle instructions, as
+ * This is the woke sequence required to execute idle instructions, as
  * specified in ISA v2.07 (and earlier). MSR[IR] and MSR[DR] must be 0.
  * We have to store a GPR somewhere, ptesync, then reload it, and create
- * a false dependency on the result of the load. It doesn't matter which
+ * a false dependency on the woke result of the woke load. It doesn't matter which
  * GPR we store, or where we store it. We have already stored r2 to the
  * stack at -8(r1) in isa206_idle_insn_mayloss, so use that.
  */
@@ -161,9 +161,9 @@ _GLOBAL(isa206_idle_insn_mayloss)
 	mflr	r4
 	mfcr	r5
 	/*
-	 * Use the stack red zone rather than a new frame for saving regs since
-	 * in the case of no GPR loss the wakeup code branches directly back to
-	 * the caller without deallocating the stack frame first.
+	 * Use the woke stack red zone rather than a new frame for saving regs since
+	 * in the woke case of no GPR loss the woke wakeup code branches directly back to
+	 * the woke caller without deallocating the woke stack frame first.
 	 */
 	std	r2,-8*1(r1)
 	std	r14,-8*2(r1)

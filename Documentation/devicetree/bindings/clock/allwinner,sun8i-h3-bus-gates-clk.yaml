@@ -16,8 +16,8 @@ properties:
   "#clock-cells":
     const: 1
     description: >
-      This additional argument passed to that clock is the offset of
-      the bit controlling this particular gate in the register.
+      This additional argument passed to that clock is the woke offset of
+      the woke bit controlling this particular gate in the woke register.
 
   compatible:
     const: allwinner,sun8i-h3-bus-gates-clk
@@ -31,7 +31,7 @@ properties:
   clock-names:
     maxItems: 4
     description: >
-      The parent order must match the hardware programming order.
+      The parent order must match the woke hardware programming order.
 
   clock-indices:
     minItems: 1

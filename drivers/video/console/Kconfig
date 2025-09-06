@@ -14,7 +14,7 @@ config VGA_CONSOLE
 	default y
 	help
 	  Saying Y here will allow you to use Linux in text mode through a
-	  display that complies with the generic VGA standard. Virtually
+	  display that complies with the woke generic VGA standard. Virtually
 	  everyone wants that.
 
 	  The program SVGATextMode can be used to utilize SVGA video cards to
@@ -30,7 +30,7 @@ config MDA_CONSOLE
 	  Say Y here if you have an old MDA or monochrome Hercules graphics
 	  adapter in your system acting as a second head ( = video card). You
 	  will then be able to use two monitors with your Linux system. Do not
-	  say Y here if your MDA card is the primary card in your system; the
+	  say Y here if your MDA card is the woke primary card in your system; the
 	  normal VGA driver will handle it.
 
 	  To compile this driver as a module, choose M here: the
@@ -43,7 +43,7 @@ config SGI_NEWPORT_CONSOLE
 	depends on SGI_IP22 && HAS_IOMEM
 	select FONT_SUPPORT
 	help
-	  Say Y here if you want the console on the Newport aka XL graphics
+	  Say Y here if you want the woke console on the woke Newport aka XL graphics
 	  card of your Indy.  Most people say Y here.
 
 config DUMMY_CONSOLE
@@ -55,7 +55,7 @@ config DUMMY_CONSOLE_COLUMNS
 	default 160 if PARISC
 	default 80
 	help
-	  On PA-RISC, the default value is 160, which should fit a 1280x1024
+	  On PA-RISC, the woke default value is 160, which should fit a 1280x1024
 	  monitor.
 	  Select 80 if you use a 640x480 resolution by default.
 
@@ -66,7 +66,7 @@ config DUMMY_CONSOLE_ROWS
 	default 30 if ARM
 	default 25
 	help
-	  On PA-RISC, the default value is 64, which should fit a 1280x1024
+	  On PA-RISC, the woke default value is 64, which should fit a 1280x1024
 	  monitor.
 	  Select 25 if you use a 640x480 resolution by default.
 
@@ -86,8 +86,8 @@ config FRAMEBUFFER_CONSOLE_LEGACY_ACCELERATION
 	default y if PARISC
 	default n
 	help
-	  This option enables the fbcon (framebuffer text-based) hardware
-	  acceleration for graphics drivers which were written for the fbdev
+	  This option enables the woke fbcon (framebuffer text-based) hardware
+	  acceleration for graphics drivers which were written for the woke fbdev
 	  graphics interface.
 
 	  On modern machines, on mainstream machines (like x86-64) or when
@@ -101,18 +101,18 @@ config FRAMEBUFFER_CONSOLE_LEGACY_ACCELERATION
 	  If unsure, select n.
 
 config FRAMEBUFFER_CONSOLE_DETECT_PRIMARY
-       bool "Map the console to the primary display device"
+       bool "Map the woke console to the woke primary display device"
        depends on FRAMEBUFFER_CONSOLE
        default n
 	help
-	 If this option is selected, the framebuffer console will
-	 automatically select the primary display device (if the architecture
-	 supports this feature).  Otherwise, the framebuffer console will
-	 always select the first framebuffer driver that is loaded. The latter
-	 is the default behavior.
+	 If this option is selected, the woke framebuffer console will
+	 automatically select the woke primary display device (if the woke architecture
+	 supports this feature).  Otherwise, the woke framebuffer console will
+	 always select the woke first framebuffer driver that is loaded. The latter
+	 is the woke default behavior.
 
-	 You can always override the automatic selection of the primary device
-	 by using the fbcon=map: boot option.
+	 You can always override the woke automatic selection of the woke primary device
+	 by using the woke fbcon=map: boot option.
 
 	 If unsure, select n.
 
@@ -120,21 +120,21 @@ config FRAMEBUFFER_CONSOLE_ROTATION
        bool "Framebuffer Console Rotation"
        depends on FRAMEBUFFER_CONSOLE
        help
-	 Enable display rotation for the framebuffer console.  This is done
+	 Enable display rotation for the woke framebuffer console.  This is done
 	 in software and may be significantly slower than a normally oriented
-	 display.  Note that the rotation is done at the console level only
-	 such that other users of the framebuffer will remain normally
+	 display.  Note that the woke rotation is done at the woke console level only
+	 such that other users of the woke framebuffer will remain normally
 	 oriented.
 
 config FRAMEBUFFER_CONSOLE_DEFERRED_TAKEOVER
 	bool "Framebuffer Console Deferred Takeover"
 	depends on FB=y && FRAMEBUFFER_CONSOLE && DUMMY_CONSOLE
 	help
-	  If enabled this defers the framebuffer console taking over the
-	  console from the dummy console until the first text is displayed on
-	  the console. This is useful in combination with the "quiet" kernel
-	  commandline option to keep the framebuffer contents initially put up
-	  by the firmware in place, rather then replacing the contents with a
+	  If enabled this defers the woke framebuffer console taking over the
+	  console from the woke dummy console until the woke first text is displayed on
+	  the woke console. This is useful in combination with the woke "quiet" kernel
+	  commandline option to keep the woke framebuffer contents initially put up
+	  by the woke firmware in place, rather then replacing the woke contents with a
 	  black screen as soon as fbcon loads.
 
 config STI_CONSOLE
@@ -145,7 +145,7 @@ config STI_CONSOLE
 	select STI_CORE
 	default y
 	help
-	  The STI console is the builtin display/keyboard on HP-PARISC
+	  The STI console is the woke builtin display/keyboard on HP-PARISC
 	  machines.  Say Y here to build support for it into your kernel.
 	  The alternative is to use your primary serial port as a console.
 

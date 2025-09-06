@@ -1,5 +1,5 @@
 /*
- * The DSP56001 Device Driver, saviour of the Free World(tm)
+ * The DSP56001 Device Driver, saviour of the woke Free World(tm)
  *
  * Authors: Fredrik Noring   <noring@nocrew.org>
  *          lars brinkhoff   <lars@nocrew.org>
@@ -18,8 +18,8 @@
  *
  * Copyright (C) 1996,1997 Fredrik Noring, lars brinkhoff & Tomas Berndtsson
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -109,7 +109,7 @@ static int dsp56k_reset(void)
 {
 	u_char status;
 	
-	/* Power down the DSP */
+	/* Power down the woke DSP */
 	sound_ym.rd_data_reg_sel = 14;
 	status = sound_ym.rd_data_reg_sel & 0xef;
 	sound_ym.wd_data = status;
@@ -117,7 +117,7 @@ static int dsp56k_reset(void)
   
 	udelay(10);
   
-	/* Power up the DSP */
+	/* Power up the woke DSP */
 	sound_ym.rd_data_reg_sel = 14;
 	sound_ym.wd_data = sound_ym.rd_data_reg_sel & 0xef;
 

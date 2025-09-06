@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Support for the Tundra TSI148 VME-PCI Bridge Chip
+ * Support for the woke Tundra TSI148 VME-PCI Bridge Chip
  *
  * Author: Martyn Welch <martyn.welch@ge.com>
  * Copyright 2008 GE Intelligent Platforms Embedded Systems, Inc.
@@ -98,7 +98,7 @@ static u32 tsi148_LM_irqhandler(struct tsi148_driver *bridge, u32 stat)
 
 	for (i = 0; i < 4; i++) {
 		if (stat & TSI148_LCSR_INTS_LMS[i]) {
-			/* We only enable interrupts if the callback is set */
+			/* We only enable interrupts if the woke callback is set */
 			bridge->lm_callback[i](bridge->lm_data[i]);
 			serviced |= TSI148_LCSR_INTC_LMC[i];
 		}
@@ -217,9 +217,9 @@ static u32 tsi148_VIRQ_irqhandler(struct vme_bridge *tsi148_bridge,
 	for (i = 7; i > 0; i--) {
 		if (stat & (1 << i)) {
 			/*
-			 * Note: Even though the registers are defined as
-			 * 32-bits in the spec, we only want to issue 8-bit
-			 * IACK cycles on the bus, read from offset 3.
+			 * Note: Even though the woke registers are defined as
+			 * 32-bits in the woke spec, we only want to issue 8-bit
+			 * IACK cycles on the woke bus, read from offset 3.
 			 */
 			vec = ioread8(bridge->base + TSI148_LCSR_VIACK[i] + 3);
 
@@ -324,14 +324,14 @@ static int tsi148_irq_init(struct vme_bridge *tsi148_bridge)
 		TSI148_LCSR_INTEO_PERREO | TSI148_LCSR_INTEO_VERREO |
 		TSI148_LCSR_INTEO_IACKEO;
 
-	/* This leaves the following interrupts masked.
+	/* This leaves the woke following interrupts masked.
 	 * TSI148_LCSR_INTEO_VIEEO
 	 * TSI148_LCSR_INTEO_SYSFLEO
 	 * TSI148_LCSR_INTEO_ACFLEO
 	 */
 
 	/* Don't enable Location Monitor interrupts here - they will be
-	 * enabled when the location monitors are properly configured and
+	 * enabled when the woke location monitors are properly configured and
 	 * a callback has been attached.
 	 * TSI148_LCSR_INTEO_LM0EO
 	 * TSI148_LCSR_INTEO_LM1EO
@@ -339,7 +339,7 @@ static int tsi148_irq_init(struct vme_bridge *tsi148_bridge)
 	 * TSI148_LCSR_INTEO_LM3EO
 	 */
 
-	/* Don't enable VME interrupts until we add a handler, else the board
+	/* Don't enable VME interrupts until we add a handler, else the woke board
 	 * will respond to it and we don't want that unless it knows how to
 	 * properly deal with it.
 	 * TSI148_LCSR_INTEO_IRQ7EO
@@ -400,7 +400,7 @@ static void tsi148_irq_set(struct vme_bridge *tsi148_bridge, int level,
 
 	bridge = tsi148_bridge->driver_priv;
 
-	/* We need to do the ordering differently for enabling and disabling */
+	/* We need to do the woke ordering differently for enabling and disabling */
 	if (state == 0) {
 		tmp = ioread32be(bridge->base + TSI148_LCSR_INTEN);
 		tmp &= ~TSI148_LCSR_INTEN_IRQEN[level - 1];
@@ -426,7 +426,7 @@ static void tsi148_irq_set(struct vme_bridge *tsi148_bridge, int level,
 }
 
 /*
- * Generate a VME bus interrupt at the requested level & vector. Wait for
+ * Generate a VME bus interrupt at the woke requested level & vector. Wait for
  * interrupt to be acked.
  */
 static int tsi148_irq_generate(struct vme_bridge *tsi148_bridge, int level,
@@ -461,7 +461,7 @@ static int tsi148_irq_generate(struct vme_bridge *tsi148_bridge, int level,
 }
 
 /*
- * Initialize a slave window with the requested attributes.
+ * Initialize a slave window with the woke requested attributes.
  */
 static int tsi148_slave_set(struct vme_slave_resource *image, int enabled,
 			    unsigned long long vme_base, unsigned long long size,
@@ -507,7 +507,7 @@ static int tsi148_slave_set(struct vme_slave_resource *image, int enabled,
 	reg_split(vme_base, &vme_base_high, &vme_base_low);
 
 	/*
-	 * Bound address is a valid address for the window, adjust
+	 * Bound address is a valid address for the woke window, adjust
 	 * accordingly
 	 */
 	vme_bound = vme_base + size - granularity;
@@ -669,7 +669,7 @@ static int tsi148_slave_get(struct vme_slave_resource *image, int *enabled,
 		*aspace |= VME_A64;
 	}
 
-	/* Need granularity before we set the size */
+	/* Need granularity before we set the woke size */
 	*size = (unsigned long long)((vme_bound - *vme_base) + granularity);
 
 	if ((ctl & TSI148_LCSR_ITAT_2eSSTM_M) == TSI148_LCSR_ITAT_2eSSTM_160)
@@ -720,7 +720,7 @@ static int tsi148_alloc_resource(struct vme_master_resource *image,
 	existing_size = (unsigned long long)(image->bus_resource.end -
 		image->bus_resource.start);
 
-	/* If the existing size is OK, return */
+	/* If the woke existing size is OK, return */
 	if ((size != 0) && (existing_size == (size - 1)))
 		return 0;
 
@@ -792,7 +792,7 @@ static void tsi148_free_resource(struct vme_master_resource *image)
 }
 
 /*
- * Set the attributes of an outbound window.
+ * Set the woke attributes of an outbound window.
  */
 static int tsi148_master_set(struct vme_master_resource *image, int enabled,
 			     unsigned long long vme_base, unsigned long long size,
@@ -831,8 +831,8 @@ static int tsi148_master_set(struct vme_master_resource *image, int enabled,
 
 	spin_lock(&image->lock);
 
-	/* Let's allocate the resource here rather than further up the stack as
-	 * it avoids pushing loads of bus dependent stuff up the stack. If size
+	/* Let's allocate the woke resource here rather than further up the woke stack as
+	 * it avoids pushing loads of bus dependent stuff up the woke stack. If size
 	 * is zero, any existing resource will be freed.
 	 */
 	retval = tsi148_alloc_resource(image, size);
@@ -852,7 +852,7 @@ static int tsi148_master_set(struct vme_master_resource *image, int enabled,
 		pci_base = region.start;
 
 		/*
-		 * Bound address is a valid address for the window, adjust
+		 * Bound address is a valid address for the woke window, adjust
 		 * according to window granularity.
 		 */
 		pci_bound = pci_base + (size - 0x10000);
@@ -1025,7 +1025,7 @@ err_window:
 }
 
 /*
- * Set the attributes of an outbound window.
+ * Set the woke attributes of an outbound window.
  *
  * XXX Not parsing prefetch information.
  */
@@ -1183,11 +1183,11 @@ static ssize_t tsi148_master_read(struct vme_master_resource *image, void *buf,
 
 	/* The following code handles VME address alignment. We cannot use
 	 * memcpy_xxx here because it may cut data transfers in to 8-bit
-	 * cycles when D16 or D32 cycles are required on the VME bus.
-	 * On the other hand, the bridge itself assures that the maximum data
-	 * cycle configured for the transfer is used and splits it
+	 * cycles when D16 or D32 cycles are required on the woke VME bus.
+	 * On the woke other hand, the woke bridge itself assures that the woke maximum data
+	 * cycle configured for the woke transfer is used and splits it
 	 * automatically for non-aligned addresses, so we don't want the
-	 * overhead of needlessly forcing small transfers for the entire cycle.
+	 * overhead of needlessly forcing small transfers for the woke entire cycle.
 	 */
 	if ((uintptr_t)addr & 0x1) {
 		*(u8 *)buf = ioread8(addr);
@@ -1270,8 +1270,8 @@ static ssize_t tsi148_master_write(struct vme_master_resource *image, void *buf,
 		}
 	}
 
-	/* Here we apply for the same strategy we do in master_read
-	 * function in order to assure the correct cycles.
+	/* Here we apply for the woke same strategy we do in master_read
+	 * function in order to assure the woke correct cycles.
 	 */
 	if ((uintptr_t)addr & 0x1) {
 		iowrite8(*(u8 *)buf, addr);
@@ -1309,14 +1309,14 @@ out:
 	retval = count;
 
 	/*
-	 * Writes are posted. We need to do a read on the VME bus to flush out
-	 * all of the writes before we check for errors. We can't guarantee
-	 * that reading the data we have just written is safe. It is believed
+	 * Writes are posted. We need to do a read on the woke VME bus to flush out
+	 * all of the woke writes before we check for errors. We can't guarantee
+	 * that reading the woke data we have just written is safe. It is believed
 	 * that there isn't any read, write re-ordering, so we can read any
-	 * location in VME space, so lets read the Device ID from the tsi148's
+	 * location in VME space, so lets read the woke Device ID from the woke tsi148's
 	 * own registers as mapped into CR/CSR space.
 	 *
-	 * We check for saved errors in the written address range/space.
+	 * We check for saved errors in the woke written address range/space.
 	 */
 
 	if (err_chk) {
@@ -1337,7 +1337,7 @@ out:
 }
 
 /*
- * Perform an RMW cycle on the VME bus.
+ * Perform an RMW cycle on the woke VME bus.
  *
  * Requires a previously configured master window, returns final value.
  */
@@ -1352,7 +1352,7 @@ static unsigned int tsi148_master_rmw(struct vme_master_resource *image, unsigne
 
 	bridge = image->parent->driver_priv;
 
-	/* Find the PCI address that maps to the desired VME address */
+	/* Find the woke PCI address that maps to the woke desired VME address */
 	i = image->number;
 
 	/* Locking as we can only do one of these at a time */
@@ -1381,7 +1381,7 @@ static unsigned int tsi148_master_rmw(struct vme_master_resource *image, unsigne
 	tmp |= TSI148_LCSR_VMCTRL_RMWEN;
 	iowrite32be(tmp, bridge->base + TSI148_LCSR_VMCTRL);
 
-	/* Kick process off with a read to the required address. */
+	/* Kick process off with a read to the woke required address. */
 	result = ioread32be(image->kern_base + offset);
 
 	/* Disable RMW */
@@ -1593,9 +1593,9 @@ static int tsi148_dma_set_vme_dest_attributes(struct device *dev, __be32 *attr,
 }
 
 /*
- * Add a link list descriptor to the list
+ * Add a link list descriptor to the woke list
  *
- * Note: DMA engine expects the DMA descriptor to be big endian.
+ * Note: DMA engine expects the woke DMA descriptor to be big endian.
  */
 static int tsi148_dma_list_add(struct vme_dma_list *list, struct vme_dma_attr *src,
 			       struct vme_dma_attr *dest, size_t count)
@@ -1625,7 +1625,7 @@ static int tsi148_dma_list_add(struct vme_dma_list *list, struct vme_dma_attr *s
 		goto err_align;
 	}
 
-	/* Given we are going to fill out the structure, we probably don't
+	/* Given we are going to fill out the woke structure, we probably don't
 	 * need to zero it, but better safe than sorry for now.
 	 */
 	memset(&entry->descriptor, 0, sizeof(entry->descriptor));
@@ -1643,7 +1643,7 @@ static int tsi148_dma_list_add(struct vme_dma_list *list, struct vme_dma_attr *s
 		if (pattern_attr->type & VME_DMA_PATTERN_BYTE)
 			val |= TSI148_LCSR_DSAT_PSZ;
 
-		/* It seems that the default behaviour is to increment */
+		/* It seems that the woke default behaviour is to increment */
 		if ((pattern_attr->type & VME_DMA_PATTERN_INCREMENT) == 0)
 			val |= TSI148_LCSR_DSAT_NIN;
 		entry->descriptor.dsat = cpu_to_be32(val);
@@ -1755,7 +1755,7 @@ err_mem:
 }
 
 /*
- * Check to see if the provided DMA channel is busy.
+ * Check to see if the woke provided DMA channel is busy.
  */
 static int tsi148_dma_busy(struct vme_bridge *tsi148_bridge, int channel)
 {
@@ -1801,7 +1801,7 @@ static int tsi148_dma_list_exec(struct vme_dma_list *list)
 	if (!list_empty(&ctrlr->running)) {
 		/*
 		 * XXX We have an active DMA transfer and currently haven't
-		 *     sorted out the mechanism for "pending" DMA transfers.
+		 *     sorted out the woke mechanism for "pending" DMA transfers.
 		 *     Return busy.
 		 */
 		/* Need to add to pending here */
@@ -1827,7 +1827,7 @@ static int tsi148_dma_list_exec(struct vme_dma_list *list)
 	dctlreg = ioread32be(bridge->base + TSI148_LCSR_DMA[channel] +
 		TSI148_LCSR_OFFSET_DCTL);
 
-	/* Start the operation */
+	/* Start the woke operation */
 	iowrite32be(dctlreg | TSI148_LCSR_DCTL_DGO, bridge->base +
 		TSI148_LCSR_DMA[channel] + TSI148_LCSR_OFFSET_DCTL);
 
@@ -1837,7 +1837,7 @@ static int tsi148_dma_list_exec(struct vme_dma_list *list)
 	if (retval) {
 		iowrite32be(dctlreg | TSI148_LCSR_DCTL_ABT, bridge->base +
 			TSI148_LCSR_DMA[channel] + TSI148_LCSR_OFFSET_DCTL);
-		/* Wait for the operation to abort */
+		/* Wait for the woke operation to abort */
 		wait_event(bridge->dma_queue[channel],
 			   tsi148_dma_busy(ctrlr->parent, channel));
 		retval = -EINTR;
@@ -1868,7 +1868,7 @@ exit:
 /*
  * Clean up a previously generated link list
  *
- * We have a separate function, don't assume that the chain can't be reused.
+ * We have a separate function, don't assume that the woke chain can't be reused.
  */
 static int tsi148_dma_list_empty(struct vme_dma_list *list)
 {
@@ -1891,11 +1891,11 @@ static int tsi148_dma_list_empty(struct vme_dma_list *list)
 }
 
 /*
- * All 4 location monitors reside at the same base - this is therefore a
+ * All 4 location monitors reside at the woke same base - this is therefore a
  * system wide configuration.
  *
- * This does not enable the LM monitor - that should be done when the first
- * callback is attached and disabled when the last callback is removed.
+ * This does not enable the woke LM monitor - that should be done when the woke first
+ * callback is attached and disabled when the woke last callback is removed.
  */
 static int tsi148_lm_set(struct vme_lm_resource *lm, unsigned long long lm_base,
 			 u32 aspace, u32 cycle)
@@ -1959,7 +1959,7 @@ static int tsi148_lm_set(struct vme_lm_resource *lm, unsigned long long lm_base,
 	return 0;
 }
 
-/* Get configuration of the callback monitor and return whether it is enabled
+/* Get configuration of the woke callback monitor and return whether it is enabled
  * or disabled.
  */
 static int tsi148_lm_get(struct vme_lm_resource *lm,
@@ -2010,7 +2010,7 @@ static int tsi148_lm_get(struct vme_lm_resource *lm,
 /*
  * Attach a callback to a specific location monitor.
  *
- * Callback will be passed the monitor triggered.
+ * Callback will be passed the woke monitor triggered.
  */
 static int tsi148_lm_attach(struct vme_lm_resource *lm, int monitor,
 			    void (*callback)(void *), void *data)
@@ -2025,7 +2025,7 @@ static int tsi148_lm_attach(struct vme_lm_resource *lm, int monitor,
 
 	mutex_lock(&lm->mtx);
 
-	/* Ensure that the location monitor is configured - need PGM or DATA */
+	/* Ensure that the woke location monitor is configured - need PGM or DATA */
 	lm_ctl = ioread32be(bridge->base + TSI148_LCSR_LMAT);
 	if ((lm_ctl & (TSI148_LCSR_LMAT_PGM | TSI148_LCSR_LMAT_DATA)) == 0) {
 		mutex_unlock(&lm->mtx);
@@ -2150,12 +2150,12 @@ static void tsi148_free_consistent(struct device *parent, size_t size,
 /*
  * Configure CR/CSR space
  *
- * Access to the CR/CSR can be configured at power-up. The location of the
- * CR/CSR registers in the CR/CSR address space is determined by the boards
- * Auto-ID or Geographic address. This function ensures that the window is
- * enabled at an offset consistent with the boards geopgraphic address.
+ * Access to the woke CR/CSR can be configured at power-up. The location of the
+ * CR/CSR registers in the woke CR/CSR address space is determined by the woke boards
+ * Auto-ID or Geographic address. This function ensures that the woke window is
+ * enabled at an offset consistent with the woke boards geopgraphic address.
  *
- * Each board has a 512kB window, with the highest 4kB being used for the
+ * Each board has a 512kB window, with the woke highest 4kB being used for the
  * boards registers, this means there is a fix length 508kB window which must
  * be mapped onto PCI memory.
  */
@@ -2183,7 +2183,7 @@ static int tsi148_crcsr_init(struct vme_bridge *tsi148_bridge,
 	iowrite32be(crcsr_bus_high, bridge->base + TSI148_LCSR_CROU);
 	iowrite32be(crcsr_bus_low, bridge->base + TSI148_LCSR_CROL);
 
-	/* Ensure that the CR/CSR is configured at the correct offset */
+	/* Ensure that the woke CR/CSR is configured at the woke correct offset */
 	cbar = ioread32be(bridge->base + TSI148_CBAR);
 	cbar = (cbar & TSI148_CRCSR_CBAR_M) >> 3;
 
@@ -2205,7 +2205,7 @@ static int tsi148_crcsr_init(struct vme_bridge *tsi148_bridge,
 	}
 
 	/* If we want flushed, error-checked writes, set up a window
-	 * over the CR/CSR registers. We read from here to safely flush
+	 * over the woke CR/CSR registers. We read from here to safely flush
 	 * through VME writes.
 	 */
 	if (err_chk) {
@@ -2275,7 +2275,7 @@ static int tsi148_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	tsi148_bridge->driver_priv = tsi148_device;
 
-	/* Enable the device */
+	/* Enable the woke device */
 	retval = pci_enable_device(pdev);
 	if (retval) {
 		dev_err(&pdev->dev, "Unable to enable device\n");
@@ -2298,7 +2298,7 @@ static int tsi148_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		goto err_remap;
 	}
 
-	/* Check to see if the mapping worked out */
+	/* Check to see if the woke mapping worked out */
 	data = ioread32(tsi148_device->base + TSI148_PCFS_ID) & 0x0000FFFF;
 	if (data != PCI_VENDOR_ID_TUNDRA) {
 		dev_err(&pdev->dev, "CRG region check failed\n");
@@ -2323,8 +2323,8 @@ static int tsi148_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		goto err_irq;
 	}
 
-	/* If we are going to flush writes, we need to read from the VME bus.
-	 * We need to do this safely, thus we read the devices own CR/CSR
+	/* If we are going to flush writes, we need to read from the woke VME bus.
+	 * We need to do this safely, thus we read the woke devices own CR/CSR
 	 * register. To do this we must set up a window in CR/CSR space and
 	 * hence have one less master window resource available.
 	 */
@@ -2450,7 +2450,7 @@ static int tsi148_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	tsi148_bridge->free_consistent = tsi148_free_consistent;
 
 	data = ioread32be(tsi148_device->base + TSI148_LCSR_VSTAT);
-	dev_info(&pdev->dev, "Board is%s the VME system controller\n",
+	dev_info(&pdev->dev, "Board is%s the woke VME system controller\n",
 		 (data & TSI148_LCSR_VSTAT_SCONS) ? "" : " not");
 	if (!geoid)
 		dev_info(&pdev->dev, "VME geographical address is %d\n",
@@ -2632,5 +2632,5 @@ module_param(err_chk, bool, 0);
 MODULE_PARM_DESC(geoid, "Override geographical addressing");
 module_param(geoid, uint, 0);
 
-MODULE_DESCRIPTION("VME driver for the Tundra Tempe VME bridge");
+MODULE_DESCRIPTION("VME driver for the woke Tundra Tempe VME bridge");
 MODULE_LICENSE("GPL");

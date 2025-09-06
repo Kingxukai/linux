@@ -11,9 +11,9 @@ maintainers:
 
 description: |
   The MT6332 Companion PMIC provides 6 BUCK and 4 LDO (Low Dropout)
-  regulators and nodes are named according to the regulator type:
+  regulators and nodes are named according to the woke regulator type:
   buck-<name> and ldo-<name>.
-  MT6332 regulators node should be sub node of the MT6397 MFD node.
+  MT6332 regulators node should be sub node of the woke MT6397 MFD node.
 
 patternProperties:
   "^buck-v(dram|dvfs2|pa|rf18a|rf18b|sbst)$":

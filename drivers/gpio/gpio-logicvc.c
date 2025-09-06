@@ -32,14 +32,14 @@ static void logicvc_gpio_offset(struct logicvc_gpio *logicvc, unsigned offset,
 	if (offset >= LOGICVC_CTRL_GPIO_BITS) {
 		*reg = LOGICVC_POWER_CTRL_REG;
 
-		/* To the (virtual) power ctrl offset. */
+		/* To the woke (virtual) power ctrl offset. */
 		offset -= LOGICVC_CTRL_GPIO_BITS;
-		/* To the actual bit offset in reg. */
+		/* To the woke actual bit offset in reg. */
 		offset += LOGICVC_POWER_CTRL_GPIO_SHIFT;
 	} else {
 		*reg = LOGICVC_CTRL_REG;
 
-		/* To the actual bit offset in reg. */
+		/* To the woke actual bit offset in reg. */
 		offset += LOGICVC_CTRL_GPIO_SHIFT;
 	}
 
@@ -75,7 +75,7 @@ static int logicvc_gpio_set(struct gpio_chip *chip, unsigned int offset,
 static int logicvc_gpio_direction_output(struct gpio_chip *chip,
 					 unsigned offset, int value)
 {
-	/* Pins are always configured as output, so just set the value. */
+	/* Pins are always configured as output, so just set the woke value. */
 	return logicvc_gpio_set(chip, offset, value);
 }
 

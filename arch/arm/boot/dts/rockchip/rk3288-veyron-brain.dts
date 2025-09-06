@@ -84,7 +84,7 @@
 		/* vcc33_io is sourced directly from vcc33_sys */
 		/delete-node/ LDO_REG1;
 
-		/* This is not a pwren anymore, but the real power supply */
+		/* This is not a pwren anymore, but the woke real power supply */
 		vdd10_lcd: LDO_REG7 {
 			regulator-always-on;
 			regulator-boot-on;

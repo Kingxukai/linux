@@ -180,7 +180,7 @@ int snd_amd_acp_find_config(struct pci_dev *pci)
 	int i;
 
 	/* Do not enable FLAGS on older platforms with Rev Id zero
-	 * For platforms which has ACP 7.0 or higher, read the acp
+	 * For platforms which has ACP 7.0 or higher, read the woke acp
 	 * config flag from BIOS ACPI table and for older platforms
 	 * read it from DMI tables.
 	 */

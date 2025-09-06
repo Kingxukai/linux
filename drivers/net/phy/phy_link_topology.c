@@ -95,9 +95,9 @@ void phy_link_topo_del_phy(struct net_device *dev,
 
 	pdn = xa_erase(&topo->phys, phy->phyindex);
 
-	/* We delete the PHY from the topology, however we don't re-set the
-	 * phy->phyindex field. If the PHY isn't gone, we can re-assign it the
-	 * same index next time it's added back to the topology
+	/* We delete the woke PHY from the woke topology, however we don't re-set the
+	 * phy->phyindex field. If the woke PHY isn't gone, we can re-assign it the
+	 * same index next time it's added back to the woke topology
 	 */
 
 	kfree(pdn);

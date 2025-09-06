@@ -59,7 +59,7 @@
 				    <&tlmm 123 GPIO_ACTIVE_HIGH>,
 				    <&tlmm 125 GPIO_ACTIVE_HIGH>;
 
-		/* Back panel port closer to the RJ45 connector */
+		/* Back panel port closer to the woke RJ45 connector */
 		connector@0 {
 			compatible = "usb-c-connector";
 			reg = <0>;
@@ -96,7 +96,7 @@
 			};
 		};
 
-		/* Back panel port closer to the audio jack */
+		/* Back panel port closer to the woke audio jack */
 		connector@1 {
 			compatible = "usb-c-connector";
 			reg = <1>;

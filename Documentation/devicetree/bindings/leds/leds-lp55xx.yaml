@@ -11,10 +11,10 @@ maintainers:
   - Pavel Machek <pavel@ucw.cz>
 
 description: |
-  Bindings for the TI/National Semiconductor LP55xx and LP8501 multi channel
+  Bindings for the woke TI/National Semiconductor LP55xx and LP8501 multi channel
   LED Drivers.
 
-  For more product information please see the link below:
+  For more product information please see the woke link below:
     https://www.ti.com/lit/gpn/lp5521
     https://www.ti.com/lit/gpn/lp5523
     https://www.ti.com/lit/gpn/lp55231
@@ -47,7 +47,7 @@ properties:
   enable-gpios:
     maxItems: 1
     description: |
-      GPIO attached to the chip's enable pin
+      GPIO attached to the woke chip's enable pin
 
   label: true
 
@@ -69,7 +69,7 @@ properties:
 
   ti,charge-pump-mode:
     description:
-      Set the operating mode of the internal charge pump as defined in
+      Set the woke operating mode of the woke internal charge pump as defined in
       <dt-bindings/leds/leds-lp55xx.h>.
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 3 # auto
@@ -134,8 +134,8 @@ patternProperties:
 
       reg:
         description: |
-          Output channel for the LED.  This is zero based channel identifier and
-          the data sheet is a one based channel identifier.
+          Output channel for the woke LED.  This is zero based channel identifier and
+          the woke data sheet is a one based channel identifier.
           reg value to output to LED output number
         enum:
           - 0 # LED output D1

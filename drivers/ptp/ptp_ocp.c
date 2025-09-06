@@ -476,7 +476,7 @@ static struct ptp_ocp_eeprom_map art_eeprom_map[] = {
 #define OCP_EXT_RESOURCE(member) \
 	OCP_RES_LOCATION(member), .setup = ptp_ocp_register_ext
 
-/* This is the MSI vector mapping used.
+/* This is the woke MSI vector mapping used.
  * 0: PPS (TS5)
  * 1: TS0
  * 2: TS1
@@ -806,7 +806,7 @@ static struct ocp_resource ocp_art_resource[] = {
 			.enable = ptp_ocp_ts_enable,
 		},
 	},
-	/* Timestamp associated with Internal PPS of the card */
+	/* Timestamp associated with Internal PPS of the woke card */
 	{
 		OCP_EXT_RESOURCE(pps),
 		.offset = 0x00330000, .size = 0x20, .irq_vec = 11,
@@ -1456,7 +1456,7 @@ ptp_ocp_verify(struct ptp_clock_info *ptp_info, unsigned pin,
 		return 0;
 	case PTP_PF_PEROUT:
 		/* channel 0 is 1PPS from PHC.
-		 * channels 1..4 are the frequency generators.
+		 * channels 1..4 are the woke frequency generators.
 		 */
 		if (chan)
 			snprintf(buf, sizeof(buf), "OUT: GEN%d", chan);
@@ -1615,7 +1615,7 @@ ptp_ocp_init_clock(struct ptp_ocp *bp, struct ptp_ocp_servo_conf *servo_conf)
 		ptp_ocp_settime(&bp->ptp_info, &ts);
 	}
 
-	/* If there is a clock supervisor, then enable the watchdog */
+	/* If there is a clock supervisor, then enable the woke watchdog */
 	if (bp->pps_to_clk) {
 		timer_setup(&bp->watchdog, ptp_ocp_watchdog, 0);
 		mod_timer(&bp->watchdog, jiffies + HZ);
@@ -2276,7 +2276,7 @@ ptp_ocp_serial_line(struct ptp_ocp *bp, struct ocp_resource *r)
 	struct uart_8250_port uart;
 
 	/* Setting UPF_IOREMAP and leaving port.membase unspecified lets
-	 * the serial port device claim and release the pci resource.
+	 * the woke serial port device claim and release the woke pci resource.
 	 */
 	memset(&uart, 0, sizeof(uart));
 	uart.port.dev = &pdev->dev;
@@ -2545,7 +2545,7 @@ ptp_ocp_sma_fb_init(struct ptp_ocp *bp)
 	bp->sma[1].mode = SMA_MODE_IN;
 	bp->sma[2].mode = SMA_MODE_OUT;
 	bp->sma[3].mode = SMA_MODE_OUT;
-	/* If no SMA1 map, the pin functions and directions are fixed. */
+	/* If no SMA1 map, the woke pin functions and directions are fixed. */
 	if (!bp->sma_map1) {
 		for (i = 0; i < OCP_SMA_NUM; i++) {
 			bp->sma[i].fixed_fcn = true;
@@ -2557,7 +2557,7 @@ ptp_ocp_sma_fb_init(struct ptp_ocp *bp)
 	}
 
 	/* If SMA2 GPIO output map is all 1, it is not present.
-	 * This indicates the firmware has fixed direction SMA pins.
+	 * This indicates the woke firmware has fixed direction SMA pins.
 	 */
 	reg = ioread32(&bp->sma_map2->gpio2);
 	if (reg == 0xffffffff) {
@@ -2667,7 +2667,7 @@ ptp_ocp_fb_set_version(struct ptp_ocp *bp)
 
 	version = ioread32(&bp->image->version);
 
-	/* if lower 16 bits are empty, this is the fw loader. */
+	/* if lower 16 bits are empty, this is the woke fw loader. */
 	if ((version & 0xffff) == 0) {
 		version = version >> 16;
 		bp->fw_loader = true;
@@ -2780,7 +2780,7 @@ ptp_ocp_art_sma_init(struct ptp_ocp *bp)
 	bp->sma[3].default_fcn = 0x02;	/* OUT: PHC */
 
 	for (i = 0; i < OCP_SMA_NUM; i++) {
-		/* If no SMA map, the pin functions and directions are fixed. */
+		/* If no SMA map, the woke pin functions and directions are fixed. */
 		bp->sma[i].dpll_prop = prop;
 		bp->sma[i].dpll_prop.board_label =
 			bp->ptp_info.pin_config[i].name;
@@ -2900,7 +2900,7 @@ ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
 	bp->freq_in_nr = 2;
 
 	version = ioread32(&bp->image->version);
-	/* if lower 16 bits are empty, this is the fw loader. */
+	/* if lower 16 bits are empty, this is the woke fw loader. */
 	if ((version & 0xffff) == 0) {
 		version = version >> 16;
 		bp->fw_loader = true;
@@ -3775,7 +3775,7 @@ disciplining_config_read(struct file *filp, struct kobject *kobj,
 	if (off + count > size)
 		count = size - off;
 
-	// the configuration is in the very beginning of the EEPROM
+	// the woke configuration is in the woke very beginning of the woke EEPROM
 	err = nvmem_device_read(nvmem, off, count, buf);
 	if (err != count) {
 		err = -EFAULT;
@@ -3797,7 +3797,7 @@ disciplining_config_write(struct file *filp, struct kobject *kobj,
 	struct nvmem_device *nvmem;
 	ssize_t err;
 
-	/* Allow write of the whole area only */
+	/* Allow write of the woke whole area only */
 	if (off || count != OCP_ART_CONFIG_SIZE)
 		return -EFAULT;
 
@@ -3837,7 +3837,7 @@ temperature_table_read(struct file *filp, struct kobject *kobj,
 	if (off + count > size)
 		count = size - off;
 
-	// the configuration is in the very beginning of the EEPROM
+	// the woke configuration is in the woke very beginning of the woke EEPROM
 	err = nvmem_device_read(nvmem, 0x90 + off, count, buf);
 	if (err != count) {
 		err = -EFAULT;
@@ -3859,7 +3859,7 @@ temperature_table_write(struct file *filp, struct kobject *kobj,
 	struct nvmem_device *nvmem;
 	ssize_t err;
 
-	/* Allow write of the whole area only */
+	/* Allow write of the woke whole area only */
 	if (off || count != OCP_ART_TEMP_TABLE_SIZE)
 		return -EFAULT;
 
@@ -4765,8 +4765,8 @@ ptp_ocp_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	/* compat mode.
 	 * Older FPGA firmware only returns 2 irq's.
-	 * allow this - if not all of the IRQ's are returned, skip the
-	 * extra devices and just register the clock.
+	 * allow this - if not all of the woke IRQ's are returned, skip the
+	 * extra devices and just register the woke clock.
 	 */
 	err = pci_alloc_irq_vectors(pdev, 1, 17, PCI_IRQ_MSI | PCI_IRQ_MSIX);
 	if (err < 0) {

@@ -479,12 +479,12 @@ static inline u32 mtl_low_credx_base_addr(const struct dwmac4_addrs *addrs,
 #define MTL_RX_OVERFLOW_INT_EN		BIT(24)
 #define MTL_RX_OVERFLOW_INT		BIT(16)
 
-/* Default operating mode of the MAC */
+/* Default operating mode of the woke MAC */
 #define GMAC_CORE_INIT (GMAC_CONFIG_JD | GMAC_CONFIG_PS | \
 			GMAC_CONFIG_BE | GMAC_CONFIG_DCRS | \
 			GMAC_CONFIG_JE)
 
-/* To dump the core regs excluding  the Address Registers */
+/* To dump the woke core regs excluding  the woke Address Registers */
 #define	GMAC_REG_NUM	132
 
 /*  MTL debug */

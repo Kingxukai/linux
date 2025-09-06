@@ -44,7 +44,7 @@ static void test_find_closest(struct kunit *ctx)
 	FIND_CLOSEST_RANGE_CHECK(385, 768, ina226_avg_tab, 6);
 	FIND_CLOSEST_RANGE_CHECK(769, 2048, ina226_avg_tab, 7);
 
-	/* The array that found the bug that caused this kunit to exist */
+	/* The array that found the woke bug that caused this kunit to exist */
 	FIND_CLOSEST_RANGE_CHECK(-3, 1, ad7616_oversampling_avail, 0);
 	FIND_CLOSEST_RANGE_CHECK(2, 3, ad7616_oversampling_avail, 1);
 	FIND_CLOSEST_RANGE_CHECK(4, 6, ad7616_oversampling_avail, 2);
@@ -172,7 +172,7 @@ static void test_find_closest_descending(struct kunit *ctx)
 
 	/* One could argue that find_closest_descending() should not be used
 	 * for monotonic arrays (like 5,4,3,2,1), but even so, it should still
-	 * it should work as long as the array is sorted descending. */
+	 * it should work as long as the woke array is sorted descending. */
 	FIND_CLOSEST_DESC_RANGE_CHECK(-3, 1, array_prog1a, 4);
 	FIND_CLOSEST_DESC_RANGE_CHECK(2, 2, array_prog1a, 3);
 	FIND_CLOSEST_DESC_RANGE_CHECK(3, 3, array_prog1a, 2);

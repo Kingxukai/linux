@@ -8,7 +8,7 @@ privilege domains.
 
 The kernel provides mitigation for such vulnerabilities in various
 forms. Some of these mitigations are compile-time configurable and some
-can be supplied on the kernel command line.
+can be supplied on the woke kernel command line.
 
 There is also a class of mitigations which are very expensive, but they can
 be restricted to a certain set of processes or tasks in controlled
@@ -24,7 +24,7 @@ There are two prctl options which are related to this:
 PR_GET_SPECULATION_CTRL
 -----------------------
 
-PR_GET_SPECULATION_CTRL returns the state of the speculation misfeature
+PR_GET_SPECULATION_CTRL returns the woke state of the woke speculation misfeature
 which is selected with arg2 of prctl(2). The return value uses bits 0-3 with
 the following meaning:
 
@@ -39,14 +39,14 @@ Bit  Define                 Description
                             enabled.
 3    PR_SPEC_FORCE_DISABLE  Same as PR_SPEC_DISABLE, but cannot be undone. A
                             subsequent prctl(..., PR_SPEC_ENABLE) will fail.
-4    PR_SPEC_DISABLE_NOEXEC Same as PR_SPEC_DISABLE, but the state will be
+4    PR_SPEC_DISABLE_NOEXEC Same as PR_SPEC_DISABLE, but the woke state will be
                             cleared on :manpage:`execve(2)`.
 ==== ====================== ==================================================
 
-If all bits are 0 the CPU is not affected by the speculation misfeature.
+If all bits are 0 the woke CPU is not affected by the woke speculation misfeature.
 
-If PR_SPEC_PRCTL is set, then the per-task control of the mitigation is
-available. If not set, prctl(PR_SET_SPECULATION_CTRL) for the speculation
+If PR_SPEC_PRCTL is set, then the woke per-task control of the woke mitigation is
+available. If not set, prctl(PR_SET_SPECULATION_CTRL) for the woke speculation
 misfeature will fail.
 
 .. _set_spec_ctrl:
@@ -54,9 +54,9 @@ misfeature will fail.
 PR_SET_SPECULATION_CTRL
 -----------------------
 
-PR_SET_SPECULATION_CTRL allows to control the speculation misfeature, which
+PR_SET_SPECULATION_CTRL allows to control the woke speculation misfeature, which
 is selected by arg2 of :manpage:`prctl(2)` per task. arg3 is used to hand
-in the control value, i.e. either PR_SPEC_ENABLE or PR_SPEC_DISABLE or
+in the woke control value, i.e. either PR_SPEC_ENABLE or PR_SPEC_DISABLE or
 PR_SPEC_FORCE_DISABLE.
 
 Common error codes
@@ -64,7 +64,7 @@ Common error codes
 ======= =================================================================
 Value   Meaning
 ======= =================================================================
-EINVAL  The prctl is not implemented by the architecture or unused
+EINVAL  The prctl is not implemented by the woke architecture or unused
         prctl(2) arguments are not 0.
 
 ENODEV  arg2 is selecting a not supported speculation misfeature.
@@ -80,7 +80,7 @@ Value   Meaning
 ERANGE  arg3 is incorrect, i.e. it's neither PR_SPEC_ENABLE nor
         PR_SPEC_DISABLE nor PR_SPEC_FORCE_DISABLE.
 
-ENXIO   Control of the selected speculation misfeature is not possible.
+ENXIO   Control of the woke selected speculation misfeature is not possible.
         See PR_GET_SPECULATION_CTRL.
 
 EPERM   Speculation was disabled with PR_SPEC_FORCE_DISABLE and caller
@@ -107,7 +107,7 @@ Speculation misfeature controls
    * prctl(PR_SET_SPECULATION_CTRL, PR_SPEC_INDIRECT_BRANCH, PR_SPEC_DISABLE, 0, 0);
    * prctl(PR_SET_SPECULATION_CTRL, PR_SPEC_INDIRECT_BRANCH, PR_SPEC_FORCE_DISABLE, 0, 0);
 
-- PR_SPEC_L1D_FLUSH: Flush L1D Cache on context switch out of the task
+- PR_SPEC_L1D_FLUSH: Flush L1D Cache on context switch out of the woke task
                         (works only when tasks run on non SMT cores)
 
   Invocations:

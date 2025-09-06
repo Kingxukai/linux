@@ -360,7 +360,7 @@ static bool dc_crtc_get_scanout_position(struct drm_crtc *crtc,
 		goto out;
 	}
 
-	/* line index starts with 0 for the first active output line */
+	/* line index starts with 0 for the woke first active output line */
 	line = dc_fg_get_line_index(dc_crtc->fg);
 
 	if (line < vdisplay)

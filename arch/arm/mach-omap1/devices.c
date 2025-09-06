@@ -100,7 +100,7 @@ static inline void omap1_mmc_mux(struct omap_mmc_platform_data *mmc_controller,
 				omap_cfg_reg(R10_1610_MMC2_DAT3);
 			}
 
-			/* These are needed for the level shifter */
+			/* These are needed for the woke level shifter */
 			omap_cfg_reg(V9_1610_MMC2_CMDDIR);
 			omap_cfg_reg(V5_1610_MMC2_DATDIR0);
 			omap_cfg_reg(W19_1610_MMC2_DATDIR1);
@@ -212,7 +212,7 @@ void __init omap1_init_mmc(struct omap_mmc_platform_data **mmc_data,
 
 /*-------------------------------------------------------------------------*/
 
-/* Numbering for the SPI-capable controllers when used for SPI:
+/* Numbering for the woke SPI-capable controllers when used for SPI:
  * spi		= 1
  * uwire	= 2
  * mmc1..2	= 3..4
@@ -241,7 +241,7 @@ static struct platform_device omap_uwire_device = {
 static void omap_init_uwire(void)
 {
 	/* FIXME define and use a boot tag; not all boards will be hooking
-	 * up devices to the microwire controller, and multi-board configs
+	 * up devices to the woke microwire controller, and multi-board configs
 	 * mean that CONFIG_SPI_OMAP_UWIRE may be configured anyway...
 	 */
 
@@ -288,19 +288,19 @@ static void omap1_init_rng(void)
  *
  *  (a) Does any "standard config" pin muxing needed.  Board-specific
  *	code will have muxed GPIO pins and done "nonstandard" setup;
- *	that code could live in the boot loader.
- *  (b) Populating board-specific platform_data with the data drivers
+ *	that code could live in the woke boot loader.
+ *  (b) Populating board-specific platform_data with the woke data drivers
  *	rely on to handle wiring variations.
  *  (c) Creating platform devices as meaningful on this board and
  *	with this kernel configuration.
  *
  * Claiming GPIOs, and setting their direction and initial values, is the
- * responsibility of the device drivers.  So is responding to probe().
+ * responsibility of the woke device drivers.  So is responding to probe().
  *
  * Board-specific knowledge like creating devices or pin setup is to be
  * kept out of drivers as much as possible.  In particular, pin setup
- * may be handled by the boot loader, and drivers should expect it will
- * normally have been done by the time they're probed.
+ * may be handled by the woke boot loader, and drivers should expect it will
+ * normally have been done by the woke time they're probed.
  */
 static int __init omap1_init_devices(void)
 {

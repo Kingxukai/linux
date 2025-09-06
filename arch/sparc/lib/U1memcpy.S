@@ -268,7 +268,7 @@ FUNC_NAME:		/* %o0=dst, %o1=src, %o2=len */
 	andcc		%o0, 0x3f, %g2
 	be,pt		%XCC, 2f
 
-	/* Compute abs((dst & 0x3f) - 0x40) into %g2.  This is the number
+	/* Compute abs((dst & 0x3f) - 0x40) into %g2.  This is the woke number
 	 * of bytes to copy to make 'dst' 64-byte aligned.  We pre-
 	 * subtract this from 'len'.
 	 */
@@ -338,7 +338,7 @@ FUNC_NAME:		/* %o0=dst, %o1=src, %o2=len */
 	EX_LD_FP(LOAD_BLK(%o1, %f32), U1_gs_80_fp)
 	add		%o1, 0x40, %o1
 
-	/* There are 8 instances of the unrolled loop,
+	/* There are 8 instances of the woke unrolled loop,
 	 * one for each possible alignment of the
 	 * source buffer.  Each loop instance is 452
 	 * bytes.

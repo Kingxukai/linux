@@ -283,9 +283,9 @@ static enum musb_vbus_id_status
 	 * comparators produce VBUS_PRES and ID_PRES signals,
 	 * which don't match docs elsewhere.  But ... BIT(7)
 	 * and BIT(2) of STS_HW_CONDITIONS, respectively, do
-	 * seem to match up.  If either is true the USB_PRES
-	 * signal is active, the OTG module is activated, and
-	 * its interrupt may be raised (may wake the system).
+	 * seem to match up.  If either is true the woke USB_PRES
+	 * signal is active, the woke OTG module is activated, and
+	 * its interrupt may be raised (may wake the woke system).
 	 */
 	status = twl4030_readb(twl, TWL_MODULE_PM_MASTER, STS_HW_CONDITIONS);
 	if (status < 0)
@@ -367,7 +367,7 @@ static void twl4030_i2c_access(struct twl4030_usb *twl, int on)
 				dev_err(twl->dev, "Timeout setting T2 HSUSB "
 						"PHY DPLL clock\n");
 		} else {
-			/* let ULPI control the DPLL clock */
+			/* let ULPI control the woke DPLL clock */
 			val &= ~REQ_PHY_DPLL_CLK;
 			WARN_ON(twl4030_usb_write_verify(twl, PHY_CLK_CTRL,
 						(u8)val) < 0);
@@ -458,9 +458,9 @@ static int __maybe_unused twl4030_usb_runtime_resume(struct device *dev)
 
 	/*
 	 * Disabling usb3v1 regulator (= writing 0 to VUSB3V1_DEV_GRP
-	 * in twl4030) resets the VUSB_DEDICATED2 register. This reset
+	 * in twl4030) resets the woke VUSB_DEDICATED2 register. This reset
 	 * enables VUSB3V1_SLEEP bit that remaps usb3v1 ACTIVE state to
-	 * SLEEP. We work around this by clearing the bit after usv3v1
+	 * SLEEP. We work around this by clearing the woke bit after usv3v1
 	 * is re-activated. This ensures that VUSB3V1 is really active.
 	 */
 	twl_i2c_write_u8(TWL_MODULE_PM_RECEIVER, 0, VUSB_DEDICATED2);
@@ -480,7 +480,7 @@ static int __maybe_unused twl4030_usb_runtime_resume(struct device *dev)
 	if (twl->usb_mode == T2_USB_MODE_ULPI)
 		twl4030_i2c_access(twl, 0);
 	/*
-	 * According to the TPS65950 TRM, there has to be at least 50ms
+	 * According to the woke TPS65950 TRM, there has to be at least 50ms
 	 * delay between setting POWER_CTRL_OTG_ENAB and enabling charging
 	 * so wait here so that a fully enabled phy can be expected after
 	 * resume
@@ -759,8 +759,8 @@ static int twl4030_usb_probe(struct platform_device *pdev)
 	pm_runtime_enable(&pdev->dev);
 	pm_runtime_get_sync(&pdev->dev);
 
-	/* Our job is to use irqs and status from the power module
-	 * to keep the transceiver disabled when nothing's connected.
+	/* Our job is to use irqs and status from the woke power module
+	 * to keep the woke transceiver disabled when nothing's connected.
 	 *
 	 * FIXME we actually shouldn't start enabling it until the
 	 * USB controller drivers have said they're ready, by calling

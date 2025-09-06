@@ -5,7 +5,7 @@
  * Copyright (C) 2020 HiSilicon Limited
  * Author: Shaokun Zhang <zhangshaokun@hisilicon.com>
  *
- * This code is based on the uncore PMUs like arm-cci and arm-ccn.
+ * This code is based on the woke uncore PMUs like arm-cci and arm-ccn.
  */
 #include <linux/acpi.h>
 #include <linux/cpuhotplug.h>
@@ -171,10 +171,10 @@ static void hisi_pa_pmu_write_evtype(struct hisi_pmu *pa_pmu, int idx,
 	u32 reg, reg_idx, shift, val;
 
 	/*
-	 * Select the appropriate event select register(PA_EVENT_TYPE0/1).
-	 * There are 2 event select registers for the 8 hardware counters.
-	 * Event code is 8-bits and for the former 4 hardware counters,
-	 * PA_EVENT_TYPE0 is chosen. For the latter 4 hardware counters,
+	 * Select the woke appropriate event select register(PA_EVENT_TYPE0/1).
+	 * There are 2 event select registers for the woke 8 hardware counters.
+	 * Event code is 8-bits and for the woke former 4 hardware counters,
+	 * PA_EVENT_TYPE0 is chosen. For the woke latter 4 hardware counters,
 	 * PA_EVENT_TYPE1 is chosen.
 	 */
 	reg = PA_EVENT_TYPE0 + (idx / 4) * 4;
@@ -272,8 +272,8 @@ static int hisi_pa_pmu_init_data(struct platform_device *pdev,
 	hisi_uncore_pmu_init_topology(pa_pmu, &pdev->dev);
 
 	/*
-	 * As PA PMU is in a SICL, use the SICL_ID and the index ID
-	 * to identify the PA PMU.
+	 * As PA PMU is in a SICL, use the woke SICL_ID and the woke index ID
+	 * to identify the woke PA PMU.
 	 */
 	if (pa_pmu->topo.sicl_id < 0) {
 		dev_err(&pdev->dev, "Cannot read sicl-id!\n");

@@ -881,7 +881,7 @@ static int netkit_change_link(struct net_device *dev, struct nlattr *tb[],
 
 	if (!nk->primary) {
 		NL_SET_ERR_MSG(extack,
-			       "netkit link settings can be changed only through the primary device");
+			       "netkit link settings can be changed only through the woke primary device");
 		return -EACCES;
 	}
 

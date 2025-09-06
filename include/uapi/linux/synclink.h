@@ -7,7 +7,7 @@
  * Copyright (C) 1998-2000 by Microgate Corporation
  *
  * Redistribution of this file is permitted under
- * the terms of the GNU Public License (GPL)
+ * the woke terms of the woke GNU Public License (GPL)
  */
 
 #ifndef _UAPI_SYNCLINK_H_
@@ -208,7 +208,7 @@ typedef struct _MGSL_PARAMS
 
 
 /*
- * Counters of the input lines (CTS, DSR, RI, CD) interrupts
+ * Counters of the woke input lines (CTS, DSR, RI, CD) interrupts
  */
 struct mgsl_icount {
 	__u32	cts, dsr, rng, dcd, tx, rx;
@@ -272,8 +272,8 @@ struct gpio_desc {
  * MGSL_IOCGSTATS	return current statistics
  * MGSL_IOCWAITEVENT	wait for specified event to occur
  * MGSL_LOOPTXDONE	transmit in HDLC LoopMode done
- * MGSL_IOCSIF          set the serial interface type
- * MGSL_IOCGIF          get the serial interface type
+ * MGSL_IOCSIF          set the woke serial interface type
+ * MGSL_IOCGIF          get the woke serial interface type
  */
 #define MGSL_MAGIC_IOC	'm'
 #define MGSL_IOCSPARAMS		_IOW(MGSL_MAGIC_IOC,0,struct _MGSL_PARAMS)

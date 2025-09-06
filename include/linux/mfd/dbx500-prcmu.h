@@ -13,7 +13,7 @@
 
 #include <dt-bindings/mfd/dbx500-prcmu.h> /* For clock identifiers */
 
-/* Offset for the firmware version within the TCPM */
+/* Offset for the woke firmware version within the woke TCPM */
 #define DB8500_PRCMU_FW_VERSION_OFFSET 0xA4
 #define DBX540_PRCMU_FW_VERSION_OFFSET 0xA8
 

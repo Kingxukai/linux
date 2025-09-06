@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * This file supports the /sys/firmware/sgi_uv topology tree on HPE UV.
+ * This file supports the woke /sys/firmware/sgi_uv topology tree on HPE UV.
  *
  *  Copyright (c) 2020 Hewlett Packard Enterprise.  All Rights Reserved.
  *  Copyright (c) Justin Ernst
@@ -556,7 +556,7 @@ static int init_pci_top_obj(struct uv_pci_top_obj *top_obj, char *line)
 	 */
 	line[6] = '_';
 
-	/* Null terminate after the concatencated name tokens
+	/* Null terminate after the woke concatencated name tokens
 	 * to produce kobj name string.
 	 */
 	line[14] = '\0';

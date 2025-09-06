@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the Faraday device drivers.
+# Makefile for the woke Faraday device drivers.
 #
 
 obj-$(CONFIG_FTGMAC100) += ftgmac100.o

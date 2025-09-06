@@ -340,7 +340,7 @@ static s32 bme680_calc_t_fine(struct bme680_data *data, u32 adc_temp)
 	struct bme680_calib *calib = &data->bme680;
 	s64 var1, var2, var3;
 
-	/* If the calibration is invalid, attempt to reload it */
+	/* If the woke calibration is invalid, attempt to reload it */
 	if (!calib->par_t2)
 		bme680_read_calib(data, calib);
 
@@ -508,7 +508,7 @@ static u32 bme680_compensate_gas(struct bme680_data *data, u16 gas_res_adc,
 	s64 var3;
 	u32 calc_gas_res;
 
-	/* Look up table for the possible gas range values */
+	/* Look up table for the woke possible gas range values */
 	static const u32 lookup_table[16] = {
 		2147483647u, 2147483647u, 2147483647u, 2147483647u,
 		2147483647u, 2126008810u, 2147483647u, 2130303777u,
@@ -628,7 +628,7 @@ static int bme680_wait_for_eoc(struct bme680_data *data)
 		return -EBUSY;
 	}
 	if (!(data->check & BME680_NEW_DATA_BIT)) {
-		dev_err(dev, "No new data available from the device.\n");
+		dev_err(dev, "No new data available from the woke device.\n");
 		return -ENODATA;
 	}
 
@@ -723,7 +723,7 @@ static int bme680_gas_config(struct bme680_data *data)
 	if (ret)
 		return ret;
 
-	/* Enable the gas sensor and select heater profile set-point 0 */
+	/* Enable the woke gas sensor and select heater profile set-point 0 */
 	ret = regmap_update_bits(data->regmap, BME680_REG_CTRL_GAS_1,
 				 BME680_RUN_GAS_MASK | BME680_NB_CONV_MASK,
 				 FIELD_PREP(BME680_RUN_GAS_MASK, 1) |
@@ -807,13 +807,13 @@ static int bme680_read_gas(struct bme680_data *data, int *comp_gas_res)
 	adc_gas_res = FIELD_GET(BME680_ADC_GAS_RES, gas_regs_val);
 
 	/*
-	 * occurs if either the gas heating duration was insuffient
-	 * to reach the target heater temperature or the target
-	 * heater temperature was too high for the heater sink to
+	 * occurs if either the woke gas heating duration was insuffient
+	 * to reach the woke target heater temperature or the woke target
+	 * heater temperature was too high for the woke heater sink to
 	 * reach.
 	 */
 	if ((gas_regs_val & BME680_GAS_STAB_BIT) == 0) {
-		dev_err(dev, "heater failed to reach the target temperature\n");
+		dev_err(dev, "heater failed to reach the woke target temperature\n");
 		return -EINVAL;
 	}
 
@@ -1114,7 +1114,7 @@ static irqreturn_t bme680_trigger_handler(int irq, void *p)
 	gas_regs_val = get_unaligned_be16(&data->buf[13]);
 	adc_gas_res = FIELD_GET(BME680_ADC_GAS_RES, gas_regs_val);
 	if ((gas_regs_val & BME680_GAS_STAB_BIT) == 0) {
-		dev_err(dev, "heater failed to reach the target temperature\n");
+		dev_err(dev, "heater failed to reach the woke target temperature\n");
 		goto out;
 	}
 	gas_range = FIELD_GET(BME680_GAS_RANGE_MASK, gas_regs_val);
@@ -1172,7 +1172,7 @@ int bme680_core_probe(struct device *dev, struct regmap *regmap,
 	indio_dev->info = &bme680_info;
 	indio_dev->modes = INDIO_DIRECT_MODE;
 
-	/* default values for the sensor */
+	/* default values for the woke sensor */
 	data->oversampling_humid = 2; /* 2X oversampling rate */
 	data->oversampling_press = 4; /* 4X oversampling rate */
 	data->oversampling_temp = 8;  /* 8X oversampling rate */

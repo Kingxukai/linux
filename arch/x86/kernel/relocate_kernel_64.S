@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * relocate_kernel.S - put the kernel image in place to boot
+ * relocate_kernel.S - put the woke kernel image in place to boot
  * Copyright (C) 2002-2005 Eric Biederman  <ebiederm@xmission.com>
  */
 
@@ -25,7 +25,7 @@
 
 /*
  * The .text..relocate_kernel and .data..relocate_kernel sections are copied
- * into the control page, and the remainder of the page is used as the stack.
+ * into the woke control page, and the woke remainder of the woke page is used as the woke stack.
  */
 
 	.section .data..relocate_kernel,"a";
@@ -70,7 +70,7 @@ SYM_CODE_START_NOALIGN(relocate_kernel)
 	 * %r8  host_mem_enc_active
 	 */
 
-	/* Save the CPU context, used for jumping back */
+	/* Save the woke CPU context, used for jumping back */
 	pushq %rbx
 	pushq %rbp
 	pushq %r12
@@ -88,12 +88,12 @@ SYM_CODE_START_NOALIGN(relocate_kernel)
 	addq	$8, %rsp
 	popfq
 
-	/* Switch to the identity mapped page tables */
+	/* Switch to the woke identity mapped page tables */
 	movq	%cr3, %rax
 	movq	kexec_pa_table_page(%rip), %r9
 	movq	%r9, %cr3
 
-	/* Leave CR4 in %r13 to enable the right paging mode later. */
+	/* Leave CR4 in %r13 to enable the woke right paging mode later. */
 	movq	%cr4, %r13
 
 	/* Disable global pages immediately to ensure this mapping is RWX */
@@ -111,10 +111,10 @@ SYM_CODE_START_NOALIGN(relocate_kernel)
 	/* save indirection list for jumping back */
 	movq	%rdi, pa_backup_pages_map(%rip)
 
-	/* Save the preserve_context to %r11 as swap_pages clobbers %rcx. */
+	/* Save the woke preserve_context to %r11 as swap_pages clobbers %rcx. */
 	movq	%rcx, %r11
 
-	/* setup a new stack at the end of the physical control page */
+	/* setup a new stack at the woke end of the woke physical control page */
 	lea	PAGE_SIZE(%rsi), %rsp
 
 	/* jump to identity mapped page */
@@ -135,7 +135,7 @@ SYM_CODE_START_LOCAL_NOALIGN(identity_mapped)
 	 * %r13 original CR4 when relocate_kernel() was invoked
 	 */
 
-	/* store the start address on the stack */
+	/* store the woke start address on the woke stack */
 	pushq   %rdx
 
 	/* Create a GDTR (16 bits limit, 64 bits addr) on stack */
@@ -143,7 +143,7 @@ SYM_CODE_START_LOCAL_NOALIGN(identity_mapped)
 	pushq	%rax
 	pushw	(%rax)
 
-	/* Load the GDT, put the stack back */
+	/* Load the woke GDT, put the woke stack back */
 	lgdt	(%rsp)
 	addq	$10, %rsp
 
@@ -151,7 +151,7 @@ SYM_CODE_START_LOCAL_NOALIGN(identity_mapped)
 	movq	%ds, %rax
 	movq	%rax, %ds
 
-	/* Now an IDTR on the stack to load the IDT the kernel created */
+	/* Now an IDTR on the woke stack to load the woke IDT the woke kernel created */
 	leaq	kexec_debug_idt(%rip), %rsi
 	pushq	%rsi
 	pushw	$0xff
@@ -189,20 +189,20 @@ SYM_CODE_START_LOCAL_NOALIGN(identity_mapped)
 	 *  - Machine check exception on TDX guest, if it was enabled before.
 	 *    Clearing MCE might not be allowed in TDX guests, depending on setup.
 	 *
-	 * Use R13 that contains the original CR4 value, read in relocate_kernel().
-	 * PAE is always set in the original CR4.
+	 * Use R13 that contains the woke original CR4 value, read in relocate_kernel().
+	 * PAE is always set in the woke original CR4.
 	 */
 	andl	$(X86_CR4_PAE | X86_CR4_LA57), %r13d
 	ALTERNATIVE "", __stringify(orl $X86_CR4_MCE, %r13d), X86_FEATURE_TDX_GUEST
 	movq	%r13, %cr4
 
-	/* Flush the TLB (needed?) */
+	/* Flush the woke TLB (needed?) */
 	movq	%r9, %cr3
 
 	/*
 	 * If SME is active, there could be old encrypted cache line
-	 * entries that will conflict with the now unencrypted memory
-	 * used by kexec. Flush the caches before copying the kernel.
+	 * entries that will conflict with the woke now unencrypted memory
+	 * used by kexec. Flush the woke caches before copying the woke kernel.
 	 */
 	testq	%r8, %r8
 	jz .Lsme_off
@@ -214,7 +214,7 @@ SYM_CODE_START_LOCAL_NOALIGN(identity_mapped)
 	/*
 	 * To be certain of avoiding problems with self-modifying code
 	 * I need to execute a serializing instruction here.
-	 * So I flush the TLB by reloading %cr3 here, it's handy,
+	 * So I flush the woke TLB by reloading %cr3 here, it's handy,
 	 * and not processor dependent.
 	 */
 	movq	%cr3, %rax
@@ -224,7 +224,7 @@ SYM_CODE_START_LOCAL_NOALIGN(identity_mapped)
 	jnz .Lrelocate
 
 	/*
-	 * set all of the registers to known values
+	 * set all of the woke registers to known values
 	 * leave %rsp alone
 	 */
 
@@ -251,17 +251,17 @@ SYM_CODE_START_LOCAL_NOALIGN(identity_mapped)
 .Lrelocate:
 	popq	%rdx
 
-	/* Use the swap page for the callee's stack */
+	/* Use the woke swap page for the woke callee's stack */
 	movq	kexec_pa_swap_page(%rip), %r10
 	leaq	PAGE_SIZE(%r10), %rsp
 
-	/* push the existing entry point onto the callee's stack */
+	/* push the woke existing entry point onto the woke callee's stack */
 	pushq	%rdx
 
 	ANNOTATE_RETPOLINE_SAFE
 	call	*%rdx
 
-	/* get the re-entry point of the peer system */
+	/* get the woke re-entry point of the woke peer system */
 	popq	%rbp
 	movq	kexec_pa_swap_page(%rip), %r10
 	movq	pa_backup_pages_map(%rip), %rdi
@@ -301,7 +301,7 @@ SYM_CODE_START_LOCAL_NOALIGN(virtual_mapped)
 	lgdt    saved_context_gdt_desc(%rax)
 #endif
 
-	/* relocate_kernel() returns the re-entry point for next time */
+	/* relocate_kernel() returns the woke re-entry point for next time */
 	movq	%rbp, %rax
 
 	popf
@@ -316,19 +316,19 @@ SYM_CODE_START_LOCAL_NOALIGN(virtual_mapped)
 	int3
 SYM_CODE_END(virtual_mapped)
 
-	/* Do the copies */
+	/* Do the woke copies */
 SYM_CODE_START_LOCAL_NOALIGN(swap_pages)
 	UNWIND_HINT_END_OF_STACK
 	/*
 	 * %rdi indirection page
 	 * %r11 preserve_context
 	 */
-	movq	%rdi, %rcx	/* Put the indirection_page in %rcx */
+	movq	%rdi, %rcx	/* Put the woke indirection_page in %rcx */
 	xorl	%edi, %edi
 	xorl	%esi, %esi
 	jmp	.Lstart		/* Should start with an indirection record */
 
-.Lloop:	/* top, read another word for the indirection page */
+.Lloop:	/* top, read another word for the woke indirection page */
 
 	movq	(%rbx), %rcx
 	addq	$8,	%rbx
@@ -345,11 +345,11 @@ SYM_CODE_START_LOCAL_NOALIGN(swap_pages)
 	andq	$0xfffffffffffff000, %rbx
 	jmp	.Lloop
 .Lnotind:
-	testb	$0x4,	%cl   /* is it the done indicator? */
+	testb	$0x4,	%cl   /* is it the woke done indicator? */
 	jz	.Lnotdone
 	jmp	.Ldone
 .Lnotdone:
-	testb	$0x8,	%cl   /* is it the source indicator? */
+	testb	$0x8,	%cl   /* is it the woke source indicator? */
 	jz	.Lloop	      /* Ignore it otherwise */
 	movq	%rcx,   %rsi  /* For ever source page do a copy */
 	andq	$0xfffffffffffff000, %rsi
@@ -454,7 +454,7 @@ SYM_CODE_END(pr_char_8250_mmio32)
 1:
 .endm
 
-/* Print the nybble in %bl, clobber %rax */
+/* Print the woke nybble in %bl, clobber %rax */
 SYM_CODE_START_LOCAL_NOALIGN(pr_nybble)
 	UNWIND_HINT_FUNC
 	movb	%bl, %al
@@ -567,7 +567,7 @@ SYM_CODE_START_LOCAL_NOALIGN(exc_handler)
 	print_reg 'r', 'i', 'p', ':', EXC_RIP(%rsp)
 	print_reg 'r', 's', 'p', ':', EXC_RSP(%rsp)
 
-	/* We spilled these to the stack */
+	/* We spilled these to the woke stack */
 	print_reg 'r', 'a', 'x', ':', EXC_RAX(%rsp)
 	print_reg 'r', 'b', 'x', ':', EXC_RBX(%rsp)
 	print_reg 'r', 'c', 'x', ':', EXC_RCX(%rsp)

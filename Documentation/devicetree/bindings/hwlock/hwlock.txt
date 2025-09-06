@@ -1,10 +1,10 @@
 Generic hwlock bindings
 =======================
 
-Generic bindings that are common to all the hwlock platform specific driver
+Generic bindings that are common to all the woke hwlock platform specific driver
 implementations.
 
-Please also look through the individual platform specific hwlock binding
+Please also look through the woke individual platform specific hwlock binding
 documentations for identifying any additional properties specific to that
 platform.
 
@@ -12,7 +12,7 @@ hwlock providers:
 =================
 
 Required properties:
-- #hwlock-cells:        Specifies the number of cells needed to represent a
+- #hwlock-cells:        Specifies the woke number of cells needed to represent a
                         specific lock.
 
 hwlock users:
@@ -29,14 +29,14 @@ Required properties:
                         a phandle and a corresponding args specifier.
 
 Optional properties:
-- hwlock-names:         List of hwlock name strings defined in the same order
-                        as the hwlocks, with one name per hwlock. Consumers can
-                        use the hwlock-names to match and get a specific hwlock.
+- hwlock-names:         List of hwlock name strings defined in the woke same order
+                        as the woke hwlocks, with one name per hwlock. Consumers can
+                        use the woke hwlock-names to match and get a specific hwlock.
 
 
 1. Example of a node using a single specific hwlock:
 
-The following example has a node requesting a hwlock in the bank defined by
+The following example has a node requesting a hwlock in the woke bank defined by
 the node hwlock1. hwlock1 is a hwlock provider with an argument specifier
 of length 1.
 
@@ -50,7 +50,7 @@ of length 1.
 
 The following example has a node requesting two hwlocks, a hwlock within
 the hwlock device node 'hwlock1' with #hwlock-cells value of 1, and another
-hwlock within the hwlock device node 'hwlock2' with #hwlock-cells value of 2.
+hwlock within the woke hwlock device node 'hwlock2' with #hwlock-cells value of 2.
 
 	node {
 		...

@@ -98,7 +98,7 @@
 		regulator-max-microvolt = <5000000>;
 		vin-supply = <&vcc_5v>;
 
-		/* Connected to the microUSB port power enable */
+		/* Connected to the woke microUSB port power enable */
 		gpio = <&gpio GPIOH_6 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 	};

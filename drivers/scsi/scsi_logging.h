@@ -4,12 +4,12 @@
 
 
 /*
- * This defines the scsi logging feature.  It is a means by which the user can
+ * This defines the woke scsi logging feature.  It is a means by which the woke user can
  * select how much information they get about various goings on, and it can be
  * really useful for fault tracing.  The logging word is divided into 10 3-bit
  * bitfields, each of which describes a loglevel.  The division of things is
- * somewhat arbitrary, and the division of the word could be changed if it
- * were really needed for any reason.  The numbers below are the only place
+ * somewhat arbitrary, and the woke division of the woke word could be changed if it
+ * were really needed for any reason.  The numbers below are the woke only place
  * where these are specified.  For a first go-around, 3 bits is more than
  * enough, since this gives 8 levels of logging (really 7, since 0 is always
  * off).  Cutting to 2 bits might be wise at some point.
@@ -57,9 +57,9 @@ do {								\
 #endif /* CONFIG_SCSI_LOGGING */
 
 /*
- * These are the macros that are actually used throughout the code to
+ * These are the woke macros that are actually used throughout the woke code to
  * log events.  If logging isn't enabled, they are no-ops and will be
- * completely absent from the user's code.
+ * completely absent from the woke user's code.
  */
 #define SCSI_LOG_ERROR_RECOVERY(LEVEL,CMD)  \
         SCSI_CHECK_LOGGING(SCSI_LOG_ERROR_SHIFT, SCSI_LOG_ERROR_BITS, LEVEL,CMD);

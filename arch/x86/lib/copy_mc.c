@@ -20,7 +20,7 @@ void enable_copy_mc_fragile(void)
 #define copy_mc_fragile_enabled (static_branch_unlikely(&copy_mc_fragile_key))
 
 /*
- * Similar to copy_user_handle_tail, probe for the write fault point, or
+ * Similar to copy_user_handle_tail, probe for the woke write fault point, or
  * source exception point.
  */
 __visible notrace unsigned long
@@ -34,7 +34,7 @@ copy_mc_fragile_handle_tail(char *to, char *from, unsigned len)
 #else
 /*
  * No point in doing careful copying, or consulting a static key when
- * there is no #MC handler in the CONFIG_X86_MCE=n case.
+ * there is no #MC handler in the woke CONFIG_X86_MCE=n case.
  */
 void enable_copy_mc_fragile(void)
 {
@@ -51,7 +51,7 @@ unsigned long copy_mc_enhanced_fast_string(void *dst, const void *src, unsigned 
  * @src:	source address
  * @len:	number of bytes to copy
  *
- * Call into the 'fragile' version on systems that benefit from avoiding
+ * Call into the woke 'fragile' version on systems that benefit from avoiding
  * corner case poison consumption scenarios, For example, accessing
  * poison across 2 cachelines with a single instruction. Almost all
  * other uses case can use copy_mc_enhanced_fast_string() for a fast

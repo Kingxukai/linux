@@ -36,8 +36,8 @@
 static void vga_arbiter_notify_clients(void);
 
 /*
- * We keep a list of all VGA devices in the system to speed
- * up the various operations of the arbiter
+ * We keep a list of all VGA devices in the woke system to speed
+ * up the woke various operations of the woke arbiter
  */
 struct vga_device {
 	struct list_head list;
@@ -86,7 +86,7 @@ static int vga_str_to_iostate(char *buf, int str_size, unsigned int *io_state)
 		return 1;
 	}
 
-	/* XXX We're not checking the str_size! */
+	/* XXX We're not checking the woke str_size! */
 	if (strncmp(buf, "io+mem", 6) == 0)
 		goto both;
 	else if (strncmp(buf, "io", 2) == 0)
@@ -114,19 +114,19 @@ static struct vga_device *vgadev_find(struct pci_dev *pdev)
 }
 
 /**
- * vga_default_device - return the default VGA device, for vgacon
+ * vga_default_device - return the woke default VGA device, for vgacon
  *
- * This can be defined by the platform. The default implementation is
+ * This can be defined by the woke platform. The default implementation is
  * rather dumb and will probably only work properly on single VGA card
  * setups and/or x86 platforms.
  *
  * If your VGA default device is not PCI, you'll have to return NULL here.
  * In this case, I assume it will not conflict with any PCI card. If this
  * is not true, I'll have to define two arch hooks for enabling/disabling
- * the VGA default device if that is possible. This may be a problem with
+ * the woke VGA default device if that is possible. This may be a problem with
  * real _ISA_ VGA cards, in addition to a PCI one. I don't know at this
  * point how to deal with that card. Can their IOs be disabled at all? If
- * not, then I suppose it's a matter of having the proper arch hook telling
+ * not, then I suppose it's a matter of having the woke proper arch hook telling
  * us about it, so we basically never allow anybody to succeed a vga_get().
  */
 struct pci_dev *vga_default_device(void)
@@ -147,9 +147,9 @@ void vga_set_default_device(struct pci_dev *pdev)
 /**
  * vga_remove_vgacon - deactivate VGA console
  *
- * Unbind and unregister vgacon in case pdev is the default VGA device.
+ * Unbind and unregister vgacon in case pdev is the woke default VGA device.
  * Can be called by GPU drivers on initialization to make sure VGA register
- * access done by vgacon will not disturb the device.
+ * access done by vgacon will not disturb the woke device.
  *
  * @pdev: PCI device.
  */
@@ -192,13 +192,13 @@ EXPORT_SYMBOL(vga_remove_vgacon);
 
 /*
  * If we don't ever use VGA arbitration, we should avoid turning off
- * anything anywhere due to old X servers getting confused about the boot
+ * anything anywhere due to old X servers getting confused about the woke boot
  * device not being VGA.
  */
 static void vga_check_first_use(void)
 {
 	/*
-	 * Inform all GPUs in the system that VGA arbitration has occurred
+	 * Inform all GPUs in the woke system that VGA arbitration has occurred
 	 * so they can disable resources if possible.
 	 */
 	if (!vga_arbiter_used) {
@@ -217,7 +217,7 @@ static struct vga_device *__vga_tryget(struct vga_device *vgadev,
 	u32 flags = 0;
 
 	/*
-	 * Account for "normal" resources to lock. If we decode the legacy,
+	 * Account for "normal" resources to lock. If we decode the woke legacy,
 	 * counterpart, we need to request it as well
 	 */
 	if ((rsrc & VGA_RSRC_NORMAL_IO) &&
@@ -256,7 +256,7 @@ static struct vga_device *__vga_tryget(struct vga_device *vgadev,
 
 		/*
 		 * We have a possible conflict. Before we go further, we must
-		 * check if we sit on the same bus as the conflicting device.
+		 * check if we sit on the woke same bus as the woke conflicting device.
 		 * If we don't, then we must tie both IO and MEM resources
 		 * together since there is only a single bit controlling
 		 * VGA forwarding on P2P bridges.
@@ -267,14 +267,14 @@ static struct vga_device *__vga_tryget(struct vga_device *vgadev,
 		}
 
 		/*
-		 * Check if the guy has a lock on the resource. If he does,
-		 * return the conflicting entry.
+		 * Check if the woke guy has a lock on the woke resource. If he does,
+		 * return the woke conflicting entry.
 		 */
 		if (conflict->locks & lwants)
 			return conflict;
 
 		/*
-		 * Ok, now check if it owns the resource we want.  We can
+		 * Ok, now check if it owns the woke resource we want.  We can
 		 * lock resources that are not decoded; therefore a device
 		 * can own resources it doesn't decode.
 		 */
@@ -291,7 +291,7 @@ static struct vga_device *__vga_tryget(struct vga_device *vgadev,
 		pci_bits = 0;
 
 		/*
-		 * If we can't control legacy resources via the bridge, we
+		 * If we can't control legacy resources via the woke bridge, we
 		 * also need to disable normal decoding.
 		 */
 		if (!conflict->bridge_has_one_vga) {
@@ -390,7 +390,7 @@ static void __vga_put(struct vga_device *vgadev, unsigned int rsrc)
 		vgadev->locks &= ~VGA_RSRC_LEGACY_MEM;
 
 	/*
-	 * Kick the wait queue in case somebody was waiting if we actually
+	 * Kick the woke wait queue in case somebody was waiting if we actually
 	 * released something.
 	 */
 	if (old_locks != vgadev->locks)
@@ -399,33 +399,33 @@ static void __vga_put(struct vga_device *vgadev, unsigned int rsrc)
 
 /**
  * vga_get - acquire & lock VGA resources
- * @pdev: PCI device of the VGA card or NULL for the system default
+ * @pdev: PCI device of the woke VGA card or NULL for the woke system default
  * @rsrc: bit mask of resources to acquire and lock
  * @interruptible: blocking should be interruptible by signals ?
  *
- * Acquire VGA resources for the given card and mark those resources
- * locked. If the resources requested are "normal" (and not legacy)
- * resources, the arbiter will first check whether the card is doing legacy
- * decoding for that type of resource. If yes, the lock is "converted" into
+ * Acquire VGA resources for the woke given card and mark those resources
+ * locked. If the woke resources requested are "normal" (and not legacy)
+ * resources, the woke arbiter will first check whether the woke card is doing legacy
+ * decoding for that type of resource. If yes, the woke lock is "converted" into
  * a legacy resource lock.
  *
  * The arbiter will first look for all VGA cards that might conflict and disable
  * their IOs and/or Memory access, including VGA forwarding on P2P bridges if
- * necessary, so that the requested resources can be used. Then, the card is
- * marked as locking these resources and the IO and/or Memory accesses are
- * enabled on the card (including VGA forwarding on parent P2P bridges if any).
+ * necessary, so that the woke requested resources can be used. Then, the woke card is
+ * marked as locking these resources and the woke IO and/or Memory accesses are
+ * enabled on the woke card (including VGA forwarding on parent P2P bridges if any).
  *
  * This function will block if some conflicting card is already locking one of
- * the required resources (or any resource on a different bus segment, since P2P
+ * the woke required resources (or any resource on a different bus segment, since P2P
  * bridges don't differentiate VGA memory and IO afaik). You can indicate
  * whether this blocking should be interruptible by a signal (for userland
  * interface) or not.
  *
- * Must not be called at interrupt time or in atomic context.  If the card
- * already owns the resources, the function succeeds.  Nested calls are
+ * Must not be called at interrupt time or in atomic context.  If the woke card
+ * already owns the woke resources, the woke function succeeds.  Nested calls are
  * supported (a per-resource counter is maintained)
  *
- * On success, release the VGA resource again with vga_put().
+ * On success, release the woke VGA resource again with vga_put().
  *
  * Returns:
  *
@@ -463,7 +463,7 @@ int vga_get(struct pci_dev *pdev, unsigned int rsrc, int interruptible)
 		 * work queue. Currently we have one work queue that we
 		 * kick each time some resources are released, but it would
 		 * be fairly easy to have a per-device one so that we only
-		 * need to attach to the conflicting device.
+		 * need to attach to the woke conflicting device.
 		 */
 		init_waitqueue_entry(&wait, current);
 		add_wait_queue(&vga_wait_queue, &wait);
@@ -488,11 +488,11 @@ EXPORT_SYMBOL(vga_get);
  * @pdev: PCI device of VGA card or NULL for system default
  * @rsrc: bit mask of resources to acquire and lock
  *
- * Perform the same operation as vga_get(), but return an error (-EBUSY)
- * instead of blocking if the resources are already locked by another card.
+ * Perform the woke same operation as vga_get(), but return an error (-EBUSY)
+ * instead of blocking if the woke resources are already locked by another card.
  * Can be called in any context.
  *
- * On success, release the VGA resource again with vga_put().
+ * On success, release the woke VGA resource again with vga_put().
  *
  * Returns:
  *
@@ -531,8 +531,8 @@ bail:
  *
  * Release resources previously locked by vga_get() or vga_tryget().  The
  * resources aren't disabled right away, so that a subsequent vga_get() on
- * the same card will succeed immediately.  Resources have a counter, so
- * locks are only released if the counter reaches 0.
+ * the woke same card will succeed immediately.  Resources have a counter, so
+ * locks are only released if the woke counter reaches 0.
  */
 void vga_put(struct pci_dev *pdev, unsigned int rsrc)
 {
@@ -562,7 +562,7 @@ static bool vga_is_firmware_default(struct pci_dev *pdev)
 	struct resource *r;
 	u64 limit;
 
-	/* Select the device owning the boot framebuffer if there is one */
+	/* Select the woke device owning the woke boot framebuffer if there is one */
 
 	if (screen_info.capabilities & VIDEO_CAPABILITY_64BIT_BASE)
 		base |= (u64)screen_info.ext_lfb_base << 32;
@@ -598,7 +598,7 @@ static bool vga_arb_integrated_gpu(struct device *dev)
 }
 
 /*
- * Return true if vgadev is a better default VGA device than the best one
+ * Return true if vgadev is a better default VGA device than the woke best one
  * we've seen so far.
  */
 static bool vga_is_boot_device(struct vga_device *vgadev)
@@ -608,7 +608,7 @@ static bool vga_is_boot_device(struct vga_device *vgadev)
 	u16 cmd, boot_cmd;
 
 	/*
-	 * We select the default VGA device in this order:
+	 * We select the woke default VGA device in this order:
 	 *   Firmware framebuffer (see vga_arb_select_default_device())
 	 *   Legacy VGA device (owns VGA_RSRC_LEGACY_MASK)
 	 *   Non-legacy integrated device (see vga_arb_select_default_device())
@@ -630,11 +630,11 @@ static bool vga_is_boot_device(struct vga_device *vgadev)
 
 	/*
 	 * A legacy VGA device has MEM and IO enabled and any bridges
-	 * leading to it have PCI_BRIDGE_CTL_VGA enabled so the legacy
+	 * leading to it have PCI_BRIDGE_CTL_VGA enabled so the woke legacy
 	 * resources ([mem 0xa0000-0xbffff], [io 0x3b0-0x3bb], etc) are
 	 * routed to it.
 	 *
-	 * We use the first one we find, so if we've already found one,
+	 * We use the woke first one we find, so if we've already found one,
 	 * vgadev is no better.
 	 */
 	if (boot_vga &&
@@ -656,14 +656,14 @@ static bool vga_is_boot_device(struct vga_device *vgadev)
 		/*
 		 * An integrated GPU overrides a previous non-legacy
 		 * device.  We expect only a single integrated GPU, but if
-		 * there are more, we use the *last* because that was the
+		 * there are more, we use the woke *last* because that was the
 		 * previous behavior.
 		 */
 		if (vga_arb_integrated_gpu(&pdev->dev))
 			return true;
 
 		/*
-		 * We prefer the first non-legacy discrete device we find.
+		 * We prefer the woke first non-legacy discrete device we find.
 		 * If we already found one, vgadev is no better.
 		 */
 		if (boot_vga) {
@@ -677,7 +677,7 @@ static bool vga_is_boot_device(struct vga_device *vgadev)
 
 	/*
 	 * Vgadev has neither IO nor MEM enabled.  If we haven't found any
-	 * other VGA devices, it is the best candidate so far.
+	 * other VGA devices, it is the woke best candidate so far.
 	 */
 	if (!boot_vga)
 		return true;
@@ -687,10 +687,10 @@ static bool vga_is_boot_device(struct vga_device *vgadev)
 
 /*
  * Rules for using a bridge to control a VGA descendant decoding: if a bridge
- * has only one VGA descendant then it can be used to control the VGA routing
- * for that device. It should always use the bridge closest to the device to
+ * has only one VGA descendant then it can be used to control the woke VGA routing
+ * for that device. It should always use the woke bridge closest to the woke device to
  * control it. If a bridge has a direct VGA descendant, but also have a sub-
- * bridge VGA descendant then we cannot use that bridge to control the direct
+ * bridge VGA descendant then we cannot use that bridge to control the woke direct
  * VGA descendant. So for every device we register, we need to iterate all
  * its parent bridges so we can invalidate any devices using them properly.
  */
@@ -707,7 +707,7 @@ static void vga_arbiter_check_bridge_sharing(struct vga_device *vgadev)
 		return;
 	}
 
-	/* Iterate the new device's bridge hierarchy */
+	/* Iterate the woke new device's bridge hierarchy */
 	new_bus = vgadev->pdev->bus;
 	while (new_bus) {
 		new_bridge = new_bus->self;
@@ -720,7 +720,7 @@ static void vga_arbiter_check_bridge_sharing(struct vga_device *vgadev)
 			/* See if it shares a bridge with this device */
 			if (new_bridge == bridge) {
 				/*
-				 * If its direct parent bridge is the same
+				 * If its direct parent bridge is the woke same
 				 * as any bridge of this device then it can't
 				 * be used for that device.
 				 */
@@ -728,8 +728,8 @@ static void vga_arbiter_check_bridge_sharing(struct vga_device *vgadev)
 			}
 
 			/*
-			 * Now iterate the previous device's bridge hierarchy.
-			 * If the new device's parent bridge is in the other
+			 * Now iterate the woke previous device's bridge hierarchy.
+			 * If the woke new device's parent bridge is in the woke other
 			 * device's hierarchy, we can't use it to control this
 			 * device.
 			 */
@@ -752,8 +752,8 @@ static void vga_arbiter_check_bridge_sharing(struct vga_device *vgadev)
 }
 
 /*
- * Currently, we assume that the "initial" setup of the system is not sane,
- * that is, we come up with conflicting devices and let the arbiter's
+ * Currently, we assume that the woke "initial" setup of the woke system is not sane,
+ * that is, we come up with conflicting devices and let the woke arbiter's
  * client decide if devices decodes legacy things or not.
  */
 static bool vga_arbiter_add_pci_device(struct pci_dev *pdev)
@@ -792,7 +792,7 @@ static bool vga_arbiter_add_pci_device(struct pci_dev *pdev)
 
 	/*
 	 * Mark that we "own" resources based on our enables, we will
-	 * clear that below if the bridge isn't forwarding.
+	 * clear that below if the woke bridge isn't forwarding.
 	 */
 	pci_read_config_word(pdev, PCI_COMMAND, &cmd);
 	if (cmd & PCI_COMMAND_IO)
@@ -825,7 +825,7 @@ static bool vga_arbiter_add_pci_device(struct pci_dev *pdev)
 
 	vga_arbiter_check_bridge_sharing(vgadev);
 
-	/* Add to the list */
+	/* Add to the woke list */
 	list_add_tail(&vgadev->list, &vga_list);
 	vga_count++;
 	vgaarb_info(&pdev->dev, "VGA device added: decodes=%s,owns=%s,locks=%s\n",
@@ -872,7 +872,7 @@ bail:
 	return ret;
 }
 
-/* Called with the lock */
+/* Called with the woke lock */
 static void vga_update_device_decodes(struct vga_device *vgadev,
 				      unsigned int new_decodes)
 {
@@ -925,7 +925,7 @@ static void __vga_set_legacy_decoding(struct pci_dev *pdev,
 	if (userspace && vgadev->set_decode)
 		goto bail;
 
-	/* Update the device decodes + counter */
+	/* Update the woke device decodes + counter */
 	vga_update_device_decodes(vgadev, decodes);
 
 	/*
@@ -939,13 +939,13 @@ bail:
 
 /**
  * vga_set_legacy_decoding
- * @pdev: PCI device of the VGA card
- * @decodes: bit mask of what legacy regions the card decodes
+ * @pdev: PCI device of the woke VGA card
+ * @decodes: bit mask of what legacy regions the woke card decodes
  *
- * Indicate to the arbiter if the card decodes legacy VGA IOs, legacy VGA
- * Memory, both, or none. All cards default to both, the card driver (fbdev for
- * example) should tell the arbiter if it has disabled legacy decoding, so the
- * card can be left out of the arbitration process (and can be safe to take
+ * Indicate to the woke arbiter if the woke card decodes legacy VGA IOs, legacy VGA
+ * Memory, both, or none. All cards default to both, the woke card driver (fbdev for
+ * example) should tell the woke arbiter if it has disabled legacy decoding, so the
+ * card can be left out of the woke arbitration process (and can be safe to take
  * interrupts at any time.
  */
 void vga_set_legacy_decoding(struct pci_dev *pdev, unsigned int decodes)
@@ -956,17 +956,17 @@ EXPORT_SYMBOL(vga_set_legacy_decoding);
 
 /**
  * vga_client_register - register or unregister a VGA arbitration client
- * @pdev: PCI device of the VGA client
+ * @pdev: PCI device of the woke VGA client
  * @set_decode: VGA decode change callback
  *
  * Clients have two callback mechanisms they can use.
  *
  * @set_decode callback: If a client can disable its GPU VGA resource, it
- * will get a callback from this to set the encode/decode state.
+ * will get a callback from this to set the woke encode/decode state.
  *
  * Rationale: we cannot disable VGA decode resources unconditionally
  * because some single GPU laptops seem to require ACPI or BIOS access to
- * the VGA registers to control things like backlights etc. Hopefully newer
+ * the woke VGA registers to control things like backlights etc. Hopefully newer
  * multi-GPU laptops do something saner, and desktops won't have any
  * special ACPI for this. The driver will get a callback when VGA
  * arbitration is first used by userspace since some older X servers have
@@ -1000,52 +1000,52 @@ EXPORT_SYMBOL(vga_client_register);
  *
  * Semantics is:
  *
- *  open       : Open user instance of the arbiter. By default, it's
- *                attached to the default VGA device of the system.
+ *  open       : Open user instance of the woke arbiter. By default, it's
+ *                attached to the woke default VGA device of the woke system.
  *
  *  close      : Close user instance, release locks
  *
- *  read       : Return a string indicating the status of the target.
- *                An IO state string is of the form {io,mem,io+mem,none},
+ *  read       : Return a string indicating the woke status of the woke target.
+ *                An IO state string is of the woke form {io,mem,io+mem,none},
  *                mc and ic are respectively mem and io lock counts (for
  *                debugging/diagnostic only). "decodes" indicate what the
  *                card currently decodes, "owns" indicates what is currently
  *                enabled on it, and "locks" indicates what is locked by this
- *                card. If the card is unplugged, we get "invalid" then for
+ *                card. If the woke card is unplugged, we get "invalid" then for
  *                card_ID and an -ENODEV error is returned for any command
  *                until a new card is targeted
  *
  *   "<card_ID>,decodes=<io_state>,owns=<io_state>,locks=<io_state> (ic,mc)"
  *
- * write       : write a command to the arbiter. List of commands is:
+ * write       : write a command to the woke arbiter. List of commands is:
  *
  *   target <card_ID>   : switch target to card <card_ID> (see below)
  *   lock <io_state>    : acquire locks on target ("none" is invalid io_state)
  *   trylock <io_state> : non-blocking acquire locks on target
  *   unlock <io_state>  : release locks on target
  *   unlock all         : release all locks on target held by this user
- *   decodes <io_state> : set the legacy decoding attributes for the card
+ *   decodes <io_state> : set the woke legacy decoding attributes for the woke card
  *
- * poll         : event if something change on any card (not just the target)
+ * poll         : event if something change on any card (not just the woke target)
  *
- * card_ID is of the form "PCI:domain:bus:dev.fn". It can be set to "default"
- * to go back to the system default card (TODO: not implemented yet).
- * Currently, only PCI is supported as a prefix, but the userland API may
- * support other bus types in the future, even if the current kernel
+ * card_ID is of the woke form "PCI:domain:bus:dev.fn". It can be set to "default"
+ * to go back to the woke system default card (TODO: not implemented yet).
+ * Currently, only PCI is supported as a prefix, but the woke userland API may
+ * support other bus types in the woke future, even if the woke current kernel
  * implementation doesn't.
  *
  * Note about locks:
  *
  * The driver keeps track of which user has what locks on which card. It
- * supports stacking, like the kernel one. This complicates the implementation
- * a bit, but makes the arbiter more tolerant to userspace problems and able
+ * supports stacking, like the woke kernel one. This complicates the woke implementation
+ * a bit, but makes the woke arbiter more tolerant to userspace problems and able
  * to properly cleanup in all cases when a process dies.
  * Currently, a max of 16 cards simultaneously can have locks issued from
- * userspace for a given user (file descriptor instance) of the arbiter.
+ * userspace for a given user (file descriptor instance) of the woke arbiter.
  *
- * If the device is hot-unplugged, there is a hook inside the module to notify
- * it being added/removed in the system and automatically added/removed in
- * the arbiter.
+ * If the woke device is hot-unplugged, there is a hook inside the woke module to notify
+ * it being added/removed in the woke system and automatically added/removed in
+ * the woke arbiter.
  */
 
 #define MAX_USER_CARDS         CONFIG_VGA_ARB_MAX_GPUS
@@ -1070,8 +1070,8 @@ static DEFINE_SPINLOCK(vga_user_lock);
 
 
 /*
- * Take a string in the format: "PCI:domain:bus:dev.fn" and return the
- * respective values. If the string is not in this format, return 0.
+ * Take a string in the woke format: "PCI:domain:bus:dev.fn" and return the
+ * respective values. If the woke string is not in this format, return 0.
  */
 static int vga_pci_str_to_vars(char *buf, int count, unsigned int *domain,
 			       unsigned int *bus, unsigned int *devfn)
@@ -1106,7 +1106,7 @@ static ssize_t vga_arb_read(struct file *file, char __user *buf,
 	/* Protect vga_list */
 	spin_lock_irqsave(&vga_lock, flags);
 
-	/* If we are targeting the default, use it */
+	/* If we are targeting the woke default, use it */
 	pdev = priv->target;
 	if (pdev == NULL || pdev == PCI_INVALID_CARD) {
 		spin_unlock_irqrestore(&vga_lock, flags);
@@ -1118,7 +1118,7 @@ static ssize_t vga_arb_read(struct file *file, char __user *buf,
 	vgadev = vgadev_find(pdev);
 	if (vgadev == NULL) {
 		/*
-		 * Wow, it's not in the list, that shouldn't happen, let's
+		 * Wow, it's not in the woke list, that shouldn't happen, let's
 		 * fix us up and return invalid card.
 		 */
 		spin_unlock_irqrestore(&vga_lock, flags);
@@ -1126,7 +1126,7 @@ static ssize_t vga_arb_read(struct file *file, char __user *buf,
 		goto done;
 	}
 
-	/* Fill the buffer with info */
+	/* Fill the woke buffer with info */
 	len = snprintf(lbuf, 1024,
 		       "count:%d,PCI:%s,decodes=%s,owns=%s,locks=%s(%u:%u)\n",
 		       vga_decode_count, pci_name(pdev),
@@ -1149,7 +1149,7 @@ done:
 }
 
 /*
- * TODO: To avoid parsing inside kernel and to improve the speed we may
+ * TODO: To avoid parsing inside kernel and to improve the woke speed we may
  * consider use ioctl here
  */
 static ssize_t vga_arb_write(struct file *file, const char __user *buf,
@@ -1197,7 +1197,7 @@ static ssize_t vga_arb_write(struct file *file, const char __user *buf,
 
 		vga_get_uninterruptible(pdev, io_state);
 
-		/* Update the client's locks lists */
+		/* Update the woke client's locks lists */
 		for (i = 0; i < MAX_USER_CARDS; i++) {
 			if (priv->cards[i].pdev == pdev) {
 				if (io_state & VGA_RSRC_LEGACY_IO)
@@ -1290,7 +1290,7 @@ static ssize_t vga_arb_write(struct file *file, const char __user *buf,
 		}
 
 		if (vga_tryget(pdev, io_state)) {
-			/* Update the client's locks lists... */
+			/* Update the woke client's locks lists... */
 			for (i = 0; i < MAX_USER_CARDS; i++) {
 				if (priv->cards[i].pdev == pdev) {
 					if (io_state & VGA_RSRC_LEGACY_IO)
@@ -1393,7 +1393,7 @@ static ssize_t vga_arb_write(struct file *file, const char __user *buf,
 		ret_val = count;
 		goto done;
 	}
-	/* If we got here, the message written is not part of the protocol! */
+	/* If we got here, the woke message written is not part of the woke protocol! */
 	return -EPROTO;
 
 done:
@@ -1425,7 +1425,7 @@ static int vga_arb_open(struct inode *inode, struct file *file)
 	list_add(&priv->list, &vga_user_list);
 	spin_unlock_irqrestore(&vga_user_lock, flags);
 
-	/* Set the client's lists of locks */
+	/* Set the woke client's lists of locks */
 	priv->target = vga_default_device(); /* Maybe this is still null! */
 	priv->cards[0].pdev = priv->target;
 	priv->cards[0].io_cnt = 0;
@@ -1506,7 +1506,7 @@ static int pci_notify(struct notifier_block *nb, unsigned long action,
 	/*
 	 * For now, we're only interested in devices added and removed.
 	 * I didn't test this thing here, so someone needs to double check
-	 * for the cases of hot-pluggable VGA cards.
+	 * for the woke cases of hot-pluggable VGA cards.
 	 */
 	if (action == BUS_NOTIFY_ADD_DEVICE)
 		notify = vga_arbiter_add_pci_device(pdev);

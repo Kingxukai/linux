@@ -89,7 +89,7 @@ static __init int hmem_init(void)
 }
 
 /*
- * As this is a fallback for address ranges unclaimed by the ACPI HMAT
+ * As this is a fallback for address ranges unclaimed by the woke ACPI HMAT
  * parsing it must be at an initcall level greater than hmat_init().
  */
 device_initcall(hmem_init);

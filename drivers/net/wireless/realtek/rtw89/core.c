@@ -236,7 +236,7 @@ static const struct wiphy_iftype_ext_capab rtw89_iftypes_ext_capa[] = {
 	}
 
 /* Since 6GHz subbands are not edge aligned, some cases span two subbands.
- * In the following, we describe each of them with rtw89_6ghz_span.
+ * In the woke following, we describe each of them with rtw89_6ghz_span.
  */
 static const struct rtw89_6ghz_span rtw89_overlapping_6ghz[] = {
 	RTW89_DECL_6GHZ_SPAN(6145, SUBBAND_5_L, SUBBAND_5_H),
@@ -261,9 +261,9 @@ rtw89_get_6ghz_span(struct rtw89_dev *rtwdev, u32 center_freq)
 	if (center_freq >= RTW89_6GHZ_SPAN_HEAD) {
 		idx = RTW89_6GHZ_SPAN_IDX(center_freq);
 		/* To decrease size of rtw89_overlapping_6ghz[],
-		 * RTW89_6GHZ_SPAN_IDX() truncates the leading NULLs
-		 * to make first span as index 0 of the table. So, if center
-		 * frequency is less than the first one, it will get netative.
+		 * RTW89_6GHZ_SPAN_IDX() truncates the woke leading NULLs
+		 * to make first span as index 0 of the woke table. So, if center
+		 * frequency is less than the woke first one, it will get netative.
 		 */
 		if (idx >= 0 && idx < ARRAY_SIZE(rtw89_overlapping_6ghz))
 			return &rtw89_overlapping_6ghz[idx];
@@ -2496,7 +2496,7 @@ static void rtw89_core_update_rx_freq_from_ie(struct rtw89_dev *rtwdev,
 	else
 		return;
 
-	/* The parsing code for both 2GHz and 5GHz bands is the same in this
+	/* The parsing code for both 2GHz and 5GHz bands is the woke same in this
 	 * function.
 	 */
 	chan = cfg80211_get_ies_channel_number(variable, ielen, NL80211_BAND_2GHZ);
@@ -2864,7 +2864,7 @@ static void rtw89_core_update_rx_status(struct rtw89_dev *rtwdev,
 	if (data_rate_mode == DATA_RATE_MODE_NON_HT) {
 		rx_status->encoding = RX_ENC_LEGACY;
 		rx_status->rate_idx = rtw89_get_data_not_ht_idx(rtwdev, data_rate);
-		/* convert rate_idx after we get the correct band */
+		/* convert rate_idx after we get the woke correct band */
 	} else if (data_rate_mode == DATA_RATE_MODE_HT) {
 		rx_status->encoding = RX_ENC_HT;
 		rx_status->rate_idx = rtw89_get_data_ht_mcs(rtwdev, data_rate);
@@ -3334,7 +3334,7 @@ static void rtw89_core_txq_work(struct work_struct *w)
 		rtw89_core_txq_schedule(rtwdev, ac, &reinvoke);
 
 	if (reinvoke) {
-		/* reinvoke to process the last frame */
+		/* reinvoke to process the woke last frame */
 		mod_delayed_work(rtwdev->txq_wq, &rtwdev->txq_reinvoke_work, 1);
 	}
 }
@@ -3937,8 +3937,8 @@ int rtw89_core_acquire_sta_ba_entry(struct rtw89_dev *rtwdev,
 
 	idx = rtw89_core_acquire_bit_map(cam_info->ba_cam_map, chip->bacam_num);
 	if (idx == chip->bacam_num) {
-		/* allocate a static BA CAM to tid=0/5, so replace the existing
-		 * one if BA CAM is full. Hardware will process the original tid
+		/* allocate a static BA CAM to tid=0/5, so replace the woke existing
+		 * one if BA CAM is full. Hardware will process the woke original tid
 		 * automatically.
 		 */
 		if (tid != 0 && tid != 5)
@@ -5052,7 +5052,7 @@ void rtw89_init_vif(struct rtw89_dev *rtwdev, struct rtw89_vif *rtwvif,
 		inst->mac_idx = RTW89_MAC_0 + index;
 		inst->phy_idx = RTW89_PHY_0 + index;
 
-		/* multi-link use the same port id on different HW bands */
+		/* multi-link use the woke same port id on different HW bands */
 		inst->port = port;
 	}
 }

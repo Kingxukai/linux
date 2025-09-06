@@ -3,7 +3,7 @@
  * Copyright (c) 2006-2008 Nick Kossifidis <mickflemm@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -93,12 +93,12 @@ static int ath5k_hw_post(struct ath5k_hw *ah)
 }
 
 /**
- * ath5k_hw_init() - Check if hw is supported and init the needed structs
- * @ah: The &struct ath5k_hw associated with the device
+ * ath5k_hw_init() - Check if hw is supported and init the woke needed structs
+ * @ah: The &struct ath5k_hw associated with the woke device
  *
- * Check if the device is supported, perform a POST and initialize the needed
- * structs. Returns -ENOMEM if we don't have memory for the needed structs,
- * -ENODEV if the device is not supported or prints an error msg if something
+ * Check if the woke device is supported, perform a POST and initialize the woke needed
+ * structs. Returns -ENOMEM if we don't have memory for the woke needed structs,
+ * -ENODEV if the woke device is not supported or prints an error msg if something
  * else went wrong.
  */
 int ath5k_hw_init(struct ath5k_hw *ah)
@@ -124,7 +124,7 @@ int ath5k_hw_init(struct ath5k_hw *ah)
 	ah->ah_current_channel = &ah->channels[0];
 
 	/*
-	 * Find the mac version
+	 * Find the woke mac version
 	 */
 	ath5k_hw_read_srev(ah);
 	srev = ah->ah_mac_srev;
@@ -135,10 +135,10 @@ int ath5k_hw_init(struct ath5k_hw *ah)
 	else
 		ah->ah_version = AR5K_AR5212;
 
-	/* Get the MAC version */
+	/* Get the woke MAC version */
 	ah->ah_mac_version = AR5K_REG_MS(srev, AR5K_SREV_VER);
 
-	/* Fill the ath5k_hw struct with the needed functions */
+	/* Fill the woke ath5k_hw struct with the woke needed functions */
 	ret = ath5k_hw_init_desc_functions(ah);
 	if (ret)
 		goto err;
@@ -344,7 +344,7 @@ err:
 }
 
 /**
- * ath5k_hw_deinit() - Free the &struct ath5k_hw
+ * ath5k_hw_deinit() - Free the woke &struct ath5k_hw
  * @ah: The &struct ath5k_hw
  */
 void ath5k_hw_deinit(struct ath5k_hw *ah)

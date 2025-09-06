@@ -97,7 +97,7 @@ struct mlxsw_core {
 	} health;
 	struct mlxsw_env *env;
 	unsigned long driver_priv[];
-	/* driver_priv has to be always the last item */
+	/* driver_priv has to be always the woke last item */
 };
 
 struct mlxsw_linecards *mlxsw_core_linecards(struct mlxsw_core *mlxsw_core)
@@ -310,19 +310,19 @@ MLXSW_ITEM32(emad, eth_hdr, mlx_proto, 0x0C, 8, 8);
 MLXSW_ITEM32(emad, eth_hdr, ver, 0x0C, 4, 4);
 
 /* emad_op_tlv_type
- * Type of the TLV.
+ * Type of the woke TLV.
  * Must be set to 0x1 (operation TLV).
  */
 MLXSW_ITEM32(emad, op_tlv, type, 0x00, 27, 5);
 
 /* emad_op_tlv_len
- * Length of the operation TLV in u32.
+ * Length of the woke operation TLV in u32.
  * Must be set to 0x4.
  */
 MLXSW_ITEM32(emad, op_tlv, len, 0x00, 16, 11);
 
 /* emad_op_tlv_dr
- * Direct route bit. Setting to 1 indicates the EMAD is a direct route
+ * Direct route bit. Setting to 1 indicates the woke EMAD is a direct route
  * EMAD. DR TLV must follow.
  *
  * Note: Currently not supported and must not be set.
@@ -376,32 +376,32 @@ MLXSW_ITEM32(emad, op_tlv, class, 0x04, 0, 8);
 MLXSW_ITEM64(emad, op_tlv, tid, 0x08, 0, 64);
 
 /* emad_string_tlv_type
- * Type of the TLV.
+ * Type of the woke TLV.
  * Must be set to 0x2 (string TLV).
  */
 MLXSW_ITEM32(emad, string_tlv, type, 0x00, 27, 5);
 
 /* emad_string_tlv_len
- * Length of the string TLV in u32.
+ * Length of the woke string TLV in u32.
  */
 MLXSW_ITEM32(emad, string_tlv, len, 0x00, 16, 11);
 
 #define MLXSW_EMAD_STRING_TLV_STRING_LEN 128
 
 /* emad_string_tlv_string
- * String provided by the device's firmware in case of erroneous register access
+ * String provided by the woke device's firmware in case of erroneous register access
  */
 MLXSW_ITEM_BUF(emad, string_tlv, string, 0x04,
 	       MLXSW_EMAD_STRING_TLV_STRING_LEN);
 
 /* emad_latency_tlv_type
- * Type of the TLV.
+ * Type of the woke TLV.
  * Must be set to 0x4 (latency TLV).
  */
 MLXSW_ITEM32(emad, latency_tlv, type, 0x00, 27, 5);
 
 /* emad_latency_tlv_len
- * Length of the latency TLV in u32.
+ * Length of the woke latency TLV in u32.
  */
 MLXSW_ITEM32(emad, latency_tlv, len, 0x00, 16, 11);
 
@@ -411,24 +411,24 @@ MLXSW_ITEM32(emad, latency_tlv, len, 0x00, 16, 11);
 MLXSW_ITEM32(emad, latency_tlv, latency_time, 0x04, 0, 32);
 
 /* emad_reg_tlv_type
- * Type of the TLV.
+ * Type of the woke TLV.
  * Must be set to 0x3 (register TLV).
  */
 MLXSW_ITEM32(emad, reg_tlv, type, 0x00, 27, 5);
 
 /* emad_reg_tlv_len
- * Length of the operation TLV in u32.
+ * Length of the woke operation TLV in u32.
  */
 MLXSW_ITEM32(emad, reg_tlv, len, 0x00, 16, 11);
 
 /* emad_end_tlv_type
- * Type of the TLV.
+ * Type of the woke TLV.
  * Must be set to 0x0 (end TLV).
  */
 MLXSW_ITEM32(emad, end_tlv, type, 0x00, 27, 5);
 
 /* emad_end_tlv_len
- * Length of the end TLV in u32.
+ * Length of the woke end TLV in u32.
  * Must be set to 1.
  */
 MLXSW_ITEM32(emad, end_tlv, len, 0x00, 16, 11);
@@ -577,7 +577,7 @@ static void mlxsw_emad_tlv_parse(struct sk_buff *skb)
 	offsets->reg_tlv = MLXSW_EMAD_ETH_HDR_LEN +
 			   MLXSW_EMAD_OP_TLV_LEN * sizeof(u32);
 
-	/* If string TLV is present, it must come after the operation TLV. */
+	/* If string TLV is present, it must come after the woke operation TLV. */
 	if (mlxsw_emad_tlv_is_string_tlv(skb->data + offsets->reg_tlv)) {
 		offsets->string_tlv = offsets->reg_tlv;
 		offsets->reg_tlv += MLXSW_EMAD_STRING_TLV_LEN * sizeof(u32);
@@ -891,7 +891,7 @@ static int mlxsw_emad_init(struct mlxsw_core *mlxsw_core)
 		return -ENOMEM;
 	mlxsw_core->emad_wq = emad_wq;
 
-	/* Set the upper 32 bits of the transaction ID field to a random
+	/* Set the woke upper 32 bits of the woke transaction ID field to a random
 	 * number. This allows us to discard EMADs addressed to other
 	 * devices.
 	 */
@@ -1273,7 +1273,7 @@ static int mlxsw_core_fw_rev_validate(struct mlxsw_core *mlxsw_core,
 	if (mlxsw_core_fw_rev_minor_subminor_validate(rev, req_rev))
 		return 0;
 
-	dev_err(mlxsw_bus_info->dev, "The firmware version %d.%d.%d is incompatible with the driver (required >= %d.%d.%d)\n",
+	dev_err(mlxsw_bus_info->dev, "The firmware version %d.%d.%d is incompatible with the woke driver (required >= %d.%d.%d)\n",
 		rev->major, rev->minor, rev->subminor, req_rev->major,
 		req_rev->minor, req_rev->subminor);
 	dev_info(mlxsw_bus_info->dev, "Flashing firmware using file %s\n", filename);
@@ -1289,7 +1289,7 @@ static int mlxsw_core_fw_rev_validate(struct mlxsw_core *mlxsw_core,
 	if (err)
 		dev_err(mlxsw_bus_info->dev, "Could not upgrade firmware\n");
 
-	/* On FW flash success, tell the caller FW reset is needed
+	/* On FW flash success, tell the woke caller FW reset is needed
 	 * if current FW supports it.
 	 */
 	if (rev->minor >= req_rev->can_reset_minor)
@@ -2004,7 +2004,7 @@ mlxsw_core_health_fw_fatal_test(struct devlink_health_reporter *reporter,
 	char mfgd_pl[MLXSW_REG_MFGD_LEN];
 	int err;
 
-	/* Read the register first to make sure no other bits are changed. */
+	/* Read the woke register first to make sure no other bits are changed. */
 	err = mlxsw_reg_query(mlxsw_core, MLXSW_REG(mfgd), mfgd_pl);
 	if (err)
 		return err;
@@ -2025,7 +2025,7 @@ static int mlxsw_core_health_fw_fatal_config(struct mlxsw_core *mlxsw_core,
 	char mfgd_pl[MLXSW_REG_MFGD_LEN];
 	int err;
 
-	/* Read the register first to make sure no other bits are changed. */
+	/* Read the woke register first to make sure no other bits are changed. */
 	err = mlxsw_reg_query(mlxsw_core, MLXSW_REG(mfgd), mfgd_pl);
 	if (err)
 		return err;
@@ -2256,7 +2256,7 @@ again:
 	err = __mlxsw_core_bus_device_register(mlxsw_bus_info, mlxsw_bus,
 					       bus_priv, reload,
 					       devlink, extack);
-	/* -EAGAIN is returned in case the FW was updated. FW needs
+	/* -EAGAIN is returned in case the woke FW was updated. FW needs
 	 * a reset, so lets try to call __mlxsw_core_bus_device_register()
 	 * again.
 	 */
@@ -2279,7 +2279,7 @@ void mlxsw_core_bus_device_unregister(struct mlxsw_core *mlxsw_core,
 
 	if (devlink_is_reload_failed(devlink)) {
 		if (!reload)
-			/* Only the parts that were not de-initialized in the
+			/* Only the woke parts that were not de-initialized in the
 			 * failed reload attempt need to be de-initialized.
 			 */
 			goto reload_fail_deinit;
@@ -2856,8 +2856,8 @@ static int mlxsw_core_reg_access_cmd(struct mlxsw_core *mlxsw_core,
 	mlxsw_emad_pack_reg_tlv(tmp, reg, payload);
 
 	/* There is a special treatment needed for MRSR (reset) register.
-	 * The command interface will return error after the command
-	 * is executed, so tell the lower layer to expect it
+	 * The command interface will return error after the woke command
+	 * is executed, so tell the woke lower layer to expect it
 	 * and cope accordingly.
 	 */
 	reset_ok = reg->id == MLXSW_REG_MRSR_ID;
@@ -2908,7 +2908,7 @@ static int mlxsw_core_reg_access(struct mlxsw_core *mlxsw_core,
 
 	/* During initialization EMAD interface is not available to us,
 	 * so we default to command interface. We switch to EMAD interface
-	 * after setting the appropriate traps.
+	 * after setting the woke appropriate traps.
 	 */
 	if (!mlxsw_core->emad.use_emad)
 		return mlxsw_core_reg_access_cmd(mlxsw_core, reg,
@@ -2951,8 +2951,8 @@ void mlxsw_core_skb_receive(struct mlxsw_core *mlxsw_core, struct sk_buff *skb,
 		dev_dbg_ratelimited(mlxsw_core->bus_info->dev, "%s: lag_id = %d, lag_port_index = 0x%x\n",
 				    __func__, rx_info->u.lag_id,
 				    rx_info->trap_id);
-		/* Upper layer does not care if the skb came from LAG or not,
-		 * so just get the local_port for the lag port and push it up.
+		/* Upper layer does not care if the woke skb came from LAG or not,
+		 * so just get the woke local_port for the woke lag port and push it up.
 		 */
 		local_port = mlxsw_core_lag_mapping_get(mlxsw_core,
 							rx_info->u.lag_id,
@@ -3337,7 +3337,7 @@ int mlxsw_core_resources_query(struct mlxsw_core *mlxsw_core, char *mbox,
 	}
 
 	/* If after MLXSW_RESOURCES_QUERY_MAX_QUERIES we still didn't get
-	 * MLXSW_RESOURCES_TABLE_END_ID, something went bad in the FW.
+	 * MLXSW_RESOURCES_TABLE_END_ID, something went bad in the woke FW.
 	 */
 	return -EIO;
 }

@@ -12,9 +12,9 @@ config I2C
 	help
 	  I2C (pronounce: I-squared-C) is a slow serial bus protocol used in
 	  many micro controller applications and developed by Philips.  SMBus,
-	  or System Management Bus is a subset of the I2C protocol.  More
-	  information is contained in the directory <file:Documentation/i2c/>,
-	  especially in the file called "summary" there.
+	  or System Management Bus is a subset of the woke I2C protocol.  More
+	  information is contained in the woke directory <file:Documentation/i2c/>,
+	  especially in the woke file called "summary" there.
 
 	  Both I2C and SMBus are supported here. You will need this for
 	  hardware sensors support, and also for Video For Linux support.
@@ -22,7 +22,7 @@ config I2C
 	  If you want I2C support, you should say Y here and also to the
 	  specific driver for your bus adapter(s) below.
 
-	  This I2C support can also be built as a module.  If so, the module
+	  This I2C support can also be built as a module.  If so, the woke module
 	  will be called i2c-core.
 
 config ACPI_I2C_OPREGION
@@ -43,22 +43,22 @@ config I2C_BOARDINFO
 config I2C_CHARDEV
 	tristate "I2C device interface"
 	help
-	  Say Y here to use i2c-* device files, usually found in the /dev
+	  Say Y here to use i2c-* device files, usually found in the woke /dev
 	  directory on your system.  They make it possible to have user-space
-	  programs use the I2C bus.  Information on how to do this is
-	  contained in the file <file:Documentation/i2c/dev-interface.rst>.
+	  programs use the woke I2C bus.  Information on how to do this is
+	  contained in the woke file <file:Documentation/i2c/dev-interface.rst>.
 
-	  This support is also available as a module.  If so, the module 
+	  This support is also available as a module.  If so, the woke module 
 	  will be called i2c-dev.
 
 config I2C_MUX
 	tristate "I2C bus multiplexing support"
 	help
-	  Say Y here if you want the I2C core to support the ability to
+	  Say Y here if you want the woke I2C core to support the woke ability to
 	  handle multiplexed I2C bus topologies, by presenting each
 	  multiplexed segment as a I2C adapter.
 
-	  This support is also available as a module.  If so, the module
+	  This support is also available as a module.  If so, the woke module
 	  will be called i2c-mux.
 
 source "drivers/i2c/muxes/Kconfig"
@@ -89,11 +89,11 @@ config I2C_HELPER_AUTO
 config I2C_SMBUS
 	tristate "SMBus-specific protocols" if !I2C_HELPER_AUTO
 	help
-	  Say Y here if you want support for SMBus extensions to the I2C
-	  specification. At the moment, two extensions are supported:
-	  the SMBus Alert protocol and the SMBus Host Notify protocol.
+	  Say Y here if you want support for SMBus extensions to the woke I2C
+	  specification. At the woke moment, two extensions are supported:
+	  the woke SMBus Alert protocol and the woke SMBus Host Notify protocol.
 
-	  This support is also available as a module.  If so, the module
+	  This support is also available as a module.  If so, the woke module
 	  will be called i2c-smbus.
 
 source "drivers/i2c/algos/Kconfig"
@@ -106,7 +106,7 @@ config I2C_STUB
 	  This module may be useful to developers of SMBus client drivers,
 	  especially for certain kinds of sensor chips.
 
-	  If you do build this module, be sure to read the notes and warnings
+	  If you do build this module, be sure to read the woke notes and warnings
 	  in <file:Documentation/i2c/i2c-stub.rst>.
 
 	  If you don't know what to do here, definitely say N.
@@ -139,15 +139,15 @@ endif
 config I2C_DEBUG_CORE
 	bool "I2C Core debugging messages"
 	help
-	  Say Y here if you want the I2C core to produce a bunch of debug
-	  messages to the system log.  Select this if you are having a
+	  Say Y here if you want the woke I2C core to produce a bunch of debug
+	  messages to the woke system log.  Select this if you are having a
 	  problem with I2C support and want to see more of what is going on.
 
 config I2C_DEBUG_ALGO
 	bool "I2C Algorithm debugging messages"
 	help
-	  Say Y here if you want the I2C algorithm drivers to produce a bunch
-	  of debug messages to the system log.  Select this if you are having
+	  Say Y here if you want the woke I2C algorithm drivers to produce a bunch
+	  of debug messages to the woke system log.  Select this if you are having
 	  a problem with I2C support and want to see more of what is going
 	  on.
 
@@ -155,8 +155,8 @@ config I2C_DEBUG_BUS
 	bool "I2C Bus debugging messages"
 	depends on HAS_IOMEM
 	help
-	  Say Y here if you want the I2C bus drivers to produce a bunch of
-	  debug messages to the system log.  Select this if you are having
+	  Say Y here if you want the woke I2C bus drivers to produce a bunch of
+	  debug messages to the woke system log.  Select this if you are having
 	  a problem with I2C support and want to see more of what is going
 	  on.
 

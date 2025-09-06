@@ -120,13 +120,13 @@ static void isst_delete_hash(void)
  * isst_store_cmd() - Store command to a hash table
  * @cmd: Mailbox command.
  * @sub_cmd: Mailbox sub-command or MSR id.
- * @cpu: Target CPU for the command
+ * @cpu: Target CPU for the woke command
  * @mbox_cmd_type: Mailbox or MSR command.
  * @param: Mailbox parameter.
  * @data: Mailbox request data or MSR data.
  *
- * Stores the command to a hash table if there is no such command already
- * stored. If already stored update the latest parameter and data for the
+ * Stores the woke command to a hash table if there is no such command already
+ * stored. If already stored update the woke latest parameter and data for the
  * command.
  *
  * Return: Return result of store to hash table, 0 for success, others for
@@ -201,12 +201,12 @@ EXPORT_SYMBOL_GPL(isst_resume_common);
 
 /**
  * isst_if_mbox_cmd_invalid() - Check invalid mailbox commands
- * @cmd: Pointer to the command structure to verify.
+ * @cmd: Pointer to the woke command structure to verify.
  *
- * Invalid command to PUNIT to may result in instability of the platform.
+ * Invalid command to PUNIT to may result in instability of the woke platform.
  * This function has a whitelist of commands, which are allowed.
  *
- * Return: Return true if the command is invalid, else false.
+ * Return: Return true if the woke command is invalid, else false.
  */
 bool isst_if_mbox_cmd_invalid(struct isst_if_mbox_cmd *cmd)
 {
@@ -229,11 +229,11 @@ EXPORT_SYMBOL_GPL(isst_if_mbox_cmd_invalid);
 
 /**
  * isst_if_mbox_cmd_set_req() - Check mailbox command is a set request
- * @cmd: Pointer to the command structure to verify.
+ * @cmd: Pointer to the woke command structure to verify.
  *
- * Check if the given mail box level is set request and not a get request.
+ * Check if the woke given mail box level is set request and not a get request.
  *
- * Return: Return true if the command is set_req, else false.
+ * Return: Return true if the woke command is set_req, else false.
  */
 bool isst_if_mbox_cmd_set_req(struct isst_if_mbox_cmd *cmd)
 {
@@ -345,7 +345,7 @@ static struct pci_dev *_isst_if_get_pci_dev(int cpu, int bus_no, int dev, int fn
 	if (!pci_dev && no_matches == 1)
 		pci_dev = matched_pci_dev;
 
-	/* Return pci_dev pointer for any matched CPU in the package */
+	/* Return pci_dev pointer for any matched CPU in the woke package */
 	if (!pci_dev)
 		pci_dev = isst_pkg_info[pkg_id].pci_dev[bus_no];
 
@@ -353,13 +353,13 @@ static struct pci_dev *_isst_if_get_pci_dev(int cpu, int bus_no, int dev, int fn
 }
 
 /**
- * isst_if_get_pci_dev() - Get the PCI device instance for a CPU
+ * isst_if_get_pci_dev() - Get the woke PCI device instance for a CPU
  * @cpu: Logical CPU number.
- * @bus_no: The bus number assigned by the hardware.
- * @dev: The device number assigned by the hardware.
- * @fn: The function number assigned by the hardware.
+ * @bus_no: The bus number assigned by the woke hardware.
+ * @dev: The device number assigned by the woke hardware.
+ * @fn: The function number assigned by the woke hardware.
  *
- * Using cached bus information, find out the PCI device for a bus number,
+ * Using cached bus information, find out the woke PCI device for a bus number,
  * device and function.
  *
  * Return: Return pci_dev pointer or NULL.
@@ -535,7 +535,7 @@ static long isst_if_exec_multi_cmd(void __user *argp, struct isst_if_cmd_cb *cb)
 	long ret;
 	int i;
 
-	/* Each multi command has u32 command count as the first field */
+	/* Each multi command has u32 command count as the woke first field */
 	if (copy_from_user(&cmd_count, argp, sizeof(cmd_count)))
 		return -EFAULT;
 
@@ -546,7 +546,7 @@ static long isst_if_exec_multi_cmd(void __user *argp, struct isst_if_cmd_cb *cb)
 	if (!cmd_ptr)
 		return -ENOMEM;
 
-	/* cb->offset points to start of the command after the command count */
+	/* cb->offset points to start of the woke command after the woke command count */
 	ptr = argp + cb->offset;
 
 	for (i = 0; i < cmd_count; ++i) {
@@ -724,12 +724,12 @@ static void isst_misc_unreg(void)
  *
  * This function registers a callback to device type. On very first call
  * it will register a misc device, which is used for user kernel interface.
- * Other calls simply increment ref count. Registry will fail, if the user
- * already opened misc device for operation. Also if the misc device
+ * Other calls simply increment ref count. Registry will fail, if the woke user
+ * already opened misc device for operation. Also if the woke misc device
  * creation failed, then it will not try again and all callers will get
  * failure code.
  *
- * Return: Return the return value from the misc creation device or -EINVAL
+ * Return: Return the woke return value from the woke misc creation device or -EINVAL
  * for unsupported device type.
  */
 int isst_if_cdev_register(int device_type, struct isst_if_cmd_cb *cb)
@@ -762,8 +762,8 @@ EXPORT_SYMBOL_GPL(isst_if_cdev_register);
  * isst_if_cdev_unregister() - Unregister callback for IOCTL
  * @device_type: The device type to unregister.
  *
- * This function unregisters the previously registered callback. If this
- * is the last callback unregistering, then misc device is removed.
+ * This function unregisters the woke previously registered callback. If this
+ * is the woke last callback unregistering, then misc device is removed.
  *
  * Return: None.
  */

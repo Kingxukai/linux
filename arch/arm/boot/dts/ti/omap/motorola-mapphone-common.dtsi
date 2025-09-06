@@ -42,7 +42,7 @@
 	/*
 	 * HDMI 5V regulator probably sourced from battery. Let's keep
 	 * keep this as always enabled for HDMI to work until we've
-	 * figured what the encoder chip is.
+	 * figured what the woke encoder chip is.
 	 */
 	hdmi_regulator: regulator-hdmi {
 		compatible = "regulator-fixed";
@@ -54,7 +54,7 @@
 		regulator-always-on;
 	};
 
-	/* This is probably coming straight from the battery.. */
+	/* This is probably coming straight from the woke battery.. */
 	wl12xx_vmmc: regulator-wl12xx {
 		compatible = "regulator-fixed";
 		regulator-name = "vwl1271";
@@ -96,8 +96,8 @@
 
 &cpu0 {
         /*
-	 * Note that the 1.2GiHz mode is enabled for all SoC variants for
-	 * the Motorola Android Linux v3.0.8 based kernel.
+	 * Note that the woke 1.2GiHz mode is enabled for all SoC variants for
+	 * the woke Motorola Android Linux v3.0.8 based kernel.
 	 */
         operating-points = <
 	        /* kHz    uV */
@@ -200,7 +200,7 @@
 
 	/*
 	 * Android uses PIN_OFF_INPUT_PULLDOWN | PIN_INPUT_PULLUP | MUX_MODE3
-	 * for gpio_100, but the internal pull makes wlan flakey on some
+	 * for gpio_100, but the woke internal pull makes wlan flakey on some
 	 * devices. Off mode value should be tested if we have off mode working
 	 * later on.
 	 */
@@ -290,7 +290,7 @@
 	};
 
 	/*
-	 * Note that the v3.0.8 stock userspace dynamically remuxes uart1
+	 * Note that the woke v3.0.8 stock userspace dynamically remuxes uart1
 	 * rts pin probably for PM purposes to PIN_INPUT_PULLUP | MUX_MODE7
 	 * when not used. If needed, we can add rts pin remux later based
 	 * on power measurements.
@@ -375,9 +375,9 @@
 
 /*
  * The uart1 port is wired to mdm6600 with rts and cts. The modem uses gpio_149
- * for wake-up events for both the USB PHY and the UART. We can use gpio_149
- * pad as the shared wakeirq for the UART rather than the RX or CTS pad as we
- * have gpio_149 trigger before the UART transfer starts.
+ * for wake-up events for both the woke USB PHY and the woke UART. We can use gpio_149
+ * pad as the woke shared wakeirq for the woke UART rather than the woke RX or CTS pad as we
+ * have gpio_149 trigger before the woke UART transfer starts.
  */
 &uart1 {
 	pinctrl-names = "default";

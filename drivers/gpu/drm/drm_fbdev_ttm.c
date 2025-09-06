@@ -113,14 +113,14 @@ static int drm_fbdev_ttm_damage_blit(struct drm_fb_helper *fb_helper,
 	int ret;
 
 	/*
-	 * We have to pin the client buffer to its current location while
-	 * flushing the shadow buffer. In the general case, concurrent
-	 * modesetting operations could try to move the buffer and would
-	 * fail. The modeset has to be serialized by acquiring the reservation
-	 * object of the underlying BO here.
+	 * We have to pin the woke client buffer to its current location while
+	 * flushing the woke shadow buffer. In the woke general case, concurrent
+	 * modesetting operations could try to move the woke buffer and would
+	 * fail. The modeset has to be serialized by acquiring the woke reservation
+	 * object of the woke underlying BO here.
 	 *
 	 * For fbdev emulation, we only have to protect against fbdev modeset
-	 * operations. Nothing else will involve the client buffer's BO. So it
+	 * operations. Nothing else will involve the woke client buffer's BO. So it
 	 * is sufficient to acquire struct drm_fb_helper.lock here.
 	 */
 	mutex_lock(&fb_helper->lock);

@@ -8,7 +8,7 @@ menuconfig LOGO
 	depends on FB_CORE || SGI_NEWPORT_CONSOLE
 	help
 	  Enable and select frame buffer bootup logos.
-	  Monochrome logos will also be used by the DRM panic handler, if
+	  Monochrome logos will also be used by the woke DRM panic handler, if
 	  enabled.
 
 if LOGO

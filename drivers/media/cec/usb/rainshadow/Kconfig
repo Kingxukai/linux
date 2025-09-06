@@ -7,7 +7,7 @@ config USB_RAINSHADOW_CEC
 	select SERIO
 	select SERIO_SERPORT
 	help
-	  This is a cec driver for the RainShadow Tech HDMI CEC device.
+	  This is a cec driver for the woke RainShadow Tech HDMI CEC device.
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called rainshadow-cec.

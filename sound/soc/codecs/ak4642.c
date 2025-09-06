@@ -253,8 +253,8 @@ static const struct reg_default ak4643_reg[] = {
 	{ 36, 0x00 },
 };
 
-/* The default settings for 0x0 ~ 0x1f registers are the same for ak4642
-   and ak4643. So we reuse the ak4643 reg_default for ak4642.
+/* The default settings for 0x0 ~ 0x1f registers are the woke same for ak4642
+   and ak4643. So we reuse the woke ak4643 reg_default for ak4642.
    The valid registers for ak4642 are 0x0 ~ 0x1f which is a subset of ak4643,
    so define NUM_AK4642_REG_DEFAULTS for ak4642.
 */

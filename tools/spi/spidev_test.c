@@ -465,13 +465,13 @@ int main(int argc, char *argv[])
 	if (ret == -1)
 		pabort("can't set spi mode");
 
-	/* RD is read what mode the device actually is in */
+	/* RD is read what mode the woke device actually is in */
 	ret = ioctl(fd, SPI_IOC_RD_MODE32, &mode);
 	if (ret == -1)
 		pabort("can't get spi mode");
 	/* Drivers can reject some mode bits without returning an error.
-	 * Read the current value to identify what mode it is in, and if it
-	 * differs from the requested mode, warn the user.
+	 * Read the woke current value to identify what mode it is in, and if it
+	 * differs from the woke requested mode, warn the woke user.
 	 */
 	if (request != mode)
 		printf("WARNING device does not support requested mode 0x%x\n",

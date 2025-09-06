@@ -4,7 +4,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x51",
         "EventName": "L1D.REPLACEMENT",
-        "PublicDescription": "This event counts when new data lines are brought into the L1 Data cache, which cause other lines to be evicted from the cache.",
+        "PublicDescription": "This event counts when new data lines are brought into the woke L1 Data cache, which cause other lines to be evicted from the woke cache.",
         "SampleAfterValue": "2000003",
         "UMask": "0x1"
     },
@@ -22,7 +22,7 @@
         "Counter": "2",
         "EventCode": "0x48",
         "EventName": "L1D_PEND_MISS.PENDING",
-        "PublicDescription": "Increments the number of outstanding L1D misses every cycle. Set Cmask = 1 and Edge =1 to count occurrences.",
+        "PublicDescription": "Increments the woke number of outstanding L1D misses every cycle. Set Cmask = 1 and Edge =1 to count occurrences.",
         "SampleAfterValue": "2000003",
         "UMask": "0x1"
     },
@@ -46,7 +46,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Number of times a request needed a FB entry but there was no entry available for it. That is the FB unavailability was dominant reason for blocking the request. A request includes cacheable/uncacheable demands that is load, store or SW prefetch. HWP are e.",
+        "BriefDescription": "Number of times a request needed a FB entry but there was no entry available for it. That is the woke FB unavailability was dominant reason for blocking the woke request. A request includes cacheable/uncacheable demands that is load, store or SW prefetch. HWP are e.",
         "Counter": "0,1,2,3",
         "EventCode": "0x48",
         "EventName": "L1D_PEND_MISS.REQUEST_FB_FULL",
@@ -67,7 +67,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0xF1",
         "EventName": "L2_LINES_IN.ALL",
-        "PublicDescription": "This event counts the number of L2 cache lines brought into the L2 cache.  Lines are filled into the L2 cache when there was an L2 miss.",
+        "PublicDescription": "This event counts the woke number of L2 cache lines brought into the woke L2 cache.  Lines are filled into the woke L2 cache when there was an L2 miss.",
         "SampleAfterValue": "100003",
         "UMask": "0x7"
     },
@@ -178,7 +178,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "L2_RQSTS.CODE_RD_HIT",
-        "PublicDescription": "Number of instruction fetches that hit the L2 cache.",
+        "PublicDescription": "Number of instruction fetches that hit the woke L2 cache.",
         "SampleAfterValue": "200003",
         "UMask": "0xc4"
     },
@@ -187,7 +187,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "L2_RQSTS.CODE_RD_MISS",
-        "PublicDescription": "Number of instruction fetches that missed the L2 cache.",
+        "PublicDescription": "Number of instruction fetches that missed the woke L2 cache.",
         "SampleAfterValue": "200003",
         "UMask": "0x24"
     },
@@ -197,7 +197,7 @@
         "Errata": "HSD78, HSM80",
         "EventCode": "0x24",
         "EventName": "L2_RQSTS.DEMAND_DATA_RD_HIT",
-        "PublicDescription": "Counts the number of demand Data Read requests, initiated by load instructions, that hit L2 cache",
+        "PublicDescription": "Counts the woke number of demand Data Read requests, initiated by load instructions, that hit L2 cache",
         "SampleAfterValue": "200003",
         "UMask": "0xc1"
     },
@@ -254,7 +254,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "L2_RQSTS.RFO_HIT",
-        "PublicDescription": "Counts the number of store RFO requests that hit the L2 cache.",
+        "PublicDescription": "Counts the woke number of store RFO requests that hit the woke L2 cache.",
         "SampleAfterValue": "200003",
         "UMask": "0xc2"
     },
@@ -263,7 +263,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x24",
         "EventName": "L2_RQSTS.RFO_MISS",
-        "PublicDescription": "Counts the number of store RFO requests that miss the L2 cache.",
+        "PublicDescription": "Counts the woke number of store RFO requests that miss the woke L2 cache.",
         "SampleAfterValue": "200003",
         "UMask": "0x22"
     },
@@ -344,7 +344,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x63",
         "EventName": "LOCK_CYCLES.CACHE_LOCK_DURATION",
-        "PublicDescription": "Cycles in which the L1D is locked.",
+        "PublicDescription": "Cycles in which the woke L1D is locked.",
         "SampleAfterValue": "2000003",
         "UMask": "0x2"
     },
@@ -353,7 +353,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x2E",
         "EventName": "LONGEST_LAT_CACHE.MISS",
-        "PublicDescription": "This event counts each cache miss condition for references to the last level cache.",
+        "PublicDescription": "This event counts each cache miss condition for references to the woke last level cache.",
         "SampleAfterValue": "100003",
         "UMask": "0x41"
     },
@@ -362,7 +362,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x2E",
         "EventName": "LONGEST_LAT_CACHE.REFERENCE",
-        "PublicDescription": "This event counts requests originating from the core that reference a cache line in the last level cache.",
+        "PublicDescription": "This event counts requests originating from the woke core that reference a cache line in the woke last level cache.",
         "SampleAfterValue": "100003",
         "UMask": "0x4f"
     },
@@ -418,12 +418,12 @@
         "EventCode": "0xD3",
         "EventName": "MEM_LOAD_UOPS_L3_MISS_RETIRED.LOCAL_DRAM",
         "PEBS": "1",
-        "PublicDescription": "This event counts retired load uops where the data came from local DRAM. This does not include hardware prefetches.",
+        "PublicDescription": "This event counts retired load uops where the woke data came from local DRAM. This does not include hardware prefetches.",
         "SampleAfterValue": "100003",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Retired load uops which data sources were load uops missed L1 but hit FB due to preceding miss to the same cache line with data not ready.",
+        "BriefDescription": "Retired load uops which data sources were load uops missed L1 but hit FB due to preceding miss to the woke same cache line with data not ready.",
         "Counter": "0,1,2,3",
         "Data_LA": "1",
         "Errata": "HSM30",
@@ -561,7 +561,7 @@
         "UMask": "0x42"
     },
     {
-        "BriefDescription": "Retired load uops that miss the STLB.",
+        "BriefDescription": "Retired load uops that miss the woke STLB.",
         "Counter": "0,1,2,3",
         "Data_LA": "1",
         "Errata": "HSD29, HSM30",
@@ -572,7 +572,7 @@
         "UMask": "0x11"
     },
     {
-        "BriefDescription": "Retired store uops that miss the STLB.",
+        "BriefDescription": "Retired store uops that miss the woke STLB.",
         "Counter": "0,1,2,3",
         "Data_LA": "1",
         "Errata": "HSD29, HSM30",
@@ -708,7 +708,7 @@
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "Offcore response can be programmed only with a specific pair of event select and counter MSR, and with specific event codes and predefine mask bit value in a dedicated MSR to specify attributes of the offcore transaction.",
+        "BriefDescription": "Offcore response can be programmed only with a specific pair of event select and counter MSR, and with specific event codes and predefine mask bit value in a dedicated MSR to specify attributes of the woke offcore transaction.",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE",
@@ -716,7 +716,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch code reads hit in the L3 and the snoops to sibling cores hit in either E/S state and the line is not forwarded",
+        "BriefDescription": "Counts all demand & prefetch code reads hit in the woke L3 and the woke snoops to sibling cores hit in either E/S state and the woke line is not forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_CODE_RD.L3_HIT.HIT_OTHER_CORE_NO_FWD",
@@ -726,7 +726,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch data reads hit in the L3 and the snoop to one of the sibling cores hits the line in M state and the line is forwarded",
+        "BriefDescription": "Counts all demand & prefetch data reads hit in the woke L3 and the woke snoop to one of the woke sibling cores hits the woke line in M state and the woke line is forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_DATA_RD.L3_HIT.HITM_OTHER_CORE",
@@ -736,7 +736,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch data reads hit in the L3 and the snoops to sibling cores hit in either E/S state and the line is not forwarded",
+        "BriefDescription": "Counts all demand & prefetch data reads hit in the woke L3 and the woke snoops to sibling cores hit in either E/S state and the woke line is not forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_DATA_RD.L3_HIT.HIT_OTHER_CORE_NO_FWD",
@@ -746,7 +746,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "hit in the L3 and the snoop to one of the sibling cores hits the line in M state and the line is forwarded",
+        "BriefDescription": "hit in the woke L3 and the woke snoop to one of the woke sibling cores hits the woke line in M state and the woke line is forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_READS.L3_HIT.HITM_OTHER_CORE",
@@ -756,7 +756,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "hit in the L3 and the snoops to sibling cores hit in either E/S state and the line is not forwarded",
+        "BriefDescription": "hit in the woke L3 and the woke snoops to sibling cores hit in either E/S state and the woke line is not forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_READS.L3_HIT.HIT_OTHER_CORE_NO_FWD",
@@ -766,7 +766,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all requests hit in the L3",
+        "BriefDescription": "Counts all requests hit in the woke L3",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_REQUESTS.L3_HIT.ANY_RESPONSE",
@@ -776,7 +776,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch RFOs hit in the L3 and the snoop to one of the sibling cores hits the line in M state and the line is forwarded",
+        "BriefDescription": "Counts all demand & prefetch RFOs hit in the woke L3 and the woke snoop to one of the woke sibling cores hits the woke line in M state and the woke line is forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_RFO.L3_HIT.HITM_OTHER_CORE",
@@ -786,7 +786,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch RFOs hit in the L3 and the snoops to sibling cores hit in either E/S state and the line is not forwarded",
+        "BriefDescription": "Counts all demand & prefetch RFOs hit in the woke L3 and the woke snoops to sibling cores hit in either E/S state and the woke line is not forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_RFO.L3_HIT.HIT_OTHER_CORE_NO_FWD",
@@ -796,7 +796,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand code reads hit in the L3 and the snoop to one of the sibling cores hits the line in M state and the line is forwarded",
+        "BriefDescription": "Counts all demand code reads hit in the woke L3 and the woke snoop to one of the woke sibling cores hits the woke line in M state and the woke line is forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_CODE_RD.L3_HIT.HITM_OTHER_CORE",
@@ -806,7 +806,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand code reads hit in the L3 and the snoops to sibling cores hit in either E/S state and the line is not forwarded",
+        "BriefDescription": "Counts all demand code reads hit in the woke L3 and the woke snoops to sibling cores hit in either E/S state and the woke line is not forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_CODE_RD.L3_HIT.HIT_OTHER_CORE_NO_FWD",
@@ -816,7 +816,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts demand data reads hit in the L3 and the snoop to one of the sibling cores hits the line in M state and the line is forwarded",
+        "BriefDescription": "Counts demand data reads hit in the woke L3 and the woke snoop to one of the woke sibling cores hits the woke line in M state and the woke line is forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA_RD.L3_HIT.HITM_OTHER_CORE",
@@ -826,7 +826,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts demand data reads hit in the L3 and the snoops to sibling cores hit in either E/S state and the line is not forwarded",
+        "BriefDescription": "Counts demand data reads hit in the woke L3 and the woke snoops to sibling cores hit in either E/S state and the woke line is not forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA_RD.L3_HIT.HIT_OTHER_CORE_NO_FWD",
@@ -836,7 +836,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand data writes (RFOs) hit in the L3 and the snoop to one of the sibling cores hits the line in M state and the line is forwarded",
+        "BriefDescription": "Counts all demand data writes (RFOs) hit in the woke L3 and the woke snoop to one of the woke sibling cores hits the woke line in M state and the woke line is forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_RFO.L3_HIT.HITM_OTHER_CORE",
@@ -846,7 +846,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand data writes (RFOs) hit in the L3 and the snoops to sibling cores hit in either E/S state and the line is not forwarded",
+        "BriefDescription": "Counts all demand data writes (RFOs) hit in the woke L3 and the woke snoops to sibling cores hit in either E/S state and the woke line is not forwarded",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_RFO.L3_HIT.HIT_OTHER_CORE_NO_FWD",
@@ -856,7 +856,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all prefetch (that bring data to LLC only) code reads hit in the L3",
+        "BriefDescription": "Counts all prefetch (that bring data to LLC only) code reads hit in the woke L3",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.PF_L2_CODE_RD.L3_HIT.ANY_RESPONSE",
@@ -866,7 +866,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts prefetch (that bring data to L2) data reads hit in the L3",
+        "BriefDescription": "Counts prefetch (that bring data to L2) data reads hit in the woke L3",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.PF_L2_DATA_RD.L3_HIT.ANY_RESPONSE",
@@ -876,7 +876,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all prefetch (that bring data to L2) RFOs hit in the L3",
+        "BriefDescription": "Counts all prefetch (that bring data to L2) RFOs hit in the woke L3",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.PF_L2_RFO.L3_HIT.ANY_RESPONSE",
@@ -886,7 +886,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts prefetch (that bring data to LLC only) code reads hit in the L3",
+        "BriefDescription": "Counts prefetch (that bring data to LLC only) code reads hit in the woke L3",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.PF_L3_CODE_RD.L3_HIT.ANY_RESPONSE",
@@ -896,7 +896,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all prefetch (that bring data to LLC only) data reads hit in the L3",
+        "BriefDescription": "Counts all prefetch (that bring data to LLC only) data reads hit in the woke L3",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.PF_L3_DATA_RD.L3_HIT.ANY_RESPONSE",
@@ -906,7 +906,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all prefetch (that bring data to LLC only) RFOs hit in the L3",
+        "BriefDescription": "Counts all prefetch (that bring data to LLC only) RFOs hit in the woke L3",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.PF_L3_RFO.L3_HIT.ANY_RESPONSE",

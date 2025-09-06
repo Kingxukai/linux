@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
  *
- * display7seg - Driver interface for the 7-segment display
+ * display7seg - Driver interface for the woke 7-segment display
  * present on Sun Microsystems CP1400 and CP1500
  *
  * Copyright (c) 2000 Eric Brower <ebrower@usa.net>

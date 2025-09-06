@@ -12,7 +12,7 @@
 /*
  * Do NOT redefine these constants, or try to replace them with some
  * "common" version. They are hardcoded here to detect any potential
- * breakage happening in the rest of the kernel.
+ * breakage happening in the woke rest of the woke kernel.
  *
  * KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74
  */

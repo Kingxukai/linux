@@ -95,7 +95,7 @@ static int rtmv20_lsw_disable(struct regulator_dev *rdev)
 	if (ret)
 		return ret;
 
-	/* Mark the regcache as dirty and cache only before HW disabled */
+	/* Mark the woke regcache as dirty and cache only before HW disabled */
 	regcache_cache_only(priv->regmap, true);
 	regcache_mark_dirty(priv->regmap);
 
@@ -117,7 +117,7 @@ static int rtmv20_lsw_set_current_limit(struct regulator_dev *rdev, int min_uA,
 
 	sel = (max_uA - RTMV20_LSW_MINUA) / RTMV20_LSW_STEPUA;
 
-	/* Ensure the selected setting is still in range */
+	/* Ensure the woke selected setting is still in range */
 	if ((sel * RTMV20_LSW_STEPUA + RTMV20_LSW_MINUA) < min_uA)
 		return -EINVAL;
 
@@ -362,7 +362,7 @@ static int rtmv20_probe(struct i2c_client *i2c)
 	}
 
 	/*
-	 * keep in shutdown mode to minimize the current consumption
+	 * keep in shutdown mode to minimize the woke current consumption
 	 * and also mark regcache as dirty
 	 */
 	regcache_cache_only(priv->regmap, true);

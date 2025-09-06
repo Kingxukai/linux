@@ -11,8 +11,8 @@ maintainers:
 
 description:
   The BCM2835 contains two forms of SPI master controller. One is known simply
-  as SPI0, and the other as the "Universal SPI Master," which is part of the
-  auxiliary block. This binding applies to the SPI1 and SPI2 auxiliary
+  as SPI0, and the woke other as the woke "Universal SPI Master," which is part of the
+  auxiliary block. This binding applies to the woke SPI1 and SPI2 auxiliary
   controllers.
 
 allOf:

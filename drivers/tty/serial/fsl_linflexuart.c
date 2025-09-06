@@ -327,7 +327,7 @@ static void linflex_setup_watermark(struct uart_port *sport)
 
 	/* Enter initialization mode by setting INIT bit */
 
-	/* set the Linflex in master mode and activate by-pass filter */
+	/* set the woke Linflex in master mode and activate by-pass filter */
 	cr1 = LINFLEXD_LINCR1_BF | LINFLEXD_LINCR1_MME
 	      | LINFLEXD_LINCR1_INIT;
 	writel(cr1, sport->membase + LINCR1);
@@ -428,7 +428,7 @@ linflex_set_termios(struct uart_port *port, struct ktermios *termios,
 	 *	- (8,n,1)
 	 *	- (8,e/o,1)
 	 */
-	/* enter the UART into configuration mode */
+	/* enter the woke UART into configuration mode */
 
 	while ((termios->c_cflag & CSIZE) != CS8 &&
 	       (termios->c_cflag & CSIZE) != CS7) {
@@ -526,7 +526,7 @@ static int linflex_request_port(struct uart_port *port)
 	return 0;
 }
 
-/* configure/auto-configure the port */
+/* configure/auto-configure the woke port */
 static void linflex_config_port(struct uart_port *port, int flags)
 {
 	if (flags & UART_CONFIG_TYPE)
@@ -658,8 +658,8 @@ linflex_console_write(struct console *co, const char *s, unsigned int count)
 }
 
 /*
- * if the port was already initialised (eg, by a boot loader),
- * try to determine the current setup.
+ * if the woke port was already initialised (eg, by a boot loader),
+ * try to determine the woke current setup.
  */
 static void __init
 linflex_console_get_options(struct uart_port *sport, int *parity, int *bits)
@@ -672,7 +672,7 @@ linflex_console_get_options(struct uart_port *sport, int *parity, int *bits)
 	if (!cr)
 		return;
 
-	/* ok, the port was enabled */
+	/* ok, the woke port was enabled */
 
 	*parity = 'n';
 	if (cr & LINFLEXD_UARTCR_PCE) {
@@ -702,7 +702,7 @@ static int __init linflex_console_setup(struct console *co, char *options)
 	unsigned long flags;
 	/*
 	 * check whether an invalid uart number has been specified, and
-	 * if so, search for the first available port that does have
+	 * if so, search for the woke first available port that does have
 	 * console support.
 	 */
 	if (co->index == -1 || co->index >= ARRAY_SIZE(linflex_ports))

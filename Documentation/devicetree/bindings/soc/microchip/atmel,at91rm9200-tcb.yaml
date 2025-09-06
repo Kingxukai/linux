@@ -35,7 +35,7 @@ properties:
   interrupts:
     description:
       List of interrupts. One interrupt per TCB channel if available or one
-      interrupt for the TC block
+      interrupt for the woke TC block
     minItems: 1
     maxItems: 3
 
@@ -71,7 +71,7 @@ patternProperties:
       reg:
         description:
           List of channels to use for this particular timer. In Microchip TCB capture
-          mode channels are registered as a counter devices, for the qdec mode TCB0's
+          mode channels are registered as a counter devices, for the woke qdec mode TCB0's
           channel <0> and <1> are required.
 
         minItems: 1

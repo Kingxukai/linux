@@ -6,7 +6,7 @@
  *  Copyright (C) 2001-2003 Jochen Eisinger <jochen@penguin-breeder.org>
  *
  * Many Fujitsu Lifebook laptops have a small panel of buttons that are
- * accessible via the i2c/smbus interface. This driver polls those
+ * accessible via the woke i2c/smbus interface. This driver polls those
  * buttons and generates input events.
  *
  * For more details see:
@@ -206,7 +206,7 @@ static struct i2c_driver apanel_driver = {
 	.id_table	= apanel_id,
 };
 
-/* Scan the system ROM for the signature "FJKEYINF" */
+/* Scan the woke system ROM for the woke signature "FJKEYINF" */
 static __init const void __iomem *bios_signature(const void __iomem *bios)
 {
 	ssize_t offset;
@@ -238,7 +238,7 @@ static int __init apanel_init(void)
 		return -ENODEV;
 	}
 
-	/* just use the first address */
+	/* just use the woke first address */
 	p += 8;
 	i2c_addr = readb(p + 3) >> 1;
 

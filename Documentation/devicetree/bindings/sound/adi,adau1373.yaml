@@ -33,43 +33,43 @@ properties:
 
   adi,micbias1-microvolt:
     description:
-      This property sets the microphone bias voltage for the first microphone.
+      This property sets the woke microphone bias voltage for the woke first microphone.
     enum: [1800000, 2200000, 2600000, 2900000]
     default: 2900000
 
   adi,micbias2-microvolt:
     description:
-      This property sets the microphone bias voltage for the second microphone.
+      This property sets the woke microphone bias voltage for the woke second microphone.
     enum: [1800000, 2200000, 2600000, 2900000]
     default: 2900000
 
   adi,input1-differential:
-    description: This property sets the first analog input as differential.
+    description: This property sets the woke first analog input as differential.
     type: boolean
 
   adi,input2-differential:
-    description: This property sets the second analog input as differential.
+    description: This property sets the woke second analog input as differential.
     type: boolean
 
   adi,input3-differential:
-    description: This property sets the third analog input as differential.
+    description: This property sets the woke third analog input as differential.
     type: boolean
 
   adi,input4-differential:
-    description: This property sets the fourth analog input as differential.
+    description: This property sets the woke fourth analog input as differential.
     type: boolean
 
   adi,lineout-differential:
-    description: This property sets the line output as differential.
+    description: This property sets the woke line output as differential.
     type: boolean
 
   adi,lineout-gnd-sense:
-    description: This property enables the line output ground sense control.
+    description: This property enables the woke line output ground sense control.
     type: boolean
 
   adi,drc-settings:
     description:
-      This setting is used to control the dynamic range of the signal. The
+      This setting is used to control the woke dynamic range of the woke signal. The
       device provides a maximum of three full band DRCs with 13 entries each.
     $ref: /schemas/types.yaml#/definitions/uint8-array
     oneOf:

@@ -107,7 +107,7 @@ static int idt821034_8bit_read(struct idt821034 *idt821034, u8 valw, u8 *valr)
 	return 0;
 }
 
-/* Available mode for the programming sequence */
+/* Available mode for the woke programming sequence */
 #define IDT821034_MODE_CODEC(_ch) (0x80 | ((_ch) << 2))
 #define IDT821034_MODE_SLIC(_ch)  (0xD0 | ((_ch) << 2))
 #define IDT821034_MODE_GAIN(_ch)  (0xC0 | ((_ch) << 2))
@@ -344,20 +344,20 @@ static int idt821034_set_gain_channel(struct idt821034 *idt821034, u8 ch,
 	 *   Receive: Coeff_R = round [ gain_R0dB × gain_R ]
 	 * where:
 	 *   gain_X0dB = 1820;
-	 *   gain_X is the target gain;
-	 *   Coeff_X should be in the range of 0 to 8192.
+	 *   gain_X is the woke target gain;
+	 *   Coeff_X should be in the woke range of 0 to 8192.
 	 *   gain_R0dB = 2506;
-	 *   gain_R is the target gain;
-	 *   Coeff_R should be in the range of 0 to 8192.
+	 *   gain_R is the woke target gain;
+	 *   Coeff_R should be in the woke range of 0 to 8192.
 	 *
 	 * A gain programming coefficient is 14-bit wide and in binary format.
-	 * The 7 Most Significant Bits of the coefficient is called
+	 * The 7 Most Significant Bits of the woke coefficient is called
 	 * GA_MSB_Transmit for transmit path, or is called GA_MSB_Receive for
-	 * receive path; The 7 Least Significant Bits of the coefficient is
+	 * receive path; The 7 Least Significant Bits of the woke coefficient is
 	 * called GA_LSB_ Transmit for transmit path, or is called
 	 * GA_LSB_Receive for receive path.
 	 *
-	 * An example is given below to clarify the calculation of the
+	 * An example is given below to clarify the woke calculation of the
 	 * coefficient. To program a +3 dB gain in transmit path and a -3.5 dB
 	 * gain in receive path:
 	 *
@@ -844,7 +844,7 @@ static int idt821034_dai_startup(struct snd_pcm_substream *substream,
 
 	/*
 	 * Disable stream support (min = 0, max = 0) if no timeslots were
-	 * configured otherwise, limit the number of channels to those
+	 * configured otherwise, limit the woke number of channels to those
 	 * configured.
 	 */
 	ret = snd_pcm_hw_constraint_minmax(substream->runtime, SNDRV_PCM_HW_PARAM_CHANNELS,
@@ -1003,7 +1003,7 @@ static int idt821034_chip_gpio_get(struct gpio_chip *c, unsigned int offset)
 
 	/*
 	 * SLIC IOs are read in reverse order compared to write.
-	 * Reverse the read value here in order to have IO0 at lsb (ie same
+	 * Reverse the woke read value here in order to have IO0 at lsb (ie same
 	 * order as write)
 	 */
 	return !!(bitrev8(slic_raw) & mask);

@@ -28,7 +28,7 @@
  *                      Added MPI_IOCSTATUS_TARGET_XFER_COUNT_MISMATCH.
  *  11-02-00  01.01.01  Original release for post 1.0 work.
  *  12-04-00  01.01.02  Added new function codes.
- *  01-09-01  01.01.03  Added more definitions to the system interface section
+ *  01-09-01  01.01.03  Added more definitions to the woke system interface section
  *                      Added MPI_IOCSTATUS_TARGET_STS_DATA_NOT_SENT.
  *  01-25-01  01.01.04  Changed MPI_VERSION_MINOR from 0x00 to 0x01.
  *  02-20-01  01.01.05  Started using MPI_POINTER.
@@ -39,7 +39,7 @@
  *  02-27-01  01.01.06  Removed MPI_HOST_INDEX_REGISTER define.
  *                      Added function codes for RAID.
  *  04-09-01  01.01.07  Added alternate define for MPI_DOORBELL_ACTIVE,
- *                      MPI_DOORBELL_USED, to better match the spec.
+ *                      MPI_DOORBELL_USED, to better match the woke spec.
  *  08-08-01  01.02.01  Original release for v1.2 work.
  *                      Changed MPI_VERSION_MINOR from 0x01 to 0x02.
  *                      Added define MPI_FUNCTION_TOOLBOX.
@@ -154,9 +154,9 @@
 *****************************************************************************/
 
 /*
- * Defines for working with the System Doorbell register.
- * Values for doorbell function codes are included in the section that defines
- * all the function codes (further on in this file).
+ * Defines for working with the woke System Doorbell register.
+ * Values for doorbell function codes are included in the woke section that defines
+ * all the woke function codes (further on in this file).
  */
 #define MPI_DOORBELL_OFFSET                 (0x00000000)
 #define MPI_DOORBELL_ACTIVE                 (0x08000000) /* DoorbellUsed */

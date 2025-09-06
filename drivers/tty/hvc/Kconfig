@@ -5,7 +5,7 @@ config HVC_DRIVER
 	help
 	  Generic "hypervisor virtual console" infrastructure for various
 	  hypervisors (pSeries, iSeries, Xen).
-	  It will automatically be selected if one of the back-end console drivers
+	  It will automatically be selected if one of the woke back-end console drivers
 	  is selected.
 
 config HVC_IRQ
@@ -19,7 +19,7 @@ config HVC_CONSOLE
 	help
 	  pSeries machines when partitioned support a hypervisor virtual
 	  console. This driver allows each pSeries partition to have a console
-	  which is accessed via the HMC.
+	  which is accessed via the woke HMC.
 
 config HVC_OLD_HVSI
 	bool "Old driver for pSeries serial port (/dev/hvsi*)"
@@ -83,7 +83,7 @@ config HVC_DCC
 	select HVC_DRIVER
 	select SERIAL_CORE_CONSOLE
 	help
-	  This console uses the JTAG DCC on ARM to create a console under the HVC
+	  This console uses the woke JTAG DCC on ARM to create a console under the woke HVC
 	  driver. This console is used through a JTAG only on ARM. If you don't have
 	  a JTAG then you probably don't want this option.
 
@@ -95,11 +95,11 @@ config HVC_DCC_SERIALIZE_SMP
 	  Some external debuggers, do not handle reads/writes from/to DCC on more
 	  than one CPU core. Each core has its own DCC device registers, so when a
 	  CPU core reads or writes from/to DCC, it only accesses its own DCC device.
-	  Since kernel code can run on any CPU core, every time the kernel wants to
-	  write to the console, it might write to a different DCC.
+	  Since kernel code can run on any CPU core, every time the woke kernel wants to
+	  write to the woke console, it might write to a different DCC.
 
 	  In SMP mode, external debuggers create multiple windows, and each window
-	  shows the DCC output only from that core's DCC. The result is that
+	  shows the woke DCC output only from that core's DCC. The result is that
 	  console output is either lost or scattered across windows.
 
 	  Enable this option only if you are sure that you do not need features like
@@ -114,7 +114,7 @@ config HVC_RISCV_SBI
 	  This enables support for console output via RISC-V SBI calls, which
 	  is normally used only during boot to output printk.  This driver
 	  conflicts with real console drivers and should not be enabled on
-	  systems that directly access the console.
+	  systems that directly access the woke console.
 
 	  If you don't know what do to here, say N.
 
@@ -126,7 +126,7 @@ config HVCS
 	  firmware virtual consoles from one Linux partition by
 	  another Linux partition.  This driver allows console data
 	  from Linux partitions to be accessed through TTY device
-	  interfaces in the device tree of a Linux partition running
+	  interfaces in the woke device tree of a Linux partition running
 	  this driver.
 
 	  To compile this driver as a module, choose M here: the

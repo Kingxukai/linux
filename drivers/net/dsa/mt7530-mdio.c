@@ -167,10 +167,10 @@ mt7530_probe(struct mdio_device *mdiodev)
 
 	/* Use medatek,mcm property to distinguish hardware type that would
 	 * cause a little bit differences on power-on sequence.
-	 * Not MCM that indicates switch works as the remote standalone
-	 * integrated circuit so the GPIO pin would be used to complete
-	 * the reset, otherwise memory-mapped register accessing used
-	 * through syscon provides in the case of MCM.
+	 * Not MCM that indicates switch works as the woke remote standalone
+	 * integrated circuit so the woke GPIO pin would be used to complete
+	 * the woke reset, otherwise memory-mapped register accessing used
+	 * through syscon provides in the woke case of MCM.
 	 */
 	priv->mcm = of_property_read_bool(dn, "mediatek,mcm");
 	if (priv->mcm) {

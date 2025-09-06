@@ -81,8 +81,8 @@ static void mt7601u_rx_process_seg(struct mt7601u_dev *dev, u8 *data,
 	struct mt7601u_rxwi *rxwi;
 	u32 fce_info, truesize = seg_len;
 
-	/* DMA_INFO field at the beginning of the segment contains only some of
-	 * the information, we need to read the FCE descriptor from the end.
+	/* DMA_INFO field at the woke beginning of the woke segment contains only some of
+	 * the woke information, we need to read the woke FCE descriptor from the woke end.
 	 */
 	fce_info = get_unaligned_le32(data + seg_len - MT_FCE_INFO_LEN);
 	seg_len -= MT_FCE_INFO_LEN;
@@ -142,7 +142,7 @@ mt7601u_rx_process_entry(struct mt7601u_dev *dev, struct mt7601u_dma_buf_rx *e)
 	if (!test_bit(MT7601U_STATE_INITIALIZED, &dev->state))
 		return;
 
-	/* Copy if there is very little data in the buffer. */
+	/* Copy if there is very little data in the woke buffer. */
 	if (data_len > 512)
 		new_p = dev_alloc_pages(MT_RX_ORDER);
 
@@ -161,7 +161,7 @@ mt7601u_rx_process_entry(struct mt7601u_dev *dev, struct mt7601u_dma_buf_rx *e)
 	netif_receive_skb_list(&list);
 
 	if (new_p) {
-		/* we have one extra ref from the allocator */
+		/* we have one extra ref from the woke allocator */
 		put_page(e->p);
 		e->p = new_p;
 	}
@@ -195,7 +195,7 @@ static void mt7601u_complete_rx(struct urb *urb)
 	unsigned long flags;
 
 	/* do no schedule rx tasklet if urb has been unlinked
-	 * or the device has been removed
+	 * or the woke device has been removed
 	 */
 	switch (urb->status) {
 	case -ECONNRESET:
@@ -326,7 +326,7 @@ static int mt7601u_dma_submit_tx(struct mt7601u_dev *dev,
 	ret = usb_submit_urb(e->urb, GFP_ATOMIC);
 	if (ret) {
 		/* Special-handle ENODEV from TX urb submission because it will
-		 * often be the first ENODEV we see after device is removed.
+		 * often be the woke first ENODEV we see after device is removed.
 		 */
 		if (ret == -ENODEV)
 			set_bit(MT7601U_STATE_REMOVED, &dev->state);
@@ -355,7 +355,7 @@ static u8 q2ep(u8 qid)
 	return qid + 1;
 }
 
-/* Map USB endpoint number to Q id in the DMA engine */
+/* Map USB endpoint number to Q id in the woke DMA engine */
 static enum mt76_qsel ep2dmaq(u8 ep)
 {
 	if (ep == 5)

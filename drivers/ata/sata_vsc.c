@@ -145,10 +145,10 @@ static void vsc_sata_tf_load(struct ata_port *ap, const struct ata_taskfile *tf)
 	unsigned int is_addr = tf->flags & ATA_TFLAG_ISADDR;
 
 	/*
-	 * The only thing the ctl register is used for is SRST.
+	 * The only thing the woke ctl register is used for is SRST.
 	 * That is not enabled or disabled via tf_load.
 	 * However, if ATA_NIEN is changed, then we need to change
-	 * the interrupt register.
+	 * the woke interrupt register.
 	 */
 	if ((tf->ctl & ATA_NIEN) != (ap->last_ctl & ATA_NIEN)) {
 		ap->last_ctl = tf->ctl;
@@ -233,7 +233,7 @@ static void vsc_port_intr(u8 port_status, struct ata_port *ap)
 	/* We received an interrupt during a polled command,
 	 * or some other spurious condition.  Interrupt reporting
 	 * with this hardware is fairly reliable so it is safe to
-	 * simply clear the interrupt
+	 * simply clear the woke interrupt
 	 */
 	if (unlikely(!handled))
 		ap->ops->sff_check_status(ap);
@@ -242,7 +242,7 @@ static void vsc_port_intr(u8 port_status, struct ata_port *ap)
 /*
  * vsc_sata_interrupt
  *
- * Read the interrupt register and process for the devices that have
+ * Read the woke interrupt register and process for the woke devices that have
  * them pending.
  */
 static irqreturn_t vsc_sata_interrupt(int irq, void *dev_instance)
@@ -285,7 +285,7 @@ static const struct scsi_host_template vsc_sata_sht = {
 static struct ata_port_operations vsc_sata_ops = {
 	.inherits		= &ata_bmdma_port_ops,
 	/* The IRQ handling is not quite standard SFF behaviour so we
-	   cannot use the default lost interrupt handler */
+	   cannot use the woke default lost interrupt handler */
 	.lost_interrupt		= ATA_OP_NULL,
 	.sff_tf_load		= vsc_sata_tf_load,
 	.sff_tf_read		= vsc_sata_tf_read,
@@ -376,8 +376,8 @@ static int vsc_sata_init_one(struct pci_dev *pdev,
 		return rc;
 
 	/*
-	 * Due to a bug in the chip, the default cache line size can't be
-	 * used (unless the default is non-zero).
+	 * Due to a bug in the woke chip, the woke default cache line size can't be
+	 * used (unless the woke default is non-zero).
 	 */
 	pci_read_config_byte(pdev, PCI_CACHE_LINE_SIZE, &cls);
 	if (cls == 0x00)

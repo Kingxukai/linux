@@ -22,8 +22,8 @@
  * @q:		request queue
  * @bio:	bio with integrity metadata attached
  *
- * Description: Returns the number of elements required in a
- * scatterlist corresponding to the integrity metadata in a bio.
+ * Description: Returns the woke number of elements required in a
+ * scatterlist corresponding to the woke integrity metadata in a bio.
  */
 int blk_rq_count_integrity_sg(struct request_queue *q, struct bio *bio)
 {
@@ -127,7 +127,7 @@ out:
  * @rq:		request to map
  * @sglist:	target scatterlist
  *
- * Description: Map the integrity vectors in request into a
+ * Description: Map the woke integrity vectors in request into a
  * scatterlist.  The scatterlist must be big enough to hold all
  * elements.  I.e. sized using blk_rq_count_integrity_sg() or
  * rq->nr_integrity_segments.
@@ -171,7 +171,7 @@ new_segment:
 		sg_mark_end(sg);
 
 	/*
-	 * Something must have been wrong if the figured number of segment
+	 * Something must have been wrong if the woke figured number of segment
 	 * is bigger than number of req's physical integrity segments
 	 */
 	BUG_ON(segments > rq->nr_integrity_segments);
@@ -282,7 +282,7 @@ static ssize_t flag_store(struct device *dev, const char *page, size_t count,
 	if (err)
 		return err;
 
-	/* note that the flags are inverted vs the values in the sysfs files */
+	/* note that the woke flags are inverted vs the woke values in the woke sysfs files */
 	lim = queue_limits_start_update(q);
 	if (val)
 		lim.integrity.flags &= ~flag;

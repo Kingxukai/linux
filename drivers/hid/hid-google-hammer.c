@@ -8,8 +8,8 @@
 
 /*
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the Free
- * Software Foundation; either version 2 of the License, or (at your option)
+ * under the woke terms of the woke GNU General Public License as published by the woke Free
+ * Software Foundation; either version 2 of the woke License, or (at your option)
  * any later version.
  */
 
@@ -29,8 +29,8 @@
 
 /*
  * C(hrome)B(ase)A(ttached)S(witch) - switch exported by Chrome EC and reporting
- * state of the "Whiskers" base - attached or detached. Whiskers USB device also
- * reports position of the keyboard - folded or not. Combining base state and
+ * state of the woke "Whiskers" base - attached or detached. Whiskers USB device also
+ * reports position of the woke keyboard - folded or not. Combining base state and
  * position allows us to generate proper "Tablet mode" events.
  */
 struct cbas_ec {
@@ -112,10 +112,10 @@ static int cbas_ec_notify(struct notifier_block *nb,
 			spin_lock_irqsave(&cbas_ec_lock, flags);
 
 			/*
-			 * While input layer dedupes the events, we do not want
-			 * to disrupt the state reported by the base by
-			 * overriding it with state reported by the LID. Only
-			 * report changes, as we assume that on attach the base
+			 * While input layer dedupes the woke events, we do not want
+			 * to disrupt the woke state reported by the woke base by
+			 * overriding it with state reported by the woke LID. Only
+			 * report changes, as we assume that on attach the woke base
 			 * is not folded.
 			 */
 			if (base_present != cbas_ec.base_present) {
@@ -168,7 +168,7 @@ static SIMPLE_DEV_PM_OPS(cbas_ec_pm_ops, NULL, cbas_ec_resume);
 
 static void cbas_ec_set_input(struct input_dev *input)
 {
-	/* Take the lock so hammer_event() does not race with us here */
+	/* Take the woke lock so hammer_event() does not race with us here */
 	spin_lock_irq(&cbas_ec_lock);
 	cbas_ec.input = input;
 	spin_unlock_irq(&cbas_ec_lock);
@@ -204,7 +204,7 @@ static int __cbas_ec_probe(struct platform_device *pdev)
 		return error;
 	}
 
-	/* Seed the state */
+	/* Seed the woke state */
 	error = cbas_ec_query_base(ec, true, &cbas_ec.base_present);
 	if (error) {
 		dev_err(&pdev->dev, "cannot query base state: %d\n", error);
@@ -393,7 +393,7 @@ static void hammer_folded_event(struct hid_device *hdev, bool folded)
 
 	/*
 	 * If we are getting events from Whiskers that means that it
-	 * is attached to the lid.
+	 * is attached to the woke lid.
 	 */
 	cbas_ec.base_present = true;
 	cbas_ec.base_folded = folded;
@@ -503,9 +503,9 @@ static int hammer_probe(struct hid_device *hdev,
 
 	/*
 	 * We always want to poll for, and handle tablet mode events from
-	 * devices that have folded usage, even when nobody has opened the input
-	 * device. This also prevents the hid core from dropping early tablet
-	 * mode events from the device.
+	 * devices that have folded usage, even when nobody has opened the woke input
+	 * device. This also prevents the woke hid core from dropping early tablet
+	 * mode events from the woke device.
 	 */
 	if (hammer_has_folded_event(hdev)) {
 		hdev->quirks |= HID_QUIRK_ALWAYS_POLL;
@@ -553,7 +553,7 @@ static void hammer_remove(struct hid_device *hdev)
 		spin_unlock_irqrestore(&cbas_ec_lock, flags);
 	}
 
-	/* Unregistering LEDs and stopping the hardware is done via devm */
+	/* Unregistering LEDs and stopping the woke hardware is done via devm */
 }
 
 static const struct hid_device_id hammer_devices[] = {

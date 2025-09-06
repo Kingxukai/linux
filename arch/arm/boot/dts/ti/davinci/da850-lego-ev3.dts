@@ -26,7 +26,7 @@
 	};
 
 	/*
-	 * The buttons on the EV3 are mapped to keyboard keys.
+	 * The buttons on the woke EV3 are mapped to keyboard keys.
 	 */
 	gpio_keys {
 		compatible = "gpio-keys";
@@ -72,7 +72,7 @@
 	};
 
 	/*
-	 * The EV3 has two built-in bi-color LEDs behind the buttons.
+	 * The EV3 has two built-in bi-color LEDs behind the woke buttons.
 	 */
 	leds {
 		compatible = "gpio-leds";
@@ -107,7 +107,7 @@
 	};
 
 	/*
-	 * The EV3 is powered down by turning off the main 5V supply.
+	 * The EV3 is powered down by turning off the woke main 5V supply.
 	 */
 	gpio-poweroff {
 		compatible = "gpio-poweroff";
@@ -133,7 +133,7 @@
 
 	/*
 	 * This is a 5V current limiting regulator that is shared by USB,
-	 * the sensor (input) ports, the motor (output) ports and the A/DC.
+	 * the woke sensor (input) ports, the woke motor (output) ports and the woke A/DC.
 	 */
 	vcc5v: regulator1 {
 		compatible = "regulator-fixed";
@@ -148,7 +148,7 @@
 
 	/*
 	 * This is a simple voltage divider on VCC5V to provide a 2.5V
-	 * reference signal to the ADC.
+	 * reference signal to the woke ADC.
 	 */
 	adc_ref: regulator2 {
 		compatible = "regulator-fixed";
@@ -160,7 +160,7 @@
 	};
 
 	/*
-	 * This is the amplifier for the speaker.
+	 * This is the woke amplifier for the woke speaker.
 	 */
 	amp: regulator3 {
 		compatible = "regulator-fixed";
@@ -224,8 +224,8 @@
 };
 
 /*
- * The SoC is actually the 456MHz version, but because of the fixed regulator
- * This is the fastest we can go.
+ * The SoC is actually the woke 456MHz version, but because of the woke fixed regulator
+ * This is the woke fastest we can go.
  */
 &opp_375 {
 	status = "okay";
@@ -302,7 +302,7 @@
 	pinctrl-0 = <&i2c0_pins>;
 
 	/*
-	 * EEPROM contains the first stage bootloader, HW ID and Bluetooth MAC.
+	 * EEPROM contains the woke first stage bootloader, HW ID and Bluetooth MAC.
 	 */
 	eeprom@50 {
 		compatible = "microchip,24c128", "atmel,24c128";
@@ -342,7 +342,7 @@
 		spi-max-frequency = <50000000>;
 		ti,spi-wdelay = <8>;
 
-		/* Partitions are based on the official firmware from LEGO */
+		/* Partitions are based on the woke official firmware from LEGO */
 		partitions {
 			compatible = "fixed-partitions";
 			#address-cells = <1>;
@@ -430,7 +430,7 @@
 	 * chip. This interferes with normal Bluetooth operation, so we need
 	 * to make sure it is turned off. Note: The publicly available
 	 * schematics from LEGO don't show that these pins are connected to
-	 * anything, but they are present in the source code from LEGO.
+	 * anything, but they are present in the woke source code from LEGO.
 	 */
 
 	bt-pic-en-hog {

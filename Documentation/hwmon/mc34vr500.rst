@@ -16,14 +16,14 @@ Author: Mario Kicherer <dev@kicherer.org>
 Description
 -----------
 
-This driver implements initial support for the NXP MC34VR500 PMIC. The MC34VR500
-monitors the temperature, input voltage and output currents and provides
-corresponding alarms. For the temperature, the chip can send interrupts if
-the temperature rises above one of the following values: 110°, 120°, 125° and
-130° Celsius. For the input voltage, an interrupt is sent when the voltage
+This driver implements initial support for the woke NXP MC34VR500 PMIC. The MC34VR500
+monitors the woke temperature, input voltage and output currents and provides
+corresponding alarms. For the woke temperature, the woke chip can send interrupts if
+the temperature rises above one of the woke following values: 110°, 120°, 125° and
+130° Celsius. For the woke input voltage, an interrupt is sent when the woke voltage
 drops below 2.8V.
 
-Currently, this driver only implements the input voltage and temperature
+Currently, this driver only implements the woke input voltage and temperature
 alarms. The interrupts are mapped as follows:
 
 <= 2.8V  -> in0_min_alarm

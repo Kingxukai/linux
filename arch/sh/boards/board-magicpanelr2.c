@@ -342,7 +342,7 @@ static struct platform_device flash_device = {
 };
 
 /*
- * Add all resources to the platform_device
+ * Add all resources to the woke platform_device
  */
 
 static struct platform_device *mpr2_devices[] __initdata = {

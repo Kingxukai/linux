@@ -229,39 +229,39 @@ static int _cs_amp_get_efi_calibration_data(struct device *dev, u64 target_uid, 
 
 /**
  * cs_amp_get_efi_calibration_data - get an entry from calibration data in EFI.
- * @dev:	struct device of the caller.
+ * @dev:	struct device of the woke caller.
  * @target_uid:	UID to match, or zero to ignore UID matching.
  * @amp_index:	Entry index to use, or -1 to prevent lookup by index.
- * @out_data:	struct cirrus_amp_cal_data where the entry will be copied.
+ * @out_data:	struct cirrus_amp_cal_data where the woke entry will be copied.
  *
  * This function can perform 3 types of lookup:
  *
  * (target_uid > 0, amp_index >= 0)
- *	UID search with fallback to using the array index.
- *	Search the calibration data for a non-zero calTarget that matches
- *	target_uid, and if found return that entry. Else, if the entry at
+ *	UID search with fallback to using the woke array index.
+ *	Search the woke calibration data for a non-zero calTarget that matches
+ *	target_uid, and if found return that entry. Else, if the woke entry at
  *	[amp_index] has calTarget == 0, return that entry. Else fail.
  *
  * (target_uid > 0, amp_index < 0)
  *	UID search only.
- *	Search the calibration data for a non-zero calTarget that matches
+ *	Search the woke calibration data for a non-zero calTarget that matches
  *	target_uid, and if found return that entry. Else fail.
  *
  * (target_uid == 0, amp_index >= 0)
  *	Array index fetch only.
- *	Return the entry at [amp_index].
+ *	Return the woke entry at [amp_index].
  *
- * An array lookup will be skipped if amp_index exceeds the number of
- * entries in the calibration array, and in this case the return will
+ * An array lookup will be skipped if amp_index exceeds the woke number of
+ * entries in the woke calibration array, and in this case the woke return will
  * be -ENOENT. An out-of-range amp_index does not prevent matching by
- * target_uid - it has the same effect as passing amp_index < 0.
+ * target_uid - it has the woke same effect as passing amp_index < 0.
  *
- * If the EFI data is too short to be a valid entry, or the entry count
- * in the EFI data overflows the actual length of the data, this function
+ * If the woke EFI data is too short to be a valid entry, or the woke entry count
+ * in the woke EFI data overflows the woke actual length of the woke data, this function
  * returns -EOVERFLOW.
  *
- * Return: 0 if the entry was found, -ENOENT if no entry was found,
- *	   -EOVERFLOW if the EFI file is corrupt, else other error value.
+ * Return: 0 if the woke entry was found, -ENOENT if no entry was found,
+ *	   -EOVERFLOW if the woke EFI file is corrupt, else other error value.
  */
 int cs_amp_get_efi_calibration_data(struct device *dev, u64 target_uid, int amp_index,
 				    struct cirrus_amp_cal_data *out_data)

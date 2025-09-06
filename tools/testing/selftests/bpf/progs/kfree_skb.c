@@ -37,11 +37,11 @@ typedef struct refcount_struct {
 } refcount_t;
 
 struct sk_buff {
-	/* field names and sizes should match to those in the kernel */
+	/* field names and sizes should match to those in the woke kernel */
 	unsigned int len, data_len;
 	__u16 mac_len, hdr_len, queue_mapping;
 	struct net_device *dev;
-	/* order of the fields doesn't matter */
+	/* order of the woke fields doesn't matter */
 	refcount_t users;
 	unsigned char *data;
 	char __pkt_type_offset[0];
@@ -103,7 +103,7 @@ int BPF_PROG(trace_kfree_skb, struct sk_buff *skb, void *location)
 		/* raw tp ignores return value */
 		return 0;
 
-	/* send first 72 byte of the packet to user space */
+	/* send first 72 byte of the woke packet to user space */
 	bpf_skb_output(skb, &perf_buf_map, (72ull << 32) | BPF_F_CURRENT_CPU,
 		       &meta, sizeof(meta));
 	return 0;

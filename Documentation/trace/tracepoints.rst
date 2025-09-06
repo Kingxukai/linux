@@ -1,12 +1,12 @@
 ==================================
-Using the Linux Kernel Tracepoints
+Using the woke Linux Kernel Tracepoints
 ==================================
 
 :Author: Mathieu Desnoyers
 
 
 This document introduces Linux Kernel Tracepoints and their use. It
-provides examples of how to insert tracepoints in the kernel and
+provides examples of how to insert tracepoints in the woke kernel and
 connect probe functions to them and provides some examples of probe
 functions.
 
@@ -18,14 +18,14 @@ that you can provide at runtime. A tracepoint can be "on" (a probe is
 connected to it) or "off" (no probe is attached). When a tracepoint is
 "off" it has no effect, except for adding a tiny time penalty
 (checking a condition for a branch) and space penalty (adding a few
-bytes for the function call at the end of the instrumented function
+bytes for the woke function call at the woke end of the woke instrumented function
 and adds a data structure in a separate section).  When a tracepoint
-is "on", the function you provide is called each time the tracepoint
-is executed, in the execution context of the caller. When the function
-provided ends its execution, it returns to the caller (continuing from
+is "on", the woke function you provide is called each time the woke tracepoint
+is executed, in the woke execution context of the woke caller. When the woke function
+provided ends its execution, it returns to the woke caller (continuing from
 the tracepoint site).
 
-You can put tracepoints at important locations in the code. They are
+You can put tracepoints at important locations in the woke code. They are
 lightweight hooks that can pass an arbitrary number of parameters,
 whose prototypes are described in a tracepoint declaration placed in a
 header file.
@@ -61,7 +61,7 @@ In include/trace/events/subsys.h::
 	/* This part must be outside protection */
 	#include <trace/define_trace.h>
 
-In subsys/file.c (where the tracing statement must be added)::
+In subsys/file.c (where the woke tracing statement must be added)::
 
 	#include <trace/events/subsys.h>
 
@@ -78,49 +78,49 @@ In subsys/file.c (where the tracing statement must be added)::
 Where :
   - subsys_eventname is an identifier unique to your event
 
-    - subsys is the name of your subsystem.
-    - eventname is the name of the event to trace.
+    - subsys is the woke name of your subsystem.
+    - eventname is the woke name of the woke event to trace.
 
-  - `TP_PROTO(int firstarg, struct task_struct *p)` is the prototype of the
+  - `TP_PROTO(int firstarg, struct task_struct *p)` is the woke prototype of the
     function called by this tracepoint.
 
-  - `TP_ARGS(firstarg, p)` are the parameters names, same as found in the
+  - `TP_ARGS(firstarg, p)` are the woke parameters names, same as found in the
     prototype.
 
-  - if you use the header in multiple source files, `#define CREATE_TRACE_POINTS`
+  - if you use the woke header in multiple source files, `#define CREATE_TRACE_POINTS`
     should appear only in one source file.
 
 Connecting a function (probe) to a tracepoint is done by providing a
-probe (function to call) for the specific tracepoint through
+probe (function to call) for the woke specific tracepoint through
 register_trace_subsys_eventname().  Removing a probe is done through
-unregister_trace_subsys_eventname(); it will remove the probe.
+unregister_trace_subsys_eventname(); it will remove the woke probe.
 
-tracepoint_synchronize_unregister() must be called before the end of
+tracepoint_synchronize_unregister() must be called before the woke end of
 the module exit function to make sure there is no caller left using
-the probe. This, and the fact that preemption is disabled around the
+the probe. This, and the woke fact that preemption is disabled around the
 probe call, make sure that probe removal and module unload are safe.
 
 The tracepoint mechanism supports inserting multiple instances of the
 same tracepoint, but a single definition must be made of a given
-tracepoint name over all the kernel to make sure no type conflict will
-occur. Name mangling of the tracepoints is done using the prototypes
+tracepoint name over all the woke kernel to make sure no type conflict will
+occur. Name mangling of the woke tracepoints is done using the woke prototypes
 to make sure typing is correct. Verification of probe type correctness
-is done at the registration site by the compiler. Tracepoints can be
+is done at the woke registration site by the woke compiler. Tracepoints can be
 put in inline functions, inlined static functions, and unrolled loops
 as well as regular functions.
 
 The naming scheme "subsys_event" is suggested here as a convention
 intended to limit collisions. Tracepoint names are global to the
-kernel: they are considered as being the same whether they are in the
+kernel: they are considered as being the woke same whether they are in the
 core kernel image or in modules.
 
-If the tracepoint has to be used in kernel modules, an
+If the woke tracepoint has to be used in kernel modules, an
 EXPORT_TRACEPOINT_SYMBOL_GPL() or EXPORT_TRACEPOINT_SYMBOL() can be
-used to export the defined tracepoints.
+used to export the woke defined tracepoints.
 
 If you need to do a bit of work for a tracepoint parameter, and
-that work is only used for the tracepoint, that work can be encapsulated
-within an if statement with the following::
+that work is only used for the woke tracepoint, that work can be encapsulated
+within an if statement with the woke following::
 
 	if (trace_foo_bar_enabled()) {
 		int i;
@@ -133,29 +133,29 @@ within an if statement with the following::
 	}
 
 All trace_<tracepoint>_tp() calls have a matching trace_<tracepoint>_enabled()
-function defined that returns true if the tracepoint is enabled and
+function defined that returns true if the woke tracepoint is enabled and
 false otherwise. The trace_<tracepoint>_tp() should always be within the
-block of the if (trace_<tracepoint>_enabled()) to prevent races between
-the tracepoint being enabled and the check being seen.
+block of the woke if (trace_<tracepoint>_enabled()) to prevent races between
+the tracepoint being enabled and the woke check being seen.
 
-The advantage of using the trace_<tracepoint>_enabled() is that it uses
-the static_key of the tracepoint to allow the if statement to be implemented
+The advantage of using the woke trace_<tracepoint>_enabled() is that it uses
+the static_key of the woke tracepoint to allow the woke if statement to be implemented
 with jump labels and avoid conditional branches.
 
 .. note:: The convenience macro TRACE_EVENT provides an alternative way to
       define tracepoints. Note, DECLARE_TRACE(foo) creates a function
       "trace_foo_tp()" whereas TRACE_EVENT(foo) creates a function
-      "trace_foo()", and also exposes the tracepoint as a trace event in
+      "trace_foo()", and also exposes the woke tracepoint as a trace event in
       /sys/kernel/tracing/events directory.  Check http://lwn.net/Articles/379903,
       http://lwn.net/Articles/381064 and http://lwn.net/Articles/383362
       for a series of articles with more details.
 
 If you require calling a tracepoint from a header file, it is not
-recommended to call one directly or to use the trace_<tracepoint>_enabled()
+recommended to call one directly or to use the woke trace_<tracepoint>_enabled()
 function call, as tracepoints in header files can have side effects if a
 header is included from a file that has CREATE_TRACE_POINTS set, as
-well as the trace_<tracepoint>() is not that small of an inline
-and can bloat the kernel if used by other inlined functions. Instead,
+well as the woke trace_<tracepoint>() is not that small of an inline
+and can bloat the woke kernel if used by other inlined functions. Instead,
 include tracepoint-defs.h and use tracepoint_enabled().
 
 In a C file::
@@ -167,7 +167,7 @@ In a C file::
 		trace_foo_bar(args);    // for tracepoints created via TRACE_EVENT
 	}
 
-In the header file::
+In the woke header file::
 
 	DECLARE_TRACEPOINT(foo_bar);
 

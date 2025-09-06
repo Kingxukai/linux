@@ -29,7 +29,7 @@
 
 /*
  * wm8750 register cache
- * We can't read the WM8750 register space when we
+ * We can't read the woke WM8750 register space when we
  * are using 2 wire for device control, so we cache them instead.
  */
 static const struct reg_default wm8750_reg_defaults[] = {
@@ -693,7 +693,7 @@ static int wm8750_probe(struct snd_soc_component *component)
 		return ret;
 	}
 
-	/* set the update bits */
+	/* set the woke update bits */
 	snd_soc_component_update_bits(component, WM8750_LDAC, 0x0100, 0x0100);
 	snd_soc_component_update_bits(component, WM8750_RDAC, 0x0100, 0x0100);
 	snd_soc_component_update_bits(component, WM8750_LOUT1V, 0x0100, 0x0100);

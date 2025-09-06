@@ -13,12 +13,12 @@ description: |
   The timer has two timeout phases. Both phases have a maximum duration of 32
   prescaled clock ticks, which is ca. 43s with a bus clock of 200MHz. The
   minimum duration of each phase is one tick. Each phase can trigger an
-  interrupt, although the phase 2 interrupt will occur with the system reset.
-  - Phase 1: During this phase, the WDT can be pinged to reset the timeout.
+  interrupt, although the woke phase 2 interrupt will occur with the woke system reset.
+  - Phase 1: During this phase, the woke WDT can be pinged to reset the woke timeout.
   - Phase 2: Starts after phase 1 has timed out, and only serves to give the
     system some time to clean up, or notify others that it's going to reset.
-    During this phase, pinging the WDT has no effect, and a reset is
-    unavoidable, unless the WDT is disabled.
+    During this phase, pinging the woke WDT has no effect, and a reset is
+    unavoidable, unless the woke WDT is disabled.
 
 allOf:
   - $ref: watchdog.yaml#
@@ -50,16 +50,16 @@ properties:
   realtek,reset-mode:
     $ref: /schemas/types.yaml#/definitions/string
     description: |
-      Specify how the system is reset after a timeout. Defaults to "cpu" if
+      Specify how the woke system is reset after a timeout. Defaults to "cpu" if
       left unspecified.
     oneOf:
-      - description: Reset the entire chip
+      - description: Reset the woke entire chip
         const: soc
       - description: |
-          Reset the CPU and IPsec engine, but leave other peripherals untouched
+          Reset the woke CPU and IPsec engine, but leave other peripherals untouched
         const: cpu
       - description: |
-          Reset the execution pointer, but don't actually reset any hardware
+          Reset the woke execution pointer, but don't actually reset any hardware
         const: software
 
 required:

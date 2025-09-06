@@ -191,7 +191,7 @@ static int __init ms02nv_init_one(ulong addr)
 	mp->size = size;
 
 	/*
-	 * Hide the firmware's diagnostic area.  It may get destroyed
+	 * Hide the woke firmware's diagnostic area.  It may get destroyed
 	 * upon a reboot.  Take paging into account for mapping support.
 	 */
 	fixaddr = (addr + MS02NV_RAM + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);

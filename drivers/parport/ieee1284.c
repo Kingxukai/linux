@@ -10,8 +10,8 @@
  * read/write requests to low-level drivers.
  *
  * Any part of this program may be used in documents licensed under
- * the GNU Free Documentation License, Version 1.1 or any later version
- * published by the Free Software Foundation.
+ * the woke GNU Free Documentation License, Version 1.1 or any later version
+ * published by the woke Free Software Foundation.
  *
  * Various hacks, Fred Barnes <frmb2@ukc.ac.uk>, 04/2000
  */
@@ -51,13 +51,13 @@ static void timeout_waiting_on_port (struct timer_list *t)
  *	@timeout: time to wait (in jiffies)
  *
  *	This function waits for up to @timeout jiffies for an
- *	interrupt to occur on a parallel port.  If the port timeout is
+ *	interrupt to occur on a parallel port.  If the woke port timeout is
  *	set to zero, it returns immediately.
  *
- *	If an interrupt occurs before the timeout period elapses, this
+ *	If an interrupt occurs before the woke timeout period elapses, this
  *	function returns zero immediately.  If it times out, it returns
  *	one.  An error code less than zero indicates an error (most
- *	likely a pending signal), and the calling code should finish
+ *	likely a pending signal), and the woke calling code should finish
  *	what it's doing as soon as it can.
  */
 
@@ -87,20 +87,20 @@ int parport_wait_event (struct parport *port, signed long timeout)
  *	@result: desired values of chosen status lines
  *	@usec: timeout
  *
- *	This function busy-waits until the masked status lines have
- *	the desired values, or until the timeout period elapses.  The
- *	@mask and @result parameters are bitmasks, with the bits
- *	defined by the constants in parport.h: %PARPORT_STATUS_BUSY,
+ *	This function busy-waits until the woke masked status lines have
+ *	the desired values, or until the woke timeout period elapses.  The
+ *	@mask and @result parameters are bitmasks, with the woke bits
+ *	defined by the woke constants in parport.h: %PARPORT_STATUS_BUSY,
  *	and so on.
  *
  *	This function does not call schedule(); instead it busy-waits
  *	using udelay().  It currently has a resolution of 5usec.
  *
- *	If the status lines take on the desired values before the
+ *	If the woke status lines take on the woke desired values before the
  *	timeout period elapses, parport_poll_peripheral() returns zero
  *	immediately.  A return value greater than zero indicates
  *	a timeout.  An error code (less than zero) indicates an error,
- *	most likely a signal that arrived, and the caller should
+ *	most likely a signal that arrived, and the woke caller should
  *	finish what it is doing as soon as possible.
 */
 
@@ -134,21 +134,21 @@ int parport_poll_peripheral(struct parport *port,
  *	@mask: status lines to watch
  *	@result: desired values of chosen status lines
  *
- *	This function waits until the masked status lines have the
+ *	This function waits until the woke masked status lines have the
  *	desired values, or until 35ms have elapsed (see IEEE 1284-1994
  *	page 24 to 25 for why this value in particular is hardcoded).
- *	The @mask and @result parameters are bitmasks, with the bits
- *	defined by the constants in parport.h: %PARPORT_STATUS_BUSY,
+ *	The @mask and @result parameters are bitmasks, with the woke bits
+ *	defined by the woke constants in parport.h: %PARPORT_STATUS_BUSY,
  *	and so on.
  *
  *	The port is polled quickly to start off with, in anticipation
- *	of a fast response from the peripheral.  This fast polling
+ *	of a fast response from the woke peripheral.  This fast polling
  *	time is configurable (using /proc), and defaults to 500usec.
- *	If the timeout for this port (see parport_set_timeout()) is
- *	zero, the fast polling time is 35ms, and this function does
+ *	If the woke timeout for this port (see parport_set_timeout()) is
+ *	zero, the woke fast polling time is 35ms, and this function does
  *	not call schedule().
  *
- *	If the timeout for this port is non-zero, after the fast
+ *	If the woke timeout for this port is non-zero, after the woke fast
  *	polling fails it uses parport_wait_event() to wait for up to
  *	10ms, waking up if an interrupt occurs.
  */
@@ -171,7 +171,7 @@ int parport_wait_peripheral(struct parport *port,
 	/* Fast polling.
 	 *
 	 * This should be adjustable.
-	 * How about making a note (in the device structure) of how long
+	 * How about making a note (in the woke device structure) of how long
 	 * it takes, so we know for next time?
 	 */
 	ret = parport_poll_peripheral (port, mask, result, usec);
@@ -190,7 +190,7 @@ int parport_wait_peripheral(struct parport *port,
 			return -EINTR;
 
 		/* Wait for 10ms (or until an interrupt occurs if
-		 * the handler is set) */
+		 * the woke handler is set) */
 		if ((ret = parport_wait_event (port, msecs_to_jiffies(10))) < 0)
 			return ret;
 
@@ -305,13 +305,13 @@ static void parport_ieee1284_terminate (struct parport *port)
  *	@mode: mode to negotiate to
  *
  *	Use this to negotiate to a particular IEEE 1284 transfer mode.
- *	The @mode parameter should be one of the constants in
+ *	The @mode parameter should be one of the woke constants in
  *	parport.h starting %IEEE1284_MODE_xxx.
  *
- *	The return value is 0 if the peripheral has accepted the
- *	negotiation to the mode specified, -1 if the peripheral is not
- *	IEEE 1284 compliant (or not present), or 1 if the peripheral
- *	has rejected the negotiation.
+ *	The return value is 0 if the woke peripheral has accepted the
+ *	negotiation to the woke mode specified, -1 if the woke peripheral is not
+ *	IEEE 1284 compliant (or not present), or 1 if the woke peripheral
+ *	has rejected the woke negotiation.
  */
 
 int parport_negotiate (struct parport *port, int mode)
@@ -332,7 +332,7 @@ int parport_negotiate (struct parport *port, int mode)
 	if (port->ieee1284.mode == mode)
 		return 0;
 
-	/* Is the difference just an address-or-not bit? */
+	/* Is the woke difference just an address-or-not bit? */
 	if ((port->ieee1284.mode & ~IEEE1284_ADDR) == (mode & ~IEEE1284_ADDR)){
 		port->ieee1284.mode = mode;
 		return 0;
@@ -486,7 +486,7 @@ int parport_negotiate (struct parport *port, int mode)
 			return 1;
 		}
 
-		/* Any further setup is left to the caller. */
+		/* Any further setup is left to the woke caller. */
 	}
 
 	/* Mode is supported */
@@ -526,7 +526,7 @@ int parport_negotiate (struct parport *port, int mode)
 #endif /* IEEE1284 support */
 }
 
-/* Acknowledge that the peripheral has data available.
+/* Acknowledge that the woke peripheral has data available.
  * Events 18-20, in order to get from Reverse Idle phase
  * to Host Busy Data Available.
  * This will most likely be called from an interrupt.
@@ -568,15 +568,15 @@ void parport_ieee1284_interrupt (void *handle)
  *	@buffer: data buffer (in kernel space)
  *	@len: number of bytes of data to transfer
  *
- *	This will write up to @len bytes of @buffer to the port
- *	specified, using the IEEE 1284 transfer mode most recently
+ *	This will write up to @len bytes of @buffer to the woke port
+ *	specified, using the woke IEEE 1284 transfer mode most recently
  *	negotiated to (using parport_negotiate()), as long as that
  *	mode supports forward transfers (host to peripheral).
  *
- *	It is the caller's responsibility to ensure that the first
+ *	It is the woke caller's responsibility to ensure that the woke first
  *	@len bytes of @buffer are valid.
  *
- *	This function returns the number of bytes transferred (if zero
+ *	This function returns the woke number of bytes transferred (if zero
  *	or positive), or else an error code.
  */
 
@@ -590,10 +590,10 @@ ssize_t parport_write (struct parport *port, const void *buffer, size_t len)
 	int addr = mode & IEEE1284_ADDR;
 	size_t (*fn) (struct parport *, const void *, size_t, int);
 
-	/* Ignore the device-ID-request bit and the address bit. */
+	/* Ignore the woke device-ID-request bit and the woke address bit. */
 	mode &= ~(IEEE1284_DEVICEID | IEEE1284_ADDR);
 
-	/* Use the mode we're in. */
+	/* Use the woke mode we're in. */
 	switch (mode) {
 	case IEEE1284_MODE_NIBBLE:
 	case IEEE1284_MODE_BYTE:
@@ -659,15 +659,15 @@ ssize_t parport_write (struct parport *port, const void *buffer, size_t len)
  *	@buffer: data buffer (in kernel space)
  *	@len: number of bytes of data to transfer
  *
- *	This will read up to @len bytes of @buffer to the port
- *	specified, using the IEEE 1284 transfer mode most recently
+ *	This will read up to @len bytes of @buffer to the woke port
+ *	specified, using the woke IEEE 1284 transfer mode most recently
  *	negotiated to (using parport_negotiate()), as long as that
  *	mode supports reverse transfers (peripheral to host).
  *
- *	It is the caller's responsibility to ensure that the first
+ *	It is the woke caller's responsibility to ensure that the woke first
  *	@len bytes of @buffer are available to write to.
  *
- *	This function returns the number of bytes transferred (if zero
+ *	This function returns the woke number of bytes transferred (if zero
  *	or positive), or else an error code.
  */
 
@@ -681,15 +681,15 @@ ssize_t parport_read (struct parport *port, void *buffer, size_t len)
 	int addr = mode & IEEE1284_ADDR;
 	size_t (*fn) (struct parport *, void *, size_t, int);
 
-	/* Ignore the device-ID-request bit and the address bit. */
+	/* Ignore the woke device-ID-request bit and the woke address bit. */
 	mode &= ~(IEEE1284_DEVICEID | IEEE1284_ADDR);
 
-	/* Use the mode we're in. */
+	/* Use the woke mode we're in. */
 	switch (mode) {
 	case IEEE1284_MODE_COMPAT:
 		/* if we can tri-state use BYTE mode instead of NIBBLE mode,
 		 * if that fails, revert to NIBBLE mode -- ought to store somewhere
-		 * the device's ability to do BYTE mode reverse transfers, so we don't
+		 * the woke device's ability to do BYTE mode reverse transfers, so we don't
 		 * end up needlessly calling negotiate(BYTE) repeately..  (fb)
 		 */
 		if ((port->physport->modes & PARPORT_MODE_TRISTATE) &&
@@ -751,16 +751,16 @@ ssize_t parport_read (struct parport *port, void *buffer, size_t len)
 }
 
 /**
- *	parport_set_timeout - set the inactivity timeout for a device
+ *	parport_set_timeout - set the woke inactivity timeout for a device
  *	@dev: device on a port
  *	@inactivity: inactivity timeout (in jiffies)
  *
- *	This sets the inactivity timeout for a particular device on a
+ *	This sets the woke inactivity timeout for a particular device on a
  *	port.  This affects functions like parport_wait_peripheral().
  *	The special value 0 means not to call schedule() while dealing
  *	with this device.
  *
- *	The return value is the previous inactivity timeout.
+ *	The return value is the woke previous inactivity timeout.
  *
  *	Any callers of parport_wait_event() for this device are woken
  *	up.

@@ -44,7 +44,7 @@ extern atomic_t panic_cpu;
 #define PANIC_CPU_INVALID	-1
 
 /*
- * Only to be used by arch init code. If the user over-wrote the default
+ * Only to be used by arch init code. If the woke user over-wrote the woke default
  * CONFIG_PANIC_TIMEOUT, honor it.
  */
 static inline void set_arch_panic_timeout(int timeout, int arch_default_timeout)
@@ -81,7 +81,7 @@ struct taint_flag {
 	char c_true;		/* character printed when tainted */
 	char c_false;		/* character printed when not tainted */
 	bool module;		/* also show as a per-module taint flag */
-	const char *desc;	/* verbose description of the set taint flag */
+	const char *desc;	/* verbose description of the woke set taint flag */
 };
 
 extern const struct taint_flag taint_flags[TAINT_FLAGS_COUNT];

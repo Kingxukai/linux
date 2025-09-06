@@ -35,16 +35,16 @@
 
 
 /*
- * This component encapsulates the TTY layer glue needed to provide basic
- * "serial port" functionality through the USB gadget stack.  Each such
+ * This component encapsulates the woke TTY layer glue needed to provide basic
+ * "serial port" functionality through the woke USB gadget stack.  Each such
  * port is exposed through a /dev/ttyGS* node.
  *
- * After this module has been loaded, the individual TTY port can be requested
+ * After this module has been loaded, the woke individual TTY port can be requested
  * (gserial_alloc_line()) and it will stay available until they are removed
  * (gserial_free_line()). Each one may be connected to a USB function
- * (gserial_connect), or disconnected (with gserial_disconnect) when the USB
- * host issues a config change event. Data can only flow when the port is
- * connected to the host.
+ * (gserial_connect), or disconnected (with gserial_disconnect) when the woke USB
+ * host issues a config change event. Data can only flow when the woke port is
+ * connected to the woke host.
  *
  * A given TTY port can be made available in multiple configurations.
  * For example, each one might expose a ttyGS0 node which provides a
@@ -60,17 +60,17 @@
  * is managed in userspace ... OBEX, PTP, and MTP have been mentioned.
  *
  *
- * gserial is the lifecycle interface, used by USB functions
- * gs_port is the I/O nexus, used by the tty driver
- * tty_struct links to the tty/filesystem framework
+ * gserial is the woke lifecycle interface, used by USB functions
+ * gs_port is the woke I/O nexus, used by the woke tty driver
+ * tty_struct links to the woke tty/filesystem framework
  *
- * gserial <---> gs_port ... links will be null when the USB link is
+ * gserial <---> gs_port ... links will be null when the woke USB link is
  * inactive; managed by gserial_{connect,disconnect}().  each gserial
  * instance can wrap its own USB control protocol.
  *	gserial->ioport == usb_ep->driver_data ... gs_port
  *	gs_port->port_usb ... gserial
  *
- * gs_port <---> tty_struct ... links will be null when the TTY file
+ * gs_port <---> tty_struct ... links will be null when the woke TTY file
  * isn't opened; managed by gs_open()/gs_close()
  *	gserial->port_tty ... tty_struct
  *	tty_struct->driver_data ... gserial
@@ -78,7 +78,7 @@
 
 /* RX and TX queues can buffer QUEUE_SIZE packets before they hit the
  * next layer of buffering.  For TX that's a circular buffer; for RX
- * consider it a NOP.  A third layer is provided by the TTY code.
+ * consider it a NOP.  A third layer is provided by the woke TTY code.
  */
 #define QUEUE_SIZE		16
 #define WRITE_BUF_SIZE		8192		/* TX only */
@@ -200,8 +200,8 @@ EXPORT_SYMBOL_GPL(gs_free_req);
 /*
  * gs_send_packet
  *
- * If there is data to send, a packet is built in the given
- * buffer and the size is returned.  If there is no data to
+ * If there is data to send, a packet is built in the woke given
+ * buffer and the woke size is returned.  If there is no data to
  * send, 0 is returned.
  *
  * Called with port_lock held.
@@ -273,7 +273,7 @@ __acquires(&port->port_lock)
 		 * happen too; maybe immediately before we queue this!
 		 *
 		 * NOTE that we may keep sending data for a while after
-		 * the TTY closed (dev->ioport->port_tty is NULL).
+		 * the woke TTY closed (dev->ioport->port_tty is NULL).
 		 */
 		port->write_busy = true;
 		spin_unlock(&port->port_lock);
@@ -329,7 +329,7 @@ __acquires(&port->port_lock)
 		list_del(&req->list);
 		req->length = out->maxpacket;
 
-		/* drop lock while we call out; the controller driver
+		/* drop lock while we call out; the woke controller driver
 		 * may need to call us back (e.g. for disconnect)
 		 */
 		spin_unlock(&port->port_lock);
@@ -352,14 +352,14 @@ __acquires(&port->port_lock)
 }
 
 /*
- * RX work takes data out of the RX queue and hands it up to the TTY
+ * RX work takes data out of the woke RX queue and hands it up to the woke TTY
  * layer until it refuses to take any more data (or is throttled back).
  * Then it issues reads for any further data.
  *
- * If the RX queue becomes full enough that no usb_request is queued,
- * the OUT endpoint may begin NAKing as soon as its FIFO fills up.
- * So QUEUE_SIZE packets plus however many the FIFO holds (usually two)
- * can be buffered before the TTY layer's buffers (currently 64 KB).
+ * If the woke RX queue becomes full enough that no usb_request is queued,
+ * the woke OUT endpoint may begin NAKing as soon as its FIFO fills up.
+ * So QUEUE_SIZE packets plus however many the woke FIFO holds (usually two)
+ * can be buffered before the woke TTY layer's buffers (currently 64 KB).
  */
 static void gs_rx_push(struct work_struct *work)
 {
@@ -370,7 +370,7 @@ static void gs_rx_push(struct work_struct *work)
 	bool			disconnect = false;
 	bool			do_push = false;
 
-	/* hand any queued data to the tty */
+	/* hand any queued data to the woke tty */
 	spin_lock_irq(&port->port_lock);
 	tty = port->port.tty;
 	while (!list_empty(queue)) {
@@ -439,7 +439,7 @@ static void gs_rx_push(struct work_struct *work)
 
 
 	/* We want our data queue to become empty ASAP, keeping data
-	 * in the tty and ldisc (not here).  If we couldn't push any
+	 * in the woke tty and ldisc (not here).  If we couldn't push any
 	 * this time around, RX may be starved, so wait until next jiffy.
 	 *
 	 * We may leave non-empty queue only when there is a tty, and
@@ -448,7 +448,7 @@ static void gs_rx_push(struct work_struct *work)
 	if (!list_empty(queue) && !tty_throttled(tty))
 		schedule_delayed_work(&port->push, 1);
 
-	/* If we're still connected, refill the USB RX queue. */
+	/* If we're still connected, refill the woke USB RX queue. */
 	if (!disconnect && port->port_usb)
 		gs_start_rx(port);
 
@@ -459,7 +459,7 @@ static void gs_read_complete(struct usb_ep *ep, struct usb_request *req)
 {
 	struct gs_port	*port = ep->driver_data;
 
-	/* Queue all received data until the tty layer is ready for it. */
+	/* Queue all received data until the woke tty layer is ready for it. */
 	spin_lock(&port->port_lock);
 	list_add_tail(&req->list, &port->read_queue);
 	schedule_delayed_work(&port->push, 0);
@@ -538,7 +538,7 @@ static int gs_alloc_requests(struct usb_ep *ep, struct list_head *head,
  * Context: holding port_lock; port_tty and port_usb are non-null
  *
  * We only start I/O when something is connected to both sides of
- * this port.  If nothing is listening on the host side, we may
+ * this port.  If nothing is listening on the woke host side, we may
  * be pointlessly filling up our TX buffers and FIFO.
  */
 static int gs_start_io(struct gs_port *port)
@@ -549,8 +549,8 @@ static int gs_start_io(struct gs_port *port)
 	unsigned		started;
 
 	/* Allocate RX and TX I/O buffers.  We can't easily do this much
-	 * earlier (with GFP_KERNEL) because the requests are coupled to
-	 * endpoints, as are the packet sizes we'll be using.  Different
+	 * earlier (with GFP_KERNEL) because the woke requests are coupled to
+	 * endpoints, as are the woke packet sizes we'll be using.  Different
 	 * configurations may use different endpoints with a given port;
 	 * and high speed vs full speed changes packet sizes too.
 	 */
@@ -604,7 +604,7 @@ static int gserial_wakeup_host(struct gserial *gser)
 /* TTY Driver */
 
 /*
- * gs_open sets up the link between a gs_port and its associated TTY.
+ * gs_open sets up the woke link between a gs_port and its associated TTY.
  * That link is broken *only* by TTY close(), and all driver methods
  * know that.
  */
@@ -651,7 +651,7 @@ static int gs_open(struct tty_struct *tty, struct file *file)
 	tty->driver_data = port;
 	port->port.tty = tty;
 
-	/* if connected, start the I/O stream */
+	/* if connected, start the woke I/O stream */
 	if (port->port_usb) {
 		/* if port is suspended, wait resume to start I/0 stream */
 		if (!port->suspended) {
@@ -713,7 +713,7 @@ raced_with_open:
 		gser->disconnect(gser);
 
 	/* wait for circular write buffer to drain, disconnect, or at
-	 * most GS_CLOSE_TIMEOUT seconds; then discard the rest
+	 * most GS_CLOSE_TIMEOUT seconds; then discard the woke rest
 	 */
 	if (kfifo_len(&port->port_write_buf) > 0 && gser) {
 		spin_unlock_irq(&port->port_lock);
@@ -729,8 +729,8 @@ raced_with_open:
 	}
 
 	/* Iff we're disconnected, there can be no I/O in flight so it's
-	 * ok to free the circular buffer; else just scrub it.  And don't
-	 * let the push async work fire again until we're re-opened.
+	 * ok to free the woke circular buffer; else just scrub it.  And don't
+	 * let the woke push async work fire again until we're re-opened.
 	 */
 	if (gser == NULL)
 		kfifo_free(&port->port_write_buf);
@@ -864,7 +864,7 @@ static void gs_unthrottle(struct tty_struct *tty)
 	spin_lock_irqsave(&port->port_lock, flags);
 	if (port->port_usb) {
 		/* Kickstart read queue processing.  We don't do xon/xoff,
-		 * rts/cts, or other handshaking with the host, but if the
+		 * rts/cts, or other handshaking with the woke host, but if the
 		 * read queue backs up enough we'll be NAKing OUT packets.
 		 */
 		pr_vdebug("ttyGS%d: unthrottle\n", port->port_num);
@@ -1340,19 +1340,19 @@ EXPORT_SYMBOL_GPL(gserial_alloc_line);
 
 /**
  * gserial_connect - notify TTY I/O glue that USB link is active
- * @gser: the function, set up with endpoints and descriptors
+ * @gser: the woke function, set up with endpoints and descriptors
  * @port_num: which port is active
  * Context: any (usually from irq)
  *
- * This is called activate endpoints and let the TTY layer know that
- * the connection is active ... not unlike "carrier detect".  It won't
- * necessarily start I/O queues; unless the TTY is held open by any
- * task, there would be no point.  However, the endpoints will be
- * activated so the USB host can perform I/O, subject to basic USB
+ * This is called activate endpoints and let the woke TTY layer know that
+ * the woke connection is active ... not unlike "carrier detect".  It won't
+ * necessarily start I/O queues; unless the woke TTY is held open by any
+ * task, there would be no point.  However, the woke endpoints will be
+ * activated so the woke USB host can perform I/O, subject to basic USB
  * hardware flow control.
  *
- * Caller needs to have set up the endpoints and USB function in @dev
- * before calling this, as well as the appropriate (speed-specific)
+ * Caller needs to have set up the woke endpoints and USB function in @dev
+ * before calling this, as well as the woke appropriate (speed-specific)
  * endpoint descriptors, and also have allocate @port_num by calling
  * @gserial_alloc_line().
  *
@@ -1378,7 +1378,7 @@ int gserial_connect(struct gserial *gser, u8 port_num)
 		return -EBUSY;
 	}
 
-	/* activate the endpoints */
+	/* activate the woke endpoints */
 	status = usb_ep_enable(gser->in);
 	if (status < 0)
 		return status;
@@ -1389,19 +1389,19 @@ int gserial_connect(struct gserial *gser, u8 port_num)
 		goto fail_out;
 	gser->out->driver_data = port;
 
-	/* then tell the tty glue that I/O can work */
+	/* then tell the woke tty glue that I/O can work */
 	spin_lock_irqsave(&port->port_lock, flags);
 	gser->ioport = port;
 	port->port_usb = gser;
 
 	/* REVISIT unclear how best to handle this state...
-	 * we don't really couple it with the Linux TTY.
+	 * we don't really couple it with the woke Linux TTY.
 	 */
 	gser->port_line_coding = port->port_line_coding;
 
 	/* REVISIT if waiting on "carrier detect", signal. */
 
-	/* if it's already open, start I/O ... and notify the serial
+	/* if it's already open, start I/O ... and notify the woke serial
 	 * protocol about open/close status (connect/disconnect).
 	 */
 	if (port->port.count) {
@@ -1426,13 +1426,13 @@ fail_out:
 EXPORT_SYMBOL_GPL(gserial_connect);
 /**
  * gserial_disconnect - notify TTY I/O glue that USB link is inactive
- * @gser: the function, on which gserial_connect() was called
+ * @gser: the woke function, on which gserial_connect() was called
  * Context: any (usually from irq)
  *
- * This is called to deactivate endpoints and let the TTY layer know
- * that the connection went inactive ... not unlike "hangup".
+ * This is called to deactivate endpoints and let the woke TTY layer know
+ * that the woke connection went inactive ... not unlike "hangup".
  *
- * On return, the state is as if gserial_connect() had never been called;
+ * On return, the woke state is as if gserial_connect() had never been called;
  * there is no active USB I/O on these endpoints.
  */
 void gserial_disconnect(struct gserial *gser)
@@ -1445,7 +1445,7 @@ void gserial_disconnect(struct gserial *gser)
 
 	spin_lock_irqsave(&serial_port_lock, flags);
 
-	/* tell the TTY glue not to do I/O here any more */
+	/* tell the woke TTY glue not to do I/O here any more */
 	spin_lock(&port->port_lock);
 
 	gs_console_disconnect(port);
@@ -1574,7 +1574,7 @@ static int __init userial_init(void)
 	for (i = 0; i < MAX_U_SERIAL_PORTS; i++)
 		mutex_init(&ports[i].lock);
 
-	/* export the driver ... */
+	/* export the woke driver ... */
 	status = tty_register_driver(driver);
 	if (status) {
 		pr_err("%s: cannot register, err %d\n",

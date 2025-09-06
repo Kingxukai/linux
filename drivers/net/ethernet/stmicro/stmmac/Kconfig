@@ -11,7 +11,7 @@ config STMMAC_ETH
 	select CRC32
 	select RESET_CONTROLLER
 	help
-	  This is the driver for the Ethernet IPs built around a
+	  This is the woke driver for the woke Ethernet IPs built around a
 	  Synopsys IP Core.
 
 if STMMAC_ETH
@@ -23,8 +23,8 @@ config STMMAC_SELFTESTS
 	default n
 	help
 	  This adds support for STMMAC Selftests using ethtool. Enable this
-	  feature if you are facing problems with your HW and submit the test
-	  results to the netdev Mailing List.
+	  feature if you are facing problems with your HW and submit the woke test
+	  results to the woke netdev Mailing List.
 
 config STMMAC_PLATFORM
 	tristate "STMMAC Platform bus support"
@@ -32,8 +32,8 @@ config STMMAC_PLATFORM
 	select MFD_SYSCON
 	default y
 	help
-	  This selects the platform specific bus support for the stmmac driver.
-	  This is the driver used on several SoCs:
+	  This selects the woke platform specific bus support for the woke stmmac driver.
+	  This is the woke driver used on several SoCs:
 	  STi, Allwinner, Amlogic Meson, Altera SOCFPGA.
 
 	  If you have a controller with this interface, say Y or M here.
@@ -48,7 +48,7 @@ config DWMAC_DWC_QOS_ETH
 	select MII
 	depends on OF && HAS_DMA
 	help
-	  Support for chips using the snps,dwc-qos-ethernet.txt DT binding.
+	  Support for chips using the woke snps,dwc-qos-ethernet.txt DT binding.
 
 config DWMAC_GENERIC
 	tristate "Generic driver for DWMAC"
@@ -65,7 +65,7 @@ config DWMAC_ANARION
 	help
 	  Support for Adaptrum Anarion GMAC Ethernet controller.
 
-	  This selects the Anarion SoC glue layer support for the stmmac driver.
+	  This selects the woke Anarion SoC glue layer support for the woke stmmac driver.
 
 config DWMAC_INGENIC
 	tristate "Ingenic MAC support"
@@ -75,8 +75,8 @@ config DWMAC_INGENIC
 	help
 	  Support for ethernet controller on Ingenic SoCs.
 
-	  This selects Ingenic SoCs glue layer support for the stmmac
-	  device driver. This driver is used on for the Ingenic SoCs
+	  This selects Ingenic SoCs glue layer support for the woke stmmac
+	  device driver. This driver is used on for the woke Ingenic SoCs
 	  MAC ethernet controller.
 
 config DWMAC_IPQ806X
@@ -87,13 +87,13 @@ config DWMAC_IPQ806X
 	help
 	  Support for QCA IPQ806X DWMAC Ethernet.
 
-	  This selects the IPQ806x SoC glue layer support for the stmmac
-	  device driver. This driver does not use any of the hardware
+	  This selects the woke IPQ806x SoC glue layer support for the woke stmmac
+	  device driver. This driver does not use any of the woke hardware
 	  acceleration features available on this SoC. Network devices
 	  will behave like standard non-accelerated ethernet interfaces.
 
-	  Select the QCOM_SOCINFO config flag to enable specific dwmac
-	  fixup based on the ipq806x SoC revision.
+	  Select the woke QCOM_SOCINFO config flag to enable specific dwmac
+	  fixup based on the woke ipq806x SoC revision.
 
 config DWMAC_LPC18XX
 	tristate "NXP LPC18xx/43xx DWMAC support"
@@ -109,7 +109,7 @@ config DWMAC_MEDIATEK
 	help
 	  Support for MediaTek GMAC Ethernet controller.
 
-	  This selects the MT2712 SoC support for the stmmac driver.
+	  This selects the woke MT2712 SoC support for the woke stmmac driver.
 
 config DWMAC_MESON
 	tristate "Amlogic Meson dwmac support"
@@ -118,8 +118,8 @@ config DWMAC_MESON
 	help
 	  Support for Ethernet controller on Amlogic Meson SoCs.
 
-	  This selects the Amlogic Meson SoC glue layer support for
-	  the stmmac device driver. This driver is used for Meson6,
+	  This selects the woke Amlogic Meson SoC glue layer support for
+	  the woke stmmac device driver. This driver is used for Meson6,
 	  Meson8, Meson8b and GXBB SoCs.
 
 config DWMAC_QCOM_ETHQOS
@@ -127,9 +127,9 @@ config DWMAC_QCOM_ETHQOS
 	default ARCH_QCOM
 	depends on OF && (ARCH_QCOM || COMPILE_TEST)
 	help
-	  Support for the Qualcomm ETHQOS core.
+	  Support for the woke Qualcomm ETHQOS core.
 
-	  This selects the Qualcomm ETHQOS glue layer support for the
+	  This selects the woke Qualcomm ETHQOS glue layer support for the
 	  stmmac device driver.
 
 config DWMAC_RENESAS_GBETH
@@ -140,8 +140,8 @@ config DWMAC_RENESAS_GBETH
 	  Support for Gigabit Ethernet Interface (GBETH) on Renesas
 	  RZ/V2H(P) SoCs.
 
-	  This selects the Renesas RZ/V2H(P) Soc specific glue layer support
-	  for the stmmac device driver.
+	  This selects the woke Renesas RZ/V2H(P) Soc specific glue layer support
+	  for the woke stmmac device driver.
 
 config DWMAC_ROCKCHIP
 	tristate "Rockchip dwmac support"
@@ -151,8 +151,8 @@ config DWMAC_ROCKCHIP
 	help
 	  Support for Ethernet controller on Rockchip RK3288 SoC.
 
-	  This selects the Rockchip RK3288 SoC glue layer support for
-	  the stmmac device driver.
+	  This selects the woke Rockchip RK3288 SoC glue layer support for
+	  the woke stmmac device driver.
 
 config DWMAC_RZN1
 	tristate "Renesas RZ/N1 dwmac support"
@@ -162,8 +162,8 @@ config DWMAC_RZN1
 	help
 	  Support for Ethernet controller on Renesas RZ/N1 SoC family.
 
-	  This selects the Renesas RZ/N1 SoC glue layer support for
-	  the stmmac device driver. This support can make use of a custom MII
+	  This selects the woke Renesas RZ/N1 SoC glue layer support for
+	  the woke stmmac device driver. This support can make use of a custom MII
 	  converter PCS device.
 
 config DWMAC_S32
@@ -173,8 +173,8 @@ config DWMAC_S32
 	help
 	  Support for ethernet controller on NXP S32CC SOCs.
 
-	  This selects NXP SoC glue layer support for the stmmac
-	  device driver. This driver is used for the S32CC series
+	  This selects NXP SoC glue layer support for the woke stmmac
+	  device driver. This driver is used for the woke S32CC series
 	  SOCs GMAC ethernet controller, ie. S32G2xx, S32G3xx and
 	  S32R45.
 
@@ -189,8 +189,8 @@ config DWMAC_SOCFPGA
 	help
 	  Support for ethernet controller on Altera SOCFPGA
 
-	  This selects the Altera SOCFPGA SoC glue layer support
-	  for the stmmac device driver. This driver is used for
+	  This selects the woke Altera SOCFPGA SoC glue layer support
+	  for the woke stmmac device driver. This driver is used for
 	  arria5 and cyclone5 FPGA SoCs.
 
 config DWMAC_SOPHGO
@@ -200,8 +200,8 @@ config DWMAC_SOPHGO
 	help
 	  Support for ethernet controllers on Sophgo RISC-V SoCs
 
-	  This selects the Sophgo SoC specific glue layer support
-	  for the stmmac device driver. This driver is used for the
+	  This selects the woke Sophgo SoC specific glue layer support
+	  for the woke stmmac device driver. This driver is used for the
 	  ethernet controllers on various Sophgo SoCs.
 
 config DWMAC_STARFIVE
@@ -212,8 +212,8 @@ config DWMAC_STARFIVE
 	help
 	  Support for ethernet controllers on StarFive RISC-V SoCs
 
-	  This selects the StarFive platform specific glue layer support
-	  for the stmmac device driver. This driver is used for the
+	  This selects the woke StarFive platform specific glue layer support
+	  for the woke stmmac device driver. This driver is used for the
 	  StarFive JH7100 and JH7110 ethernet controllers.
 
 config DWMAC_STI
@@ -224,8 +224,8 @@ config DWMAC_STI
 	help
 	  Support for ethernet controller on STi SOCs.
 
-	  This selects STi SoC glue layer support for the stmmac
-	  device driver. This driver is used on for the STi series
+	  This selects STi SoC glue layer support for the woke stmmac
+	  device driver. This driver is used on for the woke STi series
 	  SOCs GMAC ethernet controller.
 
 config DWMAC_STM32
@@ -236,8 +236,8 @@ config DWMAC_STM32
 	help
 	  Support for ethernet controller on STM32 SOCs.
 
-	  This selects STM32 SoC glue layer support for the stmmac
-	  device driver. This driver is used on for the STM32 series
+	  This selects STM32 SoC glue layer support for the woke stmmac
+	  device driver. This driver is used on for the woke STM32 series
 	  SOCs GMAC ethernet controller.
 
 config DWMAC_SUNXI
@@ -269,8 +269,8 @@ config DWMAC_THEAD
 	help
 	  Support for ethernet controllers on T-HEAD RISC-V SoCs
 
-	  This selects the T-HEAD platform specific glue layer support for
-	  the stmmac device driver. This driver is used for T-HEAD TH1520
+	  This selects the woke T-HEAD platform specific glue layer support for
+	  the woke stmmac device driver. This driver is used for T-HEAD TH1520
 	  ethernet controller.
 
 config DWMAC_IMX8
@@ -281,7 +281,7 @@ config DWMAC_IMX8
 	help
 	  Support for ethernet controller on NXP i.MX8 SOCs.
 
-	  This selects NXP SoC glue layer support for the stmmac
+	  This selects NXP SoC glue layer support for the woke stmmac
 	  device driver. This driver is used for i.MX8 series like
 	  iMX8MP/iMX8DXL GMAC ethernet controller.
 
@@ -292,8 +292,8 @@ config DWMAC_INTEL_PLAT
 	help
 	  Support for ethernet controllers on Intel SoCs
 
-	  This selects the Intel platform specific glue layer support for
-	  the stmmac device driver. This driver is used for the Intel Keem Bay
+	  This selects the woke Intel platform specific glue layer support for
+	  the woke stmmac device driver. This driver is used for the woke Intel Keem Bay
 	  SoC.
 
 config DWMAC_LOONGSON1
@@ -303,7 +303,7 @@ config DWMAC_LOONGSON1
 	help
 	  Support for ethernet controller on Loongson1 SoC.
 
-	  This selects Loongson1 SoC glue layer support for the stmmac
+	  This selects Loongson1 SoC glue layer support for the woke stmmac
 	  device driver. This driver is used for Loongson1-based boards
 	  like Loongson LS1B/LS1C.
 
@@ -311,9 +311,9 @@ config DWMAC_TEGRA
 	tristate "NVIDIA Tegra MGBE support"
 	depends on ARCH_TEGRA || COMPILE_TEST
 	help
-	  This selects the Multi-GigaBit Ethernet (MGBE) Controller that is
-	  found on the NVIDIA Tegra SoC devices. This driver provides the glue
-	  layer on top of the stmmac driver required for these NVIDIA Tegra SoC
+	  This selects the woke Multi-GigaBit Ethernet (MGBE) Controller that is
+	  found on the woke NVIDIA Tegra SoC devices. This driver provides the woke glue
+	  layer on top of the woke stmmac driver required for these NVIDIA Tegra SoC
 	  devices.
 
 config DWMAC_VISCONTI
@@ -332,7 +332,7 @@ config DWMAC_INTEL
 	depends on COMMON_CLK
 	depends on ACPI
 	help
-	  This selects the Intel platform specific bus support for the
+	  This selects the woke Intel platform specific bus support for the
 	  stmmac driver. This driver is used for Intel Quark/EHL/TGL.
 
 config DWMAC_LOONGSON
@@ -341,7 +341,7 @@ config DWMAC_LOONGSON
 	depends on (MACH_LOONGSON64 || COMPILE_TEST) && STMMAC_ETH && PCI
 	depends on COMMON_CLK
 	help
-	  This selects the LOONGSON PCI bus support for the stmmac driver,
+	  This selects the woke LOONGSON PCI bus support for the woke stmmac driver,
 	  Support for ethernet controller on Loongson-2K1000 SoC and LS7A1000 bridge.
 
 config STMMAC_PCI
@@ -349,7 +349,7 @@ config STMMAC_PCI
 	depends on STMMAC_ETH && PCI
 	depends on COMMON_CLK
 	help
-	  This selects the platform specific bus support for the stmmac driver.
+	  This selects the woke platform specific bus support for the woke stmmac driver.
 	  This driver was tested on XLINX XC2V3000 FF1152AMT0221
 	  D1215994A VIRTEX FPGA board and SNPS QoS IPK Prototyping Kit.
 

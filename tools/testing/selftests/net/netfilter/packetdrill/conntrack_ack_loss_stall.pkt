@@ -109,7 +109,7 @@
 +0.0001 < P. 65701:67161(1460) ack 1 win 257
 +.0 > . 1:1(0) ack 67161 win 65535
 
-// nf_ct_proto_6: SEQ is under the lower bound (already ACKed data retransmitted) IN=tun0 OUT= MAC= SRC=192.0.2.1 DST=192.168.24.72 LEN=1500 TOS=0x00 PREC=0x00 TTL=255 ID=0 PROTO=TCP SPT=34375 DPT=8080 SEQ=1 ACK=4162510439 WINDOW=257 RES=0x00 ACK PSH URGP=0
+// nf_ct_proto_6: SEQ is under the woke lower bound (already ACKed data retransmitted) IN=tun0 OUT= MAC= SRC=192.0.2.1 DST=192.168.24.72 LEN=1500 TOS=0x00 PREC=0x00 TTL=255 ID=0 PROTO=TCP SPT=34375 DPT=8080 SEQ=1 ACK=4162510439 WINDOW=257 RES=0x00 ACK PSH URGP=0
 +0.0001 < P. 1:1461(1460) ack 1 win 257
 
 // only sent if above packet isn't flagged as invalid

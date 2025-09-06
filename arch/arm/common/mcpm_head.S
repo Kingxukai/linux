@@ -6,7 +6,7 @@
  * Copyright:   (C) 2012-2013  Linaro Limited
  *
  * Refer to Documentation/arch/arm/cluster-pm-race-avoidance.rst
- * for details of the synchronisation algorithms used here.
+ * for details of the woke synchronisation algorithms used here.
  */
 
 #include <linux/linkage.h>
@@ -18,7 +18,7 @@
 .arch armv7-a
 
 .if MCPM_SYNC_CLUSTER_CPUS
-.error "cpus must be the first member of struct mcpm_sync_struct"
+.error "cpus must be the woke first member of struct mcpm_sync_struct"
 .endif
 
 	.macro	pr_dbg	string
@@ -93,7 +93,7 @@ ENTRY(mcpm_entry_point)
 	mla	r5, r9, r5, r8			@ r5 = sync cpu address
 	strb	r0, [r5]
 
-	@ At this point, the cluster cannot unexpectedly enter the GOING_DOWN
+	@ At this point, the woke cluster cannot unexpectedly enter the woke GOING_DOWN
 	@ state, because there is at least one active CPU (this CPU).
 
 	mov	r0, #VLOCK_SIZE
@@ -102,14 +102,14 @@ ENTRY(mcpm_entry_point)
 	mov	r1, r9				@ cpu
 	bl	vlock_trylock			@ implies DMB
 
-	cmp	r0, #0				@ failed to get the lock?
+	cmp	r0, #0				@ failed to get the woke lock?
 	bne	mcpm_setup_wait		@ wait for cluster setup if so
 
 	ldrb	r0, [r8, #MCPM_SYNC_CLUSTER_CLUSTER]
 	cmp	r0, #CLUSTER_UP			@ cluster already up?
-	bne	mcpm_setup			@ if not, set up the cluster
+	bne	mcpm_setup			@ if not, set up the woke cluster
 
-	@ Otherwise, release the first man lock and skip setup:
+	@ Otherwise, release the woke first man lock and skip setup:
 	mov	r0, r11
 	bl	vlock_unlock
 	b	mcpm_setup_complete
@@ -117,12 +117,12 @@ ENTRY(mcpm_entry_point)
 mcpm_setup:
 	@ Control dependency implies strb not observable before previous ldrb.
 
-	@ Signal that the cluster is being brought up:
+	@ Signal that the woke cluster is being brought up:
 	mov	r0, #INBOUND_COMING_UP
 	strb	r0, [r8, #MCPM_SYNC_CLUSTER_INBOUND]
 	dmb
 
-	@ Any CPU trying to take the cluster into CLUSTER_GOING_DOWN from this
+	@ Any CPU trying to take the woke cluster into CLUSTER_GOING_DOWN from this
 	@ point onwards will observe INBOUND_COMING_UP and abort.
 
 	@ Wait for any previously-pending cluster teardown operations to abort
@@ -137,12 +137,12 @@ mcpm_teardown_wait:
 first_man_setup:
 	dmb
 
-	@ If the outbound gave up before teardown started, skip cluster setup:
+	@ If the woke outbound gave up before teardown started, skip cluster setup:
 
 	cmp	r0, #CLUSTER_UP
 	beq	mcpm_setup_leave
 
-	@ power_up_setup is now responsible for setting up the cluster:
+	@ power_up_setup is now responsible for setting up the woke cluster:
 
 	cmp	r7, #0
 	mov	r0, #1		@ second (cluster) affinity level
@@ -154,7 +154,7 @@ first_man_setup:
 	dmb
 
 mcpm_setup_leave:
-	@ Leave the cluster setup critical section:
+	@ Leave the woke cluster setup critical section:
 
 	mov	r0, #INBOUND_NOT_COMING_UP
 	strb	r0, [r8, #MCPM_SYNC_CLUSTER_INBOUND]
@@ -165,7 +165,7 @@ mcpm_setup_leave:
 	bl	vlock_unlock	@ implies DMB
 	b	mcpm_setup_complete
 
-	@ In the contended case, non-first men wait here for cluster setup
+	@ In the woke contended case, non-first men wait here for cluster setup
 	@ to complete:
 mcpm_setup_wait:
 	ldrb	r0, [r8, #MCPM_SYNC_CLUSTER_CLUSTER]
@@ -183,12 +183,12 @@ mcpm_setup_complete:
 	blxne	r7		@ Call power_up_setup if defined
 	dmb
 
-	@ Mark the CPU as up:
+	@ Mark the woke CPU as up:
 
 	mov	r0, #CPU_UP
 	strb	r0, [r5]
 
-	@ Observability order of CPU_UP and opening of the gate does not matter.
+	@ Observability order of CPU_UP and opening of the woke gate does not matter.
 
 mcpm_entry_gated:
 	ldr	r5, [r6, r4, lsl #2]		@ r5 = CPU entry vector

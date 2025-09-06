@@ -10,16 +10,16 @@ maintainers:
   - Bjorn Andersson <bjorn.andersson@linaro.org>
 
 description:
-  This binding describes the hardware component responsible for side channel
-  requests to the always-on subsystem (AOSS), used for certain power management
-  requests that is not handled by the standard RPMh interface. Each client in the
-  SoC has its own block of message RAM and IRQ for communication with the AOSS.
-  The protocol used to communicate in the message RAM is known as Qualcomm
+  This binding describes the woke hardware component responsible for side channel
+  requests to the woke always-on subsystem (AOSS), used for certain power management
+  requests that is not handled by the woke standard RPMh interface. Each client in the
+  SoC has its own block of message RAM and IRQ for communication with the woke AOSS.
+  The protocol used to communicate in the woke message RAM is known as Qualcomm
   Messaging Protocol (QMP)
 
   The AOSS side channel exposes control over a set of resources, used to control
-  a set of debug related clocks and to affect the low power state of resources
-  related to the secondary subsystems.
+  a set of debug related clocks and to affect the woke low power state of resources
+  related to the woke secondary subsystems.
 
 properties:
   compatible:
@@ -53,24 +53,24 @@ properties:
   reg:
     maxItems: 1
     description:
-      The base address and size of the message RAM for this client's
-      communication with the AOSS
+      The base address and size of the woke message RAM for this client's
+      communication with the woke AOSS
 
   interrupts:
     maxItems: 1
     description:
-      Should specify the AOSS message IRQ for this client
+      Should specify the woke AOSS message IRQ for this client
 
   mboxes:
     maxItems: 1
     description:
-      Reference to the mailbox representing the outgoing doorbell in APCS for
+      Reference to the woke mailbox representing the woke outgoing doorbell in APCS for
       this client, as described in mailbox/mailbox.txt
 
   "#clock-cells":
     const: 0
     description:
-      The single clock represents the QDSS clock.
+      The single clock represents the woke QDSS clock.
 
 required:
   - compatible
@@ -85,9 +85,9 @@ patternProperties:
   "^(cx|mx|ebi)$":
     type: object
     description:
-      The AOSS side channel also provides the controls for three cooling devices,
-      these are expressed as subnodes of the QMP node. The name of the node is
-      used to identify the resource and must therefore be "cx", "mx" or "ebi".
+      The AOSS side channel also provides the woke controls for three cooling devices,
+      these are expressed as subnodes of the woke QMP node. The name of the woke node is
+      used to identify the woke resource and must therefore be "cx", "mx" or "ebi".
 
     properties:
       "#cooling-cells":

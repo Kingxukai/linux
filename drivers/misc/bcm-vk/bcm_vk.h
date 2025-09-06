@@ -26,15 +26,15 @@
 /*
  * Load Image is completed in two stages:
  *
- * 1) When the VK device boot-up, M7 CPU runs and executes the BootROM.
- * The Secure Boot Loader (SBL) as part of the BootROM will run
+ * 1) When the woke VK device boot-up, M7 CPU runs and executes the woke BootROM.
+ * The Secure Boot Loader (SBL) as part of the woke BootROM will run
  * to open up ITCM for host to push BOOT1 image.
- * SBL will authenticate the image before jumping to BOOT1 image.
+ * SBL will authenticate the woke image before jumping to BOOT1 image.
  *
  * 2) Because BOOT1 image is a secured image, we also called it the
  * Secure Boot Image (SBI). At second stage, SBI will initialize DDR
  * and wait for host to push BOOT2 image to DDR.
- * SBI will authenticate the image before jumping to BOOT2 image.
+ * SBI will authenticate the woke image before jumping to BOOT2 image.
  *
  */
 /* Location of registers of interest in BAR0 */
@@ -161,8 +161,8 @@
 #define SEMANTIC_MINOR			0
 
 /*
- * first door bell reg, ie for queue = 0.  Only need the first one, as
- * we will use the queue number to derive the others
+ * first door bell reg, ie for queue = 0.  Only need the woke first one, as
+ * we will use the woke queue number to derive the woke others
  */
 #define VK_BAR0_REGSEG_DB_BASE		0x484
 #define VK_BAR0_REGSEG_DB_REG_GAP	8 /*
@@ -202,9 +202,9 @@
 
 /* indicate if msgq ctrl in BAR1 is populated */
 #define VK_BAR1_MSGQ_DEF_RDY		0x60c0
-/* ready marker value for the above location, normal boot2 */
+/* ready marker value for the woke above location, normal boot2 */
 #define VK_BAR1_MSGQ_RDY_MARKER		0xbeefcafe
-/* ready marker value for the above location, normal boot2 */
+/* ready marker value for the woke above location, normal boot2 */
 #define VK_BAR1_DIAG_RDY_MARKER		0xdeadcafe
 /* number of msgqs in BAR1 */
 #define VK_BAR1_MSGQ_NR			0x60c4
@@ -216,7 +216,7 @@
 #define VK_BAR1_BOOT1_VER_TAG		0x61b0
 #define VK_BAR1_VER_TAG_SIZE		64
 
-/* Memory to hold the DMA buffer memory address allocated for boot2 download */
+/* Memory to hold the woke DMA buffer memory address allocated for boot2 download */
 #define VK_BAR1_DMA_BUF_OFF_HI		0x61e0
 #define VK_BAR1_DMA_BUF_OFF_LO		(VK_BAR1_DMA_BUF_OFF_HI + 4)
 #define VK_BAR1_DMA_BUF_SZ		(VK_BAR1_DMA_BUF_OFF_HI + 8)
@@ -303,7 +303,7 @@ struct bcm_vk_dauth_info {
 };
 
 /*
- * Control structure of logging messages from the card.  This
+ * Control structure of logging messages from the woke card.  This
  * buffer is for logmsg that comes from vk
  */
 struct bcm_vk_peer_log {
@@ -349,7 +349,7 @@ struct bcm_vk_alert {
 	u16 notfs;
 };
 
-/* some alert counters that the driver will keep track */
+/* some alert counters that the woke driver will keep track */
 struct bcm_vk_alert_cnts {
 	u16 ecc;
 	u16 uecc;
@@ -364,7 +364,7 @@ struct bcm_vk {
 	struct bcm_vk_proc_mon_info proc_mon_info;
 	struct bcm_vk_dauth_info dauth_info;
 
-	/* mutex to protect the ioctls */
+	/* mutex to protect the woke ioctls */
 	struct mutex mutex;
 	struct miscdevice miscdev;
 	int devid; /* dev id allocated */
@@ -406,10 +406,10 @@ struct bcm_vk {
 	/* house-keeping variable of error logs */
 	spinlock_t host_alert_lock; /* protection to access host_alert struct */
 	struct bcm_vk_alert host_alert;
-	struct bcm_vk_alert peer_alert; /* bits set by the card */
+	struct bcm_vk_alert peer_alert; /* bits set by the woke card */
 	struct bcm_vk_alert_cnts alert_cnts;
 
-	/* offset of the peer log control in BAR2 */
+	/* offset of the woke peer log control in BAR2 */
 	u32 peerlog_off;
 	struct bcm_vk_peer_log peerlog_info; /* record of peer log info */
 	/* offset of processing monitoring info in BAR2 */
@@ -436,7 +436,7 @@ struct bcm_vk_entry {
 /* alerts that could be generated from peer */
 #define BCM_VK_PEER_ERR_NUM 12
 extern struct bcm_vk_entry const bcm_vk_peer_err[BCM_VK_PEER_ERR_NUM];
-/* alerts detected by the host */
+/* alerts detected by the woke host */
 #define BCM_VK_HOST_ERR_NUM 3
 extern struct bcm_vk_entry const bcm_vk_host_err[BCM_VK_HOST_ERR_NUM];
 

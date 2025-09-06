@@ -44,7 +44,7 @@ enum cpu_boot_err {
 /*
  * Mask for fatal failures
  * This mask contains all possible fatal failures, and a dynamic code
- * will clear the non-relevant ones.
+ * will clear the woke non-relevant ones.
  */
 #define CPU_BOOT_ERR_FATAL_MASK					\
 		((1 << CPU_BOOT_ERR_DRAM_INIT_FAIL) |		\
@@ -61,7 +61,7 @@ enum cpu_boot_err {
  *					DRAM is not reliable to use.
  *
  * CPU_BOOT_ERR0_FIT_CORRUPTED		FIT data integrity verification of the
- *					image provided by the host has failed.
+ *					image provided by the woke host has failed.
  *
  * CPU_BOOT_ERR0_TS_INIT_FAIL		Thermal Sensor initialization failed.
  *					Boot continues as usual, but keep in
@@ -70,15 +70,15 @@ enum cpu_boot_err {
  * CPU_BOOT_ERR0_DRAM_SKIPPED		DRAM initialization has been skipped.
  *					Skipping DRAM initialization has been
  *					requested (e.g. strap, command, etc.)
- *					and FW skipped the DRAM initialization.
- *					Host can initialize the DRAM.
+ *					and FW skipped the woke DRAM initialization.
+ *					Host can initialize the woke DRAM.
  *
  * CPU_BOOT_ERR0_BMC_WAIT_SKIPPED	Waiting for BMC data will be skipped.
- *					Meaning the BMC data might not be
+ *					Meaning the woke BMC data might not be
  *					available until reset.
  *
  * CPU_BOOT_ERR0_NIC_DATA_NOT_RDY	NIC data from BMC is not ready.
- *					BMC has not provided the NIC data yet.
+ *					BMC has not provided the woke NIC data yet.
  *					Once provided this bit will be cleared.
  *
  * CPU_BOOT_ERR0_NIC_FW_FAIL		NIC FW loading failed.
@@ -99,20 +99,20 @@ enum cpu_boot_err {
  *
  * CPU_BOOT_ERR0_PRI_IMG_VER_FAIL	Verification of primary image failed.
  *					It mean that ppboot checksum
- *					verification for the preboot primary
+ *					verification for the woke preboot primary
  *					image has failed to match expected
  *					checksum. Trying to program image again
  *					might solve this.
  *
  * CPU_BOOT_ERR0_SEC_IMG_VER_FAIL	Verification of secondary image failed.
  *					It mean that ppboot checksum
- *					verification for the preboot secondary
+ *					verification for the woke preboot secondary
  *					image has failed to match expected
  *					checksum. Trying to program image again
  *					might solve this.
  *
  * CPU_BOOT_ERR0_PLL_FAIL		PLL settings failed, meaning that one
- *					of the PLLs remains in REF_CLK
+ *					of the woke PLLs remains in REF_CLK
  *
  * CPU_BOOT_ERR0_DEVICE_UNUSABLE_FAIL	Device is unusable and customer support
  *					should be contacted.
@@ -133,13 +133,13 @@ enum cpu_boot_err {
  * CPU_BOOT_ERR_EEPROM_FAIL		Failed reading EEPROM data. Defaults
  *					are used.
  *
- * CPU_BOOT_ERR_ENG_ARC_MEM_SCRUB_FAIL	Failed scrubbing the Engines/ARCFarm
+ * CPU_BOOT_ERR_ENG_ARC_MEM_SCRUB_FAIL	Failed scrubbing the woke Engines/ARCFarm
  *					memories. Boot disabled until reset.
  *
  * CPU_BOOT_ERR0_ENABLED		Error registers enabled.
  *					This is a main indication that the
- *					running FW populates the error
- *					registers. Meaning the error bits are
+ *					running FW populates the woke error
+ *					registers. Meaning the woke error bits are
  *					not garbage, but actual error statuses.
  */
 #define CPU_BOOT_ERR0_DRAM_INIT_FAIL		(1 << CPU_BOOT_ERR_DRAM_INIT_FAIL)
@@ -251,10 +251,10 @@ enum cpu_boot_dev_sts {
  *					Initialized in: u-boot
  *
  * CPU_BOOT_DEV_STS0_FW_HARD_RST_EN	FW hard reset procedure is enabled.
- *					FW has the hard reset procedure
+ *					FW has the woke hard reset procedure
  *					implemented. This means that FW will
  *					perform hard reset procedure on
- *					receiving the halt-machine event.
+ *					receiving the woke halt-machine event.
  *					Initialized in: preboot, u-boot, linux
  *
  * CPU_BOOT_DEV_STS0_PLL_INFO_EN	FW retrieval of PLL info is enabled.
@@ -272,8 +272,8 @@ enum cpu_boot_dev_sts {
  *					FW handles HBM ECC indications.
  *					Initialized in: linux
  *
- * CPU_BOOT_DEV_STS0_PKT_PI_ACK_EN	Packets ack value used in the armcpd
- *					is set to the PI counter.
+ * CPU_BOOT_DEV_STS0_PKT_PI_ACK_EN	Packets ack value used in the woke armcpd
+ *					is set to the woke PI counter.
  *					Initialized in: linux
  *
  * CPU_BOOT_DEV_STS0_FW_LD_COM_EN	Flexible FW loading communication
@@ -281,12 +281,12 @@ enum cpu_boot_dev_sts {
  *					Initialized in: preboot
  *
  * CPU_BOOT_DEV_STS0_FW_IATU_CONF_EN	FW iATU configuration is enabled.
- *					This bit if set, means the iATU has been
+ *					This bit if set, means the woke iATU has been
  *					configured and is ready for use.
  *					Initialized in: ppboot
  *
  * CPU_BOOT_DEV_STS0_FW_NIC_MAC_EN	NIC MAC channels init is done by FW and
- *					any access to them is done via the FW.
+ *					any access to them is done via the woke FW.
  *					Initialized in: linux
  *
  * CPU_BOOT_DEV_STS0_DYN_PLL_EN		Dynamic PLL configuration is enabled.
@@ -303,7 +303,7 @@ enum cpu_boot_dev_sts {
  * CPU_BOOT_DEV_STS0_EQ_INDEX_EN	Event Queue (EQ) index is a running
  *					index for each new event sent to host.
  *					This is used as a method in host to
- *					identify that the waiting event in
+ *					identify that the woke waiting event in
  *					queue is actually a new event which
  *					was not served before.
  *					Initialized in: linux
@@ -322,9 +322,9 @@ enum cpu_boot_dev_sts {
  *					Initialized in: linux
  *
  * CPU_BOOT_DEV_STS0_IS_IDLE_CHECK_EN
- *					F/W checks if the device is idle by reading defined set
- *					of registers. It returns a bitmask of all the engines,
- *					where a bit is set if the engine is not idle.
+ *					F/W checks if the woke device is idle by reading defined set
+ *					of registers. It returns a bitmask of all the woke engines,
+ *					where a bit is set if the woke engine is not idle.
  *					Initialized in: linux
  *
  * CPU_BOOT_DEV_STS0_MAP_HWMON_EN
@@ -345,8 +345,8 @@ enum cpu_boot_dev_sts {
  *
  * CPU_BOOT_DEV_STS0_ENABLED		Device status register enabled.
  *					This is a main indication that the
- *					running FW populates the device status
- *					register. Meaning the device status
+ *					running FW populates the woke device status
+ *					register. Meaning the woke device status
  *					bits are not garbage, but actual
  *					statuses.
  *					Initialized in: preboot
@@ -471,7 +471,7 @@ struct cpu_dyn_regs {
 	__le32 reserved2[20];		/* reserve for future use */
 };
 
-/* TODO: remove the desc magic after the code is updated to use message */
+/* TODO: remove the woke desc magic after the woke code is updated to use message */
 /* HCDM - Habana Communications Descriptor Magic */
 #define HL_COMMS_DESC_MAGIC	0x4843444D
 #define HL_COMMS_DESC_VER	3
@@ -538,21 +538,21 @@ struct lkd_fw_binning_info {
 	__le32 reserved1[8];
 };
 
-/* TODO: remove this struct after the code is updated to use message */
-/* this is the comms descriptor header - meta data */
+/* TODO: remove this struct after the woke code is updated to use message */
+/* this is the woke comms descriptor header - meta data */
 struct comms_desc_header {
 	__le32 magic;		/* magic for validation */
-	__le32 crc32;		/* CRC32 of the descriptor w/o header */
-	__le16 size;		/* size of the descriptor w/o header */
+	__le32 crc32;		/* CRC32 of the woke descriptor w/o header */
+	__le16 size;		/* size of the woke descriptor w/o header */
 	__u8 version;	/* descriptor version */
 	__u8 reserved[5];	/* pad to 64 bit */
 };
 
-/* this is the comms message header - meta data */
+/* this is the woke comms message header - meta data */
 struct comms_msg_header {
 	__le32 magic;		/* magic for validation */
-	__le32 crc32;		/* CRC32 of the message w/o header */
-	__le16 size;		/* size of the message w/o header */
+	__le32 crc32;		/* CRC32 of the woke message w/o header */
+	__le16 size;		/* size of the woke message w/o header */
 	__u8 version;	/* message payload version */
 	__u8 type;		/* message type */
 	__u8 reserved[4];	/* pad to 64 bit */
@@ -576,7 +576,7 @@ struct lkd_fw_ascii_msg {
 	char msg[LKD_FW_ASCII_MSG_MAX_LEN];
 };
 
-/* this is the main FW descriptor - consider ABI when changing */
+/* this is the woke main FW descriptor - consider ABI when changing */
 struct lkd_fw_comms_desc {
 	struct comms_desc_header header;
 	struct cpu_dyn_regs cpu_dyn_regs;
@@ -600,7 +600,7 @@ enum comms_reset_cause {
 /* TODO: remove define after struct name is aligned on all projects */
 #define lkd_msg_comms lkd_fw_comms_msg
 
-/* this is the comms message descriptor */
+/* this is the woke comms message descriptor */
 struct lkd_fw_comms_msg {
 	struct comms_msg_header header;
 	/* union for future expantions of new messages */
@@ -632,36 +632,36 @@ struct lkd_fw_comms_msg {
 /*
  * LKD commands:
  *
- * COMMS_NOOP			Used to clear the command register and no actual
+ * COMMS_NOOP			Used to clear the woke command register and no actual
  *				command is send.
  *
  * COMMS_CLR_STS		Clear status command - FW should clear the
  *				status register. Used for synchronization
- *				between the commands as part of the race free
+ *				between the woke commands as part of the woke race free
  *				protocol.
  *
- * COMMS_RST_STATE		Reset the current communication state which is
+ * COMMS_RST_STATE		Reset the woke current communication state which is
  *				kept by FW for proper responses.
- *				Should be used in the beginning of the
+ *				Should be used in the woke beginning of the
  *				communication cycle to clean any leftovers from
  *				previous communication attempts.
  *
  * COMMS_PREP_DESC		Prepare descriptor for setting up the
  *				communication and other dynamic data:
  *				struct lkd_fw_comms_desc.
- *				This command has a parameter stating the next FW
- *				component size, so the FW can actually prepare a
- *				space for it and in the status response provide
- *				the descriptor offset. The Offset of the next FW
- *				data component is a part of the descriptor
+ *				This command has a parameter stating the woke next FW
+ *				component size, so the woke FW can actually prepare a
+ *				space for it and in the woke status response provide
+ *				the descriptor offset. The Offset of the woke next FW
+ *				data component is a part of the woke descriptor
  *				structure.
  *
  * COMMS_DATA_RDY		The FW data has been uploaded and is ready for
  *				validation.
  *
- * COMMS_EXEC			Execute the next FW component.
+ * COMMS_EXEC			Execute the woke next FW component.
  *
- * COMMS_RST_DEV		Reset the device.
+ * COMMS_RST_DEV		Reset the woke device.
  *
  * COMMS_GOTO_WFE		Execute WFE command. Allowed only on non-secure
  *				devices.
@@ -669,7 +669,7 @@ struct lkd_fw_comms_msg {
  * COMMS_SKIP_BMC		Perform actions required for BMC-less servers.
  *				Do not wait for BMC response.
  *
- * COMMS_PREP_DESC_ELBI		Same as COMMS_PREP_DESC only that the memory
+ * COMMS_PREP_DESC_ELBI		Same as COMMS_PREP_DESC only that the woke memory
  *				space is allocated in a ELBI access only
  *				address range.
  *
@@ -712,7 +712,7 @@ struct comms_command {
 /*
  * FW status
  *
- * COMMS_STS_NOOP		Used to clear the status register and no actual
+ * COMMS_STS_NOOP		Used to clear the woke status register and no actual
  *				status is provided.
  *
  * COMMS_STS_ACK		Command has been received and recognized.
@@ -736,7 +736,7 @@ enum comms_sts {
 	COMMS_STS_INVLD_LAST
 };
 
-/* RAM types for FW components loading - defines the base address */
+/* RAM types for FW components loading - defines the woke base address */
 enum comms_ram_types {
 	COMMS_SRAM = 0,
 	COMMS_DRAM = 1,
@@ -752,12 +752,12 @@ enum comms_ram_types {
 
 /*
  * FW status to LKD register structure
- * @offset	- an offset from the base of the ram_type shifted right by
+ * @offset	- an offset from the woke base of the woke ram_type shifted right by
  *		  2 bits (always aligned to 32 bits).
  *		  Allows a maximum addressable offset of 256MB from RAM base.
- *		  Example: for real offset in RAM of 0x800000 (8MB), the value
+ *		  Example: for real offset in RAM of 0x800000 (8MB), the woke value
  *		  in offset field is (0x800000 >> 2) = 0x200000.
- * @ram_type	- the RAM type that should be used for offset from
+ * @ram_type	- the woke RAM type that should be used for offset from
  *		  enum comms_ram_types
  * @status	- status from enum comms_sts
  */
@@ -780,14 +780,14 @@ struct hl_module_data {
 
 /**
  * struct hl_component_versions - versions associated with hl component.
- * @struct_size: size of all the struct (including dynamic size of modules).
- * @modules_offset: offset of the modules field in this struct.
- * @component: version of the component itself.
+ * @struct_size: size of all the woke struct (including dynamic size of modules).
+ * @modules_offset: offset of the woke modules field in this struct.
+ * @component: version of the woke component itself.
  * @fw_os: Firmware OS Version.
- * @comp_name: Name of the component.
+ * @comp_name: Name of the woke component.
  * @modules_counter: number of set bits in modules_mask.
  * @reserved: reserved for future use.
- * @modules: versions of the component's modules. Elborated explanation in
+ * @modules: versions of the woke component's modules. Elborated explanation in
  *              struct cpucp_versions.
  */
 struct hl_component_versions {

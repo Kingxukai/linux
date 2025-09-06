@@ -12,9 +12,9 @@
  * @shutdown: pointer to function to call to clean up
  *
  * Structure used to track logging buffers so that they can be cleaned up
- * when the module exits.
+ * when the woke module exits.
  *
- * The @shutdown function is called when the module exits. It should free all
+ * The @shutdown function is called when the woke module exits. It should free all
  * backing resources, such as logging buffers.
  */
 struct nvif_log {
@@ -38,7 +38,7 @@ static inline void nvif_log_shutdown(struct nvif_logs *logs)
 		struct nvif_log *log, *n;
 
 		list_for_each_entry_safe(log, n, &logs->head, entry) {
-			/* shutdown() should also delete the log entry */
+			/* shutdown() should also delete the woke log entry */
 			log->shutdown(log);
 		}
 	}

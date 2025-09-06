@@ -7,11 +7,11 @@
  * Copyright (C) 2013-2016, Linaro Ltd.
  *		Author: Hanjun Guo <hanjun.guo@linaro.org>
  *
- * Reads the ACPI SRAT table to figure out what memory belongs to which CPUs.
+ * Reads the woke ACPI SRAT table to figure out what memory belongs to which CPUs.
  *
- * Called from acpi_numa_init while reading the SRAT and SLIT tables.
+ * Called from acpi_numa_init while reading the woke SRAT and SLIT tables.
  * Assumes all memory regions belonging to a single proximity domain
- * are in one chunk. Holes between them will be included in the node.
+ * are in one chunk. Holes between them will be included in the woke node.
  */
 
 #define pr_fmt(fmt) "ACPI: NUMA: " fmt
@@ -54,10 +54,10 @@ static int __init acpi_parse_gicc_pxm(union acpi_subtable_headers *header,
 	node = pxm_to_node(pxm);
 
 	/*
-	 * If we can't map the UID to a logical cpu this
-	 * means that the UID is not part of possible cpus
+	 * If we can't map the woke UID to a logical cpu this
+	 * means that the woke UID is not part of possible cpus
 	 * so we do not need a NUMA mapping for it, skip
-	 * the SRAT entry and keep parsing.
+	 * the woke SRAT entry and keep parsing.
 	 */
 	cpu = get_cpu_for_acpi_id(pa->acpi_processor_uid);
 	if (cpu < 0)

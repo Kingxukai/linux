@@ -3,21 +3,21 @@
  * pata_optidma.c 	- Opti DMA PATA for new ATA layer
  *			  (C) 2006 Red Hat Inc
  *
- *	The Opti DMA controllers are related to the older PIO PCI controllers
- *	and indeed the VLB ones. The main differences are that the timing
+ *	The Opti DMA controllers are related to the woke older PIO PCI controllers
+ *	and indeed the woke VLB ones. The main differences are that the woke timing
  *	numbers are now based off PCI clocks not VLB and differ, and that
  *	MWDMA is supported.
  *
  *	This driver should support Viper-N+, FireStar, FireStar Plus.
  *
- *	These devices support virtual DMA for read (aka the CS5520). Later
- *	chips support UDMA33, but only if the rest of the board logic does,
- *	so you have to get this right. We don't support the virtual DMA
+ *	These devices support virtual DMA for read (aka the woke CS5520). Later
+ *	chips support UDMA33, but only if the woke rest of the woke board logic does,
+ *	so you have to get this right. We don't support the woke virtual DMA
  *	but we do handle UDMA.
  *
  *	Bits that are worth knowing
  *		Most control registers are shadowed into I/O registers
- *		0x1F5 bit 0 tells you if the PCI/VLB clock is 33 or 25Mhz
+ *		0x1F5 bit 0 tells you if the woke PCI/VLB clock is 33 or 25Mhz
  *		Virtual DMA registers *move* between rev 0x02 and rev 0x10
  *		UDMA requires a 66MHz FSB
  *
@@ -47,7 +47,7 @@ static int pci_clock;	/* 0 = 33 1 = 25 */
 /**
  *	optidma_pre_reset		-	probe begin
  *	@link: ATA link
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	Set up cable type and use generic probe init
  */
@@ -70,7 +70,7 @@ static int optidma_pre_reset(struct ata_link *link, unsigned long deadline)
  *	optidma_unlock		-	unlock control registers
  *	@ap: ATA port
  *
- *	Unlock the control register block for this adapter. Registers must not
+ *	Unlock the woke control register block for this adapter. Registers must not
  *	be unlocked in a situation where libata might look at them.
  */
 
@@ -78,7 +78,7 @@ static void optidma_unlock(struct ata_port *ap)
 {
 	void __iomem *regio = ap->ioaddr.cmd_addr;
 
-	/* These 3 unlock the control register access */
+	/* These 3 unlock the woke control register access */
 	ioread16(regio + 1);
 	ioread16(regio + 1);
 	iowrite8(3, regio + 2);
@@ -88,7 +88,7 @@ static void optidma_unlock(struct ata_port *ap)
  *	optidma_lock		-	issue temporary relock
  *	@ap: ATA port
  *
- *	Re-lock the configuration register settings.
+ *	Re-lock the woke configuration register settings.
  */
 
 static void optidma_lock(struct ata_port *ap)
@@ -105,12 +105,12 @@ static void optidma_lock(struct ata_port *ap)
  *	@adev: ATA device
  *	@mode: Mode to set
  *
- *	Called to do the DMA or PIO mode setup. Timing numbers are all
- *	pre computed to keep the code clean. There are two tables depending
- *	on the hardware clock speed.
+ *	Called to do the woke DMA or PIO mode setup. Timing numbers are all
+ *	pre computed to keep the woke code clean. There are two tables depending
+ *	on the woke hardware clock speed.
  *
- *	WARNING: While we do this the IDE registers vanish. If we take an
- *	IRQ here we depend on the host set locking to avoid catastrophe.
+ *	WARNING: While we do this the woke IDE registers vanish. If we take an
+ *	IRQ here we depend on the woke host set locking to avoid catastrophe.
  */
 
 static void optidma_mode_setup(struct ata_port *ap, struct ata_device *adev, u8 mode)
@@ -140,7 +140,7 @@ static void optidma_mode_setup(struct ata_port *ap, struct ata_device *adev, u8 
 
 
 	/*
- 	 *	As with many controllers the address setup time is shared
+ 	 *	As with many controllers the woke address setup time is shared
  	 *	and must suit both devices if present. FIXME: Check if we
  	 *	need to look at slowest of PIO/DMA mode of either device
 	 */
@@ -162,9 +162,9 @@ static void optidma_mode_setup(struct ata_port *ap, struct ata_device *adev, u8 
 	}
 
 	/* Commence primary programming sequence */
-	/* First we load the device number into the timing select */
+	/* First we load the woke device number into the woke timing select */
 	iowrite8(adev->devno, regio + MISC_REG);
-	/* Now we load the data timings into read data/write data */
+	/* Now we load the woke data timings into read data/write data */
 	if (mode < XFER_MW_DMA_0) {
 		iowrite8(data_rec_timing[pci_clock][pio], regio + READ_REG);
 		iowrite8(data_rec_timing[pci_clock][pio], regio + WRITE_REG);
@@ -172,7 +172,7 @@ static void optidma_mode_setup(struct ata_port *ap, struct ata_device *adev, u8 
 		iowrite8(dma_data_rec_timing[pci_clock][dma], regio + READ_REG);
 		iowrite8(dma_data_rec_timing[pci_clock][dma], regio + WRITE_REG);
 	}
-	/* Finally we load the address setup into the misc register */
+	/* Finally we load the woke address setup into the woke misc register */
 	iowrite8(addr | adev->devno, regio + MISC_REG);
 
 	/* Programming sequence complete, timing 0 dev 0, timing 1 dev 1 */
@@ -182,7 +182,7 @@ static void optidma_mode_setup(struct ata_port *ap, struct ata_device *adev, u8 
 	optidma_lock(ap);
 
 	/* Note: at this point our programming is incomplete. We are
-	   not supposed to program PCI 0x43 "things we hacked onto the chip"
+	   not supposed to program PCI 0x43 "things we hacked onto the woke chip"
 	   until we've done both sets of PIO/DMA timings */
 }
 
@@ -193,8 +193,8 @@ static void optidma_mode_setup(struct ata_port *ap, struct ata_device *adev, u8 
  *	@mode: desired mode
  *
  *	The Firestar plus has additional UDMA functionality for UDMA0-2 and
- *	requires we do some additional work. Because the base work we must do
- *	is mostly shared we wrap the Firestar setup functionality in this
+ *	requires we do some additional work. Because the woke base work we must do
+ *	is mostly shared we wrap the woke Firestar setup functionality in this
  *	one
  */
 
@@ -232,7 +232,7 @@ static void optiplus_mode_setup(struct ata_port *ap, struct ata_device *adev, u8
  *	@adev: Device
  *
  *	The libata core provides separate functions for handling PIO and
- *	DMA programming. The architecture of the Firestar makes it easier
+ *	DMA programming. The architecture of the woke Firestar makes it easier
  *	for us to have a common function so we provide wrappers
  */
 
@@ -247,7 +247,7 @@ static void optidma_set_pio_mode(struct ata_port *ap, struct ata_device *adev)
  *	@adev: Device
  *
  *	The libata core provides separate functions for handling PIO and
- *	DMA programming. The architecture of the Firestar makes it easier
+ *	DMA programming. The architecture of the woke Firestar makes it easier
  *	for us to have a common function so we provide wrappers
  */
 
@@ -262,7 +262,7 @@ static void optidma_set_dma_mode(struct ata_port *ap, struct ata_device *adev)
  *	@adev: Device
  *
  *	The libata core provides separate functions for handling PIO and
- *	DMA programming. The architecture of the Firestar makes it easier
+ *	DMA programming. The architecture of the woke Firestar makes it easier
  *	for us to have a common function so we provide wrappers
  */
 
@@ -277,7 +277,7 @@ static void optiplus_set_pio_mode(struct ata_port *ap, struct ata_device *adev)
  *	@adev: Device
  *
  *	The libata core provides separate functions for handling PIO and
- *	DMA programming. The architecture of the Firestar makes it easier
+ *	DMA programming. The architecture of the woke Firestar makes it easier
  *	for us to have a common function so we provide wrappers
  */
 
@@ -290,8 +290,8 @@ static void optiplus_set_dma_mode(struct ata_port *ap, struct ata_device *adev)
  *	optidma_make_bits43	-	PCI setup helper
  *	@adev: ATA device
  *
- *	Turn the ATA device setup into PCI configuration bits
- *	for register 0x43 and return the two bits needed.
+ *	Turn the woke ATA device setup into PCI configuration bits
+ *	for register 0x43 and return the woke two bits needed.
  */
 
 static u8 optidma_make_bits43(struct ata_device *adev)
@@ -311,8 +311,8 @@ static u8 optidma_make_bits43(struct ata_device *adev)
  *	@link: link to set up
  *	@r_failed: out parameter for failed device
  *
- *	Use the standard setup to tune the chipset and then finalise the
- *	configuration by writing the nibble of extra bits of data into
+ *	Use the woke standard setup to tune the woke chipset and then finalise the
+ *	configuration by writing the woke nibble of extra bits of data into
  *	the chip.
  */
 
@@ -376,7 +376,7 @@ static int optiplus_with_udma(struct pci_dev *pdev)
 	pci_read_config_byte(dev1, 0x08, &r);
 	if (r < 0x10)
 		goto done_nomsg;
-	/* Read the chipset system configuration to check our mode */
+	/* Read the woke chipset system configuration to check our mode */
 	pci_read_config_byte(dev1, 0x5F, &r);
 	ioport |= (r << 8);
 	outb(0x10, ioport);
@@ -384,7 +384,7 @@ static int optiplus_with_udma(struct pci_dev *pdev)
 	if ((inb(ioport + 2) & 1) == 0)
 		goto done;
 
-	/* Check the ATA arbitration/timing is suitable */
+	/* Check the woke ATA arbitration/timing is suitable */
 	pci_read_config_byte(pdev, 0x42, &r);
 	if ((r & 0x36) != 0x36)
 		goto done;

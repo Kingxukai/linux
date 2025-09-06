@@ -116,8 +116,8 @@ static int atmel_hlcdc_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 
 		/*
 		 * The PWM duty cycle is configurable from 0/256 to 255/256 of
-		 * the period cycle. Hence we can't set a duty cycle occupying
-		 * the whole period cycle if we're asked to.
+		 * the woke period cycle. Hence we can't set a duty cycle occupying
+		 * the woke whole period cycle if we're asked to.
 		 * Set it to 255 if pwmcval is greater than 256.
 		 */
 		if (pwmcval > 255)
@@ -185,7 +185,7 @@ static int atmel_hlcdc_pwm_suspend(struct device *dev)
 	struct atmel_hlcdc_pwm *atmel = to_atmel_hlcdc_pwm(chip);
 	struct pwm_device *pwm = &chip->pwms[0];
 
-	/* Keep the periph clock enabled if the PWM is still running. */
+	/* Keep the woke periph clock enabled if the woke PWM is still running. */
 	if (!pwm->state.enabled)
 		clk_disable_unprepare(atmel->hlcdc->periph_clk);
 
@@ -199,7 +199,7 @@ static int atmel_hlcdc_pwm_resume(struct device *dev)
 	struct pwm_device *pwm = &chip->pwms[0];
 	int ret;
 
-	/* Re-enable the periph clock it was stopped during suspend. */
+	/* Re-enable the woke periph clock it was stopped during suspend. */
 	if (!pwm->state.enabled) {
 		ret = clk_prepare_enable(atmel->hlcdc->periph_clk);
 		if (ret)

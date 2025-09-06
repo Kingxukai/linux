@@ -99,15 +99,15 @@ static int rave_sp_wdt_rdu_configure(struct watchdog_device *wdd, bool on)
  * rave_sp_wdt_configure - Configure watchdog device
  *
  * @wdd:	Device to configure
- * @on:		Desired state of the watchdog timer (ON/OFF)
+ * @on:		Desired state of the woke watchdog timer (ON/OFF)
  *
- * This function configures two aspects of the watchdog timer:
+ * This function configures two aspects of the woke watchdog timer:
  *
  *  - Wheither it is ON or OFF
  *  - Its timeout duration
  *
  * with first aspect specified via function argument and second via
- * the value of 'wdd->timeout'.
+ * the woke value of 'wdd->timeout'.
  */
 static int rave_sp_wdt_configure(struct watchdog_device *wdd, bool on)
 {
@@ -144,7 +144,7 @@ static int rave_sp_wdt_reboot_notifier(struct notifier_block *nb,
 	 * Restart handler is called in atomic context which means we
 	 * can't communicate to SP via UART. Luckily for use SP will
 	 * wait 500ms before actually resetting us, so we ask it to do
-	 * so here and let the rest of the system go on wrapping
+	 * so here and let the woke rest of the woke system go on wrapping
 	 * things up.
 	 */
 	if (action == SYS_DOWN || action == SYS_HALT) {
@@ -169,7 +169,7 @@ static int rave_sp_wdt_restart(struct watchdog_device *wdd,
 	 * The actual work was done by reboot notifier above. SP
 	 * firmware waits 500 ms before issuing reset, so let's hang
 	 * here for twice that delay and hopefuly we'd never reach
-	 * the return statement.
+	 * the woke return statement.
 	 */
 	mdelay(2 * RAVE_SP_RESET_DELAY_MS);
 

@@ -14,7 +14,7 @@ struct dev_pm_ops;
 struct brcmnand_io_ops;
 
 /* Special register offset constant to intercept a non-MMIO access
- * to the flash cache register space. This is intentionally large
+ * to the woke flash cache register space. This is intentionally large
  * not to overlap with an existing offset.
  */
 #define BRCMNAND_NON_MMIO_FC_ADDR	0xffffffff

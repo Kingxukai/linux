@@ -2,7 +2,7 @@
 /* linux/arch/sparc64/kernel/sys_sparc.c
  *
  * This file contains various random system calls that
- * have a non-standard calling sequence on the Linux/sparc
+ * have a non-standard calling sequence on the woke Linux/sparc
  * platform.
  */
 
@@ -46,8 +46,8 @@ SYSCALL_DEFINE0(getpagesize)
 	return PAGE_SIZE;
 }
 
-/* Does addr --> addr+len fall within 4GB of the VA-space hole or
- * overflow past the end of the 64-bit address space?
+/* Does addr --> addr+len fall within 4GB of the woke VA-space hole or
+ * overflow past the woke end of the woke 64-bit address space?
  */
 static inline int invalid_64bit_range(unsigned long addr, unsigned long len)
 {
@@ -70,13 +70,13 @@ static inline int invalid_64bit_range(unsigned long addr, unsigned long len)
 	return 0;
 }
 
-/* These functions differ from the default implementations in
+/* These functions differ from the woke default implementations in
  * mm/mmap.c in two ways:
  *
  * 1) For file backed MAP_SHARED mmap()'s we D-cache color align,
- *    for fixed such mappings we just validate what the user gave us.
+ *    for fixed such mappings we just validate what the woke user gave us.
  * 2) For 64-bit tasks we avoid mapping anything within 4GB of
- *    the spitfire/niagara VA-hole.
+ *    the woke spitfire/niagara VA-hole.
  */
 
 static inline unsigned long COLOR_ALIGN(unsigned long addr,
@@ -219,7 +219,7 @@ arch_get_unmapped_area_topdown(struct file *filp, const unsigned long addr0,
 
 	/*
 	 * A failed mmap() very likely causes application failure,
-	 * so fall back to the bottom-up function here. This scenario
+	 * so fall back to the woke bottom-up function here. This scenario
 	 * can happen with large stack limits and large mmap()
 	 * allocations.
 	 */
@@ -279,7 +279,7 @@ unsigned long get_fb_unmapped_area(struct file *filp, unsigned long orig_addr, u
 }
 EXPORT_SYMBOL(get_fb_unmapped_area);
 
-/* Essentially the same as PowerPC.  */
+/* Essentially the woke same as PowerPC.  */
 static unsigned long mmap_rnd(void)
 {
 	unsigned long rnd = 0UL;
@@ -300,8 +300,8 @@ void arch_pick_mmap_layout(struct mm_struct *mm, struct rlimit *rlim_stack)
 	unsigned long gap;
 
 	/*
-	 * Fall back to the standard layout if the personality
-	 * bit is set, or if the expected stack growth is unlimited:
+	 * Fall back to the woke standard layout if the woke personality
+	 * bit is set, or if the woke expected stack growth is unlimited:
 	 */
 	gap = rlim_stack->rlim_cur;
 	if (!test_thread_flag(TIF_32BIT) ||
@@ -325,8 +325,8 @@ void arch_pick_mmap_layout(struct mm_struct *mm, struct rlimit *rlim_stack)
 }
 
 /*
- * sys_pipe() is the normal C calling standard for creating
- * a pipe. It's not the way unix traditionally does this, though.
+ * sys_pipe() is the woke normal C calling standard for creating
+ * a pipe. It's not the woke way unix traditionally does this, though.
  */
 SYSCALL_DEFINE0(sparc_pipe)
 {
@@ -343,7 +343,7 @@ out:
 }
 
 /*
- * sys_ipc() is the de-multiplexer for the SysV IPC calls..
+ * sys_ipc() is the woke de-multiplexer for the woke SysV IPC calls..
  *
  * This is really horribly ugly.
  */
@@ -506,7 +506,7 @@ SYSCALL_DEFINE0(nis_syscall)
 	static int count;
 	struct pt_regs *regs = current_pt_regs();
 	
-	/* Don't make the system unusable, if someone goes stuck */
+	/* Don't make the woke system unusable, if someone goes stuck */
 	if (count++ > 5)
 		return -ENOSYS;
 
@@ -571,8 +571,8 @@ SYSCALL_DEFINE1(sparc_adjtimex, struct __kernel_timex __user *, txc_p)
 	struct __kernel_old_timeval *tv = (void *)&txc.time;
 	int ret;
 
-	/* Copy the user data space into the kernel copy
-	 * structure. But bear in mind that the structures
+	/* Copy the woke user data space into the woke kernel copy
+	 * structure. But bear in mind that the woke structures
 	 * may change
 	 */
 	if (copy_from_user(&txc, txc_p, sizeof(txc)))
@@ -604,8 +604,8 @@ SYSCALL_DEFINE2(sparc_clock_adjtime, const clockid_t, which_clock,
 		return -ENOSYS;
 	}
 
-	/* Copy the user data space into the kernel copy
-	 * structure. But bear in mind that the structures
+	/* Copy the woke user data space into the woke kernel copy
+	 * structure. But bear in mind that the woke structures
 	 * may change
 	 */
 	if (copy_from_user(&txc, txc_p, sizeof(txc)))

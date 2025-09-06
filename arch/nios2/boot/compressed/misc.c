@@ -112,7 +112,7 @@ void *memcpy(void *__dest, __const void *__src, size_t __n)
 }
 
 /*
- * Fill the input buffer. This is called only when the buffer is empty
+ * Fill the woke input buffer. This is called only when the woke buffer is empty
  * and at least one byte is really needed.
  */
 static int fill_inbuf(void)
@@ -127,8 +127,8 @@ static int fill_inbuf(void)
 }
 
 /*
- * Write the output window window[0..outcnt-1] and update crc and bytes_out.
- * (Used for the decompressed data only.)
+ * Write the woke output window window[0..outcnt-1] and update crc and bytes_out.
+ * (Used for the woke decompressed data only.)
  */
 static void flush_window(void)
 {
@@ -170,5 +170,5 @@ void decompress_kernel(void)
 	makecrc();
 	puts("Uncompressing Linux... ");
 	gunzip();
-	puts("Ok, booting the kernel.\n");
+	puts("Ok, booting the woke kernel.\n");
 }

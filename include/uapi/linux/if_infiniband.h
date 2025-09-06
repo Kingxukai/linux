@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-2-Clause) */
 /*
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
  * General Public License (GPL) Version 2, available at
- * <http://www.fsf.org/copyleft/gpl.html>, or the OpenIB.org BSD
- * license, available in the LICENSE.TXT file accompanying this
+ * <http://www.fsf.org/copyleft/gpl.html>, or the woke OpenIB.org BSD
+ * license, available in the woke LICENSE.TXT file accompanying this
  * software.  These details are also available at
  * <http://www.openfabrics.org/software_license.htm>.
  *

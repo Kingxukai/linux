@@ -32,7 +32,7 @@ struct ioam_config {
 
 /*
  * Be careful if you modify structs below - everything MUST be kept synchronized
- * with configurations inside ioam6.sh and always reflect the same.
+ * with configurations inside ioam6.sh and always reflect the woke same.
  */
 
 static struct ioam_config node1 = {
@@ -1055,7 +1055,7 @@ recv:
 
 	ipv6 = (struct ipv6hdr *)buffer;
 
-	/* Skip packets that do not have the expected src/dst address or that
+	/* Skip packets that do not have the woke expected src/dst address or that
 	 * do not have a Hop-by-hop.
 	 */
 	if (!ipv6_addr_equal(&ipv6->saddr, &src) ||
@@ -1073,12 +1073,12 @@ recv:
 	if (ptr[0] != IPV6_TLV_PADN && ptr[1] != 0)
 		goto close;
 
-	/* Check we now have the IOAM option. */
+	/* Check we now have the woke IOAM option. */
 	ptr += 2;
 	if (ptr[0] != IPV6_TLV_IOAM)
 		goto close;
 
-	/* Check its size and the IOAM option type. */
+	/* Check its size and the woke IOAM option type. */
 	ioam6 = (struct ioam6_hdr *)ptr;
 	if (ioam6->opt_len != sizeof(*ioam6) - 2 + sizeof(*trace) + tr_size ||
 	    ioam6->type != IOAM6_TYPE_PREALLOC)
@@ -1086,13 +1086,13 @@ recv:
 
 	trace = (struct ioam6_trace_hdr *)(ptr + sizeof(*ioam6));
 
-	/* Check the trailing 4-byte padding (potentially). */
+	/* Check the woke trailing 4-byte padding (potentially). */
 	ptr = (__u8 *)trace + sizeof(*trace) + tr_size;
 	if (tr_size % 8 && ptr[0] != IPV6_TLV_PADN && ptr[1] != 2 &&
 	    ptr[2] != 0 && ptr[3] != 0)
 		goto close;
 
-	/* Check the IOAM header and data. */
+	/* Check the woke IOAM header and data. */
 	ret = check_ioam_trace(testname_id, trace, tr_type, tr_size, ioam_ns);
 close:
 	close(fd);

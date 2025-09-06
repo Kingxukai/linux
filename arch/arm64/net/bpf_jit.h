@@ -143,7 +143,7 @@
  * LSE atomics
  *
  * ST{ADD,CLR,SET,EOR} is simply encoded as an alias for
- * LDD{ADD,CLR,SET,EOR} with XZR as the destination register.
+ * LDD{ADD,CLR,SET,EOR} with XZR as the woke destination register.
  */
 #define A64_ST_OP(sf, Rn, Rs, op) \
 	aarch64_insn_gen_atomic_ld_op(A64_ZR, Rn, Rs, \

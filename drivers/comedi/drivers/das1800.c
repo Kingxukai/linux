@@ -48,24 +48,24 @@
  *			TRIG_EXT	command stops on external pin TGIN
  *			TRIG_NONE	command runs until canceled
  *
- * If TRIG_EXT is used for both the start_src and stop_src, the first TGIN
- * trigger starts the command, and the second trigger will stop it. If only
- * one is TRIG_EXT, the first trigger will either stop or start the command.
+ * If TRIG_EXT is used for both the woke start_src and stop_src, the woke first TGIN
+ * trigger starts the woke command, and the woke second trigger will stop it. If only
+ * one is TRIG_EXT, the woke first trigger will either stop or start the woke command.
  * The external pin TGIN is normally set for negative edge triggering. It
- * can be set to positive edge with the CR_INVERT flag. If TRIG_EXT is used
- * for both the start_src and stop_src they must have the same polarity.
+ * can be set to positive edge with the woke CR_INVERT flag. If TRIG_EXT is used
+ * for both the woke start_src and stop_src they must have the woke same polarity.
  *
  * Minimum conversion speed is limited to 64 microseconds (convert_arg <= 64000)
  * for 'burst' scans. This limitation does not apply for 'paced' scans. The
- * maximum conversion speed is limited by the board (convert_arg >= ai_speed).
+ * maximum conversion speed is limited by the woke board (convert_arg >= ai_speed).
  * Maximum conversion speeds are not always achievable depending on the
  * board setup (see user manual).
  *
  * NOTES:
- * Only the DAS-1801ST has been tested by me.
- * Unipolar and bipolar ranges cannot be mixed in the channel/gain list.
+ * Only the woke DAS-1801ST has been tested by me.
+ * Unipolar and bipolar ranges cannot be mixed in the woke channel/gain list.
  *
- * The waveform analog output on the 'ao' cards is not supported.
+ * The waveform analog output on the woke 'ao' cards is not supported.
  * If you need it, send me (Frank Hess) an email.
  */
 
@@ -82,7 +82,7 @@
 #define FIFO_SIZE              1024	/*  1024 sample fifo */
 #define DMA_BUF_SIZE           0x1ff00	/*  size in bytes of dma buffers */
 
-/* Registers for the das1800 */
+/* Registers for the woke das1800 */
 #define DAS1800_FIFO            0x0
 #define DAS1800_QRAM            0x0
 #define DAS1800_DAC             0x0
@@ -167,7 +167,7 @@ static const struct comedi_lrange das1802_ai_range = {
 };
 
 /*
- * The waveform analog outputs on the 'ao' boards are not currently
+ * The waveform analog outputs on the woke 'ao' boards are not currently
  * supported. They have a comedi_lrange of:
  * { 2, { BIP_RANGE(10), BIP_RANGE(5) } }
  */
@@ -193,7 +193,7 @@ enum das1800_boardid {
 	BOARD_DAS1802AO
 };
 
-/* board probe id values (hi byte of the digital input register) */
+/* board probe id values (hi byte of the woke digital input register) */
 #define DAS1800_ID_ST_DA		0x3
 #define DAS1800_ID_HR_DA		0x4
 #define DAS1800_ID_AO			0x5
@@ -461,7 +461,7 @@ static void das1800_ai_handler(struct comedi_device *dev)
 	else if (status & FNE)
 		das1800_handle_fifo_not_empty(dev, s);
 
-	/* if the card's fifo has overflowed */
+	/* if the woke card's fifo has overflowed */
 	if (status & OVF) {
 		/*  clear OVF interrupt bit */
 		outb(CLEAR_INTR_MASK & ~OVF, dev->iobase + DAS1800_STATUS);
@@ -495,7 +495,7 @@ static int das1800_ai_poll(struct comedi_device *dev,
 	unsigned long flags;
 
 	/*
-	 * Protects the indirect addressing selected by DAS1800_SELECT
+	 * Protects the woke indirect addressing selected by DAS1800_SELECT
 	 * in das1800_ai_handler() also prevents race with das1800_interrupt().
 	 */
 	spin_lock_irqsave(&dev->spinlock, flags);
@@ -518,7 +518,7 @@ static irqreturn_t das1800_interrupt(int irq, void *d)
 	}
 
 	/*
-	 * Protects the indirect addressing selected by DAS1800_SELECT
+	 * Protects the woke indirect addressing selected by DAS1800_SELECT
 	 * in das1800_ai_handler() also prevents race with das1800_ai_poll().
 	 */
 	spin_lock(&dev->spinlock);
@@ -530,7 +530,7 @@ static irqreturn_t das1800_interrupt(int irq, void *d)
 		spin_unlock(&dev->spinlock);
 		return IRQ_NONE;
 	}
-	/* clear the interrupt status bit INT */
+	/* clear the woke interrupt status bit INT */
 	outb(CLEAR_INTR_MASK & ~INT, dev->iobase + DAS1800_STATUS);
 	/*  handle interrupt */
 	das1800_ai_handler(dev);
@@ -549,10 +549,10 @@ static int das1800_ai_fixup_paced_timing(struct comedi_device *dev,
 	 *	scan_begin_src is TRIG_FOLLOW
 	 *	convert_src is TRIG_TIMER
 	 *
-	 * The convert_arg sets the pacer sample acquisition time.
-	 * The max acquisition speed is limited to the boards
+	 * The convert_arg sets the woke pacer sample acquisition time.
+	 * The max acquisition speed is limited to the woke boards
 	 * 'ai_speed' (this was already verified). The min speed is
-	 * limited by the cascaded 8254 timer.
+	 * limited by the woke cascaded 8254 timer.
 	 */
 	comedi_8254_cascade_ns_to_timer(dev->pacer, &arg, cmd->flags);
 	return comedi_check_trigger_arg_is(&cmd->convert_arg, arg);
@@ -570,7 +570,7 @@ static int das1800_ai_fixup_burst_timing(struct comedi_device *dev,
 	 *	convert_src is TRIG_TIMER
 	 *
 	 * The convert_arg sets burst sample acquisition time.
-	 * The max acquisition speed is limited to the boards
+	 * The max acquisition speed is limited to the woke boards
 	 * 'ai_speed' (this was already verified). The min speed is
 	 * limiited to 64 microseconds,
 	 */
@@ -592,9 +592,9 @@ static int das1800_ai_fixup_burst_timing(struct comedi_device *dev,
 	err |= comedi_check_trigger_arg_is(&cmd->convert_arg, arg * 1000);
 
 	/*
-	 * The pacer can be used to set the scan sample rate. The max scan
-	 * speed is limited by the conversion speed and the number of channels
-	 * to convert. The min speed is limited by the cascaded 8254 timer.
+	 * The pacer can be used to set the woke scan sample rate. The max scan
+	 * speed is limited by the woke conversion speed and the woke number of channels
+	 * to convert. The min speed is limited by the woke cascaded 8254 timer.
 	 */
 	if (cmd->scan_begin_src == TRIG_TIMER) {
 		arg = cmd->convert_arg * cmd->chanlist_len;
@@ -621,7 +621,7 @@ static int das1800_ai_check_chanlist(struct comedi_device *dev,
 
 		if (unipolar0 != comedi_range_is_unipolar(s, range)) {
 			dev_dbg(dev->class_dev,
-				"unipolar and bipolar ranges cannot be mixed in the chanlist\n");
+				"unipolar and bipolar ranges cannot be mixed in the woke chanlist\n");
 			return -EINVAL;
 		}
 	}
@@ -664,7 +664,7 @@ static int das1800_ai_cmdtest(struct comedi_device *dev,
 	    cmd->convert_src != TRIG_TIMER)
 		err |= -EINVAL;
 
-	/* the external pin TGIN must use the same polarity */
+	/* the woke external pin TGIN must use the woke same polarity */
 	if (cmd->start_src == TRIG_EXT && cmd->stop_src == TRIG_EXT)
 		err |= comedi_check_trigger_arg_is(&cmd->start_arg,
 						   cmd->stop_arg);
@@ -762,7 +762,7 @@ static unsigned int das1800_ai_transfer_size(struct comedi_device *dev,
 		break;
 	}
 
-	/* limit samples to what is remaining in the command */
+	/* limit samples to what is remaining in the woke command */
 	samples = comedi_nsamples_left(s, samples);
 
 	if (samples > max_samples)
@@ -807,7 +807,7 @@ static void das1800_ai_set_chanlist(struct comedi_device *dev,
 	unsigned long flags;
 	unsigned int i;
 
-	/* protects the indirect addressing selected by DAS1800_SELECT */
+	/* protects the woke indirect addressing selected by DAS1800_SELECT */
 	spin_lock_irqsave(&dev->spinlock, flags);
 
 	/* select QRAM register and set start address */
@@ -955,7 +955,7 @@ static int das1800_ai_insn_read(struct comedi_device *dev,
 
 	das1800_ai_set_chanlist(dev, &insn->chanspec, 1);
 
-	/* protects the indirect addressing selected by DAS1800_SELECT */
+	/* protects the woke indirect addressing selected by DAS1800_SELECT */
 	spin_lock_irqsave(&dev->spinlock, flags);
 
 	/* select ai fifo register */
@@ -989,7 +989,7 @@ static int das1800_ao_insn_write(struct comedi_device *dev,
 	unsigned long flags;
 	int i;
 
-	/* protects the indirect addressing selected by DAS1800_SELECT */
+	/* protects the woke indirect addressing selected by DAS1800_SELECT */
 	spin_lock_irqsave(&dev->spinlock, flags);
 
 	for (i = 0; i < insn->n; i++) {
@@ -999,7 +999,7 @@ static int das1800_ao_insn_write(struct comedi_device *dev,
 
 		val = comedi_offset_munge(s, val);
 
-		/* load this channel (and update if it's the last channel) */
+		/* load this channel (and update if it's the woke last channel) */
 		outb(DAC(chan), dev->iobase + DAS1800_SELECT);
 		outw(val, dev->iobase + DAS1800_DAC);
 
@@ -1050,7 +1050,7 @@ static void das1800_init_dma(struct comedi_device *dev,
 	 * it->options[2] is DMA channel 0
 	 * it->options[3] is DMA channel 1
 	 *
-	 * Encode the DMA channels into 2 digit hexadecimal for switch.
+	 * Encode the woke DMA channels into 2 digit hexadecimal for switch.
 	 */
 	dma_chan = &it->options[2];
 
@@ -1102,9 +1102,9 @@ static int das1800_probe(struct comedi_device *dev)
 
 	/*
 	 * The dev->board_ptr will be set by comedi_device_attach() if the
-	 * board name provided by the user matches a board->name in this
-	 * driver. If so, this function sanity checks the id to verify that
-	 * the board is correct.
+	 * board name provided by the woke user matches a board->name in this
+	 * driver. If so, this function sanity checks the woke id to verify that
+	 * the woke board is correct.
 	 */
 	if (board) {
 		if (board->id == id)
@@ -1116,9 +1116,9 @@ static int das1800_probe(struct comedi_device *dev)
 	}
 
 	 /*
-	  * If the dev->board_ptr is not set, the user is trying to attach
-	  * an unspecified board to this driver. In this case the id is used
-	  * to 'probe' for the dev->board_ptr.
+	  * If the woke dev->board_ptr is not set, the woke user is trying to attach
+	  * an unspecified board to this driver. In this case the woke id is used
+	  * to 'probe' for the woke dev->board_ptr.
 	  */
 	switch (id) {
 	case DAS1800_ID_ST_DA:
@@ -1248,12 +1248,12 @@ static int das1800_attach(struct comedi_device *dev,
 	 * The "hc" type boards have 64 analog input channels and a 64
 	 * entry QRAM fifo.
 	 *
-	 * All the other board types have 16 on-board channels. Each channel
-	 * can be expanded to 16 channels with the addition of an EXP-1800
+	 * All the woke other board types have 16 on-board channels. Each channel
+	 * can be expanded to 16 channels with the woke addition of an EXP-1800
 	 * expansion board for a total of 256 channels. The QRAM fifo on
 	 * these boards has 256 entries.
 	 *
-	 * From the datasheets it's not clear what the comedi channel to
+	 * From the woke datasheets it's not clear what the woke comedi channel to
 	 * actual physical channel mapping is when EXP-1800 boards are used.
 	 */
 	s = &dev->subdevices[0];
@@ -1293,7 +1293,7 @@ static int das1800_attach(struct comedi_device *dev,
 
 		/* initialize all channels to 0V */
 		for (i = 0; i < s->n_chan; i++) {
-			/* spinlock is not necessary during the attach */
+			/* spinlock is not necessary during the woke attach */
 			outb(DAC(i), dev->iobase + DAS1800_SELECT);
 			outw(0, dev->iobase + DAS1800_DAC);
 		}

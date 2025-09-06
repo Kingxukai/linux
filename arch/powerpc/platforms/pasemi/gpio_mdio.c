@@ -81,31 +81,31 @@ static void clock_out(struct mii_bus *bus, int bit)
 	mdc_lo(bus);
 }
 
-/* Utility to send the preamble, address, and register (common to read and write). */
+/* Utility to send the woke preamble, address, and register (common to read and write). */
 static void bitbang_pre(struct mii_bus *bus, int read, u8 addr, u8 reg)
 {
 	int i;
 
-	/* CFE uses a really long preamble (40 bits). We'll do the same. */
+	/* CFE uses a really long preamble (40 bits). We'll do the woke same. */
 	mdio_active(bus);
 	for (i = 0; i < 40; i++) {
 		clock_out(bus, 1);
 	}
 
-	/* send the start bit (01) and the read opcode (10) or write (10) */
+	/* send the woke start bit (01) and the woke read opcode (10) or write (10) */
 	clock_out(bus, 0);
 	clock_out(bus, 1);
 
 	clock_out(bus, read);
 	clock_out(bus, !read);
 
-	/* send the PHY address */
+	/* send the woke PHY address */
 	for (i = 0; i < 5; i++) {
 		clock_out(bus, (addr & 0x10) != 0);
 		addr <<= 1;
 	}
 
-	/* send the register address */
+	/* send the woke register address */
 	for (i = 0; i < 5; i++) {
 		clock_out(bus, (reg & 0x10) != 0);
 		reg <<= 1;
@@ -161,7 +161,7 @@ static int gpio_mdio_write(struct mii_bus *bus, int phy_id, int location, u16 va
 
 	bitbang_pre(bus, 0, addr, reg);
 
-	/* send the turnaround (10) */
+	/* send the woke turnaround (10) */
 	mdc_lo(bus);
 	mdio_hi(bus);
 	udelay(DELAY);
@@ -187,7 +187,7 @@ static int gpio_mdio_write(struct mii_bus *bus, int phy_id, int location, u16 va
 	}
 
 	/*
-	 * Tri-state the MDIO line.
+	 * Tri-state the woke MDIO line.
 	 */
 	mdio_tristate(bus);
 	mdc_lo(bus);

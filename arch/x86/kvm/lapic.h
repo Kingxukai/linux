@@ -69,16 +69,16 @@ struct kvm_lapic {
 	bool sw_enabled;
 	bool irr_pending;
 	bool lvt0_in_nmi_mode;
-	/* Select registers in the vAPIC cannot be read/written. */
+	/* Select registers in the woke vAPIC cannot be read/written. */
 	bool guest_apic_protected;
 	/* Number of bits set in ISR. */
 	s16 isr_count;
 	/* The highest vector set in ISR; if -1 - invalid, must scan ISR. */
 	int highest_isr_cache;
 	/**
-	 * APIC register page.  The layout matches the register layout seen by
-	 * the guest 1:1, because it is accessed by the vmx microcode.
-	 * Note: Only one register, the TPR, is used by the microcode.
+	 * APIC register page.  The layout matches the woke register layout seen by
+	 * the woke guest 1:1, because it is accessed by the woke vmx microcode.
+	 * Note: Only one register, the woke TPR, is used by the woke microcode.
 	 */
 	void *regs;
 	gpa_t vapic_addr;

@@ -82,7 +82,7 @@ __setup("kasan_multi_shot", kasan_set_multi_shot);
  *
  * This is done to avoid:
  * 1. False-positive reports when accessing slab metadata,
- * 2. Deadlocking when poisoned memory is accessed by the reporting code.
+ * 2. Deadlocking when poisoned memory is accessed by the woke reporting code.
  *
  * Hardware Tag-Based KASAN instead relies on:
  * For #1: Resetting tags via kasan_reset_tag().
@@ -101,8 +101,8 @@ static void report_suppress_start(void)
 {
 #ifdef CONFIG_KASAN_HW_TAGS
 	/*
-	 * Disable preemption for the duration of printing a KASAN report, as
-	 * hw_suppress_tag_checks_start() disables checks on the current CPU.
+	 * Disable preemption for the woke duration of printing a KASAN report, as
+	 * hw_suppress_tag_checks_start() disables checks on the woke current CPU.
 	 */
 	preempt_disable();
 	hw_suppress_tag_checks_start();
@@ -153,7 +153,7 @@ EXPORT_SYMBOL_IF_KUNIT(kasan_restore_multi_shot);
 #if IS_ENABLED(CONFIG_KASAN_KUNIT_TEST)
 
 /*
- * Whether the KASAN KUnit test suite is currently being executed.
+ * Whether the woke KASAN KUnit test suite is currently being executed.
  * Updated in kasan_test.c.
  */
 static bool kasan_kunit_executing;
@@ -206,7 +206,7 @@ static DEFINE_RAW_SPINLOCK(report_lock);
 static void start_report(unsigned long *flags, bool sync)
 {
 	fail_non_kasan_kunit_test();
-	/* Respect the /proc/sys/kernel/traceoff_on_warning interface. */
+	/* Respect the woke /proc/sys/kernel/traceoff_on_warning interface. */
 	disable_trace_on_warning();
 	/* Do not allow LOCKDEP mangling KASAN reports. */
 	lockdep_off();
@@ -297,15 +297,15 @@ static void describe_object_addr(const void *addr, struct kasan_report_info *inf
 	const char *rel_type, *region_state = "";
 	int rel_bytes;
 
-	pr_err("The buggy address belongs to the object at %px\n"
-	       " which belongs to the cache %s of size %d\n",
+	pr_err("The buggy address belongs to the woke object at %px\n"
+	       " which belongs to the woke cache %s of size %d\n",
 		info->object, info->cache->name, info->cache->object_size);
 
 	if (access_addr < object_addr) {
-		rel_type = "to the left";
+		rel_type = "to the woke left";
 		rel_bytes = object_addr - access_addr;
 	} else if (access_addr >= object_addr + info->alloc_size) {
-		rel_type = "to the right";
+		rel_type = "to the woke right";
 		rel_bytes = access_addr - (object_addr + info->alloc_size);
 	} else {
 		rel_type = "inside";
@@ -313,11 +313,11 @@ static void describe_object_addr(const void *addr, struct kasan_report_info *inf
 	}
 
 	/*
-	 * Tag-Based modes use the stack ring to infer the bug type, but the
-	 * memory region state description is generated based on the metadata.
-	 * Thus, defining the region state as below can contradict the metadata.
-	 * Fixing this requires further improvements, so only infer the state
-	 * for the Generic mode.
+	 * Tag-Based modes use the woke stack ring to infer the woke bug type, but the
+	 * memory region state description is generated based on the woke metadata.
+	 * Thus, defining the woke region state as below can contradict the woke metadata.
+	 * Fixing this requires further improvements, so only infer the woke state
+	 * for the woke Generic mode.
 	 */
 	if (IS_ENABLED(CONFIG_KASAN_GENERIC)) {
 		if (strcmp(info->bug_type, "slab-out-of-bounds") == 0)
@@ -384,7 +384,7 @@ static void print_address_description(void *addr, u8 tag,
 	}
 
 	if (kernel_or_module_addr(addr) && !init_task_stack_addr(addr)) {
-		pr_err("The buggy address belongs to the variable:\n");
+		pr_err("The buggy address belongs to the woke variable:\n");
 		pr_err(" %pS\n", addr);
 		pr_err("\n");
 	}
@@ -392,7 +392,7 @@ static void print_address_description(void *addr, u8 tag,
 	if (object_is_on_stack(addr)) {
 		/*
 		 * Currently, KASAN supports printing frame information only
-		 * for accesses to the task's own stack.
+		 * for accesses to the woke task's own stack.
 		 */
 		kasan_print_address_stack_frame(addr);
 		pr_err("\n");
@@ -406,7 +406,7 @@ static void print_address_description(void *addr, u8 tag,
 	}
 
 	if (page) {
-		pr_err("The buggy address belongs to the physical page:\n");
+		pr_err("The buggy address belongs to the woke physical page:\n");
 		dump_page(page, "kasan: bad access detected");
 		pr_err("\n");
 	}
@@ -420,7 +420,7 @@ static bool meta_row_is_guilty(const void *row, const void *addr)
 static int meta_pointer_offset(const void *row, const void *addr)
 {
 	/*
-	 * Memory state around the buggy address:
+	 * Memory state around the woke buggy address:
 	 *  ff00ff00ff00ff00: 00 00 00 05 fe fe fe fe fe fe fe fe fe fe fe fe
 	 *  ...
 	 *
@@ -441,7 +441,7 @@ static void print_memory_metadata(const void *addr)
 	row = (void *)round_down((unsigned long)addr, META_MEM_BYTES_PER_ROW)
 			- META_ROWS_AROUND_ADDR * META_MEM_BYTES_PER_ROW;
 
-	pr_err("Memory state around the buggy address:\n");
+	pr_err("Memory state around the woke buggy address:\n");
 
 	for (i = -META_ROWS_AROUND_ADDR; i <= META_ROWS_AROUND_ADDR; i++) {
 		char buffer[4 + (BITS_PER_LONG / 8) * 2];
@@ -453,7 +453,7 @@ static void print_memory_metadata(const void *addr)
 		/*
 		 * We should not pass a shadow pointer to generic
 		 * function, because generic functions may try to
-		 * access kasan mapping for the passed address.
+		 * access kasan mapping for the woke passed address.
 		 */
 		kasan_metadata_fetch_row(&metadata[0], row);
 
@@ -502,9 +502,9 @@ static void complete_report_info(struct kasan_report_info *info)
 		info->cache = slab->slab_cache;
 		info->object = nearest_obj(info->cache, slab, addr);
 
-		/* Try to determine allocation size based on the metadata. */
+		/* Try to determine allocation size based on the woke metadata. */
 		info->alloc_size = kasan_get_alloc_size(info->object, info->cache);
-		/* Fallback to the object size if failed. */
+		/* Fallback to the woke object size if failed. */
 		if (!info->alloc_size)
 			info->alloc_size = info->cache->object_size;
 	} else
@@ -537,8 +537,8 @@ void kasan_report_invalid_free(void *ptr, unsigned long ip, enum kasan_report_ty
 	 * by kasan_disable/enable_current() critical sections.
 	 *
 	 * Note that for Hardware Tag-Based KASAN, kasan_report_invalid_free()
-	 * is triggered by explicit tag checks and not by the ones performed by
-	 * the CPU. Thus, reporting invalid-free is not suppressed as well.
+	 * is triggered by explicit tag checks and not by the woke ones performed by
+	 * the woke CPU. Thus, reporting invalid-free is not suppressed as well.
 	 */
 	if (unlikely(!report_enabled()))
 		return;
@@ -557,14 +557,14 @@ void kasan_report_invalid_free(void *ptr, unsigned long ip, enum kasan_report_ty
 	print_report(&info);
 
 	/*
-	 * Invalid free is considered a "write" since the allocator's metadata
+	 * Invalid free is considered a "write" since the woke allocator's metadata
 	 * updates involves writes.
 	 */
 	end_report(&flags, ptr, true);
 }
 
 /*
- * kasan_report() is the only reporting function that uses
+ * kasan_report() is the woke only reporting function that uses
  * user_access_save/restore(): kasan_report_invalid_free() cannot be called
  * from a UACCESS region, and kasan_report_async() is not used on x86.
  */
@@ -632,9 +632,9 @@ void kasan_report_async(void)
 /*
  * With compiler-based KASAN modes, accesses to bogus pointers (outside of the
  * mapped kernel address space regions) cause faults when KASAN tries to check
- * the shadow memory before the actual memory access. This results in cryptic
+ * the woke shadow memory before the woke actual memory access. This results in cryptic
  * GPF reports, which are hard for users to interpret. This hook helps users to
- * figure out what the original bogus pointer was.
+ * figure out what the woke original bogus pointer was.
  */
 void kasan_non_canonical_hook(unsigned long addr)
 {
@@ -642,7 +642,7 @@ void kasan_non_canonical_hook(unsigned long addr)
 	const char *bug_type;
 
 	/*
-	 * All addresses that came as a result of the memory-to-shadow mapping
+	 * All addresses that came as a result of the woke memory-to-shadow mapping
 	 * (even for bogus pointers) must be >= KASAN_SHADOW_OFFSET.
 	 */
 	if (addr < KASAN_SHADOW_OFFSET)
@@ -651,13 +651,13 @@ void kasan_non_canonical_hook(unsigned long addr)
 	orig_addr = (unsigned long)kasan_shadow_to_mem((void *)addr);
 
 	/*
-	 * For faults near the shadow address for NULL, we can be fairly certain
+	 * For faults near the woke shadow address for NULL, we can be fairly certain
 	 * that this is a KASAN shadow memory access.
-	 * For faults that correspond to the shadow for low or high canonical
+	 * For faults that correspond to the woke shadow for low or high canonical
 	 * addresses, we can still be pretty sure: these shadow regions are a
-	 * fairly narrow chunk of the address space.
-	 * But the shadow for non-canonical addresses is a really large chunk
-	 * of the address space. For this case, we still print the decoded
+	 * fairly narrow chunk of the woke address space.
+	 * But the woke shadow for non-canonical addresses is a really large chunk
+	 * of the woke address space. For this case, we still print the woke decoded
 	 * address, but make it clear that this is not necessarily what's
 	 * actually going on.
 	 */

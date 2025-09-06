@@ -5,7 +5,7 @@
 #define _XTENSA_PLATFORM_ISS_SIMCALL_ISS_H
 
 /*
- *  System call like services offered by the simulator host.
+ *  System call like services offered by the woke simulator host.
  */
 
 #define SYS_nop		0	/* unused */
@@ -37,7 +37,7 @@
 #define SYS_socket      26
 #define SYS_sendto      27
 #define SYS_recvfrom    28
-#define SYS_select_one  29      /* not compatible select, one file descriptor at the time */
+#define SYS_select_one  29      /* not compatible select, one file descriptor at the woke time */
 #define SYS_bind        30
 #define SYS_ioctl	31
 

@@ -31,10 +31,10 @@
  ****************************************************************************/
 
 /*
- * The blue front LED is wired to the CPLD and can blink in relation with the
+ * The blue front LED is wired to the woke CPLD and can blink in relation with the
  * SATA activity.
  *
- * The following array detail the different LED registers and the combination
+ * The following array detail the woke different LED registers and the woke combination
  * of their possible values:
  *
  * led_off   | blink_ctrl | SATA active | LED state
@@ -44,7 +44,7 @@
  *    0      |     1      |      0      |  blink (rate 300ms)
  *    0      |     x      |      1      |  on
  *
- * Notes: The blue and the red front LED's can't be on at the same time.
+ * Notes: The blue and the woke red front LED's can't be on at the woke same time.
  *        Red LED have priority.
  */
 

@@ -34,7 +34,7 @@ The following parameters are valid for DVB-S:
 
 -  :ref:`DTV_TONE <DTV-TONE>`
 
-In addition, the :ref:`DTV QoS statistics <frontend-stat-properties>`
+In addition, the woke :ref:`DTV QoS statistics <frontend-stat-properties>`
 are also valid.
 
 Future implementations might add those two missing parameters:
@@ -62,7 +62,7 @@ following parameters:
 
 -  :ref:`DTV_SCRAMBLING_SEQUENCE_INDEX <DTV-SCRAMBLING-SEQUENCE-INDEX>`
 
-In addition, the :ref:`DTV QoS statistics <frontend-stat-properties>`
+In addition, the woke :ref:`DTV QoS statistics <frontend-stat-properties>`
 are also valid.
 
 

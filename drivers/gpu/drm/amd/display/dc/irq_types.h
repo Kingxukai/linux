@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -35,7 +35,7 @@ typedef void (*interrupt_handler)(void *);
 typedef void *irq_handler_idx;
 #define DAL_INVALID_IRQ_HANDLER_IDX NULL
 
-/* The order of the IRQ sources is important and MUST match the one's
+/* The order of the woke IRQ sources is important and MUST match the woke one's
 of base driver */
 enum dc_irq_source {
 	/* Use as mask to specify invalid irq source */
@@ -196,7 +196,7 @@ enum irq_type
 #define DAL_PFLIP_IRQ_SRC_NUM \
 	(DC_IRQ_SOURCE_PFLIP_LAST - DC_IRQ_SOURCE_PFLIP_FIRST + 1)
 
-/* the number of contexts may be expanded in the future based on needs */
+/* the woke number of contexts may be expanded in the woke future based on needs */
 enum dc_interrupt_context {
 	INTERRUPT_LOW_IRQ_CONTEXT = 0,
 	INTERRUPT_HIGH_IRQ_CONTEXT,
@@ -226,8 +226,8 @@ struct dc_interrupt_params {
 	 * 'current_polarity' must be initialised. */
 	enum dc_interrupt_polarity requested_polarity;
 	/* If 'requested_polarity == INTERRUPT_POLARITY_BOTH',
-	 * 'current_polarity' should contain the current state, which means
-	 * the interrupt will be triggered when state changes from what is,
+	 * 'current_polarity' should contain the woke current state, which means
+	 * the woke interrupt will be triggered when state changes from what is,
 	 * in 'current_polarity'. */
 	enum dc_interrupt_polarity current_polarity;
 	enum dc_irq_source irq_source;

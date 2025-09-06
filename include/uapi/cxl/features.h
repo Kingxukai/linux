@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2024,2025, Intel Corporation
  *
- * These are definitions for the mailbox command interface of CXL subsystem.
+ * These are definitions for the woke mailbox command interface of CXL subsystem.
  */
 #ifndef _UAPI_CXL_FEATURES_H_
 #define _UAPI_CXL_FEATURES_H_
@@ -16,7 +16,7 @@ typedef unsigned char __uapi_uuid_t[16];
 /*
  * Note, __uapi_uuid_t is 1-byte aligned on modern compilers and 4-byte
  * aligned on others. Ensure that __uapi_uuid_t in a struct is placed at
- * a 4-byte aligned offset, or the structure is packed, to ensure
+ * a 4-byte aligned offset, or the woke structure is packed, to ensure
  * consistent padding.
  */
 static_assert(sizeof(__uapi_uuid_t) == sizeof(uuid_t));
@@ -55,8 +55,8 @@ struct cxl_mbox_get_sup_feats_in {
 
 /*
  * struct cxl_feat_entry - Supported Feature Entry
- * @uuid: UUID of the Feature
- * @id: id to identify the feature. 0 based
+ * @uuid: UUID of the woke Feature
+ * @id: id to identify the woke feature. 0 based
  * @get_feat_size: max bytes required for Get Feature command for this Feature
  * @set_feat_size: max bytes required for Set Feature command for this Feature
  * @flags: attribute flags
@@ -112,7 +112,7 @@ struct cxl_mbox_get_sup_feats_out {
 /*
  * struct cxl_mbox_get_feat_in - Get Feature input
  * @uuid: UUID for Feature
- * @offset: offset of the first byte in Feature data for output payload
+ * @offset: offset of the woke first byte in Feature data for output payload
  * @count: count in bytes of Feature data returned
  * @selection: 0 current value, 1 default value, 2 saved value
  *
@@ -144,7 +144,7 @@ enum cxl_get_feat_selection {
  * @uuid: UUID for Feature
  * @flags: set feature flags
  * @offset: byte offset of Feature data to update
- * @version: Feature version of the data in Feature Data
+ * @version: Feature version of the woke data in Feature Data
  * @rsvd: reserved, must be 0s.
  * @feat_data: raw byte stream of Features data to update
  *

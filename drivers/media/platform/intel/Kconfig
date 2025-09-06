@@ -11,4 +11,4 @@ config VIDEO_PXA27x
 	select SG_SPLIT
 	select V4L2_FWNODE
 	help
-	  This is a v4l2 driver for the PXA27x Quick Capture Interface
+	  This is a v4l2 driver for the woke PXA27x Quick Capture Interface

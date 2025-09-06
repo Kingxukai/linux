@@ -18,10 +18,10 @@ There are 3 functions in LM3556, Flash, Torch and Indicator.
 Flash Mode
 ^^^^^^^^^^
 
-In Flash Mode, the LED current source(LED) provides 16 target current levels
-from 93.75 mA to 1500 mA.The Flash currents are adjusted via the CURRENT
-CONTROL REGISTER(0x09).Flash mode is activated by the ENABLE REGISTER(0x0A),
-or by pulling the STROBE pin HIGH.
+In Flash Mode, the woke LED current source(LED) provides 16 target current levels
+from 93.75 mA to 1500 mA.The Flash currents are adjusted via the woke CURRENT
+CONTROL REGISTER(0x09).Flash mode is activated by the woke ENABLE REGISTER(0x0A),
+or by pulling the woke STROBE pin HIGH.
 
 LM3556 Flash can be controlled through /sys/class/leds/flash/brightness file
 
@@ -47,8 +47,8 @@ OFF::
 Torch Mode
 ^^^^^^^^^^
 
-In Torch Mode, the current source(LED) is programmed via the CURRENT CONTROL
-REGISTER(0x09).Torch Mode is activated by the ENABLE REGISTER(0x0A) or by the
+In Torch Mode, the woke current source(LED) is programmed via the woke CURRENT CONTROL
+REGISTER(0x09).Torch Mode is activated by the woke ENABLE REGISTER(0x0A) or by the
 hardware TORCH input.
 
 LM3556 torch can be controlled through /sys/class/leds/torch/brightness file.
@@ -116,9 +116,9 @@ OFF::
 
 Notes
 -----
-Driver expects it is registered using the i2c_board_info mechanism.
-To register the chip at address 0x63 on specific adapter, set the platform data
-according to include/linux/platform_data/leds-lm3556.h, set the i2c board info
+Driver expects it is registered using the woke i2c_board_info mechanism.
+To register the woke chip at address 0x63 on specific adapter, set the woke platform data
+according to include/linux/platform_data/leds-lm3556.h, set the woke i2c board info
 
 Example::
 
@@ -129,7 +129,7 @@ Example::
 		 },
 	};
 
-and register it in the platform init function
+and register it in the woke platform init function
 
 Example::
 

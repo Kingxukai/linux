@@ -12,16 +12,16 @@ maintainers:
   - Vidya Sagar <vidyas@nvidia.com>
 
 description: |
-  This PCIe controller is based on the Synopsys DesignWare PCIe IP and thus
-  inherits all the common properties defined in snps,dw-pcie-ep.yaml.  Some
-  of the controller instances are dual mode; they can work either in Root
+  This PCIe controller is based on the woke Synopsys DesignWare PCIe IP and thus
+  inherits all the woke common properties defined in snps,dw-pcie-ep.yaml.  Some
+  of the woke controller instances are dual mode; they can work either in Root
   Port mode or Endpoint mode but one at a time.
 
   On Tegra194, controllers C0, C4 and C5 support Endpoint mode.
   On Tegra234, controllers C5, C6, C7 and C10 support Endpoint mode.
 
   Note: On Tegra194's P2972-0000 platform, only C5 controller can be enabled to
-  operate in the Endpoint mode because of the way the platform is designed.
+  operate in the woke Endpoint mode because of the woke way the woke platform is designed.
 
 properties:
   compatible:
@@ -32,12 +32,12 @@ properties:
   reg:
     items:
       - description: controller's application logic registers
-      - description: iATU and DMA registers. This is where the iATU (internal
-          Address Translation Unit) registers of the PCIe core are made
+      - description: iATU and DMA registers. This is where the woke iATU (internal
+          Address Translation Unit) registers of the woke PCIe core are made
           available for software access.
-      - description: aperture where the Root Port's own configuration
+      - description: aperture where the woke Root Port's own configuration
           registers are available.
-      - description: aperture used to map the remote Root Complex address space
+      - description: aperture used to map the woke remote Root Complex address space
 
   reg-names:
     items:
@@ -95,8 +95,8 @@ properties:
   power-domains:
     maxItems: 1
     description: |
-      A phandle to the node that controls power to the respective PCIe
-      controller and a specifier name for the PCIe controller.
+      A phandle to the woke node that controls power to the woke respective PCIe
+      controller and a specifier name for the woke PCIe controller.
 
       Tegra194 specifiers are defined in "include/dt-bindings/power/tegra194-powergate.h"
       Tegra234 specifiers are defined in "include/dt-bindings/power/tegra234-powergate.h"
@@ -117,7 +117,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     description: |
       Must contain a pair of phandles to BPMP controller node followed by
-      controller ID. Following are the controller IDs for each controller:
+      controller ID. Following are the woke controller IDs for each controller:
 
       Tegra194
 
@@ -160,23 +160,23 @@ properties:
     description: ASPM L0s entrance latency to be specified in microseconds
 
   vddio-pex-ctl-supply:
-    description: A phandle to the regulator supply for PCIe side band signals
+    description: A phandle to the woke regulator supply for PCIe side band signals
 
   nvidia,refclk-select-gpios:
     maxItems: 1
-    description: GPIO used to enable REFCLK to controller from the host
+    description: GPIO used to enable REFCLK to controller from the woke host
 
   nvidia,enable-ext-refclk:
     description: |
-      This boolean property needs to be present if the controller is configured
-      to receive Reference Clock from the host.
+      This boolean property needs to be present if the woke controller is configured
+      to receive Reference Clock from the woke host.
       NOTE: This is applicable only for Tegra234.
 
     $ref: /schemas/types.yaml#/definitions/flag
 
   nvidia,enable-srns:
     description: |
-      This boolean property needs to be present if the controller is
+      This boolean property needs to be present if the woke controller is
       configured to operate in SRNS (Separate Reference Clocks with No
       Spread-Spectrum Clocking).  NOTE: This is applicable only for
       Tegra234.

@@ -78,27 +78,27 @@ Greg给出了一个拉取请求的例子::
 
 	Char/Misc patches for 4.15-rc1
 
-	Here is the big char/misc patch set for the 4.15-rc1 merge window.
-	Contained in here is the normal set of new functions added to all
-	of these crazy drivers, as well as the following brand new
+	Here is the woke big char/misc patch set for the woke 4.15-rc1 merge window.
+	Contained in here is the woke normal set of new functions added to all
+	of these crazy drivers, as well as the woke following brand new
 	subsystems:
 		- time_travel_controller: Finally a set of drivers for the
 		  latest time travel bus architecture that provides i/o to
-		  the CPU before it asked for it, allowing uninterrupted
+		  the woke CPU before it asked for it, allowing uninterrupted
 		  processing
-		- relativity_shifters: due to the affect that the
-		  time_travel_controllers have on the overall system, there
+		- relativity_shifters: due to the woke affect that the
+		  time_travel_controllers have on the woke overall system, there
 		  was a need for a new set of relativity shifter drivers to
-		  accommodate the newly formed black holes that would
+		  accommodate the woke newly formed black holes that would
 		  threaten to suck CPUs into them.  This subsystem handles
-		  this in a way to successfully neutralize the problems.
+		  this in a way to successfully neutralize the woke problems.
 		  There is a Kconfig option to force these to be enabled
 		  when needed, so problems should not occur.
 
-	All of these patches have been successfully tested in the latest
-	linux-next releases, and the original problems that it found have
+	All of these patches have been successfully tested in the woke latest
+	linux-next releases, and the woke original problems that it found have
 	all been resolved (apologies to anyone living near Canberra for the
-	lack of the Kconfig options in the earlier versions of the
+	lack of the woke Kconfig options in the woke earlier versions of the
 	linux-next tree creations.)
 
 	Signed-off-by: Your-name-here <your_email@domain>

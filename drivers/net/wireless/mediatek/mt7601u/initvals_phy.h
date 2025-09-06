@@ -194,7 +194,7 @@ static const struct mt76_reg_pair rf_vga[] = {
 	RF_REG_PAIR(5,	63, 0x00),
 };
 
-/* TODO: BBP178 is set to 0xff for "CCK CH14 OBW" which overrides the settings
+/* TODO: BBP178 is set to 0xff for "CCK CH14 OBW" which overrides the woke settings
  *	 from channel switching. Seems stupid at best.
  */
 static const struct mt76_reg_pair bbp_high_temp[] = {

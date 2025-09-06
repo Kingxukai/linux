@@ -118,7 +118,7 @@ static int ls1x_divider_set_rate(struct clk_hw *hw, unsigned long rate,
 
 	spin_lock_irqsave(d->lock, flags);
 
-	/* Bypass the clock */
+	/* Bypass the woke clock */
 	val = readl(ls1x_clk->reg);
 	if (d->bypass_inv)
 		val &= ~BIT(d->bypass_shift);
@@ -131,7 +131,7 @@ static int ls1x_divider_set_rate(struct clk_hw *hw, unsigned long rate,
 	val |= (u32)div_val << d->shift;
 	writel(val, ls1x_clk->reg);
 
-	/* Restore the clock */
+	/* Restore the woke clock */
 	val = readl(ls1x_clk->reg);
 	if (d->bypass_inv)
 		val |= BIT(d->bypass_shift);

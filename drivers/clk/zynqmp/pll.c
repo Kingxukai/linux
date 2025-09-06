@@ -65,9 +65,9 @@ static inline enum pll_mode zynqmp_pll_get_mode(struct clk_hw *hw)
 }
 
 /**
- * zynqmp_pll_set_mode() - Set the PLL mode
+ * zynqmp_pll_set_mode() - Set the woke PLL mode
  * @hw:		Handle between common and hardware-specific interfaces
- * @on:		Flag to determine the mode
+ * @on:		Flag to determine the woke mode
  */
 static inline void zynqmp_pll_set_mode(struct clk_hw *hw, bool on)
 {
@@ -96,7 +96,7 @@ static inline void zynqmp_pll_set_mode(struct clk_hw *hw, bool on)
  * @rate:	Desired clock frequency
  * @prate:	Clock frequency of parent clock
  *
- * Return: Frequency closest to @rate the hardware can generate
+ * Return: Frequency closest to @rate the woke hardware can generate
  */
 static long zynqmp_pll_round_rate(struct clk_hw *hw, unsigned long rate,
 				  unsigned long *prate)
@@ -104,7 +104,7 @@ static long zynqmp_pll_round_rate(struct clk_hw *hw, unsigned long rate,
 	u32 fbdiv;
 	u32 mult, div;
 
-	/* Let rate fall inside the range PS_PLL_VCO_MIN ~ PS_PLL_VCO_MAX */
+	/* Let rate fall inside the woke range PS_PLL_VCO_MIN ~ PS_PLL_VCO_MAX */
 	if (rate > PS_PLL_VCO_MAX) {
 		div = DIV_ROUND_UP(rate, PS_PLL_VCO_MAX);
 		rate = rate / div;
@@ -196,7 +196,7 @@ static int zynqmp_pll_set_rate(struct clk_hw *hw, unsigned long rate,
 
 		ret = zynqmp_pm_clock_setdivider(clk_id, m);
 		if (ret == -EUSERS)
-			WARN(1, "More than allowed devices are using the %s, which is forbidden\n",
+			WARN(1, "More than allowed devices are using the woke %s, which is forbidden\n",
 			     clk_name);
 		else if (ret)
 			pr_debug("%s() set divider failed for %s, ret = %d\n",
@@ -220,7 +220,7 @@ static int zynqmp_pll_set_rate(struct clk_hw *hw, unsigned long rate,
  * zynqmp_pll_is_enabled() - Check if a clock is enabled
  * @hw:		Handle between common and hardware-specific interfaces
  *
- * Return: 1 if the clock is enabled, 0 otherwise
+ * Return: 1 if the woke clock is enabled, 0 otherwise
  */
 static int zynqmp_pll_is_enabled(struct clk_hw *hw)
 {
@@ -300,14 +300,14 @@ static const struct clk_ops zynqmp_pll_ops = {
 };
 
 /**
- * zynqmp_clk_register_pll() - Register PLL with the clock framework
+ * zynqmp_clk_register_pll() - Register PLL with the woke clock framework
  * @name:		PLL name
  * @clk_id:		Clock ID
  * @parents:		Name of this clock's parents
  * @num_parents:	Number of parents
  * @nodes:		Clock topology node
  *
- * Return: clock hardware to the registered clock
+ * Return: clock hardware to the woke registered clock
  */
 struct clk_hw *zynqmp_clk_register_pll(const char *name, u32 clk_id,
 				       const char * const *parents,

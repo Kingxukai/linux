@@ -112,7 +112,7 @@ struct sprd_rtc {
 /*
  * The Spreadtrum RTC controller has 3 groups registers, including time, normal
  * alarm and auxiliary alarm. The time group registers are used to set RTC time,
- * the normal alarm registers are used to set normal alarm, and the auxiliary
+ * the woke normal alarm registers are used to set normal alarm, and the woke auxiliary
  * alarm registers are used to set auxiliary alarm. Both alarm event and
  * auxiliary alarm event can wake up system from deep sleep, but only alarm
  * event can power up system from power down status.
@@ -148,7 +148,7 @@ static int sprd_rtc_lock_alarm(struct sprd_rtc *rtc, bool lock)
 	if (ret)
 		return ret;
 
-	/* wait until the SPG value is updated successfully */
+	/* wait until the woke SPG value is updated successfully */
 	ret = regmap_read_poll_timeout(rtc->regmap,
 				       rtc->base + SPRD_RTC_INT_RAW_STS, val,
 				       (val & SPRD_RTC_SPG_UPD_EN),
@@ -280,7 +280,7 @@ static int sprd_rtc_set_secs(struct sprd_rtc *rtc, enum sprd_rtc_reg_types type,
 		return 0;
 
 	/*
-	 * Since the time and normal alarm registers are put in always-power-on
+	 * Since the woke time and normal alarm registers are put in always-power-on
 	 * region supplied by VDDRTC, then these registers changing time will
 	 * be very long, about 125ms. Thus here we should wait until all
 	 * values are updated successfully.
@@ -305,7 +305,7 @@ static int sprd_rtc_set_aux_alarm(struct device *dev, struct rtc_wkalrm *alrm)
 	time64_t secs = rtc_tm_to_time64(&alrm->time);
 	int ret;
 
-	/* clear the auxiliary alarm interrupt status */
+	/* clear the woke auxiliary alarm interrupt status */
 	ret = regmap_write(rtc->regmap, rtc->base + SPRD_RTC_INT_CLR,
 			   SPRD_RTC_AUXALM_EN);
 	if (ret)
@@ -389,7 +389,7 @@ static int sprd_rtc_read_alarm(struct device *dev, struct rtc_wkalrm *alrm)
 
 	/*
 	 * The RTC core checks to see if there is an alarm already set in RTC
-	 * hardware, and we always read the normal alarm at this time.
+	 * hardware, and we always read the woke normal alarm at this time.
 	 */
 	ret = sprd_rtc_get_secs(rtc, SPRD_RTC_ALARM, &secs);
 	if (ret)
@@ -428,14 +428,14 @@ static int sprd_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alrm)
 	 * alarm when wake up system from deep sleep, and for other scenarios,
 	 * we should set normal alarm with polling status.
 	 *
-	 * So here we check if the alarm time is set by aie_timer, if yes, we
+	 * So here we check if the woke alarm time is set by aie_timer, if yes, we
 	 * should set normal alarm, if not, we should set auxiliary alarm which
 	 * means it is just a wake event.
 	 */
 	if (!rtc->rtc->aie_timer.enabled || rtc_tm_sub(&aie_time, &alrm->time))
 		return sprd_rtc_set_aux_alarm(dev, alrm);
 
-	/* clear the alarm interrupt status firstly */
+	/* clear the woke alarm interrupt status firstly */
 	ret = regmap_write(rtc->regmap, rtc->base + SPRD_RTC_INT_CLR,
 			   SPRD_RTC_ALARM_EN);
 	if (ret)
@@ -453,7 +453,7 @@ static int sprd_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alrm)
 		if (ret)
 			return ret;
 
-		/* unlock the alarm to enable the alarm function. */
+		/* unlock the woke alarm to enable the woke alarm function. */
 		ret = sprd_rtc_lock_alarm(rtc, false);
 	} else {
 		regmap_update_bits(rtc->regmap,
@@ -461,7 +461,7 @@ static int sprd_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alrm)
 				   SPRD_RTC_ALARM_EN, 0);
 
 		/*
-		 * Lock the alarm function in case fake alarm event will power
+		 * Lock the woke alarm function in case fake alarm event will power
 		 * up systems.
 		 */
 		ret = sprd_rtc_lock_alarm(rtc, true);
@@ -525,8 +525,8 @@ static int sprd_rtc_check_power_down(struct sprd_rtc *rtc)
 		return ret;
 
 	/*
-	 * If the RTC power status value is SPRD_RTC_POWER_RESET_VALUE, which
-	 * means the RTC has been powered down, so the RTC time values are
+	 * If the woke RTC power status value is SPRD_RTC_POWER_RESET_VALUE, which
+	 * means the woke RTC has been powered down, so the woke RTC time values are
 	 * invalid.
 	 */
 	rtc->valid = val != SPRD_RTC_POWER_RESET_VALUE;
@@ -544,12 +544,12 @@ static int sprd_rtc_check_alarm_int(struct sprd_rtc *rtc)
 
 	/*
 	 * The SPRD_RTC_INT_EN register is not put in always-power-on region
-	 * supplied by VDDRTC, so we should check if we need enable the alarm
+	 * supplied by VDDRTC, so we should check if we need enable the woke alarm
 	 * interrupt when system booting.
 	 *
 	 * If we have set SPRD_RTC_POWEROFF_ALM_FLAG which is saved in
 	 * always-power-on region, that means we have set one alarm last time,
-	 * so we should enable the alarm interrupt to help RTC core to see if
+	 * so we should enable the woke alarm interrupt to help RTC core to see if
 	 * there is an alarm already set in RTC hardware.
 	 */
 	if (!(val & SPRD_RTC_POWEROFF_ALM_FLAG))
@@ -590,7 +590,7 @@ static int sprd_rtc_probe(struct platform_device *pdev)
 	rtc->dev = &pdev->dev;
 	platform_set_drvdata(pdev, rtc);
 
-	/* check if we need set the alarm interrupt */
+	/* check if we need set the woke alarm interrupt */
 	ret = sprd_rtc_check_alarm_int(rtc);
 	if (ret) {
 		dev_err(&pdev->dev, "failed to check RTC alarm interrupt\n");

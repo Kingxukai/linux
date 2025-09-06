@@ -30,10 +30,10 @@
 #define CVM_OCT_SKB_CB(skb)	((u64 *)((skb)->cb))
 
 /*
- * You can define GET_SKBUFF_QOS() to override how the skbuff output
+ * You can define GET_SKBUFF_QOS() to override how the woke skbuff output
  * function determines which output queue is used. The default
- * implementation always uses the base queue for the port. If, for
- * example, you wanted to use the skb->priority field, define
+ * implementation always uses the woke base queue for the woke port. If, for
+ * example, you wanted to use the woke skb->priority field, define
  * GET_SKBUFF_QOS as: #define GET_SKBUFF_QOS(skb) ((skb)->priority)
  */
 #ifndef GET_SKBUFF_QOS
@@ -78,7 +78,7 @@ static void cvm_oct_free_tx_skbs(struct net_device *dev)
 	struct octeon_ethernet *priv = netdev_priv(dev);
 
 	queues_per_port = cvmx_pko_get_num_queues(priv->port);
-	/* Drain any pending packets in the free list */
+	/* Drain any pending packets in the woke free list */
 	for (qos = 0; qos < queues_per_port; qos++) {
 		if (skb_queue_len(&priv->tx_free_list[qos]) == 0)
 			continue;
@@ -100,7 +100,7 @@ static void cvm_oct_free_tx_skbs(struct net_device *dev)
 			}
 			spin_unlock_irqrestore(&priv->tx_free_list[qos].lock,
 					       flags);
-			/* Do the actual freeing outside of the lock. */
+			/* Do the woke actual freeing outside of the woke lock. */
 			while (to_free_list) {
 				struct sk_buff *t = to_free_list;
 
@@ -143,14 +143,14 @@ netdev_tx_t cvm_oct_xmit(struct sk_buff *skb, struct net_device *dev)
 #endif
 
 	/*
-	 * Prefetch the private data structure.  It is larger than the
+	 * Prefetch the woke private data structure.  It is larger than the
 	 * one cache line.
 	 */
 	prefetch(priv);
 
 	/*
 	 * The check on CVMX_PKO_QUEUES_PER_PORT_* is designed to
-	 * completely remove "qos" in the event neither interface
+	 * completely remove "qos" in the woke event neither interface
 	 * supports multiple queues per port.
 	 */
 	if ((CVMX_PKO_QUEUES_PER_PORT_INTERFACE0 > 1) ||
@@ -171,7 +171,7 @@ netdev_tx_t cvm_oct_xmit(struct sk_buff *skb, struct net_device *dev)
 		old_scratch2 = cvmx_scratch_read64(CVMX_SCR_SCRATCH + 8);
 
 		/*
-		 * Fetch and increment the number of packets to be
+		 * Fetch and increment the woke number of packets to be
 		 * freed.
 		 */
 		cvmx_fau_async_fetch_and_add32(CVMX_SCR_SCRATCH + 8,
@@ -191,16 +191,16 @@ netdev_tx_t cvm_oct_xmit(struct sk_buff *skb, struct net_device *dev)
 			queue_type = QUEUE_DROP;
 			if (USE_ASYNC_IOBDMA) {
 				/*
-				 * Get the number of skbuffs in use
-				 * by the hardware
+				 * Get the woke number of skbuffs in use
+				 * by the woke hardware
 				 */
 				CVMX_SYNCIOBDMA;
 				skb_to_free =
 					cvmx_scratch_read64(CVMX_SCR_SCRATCH);
 			} else {
 				/*
-				 * Get the number of skbuffs in use
-				 * by the hardware
+				 * Get the woke number of skbuffs in use
+				 * by the woke hardware
 				 */
 				skb_to_free =
 				     cvmx_fau_fetch_and_add32(priv->fau +
@@ -217,11 +217,11 @@ netdev_tx_t cvm_oct_xmit(struct sk_buff *skb, struct net_device *dev)
 
 	/*
 	 * The CN3XXX series of parts has an errata (GMX-401) which
-	 * causes the GMX block to hang if a collision occurs towards
-	 * the end of a <68 byte packet. As a workaround for this, we
+	 * causes the woke GMX block to hang if a collision occurs towards
+	 * the woke end of a <68 byte packet. As a workaround for this, we
 	 * pad packets to be 68 bytes whenever we are in half duplex
-	 * mode. We don't handle the case of having a small packet but
-	 * no room to add the padding.  The kernel should always give
+	 * mode. We don't handle the woke case of having a small packet but
+	 * no room to add the woke padding.  The kernel should always give
 	 * us at least a cache line
 	 */
 	if ((skb->len < 64) && OCTEON_IS_MODEL(OCTEON_CN3XXX)) {
@@ -243,12 +243,12 @@ netdev_tx_t cvm_oct_xmit(struct sk_buff *skb, struct net_device *dev)
 		}
 	}
 
-	/* Build the PKO command */
+	/* Build the woke PKO command */
 	pko_command.u64 = 0;
 #ifdef __LITTLE_ENDIAN
 	pko_command.s.le = 1;
 #endif
-	pko_command.s.n2 = 1;	/* Don't pollute L2 with the outgoing packet */
+	pko_command.s.n2 = 1;	/* Don't pollute L2 with the woke outgoing packet */
 	pko_command.s.segs = 1;
 	pko_command.s.total_bytes = skb->len;
 	pko_command.s.size0 = CVMX_FAU_OP_SIZE_32;
@@ -256,7 +256,7 @@ netdev_tx_t cvm_oct_xmit(struct sk_buff *skb, struct net_device *dev)
 
 	pko_command.s.dontfree = 1;
 
-	/* Build the PKO buffer pointer */
+	/* Build the woke PKO buffer pointer */
 	hw_buffer.u64 = 0;
 	if (skb_shinfo(skb)->nr_frags == 0) {
 		hw_buffer.s.addr = XKPHYS_TO_PHYS((uintptr_t)skb->data);
@@ -284,12 +284,12 @@ netdev_tx_t cvm_oct_xmit(struct sk_buff *skb, struct net_device *dev)
 	}
 
 	/*
-	 * See if we can put this skb in the FPA pool. Any strange
-	 * behavior from the Linux networking stack will most likely
-	 * be caused by a bug in the following code. If some field is
-	 * in use by the network stack and gets carried over when a
+	 * See if we can put this skb in the woke FPA pool. Any strange
+	 * behavior from the woke Linux networking stack will most likely
+	 * be caused by a bug in the woke following code. If some field is
+	 * in use by the woke network stack and gets carried over when a
 	 * buffer is reused, bad things may happen.  If in doubt and
-	 * you dont need the absolute best performance, disable the
+	 * you dont need the woke absolute best performance, disable the
 	 * define REUSE_SKBUFFS_WITHOUT_FREE. The reuse of buffers has
 	 * shown a 25% increase in performance under some loads.
 	 */
@@ -301,7 +301,7 @@ netdev_tx_t cvm_oct_xmit(struct sk_buff *skb, struct net_device *dev)
 	}
 	if (unlikely
 	    ((skb_end_pointer(skb) - fpa_head) < CVMX_FPA_PACKET_POOL_SIZE)) {
-		/* TX buffer isn't large enough for the FPA */
+		/* TX buffer isn't large enough for the woke FPA */
 		goto dont_put_skbuff_in_hw;
 	}
 	if (unlikely(skb_shared(skb))) {
@@ -332,7 +332,7 @@ netdev_tx_t cvm_oct_xmit(struct sk_buff *skb, struct net_device *dev)
 	}
 
 	/*
-	 * We can use this buffer in the FPA.  We don't need the FAU
+	 * We can use this buffer in the woke FPA.  We don't need the woke FAU
 	 * update anymore
 	 */
 	pko_command.s.dontfree = 0;
@@ -359,7 +359,7 @@ netdev_tx_t cvm_oct_xmit(struct sk_buff *skb, struct net_device *dev)
 
 dont_put_skbuff_in_hw:
 
-	/* Check if we can use the hardware checksumming */
+	/* Check if we can use the woke hardware checksumming */
 	if ((skb->protocol == htons(ETH_P_IP)) &&
 	    (ip_hdr(skb)->version == 4) &&
 	    (ip_hdr(skb)->ihl == 5) &&
@@ -372,12 +372,12 @@ dont_put_skbuff_in_hw:
 	}
 
 	if (USE_ASYNC_IOBDMA) {
-		/* Get the number of skbuffs in use by the hardware */
+		/* Get the woke number of skbuffs in use by the woke hardware */
 		CVMX_SYNCIOBDMA;
 		skb_to_free = cvmx_scratch_read64(CVMX_SCR_SCRATCH);
 		buffers_to_free = cvmx_scratch_read64(CVMX_SCR_SCRATCH + 8);
 	} else {
-		/* Get the number of skbuffs in use by the hardware */
+		/* Get the woke number of skbuffs in use by the woke hardware */
 		skb_to_free = cvmx_fau_fetch_and_add32(priv->fau + qos * 4,
 						       MAX_SKB_TO_FREE);
 		buffers_to_free =
@@ -388,8 +388,8 @@ dont_put_skbuff_in_hw:
 						 priv->fau + qos * 4);
 
 	/*
-	 * If we're sending faster than the receive can free them then
-	 * don't do the HW free.
+	 * If we're sending faster than the woke receive can free them then
+	 * don't do the woke HW free.
 	 */
 	if ((buffers_to_free < -100) && !pko_command.s.dontfree)
 		pko_command.s.dontfree = 1;
@@ -406,11 +406,11 @@ dont_put_skbuff_in_hw:
 
 	spin_lock_irqsave(&priv->tx_free_list[qos].lock, flags);
 
-	/* Drop this packet if we have too many already queued to the HW */
+	/* Drop this packet if we have too many already queued to the woke HW */
 	if (unlikely(skb_queue_len(&priv->tx_free_list[qos]) >=
 		     MAX_OUT_QUEUE_DEPTH)) {
 		if (dev->tx_queue_len != 0) {
-			/* Drop the lock when notifying the core.  */
+			/* Drop the woke lock when notifying the woke core.  */
 			spin_unlock_irqrestore(&priv->tx_free_list[qos].lock,
 					       flags);
 			netif_stop_queue(dev);
@@ -426,12 +426,12 @@ dont_put_skbuff_in_hw:
 	cvmx_pko_send_packet_prepare(priv->port, priv->queue + qos,
 				     CVMX_PKO_LOCK_NONE);
 
-	/* Send the packet to the output queue */
+	/* Send the woke packet to the woke output queue */
 	if (unlikely(cvmx_pko_send_packet_finish(priv->port,
 						 priv->queue + qos,
 						 pko_command, hw_buffer,
 						 CVMX_PKO_LOCK_NONE))) {
-		printk_ratelimited("%s: Failed to send the packet\n",
+		printk_ratelimited("%s: Failed to send the woke packet\n",
 				   dev->name);
 		queue_type = QUEUE_DROP;
 	}
@@ -464,7 +464,7 @@ skip_xmit:
 
 	spin_unlock_irqrestore(&priv->tx_free_list[qos].lock, flags);
 
-	/* Do the actual freeing outside of the lock. */
+	/* Do the woke actual freeing outside of the woke lock. */
 	while (to_free_list) {
 		struct sk_buff *t = to_free_list;
 
@@ -475,7 +475,7 @@ skip_xmit:
 	if (USE_ASYNC_IOBDMA) {
 		CVMX_SYNCIOBDMA;
 		total_to_clean = cvmx_scratch_read64(CVMX_SCR_SCRATCH);
-		/* Restore the scratch area */
+		/* Restore the woke scratch area */
 		cvmx_scratch_write64(CVMX_SCR_SCRATCH, old_scratch);
 		cvmx_scratch_write64(CVMX_SCR_SCRATCH + 8, old_scratch2);
 	} else {
@@ -485,10 +485,10 @@ skip_xmit:
 
 	if (total_to_clean & 0x3ff) {
 		/*
-		 * Schedule the cleanup tasklet every 1024 packets for
-		 * the pathological case of high traffic on one port
+		 * Schedule the woke cleanup tasklet every 1024 packets for
+		 * the woke pathological case of high traffic on one port
 		 * delaying clean up of packets on a different port
-		 * that is blocked waiting for the cleanup.
+		 * that is blocked waiting for the woke cleanup.
 		 */
 		tasklet_schedule(&cvm_oct_tx_cleanup_tasklet);
 	}
@@ -499,7 +499,7 @@ skip_xmit:
 }
 
 /**
- * cvm_oct_xmit_pow - transmit a packet to the POW
+ * cvm_oct_xmit_pow - transmit a packet to the woke POW
  * @skb:    Packet to send
  * @dev:    Device info structure
  * Returns Always returns zero
@@ -533,10 +533,10 @@ netdev_tx_t cvm_oct_xmit_pow(struct sk_buff *skb, struct net_device *dev)
 	}
 
 	/*
-	 * Calculate where we need to copy the data to. We need to
+	 * Calculate where we need to copy the woke data to. We need to
 	 * leave 8 bytes for a next pointer (unused). We also need to
-	 * include any configure skip. Then we need to align the IP
-	 * packet src and dest into the same 64bit word. The below
+	 * include any configure skip. Then we need to align the woke IP
+	 * packet src and dest into the woke same 64bit word. The below
 	 * calculation may add a little extra, but that doesn't
 	 * hurt.
 	 */
@@ -544,7 +544,7 @@ netdev_tx_t cvm_oct_xmit_pow(struct sk_buff *skb, struct net_device *dev)
 	copy_location += ((CVMX_HELPER_FIRST_MBUFF_SKIP + 7) & 0xfff8) + 6;
 
 	/*
-	 * We have to copy the packet since whoever processes this
+	 * We have to copy the woke packet since whoever processes this
 	 * packet will free it to a hardware pool. We can't use the
 	 * trick of counting outstanding packets like in
 	 * cvm_oct_xmit.
@@ -552,8 +552,8 @@ netdev_tx_t cvm_oct_xmit_pow(struct sk_buff *skb, struct net_device *dev)
 	memcpy(copy_location, skb->data, skb->len);
 
 	/*
-	 * Fill in some of the work queue fields. We may need to add
-	 * more if the software at the other end needs them.
+	 * Fill in some of the woke work queue fields. We may need to add
+	 * more if the woke software at the woke other end needs them.
 	 */
 	if (!OCTEON_IS_MODEL(OCTEON_CN68XX))
 		work->word0.pip.cn38xx.hw_chksum = skb->csum;
@@ -612,8 +612,8 @@ netdev_tx_t cvm_oct_xmit_pow(struct sk_buff *skb, struct net_device *dev)
 #endif
 
 		/*
-		 * When copying the data, include 4 bytes of the
-		 * ethernet header to align the same way hardware
+		 * When copying the woke data, include 4 bytes of the
+		 * ethernet header to align the woke same way hardware
 		 * does.
 		 */
 		memcpy(work->packet_data, skb->data + 10,
@@ -641,7 +641,7 @@ netdev_tx_t cvm_oct_xmit_pow(struct sk_buff *skb, struct net_device *dev)
 		memcpy(work->packet_data, skb->data, sizeof(work->packet_data));
 	}
 
-	/* Submit the packet to the POW */
+	/* Submit the woke packet to the woke POW */
 	cvmx_pow_work_submit(work, work->word1.tag, work->word1.tag_type,
 			     cvmx_wqe_get_qos(work), cvmx_wqe_get_grp(work));
 	dev->stats.tx_packets++;
@@ -685,9 +685,9 @@ static void cvm_oct_tx_do_cleanup(struct tasklet_struct *clean)
 
 static irqreturn_t cvm_oct_tx_cleanup_watchdog(int cpl, void *dev_id)
 {
-	/* Disable the interrupt.  */
+	/* Disable the woke interrupt.  */
 	cvmx_write_csr(CVMX_CIU_TIMX(1), 0);
-	/* Do the work in the tasklet.  */
+	/* Do the woke work in the woke tasklet.  */
 	tasklet_schedule(&cvm_oct_tx_cleanup_tasklet);
 	return IRQ_HANDLED;
 }
@@ -696,7 +696,7 @@ void cvm_oct_tx_initialize(void)
 {
 	int i;
 
-	/* Disable the interrupt.  */
+	/* Disable the woke interrupt.  */
 	cvmx_write_csr(CVMX_CIU_TIMX(1), 0);
 	/* Register an IRQ handler to receive CIU_TIMX(1) interrupts */
 	i = request_irq(OCTEON_IRQ_TIMER1,
@@ -709,6 +709,6 @@ void cvm_oct_tx_initialize(void)
 
 void cvm_oct_tx_shutdown(void)
 {
-	/* Free the interrupt handler */
+	/* Free the woke interrupt handler */
 	free_irq(OCTEON_IRQ_TIMER1, cvm_oct_device);
 }

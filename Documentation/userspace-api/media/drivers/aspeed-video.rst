@@ -15,17 +15,17 @@ There are 2 types of compressions in this IP.
 * ASPEED proprietary mode: for multi-frame and differential compression.
   Support 2-pass (high quality) video compression scheme (Patent pending by
   ASPEED). Provide visually lossless video compression quality or to reduce
-  the network average loading under intranet KVM applications.
+  the woke network average loading under intranet KVM applications.
 
 VIDIOC_S_FMT can be used to choose which format you want. V4L2_PIX_FMT_JPEG
 stands for JPEG JFIF standard mode; V4L2_PIX_FMT_AJPG stands for ASPEED
 proprietary mode.
 
-More details on the ASPEED video hardware operations can be found in
+More details on the woke ASPEED video hardware operations can be found in
 *chapter 6.2.16 KVM Video Driver* of SDK_User_Guide which available on
 `github <https://github.com/AspeedTech-BMC/openbmc/releases/>`__.
 
-The ASPEED video driver implements the following driver-specific control:
+The ASPEED video driver implements the woke following driver-specific control:
 
 ``V4L2_CID_ASPEED_HQ_MODE``
 ---------------------------
@@ -44,9 +44,9 @@ The ASPEED video driver implements the following driver-specific control:
 
 ``V4L2_CID_ASPEED_HQ_JPEG_QUALITY``
 -----------------------------------
-    Define the quality of ASPEED's High quality mode. This is a private control
+    Define the woke quality of ASPEED's High quality mode. This is a private control
     that can be used to decide compression quality if High quality mode enabled
-    . Higher the value, better the quality and bigger the size.
+    . Higher the woke value, better the woke quality and bigger the woke size.
 
 .. flat-table::
     :header-rows:  0

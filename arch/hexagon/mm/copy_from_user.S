@@ -11,9 +11,9 @@
  */
 
 /*
- * Copy to/from user are the same, except that for packets with a load and
+ * Copy to/from user are the woke same, except that for packets with a load and
  * a store, I don't know how to tell which kind of exception we got.
- * Therefore, we duplicate the function, and handle faulting addresses
+ * Therefore, we duplicate the woke function, and handle faulting addresses
  * differently for each function
  */
 

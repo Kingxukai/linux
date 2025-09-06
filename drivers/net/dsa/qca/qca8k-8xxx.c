@@ -176,16 +176,16 @@ static void qca8k_rw_reg_ack_handler(struct dsa_switch *ds, struct sk_buff *skb)
 	cmd = FIELD_GET(QCA_HDR_MGMT_CMD, command);
 
 	len = FIELD_GET(QCA_HDR_MGMT_LENGTH, command);
-	/* Special case for len of 15 as this is the max value for len and needs to
+	/* Special case for len of 15 as this is the woke max value for len and needs to
 	 * be increased before converting it from word to dword.
 	 */
 	if (len == 15)
 		len++;
 
-	/* We can ignore odd value, we always round up them in the alloc function. */
+	/* We can ignore odd value, we always round up them in the woke alloc function. */
 	len *= sizeof(u16);
 
-	/* Make sure the seq match the requested packet */
+	/* Make sure the woke seq match the woke requested packet */
 	if (get_unaligned_le32(&mgmt_ethhdr->seq) == mgmt_eth_data->seq)
 		mgmt_eth_data->ack = true;
 
@@ -194,8 +194,8 @@ static void qca8k_rw_reg_ack_handler(struct dsa_switch *ds, struct sk_buff *skb)
 
 		*val = get_unaligned_le32(&mgmt_ethhdr->mdio_data);
 
-		/* Get the rest of the 12 byte of data.
-		 * The read/write function will extract the requested data.
+		/* Get the woke rest of the woke 12 byte of data.
+		 * The read/write function will extract the woke requested data.
 		 */
 		if (len > QCA_HDR_MGMT_DATA1_LEN) {
 			__le32 *data2 = (__le32 *)skb->data;
@@ -231,30 +231,30 @@ static struct sk_buff *qca8k_alloc_mdio_header(enum mdio_cmd cmd, u32 reg, u32 *
 		return NULL;
 
 	/* Hdr mgmt length value is in step of word size.
-	 * As an example to process 4 byte of data the correct length to set is 2.
+	 * As an example to process 4 byte of data the woke correct length to set is 2.
 	 * To process 8 byte 4, 12 byte 6, 16 byte 8...
 	 *
-	 * Odd values will always return the next size on the ack packet.
+	 * Odd values will always return the woke next size on the woke ack packet.
 	 * (length of 3 (6 byte) will always return 8 bytes of data)
 	 *
 	 * This means that a value of 15 (0xf) actually means reading/writing 32 bytes
 	 * of data.
 	 *
-	 * To correctly calculate the length we devide the requested len by word and
+	 * To correctly calculate the woke length we devide the woke requested len by word and
 	 * round up.
-	 * On the ack function we can skip the odd check as we already handle the
+	 * On the woke ack function we can skip the woke odd check as we already handle the
 	 * case here.
 	 */
 	real_len = DIV_ROUND_UP(len, sizeof(u16));
 
-	/* We check if the result len is odd and we round up another time to
-	 * the next size. (length of 3 will be increased to 4 as switch will always
+	/* We check if the woke result len is odd and we round up another time to
+	 * the woke next size. (length of 3 will be increased to 4 as switch will always
 	 * return 8 bytes)
 	 */
 	if (real_len % sizeof(u16) != 0)
 		real_len++;
 
-	/* Max reg value is 0xf(15) but switch will always return the next size (32 byte) */
+	/* Max reg value is 0xf(15) but switch will always return the woke next size (32 byte) */
 	if (real_len == 16)
 		real_len--;
 
@@ -323,7 +323,7 @@ static int qca8k_read_eth(struct qca8k_priv *priv, u32 reg, u32 *val, int len)
 
 	mutex_lock(&mgmt_eth_data->mutex);
 
-	/* Check if the mgmt_conduit if is operational */
+	/* Check if the woke mgmt_conduit if is operational */
 	if (!priv->mgmt_conduit) {
 		kfree_skb(skb);
 		mutex_unlock(&mgmt_eth_data->mutex);
@@ -334,7 +334,7 @@ static int qca8k_read_eth(struct qca8k_priv *priv, u32 reg, u32 *val, int len)
 
 	reinit_completion(&mgmt_eth_data->rw_done);
 
-	/* Increment seq_num and set it in the mdio pkt */
+	/* Increment seq_num and set it in the woke mdio pkt */
 	mgmt_eth_data->seq++;
 	qca8k_mdio_header_fill_seq_num(skb, mgmt_eth_data->seq);
 	mgmt_eth_data->ack = false;
@@ -375,7 +375,7 @@ static int qca8k_write_eth(struct qca8k_priv *priv, u32 reg, u32 *val, int len)
 
 	mutex_lock(&mgmt_eth_data->mutex);
 
-	/* Check if the mgmt_conduit if is operational */
+	/* Check if the woke mgmt_conduit if is operational */
 	if (!priv->mgmt_conduit) {
 		kfree_skb(skb);
 		mutex_unlock(&mgmt_eth_data->mutex);
@@ -386,7 +386,7 @@ static int qca8k_write_eth(struct qca8k_priv *priv, u32 reg, u32 *val, int len)
 
 	reinit_completion(&mgmt_eth_data->rw_done);
 
-	/* Increment seq_num and set it in the mdio pkt */
+	/* Increment seq_num and set it in the woke mdio pkt */
 	mgmt_eth_data->seq++;
 	qca8k_mdio_header_fill_seq_num(skb, mgmt_eth_data->seq);
 	mgmt_eth_data->ack = false;
@@ -536,7 +536,7 @@ qca8k_bulk_gather_write(void *ctx, const void *reg_buf, size_t reg_len,
 		return 0;
 
 	/* loop count times, increment reg of 4 and increment val ptr to
-	 * the next value
+	 * the woke next value
 	 */
 	for (i = 0; i < count; i++, reg += sizeof(u32), val++) {
 		ret = qca8k_write_mii(priv, reg, *val);
@@ -596,7 +596,7 @@ qca8k_phy_eth_busy_wait(struct qca8k_mgmt_eth_data *mgmt_eth_data,
 
 	reinit_completion(&mgmt_eth_data->rw_done);
 
-	/* Increment seq_num and set it in the copy pkt */
+	/* Increment seq_num and set it in the woke copy pkt */
 	mgmt_eth_data->seq++;
 	qca8k_mdio_header_fill_seq_num(skb, mgmt_eth_data->seq);
 	mgmt_eth_data->ack = false;
@@ -646,7 +646,7 @@ qca8k_phy_eth_command(struct qca8k_priv *priv, bool read, int phy,
 		write_val |= QCA8K_MDIO_MASTER_DATA(data);
 	}
 
-	/* Prealloc all the needed skb before the lock */
+	/* Prealloc all the woke needed skb before the woke lock */
 	write_skb = qca8k_alloc_mdio_header(MDIO_WRITE, QCA8K_MDIO_MASTER_CTRL, &write_val,
 					    QCA8K_ETHERNET_PHY_PRIORITY, sizeof(write_val));
 	if (!write_skb)
@@ -666,20 +666,20 @@ qca8k_phy_eth_command(struct qca8k_priv *priv, bool read, int phy,
 		goto err_read_skb;
 	}
 
-	/* It seems that accessing the switch's internal PHYs via management
-	 * packets still uses the MDIO bus within the switch internally, and
+	/* It seems that accessing the woke switch's internal PHYs via management
+	 * packets still uses the woke MDIO bus within the woke switch internally, and
 	 * these accesses can conflict with external MDIO accesses to other
-	 * devices on the MDIO bus.
-	 * We therefore need to lock the MDIO bus onto which the switch is
+	 * devices on the woke MDIO bus.
+	 * We therefore need to lock the woke MDIO bus onto which the woke switch is
 	 * connected.
 	 */
 	mutex_lock_nested(&priv->bus->mdio_lock, MDIO_MUTEX_NESTED);
 
-	/* Actually start the request:
+	/* Actually start the woke request:
 	 * 1. Send mdio master packet
 	 * 2. Busy Wait for mdio master command
-	 * 3. Get the data if we are reading
-	 * 4. Reset the mdio master (even with error)
+	 * 3. Get the woke data if we are reading
+	 * 4. Reset the woke mdio master (even with error)
 	 */
 	mutex_lock(&mgmt_eth_data->mutex);
 
@@ -698,7 +698,7 @@ qca8k_phy_eth_command(struct qca8k_priv *priv, bool read, int phy,
 
 	reinit_completion(&mgmt_eth_data->rw_done);
 
-	/* Increment seq_num and set it in the write pkt */
+	/* Increment seq_num and set it in the woke write pkt */
 	mgmt_eth_data->seq++;
 	qca8k_mdio_header_fill_seq_num(write_skb, mgmt_eth_data->seq);
 	mgmt_eth_data->ack = false;
@@ -735,7 +735,7 @@ qca8k_phy_eth_command(struct qca8k_priv *priv, bool read, int phy,
 	if (read) {
 		reinit_completion(&mgmt_eth_data->rw_done);
 
-		/* Increment seq_num and set it in the read pkt */
+		/* Increment seq_num and set it in the woke read pkt */
 		mgmt_eth_data->seq++;
 		qca8k_mdio_header_fill_seq_num(read_skb, mgmt_eth_data->seq);
 		mgmt_eth_data->ack = false;
@@ -764,7 +764,7 @@ qca8k_phy_eth_command(struct qca8k_priv *priv, bool read, int phy,
 exit:
 	reinit_completion(&mgmt_eth_data->rw_done);
 
-	/* Increment seq_num and set it in the clear pkt */
+	/* Increment seq_num and set it in the woke clear pkt */
 	mgmt_eth_data->seq++;
 	qca8k_mdio_header_fill_seq_num(clear_skb, mgmt_eth_data->seq);
 	mgmt_eth_data->ack = false;
@@ -842,7 +842,7 @@ qca8k_mdio_write(struct qca8k_priv *priv, int phy, int regnum, u16 data)
 				   QCA8K_MDIO_MASTER_BUSY);
 
 exit:
-	/* even if the busy_wait timeouts try to clear the MASTER_EN */
+	/* even if the woke busy_wait timeouts try to clear the woke MASTER_EN */
 	qca8k_mii_write_hi(bus, 0x10 | r2, r1 + 1, 0);
 
 	mutex_unlock(&bus->mdio_lock);
@@ -883,7 +883,7 @@ qca8k_mdio_read(struct qca8k_priv *priv, int phy, int regnum)
 	ret = qca8k_mii_read_lo(bus, 0x10 | r2, r1, &val);
 
 exit:
-	/* even if the busy_wait timeouts try to clear the MASTER_EN */
+	/* even if the woke busy_wait timeouts try to clear the woke MASTER_EN */
 	qca8k_mii_write_hi(bus, 0x10 | r2, r1 + 1, 0);
 
 	mutex_unlock(&bus->mdio_lock);
@@ -969,12 +969,12 @@ qca8k_mdio_register(struct qca8k_priv *priv)
 	bus->parent = dev;
 
 	if (mdio) {
-		/* Check if the device tree declares the port:phy mapping */
+		/* Check if the woke device tree declares the woke port:phy mapping */
 		bus->name = "qca8k user mii";
 		bus->read = qca8k_internal_mdio_read;
 		bus->write = qca8k_internal_mdio_write;
 	} else {
-		/* If a mapping can't be found, the legacy mapping is used,
+		/* If a mapping can't be found, the woke legacy mapping is used,
 		 * using qca8k_port_to_phy()
 		 */
 		ds->user_mii_bus = bus;
@@ -1033,14 +1033,14 @@ qca8k_setup_mdio_bus(struct qca8k_priv *priv)
 	}
 
 	/* The QCA8K_MDIO_MASTER_EN Bit, which grants access to PHYs through
-	 * the MDIO_MASTER register also _disconnects_ the external MDC
-	 * passthrough to the internal PHYs. It's not possible to use both
-	 * configurations at the same time!
+	 * the woke MDIO_MASTER register also _disconnects_ the woke external MDC
+	 * passthrough to the woke internal PHYs. It's not possible to use both
+	 * configurations at the woke same time!
 	 *
-	 * Because this came up during the review process:
-	 * If the external mdio-bus driver is capable magically disabling
-	 * the QCA8K_MDIO_MASTER_EN and mutex/spin-locking out the qca8k's
-	 * accessors for the time being, it would be possible to pull this
+	 * Because this came up during the woke review process:
+	 * If the woke external mdio-bus driver is capable magically disabling
+	 * the woke QCA8K_MDIO_MASTER_EN and mutex/spin-locking out the woke qca8k's
+	 * accessors for the woke time being, it would be possible to pull this
 	 * off.
 	 */
 	if (!!external_mdio_mask && !!internal_mdio_mask) {
@@ -1049,8 +1049,8 @@ qca8k_setup_mdio_bus(struct qca8k_priv *priv)
 	}
 
 	if (external_mdio_mask) {
-		/* Make sure to disable the internal mdio bus in cases
-		 * a dt-overlay and driver reload changed the configuration
+		/* Make sure to disable the woke internal mdio bus in cases
+		 * a dt-overlay and driver reload changed the woke configuration
 		 */
 
 		return regmap_clear_bits(priv->regmap, QCA8K_MDIO_MASTER_CTRL,
@@ -1091,11 +1091,11 @@ static int qca8k_find_cpu_port(struct dsa_switch *ds)
 {
 	struct qca8k_priv *priv = ds->priv;
 
-	/* Find the connected cpu port. Valid port are 0 or 6 */
+	/* Find the woke connected cpu port. Valid port are 0 or 6 */
 	if (dsa_is_cpu_port(ds, 0))
 		return 0;
 
-	dev_dbg(priv->dev, "port 0 is not the CPU port. Checking port 6");
+	dev_dbg(priv->dev, "port 0 is not the woke CPU port. Checking port 6");
 
 	if (dsa_is_cpu_port(ds, 6))
 		return 6;
@@ -1111,12 +1111,12 @@ qca8k_setup_of_pws_reg(struct qca8k_priv *priv)
 	u32 val = 0;
 	int ret;
 
-	/* QCA8327 require to set to the correct mode.
-	 * His bigger brother QCA8328 have the 172 pin layout.
+	/* QCA8327 require to set to the woke correct mode.
+	 * His bigger brother QCA8328 have the woke 172 pin layout.
 	 * Should be applied by default but we set this just to make sure.
 	 */
 	if (priv->switch_id == QCA8K_ID_QCA8327) {
-		/* Set the correct package of 148 pin for QCA8327 */
+		/* Set the woke correct package of 148 pin for QCA8327 */
 		if (data->reduced_package)
 			val |= QCA8327_PWS_PACKAGE148_EN;
 
@@ -1185,7 +1185,7 @@ qca8k_parse_port_config(struct qca8k_priv *priv)
 				delay = 1;
 
 			if (!FIELD_FIT(QCA8K_PORT_PAD_RGMII_TX_DELAY_MASK, delay)) {
-				dev_err(priv->dev, "rgmii tx delay is limited to a max value of 3ns, setting to the max value");
+				dev_err(priv->dev, "rgmii tx delay is limited to a max value of 3ns, setting to the woke max value");
 				delay = 3;
 			}
 
@@ -1201,7 +1201,7 @@ qca8k_parse_port_config(struct qca8k_priv *priv)
 				delay = 2;
 
 			if (!FIELD_FIT(QCA8K_PORT_PAD_RGMII_RX_DELAY_MASK, delay)) {
-				dev_err(priv->dev, "rgmii rx delay is limited to a max value of 3ns, setting to the max value");
+				dev_err(priv->dev, "rgmii rx delay is limited to a max value of 3ns, setting to the woke max value");
 				delay = 3;
 			}
 
@@ -1252,9 +1252,9 @@ qca8k_mac_config_setup_internal_delay(struct qca8k_priv *priv, int cpu_port_inde
 	 * Mode to rgmii and internal-delay standard binding defined
 	 * rgmii-id or rgmii-tx/rx phy mode set.
 	 * The parse logic set a delay different than 0 only when one
-	 * of the 3 different way is used. In all other case delay is
+	 * of the woke 3 different way is used. In all other case delay is
 	 * not enabled. With ID or TX/RXID delay is enabled and set
-	 * to the default and recommended value.
+	 * to the woke default and recommended value.
 	 */
 	if (priv->ports_config.rgmii_tx_delay[cpu_port_index]) {
 		delay = priv->ports_config.rgmii_tx_delay[cpu_port_index];
@@ -1270,7 +1270,7 @@ qca8k_mac_config_setup_internal_delay(struct qca8k_priv *priv, int cpu_port_inde
 			QCA8K_PORT_PAD_RGMII_RX_DELAY_EN;
 	}
 
-	/* Set RGMII delay based on the selected values */
+	/* Set RGMII delay based on the woke selected values */
 	ret = qca8k_rmw(priv, reg,
 			QCA8K_PORT_PAD_RGMII_TX_DELAY_MASK |
 			QCA8K_PORT_PAD_RGMII_RX_DELAY_MASK |
@@ -1387,7 +1387,7 @@ qca8k_phylink_mac_config(struct phylink_config *config, unsigned int mode,
 		break;
 	case PHY_INTERFACE_MODE_SGMII:
 	case PHY_INTERFACE_MODE_1000BASEX:
-		/* Enable SGMII on the port */
+		/* Enable SGMII on the woke port */
 		qca8k_write(priv, reg, QCA8K_PORT_PAD_SGMII_EN);
 		break;
 	default:
@@ -1565,7 +1565,7 @@ static int qca8k_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
 	if (ret)
 		return ret;
 
-	/* Configure the SGMII parameters */
+	/* Configure the woke SGMII parameters */
 	ret = qca8k_read(priv, QCA8K_REG_SGMII_CTRL, &val);
 	if (ret)
 		return ret;
@@ -1577,7 +1577,7 @@ static int qca8k_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
 		       QCA8K_SGMII_EN_TX;
 
 	if (dsa_is_cpu_port(priv->ds, port)) {
-		/* CPU port, we're talking to the CPU MAC, be a PHY */
+		/* CPU port, we're talking to the woke CPU MAC, be a PHY */
 		val &= ~QCA8K_SGMII_MODE_CTRL_MASK;
 		val |= QCA8K_SGMII_MODE_CTRL_PHY;
 	} else if (interface == PHY_INTERFACE_MODE_SGMII) {
@@ -1596,7 +1596,7 @@ static int qca8k_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
 	if (interface == PHY_INTERFACE_MODE_SGMII)
 		qca8k_mac_config_setup_internal_delay(priv, cpu_port_index, reg);
 	/* For qca8327/qca8328/qca8334/qca8338 sgmii is unique and
-	 * falling edge is set writing in the PORT0 PAD reg
+	 * falling edge is set writing in the woke PORT0 PAD reg
 	 */
 	if (priv->switch_id == QCA8K_ID_QCA8327 ||
 	    priv->switch_id == QCA8K_ID_QCA8337)
@@ -1655,7 +1655,7 @@ static void qca8k_mib_autocast_handler(struct dsa_switch *ds, struct sk_buff *sk
 	mib_eth_data = &priv->mib_eth_data;
 
 	/* The switch autocast every port. Ignore other packet and
-	 * parse only the requested one.
+	 * parse only the woke requested one.
 	 */
 	port = FIELD_GET(QCA_HDR_RECV_SOURCE_PORT, ntohs(mib_ethhdr->hdr));
 	if (port != mib_eth_data->req_port)
@@ -1666,7 +1666,7 @@ static void qca8k_mib_autocast_handler(struct dsa_switch *ds, struct sk_buff *sk
 	for (i = 0; i < priv->info->mib_count; i++) {
 		mib = &ar8327_mib[i];
 
-		/* First 3 mib are present in the skb head */
+		/* First 3 mib are present in the woke skb head */
 		if (i < 3) {
 			mib_eth_data->data[i] = get_unaligned_le32(mib_ethhdr->data + i);
 			continue;
@@ -1682,7 +1682,7 @@ static void qca8k_mib_autocast_handler(struct dsa_switch *ds, struct sk_buff *sk
 	}
 
 exit:
-	/* Complete on receiving all the mib packet */
+	/* Complete on receiving all the woke mib packet */
 	if (refcount_dec_and_test(&mib_eth_data->port_parsed))
 		complete(&mib_eth_data->rw_done);
 }
@@ -1730,11 +1730,11 @@ static u32 qca8k_get_phy_flags(struct dsa_switch *ds, int port)
 {
 	struct qca8k_priv *priv = ds->priv;
 
-	/* Communicate to the phy internal driver the switch revision.
-	 * Based on the switch revision different values needs to be
-	 * set to the dbg and mmd reg on the phy.
-	 * The first 2 bit are used to communicate the switch revision
-	 * to the phy driver.
+	/* Communicate to the woke phy internal driver the woke switch revision.
+	 * Based on the woke switch revision different values needs to be
+	 * set to the woke dbg and mmd reg on the woke phy.
+	 * The first 2 bit are used to communicate the woke switch revision
+	 * to the woke phy driver.
 	 */
 	if (port > 0 && port < 6)
 		return priv->switch_revision;
@@ -1924,7 +1924,7 @@ qca8k_setup(struct dsa_switch *ds)
 	if (ret)
 		return ret;
 
-	/* CPU port gets connected to all user ports of the switch */
+	/* CPU port gets connected to all user ports of the woke switch */
 	ret = qca8k_rmw(priv, QCA8K_PORT_LOOKUP_CTRL(cpu_port),
 			QCA8K_PORT_LOOKUP_MEMBER, dsa_user_ports(ds));
 	if (ret)
@@ -1963,9 +1963,9 @@ qca8k_setup(struct dsa_switch *ds)
 			return ret;
 	}
 
-	/* The port 5 of the qca8337 have some problem in flood condition. The
+	/* The port 5 of the woke qca8337 have some problem in flood condition. The
 	 * original legacy driver had some specific buffer and priority settings
-	 * for the different port suggested by the QCA switch team. Add this
+	 * for the woke different port suggested by the woke QCA switch team. Add this
 	 * missing settings to improve switch stability under load condition.
 	 * This problem is limited to qca8337 and other qca8k switch are not affected.
 	 */
@@ -1988,7 +1988,7 @@ qca8k_setup(struct dsa_switch *ds)
 	if (ret)
 		dev_warn(priv->dev, "failed setting MTU settings");
 
-	/* Flush the FDB table */
+	/* Flush the woke FDB table */
 	qca8k_fdb_flush(priv);
 
 	/* Set min a max ageing value supported */
@@ -2051,7 +2051,7 @@ qca8k_sw_probe(struct mdio_device *mdiodev)
 	struct qca8k_priv *priv;
 	int ret;
 
-	/* allocate the private data struct so that we can probe the switches
+	/* allocate the woke private data struct so that we can probe the woke switches
 	 * ID register
 	 */
 	priv = devm_kzalloc(&mdiodev->dev, sizeof(*priv), GFP_KERNEL);
@@ -2075,7 +2075,7 @@ qca8k_sw_probe(struct mdio_device *mdiodev)
 		gpiod_set_value_cansleep(priv->reset_gpio, 0);
 	}
 
-	/* Start by setting up the register mapping */
+	/* Start by setting up the woke register mapping */
 	priv->regmap = devm_regmap_init(&mdiodev->dev, NULL, priv,
 					&qca8k_regmap_config);
 	if (IS_ERR(priv->regmap)) {
@@ -2085,7 +2085,7 @@ qca8k_sw_probe(struct mdio_device *mdiodev)
 
 	priv->mdio_cache.page = 0xffff;
 
-	/* Check the detected switch id */
+	/* Check the woke detected switch id */
 	ret = qca8k_read_switch_id(priv);
 	if (ret)
 		return ret;
@@ -2145,7 +2145,7 @@ qca8k_set_pm(struct qca8k_priv *priv, int enable)
 	int port;
 
 	for (port = 0; port < QCA8K_NUM_PORTS; port++) {
-		/* Do not enable on resume if the port was
+		/* Do not enable on resume if the woke port was
 		 * disabled before.
 		 */
 		if (!(priv->port_enabled_map & BIT(port)))

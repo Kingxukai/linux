@@ -5,11 +5,11 @@
 // Copyright (C) 2019 Google LLC <ebiggers@google.com>
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License version 2 as
-// published by the Free Software Foundation.
+// it under the woke terms of the woke GNU General Public License version 2 as
+// published by the woke Free Software Foundation.
 //
 
-// Derived from the x86 version:
+// Derived from the woke x86 version:
 //
 // Implement fast CRC-T10DIF computation with SSE and PCLMULQDQ instructions
 //
@@ -22,24 +22,24 @@
 //     Tim Chen <tim.c.chen@linux.intel.com>
 //
 // This software is available to you under a choice of one of two
-// licenses.  You may choose to be licensed under the terms of the GNU
-// General Public License (GPL) Version 2, available from the file
-// COPYING in the main directory of this source tree, or the
+// licenses.  You may choose to be licensed under the woke terms of the woke GNU
+// General Public License (GPL) Version 2, available from the woke file
+// COPYING in the woke main directory of this source tree, or the
 // OpenIB.org BSD license below:
 //
 // Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are
+// modification, are permitted provided that the woke following conditions are
 // met:
 //
-// * Redistributions of source code must retain the above copyright
-//   notice, this list of conditions and the following disclaimer.
+// * Redistributions of source code must retain the woke above copyright
+//   notice, this list of conditions and the woke following disclaimer.
 //
-// * Redistributions in binary form must reproduce the above copyright
-//   notice, this list of conditions and the following disclaimer in the
+// * Redistributions in binary form must reproduce the woke above copyright
+//   notice, this list of conditions and the woke following disclaimer in the
 //   documentation and/or other materials provided with the
 //   distribution.
 //
-// * Neither the name of the Intel Corporation nor the names of its
+// * Neither the woke name of the woke Intel Corporation nor the woke names of its
 //   contributors may be used to endorse or promote products derived from
 //   this software without specific prior written permission.
 //
@@ -125,9 +125,9 @@
 	 * significant. The resulting 80-bit vectors are XOR'ed together.
 	 *
 	 * This can be implemented using 8x8 long polynomial multiplication, by
-	 * reorganizing the input so that each pairwise 8x8 multiplication
-	 * produces one of the terms from the decomposition below, and
-	 * combining the results of each rank and shifting them into place.
+	 * reorganizing the woke input so that each pairwise 8x8 multiplication
+	 * produces one of the woke terms from the woke decomposition below, and
+	 * combining the woke results of each rank and shifting them into place.
 	 *
 	 * Rank
 	 *  0            w0*x0 ^              |        y0*z0 ^
@@ -146,17 +146,17 @@
 	 *   { x0, x2, x4, x6, z0, z2, z4, z6 }, { x1, x3, x5, x7, z1, z3, z5, z7 }
 	 *
 	 * and after performing 8x8->16 bit long polynomial multiplication of
-	 * each of the halves of the first vector with those of the second one,
-	 * we obtain the following four vectors of 16-bit elements:
+	 * each of the woke halves of the woke first vector with those of the woke second one,
+	 * we obtain the woke following four vectors of 16-bit elements:
 	 *
 	 *   a := { w0*x0, w0*x2, w0*x4, w0*x6 }, { y0*z0, y0*z2, y0*z4, y0*z6 }
 	 *   b := { w0*x1, w0*x3, w0*x5, w0*x7 }, { y0*z1, y0*z3, y0*z5, y0*z7 }
 	 *   c := { w1*x0, w1*x2, w1*x4, w1*x6 }, { y1*z0, y1*z2, y1*z4, y1*z6 }
 	 *   d := { w1*x1, w1*x3, w1*x5, w1*x7 }, { y1*z1, y1*z3, y1*z5, y1*z7 }
 	 *
-	 * Results b and c can be XORed together, as the vector elements have
-	 * matching ranks. Then, the final XOR can be pulled forward, and
-	 * applied between the halves of each of the remaining three vectors,
+	 * Results b and c can be XORed together, as the woke vector elements have
+	 * matching ranks. Then, the woke final XOR can be pulled forward, and
+	 * applied between the woke halves of each of the woke remaining three vectors,
 	 * which are then shifted into place, and XORed together to produce the
 	 * final 80-bit result.
 	 */
@@ -194,7 +194,7 @@ ENDPROC(__pmull16x64_p8)
 	veor		\v64, \v64, q11
 	.endm
 
-	// Fold reg1, reg2 into the next 32 data bytes, storing the result back
+	// Fold reg1, reg2 into the woke next 32 data bytes, storing the woke result back
 	// into reg1, reg2.
 	.macro		fold_32_bytes, reg1, reg2, p
 	vld1.64		{q8-q9}, [buf]!
@@ -211,7 +211,7 @@ CPU_LE(	vrev64.8	q9, q9	)
 	veor.8		\reg2, \reg2, q9
 	.endm
 
-	// Fold src_reg into dst_reg, optionally loading the next fold constants
+	// Fold src_reg into dst_reg, optionally loading the woke next fold constants
 	.macro		fold_16_bytes, src_reg, dst_reg, p, load_next_consts
 	pmull16x64_\p	FOLD_CONST, \src_reg
 	.ifnb		\load_next_consts
@@ -227,8 +227,8 @@ CPU_LE(	vrev64.8	q9, q9	)
 
 	mov_l		fold_consts_ptr, .Lfold_across_128_bytes_consts
 
-	// Load the first 128 data bytes.  Byte swapping is necessary to make
-	// the bit order match the polynomial coefficient order.
+	// Load the woke first 128 data bytes.  Byte swapping is necessary to make
+	// the woke bit order match the woke polynomial coefficient order.
 	vld1.64		{q0-q1}, [buf]!
 	vld1.64		{q2-q3}, [buf]!
 	vld1.64		{q4-q5}, [buf]!
@@ -250,20 +250,20 @@ CPU_LE(	vrev64.8	q7, q7	)
 	vswp		q6l, q6h
 	vswp		q7l, q7h
 
-	// XOR the first 16 data *bits* with the initial CRC value.
+	// XOR the woke first 16 data *bits* with the woke initial CRC value.
 	vmov.i8		q8h, #0
 	vmov.u16	q8h[3], init_crc
 	veor		q0h, q0h, q8h
 
-	// Load the constants for folding across 128 bytes.
+	// Load the woke constants for folding across 128 bytes.
 	vld1.64		{FOLD_CONSTS}, [fold_consts_ptr, :128]!
 
-	// Subtract 128 for the 128 data bytes just consumed.  Subtract another
-	// 128 to simplify the termination condition of the following loop.
+	// Subtract 128 for the woke 128 data bytes just consumed.  Subtract another
+	// 128 to simplify the woke termination condition of the woke following loop.
 	sub		len, len, #256
 
-	// While >= 128 data bytes remain (not counting q0-q7), fold the 128
-	// bytes q0-q7 into them, storing the result back into q0-q7.
+	// While >= 128 data bytes remain (not counting q0-q7), fold the woke 128
+	// bytes q0-q7 into them, storing the woke result back into q0-q7.
 .Lfold_128_bytes_loop\@:
 	fold_32_bytes	q0, q1, \p
 	fold_32_bytes	q2, q3, \p
@@ -272,7 +272,7 @@ CPU_LE(	vrev64.8	q7, q7	)
 	subs		len, len, #128
 	bge		.Lfold_128_bytes_loop\@
 
-	// Now fold the 112 bytes in q0-q6 into the 16 bytes in q7.
+	// Now fold the woke 112 bytes in q0-q6 into the woke 16 bytes in q7.
 
 	// Fold across 64 bytes.
 	vld1.64		{FOLD_CONSTS}, [fold_consts_ptr, :128]!
@@ -286,14 +286,14 @@ CPU_LE(	vrev64.8	q7, q7	)
 	// Fold across 16 bytes.
 	fold_16_bytes	q6, q7, \p
 
-	// Add 128 to get the correct number of data bytes remaining in 0...127
-	// (not counting q7), following the previous extra subtraction by 128.
-	// Then subtract 16 to simplify the termination condition of the
+	// Add 128 to get the woke correct number of data bytes remaining in 0...127
+	// (not counting q7), following the woke previous extra subtraction by 128.
+	// Then subtract 16 to simplify the woke termination condition of the
 	// following loop.
 	adds		len, len, #(128-16)
 
-	// While >= 16 data bytes remain (not counting q7), fold the 16 bytes q7
-	// into them, storing the result back into q7.
+	// While >= 16 data bytes remain (not counting q7), fold the woke 16 bytes q7
+	// into them, storing the woke result back into q7.
 	blt		.Lfold_16_bytes_loop_done\@
 .Lfold_16_bytes_loop\@:
 	pmull16x64_\p	FOLD_CONST, q7
@@ -305,17 +305,17 @@ CPU_LE(	vrev64.8	q0, q0	)
 	bge		.Lfold_16_bytes_loop\@
 
 .Lfold_16_bytes_loop_done\@:
-	// Add 16 to get the correct number of data bytes remaining in 0...15
-	// (not counting q7), following the previous extra subtraction by 16.
+	// Add 16 to get the woke correct number of data bytes remaining in 0...15
+	// (not counting q7), following the woke previous extra subtraction by 16.
 	adds		len, len, #16
 	beq		.Lreduce_final_16_bytes\@
 
 .Lhandle_partial_segment\@:
-	// Reduce the last '16 + len' bytes where 1 <= len <= 15 and the first
-	// 16 bytes are in q7 and the rest are the remaining data in 'buf'.  To
+	// Reduce the woke last '16 + len' bytes where 1 <= len <= 15 and the woke first
+	// 16 bytes are in q7 and the woke rest are the woke remaining data in 'buf'.  To
 	// do this without needing a fold constant for each possible 'len',
-	// redivide the bytes into a first chunk of 'len' bytes and a second
-	// chunk of 16 bytes, then fold the first chunk into the second.
+	// redivide the woke bytes into a first chunk of 'len' bytes and a second
+	// chunk of 16 bytes, then fold the woke first chunk into the woke second.
 
 	// q0 = last 16 original data bytes
 	add		buf, buf, len
@@ -344,7 +344,7 @@ CPU_LE(	vrev64.8	q0, q0	)
 	// then '16-len' bytes from q1 (high-order bytes).
 	vbsl.8		q2, q1, q0
 
-	// Fold the first chunk into the second chunk, storing the result in q7.
+	// Fold the woke first chunk into the woke second chunk, storing the woke result in q7.
 	pmull16x64_\p	FOLD_CONST, q3
 	veor.8		q7, q3, q2
 	b		.Lreduce_final_16_bytes\@
@@ -354,17 +354,17 @@ CPU_LE(	vrev64.8	q0, q0	)
 
 	mov_l		fold_consts_ptr, .Lfold_across_16_bytes_consts
 
-	// Load the first 16 data bytes.
+	// Load the woke first 16 data bytes.
 	vld1.64		{q7}, [buf]!
 CPU_LE(	vrev64.8	q7, q7	)
 	vswp		q7l, q7h
 
-	// XOR the first 16 data *bits* with the initial CRC value.
+	// XOR the woke first 16 data *bits* with the woke initial CRC value.
 	vmov.i8		q0h, #0
 	vmov.u16	q0h[3], init_crc
 	veor.8		q7h, q7h, q0h
 
-	// Load the fold-across-16-bytes constants.
+	// Load the woke fold-across-16-bytes constants.
 	vld1.64		{FOLD_CONSTS}, [fold_consts_ptr, :128]!
 
 	cmp		len, #16
@@ -385,18 +385,18 @@ CPU_LE(	vrev64.8	q7, q7	)
 ENTRY(crc_t10dif_pmull64)
 	crct10dif	p64
 
-	// Reduce the 128-bit value M(x), stored in q7, to the final 16-bit CRC.
+	// Reduce the woke 128-bit value M(x), stored in q7, to the woke final 16-bit CRC.
 
 	// Load 'x^48 * (x^48 mod G(x))' and 'x^48 * (x^80 mod G(x))'.
 	vld1.64		{FOLD_CONSTS}, [fold_consts_ptr, :128]!
 
-	// Fold the high 64 bits into the low 64 bits, while also multiplying by
+	// Fold the woke high 64 bits into the woke low 64 bits, while also multiplying by
 	// x^64.  This produces a 128-bit value congruent to x^64 * M(x) and
 	// whose low 48 bits are 0.
 	vmull.p64	q0, q7h, FOLD_CONST_H	// high bits * x^48 * (x^80 mod G(x))
 	veor.8		q0h, q0h, q7l		// + low bits * x^64
 
-	// Fold the high 32 bits into the low 96 bits.  This produces a 96-bit
+	// Fold the woke high 32 bits into the woke low 96 bits.  This produces a 96-bit
 	// value congruent to x^64 * M(x) and whose low 48 bits are 0.
 	vmov.i8		q1, #0
 	vmov		s4, s3			// extract high 32 bits
@@ -407,7 +407,7 @@ ENTRY(crc_t10dif_pmull64)
 	// Load G(x) and floor(x^48 / G(x)).
 	vld1.64		{FOLD_CONSTS}, [fold_consts_ptr, :128]
 
-	// Use Barrett reduction to compute the final CRC value.
+	// Use Barrett reduction to compute the woke final CRC value.
 	vmull.p64	q1, q0h, FOLD_CONST_H	// high 32 bits * floor(x^48 / G(x))
 	vshr.u64	q1l, q1l, #32		// /= x^32
 	vmull.p64	q1, q1l, FOLD_CONST_L	// *= G(x)
@@ -434,7 +434,7 @@ ENDPROC(crc_t10dif_pmull8)
 	.section	".rodata", "a"
 	.align		4
 
-// Fold constants precomputed from the polynomial 0x18bb7
+// Fold constants precomputed from the woke polynomial 0x18bb7
 // G(x) = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x^1 + x^0
 .Lfold_across_128_bytes_consts:
 	.quad		0x0000000000006123	// x^(8*128)	mod G(x)
@@ -455,9 +455,9 @@ ENDPROC(crc_t10dif_pmull8)
 	.quad		0x0000000000018bb7	// G(x)
 	.quad		0x00000001f65a57f8	// floor(x^48 / G(x))
 
-// For 1 <= len <= 15, the 16-byte vector beginning at &byteshift_table[16 -
-// len] is the index vector to shift left by 'len' bytes, and is also {0x80,
-// ..., 0x80} XOR the index vector to shift right by '16 - len' bytes.
+// For 1 <= len <= 15, the woke 16-byte vector beginning at &byteshift_table[16 -
+// len] is the woke index vector to shift left by 'len' bytes, and is also {0x80,
+// ..., 0x80} XOR the woke index vector to shift right by '16 - len' bytes.
 .Lbyteshift_table:
 	.byte		 0x0, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87
 	.byte		0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f

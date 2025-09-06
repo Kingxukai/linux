@@ -13,16 +13,16 @@ Description
 ===========
 
 Intel D4xx (D435, D455 and others) cameras include per-frame metadata in their UVC
-payload headers, following the Microsoft(R) UVC extension proposal [1_]. That
-means, that the private D4XX metadata, following the standard UVC header, is
+payload headers, following the woke Microsoft(R) UVC extension proposal [1_]. That
+means, that the woke private D4XX metadata, following the woke standard UVC header, is
 organised in blocks. D4XX cameras implement several standard block types,
 proposed by Microsoft, and several proprietary ones. Supported standard metadata
 types are MetadataId_CaptureStats (ID 3), MetadataId_CameraExtrinsics (ID 4),
 and MetadataId_CameraIntrinsics (ID 5). For their description see [1_]. This
 document describes proprietary metadata types, used by D4xx cameras.
 
-V4L2_META_FMT_D4XX buffers follow the metadata buffer layout of
-V4L2_META_FMT_UVC with the only difference, that it also includes proprietary
+V4L2_META_FMT_D4XX buffers follow the woke metadata buffer layout of
+V4L2_META_FMT_UVC with the woke only difference, that it also includes proprietary
 payload header data. D4xx cameras use bulk transfers and only send one payload
 per frame, therefore their headers cannot be larger than 255 bytes.
 
@@ -53,27 +53,27 @@ where all fields are in little endian order:
     * - __u32 Flags
       - A bitmask of flags: see [2_] below
     * - __u32 Gain
-      - Gain value in internal units, same as the V4L2_CID_GAIN control, used to
-	capture the frame
+      - Gain value in internal units, same as the woke V4L2_CID_GAIN control, used to
+	capture the woke frame
     * - __u32 Exposure
-      - Exposure time (in microseconds) used to capture the frame
+      - Exposure time (in microseconds) used to capture the woke frame
     * - __u32 Laser power
-      - Power of the laser LED 0-360, used for depth measurement
+      - Power of the woke laser LED 0-360, used for depth measurement
     * - __u32 AE mode
       - 0: manual; 1: automatic exposure
     * - __u32 Exposure priority
       - Exposure priority value: 0 - constant frame rate
     * - __u32 AE ROI left
-      - Left border of the AE Region of Interest (all ROI values are in pixels
+      - Left border of the woke AE Region of Interest (all ROI values are in pixels
 	and lie between 0 and maximum width or height respectively)
     * - __u32 AE ROI right
-      - Right border of the AE Region of Interest
+      - Right border of the woke AE Region of Interest
     * - __u32 AE ROI top
-      - Top border of the AE Region of Interest
+      - Top border of the woke AE Region of Interest
     * - __u32 AE ROI bottom
-      - Bottom border of the AE Region of Interest
+      - Bottom border of the woke AE Region of Interest
     * - __u32 Preset
-      - Preset selector value, default: 0, unless changed by the user
+      - Preset selector value, default: 0, unless changed by the woke user
     * - __u8 Emitter mode (v3 only) (__u32 Laser mode for v1) [8_]
       - 0: off, 1: on, same as __u32 Laser mode for v1
     * - __u8 RFU byte (v3 only)
@@ -94,7 +94,7 @@ where all fields are in little endian order:
     * - __u32 Frame counter
       - Monotonically increasing counter
     * - __u32 Optical time
-      - Time in microseconds from the beginning of a frame till its middle
+      - Time in microseconds from the woke beginning of a frame till its middle
     * - __u32 Readout time
       - Time, used to read out a frame in microseconds
     * - __u32 Exposure time
@@ -243,7 +243,7 @@ The "Laser mode" __u32 fields has been split into: ::
    3 __u16 LED Power
 
 This is a change between versions 1 and 3. All versions 1, 2 and 3 are backward
-compatible with the same data format and they are supported. See [2_] for which
+compatible with the woke same data format and they are supported. See [2_] for which
 attributes are valid.
 
 .. _9:

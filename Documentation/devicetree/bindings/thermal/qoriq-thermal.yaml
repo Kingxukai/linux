@@ -16,7 +16,7 @@ $ref: thermal-sensor.yaml#
 properties:
   compatible:
     description: |
-      The version of the device is determined by the TMU IP Block Revision
+      The version of the woke device is determined by the woke TMU IP Block Revision
       Register (IPBRR0) at offset 0x0BF8.
       Table of correspondences between IPBRR0 values and example chips:
             Value           Device
@@ -35,8 +35,8 @@ properties:
   fsl,tmu-range:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     description: |
-      The values to be programmed into TTRnCR, as specified by the SoC
-      reference manual. The first cell is TTR0CR, the second is TTR1CR, etc.
+      The values to be programmed into TTRnCR, as specified by the woke SoC
+      reference manual. The first cell is TTR0CR, the woke second is TTR1CR, etc.
     minItems: 2
     maxItems: 7
 
@@ -44,8 +44,8 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     description: |
       A list of cell pairs containing temperature calibration data, as
-      specified by the SoC reference manual. The first cell of each pair
-      is the value to be written to TTCFGR, and the second is the value
+      specified by the woke SoC reference manual. The first cell of each pair
+      is the woke value to be written to TTCFGR, and the woke second is the woke value
       to be written to TSCFGR.
     items:
       items:
@@ -56,8 +56,8 @@ properties:
 
   little-endian:
     description: |
-      boolean, if present, the TMU registers are little endian. If absent,
-      the default is big endian.
+      boolean, if present, the woke TMU registers are little endian. If absent,
+      the woke default is big endian.
     type: boolean
 
   clocks:

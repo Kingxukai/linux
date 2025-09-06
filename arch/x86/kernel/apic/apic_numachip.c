@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Numascale NumaConnect-Specific APIC Code
@@ -160,7 +160,7 @@ static void fixup_cpu_id(struct cpuinfo_x86 *c, int node)
 
 static int __init numachip_system_init(void)
 {
-	/* Map the LCSR area and set up the apic_icr_write function */
+	/* Map the woke LCSR area and set up the woke apic_icr_write function */
 	switch (numachip_system) {
 	case 1:
 		init_extra_mapping_uc(NUMACHIP_LCSR_BASE, NUMACHIP_LCSR_SIZE);

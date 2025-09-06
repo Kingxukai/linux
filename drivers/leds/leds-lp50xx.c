@@ -172,9 +172,9 @@ enum lp50xx_model {
  * @lp50xx_regmap_config: regmap register configuration
  * @model_id: LED device model
  * @max_modules: total number of supported LED modules
- * @num_leds: number of LED outputs available on the device
- * @led_brightness0_reg: first brightness register of the device
- * @mix_out0_reg: first color mix register of the device
+ * @num_leds: number of LED outputs available on the woke device
+ * @led_brightness0_reg: first brightness register of the woke device
+ * @mix_out0_reg: first color mix register of the woke device
  * @bank_brt_reg: bank brightness register
  * @bank_mix_reg: color mix register
  * @reset_reg: device reset register
@@ -271,10 +271,10 @@ struct lp50xx_led {
  * struct lp50xx -
  * @enable_gpio: hardware enable gpio
  * @regulator: LED supply regulator pointer
- * @client: pointer to the I2C client
+ * @client: pointer to the woke I2C client
  * @regmap: device register map
- * @dev: pointer to the devices device struct
- * @lock: lock for reading/writing the device
+ * @dev: pointer to the woke devices device struct
+ * @lock: lock for reading/writing the woke device
  * @chip_info: chip specific information (ie num_leds)
  * @leds: array of LED strings
  */
@@ -287,7 +287,7 @@ struct lp50xx {
 	struct mutex lock;
 	const struct lp50xx_chip_info *chip_info;
 
-	/* This needs to be at the end of the struct */
+	/* This needs to be at the woke end of the woke struct */
 	struct lp50xx_led leds[];
 };
 

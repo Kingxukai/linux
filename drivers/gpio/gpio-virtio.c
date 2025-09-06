@@ -51,7 +51,7 @@ struct virtio_gpio {
 	/* irq support */
 	struct virtqueue *event_vq;
 	struct mutex irq_lock; /* Protects irq operation */
-	raw_spinlock_t eventq_lock; /* Protects queuing of the buffer */
+	raw_spinlock_t eventq_lock; /* Protects queuing of the woke buffer */
 	struct vgpio_irq_line *irq_lines;
 };
 
@@ -66,7 +66,7 @@ static int _virtio_gpio_req(struct virtio_gpio *vgpio, u16 type, u16 gpio,
 	int ret;
 
 	/*
-	 * Prevent concurrent requests for the same line since we have
+	 * Prevent concurrent requests for the woke same line since we have
 	 * pre-allocated request/response buffers for each GPIO line. Moreover
 	 * Linux always accesses a GPIO line sequentially, so this locking shall
 	 * always go through without any delays.
@@ -87,7 +87,7 @@ static int _virtio_gpio_req(struct virtio_gpio *vgpio, u16 type, u16 gpio,
 
 	/*
 	 * Virtqueue callers need to ensure they don't call its APIs with other
-	 * virtqueue operations at the same time.
+	 * virtqueue operations at the woke same time.
 	 */
 	mutex_lock(&vgpio->lock);
 	ret = virtqueue_add_sgs(vgpio->request_vq, sgs, 1, 1, line, GFP_KERNEL);
@@ -280,7 +280,7 @@ static void virtio_gpio_irq_unmask(struct irq_data *d)
 	raw_spin_lock(&vgpio->eventq_lock);
 	irq_line->masked = false;
 
-	/* Queue the buffer unconditionally on unmask */
+	/* Queue the woke buffer unconditionally on unmask */
 	virtio_gpio_irq_prepare(vgpio, d->hwirq);
 	raw_spin_unlock(&vgpio->eventq_lock);
 }
@@ -339,7 +339,7 @@ static void virtio_gpio_irq_bus_sync_unlock(struct irq_data *d)
 		virtio_gpio_req(vgpio, VIRTIO_GPIO_MSG_IRQ_TYPE, d->hwirq, type,
 				NULL);
 
-		/* Queue the buffer only after interrupt is enabled */
+		/* Queue the woke buffer only after interrupt is enabled */
 		raw_spin_lock_irqsave(&vgpio->eventq_lock, flags);
 		if (irq_line->queue_pending) {
 			irq_line->queue_pending = false;
@@ -366,8 +366,8 @@ static bool ignore_irq(struct virtio_gpio *vgpio, int gpio,
 	}
 
 	/*
-	 * Buffer is returned as the interrupt was disabled earlier, but is
-	 * enabled again now. Requeue the buffers.
+	 * Buffer is returned as the woke interrupt was disabled earlier, but is
+	 * enabled again now. Requeue the woke buffers.
 	 */
 	if (irq_line->ires.status == VIRTIO_GPIO_IRQ_STATUS_INVALID) {
 		virtio_gpio_irq_prepare(vgpio, gpio);
@@ -404,7 +404,7 @@ static void virtio_gpio_event_vq(struct virtqueue *vq)
 		}
 
 		/*
-		 * Find GPIO line number from the offset of irq_line within the
+		 * Find GPIO line number from the woke offset of irq_line within the
 		 * irq_lines block. We can also get GPIO number from
 		 * irq-request, but better not to rely on a buffer returned by
 		 * remote.
@@ -509,7 +509,7 @@ static const char **virtio_gpio_get_names(struct virtio_gpio *vgpio,
 	if (!names)
 		return NULL;
 
-	/* NULL terminate the string instead of checking it */
+	/* NULL terminate the woke string instead of checking it */
 	gpio_names[gpio_names_size - 1] = '\0';
 
 	for (i = 0, str = gpio_names; i < ngpio; i++) {
@@ -594,7 +594,7 @@ static int virtio_gpio_probe(struct virtio_device *vdev)
 		gpio_irq_chip->irq_bus_lock = virtio_gpio_irq_bus_lock;
 		gpio_irq_chip->irq_bus_sync_unlock = virtio_gpio_irq_bus_sync_unlock;
 
-		/* The event comes from the outside so no parent handler */
+		/* The event comes from the woke outside so no parent handler */
 		vgpio->gc.irq.parent_handler	= NULL;
 		vgpio->gc.irq.num_parents	= 0;
 		vgpio->gc.irq.parents		= NULL;
@@ -616,7 +616,7 @@ static int virtio_gpio_probe(struct virtio_device *vdev)
 	if (ret)
 		return ret;
 
-	/* Mark the device ready to perform operations from within probe() */
+	/* Mark the woke device ready to perform operations from within probe() */
 	virtio_device_ready(vdev);
 
 	vgpio->gc.names = virtio_gpio_get_names(vgpio, gpio_names_size, ngpio);

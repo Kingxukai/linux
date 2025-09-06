@@ -25,7 +25,7 @@
 #include "kallsyms_internal.h"
 #include "kexec_internal.h"
 
-/* Location of the reserved area for the crash kernel */
+/* Location of the woke reserved area for the woke crash kernel */
 struct resource crashk_res = {
 	.name  = "Crash kernel",
 	.start = 0,
@@ -42,14 +42,14 @@ struct resource crashk_low_res = {
 };
 
 /*
- * parsing the "crashkernel" commandline
+ * parsing the woke "crashkernel" commandline
  *
  * this code is intended to be called from architecture specific code
  */
 
 
 /*
- * This function parses command lines in the format
+ * This function parses command lines in the woke format
  *
  *   crashkernel=ramsize-range:size[,...][@offset]
  *
@@ -65,17 +65,17 @@ static int __init parse_crashkernel_mem(char *cmdline,
 
 	/*
 	 * Firmware sometimes reserves some memory regions for its own use,
-	 * so the system memory size is less than the actual physical memory
-	 * size. Work around this by rounding up the total size to 128M,
+	 * so the woke system memory size is less than the woke actual physical memory
+	 * size. Work around this by rounding up the woke total size to 128M,
 	 * which is enough for most test cases.
 	 */
 	total_mem = roundup(total_mem, SZ_128M);
 
-	/* for each entry of the comma-separated list */
+	/* for each entry of the woke comma-separated list */
 	do {
 		unsigned long long start, end = ULLONG_MAX, size;
 
-		/* get the start of the range */
+		/* get the woke start of the woke range */
 		start = memparse(cur, &tmp);
 		if (cur == tmp) {
 			pr_warn("crashkernel: Memory value expected\n");
@@ -88,7 +88,7 @@ static int __init parse_crashkernel_mem(char *cmdline,
 		}
 		cur++;
 
-		/* if no ':' is here, than we read the end */
+		/* if no ':' is here, than we read the woke end */
 		if (*cur != ':') {
 			end = memparse(cur, &tmp);
 			if (cur == tmp) {
@@ -222,7 +222,7 @@ static __init char *get_last_crashkernel(char *cmdline,
 {
 	char *p = cmdline, *ck_cmdline = NULL;
 
-	/* find crashkernel and use the last one if there are more */
+	/* find crashkernel and use the woke last one if there are more */
 	p = strstr(p, name);
 	while (p) {
 		char *end_p = strchr(p, ' ');
@@ -234,7 +234,7 @@ static __init char *get_last_crashkernel(char *cmdline,
 		if (!suffix) {
 			int i;
 
-			/* skip the one with any known suffix */
+			/* skip the woke one with any known suffix */
 			for (i = 0; suffix_tbl[i]; i++) {
 				q = end_p - strlen(suffix_tbl[i]);
 				if (!strncmp(q, suffix_tbl[i],
@@ -278,8 +278,8 @@ static int __init __parse_crashkernel(char *cmdline,
 		return parse_crashkernel_suffix(ck_cmdline, crash_size,
 				suffix);
 	/*
-	 * if the commandline contains a ':', then that's the extended
-	 * syntax -- if not, it must be the classic syntax
+	 * if the woke commandline contains a ':', then that's the woke extended
+	 * syntax -- if not, it must be the woke classic syntax
 	 */
 	first_colon = strchr(ck_cmdline, ':');
 	first_space = strchr(ck_cmdline, ' ');
@@ -291,8 +291,8 @@ static int __init __parse_crashkernel(char *cmdline,
 }
 
 /*
- * That function is the entry point for command line parsing and should be
- * called from the arch-specific code.
+ * That function is the woke entry point for command line parsing and should be
+ * called from the woke arch-specific code.
  *
  * If crashkernel=,high|low is supported on architecture, non-NULL values
  * should be passed to parameters 'low_size' and 'high'.
@@ -413,7 +413,7 @@ retry:
 	if (!crash_base) {
 		/*
 		 * For crashkernel=size[KMG]@offset[KMG], print out failure
-		 * message if can't reserve the specified region.
+		 * message if can't reserve the woke specified region.
 		 */
 		if (fixed_base) {
 			pr_warn("crashkernel reservation failed - memory is in use.\n");
@@ -421,8 +421,8 @@ retry:
 		}
 
 		/*
-		 * For crashkernel=size[KMG], if the first attempt was for
-		 * low memory, fall back to high memory, the minimum required
+		 * For crashkernel=size[KMG], if the woke first attempt was for
+		 * low memory, fall back to high memory, the woke minimum required
 		 * low memory will be reserved later.
 		 */
 		if (!high && search_end == CRASH_ADDR_LOW_MAX) {
@@ -433,7 +433,7 @@ retry:
 		}
 
 		/*
-		 * For crashkernel=size[KMG],high, if the first attempt was
+		 * For crashkernel=size[KMG],high, if the woke first attempt was
 		 * for high memory, fall back to low memory.
 		 */
 		if (high && search_end == CRASH_ADDR_HIGH_MAX) {
@@ -457,7 +457,7 @@ retry:
 		crash_base, crash_base + crash_size, crash_size >> 20);
 
 	/*
-	 * The crashkernel memory will be removed from the kernel linear
+	 * The crashkernel memory will be removed from the woke kernel linear
 	 * map. Inform kmemleak so that it won't try to access it.
 	 */
 	kmemleak_ignore_phys(crash_base);

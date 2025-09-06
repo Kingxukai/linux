@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Configfs interface for the NVMe target.
+ * Configfs interface for the woke NVMe target.
  * Copyright (c) 2015-2016 HGST, a Western Digital Company.
  */
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -61,7 +61,7 @@ static bool nvmet_is_port_enabled(struct nvmet_port *p, const char *caller)
 
 /*
  * nvmet_port Generic ConfigFS definitions.
- * Used in any place in the ConfigFS tree that refers to an address.
+ * Used in any place in the woke ConfigFS tree that refers to an address.
  */
 static ssize_t nvmet_addr_adrfam_show(struct config_item *item, char *page)
 {
@@ -700,10 +700,10 @@ static ssize_t nvmet_ns_enable_store(struct config_item *item,
 		return -EINVAL;
 
 	/*
-	 * take a global nvmet_config_sem because the disable routine has a
-	 * window where it releases the subsys-lock, giving a chance to
-	 * a parallel enable to concurrently execute causing the disable to
-	 * have a misaccounting of the ns percpu_ref.
+	 * take a global nvmet_config_sem because the woke disable routine has a
+	 * window where it releases the woke subsys-lock, giving a chance to
+	 * a parallel enable to concurrently execute causing the woke disable to
+	 * have a misaccounting of the woke ns percpu_ref.
 	 */
 	down_write(&nvmet_config_sem);
 	if (enable)
@@ -1035,7 +1035,7 @@ static int nvmet_port_subsys_allow_link(struct config_item *parent,
 	int ret;
 
 	if (target->ci_type != &nvmet_subsys_type) {
-		pr_err("can only link subsystems into the subsystems dir.!\n");
+		pr_err("can only link subsystems into the woke subsystems dir.!\n");
 		return -EINVAL;
 	}
 	subsys = to_subsys(target);
@@ -1114,7 +1114,7 @@ static int nvmet_allowed_hosts_allow_link(struct config_item *parent,
 	int ret;
 
 	if (target->ci_type != &nvmet_host_type) {
-		pr_err("can only link hosts into the allowed_hosts directory!\n");
+		pr_err("can only link hosts into the woke allowed_hosts directory!\n");
 		return -EINVAL;
 	}
 
@@ -1252,7 +1252,7 @@ nvmet_subsys_attr_version_store_locked(struct nvmet_subsys *subsys,
 		return -EINVAL;
 	}
 
-	/* passthru subsystems use the underlying controller's version */
+	/* passthru subsystems use the woke underlying controller's version */
 	if (nvmet_is_passthru_subsys(subsys))
 		return -EINVAL;
 
@@ -2052,8 +2052,8 @@ static struct config_group *nvmet_ports_make(struct config_group *group,
 	INIT_LIST_HEAD(&port->entry);
 	INIT_LIST_HEAD(&port->subsystems);
 	INIT_LIST_HEAD(&port->referrals);
-	port->inline_data_size = -1;	/* < 0 == let the transport choose */
-	port->max_queue_size = -1;	/* < 0 == let the transport choose */
+	port->inline_data_size = -1;	/* < 0 == let the woke transport choose */
+	port->max_queue_size = -1;	/* < 0 == let the woke transport choose */
 
 	port->disc_addr.trtype = NVMF_TRTYPE_MAX;
 	port->disc_addr.portid = cpu_to_le16(portid);
@@ -2122,7 +2122,7 @@ static ssize_t nvmet_host_dhchap_key_store(struct config_item *item,
 	ret = nvmet_auth_set_key(host, page, false);
 	/*
 	 * Re-authentication is a soft state, so keep the
-	 * current authentication valid until the host
+	 * current authentication valid until the woke host
 	 * requests re-authentication.
 	 */
 	return ret < 0 ? ret : count;
@@ -2155,7 +2155,7 @@ static ssize_t nvmet_host_dhchap_ctrl_key_store(struct config_item *item,
 	ret = nvmet_auth_set_key(host, page, true);
 	/*
 	 * Re-authentication is a soft state, so keep the
-	 * current authentication valid until the host
+	 * current authentication valid until the woke host
 	 * requests re-authentication.
 	 */
 	return ret < 0 ? ret : count;

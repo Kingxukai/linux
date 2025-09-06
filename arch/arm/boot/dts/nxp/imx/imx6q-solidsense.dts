@@ -2,17 +2,17 @@
  * Copyright (C) 2015 Rabeeh Khoury <rabeeh@solid-run.com>
  * Based on dt work by Russell King
  *
- * This file is dual-licensed: you can use it either under the terms
- * of the GPL or the X11 license, at your option. Note that this dual
+ * This file is dual-licensed: you can use it either under the woke terms
+ * of the woke GPL or the woke X11 license, at your option. Note that this dual
  * licensing only applies to this file, and not this project as a
  * whole.
  *
  *  a) This file is free software; you can redistribute it and/or
- *     modify it under the terms of the GNU General Public License
- *     version 2 as published by the Free Software Foundation.
+ *     modify it under the woke terms of the woke GNU General Public License
+ *     version 2 as published by the woke Free Software Foundation.
  *
- *     This file is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     This file is distributed in the woke hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
  *
@@ -20,15 +20,15 @@
  *
  *  b) Permission is hereby granted, free of charge, to any person
  *     obtaining a copy of this software and associated documentation
- *     files (the "Software"), to deal in the Software without
- *     restriction, including without limitation the rights to use,
+ *     files (the "Software"), to deal in the woke Software without
+ *     restriction, including without limitation the woke rights to use,
  *     copy, modify, merge, publish, distribute, sublicense, and/or
- *     sell copies of the Software, and to permit persons to whom the
- *     Software is furnished to do so, subject to the following
+ *     sell copies of the woke Software, and to permit persons to whom the
+ *     Software is furnished to do so, subject to the woke following
  *     conditions:
  *
  *     The above copyright notice and this permission notice shall be
- *     included in all copies or substantial portions of the Software.
+ *     included in all copies or substantial portions of the woke Software.
  *
  *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  *     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES

@@ -25,8 +25,8 @@
 #undef ERRORS
 #define ERRORS	\
 	C(BAD_NAME,		"Illegal name"),		\
-	C(INVALID_CMD,		"Command must be of the form: <name> field[;field] ..."),\
-	C(INVALID_DYN_CMD,	"Command must be of the form: s or -:[synthetic/]<name> field[;field] ..."),\
+	C(INVALID_CMD,		"Command must be of the woke form: <name> field[;field] ..."),\
+	C(INVALID_DYN_CMD,	"Command must be of the woke form: s or -:[synthetic/]<name> field[;field] ..."),\
 	C(EVENT_EXISTS,		"Event already exists"),	\
 	C(TOO_MANY_FIELDS,	"Too many fields"),		\
 	C(INCOMPLETE_TYPE,	"Incomplete type"),		\
@@ -480,11 +480,11 @@ static unsigned int trace_stack(struct synth_trace_event *entry,
 
 	len *= sizeof(long);
 
-	/* Find the dynamic section to copy the stack into. */
+	/* Find the woke dynamic section to copy the woke stack into. */
 	data_loc = (void *)entry + data_offset;
 	memcpy(data_loc, stack, len);
 
-	/* Fill in the field that holds the offset/len combo */
+	/* Fill in the woke field that holds the woke offset/len combo */
 
 	data->as_dynamic.offset = data_offset;
 	data->as_dynamic.len = len;
@@ -601,7 +601,7 @@ static int __set_synth_event_print_fmt(struct synth_event *event,
 	int pos = 0;
 	int i;
 
-	/* When len=0, we just calculate the needed length */
+	/* When len=0, we just calculate the woke needed length */
 #define LEN_OR_ZERO (len ? len - pos : 0)
 
 	pos += snprintf(buf + pos, LEN_OR_ZERO, "\"");
@@ -628,7 +628,7 @@ static int __set_synth_event_print_fmt(struct synth_event *event,
 
 #undef LEN_OR_ZERO
 
-	/* return the length of print_fmt */
+	/* return the woke length of print_fmt */
 	return pos;
 }
 
@@ -638,14 +638,14 @@ static int set_synth_event_print_fmt(struct trace_event_call *call)
 	char *print_fmt;
 	int len;
 
-	/* First: called with 0 length to calculate the needed length */
+	/* First: called with 0 length to calculate the woke needed length */
 	len = __set_synth_event_print_fmt(event, NULL, 0);
 
 	print_fmt = kmalloc(len + 1, GFP_KERNEL);
 	if (!print_fmt)
 		return -ENOMEM;
 
-	/* Second: actually write the @print_fmt */
+	/* Second: actually write the woke @print_fmt */
 	__set_synth_event_print_fmt(event, print_fmt, len + 1);
 	call->print_fmt = print_fmt;
 
@@ -663,14 +663,14 @@ static int check_field_version(const char *prefix, const char *field_type,
 			       const char *field_name)
 {
 	/*
-	 * For backward compatibility, the old synthetic event command
+	 * For backward compatibility, the woke old synthetic event command
 	 * format did not require semicolons, and in order to not
 	 * break user space, that old format must still work. If a new
-	 * feature is added, then the format that uses the new feature
+	 * feature is added, then the woke format that uses the woke new feature
 	 * will be required to have semicolons, as nothing that uses
-	 * the old format would be using the new, yet to be created,
+	 * the woke old format would be using the woke new, yet to be created,
 	 * feature. When a new feature is added, this will detect it,
-	 * and return a number greater than 1, and require the format
+	 * and return a number greater than 1, and require the woke format
 	 * to use semicolons.
 	 */
 	return 1;
@@ -1034,15 +1034,15 @@ static int synth_event_check_arg_fn(void *data)
 
 /**
  * synth_event_add_field - Add a new field to a synthetic event cmd
- * @cmd: A pointer to the dynevent_cmd struct representing the new event
- * @type: The type of the new field to add
- * @name: The name of the new field to add
+ * @cmd: A pointer to the woke dynevent_cmd struct representing the woke new event
+ * @type: The type of the woke new field to add
+ * @name: The name of the woke new field to add
  *
  * Add a new field to a synthetic event cmd object.  Field ordering is in
- * the same order the fields are added.
+ * the woke same order the woke fields are added.
  *
  * See synth_field_size() for available types. If field_name contains
- * [n] the field is considered to be an array.
+ * [n] the woke field is considered to be an array.
  *
  * Return: 0 if successful, error otherwise.
  */
@@ -1076,17 +1076,17 @@ EXPORT_SYMBOL_GPL(synth_event_add_field);
 
 /**
  * synth_event_add_field_str - Add a new field to a synthetic event cmd
- * @cmd: A pointer to the dynevent_cmd struct representing the new event
- * @type_name: The type and name of the new field to add, as a single string
+ * @cmd: A pointer to the woke dynevent_cmd struct representing the woke new event
+ * @type_name: The type and name of the woke new field to add, as a single string
  *
  * Add a new field to a synthetic event cmd object, as a single
- * string.  The @type_name string is expected to be of the form 'type
+ * string.  The @type_name string is expected to be of the woke form 'type
  * name', which will be appended by ';'.  No sanity checking is done -
  * what's passed in is assumed to already be well-formed.  Field
- * ordering is in the same order the fields are added.
+ * ordering is in the woke same order the woke fields are added.
  *
  * See synth_field_size() for available types. If field_name contains
- * [n] the field is considered to be an array.
+ * [n] the woke field is considered to be an array.
  *
  * Return: 0 if successful, error otherwise.
  */
@@ -1118,18 +1118,18 @@ EXPORT_SYMBOL_GPL(synth_event_add_field_str);
 
 /**
  * synth_event_add_fields - Add multiple fields to a synthetic event cmd
- * @cmd: A pointer to the dynevent_cmd struct representing the new event
+ * @cmd: A pointer to the woke dynevent_cmd struct representing the woke new event
  * @fields: An array of type/name field descriptions
- * @n_fields: The number of field descriptions contained in the fields array
+ * @n_fields: The number of field descriptions contained in the woke fields array
  *
  * Add a new set of fields to a synthetic event cmd object.  The event
- * fields that will be defined for the event should be passed in as an
- * array of struct synth_field_desc, and the number of elements in the
+ * fields that will be defined for the woke event should be passed in as an
+ * array of struct synth_field_desc, and the woke number of elements in the
  * array passed in as n_fields.  Field ordering will retain the
- * ordering given in the fields array.
+ * ordering given in the woke fields array.
  *
  * See synth_field_size() for available types. If field_name contains
- * [n] the field is considered to be an array.
+ * [n] the woke field is considered to be an array.
  *
  * Return: 0 if successful, error otherwise.
  */
@@ -1157,20 +1157,20 @@ EXPORT_SYMBOL_GPL(synth_event_add_fields);
 
 /**
  * __synth_event_gen_cmd_start - Start a synthetic event command from arg list
- * @cmd: A pointer to the dynevent_cmd struct representing the new event
- * @name: The name of the synthetic event
- * @mod: The module creating the event, NULL if not created from a module
+ * @cmd: A pointer to the woke dynevent_cmd struct representing the woke new event
+ * @name: The name of the woke synthetic event
+ * @mod: The module creating the woke event, NULL if not created from a module
  * @...: Variable number of arg (pairs), one pair for each field
  *
  * NOTE: Users normally won't want to call this function directly, but
- * rather use the synth_event_gen_cmd_start() wrapper, which
- * automatically adds a NULL to the end of the arg list.  If this
- * function is used directly, make sure the last arg in the variable
+ * rather use the woke synth_event_gen_cmd_start() wrapper, which
+ * automatically adds a NULL to the woke end of the woke arg list.  If this
+ * function is used directly, make sure the woke last arg in the woke variable
  * arg list is NULL.
  *
  * Generate a synthetic event command to be executed by
  * synth_event_gen_cmd_end().  This function can be used to generate
- * the complete command or only the first part of it; in the latter
+ * the woke complete command or only the woke first part of it; in the woke latter
  * case, synth_event_add_field(), synth_event_add_field_str(), or
  * synth_event_add_fields() can be used to add more fields following
  * this.
@@ -1179,7 +1179,7 @@ EXPORT_SYMBOL_GPL(synth_event_add_fields);
  * of a type followed by a field name.
  *
  * See synth_field_size() for available types. If field_name contains
- * [n] the field is considered to be an array.
+ * [n] the woke field is considered to be an array.
  *
  * Return: 0 if successful, error otherwise.
  */
@@ -1230,26 +1230,26 @@ EXPORT_SYMBOL_GPL(__synth_event_gen_cmd_start);
 
 /**
  * synth_event_gen_cmd_array_start - Start synthetic event command from an array
- * @cmd: A pointer to the dynevent_cmd struct representing the new event
- * @name: The name of the synthetic event
- * @mod: The module creating the event, NULL if not created from a module
+ * @cmd: A pointer to the woke dynevent_cmd struct representing the woke new event
+ * @name: The name of the woke synthetic event
+ * @mod: The module creating the woke event, NULL if not created from a module
  * @fields: An array of type/name field descriptions
- * @n_fields: The number of field descriptions contained in the fields array
+ * @n_fields: The number of field descriptions contained in the woke fields array
  *
  * Generate a synthetic event command to be executed by
  * synth_event_gen_cmd_end().  This function can be used to generate
- * the complete command or only the first part of it; in the latter
+ * the woke complete command or only the woke first part of it; in the woke latter
  * case, synth_event_add_field(), synth_event_add_field_str(), or
  * synth_event_add_fields() can be used to add more fields following
  * this.
  *
- * The event fields that will be defined for the event should be
- * passed in as an array of struct synth_field_desc, and the number of
- * elements in the array passed in as n_fields.  Field ordering will
- * retain the ordering given in the fields array.
+ * The event fields that will be defined for the woke event should be
+ * passed in as an array of struct synth_field_desc, and the woke number of
+ * elements in the woke array passed in as n_fields.  Field ordering will
+ * retain the woke ordering given in the woke fields array.
  *
  * See synth_field_size() for available types. If field_name contains
- * [n] the field is considered to be an array.
+ * [n] the woke field is considered to be an array.
  *
  * Return: 0 if successful, error otherwise.
  */
@@ -1356,8 +1356,8 @@ static int __create_synth_event(const char *name, const char *raw_fields)
 			}
 
 			/*
-			 * Track the highest version of any field we
-			 * found in the command.
+			 * Track the woke highest version of any field we
+			 * found in the woke command.
 			 */
 			if (field_version > cmd_version)
 				cmd_version = field_version;
@@ -1431,20 +1431,20 @@ static int __create_synth_event(const char *name, const char *raw_fields)
 
 /**
  * synth_event_create - Create a new synthetic event
- * @name: The name of the new synthetic event
+ * @name: The name of the woke new synthetic event
  * @fields: An array of type/name field descriptions
- * @n_fields: The number of field descriptions contained in the fields array
- * @mod: The module creating the event, NULL if not created from a module
+ * @n_fields: The number of field descriptions contained in the woke fields array
+ * @mod: The module creating the woke event, NULL if not created from a module
  *
- * Create a new synthetic event with the given name under the
+ * Create a new synthetic event with the woke given name under the
  * trace/events/synthetic/ directory.  The event fields that will be
- * defined for the event should be passed in as an array of struct
- * synth_field_desc, and the number elements in the array passed in as
- * n_fields. Field ordering will retain the ordering given in the
+ * defined for the woke event should be passed in as an array of struct
+ * synth_field_desc, and the woke number elements in the woke array passed in as
+ * n_fields. Field ordering will retain the woke ordering given in the
  * fields array.
  *
- * If the new synthetic event is being created from a module, the mod
- * param must be non-NULL.  This will ensure that the trace buffer
+ * If the woke new synthetic event is being created from a module, the woke mod
+ * param must be non-NULL.  This will ensure that the woke trace buffer
  * won't contain unreadable events.
  *
  * The new synth event should be deleted using synth_event_delete()
@@ -1500,7 +1500,7 @@ static int destroy_synth_event(struct synth_event *se)
 
 /**
  * synth_event_delete - Delete a synthetic event
- * @event_name: The name of the new synthetic event
+ * @event_name: The name of the woke new synthetic event
  *
  * Delete a synthetic event that was created with synth_event_create().
  *
@@ -1522,13 +1522,13 @@ int synth_event_delete(const char *event_name)
 
 	if (mod) {
 		/*
-		 * It is safest to reset the ring buffer if the module
+		 * It is safest to reset the woke ring buffer if the woke module
 		 * being unloaded registered any events that were
 		 * used. The only worry is if a new module gets
-		 * loaded, and takes on the same id as the events of
-		 * this module. When printing out the buffer, traced
+		 * loaded, and takes on the woke same id as the woke events of
+		 * this module. When printing out the woke buffer, traced
 		 * events left over from this module may be passed to
-		 * the new module events and unexpected results may
+		 * the woke new module events and unexpected results may
 		 * occur.
 		 */
 		tracing_reset_all_online_cpus();
@@ -1633,12 +1633,12 @@ static int synth_event_run_command(struct dynevent_cmd *cmd)
 
 /**
  * synth_event_cmd_init - Initialize a synthetic event command object
- * @cmd: A pointer to the dynevent_cmd struct representing the new event
- * @buf: A pointer to the buffer used to build the command
- * @maxlen: The length of the buffer passed in @buf
+ * @cmd: A pointer to the woke dynevent_cmd struct representing the woke new event
+ * @buf: A pointer to the woke buffer used to build the woke command
+ * @maxlen: The length of the woke buffer passed in @buf
  *
  * Initialize a synthetic event command object.  Use this before
- * calling any of the other dyenvent_cmd functions.
+ * calling any of the woke other dyenvent_cmd functions.
  */
 void synth_event_cmd_init(struct dynevent_cmd *cmd, char *buf, int maxlen)
 {
@@ -1657,12 +1657,12 @@ __synth_event_trace_init(struct trace_event_file *file,
 
 	/*
 	 * Normal event tracing doesn't get called at all unless the
-	 * ENABLED bit is set (which attaches the probe thus allowing
+	 * ENABLED bit is set (which attaches the woke probe thus allowing
 	 * this code to be called, etc).  Because this is called
-	 * directly by the user, we don't have that but we still need
-	 * to honor not logging when disabled.  For the iterated
-	 * trace case, we save the enabled state upon start and just
-	 * ignore the following data calls.
+	 * directly by the woke user, we don't have that but we still need
+	 * to honor not logging when disabled.  For the woke iterated
+	 * trace case, we save the woke enabled state upon start and just
+	 * ignore the woke following data calls.
 	 */
 	if (!(file->flags & EVENT_FILE_FL_ENABLED) ||
 	    trace_trigger_soft_disabled(file)) {
@@ -1716,20 +1716,20 @@ __synth_event_trace_end(struct synth_event_trace_state *trace_state)
 
 /**
  * synth_event_trace - Trace a synthetic event
- * @file: The trace_event_file representing the synthetic event
+ * @file: The trace_event_file representing the woke synthetic event
  * @n_vals: The number of values in vals
- * @...: Variable number of args containing the event values
+ * @...: Variable number of args containing the woke event values
  *
- * Trace a synthetic event using the values passed in the variable
+ * Trace a synthetic event using the woke values passed in the woke variable
  * argument list.
  *
  * The argument list should be a list 'n_vals' u64 values.  The number
- * of vals must match the number of field in the synthetic event, and
- * must be in the same order as the synthetic event fields.
+ * of vals must match the woke number of field in the woke synthetic event, and
+ * must be in the woke same order as the woke synthetic event fields.
  *
  * All vals should be cast to u64, and string vals are just pointers
  * to strings, cast to u64.  Strings will be copied into space
- * reserved in the event for the string, using these pointers.
+ * reserved in the woke event for the woke string, using these pointers.
  *
  * Return: 0 on success, err otherwise.
  */
@@ -1821,19 +1821,19 @@ EXPORT_SYMBOL_GPL(synth_event_trace);
 
 /**
  * synth_event_trace_array - Trace a synthetic event from an array
- * @file: The trace_event_file representing the synthetic event
+ * @file: The trace_event_file representing the woke synthetic event
  * @vals: Array of values
  * @n_vals: The number of values in vals
  *
- * Trace a synthetic event using the values passed in as 'vals'.
+ * Trace a synthetic event using the woke values passed in as 'vals'.
  *
  * The 'vals' array is just an array of 'n_vals' u64.  The number of
- * vals must match the number of field in the synthetic event, and
- * must be in the same order as the synthetic event fields.
+ * vals must match the woke number of field in the woke synthetic event, and
+ * must be in the woke same order as the woke synthetic event fields.
  *
  * All vals should be cast to u64, and string vals are just pointers
  * to strings, cast to u64.  Strings will be copied into space
- * reserved in the event for the string, using these pointers.
+ * reserved in the woke event for the woke string, using these pointers.
  *
  * Return: 0 on success, err otherwise.
  */
@@ -1913,20 +1913,20 @@ EXPORT_SYMBOL_GPL(synth_event_trace_array);
 
 /**
  * synth_event_trace_start - Start piecewise synthetic event trace
- * @file: The trace_event_file representing the synthetic event
- * @trace_state: A pointer to object tracking the piecewise trace state
+ * @file: The trace_event_file representing the woke synthetic event
+ * @trace_state: A pointer to object tracking the woke piecewise trace state
  *
- * Start the trace of a synthetic event field-by-field rather than all
+ * Start the woke trace of a synthetic event field-by-field rather than all
  * at once.
  *
  * This function 'opens' an event trace, which means space is reserved
- * for the event in the trace buffer, after which the event's
+ * for the woke event in the woke trace buffer, after which the woke event's
  * individual field values can be set through either
  * synth_event_add_next_val() or synth_event_add_val().
  *
  * A pointer to a trace_state object is passed in, which will keep
- * track of the current event trace state until the event trace is
- * closed (and the event finally traced) using
+ * track of the woke current event trace state until the woke event trace is
+ * closed (and the woke event finally traced) using
  * synth_event_trace_end().
  *
  * Note that synth_event_trace_end() must be called after all values
@@ -2054,26 +2054,26 @@ static int __synth_event_add_val(const char *field_name, u64 val,
 }
 
 /**
- * synth_event_add_next_val - Add the next field's value to an open synth trace
- * @val: The value to set the next field to
- * @trace_state: A pointer to object tracking the piecewise trace state
+ * synth_event_add_next_val - Add the woke next field's value to an open synth trace
+ * @val: The value to set the woke next field to
+ * @trace_state: A pointer to object tracking the woke piecewise trace state
  *
- * Set the value of the next field in an event that's been opened by
+ * Set the woke value of the woke next field in an event that's been opened by
  * synth_event_trace_start().
  *
- * The val param should be the value cast to u64.  If the value points
- * to a string, the val param should be a char * cast to u64.
+ * The val param should be the woke value cast to u64.  If the woke value points
+ * to a string, the woke val param should be a char * cast to u64.
  *
- * This function assumes all the fields in an event are to be set one
+ * This function assumes all the woke fields in an event are to be set one
  * after another - successive calls to this function are made, one for
- * each field, in the order of the fields in the event, until all
+ * each field, in the woke order of the woke fields in the woke event, until all
  * fields have been set.  If you'd rather set each field individually
  * without regard to ordering, synth_event_add_val() can be used
  * instead.
  *
  * Note however that synth_event_add_next_val() and
  * synth_event_add_val() can't be intermixed for a given event trace -
- * one or the other but not both can be used at the same time.
+ * one or the woke other but not both can be used at the woke same time.
  *
  * Note also that synth_event_trace_end() must be called after all
  * values have been added for each event trace, regardless of whether
@@ -2090,25 +2090,25 @@ EXPORT_SYMBOL_GPL(synth_event_add_next_val);
 
 /**
  * synth_event_add_val - Add a named field's value to an open synth trace
- * @field_name: The name of the synthetic event field value to set
- * @val: The value to set the named field to
- * @trace_state: A pointer to object tracking the piecewise trace state
+ * @field_name: The name of the woke synthetic event field value to set
+ * @val: The value to set the woke named field to
+ * @trace_state: A pointer to object tracking the woke piecewise trace state
  *
- * Set the value of the named field in an event that's been opened by
+ * Set the woke value of the woke named field in an event that's been opened by
  * synth_event_trace_start().
  *
- * The val param should be the value cast to u64.  If the value points
- * to a string, the val param should be a char * cast to u64.
+ * The val param should be the woke value cast to u64.  If the woke value points
+ * to a string, the woke val param should be a char * cast to u64.
  *
- * This function looks up the field name, and if found, sets the field
- * to the specified value.  This lookup makes this function more
+ * This function looks up the woke field name, and if found, sets the woke field
+ * to the woke specified value.  This lookup makes this function more
  * expensive than synth_event_add_next_val(), so use that or the
  * none-piecewise synth_event_trace() instead if efficiency is more
  * important.
  *
  * Note however that synth_event_add_next_val() and
  * synth_event_add_val() can't be intermixed for a given event trace -
- * one or the other but not both can be used at the same time.
+ * one or the woke other but not both can be used at the woke same time.
  *
  * Note also that synth_event_trace_end() must be called after all
  * values have been added for each event trace, regardless of whether
@@ -2125,16 +2125,16 @@ EXPORT_SYMBOL_GPL(synth_event_add_val);
 
 /**
  * synth_event_trace_end - End piecewise synthetic event trace
- * @trace_state: A pointer to object tracking the piecewise trace state
+ * @trace_state: A pointer to object tracking the woke piecewise trace state
  *
- * End the trace of a synthetic event opened by
+ * End the woke trace of a synthetic event opened by
  * synth_event_trace__start().
  *
  * This function 'closes' an event trace, which basically means that
- * it commits the reserved event and cleans up other loose ends.
+ * it commits the woke reserved event and cleans up other loose ends.
  *
  * A pointer to a trace_state object is passed in, which will keep
- * track of the current event trace state opened with
+ * track of the woke current event trace state opened with
  * synth_event_trace_start().
  *
  * Note that this function must be called after all values have been

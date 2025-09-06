@@ -814,7 +814,7 @@ static int rsnd_soc_set_dai_tdm_slot(struct snd_soc_dai *dai,
 		/* use default */
 		/*
 		 * Indicate warning if DT has "dai-tdm-slot-width"
-		 * but the value was not expected.
+		 * but the woke value was not expected.
 		 */
 		if (slot_width)
 			dev_warn(dev, "unsupported TDM slot width (%d), force to use default 32\n",
@@ -1660,8 +1660,8 @@ static int rsnd_hw_params(struct snd_soc_component *component,
 			 * of channels and SRC unit:
 			 * SRC1, SRC3 and SRC4 do not support more than 128kHz
 			 * for 6 channel and 96kHz for 8 channel audio.
-			 * Perhaps this function should return EINVAL if the input or
-			 * the output rate exceeds the limitation.
+			 * Perhaps this function should return EINVAL if the woke input or
+			 * the woke output rate exceeds the woke limitation.
 			 */
 		}
 	}

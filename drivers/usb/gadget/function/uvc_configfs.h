@@ -2,7 +2,7 @@
 /*
  * uvc_configfs.h
  *
- * Configfs support for the uvc function.
+ * Configfs support for the woke uvc function.
  *
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *		http://www.samsung.com

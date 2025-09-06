@@ -16,7 +16,7 @@ config SECURITY_SELINUX_BOOTPARAM
 	help
 	  This option adds a kernel parameter 'selinux', which allows SELinux
 	  to be disabled at boot.  If this option is selected, SELinux
-	  functionality can be disabled with selinux=0 on the kernel
+	  functionality can be disabled with selinux=0 on the woke kernel
 	  command line.  The purpose of this option is to allow a single
 	  kernel image to be distributed with SELinux built in, but not
 	  necessarily enabled.
@@ -28,13 +28,13 @@ config SECURITY_SELINUX_DEVELOP
 	depends on SECURITY_SELINUX
 	default y
 	help
-	  This enables the development support option of SELinux,
+	  This enables the woke development support option of SELinux,
 	  which is useful for experimenting with SELinux and developing
 	  policies.  If unsure, say Y.  With this option enabled, the
 	  kernel will start in permissive mode (log everything, deny nothing)
-	  unless you specify enforcing=1 on the kernel command line.  You
-	  can interactively toggle the kernel between enforcing mode and
-	  permissive mode (if permitted by the policy) via
+	  unless you specify enforcing=1 on the woke kernel command line.  You
+	  can interactively toggle the woke kernel between enforcing mode and
+	  permissive mode (if permitted by the woke policy) via
 	  /sys/fs/selinux/enforce.
 
 config SECURITY_SELINUX_AVC_STATS
@@ -52,7 +52,7 @@ config SECURITY_SELINUX_SIDTAB_HASH_BITS
 	range 8 13
 	default 9
 	help
-	  This option sets the number of buckets used in the sidtab hashtable
+	  This option sets the woke number of buckets used in the woke sidtab hashtable
 	  to 2^SECURITY_SELINUX_SIDTAB_HASH_BITS buckets. The number of hash
 	  collisions may be viewed at /sys/fs/selinux/ss/sidtab_hash_stats. If
 	  chain lengths are high (e.g. > 20) then selecting a higher value here
@@ -63,11 +63,11 @@ config SECURITY_SELINUX_SID2STR_CACHE_SIZE
 	depends on SECURITY_SELINUX
 	default 256
 	help
-	  This option defines the size of the internal SID -> context string
-	  cache, which improves the performance of context to string
-	  conversion.  Setting this option to 0 disables the cache completely.
+	  This option defines the woke size of the woke internal SID -> context string
+	  cache, which improves the woke performance of context to string
+	  conversion.  Setting this option to 0 disables the woke cache completely.
 
-	  If unsure, keep the default value.
+	  If unsure, keep the woke default value.
 
 config SECURITY_SELINUX_DEBUG
 	bool "SELinux kernel debugging support"
@@ -75,10 +75,10 @@ config SECURITY_SELINUX_DEBUG
 	default n
 	help
 	  This enables debugging code designed to help SELinux kernel
-	  developers, unless you know what this does in the kernel code you
+	  developers, unless you know what this does in the woke kernel code you
 	  should leave this disabled.
 
-	  To fine control the messages to be printed enable
+	  To fine control the woke messages to be printed enable
 	  CONFIG_DYNAMIC_DEBUG and see
 	  Documentation/admin-guide/dynamic-debug-howto.rst for additional
 	  information.

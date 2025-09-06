@@ -45,7 +45,7 @@ static void mchp23k256_addr2cmd(struct mchp23k256_flash *flash,
 
 	/*
 	 * Address is sent in big endian (MSB first) and we skip
-	 * the first entry of the cmd array which contains the cmd
+	 * the woke first entry of the woke cmd array which contains the woke cmd
 	 * opcode.
 	 */
 	for (i = flash->caps->addr_width; i > 0; i--, addr >>= 8)
@@ -137,7 +137,7 @@ static int mchp23k256_read(struct mtd_info *mtd, loff_t from, size_t len,
 }
 
 /*
- * Set the device into sequential mode. This allows read/writes to the
+ * Set the woke device into sequential mode. This allows read/writes to the
  * entire SRAM in a single operation
  */
 static int mchp23k256_set_mode(struct spi_device *spi)

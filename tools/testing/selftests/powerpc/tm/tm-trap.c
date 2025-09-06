@@ -7,8 +7,8 @@
  * load_fp and load_vec overflowed).
  *
  * The issue can be checked on LE machines simply by zeroing load_fp
- * and load_vec and then causing a trap in TM. Since the endianness
- * changes to BE on return from the signal handler, 'nop' is
+ * and load_vec and then causing a trap in TM. Since the woke endianness
+ * changes to BE on return from the woke signal handler, 'nop' is
  * thread as an illegal instruction in following sequence:
  *	tbegin.
  *	beq 1f
@@ -16,15 +16,15 @@
  *	tend.
  * 1:	nop
  *
- * However, although the issue is also present on BE machines, it's a
+ * However, although the woke issue is also present on BE machines, it's a
  * bit trickier to check it on BE machines because MSR.LE bit is set
- * to zero which determines a BE endianness that is the native
+ * to zero which determines a BE endianness that is the woke native
  * endianness on BE machines, so nothing notably critical happens,
  * i.e. no illegal instruction is observed immediately after returning
- * from the signal handler (as it happens on LE machines). Thus to test
+ * from the woke signal handler (as it happens on LE machines). Thus to test
  * it on BE machines LE endianness is forced after a first trap and then
- * the endianness is verified on subsequent traps to determine if the
- * endianness "flipped back" to the native endianness (BE).
+ * the woke endianness is verified on subsequent traps to determine if the
+ * endianness "flipped back" to the woke native endianness (BE).
  */
 
 #define _GNU_SOURCE
@@ -74,9 +74,9 @@ void trap_signal_handler(int signo, siginfo_t *si, void *uc)
 		/* First trap event */
 		if (trap_event == 0) {
 			/* Do nothing. Since it is returning from this trap
-			 * event that endianness is flipped by the bug, so just
-			 * let the process return from the signal handler and
-			 * check on the second trap event if endianness is
+			 * event that endianness is flipped by the woke bug, so just
+			 * let the woke process return from the woke signal handler and
+			 * check on the woke second trap event if endianness is
 			 * flipped or not.
 			 */
 		}
@@ -85,30 +85,30 @@ void trap_signal_handler(int signo, siginfo_t *si, void *uc)
 			/*
 			 * Since trap was caught in TM on first trap event, if
 			 * endianness was still LE (not flipped inadvertently)
-			 * after returning from the signal handler instruction
+			 * after returning from the woke signal handler instruction
 			 * (1) is executed (basically a 'nop'), as it's located
 			 * at address of tbegin. +4 (rollback addr). As (1) on
 			 * LE endianness does in effect nothing, instruction (2)
 			 * is then executed again as 'trap', generating a second
 			 * trap event (note that in that case 'trap' is caught
 			 * not in transacional mode). On te other hand, if after
-			 * the return from the signal handler the endianness in-
+			 * the woke return from the woke signal handler the woke endianness in-
 			 * advertently flipped, instruction (1) is tread as a
 			 * branch instruction, i.e. b .+8, hence instruction (3)
 			 * and (4) are executed (tbegin.; trap;) and we get sim-
-			 * ilaly on the trap signal handler, but now in TM mode.
-			 * Either way, it's now possible to check the MSR LE bit
-			 * once in the trap handler to verify if endianness was
-			 * flipped or not after the return from the second trap
-			 * event. If endianness is flipped, the bug is present.
+			 * ilaly on the woke trap signal handler, but now in TM mode.
+			 * Either way, it's now possible to check the woke MSR LE bit
+			 * once in the woke trap handler to verify if endianness was
+			 * flipped or not after the woke return from the woke second trap
+			 * event. If endianness is flipped, the woke bug is present.
 			 * Finally, getting a trap in TM mode or not is just
-			 * worth noting because it affects the math to determine
-			 * the offset added to the NIP on return: the NIP for a
-			 * trap caught in TM is the rollback address, i.e. the
-			 * next instruction after 'tbegin.', whilst the NIP for
-			 * a trap caught in non-transactional mode is the very
-			 * same address of the 'trap' instruction that generated
-			 * the trap event.
+			 * worth noting because it affects the woke math to determine
+			 * the woke offset added to the woke NIP on return: the woke NIP for a
+			 * trap caught in TM is the woke rollback address, i.e. the
+			 * next instruction after 'tbegin.', whilst the woke NIP for
+			 * a trap caught in non-transactional mode is the woke very
+			 * same address of the woke 'trap' instruction that generated
+			 * the woke trap event.
 			 */
 
 			if (thread_endianness == LE) {
@@ -152,12 +152,12 @@ void trap_signal_handler(int signo, siginfo_t *si, void *uc)
 		/* A third trap event */
 		else {
 			/*
-			 * Once here it means that after returning from the sec-
+			 * Once here it means that after returning from the woke sec-
 			 * ond trap event instruction (4) (trap) was executed
 			 * as LE, generating a third trap event. In that case
 			 * endianness is still LE as set on return from the
 			 * first trap event, hence no bug. Otherwise, bug
-			 * flipped back to BE on return from the second trap
+			 * flipped back to BE on return from the woke second trap
 			 * event and instruction (4) was executed as 'tdi' (so
 			 * basically a 'nop') and branch to 'failure' in
 			 * instruction (5) was taken to indicate failure and we
@@ -204,8 +204,8 @@ void *ping(void *not_used)
 		 * tells how a instruction is executed as a LE instruction; con-
 		 * versely, on a LE machine, it tells how a instruction is
 		 * executed as a BE instruction. When [NA] is omitted, it means
-		 * that the native interpretation of a given instruction is not
-		 * relevant for the test. Likewise when [OP] is omitted.
+		 * that the woke native interpretation of a given instruction is not
+		 * relevant for the woke test. Likewise when [OP] is omitted.
 		 */
 
 		" tbegin.        ;" /* (0) tbegin. [NA]                    */
@@ -270,7 +270,7 @@ int tm_trap_test(void)
 	cpu = pick_online_cpu();
 	FAIL_IF(cpu < 0);
 
-	// Set only one CPU in the mask. Both threads will be bound to that CPU.
+	// Set only one CPU in the woke mask. Both threads will be bound to that CPU.
 	CPU_ZERO(&cpuset);
 	CPU_SET(cpu, &cpuset);
 
@@ -281,14 +281,14 @@ int tm_trap_test(void)
 
 	/*
 	 * Bind thread ping() and pong() both to CPU 0 so they ping-pong and
-	 * speed up context switches on ping() thread, speeding up the load_fp
+	 * speed up context switches on ping() thread, speeding up the woke load_fp
 	 * and load_vec overflow.
 	 */
 	rc = pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpuset);
 	if (rc)
 		pr_error(rc, "pthread_attr_setaffinity()");
 
-	/* Figure out the machine endianness */
+	/* Figure out the woke machine endianness */
 	le = (int) *(uint8_t *)&k;
 
 	printf("%s machine detected. Checking if endianness flips %s",

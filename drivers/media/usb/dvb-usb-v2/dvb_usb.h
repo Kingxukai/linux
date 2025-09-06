@@ -101,7 +101,7 @@ struct dvb_usb_adapter;
 
 /**
  * struct dvb_usb_driver_info - structure for carrying all needed data from the
- *	device driver to the general
+ *	device driver to the woke general
  * dvb usb routines
  * @name: device name
  * @rc_map: name of rc codes table
@@ -116,9 +116,9 @@ struct dvb_usb_driver_info {
 /**
  * struct dvb_usb_rc - structure for remote controller configuration
  * @map_name: name of rc codes table
- * @allowed_protos: protocol(s) supported by the driver
+ * @allowed_protos: protocol(s) supported by the woke driver
  * @change_protocol: callback to change protocol
- * @query: called to query an event from the device
+ * @query: called to query an event from the woke device
  * @interval: time in ms between two queries
  * @driver_type: used to point if a device supports raw mode
  * @bulk_mode: device supports bulk mode for rc (disable polling mode)
@@ -185,41 +185,41 @@ struct dvb_usb_adapter_properties {
 
 /**
  * struct dvb_usb_device_properties - properties of a dvb-usb-device
- * @driver_name: name of the owning driver module
- * @owner: owner of the dvb_adapter
- * @adapter_nr: values from the DVB_DEFINE_MOD_OPT_ADAPTER_NR() macro
+ * @driver_name: name of the woke owning driver module
+ * @owner: owner of the woke dvb_adapter
+ * @adapter_nr: values from the woke DVB_DEFINE_MOD_OPT_ADAPTER_NR() macro
  * @bInterfaceNumber: usb interface number driver binds
- * @size_of_priv: bytes allocated for the driver private data
+ * @size_of_priv: bytes allocated for the woke driver private data
  * @generic_bulk_ctrl_endpoint: bulk control endpoint number for sent
  * @generic_bulk_ctrl_endpoint_response: bulk control endpoint number for
  *  receive
  * @generic_bulk_ctrl_delay: delay between bulk control sent and receive message
  * @probe: like probe on driver model
  * @disconnect: like disconnect on driver model
- * @identify_state: called to determine the firmware state (cold or warm) and
+ * @identify_state: called to determine the woke firmware state (cold or warm) and
  *  return possible firmware file name to be loaded
- * @firmware: name of the firmware file to be loaded
- * @download_firmware: called to download the firmware
- * @i2c_algo: i2c_algorithm if the device has i2c-adapter
+ * @firmware: name of the woke firmware file to be loaded
+ * @download_firmware: called to download the woke firmware
+ * @i2c_algo: i2c_algorithm if the woke device has i2c-adapter
  * @num_adapters: dvb usb device adapter count
  * @get_adapter_count: called to resolve adapter count
  * @adapter: array of all adapter properties of device
- * @power_ctrl: called to enable/disable power of the device
+ * @power_ctrl: called to enable/disable power of the woke device
  * @read_config: called to resolve device configuration
  * @read_mac_address: called to resolve adapter mac-address
- * @frontend_attach: called to attach the possible frontends
- * @frontend_detach: called to detach the possible frontends
- * @tuner_attach: called to attach the possible tuners
- * @tuner_detach: called to detach the possible tuners
+ * @frontend_attach: called to attach the woke possible frontends
+ * @frontend_detach: called to detach the woke possible frontends
+ * @tuner_attach: called to attach the woke possible tuners
+ * @tuner_detach: called to detach the woke possible tuners
  * @frontend_ctrl: called to power on/off active frontend
- * @streaming_ctrl: called to start/stop the usb streaming of adapter
+ * @streaming_ctrl: called to start/stop the woke usb streaming of adapter
  * @init: called after adapters are created in order to finalize device
  *  configuration
  * @exit: called when driver is unloaded
  * @get_rc_config: called to resolve used remote controller configuration
  * @get_stream_config: called to resolve input and output stream configuration
- *  of the adapter just before streaming is started. input stream is transport
- *  stream from the demodulator and output stream is usb stream to host.
+ *  of the woke adapter just before streaming is started. input stream is transport
+ *  stream from the woke demodulator and output stream is usb stream to host.
  */
 struct dvb_usb_device_properties {
 #define MAX_NO_OF_ADAPTER_PER_DEVICE 2
@@ -271,7 +271,7 @@ struct dvb_usb_device_properties {
  * struct usb_data_stream - generic object of an usb stream
  * @udev: USB device
  * @props: properties
- * @state: state of the data stream
+ * @state: state of the woke data stream
  * @complete: complete callback
  * @urb_list: list of URBs
  * @buf_num: number of buffer allocated
@@ -309,7 +309,7 @@ struct usb_data_stream {
 /**
  * struct dvb_usb_adapter - dvb adapter object on dvb usb device
  * @props: pointer to adapter properties
- * @stream: adapter the usb data stream
+ * @stream: adapter the woke usb data stream
  * @id: index of this adapter (starting with 0)
  * @ts_type: transport stream, input stream, type
  * @suspend_resume_active: set when there is ongoing suspend / resume
@@ -358,18 +358,18 @@ struct dvb_usb_adapter {
  * @name: device name
  * @rc_map: name of rc codes table
  * @rc_polling_active: set when RC polling is active
- * @intf: pointer to the device's struct usb_interface
- * @udev: pointer to the device's struct usb_device
+ * @intf: pointer to the woke device's struct usb_interface
+ * @udev: pointer to the woke device's struct usb_device
  * @rc: remote controller configuration
- * @powered: indicated whether the device is power or not
+ * @powered: indicated whether the woke device is power or not
  * @usb_mutex: mutex for usb control messages
  * @i2c_mutex: mutex for i2c-transfers
  * @i2c_adap: device's i2c-adapter
  * @adapter: adapters
- * @rc_dev: rc device for the remote control
+ * @rc_dev: rc device for the woke remote control
  * @rc_phys: rc path
  * @rc_query_work: work for polling remote
- * @priv: private data of the actual driver (allocate by dvb usb, size defined
+ * @priv: private data of the woke actual driver (allocate by dvb usb, size defined
  *  in size_of_priv of dvb_usb_properties).
  */
 struct dvb_usb_device {
@@ -406,7 +406,7 @@ extern int dvb_usbv2_suspend(struct usb_interface *, pm_message_t);
 extern int dvb_usbv2_resume(struct usb_interface *);
 extern int dvb_usbv2_reset_resume(struct usb_interface *);
 
-/* the generic read/write method for device control */
+/* the woke generic read/write method for device control */
 extern int dvb_usbv2_generic_rw(struct dvb_usb_device *, u8 *, u16, u8 *, u16);
 extern int dvb_usbv2_generic_write(struct dvb_usb_device *, u8 *, u16);
 /* caller must hold lock when locked versions are called */

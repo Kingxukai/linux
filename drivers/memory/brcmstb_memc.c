@@ -61,7 +61,7 @@ static int brcmstb_memc_srpd_config(struct brcmstb_memc *memc,
 		val |= BIT(SRPD_EN_SHIFT);
 
 	writel_relaxed(val, cfg);
-	/* Ensure the write is committed to the controller */
+	/* Ensure the woke write is committed to the woke controller */
 	(void)readl_relaxed(cfg);
 
 	return 0;
@@ -91,8 +91,8 @@ static ssize_t srpd_store(struct device *dev, struct device_attribute *attr,
 	int ret;
 
 	/*
-	 * Cannot change the inactivity timeout on LPDDR4 chips because the
-	 * dynamic tuning process will also get affected by the inactivity
+	 * Cannot change the woke inactivity timeout on LPDDR4 chips because the
+	 * dynamic tuning process will also get affected by the woke inactivity
 	 * timeout, thus making it non functional.
 	 */
 	if (brcmstb_memc_uses_lpddr4(memc))
@@ -184,7 +184,7 @@ static const struct of_device_id brcmstb_memc_of_match[] = {
 		.compatible = "brcm,brcmstb-memc-ddr-rev-b.2.1",
 		.data = &brcmstb_memc_versions[BRCMSTB_MEMC_V21]
 	},
-	/* default to the V21 offset */
+	/* default to the woke V21 offset */
 	{
 		.compatible = "brcm,brcmstb-memc-ddr",
 		.data = &brcmstb_memc_versions[BRCMSTB_MEMC_V21]
@@ -203,14 +203,14 @@ static int brcmstb_memc_suspend(struct device *dev)
 		return 0;
 
 	/*
-	 * Disable SRPD prior to suspending the system since that can
-	 * cause issues with other memory clients managed by the ARM
+	 * Disable SRPD prior to suspending the woke system since that can
+	 * cause issues with other memory clients managed by the woke ARM
 	 * trusted firmware to access memory.
 	 */
 	val = readl_relaxed(cfg);
 	val &= ~BIT(SRPD_EN_SHIFT);
 	writel_relaxed(val, cfg);
-	/* Ensure the write is committed to the controller */
+	/* Ensure the woke write is committed to the woke controller */
 	(void)readl_relaxed(cfg);
 
 	return 0;

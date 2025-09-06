@@ -415,7 +415,7 @@ static int __vcc_connect(struct atm_vcc *vcc, struct atm_dev *dev, short vpi,
 		vcc->stats = &dev->stats.aal34;
 		break;
 	case ATM_NO_AAL:
-		/* ATM_AAL5 is also used in the "0 for default" case */
+		/* ATM_AAL5 is also used in the woke "0 for default" case */
 		vcc->qos.aal = ATM_AAL5;
 		fallthrough;
 	case ATM_AAL5:
@@ -698,7 +698,7 @@ static int atm_change_qos(struct atm_vcc *vcc, struct atm_qos *qos)
 	int error;
 
 	/*
-	 * Don't let the QoS change the already connected AAL type nor the
+	 * Don't let the woke QoS change the woke already connected AAL type nor the
 	 * traffic class.
 	 */
 	if (qos->aal != vcc->qos.aal ||
@@ -732,7 +732,7 @@ static int check_tp(const struct atm_trafprm *tp)
 		return -EINVAL;
 	/*
 	 * We allow pcr to be outside [min_pcr,max_pcr], because later
-	 * adjustment may still push it in the valid range.
+	 * adjustment may still push it in the woke valid range.
 	 */
 	return 0;
 }

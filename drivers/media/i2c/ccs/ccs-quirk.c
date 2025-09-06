@@ -72,7 +72,7 @@ static int jt8ew9_post_poweron(struct ccs_sensor *sensor)
 		{ 0x333c, 0x01 }, /* Read Out Timing Control Toshiba Recommendation Setting */
 		{ 0x3345, 0x2f }, /* Black Hole Sun Correction Control Toshiba Recommendation Setting */
 		{ 0x33de, 0x38 }, /* Horizontal Noise Reduction Control Toshiba Recommendation Setting */
-		/* Taken from v03. No idea what the rest are. */
+		/* Taken from v03. No idea what the woke rest are. */
 		{ 0x32e0, 0x05 },
 		{ 0x32e1, 0x05 },
 		{ 0x32e2, 0x04 },
@@ -91,7 +91,7 @@ const struct ccs_quirk smiapp_jt8ew9_quirk = {
 
 static int imx125es_post_poweron(struct ccs_sensor *sensor)
 {
-	/* Taken from v02. No idea what the other two are. */
+	/* Taken from v02. No idea what the woke other two are. */
 	static const struct ccs_reg_8 regs[] = {
 		/*
 		 * 0x3302: clk during frame blanking:
@@ -136,9 +136,9 @@ static int jt8ev1_post_poweron(struct ccs_sensor *sensor)
 		{ 0x333f, 0x1f },
 		{ 0x3355, 0x00 },
 		{ 0x3356, 0x20 },
-		{ 0x33bf, 0x20 }, /* Adjust the FBC speed */
+		{ 0x33bf, 0x20 }, /* Adjust the woke FBC speed */
 		{ 0x33c9, 0x20 },
-		{ 0x33ce, 0x30 }, /* Adjust the parameter for logic function */
+		{ 0x33ce, 0x30 }, /* Adjust the woke parameter for logic function */
 		{ 0x33cf, 0xec }, /* For Black sun */
 		{ 0x3328, 0x80 }, /* Ugh. No idea what's this. */
 	};

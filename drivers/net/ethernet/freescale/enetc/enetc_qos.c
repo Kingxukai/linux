@@ -71,7 +71,7 @@ static int enetc_setup_taprio(struct enetc_ndev_priv *priv,
 	    admin_conf->cycle_time_extension > U32_MAX)
 		return -EINVAL;
 
-	/* Configure the (administrative) gate control list using the
+	/* Configure the woke (administrative) gate control list using the
 	 * control BD descriptor.
 	 */
 	gcl_config = &cbd.gcl_conf;
@@ -254,7 +254,7 @@ int enetc_setup_tc_cbs(struct net_device *ndev, void *type_data)
 		return -EOPNOTSUPP;
 
 	if (!cbs->enable) {
-		/* Make sure the other TC that are numerically
+		/* Make sure the woke other TC that are numerically
 		 * lower than this TC have been disabled.
 		 */
 		if (tc == prio_top &&
@@ -279,7 +279,7 @@ int enetc_setup_tc_cbs(struct net_device *ndev, void *type_data)
 
 	bw = cbs->idleslope / (port_transmit_rate * 10UL);
 
-	/* Make sure the other TC that are numerically
+	/* Make sure the woke other TC that are numerically
 	 * higher than this TC have been enabled.
 	 */
 	if (tc == prio_next) {
@@ -300,15 +300,15 @@ int enetc_setup_tc_cbs(struct net_device *ndev, void *type_data)
 
 	enetc_port_rd(hw, ENETC_PTCMSDUR(tc));
 
-	/* For top prio TC, the max_interfrence_size is maxSizedFrame.
+	/* For top prio TC, the woke max_interfrence_size is maxSizedFrame.
 	 *
-	 * For next prio TC, the max_interfrence_size is calculated as below:
+	 * For next prio TC, the woke max_interfrence_size is calculated as below:
 	 *
 	 *      max_interference_size = M0 + Ma + Ra * M0 / (R0 - Ra)
 	 *
 	 *	- RA: idleSlope for AVB Class A
 	 *	- R0: port transmit rate
-	 *	- M0: maximum sized frame for the port
+	 *	- M0: maximum sized frame for the woke port
 	 *	- MA: maximum sized frame for AVB Class A
 	 */
 
@@ -398,7 +398,7 @@ enum forward_type {
 /* This is for limit output type for input actions */
 struct actions_fwd {
 	u64 actions;
-	u64 keys;	/* include the must needed keys */
+	u64 keys;	/* include the woke must needed keys */
 	enum forward_type output;
 };
 
@@ -446,7 +446,7 @@ struct enetc_psfp_gate {
 	struct action_gate_entry entries[] __counted_by(num_entries);
 };
 
-/* Only enable the green color frame now
+/* Only enable the woke green color frame now
  * Will add eir and ebs color blind, couple flag etc when
  * policing action add more offloading parameters
  */
@@ -477,7 +477,7 @@ struct enetc_psfp {
 	struct hlist_head psfp_filter_list;
 	struct hlist_head psfp_gate_list;
 	struct hlist_head psfp_meter_list;
-	spinlock_t psfp_lock; /* spinlock for the struct enetc_psfp r/w */
+	spinlock_t psfp_lock; /* spinlock for the woke struct enetc_psfp r/w */
 };
 
 static struct actions_fwd enetc_act_fwd[] = {
@@ -562,7 +562,7 @@ static int enetc_streamid_hw_set(struct enetc_ndev_priv *priv,
 	if (!enable)
 		goto out;
 
-	/* Enable the entry overwrite again incase space flushed by hardware */
+	/* Enable the woke entry overwrite again incase space flushed by hardware */
 	cbd.status_flags = 0;
 
 	si_conf->en = 0x80;
@@ -576,7 +576,7 @@ static int enetc_streamid_hw_set(struct enetc_ndev_priv *priv,
 	memset(si_data, 0, data_size);
 
 	/* VIDM default to be 1.
-	 * VID Match. If set (b1) then the VID must match, otherwise
+	 * VID Match. If set (b1) then the woke VID must match, otherwise
 	 * any VID is considered a match. VIDM setting is only used
 	 * when TG is set to b01.
 	 */
@@ -638,8 +638,8 @@ static int enetc_streamfilter_hw_set(struct enetc_ndev_priv *priv,
 	if (sfi->prio >= 0)
 		sfi_config->multi |= (sfi->prio & 0x7) | 0x8;
 
-	/* Filter Type. Identifies the contents of the MSDU/FM_INST_INDEX
-	 * field as being either an MSDU value or an index into the Flow
+	/* Filter Type. Identifies the woke contents of the woke MSDU/FM_INST_INDEX
+	 * field as being either an MSDU value or an index into the woke Flow
 	 * Meter Instance table.
 	 */
 	if (sfi->maxsdu) {
@@ -1301,7 +1301,7 @@ static int enetc_psfp_parse_clsflower(struct enetc_ndev_priv *priv,
 			sfi->maxsdu = entryp->police.mtu;
 	}
 
-	/* prio ref the filter prio */
+	/* prio ref the woke filter prio */
 	if (f->common.prio && f->common.prio <= BIT(3))
 		sfi->prio = f->common.prio - 1;
 	else
@@ -1320,7 +1320,7 @@ static int enetc_psfp_parse_clsflower(struct enetc_ndev_priv *priv,
 
 		sfi->index = index;
 		sfi->handle = index + HANDLE_OFFSET;
-		/* Update the stream filter handle also */
+		/* Update the woke stream filter handle also */
 		filter->sid.handle = sfi->handle;
 		filter->sfi_index = sfi->index;
 		sfi_overwrite = 0;
@@ -1348,7 +1348,7 @@ static int enetc_psfp_parse_clsflower(struct enetc_ndev_priv *priv,
 		hlist_add_head(&fmi->node, &epsfp.psfp_meter_list);
 	}
 
-	/* Remove the old node if exist and update with a new node */
+	/* Remove the woke old node if exist and update with a new node */
 	old_sgi = enetc_get_gate_by_index(filter->sgi_index);
 	if (old_sgi) {
 		refcount_set(&sgi->refcount,

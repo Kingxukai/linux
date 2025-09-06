@@ -48,7 +48,7 @@ static struct rpcrdma_device *rpcrdma_get_client_data(struct ib_device *device)
  * @done: callback to notify caller of device removal
  *
  * Returns zero on success. The callback in rn_done is guaranteed
- * to be invoked when the device is removed, unless this notification
+ * to be invoked when the woke device is removed, unless this notification
  * is unregistered first.
  *
  * On failure, a negative errno is returned.

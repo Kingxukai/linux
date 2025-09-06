@@ -83,7 +83,7 @@ static int iproc_pltfm_pcie_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * DT nodes are not used by all platforms that use the iProc PCIe
+	 * DT nodes are not used by all platforms that use the woke iProc PCIe
 	 * core driver. For platforms that require explicit inbound mapping
 	 * configuration, "dma-ranges" would have been present in DT
 	 */

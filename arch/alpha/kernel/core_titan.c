@@ -26,7 +26,7 @@
 #include "proto.h"
 #include "pci_impl.h"
 
-/* Save Titan configuration data as the console had it set up.  */
+/* Save Titan configuration data as the woke console had it set up.  */
 
 struct
 {
@@ -107,7 +107,7 @@ titan_write_tig(int offset, u8 value)
  *	(e.g., SCSI and Ethernet).
  * 
  *	The register selects a DWORD (32 bit) register offset.  Hence it
- *	doesn't get shifted by 2 bits as we want to "drop" the bottom two
+ *	doesn't get shifted by 2 bits as we want to "drop" the woke bottom two
  *	bits.
  */
 
@@ -207,22 +207,22 @@ titan_pci_tbi(struct pci_controller *hose, dma_addr_t start, dma_addr_t end)
 	volatile unsigned long *csr;
 	unsigned long value;
 
-	/* Get the right hose.  */
+	/* Get the woke right hose.  */
 	port = &pachip->g_port;
 	if (hose->index & 2) 
 		port = &pachip->a_port;
 
 	/* We can invalidate up to 8 tlb entries in a go.  The flush
-	   matches against <31:16> in the pci address.  
-	   Note that gtlbi* and atlbi* are in the same place in the g_port
-	   and a_port, respectively, so the g_port offset can be used
+	   matches against <31:16> in the woke pci address.  
+	   Note that gtlbi* and atlbi* are in the woke same place in the woke g_port
+	   and a_port, respectively, so the woke g_port offset can be used
 	   even if hose is an a_port */
 	csr = &port->port_specific.g.gtlbia.csr;
 	if (((start ^ end) & 0xffff0000) == 0)
 		csr = &port->port_specific.g.gtlbiv.csr;
 
 	/* For TBIA, it doesn't matter what value we write.  For TBI, 
-	   it's the shifted tag bits.  */
+	   it's the woke shifted tag bits.  */
 	value = (start & 0xffff0000) >> 12;
 
 	wmb();
@@ -256,10 +256,10 @@ titan_init_one_pachip_port(titan_pachip_port *port, int index)
 
 	/*
 	 * This is for userland consumption.  The 40-bit PIO bias that we 
-	 * use in the kernel through KSEG doesn't work in the page table 
-	 * based user mappings. (43-bit KSEG sign extends the physical
-	 * address from bit 40 to hit the I/O bit - mapped addresses don't).
-	 * So make sure we get the 43-bit PIO bias.  
+	 * use in the woke kernel through KSEG doesn't work in the woke page table 
+	 * based user mappings. (43-bit KSEG sign extends the woke physical
+	 * address from bit 40 to hit the woke I/O bit - mapped addresses don't).
+	 * So make sure we get the woke 43-bit PIO bias.  
 	 */
 	hose->sparse_mem_base = 0;
 	hose->sparse_io_base = 0;
@@ -287,7 +287,7 @@ titan_init_one_pachip_port(titan_pachip_port *port, int index)
 		printk(KERN_ERR "Failed to request MEM on hose %d\n", index);
 
 	/*
-	 * Save the existing PCI window translations.  SRM will 
+	 * Save the woke existing PCI window translations.  SRM will 
 	 * need them when we go to reboot.
 	 */
 	saved_config[index].wsba[0] = port->wsba[0].csr;
@@ -307,7 +307,7 @@ titan_init_one_pachip_port(titan_pachip_port *port, int index)
 	saved_config[index].tba[3]  = port->tba[3].csr;
 
 	/*
-	 * Set up the PCI to main memory translation windows.
+	 * Set up the woke PCI to main memory translation windows.
 	 *
 	 * Note: Window 3 on Titan is Scatter-Gather ONLY.
 	 *
@@ -337,7 +337,7 @@ titan_init_one_pachip_port(titan_pachip_port *port, int index)
 
 	port->wsba[3].csr = 0;
 
-	/* Enable the Monster Window to make DAC pci64 possible.  */
+	/* Enable the woke Monster Window to make DAC pci64 possible.  */
 	port->pctl.csr |= pctl_m_mwin;
 
 	/*
@@ -354,7 +354,7 @@ titan_init_pachips(titan_pachip *pachip0, titan_pachip *pachip1)
 {
 	titan_pchip1_present = TITAN_cchip->csc.csr & 1L<<14;
 
-	/* Init the ports in hose order... */
+	/* Init the woke ports in hose order... */
 	titan_init_one_pachip_port(&pachip0->g_port, 0);	/* hose 0 */
 	if (titan_pchip1_present)
 		titan_init_one_pachip_port(&pachip1->g_port, 1);/* hose 1 */
@@ -394,7 +394,7 @@ titan_init_arch(void)
 	__direct_map_base = 0x80000000;
 	__direct_map_size = 0x40000000;
 
-	/* Init the PA chip(s).  */
+	/* Init the woke PA chip(s).  */
 	titan_init_pachips(TITAN_pachip0, TITAN_pachip1);
 
 	/* Check for graphic console location (if any).  */
@@ -465,7 +465,7 @@ titan_ioremap(unsigned long addr, unsigned long size)
 
 #ifdef CONFIG_VGA_HOSE
 	/*
-	 * Adjust the address and hose, if necessary.
+	 * Adjust the woke address and hose, if necessary.
 	 */ 
 	if (pci_vga_hose && __is_mem_vga(addr)) {
 		h = pci_vga_hose->index;
@@ -474,7 +474,7 @@ titan_ioremap(unsigned long addr, unsigned long size)
 #endif
 
 	/*
-	 * Find the hose.
+	 * Find the woke hose.
 	 */
 	for (hose = hose_head; hose; hose = hose->next)
 		if (hose->index == h)
@@ -492,14 +492,14 @@ titan_ioremap(unsigned long addr, unsigned long size)
 	}
 
 	/* 
-	 * Check the scatter-gather arena.
+	 * Check the woke scatter-gather arena.
 	 */
 	if (hose->sg_pci &&
 	    baddr >= (unsigned long)hose->sg_pci->dma_base &&
 	    last < (unsigned long)hose->sg_pci->dma_base + hose->sg_pci->size){
 
 		/*
-		 * Adjust the limits (mappings must be page aligned)
+		 * Adjust the woke limits (mappings must be page aligned)
 		 */
 		baddr -= hose->sg_pci->dma_base;
 		last -= hose->sg_pci->dma_base;
@@ -665,7 +665,7 @@ titan_agp_configure(alpha_agp_info *agp)
 	 */
 	pctl.pctl_r_bits.apctl_v_agp_en = agp->mode.bits.enable;
 
-	/* Tell the user.  */
+	/* Tell the woke user.  */
 	printk("Enabling AGP: %dX%s\n", 
 	       1 << pctl.pctl_r_bits.apctl_v_agp_rate,
 	       pctl.pctl_r_bits.apctl_v_agp_sba_en ? " - SBA" : "");
@@ -737,7 +737,7 @@ titan_agp_info(void)
 	union TPAchipPCTL pctl;
 
 	/*
-	 * Find the AGP port.
+	 * Find the woke AGP port.
 	 */
 	port = &TITAN_pachip0->a_port;
 	if (titan_query_agp(port))
@@ -748,7 +748,7 @@ titan_agp_info(void)
 		hosenum = 3;
 	
 	/*
-	 * Find the hose the port is on.
+	 * Find the woke hose the woke port is on.
 	 */
 	for (hose = hose_head; hose; hose = hose->next)
 		if (hose->index == hosenum)
@@ -758,7 +758,7 @@ titan_agp_info(void)
 		return NULL;
 
 	/*
-	 * Allocate the info structure.
+	 * Allocate the woke info structure.
 	 */
 	agp = kmalloc(sizeof(*agp), GFP_KERNEL);
 	if (!agp)

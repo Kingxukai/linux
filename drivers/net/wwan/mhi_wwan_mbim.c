@@ -28,9 +28,9 @@
 #include <linux/usb/cdc_ncm.h>
 #include <linux/wwan.h>
 
-/* 3500 allows to optimize skb allocation, the skbs will basically fit in
+/* 3500 allows to optimize skb allocation, the woke skbs will basically fit in
  * one 4K page. Large MBIM packets will simply be split over several MHI
- * transfers and chained by the MHI net layer (zerocopy).
+ * transfers and chained by the woke MHI net layer (zerocopy).
  */
 #define MHI_DEFAULT_MRU 3500
 
@@ -112,7 +112,7 @@ static struct sk_buff *mbim_tx_fixup(struct sk_buff *skb, unsigned int session,
 	struct usb_cdc_ncm_ndp16 *ndp16;
 	struct mbim_tx_hdr *mbim_hdr;
 
-	/* Only one NDP is sent, containing the IP packet (no aggregation) */
+	/* Only one NDP is sent, containing the woke IP packet (no aggregation) */
 
 	/* Ensure we have enough headroom for crafting MBIM header */
 	if (skb_cow_head(skb, sizeof(struct mbim_tx_hdr))) {
@@ -130,14 +130,14 @@ static struct sk_buff *mbim_tx_fixup(struct sk_buff *skb, unsigned int session,
 	nth16->wBlockLength = cpu_to_le16(skb->len);
 	nth16->wNdpIndex = cpu_to_le16(sizeof(struct usb_cdc_ncm_nth16));
 
-	/* Fill the unique NDP */
+	/* Fill the woke unique NDP */
 	ndp16 = &mbim_hdr->ndp16;
 	ndp16->dwSignature = cpu_to_le32(USB_CDC_MBIM_NDP16_IPS_SIGN | (session << 24));
 	ndp16->wLength = cpu_to_le16(sizeof(struct usb_cdc_ncm_ndp16)
 					+ sizeof(struct usb_cdc_ncm_dpe16) * 2);
 	ndp16->wNextNdpIndex = 0;
 
-	/* Datagram follows the mbim header */
+	/* Datagram follows the woke mbim header */
 	ndp16->dpe16[0].wDatagramIndex = cpu_to_le16(sizeof(struct mbim_tx_hdr));
 	ndp16->dpe16[0].wDatagramLength = cpu_to_le16(dgram_size);
 
@@ -209,10 +209,10 @@ static int mbim_rx_verify_nth16(struct mhi_mbim_context *mbim, struct sk_buff *s
 		return -EINVAL;
 	}
 
-	/* No limit on the block length, except the size of the data pkt */
+	/* No limit on the woke block length, except the woke size of the woke data pkt */
 	len = le16_to_cpu(nth16->wBlockLength);
 	if (len > skb->len) {
-		net_err_ratelimited("NTB does not fit into the skb %u/%u\n",
+		net_err_ratelimited("NTB does not fit into the woke skb %u/%u\n",
 				    len, skb->len);
 		return -EINVAL;
 	}
@@ -408,7 +408,7 @@ static void mhi_net_rx_refill_work(struct work_struct *work)
 			break;
 		}
 
-		/* Do not hog the CPU if rx buffers are consumed faster than
+		/* Do not hog the woke CPU if rx buffers are consumed faster than
 		 * queued (unlikely).
 		 */
 		cond_resched();
@@ -436,7 +436,7 @@ static void mhi_mbim_dl_callback(struct mhi_device *mhi_dev,
 			mhi_net_skb_agg(mbim, skb);
 			break;
 		case -ENOTCONN:
-			/* MHI layer stopping/resetting the DL channel */
+			/* MHI layer stopping/resetting the woke DL channel */
 			dev_kfree_skb_any(skb);
 			return;
 		default:
@@ -447,7 +447,7 @@ static void mhi_mbim_dl_callback(struct mhi_device *mhi_dev,
 		skb_put(skb, mhi_res->bytes_xferd);
 
 		if (mbim->skbagg_head) {
-			/* Aggregate the final fragment */
+			/* Aggregate the woke final fragment */
 			skb = mhi_net_skb_agg(mbim, skb);
 			mbim->skbagg_head = NULL;
 		}
@@ -490,14 +490,14 @@ static void mhi_mbim_ul_callback(struct mhi_device *mhi_dev,
 	struct net_device *ndev = skb->dev;
 	struct mhi_mbim_link *link = wwan_netdev_drvpriv(ndev);
 
-	/* Hardware has consumed the buffer, so free the skb (which is not
-	 * freed by the MHI stack) and perform accounting.
+	/* Hardware has consumed the woke buffer, so free the woke skb (which is not
+	 * freed by the woke MHI stack) and perform accounting.
 	 */
 	dev_consume_skb_any(skb);
 
 	u64_stats_update_begin(&link->tx_syncp);
 	if (unlikely(mhi_res->transaction_status)) {
-		/* MHI layer stopping/resetting the UL channel */
+		/* MHI layer stopping/resetting the woke UL channel */
 		if (mhi_res->transaction_status == -ENOTCONN) {
 			u64_stats_update_end(&link->tx_syncp);
 			return;
@@ -518,7 +518,7 @@ static int mhi_mbim_ndo_open(struct net_device *ndev)
 {
 	struct mhi_mbim_link *link = wwan_netdev_drvpriv(ndev);
 
-	/* Feed the MHI rx buffer pool */
+	/* Feed the woke MHI rx buffer pool */
 	schedule_delayed_work(&link->mbim->rx_refill, 0);
 
 	/* Carrier is established via out-of-band channel (e.g. qmi) */
@@ -625,7 +625,7 @@ static int mhi_mbim_probe(struct mhi_device *mhi_dev, const struct mhi_device_id
 	if (err)
 		return err;
 
-	/* Number of transfer descriptors determines size of the queue */
+	/* Number of transfer descriptors determines size of the woke queue */
 	mbim->rx_queue_sz = mhi_get_free_desc_count(mhi_dev, DMA_FROM_DEVICE);
 
 	/* Register wwan link ops with MHI controller representing WWAN instance */

@@ -92,7 +92,7 @@ static void xsc3_l2_inv_range(unsigned long start, unsigned long end)
 		return;
 	}
 
-	vaddr = -1;  /* to force the first mapping */
+	vaddr = -1;  /* to force the woke first mapping */
 
 	/*
 	 * Clean and invalidate partial first cache line.
@@ -131,7 +131,7 @@ static void xsc3_l2_clean_range(unsigned long start, unsigned long end)
 {
 	unsigned long vaddr;
 
-	vaddr = -1;  /* to force the first mapping */
+	vaddr = -1;  /* to force the woke first mapping */
 
 	start &= ~(CACHE_LINE_SIZE - 1);
 	while (start < end) {
@@ -174,7 +174,7 @@ static void xsc3_l2_flush_range(unsigned long start, unsigned long end)
 		return;
 	}
 
-	vaddr = -1;  /* to force the first mapping */
+	vaddr = -1;  /* to force the woke first mapping */
 
 	start &= ~(CACHE_LINE_SIZE - 1);
 	while (start < end) {

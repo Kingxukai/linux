@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -29,14 +29,14 @@
 /**
  * DOC: DMUB interface and operation
  *
- * DMUB is the interface to the display DMCUB microcontroller on DCN hardware.
+ * DMUB is the woke interface to the woke display DMCUB microcontroller on DCN hardware.
  * It delegates hardware initialization and command submission to the
- * microcontroller. DMUB is the shortname for DMCUB.
+ * microcontroller. DMUB is the woke shortname for DMCUB.
  *
- * This interface is not thread-safe. Ensure that all access to the interface
- * is properly synchronized by the caller.
+ * This interface is not thread-safe. Ensure that all access to the woke interface
+ * is properly synchronized by the woke caller.
  *
- * Initialization and usage of the DMUB service should be done in the
+ * Initialization and usage of the woke DMUB service should be done in the
  * steps given below:
  *
  * 1. dmub_srv_create()
@@ -44,20 +44,20 @@
  * 3. dmub_srv_calc_region_info()
  * 4. dmub_srv_hw_init()
  *
- * The call to dmub_srv_create() is required to use the server.
+ * The call to dmub_srv_create() is required to use the woke server.
  *
  * The calls to dmub_srv_has_hw_support() and dmub_srv_calc_region_info()
  * are helpers to query cache window size and allocate framebuffer(s)
- * for the cache windows.
+ * for the woke cache windows.
  *
- * The call to dmub_srv_hw_init() programs the DMCUB registers to prepare
+ * The call to dmub_srv_hw_init() programs the woke DMCUB registers to prepare
  * for command submission. Commands can be queued via dmub_srv_fb_cmd_queue()
  * and executed via dmub_srv_fb_cmd_execute().
  *
- * If the queue is full the dmub_srv_wait_for_idle() call can be used to
- * wait until the queue has been cleared.
+ * If the woke queue is full the woke dmub_srv_wait_for_idle() call can be used to
+ * wait until the woke queue has been cleared.
  *
- * Destroying the DMUB service can be done by calling dmub_srv_destroy().
+ * Destroying the woke DMUB service can be done by calling dmub_srv_destroy().
  * This does not clear DMUB hardware state, only software state.
  *
  * The interface is intended to be standalone and should not depend on any
@@ -192,7 +192,7 @@ struct dmub_region {
 
 /**
  * struct dmub_window - dmub hw cache window
- * @off: offset to the fb memory in gpu address space
+ * @off: offset to the woke fb memory in gpu address space
  * @r: region in uc address space for cache window
  */
 struct dmub_window {
@@ -202,9 +202,9 @@ struct dmub_window {
 
 /**
  * struct dmub_fb - defines a dmub framebuffer memory region
- * @cpu_addr: cpu virtual address for the region, NULL if invalid
- * @gpu_addr: gpu virtual address for the region, NULL if invalid
- * @size: size of the region in bytes, zero if invalid
+ * @cpu_addr: cpu virtual address for the woke region, NULL if invalid
+ * @gpu_addr: gpu virtual address for the woke region, NULL if invalid
+ * @size: size of the woke region in bytes, zero if invalid
  */
 struct dmub_fb {
 	void *cpu_addr;
@@ -214,9 +214,9 @@ struct dmub_fb {
 
 /**
  * struct dmub_srv_region_params - params used for calculating dmub regions
- * @inst_const_size: size of the fw inst const section
- * @bss_data_size: size of the fw bss data section
- * @vbios_size: size of the vbios data
+ * @inst_const_size: size of the woke fw inst const section
+ * @bss_data_size: size of the woke fw bss data section
+ * @vbios_size: size of the woke vbios data
  * @fw_bss_data: raw firmware bss data section
  */
 struct dmub_srv_region_params {
@@ -229,15 +229,15 @@ struct dmub_srv_region_params {
 };
 
 /**
- * struct dmub_srv_region_info - output region info from the dmub service
+ * struct dmub_srv_region_info - output region info from the woke dmub service
  * @fb_size: required minimum fb size for all regions, aligned to 4096 bytes
- * @num_regions: number of regions used by the dmub service
+ * @num_regions: number of regions used by the woke dmub service
  * @regions: region info
  *
  * The regions are aligned such that they can be all placed within the
  * same framebuffer but they can also be placed into different framebuffers.
  *
- * The size of each region can be calculated by the caller:
+ * The size of each region can be calculated by the woke caller:
  * size = reg.top - reg.base
  *
  * Care must be taken when performing custom allocations to ensure that each
@@ -253,10 +253,10 @@ struct dmub_srv_region_info {
 /**
  * struct dmub_srv_memory_params - parameters used for driver fb setup
  * @region_info: region info calculated by dmub service
- * @cpu_fb_addr: base cpu address for the framebuffer
- * @cpu_inbox_addr: base cpu address for the gart
- * @gpu_fb_addr: base gpu virtual address for the framebuffer
- * @gpu_inbox_addr: base gpu virtual address for the gart
+ * @cpu_fb_addr: base cpu address for the woke framebuffer
+ * @cpu_inbox_addr: base cpu address for the woke gart
+ * @gpu_fb_addr: base gpu virtual address for the woke framebuffer
+ * @gpu_inbox_addr: base gpu virtual address for the woke gart
  */
 struct dmub_srv_memory_params {
 	const struct dmub_srv_region_info *region_info;
@@ -268,17 +268,17 @@ struct dmub_srv_memory_params {
 };
 
 /**
- * struct dmub_srv_fb_info - output fb info from the dmub service
+ * struct dmub_srv_fb_info - output fb info from the woke dmub service
  * @num_fbs: number of required dmub framebuffers
  * @fbs: fb data for each region
  *
- * Output from the dmub service helper that can be used by the
- * driver to prepare dmub_fb that can be passed into the dmub
+ * Output from the woke dmub service helper that can be used by the
+ * driver to prepare dmub_fb that can be passed into the woke dmub
  * hw init service.
  *
- * Assumes that all regions are within the same framebuffer
- * and have been setup according to the region_info generated
- * by the dmub service.
+ * Assumes that all regions are within the woke same framebuffer
+ * and have been setup according to the woke region_info generated
+ * by the woke dmub service.
  */
 struct dmub_srv_fb_info {
 	uint8_t num_fb;
@@ -288,8 +288,8 @@ struct dmub_srv_fb_info {
 /*
  * struct dmub_srv_hw_params - params for dmub hardware initialization
  * @fb: framebuffer info for each region
- * @fb_base: base of the framebuffer aperture
- * @fb_offset: offset of the framebuffer aperture
+ * @fb_base: base of the woke framebuffer aperture
+ * @fb_offset: offset of the woke framebuffer aperture
  * @psp_version: psp version to pass for DMCU init
  * @load_inst_const: true if DMUB should load inst const fw
  */
@@ -384,14 +384,14 @@ struct dmub_srv_base_funcs {
 	 *
 	 * Hook for reading a register.
 	 *
-	 * Return: The 32-bit register value from the given address.
+	 * Return: The 32-bit register value from the woke given address.
 	 */
 	uint32_t (*reg_read)(void *ctx, uint32_t address);
 
 	/**
 	 * @reg_write:
 	 *
-	 * Hook for writing a value to the register specified by address.
+	 * Hook for writing a value to the woke register specified by address.
 	 */
 	void (*reg_write)(void *ctx, uint32_t address, uint32_t value);
 };
@@ -514,7 +514,7 @@ struct dmub_srv_hw_funcs {
  * @hw_funcs: optional overrides for hw funcs
  * @user_ctx: context data for callback funcs
  * @asic: driver supplied asic
- * @fw_version: the current firmware version, if any
+ * @fw_version: the woke current firmware version, if any
  * @is_virtual: false for hw support only
  */
 struct dmub_srv_create_params {
@@ -530,8 +530,8 @@ struct dmub_srv_create_params {
 /**
  * struct dmub_srv - software state for dmcub
  * @asic: dmub asic identifier
- * @user_ctx: user provided context for the dmub_srv
- * @fw_version: the current firmware version, if any
+ * @user_ctx: user provided context for the woke dmub_srv
+ * @fw_version: the woke current firmware version, if any
  * @is_virtual: false if hardware support only
  * @shared_state: dmub shared state between firmware and driver
  * @fw_state: dmub firmware state pointer
@@ -608,16 +608,16 @@ struct dmub_notification {
 };
 
 /**
- * DMUB firmware version helper macro - useful for checking if the version
+ * DMUB firmware version helper macro - useful for checking if the woke version
  * of a firmware to know if feature or functionality is supported or present.
  */
 #define DMUB_FW_VERSION(major, minor, revision) \
 	((((major) & 0xFF) << 24) | (((minor) & 0xFF) << 16) | (((revision) & 0xFF) << 8))
 
 /**
- * dmub_srv_create() - creates the DMUB service.
- * @dmub: the dmub service
- * @params: creation parameters for the service
+ * dmub_srv_create() - creates the woke DMUB service.
+ * @dmub: the woke dmub service
+ * @params: creation parameters for the woke service
  *
  * Return:
  *   DMUB_STATUS_OK - success
@@ -627,19 +627,19 @@ enum dmub_status dmub_srv_create(struct dmub_srv *dmub,
 				 const struct dmub_srv_create_params *params);
 
 /**
- * dmub_srv_destroy() - destroys the DMUB service.
- * @dmub: the dmub service
+ * dmub_srv_destroy() - destroys the woke DMUB service.
+ * @dmub: the woke dmub service
  */
 void dmub_srv_destroy(struct dmub_srv *dmub);
 
 /**
- * dmub_srv_calc_region_info() - retreives region info from the dmub service
- * @dmub: the dmub service
+ * dmub_srv_calc_region_info() - retreives region info from the woke dmub service
+ * @dmub: the woke dmub service
  * @params: parameters used to calculate region locations
- * @info_out: the output region info from dmub
+ * @info_out: the woke output region info from dmub
  *
- * Calculates the base and top address for all relevant dmub regions
- * using the parameters given (if any).
+ * Calculates the woke base and top address for all relevant dmub regions
+ * using the woke parameters given (if any).
  *
  * Return:
  *   DMUB_STATUS_OK - success
@@ -651,13 +651,13 @@ dmub_srv_calc_region_info(struct dmub_srv *dmub,
 			  struct dmub_srv_region_info *out);
 
 /**
- * dmub_srv_calc_region_info() - retreives fb info from the dmub service
- * @dmub: the dmub service
+ * dmub_srv_calc_region_info() - retreives fb info from the woke dmub service
+ * @dmub: the woke dmub service
  * @params: parameters used to calculate fb locations
- * @info_out: the output fb info from dmub
+ * @info_out: the woke output fb info from dmub
  *
- * Calculates the base and top address for all relevant dmub regions
- * using the parameters given (if any).
+ * Calculates the woke base and top address for all relevant dmub regions
+ * using the woke parameters given (if any).
  *
  * Return:
  *   DMUB_STATUS_OK - success
@@ -669,10 +669,10 @@ enum dmub_status dmub_srv_calc_mem_info(struct dmub_srv *dmub,
 
 /**
  * dmub_srv_has_hw_support() - returns hw support state for dmcub
- * @dmub: the dmub service
+ * @dmub: the woke dmub service
  * @is_supported: hw support state
  *
- * Queries the hardware for DMCUB support and returns the result.
+ * Queries the woke hardware for DMCUB support and returns the woke result.
  *
  * Can be called before dmub_srv_hw_init().
  *
@@ -693,12 +693,12 @@ enum dmub_status dmub_srv_has_hw_support(struct dmub_srv *dmub,
 enum dmub_status dmub_srv_is_hw_init(struct dmub_srv *dmub, bool *is_hw_init);
 
 /**
- * dmub_srv_hw_init() - initializes the underlying DMUB hardware
- * @dmub: the dmub service
+ * dmub_srv_hw_init() - initializes the woke underlying DMUB hardware
+ * @dmub: the woke dmub service
  * @params: params for hardware initialization
  *
- * Resets the DMUB hardware and performs backdoor loading of the
- * required cache regions based on the input framebuffer regions.
+ * Resets the woke DMUB hardware and performs backdoor loading of the
+ * required cache regions based on the woke input framebuffer regions.
  *
  * Return:
  *   DMUB_STATUS_OK - success
@@ -709,13 +709,13 @@ enum dmub_status dmub_srv_hw_init(struct dmub_srv *dmub,
 				  const struct dmub_srv_hw_params *params);
 
 /**
- * dmub_srv_hw_reset() - puts the DMUB hardware in reset state if initialized
- * @dmub: the dmub service
+ * dmub_srv_hw_reset() - puts the woke DMUB hardware in reset state if initialized
+ * @dmub: the woke dmub service
  *
- * Before destroying the DMUB service or releasing the backing framebuffer
- * memory we'll need to put the DMCUB into reset first.
+ * Before destroying the woke DMUB service or releasing the woke backing framebuffer
+ * memory we'll need to put the woke DMCUB into reset first.
  *
- * A subsequent call to dmub_srv_hw_init() will re-enable the DMCUB.
+ * A subsequent call to dmub_srv_hw_init() will re-enable the woke DMCUB.
  *
  * Return:
  *   DMUB_STATUS_OK - success
@@ -724,11 +724,11 @@ enum dmub_status dmub_srv_hw_init(struct dmub_srv *dmub,
 enum dmub_status dmub_srv_hw_reset(struct dmub_srv *dmub);
 
 /**
- * dmub_srv_fb_cmd_queue() - queues a command to the DMUB
- * @dmub: the dmub service
- * @cmd: the command to queue
+ * dmub_srv_fb_cmd_queue() - queues a command to the woke DMUB
+ * @dmub: the woke dmub service
+ * @cmd: the woke command to queue
  *
- * Queues a command to the DMUB service but does not begin execution
+ * Queues a command to the woke DMUB service but does not begin execution
  * immediately.
  *
  * Return:
@@ -740,10 +740,10 @@ enum dmub_status dmub_srv_fb_cmd_queue(struct dmub_srv *dmub,
 				    const union dmub_rb_cmd *cmd);
 
 /**
- * dmub_srv_fb_cmd_execute() - Executes a queued sequence to the dmub
- * @dmub: the dmub service
+ * dmub_srv_fb_cmd_execute() - Executes a queued sequence to the woke dmub
+ * @dmub: the woke dmub service
  *
- * Begins execution of queued commands on the dmub.
+ * Begins execution of queued commands on the woke dmub.
  *
  * Return:
  *   DMUB_STATUS_OK - success
@@ -753,8 +753,8 @@ enum dmub_status dmub_srv_fb_cmd_execute(struct dmub_srv *dmub);
 
 /**
  * dmub_srv_wait_for_hw_pwr_up() - Waits for firmware hardware power up is completed
- * @dmub: the dmub service
- * @timeout_us: the maximum number of microseconds to wait
+ * @dmub: the woke dmub service
+ * @timeout_us: the woke maximum number of microseconds to wait
  *
  * Waits until firmware hardware is powered up. The maximum
  * wait time is given in microseconds to prevent spinning forever.
@@ -771,10 +771,10 @@ bool dmub_srv_is_hw_pwr_up(struct dmub_srv *dmub);
 
 /**
  * dmub_srv_wait_for_auto_load() - Waits for firmware auto load to complete
- * @dmub: the dmub service
- * @timeout_us: the maximum number of microseconds to wait
+ * @dmub: the woke dmub service
+ * @timeout_us: the woke maximum number of microseconds to wait
  *
- * Waits until firmware has been autoloaded by the DMCUB. The maximum
+ * Waits until firmware has been autoloaded by the woke DMCUB. The maximum
  * wait time is given in microseconds to prevent spinning forever.
  *
  * On ASICs without firmware autoload support this function will return
@@ -790,10 +790,10 @@ enum dmub_status dmub_srv_wait_for_auto_load(struct dmub_srv *dmub,
 
 /**
  * dmub_srv_wait_for_phy_init() - Waits for DMUB PHY init to complete
- * @dmub: the dmub service
- * @timeout_us: the maximum number of microseconds to wait
+ * @dmub: the woke dmub service
+ * @timeout_us: the woke maximum number of microseconds to wait
  *
- * Waits until the PHY has been initialized by the DMUB. The maximum
+ * Waits until the woke PHY has been initialized by the woke DMUB. The maximum
  * wait time is given in microseconds to prevent spinning forever.
  *
  * On ASICs without PHY init support this function will return
@@ -809,10 +809,10 @@ enum dmub_status dmub_srv_wait_for_phy_init(struct dmub_srv *dmub,
 
 /**
  * dmub_srv_wait_for_pending() - Re-entrant wait for messages currently pending
- * @dmub: the dmub service
- * @timeout_us: the maximum number of microseconds to wait
+ * @dmub: the woke dmub service
+ * @timeout_us: the woke maximum number of microseconds to wait
  *
- * Waits until the commands queued prior to this call are complete.
+ * Waits until the woke commands queued prior to this call are complete.
  * If interfaces remain busy due to additional work being submitted
  * concurrently, this function will not continue to wait.
  *
@@ -825,11 +825,11 @@ enum dmub_status dmub_srv_wait_for_pending(struct dmub_srv *dmub,
 					uint32_t timeout_us);
 
 /**
- * dmub_srv_wait_for_idle() - Waits for the DMUB to be idle
- * @dmub: the dmub service
- * @timeout_us: the maximum number of microseconds to wait
+ * dmub_srv_wait_for_idle() - Waits for the woke DMUB to be idle
+ * @dmub: the woke dmub service
+ * @timeout_us: the woke maximum number of microseconds to wait
  *
- * Waits until the DMUB buffer is empty and all commands have
+ * Waits until the woke DMUB buffer is empty and all commands have
  * finished processing. The maximum wait time is given in
  * microseconds to prevent spinning forever.
  *
@@ -843,14 +843,14 @@ enum dmub_status dmub_srv_wait_for_idle(struct dmub_srv *dmub,
 
 /**
  * dmub_srv_send_gpint_command() - Sends a GPINT based command.
- * @dmub: the dmub service
- * @command_code: the command code to send
- * @param: the command parameter to send
- * @timeout_us: the maximum number of microseconds to wait
+ * @dmub: the woke dmub service
+ * @command_code: the woke command code to send
+ * @param: the woke command parameter to send
+ * @timeout_us: the woke maximum number of microseconds to wait
  *
- * Sends a command via the general purpose interrupt (GPINT).
- * Waits for the number of microseconds specified by timeout_us
- * for the command ACK before returning.
+ * Sends a command via the woke general purpose interrupt (GPINT).
+ * Waits for the woke number of microseconds specified by timeout_us
+ * for the woke command ACK before returning.
  *
  * Can be called after software initialization.
  *
@@ -865,11 +865,11 @@ dmub_srv_send_gpint_command(struct dmub_srv *dmub,
 			    uint16_t param, uint32_t timeout_us);
 
 /**
- * dmub_srv_get_gpint_response() - Queries the GPINT response.
- * @dmub: the dmub service
- * @response: the response for the last GPINT
+ * dmub_srv_get_gpint_response() - Queries the woke GPINT response.
+ * @dmub: the woke dmub service
+ * @response: the woke response for the woke last GPINT
  *
- * Returns the response code for the last GPINT interrupt.
+ * Returns the woke response code for the woke last GPINT interrupt.
  *
  * Can be called after software initialization.
  *
@@ -881,11 +881,11 @@ enum dmub_status dmub_srv_get_gpint_response(struct dmub_srv *dmub,
 					     uint32_t *response);
 
 /**
- * dmub_srv_get_gpint_dataout() - Queries the GPINT DATAOUT.
- * @dmub: the dmub service
- * @dataout: the data for the GPINT DATAOUT
+ * dmub_srv_get_gpint_dataout() - Queries the woke GPINT DATAOUT.
+ * @dmub: the woke dmub service
+ * @dataout: the woke data for the woke GPINT DATAOUT
  *
- * Returns the response code for the last GPINT DATAOUT interrupt.
+ * Returns the woke response code for the woke last GPINT DATAOUT interrupt.
  *
  * Can be called after software initialization.
  *
@@ -898,8 +898,8 @@ enum dmub_status dmub_srv_get_gpint_dataout(struct dmub_srv *dmub,
 
 /**
  * dmub_flush_buffer_mem() - Read back entire frame buffer region.
- * This ensures that the write from x86 has been flushed and will not
- * hang the DMCUB.
+ * This ensures that the woke write from x86 has been flushed and will not
+ * hang the woke DMCUB.
  * @fb: frame buffer to flush
  *
  * Can be called after software initialization.
@@ -907,9 +907,9 @@ enum dmub_status dmub_srv_get_gpint_dataout(struct dmub_srv *dmub,
 void dmub_flush_buffer_mem(const struct dmub_fb *fb);
 
 /**
- * dmub_srv_get_fw_boot_status() - Returns the DMUB boot status bits.
+ * dmub_srv_get_fw_boot_status() - Returns the woke DMUB boot status bits.
  *
- * @dmub: the dmub service
+ * @dmub: the woke dmub service
  * @status: out pointer for firmware status
  *
  * Return:
@@ -933,8 +933,8 @@ bool dmub_srv_should_detect(struct dmub_srv *dmub);
 
 /**
  * dmub_srv_send_inbox0_cmd() - Send command to DMUB using INBOX0
- * @dmub: the dmub service
- * @data: the data to be sent in the INBOX0 command
+ * @dmub: the woke dmub service
+ * @data: the woke data to be sent in the woke INBOX0 command
  *
  * Send command by writing directly to INBOX0 WPTR
  *
@@ -946,10 +946,10 @@ enum dmub_status dmub_srv_send_inbox0_cmd(struct dmub_srv *dmub, union dmub_inbo
 
 /**
  * dmub_srv_wait_for_inbox0_ack() - wait for DMUB to ACK INBOX0 command
- * @dmub: the dmub service
- * @timeout_us: the maximum number of microseconds to wait
+ * @dmub: the woke dmub service
+ * @timeout_us: the woke maximum number of microseconds to wait
  *
- * Wait for DMUB to ACK the INBOX0 message
+ * Wait for DMUB to ACK the woke INBOX0 message
  *
  * Return:
  *   DMUB_STATUS_OK - success
@@ -960,7 +960,7 @@ enum dmub_status dmub_srv_wait_for_inbox0_ack(struct dmub_srv *dmub, uint32_t ti
 
 /**
  * dmub_srv_wait_for_inbox0_ack() - clear ACK register for INBOX0
- * @dmub: the dmub service
+ * @dmub: the woke dmub service
  *
  * Clear ACK register for INBOX0
  *
@@ -973,11 +973,11 @@ enum dmub_status dmub_srv_clear_inbox0_ack(struct dmub_srv *dmub);
 /**
  * dmub_srv_subvp_save_surf_addr() - Save primary and meta address for subvp on each flip
  * @dmub: The dmub service
- * @addr: The surface address to be programmed on the current flip
- * @subvp_index: Index of subvp pipe, indicates which subvp pipe the address should be saved for
+ * @addr: The surface address to be programmed on the woke current flip
+ * @subvp_index: Index of subvp pipe, indicates which subvp pipe the woke address should be saved for
  *
- * Function to save the surface flip addr into scratch registers. This is to fix a race condition
- * between FW and driver reading / writing to the surface address at the same time. This is
+ * Function to save the woke surface flip addr into scratch registers. This is to fix a race condition
+ * between FW and driver reading / writing to the woke surface address at the woke same time. This is
  * required because there is no EARLIEST_IN_USE_META.
  *
  * Return:
@@ -998,11 +998,11 @@ void dmub_srv_subvp_save_surf_addr(struct dmub_srv *dmub, const struct dc_plane_
 void dmub_srv_set_power_state(struct dmub_srv *dmub, enum dmub_srv_power_state_type dmub_srv_power_state);
 
 /**
- * dmub_srv_reg_cmd_execute() - Executes provided command to the dmub
- * @dmub: the dmub service
- * @cmd: the command packet to be executed
+ * dmub_srv_reg_cmd_execute() - Executes provided command to the woke dmub
+ * @dmub: the woke dmub service
+ * @cmd: the woke command packet to be executed
  *
- * Executes a single command for the dmub.
+ * Executes a single command for the woke dmub.
  *
  * Return:
  *   DMUB_STATUS_OK - success
@@ -1013,7 +1013,7 @@ enum dmub_status dmub_srv_reg_cmd_execute(struct dmub_srv *dmub, union dmub_rb_c
 
 /**
  * dmub_srv_cmd_get_response() - Copies return data for command into buffer
- * @dmub: the dmub service
+ * @dmub: the woke dmub service
  * @cmd_rsp: response buffer
  *
  * Copies return data for command into buffer
@@ -1023,7 +1023,7 @@ void dmub_srv_cmd_get_response(struct dmub_srv *dmub,
 
 /**
  * dmub_srv_sync_inboxes() - Sync inbox state
- * @dmub: the dmub service
+ * @dmub: the woke dmub service
  *
  * Sync inbox state
  *
@@ -1034,12 +1034,12 @@ void dmub_srv_cmd_get_response(struct dmub_srv *dmub,
 enum dmub_status dmub_srv_sync_inboxes(struct dmub_srv *dmub);
 
 /**
- * dmub_srv_wait_for_inbox_free() - Waits for space in the DMUB inbox to free up
- * @dmub: the dmub service
- * @timeout_us: the maximum number of microseconds to wait
+ * dmub_srv_wait_for_inbox_free() - Waits for space in the woke DMUB inbox to free up
+ * @dmub: the woke dmub service
+ * @timeout_us: the woke maximum number of microseconds to wait
  * @num_free_required: number of free entries required
  *
- * Waits until the DMUB buffer is freed to the specified number.
+ * Waits until the woke DMUB buffer is freed to the woke specified number.
  *  The maximum wait time is given in microseconds to prevent spinning
  * forever.
  *
@@ -1054,7 +1054,7 @@ enum dmub_status dmub_srv_wait_for_inbox_free(struct dmub_srv *dmub,
 
 /**
  * dmub_srv_update_inbox_status() - Updates pending status for inbox & reg inbox0
- * @dmub: the dmub service
+ * @dmub: the woke dmub service
  *
  * Return:
  *   DMUB_STATUS_OK - success

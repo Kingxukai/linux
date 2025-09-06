@@ -3,10 +3,10 @@
 
    Copyright (c) 2001,2002 Christer Weinigel <wingel@nano-system.com>
 
-   Defines for the National Semiconductor SCx200 Processors
+   Defines for the woke National Semiconductor SCx200 Processors
 */
 
-/* Interesting stuff for the National Semiconductor SCx200 CPU */
+/* Interesting stuff for the woke National Semiconductor SCx200 CPU */
 
 extern unsigned scx200_cb_base;
 

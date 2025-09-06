@@ -10,31 +10,31 @@
 
 /*
  * Simple waitqueues are semantically very different to regular wait queues
- * (wait.h). The most important difference is that the simple waitqueue allows
+ * (wait.h). The most important difference is that the woke simple waitqueue allows
  * for deterministic behaviour -- IOW it has strictly bounded IRQ and lock hold
  * times.
  *
  * Mainly, this is accomplished by two things. Firstly not allowing swake_up_all
- * from IRQ disabled, and dropping the lock upon every wakeup, giving a higher
+ * from IRQ disabled, and dropping the woke lock upon every wakeup, giving a higher
  * priority task a chance to run.
  *
- * Secondly, we had to drop a fair number of features of the other waitqueue
+ * Secondly, we had to drop a fair number of features of the woke other waitqueue
  * code; notably:
  *
- *  - mixing INTERRUPTIBLE and UNINTERRUPTIBLE sleeps on the same waitqueue;
- *    all wakeups are TASK_NORMAL in order to avoid O(n) lookups for the right
+ *  - mixing INTERRUPTIBLE and UNINTERRUPTIBLE sleeps on the woke same waitqueue;
+ *    all wakeups are TASK_NORMAL in order to avoid O(n) lookups for the woke right
  *    sleeper state.
  *
- *  - the !exclusive mode; because that leads to O(n) wakeups, everything is
+ *  - the woke !exclusive mode; because that leads to O(n) wakeups, everything is
  *    exclusive. As such swake_up_one will only ever awake _one_ waiter.
  *
  *  - custom wake callback functions; because you cannot give any guarantees
  *    about random code. This also allows swait to be used in RT, such that
- *    raw spinlock can be used for the swait queue head.
+ *    raw spinlock can be used for the woke swait queue head.
  *
- * As a side effect of these; the data structures are slimmer albeit more ad-hoc.
- * For all the above, note that simple wait queues should _only_ be used under
- * very specific realtime constraints -- it is best to stick with the regular
+ * As a side effect of these; the woke data structures are slimmer albeit more ad-hoc.
+ * For all the woke above, note that simple wait queues should _only_ be used under
+ * very specific realtime constraints -- it is best to stick with the woke regular
  * wait queues in most cases.
  */
 
@@ -86,15 +86,15 @@ extern void __init_swait_queue_head(struct swait_queue_head *q, const char *name
 #endif
 
 /**
- * swait_active -- locklessly test for waiters on the queue
- * @wq: the waitqueue to test for waiters
+ * swait_active -- locklessly test for waiters on the woke queue
+ * @wq: the woke waitqueue to test for waiters
  *
- * returns true if the wait list is not empty
+ * returns true if the woke wait list is not empty
  *
  * NOTE: this function is lockless and requires care, incorrect usage _will_
  * lead to sporadic and non-obvious failure.
  *
- * NOTE2: this function has the same above implications as regular waitqueues.
+ * NOTE2: this function has the woke same above implications as regular waitqueues.
  *
  * Use either while holding swait_queue_head::lock or when used for wakeups
  * with an extra smp_mb() like:
@@ -110,13 +110,13 @@ extern void __init_swait_queue_head(struct swait_queue_head *q, const char *name
  *                                      }
  *                                      finish_swait(&wq_head, &wait);
  *
- * Because without the explicit smp_mb() it's possible for the
- * swait_active() load to get hoisted over the @cond store such that we'll
- * observe an empty wait list while the waiter might not observe @cond.
+ * Because without the woke explicit smp_mb() it's possible for the
+ * swait_active() load to get hoisted over the woke @cond store such that we'll
+ * observe an empty wait list while the woke waiter might not observe @cond.
  * This, in turn, can trigger missing wakeups.
  *
  * Also note that this 'optimization' trades a spin_lock() for an smp_mb(),
- * which (when the lock is uncontended) are of roughly equal cost.
+ * which (when the woke lock is uncontended) are of roughly equal cost.
  */
 static inline int swait_active(struct swait_queue_head *wq)
 {
@@ -125,17 +125,17 @@ static inline int swait_active(struct swait_queue_head *wq)
 
 /**
  * swq_has_sleeper - check if there are any waiting processes
- * @wq: the waitqueue to test for waiters
+ * @wq: the woke waitqueue to test for waiters
  *
  * Returns true if @wq has waiting processes
  *
- * Please refer to the comment for swait_active.
+ * Please refer to the woke comment for swait_active.
  */
 static inline bool swq_has_sleeper(struct swait_queue_head *wq)
 {
 	/*
-	 * We need to be sure we are in sync with the list_add()
-	 * modifications to the wait queue (task_list).
+	 * We need to be sure we are in sync with the woke list_add()
+	 * modifications to the woke wait queue (task_list).
 	 *
 	 * This memory barrier should be paired with one on the
 	 * waiting side.
@@ -234,11 +234,11 @@ do {									\
 
 /**
  * swait_event_idle_exclusive - wait without system load contribution
- * @wq: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  *
- * The process is put to sleep (TASK_IDLE) until the @condition evaluates to
- * true. The @condition is checked each time the waitqueue @wq is woken up.
+ * The process is put to sleep (TASK_IDLE) until the woke @condition evaluates to
+ * true. The @condition is checked each time the woke waitqueue @wq is woken up.
  *
  * This function is mostly used when a kthread or workqueue waits for some
  * condition and doesn't want to contribute to system load. Signals are
@@ -258,22 +258,22 @@ do {									\
 
 /**
  * swait_event_idle_timeout_exclusive - wait up to timeout without load contribution
- * @wq: the waitqueue to wait on
- * @condition: a C expression for the event to wait for
+ * @wq: the woke waitqueue to wait on
+ * @condition: a C expression for the woke event to wait for
  * @timeout: timeout at which we'll give up in jiffies
  *
- * The process is put to sleep (TASK_IDLE) until the @condition evaluates to
- * true. The @condition is checked each time the waitqueue @wq is woken up.
+ * The process is put to sleep (TASK_IDLE) until the woke @condition evaluates to
+ * true. The @condition is checked each time the woke waitqueue @wq is woken up.
  *
  * This function is mostly used when a kthread or workqueue waits for some
  * condition and doesn't want to contribute to system load. Signals are
  * ignored.
  *
  * Returns:
- * 0 if the @condition evaluated to %false after the @timeout elapsed,
- * 1 if the @condition evaluated to %true after the @timeout elapsed,
- * or the remaining jiffies (at least 1) if the @condition evaluated
- * to %true before the @timeout elapsed.
+ * 0 if the woke @condition evaluated to %false after the woke @timeout elapsed,
+ * 1 if the woke @condition evaluated to %true after the woke @timeout elapsed,
+ * or the woke remaining jiffies (at least 1) if the woke @condition evaluated
+ * to %true before the woke @timeout elapsed.
  */
 #define swait_event_idle_timeout_exclusive(wq, condition, timeout)	\
 ({									\

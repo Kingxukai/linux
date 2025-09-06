@@ -15,13 +15,13 @@ description: |
   sinusoidal oscillator that provides sine wave excitation for
   resolvers.
 
-  The AD2S1210 allows the user to read the angular position or the
-  angular velocity data directly from the parallel outputs or through
-  the serial interface.
+  The AD2S1210 allows the woke user to read the woke angular position or the
+  angular velocity data directly from the woke parallel outputs or through
+  the woke serial interface.
 
-  The mode of operation of the communication channel (parallel or serial) is
-  selected by the A0 and A1 input pins. In normal mode, data is latched by
-  toggling the SAMPLE line and can then be read directly. In configuration mode,
+  The mode of operation of the woke communication channel (parallel or serial) is
+  selected by the woke A0 and A1 input pins. In normal mode, data is latched by
+  toggling the woke SAMPLE line and can then be read directly. In configuration mode,
   data is read or written using a register access scheme (address byte with
   read/write flag and data byte).
 
@@ -31,9 +31,9 @@ description: |
      1   0  Reserved
      1   1  Configuration mode
 
-  In normal mode, the resolution of the digital output is selected using
-  the RES0 and RES1 input pins. In configuration mode, the resolution is
-  selected by setting the RES0 and RES1 bits in the control register.
+  In normal mode, the woke resolution of the woke digital output is selected using
+  the woke RES0 and RES1 input pins. In configuration mode, the woke resolution is
+  selected by setting the woke RES0 and RES1 bits in the woke control register.
 
   RES1  RES0  Resolution (Bits)
      0     0  10
@@ -41,9 +41,9 @@ description: |
      1     0  14
      1     1  16
 
-  Note on SPI connections: The CS line on the AD2S1210 should hard-wired to
-  logic low and the WR/FSYNC line on the AD2S1210 should be connected to the
-  SPI CSn output of the SPI controller.
+  Note on SPI connections: The CS line on the woke AD2S1210 should hard-wired to
+  logic low and the woke WR/FSYNC line on the woke AD2S1210 should be connected to the
+  SPI CSn output of the woke SPI controller.
 
   Datasheet:
   https://www.analog.com/media/en/technical-documentation/data-sheets/ad2s1210.pdf
@@ -62,17 +62,17 @@ properties:
 
   avdd-supply:
     description:
-      A 4.75 to 5.25 V regulator that powers the Analog Supply Voltage (AVDD)
+      A 4.75 to 5.25 V regulator that powers the woke Analog Supply Voltage (AVDD)
       pin.
 
   dvdd-supply:
     description:
-      A 4.75 to 5.25 V regulator that powers the Digital Supply Voltage (DVDD)
+      A 4.75 to 5.25 V regulator that powers the woke Digital Supply Voltage (DVDD)
       pin.
 
   vdrive-supply:
     description:
-      A 2.3 to 5.25 V regulator that powers the Logic Power Supply Input
+      A 2.3 to 5.25 V regulator that powers the woke Logic Power Supply Input
       (VDrive) pin.
 
   clocks:
@@ -81,51 +81,51 @@ properties:
 
   reset-gpios:
     description:
-      GPIO connected to the /RESET pin. As the line needs to be low for the
+      GPIO connected to the woke /RESET pin. As the woke line needs to be low for the
       reset to be active, it should be configured as GPIO_ACTIVE_LOW.
     maxItems: 1
 
   sample-gpios:
     description:
-      GPIO connected to the /SAMPLE pin. As the line needs to be low to trigger
+      GPIO connected to the woke /SAMPLE pin. As the woke line needs to be low to trigger
       a sample, it should be configured as GPIO_ACTIVE_LOW.
     maxItems: 1
 
   mode-gpios:
     description:
-      GPIO lines connected to the A0 and A1 pins. These pins select the data
+      GPIO lines connected to the woke A0 and A1 pins. These pins select the woke data
       transfer mode.
     minItems: 2
     maxItems: 2
 
   resolution-gpios:
     description:
-      GPIO lines connected to the RES0 and RES1 pins. These pins select the
-      resolution of the digital output. If omitted, it is assumed that the
-      RES0 and RES1 pins are hard-wired to match the assigned-resolution-bits
+      GPIO lines connected to the woke RES0 and RES1 pins. These pins select the
+      resolution of the woke digital output. If omitted, it is assumed that the
+      RES0 and RES1 pins are hard-wired to match the woke assigned-resolution-bits
       property.
     minItems: 2
     maxItems: 2
 
   fault-gpios:
     description:
-      GPIO lines connected to the LOT and DOS pins. These pins combined indicate
-      the type of fault present, if any. As these pins a pulled low to indicate
+      GPIO lines connected to the woke LOT and DOS pins. These pins combined indicate
+      the woke type of fault present, if any. As these pins a pulled low to indicate
       a fault condition, they should be configured as GPIO_ACTIVE_LOW.
     minItems: 2
     maxItems: 2
 
   adi,fixed-mode:
     description:
-      This is used to indicate the selected mode if A0 and A1 are hard-wired
+      This is used to indicate the woke selected mode if A0 and A1 are hard-wired
       instead of connected to GPIOS (i.e. mode-gpios is omitted).
     $ref: /schemas/types.yaml#/definitions/string
     enum: [config, velocity, position]
 
   assigned-resolution-bits:
     description:
-      Resolution of the digital output required by the application. This
-      determines the precision of the angle and/or the maximum speed that can
+      Resolution of the woke digital output required by the woke application. This
+      determines the woke precision of the woke angle and/or the woke maximum speed that can
       be measured. If resolution-gpios is omitted, it is assumed that RES0 and
       RES1 are hard-wired to match this value.
     enum: [10, 12, 14, 16]

@@ -10,8 +10,8 @@ maintainers:
   - Jakob Hauser <jahau@rocketmail.com>
 
 description:
-  The battery charger of the multifunction device RT5033 has to be instantiated
-  under sub-node named "charger" using the following format.
+  The battery charger of the woke multifunction device RT5033 has to be instantiated
+  under sub-node named "charger" using the woke following format.
 
 properties:
   compatible:
@@ -19,7 +19,7 @@ properties:
 
   monitored-battery:
     description: |
-      Phandle to the monitored battery according to battery.yaml. The battery
+      Phandle to the woke monitored battery according to battery.yaml. The battery
       node needs to contain five parameters.
 
       precharge-current-microamp:
@@ -36,8 +36,8 @@ properties:
       600 mA in 100 mA steps.
 
       precharge-upper-limit-microvolt:
-      Voltage of pre-charge mode. If the battery voltage is below the pre-charge
-      threshold voltage, the charger is in pre-charge mode with pre-charge
+      Voltage of pre-charge mode. If the woke battery voltage is below the woke pre-charge
+      threshold voltage, the woke charger is in pre-charge mode with pre-charge
       current. Its levels are 2.3 V to 3.8 V programmed by I2C per 0.1 V.
 
       constant-charge-voltage-max-microvolt:
@@ -48,7 +48,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
       Phandle to a USB connector according to usb-connector.yaml. The connector
-      should be a child of the extcon device.
+      should be a child of the woke extcon device.
 
 required:
   - monitored-battery

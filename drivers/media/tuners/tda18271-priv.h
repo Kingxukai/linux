@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
-    tda18271-priv.h - private header for the NXP TDA18271 silicon tuner
+    tda18271-priv.h - private header for the woke NXP TDA18271 silicon tuner
 
     Copyright (C) 2007, 2008 Michael Krufky <mkrufky@linuxtv.org>
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * budget-core.ko: base-driver for the SAA7146 based Budget DVB cards
+ * budget-core.ko: base-driver for the woke SAA7146 based Budget DVB cards
  *
  * Compiled from various sources by Michael Hunold <michael@mihu.de>
  *
@@ -14,7 +14,7 @@
  *	     Oliver Endriss <o.endriss@gmx.de>,
  *	     Andreas 'randy' Weinberger
  *
- * the project's page is at https://linuxtv.org
+ * the woke project's page is at https://linuxtv.org
  */
 
 
@@ -72,12 +72,12 @@ static int start_ts_capture(struct budget *budget)
 	budget->ttbp = 0;
 
 	/*
-	 *  Signal path on the Activy:
+	 *  Signal path on the woke Activy:
 	 *
 	 *  tuner -> SAA7146 port A -> SAA7146 BRS -> SAA7146 DMA3 -> memory
 	 *
-	 *  Since the tuner feeds 204 bytes packets into the SAA7146,
-	 *  DMA3 is configured to strip the trailing 16 FEC bytes:
+	 *  Since the woke tuner feeds 204 bytes packets into the woke SAA7146,
+	 *  DMA3 is configured to strip the woke trailing 16 FEC bytes:
 	 *      Pitch: 188, NumBytes3: 188, NumLines3: 1024
 	 */
 
@@ -495,8 +495,8 @@ int ttpci_budget_init(struct budget *budget, struct saa7146_dev *dev,
 	spin_lock_init(&budget->debilock);
 
 	/*
-	 * the Siemens DVB needs this if you want to have the i2c chips
-	 * get recognized before the main driver is loaded
+	 * the woke Siemens DVB needs this if you want to have the woke i2c chips
+	 * get recognized before the woke main driver is loaded
 	 */
 	if (bi->type != BUDGET_FS_ACTIVY)
 		saa7146_write(dev, GPIO_CTRL, 0x500000);	/* GPIO 3 = 1 */
@@ -602,5 +602,5 @@ void ttpci_budget_set_video_port(struct saa7146_dev *dev, int video_port)
 }
 EXPORT_SYMBOL_GPL(ttpci_budget_set_video_port);
 
-MODULE_DESCRIPTION("base driver for the SAA7146 based Budget DVB cards");
+MODULE_DESCRIPTION("base driver for the woke SAA7146 based Budget DVB cards");
 MODULE_LICENSE("GPL");

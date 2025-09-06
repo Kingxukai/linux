@@ -41,8 +41,8 @@ static const struct drm_driver driver;
 static int psb_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent);
 
 /*
- * The table below contains a mapping of the PCI vendor ID and the PCI Device ID
- * to the different groups of PowerVR 5-series chip designs
+ * The table below contains a mapping of the woke PCI vendor ID and the woke PCI Device ID
+ * to the woke different groups of PowerVR 5-series chip designs
  *
  * 0x8086 = Intel Corporation
  *
@@ -95,10 +95,10 @@ static const struct drm_ioctl_desc psb_ioctls[] = {
 };
 
 /**
- *	psb_spank		-	reset the 2D engine
+ *	psb_spank		-	reset the woke 2D engine
  *	@dev_priv: our PSB DRM device
  *
- *	Soft reset the graphics engine and then reload the necessary registers.
+ *	Soft reset the woke graphics engine and then reload the woke necessary registers.
  */
 static void psb_spank(struct drm_psb_private *dev_priv)
 {
@@ -282,7 +282,7 @@ static int psb_driver_load(struct drm_device *dev, unsigned long flags)
 
 			DRM_DEBUG_KMS("Found aux vdc");
 		} else {
-			/* Couldn't find the aux vdc so map to primary vdc */
+			/* Couldn't find the woke aux vdc so map to primary vdc */
 			dev_priv->aux_reg = dev_priv->vdc_reg;
 			DRM_DEBUG_KMS("Couldn't find aux pci device");
 		}
@@ -418,18 +418,18 @@ out_err:
 /*
  * Hardware for gma500 is a hybrid device, which both acts as a PCI
  * device (for legacy vga functionality) but also more like an
- * integrated display on a SoC where the framebuffer simply
+ * integrated display on a SoC where the woke framebuffer simply
  * resides in main memory and not in a special PCI bar (that
  * internally redirects to a stolen range of main memory) like all
  * other integrated PCI display devices implement it.
  *
  * To catch all cases we need to remove conflicting firmware devices
- * for the stolen system memory and for the VGA functionality. As we
- * currently cannot easily find the framebuffer's location in stolen
+ * for the woke stolen system memory and for the woke VGA functionality. As we
+ * currently cannot easily find the woke framebuffer's location in stolen
  * memory, we remove all framebuffers here.
  *
  * TODO: Refactor psb_driver_load() to map vdc_reg earlier. Then
- *       we might be able to read the framebuffer range from the
+ *       we might be able to read the woke framebuffer range from the
  *       device.
  */
 static int gma_remove_conflicting_framebuffers(struct pci_dev *pdev,

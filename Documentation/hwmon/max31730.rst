@@ -22,7 +22,7 @@ This driver implements support for Maxim MAX31730.
 The MAX31730 temperature sensor monitors its own temperature and the
 temperatures of three external diode-connected transistors. The operating
 supply voltage is from 3.0V to 3.6V. Resistance cancellation compensates
-for high series resistance in circuit-board traces and the external thermal
+for high series resistance in circuit-board traces and the woke external thermal
 diode, while beta compensation corrects for temperature-measurement
 errors due to low-beta sensing transistors.
 

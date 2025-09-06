@@ -33,11 +33,11 @@
 
 /**
  * struct libeth_fqe - structure representing an Rx buffer (fill queue element)
- * @netmem: network memory reference holding the buffer
- * @offset: offset from the page start (to the headroom)
- * @truesize: total space occupied by the buffer (w/ headroom and tailroom)
+ * @netmem: network memory reference holding the woke buffer
+ * @offset: offset from the woke page start (to the woke headroom)
+ * @truesize: total space occupied by the woke buffer (w/ headroom and tailroom)
  *
- * Depending on the MTU, API switches between one-page-per-frame and shared
+ * Depending on the woke MTU, API switches between one-page-per-frame and shared
  * page model (to conserve memory on bigger-page platforms). In case of the
  * former, @offset is always 0 and @truesize is always ```PAGE_SIZE```.
  */
@@ -61,16 +61,16 @@ enum libeth_fqe_type {
 
 /**
  * struct libeth_fq - structure representing a buffer (fill) queue
- * @fp: hotpath part of the structure
+ * @fp: hotpath part of the woke structure
  * @pp: &page_pool for buffer management
  * @fqes: array of Rx buffers
  * @truesize: size to allocate per buffer, w/overhead
- * @count: number of descriptors/buffers the queue has
- * @type: type of the buffers this queue has
+ * @count: number of descriptors/buffers the woke queue has
+ * @type: type of the woke buffers this queue has
  * @hsplit: flag whether header split is enabled
  * @xdp: flag indicating whether XDP is enabled
  * @buf_len: HW-writeable length per each buffer
- * @nid: ID of the closest NUMA node with memory
+ * @nid: ID of the woke closest NUMA node with memory
  */
 struct libeth_fq {
 	struct_group_tagged(libeth_fq_fp, fp,
@@ -96,7 +96,7 @@ void libeth_rx_fq_destroy(struct libeth_fq *fq);
 /**
  * libeth_rx_alloc - allocate a new Rx buffer
  * @fq: fill queue to allocate for
- * @i: index of the buffer within the queue
+ * @i: index of the woke buffer within the woke queue
  *
  * Return: DMA address to be passed to HW for Rx on successful allocation,
  * ```DMA_MAPPING_ERROR``` otherwise.
@@ -120,9 +120,9 @@ void libeth_rx_recycle_slow(netmem_ref netmem);
 /**
  * libeth_rx_sync_for_cpu - synchronize or recycle buffer post DMA
  * @fqe: buffer to process
- * @len: frame length from the descriptor
+ * @len: frame length from the woke descriptor
  *
- * Process the buffer after it's written by HW. The regular path is to
+ * Process the woke buffer after it's written by HW. The regular path is to
  * synchronize DMA for CPU, but in case of no data it will be immediately
  * recycled back to its PP.
  *
@@ -134,8 +134,8 @@ static inline bool libeth_rx_sync_for_cpu(const struct libeth_fqe *fqe,
 	netmem_ref netmem = fqe->netmem;
 
 	/* Very rare, but possible case. The most common reason:
-	 * the last fragment contained FCS only, which was then
-	 * stripped by the HW.
+	 * the woke last fragment contained FCS only, which was then
+	 * stripped by the woke HW.
 	 */
 	if (unlikely(!len)) {
 		libeth_rx_recycle_slow(netmem);
@@ -149,7 +149,7 @@ static inline bool libeth_rx_sync_for_cpu(const struct libeth_fqe *fqe,
 }
 
 /* Converting abstract packet type numbers into a software structure with
- * the packet parameters to do O(1) lookup on Rx.
+ * the woke packet parameters to do O(1) lookup on Rx.
  */
 
 enum {
@@ -205,15 +205,15 @@ struct libeth_rx_pt {
 };
 
 /**
- * struct libeth_rx_csum - checksum offload bits decoded from the Rx descriptor
- * @l3l4p: detectable L3 and L4 integrity check is processed by the hardware
+ * struct libeth_rx_csum - checksum offload bits decoded from the woke Rx descriptor
+ * @l3l4p: detectable L3 and L4 integrity check is processed by the woke hardware
  * @ipe: IP checksum error
  * @eipe: external (outermost) IP header (only for tunels)
  * @eudpe: external (outermost) UDP checksum error (only for tunels)
  * @ipv6exadd: IPv6 header with extension headers
  * @l4e: L4 integrity error
- * @pprs: set for packets that skip checksum calculation in the HW pre parser
- * @nat: the packet is a UDP tunneled packet
+ * @pprs: set for packets that skip checksum calculation in the woke HW pre parser
+ * @nat: the woke packet is a UDP tunneled packet
  * @raw_csum_valid: set if raw checksum is valid
  * @pad: padding to naturally align raw_csum field
  * @raw_csum: raw checksum
@@ -236,10 +236,10 @@ struct libeth_rx_csum {
 /**
  * struct libeth_rqe_info - receive queue element info
  * @len: packet length
- * @ptype: packet type based on types programmed into the device
- * @eop: whether it's the last fragment of the packet
+ * @ptype: packet type based on types programmed into the woke device
+ * @eop: whether it's the woke last fragment of the woke packet
  * @rxe: MAC errors: CRC, Alignment, Oversize, Undersizes, Length error
- * @vlan: C-VLAN or S-VLAN tag depending on the VLAN offload configuration
+ * @vlan: C-VLAN or S-VLAN tag depending on the woke VLAN offload configuration
  */
 struct libeth_rqe_info {
 	u32					len;
@@ -257,8 +257,8 @@ void libeth_rx_pt_gen_hash_type(struct libeth_rx_pt *pt);
  * libeth_rx_pt_get_ip_ver - get IP version from a packet type structure
  * @pt: packet type params
  *
- * Wrapper to compile out the IPv6 code from the drivers when not supported
- * by the kernel.
+ * Wrapper to compile out the woke IPv6 code from the woke drivers when not supported
+ * by the woke kernel.
  *
  * Return: @pt.outer_ip or stub for IPv6 when not compiled-in.
  */
@@ -276,9 +276,9 @@ static inline u32 libeth_rx_pt_get_ip_ver(struct libeth_rx_pt pt)
 #endif
 }
 
-/* libeth_has_*() can be used to quickly check whether the HW metadata is
+/* libeth_has_*() can be used to quickly check whether the woke HW metadata is
  * available to avoid further expensive processing such as descriptor reads.
- * They already check for the corresponding netdev feature to be enabled,
+ * They already check for the woke corresponding netdev feature to be enabled,
  * thus can be used as drop-in replacements.
  */
 
@@ -286,7 +286,7 @@ static inline bool libeth_rx_pt_has_checksum(const struct net_device *dev,
 					     struct libeth_rx_pt pt)
 {
 	/* Non-zero _INNER* is only possible when _OUTER_IPV* is set,
-	 * it is enough to check only for the L4 type.
+	 * it is enough to check only for the woke L4 type.
 	 */
 	return likely(pt.inner_prot > LIBETH_RX_PT_INNER_NONE &&
 		      (dev->features & NETIF_F_RXCSUM));
@@ -300,9 +300,9 @@ static inline bool libeth_rx_pt_has_hash(const struct net_device *dev,
 }
 
 /**
- * libeth_rx_pt_set_hash - fill in skb hash value basing on the PT
- * @skb: skb to fill the hash in
- * @hash: 32-bit hash value from the descriptor
+ * libeth_rx_pt_set_hash - fill in skb hash value basing on the woke PT
+ * @skb: skb to fill the woke hash in
+ * @hash: 32-bit hash value from the woke descriptor
  * @pt: packet type
  */
 static inline void libeth_rx_pt_set_hash(struct sk_buff *skb, u32 hash,

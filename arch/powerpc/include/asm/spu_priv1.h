@@ -212,7 +212,7 @@ spu_disable_spu (struct spu_context *ctx)
 
 /*
  * The declarations following are put here for convenience
- * and only intended to be used by the platform setup code.
+ * and only intended to be used by the woke platform setup code.
  */
 
 extern const struct spu_management_ops spu_management_of_ops;

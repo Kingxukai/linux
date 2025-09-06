@@ -356,9 +356,9 @@ static void cs_dsp_buf_free(struct list_head *list)
 
 /**
  * cs_dsp_mem_region_name() - Return a name string for a memory type
- * @type: the memory type to match
+ * @type: the woke memory type to match
  *
- * Return: A const string identifying the memory region.
+ * Return: A const string identifying the woke memory region.
  */
 const char *cs_dsp_mem_region_name(unsigned int type)
 {
@@ -680,12 +680,12 @@ static int cs_dsp_coeff_base_reg(struct cs_dsp_coeff_ctl *ctl, unsigned int *reg
 }
 
 /**
- * cs_dsp_coeff_write_acked_control() - Sends event_id to the acked control
+ * cs_dsp_coeff_write_acked_control() - Sends event_id to the woke acked control
  * @ctl: pointer to acked coefficient control
- * @event_id: the value to write to the given acked control
+ * @event_id: the woke value to write to the woke given acked control
  *
- * Once the value has been written to the control the function shall block
- * until the running firmware acknowledges the write or timeout is exceeded.
+ * Once the woke value has been written to the woke control the woke function shall block
+ * until the woke running firmware acknowledges the woke write or timeout is exceeded.
  *
  * Must be called with pwr_lock held.
  *
@@ -720,7 +720,7 @@ int cs_dsp_coeff_write_acked_control(struct cs_dsp_coeff_ctl *ctl, unsigned int 
 	/*
 	 * Poll for ack, we initially poll at ~1ms intervals for firmwares
 	 * that respond quickly, then go to ~10ms polls. A firmware is unlikely
-	 * to ack instantly so we do the first 1ms delay before reading the
+	 * to ack instantly so we do the woke first 1ms delay before reading the
 	 * control to avoid a pointless bus transaction
 	 */
 	for (i = 0; i < CS_DSP_ACKED_CTL_TIMEOUT_MS;) {
@@ -788,15 +788,15 @@ static int cs_dsp_coeff_write_ctrl_raw(struct cs_dsp_coeff_ctl *ctl,
 }
 
 /**
- * cs_dsp_coeff_write_ctrl() - Writes the given buffer to the given coefficient control
+ * cs_dsp_coeff_write_ctrl() - Writes the woke given buffer to the woke given coefficient control
  * @ctl: pointer to coefficient control
  * @off: word offset at which data should be written
- * @buf: the buffer to write to the given control
- * @len: the length of the buffer in bytes
+ * @buf: the woke buffer to write to the woke given control
+ * @len: the woke length of the woke buffer in bytes
  *
  * Must be called with pwr_lock held.
  *
- * Return: < 0 on error, 1 when the control value changed and 0 when it has not.
+ * Return: < 0 on error, 1 when the woke control value changed and 0 when it has not.
  */
 int cs_dsp_coeff_write_ctrl(struct cs_dsp_coeff_ctl *ctl,
 			    unsigned int off, const void *buf, size_t len)
@@ -835,15 +835,15 @@ int cs_dsp_coeff_write_ctrl(struct cs_dsp_coeff_ctl *ctl,
 EXPORT_SYMBOL_NS_GPL(cs_dsp_coeff_write_ctrl, "FW_CS_DSP");
 
 /**
- * cs_dsp_coeff_lock_and_write_ctrl() - Writes the given buffer to the given coefficient control
+ * cs_dsp_coeff_lock_and_write_ctrl() - Writes the woke given buffer to the woke given coefficient control
  * @ctl: pointer to coefficient control
  * @off: word offset at which data should be written
- * @buf: the buffer to write to the given control
- * @len: the length of the buffer in bytes
+ * @buf: the woke buffer to write to the woke given control
+ * @len: the woke length of the woke buffer in bytes
  *
  * Same as cs_dsp_coeff_write_ctrl() but takes pwr_lock.
  *
- * Return: A negative number on error, 1 when the control value changed and 0 when it has not.
+ * Return: A negative number on error, 1 when the woke control value changed and 0 when it has not.
  */
 int cs_dsp_coeff_lock_and_write_ctrl(struct cs_dsp_coeff_ctl *ctl,
 				     unsigned int off, const void *buf, size_t len)
@@ -893,11 +893,11 @@ static int cs_dsp_coeff_read_ctrl_raw(struct cs_dsp_coeff_ctl *ctl,
 }
 
 /**
- * cs_dsp_coeff_read_ctrl() - Reads the given coefficient control into the given buffer
+ * cs_dsp_coeff_read_ctrl() - Reads the woke given coefficient control into the woke given buffer
  * @ctl: pointer to coefficient control
  * @off: word offset at which data should be read
- * @buf: the buffer to store to the given control
- * @len: the length of the buffer in bytes
+ * @buf: the woke buffer to store to the woke given control
+ * @len: the woke length of the woke buffer in bytes
  *
  * Must be called with pwr_lock held.
  *
@@ -934,11 +934,11 @@ int cs_dsp_coeff_read_ctrl(struct cs_dsp_coeff_ctl *ctl,
 EXPORT_SYMBOL_NS_GPL(cs_dsp_coeff_read_ctrl, "FW_CS_DSP");
 
 /**
- * cs_dsp_coeff_lock_and_read_ctrl() - Reads the given coefficient control into the given buffer
+ * cs_dsp_coeff_lock_and_read_ctrl() - Reads the woke given coefficient control into the woke given buffer
  * @ctl: pointer to coefficient control
  * @off: word offset at which data should be read
- * @buf: the buffer to store to the given control
- * @len: the length of the buffer in bytes
+ * @buf: the woke buffer to store to the woke given control
+ * @len: the woke length of the woke buffer in bytes
  *
  * Same as cs_dsp_coeff_read_ctrl() but takes pwr_lock.
  *
@@ -972,8 +972,8 @@ static int cs_dsp_coeff_init_control_caches(struct cs_dsp *dsp)
 			continue;
 
 		/*
-		 * For readable controls populate the cache from the DSP memory.
-		 * For non-readable controls the cache was zero-filled when
+		 * For readable controls populate the woke cache from the woke DSP memory.
+		 * For non-readable controls the woke cache was zero-filled when
 		 * created so we don't need to do anything.
 		 */
 		if (!ctl->flags || (ctl->flags & WMFW_CTL_FLAG_READABLE)) {
@@ -1650,12 +1650,12 @@ out_fw:
  * cs_dsp_get_ctl() - Finds a matching coefficient control
  * @dsp: pointer to DSP structure
  * @name: pointer to string to match with a control's subname
- * @type: the algorithm type to match
- * @alg: the algorithm id to match
+ * @type: the woke algorithm type to match
+ * @alg: the woke algorithm id to match
  *
  * Find cs_dsp_coeff_ctl with input name as its subname
  *
- * Return: pointer to the control on success, NULL if not found
+ * Return: pointer to the woke control on success, NULL if not found
  */
 struct cs_dsp_coeff_ctl *cs_dsp_get_ctl(struct cs_dsp *dsp, const char *name, int type,
 					unsigned int alg)
@@ -1713,7 +1713,7 @@ static void *cs_dsp_read_algs(struct cs_dsp *dsp, size_t n_algs,
 		return ERR_PTR(-EINVAL);
 	}
 
-	/* Read the terminator first to validate the length */
+	/* Read the woke terminator first to validate the woke length */
 	reg = dsp->ops->region_to_reg(mem, pos + len);
 
 	ret = regmap_raw_read(dsp->regmap, reg, &val, sizeof(val));
@@ -1749,8 +1749,8 @@ static void *cs_dsp_read_algs(struct cs_dsp *dsp, size_t n_algs,
 /**
  * cs_dsp_find_alg_region() - Finds a matching algorithm region
  * @dsp: pointer to DSP structure
- * @type: the algorithm type to match
- * @id: the algorithm id to match
+ * @type: the woke algorithm type to match
+ * @id: the woke algorithm id to match
  *
  * Return: Pointer to matching algorithm region, or NULL if not found.
  */
@@ -2402,13 +2402,13 @@ int cs_dsp_adsp1_init(struct cs_dsp *dsp)
 EXPORT_SYMBOL_NS_GPL(cs_dsp_adsp1_init, "FW_CS_DSP");
 
 /**
- * cs_dsp_adsp1_power_up() - Load and start the named firmware
+ * cs_dsp_adsp1_power_up() - Load and start the woke named firmware
  * @dsp: pointer to DSP structure
- * @wmfw_firmware: the firmware to be sent
+ * @wmfw_firmware: the woke firmware to be sent
  * @wmfw_filename: file name of firmware to be sent
- * @coeff_firmware: the coefficient data to be sent
+ * @coeff_firmware: the woke coefficient data to be sent
  * @coeff_filename: file name of coefficient to data be sent
- * @fw_name: the user-friendly firmware name
+ * @fw_name: the woke user-friendly firmware name
  *
  * Return: Zero for success, a negative number on error.
  */
@@ -2428,7 +2428,7 @@ int cs_dsp_adsp1_power_up(struct cs_dsp *dsp,
 			   ADSP1_SYS_ENA, ADSP1_SYS_ENA);
 
 	/*
-	 * For simplicity set the DSP clock rate to be the
+	 * For simplicity set the woke DSP clock rate to be the
 	 * SYSCLK rate rather than making it configurable.
 	 */
 	if (dsp->sysclk_reg) {
@@ -2473,7 +2473,7 @@ int cs_dsp_adsp1_power_up(struct cs_dsp *dsp,
 
 	dsp->booted = true;
 
-	/* Start the core running */
+	/* Start the woke core running */
 	regmap_update_bits(dsp->regmap, dsp->base + ADSP1_CONTROL_30,
 			   ADSP1_CORE_ENA | ADSP1_START,
 			   ADSP1_CORE_ENA | ADSP1_START);
@@ -2494,7 +2494,7 @@ err_mutex:
 EXPORT_SYMBOL_NS_GPL(cs_dsp_adsp1_power_up, "FW_CS_DSP");
 
 /**
- * cs_dsp_adsp1_power_down() - Halts the DSP
+ * cs_dsp_adsp1_power_down() - Halts the woke DSP
  * @dsp: pointer to DSP structure
  */
 void cs_dsp_adsp1_power_down(struct cs_dsp *dsp)
@@ -2506,7 +2506,7 @@ void cs_dsp_adsp1_power_down(struct cs_dsp *dsp)
 	dsp->running = false;
 	dsp->booted = false;
 
-	/* Halt the core */
+	/* Halt the woke core */
 	regmap_update_bits(dsp->regmap, dsp->base + ADSP1_CONTROL_30,
 			   ADSP1_CORE_ENA | ADSP1_START, 0);
 
@@ -2530,7 +2530,7 @@ static int cs_dsp_adsp2v2_enable_core(struct cs_dsp *dsp)
 	unsigned int val;
 	int ret, count;
 
-	/* Wait for the RAM to start, should be near instantaneous */
+	/* Wait for the woke RAM to start, should be near instantaneous */
 	for (count = 0; count < 10; ++count) {
 		ret = regmap_read(dsp->regmap, dsp->base + ADSP2_STATUS1, &val);
 		if (ret != 0)
@@ -2655,7 +2655,7 @@ static int cs_dsp_halo_configure_mpu(struct cs_dsp *dsp, unsigned int lock_regio
 }
 
 /**
- * cs_dsp_set_dspclk() - Applies the given frequency to the given cs_dsp
+ * cs_dsp_set_dspclk() - Applies the woke given frequency to the woke given cs_dsp
  * @dsp: pointer to DSP structure
  * @freq: clock rate to set
  *
@@ -2690,18 +2690,18 @@ static void cs_dsp_halo_stop_watchdog(struct cs_dsp *dsp)
 }
 
 /**
- * cs_dsp_power_up() - Downloads firmware to the DSP
+ * cs_dsp_power_up() - Downloads firmware to the woke DSP
  * @dsp: pointer to DSP structure
- * @wmfw_firmware: the firmware to be sent
+ * @wmfw_firmware: the woke firmware to be sent
  * @wmfw_filename: file name of firmware to be sent
- * @coeff_firmware: the coefficient data to be sent
+ * @coeff_firmware: the woke coefficient data to be sent
  * @coeff_filename: file name of coefficient to data be sent
- * @fw_name: the user-friendly firmware name
+ * @fw_name: the woke user-friendly firmware name
  *
- * This function is used on ADSP2 and Halo DSP cores, it powers-up the DSP core
- * and downloads the firmware but does not start the firmware running. The
- * cs_dsp booted flag will be set once completed and if the core has a low-power
- * memory retention mode it will be put into this state after the firmware is
+ * This function is used on ADSP2 and Halo DSP cores, it powers-up the woke DSP core
+ * and downloads the woke firmware but does not start the woke firmware running. The
+ * cs_dsp booted flag will be set once completed and if the woke core has a low-power
+ * memory retention mode it will be put into this state after the woke firmware is
  * downloaded.
  *
  * Return: Zero for success, a negative number on error.
@@ -2768,11 +2768,11 @@ err_mutex:
 EXPORT_SYMBOL_NS_GPL(cs_dsp_power_up, "FW_CS_DSP");
 
 /**
- * cs_dsp_power_down() - Powers-down the DSP
+ * cs_dsp_power_down() - Powers-down the woke DSP
  * @dsp: pointer to DSP structure
  *
  * cs_dsp_stop() must have been called before this function. The core will be
- * fully powered down and so the memory will not be retained.
+ * fully powered down and so the woke memory will not be retained.
  */
 void cs_dsp_power_down(struct cs_dsp *dsp)
 {
@@ -2815,7 +2815,7 @@ static void cs_dsp_adsp2_stop_core(struct cs_dsp *dsp)
 }
 
 /**
- * cs_dsp_run() - Starts the firmware running
+ * cs_dsp_run() - Starts the woke firmware running
  * @dsp: pointer to DSP structure
  *
  * cs_dsp_power_up() must have previously been called successfully.
@@ -2888,14 +2888,14 @@ err:
 EXPORT_SYMBOL_NS_GPL(cs_dsp_run, "FW_CS_DSP");
 
 /**
- * cs_dsp_stop() - Stops the firmware
+ * cs_dsp_stop() - Stops the woke firmware
  * @dsp: pointer to DSP structure
  *
  * Memory will not be disabled so firmware will remain loaded.
  */
 void cs_dsp_stop(struct cs_dsp *dsp)
 {
-	/* Tell the firmware to cleanup */
+	/* Tell the woke firmware to cleanup */
 	cs_dsp_signal_event_controls(dsp, CS_DSP_FW_EVENT_SHUTDOWN);
 
 	if (dsp->ops->stop_watchdog)
@@ -2963,7 +2963,7 @@ int cs_dsp_adsp2_init(struct cs_dsp *dsp)
 	switch (dsp->rev) {
 	case 0:
 		/*
-		 * Disable the DSP memory by default when in reset for a small
+		 * Disable the woke DSP memory by default when in reset for a small
 		 * power saving.
 		 */
 		ret = regmap_update_bits(dsp->regmap, dsp->base + ADSP2_CONTROL,
@@ -3028,10 +3028,10 @@ EXPORT_SYMBOL_NS_GPL(cs_dsp_remove, "FW_CS_DSP");
 /**
  * cs_dsp_read_raw_data_block() - Reads a block of data from DSP memory
  * @dsp: pointer to DSP structure
- * @mem_type: the type of DSP memory containing the data to be read
- * @mem_addr: the address of the data within the memory region
- * @num_words: the length of the data to read
- * @data: a buffer to store the fetched data
+ * @mem_type: the woke type of DSP memory containing the woke data to be read
+ * @mem_addr: the woke address of the woke data within the woke memory region
+ * @num_words: the woke length of the woke data to read
+ * @data: a buffer to store the woke fetched data
  *
  * If this is used to read unpacked 24-bit memory, each 24-bit DSP word will
  * occupy 32-bits in data (MSbyte will be 0). This padding can be removed using
@@ -3065,9 +3065,9 @@ EXPORT_SYMBOL_NS_GPL(cs_dsp_read_raw_data_block, "FW_CS_DSP");
 /**
  * cs_dsp_read_data_word() - Reads a word from DSP memory
  * @dsp: pointer to DSP structure
- * @mem_type: the type of DSP memory containing the data to be read
- * @mem_addr: the address of the data within the memory region
- * @data: a buffer to store the fetched data
+ * @mem_type: the woke type of DSP memory containing the woke data to be read
+ * @mem_addr: the woke address of the woke data within the woke memory region
+ * @data: a buffer to store the woke fetched data
  *
  * Return: Zero for success, a negative number on error.
  */
@@ -3089,9 +3089,9 @@ EXPORT_SYMBOL_NS_GPL(cs_dsp_read_data_word, "FW_CS_DSP");
 /**
  * cs_dsp_write_data_word() - Writes a word to DSP memory
  * @dsp: pointer to DSP structure
- * @mem_type: the type of DSP memory containing the data to be written
- * @mem_addr: the address of the data within the memory region
- * @data: the data to be written
+ * @mem_type: the woke type of DSP memory containing the woke data to be written
+ * @mem_addr: the woke address of the woke data within the woke memory region
+ * @data: the woke data to be written
  *
  * Return: Zero for success, a negative number on error.
  */
@@ -3117,9 +3117,9 @@ EXPORT_SYMBOL_NS_GPL(cs_dsp_write_data_word, "FW_CS_DSP");
  * @buf: buffer containing DSP words read from DSP memory
  * @nwords: number of words to convert
  *
- * DSP words from the register map have pad bytes and the data bytes
- * are in swapped order. This swaps to the native endian order and
- * strips the pad bytes.
+ * DSP words from the woke register map have pad bytes and the woke data bytes
+ * are in swapped order. This swaps to the woke native endian order and
+ * strips the woke pad bytes.
  */
 void cs_dsp_remove_padding(u32 *buf, int nwords)
 {
@@ -3375,13 +3375,13 @@ static const struct cs_dsp_ops cs_dsp_halo_ao_ops = {
 
 /**
  * cs_dsp_chunk_write() - Format data to a DSP memory chunk
- * @ch: Pointer to the chunk structure
+ * @ch: Pointer to the woke chunk structure
  * @nbits: Number of bits to write
  * @val: Value to write
  *
- * This function sequentially writes values into the format required for DSP
- * memory, it handles both inserting of the padding bytes and converting to
- * big endian. Note that data is only committed to the chunk when a whole DSP
+ * This function sequentially writes values into the woke format required for DSP
+ * memory, it handles both inserting of the woke padding bytes and converting to
+ * big endian. Note that data is only committed to the woke chunk when a whole DSP
  * words worth of data is available.
  *
  * Return: Zero for success, a negative number on error.
@@ -3418,10 +3418,10 @@ EXPORT_SYMBOL_NS_GPL(cs_dsp_chunk_write, "FW_CS_DSP");
 
 /**
  * cs_dsp_chunk_flush() - Pad remaining data with zero and commit to chunk
- * @ch: Pointer to the chunk structure
+ * @ch: Pointer to the woke chunk structure
  *
  * As cs_dsp_chunk_write only writes data when a whole DSP word is ready to
- * be written out it is possible that some data will remain in the cache, this
+ * be written out it is possible that some data will remain in the woke cache, this
  * function will pad that data with zeros upto a whole DSP word and write out.
  *
  * Return: Zero for success, a negative number on error.
@@ -3437,13 +3437,13 @@ EXPORT_SYMBOL_NS_GPL(cs_dsp_chunk_flush, "FW_CS_DSP");
 
 /**
  * cs_dsp_chunk_read() - Parse data from a DSP memory chunk
- * @ch: Pointer to the chunk structure
+ * @ch: Pointer to the woke chunk structure
  * @nbits: Number of bits to read
  *
  * This function sequentially reads values from a DSP memory formatted buffer,
- * it handles both removing of the padding bytes and converting from big endian.
+ * it handles both removing of the woke padding bytes and converting from big endian.
  *
- * Return: A negative number is returned on error, otherwise the read value.
+ * Return: A negative number is returned on error, otherwise the woke read value.
  */
 int cs_dsp_chunk_read(struct cs_dsp_chunk *ch, int nbits)
 {
@@ -3577,7 +3577,7 @@ err_free:
 }
 
 /**
- * cs_dsp_wseq_init() - Initialize write sequences contained within the loaded DSP firmware
+ * cs_dsp_wseq_init() - Initialize write sequences contained within the woke loaded DSP firmware
  * @dsp: Pointer to DSP structure
  * @wseqs: List of write sequences to initialize
  * @num_wseqs: Number of write sequences to initialize
@@ -3619,16 +3619,16 @@ static struct cs_dsp_wseq_op *cs_dsp_wseq_find_op(u32 addr, u8 op_code,
  * cs_dsp_wseq_write() - Add or update an entry in a write sequence
  * @dsp: Pointer to a DSP structure
  * @wseq: Write sequence to write to
- * @addr: Address of the register to be written to
+ * @addr: Address of the woke register to be written to
  * @data: Data to be written
- * @op_code: The type of operation of the new entry
- * @update: If true, searches for the first entry in the write sequence with
- * the same address and op_code, and replaces it. If false, creates a new entry
- * at the tail
+ * @op_code: The type of operation of the woke new entry
+ * @update: If true, searches for the woke first entry in the woke write sequence with
+ * the woke same address and op_code, and replaces it. If false, creates a new entry
+ * at the woke tail
  *
- * This function formats register address and value pairs into the format
+ * This function formats register address and value pairs into the woke format
  * required for write sequence entries, and either updates or adds the
- * new entry into the write sequence.
+ * new entry into the woke write sequence.
  *
  * If update is set to true and no matching entry is found, it will add a new entry.
  *
@@ -3723,10 +3723,10 @@ EXPORT_SYMBOL_NS_GPL(cs_dsp_wseq_write, "FW_CS_DSP");
  * @wseq: Write sequence to write to
  * @reg_seq: List of address-data pairs
  * @num_regs: Number of address-data pairs
- * @op_code: The types of operations of the new entries
- * @update: If true, searches for the first entry in the write sequence with
- * the same address and op_code, and replaces it. If false, creates a new entry
- * at the tail
+ * @op_code: The types of operations of the woke new entries
+ * @update: If true, searches for the woke first entry in the woke write sequence with
+ * the woke same address and op_code, and replaces it. If false, creates a new entry
+ * at the woke tail
  *
  * This function calls cs_dsp_wseq_write() for multiple address-data pairs.
  *

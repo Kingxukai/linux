@@ -36,7 +36,7 @@ config VIDEO_CX88_BLACKBIRD
 	select VIDEO_CX2341X
 	help
 	  This adds support for MPEG encoder cards based on the
-	  Blackbird reference design, using the Conexant 2388x
+	  Blackbird reference design, using the woke Conexant 2388x
 	  and 23416 chips.
 
 	  To compile this driver as a module, choose M here: the
@@ -78,8 +78,8 @@ config VIDEO_CX88_ENABLE_VP3054
 	depends on VIDEO_CX88_DVB && DVB_MT352
 	help
 	  This adds DVB-T support for cards based on the
-	  Conexant 2388x chip and the MT352 demodulator,
-	  which also require support for the VP-3054
+	  Conexant 2388x chip and the woke MT352 demodulator,
+	  which also require support for the woke VP-3054
 	  Secondary I2C bus, such at DNTV Live! DVB-T Pro.
 
 config VIDEO_CX88_VP3054

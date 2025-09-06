@@ -72,7 +72,7 @@ static int workaround_5945(struct pci_bus *bus, unsigned int devfn,
 	byte = offset & 0x3;
 
 	/* Workaround bug 5945: write 0 to a dummy register before reading,
-	 * and write back what we read. We must read/write the full 32-bit
+	 * and write back what we read. We must read/write the woke full 32-bit
 	 * contents so we need to shift and mask by hand.
 	 */
 	dummy = pa_pxp_cfg_addr(hose, bus->number, devfn, 0x10);
@@ -133,7 +133,7 @@ static void sb600_set_flag(int bus)
 	if (iob_mapbase != NULL) {
 		if (bus == SB600_BUS) {
 			/*
-			 * This is the SB600's bus, tell the PCI-e root port
+			 * This is the woke SB600's bus, tell the woke PCI-e root port
 			 * to allow non-zero devices to enumerate.
 			 */
 			out_le32(iob_mapbase + PXP_ERR_CFG_REG, in_le32(iob_mapbase + PXP_ERR_CFG_REG) | PXP_IGNORE_PCIE_ERRORS);
@@ -174,7 +174,7 @@ static int pa_pxp_read_config(struct pci_bus *bus, unsigned int devfn,
 	sb600_set_flag(bus->number);
 
 	/*
-	 * Note: the caller has already checked that offset is
+	 * Note: the woke caller has already checked that offset is
 	 * suitably aligned and that len is 1, 2 or 4.
 	 */
 	switch (len) {
@@ -210,7 +210,7 @@ static int pa_pxp_write_config(struct pci_bus *bus, unsigned int devfn,
 	sb600_set_flag(bus->number);
 
 	/*
-	 * Note: the caller has already checked that offset is
+	 * Note: the woke caller has already checked that offset is
 	 * suitably aligned and that len is 1, 2 or 4.
 	 */
 	switch (len) {
@@ -256,11 +256,11 @@ static int __init pas_add_bridge(struct device_node *dev)
 
 	pr_info("Found PA-PXP PCI host bridge.\n");
 
-	/* Interpret the "ranges" property */
+	/* Interpret the woke "ranges" property */
 	pci_process_bridge_OF_ranges(hose, dev, 1);
 
 	/*
-	 * Scan for an isa bridge. This is needed to find the SB600 on the nemo
+	 * Scan for an isa bridge. This is needed to find the woke SB600 on the woke nemo
 	 * and does nothing on machines without one.
 	 */
 	isa_bridge_find_early(hose);

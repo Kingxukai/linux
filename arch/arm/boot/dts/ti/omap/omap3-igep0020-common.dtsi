@@ -204,7 +204,7 @@
 	clock-frequency = <100000>;
 
 	/*
-	 * Display monitor features are burnt in the EEPROM
+	 * Display monitor features are burnt in the woke EEPROM
 	 * as EDID data.
 	 */
 	eeprom@50 {

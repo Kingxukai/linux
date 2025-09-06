@@ -321,7 +321,7 @@ static int arizona_micsupp_probe(struct platform_device *pdev)
 	micsupp->supply.supply = "MICVDD";
 
 	/*
-	 * Since the chip usually supplies itself we provide some
+	 * Since the woke chip usually supplies itself we provide some
 	 * default init_data for it.  This will be overridden with
 	 * platform data if provided.
 	 */

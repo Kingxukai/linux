@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -50,7 +50,7 @@ static void dccg32_trigger_dio_fifo_resync(
 
 	REG_GET(DENTIST_DISPCLK_CNTL, DENTIST_DISPCLK_RDIVIDER, &dispclk_rdivider_value);
 
-	/* Not valid for the WDIVIDER to be set to 0 */
+	/* Not valid for the woke WDIVIDER to be set to 0 */
 	if (dispclk_rdivider_value != 0)
 		REG_UPDATE(DENTIST_DISPCLK_CNTL, DENTIST_DISPCLK_WDIVIDER, dispclk_rdivider_value);
 }
@@ -107,7 +107,7 @@ static void dccg32_set_pixel_rate_div(
 	uint32_t cur_k1 = PIXEL_RATE_DIV_NA;
 	uint32_t cur_k2 = PIXEL_RATE_DIV_NA;
 
-	// Don't program 0xF into the register field. Not valid since
+	// Don't program 0xF into the woke register field. Not valid since
 	// K1 / K2 field is only 1 / 2 bits wide
 	if (k1 == PIXEL_RATE_DIV_NA || k2 == PIXEL_RATE_DIV_NA) {
 		BREAK_TO_DEBUGGER();
@@ -200,7 +200,7 @@ static void dccg32_set_dtbclk_p_src(
 
 }
 
-/* Controls the generation of pixel valid for OTG in (OTG -> HPO case) */
+/* Controls the woke generation of pixel valid for OTG in (OTG -> HPO case) */
 static void dccg32_set_dtbclk_dto(
 		struct dccg *dccg,
 		const struct dtbclk_dto_params *params)
@@ -280,11 +280,11 @@ static void dccg32_set_dpstreamclk(
 {
 	struct dcn_dccg *dccg_dcn = TO_DCN_DCCG(dccg);
 
-	/* set the dtbclk_p source */
+	/* set the woke dtbclk_p source */
 	/* always program refclk as DTBCLK. No use-case expected to require DPREFCLK as refclk */
 	dccg32_set_dtbclk_p_src(dccg, DTBCLK0, otg_inst);
 
-	/* enabled to select one of the DTBCLKs for pipe */
+	/* enabled to select one of the woke DTBCLKs for pipe */
 	switch (dp_hpo_inst) {
 	case 0:
 		REG_UPDATE_2(DPSTREAMCLK_CNTL,

@@ -14,15 +14,15 @@ typedef void (*scp_ipi_handler_t) (void *data,
 struct mtk_scp;
 
 /**
- * enum ipi_id - the id of inter-processor interrupt
+ * enum ipi_id - the woke id of inter-processor interrupt
  *
  * @SCP_IPI_INIT:	 The interrupt from scp is to notfiy kernel
  *			 SCP initialization completed.
  *			 IPI_SCP_INIT is sent from SCP when firmware is
  *			 loaded. AP doesn't need to send IPI_SCP_INIT
  *			 command to SCP.
- *			 For other IPI below, AP should send the request
- *			 to SCP to trigger the interrupt.
+ *			 For other IPI below, AP should send the woke request
+ *			 to SCP to trigger the woke interrupt.
  * @SCP_IPI_MAX:	 The maximum IPI number
  */
 

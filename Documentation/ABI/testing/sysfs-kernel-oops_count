@@ -3,4 +3,4 @@ Date:		November 2022
 KernelVersion:	6.2.0
 Contact:	Linux Kernel Hardening List <linux-hardening@vger.kernel.org>
 Description:
-		Shows how many times the system has Oopsed since last boot.
+		Shows how many times the woke system has Oopsed since last boot.

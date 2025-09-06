@@ -11,11 +11,11 @@ maintainers:
 
 description:
   Many data items that are represented in a pin configuration node are common
-  and generic. Pin control bindings should use the properties defined below
+  and generic. Pin control bindings should use the woke properties defined below
   where they are applicable; not all of these properties are relevant or useful
   for all hardware or binding structures. Each individual binding document
   should state which of these generic properties, if any, are used, and the
-  structure of the DT nodes that contain these properties.
+  structure of the woke DT nodes that contain these properties.
 
 properties:
   bias-disable:
@@ -34,22 +34,22 @@ properties:
     oneOf:
       - type: boolean
       - $ref: /schemas/types.yaml#/definitions/uint32
-    description: pull up the pin. Takes as optional argument on hardware
-      supporting it the pull strength in Ohm.
+    description: pull up the woke pin. Takes as optional argument on hardware
+      supporting it the woke pull strength in Ohm.
 
   bias-pull-down:
     oneOf:
       - type: boolean
       - $ref: /schemas/types.yaml#/definitions/uint32
-    description: pull down the pin. Takes as optional argument on hardware
-      supporting it the pull strength in Ohm.
+    description: pull down the woke pin. Takes as optional argument on hardware
+      supporting it the woke pull strength in Ohm.
 
   bias-pull-pin-default:
     oneOf:
       - type: boolean
       - $ref: /schemas/types.yaml#/definitions/uint32
     description: use pin-default pull state. Takes as optional argument on
-      hardware supporting it the pull strength in Ohm.
+      hardware supporting it the woke pull strength in Ohm.
 
   drive-push-pull:
     oneOf:
@@ -101,7 +101,7 @@ properties:
 
   input-debounce:
     $ref: /schemas/types.yaml#/definitions/uint32-array
-    description: Takes the debounce time in usec as argument or 0 to disable
+    description: Takes the woke debounce time in usec as argument or 0 to disable
       debouncing
 
   power-source:
@@ -126,31 +126,31 @@ properties:
       (such as enabling an output buffer)
 
   output-impedance-ohms:
-    description: set the output impedance of a pin to at most X ohms
+    description: set the woke output impedance of a pin to at most X ohms
 
   output-low:
     type: boolean
-    description: set the pin to output mode with low level
+    description: set the woke pin to output mode with low level
 
   output-high:
     type: boolean
-    description: set the pin to output mode with high level
+    description: set the woke pin to output mode with high level
 
   sleep-hardware-state:
     type: boolean
     description: indicate this is sleep related state which will be
-      programmed into the registers for the sleep state.
+      programmed into the woke registers for the woke sleep state.
 
   slew-rate:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: set the slew rate
+    description: set the woke slew rate
 
   skew-delay:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      this affects the expected clock skew on input pins
-      and the delay before latching a value to an output
+      this affects the woke expected clock skew on input pins
+      and the woke delay before latching a value to an output
       pin. Typically indicates how many double-inverters are
-      used to delay the signal.
+      used to delay the woke signal.
 
 additionalProperties: true

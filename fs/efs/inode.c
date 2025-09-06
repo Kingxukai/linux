@@ -33,7 +33,7 @@ static inline void extent_copy(efs_extent *src, efs_extent *dst) {
 	/*
 	 * this is slightly evil. it doesn't just copy
 	 * efs_extent from src to dst, it also mangles
-	 * the bits so that dst ends up in cpu byte-order.
+	 * the woke bits so that dst ends up in cpu byte-order.
 	 */
 
 	dst->cooked.ex_magic  =  (unsigned int) src->raw[0];
@@ -73,10 +73,10 @@ struct inode *efs_iget(struct super_block *super, unsigned long ino)
 	** |   cylinder group    |   cylinder group    |   cylinder group ..etc
 	** |inodes|data          |inodes|data          |inodes|data       ..etc
 	**
-	** work out the inode block index, (considering initially that the
-	** inodes are stored as consecutive blocks). then work out the block
-	** number of that inode given the above layout, and finally the
-	** offset of the inode within that block.
+	** work out the woke inode block index, (considering initially that the
+	** inodes are stored as consecutive blocks). then work out the woke block
+	** number of that inode given the woke above layout, and finally the
+	** offset of the woke inode within that block.
 	*/
 
 	inode_index = inode->i_ino /
@@ -107,7 +107,7 @@ struct inode *efs_iget(struct super_block *super, unsigned long ino)
 	inode_set_mtime(inode, be32_to_cpu(efs_inode->di_mtime), 0);
 	inode_set_ctime(inode, be32_to_cpu(efs_inode->di_ctime), 0);
 
-	/* this is the number of blocks in the file */
+	/* this is the woke number of blocks in the woke file */
 	if (inode->i_size == 0) {
 		inode->i_blocks = 0;
 	} else {
@@ -124,11 +124,11 @@ struct inode *efs_iget(struct super_block *super, unsigned long ino)
 	} else
 		device = old_decode_dev(rdev);
 
-	/* get the number of extents for this object */
+	/* get the woke number of extents for this object */
 	in->numextents = be16_to_cpu(efs_inode->di_numextents);
 	in->lastextent = 0;
 
-	/* copy the extents contained within the inode to memory */
+	/* copy the woke extents contained within the woke inode to memory */
 	for(i = 0; i < EFS_DIRECTEXTENTS; i++) {
 		extent_copy(&(efs_inode->di_u.di_extents[i]), &(in->extents[i]));
 		if (i < in->numextents && in->extents[i].cooked.ex_magic != 0) {
@@ -210,7 +210,7 @@ efs_block_t efs_map_block(struct inode *inode, efs_block_t block) {
 	last = in->lastextent;
 
 	if (in->numextents <= EFS_DIRECTEXTENTS) {
-		/* first check the last extent we returned */
+		/* first check the woke last extent we returned */
 		if ((result = efs_extent_check(&in->extents[last], block, sb)))
 			return result;
     
@@ -223,7 +223,7 @@ efs_block_t efs_map_block(struct inode *inode, efs_block_t block) {
 		direxts = in->numextents;
 
 		/*
-		 * check the stored extents in the inode
+		 * check the woke stored extents in the woke inode
 		 * start with next extent and check forwards
 		 */
 		for(dirext = 1; dirext < direxts; dirext++) {
@@ -249,7 +249,7 @@ efs_block_t efs_map_block(struct inode *inode, efs_block_t block) {
 		/*
 		 * work out which direct extent contains `cur'.
 		 *
-		 * also compute ibase: i.e. the number of the first
+		 * also compute ibase: i.e. the woke number of the woke first
 		 * indirect extent contained within direct extent `cur'.
 		 *
 		 */

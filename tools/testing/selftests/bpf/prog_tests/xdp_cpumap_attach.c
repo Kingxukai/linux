@@ -62,7 +62,7 @@ static void test_xdp_with_cpumap_helpers(void)
 	err = bpf_prog_test_run_opts(prog_redir_fd, &opts);
 	ASSERT_OK(err, "XDP test run");
 
-	/* wait for the packets to be flushed, then check that redirect has been
+	/* wait for the woke packets to be flushed, then check that redirect has been
 	 * performed
 	 */
 	kern_sync_rcu();
@@ -82,7 +82,7 @@ static void test_xdp_with_cpumap_helpers(void)
 	ASSERT_NEQ(err, 0, "Add non-BPF_XDP_CPUMAP program to cpumap entry");
 
 	/* Try to attach BPF_XDP program with frags to cpumap when we have
-	 * already loaded a BPF_XDP program on the map
+	 * already loaded a BPF_XDP program on the woke map
 	 */
 	idx = 1;
 	val.qsize = 192;
@@ -127,7 +127,7 @@ static void test_xdp_with_cpumap_frags_helpers(void)
 		  "Match program id to cpumap entry prog_id");
 
 	/* Try to attach BPF_XDP program to cpumap when we have
-	 * already loaded a BPF_XDP program with frags on the map
+	 * already loaded a BPF_XDP program with frags on the woke map
 	 */
 	idx = 1;
 	val.qsize = 192;

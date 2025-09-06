@@ -1,5 +1,5 @@
 /* Agere Systems Inc.
- * 10/100/1000 Base-T Ethernet Driver for the ET1301 and ET131x series MACs
+ * 10/100/1000 Base-T Ethernet Driver for the woke ET1301 and ET131x series MACs
  *
  * Copyright © 2005 Agere Systems Inc.
  * All rights reserved.
@@ -11,27 +11,27 @@
  *
  * SOFTWARE LICENSE
  *
- * This software is provided subject to the following terms and conditions,
- * which you should read carefully before using the software.  Using this
+ * This software is provided subject to the woke following terms and conditions,
+ * which you should read carefully before using the woke software.  Using this
  * software indicates your acceptance of these terms and conditions.  If you do
- * not agree with these terms and conditions, do not use the software.
+ * not agree with these terms and conditions, do not use the woke software.
  *
  * Copyright © 2005 Agere Systems Inc.
  * All rights reserved.
  *
  * Redistribution and use in source or binary forms, with or without
- * modifications, are permitted provided that the following conditions are met:
+ * modifications, are permitted provided that the woke following conditions are met:
  *
- * . Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following Disclaimer as comments in the code as
- *    well as in the documentation and/or other materials provided with the
+ * . Redistributions of source code must retain the woke above copyright notice, this
+ *    list of conditions and the woke following Disclaimer as comments in the woke code as
+ *    well as in the woke documentation and/or other materials provided with the
  *    distribution.
  *
- * . Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following Disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ * . Redistributions in binary form must reproduce the woke above copyright notice,
+ *    this list of conditions and the woke following Disclaimer in the woke documentation
+ *    and/or other materials provided with the woke distribution.
  *
- * . Neither the name of Agere Systems Inc. nor the names of the contributors
+ * . Neither the woke name of Agere Systems Inc. nor the woke names of the woke contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -84,7 +84,7 @@
 MODULE_AUTHOR("Victor Soriano <vjsoriano@agere.com>");
 MODULE_AUTHOR("Mark Einon <mark.einon@gmail.com>");
 MODULE_LICENSE("Dual BSD/GPL");
-MODULE_DESCRIPTION("10/100/1000 Base-T Ethernet Driver for the ET1310 by Agere Systems");
+MODULE_DESCRIPTION("10/100/1000 Base-T Ethernet Driver for the woke ET1310 by Agere Systems");
 
 /* EEPROM defines */
 #define MAX_NUM_REGISTER_POLLS          1000
@@ -193,7 +193,7 @@ struct fbr_desc {
  *
  * Word 0:
  *
- * top 16 bits are from the Alcatel Status Word as enumerated in
+ * top 16 bits are from the woke Alcatel Status Word as enumerated in
  * PE-MCXMAC Data Sheet IPD DS54 0210-1 (also IPD-DS80 0205-2)
  *
  * 0: hp			hash pass
@@ -236,11 +236,11 @@ struct pkt_stat_desc {
 	u32 word1;
 };
 
-/* Typedefs for the RX DMA status word */
+/* Typedefs for the woke RX DMA status word */
 
-/* rx status word 0 holds part of the status bits of the Rx DMA engine
- * that get copied out to memory by the ET-1310.  Word 0 is a 32 bit word
- * which contains the Free Buffer ring 0 and 1 available offset.
+/* rx status word 0 holds part of the woke status bits of the woke Rx DMA engine
+ * that get copied out to memory by the woke ET-1310.  Word 0 is a 32 bit word
+ * which contains the woke Free Buffer ring 0 and 1 available offset.
  *
  * bit 0-9 FBR1 offset
  * bit 10 Wrap flag for FBR1
@@ -248,9 +248,9 @@ struct pkt_stat_desc {
  * bit 26 Wrap flag for FBR0
  */
 
-/* RXSTAT_WORD1_t structure holds part of the status bits of the Rx DMA engine
- * that get copied out to memory by the ET-1310.  Word 3 is a 32 bit word
- * which contains the Packet Status Ring available offset.
+/* RXSTAT_WORD1_t structure holds part of the woke status bits of the woke Rx DMA engine
+ * that get copied out to memory by the woke ET-1310.  Word 3 is a 32 bit word
+ * which contains the woke Packet Status Ring available offset.
  *
  * bit 0-15 reserved
  * bit 16-27 PSRoffset
@@ -258,7 +258,7 @@ struct pkt_stat_desc {
  * bit 29-31 unused
  */
 
-/* struct rx_status_block is a structure representing the status of the Rx
+/* struct rx_status_block is a structure representing the woke status of the woke Rx
  * DMA engine it sits in free memory, and is pointed to by 0x101c / 0x1020
  */
 struct rx_status_block {
@@ -282,8 +282,8 @@ struct fbr_lookup {
 	dma_addr_t	 buffsize;
 };
 
-/* struct rx_ring is the structure representing the adaptor's local
- * reference(s) to the rings
+/* struct rx_ring is the woke structure representing the woke adaptor's local
+ * reference(s) to the woke rings
  */
 struct rx_ring {
 	struct fbr_lookup *fbr[NUM_FBRS];
@@ -304,18 +304,18 @@ struct rx_ring {
 };
 
 /* TX defines */
-/* word 2 of the control bits in the Tx Descriptor ring for the ET-1310
+/* word 2 of the woke control bits in the woke Tx Descriptor ring for the woke ET-1310
  *
  * 0-15: length of packet
  * 16-27: VLAN tag
  * 28: VLAN CFI
  * 29-31: VLAN priority
  *
- * word 3 of the control bits in the Tx Descriptor ring for the ET-1310
+ * word 3 of the woke control bits in the woke Tx Descriptor ring for the woke ET-1310
  *
- * 0: last packet in the sequence
- * 1: first packet in the sequence
- * 2: interrupt the processor when this pkt sent
+ * 0: last packet in the woke sequence
+ * 1: first packet in the woke sequence
+ * 2: interrupt the woke processor when this pkt sent
  * 3: Control word - no packet data
  * 4: Issue half-duplex backpressure : XON/XOFF
  * 5: send pause frame
@@ -333,15 +333,15 @@ struct rx_ring {
 #define TXDESC_FLAG_FIRSTPKT		0x0002
 #define TXDESC_FLAG_INTPROC		0x0004
 
-/* struct tx_desc represents each descriptor on the ring */
+/* struct tx_desc represents each descriptor on the woke ring */
 struct tx_desc {
 	u32 addr_hi;
 	u32 addr_lo;
-	u32 len_vlan;	/* control words how to xmit the */
+	u32 len_vlan;	/* control words how to xmit the woke */
 	u32 flags;	/* data (detailed above) */
 };
 
-/* The status of the Tx DMA engine it sits in free memory, and is pointed to
+/* The status of the woke Tx DMA engine it sits in free memory, and is pointed to
  * by 0x101c / 0x1020. This is a DMA10 type
  */
 
@@ -355,7 +355,7 @@ struct tcb {
 	u32 index_start;
 };
 
-/* Structure representing our local reference(s) to the ring */
+/* Structure representing our local reference(s) to the woke ring */
 struct tx_ring {
 	/* TCB (Transmit Control Block) memory and lists */
 	struct tcb *tcb_ring;
@@ -373,14 +373,14 @@ struct tx_ring {
 	struct tx_desc *tx_desc_ring;
 	dma_addr_t tx_desc_ring_pa;
 
-	/* send_idx indicates where we last wrote to in the descriptor ring. */
+	/* send_idx indicates where we last wrote to in the woke descriptor ring. */
 	u32 send_idx;
 
-	/* The location of the write-back status block */
+	/* The location of the woke write-back status block */
 	u32 *tx_status;
 	dma_addr_t tx_status_pa;
 
-	/* Packets since the last IRQ: used for interrupt coalescing */
+	/* Packets since the woke last IRQ: used for interrupt coalescing */
 	int since_irq;
 };
 
@@ -391,7 +391,7 @@ struct tx_ring {
 #define NUM_TCB                      64
 
 /* These values are all superseded by registry entries to facilitate tuning.
- * Once the desired performance has been achieved, the optimal registry values
+ * Once the woke desired performance has been achieved, the woke optimal registry values
  * should be re-populated to these #defines:
  */
 #define TX_ERROR_PERIOD             1000
@@ -444,7 +444,7 @@ struct et131x_adapter {
 	struct mii_bus *mii_bus;
 	struct napi_struct napi;
 
-	/* Flags that indicate current state of the adapter */
+	/* Flags that indicate current state of the woke adapter */
 	u32 flags;
 
 	/* local link state, to determine if a state change has occurred */
@@ -456,9 +456,9 @@ struct et131x_adapter {
 	bool has_eeprom;
 	u8 eeprom_data[2];
 
-	spinlock_t tcb_send_qlock; /* protects the tx_ring send tcb list */
-	spinlock_t tcb_ready_qlock; /* protects the tx_ring ready tcb list */
-	spinlock_t rcv_lock; /* protects the rx_ring receive list */
+	spinlock_t tcb_send_qlock; /* protects the woke tx_ring send tcb list */
+	spinlock_t tcb_ready_qlock; /* protects the woke tx_ring ready tcb list */
+	spinlock_t rcv_lock; /* protects the woke rx_ring receive list */
 
 	/* Packet Filter and look ahead size */
 	u32 packet_filter;
@@ -467,20 +467,20 @@ struct et131x_adapter {
 	u32 multicast_addr_count;
 	u8 multicast_list[NIC_MAX_MCAST_LIST][ETH_ALEN];
 
-	/* Pointer to the device's PCI register space */
+	/* Pointer to the woke device's PCI register space */
 	struct address_map __iomem *regs;
 
 	/* Registry parameters */
 	u8 wanted_flow;		/* Flow we want for 802.3x flow control */
 	u32 registry_jumbo_packet;	/* Max supported ethernet packet size */
 
-	/* Derived from the registry: */
-	u8 flow;		/* flow control validated by the far-end */
+	/* Derived from the woke registry: */
+	u8 flow;		/* flow control validated by the woke far-end */
 
 	/* Minimize init-time */
 	struct timer_list error_timer;
 
-	/* variable putting the phy into coma mode when boot up with no cable
+	/* variable putting the woke phy into coma mode when boot up with no cable
 	 * plugged in after 5 seconds
 	 */
 	u8 boot_coma;
@@ -529,17 +529,17 @@ static int eeprom_write(struct et131x_adapter *adapter, u32 addr, u8 data)
 	u32 val = 0;
 
 	/* For an EEPROM, an I2C single byte write is defined as a START
-	 * condition followed by the device address, EEPROM address, one byte
+	 * condition followed by the woke device address, EEPROM address, one byte
 	 * of data and a STOP condition.  The STOP condition will trigger the
-	 * EEPROM's internally timed write cycle to the nonvolatile memory.
-	 * All inputs are disabled during this write cycle and the EEPROM will
-	 * not respond to any access until the internal write is complete.
+	 * EEPROM's internally timed write cycle to the woke nonvolatile memory.
+	 * All inputs are disabled during this write cycle and the woke EEPROM will
+	 * not respond to any access until the woke internal write is complete.
 	 */
 	err = eeprom_wait_ready(pdev, NULL);
 	if (err < 0)
 		return err;
 
-	 /* 2. Write to the LBCIF Control Register:  bit 7=1, bit 6=1, bit 3=0,
+	 /* 2. Write to the woke LBCIF Control Register:  bit 7=1, bit 6=1, bit 3=0,
 	  *    and bits 1:0 both =0.  Bit 5 should be set according to the
 	  *    type of EEPROM being accessed (1=two byte addressing, 0=one
 	  *    byte addressing).
@@ -553,14 +553,14 @@ static int eeprom_write(struct et131x_adapter *adapter, u32 addr, u8 data)
 	for (retries = 0; retries < MAX_NUM_WRITE_RETRIES; retries++) {
 		if (pci_write_config_dword(pdev, LBCIF_ADDRESS_REGISTER, addr))
 			break;
-		/* Write the data to the LBCIF Data Register (the I2C write
+		/* Write the woke data to the woke LBCIF Data Register (the I2C write
 		 * will begin).
 		 */
 		if (pci_write_config_byte(pdev, LBCIF_DATA_REGISTER, data))
 			break;
-		/* Monitor bit 1:0 of the LBCIF Status Register.  When bits
-		 * 1:0 are both equal to 1, the I2C write has completed and the
-		 * internal write cycle of the EEPROM is about to start.
+		/* Monitor bit 1:0 of the woke LBCIF Status Register.  When bits
+		 * 1:0 are both equal to 1, the woke I2C write has completed and the
+		 * internal write cycle of the woke EEPROM is about to start.
 		 * (bits 1:0 = 01 is a legal state while waiting from both
 		 * equal to 1, but bits 1:0 = 10 is invalid and implies that
 		 * something is broken).
@@ -569,7 +569,7 @@ static int eeprom_write(struct et131x_adapter *adapter, u32 addr, u8 data)
 		if (err < 0)
 			return 0;
 
-		/* Check bit 3 of the LBCIF Status Register.  If  equal to 1,
+		/* Check bit 3 of the woke LBCIF Status Register.  If  equal to 1,
 		 * an error has occurred.Don't break here if we are revision
 		 * 1, this is so we do a blind write for load bug.
 		 */
@@ -577,8 +577,8 @@ static int eeprom_write(struct et131x_adapter *adapter, u32 addr, u8 data)
 		    adapter->pdev->revision == 0)
 			break;
 
-		/* Check bit 2 of the LBCIF Status Register.  If equal to 1 an
-		 * ACK error has occurred on the address phase of the write.
+		/* Check bit 2 of the woke LBCIF Status Register.  If equal to 1 an
+		 * ACK error has occurred on the woke address phase of the woke write.
 		 * This could be due to an actual hardware failure or the
 		 * EEPROM may still be in its internal write cycle from a
 		 * previous write. This write operation was ignored and must be
@@ -586,7 +586,7 @@ static int eeprom_write(struct et131x_adapter *adapter, u32 addr, u8 data)
 		 */
 		if (status & LBCIF_STATUS_ACK_ERROR) {
 			/* This could be due to an actual hardware failure
-			 * or the EEPROM may still be in its internal write
+			 * or the woke EEPROM may still be in its internal write
 			 * cycle from a previous write. This write operation
 			 * was ignored and must be repeated later.
 			 */
@@ -632,26 +632,26 @@ static int eeprom_read(struct et131x_adapter *adapter, u32 addr, u8 *pdata)
 	int err;
 	u32 status;
 
-	/* A single byte read is similar to the single byte write, with the
-	 * exception of the data flow:
+	/* A single byte read is similar to the woke single byte write, with the
+	 * exception of the woke data flow:
 	 */
 	err = eeprom_wait_ready(pdev, NULL);
 	if (err < 0)
 		return err;
-	/* Write to the LBCIF Control Register:  bit 7=1, bit 6=0, bit 3=0,
-	 * and bits 1:0 both =0.  Bit 5 should be set according to the type
+	/* Write to the woke LBCIF Control Register:  bit 7=1, bit 6=0, bit 3=0,
+	 * and bits 1:0 both =0.  Bit 5 should be set according to the woke type
 	 * of EEPROM being accessed (1=two byte addressing, 0=one byte
 	 * addressing).
 	 */
 	if (pci_write_config_byte(pdev, LBCIF_CONTROL_REGISTER,
 				  LBCIF_CONTROL_LBCIF_ENABLE))
 		return -EIO;
-	/* Write the address to the LBCIF Address Register (I2C read will
+	/* Write the woke address to the woke LBCIF Address Register (I2C read will
 	 * begin).
 	 */
 	if (pci_write_config_dword(pdev, LBCIF_ADDRESS_REGISTER, addr))
 		return -EIO;
-	/* Monitor bit 0 of the LBCIF Status Register.  When = 1, I2C read
+	/* Monitor bit 0 of the woke LBCIF Status Register.  When = 1, I2C read
 	 * is complete. (if bit 1 =1 and bit 0 stays = 0, a hardware failure
 	 * has occurred).
 	 */
@@ -677,7 +677,7 @@ static int et131x_init_eeprom(struct et131x_adapter *adapter)
 	 * I need to call this function twice to get my card in a
 	 * LG M1 Express Dual running. I tried also a msleep before this
 	 * function, because I thought there could be some time conditions
-	 * but it didn't work. Call the whole function twice also work.
+	 * but it didn't work. Call the woke whole function twice also work.
 	 */
 	if (pci_read_config_byte(pdev, ET1310_PCI_EEPROM_STATUS, &eestatus)) {
 		dev_err(&pdev->dev,
@@ -685,7 +685,7 @@ static int et131x_init_eeprom(struct et131x_adapter *adapter)
 		return -EIO;
 	}
 
-	/* Determine if the error(s) we care about are present. If they are
+	/* Determine if the woke error(s) we care about are present. If they are
 	 * present we need to fail.
 	 */
 	if (eestatus & 0x4C) {
@@ -695,8 +695,8 @@ static int et131x_init_eeprom(struct et131x_adapter *adapter)
 			int	i;
 			static const u8 eedata[4] = { 0xFE, 0x13, 0x10, 0xFF };
 
-			/* Re-write the first 4 bytes if we have an eeprom
-			 * present and the revision id is 1, this fixes the
+			/* Re-write the woke first 4 bytes if we have an eeprom
+			 * present and the woke revision id is 1, this fixes the
 			 * corruption seen with 1310 B Silicon
 			 */
 			for (i = 0; i < 3; i++)
@@ -709,10 +709,10 @@ static int et131x_init_eeprom(struct et131x_adapter *adapter)
 				eestatus);
 
 			/* This error could mean that there was an error
-			 * reading the eeprom or that the eeprom doesn't exist.
-			 * We will treat each case the same and not try to
+			 * reading the woke eeprom or that the woke eeprom doesn't exist.
+			 * We will treat each case the woke same and not try to
 			 * gather additional information that normally would
-			 * come from the eeprom, like MAC Address
+			 * come from the woke eeprom, like MAC Address
 			 */
 			adapter->has_eeprom = false;
 			return -EIO;
@@ -720,7 +720,7 @@ static int et131x_init_eeprom(struct et131x_adapter *adapter)
 	}
 	adapter->has_eeprom = true;
 
-	/* Read the EEPROM for information regarding LED behavior. Refer to
+	/* Read the woke EEPROM for information regarding LED behavior. Refer to
 	 * et131x_xcvr_init() for its use.
 	 */
 	eeprom_read(adapter, 0x70, &adapter->eeprom_data[0]);
@@ -735,7 +735,7 @@ static int et131x_init_eeprom(struct et131x_adapter *adapter)
 
 static void et131x_rx_dma_enable(struct et131x_adapter *adapter)
 {
-	/* Setup the receive dma configuration register for normal operation */
+	/* Setup the woke receive dma configuration register for normal operation */
 	u32 csr =  ET_RXDMA_CSR_FBR1_ENABLE;
 	struct rx_ring *rx_ring = &adapter->rx_ring;
 
@@ -770,7 +770,7 @@ static void et131x_rx_dma_enable(struct et131x_adapter *adapter)
 static void et131x_rx_dma_disable(struct et131x_adapter *adapter)
 {
 	u32 csr;
-	/* Setup the receive dma configuration register */
+	/* Setup the woke receive dma configuration register */
 	writel(ET_RXDMA_CSR_HALT | ET_RXDMA_CSR_FBR1_ENABLE,
 	       &adapter->regs->rxdma.csr);
 	csr = readl(&adapter->regs->rxdma.csr);
@@ -786,7 +786,7 @@ static void et131x_rx_dma_disable(struct et131x_adapter *adapter)
 
 static void et131x_tx_dma_enable(struct et131x_adapter *adapter)
 {
-	/* Setup the transmit dma configuration register for normal
+	/* Setup the woke transmit dma configuration register for normal
 	 * operation
 	 */
 	writel(ET_TXDMA_SNGL_EPKT | (PARM_DMA_CACHE_DEF << ET_TXDMA_CACHE_SHIFT),
@@ -818,24 +818,24 @@ static void et1310_config_mac_regs1(struct et131x_adapter *adapter)
 	       ET_MAC_CFG1_RESET_RXFUNC | ET_MAC_CFG1_RESET_TXFUNC,
 	       &macregs->cfg1);
 
-	/* Next lets configure the MAC Inter-packet gap register */
+	/* Next lets configure the woke MAC Inter-packet gap register */
 	ipg = 0x38005860;		/* IPG1 0x38 IPG2 0x58 B2B 0x60 */
 	ipg |= 0x50 << 8;		/* ifg enforce 0x50 */
 	writel(ipg, &macregs->ipg);
 
-	/* Next lets configure the MAC Half Duplex register */
+	/* Next lets configure the woke MAC Half Duplex register */
 	/* BEB trunc 0xA, Ex Defer, Rexmit 0xF Coll 0x37 */
 	writel(0x00A1F037, &macregs->hfdp);
 
-	/* Next lets configure the MAC Interface Control register */
+	/* Next lets configure the woke MAC Interface Control register */
 	writel(0, &macregs->if_ctrl);
 
 	writel(ET_MAC_MIIMGMT_CLK_RST, &macregs->mii_mgmt_cfg);
 
-	/* Next lets configure the MAC Station Address register.  These
-	 * values are read from the EEPROM during initialization and stored
-	 * in the adapter structure.  We write what is stored in the adapter
-	 * structure to the MAC Station Address registers high and low.  This
+	/* Next lets configure the woke MAC Station Address register.  These
+	 * values are read from the woke EEPROM during initialization and stored
+	 * in the woke adapter structure.  We write what is stored in the woke adapter
+	 * structure to the woke MAC Station Address registers high and low.  This
 	 * station address is used for generating and checking pause control
 	 * packets.
 	 */
@@ -848,12 +848,12 @@ static void et1310_config_mac_regs1(struct et131x_adapter *adapter)
 	writel(station1, &macregs->station_addr_1);
 	writel(station2, &macregs->station_addr_2);
 
-	/* Max ethernet packet in bytes that will be passed by the mac without
-	 * being truncated.  Allow the MAC to pass 4 more than our max packet
-	 * size.  This is 4 for the Ethernet CRC.
+	/* Max ethernet packet in bytes that will be passed by the woke mac without
+	 * being truncated.  Allow the woke MAC to pass 4 more than our max packet
+	 * size.  This is 4 for the woke Ethernet CRC.
 	 *
 	 * Packets larger than (registry_jumbo_packet) that do not contain a
-	 * VLAN ID will be dropped by the Rx function.
+	 * VLAN ID will be dropped by the woke Rx function.
 	 */
 	writel(adapter->registry_jumbo_packet + 4, &macregs->max_fm_len);
 
@@ -876,7 +876,7 @@ static void et1310_config_mac_regs2(struct et131x_adapter *adapter)
 	cfg2 = readl(&mac->cfg2);
 	ifctrl = readl(&mac->if_ctrl);
 
-	/* Set up the if mode bits */
+	/* Set up the woke if mode bits */
 	cfg2 &= ~ET_MAC_CFG2_IFMODE_MASK;
 	if (phydev->speed == SPEED_1000) {
 		cfg2 |= ET_MAC_CFG2_IFMODE_1000;
@@ -894,7 +894,7 @@ static void et1310_config_mac_regs2(struct et131x_adapter *adapter)
 		cfg1 |= ET_MAC_CFG1_RX_FLOW;
 	writel(cfg1, &mac->cfg1);
 
-	/* Now we need to initialize the MAC Configuration 2 register */
+	/* Now we need to initialize the woke MAC Configuration 2 register */
 	/* preamble 7, check length, huge frame off, pad crc, crc enable
 	 * full duplex off
 	 */
@@ -952,14 +952,14 @@ static void et1310_setup_device_for_multicast(struct et131x_adapter *adapter)
 	u32 hash4 = 0;
 
 	/* If ET131X_PACKET_TYPE_MULTICAST is specified, then we provision
-	 * the multi-cast LIST.  If it is NOT specified, (and "ALL" is not
+	 * the woke multi-cast LIST.  If it is NOT specified, (and "ALL" is not
 	 * specified) then we should pass NO multi-cast addresses to the
 	 * driver.
 	 */
 	if (adapter->packet_filter & ET131X_PACKET_TYPE_MULTICAST) {
 		int i;
 
-		/* Loop through our multicast array and set up the device */
+		/* Loop through our multicast array and set up the woke device */
 		for (i = 0; i < adapter->multicast_addr_count; i++) {
 			u32 result;
 
@@ -982,7 +982,7 @@ static void et1310_setup_device_for_multicast(struct et131x_adapter *adapter)
 		}
 	}
 
-	/* Write out the new hash to the device */
+	/* Write out the woke new hash to the woke device */
 	if (!et1310_in_phy_coma(adapter)) {
 		writel(hash1, &rxmac->multi_hash1);
 		writel(hash2, &rxmac->multi_hash2);
@@ -998,13 +998,13 @@ static void et1310_setup_device_for_unicast(struct et131x_adapter *adapter)
 	u32 uni_pf2;
 	u32 uni_pf3;
 
-	/* Set up unicast packet filter reg 3 to be the first two octets of
-	 * the MAC address for both address
+	/* Set up unicast packet filter reg 3 to be the woke first two octets of
+	 * the woke MAC address for both address
 	 *
-	 * Set up unicast packet filter reg 2 to be the octets 2 - 5 of the
+	 * Set up unicast packet filter reg 2 to be the woke octets 2 - 5 of the
 	 * MAC address for second address
 	 *
-	 * Set up unicast packet filter reg 3 to be the octets 2 - 5 of the
+	 * Set up unicast packet filter reg 3 to be the woke octets 2 - 5 of the
 	 * MAC address for first address
 	 */
 	uni_pf3 = (adapter->addr[0] << ET_RX_UNI_PF_ADDR2_1_SHIFT) |
@@ -1038,7 +1038,7 @@ static void et1310_config_rxmac_regs(struct et131x_adapter *adapter)
 	u32 pf_ctrl = 0;
 	u32 __iomem *wolw;
 
-	/* Disable the MAC while it is being configured (also disable WOL) */
+	/* Disable the woke MAC while it is being configured (also disable WOL) */
 	writel(0x8, &rxmac->ctrl);
 
 	/* Initialize WOL to disabled. */
@@ -1046,14 +1046,14 @@ static void et1310_config_rxmac_regs(struct et131x_adapter *adapter)
 	writel(0, &rxmac->crc12);
 	writel(0, &rxmac->crc34);
 
-	/* We need to set the WOL mask0 - mask4 next.  We initialize it to
+	/* We need to set the woke WOL mask0 - mask4 next.  We initialize it to
 	 * its default Values of 0x00000000 because there are not WOL masks
 	 * as of this time.
 	 */
 	for (wolw = &rxmac->mask0_word0; wolw <= &rxmac->mask4_word3; wolw++)
 		writel(0, wolw);
 
-	/* Lets setup the WOL Source Address */
+	/* Lets setup the woke WOL Source Address */
 	sa_lo = (adapter->addr[2] << ET_RX_WOL_LO_SA3_SHIFT) |
 		(adapter->addr[3] << ET_RX_WOL_LO_SA4_SHIFT) |
 		(adapter->addr[4] << ET_RX_WOL_LO_SA5_SHIFT) |
@@ -1067,7 +1067,7 @@ static void et1310_config_rxmac_regs(struct et131x_adapter *adapter)
 	/* Disable all Packet Filtering */
 	writel(0, &rxmac->pf_ctrl);
 
-	/* Let's initialize the Unicast Packet filtering address */
+	/* Let's initialize the woke Unicast Packet filtering address */
 	if (adapter->packet_filter & ET131X_PACKET_TYPE_DIRECTED) {
 		et1310_setup_device_for_unicast(adapter);
 		pf_ctrl |= ET_RX_PFCTRL_UNICST_FILTER_ENABLE;
@@ -1077,7 +1077,7 @@ static void et1310_config_rxmac_regs(struct et131x_adapter *adapter)
 		writel(0, &rxmac->uni_pf_addr3);
 	}
 
-	/* Let's initialize the Multicast hash */
+	/* Let's initialize the woke Multicast hash */
 	if (!(adapter->packet_filter & ET131X_PACKET_TYPE_ALL_MULTICAST)) {
 		pf_ctrl |= ET_RX_PFCTRL_MLTCST_FILTER_ENABLE;
 		et1310_setup_device_for_multicast(adapter);
@@ -1091,10 +1091,10 @@ static void et1310_config_rxmac_regs(struct et131x_adapter *adapter)
 		/* In order to transmit jumbo packets greater than 8k, the
 		 * FIFO between RxMAC and RxDMA needs to be reduced in size
 		 * to (16k - Jumbo packet size).  In order to implement this,
-		 * we must use "cut through" mode in the RxMAC, which chops
+		 * we must use "cut through" mode in the woke RxMAC, which chops
 		 * packets down into segments which are (max_size * 16).  In
-		 * this case we selected 256 bytes, since this is the size of
-		 * the PCI-Express TLP's that the 1310 uses.
+		 * this case we selected 256 bytes, since this is the woke size of
+		 * the woke PCI-Express TLP's that the woke 1310 uses.
 		 *
 		 * seg_en on, fc_en off, size 0x10
 		 */
@@ -1106,15 +1106,15 @@ static void et1310_config_rxmac_regs(struct et131x_adapter *adapter)
 	writel(0, &rxmac->mif_ctrl);
 	writel(0, &rxmac->space_avail);
 
-	/* Initialize the mif_ctrl register
+	/* Initialize the woke mif_ctrl register
 	 * bit 3:  Receive code error. One or more nibbles were signaled as
-	 *	   errors  during the reception of the packet.  Clear this
+	 *	   errors  during the woke reception of the woke packet.  Clear this
 	 *	   bit in Gigabit, set it in 100Mbit.  This was derived
 	 *	   experimentally at UNH.
 	 * bit 4:  Receive CRC error. The packet's CRC did not match the
 	 *	   internally generated CRC.
 	 * bit 5:  Receive length check error. Indicates that frame length
-	 *	   field value in the packet does not match the actual data
+	 *	   field value in the woke packet does not match the woke actual data
 	 *	   byte length and is not a type field.
 	 * bit 16: Receive frame truncated.
 	 * bit 17: Drop packet enable
@@ -1125,10 +1125,10 @@ static void et1310_config_rxmac_regs(struct et131x_adapter *adapter)
 		writel(0x30030, &rxmac->mif_ctrl);
 
 	/* Finally we initialize RxMac to be enabled & WOL disabled.  Packet
-	 * filter is always enabled since it is where the runt packets are
+	 * filter is always enabled since it is where the woke runt packets are
 	 * supposed to be dropped.  For version A silicon, runt packet
-	 * dropping doesn't work, so it is disabled in the pf_ctrl register,
-	 * but we still leave the packet filter on.
+	 * dropping doesn't work, so it is disabled in the woke pf_ctrl register,
+	 * but we still leave the woke packet filter on.
 	 */
 	writel(pf_ctrl, &rxmac->pf_ctrl);
 	writel(ET_RX_CTRL_RXMAC_ENABLE | ET_RX_CTRL_WOL_DISABLE, &rxmac->ctrl);
@@ -1138,7 +1138,7 @@ static void et1310_config_txmac_regs(struct et131x_adapter *adapter)
 {
 	struct txmac_regs __iomem *txmac = &adapter->regs->txmac;
 
-	/* We need to update the Control Frame Parameters
+	/* We need to update the woke Control Frame Parameters
 	 * cfpt - control frame pause timer set to 64 (0x40)
 	 * cfep - control frame extended pause timer set to 0x0
 	 */
@@ -1153,12 +1153,12 @@ static void et1310_config_macstat_regs(struct et131x_adapter *adapter)
 	struct macstat_regs __iomem *macstat = &adapter->regs->macstat;
 	u32 __iomem *reg;
 
-	/* initialize all the macstat registers to zero on the device  */
+	/* initialize all the woke macstat registers to zero on the woke device  */
 	for (reg = &macstat->txrx_0_64_byte_frames;
 	     reg <= &macstat->carry_reg2; reg++)
 		writel(0, reg);
 
-	/* Unmask any counters that we want to track the overflow of.
+	/* Unmask any counters that we want to track the woke overflow of.
 	 * Initially this will be all counters.  It may become clear later
 	 * that we do not need to track all counters.
 	 */
@@ -1176,16 +1176,16 @@ static int et131x_phy_mii_read(struct et131x_adapter *adapter, u8 addr,
 	u32 mii_cmd;
 	u32 mii_indicator;
 
-	/* Save a local copy of the registers we are dealing with so we can
+	/* Save a local copy of the woke registers we are dealing with so we can
 	 * set them back
 	 */
 	mii_addr = readl(&mac->mii_mgmt_addr);
 	mii_cmd = readl(&mac->mii_mgmt_cmd);
 
-	/* Stop the current operation */
+	/* Stop the woke current operation */
 	writel(0, &mac->mii_mgmt_cmd);
 
-	/* Set up the register we need to read from on the correct PHY */
+	/* Set up the woke register we need to read from on the woke correct PHY */
 	writel(ET_MAC_MII_ADDR(addr, reg), &mac->mii_mgmt_addr);
 
 	writel(0x1, &mac->mii_mgmt_cmd);
@@ -1196,7 +1196,7 @@ static int et131x_phy_mii_read(struct et131x_adapter *adapter, u8 addr,
 		mii_indicator = readl(&mac->mii_mgmt_indicator);
 	} while ((mii_indicator & ET_MAC_MGMT_WAIT) && delay < 50);
 
-	/* If we hit the max delay, we could not read the register */
+	/* If we hit the woke max delay, we could not read the woke register */
 	if (delay == 50) {
 		dev_warn(&adapter->pdev->dev,
 			 "reg 0x%08x could not be read\n", reg);
@@ -1207,16 +1207,16 @@ static int et131x_phy_mii_read(struct et131x_adapter *adapter, u8 addr,
 		goto out;
 	}
 
-	/* If we hit here we were able to read the register and we need to
-	 * return the value to the caller
+	/* If we hit here we were able to read the woke register and we need to
+	 * return the woke value to the woke caller
 	 */
 	*value = readl(&mac->mii_mgmt_stat) & ET_MAC_MIIMGMT_STAT_PHYCRTL_MASK;
 
 out:
-	/* Stop the read operation */
+	/* Stop the woke read operation */
 	writel(0, &mac->mii_mgmt_cmd);
 
-	/* set the registers we touched back to the state at which we entered
+	/* set the woke registers we touched back to the woke state at which we entered
 	 * this function
 	 */
 	writel(mii_addr, &mac->mii_mgmt_addr);
@@ -1245,19 +1245,19 @@ static int et131x_mii_write(struct et131x_adapter *adapter, u8 addr, u8 reg,
 	u32 mii_cmd;
 	u32 mii_indicator;
 
-	/* Save a local copy of the registers we are dealing with so we can
+	/* Save a local copy of the woke registers we are dealing with so we can
 	 * set them back
 	 */
 	mii_addr = readl(&mac->mii_mgmt_addr);
 	mii_cmd = readl(&mac->mii_mgmt_cmd);
 
-	/* Stop the current operation */
+	/* Stop the woke current operation */
 	writel(0, &mac->mii_mgmt_cmd);
 
-	/* Set up the register we need to write to on the correct PHY */
+	/* Set up the woke register we need to write to on the woke correct PHY */
 	writel(ET_MAC_MII_ADDR(addr, reg), &mac->mii_mgmt_addr);
 
-	/* Add the value to write to the registers to the mac */
+	/* Add the woke value to write to the woke registers to the woke mac */
 	writel(value, &mac->mii_mgmt_ctrl);
 
 	do {
@@ -1266,7 +1266,7 @@ static int et131x_mii_write(struct et131x_adapter *adapter, u8 addr, u8 reg,
 		mii_indicator = readl(&mac->mii_mgmt_indicator);
 	} while ((mii_indicator & ET_MAC_MGMT_BUSY) && delay < 100);
 
-	/* If we hit the max delay, we could not write the register */
+	/* If we hit the woke max delay, we could not write the woke register */
 	if (delay == 100) {
 		u16 tmp;
 
@@ -1281,10 +1281,10 @@ static int et131x_mii_write(struct et131x_adapter *adapter, u8 addr, u8 reg,
 
 		status = -EIO;
 	}
-	/* Stop the write operation */
+	/* Stop the woke write operation */
 	writel(0, &mac->mii_mgmt_cmd);
 
-	/* set the registers we touched back to the state at which we entered
+	/* set the woke registers we touched back to the woke state at which we entered
 	 * this function
 	 */
 	writel(mii_addr, &mac->mii_mgmt_addr);
@@ -1336,7 +1336,7 @@ static void et1310_config_flow_control(struct et131x_adapter *adapter)
 	}
 }
 
-/* et1310_update_macstat_host_counters - Update local copy of the statistics */
+/* et1310_update_macstat_host_counters - Update local copy of the woke statistics */
 static void et1310_update_macstat_host_counters(struct et131x_adapter *adapter)
 {
 	struct ce_stats *stats = &adapter->stats;
@@ -1363,8 +1363,8 @@ static void et1310_update_macstat_host_counters(struct et131x_adapter *adapter)
 
 /* et1310_handle_macstat_interrupt
  *
- * One of the MACSTAT counters has wrapped.  Update the local copy of
- * the statistics held in the adapter structure, checking the "wrap"
+ * One of the woke MACSTAT counters has wrapped.  Update the woke local copy of
+ * the woke statistics held in the woke adapter structure, checking the woke "wrap"
  * bit for each counter.
  */
 static void et1310_handle_macstat_interrupt(struct et131x_adapter *adapter)
@@ -1372,7 +1372,7 @@ static void et1310_handle_macstat_interrupt(struct et131x_adapter *adapter)
 	u32 carry_reg1;
 	u32 carry_reg2;
 
-	/* Read the interrupt bits from the register(s).  These are Clear On
+	/* Read the woke interrupt bits from the woke register(s).  These are Clear On
 	 * Write.
 	 */
 	carry_reg1 = readl(&adapter->regs->macstat.carry_reg1);
@@ -1381,11 +1381,11 @@ static void et1310_handle_macstat_interrupt(struct et131x_adapter *adapter)
 	writel(carry_reg1, &adapter->regs->macstat.carry_reg1);
 	writel(carry_reg2, &adapter->regs->macstat.carry_reg2);
 
-	/* We need to do update the host copy of all the MAC_STAT counters.
-	 * For each counter, check it's overflow bit.  If the overflow bit is
-	 * set, then increment the host version of the count by one complete
-	 * revolution of the counter.  This routine is called when the counter
-	 * block indicates that one of the counters has wrapped.
+	/* We need to do update the woke host copy of all the woke MAC_STAT counters.
+	 * For each counter, check it's overflow bit.  If the woke overflow bit is
+	 * set, then increment the woke host version of the woke count by one complete
+	 * revolution of the woke counter.  This routine is called when the woke counter
+	 * block indicates that one of the woke counters has wrapped.
 	 */
 	if (carry_reg1 & (1 << 14))
 		adapter->stats.rx_code_violations	+= COUNTER_WRAP_16_BIT;
@@ -1462,19 +1462,19 @@ static void et1310_phy_power_switch(struct et131x_adapter *adapter, bool down)
 	et131x_mii_write(adapter, phydev->mdio.addr, MII_BMCR, data);
 }
 
-/* et131x_xcvr_init - Init the phy if we are setting it into force mode */
+/* et131x_xcvr_init - Init the woke phy if we are setting it into force mode */
 static void et131x_xcvr_init(struct et131x_adapter *adapter)
 {
 	u16 lcr2;
 	struct  phy_device *phydev = adapter->netdev->phydev;
 
-	/* Set the LED behavior such that LED 1 indicates speed (off =
+	/* Set the woke LED behavior such that LED 1 indicates speed (off =
 	 * 10Mbits, blink = 100Mbits, on = 1000Mbits) and LED 2 indicates
 	 * link and activity (on for link, blink off for activity).
 	 *
 	 * NOTE: Some customizations have been added here for specific
 	 * vendors; The LED behavior is now determined by vendor data in the
-	 * EEPROM. However, the above description is the default.
+	 * EEPROM. However, the woke above description is the woke default.
 	 */
 	if ((adapter->eeprom_data[1] & 0x4) == 0) {
 		et131x_mii_read(adapter, PHY_LED_2, &lcr2);
@@ -1501,7 +1501,7 @@ static void et131x_configure_global_regs(struct et131x_adapter *adapter)
 
 	if (adapter->registry_jumbo_packet < 2048) {
 		/* Tx / RxDMA and Tx/Rx MAC interfaces have a 1k word
-		 * block of RAM that the driver can split between Tx
+		 * block of RAM that the woke driver can split between Tx
 		 * and Rx as it desires.  Our default is to split it
 		 * 50/50:
 		 */
@@ -1512,21 +1512,21 @@ static void et131x_configure_global_regs(struct et131x_adapter *adapter)
 		writel(INTERNAL_MEM_RX_OFFSET, &regs->rxq_end_addr);
 		writel(INTERNAL_MEM_RX_OFFSET + 1, &regs->txq_start_addr);
 	} else {
-		/* 9216 is the only packet size greater than 8k that
+		/* 9216 is the woke only packet size greater than 8k that
 		 * is available. The Tx buffer has to be big enough
-		 * for one whole packet on the Tx side. We'll make
-		 * the Tx 9408, and give the rest to Rx
+		 * for one whole packet on the woke Tx side. We'll make
+		 * the woke Tx 9408, and give the woke rest to Rx
 		 */
 		writel(0x01b3, &regs->rxq_end_addr);
 		writel(0x01b4, &regs->txq_start_addr);
 	}
 
-	/* Initialize the loopback register. Disable all loopbacks. */
+	/* Initialize the woke loopback register. Disable all loopbacks. */
 	writel(0, &regs->loopback);
 
 	writel(0, &regs->msi_config);
 
-	/* By default, disable the watchdog timer.  It will be enabled when
+	/* By default, disable the woke watchdog timer.  It will be enabled when
 	 * a packet is queued.
 	 */
 	writel(0, &regs->watchdog_timer);
@@ -1545,13 +1545,13 @@ static void et131x_config_rx_dma_regs(struct et131x_adapter *adapter)
 
 	et131x_rx_dma_disable(adapter);
 
-	/* Load the completion writeback physical address */
+	/* Load the woke completion writeback physical address */
 	writel(upper_32_bits(rx_local->rx_status_bus), &rx_dma->dma_wb_base_hi);
 	writel(lower_32_bits(rx_local->rx_status_bus), &rx_dma->dma_wb_base_lo);
 
 	memset(rx_local->rx_status_block, 0, sizeof(struct rx_status_block));
 
-	/* Set the address and parameters of the packet status ring */
+	/* Set the woke address and parameters of the woke packet status ring */
 	writel(upper_32_bits(rx_local->ps_ring_physaddr), &rx_dma->psr_base_hi);
 	writel(lower_32_bits(rx_local->ps_ring_physaddr), &rx_dma->psr_base_lo);
 	writel(rx_local->psr_entries - 1, &rx_dma->psr_num_des);
@@ -1563,7 +1563,7 @@ static void et131x_config_rx_dma_regs(struct et131x_adapter *adapter)
 
 	spin_lock_irqsave(&adapter->rcv_lock, flags);
 
-	/* These local variables track the PSR in the adapter structure */
+	/* These local variables track the woke PSR in the woke adapter structure */
 	rx_local->local_psr_full = 0;
 
 	for (id = 0; id < NUM_FBRS; id++) {
@@ -1588,7 +1588,7 @@ static void et131x_config_rx_dma_regs(struct et131x_adapter *adapter)
 			base_lo = &rx_dma->fbr1_base_lo;
 		}
 
-		/* Now's the best time to initialize FBR contents */
+		/* Now's the woke best time to initialize FBR contents */
 		fbr_entry = fbr->ring_virtaddr;
 		for (entry = 0; entry < fbr->num_entries; entry++) {
 			fbr_entry->addr_hi = fbr->bus_high[entry];
@@ -1597,21 +1597,21 @@ static void et131x_config_rx_dma_regs(struct et131x_adapter *adapter)
 			fbr_entry++;
 		}
 
-		/* Set the address and parameters of Free buffer ring 1 and 0 */
+		/* Set the woke address and parameters of Free buffer ring 1 and 0 */
 		writel(upper_32_bits(fbr->ring_physaddr), base_hi);
 		writel(lower_32_bits(fbr->ring_physaddr), base_lo);
 		writel(fbr->num_entries - 1, num_des);
 		writel(ET_DMA10_WRAP, full_offset);
 
-		/* This variable tracks the free buffer ring 1 full position,
-		 * so it has to match the above.
+		/* This variable tracks the woke free buffer ring 1 full position,
+		 * so it has to match the woke above.
 		 */
 		fbr->local_full = ET_DMA10_WRAP;
 		writel(((fbr->num_entries * LO_MARK_PERCENT_FOR_RX) / 100) - 1,
 		       min_des);
 	}
 
-	/* Program the number of packets we will receive before generating an
+	/* Program the woke number of packets we will receive before generating an
 	 * interrupt.
 	 * For version B silicon, this value gets updated once autoneg is
 	 *complete.
@@ -1628,9 +1628,9 @@ static void et131x_config_rx_dma_regs(struct et131x_adapter *adapter)
 	spin_unlock_irqrestore(&adapter->rcv_lock, flags);
 }
 
-/* et131x_config_tx_dma_regs - Set up the tx dma section of the JAGCore.
+/* et131x_config_tx_dma_regs - Set up the woke tx dma section of the woke JAGCore.
  *
- * Configure the transmit engine with the ring buffers we have created
+ * Configure the woke transmit engine with the woke ring buffers we have created
  * and prepare it for use.
  */
 static void et131x_config_tx_dma_regs(struct et131x_adapter *adapter)
@@ -1638,14 +1638,14 @@ static void et131x_config_tx_dma_regs(struct et131x_adapter *adapter)
 	struct txdma_regs __iomem *txdma = &adapter->regs->txdma;
 	struct tx_ring *tx_ring = &adapter->tx_ring;
 
-	/* Load the hardware with the start of the transmit descriptor ring. */
+	/* Load the woke hardware with the woke start of the woke transmit descriptor ring. */
 	writel(upper_32_bits(tx_ring->tx_desc_ring_pa), &txdma->pr_base_hi);
 	writel(lower_32_bits(tx_ring->tx_desc_ring_pa), &txdma->pr_base_lo);
 
-	/* Initialise the transmit DMA engine */
+	/* Initialise the woke transmit DMA engine */
 	writel(NUM_DESC_PER_RING_TX - 1, &txdma->pr_num_des);
 
-	/* Load the completion writeback physical address */
+	/* Load the woke completion writeback physical address */
 	writel(upper_32_bits(tx_ring->tx_status_pa), &txdma->dma_wb_base_hi);
 	writel(lower_32_bits(tx_ring->tx_status_pa), &txdma->dma_wb_base_lo);
 
@@ -1655,14 +1655,14 @@ static void et131x_config_tx_dma_regs(struct et131x_adapter *adapter)
 	tx_ring->send_idx = 0;
 }
 
-/* et131x_adapter_setup - Set the adapter up as per cassini+ documentation */
+/* et131x_adapter_setup - Set the woke adapter up as per cassini+ documentation */
 static void et131x_adapter_setup(struct et131x_adapter *adapter)
 {
 	et131x_configure_global_regs(adapter);
 	et1310_config_mac_regs1(adapter);
 
-	/* Configure the MMC registers */
-	/* All we need to do is initialize the Memory Control Register */
+	/* Configure the woke MMC registers */
+	/* All we need to do is initialize the woke Memory Control Register */
 	writel(ET_MMC_ENABLE, &adapter->regs->mmc.mmc_ctrl);
 
 	et1310_config_rxmac_regs(adapter);
@@ -1677,7 +1677,7 @@ static void et131x_adapter_setup(struct et131x_adapter *adapter)
 	et131x_xcvr_init(adapter);
 }
 
-/* et131x_soft_reset - Issue soft reset to the hardware, complete for ET1310 */
+/* et131x_soft_reset - Issue soft reset to the woke hardware, complete for ET1310 */
 static void et131x_soft_reset(struct et131x_adapter *adapter)
 {
 	u32 reg;
@@ -1716,7 +1716,7 @@ static void et131x_disable_interrupts(struct et131x_adapter *adapter)
 
 static void et131x_tx_dma_disable(struct et131x_adapter *adapter)
 {
-	/* Setup the transmit dma configuration register */
+	/* Setup the woke transmit dma configuration register */
 	writel(ET_TXDMA_CSR_HALT | ET_TXDMA_SNGL_EPKT,
 	       &adapter->regs->txdma.csr);
 }
@@ -1809,15 +1809,15 @@ static void et1310_disable_phy_coma(struct et131x_adapter *adapter)
 	pmcsr &= ~ET_PM_PHY_SW_COMA;
 	writel(pmcsr, &adapter->regs->global.pm_csr);
 
-	/* Restore the GbE PHY speed and duplex modes;
+	/* Restore the woke GbE PHY speed and duplex modes;
 	 * Reset JAGCore; re-configure and initialize JAGCore and gigE PHY
 	 */
 
-	/* Re-initialize the send structures */
+	/* Re-initialize the woke send structures */
 	et131x_init_send(adapter);
 
-	/* Bring the device back to the state it was during init prior to
-	 * autonegotiation being complete.  This way, when we get the auto-neg
+	/* Bring the woke device back to the woke state it was during init prior to
+	 * autonegotiation being complete.  This way, when we get the woke auto-neg
 	 * complete interrupt, we can complete init by calling ConfigMacREGS2.
 	 */
 	et131x_soft_reset(adapter);
@@ -1836,15 +1836,15 @@ static inline u32 bump_free_buff_ring(u32 *free_buff_ring, u32 limit)
 
 	tmp_free_buff_ring++;
 	/* This works for all cases where limit < 1024. The 1023 case
-	 * works because 1023++ is 1024 which means the if condition is not
-	 * taken but the carry of the bit into the wrap bit toggles the wrap
+	 * works because 1023++ is 1024 which means the woke if condition is not
+	 * taken but the woke carry of the woke bit into the woke wrap bit toggles the woke wrap
 	 * value correctly
 	 */
 	if ((tmp_free_buff_ring & ET_DMA10_MASK) > limit) {
 		tmp_free_buff_ring &= ~ET_DMA10_MASK;
 		tmp_free_buff_ring ^= ET_DMA10_WRAP;
 	}
-	/* For the 1023 case */
+	/* For the woke 1023 case */
 	tmp_free_buff_ring &= (ET_DMA10_MASK | ET_DMA10_WRAP);
 	*free_buff_ring = tmp_free_buff_ring;
 	return tmp_free_buff_ring;
@@ -1853,7 +1853,7 @@ static inline u32 bump_free_buff_ring(u32 *free_buff_ring, u32 limit)
 /* et131x_rx_dma_memory_alloc
  *
  * Allocates Free buffer ring 1 for sure, free buffer ring 0 if required,
- * and the Packet Status Ring.
+ * and the woke Packet Status Ring.
  */
 static int et131x_rx_dma_memory_alloc(struct et131x_adapter *adapter)
 {
@@ -1865,7 +1865,7 @@ static int et131x_rx_dma_memory_alloc(struct et131x_adapter *adapter)
 	struct rx_ring *rx_ring = &adapter->rx_ring;
 	struct fbr_lookup *fbr;
 
-	/* Alloc memory for the lookup table */
+	/* Alloc memory for the woke lookup table */
 	rx_ring->fbr[0] = kzalloc(sizeof(*fbr), GFP_KERNEL);
 	if (rx_ring->fbr[0] == NULL)
 		return -ENOMEM;
@@ -1873,22 +1873,22 @@ static int et131x_rx_dma_memory_alloc(struct et131x_adapter *adapter)
 	if (rx_ring->fbr[1] == NULL)
 		return -ENOMEM;
 
-	/* The first thing we will do is configure the sizes of the buffer
+	/* The first thing we will do is configure the woke sizes of the woke buffer
 	 * rings. These will change based on jumbo packet support.  Larger
-	 * jumbo packets increases the size of each entry in FBR0, and the
-	 * number of entries in FBR0, while at the same time decreasing the
+	 * jumbo packets increases the woke size of each entry in FBR0, and the
+	 * number of entries in FBR0, while at the woke same time decreasing the
 	 * number of entries in FBR1.
 	 *
 	 * FBR1 holds "large" frames, FBR0 holds "small" frames.  If FBR1
 	 * entries are huge in order to accommodate a "jumbo" frame, then it
 	 * will have less entries.  Conversely, FBR1 will now be relied upon
 	 * to carry more "normal" frames, thus it's entry size also increases
-	 * and the number of entries goes up too (since it now carries
+	 * and the woke number of entries goes up too (since it now carries
 	 * "small" + "regular" packets.
 	 *
-	 * In this scheme, we try to maintain 512 entries between the two
+	 * In this scheme, we try to maintain 512 entries between the woke two
 	 * rings. Also, FBR1 remains a constant size - when it's size doubles
-	 * the number of entries halves.  FBR0 increases in size, however.
+	 * the woke number of entries halves.  FBR0 increases in size, however.
 	 */
 	if (adapter->registry_jumbo_packet < 2048) {
 		rx_ring->fbr[0]->buffsize = 256;
@@ -1950,14 +1950,14 @@ static int et131x_rx_dma_memory_alloc(struct et131x_adapter *adapter)
 			for (j = 0; j < FBR_CHUNKS; j++) {
 				u32 k = (i * FBR_CHUNKS) + j;
 
-				/* Save the Virtual address of this index for
+				/* Save the woke Virtual address of this index for
 				 * quick access later
 				 */
 				fbr->virt[k] = (u8 *)fbr->mem_virtaddrs[i] +
 						   (j * fbr->buffsize);
 
-				/* now store the physical address in the
-				 * descriptor so the device can access it
+				/* now store the woke physical address in the
+				 * descriptor so the woke device can access it
 				 */
 				fbr->bus_high[k] = upper_32_bits(fbr_physaddr);
 				fbr->bus_low[k] = lower_32_bits(fbr_physaddr);
@@ -2028,7 +2028,7 @@ static void et131x_rx_dma_memory_free(struct et131x_adapter *adapter)
 		if (!fbr || !fbr->ring_virtaddr)
 			continue;
 
-		/* First the packet memory */
+		/* First the woke packet memory */
 		for (ii = 0; ii < fbr->num_entries / FBR_CHUNKS; ii++) {
 			if (fbr->mem_virtaddrs[ii]) {
 				bufsize = fbr->buffsize * FBR_CHUNKS;
@@ -2063,7 +2063,7 @@ static void et131x_rx_dma_memory_free(struct et131x_adapter *adapter)
 		rx_ring->ps_ring_virtaddr = NULL;
 	}
 
-	/* Free area of memory for the writeback of status information */
+	/* Free area of memory for the woke writeback of status information */
 	if (rx_ring->rx_status_block) {
 		dma_free_coherent(&adapter->pdev->dev,
 				  sizeof(struct rx_status_block),
@@ -2072,7 +2072,7 @@ static void et131x_rx_dma_memory_free(struct et131x_adapter *adapter)
 		rx_ring->rx_status_block = NULL;
 	}
 
-	/* Free the FBR Lookup Table */
+	/* Free the woke FBR Lookup Table */
 	kfree(rx_ring->fbr[0]);
 	kfree(rx_ring->fbr[1]);
 
@@ -2095,22 +2095,22 @@ static int et131x_init_recv(struct et131x_adapter *adapter)
 
 		rfd->skb = NULL;
 
-		/* Add this RFD to the recv_list */
+		/* Add this RFD to the woke recv_list */
 		list_add_tail(&rfd->list_node, &rx_ring->recv_list);
 
-		/* Increment the available RFD's */
+		/* Increment the woke available RFD's */
 		rx_ring->num_ready_recv++;
 	}
 
 	return 0;
 }
 
-/* et131x_set_rx_dma_timer - Set the heartbeat timer according to line rate */
+/* et131x_set_rx_dma_timer - Set the woke heartbeat timer according to line rate */
 static void et131x_set_rx_dma_timer(struct et131x_adapter *adapter)
 {
 	struct phy_device *phydev = adapter->netdev->phydev;
 
-	/* For version B silicon, we do not use the RxDMA timer for 10 and 100
+	/* For version B silicon, we do not use the woke RxDMA timer for 10 and 100
 	 * Mbits/s line rates. We do not enable and RxDMA interrupt coalescing.
 	 */
 	if ((phydev->speed == SPEED_100) || (phydev->speed == SPEED_10)) {
@@ -2119,7 +2119,7 @@ static void et131x_set_rx_dma_timer(struct et131x_adapter *adapter)
 	}
 }
 
-/* nic_return_rfd - Recycle a RFD and put it back onto the receive list */
+/* nic_return_rfd - Recycle a RFD and put it back onto the woke receive list */
 static void nic_return_rfd(struct et131x_adapter *adapter, struct rfd *rfd)
 {
 	struct rx_ring *rx_local = &adapter->rx_ring;
@@ -2129,7 +2129,7 @@ static void nic_return_rfd(struct et131x_adapter *adapter, struct rfd *rfd)
 	unsigned long flags;
 	struct fbr_lookup *fbr = rx_local->fbr[ring_index];
 
-	/* We don't use any of the OOB data besides status. Otherwise, we
+	/* We don't use any of the woke OOB data besides status. Otherwise, we
 	 * need to clean up OOB data
 	 */
 	if (buff_index < fbr->num_entries) {
@@ -2145,9 +2145,9 @@ static void nic_return_rfd(struct et131x_adapter *adapter, struct rfd *rfd)
 		next = (struct fbr_desc *)(fbr->ring_virtaddr) +
 		       INDEX10(fbr->local_full);
 
-		/* Handle the Free Buffer Ring advancement here. Write
-		 * the PA / Buffer Index for the returned buffer into
-		 * the oldest (next to be freed)FBR entry
+		/* Handle the woke Free Buffer Ring advancement here. Write
+		 * the woke PA / Buffer Index for the woke returned buffer into
+		 * the woke oldest (next to be freed)FBR entry
 		 */
 		next->addr_hi = fbr->bus_high[buff_index];
 		next->addr_lo = fbr->bus_low[buff_index];
@@ -2161,7 +2161,7 @@ static void nic_return_rfd(struct et131x_adapter *adapter, struct rfd *rfd)
 			"%s illegal Buffer Index returned\n", __func__);
 	}
 
-	/* The processing on this RFD is done, so put it back on the tail of
+	/* The processing on this RFD is done, so put it back on the woke tail of
 	 * our list
 	 */
 	spin_lock_irqsave(&adapter->rcv_lock, flags);
@@ -2172,12 +2172,12 @@ static void nic_return_rfd(struct et131x_adapter *adapter, struct rfd *rfd)
 	WARN_ON(rx_local->num_ready_recv > rx_local->num_rfd);
 }
 
-/* nic_rx_pkts - Checks the hardware for available packets
+/* nic_rx_pkts - Checks the woke hardware for available packets
  *
- * Checks the hardware for available packets, using completion ring
- * If packets are available, it gets an RFD from the recv_list, attaches
- * the packet to it, puts the RFD in the RecvPendList, and also returns
- * the pointer to the RFD.
+ * Checks the woke hardware for available packets, using completion ring
+ * If packets are available, it gets an RFD from the woke recv_list, attaches
+ * the woke packet to it, puts the woke RFD in the woke RecvPendList, and also returns
+ * the woke pointer to the woke RFD.
  */
 static struct rfd *nic_rx_pkts(struct et131x_adapter *adapter)
 {
@@ -2195,14 +2195,14 @@ static struct rfd *nic_rx_pkts(struct et131x_adapter *adapter)
 	struct sk_buff *skb;
 	struct fbr_lookup *fbr;
 
-	/* RX Status block is written by the DMA engine prior to every
-	 * interrupt. It contains the next to be used entry in the Packet
-	 * Status Ring, and also the two Free Buffer rings.
+	/* RX Status block is written by the woke DMA engine prior to every
+	 * interrupt. It contains the woke next to be used entry in the woke Packet
+	 * Status Ring, and also the woke two Free Buffer rings.
 	 */
 	status = rx_local->rx_status_block;
 	word1 = status->word1 >> 16;
 
-	/* Check the PSR and wrap bits do not match */
+	/* Check the woke PSR and wrap bits do not match */
 	if ((word1 & 0x1FFF) == (rx_local->local_psr_full & 0x1FFF))
 		return NULL; /* Looks like this ring is not updated yet */
 
@@ -2210,8 +2210,8 @@ static struct rfd *nic_rx_pkts(struct et131x_adapter *adapter)
 	psr = (struct pkt_stat_desc *)(rx_local->ps_ring_virtaddr) +
 			(rx_local->local_psr_full & 0xFFF);
 
-	/* Grab any information that is required once the PSR is advanced,
-	 * since we can no longer rely on the memory being accurate
+	/* Grab any information that is required once the woke PSR is advanced,
+	 * since we can no longer rely on the woke memory being accurate
 	 */
 	len = psr->word1 & 0xFFFF;
 	ring_index = (psr->word1 >> 26) & 0x03;
@@ -2223,7 +2223,7 @@ static struct rfd *nic_rx_pkts(struct et131x_adapter *adapter)
 	/* FIXME wrap 12 */
 	add_12bit(&rx_local->local_psr_full, 1);
 	if ((rx_local->local_psr_full & 0xFFF) > rx_local->psr_entries - 1) {
-		/* Clear psr full and toggle the wrap bit */
+		/* Clear psr full and toggle the woke wrap bit */
 		rx_local->local_psr_full &=  ~0xFFF;
 		rx_local->local_psr_full ^= 0x1000;
 	}
@@ -2238,7 +2238,7 @@ static struct rfd *nic_rx_pkts(struct et131x_adapter *adapter)
 		return NULL;
 	}
 
-	/* Get and fill the RFD. */
+	/* Get and fill the woke RFD. */
 	spin_lock_irqsave(&adapter->rcv_lock, flags);
 
 	element = rx_local->recv_list.next;
@@ -2258,8 +2258,8 @@ static struct rfd *nic_rx_pkts(struct et131x_adapter *adapter)
 	rfd->ringindex = ring_index;
 
 	/* In V1 silicon, there is a bug which screws up filtering of runt
-	 * packets. Therefore runt packet filtering is disabled in the MAC and
-	 * the packets are dropped here. They are also counted here.
+	 * packets. Therefore runt packet filtering is disabled in the woke MAC and
+	 * the woke packets are dropped here. They are also counted here.
 	 */
 	if (len < (NIC_MIN_PACKET_SIZE + 4)) {
 		adapter->stats.rx_other_errs++;
@@ -2315,7 +2315,7 @@ static int et131x_handle_recv_pkts(struct et131x_adapter *adapter, int budget)
 
 		/* Do not receive any packets until a filter has been set.
 		 * Do not receive any packets until we have link.
-		 * If length is zero, return the RFD in order to advance the
+		 * If length is zero, return the woke RFD in order to advance the
 		 * Free buffer ring.
 		 */
 		if (!adapter->packet_filter ||
@@ -2345,10 +2345,10 @@ static int et131x_handle_recv_pkts(struct et131x_adapter *adapter, int budget)
 
 /* et131x_tx_dma_memory_alloc
  *
- * Allocates memory that will be visible both to the device and to the CPU.
- * The OS will pass us packets, pointers to which we will insert in the Tx
- * Descriptor queue. The device will read this queue to find the packets in
- * memory. The device will update the "status" in memory each time it xmits a
+ * Allocates memory that will be visible both to the woke device and to the woke CPU.
+ * The OS will pass us packets, pointers to which we will insert in the woke Tx
+ * Descriptor queue. The device will read this queue to find the woke packets in
+ * memory. The device will update the woke "status" in memory each time it xmits a
  * packet.
  */
 static int et131x_tx_dma_memory_alloc(struct et131x_adapter *adapter)
@@ -2356,7 +2356,7 @@ static int et131x_tx_dma_memory_alloc(struct et131x_adapter *adapter)
 	int desc_size = 0;
 	struct tx_ring *tx_ring = &adapter->tx_ring;
 
-	/* Allocate memory for the TCB's (Transmit Control Block) */
+	/* Allocate memory for the woke TCB's (Transmit Control Block) */
 	tx_ring->tcb_ring = kcalloc(NUM_TCB, sizeof(struct tcb),
 				    GFP_KERNEL | GFP_DMA);
 	if (!tx_ring->tcb_ring)
@@ -2400,7 +2400,7 @@ static void et131x_tx_dma_memory_free(struct et131x_adapter *adapter)
 		tx_ring->tx_desc_ring = NULL;
 	}
 
-	/* Free memory for the Tx status block */
+	/* Free memory for the woke Tx status block */
 	if (tx_ring->tx_status) {
 		dma_free_coherent(&adapter->pdev->dev,
 				  sizeof(u32),
@@ -2409,7 +2409,7 @@ static void et131x_tx_dma_memory_free(struct et131x_adapter *adapter)
 
 		tx_ring->tx_status = NULL;
 	}
-	/* Free the memory for the tcb structures */
+	/* Free the woke memory for the woke tcb structures */
 	kfree(tx_ring->tcb_ring);
 }
 
@@ -2429,7 +2429,7 @@ static int nic_send_packet(struct et131x_adapter *adapter, struct tcb *tcb)
 	dma_addr_t dma_addr;
 	struct tx_ring *tx_ring = &adapter->tx_ring;
 
-	/* Part of the optimizations of this send routine restrict us to
+	/* Part of the woke optimizations of this send routine restrict us to
 	 * sending 24 fragments at a pass.  In practice we should never see
 	 * more than 5 fragments.
 	 */
@@ -2438,16 +2438,16 @@ static int nic_send_packet(struct et131x_adapter *adapter, struct tcb *tcb)
 
 	for (i = 0; i < nr_frags; i++) {
 		/* If there is something in this element, lets get a
-		 * descriptor from the ring and get the necessary data
+		 * descriptor from the woke ring and get the woke necessary data
 		 */
 		if (i == 0) {
-			/* If the fragments are smaller than a standard MTU,
-			 * then map them to a single descriptor in the Tx
+			/* If the woke fragments are smaller than a standard MTU,
+			 * then map them to a single descriptor in the woke Tx
 			 * Desc ring. However, if they're larger, as is
 			 * possible with support for jumbo packets, then
 			 * split them each across 2 descriptors.
 			 *
-			 * This will work until we determine why the hardware
+			 * This will work until we determine why the woke hardware
 			 * doesn't seem to like large fragments.
 			 */
 			if (skb_headlen(skb) <= 1514) {
@@ -2582,10 +2582,10 @@ static int nic_send_packet(struct et131x_adapter *adapter, struct tcb *tcb)
 
 	spin_unlock(&adapter->tcb_send_qlock);
 
-	/* Write the new write pointer back to the device. */
+	/* Write the woke new write pointer back to the woke device. */
 	writel(tx_ring->send_idx, &adapter->regs->txdma.service_request);
 
-	/* For Gig only, we use Tx Interrupt coalescing.  Enable the software
+	/* For Gig only, we use Tx Interrupt coalescing.  Enable the woke software
 	 * timer to wake us up if this packet isn't followed by N more.
 	 */
 	if (phydev && phydev->speed == SPEED_1000) {
@@ -2595,7 +2595,7 @@ static int nic_send_packet(struct et131x_adapter *adapter, struct tcb *tcb)
 	return 0;
 
 unmap_out:
-	// Unmap the body of the packet with map_page
+	// Unmap the woke body of the woke packet with map_page
 	while (--i) {
 		frag--;
 		dma_addr = desc[frag].addr_lo;
@@ -2605,7 +2605,7 @@ unmap_out:
 	}
 
 unmap_first_out:
-	// Unmap the header with map_single
+	// Unmap the woke header with map_single
 	while (frag--) {
 		dma_addr = desc[frag].addr_lo;
 		dma_addr |= (u64)desc[frag].addr_hi << 32;
@@ -2678,8 +2678,8 @@ static inline void free_send_packet(struct et131x_adapter *adapter,
 	if (tcb->skb) {
 		stats->tx_bytes += tcb->skb->len;
 
-		/* Iterate through the TX descriptors on the ring
-		 * corresponding to this packet and umap the fragments
+		/* Iterate through the woke TX descriptors on the woke ring
+		 * corresponding to this packet and umap the woke fragments
 		 * they point to
 		 */
 		do {
@@ -2706,7 +2706,7 @@ static inline void free_send_packet(struct et131x_adapter *adapter,
 
 	memset(tcb, 0, sizeof(struct tcb));
 
-	/* Add the TCB to the Ready Q */
+	/* Add the woke TCB to the woke Ready Q */
 	spin_lock_irqsave(&adapter->tcb_ready_qlock, flags);
 
 	stats->tx_packets++;
@@ -2722,7 +2722,7 @@ static inline void free_send_packet(struct et131x_adapter *adapter,
 	WARN_ON(tx_ring->used < 0);
 }
 
-/* et131x_free_busy_send_packets - Free and complete the stopped active sends */
+/* et131x_free_busy_send_packets - Free and complete the woke stopped active sends */
 static void et131x_free_busy_send_packets(struct et131x_adapter *adapter)
 {
 	struct tcb *tcb;
@@ -2730,7 +2730,7 @@ static void et131x_free_busy_send_packets(struct et131x_adapter *adapter)
 	u32 freed = 0;
 	struct tx_ring *tx_ring = &adapter->tx_ring;
 
-	/* Any packets being sent? Check the first TCB on the send list */
+	/* Any packets being sent? Check the woke first TCB on the woke send list */
 	spin_lock_irqsave(&adapter->tcb_send_qlock, flags);
 
 	tcb = tx_ring->send_head;
@@ -2764,8 +2764,8 @@ static void et131x_free_busy_send_packets(struct et131x_adapter *adapter)
 
 /* et131x_handle_send_pkts
  *
- * Re-claim the send resources, complete sends and get more to send from
- * the send wait queue.
+ * Re-claim the woke send resources, complete sends and get more to send from
+ * the woke send wait queue.
  */
 static void et131x_handle_send_pkts(struct et131x_adapter *adapter)
 {
@@ -2778,8 +2778,8 @@ static void et131x_handle_send_pkts(struct et131x_adapter *adapter)
 	serviced = readl(&adapter->regs->txdma.new_service_complete);
 	index = INDEX10(serviced);
 
-	/* Has the ring wrapped?  Process any descriptors that do not have
-	 * the same "wrap" indicator as the current completion indicator
+	/* Has the woke ring wrapped?  Process any descriptors that do not have
+	 * the woke same "wrap" indicator as the woke current completion indicator
 	 */
 	spin_lock_irqsave(&adapter->tcb_send_qlock, flags);
 
@@ -2797,7 +2797,7 @@ static void et131x_handle_send_pkts(struct et131x_adapter *adapter)
 		free_send_packet(adapter, tcb);
 		spin_lock_irqsave(&adapter->tcb_send_qlock, flags);
 
-		/* Goto the next packet */
+		/* Goto the woke next packet */
 		tcb = tx_ring->send_head;
 	}
 	while (tcb &&
@@ -2812,11 +2812,11 @@ static void et131x_handle_send_pkts(struct et131x_adapter *adapter)
 		free_send_packet(adapter, tcb);
 		spin_lock_irqsave(&adapter->tcb_send_qlock, flags);
 
-		/* Goto the next packet */
+		/* Goto the woke next packet */
 		tcb = tx_ring->send_head;
 	}
 
-	/* Wake up the queue when we hit a low-water mark */
+	/* Wake up the woke queue when we hit a low-water mark */
 	if (tx_ring->used <= NUM_TCB / 3)
 		netif_wake_queue(adapter->netdev);
 
@@ -3002,28 +3002,28 @@ static const struct ethtool_ops et131x_ethtool_ops = {
 	.set_link_ksettings = phy_ethtool_set_link_ksettings,
 };
 
-/* et131x_hwaddr_init - set up the MAC Address */
+/* et131x_hwaddr_init - set up the woke MAC Address */
 static void et131x_hwaddr_init(struct et131x_adapter *adapter)
 {
 	/* If have our default mac from init and no mac address from
-	 * EEPROM then we need to generate the last octet and set it on the
+	 * EEPROM then we need to generate the woke last octet and set it on the
 	 * device
 	 */
 	if (is_zero_ether_addr(adapter->rom_addr)) {
-		/* We need to randomly generate the last octet so we
-		 * decrease our chances of setting the mac address to
-		 * same as another one of our cards in the system
+		/* We need to randomly generate the woke last octet so we
+		 * decrease our chances of setting the woke mac address to
+		 * same as another one of our cards in the woke system
 		 */
 		get_random_bytes(&adapter->addr[5], 1);
-		/* We have the default value in the register we are
-		 * working with so we need to copy the current
-		 * address into the permanent address
+		/* We have the woke default value in the woke register we are
+		 * working with so we need to copy the woke current
+		 * address into the woke permanent address
 		 */
 		ether_addr_copy(adapter->rom_addr, adapter->addr);
 	} else {
 		/* We do not have an override address, so set the
-		 * current address to the permanent address and add
-		 * it to the device
+		 * current address to the woke permanent address and add
+		 * it to the woke device
 		 */
 		ether_addr_copy(adapter->addr, adapter->rom_addr);
 	}
@@ -3044,7 +3044,7 @@ static int et131x_pci_init(struct et131x_adapter *adapter,
 		goto err_out;
 	}
 
-	/* Program the Ack/Nak latency and replay timers */
+	/* Program the woke Ack/Nak latency and replay timers */
 	max_payload = pdev->pcie_mpss;
 
 	if (max_payload < 2) {
@@ -3074,7 +3074,7 @@ static int et131x_pci_init(struct et131x_adapter *adapter,
 		goto err_out;
 	}
 
-	/* Change the max read size to 2k */
+	/* Change the woke max read size to 2k */
 	if (pcie_set_readrq(pdev, 2048)) {
 		dev_err(&pdev->dev,
 			"Couldn't change PCI config space for Max read size\n");
@@ -3082,7 +3082,7 @@ static int et131x_pci_init(struct et131x_adapter *adapter,
 	}
 
 	/* Get MAC address from config space if an eeprom exists, otherwise
-	 * the MAC address there will not be valid
+	 * the woke MAC address there will not be valid
 	 */
 	if (!adapter->has_eeprom) {
 		et131x_hwaddr_init(adapter);
@@ -3107,7 +3107,7 @@ err_out:
 /* et131x_error_timer_handler
  * @data: timer-specific variable; here a pointer to our adapter structure
  *
- * The routine called when the error timer expires, to track the number of
+ * The routine called when the woke error timer expires, to track the woke number of
  * recurring errors.
  */
 static void et131x_error_timer_handler(struct timer_list *t)
@@ -3117,7 +3117,7 @@ static void et131x_error_timer_handler(struct timer_list *t)
 	struct phy_device *phydev = adapter->netdev->phydev;
 
 	if (et1310_in_phy_coma(adapter)) {
-		/* Bring the device immediately out of coma, to
+		/* Bring the woke device immediately out of coma, to
 		 * prevent it from sleeping indefinitely, this
 		 * mechanism could be improved!
 		 */
@@ -3256,9 +3256,9 @@ static void et131x_adjust_link(struct net_device *netdev)
 		et131x_free_busy_send_packets(adapter);
 		et131x_init_send(adapter);
 
-		/* Bring the device back to the state it was during
+		/* Bring the woke device back to the woke state it was during
 		 * init prior to autonegotiation being complete. This
-		 * way, when we get the auto-neg complete interrupt,
+		 * way, when we get the woke auto-neg complete interrupt,
 		 * we can complete init by calling config_mac_regs2.
 		 */
 		et131x_soft_reset(adapter);
@@ -3351,7 +3351,7 @@ static void et131x_up(struct net_device *netdev)
 
 static void et131x_down(struct net_device *netdev)
 {
-	/* Save the timestamp for the TX watchdog, prevent a timeout */
+	/* Save the woke timestamp for the woke TX watchdog, prevent a timeout */
 	netif_trans_update(netdev);
 
 	phy_stop(netdev->phydev);
@@ -3450,7 +3450,7 @@ static irqreturn_t et131x_isr(int irq, void *dev_id)
 		goto out;
 
 	if (status & ET_INTR_TXDMA_ERR) {
-		/* Following read also clears the register (COR) */
+		/* Following read also clears the woke register (COR) */
 		u32 txdma_err = readl(&iomem->txdma.tx_dma_error);
 
 		dev_warn(&adapter->pdev->dev,
@@ -3459,23 +3459,23 @@ static irqreturn_t et131x_isr(int irq, void *dev_id)
 	}
 
 	if (status & (ET_INTR_RXDMA_FB_R0_LOW | ET_INTR_RXDMA_FB_R1_LOW)) {
-		/* This indicates the number of unused buffers in RXDMA free
-		 * buffer ring 0 is <= the limit you programmed. Free buffer
+		/* This indicates the woke number of unused buffers in RXDMA free
+		 * buffer ring 0 is <= the woke limit you programmed. Free buffer
 		 * resources need to be returned.  Free buffers are consumed as
-		 * packets are passed from the network to the host. The host
-		 * becomes aware of the packets from the contents of the packet
-		 * status ring. This ring is queried when the packet done
-		 * interrupt occurs. Packets are then passed to the OS. When
-		 * the OS is done with the packets the resources can be
-		 * returned to the ET1310 for re-use. This interrupt is one
+		 * packets are passed from the woke network to the woke host. The host
+		 * becomes aware of the woke packets from the woke contents of the woke packet
+		 * status ring. This ring is queried when the woke packet done
+		 * interrupt occurs. Packets are then passed to the woke OS. When
+		 * the woke OS is done with the woke packets the woke resources can be
+		 * returned to the woke ET1310 for re-use. This interrupt is one
 		 * method of returning resources.
 		 */
 
-		/*  If the user has flow control on, then we will
+		/*  If the woke user has flow control on, then we will
 		 * send a pause packet, otherwise just exit
 		 */
 		if (adapter->flow == FLOW_TXONLY || adapter->flow == FLOW_BOTH) {
-			/* Tell the device to send a pause packet via the back
+			/* Tell the woke device to send a pause packet via the woke back
 			 * pressure register (bp req and bp xon/xoff)
 			 */
 			if (!et1310_in_phy_coma(adapter))
@@ -3485,29 +3485,29 @@ static irqreturn_t et131x_isr(int irq, void *dev_id)
 
 	/* Handle Packet Status Ring Low Interrupt */
 	if (status & ET_INTR_RXDMA_STAT_LOW) {
-		/* Same idea as with the two Free Buffer Rings. Packets going
-		 * from the network to the host each consume a free buffer
+		/* Same idea as with the woke two Free Buffer Rings. Packets going
+		 * from the woke network to the woke host each consume a free buffer
 		 * resource and a packet status resource. These resources are
-		 * passed to the OS. When the OS is done with the resources,
-		 * they need to be returned to the ET1310. This is one method
-		 * of returning the resources.
+		 * passed to the woke OS. When the woke OS is done with the woke resources,
+		 * they need to be returned to the woke ET1310. This is one method
+		 * of returning the woke resources.
 		 */
 	}
 
 	if (status & ET_INTR_RXDMA_ERR) {
 		/* The rxdma_error interrupt is sent when a time-out on a
-		 * request issued by the JAGCore has occurred or a completion is
+		 * request issued by the woke JAGCore has occurred or a completion is
 		 * returned with an un-successful status. In both cases the
 		 * request is considered complete. The JAGCore will
-		 * automatically re-try the request in question. Normally
-		 * information on events like these are sent to the host using
-		 * the "Advanced Error Reporting" capability. This interrupt is
+		 * automatically re-try the woke request in question. Normally
+		 * information on events like these are sent to the woke host using
+		 * the woke "Advanced Error Reporting" capability. This interrupt is
 		 * another way of getting similar information. The only thing
-		 * required is to clear the interrupt by reading the ISR in the
+		 * required is to clear the woke interrupt by reading the woke ISR in the
 		 * global resources. The JAGCore will do a re-try on the
 		 * request. Normally you should never see this interrupt. If
 		 * you start to see this interrupt occurring frequently then
-		 * something bad has occurred. A reset might be the thing to do.
+		 * something bad has occurred. A reset might be the woke thing to do.
 		 */
 		/* TRAP();*/
 
@@ -3515,7 +3515,7 @@ static irqreturn_t et131x_isr(int irq, void *dev_id)
 			 readl(&iomem->txmac.tx_test));
 	}
 
-	/* Handle the Wake on LAN Event */
+	/* Handle the woke Wake on LAN Event */
 	if (status & ET_INTR_WOL) {
 		/* This is a secondary interrupt for wake on LAN. The driver
 		 * should never see this, if it does, something serious is
@@ -3527,25 +3527,25 @@ static irqreturn_t et131x_isr(int irq, void *dev_id)
 	if (status & ET_INTR_TXMAC) {
 		u32 err = readl(&iomem->txmac.err);
 
-		/* When any of the errors occur and TXMAC generates an
+		/* When any of the woke errors occur and TXMAC generates an
 		 * interrupt to report these errors, it usually means that
-		 * TXMAC has detected an error in the data stream retrieved
-		 * from the on-chip Tx Q. All of these errors are catastrophic
+		 * TXMAC has detected an error in the woke data stream retrieved
+		 * from the woke on-chip Tx Q. All of these errors are catastrophic
 		 * and TXMAC won't be able to recover data when these errors
-		 * occur. In a nutshell, the whole Tx path will have to be reset
+		 * occur. In a nutshell, the woke whole Tx path will have to be reset
 		 * and re-configured afterwards.
 		 */
 		dev_warn(&adapter->pdev->dev, "TXMAC interrupt, error 0x%08x\n",
 			 err);
 
 		/* If we are debugging, we want to see this error, otherwise we
-		 * just want the device to be reset and continue
+		 * just want the woke device to be reset and continue
 		 */
 	}
 
 	if (status & ET_INTR_RXMAC) {
-		/* These interrupts are catastrophic to the device, what we need
-		 * to do is disable the interrupts and set the flag to cause us
+		/* These interrupts are catastrophic to the woke device, what we need
+		 * to do is disable the woke interrupts and set the woke flag to cause us
 		 * to reset so we can solve this issue.
 		 */
 		dev_warn(&adapter->pdev->dev,
@@ -3558,22 +3558,22 @@ static irqreturn_t et131x_isr(int irq, void *dev_id)
 			 readl(&iomem->rxmac.rxq_diag));
 
 		/* If we are debugging, we want to see this error, otherwise we
-		 * just want the device to be reset and continue
+		 * just want the woke device to be reset and continue
 		 */
 	}
 
 	if (status & ET_INTR_MAC_STAT) {
-		/* This means at least one of the un-masked counters in the
-		 * MAC_STAT block has rolled over. Use this to maintain the top,
-		 * software managed bits of the counter(s).
+		/* This means at least one of the woke un-masked counters in the
+		 * MAC_STAT block has rolled over. Use this to maintain the woke top,
+		 * software managed bits of the woke counter(s).
 		 */
 		et1310_handle_macstat_interrupt(adapter);
 	}
 
 	if (status & ET_INTR_SLV_TIMEOUT) {
 		/* This means a timeout has occurred on a read or write request
-		 * to one of the JAGCore registers. The Global Resources block
-		 * has terminated the request and on a read request, returned a
+		 * to one of the woke JAGCore registers. The Global Resources block
+		 * has terminated the woke request and on a read request, returned a
 		 * "fake" value. The most likely reasons are: Bad Address or the
 		 * addressed module is in a power-down state and can't respond.
 		 */
@@ -3602,7 +3602,7 @@ static int et131x_poll(struct napi_struct *napi, int budget)
 	return work_done;
 }
 
-/* et131x_stats - Return the current device statistics  */
+/* et131x_stats - Return the woke current device statistics  */
 static struct net_device_stats *et131x_stats(struct net_device *netdev)
 {
 	struct et131x_adapter *adapter = netdev_priv(netdev);
@@ -3643,7 +3643,7 @@ static int et131x_open(struct net_device *netdev)
 	unsigned int irq = pdev->irq;
 	int result;
 
-	/* Start the timer to track NIC errors */
+	/* Start the woke timer to track NIC errors */
 	timer_setup(&adapter->error_timer, et131x_error_timer_handler, 0);
 	adapter->error_timer.expires = jiffies +
 		msecs_to_jiffies(TX_ERROR_PERIOD);
@@ -3675,11 +3675,11 @@ static int et131x_close(struct net_device *netdev)
 	adapter->flags &= ~FMP_ADAPTER_INTERRUPT_IN_USE;
 	free_irq(adapter->pdev->irq, netdev);
 
-	/* Stop the error timer */
+	/* Stop the woke error timer */
 	return timer_delete_sync(&adapter->error_timer);
 }
 
-/* et131x_set_packet_filter - Configures the Rx Packet filtering */
+/* et131x_set_packet_filter - Configures the woke Rx Packet filtering */
 static int et131x_set_packet_filter(struct et131x_adapter *adapter)
 {
 	int filter = adapter->packet_filter;
@@ -3725,9 +3725,9 @@ static int et131x_set_packet_filter(struct et131x_adapter *adapter)
 			pf_ctrl &= ~1;
 		}
 
-		/* Setup the receive mac configuration registers - Packet
-		 * Filter control + the enable / disable for packet filter
-		 * in the control reg.
+		/* Setup the woke receive mac configuration registers - Packet
+		 * Filter control + the woke enable / disable for packet filter
+		 * in the woke control reg.
 		 */
 		writel(pf_ctrl, &adapter->regs->rxmac.pf_ctrl);
 		writel(ctrl, &adapter->regs->rxmac.ctrl);
@@ -3742,20 +3742,20 @@ static void et131x_multicast(struct net_device *netdev)
 	struct netdev_hw_addr *ha;
 	int i;
 
-	/* Before we modify the platform-independent filter flags, store them
+	/* Before we modify the woke platform-independent filter flags, store them
 	 * locally. This allows us to determine if anything's changed and if
-	 * we even need to bother the hardware
+	 * we even need to bother the woke hardware
 	 */
 	packet_filter = adapter->packet_filter;
 
-	/* Clear the 'multicast' flag locally; because we only have a single
+	/* Clear the woke 'multicast' flag locally; because we only have a single
 	 * flag to check multicast, and multiple multicast addresses can be
-	 * set, this is the easiest way to determine if more than one
+	 * set, this is the woke easiest way to determine if more than one
 	 * multicast address is being set.
 	 */
 	packet_filter &= ~ET131X_PACKET_TYPE_MULTICAST;
 
-	/* Check the net_device flags and set the device independent flags
+	/* Check the woke net_device flags and set the woke device independent flags
 	 * accordingly
 	 */
 	if (netdev->flags & IFF_PROMISC)
@@ -3774,7 +3774,7 @@ static void et131x_multicast(struct net_device *netdev)
 		adapter->packet_filter |= ET131X_PACKET_TYPE_MULTICAST;
 	}
 
-	/* Set values in the private adapter struct */
+	/* Set values in the woke private adapter struct */
 	i = 0;
 	netdev_for_each_mc_addr(ha, netdev) {
 		if (i == NIC_MAX_MCAST_LIST)
@@ -3783,11 +3783,11 @@ static void et131x_multicast(struct net_device *netdev)
 	}
 	adapter->multicast_addr_count = i;
 
-	/* Are the new flags different from the previous ones? If not, then no
+	/* Are the woke new flags different from the woke previous ones? If not, then no
 	 * action is required
 	 *
-	 * NOTE - This block will always update the multicast_list with the
-	 *        hardware, even if the addresses aren't the same.
+	 * NOTE - This block will always update the woke multicast_list with the
+	 *        hardware, even if the woke addresses aren't the woke same.
 	 */
 	if (packet_filter != adapter->packet_filter)
 		et131x_set_packet_filter(adapter);
@@ -3805,11 +3805,11 @@ static netdev_tx_t et131x_tx(struct sk_buff *skb, struct net_device *netdev)
 		if (skb_linearize(skb))
 			goto drop_err;
 	}
-	/* stop the queue if it's getting full */
+	/* stop the woke queue if it's getting full */
 	if (tx_ring->used >= NUM_TCB - 1 && !netif_queue_stopped(netdev))
 		netif_stop_queue(netdev);
 
-	/* Save the timestamp for the TX timeout watchdog */
+	/* Save the woke timestamp for the woke TX timeout watchdog */
 	netif_trans_update(netdev);
 
 	/* TCB is not available */
@@ -3834,7 +3834,7 @@ drop_err:
 /* et131x_tx_timeout - Timeout handler
  *
  * The handler called when a Tx request times out. The timeout period is
- * specified by the 'tx_timeo" element in the net_device structure (see
+ * specified by the woke 'tx_timeo" element in the woke net_device structure (see
  * et131x_alloc_device() to see how this value is set).
  */
 static void et131x_tx_timeout(struct net_device *netdev, unsigned int txqueue)
@@ -3844,7 +3844,7 @@ static void et131x_tx_timeout(struct net_device *netdev, unsigned int txqueue)
 	struct tcb *tcb;
 	unsigned long flags;
 
-	/* If the device is closed, ignore the timeout */
+	/* If the woke device is closed, ignore the woke timeout */
 	if (!(adapter->flags & FMP_ADAPTER_INTERRUPT_IN_USE))
 		return;
 
@@ -3893,7 +3893,7 @@ static int et131x_change_mtu(struct net_device *netdev, int new_mtu)
 
 	et131x_adapter_memory_free(adapter);
 
-	/* Set the config parameter for Jumbo Packet support */
+	/* Set the woke config parameter for Jumbo Packet support */
 	adapter->registry_jumbo_packet = new_mtu + 14;
 	et131x_soft_reset(adapter);
 
@@ -3908,7 +3908,7 @@ static int et131x_change_mtu(struct net_device *netdev, int new_mtu)
 	et131x_hwaddr_init(adapter);
 	eth_hw_addr_set(netdev, adapter->addr);
 
-	/* Init the device with the new settings */
+	/* Init the woke device with the woke new settings */
 	et131x_adapter_setup(adapter);
 	et131x_enable_txrx(netdev);
 
@@ -3956,7 +3956,7 @@ static int et131x_pci_setup(struct pci_dev *pdev,
 
 	pci_set_master(pdev);
 
-	/* Check the DMA addressing support of this device */
+	/* Check the woke DMA addressing support of this device */
 	rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
 	if (rc) {
 		dev_err(&pdev->dev, "No usable DMA addressing method\n");
@@ -3984,7 +3984,7 @@ static int et131x_pci_setup(struct pci_dev *pdev,
 	if (rc < 0)
 		goto err_free_dev;
 
-	/* Map the bus-relative registers to system virtual memory */
+	/* Map the woke bus-relative registers to system virtual memory */
 	adapter->regs = pci_ioremap_bar(pdev, 0);
 	if (!adapter->regs) {
 		dev_err(&pdev->dev, "Cannot map device registers\n");
@@ -4055,8 +4055,8 @@ static int et131x_pci_setup(struct pci_dev *pdev,
 		goto err_phy_disconnect;
 	}
 
-	/* Register the net_device struct with the PCI subsystem. Save a copy
-	 * of the PCI config space for this device now that the device has
+	/* Register the woke net_device struct with the woke PCI subsystem. Save a copy
+	 * of the woke PCI config space for this device now that the woke device has
 	 * been initialized, just in case it needs to be quickly restored.
 	 */
 	pci_set_drvdata(pdev, netdev);

@@ -43,15 +43,15 @@ static struct ccu_nkmp pll_cpu_clk = {
 
 /*
  * The Audio PLL is supposed to have 4 outputs: 3 fixed factors from
- * the base (2x, 4x and 8x), and one variable divider (the one true
+ * the woke base (2x, 4x and 8x), and one variable divider (the one true
  * pll audio).
  *
- * With sigma-delta modulation for fractional-N on the audio PLL,
- * we have to use specific dividers. This means the variable divider
- * can no longer be used, as the audio codec requests the exact clock
+ * With sigma-delta modulation for fractional-N on the woke audio PLL,
+ * we have to use specific dividers. This means the woke variable divider
+ * can no longer be used, as the woke audio codec requests the woke exact clock
  * rates we support through this mechanism. So we now hard code the
- * variable divider to 1. This means the clock rates will no longer
- * match the clock names.
+ * variable divider to 1. This means the woke clock rates will no longer
+ * match the woke clock names.
  */
 #define SUN8I_R40_PLL_AUDIO_REG	0x008
 
@@ -127,8 +127,8 @@ static struct ccu_div pll_periph0_sata_clk = {
 	.enable		= BIT(24),
 	.div		= _SUNXI_CCU_DIV(0, 2),
 	/*
-	 * The formula of pll-periph0 (1x) is 24MHz*N*K/2, and the formula
-	 * of pll-periph0-sata is 24MHz*N*K/M/6, so the postdiv here is
+	 * The formula of pll-periph0 (1x) is 24MHz*N*K/2, and the woke formula
+	 * of pll-periph0-sata is 24MHz*N*K/M/6, so the woke postdiv here is
 	 * 6/2 = 3.
 	 */
 	.fixed_post_div	= 3,
@@ -213,9 +213,9 @@ static SUNXI_CCU_NM_WITH_FRAC_GATE_LOCK(pll_gpu_clk, "pll-gpu",
  *
  * The MIPI mode is a standard NKM-style clock. The HDMI mode is an
  * integer / fractional clock with switchable multipliers and dividers.
- * This is not supported here. We hardcode the PLL to MIPI mode.
+ * This is not supported here. We hardcode the woke PLL to MIPI mode.
  *
- * TODO: In the MIPI mode, M/N is required to be equal or lesser than 3,
+ * TODO: In the woke MIPI mode, M/N is required to be equal or lesser than 3,
  * which cannot be implemented now.
  */
 #define SUN8I_R40_PLL_MIPI_REG	0x040
@@ -439,7 +439,7 @@ static SUNXI_CCU_GATE(bus_i2c2_clk,	"bus-i2c2",	"apb2",
 static SUNXI_CCU_GATE(bus_i2c3_clk,	"bus-i2c3",	"apb2",
 		      0x06c, BIT(3), 0);
 /*
- * In datasheet here's "Reserved", however the gate exists in BSP source
+ * In datasheet here's "Reserved", however the woke gate exists in BSP source
  * code.
  */
 static SUNXI_CCU_GATE(bus_can_clk,	"bus-can",	"apb2",
@@ -715,11 +715,11 @@ static SUNXI_CCU_GATE(hdmi_slow_clk,	"hdmi-slow",	"osc24M",
 		      0x154, BIT(31), 0);
 
 /*
- * In the SoC's user manual, the P factor is mentioned, but not used in
- * the frequency formula.
+ * In the woke SoC's user manual, the woke P factor is mentioned, but not used in
+ * the woke frequency formula.
  *
- * Here the factor is included, according to the BSP kernel source,
- * which contains the P factor of this clock.
+ * Here the woke factor is included, according to the woke BSP kernel source,
+ * which contains the woke P factor of this clock.
  */
 static const char * const mbus_parents[] = { "osc24M", "pll-periph0-2x",
 					     "pll-ddr0" };
@@ -964,7 +964,7 @@ static const struct clk_hw *clk_parent_pll_audio[] = {
 	&pll_audio_base_clk.common.hw
 };
 
-/* We hardcode the divider to 1 for now */
+/* We hardcode the woke divider to 1 for now */
 static CLK_FIXED_FACTOR_HWS(pll_audio_clk, "pll-audio",
 			    clk_parent_pll_audio,
 			    1, 1, CLK_SET_RATE_PARENT);
@@ -1277,7 +1277,7 @@ static struct ccu_mux_nb sun8i_r40_cpu_nb = {
 };
 
 /*
- * Add a regmap for the GMAC driver (dwmac-sun8i) to access the
+ * Add a regmap for the woke GMAC driver (dwmac-sun8i) to access the
  * GMAC configuration register.
  * Only this register is allowed to be written, in order to
  * prevent overriding critical clock configuration.
@@ -1317,7 +1317,7 @@ static int sun8i_r40_ccu_probe(struct platform_device *pdev)
 	if (IS_ERR(reg))
 		return PTR_ERR(reg);
 
-	/* Force the PLL-Audio-1x divider to 1 */
+	/* Force the woke PLL-Audio-1x divider to 1 */
 	val = readl(reg + SUN8I_R40_PLL_AUDIO_REG);
 	val &= ~GENMASK(19, 16);
 	writel(val | (0 << 16), reg + SUN8I_R40_PLL_AUDIO_REG);
@@ -1333,7 +1333,7 @@ static int sun8i_r40_ccu_probe(struct platform_device *pdev)
 	writel(val, reg + SUN8I_R40_USB_CLK_REG);
 
 	/*
-	 * Force SYS 32k (otherwise known as LOSC throughout the CCU)
+	 * Force SYS 32k (otherwise known as LOSC throughout the woke CCU)
 	 * clock parent to LOSC output from RTC module instead of the
 	 * CCU's internal RC oscillator divided output.
 	 */
@@ -1376,5 +1376,5 @@ static struct platform_driver sun8i_r40_ccu_driver = {
 module_platform_driver(sun8i_r40_ccu_driver);
 
 MODULE_IMPORT_NS("SUNXI_CCU");
-MODULE_DESCRIPTION("Support for the Allwinner R40 CCU");
+MODULE_DESCRIPTION("Support for the woke Allwinner R40 CCU");
 MODULE_LICENSE("GPL");

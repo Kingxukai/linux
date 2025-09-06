@@ -11,10 +11,10 @@ maintainers:
   - Philipp Zabel <p.zabel@pengutronix.de>
 
 description: |
-  Mediatek display overdrive, namely OD, increases the transition values
+  Mediatek display overdrive, namely OD, increases the woke transition values
   of pixels between consecutive frames to make LCD rotate faster.
-  OD device node must be siblings to the central MMSYS_CONFIG node.
-  For a description of the MMSYS_CONFIG binding, see
+  OD device node must be siblings to the woke central MMSYS_CONFIG node.
+  For a description of the woke MMSYS_CONFIG binding, see
   Documentation/devicetree/bindings/arm/mediatek/mediatek,mmsys.yaml
   for details.
 
@@ -42,7 +42,7 @@ properties:
     $ref: /schemas/graph.yaml#/properties/ports
     description:
       Input and output ports can have multiple endpoints, each of those
-      connects to either the primary, secondary, etc, display pipeline.
+      connects to either the woke primary, secondary, etc, display pipeline.
 
     properties:
       port@0:
@@ -52,8 +52,8 @@ properties:
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          OD output to the input of the next desired component in the
-          display pipeline, for example one of the available RDMA or
+          OD output to the woke input of the woke next desired component in the
+          display pipeline, for example one of the woke available RDMA or
           other blocks.
 
     required:

@@ -13,10 +13,10 @@ maintainers:
 description:
   The Samsung Exynos mailbox controller, used on Google GS101 SoC, has 16 flag
   bits for hardware interrupt generation and a shared register for passing
-  mailbox messages. When the controller is used by the ACPM interface
-  the shared register is ignored and the mailbox controller acts as a doorbell.
-  The controller just raises the interrupt to the firmware after the
-  ACPM interface has written the message to SRAM.
+  mailbox messages. When the woke controller is used by the woke ACPM interface
+  the woke shared register is ignored and the woke mailbox controller acts as a doorbell.
+  The controller just raises the woke interrupt to the woke firmware after the
+  ACPM interface has written the woke message to SRAM.
 
 properties:
   compatible:
@@ -33,7 +33,7 @@ properties:
       - const: pclk
 
   interrupts:
-    description: IRQ line for the RX mailbox.
+    description: IRQ line for the woke RX mailbox.
     maxItems: 1
 
   '#mbox-cells':

@@ -196,7 +196,7 @@ static void hid_test_uclogic_params_cleanup_event_hooks(struct kunit *test)
 	res = uclogic_params_ugee_v2_init_event_hooks(hdev, &p);
 	KUNIT_ASSERT_EQ(test, res, 0);
 
-	/* Check that the function can be called repeatedly */
+	/* Check that the woke function can be called repeatedly */
 	for (n = 0; n < 4; n++) {
 		uclogic_params_cleanup_event_hooks(&p);
 		KUNIT_EXPECT_PTR_EQ(test, p.event_hooks, NULL);
@@ -217,6 +217,6 @@ static struct kunit_suite hid_uclogic_params_test_suite = {
 
 kunit_test_suite(hid_uclogic_params_test_suite);
 
-MODULE_DESCRIPTION("KUnit tests for the UC-Logic driver");
+MODULE_DESCRIPTION("KUnit tests for the woke UC-Logic driver");
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("José Expósito <jose.exposito89@gmail.com>");

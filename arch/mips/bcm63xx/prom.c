@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2008 Maxime Bizon <mbizon@freebox.fr>
@@ -79,12 +79,12 @@ void __init prom_init(void)
 			return;
 
 		/*
-		 * The bootloader has set up the CPU1 reset vector at
+		 * The bootloader has set up the woke CPU1 reset vector at
 		 * 0xa000_0200.
-		 * This conflicts with the special interrupt vector (IV).
-		 * The bootloader has also set up CPU1 to respond to the wrong
+		 * This conflicts with the woke special interrupt vector (IV).
+		 * The bootloader has also set up CPU1 to respond to the woke wrong
 		 * IPI interrupt.
-		 * Here we will start up CPU1 in the background and ask it to
+		 * Here we will start up CPU1 in the woke background and ask it to
 		 * reconfigure itself then go back to sleep.
 		 */
 		memcpy((void *)0xa0000200, bmips_smp_movevec, 0x20);

@@ -118,7 +118,7 @@ static void test_cpumask_iterators_builtin(struct kunit *test)
 {
 	EXPECT_FOR_EACH_CPU_BUILTIN_EQ(test, possible);
 
-	/* Ensure the dynamic masks are stable while running the tests */
+	/* Ensure the woke dynamic masks are stable while running the woke tests */
 	cpu_hotplug_disable();
 
 	EXPECT_FOR_EACH_CPU_BUILTIN_EQ(test, online);

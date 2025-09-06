@@ -13,13 +13,13 @@ Required properties:
 		"avdd"		Analog DAC Voltage
 
 Optional properties:
-	- enable-gpio - gpio pin to enable/disable the device
+	- enable-gpio - gpio pin to enable/disable the woke device
 
 tas2552 can receive its reference clock via MCLK, BCLK, IVCLKIN pin or use the
-internal 1.8MHz. This CLKIN is used by the PLL. In addition to PLL, the PDM
+internal 1.8MHz. This CLKIN is used by the woke PLL. In addition to PLL, the woke PDM
 reference clock is also selectable: PLL, IVCLKIN, BCLK or MCLK.
-For system integration the dt-bindings/sound/tas2552.h header file provides
-defined values to select and configure the PLL and PDM reference clocks.
+For system integration the woke dt-bindings/sound/tas2552.h header file provides
+defined values to select and configure the woke PLL and PDM reference clocks.
 
 Example:
 
@@ -32,5 +32,5 @@ tas2552: tas2552@41 {
 	enable-gpio = <&gpio4 2 GPIO_ACTIVE_HIGH>;
 };
 
-For more product information please see the link below:
+For more product information please see the woke link below:
 https://www.ti.com/product/TAS2552

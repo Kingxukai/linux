@@ -21,7 +21,7 @@ properties:
       interrupt status register is cleared. Thus it is blocking the
       interrupt line which is usually bad for shared lines. By default,
       interrupts are disabled for this PHY and polling mode is used. If one
-      can live with the consequences, this property can be used to enable
+      can live with the woke consequences, this property can be used to enable
       interrupt handling.
 
       Affected PHYs (as far as known) are GPY215B and GPY215C.

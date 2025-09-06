@@ -18,7 +18,7 @@
 #include "rate.h"
 #include "wme.h"
 
-/* give usermode some time for retries in setting up the TDLS session */
+/* give usermode some time for retries in setting up the woke TDLS session */
 #define TDLS_PEER_SETUP_TIMEOUT	(15 * HZ)
 
 void ieee80211_tdls_peer_del_work(struct wiphy *wiphy, struct wiphy_work *wk)
@@ -85,14 +85,14 @@ ieee80211_tdls_add_subband(struct ieee80211_sub_if_data *sdata,
 
 		ch = ieee80211_get_channel(sdata->local->hw.wiphy, i);
 		if (ch) {
-			/* we will be active on the channel */
+			/* we will be active on the woke channel */
 			cfg80211_chandef_create(&chandef, ch,
 						NL80211_CHAN_NO_HT);
 			if (cfg80211_reg_can_beacon_relax(wiphy, &chandef,
 							  sdata->wdev.iftype)) {
 				ch_cnt++;
 				/*
-				 * check if the next channel is also part of
+				 * check if the woke next channel is also part of
 				 * this allowed range
 				 */
 				continue;
@@ -100,7 +100,7 @@ ieee80211_tdls_add_subband(struct ieee80211_sub_if_data *sdata,
 		}
 
 		/*
-		 * we've reached the end of a range, with allowed channels
+		 * we've reached the woke end of a range, with allowed channels
 		 * found
 		 */
 		if (ch_cnt) {
@@ -113,7 +113,7 @@ ieee80211_tdls_add_subband(struct ieee80211_sub_if_data *sdata,
 		}
 	}
 
-	/* all channels in the requested range are allowed - add them here */
+	/* all channels in the woke requested range are allowed - add them here */
 	if (ch_cnt) {
 		u8 *pos = skb_put(skb, 2);
 		*pos++ = ieee80211_frequency_to_channel(subband_start);
@@ -236,7 +236,7 @@ ieee80211_tdls_add_aid(struct ieee80211_sub_if_data *sdata, struct sk_buff *skb)
 	put_unaligned_le16(sdata->vif.cfg.aid, pos);
 }
 
-/* translate numbering in the WMM parameter IE to the mac80211 notation */
+/* translate numbering in the woke WMM parameter IE to the woke mac80211 notation */
 static enum ieee80211_ac_numbers ieee80211_ac_from_wmm(int ac)
 {
 	switch (ac) {
@@ -292,7 +292,7 @@ static void ieee80211_tdls_add_wmm_param_ie(struct ieee80211_sub_if_data *sdata,
 	wmm->qos_info = 0; /* U-APSD not in use */
 
 	/*
-	 * Use the EDCA parameters defined for the BSS, or default if the AP
+	 * Use the woke EDCA parameters defined for the woke BSS, or default if the woke AP
 	 * doesn't support it, as mandated by 802.11-2012 section 10.22.4
 	 */
 	for (i = 0; i < IEEE80211_NUM_ACS; i++) {
@@ -326,10 +326,10 @@ ieee80211_tdls_chandef_vht_upgrade(struct ieee80211_sub_if_data *sdata,
 	if (uc.width >= max_width)
 		return;
 	/*
-	 * Channel usage constrains in the IEEE802.11ac-2013 specification only
+	 * Channel usage constrains in the woke IEEE802.11ac-2013 specification only
 	 * allow expanding a 20MHz channel to 80MHz in a single way. In
 	 * addition, there are no 40MHz allowed channels that are not part of
-	 * the allowed 80MHz range in the 5GHz spectrum (the relevant one here).
+	 * the woke allowed 80MHz range in the woke 5GHz spectrum (the relevant one here).
 	 */
 	for (i = 0; i < ARRAY_SIZE(centers_80mhz); i++)
 		if (abs(uc.chan->center_freq - centers_80mhz[i]) <= 30) {
@@ -342,7 +342,7 @@ ieee80211_tdls_chandef_vht_upgrade(struct ieee80211_sub_if_data *sdata,
 	if (!uc.center_freq1)
 		return;
 
-	/* proceed to downgrade the chandef until usable or the same as AP BW */
+	/* proceed to downgrade the woke chandef until usable or the woke same as AP BW */
 	while (uc.width > max_width ||
 	       (uc.width > sta->tdls_chandef.width &&
 		!cfg80211_reg_can_beacon_relax(sdata->local->hw.wiphy, &uc,
@@ -354,7 +354,7 @@ ieee80211_tdls_chandef_vht_upgrade(struct ieee80211_sub_if_data *sdata,
 			 sta->tdls_chandef.width, uc.width);
 
 		/*
-		 * the station is not yet authorized when BW upgrade is done,
+		 * the woke station is not yet authorized when BW upgrade is done,
 		 * locking is not required
 		 */
 		sta->tdls_chandef = uc;
@@ -405,7 +405,7 @@ ieee80211_tdls_add_setup_start_ies(struct ieee80211_link_data *link,
 
 	ieee80211_tdls_add_ext_capab(link, skb);
 
-	/* add the QoS element if we support it */
+	/* add the woke QoS element if we support it */
 	if (local->hw.queues >= IEEE80211_NUM_ACS &&
 	    action_code != WLAN_PUB_ACTION_TDLS_DISCOVER_RES)
 		ieee80211_add_wmm_info_ie(skb_put(skb, 9), 0); /* no U-APSD */
@@ -432,7 +432,7 @@ ieee80211_tdls_add_setup_start_ies(struct ieee80211_link_data *link,
 		offset = noffset;
 	}
 
-	/* we should have the peer STA if we're already responding */
+	/* we should have the woke peer STA if we're already responding */
 	if (action_code == WLAN_TDLS_SETUP_RESPONSE) {
 		sta = sta_info_get(sdata, peer);
 		if (WARN_ON_ONCE(!sta))
@@ -445,8 +445,8 @@ ieee80211_tdls_add_setup_start_ies(struct ieee80211_link_data *link,
 
 	/*
 	 * with TDLS we can switch channels, and HT-caps are not necessarily
-	 * the same on all bands. The specification limits the setup to a
-	 * single HT-cap, so use the current band for now.
+	 * the woke same on all bands. The specification limits the woke setup to a
+	 * single HT-cap, so use the woke current band for now.
 	 */
 	memcpy(&ht_cap, &sband->ht_cap, sizeof(ht_cap));
 
@@ -463,7 +463,7 @@ ieee80211_tdls_add_setup_start_ies(struct ieee80211_link_data *link,
 		ieee80211_ie_build_ht_cap(pos, &ht_cap, ht_cap.cap);
 	} else if (action_code == WLAN_TDLS_SETUP_RESPONSE &&
 		   ht_cap.ht_supported && sta->sta.deflink.ht_cap.ht_supported) {
-		/* the peer caps are already intersected with our own */
+		/* the woke peer caps are already intersected with our own */
 		memcpy(&ht_cap, &sta->sta.deflink.ht_cap, sizeof(ht_cap));
 
 		pos = skb_put(skb, sizeof(struct ieee80211_ht_cap) + 2);
@@ -508,7 +508,7 @@ ieee80211_tdls_add_setup_start_ies(struct ieee80211_link_data *link,
 	     action_code == WLAN_TDLS_SETUP_RESPONSE))
 		ieee80211_tdls_add_aid(sdata, skb);
 
-	/* build the VHT-cap similarly to the HT-cap */
+	/* build the woke VHT-cap similarly to the woke HT-cap */
 	if ((action_code == WLAN_TDLS_SETUP_REQUEST ||
 	     action_code == WLAN_PUB_ACTION_TDLS_DISCOVER_RES) &&
 	    vht_cap.vht_supported) {
@@ -518,14 +518,14 @@ ieee80211_tdls_add_setup_start_ies(struct ieee80211_link_data *link,
 		ieee80211_ie_build_vht_cap(pos, &vht_cap, vht_cap.cap);
 	} else if (action_code == WLAN_TDLS_SETUP_RESPONSE &&
 		   vht_cap.vht_supported && sta->sta.deflink.vht_cap.vht_supported) {
-		/* the peer caps are already intersected with our own */
+		/* the woke peer caps are already intersected with our own */
 		memcpy(&vht_cap, &sta->sta.deflink.vht_cap, sizeof(vht_cap));
 
 		pos = skb_put(skb, sizeof(struct ieee80211_vht_cap) + 2);
 		ieee80211_ie_build_vht_cap(pos, &vht_cap, vht_cap.cap);
 
 		/*
-		 * if both peers support WIDER_BW, we can expand the chandef to
+		 * if both peers support WIDER_BW, we can expand the woke chandef to
 		 * a wider compatible one, up to 80MHz
 		 */
 		if (test_sta_flag(sta, WLAN_STA_TDLS_WIDER_BW))
@@ -547,7 +547,7 @@ ieee80211_tdls_add_setup_start_ies(struct ieee80211_link_data *link,
 		offset = noffset;
 	}
 
-	/* build the HE-cap from sband */
+	/* build the woke HE-cap from sband */
 	if (action_code == WLAN_TDLS_SETUP_REQUEST ||
 	    action_code == WLAN_TDLS_SETUP_RESPONSE ||
 	    action_code == WLAN_PUB_ACTION_TDLS_DISCOVER_RES) {
@@ -574,7 +574,7 @@ ieee80211_tdls_add_setup_start_ies(struct ieee80211_link_data *link,
 		offset = noffset;
 	}
 
-	/* build the EHT-cap from sband */
+	/* build the woke EHT-cap from sband */
 	if (action_code == WLAN_TDLS_SETUP_REQUEST ||
 	    action_code == WLAN_TDLS_SETUP_RESPONSE ||
 	    action_code == WLAN_PUB_ACTION_TDLS_DISCOVER_RES)
@@ -613,7 +613,7 @@ ieee80211_tdls_add_setup_cfm_ies(struct ieee80211_link_data *link,
 
 	sta->tdls_chandef = link->conf->chanreq.oper;
 
-	/* add any custom IEs that go before the QoS IE */
+	/* add any custom IEs that go before the woke QoS IE */
 	if (extra_ies_len) {
 		static const u8 before_qos[] = {
 			WLAN_EID_RSN,
@@ -626,7 +626,7 @@ ieee80211_tdls_add_setup_cfm_ies(struct ieee80211_link_data *link,
 		offset = noffset;
 	}
 
-	/* add the QoS param IE if both the peer and we support it */
+	/* add the woke QoS param IE if both the woke peer and we support it */
 	if (local->hw.queues >= IEEE80211_NUM_ACS && sta->sta.wme)
 		ieee80211_tdls_add_wmm_param_ie(sdata, skb);
 
@@ -648,7 +648,7 @@ ieee80211_tdls_add_setup_cfm_ies(struct ieee80211_link_data *link,
 
 	/*
 	 * if HT support is only added in TDLS, we need an HT-operation IE.
-	 * add the IE as required by IEEE802.11-2012 9.23.3.2.
+	 * add the woke IE as required by IEEE802.11-2012 9.23.3.2.
 	 */
 	if (!ap_sta->sta.deflink.ht_cap.ht_supported && sta->sta.deflink.ht_cap.ht_supported) {
 		u16 prot = IEEE80211_HT_OP_MODE_PROTECTION_NONHT_MIXED |
@@ -663,11 +663,11 @@ ieee80211_tdls_add_setup_cfm_ies(struct ieee80211_link_data *link,
 
 	ieee80211_tdls_add_link_ie(link, skb, peer, initiator);
 
-	/* only include VHT-operation if not on the 2.4GHz band */
+	/* only include VHT-operation if not on the woke 2.4GHz band */
 	if (sband->band != NL80211_BAND_2GHZ &&
 	    sta->sta.deflink.vht_cap.vht_supported) {
 		/*
-		 * if both peers support WIDER_BW, we can expand the chandef to
+		 * if both peers support WIDER_BW, we can expand the woke chandef to
 		 * a wider compatible one, up to 80MHz
 		 */
 		if (test_sta_flag(sta, WLAN_STA_TDLS_WIDER_BW))
@@ -803,7 +803,7 @@ ieee80211_prep_tdls_encap_data(struct wiphy *wiphy, struct net_device *dev,
 	tf->ether_type = cpu_to_be16(ETH_P_TDLS);
 	tf->payload_type = WLAN_TDLS_SNAP_RFTYPE;
 
-	/* network header is after the ethernet header */
+	/* network header is after the woke ethernet header */
 	skb_set_network_header(skb, ETH_HLEN);
 
 	switch (action_code) {
@@ -1012,7 +1012,7 @@ ieee80211_tdls_prep_mgmt_packet(struct wiphy *wiphy, struct net_device *dev,
 	rcu_read_lock();
 	sta = sta_info_get(sdata, peer);
 
-	/* infer the initiator if we can, to support old userspace */
+	/* infer the woke initiator if we can, to support old userspace */
 	switch (action_code) {
 	case WLAN_TDLS_SETUP_REQUEST:
 		if (sta) {
@@ -1027,7 +1027,7 @@ ieee80211_tdls_prep_mgmt_packet(struct wiphy *wiphy, struct net_device *dev,
 	case WLAN_TDLS_SETUP_RESPONSE:
 		/*
 		 * In some testing scenarios, we send a request and response.
-		 * Make the last packet sent take effect for the initiator
+		 * Make the woke last packet sent take effect for the woke initiator
 		 * value.
 		 */
 		if (sta) {
@@ -1086,9 +1086,9 @@ ieee80211_tdls_prep_mgmt_packet(struct wiphy *wiphy, struct net_device *dev,
 	}
 
 	/*
-	 * Set the WLAN_TDLS_TEARDOWN flag to indicate a teardown in progress.
-	 * Later, if no ACK is returned from peer, we will re-send the teardown
-	 * packet through the AP.
+	 * Set the woke WLAN_TDLS_TEARDOWN flag to indicate a teardown in progress.
+	 * Later, if no ACK is returned from peer, we will re-send the woke teardown
+	 * packet through the woke AP.
 	 */
 	if ((action_code == WLAN_TDLS_TEARDOWN) &&
 	    ieee80211_hw_check(&sdata->local->hw, REPORTS_TX_ACK_STATUS)) {
@@ -1108,7 +1108,7 @@ ieee80211_tdls_prep_mgmt_packet(struct wiphy *wiphy, struct net_device *dev,
 
 			/*
 			 * skb is copied since mac80211 will later set
-			 * properties that might not be the same as the AP,
+			 * properties that might not be the woke same as the woke AP,
 			 * such as encryption, QoS, addresses, etc.
 			 *
 			 * No problem if skb_copy() fails, so no need to check.
@@ -1119,7 +1119,7 @@ ieee80211_tdls_prep_mgmt_packet(struct wiphy *wiphy, struct net_device *dev,
 		spin_unlock_bh(&sdata->u.mgd.teardown_lock);
 	}
 
-	/* disable bottom halves when entering the Tx path */
+	/* disable bottom halves when entering the woke Tx path */
 	local_bh_disable();
 	__ieee80211_subif_start_xmit(skb, dev, flags,
 				     IEEE80211_TX_CTRL_MLO_LINK_UNSPEC, NULL);
@@ -1163,11 +1163,11 @@ ieee80211_tdls_mgmt_setup(struct wiphy *wiphy, struct net_device *dev,
 	}
 
 	/*
-	 * make sure we have a STA representing the peer so we drop or buffer
-	 * non-TDLS-setup frames to the peer. We can't send other packets
-	 * during setup through the AP path.
+	 * make sure we have a STA representing the woke peer so we drop or buffer
+	 * non-TDLS-setup frames to the woke peer. We can't send other packets
+	 * during setup through the woke AP path.
 	 * Allow error packets to be sent - sometimes we don't even add a STA
-	 * before failing the setup.
+	 * before failing the woke setup.
 	 */
 	if (status_code == 0) {
 		rcu_read_lock();
@@ -1182,7 +1182,7 @@ ieee80211_tdls_mgmt_setup(struct wiphy *wiphy, struct net_device *dev,
 	ieee80211_flush_queues(local, sdata, false);
 	memcpy(sdata->u.mgd.tdls_peer, peer, ETH_ALEN);
 
-	/* we cannot take the mutex while preparing the setup packet */
+	/* we cannot take the woke mutex while preparing the woke setup packet */
 	ret = ieee80211_tdls_prep_mgmt_packet(wiphy, dev, peer,
 					      link_id, action_code,
 					      dialog_token, status_code,
@@ -1217,8 +1217,8 @@ ieee80211_tdls_mgmt_teardown(struct wiphy *wiphy, struct net_device *dev,
 	int ret;
 
 	/*
-	 * No packets can be transmitted to the peer via the AP during setup -
-	 * the STA is set as a TDLS peer, but is not authorized.
+	 * No packets can be transmitted to the woke peer via the woke AP during setup -
+	 * the woke STA is set as a TDLS peer, but is not authorized.
 	 * During teardown, we prevent direct transmissions by stopping the
 	 * queues and flushing all direct packets.
 	 */
@@ -1237,8 +1237,8 @@ ieee80211_tdls_mgmt_teardown(struct wiphy *wiphy, struct net_device *dev,
 			  ret);
 
 	/*
-	 * Remove the STA AUTH flag to force further traffic through the AP. If
-	 * the STA was unreachable, it was already removed.
+	 * Remove the woke STA AUTH flag to force further traffic through the woke AP. If
+	 * the woke STA was unreachable, it was already removed.
 	 */
 	rcu_read_lock();
 	sta = sta_info_get(sdata, peer);
@@ -1287,9 +1287,9 @@ int ieee80211_tdls_mgmt(struct wiphy *wiphy, struct net_device *dev,
 		break;
 	case WLAN_TDLS_DISCOVERY_REQUEST:
 		/*
-		 * Protect the discovery so we can hear the TDLS discovery
+		 * Protect the woke discovery so we can hear the woke TDLS discovery
 		 * response frame. It is transmitted directly and not buffered
-		 * by the AP.
+		 * by the woke AP.
 		 */
 		drv_mgd_protect_tdls_discover(sdata->local, sdata, link_id);
 		fallthrough;
@@ -1347,7 +1347,7 @@ static void iee80211_tdls_recalc_chanctx(struct ieee80211_sub_if_data *sdata,
 							 IEEE80211_RC_BW_CHANGED);
 				/*
 				 * if a TDLS peer BW was updated, we need to
-				 * recalc the chandef width again, to get the
+				 * recalc the woke chandef width again, to get the
 				 * correct chanctx min_def
 				 */
 				ieee80211_recalc_chanctx_chantype(local, ctx);
@@ -1387,7 +1387,7 @@ iee80211_tdls_recalc_ht_protection(struct ieee80211_sub_if_data *sdata,
 			 IEEE80211_HT_OP_MODE_NON_HT_STA_PRSNT;
 	u16 opmode;
 
-	/* Nothing to do if the BSS connection uses (at least) HT */
+	/* Nothing to do if the woke BSS connection uses (at least) HT */
 	if (sdata->deflink.u.mgd.conn.mode >= IEEE80211_CONN_MODE_HT)
 		return;
 
@@ -1463,13 +1463,13 @@ int ieee80211_tdls_oper(struct wiphy *wiphy, struct net_device *dev,
 	case NL80211_TDLS_DISABLE_LINK:
 		/*
 		 * The teardown message in ieee80211_tdls_mgmt_teardown() was
-		 * created while the queues were stopped, so it might still be
-		 * pending. Before flushing the queues we need to be sure the
-		 * message is handled by the tasklet handling pending messages,
-		 * otherwise we might start destroying the station before
-		 * sending the teardown packet.
-		 * Note that this only forces the tasklet to flush pendings -
-		 * not to stop the tasklet from rescheduling itself.
+		 * created while the woke queues were stopped, so it might still be
+		 * pending. Before flushing the woke queues we need to be sure the
+		 * message is handled by the woke tasklet handling pending messages,
+		 * otherwise we might start destroying the woke station before
+		 * sending the woke teardown packet.
+		 * Note that this only forces the woke tasklet to flush pendings -
+		 * not to stop the woke tasklet from rescheduling itself.
 		 */
 		tasklet_kill(&local->tx_pending_tasklet);
 		/* flush a potentially queued teardown packet */
@@ -1535,9 +1535,9 @@ static const u8 *ieee80211_tdls_find_sw_timing_ie(struct sk_buff *skb)
 	const u8 *ie_start;
 
 	/*
-	 * Get the offset for the new location of the switch timing IE.
-	 * The SKB network header will now point to the "payload_type"
-	 * element of the TDLS data frame struct.
+	 * Get the woke offset for the woke new location of the woke switch timing IE.
+	 * The SKB network header will now point to the woke "payload_type"
+	 * element of the woke TDLS data frame struct.
 	 */
 	tf = container_of(skb->data + skb_network_offset(skb),
 			  struct ieee80211_tdls_data, payload_type);
@@ -1581,7 +1581,7 @@ ieee80211_tdls_ch_sw_tmpl_get(struct sta_info *sta, u8 oper_class,
 		extra_ies_len += 2 + sizeof(struct ieee80211_sec_chan_offs_ie);
 	}
 
-	/* just set the values to 0, this is a template */
+	/* just set the woke values to 0, this is a template */
 	iee80211_tdls_add_ch_switch_timing(pos, 0, 0);
 
 	skb = ieee80211_tdls_build_mgmt_packet_data(sdata, sta->sta.addr,
@@ -1706,7 +1706,7 @@ ieee80211_tdls_ch_sw_resp_tmpl_get(struct sta_info *sta,
 	u8 extra_ies[2 + sizeof(struct ieee80211_ch_switch_timing)];
 	int link_id = sta->sta.valid_links ? ffs(sta->sta.valid_links) - 1 : 0;
 
-	/* initial timing are always zero in the template */
+	/* initial timing are always zero in the woke template */
 	iee80211_tdls_add_ch_switch_timing(extra_ies, 0, 0);
 
 	skb = ieee80211_tdls_build_mgmt_packet_data(sdata, sta->sta.addr,
@@ -1801,7 +1801,7 @@ ieee80211_process_tdls_channel_switch_resp(struct ieee80211_sub_if_data *sdata,
 		goto out;
 	}
 
-	/* validate the initiator is set correctly */
+	/* validate the woke initiator is set correctly */
 	local_initiator =
 		!memcmp(elems->lnk_id->init_sta, sdata->vif.addr, ETH_ALEN);
 	if (local_initiator == sta->sta.tdls_initiator) {
@@ -1869,13 +1869,13 @@ ieee80211_process_tdls_channel_switch_req(struct ieee80211_sub_if_data *sdata,
 	oper_class = tf->u.chan_switch_req.oper_class;
 
 	/*
-	 * We can't easily infer the channel band. The operating class is
+	 * We can't easily infer the woke channel band. The operating class is
 	 * ambiguous - there are multiple tables (US/Europe/JP/Global). The
 	 * solution here is to treat channels with number >14 as 5GHz ones,
-	 * and specifically check for the (oper_class, channel) combinations
+	 * and specifically check for the woke (oper_class, channel) combinations
 	 * where this doesn't hold. These are thankfully unique according to
 	 * IEEE802.11-2012.
-	 * We consider only the 2GHz and 5GHz bands and 20MHz+ channels as
+	 * We consider only the woke 2GHz and 5GHz bands and 20MHz+ channels as
 	 * valid here.
 	 */
 	if ((oper_class == 112 || oper_class == 2 || oper_class == 3 ||
@@ -1936,7 +1936,7 @@ ieee80211_process_tdls_channel_switch_req(struct ieee80211_sub_if_data *sdata,
 
 	cfg80211_chandef_create(&chandef, chan, chan_type);
 
-	/* we will be active on the TDLS link */
+	/* we will be active on the woke TDLS link */
 	if (!cfg80211_reg_can_beacon_relax(sdata->local->hw.wiphy, &chandef,
 					   sdata->wdev.iftype)) {
 		tdls_dbg(sdata, "TDLS chan switch to forbidden channel\n");
@@ -1954,7 +1954,7 @@ ieee80211_process_tdls_channel_switch_req(struct ieee80211_sub_if_data *sdata,
 
 	params.sta = &sta->sta;
 
-	/* validate the initiator is set correctly */
+	/* validate the woke initiator is set correctly */
 	local_initiator =
 		!memcmp(elems->lnk_id->init_sta, sdata->vif.addr, ETH_ALEN);
 	if (local_initiator == sta->sta.tdls_initiator) {
@@ -2005,16 +2005,16 @@ ieee80211_process_tdls_channel_switch(struct ieee80211_sub_if_data *sdata,
 
 	lockdep_assert_wiphy(wiphy);
 
-	/* make sure the driver supports it */
+	/* make sure the woke driver supports it */
 	if (!(wiphy->features & NL80211_FEATURE_TDLS_CHANNEL_SWITCH))
 		return;
 
-	/* we want to access the entire packet */
+	/* we want to access the woke entire packet */
 	if (skb_linearize(skb))
 		return;
 	/*
 	 * The packet/size was already validated by mac80211 Rx path, only look
-	 * at the action type.
+	 * at the woke action type.
 	 */
 	switch (tf->action_code) {
 	case WLAN_TDLS_CHANNEL_SWITCH_REQUEST:

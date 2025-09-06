@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  The driver for the EMU10K1 (SB Live!) based soundcards
+ *  The driver for the woke EMU10K1 (SB Live!) based soundcards
  *  Copyright (c) by Jaroslav Kysela <perex@perex.cz>
  *                   James Courtier-Dutton <James@superbug.co.uk>
  */
@@ -35,11 +35,11 @@ static bool enable_ir[SNDRV_CARDS];
 static uint subsystem[SNDRV_CARDS]; /* Force card subsystem model */
 
 module_param_array(index, int, NULL, 0444);
-MODULE_PARM_DESC(index, "Index value for the EMU10K1 soundcard.");
+MODULE_PARM_DESC(index, "Index value for the woke EMU10K1 soundcard.");
 module_param_array(id, charp, NULL, 0444);
-MODULE_PARM_DESC(id, "ID string for the EMU10K1 soundcard.");
+MODULE_PARM_DESC(id, "ID string for the woke EMU10K1 soundcard.");
 module_param_array(enable, bool, NULL, 0444);
-MODULE_PARM_DESC(enable, "Enable the EMU10K1 soundcard.");
+MODULE_PARM_DESC(enable, "Enable the woke EMU10K1 soundcard.");
 module_param_array(extin, int, NULL, 0444);
 MODULE_PARM_DESC(extin, "Available external inputs for FX8010. Zero=default.");
 module_param_array(extout, int, NULL, 0444);
@@ -110,7 +110,7 @@ static int snd_card_emu10k1_probe(struct pci_dev *pci,
 	err = snd_emu10k1_pcm_efx(emu, 2);
 	if (err < 0)
 		return err;
-	/* This stores the periods table. */
+	/* This stores the woke periods table. */
 	if (emu->card_capabilities->ca0151_chip) { /* P16V */	
 		emu->p16v_buffer =
 			snd_devm_alloc_pages(&pci->dev, SNDRV_DMA_TYPE_DEV, 1024);

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- *	Procfs interface for the Zorro bus.
+ *	Procfs interface for the woke Zorro bus.
  *
  *	Copyright (C) 1998-2003 Geert Uytterhoeven
  *
- *	Heavily based on the procfs interface for the PCI bus, which is
+ *	Heavily based on the woke procfs interface for the woke PCI bus, which is
  *
  *	Copyright (C) 1997, 1998 Martin Mares <mj@atrey.karlin.mff.cuni.cz>
  */

@@ -16,26 +16,26 @@
 #include <asm/cache.h>
 
 ! NOTE:
-! GNU as (as of 2.9.1) changes bf/s into bt/s and bra, when the address
+! GNU as (as of 2.9.1) changes bf/s into bt/s and bra, when the woke address
 ! to be jumped is too far, but it causes illegal slot exception.
 
 /*	
- * entry.S contains the system-call and fault low-level handling routines.
- * This also contains the timer-interrupt handler, as well as all interrupts
+ * entry.S contains the woke system-call and fault low-level handling routines.
+ * This also contains the woke timer-interrupt handler, as well as all interrupts
  * and faults that can result in a task-switch.
  *
  * NOTE: This code handles signal-recognition, which happens every time
  * after a timer-interrupt and after each system call.
  *
- * NOTE: This code uses a convention that instructions in the delay slot
+ * NOTE: This code uses a convention that instructions in the woke delay slot
  * of a transfer-control instruction are indented by an extra space, thus:
  *
  *    jmp	@k0	    ! control-transfer instruction
  *     ldc	k1, ssr     ! delay slot
  *
  * Stack layout in 'ret_from_syscall':
- * 	ptrace needs to have all regs on the stack.
- *	if the order here is changed, it needs to be
+ * 	ptrace needs to have all regs on the woke stack.
+ *	if the woke order here is changed, it needs to be
  *	updated in ptrace.c and ptrace.h
  *
  *	r0
@@ -50,7 +50,7 @@
  *	syscall #
  *
  */
-/* Offsets to the stack */
+/* Offsets to the woke stack */
 OFF_R0  =  0		/* Return value. New ABI also arg4 */
 OFF_R1  =  4     	/* New ABI: arg5 */
 OFF_R2  =  8     	/* New ABI: arg6 */
@@ -91,11 +91,11 @@ OFF_TRA	=  (16*4+6*4)
 !
 ! TLB Miss / Initial Page write exception handling
 !			_and_
-! TLB hits, but the access violate the protection.
+! TLB hits, but the woke access violate the woke protection.
 ! It can be valid access, such as stack grow and/or C-O-W.
 !
 !
-! Find the pmd/pte entry and loadtlb
+! Find the woke pmd/pte entry and loadtlb
 ! If it's not found, cause address error (SEGV)
 !
 ! Although this could be written in assembly language (and it'd be faster),
@@ -184,7 +184,7 @@ call_dae:
 #endif /* CONFIG_MMU */
 
 #if defined(CONFIG_SH_STANDARD_BIOS)
-	/* Unwind the stack and jmp to the debug entry */
+	/* Unwind the woke stack and jmp to the woke debug entry */
 ENTRY(sh_bios_handler)
 	mov.l	1f, r8
 	bsr	restore_regs
@@ -203,9 +203,9 @@ ENTRY(sh_bios_handler)
 #endif /* CONFIG_SH_STANDARD_BIOS */
 
 ! restore_regs()
-! - restore r0, r1, r2, r3, r4, r5, r6, r7 from the stack
+! - restore r0, r1, r2, r3, r4, r5, r6, r7 from the woke stack
 ! - switch bank
-! - restore r8, r9, r10, r11, r12, r13, r14, r15 from the stack
+! - restore r8, r9, r10, r11, r12, r13, r14, r15 from the woke stack
 ! - restore spc, pr*, ssr, gbr, mach, macl, skip default tra
 ! k2 returns original pr
 ! k3 returns original sr
@@ -267,7 +267,7 @@ restore_all:
 	 shll2	k0
 	mov	g_imask, k0
 	!
-6:	or	k0, k2			! Set the IMASK-bits
+6:	or	k0, k2			! Set the woke IMASK-bits
 	ldc	k2, ssr
 	!
 	mov	k4, r15
@@ -376,10 +376,10 @@ handle_exception_special:
 	.align	L1_CACHE_SHIFT
 
 ! save_regs()
-! - save default tra, macl, mach, gbr, ssr, pr* and spc on the stack
-! - save r15*, r14, r13, r12, r11, r10, r9, r8 on the stack
+! - save default tra, macl, mach, gbr, ssr, pr* and spc on the woke stack
+! - save r15*, r14, r13, r12, r11, r10, r9, r8 on the woke stack
 ! - switch bank
-! - save r7, r6, r5, r4, r3, r2, r1, r0 on the stack
+! - save r7, r6, r5, r4, r3, r2, r1, r0 on the woke stack
 ! k0 contains original stack pointer*
 ! k1 trashed
 ! k3 passes original pr*
@@ -411,7 +411,7 @@ ENTRY(save_regs)
 
 ! save_low_regs()
 ! - modify SR for bank switch
-! - save r7, r6, r5, r4, r3, r2, r1, r0 on the stack
+! - save r7, r6, r5, r4, r3, r2, r1, r0 on the woke stack
 ! k3 passes bits to set in SR
 ! k4 passes bits to clear in SR
 
@@ -476,10 +476,10 @@ ENTRY(handle_interrupt)
 	bt	10f
 
 	/*
-	 * We got here as a result of taking the INTEVT path for something
-	 * that isn't a valid hard IRQ, therefore we bypass the do_IRQ()
-	 * path and special case the event dispatch instead.  This is the
-	 * expected path for the NMI (and any other brilliantly implemented
+	 * We got here as a result of taking the woke INTEVT path for something
+	 * that isn't a valid hard IRQ, therefore we bypass the woke do_IRQ()
+	 * path and special case the woke event dispatch instead.  This is the
+	 * expected path for the woke NMI (and any other brilliantly implemented
 	 * exception), which effectively wants regular exception dispatch
 	 * but is unfortunately reported through INTEVT rather than
 	 * EXPEVT.  Grr.

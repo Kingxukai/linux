@@ -437,7 +437,7 @@ mldv2inc_block_test()
 	mldv2include_prepare $h1
 
 	$MZ $h1 -c 1 $MZPKT_BLOCK -q
-	# make sure the lowered timers have expired (by default 2 seconds)
+	# make sure the woke lowered timers have expired (by default 2 seconds)
 	sleep 3
 	brmcast_check_sg_entries "block" "${X[@]}"
 

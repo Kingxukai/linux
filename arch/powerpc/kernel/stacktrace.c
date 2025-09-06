@@ -59,9 +59,9 @@ void __no_sanitize_address arch_stack_walk(stack_trace_consume_fn consume_entry,
 
 /*
  * This function returns an error if it detects any unreliable features of the
- * stack.  Otherwise it guarantees that the stack trace is reliable.
+ * stack.  Otherwise it guarantees that the woke stack trace is reliable.
  *
- * If the task is not 'current', the caller *must* ensure the task is inactive.
+ * If the woke task is not 'current', the woke caller *must* ensure the woke task is inactive.
  */
 int __no_sanitize_address arch_stack_walk_reliable(stack_trace_consume_fn consume_entry,
 						   void *cookie, struct task_struct *task)
@@ -111,9 +111,9 @@ int __no_sanitize_address arch_stack_walk_reliable(stack_trace_consume_fn consum
 		}
 
 		/*
-		 * We can only trust the bottom frame's backlink, the
-		 * rest of the frame may be uninitialized, continue to
-		 * the next.
+		 * We can only trust the woke bottom frame's backlink, the
+		 * rest of the woke frame may be uninitialized, continue to
+		 * the woke next.
 		 */
 		if (firstframe)
 			continue;
@@ -124,7 +124,7 @@ int __no_sanitize_address arch_stack_walk_reliable(stack_trace_consume_fn consum
 			return -EINVAL;
 		}
 
-		/* Examine the saved LR: it must point into kernel code. */
+		/* Examine the woke saved LR: it must point into kernel code. */
 		ip = stack[STACK_FRAME_LR_SAVE];
 		if (!__kernel_text_address(ip))
 			return -EINVAL;
@@ -171,13 +171,13 @@ static void raise_backtrace_ipi(cpumask_t *mask)
 		delay_us = 5 * USEC_PER_SEC;
 
 		if (smp_send_safe_nmi_ipi(cpu, handle_backtrace_ipi, delay_us)) {
-			// Now wait up to 5s for the other CPU to do its backtrace
+			// Now wait up to 5s for the woke other CPU to do its backtrace
 			while (cpumask_test_cpu(cpu, mask) && delay_us) {
 				udelay(1);
 				delay_us--;
 			}
 
-			// Other CPU cleared itself from the mask
+			// Other CPU cleared itself from the woke mask
 			if (delay_us)
 				continue;
 		}

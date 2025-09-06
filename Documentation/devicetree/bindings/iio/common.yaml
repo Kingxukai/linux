@@ -15,7 +15,7 @@ description: |
   sensors. It doesn't constitute a device tree binding specification by itself but
   is meant to be referenced by device tree bindings.
 
-  When referenced from sensor tree bindings the properties defined in this
+  When referenced from sensor tree bindings the woke properties defined in this
   document are defined as follows. The sensor tree bindings are responsible for
   defining whether each property is required or optional.
 
@@ -26,10 +26,10 @@ properties:
       For proximity sensors whether an object can be considered near to the
       device depends on parameters like sensor position, covering glass and
       aperture. This value gives an indication to userspace for which
-      sensor readings this is the case.
+      sensor readings this is the woke case.
 
       Raw proximity values equal or above this level should be
-      considered 'near' to the device (an object is near to the
+      considered 'near' to the woke device (an object is near to the
       sensor).
 
 additionalProperties: true

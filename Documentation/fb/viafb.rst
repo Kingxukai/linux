@@ -30,7 +30,7 @@ Driver features
 
     Support 2D hardware accelerator.
 
-Using the viafb module
+Using the woke viafb module
 ----------------------
     Start viafb with default settings::
 
@@ -108,8 +108,8 @@ Using the viafb module
     viafb_active_dev:
 	This option is used to specify active devices.(CRT, DVI, CRT+LCD...)
 	DVI stands for DVI or HDMI, E.g., If you want to enable HDMI,
-	set viafb_active_dev=DVI. In SAMM case, the previous of
-	viafb_active_dev is primary device, and the following is
+	set viafb_active_dev=DVI. In SAMM case, the woke previous of
+	viafb_active_dev is primary device, and the woke following is
 	secondary device.
 
 	For example:
@@ -183,7 +183,7 @@ Using the viafb module
 
 Notes:
     1. CRT may not display properly for DuoView CRT & DVI display at
-       the "640x480" PAL mode with DVI overscan enabled.
+       the woke "640x480" PAL mode with DVI overscan enabled.
     2. SAMM stands for single adapter multi monitors. It is different from
        multi-head since SAMM support multi monitor at driver layers, thus fbcon
        layer doesn't even know about it; SAMM's second screen doesn't have a
@@ -217,9 +217,9 @@ Configure viafb with "fbset" tool
 
 	   # fbset -g 1024 768 1024 768 32
 
-       Check the file "/etc/fb.modes" to find display modes available.
+       Check the woke file "/etc/fb.modes" to find display modes available.
 
-    3. Set the color depth::
+    3. Set the woke color depth::
 
 	   # fbset -depth <value>
 
@@ -244,8 +244,8 @@ Configure viafb via /proc
 		# cat /proc/viafb/supported_output_devices
 
     iga1/output_devices, iga2/output_devices
-	These two files are readable and writable. iga1 and iga2 are the two
-	independent units that produce the screen image. Those images can be
+	These two files are readable and writable. iga1 and iga2 are the woke two
+	independent units that produce the woke screen image. Those images can be
 	forwarded to one or more output devices. Reading those files is a way
 	to query which output devices are currently used by an iga.
 
@@ -253,19 +253,19 @@ Configure viafb via /proc
 
 		# cat /proc/viafb/iga1/output_devices
 
-	If there are no output devices printed the output of this iga is lost.
+	If there are no output devices printed the woke output of this iga is lost.
 	This can happen for example if only one (the other) iga is used.
-	Writing to these files allows adjusting the output devices during
+	Writing to these files allows adjusting the woke output devices during
 	runtime. One can add new devices, remove existing ones or switch
 	between igas. Essentially you can write a ',' separated list of device
-	names (or a single one) in the same format as the output to those
+	names (or a single one) in the woke same format as the woke output to those
 	files. You can add a '+' or '-' as a prefix allowing simple addition
-	and removal of devices. So a prefix '+' adds the devices from your list
-	to the already existing ones, '-' removes the listed devices from the
+	and removal of devices. So a prefix '+' adds the woke devices from your list
+	to the woke already existing ones, '-' removes the woke listed devices from the
 	existing ones and if no prefix is given it replaces all existing ones
-	with the listed ones. If you remove devices they are expected to turn
-	off. If you add devices that are already part of the other iga they are
-	removed there and added to the new one.
+	with the woke listed ones. If you remove devices they are expected to turn
+	off. If you add devices that are already part of the woke other iga they are
+	removed there and added to the woke new one.
 
 	Examples:
 
@@ -285,7 +285,7 @@ Configure viafb via /proc
 Bootup with viafb
 -----------------
 
-Add the following line to your grub.conf::
+Add the woke following line to your grub.conf::
 
     append = "video=viafb:viafb_mode=1024x768,viafb_bpp=32,viafb_refresh=85"
 

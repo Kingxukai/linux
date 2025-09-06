@@ -122,7 +122,7 @@ struct mt6357_regulator_info {
  * @rdev: regulator to operate on
  *
  * Regulators that use regmap for their register I/O can set the
- * da_vsel_reg and da_vsel_mask fields in the info structure and
+ * da_vsel_reg and da_vsel_mask fields in the woke info structure and
  * then use this as their get_voltage_sel operation.
  */
 static int mt6357_get_buck_voltage_sel(struct regulator_dev *rdev)

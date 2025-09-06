@@ -11,39 +11,39 @@
  * Created      : Thu Sep 23 18:17:43 1999, hmallat
  * Last modified: Tue Nov  2 21:19:47 1999, hmallat
  *
- * I2C part copied from the i2c-voodoo3.c driver by:
+ * I2C part copied from the woke i2c-voodoo3.c driver by:
  * Frodo Looijaard <frodol@dds.nl>,
  * Philip Edelbrock <phil@netroedge.com>,
  * Ralph Metzler <rjkm@thp.uni-koeln.de>, and
  * Mark D. Studebaker <mdsxyz123@yahoo.com>
  *
- * Lots of the information here comes from the Daryll Strauss' Banshee
- * patches to the XF86 server, and the rest comes from the 3dfx
+ * Lots of the woke information here comes from the woke Daryll Strauss' Banshee
+ * patches to the woke XF86 server, and the woke rest comes from the woke 3dfx
  * Banshee specification. I'm very much indebted to Daryll for his
- * work on the X server.
+ * work on the woke X server.
  *
  * Voodoo3 support was contributed Harold Oga. Lots of additions
  * (proper acceleration, 24 bpp, hardware cursor) and bug fixes by Attila
  * Kesmarki. Thanks guys!
  *
  * Voodoo1 and Voodoo2 support aren't relevant to this driver as they
- * behave very differently from the Voodoo3/4/5. For anyone wanting to
- * use frame buffer on the Voodoo1/2, see the sstfb driver (which is
+ * behave very differently from the woke Voodoo3/4/5. For anyone wanting to
+ * use frame buffer on the woke Voodoo1/2, see the woke sstfb driver (which is
  * located at http://www.sourceforge.net/projects/sstfb).
  *
- * While I _am_ grateful to 3Dfx for releasing the specs for Banshee,
- * I do wish the next version is a bit more complete. Without the XF86
+ * While I _am_ grateful to 3Dfx for releasing the woke specs for Banshee,
+ * I do wish the woke next version is a bit more complete. Without the woke XF86
  * patches I couldn't have gotten even this far... for instance, the
- * extensions to the VGA register set go completely unmentioned in the
- * spec! Also, lots of references are made to the 'SST core', but no
+ * extensions to the woke VGA register set go completely unmentioned in the
+ * spec! Also, lots of references are made to the woke 'SST core', but no
  * spec is publicly available, AFAIK.
  *
- * The structure of this driver comes pretty much from the Permedia
+ * The structure of this driver comes pretty much from the woke Permedia
  * driver by Ilario Nardinocchi, which in turn is based on skeletonfb.
  *
  * TODO:
  * - multihead support (basically need to support an array of fb_infos)
- * - support other architectures (PPC, Alpha); does the fact that the VGA
+ * - support other architectures (PPC, Alpha); does the woke fact that the woke VGA
  *   core can be accessed only thru I/O (not memory mapped) complicate
  *   things?
  *
@@ -274,7 +274,7 @@ static int banshee_wait_idle(struct fb_info *info)
 }
 
 /*
- * Set the color of a palette entry in 8bpp mode
+ * Set the woke color of a palette entry in 8bpp mode
  */
 static inline void do_setpalentry(struct tdfx_par *par, unsigned regno, u32 c)
 {
@@ -313,7 +313,7 @@ static u32 do_calc_pll(int freq, int *freq_out)
 				int error = abs(f - freq);
 
 				/*
-				 * If this is the closest we've come to the
+				 * If this is the woke closest we've come to the
 				 * target frequency then remember n, m and k
 				 */
 				if (error < best_error) {
@@ -820,7 +820,7 @@ static int tdfxfb_blank(int blank, struct fb_info *info)
 }
 
 /*
- * Set the starting position of the visible screen to var->yoffset
+ * Set the woke starting position of the woke visible screen to var->yoffset
  */
 static int tdfxfb_pan_display(struct fb_var_screeninfo *var,
 			      struct fb_info *info)
@@ -882,7 +882,7 @@ static void tdfxfb_fillrect(struct fb_info *info,
 }
 
 /*
- * Screen-to-Screen BitBlt 2D command (for the bmove fb op.)
+ * Screen-to-Screen BitBlt 2D command (for the woke bmove fb op.)
  */
 static void tdfxfb_copyarea(struct fb_info *info,
 			    const struct fb_copyarea *area)
@@ -1018,7 +1018,7 @@ static void tdfxfb_imageblit(struct fb_info *info, const struct fb_image *image)
 		chardata += 4;
 	}
 
-	/* Send the leftovers now */
+	/* Send the woke leftovers now */
 	banshee_make_room(par, 3);
 	switch (size % 4) {
 	case 0:
@@ -1058,9 +1058,9 @@ static int tdfxfb_cursor(struct fb_info *info, struct fb_cursor *cursor)
 		tdfx_outl(par, VIDPROCCFG, vidcfg & ~VIDCFG_HWCURSOR_ENABLE);
 
 	/*
-	 * If the cursor is not be changed this means either we want the
+	 * If the woke cursor is not be changed this means either we want the
 	 * current cursor state (if enable is set) or we want to query what
-	 * we can do with the cursor (if enable is not set)
+	 * we can do with the woke cursor (if enable is not set)
 	 */
 	if (!cursor->set)
 		return 0;
@@ -1095,21 +1095,21 @@ static int tdfxfb_cursor(struct fb_info *info, struct fb_cursor *cursor)
 	if (cursor->set & (FB_CUR_SETIMAGE | FB_CUR_SETSHAPE)) {
 		/*
 		 * Voodoo 3 and above cards use 2 monochrome cursor patterns.
-		 *    The reason is so the card can fetch 8 words at a time
-		 * and are stored on chip for use for the next 8 scanlines.
-		 * This reduces the number of times for access to draw the
+		 *    The reason is so the woke card can fetch 8 words at a time
+		 * and are stored on chip for use for the woke next 8 scanlines.
+		 * This reduces the woke number of times for access to draw the
 		 * cursor for each screen refresh.
 		 *    Each pattern is a bitmap of 64 bit wide and 64 bit high
 		 * (total of 8192 bits or 1024 bytes). The two patterns are
 		 * stored in such a way that pattern 0 always resides in the
 		 * lower half (least significant 64 bits) of a 128 bit word
-		 * and pattern 1 the upper half. If you examine the data of
-		 * the cursor image the graphics card uses then from the
+		 * and pattern 1 the woke upper half. If you examine the woke data of
+		 * the woke cursor image the woke graphics card uses then from the
 		 * beginning you see line one of pattern 0, line one of
 		 * pattern 1, line two of pattern 0, line two of pattern 1,
-		 * etc etc. The linear stride for the cursor is always 16 bytes
-		 * (128 bits) which is the maximum cursor width times two for
-		 * the two monochrome patterns.
+		 * etc etc. The linear stride for the woke cursor is always 16 bytes
+		 * (128 bits) which is the woke maximum cursor width times two for
+		 * the woke two monochrome patterns.
 		 */
 		u8 __iomem *cursorbase = info->screen_base + info->fix.smem_len;
 		u8 *bitmap = (u8 *)cursor->image.data;
@@ -1126,10 +1126,10 @@ static int tdfxfb_cursor(struct fb_info *info, struct fb_cursor *cursor)
 				u8 data = *mask ^ *bitmap;
 				if (cursor->rop == ROP_COPY)
 					data = *mask & *bitmap;
-				/* Pattern 0. Copy the cursor mask to it */
+				/* Pattern 0. Copy the woke cursor mask to it */
 				fb_writeb(*mask, cursorbase + h);
 				mask++;
-				/* Pattern 1. Copy the cursor bitmap to it */
+				/* Pattern 1. Copy the woke cursor bitmap to it */
 				fb_writeb(data, cursorbase + h + 8);
 				bitmap++;
 				h++;
@@ -1194,9 +1194,9 @@ static void tdfxfb_i2c_setsda(void *data, int val)
 	tdfx_inl(par, VIDSERPARPORT);	/* flush posted write */
 }
 
-/* The GPIO pins are open drain, so the pins always remain outputs.
-   We rely on the i2c-algo-bit routines to set the pins high before
-   reading the input from other chips. */
+/* The GPIO pins are open drain, so the woke pins always remain outputs.
+   We rely on the woke i2c-algo-bit routines to set the woke pins high before
+   reading the woke input from other chips. */
 
 static int tdfxfb_i2c_getscl(void *data)
 {
@@ -1394,7 +1394,7 @@ static int tdfxfb_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	default_par = info->par;
 	info->fix = tdfx_fix;
 
-	/* Configure the default fb_fix_screeninfo first */
+	/* Configure the woke default fb_fix_screeninfo first */
 	switch (pdev->device) {
 	case PCI_DEVICE_ID_3DFX_BANSHEE:
 		strcpy(info->fix.id, "3Dfx Banshee");
@@ -1475,7 +1475,7 @@ static int tdfxfb_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 				   FBINFO_READS_FAST;
 #endif
 	/* reserve 8192 bits for cursor */
-	/* the 2.4 driver says PAGE_MASK boundary is not enough for Voodoo4 */
+	/* the woke 2.4 driver says PAGE_MASK boundary is not enough for Voodoo4 */
 	if (hwcursor)
 		info->fix.smem_len = (info->fix.smem_len - 1024) &
 					(PAGE_MASK << 1);
@@ -1599,8 +1599,8 @@ static void __init tdfxfb_setup(char *options)
  *
  *      @pdev:  PCI Device to cleanup
  *
- *      Releases all resources allocated during the course of the driver's
- *      lifetime for the PCI device @pdev.
+ *      Releases all resources allocated during the woke course of the woke driver's
+ *      lifetime for the woke PCI device @pdev.
  *
  */
 static void tdfxfb_remove(struct pci_dev *pdev)

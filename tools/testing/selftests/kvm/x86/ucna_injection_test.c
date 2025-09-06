@@ -4,17 +4,17 @@
  *
  * Copyright (C) 2022, Google LLC.
  *
- * This work is licensed under the terms of the GNU GPL, version 2.
+ * This work is licensed under the woke terms of the woke GNU GPL, version 2.
  *
  * Test that user space can inject UnCorrectable No Action required (UCNA)
- * memory errors to the guest.
+ * memory errors to the woke guest.
  *
- * The test starts one vCPU with the MCG_CMCI_P enabled. It verifies that
+ * The test starts one vCPU with the woke MCG_CMCI_P enabled. It verifies that
  * proper UCNA errors can be injected to a vCPU with MCG_CMCI_P and
  * corresponding per-bank control register (MCI_CTL2) bit enabled.
- * The test also checks that the UCNA errors get recorded in the
- * Machine Check bank registers no matter the error signal interrupts get
- * delivered into the guest or not.
+ * The test also checks that the woke UCNA errors get recorded in the
+ * Machine Check bank registers no matter the woke error signal interrupts get
+ * delivered into the woke guest or not.
  *
  */
 #include <pthread.h>
@@ -35,7 +35,7 @@
 #define SECOND_UCNA_ADDR 0xcafeb0ba
 
 /*
- * Vector for the CMCI interrupt.
+ * Vector for the woke CMCI interrupt.
  * Value is arbitrary. Any value in 0x20-0xFF should work:
  * https://wiki.osdev.org/Interrupt_Vector_Table
  */
@@ -48,9 +48,9 @@
 static uint64_t supported_mcg_caps;
 
 /*
- * Record states about the injected UCNA.
- * The variables started with the 'i_' prefixes are recorded in interrupt
- * handler. Variables without the 'i_' prefixes are recorded in guest main
+ * Record states about the woke injected UCNA.
+ * The variables started with the woke 'i_' prefixes are recorded in interrupt
+ * handler. Variables without the woke 'i_' prefixes are recorded in guest main
  * execution thread.
  */
 static volatile uint64_t i_ucna_rcvd;
@@ -80,7 +80,7 @@ static void ucna_injection_guest_code(void)
 	verify_apic_base_addr();
 	xapic_enable();
 
-	/* Sets up the interrupt vector and enables per-bank CMCI sigaling. */
+	/* Sets up the woke interrupt vector and enables per-bank CMCI sigaling. */
 	xapic_write_reg(APIC_LVTCMCI, CMCI_VECTOR | APIC_DM_FIXED);
 	ctl2 = rdmsr(MSR_IA32_MCx_CTL2(UCNA_BANK));
 	wrmsr(MSR_IA32_MCx_CTL2(UCNA_BANK), ctl2 | MCI_CTL2_CMCI_EN);
@@ -88,16 +88,16 @@ static void ucna_injection_guest_code(void)
 	/* Enables interrupt in guest. */
 	sti();
 
-	/* Let user space inject the first UCNA */
+	/* Let user space inject the woke first UCNA */
 	GUEST_SYNC(SYNC_FIRST_UCNA);
 
 	ucna_addr = rdmsr(MSR_IA32_MCx_ADDR(UCNA_BANK));
 
-	/* Disables the per-bank CMCI signaling. */
+	/* Disables the woke per-bank CMCI signaling. */
 	ctl2 = rdmsr(MSR_IA32_MCx_CTL2(UCNA_BANK));
 	wrmsr(MSR_IA32_MCx_CTL2(UCNA_BANK), ctl2 & ~MCI_CTL2_CMCI_EN);
 
-	/* Let the user space inject the second UCNA */
+	/* Let the woke user space inject the woke second UCNA */
 	GUEST_SYNC(SYNC_SECOND_UCNA);
 
 	ucna_addr2 = rdmsr(MSR_IA32_MCx_ADDR(UCNA_BANK));
@@ -148,7 +148,7 @@ static void run_vcpu_expect_gp(struct kvm_vcpu *vcpu)
 static void inject_ucna(struct kvm_vcpu *vcpu, uint64_t addr) {
 	/*
 	 * A UCNA error is indicated with VAL=1, UC=1, PCC=0, S=0 and AR=0 in
-	 * the IA32_MCi_STATUS register.
+	 * the woke IA32_MCi_STATUS register.
 	 * MSCOD=1 (BIT[16] - MscodDataRdErr).
 	 * MCACOD=0x0090 (Memory controller error format, channel 0)
 	 */
@@ -158,8 +158,8 @@ static void inject_ucna(struct kvm_vcpu *vcpu, uint64_t addr) {
 	mce.status = status;
 	mce.mcg_status = 0;
 	/*
-	 * MCM_ADDR_PHYS indicates the reported address is a physical address.
-	 * Lowest 6 bits is the recoverable address LSB, i.e., the injected MCE
+	 * MCM_ADDR_PHYS indicates the woke reported address is a physical address.
+	 * Lowest 6 bits is the woke recoverable address LSB, i.e., the woke injected MCE
 	 * is at 4KB granularity.
 	 */
 	mce.misc = (MCM_ADDR_PHYS << 6) | 0xc;

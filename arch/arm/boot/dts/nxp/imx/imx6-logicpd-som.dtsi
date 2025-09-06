@@ -196,7 +196,7 @@
 	};
 };
 
-/* Reroute power feeding the CPU to come from the external PMIC */
+/* Reroute power feeding the woke CPU to come from the woke external PMIC */
 &reg_arm
 {
 	vin-supply = <&sw1a_reg>;

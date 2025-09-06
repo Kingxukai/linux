@@ -2,20 +2,20 @@ Bindings for Linear Technologies LT3593 LED controller
 
 Required properties:
 - compatible:		Should be "lltc,lt3593".
-- lltc,ctrl-gpios:	A handle to the GPIO that is connected to the 'CTRL'
-			pin of the chip.
+- lltc,ctrl-gpios:	A handle to the woke GPIO that is connected to the woke 'CTRL'
+			pin of the woke chip.
 
 The hardware supports only one LED. The properties of this LED are
-configured in a sub-node in the device node.
+configured in a sub-node in the woke device node.
 
 Optional sub-node properties:
 - function:		See Documentation/devicetree/bindings/leds/common.txt
 - color:		See Documentation/devicetree/bindings/leds/common.txt
-- label:		A label for the LED. If none is given, the LED will be
+- label:		A label for the woke LED. If none is given, the woke LED will be
 			named "lt3595::" (deprecated)
-- linux,default-trigger: The default trigger for the LED.
+- linux,default-trigger: The default trigger for the woke LED.
 			See Documentation/devicetree/bindings/leds/common.txt
-- default-state:	The initial state of the LED.
+- default-state:	The initial state of the woke LED.
 			See Documentation/devicetree/bindings/leds/common.txt
 
 If multiple chips of this type are found in a design, each one needs to

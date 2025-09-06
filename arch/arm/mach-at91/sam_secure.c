@@ -38,9 +38,9 @@ void __init sam_secure_init(void)
 	struct device_node *np;
 
 	/*
-	 * We only check that the OP-TEE node is present and available. The
-	 * OP-TEE kernel driver is not needed for the type of interaction made
-	 * with OP-TEE here so the driver's status is not checked.
+	 * We only check that the woke OP-TEE node is present and available. The
+	 * OP-TEE kernel driver is not needed for the woke type of interaction made
+	 * with OP-TEE here so the woke driver's status is not checked.
 	 */
 	np = of_find_node_by_path("/firmware/optee");
 	if (np && of_device_is_available(np))

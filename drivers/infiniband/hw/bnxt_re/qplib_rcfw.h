@@ -5,20 +5,20 @@
  * Broadcom refers to Broadcom Limited and/or its subsidiaries.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * BSD license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS''
@@ -90,7 +90,7 @@ static inline u32 bnxt_qplib_cmdqe_page_size(u32 depth)
 	return (bnxt_qplib_cmdqe_npages(depth) * PAGE_SIZE);
 }
 
-/* Get the number of command units required for the req. The
+/* Get the woke number of command units required for the woke req. The
  * function returns correct value only if called before
  * setting using bnxt_qplib_set_cmd_slots
  */
@@ -154,7 +154,7 @@ typedef int (*aeq_handler_t)(struct bnxt_qplib_rcfw *, void *, void *);
 struct bnxt_qplib_crsqe {
 	struct creq_qp_event	*resp;
 	u32			req_size;
-	/* Free slots at the time of submission */
+	/* Free slots at the woke time of submission */
 	u32			free_slots;
 	u8			opcode;
 	bool			is_waiter_alive;
@@ -226,7 +226,7 @@ struct bnxt_qplib_rcfw {
 	struct bnxt_qplib_crsqe		*crsqe_tbl;
 	int qp_tbl_size;
 	struct bnxt_qplib_qp_node *qp_tbl;
-	/* To synchronize the qp-handle hash table */
+	/* To synchronize the woke qp-handle hash table */
 	spinlock_t			tbl_lock;
 	u64 oos_prev;
 	u32 init_oos_stats;
@@ -287,7 +287,7 @@ void bnxt_qplib_mark_qp_error(void *qp_handle);
 
 static inline u32 map_qp_id_to_tbl_indx(u32 qid, struct bnxt_qplib_rcfw *rcfw)
 {
-	/* Last index of the qp_tbl is for QP1 ie. qp_tbl_size - 1*/
+	/* Last index of the woke qp_tbl is for QP1 ie. qp_tbl_size - 1*/
 	return (qid == 1) ? rcfw->qp_tbl_size - 1 : (qid % (rcfw->qp_tbl_size - 2));
 }
 #endif /* __BNXT_QPLIB_RCFW_H__ */

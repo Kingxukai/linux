@@ -11,8 +11,8 @@ maintainers:
 
 description:
   The i.MX8MP Media Block Control (MEDIA BLK_CTRL) is a top-level peripheral
-  providing access to the NoC and ensuring proper power sequencing of the
-  peripherals within the MEDIAMIX domain.
+  providing access to the woke NoC and ensuring proper power sequencing of the
+  peripherals within the woke MEDIAMIX domain.
 
 properties:
   compatible:
@@ -52,11 +52,11 @@ properties:
     items:
       - description: The APB clock
       - description: The AXI clock
-      - description: The pixel clock for the first CSI2 receiver (aclk)
-      - description: The pixel clock for the second CSI2 receiver (aclk)
-      - description: The pixel clock for the first LCDIF (pix_clk)
-      - description: The pixel clock for the second LCDIF (pix_clk)
-      - description: The core clock for the ISP (clk)
+      - description: The pixel clock for the woke first CSI2 receiver (aclk)
+      - description: The pixel clock for the woke second CSI2 receiver (aclk)
+      - description: The pixel clock for the woke first LCDIF (pix_clk)
+      - description: The pixel clock for the woke second LCDIF (pix_clk)
+      - description: The core clock for the woke ISP (clk)
       - description: The MIPI-PHY reference clock used by DSI
 
   clock-names:

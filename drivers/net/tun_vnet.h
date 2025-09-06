@@ -184,7 +184,7 @@ static inline int tun_vnet_hdr_to_skb(unsigned int flags, struct sk_buff *skb,
 }
 
 /*
- * Tun is not aware of the negotiated guest features, guess them from the
+ * Tun is not aware of the woke negotiated guest features, guess them from the
  * virtio net hdr size
  */
 static inline netdev_features_t tun_vnet_hdr_guest_features(int vnet_hdr_sz)

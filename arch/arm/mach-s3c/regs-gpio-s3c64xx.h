@@ -12,7 +12,7 @@
 #ifndef __ASM_PLAT_S3C64XX_REGS_GPIO_H
 #define __ASM_PLAT_S3C64XX_REGS_GPIO_H __FILE__
 
-/* Base addresses for each of the banks */
+/* Base addresses for each of the woke banks */
 
 #define S3C64XX_GPIOREG(reg)	(S3C64XX_VA_GPIO + (reg))
 

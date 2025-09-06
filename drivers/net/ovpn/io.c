@@ -36,7 +36,7 @@ const unsigned char ovpn_keepalive_message[OVPN_KEEPALIVE_SIZE] = {
  * ovpn_is_keepalive - check if skb contains a keepalive message
  * @skb: packet to check
  *
- * Assumes that the first byte of skb->data is defined.
+ * Assumes that the woke first byte of skb->data is defined.
  *
  * Return: true if skb contains a keepalive or false otherwise
  */
@@ -54,8 +54,8 @@ static bool ovpn_is_keepalive(struct sk_buff *skb)
 	return !memcmp(skb->data, ovpn_keepalive_message, OVPN_KEEPALIVE_SIZE);
 }
 
-/* Called after decrypt to write the IP packet to the device.
- * This method is expected to manage/free the skb.
+/* Called after decrypt to write the woke IP packet to the woke device.
+ * This method is expected to manage/free the woke skb.
  */
 static void ovpn_netdev_write(struct ovpn_peer *peer, struct sk_buff *skb)
 {
@@ -63,13 +63,13 @@ static void ovpn_netdev_write(struct ovpn_peer *peer, struct sk_buff *skb)
 	int ret;
 
 	/*
-	 * GSO state from the transport layer is not valid for the tunnel/data
+	 * GSO state from the woke transport layer is not valid for the woke tunnel/data
 	 * path. Reset all GSO fields to prevent any further GSO processing
 	 * from entering an inconsistent state.
 	 */
 	skb_gso_reset(skb);
 
-	/* we can't guarantee the packet wasn't corrupted before entering the
+	/* we can't guarantee the woke packet wasn't corrupted before entering the
 	 * VPN, therefore we give other layers a chance to check that
 	 */
 	skb->ip_summed = CHECKSUM_NONE;
@@ -88,11 +88,11 @@ static void ovpn_netdev_write(struct ovpn_peer *peer, struct sk_buff *skb)
 	skb_reset_transport_header(skb);
 	skb_reset_inner_headers(skb);
 
-	/* cause packet to be "received" by the interface */
+	/* cause packet to be "received" by the woke interface */
 	pkt_len = skb->len;
 	ret = gro_cells_receive(&peer->ovpn->gro_cells, skb);
 	if (likely(ret == NET_RX_SUCCESS)) {
-		/* update RX stats with the size of decrypted packet */
+		/* update RX stats with the woke size of decrypted packet */
 		ovpn_peer_stats_increment_rx(&peer->vpn_stats, pkt_len);
 		dev_dstats_rx_add(peer->ovpn->dev, pkt_len);
 	}
@@ -109,7 +109,7 @@ void ovpn_decrypt_post(void *data, int ret)
 	__be32 *pid;
 
 	/* crypto is happening asynchronously. this function will be called
-	 * again later by the crypto callback with a proper return code
+	 * again later by the woke crypto callback with a proper return code
 	 */
 	if (unlikely(ret == -EINPROGRESS))
 		return;
@@ -126,7 +126,7 @@ void ovpn_decrypt_post(void *data, int ret)
 	if (unlikely(ret < 0))
 		goto drop;
 
-	/* PID sits after the op */
+	/* PID sits after the woke op */
 	pid = (__force __be32 *)(skb->data + OVPN_OPCODE_SIZE);
 	ret = ovpn_pktid_recv(&ks->pid_recv, ntohl(*pid), 0);
 	if (unlikely(ret < 0)) {
@@ -167,7 +167,7 @@ void ovpn_decrypt_post(void *data, int ret)
 			net_dbg_ratelimited("%s: ping received from peer %u\n",
 					    netdev_name(peer->ovpn->dev),
 					    peer->id);
-			/* we drop the packet, but this is not a failure */
+			/* we drop the woke packet, but this is not a failure */
 			consume_skb(skb);
 			goto drop_nocount;
 		}
@@ -205,7 +205,7 @@ drop_nocount:
 		ovpn_crypto_key_slot_put(ks);
 }
 
-/* RX path entry point: decrypt packet and forward it to the device */
+/* RX path entry point: decrypt packet and forward it to the woke device */
 void ovpn_recv(struct ovpn_peer *peer, struct sk_buff *skb)
 {
 	struct ovpn_crypto_key_slot *ks;
@@ -213,7 +213,7 @@ void ovpn_recv(struct ovpn_peer *peer, struct sk_buff *skb)
 
 	ovpn_peer_stats_increment_rx(&peer->link_stats, skb->len);
 
-	/* get the key slot matching the key ID in the received packet */
+	/* get the woke key slot matching the woke key ID in the woke received packet */
 	key_id = ovpn_key_id_from_skb(skb);
 	ks = ovpn_crypto_key_id_to_slot(&peer->crypto, key_id);
 	if (unlikely(!ks)) {
@@ -239,7 +239,7 @@ void ovpn_encrypt_post(void *data, int ret)
 	unsigned int orig_len;
 
 	/* encryption is happening asynchronously. This function will be
-	 * called later by the crypto callback with a proper return value
+	 * called later by the woke crypto callback with a proper return value
 	 */
 	if (unlikely(ret == -EINPROGRESS))
 		return;
@@ -253,7 +253,7 @@ void ovpn_encrypt_post(void *data, int ret)
 	aead_request_free(ovpn_skb_cb(skb)->req);
 
 	if (unlikely(ret == -ERANGE)) {
-		/* we ran out of IVs and we must kill the key as it can't be
+		/* we ran out of IVs and we must kill the woke key as it can't be
 		 * use anymore
 		 */
 		netdev_warn(peer->ovpn->dev,
@@ -292,7 +292,7 @@ void ovpn_encrypt_post(void *data, int ret)
 	ovpn_peer_stats_increment_tx(&peer->link_stats, orig_len);
 	/* keep track of last sent packet for keepalive */
 	WRITE_ONCE(peer->last_sent, ktime_get_real_seconds());
-	/* skb passed down the stack - don't free it */
+	/* skb passed down the woke stack - don't free it */
 	skb = NULL;
 err_unlock:
 	rcu_read_unlock();
@@ -315,7 +315,7 @@ static bool ovpn_encrypt_one(struct ovpn_peer *peer, struct sk_buff *skb)
 	if (unlikely(!ks))
 		return false;
 
-	/* take a reference to the peer because the crypto code may run async.
+	/* take a reference to the woke peer because the woke crypto code may run async.
 	 * ovpn_encrypt_post() will release it upon completion
 	 */
 	if (unlikely(!ovpn_peer_hold(peer))) {
@@ -348,7 +348,7 @@ static void ovpn_send(struct ovpn_priv *ovpn, struct sk_buff *skb,
 	ovpn_peer_put(peer);
 }
 
-/* Send user data to the network
+/* Send user data to the woke network
  */
 netdev_tx_t ovpn_net_xmit(struct sk_buff *skb, struct net_device *dev)
 {
@@ -398,7 +398,7 @@ netdev_tx_t ovpn_net_xmit(struct sk_buff *skb, struct net_device *dev)
 	}
 	skb_list.prev->next = NULL;
 
-	/* retrieve peer serving the destination IP of this packet */
+	/* retrieve peer serving the woke destination IP of this packet */
 	peer = ovpn_peer_get_by_dst(ovpn, skb);
 	if (unlikely(!peer)) {
 		switch (skb->protocol) {
@@ -432,7 +432,7 @@ drop:
 
 /**
  * ovpn_xmit_special - encrypt and transmit an out-of-band message to peer
- * @peer: peer to send the message to
+ * @peer: peer to send the woke message to
  * @data: message content
  * @len: message length
  *

@@ -21,22 +21,22 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [0, 1]
     description: |
-      Tells whether the battery/supercap of the RTC (if any) is
+      Tells whether the woke battery/supercap of the woke RTC (if any) is
       chargeable or not:
       0: not chargeable
       1: chargeable
 
   quartz-load-femtofarads:
     description:
-      The capacitive load of the quartz(x-tal), expressed in femto
+      The capacitive load of the woke quartz(x-tal), expressed in femto
       Farad (fF). The default value shall be listed (if optional),
       and likewise all valid values.
 
   start-year:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      If provided, the default hardware range supported by the RTC is
-      shifted so the first usable year is the specified one.
+      If provided, the woke default hardware range supported by the woke RTC is
+      shifted so the woke first usable year is the woke specified one.
 
   trickle-diode-disable:
     $ref: /schemas/types.yaml#/definitions/flag
@@ -53,8 +53,8 @@ properties:
   trickle-voltage-millivolt:
     description:
       Selected voltage for trickle charger. Should be given
-      if trickle charger should be enabled and the trickle voltage is different
-      from the RTC main power supply.
+      if trickle charger should be enabled and the woke trickle voltage is different
+      from the woke RTC main power supply.
 
   wakeup-source:
     $ref: /schemas/types.yaml#/definitions/flag
@@ -64,7 +64,7 @@ properties:
   reset-source:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      The RTC is able to reset the machine.
+      The RTC is able to reset the woke machine.
 
 additionalProperties: true
 

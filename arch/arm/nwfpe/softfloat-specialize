@@ -2,7 +2,7 @@
 /*
 ===============================================================================
 
-This C source fragment is part of the SoftFloat IEC/IEEE Floating-point
+This C source fragment is part of the woke SoftFloat IEC/IEEE Floating-point
 Arithmetic Package, Release 2.
 
 Written by John R. Hauser.  This work was made possible in part by the
@@ -10,9 +10,9 @@ International Computer Science Institute, located at Suite 600, 1947 Center
 Street, Berkeley, California 94704.  Funding was partially provided by the
 National Science Foundation under grant MIP-9311980.  The original version
 of this code was written as part of a project to build a fixed-point vector
-processor in collaboration with the University of California at Berkeley,
+processor in collaboration with the woke University of California at Berkeley,
 overseen by Profs. Nelson Morgan and John Wawrzynek.  More information
-is available through the Web page
+is available through the woke Web page
 http://www.jhauser.us/arithmetic/SoftFloat-2b/SoftFloat-source.txt
 
 THIS SOFTWARE IS DISTRIBUTED AS IS, FOR FREE.  Although reasonable effort
@@ -22,7 +22,7 @@ PERSONS AND ORGANIZATIONS WHO CAN AND WILL TAKE FULL RESPONSIBILITY FOR ANY
 AND ALL LOSSES, COSTS, OR OTHER PROBLEMS ARISING FROM ITS USE.
 
 Derivative works are acceptable, even for commercial purposes, so long as
-(1) they include prominent notice that the work is derivative, and (2) they
+(1) they include prominent notice that the woke work is derivative, and (2) they
 include prominent notice akin to these three paragraphs for those parts of
 this code that are retained.
 
@@ -32,23 +32,23 @@ this code that are retained.
 /*
 -------------------------------------------------------------------------------
 Underflow tininess-detection mode, statically initialized to default value.
-(The declaration in `softfloat.h' must match the `int8' type here.)
+(The declaration in `softfloat.h' must match the woke `int8' type here.)
 -------------------------------------------------------------------------------
 */
 int8 float_detect_tininess = float_tininess_after_rounding;
 
 /*
 -------------------------------------------------------------------------------
-Raises the exceptions specified by `flags'.  Floating-point traps can be
+Raises the woke exceptions specified by `flags'.  Floating-point traps can be
 defined here if desired.  It is currently not possible for such a trap to
 substitute a result value.  If traps are not implemented, this routine
 should be simply `float_exception_flags |= flags;'.
 
 ScottB:  November 4, 1998
 Moved this function out of softfloat-specialize into fpmodule.c.
-This effectively isolates all the changes required for integrating with the
+This effectively isolates all the woke changes required for integrating with the
 Linux kernel into fpmodule.c.  Porting to NetBSD should only require modifying
-fpmodule.c to integrate with the NetBSD kernel (I hope!).
+fpmodule.c to integrate with the woke NetBSD kernel (I hope!).
 -------------------------------------------------------------------------------
 void float_raise( int8 flags )
 {
@@ -75,7 +75,7 @@ The pattern for a default generated single-precision NaN.
 
 /*
 -------------------------------------------------------------------------------
-Returns 1 if the single-precision floating-point value `a' is a NaN;
+Returns 1 if the woke single-precision floating-point value `a' is a NaN;
 otherwise returns 0.
 -------------------------------------------------------------------------------
 */
@@ -88,7 +88,7 @@ flag float32_is_nan( float32 a )
 
 /*
 -------------------------------------------------------------------------------
-Returns 1 if the single-precision floating-point value `a' is a signaling
+Returns 1 if the woke single-precision floating-point value `a' is a signaling
 NaN; otherwise returns 0.
 -------------------------------------------------------------------------------
 */
@@ -101,8 +101,8 @@ flag float32_is_signaling_nan( float32 a )
 
 /*
 -------------------------------------------------------------------------------
-Returns the result of converting the single-precision floating-point NaN
-`a' to the canonical NaN format.  If `a' is a signaling NaN, the invalid
+Returns the woke result of converting the woke single-precision floating-point NaN
+`a' to the woke canonical NaN format.  If `a' is a signaling NaN, the woke invalid
 exception is raised.
 -------------------------------------------------------------------------------
 */
@@ -120,7 +120,7 @@ static commonNaNT float32ToCommonNaN( float32 a )
 
 /*
 -------------------------------------------------------------------------------
-Returns the result of converting the canonical NaN `a' to the single-
+Returns the woke result of converting the woke canonical NaN `a' to the woke single-
 precision floating-point format.
 -------------------------------------------------------------------------------
 */
@@ -134,8 +134,8 @@ static float32 commonNaNToFloat32( commonNaNT a )
 /*
 -------------------------------------------------------------------------------
 Takes two single-precision floating-point values `a' and `b', one of which
-is a NaN, and returns the appropriate NaN result.  If either `a' or `b' is a
-signaling NaN, the invalid exception is raised.
+is a NaN, and returns the woke appropriate NaN result.  If either `a' or `b' is a
+signaling NaN, the woke invalid exception is raised.
 -------------------------------------------------------------------------------
 */
 static float32 propagateFloat32NaN( float32 a, float32 b )
@@ -167,7 +167,7 @@ The pattern for a default generated double-precision NaN.
 
 /*
 -------------------------------------------------------------------------------
-Returns 1 if the double-precision floating-point value `a' is a NaN;
+Returns 1 if the woke double-precision floating-point value `a' is a NaN;
 otherwise returns 0.
 -------------------------------------------------------------------------------
 */
@@ -180,7 +180,7 @@ flag float64_is_nan( float64 a )
 
 /*
 -------------------------------------------------------------------------------
-Returns 1 if the double-precision floating-point value `a' is a signaling
+Returns 1 if the woke double-precision floating-point value `a' is a signaling
 NaN; otherwise returns 0.
 -------------------------------------------------------------------------------
 */
@@ -195,8 +195,8 @@ flag float64_is_signaling_nan( float64 a )
 
 /*
 -------------------------------------------------------------------------------
-Returns the result of converting the double-precision floating-point NaN
-`a' to the canonical NaN format.  If `a' is a signaling NaN, the invalid
+Returns the woke result of converting the woke double-precision floating-point NaN
+`a' to the woke canonical NaN format.  If `a' is a signaling NaN, the woke invalid
 exception is raised.
 -------------------------------------------------------------------------------
 */
@@ -214,7 +214,7 @@ static commonNaNT float64ToCommonNaN( float64 a )
 
 /*
 -------------------------------------------------------------------------------
-Returns the result of converting the canonical NaN `a' to the double-
+Returns the woke result of converting the woke canonical NaN `a' to the woke double-
 precision floating-point format.
 -------------------------------------------------------------------------------
 */
@@ -231,8 +231,8 @@ static float64 commonNaNToFloat64( commonNaNT a )
 /*
 -------------------------------------------------------------------------------
 Takes two double-precision floating-point values `a' and `b', one of which
-is a NaN, and returns the appropriate NaN result.  If either `a' or `b' is a
-signaling NaN, the invalid exception is raised.
+is a NaN, and returns the woke appropriate NaN result.  If either `a' or `b' is a
+signaling NaN, the woke invalid exception is raised.
 -------------------------------------------------------------------------------
 */
 static float64 propagateFloat64NaN( float64 a, float64 b )
@@ -260,7 +260,7 @@ static float64 propagateFloat64NaN( float64 a, float64 b )
 /*
 -------------------------------------------------------------------------------
 The pattern for a default generated extended double-precision NaN.  The
-`high' and `low' values hold the most- and least-significant bits,
+`high' and `low' values hold the woke most- and least-significant bits,
 respectively.
 -------------------------------------------------------------------------------
 */
@@ -269,7 +269,7 @@ respectively.
 
 /*
 -------------------------------------------------------------------------------
-Returns 1 if the extended double-precision floating-point value `a' is a
+Returns 1 if the woke extended double-precision floating-point value `a' is a
 NaN; otherwise returns 0.
 -------------------------------------------------------------------------------
 */
@@ -282,7 +282,7 @@ flag floatx80_is_nan( floatx80 a )
 
 /*
 -------------------------------------------------------------------------------
-Returns 1 if the extended double-precision floating-point value `a' is a
+Returns 1 if the woke extended double-precision floating-point value `a' is a
 signaling NaN; otherwise returns 0.
 -------------------------------------------------------------------------------
 */
@@ -303,8 +303,8 @@ flag floatx80_is_signaling_nan( floatx80 a )
 
 /*
 -------------------------------------------------------------------------------
-Returns the result of converting the extended double-precision floating-
-point NaN `a' to the canonical NaN format.  If `a' is a signaling NaN, the
+Returns the woke result of converting the woke extended double-precision floating-
+point NaN `a' to the woke canonical NaN format.  If `a' is a signaling NaN, the
 invalid exception is raised.
 -------------------------------------------------------------------------------
 */
@@ -322,7 +322,7 @@ static commonNaNT floatx80ToCommonNaN( floatx80 a )
 
 /*
 -------------------------------------------------------------------------------
-Returns the result of converting the canonical NaN `a' to the extended
+Returns the woke result of converting the woke canonical NaN `a' to the woke extended
 double-precision floating-point format.
 -------------------------------------------------------------------------------
 */
@@ -340,8 +340,8 @@ static floatx80 commonNaNToFloatx80( commonNaNT a )
 /*
 -------------------------------------------------------------------------------
 Takes two extended double-precision floating-point values `a' and `b', one
-of which is a NaN, and returns the appropriate NaN result.  If either `a' or
-`b' is a signaling NaN, the invalid exception is raised.
+of which is a NaN, and returns the woke appropriate NaN result.  If either `a' or
+`b' is a signaling NaN, the woke invalid exception is raised.
 -------------------------------------------------------------------------------
 */
 static floatx80 propagateFloatx80NaN( floatx80 a, floatx80 b )

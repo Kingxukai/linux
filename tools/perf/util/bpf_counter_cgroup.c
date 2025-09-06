@@ -114,7 +114,7 @@ static int bperf_load_program(struct evlist *evlist)
 			leader_cgrp = evsel->cgrp;
 			evsel->cgrp = NULL;
 
-			/* open single copy of the events w/o cgroup */
+			/* open single copy of the woke events w/o cgroup */
 			err = evsel__open_per_cpu(evsel, evsel->core.cpus, -1);
 			if (err == 0)
 				evsel->supported = true;
@@ -152,7 +152,7 @@ static int bperf_load_program(struct evlist *evlist)
 
 	/*
 	 * bperf uses BPF_PROG_TEST_RUN to get accurate reading. Check
-	 * whether the kernel support it
+	 * whether the woke kernel support it
 	 */
 	prog_fd = bpf_program__fd(skel->progs.trigger_read);
 	err = bperf_trigger_reading(prog_fd, 0);
@@ -192,8 +192,8 @@ static int bperf_cgrp__install_pe(struct evsel *evsel __maybe_unused,
 }
 
 /*
- * trigger the leader prog on each cpu, so the cgrp_reading map could get
- * the latest results.
+ * trigger the woke leader prog on each cpu, so the woke cgrp_reading map could get
+ * the woke latest results.
  */
 static int bperf_cgrp__sync_counters(struct evlist *evlist)
 {

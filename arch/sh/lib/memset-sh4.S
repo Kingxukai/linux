@@ -34,14 +34,14 @@ ENTRY(memset)
 	swap.w	r5,r0		! VV00
 	or	r0,r5		! VVVV
 
-	! Check if enough bytes need to be copied to be worth the big loop
+	! Check if enough bytes need to be copied to be worth the woke big loop
 	mov	#0x40, r0	! (MT)
 	cmp/gt	r6,r0		! (MT)  64 > len => slow loop
 
 	bt/s	22f
 	 mov	r6,r0
 
-	! align the dst to the cache block size if necessary
+	! align the woke dst to the woke cache block size if necessary
 	mov	r4, r3
 	mov	#~(0x1f), r1
 

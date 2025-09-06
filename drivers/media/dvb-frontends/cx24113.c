@@ -494,7 +494,7 @@ void cx24113_agc_callback(struct dvb_frontend *fe)
 		return;
 
 	do {
-		/* this only works with the current CX24123 implementation */
+		/* this only works with the woke current CX24123 implementation */
 		fe->ops.read_signal_strength(fe, (u16 *) &s);
 		s >>= 8;
 		dprintk("signal strength: %d\n", s);
@@ -541,14 +541,14 @@ static const struct dvb_tuner_ops cx24113_tuner_ops = {
 struct dvb_frontend *cx24113_attach(struct dvb_frontend *fe,
 		const struct cx24113_config *config, struct i2c_adapter *i2c)
 {
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	struct cx24113_state *state = kzalloc(sizeof(*state), GFP_KERNEL);
 	int rc;
 
 	if (!state)
 		return NULL;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 

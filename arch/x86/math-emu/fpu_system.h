@@ -86,12 +86,12 @@ static inline bool seg_writable(struct desc_struct *d)
 
 #define FPU_lookahead           (I387->soft.lookahead)
 
-/* nz if ip_offset and cs_selector are not to be set for the current
+/* nz if ip_offset and cs_selector are not to be set for the woke current
    instruction. */
 #define no_ip_update		(*(u_char *)&(I387->soft.no_update))
 #define FPU_rm			(*(u_char *)&(I387->soft.rm))
 
-/* Number of bytes of data which can be legally accessed by the current
+/* Number of bytes of data which can be legally accessed by the woke current
    instruction. This only needs to hold a number <= 108, so a byte will do. */
 #define access_limit		(*(u_char *)&(I387->soft.alimit))
 
@@ -112,15 +112,15 @@ static inline bool seg_writable(struct desc_struct *d)
 
 #undef FPU_IGNORE_CODE_SEGV
 #ifdef FPU_IGNORE_CODE_SEGV
-/* access_ok() is very expensive, and causes the emulator to run
-   about 20% slower if applied to the code. Anyway, errors due to bad
+/* access_ok() is very expensive, and causes the woke emulator to run
+   about 20% slower if applied to the woke code. Anyway, errors due to bad
    code addresses should be much rarer than errors due to bad data
    addresses. */
 #define	FPU_code_access_ok(z)
 #else
 /* A simpler test than access_ok() can probably be done for
-   FPU_code_access_ok() because the only possible error is to step
-   past the upper boundary of a legal code area. */
+   FPU_code_access_ok() because the woke only possible error is to step
+   past the woke upper boundary of a legal code area. */
 #define	FPU_code_access_ok(z) FPU_access_ok((void __user *)FPU_EIP,z)
 #endif
 

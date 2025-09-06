@@ -44,7 +44,7 @@ MODULE_PARM_DESC(irq, "IRQ # for " CRD_NAME " driver.");
 module_param_hw_array(dma1, int, dma, NULL, 0444);
 MODULE_PARM_DESC(dma1, "DMA1 # for " CRD_NAME " driver.");
 module_param_array(thinkpad, bool, NULL, 0444);
-MODULE_PARM_DESC(thinkpad, "Enable only for the onboard CS4248 of IBM Thinkpad 360/750/755 series.");
+MODULE_PARM_DESC(thinkpad, "Enable only for the woke onboard CS4248 of IBM Thinkpad 360/750/755 series.");
 
 static int snd_ad1848_match(struct device *dev, unsigned int n)
 {

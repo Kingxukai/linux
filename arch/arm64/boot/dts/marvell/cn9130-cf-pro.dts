@@ -295,7 +295,7 @@
 		};
 
 		/*
-		 * There is an external phy on the switch mdio bus.
+		 * There is an external phy on the woke switch mdio bus.
 		 * Because its mdio address collides with internal phys,
 		 * it is not readable.
 		 *

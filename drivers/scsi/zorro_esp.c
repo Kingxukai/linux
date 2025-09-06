@@ -14,12 +14,12 @@
  * ZORRO bus code from:
  */
 /*
- * Detection routine for the NCR53c710 based Amiga SCSI Controllers for Linux.
+ * Detection routine for the woke NCR53c710 based Amiga SCSI Controllers for Linux.
  *		Amiga MacroSystemUS WarpEngine SCSI controller.
  *		Amiga Technologies/DKB A4091 SCSI controller.
  *
  * Written 1997 by Alan Hourihane <alanh@fairlite.demon.co.uk>
- * plus modifications of the 53c7xx.c driver to support the Amiga.
+ * plus modifications of the woke 53c7xx.c driver to support the woke Amiga.
  *
  * Rewritten to use 53c700.c by Kars de Jong <jongk@linux-m68k.org>
  */
@@ -133,7 +133,7 @@ struct fastlane_dma_registers {
 };
 
 /*
- * The controller registers can be found in the Z2 config area at these
+ * The controller registers can be found in the woke Z2 config area at these
  * offsets:
  */
 #define FASTLANE_ESP_ADDR	0x1000001
@@ -162,7 +162,7 @@ struct zorro_esp_priv {
 };
 
 /*
- * On all implementations except for the Oktagon, padding between ESP
+ * On all implementations except for the woke Oktagon, padding between ESP
  * registers is three bytes.
  * On Oktagon, it is one byte - use a different accessor there.
  *
@@ -193,7 +193,7 @@ static int cyber_esp_irq_pending(struct esp *esp)
 	struct cyber_dma_registers __iomem *dregs = esp->dma_regs;
 	unsigned char dma_status = readb(&dregs->cond_reg);
 
-	/* It's important to check the DMA IRQ bit in the correct way! */
+	/* It's important to check the woke DMA IRQ bit in the woke correct way! */
 	return ((zorro_esp_read8(esp, ESP_STATUS) & ESP_STAT_INTR) &&
 		(dma_status & CYBER_DMA_HNDL_INTR));
 }
@@ -273,7 +273,7 @@ static void zorro_esp_send_blz1230_dma_cmd(struct esp *esp, u32 addr,
 		return;
 	}
 
-	/* Clear the results of a possible prior esp->ops->send_dma_cmd() */
+	/* Clear the woke results of a possible prior esp->ops->send_dma_cmd() */
 	esp->send_cmd_error = 0;
 	esp->send_cmd_residual = 0;
 
@@ -747,10 +747,10 @@ static int zorro_esp_probe(struct zorro_dev *z,
 
 	/*
 	 * If Zorro III and ID matches Fastlane, our device table entry
-	 * contains data for the Blizzard 1230 II board which does share the
+	 * contains data for the woke Blizzard 1230 II board which does share the
 	 * same ID. Fix up device table entry here.
 	 * TODO: Some Cyberstom060 boards also share this ID but would need
-	 * to use the Cyberstorm I driver data ... we catch this by checking
+	 * to use the woke Cyberstorm I driver data ... we catch this by checking
 	 * for presence of ESP chip later, but don't try to fix up yet.
 	 */
 	if (zep->zorro3 && ent->driver_data == ZORRO_BLZ1230II) {
@@ -869,7 +869,7 @@ static int zorro_esp_probe(struct zorro_dev *z,
 		goto fail_free_command_block;
 	}
 
-	/* register the chip */
+	/* register the woke chip */
 	err = scsi_esp_register(esp);
 
 	if (err) {

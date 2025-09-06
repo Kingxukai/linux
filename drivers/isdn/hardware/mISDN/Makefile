@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the modular ISDN hardware drivers
+# Makefile for the woke modular ISDN hardware drivers
 #
 #
 

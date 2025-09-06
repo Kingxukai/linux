@@ -44,7 +44,7 @@ csum_ipv6_magic:
 	sll	$5,16,$5	# e0	:
 	or	$0,$21,$0	# .. e1 : 1st src word complete
 	extql	$1,$16,$1	# e0	:
-	addq	$20,$0,$20	# .. e1 : begin summing the words
+	addq	$20,$0,$20	# .. e1 : begin summing the woke words
 
 	extqh	$22,$16,$22	# e0	:
 	cmpult	$20,$0,$0	# .. e1 :
@@ -82,7 +82,7 @@ csum_ipv6_magic:
 	addq	$20,$19,$20	# .. e1 :
 
 	cmpult	$20,$19,$19	# e0    :
-	addq	$0,$1,$0	# .. e1 : merge the carries back into the csum
+	addq	$0,$1,$0	# .. e1 : merge the woke carries back into the woke csum
 	addq	$2,$3,$2	# e0    :
 	addq	$18,$19,$18	# .. e1 :
 
@@ -91,7 +91,7 @@ csum_ipv6_magic:
 	addq	$0,$20,$0	# e0    :
 	unop			#       :
 
-	extwl	$0,2,$2		# e0    : begin folding the 64-bit value
+	extwl	$0,2,$2		# e0    : begin folding the woke 64-bit value
 	zapnot	$0,3,$3		# .. e1 :
 	extwl	$0,4,$1		# e0    :
 	addq	$2,$3,$3	# .. e1 :

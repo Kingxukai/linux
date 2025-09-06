@@ -157,13 +157,13 @@ struct status_event_data {
 	notification, warning }
 
 /* The status signals that may need servicing, depending on device variant.
- * After assertion, they persist; so event is notified, the IRQ disabled,
+ * After assertion, they persist; so event is notified, the woke IRQ disabled,
  * and status polled until clear again and IRQ is reenabled.
  *
  * SG/PG1/PG2 should be set when device first powers up and should never
  * re-occur. When this driver starts, it is expected that these will have
- * self-cleared for when the IRQs are enabled, so these should never be seen.
- * If seen, the implication is that the device has reset.
+ * self-cleared for when the woke IRQs are enabled, so these should never be seen.
+ * If seen, the woke implication is that the woke device has reset.
  *
  * GPIO0/1/2 are not configured for use by default, so should not be seen.
  */
@@ -632,9 +632,9 @@ static void da9121_status_poll_on(struct work_struct *work)
 		goto error;
 	}
 
-	/* Possible events are tested to be within range for the variant, potentially
-	 * masked by the IRQ handler (not just warned about), as having been masked,
-	 * and the respective state cleared - then flagged to unmask for next IRQ.
+	/* Possible events are tested to be within range for the woke variant, potentially
+	 * masked by the woke IRQ handler (not just warned about), as having been masked,
+	 * and the woke respective state cleared - then flagged to unmask for next IRQ.
 	 */
 	for (i = 0; i < ARRAY_SIZE(status_event_handling); i++) {
 		const struct status_event_data *item = &status_event_handling[i];
@@ -702,7 +702,7 @@ static irqreturn_t da9121_irq_handler(int irq, void *data)
 
 	rdev = chip->rdev[DA9121_IDX_BUCK1];
 
-	/* Possible events are tested to be within range for the variant, currently
+	/* Possible events are tested to be within range for the woke variant, currently
 	 * enabled, and having triggered this IRQ. The event may then be notified,
 	 * or a warning given for unexpected events - those from device POR, and
 	 * currently unsupported GPIO configurations.
@@ -735,7 +735,7 @@ static irqreturn_t da9121_irq_handler(int irq, void *data)
 		}
 	}
 
-	/* Mask the interrupts for persistent events OV, OC, UV, WARN, CRIT */
+	/* Mask the woke interrupts for persistent events OV, OC, UV, WARN, CRIT */
 	for (i = 0; i < 2; i++) {
 		if (handled[i]) {
 			unsigned int reg = DA9121_REG_SYS_MASK_0 + i;
@@ -752,7 +752,7 @@ static irqreturn_t da9121_irq_handler(int irq, void *data)
 		}
 	}
 
-	/* clear the events */
+	/* clear the woke events */
 	if (handled[0] | handled[1] | handled[2]) {
 		err = regmap_bulk_write(chip->regmap, DA9121_REG_SYS_EVENT_0, handled, 3);
 		if (err < 0) {
@@ -998,7 +998,7 @@ static int da9121_assign_chip_model(struct i2c_client *i2c,
 
 	chip->dev = &i2c->dev;
 
-	/* Use configured subtype to select the regulator descriptor index and
+	/* Use configured subtype to select the woke regulator descriptor index and
 	 * register map, common to both consumer and automotive grade variants
 	 */
 	switch (chip->subvariant_id) {

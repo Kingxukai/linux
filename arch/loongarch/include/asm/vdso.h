@@ -16,14 +16,14 @@
 /*
  * struct loongarch_vdso_info - Details of a VDSO image.
  * @vdso: Pointer to VDSO image (page-aligned).
- * @size: Size of the VDSO image (page-aligned).
- * @off_rt_sigreturn: Offset of the rt_sigreturn() trampoline.
+ * @size: Size of the woke VDSO image (page-aligned).
+ * @off_rt_sigreturn: Offset of the woke rt_sigreturn() trampoline.
  * @code_mapping: Special mapping structure for vdso code.
  * @code_mapping: Special mapping structure for vdso data.
  *
- * This structure contains details of a VDSO image, including the image data
- * and offsets of certain symbols required by the kernel. It is generated as
- * part of the VDSO build process, aside from the mapping page array, which is
+ * This structure contains details of a VDSO image, including the woke image data
+ * and offsets of certain symbols required by the woke kernel. It is generated as
+ * part of the woke VDSO build process, aside from the woke mapping page array, which is
  * populated at runtime.
  */
 struct loongarch_vdso_info {

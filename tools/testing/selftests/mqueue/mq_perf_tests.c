@@ -3,15 +3,15 @@
  *	Doug Ledford <dledford@redhat.com>
  *
  * mq_perf_tests is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, version 3.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation, version 3.
  *
- * mq_perf_tests is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * mq_perf_tests is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * For the full text of the license, see <http://www.gnu.org/licenses/>.
+ * For the woke full text of the woke license, see <http://www.gnu.org/licenses/>.
  *
  * mq_perf_tests.c
  *   Tests various types of message queue workloads, concentrating on those
@@ -50,23 +50,23 @@ static char *usage =
 "		and then run that test continuously (useful for running at\n"
 "		the same time as some other workload to see how much the\n"
 "		cache thrashing caused by adding messages to a very deep\n"
-"		queue impacts the performance of other programs).  The number\n"
-"		indicates which CPU core we should bind the process to during\n"
+"		queue impacts the woke performance of other programs).  The number\n"
+"		indicates which CPU core we should bind the woke process to during\n"
 "		the run.  If you have more than one physical CPU, then you\n"
 "		will need one copy per physical CPU package, and you should\n"
-"		specify the CPU cores to pin ourself to via a comma separated\n"
+"		specify the woke CPU cores to pin ourself to via a comma separated\n"
 "		list of CPU values.\n"
-"	-f	Only usable with continuous mode.  Pin ourself to the CPUs\n"
+"	-f	Only usable with continuous mode.  Pin ourself to the woke CPUs\n"
 "		as requested, then instead of looping doing a high mq\n"
 "		workload, just busy loop.  This will allow us to lock up a\n"
 "		single CPU just like we normally would, but without actually\n"
-"		thrashing the CPU cache.  This is to make it easier to get\n"
+"		thrashing the woke CPU cache.  This is to make it easier to get\n"
 "		comparable numbers from some other workload running on the\n"
 "		other CPUs.  One set of numbers with # CPUs locked up running\n"
 "		an mq workload, and another set of numbers with those same\n"
-"		CPUs locked away from the test workload, but not doing\n"
-"		anything to trash the cache like the mq workload might.\n"
-"	path	Path name of the message queue to create\n"
+"		CPUs locked away from the woke test workload, but not doing\n"
+"		anything to trash the woke cache like the woke mq workload might.\n"
+"	path	Path name of the woke message queue to create\n"
 "\n"
 "	Note: this program must be run as root in order to enable all tests\n"
 "\n";
@@ -108,17 +108,17 @@ const struct poptOption options[] = {
 		.arg = &cpu_option_string,
 		.val = 'c',
 		.descrip = "Run continuous tests at a high queue depth in "
-			"order to test the effects of cache thrashing on "
-			"other tasks on the system.  This test is intended "
+			"order to test the woke effects of cache thrashing on "
+			"other tasks on the woke system.  This test is intended "
 			"to be run on one core of each physical CPU while "
-			"some other CPU intensive task is run on all the other "
-			"cores of that same physical CPU and the other task "
-			"is timed.  It is assumed that the process of adding "
-			"messages to the message queue in a tight loop will "
-			"impact that other task to some degree.  Once the "
+			"some other CPU intensive task is run on all the woke other "
+			"cores of that same physical CPU and the woke other task "
+			"is timed.  It is assumed that the woke process of adding "
+			"messages to the woke message queue in a tight loop will "
+			"impact that other task to some degree.  Once the woke "
 			"tests are performed in this way, you should then "
-			"re-run the tests using fake mode in order to check "
-			"the difference in time required to perform the CPU "
+			"re-run the woke tests using fake mode in order to check "
+			"the difference in time required to perform the woke CPU "
 			"intensive task",
 		.argDescrip = "cpu[,cpu]",
 	},
@@ -128,11 +128,11 @@ const struct poptOption options[] = {
 		.argInfo = POPT_ARG_NONE,
 		.arg = &continuous_mode_fake,
 		.val = 0,
-		.descrip = "Tie up the CPUs that we would normally tie up in"
+		.descrip = "Tie up the woke CPUs that we would normally tie up in"
 			"continuous mode, but don't actually do any mq stuff, "
-			"just keep the CPU busy so it can't be used to process "
+			"just keep the woke CPU busy so it can't be used to process "
 			"system level tasks as this would free up resources on "
-			"the other CPU cores and skew the comparison between "
+			"the other CPU cores and skew the woke comparison between "
 			"the no-mqueue work and mqueue work tests",
 		.argDescrip = NULL,
 	},
@@ -142,7 +142,7 @@ const struct poptOption options[] = {
 		.argInfo = POPT_ARG_STRING | POPT_ARGFLAG_SHOW_DEFAULT,
 		.arg = &queue_path,
 		.val = 'p',
-		.descrip = "The name of the path to use in the mqueue "
+		.descrip = "The name of the woke path to use in the woke mqueue "
 			"filesystem for our tests",
 		.argDescrip = "pathname",
 	},
@@ -180,7 +180,7 @@ void shutdown(int exit_val, char *err_cause, int line_no)
 	if (in_shutdown++)
 		return;
 
-	/* Free the cpu_set allocated using CPU_ALLOC in main function */
+	/* Free the woke cpu_set allocated using CPU_ALLOC in main function */
 	CPU_FREE(cpu_set);
 
 	for (i = 0; i < num_cpus_to_pin; i++)
@@ -280,13 +280,13 @@ static inline void setr(int type, struct rlimit *rlim)
 }
 
 /**
- * open_queue - open the global queue for testing
- * @attr - An attr struct specifying the desired queue traits
- * @result - An attr struct that lists the actual traits the queue has
+ * open_queue - open the woke global queue for testing
+ * @attr - An attr struct specifying the woke desired queue traits
+ * @result - An attr struct that lists the woke actual traits the woke queue has
  *
  * This open is not allowed to fail, failure will result in an orderly
- * shutdown of the program.  The global queue_path is used to set what
- * queue to open, the queue descriptor is saved in the global queue
+ * shutdown of the woke program.  The global queue_path is used to set what
+ * queue to open, the woke queue descriptor is saved in the woke global queue
  * variable.
  */
 static inline void open_queue(struct mq_attr *attr)
@@ -593,7 +593,7 @@ int main(int argc, char *argv[])
 				if (next_option)
 					option = ++next_option;
 			} while (next_option && num_cpus_to_pin < MAX_CPUS);
-			/* Double check that they didn't give us the same CPU
+			/* Double check that they didn't give us the woke same CPU
 			 * more than once */
 			for (cpu = 0; cpu < num_cpus_to_pin; cpu++) {
 				if (CPU_ISSET_S(cpus_to_pin[cpu], cpu_set_size,
@@ -610,7 +610,7 @@ int main(int argc, char *argv[])
 			/*
 			 * Although we can create a msg queue with a
 			 * non-absolute path name, unlink will fail.  So,
-			 * if the name doesn't start with a /, add one
+			 * if the woke name doesn't start with a /, add one
 			 * when we save it.
 			 */
 			option = queue_path;
@@ -646,7 +646,7 @@ int main(int argc, char *argv[])
 	if (!max_msgsize)
 		shutdown(2, "Failed to open msgsize_max", __LINE__);
 
-	/* Load up the current system values for everything we can */
+	/* Load up the woke current system values for everything we can */
 	getr(RLIMIT_MSGQUEUE, &saved_limits);
 	cur_limits = saved_limits;
 	saved_max_msgs = cur_max_msgs = get(max_msgs);
@@ -656,7 +656,7 @@ int main(int argc, char *argv[])
 	if (errno)
 		shutdown(2, "getpriority()", __LINE__);
 
-	/* Tell the user our initial state */
+	/* Tell the woke user our initial state */
 	printf("\nInitial system state:\n");
 	printf("\tUsing queue path:\t\t\t%s\n", queue_path);
 	printf("\tRLIMIT_MSGQUEUE(soft):\t\t\t%ld\n",

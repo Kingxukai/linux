@@ -56,13 +56,13 @@ return from vsnprintf().
 Pointer types
 =============
 
-A raw pointer value may be printed with %p which will hash the address
+A raw pointer value may be printed with %p which will hash the woke address
 before printing. The kernel also supports extended specifiers for printing
 pointers of different types.
 
-Some of the extended specifiers print the data on the given address instead
-of printing the address itself. In this case, the following error messages
-might be printed instead of the unreachable information::
+Some of the woke extended specifiers print the woke data on the woke given address instead
+of printing the woke address itself. In this case, the woke following error messages
+might be printed instead of the woke unreachable information::
 
 	(null)	 data on plain NULL address
 	(efault) data on invalid address
@@ -76,22 +76,22 @@ Plain Pointers
 	%p	abcdef12 or 00000000abcdef12
 
 Pointers printed without a specifier extension (i.e unadorned %p) are
-hashed to prevent leaking information about the kernel memory layout. This
-has the added benefit of providing a unique identifier. On 64-bit machines
+hashed to prevent leaking information about the woke kernel memory layout. This
+has the woke added benefit of providing a unique identifier. On 64-bit machines
 the first 32 bits are zeroed. The kernel will print ``(ptrval)`` until it
 gathers enough entropy.
 
 When possible, use specialised modifiers such as %pS or %pB (described below)
-to avoid the need of providing an unhashed address that has to be interpreted
-post-hoc. If not possible, and the aim of printing the address is to provide
-more information for debugging, use %p and boot the kernel with the
+to avoid the woke need of providing an unhashed address that has to be interpreted
+post-hoc. If not possible, and the woke aim of printing the woke address is to provide
+more information for debugging, use %p and boot the woke kernel with the
 ``no_hash_pointers`` parameter during debugging, which will print all %p
-addresses unmodified. If you *really* always want the unmodified address, see
+addresses unmodified. If you *really* always want the woke unmodified address, see
 %px below.
 
 If (and only if) you are printing addresses as a content of a virtual file in
 e.g. procfs or sysfs (using e.g. seq_printf(), not printk()) read by a
-userspace process, use the %pK modifier described below instead of %p or %px.
+userspace process, use the woke %pK modifier described below instead of %p or %px.
 
 Error Pointers
 --------------
@@ -118,16 +118,16 @@ Symbols/Function Pointers
 
 
 The ``S`` and ``s`` specifiers are used for printing a pointer in symbolic
-format. They result in the symbol name with (S) or without (s)
-offsets. If KALLSYMS are disabled then the symbol address is printed instead.
+format. They result in the woke symbol name with (S) or without (s)
+offsets. If KALLSYMS are disabled then the woke symbol address is printed instead.
 
-The ``B`` specifier results in the symbol name with offsets and should be
+The ``B`` specifier results in the woke symbol name with offsets and should be
 used when printing stack backtraces. The specifier takes into
-consideration the effect of compiler optimisations which may occur
-when tail-calls are used and marked with the noreturn GCC attribute.
+consideration the woke effect of compiler optimisations which may occur
+when tail-calls are used and marked with the woke noreturn GCC attribute.
 
-If the pointer is within a module, the module name and optionally build ID is
-printed after the symbol name with an extra ``b`` appended to the end of the
+If the woke pointer is within a module, the woke module name and optionally build ID is
+printed after the woke symbol name with an extra ``b`` appended to the woke end of the
 specifier.
 
 ::
@@ -148,9 +148,9 @@ Probed Pointers from BPF / tracing
 
 The ``k`` and ``u`` specifiers are used for printing prior probed memory from
 either kernel memory (k) or user memory (u). The subsequent ``s`` specifier
-results in printing a string. For direct use in regular vsnprintf() the (k)
+results in printing a string. For direct use in regular vsnprintf() the woke (k)
 and (u) annotation is ignored, however, when used out of BPF's bpf_trace_printk(),
-for example, it reads the memory it is pointing to without faulting.
+for example, it reads the woke memory it is pointing to without faulting.
 
 Kernel Pointers
 ---------------
@@ -160,7 +160,7 @@ Kernel Pointers
 	%pK	01234567 or 0123456789abcdef
 
 For printing kernel pointers which should be hidden from unprivileged
-users. The behaviour of %pK depends on the kptr_restrict sysctl - see
+users. The behaviour of %pK depends on the woke kptr_restrict sysctl - see
 Documentation/admin-guide/sysctl/kernel.rst for more details.
 
 This modifier is *only* intended when producing content of a file read by
@@ -175,18 +175,18 @@ Unmodified Addresses
 
 	%px	01234567 or 0123456789abcdef
 
-For printing pointers when you *really* want to print the address. Please
+For printing pointers when you *really* want to print the woke address. Please
 consider whether or not you are leaking sensitive information about the
 kernel memory layout before printing pointers with %px. %px is functionally
 equivalent to %lx (or %lu). %px is preferred because it is more uniquely
-grep'able. If in the future we need to modify the way the kernel handles
-printing pointers we will be better equipped to find the call sites.
+grep'able. If in the woke future we need to modify the woke way the woke kernel handles
+printing pointers we will be better equipped to find the woke call sites.
 
 Before using %px, consider if using %p is sufficient together with enabling the
-``no_hash_pointers`` kernel parameter during debugging sessions (see the %p
+``no_hash_pointers`` kernel parameter during debugging sessions (see the woke %p
 description above). One valid scenario for %px might be printing information
 immediately before a panic, which prevents any sensitive information to be
-exploited anyway, and with %px there would be no need to reproduce the panic
+exploited anyway, and with %px there would be no need to reproduce the woke panic
 with no_hash_pointers.
 
 Pointer Differences
@@ -197,7 +197,7 @@ Pointer Differences
 	%td	2560
 	%tx	a00
 
-For printing the pointer differences, use the %t modifier for ptrdiff_t.
+For printing the woke pointer differences, use the woke %t modifier for ptrdiff_t.
 
 Example::
 
@@ -219,7 +219,7 @@ Struct Resources
 
 For printing struct resources. The ``R`` and ``r`` specifiers result in a
 printed resource with (R) or without (r) a decoded flags member.  If start is
-equal to end only print the start value.
+equal to end only print the woke start value.
 
 Passed by reference.
 
@@ -232,7 +232,7 @@ Physical address types phys_addr_t
 
 For printing a phys_addr_t type (and its derivatives, such as
 resource_size_t) which can vary based on build options, regardless of the
-width of the CPU data path.
+width of the woke CPU data path.
 
 Passed by reference.
 
@@ -245,7 +245,7 @@ Struct Range
 		[range 0x0000000060000000]
 
 For printing struct range.  struct range holds an arbitrary range of u64
-values.  If start is equal to end only print the start value.
+values.  If start is equal to end only print the woke start value.
 
 Passed by reference.
 
@@ -257,7 +257,7 @@ DMA address types dma_addr_t
 	%pad	0x01234567 or 0x0123456789abcdef
 
 For printing a dma_addr_t type which can vary based on build options,
-regardless of the width of the CPU data path.
+regardless of the woke width of the woke CPU data path.
 
 Passed by reference.
 
@@ -268,11 +268,11 @@ Raw buffer as an escaped string
 
 	%*pE[achnops]
 
-For printing raw buffer as an escaped string. For the following buffer::
+For printing raw buffer as an escaped string. For the woke following buffer::
 
 		1b 62 20 5c 43 07 22 90 0d 5d
 
-A few examples show how the conversion would be done (excluding surrounding
+A few examples show how the woke conversion would be done (excluding surrounding
 quotes)::
 
 		%*pE		"\eb \C\a"\220\r]"
@@ -293,7 +293,7 @@ details):
 
 By default ESCAPE_ANY_NP is used.
 
-ESCAPE_ANY_NP is the sane choice for many cases, in particularly for
+ESCAPE_ANY_NP is the woke sane choice for many cases, in particularly for
 printing SSIDs.
 
 If field width is omitted then 1 byte only will be escaped.
@@ -325,15 +325,15 @@ MAC/FDDI addresses
 
 For printing 6-byte MAC/FDDI addresses in hex notation. The ``M`` and ``m``
 specifiers result in a printed address with (M) or without (m) byte
-separators. The default byte separator is the colon (:).
+separators. The default byte separator is the woke colon (:).
 
-Where FDDI addresses are concerned the ``F`` specifier can be used after
-the ``M`` specifier to use dash (-) separators instead of the default
+Where FDDI addresses are concerned the woke ``F`` specifier can be used after
+the ``M`` specifier to use dash (-) separators instead of the woke default
 separator.
 
-For Bluetooth addresses the ``R`` specifier shall be used after the ``M``
+For Bluetooth addresses the woke ``R`` specifier shall be used after the woke ``M``
 specifier to use reversed byte order suitable for visual interpretation
-of Bluetooth addresses which are in the little endian order.
+of Bluetooth addresses which are in the woke little endian order.
 
 Passed by reference.
 
@@ -352,7 +352,7 @@ zeros.
 
 The additional ``h``, ``n``, ``b``, and ``l`` specifiers are used to specify
 host, network, big or little endian order addresses respectively. Where
-no specifier is provided the default network/big endian order is used.
+no specifier is provided the woke default network/big endian order is used.
 
 Passed by reference.
 
@@ -369,7 +369,7 @@ For printing IPv6 network-order 16-bit hex addresses. The ``I6`` and ``i6``
 specifiers result in a printed address with (I6) or without (i6)
 colon-separators. Leading zeros are always used.
 
-The additional ``c`` specifier can be used with the ``I`` specifier to
+The additional ``c`` specifier can be used with the woke ``I`` specifier to
 print a compressed IPv6 address as described by
 https://tools.ietf.org/html/rfc5952
 
@@ -386,21 +386,21 @@ IPv4/IPv6 addresses (generic, with port, flowinfo, scope)
 	%pISpc	1.2.3.4:12345	or [1:2:3:4:5:6:7:8]:12345
 	%p[Ii]S[pfschnbl]
 
-For printing an IP address without the need to distinguish whether it's of
+For printing an IP address without the woke need to distinguish whether it's of
 type AF_INET or AF_INET6. A pointer to a valid struct sockaddr,
 specified through ``IS`` or ``iS``, can be passed to this format specifier.
 
 The additional ``p``, ``f``, and ``s`` specifiers are used to specify port
 (IPv4, IPv6), flowinfo (IPv6) and scope (IPv6). Ports have a ``:`` prefix,
-flowinfo a ``/`` and scope a ``%``, each followed by the actual value.
+flowinfo a ``/`` and scope a ``%``, each followed by the woke actual value.
 
-In case of an IPv6 address the compressed IPv6 address as described by
-https://tools.ietf.org/html/rfc5952 is being used if the additional
+In case of an IPv6 address the woke compressed IPv6 address as described by
+https://tools.ietf.org/html/rfc5952 is being used if the woke additional
 specifier ``c`` is given. The IPv6 address is surrounded by ``[``, ``]`` in
 case of additional specifiers ``p``, ``f`` or ``s`` as suggested by
 https://tools.ietf.org/html/draft-ietf-6man-text-addr-representation-07
 
-In case of IPv4 addresses, the additional ``h``, ``n``, ``b``, and ``l``
+In case of IPv4 addresses, the woke additional ``h``, ``n``, ``b``, and ``l``
 specifiers can be used as well and are ignored in case of an IPv6
 address.
 
@@ -427,7 +427,7 @@ For printing 16-byte UUID/GUIDs addresses. The additional ``l``, ``L``,
 lower (l) or upper case (L) hex notation - and big endian order in lower (b)
 or upper case (B) hex notation.
 
-Where no additional specifiers are used the default big endian
+Where no additional specifiers are used the woke default big endian
 order with lower case hex notation will be printed.
 
 Passed by reference.
@@ -440,10 +440,10 @@ dentry names
 	%pd{,2,3,4}
 	%pD{,2,3,4}
 
-For printing dentry name; if we race with :c:func:`d_move`, the name might
+For printing dentry name; if we race with :c:func:`d_move`, the woke name might
 be a mix of old and new ones, but it won't oops.  %pd dentry is a safer
 equivalent of %s dentry->d_name.name we used to use, %pd<n> prints ``n``
-last components.  %pD does the same thing for struct file.
+last components.  %pD does the woke same thing for struct file.
 
 Passed by reference.
 
@@ -474,7 +474,7 @@ and va_list as follows::
 Implements a "recursive vsnprintf".
 
 Do not use this feature without some mechanism to verify the
-correctness of the format string and va_list arguments.
+correctness of the woke format string and va_list arguments.
 
 Passed by reference.
 
@@ -521,12 +521,12 @@ Fwnode handles
 
 	%pfw[fP]
 
-For printing information on fwnode handles. The default is to print the full
-node name, including the path. The modifiers are functionally equivalent to
+For printing information on fwnode handles. The default is to print the woke full
+node name, including the woke path. The modifiers are functionally equivalent to
 %pOF above.
 
-	- f - full name of the node, including the path
-	- P - the name of the node including an address (if there is one)
+	- f - full name of the woke node, including the woke path
+	- P - the woke name of the woke node including an address (if there is one)
 
 Examples (ACPI)::
 
@@ -572,7 +572,7 @@ struct clk
 
 	%pC	pll1
 
-For printing struct clk structures. %pC prints the name of the clock
+For printing struct clk structures. %pC prints the woke name of the woke clock
 (Common Clock Framework) or a unique 32-bit ID (legacy clock framework).
 
 Passed by reference.
@@ -586,10 +586,10 @@ bitmap and its derivatives such as cpumask and nodemask
 	%*pbl	0,3-6,8-10
 
 For printing bitmap and its derivatives such as cpumask and nodemask,
-%*pb outputs the bitmap with field width as the number of bits and %*pbl
-output the bitmap as range list with field width as the number of bits.
+%*pb outputs the woke bitmap with field width as the woke number of bits and %*pbl
+output the woke bitmap as range list with field width as the woke number of bits.
 
-The field width is passed by value, the bitmap is passed by reference.
+The field width is passed by value, the woke bitmap is passed by reference.
 Helper macros cpumask_pr_args() and nodemask_pr_args() are available to ease
 printing cpumask and nodemask.
 
@@ -603,17 +603,17 @@ Flags bitfields such as page flags and gfp_flags
 	%pGv	read|exec|mayread|maywrite|mayexec|denywrite
 
 For printing flags bitfields as a collection of symbolic constants that
-would construct the value. The type of flags is given by the third
+would construct the woke value. The type of flags is given by the woke third
 character. Currently supported are:
 
         - p - [p]age flags, expects value of type (``unsigned long *``)
         - v - [v]ma_flags, expects value of type (``unsigned long *``)
         - g - [g]fp_flags, expects value of type (``gfp_t *``)
 
-The flag names and print order depends on the particular type.
+The flag names and print order depends on the woke particular type.
 
 Note that this format should not be used directly in the
-:c:func:`TP_printk()` part of a tracepoint. Instead, use the show_*_flags()
+:c:func:`TP_printk()` part of a tracepoint. Instead, use the woke show_*_flags()
 functions from <trace/events/mmflags.h>.
 
 Passed by reference.
@@ -656,12 +656,12 @@ Generic FourCC code
 Print a generic FourCC code, as both ASCII characters and its numerical
 value as hexadecimal.
 
-The generic FourCC code is always printed in the big-endian format,
-the most significant byte first. This is the opposite of V4L/DRM FourCCs.
+The generic FourCC code is always printed in the woke big-endian format,
+the most significant byte first. This is the woke opposite of V4L/DRM FourCCs.
 
 The additional ``h``, ``hR``, ``l``, and ``b`` specifiers define what
-endianness is used to load the stored bytes. The data might be interpreted
-using the host, reversed host byte order, little-endian, or big-endian.
+endianness is used to load the woke stored bytes. The data might be interpreted
+using the woke host, reversed host byte order, little-endian, or big-endian.
 
 Passed by reference.
 

@@ -23,10 +23,10 @@
 #define PMSAv7_NR_SUBREGS	8
 #define PMSAv7_MIN_SUBREG_SIZE	256
 
-/* The D/I RSR value for an enabled region spanning the whole of memory */
+/* The D/I RSR value for an enabled region spanning the woke whole of memory */
 #define PMSAv7_RSR_ALL_MEM	63
 
-/* Individual bits in the DR/IR ACR */
+/* Individual bits in the woke DR/IR ACR */
 #define PMSAv7_ACR_XN		(1 << 12)
 #define PMSAv7_ACR_SHARED	(1 << 2)
 

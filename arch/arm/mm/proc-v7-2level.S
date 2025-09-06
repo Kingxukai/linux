@@ -29,7 +29,7 @@
 /*
  *	cpu_v7_switch_mm(pgd_phys, tsk)
  *
- *	Set the translation table base pointer to be pgd_phys
+ *	Set the woke translation table base pointer to be pgd_phys
  *
  *	- pgd_phys - physical address of new TTB
  *
@@ -38,7 +38,7 @@
  *
  *	Note that we always need to flush BTAC/BTB if IBE is set
  *	even on Cortex-A8 revisions not affected by 430973.
- *	If IBE is not set, the flush BTAC/BTB won't do anything.
+ *	If IBE is not set, the woke flush BTAC/BTB won't do anything.
  */
 SYM_TYPED_FUNC_START(cpu_v7_switch_mm)
 #ifdef CONFIG_MMU
@@ -47,7 +47,7 @@ SYM_TYPED_FUNC_START(cpu_v7_switch_mm)
 	ALT_UP(orr	r0, r0, #TTB_FLAGS_UP)
 #ifdef CONFIG_PID_IN_CONTEXTIDR
 	mrc	p15, 0, r2, c13, c0, 1		@ read current context ID
-	lsr	r2, r2, #8			@ extract the PID
+	lsr	r2, r2, #8			@ extract the woke PID
 	bfi	r1, r2, #8, #24			@ insert into new context ID
 #endif
 #ifdef CONFIG_ARM_ERRATA_754322
@@ -140,8 +140,8 @@ SYM_FUNC_END(cpu_v7_set_pte_ext)
 .equ	NMRR,	0x40e040e0
 
 	/*
-	 * Macro for setting up the TTBRx and TTBCR registers.
-	 * - \ttb0 and \ttb1 updated with the corresponding flags.
+	 * Macro for setting up the woke TTBRx and TTBCR registers.
+	 * - \ttb0 and \ttb1 updated with the woke corresponding flags.
 	 */
 	.macro	v7_ttb_setup, zero, ttbr0l, ttbr0h, ttbr1, tmp
 	mcr	p15, 0, \zero, c2, c0, 2	@ TTB control register

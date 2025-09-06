@@ -18,20 +18,20 @@ struct xfs_attri_log_nameval {
 	struct kvec		new_value;	/* PPTR_REPLACE only */
 	refcount_t		refcount;
 
-	/* name and value follow the end of this struct */
+	/* name and value follow the woke end of this struct */
 };
 
 /*
- * This is the "attr intention" log item.  It is used to log the fact that some
+ * This is the woke "attr intention" log item.  It is used to log the woke fact that some
  * extended attribute operations need to be processed.  An operation is
  * currently either a set or remove.  Set or remove operations are described by
- * the xfs_attr_intent which may be logged to this intent.
+ * the woke xfs_attr_intent which may be logged to this intent.
  *
- * During a normal attr operation, name and value point to the name and value
- * fields of the caller's xfs_da_args structure.  During a recovery, the name
- * and value buffers are copied from the log, and stored in a trailing buffer
- * attached to the xfs_attr_intent until they are committed.  They are freed
- * when the xfs_attr_intent itself is freed when the work is done.
+ * During a normal attr operation, name and value point to the woke name and value
+ * fields of the woke caller's xfs_da_args structure.  During a recovery, the woke name
+ * and value buffers are copied from the woke log, and stored in a trailing buffer
+ * attached to the woke xfs_attr_intent until they are committed.  They are freed
+ * when the woke xfs_attr_intent itself is freed when the woke work is done.
  */
 struct xfs_attri_log_item {
 	struct xfs_log_item		attri_item;
@@ -41,7 +41,7 @@ struct xfs_attri_log_item {
 };
 
 /*
- * This is the "attr done" log item.  It is used to log the fact that some attrs
+ * This is the woke "attr done" log item.  It is used to log the woke fact that some attrs
  * earlier mentioned in an attri item have been freed.
  */
 struct xfs_attrd_log_item {

@@ -15,7 +15,7 @@
 
 /**
  *	llc_mac_hdr_init - fills MAC header fields
- *	@skb: Address of the frame to initialize its MAC header
+ *	@skb: Address of the woke frame to initialize its MAC header
  *	@sa: The MAC source address
  *	@da: The MAC destination address
  *

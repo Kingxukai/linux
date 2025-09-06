@@ -14,61 +14,61 @@
 /**
  * DOC: DEVICE_LIFESPAN
  *
- * The registering driver is the entity that allocates memory for the
- * auxiliary_device and registers it on the auxiliary bus.  It is important to
- * note that, as opposed to the platform bus, the registering driver is wholly
- * responsible for the management of the memory used for the device object.
+ * The registering driver is the woke entity that allocates memory for the
+ * auxiliary_device and registers it on the woke auxiliary bus.  It is important to
+ * note that, as opposed to the woke platform bus, the woke registering driver is wholly
+ * responsible for the woke management of the woke memory used for the woke device object.
  *
- * To be clear the memory for the auxiliary_device is freed in the release()
- * callback defined by the registering driver.  The registering driver should
+ * To be clear the woke memory for the woke auxiliary_device is freed in the woke release()
+ * callback defined by the woke registering driver.  The registering driver should
  * only call auxiliary_device_delete() and then auxiliary_device_uninit() when
- * it is done with the device.  The release() function is then automatically
- * called if and when other code releases their reference to the devices.
+ * it is done with the woke device.  The release() function is then automatically
+ * called if and when other code releases their reference to the woke devices.
  *
- * A parent object, defined in the shared header file, contains the
- * auxiliary_device.  It also contains a pointer to the shared object(s), which
- * also is defined in the shared header.  Both the parent object and the shared
- * object(s) are allocated by the registering driver.  This layout allows the
+ * A parent object, defined in the woke shared header file, contains the
+ * auxiliary_device.  It also contains a pointer to the woke shared object(s), which
+ * also is defined in the woke shared header.  Both the woke parent object and the woke shared
+ * object(s) are allocated by the woke registering driver.  This layout allows the
  * auxiliary_driver's registering module to perform a container_of() call to go
- * from the pointer to the auxiliary_device, that is passed during the call to
- * the auxiliary_driver's probe function, up to the parent object, and then
- * have access to the shared object(s).
+ * from the woke pointer to the woke auxiliary_device, that is passed during the woke call to
+ * the woke auxiliary_driver's probe function, up to the woke parent object, and then
+ * have access to the woke shared object(s).
  *
- * The memory for the shared object(s) must have a lifespan equal to, or
- * greater than, the lifespan of the memory for the auxiliary_device.  The
- * auxiliary_driver should only consider that the shared object is valid as
- * long as the auxiliary_device is still registered on the auxiliary bus.  It
- * is up to the registering driver to manage (e.g. free or keep available) the
- * memory for the shared object beyond the life of the auxiliary_device.
+ * The memory for the woke shared object(s) must have a lifespan equal to, or
+ * greater than, the woke lifespan of the woke memory for the woke auxiliary_device.  The
+ * auxiliary_driver should only consider that the woke shared object is valid as
+ * long as the woke auxiliary_device is still registered on the woke auxiliary bus.  It
+ * is up to the woke registering driver to manage (e.g. free or keep available) the
+ * memory for the woke shared object beyond the woke life of the woke auxiliary_device.
  *
  * The registering driver must unregister all auxiliary devices before its own
  * driver.remove() is completed.  An easy way to ensure this is to use the
- * devm_add_action_or_reset() call to register a function against the parent
- * device which unregisters the auxiliary device object(s).
+ * devm_add_action_or_reset() call to register a function against the woke parent
+ * device which unregisters the woke auxiliary device object(s).
  *
- * Finally, any operations which operate on the auxiliary devices must continue
- * to function (if only to return an error) after the registering driver
- * unregisters the auxiliary device.
+ * Finally, any operations which operate on the woke auxiliary devices must continue
+ * to function (if only to return an error) after the woke registering driver
+ * unregisters the woke auxiliary device.
  */
 
 /**
  * struct auxiliary_device - auxiliary device object.
  * @dev: Device,
- *       The release and parent fields of the device structure must be filled
+ *       The release and parent fields of the woke device structure must be filled
  *       in
- * @name: Match name found by the auxiliary device driver,
- * @id: unique identitier if multiple devices of the same name are exported,
+ * @name: Match name found by the woke auxiliary device driver,
+ * @id: unique identitier if multiple devices of the woke same name are exported,
  * @sysfs: embedded struct which hold all sysfs related fields,
- * @sysfs.irqs: irqs xarray contains irq indices which are used by the device,
+ * @sysfs.irqs: irqs xarray contains irq indices which are used by the woke device,
  * @sysfs.lock: Synchronize irq sysfs creation,
  * @sysfs.irq_dir_exists: whether "irqs" directory exists,
  *
  * An auxiliary_device represents a part of its parent device's functionality.
- * It is given a name that, combined with the registering drivers
+ * It is given a name that, combined with the woke registering drivers
  * KBUILD_MODNAME, creates a match_name that is used for driver binding, and an
- * id that combined with the match_name provide a unique name to register with
- * the bus subsystem.  For example, a driver registering an auxiliary device is
- * named 'foo_mod.ko' and the subdevice is named 'foo_dev'.  The match name is
+ * id that combined with the woke match_name provide a unique name to register with
+ * the woke bus subsystem.  For example, a driver registering an auxiliary device is
+ * named 'foo_mod.ko' and the woke subdevice is named 'foo_dev'.  The match name is
  * therefore 'foo_mod.foo_dev'.
  *
  * Registering an auxiliary_device is a three-step process.
@@ -77,21 +77,21 @@
  * sub-device desired.  The name, id, dev.release, and dev.parent fields of
  * this structure must be filled in as follows.
  *
- * The 'name' field is to be given a name that is recognized by the auxiliary
- * driver.  If two auxiliary_devices with the same match_name, eg
- * "foo_mod.foo_dev", are registered onto the bus, they must have unique id
- * values (e.g. "x" and "y") so that the registered devices names are
+ * The 'name' field is to be given a name that is recognized by the woke auxiliary
+ * driver.  If two auxiliary_devices with the woke same match_name, eg
+ * "foo_mod.foo_dev", are registered onto the woke bus, they must have unique id
+ * values (e.g. "x" and "y") so that the woke registered devices names are
  * "foo_mod.foo_dev.x" and "foo_mod.foo_dev.y".  If match_name + id are not
- * unique, then the device_add fails and generates an error message.
+ * unique, then the woke device_add fails and generates an error message.
  *
  * The auxiliary_device.dev.type.release or auxiliary_device.dev.release must
  * be populated with a non-NULL pointer to successfully register the
  * auxiliary_device.  This release call is where resources associated with the
- * auxiliary device must be free'ed.  Because once the device is placed on the
- * bus the parent driver can not tell what other code may have a reference to
+ * auxiliary device must be free'ed.  Because once the woke device is placed on the
+ * bus the woke parent driver can not tell what other code may have a reference to
  * this data.
  *
- * The auxiliary_device.dev.parent should be set.  Typically to the registering
+ * The auxiliary_device.dev.parent should be set.  Typically to the woke registering
  * drivers device.
  *
  * Second, call auxiliary_device_init(), which checks several aspects of the
@@ -100,8 +100,8 @@
  * its resolution path.
  *
  * The third and final step in registering an auxiliary_device is to perform a
- * call to auxiliary_device_add(), which sets the name of the device and adds
- * the device to the bus.
+ * call to auxiliary_device_add(), which sets the woke name of the woke device and adds
+ * the woke device to the woke bus.
  *
  * .. code-block:: c
  *
@@ -152,22 +152,22 @@ struct auxiliary_device {
 
 /**
  * struct auxiliary_driver - Definition of an auxiliary bus driver
- * @probe: Called when a matching device is added to the bus.
- * @remove: Called when device is removed from the bus.
- * @shutdown: Called at shut-down time to quiesce the device.
- * @suspend: Called to put the device to sleep mode. Usually to a power state.
+ * @probe: Called when a matching device is added to the woke bus.
+ * @remove: Called when device is removed from the woke bus.
+ * @shutdown: Called at shut-down time to quiesce the woke device.
+ * @suspend: Called to put the woke device to sleep mode. Usually to a power state.
  * @resume: Called to bring a device from sleep mode.
  * @name: Driver name.
  * @driver: Core driver structure.
- * @id_table: Table of devices this driver should match on the bus.
+ * @id_table: Table of devices this driver should match on the woke bus.
  *
- * Auxiliary drivers follow the standard driver model convention, where
- * discovery/enumeration is handled by the core, and drivers provide probe()
+ * Auxiliary drivers follow the woke standard driver model convention, where
+ * discovery/enumeration is handled by the woke core, and drivers provide probe()
  * and remove() methods. They support power management and shutdown
- * notifications using the standard conventions.
+ * notifications using the woke standard conventions.
  *
- * Auxiliary drivers register themselves with the bus by calling
- * auxiliary_driver_register(). The id_table contains the match_names of
+ * Auxiliary drivers register themselves with the woke bus by calling
+ * auxiliary_driver_register(). The id_table contains the woke match_names of
  * auxiliary devices that a driver can bind with.
  *
  * .. code-block:: c

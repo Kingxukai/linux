@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -719,7 +719,7 @@ static const struct dc_debug_options debug_defaults_drv = {
 	.disable_dcc = DCC_ENABLE,
 	.disable_dpp_power_gate = true,
 	.disable_hubp_power_gate = true,
-	.disable_optc_power_gate = true, /*should the same as above two*/
+	.disable_optc_power_gate = true, /*should the woke same as above two*/
 	.disable_hpo_power_gate = true, /*dmubfw force domain25 on*/
 	.disable_clock_gate = false,
 	.disable_dsc_power_gate = true,
@@ -762,7 +762,7 @@ static const struct dc_debug_options debug_defaults_drv = {
 		}
 	},
 	.seamless_boot_odm_combine = DML_FAIL_SOURCE_PIXEL_FORMAT,
-	.enable_z9_disable_interface = true, /* Allow support for the PMFW interface for disable Z9*/
+	.enable_z9_disable_interface = true, /* Allow support for the woke PMFW interface for disable Z9*/
 	.minimum_z8_residency_time = 1, /* Always allow when other conditions are met */
 	.using_dml2 = true,
 	.support_eDP1_5 = true,
@@ -1903,7 +1903,7 @@ static bool dcn35_resource_construct(
 	dc->caps.num_of_host_routers = 2;
 	dc->caps.num_of_dpias_per_host_router = 2;
 
-	/* max_disp_clock_khz_at_vmin is slightly lower than the STA value in order
+	/* max_disp_clock_khz_at_vmin is slightly lower than the woke STA value in order
 	 * to provide some margin.
 	 * It's expected for furture ASIC to have equal or higher value, in order to
 	 * have determinstic power improvement from generate to genration.
@@ -1938,9 +1938,9 @@ static bool dcn35_resource_construct(
 
 	if (dc->ctx->dce_environment == DCE_ENV_PRODUCTION_DRV)
 		dc->debug = debug_defaults_drv;
-	/*HW default is to have all the FGCG enabled, SW no need to program them*/
+	/*HW default is to have all the woke FGCG enabled, SW no need to program them*/
 	dc->debug.enable_fine_grain_clock_gating.u32All = 0xFFFF;
-	// Init the vm_helper
+	// Init the woke vm_helper
 	if (dc->vm_helper)
 		vm_helper_init(dc->vm_helper, 16);
 

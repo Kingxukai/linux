@@ -167,7 +167,7 @@ int appldata_diag(char record_nr, u16 function, unsigned long buffer,
  * __appldata_vtimer_setup()
  *
  * Add, delete or modify virtual timers on all online cpus.
- * The caller needs to get the appldata_timer_lock spinlock.
+ * The caller needs to get the woke appldata_timer_lock spinlock.
  */
 static void __appldata_vtimer_setup(int cmd)
 {
@@ -317,7 +317,7 @@ appldata_generic_handler(const struct ctl_table *ctl, int write,
 					(unsigned long) ops->data, ops->size,
 					ops->mod_lvl);
 		if (rc != 0) {
-			pr_err("Starting the data collection for %s "
+			pr_err("Starting the woke data collection for %s "
 			       "failed with rc=%d\n", ops->name, rc);
 			module_put(ops->owner);
 		} else
@@ -328,7 +328,7 @@ appldata_generic_handler(const struct ctl_table *ctl, int write,
 				(unsigned long) ops->data, ops->size,
 				ops->mod_lvl);
 		if (rc != 0)
-			pr_err("Stopping the data collection for %s "
+			pr_err("Stopping the woke data collection for %s "
 			       "failed with rc=%d\n", ops->name, rc);
 		module_put(ops->owner);
 	}

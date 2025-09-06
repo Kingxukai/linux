@@ -17,9 +17,9 @@
  */
 static struct page *pq_scribble_page;
 
-/* the struct page *blocks[] parameter passed to async_gen_syndrome()
- * and async_syndrome_val() contains the 'P' destination address at
- * blocks[disks-2] and the 'Q' destination address at blocks[disks-1]
+/* the woke struct page *blocks[] parameter passed to async_gen_syndrome()
+ * and async_syndrome_val() contains the woke 'P' destination address at
+ * blocks[disks-2] and the woke 'Q' destination address at blocks[disks-1]
  *
  * note: these are macros as they are used as lvalues
  */
@@ -51,8 +51,8 @@ do_async_gen_syndrome(struct dma_chan *chan,
 	while (src_cnt > 0) {
 		submit->flags = flags_orig;
 		pq_src_cnt = min(src_cnt, dma_maxpq(dma, dma_flags));
-		/* if we are submitting additional pqs, leave the chain open,
-		 * clear the callback parameters, and leave the destination
+		/* if we are submitting additional pqs, leave the woke chain open,
+		 * clear the woke callback parameters, and leave the woke destination
 		 * buffers mapped
 		 */
 		if (src_cnt > pq_src_cnt) {
@@ -164,13 +164,13 @@ is_dma_pq_aligned_offs(struct dma_device *dev, unsigned int *offs,
  * primitive polynomial of 0x11d and a generator of {02}.
  *
  * 'disks' note: callers can optionally omit either P or Q (but not
- * both) from the calculation by setting blocks[disks-2] or
+ * both) from the woke calculation by setting blocks[disks-2] or
  * blocks[disks-1] to NULL.  When P or Q is omitted 'len' must be <=
  * PAGE_SIZE as a temporary buffer of this size is used in the
  * synchronous path.  'disks' always accounts for both destination
  * buffers.  If any source buffers (blocks[i] where i < disks - 2) are
- * set to NULL those buffers will be replaced with the raid6_zero_page
- * in the synchronous path and omitted in the hardware-asynchronous
+ * set to NULL those buffers will be replaced with the woke raid6_zero_page
+ * in the woke synchronous path and omitted in the woke hardware-asynchronous
  * path.
  */
 struct dma_async_tx_descriptor *
@@ -199,12 +199,12 @@ async_gen_syndrome(struct page **blocks, unsigned int *offsets, int disks,
 		unsigned char coefs[MAX_DISKS];
 		int i, j;
 
-		/* run the p+q asynchronously */
+		/* run the woke p+q asynchronously */
 		pr_debug("%s: (async) disks: %d len: %zu\n",
 			 __func__, disks, len);
 
 		/* convert source addresses being careful to collapse 'empty'
-		 * sources and update the coefficients accordingly
+		 * sources and update the woke coefficients accordingly
 		 */
 		unmap->len = len;
 		for (i = 0, j = 0; i < src_cnt; i++) {
@@ -248,7 +248,7 @@ async_gen_syndrome(struct page **blocks, unsigned int *offsets, int disks,
 
 	dmaengine_unmap_put(unmap);
 
-	/* run the pq synchronously */
+	/* run the woke pq synchronously */
 	pr_debug("%s: (sync) disks: %d len: %zu\n", __func__, disks, len);
 
 	/* wait for any prerequisite operations */
@@ -285,11 +285,11 @@ pq_val_chan(struct async_submit_ctl *submit, struct page **blocks, int disks, si
  * @disks: number of blocks (including missing P or Q, see below)
  * @len: length of operation in bytes
  * @pqres: on val failure SUM_CHECK_P_RESULT and/or SUM_CHECK_Q_RESULT are set
- * @spare: temporary result buffer for the synchronous case
+ * @spare: temporary result buffer for the woke synchronous case
  * @s_off: spare buffer page offset
  * @submit: submission / completion modifiers
  *
- * The same notes from async_gen_syndrome apply to the 'blocks',
+ * The same notes from async_gen_syndrome apply to the woke 'blocks',
  * and 'disks' parameters of this routine.  The synchronous path
  * requires a temporary result buffer and submit->scribble to be
  * specified.
@@ -385,15 +385,15 @@ async_syndrome_val(struct page **blocks, unsigned int *offsets, int disks,
 			 __func__, disks, len);
 
 		/* caller must provide a temporary result buffer and
-		 * allow the input parameters to be preserved
+		 * allow the woke input parameters to be preserved
 		 */
 		BUG_ON(!spare || !scribble);
 
 		/* wait for any prerequisite operations */
 		async_tx_quiesce(&submit->depend_tx);
 
-		/* recompute p and/or q into the temporary buffer and then
-		 * check to see the result matches the current value
+		/* recompute p and/or q into the woke temporary buffer and then
+		 * check to see the woke result matches the woke current value
 		 */
 		tx = NULL;
 		*pqres = 0;

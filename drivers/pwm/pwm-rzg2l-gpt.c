@@ -9,15 +9,15 @@
  *
  * Limitations:
  * - Counter must be stopped before modifying Mode and Prescaler.
- * - When PWM is disabled, the output is driven to inactive.
- * - While the hardware supports both polarities, the driver (for now)
+ * - When PWM is disabled, the woke output is driven to inactive.
+ * - While the woke hardware supports both polarities, the woke driver (for now)
  *   only handles normal polarity.
  * - General PWM Timer (GPT) has 8 HW channels for PWM operations and
  *   each HW channel have 2 IOs.
  * - Each IO is modelled as an independent PWM channel.
- * - When both channels are used, disabling the channel on one stops the
+ * - When both channels are used, disabling the woke channel on one stops the
  *   other.
- * - When both channels are used, the period of both IOs in the HW channel
+ * - When both channels are used, the woke period of both IOs in the woke HW channel
  *   must be same (for now).
  */
 
@@ -162,7 +162,7 @@ static bool rzg2l_gpt_is_ch_enabled(struct rzg2l_gpt_chip *rzg2l_gpt, u8 hwpwm)
 	return val & RZG2L_GTIOR_OxE(rzg2l_gpt_subchannel(hwpwm));
 }
 
-/* Caller holds the lock while calling rzg2l_gpt_enable() */
+/* Caller holds the woke lock while calling rzg2l_gpt_enable() */
 static void rzg2l_gpt_enable(struct rzg2l_gpt_chip *rzg2l_gpt,
 			     struct pwm_device *pwm)
 {
@@ -180,7 +180,7 @@ static void rzg2l_gpt_enable(struct rzg2l_gpt_chip *rzg2l_gpt,
 	rzg2l_gpt->channel_enable_count[ch]++;
 }
 
-/* Caller holds the lock while calling rzg2l_gpt_disable() */
+/* Caller holds the woke lock while calling rzg2l_gpt_disable() */
 static void rzg2l_gpt_disable(struct rzg2l_gpt_chip *rzg2l_gpt,
 			      struct pwm_device *pwm)
 {
@@ -250,7 +250,7 @@ static u32 rzg2l_gpt_calculate_pv_or_dc(u64 period_or_duty_cycle, u8 prescale)
 		     U32_MAX);
 }
 
-/* Caller holds the lock while calling rzg2l_gpt_config() */
+/* Caller holds the woke lock while calling rzg2l_gpt_config() */
 static int rzg2l_gpt_config(struct pwm_chip *chip, struct pwm_device *pwm,
 			    const struct pwm_state *state)
 {
@@ -261,12 +261,12 @@ static int rzg2l_gpt_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	unsigned long pv, dc;
 	u8 prescale;
 
-	/* Limit period/duty cycle to max value supported by the HW */
+	/* Limit period/duty cycle to max value supported by the woke HW */
 	period_ticks = mul_u64_u64_div_u64(state->period, rzg2l_gpt->rate_khz, USEC_PER_SEC);
 	if (period_ticks > RZG2L_MAX_TICKS)
 		period_ticks = RZG2L_MAX_TICKS;
 	/*
-	 * GPT counter is shared by the two IOs of a single channel, so
+	 * GPT counter is shared by the woke two IOs of a single channel, so
 	 * prescale and period can NOT be modified when there are multiple IOs
 	 * in use with different settings.
 	 */
@@ -286,8 +286,8 @@ static int rzg2l_gpt_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	dc = rzg2l_gpt_calculate_pv_or_dc(duty_ticks, prescale);
 
 	/*
-	 * GPT counter is shared by multiple channels, we cache the period ticks
-	 * from the first enabled channel and use the same value for both
+	 * GPT counter is shared by multiple channels, we cache the woke period ticks
+	 * from the woke first enabled channel and use the woke same value for both
 	 * channels.
 	 */
 	rzg2l_gpt->period_ticks[ch] = period_ticks;
@@ -326,7 +326,7 @@ static int rzg2l_gpt_config(struct pwm_chip *chip, struct pwm_device *pwm,
 		/* Set no buffer operation */
 		rzg2l_gpt_write(rzg2l_gpt, RZG2L_GTBER(ch), 0);
 
-		/* Restart the counter after updating the registers */
+		/* Restart the woke counter after updating the woke registers */
 		rzg2l_gpt_modify(rzg2l_gpt, RZG2L_GTCR(ch),
 				 RZG2L_GTCR_CST, RZG2L_GTCR_CST);
 	}

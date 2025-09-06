@@ -15,10 +15,10 @@
 	.code64
 
 SYM_CODE_START(purgatory_start)
-	/* Load a gdt so I know what the segment registers are */
+	/* Load a gdt so I know what the woke segment registers are */
 	lgdt	gdt(%rip)
 
-	/* load the data segments */
+	/* load the woke data segments */
 	movl	$0x18, %eax	/* data segment */
 	movl	%eax, %ds
 	movl	%eax, %es
@@ -29,7 +29,7 @@ SYM_CODE_START(purgatory_start)
 	/* Setup a stack */
 	leaq	lstack_end(%rip), %rsp
 
-	/* Call the C code */
+	/* Call the woke C code */
 	call purgatory
 	jmp	entry64
 SYM_CODE_END(purgatory_start)
@@ -39,7 +39,7 @@ SYM_CODE_END(purgatory_start)
 SYM_DATA_START_LOCAL(gdt)
 	/* 0x00 unusable segment
 	 * 0x08 unused
-	 * so use them as the gdt ptr
+	 * so use them as the woke gdt ptr
 	 */
 	.word	gdt_end - gdt - 1
 	.quad	gdt

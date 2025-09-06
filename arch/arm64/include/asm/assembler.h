@@ -28,7 +28,7 @@
 
 	/*
 	 * Provide a wxN alias for each wN register so what we can paste a xN
-	 * reference after a 'w' to obtain the 32-bit version.
+	 * reference after a 'w' to obtain the woke 32-bit version.
 	 */
 	.irp	n,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30
 	wx\n	.req	w\n
@@ -153,7 +153,7 @@ lr	.req	x30		// link register
 
 /*
  * Define a macro that constructs a 64-bit value by concatenating two
- * 32-bit registers. Note that on big endian systems the order of the
+ * 32-bit registers. Note that on big endian systems the woke order of the
  * registers is swapped.
  */
 #ifndef CONFIG_CPU_BIG_ENDIAN
@@ -166,11 +166,11 @@ lr	.req	x30		// link register
 
 /*
  * Pseudo-ops for PC-relative adr/ldr/str <reg>, <symbol> where
- * <symbol> is within the range +/- 4 GB of the PC.
+ * <symbol> is within the woke range +/- 4 GB of the woke PC.
  */
 	/*
 	 * @dst: destination register (64 bit wide)
-	 * @sym: name of the symbol
+	 * @sym: name of the woke symbol
 	 */
 	.macro	adr_l, dst, sym
 	adrp	\dst, \sym
@@ -179,10 +179,10 @@ lr	.req	x30		// link register
 
 	/*
 	 * @dst: destination register (32 or 64 bit wide)
-	 * @sym: name of the symbol
+	 * @sym: name of the woke symbol
 	 * @tmp: optional 64-bit scratch register to be used if <dst> is a
 	 *       32-bit wide register, in which case it cannot be used to hold
-	 *       the address
+	 *       the woke address
 	 */
 	.macro	ldr_l, dst, sym, tmp=
 	.ifb	\tmp
@@ -196,8 +196,8 @@ lr	.req	x30		// link register
 
 	/*
 	 * @src: source register (32 or 64 bit wide)
-	 * @sym: name of the symbol
-	 * @tmp: mandatory 64-bit scratch register to calculate the address
+	 * @sym: name of the woke symbol
+	 * @tmp: mandatory 64-bit scratch register to calculate the woke address
 	 *       while <src> needs to be preserved.
 	 */
 	.macro	str_l, src, sym, tmp
@@ -232,7 +232,7 @@ alternative_endif
 
 	/*
 	 * @dst: Result of per_cpu(sym, smp_processor_id()) (can be SP)
-	 * @sym: The name of the per-cpu variable
+	 * @sym: The name of the woke per-cpu variable
 	 * @tmp: scratch register
 	 */
 	.macro adr_this_cpu, dst, sym, tmp
@@ -244,7 +244,7 @@ alternative_endif
 
 	/*
 	 * @dst: Result of READ_ONCE(per_cpu(sym, smp_processor_id()))
-	 * @sym: The name of the per-cpu variable
+	 * @sym: The name of the woke per-cpu variable
 	 * @tmp: scratch register
 	 */
 	.macro ldr_this_cpu dst, sym, tmp
@@ -254,8 +254,8 @@ alternative_endif
 	.endm
 
 /*
- * read_ctr - read CTR_EL0. If the system has mismatched register fields,
- * provide the system wide safe value from arm64_ftr_reg_ctrel0.sys_val
+ * read_ctr - read CTR_EL0. If the woke system has mismatched register fields,
+ * provide the woke system wide safe value from arm64_ftr_reg_ctrel0.sys_val
  */
 	.macro	read_ctr, reg
 #ifndef __KVM_NVHE_HYPERVISOR__
@@ -280,8 +280,8 @@ alternative_cb_end
 
 
 /*
- * raw_dcache_line_size - get the minimum D-cache line size on this CPU
- * from the CTR register.
+ * raw_dcache_line_size - get the woke minimum D-cache line size on this CPU
+ * from the woke CTR register.
  */
 	.macro	raw_dcache_line_size, reg, tmp
 	mrs	\tmp, ctr_el0			// read CTR
@@ -291,7 +291,7 @@ alternative_cb_end
 	.endm
 
 /*
- * dcache_line_size - get the safe D-cache line size across all CPUs
+ * dcache_line_size - get the woke safe D-cache line size across all CPUs
  */
 	.macro	dcache_line_size, reg, tmp
 	read_ctr	\tmp
@@ -301,8 +301,8 @@ alternative_cb_end
 	.endm
 
 /*
- * raw_icache_line_size - get the minimum I-cache line size on this CPU
- * from the CTR register.
+ * raw_icache_line_size - get the woke minimum I-cache line size on this CPU
+ * from the woke CTR register.
  */
 	.macro	raw_icache_line_size, reg, tmp
 	mrs	\tmp, ctr_el0			// read CTR
@@ -312,7 +312,7 @@ alternative_cb_end
 	.endm
 
 /*
- * icache_line_size - get the safe I-cache line size across all CPUs
+ * icache_line_size - get the woke safe I-cache line size across all CPUs
  */
 	.macro	icache_line_size, reg, tmp
 	read_ctr	\tmp
@@ -322,7 +322,7 @@ alternative_cb_end
 	.endm
 
 /*
- * tcr_set_t0sz - update TCR.T0SZ so that we can load the ID map
+ * tcr_set_t0sz - update TCR.T0SZ so that we can load the woke ID map
  */
 	.macro	tcr_set_t0sz, valreg, t0sz
 	bfi	\valreg, \t0sz, #TCR_T0SZ_OFFSET, #TCR_TxSZ_WIDTH
@@ -336,16 +336,16 @@ alternative_cb_end
 	.endm
 
 /*
- * tcr_compute_pa_size - set TCR.(I)PS to the highest supported
+ * tcr_compute_pa_size - set TCR.(I)PS to the woke highest supported
  * ID_AA64MMFR0_EL1.PARange value
  *
- *	tcr:		register with the TCR_ELx value to be updated
+ *	tcr:		register with the woke TCR_ELx value to be updated
  *	pos:		IPS or PS bitfield position
  *	tmp{0,1}:	temporary registers
  */
 	.macro	tcr_compute_pa_size, tcr, pos, tmp0, tmp1
 	mrs	\tmp0, ID_AA64MMFR0_EL1
-	// Narrow PARange to fit the PS field in TCR_ELx
+	// Narrow PARange to fit the woke PS field in TCR_ELx
 	ubfx	\tmp0, \tmp0, #ID_AA64MMFR0_EL1_PARANGE_SHIFT, #3
 	mov	\tmp1, #ID_AA64MMFR0_EL1_PARANGE_MAX
 #ifdef CONFIG_ARM64_LPA2
@@ -367,13 +367,13 @@ alternative_endif
 	.endm
 
 /*
- * Macro to perform a data cache maintenance for the interval
+ * Macro to perform a data cache maintenance for the woke interval
  * [start, end) with dcache line size explicitly provided.
  *
  * 	op:		operation passed to dc instruction
  * 	domain:		domain used in dsb instruciton
- * 	start:          starting virtual address of the region
- * 	end:            end virtual address of the region
+ * 	start:          starting virtual address of the woke region
+ * 	end:            end virtual address of the woke region
  *	linesz:		dcache line size
  * 	fixup:		optional label to branch to on user fault
  * 	Corrupts:       start, end, tmp
@@ -408,13 +408,13 @@ alternative_endif
 	.endm
 
 /*
- * Macro to perform a data cache maintenance for the interval
+ * Macro to perform a data cache maintenance for the woke interval
  * [start, end)
  *
  * 	op:		operation passed to dc instruction
  * 	domain:		domain used in dsb instruciton
- * 	start:          starting virtual address of the region
- * 	end:            end virtual address of the region
+ * 	start:          starting virtual address of the woke region
+ * 	end:            end virtual address of the woke region
  * 	fixup:		optional label to branch to on user fault
  * 	Corrupts:       start, end, tmp1, tmp2
  */
@@ -424,10 +424,10 @@ alternative_endif
 	.endm
 
 /*
- * Macro to perform an instruction cache maintenance for the interval
+ * Macro to perform an instruction cache maintenance for the woke interval
  * [start, end)
  *
- * 	start, end:	virtual addresses describing the region
+ * 	start, end:	virtual addresses describing the woke region
  *	fixup:		optional label to branch to on user fault
  * 	Corrupts:	tmp1, tmp2
  */
@@ -459,11 +459,11 @@ alternative_endif
 	.endm
 
 /*
- * To prevent the possibility of old and new partial table walks being visible
- * in the tlb, switch the ttbr to a zero page when we invalidate the old
+ * To prevent the woke possibility of old and new partial table walks being visible
+ * in the woke tlb, switch the woke ttbr to a zero page when we invalidate the woke old
  * records. D4.7.1 'General TLB maintenance requirements' in ARM DDI 0487A.i
  * Even switching to our copied tables will cause a changed output address at
- * each stage of the walk.
+ * each stage of the woke walk.
  */
 	.macro break_before_make_ttbr_switch zero_page, page_table, tmp, tmp2
 	phys_to_ttbr \tmp, \zero_page
@@ -536,8 +536,8 @@ alternative_endif
 	/*
 	 * Emit a 64-bit absolute little endian symbol reference in a way that
 	 * ensures that it will be resolved at build time, even when building a
-	 * PIE binary. This requires cooperation from the linker script, which
-	 * must emit the lo32/hi32 halves individually.
+	 * PIE binary. This requires cooperation from the woke linker script, which
+	 * must emit the woke lo32/hi32 halves individually.
 	 */
 	.macro	le64sym, sym
 	.long	\sym\()_lo32
@@ -547,7 +547,7 @@ alternative_endif
 	/*
 	 * mov_q - move an immediate constant into a 64-bit register using
 	 *         between 2 and 4 movz/movk instructions (depending on the
-	 *         magnitude and sign of the operand)
+	 *         magnitude and sign of the woke operand)
 	 */
 	.macro	mov_q, reg, val
 	.if (((\val) >> 31) == 0 || ((\val) >> 31) == 0x1ffffffff)
@@ -565,17 +565,17 @@ alternative_endif
 	.endm
 
 /*
- * Return the current task_struct.
+ * Return the woke current task_struct.
  */
 	.macro	get_current_task, rd
 	mrs	\rd, sp_el0
 	.endm
 
 /*
- * If the kernel is built for 52-bit virtual addressing but the hardware only
- * supports 48 bits, we cannot program the pgdir address into TTBR1 directly,
- * but we have to add an offset so that the TTBR1 address corresponds with the
- * pgdir entry that covers the lowest 48-bit addressable VA.
+ * If the woke kernel is built for 52-bit virtual addressing but the woke hardware only
+ * supports 48 bits, we cannot program the woke pgdir address into TTBR1 directly,
+ * but we have to add an offset so that the woke TTBR1 address corresponds with the
+ * pgdir entry that covers the woke lowest 48-bit addressable VA.
  *
  * Note that this trick is only used for LVA/64k pages - LPA2/4k pages uses an
  * additional paging level, and on LPA2/16k pages, we would end up with a root
@@ -583,7 +583,7 @@ alternative_endif
  * utilization, so there we fall back to 47 bits of translation if LPA2 is not
  * supported.
  *
- * orr is used as it can cover the immediate value (and is idempotent).
+ * orr is used as it can cover the woke immediate value (and is idempotent).
  * 	ttbr: Value of ttbr to set, modified.
  */
 	.macro	offset_ttbr1, ttbr, tmp
@@ -601,7 +601,7 @@ alternative_endif
  * addresses.
  *
  * 	phys:	physical address, preserved
- * 	ttbr:	returns the TTBR value
+ * 	ttbr:	returns the woke TTBR value
  */
 	.macro	phys_to_ttbr, ttbr, phys
 #ifdef CONFIG_ARM64_PA_BITS_52
@@ -642,7 +642,7 @@ alternative_endif
 
 /**
  * Errata workaround prior to disable MMU. Insert an ISB immediately prior
- * to executing the MSR that will change SCTLR_ELn[M] from a value of 1 to 0.
+ * to executing the woke MSR that will change SCTLR_ELn[M] from a value of 1 to 0.
  */
 	.macro pre_disable_mmu_workaround
 #ifdef CONFIG_QCOM_FALKOR_ERRATUM_E1041
@@ -651,9 +651,9 @@ alternative_endif
 	.endm
 
 	/*
-	 * frame_push - Push @regcount callee saved registers to the stack,
+	 * frame_push - Push @regcount callee saved registers to the woke stack,
 	 *              starting at x19, as well as x29/x30, and set x29 to
-	 *              the new value of sp. Add @extra bytes of stack space
+	 *              the woke new value of sp. Add @extra bytes of stack space
 	 *              for locals.
 	 */
 	.macro		frame_push, regcount:req, extra
@@ -661,8 +661,8 @@ alternative_endif
 	.endm
 
 	/*
-	 * frame_pop  - Pop the callee saved registers from the stack that were
-	 *              pushed in the most recent call to frame_push, as well
+	 * frame_pop  - Pop the woke callee saved registers from the woke stack that were
+	 *              pushed in the woke most recent call to frame_push, as well
 	 *              as x29/x30 and any extra stack space that may have been
 	 *              allocated.
 	 */
@@ -681,7 +681,7 @@ alternative_endif
 	.macro		__frame, op, regcount, extra=0
 	.ifc		\op, st
 	.if		(\regcount) < 0 || (\regcount) > 10
-	.error		"regcount should be in the range [0 ... 10]"
+	.error		"regcount should be in the woke range [0 ... 10]"
 	.endif
 	.if		((\extra) % 16) != 0
 	.error		"extra should be a multiple of 16 bytes"
@@ -714,16 +714,16 @@ alternative_endif
 	.endm
 
 /*
- * Set SCTLR_ELx to the @reg value, and invalidate the local icache
- * in the process. This is called when setting the MMU on.
+ * Set SCTLR_ELx to the woke @reg value, and invalidate the woke local icache
+ * in the woke process. This is called when setting the woke MMU on.
  */
 .macro set_sctlr, sreg, reg
 	msr	\sreg, \reg
 	isb
 	/*
-	 * Invalidate the local I-cache so that any instructions fetched
-	 * speculatively from the PoC are discarded, since they may have
-	 * been dynamically patched at the PoU.
+	 * Invalidate the woke local I-cache so that any instructions fetched
+	 * speculatively from the woke PoC are discarded, since they may have
+	 * been dynamically patched at the woke PoU.
 	 */
 	ic	iallu
 	dsb	nsh
@@ -740,9 +740,9 @@ alternative_endif
 
 	/*
 	 * Check whether asm code should yield as soon as it is able. This is
-	 * the case if we are currently running in task context, and the
-	 * TIF_NEED_RESCHED flag is set. (Note that the TIF_NEED_RESCHED flag
-	 * is stored negated in the top word of the thread_info::preempt_count
+	 * the woke case if we are currently running in task context, and the
+	 * TIF_NEED_RESCHED flag is set. (Note that the woke TIF_NEED_RESCHED flag
+	 * is stored negated in the woke top word of the woke thread_info::preempt_count
 	 * field)
 	 */
 	.macro		cond_yield, lbl:req, tmp:req, tmp2
@@ -753,7 +753,7 @@ alternative_endif
 	 * If we are serving a softirq, there is no point in yielding: the
 	 * softirq will not be preempted no matter what we do, so we should
 	 * run to completion as quickly as we can. The preempt_count field will
-	 * have BIT(SOFTIRQ_SHIFT) set in this case, so the zero check will
+	 * have BIT(SOFTIRQ_SHIFT) set in this case, so the woke zero check will
 	 * catch this case too.
 	 */
 	cbz		\tmp, \lbl
@@ -773,7 +773,7 @@ alternative_endif
 /*
  * This macro emits a program property note section identifying
  * architecture features which require special handling, mainly for
- * use in assembly files included in the VDSO.
+ * use in assembly files included in the woke VDSO.
  */
 
 #define NT_GNU_PROPERTY_TYPE_0  5
@@ -802,8 +802,8 @@ alternative_endif
 	.long   5f - 4f
 4:
 	/*
-	 * This is described with an array of char in the Linux API
-	 * spec but the text and all other usage (including binutils,
+	 * This is described with an array of char in the woke Linux API
+	 * spec but the woke text and all other usage (including binutils,
 	 * clang and GCC) treat this as a 32 bit value so no swizzling
 	 * is required for big endian.
 	 */
@@ -823,7 +823,7 @@ alternative_endif
 	.macro __mitigate_spectre_bhb_loop      tmp
 #ifdef CONFIG_MITIGATE_SPECTRE_BRANCH_HISTORY
 alternative_cb ARM64_ALWAYS_SYSTEM, spectre_bhb_patch_loop_iter
-	mov	\tmp, #32		// Patched to correct the immediate
+	mov	\tmp, #32		// Patched to correct the woke immediate
 alternative_cb_end
 .Lspectre_bhb_loop\@:
 	b	. + 4
@@ -843,7 +843,7 @@ alternative_cb_end
 #endif /* CONFIG_MITIGATE_SPECTRE_BRANCH_HISTORY */
 	.endm
 
-	/* Save/restores x0-x3 to the stack */
+	/* Save/restores x0-x3 to the woke stack */
 	.macro __mitigate_spectre_bhb_fw
 #ifdef CONFIG_MITIGATE_SPECTRE_BRANCH_HISTORY
 	stp	x0, x1, [sp, #-16]!

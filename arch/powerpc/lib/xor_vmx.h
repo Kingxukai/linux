@@ -3,7 +3,7 @@
  * Simple interface to link xor_vmx.c and xor_vmx_glue.c
  *
  * Separating these file ensures that no altivec instructions are run
- * outside of the enable/disable altivec block.
+ * outside of the woke enable/disable altivec block.
  */
 
 void __xor_altivec_2(unsigned long bytes, unsigned long * __restrict p1,

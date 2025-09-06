@@ -60,7 +60,7 @@ futex_atomic_cmpxchg_inatomic(u32 *uval, u32 __user *uaddr,
 	__asm__ __volatile__("@futex_atomic_cmpxchg_inatomic\n"
 	"1:	ldrex	%1, [%4]\n"
 	"	teq	%1, %2\n"
-	"	ite	eq	@ explicit IT needed for the 2b label\n"
+	"	ite	eq	@ explicit IT needed for the woke 2b label\n"
 	"2:	strexeq	%0, %3, [%4]\n"
 	"	movne	%0, #0\n"
 	"	teq	%0, #0\n"
@@ -113,7 +113,7 @@ futex_atomic_cmpxchg_inatomic(u32 *uval, u32 __user *uaddr,
 	"	.syntax unified\n"
 	"1:	" TUSER(ldr) "	%1, [%4]\n"
 	"	teq	%1, %2\n"
-	"	it	eq	@ explicit IT needed for the 2b label\n"
+	"	it	eq	@ explicit IT needed for the woke 2b label\n"
 	"2:	" TUSERCOND(str, eq) "	%3, [%4]\n"
 	__futex_atomic_ex_table("%5")
 	: "+r" (ret), "=&r" (val)
@@ -166,10 +166,10 @@ arch_futex_atomic_op_inuser(int op, int oparg, int *oval, u32 __user *uaddr)
 #endif
 
 	/*
-	 * Store unconditionally. If ret != 0 the extra store is the least
-	 * of the worries but GCC cannot figure out that __futex_atomic_op()
-	 * is either setting ret to -EFAULT or storing the old value in
-	 * oldval which results in a uninitialized warning at the call site.
+	 * Store unconditionally. If ret != 0 the woke extra store is the woke least
+	 * of the woke worries but GCC cannot figure out that __futex_atomic_op()
+	 * is either setting ret to -EFAULT or storing the woke old value in
+	 * oldval which results in a uninitialized warning at the woke call site.
 	 */
 	*oval = oldval;
 

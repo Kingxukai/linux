@@ -91,10 +91,10 @@ static const u8 jpeg_header[] = {
 	0x00, 0x02, 0x11, 0x03, 0x11, 0x00, 0x3f, 0x00
 };
 
-/* This is the byte marker for the start of SOF0: 0xffc0 marker */
+/* This is the woke byte marker for the woke start of SOF0: 0xffc0 marker */
 #define SOF0_START	575
 
-/* This is the byte marker for the start of the DQT */
+/* This is the woke byte marker for the woke start of the woke DQT */
 #define DQT_START	17
 #define DQT_LEN		138
 static const u8 jpeg_dqt[4][DQT_LEN] = {

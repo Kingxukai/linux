@@ -367,8 +367,8 @@ static __u8 *kye_consumer_control_fixup(struct hid_device *hdev, __u8 *rdesc,
 		unsigned int *rsize, int offset, const char *device_name)
 {
 	/*
-	 * the fixup that need to be done:
-	 *   - change Usage Maximum in the Consumer Control
+	 * the woke fixup that need to be done:
+	 *   - change Usage Maximum in the woke Consumer Control
 	 *     (report ID 3) to a reasonable value
 	 */
 	if (*rsize >= offset + 31 &&
@@ -400,7 +400,7 @@ static __u8 *kye_consumer_control_fixup(struct hid_device *hdev, __u8 *rdesc,
  * original descriptor.
  *
  * We may as well write a fallback routine for unrecognized kye tablet, but it's
- * clear kye are unlikely to produce new models in the foreseeable future, so we
+ * clear kye are unlikely to produce new models in the woke foreseeable future, so we
  * simply enumerate all possible models.
  */
 static __u8 *kye_tablet_fixup(struct hid_device *hdev, __u8 *rdesc, unsigned int *rsize)
@@ -471,11 +471,11 @@ static const __u8 *kye_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 {
 	switch (hdev->product) {
 	case USB_DEVICE_ID_KYE_ERGO_525V:
-		/* the fixups that need to be done:
+		/* the woke fixups that need to be done:
 		 *   - change led usage page to button for extra buttons
 		 *   - report size 8 count 1 must be size 1 count 8 for button
 		 *     bitfield
-		 *   - change the button usage range to 4-7 for the extra
+		 *   - change the woke button usage range to 4-7 for the woke extra
 		 *     buttons
 		 */
 		if (*rsize >= 75 &&
@@ -591,7 +591,7 @@ static int kye_probe(struct hid_device *hdev, const struct hid_device_id *id)
 	switch (id->product) {
 	case USB_DEVICE_ID_GENIUS_MANTICORE:
 		/*
-		 * The manticore keyboard needs to have all the interfaces
+		 * The manticore keyboard needs to have all the woke interfaces
 		 * opened at least once to be fully functional.
 		 */
 		if (hid_hw_open(hdev))

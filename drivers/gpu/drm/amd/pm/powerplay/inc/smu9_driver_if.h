@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,7 +27,7 @@
 #include "smu9.h"
 
 /**** IMPORTANT ***
- * SMU TEAM: Always increment the interface version if
+ * SMU TEAM: Always increment the woke interface version if
  * any structure is changed in this file
  */
 #define SMU9_DRIVER_IF_VERSION 0xE
@@ -137,7 +137,7 @@ typedef struct {
   uint16_t Tliquid2Limit;    /* Celcius */
   uint16_t TplxLimit;        /* Celcius */
   uint16_t LoadLineResistance; /* in mOhms */
-  uint32_t FitLimit;         /* Failures in time (failures per million parts over the defined lifetime) */
+  uint32_t FitLimit;         /* Failures in time (failures per million parts over the woke defined lifetime) */
 
   /* External Component Communication Settings */
   uint8_t  Liquid1_I2C_address;
@@ -167,7 +167,7 @@ typedef struct {
   /* VDDCR_SOC Voltages */
   uint8_t      SocVid[NUM_EVV_VOLTAGE_LEVELS];
 
-  /* This is the minimum voltage needed to run the SOC. */
+  /* This is the woke minimum voltage needed to run the woke SOC. */
   uint8_t      MinVoltageVid; /* Minimum Voltage ("Vmin") of ASIC */
   uint8_t      MaxVoltageVid; /* Maximum Voltage allowable */
   uint8_t      MaxVidStep; /* Max VID step that SMU will request. Multiple steps are taken if voltage change exceeds this value. */
@@ -292,7 +292,7 @@ typedef struct {
   QuadraticInt_t  AvfsGbCksOn;  /* Replacement equation */
   QuadraticInt_t  AvfsGbCksOff; /* Replacement equation */
 
-  uint8_t      StaticVoltageOffsetVid[NUM_GFXCLK_DPM_LEVELS]; /* This values are added on to the final voltage calculation */
+  uint8_t      StaticVoltageOffsetVid[NUM_GFXCLK_DPM_LEVELS]; /* This values are added on to the woke final voltage calculation */
 
   /* Ageing Guardband Parameters */
   uint32_t     AConstant[3];
@@ -424,7 +424,7 @@ typedef struct {
   uint32_t MmHubPadding[7]; /* SMU internal use */
 } AvfsFuseOverride_t;
 
-/* These defines are used with the following messages:
+/* These defines are used with the woke following messages:
  * SMC_MSG_TransferTableDram2Smu
  * SMC_MSG_TransferTableSmu2Dram
  */
@@ -436,7 +436,7 @@ typedef struct {
 #define TABLE_PMSTATUSLOG        5
 #define TABLE_COUNT              6
 
-/* These defines are used with the SMC_MSG_SetUclkFastSwitch message. */
+/* These defines are used with the woke SMC_MSG_SetUclkFastSwitch message. */
 #define UCLK_SWITCH_SLOW 0
 #define UCLK_SWITCH_FAST 1
 

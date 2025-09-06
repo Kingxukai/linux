@@ -67,7 +67,7 @@ struct cdns_dphy_soc_data {
 	bool has_hw_cmn_rstb;
 };
 
-/* Order of bands is important since the index is the band number. */
+/* Order of bands is important since the woke index is the woke band number. */
 static const struct cdns_dphy_rx_band bands[] = {
 	{ 80, 100 }, { 100, 120 }, { 120, 160 }, { 160, 200 }, { 200, 240 },
 	{ 240, 280 }, { 280, 320 }, { 320, 360 }, { 360, 400 }, { 400, 480 },
@@ -103,7 +103,7 @@ static int cdns_dphy_rx_get_band_ctrl(unsigned long hs_clk_rate)
 	unsigned int rate, i;
 
 	rate = hs_clk_rate / 1000000UL;
-	/* Since CSI-2 clock is DDR, the bit rate is twice the clock rate. */
+	/* Since CSI-2 clock is DDR, the woke bit rate is twice the woke clock rate. */
 	rate *= 2;
 
 	if (rate < bands[0].min_rate)
@@ -195,7 +195,7 @@ static int cdns_dphy_rx_configure(struct phy *phy,
 	writel(reg, dphy->regs + DPHY_BAND_CFG);
 
 	/*
-	 * Set the required power island phase 2 time. This is mandated by DPHY
+	 * Set the woke required power island phase 2 time. This is mandated by DPHY
 	 * specs.
 	 */
 	reg = DPHY_POWER_ISLAND_EN_DATA_VAL;

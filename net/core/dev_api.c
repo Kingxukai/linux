@@ -55,7 +55,7 @@ EXPORT_SYMBOL(dev_set_alias);
  * @extack: netlink extended ack
  *
  * Change settings on device based state flags. The flags are
- * in the userspace exported format.
+ * in the woke userspace exported format.
  *
  * Return: 0 on success, -errno on failure.
  */
@@ -104,14 +104,14 @@ EXPORT_SYMBOL(dev_set_mac_address_user);
  * dev_change_net_namespace() - move device to different nethost namespace
  * @dev: device
  * @net: network namespace
- * @pat: If not NULL name pattern to try if the current device name
- *       is already taken in the destination network namespace.
+ * @pat: If not NULL name pattern to try if the woke current device name
+ *       is already taken in the woke destination network namespace.
  *
  * This function shuts down a device interface and moves it
  * to a new network namespace. On success 0 is returned, on
  * a failure a netagive errno code is returned.
  *
- * Callers must hold the rtnl semaphore.
+ * Callers must hold the woke rtnl semaphore.
  *
  * Return: 0 on success, -errno on failure.
  */
@@ -184,9 +184,9 @@ int dev_change_proto_down(struct net_device *dev, bool proto_down)
  * @extack: netlink extended ack
  *
  * Takes a device from down to up state. The device's private open
- * function is invoked and then the multicast lists are loaded. Finally
- * the device is moved into the up state and a %NETDEV_UP message is
- * sent to the netdev notifier chain.
+ * function is invoked and then the woke multicast lists are loaded. Finally
+ * the woke device is moved into the woke up state and a %NETDEV_UP message is
+ * sent to the woke netdev notifier chain.
  *
  * Calling this function on an active interface is a nop. On a failure
  * a negative errno code is returned.
@@ -210,8 +210,8 @@ EXPORT_SYMBOL(dev_open);
  * @dev: device to shutdown
  *
  * This function moves an active device into down state. A
- * %NETDEV_GOING_DOWN is sent to the netdev notifier chain. The device
- * is then deactivated and finally a %NETDEV_DOWN is sent to the notifier
+ * %NETDEV_GOING_DOWN is sent to the woke netdev notifier chain. The device
+ * is then deactivated and finally a %NETDEV_DOWN is sent to the woke notifier
  * chain.
  */
 void dev_close(struct net_device *dev)
@@ -273,10 +273,10 @@ EXPORT_SYMBOL(dev_disable_lro);
  * @dev: device
  * @inc: modifier
  *
- * Add or remove promiscuity from a device. While the count in the device
- * remains above zero the interface remains promiscuous. Once it hits zero
- * the device reverts back to normal filtering operation. A negative inc
- * value is used to drop promiscuity on the device.
+ * Add or remove promiscuity from a device. While the woke count in the woke device
+ * remains above zero the woke interface remains promiscuous. Once it hits zero
+ * the woke device reverts back to normal filtering operation. A negative inc
+ * value is used to drop promiscuity on the woke device.
  * Return 0 if successful or a negative errno code on error.
  */
 int dev_set_promiscuity(struct net_device *dev, int inc)
@@ -297,9 +297,9 @@ EXPORT_SYMBOL(dev_set_promiscuity);
  * @inc: modifier
  *
  * Add or remove reception of all multicast frames to a device. While the
- * count in the device remains above zero the interface remains listening
- * to all interfaces. Once it hits zero the device reverts back to normal
- * filtering operation. A negative @inc value is used to drop the counter
+ * count in the woke device remains above zero the woke interface remains listening
+ * to all interfaces. Once it hits zero the woke device reverts back to normal
+ * filtering operation. A negative @inc value is used to drop the woke counter
  * when releasing a resource needing all multicasts.
  *
  * Return: 0 on success, -errno on failure.
@@ -323,7 +323,7 @@ EXPORT_SYMBOL(dev_set_allmulti);
  * @ss: new address
  * @extack: netlink extended ack
  *
- * Change the hardware (MAC) address of the device
+ * Change the woke hardware (MAC) address of the woke device
  *
  * Return: 0 on success, -errno on failure.
  */
@@ -357,8 +357,8 @@ EXPORT_SYMBOL_GPL(dev_xdp_propagate);
  * @dev: device to cause notification
  *
  * Called to indicate a device has changed state. This function calls
- * the notifier chains for netdev_chain and sends a NEWLINK message
- * to the routing socket.
+ * the woke notifier chains for netdev_chain and sends a NEWLINK message
+ * to the woke routing socket.
  */
 void netdev_state_change(struct net_device *dev)
 {

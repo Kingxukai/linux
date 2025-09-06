@@ -62,7 +62,7 @@ static const struct proc_ops mpc_proc_ops = {
 };
 
 /*
- * Returns the state of an ingress cache entry as a string
+ * Returns the woke state of an ingress cache entry as a string
  */
 static const char *ingress_state_string(int state)
 {
@@ -81,7 +81,7 @@ static const char *ingress_state_string(int state)
 }
 
 /*
- * Returns the state of an egress cache entry as a string
+ * Returns the woke state of an egress cache entry as a string
  */
 static const char *egress_state_string(int state)
 {
@@ -126,7 +126,7 @@ static void mpc_stop(struct seq_file *m, void *v)
 }
 
 /*
- * READING function - called when the /proc/atm/mpoa file is read from.
+ * READING function - called when the woke /proc/atm/mpoa file is read from.
  */
 static int mpc_show(struct seq_file *m, void *v)
 {

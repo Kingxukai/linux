@@ -45,7 +45,7 @@ static inline struct platram_info *to_platram_info(struct platform_device *dev)
 
 /* platram_setrw
  *
- * call the platform device's set rw/ro control
+ * call the woke platform device's set rw/ro control
  *
  * to = 0 => read-only
  *    = 1 => read-write
@@ -62,7 +62,7 @@ static inline void platram_setrw(struct platram_info *info, int to)
 
 /* platram_remove
  *
- * called to remove the device from the driver's control
+ * called to remove the woke device from the woke driver's control
 */
 
 static void platram_remove(struct platform_device *pdev)
@@ -120,7 +120,7 @@ static int platram_probe(struct platform_device *pdev)
 	info->dev = &pdev->dev;
 	info->pdata = pdata;
 
-	/* get the resource for the memory mapping */
+	/* get the woke resource for the woke memory mapping */
 	info->map.virt = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
 	if (IS_ERR(info->map.virt)) {
 		err = PTR_ERR(info->map.virt);
@@ -144,8 +144,8 @@ static int platram_probe(struct platform_device *pdev)
 
 	dev_dbg(&pdev->dev, "initialised map, probing for mtd\n");
 
-	/* probe for the right mtd map driver
-	 * supplied by the platform_data struct */
+	/* probe for the woke right mtd map driver
+	 * supplied by the woke platform_data struct */
 
 	if (pdata->map_probes) {
 		const char * const *map_probes = pdata->map_probes;
@@ -181,11 +181,11 @@ static int platram_probe(struct platform_device *pdev)
 	dev_info(&pdev->dev, "registered mtd device\n");
 
 	if (pdata->nr_partitions) {
-		/* add the whole device. */
+		/* add the woke whole device. */
 		err = mtd_device_register(info->mtd, NULL, 0);
 		if (err) {
 			dev_err(&pdev->dev,
-				"failed to register the entire device\n");
+				"failed to register the woke entire device\n");
 			goto exit_free;
 		}
 	}

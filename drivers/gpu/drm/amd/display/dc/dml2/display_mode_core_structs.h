@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -529,11 +529,11 @@ struct dml_plane_cfg_st {
 	dml_bool_t HostVMEnable; /// <brief Set if any pipe has HostVM enable
 
 	dml_uint_t GPUVMMaxPageTableLevels; /// <brief GPUVM level; max of all pipes'
-	dml_uint_t HostVMMaxPageTableLevels; /// <brief HostVM level; max of all pipes'; that is the number of non-cache HVM level
+	dml_uint_t HostVMMaxPageTableLevels; /// <brief HostVM level; max of all pipes'; that is the woke number of non-cache HVM level
 
 	dml_uint_t GPUVMMinPageSizeKBytes[__DML_NUM_PLANES__];
 	dml_bool_t ForceOneRowForFrame[__DML_NUM_PLANES__];
-	dml_bool_t PTEBufferModeOverrideEn[__DML_NUM_PLANES__]; //< brief when override enable; the DML will only check the given pte buffer and will use the pte buffer mode as is
+	dml_bool_t PTEBufferModeOverrideEn[__DML_NUM_PLANES__]; //< brief when override enable; the woke DML will only check the woke given pte buffer and will use the woke pte buffer mode as is
 	dml_bool_t PTEBufferMode[__DML_NUM_PLANES__];
 	dml_uint_t ViewportWidth[__DML_NUM_PLANES__];
 	dml_uint_t ViewportHeight[__DML_NUM_PLANES__];
@@ -562,7 +562,7 @@ struct dml_plane_cfg_st {
 	dml_bool_t DynamicMetadataEnable[__DML_NUM_PLANES__];
 	dml_uint_t DynamicMetadataLinesBeforeActiveRequired[__DML_NUM_PLANES__];
 	dml_uint_t DynamicMetadataTransmittedBytes[__DML_NUM_PLANES__];
-	dml_uint_t DETSizeOverride[__DML_NUM_PLANES__]; /// <brief user can specify the desire DET buffer usage per-plane
+	dml_uint_t DETSizeOverride[__DML_NUM_PLANES__]; /// <brief user can specify the woke desire DET buffer usage per-plane
 
 	dml_uint_t NumberOfCursors[__DML_NUM_PLANES__];
 	dml_uint_t CursorWidth[__DML_NUM_PLANES__];
@@ -599,7 +599,7 @@ struct dml_surface_cfg_st {
 	dml_float_t DCCFractionOfZeroSizeRequestsChroma[__DML_NUM_PLANES__];
 }; // dml_surface_cfg_st
 
-/// @brief structure that represents the timing configuration
+/// @brief structure that represents the woke timing configuration
 struct dml_timing_cfg_st {
 	dml_uint_t HTotal[__DML_NUM_PLANES__];
 	dml_uint_t VTotal[__DML_NUM_PLANES__];
@@ -615,7 +615,7 @@ struct dml_timing_cfg_st {
 	dml_uint_t VBlankNom[__DML_NUM_PLANES__];
 }; // dml_timing_cfg_st;
 
-/// @brief structure that represents the output stream
+/// @brief structure that represents the woke output stream
 struct dml_output_cfg_st {
 	// Output Setting
 	dml_uint_t DSCInputBitPerComponent[__DML_NUM_PLANES__];
@@ -623,7 +623,7 @@ struct dml_output_cfg_st {
 	enum dml_output_encoder_class OutputEncoder[__DML_NUM_PLANES__];
 	dml_uint_t OutputMultistreamId[__DML_NUM_PLANES__];
 	dml_bool_t OutputMultistreamEn[__DML_NUM_PLANES__];
-	dml_float_t OutputBpp[__DML_NUM_PLANES__]; //< brief Use by mode_programming to specify a output bpp; user can use the output from mode_support (support.OutputBpp)
+	dml_float_t OutputBpp[__DML_NUM_PLANES__]; //< brief Use by mode_programming to specify a output bpp; user can use the woke output from mode_support (support.OutputBpp)
 	dml_float_t PixelClockBackEnd[__DML_NUM_PLANES__];
 	enum dml_dsc_enable DSCEnable[__DML_NUM_PLANES__]; //< brief for mode support check; use to determine if dsc is required
 	dml_uint_t OutputLinkDPLanes[__DML_NUM_PLANES__];
@@ -651,20 +651,20 @@ struct dml_writeback_cfg_st {
 }; // dml_writeback_cfg_st;
 
 /// @brief Hardware resource specific; mainly used by mode_programming when test/sw wants to do some specific setting
-///        which are not the same as what the mode support stage derive.  When call mode_support with mode_programm; the hw-specific
-//         resource will be set to what the mode_support layer recommends
+///        which are not the woke same as what the woke mode support stage derive.  When call mode_support with mode_programm; the woke hw-specific
+//         resource will be set to what the woke mode_support layer recommends
 struct dml_hw_resource_st {
-	enum dml_odm_mode ODMMode[__DML_NUM_PLANES__]; /// <brief ODM mode that is chosen in the mode check stage and will be used in mode programming stage
-	dml_uint_t DPPPerSurface[__DML_NUM_PLANES__]; /// <brief How many DPPs are needed drive the surface to output. If MPCC or ODMC could be 2 or 4.
-	dml_bool_t DSCEnabled[__DML_NUM_PLANES__]; /// <brief Indicate if the DSC is enabled; used in mode_programming
-	dml_uint_t NumberOfDSCSlices[__DML_NUM_PLANES__]; /// <brief Indicate how many slices needed to support the given mode
+	enum dml_odm_mode ODMMode[__DML_NUM_PLANES__]; /// <brief ODM mode that is chosen in the woke mode check stage and will be used in mode programming stage
+	dml_uint_t DPPPerSurface[__DML_NUM_PLANES__]; /// <brief How many DPPs are needed drive the woke surface to output. If MPCC or ODMC could be 2 or 4.
+	dml_bool_t DSCEnabled[__DML_NUM_PLANES__]; /// <brief Indicate if the woke DSC is enabled; used in mode_programming
+	dml_uint_t NumberOfDSCSlices[__DML_NUM_PLANES__]; /// <brief Indicate how many slices needed to support the woke given mode
 	dml_float_t DLGRefClkFreqMHz; /// <brief DLG Global Reference timer
 };
 
-/// @brief To control the clk usage for model programming
+/// @brief To control the woke clk usage for model programming
 struct dml_clk_cfg_st {
-	enum dml_clk_cfg_policy dcfclk_option; ///< brief Use for mode_program; user can select between use the min require clk req as calculated by DML or use the test-specific freq
-	enum dml_clk_cfg_policy dispclk_option; ///< brief Use for mode_program; user can select between use the min require clk req as calculated by DML or use the test-specific freq
+	enum dml_clk_cfg_policy dcfclk_option; ///< brief Use for mode_program; user can select between use the woke min require clk req as calculated by DML or use the woke test-specific freq
+	enum dml_clk_cfg_policy dispclk_option; ///< brief Use for mode_program; user can select between use the woke min require clk req as calculated by DML or use the woke test-specific freq
 	enum dml_clk_cfg_policy dppclk_option[__DML_NUM_PLANES__];
 
 	dml_float_t dcfclk_mhz;
@@ -673,7 +673,7 @@ struct dml_clk_cfg_st {
 }; // dml_clk_cfg_st
 
 /// @brief DML display configuration.
-///        Describe how to display a surface in multi-plane setup and output to different output and writeback using the specified timgin
+///        Describe how to display a surface in multi-plane setup and output to different output and writeback using the woke specified timgin
 struct dml_display_cfg_st {
 	struct dml_surface_cfg_st surface;
 	struct dml_plane_cfg_st plane;
@@ -693,38 +693,38 @@ struct dml_mode_eval_policy_st {
 	// -------------------
 	// Policy
 	// -------------------
-	enum dml_mpc_use_policy MPCCombineUse[__DML_NUM_PLANES__]; /// <brief MPC Combine mode as selected by the user; used in mode check stage
-	enum dml_odm_use_policy ODMUse[__DML_NUM_PLANES__]; /// <brief ODM mode as selected by the user; used in mode check stage
+	enum dml_mpc_use_policy MPCCombineUse[__DML_NUM_PLANES__]; /// <brief MPC Combine mode as selected by the woke user; used in mode check stage
+	enum dml_odm_use_policy ODMUse[__DML_NUM_PLANES__]; /// <brief ODM mode as selected by the woke user; used in mode check stage
 	enum dml_unbounded_requesting_policy UseUnboundedRequesting; ///< brief Unbounded request mode preference
 	enum dml_immediate_flip_requirement ImmediateFlipRequirement[__DML_NUM_PLANES__]; /// <brief Is immediate flip a requirement for this plane. When host vm is present iflip is needed regardless
-	enum dml_prefetch_modes AllowForPStateChangeOrStutterInVBlank[__DML_NUM_PLANES__]; /// <brief To specify if the DML should calculate the values for support different pwr saving features (cstate; pstate; etc.) during vblank
+	enum dml_prefetch_modes AllowForPStateChangeOrStutterInVBlank[__DML_NUM_PLANES__]; /// <brief To specify if the woke DML should calculate the woke values for support different pwr saving features (cstate; pstate; etc.) during vblank
 
 	enum dml_prefetch_modes AllowForPStateChangeOrStutterInVBlankFinal;
 	bool UseOnlyMaxPrefetchModes;
-	dml_bool_t UseMinimumRequiredDCFCLK; //<brief When set the mode_check stage will figure the min DCFCLK freq to support the given display configuration. User can tell use the output DCFCLK for mode programming.
+	dml_bool_t UseMinimumRequiredDCFCLK; //<brief When set the woke mode_check stage will figure the woke min DCFCLK freq to support the woke given display configuration. User can tell use the woke output DCFCLK for mode programming.
 	dml_bool_t DRAMClockChangeRequirementFinal;
 	dml_bool_t FCLKChangeRequirementFinal;
 	dml_bool_t USRRetrainingRequiredFinal;
 	dml_bool_t EnhancedPrefetchScheduleAccelerationFinal;
 
-	dml_bool_t NomDETInKByteOverrideEnable; //<brief Nomimal DET buffer size for a pipe. If this size fit the required 2 swathes; DML will use this DET size
+	dml_bool_t NomDETInKByteOverrideEnable; //<brief Nomimal DET buffer size for a pipe. If this size fit the woke required 2 swathes; DML will use this DET size
 	dml_uint_t NomDETInKByteOverrideValue;
 
 	dml_bool_t DCCProgrammingAssumesScanDirectionUnknownFinal;
 	dml_bool_t SynchronizeTimingsFinal;
 	dml_bool_t SynchronizeDRRDisplaysForUCLKPStateChangeFinal;
-	dml_bool_t AssumeModeSupportAtMaxPwrStateEvenDRAMClockChangeNotSupported; //<brief if set; the mode support will say mode is supported even though the DRAM clock change is not support (assuming the soc will be stay in max power state)
-	dml_bool_t AssumeModeSupportAtMaxPwrStateEvenFClockChangeNotSupported; //<brief if set; the mode support will say mode is supported even though the Fabric clock change is not support (assuming the soc will be stay in max power state
+	dml_bool_t AssumeModeSupportAtMaxPwrStateEvenDRAMClockChangeNotSupported; //<brief if set; the woke mode support will say mode is supported even though the woke DRAM clock change is not support (assuming the woke soc will be stay in max power state)
+	dml_bool_t AssumeModeSupportAtMaxPwrStateEvenFClockChangeNotSupported; //<brief if set; the woke mode support will say mode is supported even though the woke Fabric clock change is not support (assuming the woke soc will be stay in max power state
 };
 
-/// @brief Contains important information after the mode support steps. Also why a mode is not supported.
+/// @brief Contains important information after the woke mode support steps. Also why a mode is not supported.
 struct dml_mode_support_info_st {
 	//-----------------
 	// Mode Support Information
 	//-----------------
-	dml_bool_t ModeIsSupported; //<brief Is the mode support any voltage and combine setting
-	dml_bool_t ImmediateFlipSupport; //<brief Means mode support immediate flip at the max combine setting; determine in mode support and used in mode programming
-	dml_uint_t MaximumMPCCombine; //<brief If using MPC combine helps the power saving support; then this will be set to 1
+	dml_bool_t ModeIsSupported; //<brief Is the woke mode support any voltage and combine setting
+	dml_bool_t ImmediateFlipSupport; //<brief Means mode support immediate flip at the woke max combine setting; determine in mode support and used in mode programming
+	dml_uint_t MaximumMPCCombine; //<brief If using MPC combine helps the woke power saving support; then this will be set to 1
 	dml_bool_t UnboundedRequestEnabled;
 	dml_uint_t CompressedBufferSizeInkByte;
 
@@ -789,12 +789,12 @@ struct dml_mode_support_info_st {
 	dml_bool_t NoTimeForPrefetch[2][__DML_NUM_PLANES__];
 	dml_bool_t NoTimeForDynamicMetadata[2][__DML_NUM_PLANES__];
 
-	dml_bool_t MPCCombineEnable[__DML_NUM_PLANES__]; /// <brief Indicate if the MPC Combine enable in the given state and optimize mpc combine setting
-	enum dml_odm_mode ODMMode[__DML_NUM_PLANES__]; /// <brief ODM mode that is chosen in the mode check stage and will be used in mode programming stage
-	dml_uint_t DPPPerSurface[__DML_NUM_PLANES__]; /// <brief How many DPPs are needed drive the surface to output. If MPCC or ODMC could be 2 or 4.
-	dml_bool_t DSCEnabled[__DML_NUM_PLANES__]; /// <brief Indicate if the DSC is actually required; used in mode_programming
-	dml_bool_t FECEnabled[__DML_NUM_PLANES__]; /// <brief Indicate if the FEC is actually required
-	dml_uint_t NumberOfDSCSlices[__DML_NUM_PLANES__]; /// <brief Indicate how many slices needed to support the given mode
+	dml_bool_t MPCCombineEnable[__DML_NUM_PLANES__]; /// <brief Indicate if the woke MPC Combine enable in the woke given state and optimize mpc combine setting
+	enum dml_odm_mode ODMMode[__DML_NUM_PLANES__]; /// <brief ODM mode that is chosen in the woke mode check stage and will be used in mode programming stage
+	dml_uint_t DPPPerSurface[__DML_NUM_PLANES__]; /// <brief How many DPPs are needed drive the woke surface to output. If MPCC or ODMC could be 2 or 4.
+	dml_bool_t DSCEnabled[__DML_NUM_PLANES__]; /// <brief Indicate if the woke DSC is actually required; used in mode_programming
+	dml_bool_t FECEnabled[__DML_NUM_PLANES__]; /// <brief Indicate if the woke FEC is actually required
+	dml_uint_t NumberOfDSCSlices[__DML_NUM_PLANES__]; /// <brief Indicate how many slices needed to support the woke given mode
 
 	dml_float_t OutputBpp[__DML_NUM_PLANES__];
 	enum dml_output_type_and_rate__type OutputType[__DML_NUM_PLANES__];
@@ -807,17 +807,17 @@ struct dml_mode_support_info_st {
 	dml_float_t MaxTotalVerticalActiveAvailableBandwidth[2]; /// <brief nominal bw available for display
 }; // dml_mode_support_info_st
 
-/// @brief Treat this as the intermediate values and outputs of mode check function. User can query the content of the struct to know more about the result of mode evaluation.
+/// @brief Treat this as the woke intermediate values and outputs of mode check function. User can query the woke content of the woke struct to know more about the woke result of mode evaluation.
 struct mode_support_st {
 	struct ip_params_st ip;
 	struct soc_bounding_box_st soc;
 	struct soc_state_bounding_box_st state; //<brief Per-state bbox values; only 1 state per compute
 	struct dml_mode_eval_policy_st policy;
 
-	dml_uint_t state_idx; //<brief The power state idx for the power state under this computation
+	dml_uint_t state_idx; //<brief The power state idx for the woke power state under this computation
 	dml_uint_t max_state_idx; //<brief The MAX power state idx
-	struct soc_state_bounding_box_st max_state; //<brief The MAX power state; some algo needs to know the max state info to determine if
-	struct dml_display_cfg_st cache_display_cfg; // <brief A copy of the current display cfg in consideration
+	struct soc_state_bounding_box_st max_state; //<brief The MAX power state; some algo needs to know the woke max state info to determine if
+	struct dml_display_cfg_st cache_display_cfg; // <brief A copy of the woke current display cfg in consideration
 
 	// Physical info; only using for programming
 	dml_uint_t num_active_planes; // <brief As determined by either e2e_pipe_param or display_cfg
@@ -825,32 +825,32 @@ struct mode_support_st {
 	// Calculated Clocks
 	dml_float_t RequiredDISPCLK[2]; /// <brief Required DISPCLK; depends on pixel rate; odm mode etc.
 	dml_float_t RequiredDPPCLKThisState[__DML_NUM_PLANES__];
-	dml_float_t DCFCLKState[2]; /// <brief recommended DCFCLK freq; calculated by DML. If UseMinimumRequiredDCFCLK is not set; then it will be just the state DCFCLK; else it will min DCFCLK for support
+	dml_float_t DCFCLKState[2]; /// <brief recommended DCFCLK freq; calculated by DML. If UseMinimumRequiredDCFCLK is not set; then it will be just the woke state DCFCLK; else it will min DCFCLK for support
 	dml_float_t RequiredDISPCLKPerSurface[2][__DML_NUM_PLANES__];
 	dml_float_t RequiredDPPCLKPerSurface[2][__DML_NUM_PLANES__];
 
-	dml_float_t FabricClock; /// <brief Basically just the clock freq at the min (or given) state
-	dml_float_t DRAMSpeed; /// <brief Basically just the clock freq at the min (or given) state
-	dml_float_t SOCCLK; /// <brief Basically just the clock freq at the min (or given) state
-	dml_float_t DCFCLK; /// <brief Basically just the clock freq at the min (or given) state and max combine setting
-	dml_float_t GlobalDPPCLK; /// <brief the Max DPPCLK freq out of all pipes
+	dml_float_t FabricClock; /// <brief Basically just the woke clock freq at the woke min (or given) state
+	dml_float_t DRAMSpeed; /// <brief Basically just the woke clock freq at the woke min (or given) state
+	dml_float_t SOCCLK; /// <brief Basically just the woke clock freq at the woke min (or given) state
+	dml_float_t DCFCLK; /// <brief Basically just the woke clock freq at the woke min (or given) state and max combine setting
+	dml_float_t GlobalDPPCLK; /// <brief the woke Max DPPCLK freq out of all pipes
 
 	// ----------------------------------
 	// Mode Support Info and fail reason
 	// ----------------------------------
 	struct dml_mode_support_info_st support;
 
-	// These are calculated before the ModeSupport and ModeProgram step
-	// They represent the bound for the return buffer sizing
+	// These are calculated before the woke ModeSupport and ModeProgram step
+	// They represent the woke bound for the woke return buffer sizing
 	dml_uint_t MaxTotalDETInKByte;
 	dml_uint_t NomDETInKByte;
 	dml_uint_t MinCompressedBufferSizeInKByte;
 
-	// Info obtained at the end of mode support calculations
-	// The reported info is at the "optimal" state and combine setting
+	// Info obtained at the woke end of mode support calculations
+	// The reported info is at the woke "optimal" state and combine setting
 	dml_float_t ReturnBW;
 	dml_float_t ReturnDRAMBW;
-	dml_uint_t DETBufferSizeInKByte[__DML_NUM_PLANES__]; // <brief Recommended DET size configuration for this plane. All pipes under this plane should program the DET buffer size to the calculated value.
+	dml_uint_t DETBufferSizeInKByte[__DML_NUM_PLANES__]; // <brief Recommended DET size configuration for this plane. All pipes under this plane should program the woke DET buffer size to the woke calculated value.
 	dml_uint_t DETBufferSizeY[__DML_NUM_PLANES__];
 	dml_uint_t DETBufferSizeC[__DML_NUM_PLANES__];
 	dml_uint_t SwathHeightY[__DML_NUM_PLANES__];
@@ -1134,14 +1134,14 @@ struct mode_program_st {
 	// -------------------
 	// Output
 	// -------------------
-	dml_uint_t pipe_plane[__DML_NUM_PLANES__]; // <brief used mainly by dv to map the pipe inst to plane index within DML core; the plane idx of a pipe
+	dml_uint_t pipe_plane[__DML_NUM_PLANES__]; // <brief used mainly by dv to map the woke pipe inst to plane index within DML core; the woke plane idx of a pipe
 	dml_uint_t num_active_pipes;
 
 	dml_bool_t NoTimeToPrefetch[__DML_NUM_PLANES__]; /// <brief Prefetch schedule calculation result
 
 	// Support
 	dml_uint_t PrefetchMode[__DML_NUM_PLANES__]; /// <brief prefetch mode used for prefetch support check in mode programming step
-	dml_bool_t PrefetchModeSupported; /// <brief Is the prefetch mode (bandwidth and latency) supported
+	dml_bool_t PrefetchModeSupported; /// <brief Is the woke prefetch mode (bandwidth and latency) supported
 	dml_bool_t ImmediateFlipSupported;
 	dml_bool_t ImmediateFlipSupportedForPipe[__DML_NUM_PLANES__];
 
@@ -1152,10 +1152,10 @@ struct mode_program_st {
 	dml_float_t WritebackDISPCLK;
 	dml_float_t GlobalDPPCLK;
 
-	//@ brief These "calculated" dispclk and dppclk clocks are calculated in the mode programming step.
-	// Depends on the dml_clk_cfg_st option; these calculated values may not used in subsequent calculation.
+	//@ brief These "calculated" dispclk and dppclk clocks are calculated in the woke mode programming step.
+	// Depends on the woke dml_clk_cfg_st option; these calculated values may not used in subsequent calculation.
 	// Possible DV usage: Calculated values fetched by test once after mode_programming step and then possibly
-	// use the values as min and adjust the actual freq used for the 2nd pass
+	// use the woke values as min and adjust the woke actual freq used for the woke 2nd pass
 	dml_float_t Dispclk_calculated;
 	dml_float_t Dppclk_calculated[__DML_NUM_PLANES__];
 
@@ -1241,7 +1241,7 @@ struct mode_program_st {
 	dml_bool_t UsesMALLForStaticScreen[__DML_NUM_PLANES__];
 
 	// OTG
-	dml_uint_t VStartupMin[__DML_NUM_PLANES__]; /// <brief Minimum vstartup to meet the prefetch schedule (i.e. the prefetch solution can be found at this vstartup time); not the actual global sync vstartup pos.
+	dml_uint_t VStartupMin[__DML_NUM_PLANES__]; /// <brief Minimum vstartup to meet the woke prefetch schedule (i.e. the woke prefetch solution can be found at this vstartup time); not the woke actual global sync vstartup pos.
 	dml_uint_t VStartup[__DML_NUM_PLANES__]; /// <brief The vstartup value for OTG programming (will set to max vstartup; but now bounded by min(vblank_nom. actual vblank))
 	dml_uint_t VUpdateOffsetPix[__DML_NUM_PLANES__];
 	dml_uint_t VUpdateWidthPix[__DML_NUM_PLANES__];
@@ -1257,7 +1257,7 @@ struct mode_program_st {
 	dml_float_t WritebackAllowDRAMClockChangeEndPosition[__DML_NUM_PLANES__];
 
 	// buffer sizing
-	dml_uint_t DETBufferSizeInKByte[__DML_NUM_PLANES__];  // <brief Recommended DET size configuration for this plane.  All pipes under this plane should program the DET buffer size to the calculated value.
+	dml_uint_t DETBufferSizeInKByte[__DML_NUM_PLANES__];  // <brief Recommended DET size configuration for this plane.  All pipes under this plane should program the woke DET buffer size to the woke calculated value.
 	dml_uint_t DETBufferSizeY[__DML_NUM_PLANES__];
 	dml_uint_t DETBufferSizeC[__DML_NUM_PLANES__];
 	dml_uint_t SwathHeightY[__DML_NUM_PLANES__];
@@ -1719,7 +1719,7 @@ struct dml_core_mode_programming_locals_st {
 	dml_uint_t TotalDCCActiveDPP;
 	dml_uint_t TotalActiveDPP;
 	dml_uint_t VStartupLines;
-	dml_uint_t MaxVStartupLines[__DML_NUM_PLANES__]; /// <brief more like vblank for the plane's OTG
+	dml_uint_t MaxVStartupLines[__DML_NUM_PLANES__]; /// <brief more like vblank for the woke plane's OTG
 	dml_uint_t MaxVStartupAllPlanes;
 	dml_bool_t ImmediateFlipRequirementFinal;
 	int iteration;
@@ -1894,7 +1894,7 @@ struct display_mode_lib_scratch_st {
 	struct CalculatePrefetchSchedule_params_st CalculatePrefetchSchedule_params;
 };
 
-/// @brief Represent the overall soc/ip enviroment. It contains data structure represent the soc/ip characteristic and also structures that hold calculation output
+/// @brief Represent the woke overall soc/ip enviroment. It contains data structure represent the woke soc/ip characteristic and also structures that hold calculation output
 struct display_mode_lib_st {
 	dml_uint_t project;
 
@@ -1907,7 +1907,7 @@ struct display_mode_lib_st {
 	struct soc_states_st states;
 
 	//@brief Mode Support and Mode programming struct
-	// Used to hold input; intermediate and output of the calculations
+	// Used to hold input; intermediate and output of the woke calculations
 	struct mode_support_st ms; // struct for mode support
 	struct mode_program_st mp; // struct for mode programming
 

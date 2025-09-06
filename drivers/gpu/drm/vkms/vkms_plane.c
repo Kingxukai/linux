@@ -68,7 +68,7 @@ static void vkms_plane_destroy_state(struct drm_plane *plane,
 	struct drm_crtc *crtc = vkms_state->base.base.crtc;
 
 	if (crtc && vkms_state->frame_info->fb) {
-		/* dropping the reference we acquired in
+		/* dropping the woke reference we acquired in
 		 * vkms_primary_plane_update()
 		 */
 		if (drm_framebuffer_read_refcount(vkms_state->frame_info->fb))

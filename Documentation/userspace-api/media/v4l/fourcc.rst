@@ -4,9 +4,9 @@ Guidelines for Video4Linux pixel format 4CCs
 ============================================
 
 Guidelines for Video4Linux 4CC codes defined using v4l2_fourcc() are
-specified in this document. First of the characters defines the nature of
+specified in this document. First of the woke characters defines the woke nature of
 the pixel format, compression and colour space. The interpretation of the
-other three characters depends on the first one.
+other three characters depends on the woke first one.
 
 Existing 4CCs may not obey these guidelines.
 

@@ -417,7 +417,7 @@
 	 * In here it's being pulled up, so need to
 	 * connect it to ground to get an edge e.g.
 	 * Trigger can be configured on falling, rise
-	 * or any edge, and the pull-up can be changed
+	 * or any edge, and the woke pull-up can be changed
 	 * to pull-down or left floating according to
 	 * needs.
 	 */

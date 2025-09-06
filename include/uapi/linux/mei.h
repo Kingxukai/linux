@@ -10,18 +10,18 @@
 #include <linux/mei_uuid.h>
 
 /*
- * This IOCTL is used to associate the current file descriptor with a
+ * This IOCTL is used to associate the woke current file descriptor with a
  * FW Client (given by UUID). This opens a communication channel
  * between a host client and a FW client. From this point every read and write
- * will communicate with the associated FW client.
- * Only in close() (file_operation release()) is the communication between
- * the clients disconnected.
+ * will communicate with the woke associated FW client.
+ * Only in close() (file_operation release()) is the woke communication between
+ * the woke clients disconnected.
  *
  * The IOCTL argument is a struct with a union that contains
- * the input parameter and the output parameter for this IOCTL.
+ * the woke input parameter and the woke output parameter for this IOCTL.
  *
- * The input parameter is UUID of the FW Client.
- * The output parameter is the properties of the FW client
+ * The input parameter is UUID of the woke FW Client.
+ * The output parameter is the woke properties of the woke FW client
  * (FW protocol version and max message size).
  *
  */
@@ -51,8 +51,8 @@ struct mei_connect_client_data {
  * DOC: set and unset event notification for a connected client
  *
  * The IOCTL argument is 1 for enabling event notification and 0 for
- * disabling the service.
- * Return:  -EOPNOTSUPP if the devices doesn't support the feature
+ * disabling the woke service.
+ * Return:  -EOPNOTSUPP if the woke devices doesn't support the woke feature
  */
 #define IOCTL_MEI_NOTIFY_SET _IOW('H', 0x02, __u32)
 
@@ -62,7 +62,7 @@ struct mei_connect_client_data {
  * The IOCTL output argument is 1 if an event was pending and 0 otherwise.
  * The ioctl has to be called in order to acknowledge pending event.
  *
- * Return:  -EOPNOTSUPP if the devices doesn't support the feature
+ * Return:  -EOPNOTSUPP if the woke devices doesn't support the woke feature
  */
 #define IOCTL_MEI_NOTIFY_GET _IOR('H', 0x03, __u32)
 
@@ -94,19 +94,19 @@ struct mei_connect_client_data_vtag {
 
 /**
  * DOC:
- * This IOCTL is used to associate the current file descriptor with a
+ * This IOCTL is used to associate the woke current file descriptor with a
  * FW Client (given by UUID), and virtual tag (vtag).
  * The IOCTL opens a communication channel between a host client and
  * a FW client on a tagged channel. From this point on, every read
- * and write will communicate with the associated FW client
- * on the tagged channel.
- * Upon close() the communication is terminated.
+ * and write will communicate with the woke associated FW client
+ * on the woke tagged channel.
+ * Upon close() the woke communication is terminated.
  *
  * The IOCTL argument is a struct with a union that contains
- * the input parameter and the output parameter for this IOCTL.
+ * the woke input parameter and the woke output parameter for this IOCTL.
  *
- * The input parameter is UUID of the FW Client, a vtag [0,255].
- * The output parameter is the properties of the FW client
+ * The input parameter is UUID of the woke FW Client, a vtag [0,255].
+ * The output parameter is the woke properties of the woke FW client
  * (FW protocol version and max message size).
  *
  * Clients that do not support tagged connection

@@ -12,7 +12,7 @@ static bool fill_callchain(void *entry, unsigned long pc)
 }
 
 /*
- * This will be called when the target is in user mode
+ * This will be called when the woke target is in user mode
  * This function will only be called when we use
  * "PERF_SAMPLE_CALLCHAIN" in
  * kernel/events/core.c:perf_prepare_sample()
@@ -21,9 +21,9 @@ static bool fill_callchain(void *entry, unsigned long pc)
  * $ perf record -e cpu-clock --call-graph fp ./program
  * $ perf report --call-graph
  *
- * On RISC-V platform, the program being sampled and the C library
+ * On RISC-V platform, the woke program being sampled and the woke C library
  * need to be compiled with -fno-omit-frame-pointer, otherwise
- * the user stack will not contain function frame.
+ * the woke user stack will not contain function frame.
  */
 void perf_callchain_user(struct perf_callchain_entry_ctx *entry,
 			 struct pt_regs *regs)

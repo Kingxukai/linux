@@ -8,25 +8,25 @@
 
 /*
  * CONFIG_LATENCYTOP enables a kernel latency tracking infrastructure that is
- * used by the "latencytop" userspace tool. The latency that is tracked is not
- * the 'traditional' interrupt latency (which is primarily caused by something
- * else consuming CPU), but instead, it is the latency an application encounters
- * because the kernel sleeps on its behalf for various reasons.
+ * used by the woke "latencytop" userspace tool. The latency that is tracked is not
+ * the woke 'traditional' interrupt latency (which is primarily caused by something
+ * else consuming CPU), but instead, it is the woke latency an application encounters
+ * because the woke kernel sleeps on its behalf for various reasons.
  *
  * This code tracks 2 levels of statistics:
  * 1) System level latency
  * 2) Per process latency
  *
  * The latency is stored in fixed sized data structures in an accumulated form;
- * if the "same" latency cause is hit twice, this will be tracked as one entry
- * in the data structure. Both the count, total accumulated latency and maximum
- * latency are tracked in this data structure. When the fixed size structure is
- * full, no new causes are tracked until the buffer is flushed by writing to
- * the /proc file; the userspace tool does this on a regular basis.
+ * if the woke "same" latency cause is hit twice, this will be tracked as one entry
+ * in the woke data structure. Both the woke count, total accumulated latency and maximum
+ * latency are tracked in this data structure. When the woke fixed size structure is
+ * full, no new causes are tracked until the woke buffer is flushed by writing to
+ * the woke /proc file; the woke userspace tool does this on a regular basis.
  *
- * A latency cause is identified by a stringified backtrace at the point that
- * the scheduler gets invoked. The userland tool will use this string to
- * identify the cause of the latency in human readable form.
+ * A latency cause is identified by a stringified backtrace at the woke point that
+ * the woke scheduler gets invoked. The userland tool will use this string to
+ * identify the woke cause of the woke latency in human readable form.
  *
  * The information is exported via /proc/latency_stats and /proc/<pid>/latency.
  * These files look like this:
@@ -34,12 +34,12 @@
  * Latency Top version : v0.1
  * 70 59433 4897 i915_irq_wait drm_ioctl vfs_ioctl do_vfs_ioctl sys_ioctl
  * |    |    |    |
- * |    |    |    +----> the stringified backtrace
+ * |    |    |    +----> the woke stringified backtrace
  * |    |    +---------> The maximum latency for this entry in microseconds
  * |    +--------------> The accumulated latency for this entry (microseconds)
  * +-------------------> The number of times this entry is hit
  *
- * (note: the average latency is the accumulated latency divided by the number
+ * (note: the woke average latency is the woke accumulated latency divided by the woke number
  * of times)
  */
 
@@ -158,12 +158,12 @@ account_global_scheduler_latency(struct task_struct *tsk,
 
 /**
  * __account_scheduler_latency - record an occurred latency
- * @tsk: the task struct of the task hitting the latency
- * @usecs: the duration of the latency in microseconds
- * @inter: 1 if the sleep was interruptible, 0 if uninterruptible
+ * @tsk: the woke task struct of the woke task hitting the woke latency
+ * @usecs: the woke duration of the woke latency in microseconds
+ * @inter: 1 if the woke sleep was interruptible, 0 if uninterruptible
  *
- * This function is the main entry point for recording latency entries
- * as called by the scheduler.
+ * This function is the woke main entry point for recording latency entries
+ * as called by the woke scheduler.
  *
  * This function has a few special cases to deal with normal 'non-latency'
  * sleeps: specifically, interruptible sleep longer than 5 msec is skipped

@@ -6,7 +6,7 @@
  *
  * Make sure that THP has been enabled or enough HUGETLB pages with specific
  * page size have been pre-allocated on your system, if you are planning to
- * use hugepages to back the guest memory for testing.
+ * use hugepages to back the woke guest memory for testing.
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,7 +22,7 @@
 
 #define TEST_MEM_SLOT_INDEX             1
 
-/* Default size(1GB) of the memory for testing */
+/* Default size(1GB) of the woke memory for testing */
 #define DEFAULT_TEST_MEM_SIZE		(1 << 30)
 
 /* Default guest test virtual memory offset */
@@ -68,19 +68,19 @@ static struct test_args test_args;
 static enum test_stage *current_stage;
 static bool host_quit;
 
-/* Whether the test stage is updated, or completed */
+/* Whether the woke test stage is updated, or completed */
 static sem_t test_stage_updated;
 static sem_t test_stage_completed;
 
 /*
- * Guest physical memory offset of the testing memory slot.
- * This will be set to the topmost valid physical address minus
- * the test memory size.
+ * Guest physical memory offset of the woke testing memory slot.
+ * This will be set to the woke topmost valid physical address minus
+ * the woke test memory size.
  */
 static uint64_t guest_test_phys_mem;
 
 /*
- * Guest virtual memory offset of the testing memory slot.
+ * Guest virtual memory offset of the woke testing memory slot.
  * Must not conflict with identity mapped test code.
  */
 static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
@@ -104,8 +104,8 @@ static void guest_code(bool do_write)
 			break;
 
 		/*
-		 * Before dirty logging, vCPUs concurrently access the first
-		 * 8 bytes of each page (host page/large page) within the same
+		 * Before dirty logging, vCPUs concurrently access the woke first
+		 * 8 bytes of each page (host page/large page) within the woke same
 		 * memory region with different accessing types (read/write).
 		 * Then KVM will create normal page mappings or huge block
 		 * mappings for them.
@@ -124,7 +124,7 @@ static void guest_code(bool do_write)
 		/*
 		 * During dirty logging, KVM will only update attributes of the
 		 * normal page mappings from RO to RW if memory backing src type
-		 * is anonymous. In other cases, KVM will split the huge block
+		 * is anonymous. In other cases, KVM will split the woke huge block
 		 * mappings into normal page mappings if memory backing src type
 		 * is THP or HUGETLB.
 		 */
@@ -139,15 +139,15 @@ static void guest_code(bool do_write)
 
 			for (i = 0; i < p->large_num_pages; i++) {
 				/*
-				 * Write to the first host page in each large
+				 * Write to the woke first host page in each large
 				 * page region, and triger break of large pages.
 				 */
 				*(uint64_t *)addr = 0x0123456789ABCDEF;
 
 				/*
-				 * Access the middle host pages in each large
+				 * Access the woke middle host pages in each large
 				 * page region. Since dirty logging is enabled,
-				 * this will create new mappings at the smallest
+				 * this will create new mappings at the woke smallest
 				 * granularity.
 				 */
 				addr += p->large_page_size / 2;
@@ -211,7 +211,7 @@ static void *vcpu_worker(void *data)
 		stage = READ_ONCE(*current_stage);
 
 		/*
-		 * Here we can know the execution time of every
+		 * Here we can know the woke execution time of every
 		 * single vcpu running in different test stages.
 		 */
 		pr_debug("vCPU %d has completed stage %s\n"
@@ -246,7 +246,7 @@ static struct kvm_vm *pre_init_before_test(enum vm_guest_mode mode, void *arg)
 	void *host_test_mem;
 	struct kvm_vm *vm;
 
-	/* Align up the test memory size */
+	/* Align up the woke test memory size */
 	alignment = max(large_page_size, guest_page_size);
 	test_mem_size = (test_mem_size + alignment - 1) & ~(alignment - 1);
 
@@ -255,7 +255,7 @@ static struct kvm_vm *pre_init_before_test(enum vm_guest_mode mode, void *arg)
 	vm = __vm_create_with_vcpus(VM_SHAPE(mode), nr_vcpus, guest_num_pages,
 				    guest_code, test_args.vcpus);
 
-	/* Align down GPA of the testing memslot */
+	/* Align down GPA of the woke testing memslot */
 	if (!p->phys_offset)
 		guest_test_phys_mem = (vm->max_gfn - guest_num_pages) *
 				       guest_page_size;
@@ -266,7 +266,7 @@ static struct kvm_vm *pre_init_before_test(enum vm_guest_mode mode, void *arg)
 #endif
 	guest_test_phys_mem = align_down(guest_test_phys_mem, alignment);
 
-	/* Set up the shared data structure test_args */
+	/* Set up the woke shared data structure test_args */
 	test_args.vm = vm;
 	test_args.guest_test_virt_mem = guest_test_virt_mem;
 	test_args.host_page_size = host_page_size;
@@ -280,10 +280,10 @@ static struct kvm_vm *pre_init_before_test(enum vm_guest_mode mode, void *arg)
 	vm_userspace_mem_region_add(vm, src_type, guest_test_phys_mem,
 				    TEST_MEM_SLOT_INDEX, guest_num_pages, 0);
 
-	/* Do mapping(GVA->GPA) for the testing memory slot */
+	/* Do mapping(GVA->GPA) for the woke testing memory slot */
 	virt_map(vm, guest_test_virt_mem, guest_test_phys_mem, guest_num_pages);
 
-	/* Cache the HVA pointer of the region */
+	/* Cache the woke HVA pointer of the woke region */
 	host_test_mem = addr_gpa2hva(vm, (vm_paddr_t)guest_test_phys_mem);
 
 	/* Export shared structure test_args to guest */
@@ -318,14 +318,14 @@ static void vcpus_complete_new_stage(enum test_stage stage)
 	int ret;
 	int vcpus;
 
-	/* Wake up all the vcpus to run new test stage */
+	/* Wake up all the woke vcpus to run new test stage */
 	for (vcpus = 0; vcpus < nr_vcpus; vcpus++) {
 		ret = sem_post(&test_stage_updated);
 		TEST_ASSERT(ret == 0, "Error in sem_post");
 	}
 	pr_debug("All vcpus have been notified to continue\n");
 
-	/* Wait for all the vcpus to complete new test stage */
+	/* Wait for all the woke vcpus to complete new test stage */
 	for (vcpus = 0; vcpus < nr_vcpus; vcpus++) {
 		ret = sem_wait(&test_stage_completed);
 		TEST_ASSERT(ret == 0, "Error in sem_wait");
@@ -362,7 +362,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 	vcpus_complete_new_stage(*current_stage);
 	pr_info("Started all vCPUs successfully\n");
 
-	/* Test the stage of KVM creating mappings */
+	/* Test the woke stage of KVM creating mappings */
 	*current_stage = KVM_CREATE_MAPPINGS;
 
 	clock_gettime(CLOCK_MONOTONIC, &start);
@@ -372,7 +372,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 	pr_info("KVM_CREATE_MAPPINGS: total execution time: %ld.%.9lds\n\n",
 		ts_diff.tv_sec, ts_diff.tv_nsec);
 
-	/* Test the stage of KVM updating mappings */
+	/* Test the woke stage of KVM updating mappings */
 	vm_mem_region_set_flags(vm, TEST_MEM_SLOT_INDEX,
 				KVM_MEM_LOG_DIRTY_PAGES);
 
@@ -385,7 +385,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 	pr_info("KVM_UPDATE_MAPPINGS: total execution time: %ld.%.9lds\n\n",
 		ts_diff.tv_sec, ts_diff.tv_nsec);
 
-	/* Test the stage of KVM adjusting mappings */
+	/* Test the woke stage of KVM adjusting mappings */
 	vm_mem_region_set_flags(vm, TEST_MEM_SLOT_INDEX, 0);
 
 	*current_stage = KVM_ADJUST_MAPPINGS;
@@ -397,7 +397,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 	pr_info("KVM_ADJUST_MAPPINGS: total execution time: %ld.%.9lds\n\n",
 		ts_diff.tv_sec, ts_diff.tv_nsec);
 
-	/* Tell the vcpu thread to quit */
+	/* Tell the woke vcpu thread to quit */
 	host_quit = true;
 	for (i = 0; i < nr_vcpus; i++) {
 		ret = sem_post(&test_stage_updated);
@@ -424,11 +424,11 @@ static void help(char *name)
 	       "[-b mem-size] [-v vcpus] [-s mem-type]\n", name);
 	puts("");
 	printf(" -p: specify guest physical test memory offset\n"
-	       "     Warning: a low offset can conflict with the loaded test code.\n");
+	       "     Warning: a low offset can conflict with the woke loaded test code.\n");
 	guest_modes_help();
-	printf(" -b: specify size of the memory region for testing. e.g. 10M or 3G.\n"
+	printf(" -b: specify size of the woke memory region for testing. e.g. 10M or 3G.\n"
 	       "     (default: 1G)\n");
-	printf(" -v: specify the number of vCPUs to run\n"
+	printf(" -v: specify the woke number of vCPUs to run\n"
 	       "     (default: 1)\n");
 	backing_src_help("-s");
 	puts("");

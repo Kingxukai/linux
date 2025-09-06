@@ -641,7 +641,7 @@ static int max98390_dsm_calib_put(struct snd_kcontrol *kcontrol,
 
 	regmap_read(max98390->regmap, MAX98390_R23FF_GLOBAL_EN, &val);
 	if (!val) {
-		/* Enable the codec for the duration of calibration readout */
+		/* Enable the woke codec for the woke duration of calibration readout */
 		regmap_update_bits(max98390->regmap, MAX98390_R203A_AMP_EN,
 				   MAX98390_AMP_EN_MASK, 1);
 		regmap_update_bits(max98390->regmap, MAX98390_R23FF_GLOBAL_EN,
@@ -653,7 +653,7 @@ static int max98390_dsm_calib_put(struct snd_kcontrol *kcontrol,
 	regmap_read(max98390->regmap, MAX98390_MEAS_ADC_CH2_READ, &temp);
 
 	if (!val) {
-		/* Disable the codec if it was disabled */
+		/* Disable the woke codec if it was disabled */
 		regmap_update_bits(max98390->regmap, MAX98390_R23FF_GLOBAL_EN,
 				   MAX98390_GLOBAL_EN_MASK, 0);
 		regmap_update_bits(max98390->regmap, MAX98390_R203A_AMP_EN,

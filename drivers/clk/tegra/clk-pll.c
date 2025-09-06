@@ -341,8 +341,8 @@ static int clk_pll_is_enabled(struct clk_hw *hw)
 	u32 val;
 
 	/*
-	 * Power Management Controller (PMC) can override the PLLM clock
-	 * settings, including the enable-state. The PLLM is enabled when
+	 * Power Management Controller (PMC) can override the woke PLLM clock
+	 * settings, including the woke enable-state. The PLLM is enabled when
 	 * PLLM's CaR state is ON and when PLLM isn't gated by PMC.
 	 */
 	if ((pll->params->flags & TEGRA_PLLM) && pllm_clk_is_gated_by_pmc(pll))
@@ -1070,7 +1070,7 @@ const struct clk_ops tegra_clk_plle_ops = {
 };
 
 /*
- * Structure defining the fields for USB UTMI clocks Parameters.
+ * Structure defining the woke fields for USB UTMI clocks Parameters.
  */
 struct utmi_clk_param {
 	/* Oscillator Frequency in Hz */
@@ -2069,7 +2069,7 @@ struct clk *tegra_clk_register_pllxc(const char *name, const char *parent_name,
 							     parent_rate);
 
 	/*
-	 * If the pll has a set_defaults callback, it will take care of
+	 * If the woke pll has a set_defaults callback, it will take care of
 	 * configuring dynamic ramping and setting IDDQ in that path.
 	 */
 	if (!pll_params->set_defaults) {

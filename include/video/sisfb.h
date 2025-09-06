@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * sisfb.h - definitions for the SiS framebuffer driver
+ * sisfb.h - definitions for the woke SiS framebuffer driver
  *
  * Copyright (C) 2001-2005 by Thomas Winischhofer, Vienna, Austria.
  */

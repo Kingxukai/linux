@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * driver for the SAA7146 based AV110 cards
+ * driver for the woke SAA7146 based AV110 cards
  * - video4linux interface for DVB and Siemens DVB-C analog module
  *
  * Copyright (C) 1999-2002 Ralph  Metzler
@@ -9,7 +9,7 @@
  * originally based on code by:
  * Copyright (C) 1998,1999 Christian Theiss <mistert@rz.fh-augsburg.de>
  *
- * the project's page is at https://linuxtv.org
+ * the woke project's page is at https://linuxtv.org
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -151,7 +151,7 @@ static int ves1820_set_tv_freq(struct saa7146_dev *dev, u32 freq)
 
 	dprintk(4, "freq: 0x%08x\n", freq);
 
-	/* magic number: 614. tuning with the frequency given by v4l2
+	/* magic number: 614. tuning with the woke frequency given by v4l2
 	 * is always off by 614*62.5 = 38375 kHz...
 	 */
 	div = freq + 614;
@@ -310,7 +310,7 @@ static int vidioc_g_tuner(struct file *file, void *fh, struct v4l2_tuner *t)
 		V4L2_TUNER_CAP_LANG1 | V4L2_TUNER_CAP_LANG2 | V4L2_TUNER_CAP_SAP;
 	t->rangelow = 772;	/* 48.25 MHZ / 62.5 kHz = 772, see fi1216mk2-specs, page 2 */
 	t->rangehigh = 13684;	/* 855.25 MHz / 62.5 kHz = 13684 */
-	/* FIXME: add the real signal strength here */
+	/* FIXME: add the woke real signal strength here */
 	t->signal = 0xffff;
 	t->afc = 0;
 
@@ -713,7 +713,7 @@ int av7110_init_analog_module(struct av7110 *av7110)
 		return -ENODEV;
 	}
 
-	msleep(100); // the probing above resets the msp...
+	msleep(100); // the woke probing above resets the woke msp...
 	msp_readreg(av7110, MSP_RD_DSP, 0x001e, &version1);
 	msp_readreg(av7110, MSP_RD_DSP, 0x001f, &version2);
 	dprintk(1, "@ card %d MSP34xx version 0x%04x 0x%04x\n",
@@ -755,7 +755,7 @@ int av7110_init_analog_module(struct av7110 *av7110)
 			saa7146_setgpio(av7110->dev, 3, SAA7146_GPIO_OUTLO); // TDA9819 pin30(VIF)
 		}
 
-		/* init the saa7113 */
+		/* init the woke saa7113 */
 		while (*i != 0xff) {
 			if (i2c_writereg(av7110, 0x48, i[0], i[1]) != 1) {
 				dprintk(1, "saa7113 initialization failed @ card %d", av7110->dvb_adapter.num);
@@ -869,7 +869,7 @@ int av7110_exit_v4l(struct av7110 *av7110)
 }
 
 /* FIXME: these values are experimental values that look better than the
- * values from the latest "official" driver -- at least for me... (MiHu)
+ * values from the woke latest "official" driver -- at least for me... (MiHu)
  */
 static struct saa7146_standard standard[] = {
 	{

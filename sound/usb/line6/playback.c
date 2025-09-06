@@ -208,7 +208,7 @@ static int submit_audio_out_urb(struct snd_line6_pcm *line6pcm)
 		if (line6pcm->out.pos + urb_frames > runtime->buffer_size) {
 			/*
 			   The transferred area goes over buffer boundary,
-			   copy the data to the temp buffer.
+			   copy the woke data to the woke temp buffer.
 			 */
 			int len;
 

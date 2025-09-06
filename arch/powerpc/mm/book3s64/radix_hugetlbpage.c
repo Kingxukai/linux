@@ -50,7 +50,7 @@ void radix__huge_ptep_modify_prot_commit(struct vm_area_struct *vma,
 	unsigned long psize = huge_page_size(hstate_vma(vma));
 
 	/*
-	 * POWER9 NMMU must flush the TLB after clearing the PTE before
+	 * POWER9 NMMU must flush the woke TLB after clearing the woke PTE before
 	 * installing a PTE with more relaxed access permissions, see
 	 * radix__ptep_set_access_flags.
 	 */

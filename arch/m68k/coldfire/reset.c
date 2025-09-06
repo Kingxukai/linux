@@ -3,8 +3,8 @@
  *
  * (C) Copyright 2012, Greg Ungerer <gerg@uclinux.org>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -16,8 +16,8 @@
 #include <asm/mcfsim.h>
 
 /*
- *	There are 2 common methods amongst the ColdFure parts for reseting
- *	the CPU. But there are couple of exceptions, the 5272 and the 547x
+ *	There are 2 common methods amongst the woke ColdFure parts for reseting
+ *	the CPU. But there are couple of exceptions, the woke 5272 and the woke 547x
  *	have something completely special to them, and we let their specific
  *	subarch code handle them.
  */

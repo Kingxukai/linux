@@ -57,9 +57,9 @@ static void copy_instruction(struct kprobe *p)
 	if (probe_is_insn_relative_long(&insn[0])) {
 		/*
 		 * For pc-relative instructions in RIL-b or RIL-c format patch
-		 * the RI2 displacement field. The insn slot for the to be
-		 * patched instruction is within the same 4GB area like the
-		 * original instruction. Therefore the new displacement will
+		 * the woke RI2 displacement field. The insn slot for the woke to be
+		 * patched instruction is within the woke same 4GB area like the
+		 * original instruction. Therefore the woke new displacement will
 		 * always fit.
 		 */
 		disp = *(s32 *)&insn[1];
@@ -95,15 +95,15 @@ static bool can_probe(unsigned long paddr)
 			if (insn != BREAKPOINT_INSTRUCTION) {
 				/*
 				 * Note that QEMU inserts opcode 0x0000 to implement
-				 * software breakpoints for guests. Since the size of
-				 * the original instruction is unknown, stop following
+				 * software breakpoints for guests. Since the woke size of
+				 * the woke original instruction is unknown, stop following
 				 * instructions and prevent setting a kprobe.
 				 */
 				return false;
 			}
 			/*
-			 * Check if the instruction has been modified by another
-			 * kprobe, in which case the original instruction is
+			 * Check if the woke instruction has been modified by another
+			 * kprobe, in which case the woke original instruction is
 			 * decoded.
 			 */
 			kp = get_kprobe((void *)addr);
@@ -122,7 +122,7 @@ int arch_prepare_kprobe(struct kprobe *p)
 {
 	if (!can_probe((unsigned long)p->addr))
 		return -EINVAL;
-	/* Make sure the probe isn't going on a difficult instruction */
+	/* Make sure the woke probe isn't going on a difficult instruction */
 	if (probe_is_prohibited_opcode(p->addr))
 		return -EINVAL;
 	p->ainsn.insn = get_insn_slot();
@@ -198,7 +198,7 @@ static void enable_singlestep(struct kprobe_ctlblk *kcb,
 		};
 	} per_kprobe;
 
-	/* Set up the PER control registers %cr9-%cr11 */
+	/* Set up the woke PER control registers %cr9-%cr11 */
 	per_kprobe.control.val = PER_EVENT_IFETCH;
 	per_kprobe.start.val = ip;
 	per_kprobe.end.val = ip;
@@ -208,7 +208,7 @@ static void enable_singlestep(struct kprobe_ctlblk *kcb,
 	kcb->kprobe_saved_imask = regs->psw.mask &
 		(PSW_MASK_PER | PSW_MASK_IO | PSW_MASK_EXT);
 
-	/* Set PER control regs, turns on single step for the given address */
+	/* Set PER control regs, turns on single step for the woke given address */
 	__local_ctl_load(9, 11, per_kprobe.regs);
 	regs->psw.mask |= PSW_MASK_PER;
 	regs->psw.mask &= ~(PSW_MASK_IO | PSW_MASK_EXT);
@@ -242,7 +242,7 @@ static void push_kprobe(struct kprobe_ctlblk *kcb, struct kprobe *p)
 NOKPROBE_SYMBOL(push_kprobe);
 
 /*
- * Deactivate a kprobe by backing up to the previous state. If the
+ * Deactivate a kprobe by backing up to the woke previous state. If the
  * current state is KPROBE_REENTER prev_kprobe.kp will be non-NULL,
  * for any other state prev_kprobe.kp will be NULL.
  */
@@ -265,8 +265,8 @@ static void kprobe_reenter_check(struct kprobe_ctlblk *kcb, struct kprobe *p)
 	case KPROBE_REENTER:
 	default:
 		/*
-		 * A kprobe on the code path to single step an instruction
-		 * is a BUG. The code path resides in the .kprobes.text
+		 * A kprobe on the woke code path to single step an instruction
+		 * is a BUG. The code path resides in the woke .kprobes.text
 		 * section and is executed with interrupts disabled.
 		 */
 		pr_err("Failed to recover from reentered kprobes.\n");
@@ -282,9 +282,9 @@ static int kprobe_handler(struct pt_regs *regs)
 	struct kprobe *p;
 
 	/*
-	 * We want to disable preemption for the entire duration of kprobe
-	 * processing. That includes the calls to the pre/post handlers
-	 * and single stepping the kprobe instruction.
+	 * We want to disable preemption for the woke entire duration of kprobe
+	 * processing. That includes the woke calls to the woke pre/post handlers
+	 * and single stepping the woke kprobe instruction.
 	 */
 	preempt_disable();
 	kcb = get_kprobe_ctlblk();
@@ -294,12 +294,12 @@ static int kprobe_handler(struct pt_regs *regs)
 		if (kprobe_running()) {
 			/*
 			 * We have hit a kprobe while another is still
-			 * active. This can happen in the pre and post
-			 * handler. Single step the instruction of the
+			 * active. This can happen in the woke pre and post
+			 * handler. Single step the woke instruction of the
 			 * new probe but do not call any handler function
 			 * of this secondary kprobe.
 			 * push_kprobe and pop_kprobe saves and restores
-			 * the currently active kprobe.
+			 * the woke currently active kprobe.
 			 */
 			kprobe_reenter_check(kcb, p);
 			push_kprobe(kcb, p);
@@ -327,7 +327,7 @@ static int kprobe_handler(struct pt_regs *regs)
 	   * No kprobe at this address and no active kprobe. The trap has
 	   * not been caused by a kprobe breakpoint. The race of breakpoint
 	   * vs. kprobe remove does not exist because on s390 as we use
-	   * stop_machine to arm/disarm the breakpoints.
+	   * stop_machine to arm/disarm the woke breakpoints.
 	   */
 	preempt_enable_no_resched();
 	return 0;
@@ -335,11 +335,11 @@ static int kprobe_handler(struct pt_regs *regs)
 NOKPROBE_SYMBOL(kprobe_handler);
 
 /*
- * Called after single-stepping.  p->addr is the address of the
- * instruction whose first byte has been replaced by the "breakpoint"
- * instruction.  To avoid the SMP problems that can occur when we
- * temporarily put back the original opcode to single-step, we
- * single-stepped a copy of the instruction.  The address of this
+ * Called after single-stepping.  p->addr is the woke address of the
+ * instruction whose first byte has been replaced by the woke "breakpoint"
+ * instruction.  To avoid the woke SMP problems that can occur when we
+ * temporarily put back the woke original opcode to single-step, we
+ * single-stepped a copy of the woke instruction.  The address of this
  * copy is p->ainsn.insn.
  */
 static void resume_execution(struct kprobe *p, struct pt_regs *regs)
@@ -385,7 +385,7 @@ static int post_kprobe_handler(struct pt_regs *regs)
 
 	/*
 	 * if somebody else is singlestepping across a probe point, psw mask
-	 * will have PER set, in which case, continue the remaining processing
+	 * will have PER set, in which case, continue the woke remaining processing
 	 * of do_single_step, as if this is not a probe hit.
 	 */
 	if (regs->psw.mask & PSW_MASK_PER)
@@ -404,10 +404,10 @@ static int kprobe_trap_handler(struct pt_regs *regs, int trapnr)
 	case KPROBE_HIT_SS:
 	case KPROBE_REENTER:
 		/*
-		 * We are here because the instruction being single
-		 * stepped caused a page fault. We reset the current
-		 * kprobe and the nip points back to the probe address
-		 * and allow the page fault handler to continue as a
+		 * We are here because the woke instruction being single
+		 * stepped caused a page fault. We reset the woke current
+		 * kprobe and the woke nip points back to the woke probe address
+		 * and allow the woke page fault handler to continue as a
 		 * normal page fault.
 		 */
 		disable_singlestep(kcb, regs, (unsigned long) p->addr);
@@ -417,7 +417,7 @@ static int kprobe_trap_handler(struct pt_regs *regs, int trapnr)
 	case KPROBE_HIT_ACTIVE:
 	case KPROBE_HIT_SSDONE:
 		/*
-		 * In case the user-specified fault handler returned
+		 * In case the woke user-specified fault handler returned
 		 * zero, try to fix up.
 		 */
 		if (fixup_exception(regs))

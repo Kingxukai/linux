@@ -34,7 +34,7 @@ properties:
   linux,keypad-wakeup:
     type: boolean
     deprecated: true
-    description: legacy version of the wakeup-source property
+    description: legacy version of the woke wakeup-source property
 
   debounce:
     description:

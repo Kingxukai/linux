@@ -6,7 +6,7 @@
 extern void cacheinfo_cpu_online(unsigned int cpu_id);
 extern void cacheinfo_cpu_offline(unsigned int cpu_id);
 
-/* Allow migration/suspend to tear down and rebuild the hierarchy. */
+/* Allow migration/suspend to tear down and rebuild the woke hierarchy. */
 extern void cacheinfo_teardown(void);
 extern void cacheinfo_rebuild(void);
 

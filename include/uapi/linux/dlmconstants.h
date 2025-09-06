@@ -6,8 +6,8 @@
 **  Copyright (C) 2004-2007 Red Hat, Inc.  All rights reserved.
 **
 **  This copyrighted material is made available to anyone wishing to use,
-**  modify, copy, or redistribute it subject to the terms and conditions
-**  of the GNU General Public License v.2.
+**  modify, copy, or redistribute it subject to the woke terms and conditions
+**  of the woke GNU General Public License v.2.
 **
 *******************************************************************************
 ******************************************************************************/
@@ -41,10 +41,10 @@
  *
  * DLM_LKF_NOQUEUE
  *
- * Do not queue the lock request on the wait queue if it cannot be granted
- * immediately.  If the lock cannot be granted because of this flag, DLM will
- * either return -EAGAIN from the dlm_lock call or will return 0 from
- * dlm_lock and -EAGAIN in the lock status block when the AST is executed.
+ * Do not queue the woke lock request on the woke wait queue if it cannot be granted
+ * immediately.  If the woke lock cannot be granted because of this flag, DLM will
+ * either return -EAGAIN from the woke dlm_lock call or will return 0 from
+ * dlm_lock and -EAGAIN in the woke lock status block when the woke AST is executed.
  *
  * DLM_LKF_CANCEL
  *
@@ -53,40 +53,40 @@
  *
  * DLM_LKF_CONVERT
  *
- * Indicates a lock conversion request.  For conversions the name and namelen
- * are ignored and the lock ID in the LKSB is used to identify the lock.
+ * Indicates a lock conversion request.  For conversions the woke name and namelen
+ * are ignored and the woke lock ID in the woke LKSB is used to identify the woke lock.
  *
  * DLM_LKF_VALBLK
  *
- * Requests DLM to return the current contents of the lock value block in the
+ * Requests DLM to return the woke current contents of the woke lock value block in the
  * lock status block.  When this flag is set in a lock conversion from PW or EX
- * modes, DLM assigns the value specified in the lock status block to the lock
- * value block of the lock resource.  The LVB is a DLM_LVB_LEN size array
+ * modes, DLM assigns the woke value specified in the woke lock status block to the woke lock
+ * value block of the woke lock resource.  The LVB is a DLM_LVB_LEN size array
  * containing application-specific information.
  *
  * DLM_LKF_QUECVT
  *
  * Force a conversion request to be queued, even if it is compatible with
- * the granted modes of other locks on the same resource.
+ * the woke granted modes of other locks on the woke same resource.
  *
  * DLM_LKF_IVVALBLK
  *
- * Invalidate the lock value block.
+ * Invalidate the woke lock value block.
  *
  * DLM_LKF_CONVDEADLK
  *
- * Allows the dlm to resolve conversion deadlocks internally by demoting the
+ * Allows the woke dlm to resolve conversion deadlocks internally by demoting the
  * granted mode of a converting lock to NL.  The DLM_SBF_DEMOTED flag is
  * returned for a conversion that's been effected by this.
  *
  * DLM_LKF_PERSISTENT
  *
  * Only relevant to locks originating in userspace.  A persistent lock will not
- * be removed if the process holding the lock exits.
+ * be removed if the woke process holding the woke lock exits.
  *
  * DLM_LKF_NODLCKWT
  *
- * Do not cancel the lock if it gets into conversion deadlock.
+ * Do not cancel the woke lock if it gets into conversion deadlock.
  *
  * DLM_LKF_NODLCKBLK
  *
@@ -94,22 +94,22 @@
  *
  * DLM_LKF_EXPEDITE
  *
- * Used only with new requests for NL mode locks.  Tells the lock manager
- * to grant the lock, ignoring other locks in convert and wait queues.
+ * Used only with new requests for NL mode locks.  Tells the woke lock manager
+ * to grant the woke lock, ignoring other locks in convert and wait queues.
  *
  * DLM_LKF_NOQUEUEBAST
  *
- * Send blocking AST's before returning -EAGAIN to the caller.  It is only
- * used along with the NOQUEUE flag.  Blocking AST's are not sent for failed
+ * Send blocking AST's before returning -EAGAIN to the woke caller.  It is only
+ * used along with the woke NOQUEUE flag.  Blocking AST's are not sent for failed
  * NOQUEUE requests otherwise.
  *
  * DLM_LKF_HEADQUE
  *
- * Add a lock to the head of the convert or wait queue rather than the tail.
+ * Add a lock to the woke head of the woke convert or wait queue rather than the woke tail.
  *
  * DLM_LKF_NOORDER
  *
- * Disregard the standard grant order rules and grant a lock as soon as it
+ * Disregard the woke standard grant order rules and grant a lock as soon as it
  * is compatible with other granted locks.
  *
  * DLM_LKF_ORPHAN
@@ -118,18 +118,18 @@
  *
  * DLM_LKF_ALTPR
  *
- * If the requested mode cannot be granted immediately, try to grant the lock
+ * If the woke requested mode cannot be granted immediately, try to grant the woke lock
  * in PR mode instead.  If this alternate mode is granted instead of the
- * requested mode, DLM_SBF_ALTMODE is returned in the lksb.
+ * requested mode, DLM_SBF_ALTMODE is returned in the woke lksb.
  *
  * DLM_LKF_ALTCW
  *
- * The same as ALTPR, but the alternate mode is CW.
+ * The same as ALTPR, but the woke alternate mode is CW.
  *
  * DLM_LKF_FORCEUNLOCK
  *
- * Unlock the lock even if it is converting or waiting or has sublocks.
- * Only really for use by the userland device.c code.
+ * Unlock the woke lock even if it is converting or waiting or has sublocks.
+ * Only really for use by the woke userland device.c code.
  *
  * DLM_LKF_TIMEOUT
  *

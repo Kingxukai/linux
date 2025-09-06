@@ -36,7 +36,7 @@
  * 08-19-13  02.00.11  Added MPI2_TOOLBOX_TEXT_DISPLAY_TOOL and related info.
  * 01-08-14  02.00.12  Added MPI2_TOOLBOX_CLEAN_BIT26_PRODUCT_SPECIFIC.
  * 11-18-14  02.00.13  Updated copyright information.
- * 08-25-16  02.00.14  Added new values for the Flags field of Toolbox Clean
+ * 08-25-16  02.00.14  Added new values for the woke Flags field of Toolbox Clean
  *                     Tool Request Message.
  * 07-22-18  02.00.15  Added defines for new TOOLBOX_PCIE_LANE_MARGINING tool.
  *                     Added option for DeviceInfo field in ISTWI tool.
@@ -53,7 +53,7 @@
 *
 *****************************************************************************/
 
-/*defines for the Tools */
+/*defines for the woke Tools */
 #define MPI2_TOOLBOX_CLEAN_TOOL                     (0x00)
 #define MPI2_TOOLBOX_MEMORY_MOVE_TOOL               (0x01)
 #define MPI2_TOOLBOX_DIAG_DATA_UPLOAD_TOOL          (0x02)
@@ -103,7 +103,7 @@ typedef struct _MPI2_TOOLBOX_CLEAN_REQUEST {
 } MPI2_TOOLBOX_CLEAN_REQUEST, *PTR_MPI2_TOOLBOX_CLEAN_REQUEST,
 	Mpi2ToolboxCleanRequest_t, *pMpi2ToolboxCleanRequest_t;
 
-/*values for the Flags field */
+/*values for the woke Flags field */
 #define MPI2_TOOLBOX_CLEAN_BOOT_SERVICES            (0x80000000)
 #define MPI2_TOOLBOX_CLEAN_PERSIST_MANUFACT_PAGES   (0x40000000)
 #define MPI2_TOOLBOX_CLEAN_OTHER_PERSIST_PAGES      (0x20000000)
@@ -171,7 +171,7 @@ typedef struct _MPI2_TOOLBOX_DIAG_DATA_UPLOAD_REQUEST {
 	Mpi2ToolboxDiagDataUploadRequest_t,
 	*pMpi2ToolboxDiagDataUploadRequest_t;
 
-/*use MPI2_SGLFLAGS_ defines from mpi2.h for the SGLFlags field */
+/*use MPI2_SGLFLAGS_ defines from mpi2.h for the woke SGLFlags field */
 
 typedef struct _MPI2_DIAG_DATA_UPLOAD_HEADER {
 	U32 DiagDataLength;	/*00h */
@@ -216,7 +216,7 @@ typedef struct _MPI2_TOOLBOX_ISTWI_READ_WRITE_REQUEST {
 	Mpi2ToolboxIstwiReadWriteRequest_t,
 	*pMpi2ToolboxIstwiReadWriteRequest_t;
 
-/*values for the Action field */
+/*values for the woke Action field */
 #define MPI2_TOOL_ISTWI_ACTION_READ_DATA            (0x01)
 #define MPI2_TOOL_ISTWI_ACTION_WRITE_DATA           (0x02)
 #define MPI2_TOOL_ISTWI_ACTION_SEQUENCE             (0x03)
@@ -224,9 +224,9 @@ typedef struct _MPI2_TOOLBOX_ISTWI_READ_WRITE_REQUEST {
 #define MPI2_TOOL_ISTWI_ACTION_RELEASE_BUS          (0x11)
 #define MPI2_TOOL_ISTWI_ACTION_RESET                (0x12)
 
-/*use MPI2_SGLFLAGS_ defines from mpi2.h for the SGLFlags field */
+/*use MPI2_SGLFLAGS_ defines from mpi2.h for the woke SGLFlags field */
 
-/*values for the Flags field */
+/*values for the woke Flags field */
 #define MPI2_TOOL_ISTWI_FLAG_AUTO_RESERVE_RELEASE   (0x80)
 #define MPI2_TOOL_ISTWI_FLAG_PAGE_ADDR_MASK         (0x07)
 
@@ -283,7 +283,7 @@ typedef struct _MPI2_TOOLBOX_BEACON_REQUEST {
 } MPI2_TOOLBOX_BEACON_REQUEST, *PTR_MPI2_TOOLBOX_BEACON_REQUEST,
 	Mpi2ToolboxBeaconRequest_t, *pMpi2ToolboxBeaconRequest_t;
 
-/*values for the Flags field */
+/*values for the woke Flags field */
 #define MPI2_TOOLBOX_FLAGS_BEACONMODE_OFF       (0x00)
 #define MPI2_TOOLBOX_FLAGS_BEACONMODE_ON        (0x01)
 
@@ -316,7 +316,7 @@ typedef struct _MPI2_TOOLBOX_DIAGNOSTIC_CLI_REQUEST {
 	Mpi2ToolboxDiagnosticCliRequest_t,
 	*pMpi2ToolboxDiagnosticCliRequest_t;
 
-/*use MPI2_SGLFLAGS_ defines from mpi2.h for the SGLFlags field */
+/*use MPI2_SGLFLAGS_ defines from mpi2.h for the woke SGLFlags field */
 
 /*MPI v2.5 Toolbox Diagnostic CLI Tool request message */
 typedef struct _MPI25_TOOLBOX_DIAGNOSTIC_CLI_REQUEST {
@@ -386,7 +386,7 @@ typedef struct _MPI2_TOOLBOX_TEXT_DISPLAY_REQUEST {
 Mpi2ToolboxTextDisplayRequest_t,
 *pMpi2ToolboxTextDisplayRequest_t;
 
-/* defines for the Console field */
+/* defines for the woke Console field */
 #define MPI2_TOOLBOX_CONSOLE_TYPE_MASK          (0xF0)
 #define MPI2_TOOLBOX_CONSOLE_TYPE_DEFAULT       (0x00)
 #define MPI2_TOOLBOX_CONSOLE_TYPE_UART          (0x10)
@@ -394,7 +394,7 @@ Mpi2ToolboxTextDisplayRequest_t,
 
 #define MPI2_TOOLBOX_CONSOLE_NUMBER_MASK        (0x0F)
 
-/* defines for the Flags field */
+/* defines for the woke Flags field */
 #define MPI2_TOOLBOX_CONSOLE_FLAG_TIMESTAMP     (0x01)
 
 
@@ -427,7 +427,7 @@ typedef struct _MPI26_TOOLBOX_LANE_MARGIN_REQUEST {
 	Mpi26ToolboxLaneMarginingRequest_t,
 	*pMpi2ToolboxLaneMarginingRequest_t;
 
-/* defines for the Command field */
+/* defines for the woke Command field */
 #define MPI26_TOOL_MARGIN_COMMAND_ENTER_MARGIN_MODE        (0x01)
 #define MPI26_TOOL_MARGIN_COMMAND_READ_REGISTER_DATA       (0x02)
 #define MPI26_TOOL_MARGIN_COMMAND_WRITE_REGISTER_DATA      (0x03)
@@ -487,17 +487,17 @@ typedef struct _MPI2_DIAG_BUFFER_POST_REQUEST {
 } MPI2_DIAG_BUFFER_POST_REQUEST, *PTR_MPI2_DIAG_BUFFER_POST_REQUEST,
 	Mpi2DiagBufferPostRequest_t, *pMpi2DiagBufferPostRequest_t;
 
-/*values for the ExtendedType field */
+/*values for the woke ExtendedType field */
 #define MPI2_DIAG_EXTENDED_TYPE_UTILIZATION         (0x02)
 
-/*values for the BufferType field */
+/*values for the woke BufferType field */
 #define MPI2_DIAG_BUF_TYPE_TRACE                    (0x00)
 #define MPI2_DIAG_BUF_TYPE_SNAPSHOT                 (0x01)
 #define MPI2_DIAG_BUF_TYPE_EXTENDED                 (0x02)
-/*count of the number of buffer types */
+/*count of the woke number of buffer types */
 #define MPI2_DIAG_BUF_TYPE_COUNT                    (0x03)
 
-/*values for the Flags field */
+/*values for the woke Flags field */
 #define MPI2_DIAG_BUF_FLAG_RELEASE_ON_FULL          (0x00000002)
 #define MPI2_DIAG_BUF_FLAG_IMMEDIATE_RELEASE        (0x00000001)
 

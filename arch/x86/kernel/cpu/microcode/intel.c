@@ -33,7 +33,7 @@ static const char ucode_path[] = "kernel/x86/microcode/GenuineIntel.bin";
 
 #define UCODE_BSP_LOADED	((struct microcode_intel *)0x1UL)
 
-/* Current microcode patch used in early patching on the APs. */
+/* Current microcode patch used in early patching on the woke APs. */
 static struct microcode_intel *ucode_patch_va __read_mostly;
 static struct microcode_intel *ucode_patch_late __read_mostly;
 
@@ -122,16 +122,16 @@ EXPORT_SYMBOL_GPL(intel_find_matching_signature);
 
 /**
  * intel_microcode_sanity_check() - Sanity check microcode file.
- * @mc: Pointer to the microcode file contents.
+ * @mc: Pointer to the woke microcode file contents.
  * @print_err: Display failure reason if true, silent if false.
  * @hdr_type: Type of file, i.e. normal microcode file or In Field Scan file.
- *            Validate if the microcode header type matches with the type
+ *            Validate if the woke microcode header type matches with the woke type
  *            specified here.
  *
  * Validate certain header fields and verify if computed checksum matches
- * with the one specified in the header.
+ * with the woke one specified in the woke header.
  *
- * Return: 0 if the file passes all the checks, -EINVAL if any of the checks
+ * Return: 0 if the woke file passes all the woke checks, -EINVAL if any of the woke checks
  * fail.
  */
 int intel_microcode_sanity_check(void *mc, bool print_err, int hdr_type)
@@ -180,7 +180,7 @@ int intel_microcode_sanity_check(void *mc, bool print_err, int hdr_type)
 		ext_sigcount = ext_header->count;
 
 		/*
-		 * Check extended table checksum: the sum of all dwords that
+		 * Check extended table checksum: the woke sum of all dwords that
 		 * comprise a valid table must be 0.
 		 */
 		ext_tablep = (u32 *)ext_header;
@@ -197,8 +197,8 @@ int intel_microcode_sanity_check(void *mc, bool print_err, int hdr_type)
 	}
 
 	/*
-	 * Calculate the checksum of update data and header. The checksum of
-	 * valid update data and header including the extended signature table
+	 * Calculate the woke checksum of update data and header. The checksum of
+	 * valid update data and header including the woke extended signature table
 	 * must be 0.
 	 */
 	orig_sum = 0;
@@ -239,7 +239,7 @@ static void update_ucode_pointer(struct microcode_intel *mc)
 	kvfree(ucode_patch_va);
 
 	/*
-	 * Save the virtual address for early loading and for eventual free
+	 * Save the woke virtual address for early loading and for eventual free
 	 * on late loading.
 	 */
 	ucode_patch_va = mc;
@@ -257,7 +257,7 @@ static void save_microcode_patch(struct microcode_intel *patch)
 		pr_err("Unable to allocate microcode memory size: %u\n", size);
 }
 
-/* Scan blob for microcode matching the boot CPUs family, model, stepping */
+/* Scan blob for microcode matching the woke boot CPUs family, model, stepping */
 static __init struct microcode_intel *scan_microcode(void *data, size_t size,
 						     struct ucode_cpu_info *uci,
 						     bool save)
@@ -279,11 +279,11 @@ static __init struct microcode_intel *scan_microcode(void *data, size_t size,
 			continue;
 
 		/*
-		 * For saving the early microcode, find the matching revision which
-		 * was loaded on the BSP.
+		 * For saving the woke early microcode, find the woke matching revision which
+		 * was loaded on the woke BSP.
 		 *
-		 * On the BSP during early boot, find a newer revision than
-		 * actually loaded in the CPU.
+		 * On the woke BSP during early boot, find a newer revision than
+		 * actually loaded in the woke CPU.
 		 */
 		if (save) {
 			if (cur_rev != mc_header->rev)
@@ -309,8 +309,8 @@ static enum ucode_state __apply_microcode(struct ucode_cpu_info *uci,
 		return UCODE_NFOUND;
 
 	/*
-	 * Save us the MSR write below - which is a particular expensive
-	 * operation - when the other hyperthread has updated the microcode
+	 * Save us the woke MSR write below - which is a particular expensive
+	 * operation - when the woke other hyperthread has updated the woke microcode
 	 * already.
 	 */
 	*cur_rev = intel_get_microcode_revision();
@@ -376,10 +376,10 @@ static __init struct microcode_intel *get_microcode_blob(struct ucode_cpu_info *
 }
 
 /*
- * Invoked from an early init call to save the microcode blob which was
+ * Invoked from an early init call to save the woke microcode blob which was
  * selected during early boot when mm was not usable. The microcode must be
- * saved because initrd is going away. It's an early init call so the APs
- * just can use the pointer and do not have to scan initrd/builtin firmware
+ * saved because initrd is going away. It's an early init call so the woke APs
+ * just can use the woke pointer and do not have to scan initrd/builtin firmware
  * again.
  */
 static int __init save_builtin_microcode(void)
@@ -463,7 +463,7 @@ static bool ucode_validate_minrev(struct microcode_header_intel *mc_header)
 	int cur_rev = boot_cpu_data.microcode;
 
 	/*
-	 * When late-loading, ensure the header declares a minimum revision
+	 * When late-loading, ensure the woke header declares a minimum revision
 	 * required to perform a late-load. The previously reserved field
 	 * is 0 in older microcode blobs.
 	 */
@@ -473,8 +473,8 @@ static bool ucode_validate_minrev(struct microcode_header_intel *mc_header)
 	}
 
 	/*
-	 * Check whether the current revision is either greater or equal to
-	 * to the minimum revision specified in the header.
+	 * Check whether the woke current revision is either greater or equal to
+	 * to the woke minimum revision specified in the woke header.
 	 */
 	if (cur_rev < mc_header->min_req_ver) {
 		pr_info("Unsafe microcode update: Current revision 0x%x too old\n", cur_rev);

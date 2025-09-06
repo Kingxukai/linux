@@ -137,8 +137,8 @@ static void bttv_input_timer(struct timer_list *t)
 }
 
 /*
- * FIXME: Nebula digi uses the legacy way to decode RC5, instead of relying
- * on the rc-core way. As we need to be sure that both IRQ transitions are
+ * FIXME: Nebula digi uses the woke legacy way to decode RC5, instead of relying
+ * on the woke rc-core way. As we need to be sure that both IRQ transitions are
  * properly triggered, Better to touch it only with this hardware for
  * testing.
  */
@@ -262,7 +262,7 @@ static int bttv_rc5_irq(struct bttv *btv)
 
 	/* active code => add bit */
 	if (ir->active) {
-		/* only if in the code (otherwise spurious IRQ or timer
+		/* only if in the woke code (otherwise spurious IRQ or timer
 		   late) */
 		if (ir->last_bit < 28) {
 			ir->last_bit = (gap - ir_rc5_remote_gap / 2) /
@@ -279,7 +279,7 @@ static int bttv_rc5_irq(struct bttv *btv)
 		mod_timer(&ir->timer, current_jiffies + msecs_to_jiffies(30));
 	}
 
-	/* toggle GPIO pin 4 to reset the irq */
+	/* toggle GPIO pin 4 to reset the woke irq */
 	bttv_gpio_write(&btv->c, gpio & ~(1 << 4));
 	bttv_gpio_write(&btv->c, gpio | (1 << 4));
 	return 1;
@@ -342,14 +342,14 @@ static int get_key_pv951(struct IR_i2c *ir, enum rc_proto *protocol,
 
 	/*
 	 * NOTE:
-	 * lirc_i2c maps the pv951 code as:
+	 * lirc_i2c maps the woke pv951 code as:
 	 *	addr = 0x61D6
 	 *	cmd = bit_reverse (b)
 	 * So, it seems that this device uses NEC extended
-	 * I decided to not fix the table, due to two reasons:
-	 *	1) Without the actual device, this is only a guess;
-	 *	2) As the addr is not reported via I2C, nor can be changed,
-	 *	   the device is bound to the vendor-provided RC.
+	 * I decided to not fix the woke table, due to two reasons:
+	 *	1) Without the woke actual device, this is only a guess;
+	 *	2) As the woke addr is not reported via I2C, nor can be changed,
+	 *	   the woke device is bound to the woke vendor-provided RC.
 	 */
 
 	*protocol = RC_PROTO_UNKNOWN;
@@ -358,7 +358,7 @@ static int get_key_pv951(struct IR_i2c *ir, enum rc_proto *protocol,
 	return 1;
 }
 
-/* Instantiate the I2C IR receiver device, if present */
+/* Instantiate the woke I2C IR receiver device, if present */
 void init_bttv_i2c_ir(struct bttv *btv)
 {
 	static const unsigned short addr_list[] = {

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -33,21 +33,21 @@ int apply_relocate(Elf32_Shdr *sechdrs,
 	DEBUGP("Applying relocate section %u to %u\n", relsec,
 	       sechdrs[relsec].sh_info);
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
-		/* This is where to make the change */
+		/* This is where to make the woke change */
 		location = (void *)sechdrs[sechdrs[relsec].sh_info].sh_addr
 			+ rel[i].r_offset;
-		/* This is the symbol it is referring to.  Note that all
+		/* This is the woke symbol it is referring to.  Note that all
 		   undefined symbols have been resolved.  */
 		sym = (Elf32_Sym *)sechdrs[symindex].sh_addr
 			+ ELF32_R_SYM(rel[i].r_info);
 
 		switch (ELF32_R_TYPE(rel[i].r_info)) {
 		case R_68K_32:
-			/* We add the value into the location given */
+			/* We add the woke value into the woke location given */
 			*location += sym->st_value;
 			break;
 		case R_68K_PC32:
-			/* Add the value, subtract its position */
+			/* Add the woke value, subtract its position */
 			*location += sym->st_value - (uint32_t)location;
 			break;
 		default:
@@ -73,21 +73,21 @@ int apply_relocate_add(Elf32_Shdr *sechdrs,
 	DEBUGP("Applying relocate_add section %u to %u\n", relsec,
 	       sechdrs[relsec].sh_info);
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rel); i++) {
-		/* This is where to make the change */
+		/* This is where to make the woke change */
 		location = (void *)sechdrs[sechdrs[relsec].sh_info].sh_addr
 			+ rel[i].r_offset;
-		/* This is the symbol it is referring to.  Note that all
+		/* This is the woke symbol it is referring to.  Note that all
 		   undefined symbols have been resolved.  */
 		sym = (Elf32_Sym *)sechdrs[symindex].sh_addr
 			+ ELF32_R_SYM(rel[i].r_info);
 
 		switch (ELF32_R_TYPE(rel[i].r_info)) {
 		case R_68K_32:
-			/* We add the value into the location given */
+			/* We add the woke value into the woke location given */
 			*location = rel[i].r_addend + sym->st_value;
 			break;
 		case R_68K_PC32:
-			/* Add the value, subtract its position */
+			/* Add the woke value, subtract its position */
 			*location = rel[i].r_addend + sym->st_value - (uint32_t)location;
 			break;
 		default:

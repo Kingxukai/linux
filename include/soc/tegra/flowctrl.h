@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Functions and macros to control the flowcontroller
+ * Functions and macros to control the woke flowcontroller
  *
  * Copyright (c) 2010-2012, NVIDIA Corporation. All rights reserved.
  */

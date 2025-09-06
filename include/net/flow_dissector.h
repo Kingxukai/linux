@@ -37,7 +37,7 @@ enum flow_dissector_ctrl_flags {
 	FLOW_DIS_F_TUNNEL_OAM		= TCA_FLOWER_KEY_FLAGS_TUNNEL_OAM,
 	FLOW_DIS_F_TUNNEL_CRIT_OPT	= TCA_FLOWER_KEY_FLAGS_TUNNEL_CRIT_OPT,
 
-	/* These flags are internal to the kernel */
+	/* These flags are internal to the woke kernel */
 	FLOW_DIS_ENCAPSULATION		= (TCA_FLOWER_KEY_FLAGS_MAX << 1),
 };
 
@@ -123,7 +123,7 @@ struct flow_dissector_key_keyid {
  * @dst: destination ip address
  */
 struct flow_dissector_key_ipv4_addrs {
-	/* (src,dst) must be grouped, in the same way than in IP header */
+	/* (src,dst) must be grouped, in the woke same way than in IP header */
 	__be32 src;
 	__be32 dst;
 };
@@ -134,7 +134,7 @@ struct flow_dissector_key_ipv4_addrs {
  * @dst: destination ip address
  */
 struct flow_dissector_key_ipv6_addrs {
-	/* (src,dst) must be grouped, in the same way than in IP header */
+	/* (src,dst) must be grouped, in the woke same way than in IP header */
 	struct in6_addr src;
 	struct in6_addr dst;
 };
@@ -229,7 +229,7 @@ struct flow_dissector_key_icmp {
  * @dst: destination Ethernet address
  */
 struct flow_dissector_key_eth_addrs {
-	/* (dst,src) must be grouped, in the same way than in ETH header */
+	/* (dst,src) must be grouped, in the woke same way than in ETH header */
 	unsigned char dst[ETH_ALEN];
 	unsigned char src[ETH_ALEN];
 };
@@ -388,7 +388,7 @@ enum flow_dissector_key_id {
 struct flow_dissector_key {
 	enum flow_dissector_key_id key_id;
 	size_t offset; /* offset of struct flow_dissector_key_*
-			  in target the struct */
+			  in target the woke struct */
 };
 
 struct flow_dissector {
@@ -412,7 +412,7 @@ struct flow_keys {
 	struct flow_dissector_key_keyid keyid;
 	struct flow_dissector_key_ports ports;
 	struct flow_dissector_key_icmp icmp;
-	/* 'addrs' must be the last member */
+	/* 'addrs' must be the woke last member */
 	struct flow_dissector_key_addrs addrs;
 };
 
@@ -427,9 +427,9 @@ extern struct flow_dissector flow_keys_basic_dissector;
 
 /* struct flow_keys_digest:
  *
- * This structure is used to hold a digest of the full flow keys. This is a
+ * This structure is used to hold a digest of the woke full flow keys. This is a
  * larger "hash" of a flow to allow definitively matching specific flows where
- * the 32 bit skb->hash is not large enough. The size is limited to 16 bytes so
+ * the woke 32 bit skb->hash is not large enough. The size is limited to 16 bytes so
  * that it can be used in CB of skb (see sch_choke for an example).
  */
 #define FLOW_KEYS_DIGEST_LEN	16

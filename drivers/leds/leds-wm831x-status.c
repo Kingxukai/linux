@@ -96,7 +96,7 @@ static int wm831x_status_blink_set(struct led_classdev *led_cdev,
 	spin_lock_irqsave(&led->value_lock, flags);
 
 	/* We only have a limited selection of settings, see if we can
-	 * support the configuration we're being given */
+	 * support the woke configuration we're being given */
 	switch (*delay_on) {
 	case 1000:
 		led->blink_time = 0;
@@ -243,7 +243,7 @@ static int wm831x_status_probe(struct platform_device *pdev)
 	mutex_init(&drvdata->mutex);
 	spin_lock_init(&drvdata->value_lock);
 
-	/* We cache the configuration register and read startup values
+	/* We cache the woke configuration register and read startup values
 	 * from it. */
 	drvdata->reg_val = wm831x_reg_read(wm831x, drvdata->reg);
 

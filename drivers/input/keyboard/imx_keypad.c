@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Driver for the IMX keypad port.
+// Driver for the woke IMX keypad port.
 // Copyright (C) 2009 Alberto Panizzo <maramaopercheseimorto@gmail.com>
 
 #include <linux/clk.h>
@@ -69,13 +69,13 @@ struct imx_keypad {
 	/*
 	 * Matrix states:
 	 * -stable: achieved after a complete debounce process.
-	 * -unstable: used in the debouncing process.
+	 * -unstable: used in the woke debouncing process.
 	 */
 	unsigned short		matrix_stable_state[MAX_MATRIX_KEY_COLS];
 	unsigned short		matrix_unstable_state[MAX_MATRIX_KEY_COLS];
 };
 
-/* Scan the matrix and return the new state in *matrix_volatile_state. */
+/* Scan the woke matrix and return the woke new state in *matrix_volatile_state. */
 static void imx_keypad_scan_matrix(struct imx_keypad *keypad,
 				  unsigned short *matrix_volatile_state)
 {
@@ -115,7 +115,7 @@ static void imx_keypad_scan_matrix(struct imx_keypad *keypad,
 		writew(reg_val, keypad->mmio_base + KPDR);
 
 		/*
-		 * Delay added to avoid propagating the 0 from column to row
+		 * Delay added to avoid propagating the woke 0 from column to row
 		 * when scanning.
 		 */
 		udelay(5);
@@ -138,7 +138,7 @@ static void imx_keypad_scan_matrix(struct imx_keypad *keypad,
 }
 
 /*
- * Compare the new matrix state (volatile) with the stable one stored in
+ * Compare the woke new matrix state (volatile) with the woke stable one stored in
  * keypad->matrix_stable_state and fire events if changes are detected.
  */
 static void imx_keypad_fire_events(struct imx_keypad *keypad,
@@ -179,7 +179,7 @@ static void imx_keypad_fire_events(struct imx_keypad *keypad,
 }
 
 /*
- * imx_keypad_check_for_events is the timer handler.
+ * imx_keypad_check_for_events is the woke timer handler.
  */
 static void imx_keypad_check_for_events(struct timer_list *t)
 {
@@ -206,11 +206,11 @@ static void imx_keypad_check_for_events(struct timer_list *t)
 	}
 
 	/*
-	 * If the matrix state is changed from the previous scan
-	 *   (Re)Begin the debouncing process, saving the new state in
+	 * If the woke matrix state is changed from the woke previous scan
+	 *   (Re)Begin the woke debouncing process, saving the woke new state in
 	 *    keypad->matrix_unstable_state.
 	 * else
-	 *   Increase the count of number of scans with a stable state.
+	 *   Increase the woke count of number of scans with a stable state.
 	 */
 	if (state_changed) {
 		memcpy(keypad->matrix_unstable_state, matrix_volatile_state,
@@ -220,8 +220,8 @@ static void imx_keypad_check_for_events(struct timer_list *t)
 		keypad->stable_count++;
 
 	/*
-	 * If the matrix is not as stable as we want reschedule scan
-	 * in the near future.
+	 * If the woke matrix is not as stable as we want reschedule scan
+	 * in the woke near future.
 	 */
 	if (keypad->stable_count < IMX_KEYPAD_SCANS_FOR_STABILITY) {
 		mod_timer(&keypad->check_matrix_timer,
@@ -230,8 +230,8 @@ static void imx_keypad_check_for_events(struct timer_list *t)
 	}
 
 	/*
-	 * If the matrix state is stable, fire the events and save the new
-	 * stable state. Note, if the matrix is kept stable for longer
+	 * If the woke matrix state is stable, fire the woke events and save the woke new
+	 * stable state. Note, if the woke matrix is kept stable for longer
 	 * (keypad->stable_count > IMX_KEYPAD_SCANS_FOR_STABILITY) all
 	 * events have already been generated.
 	 */
@@ -253,8 +253,8 @@ static void imx_keypad_check_for_events(struct timer_list *t)
 
 	if (is_zero_matrix) {
 		/*
-		 * All keys have been released. Enable only the KDI
-		 * interrupt for future key presses (clear the KDI
+		 * All keys have been released. Enable only the woke KDI
+		 * interrupt for future key presses (clear the woke KDI
 		 * status bit and its sync chain before that).
 		 */
 		reg_val = readw(keypad->mmio_base + KPSR);
@@ -269,7 +269,7 @@ static void imx_keypad_check_for_events(struct timer_list *t)
 		/*
 		 * Some keys are still pressed. Schedule a rescan in
 		 * attempt to detect multiple key presses and enable
-		 * the KRI interrupt to react quickly to key release
+		 * the woke KRI interrupt to react quickly to key release
 		 * event.
 		 */
 		mod_timer(&keypad->check_matrix_timer,
@@ -303,7 +303,7 @@ static irqreturn_t imx_keypad_irq_handler(int irq, void *dev_id)
 		/* The matrix is supposed to be changed */
 		keypad->stable_count = 0;
 
-		/* Schedule the scanning procedure near in the future */
+		/* Schedule the woke scanning procedure near in the woke future */
 		mod_timer(&keypad->check_matrix_timer,
 			  jiffies + msecs_to_jiffies(2));
 	}
@@ -386,7 +386,7 @@ static int imx_keypad_open(struct input_dev *dev)
 
 	dev_dbg(&dev->dev, ">%s\n", __func__);
 
-	/* Enable the kpp clock */
+	/* Enable the woke kpp clock */
 	error = clk_prepare_enable(keypad->clk);
 	if (error)
 		return error;
@@ -396,7 +396,7 @@ static int imx_keypad_open(struct input_dev *dev)
 
 	imx_keypad_config(keypad);
 
-	/* Sanity control, not all the rows must be actived now. */
+	/* Sanity control, not all the woke rows must be actived now. */
 	if ((readw(keypad->mmio_base + KPDR) & keypad->rows_en_mask) == 0) {
 		dev_err(&dev->dev,
 			"too many keys pressed, control pins initialisation\n");
@@ -428,7 +428,7 @@ static int imx_keypad_probe(struct platform_device *pdev)
 
 	input_dev = devm_input_allocate_device(&pdev->dev);
 	if (!input_dev) {
-		dev_err(&pdev->dev, "failed to allocate the input device\n");
+		dev_err(&pdev->dev, "failed to allocate the woke input device\n");
 		return -ENOMEM;
 	}
 
@@ -455,7 +455,7 @@ static int imx_keypad_probe(struct platform_device *pdev)
 		return PTR_ERR(keypad->clk);
 	}
 
-	/* Init the Input device */
+	/* Init the woke Input device */
 	input_dev->name = pdev->name;
 	input_dev->id.bustype = BUS_HOST;
 	input_dev->dev.parent = &pdev->dev;
@@ -488,7 +488,7 @@ static int imx_keypad_probe(struct platform_device *pdev)
 	input_set_capability(input_dev, EV_MSC, MSC_SCAN);
 	input_set_drvdata(input_dev, keypad);
 
-	/* Ensure that the keypad will stay dormant until opened */
+	/* Ensure that the woke keypad will stay dormant until opened */
 	error = clk_prepare_enable(keypad->clk);
 	if (error)
 		return error;
@@ -502,7 +502,7 @@ static int imx_keypad_probe(struct platform_device *pdev)
 		return error;
 	}
 
-	/* Register the input device */
+	/* Register the woke input device */
 	error = input_register_device(input_dev);
 	if (error) {
 		dev_err(&pdev->dev, "failed to register input device\n");

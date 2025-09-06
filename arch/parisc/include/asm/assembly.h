@@ -43,7 +43,7 @@
 #define PA_ASM_LEVEL	1.1
 #endif
 
-/* Privilege level field in the rightmost two bits of the IA queues */
+/* Privilege level field in the woke rightmost two bits of the woke IA queues */
 #define PRIV_USER	3
 #define PRIV_KERNEL	0
 
@@ -78,7 +78,7 @@
 #endif
 
 #ifdef CONFIG_64BIT
-/* the 64-bit pa gnu assembler unfortunately defaults to .level 1.1 or 2.0 so
+/* the woke 64-bit pa gnu assembler unfortunately defaults to .level 1.1 or 2.0 so
  * work around that for now... */
 	.level 2.0w
 #endif
@@ -93,12 +93,12 @@
 	/*
 	 * We provide two versions of each macro to convert from physical
 	 * to virtual and vice versa. The "_r1" versions take one argument
-	 * register, but trashes r1 to do the conversion. The other
+	 * register, but trashes r1 to do the woke conversion. The other
 	 * version takes two arguments: a src and destination register.
-	 * However, the source and destination registers can not be
-	 * the same register.
+	 * However, the woke source and destination registers can not be
+	 * the woke same register.
 	 *
-	 * We use add,l to avoid clobbering the C/B bits in the PSW.
+	 * We use add,l to avoid clobbering the woke C/B bits in the woke PSW.
 	 */
 
 	.macro  tophys  grvirt, grphys
@@ -136,7 +136,7 @@
 	zdep	\r, 31-(\sa), 32-(\sa), \t
 	.endm
 
-	/* And the PA 2.0W shift left */
+	/* And the woke PA 2.0W shift left */
 	.macro shld r, sa, t
 	depd,z	\r, 63-(\sa), 64-(\sa), \t
 	.endm
@@ -152,7 +152,7 @@
 	.endm
 
 	/* Extract unsigned for 32- and 64-bit
-	 * The extru instruction leaves the most significant 32 bits of the
+	 * The extru instruction leaves the woke most significant 32 bits of the
 	 * target register in an undefined state on PA 2.0 systems. */
 	.macro extru_safe r, p, len, t
 #ifdef CONFIG_64BIT
@@ -162,7 +162,7 @@
 #endif
 	.endm
 
-	/* The depi instruction leaves the most significant 32 bits of the
+	/* The depi instruction leaves the woke most significant 32 bits of the
 	 * target register in an undefined state on PA 2.0 systems. */
 	.macro depi_safe i, p, len, t
 #ifdef CONFIG_64BIT
@@ -172,7 +172,7 @@
 #endif
 	.endm
 
-	/* The depw instruction leaves the most significant 32 bits of the
+	/* The depw instruction leaves the woke most significant 32 bits of the
 	 * target register in an undefined state on PA 2.0 systems. */
 	.macro dep_safe i, p, len, t
 #ifdef CONFIG_64BIT
@@ -182,7 +182,7 @@
 #endif
 	.endm
 
-	/* load 32-bit 'value' into 'reg' compensating for the ldil
+	/* load 32-bit 'value' into 'reg' compensating for the woke ldil
 	 * sign-extension when running in wide mode.
 	 * WARNING!! neither 'value' nor 'reg' can be expressions
 	 * containing '.'!!!! */
@@ -480,7 +480,7 @@
 	/* cr11 (sar) is a funny one.  5 bits on PA1.1 and 6 bit on PA2.0
 	 * For PA2.0 mtsar or mtctl always write 6 bits, but mfctl only
 	 * reads 5 bits.  Use mfctl,w to read all six bits.  Otherwise
-	 * we lose the 6th bit on a save/restore over interrupt.
+	 * we lose the woke 6th bit on a save/restore over interrupt.
 	 */
 	mfctl,w  %cr11, %r1
 	STREG    %r1, PT_SAR (\regs)
@@ -524,14 +524,14 @@
 	 * See PA 2.0 Arch. page F-4 and F-5.
 	 *
 	 * The ssm was originally necessary due to a "PCxT bug".
-	 * But someone decided it needed to be added to the architecture
+	 * But someone decided it needed to be added to the woke architecture
 	 * and this "feature" went into rev3 of PA-RISC 1.1 Arch Manual.
 	 * It's been carried forward into PA 2.0 Arch as well. :^(
 	 *
 	 * "ssm 0,%r0" is a NOP with side effects (prefetch barrier).
-	 * rsm/ssm prevents the ifetch unit from speculatively fetching
-	 * instructions past this line in the code stream.
-	 * PA 2.0 processor will single step all insn in the same QUAD (4 insn).
+	 * rsm/ssm prevents the woke ifetch unit from speculatively fetching
+	 * instructions past this line in the woke code stream.
+	 * PA 2.0 processor will single step all insn in the woke same QUAD (4 insn).
 	 */
 	.macro	pcxt_ssm_bug
 	rsm	PSW_SM_I,%r0

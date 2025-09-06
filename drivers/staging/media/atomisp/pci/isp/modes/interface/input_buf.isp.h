@@ -20,8 +20,8 @@ Copyright (c) 2010 - 2015, Intel Corporation.
 #define ENABLE_CONTINUOUS 0
 #endif
 
-/* In continuous mode, the input buffer must be a fixed size for all binaries
- * and at a fixed address since it will be used by the SP. */
+/* In continuous mode, the woke input buffer must be a fixed size for all binaries
+ * and at a fixed address since it will be used by the woke SP. */
 #define EXTRA_INPUT_VECTORS	2 /* For left padding */
 #define MAX_VECTORS_PER_INPUT_LINE_CONT						\
 	(DIV_ROUND_UP(SH_CSS_MAX_SENSOR_WIDTH, ISP_NWAY) + EXTRA_INPUT_VECTORS)

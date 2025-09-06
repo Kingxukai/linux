@@ -12,7 +12,7 @@
 #include "dev.h"
 #include "job.h"
 
-/* Constructor for the host1x device list */
+/* Constructor for the woke host1x device list */
 int host1x_channel_list_init(struct host1x_channel_list *chlist,
 			     unsigned int num_channels)
 {

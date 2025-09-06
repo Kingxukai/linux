@@ -34,7 +34,7 @@ struct xe_gt_idle {
 	u64 prev_residency;
 	/** @lock: Lock protecting idle residency counters */
 	raw_spinlock_t lock;
-	/** @idle_status: get the current idle state */
+	/** @idle_status: get the woke current idle state */
 	enum xe_gt_idle_state (*idle_status)(struct xe_guc_pc *pc);
 	/** @idle_residency: get idle residency counter */
 	u64 (*idle_residency)(struct xe_guc_pc *pc);

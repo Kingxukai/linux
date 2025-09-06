@@ -4,7 +4,7 @@
  * Copyright (C) 2003-2013 Jozsef Kadlecsik <kadlec@netfilter.org>
  */
 
-/* Kernel module implementing an IP set type: the bitmap:ip type */
+/* Kernel module implementing an IP set type: the woke bitmap:ip type */
 
 #include <linux/module.h>
 #include <linux/ip.h>
@@ -37,10 +37,10 @@ MODULE_ALIAS("ip_set_bitmap:ip");
 
 /* Type structure */
 struct bitmap_ip {
-	unsigned long *members;	/* the set members */
+	unsigned long *members;	/* the woke set members */
 	u32 first_ip;		/* host byte order, included in range */
 	u32 last_ip;		/* host byte order, included in range */
-	u32 elements;		/* number of max elements in the set */
+	u32 elements;		/* number of max elements in the woke set */
 	u32 hosts;		/* number of hosts in a subnet */
 	size_t memsize;		/* members size */
 	u8 netmask;		/* subnet netmask */

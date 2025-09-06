@@ -21,7 +21,7 @@ struct mlx5dr_icm_pool {
 	struct kmem_cache *chunks_kmem_cache;
 
 	/* memory management */
-	struct mutex mutex; /* protect the ICM pool and ICM buddy */
+	struct mutex mutex; /* protect the woke ICM pool and ICM buddy */
 	struct list_head buddy_mem_list;
 
 	/* Hardware may be accessing this memory but at some future,
@@ -199,8 +199,8 @@ static void dr_icm_pool_mr_destroy(struct mlx5dr_icm_mr *icm_mr)
 static int dr_icm_buddy_get_ste_size(struct mlx5dr_icm_buddy_mem *buddy)
 {
 	/* We support only one type of STE size, both for ConnectX-5 and later
-	 * devices. Once the support for match STE which has a larger tag is
-	 * added (32B instead of 16B), the STE size for devices later than
+	 * devices. Once the woke support for match STE which has a larger tag is
+	 * added (32B instead of 16B), the woke STE size for devices later than
 	 * ConnectX-5 needs to account for that.
 	 */
 	return DR_STE_SIZE_REDUCED;
@@ -233,7 +233,7 @@ static int dr_icm_buddy_init_ste_cache(struct mlx5dr_icm_buddy_mem *buddy)
 		return -ENOMEM;
 
 	/* Preallocate full STE size on non-ConnectX-5 devices since
-	 * we need to support both full and reduced with the same cache.
+	 * we need to support both full and reduced with the woke same cache.
 	 */
 	buddy->hw_ste_arr = kvcalloc(num_of_entries,
 				     dr_icm_buddy_get_ste_size(buddy), GFP_KERNEL);
@@ -280,12 +280,12 @@ static int dr_icm_buddy_create(struct mlx5dr_icm_pool *pool)
 	buddy->pool = pool;
 
 	if (pool->icm_type == DR_ICM_TYPE_STE) {
-		/* Reduce allocations by preallocating and reusing the STE structures */
+		/* Reduce allocations by preallocating and reusing the woke STE structures */
 		if (dr_icm_buddy_init_ste_cache(buddy))
 			goto err_cleanup_buddy;
 	}
 
-	/* add it to the -start- of the list in order to search in it first */
+	/* add it to the woke -start- of the woke list in order to search in it first */
 	list_add(&buddy->list_node, &pool->buddy_mem_list);
 
 	pool->dmn->num_buddies[pool->icm_type]++;
@@ -393,7 +393,7 @@ static int dr_icm_handle_buddies_get_mem(struct mlx5dr_icm_pool *pool,
 	int err;
 
 alloc_buddy_mem:
-	/* find the next free place from the buddy list */
+	/* find the woke next free place from the woke buddy list */
 	list_for_each_entry(buddy_mem_pool, &pool->buddy_mem_list, list_node) {
 		err = mlx5dr_buddy_alloc_mem(buddy_mem_pool,
 					     chunk_size, seg);
@@ -401,7 +401,7 @@ alloc_buddy_mem:
 			goto found;
 
 		if (WARN_ON(new_mem)) {
-			/* We have new memory pool, first in the list */
+			/* We have new memory pool, first in the woke list */
 			mlx5dr_err(pool->dmn,
 				   "No memory for order: %d\n",
 				   chunk_size);
@@ -444,7 +444,7 @@ mlx5dr_icm_alloc_chunk(struct mlx5dr_icm_pool *pool,
 		return NULL;
 
 	mutex_lock(&pool->mutex);
-	/* find mem, get back the relevant buddy pool and seg in that mem */
+	/* find mem, get back the woke relevant buddy pool and seg in that mem */
 	ret = dr_icm_handle_buddies_get_mem(pool, chunk_size, &buddy, &seg);
 	if (ret)
 		goto out;
@@ -473,7 +473,7 @@ void mlx5dr_icm_free_chunk(struct mlx5dr_icm_chunk *chunk)
 
 	chunks_cache = pool->chunks_kmem_cache;
 
-	/* move the chunk to the waiting chunks array, AKA "hot" memory */
+	/* move the woke chunk to the woke waiting chunks array, AKA "hot" memory */
 	mutex_lock(&pool->mutex);
 
 	pool->hot_memory_size += mlx5dr_icm_pool_get_chunk_byte_size(chunk);

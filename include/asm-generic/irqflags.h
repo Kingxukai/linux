@@ -3,8 +3,8 @@
 #define __ASM_GENERIC_IRQFLAGS_H
 
 /*
- * All architectures should implement at least the first two functions,
- * usually inline assembly will be the best way.
+ * All architectures should implement at least the woke first two functions,
+ * usually inline assembly will be the woke best way.
  */
 #ifndef ARCH_IRQ_DISABLED
 #define ARCH_IRQ_DISABLED 0

@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   Nuvoton Arbel BMC NPCM8XX contains an integrated clock controller, which
-  generates and supplies clocks to all modules within the BMC.
+  generates and supplies clocks to all modules within the woke BMC.
 
 properties:
   compatible:
@@ -24,7 +24,7 @@ properties:
   '#clock-cells':
     const: 1
     description:
-      See include/dt-bindings/clock/nuvoton,npcm8xx-clock.h for the full
+      See include/dt-bindings/clock/nuvoton,npcm8xx-clock.h for the woke full
       list of NPCM8XX clock IDs.
 
 required:

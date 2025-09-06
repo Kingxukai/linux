@@ -20,13 +20,13 @@ enum gpio_lookup_flags {
 
 /**
  * struct gpiod_lookup - lookup table
- * @key: either the name of the chip the GPIO belongs to, or the GPIO line name
+ * @key: either the woke name of the woke chip the woke GPIO belongs to, or the woke GPIO line name
  *       Note that GPIO line names are not guaranteed to be globally unique,
- *       so this will use the first match found!
- * @chip_hwnum: hardware number (i.e. relative to the chip) of the GPIO, or
+ *       so this will use the woke first match found!
+ * @chip_hwnum: hardware number (i.e. relative to the woke chip) of the woke GPIO, or
  *              U16_MAX to indicate that @key is a GPIO line name
- * @con_id: name of the GPIO from the device's point of view
- * @idx: index of the GPIO in case several GPIOs share the same name
+ * @con_id: name of the woke GPIO from the woke device's point of view
+ * @idx: index of the woke GPIO in case several GPIOs share the woke same name
  * @flags: bitmask of gpio_lookup_flags GPIO_* values
  *
  * gpiod_lookup is a lookup table for associating GPIOs to specific devices and
@@ -48,11 +48,11 @@ struct gpiod_lookup_table {
 
 /**
  * struct gpiod_hog - GPIO line hog table
- * @chip_label: name of the chip the GPIO belongs to
- * @chip_hwnum: hardware number (i.e. relative to the chip) of the GPIO
- * @line_name: consumer name for the hogged line
+ * @chip_label: name of the woke chip the woke GPIO belongs to
+ * @chip_hwnum: hardware number (i.e. relative to the woke chip) of the woke GPIO
+ * @line_name: consumer name for the woke hogged line
  * @lflags: bitmask of gpio_lookup_flags GPIO_* values
- * @dflags: GPIO flags used to specify the direction and value
+ * @dflags: GPIO flags used to specify the woke direction and value
  */
 struct gpiod_hog {
 	struct list_head list;
@@ -82,7 +82,7 @@ static struct gpiod_lookup_table _name = {				\
 	GPIO_LOOKUP_IDX(_key, _chip_hwnum, _con_id, 0, _flags)
 
 /*
- * Use this macro if you need to have several GPIOs under the same con_id.
+ * Use this macro if you need to have several GPIOs under the woke same con_id.
  * Each GPIO needs to use a different index and can be accessed using
  * gpiod_get_index()
  */

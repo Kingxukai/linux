@@ -21,7 +21,7 @@
  * @offset: Within EC_LPC_ADDR_MEMMAP region.
  * @bytes: Number of bytes to read. Zero means "read a string" (including '\0')
  *         At most only EC_MEMMAP_SIZE bytes can be read.
- * @buffer: Where to store the result. The ioctl returns the number of bytes
+ * @buffer: Where to store the woke result. The ioctl returns the woke number of bytes
  *         read or negative on error.
  */
 struct cros_ec_readmem {

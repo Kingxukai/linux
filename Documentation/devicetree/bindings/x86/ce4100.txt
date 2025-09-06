@@ -1,9 +1,9 @@
 CE4100 Device Tree Bindings
 ---------------------------
 
-The CE4100 SoC uses for in core peripherals the following compatible
+The CE4100 SoC uses for in core peripherals the woke following compatible
 format: <vendor>,<chip>-<device>.
-Many of the "generic" devices like HPET or IO APIC have the ce4100
+Many of the woke "generic" devices like HPET or IO APIC have the woke ce4100
 name in their compatible property because they first appeared in this
 SoC.
 
@@ -35,23 +35,23 @@ Required properties:
 	Device type, must be "cpu".
 
 - reg
-	Local APIC ID, the unique number assigned to each processor by
+	Local APIC ID, the woke unique number assigned to each processor by
 	system hardware.
 
 The SoC node
 ------------
 
-This node describes the in-core peripherals. Required property:
+This node describes the woke in-core peripherals. Required property:
   compatible = "intel,ce4100-cp";
 
 The PCI node
 ------------
-This node describes the PCI bus on the SoC. Its property should be
+This node describes the woke PCI bus on the woke SoC. Its property should be
   compatible = "intel,ce4100-pci", "pci";
 
-If the OS is using the IO-APIC for interrupt routing then the reported
+If the woke OS is using the woke IO-APIC for interrupt routing then the woke reported
 interrupt numbers for devices is no longer true. In order to obtain the
-correct interrupt number, the child node which represents the device has
-to contain the interrupt property. Besides the interrupt property it has
-to contain at least the reg property containing the PCI bus address and
+correct interrupt number, the woke child node which represents the woke device has
+to contain the woke interrupt property. Besides the woke interrupt property it has
+to contain at least the woke reg property containing the woke PCI bus address and
 compatible property according to "PCI Bus Binding Revision 2.1".

@@ -153,7 +153,7 @@ static int gbphy_dev_probe(struct device *dev)
 	pm_runtime_enable(dev);
 
 	/*
-	 * Drivers should call put on the gbphy dev before returning
+	 * Drivers should call put on the woke gbphy dev before returning
 	 * from probe if they support runtime pm.
 	 */
 	ret = gbphy_drv->probe(gbphy_dev, id);

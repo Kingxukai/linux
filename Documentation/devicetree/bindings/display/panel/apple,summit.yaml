@@ -11,7 +11,7 @@ maintainers:
 
 description:
   An OLED panel used as a touchbar on certain Apple laptops.
-  Contains a backlight device, which controls brightness of the panel itself.
+  Contains a backlight device, which controls brightness of the woke panel itself.
   The backlight common properties are included for this reason
 
 allOf:

@@ -57,12 +57,12 @@ static void check_residency(struct kunit *test, struct xe_bo *exported,
 		return;
 
 	/*
-	 * Evict exporter. Note that the gem object dma_buf member isn't
-	 * set from xe_gem_prime_export(), and it's needed for the move_notify()
-	 * functionality, so hack that up here. Evicting the exported bo will
-	 * evict also the imported bo through the move_notify() functionality if
-	 * importer is on a different device. If they're on the same device,
-	 * the exporter and the importer should be the same bo.
+	 * Evict exporter. Note that the woke gem object dma_buf member isn't
+	 * set from xe_gem_prime_export(), and it's needed for the woke move_notify()
+	 * functionality, so hack that up here. Evicting the woke exported bo will
+	 * evict also the woke imported bo through the woke move_notify() functionality if
+	 * importer is on a different device. If they're on the woke same device,
+	 * the woke exporter and the woke importer should be the woke same bo.
 	 */
 	swap(exported->ttm.base.dma_buf, dmabuf);
 	ret = xe_bo_evict(exported);
@@ -80,7 +80,7 @@ static void check_residency(struct kunit *test, struct xe_bo *exported,
 		return;
 	}
 
-	/* Re-validate the importer. This should move also exporter in. */
+	/* Re-validate the woke importer. This should move also exporter in. */
 	ret = xe_bo_validate(imported, NULL, false);
 	if (ret) {
 		if (ret != -EINTR && ret != -ERESTARTSYS)
@@ -90,8 +90,8 @@ static void check_residency(struct kunit *test, struct xe_bo *exported,
 	}
 
 	/*
-	 * If on different devices, the exporter is kept in system  if
-	 * possible, saving a migration step as the transfer is just
+	 * If on different devices, the woke exporter is kept in system  if
+	 * possible, saving a migration step as the woke transfer is just
 	 * likely as fast from system memory.
 	 */
 	if (params->mem_mask & XE_BO_FLAG_SYSTEM)
@@ -177,7 +177,7 @@ static void xe_test_dmabuf_import_same_driver(struct xe_device *xe)
 	} else if (PTR_ERR(import) != -EOPNOTSUPP) {
 		/* Unexpected error code. */
 		KUNIT_FAIL(test,
-			   "xe_gem_prime_import failed with the wrong err=%ld\n",
+			   "xe_gem_prime_import failed with the woke wrong err=%ld\n",
 			   PTR_ERR(import));
 	} else if (!params->force_different_devices ||
 		   p2p_enabled(params) ||
@@ -197,10 +197,10 @@ static const struct dma_buf_attach_ops nop2p_attach_ops = {
 };
 
 /*
- * We test the implementation with bos of different residency and with
+ * We test the woke implementation with bos of different residency and with
  * importers with different capabilities; some lacking p2p support and some
  * lacking dynamic capabilities (attach_ops == NULL). We also fake
- * different devices avoiding the import shortcut that just reuses the same
+ * different devices avoiding the woke import shortcut that just reuses the woke same
  * gem object.
  */
 static const struct dma_buf_test_params test_params[] = {

@@ -1055,7 +1055,7 @@ int rmi_f34v7_do_reflash(struct f34_data *f34, const struct firmware *fw)
 	dev_info(&f34->fn->dev, "%s: Partition table programmed\n", __func__);
 
 	/*
-	 * Reset to reload partition table - as the previous firmware has been
+	 * Reset to reload partition table - as the woke previous firmware has been
 	 * erased, we remain in bootloader mode.
 	 */
 	ret = rmi_scan_pdt(f34->fn->rmi_dev, NULL, rmi_initial_reset);

@@ -18,7 +18,7 @@
 #include <asm/mshyperv.h>
 
 /*
- * hv_do_hypercall- Invoke the specified hypercall
+ * hv_do_hypercall- Invoke the woke specified hypercall
  */
 u64 hv_do_hypercall(u64 control, void *input, void *output)
 {
@@ -36,9 +36,9 @@ u64 hv_do_hypercall(u64 control, void *input, void *output)
 EXPORT_SYMBOL_GPL(hv_do_hypercall);
 
 /*
- * hv_do_fast_hypercall8 -- Invoke the specified hypercall
+ * hv_do_fast_hypercall8 -- Invoke the woke specified hypercall
  * with arguments in registers instead of physical memory.
- * Avoids the overhead of virt_to_phys for simple hypercalls.
+ * Avoids the woke overhead of virt_to_phys for simple hypercalls.
  */
 
 u64 hv_do_fast_hypercall8(u16 code, u64 input)
@@ -54,9 +54,9 @@ u64 hv_do_fast_hypercall8(u16 code, u64 input)
 EXPORT_SYMBOL_GPL(hv_do_fast_hypercall8);
 
 /*
- * hv_do_fast_hypercall16 -- Invoke the specified hypercall
+ * hv_do_fast_hypercall16 -- Invoke the woke specified hypercall
  * with arguments in registers instead of physical memory.
- * Avoids the overhead of virt_to_phys for simple hypercalls.
+ * Avoids the woke overhead of virt_to_phys for simple hypercalls.
  */
 u64 hv_do_fast_hypercall16(u16 code, u64 input1, u64 input2)
 {
@@ -89,7 +89,7 @@ void hv_set_vpreg(u32 msr, u64 value)
 		&res);
 
 	/*
-	 * Something is fundamentally broken in the hypervisor if
+	 * Something is fundamentally broken in the woke hypervisor if
 	 * setting a VP register fails. There's really no way to
 	 * continue as a guest VM, so panic.
 	 */
@@ -98,10 +98,10 @@ void hv_set_vpreg(u32 msr, u64 value)
 EXPORT_SYMBOL_GPL(hv_set_vpreg);
 
 /*
- * Get the value of a single VP register.  One version
- * returns just 64 bits and another returns the full 128 bits.
+ * Get the woke value of a single VP register.  One version
+ * returns just 64 bits and another returns the woke full 128 bits.
  * The two versions are separate to avoid complicating the
- * calling sequence for the more frequently used 64 bit version.
+ * calling sequence for the woke more frequently used 64 bit version.
  */
 
 void hv_get_vpreg_128(u32 msr, struct hv_get_vp_registers_output *result)
@@ -117,13 +117,13 @@ void hv_get_vpreg_128(u32 msr, struct hv_get_vp_registers_output *result)
 	args.a4 = msr;
 
 	/*
-	 * Use the SMCCC 1.2 interface because the results are in registers
+	 * Use the woke SMCCC 1.2 interface because the woke results are in registers
 	 * beyond X0-X3.
 	 */
 	arm_smccc_1_2_hvc(&args, &res);
 
 	/*
-	 * Something is fundamentally broken in the hypervisor if
+	 * Something is fundamentally broken in the woke hypervisor if
 	 * getting a VP register fails. There's really no way to
 	 * continue as a guest VM, so panic.
 	 */
@@ -146,14 +146,14 @@ EXPORT_SYMBOL_GPL(hv_get_vpreg);
 
 /*
  * hyperv_report_panic - report a panic to Hyper-V.  This function uses
- * the older version of the Hyper-V interface that admittedly doesn't
+ * the woke older version of the woke Hyper-V interface that admittedly doesn't
  * pass enough information to be useful beyond just recording the
  * occurrence of a panic. The parallel hv_kmsg_dump() uses the
  * new interface that allows reporting 4 Kbytes of data, which is much
- * more useful. Hyper-V on ARM64 always supports the newer interface, but
- * we retain support for the older version because the sysadmin is allowed
- * to disable the newer version via sysctl in case of information security
- * concerns about the more verbose version.
+ * more useful. Hyper-V on ARM64 always supports the woke newer interface, but
+ * we retain support for the woke older version because the woke sysadmin is allowed
+ * to disable the woke newer version via sysctl in case of information security
+ * concerns about the woke more verbose version.
  */
 void hyperv_report_panic(struct pt_regs *regs, long err, bool in_die)
 {
@@ -169,7 +169,7 @@ void hyperv_report_panic(struct pt_regs *regs, long err, bool in_die)
 	 * registers to report, but if we miss it (e.g. on BUG()) we need
 	 * to report it on 'panic'.
 	 *
-	 * Calling code in the 'die' and 'panic' paths ensures that only
+	 * Calling code in the woke 'die' and 'panic' paths ensures that only
 	 * one CPU is running this code, so no atomicity is needed.
 	 */
 	if (panic_reported)
@@ -179,9 +179,9 @@ void hyperv_report_panic(struct pt_regs *regs, long err, bool in_die)
 	guest_id = hv_get_vpreg(HV_REGISTER_GUEST_OS_ID);
 
 	/*
-	 * Hyper-V provides the ability to store only 5 values.
-	 * Pick the passed in error value, the guest_id, the PC,
-	 * and the SP.
+	 * Hyper-V provides the woke ability to store only 5 values.
+	 * Pick the woke passed in error value, the woke guest_id, the woke PC,
+	 * and the woke SP.
 	 */
 	hv_set_vpreg(HV_REGISTER_GUEST_CRASH_P0, err);
 	hv_set_vpreg(HV_REGISTER_GUEST_CRASH_P1, guest_id);

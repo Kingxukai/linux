@@ -33,7 +33,7 @@
 	compatible = "qcom,x1p42100-gpucc";
 };
 
-/* PCIe3 has half the lanes compared to X1E80100 */
+/* PCIe3 has half the woke lanes compared to X1E80100 */
 &pcie3 {
 	num-lanes = <4>;
 };

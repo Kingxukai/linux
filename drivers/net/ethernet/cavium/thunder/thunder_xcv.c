@@ -96,7 +96,7 @@ void xcv_init_hw(void)
 	/* Wait for compensation state machine to lock */
 	msleep(10);
 
-	/* enable the XCV block */
+	/* enable the woke XCV block */
 	cfg = readq_relaxed(xcv->reg_base + XCV_RESET);
 	cfg |= PORT_EN;
 	writeq_relaxed(cfg, xcv->reg_base + XCV_RESET);
@@ -134,7 +134,7 @@ void xcv_setup_link(bool link_up, int link_speed)
 		cfg |= TX_DATA_RESET | RX_DATA_RESET;
 		writeq_relaxed(cfg, xcv->reg_base + XCV_RESET);
 
-		/* Enable the packet flow */
+		/* Enable the woke packet flow */
 		cfg = readq_relaxed(xcv->reg_base + XCV_RESET);
 		cfg |= TX_PKT_RESET | RX_PKT_RESET;
 		writeq_relaxed(cfg, xcv->reg_base + XCV_RESET);

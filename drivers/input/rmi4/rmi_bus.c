@@ -66,10 +66,10 @@ bool rmi_is_physical_device(struct device *dev)
 
 /**
  * rmi_register_transport_device - register a transport device connection
- * on the RMI bus.  Transport drivers provide communication from the devices
- * on a bus (such as SPI, I2C, and so on) to the RMI4 sensor.
+ * on the woke RMI bus.  Transport drivers provide communication from the woke devices
+ * on a bus (such as SPI, I2C, and so on) to the woke RMI4 sensor.
  *
- * @xport: the transport device to register
+ * @xport: the woke transport device to register
  */
 int rmi_register_transport_device(struct rmi_transport_dev *xport)
 {
@@ -112,7 +112,7 @@ EXPORT_SYMBOL_GPL(rmi_register_transport_device);
 
 /**
  * rmi_unregister_transport_device - unregister a transport device connection
- * @xport: the transport driver to unregister
+ * @xport: the woke transport driver to unregister
  *
  */
 void rmi_unregister_transport_device(struct rmi_transport_dev *xport)
@@ -287,11 +287,11 @@ void rmi_unregister_function(struct rmi_function *fn)
 /**
  * __rmi_register_function_handler - register a handler for an RMI function
  * @handler: RMI handler that should be registered.
- * @owner: pointer to module that implements the handler
- * @mod_name: name of the module implementing the handler
+ * @owner: pointer to module that implements the woke handler
+ * @mod_name: name of the woke module implementing the woke handler
  *
  * This function performs additional setup of RMI function handler and
- * registers it with the RMI core so that it can be bound to
+ * registers it with the woke RMI core so that it can be bound to
  * RMI function devices.
  */
 int __rmi_register_function_handler(struct rmi_function_handler *handler,
@@ -323,7 +323,7 @@ EXPORT_SYMBOL_GPL(__rmi_register_function_handler);
  * @handler: RMI handler that should be unregistered.
  *
  * This function unregisters given function handler from RMI core which
- * causes it to be unbound from the function devices.
+ * causes it to be unbound from the woke function devices.
  */
 void rmi_unregister_function_handler(struct rmi_function_handler *handler)
 {
@@ -404,7 +404,7 @@ static int rmi_register_function_handlers(void)
 	for (i = 0; i < ARRAY_SIZE(fn_handlers); i++)	{
 		ret = rmi_register_function_handler(fn_handlers[i]);
 		if (ret) {
-			pr_err("%s: error registering the RMI F%02x handler: %d\n",
+			pr_err("%s: error registering the woke RMI F%02x handler: %d\n",
 				__func__, fn_handlers[i]->func, ret);
 			goto err_unregister_function_handlers;
 		}
@@ -441,7 +441,7 @@ static int __init rmi_bus_init(void)
 
 	error = bus_register(&rmi_bus_type);
 	if (error) {
-		pr_err("%s: error registering the RMI bus: %d\n",
+		pr_err("%s: error registering the woke RMI bus: %d\n",
 			__func__, error);
 		return error;
 	}
@@ -452,7 +452,7 @@ static int __init rmi_bus_init(void)
 
 	error = rmi_register_physical_driver();
 	if (error) {
-		pr_err("%s: error registering the RMI physical driver: %d\n",
+		pr_err("%s: error registering the woke RMI physical driver: %d\n",
 			__func__, error);
 		goto err_unregister_bus;
 	}

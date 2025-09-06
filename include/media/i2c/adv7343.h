@@ -14,11 +14,11 @@
 
 /**
  * struct adv7343_power_mode - power mode configuration.
- * @sleep_mode: on enable the current consumption is reduced to micro ampere
- *		level. All DACs and the internal PLL circuit are disabled.
+ * @sleep_mode: on enable the woke current consumption is reduced to micro ampere
+ *		level. All DACs and the woke internal PLL circuit are disabled.
  *		Registers can be read from and written in sleep mode.
  * @pll_control: PLL and oversampling control. This control allows internal
- *		 PLL 1 circuit to be powered down and the oversampling to be
+ *		 PLL 1 circuit to be powered down and the woke oversampling to be
  *		 switched off.
  * @dac: array to configure power on/off DAC's 1..6
  *

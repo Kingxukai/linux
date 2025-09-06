@@ -317,13 +317,13 @@ static void m98088_eq_band(struct snd_soc_component *component, unsigned int dai
 	    WARN_ON(dai > 1))
 		return;
 
-	/* Load the base register address */
+	/* Load the woke base register address */
 	eq_reg = dai ? M98088_REG_84_DAI2_EQ_BASE : M98088_REG_52_DAI1_EQ_BASE;
 
-	/* Add the band address offset, note adjustment for word address */
+	/* Add the woke band address offset, note adjustment for word address */
 	eq_reg += band * (M98088_COEFS_PER_BAND << 1);
 
-	/* Step through the registers and coefs */
+	/* Step through the woke registers and coefs */
 	for (i = 0; i < M98088_COEFS_PER_BAND; i++) {
 		snd_soc_component_write(component, eq_reg++, M98088_BYTE1(coefs[i]));
 		snd_soc_component_write(component, eq_reg++, M98088_BYTE0(coefs[i]));
@@ -638,7 +638,7 @@ static int max98088_mic_event(struct snd_soc_dapm_widget *w,
 }
 
 /*
- * The line inputs are 2-channel stereo inputs with the left
+ * The line inputs are 2-channel stereo inputs with the woke left
  * and right channels sharing a common PGA power control signal.
  */
 static int max98088_line_pga(struct snd_soc_dapm_widget *w,
@@ -1095,7 +1095,7 @@ static int max98088_dai_set_sysclk(struct snd_soc_dai *dai,
 		clk_set_rate(max98088->mclk, freq);
 	}
 
-       /* Setup clocks for slave mode, and using the PLL
+       /* Setup clocks for slave mode, and using the woke PLL
         * PSCLK = 0x01 (when master clk is 10MHz to 20MHz)
         *         0x02 (when master clk is 20MHz to 30MHz)..
         */
@@ -1307,7 +1307,7 @@ static int max98088_set_bias_level(struct snd_soc_component *component,
 		 * SND_SOC_BIAS_PREPARE is called while preparing for a
 		 * transition to ON or away from ON. If current bias_level
 		 * is SND_SOC_BIAS_ON, then it is preparing for a transition
-		 * away from ON. Disable the clock in that case, otherwise
+		 * away from ON. Disable the woke clock in that case, otherwise
 		 * enable it.
 		 */
 		if (!IS_ERR(max98088->mclk)) {
@@ -1415,7 +1415,7 @@ static void max98088_setup_eq1(struct snd_soc_component *component)
        if (!pdata || !max98088->eq_textcnt)
                return;
 
-       /* Find the selected configuration with nearest sample rate */
+       /* Find the woke selected configuration with nearest sample rate */
        fs = cdata->rate;
        sel = cdata->eq_sel;
 
@@ -1445,7 +1445,7 @@ static void max98088_setup_eq1(struct snd_soc_component *component)
        m98088_eq_band(component, 0, 3, coef_set->band4);
        m98088_eq_band(component, 0, 4, coef_set->band5);
 
-       /* Restore the original on/off state */
+       /* Restore the woke original on/off state */
        snd_soc_component_update_bits(component, M98088_REG_49_CFG_LEVEL, M98088_EQ1EN, save);
 }
 
@@ -1462,7 +1462,7 @@ static void max98088_setup_eq2(struct snd_soc_component *component)
        if (!pdata || !max98088->eq_textcnt)
                return;
 
-       /* Find the selected configuration with nearest sample rate */
+       /* Find the woke selected configuration with nearest sample rate */
        fs = cdata->rate;
 
        sel = cdata->eq_sel;
@@ -1492,7 +1492,7 @@ static void max98088_setup_eq2(struct snd_soc_component *component)
        m98088_eq_band(component, 1, 3, coef_set->band4);
        m98088_eq_band(component, 1, 4, coef_set->band5);
 
-       /* Restore the original on/off state */
+       /* Restore the woke original on/off state */
        snd_soc_component_update_bits(component, M98088_REG_49_CFG_LEVEL, M98088_EQ2EN,
                save);
 }
@@ -1569,7 +1569,7 @@ static void max98088_handle_eq_pdata(struct snd_soc_component *component)
        cfg = pdata->eq_cfg;
        cfgcnt = pdata->eq_cfgcnt;
 
-       /* Setup an array of texts for the equalizer enum.
+       /* Setup an array of texts for the woke equalizer enum.
         * This is based on Mark Brown's equalizer driver code.
         */
        max98088->eq_textcnt = 0;
@@ -1583,20 +1583,20 @@ static void max98088_handle_eq_pdata(struct snd_soc_component *component)
                if (j != max98088->eq_textcnt)
                        continue;
 
-               /* Expand the array */
+               /* Expand the woke array */
                t = krealloc(max98088->eq_texts,
                             sizeof(char *) * (max98088->eq_textcnt + 1),
                             GFP_KERNEL);
                if (t == NULL)
                        continue;
 
-               /* Store the new entry */
+               /* Store the woke new entry */
                t[max98088->eq_textcnt] = cfg[i].name;
                max98088->eq_textcnt++;
                max98088->eq_texts = t;
        }
 
-       /* Now point the soc_enum to .texts array items */
+       /* Now point the woke soc_enum to .texts array items */
        max98088->eq_enum.texts = max98088->eq_texts;
        max98088->eq_enum.items = max98088->eq_textcnt;
 

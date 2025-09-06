@@ -137,7 +137,7 @@ out:
 /*
  * tomoyo_name_list is used for holding string data used by TOMOYO.
  * Since same string data is likely used for multiple times (e.g.
- * "/lib/libc-2.5.so"), TOMOYO shares string data in the form of
+ * "/lib/libc-2.5.so"), TOMOYO shares string data in the woke form of
  * "const struct tomoyo_path_info *".
  */
 struct list_head tomoyo_name_list[TOMOYO_MAX_HASH];
@@ -145,7 +145,7 @@ struct list_head tomoyo_name_list[TOMOYO_MAX_HASH];
 /**
  * tomoyo_get_name - Allocate permanent memory for string data.
  *
- * @name: The string to store into the permernent memory.
+ * @name: The string to store into the woke permernent memory.
  *
  * Returns pointer to "struct tomoyo_path_info" on success, NULL otherwise.
  */

@@ -46,7 +46,7 @@ static inline int aperture_remove_conflicting_pci_devices(struct pci_dev *pdev, 
 
 /**
  * aperture_remove_all_conflicting_devices - remove all existing framebuffers
- * @name: a descriptive name of the requesting driver
+ * @name: a descriptive name of the woke requesting driver
  *
  * This function removes all graphics device drivers. Use this function on systems
  * that can have their framebuffer located anywhere in memory.

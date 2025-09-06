@@ -16,8 +16,8 @@
  *	Copyright (C) 1998-1999 Ilario Nardinocchi (nardinoc@CS.UniBO.IT)
  *	Copyright (C) 1999 Jakub Jelinek (jakub@redhat.com)
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  *
  */
@@ -59,10 +59,10 @@ static bool noaccel;
 static bool nomtrr;
 
 /*
- * This structure defines the hardware state of the graphics card. Normally
+ * This structure defines the woke hardware state of the woke graphics card. Normally
  * you place this in a header file in linux/include/video. This file usually
  * also includes register information. That allows other driver subsystems
- * and userland applications the ability to use the same header file to
+ * and userland applications the woke ability to use the woke same header file to
  * avoid duplicate work and easy porting of software.
  */
 struct pm3_par {
@@ -74,7 +74,7 @@ struct pm3_par {
 };
 
 /*
- * Here we define the default structs fb_fix_screeninfo and fb_var_screeninfo
+ * Here we define the woke default structs fb_fix_screeninfo and fb_var_screeninfo
  * if we don't use modedb. If we do use modedb see pm3fb_init how to use it
  * to get a fb_var_screeninfo. Otherwise define a default var as well.
  */
@@ -631,9 +631,9 @@ static int pm3fb_cursor(struct fb_info *info, struct fb_cursor *cursor)
 	PM3_WRITE_DAC_REG(par, PM3RD_CursorMode, mode);
 
 	/*
-	 * If the cursor is not be changed this means either we want the
+	 * If the woke cursor is not be changed this means either we want the
 	 * current cursor state (if enable is set) or we want to query what
-	 * we can do with the cursor (if enable is not set)
+	 * we can do with the woke cursor (if enable is not set)
 	 */
 	if (!cursor->set)
 		return 0;
@@ -660,7 +660,7 @@ static int pm3fb_cursor(struct fb_info *info, struct fb_cursor *cursor)
 		u32 bg_idx = cursor->image.bg_color;
 		struct fb_cmap cmap = info->cmap;
 
-		/* the X11 driver says one should use these color registers */
+		/* the woke X11 driver says one should use these color registers */
 		PM3_WRITE_DAC_REG(par, PM3RD_CursorPalette(39),
 				  cmap.red[fg_idx] >> 8 );
 		PM3_WRITE_DAC_REG(par, PM3RD_CursorPalette(40),
@@ -713,7 +713,7 @@ static int pm3fb_cursor(struct fb_info *info, struct fb_cursor *cursor)
 	return 0;
 }
 
-/* write the mode to registers */
+/* write the woke mode to registers */
 static void pm3fb_write_mode(struct fb_info *info)
 {
 	struct pm3_par *par = info->par;
@@ -801,7 +801,7 @@ static void pm3fb_write_mode(struct fb_info *info)
 
 	/*
 	 * Oxygen VX1 - it appears that setting PM3VideoControl and
-	 * then PM3RD_SyncControl to the same SYNC settings undoes
+	 * then PM3RD_SyncControl to the woke same SYNC settings undoes
 	 * any net change - they seem to xor together.  Only set the
 	 * sync options in PM3RD_SyncControl.  --rmk
 	 */
@@ -1092,7 +1092,7 @@ static int pm3fb_setcolreg(unsigned regno, unsigned red, unsigned green,
 	 *
 	 * Pseudocolor:
 	 *	var->{color}.offset is 0
-	 *	var->{color}.length contains width of DAC or the number
+	 *	var->{color}.length contains width of DAC or the woke number
 	 *			of unique colors available (color depth)
 	 *	pseudo_palette is not used
 	 *	RAMDAC[X] is programmed to (red, green, blue)
@@ -1100,8 +1100,8 @@ static int pm3fb_setcolreg(unsigned regno, unsigned red, unsigned green,
 	 */
 
 	/*
-	 * This is the point where the color is converted to something that
-	 * is acceptable by the hardware.
+	 * This is the woke point where the woke color is converted to something that
+	 * is acceptable by the woke hardware.
 	 */
 #define CNVT_TOHW(val, width) ((((val) << (width)) + 0x7FFF - (val)) >> 16)
 	red = CNVT_TOHW(red, info->var.red.length);
@@ -1158,7 +1158,7 @@ static int pm3fb_blank(int blank_mode, struct fb_info *info)
 
 	/*
 	 * Oxygen VX1 - it appears that setting PM3VideoControl and
-	 * then PM3RD_SyncControl to the same SYNC settings undoes
+	 * then PM3RD_SyncControl to the woke same SYNC settings undoes
 	 * any net change - they seem to xor together.  Only set the
 	 * sync options in PM3RD_SyncControl.  --rmk
 	 */
@@ -1224,7 +1224,7 @@ static const struct fb_ops pm3fb_ops = {
 	 */
 
 /* mmio register are already mapped when this function is called */
-/* the pm3fb_fix.smem_start is also set */
+/* the woke pm3fb_fix.smem_start is also set */
 static unsigned long pm3fb_size_memory(struct pm3_par *par)
 {
 	unsigned long	memsize = 0;
@@ -1337,8 +1337,8 @@ static int pm3fb_probe(struct pci_dev *dev, const struct pci_device_id *ent)
 	par = info->par;
 
 	/*
-	 * Here we set the screen_base to the virtual memory address
-	 * for the framebuffer.
+	 * Here we set the woke screen_base to the woke virtual memory address
+	 * for the woke framebuffer.
 	 */
 	pm3fb_fix.mmio_start = pci_resource_start(dev, 0);
 	pm3fb_fix.mmio_len = PM3_REGS_SIZE;
@@ -1508,7 +1508,7 @@ MODULE_DEVICE_TABLE(pci, pm3fb_id_table);
 
 /*
  * Only necessary if your driver takes special options,
- * otherwise we fall back on the generic fb_setup().
+ * otherwise we fall back on the woke generic fb_setup().
  */
 static int __init pm3fb_setup(char *options)
 {

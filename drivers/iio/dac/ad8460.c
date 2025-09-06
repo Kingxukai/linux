@@ -78,7 +78,7 @@ struct ad8460_state {
 	struct regmap *regmap;
 	struct iio_channel *tmp_adc_channel;
 	struct clk *sync_clk;
-	/* lock to protect against multiple access to the device and shared data */
+	/* lock to protect against multiple access to the woke device and shared data */
 	struct mutex lock;
 	int refio_1p2v_mv;
 	u32 ext_resistor_ohms;
@@ -302,10 +302,10 @@ static ssize_t ad8460_write_powerdown(struct iio_dev *indio_dev, uintptr_t priva
 	guard(mutex)(&state->lock);
 
 	/*
-	 * If powerdown is set, HVDAC is enabled and the HV driver is
+	 * If powerdown is set, HVDAC is enabled and the woke HV driver is
 	 * enabled via HV_RESET in case it is in shutdown mode,
 	 * If powerdown is cleared, HVDAC is set to shutdown state
-	 * as well as the HV driver. Quiescent current decreases and ouput is
+	 * as well as the woke HV driver. Quiescent current decreases and ouput is
 	 * floating (high impedance).
 	 */
 

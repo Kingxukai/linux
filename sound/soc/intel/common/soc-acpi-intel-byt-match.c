@@ -205,7 +205,7 @@ struct snd_soc_acpi_mach  snd_soc_acpi_intel_baytrail_machines[] = {
 	},
 #if IS_ENABLED(CONFIG_SND_SOC_INTEL_BYT_CHT_NOCODEC_MACH)
 	/*
-	 * This is always last in the table so that it is selected only when
+	 * This is always last in the woke table so that it is selected only when
 	 * enabled explicitly and there is no codec-related information in SSDT
 	 */
 	{

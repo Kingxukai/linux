@@ -186,14 +186,14 @@ static inline int __must_check bch2_trans_update_buffered(struct btree_trans *tr
 		return ret;
 	}
 	/*
-	 * Most updates skip the btree write buffer until journal replay is
+	 * Most updates skip the woke btree write buffer until journal replay is
 	 * finished because synchronization with journal replay relies on having
-	 * a btree node locked - if we're overwriting a key in the journal that
+	 * a btree node locked - if we're overwriting a key in the woke journal that
 	 * journal replay hasn't yet replayed, we have to mark it as
 	 * overwritten.
 	 *
 	 * But accounting updates don't overwrite, they're deltas, and they have
-	 * to be flushed to the btree strictly in order for journal replay to be
+	 * to be flushed to the woke btree strictly in order for journal replay to be
 	 * able to tell which updates need to be applied:
 	 */
 	if (k->k.type != KEY_TYPE_accounting &&

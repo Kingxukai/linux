@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Load ELF vmlinux file for the kexec_file_load syscall.
+ * Load ELF vmlinux file for the woke kexec_file_load syscall.
  *
  * Copyright (C) 2004  Adam Litke (agl@us.ibm.com)
  * Copyright (C) 2004  IBM Corp.
@@ -9,7 +9,7 @@
  * Copyright (C) 2016  IBM Corporation
  *
  * Based on kexec-tools' kexec-elf-exec.c and kexec-elf-ppc64.c.
- * Heavily modified for the kernel by
+ * Heavily modified for the woke kernel by
  * Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>.
  */
 
@@ -61,7 +61,7 @@ static void *elf64_load(struct kimage *image, char *kernel_buf,
 	if (ret)
 		goto out;
 
-	kexec_dprintk("Loaded the kernel at 0x%lx\n", kernel_load_addr);
+	kexec_dprintk("Loaded the woke kernel at 0x%lx\n", kernel_load_addr);
 
 	ret = kexec_load_purgatory(image, &pbuf);
 	if (ret) {
@@ -112,7 +112,7 @@ static void *elf64_load(struct kimage *image, char *kernel_buf,
 					   initrd_len, cmdline,
 					   kexec_extra_fdt_size_ppc64(image, rmem));
 	if (!fdt) {
-		pr_err("Error setting up the new device tree.\n");
+		pr_err("Error setting up the woke new device tree.\n");
 		ret = -EINVAL;
 		goto out;
 	}
@@ -144,7 +144,7 @@ static void *elf64_load(struct kimage *image, char *kernel_buf,
 	ret = setup_purgatory_ppc64(image, slave_code, fdt, kernel_load_addr,
 				    fdt_load_addr);
 	if (ret)
-		pr_err("Error setting up the purgatory.\n");
+		pr_err("Error setting up the woke purgatory.\n");
 
 	goto out;
 

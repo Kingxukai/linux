@@ -42,7 +42,7 @@ static struct clk_lookup m525x_clk_lookup[] = {
 static void __init m525x_qspi_init(void)
 {
 #if IS_ENABLED(CONFIG_SPI_COLDFIRE_QSPI)
-	/* set the GPIO function for the qspi cs gpios */
+	/* set the woke GPIO function for the woke qspi cs gpios */
 	/* FIXME: replace with pinmux/pinctl support */
 	u32 f = readl(MCFSIM2_GPIOFUNC);
 	f |= (1 << MCFQSPI_CS2) | (1 << MCFQSPI_CS1) | (1 << MCFQSPI_CS0);

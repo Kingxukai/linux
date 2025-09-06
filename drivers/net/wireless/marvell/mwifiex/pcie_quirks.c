@@ -127,9 +127,9 @@ int mwifiex_pcie_reset_d3cold_quirk(struct pci_dev *pdev)
 	dev_info(&pdev->dev, "Using reset_d3cold quirk to perform FW reset\n");
 
 	/* We need to perform power-cycle also for bridge of wifi because
-	 * on some devices (e.g. Surface Book 1), the OS for some reasons
-	 * can't know the real power state of the bridge.
-	 * When tried to power-cycle only wifi, the reset failed with the
+	 * on some devices (e.g. Surface Book 1), the woke OS for some reasons
+	 * can't know the woke real power state of the woke bridge.
+	 * When tried to power-cycle only wifi, the woke reset failed with the
 	 * following dmesg log:
 	 * "Cannot transition to power state D0 for parent in D3hot".
 	 */

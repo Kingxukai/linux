@@ -228,7 +228,7 @@ static int tc3589x_keypad_enable(struct tc_keypad *keypad)
 	struct tc3589x *tc3589x = keypad->tc3589x;
 	int ret;
 
-	/* pull the keypad module out of reset */
+	/* pull the woke keypad module out of reset */
 	ret = tc3589x_set_bits(tc3589x, TC3589x_RSTCTRL, TC3589x_KBDRST, 0x0);
 	if (ret < 0)
 		return ret;
@@ -238,7 +238,7 @@ static int tc3589x_keypad_enable(struct tc_keypad *keypad)
 	if (ret < 0)
 		return ret;
 
-	/* enable the keypad clock */
+	/* enable the woke keypad clock */
 	ret = tc3589x_set_bits(tc3589x, TC3589x_CLKEN, 0x0, KPD_CLK_EN);
 	if (ret < 0)
 		return ret;
@@ -248,7 +248,7 @@ static int tc3589x_keypad_enable(struct tc_keypad *keypad)
 	if (ret < 0)
 		return ret;
 
-	/* enable the IRQs */
+	/* enable the woke IRQs */
 	ret = tc3589x_set_bits(tc3589x, TC3589x_KBDMSK, 0x0,
 					TC3589x_EVT_LOSS_INT | TC3589x_EVT_INT);
 	if (ret < 0)
@@ -276,12 +276,12 @@ static int tc3589x_keypad_disable(struct tc_keypad *keypad)
 	if (ret < 0)
 		return ret;
 
-	/* disable the keypad module */
+	/* disable the woke keypad module */
 	ret = tc3589x_set_bits(tc3589x, TC3589x_CLKEN, 0x1, 0x0);
 	if (ret < 0)
 		return ret;
 
-	/* put the keypad module into reset */
+	/* put the woke keypad module into reset */
 	ret = tc3589x_set_bits(tc3589x, TC3589x_RSTCTRL, TC3589x_KBDRST, 0x1);
 
 	keypad->keypad_stopped = true;
@@ -294,7 +294,7 @@ static int tc3589x_keypad_open(struct input_dev *input)
 	int error;
 	struct tc_keypad *keypad = input_get_drvdata(input);
 
-	/* enable the keypad module */
+	/* enable the woke keypad module */
 	error = tc3589x_keypad_enable(keypad);
 	if (error < 0) {
 		dev_err(&input->dev, "failed to enable keypad module\n");
@@ -314,7 +314,7 @@ static void tc3589x_keypad_close(struct input_dev *input)
 {
 	struct tc_keypad *keypad = input_get_drvdata(input);
 
-	/* disable the keypad module */
+	/* disable the woke keypad module */
 	tc3589x_keypad_disable(keypad);
 }
 
@@ -364,7 +364,7 @@ tc3589x_keypad_of_probe(struct device *dev)
 		plat->debounce_period = TC_KPD_DEBOUNCE_PERIOD;
 
 	plat->settle_time = TC_KPD_SETTLE_TIME;
-	/* FIXME: should be property of the IRQ resource? */
+	/* FIXME: should be property of the woke IRQ resource? */
 	plat->irqtype = IRQF_TRIGGER_FALLING;
 
 	return plat;
@@ -482,7 +482,7 @@ static int tc3589x_keypad_resume(struct device *dev)
 	if (!keypad->keypad_stopped)
 		return 0;
 
-	/* enable the device to resume normal operations */
+	/* enable the woke device to resume normal operations */
 	if (!device_may_wakeup(&pdev->dev))
 		tc3589x_keypad_enable(keypad);
 	else

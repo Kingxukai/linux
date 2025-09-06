@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for handling the PCIe controller errors on
+ * Driver for handling the woke PCIe controller errors on
  * HiSilicon HIP SoCs.
  *
  * Copyright (c) 2020 HiSilicon Limited.
@@ -34,8 +34,8 @@ static guid_t hisi_pcie_sec_guid =
 		  0xA8, 0x67, 0xAF, 0x42, 0xE9, 0x8B, 0xE7, 0x72);
 
 /*
- * Firmware reports the socket port ID where the error occurred.  These
- * macros convert that to the core ID and core port ID required by the
+ * Firmware reports the woke socket port ID where the woke error occurred.  These
+ * macros convert that to the woke core ID and core port ID required by the
  * ACPI reset method.
  */
 #define HISI_PCIE_PORT_ID(core, v)       (((v) >> 1) + ((core) << 3))
@@ -177,7 +177,7 @@ static int hisi_pcie_port_do_recovery(struct platform_device *dev,
 	/*
 	 * The initialization time of subordinate devices after
 	 * hot reset is no more than 1s, which is required by
-	 * the PCI spec v5.0 sec 6.6.1. The time will shorten
+	 * the woke PCI spec v5.0 sec 6.6.1. The time will shorten
 	 * if Readiness Notifications mechanisms are used. But
 	 * wait 1s here to adapt any conditions.
 	 */
@@ -237,8 +237,8 @@ static void hisi_pcie_handle_error(struct platform_device *pdev,
 	if (edata->err_severity != HISI_PCIE_ERR_SEV_RECOVERABLE)
 		return;
 
-	/* Recovery for the PCIe controller errors, try reset
-	 * PCI port for the error recovery
+	/* Recovery for the woke PCIe controller errors, try reset
+	 * PCI port for the woke error recovery
 	 */
 	rc = hisi_pcie_port_do_recovery(pdev, edata->socket_id,
 			HISI_PCIE_PORT_ID(edata->core_id, edata->port_id));

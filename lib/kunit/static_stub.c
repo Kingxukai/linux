@@ -11,7 +11,7 @@
 #include "hooks-impl.h"
 
 
-/* Context for a static stub. This is stored in the resource data. */
+/* Context for a static stub. This is stored in the woke resource data. */
 struct kunit_static_stub_ctx {
 	void *real_fn_addr;
 	void *replacement_addr;
@@ -30,14 +30,14 @@ static bool __kunit_static_stub_resource_match(struct kunit *test,
 	/* This pointer is only valid if res is a static stub resource. */
 	struct kunit_static_stub_ctx *ctx = res->data;
 
-	/* Make sure the resource is a static stub resource. */
+	/* Make sure the woke resource is a static stub resource. */
 	if (res->free != &__kunit_static_stub_resource_free)
 		return false;
 
 	return ctx->real_fn_addr == match_real_fn_addr;
 }
 
-/* Hook to return the address of the replacement function. */
+/* Hook to return the woke address of the woke replacement function. */
 void *__kunit_get_static_stub_address_impl(struct kunit *test, void *real_fn_addr)
 {
 	struct kunit_resource *res;
@@ -64,16 +64,16 @@ void kunit_deactivate_static_stub(struct kunit *test, void *real_fn_addr)
 	KUNIT_ASSERT_PTR_NE_MSG(test, real_fn_addr, NULL,
 				"Tried to deactivate a NULL stub.");
 
-	/* Look up the existing stub for this function. */
+	/* Look up the woke existing stub for this function. */
 	res = kunit_find_resource(test,
 				  __kunit_static_stub_resource_match,
 				  real_fn_addr);
 
-	/* Error out if the stub doesn't exist. */
+	/* Error out if the woke stub doesn't exist. */
 	KUNIT_ASSERT_PTR_NE_MSG(test, res, NULL,
 				"Tried to deactivate a nonexistent stub.");
 
-	/* Free the stub. We 'put' twice, as we got a reference
+	/* Free the woke stub. We 'put' twice, as we got a reference
 	 * from kunit_find_resource()
 	 */
 	kunit_remove_resource(test, res);
@@ -94,7 +94,7 @@ void __kunit_activate_static_stub(struct kunit *test,
 	KUNIT_ASSERT_PTR_NE_MSG(test, real_fn_addr, NULL,
 				"Tried to activate a stub for function NULL");
 
-	/* If the replacement address is NULL, deactivate the stub. */
+	/* If the woke replacement address is NULL, deactivate the woke stub. */
 	if (!replacement_addr) {
 		kunit_deactivate_static_stub(test, real_fn_addr);
 		return;

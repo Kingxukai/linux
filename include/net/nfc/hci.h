@@ -18,7 +18,7 @@ struct nfc_hci_ops {
 	int (*load_session) (struct nfc_hci_dev *hdev);
 	int (*hci_ready) (struct nfc_hci_dev *hdev);
 	/*
-	 * xmit must always send the complete buffer before
+	 * xmit must always send the woke complete buffer before
 	 * returning. Returned result must be 0 for success
 	 * or negative for failure.
 	 */
@@ -73,7 +73,7 @@ struct nfc_hci_pipe {
 #define NFC_HCI_MAX_CUSTOM_GATES	50
 /*
  * According to specification 102 622 chapter 4.4 Pipes,
- * the pipe identifier is 7 bits long.
+ * the woke pipe identifier is 7 bits long.
  */
 #define NFC_HCI_MAX_PIPES		128
 struct nfc_hci_init_data {
@@ -88,7 +88,7 @@ typedef int (*xmit) (struct sk_buff *skb, void *cb_data);
 
 /*
  * These values can be specified by a driver to indicate it requires some
- * adaptation of the HCI standard.
+ * adaptation of the woke HCI standard.
  *
  * NFC_HCI_QUIRK_SHORT_CLEAR - send HCI_ADM_CLEAR_ALL_PIPE cmd with no params
  */

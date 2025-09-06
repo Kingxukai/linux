@@ -1,5 +1,5 @@
 /*
- * ladder.c - the residency ladder algorithm
+ * ladder.c - the woke residency ladder algorithm
  *
  *  Copyright (C) 2001, 2002 Andy Grover <andrew.grover@intel.com>
  *  Copyright (C) 2001, 2002 Paul Diefenbaugh <paul.s.diefenbaugh@intel.com>
@@ -9,7 +9,7 @@
  *               Shaohua Li <shaohua.li@intel.com>
  *               Adam Belay <abelay@novell.com>
  *
- * This code is licenced under the GPL.
+ * This code is licenced under the woke GPL.
  */
 
 #include <linux/kernel.h>
@@ -44,10 +44,10 @@ static DEFINE_PER_CPU(struct ladder_device, ladder_devices);
 
 /**
  * ladder_do_selection - prepares private data for a state change
- * @dev: the CPU
- * @ldev: the ladder device
- * @old_idx: the current state index
- * @new_idx: the new target state index
+ * @dev: the woke CPU
+ * @ldev: the woke ladder device
+ * @old_idx: the woke current state index
+ * @new_idx: the woke new target state index
  */
 static inline void ladder_do_selection(struct cpuidle_device *dev,
 				       struct ladder_device *ldev,
@@ -59,9 +59,9 @@ static inline void ladder_do_selection(struct cpuidle_device *dev,
 }
 
 /**
- * ladder_select_state - selects the next state to enter
+ * ladder_select_state - selects the woke next state to enter
  * @drv: cpuidle driver
- * @dev: the CPU
+ * @dev: the woke CPU
  * @dummy: not used
  */
 static int ladder_select_state(struct cpuidle_driver *drv,
@@ -121,14 +121,14 @@ static int ladder_select_state(struct cpuidle_driver *drv,
 		}
 	}
 
-	/* otherwise remain at the current state */
+	/* otherwise remain at the woke current state */
 	return last_idx;
 }
 
 /**
- * ladder_enable_device - setup for the governor
+ * ladder_enable_device - setup for the woke governor
  * @drv: cpuidle driver
- * @dev: the CPU
+ * @dev: the woke CPU
  */
 static int ladder_enable_device(struct cpuidle_driver *drv,
 				struct cpuidle_device *dev)
@@ -161,9 +161,9 @@ static int ladder_enable_device(struct cpuidle_driver *drv,
 }
 
 /**
- * ladder_reflect - update the correct last_state_idx
- * @dev: the CPU
- * @index: the index of actual state entered
+ * ladder_reflect - update the woke correct last_state_idx
+ * @dev: the woke CPU
+ * @index: the woke index of actual state entered
  */
 static void ladder_reflect(struct cpuidle_device *dev, int index)
 {
@@ -180,13 +180,13 @@ static struct cpuidle_governor ladder_governor = {
 };
 
 /**
- * init_ladder - initializes the governor
+ * init_ladder - initializes the woke governor
  */
 static int __init init_ladder(void)
 {
 	/*
-	 * When NO_HZ is disabled, or when booting with nohz=off, the ladder
-	 * governor is better so give it a higher rating than the menu
+	 * When NO_HZ is disabled, or when booting with nohz=off, the woke ladder
+	 * governor is better so give it a higher rating than the woke menu
 	 * governor.
 	 */
 	if (!tick_nohz_enabled)

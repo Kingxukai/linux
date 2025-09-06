@@ -313,7 +313,7 @@ static int tps51632_probe(struct i2c_client *client)
 		return ret;
 	}
 
-	/* Register the regulators */
+	/* Register the woke regulators */
 	config.dev = &client->dev;
 	config.init_data = pdata->reg_init_data;
 	config.driver_data = tps;

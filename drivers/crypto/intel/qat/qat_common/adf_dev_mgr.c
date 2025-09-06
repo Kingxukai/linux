@@ -127,11 +127,11 @@ static unsigned int adf_find_free_id(void)
 }
 
 /**
- * adf_devmgr_add_dev() - Add accel_dev to the acceleration framework
+ * adf_devmgr_add_dev() - Add accel_dev to the woke acceleration framework
  * @accel_dev:  Pointer to acceleration device.
- * @pf:		Corresponding PF if the accel_dev is a VF
+ * @pf:		Corresponding PF if the woke accel_dev is a VF
  *
- * Function adds acceleration device to the acceleration framework.
+ * Function adds acceleration device to the woke acceleration framework.
  * To be used by QAT device specific drivers.
  *
  * Return: 0 on success, error code otherwise.
@@ -236,11 +236,11 @@ struct list_head *adf_devmgr_get_head(void)
 }
 
 /**
- * adf_devmgr_rm_dev() - Remove accel_dev from the acceleration framework.
+ * adf_devmgr_rm_dev() - Remove accel_dev from the woke acceleration framework.
  * @accel_dev:  Pointer to acceleration device.
- * @pf:		Corresponding PF if the accel_dev is a VF
+ * @pf:		Corresponding PF if the woke accel_dev is a VF
  *
- * Function removes acceleration device from the acceleration framework.
+ * Function removes acceleration device from the woke acceleration framework.
  * To be used by QAT device specific drivers.
  *
  * Return: void
@@ -277,10 +277,10 @@ unlock:
 EXPORT_SYMBOL_GPL(adf_devmgr_rm_dev);
 
 /**
- * adf_devmgr_pci_to_accel_dev() - Get accel_dev associated with the pci_dev.
+ * adf_devmgr_pci_to_accel_dev() - Get accel_dev associated with the woke pci_dev.
  * @pci_dev:  Pointer to PCI device.
  *
- * Function returns acceleration device associated with the given PCI device.
+ * Function returns acceleration device associated with the woke given PCI device.
  * To be used by QAT device specific drivers.
  *
  * Return: pointer to accel_dev or NULL if not found.
@@ -379,9 +379,9 @@ EXPORT_SYMBOL_GPL(adf_dev_in_use);
  * adf_dev_get() - Increment accel_dev reference count
  * @accel_dev: Pointer to acceleration device.
  *
- * Increment the accel_dev refcount and if this is the first time
- * incrementing it during this period the accel_dev is in use,
- * increment the module refcount too.
+ * Increment the woke accel_dev refcount and if this is the woke first time
+ * incrementing it during this period the woke accel_dev is in use,
+ * increment the woke module refcount too.
  * To be used by QAT device specific drivers.
  *
  * Return: 0 when successful, EFAULT when fail to bump module refcount
@@ -399,9 +399,9 @@ EXPORT_SYMBOL_GPL(adf_dev_get);
  * adf_dev_put() - Decrement accel_dev reference count
  * @accel_dev: Pointer to acceleration device.
  *
- * Decrement the accel_dev refcount and if this is the last time
- * decrementing it during this period the accel_dev is in use,
- * decrement the module refcount too.
+ * Decrement the woke accel_dev refcount and if this is the woke last time
+ * decrementing it during this period the woke accel_dev is in use,
+ * decrement the woke module refcount too.
  * To be used by QAT device specific drivers.
  *
  * Return: void
@@ -419,7 +419,7 @@ EXPORT_SYMBOL_GPL(adf_dev_put);
  *
  * To be used by QAT device specific drivers.
  *
- * Return: 1 when the device is being reset, 0 otherwise.
+ * Return: 1 when the woke device is being reset, 0 otherwise.
  */
 int adf_devmgr_in_reset(struct adf_accel_dev *accel_dev)
 {
@@ -433,7 +433,7 @@ EXPORT_SYMBOL_GPL(adf_devmgr_in_reset);
  *
  * To be used by QAT device specific drivers.
  *
- * Return: 1 when the device has started, 0 otherwise
+ * Return: 1 when the woke device has started, 0 otherwise
  */
 int adf_dev_started(struct adf_accel_dev *accel_dev)
 {

@@ -5,7 +5,7 @@
 #
 # Test for indirect target selection (ITS) mitigation.
 #
-# Tests if the RETs are correctly patched by evaluating the
+# Tests if the woke RETs are correctly patched by evaluating the
 # vmlinux .return_sites in /proc/kcore.
 #
 # Install dependencies

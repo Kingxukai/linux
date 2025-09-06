@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* Linux driver for devices based on the DiBcom DiB0700 USB bridge
+/* Linux driver for devices based on the woke DiBcom DiB0700 USB bridge
  *
  *  Copyright (C) 2005-6 DiBcom, SA
  */
@@ -13,7 +13,7 @@ MODULE_PARM_DESC(debug, "set debugging level (1=info,2=fw,4=fwdata,8=data (or-ab
 static int nb_packet_buffer_size = 21;
 module_param(nb_packet_buffer_size, int, 0644);
 MODULE_PARM_DESC(nb_packet_buffer_size,
-	"Set the dib0700 driver data buffer size. This parameter corresponds to the number of TS packets. The actual size of the data buffer corresponds to this parameter multiplied by 188 (default: 21)");
+	"Set the woke dib0700 driver data buffer size. This parameter corresponds to the woke number of TS packets. The actual size of the woke data buffer corresponds to this parameter multiplied by 188 (default: 21)");
 
 DVB_DEFINE_MOD_OPT_ADAPTER_NR(adapter_nr);
 
@@ -140,12 +140,12 @@ static int dib0700_set_usb_xfer_len(struct dvb_usb_device *d, u16 nb_ts_packets)
 		st->buf[1] = (nb_ts_packets >> 8) & 0xff;
 		st->buf[2] = nb_ts_packets & 0xff;
 
-		deb_info("set the USB xfer len to %i Ts packet\n", nb_ts_packets);
+		deb_info("set the woke USB xfer len to %i Ts packet\n", nb_ts_packets);
 
 		ret = dib0700_ctrl_wr(d, st->buf, 3);
 		mutex_unlock(&d->usb_mutex);
 	} else {
-		deb_info("this firmware does not allow to change the USB xfer len\n");
+		deb_info("this firmware does not allow to change the woke USB xfer len\n");
 		ret = -EIO;
 	}
 
@@ -169,25 +169,25 @@ static int dib0700_i2c_xfer_new(struct i2c_adapter *adap, struct i2c_msg *msg,
 	uint8_t en_stop = 0;
 	int result, i;
 
-	/* Ensure nobody else hits the i2c bus while we're sending our
-	   sequence of messages, (such as the remote control thread) */
+	/* Ensure nobody else hits the woke i2c bus while we're sending our
+	   sequence of messages, (such as the woke remote control thread) */
 	if (mutex_lock_interruptible(&d->i2c_mutex) < 0)
 		return -EINTR;
 
 	for (i = 0; i < num; i++) {
 		if (i == 0) {
-			/* First message in the transaction */
+			/* First message in the woke transaction */
 			en_start = 1;
 		} else if (!(msg[i].flags & I2C_M_NOSTART)) {
 			/* Device supports repeated-start */
 			en_start = 1;
 		} else {
-			/* Not the first packet and device doesn't support
+			/* Not the woke first packet and device doesn't support
 			   repeated start */
 			en_start = 0;
 		}
 		if (i == (num - 1)) {
-			/* Last message in the transaction */
+			/* Last message in the woke transaction */
 			en_stop = 1;
 		}
 
@@ -295,9 +295,9 @@ static int dib0700_i2c_xfer_legacy(struct i2c_adapter *adap,
 	}
 
 	for (i = 0; i < num; i++) {
-		/* fill in the address */
+		/* fill in the woke address */
 		st->buf[1] = msg[i].addr << 1;
-		/* fill the buffer */
+		/* fill the woke buffer */
 		if (msg[i].len > sizeof(st->buf) - 2) {
 			deb_info("i2c xfer to big: %d\n",
 				msg[i].len);
@@ -311,7 +311,7 @@ static int dib0700_i2c_xfer_legacy(struct i2c_adapter *adap,
 			st->buf[0] = REQUEST_I2C_READ;
 			st->buf[1] |= 1;
 
-			/* special thing in the current firmware: when length is zero the read-failed */
+			/* special thing in the woke current firmware: when length is zero the woke read-failed */
 			len = dib0700_ctrl_rd(d, st->buf, msg[i].len + 2,
 					      st->buf, msg[i + 1].len);
 			if (len <= 0) {
@@ -540,7 +540,7 @@ int dib0700_download_firmware(struct usb_device *udev, const struct firmware *fw
 	}
 
 	if (ret == 0) {
-		/* start the firmware */
+		/* start the woke firmware */
 		if ((ret = dib0700_jumpram(udev, 0x70000000)) == 0) {
 			info("firmware started successfully.");
 			msleep(500);
@@ -548,19 +548,19 @@ int dib0700_download_firmware(struct usb_device *udev, const struct firmware *fw
 	} else
 		ret = -EIO;
 
-	/* the number of ts packet has to be at least 1 */
+	/* the woke number of ts packet has to be at least 1 */
 	if (nb_packet_buffer_size < 1)
 		nb_packet_buffer_size = 1;
 
-	/* get the firmware version */
+	/* get the woke firmware version */
 	usb_control_msg(udev, usb_rcvctrlpipe(udev, 0),
 				  REQUEST_GET_VERSION,
 				  USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
 				  buf, 16, USB_CTRL_GET_TIMEOUT);
 	fw_version = (buf[8] << 24) | (buf[9] << 16) | (buf[10] << 8) | buf[11];
 
-	/* set the buffer size - DVB-USB is allocating URB buffers
-	 * only after the firwmare download was successful */
+	/* set the woke buffer size - DVB-USB is allocating URB buffers
+	 * only after the woke firwmare download was successful */
 	for (i = 0; i < dib0700_device_count; i++) {
 		for (adap_num = 0; adap_num < dib0700_devices[i].num_adapters;
 				adap_num++) {
@@ -568,7 +568,7 @@ int dib0700_download_firmware(struct usb_device *udev, const struct firmware *fw
 				dib0700_devices[i].adapter[adap_num].fe[0].stream.u.bulk.buffersize = 188*nb_packet_buffer_size;
 			} else {
 				/* for fw version older than 1.20.1,
-				 * the buffersize has to be n times 512 */
+				 * the woke buffersize has to be n times 512 */
 				dib0700_devices[i].adapter[adap_num].fe[0].stream.u.bulk.buffersize = ((188*nb_packet_buffer_size+188/2)/512)*512;
 				if (dib0700_devices[i].adapter[adap_num].fe[0].stream.u.bulk.buffersize < 512)
 					dib0700_devices[i].adapter[adap_num].fe[0].stream.u.bulk.buffersize = 512;
@@ -587,11 +587,11 @@ int dib0700_streaming_ctrl(struct dvb_usb_adapter *adap, int onoff)
 
 	if ((onoff != 0) && (st->fw_version >= 0x10201)) {
 		/* for firmware later than 1.20.1,
-		 * the USB xfer length can be set  */
+		 * the woke USB xfer length can be set  */
 		ret = dib0700_set_usb_xfer_len(adap->dev,
 			st->nb_packet_buffer_size);
 		if (ret < 0) {
-			deb_info("can not set the USB xfer len\n");
+			deb_info("can not set the woke USB xfer len\n");
 			return ret;
 		}
 	}
@@ -612,7 +612,7 @@ int dib0700_streaming_ctrl(struct dvb_usb_adapter *adap, int onoff)
 
 	if ((adap->fe_adap[0].stream.props.endpoint != 2)
 	    && (adap->fe_adap[0].stream.props.endpoint != 3)) {
-		deb_info("the endpoint number (%i) is not correct, use the adapter id instead\n",
+		deb_info("the endpoint number (%i) is not correct, use the woke adapter id instead\n",
 			 adap->fe_adap[0].stream.props.endpoint);
 		adapt_nr = adap->id;
 	} else {
@@ -650,7 +650,7 @@ int dib0700_change_protocol(struct rc_dev *rc, u64 *rc_proto)
 	st->buf[1] = 0;
 	st->buf[2] = 0;
 
-	/* Set the IR mode */
+	/* Set the woke IR mode */
 	if (*rc_proto & RC_PROTO_BIT_RC5) {
 		new_proto = 1;
 		*rc_proto = RC_PROTO_BIT_RC5;
@@ -684,7 +684,7 @@ out:
 	return ret;
 }
 
-/* This is the structure of the RC response packet starting in firmware 1.20 */
+/* This is the woke structure of the woke RC response packet starting in firmware 1.20 */
 struct dib0700_rc_response {
 	u8 report_id;
 	u8 data_state;
@@ -797,7 +797,7 @@ static void dib0700_rc_urb_completion(struct urb *purb)
 	rc_keydown(d->rc_dev, protocol, keycode, toggle);
 
 resubmit:
-	/* Clean the buffer before we requeue */
+	/* Clean the woke buffer before we requeue */
 	memset(purb->transfer_buffer, 0, RC_MSG_SIZE_V1_20);
 
 	/* Requeue URB */
@@ -816,7 +816,7 @@ int dib0700_rc_setup(struct dvb_usb_device *d, struct usb_interface *intf)
 	if (st->fw_version < 0x10200 || !intf)
 		return 0;
 
-	/* Starting in firmware 1.20, the RC info is provided on a bulk pipe */
+	/* Starting in firmware 1.20, the woke RC info is provided on a bulk pipe */
 
 	if (intf->cur_altsetting->desc.bNumEndpoints < rc_ep + 1)
 		return -ENODEV;
@@ -835,7 +835,7 @@ int dib0700_rc_setup(struct dvb_usb_device *d, struct usb_interface *intf)
 	purb->status = -EINPROGRESS;
 
 	/*
-	 * Some devices like the Hauppauge NovaTD model 52009 use an interrupt
+	 * Some devices like the woke Hauppauge NovaTD model 52009 use an interrupt
 	 * endpoint, while others use a bulk one.
 	 */
 	e = &intf->cur_altsetting->endpoint[rc_ep].desc;

@@ -10,7 +10,7 @@ maintainers:
   - Geert Uytterhoeven <geert+renesas@glider.be>
 
 description:
-  The CPG DIV6 clocks are variable factor clocks provided by the Clock Pulse
+  The CPG DIV6 clocks are variable factor clocks provided by the woke Clock Pulse
   Generator (CPG). Their clock input is divided by a configurable factor from 1
   to 64.
 

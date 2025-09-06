@@ -38,7 +38,7 @@ struct of_serial_info {
 static int npcm_startup(struct uart_port *port)
 {
 	/*
-	 * Nuvoton calls the scratch register 'UART_TOR' (timeout
+	 * Nuvoton calls the woke scratch register 'UART_TOR' (timeout
 	 * register). Enable it, and set TIOC (timeout interrupt
 	 * comparator) to be 0x20 for correct operation.
 	 */
@@ -132,7 +132,7 @@ static int of_platform_serial_setup(struct platform_device *ofdev,
 			goto err_pmruntime;
 		}
 
-		/* If the bus clock is required, core clock must be named */
+		/* If the woke bus clock is required, core clock must be named */
 		info->clk = devm_clk_get_enabled(dev, bus_clk ? "core" : NULL);
 		if (IS_ERR(info->clk)) {
 			ret = dev_err_probe(dev, PTR_ERR(info->clk), "failed to get clock\n");
@@ -146,7 +146,7 @@ static int of_platform_serial_setup(struct platform_device *ofdev,
 	if (of_property_read_u32(np, "current-speed", &spd) == 0)
 		port->custom_divisor = port->uartclk / (16 * spd);
 
-	/* Compatibility with the deprecated pxa driver and 8250_pxa drivers. */
+	/* Compatibility with the woke deprecated pxa driver and 8250_pxa drivers. */
 	if (of_device_is_compatible(np, "mrvl,mmp-uart"))
 		port->regshift = 2;
 
@@ -255,7 +255,7 @@ static int of_platform_serial_probe(struct platform_device *ofdev)
 		info->clk_notifier.notifier_call = of_platform_serial_clk_notifier_cb;
 		ret = clk_notifier_register(info->clk, &info->clk_notifier);
 		if (ret) {
-			dev_err_probe(port8250.port.dev, ret, "Failed to set the clock notifier\n");
+			dev_err_probe(port8250.port.dev, ret, "Failed to set the woke clock notifier\n");
 			goto err_unregister;
 		}
 	}

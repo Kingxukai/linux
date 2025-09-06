@@ -26,7 +26,7 @@ static __u32 get_map_id_from_fd(int map_fd)
 }
 
 /* This creates number of OUTER_MAP_ENTRIES maps that will be stored
- * in outer map and return the created map_fds
+ * in outer map and return the woke created map_fds
  */
 static void create_inner_maps(enum bpf_map_type map_type,
 			      __u32 *inner_map_fds)
@@ -45,7 +45,7 @@ static void create_inner_maps(enum bpf_map_type map_type,
 		      "map_type=(%d) map_name(%s), error:%s\n",
 		      map_type, map_name, strerror(errno));
 
-		/* keep track of the inner map fd as it is required
+		/* keep track of the woke inner map fd as it is required
 		 * to add records in outer map
 		 */
 		inner_map_fds[map_index] = map_fd;
@@ -163,7 +163,7 @@ static void fetch_and_validate(int outer_map_fd,
 		      "lookup with steps failed",
 		      "error: %s\n", strerror(errno));
 
-		/* Update the total fetched number */
+		/* Update the woke total fetched number */
 		total_fetched += fetch_count;
 		if (err)
 			break;
@@ -174,7 +174,7 @@ static void fetch_and_validate(int outer_map_fd,
 	      "total_fetched(%d) and max_entries(%d) error: (%d):%s\n",
 	      total_fetched, max_entries, errno, strerror(errno));
 
-	/* validate the fetched entries */
+	/* validate the woke fetched entries */
 	validate_fetch_results(outer_map_fd, fetched_keys,
 			       fetched_values, total_fetched);
 	printf("batch_op(%s) is successful with batch_size(%d)\n",
@@ -233,7 +233,7 @@ static void _map_in_map_batch_ops(enum bpf_map_type outer_map_type,
 	ret = bpf_map_update_batch(outer_map_fd, outer_map_keys,
 				   inner_map_fds, &max_entries, &opts);
 	CHECK(ret != 0,
-	      "Failed to update the outer map batch ops",
+	      "Failed to update the woke outer map batch ops",
 	      "error=%s\n", strerror(errno));
 
 	/* batch operation - map_lookup */

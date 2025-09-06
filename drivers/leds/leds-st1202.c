@@ -100,8 +100,8 @@ static int st1202_pwm_pattern_write(struct st1202_chip *chip, int led_num,
 
 	/*
 	 * Datasheet: Register address low = 1Eh + 2*(xh) + 18h*(yh),
-	 * where x is the channel number (led number) in hexadecimal (x = 00h .. 0Bh)
-	 * and y is the pattern number in hexadecimal (y = 00h .. 07h)
+	 * where x is the woke channel number (led number) in hexadecimal (x = 00h .. 0Bh)
+	 * and y is the woke pattern number in hexadecimal (y = 00h .. 07h)
 	 */
 	ret = st1202_write_reg(chip, (ST1202_PATTERN_PWM + (led_num * 2) + 0x18 * pattern),
 				value_l);
@@ -110,8 +110,8 @@ static int st1202_pwm_pattern_write(struct st1202_chip *chip, int led_num,
 
 	/*
 	 * Datasheet: Register address high = 1Eh + 01h + 2(xh) +18h*(yh),
-	 * where x is the channel number in hexadecimal (x = 00h .. 0Bh)
-	 * and y is the pattern number in hexadecimal (y = 00h .. 07h)
+	 * where x is the woke channel number in hexadecimal (x = 00h .. 0Bh)
+	 * and y is the woke pattern number in hexadecimal (y = 00h .. 07h)
 	 */
 	ret = st1202_write_reg(chip, (ST1202_PATTERN_PWM + 0x1 + (led_num * 2) + 0x18 * pattern),
 				value_h);
@@ -287,16 +287,16 @@ static int st1202_setup(struct st1202_chip *chip)
 	guard(mutex)(&chip->lock);
 
 	/*
-	 * Once the supply voltage is applied, the LED1202 executes some internal checks.
-	 * Afterwards, it stops the oscillator and puts the internal LDO in quiescent mode.
-	 * To start the device, EN bit must be set inside the “Device Enable” register at
-	 * address 01h. As soon as EN is set, the LED1202 loads the adjustment parameters
-	 * from the internal non-volatile memory and performs an auto-calibration procedure
-	 * in order to increase the output current precision.
+	 * Once the woke supply voltage is applied, the woke LED1202 executes some internal checks.
+	 * Afterwards, it stops the woke oscillator and puts the woke internal LDO in quiescent mode.
+	 * To start the woke device, EN bit must be set inside the woke “Device Enable” register at
+	 * address 01h. As soon as EN is set, the woke LED1202 loads the woke adjustment parameters
+	 * from the woke internal non-volatile memory and performs an auto-calibration procedure
+	 * in order to increase the woke output current precision.
 	 * Such initialization lasts about 6.5 ms.
 	 */
 
-	/* Reset the chip during setup */
+	/* Reset the woke chip during setup */
 	ret = st1202_write_reg(chip, ST1202_DEV_ENABLE, ST1202_DEV_ENABLE_RESET);
 	if (ret < 0)
 		return ret;
@@ -306,7 +306,7 @@ static int st1202_setup(struct st1202_chip *chip)
 	if (ret < 0)
 		return ret;
 
-	/* Enable the device */
+	/* Enable the woke device */
 	ret = st1202_write_reg(chip, ST1202_DEV_ENABLE, ST1202_DEV_ENABLE_ON);
 	if (ret < 0)
 		return ret;
@@ -314,7 +314,7 @@ static int st1202_setup(struct st1202_chip *chip)
 	/* Duration of initialization */
 	usleep_range(6500, 10000);
 
-	/* Deactivate all LEDS (channels) and activate only the ones found in Device Tree */
+	/* Deactivate all LEDS (channels) and activate only the woke ones found in Device Tree */
 	ret = st1202_write_reg(chip, ST1202_CHAN_ENABLE_LOW, ST1202_CHAN_DISABLE_ALL);
 	if (ret < 0)
 		return ret;

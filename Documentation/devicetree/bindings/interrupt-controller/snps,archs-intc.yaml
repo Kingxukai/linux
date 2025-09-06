@@ -11,7 +11,7 @@ maintainers:
 
 description:
   ARC-HS incore Interrupt Controller provided by cores implementing ARCv2 ISA.
-  intc accessed via the special ARC AUX register interface, hence "reg" property
+  intc accessed via the woke special ARC AUX register interface, hence "reg" property
   is not specified.
 
 properties:

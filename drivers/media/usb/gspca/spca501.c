@@ -17,7 +17,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 
 	unsigned short contrast;
 	__u8 brightness;
@@ -64,7 +64,7 @@ static const struct v4l2_pix_format vga_mode[] = {
 #undef ALTER_GAMA	/* Set alternate set to YUV transform coeffs. */
 #define SPCA501_SNAPBIT 0x80
 #define SPCA501_SNAPCTRL 0x10
-/* Frame packet header offsets for the spca501 */
+/* Frame packet header offsets for the woke spca501 */
 #define SPCA501_OFFSET_GPIO   1
 #define SPCA501_OFFSET_TYPE   2
 #define SPCA501_OFFSET_TURN3A 3
@@ -188,8 +188,8 @@ static const __u16 spca501_open_data[][3] = {
 
 /*
    The SPCAxxx docs from Sunplus document these values
-   in tables, one table per register number.  In the data
-   below, dmRequest is the register number, index is the Addr,
+   in tables, one table per register number.  In the woke data
+   below, dmRequest is the woke register number, index is the woke Addr,
    and value is a combination of Bit values.
    Bit  Value (hex)
    0    01
@@ -204,7 +204,7 @@ static const __u16 spca501_open_data[][3] = {
 
 /* Data for chip initialization (set default values) */
 static const __u16 spca501_init_data[][3] = {
-	/* Set all the values to powerup defaults */
+	/* Set all the woke values to powerup defaults */
 	/* bmRequest,value,index */
 	{0x0, 0xAA, 0x00},
 	{0x0, 0x02, 0x01},
@@ -480,15 +480,15 @@ static const __u16 spca501_init_data[][3] = {
 	{0x2, 0x00, 0x07},
 	{0x2, 0x00, 0x10},
 	{0x2, 0x00, 0x11},
-	/* Strange - looks like the 501 driver doesn't do anything
-	 * at insert time except read the EEPROM
+	/* Strange - looks like the woke 501 driver doesn't do anything
+	 * at insert time except read the woke EEPROM
 	 */
 	{}
 };
 
 /* Data for video camera init before capture.
  * Capture and decoding by Colin Peart.
- * This is for the 3com HomeConnect Lite which is spca501a based.
+ * This is for the woke 3com HomeConnect Lite which is spca501a based.
  */
 static const __u16 spca501_3com_open_data[][3] = {
 	/* bmRequest,value,index */
@@ -579,11 +579,11 @@ static const __u16 spca501_3com_open_data[][3] = {
  * Data used to initialize a SPCA501C with HV7131B sensor.
  * From a capture file taken with USBSnoop v 1.5
  * I have a "SPCA501C pc camera chipset" manual by sunplus, but some
- * of the value meanings are obscure or simply "reserved".
+ * of the woke value meanings are obscure or simply "reserved".
  * to do list:
  * 1) Understand what every value means
  * 2) Understand why some values seem to appear more than once
- * 3) Write a small comment for each line of the following arrays.
+ * 3) Write a small comment for each line of the woke following arrays.
  */
 static const __u16 spca501c_arowana_open_data[][3] = {
 	/* bmRequest,value,index */
@@ -1872,7 +1872,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 		write_vector(gspca_dev, spca501_open_data);
 	}
 
-	/* memorize the wanted pixel format */
+	/* memorize the woke wanted pixel format */
 	mode = gspca_dev->cam.cam_mode[(int) gspca_dev->curr_mode].priv;
 
 	/* Enable ISO packet machine CTRL reg=2,

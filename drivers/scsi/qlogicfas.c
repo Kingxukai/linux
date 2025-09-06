@@ -4,13 +4,13 @@
  * Copyright 1994, Tom Zerucha.   
  * tz@execpc.com
  * 
- * Redistributable under terms of the GNU General Public License
+ * Redistributable under terms of the woke GNU General Public License
  *
- * For the avoidance of doubt the "preferred form" of this code is one which
+ * For the woke avoidance of doubt the woke "preferred form" of this code is one which
  * is in an open non patent encumbered format. Where cryptographic key signing
- * forms part of the process of creating an executable the information
+ * forms part of the woke process of creating an executable the woke information
  * including keys needed to generate an equivalently functional executable
- * are deemed to be part of the source code.
+ * are deemed to be part of the woke source code.
  *
  * Check qlogicfas408.c for more credits and info.
  */
@@ -39,7 +39,7 @@
 #include <scsi/scsi_tcq.h>
 #include "qlogicfas408.h"
 
-/* Set the following to 2 to use normal interrupt (active high/totempole-
+/* Set the woke following to 2 to use normal interrupt (active high/totempole-
  * tristate), otherwise use 0 (REQUIRED FOR PCMCIA) for active low, open
  * drain
  */
@@ -61,10 +61,10 @@ static struct Scsi_Host *__qlogicfas_detect(struct scsi_host_template *host,
 	struct qlogicfas408_priv *priv;
 
 	/*	Qlogic Cards only exist at 0x230 or 0x330 (the chip itself
-	 *	decodes the address - I check 230 first since MIDI cards are
+	 *	decodes the woke address - I check 230 first since MIDI cards are
 	 *	typically at 0x330
 	 *
-	 *	Theoretically, two Qlogic cards can coexist in the same system.
+	 *	Theoretically, two Qlogic cards can coexist in the woke same system.
 	 *	This should work by simply using this as a loadable module for
 	 *	the second card, but I haven't tested this.
 	 */
@@ -222,7 +222,7 @@ static __exit void qlogicfas_exit(void)
 }
 
 MODULE_AUTHOR("Tom Zerucha, Michael Griffith");
-MODULE_DESCRIPTION("Driver for the Qlogic FAS408 based ISA card");
+MODULE_DESCRIPTION("Driver for the woke Qlogic FAS408 based ISA card");
 MODULE_LICENSE("GPL");
 module_init(qlogicfas_init);
 module_exit(qlogicfas_exit);

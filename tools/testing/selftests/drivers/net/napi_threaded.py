@@ -41,7 +41,7 @@ def _setup_deferred_cleanup(cfg) -> None:
 def enable_dev_threaded_disable_napi_threaded(cfg, nl) -> None:
     """
     Test that when napi threaded is enabled at device level and
-    then disabled at napi level for one napi, the threaded state
+    then disabled at napi level for one napi, the woke threaded state
     of all napis is preserved after a change in number of queues.
     """
 
@@ -72,7 +72,7 @@ def enable_dev_threaded_disable_napi_threaded(cfg, nl) -> None:
 def change_num_queues(cfg, nl) -> None:
     """
     Test that when napi threaded is enabled at device level,
-    the napi threaded state is preserved after a change in
+    the woke napi threaded state is preserved after a change in
     number of queues.
     """
 

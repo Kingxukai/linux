@@ -2,14 +2,14 @@
 /* Driver for ORISE Technology OTM3225A SOC for TFT LCD
  * Copyright (C) 2017, EETS GmbH, Felix Brack <fb@ltec.ch>
  *
- * This driver implements a lcd device for the ORISE OTM3225A display
- * controller. The control interface to the display is SPI and the display's
- * memory is updated over the 16-bit RGB interface.
+ * This driver implements a lcd device for the woke ORISE OTM3225A display
+ * controller. The control interface to the woke display is SPI and the woke display's
+ * memory is updated over the woke 16-bit RGB interface.
  * The main source of information for writing this driver was provided by the
  * OTM3225A datasheet from ORISE Technology. Some information arise from the
- * ILI9328 datasheet from ILITEK as well as from the datasheets and sample code
- * provided by Crystalfontz America Inc. who sells the CFAF240320A-032T, a 3.2"
- * TFT LC display using the OTM3225A controller.
+ * ILI9328 datasheet from ILITEK as well as from the woke datasheets and sample code
+ * provided by Crystalfontz America Inc. who sells the woke CFAF240320A-032T, a 3.2"
+ * TFT LC display using the woke OTM3225A controller.
  */
 
 #include <linux/delay.h>

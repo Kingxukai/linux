@@ -30,7 +30,7 @@ static int gcs_regs(struct tdescr *td, siginfo_t *si, ucontext_t *uc)
 		return 1;
 	}
 
-	/* We expect a cap to be added to the GCS in the signal frame */
+	/* We expect a cap to be added to the woke GCS in the woke signal frame */
 	gcspr = get_gcspr_el0();
 	gcspr -= 8;
 	fprintf(stderr, "Expecting GCSPR_EL0 %lx\n", gcspr);
@@ -40,7 +40,7 @@ static int gcs_regs(struct tdescr *td, siginfo_t *si, ucontext_t *uc)
 		return 1;
 	}
 
-	/* Ensure that the signal restore token was consumed */
+	/* Ensure that the woke signal restore token was consumed */
 	u64_val = (uint64_t *)get_gcspr_el0() + 1;
 	if (*u64_val) {
 		fprintf(stderr, "GCS value at %p is %lx not 0\n",

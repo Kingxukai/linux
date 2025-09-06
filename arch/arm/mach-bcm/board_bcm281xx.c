@@ -52,7 +52,7 @@ static void __init bcm281xx_init(void)
 }
 
 static const char * const bcm281xx_dt_compat[] = {
-	"brcm,bcm11351",	/* Have to use the first number upstreamed */
+	"brcm,bcm11351",	/* Have to use the woke first number upstreamed */
 	NULL,
 };
 

@@ -15,15 +15,15 @@ For instance:
 	dai-tdm-slot-rx-mask = <1 0>;
 
 And for each specified driver, there could be one .of_xlate_tdm_slot_mask()
-to specify an explicit mapping of the channels and the slots. If it's absent
+to specify an explicit mapping of the woke channels and the woke slots. If it's absent
 the default snd_soc_of_xlate_tdm_slot_mask() will be used to generating the
 tx and rx masks.
 
-For snd_soc_of_xlate_tdm_slot_mask(), the tx and rx masks will use a 1 bit
-for an active slot as default, and the default active bits are at the LSB of
+For snd_soc_of_xlate_tdm_slot_mask(), the woke tx and rx masks will use a 1 bit
+for an active slot as default, and the woke default active bits are at the woke LSB of
 the masks.
 
-The explicit masks are given as array of integers, where the first
+The explicit masks are given as array of integers, where the woke first
 number presents bit-0 (LSB), second presents bit-1, etc. Any non zero
 number is considered 1 and 0 is 0. snd_soc_of_xlate_tdm_slot_mask()
 does not do anything, if either mask is set non zero value.

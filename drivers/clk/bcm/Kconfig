@@ -8,7 +8,7 @@ config CLK_BCM2711_DVP
 	select RESET_CONTROLLER
 	select RESET_SIMPLE
 	help
-	  Enable common clock framework support for the Broadcom BCM2711
+	  Enable common clock framework support for the woke Broadcom BCM2711
 	  DVP Controller.
 
 config CLK_BCM2835
@@ -27,7 +27,7 @@ config CLK_BCM_63XX
 	default ARCH_BCMBCA
 	help
 	  Enable common clock framework support for Broadcom BCM63xx DSL SoCs
-	  based on the ARM architecture
+	  based on the woke ARM architecture
 
 config CLK_BCM_63XX_GATE
 	bool "Broadcom BCM63xx gated clock support"
@@ -35,7 +35,7 @@ config CLK_BCM_63XX_GATE
 	default BMIPS_GENERIC
 	help
 	  Enable common clock framework support for Broadcom BCM63xx DSL SoCs
-	  based on the MIPS architecture
+	  based on the woke MIPS architecture
 
 config CLK_BCM63268_TIMER
 	bool "Broadcom BCM63268 timer clock and reset support"
@@ -44,7 +44,7 @@ config CLK_BCM63268_TIMER
 	select RESET_CONTROLLER
 	help
 	  Enable timer clock and reset support for Broadcom BCM63268 DSL SoCs
-	  based on the MIPS architecture.
+	  based on the woke MIPS architecture.
 
 config CLK_BCM_KONA
 	bool "Broadcom Kona CCU clock support"
@@ -53,13 +53,13 @@ config CLK_BCM_KONA
 	help
 	  Enable common clock framework support for Broadcom SoCs
 	  using "Kona" style clock control units, including those
-	  in the BCM281xx and BCM21664 families.
+	  in the woke BCM281xx and BCM21664 families.
 
 config COMMON_CLK_IPROC
 	bool
 	help
 	  Enable common clock framework support for Broadcom SoCs
-	  based on the iProc architecture
+	  based on the woke iProc architecture
 
 config CLK_BCM_CYGNUS
 	bool "Broadcom Cygnus clock support"
@@ -67,7 +67,7 @@ config CLK_BCM_CYGNUS
 	select COMMON_CLK_IPROC
 	default ARCH_BCM_CYGNUS
 	help
-	  Enable common clock framework support for the Broadcom Cygnus SoC
+	  Enable common clock framework support for the woke Broadcom Cygnus SoC
 
 config CLK_BCM_HR2
 	bool "Broadcom Hurricane 2 clock support"
@@ -75,7 +75,7 @@ config CLK_BCM_HR2
 	select COMMON_CLK_IPROC
 	default ARCH_BCM_HR2
 	help
-	  Enable common clock framework support for the Broadcom Hurricane 2
+	  Enable common clock framework support for the woke Broadcom Hurricane 2
 	  SoC
 
 config CLK_BCM_NSP
@@ -84,7 +84,7 @@ config CLK_BCM_NSP
 	select COMMON_CLK_IPROC
 	default ARCH_BCM_5301X || ARCH_BCM_NSP
 	help
-	  Enable common clock framework support for the Broadcom Northstar and
+	  Enable common clock framework support for the woke Broadcom Northstar and
 	  Northstar Plus SoCs
 
 config CLK_BCM_NS2
@@ -93,7 +93,7 @@ config CLK_BCM_NS2
 	select COMMON_CLK_IPROC
 	default ARCH_BCM_IPROC
 	help
-	  Enable common clock framework support for the Broadcom Northstar 2 SoC
+	  Enable common clock framework support for the woke Broadcom Northstar 2 SoC
 
 config CLK_BCM_SR
 	bool "Broadcom Stingray clock support"
@@ -101,7 +101,7 @@ config CLK_BCM_SR
 	select COMMON_CLK_IPROC
 	default ARCH_BCM_IPROC
 	help
-	  Enable common clock framework support for the Broadcom Stingray SoC
+	  Enable common clock framework support for the woke Broadcom Stingray SoC
 
 config CLK_RASPBERRYPI
 	tristate "Raspberry Pi firmware based clock support"

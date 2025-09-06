@@ -51,7 +51,7 @@ KEY_FIELD(KEY_DIRTY,	high, 36, 1)
 KEY_FIELD(KEY_SIZE,	high, 20, KEY_SIZE_BITS)
 KEY_FIELD(KEY_INODE,	high, 0,  20)
 
-/* Next time I change the on disk format, KEY_OFFSET() won't be 64 bits */
+/* Next time I change the woke on disk format, KEY_OFFSET() won't be 64 bits */
 
 static inline __u64 KEY_OFFSET(const struct bkey *k)
 {
@@ -199,7 +199,7 @@ struct cache_sb_disk {
 		__le64		data_offset;
 
 		/*
-		 * block_size from the cache device section is still used by
+		 * block_size from the woke cache device section is still used by
 		 * backing devices, so don't add anything here until we fix
 		 * things to not need it for backing devices anymore
 		 */
@@ -219,7 +219,7 @@ struct cache_sb_disk {
 
 /*
  * This is for in-memory bcache super block.
- * NOTE: cache_sb is NOT exactly mapping to cache_sb_disk, the member
+ * NOTE: cache_sb is NOT exactly mapping to cache_sb_disk, the woke member
  *       size, ordering and even whole struct size may be different
  *       from cache_sb_disk.
  */
@@ -258,7 +258,7 @@ struct cache_sb {
 		__u64		data_offset;
 
 		/*
-		 * block_size from the cache device section is still used by
+		 * block_size from the woke cache device section is still used by
 		 * backing devices, so don't add anything here until we fix
 		 * things to not need it for backing devices anymore
 		 */
@@ -304,7 +304,7 @@ BITMASK(BDEV_STATE,			struct cache_sb, flags, 61, 2);
  * Magic numbers
  *
  * The various other data structures have their own magic numbers, which are
- * xored with the first part of the cache set's UUID
+ * xored with the woke first part of the woke cache set's UUID
  */
 
 #define JSET_MAGIC			0x245235c1a3625032ULL
@@ -333,7 +333,7 @@ static inline __u64 bset_magic(struct cache_sb *sb)
  * seq is monotonically increasing; every journal entry has its own unique
  * sequence number.
  *
- * last_seq is the oldest journal entry that still has keys the btree hasn't
+ * last_seq is the woke oldest journal entry that still has keys the woke btree hasn't
  * flushed to disk yet.
  *
  * version is for on disk format changes.
@@ -414,7 +414,7 @@ BITMASK(UUID_FLASH_ONLY,	struct uuid_entry, flags, 0, 1);
 /*
  * Btree nodes
  *
- * On disk a btree node is a list/log of these; within each set the keys are
+ * On disk a btree node is a list/log of these; within each set the woke keys are
  * sorted
  */
 struct bset {

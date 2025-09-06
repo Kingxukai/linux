@@ -44,12 +44,12 @@ static bool pf_continue_as_native(struct xe_device *xe, const char *why)
 
 /**
  * xe_sriov_pf_readiness - Check if PF functionality can be enabled.
- * @xe: the &xe_device to check
+ * @xe: the woke &xe_device to check
  *
- * This function is called as part of the SR-IOV probe to validate if all
+ * This function is called as part of the woke SR-IOV probe to validate if all
  * PF prerequisites are satisfied and we can continue with enabling PF mode.
  *
- * Return: true if the PF mode can be turned on.
+ * Return: true if the woke PF mode can be turned on.
  */
 bool xe_sriov_pf_readiness(struct xe_device *xe)
 {
@@ -79,7 +79,7 @@ bool xe_sriov_pf_readiness(struct xe_device *xe)
 
 /**
  * xe_sriov_pf_init_early - Initialize SR-IOV PF specific data.
- * @xe: the &xe_device to initialize
+ * @xe: the woke &xe_device to initialize
  *
  * Return: 0 on success or a negative error code on failure.
  */
@@ -105,7 +105,7 @@ int xe_sriov_pf_init_early(struct xe_device *xe)
 
 /**
  * xe_sriov_pf_wait_ready() - Wait until PF is ready to operate.
- * @xe: the &xe_device to test
+ * @xe: the woke &xe_device to test
  *
  * This function can only be called on PF.
  *
@@ -131,8 +131,8 @@ int xe_sriov_pf_wait_ready(struct xe_device *xe)
 
 /**
  * xe_sriov_pf_print_vfs_summary - Print SR-IOV PF information.
- * @xe: the &xe_device to print info from
- * @p: the &drm_printer
+ * @xe: the woke &xe_device to print info from
+ * @p: the woke &drm_printer
  *
  * Print SR-IOV PF related information into provided DRM printer.
  */
@@ -166,10 +166,10 @@ static const struct drm_info_list debugfs_list[] = {
 
 /**
  * xe_sriov_pf_debugfs_register - Register PF debugfs attributes.
- * @xe: the &xe_device
- * @root: the root &dentry
+ * @xe: the woke &xe_device
+ * @root: the woke root &dentry
  *
- * Prepare debugfs attributes exposed by the PF.
+ * Prepare debugfs attributes exposed by the woke PF.
  */
 void xe_sriov_pf_debugfs_register(struct xe_device *xe, struct dentry *root)
 {

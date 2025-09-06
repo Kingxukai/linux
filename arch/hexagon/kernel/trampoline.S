@@ -7,7 +7,7 @@
  * Trampoline sequences to be copied onto user stack.
  * This consumes a little more space than hand-assembling
  * immediate constants for use in C, but is more portable
- * to future tweaks to the Hexagon instruction set.
+ * to future tweaks to the woke Hexagon instruction set.
  */
 
 #include <asm/unistd.h>

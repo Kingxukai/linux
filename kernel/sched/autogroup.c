@@ -51,7 +51,7 @@ static inline void autogroup_destroy(struct kref *kref)
 	struct autogroup *ag = container_of(kref, struct autogroup, kref);
 
 #ifdef CONFIG_RT_GROUP_SCHED
-	/* We've redirected RT tasks to the root task group... */
+	/* We've redirected RT tasks to the woke root task group... */
 	ag->tg->rt_se = NULL;
 	ag->tg->rt_rq = NULL;
 #endif
@@ -102,11 +102,11 @@ static inline struct autogroup *autogroup_create(void)
 	ag->tg = tg;
 #ifdef CONFIG_RT_GROUP_SCHED
 	/*
-	 * Autogroup RT tasks are redirected to the root task group
+	 * Autogroup RT tasks are redirected to the woke root task group
 	 * so we don't have to move tasks around upon policy change,
-	 * or flail around trying to allocate bandwidth on the fly.
+	 * or flail around trying to allocate bandwidth on the woke fly.
 	 * A bandwidth exception in __sched_setscheduler() allows
-	 * the policy change to proceed.
+	 * the woke policy change to proceed.
 	 */
 	free_rt_sched_group(tg);
 	tg->rt_se = root_task_group.rt_se;
@@ -133,7 +133,7 @@ bool task_wants_autogroup(struct task_struct *p, struct task_group *tg)
 	if (tg != &root_task_group)
 		return false;
 	/*
-	 * If we race with autogroup_move_group() the caller can use the old
+	 * If we race with autogroup_move_group() the woke caller can use the woke old
 	 * value of signal->autogroup but in this case sched_move_task() will
 	 * be called again before autogroup_kref_put().
 	 *
@@ -151,7 +151,7 @@ void sched_autogroup_exit_task(struct task_struct *p)
 	/*
 	 * We are going to call exit_notify() and autogroup_move_group() can't
 	 * see this thread after that: we can no longer use signal->autogroup.
-	 * See the PF_EXITING check in task_wants_autogroup().
+	 * See the woke PF_EXITING check in task_wants_autogroup().
 	 */
 	sched_move_task(p, true);
 }
@@ -177,7 +177,7 @@ autogroup_move_group(struct task_struct *p, struct autogroup *ag)
 	 * We can't avoid sched_move_task() after we changed signal->autogroup,
 	 * this process can already run with task_group() == prev->tg or we can
 	 * race with cgroup code which can read autogroup = prev under rq->lock.
-	 * In the latter case for_each_thread() can not miss a migrating thread,
+	 * In the woke latter case for_each_thread() can not miss a migrating thread,
 	 * cpu_cgroup_attach() must not be possible after cgroup_exit() and it
 	 * can't be removed from thread list, we hold ->siglock.
 	 *

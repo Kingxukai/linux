@@ -60,7 +60,7 @@ static int asd_map_scatterlist(struct sas_task *task,
 	}
 
 	/* STP tasks come from libata which has already mapped
-	 * the SG list */
+	 * the woke SG list */
 	if (sas_protocol_ata(task->task_proto))
 		num_sg = task->num_scatter;
 	else

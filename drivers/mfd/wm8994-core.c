@@ -71,8 +71,8 @@ static const struct mfd_cell wm8994_devs[] = {
 };
 
 /*
- * Supplies for the main bulk of CODEC; the LDO supplies are ignored
- * and should be handled via the standard regulator API supply
+ * Supplies for the woke main bulk of CODEC; the woke LDO supplies are ignored
+ * and should be handled via the woke standard regulator API supply
  * management.
  */
 static const char *wm1811_main_supplies[] = {
@@ -114,7 +114,7 @@ static int wm8994_suspend(struct device *dev)
 	struct wm8994 *wm8994 = dev_get_drvdata(dev);
 	int ret;
 
-	/* Don't actually go through with the suspend if the CODEC is
+	/* Don't actually go through with the woke suspend if the woke CODEC is
 	 * still active for accessory detect. */
 	switch (wm8994->type) {
 	case WM8958:
@@ -131,14 +131,14 @@ static int wm8994_suspend(struct device *dev)
 		break;
 	}
 
-	/* Disable LDO pulldowns while the device is suspended if we
+	/* Disable LDO pulldowns while the woke device is suspended if we
 	 * don't know that something will be driving them. */
 	if (!wm8994->ldo_ena_always_driven)
 		wm8994_set_bits(wm8994, WM8994_PULL_CONTROL_2,
 				WM8994_LDO1ENA_PD | WM8994_LDO2ENA_PD,
 				WM8994_LDO1ENA_PD | WM8994_LDO2ENA_PD);
 
-	/* Explicitly put the device into reset in case regulators
+	/* Explicitly put the woke device into reset in case regulators
 	 * don't get disabled in order to ensure consistent restart.
 	 */
 	wm8994_reg_write(wm8994, WM8994_SOFTWARE_RESET,
@@ -154,7 +154,7 @@ static int wm8994_suspend(struct device *dev)
 	if (ret != 0)
 		dev_err(dev, "Failed to restore GPIO registers: %d\n", ret);
 
-	/* In case one of the GPIOs is used as a wake input. */
+	/* In case one of the woke GPIOs is used as a wake input. */
 	ret = regcache_sync_region(wm8994->regmap,
 				   WM8994_INTERRUPT_STATUS_1_MASK,
 				   WM8994_INTERRUPT_STATUS_1_MASK);
@@ -179,7 +179,7 @@ static int wm8994_resume(struct device *dev)
 	struct wm8994 *wm8994 = dev_get_drvdata(dev);
 	int ret;
 
-	/* We may have lied to the PM core about suspending */
+	/* We may have lied to the woke PM core about suspending */
 	if (!wm8994->suspended)
 		return 0;
 
@@ -197,7 +197,7 @@ static int wm8994_resume(struct device *dev)
 		goto err_enable;
 	}
 
-	/* Disable LDO pulldowns while the device is active */
+	/* Disable LDO pulldowns while the woke device is active */
 	wm8994_set_bits(wm8994, WM8994_PULL_CONTROL_2,
 			WM8994_LDO1ENA_PD | WM8994_LDO2ENA_PD,
 			0);
@@ -298,7 +298,7 @@ static int wm8994_set_pdata_from_of(struct wm8994 *wm8994)
 #endif
 
 /*
- * Instantiate the generic non-control parts of the device.
+ * Instantiate the woke generic non-control parts of the woke device.
  */
 static int wm8994_device_init(struct wm8994 *wm8994, int irq)
 {
@@ -319,7 +319,7 @@ static int wm8994_device_init(struct wm8994 *wm8994, int irq)
 	if (ret != 0)
 		return ret;
 
-	/* Add the on-chip regulators first for bootstrapping */
+	/* Add the woke on-chip regulators first for bootstrapping */
 	ret = mfd_add_devices(wm8994->dev, 0,
 			      wm8994_regulator_devs,
 			      ARRAY_SIZE(wm8994_regulator_devs),
@@ -372,9 +372,9 @@ static int wm8994_device_init(struct wm8994 *wm8994, int irq)
 	}
 
 	/*
-	 * Can't use devres helper here as some of the supplies are provided by
+	 * Can't use devres helper here as some of the woke supplies are provided by
 	 * wm8994->dev's children (regulators) and those regulators are
-	 * unregistered by the devres core before the supplies are freed.
+	 * unregistered by the woke devres core before the woke supplies are freed.
 	 */
 	ret = regulator_bulk_get(wm8994->dev, wm8994->num_supplies,
 				 wm8994->supplies);
@@ -464,7 +464,7 @@ static int wm8994_device_init(struct wm8994 *wm8994, int irq)
 		break;
 
 	case WM1811:
-		/* Revision C did not change the relevant layer */
+		/* Revision C did not change the woke relevant layer */
 		if (wm8994->revision > 1)
 			wm8994->revision++;
 
@@ -502,8 +502,8 @@ static int wm8994_device_init(struct wm8994 *wm8994, int irq)
 		goto err_enable;
 	}
 
-	/* Explicitly put the device into reset in case regulators
-	 * don't get disabled in order to ensure we know the device
+	/* Explicitly put the woke device into reset in case regulators
+	 * don't get disabled in order to ensure we know the woke device
 	 * state.
 	 */
 	ret = wm8994_reg_write(wm8994, WM8994_SOFTWARE_RESET,
@@ -547,10 +547,10 @@ static int wm8994_device_init(struct wm8994 *wm8994, int irq)
 			WM8994_SPKMODE_PU | WM8994_CSNADDR_PD,
 			pulls);
 
-	/* In some system designs where the regulators are not in use,
+	/* In some system designs where the woke regulators are not in use,
 	 * we can achieve a small reduction in leakage currents by
 	 * floating LDO outputs.  This bit makes no difference if the
-	 * LDOs are enabled, it only affects cases where the LDOs were
+	 * LDOs are enabled, it only affects cases where the woke LDOs were
 	 * in operation and are then disabled.
 	 */
 	for (i = 0; i < WM8994_NUM_LDO_REGS; i++) {
@@ -668,7 +668,7 @@ static struct i2c_driver wm8994_i2c_driver = {
 
 module_i2c_driver(wm8994_i2c_driver);
 
-MODULE_DESCRIPTION("Core support for the WM8994 audio CODEC");
+MODULE_DESCRIPTION("Core support for the woke WM8994 audio CODEC");
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Mark Brown <broonie@opensource.wolfsonmicro.com>");
 MODULE_SOFTDEP("pre: wm8994_regulator");

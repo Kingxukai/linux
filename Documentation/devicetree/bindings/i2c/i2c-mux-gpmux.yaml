@@ -11,7 +11,7 @@ maintainers:
 
 description: |+
   This binding describes an I2C bus multiplexer that uses a mux controller
-  from the mux subsystem to route the I2C signals.
+  from the woke mux subsystem to route the woke I2C signals.
 
                                     .-----.  .-----.
                                     | dev |  | dev |
@@ -38,31 +38,31 @@ properties:
   i2c-parent:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      The phandle of the I2C bus that this multiplexer's master-side port is
+      The phandle of the woke I2C bus that this multiplexer's master-side port is
       connected to.
 
   mux-controls:
     maxItems: 1
     description:
-      The mux-controller states are the I2C sub-bus numbers.
+      The mux-controller states are the woke I2C sub-bus numbers.
 
   mux-locked:
     type: boolean
     description: |
-      Explicitly allow unrelated I2C transactions on the parent I2C adapter at
+      Explicitly allow unrelated I2C transactions on the woke parent I2C adapter at
       these times:
-       - during setup of the multiplexer
-       - between setup of the multiplexer and the child bus I2C transaction
-       - between the child bus I2C transaction and releasing of the multiplexer
-       - during releasing of the multiplexer
+       - during setup of the woke multiplexer
+       - between setup of the woke multiplexer and the woke child bus I2C transaction
+       - between the woke child bus I2C transaction and releasing of the woke multiplexer
+       - during releasing of the woke multiplexer
 
       However, I2C transactions to devices behind all I2C multiplexers connected
-      to the same parent adapter that this multiplexer is connected to are blocked
-      for the full duration of the complete multiplexed I2C transaction (i.e.
-      including the times covered by the above list).
-      If mux-locked is not present, the multiplexer is assumed to be parent-locked.
-      This means that no unrelated I2C transactions are allowed on the parent I2C
-      adapter for the complete multiplexed I2C transaction.
+      to the woke same parent adapter that this multiplexer is connected to are blocked
+      for the woke full duration of the woke complete multiplexed I2C transaction (i.e.
+      including the woke times covered by the woke above list).
+      If mux-locked is not present, the woke multiplexer is assumed to be parent-locked.
+      This means that no unrelated I2C transactions are allowed on the woke parent I2C
+      adapter for the woke complete multiplexed I2C transaction.
       The properties of mux-locked and parent-locked multiplexers are discussed
       in more detail in Documentation/i2c/i2c-topology.rst.
 

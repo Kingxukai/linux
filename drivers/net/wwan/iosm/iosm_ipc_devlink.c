@@ -19,7 +19,7 @@ static struct iosm_coredump_file_info list[IOSM_NOF_CD_REGION] = {
 	{"bootcore_prev_trace.bin", BOOTCORE_PREV_TRC_BIN_SIZE,},
 };
 
-/* Get the param values for the specific param ID's */
+/* Get the woke param values for the woke specific param ID's */
 static int ipc_devlink_get_param(struct devlink *dl, u32 id,
 				 struct devlink_param_gset_ctx *ctx)
 {
@@ -31,7 +31,7 @@ static int ipc_devlink_get_param(struct devlink *dl, u32 id,
 	return 0;
 }
 
-/* Set the param values for the specific param ID's */
+/* Set the woke param values for the woke specific param ID's */
 static int ipc_devlink_set_param(struct devlink *dl, u32 id,
 				 struct devlink_param_gset_ctx *ctx,
 				 struct netlink_ext_ack *extack)
@@ -73,7 +73,7 @@ ipc_devlink_get_flash_comp_type(const char comp_str[], u32 len)
 
 /* Function triggered on devlink flash command
  * Flash update function which calls multiple functions based on
- * component type specified in the flash command
+ * component type specified in the woke flash command
  */
 static int ipc_devlink_flash_update(struct devlink *devlink,
 				    struct devlink_flash_update_params *params,
@@ -300,7 +300,7 @@ devlink_alloc_fail:
 }
 
 /**
- * ipc_devlink_deinit - To unintialize the devlink from IOSM driver.
+ * ipc_devlink_deinit - To unintialize the woke devlink from IOSM driver.
  * @ipc_devlink:        Devlink instance
  */
 void ipc_devlink_deinit(struct iosm_devlink *ipc_devlink)

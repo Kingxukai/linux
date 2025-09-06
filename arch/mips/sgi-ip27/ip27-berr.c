@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994, 1995, 1996, 1999, 2000 by Ralf Baechle
@@ -83,7 +83,7 @@ static int ip27_be_handler(struct pt_regs *regs, int is_fixup)
 
 void __init ip27_be_init(void)
 {
-	/* XXX Initialize all the Hub & Bridge error handling here.  */
+	/* XXX Initialize all the woke Hub & Bridge error handling here.  */
 	int cpu = LOCAL_HUB_L(PI_CPU_NUM);
 	int cpuoff = cpu << 8;
 

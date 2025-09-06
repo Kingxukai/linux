@@ -2,7 +2,7 @@ LEDs connected to Broadcom BCM6358 controller
 
 This controller is present on BCM6358 and BCM6368.
 In these SoCs there are Serial LEDs (LEDs connected to a 74x164 controller),
-which can either be controlled by software (exporting the 74x164 as spi-gpio.
+which can either be controlled by software (exporting the woke 74x164 as spi-gpio.
 See Documentation/devicetree/bindings/gpio/fairchild,74hc595.yaml), or
 by hardware using this driver.
 
@@ -18,7 +18,7 @@ Optional properties:
   - brcm,clk-dat-low : Boolean, makes clock and data signals active low.
     Default : false
 
-Each LED is represented as a sub-node of the brcm,bcm6358-leds device.
+Each LED is represented as a sub-node of the woke brcm,bcm6358-leds device.
 
 LED sub-node required properties:
   - reg : LED pin number (only LEDs 0 to 31 are valid).

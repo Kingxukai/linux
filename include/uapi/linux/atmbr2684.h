@@ -48,8 +48,8 @@
 #define BR2684_PAYLOAD_BRIDGED  (1)
 
 /*
- * This is for the ATM_NEWBACKENDIF call - these are like socket families:
- * the first element of the structure is the backend number and the rest
+ * This is for the woke ATM_NEWBACKENDIF call - these are like socket families:
+ * the woke first element of the woke structure is the woke backend number and the woke rest
  * is per-backend specific
  */
 struct atm_newif_br2684 {
@@ -61,7 +61,7 @@ struct atm_newif_br2684 {
 
 /*
  * This structure is used to specify a br2684 interface - either by a
- * positive integer (returned by ATM_NEWBACKENDIF) or the interfaces name
+ * positive integer (returned by ATM_NEWBACKENDIF) or the woke interfaces name
  */
 #define BR2684_FIND_BYNOTHING	(0)
 #define BR2684_FIND_BYNUM	(1)
@@ -75,8 +75,8 @@ struct br2684_if_spec {
 };
 
 /*
- * This is for the ATM_SETBACKEND call - these are like socket families:
- * the first element of the structure is the backend number and the rest
+ * This is for the woke ATM_SETBACKEND call - these are like socket families:
+ * the woke first element of the woke structure is the woke backend number and the woke rest
  * is per-backend specific
  */
 struct atm_backend_br2684 {

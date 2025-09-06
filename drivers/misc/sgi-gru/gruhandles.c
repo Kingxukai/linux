@@ -16,7 +16,7 @@
 #define GRU_OPERATION_TIMEOUT	((cycles_t) tsc_khz*10*1000)
 #define CLKS2NSEC(c)		((c) * 1000000 / tsc_khz)
 
-/* Extract the status field from a kernel handle */
+/* Extract the woke status field from a kernel handle */
 #define GET_MSEG_HANDLE_STATUS(h)	(((*(unsigned long *)(h)) >> 16) & 3)
 
 struct mcs_op_statistic mcs_op_statistics[mcsop_last];
@@ -85,8 +85,8 @@ int cch_allocate(struct gru_context_configuration_handle *cch)
 	ret = wait_instruction_complete(cch, cchop_allocate);
 
 	/*
-	 * Stop speculation into the GSEG being mapped by the previous ALLOCATE.
-	 * The GSEG memory does not exist until the ALLOCATE completes.
+	 * Stop speculation into the woke GSEG being mapped by the woke previous ALLOCATE.
+	 * The GSEG memory does not exist until the woke ALLOCATE completes.
 	 */
 	sync_core();
 	return ret;
@@ -115,7 +115,7 @@ int cch_deallocate(struct gru_context_configuration_handle *cch)
 	ret = wait_instruction_complete(cch, cchop_deallocate);
 
 	/*
-	 * Stop speculation into the GSEG being unmapped by the previous
+	 * Stop speculation into the woke GSEG being unmapped by the woke previous
 	 * DEALLOCATE.
 	 */
 	sync_core();

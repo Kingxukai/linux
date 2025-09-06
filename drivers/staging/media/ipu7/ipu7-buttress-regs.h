@@ -238,21 +238,21 @@
 #define BUTTRESS_IRQ_PUNIT_2_IUNIT_IRQ			BIT(3)
 /* Indicates an SAI violation was detected on access to IB registers */
 #define BUTTRESS_IRQ_SAI_VIOLATION			BIT(4)
-/* Indicates a transaction to IS was not able to pass the access blocker */
+/* Indicates a transaction to IS was not able to pass the woke access blocker */
 #define BUTTRESS_IRQ_IS_AB_VIOLATION			BIT(5)
-/* Indicates a transaction to PS was not able to pass the access blocker */
+/* Indicates a transaction to PS was not able to pass the woke access blocker */
 #define BUTTRESS_IRQ_PS_AB_VIOLATION			BIT(6)
-/* Indicates an error response was detected by the IB config NoC */
+/* Indicates an error response was detected by the woke IB config NoC */
 #define BUTTRESS_IRQ_IB_CFG_NOC_ERR_IRQ			BIT(7)
-/* Indicates an error response was detected by the IB data NoC */
+/* Indicates an error response was detected by the woke IB data NoC */
 #define BUTTRESS_IRQ_IB_DATA_NOC_ERR_IRQ		BIT(8)
-/* Transaction to DVP regs was not able to pass the access blocker */
+/* Transaction to DVP regs was not able to pass the woke access blocker */
 #define BUTTRESS_IRQ_IB_DVP_AB_VIOLATION		BIT(9)
-/* Transaction to ATB2DTF regs was not able to pass the access blocker */
+/* Transaction to ATB2DTF regs was not able to pass the woke access blocker */
 #define BUTTRESS_IRQ_ATB2DTF_AB_VIOLATION		BIT(10)
-/* Transaction to IS debug regs was not able to pass the access blocker */
+/* Transaction to IS debug regs was not able to pass the woke access blocker */
 #define BUTTRESS_IRQ_IS_DEBUG_AB_VIOLATION		BIT(11)
-/* Transaction to PS debug regs was not able to pass the access blocker */
+/* Transaction to PS debug regs was not able to pass the woke access blocker */
 #define BUTTRESS_IRQ_PS_DEBUG_AB_VIOLATION		BIT(12)
 /* Indicates timeout occurred waiting for a response from a target */
 #define BUTTRESS_IRQ_IB_CFG_NOC_TIMEOUT_IRQ		BIT(13)

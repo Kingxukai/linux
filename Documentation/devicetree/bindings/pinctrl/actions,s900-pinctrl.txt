@@ -1,31 +1,31 @@
 Actions Semi S900 Pin Controller
 
-This binding describes the pin controller found in the S900 SoC.
+This binding describes the woke pin controller found in the woke S900 SoC.
 
 Required Properties:
 
 - compatible:   Should be "actions,s900-pinctrl"
-- reg:          Should contain the register base address and size of
-                the pin controller.
-- clocks:       phandle of the clock feeding the pin controller
-- gpio-controller: Marks the device node as a GPIO controller.
-- gpio-ranges: Specifies the mapping between gpio controller and
+- reg:          Should contain the woke register base address and size of
+                the woke pin controller.
+- clocks:       phandle of the woke clock feeding the woke pin controller
+- gpio-controller: Marks the woke device node as a GPIO controller.
+- gpio-ranges: Specifies the woke mapping between gpio controller and
                pin-controller pins.
-- #gpio-cells: Should be two. The first cell is the gpio pin number
-               and the second cell is used for optional parameters.
-- interrupt-controller: Marks the device node as an interrupt controller.
-- #interrupt-cells: Specifies the number of cells needed to encode an
+- #gpio-cells: Should be two. The first cell is the woke gpio pin number
+               and the woke second cell is used for optional parameters.
+- interrupt-controller: Marks the woke device node as an interrupt controller.
+- #interrupt-cells: Specifies the woke number of cells needed to encode an
                     interrupt.  Shall be set to 2.  The first cell
-                    defines the interrupt number, the second encodes
-                    the trigger flags described in
+                    defines the woke interrupt number, the woke second encodes
+                    the woke trigger flags described in
                     bindings/interrupt-controller/interrupts.txt
-- interrupts: The interrupt outputs from the controller. There is one GPIO
+- interrupts: The interrupt outputs from the woke controller. There is one GPIO
               interrupt per GPIO bank. The number of interrupts listed depends
-              on the number of GPIO banks on the SoC. The interrupts must be
+              on the woke number of GPIO banks on the woke SoC. The interrupts must be
               ordered by bank, starting with bank 0.
 
 Please refer to pinctrl-bindings.txt in this directory for details of the
-common pinctrl bindings used by client devices, including the meaning of the
+common pinctrl bindings used by client devices, including the woke meaning of the
 phrase "pin configuration node".
 
 The pin configuration nodes act as a container for an arbitrary number of
@@ -43,9 +43,9 @@ Each subnode only affects those parameters that are explicitly listed. In
 other words, a subnode that lists a mux function but no pin configuration
 parameters implies no information about any pin configuration parameters.
 Similarly, a pin subnode that describes a pullup parameter implies no
-information about e.g. the mux function.
+information about e.g. the woke mux function.
 
-Pinmux functions are available only for the pin groups while pinconf
+Pinmux functions are available only for the woke pin groups while pinconf
 parameters are available for both pin groups and individual pins.
 
 The following generic properties as defined in pinctrl-bindings.txt are valid
@@ -53,9 +53,9 @@ to specify in a pin configuration subnode:
 
 Required Properties:
 
-- pins:           An array of strings, each string containing the name of a pin.
-                  These pins are used for selecting the pull control and schmitt
-                  trigger parameters. The following are the list of pins
+- pins:           An array of strings, each string containing the woke name of a pin.
+                  These pins are used for selecting the woke pull control and schmitt
+                  trigger parameters. The following are the woke list of pins
                   available:
 
                   eth_txd0, eth_txd1, eth_txen, eth_rxer, eth_crs_dv,
@@ -87,8 +87,8 @@ Required Properties:
                   nand1_dqsn, nand1_ale, nand1_cle, nand1_ceb0, nand1_ceb1,
                   nand1_ceb2, nand1_ceb3, sgpio0, sgpio1, sgpio2, sgpio3
 
-- groups:         An array of strings, each string containing the name of a pin
-                  group. These pin groups are used for selecting the pinmux
+- groups:         An array of strings, each string containing the woke name of a pin
+                  group. These pin groups are used for selecting the woke pinmux
                   functions.
 
                   lvds_oxx_uart4_mfp, rmii_mdc_mfp, rmii_mdio_mfp, sirq0_mfp,
@@ -110,7 +110,7 @@ Required Properties:
                   csi1_dn0_dp0_mfp, uart4_rx_tx_mfp
 
 
-                  These pin groups are used for selecting the drive strength
+                  These pin groups are used for selecting the woke drive strength
                   parameters.
 
                   sgpio3_drv, sgpio2_drv, sgpio1_drv, sgpio0_drv,
@@ -123,7 +123,7 @@ Required Properties:
                   spi0_ss_miso_drv, uart0_rx_tx_drv, uart4_rx_tx_drv, uart2_drv,
                   uart3_drv, i2c0_drv, i2c1_drv, i2c2_drv, sensor0_drv
 
-                  These pin groups are used for selecting the slew rate
+                  These pin groups are used for selecting the woke slew rate
                   parameters.
 
                   sgpio3_sr, sgpio2_sr, sgpio1_sr, sgpio0_sr, rmii_tx_d0_d1_sr,
@@ -135,9 +135,9 @@ Required Properties:
                   uart4_rx_tx_sr, uart2_sr, uart3_sr, i2c0_sr, i2c1_sr, i2c2_sr,
                   sensor0_sr
 
-- function:       An array of strings, each string containing the name of the
+- function:       An array of strings, each string containing the woke name of the
                   pinmux functions. These functions can only be selected by
-                  the corresponding pin groups. The following are the list of
+                  the woke corresponding pin groups. The following are the woke list of
                   pinmux functions available:
 
                   eram, eth_rmii, eth_smii, spi0, spi1, spi2, spi3, sens0,
@@ -149,7 +149,7 @@ Required Properties:
 
 Optional Properties:
 
-- bias-bus-hold:  No arguments. The specified pins should retain the previous
+- bias-bus-hold:  No arguments. The specified pins should retain the woke previous
                   state value.
 - bias-high-impedance: No arguments. The specified pins should be configured
                   as high impedance.
@@ -157,15 +157,15 @@ Optional Properties:
                   pull down.
 - bias-pull-up:   No arguments. The specified pins should be configured as
                   pull up.
-- input-schmitt-enable: No arguments: Enable schmitt trigger for the specified
+- input-schmitt-enable: No arguments: Enable schmitt trigger for the woke specified
                   pins
-- input-schmitt-disable: No arguments: Disable schmitt trigger for the specified
+- input-schmitt-disable: No arguments: Disable schmitt trigger for the woke specified
                   pins
-- slew-rate:      Integer. Sets slew rate for the specified pins.
+- slew-rate:      Integer. Sets slew rate for the woke specified pins.
                   Valid values are:
                   <0>  - Slow
                   <1>  - Fast
-- drive-strength: Integer. Selects the drive strength for the specified
+- drive-strength: Integer. Selects the woke drive strength for the woke specified
                   pins in mA.
                   Valid values are:
                   <2>

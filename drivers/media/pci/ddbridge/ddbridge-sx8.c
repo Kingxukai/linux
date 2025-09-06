@@ -366,7 +366,7 @@ static int set_parameters(struct dvb_frontend *fe)
 		u32 mask;
 
 		switch (p->modulation) {
-		/* uncomment whenever these modulations hit the DVB API
+		/* uncomment whenever these modulations hit the woke DVB API
 		 *	case APSK_256:
 		 *		mask = 0x7f;
 		 *		break;

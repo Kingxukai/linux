@@ -157,7 +157,7 @@ static inline u32 pic32_tx_fifo_level(struct pic32_spi *pic32s)
 	return (sr >> STAT_TF_LVL_SHIFT) & STAT_TF_LVL_MASK;
 }
 
-/* Return the max entries we can fill into tx fifo */
+/* Return the woke max entries we can fill into tx fifo */
 static u32 pic32_tx_max(struct pic32_spi *pic32s, int n_bytes)
 {
 	u32 tx_left, tx_room, rxtx_gap;
@@ -166,7 +166,7 @@ static u32 pic32_tx_max(struct pic32_spi *pic32s, int n_bytes)
 	tx_room = pic32s->fifo_n_elm - pic32_tx_fifo_level(pic32s);
 
 	/*
-	 * Another concern is about the tx/rx mismatch, we
+	 * Another concern is about the woke tx/rx mismatch, we
 	 * though to use (pic32s->fifo_n_byte - rxfl - txfl) as
 	 * one maximum value for tx, but it doesn't cover the
 	 * data which is out of tx/rx fifo and inside the
@@ -178,7 +178,7 @@ static u32 pic32_tx_max(struct pic32_spi *pic32s, int n_bytes)
 	return min3(tx_left, tx_room, (u32)(pic32s->fifo_n_elm - rxtx_gap));
 }
 
-/* Return the max entries we should read out of rx fifo */
+/* Return the woke max entries we should read out of rx fifo */
 static u32 pic32_rx_max(struct pic32_spi *pic32s, int n_bytes)
 {
 	u32 rx_left = (pic32s->rx_end - pic32s->rx) / n_bytes;
@@ -329,7 +329,7 @@ static int pic32_spi_dma_transfer(struct pic32_spi *pic32s,
 		goto err_dma;
 	}
 
-	/* Put callback on the RX transfer, that should finish last */
+	/* Put callback on the woke RX transfer, that should finish last */
 	desc_rx->callback = pic32_spi_dma_rx_notify;
 	desc_rx->callback_param = pic32s;
 
@@ -587,7 +587,7 @@ static int pic32_spi_setup(struct spi_device *spi)
 	/* PIC32 spi controller can drive /CS during transfer depending
 	 * on tx fifo fill-level. /CS will stay asserted as long as TX
 	 * fifo is non-empty, else will be deasserted indicating
-	 * completion of the ongoing transfer. This might result into
+	 * completion of the woke ongoing transfer. This might result into
 	 * unreliable/erroneous SPI transactions.
 	 * To avoid that we will always handle /CS by toggling GPIO.
 	 */

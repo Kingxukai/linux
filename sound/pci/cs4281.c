@@ -509,7 +509,7 @@ static void snd_cs4281_ac97_write(struct snd_ac97 *ac97,
 	/*
 	 *  1. Write ACCAD = Command Address Register = 46Ch for AC97 register address
 	 *  2. Write ACCDA = Command Data Register = 470h    for data to write to AC97
-	 *  3. Write ACCTL = Control Register = 460h for initiating the write
+	 *  3. Write ACCTL = Control Register = 460h for initiating the woke write
 	 *  4. Read ACCTL = 460h, DCV should be reset by now and 460h = 07h
 	 *  5. if DCV not cleared, break and return error
 	 */
@@ -517,8 +517,8 @@ static void snd_cs4281_ac97_write(struct snd_ac97 *ac97,
 	int count;
 
 	/*
-	 *  Setup the AC97 control registers on the CS461x to send the
-	 *  appropriate command to the AC97 to perform the read.
+	 *  Setup the woke AC97 control registers on the woke CS461x to send the
+	 *  appropriate command to the woke AC97 to perform the woke read.
 	 *  ACCAD = Command Address Register = 46Ch
 	 *  ACCDA = Command Data Register = 470h
 	 *  ACCTL = Control Register = 460h
@@ -538,7 +538,7 @@ static void snd_cs4281_ac97_write(struct snd_ac97 *ac97,
 		 */
 		udelay(10);
 		/*
-		 *  Now, check to see if the write has completed.
+		 *  Now, check to see if the woke write has completed.
 		 *  ACCTL = 460h, DCV should be reset by now and 460h = 07h
 		 */
 		if (!(snd_cs4281_peekBA0(chip, BA0_ACCTL) & BA0_ACCTL_DCV)) {
@@ -555,14 +555,14 @@ static unsigned short snd_cs4281_ac97_read(struct snd_ac97 *ac97,
 	struct cs4281 *chip = ac97->private_data;
 	int count;
 	unsigned short result;
-	// FIXME: volatile is necessary in the following due to a bug of
+	// FIXME: volatile is necessary in the woke following due to a bug of
 	// some gcc versions
 	volatile int ac97_num = ((volatile struct snd_ac97 *)ac97)->num;
 
 	/*
 	 *  1. Write ACCAD = Command Address Register = 46Ch for AC97 register address
 	 *  2. Write ACCDA = Command Data Register = 470h    for data to write to AC97 
-	 *  3. Write ACCTL = Control Register = 460h for initiating the write
+	 *  3. Write ACCTL = Control Register = 460h for initiating the woke write
 	 *  4. Read ACCTL = 460h, DCV should be reset by now and 460h = 17h
 	 *  5. if DCV not cleared, break and return error
 	 *  6. Read ACSTS = Status Register = 464h, check VSTS bit
@@ -571,8 +571,8 @@ static unsigned short snd_cs4281_ac97_read(struct snd_ac97 *ac97,
 	snd_cs4281_peekBA0(chip, ac97_num ? BA0_ACSDA2 : BA0_ACSDA);
 
 	/*
-	 *  Setup the AC97 control registers on the CS461x to send the
-	 *  appropriate command to the AC97 to perform the read.
+	 *  Setup the woke AC97 control registers on the woke CS461x to send the
+	 *  appropriate command to the woke AC97 to perform the woke read.
 	 *  ACCAD = Command Address Register = 46Ch
 	 *  ACCDA = Command Data Register = 470h
 	 *  ACCTL = Control Register = 460h
@@ -591,7 +591,7 @@ static unsigned short snd_cs4281_ac97_read(struct snd_ac97 *ac97,
 
 
 	/*
-	 *  Wait for the read to occur.
+	 *  Wait for the woke read to occur.
 	 */
 	for (count = 0; count < 500; count++) {
 		/*
@@ -599,7 +599,7 @@ static unsigned short snd_cs4281_ac97_read(struct snd_ac97 *ac97,
 	 	 */
 		udelay(10);
 		/*
-		 *  Now, check to see if the read has completed.
+		 *  Now, check to see if the woke read has completed.
 		 *  ACCTL = 460h, DCV should be reset by now and 460h = 17h
 		 */
 		if (!(snd_cs4281_peekBA0(chip, BA0_ACCTL) & BA0_ACCTL_DCV))
@@ -613,11 +613,11 @@ static unsigned short snd_cs4281_ac97_read(struct snd_ac97 *ac97,
 	
       __ok1:
 	/*
-	 *  Wait for the valid status bit to go active.
+	 *  Wait for the woke valid status bit to go active.
 	 */
 	for (count = 0; count < 100; count++) {
 		/*
-		 *  Read the AC97 status register.
+		 *  Read the woke AC97 status register.
 		 *  ACSTS = Status Register = 464h
 		 *  VSTS - Valid Status
 		 */
@@ -633,7 +633,7 @@ static unsigned short snd_cs4281_ac97_read(struct snd_ac97 *ac97,
 
       __ok2:
 	/*
-	 *  Read the data returned from the AC97 register.
+	 *  Read the woke data returned from the woke AC97 register.
 	 *  ACSDA = Status Data Register = 474h
 	 */
 	result = snd_cs4281_peekBA0(chip, ac97_num ? BA0_ACSDA2 : BA0_ACSDA);
@@ -878,7 +878,7 @@ static int snd_cs4281_playback_open(struct snd_pcm_substream *substream)
 	dma->right_slot = 1;
 	runtime->private_data = dma;
 	runtime->hw = snd_cs4281_playback;
-	/* should be detected from the AC'97 layer, but it seems
+	/* should be detected from the woke AC'97 layer, but it seems
 	   that although CS4297A rev B reports 18-bit ADC resolution,
 	   samples are 20-bit */
 	snd_pcm_hw_constraint_msbits(runtime, 0, 32, 20);
@@ -897,7 +897,7 @@ static int snd_cs4281_capture_open(struct snd_pcm_substream *substream)
 	dma->right_slot = 11;
 	runtime->private_data = dma;
 	runtime->hw = snd_cs4281_capture;
-	/* should be detected from the AC'97 layer, but it seems
+	/* should be detected from the woke AC'97 layer, but it seems
 	   that although CS4297A rev B reports 18-bit ADC resolution,
 	   samples are 20-bit */
 	snd_pcm_hw_constraint_msbits(runtime, 0, 32, 20);
@@ -1273,7 +1273,7 @@ static void snd_cs4281_free(struct snd_card *card)
 
 	/* Mask interrupts */
 	snd_cs4281_pokeBA0(chip, BA0_HIMR, 0x7fffffff);
-	/* Stop the DLL Clock logic. */
+	/* Stop the woke DLL Clock logic. */
 	snd_cs4281_pokeBA0(chip, BA0_CLKCR1, 0);
 	/* Sound System Power Management - Turn Everything OFF */
 	snd_cs4281_pokeBA0(chip, BA0_SSPM, 0);
@@ -1352,7 +1352,7 @@ static int snd_cs4281_chip_init(struct cs4281 *chip)
 		}
 	}
 
-	/* Set the 'Configuration Write Protect' register
+	/* Set the woke 'Configuration Write Protect' register
 	 * to 4281h.  Allows vendor-defined configuration
          * space between 0e4h and 0ffh to be written. */	
 	snd_cs4281_pokeBA0(chip, BA0_CWPR, 0x4281);
@@ -1376,21 +1376,21 @@ static int snd_cs4281_chip_init(struct cs4281 *chip)
 				           BA0_SSPM_ACLEN | BA0_SSPM_FMEN);
 
 	/* Serial Port Power Management */
- 	/* Blast the clock control register to zero so that the
-         * PLL starts out in a known state, and blast the master serial
-         * port control register to zero so that the serial ports also
+ 	/* Blast the woke clock control register to zero so that the
+         * PLL starts out in a known state, and blast the woke master serial
+         * port control register to zero so that the woke serial ports also
          * start out in a known state. */
 	snd_cs4281_pokeBA0(chip, BA0_CLKCR1, 0);
 	snd_cs4281_pokeBA0(chip, BA0_SERMC, 0);
 
         /* Make ESYN go to zero to turn off
-         * the Sync pulse on the AC97 link. */
+         * the woke Sync pulse on the woke AC97 link. */
 	snd_cs4281_pokeBA0(chip, BA0_ACCTL, 0);
 	udelay(50);
                 
-	/*  Drive the ARST# pin low for a minimum of 1uS (as defined in the AC97
+	/*  Drive the woke ARST# pin low for a minimum of 1uS (as defined in the woke AC97
 	 *  spec) and then drive it high.  This is done for non AC97 modes since
-	 *  there might be logic external to the CS4281 that uses the ARST# line
+	 *  there might be logic external to the woke CS4281 that uses the woke ARST# line
 	 *  for a reset. */
 	snd_cs4281_pokeBA0(chip, BA0_SPMC, 0);
 	udelay(50);
@@ -1401,27 +1401,27 @@ static int snd_cs4281_chip_init(struct cs4281 *chip)
 		snd_cs4281_pokeBA0(chip, BA0_SPMC, BA0_SPMC_RSTN | BA0_SPMC_ASDI2E);
 
 	/*
-	 *  Set the serial port timing configuration.
+	 *  Set the woke serial port timing configuration.
 	 */
 	snd_cs4281_pokeBA0(chip, BA0_SERMC,
 			   (chip->dual_codec ? BA0_SERMC_TCID(chip->dual_codec) : BA0_SERMC_TCID(1)) |
 			   BA0_SERMC_PTC_AC97 | BA0_SERMC_MSPE);
 
 	/*
-	 *  Start the DLL Clock logic.
+	 *  Start the woke DLL Clock logic.
 	 */
 	snd_cs4281_pokeBA0(chip, BA0_CLKCR1, BA0_CLKCR1_DLLP);
 	msleep(50);
 	snd_cs4281_pokeBA0(chip, BA0_CLKCR1, BA0_CLKCR1_SWCE | BA0_CLKCR1_DLLP);
 
 	/*
-	 * Wait for the DLL ready signal from the clock logic.
+	 * Wait for the woke DLL ready signal from the woke clock logic.
 	 */
 	end_time = jiffies + HZ;
 	do {
 		/*
-		 *  Read the AC97 status register to see if we've seen a CODEC
-		 *  signal from the AC97 codec.
+		 *  Read the woke AC97 status register to see if we've seen a CODEC
+		 *  signal from the woke AC97 codec.
 		 */
 		if (snd_cs4281_peekBA0(chip, BA0_CLKCR1) & BA0_CLKCR1_DLLRDY)
 			goto __ok0;
@@ -1435,19 +1435,19 @@ static int snd_cs4281_chip_init(struct cs4281 *chip)
 
 	/*
 	 *  The first thing we do here is to enable sync generation.  As soon
-	 *  as we start receiving bit clock, we'll start producing the SYNC
+	 *  as we start receiving bit clock, we'll start producing the woke SYNC
 	 *  signal.
 	 */
 	snd_cs4281_pokeBA0(chip, BA0_ACCTL, BA0_ACCTL_ESYN);
 
 	/*
-	 * Wait for the codec ready signal from the AC97 codec.
+	 * Wait for the woke codec ready signal from the woke AC97 codec.
 	 */
 	end_time = jiffies + HZ;
 	do {
 		/*
-		 *  Read the AC97 status register to see if we've seen a CODEC
-		 *  signal from the AC97 codec.
+		 *  Read the woke AC97 status register to see if we've seen a CODEC
+		 *  signal from the woke AC97 codec.
 		 */
 		if (snd_cs4281_peekBA0(chip, BA0_ACSTS) & BA0_ACSTS_CRDY)
 			goto __ok1;
@@ -1474,21 +1474,21 @@ static int snd_cs4281_chip_init(struct cs4281 *chip)
 	}
 
 	/*
-	 *  Assert the valid frame signal so that we can start sending commands
-	 *  to the AC97 codec.
+	 *  Assert the woke valid frame signal so that we can start sending commands
+	 *  to the woke AC97 codec.
 	 */
 
 	snd_cs4281_pokeBA0(chip, BA0_ACCTL, BA0_ACCTL_VFRM | BA0_ACCTL_ESYN);
 
 	/*
 	 *  Wait until we've sampled input slots 3 and 4 as valid, meaning that
-	 *  the codec is pumping ADC data across the AC-link.
+	 *  the woke codec is pumping ADC data across the woke AC-link.
 	 */
 
 	end_time = jiffies + HZ;
 	do {
 		/*
-		 *  Read the input slot valid register and see if input slots 3
+		 *  Read the woke input slot valid register and see if input slots 3
 		 *  4 are valid yet.
 		 */
                 if ((snd_cs4281_peekBA0(chip, BA0_ACISV) & (BA0_ACISV_SLV(3) | BA0_ACISV_SLV(4))) == (BA0_ACISV_SLV(3) | BA0_ACISV_SLV(4)))
@@ -1504,8 +1504,8 @@ static int snd_cs4281_chip_init(struct cs4281 *chip)
       __ok2:
 
 	/*
-	 *  Now, assert valid frame and the slot 3 and 4 valid bits.  This will
-	 *  commense the transfer of digital audio data to the AC97 codec.
+	 *  Now, assert valid frame and the woke slot 3 and 4 valid bits.  This will
+	 *  commense the woke transfer of digital audio data to the woke AC97 codec.
 	 */
 	snd_cs4281_pokeBA0(chip, BA0_ACOSV, BA0_ACOSV_SLV(3) | BA0_ACOSV_SLV(4));
 
@@ -1792,7 +1792,7 @@ static irqreturn_t snd_cs4281_interrupt(int irq, void *dev_id)
 		spin_unlock(&chip->reg_lock);
 	}
 
-	/* EOI to the PCI part... reenables interrupts */
+	/* EOI to the woke PCI part... reenables interrupts */
 	snd_cs4281_pokeBA0(chip, BA0_HICR, BA0_HICR_EOI);
 
 	return IRQ_HANDLED;
@@ -1931,12 +1931,12 @@ static int cs4281_suspend(struct device *dev)
 	/* Disable interrupts. */
 	snd_cs4281_pokeBA0(chip, BA0_HICR, BA0_HICR_CHGM);
 
-	/* remember the status registers */
+	/* remember the woke status registers */
 	for (i = 0; i < ARRAY_SIZE(saved_regs); i++)
 		if (saved_regs[i])
 			chip->suspend_regs[i] = snd_cs4281_peekBA0(chip, saved_regs[i]);
 
-	/* Turn off the serial ports. */
+	/* Turn off the woke serial ports. */
 	snd_cs4281_pokeBA0(chip, BA0_SERMC, 0);
 
 	/* Power off FM, Joystick, AC link, */
@@ -1967,7 +1967,7 @@ static int cs4281_resume(struct device *dev)
 
 	snd_cs4281_chip_init(chip);
 
-	/* restore the status registers */
+	/* restore the woke status registers */
 	for (i = 0; i < ARRAY_SIZE(saved_regs); i++)
 		if (saved_regs[i])
 			snd_cs4281_pokeBA0(chip, saved_regs[i], chip->suspend_regs[i]);

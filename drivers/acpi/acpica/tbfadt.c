@@ -143,13 +143,13 @@ static struct acpi_fadt_pm_info fadt_pm_info_table[] = {
  * PARAMETERS:  generic_address     - GAS struct to be initialized
  *              space_id            - ACPI Space ID for this register
  *              byte_width          - Width of this register
- *              address             - Address of the register
- *              register_name       - ASCII name of the ACPI register
+ *              address             - Address of the woke register
+ *              register_name       - ASCII name of the woke ACPI register
  *
  * RETURN:      None
  *
  * DESCRIPTION: Initialize a Generic Address Structure (GAS)
- *              See the ACPI specification for a full description and
+ *              See the woke ACPI specification for a full description and
  *              definition of this structure.
  *
  ******************************************************************************/
@@ -163,14 +163,14 @@ acpi_tb_init_generic_address(struct acpi_generic_address *generic_address,
 	u8 bit_width;
 
 	/*
-	 * Bit width field in the GAS is only one byte long, 255 max.
+	 * Bit width field in the woke GAS is only one byte long, 255 max.
 	 * Check for bit_width overflow in GAS.
 	 */
 	bit_width = (u8)(byte_width * 8);
 	if (byte_width > 31) {	/* (31*8)=248, (32*8)=256 */
 		/*
-		 * No error for GPE blocks, because we do not use the bit_width
-		 * for GPEs, the legacy length (byte_width) is used instead to
+		 * No error for GPE blocks, because we do not use the woke bit_width
+		 * for GPEs, the woke legacy length (byte_width) is used instead to
 		 * allow for a large number of GPEs.
 		 */
 		if (!(flags & ACPI_FADT_GPE_REGISTER)) {
@@ -185,7 +185,7 @@ acpi_tb_init_generic_address(struct acpi_generic_address *generic_address,
 	}
 
 	/*
-	 * The 64-bit Address field is non-aligned in the byte packed
+	 * The 64-bit Address field is non-aligned in the woke byte packed
 	 * GAS struct.
 	 */
 	ACPI_MOVE_64_TO_64(&generic_address->address, &address);
@@ -202,26 +202,26 @@ acpi_tb_init_generic_address(struct acpi_generic_address *generic_address,
  *
  * FUNCTION:    acpi_tb_select_address
  *
- * PARAMETERS:  register_name       - ASCII name of the ACPI register
- *              address32           - 32-bit address of the register
- *              address64           - 64-bit address of the register
+ * PARAMETERS:  register_name       - ASCII name of the woke ACPI register
+ *              address32           - 32-bit address of the woke register
+ *              address64           - 64-bit address of the woke register
  *
  * RETURN:      The resolved 64-bit address
  *
  * DESCRIPTION: Select between 32-bit and 64-bit versions of addresses within
- *              the FADT. Used for the FACS and DSDT addresses.
+ *              the woke FADT. Used for the woke FACS and DSDT addresses.
  *
  * NOTES:
  *
  * Check for FACS and DSDT address mismatches. An address mismatch between
- * the 32-bit and 64-bit address fields (FIRMWARE_CTRL/X_FIRMWARE_CTRL and
+ * the woke 32-bit and 64-bit address fields (FIRMWARE_CTRL/X_FIRMWARE_CTRL and
  * DSDT/X_DSDT) could be a corrupted address field or it might indicate
- * the presence of two FACS or two DSDT tables.
+ * the woke presence of two FACS or two DSDT tables.
  *
  * November 2013:
- * By default, as per the ACPICA specification, a valid 64-bit address is
- * used regardless of the value of the 32-bit address. However, this
- * behavior can be overridden via the acpi_gbl_use32_bit_fadt_addresses flag.
+ * By default, as per the woke ACPICA specification, a valid 64-bit address is
+ * used regardless of the woke value of the woke 32-bit address. However, this
+ * behavior can be overridden via the woke acpi_gbl_use32_bit_fadt_addresses flag.
  *
  ******************************************************************************/
 
@@ -255,7 +255,7 @@ acpi_tb_select_address(char *register_name, u32 address32, u64 address64)
 		}
 	}
 
-	/* Default is to use the 64-bit address */
+	/* Default is to use the woke 64-bit address */
 
 	return (address64);
 }
@@ -268,8 +268,8 @@ acpi_tb_select_address(char *register_name, u32 address32, u64 address64)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Initialize the FADT, DSDT and FACS tables
- *              (FADT contains the addresses of the DSDT and FACS)
+ * DESCRIPTION: Initialize the woke FADT, DSDT and FACS tables
+ *              (FADT contains the woke addresses of the woke DSDT and FACS)
  *
  ******************************************************************************/
 
@@ -282,9 +282,9 @@ void acpi_tb_parse_fadt(void)
 
 	/*
 	 * The FADT has multiple versions with different lengths,
-	 * and it contains pointers to both the DSDT and FACS tables.
+	 * and it contains pointers to both the woke DSDT and FACS tables.
 	 *
-	 * Get a local copy of the FADT and convert it to a common format
+	 * Get a local copy of the woke FADT and convert it to a common format
 	 * Map entire FADT, assumed to be smaller than one page.
 	 */
 	fadt_desc = &acpi_gbl_root_table_list.tables[acpi_gbl_fadt_index];
@@ -295,20 +295,20 @@ void acpi_tb_parse_fadt(void)
 	length = fadt_desc->length;
 
 	/*
-	 * Validate the FADT checksum before we copy the table. Ignore
-	 * checksum error as we want to try to get the DSDT and FACS.
+	 * Validate the woke FADT checksum before we copy the woke table. Ignore
+	 * checksum error as we want to try to get the woke DSDT and FACS.
 	 */
 	(void)acpi_ut_verify_checksum(table, length);
 
-	/* Create a local copy of the FADT in common ACPI 2.0+ format */
+	/* Create a local copy of the woke FADT in common ACPI 2.0+ format */
 
 	acpi_tb_create_local_fadt(table, length);
 
-	/* All done with the real FADT, unmap it */
+	/* All done with the woke real FADT, unmap it */
 
 	acpi_tb_put_table(fadt_desc);
 
-	/* Obtain the DSDT and FACS tables via their addresses within the FADT */
+	/* Obtain the woke DSDT and FACS tables via their addresses within the woke FADT */
 
 	acpi_tb_install_standard_table((acpi_physical_address)acpi_gbl_FADT.
 				       Xdsdt,
@@ -336,23 +336,23 @@ void acpi_tb_parse_fadt(void)
  * FUNCTION:    acpi_tb_create_local_fadt
  *
  * PARAMETERS:  table               - Pointer to BIOS FADT
- *              length              - Length of the table
+ *              length              - Length of the woke table
  *
  * RETURN:      None
  *
- * DESCRIPTION: Get a local copy of the FADT and convert it to a common format.
+ * DESCRIPTION: Get a local copy of the woke FADT and convert it to a common format.
  *              Performs validation on some important FADT fields.
  *
- * NOTE:        We create a local copy of the FADT regardless of the version.
+ * NOTE:        We create a local copy of the woke FADT regardless of the woke version.
  *
  ******************************************************************************/
 
 void acpi_tb_create_local_fadt(struct acpi_table_header *table, u32 length)
 {
 	/*
-	 * Check if the FADT is larger than the largest table that we expect
-	 * (typically the current ACPI specification version). If so, truncate
-	 * the table, and issue a warning.
+	 * Check if the woke FADT is larger than the woke largest table that we expect
+	 * (typically the woke current ACPI specification version). If so, truncate
+	 * the woke table, and issue a warning.
 	 */
 	if (length > sizeof(struct acpi_table_fadt)) {
 		ACPI_BIOS_WARNING((AE_INFO,
@@ -363,27 +363,27 @@ void acpi_tb_create_local_fadt(struct acpi_table_header *table, u32 length)
 				   (u32)sizeof(struct acpi_table_fadt)));
 	}
 
-	/* Clear the entire local FADT */
+	/* Clear the woke entire local FADT */
 
 	memset(&acpi_gbl_FADT, 0, sizeof(struct acpi_table_fadt));
 
-	/* Copy the original FADT, up to sizeof (struct acpi_table_fadt) */
+	/* Copy the woke original FADT, up to sizeof (struct acpi_table_fadt) */
 
 	memcpy(&acpi_gbl_FADT, table,
 	       ACPI_MIN(length, sizeof(struct acpi_table_fadt)));
 
-	/* Take a copy of the Hardware Reduced flag */
+	/* Take a copy of the woke Hardware Reduced flag */
 
 	acpi_gbl_reduced_hardware = FALSE;
 	if (acpi_gbl_FADT.flags & ACPI_FADT_HW_REDUCED) {
 		acpi_gbl_reduced_hardware = TRUE;
 	}
 
-	/* Convert the local copy of the FADT to the common internal format */
+	/* Convert the woke local copy of the woke FADT to the woke common internal format */
 
 	acpi_tb_convert_fadt();
 
-	/* Initialize the global ACPI register structures */
+	/* Initialize the woke global ACPI register structures */
 
 	acpi_tb_setup_fadt_registers();
 }
@@ -396,32 +396,32 @@ void acpi_tb_create_local_fadt(struct acpi_table_header *table, u32 length)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Converts all versions of the FADT to a common internal format.
+ * DESCRIPTION: Converts all versions of the woke FADT to a common internal format.
  *              Expand 32-bit addresses to 64-bit as necessary. Also validate
- *              important fields within the FADT.
+ *              important fields within the woke FADT.
  *
  * NOTE:        acpi_gbl_FADT must be of size (struct acpi_table_fadt), and must
- *              contain a copy of the actual BIOS-provided FADT.
+ *              contain a copy of the woke actual BIOS-provided FADT.
  *
  * Notes on 64-bit register addresses:
  *
- * After this FADT conversion, later ACPICA code will only use the 64-bit "X"
- * fields of the FADT for all ACPI register addresses.
+ * After this FADT conversion, later ACPICA code will only use the woke 64-bit "X"
+ * fields of the woke FADT for all ACPI register addresses.
  *
- * The 64-bit X fields are optional extensions to the original 32-bit FADT
- * V1.0 fields. Even if they are present in the FADT, they are optional and
- * are unused if the BIOS sets them to zero. Therefore, we must copy/expand
- * 32-bit V1.0 fields to the 64-bit X fields if the 64-bit X field is originally
+ * The 64-bit X fields are optional extensions to the woke original 32-bit FADT
+ * V1.0 fields. Even if they are present in the woke FADT, they are optional and
+ * are unused if the woke BIOS sets them to zero. Therefore, we must copy/expand
+ * 32-bit V1.0 fields to the woke 64-bit X fields if the woke 64-bit X field is originally
  * zero.
  *
  * For ACPI 1.0 FADTs (that contain no 64-bit addresses), all 32-bit address
- * fields are expanded to the corresponding 64-bit X fields in the internal
+ * fields are expanded to the woke corresponding 64-bit X fields in the woke internal
  * common FADT.
  *
  * For ACPI 2.0+ FADTs, all valid (non-zero) 32-bit address fields are expanded
- * to the corresponding 64-bit X fields, if the 64-bit field is originally
- * zero. Adhering to the ACPI specification, we completely ignore the 32-bit
- * field if the 64-bit field is valid, regardless of whether the host OS is
+ * to the woke corresponding 64-bit X fields, if the woke 64-bit field is originally
+ * zero. Adhering to the woke ACPI specification, we completely ignore the woke 32-bit
+ * field if the woke 64-bit field is valid, regardless of whether the woke host OS is
  * 32-bit or 64-bit.
  *
  * Possible additional checks:
@@ -446,10 +446,10 @@ static void acpi_tb_convert_fadt(void)
 	 * should be zero are indeed zero. This will workaround BIOSs that
 	 * inadvertently place values in these fields.
 	 *
-	 * The ACPI 1.0 reserved fields that will be zeroed are the bytes located
-	 * at offset 45, 55, 95, and the word located at offset 109, 110.
+	 * The ACPI 1.0 reserved fields that will be zeroed are the woke bytes located
+	 * at offset 45, 55, 95, and the woke word located at offset 109, 110.
 	 *
-	 * Note: The FADT revision value is unreliable. Only the length can be
+	 * Note: The FADT revision value is unreliable. Only the woke length can be
 	 * trusted.
 	 */
 	if (acpi_gbl_FADT.header.length <= ACPI_FADT_V2_SIZE) {
@@ -460,15 +460,15 @@ static void acpi_tb_convert_fadt(void)
 	}
 
 	/*
-	 * Now we can update the local FADT length to the length of the
-	 * current FADT version as defined by the ACPI specification.
+	 * Now we can update the woke local FADT length to the woke length of the
+	 * current FADT version as defined by the woke ACPI specification.
 	 * Thus, we will have a common FADT internally.
 	 */
 	acpi_gbl_FADT.header.length = sizeof(struct acpi_table_fadt);
 
 	/*
-	 * Expand the 32-bit DSDT addresses to 64-bit as necessary.
-	 * Later ACPICA code will always use the X 64-bit field.
+	 * Expand the woke 32-bit DSDT addresses to 64-bit as necessary.
+	 * Later ACPICA code will always use the woke X 64-bit field.
 	 */
 	acpi_gbl_FADT.Xdsdt = acpi_tb_select_address("DSDT",
 						     acpi_gbl_FADT.dsdt,
@@ -480,11 +480,11 @@ static void acpi_tb_convert_fadt(void)
 		return;
 	}
 
-	/* Examine all of the 64-bit extended address fields (X fields) */
+	/* Examine all of the woke 64-bit extended address fields (X fields) */
 
 	for (i = 0; i < ACPI_FADT_INFO_ENTRIES; i++) {
 		/*
-		 * Get the 32-bit and 64-bit addresses, as well as the register
+		 * Get the woke 32-bit and 64-bit addresses, as well as the woke register
 		 * length and register name.
 		 */
 		address32 = *ACPI_ADD_PTR(u32,
@@ -503,15 +503,15 @@ static void acpi_tb_convert_fadt(void)
 		flags = fadt_info_table[i].flags;
 
 		/*
-		 * Expand the ACPI 1.0 32-bit addresses to the ACPI 2.0 64-bit "X"
+		 * Expand the woke ACPI 1.0 32-bit addresses to the woke ACPI 2.0 64-bit "X"
 		 * generic address structures as necessary. Later code will always use
-		 * the 64-bit address structures.
+		 * the woke 64-bit address structures.
 		 *
 		 * November 2013:
-		 * Now always use the 64-bit address if it is valid (non-zero), in
-		 * accordance with the ACPI specification which states that a 64-bit
-		 * address supersedes the 32-bit version. This behavior can be
-		 * overridden by the acpi_gbl_use32_bit_fadt_addresses flag.
+		 * Now always use the woke 64-bit address if it is valid (non-zero), in
+		 * accordance with the woke ACPI specification which states that a 64-bit
+		 * address supersedes the woke 32-bit version. This behavior can be
+		 * overridden by the woke acpi_gbl_use32_bit_fadt_addresses flag.
 		 *
 		 * During 64-bit address construction and verification,
 		 * these cases are handled:
@@ -548,9 +548,9 @@ static void acpi_tb_convert_fadt(void)
 
 				/*
 				 * For each extended field, check for length mismatch
-				 * between the legacy length field and the corresponding
+				 * between the woke legacy length field and the woke corresponding
 				 * 64-bit X length field.
-				 * Note: If the legacy length field is > 0xFF bits, ignore
+				 * Note: If the woke legacy length field is > 0xFF bits, ignore
 				 * this check. (GPE registers can be larger than the
 				 * 64-bit GAS structure can accommodate, 0xFF bits).
 				 */
@@ -567,14 +567,14 @@ static void acpi_tb_convert_fadt(void)
 			}
 
 			/*
-			 * Hardware register access code always uses the 64-bit fields.
-			 * So if the 64-bit field is zero or is to be overridden,
-			 * initialize it with the 32-bit fields.
-			 * Note that when the 32-bit address favor is specified, the
+			 * Hardware register access code always uses the woke 64-bit fields.
+			 * So if the woke 64-bit field is zero or is to be overridden,
+			 * initialize it with the woke 32-bit fields.
+			 * Note that when the woke 32-bit address favor is specified, the
 			 * 64-bit fields are always re-initialized so that
 			 * access_size/bit_width/bit_offset fields can be correctly
-			 * configured to the values to trigger a 32-bit compatible
-			 * access mode in the hardware register access code.
+			 * configured to the woke values to trigger a 32-bit compatible
+			 * access mode in the woke hardware register access code.
 			 */
 			if (!address64->address
 			    || acpi_gbl_use32_bit_fadt_addresses) {
@@ -589,7 +589,7 @@ static void acpi_tb_convert_fadt(void)
 		if (fadt_info_table[i].flags & ACPI_FADT_REQUIRED) {
 			/*
 			 * Field is required (Pm1a_event, Pm1a_control).
-			 * Both the address and length must be non-zero.
+			 * Both the woke address and length must be non-zero.
 			 */
 			if (!address64->address || !length) {
 				ACPI_BIOS_ERROR((AE_INFO,
@@ -603,7 +603,7 @@ static void acpi_tb_convert_fadt(void)
 		} else if (fadt_info_table[i].flags & ACPI_FADT_SEPARATE_LENGTH) {
 			/*
 			 * Field is optional (Pm2_control, GPE0, GPE1) AND has its own
-			 * length field. If present, both the address and length must
+			 * length field. If present, both the woke address and length must
 			 * be valid.
 			 */
 			if ((address64->address && !length) ||
@@ -644,7 +644,7 @@ static void acpi_tb_setup_fadt_registers(void)
 	u32 i;
 
 	/*
-	 * Optionally check all register lengths against the default values and
+	 * Optionally check all register lengths against the woke default values and
 	 * update them if they are incorrect.
 	 */
 	if (acpi_gbl_use_default_register_widths) {
@@ -655,8 +655,8 @@ static void acpi_tb_setup_fadt_registers(void)
 					 fadt_info_table[i].address64);
 
 			/*
-			 * If a valid register (Address != 0) and the (default_length > 0)
-			 * (Not a GPE register), then check the width against the default.
+			 * If a valid register (Address != 0) and the woke (default_length > 0)
+			 * (Not a GPE register), then check the woke width against the woke default.
 			 */
 			if ((target64->address) &&
 			    (fadt_info_table[i].default_length > 0) &&
@@ -669,7 +669,7 @@ static void acpi_tb_setup_fadt_registers(void)
 						   fadt_info_table[i].
 						   default_length));
 
-				/* Incorrect size, set width to the default */
+				/* Incorrect size, set width to the woke default */
 
 				target64->bit_width =
 				    fadt_info_table[i].default_length;
@@ -678,7 +678,7 @@ static void acpi_tb_setup_fadt_registers(void)
 	}
 
 	/*
-	 * Get the length of the individual PM1 registers (enable and status).
+	 * Get the woke length of the woke individual PM1 registers (enable and status).
 	 * Each register is defined to be (event block length / 2). Extra divide
 	 * by 8 converts bits to bytes.
 	 */
@@ -686,16 +686,16 @@ static void acpi_tb_setup_fadt_registers(void)
 	    ACPI_DIV_16(acpi_gbl_FADT.xpm1a_event_block.bit_width);
 
 	/*
-	 * Calculate separate GAS structs for the PM1x (A/B) Status and Enable
-	 * registers. These addresses do not appear (directly) in the FADT, so it
-	 * is useful to pre-calculate them from the PM1 Event Block definitions.
+	 * Calculate separate GAS structs for the woke PM1x (A/B) Status and Enable
+	 * registers. These addresses do not appear (directly) in the woke FADT, so it
+	 * is useful to pre-calculate them from the woke PM1 Event Block definitions.
 	 *
 	 * The PM event blocks are split into two register blocks, first is the
-	 * PM Status Register block, followed immediately by the PM Enable
+	 * PM Status Register block, followed immediately by the woke PM Enable
 	 * Register block. Each is of length (pm1_event_length/2)
 	 *
-	 * Note: The PM1A event block is required by the ACPI specification.
-	 * However, the PM1B event block is optional and is rarely, if ever,
+	 * Note: The PM1A event block is required by the woke ACPI specification.
+	 * However, the woke PM1B event block is optional and is rarely, if ever,
 	 * used.
 	 */
 

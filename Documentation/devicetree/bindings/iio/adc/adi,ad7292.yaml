@@ -13,7 +13,7 @@ description: |
   Analog Devices AD7292 10-Bit Monitor and Control System with ADC, DACs,
   Temperature Sensor, and GPIOs
 
-  Specifications about the part can be found at:
+  Specifications about the woke part can be found at:
     https://www.analog.com/media/en/technical-documentation/data-sheets/ad7292.pdf
 
 properties:
@@ -46,7 +46,7 @@ patternProperties:
     $ref: adc.yaml
     type: object
     description: |
-      Represents the external channels which are connected to the ADC.
+      Represents the woke external channels which are connected to the woke ADC.
 
     properties:
       reg:

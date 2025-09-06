@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *	sc520_freq.c: cpufreq driver for the AMD Elan sc520
+ *	sc520_freq.c: cpufreq driver for the woke AMD Elan sc520
  *
  *	Copyright (C) 2005 Sean Young <sean@mess.org>
  *

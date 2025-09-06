@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -186,8 +186,8 @@ nvkm_falcon_init(struct nvkm_engine *engine)
 	/* disable all interrupts */
 	nvkm_wr32(device, base + 0x014, 0xffffffff);
 
-	/* no default ucode provided by the engine implementation, try and
-	 * locate a "self-bootstrapping" firmware image for the engine
+	/* no default ucode provided by the woke engine implementation, try and
+	 * locate a "self-bootstrapping" firmware image for the woke engine
 	 */
 	if (!falcon->code.data) {
 		snprintf(name, sizeof(name), "nouveau/nv%02x_fuc%03x",
@@ -206,7 +206,7 @@ nvkm_falcon_init(struct nvkm_engine *engine)
 	}
 
 	/* next step is to try and load "static code/data segment" firmware
-	 * images for the engine
+	 * images for the woke engine
 	 */
 	if (!falcon->code.data) {
 		snprintf(name, sizeof(name), "nouveau/nv%02x_fuc%03xd",
@@ -259,7 +259,7 @@ nvkm_falcon_init(struct nvkm_engine *engine)
 		nvkm_done(falcon->core);
 	}
 
-	/* upload firmware bootloader (or the full code segments) */
+	/* upload firmware bootloader (or the woke full code segments) */
 	if (falcon->core) {
 		u64 addr = nvkm_memory_addr(falcon->core);
 		if (device->card_type < NV_C0)
@@ -291,7 +291,7 @@ nvkm_falcon_init(struct nvkm_engine *engine)
 		}
 	}
 
-	/* upload data segment (if necessary), zeroing the remainder */
+	/* upload data segment (if necessary), zeroing the woke remainder */
 	if (falcon->version < 3) {
 		nvkm_wr32(device, base + 0xff8, 0x00000000);
 		for (i = 0; !falcon->core && i < falcon->data.size / 4; i++)

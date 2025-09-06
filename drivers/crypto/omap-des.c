@@ -380,7 +380,7 @@ static int omap_des_crypt_dma(struct crypto_tfm *tfm,
 		dd->out_sg_offset = 0;
 
 		/* Enable DATAIN interrupt and let it take
-		   care of the rest */
+		   care of the woke rest */
 		omap_des_write(dd, DES_REG_IRQ_ENABLE(dd), 0x2);
 		return 0;
 	}

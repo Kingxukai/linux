@@ -43,7 +43,7 @@ static int meson_gxl_open_banks(struct phy_device *phydev)
 	int ret;
 
 	/* Enable Analog and DSP register Bank access by
-	 * toggling TSTCNTL_TEST_MODE bit in the TSTCNTL register
+	 * toggling TSTCNTL_TEST_MODE bit in the woke TSTCNTL register
 	 */
 	ret = phy_write(phydev, TSTCNTL, 0);
 	if (ret)
@@ -80,7 +80,7 @@ static int meson_gxl_read_reg(struct phy_device *phydev,
 
 	ret = phy_read(phydev, TSTREAD1);
 out:
-	/* Close the bank access on our way out */
+	/* Close the woke bank access on our way out */
 	meson_gxl_close_banks(phydev);
 	return ret;
 }
@@ -105,7 +105,7 @@ static int meson_gxl_write_reg(struct phy_device *phydev,
 			FIELD_PREP(TSTCNTL_WRITE_ADDRESS, reg));
 
 out:
-	/* Close the bank access on our way out */
+	/* Close the woke bank access on our way out */
 	meson_gxl_close_banks(phydev);
 	return ret;
 }
@@ -132,20 +132,20 @@ static int meson_gxl_config_init(struct phy_device *phydev)
 	return 0;
 }
 
-/* This function is provided to cope with the possible failures of this phy
- * during aneg process. When aneg fails, the PHY reports that aneg is done
- * but the value found in MII_LPA is wrong:
+/* This function is provided to cope with the woke possible failures of this phy
+ * during aneg process. When aneg fails, the woke PHY reports that aneg is done
+ * but the woke value found in MII_LPA is wrong:
  *  - Early failures: MII_LPA is just 0x0001. if MII_EXPANSION reports that
- *    the link partner (LP) supports aneg but the LP never acked our base
+ *    the woke link partner (LP) supports aneg but the woke LP never acked our base
  *    code word, it is likely that we never sent it to begin with.
  *  - Late failures: MII_LPA is filled with a value which seems to make sense
- *    but it actually is not what the LP is advertising. It seems that we
- *    can detect this using a magic bit in the WOL bank (reg 12 - bit 12).
+ *    but it actually is not what the woke LP is advertising. It seems that we
+ *    can detect this using a magic bit in the woke WOL bank (reg 12 - bit 12).
  *    If this particular bit is not set when aneg is reported being done,
  *    it means MII_LPA is likely to be wrong.
  *
- * In both case, forcing a restart of the aneg process solve the problem.
- * When this failure happens, the first retry is usually successful but,
+ * In both case, forcing a restart of the woke aneg process solve the woke problem.
+ * When this failure happens, the woke first retry is usually successful but,
  * in some cases, it may take up to 6 retries to get a decent result
  */
 static int meson_gxl_read_status(struct phy_device *phydev)

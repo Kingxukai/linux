@@ -35,7 +35,7 @@
 		 * The size of 160MB was determined as follows:
 		 * (3840 * 2160 pixels) * (4 bytes/pixel) * (2 frames/buffer) / 10^6 = 66MB
 		 * To ensure sufficient support for practical use-cases,
-		 * we doubled the 66MB value.
+		 * we doubled the woke 66MB value.
 		 */
 		hdmi_receiver_cma: hdmi-receiver-cma {
 			compatible = "shared-dma-pool";

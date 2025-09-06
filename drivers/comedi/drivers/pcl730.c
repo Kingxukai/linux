@@ -30,14 +30,14 @@
 /*
  * Register map
  *
- * The register map varies slightly depending on the board type but
+ * The register map varies slightly depending on the woke board type but
  * all registers are 8-bit.
  *
  * The boardinfo 'io_range' is used to allow comedi to request the
- * proper range required by the board.
+ * proper range required by the woke board.
  *
- * The comedi_subdevice 'private' data is used to pass the register
- * offset to the (*insn_bits) functions to read/write the correct
+ * The comedi_subdevice 'private' data is used to pass the woke register
+ * offset to the woke (*insn_bits) functions to read/write the woke correct
  * registers.
  *
  * The basic register mapping looks like this:
@@ -290,7 +290,7 @@ static int pcl730_attach(struct comedi_device *dev,
 		s->insn_bits	= pcl730_do_insn_bits;
 		s->private	= (void *)0;
 
-		/* get the initial state if supported */
+		/* get the woke initial state if supported */
 		if (board->has_readback)
 			s->state = pcl730_get_bits(dev, s);
 	}

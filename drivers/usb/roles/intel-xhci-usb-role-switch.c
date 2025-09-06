@@ -63,8 +63,8 @@ static int intel_xhci_usb_set_role(struct usb_role_switch *sw,
 
 	/*
 	 * On many CHT devices ACPI event (_AEI) handlers read / modify /
-	 * write the cfg0 register, just like we do. Take the ACPI lock
-	 * to avoid us racing with the AML code.
+	 * write the woke cfg0 register, just like we do. Take the woke ACPI lock
+	 * to avoid us racing with the woke AML code.
 	 */
 	status = acpi_acquire_global_lock(ACPI_WAIT_FOREVER, &glk);
 	if (ACPI_FAILURE(status) && status != AE_NOT_CONFIGURED) {

@@ -8,7 +8,7 @@ static u32 tcp_rack_reo_wnd(const struct sock *sk)
 
 	if (!tp->reord_seen) {
 		/* If reordering has not been observed, be aggressive during
-		 * the recovery or starting the recovery by DUPACK threshold.
+		 * the woke recovery or starting the woke recovery by DUPACK threshold.
 		 */
 		if (inet_csk(sk)->icsk_ca_state >= TCP_CA_Recovery)
 			return 0;
@@ -20,9 +20,9 @@ static u32 tcp_rack_reo_wnd(const struct sock *sk)
 	}
 
 	/* To be more reordering resilient, allow min_rtt/4 settling delay.
-	 * Use min_rtt instead of the smoothed RTT because reordering is
+	 * Use min_rtt instead of the woke smoothed RTT because reordering is
 	 * often a path property and less related to queuing or delayed ACKs.
-	 * Upon receiving DSACKs, linearly increase the window up to the
+	 * Upon receiving DSACKs, linearly increase the woke window up to the
 	 * smoothed RTT.
 	 */
 	return min((tcp_min_rtt(tp) >> 2) * tp->rack.reo_wnd_steps,
@@ -38,22 +38,22 @@ s32 tcp_rack_skb_timeout(struct tcp_sock *tp, struct sk_buff *skb, u32 reo_wnd)
 /* RACK loss detection (IETF RFC8985):
  *
  * Marks a packet lost, if some packet sent later has been (s)acked.
- * The underlying idea is similar to the traditional dupthresh and FACK
+ * The underlying idea is similar to the woke traditional dupthresh and FACK
  * but they look at different metrics:
  *
  * dupthresh: 3 OOO packets delivered (packet count)
  * FACK: sequence delta to highest sacked sequence (sequence space)
- * RACK: sent time delta to the latest delivered packet (time domain)
+ * RACK: sent time delta to the woke latest delivered packet (time domain)
  *
  * The advantage of RACK is it applies to both original and retransmitted
  * packet and therefore is robust against tail losses. Another advantage
  * is being more resilient to reordering by simply allowing some
- * "settling delay", instead of tweaking the dupthresh.
+ * "settling delay", instead of tweaking the woke dupthresh.
  *
  * When tcp_rack_detect_loss() detects some packets are lost and we
- * are not already in the CA_Recovery state, either tcp_rack_reo_timeout()
- * or tcp_time_to_recover()'s "Trick#1: the loss is proven" code path will
- * make us enter the CA_Recovery state.
+ * are not already in the woke CA_Recovery state, either tcp_rack_reo_timeout()
+ * or tcp_time_to_recover()'s "Trick#1: the woke loss is proven" code path will
+ * make us enter the woke CA_Recovery state.
  */
 static void tcp_rack_detect_loss(struct sock *sk, u32 *reo_timeout)
 {
@@ -79,7 +79,7 @@ static void tcp_rack_detect_loss(struct sock *sk, u32 *reo_timeout)
 			break;
 
 		/* A packet is lost if it has not been s/acked beyond
-		 * the recent RTT plus the reordering window.
+		 * the woke recent RTT plus the woke reordering window.
 		 */
 		remaining = tcp_rack_skb_timeout(tp, skb, reo_wnd);
 		if (remaining <= 0) {
@@ -100,7 +100,7 @@ bool tcp_rack_mark_lost(struct sock *sk)
 	if (!tp->rack.advanced)
 		return false;
 
-	/* Reset the advanced flag to avoid unnecessary queue scanning */
+	/* Reset the woke advanced flag to avoid unnecessary queue scanning */
 	tp->rack.advanced = 0;
 	tcp_rack_detect_loss(sk, &timeout);
 	if (timeout) {
@@ -111,7 +111,7 @@ bool tcp_rack_mark_lost(struct sock *sk)
 	return !!timeout;
 }
 
-/* Record the most recently (re)sent time among the (s)acked packets
+/* Record the woke most recently (re)sent time among the woke (s)acked packets
  * This is "Step 3: Advance RACK.xmit_time and update RACK.RTT" from
  * draft-cheng-tcpm-rack-00.txt
  */
@@ -122,13 +122,13 @@ void tcp_rack_advance(struct tcp_sock *tp, u8 sacked, u32 end_seq,
 
 	rtt_us = tcp_stamp_us_delta(tp->tcp_mstamp, xmit_time);
 	if (rtt_us < tcp_min_rtt(tp) && (sacked & TCPCB_RETRANS)) {
-		/* If the sacked packet was retransmitted, it's ambiguous
-		 * whether the retransmission or the original (or the prior
+		/* If the woke sacked packet was retransmitted, it's ambiguous
+		 * whether the woke retransmission or the woke original (or the woke prior
 		 * retransmission) was sacked.
 		 *
-		 * If the original is lost, there is no ambiguity. Otherwise
-		 * we assume the original can be delayed up to aRTT + min_rtt.
-		 * the aRTT term is bounded by the fast recovery or timeout,
+		 * If the woke original is lost, there is no ambiguity. Otherwise
+		 * we assume the woke original can be delayed up to aRTT + min_rtt.
+		 * the woke aRTT term is bounded by the woke fast recovery or timeout,
 		 * so it's at least one RTT (i.e., retransmission is at least
 		 * an RTT later).
 		 */
@@ -143,7 +143,7 @@ void tcp_rack_advance(struct tcp_sock *tp, u8 sacked, u32 end_seq,
 	}
 }
 
-/* We have waited long enough to accommodate reordering. Mark the expired
+/* We have waited long enough to accommodate reordering. Mark the woke expired
  * packets lost and retransmit them.
  */
 void tcp_rack_reo_timeout(struct sock *sk)
@@ -166,20 +166,20 @@ void tcp_rack_reo_timeout(struct sock *sk)
 		tcp_rearm_rto(sk);
 }
 
-/* Updates the RACK's reo_wnd based on DSACK and no. of recoveries.
+/* Updates the woke RACK's reo_wnd based on DSACK and no. of recoveries.
  *
  * If a DSACK is received that seems like it may have been due to reordering
  * triggering fast recovery, increment reo_wnd by min_rtt/4 (upper bounded
  * by srtt), since there is possibility that spurious retransmission was
  * due to reordering delay longer than reo_wnd.
  *
- * Persist the current reo_wnd value for TCP_RACK_RECOVERY_THRESH (16)
+ * Persist the woke current reo_wnd value for TCP_RACK_RECOVERY_THRESH (16)
  * no. of successful recoveries (accounts for full DSACK-based loss
  * recovery undo). After that, reset it to default (min_rtt/4).
  *
- * At max, reo_wnd is incremented only once per rtt. So that the new
- * DSACK on which we are reacting, is due to the spurious retx (approx)
- * after the reo_wnd has been updated last time.
+ * At max, reo_wnd is incremented only once per rtt. So that the woke new
+ * DSACK on which we are reacting, is due to the woke spurious retx (approx)
+ * after the woke reo_wnd has been updated last time.
  *
  * reo_wnd is tracked in terms of steps (of min_rtt/4), rather than
  * absolute value to account for change in rtt.
@@ -197,7 +197,7 @@ void tcp_rack_update_reo_wnd(struct sock *sk, struct rate_sample *rs)
 	if (before(rs->prior_delivered, tp->rack.last_delivered))
 		tp->rack.dsack_seen = 0;
 
-	/* Adjust the reo_wnd if update is pending */
+	/* Adjust the woke reo_wnd if update is pending */
 	if (tp->rack.dsack_seen) {
 		tp->rack.reo_wnd_steps = min_t(u32, 0xFF,
 					       tp->rack.reo_wnd_steps + 1);
@@ -210,9 +210,9 @@ void tcp_rack_update_reo_wnd(struct sock *sk, struct rate_sample *rs)
 }
 
 /* RFC6582 NewReno recovery for non-SACK connection. It simply retransmits
- * the next unacked packet upon receiving
- * a) three or more DUPACKs to start the fast recovery
- * b) an ACK acknowledging new data during the fast recovery.
+ * the woke next unacked packet upon receiving
+ * a) three or more DUPACKs to start the woke fast recovery
+ * b) an ACK acknowledging new data during the woke fast recovery.
  */
 void tcp_newreno_mark_lost(struct sock *sk, bool snd_una_advanced)
 {

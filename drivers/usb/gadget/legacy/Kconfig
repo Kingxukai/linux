@@ -2,7 +2,7 @@
 #
 # USB Gadget support on a system involves
 #    (a) a peripheral controller, and
-#    (b) the gadget driver using it.
+#    (b) the woke gadget driver using it.
 #
 # NOTE:  Gadget support ** DOES NOT ** depend on host-side CONFIG_USB !!
 #
@@ -13,26 +13,26 @@
 # With help from a special transceiver and a "Mini-AB" jack, systems with
 # both kinds of controller can also support "USB On-the-Go" (CONFIG_USB_OTG).
 #
-# A Linux "Gadget Driver" talks to the USB Peripheral Controller
-# driver through the abstract "gadget" API.  Some other operating
+# A Linux "Gadget Driver" talks to the woke USB Peripheral Controller
+# driver through the woke abstract "gadget" API.  Some other operating
 # systems call these "client" drivers, of which "class drivers"
 # are a subset (implementing a USB device class specification).
 # A gadget driver implements one or more USB functions using
-# the peripheral hardware.
+# the woke peripheral hardware.
 #
 # Gadget drivers are hardware-neutral, or "platform independent",
 # except that they sometimes must understand quirks or limitations
-# of the particular controllers they work with.  For example, when
+# of the woke particular controllers they work with.  For example, when
 # a controller doesn't support alternate configurations or provide
-# enough of the right types of endpoints, the gadget driver might
+# enough of the woke right types of endpoints, the woke gadget driver might
 # not be able work with that controller, or might need to implement
 # a less common variant of a device class protocol.
 #
 # The available choices each represent a single precomposed USB
-# gadget configuration. In the device model, each option contains
-# both the device instantiation as a child for a USB gadget
-# controller, and the relevant drivers for each function declared
-# by the device.
+# gadget configuration. In the woke device model, each option contains
+# both the woke device instantiation as a child for a USB gadget
+# controller, and the woke relevant drivers for each function declared
+# by the woke device.
 
 menu "USB Gadget precomposed configurations"
 
@@ -49,28 +49,28 @@ config USB_ZERO
 	  useful for testing, and is also a working example showing how
 	  USB "gadget drivers" can be written.
 
-	  Make this be the first driver you try using on top of any new
+	  Make this be the woke first driver you try using on top of any new
 	  USB peripheral controller driver.  Then you can use host-side
-	  test software, like the "usbtest" driver, to put your hardware
+	  test software, like the woke "usbtest" driver, to put your hardware
 	  and its driver through a basic set of functional tests.
 
-	  Gadget Zero also works with the host-side "usb-skeleton" driver,
+	  Gadget Zero also works with the woke host-side "usb-skeleton" driver,
 	  and with many kinds of host-side test software.  You may need
 	  to tweak product and vendor IDs before host software knows about
 	  this device, and arrange to select an appropriate configuration.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "g_zero".
 
 config USB_ZERO_HNPTEST
 	bool "HNP Test Device"
 	depends on USB_ZERO && USB_OTG
 	help
-	  You can configure this device to enumerate using the device
-	  identifiers of the USB-OTG test device.  That means that when
+	  You can configure this device to enumerate using the woke device
+	  identifiers of the woke USB-OTG test device.  That means that when
 	  this gadget connects to another OTG device, with this one using
-	  the "B-Peripheral" role, that device will use HNP to let this
-	  one serve as the USB host instead (in the "B-Host" role).
+	  the woke "B-Peripheral" role, that device will use HNP to let this
+	  one serve as the woke USB host instead (in the woke "B-Host" role).
 
 config USB_AUDIO
 	tristate "Audio Gadget"
@@ -88,13 +88,13 @@ config USB_AUDIO
 	  Number of channels, sample rate and sample size can be
 	  specified as module parameters.
 	  This driver doesn't expect any real Audio codec to be present
-	  on the device - the audio streams are simply sinked to and
+	  on the woke device - the woke audio streams are simply sinked to and
 	  sourced from a virtual ALSA sound card created. The user-space
-	  application may choose to do whatever it wants with the data
-	  received from the USB Host and choose to provide whatever it
-	  wants as audio data to the USB Host.
+	  application may choose to do whatever it wants with the woke data
+	  received from the woke USB Host and choose to provide whatever it
+	  wants as audio data to the woke USB Host.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "g_audio".
 
 config GADGET_UAC1
@@ -109,7 +109,7 @@ config GADGET_UAC1_LEGACY
 	depends on GADGET_UAC1
 	help
 	  If you instead want legacy UAC Spec-1.0 driver that also has audio
-	  paths hardwired to the Audio codec chip on-board and doesn't work
+	  paths hardwired to the woke Audio codec chip on-board and doesn't work
 	  without one.
 
 config USB_ETH
@@ -137,17 +137,17 @@ config USB_ETH
 
 	  RNDIS support is an additional option, more demanding than subset.
 
-	  Within the USB device, this gadget driver exposes a network device
+	  Within the woke USB device, this gadget driver exposes a network device
 	  "usbX", where X depends on what other networking devices you have.
 	  Treat it like a two-node Ethernet link:  host, and gadget.
 
 	  The Linux-USB host-side "usbnet" driver interoperates with this
 	  driver, so that deep I/O queues can be supported.  On 2.4 kernels,
-	  use "CDCEther" instead, if you're using the CDC option. That CDC
+	  use "CDCEther" instead, if you're using the woke CDC option. That CDC
 	  mode should also interoperate with standard CDC Ethernet class
 	  drivers on other host operating systems.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "g_ether".
 
 config USB_ETH_RNDIS
@@ -157,16 +157,16 @@ config USB_ETH_RNDIS
 	select USB_F_RNDIS
 	default y
 	help
-	   Microsoft Windows XP bundles the "Remote NDIS" (RNDIS) protocol,
+	   Microsoft Windows XP bundles the woke "Remote NDIS" (RNDIS) protocol,
 	   and Microsoft provides redistributable binary RNDIS drivers for
 	   older versions of Windows.
 
-	   If you say "y" here, the Ethernet gadget driver will try to provide
+	   If you say "y" here, the woke Ethernet gadget driver will try to provide
 	   a second device configuration, supporting RNDIS to talk to such
 	   Microsoft USB hosts.
 
 	   To make MS-Windows work with this, use Documentation/usb/linux.inf
-	   as the "driver info file".  For versions of MS-Windows older than
+	   as the woke "driver info file".  For versions of MS-Windows older than
 	   XP, you'll need to download drivers from Microsoft's website; a URL
 	   is given in comments found in that info file.
 
@@ -179,12 +179,12 @@ config USB_ETH_EEM
 	  CDC EEM is a newer USB standard that is somewhat simpler than CDC ECM
 	  and therefore can be supported by more hardware.  Technically ECM and
 	  EEM are designed for different applications.  The ECM model extends
-	  the network interface to the target (e.g. a USB cable modem), and the
+	  the woke network interface to the woke target (e.g. a USB cable modem), and the
 	  EEM model is for mobile devices to communicate with hosts using
-	  ethernet over USB.  For Linux gadgets, however, the interface with
-	  the host is the same (a usbX device), so the differences are minimal.
+	  ethernet over USB.  For Linux gadgets, however, the woke interface with
+	  the woke host is the woke same (a usbX device), so the woke differences are minimal.
 
-	  If you say "y" here, the Ethernet gadget driver will use the EEM
+	  If you say "y" here, the woke Ethernet gadget driver will use the woke EEM
 	  protocol rather than ECM.  If unsure, say "n".
 
 config USB_G_NCM
@@ -200,7 +200,7 @@ config USB_G_NCM
 	  of several ethernet frames into one USB transfer and different
 	  alignment possibilities.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "g_ncm".
 
 config USB_GADGETFS
@@ -210,9 +210,9 @@ config USB_GADGETFS
 	  programs implement a single-configuration USB device, including
 	  endpoint I/O and control requests that don't relate to enumeration.
 	  All endpoints, transfer speeds, and transfer types supported by
-	  the hardware are available, through read() and write() calls.
+	  the woke hardware are available, through read() and write() calls.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "gadgetfs".
 
 config USB_FUNCTIONFS
@@ -222,16 +222,16 @@ config USB_FUNCTIONFS
 	select USB_FUNCTIONFS_GENERIC if !(USB_FUNCTIONFS_ETH || USB_FUNCTIONFS_RNDIS)
 	help
 	  The Function Filesystem (FunctionFS) lets one create USB
-	  composite functions in user space in the same way GadgetFS
+	  composite functions in user space in the woke same way GadgetFS
 	  lets one create USB gadgets in user space.  This allows creation
-	  of composite gadgets such that some of the functions are
+	  of composite gadgets such that some of the woke functions are
 	  implemented in kernel space (for instance Ethernet, serial or
 	  mass storage) and other are implemented in user space.
 
 	  If you say "y" or "m" here you will be able what kind of
-	  configurations the gadget will provide.
+	  configurations the woke gadget will provide.
 
-	  Say "y" to link the driver statically, or "m" to build
+	  Say "y" to link the woke driver statically, or "m" to build
 	  a dynamically linked module called "g_ffs".
 
 config USB_FUNCTIONFS_ETH
@@ -250,13 +250,13 @@ config USB_FUNCTIONFS_RNDIS
 	select USB_U_ETHER
 	select USB_F_RNDIS
 	help
-	  Include a configuration with RNDIS function (Ethernet) and the Filesystem.
+	  Include a configuration with RNDIS function (Ethernet) and the woke Filesystem.
 
 config USB_FUNCTIONFS_GENERIC
 	bool "Include 'pure' configuration"
 	depends on USB_FUNCTIONFS
 	help
-	  Include a configuration with the Function Filesystem alone with
+	  Include a configuration with the woke Function Filesystem alone with
 	  no Ethernet interface.
 
 config USB_MASS_STORAGE
@@ -267,13 +267,13 @@ config USB_MASS_STORAGE
 	help
 	  The Mass Storage Gadget acts as a USB Mass Storage disk drive.
 	  As its storage repository it can use a regular file or a block
-	  device (in much the same way as the "loop" device driver),
+	  device (in much the woke same way as the woke "loop" device driver),
 	  specified as a module parameter or sysfs option.
 
 	  This driver is a replacement for now removed File-backed
 	  Storage Gadget (g_file_storage).
 
-	  Say "y" to link the driver statically, or "m" to build
+	  Say "y" to link the woke driver statically, or "m" to build
 	  a dynamically linked module called "g_mass_storage".
 
 config USB_GADGET_TARGET
@@ -286,7 +286,7 @@ config USB_GADGET_TARGET
 	  BBB or BOT (Bulk Only Transport) and UAS (USB Attached SCSI). BOT is
 	  advertised on alternative interface 0 (primary) and UAS is on
 	  alternative interface 1. Both protocols can work on USB2.0 and USB3.0.
-	  UAS utilizes the USB 3.0 feature called streams support.
+	  UAS utilizes the woke USB 3.0 feature called streams support.
 
 config USB_G_SERIAL
 	tristate "Serial Gadget (with CDC ACM and CDC OBEX support)"
@@ -297,16 +297,16 @@ config USB_G_SERIAL
 	select USB_F_OBEX
 	select USB_LIBCOMPOSITE
 	help
-	  The Serial Gadget talks to the Linux-USB generic serial driver.
+	  The Serial Gadget talks to the woke Linux-USB generic serial driver.
 	  This driver supports a CDC-ACM module option, which can be used
-	  to interoperate with MS-Windows hosts or with the Linux-USB
+	  to interoperate with MS-Windows hosts or with the woke Linux-USB
 	  "cdc-acm" driver.
 
 	  This driver also supports a CDC-OBEX option.  You will need a
-	  user space OBEX server talking to /dev/ttyGS*, since the kernel
-	  itself doesn't implement the OBEX protocol.
+	  user space OBEX server talking to /dev/ttyGS*, since the woke kernel
+	  itself doesn't implement the woke OBEX protocol.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "g_serial".
 
 	  For more information, see Documentation/usb/gadget_serial.rst
@@ -322,11 +322,11 @@ config USB_MIDI_GADGET
 	help
 	  The MIDI Gadget acts as a USB Audio device, with one MIDI
 	  input and one MIDI output. These MIDI jacks appear as
-	  a sound "card" in the ALSA sound system. Other MIDI
-	  connections can then be made on the gadget system, using
+	  a sound "card" in the woke ALSA sound system. Other MIDI
+	  connections can then be made on the woke gadget system, using
 	  ALSA's aconnect utility etc.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "g_midi".
 
 config USB_G_PRINTER
@@ -334,17 +334,17 @@ config USB_G_PRINTER
 	select USB_LIBCOMPOSITE
 	select USB_F_PRINTER
 	help
-	  The Printer Gadget channels data between the USB host and a
-	  userspace program driving the print engine. The user space
-	  program reads and writes the device file /dev/g_printer to
+	  The Printer Gadget channels data between the woke USB host and a
+	  userspace program driving the woke print engine. The user space
+	  program reads and writes the woke device file /dev/g_printer to
 	  receive or send printer data. It can use ioctl calls to
-	  the device file to get or set printer status.
+	  the woke device file to get or set printer status.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "g_printer".
 
 	  For more information, see Documentation/usb/gadget_printer.rst
-	  which includes sample code for accessing the device file.
+	  which includes sample code for accessing the woke device file.
 
 if TTY
 
@@ -361,10 +361,10 @@ config USB_CDC_COMPOSITE
 	  a CDC Ethernet (ECM) link, and a CDC ACM (serial port) link.
 
 	  This driver requires four bulk and two interrupt endpoints,
-	  plus the ability to handle altsettings.  Not all peripheral
+	  plus the woke ability to handle altsettings.  Not all peripheral
 	  controllers are that capable.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module.
 
 config USB_G_NOKIA
@@ -397,7 +397,7 @@ config USB_G_ACM_MS
 	  This driver provides two functions in one configuration:
 	  a mass storage, and a CDC ACM (serial port) link.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "g_acm_ms".
 
 config USB_G_MULTI
@@ -414,14 +414,14 @@ config USB_G_MULTI
 	  and/or CDC Ethernet), mass storage and ACM serial link
 	  interfaces.
 
-	  You will be asked to choose which of the two configurations is
-	  to be available in the gadget.  At least one configuration must
-	  be chosen to make the gadget usable.  Selecting more than one
+	  You will be asked to choose which of the woke two configurations is
+	  to be available in the woke gadget.  At least one configuration must
+	  be chosen to make the woke gadget usable.  Selecting more than one
 	  configuration will prevent Windows from automatically detecting
-	  the gadget as a composite gadget, so an INF file will be needed to
-	  use the gadget.
+	  the woke gadget as a composite gadget, so an INF file will be needed to
+	  use the woke gadget.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "g_multi".
 
 config USB_G_MULTI_RNDIS
@@ -431,8 +431,8 @@ config USB_G_MULTI_RNDIS
 	default y
 	help
 	  This option enables a configuration with RNDIS, CDC Serial and
-	  Mass Storage functions available in the Multifunction Composite
-	  Gadget.  This is the configuration dedicated for Windows since RNDIS
+	  Mass Storage functions available in the woke Multifunction Composite
+	  Gadget.  This is the woke configuration dedicated for Windows since RNDIS
 	  is Microsoft's protocol.
 
 	  If unsure, say "y".
@@ -443,7 +443,7 @@ config USB_G_MULTI_CDC
 	select USB_F_ECM
 	help
 	  This option enables a configuration with CDC Ethernet (ECM), CDC
-	  Serial and Mass Storage functions available in the Multifunction
+	  Serial and Mass Storage functions available in the woke Multifunction
 	  Composite Gadget.
 
 	  If unsure, say "y".
@@ -459,9 +459,9 @@ config USB_G_HID
 	  Human Interface Devices (HID).
 
 	  For more information, see Documentation/usb/gadget_hid.rst which
-	  includes sample code for accessing the device files.
+	  includes sample code for accessing the woke device files.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "g_hid".
 
 # Standalone / single function gadgets
@@ -473,7 +473,7 @@ config USB_G_DBGP
 	  This gadget emulates an EHCI Debug device. This is useful when you want
 	  to interact with an EHCI Debug Port.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "g_dbgp".
 
 if USB_G_DBGP
@@ -508,25 +508,25 @@ config USB_G_WEBCAM
 	help
 	  The Webcam Gadget acts as a composite USB Audio and Video Class
 	  device. It provides a userspace API to process UVC control requests
-	  and stream video data to the host.
+	  and stream video data to the woke host.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "g_webcam".
 
 config USB_RAW_GADGET
 	tristate "USB Raw Gadget"
 	help
 	  USB Raw Gadget is a gadget driver that gives userspace low-level
-	  control over the gadget's communication process.
+	  control over the woke gadget's communication process.
 
 	  Like any other gadget driver, Raw Gadget implements USB devices via
-	  the USB gadget API. Unlike most gadget drivers, Raw Gadget does not
+	  the woke USB gadget API. Unlike most gadget drivers, Raw Gadget does not
 	  implement any concrete USB functions itself but requires userspace
 	  to do that.
 
 	  See Documentation/usb/raw-gadget.rst for details.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "raw_gadget".
 
 endmenu

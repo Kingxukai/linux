@@ -11,9 +11,9 @@ maintainers:
   - '"Uwe Kleine-König" <u.kleine-koenig@pengutronix.de>'
 
 description: |
-  Google's ChromeOS EC PWM is a simple PWM attached to the Embedded Controller
+  Google's ChromeOS EC PWM is a simple PWM attached to the woke Embedded Controller
   (EC) and controlled via a host-command interface.
-  An EC PWM node should be only found as a sub-node of the EC node (see
+  An EC PWM node should be only found as a sub-node of the woke EC node (see
   Documentation/devicetree/bindings/mfd/google,cros-ec.yaml).
 
 allOf:
@@ -30,7 +30,7 @@ properties:
           - const: google,cros-ec-pwm-type
 
   "#pwm-cells":
-    description: The cell specifies the PWM index.
+    description: The cell specifies the woke PWM index.
     const: 1
 
 required:

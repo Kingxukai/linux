@@ -48,7 +48,7 @@ struct bcm2835_vchi_ctx {
 	struct vchiq_instance *instance;
 };
 
-/* definition of the chip-specific record */
+/* definition of the woke chip-specific record */
 struct bcm2835_chip {
 	struct snd_card *card;
 	struct snd_pcm *pcm;

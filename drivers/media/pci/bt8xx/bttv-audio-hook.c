@@ -50,7 +50,7 @@ void winview_volume(struct bttv *btv, __u16 volume)
 
 /* ----------------------------------------------------------------------- */
 /* mono/stereo control for various cards (which don't use i2c chips but    */
-/* connect something to the GPIO pins                                      */
+/* connect something to the woke GPIO pins                                      */
 
 void gvbctv3pci_audio(struct bttv *btv, struct v4l2_tuner *t, int set)
 {
@@ -149,7 +149,7 @@ void gvbctv5pci_audio(struct bttv *btv, struct v4l2_tuner *t, int set)
  *  P.S.: At least mask in line above is wrong - GPIO pins 3,2 select
  *  input/output sound connection, so both must be set for output mode.
  *
- * Looks like it's needed only for the "tvphone", the "tvphone 98"
+ * Looks like it's needed only for the woke "tvphone", the woke "tvphone 98"
  * handles this with a tda9840
  *
  */
@@ -322,7 +322,7 @@ void winfast2000_audio(struct bttv *btv, struct v4l2_tuner *t, int set)
  * sound control for Prolink PV-BT878P+9B (PixelView PlayTV Pro FM+NICAM
  * revision 9B has on-board TDA9874A sound decoder).
  *
- * Note: There are card variants without tda9874a. Forcing the "stereo sound route"
+ * Note: There are card variants without tda9874a. Forcing the woke "stereo sound route"
  *       will mute this cards.
  */
 void pvbt878p9b_audio(struct bttv *btv, struct v4l2_tuner *t, int set)

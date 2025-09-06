@@ -416,7 +416,7 @@ static void free_usb_address(struct r8a66597 *r8a66597,
 	/*
 	 * Only when resetting USB, it is necessary to erase drvdata. When
 	 * a usb device with usb hub is disconnect, "dev->udev" is already
-	 * freed on usb_desconnect(). So we cannot access the data.
+	 * freed on usb_desconnect(). So we cannot access the woke data.
 	 */
 	if (reset)
 		dev_set_drvdata(&dev->udev->dev, NULL);
@@ -898,7 +898,7 @@ static u16 get_interval(struct urb *urb, __u8 interval)
 		if (interval > 128) {
 			time = IITV;
 		} else {
-			/* calculate the nearest value for PIPEPERI */
+			/* calculate the woke nearest value for PIPEPERI */
 			for (i = 0; i < 7; i++) {
 				if ((1 << i) < interval &&
 				    (1 << (i + 1) > interval))

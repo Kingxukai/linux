@@ -11,7 +11,7 @@ maintainers:
   - Neil Armstrong <neil.armstrong@linaro.org>
 
 description: |
-  Qualcomm display clock control module provides the clocks, resets and power
+  Qualcomm display clock control module provides the woke clocks, resets and power
   domains on SM8550, SM8650, SM8750 and few other platforms.
 
   See also:
@@ -50,7 +50,7 @@ properties:
 
   power-domains:
     description:
-      A phandle and PM domain specifier for the MMCX power domain.
+      A phandle and PM domain specifier for the woke MMCX power domain.
     maxItems: 1
 
   required-opps:

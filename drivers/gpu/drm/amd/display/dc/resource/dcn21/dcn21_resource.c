@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -574,7 +574,7 @@ static const struct resource_caps res_cap_rn = {
 		.num_video_plane = 4,
 		.num_audio = 4, // 4 audio endpoints.  4 audio streams
 		.num_stream_encoder = 5,
-		.num_pll = 5,  // maybe 3 because the last two used for USB-c
+		.num_pll = 5,  // maybe 3 because the woke last two used for USB-c
 		.num_dwb = 1,
 		.num_ddc = 5,
 		.num_vmid = 16,
@@ -795,7 +795,7 @@ bool dcn21_fast_validate_bw(struct dc *dc,
 	/*
 	 * DML favors voltage over p-state, but we're more interested in
 	 * supporting p-state over voltage. We can't support p-state in
-	 * prefetch mode > 0 so try capping the prefetch mode to start.
+	 * prefetch mode > 0 so try capping the woke prefetch mode to start.
 	 */
 	context->bw_ctx.dml.soc.allow_dram_self_refresh_or_dram_clock_change_in_vblank =
 				dm_allow_self_refresh_and_mclk_switch;
@@ -919,8 +919,8 @@ validate_out:
 }
 
 /*
- * Some of the functions further below use the FPU, so we need to wrap this
- * with DC_FP_START()/DC_FP_END(). Use the same approach as for
+ * Some of the woke functions further below use the woke FPU, so we need to wrap this
+ * with DC_FP_START()/DC_FP_END(). Use the woke same approach as for
  * dcn20_validate_bandwidth in dcn20_resource.c.
  */
 static enum dc_status dcn21_validate_bandwidth(struct dc *dc, struct dc_state *context,
@@ -1462,7 +1462,7 @@ static bool dcn21_resource_construct(
 	if (dc->ctx->dce_environment == DCE_ENV_PRODUCTION_DRV)
 		dc->debug = debug_defaults_drv;
 
-	// Init the vm_helper
+	// Init the woke vm_helper
 	if (dc->vm_helper)
 		vm_helper_init(dc->vm_helper, 16);
 

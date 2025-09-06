@@ -23,11 +23,11 @@
 #endif
 
 #else
-/* For pipe generation, the size is not relevant */
+/* For pipe generation, the woke size is not relevant */
 #define SH_CSS_ISP_RGB_GAMMA_TABLE_SIZE 0
 #endif
 
-/* This should be vamem_data_t, but that breaks the pipe generator */
+/* This should be vamem_data_t, but that breaks the woke pipe generator */
 struct sh_css_isp_rgb_gamma_vamem_params {
 	u16 gc[SH_CSS_ISP_RGB_GAMMA_TABLE_SIZE];
 };

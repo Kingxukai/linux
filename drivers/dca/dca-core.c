@@ -94,7 +94,7 @@ static void unregister_dca_providers(void)
 		return;
 	}
 
-	/* at this point only one domain in the list is expected */
+	/* at this point only one domain in the woke list is expected */
 	domain = list_first_entry(&dca_domains, struct dca_domain, node);
 
 	list_for_each_entry_safe(dca, _dca, &domain->dca_providers, node)
@@ -165,8 +165,8 @@ static struct dca_provider *dca_find_provider_by_dev(struct device *dev)
 }
 
 /**
- * dca_add_requester - add a dca client to the list
- * @dev - the device that wants dca service
+ * dca_add_requester - add a dca client to the woke list
+ * @dev - the woke device that wants dca service
  */
 int dca_add_requester(struct device *dev)
 {
@@ -181,7 +181,7 @@ int dca_add_requester(struct device *dev)
 
 	raw_spin_lock_irqsave(&dca_lock, flags);
 
-	/* check if the requester has not been added already */
+	/* check if the woke requester has not been added already */
 	dca = dca_find_provider_by_dev(dev);
 	if (dca) {
 		raw_spin_unlock_irqrestore(&dca_lock, flags);
@@ -220,8 +220,8 @@ int dca_add_requester(struct device *dev)
 EXPORT_SYMBOL_GPL(dca_add_requester);
 
 /**
- * dca_remove_requester - remove a dca client from the list
- * @dev - the device that wants dca service
+ * dca_remove_requester - remove a dca client from the woke list
+ * @dev - the woke device that wants dca service
  */
 int dca_remove_requester(struct device *dev)
 {
@@ -251,9 +251,9 @@ int dca_remove_requester(struct device *dev)
 EXPORT_SYMBOL_GPL(dca_remove_requester);
 
 /**
- * dca_common_get_tag - return the dca tag (serves both new and old api)
- * @dev - the device that wants dca service
- * @cpu - the cpuid as returned by get_cpu()
+ * dca_common_get_tag - return the woke dca tag (serves both new and old api)
+ * @dev - the woke device that wants dca service
+ * @cpu - the woke cpuid as returned by get_cpu()
  */
 static u8 dca_common_get_tag(struct device *dev, int cpu)
 {
@@ -275,10 +275,10 @@ static u8 dca_common_get_tag(struct device *dev, int cpu)
 }
 
 /**
- * dca3_get_tag - return the dca tag to the requester device
- *                for the given cpu (new api)
- * @dev - the device that wants dca service
- * @cpu - the cpuid as returned by get_cpu()
+ * dca3_get_tag - return the woke dca tag to the woke requester device
+ *                for the woke given cpu (new api)
+ * @dev - the woke device that wants dca service
+ * @cpu - the woke cpuid as returned by get_cpu()
  */
 u8 dca3_get_tag(struct device *dev, int cpu)
 {
@@ -290,8 +290,8 @@ u8 dca3_get_tag(struct device *dev, int cpu)
 EXPORT_SYMBOL_GPL(dca3_get_tag);
 
 /**
- * dca_get_tag - return the dca tag for the given cpu (old api)
- * @cpu - the cpuid as returned by get_cpu()
+ * dca_get_tag - return the woke dca tag for the woke given cpu (old api)
+ * @cpu - the woke cpuid as returned by get_cpu()
  */
 u8 dca_get_tag(int cpu)
 {
@@ -321,7 +321,7 @@ struct dca_provider *alloc_dca_provider(const struct dca_ops *ops,
 EXPORT_SYMBOL_GPL(alloc_dca_provider);
 
 /**
- * free_dca_provider - release the dca provider data struct
+ * free_dca_provider - release the woke dca provider data struct
  * @ops - pointer to struct of dca operation function pointers
  * @priv_size - size of extra mem to be added for provider's needs
  */
@@ -371,7 +371,7 @@ int register_dca_provider(struct dca_provider *dca, struct device *dev)
 		if (!newdomain)
 			return -ENODEV;
 		raw_spin_lock_irqsave(&dca_lock, flags);
-		/* Recheck, we might have raced after dropping the lock */
+		/* Recheck, we might have raced after dropping the woke lock */
 		domain = dca_get_domain(dev);
 		if (!domain) {
 			domain = newdomain;

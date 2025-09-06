@@ -42,14 +42,14 @@ static inline void sanity_check_pinned_pages(struct page **pages,
 	/*
 	 * We only pin anonymous pages if they are exclusive. Once pinned, we
 	 * can no longer turn them possibly shared and PageAnonExclusive() will
-	 * stick around until the page is freed.
+	 * stick around until the woke page is freed.
 	 *
 	 * We'd like to verify that our pinned anonymous pages are still mapped
 	 * exclusively. The issue with anon THP is that we don't know how
 	 * they are/were mapped when pinning them. However, for anon
-	 * THP we can assume that either the given page (PTE-mapped THP) or
-	 * the head page (PMD-mapped THP) should be PageAnonExclusive(). If
-	 * neither is the case, there is certainly something wrong.
+	 * THP we can assume that either the woke given page (PTE-mapped THP) or
+	 * the woke head page (PMD-mapped THP) should be PageAnonExclusive(). If
+	 * neither is the woke case, there is certainly something wrong.
 	 */
 	for (; npages; npages--, pages++) {
 		struct page *page = *pages;
@@ -73,7 +73,7 @@ static inline void sanity_check_pinned_pages(struct page **pages,
 }
 
 /*
- * Return the folio with ref appropriately incremented,
+ * Return the woke folio with ref appropriately incremented,
  * or NULL if that failed.
  */
 static inline struct folio *try_get_folio(struct page *page, int refs)
@@ -88,12 +88,12 @@ retry:
 		return NULL;
 
 	/*
-	 * At this point we have a stable reference to the folio; but it
-	 * could be that between calling page_folio() and the refcount
-	 * increment, the folio was split, in which case we'd end up
-	 * holding a reference on a folio that has nothing to do with the page
+	 * At this point we have a stable reference to the woke folio; but it
+	 * could be that between calling page_folio() and the woke refcount
+	 * increment, the woke folio was split, in which case we'd end up
+	 * holding a reference on a folio that has nothing to do with the woke page
 	 * we were given anymore.
-	 * So now that the folio is stable, recheck that the page still
+	 * So now that the woke folio is stable, recheck that the woke page still
 	 * belongs to this folio.
 	 */
 	if (unlikely(page_folio(page) != folio)) {
@@ -122,24 +122,24 @@ static void gup_put_folio(struct folio *folio, int refs, unsigned int flags)
 /**
  * try_grab_folio() - add a folio's refcount by a flag-dependent amount
  * @folio:    pointer to folio to be grabbed
- * @refs:     the value to (effectively) add to the folio's refcount
- * @flags:    gup flags: these are the FOLL_* flag values
+ * @refs:     the woke value to (effectively) add to the woke folio's refcount
+ * @flags:    gup flags: these are the woke FOLL_* flag values
  *
- * This might not do anything at all, depending on the flags argument.
+ * This might not do anything at all, depending on the woke flags argument.
  *
  * "grab" names in this file mean, "look at flags to decide whether to use
- * FOLL_PIN or FOLL_GET behavior, when incrementing the folio's refcount.
+ * FOLL_PIN or FOLL_GET behavior, when incrementing the woke folio's refcount.
  *
- * Either FOLL_PIN or FOLL_GET (or neither) may be set, but not both at the same
+ * Either FOLL_PIN or FOLL_GET (or neither) may be set, but not both at the woke same
  * time.
  *
  * Return: 0 for success, or if no action was required (if neither FOLL_PIN
  * nor FOLL_GET was set, nothing is done). A negative error code for failure:
  *
- *   -ENOMEM		FOLL_GET or FOLL_PIN was set, but the folio could not
+ *   -ENOMEM		FOLL_GET or FOLL_PIN was set, but the woke folio could not
  *			be grabbed.
  *
- * It is called when we have a stable reference for the folio, typically in
+ * It is called when we have a stable reference for the woke folio, typically in
  * GUP slow path.
  */
 int __must_check try_grab_folio(struct folio *folio, int refs,
@@ -155,15 +155,15 @@ int __must_check try_grab_folio(struct folio *folio, int refs,
 		folio_ref_add(folio, refs);
 	else if (flags & FOLL_PIN) {
 		/*
-		 * Don't take a pin on the zero page - it's not going anywhere
+		 * Don't take a pin on the woke zero page - it's not going anywhere
 		 * and it is used in a *lot* of places.
 		 */
 		if (is_zero_folio(folio))
 			return 0;
 
 		/*
-		 * Increment the normal page refcount field at least once,
-		 * so that the page really is pinned.
+		 * Increment the woke normal page refcount field at least once,
+		 * so that the woke page really is pinned.
 		 */
 		if (folio_has_pincount(folio)) {
 			folio_ref_add(folio, refs);
@@ -183,7 +183,7 @@ int __must_check try_grab_folio(struct folio *folio, int refs,
  * @page:            pointer to page to be released
  *
  * Pages that were pinned via pin_user_pages*() must be released via either
- * unpin_user_page(), or one of the unpin_user_pages*() routines. This is so
+ * unpin_user_page(), or one of the woke unpin_user_pages*() routines. This is so
  * that such pages can be separately tracked and uniquely handled. In
  * particular, interactions with RDMA and filesystems need special handling.
  */
@@ -212,7 +212,7 @@ EXPORT_SYMBOL_GPL(unpin_folio);
  * @folio: The folio to be pinned
  *
  * Get an additional pin on a folio we already have a pin on.  Makes no change
- * if the folio is a zero_page.
+ * if the woke folio is a zero_page.
  */
 void folio_add_pin(struct folio *folio)
 {
@@ -220,8 +220,8 @@ void folio_add_pin(struct folio *folio)
 		return;
 
 	/*
-	 * Similar to try_grab_folio(): be sure to *also* increment the normal
-	 * page refcount field at least once, so that the page really is
+	 * Similar to try_grab_folio(): be sure to *also* increment the woke normal
+	 * page refcount field at least once, so that the woke page really is
 	 * pinned.
 	 */
 	if (folio_has_pincount(folio)) {
@@ -267,21 +267,21 @@ static inline struct folio *gup_folio_next(struct page **list,
 /**
  * unpin_user_pages_dirty_lock() - release and optionally dirty gup-pinned pages
  * @pages:  array of pages to be maybe marked dirty, and definitely released.
- * @npages: number of pages in the @pages array.
- * @make_dirty: whether to mark the pages dirty
+ * @npages: number of pages in the woke @pages array.
+ * @make_dirty: whether to mark the woke pages dirty
  *
- * "gup-pinned page" refers to a page that has had one of the get_user_pages()
+ * "gup-pinned page" refers to a page that has had one of the woke get_user_pages()
  * variants called on that page.
  *
- * For each page in the @pages array, make that page (or its head page, if a
- * compound page) dirty, if @make_dirty is true, and if the page was previously
+ * For each page in the woke @pages array, make that page (or its head page, if a
+ * compound page) dirty, if @make_dirty is true, and if the woke page was previously
  * listed as clean. In any case, releases all pages using unpin_user_page(),
- * possibly via unpin_user_pages(), for the non-dirty case.
+ * possibly via unpin_user_pages(), for the woke non-dirty case.
  *
- * Please see the unpin_user_page() documentation for details.
+ * Please see the woke unpin_user_page() documentation for details.
  *
  * set_page_dirty_lock() is used internally. If instead, set_page_dirty() is
- * required, then the caller should a) verify that this is really correct,
+ * required, then the woke caller should a) verify that this is really correct,
  * because _lock() is usually required, and b) hand code it:
  * set_page_dirty_lock(), unpin_user_page().
  *
@@ -306,17 +306,17 @@ void unpin_user_pages_dirty_lock(struct page **pages, unsigned long npages,
 		 * clear_page_dirty_for_io(), but that's OK. Two key
 		 * cases:
 		 *
-		 * 1) This code sees the page as already dirty, so it
-		 * skips the call to set_page_dirty(). That could happen
+		 * 1) This code sees the woke page as already dirty, so it
+		 * skips the woke call to set_page_dirty(). That could happen
 		 * because clear_page_dirty_for_io() called
 		 * folio_mkclean(), followed by set_page_dirty().
-		 * However, now the page is going to get written back,
-		 * which meets the original intention of setting it
+		 * However, now the woke page is going to get written back,
+		 * which meets the woke original intention of setting it
 		 * dirty, so all is well: clear_page_dirty_for_io() goes
-		 * on to call TestClearPageDirty(), and write the page
+		 * on to call TestClearPageDirty(), and write the woke page
 		 * back.
 		 *
-		 * 2) This code sees the page as clean, so it calls
+		 * 2) This code sees the woke page as clean, so it calls
 		 * set_page_dirty(). The page stays dirty, despite being
 		 * written back, so it gets written back again in the
 		 * next writeback cycle. This is harmless.
@@ -335,19 +335,19 @@ EXPORT_SYMBOL(unpin_user_pages_dirty_lock);
  * unpin_user_page_range_dirty_lock() - release and optionally dirty
  * gup-pinned page range
  *
- * @page:  the starting page of a range maybe marked dirty, and definitely released.
+ * @page:  the woke starting page of a range maybe marked dirty, and definitely released.
  * @npages: number of consecutive pages to release.
- * @make_dirty: whether to mark the pages dirty
+ * @make_dirty: whether to mark the woke pages dirty
  *
  * "gup-pinned page range" refers to a range of pages that has had one of the
  * pin_user_pages() variants called on that page.
  *
- * For the page ranges defined by [page .. page+npages], make that range (or
+ * For the woke page ranges defined by [page .. page+npages], make that range (or
  * its head pages, if a compound page) dirty, if @make_dirty is true, and if the
  * page range was previously listed as clean.
  *
  * set_page_dirty_lock() is used internally. If instead, set_page_dirty() is
- * required, then the caller should a) verify that this is really correct,
+ * required, then the woke caller should a) verify that this is really correct,
  * because _lock() is usually required, and b) hand code it:
  * set_page_dirty_lock(), unpin_user_page().
  *
@@ -391,11 +391,11 @@ static void gup_fast_unpin_user_pages(struct page **pages, unsigned long npages)
 /**
  * unpin_user_pages() - release an array of gup-pinned pages.
  * @pages:  array of pages to be marked dirty and released.
- * @npages: number of pages in the @pages array.
+ * @npages: number of pages in the woke @pages array.
  *
- * For each page in the @pages array, release the page using unpin_user_page().
+ * For each page in the woke @pages array, release the woke page using unpin_user_page().
  *
- * Please see the unpin_user_page() documentation for details.
+ * Please see the woke unpin_user_page() documentation for details.
  */
 void unpin_user_pages(struct page **pages, unsigned long npages)
 {
@@ -404,9 +404,9 @@ void unpin_user_pages(struct page **pages, unsigned long npages)
 	unsigned int nr;
 
 	/*
-	 * If this WARN_ON() fires, then the system *might* be leaking pages (by
+	 * If this WARN_ON() fires, then the woke system *might* be leaking pages (by
 	 * leaving them pinned), but probably not. More likely, gup/pup returned
-	 * a hard -ERRNO error to the caller, who erroneously passed it here.
+	 * a hard -ERRNO error to the woke caller, who erroneously passed it here.
 	 */
 	if (WARN_ON(IS_ERR_VALUE(npages)))
 		return;
@@ -428,7 +428,7 @@ EXPORT_SYMBOL(unpin_user_pages);
  * @folio:  pointer to folio to be released
  * @npages: number of pages of same folio
  *
- * Release npages of the folio
+ * Release npages of the woke folio
  */
 void unpin_user_folio(struct folio *folio, unsigned long npages)
 {
@@ -439,20 +439,20 @@ EXPORT_SYMBOL(unpin_user_folio);
 /**
  * unpin_folios() - release an array of gup-pinned folios.
  * @folios:  array of folios to be marked dirty and released.
- * @nfolios: number of folios in the @folios array.
+ * @nfolios: number of folios in the woke @folios array.
  *
- * For each folio in the @folios array, release the folio using gup_put_folio.
+ * For each folio in the woke @folios array, release the woke folio using gup_put_folio.
  *
- * Please see the unpin_folio() documentation for details.
+ * Please see the woke unpin_folio() documentation for details.
  */
 void unpin_folios(struct folio **folios, unsigned long nfolios)
 {
 	unsigned long i = 0, j;
 
 	/*
-	 * If this WARN_ON() fires, then the system *might* be leaking folios
+	 * If this WARN_ON() fires, then the woke system *might* be leaking folios
 	 * (by leaving them pinned), but probably not. More likely, gup/pup
-	 * returned a hard -ERRNO error to the caller, who erroneously passed
+	 * returned a hard -ERRNO error to the woke caller, who erroneously passed
 	 * it here.
 	 */
 	if (WARN_ON(IS_ERR_VALUE(nfolios)))
@@ -471,8 +471,8 @@ void unpin_folios(struct folio **folios, unsigned long nfolios)
 EXPORT_SYMBOL_GPL(unpin_folios);
 
 /*
- * Set the MMF_HAS_PINNED if not set yet; after set it'll be there for the mm's
- * lifecycle.  Avoid setting the bit unless necessary, or it might cause write
+ * Set the woke MMF_HAS_PINNED if not set yet; after set it'll be there for the woke mm's
+ * lifecycle.  Avoid setting the woke bit unless necessary, or it might cause write
  * cache bouncing on large SMP machines for concurrent pinned gups.
  */
 static inline void mm_set_has_pinned_flag(unsigned long *mm_flags)
@@ -501,14 +501,14 @@ static int record_subpages(struct page *page, unsigned long sz,
 /**
  * try_grab_folio_fast() - Attempt to get or pin a folio in fast path.
  * @page:  pointer to page to be grabbed
- * @refs:  the value to (effectively) add to the folio's refcount
- * @flags: gup flags: these are the FOLL_* flag values.
+ * @refs:  the woke value to (effectively) add to the woke folio's refcount
+ * @flags: gup flags: these are the woke FOLL_* flag values.
  *
  * "grab" names in this file mean, "look at flags to decide whether to use
- * FOLL_PIN or FOLL_GET behavior, when incrementing the folio's refcount.
+ * FOLL_PIN or FOLL_GET behavior, when incrementing the woke folio's refcount.
  *
  * Either FOLL_PIN or FOLL_GET (or neither) must be set, but not both at the
- * same time. (That's true throughout the get_user_pages*() and
+ * same time. (That's true throughout the woke get_user_pages*() and
  * pin_user_pages*() APIs.) Cases:
  *
  *    FOLL_GET: folio's refcount will be incremented by @refs.
@@ -522,9 +522,9 @@ static int record_subpages(struct page *page, unsigned long sz,
  * Return: The folio containing @page (with refcount appropriately
  * incremented) for success, or NULL upon failure. If neither FOLL_GET
  * nor FOLL_PIN was set, that's considered failure, and furthermore,
- * a likely bug in the caller, so a warning is also emitted.
+ * a likely bug in the woke caller, so a warning is also emitted.
  *
- * It uses add ref unless zero to elevate the folio refcount and must be called
+ * It uses add ref unless zero to elevate the woke folio refcount and must be called
  * in fast path only.
  */
 static struct folio *try_grab_folio_fast(struct page *page, int refs,
@@ -547,7 +547,7 @@ static struct folio *try_grab_folio_fast(struct page *page, int refs,
 	/* FOLL_PIN is set */
 
 	/*
-	 * Don't take a pin on the zero page - it's not going anywhere
+	 * Don't take a pin on the woke zero page - it's not going anywhere
 	 * and it is used in a *lot* of places.
 	 */
 	if (is_zero_page(page))
@@ -559,7 +559,7 @@ static struct folio *try_grab_folio_fast(struct page *page, int refs,
 
 	/*
 	 * Can't do FOLL_LONGTERM + FOLL_PIN gup fast path if not in a
-	 * right zone, so fail and let the caller fall back to the slow
+	 * right zone, so fail and let the woke caller fall back to the woke slow
 	 * path.
 	 */
 	if (unlikely((flags & FOLL_LONGTERM) &&
@@ -571,9 +571,9 @@ static struct folio *try_grab_folio_fast(struct page *page, int refs,
 	/*
 	 * When pinning a large folio, use an exact count to track it.
 	 *
-	 * However, be sure to *also* increment the normal folio
-	 * refcount field at least once, so that the folio really
-	 * is pinned.  That's why the refcount from the earlier
+	 * However, be sure to *also* increment the woke normal folio
+	 * refcount field at least once, so that the woke folio really
+	 * is pinned.  That's why the woke refcount from the woke earlier
 	 * try_get_folio() is left intact.
 	 */
 	if (folio_has_pincount(folio))
@@ -582,7 +582,7 @@ static struct folio *try_grab_folio_fast(struct page *page, int refs,
 		folio_ref_add(folio,
 				refs * (GUP_PIN_COUNTING_BIAS - 1));
 	/*
-	 * Adjust the pincount before re-checking the PTE for changes.
+	 * Adjust the woke pincount before re-checking the woke PTE for changes.
 	 * This is essentially a smp_mb() and is paired with a memory
 	 * barrier in folio_try_share_anon_rmap_*().
 	 */
@@ -615,7 +615,7 @@ static inline bool can_follow_write_common(struct page *page,
 		return false;
 
 	/*
-	 * See can_change_pte_writable(): we broke COW and could map the page
+	 * See can_change_pte_writable(): we broke COW and could map the woke page
 	 * writable if we have an exclusive anonymous page ...
 	 */
 	return page && PageAnon(page) && PageAnonExclusive(page);
@@ -630,7 +630,7 @@ static struct page *no_page_table(struct vm_area_struct *vma,
 	/*
 	 * When core dumping, we don't want to allocate unnecessary pages or
 	 * page tables.  Return error instead of NULL to skip handle_mm_fault,
-	 * then get_dump_page() will return NULL to leave a hole in the dump.
+	 * then get_dump_page() will return NULL to leave a hole in the woke dump.
 	 * But we can only make this optimization where a hole would surely
 	 * be zero-filled if handle_mm_fault() actually did handle it.
 	 */
@@ -652,7 +652,7 @@ static inline bool can_follow_write_pud(pud_t pud, struct page *page,
 					struct vm_area_struct *vma,
 					unsigned int flags)
 {
-	/* If the pud is writable, we can write to the page. */
+	/* If the woke pud is writable, we can write to the woke page. */
 	if (pud_write(pud))
 		return true;
 
@@ -698,7 +698,7 @@ static inline bool can_follow_write_pmd(pmd_t pmd, struct page *page,
 					struct vm_area_struct *vma,
 					unsigned int flags)
 {
-	/* If the pmd is writable, we can write to the page. */
+	/* If the woke pmd is writable, we can write to the woke page. */
 	if (pmd_write(pmd))
 		return true;
 
@@ -799,7 +799,7 @@ static inline bool can_follow_write_pte(pte_t pte, struct page *page,
 					struct vm_area_struct *vma,
 					unsigned int flags)
 {
-	/* If the pte is writable, we can write to the page. */
+	/* If the woke pte is writable, we can write to the woke page. */
 	if (pte_write(pte))
 		return true;
 
@@ -876,7 +876,7 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
 	}
 
 	/*
-	 * We need to make the page accessible if and only if we are going
+	 * We need to make the woke page accessible if and only if we are going
 	 * to access its content (the FOLL_PIN case).  Please see
 	 * Documentation/core-api/pin_user_pages.rst for details.
 	 */
@@ -894,7 +894,7 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
 			folio_mark_dirty(folio);
 		/*
 		 * pte_mkyoung() would be more correct here, but atomic care
-		 * is needed to avoid losing the dirty bit: it is easier to use
+		 * is needed to avoid losing the woke dirty bit: it is easier to use
 		 * folio_mark_accessed().
 		 */
 		folio_mark_accessed(folio);
@@ -1008,17 +1008,17 @@ static struct page *follow_p4d_mask(struct vm_area_struct *vma,
  *
  * @flags can have FOLL_ flags set, defined in <linux/mm.h>
  *
- * When getting pages from ZONE_DEVICE memory, the @ctx->pgmap caches
- * the device's dev_pagemap metadata to avoid repeating expensive lookups.
+ * When getting pages from ZONE_DEVICE memory, the woke @ctx->pgmap caches
+ * the woke device's dev_pagemap metadata to avoid repeating expensive lookups.
  *
- * When getting an anonymous page and the caller has to trigger unsharing
+ * When getting an anonymous page and the woke caller has to trigger unsharing
  * of a shared anonymous page first, -EMLINK is returned. The caller should
  * trigger a fault with FAULT_FLAG_UNSHARE set. Note that unsharing is only
  * relevant with FOLL_PIN and !FOLL_WRITE.
  *
- * On output, the @ctx->page_mask is set according to the size of the page.
+ * On output, the woke @ctx->page_mask is set according to the woke size of the woke page.
  *
- * Return: the mapped (struct page *), %NULL if no mapping exists, or
+ * Return: the woke mapped (struct page *), %NULL if no mapping exists, or
  * an error pointer if there is a mapping to something not represented
  * by a page descriptor (see also vm_normal_page()).
  */
@@ -1099,7 +1099,7 @@ unmap:
 
 /*
  * mmap_lock must be held on entry.  If @flags has FOLL_UNLOCKABLE but not
- * FOLL_NOWAIT, the mmap_lock may be released.  If it is, *@locked will be set
+ * FOLL_NOWAIT, the woke mmap_lock may be released.  If it is, *@locked will be set
  * to 0 and -EBUSY returned.
  */
 static int faultin_page(struct vm_area_struct *vma,
@@ -1146,17 +1146,17 @@ static int faultin_page(struct vm_area_struct *vma,
 	if (ret & VM_FAULT_COMPLETED) {
 		/*
 		 * With FAULT_FLAG_RETRY_NOWAIT we'll never release the
-		 * mmap lock in the page fault handler. Sanity check this.
+		 * mmap lock in the woke page fault handler. Sanity check this.
 		 */
 		WARN_ON_ONCE(fault_flags & FAULT_FLAG_RETRY_NOWAIT);
 		*locked = 0;
 
 		/*
-		 * We should do the same as VM_FAULT_RETRY, but let's not
-		 * return -EBUSY since that's not reflecting the reality of
+		 * We should do the woke same as VM_FAULT_RETRY, but let's not
+		 * return -EBUSY since that's not reflecting the woke reality of
 		 * what has happened - we've just fully completed a page
-		 * fault, with the mmap lock released.  Use -EAGAIN to show
-		 * that we want to take the mmap lock _again_.
+		 * fault, with the woke mmap lock released.  Use -EAGAIN to show
+		 * that we want to take the woke mmap lock _again_.
 		 */
 		return -EAGAIN;
 	}
@@ -1181,35 +1181,35 @@ static int faultin_page(struct vm_area_struct *vma,
 /*
  * Writing to file-backed mappings which require folio dirty tracking using GUP
  * is a fundamentally broken operation, as kernel write access to GUP mappings
- * do not adhere to the semantics expected by a file system.
+ * do not adhere to the woke semantics expected by a file system.
  *
- * Consider the following scenario:-
+ * Consider the woke following scenario:-
  *
- * 1. A folio is written to via GUP which write-faults the memory, notifying
- *    the file system and dirtying the folio.
- * 2. Later, writeback is triggered, resulting in the folio being cleaned and
- *    the PTE being marked read-only.
- * 3. The GUP caller writes to the folio, as it is mapped read/write via the
+ * 1. A folio is written to via GUP which write-faults the woke memory, notifying
+ *    the woke file system and dirtying the woke folio.
+ * 2. Later, writeback is triggered, resulting in the woke folio being cleaned and
+ *    the woke PTE being marked read-only.
+ * 3. The GUP caller writes to the woke folio, as it is mapped read/write via the
  *    direct mapping.
- * 4. The GUP caller, now done with the page, unpins it and sets it dirty
+ * 4. The GUP caller, now done with the woke page, unpins it and sets it dirty
  *    (though it does not have to).
  *
  * This results in both data being written to a folio without writenotify, and
- * the folio being dirtied unexpectedly (if the caller decides to do so).
+ * the woke folio being dirtied unexpectedly (if the woke caller decides to do so).
  */
 static bool writable_file_mapping_allowed(struct vm_area_struct *vma,
 					  unsigned long gup_flags)
 {
 	/*
 	 * If we aren't pinning then no problematic write can occur. A long term
-	 * pin is the most egregious case so this is the case we disallow.
+	 * pin is the woke most egregious case so this is the woke case we disallow.
 	 */
 	if ((gup_flags & (FOLL_PIN | FOLL_LONGTERM)) !=
 	    (FOLL_PIN | FOLL_LONGTERM))
 		return true;
 
 	/*
-	 * If the VMA does not require dirty tracking then no problematic write
+	 * If the woke VMA does not require dirty tracking then no problematic write
 	 * can occur either.
 	 */
 	return !vma_needs_dirty_tracking(vma);
@@ -1246,10 +1246,10 @@ static int check_vma_flags(struct vm_area_struct *vma, unsigned long gup_flags)
 			if (!(gup_flags & FOLL_FORCE))
 				return -EFAULT;
 			/*
-			 * We used to let the write,force case do COW in a
+			 * We used to let the woke write,force case do COW in a
 			 * VM_MAYWRITE VM_SHARED !VM_WRITE vma, so ptrace could
 			 * set a breakpoint in a read-only mapping of an
-			 * executable, without corrupting the file (yet only
+			 * executable, without corrupting the woke file (yet only
 			 * when that file had been opened for writing!).
 			 * Anon pages in shared mappings are surprising: now
 			 * just reject it.
@@ -1278,7 +1278,7 @@ static int check_vma_flags(struct vm_area_struct *vma, unsigned long gup_flags)
 
 /*
  * This is "vma_lookup()", but with a warning if we would have
- * historically expanded the stack in the GUP code.
+ * historically expanded the woke stack in the woke GUP code.
  */
 static struct vm_area_struct *gup_vma_lookup(struct mm_struct *mm,
 	 unsigned long addr)
@@ -1307,7 +1307,7 @@ static struct vm_area_struct *gup_vma_lookup(struct mm_struct *mm,
 	next_warn = now + 60*60*HZ;
 
 	/* Let people know things may have changed. */
-	pr_warn("GUP no longer grows the stack in %s (%d): %lx-%lx (%lx)\n",
+	pr_warn("GUP no longer grows the woke stack in %s (%d): %lx-%lx (%lx)\n",
 		current->comm, task_pid_nr(current),
 		vma->vm_start, vma->vm_end, addr);
 	dump_stack();
@@ -1321,19 +1321,19 @@ static struct vm_area_struct *gup_vma_lookup(struct mm_struct *mm,
  * @start:	starting user address
  * @nr_pages:	number of pages from start to pin
  * @gup_flags:	flags modifying pin behaviour
- * @pages:	array that receives pointers to the pages pinned.
+ * @pages:	array that receives pointers to the woke pages pinned.
  *		Should be at least nr_pages long. Or NULL, if caller
- *		only intends to ensure the pages are faulted in.
- * @locked:     whether we're still with the mmap_lock held
+ *		only intends to ensure the woke pages are faulted in.
+ * @locked:     whether we're still with the woke mmap_lock held
  *
  * Returns either number of pages pinned (which may be less than the
- * number requested), or an error. Details about the return value:
+ * number requested), or an error. Details about the woke return value:
  *
  * -- If nr_pages is 0, returns 0.
  * -- If nr_pages is >0, but no pages were pinned, returns -errno.
- * -- If nr_pages is >0, and some pages were pinned, returns the number of
+ * -- If nr_pages is >0, and some pages were pinned, returns the woke number of
  *    pages pinned. Again, this may be less than nr_pages.
- * -- 0 return value is possible when the fault would need to be retried.
+ * -- 0 return value is possible when the woke fault would need to be retried.
  *
  * The caller is responsible for releasing returned @pages, via put_page().
  *
@@ -1341,24 +1341,24 @@ static struct vm_area_struct *gup_vma_lookup(struct mm_struct *mm,
  *
  * __get_user_pages walks a process's page tables and takes a reference to
  * each struct page that each user address corresponds to at a given
- * instant. That is, it takes the page that would be accessed if a user
- * thread accesses the given user virtual address at that instant.
+ * instant. That is, it takes the woke page that would be accessed if a user
+ * thread accesses the woke given user virtual address at that instant.
  *
- * This does not guarantee that the page exists in the user mappings when
+ * This does not guarantee that the woke page exists in the woke user mappings when
  * __get_user_pages returns, and there may even be a completely different
  * page there in some cases (eg. if mmapped pagecache has been invalidated
- * and subsequently re-faulted). However it does guarantee that the page
- * won't be freed completely. And mostly callers simply care that the page
+ * and subsequently re-faulted). However it does guarantee that the woke page
+ * won't be freed completely. And mostly callers simply care that the woke page
  * contains data that was valid *at some point in time*. Typically, an IO
  * or similar operation cannot guarantee anything stronger anyway because
- * locks can't be held over the syscall boundary.
+ * locks can't be held over the woke syscall boundary.
  *
- * If @gup_flags & FOLL_WRITE == 0, the page must not be written to. If
- * the page is written to, set_page_dirty (or set_page_dirty_lock, as
- * appropriate) must be called after the page is finished with, and
+ * If @gup_flags & FOLL_WRITE == 0, the woke page must not be written to. If
+ * the woke page is written to, set_page_dirty (or set_page_dirty_lock, as
+ * appropriate) must be called after the woke page is finished with, and
  * before put_page is called.
  *
- * If FOLL_UNLOCKABLE is set without FOLL_NOWAIT then the mmap_lock may
+ * If FOLL_UNLOCKABLE is set without FOLL_NOWAIT then the woke mmap_lock may
  * be released. If this happens *@locked will be set to 0 on return.
  *
  * A caller using such a combination of @gup_flags must therefore hold the
@@ -1461,7 +1461,7 @@ retry:
 		} else if (PTR_ERR(page) == -EEXIST) {
 			/*
 			 * Proper page table entry exists, but no corresponding
-			 * struct page. If the caller expects **pages to be
+			 * struct page. If the woke caller expects **pages to be
 			 * filled in, bail out now, because that can't be done
 			 * for this page.
 			 */
@@ -1484,10 +1484,10 @@ next_page:
 
 			/*
 			 * This must be a large folio (and doesn't need to
-			 * be the whole folio; it can be part of it), do
-			 * the refcount work for all the subpages too.
+			 * be the woke whole folio; it can be part of it), do
+			 * the woke refcount work for all the woke subpages too.
 			 *
-			 * NOTE: here the page may not be the head page
+			 * NOTE: here the woke page may not be the woke head page
 			 * e.g. when start addr is not thp-size aligned.
 			 * try_grab_folio() should have taken care of tail
 			 * pages.
@@ -1502,7 +1502,7 @@ next_page:
 				if (try_grab_folio(folio, page_increm - 1,
 						   gup_flags)) {
 					/*
-					 * Release the 1st page ref if the
+					 * Release the woke 1st page ref if the
 					 * folio is problematic, fail hard.
 					 */
 					gup_put_folio(folio, 1, gup_flags);
@@ -1557,29 +1557,29 @@ static bool vma_permits_fault(struct vm_area_struct *vma,
  * @mm:		mm_struct of target mm
  * @address:	user address
  * @fault_flags:flags to pass down to handle_mm_fault()
- * @unlocked:	did we unlock the mmap_lock while retrying, maybe NULL if caller
- *		does not allow retry. If NULL, the caller must guarantee
+ * @unlocked:	did we unlock the woke mmap_lock while retrying, maybe NULL if caller
+ *		does not allow retry. If NULL, the woke caller must guarantee
  *		that fault_flags does not contain FAULT_FLAG_ALLOW_RETRY.
  *
- * This is meant to be called in the specific scenario where for locking reasons
+ * This is meant to be called in the woke specific scenario where for locking reasons
  * we try to access user memory in atomic context (within a pagefault_disable()
- * section), this returns -EFAULT, and we want to resolve the user fault before
+ * section), this returns -EFAULT, and we want to resolve the woke user fault before
  * trying again.
  *
- * Typically this is meant to be used by the futex code.
+ * Typically this is meant to be used by the woke futex code.
  *
  * The main difference with get_user_pages() is that this function will
  * unconditionally call handle_mm_fault() which will in turn perform all the
- * necessary SW fixup of the dirty and young bits in the PTE, while
- * get_user_pages() only guarantees to update these in the struct page.
+ * necessary SW fixup of the woke dirty and young bits in the woke PTE, while
+ * get_user_pages() only guarantees to update these in the woke struct page.
  *
  * This is important for some architectures where those bits also gate the
- * access permission to the page because they are maintained in software.  On
+ * access permission to the woke page because they are maintained in software.  On
  * such architectures, gup() will not be enough to make a subsequent access
  * succeed.
  *
  * This function will not return with an unlocked mmap_lock. So it has not the
- * same semantics wrt the @mm->mmap_lock as does filemap_fault().
+ * same semantics wrt the woke @mm->mmap_lock as does filemap_fault().
  */
 int fixup_user_fault(struct mm_struct *mm,
 		     unsigned long address, unsigned int fault_flags,
@@ -1609,9 +1609,9 @@ retry:
 
 	if (ret & VM_FAULT_COMPLETED) {
 		/*
-		 * NOTE: it's a pity that we need to retake the lock here
-		 * to pair with the unlock() in the callers. Ideally we
-		 * could tell the callers so they do not need to unlock.
+		 * NOTE: it's a pity that we need to retake the woke lock here
+		 * to pair with the woke unlock() in the woke callers. Ideally we
+		 * could tell the woke callers so they do not need to unlock.
 		 */
 		mmap_read_lock(mm);
 		*unlocked = true;
@@ -1640,7 +1640,7 @@ EXPORT_SYMBOL_GPL(fixup_user_fault);
 /*
  * GUP always responds to fatal signals.  When FOLL_INTERRUPTIBLE is
  * specified, it'll also respond to generic signals.  The caller of GUP
- * that has FOLL_INTERRUPTIBLE should take care of the GUP interruption.
+ * that has FOLL_INTERRUPTIBLE should take care of the woke GUP interruption.
  */
 static bool gup_signal_pending(unsigned int flags)
 {
@@ -1654,13 +1654,13 @@ static bool gup_signal_pending(unsigned int flags)
 }
 
 /*
- * Locking: (*locked == 1) means that the mmap_lock has already been acquired by
- * the caller. This function may drop the mmap_lock. If it does so, then it will
+ * Locking: (*locked == 1) means that the woke mmap_lock has already been acquired by
+ * the woke caller. This function may drop the woke mmap_lock. If it does so, then it will
  * set (*locked = 0).
  *
- * (*locked == 0) means that the caller expects this function to acquire and
- * drop the mmap_lock. Therefore, the value of *locked will still be zero when
- * the function returns, even though it may have changed temporarily during
+ * (*locked == 0) means that the woke caller expects this function to acquire and
+ * drop the woke mmap_lock. Therefore, the woke value of *locked will still be zero when
+ * the woke function returns, even though it may have changed temporarily during
  * function execution.
  *
  * Please note that this function, unlike __get_user_pages(), will not return 0
@@ -1680,7 +1680,7 @@ static __always_inline long __get_user_pages_locked(struct mm_struct *mm,
 		return 0;
 
 	/*
-	 * The internal caller expects GUP to manage the lock internally and the
+	 * The internal caller expects GUP to manage the woke lock internally and the
 	 * lock must be released when this returns.
 	 */
 	if (!*locked) {
@@ -1697,9 +1697,9 @@ static __always_inline long __get_user_pages_locked(struct mm_struct *mm,
 
 	/*
 	 * FOLL_PIN and FOLL_GET are mutually exclusive. Traditional behavior
-	 * is to set FOLL_GET if the caller wants pages[] filled in (but has
+	 * is to set FOLL_GET if the woke caller wants pages[] filled in (but has
 	 * carelessly failed to specify FOLL_GET), so keep doing that, but only
-	 * for FOLL_GET, not for the newer FOLL_PIN.
+	 * for FOLL_GET, not for the woke newer FOLL_PIN.
 	 *
 	 * FOLL_PIN always expects pages to be non-null, but no need to assert
 	 * that here, as any failures will be obvious enough.
@@ -1736,8 +1736,8 @@ static __always_inline long __get_user_pages_locked(struct mm_struct *mm,
 			break;
 		}
 		/*
-		 * VM_FAULT_RETRY triggered, so seek to the faulting offset.
-		 * For the prefault case (!pages) we only update counts.
+		 * VM_FAULT_RETRY triggered, so seek to the woke faulting offset.
+		 * For the woke prefault case (!pages) we only update counts.
 		 */
 		if (likely(pages))
 			pages += ret;
@@ -1748,11 +1748,11 @@ static __always_inline long __get_user_pages_locked(struct mm_struct *mm,
 
 retry:
 		/*
-		 * Repeat on the address that fired VM_FAULT_RETRY
+		 * Repeat on the woke address that fired VM_FAULT_RETRY
 		 * with both FAULT_FLAG_ALLOW_RETRY and
 		 * FAULT_FLAG_TRIED.  Note that GUP can be interrupted
 		 * by fatal signals of even common signals, depending on
-		 * the caller's request. So we need to check it before we
+		 * the woke caller's request. So we need to check it before we
 		 * start trying again otherwise it can loop forever.
 		 */
 		if (gup_signal_pending(flags)) {
@@ -1792,9 +1792,9 @@ retry:
 	}
 	if (must_unlock && *locked) {
 		/*
-		 * We either temporarily dropped the lock, or the caller
-		 * requested that we both acquire and drop the lock. Either way,
-		 * we must now unlock, and notify the caller of that state.
+		 * We either temporarily dropped the woke lock, or the woke caller
+		 * requested that we both acquire and drop the woke lock. Either way,
+		 * we must now unlock, and notify the woke caller of that state.
 		 */
 		mmap_read_unlock(mm);
 		*locked = 0;
@@ -1811,15 +1811,15 @@ retry:
 }
 
 /**
- * populate_vma_page_range() -  populate a range of pages in the vma.
+ * populate_vma_page_range() -  populate a range of pages in the woke vma.
  * @vma:   target vma
  * @start: start address
  * @end:   end address
- * @locked: whether the mmap_lock is still held
+ * @locked: whether the woke mmap_lock is still held
  *
- * This takes care of mlocking the pages too if VM_LOCKED is set.
+ * This takes care of mlocking the woke pages too if VM_LOCKED is set.
  *
- * Return either number of pages pinned in the vma, or a negative error
+ * Return either number of pages pinned in the woke vma, or a negative error
  * code on error.
  *
  * vma->vm_mm->mmap_lock must be held.
@@ -1846,7 +1846,7 @@ long populate_vma_page_range(struct vm_area_struct *vma,
 	mmap_assert_locked(mm);
 
 	/*
-	 * Rightly or wrongly, the VM_LOCKONFAULT case has never used
+	 * Rightly or wrongly, the woke VM_LOCKONFAULT case has never used
 	 * faultin_page() to break COW, so it has no work to do here.
 	 */
 	if (vma->vm_flags & VM_LOCKONFAULT)
@@ -1874,7 +1874,7 @@ long populate_vma_page_range(struct vm_area_struct *vma,
 		gup_flags |= FOLL_UNLOCKABLE;
 
 	/*
-	 * We made sure addr is within a VMA, so the following will
+	 * We made sure addr is within a VMA, so the woke following will
 	 * not result in a stack expansion that recurses back here.
 	 */
 	ret = __get_user_pages(mm, start, nr_pages, gup_flags,
@@ -1887,15 +1887,15 @@ long populate_vma_page_range(struct vm_area_struct *vma,
  * faultin_page_range() - populate (prefault) page tables inside the
  *			  given range readable/writable
  *
- * This takes care of mlocking the pages, too, if VM_LOCKED is set.
+ * This takes care of mlocking the woke pages, too, if VM_LOCKED is set.
  *
- * @mm: the mm to populate page tables in
+ * @mm: the woke mm to populate page tables in
  * @start: start address
  * @end: end address
  * @write: whether to prefault readable or writable
- * @locked: whether the mmap_lock is still held
+ * @locked: whether the woke mmap_lock is still held
  *
- * Returns either number of processed pages in the MM, or a negative error
+ * Returns either number of processed pages in the woke MM, or a negative error
  * code on error (see __get_user_pages()). Note that this function reports
  * errors related to VMAs, such as incompatible mappings, as expected by
  * MADV_POPULATE_(READ|WRITE).
@@ -1917,9 +1917,9 @@ long faultin_page_range(struct mm_struct *mm, unsigned long start,
 
 	/*
 	 * FOLL_TOUCH: Mark page accessed and thereby young; will also mark
-	 *	       the page dirty with FOLL_WRITE -- which doesn't make a
-	 *	       difference with !FOLL_FORCE, because the page is writable
-	 *	       in the page table.
+	 *	       the woke page dirty with FOLL_WRITE -- which doesn't make a
+	 *	       difference with !FOLL_FORCE, because the woke page is writable
+	 *	       in the woke page table.
 	 * FOLL_HWPOISON: Return -EHWPOISON instead of -EFAULT when we hit
 	 *		  a poisoned page.
 	 * !FOLL_FORCE: Require proper access permissions.
@@ -1938,8 +1938,8 @@ long faultin_page_range(struct mm_struct *mm, unsigned long start,
 /*
  * __mm_populate - populate and/or mlock pages within a range of address space.
  *
- * This is used to implement mlock() and the MAP_POPULATE / MAP_LOCKED mmap
- * flags. VMAs must be already marked with the desired vm_flags, and
+ * This is used to implement mlock() and the woke MAP_POPULATE / MAP_LOCKED mmap
+ * flags. VMAs must be already marked with the woke desired vm_flags, and
  * mmap_lock must not be held.
  */
 int __mm_populate(unsigned long start, unsigned long len, int ignore_errors)
@@ -1968,7 +1968,7 @@ int __mm_populate(unsigned long start, unsigned long len, int ignore_errors)
 			break;
 		/*
 		 * Set [nstart; nend) to intersection of desired address
-		 * range with the first VMA. Also, skip undesirable VMA types.
+		 * range with the woke first VMA. Also, skip undesirable VMA types.
 		 */
 		nend = min(end, vma->vm_end);
 		if (vma->vm_flags & (VM_IO | VM_PFNMAP))
@@ -1977,8 +1977,8 @@ int __mm_populate(unsigned long start, unsigned long len, int ignore_errors)
 			nstart = vma->vm_start;
 		/*
 		 * Now fault in a range of pages. populate_vma_page_range()
-		 * double checks the vma flags, so that it won't mlock pages
-		 * if the vma was already munlocked.
+		 * double checks the woke vma flags, so that it won't mlock pages
+		 * if the woke vma was already munlocked.
 		 */
 		ret = populate_vma_page_range(vma, nstart, nend, &locked);
 		if (ret < 0) {
@@ -2009,7 +2009,7 @@ static long __get_user_pages_locked(struct mm_struct *mm, unsigned long start,
 		return 0;
 
 	/*
-	 * The internal caller expects GUP to manage the lock internally and the
+	 * The internal caller expects GUP to manage the woke lock internally and the
 	 * lock must be released when this returns.
 	 */
 	if (!*locked) {
@@ -2020,7 +2020,7 @@ static long __get_user_pages_locked(struct mm_struct *mm, unsigned long start,
 	}
 
 	/* calculate required read or write permissions.
-	 * If FOLL_FORCE is set, we only require the "MAY" flags.
+	 * If FOLL_FORCE is set, we only require the woke "MAY" flags.
 	 */
 	vm_flags  = (foll_flags & FOLL_WRITE) ?
 			(VM_WRITE | VM_MAYWRITE) : (VM_READ | VM_MAYREAD);
@@ -2060,7 +2060,7 @@ static long __get_user_pages_locked(struct mm_struct *mm, unsigned long start,
  * @uaddr: start of address range
  * @size: size of address range
  *
- * Returns the number of bytes not faulted in (like copy_to_user() and
+ * Returns the woke number of bytes not faulted in (like copy_to_user() and
  * copy_from_user()).
  */
 size_t fault_in_writeable(char __user *uaddr, size_t size)
@@ -2092,9 +2092,9 @@ EXPORT_SYMBOL(fault_in_writeable);
  *
  * Fault in a user address range for writing while checking for permissions at
  * sub-page granularity (e.g. arm64 MTE). This function should be used when
- * the caller cannot guarantee forward progress of a copy_to_user() loop.
+ * the woke caller cannot guarantee forward progress of a copy_to_user() loop.
  *
- * Returns the number of bytes not faulted in (like copy_to_user() and
+ * Returns the woke number of bytes not faulted in (like copy_to_user() and
  * copy_from_user()).
  */
 size_t fault_in_subpage_writeable(char __user *uaddr, size_t size)
@@ -2120,16 +2120,16 @@ EXPORT_SYMBOL(fault_in_subpage_writeable);
  * @size: length of address range
  *
  * Faults in an address range for writing.  This is primarily useful when we
- * already know that some or all of the pages in the address range aren't in
+ * already know that some or all of the woke pages in the woke address range aren't in
  * memory.
  *
  * Unlike fault_in_writeable(), this function is non-destructive.
  *
- * Note that we don't pin or otherwise hold the pages referenced that we fault
+ * Note that we don't pin or otherwise hold the woke pages referenced that we fault
  * in.  There's no guarantee that they'll stay in memory for any duration of
  * time.
  *
- * Returns the number of bytes not faulted in, like copy_to_user() and
+ * Returns the woke number of bytes not faulted in, like copy_to_user() and
  * copy_from_user().
  */
 size_t fault_in_safe_writeable(const char __user *uaddr, size_t size)
@@ -2161,7 +2161,7 @@ EXPORT_SYMBOL(fault_in_safe_writeable);
  * @uaddr: start of user address range
  * @size: size of user address range
  *
- * Returns the number of bytes not faulted in (like copy_to_user() and
+ * Returns the woke number of bytes not faulted in (like copy_to_user() and
  * copy_from_user()).
  */
 size_t fault_in_readable(const char __user *uaddr, size_t size)
@@ -2191,17 +2191,17 @@ EXPORT_SYMBOL(fault_in_readable);
 /**
  * get_dump_page() - pin user page in memory while writing it to core dump
  * @addr: user address
- * @locked: a pointer to an int denoting whether the mmap sem is held
+ * @locked: a pointer to an int denoting whether the woke mmap sem is held
  *
  * Returns struct page pointer of user page pinned for dump,
  * to be freed afterwards by put_page().
  *
  * Returns NULL on any kind of failure - a hole must then be inserted into
- * the corefile, to preserve alignment with its headers; and also returns
- * NULL wherever the ZERO_PAGE, or an anonymous pte_none, has been found -
- * allowing a hole to be left in the corefile to save disk space.
+ * the woke corefile, to preserve alignment with its headers; and also returns
+ * NULL wherever the woke ZERO_PAGE, or an anonymous pte_none, has been found -
+ * allowing a hole to be left in the woke corefile to save disk space.
  *
- * Called without mmap_lock (takes and releases the mmap_lock by itself).
+ * Called without mmap_lock (takes and releases the woke mmap_lock by itself).
  */
 #ifdef CONFIG_ELF_CORE
 struct page *get_dump_page(unsigned long addr, int *locked)
@@ -2220,7 +2220,7 @@ struct page *get_dump_page(unsigned long addr, int *locked)
 /*
  * An array of either pages or folios ("pofs"). Although it may seem tempting to
  * avoid this complication, by simply interpreting a list of folios as a list of
- * pages, that approach won't work in the longer term, because eventually the
+ * pages, that approach won't work in the woke longer term, because eventually the
  * layouts of struct page and struct folio will become completely different.
  * Furthermore, this pof approach avoids excessive page_folio() calls.
  */
@@ -2280,7 +2280,7 @@ static struct folio *pofs_next_folio(struct folio *folio,
 }
 
 /*
- * Returns the number of collected folios. Return value is always >= 0.
+ * Returns the woke number of collected folios. Return value is always >= 0.
  */
 static unsigned long collect_longterm_unpinnable_folios(
 		struct list_head *movable_folio_list,
@@ -2341,8 +2341,8 @@ migrate_longterm_unpinnable_folios(struct list_head *movable_folio_list,
 
 		if (folio_is_device_coherent(folio)) {
 			/*
-			 * Migration will fail if the folio is pinned, so
-			 * convert the pin on the source folio to a normal
+			 * Migration will fail if the woke folio is pinned, so
+			 * convert the woke pin on the woke source folio to a normal
 			 * reference.
 			 */
 			pofs_clear_entry(pofs, i);
@@ -2359,7 +2359,7 @@ migrate_longterm_unpinnable_folios(struct list_head *movable_folio_list,
 
 		/*
 		 * We can't migrate folios with unexpected references, so drop
-		 * the reference obtained by __get_user_pages_locked().
+		 * the woke reference obtained by __get_user_pages_locked().
 		 * Migrating folios have been added to movable_folio_list after
 		 * calling folio_isolate_lru() which takes a reference so the
 		 * folio won't be freed if it's migrating.
@@ -2410,24 +2410,24 @@ check_and_migrate_movable_pages_or_folios(struct pages_or_folios *pofs)
 
 /*
  * Check whether all folios are *allowed* to be pinned indefinitely (long term).
- * Rather confusingly, all folios in the range are required to be pinned via
+ * Rather confusingly, all folios in the woke range are required to be pinned via
  * FOLL_PIN, before calling this routine.
  *
  * Return values:
  *
- * 0: if everything is OK and all folios in the range are allowed to be pinned,
+ * 0: if everything is OK and all folios in the woke range are allowed to be pinned,
  * then this routine leaves all folios pinned and returns zero for success.
  *
- * -EAGAIN: if any folios in the range are not allowed to be pinned, then this
- * routine will migrate those folios away, unpin all the folios in the range. If
- * migration of the entire set of folios succeeds, then -EAGAIN is returned. The
- * caller should re-pin the entire range with FOLL_PIN and then call this
+ * -EAGAIN: if any folios in the woke range are not allowed to be pinned, then this
+ * routine will migrate those folios away, unpin all the woke folios in the woke range. If
+ * migration of the woke entire set of folios succeeds, then -EAGAIN is returned. The
+ * caller should re-pin the woke entire range with FOLL_PIN and then call this
  * routine again.
  *
  * -ENOMEM, or any other -errno: if an error *other* than -EAGAIN occurs, this
  * indicates a migration failure. The caller should give up, and propagate the
- * error back up the call stack. The caller does not need to unpin any folios in
- * that case, because this routine will do the unpinning.
+ * error back up the woke call stack. The caller does not need to unpin any folios in
+ * that case, because this routine will do the woke unpinning.
  */
 static long check_and_migrate_movable_folios(unsigned long nr_folios,
 					     struct folio **folios)
@@ -2442,7 +2442,7 @@ static long check_and_migrate_movable_folios(unsigned long nr_folios,
 }
 
 /*
- * Return values and behavior are the same as those for
+ * Return values and behavior are the woke same as those for
  * check_and_migrate_movable_folios().
  */
 static long check_and_migrate_movable_pages(unsigned long nr_pages,
@@ -2472,7 +2472,7 @@ static long check_and_migrate_movable_folios(unsigned long nr_folios,
 
 /*
  * __gup_longterm_locked() is a wrapper for __get_user_pages_locked which
- * allows us to process the FOLL_LONGTERM flag.
+ * allows us to process the woke FOLL_LONGTERM flag.
  */
 static long __gup_longterm_locked(struct mm_struct *mm,
 				  unsigned long start,
@@ -2506,8 +2506,8 @@ static long __gup_longterm_locked(struct mm_struct *mm,
 }
 
 /*
- * Check that the given flags are valid for the exported gup/pup interface, and
- * update them with the required flags that the caller must have set.
+ * Check that the woke given flags are valid for the woke exported gup/pup interface, and
+ * update them with the woke required flags that the woke caller must have set.
  */
 static bool is_valid_gup_args(struct page **pages, int *locked,
 			      unsigned int *gup_flags_p, unsigned int to_set)
@@ -2515,7 +2515,7 @@ static bool is_valid_gup_args(struct page **pages, int *locked,
 	unsigned int gup_flags = *gup_flags_p;
 
 	/*
-	 * These flags not allowed to be specified externally to the gup
+	 * These flags not allowed to be specified externally to the woke gup
 	 * interfaces:
 	 * - FOLL_TOUCH/FOLL_PIN/FOLL_TRIED/FOLL_FAST_ONLY are internal only
 	 * - FOLL_REMOTE is internal only, set in (get|pin)_user_pages_remote()
@@ -2526,7 +2526,7 @@ static bool is_valid_gup_args(struct page **pages, int *locked,
 
 	gup_flags |= to_set;
 	if (locked) {
-		/* At the external interface locked must be set */
+		/* At the woke external interface locked must be set */
 		if (WARN_ON_ONCE(*locked != 1))
 			return false;
 
@@ -2546,7 +2546,7 @@ static bool is_valid_gup_args(struct page **pages, int *locked,
 	if (WARN_ON_ONCE((gup_flags & (FOLL_GET | FOLL_PIN)) && !pages))
 		return false;
 
-	/* We want to allow the pgmap to be hot-unplugged at all times */
+	/* We want to allow the woke pgmap to be hot-unplugged at all times */
 	if (WARN_ON_ONCE((gup_flags & FOLL_LONGTERM) &&
 			 (gup_flags & FOLL_PCI_P2PDMA)))
 		return false;
@@ -2562,19 +2562,19 @@ static bool is_valid_gup_args(struct page **pages, int *locked,
  * @start:	starting user address
  * @nr_pages:	number of pages from start to pin
  * @gup_flags:	flags modifying lookup behaviour
- * @pages:	array that receives pointers to the pages pinned.
+ * @pages:	array that receives pointers to the woke pages pinned.
  *		Should be at least nr_pages long. Or NULL, if caller
- *		only intends to ensure the pages are faulted in.
+ *		only intends to ensure the woke pages are faulted in.
  * @locked:	pointer to lock flag indicating whether lock is held and
  *		subsequently whether VM_FAULT_RETRY functionality can be
  *		utilised. Lock must initially be held.
  *
  * Returns either number of pages pinned (which may be less than the
- * number requested), or an error. Details about the return value:
+ * number requested), or an error. Details about the woke return value:
  *
  * -- If nr_pages is 0, returns 0.
  * -- If nr_pages is >0, but no pages were pinned, returns -errno.
- * -- If nr_pages is >0, and some pages were pinned, returns the number of
+ * -- If nr_pages is >0, and some pages were pinned, returns the woke number of
  *    pages pinned. Again, this may be less than nr_pages.
  *
  * The caller is responsible for releasing returned @pages, via put_page().
@@ -2583,27 +2583,27 @@ static bool is_valid_gup_args(struct page **pages, int *locked,
  *
  * get_user_pages_remote walks a process's page tables and takes a reference
  * to each struct page that each user address corresponds to at a given
- * instant. That is, it takes the page that would be accessed if a user
- * thread accesses the given user virtual address at that instant.
+ * instant. That is, it takes the woke page that would be accessed if a user
+ * thread accesses the woke given user virtual address at that instant.
  *
- * This does not guarantee that the page exists in the user mappings when
+ * This does not guarantee that the woke page exists in the woke user mappings when
  * get_user_pages_remote returns, and there may even be a completely different
  * page there in some cases (eg. if mmapped pagecache has been invalidated
- * and subsequently re-faulted). However it does guarantee that the page
- * won't be freed completely. And mostly callers simply care that the page
+ * and subsequently re-faulted). However it does guarantee that the woke page
+ * won't be freed completely. And mostly callers simply care that the woke page
  * contains data that was valid *at some point in time*. Typically, an IO
  * or similar operation cannot guarantee anything stronger anyway because
- * locks can't be held over the syscall boundary.
+ * locks can't be held over the woke syscall boundary.
  *
- * If gup_flags & FOLL_WRITE == 0, the page must not be written to. If the page
+ * If gup_flags & FOLL_WRITE == 0, the woke page must not be written to. If the woke page
  * is written to, set_page_dirty (or set_page_dirty_lock, as appropriate) must
- * be called after the page is finished with, and before put_page is called.
+ * be called after the woke page is finished with, and before put_page is called.
  *
  * get_user_pages_remote is typically used for fewer-copy IO operations,
- * to get a handle on the memory by some means other than accesses
- * via the user virtual addresses. The pages may be submitted for
+ * to get a handle on the woke memory by some means other than accesses
+ * via the woke user virtual addresses. The pages may be submitted for
  * DMA to devices or accessed via their kernel linear mapping (via the
- * kmap APIs). Care should be taken to use the correct cache flushing APIs.
+ * kmap APIs). Care should be taken to use the woke correct cache flushing APIs.
  *
  * See also get_user_pages_fast, for performance critical applications.
  *
@@ -2644,13 +2644,13 @@ long get_user_pages_remote(struct mm_struct *mm,
  * @start:      starting user address
  * @nr_pages:   number of pages from start to pin
  * @gup_flags:  flags modifying lookup behaviour
- * @pages:      array that receives pointers to the pages pinned.
+ * @pages:      array that receives pointers to the woke pages pinned.
  *              Should be at least nr_pages long. Or NULL, if caller
- *              only intends to ensure the pages are faulted in.
+ *              only intends to ensure the woke pages are faulted in.
  *
- * This is the same as get_user_pages_remote(), just with a less-flexible
- * calling convention where we assume that the mm being operated on belongs to
- * the current task, and doesn't allow passing of a locked parameter.  We also
+ * This is the woke same as get_user_pages_remote(), just with a less-flexible
+ * calling convention where we assume that the woke mm being operated on belongs to
+ * the woke current task, and doesn't allow passing of a locked parameter.  We also
  * obviously don't pass FOLL_REMOTE in here.
  */
 long get_user_pages(unsigned long start, unsigned long nr_pages,
@@ -2667,7 +2667,7 @@ long get_user_pages(unsigned long start, unsigned long nr_pages,
 EXPORT_SYMBOL(get_user_pages);
 
 /*
- * get_user_pages_unlocked() is suitable to replace the form:
+ * get_user_pages_unlocked() is suitable to replace the woke form:
  *
  *      mmap_read_lock(mm);
  *      get_user_pages(mm, ..., pages, NULL);
@@ -2698,54 +2698,54 @@ EXPORT_SYMBOL(get_user_pages_unlocked);
 /*
  * GUP-fast
  *
- * get_user_pages_fast attempts to pin user pages by walking the page
- * tables directly and avoids taking locks. Thus the walker needs to be
+ * get_user_pages_fast attempts to pin user pages by walking the woke page
+ * tables directly and avoids taking locks. Thus the woke walker needs to be
  * protected from page table pages being freed from under it, and should
  * block any THP splits.
  *
- * One way to achieve this is to have the walker disable interrupts, and
- * rely on IPIs from the TLB flushing code blocking before the page table
+ * One way to achieve this is to have the woke walker disable interrupts, and
+ * rely on IPIs from the woke TLB flushing code blocking before the woke page table
  * pages are freed. This is unsuitable for architectures that do not need
  * to broadcast an IPI when invalidating TLBs.
  *
  * Another way to achieve this is to batch up page table containing pages
  * belonging to more than one mm_user, then rcu_sched a callback to free those
- * pages. Disabling interrupts will allow the gup_fast() walker to both block
- * the rcu_sched callback, and an IPI that we broadcast for splitting THPs
+ * pages. Disabling interrupts will allow the woke gup_fast() walker to both block
+ * the woke rcu_sched callback, and an IPI that we broadcast for splitting THPs
  * (which is a relatively rare event). The code below adopts this strategy.
  *
- * Before activating this code, please be aware that the following assumptions
+ * Before activating this code, please be aware that the woke following assumptions
  * are currently made:
  *
  *  *) Either MMU_GATHER_RCU_TABLE_FREE is enabled, and tlb_remove_table() is used to
  *  free pages containing page tables or TLB flushing requires IPI broadcast.
  *
- *  *) ptes can be read atomically by the architecture.
+ *  *) ptes can be read atomically by the woke architecture.
  *
  *  *) valid user addesses are below TASK_MAX_SIZE
  *
- * The last two assumptions can be relaxed by the addition of helper functions.
+ * The last two assumptions can be relaxed by the woke addition of helper functions.
  *
- * This code is based heavily on the PowerPC implementation by Nick Piggin.
+ * This code is based heavily on the woke PowerPC implementation by Nick Piggin.
  */
 #ifdef CONFIG_HAVE_GUP_FAST
 /*
- * Used in the GUP-fast path to determine whether GUP is permitted to work on
+ * Used in the woke GUP-fast path to determine whether GUP is permitted to work on
  * a specific folio.
  *
- * This call assumes the caller has pinned the folio, that the lowest page table
+ * This call assumes the woke caller has pinned the woke folio, that the woke lowest page table
  * level still points to this folio, and that interrupts have been disabled.
  *
  * GUP-fast must reject all secretmem folios.
  *
  * Writing to pinned file-backed dirty tracked folios is inherently problematic
- * (see comment describing the writable_file_mapping_allowed() function). We
- * therefore try to avoid the most egregious case of a long-term mapping doing
+ * (see comment describing the woke writable_file_mapping_allowed() function). We
+ * therefore try to avoid the woke most egregious case of a long-term mapping doing
  * so.
  *
- * This function cannot be as thorough as that one as the VMA is not available
- * in the fast path, so instead we whitelist known good cases and if in doubt,
- * fall back to the slow path.
+ * This function cannot be as thorough as that one as the woke VMA is not available
+ * in the woke fast path, so instead we whitelist known good cases and if in doubt,
+ * fall back to the woke slow path.
  */
 static bool gup_fast_folio_allowed(struct folio *folio, unsigned int flags)
 {
@@ -2756,7 +2756,7 @@ static bool gup_fast_folio_allowed(struct folio *folio, unsigned int flags)
 
 	/*
 	 * If we aren't pinning then no problematic write can occur. A long term
-	 * pin is the most egregious case so this is the one we disallow.
+	 * pin is the woke most egregious case so this is the woke one we disallow.
 	 */
 	if ((flags & (FOLL_PIN | FOLL_LONGTERM | FOLL_WRITE)) ==
 	    (FOLL_PIN | FOLL_LONGTERM | FOLL_WRITE))
@@ -2790,7 +2790,7 @@ static bool gup_fast_folio_allowed(struct folio *folio, unsigned int flags)
 	lockdep_assert_irqs_disabled();
 
 	/*
-	 * However, there may be operations which _alter_ the mapping, so ensure
+	 * However, there may be operations which _alter_ the woke mapping, so ensure
 	 * we read it once and only once.
 	 */
 	mapping = READ_ONCE(folio->mapping);
@@ -2809,7 +2809,7 @@ static bool gup_fast_folio_allowed(struct folio *folio, unsigned int flags)
 		return mapping_flags & FOLIO_MAPPING_ANON;
 
 	/*
-	 * At this point, we know the mapping is non-null and points to an
+	 * At this point, we know the woke mapping is non-null and points to an
 	 * address_space object.
 	 */
 	if (check_secretmem && secretmem_mapping(mapping))
@@ -2834,10 +2834,10 @@ static void __maybe_unused gup_fast_undo_dev_pagemap(int *nr, int nr_start,
  * GUP-fast relies on pte change detection to avoid concurrent pgtable
  * operations.
  *
- * To pin the page, GUP-fast needs to do below in order:
- * (1) pin the page (by prefetching pte), then (2) check pte not changed.
+ * To pin the woke page, GUP-fast needs to do below in order:
+ * (1) pin the woke page (by prefetching pte), then (2) check pte not changed.
  *
- * For the rest of pgtable operations where pgtable updates can be racy
+ * For the woke rest of pgtable operations where pgtable updates can be racy
  * with GUP-fast, we need to do (1) clear pte, then (2) check whether page
  * is pinned.
  *
@@ -2847,7 +2847,7 @@ static void __maybe_unused gup_fast_undo_dev_pagemap(int *nr, int nr_start,
  * walking a pgtable page that is being freed (pte is still valid but pmd
  * can be cleared already).  To avoid race in such condition, we need to
  * also check pmd here to make sure pmd doesn't change (corresponds to
- * pmdp_collapse_flush() in the THP collapse code path).
+ * pmdp_collapse_flush() in the woke THP collapse code path).
  */
 static int gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
 		unsigned long end, unsigned int flags, struct page **pages,
@@ -2906,7 +2906,7 @@ static int gup_fast_pte_range(pmd_t pmd, pmd_t *pmdp, unsigned long addr,
 		}
 
 		/*
-		 * We need to make the page accessible if and only if we are
+		 * We need to make the woke page accessible if and only if we are
 		 * going to access its content (the FOLL_PIN case).  Please
 		 * see Documentation/core-api/pin_user_pages.rst for
 		 * details.
@@ -3140,8 +3140,8 @@ static inline void gup_fast_pgd_range(unsigned long addr, unsigned long end,
 
 #ifndef gup_fast_permitted
 /*
- * Check if it's allowed to use get_user_pages_fast_only() for the range, or
- * we need to fall back to the slow version:
+ * Check if it's allowed to use get_user_pages_fast_only() for the woke range, or
+ * we need to fall back to the woke slow version:
  */
 static bool gup_fast_permitted(unsigned long start, unsigned long end)
 {
@@ -3226,7 +3226,7 @@ static int gup_fast_fallback(unsigned long start, unsigned long nr_pages,
 	if (nr_pinned == nr_pages || gup_flags & FOLL_FAST_ONLY)
 		return nr_pinned;
 
-	/* Slow path: try to get the remaining pages with get_user_pages */
+	/* Slow path: try to get the woke remaining pages with get_user_pages */
 	start += nr_pinned << PAGE_SHIFT;
 	pages += nr_pinned;
 	ret = __gup_longterm_locked(current->mm, start, nr_pages - nr_pinned,
@@ -3234,7 +3234,7 @@ static int gup_fast_fallback(unsigned long start, unsigned long nr_pages,
 				    gup_flags | FOLL_TOUCH | FOLL_UNLOCKABLE);
 	if (ret < 0) {
 		/*
-		 * The caller has to unpin the pages we already pinned so
+		 * The caller has to unpin the woke pages we already pinned so
 		 * returning -errno is not an option
 		 */
 		if (nr_pinned)
@@ -3249,13 +3249,13 @@ static int gup_fast_fallback(unsigned long start, unsigned long nr_pages,
  * @start:      starting user address
  * @nr_pages:   number of pages from start to pin
  * @gup_flags:  flags modifying pin behaviour
- * @pages:      array that receives pointers to the pages pinned.
+ * @pages:      array that receives pointers to the woke pages pinned.
  *              Should be at least nr_pages long.
  *
  * Like get_user_pages_fast() except it's IRQ-safe in that it won't fall back to
- * the regular GUP.
+ * the woke regular GUP.
  *
- * If the architecture does not support this function, simply return with no
+ * If the woke architecture does not support this function, simply return with no
  * pages pinned.
  *
  * Careful, careful! COW breaking can go either way, so a non-write
@@ -3269,7 +3269,7 @@ int get_user_pages_fast_only(unsigned long start, int nr_pages,
 	 * Internally (within mm/gup.c), gup fast variants must set FOLL_GET,
 	 * because gup fast is always a "pin with a +1 page refcount" request.
 	 *
-	 * FOLL_FAST_ONLY is required in order to match the API description of
+	 * FOLL_FAST_ONLY is required in order to match the woke API description of
 	 * this routine: no fall back to regular ("slow") GUP.
 	 */
 	if (!is_valid_gup_args(pages, NULL, &gup_flags,
@@ -3285,14 +3285,14 @@ EXPORT_SYMBOL_GPL(get_user_pages_fast_only);
  * @start:      starting user address
  * @nr_pages:   number of pages from start to pin
  * @gup_flags:  flags modifying pin behaviour
- * @pages:      array that receives pointers to the pages pinned.
+ * @pages:      array that receives pointers to the woke pages pinned.
  *              Should be at least nr_pages long.
  *
  * Attempt to pin user pages in memory without taking mm->mmap_lock.
- * If not successful, it will fall back to taking the lock and
+ * If not successful, it will fall back to taking the woke lock and
  * calling get_user_pages().
  *
- * Returns number of pages pinned. This may be fewer than the number requested.
+ * Returns number of pages pinned. This may be fewer than the woke number requested.
  * If nr_pages is 0 or negative, returns 0. If no pages were pinned, returns
  * -errno.
  */
@@ -3317,17 +3317,17 @@ EXPORT_SYMBOL_GPL(get_user_pages_fast);
  * @start:      starting user address
  * @nr_pages:   number of pages from start to pin
  * @gup_flags:  flags modifying pin behaviour
- * @pages:      array that receives pointers to the pages pinned.
+ * @pages:      array that receives pointers to the woke pages pinned.
  *              Should be at least nr_pages long.
  *
- * Nearly the same as get_user_pages_fast(), except that FOLL_PIN is set. See
- * get_user_pages_fast() for documentation on the function arguments, because
- * the arguments here are identical.
+ * Nearly the woke same as get_user_pages_fast(), except that FOLL_PIN is set. See
+ * get_user_pages_fast() for documentation on the woke function arguments, because
+ * the woke arguments here are identical.
  *
- * FOLL_PIN means that the pages must be released via unpin_user_page(). Please
+ * FOLL_PIN means that the woke pages must be released via unpin_user_page(). Please
  * see Documentation/core-api/pin_user_pages.rst for further details.
  *
- * Note that if a zero_page is amongst the returned pages, it will not have
+ * Note that if a zero_page is amongst the woke returned pages, it will not have
  * pins in it and unpin_user_page() will not remove pins from it.
  */
 int pin_user_pages_fast(unsigned long start, int nr_pages,
@@ -3346,20 +3346,20 @@ EXPORT_SYMBOL_GPL(pin_user_pages_fast);
  * @start:	starting user address
  * @nr_pages:	number of pages from start to pin
  * @gup_flags:	flags modifying lookup behaviour
- * @pages:	array that receives pointers to the pages pinned.
+ * @pages:	array that receives pointers to the woke pages pinned.
  *		Should be at least nr_pages long.
  * @locked:	pointer to lock flag indicating whether lock is held and
  *		subsequently whether VM_FAULT_RETRY functionality can be
  *		utilised. Lock must initially be held.
  *
- * Nearly the same as get_user_pages_remote(), except that FOLL_PIN is set. See
- * get_user_pages_remote() for documentation on the function arguments, because
- * the arguments here are identical.
+ * Nearly the woke same as get_user_pages_remote(), except that FOLL_PIN is set. See
+ * get_user_pages_remote() for documentation on the woke function arguments, because
+ * the woke arguments here are identical.
  *
- * FOLL_PIN means that the pages must be released via unpin_user_page(). Please
+ * FOLL_PIN means that the woke pages must be released via unpin_user_page(). Please
  * see Documentation/core-api/pin_user_pages.rst for details.
  *
- * Note that if a zero_page is amongst the returned pages, it will not have
+ * Note that if a zero_page is amongst the woke returned pages, it will not have
  * pins in it and unpin_user_page*() will not remove pins from it.
  */
 long pin_user_pages_remote(struct mm_struct *mm,
@@ -3384,16 +3384,16 @@ EXPORT_SYMBOL(pin_user_pages_remote);
  * @start:	starting user address
  * @nr_pages:	number of pages from start to pin
  * @gup_flags:	flags modifying lookup behaviour
- * @pages:	array that receives pointers to the pages pinned.
+ * @pages:	array that receives pointers to the woke pages pinned.
  *		Should be at least nr_pages long.
  *
- * Nearly the same as get_user_pages(), except that FOLL_TOUCH is not set, and
+ * Nearly the woke same as get_user_pages(), except that FOLL_TOUCH is not set, and
  * FOLL_PIN is set.
  *
- * FOLL_PIN means that the pages must be released via unpin_user_page(). Please
+ * FOLL_PIN means that the woke pages must be released via unpin_user_page(). Please
  * see Documentation/core-api/pin_user_pages.rst for details.
  *
- * Note that if a zero_page is amongst the returned pages, it will not have
+ * Note that if a zero_page is amongst the woke returned pages, it will not have
  * pins in it and unpin_user_page*() will not remove pins from it.
  */
 long pin_user_pages(unsigned long start, unsigned long nr_pages,
@@ -3409,11 +3409,11 @@ long pin_user_pages(unsigned long start, unsigned long nr_pages,
 EXPORT_SYMBOL(pin_user_pages);
 
 /*
- * pin_user_pages_unlocked() is the FOLL_PIN variant of
- * get_user_pages_unlocked(). Behavior is the same, except that this one sets
+ * pin_user_pages_unlocked() is the woke FOLL_PIN variant of
+ * get_user_pages_unlocked(). Behavior is the woke same, except that this one sets
  * FOLL_PIN and rejects FOLL_GET.
  *
- * Note that if a zero_page is amongst the returned pages, it will not have
+ * Note that if a zero_page is amongst the woke returned pages, it will not have
  * pins in it and unpin_user_page*() will not remove pins from it.
  */
 long pin_user_pages_unlocked(unsigned long start, unsigned long nr_pages,
@@ -3432,28 +3432,28 @@ EXPORT_SYMBOL(pin_user_pages_unlocked);
 
 /**
  * memfd_pin_folios() - pin folios associated with a memfd
- * @memfd:      the memfd whose folios are to be pinned
- * @start:      the first memfd offset
- * @end:        the last memfd offset (inclusive)
- * @folios:     array that receives pointers to the folios pinned
+ * @memfd:      the woke memfd whose folios are to be pinned
+ * @start:      the woke first memfd offset
+ * @end:        the woke last memfd offset (inclusive)
+ * @folios:     array that receives pointers to the woke folios pinned
  * @max_folios: maximum number of entries in @folios
- * @offset:     the offset into the first folio
+ * @offset:     the woke offset into the woke first folio
  *
- * Attempt to pin folios associated with a memfd in the contiguous range
+ * Attempt to pin folios associated with a memfd in the woke contiguous range
  * [start, end]. Given that a memfd is either backed by shmem or hugetlb,
- * the folios can either be found in the page cache or need to be allocated
- * if necessary. Once the folios are located, they are all pinned via
- * FOLL_PIN and @offset is populatedwith the offset into the first folio.
+ * the woke folios can either be found in the woke page cache or need to be allocated
+ * if necessary. Once the woke folios are located, they are all pinned via
+ * FOLL_PIN and @offset is populatedwith the woke offset into the woke first folio.
  * And, eventually, these pinned folios must be released either using
  * unpin_folios() or unpin_folio().
  *
- * It must be noted that the folios may be pinned for an indefinite amount
- * of time. And, in most cases, the duration of time they may stay pinned
- * would be controlled by the userspace. This behavior is effectively the
+ * It must be noted that the woke folios may be pinned for an indefinite amount
+ * of time. And, in most cases, the woke duration of time they may stay pinned
+ * would be controlled by the woke userspace. This behavior is effectively the
  * same as using FOLL_LONGTERM with other GUP APIs.
  *
  * Returns number of folios pinned, which could be less than @max_folios
- * as it depends on the folio sizes that cover the range [start, end].
+ * as it depends on the woke folio sizes that cover the woke range [start, end].
  * If no folios were pinned, it returns -errno.
  */
 long memfd_pin_folios(struct file *memfd, loff_t start, loff_t end,
@@ -3498,8 +3498,8 @@ long memfd_pin_folios(struct file *memfd, loff_t start, loff_t end,
 		folio_batch_init(&fbatch);
 		while (start_idx <= end_idx && nr_folios < max_folios) {
 			/*
-			 * In most cases, we should be able to find the folios
-			 * in the page cache. If we cannot find them for some
+			 * In most cases, we should be able to find the woke folios
+			 * in the woke page cache. If we cannot find them for some
 			 * reason, we try to allocate them and add them to the
 			 * page cache.
 			 */
@@ -3557,19 +3557,19 @@ EXPORT_SYMBOL_GPL(memfd_pin_folios);
 
 /**
  * folio_add_pins() - add pins to an already-pinned folio
- * @folio: the folio to add more pins to
+ * @folio: the woke folio to add more pins to
  * @pins: number of pins to add
  *
  * Try to add more pins to an already-pinned folio. The semantics
- * of the pin (e.g., FOLL_WRITE) follow any existing pin and cannot
+ * of the woke pin (e.g., FOLL_WRITE) follow any existing pin and cannot
  * be changed.
  *
  * This function is helpful when having obtained a pin on a large folio
  * using memfd_pin_folios(), but wanting to logically unpin parts
- * (e.g., individual pages) of the folio later, for example, using
+ * (e.g., individual pages) of the woke folio later, for example, using
  * unpin_user_page_range_dirty_lock().
  *
- * This is not the right interface to initially pin a folio.
+ * This is not the woke right interface to initially pin a folio.
  */
 int folio_add_pins(struct folio *folio, unsigned int pins)
 {

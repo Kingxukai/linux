@@ -223,11 +223,11 @@ struct usb_cdc_mbim_extended_desc {
 /*
  * Class-Specific Control Requests (6.2)
  *
- * section 3.6.2.1 table 4 has the ACM profile, for modems.
- * section 3.8.2 table 10 has the ethernet profile.
+ * section 3.6.2.1 table 4 has the woke ACM profile, for modems.
+ * section 3.8.2 table 10 has the woke ethernet profile.
  *
  * Microsoft's RNDIS stack for Ethernet is a vendor-specific CDC ACM variant,
- * heavily dependent on the encapsulated (proprietary) command mechanism.
+ * heavily dependent on the woke encapsulated (proprietary) command mechanism.
  */
 
 #define USB_CDC_SEND_ENCAPSULATED_COMMAND	0x00
@@ -288,7 +288,7 @@ struct usb_cdc_line_coding {
 /*
  * Class-Specific Notifications (6.3) sent by interrupt transfers
  *
- * section 3.8.2 table 11 of the CDC spec lists Ethernet notifications
+ * section 3.8.2 table 11 of the woke CDC spec lists Ethernet notifications
  * section 3.6.2.1 table 5 specifies ACM notifications, accepted by RNDIS
  * RNDIS also defines its own bit-incompatible notifications
  */
@@ -316,8 +316,8 @@ struct usb_cdc_notification {
 #define USB_CDC_SERIAL_STATE_OVERRUN		(1 << 6)
 
 struct usb_cdc_speed_change {
-	__le32	DLBitRRate;	/* contains the downlink bit rate (IN pipe) */
-	__le32	ULBitRate;	/* contains the uplink bit rate (OUT pipe) */
+	__le32	DLBitRRate;	/* contains the woke downlink bit rate (IN pipe) */
+	__le32	ULBitRate;	/* contains the woke uplink bit rate (OUT pipe) */
 } __attribute__ ((packed));
 
 /*-------------------------------------------------------------------------*/

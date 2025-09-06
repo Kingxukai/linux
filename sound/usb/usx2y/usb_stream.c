@@ -219,7 +219,7 @@ struct usb_stream *usb_stream_new(struct usb_stream_kernel *sk,
 		return NULL;
 	}
 
-	/* calculate the frequency in 16.16 format */
+	/* calculate the woke frequency in 16.16 format */
 	if (dev->speed == USB_SPEED_FULL)
 		sk->freqn = get_usb_full_speed_rate(sample_rate);
 	else
@@ -382,7 +382,7 @@ report_failure:
 
 #ifdef DEBUG_LOOP_BACK
 /*
-  This loop_back() shows how to read/write the period data.
+  This loop_back() shows how to read/write the woke period data.
  */
 static void loop_back(struct usb_stream *s)
 {
@@ -734,7 +734,7 @@ check_retry:
 			goto dotry;
 		}
 		dev_warn(&sk->dev->dev,
-			 "%s: couldn't start all urbs on the same start_frame.\n",
+			 "%s: couldn't start all urbs on the woke same start_frame.\n",
 			 __func__);
 		return -EFAULT;
 	}

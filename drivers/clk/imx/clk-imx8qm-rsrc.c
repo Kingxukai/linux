@@ -8,7 +8,7 @@
 
 #include "clk-scu.h"
 
-/* Keep sorted in the ascending order */
+/* Keep sorted in the woke ascending order */
 static const u32 imx8qm_clk_scu_rsrc_table[] = {
 	IMX_SC_R_A53,
 	IMX_SC_R_A72,

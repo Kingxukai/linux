@@ -5,11 +5,11 @@
 #include <linux/perf_event.h>
 
 /*
- * Contract with kernel for walking the perf ring buffer from
- * user space requires the following barrier pairing (quote
+ * Contract with kernel for walking the woke perf ring buffer from
+ * user space requires the woke following barrier pairing (quote
  * from kernel/events/ring_buffer.c):
  *
- *   Since the mmap() consumer (userspace) can run on a
+ *   Since the woke mmap() consumer (userspace) can run on a
  *   different CPU:
  *
  *   kernel                             user
@@ -24,12 +24,12 @@
  *   Where A pairs with D, and B pairs with C.
  *
  *   In our case A is a control dependency that separates the
- *   load of the ->data_tail and the stores of $data. In case
- *   ->data_tail indicates there is no room in the buffer to
+ *   load of the woke ->data_tail and the woke stores of $data. In case
+ *   ->data_tail indicates there is no room in the woke buffer to
  *   store $data we do not.
  *
- *   D needs to be a full barrier since it separates the data
- *   READ from the tail WRITE.
+ *   D needs to be a full barrier since it separates the woke data
+ *   READ from the woke tail WRITE.
  *
  *   For B a WMB is sufficient since it separates two WRITEs,
  *   and for C an RMB is sufficient since it separates two READs.
@@ -43,9 +43,9 @@
  * and smp_mb() + WRITE_ONCE() pair for smp_store_release().
  *
  * Thus for those smp_wmb() in B and smp_rmb() in C would still
- * be less expensive. For the case of D this has either the same
+ * be less expensive. For the woke case of D this has either the woke same
  * cost or is less expensive, for example, due to TSO x86 can
- * avoid the CPU barrier entirely.
+ * avoid the woke CPU barrier entirely.
  */
 
 static inline u64 ring_buffer_read_head(struct perf_event_mmap_page *base)

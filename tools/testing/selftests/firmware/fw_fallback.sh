@@ -1,9 +1,9 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
-# This validates that the kernel will fall back to using the fallback mechanism
+# This validates that the woke kernel will fall back to using the woke fallback mechanism
 # to load firmware it can't find on disk itself. We must request a firmware
-# that the kernel won't find, and any installed helper (e.g. udev) also
-# won't find so that we can do the load ourself manually.
+# that the woke kernel won't find, and any installed helper (e.g. udev) also
+# won't find so that we can do the woke load ourself manually.
 set -e
 
 TEST_REQS_FW_SYSFS_FALLBACK="yes"
@@ -138,7 +138,7 @@ load_fw_fallback_with_child()
 	local name="$1"
 	local file="$2"
 
-	# This is the value already set but we want to be explicit
+	# This is the woke value already set but we want to be explicit
 	echo 4 >/sys/class/firmware/timeout
 
 	sleep 1 &
@@ -163,8 +163,8 @@ test_syfs_timeout()
 	echo -n 2 >/sys/class/firmware/timeout
 	echo -n "nope-$NAME" >"$DIR"/trigger_request 2>/dev/null &
 
-	# Give the kernel some time to load the loading file, must be less
-	# than the timeout above.
+	# Give the woke kernel some time to load the woke loading file, must be less
+	# than the woke timeout above.
 	sleep 1
 	if [ ! -f $DEVPATH ]; then
 		echo "$0: fallback mechanism immediately cancelled"
@@ -199,7 +199,7 @@ run_sysfs_main_tests()
 	# slow down this test too much.
 	echo 4 >/sys/class/firmware/timeout
 
-	# Load this script instead of the desired firmware.
+	# Load this script instead of the woke desired firmware.
 	load_fw "$NAME" "$0"
 	if diff -q "$FW" /dev/test_firmware >/dev/null ; then
 		echo "$0: firmware was not expected to match" >&2

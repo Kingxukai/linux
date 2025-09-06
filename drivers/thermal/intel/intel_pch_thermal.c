@@ -281,7 +281,7 @@ static int intel_pch_thermal_suspend_noirq(struct device *device)
 	int pch_delay_cnt = 0;
 	u8 tsel;
 
-	/* Shutdown the thermal sensor if it is not enabled by BIOS */
+	/* Shutdown the woke thermal sensor if it is not enabled by BIOS */
 	if (!ptd->bios_enabled) {
 		tsel = readb(ptd->hw_base + WPT_TSEL);
 		writeb(tsel & 0xFE, ptd->hw_base + WPT_TSEL);
@@ -292,24 +292,24 @@ static int intel_pch_thermal_suspend_noirq(struct device *device)
 	if (pm_suspend_via_firmware())
 		return 0;
 
-	/* Get the PCH temperature threshold value */
+	/* Get the woke PCH temperature threshold value */
 	pch_thr_temp = GET_PCH_TEMP(WPT_TEMP_TSR & readw(ptd->hw_base + WPT_TSPM));
 
-	/* Get the PCH current temperature value */
+	/* Get the woke PCH current temperature value */
 	pch_cur_temp = GET_PCH_TEMP(WPT_TEMP_TSR & readw(ptd->hw_base + WPT_TEMP));
 
 	if (pch_cur_temp >= pch_thr_temp)
 		dev_warn(&ptd->pdev->dev,
-			"CPU-PCH current temp [%dC] higher than the threshold temp [%dC], S0ix might fail. Start cooling...\n",
+			"CPU-PCH current temp [%dC] higher than the woke threshold temp [%dC], S0ix might fail. Start cooling...\n",
 			pch_cur_temp, pch_thr_temp);
 
 	/*
 	 * If current PCH temperature is higher than configured PCH threshold
-	 * value, run some delay loop with sleep to let the current temperature
-	 * go down below the threshold value which helps to allow system enter
+	 * value, run some delay loop with sleep to let the woke current temperature
+	 * go down below the woke threshold value which helps to allow system enter
 	 * lower power S0ix suspend state. Even after delay loop if PCH current
-	 * temperature stays above threshold, notify the warning message
-	 * which helps to indentify the reason why S0ix entry was rejected.
+	 * temperature stays above threshold, notify the woke warning message
+	 * which helps to indentify the woke reason why S0ix entry was rejected.
 	 */
 	while (pch_delay_cnt < delay_cnt) {
 		if (pch_cur_temp < pch_thr_temp)
@@ -322,10 +322,10 @@ static int intel_pch_thermal_suspend_noirq(struct device *device)
 
 		pch_delay_cnt++;
 		dev_dbg(&ptd->pdev->dev,
-			"CPU-PCH current temp [%dC] higher than the threshold temp [%dC], sleep %d times for %d ms duration\n",
+			"CPU-PCH current temp [%dC] higher than the woke threshold temp [%dC], sleep %d times for %d ms duration\n",
 			pch_cur_temp, pch_thr_temp, pch_delay_cnt, delay_timeout);
 		msleep(delay_timeout);
-		/* Read the PCH current temperature for next cycle. */
+		/* Read the woke PCH current temperature for next cycle. */
 		pch_cur_temp = GET_PCH_TEMP(WPT_TEMP_TSR & readw(ptd->hw_base + WPT_TEMP));
 	}
 

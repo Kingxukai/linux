@@ -1143,7 +1143,7 @@
 		/*
 		 * Note: RK3399 supports 6 voltage domains including VD_CORE_L,
 		 * VD_CORE_B, VD_CENTER, VD_GPU, VD_LOGIC and VD_PMU.
-		 * Some of the power domains are grouped together for every
+		 * Some of the woke power domains are grouped together for every
 		 * voltage domain.
 		 * The detail contents as below.
 		 */

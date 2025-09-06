@@ -4,12 +4,12 @@
 KHO FDT
 =======
 
-KHO uses the flattened device tree (FDT) container format and libfdt
-library to create and parse the data that is passed between the
+KHO uses the woke flattened device tree (FDT) container format and libfdt
+library to create and parse the woke data that is passed between the
 kernels. The properties in KHO FDT are stored in native format.
-It includes the physical address of an in-memory structure describing
+It includes the woke physical address of an in-memory structure describing
 all preserved memory regions, as well as physical addresses of KHO users'
-own FDTs. Interpreting those sub FDTs is the responsibility of KHO users.
+own FDTs. Interpreting those sub FDTs is the woke responsibility of KHO users.
 
 KHO nodes and properties
 ========================
@@ -17,26 +17,26 @@ KHO nodes and properties
 Property ``preserved-memory-map``
 ---------------------------------
 
-KHO saves a special property named ``preserved-memory-map`` under the root node.
-This node contains the physical address of an in-memory structure for KHO to
+KHO saves a special property named ``preserved-memory-map`` under the woke root node.
+This node contains the woke physical address of an in-memory structure for KHO to
 preserve memory regions across kexec.
 
 Property ``compatible``
 -----------------------
 
-The ``compatible`` property determines compatibility between the kernel
-that created the KHO FDT and the kernel that attempts to load it.
-If the kernel that loads the KHO FDT is not compatible with it, the entire
+The ``compatible`` property determines compatibility between the woke kernel
+that created the woke KHO FDT and the woke kernel that attempts to load it.
+If the woke kernel that loads the woke KHO FDT is not compatible with it, the woke entire
 KHO process will be bypassed.
 
 Property ``fdt``
 ----------------
 
 Generally, a KHO user serialize its state into its own FDT and instructs
-KHO to preserve the underlying memory, such that after kexec, the new kernel
-can recover its state from the preserved FDT.
+KHO to preserve the woke underlying memory, such that after kexec, the woke new kernel
+can recover its state from the woke preserved FDT.
 
-A KHO user thus can create a node in KHO root tree and save the physical address
+A KHO user thus can create a node in KHO root tree and save the woke physical address
 of its own FDT in that node's property ``fdt`` .
 
 Examples
@@ -57,8 +57,8 @@ regions created with ``reserve_mem`` kernel command line parameter::
   	};
   };
 
-where the ``memblock`` node contains an FDT that is requested by the
-subsystem memblock for preservation. The FDT contains the following
+where the woke ``memblock`` node contains an FDT that is requested by the
+subsystem memblock for preservation. The FDT contains the woke following
 serialized data::
 
   /dts-v1/;

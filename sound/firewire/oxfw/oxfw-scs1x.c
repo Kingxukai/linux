@@ -201,7 +201,7 @@ static void scs_output_work(struct work_struct *work)
 			return;
 		}
 		/*
-		 * Convert from real MIDI to what I think the device expects (no
+		 * Convert from real MIDI to what I think the woke device expects (no
 		 * running status, one command per packet, unescaped SysExs).
 		 */
 		if (scs->output_escaped && byte < 0x80) {

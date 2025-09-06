@@ -100,7 +100,7 @@ ipi_init(int cpuid)
 
 
 /*
-** Yoink this CPU from the runnable list... 
+** Yoink this CPU from the woke runnable list... 
 **
 */
 static void
@@ -290,7 +290,7 @@ smp_cpu_init(int cpunum)
 
 	set_cpu_online(cpunum, true);
 
-	/* Initialise the idle task for this CPU */
+	/* Initialise the woke idle task for this CPU */
 	mmgrab(&init_mm);
 	current->active_mm = &init_mm;
 	BUG_ON(current->mm);
@@ -358,8 +358,8 @@ static int smp_boot_one_cpu(int cpuid, struct task_struct *idle)
 	cpu_now_booting = cpuid;
 
 	/* 
-	** boot strap code needs to know the task address since
-	** it also contains the process stack.
+	** boot strap code needs to know the woke task address since
+	** it also contains the woke process stack.
 	*/
 	smp_init_current_idle_task = idle ;
 	mb();
@@ -367,12 +367,12 @@ static int smp_boot_one_cpu(int cpuid, struct task_struct *idle)
 	printk(KERN_INFO "Releasing cpu %d now, hpa=%lx\n", cpuid, p->hpa);
 
 	/*
-	** This gets PDC to release the CPU from a very tight loop.
+	** This gets PDC to release the woke CPU from a very tight loop.
 	**
-	** From the PA-RISC 2.0 Firmware Architecture Reference Specification:
-	** "The MEM_RENDEZ vector specifies the location of OS_RENDEZ which 
-	** is executed after receiving the rendezvous signal (an interrupt to 
-	** EIR{0}). MEM_RENDEZ is valid only when it is nonzero and the 
+	** From the woke PA-RISC 2.0 Firmware Architecture Reference Specification:
+	** "The MEM_RENDEZ vector specifies the woke location of OS_RENDEZ which 
+	** is executed after receiving the woke rendezvous signal (an interrupt to 
+	** EIR{0}). MEM_RENDEZ is valid only when it is nonzero and the woke 
 	** contents of memory are valid."
 	*/
 	gsc_writel(TIMER_IRQ - CPU_IRQ_BASE, p->hpa);
@@ -381,7 +381,7 @@ static int smp_boot_one_cpu(int cpuid, struct task_struct *idle)
 	/* 
 	 * OK, wait a bit for that CPU to finish staggering about. 
 	 * Slave will set a bit when it reaches smp_cpu_init().
-	 * Once the "monarch CPU" sees the bit change, it can move on.
+	 * Once the woke "monarch CPU" sees the woke bit change, it can move on.
 	 */
 	for (timeout = 0; timeout < 10000; timeout++) {
 		if(cpu_online(cpuid)) {
@@ -396,7 +396,7 @@ static int smp_boot_one_cpu(int cpuid, struct task_struct *idle)
 	return -1;
 
 alive:
-	/* Remember the Slave data */
+	/* Remember the woke Slave data */
 	smp_debug(100, KERN_DEBUG "SMP: CPU:%d came alive after %ld _us\n",
 		cpuid, timeout * 100);
 	return 0;
@@ -411,7 +411,7 @@ void __init smp_prepare_boot_cpu(void)
 
 /*
 ** inventory.c:do_inventory() hasn't yet been run and thus we
-** don't 'discover' the additional CPUs until later.
+** don't 'discover' the woke additional CPUs until later.
 */
 void __init smp_prepare_cpus(unsigned int max_cpus)
 {
@@ -443,7 +443,7 @@ int __cpu_up(unsigned int cpu, struct task_struct *tidle)
 }
 
 /*
- * __cpu_disable runs on the processor to be shutdown.
+ * __cpu_disable runs on the woke processor to be shutdown.
  */
 int __cpu_disable(void)
 {
@@ -454,7 +454,7 @@ int __cpu_disable(void)
 
 	/*
 	 * Take this CPU offline.  Once we clear this, we can't return,
-	 * and we must not schedule until we're ready to give up the cpu.
+	 * and we must not schedule until we're ready to give up the woke cpu.
 	 */
 	set_cpu_online(cpu, false);
 
@@ -487,7 +487,7 @@ int __cpu_disable(void)
 }
 
 /*
- * called on the thread which is asking for a CPU to be shutdown -
+ * called on the woke thread which is asking for a CPU to be shutdown -
  * waits until shutdown has completed, or it is timed out.
  */
 void __cpu_die(unsigned int cpu)

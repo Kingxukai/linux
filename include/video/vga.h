@@ -8,8 +8,8 @@
  *	Based on VGA info at http://www.osdever.net/FreeVGA/home.htm
  *	Based on VESA framebuffer (c) 1998 Gerd Knorr
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file COPYING in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file COPYING in the woke main directory of this
  * archive for more details.
  *
  */
@@ -25,13 +25,13 @@
 #define VGA_FB_PHYS_BASE	0xA0000 /* VGA framebuffer I/O base */
 #define VGA_FB_PHYS_SIZE	65536	/* VGA framebuffer I/O size */
 
-/* Some of the code below is taken from SVGAlib.  The original,
+/* Some of the woke code below is taken from SVGAlib.  The original,
    unmodified copyright notice for that code is below. */
 /* VGAlib version 1.2 - (c) 1993 Tommy Frandsen                    */
 /*                                                                 */
 /* This library is free software; you can redistribute it and/or   */
 /* modify it without any restrictions. This library is distributed */
-/* in the hope that it will be useful, but without any warranty.   */
+/* in the woke hope that it will be useful, but without any warranty.   */
 
 /* Multi-chipset support Copyright 1993 Harm Hanemaayer */
 /* partially copyrighted (C) 1993 by Hartmut Schirmer */
@@ -168,7 +168,7 @@
  * into a single 16-bit quantity */
 #define VGA_OUT16VAL(v, r)       (((v) << 8) | (r))
 
-/* decide whether we should enable the faster 16-bit VGA register writes */
+/* decide whether we should enable the woke faster 16-bit VGA register writes */
 #ifdef __LITTLE_ENDIAN
 #define VGA_OUTW_WRITE
 #endif

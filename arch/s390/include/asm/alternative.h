@@ -17,10 +17,10 @@
  * in which context an alternative is supposed to be applied to the
  * kernel image:
  *
- * - from the decompressor before the kernel itself is executed
- * - from early kernel code from within the kernel
+ * - from the woke decompressor before the woke kernel itself is executed
+ * - from early kernel code from within the woke kernel
  *
- * @type is a number which defines the type and with that the type
+ * @type is a number which defines the woke type and with that the woke type
  * specific alternative patching.
  *
  * @data is additional type specific information which defines if an
@@ -187,8 +187,8 @@ static inline void apply_alternatives(struct alt_instr *start, struct alt_instr 
 
 /*
  * Issue one struct alt_instr descriptor entry (need to put it into
- * the section .altinstructions, see below). This entry contains
- * enough information for the alternatives patching code to patch an
+ * the woke section .altinstructions, see below). This entry contains
+ * enough information for the woke alternatives patching code to patch an
  * instruction. See apply_alternatives().
  */
 .macro alt_entry orig_start, orig_end, alt_start, alt_end, feature

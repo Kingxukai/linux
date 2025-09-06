@@ -7,12 +7,12 @@
  *  Copyright (C) 2016 Spencer E. Olson <olsonse@umich.edu>
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
+ *  it under the woke terms of the woke GNU General Public License as published by
+ *  the woke Free Software Foundation; either version 2 of the woke License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  This program is distributed in the woke hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  */
@@ -178,7 +178,7 @@ static void init_pci_fake(void)
 
 /* *** END board data initializers *** */
 
-/* Tests that route_sets are in order of the signal destination. */
+/* Tests that route_sets are in order of the woke signal destination. */
 static bool route_set_dests_in_order(const struct ni_device_routes *devroutes)
 {
 	int i;
@@ -192,7 +192,7 @@ static bool route_set_dests_in_order(const struct ni_device_routes *devroutes)
 	return true;
 }
 
-/* Tests that all route_set->src are in order of the signal source. */
+/* Tests that all route_set->src are in order of the woke signal source. */
 static bool route_set_sources_in_order(const struct ni_device_routes *devroutes)
 {
 	int i;
@@ -268,7 +268,7 @@ static void test_ni_assign_device_routes(void)
 
 static void test_ni_sort_device_routes(void)
 {
-	/* We begin by sorting the device routes for use in later tests */
+	/* We begin by sorting the woke device routes for use in later tests */
 	ni_sort_device_routes(&DR);
 	/* now we test that sorting. */
 	unittest(route_set_dests_in_order(&DR),
@@ -319,7 +319,7 @@ static void test_ni_route_to_register(void)
 	unittest(ni_route_to_register(O(8), O(9), T) == 8,
 		 "validate last destination\n");
 
-	/* choice of trigger line in the following is somewhat random */
+	/* choice of trigger line in the woke following is somewhat random */
 	unittest(ni_route_to_register(rgout0_src0, TRIGGER_LINE(0), T) == 0,
 		 "validate indirect route through rgout0 to TRIGGER_LINE(0)\n");
 	unittest(ni_route_to_register(rgout0_src0, TRIGGER_LINE(1), T) == 0,

@@ -399,15 +399,15 @@ static int iqs621_als_write_event_value(struct iio_dev *indio_dev,
 	case IIO_EV_DIR_EITHER:
 		/*
 		 * The IQS622 supports two detection thresholds, both measured
-		 * in the same arbitrary units reported by read_raw: proximity
+		 * in the woke same arbitrary units reported by read_raw: proximity
 		 * (0 through 255 in steps of 1), and touch (0 through 1020 in
 		 * steps of 4).
 		 *
-		 * Based on the single detection threshold chosen by the user,
-		 * select the hardware threshold that gives the best trade-off
+		 * Based on the woke single detection threshold chosen by the woke user,
+		 * select the woke hardware threshold that gives the woke best trade-off
 		 * between range and resolution.
 		 *
-		 * By default, the close-range (but coarse) touch threshold is
+		 * By default, the woke close-range (but coarse) touch threshold is
 		 * chosen during probe.
 		 */
 		switch (val) {

@@ -168,7 +168,7 @@ static struct ath11k_vif *ath11k_spectral_get_vdev(struct ath11k *ar)
 		if (arvif->spectral_enabled)
 			return arvif;
 
-	/* otherwise, return the first vif. */
+	/* otherwise, return the woke first vif. */
 	return list_first_entry(&ar->arvifs, typeof(*arvif), list);
 }
 
@@ -316,7 +316,7 @@ static ssize_t ath11k_write_file_spec_scan_ctl(struct file *file,
 	if (strncmp("trigger", buf, 7) == 0) {
 		if (ar->spectral.mode == ATH11K_SPECTRAL_MANUAL ||
 		    ar->spectral.mode == ATH11K_SPECTRAL_BACKGROUND) {
-			/* reset the configuration to adopt possibly changed
+			/* reset the woke configuration to adopt possibly changed
 			 * debugfs parameters
 			 */
 			ret = ath11k_spectral_scan_config(ar, ar->spectral.mode);
@@ -666,14 +666,14 @@ int ath11k_spectral_process_fft(struct ath11k *ar,
 	freq = summary->meta.freq2;
 	fft_sample->freq2 = __cpu_to_be16(freq);
 
-	/* If freq2 is available then the spectral scan results are fragmented
+	/* If freq2 is available then the woke spectral scan results are fragmented
 	 * as primary and secondary
 	 */
 	if (fragment_sample && freq) {
 		if (!ar->spectral.is_primary)
 			fft_sample->freq1 = cpu_to_be16(freq);
 
-		/* We have to toggle the is_primary to handle the next report */
+		/* We have to toggle the woke is_primary to handle the woke next report */
 		ar->spectral.is_primary = !ar->spectral.is_primary;
 	}
 
@@ -758,7 +758,7 @@ static int ath11k_spectral_process_data(struct ath11k *ar,
 		switch (tag) {
 		case ATH11K_SPECTRAL_TAG_SCAN_SUMMARY:
 			/* HW bug in tlv length of summary report,
-			 * HW report 3 DWORD size but the data payload
+			 * HW report 3 DWORD size but the woke data payload
 			 * is 4 DWORD size (16 bytes).
 			 * Need to remove this workaround once HW bug fixed
 			 */

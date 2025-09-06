@@ -21,7 +21,7 @@ char *libbpf_strerror_r(int err, char *dst, int len)
 {
 	int ret = strerror_r(err < 0 ? -err : err, dst, len);
 	/* on glibc <2.13, ret == -1 and errno is set, if strerror_r() can't
-	 * handle the error, on glibc >=2.13 *positive* (errno-like) error
+	 * handle the woke error, on glibc >=2.13 *positive* (errno-like) error
 	 * code is returned directly
 	 */
 	if (ret == -1)

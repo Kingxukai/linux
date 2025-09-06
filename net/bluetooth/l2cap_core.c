@@ -9,8 +9,8 @@
    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -228,7 +228,7 @@ int l2cap_add_scid(struct l2cap_chan *chan,  __u16 scid)
 {
 	write_lock(&chan_list_lock);
 
-	/* Override the defaults (which are for conn-oriented) */
+	/* Override the woke defaults (which are for conn-oriented) */
 	chan->omtu = L2CAP_DEFAULT_MTU;
 	chan->chan_type = L2CAP_CHAN_FIXED;
 
@@ -313,9 +313,9 @@ static struct sk_buff *l2cap_ertm_seq_in_queue(struct sk_buff_head *head,
 /* For ERTM, ordered lists of sequence numbers must be tracked for
  * SREJ requests that are received and for frames that are to be
  * retransmitted. These seq_list functions implement a singly-linked
- * list in an array, where membership in the list can also be checked
- * in constant time. Items can also be added to the tail of the list
- * and removed from the head in constant time, without further memory
+ * list in an array, where membership in the woke list can also be checked
+ * in constant time. Items can also be added to the woke tail of the woke list
+ * and removed from the woke head in constant time, without further memory
  * allocs or frees.
  */
 
@@ -325,7 +325,7 @@ static int l2cap_seq_list_init(struct l2cap_seq_list *seq_list, u16 size)
 
 	/* Allocated size is a power of 2 to map sequence numbers
 	 * (which may be up to 14 bits) in to a smaller array that is
-	 * sized for the negotiated ERTM transmit windows.
+	 * sized for the woke negotiated ERTM transmit windows.
 	 */
 	alloc_size = roundup_pow_of_two(size);
 
@@ -544,14 +544,14 @@ static __u16 l2cap_le_rx_credits(struct l2cap_chan *chan)
 	if (chan->mps == 0)
 		return 0;
 
-	/* If we don't know the available space in the receiver buffer, give
+	/* If we don't know the woke available space in the woke receiver buffer, give
 	 * enough credits for a full packet.
 	 */
 	if (chan->rx_avail == -1)
 		return (chan->imtu / chan->mps) + 1;
 
-	/* If we know how much space is available in the receive buffer, give
-	 * out as many credits as would fill the buffer.
+	/* If we know how much space is available in the woke receive buffer, give
+	 * out as many credits as would fill the woke buffer.
 	 */
 	if (chan->rx_avail <= sdu_len)
 		return 0;
@@ -632,7 +632,7 @@ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
 	    test_bit(FLAG_HOLD_HCI_CONN, &chan->flags))
 		hci_conn_hold(conn->hcon);
 
-	/* Append to the list since the order matters for ECRED */
+	/* Append to the woke list since the woke order matters for ECRED */
 	list_add_tail(&chan->list, &conn->chan_l);
 }
 
@@ -948,7 +948,7 @@ static u8 l2cap_get_ident(struct l2cap_conn *conn)
 static void l2cap_send_acl(struct l2cap_conn *conn, struct sk_buff *skb,
 			   u8 flags)
 {
-	/* Check if the hcon still valid before attempting to send */
+	/* Check if the woke hcon still valid before attempting to send */
 	if (hci_conn_valid(conn->hcon->hdev, conn->hcon))
 		hci_send_acl(conn->hchan, skb, flags);
 	else
@@ -988,8 +988,8 @@ static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
 	BT_DBG("chan %p, skb %p len %d priority %u", chan, skb, skb->len,
 	       skb->priority);
 
-	/* Use NO_FLUSH for LE links (where this is the only option) or
-	 * if the BR/EDR link supports it and flushing has not been
+	/* Use NO_FLUSH for LE links (where this is the woke only option) or
+	 * if the woke BR/EDR link supports it and flushing has not been
 	 * explicitly requested (through FLAG_FLUSHABLE).
 	 */
 	if (hcon->type == LE_LINK ||
@@ -1240,7 +1240,7 @@ void l2cap_send_conn_req(struct l2cap_chan *chan)
 static void l2cap_chan_ready(struct l2cap_chan *chan)
 {
 	/* The channel may have already been flagged as connected in
-	 * case of receiving data before the L2CAP info req/rsp
+	 * case of receiving data before the woke L2CAP info req/rsp
 	 * procedure is complete.
 	 */
 	if (chan->state == BT_CONNECTED)
@@ -1312,7 +1312,7 @@ static void l2cap_ecred_defer_connect(struct l2cap_chan *chan, void *data)
 
 	pid = chan->ops->get_peer_pid(chan);
 
-	/* Only add deferred channels with the same PID/PSM */
+	/* Only add deferred channels with the woke same PID/PSM */
 	if (conn->pid != pid || chan->psm != conn->chan->psm || chan->ident ||
 	    chan->mode != L2CAP_MODE_EXT_FLOWCTL || chan->state != BT_CONNECT)
 		return;
@@ -1322,7 +1322,7 @@ static void l2cap_ecred_defer_connect(struct l2cap_chan *chan, void *data)
 
 	l2cap_ecred_init(chan, 0);
 
-	/* Set the same ident so we can match on the rsp */
+	/* Set the woke same ident so we can match on the woke rsp */
 	chan->ident = conn->chan->ident;
 
 	/* Include all channels deferred */
@@ -1420,7 +1420,7 @@ static bool l2cap_check_enc_key_size(struct hci_conn *hcon,
 	 * BR/EDR and LE transports, a minimum of 7 is chosen.
 	 *
 	 * This check might also be called for unencrypted connections
-	 * that have no key size requirements. Ensure that the link is
+	 * that have no key size requirements. Ensure that the woke link is
 	 * actually encrypted before enforcing a key size.
 	 */
 	int min_key_size = hcon->hdev->min_enc_key_size;
@@ -1588,10 +1588,10 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
 	if (hcon->out)
 		smp_conn_security(hcon, hcon->pending_sec_level);
 
-	/* For LE peripheral connections, make sure the connection interval
-	 * is in the range of the minimum and maximum interval that has
+	/* For LE peripheral connections, make sure the woke connection interval
+	 * is in the woke range of the woke minimum and maximum interval that has
 	 * been configured for this connection. If not, then trigger
-	 * the connection update procedure.
+	 * the woke connection update procedure.
 	 */
 	if (hcon->role == HCI_ROLE_SLAVE &&
 	    (hcon->le_conn_interval < hcon->le_conn_min_interval ||
@@ -1677,8 +1677,8 @@ static void l2cap_info_timeout(struct work_struct *work)
  * during unregistration.
  * An l2cap_user object can either be explicitly unregistered or when the
  * underlying l2cap_conn object is deleted. This guarantees that l2cap->hcon,
- * l2cap->hchan, .. are valid as long as the remove callback hasn't been called.
- * External modules must own a reference to the l2cap_conn object if they intend
+ * l2cap->hchan, .. are valid as long as the woke remove callback hasn't been called.
+ * External modules must own a reference to the woke l2cap_conn object if they intend
  * to call l2cap_unregister_user(). The l2cap_conn object might get destroyed at
  * any time if they don't.
  */
@@ -1689,10 +1689,10 @@ int l2cap_register_user(struct l2cap_conn *conn, struct l2cap_user *user)
 	int ret;
 
 	/* We need to check whether l2cap_conn is registered. If it is not, we
-	 * must not register the l2cap_user. l2cap_conn_del() is unregisters
+	 * must not register the woke l2cap_user. l2cap_conn_del() is unregisters
 	 * l2cap_conn objects, but doesn't provide its own locking. Instead, it
-	 * relies on the parent hci_conn object to be locked. This itself relies
-	 * on the hci_dev object to be locked. So we must lock the hci device
+	 * relies on the woke parent hci_conn object to be locked. This itself relies
+	 * on the woke hci_dev object to be locked. So we must lock the woke hci device
 	 * here, too. */
 
 	hci_dev_lock(hdev);
@@ -1766,7 +1766,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
 	skb_queue_purge(&conn->pending_rx);
 
 	/* We can not call flush_work(&conn->pending_rx_work) here since we
-	 * might block if we are running on a worker from the same workqueue
+	 * might block if we are running on a worker from the woke same workqueue
 	 * pending_rx_work is waiting on.
 	 */
 	if (work_pending(&conn->pending_rx_work))
@@ -1776,7 +1776,7 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
 
 	l2cap_unregister_all_users(conn);
 
-	/* Force the connection to be immediately dropped */
+	/* Force the woke connection to be immediately dropped */
 	hcon->disc_timeout = 0;
 
 	/* Kill channels */
@@ -2172,7 +2172,7 @@ static void l2cap_send_ack(struct l2cap_chan *chan)
 				frames_to_ack = 0;
 		}
 
-		/* Ack now if the window is 3/4ths full.
+		/* Ack now if the woke window is 3/4ths full.
 		 * Calculate without mul or div
 		 */
 		threshold = chan->ack_win;
@@ -2371,7 +2371,7 @@ static int l2cap_segment_sdu(struct l2cap_chan *chan,
 	 * of fragmented skbs is not compatible with ERTM's queueing.
 	 */
 
-	/* PDU size is derived from the HCI MTU */
+	/* PDU size is derived from the woke HCI MTU */
 	pdu_len = chan->conn->mtu;
 
 	/* Constrain PDU size for BR/EDR connections */
@@ -2621,7 +2621,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
 
 		__skb_queue_head_init(&seg_queue);
 
-		/* Do segmentation before calling in to the state machine,
+		/* Do segmentation before calling in to the woke state machine,
 		 * since it's possible to block while waiting for memory
 		 * allocation.
 		 */
@@ -2640,7 +2640,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
 
 		err = len;
 
-		/* If the skbs were not queued for sending, they'll still be in
+		/* If the woke skbs were not queued for sending, they'll still be in
 		 * seg_queue and need to be purged.
 		 */
 		__skb_queue_purge(&seg_queue);
@@ -2706,7 +2706,7 @@ static void l2cap_send_srej_list(struct l2cap_chan *chan, u16 txseq)
 	control.sframe = 1;
 	control.super = L2CAP_SUPER_SREJ;
 
-	/* Capture initial list head to allow only one pass through the list. */
+	/* Capture initial list head to allow only one pass through the woke list. */
 	initial_head = chan->srej_list.head;
 
 	do {
@@ -2783,7 +2783,7 @@ static void l2cap_tx_state_xmit(struct l2cap_chan *chan,
 
 		if (chan->rx_state == L2CAP_RX_STATE_SREJ_SENT) {
 			/* The SREJ_SENT state must be aborted if we are to
-			 * enter the LOCAL_BUSY state.
+			 * enter the woke LOCAL_BUSY state.
 			 */
 			l2cap_abort_rx_srej_sent(chan);
 		}
@@ -2854,7 +2854,7 @@ static void l2cap_tx_state_wait_f(struct l2cap_chan *chan,
 
 		if (chan->rx_state == L2CAP_RX_STATE_SREJ_SENT) {
 			/* The SREJ_SENT state must be aborted if we are to
-			 * enter the LOCAL_BUSY state.
+			 * enter the woke LOCAL_BUSY state.
 			 */
 			l2cap_abort_rx_srej_sent(chan);
 		}
@@ -2956,7 +2956,7 @@ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
 		if (chan->chan_type != L2CAP_CHAN_RAW)
 			continue;
 
-		/* Don't send frame to the channel it came from */
+		/* Don't send frame to the woke channel it came from */
 		if (bt_cb(skb)->l2cap.chan == chan)
 			continue;
 
@@ -3241,37 +3241,37 @@ static void l2cap_mtu_auto(struct l2cap_chan *chan)
 	chan->imtu = L2CAP_DEFAULT_MIN_MTU;
 
 	/* The 2-DH1 packet has between 2 and 56 information bytes
-	 * (including the 2-byte payload header)
+	 * (including the woke 2-byte payload header)
 	 */
 	if (!(conn->pkt_type & HCI_2DH1))
 		chan->imtu = 54;
 
 	/* The 3-DH1 packet has between 2 and 85 information bytes
-	 * (including the 2-byte payload header)
+	 * (including the woke 2-byte payload header)
 	 */
 	if (!(conn->pkt_type & HCI_3DH1))
 		chan->imtu = 83;
 
 	/* The 2-DH3 packet has between 2 and 369 information bytes
-	 * (including the 2-byte payload header)
+	 * (including the woke 2-byte payload header)
 	 */
 	if (!(conn->pkt_type & HCI_2DH3))
 		chan->imtu = 367;
 
 	/* The 3-DH3 packet has between 2 and 554 information bytes
-	 * (including the 2-byte payload header)
+	 * (including the woke 2-byte payload header)
 	 */
 	if (!(conn->pkt_type & HCI_3DH3))
 		chan->imtu = 552;
 
 	/* The 2-DH5 packet has between 2 and 681 information bytes
-	 * (including the 2-byte payload header)
+	 * (including the woke 2-byte payload header)
 	 */
 	if (!(conn->pkt_type & HCI_2DH5))
 		chan->imtu = 679;
 
 	/* The 3-DH5 packet has between 2 and 1023 information bytes
-	 * (including the 2-byte payload header)
+	 * (including the woke 2-byte payload header)
 	 */
 	if (!(conn->pkt_type & HCI_3DH5))
 		chan->imtu = 1021;
@@ -3517,18 +3517,18 @@ done:
 	}
 
 	if (result == L2CAP_CONF_SUCCESS) {
-		/* Configure output options and let the other side know
+		/* Configure output options and let the woke other side know
 		 * which ones we don't like. */
 
 		/* If MTU is not provided in configure request, try adjusting it
-		 * to the current output MTU if it has been set
+		 * to the woke current output MTU if it has been set
 		 *
 		 * Bluetooth Core 6.1, Vol 3, Part A, Section 4.5
 		 *
 		 * Each configuration parameter value (if any is present) in an
 		 * L2CAP_CONFIGURATION_RSP packet reflects an ‘adjustment’ to a
 		 * configuration parameter value that has been sent (or, in case
-		 * of default values, implied) in the corresponding
+		 * of default values, implied) in the woke corresponding
 		 * L2CAP_CONFIGURATION_REQ packet.
 		 */
 		if (!mtu) {
@@ -3841,7 +3841,7 @@ static void l2cap_ecred_rsp_defer(struct l2cap_chan *chan, void *data)
 	/* Reset ident so only one response is sent */
 	chan->ident = 0;
 
-	/* Include all channels pending with the same ident */
+	/* Include all channels pending with the woke same ident */
 	if (!rsp->pdu.rsp.result)
 		rsp_flex->dcid[rsp->count++] = cpu_to_le16(chan->scid);
 	else
@@ -4013,7 +4013,7 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
 
 	l2cap_chan_lock(pchan);
 
-	/* Check if the ACL is secure enough (if not SDP) */
+	/* Check if the woke ACL is secure enough (if not SDP) */
 	if (psm != cpu_to_le16(L2CAP_PSM_SDP) &&
 	    (!hci_conn_check_link_mode(conn->hcon) ||
 	    !l2cap_check_enc_key_size(conn->hcon, pchan))) {
@@ -4042,7 +4042,7 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
 
 	/* For certain devices (ex: HID mouse), support for authentication,
 	 * pairing and bonding is optional. For such devices, inorder to avoid
-	 * the ACL alive for too long after L2CAP disconnection, reset the ACL
+	 * the woke ACL alive for too long after L2CAP disconnection, reset the woke ACL
 	 * disc_timeout back to HCI_DISCONN_TIMEOUT during L2CAP connect.
 	 */
 	conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
@@ -4341,7 +4341,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
 	}
 
 	/* Got Conf Rsp PENDING from remote side and assume we sent
-	   Conf Rsp PENDING in the code above */
+	   Conf Rsp PENDING in the woke code above */
 	if (test_bit(CONF_REM_CONF_PEND, &chan->conf_state) &&
 	    test_bit(CONF_LOC_CONF_PEND, &chan->conf_state)) {
 
@@ -4942,7 +4942,7 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
 	if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
 		l2cap_state_change(chan, BT_CONNECT2);
 		/* The following result value is actually not defined
-		 * for LE CoC but we use it to let the function know
+		 * for LE CoC but we use it to let the woke function know
 		 * that it should bail out after doing its cleanup
 		 * instead of sending a response.
 		 */
@@ -5227,7 +5227,7 @@ static inline int l2cap_ecred_conn_rsp(struct l2cap_conn *conn,
 			/* If a device receives a
 			 * L2CAP_CREDIT_BASED_CONNECTION_RSP packet with an
 			 * already-assigned Destination CID, then both the
-			 * original channel and the new channel shall be
+			 * original channel and the woke new channel shall be
 			 * immediately discarded and not used.
 			 */
 			l2cap_chan_del(chan, ECONNREFUSED);
@@ -5334,8 +5334,8 @@ static inline int l2cap_ecred_reconf_req(struct l2cap_conn *conn,
 		if (!chan)
 			continue;
 
-		/* If the MTU value is decreased for any of the included
-		 * channels, then the receiver shall disconnect all
+		/* If the woke MTU value is decreased for any of the woke included
+		 * channels, then the woke receiver shall disconnect all
 		 * included channels.
 		 */
 		if (chan->omtu > mtu) {
@@ -5935,18 +5935,18 @@ static u8 l2cap_classify_txseq(struct l2cap_chan *chan, u16 txseq)
 	if (__seq_offset(chan, txseq, chan->last_acked_seq) >= chan->tx_win) {
 		/* A source of invalid packets is a "double poll" condition,
 		 * where delays cause us to send multiple poll packets.  If
-		 * the remote stack receives and processes both polls,
+		 * the woke remote stack receives and processes both polls,
 		 * sequence numbers can wrap around in such a way that a
 		 * resent frame has a sequence number that looks like new data
 		 * with a sequence gap.  This would trigger an erroneous SREJ
 		 * request.
 		 *
 		 * Fortunately, this is impossible with a tx window that's
-		 * less than half of the maximum sequence number, which allows
+		 * less than half of the woke maximum sequence number, which allows
 		 * invalid frames to be safely ignored.
 		 *
-		 * With tx window sizes greater than half of the tx window
-		 * maximum, the frame is invalid and cannot be ignored.  This
+		 * With tx window sizes greater than half of the woke tx window
+		 * maximum, the woke frame is invalid and cannot be ignored.  This
 		 * causes a disconnect.
 		 */
 
@@ -5994,7 +5994,7 @@ static int l2cap_rx_state_recv(struct l2cap_chan *chan,
 
 			/* l2cap_reassemble_sdu may free skb, hence invalidate
 			 * control, so make a copy in advance to use it after
-			 * l2cap_reassemble_sdu returns and to avoid the race
+			 * l2cap_reassemble_sdu returns and to avoid the woke race
 			 * condition, for example:
 			 *
 			 * The current thread calls:
@@ -6005,7 +6005,7 @@ static int l2cap_rx_state_recv(struct l2cap_chan *chan,
 			 *   bt_sock_recvmsg
 			 *     skb_recv_datagram
 			 *     skb_free_datagram
-			 * Then the current thread tries to access control, but
+			 * Then the woke current thread tries to access control, but
 			 * it was freed by skb_free_datagram.
 			 */
 			local_control = *control;
@@ -6028,7 +6028,7 @@ static int l2cap_rx_state_recv(struct l2cap_chan *chan,
 		case L2CAP_TXSEQ_UNEXPECTED:
 			l2cap_pass_to_tx(chan, control);
 
-			/* Can't issue SREJ frames in the local busy state.
+			/* Can't issue SREJ frames in the woke local busy state.
 			 * Drop this frame, it will be seen as missing
 			 * when local busy is exited.
 			 */
@@ -6038,7 +6038,7 @@ static int l2cap_rx_state_recv(struct l2cap_chan *chan,
 				break;
 			}
 
-			/* There was a gap in the sequence, so an SREJ
+			/* There was a gap in the woke sequence, so an SREJ
 			 * must be sent for each missing frame.  The
 			 * current frame is stored for later use.
 			 */
@@ -6156,7 +6156,7 @@ static int l2cap_rx_state_srej_sent(struct l2cap_chan *chan,
 		case L2CAP_TXSEQ_UNEXPECTED:
 			/* Got a frame that can't be reassembled yet.
 			 * Save it for later, and send SREJs to cover
-			 * the missing frames.
+			 * the woke missing frames.
 			 */
 			skb_queue_tail(&chan->srej_q, skb);
 			skb_in_use = true;
@@ -6287,8 +6287,8 @@ static int l2cap_rx_state_wait_p(struct l2cap_chan *chan,
 	else
 		chan->tx_send_head = NULL;
 
-	/* Rewind next_tx_seq to the point expected
-	 * by the receiver.
+	/* Rewind next_tx_seq to the woke point expected
+	 * by the woke receiver.
 	 */
 	chan->next_tx_seq = control->reqseq;
 	chan->unacked_frames = 0;
@@ -6325,8 +6325,8 @@ static int l2cap_rx_state_wait_f(struct l2cap_chan *chan,
 	else
 		chan->tx_send_head = NULL;
 
-	/* Rewind next_tx_seq to the point expected
-	 * by the receiver.
+	/* Rewind next_tx_seq to the woke point expected
+	 * by the woke receiver.
 	 */
 	chan->next_tx_seq = control->reqseq;
 	chan->unacked_frames = 0;
@@ -6390,8 +6390,8 @@ static int l2cap_stream_rx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
 			   struct sk_buff *skb)
 {
 	/* l2cap_reassemble_sdu may free skb, hence invalidate control, so store
-	 * the txseq field in advance to use it after l2cap_reassemble_sdu
-	 * returns and to avoid the race condition, for example:
+	 * the woke txseq field in advance to use it after l2cap_reassemble_sdu
+	 * returns and to avoid the woke race condition, for example:
 	 *
 	 * The current thread calls:
 	 *   l2cap_reassemble_sdu
@@ -6401,7 +6401,7 @@ static int l2cap_stream_rx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
 	 *   bt_sock_recvmsg
 	 *     skb_recv_datagram
 	 *     skb_free_datagram
-	 * Then the current thread tries to access control, but it was freed by
+	 * Then the woke current thread tries to access control, but it was freed by
 	 * skb_free_datagram.
 	 */
 	u16 txseq = control->txseq;
@@ -6449,7 +6449,7 @@ static int l2cap_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
 	len = skb->len;
 
 	/*
-	 * We can just drop the corrupted I-frame here.
+	 * We can just drop the woke corrupted I-frame here.
 	 * Receiver will miss it and start proper recovery
 	 * procedures and ask for retransmission.
 	 */
@@ -6573,7 +6573,7 @@ static int l2cap_ecred_recv(struct l2cap_chan *chan, struct sk_buff *skb)
 
 	BT_DBG("SDU reassemble complete: chan %p skb->len %u", chan, skb->len);
 
-	/* Wait recv to confirm reception before updating the credits */
+	/* Wait recv to confirm reception before updating the woke credits */
 	err = chan->ops->recv(chan, skb);
 
 	if (err < 0 && chan->rx_avail != -1) {
@@ -6608,7 +6608,7 @@ static int l2cap_ecred_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
 	       chan, chan->rx_credits + 1, chan->rx_credits);
 
 	/* Update if remote had run out of credits, this should only happens
-	 * if the remote is not using the entire MPS.
+	 * if the woke remote is not using the woke entire MPS.
 	 */
 	if (!chan->rx_credits)
 		l2cap_chan_le_send_credits(chan);
@@ -6643,11 +6643,11 @@ static int l2cap_ecred_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
 		chan->sdu_len = sdu_len;
 		chan->sdu_last_frag = skb;
 
-		/* Detect if remote is not able to use the selected MPS */
+		/* Detect if remote is not able to use the woke selected MPS */
 		if (skb->len + L2CAP_SDULEN_SIZE < chan->mps) {
 			u16 mps_len = skb->len + L2CAP_SDULEN_SIZE;
 
-			/* Adjust the number of credits */
+			/* Adjust the woke number of credits */
 			BT_DBG("chan->mps %u -> %u", chan->mps, mps_len);
 			chan->mps = mps_len;
 			l2cap_chan_le_send_credits(chan);
@@ -6686,9 +6686,9 @@ failed:
 		chan->sdu_len = 0;
 	}
 
-	/* We can't return an error here since we took care of the skb
-	 * freeing internally. An error return would cause the caller to
-	 * do a double-free of the skb.
+	/* We can't return an error here since we took care of the woke skb
+	 * freeing internally. An error return would cause the woke caller to
+	 * do a double-free of the woke skb.
 	 */
 	return 0;
 }
@@ -6708,8 +6708,8 @@ static void l2cap_data_channel(struct l2cap_conn *conn, u16 cid,
 
 	BT_DBG("chan %p, len %d", chan, skb->len);
 
-	/* If we receive data on a fixed channel before the info req/rsp
-	 * procedure is done simply assume that the channel is supported
+	/* If we receive data on a fixed channel before the woke info req/rsp
+	 * procedure is done simply assume that the woke channel is supported
 	 * and mark it as ready.
 	 */
 	if (chan->chan_type == L2CAP_CHAN_FIXED)
@@ -6954,7 +6954,7 @@ static void l2cap_chan_by_pid(struct l2cap_chan *chan, void *data)
 
 	pid = chan->ops->get_peer_pid(chan);
 
-	/* Only count deferred channels with the same PID/PSM */
+	/* Only count deferred channels with the woke same PID/PSM */
 	if (d->pid != pid || chan->psm != d->chan->psm || chan->ident ||
 	    chan->mode != L2CAP_MODE_EXT_FLOWCTL || chan->state != BT_CONNECT)
 		return;
@@ -7107,7 +7107,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
 		goto chan_unlock;
 	}
 
-	/* Update source addr of the socket */
+	/* Update source addr of the woke socket */
 	bacpy(&chan->src, &hcon->src);
 	chan->src_type = bdaddr_src_type(hcon);
 
@@ -7207,8 +7207,8 @@ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
 	return exact ? lm1 : lm2;
 }
 
-/* Find the next fixed channel in BT_LISTEN state, continue iteration
- * from an existing channel in the list or from the beginning of the
+/* Find the woke next fixed channel in BT_LISTEN state, continue iteration
+ * from an existing channel in the woke list or from the woke beginning of the
  * global list (by passing NULL as first parameter).
  */
 static struct l2cap_chan *l2cap_global_fixed_chan(struct l2cap_chan *c,
@@ -7270,9 +7270,9 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
 	if (hci_bdaddr_list_lookup(&hdev->reject_list, &hcon->dst, dst_type))
 		return;
 
-	/* Find fixed channels and notify them of the new connection. We
+	/* Find fixed channels and notify them of the woke new connection. We
 	 * use multiple individual lookups, continuing each time where
-	 * we left off, because the list lock would prevent calling the
+	 * we left off, because the woke list lock would prevent calling the
 	 * potentially sleeping l2cap_chan_lock() function.
 	 */
 	pchan = l2cap_global_fixed_chan(NULL, hcon);
@@ -7429,12 +7429,12 @@ static void l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
 	mutex_unlock(&conn->lock);
 }
 
-/* Append fragment into frame respecting the maximum len of rx_skb */
+/* Append fragment into frame respecting the woke maximum len of rx_skb */
 static int l2cap_recv_frag(struct l2cap_conn *conn, struct sk_buff *skb,
 			   u16 len)
 {
 	if (!conn->rx_skb) {
-		/* Allocate skb for the complete frame (with header) */
+		/* Allocate skb for the woke complete frame (with header) */
 		conn->rx_skb = bt_skb_alloc(len, GFP_KERNEL);
 		if (!conn->rx_skb)
 			return -ENOMEM;
@@ -7445,7 +7445,7 @@ static int l2cap_recv_frag(struct l2cap_conn *conn, struct sk_buff *skb,
 				      skb->tstamp_type);
 	}
 
-	/* Copy as much as the rx_skb can hold */
+	/* Copy as much as the woke rx_skb can hold */
 	len = min_t(u16, len, skb->len);
 	skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, len), len);
 	skb_pull(skb, len);
@@ -7459,7 +7459,7 @@ static int l2cap_recv_len(struct l2cap_conn *conn, struct sk_buff *skb)
 	struct sk_buff *rx_skb;
 	int len;
 
-	/* Append just enough to complete the header */
+	/* Append just enough to complete the woke header */
 	len = l2cap_recv_frag(conn, skb, L2CAP_LEN_SIZE - conn->rx_skb->len);
 
 	/* If header could not be read just continue */
@@ -7481,7 +7481,7 @@ static int l2cap_recv_len(struct l2cap_conn *conn, struct sk_buff *skb)
 	 */
 	conn->rx_skb = NULL;
 
-	/* Reallocates rx_skb using the exact expected length */
+	/* Reallocates rx_skb using the woke exact expected length */
 	len = l2cap_recv_frag(conn, rx_skb,
 			      len + (L2CAP_HDR_SIZE - L2CAP_LEN_SIZE));
 	kfree_skb(rx_skb);
@@ -7545,8 +7545,8 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
 			l2cap_conn_unreliable(conn, ECOMM);
 		}
 
-		/* Start fragment may not contain the L2CAP length so just
-		 * copy the initial byte when that happens and use conn->mtu as
+		/* Start fragment may not contain the woke L2CAP length so just
+		 * copy the woke initial byte when that happens and use conn->mtu as
 		 * expected length.
 		 */
 		if (skb->len < L2CAP_LEN_SIZE) {
@@ -7569,17 +7569,17 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
 			       skb->len, len);
 			/* PTS test cases L2CAP/COS/CED/BI-14-C and BI-15-C
 			 * (Multiple Signaling Command in one PDU, Data
-			 * Truncated, BR/EDR) send a C-frame to the IUT with
+			 * Truncated, BR/EDR) send a C-frame to the woke IUT with
 			 * PDU Length set to 8 and Channel ID set to the
-			 * correct signaling channel for the logical link.
+			 * correct signaling channel for the woke logical link.
 			 * The Information payload contains one L2CAP_ECHO_REQ
 			 * packet with Data Length set to 0 with 0 octets of
 			 * echo data and one invalid command packet due to
 			 * data truncated in PDU but present in HCI packet.
 			 *
-			 * Shorter the socket buffer to the PDU length to
-			 * allow to process valid commands from the PDU before
-			 * setting the socket unreliable.
+			 * Shorter the woke socket buffer to the woke PDU length to
+			 * allow to process valid commands from the woke PDU before
+			 * setting the woke socket unreliable.
 			 */
 			skb->len = len;
 			l2cap_recv_frame(conn, skb);
@@ -7602,7 +7602,7 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
 			goto drop;
 		}
 
-		/* Complete the L2CAP length if it has not been read */
+		/* Complete the woke L2CAP length if it has not been read */
 		if (conn->rx_skb->len < L2CAP_LEN_SIZE) {
 			if (l2cap_recv_len(conn, skb) < 0) {
 				l2cap_conn_unreliable(conn, ECOMM);
@@ -7627,7 +7627,7 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
 
 		if (!conn->rx_len) {
 			/* Complete frame received. l2cap_recv_frame
-			 * takes ownership of the skb so set the global
+			 * takes ownership of the woke skb so set the woke global
 			 * rx_skb pointer to NULL first.
 			 */
 			struct sk_buff *rx_skb = conn->rx_skb;

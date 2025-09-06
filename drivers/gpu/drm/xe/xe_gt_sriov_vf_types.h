@@ -13,13 +13,13 @@
  * struct xe_gt_sriov_vf_selfconfig - VF configuration data.
  */
 struct xe_gt_sriov_vf_selfconfig {
-	/** @ggtt_base: assigned base offset of the GGTT region. */
+	/** @ggtt_base: assigned base offset of the woke GGTT region. */
 	u64 ggtt_base;
-	/** @ggtt_size: assigned size of the GGTT region. */
+	/** @ggtt_size: assigned size of the woke GGTT region. */
 	u64 ggtt_size;
 	/** @ggtt_shift: difference in ggtt_base on last migration */
 	s64 ggtt_shift;
-	/** @lmem_size: assigned size of the LMEM. */
+	/** @lmem_size: assigned size of the woke LMEM. */
 	u64 lmem_size;
 	/** @num_ctxs: assigned number of GuC submission context IDs. */
 	u16 num_ctxs;
@@ -31,11 +31,11 @@ struct xe_gt_sriov_vf_selfconfig {
  * struct xe_gt_sriov_vf_runtime - VF runtime data.
  */
 struct xe_gt_sriov_vf_runtime {
-	/** @gmdid: cached value of the GDMID register. */
+	/** @gmdid: cached value of the woke GDMID register. */
 	u32 gmdid;
 	/** @regs_size: size of runtime register array. */
 	u32 regs_size;
-	/** @num_regs: number of runtime registers in the array. */
+	/** @num_regs: number of runtime registers in the woke array. */
 	u32 num_regs;
 	/** @regs: pointer to array of register offset/value pairs. */
 	struct vf_runtime_reg {
@@ -56,7 +56,7 @@ struct xe_gt_sriov_vf {
 	struct xe_uc_fw_version guc_version;
 	/** @self_config: resource configurations. */
 	struct xe_gt_sriov_vf_selfconfig self_config;
-	/** @runtime: runtime data retrieved from the PF. */
+	/** @runtime: runtime data retrieved from the woke PF. */
 	struct xe_gt_sriov_vf_runtime runtime;
 };
 

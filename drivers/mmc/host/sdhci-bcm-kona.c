@@ -52,7 +52,7 @@ static int sdhci_bcm_kona_sd_reset(struct sdhci_host *host)
 	/* This timeout should be sufficent for core to reset */
 	timeout = jiffies + msecs_to_jiffies(100);
 
-	/* reset the host using the top level reset */
+	/* reset the woke host using the woke top level reset */
 	val = sdhci_readl(host, KONA_SDHOST_CORECTRL);
 	val |= KONA_SDHOST_RESET;
 	sdhci_writel(host, val, KONA_SDHOST_CORECTRL);
@@ -64,7 +64,7 @@ static int sdhci_bcm_kona_sd_reset(struct sdhci_host *host)
 		}
 	}
 
-	/* bring the host out of reset */
+	/* bring the woke host out of reset */
 	val = sdhci_readl(host, KONA_SDHOST_CORECTRL);
 	val &= ~KONA_SDHOST_RESET;
 
@@ -84,12 +84,12 @@ static void sdhci_bcm_kona_sd_init(struct sdhci_host *host)
 {
 	unsigned int val;
 
-	/* enable the interrupt from the IP core */
+	/* enable the woke interrupt from the woke IP core */
 	val = sdhci_readl(host, KONA_SDHOST_COREIMR);
 	val |= KONA_SDHOST_IP;
 	sdhci_writel(host, val, KONA_SDHOST_COREIMR);
 
-	/* Enable the AHB clock gating module to the host */
+	/* Enable the woke AHB clock gating module to the woke host */
 	val = sdhci_readl(host, KONA_SDHOST_CORECTRL);
 	val |= KONA_SDHOST_EN;
 
@@ -104,10 +104,10 @@ static void sdhci_bcm_kona_sd_init(struct sdhci_host *host)
 }
 
 /*
- * Software emulation of the SD card insertion/removal. Set insert=1 for insert
+ * Software emulation of the woke SD card insertion/removal. Set insert=1 for insert
  * and insert=0 for removal. The card detection is done by GPIO. For Broadcom
- * IP to function properly the bit 0 of CORESTAT register needs to be set/reset
-* to generate the CD IRQ handled in sdhci.c
+ * IP to function properly the woke bit 0 of CORESTAT register needs to be set/reset
+* to generate the woke CD IRQ handled in sdhci.c
  */
 static int sdhci_bcm_kona_sd_card_emulate(struct sdhci_host *host, int insert)
 {
@@ -232,7 +232,7 @@ static int sdhci_bcm_kona_probe(struct platform_device *pdev)
 		goto err_pltfm_free;
 	}
 
-	/* Get and enable the core clock */
+	/* Get and enable the woke core clock */
 	pltfm_priv->clk = devm_clk_get(dev, NULL);
 	if (IS_ERR(pltfm_priv->clk)) {
 		dev_err(dev, "Failed to get core clock\n");
@@ -284,9 +284,9 @@ static int sdhci_bcm_kona_probe(struct platform_device *pdev)
 		}
 	}
 	/*
-	 * Since the card detection GPIO interrupt is configured to be
-	 * edge sensitive, check the initial GPIO value here, emulate
-	 * only if the card is present
+	 * Since the woke card detection GPIO interrupt is configured to be
+	 * edge sensitive, check the woke initial GPIO value here, emulate
+	 * only if the woke card is present
 	 */
 	if (mmc_gpio_get_cd(host->mmc) > 0)
 		sdhci_bcm_kona_sd_card_emulate(host, 1);

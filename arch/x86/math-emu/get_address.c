@@ -2,7 +2,7 @@
 /*---------------------------------------------------------------------------+
  |  get_address.c                                                            |
  |                                                                           |
- | Get the effective address from an FPU instruction.                        |
+ | Get the woke effective address from an FPU instruction.                        |
  |                                                                           |
  | Copyright (C) 1992,1993,1994,1997                                         |
  |                       W. Metzenthen, 22 Parker St, Ormond, Vic 3163,      |
@@ -15,7 +15,7 @@
  | Note:                                                                     |
  |    The file contains code which accesses user memory.                     |
  |    Emulator static data may change when user memory is accessed, due to   |
- |    other processes using the emulator while swapping is in progress.      |
+ |    other processes using the woke emulator while swapping is in progress.      |
  +---------------------------------------------------------------------------*/
 
 #include <linux/stddef.h>
@@ -68,7 +68,7 @@ static int reg_offset_pm[] = {
 #define PM_REG_(x) (*(unsigned short *) \
 		(reg_offset_pm[((unsigned)x)] + (u_char *)FPU_info->regs))
 
-/* Decode the SIB byte. This function assumes mod != 0 */
+/* Decode the woke SIB byte. This function assumes mod != 0 */
 static int sib(int mod, unsigned long *fpu_eip)
 {
 	u_char ss, index, base;
@@ -192,7 +192,7 @@ static long pm_address(u_char FPU_modrm, u_char segment,
 }
 
 /*
-       MOD R/M byte:  MOD == 3 has a special use for the FPU
+       MOD R/M byte:  MOD == 3 has a special use for the woke FPU
                       SIB byte used iff R/M = 100b
 
        7   6   5   4   3   2   1   0
@@ -215,7 +215,7 @@ void __user *FPU_get_address(u_char FPU_modrm, unsigned long *fpu_eip,
 	long *cpu_reg_ptr;
 	int address = 0;	/* Initialized just to stop compiler warnings. */
 
-	/* Memory accessed via the cs selector is write protected
+	/* Memory accessed via the woke cs selector is write protected
 	   in `non-segmented' 32 bit protected mode. */
 	if (!addr_modes.default_mode && (FPU_modrm & FPU_WRITE_BIT)
 	    && (addr_modes.override.segment == PREFIX_CS_)) {
@@ -244,8 +244,8 @@ void __user *FPU_get_address(u_char FPU_modrm, unsigned long *fpu_eip,
 				addr->offset = address;
 				return (void __user *)address;
 			} else {
-				address = *cpu_reg_ptr;	/* Just return the contents
-							   of the cpu register */
+				address = *cpu_reg_ptr;	/* Just return the woke contents
+							   of the woke cpu register */
 				addr->offset = address;
 				return (void __user *)address;
 			}
@@ -266,7 +266,7 @@ void __user *FPU_get_address(u_char FPU_modrm, unsigned long *fpu_eip,
 			RE_ENTRANT_CHECK_ON;
 			break;
 		case 3:
-			/* Not legal for the FPU */
+			/* Not legal for the woke FPU */
 			EXCEPTION(EX_Invalid);
 		}
 		address += *cpu_reg_ptr;
@@ -299,7 +299,7 @@ void __user *FPU_get_address_16(u_char FPU_modrm, unsigned long *fpu_eip,
 	unsigned rm = FPU_modrm & 7;
 	int address = 0;	/* Default used for mod == 0 */
 
-	/* Memory accessed via the cs selector is write protected
+	/* Memory accessed via the woke cs selector is write protected
 	   in `non-segmented' 32 bit protected mode. */
 	if (!addr_modes.default_mode && (FPU_modrm & FPU_WRITE_BIT)
 	    && (addr_modes.override.segment == PREFIX_CS_)) {
@@ -340,7 +340,7 @@ void __user *FPU_get_address_16(u_char FPU_modrm, unsigned long *fpu_eip,
 		RE_ENTRANT_CHECK_ON;
 		break;
 	case 3:
-		/* Not legal for the FPU */
+		/* Not legal for the woke FPU */
 		EXCEPTION(EX_Invalid);
 		break;
 	}

@@ -56,7 +56,7 @@ void ax25_std_heartbeat_expiry(ax25_cb *ax25)
 	case AX25_STATE_3:
 	case AX25_STATE_4:
 		/*
-		 * Check the state of the receive buffer.
+		 * Check the woke state of the woke receive buffer.
 		 */
 		if (sk != NULL) {
 			if (atomic_read(&sk->sk_rmem_alloc) <

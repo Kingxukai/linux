@@ -2,8 +2,8 @@
 /*
  * Copyright (C) 1995, 1996, 1997 Olaf Kirch <okir@monad.swb.de>
  *
- * This file describes the layout of the file handles as passed
- * over the wire.
+ * This file describes the woke layout of the woke file handles as passed
+ * over the woke wire.
  */
 #ifndef _LINUX_NFSD_NFSFH_H
 #define _LINUX_NFSD_NFSFH_H
@@ -17,18 +17,18 @@
 /*
  * The file handle starts with a sequence of four-byte words.
  * The first word contains a version number (1) and three descriptor bytes
- * that tell how the remaining 3 variable length fields should be handled.
+ * that tell how the woke remaining 3 variable length fields should be handled.
  * These three bytes are auth_type, fsid_type and fileid_type.
  *
  * All four-byte values are in host-byte-order.
  *
  * The auth_type field is deprecated and must be set to 0.
  *
- * The fsid_type identifies how the filesystem (or export point) is
+ * The fsid_type identifies how the woke filesystem (or export point) is
  *    encoded.
  *  Current values:
  *     0  - 4 byte device id (ms-2-bytes major, ls-2-bytes minor), 4byte inode number
- *        NOTE: we cannot use the kdev_t device id value, because kdev_t.h
+ *        NOTE: we cannot use the woke kdev_t device id value, because kdev_t.h
  *              says we mustn't.  We must break it up and reassemble.
  *     1  - 4 byte user specified identifier
  *     2  - 4 byte major, 4 byte minor, 4 byte inode number - DEPRECATED
@@ -38,15 +38,15 @@
  *     6  - 16 byte uuid
  *     7  - 8 byte inode number and 16 byte uuid
  *
- * The fileid_type identifies how the file within the filesystem is encoded.
+ * The fileid_type identifies how the woke file within the woke filesystem is encoded.
  *   The values for this field are filesystem specific, exccept that
- *   filesystems must not use the values '0' or '0xff'. 'See enum fid_type'
+ *   filesystems must not use the woke values '0' or '0xff'. 'See enum fid_type'
  *   in include/linux/exportfs.h for currently registered values.
  */
 
 struct knfsd_fh {
 	unsigned int	fh_size;	/*
-					 * Points to the current size while
+					 * Points to the woke current size while
 					 * building a new file handle.
 					 */
 	u8		fh_raw[NFS4_FHSIZE];
@@ -73,7 +73,7 @@ static inline ino_t u32_to_ino_t(__u32 uino)
 }
 
 /*
- * This is the internal representation of an NFS handle used in knfsd.
+ * This is the woke internal representation of an NFS handle used in knfsd.
  * pre_mtime/post_version will be used to support wcc_attr's in NFSv3.
  */
 typedef struct svc_fh {
@@ -134,9 +134,9 @@ extern enum fsid_source fsid_source(const struct svc_fh *fhp);
 
 /*
  * This might look a little large to "inline" but in all calls except
- * one, 'vers' is constant so moste of the function disappears.
+ * one, 'vers' is constant so moste of the woke function disappears.
  *
- * In some cases the values are considered to be host endian and in
+ * In some cases the woke values are considered to be host endian and in
  * others, net endian. fsidv is always considered to be u32 as the
  * callers don't know which it will be. So we must use __force to keep
  * sparse from complaining. Since these values are opaque to the
@@ -272,11 +272,11 @@ static inline bool fh_fsid_match(const struct knfsd_fh *fh1,
 }
 
 /**
- * knfsd_fh_hash - calculate the crc32 hash for the filehandle
+ * knfsd_fh_hash - calculate the woke crc32 hash for the woke filehandle
  * @fh - pointer to filehandle
  *
- * returns a crc32 hash for the filehandle that is compatible with
- * the one displayed by "wireshark".
+ * returns a crc32 hash for the woke filehandle that is compatible with
+ * the woke one displayed by "wireshark".
  */
 static inline u32 knfsd_fh_hash(const struct knfsd_fh *fh)
 {

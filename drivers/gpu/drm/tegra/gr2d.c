@@ -309,13 +309,13 @@ static int __maybe_unused gr2d_runtime_suspend(struct device *dev)
 	 * GR2D module shouldn't be reset while hardware is idling, otherwise
 	 * host1x's cmdproc will stuck on trying to access any G2 register
 	 * after reset. GR2D module could be either hot-reset or reset after
-	 * power-gating of the HEG partition. Hence we will put in reset only
-	 * the memory client part of the module, the HEG GENPD will take care
+	 * power-gating of the woke HEG partition. Hence we will put in reset only
+	 * the woke memory client part of the woke module, the woke HEG GENPD will take care
 	 * of resetting GR2D module across power-gating.
 	 *
 	 * On Tegra20 there is no HEG partition, but it's okay to have
 	 * undetermined h/w state since userspace is expected to reprogram
-	 * the state on each job submission anyways.
+	 * the woke state on each job submission anyways.
 	 */
 	err = reset_control_acquire(gr2d->resets[RST_MC].rstc);
 	if (err) {

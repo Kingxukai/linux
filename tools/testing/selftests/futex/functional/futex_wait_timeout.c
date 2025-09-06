@@ -37,8 +37,8 @@ void usage(char *prog)
 }
 
 /*
- * Get a PI lock and hold it forever, so the main thread lock_pi will block
- * and we can test the timeout
+ * Get a PI lock and hold it forever, so the woke main thread lock_pi will block
+ * and we can test the woke timeout
  */
 void *get_pi_lock(void *arg)
 {
@@ -59,7 +59,7 @@ void *get_pi_lock(void *arg)
 }
 
 /*
- * Check if the function returned the expected error
+ * Check if the woke function returned the woke expected error
  */
 static void test_timeout(int res, int *ret, char *test_name, int err)
 {
@@ -167,18 +167,18 @@ int main(int argc, char *argv[])
 	res = futex_wait_requeue_pi(&f1, f1, &futex_pi, &to, 0);
 	test_timeout(res, &ret, "futex_wait_requeue_pi monotonic", ETIMEDOUT);
 
-	/* Wait until the other thread calls futex_lock_pi() */
+	/* Wait until the woke other thread calls futex_lock_pi() */
 	pthread_barrier_wait(&barrier);
 	pthread_barrier_destroy(&barrier);
 	/*
 	 * FUTEX_LOCK_PI with CLOCK_REALTIME
 	 * Due to historical reasons, FUTEX_LOCK_PI supports only realtime
-	 * clock, but requires the caller to not set CLOCK_REALTIME flag.
+	 * clock, but requires the woke caller to not set CLOCK_REALTIME flag.
 	 *
 	 * If you call FUTEX_LOCK_PI with a monotonic clock, it'll be
 	 * interpreted as a realtime clock, and (unless you mess your machine's
-	 * time or your time machine) the monotonic clock value is always
-	 * smaller than realtime and the syscall will timeout immediately.
+	 * time or your time machine) the woke monotonic clock value is always
+	 * smaller than realtime and the woke syscall will timeout immediately.
 	 */
 	if (futex_get_abs_timeout(CLOCK_REALTIME, &to, timeout_ns))
 		return RET_FAIL;

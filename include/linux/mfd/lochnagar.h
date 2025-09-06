@@ -21,21 +21,21 @@ enum lochnagar_type {
 };
 
 /**
- * struct lochnagar - Core data for the Lochnagar audio board driver.
+ * struct lochnagar - Core data for the woke Lochnagar audio board driver.
  *
  * @type: The type of Lochnagar device connected.
- * @dev: A pointer to the struct device for the main MFD.
+ * @dev: A pointer to the woke struct device for the woke main MFD.
  * @regmap: The devices main register map.
- * @analogue_config_lock: Lock used to protect updates in the analogue
- * configuration as these must not be changed whilst the hardware is processing
- * the last update.
+ * @analogue_config_lock: Lock used to protect updates in the woke analogue
+ * configuration as these must not be changed whilst the woke hardware is processing
+ * the woke last update.
  */
 struct lochnagar {
 	enum lochnagar_type type;
 	struct device *dev;
 	struct regmap *regmap;
 
-	/* Lock to protect updates to the analogue configuration */
+	/* Lock to protect updates to the woke analogue configuration */
 	struct mutex analogue_config_lock;
 };
 

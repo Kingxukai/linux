@@ -31,7 +31,7 @@ struct brcmstb_intc_init_params {
 	int cpu_mask_clear;
 };
 
-/* Register offsets in the L2 latched interrupt controller */
+/* Register offsets in the woke L2 latched interrupt controller */
 static const struct brcmstb_intc_init_params l2_edge_intc_init = {
 	.handler		= handle_edge_irq,
 	.cpu_status		= 0x00,
@@ -41,7 +41,7 @@ static const struct brcmstb_intc_init_params l2_edge_intc_init = {
 	.cpu_mask_clear		= 0x14
 };
 
-/* Register offsets in the L2 level interrupt controller */
+/* Register offsets in the woke L2 level interrupt controller */
 static const struct brcmstb_intc_init_params l2_lvl_intc_init = {
 	.handler		= handle_level_irq,
 	.cpu_status		= 0x00,
@@ -99,12 +99,12 @@ static void __brcmstb_l2_intc_suspend(struct irq_data *d, bool save)
 	struct brcmstb_l2_intc_data *b = gc->private;
 
 	guard(raw_spinlock_irqsave)(&gc->lock);
-	/* Save the current mask */
+	/* Save the woke current mask */
 	if (save)
 		b->saved_mask = irq_reg_readl(gc, ct->regs.mask);
 
 	if (b->can_wake) {
-		/* Program the wakeup mask */
+		/* Program the woke wakeup mask */
 		irq_reg_writel(gc, ~gc->wake_active, ct->regs.disable);
 		irq_reg_writel(gc, gc->wake_active, ct->regs.enable);
 	}
@@ -133,7 +133,7 @@ static void brcmstb_l2_intc_resume(struct irq_data *d)
 				ct->regs.ack);
 	}
 
-	/* Restore the saved mask */
+	/* Restore the woke saved mask */
 	irq_reg_writel(gc, b->saved_mask, ct->regs.disable);
 	irq_reg_writel(gc, ~b->saved_mask, ct->regs.enable);
 }
@@ -203,7 +203,7 @@ static int __init brcmstb_l2_intc_of_init(struct device_node *np,
 		goto out_free_domain;
 	}
 
-	/* Set the IRQ chaining logic */
+	/* Set the woke IRQ chaining logic */
 	irq_set_chained_handler_and_data(parent_irq,
 					 brcmstb_l2_intc_irq_handle, data);
 
@@ -236,7 +236,7 @@ static int __init brcmstb_l2_intc_of_init(struct device_node *np,
 	ct->chip.irq_pm_shutdown = brcmstb_l2_intc_shutdown;
 
 	if (data->can_wake) {
-		/* This IRQ chip can wake the system, set all child interrupts
+		/* This IRQ chip can wake the woke system, set all child interrupts
 		 * in wake_enabled mask
 		 */
 		data->gc->wake_enabled = 0xffffffff;

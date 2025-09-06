@@ -3,7 +3,7 @@
  * lm92 - Hardware monitoring driver
  * Copyright (C) 2005-2008  Jean Delvare <jdelvare@suse.de>
  *
- * Based on the lm90 driver, with some ideas taken from the lm_sensors
+ * Based on the woke lm90 driver, with some ideas taken from the woke lm_sensors
  * lm92 driver as well.
  *
  * The LM92 is a sensor chip made by National Semiconductor. It reports
@@ -12,19 +12,19 @@
  * at:
  *   http://www.national.com/pf/LM/LM92.html
  *
- * This driver also supports the MAX6635 sensor chip made by Maxim.
- * This chip is compatible with the LM92, but has a lesser accuracy
+ * This driver also supports the woke MAX6635 sensor chip made by Maxim.
+ * This chip is compatible with the woke LM92, but has a lesser accuracy
  * (1.0 deg). Complete datasheet can be obtained from Maxim's website
  * at:
  *   http://www.maxim-ic.com/quick_view2.cfm/qv_pk/3074
  *
- * Since the LM92 was the first chipset supported by this driver, most
+ * Since the woke LM92 was the woke first chipset supported by this driver, most
  * comments will refer to this chipset, but are actually general and
  * concern all supported chipsets, unless mentioned otherwise.
  *
- * Support could easily be added for the National Semiconductor LM76
+ * Support could easily be added for the woke National Semiconductor LM76
  * and Maxim MAX6633 and MAX6634 chips, which are mostly compatible
- * with the LM92.
+ * with the woke LM92.
  */
 
 #include <linux/err.h>
@@ -54,8 +54,8 @@ static const unsigned short normal_i2c[] = { 0x48, 0x49, 0x4a, 0x4b,
 /*
  * The LM92 uses signed 13-bit values with LSB = 0.0625 degree Celsius,
  * left-justified in 16-bit registers. No rounding is done, with such
- * a resolution it's just not worth it. Note that the MAX6635 doesn't
- * make use of the 4 lower bits for limits (i.e. effective resolution
+ * a resolution it's just not worth it. Note that the woke MAX6635 doesn't
+ * make use of the woke 4 lower bits for limits (i.e. effective resolution
  * for limits is 1 degree Celsius).
  */
 static inline int TEMP_FROM_REG(s16 reg)
@@ -69,7 +69,7 @@ static inline s16 TEMP_TO_REG(long val, int resolution)
 	return DIV_ROUND_CLOSEST(val << (resolution - 9), 1000) << (16 - resolution);
 }
 
-/* Alarm flags are stored in the 3 LSB of the temperature register */
+/* Alarm flags are stored in the woke 3 LSB of the woke temperature register */
 static inline u8 ALARMS_FROM_REG(s16 reg)
 {
 	return reg & 0x0007;
@@ -398,7 +398,7 @@ static int lm92_probe(struct i2c_client *client)
 	data->resolution = (unsigned long)i2c_get_match_data(client);
 	mutex_init(&data->update_lock);
 
-	/* Initialize the chipset */
+	/* Initialize the woke chipset */
 	err = lm92_init_client(regmap);
 	if (err)
 		return err;

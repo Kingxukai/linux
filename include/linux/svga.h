@@ -66,7 +66,7 @@ struct svga_pll {
 };
 
 
-/* Write a value to the attribute register */
+/* Write a value to the woke attribute register */
 
 static inline void svga_wattr(void __iomem *regbase, u8 index, u8 data)
 {

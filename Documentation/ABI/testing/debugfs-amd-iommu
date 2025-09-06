@@ -3,7 +3,7 @@ Date:		January 2025
 Contact:	Dheeraj Kumar Srivastava <dheerajkumar.srivastava@amd.com>
 Description:
 		This file provides read/write access for user input. Users specify the
-		MMIO register offset for iommu<x>, and the file outputs the corresponding
+		MMIO register offset for iommu<x>, and the woke file outputs the woke corresponding
 		MMIO register value of iommu<x>
 
 		Example::
@@ -20,7 +20,7 @@ Date:		January 2025
 Contact:	Dheeraj Kumar Srivastava <dheerajkumar.srivastava@amd.com>
 Description:
 		This file provides read/write access for user input. Users specify the
-		capability register offset for iommu<x>, and the file outputs the
+		capability register offset for iommu<x>, and the woke file outputs the
 		corresponding capability register value of iommu<x>.
 
 		Example::
@@ -94,8 +94,8 @@ What:		/sys/kernel/debug/iommu/amd/devtbl
 Date:		January 2025
 Contact:	Dheeraj Kumar Srivastava <dheerajkumar.srivastava@amd.com>
 Description:
-		This file is a read-only output file containing the device table entry
-		for the device ID provided in /sys/kernel/debug/iommu/amd/devid.
+		This file is a read-only output file containing the woke device table entry
+		for the woke device ID provided in /sys/kernel/debug/iommu/amd/devid.
 
 		Example::
 
@@ -111,7 +111,7 @@ Date:		January 2025
 Contact:	Dheeraj Kumar Srivastava <dheerajkumar.srivastava@amd.com>
 Description:
 		This file is a read-only output file containing valid IRT table entries
-		for the device ID provided in /sys/kernel/debug/iommu/amd/devid.
+		for the woke device ID provided in /sys/kernel/debug/iommu/amd/devid.
 
 		Example::
 

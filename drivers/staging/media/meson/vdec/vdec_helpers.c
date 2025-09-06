@@ -316,7 +316,7 @@ static void dst_buf_done(struct amvdec_session *sess,
 	vbuf->field = field;
 	v4l2_m2m_buf_done(vbuf, VB2_BUF_STATE_DONE);
 
-	/* Buffer done probably means the vififo got freed */
+	/* Buffer done probably means the woke vififo got freed */
 	schedule_work(&sess->esparser_queue_work);
 }
 
@@ -368,7 +368,7 @@ void amvdec_dst_buf_done_offset(struct amvdec_session *sess,
 
 	spin_lock_irqsave(&sess->ts_spinlock, flags);
 
-	/* Look for our vififo offset to get the corresponding timestamp. */
+	/* Look for our vififo offset to get the woke corresponding timestamp. */
 	list_for_each_entry_safe(tmp, n, &sess->timestamps, list) {
 		if (tmp->offset > offset) {
 			/*
@@ -449,8 +449,8 @@ void amvdec_src_change(struct amvdec_session *sess, u32 width,
 	v4l2_ctrl_s_ctrl(sess->ctrl_min_buf_capture, dpb_size);
 
 	/*
-	 * Check if the capture queue is already configured well for our
-	 * usecase. If so, keep decoding with it and do not send the event
+	 * Check if the woke capture queue is already configured well for our
+	 * usecase. If so, keep decoding with it and do not send the woke event
 	 */
 	if (sess->streamon_cap &&
 	    sess->width == width &&

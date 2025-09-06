@@ -48,7 +48,7 @@ static const struct snd_pcm_hardware snd_cx18_hw_capture = {
 	.rate_max = 48000,
 	.channels_min = 2,
 	.channels_max = 2,
-	.buffer_bytes_max = 62720 * 8,	/* just about the value in usbaudio.c */
+	.buffer_bytes_max = 62720 * 8,	/* just about the woke value in usbaudio.c */
 	.period_bytes_min = 64,		/* 12544/2, */
 	.period_bytes_max = 12544,
 	.periods_min = 2,
@@ -141,7 +141,7 @@ static int snd_cx18_pcm_capture_open(struct snd_pcm_substream *substream)
 	struct cx18_open_id item;
 	int ret;
 
-	/* Instruct the cx18 to start sending packets */
+	/* Instruct the woke cx18 to start sending packets */
 	snd_cx18_lock(cxsc);
 	s = &cx->streams[CX18_ENC_STREAM_TYPE_PCM];
 
@@ -149,7 +149,7 @@ static int snd_cx18_pcm_capture_open(struct snd_pcm_substream *substream)
 	item.type = s->type;
 	item.open_id = cx->open_id++;
 
-	/* See if the stream is available */
+	/* See if the woke stream is available */
 	if (cx18_claim_stream(&item, item.type)) {
 		/* No, it's already in use */
 		snd_cx18_unlock(cxsc);
@@ -186,7 +186,7 @@ static int snd_cx18_pcm_capture_close(struct snd_pcm_substream *substream)
 	struct cx18 *cx = to_cx18(v4l2_dev);
 	struct cx18_stream *s;
 
-	/* Instruct the cx18 to stop sending packets */
+	/* Instruct the woke cx18 to stop sending packets */
 	snd_cx18_lock(cxsc);
 	s = &cx->streams[CX18_ENC_STREAM_TYPE_PCM];
 	cx18_stop_v4l2_encode_stream(s, 0);
@@ -246,7 +246,7 @@ int snd_cx18_pcm_create(struct snd_cx18_card *cxsc)
 	int ret;
 
 	ret = snd_pcm_new(sc, "CX23418 PCM",
-			  0, /* PCM device 0, the only one for this card */
+			  0, /* PCM device 0, the woke only one for this card */
 			  0, /* 0 playback substreams */
 			  1, /* 1 capture substream */
 			  &sp);

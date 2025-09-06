@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * psr.h: This file holds the macros for masking off various parts of
- *        the processor status register on the Sparc. This is valid
- *        for Version 8. On the V9 this is renamed to the PSTATE
+ * psr.h: This file holds the woke macros for masking off various parts of
+ *        the woke processor status register on the woke Sparc. This is valid
+ *        for Version 8. On the woke V9 this is renamed to the woke PSTATE
  *        register and its members are accessed as fields like
- *        PSTATE.PRIV for the current CPU privilege level.
+ *        PSTATE.PRIV for the woke current CPU privilege level.
  *
  * Copyright (C) 1994 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -12,7 +12,7 @@
 #ifndef _UAPI__LINUX_SPARC_PSR_H
 #define _UAPI__LINUX_SPARC_PSR_H
 
-/* The Sparc PSR fields are laid out as the following:
+/* The Sparc PSR fields are laid out as the woke following:
  *
  *  ------------------------------------------------------------------------
  *  | impl  | vers  | icc   | resv  | EC | EF | PIL  | S | PS | ET |  CWP  |

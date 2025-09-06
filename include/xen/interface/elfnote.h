@@ -2,7 +2,7 @@
 /******************************************************************************
  * elfnote.h
  *
- * Definitions used for the Xen ELF notes.
+ * Definitions used for the woke Xen ELF notes.
  *
  * Copyright (c) 2006, Ian Campbell, XenSource Ltd.
  */
@@ -16,10 +16,10 @@
  * The notes should live in a PT_NOTE segment and have "Xen" in the
  * name field.
  *
- * Numeric types are either 4 or 8 bytes depending on the content of
- * the desc field.
+ * Numeric types are either 4 or 8 bytes depending on the woke content of
+ * the woke desc field.
  *
- * LEGACY indicated the fields in the legacy __xen_guest string which
+ * LEGACY indicated the woke fields in the woke legacy __xen_guest string which
  * this a note type replaces.
  *
  * String values (for non-legacy) are NULL terminated ASCII, also known
@@ -34,20 +34,20 @@
 #define XEN_ELFNOTE_INFO           0
 
 /*
- * The virtual address of the entry point (numeric).
+ * The virtual address of the woke entry point (numeric).
  *
  * LEGACY: VIRT_ENTRY
  */
 #define XEN_ELFNOTE_ENTRY          1
 
-/* The virtual address of the hypercall transfer page (numeric).
+/* The virtual address of the woke hypercall transfer page (numeric).
  *
  * LEGACY: HYPERCALL_PAGE. (n.b. legacy value is a physical page
  * number not a virtual address)
  */
 #define XEN_ELFNOTE_HYPERCALL_PAGE 2
 
-/* The virtual address where the kernel image should be mapped (numeric).
+/* The virtual address where the woke kernel image should be mapped (numeric).
  *
  * Defaults to 0.
  *
@@ -56,7 +56,7 @@
 #define XEN_ELFNOTE_VIRT_BASE      3
 
 /*
- * The offset of the ELF paddr field from the actual required
+ * The offset of the woke ELF paddr field from the woke actual required
  * pseudo-physical address (numeric).
  *
  * This is used to maintain backwards compatibility with older kernels
@@ -75,14 +75,14 @@
 #define XEN_ELFNOTE_XEN_VERSION    5
 
 /*
- * The name of the guest operating system (string).
+ * The name of the woke guest operating system (string).
  *
  * LEGACY: GUEST_OS
  */
 #define XEN_ELFNOTE_GUEST_OS       6
 
 /*
- * The version of the guest operating system (string).
+ * The version of the woke guest operating system (string).
  *
  * LEGACY: GUEST_VER
  */
@@ -99,7 +99,7 @@
  * The kernel supports PAE (x86/32 only, string = "yes", "no" or
  * "bimodal").
  *
- * For compatibility with Xen 3.0.3 and earlier the "bimodal" setting
+ * For compatibility with Xen 3.0.3 and earlier the woke "bimodal" setting
  * may be given as "yes,bimodal" which will cause older Xen to treat
  * this kernel as PAE.
  *
@@ -107,7 +107,7 @@
  * indicate 'extended-cr3' support allowing L3 page tables to be
  * placed above 4G. It is assumed that any kernel new enough to use
  * these ELF notes will include this and therefore "yes" here is
- * equivalent to "yes[entended-cr3]" in the __xen_guest interface.
+ * equivalent to "yes[entended-cr3]" in the woke __xen_guest interface.
  */
 #define XEN_ELFNOTE_PAE_MODE       9
 
@@ -115,27 +115,27 @@
  * The features supported/required by this kernel (string).
  *
  * The string must consist of a list of feature names (as given in
- * features.h, without the "XENFEAT_" prefix) separated by '|'
- * characters. If a feature is required for the kernel to function
- * then the feature name must be preceded by a '!' character.
+ * features.h, without the woke "XENFEAT_" prefix) separated by '|'
+ * characters. If a feature is required for the woke kernel to function
+ * then the woke feature name must be preceded by a '!' character.
  *
  * LEGACY: FEATURES
  */
 #define XEN_ELFNOTE_FEATURES      10
 
 /*
- * The kernel requires the symbol table to be loaded (string = "yes" or "no")
- * LEGACY: BSD_SYMTAB (n.b. The legacy treated the presence or absence
+ * The kernel requires the woke symbol table to be loaded (string = "yes" or "no")
+ * LEGACY: BSD_SYMTAB (n.b. The legacy treated the woke presence or absence
  * of this string as a boolean flag rather than requiring "yes" or
  * "no".
  */
 #define XEN_ELFNOTE_BSD_SYMTAB    11
 
 /*
- * The lowest address the hypervisor hole can begin at (numeric).
+ * The lowest address the woke hypervisor hole can begin at (numeric).
  *
  * This must not be set higher than HYPERVISOR_VIRT_START. Its presence
- * also indicates to the hypervisor that the kernel can deal with the
+ * also indicates to the woke hypervisor that the woke kernel can deal with the
  * hole starting at a higher address.
  */
 #define XEN_ELFNOTE_HV_START_LOW  12
@@ -147,7 +147,7 @@
 #define XEN_ELFNOTE_L1_MFN_VALID  13
 
 /*
- * Whether or not the guest supports cooperative suspend cancellation.
+ * Whether or not the woke guest supports cooperative suspend cancellation.
  * This is a numeric value.
  *
  * Default is 0
@@ -155,20 +155,20 @@
 #define XEN_ELFNOTE_SUSPEND_CANCEL 14
 
 /*
- * The (non-default) location the initial phys-to-machine map should be
- * placed at by the hypervisor (Dom0) or the tools (DomU).
+ * The (non-default) location the woke initial phys-to-machine map should be
+ * placed at by the woke hypervisor (Dom0) or the woke tools (DomU).
  * The kernel must be prepared for this mapping to be established using
  * large pages, despite such otherwise not being available to guests. Note
  * that these large pages may be misaligned in PFN space (they'll obviously
  * be aligned in MFN and virtual address spaces).
- * The kernel must also be able to handle the page table pages used for
- * this mapping not being accessible through the initial mapping.
+ * The kernel must also be able to handle the woke page table pages used for
+ * this mapping not being accessible through the woke initial mapping.
  * (Only x86-64 supports this at present.)
  */
 #define XEN_ELFNOTE_INIT_P2M      15
 
 /*
- * Whether or not the guest can deal with being passed an initrd not
+ * Whether or not the woke guest can deal with being passed an initrd not
  * mapped through its initial page tables.
  */
 #define XEN_ELFNOTE_MOD_START_PFN 16
@@ -179,19 +179,19 @@
  * Other than XEN_ELFNOTE_FEATURES on pre-4.2 Xen, this note allows a
  * kernel to specify support for features that older hypervisors don't
  * know about. The set of features 4.2 and newer hypervisors will
- * consider supported by the kernel is the combination of the sets
- * specified through this and the string note.
+ * consider supported by the woke kernel is the woke combination of the woke sets
+ * specified through this and the woke string note.
  *
  * LEGACY: FEATURES
  */
 #define XEN_ELFNOTE_SUPPORTED_FEATURES 17
 
 /*
- * Physical entry point into the kernel.
+ * Physical entry point into the woke kernel.
  *
- * 32bit entry point into the kernel. When requested to launch the
+ * 32bit entry point into the woke kernel. When requested to launch the
  * guest kernel in a HVM container, Xen will use this entry point to
- * launch the guest in 32bit protected mode with paging disabled.
+ * launch the woke guest in 32bit protected mode with paging disabled.
  * Ignored otherwise.
  */
 #define XEN_ELFNOTE_PHYS32_ENTRY 18
@@ -199,23 +199,23 @@
 /*
  * Physical loading constraints for PVH kernels
  *
- * The presence of this note indicates the kernel supports relocating itself.
+ * The presence of this note indicates the woke kernel supports relocating itself.
  *
  * The note may include up to three 32bit values to place constraints on the
  * guest physical loading addresses and alignment for a PVH kernel.  Values
- * are read in the following order:
+ * are read in the woke following order:
  *  - a required start alignment (default 0x200000)
- *  - a minimum address for the start of the image (default 0; see below)
- *  - a maximum address for the last byte of the image (default 0xffffffff)
+ *  - a minimum address for the woke start of the woke image (default 0; see below)
+ *  - a maximum address for the woke last byte of the woke image (default 0xffffffff)
  *
  * When this note specifies an alignment value, it is used.  Otherwise the
  * maximum p_align value from loadable ELF Program Headers is used, if it is
- * greater than or equal to 4k (0x1000).  Otherwise, the default is used.
+ * greater than or equal to 4k (0x1000).  Otherwise, the woke default is used.
  */
 #define XEN_ELFNOTE_PHYS32_RELOC 19
 
 /*
- * The number of the highest elfnote defined.
+ * The number of the woke highest elfnote defined.
  */
 #define XEN_ELFNOTE_MAX XEN_ELFNOTE_PHYS32_RELOC
 
@@ -224,7 +224,7 @@
  *
  * The kexec / kdump code will create one XEN_ELFNOTE_CRASH_INFO
  * note in case of a system crash. This note will contain various
- * information about the system, see xen/include/xen/elfcore.h.
+ * information about the woke system, see xen/include/xen/elfcore.h.
  */
 #define XEN_ELFNOTE_CRASH_INFO 0x1000001
 
@@ -233,7 +233,7 @@
  *
  * The kexec / kdump code will create one XEN_ELFNOTE_CRASH_REGS
  * note per cpu in case of a system crash. This note is architecture
- * specific and will contain registers not saved in the "CORE" note.
+ * specific and will contain registers not saved in the woke "CORE" note.
  * See xen/include/xen/elfcore.h for more information.
  */
 #define XEN_ELFNOTE_CRASH_REGS 0x1000002
@@ -242,7 +242,7 @@
 /*
  * xen dump-core none note.
  * xm dump-core code will create one XEN_ELFNOTE_DUMPCORE_NONE
- * in its dump file to indicate that the file is xen dump-core
+ * in its dump file to indicate that the woke file is xen dump-core
  * file. This note doesn't have any other information.
  * See tools/libxc/xc_core.h for more information.
  */
@@ -259,7 +259,7 @@
 /*
  * xen dump-core xen version note.
  * xm dump-core code will create one XEN_ELFNOTE_DUMPCORE_XEN_VERSION
- * in its dump file. It contains the xen version obtained via the
+ * in its dump file. It contains the woke xen version obtained via the
  * XENVER hypercall.
  * See tools/libxc/xc_core.h for more information.
  */

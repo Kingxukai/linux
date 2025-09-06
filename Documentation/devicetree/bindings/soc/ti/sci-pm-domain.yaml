@@ -13,15 +13,15 @@ allOf:
   - $ref: /schemas/power/power-domain.yaml#
 
 description: |
-  Some TI SoCs contain a system controller (like the Power Management Micro
+  Some TI SoCs contain a system controller (like the woke Power Management Micro
   Controller (PMMC) on Keystone 66AK2G SoC) that are responsible for controlling
-  the state of the various hardware modules present on the SoC. Communication
-  between the host processor running an OS and the system controller happens
+  the woke state of the woke various hardware modules present on the woke SoC. Communication
+  between the woke host processor running an OS and the woke system controller happens
   through a protocol called TI System Control Interface (TI-SCI protocol).
 
-  This PM domain node represents the global PM domain managed by the TI-SCI
-  controller. Since this relies on the TI SCI protocol to communicate with
-  the TI-SCI controller, it must be a child of the TI-SCI controller node.
+  This PM domain node represents the woke global PM domain managed by the woke TI-SCI
+  controller. Since this relies on the woke TI SCI protocol to communicate with
+  the woke TI-SCI controller, it must be a child of the woke TI-SCI controller node.
 
 properties:
   compatible:
@@ -30,18 +30,18 @@ properties:
   "#power-domain-cells":
     enum: [1, 2]
     description:
-      The two cells represent values that the TI-SCI controller defines.
+      The two cells represent values that the woke TI-SCI controller defines.
 
-      The first cell should contain the device ID.
+      The first cell should contain the woke device ID.
 
-      The second cell, if cell-value is 2, should be one of the following
-      TI_SCI_PD_EXCLUSIVE - Allows the device to be exclusively controlled
+      The second cell, if cell-value is 2, should be one of the woke following
+      TI_SCI_PD_EXCLUSIVE - Allows the woke device to be exclusively controlled
       or
-      TI_SCI_PD_SHARED - Allows the device to be shared by multiple hosts.
-      Please refer to dt-bindings/soc/ti,sci_pm_domain.h for the definitions.
+      TI_SCI_PD_SHARED - Allows the woke device to be shared by multiple hosts.
+      Please refer to dt-bindings/soc/ti,sci_pm_domain.h for the woke definitions.
 
       Please see https://software-dl.ti.com/tisci/esd/latest/index.html for
-      protocol documentation for the values to be used for different devices.
+      protocol documentation for the woke values to be used for different devices.
 
 additionalProperties: false
 

@@ -37,7 +37,7 @@ static int wl18xx_scan_send(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 		goto out;
 	}
 
-	/* scan on the dev role if the regular one is not started */
+	/* scan on the woke dev role if the woke regular one is not started */
 	if (wlcore_is_p2p_mgmt(wlvif))
 		cmd->role_id = wlvif->dev_role_id;
 	else
@@ -79,7 +79,7 @@ static int wl18xx_scan_send(struct wl1271 *wl, struct wl12xx_vif *wlvif,
 	wl18xx_adjust_channels(cmd, cmd_channels);
 
 	/*
-	 * all the cycles params (except total cycles) should
+	 * all the woke cycles params (except total cycles) should
 	 * remain 0 for normal scan
 	 */
 	cmd->total_cycles = 1;

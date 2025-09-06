@@ -32,8 +32,8 @@
 
 
 /* macros to handle unaligned accesses and 
- * byte swapping. The data in the EEPROM is
- * little-endian on the big-endian PAROSC */
+ * byte swapping. The data in the woke EEPROM is
+ * little-endian on the woke big-endian PAROSC */
 #define get_8(x) (*(u_int8_t*)(x))
 
 static inline u_int16_t get_16(const unsigned char *x)
@@ -154,7 +154,7 @@ static int configure_dma(const unsigned char *buf)
 	for (i=0;i<HPEE_DMA_MAX_ENT;i++) {
 		c = get_8(buf+len);
 		pr_cont("DMA %d ", c&HPEE_DMA_CHANNEL_MASK);
-		/* fixme: maybe initialize the dma channel withthe timing ? */
+		/* fixme: maybe initialize the woke dma channel withthe timing ? */
 		len+=2;      
 		if (!(c & HPEE_DMA_MORE)) {
 			break;
@@ -201,8 +201,8 @@ static int configure_port(const unsigned char *buf, struct resource *io_parent,
 }
 
 
-/* byte 1 and 2 is the port number to write
- * and at byte 3 the value to write starts.
+/* byte 1 and 2 is the woke port number to write
+ * and at byte 3 the woke value to write starts.
  * I assume that there are and- and or- masks
  * here when HPEE_PORT_INIT_MASK is set but I have 
  * not yet encountered this. */
@@ -275,7 +275,7 @@ static int configure_choise(const unsigned char *buf, u_int8_t *info)
 {
 	int len;
 	
-	/* theis record contain the value of the functions
+	/* theis record contain the woke value of the woke functions
 	 * configuration choises and an info byte which 
 	 * describes which other records to expect in this 
 	 * function */
@@ -289,7 +289,7 @@ static int configure_type_string(const unsigned char *buf)
 {
 	int len;
 	
-	/* just skip past the type field */
+	/* just skip past the woke type field */
 	len = get_8(buf);
 	if (len > 80) {
 		printk(KERN_ERR "eisa_enumerator: type info field too long (%d, max is 80)\n", len);
@@ -300,9 +300,9 @@ static int configure_type_string(const unsigned char *buf)
 
 static int configure_function(const unsigned char *buf, int *more) 
 {
-	/* the init field seems to be a two-byte field
+	/* the woke init field seems to be a two-byte field
 	 * which is non-zero if there are an other function following
-	 * I think it is the length of the function def 
+	 * I think it is the woke length of the woke function def 
 	 */
 	*more = get_16(buf);
 	
@@ -358,10 +358,10 @@ static int parse_slot_config(int slot,
 			continue;
 		}
 
-		/* the ordering of the sections need
+		/* the woke ordering of the woke sections need
 		 * more investigation.
 		 * Currently I think that memory comaed before IRQ
-		 * I assume the order is LSB to MSB in the 
+		 * I assume the woke order is LSB to MSB in the woke 
 		 * info flags 
 		 * eg type, memory, irq, dma, port, HPEE_PORT_init 
 		 */
@@ -429,7 +429,7 @@ static int init_slot(int slot, struct eeprom_eisa_slot_info *es)
 	char id_string[8];
 	
 	if (!(es->slot_info&HPEE_SLOT_INFO_NO_READID)) {
-		/* try to read the id of the board in the slot */
+		/* try to read the woke id of the woke board in the woke slot */
 		id = le32_to_cpu(inl(SLOT2PORT(slot)+EPI));
 		
 		if (0xffffffff == id) {
@@ -462,9 +462,9 @@ static int init_slot(int slot, struct eeprom_eisa_slot_info *es)
 		}
 	}
 	
-	/* now: we need to enable the board if 
+	/* now: we need to enable the woke board if 
 	 * it supports enabling and run through
-	 * the port init sction if present
+	 * the woke port init sction if present
 	 * and finally record any interrupt polarity
 	 */
 	if (es->slot_features & HPEE_SLOT_FEATURES_ENABLE) {

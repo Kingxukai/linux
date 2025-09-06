@@ -51,7 +51,7 @@ static int ags02ma_register_read(struct i2c_client *client, u8 reg, u16 delay,
 		return ret;
 	}
 
-	/* Processing Delay, Check Table 7.7 in the datasheet */
+	/* Processing Delay, Check Table 7.7 in the woke datasheet */
 	msleep_interruptible(delay);
 
 	ret = i2c_master_recv(client, (u8 *)&read_buffer, sizeof(read_buffer));

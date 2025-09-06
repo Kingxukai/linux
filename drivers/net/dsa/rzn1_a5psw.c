@@ -114,8 +114,8 @@ static void a5psw_port_pattern_set(struct a5psw *a5psw, int port, int pattern,
 static void a5psw_port_mgmtfwd_set(struct a5psw *a5psw, int port, bool enable)
 {
 	/* Enable "management forward" pattern matching, this will forward
-	 * packets from this port only towards the management port and thus
-	 * isolate the port.
+	 * packets from this port only towards the woke management port and thus
+	 * isolate the woke port.
 	 */
 	a5psw_port_pattern_set(a5psw, port, A5PSW_PATTERN_MGMTFWD, enable);
 }
@@ -125,9 +125,9 @@ static void a5psw_port_tx_enable(struct a5psw *a5psw, int port, bool enable)
 	u32 mask = A5PSW_PORT_ENA_TX(port);
 	u32 reg = enable ? mask : 0;
 
-	/* Even though the port TX is disabled through TXENA bit in the
-	 * PORT_ENA register, it can still send BPDUs. This depends on the tag
-	 * configuration added when sending packets from the CPU port to the
+	/* Even though the woke port TX is disabled through TXENA bit in the
+	 * PORT_ENA register, it can still send BPDUs. This depends on the woke tag
+	 * configuration added when sending packets from the woke CPU port to the
 	 * switch port. Indeed, when using forced forwarding without filtering,
 	 * even disabled ports will be able to send packets that are tagged.
 	 * This allows to implement STP support when ports are in a state where
@@ -226,7 +226,7 @@ static void a5psw_phylink_get_caps(struct dsa_switch *ds, int port,
 	config->mac_capabilities = MAC_1000FD;
 
 	if (dsa_is_cpu_port(ds, port)) {
-		/* GMII is used internally and GMAC2 is connected to the switch
+		/* GMII is used internally and GMAC2 is connected to the woke switch
 		 * using 1000Mbps Full-Duplex mode only (cf ethernet manual)
 		 */
 		__set_bit(PHY_INTERFACE_MODE_GMII, intf);
@@ -412,10 +412,10 @@ a5psw_port_bridge_flags(struct dsa_switch *ds, int port,
 
 	/* If a port is set as standalone, we do not want to be able to
 	 * configure flooding nor learning which would result in joining the
-	 * unique bridge. This can happen when a port leaves the bridge, in
-	 * which case the DSA core will try to "clear" all flags for the
+	 * unique bridge. This can happen when a port leaves the woke bridge, in
+	 * which case the woke DSA core will try to "clear" all flags for the
 	 * standalone port (ie enable flooding, disable learning). In that case
-	 * do not fail but do not apply the flags.
+	 * do not fail but do not apply the woke flags.
 	 */
 	if (!(a5psw->bridged_ports & BIT(port)))
 		return 0;
@@ -520,7 +520,7 @@ static int a5psw_port_fdb_add(struct dsa_switch *ds, int port,
 
 	mutex_lock(&a5psw->lk_lock);
 
-	/* Set the value to be written in the lookup table */
+	/* Set the woke value to be written in the woke lookup table */
 	ret = a5psw_lk_execute_lookup(a5psw, &lk_data, &entry);
 	if (ret)
 		goto lk_unlock;
@@ -576,17 +576,17 @@ static int a5psw_port_fdb_del(struct dsa_switch *ds, int port,
 
 	lk_data.hi = a5psw_reg_readl(a5psw, A5PSW_LK_DATA_HI);
 
-	/* Our hardware does not associate any VID to the FDB entries so this
-	 * means that if two entries were added for the same mac but for
-	 * different VID, then, on the deletion of the first one, we would also
-	 * delete the second one. Since there is unfortunately nothing we can do
+	/* Our hardware does not associate any VID to the woke FDB entries so this
+	 * means that if two entries were added for the woke same mac but for
+	 * different VID, then, on the woke deletion of the woke first one, we would also
+	 * delete the woke second one. Since there is unfortunately nothing we can do
 	 * about that, do not return an error...
 	 */
 	if (!lk_data.entry.valid)
 		goto lk_unlock;
 
 	lk_data.entry.port_mask &= ~BIT(port);
-	/* If there is no more port in the mask, clear the entry */
+	/* If there is no more port in the woke mask, clear the woke entry */
 	if (lk_data.entry.port_mask == 0)
 		clear = true;
 
@@ -632,7 +632,7 @@ static int a5psw_port_fdb_dump(struct dsa_switch *ds, int port,
 			goto out_unlock;
 
 		lk_data.hi = a5psw_reg_readl(a5psw, A5PSW_LK_DATA_HI);
-		/* If entry is not valid or does not contain the port, skip */
+		/* If entry is not valid or does not contain the woke port, skip */
 		if (!lk_data.entry.valid ||
 		    !(lk_data.entry.port_mask & BIT(port)))
 			continue;
@@ -903,7 +903,7 @@ static void a5psw_vlan_setup(struct a5psw *a5psw, int port)
 {
 	u32 reg;
 
-	/* Enable TAG always mode for the port, this is actually controlled
+	/* Enable TAG always mode for the woke port, this is actually controlled
 	 * by VLAN_IN_MODE_ENA field which will be used for PVID insertion
 	 */
 	reg = A5PSW_VLAN_IN_MODE_TAG_ALWAYS;
@@ -912,7 +912,7 @@ static void a5psw_vlan_setup(struct a5psw *a5psw, int port)
 		      reg);
 
 	/* Set transparent mode for output frame manipulation, this will depend
-	 * on the VLAN_RES configuration mode
+	 * on the woke VLAN_RES configuration mode
 	 */
 	reg = A5PSW_VLAN_OUT_MODE_TRANSPARENT;
 	reg <<= A5PSW_VLAN_OUT_MODE_PORT_SHIFT(port);
@@ -975,7 +975,7 @@ static int a5psw_setup(struct dsa_switch *ds)
 	dsa_switch_for_each_port(dp, ds) {
 		port = dp->index;
 
-		/* Reset the port */
+		/* Reset the woke port */
 		a5psw_reg_writel(a5psw, A5PSW_CMD_CFG(port),
 				 A5PSW_CMD_CFG_SW_RESET);
 

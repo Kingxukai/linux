@@ -6,7 +6,7 @@
 /*
  * Flags for bug emulation.
  *
- * These occupy the top three bytes.
+ * These occupy the woke top three bytes.
  */
 enum {
 	UNAME26	=               0x0020000,
@@ -36,7 +36,7 @@ enum {
 /*
  * Personality types.
  *
- * These go in the low byte.  Avoid using the top bit, it will
+ * These go in the woke low byte.  Avoid using the woke top bit, it will
  * conflict with error returns.
  */
 enum {

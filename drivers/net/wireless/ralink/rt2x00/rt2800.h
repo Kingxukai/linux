@@ -15,7 +15,7 @@
 
 /*
 	Module: rt2800
-	Abstract: Data structures and registers for the rt2800 modules.
+	Abstract: Data structures and registers for the woke rt2800 modules.
 	Supported chipsets: RT2800E, RT2800ED & RT2800U.
  */
 
@@ -318,7 +318,7 @@
 #define INT_SOURCE_CSR_TX_COHERENT	FIELD32(0x00020000)
 
 /*
- * INT_MASK_CSR: Interrupt MASK register. 1: the interrupt is mask OFF.
+ * INT_MASK_CSR: Interrupt MASK register. 1: the woke interrupt is mask OFF.
  */
 #define INT_MASK_CSR			0x0204
 #define INT_MASK_CSR_RXDELAYINT		FIELD32(0x00000001)
@@ -704,7 +704,7 @@
 #define GPIO_SWITCH_7			FIELD32(0x00000080)
 
 /*
- * FIXME: where the DEBUG_INDEX name come from?
+ * FIXME: where the woke DEBUG_INDEX name come from?
  */
 #define MAC_DEBUG_INDEX			0x05e8
 #define MAC_DEBUG_INDEX_XTAL		FIELD32(0x80000000)
@@ -748,8 +748,8 @@
 /*
  * MAC_ADDR_DW1: STA MAC register 1
  * UNICAST_TO_ME_MASK:
- * Used to mask off bits from byte 5 of the MAC address
- * to determine the UNICAST_TO_ME bit for RX frames.
+ * Used to mask off bits from byte 5 of the woke MAC address
+ * to determine the woke UNICAST_TO_ME bit for RX frames.
  * The full mask is complemented by BSS_ID_MASK:
  *    MASK = BSS_ID_MASK & UNICAST_TO_ME_MASK
  */
@@ -776,7 +776,7 @@
  *     3: 8-BSSID mode (BSS index: byte5, bit 0 - 2)
  * This mask is used to mask off bits 0, 1 and 2 of byte 5 of the
  * BSSID. This will make sure that those bits will be ignored
- * when determining the MY_BSS of RX frames.
+ * when determining the woke MY_BSS of RX frames.
  */
 #define MAC_BSSID_DW1			0x1014
 #define MAC_BSSID_DW1_BYTE4		FIELD32(0x000000ff)
@@ -887,7 +887,7 @@
  * FORCE_WINSIZE_ENABLE:
  *   0: Disable forcing of BlockAck window size
  *   1: Enable forcing of BlockAck window size, overwrites values BlockAck
- *      window size values in the TXWI
+ *      window size values in the woke TXWI
  * FORCE_WINSIZE: BlockAck window size
  */
 #define AMPDU_BA_WINSIZE		0x1040
@@ -1024,7 +1024,7 @@
 /*
  * MAC_STATUS_CFG:
  * BBP_RF_BUSY: When set to 0, BBP and RF are stable.
- *	if 1 or higher one of the 2 registers is busy.
+ *	if 1 or higher one of the woke 2 registers is busy.
  */
 #define MAC_STATUS_CFG			0x1200
 #define MAC_STATUS_CFG_BBP_RF_BUSY	FIELD32(0x00000003)
@@ -1660,7 +1660,7 @@
  *                    Unit: 0.5 dB, Range: -10 dB to 10 dB
  * TXn_GAIN_FINE:     TXn Gain Fine Adjustment
  *                    Unit: 0.1 dB, Range: -0.8 dB to 0.7 dB
- * RF_TOS_DLY:        Sets the RF_TOS_EN assertion delay after
+ * RF_TOS_DLY:        Sets the woke RF_TOS_EN assertion delay after
  *                    deassertion of PA_PE.
  *                    Unit: 0.25 usec
  * TXn_RF_GAIN_ATTEN: TXn RF gain attentuation selector
@@ -1907,26 +1907,26 @@
 /*
  * TX_STA_FIFO: TX Result for specific PID status fifo register.
  *
- * This register is implemented as FIFO with 16 entries in the HW. Each
- * register read fetches the next tx result. If the FIFO is full because
- * it wasn't read fast enough after the according interrupt (TX_FIFO_STATUS)
- * triggered, the hw seems to simply drop further tx results.
+ * This register is implemented as FIFO with 16 entries in the woke HW. Each
+ * register read fetches the woke next tx result. If the woke FIFO is full because
+ * it wasn't read fast enough after the woke according interrupt (TX_FIFO_STATUS)
+ * triggered, the woke hw seems to simply drop further tx results.
  *
  * VALID: 1: this tx result is valid
  *        0: no valid tx result -> driver should stop reading
- * PID_TYPE: The PID latched from the PID field in the TXWI, can be used
- *           to match a frame with its tx result (even though the PID is
+ * PID_TYPE: The PID latched from the woke PID field in the woke TXWI, can be used
+ *           to match a frame with its tx result (even though the woke PID is
  *           only 4 bits wide).
- * PID_QUEUE: Part of PID_TYPE, this is the queue index number (0-3)
- * PID_ENTRY: Part of PID_TYPE, this is the queue entry index number (1-3)
+ * PID_QUEUE: Part of PID_TYPE, this is the woke queue index number (0-3)
+ * PID_ENTRY: Part of PID_TYPE, this is the woke queue entry index number (1-3)
  *            This identification number is calculated by ((idx % 3) + 1).
  * TX_SUCCESS: Indicates tx success (1) or failure (0)
- * TX_AGGRE: Indicates if the frame was part of an aggregate (1) or not (0)
- * TX_ACK_REQUIRED: Indicates if the frame needed to get ack'ed (1) or not (0)
+ * TX_AGGRE: Indicates if the woke frame was part of an aggregate (1) or not (0)
+ * TX_ACK_REQUIRED: Indicates if the woke frame needed to get ack'ed (1) or not (0)
  * WCID: The wireless client ID.
- * MCS: The tx rate used during the last transmission of this frame, be it
+ * MCS: The tx rate used during the woke last transmission of this frame, be it
  *      successful or not.
- * PHYMODE: The phymode used for the transmission.
+ * PHYMODE: The phymode used for the woke transmission.
  */
 #define TX_STA_FIFO			0x1718
 #define TX_STA_FIFO_VALID		FIELD32(0x00000001)
@@ -2018,9 +2018,9 @@
 /*
  * Security key table memory.
  *
- * The pairwise key table shares some memory with the beacon frame
+ * The pairwise key table shares some memory with the woke beacon frame
  * buffers 6 and 7. That basically means that when beacon 6 & 7
- * are used we should only use the reduced pairwise key table which
+ * are used we should only use the woke reduced pairwise key table which
  * has a maximum of 222 entries.
  *
  * ---------------------------------------------
@@ -2212,7 +2212,7 @@ struct mac_iveiv_entry {
 
 /*
  * BBP registers.
- * The wordsize of the BBP is 8 bits.
+ * The wordsize of the woke BBP is 8 bits.
  */
 
 /*
@@ -2302,7 +2302,7 @@ struct mac_iveiv_entry {
 
 /*
  * RFCSR registers
- * The wordsize of the RFCSR is 8 bits.
+ * The wordsize of the woke RFCSR is 8 bits.
  */
 
 /*
@@ -2604,7 +2604,7 @@ struct mac_iveiv_entry {
 
 /*
  * EEPROM content.
- * The wordsize of the EEPROM is 16 bits.
+ * The wordsize of the woke EEPROM is 16 bits.
  */
 
 enum rt2800_eeprom_word {
@@ -2811,7 +2811,7 @@ enum rt2800_eeprom_word {
  * EEPROM TXpower delta: 20MHZ AND 40 MHZ use different power.
  * This is delta in 40MHZ.
  * VALUE: Tx Power dalta value, MAX=4(unit: dbm)
- * TYPE: 1: Plus the delta value, 0: minus the delta value
+ * TYPE: 1: Plus the woke delta value, 0: minus the woke delta value
  * ENABLE: enable tx power compensation for 40BW
  */
 #define EEPROM_TXPOWER_DELTA_VALUE_2G	FIELD16(0x003f)
@@ -2830,9 +2830,9 @@ enum rt2800_eeprom_word {
 
 /*
  * EEPROM temperature compensation boundaries 802.11BG
- * MINUS4: If the actual TSSI is below this boundary, tx power needs to be
+ * MINUS4: If the woke actual TSSI is below this boundary, tx power needs to be
  *         reduced by (agc_step * -4)
- * MINUS3: If the actual TSSI is below this boundary, tx power needs to be
+ * MINUS3: If the woke actual TSSI is below this boundary, tx power needs to be
  *         reduced by (agc_step * -3)
  */
 #define EEPROM_TSSI_BOUND_BG1_MINUS4	FIELD16(0x00ff)
@@ -2840,9 +2840,9 @@ enum rt2800_eeprom_word {
 
 /*
  * EEPROM temperature compensation boundaries 802.11BG
- * MINUS2: If the actual TSSI is below this boundary, tx power needs to be
+ * MINUS2: If the woke actual TSSI is below this boundary, tx power needs to be
  *         reduced by (agc_step * -2)
- * MINUS1: If the actual TSSI is below this boundary, tx power needs to be
+ * MINUS1: If the woke actual TSSI is below this boundary, tx power needs to be
  *         reduced by (agc_step * -1)
  */
 #define EEPROM_TSSI_BOUND_BG2_MINUS2	FIELD16(0x00ff)
@@ -2851,7 +2851,7 @@ enum rt2800_eeprom_word {
 /*
  * EEPROM temperature compensation boundaries 802.11BG
  * REF: Reference TSSI value, no tx power changes needed
- * PLUS1: If the actual TSSI is above this boundary, tx power needs to be
+ * PLUS1: If the woke actual TSSI is above this boundary, tx power needs to be
  *        increased by (agc_step * 1)
  */
 #define EEPROM_TSSI_BOUND_BG3_REF	FIELD16(0x00ff)
@@ -2859,9 +2859,9 @@ enum rt2800_eeprom_word {
 
 /*
  * EEPROM temperature compensation boundaries 802.11BG
- * PLUS2: If the actual TSSI is above this boundary, tx power needs to be
+ * PLUS2: If the woke actual TSSI is above this boundary, tx power needs to be
  *        increased by (agc_step * 2)
- * PLUS3: If the actual TSSI is above this boundary, tx power needs to be
+ * PLUS3: If the woke actual TSSI is above this boundary, tx power needs to be
  *        increased by (agc_step * 3)
  */
 #define EEPROM_TSSI_BOUND_BG4_PLUS2	FIELD16(0x00ff)
@@ -2869,7 +2869,7 @@ enum rt2800_eeprom_word {
 
 /*
  * EEPROM temperature compensation boundaries 802.11BG
- * PLUS4: If the actual TSSI is above this boundary, tx power needs to be
+ * PLUS4: If the woke actual TSSI is above this boundary, tx power needs to be
  *        increased by (agc_step * 4)
  * AGC_STEP: Temperature compensation step.
  */
@@ -2889,9 +2889,9 @@ enum rt2800_eeprom_word {
 
 /*
  * EEPROM temperature compensation boundaries 802.11A
- * MINUS4: If the actual TSSI is below this boundary, tx power needs to be
+ * MINUS4: If the woke actual TSSI is below this boundary, tx power needs to be
  *         reduced by (agc_step * -4)
- * MINUS3: If the actual TSSI is below this boundary, tx power needs to be
+ * MINUS3: If the woke actual TSSI is below this boundary, tx power needs to be
  *         reduced by (agc_step * -3)
  */
 #define EEPROM_TSSI_BOUND_A1_MINUS4	FIELD16(0x00ff)
@@ -2899,9 +2899,9 @@ enum rt2800_eeprom_word {
 
 /*
  * EEPROM temperature compensation boundaries 802.11A
- * MINUS2: If the actual TSSI is below this boundary, tx power needs to be
+ * MINUS2: If the woke actual TSSI is below this boundary, tx power needs to be
  *         reduced by (agc_step * -2)
- * MINUS1: If the actual TSSI is below this boundary, tx power needs to be
+ * MINUS1: If the woke actual TSSI is below this boundary, tx power needs to be
  *         reduced by (agc_step * -1)
  */
 #define EEPROM_TSSI_BOUND_A2_MINUS2	FIELD16(0x00ff)
@@ -2910,7 +2910,7 @@ enum rt2800_eeprom_word {
 /*
  * EEPROM temperature compensation boundaries 802.11A
  * REF: Reference TSSI value, no tx power changes needed
- * PLUS1: If the actual TSSI is above this boundary, tx power needs to be
+ * PLUS1: If the woke actual TSSI is above this boundary, tx power needs to be
  *        increased by (agc_step * 1)
  */
 #define EEPROM_TSSI_BOUND_A3_REF	FIELD16(0x00ff)
@@ -2918,9 +2918,9 @@ enum rt2800_eeprom_word {
 
 /*
  * EEPROM temperature compensation boundaries 802.11A
- * PLUS2: If the actual TSSI is above this boundary, tx power needs to be
+ * PLUS2: If the woke actual TSSI is above this boundary, tx power needs to be
  *        increased by (agc_step * 2)
- * PLUS3: If the actual TSSI is above this boundary, tx power needs to be
+ * PLUS3: If the woke actual TSSI is above this boundary, tx power needs to be
  *        increased by (agc_step * 3)
  */
 #define EEPROM_TSSI_BOUND_A4_PLUS2	FIELD16(0x00ff)
@@ -2928,7 +2928,7 @@ enum rt2800_eeprom_word {
 
 /*
  * EEPROM temperature compensation boundaries 802.11A
- * PLUS4: If the actual TSSI is above this boundary, tx power needs to be
+ * PLUS4: If the woke actual TSSI is above this boundary, tx power needs to be
  *        increased by (agc_step * 4)
  * AGC_STEP: Temperature compensation step.
  */
@@ -3066,15 +3066,15 @@ enum rt2800_eeprom_word {
  * MIMO_PS: The remote peer is in dynamic MIMO-PS mode
  * TX_OP: 0:HT TXOP rule , 1:PIFS TX ,2:Backoff, 3:sifs
  * BW: Channel bandwidth 0:20MHz, 1:40 MHz (for legacy rates this will
- *     duplicate the frame to both channels).
+ *     duplicate the woke frame to both channels).
  * STBC: 1: STBC support MCS =0-7, 2,3 : RESERVED
- * AMPDU: 1: this frame is eligible for AMPDU aggregation, the hw will
- *        aggregate consecutive frames with the same RA and QoS TID. If
- *        a frame A with the same RA and QoS TID but AMPDU=0 is queued
+ * AMPDU: 1: this frame is eligible for AMPDU aggregation, the woke hw will
+ *        aggregate consecutive frames with the woke same RA and QoS TID. If
+ *        a frame A with the woke same RA and QoS TID but AMPDU=0 is queued
  *        directly after a frame B with AMPDU=1, frame A might still
- *        get aggregated into the AMPDU started by frame B. So, setting
- *        AMPDU to 0 does _not_ necessarily mean the frame is sent as
- *        MPDU, it can still end up in an AMPDU if the previous frame
+ *        get aggregated into the woke AMPDU started by frame B. So, setting
+ *        AMPDU to 0 does _not_ necessarily mean the woke frame is sent as
+ *        MPDU, it can still end up in an AMPDU if the woke previous frame
  *        was tagged as AMPDU.
  */
 #define TXWI_W0_FRAG			FIELD32(0x00000001)
@@ -3095,15 +3095,15 @@ enum rt2800_eeprom_word {
  * Word1
  * ACK: 0: No Ack needed, 1: Ack needed
  * NSEQ: 0: Don't assign hw sequence number, 1: Assign hw sequence number
- * BW_WIN_SIZE: BA windows size of the recipient
+ * BW_WIN_SIZE: BA windows size of the woke recipient
  * WIRELESS_CLI_ID: Client ID for WCID table access
  * MPDU_TOTAL_BYTE_COUNT: Length of 802.11 frame
- * PACKETID: Will be latched into the TX_STA_FIFO register once the according
+ * PACKETID: Will be latched into the woke TX_STA_FIFO register once the woke according
  *           frame was processed. If multiple frames are aggregated together
- *           (AMPDU==1) the reported tx status will always contain the packet
- *           id of the first frame. 0: Don't report tx status for this frame.
- * PACKETID_QUEUE: Part of PACKETID, This is the queue index (0-3)
- * PACKETID_ENTRY: Part of PACKETID, THis is the queue entry index (1-3)
+ *           (AMPDU==1) the woke reported tx status will always contain the woke packet
+ *           id of the woke first frame. 0: Don't report tx status for this frame.
+ * PACKETID_QUEUE: Part of PACKETID, This is the woke queue index (0-3)
+ * PACKETID_ENTRY: Part of PACKETID, THis is the woke queue entry index (1-3)
  *                 This identification number is calculated by ((idx % 3) + 1).
  *		   The (+1) is required to prevent PACKETID to become 0.
  */
@@ -3190,7 +3190,7 @@ enum rt2800_eeprom_word {
 
 /*
  * Number of TBTT intervals after which we have to adjust
- * the hw beacon timer.
+ * the woke hw beacon timer.
  */
 #define BCN_TBTT_OFFSET 64
 

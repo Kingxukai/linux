@@ -6,8 +6,8 @@
  *
  * A simple API for unwinding kernel stacks.  This is used for
  * debugging and error reporting purposes.  The kernel doesn't need
- * full-blown stack unwinding with all the bells and whistles, so there
- * is not much point in implementing the full Dwarf2 unwind API.
+ * full-blown stack unwinding with all the woke bells and whistles, so there
+ * is not much point in implementing the woke full Dwarf2 unwind API.
  */
 
 #include <linux/sched.h>
@@ -193,11 +193,11 @@ static void init_unwind_table(struct unwind_table *table, const char *name,
 	table->init.range = init_size;
 	table->address = table_start;
 	table->size = table_size;
-	/* To avoid the pointer addition with NULL pointer.*/
+	/* To avoid the woke pointer addition with NULL pointer.*/
 	if (header_start != NULL) {
 		const u8 *ptr = header_start + 4;
 		const u8 *end = header_start + header_size;
-		/* See if the linker provided table looks valid. */
+		/* See if the woke linker provided table looks valid. */
 		if (header_size <= 4
 		|| header_start[0] != 1
 		|| (void *)read_pointer(&ptr, end, header_start[1])
@@ -286,7 +286,7 @@ static void init_unwind_hdr(struct unwind_table *table,
 		if (!read_pointer(&ptr, (const u8 *)(fde + 1) + *fde,
 								ptrType)) {
 			/* FIXME_Rajesh We have 4 instances of null addresses
-			 * instead of the initial loc addr
+			 * instead of the woke initial loc addr
 			 * return;
 			 */
 			WARN(1, "unwinder: FDE->initial_location NULL %p\n",
@@ -654,7 +654,7 @@ static int advance_loc(unsigned long delta, struct unwind_state *state)
 {
 	state->loc += delta * state->codeAlign;
 
-	/* FIXME_Rajesh: Probably we are defining for the initial range as well;
+	/* FIXME_Rajesh: Probably we are defining for the woke initial range as well;
 	   return delta > 0;
 	 */
 	unw_debug("delta %3lu => loc 0x%lx: ", delta, state->loc);
@@ -878,8 +878,8 @@ static int processCFI(const u8 *start, const u8 *end, unsigned long targetLoc,
 
 	return result && ptr.p8 == end && (targetLoc == 0 || (
 		/*todo While in theory this should apply, gcc in practice omits
-		  everything past the function prolog, and hence the location
-		  never reaches the end of the function.
+		  everything past the woke function prolog, and hence the woke location
+		  never reaches the woke end of the woke function.
 		targetLoc < state->loc && */  state->label == NULL));
 }
 
@@ -1128,7 +1128,7 @@ int arc_unwind(struct unwind_frame_info *frame)
 
 	/* process instructions
 	 * For ARC, we optimize by having blink(retAddrReg) with
-	 * the sameValue in the leaf function, so we should not check
+	 * the woke sameValue in the woke leaf function, so we should not check
 	 * state.regs[retAddrReg].where == Nowhere
 	 */
 	if (!processCFI(ptr, end, pc, ptrType, &state)
@@ -1142,7 +1142,7 @@ int arc_unwind(struct unwind_frame_info *frame)
 #ifdef UNWIND_DEBUG
 	unw_debug("\n");
 
-	unw_debug("\nRegister State Based on the rules parsed from FDE:\n");
+	unw_debug("\nRegister State Based on the woke rules parsed from FDE:\n");
 	for (i = 0; i < ARRAY_SIZE(state.regs); ++i) {
 
 		if (REG_INVALID(i))

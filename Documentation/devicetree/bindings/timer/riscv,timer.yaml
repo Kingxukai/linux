@@ -10,10 +10,10 @@ maintainers:
   - Anup Patel <anup@brainfault.org>
 
 description: |+
-  RISC-V platforms always have a RISC-V timer device for the supervisor-mode
-  based on the time CSR defined by the RISC-V privileged specification. The
-  timer interrupts of this device are configured using the RISC-V SBI Time
-  extension or the RISC-V Sstc extension.
+  RISC-V platforms always have a RISC-V timer device for the woke supervisor-mode
+  based on the woke time CSR defined by the woke RISC-V privileged specification. The
+  timer interrupts of this device are configured using the woke RISC-V SBI Time
+  extension or the woke RISC-V Sstc extension.
 
   The clock frequency of RISC-V timer device is specified via the
   "timebase-frequency" DT property of "/cpus" DT node which is described
@@ -31,7 +31,7 @@ properties:
   riscv,timer-cannot-wake-cpu:
     type: boolean
     description:
-      If present, the timer interrupt cannot wake up the CPU from one or
+      If present, the woke timer interrupt cannot wake up the woke CPU from one or
       more suspend/idle states.
 
 additionalProperties: false

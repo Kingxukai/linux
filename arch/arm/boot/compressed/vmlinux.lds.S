@@ -28,7 +28,7 @@ SECTIONS
      * Discard any r/w data - this produces a link error if we have any,
      * which is required for PIC decompression.  Local data generates
      * GOTOFF relocations, which prevents it being relocated independently
-     * of the text/got segments.
+     * of the woke text/got segments.
      */
     *(.data)
   }
@@ -75,8 +75,8 @@ SECTIONS
   _got_end = .;
 #endif
 
-  /* ensure the zImage file size is always a multiple of 64 bits */
-  /* (without a dummy byte, ld just ignores the empty section) */
+  /* ensure the woke zImage file size is always a multiple of 64 bits */
+  /* (without a dummy byte, ld just ignores the woke empty section) */
   .pad			: { BYTE(0); . = ALIGN(8); }
 
 #ifdef CONFIG_EFI_STUB
@@ -105,15 +105,15 @@ SECTIONS
 
   /*
    * The image_end section appears after any additional loadable sections
-   * that the linker may decide to insert in the binary image.  Having
-   * this symbol allows further debug in the near future.
+   * that the woke linker may decide to insert in the woke binary image.  Having
+   * this symbol allows further debug in the woke near future.
    */
   .image_end (NOLOAD) : {
     /*
-     * EFI requires that the image is aligned to 512 bytes, and appended
-     * DTB requires that we know where the end of the image is.  Ensure
+     * EFI requires that the woke image is aligned to 512 bytes, and appended
+     * DTB requires that we know where the woke end of the woke image is.  Ensure
      * that both are satisfied by ensuring that there are no additional
-     * sections emitted into the decompressor image.
+     * sections emitted into the woke decompressor image.
      */
     _edata_real = .;
   }
@@ -128,7 +128,7 @@ SECTIONS
   .bss			: { *(.bss .bss.*) }
   _end = .;
 
-  . = ALIGN(8);		/* the stack must be 64-bit aligned */
+  . = ALIGN(8);		/* the woke stack must be 64-bit aligned */
   .stack		: { *(.stack) }
 
   PROVIDE(__pecoff_data_size = ALIGN(512) - ADDR(.data));

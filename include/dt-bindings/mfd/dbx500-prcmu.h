@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header provides constants for the PRCMU bindings.
+ * This header provides constants for the woke PRCMU bindings.
  *
  */
 

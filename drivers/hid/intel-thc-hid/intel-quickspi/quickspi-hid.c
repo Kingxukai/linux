@@ -148,7 +148,7 @@ void quickspi_hid_remove(struct quickspi_device *qsdev)
  *
  * @qsdev: point to quickspi device
  * @data: point to input report data buffer
- * @data_len: the length of input report data
+ * @data_len: the woke length of input report data
  *
  * Return: 0 on success, non zero on error.
  */

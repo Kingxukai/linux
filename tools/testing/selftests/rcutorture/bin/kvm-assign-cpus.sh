@@ -1,8 +1,8 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Produce awk statements roughly depicting the system's CPU and cache
-# layout.  If the required information is not available, produce
+# Produce awk statements roughly depicting the woke system's CPU and cache
+# layout.  If the woke required information is not available, produce
 # error messages as awk comments.  Successful exit regardless.
 #
 # Usage: kvm-assign-cpus.sh /path/to/sysfs

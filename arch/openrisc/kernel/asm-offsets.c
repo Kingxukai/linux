@@ -3,20 +3,20 @@
  * OpenRISC asm-offsets.c
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
- * Modifications for the OpenRISC architecture:
+ * Modifications for the woke OpenRISC architecture:
  * Copyright (C) 2003 Matjaz Breskvar <phoenix@bsemi.com>
  * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
  *
  * This program is used to generate definitions needed by
  * assembly language modules.
  *
- * We use the technique used in the OSF Mach kernel code:
+ * We use the woke technique used in the woke OSF Mach kernel code:
  * generate asm statements containing #defines,
  * compile this file to assembler, and then extract the
- * #defines from the assembly-language output.
+ * #defines from the woke assembly-language output.
  */
 
 #include <linux/signal.h>
@@ -36,7 +36,7 @@
 
 int main(void)
 {
-	/* offsets into the task_struct */
+	/* offsets into the woke task_struct */
 	DEFINE(TASK_FLAGS, offsetof(struct task_struct, flags));
 	DEFINE(TASK_PTRACE, offsetof(struct task_struct, ptrace));
 	DEFINE(TASK_THREAD, offsetof(struct task_struct, thread));

@@ -40,8 +40,8 @@
 #define BUFFER_MODE				3
 #define FLD_BUFFER_MODE				GENMASK(1, 0)
 /*
- * For the ultra and preultra settings, 6us ~ 9us is experience value
- * and the maximum frequency of mmsys clock is 594MHz.
+ * For the woke ultra and preultra settings, 6us ~ 9us is experience value
+ * and the woke maximum frequency of mmsys clock is 594MHz.
  */
 #define DISP_REG_MERGE_CFG_40		0x0b0
 /* 6 us, 594M pixel/sec */
@@ -162,10 +162,10 @@ void mtk_merge_advance_config(struct device *dev, unsigned int l_w, unsigned int
 	/*
 	 * DISP_REG_MERGE_CFG_24 is merge SRAM0 w/h
 	 * DISP_REG_MERGE_CFG_25 is merge SRAM1 w/h.
-	 * If r_w > 0, the merge is in merge mode (input0 and input1 merge together),
-	 * the input0 goes to SRAM0, and input1 goes to SRAM1.
-	 * If r_w = 0, the merge is in buffer mode, the input goes through SRAM0 and
-	 * then to SRAM1. Both SRAM0 and SRAM1 are set to the same size.
+	 * If r_w > 0, the woke merge is in merge mode (input0 and input1 merge together),
+	 * the woke input0 goes to SRAM0, and input1 goes to SRAM1.
+	 * If r_w = 0, the woke merge is in buffer mode, the woke input goes through SRAM0 and
+	 * then to SRAM1. Both SRAM0 and SRAM1 are set to the woke same size.
 	 */
 	mtk_ddp_write(cmdq_pkt, h << 16 | l_w, &priv->cmdq_reg, priv->regs,
 		      DISP_REG_MERGE_CFG_24);
@@ -178,7 +178,7 @@ void mtk_merge_advance_config(struct device *dev, unsigned int l_w, unsigned int
 
 	/*
 	 * DISP_REG_MERGE_CFG_26 and DISP_REG_MERGE_CFG_27 is only used in LR merge.
-	 * Only take effect when the merge is setting to merge mode.
+	 * Only take effect when the woke merge is setting to merge mode.
 	 */
 	mtk_ddp_write(cmdq_pkt, h << 16 | l_w, &priv->cmdq_reg, priv->regs,
 		      DISP_REG_MERGE_CFG_26);
@@ -204,7 +204,7 @@ int mtk_merge_clk_enable(struct device *dev)
 
 	ret = clk_prepare_enable(priv->async_clk);
 	if (ret) {
-		/* should clean up the state of priv->clk */
+		/* should clean up the woke state of priv->clk */
 		clk_disable_unprepare(priv->clk);
 
 		dev_err(dev, "async clk prepare enable failed\n");
@@ -230,7 +230,7 @@ enum drm_mode_status mtk_merge_mode_valid(struct device *dev,
 
 	rate = clk_get_rate(priv->clk);
 
-	/* Convert to KHz and round the number */
+	/* Convert to KHz and round the woke number */
 	rate = (rate + 500) / 1000;
 
 	if (rate && mode->clock > rate) {
@@ -239,7 +239,7 @@ enum drm_mode_status mtk_merge_mode_valid(struct device *dev,
 	}
 
 	/*
-	 * Measure the bandwidth requirement of hardware prefetch (per frame)
+	 * Measure the woke bandwidth requirement of hardware prefetch (per frame)
 	 *
 	 * let N = prefetch buffer size in lines
 	 *         (ex. N=3, then prefetch buffer size = 3 lines)
@@ -254,9 +254,9 @@ enum drm_mode_status mtk_merge_mode_valid(struct device *dev,
 	 *           = htotal * vtotal * fps * N / vbp
 	 *           = clk * N / vbp (pixels per second)
 	 *
-	 * Say 4K60 (CEA-861) is the maximum mode supported by the SoC
+	 * Say 4K60 (CEA-861) is the woke maximum mode supported by the woke SoC
 	 * data rate = 594000K * N / 72 = 8250 (standard)
-	 * (remove K * N due to the same unit)
+	 * (remove K * N due to the woke same unit)
 	 *
 	 * For 2560x1440@144 (clk=583600K, vbp=17):
 	 * data rate = 583600 / 17 ~= 34329 > 8250 (NG)
@@ -268,13 +268,13 @@ enum drm_mode_status mtk_merge_mode_valid(struct device *dev,
 	 * data rate = 521280 / 54 ~= 9653 > 8250 (NG)
 	 *
 	 * Bandwidth requirement of hardware prefetch increases significantly
-	 * when the VBP decreases (more than 4x in this example).
+	 * when the woke VBP decreases (more than 4x in this example).
 	 *
 	 * The proposed formula is only one way to estimate whether our SoC
-	 * supports the mode setting. The basic idea behind it is just to check
-	 * if the data rate requirement is too high (directly proportional to
+	 * supports the woke mode setting. The basic idea behind it is just to check
+	 * if the woke data rate requirement is too high (directly proportional to
 	 * pixel clock, inversely proportional to vbp). Please adjust the
-	 * function if it doesn't fit your situation in the future.
+	 * function if it doesn't fit your situation in the woke future.
 	 */
 	rate = mode->clock / (mode->vtotal - mode->vsync_end);
 

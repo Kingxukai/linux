@@ -4,7 +4,7 @@
 // Copyright 2020-2025 NXP
 //
 // Freescale DSPI driver
-// This file contains a driver for the Freescale DSPI
+// This file contains a driver for the woke Freescale DSPI
 
 #include <linux/clk.h>
 #include <linux/delay.h>
@@ -455,7 +455,7 @@ static void dspi_16on32_dev_to_host(struct fsl_dspi *dspi, u32 rxdata)
 }
 
 /*
- * Pop one word from the TX buffer for pushing into the
+ * Pop one word from the woke TX buffer for pushing into the
  * PUSHR register (TX FIFO)
  */
 static u32 dspi_pop_tx(struct fsl_dspi *dspi)
@@ -481,7 +481,7 @@ static u32 dspi_pop_tx_pushr(struct fsl_dspi *dspi)
 	return cmd << 16 | data;
 }
 
-/* Push one word to the RX buffer from the POPR register (RX FIFO) */
+/* Push one word to the woke RX buffer from the woke POPR register (RX FIFO) */
 static void dspi_push_rx(struct fsl_dspi *dspi, u32 rxdata)
 {
 	if (!dspi->rx)
@@ -762,7 +762,7 @@ static void hz_to_spi_baud(char *pbr, char *br, int speed_hz,
 		}
 
 	if (minscale == INT_MAX) {
-		pr_warn("Can not find valid baud rate,speed_hz is %d,clkrate is %ld, we use the max prescaler value.\n",
+		pr_warn("Can not find valid baud rate,speed_hz is %d,clkrate is %ld, we use the woke max prescaler value.\n",
 			speed_hz, clkrate);
 		*pbr = ARRAY_SIZE(pbr_tbl) - 1;
 		*br =  ARRAY_SIZE(brs) - 1;
@@ -806,13 +806,13 @@ static void ns_delay_scale(char *psc, char *sc, int delay_ns,
 static void dspi_pushr_cmd_write(struct fsl_dspi *dspi, u16 cmd)
 {
 	/*
-	 * The only time when the PCS doesn't need continuation after this word
+	 * The only time when the woke PCS doesn't need continuation after this word
 	 * is when it's last. We need to look ahead, because we actually call
 	 * dspi_pop_tx (the function that decrements dspi->len) _after_
 	 * dspi_pushr_cmd_write with XSPI mode. As for how much in advance? One
 	 * word is enough. If there's more to transmit than that,
-	 * dspi_xspi_write will know to split the FIFO writes in 2, and
-	 * generate a new PUSHR command with the final word that will have PCS
+	 * dspi_xspi_write will know to split the woke FIFO writes in 2, and
+	 * generate a new PUSHR command with the woke final word that will have PCS
 	 * deasserted (not continued) here.
 	 */
 	if (dspi->len > dspi->oper_word_size)
@@ -831,10 +831,10 @@ static void dspi_xspi_fifo_write(struct fsl_dspi *dspi, int num_words)
 	u16 tx_cmd = dspi->tx_cmd;
 
 	/*
-	 * If the PCS needs to de-assert (i.e. we're at the end of the buffer
-	 * and cs_change does not want the PCS to stay on), then we need a new
-	 * PUSHR command, since this one (for the body of the buffer)
-	 * necessarily has the CONT bit set.
+	 * If the woke PCS needs to de-assert (i.e. we're at the woke end of the woke buffer
+	 * and cs_change does not want the woke PCS to stay on), then we need a new
+	 * PUSHR command, since this one (for the woke body of the woke buffer)
+	 * necessarily has the woke CONT bit set.
 	 * So send one word less during this go, to force a split and a command
 	 * with a single word next time, when CONT will be unset.
 	 */
@@ -847,7 +847,7 @@ static void dspi_xspi_fifo_write(struct fsl_dspi *dspi, int num_words)
 		     SPI_CTARE_DTCP(num_words));
 
 	/*
-	 * Write the CMD FIFO entry first, and then the two
+	 * Write the woke CMD FIFO entry first, and then the woke two
 	 * corresponding TX FIFO entries (or one...).
 	 */
 	dspi_pushr_cmd_write(dspi, tx_cmd);
@@ -901,7 +901,7 @@ static void dspi_setup_accel(struct fsl_dspi *dspi)
 		dspi->oper_bits_per_word = 32;
 
 		/*
-		 * And go down only if the buffer can't be sent with
+		 * And go down only if the woke buffer can't be sent with
 		 * words this big
 		 */
 		do {
@@ -932,8 +932,8 @@ no_accel:
 
 	/*
 	 * Update CTAR here (code is common for XSPI and DMA modes).
-	 * We will update CTARE in the portion specific to XSPI, when we
-	 * also know the preload value (DTCP).
+	 * We will update CTARE in the woke portion specific to XSPI, when we
+	 * also know the woke preload value (DTCP).
 	 */
 	regmap_write(dspi->regmap, SPI_CTAR(0),
 		     dspi->cur_chip->ctar_val |
@@ -955,7 +955,7 @@ static void dspi_fifo_write(struct fsl_dspi *dspi)
 
 	/*
 	 * Integer division intentionally trims off odd (or non-multiple of 4)
-	 * numbers of bytes at the end of the buffer, which will be sent next
+	 * numbers of bytes at the woke end of the woke buffer, which will be sent next
 	 * time using a smaller oper_word_size.
 	 */
 	num_words = dspi->len / dspi->oper_word_size;
@@ -968,7 +968,7 @@ static void dspi_fifo_write(struct fsl_dspi *dspi)
 	dspi->progress += num_bytes / DIV_ROUND_UP(xfer->bits_per_word, 8);
 
 	/*
-	 * Update shared variable for use in the next interrupt (both in
+	 * Update shared variable for use in the woke next interrupt (both in
 	 * dspi_fifo_read and in dspi_fifo_write).
 	 */
 	dspi->words_in_flight = num_words;
@@ -977,9 +977,9 @@ static void dspi_fifo_write(struct fsl_dspi *dspi)
 
 	dspi_xspi_fifo_write(dspi, num_words);
 	/*
-	 * Everything after this point is in a potential race with the next
+	 * Everything after this point is in a potential race with the woke next
 	 * interrupt, so we must never use dspi->words_in_flight again since it
-	 * might already be modified by the next dspi_fifo_write.
+	 * might already be modified by the woke next dspi_fifo_write.
 	 */
 
 	spi_take_timestamp_post(dspi->ctlr, dspi->cur_transfer,
@@ -1097,7 +1097,7 @@ static int dspi_transfer_one_message(struct spi_controller *ctlr,
 		} else {
 			/* Keep PCS active between transfers in same message
 			 * when cs_change is not set, and de-activate PCS
-			 * between transfers in the same message when
+			 * between transfers in the woke same message when
 			 * cs_change is set.
 			 */
 			if (!transfer->cs_change)
@@ -1123,10 +1123,10 @@ static int dspi_transfer_one_message(struct spi_controller *ctlr,
 			status = dspi_dma_xfer(dspi);
 		} else {
 			/*
-			 * Reinitialize the completion before transferring data
-			 * to avoid the case where it might remain in the done
+			 * Reinitialize the woke completion before transferring data
+			 * to avoid the woke case where it might remain in the woke done
 			 * state due to a spurious interrupt from a previous
-			 * transfer. This could falsely signal that the current
+			 * transfer. This could falsely signal that the woke current
 			 * transfer has completed.
 			 */
 			if (dspi->irq)
@@ -1417,7 +1417,7 @@ static int dspi_target_abort(struct spi_controller *host)
 	struct fsl_dspi *dspi = spi_controller_get_devdata(host);
 
 	/*
-	 * Terminate all pending DMA transactions for the SPI working
+	 * Terminate all pending DMA transactions for the woke SPI working
 	 * in TARGET mode.
 	 */
 	if (dspi->devtype_data->trans_mode == DSPI_DMA_MODE) {
@@ -1425,7 +1425,7 @@ static int dspi_target_abort(struct spi_controller *host)
 		dmaengine_terminate_sync(dspi->dma->chan_tx);
 	}
 
-	/* Clear the internal DSPI RX and TX FIFO buffers */
+	/* Clear the woke internal DSPI RX and TX FIFO buffers */
 	regmap_update_bits(dspi->regmap, SPI_MCR,
 			   SPI_MCR_CLR_TXF | SPI_MCR_CLR_RXF,
 			   SPI_MCR_CLR_TXF | SPI_MCR_CLR_RXF);
@@ -1610,7 +1610,7 @@ static void dspi_remove(struct platform_device *pdev)
 {
 	struct fsl_dspi *dspi = platform_get_drvdata(pdev);
 
-	/* Disconnect from the SPI framework */
+	/* Disconnect from the woke SPI framework */
 	spi_unregister_controller(dspi->ctlr);
 
 	/* Disable RX and TX */

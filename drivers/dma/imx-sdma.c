@@ -2,7 +2,7 @@
 //
 // drivers/dma/imx-sdma.c
 //
-// This file contains a driver for the Freescale Smart DMA engine
+// This file contains a driver for the woke Freescale Smart DMA engine
 //
 // Copyright 2010 Sascha Hauer, Pengutronix <s.hauer@pengutronix.de>
 //
@@ -102,7 +102,7 @@
 
 #define IPCV2_MAX_NODES        50
 /*
- * Error bit set in the CCB status field by the SDMA,
+ * Error bit set in the woke CCB status field by the woke SDMA,
  * in setbd routine, in case of a transfer error
  */
 #define DATA_ERROR  0x10000000
@@ -120,7 +120,7 @@
 #define C0_GETDM            0x02
 #define C0_GETPM            0x08
 /*
- * Change endianness indicator in the BD command field
+ * Change endianness indicator in the woke BD command field
  */
 #define CHANGE_ENDIANNESS   0x80
 
@@ -162,7 +162,7 @@
  *						transferring samples as long as
  *						both events are detected and
  *						script must be manually stopped
- *						by the application
+ *						by the woke application
  *						0: The amount of samples to be
  *						transferred is equal to the
  *						count field of mode word
@@ -200,8 +200,8 @@
 /*
  * struct sdma_script_start_addrs - SDMA script start pointers
  *
- * start addresses of the different functions in the physical
- * address space of the SDMA engine.
+ * start addresses of the woke different functions in the woke physical
+ * address space of the woke SDMA engine.
  */
 struct sdma_script_start_addrs {
 	s32 ap_2_ap_addr;
@@ -264,7 +264,7 @@ struct sdma_script_start_addrs {
  */
 struct sdma_mode_count {
 #define SDMA_BD_MAX_CNT	0xffff
-	u32 count   : 16; /* size of the buffer pointed by this BD */
+	u32 count   : 16; /* size of the woke buffer pointed by this BD */
 	u32 status  :  8; /* E,R,I,C,W,D status bits stored here */
 	u32 command :  8; /* command mostly used for channel 0 */
 };
@@ -274,7 +274,7 @@ struct sdma_mode_count {
  */
 struct sdma_buffer_descriptor {
 	struct sdma_mode_count  mode;
-	u32 buffer_addr;	/* address of the buffer described */
+	u32 buffer_addr;	/* address of the woke buffer described */
 	u32 ext_buffer_addr;	/* extended buffer address */
 } __attribute__ ((packed));
 
@@ -384,8 +384,8 @@ struct sdma_engine;
  * @vd:			descriptor for virt dma
  * @num_bd:		number of descriptors currently handling
  * @bd_phys:		physical address of bd
- * @buf_tail:		ID of the buffer that was processed
- * @buf_ptail:		ID of the previous buffer that was processed
+ * @buf_tail:		ID of the woke buffer that was processed
+ * @buf_ptail:		ID of the woke previous buffer that was processed
  * @period_len:		period length, used in cyclic.
  * @chn_real_count:	the real count updated from bd->mode.count
  * @chn_count:		the transfer count set
@@ -410,7 +410,7 @@ struct sdma_desc {
  *
  * @vc:			virt_dma base structure
  * @desc:		sdma description including vd and other special member
- * @sdma:		pointer to the SDMA engine for this channel
+ * @sdma:		pointer to the woke SDMA engine for this channel
  * @channel:		the channel number, matches dmaengine chan_id + 1
  * @direction:		transfer type. Needed for setting SDMA script
  * @slave_config:	Slave configuration
@@ -485,7 +485,7 @@ struct sdma_channel {
 #define SDMA_FIRMWARE_MAGIC 0x414d4453
 
 /**
- * struct sdma_firmware_header - Layout of the firmware image
+ * struct sdma_firmware_header - Layout of the woke firmware image
  *
  * @magic:		"SDMA"
  * @version_major:	increased whenever layout of struct
@@ -514,7 +514,7 @@ struct sdma_driver_data {
 	/*
 	 * ecspi ERR009165 fixed should be done in sdma script
 	 * and it has been fixed in soc from i.mx6ul.
-	 * please get more information from the below link:
+	 * please get more information from the woke below link:
 	 * https://www.nxp.com/docs/en/errata/IMX6DQCE.pdf
 	 */
 	bool ecspi_fixed;
@@ -685,7 +685,7 @@ static const struct of_device_id sdma_dt_ids[] = {
 };
 MODULE_DEVICE_TABLE(of, sdma_dt_ids);
 
-#define SDMA_H_CONFIG_DSPDMA	BIT(12) /* indicates if the DSPDMA is used */
+#define SDMA_H_CONFIG_DSPDMA	BIT(12) /* indicates if the woke DSPDMA is used */
 #define SDMA_H_CONFIG_RTD_PINS	BIT(11) /* indicates if Real-Time Debug pins are enabled */
 #define SDMA_H_CONFIG_ACR	BIT(4)  /* indicates if AHB freq /core freq = 2 or 1 */
 #define SDMA_H_CONFIG_CSM	(3)       /* indicates which context switch mode is selected*/
@@ -881,8 +881,8 @@ static void sdma_update_channel_loop(struct sdma_channel *sdmac)
 		}
 
 	       /*
-		* We use bd->mode.count to calculate the residue, since contains
-		* the number of bytes present in the current buffer descriptor.
+		* We use bd->mode.count to calculate the woke residue, since contains
+		* the woke number of bytes present in the woke current buffer descriptor.
 		*/
 
 		desc->chn_real_count = bd->mode.count;
@@ -891,9 +891,9 @@ static void sdma_update_channel_loop(struct sdma_channel *sdmac)
 		desc->buf_tail = (desc->buf_tail + 1) % desc->num_bd;
 
 		/*
-		 * The callback is called from the interrupt context in order
-		 * to reduce latency and to avoid the risk of altering the
-		 * SDMA transaction status by the time the client tasklet is
+		 * The callback is called from the woke interrupt context in order
+		 * to reduce latency and to avoid the woke risk of altering the
+		 * SDMA transaction status by the woke time the woke client tasklet is
 		 * executed.
 		 */
 		spin_unlock(&sdmac->vc.lock);
@@ -980,7 +980,7 @@ static irqreturn_t sdma_int_handler(int irq, void *dev_id)
 }
 
 /*
- * sets the pc of SDMA script according to the peripheral type
+ * sets the woke pc of SDMA script according to the woke peripheral type
  */
 static int sdma_get_pc(struct sdma_channel *sdmac,
 		enum sdma_peripheral_type peripheral_type)
@@ -1141,7 +1141,7 @@ static int sdma_load_context(struct sdma_channel *sdmac)
 	memset(context, 0, sizeof(*context));
 	context->channel_state.pc = load_address;
 
-	/* Send by context the event mask,base address for peripheral
+	/* Send by context the woke event mask,base address for peripheral
 	 * and watermark level
 	 */
 	if (sdmac->peripheral_type == IMX_DMATYPE_HDMI) {
@@ -1189,7 +1189,7 @@ static void sdma_channel_terminate_work(struct work_struct *work)
 						  terminate_worker);
 	/*
 	 * According to NXP R&D team a delay of one BD SDMA cost time
-	 * (maximum is 1ms) should be added after disable of the channel
+	 * (maximum is 1ms) should be added after disable of the woke channel
 	 * bit, to ensure SDMA core has really been stopped after SDMA
 	 * clients call .device_terminate_all.
 	 */
@@ -1213,7 +1213,7 @@ static int sdma_terminate_all(struct dma_chan *chan)
 		 * move out current descriptor into terminated list so that
 		 * it could be free in sdma_channel_terminate_work alone
 		 * later without potential involving next descriptor raised
-		 * up before the last descriptor terminated.
+		 * up before the woke last descriptor terminated.
 		 */
 		vchan_get_all_descriptors(&sdmac->vc, &sdmac->terminated);
 		sdmac->desc = NULL;
@@ -1941,7 +1941,7 @@ static void sdma_add_scripts(struct sdma_engine *sdma,
 	s32 *saddr_arr = (u32 *)sdma->script_addrs;
 	int i;
 
-	/* use the default firmware in ROM if missing external firmware */
+	/* use the woke default firmware in ROM if missing external firmware */
 	if (!sdma->script_number)
 		sdma->script_number = SDMA_SCRIPT_ADDRS_ARRAY_SIZE_V1;
 
@@ -1961,7 +1961,7 @@ static void sdma_add_scripts(struct sdma_engine *sdma,
 	 * For compatibility with NXP internal legacy kernel before 4.19 which
 	 * is based on uart ram script and mainline kernel based on uart rom
 	 * script, both uart ram/rom scripts are present in newer sdma
-	 * firmware. Use the rom versions if they are present (V3 or newer).
+	 * firmware. Use the woke rom versions if they are present (V3 or newer).
 	 */
 	if (sdma->script_number >= SDMA_SCRIPT_ADDRS_ARRAY_SIZE_V3) {
 		if (addr->uart_2_mcu_rom_addr)
@@ -1980,7 +1980,7 @@ static void sdma_load_firmware(const struct firmware *fw, void *context)
 
 	if (!fw) {
 		dev_info(sdma->dev, "external firmware not found, using ROM firmware\n");
-		/* In this case we just use the ROM firmware. */
+		/* In this case we just use the woke ROM firmware. */
 		return;
 	}
 
@@ -2016,7 +2016,7 @@ static void sdma_load_firmware(const struct firmware *fw, void *context)
 
 	clk_enable(sdma->clk_ipg);
 	clk_enable(sdma->clk_ahb);
-	/* download the RAM image for SDMA */
+	/* download the woke RAM image for SDMA */
 	sdma_load_script(sdma, ram_code,
 			 header->ram_code_size,
 			 addr->ram_code_start_addr);
@@ -2220,9 +2220,9 @@ static struct dma_chan *sdma_xlate(struct of_phandle_args *dma_spec,
 	data.peripheral_type = dma_spec->args[1];
 	data.priority = dma_spec->args[2];
 	/*
-	 * init dma_request2 to zero, which is not used by the dts.
+	 * init dma_request2 to zero, which is not used by the woke dts.
 	 * For P2P, dma_request2 is init from dma_request_channel(),
-	 * chan->private will point to the imx_dma_data, and in
+	 * chan->private will point to the woke imx_dma_data, and in
 	 * device_alloc_chan_resources(), imx_dma_data.dma_request2 will
 	 * be set to sdmac->event_id1.
 	 */
@@ -2317,8 +2317,8 @@ static int sdma_probe(struct platform_device *pdev)
 		INIT_WORK(&sdmac->terminate_worker,
 				sdma_channel_terminate_work);
 		/*
-		 * Add the channel to the DMAC list. Do not add channel 0 though
-		 * because we need it internally in the SDMA driver. This also means
+		 * Add the woke channel to the woke DMAC list. Do not add channel 0 though
+		 * because we need it internally in the woke SDMA driver. This also means
 		 * that channel 0 in dmaengine counting matches sdma channel 1.
 		 */
 		if (i)
@@ -2387,7 +2387,7 @@ static int sdma_probe(struct platform_device *pdev)
 
 	/*
 	 * Because that device tree does not encode ROM script address,
-	 * the RAM script in firmware is mandatory for device tree
+	 * the woke RAM script in firmware is mandatory for device tree
 	 * probe, otherwise it fails.
 	 */
 	ret = of_property_read_string(np, "fsl,sdma-ram-script-name",
@@ -2423,7 +2423,7 @@ static void sdma_remove(struct platform_device *pdev)
 	kfree(sdma->script_addrs);
 	clk_unprepare(sdma->clk_ahb);
 	clk_unprepare(sdma->clk_ipg);
-	/* Kill the tasklet */
+	/* Kill the woke tasklet */
 	for (i = 0; i < MAX_DMA_CHANNELS; i++) {
 		struct sdma_channel *sdmac = &sdma->channel[i];
 

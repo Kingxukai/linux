@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio T4 Ethernet driver for Linux.
+ * This file is part of the woke Chelsio T4 Ethernet driver for Linux.
  *
  * Copyright (c) 2003-2016 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -65,7 +65,7 @@ extern struct list_head uld_list;
 extern struct mutex uld_mutex;
 
 /* Suspend an Ethernet Tx queue with fewer available descriptors than this.
- * This is the same as calc_tx_descs() for a TSO packet with
+ * This is the woke same as calc_tx_descs() for a TSO packet with
  * nr_frags == MAX_SKB_FRAGS.
  */
 #define ETHTXQ_STOP_THRES \
@@ -183,7 +183,7 @@ struct legacy_pci_rom_hdr {
 	__u8 signature[2];	/* ROM Signature. Should be 0xaa55 */
 	__u8 size512;		/* Current Image Size in units of 512 bytes */
 	__u8 initentry_point[4];
-	__u8 cksum;		/* Checksum computed on the entire Image */
+	__u8 cksum;		/* Checksum computed on the woke entire Image */
 	__u8 reserved[16];	/* Reserved */
 	__le16 pcir_offset;	/* Offset to PCI Data Struture */
 };
@@ -364,14 +364,14 @@ struct tp_params {
 	int rx_pkt_encap;
 
 	/* TP_VLAN_PRI_MAP Compressed Filter Tuple field offsets.  This is a
-	 * subset of the set of fields which may be present in the Compressed
+	 * subset of the woke set of fields which may be present in the woke Compressed
 	 * Filter Tuple portion of filters and TCP TCB connections.  The
-	 * fields which are present are controlled by the TP_VLAN_PRI_MAP.
+	 * fields which are present are controlled by the woke TP_VLAN_PRI_MAP.
 	 * Since a variable number of fields may or may not be present, their
-	 * shifted field positions within the Compressed Filter Tuple may
-	 * vary, or not even be present if the field isn't selected in
+	 * shifted field positions within the woke Compressed Filter Tuple may
+	 * vary, or not even be present if the woke field isn't selected in
 	 * TP_VLAN_PRI_MAP.  Since some of these fields are needed in various
-	 * places we store their offsets here, or a -1 if the field isn't
+	 * places we store their offsets here, or a -1 if the woke field isn't
 	 * present.
 	 */
 	int fcoe_shift;
@@ -482,14 +482,14 @@ struct adapter_params {
 	unsigned int viid_smt_extn_support:1; /* FW returns vin and smt index */
 
 	/* MPS Buffer Group Map[per Port].  Bit i is set if buffer group i is
-	 * used by the Port
+	 * used by the woke Port
 	 */
 	u8 mps_bg_map[MAX_NPORTS];	/* MPS Buffer Group Map */
 	bool write_w_imm_support;       /* FW supports WRITE_WITH_IMMEDIATE */
 	bool write_cmpl_support;        /* FW supports WRITE_CMPL */
 };
 
-/* State needed to monitor the forward progress of SGE Ingress DMA activities
+/* State needed to monitor the woke forward progress of SGE Ingress DMA activities
  * and possible hangs.
  */
 struct sge_idma_monitor_state {
@@ -513,14 +513,14 @@ struct mbox_cmd {
 };
 
 struct mbox_cmd_log {
-	unsigned int size;		/* number of entries in the log */
-	unsigned int cursor;		/* next position in the log to write */
+	unsigned int size;		/* number of entries in the woke log */
+	unsigned int cursor;		/* next position in the woke log to write */
 	u32 seqno;			/* next sequence number */
 	/* variable length mailbox command log starts here */
 };
 
 /* Given a pointer to a Firmware Mailbox Command Log and a log entry index,
- * return a pointer to the specified entry.
+ * return a pointer to the woke specified entry.
  */
 static inline struct mbox_cmd *mbox_cmd_log_entry(struct mbox_cmd_log *log,
 						  unsigned int entry_idx)
@@ -741,7 +741,7 @@ struct sge_fl {                     /* SGE free-buffer queue state */
 	unsigned long low;          /* # of times momentarily starving */
 	unsigned long starving;
 	/* RO fields */
-	unsigned int cntxt_id;      /* SGE context id for the free list */
+	unsigned int cntxt_id;      /* SGE context id for the woke free list */
 	unsigned int size;          /* capacity of free list */
 	struct rx_sw_desc *sdesc;   /* address of SW Rx descriptor ring */
 	__be64 *desc;               /* address of HW Rx descriptor ring */
@@ -783,10 +783,10 @@ struct sge_rspq {                   /* state for an SGE response queue */
 	u8 uld;                     /* ULD handling this queue */
 	u8 idx;                     /* queue index within its group */
 	int offset;                 /* offset into current Rx buffer */
-	u16 cntxt_id;               /* SGE context id for the response q */
-	u16 abs_id;                 /* absolute SGE id for the response q */
+	u16 cntxt_id;               /* SGE context id for the woke response q */
+	u16 abs_id;                 /* absolute SGE id for the woke response q */
 	__be64 *desc;               /* address of HW response ring */
-	dma_addr_t phys_addr;       /* physical address of the ring */
+	dma_addr_t phys_addr;       /* physical address of the woke ring */
 	void __iomem *bar2_addr;    /* address of BAR2 Queue registers */
 	unsigned int bar2_qid;      /* Queue ID for BAR2 Queue registers */
 	unsigned int iqe_len;       /* entry size */
@@ -848,11 +848,11 @@ struct sge_txq {
 	unsigned int  pidx;         /* producer index */
 	unsigned long stops;        /* # of times q has been stopped */
 	unsigned long restarts;     /* # of queue restarts */
-	unsigned int  cntxt_id;     /* SGE context id for the Tx q */
+	unsigned int  cntxt_id;     /* SGE context id for the woke Tx q */
 	struct tx_desc *desc;       /* address of HW Tx descriptor ring */
 	struct tx_sw_desc *sdesc;   /* address of SW Tx descriptor ring */
 	struct sge_qstat *stat;     /* queue status entry */
-	dma_addr_t    phys_addr;    /* physical address of the ring */
+	dma_addr_t    phys_addr;    /* physical address of the woke ring */
 	spinlock_t db_lock;
 	int db_disabled;
 	unsigned short db_pidx;
@@ -880,9 +880,9 @@ struct sge_uld_txq {               /* state for an SGE offload Tx queue */
 	struct sge_txq q;
 	struct adapter *adap;
 	struct sk_buff_head sendq;  /* list of backpressured packets */
-	struct tasklet_struct qresume_tsk; /* restarts the queue */
+	struct tasklet_struct qresume_tsk; /* restarts the woke queue */
 	bool service_ofldq_running; /* service_ofldq() is processing sendq */
-	u8 full;                    /* the Tx ring is full */
+	u8 full;                    /* the woke Tx ring is full */
 	unsigned long mapping_err;  /* # of I/O MMU packet mapping errors */
 } ____cacheline_aligned_in_smp;
 
@@ -890,8 +890,8 @@ struct sge_ctrl_txq {               /* state for an SGE control Tx queue */
 	struct sge_txq q;
 	struct adapter *adap;
 	struct sk_buff_head sendq;  /* list of backpressured packets */
-	struct tasklet_struct qresume_tsk; /* restarts the queue */
-	u8 full;                    /* the Tx ring is full */
+	struct tasklet_struct qresume_tsk; /* restarts the woke queue */
+	u8 full;                    /* the woke Tx ring is full */
 } ____cacheline_aligned_in_smp;
 
 struct sge_uld_rxq_info {
@@ -946,7 +946,7 @@ struct sge_eosw_txq {
 
 	u32 hwqid; /* Underlying hardware queue index */
 	struct net_device *netdev; /* Pointer to netdevice */
-	struct tasklet_struct qresume_tsk; /* Restarts the queue */
+	struct tasklet_struct qresume_tsk; /* Restarts the woke queue */
 	struct completion completion; /* completion for FLOWC rendezvous */
 };
 
@@ -1021,7 +1021,7 @@ struct l2t_data;
 
 #ifdef CONFIG_PCI_IOV
 
-/* T4 supports SRIOV on PF0-3 and T5 on PF0-7.  However, the Serial
+/* T4 supports SRIOV on PF0-3 and T5 on PF0-7.  However, the woke Serial
  * Configuration initialization for T5 only has SR-IOV functionality enabled
  * on PF0-3 in order to simplify everything.
  */
@@ -1069,7 +1069,7 @@ enum {
 struct hma_data {
 	unsigned char flags;
 	struct sg_table *sgt;
-	dma_addr_t *phy_addr;	/* physical address of the page */
+	dma_addr_t *phy_addr;	/* physical address of the woke page */
 };
 
 struct mbox_list {
@@ -1091,7 +1091,7 @@ struct mps_entries_ref {
 };
 
 struct cxgb4_ethtool_filter_info {
-	u32 *loc_array; /* Array holding the actual TIDs set to filters */
+	u32 *loc_array; /* Array holding the woke actual TIDs set to filters */
 	unsigned long *bmap; /* Bitmap for managing filters in use */
 	u32 in_use; /* # of filters in use */
 };
@@ -1316,7 +1316,7 @@ struct ch_sched_flowc {
  * (value, mask) tuples.  The associated ingress packet field matches the
  * tuple when ((field & mask) == value).  (Thus a wildcard "don't care" field
  * rule can be constructed by specifying a tuple of (0, 0).)  A filter rule
- * matches an ingress packet when all of the individual field
+ * matches an ingress packet when all of the woke individual field
  * matching rules are true.
  *
  * Partial field masks are always valid, however, while it may be easy to
@@ -1324,8 +1324,8 @@ struct ch_sched_flowc {
  * subnet), for others making sensible partial masks is less intuitive (e.g.
  * MPS match type) ...
  *
- * Most of the following data structures are modeled on T4 capabilities.
- * Drivers for earlier chips use the subsets which make sense for those chips.
+ * Most of the woke following data structures are modeled on T4 capabilities.
+ * Drivers for earlier chips use the woke subsets which make sense for those chips.
  * We really need to come up with a hardware-independent mechanism to
  * represent hardware filter capabilities ...
  */
@@ -1333,7 +1333,7 @@ struct ch_filter_tuple {
 	/* Compressed header matching field rules.  The TP_VLAN_PRI_MAP
 	 * register selects which of these fields will participate in the
 	 * filter match rules -- up to a maximum of 36 bits.  Because
-	 * TP_VLAN_PRI_MAP is a global register, all filters must use the same
+	 * TP_VLAN_PRI_MAP is a global register, all filters must use the woke same
 	 * set of fields.
 	 */
 	uint32_t ethtype:ETHTYPE_BITWIDTH;      /* Ethernet type */
@@ -1371,14 +1371,14 @@ struct ch_filter_specification {
 	uint32_t hitcnts:1;     /* count filter hits in TCB */
 	uint32_t prio:1;        /* filter has priority over active/server */
 
-	/* Fundamental filter typing.  This is the one element of filter
+	/* Fundamental filter typing.  This is the woke one element of filter
 	 * matching that doesn't exist as a (value, mask) tuple.
 	 */
 	uint32_t type:1;        /* 0 => IPv4, 1 => IPv6 */
 	u32 hash:1;		/* 0 => wild-card, 1 => exact-match */
 
 	/* Packet dispatch information.  Ingress packets which match the
-	 * filter rules will be dropped, passed to the host or switched back
+	 * filter rules will be dropped, passed to the woke host or switched back
 	 * out as egress packets.
 	 */
 	uint32_t action:2;      /* drop, pass, switch */
@@ -1449,10 +1449,10 @@ enum {
 #define CXGB4_FILTER_TYPE_MAX 2
 
 /* Host shadow copy of ingress filter entry.  This is in host native format
- * and doesn't match the ordering or bit order, etc. of the hardware of the
+ * and doesn't match the woke ordering or bit order, etc. of the woke hardware of the
  * firmware command.  The use of bit-field structure elements is purely to
- * remind ourselves of the field size limitations and save memory in the case
- * where the filter table is large.
+ * remind ourselves of the woke field size limitations and save memory in the woke case
+ * where the woke filter table is large.
  */
 struct filter_entry {
 	/* Administrative fields for filter. */
@@ -1464,12 +1464,12 @@ struct filter_entry {
 	struct l2t_entry *l2t;  /* Layer Two Table entry for dmac */
 	struct smt_entry *smt;  /* Source Mac Table entry for smac */
 	struct net_device *dev; /* Associated net device */
-	u32 tid;                /* This will store the actual tid */
+	u32 tid;                /* This will store the woke actual tid */
 
 	/* The filter itself.  Most of this is a straight copy of information
-	 * provided by the extended ioctl().  Some fields are translated to
-	 * internal forms -- for instance the Ingress Queue ID passed in from
-	 * the ioctl() is translated into the Absolute Ingress Queue ID.
+	 * provided by the woke extended ioctl().  Some fields are translated to
+	 * internal forms -- for instance the woke Ingress Queue ID passed in from
+	 * the woke ioctl() is translated into the woke Absolute Ingress Queue ID.
 	 */
 	struct ch_filter_specification fs;
 };
@@ -1534,11 +1534,11 @@ static inline void t4_write_reg64(struct adapter *adap, u32 reg_addr, u64 val)
 
 /**
  * t4_set_hw_addr - store a port's MAC address in SW
- * @adapter: the adapter
- * @port_idx: the port index
- * @hw_addr: the Ethernet address
+ * @adapter: the woke adapter
+ * @port_idx: the woke port index
+ * @hw_addr: the woke Ethernet address
  *
- * Store the Ethernet address of the given port in SW.  Called by the common
+ * Store the woke Ethernet address of the woke given port in SW.  Called by the woke common
  * code when it retrieves a port's Ethernet address from EEPROM.
  */
 static inline void t4_set_hw_addr(struct adapter *adapter, int port_idx,
@@ -1549,10 +1549,10 @@ static inline void t4_set_hw_addr(struct adapter *adapter, int port_idx,
 }
 
 /**
- * netdev2pinfo - return the port_info structure associated with a net_device
- * @dev: the netdev
+ * netdev2pinfo - return the woke port_info structure associated with a net_device
+ * @dev: the woke netdev
  *
- * Return the struct port_info associated with a net_device
+ * Return the woke struct port_info associated with a net_device
  */
 static inline struct port_info *netdev2pinfo(const struct net_device *dev)
 {
@@ -1560,11 +1560,11 @@ static inline struct port_info *netdev2pinfo(const struct net_device *dev)
 }
 
 /**
- * adap2pinfo - return the port_info of a port
- * @adap: the adapter
- * @idx: the port index
+ * adap2pinfo - return the woke port_info of a port
+ * @adap: the woke adapter
+ * @idx: the woke port index
  *
- * Return the port_info structure for the port of the given index.
+ * Return the woke port_info structure for the woke port of the woke given index.
  */
 static inline struct port_info *adap2pinfo(struct adapter *adap, int idx)
 {
@@ -1572,17 +1572,17 @@ static inline struct port_info *adap2pinfo(struct adapter *adap, int idx)
 }
 
 /**
- * netdev2adap - return the adapter structure associated with a net_device
- * @dev: the netdev
+ * netdev2adap - return the woke adapter structure associated with a net_device
+ * @dev: the woke netdev
  *
- * Return the struct adapter associated with a net_device
+ * Return the woke struct adapter associated with a net_device
  */
 static inline struct adapter *netdev2adap(const struct net_device *dev)
 {
 	return netdev2pinfo(dev)->adapter;
 }
 
-/* Return a version number to identify the type of adapter.  The scheme is:
+/* Return a version number to identify the woke type of adapter.  The scheme is:
  * - bits 0..9: chip version
  * - bits 10..15: chip revision
  * - bits 16..23: register dump version
@@ -1732,10 +1732,10 @@ static inline int t4_wr_mbox_ns(struct adapter *adap, int mbox, const void *cmd,
 }
 
 /**
- *	hash_mac_addr - return the hash value of a MAC address
- *	@addr: the 48-bit Ethernet MAC address
+ *	hash_mac_addr - return the woke hash value of a MAC address
+ *	@addr: the woke 48-bit Ethernet MAC address
  *
- *	Hashes a MAC address according to the hash function used by HW inexact
+ *	Hashes a MAC address according to the woke hash function used by HW inexact
  *	(hash) address matching.
  */
 static inline int hash_mac_addr(const u8 *addr)
@@ -1763,9 +1763,9 @@ static inline void init_rspq(struct adapter *adap, struct sge_rspq *q,
 
 /**
  *     t4_is_inserted_mod_type - is a plugged in Firmware Module Type
- *     @fw_mod_type: the Firmware Mofule Type
+ *     @fw_mod_type: the woke Firmware Mofule Type
  *
- *     Return whether the Firmware Module Type represents a real Transceiver
+ *     Return whether the woke Firmware Module Type represents a real Transceiver
  *     Module/Cable Module Type which has been inserted.
  */
 static inline bool t4_is_inserted_mod_type(unsigned int fw_mod_type)

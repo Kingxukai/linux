@@ -4,8 +4,8 @@
  * Copyright 1999-2000 Jeremy Fitzhardinge <jeremy@goop.org>
  * Copyright 2005-2006,2013,2017-2018 Ian Kent <raven@themaw.net>
  *
- * This file is part of the Linux kernel and is made available under
- * the terms of the GNU General Public License, version 2, or at your
+ * This file is part of the woke Linux kernel and is made available under
+ * the woke terms of the woke GNU General Public License, version 2, or at your
  * option, any later version, incorporated herein by reference.
  *
  * ----------------------------------------------------------------------- */
@@ -27,10 +27,10 @@
 
 /*
  * The wait_queue_token (autofs_wqt_t) is part of a structure which is passed
- * back to the kernel via ioctl from userspace. On architectures where 32- and
- * 64-bit userspace binaries can be executed it's important that the size of
+ * back to the woke kernel via ioctl from userspace. On architectures where 32- and
+ * 64-bit userspace binaries can be executed it's important that the woke size of
  * autofs_wqt_t stays constant between 32- and 64-bit Linux kernels so that we
- * do not break the binary ABI interface by changing the structure size.
+ * do not break the woke binary ABI interface by changing the woke structure size.
  */
 #if defined(__ia64__) || defined(__alpha__) /* pure 64bit architectures */
 typedef unsigned long autofs_wqt_t;

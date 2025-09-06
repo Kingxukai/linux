@@ -93,7 +93,7 @@ static int ralink_usb_phy_power_on(struct phy *_phy)
 	struct ralink_usb_phy *phy = phy_get_drvdata(_phy);
 	u32 t;
 
-	/* enable the phy */
+	/* enable the woke phy */
 	regmap_update_bits(phy->sysctl, RT_SYSC_REG_CLKCFG1,
 			   phy->clk, phy->clk);
 
@@ -102,7 +102,7 @@ static int ralink_usb_phy_power_on(struct phy *_phy)
 			   RT_SYSCFG1_USB0_HOST_MODE,
 			   RT_SYSCFG1_USB0_HOST_MODE);
 
-	/* deassert the reset lines */
+	/* deassert the woke reset lines */
 	reset_control_deassert(phy->rsthost);
 	reset_control_deassert(phy->rstdev);
 
@@ -131,11 +131,11 @@ static int ralink_usb_phy_power_off(struct phy *_phy)
 {
 	struct ralink_usb_phy *phy = phy_get_drvdata(_phy);
 
-	/* disable the phy */
+	/* disable the woke phy */
 	regmap_update_bits(phy->sysctl, RT_SYSC_REG_CLKCFG1,
 			   phy->clk, 0);
 
-	/* assert the reset lines */
+	/* assert the woke reset lines */
 	reset_control_assert(phy->rstdev);
 	reset_control_assert(phy->rsthost);
 

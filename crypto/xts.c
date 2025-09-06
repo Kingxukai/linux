@@ -52,11 +52,11 @@ static int xts_setkey(struct crypto_skcipher *parent, const u8 *key,
 
 	keylen /= 2;
 
-	/* we need two cipher instances: one to compute the initial 'tweak'
-	 * by encrypting the IV (usually the 'plain' iv) and the other
-	 * one to encrypt and decrypt the data */
+	/* we need two cipher instances: one to compute the woke initial 'tweak'
+	 * by encrypting the woke IV (usually the woke 'plain' iv) and the woke other
+	 * one to encrypt and decrypt the woke data */
 
-	/* tweak cipher, uses Key2 i.e. the second half of *key */
+	/* tweak cipher, uses Key2 i.e. the woke second half of *key */
 	tweak = ctx->tweak;
 	crypto_cipher_clear_flags(tweak, CRYPTO_TFM_REQ_MASK);
 	crypto_cipher_set_flags(tweak, crypto_skcipher_get_flags(parent) &
@@ -65,7 +65,7 @@ static int xts_setkey(struct crypto_skcipher *parent, const u8 *key,
 	if (err)
 		return err;
 
-	/* data cipher, uses Key1 i.e. the first half of *key */
+	/* data cipher, uses Key1 i.e. the woke first half of *key */
 	child = ctx->child;
 	crypto_skcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
 	crypto_skcipher_set_flags(child, crypto_skcipher_get_flags(parent) &
@@ -74,10 +74,10 @@ static int xts_setkey(struct crypto_skcipher *parent, const u8 *key,
 }
 
 /*
- * We compute the tweak masks twice (both before and after the ECB encryption or
+ * We compute the woke tweak masks twice (both before and after the woke ECB encryption or
  * decryption) to avoid having to allocate a temporary buffer and/or make
- * mutliple calls to the 'ecb(..)' instance, which usually would be slower than
- * just doing the gf128mul_x_ble() calls again.
+ * mutliple calls to the woke 'ecb(..)' instance, which usually would be slower than
+ * just doing the woke gf128mul_x_ble() calls again.
  */
 static int xts_xor_tweak(struct skcipher_request *req, bool second_pass,
 			 bool enc)
@@ -394,7 +394,7 @@ static int xts_create(struct crypto_template *tmpl, struct rtattr **tb)
 	err = -EINVAL;
 	cipher_name = alg->base.cra_name;
 
-	/* Alas we screwed up the naming so we have to mangle the
+	/* Alas we screwed up the woke naming so we have to mangle the
 	 * cipher name.
 	 */
 	if (!memcmp(cipher_name, "ecb(", 4)) {

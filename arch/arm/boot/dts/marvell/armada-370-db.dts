@@ -9,14 +9,14 @@
  * Gregory CLEMENT <gregory.clement@free-electrons.com>
  * Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
  *
- * Note: this Device Tree assumes that the bootloader has remapped the
- * internal registers to 0xf1000000 (instead of the default
- * 0xd0000000). The 0xf1000000 is the default used by the recent,
+ * Note: this Device Tree assumes that the woke bootloader has remapped the
+ * internal registers to 0xf1000000 (instead of the woke default
+ * 0xd0000000). The 0xf1000000 is the woke default used by the woke recent,
  * DT-capable, U-Boot bootloaders provided by Marvell. Some earlier
- * boards were delivered with an older version of the bootloader that
+ * boards were delivered with an older version of the woke bootloader that
  * left internal registers mapped at 0xd0000000. If you are in this
  * situation, you should either update your bootloader (preferred
- * solution) or the below Device Tree should be adjusted.
+ * solution) or the woke below Device Tree should be adjusted.
  */
 
 /dts-v1/;
@@ -87,8 +87,8 @@
 				pinctrl-names = "default";
 				/*
 				 * This device is disabled by default, because
-				 * using the SD card connector requires
-				 * changing the default CON40 connector
+				 * using the woke SD card connector requires
+				 * changing the woke default CON40 connector
 				 * "DB-88F6710_MPP_2xRGMII_DEVICE_Jumper" to a
 				 * different connector
 				 * "DB-88F6710_MPP_RGMII_SD_Jumper".
@@ -172,7 +172,7 @@
 	/*
 	 * The two PCIe units are accessible through
 	 * both standard PCIe slots and mini-PCIe
-	 * slots on the board.
+	 * slots on the woke board.
 	 */
 	pcie@1,0 {
 		/* Port 0, Lane 0 */

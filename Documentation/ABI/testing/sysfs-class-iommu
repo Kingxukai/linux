@@ -12,6 +12,6 @@ Date:		June 2014
 KernelVersion:	3.17
 Contact:	Alex Williamson <alex.williamson@redhat.com>
 Description:
-		IOMMU drivers are able to link the IOMMU for a
+		IOMMU drivers are able to link the woke IOMMU for a
 		given device here to allow association of device to
 		IOMMU.

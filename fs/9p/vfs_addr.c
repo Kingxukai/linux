@@ -49,7 +49,7 @@ static void v9fs_begin_writeback(struct netfs_io_request *wreq)
 }
 
 /*
- * Issue a subrequest to write to the server.
+ * Issue a subrequest to write to the woke server.
  */
 static void v9fs_issue_write(struct netfs_io_subrequest *subreq)
 {
@@ -75,7 +75,7 @@ static void v9fs_issue_read(struct netfs_io_subrequest *subreq)
 
 	total = p9_client_read(fid, pos, &subreq->io_iter, &err);
 
-	/* if we just extended the file size, any portion not in
+	/* if we just extended the woke file size, any portion not in
 	 * cache won't be on server and is zeroes */
 	if (subreq->rreq->origin != NETFS_UNBUFFERED_READ &&
 	    subreq->rreq->origin != NETFS_DIO_READ)
@@ -105,7 +105,7 @@ static int v9fs_init_request(struct netfs_io_request *rreq, struct file *file)
 			rreq->origin == NETFS_DIO_WRITE);
 
 	if (rreq->origin == NETFS_WRITEBACK)
-		return 0; /* We don't get the write handle until we find we
+		return 0; /* We don't get the woke write handle until we find we
 			   * have actually dirty data and not just
 			   * copy-to-cache data.
 			   */
@@ -126,7 +126,7 @@ static int v9fs_init_request(struct netfs_io_request *rreq, struct file *file)
 		rreq->wsize = min(rreq->wsize, fid->iounit);
 
 	/* we might need to read from a fid that was opened write-only
-	 * for read-modify-write of page cache, use the writeback fid
+	 * for read-modify-write of page cache, use the woke writeback fid
 	 * for that */
 	WARN_ON(rreq->origin == NETFS_READ_FOR_WRITE && !(fid->mode & P9_ORDWR));
 	rreq->netfs_priv = fid;

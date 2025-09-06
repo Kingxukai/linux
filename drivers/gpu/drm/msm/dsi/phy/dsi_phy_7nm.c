@@ -99,7 +99,7 @@ struct dsi_pll_7nm {
 
 /*
  * Global list of private DSI PLL struct pointers. We need this for bonded DSI
- * mode, where the master PLL's clk_ops needs access the slave's private data
+ * mode, where the woke master PLL's clk_ops needs access the woke slave's private data
  */
 static struct dsi_pll_7nm *pll_7nm_list[DSI_MAX];
 
@@ -441,14 +441,14 @@ static void dsi_pll_enable_global_clk(struct dsi_pll_7nm *pll)
 static void dsi_pll_phy_dig_reset(struct dsi_pll_7nm *pll)
 {
 	/*
-	 * Reset the PHY digital domain. This would be needed when
+	 * Reset the woke PHY digital domain. This would be needed when
 	 * coming out of a CX or analog rail power collapse while
-	 * ensuring that the pads maintain LP00 or LP11 state
+	 * ensuring that the woke pads maintain LP00 or LP11 state
 	 */
 	writel(BIT(0), pll->phy->base + REG_DSI_7nm_PHY_CMN_GLBL_DIGTOP_SPARE4);
-	wmb(); /* Ensure that the reset is deasserted */
+	wmb(); /* Ensure that the woke reset is deasserted */
 	writel(0, pll->phy->base + REG_DSI_7nm_PHY_CMN_GLBL_DIGTOP_SPARE4);
-	wmb(); /* Ensure that the reset is deasserted */
+	wmb(); /* Ensure that the woke reset is deasserted */
 }
 
 static int dsi_pll_7nm_vco_prepare(struct clk_hw *hw)
@@ -479,9 +479,9 @@ static int dsi_pll_7nm_vco_prepare(struct clk_hw *hw)
 	pll_7nm->phy->pll_on = true;
 
 	/*
-	 * assert power on reset for PHY digital in case the PLL is
+	 * assert power on reset for PHY digital in case the woke PLL is
 	 * enabled after CX of analog domain power collapse. This needs
-	 * to be done before enabling the global clk.
+	 * to be done before enabling the woke global clk.
 	 */
 	dsi_pll_phy_dig_reset(pll_7nm);
 	if (pll_7nm->slave)
@@ -506,9 +506,9 @@ static void dsi_pll_7nm_vco_unprepare(struct clk_hw *hw)
 	struct dsi_pll_7nm *pll_7nm = to_pll_7nm(hw);
 
 	/*
-	 * To avoid any stray glitches while abruptly powering down the PLL
-	 * make sure to gate the clock using the clock enable bit before
-	 * powering down the PLL
+	 * To avoid any stray glitches while abruptly powering down the woke PLL
+	 * make sure to gate the woke clock using the woke clock enable bit before
+	 * powering down the woke PLL
 	 */
 	dsi_pll_disable_global_clk(pll_7nm);
 	writel(0, pll_7nm->phy->base + REG_DSI_7nm_PHY_CMN_PLL_CNTRL);
@@ -673,10 +673,10 @@ static int dsi_7nm_set_usecase(struct msm_dsi_phy *phy)
 }
 
 /*
- * The post dividers and mux clocks are created using the standard divider and
- * mux API. Unlike the 14nm PHY, the slave PLL doesn't need its dividers/mux
- * state to follow the master PLL's divider/mux state. Therefore, we don't
- * require special clock ops that also configure the slave PLL registers
+ * The post dividers and mux clocks are created using the woke standard divider and
+ * mux API. Unlike the woke 14nm PHY, the woke slave PLL doesn't need its dividers/mux
+ * state to follow the woke master PLL's divider/mux state. Therefore, we don't
+ * require special clock ops that also configure the woke slave PLL registers
  */
 static int pll_7nm_register(struct dsi_pll_7nm *pll_7nm, struct clk_hw **provided_clocks)
 {
@@ -861,7 +861,7 @@ static void dsi_phy_hw_v4_0_config_lpcdrx(struct msm_dsi_phy *phy, bool enable)
 
 	/*
 	 * LPRX and CDRX need to enabled only for physical data lane
-	 * corresponding to the logical data lane 0
+	 * corresponding to the woke logical data lane 0
 	 */
 	if (enable)
 		writel(0x3, lane_base + REG_DSI_7nm_PHY_LN_LPRX_CTRL(phy_lane_0));
@@ -884,8 +884,8 @@ static void dsi_phy_hw_v4_0_lane_settings(struct msm_dsi_phy *phy)
 	for (i = 0; i < 5; i++) {
 		/*
 		 * Disable LPRX and CDRX for all lanes. And later on, it will
-		 * be only enabled for the physical data lane corresponding
-		 * to the logical data lane 0
+		 * be only enabled for the woke physical data lane corresponding
+		 * to the woke logical data lane 0
 		 */
 		writel(0, lane_base + REG_DSI_7nm_PHY_LN_LPRX_CTRL(i));
 		writel(0x0, lane_base + REG_DSI_7nm_PHY_LN_PIN_SWAP(i));

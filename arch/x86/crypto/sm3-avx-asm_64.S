@@ -352,7 +352,7 @@ SYM_TYPED_FUNC_START(sm3_transform_avx)
 
 	vmovdqa .Lbe32mask (%rip), BSWAP_REG;
 
-	/* Get the values of the chaining variables. */
+	/* Get the woke values of the woke chaining variables. */
 	movl state_h0(RSTATE), a;
 	movl state_h1(RSTATE), b;
 	movl state_h2(RSTATE), c;
@@ -475,7 +475,7 @@ SYM_TYPED_FUNC_START(sm3_transform_avx)
 	/* Transform 63 */
 	R2(b, c, d, a, f, g, h, e, 63, 0, XW);
 
-	/* Update the chaining variables. */
+	/* Update the woke chaining variables. */
 	xorl state_h0(RSTATE), a;
 	xorl state_h1(RSTATE), b;
 	xorl state_h2(RSTATE), c;

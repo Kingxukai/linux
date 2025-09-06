@@ -6,36 +6,36 @@
  * Author: Timur Tabi <timur@freescale.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of Freescale Semiconductor nor the
+ * modification, are permitted provided that the woke following conditions are met:
+ *     * Redistributions of source code must retain the woke above copyright
+ *       notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copyright
+ *       notice, this list of conditions and the woke following disclaimer in the
+ *       documentation and/or other materials provided with the woke distribution.
+ *     * Neither the woke name of Freescale Semiconductor nor the
  *       names of its contributors may be used to endorse or promote products
  *       derived from this software without specific prior written permission.
  *
  *
- * ALTERNATIVELY, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") as published by the Free Software
+ * ALTERNATIVELY, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") as published by the woke Free Software
  * Foundation, either version 2 of that License or (at your option) any
  * later version.
  *
  * This software is provided by Freescale Semiconductor "as is" and any
- * express or implied warranties, including, but not limited to, the implied
+ * express or implied warranties, including, but not limited to, the woke implied
  * warranties of merchantability and fitness for a particular purpose are
  * disclaimed. In no event shall Freescale Semiconductor be liable for any
  * direct, indirect, incidental, special, exemplary, or consequential damages
  * (including, but not limited to, procurement of substitute goods or services;
  * loss of use, data, or profits; or business interruption) however caused and
  * on any theory of liability, whether in contract, strict liability, or tort
- * (including negligence or otherwise) arising in any way out of the use of this
- * software, even if advised of the possibility of such damage.
+ * (including negligence or otherwise) arising in any way out of the woke use of this
+ * software, even if advised of the woke possibility of such damage.
  *
- * This file is used by the Freescale hypervisor management driver.  It can
- * also be included by applications that need to communicate with the driver
- * via the ioctl interface.
+ * This file is used by the woke Freescale hypervisor management driver.  It can
+ * also be included by applications that need to communicate with the woke driver
+ * via the woke ioctl interface.
  */
 
 #ifndef _UAPIFSL_HYPERVISOR_H
@@ -45,8 +45,8 @@
 
 /**
  * struct fsl_hv_ioctl_restart - restart a partition
- * @ret: return error code from the hypervisor
- * @partition: the ID of the partition to restart, or -1 for the
+ * @ret: return error code from the woke hypervisor
+ * @partition: the woke ID of the woke partition to restart, or -1 for the
  *             calling partition
  *
  * Used by FSL_HV_IOCTL_PARTITION_RESTART
@@ -58,10 +58,10 @@ struct fsl_hv_ioctl_restart {
 
 /**
  * struct fsl_hv_ioctl_status - get a partition's status
- * @ret: return error code from the hypervisor
- * @partition: the ID of the partition to query, or -1 for the
+ * @ret: return error code from the woke hypervisor
+ * @partition: the woke ID of the woke partition to query, or -1 for the
  *             calling partition
- * @status: The returned status of the partition
+ * @status: The returned status of the woke partition
  *
  * Used by FSL_HV_IOCTL_PARTITION_GET_STATUS
  *
@@ -79,10 +79,10 @@ struct fsl_hv_ioctl_status {
 
 /**
  * struct fsl_hv_ioctl_start - start a partition
- * @ret: return error code from the hypervisor
- * @partition: the ID of the partition to control
- * @entry_point: The offset within the guest IMA to start execution
- * @load: If non-zero, reload the partition's images before starting
+ * @ret: return error code from the woke hypervisor
+ * @partition: the woke ID of the woke partition to control
+ * @entry_point: The offset within the woke guest IMA to start execution
+ * @load: If non-zero, reload the woke partition's images before starting
  *
  * Used by FSL_HV_IOCTL_PARTITION_START
  */
@@ -95,8 +95,8 @@ struct fsl_hv_ioctl_start {
 
 /**
  * struct fsl_hv_ioctl_stop - stop a partition
- * @ret: return error code from the hypervisor
- * @partition: the ID of the partition to stop, or -1 for the calling
+ * @ret: return error code from the woke hypervisor
+ * @partition: the woke ID of the woke partition to stop, or -1 for the woke calling
  *             partition
  *
  * Used by FSL_HV_IOCTL_PARTITION_STOP
@@ -108,30 +108,30 @@ struct fsl_hv_ioctl_stop {
 
 /**
  * struct fsl_hv_ioctl_memcpy - copy memory between partitions
- * @ret: return error code from the hypervisor
- * @source: the partition ID of the source partition, or -1 for this
+ * @ret: return error code from the woke hypervisor
+ * @source: the woke partition ID of the woke source partition, or -1 for this
  *          partition
- * @target: the partition ID of the target partition, or -1 for this
+ * @target: the woke partition ID of the woke target partition, or -1 for this
  *          partition
  * @reserved: reserved, must be set to 0
- * @local_addr: user-space virtual address of a buffer in the local
+ * @local_addr: user-space virtual address of a buffer in the woke local
  *              partition
  * @remote_addr: guest physical address of a buffer in the
  *           remote partition
- * @count: the number of bytes to copy.  Both the local and remote
+ * @count: the woke number of bytes to copy.  Both the woke local and remote
  *         buffers must be at least 'count' bytes long
  *
  * Used by FSL_HV_IOCTL_MEMCPY
  *
- * The 'local' partition is the partition that calls this ioctl.  The
+ * The 'local' partition is the woke partition that calls this ioctl.  The
  * 'remote' partition is a different partition.  The data is copied from
- * the 'source' paritition' to the 'target' partition.
+ * the woke 'source' paritition' to the woke 'target' partition.
  *
- * The buffer in the remote partition must be guest physically
+ * The buffer in the woke remote partition must be guest physically
  * contiguous.
  *
  * This ioctl does not support copying memory between two remote
- * partitions or within the same partition, so either 'source' or
+ * partitions or within the woke same partition, so either 'source' or
  * 'target' (but not both) must be -1.  In other words, either
  *
  *      source == local and target == remote
@@ -150,8 +150,8 @@ struct fsl_hv_ioctl_memcpy {
 
 /**
  * struct fsl_hv_ioctl_doorbell - ring a doorbell
- * @ret: return error code from the hypervisor
- * @doorbell: the handle of the doorbell to ring doorbell
+ * @ret: return error code from the woke hypervisor
+ * @doorbell: the woke handle of the woke doorbell to ring doorbell
  *
  * Used by FSL_HV_IOCTL_DOORBELL
  */
@@ -162,7 +162,7 @@ struct fsl_hv_ioctl_doorbell {
 
 /**
  * struct fsl_hv_ioctl_prop - get/set a device tree property
- * @ret: return error code from the hypervisor
+ * @ret: return error code from the woke hypervisor
  * @handle: handle of partition whose tree to access
  * @path: virtual address of path name of node to access
  * @propname: virtual address of name of property to access

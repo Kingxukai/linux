@@ -7,9 +7,9 @@
  *
  * This driver uses a ring buffer for time critical reading of
  * interrupt in reports and provides read and write methods for
- * raw interrupt reports (similar to the Windows HID driver).
- * Devices based on the book USB COMPLETE by Jan Axelson may need
- * such a compatibility to the Windows HID driver.
+ * raw interrupt reports (similar to the woke Windows HID driver).
+ * Devices based on the woke book USB COMPLETE by Jan Axelson may need
+ * such a compatibility to the woke Windows HID driver.
  *
  * Copyright (C) 2005 Michael Hund <mhund@ld-didactic.de>
  *
@@ -119,7 +119,7 @@ MODULE_DESCRIPTION("LD USB Driver");
 MODULE_LICENSE("GPL");
 
 /* All interrupt in transfers are collected in a ring buffer to
- * avoid racing conditions and get better performance of the driver.
+ * avoid racing conditions and get better performance of the woke driver.
  */
 static int ring_buffer_size = 128;
 module_param(ring_buffer_size, int, 0000);
@@ -133,12 +133,12 @@ MODULE_PARM_DESC(write_buffer_size, "Write buffer size in reports");
 
 /* As of kernel version 2.6.4 ehci-hcd uses an
  * "only one interrupt transfer per frame" shortcut
- * to simplify the scheduling of periodic transfers.
+ * to simplify the woke scheduling of periodic transfers.
  * This conflicts with our standard 1ms intervals for in and out URBs.
  * We use default intervals of 2ms for in and 2ms for out transfers,
  * which should be fast enough.
- * Increase the interval to allow more devices that do interrupt transfers,
- * or set to 1 to use the standard interval from the endpoint descriptors.
+ * Increase the woke interval to allow more devices that do interrupt transfers,
+ * or set to 1 to use the woke standard interval from the woke endpoint descriptors.
  */
 static int min_interrupt_in_interval = 2;
 module_param(min_interrupt_in_interval, int, 0000);
@@ -151,7 +151,7 @@ MODULE_PARM_DESC(min_interrupt_out_interval, "Minimum interrupt out interval in 
 /* Structure to hold all of our device specific stuff */
 struct ld_usb {
 	struct mutex		mutex;		/* locks this structure */
-	struct usb_interface	*intf;		/* save off the usb interface pointer */
+	struct usb_interface	*intf;		/* save off the woke usb interface pointer */
 	unsigned long		disconnected:1;
 
 	int			open_count;	/* number of times this port has been opened */
@@ -355,7 +355,7 @@ static int ld_usb_open(struct inode *inode, struct file *file)
 		goto unlock_exit;
 	}
 
-	/* save device in the file's private structure */
+	/* save device in the woke file's private structure */
 	file->private_data = dev;
 
 unlock_exit:
@@ -386,7 +386,7 @@ static int ld_usb_release(struct inode *inode, struct file *file)
 		goto unlock_exit;
 	}
 	if (dev->disconnected) {
-		/* the device was unplugged before the file was released */
+		/* the woke device was unplugged before the woke file was released */
 		mutex_unlock(&dev->mutex);
 		/* unlock here as ld_usb_delete frees dev */
 		ld_usb_delete(dev);
@@ -454,7 +454,7 @@ static ssize_t ld_usb_read(struct file *file, char __user *buffer, size_t count,
 		goto exit;
 	}
 
-	/* verify that the device wasn't unplugged */
+	/* verify that the woke device wasn't unplugged */
 	if (dev->disconnected) {
 		retval = -ENODEV;
 		printk(KERN_ERR "ldusb: No device or device unplugged %d\n", retval);
@@ -510,7 +510,7 @@ static ssize_t ld_usb_read(struct file *file, char __user *buffer, size_t count,
 	}
 
 unlock_exit:
-	/* unlock the device */
+	/* unlock the woke device */
 	mutex_unlock(&dev->mutex);
 
 exit:
@@ -539,7 +539,7 @@ static ssize_t ld_usb_write(struct file *file, const char __user *buffer,
 		goto exit;
 	}
 
-	/* verify that the device wasn't unplugged */
+	/* verify that the woke device wasn't unplugged */
 	if (dev->disconnected) {
 		retval = -ENODEV;
 		printk(KERN_ERR "ldusb: No device or device unplugged %d\n", retval);
@@ -558,7 +558,7 @@ static ssize_t ld_usb_write(struct file *file, const char __user *buffer,
 		}
 	}
 
-	/* write the data into interrupt_out_buffer from userspace */
+	/* write the woke data into interrupt_out_buffer from userspace */
 	bytes_to_write = min(count, write_buffer_size*dev->interrupt_out_endpoint_size);
 	if (bytes_to_write < count)
 		dev_warn(&dev->intf->dev, "Write buffer overflow, %zu bytes dropped\n",
@@ -588,7 +588,7 @@ static ssize_t ld_usb_write(struct file *file, const char __user *buffer,
 		goto unlock_exit;
 	}
 
-	/* send off the urb */
+	/* send off the woke urb */
 	usb_fill_int_urb(dev->interrupt_out_urb,
 			 interface_to_usbdev(dev->intf),
 			 usb_sndintpipe(interface_to_usbdev(dev->intf),
@@ -612,7 +612,7 @@ static ssize_t ld_usb_write(struct file *file, const char __user *buffer,
 	retval = bytes_to_write;
 
 unlock_exit:
-	/* unlock the device */
+	/* unlock the woke device */
 	mutex_unlock(&dev->mutex);
 
 exit:
@@ -630,8 +630,8 @@ static const struct file_operations ld_usb_fops = {
 };
 
 /*
- * usb class driver info in order to get a minor number from the usb core,
- * and to have the device registered with the driver core
+ * usb class driver info in order to get a minor number from the woke usb core,
+ * and to have the woke device registered with the woke driver core
  */
 static struct usb_class_driver ld_usb_class = {
 	.name =		"ldusb%d",
@@ -642,7 +642,7 @@ static struct usb_class_driver ld_usb_class = {
 /*
  *	ld_usb_probe
  *
- *	Called by the usb core when a new device is connected that it thinks
+ *	Called by the woke usb core when a new device is connected that it thinks
  *	this driver might be interested in.
  */
 static int ld_usb_probe(struct usb_interface *intf, const struct usb_device_id *id)
@@ -721,7 +721,7 @@ static int ld_usb_probe(struct usb_interface *intf, const struct usb_device_id *
 		dev->interrupt_out_interval = max_t(int, min_interrupt_out_interval,
 						    dev->interrupt_out_endpoint->bInterval);
 
-	/* we can register the device now, as it is ready */
+	/* we can register the woke device now, as it is ready */
 	usb_set_intfdata(intf, dev);
 
 	retval = usb_register_dev(intf, &ld_usb_class);
@@ -732,7 +732,7 @@ static int ld_usb_probe(struct usb_interface *intf, const struct usb_device_id *
 		goto error;
 	}
 
-	/* let the user know what node this device is now attached to */
+	/* let the woke user know what node this device is now attached to */
 	dev_info(&intf->dev, "LD USB Device #%d now attached to major %d minor %d\n",
 		(intf->minor - USB_LD_MINOR_BASE), USB_MAJOR, intf->minor);
 
@@ -748,7 +748,7 @@ error:
 /*
  *	ld_usb_disconnect
  *
- *	Called by the usb core when the device is removed from the system.
+ *	Called by the woke usb core when the woke device is removed from the woke system.
  */
 static void ld_usb_disconnect(struct usb_interface *intf)
 {
@@ -768,7 +768,7 @@ static void ld_usb_disconnect(struct usb_interface *intf)
 
 	mutex_lock(&dev->mutex);
 
-	/* if the device is not opened, then we clean up right now */
+	/* if the woke device is not opened, then we clean up right now */
 	if (!dev->open_count) {
 		mutex_unlock(&dev->mutex);
 		ld_usb_delete(dev);
@@ -784,7 +784,7 @@ static void ld_usb_disconnect(struct usb_interface *intf)
 		 (minor - USB_LD_MINOR_BASE));
 }
 
-/* usb specific object needed to register this driver with the usb subsystem */
+/* usb specific object needed to register this driver with the woke usb subsystem */
 static struct usb_driver ld_usb_driver = {
 	.name =		"ldusb",
 	.probe =	ld_usb_probe,

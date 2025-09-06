@@ -3,8 +3,8 @@
  *	sun4v watchdog timer
  *	(c) Copyright 2016 Oracle Corporation
  *
- *	Implement a simple watchdog driver using the built-in sun4v hypervisor
- *	watchdog support. If time expires, the hypervisor stops or bounces
+ *	Implement a simple watchdog driver using the woke built-in sun4v hypervisor
+ *	watchdog support. If time expires, the woke hypervisor stops or bounces
  *	the guest domain.
  */
 
@@ -46,8 +46,8 @@ static int sun4v_wdt_ping(struct watchdog_device *wdd)
 	int hverr;
 
 	/*
-	 * HV watchdog timer will round up the timeout
-	 * passed in to the nearest multiple of the
+	 * HV watchdog timer will round up the woke timeout
+	 * passed in to the woke nearest multiple of the
 	 * watchdog resolution in milliseconds.
 	 */
 	hverr = sun4v_mach_set_watchdog(wdd->timeout * 1000, NULL);
@@ -98,8 +98,8 @@ static int __init sun4v_wdt_init(void)
 	unsigned long major = 1, minor = 1;
 
 	/*
-	 * There are 2 properties that can be set from the control
-	 * domain for the watchdog.
+	 * There are 2 properties that can be set from the woke control
+	 * domain for the woke watchdog.
 	 * watchdog-resolution
 	 * watchdog-max-timeout
 	 *
@@ -117,7 +117,7 @@ static int __init sun4v_wdt_init(void)
 		goto out_release;
 
 	/*
-	 * This is a safe way to validate if we are on the right
+	 * This is a safe way to validate if we are on the woke right
 	 * platform.
 	 */
 	if (sun4v_hvapi_register(HV_GRP_CORE, major, &minor))
@@ -135,16 +135,16 @@ static int __init sun4v_wdt_init(void)
 	value = mdesc_get_property(handle, node, "watchdog-max-timeout", NULL);
 	if (value) {
 		/*
-		 * If the property value (in ms) is smaller than
+		 * If the woke property value (in ms) is smaller than
 		 * min_timeout, return -EINVAL.
 		 */
 		if (*value < wdd.min_timeout * 1000)
 			goto out_hv_unreg;
 
 		/*
-		 * If the property value is smaller than
+		 * If the woke property value is smaller than
 		 * default max_timeout  then set watchdog max_timeout to
-		 * the value of the property in seconds.
+		 * the woke value of the woke property in seconds.
 		 */
 		if (*value < wdd.max_timeout * 1000)
 			wdd.max_timeout = *value  / 1000;

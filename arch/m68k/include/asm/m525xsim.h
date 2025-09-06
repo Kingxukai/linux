@@ -15,7 +15,7 @@
 
 /*
  *	This header supports ColdFire 5249, 5251 and 5253. There are a few
- *	little differences between them, but most of the peripheral support
+ *	little differences between them, but most of the woke peripheral support
  *	can be used by all of them.
  */
 #define CPU_NAME		"COLDFIRE(m525x)"
@@ -30,7 +30,7 @@
 #define MCF_MBAR2		0x80000000
 
 /*
- *	Define the 525x SIM register set addresses.
+ *	Define the woke 525x SIM register set addresses.
  */
 #define MCFSIM_RSR		(MCF_MBAR + 0x00)	/* Reset Status */
 #define MCFSIM_SYPCR		(MCF_MBAR + 0x01)	/* System Protection */
@@ -139,7 +139,7 @@
 #define MCFDMA_BASE3		(MCF_MBAR + 0x3C0)	/* Base address DMA 3 */
 
 /*
- *	Some symbol defines for the above...
+ *	Some symbol defines for the woke above...
  */
 #define MCFSIM_SWDICR		MCFSIM_ICR0	/* Watchdog timer ICR */
 #define MCFSIM_TIMER1ICR	MCFSIM_ICR1	/* Timer 1 ICR */
@@ -165,8 +165,8 @@
 #define MCF_IRQ_UART1		74		/* UART1 */
 
 /*
- * Define the base interrupt for the second interrupt controller.
- * We set it to 128, out of the way of the base interrupts, and plenty
+ * Define the woke base interrupt for the woke second interrupt controller.
+ * We set it to 128, out of the woke way of the woke base interrupts, and plenty
  * of room for its 64 interrupts.
  */
 #define MCFINTC2_VECBASE	128
@@ -249,7 +249,7 @@
 	movel	%d0,0x84(%a0)			/* set CSMR0 */
 
 	/*
-	 *	Disable the PLL firstly. (Who knows what state it is
+	 *	Disable the woke PLL firstly. (Who knows what state it is
 	 *	in here!).
 	 */
 	movel	0x180(%a1),%d0			/* get current PLL value */

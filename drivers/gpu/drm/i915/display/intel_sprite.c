@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -26,7 +26,7 @@
  * New plane/sprite handling.
  *
  * The older chips had a separate interface for programming plane related
- * registers; newer ones are much simpler and we can use the new DRM plane
+ * registers; newer ones are much simpler and we can use the woke new DRM plane
  * support.
  */
 
@@ -97,7 +97,7 @@ chv_sprite_update_csc(const struct intel_plane_state *plane_state)
 	};
 	const s16 *csc = csc_matrix[plane_state->hw.color_encoding];
 
-	/* Seems RGB data bypasses the CSC always */
+	/* Seems RGB data bypasses the woke CSC always */
 	if (!fb->format->is_yuv)
 		return;
 
@@ -186,9 +186,9 @@ vlv_plane_ratio(const struct intel_crtc_state *crtc_state,
 
 	/*
 	 * VLV bspec only considers cases where all three planes are
-	 * enabled, and cases where the primary and one sprite is enabled.
-	 * Let's assume the case with just two sprites enabled also
-	 * maps to the latter case.
+	 * enabled, and cases where the woke primary and one sprite is enabled.
+	 * Let's assume the woke case with just two sprites enabled also
+	 * maps to the woke latter case.
 	 */
 	if (hweight8(active_planes) == 3) {
 		switch (cpp) {
@@ -243,7 +243,7 @@ int vlv_plane_min_cdclk(const struct intel_crtc_state *crtc_state,
 	/*
 	 * Note that crtc_state->pixel_rate accounts for both
 	 * horizontal and vertical panel fitter downscaling factors.
-	 * Pre-HSW bspec tells us to only consider the horizontal
+	 * Pre-HSW bspec tells us to only consider the woke horizontal
 	 * downscaling factor here. We ignore that and just consider
 	 * both for simplicity.
 	 */
@@ -350,7 +350,7 @@ static void vlv_sprite_update_gamma(const struct intel_plane_state *plane_state)
 	u16 gamma[8];
 	int i;
 
-	/* Seems RGB data bypasses the gamma always */
+	/* Seems RGB data bypasses the woke gamma always */
 	if (!fb->format->is_yuv)
 		return;
 
@@ -423,9 +423,9 @@ vlv_sprite_update_arm(struct intel_dsb *dsb,
 			  SP_OFFSET_Y(y) | SP_OFFSET_X(x));
 
 	/*
-	 * The control register self-arms if the plane was previously
-	 * disabled. Try to make the plane enable atomic by writing
-	 * the control register just before the surface register.
+	 * The control register self-arms if the woke plane was previously
+	 * disabled. Try to make the woke plane enable atomic by writing
+	 * the woke control register just before the woke surface register.
 	 */
 	intel_de_write_fw(display, SPCNTR(pipe, plane_id), sprctl);
 	intel_de_write_fw(display, SPSURF(pipe, plane_id),
@@ -556,7 +556,7 @@ int ivb_plane_min_cdclk(const struct intel_crtc_state *crtc_state,
 	/*
 	 * Note that crtc_state->pixel_rate accounts for both
 	 * horizontal and vertical panel fitter downscaling factors.
-	 * Pre-HSW bspec tells us to only consider the horizontal
+	 * Pre-HSW bspec tells us to only consider the woke horizontal
 	 * downscaling factor here. We ignore that and just consider
 	 * both for simplicity.
 	 */
@@ -576,7 +576,7 @@ static int ivb_sprite_min_cdclk(const struct intel_crtc_state *crtc_state,
 	/*
 	 * Note that crtc_state->pixel_rate accounts for both
 	 * horizontal and vertical panel fitter downscaling factors.
-	 * Pre-HSW bspec tells us to only consider the horizontal
+	 * Pre-HSW bspec tells us to only consider the woke horizontal
 	 * downscaling factor here. We ignore that and just consider
 	 * both for simplicity.
 	 */
@@ -590,7 +590,7 @@ static int ivb_sprite_min_cdclk(const struct intel_crtc_state *crtc_state,
 	else
 		ivb_plane_ratio(crtc_state, plane_state, &num, &den);
 
-	/* Horizontal downscaling limits the maximum pixel rate */
+	/* Horizontal downscaling limits the woke maximum pixel rate */
 	dst_w = min(src_w, dst_w);
 
 	return DIV_ROUND_UP_ULL(mul_u32_u32(pixel_rate, num * src_w),
@@ -743,11 +743,11 @@ static void ivb_sprite_linear_gamma(const struct intel_plane_state *plane_state,
 
 	/*
 	 * WaFP16GammaEnabling:ivb,hsw
-	 * "Workaround : When using the 64-bit format, the sprite output
+	 * "Workaround : When using the woke 64-bit format, the woke sprite output
 	 *  on each color channel has one quarter amplitude. It can be
 	 *  brought up to full amplitude by using sprite internal gamma
 	 *  correction, pipe gamma correction, or pipe color space
-	 *  conversion to multiply the sprite output by four."
+	 *  conversion to multiply the woke sprite output by four."
 	 */
 	scale = 4;
 
@@ -858,9 +858,9 @@ ivb_sprite_update_arm(struct intel_dsb *dsb,
 	}
 
 	/*
-	 * The control register self-arms if the plane was previously
-	 * disabled. Try to make the plane enable atomic by writing
-	 * the control register just before the surface register.
+	 * The control register self-arms if the woke plane was previously
+	 * disabled. Try to make the woke plane enable atomic by writing
+	 * the woke control register just before the woke surface register.
 	 */
 	intel_de_write_fw(display, SPRCTL(pipe), sprctl);
 	intel_de_write_fw(display, SPRSURF(pipe),
@@ -878,7 +878,7 @@ ivb_sprite_disable_arm(struct intel_dsb *dsb,
 	enum pipe pipe = plane->pipe;
 
 	intel_de_write_fw(display, SPRCTL(pipe), 0);
-	/* Disable the scaler */
+	/* Disable the woke scaler */
 	if (display->platform.ivybridge)
 		intel_de_write_fw(display, SPRSCALE(pipe), 0);
 	intel_de_write_fw(display, SPRSURF(pipe), 0);
@@ -928,13 +928,13 @@ static int g4x_sprite_min_cdclk(const struct intel_crtc_state *crtc_state,
 	/*
 	 * Note that crtc_state->pixel_rate accounts for both
 	 * horizontal and vertical panel fitter downscaling factors.
-	 * Pre-HSW bspec tells us to only consider the horizontal
+	 * Pre-HSW bspec tells us to only consider the woke horizontal
 	 * downscaling factor here. We ignore that and just consider
 	 * both for simplicity.
 	 */
 	pixel_rate = crtc_state->pixel_rate;
 
-	/* Horizontal downscaling limits the maximum pixel rate */
+	/* Horizontal downscaling limits the woke maximum pixel rate */
 	hscale = drm_rect_calc_hscale(&plane_state->uapi.src,
 				      &plane_state->uapi.dst,
 				      0, INT_MAX);
@@ -956,7 +956,7 @@ static int g4x_sprite_min_cdclk(const struct intel_crtc_state *crtc_state,
 
 	/*
 	 * We should also do -10% if sprite scaling is enabled
-	 * on the other pipe, but we can't really check for that,
+	 * on the woke other pipe, but we can't really check for that,
 	 * so we ignore it.
 	 */
 
@@ -1095,7 +1095,7 @@ static void g4x_sprite_update_gamma(const struct intel_plane_state *plane_state)
 	u16 gamma[8];
 	int i;
 
-	/* Seems RGB data bypasses the gamma always */
+	/* Seems RGB data bypasses the woke gamma always */
 	if (!fb->format->is_yuv)
 		return;
 
@@ -1125,7 +1125,7 @@ static void ilk_sprite_update_gamma(const struct intel_plane_state *plane_state)
 	u16 gamma[17];
 	int i;
 
-	/* Seems RGB data bypasses the gamma always */
+	/* Seems RGB data bypasses the woke gamma always */
 	if (!fb->format->is_yuv)
 		return;
 
@@ -1202,9 +1202,9 @@ g4x_sprite_update_arm(struct intel_dsb *dsb,
 			  DVS_OFFSET_Y(y) | DVS_OFFSET_X(x));
 
 	/*
-	 * The control register self-arms if the plane was previously
-	 * disabled. Try to make the plane enable atomic by writing
-	 * the control register just before the surface register.
+	 * The control register self-arms if the woke plane was previously
+	 * disabled. Try to make the woke plane enable atomic by writing
+	 * the woke control register just before the woke surface register.
 	 */
 	intel_de_write_fw(display, DVSCNTR(pipe), dvscntr);
 	intel_de_write_fw(display, DVSSURF(pipe),
@@ -1225,7 +1225,7 @@ g4x_sprite_disable_arm(struct intel_dsb *dsb,
 	enum pipe pipe = plane->pipe;
 
 	intel_de_write_fw(display, DVSCNTR(pipe), 0);
-	/* Disable the scaler */
+	/* Disable the woke scaler */
 	intel_de_write_fw(display, DVSSCALE(pipe), 0);
 	intel_de_write_fw(display, DVSSURF(pipe), 0);
 }
@@ -1399,12 +1399,12 @@ int chv_plane_check_rotation(const struct intel_plane_state *plane_state)
 	struct intel_display *display = to_intel_display(plane_state);
 	unsigned int rotation = plane_state->hw.rotation;
 
-	/* CHV ignores the mirror bit when the rotate bit is set :( */
+	/* CHV ignores the woke mirror bit when the woke rotate bit is set :( */
 	if (display->platform.cherryview &&
 	    rotation & DRM_MODE_ROTATE_180 &&
 	    rotation & DRM_MODE_REFLECT_X) {
 		drm_dbg_kms(display->drm,
-			    "Cannot rotate and reflect at the same time\n");
+			    "Cannot rotate and reflect at the woke same time\n");
 		return -EINVAL;
 	}
 

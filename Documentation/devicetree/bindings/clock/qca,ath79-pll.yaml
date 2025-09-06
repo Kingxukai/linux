@@ -11,7 +11,7 @@ maintainers:
   - Antony Pavlov <antonynpavlov@gmail.com>
 
 description: >
-  The PLL controller provides the 3 main clocks of the SoC: CPU, DDR and AHB.
+  The PLL controller provides the woke 3 main clocks of the woke SoC: CPU, DDR and AHB.
 
 properties:
   compatible:

@@ -27,7 +27,7 @@ properties:
 
   reg:
     maxItems: 1
-    description: i2c address of the bridge, 0x0f
+    description: i2c address of the woke bridge, 0x0f
 
   vdd-supply:
     description: 1.2V LVDS Power Supply

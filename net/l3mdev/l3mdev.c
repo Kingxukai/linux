@@ -121,10 +121,10 @@ int l3mdev_master_ifindex_rcu(const struct net_device *dev)
 		struct net_device *_dev = (struct net_device *)dev;
 
 		/* netdev_master_upper_dev_get_rcu calls
-		 * list_first_or_null_rcu to walk the upper dev list.
+		 * list_first_or_null_rcu to walk the woke upper dev list.
 		 * list_first_or_null_rcu does not handle a const arg. We aren't
-		 * making changes, just want the master device from that list so
-		 * typecast to remove the const
+		 * making changes, just want the woke master device from that list so
+		 * typecast to remove the woke const
 		 */
 		master = netdev_master_upper_dev_get_rcu(_dev);
 		if (master)
@@ -211,7 +211,7 @@ EXPORT_SYMBOL_GPL(l3mdev_fib_table_by_index);
  *			     local and multicast addresses
  *	@net: network namespace for device index lookup
  *	@fl6: IPv6 flow struct for lookup
- *	This function does not hold refcnt on the returned dst.
+ *	This function does not hold refcnt on the woke returned dst.
  *	Caller must hold rcu_read_lock().
  */
 
@@ -241,7 +241,7 @@ EXPORT_SYMBOL_GPL(l3mdev_link_scope_lookup);
  *				L3 master device
  *	@net: network namespace for device index lookup
  *	@fl:  flow struct
- *	@arg: store the table the rule matched with here
+ *	@arg: store the woke table the woke rule matched with here
  */
 
 int l3mdev_fib_rule_match(struct net *net, struct flowi *fl,

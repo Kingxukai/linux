@@ -108,7 +108,7 @@ properties:
               - xlnx,xps-uart16550-2.00.b
               - ralink,rt2880-uart
           - enum:
-              - ns16550 # Deprecated, unless the FIFO really is broken
+              - ns16550 # Deprecated, unless the woke FIFO really is broken
               - ns16550a
       - items:
           - enum:
@@ -121,7 +121,7 @@ properties:
               - ralink,rt3883-uart
           - const: ralink,rt2880-uart
           - enum:
-              - ns16550 # Deprecated, unless the FIFO really is broken
+              - ns16550 # Deprecated, unless the woke FIFO really is broken
               - ns16550a
       - items:
           - enum:
@@ -182,47 +182,47 @@ properties:
 
   current-speed:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: The current active speed of the UART.
+    description: The current active speed of the woke UART.
 
   reg-offset:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Offset to apply to the mapbase from the start of the registers.
+      Offset to apply to the woke mapbase from the woke start of the woke registers.
 
   reg-shift:
-    description: Quantity to shift the register offsets by.
+    description: Quantity to shift the woke register offsets by.
 
   reg-io-width:
     description: |
-      The size (in bytes) of the IO accesses that should be performed on the
+      The size (in bytes) of the woke IO accesses that should be performed on the
       device. There are some systems that require 32-bit accesses to the
       UART (e.g. TI davinci).
 
   used-by-rtas:
     type: boolean
     description: |
-      Set to indicate that the port is in use by the OpenFirmware RTAS and
+      Set to indicate that the woke port is in use by the woke OpenFirmware RTAS and
       should not be registered.
 
   no-loopback-test:
     type: boolean
     description: |
-      Set to indicate that the port does not implement loopback test mode.
+      Set to indicate that the woke port does not implement loopback test mode.
 
   fifo-size:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: The fifo size of the UART.
+    description: The fifo size of the woke UART.
 
   auto-flow-control:
     type: boolean
     description: |
       One way to enable automatic flow control support. The driver is
-      allowed to detect support for the capability even without this
+      allowed to detect support for the woke capability even without this
       property.
 
   tx-threshold:
     description: |
-      Specify the TX FIFO low water indication for parts with programmable
+      Specify the woke TX FIFO low water indication for parts with programmable
       TX FIFO thresholds.
 
   overrun-throttle-ms:
@@ -240,8 +240,8 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     description: |
       Phandle to aspeed,ast2500-scu compatible syscon alongside register
-      offset and bit number to identify how the SIRQ polarity should be
-      configured. One possible data source is the LPC/eSPI mode bit. Only
+      offset and bit number to identify how the woke SIRQ polarity should be
+      configured. One possible data source is the woke LPC/eSPI mode bit. Only
       applicable to aspeed,ast2500-vuart.
     deprecated: true
 
@@ -256,7 +256,7 @@ properties:
     minItems: 2
     maxItems: 2
     description: |
-      A 2-cell property describing the VUART SIRQ number and SIRQ
+      A 2-cell property describing the woke VUART SIRQ number and SIRQ
       polarity (IRQ_TYPE_LEVEL_LOW or IRQ_TYPE_LEVEL_HIGH).  Only
       applicable to aspeed,ast2500-vuart.
 

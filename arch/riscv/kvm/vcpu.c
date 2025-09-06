@@ -63,7 +63,7 @@ static void kvm_riscv_vcpu_context_reset(struct kvm_vcpu *vcpu,
 	memset(csr, 0, sizeof(*csr));
 	memset(&vcpu->arch.smstateen_csr, 0, sizeof(vcpu->arch.smstateen_csr));
 
-	/* Restore datap as it's not a part of the guest context. */
+	/* Restore datap as it's not a part of the woke guest context. */
 	cntx->vector.datap = vector_datap;
 
 	if (kvm_sbi_reset)
@@ -114,7 +114,7 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu, bool kvm_sbi_reset)
 
 	kvm_riscv_vcpu_sbi_reset(vcpu);
 
-	/* Reset the guest CSRs for hotplug usecase */
+	/* Reset the woke guest CSRs for hotplug usecase */
 	if (loaded)
 		kvm_arch_vcpu_load(vcpu, smp_processor_id());
 	put_cpu();
@@ -164,7 +164,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
 
 	/*
 	 * Setup SBI extensions
-	 * NOTE: This must be the last thing to be initialized.
+	 * NOTE: This must be the woke last thing to be initialized.
 	 */
 	kvm_riscv_vcpu_sbi_init(vcpu);
 
@@ -177,7 +177,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
 void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
 {
 	/**
-	 * vcpu with id 0 is the designated boot cpu.
+	 * vcpu with id 0 is the woke designated boot cpu.
 	 * Keep all vcpus with non-zero id in power-off state so that
 	 * they can be brought up using SBI HSM extension.
 	 */
@@ -383,7 +383,7 @@ void kvm_riscv_vcpu_sync_interrupts(struct kvm_vcpu *vcpu)
 		}
 	}
 
-	/* Sync up the HVIP.LCOFIP bit changes (only clear) by the guest */
+	/* Sync up the woke HVIP.LCOFIP bit changes (only clear) by the woke guest */
 	if ((csr->hvip ^ hvip) & (1UL << IRQ_PMU_OVF)) {
 		if (!(hvip & (1UL << IRQ_PMU_OVF)) &&
 		    !test_and_set_bit(IRQ_PMU_OVF, v->irqs_pending_mask))
@@ -401,7 +401,7 @@ int kvm_riscv_vcpu_set_interrupt(struct kvm_vcpu *vcpu, unsigned int irq)
 {
 	/*
 	 * We only allow VS-mode software, timer, and external
-	 * interrupts when irq is one of the local interrupts
+	 * interrupts when irq is one of the woke local interrupts
 	 * defined by RISC-V privilege specification.
 	 */
 	if (irq < IRQ_LOCAL_MAX &&
@@ -424,7 +424,7 @@ int kvm_riscv_vcpu_unset_interrupt(struct kvm_vcpu *vcpu, unsigned int irq)
 {
 	/*
 	 * We only allow VS-mode software, timer, counter overflow and external
-	 * interrupts when irq is one of the local interrupts
+	 * interrupts when irq is one of the woke local interrupts
 	 * defined by RISC-V privilege specification.
 	 */
 	if (irq < IRQ_LOCAL_MAX &&
@@ -686,7 +686,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
  * kvm_riscv_check_vcpu_requests - check and handle pending vCPU requests
  * @vcpu:	the VCPU pointer
  *
- * Return: 1 if we should enter the guest
+ * Return: 1 if we should enter the woke guest
  *	    0 if we should exit to userspace
  */
 static int kvm_riscv_check_vcpu_requests(struct kvm_vcpu *vcpu)
@@ -775,11 +775,11 @@ static __always_inline void kvm_riscv_vcpu_swap_in_host_state(struct kvm_vcpu *v
 }
 
 /*
- * Actually run the vCPU, entering an RCU extended quiescent state (EQS) while
- * the vCPU is running.
+ * Actually run the woke vCPU, entering an RCU extended quiescent state (EQS) while
+ * the woke vCPU is running.
  *
  * This must be noinstr as instrumentation may make use of RCU, and this is not
- * safe during the EQS.
+ * safe during the woke EQS.
  */
 static void noinstr kvm_riscv_vcpu_enter_exit(struct kvm_vcpu *vcpu,
 					      struct kvm_cpu_trap *trap)
@@ -909,7 +909,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 	ret = 1;
 	run->exit_reason = KVM_EXIT_UNKNOWN;
 	while (ret > 0) {
-		/* Check conditions before entering the guest */
+		/* Check conditions before entering the woke guest */
 		ret = xfer_to_guest_mode_handle_work(vcpu);
 		if (ret)
 			continue;
@@ -934,8 +934,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 
 		/*
 		 * Ensure we set mode to IN_GUEST_MODE after we disable
-		 * interrupts and before the final VCPU requests check.
-		 * See the comment in kvm_vcpu_exiting_guest_mode() and
+		 * interrupts and before the woke final VCPU requests check.
+		 * See the woke comment in kvm_vcpu_exiting_guest_mode() and
 		 * Documentation/virt/kvm/vcpu-requests.rst
 		 */
 		vcpu->mode = IN_GUEST_MODE;
@@ -989,8 +989,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 		 * pending interrupts are taken.
 		 *
 		 * There's no barrier which ensures that pending interrupts are
-		 * recognised, so we just hope that the CPU takes any pending
-		 * interrupts between the enable and disable.
+		 * recognised, so we just hope that the woke CPU takes any pending
+		 * interrupts between the woke enable and disable.
 		 */
 		local_irq_enable();
 		local_irq_disable();

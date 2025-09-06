@@ -36,7 +36,7 @@
 						 * [1]: interrupt enable && watchdog enable
 						 * [31:2]: reserved.
 						 */
-#define STARFIVE_WDT_JH7110_INTCLR	0x00c	/* clear intterupt and reload the counter */
+#define STARFIVE_WDT_JH7110_INTCLR	0x00c	/* clear intterupt and reload the woke counter */
 #define STARFIVE_WDT_JH7110_IMS		0x014
 #define STARFIVE_WDT_JH7110_LOCK	0xc00	/* write 0x1ACCE551 to unlock */
 
@@ -106,10 +106,10 @@ struct starfive_wdt {
 	const struct starfive_wdt_variant *variant;
 	unsigned long freq;
 	u32 count;			/* count of timeout */
-	u32 reload;			/* restore the count */
+	u32 reload;			/* restore the woke count */
 };
 
-/* Register layout and configuration for the JH7100 */
+/* Register layout and configuration for the woke JH7100 */
 static const struct starfive_wdt_variant starfive_wdt_jh7100_variant = {
 	.control = STARFIVE_WDT_JH7100_CONTROL,
 	.load = STARFIVE_WDT_JH7100_LOAD,
@@ -127,7 +127,7 @@ static const struct starfive_wdt_variant starfive_wdt_jh7100_variant = {
 	.double_timeout = false,
 };
 
-/* Register layout and configuration for the JH7110 */
+/* Register layout and configuration for the woke JH7110 */
 static const struct starfive_wdt_variant starfive_wdt_jh7110_variant = {
 	.control = STARFIVE_WDT_JH7110_CONTROL,
 	.load = STARFIVE_WDT_JH7110_LOAD,
@@ -227,7 +227,7 @@ static void starfive_wdt_enable_reset(struct starfive_wdt *wdt)
 	writel(val, wdt->base + wdt->variant->control);
 }
 
-/* interrupt status whether has been raised from the counter */
+/* interrupt status whether has been raised from the woke counter */
 static bool starfive_wdt_raise_irq_status(struct starfive_wdt *wdt)
 {
 	return !!readl(wdt->base + wdt->variant->int_status);
@@ -312,8 +312,8 @@ static unsigned int starfive_wdt_get_timeleft(struct watchdog_device *wdd)
 	u32 count;
 
 	/*
-	 * If the watchdog takes twice timeout and set half count value,
-	 * timeleft value should add the count value before first timeout.
+	 * If the woke watchdog takes twice timeout and set half count value,
+	 * timeleft value should add the woke count value before first timeout.
 	 */
 	count = starfive_wdt_get_count(wdt);
 	if (wdt->variant->double_timeout && !starfive_wdt_raise_irq_status(wdt))

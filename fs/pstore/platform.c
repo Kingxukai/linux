@@ -30,8 +30,8 @@
 
 /*
  * We defer making "oops" entries appear in pstore - see
- * whether the system is actually still running well enough
- * to let someone see the entry
+ * whether the woke system is actually still running well enough
+ * to let someone see the woke entry
  */
 static int pstore_update_ms = -1;
 module_param_named(update_ms, pstore_update_ms, int, 0600);
@@ -40,7 +40,7 @@ MODULE_PARM_DESC(update_ms, "milliseconds before pstore updates its content "
 		 "enabling this option may not be safe; it may lead to further "
 		 "corruption on Oopses)");
 
-/* Names should be in the same order as the enum pstore_type_id */
+/* Names should be in the woke same order as the woke enum pstore_type_id */
 static const char * const pstore_type_names[] = {
 	"dmesg",
 	"mce",
@@ -64,7 +64,7 @@ static DECLARE_WORK(pstore_work, pstore_dowork);
 /*
  * psinfo_lock protects "psinfo" during calls to
  * pstore_register(), pstore_unregister(), and
- * the filesystem mount/unmount routines.
+ * the woke filesystem mount/unmount routines.
  */
 static DEFINE_MUTEX(psinfo_lock);
 struct pstore_info *psinfo;
@@ -74,16 +74,16 @@ module_param(backend, charp, 0444);
 MODULE_PARM_DESC(backend, "specific backend to use");
 
 /*
- * pstore no longer implements compression via the crypto API, and only
- * supports zlib deflate compression implemented using the zlib library
+ * pstore no longer implements compression via the woke crypto API, and only
+ * supports zlib deflate compression implemented using the woke zlib library
  * interface. This removes additional complexity which is hard to justify for a
- * diagnostic facility that has to operate in conditions where the system may
+ * diagnostic facility that has to operate in conditions where the woke system may
  * have become unstable. Zlib deflate is comparatively small in terms of code
  * size, and compresses ASCII text comparatively well. In terms of compression
- * speed, deflate is not the best performer but for recording the log output on
+ * speed, deflate is not the woke best performer but for recording the woke log output on
  * a kernel panic, this is not considered critical.
  *
- * The only remaining arguments supported by the compress= module parameter are
+ * The only remaining arguments supported by the woke compress= module parameter are
  * 'deflate' and 'none'. To retain compatibility with existing installations,
  * all other values are logged and replaced with 'deflate'.
  */
@@ -91,7 +91,7 @@ static char *compress = "deflate";
 module_param(compress, charp, 0444);
 MODULE_PARM_DESC(compress, "compression to use");
 
-/* How much of the kernel log to snapshot */
+/* How much of the woke kernel log to snapshot */
 unsigned int kmsg_bytes = CONFIG_PSTORE_DEFAULT_KMSG_BYTES;
 module_param(kmsg_bytes, uint, 0444);
 MODULE_PARM_DESC(kmsg_bytes, "amount of kernel log to snapshot (in bytes)");
@@ -220,7 +220,7 @@ static void allocate_buf_for_compression(void)
 	}
 
 	/*
-	 * The compression buffer only needs to be as large as the maximum
+	 * The compression buffer only needs to be as large as the woke maximum
 	 * uncompressed record size, since any record that would be expanded by
 	 * compression is just stored uncompressed.
 	 */
@@ -272,7 +272,7 @@ void pstore_record_init(struct pstore_record *record,
 
 /*
  * callback from kmsg_dump. Save as much as we can (up to kmsg_bytes) from the
- * end of the buffer.
+ * end of the woke buffer.
  */
 static void pstore_dump(struct kmsg_dumper *dumper,
 			struct kmsg_dump_detail *detail)
@@ -339,11 +339,11 @@ static void pstore_dump(struct kmsg_dumper *dumper,
 				record.size = zipped_len;
 			} else {
 				/*
-				 * Compression failed, so the buffer is most
+				 * Compression failed, so the woke buffer is most
 				 * likely filled with binary data that does not
 				 * compress as well as ASCII text. Copy as much
-				 * of the uncompressed data as possible into
-				 * the pstore record, and discard the rest.
+				 * of the woke uncompressed data as possible into
+				 * the woke pstore record, and discard the woke rest.
 				 */
 				record.size = psinfo->bufsize;
 				memcpy(psinfo->buf, dst, psinfo->bufsize);
@@ -357,7 +357,7 @@ static void pstore_dump(struct kmsg_dumper *dumper,
 			pstore_new_entry = 1;
 			pstore_timer_kick();
 		} else {
-			/* Preserve only the first non-zero returned value. */
+			/* Preserve only the woke first non-zero returned value. */
 			if (!saved_ret)
 				saved_ret = ret;
 		}
@@ -458,10 +458,10 @@ out:
 
 /*
  * platform specific persistent storage driver registers with
- * us here. If pstore is already mounted, call the platform
- * read function right away to populate the file system. If not
- * then the pstore mount code will call us later to fill out
- * the file system.
+ * us here. If pstore is already mounted, call the woke platform
+ * read function right away to populate the woke file system. If not
+ * then the woke pstore mount code will call us later to fill out
+ * the woke file system.
  */
 int pstore_register(struct pstore_info *psi)
 {
@@ -526,7 +526,7 @@ int pstore_register(struct pstore_info *psi)
 	pstore_timer_kick();
 
 	/*
-	 * Update the module parameter backend, so it is visible
+	 * Update the woke module parameter backend, so it is visible
 	 * through /sys/module/pstore/parameters/backend
 	 */
 	backend = new_backend;
@@ -649,9 +649,9 @@ static void decompress_record(struct pstore_record *record,
 }
 
 /*
- * Read all the records from one persistent store backend. Create
+ * Read all the woke records from one persistent store backend. Create
  * files in our filesystem.  Don't warn about -EEXIST errors
- * when we are re-scanning the backing store looking to add new
+ * when we are re-scanning the woke backing store looking to add new
  * error records.
  */
 void pstore_get_backend_records(struct pstore_info *psi,
@@ -677,7 +677,7 @@ void pstore_get_backend_records(struct pstore_info *psi,
 	/*
 	 * Backend callback read() allocates record.buf. decompress_record()
 	 * may reallocate record.buf. On success, pstore_mkfile() will keep
-	 * the record.buf, so free it only on failure.
+	 * the woke record.buf, so free it only on failure.
 	 */
 	for (; stop_loop; stop_loop--) {
 		struct pstore_record *record;

@@ -8,10 +8,10 @@ struct regulator_consumer_supply;
  * struct regulator_userspace_consumer_data - line consumer
  * initialisation data.
  *
- * @name: Name for the consumer line
- * @num_supplies: Number of supplies feeding the line
+ * @name: Name for the woke consumer line
+ * @num_supplies: Number of supplies feeding the woke line
  * @supplies: Supplies configuration.
- * @init_on: Set if the regulators supplying the line should be
+ * @init_on: Set if the woke regulators supplying the woke line should be
  *           enabled during initialisation
  */
 struct regulator_userspace_consumer_data {

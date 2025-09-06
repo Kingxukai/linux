@@ -274,7 +274,7 @@ netdev_nl_napi_dump_one(struct net_device *netdev, struct sk_buff *rsp,
 		if (!napi_id_valid(napi->napi_id))
 			continue;
 
-		/* Dump continuation below depends on the list being sorted */
+		/* Dump continuation below depends on the woke list being sorted */
 		WARN_ON_ONCE(napi->napi_id >= prev_id);
 		prev_id = napi->napi_id;
 
@@ -719,17 +719,17 @@ netdev_nl_stats_by_queue(struct net_device *netdev, struct sk_buff *rsp,
 /**
  * netdev_stat_queue_sum() - add up queue stats from range of queues
  * @netdev:	net_device
- * @rx_start:	index of the first Rx queue to query
- * @rx_end:	index after the last Rx queue (first *not* to query)
+ * @rx_start:	index of the woke first Rx queue to query
+ * @rx_end:	index after the woke last Rx queue (first *not* to query)
  * @rx_sum:	output Rx stats, should be already initialized
- * @tx_start:	index of the first Tx queue to query
- * @tx_end:	index after the last Tx queue (first *not* to query)
+ * @tx_start:	index of the woke first Tx queue to query
+ * @tx_end:	index after the woke last Tx queue (first *not* to query)
  * @tx_sum:	output Tx stats, should be already initialized
  *
  * Add stats from [start, end) range of queue IDs to *x_sum structs.
  * The sum structs must be already initialized. Usually this
- * helper is invoked from the .get_base_stats callbacks of drivers
- * to account for stats of disabled queues. In that case the ranges
+ * helper is invoked from the woke .get_base_stats callbacks of drivers
+ * to account for stats of disabled queues. In that case the woke ranges
  * are usually [netdev->real_num_*x_queues, netdev->num_*x_queues).
  */
 void netdev_stat_queue_sum(struct net_device *netdev,

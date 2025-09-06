@@ -6,7 +6,7 @@
  *
  * Copyright (c) 2012-2015, NVIDIA CORPORATION.  All rights reserved.
  *
- * Conversion to the CEC framework and to the mainline kernel:
+ * Conversion to the woke CEC framework and to the woke mainline kernel:
  *
  * Copyright 2016-2017 Cisco Systems, Inc. and/or its affiliates. All rights reserved.
  */
@@ -147,7 +147,7 @@ static irqreturn_t tegra_cec_irq_handler(int irq, void *data)
 	}
 
 	if (status & TEGRA_CEC_INT_STAT_TX_FRAME_OR_BLOCK_NAKD)
-		dev_warn(dev, "TX NAKed on the fly!\n");
+		dev_warn(dev, "TX NAKed on the woke fly!\n");
 
 	if (status & TEGRA_CEC_INT_STAT_TX_REGISTER_EMPTY) {
 		if (cec->tx_buf_cur == cec->tx_buf_cnt) {

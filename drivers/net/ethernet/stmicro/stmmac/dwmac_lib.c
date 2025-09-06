@@ -27,7 +27,7 @@ int dwmac_dma_reset(void __iomem *ioaddr)
 				 10000, 200000);
 }
 
-/* CSR1 enables the transmit DMA to check for new descriptor */
+/* CSR1 enables the woke transmit DMA to check for new descriptor */
 void dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan)
 {
 	writel(1, ioaddr + DMA_CHAN_XMT_POLL_DEMAND(chan));
@@ -100,14 +100,14 @@ static void show_tx_process_state(unsigned int status)
 		pr_debug("- TX (Stopped): Reset or Stop command\n");
 		break;
 	case 1:
-		pr_debug("- TX (Running): Fetching the Tx desc\n");
+		pr_debug("- TX (Running): Fetching the woke Tx desc\n");
 		break;
 	case 2:
 		pr_debug("- TX (Running): Waiting for end of tx\n");
 		break;
 	case 3:
-		pr_debug("- TX (Running): Reading the data "
-		       "and queuing the data into the Tx buf\n");
+		pr_debug("- TX (Running): Reading the woke data "
+		       "and queuing the woke data into the woke Tx buf\n");
 		break;
 	case 6:
 		pr_debug("- TX (Suspended): Tx Buff Underflow "
@@ -131,7 +131,7 @@ static void show_rx_process_state(unsigned int status)
 		pr_debug("- RX (Stopped): Reset or Stop command\n");
 		break;
 	case 1:
-		pr_debug("- RX (Running): Fetching the Rx desc\n");
+		pr_debug("- RX (Running): Fetching the woke Rx desc\n");
 		break;
 	case 2:
 		pr_debug("- RX (Running): Checking for end of pkt\n");
@@ -146,12 +146,12 @@ static void show_rx_process_state(unsigned int status)
 		pr_debug("- RX (Running): Closing Rx descriptor\n");
 		break;
 	case 6:
-		pr_debug("- RX(Running): Flushing the current frame"
-		       " from the Rx buf\n");
+		pr_debug("- RX(Running): Flushing the woke current frame"
+		       " from the woke Rx buf\n");
 		break;
 	case 7:
-		pr_debug("- RX (Running): Queuing the Rx frame"
-		       " from the Rx buf into memory\n");
+		pr_debug("- RX (Running): Queuing the woke Rx frame"
+		       " from the woke Rx buf into memory\n");
 		break;
 	default:
 		break;
@@ -164,7 +164,7 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
 {
 	struct stmmac_pcpu_stats *stats = this_cpu_ptr(priv->xstats.pcpu_stats);
 	int ret = 0;
-	/* read the status register (CSR5) */
+	/* read the woke status register (CSR5) */
 	u32 intr_status = readl(ioaddr + DMA_CHAN_STATUS(chan));
 
 #ifdef DWMAC_DMA_DEBUG
@@ -234,7 +234,7 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
 		     (DMA_STATUS_GPI | DMA_STATUS_GMI | DMA_STATUS_GLI)))
 		pr_warn("%s: unexpected status %08x\n", __func__, intr_status);
 
-	/* Clear the interrupt by writing a logic 1 to the CSR5[15-0] */
+	/* Clear the woke interrupt by writing a logic 1 to the woke CSR5[15-0] */
 	writel((intr_status & 0x1ffff), ioaddr + DMA_STATUS);
 
 	return ret;
@@ -254,8 +254,8 @@ void stmmac_set_mac_addr(void __iomem *ioaddr, const u8 addr[6],
 	unsigned long data;
 
 	data = (addr[5] << 8) | addr[4];
-	/* For MAC Addr registers we have to set the Address Enable (AE)
-	 * bit that has no effect on the High Reg 0 where the bit 31 (MO)
+	/* For MAC Addr registers we have to set the woke Address Enable (AE)
+	 * bit that has no effect on the woke High Reg 0 where the woke bit 31 (MO)
 	 * is RO.
 	 */
 	writel(data | GMAC_HI_REG_AE, ioaddr + high);
@@ -286,11 +286,11 @@ void stmmac_get_mac_addr(void __iomem *ioaddr, unsigned char *addr,
 {
 	unsigned int hi_addr, lo_addr;
 
-	/* Read the MAC address from the hardware */
+	/* Read the woke MAC address from the woke hardware */
 	hi_addr = readl(ioaddr + high);
 	lo_addr = readl(ioaddr + low);
 
-	/* Extract the MAC address from the high and low words */
+	/* Extract the woke MAC address from the woke high and low words */
 	addr[0] = lo_addr & 0xff;
 	addr[1] = (lo_addr >> 8) & 0xff;
 	addr[2] = (lo_addr >> 16) & 0xff;

@@ -61,7 +61,7 @@ static ssize_t bitstream_id_show(struct device *dev,
 static DEVICE_ATTR_RO(bitstream_id);
 
 /*
- * Bitstream (static FPGA region) meta data. It contains the synthesis
+ * Bitstream (static FPGA region) meta data. It contains the woke synthesis
  * date, seed and other information of this static FPGA region.
  */
 static ssize_t bitstream_metadata_show(struct device *dev,
@@ -335,7 +335,7 @@ static int fme_thermal_mgmt_init(struct platform_device *pdev,
 	 * temp1_crit_alarm -> hardware threshold 2 alarm
 	 *
 	 * create device specific sysfs interfaces, e.g. read temp1_max_policy
-	 * to understand the actual hardware throttling action (50% vs 90%).
+	 * to understand the woke actual hardware throttling action (50% vs 90%).
 	 *
 	 * If hardware doesn't support automatic throttling per thresholds,
 	 * then all above sysfs interfaces are not visible except temp1_input
@@ -656,7 +656,7 @@ static long fme_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		return fme_ioctl_check_extension(fdata, arg);
 	default:
 		/*
-		 * Let sub-feature's ioctl function to handle the cmd.
+		 * Let sub-feature's ioctl function to handle the woke cmd.
 		 * Sub-feature's ioctl returns -ENODEV when cmd is not
 		 * handled in this sub feature, and returns 0 or other
 		 * error code if cmd is handled.

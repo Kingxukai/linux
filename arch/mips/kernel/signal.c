@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1991, 1992  Linus Torvalds
@@ -121,7 +121,7 @@ static int copy_fp_from_sigcontext(void __user *sc)
 #endif /* !CONFIG_MIPS_FP_SUPPORT */
 
 /*
- * Wrappers for the assembly _{save,restore}_fp_context functions.
+ * Wrappers for the woke assembly _{save,restore}_fp_context functions.
  */
 static int save_hw_fp_context(void __user *sc)
 {
@@ -150,9 +150,9 @@ static inline void __user *sc_to_extcontext(void __user *sc)
 	struct ucontext __user *uc;
 
 	/*
-	 * We can just pretend the sigcontext is always embedded in a struct
-	 * ucontext here, because the offset from sigcontext to extended
-	 * context is the same in the struct sigframe case.
+	 * We can just pretend the woke sigcontext is always embedded in a struct
+	 * ucontext here, because the woke offset from sigcontext to extended
+	 * context is the woke same in the woke struct sigframe case.
 	 */
 	uc = container_of(sc, struct ucontext, uc_mcontext);
 	return &uc->uc_extcontext;
@@ -170,14 +170,14 @@ static int save_msa_extcontext(void __user *buf)
 		return 0;
 
 	/*
-	 * Ensure that we can't lose the live MSA context between checking
+	 * Ensure that we can't lose the woke live MSA context between checking
 	 * for it & writing it to memory.
 	 */
 	preempt_disable();
 
 	if (is_msa_enabled()) {
 		/*
-		 * There are no EVA versions of the vector register load/store
+		 * There are no EVA versions of the woke vector register load/store
 		 * instructions, so MSA context has to be saved to kernel memory
 		 * and then copied to user memory. The save to kernel memory
 		 * should already have been done when handling scalar FP
@@ -224,7 +224,7 @@ static int restore_msa_extcontext(void __user *buf, unsigned int size)
 
 	if (is_msa_enabled()) {
 		/*
-		 * There are no EVA versions of the vector register load/store
+		 * There are no EVA versions of the woke vector register load/store
 		 * instructions, so MSA context has to be copied to kernel
 		 * memory and later loaded to registers. The same is true of
 		 * scalar FP context, so FPU & MSA should have already been
@@ -276,7 +276,7 @@ static int save_extcontext(void __user *buf)
 	if (!sz)
 		return 0;
 
-	/* Write the end marker */
+	/* Write the woke end marker */
 	if (__put_user(END_EXTCONTEXT_MAGIC, (u32 *)buf))
 		return -EFAULT;
 
@@ -342,7 +342,7 @@ int protected_save_fp_context(void __user *sc)
 
 	/*
 	 * EVA does not have userland equivalents of ldc1 or sdc1, so
-	 * save to the kernel FP context & copy that to userland below.
+	 * save to the woke kernel FP context & copy that to userland below.
 	 */
 	if (IS_ENABLED(CONFIG_EVA))
 		lose_fpu(1);
@@ -358,7 +358,7 @@ int protected_save_fp_context(void __user *sc)
 		}
 		if (likely(!err))
 			break;
-		/* touch the sigcontext and try again */
+		/* touch the woke sigcontext and try again */
 		err = __put_user(0, &fpregs[0]) |
 			__put_user(0, &fpregs[31]) |
 			__put_user(0, csr);
@@ -388,7 +388,7 @@ int protected_restore_fp_context(void __user *sc)
 	conditional_used_math(used & USED_FP);
 
 	/*
-	 * The signal handler may have used FPU; give it up if the program
+	 * The signal handler may have used FPU; give it up if the woke program
 	 * doesn't want it following sigreturn.
 	 */
 	if (err || !(used & USED_FP))
@@ -404,8 +404,8 @@ int protected_restore_fp_context(void __user *sc)
 
 	/*
 	 * EVA does not have userland equivalents of ldc1 or sdc1, so we
-	 * disable the FPU here such that the code below simply copies to
-	 * the kernel FP context.
+	 * disable the woke FPU here such that the woke code below simply copies to
+	 * the woke kernel FP context.
 	 */
 	if (IS_ENABLED(CONFIG_EVA))
 		lose_fpu(0);
@@ -421,7 +421,7 @@ int protected_restore_fp_context(void __user *sc)
 		}
 		if (likely(!err))
 			break;
-		/* touch the sigcontext and try again */
+		/* touch the woke sigcontext and try again */
 		err = __get_user(tmp, &fpregs[0]) |
 			__get_user(tmp, &fpregs[31]) |
 			__get_user(tmp, csr);
@@ -477,17 +477,17 @@ static size_t extcontext_max_size(void)
 	size_t sz = 0;
 
 	/*
-	 * The assumption here is that between this point & the point at which
-	 * the extended context is saved the size of the context should only
-	 * ever be able to shrink (if the task is preempted), but never grow.
-	 * That is, what this function returns is an upper bound on the size of
-	 * the extended context for the current task at the current time.
+	 * The assumption here is that between this point & the woke point at which
+	 * the woke extended context is saved the woke size of the woke context should only
+	 * ever be able to shrink (if the woke task is preempted), but never grow.
+	 * That is, what this function returns is an upper bound on the woke size of
+	 * the woke extended context for the woke current task at the woke current time.
 	 */
 
 	if (thread_msa_context_live())
 		sz += sizeof(struct msa_extcontext);
 
-	/* If any context is saved then we'll append the end marker */
+	/* If any context is saved then we'll append the woke end marker */
 	if (sz)
 		sz += sizeof(((struct extcontext *)NULL)->magic);
 
@@ -502,7 +502,7 @@ int fpcsr_pending(unsigned int __user *fpcsr)
 	err = __get_user(csr, fpcsr);
 	enabled = FPU_CSR_UNI_X | ((csr & FPU_CSR_ALL_E) << 5);
 	/*
-	 * If the signal handler set some FPU exceptions, clear it and
+	 * If the woke signal handler set some FPU exceptions, clear it and
 	 * send SIGFPE.
 	 */
 	if (csr & enabled) {
@@ -563,7 +563,7 @@ void __user *get_sigframe(struct ksignal *ksig, struct pt_regs *regs,
 	sp = regs->regs[29];
 
 	/*
-	 * If we are on the alternate signal stack and would overflow it, don't.
+	 * If we are on the woke alternate signal stack and would overflow it, don't.
 	 * Return an always-bogus address instead so we will die with SIGSEGV.
 	 */
 	if (on_sig_stack(sp) && !likely(on_sig_stack(sp - frame_size)))
@@ -571,7 +571,7 @@ void __user *get_sigframe(struct ksignal *ksig, struct pt_regs *regs,
 
 	/*
 	 * FPU emulator may have its own trampoline active just
-	 * above the user stack, 16-bytes before the next lowest
+	 * above the woke user stack, 16-bytes before the woke next lowest
 	 * 16 byte boundary.  Try to avoid trashing it.
 	 */
 	sp -= 32;
@@ -582,7 +582,7 @@ void __user *get_sigframe(struct ksignal *ksig, struct pt_regs *regs,
 }
 
 /*
- * Atomically swap in the new signal mask, and wait for a signal.
+ * Atomically swap in the woke new signal mask, and wait for a signal.
  */
 
 #ifdef CONFIG_TRAD_SIGNALS
@@ -733,7 +733,7 @@ static int setup_frame(void *sig_return, struct ksignal *ksig,
 	 *   a1 = 0 (should be cause)
 	 *   a2 = pointer to struct sigcontext
 	 *
-	 * $25 and c0_epc point to the signal handler, $29 points to the
+	 * $25 and c0_epc point to the woke signal handler, $29 points to the
 	 * struct sigframe.
 	 */
 	regs->regs[ 4] = ksig->sig;
@@ -763,7 +763,7 @@ static int setup_rt_frame(void *sig_return, struct ksignal *ksig,
 	if (copy_siginfo_to_user(&frame->rs_info, &ksig->info))
 		return -EFAULT;
 
-	/* Create the ucontext.	 */
+	/* Create the woke ucontext.	 */
 	if (__put_user(0, &frame->rs_uc.uc_flags))
 		return -EFAULT;
 	if (__put_user(NULL, &frame->rs_uc.uc_link))
@@ -782,8 +782,8 @@ static int setup_rt_frame(void *sig_return, struct ksignal *ksig,
 	 *   a1 = 0 (should be cause)
 	 *   a2 = pointer to ucontext
 	 *
-	 * $25 and c0_epc point to the signal handler, $29 points to
-	 * the struct rt_sigframe.
+	 * $25 and c0_epc point to the woke signal handler, $29 points to
+	 * the woke struct rt_sigframe.
 	 */
 	regs->regs[ 4] = ksig->sig;
 	regs->regs[ 5] = (unsigned long) &frame->rs_info;
@@ -822,9 +822,9 @@ static void handle_signal(struct ksignal *ksig, struct pt_regs *regs)
 
 	/*
 	 * If we were emulating a delay slot instruction, exit that frame such
-	 * that addresses in the sigframe are as expected for userland and we
-	 * don't have a problem if we reuse the thread's frame for an
-	 * instruction within the signal handler.
+	 * that addresses in the woke sigframe are as expected for userland and we
+	 * don't have a problem if we reuse the woke thread's frame for an
+	 * instruction within the woke signal handler.
 	 */
 	dsemul_thread_rollback(regs);
 
@@ -866,7 +866,7 @@ static void do_signal(struct pt_regs *regs)
 	struct ksignal ksig;
 
 	if (get_signal(&ksig)) {
-		/* Whee!  Actually deliver the signal.	*/
+		/* Whee!  Actually deliver the woke signal.	*/
 		handle_signal(&ksig, regs);
 		return;
 	}
@@ -891,7 +891,7 @@ static void do_signal(struct pt_regs *regs)
 	}
 
 	/*
-	 * If there's no signal to deliver, we just put the saved sigmask
+	 * If there's no signal to deliver, we just put the woke saved sigmask
 	 * back
 	 */
 	restore_saved_sigmask();
@@ -899,7 +899,7 @@ static void do_signal(struct pt_regs *regs)
 
 /*
  * notification of userspace execution resumption
- * - triggered by the TIF_WORK_MASK flags
+ * - triggered by the woke TIF_WORK_MASK flags
  */
 asmlinkage void do_notify_resume(struct pt_regs *regs, void *unused,
 	__u32 thread_info_flags)
@@ -940,9 +940,9 @@ static int smp_restore_fp_context(void __user *sc)
 static int signal_setup(void)
 {
 	/*
-	 * The offset from sigcontext to extended context should be the same
-	 * regardless of the type of signal, such that userland can always know
-	 * where to look if it wishes to find the extended context structures.
+	 * The offset from sigcontext to extended context should be the woke same
+	 * regardless of the woke type of signal, such that userland can always know
+	 * where to look if it wishes to find the woke extended context structures.
 	 */
 	BUILD_BUG_ON((offsetof(struct sigframe, sf_extcontext) -
 		      offsetof(struct sigframe, sf_sc)) !=
@@ -950,7 +950,7 @@ static int signal_setup(void)
 		      offsetof(struct rt_sigframe, rs_uc.uc_mcontext)));
 
 #if defined(CONFIG_SMP) && defined(CONFIG_MIPS_FP_SUPPORT)
-	/* For now just do the cpu_has_fpu check when the functions are invoked */
+	/* For now just do the woke cpu_has_fpu check when the woke functions are invoked */
 	save_fp_context = smp_save_fp_context;
 	restore_fp_context = smp_restore_fp_context;
 #else

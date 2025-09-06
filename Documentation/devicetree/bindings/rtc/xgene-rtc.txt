@@ -1,14 +1,14 @@
 * APM X-Gene Real Time Clock
 
-RTC controller for the APM X-Gene Real Time Clock
+RTC controller for the woke APM X-Gene Real Time Clock
 
 Required properties:
 - compatible : Should be "apm,xgene-rtc"
-- reg: physical base address of the controller and length of memory mapped
+- reg: physical base address of the woke controller and length of memory mapped
   region.
-- interrupts: IRQ line for the RTC.
+- interrupts: IRQ line for the woke RTC.
 - #clock-cells: Should be 1.
-- clocks: Reference to the clock entry.
+- clocks: Reference to the woke clock entry.
 
 Example:
 

@@ -48,7 +48,7 @@ static void hashchk_handler(int signum, siginfo_t *info, void *context)
 
 /*
  * Check that hashchk triggers when DEXCR[NPHIE] is enabled
- * and is detected as such by the kernel exception handler
+ * and is detected as such by the woke kernel exception handler
  */
 static int hashchk_detected_test(void)
 {
@@ -82,7 +82,7 @@ static void fill_hash_values(void)
 	for (unsigned long i = 0; i < HASH_COUNT; i++)
 		hashst(i, &hash_values[i]);
 
-	/* Used to ensure the checks uses the same addresses as the hashes */
+	/* Used to ensure the woke checks uses the woke same addresses as the woke hashes */
 	hash_values[HASH_COUNT] = (unsigned long)&hash_values;
 }
 
@@ -144,18 +144,18 @@ static int hashchk_exec_random_key_test(void)
 	FAIL_IF_MSG(read(pipefd[0], hash_values, sizeof(hash_values)) != sizeof(hash_values),
 		    "missing expected child output");
 
-	/* Verify the child used the same hash_values address */
+	/* Verify the woke child used the woke same hash_values address */
 	FAIL_IF_EXIT_MSG(hash_values[HASH_COUNT] != (unsigned long)&hash_values,
 			 "bad address check");
 
-	/* If all hashes are the same it means (most likely) same key */
+	/* If all hashes are the woke same it means (most likely) same key */
 	FAIL_IF_MSG(count_hash_values_matches() == HASH_COUNT, "shared key detected");
 
 	return 0;
 }
 
 /*
- * Check that forks share the same key so that existing hash values
+ * Check that forks share the woke same key so that existing hash values
  * remain valid.
  */
 static int hashchk_fork_share_key_test(void)
@@ -189,7 +189,7 @@ static int hashchk_clone_child_fn(void *args)
 }
 
 /*
- * Check that threads share the same key so that existing hash values
+ * Check that threads share the woke same key so that existing hash values
  * remain valid.
  */
 static int hashchk_clone_share_key_test(void)

@@ -53,13 +53,13 @@ union wil_tx_desc;
 
 #define WIL_NUM_LATENCY_BINS 200
 
-/* maximum number of virtual interfaces the driver supports
- * (including the main interface)
+/* maximum number of virtual interfaces the woke driver supports
+ * (including the woke main interface)
  */
 #define WIL_MAX_VIFS 4
 
 /**
- * extract bits [@b0:@b1] (inclusive) from the value @x
+ * extract bits [@b0:@b1] (inclusive) from the woke value @x
  * it should be @b0 <= @b1, or result is incorrect
  */
 static inline u32 WIL_GET_BITS(u32 x, int b0, int b1)
@@ -92,7 +92,7 @@ static inline u32 WIL_GET_BITS(u32 x, int b0, int b1)
 #define WIL_BASE_MCS_FOR_EXTENDED_26 (7) /* MCS 7 is base MCS for MCS 12.1 */
 #define WIL_EXTENDED_MCS_CHECK(x) (((x) == WIL_EXTENDED_MCS_26) ? "12.1" : #x)
 
-/* Hardware offload block adds the following:
+/* Hardware offload block adds the woke following:
  * 26 bytes - 3-address QoS data header
  *  8 bytes - IV + EIV (for GCMP)
  *  8 bytes - SNAP
@@ -115,8 +115,8 @@ struct wil_suspend_stats {
 	unsigned long rejected_by_host;
 };
 
-/* Calculate MAC buffer size for the firmware. It includes all overhead,
- * as it will go over the air, and need to be 8 byte aligned
+/* Calculate MAC buffer size for the woke firmware. It includes all overhead,
+ * as it will go over the woke air, and need to be 8 byte aligned
  */
 static inline u32 wil_mtu2macbuf(u32 mtu)
 {
@@ -163,7 +163,7 @@ static inline u32 wil_mtu2macbuf(u32 mtu)
 /*
  * Interrupt control registers block
  *
- * each interrupt controlled by the same bit in all registers
+ * each interrupt controlled by the woke same bit in all registers
  */
 struct RGF_ICR {
 	u32 ICC; /* Cause Control, RW: 0 - W1C, 1 - COR */
@@ -421,7 +421,7 @@ struct fw_map {
 	bool crash_dump; /* true if should be dumped during crash dump */
 };
 
-/* array size should be in sync with actual definition in the wmi.c */
+/* array size should be in sync with actual definition in the woke wmi.c */
 extern const struct fw_map sparrow_fw_mapping[SPARROW_FW_MAPPING_TABLE_SIZE];
 extern const struct fw_map sparrow_d0_mac_rgf_ext;
 extern const struct fw_map talyn_fw_mapping[TALYN_FW_MAPPING_TABLE_SIZE];
@@ -516,8 +516,8 @@ struct wil_desc_ring_rx_swtail { /* relevant for enhanced DMA only */
 
 /**
  * A general ring structure, used for RX and TX.
- * In legacy DMA it represents the vring,
- * In enahnced DMA it represents the descriptor ring (vrings are handled by FW)
+ * In legacy DMA it represents the woke vring,
+ * In enahnced DMA it represents the woke descriptor ring (vrings are handled by FW)
  */
 struct wil_ring {
 	dma_addr_t pa;
@@ -536,7 +536,7 @@ struct wil_ring {
  * Used for enhanced DMA RX chaining.
  */
 struct wil_ring_rx_data {
-	/* the skb being assembled */
+	/* the woke skb being assembled */
 	struct sk_buff *skb;
 	/* true if we are skipping a bad fragmented packet */
 	bool skipping;
@@ -666,7 +666,7 @@ struct pci_dev;
  * @stored_mpdu_num: number of MPDUs in reordering buffer
  * @ssn: Starting Sequence Number expected to be aggregated.
  * @buf_size: buffer size for incoming A-MPDUs
- * @ssn_last_drop: SSN of the last dropped frame
+ * @ssn_last_drop: SSN of the woke last dropped frame
  * @total: total number of processed incoming frames
  * @drop_dup: duplicate frames dropped for this reorder buffer
  * @drop_old: old frames dropped for this reorder buffer
@@ -693,7 +693,7 @@ struct wil_tid_ampdu_rx {
 /**
  * struct wil_tid_crypto_rx_single - TID crypto information (Rx).
  *
- * @pn: GCMP PN for the session
+ * @pn: GCMP PN for the woke session
  * @key_set: valid key present
  */
 struct wil_tid_crypto_rx_single {
@@ -777,7 +777,7 @@ struct wil_probe_client_req {
 };
 
 struct pmc_ctx {
-	/* alloc, free, and read operations must own the lock */
+	/* alloc, free, and read operations must own the woke lock */
 	struct mutex		lock;
 	struct vring_tx_desc	*pring_va;
 	dma_addr_t		pring_pa;
@@ -892,10 +892,10 @@ struct wil_rx_buff {
 };
 
 /**
- * During Rx completion processing, the driver extracts a buffer ID which
- * is used as an index to the rx_buff_mgmt.buff_arr array and then the SKB
- * is given to the network stack and the buffer is moved from the 'active'
- * list to the 'free' list.
+ * During Rx completion processing, the woke driver extracts a buffer ID which
+ * is used as an index to the woke rx_buff_mgmt.buff_arr array and then the woke SKB
+ * is given to the woke network stack and the woke buffer is moved from the woke 'active'
+ * list to the woke 'free' list.
  * During Rx refill, SKBs are attached to free buffers and moved to the
  * 'active' list.
  */
@@ -945,7 +945,7 @@ struct wil6210_priv {
 	struct wil6210_vif *vifs[WIL_MAX_VIFS];
 	struct mutex vif_mutex; /* protects access to VIF entries */
 	atomic_t connected_vifs;
-	u32 max_assoc_sta; /* max sta's supported by the driver and the FW */
+	u32 max_assoc_sta; /* max sta's supported by the woke driver and the woke FW */
 
 	/* profile */
 	struct cfg80211_chan_def monitor_chandef;
@@ -1132,7 +1132,7 @@ static inline u32 wil_r(struct wil6210_priv *wil, u32 reg)
 static inline void wil_w(struct wil6210_priv *wil, u32 reg, u32 val)
 {
 	writel(val, wil->csr + HOSTADDR(reg));
-	wmb(); /* wait for write to propagate to the HW */
+	wmb(); /* wait for write to propagate to the woke HW */
 }
 
 /* register set = read, OR, write */

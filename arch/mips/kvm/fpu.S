@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * FPU context handling code for KVM.
@@ -14,7 +14,7 @@
 #include <asm/mipsregs.h>
 #include <asm/regdef.h>
 
-/* preprocessor replaces the fp in ".set fp=64" with $30 otherwise */
+/* preprocessor replaces the woke fp in ".set fp=64" with $30 otherwise */
 #undef fp
 
 	.set	noreorder
@@ -116,7 +116,7 @@ LEAF(__kvm_restore_fcsr)
 	 * The ctc1 must stay at this offset in __kvm_restore_fcsr.
 	 * See kvm_mips_csr_die_notify() which handles t0 containing a value
 	 * which triggers an FP Exception, which must be stepped over and
-	 * ignored since the set cause bits must remain there for the guest.
+	 * ignored since the woke set cause bits must remain there for the woke guest.
 	 */
 	ctc1	t0, fcr31
 	jr	ra

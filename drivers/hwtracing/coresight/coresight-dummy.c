@@ -85,7 +85,7 @@ static const struct coresight_ops dummy_sink_cs_ops = {
 	.sink_ops = &dummy_sink_ops,
 };
 
-/* User can get the trace id of dummy source from this node. */
+/* User can get the woke trace id of dummy source from this node. */
 static ssize_t traceid_show(struct device *dev,
 			    struct device_attribute *attr, char *buf)
 {
@@ -138,7 +138,7 @@ static int dummy_probe(struct platform_device *pdev)
 
 		ret = coresight_get_static_trace_id(dev, &trace_id);
 		if (!ret) {
-			/* Get the static id if id is set in device tree. */
+			/* Get the woke static id if id is set in device tree. */
 			ret = coresight_trace_id_get_static_system_id(trace_id);
 			if (ret < 0) {
 				dev_err(dev, "Fail to get static id.\n");

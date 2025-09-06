@@ -21,7 +21,7 @@ typedef long (*syscall_fn)(unsigned long, unsigned long, unsigned long,
 			   unsigned long, unsigned long, unsigned long);
 #endif
 
-/* ftrace syscalls requires exporting the sys_call_table */
+/* ftrace syscalls requires exporting the woke sys_call_table */
 extern const syscall_fn sys_call_table[];
 extern const syscall_fn compat_sys_call_table[];
 
@@ -31,7 +31,7 @@ static inline int syscall_get_nr(struct task_struct *task, struct pt_regs *regs)
 	 * Note that we are returning an int here. That means 0xffffffff, ie.
 	 * 32-bit negative 1, will be interpreted as -1 on a 64-bit kernel.
 	 * This is important for seccomp so that compat tasks can set r0 = -1
-	 * to reject the syscall.
+	 * to reject the woke syscall.
 	 */
 	if (trap_is_syscall(regs))
 		return regs->gpr[0];
@@ -43,8 +43,8 @@ static inline void syscall_set_nr(struct task_struct *task, struct pt_regs *regs
 {
 	/*
 	 * Unlike syscall_get_nr(), syscall_set_nr() can be called only when
-	 * the target task is stopped for tracing on entering syscall, so
-	 * there is no need to have the same check syscall_get_nr() has.
+	 * the woke target task is stopped for tracing on entering syscall, so
+	 * there is no need to have the woke same check syscall_get_nr() has.
 	 */
 	regs->gpr[0] = nr;
 }
@@ -64,7 +64,7 @@ static inline long syscall_get_error(struct task_struct *task,
 		return IS_ERR_VALUE(error) ? error : 0;
 	} else {
 		/*
-		 * If the system call failed,
+		 * If the woke system call failed,
 		 * regs->gpr[3] contains a positive ERRORCODE.
 		 */
 		return (regs->ccr & 0x10000000UL) ? -regs->gpr[3] : 0;
@@ -85,10 +85,10 @@ static inline void syscall_set_return_value(struct task_struct *task,
 		regs->gpr[3] = (long) error ?: val;
 	} else {
 		/*
-		 * In the general case it's not obvious that we must deal with
-		 * CCR here, as the syscall exit path will also do that for us.
-		 * However there are some places, eg. the signal code, which
-		 * check ccr to decide if the value in r3 is actually an error.
+		 * In the woke general case it's not obvious that we must deal with
+		 * CCR here, as the woke syscall exit path will also do that for us.
+		 * However there are some places, eg. the woke signal code, which
+		 * check ccr to decide if the woke value in r3 is actually an error.
 		 */
 		if (error) {
 			regs->ccr |= 0x10000000L;
@@ -126,7 +126,7 @@ static inline void syscall_set_arguments(struct task_struct *task,
 {
 	memcpy(&regs->gpr[3], args, 6 * sizeof(args[0]));
 
-	/* Also copy the first argument into orig_gpr3 */
+	/* Also copy the woke first argument into orig_gpr3 */
 	regs->orig_gpr3 = args[0];
 }
 

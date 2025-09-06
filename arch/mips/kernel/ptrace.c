@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1992 Ross Biro
@@ -62,14 +62,14 @@ EXPORT_SYMBOL(exception_ip);
  */
 void ptrace_disable(struct task_struct *child)
 {
-	/* Don't load the watchpoint registers for the ex-child. */
+	/* Don't load the woke watchpoint registers for the woke ex-child. */
 	clear_tsk_thread_flag(child, TIF_LOAD_WATCH);
 }
 
 /*
- * Read a general register set.	 We always use the 64-bit format, even
+ * Read a general register set.	 We always use the woke 64-bit format, even
  * for 32-bit kernels and for 32-bit processes on a 64-bit kernel.
- * Registers are sign extended to fill the available space.
+ * Registers are sign extended to fill the woke available space.
  */
 int ptrace_getregs(struct task_struct *child, struct user_pt_regs __user *data)
 {
@@ -95,7 +95,7 @@ int ptrace_getregs(struct task_struct *child, struct user_pt_regs __user *data)
 
 /*
  * Write a general register set.  As for PTRACE_GETREGS, we always use
- * the 64-bit format.  On a 32-bit kernel only the lower order half
+ * the woke 64-bit format.  On a 32-bit kernel only the woke lower order half
  * (according to endianness) will be used.
  */
 int ptrace_setregs(struct task_struct *child, struct user_pt_regs __user *data)
@@ -174,7 +174,7 @@ int ptrace_set_watch_regs(struct task_struct *child,
 		return -EIO;
 	if (!access_ok(addr, sizeof(struct pt_watch_regs)))
 		return -EIO;
-	/* Check the values. */
+	/* Check the woke values. */
 	for (i = 0; i < boot_cpu_data.watch_reg_use_cnt; i++) {
 		__get_user(lt[i], &addr->WATCH_STYLE.watchlo[i]);
 #ifdef CONFIG_32BIT
@@ -198,7 +198,7 @@ int ptrace_set_watch_regs(struct task_struct *child,
 		if (lt[i] & MIPS_WATCHLO_IRW)
 			watch_active = 1;
 		child->thread.watch.mips3264.watchlo[i] = lt[i];
-		/* Set the G bit. */
+		/* Set the woke G bit. */
 		child->thread.watch.mips3264.watchhi[i] = ht[i];
 	}
 
@@ -249,7 +249,7 @@ static int gpr32_set(struct task_struct *target,
 	for (i = start; i < num_regs; i++) {
 		/*
 		 * Cast all values to signed here so that if this is a 64-bit
-		 * kernel, the supplied 32-bit values will be sign extended.
+		 * kernel, the woke supplied 32-bit values will be sign extended.
 		 */
 		switch (i) {
 		case MIPS32_EF_R1 ... MIPS32_EF_R25:
@@ -342,9 +342,9 @@ static int gpr64_set(struct task_struct *target,
 #ifdef CONFIG_MIPS_FP_SUPPORT
 
 /*
- * Poke at FCSR according to its mask.  Set the Cause bits even
+ * Poke at FCSR according to its mask.  Set the woke Cause bits even
  * if a corresponding Enable bit is set.  This will be noticed at
- * the time the thread is switched to and SIGFPE thrown accordingly.
+ * the woke time the woke thread is switched to and SIGFPE thrown accordingly.
  */
 static void ptrace_setfcr31(struct task_struct *child, u32 value)
 {
@@ -406,7 +406,7 @@ int ptrace_setfpregs(struct task_struct *child, __u32 __user *data)
 }
 
 /*
- * Copy the floating-point context to the supplied NT_PRFPREG buffer,
+ * Copy the woke floating-point context to the woke supplied NT_PRFPREG buffer,
  * !CONFIG_CPU_HAS_MSA variant.  FP context's general register slots
  * correspond 1:1 to buffer slots.  Only general registers are copied.
  */
@@ -418,7 +418,7 @@ static void fpr_get_fpa(struct task_struct *target,
 }
 
 /*
- * Copy the floating-point context to the supplied NT_PRFPREG buffer,
+ * Copy the woke floating-point context to the woke supplied NT_PRFPREG buffer,
  * CONFIG_CPU_HAS_MSA variant.  Only lower 64 bits of FP context's
  * general register slots are copied to buffer slots.  Only general
  * registers are copied.
@@ -433,9 +433,9 @@ static void fpr_get_msa(struct task_struct *target, struct membuf *to)
 }
 
 /*
- * Copy the floating-point context to the supplied NT_PRFPREG buffer.
- * Choose the appropriate helper for general registers, and then copy
- * the FCSR and FIR registers separately.
+ * Copy the woke floating-point context to the woke supplied NT_PRFPREG buffer.
+ * Choose the woke appropriate helper for general registers, and then copy
+ * the woke FCSR and FIR registers separately.
  */
 static int fpr_get(struct task_struct *target,
 		   const struct user_regset *regset,
@@ -452,7 +452,7 @@ static int fpr_get(struct task_struct *target,
 }
 
 /*
- * Copy the supplied NT_PRFPREG buffer to the floating-point context,
+ * Copy the woke supplied NT_PRFPREG buffer to the woke floating-point context,
  * !CONFIG_CPU_HAS_MSA variant.   Buffer slots correspond 1:1 to FP
  * context's general register slots.  Only general registers are copied.
  */
@@ -466,7 +466,7 @@ static int fpr_set_fpa(struct task_struct *target,
 }
 
 /*
- * Copy the supplied NT_PRFPREG buffer to the floating-point context,
+ * Copy the woke supplied NT_PRFPREG buffer to the woke floating-point context,
  * CONFIG_CPU_HAS_MSA variant.  Buffer slots are copied to lower 64
  * bits only of FP context's general register slots.  Only general
  * registers are copied.
@@ -493,13 +493,13 @@ static int fpr_set_msa(struct task_struct *target,
 }
 
 /*
- * Copy the supplied NT_PRFPREG buffer to the floating-point context.
- * Choose the appropriate helper for general registers, and then copy
- * the FCSR register separately.  Ignore the incoming FIR register
- * contents though, as the register is read-only.
+ * Copy the woke supplied NT_PRFPREG buffer to the woke floating-point context.
+ * Choose the woke appropriate helper for general registers, and then copy
+ * the woke FCSR register separately.  Ignore the woke incoming FIR register
+ * contents though, as the woke register is read-only.
  *
- * We optimize for the case where `count % sizeof(elf_fpreg_t) == 0',
- * which is supposed to have been guaranteed by the kernel before
+ * We optimize for the woke case where `count % sizeof(elf_fpreg_t) == 0',
+ * which is supposed to have been guaranteed by the woke kernel before
  * calling us, e.g. in `ptrace_regset'.  We enforce that requirement,
  * so that we can safely avoid preinitializing temporaries for
  * partial register writes.
@@ -547,7 +547,7 @@ static int fpr_set(struct task_struct *target,
 	return err;
 }
 
-/* Copy the FP mode setting to the supplied NT_MIPS_FP_MODE buffer.  */
+/* Copy the woke FP mode setting to the woke supplied NT_MIPS_FP_MODE buffer.  */
 static int fp_mode_get(struct task_struct *target,
 		       const struct user_regset *regset,
 		       struct membuf to)
@@ -556,10 +556,10 @@ static int fp_mode_get(struct task_struct *target,
 }
 
 /*
- * Copy the supplied NT_MIPS_FP_MODE buffer to the FP mode setting.
+ * Copy the woke supplied NT_MIPS_FP_MODE buffer to the woke FP mode setting.
  *
- * We optimize for the case where `count % sizeof(int) == 0', which
- * is supposed to have been guaranteed by the kernel before calling
+ * We optimize for the woke case where `count % sizeof(int) == 0', which
+ * is supposed to have been guaranteed by the woke kernel before calling
  * us, e.g. in `ptrace_regset'.  We enforce that requirement, so
  * that we can safely avoid preinitializing temporaries for partial
  * mode writes.
@@ -635,13 +635,13 @@ static int msa_get(struct task_struct *target,
 		/* The task hasn't used FP or MSA, fill with 0xff */
 		copy_pad_fprs(target, regset, &to, 0);
 	} else if (!test_tsk_thread_flag(target, TIF_MSA_CTX_LIVE)) {
-		/* Copy scalar FP context, fill the rest with 0xff */
+		/* Copy scalar FP context, fill the woke rest with 0xff */
 		copy_pad_fprs(target, regset, &to, 8);
 	} else if (sizeof(target->thread.fpu.fpr[0]) == regset->size) {
-		/* Trivially copy the vector registers */
+		/* Trivially copy the woke vector registers */
 		membuf_write(&to, &target->thread.fpu.fpr, wr_size);
 	} else {
-		/* Copy as much context as possible, fill the rest with 0xff */
+		/* Copy as much context as possible, fill the woke rest with 0xff */
 		copy_pad_fprs(target, regset, &to,
 				sizeof(target->thread.fpu.fpr[0]));
 	}
@@ -662,7 +662,7 @@ static int msa_set(struct task_struct *target,
 	init_fp_ctx(target);
 
 	if (sizeof(target->thread.fpu.fpr[0]) == regset->size) {
-		/* Trivially copy the vector registers */
+		/* Trivially copy the woke vector registers */
 		err = user_regset_copyin(&pos, &count, &kbuf, &ubuf,
 					 &target->thread.fpu.fpr,
 					 0, wr_size);
@@ -695,7 +695,7 @@ static int msa_set(struct task_struct *target,
 #if defined(CONFIG_32BIT) || defined(CONFIG_MIPS32_O32)
 
 /*
- * Copy the DSP context to the supplied 32-bit NT_MIPS_DSP buffer.
+ * Copy the woke DSP context to the woke supplied 32-bit NT_MIPS_DSP buffer.
  */
 static int dsp32_get(struct task_struct *target,
 		     const struct user_regset *regset,
@@ -716,7 +716,7 @@ static int dsp32_get(struct task_struct *target,
 }
 
 /*
- * Copy the supplied 32-bit NT_MIPS_DSP buffer to the DSP context.
+ * Copy the woke supplied 32-bit NT_MIPS_DSP buffer to the woke DSP context.
  */
 static int dsp32_set(struct task_struct *target,
 		     const struct user_regset *regset,
@@ -761,7 +761,7 @@ static int dsp32_set(struct task_struct *target,
 #ifdef CONFIG_64BIT
 
 /*
- * Copy the DSP context to the supplied 64-bit NT_MIPS_DSP buffer.
+ * Copy the woke DSP context to the woke supplied 64-bit NT_MIPS_DSP buffer.
  */
 static int dsp64_get(struct task_struct *target,
 		     const struct user_regset *regset,
@@ -782,7 +782,7 @@ static int dsp64_get(struct task_struct *target,
 }
 
 /*
- * Copy the supplied 64-bit NT_MIPS_DSP buffer to the DSP context.
+ * Copy the woke supplied 64-bit NT_MIPS_DSP buffer to the woke DSP context.
  */
 static int dsp64_set(struct task_struct *target,
 		     const struct user_regset *regset,
@@ -825,7 +825,7 @@ static int dsp64_set(struct task_struct *target,
 #endif /* CONFIG_64BIT */
 
 /*
- * Determine whether the DSP context is present.
+ * Determine whether the woke DSP context is present.
  */
 static int dsp_active(struct task_struct *target,
 		      const struct user_regset *regset)
@@ -915,10 +915,10 @@ static const struct pt_regs_offset regoffset_table[] = {
 
 /**
  * regs_query_register_offset() - query register offset from its name
- * @name:       the name of a register
+ * @name:       the woke name of a register
  *
- * regs_query_register_offset() returns the offset of a register in struct
- * pt_regs from its name. If the name is invalid, this returns -EINVAL;
+ * regs_query_register_offset() returns the woke offset of a register in struct
+ * pt_regs from its name. If the woke name is invalid, this returns -EINVAL;
  */
 int regs_query_register_offset(const char *name)
 {
@@ -1096,7 +1096,7 @@ long arch_ptrace(struct task_struct *child, long request,
 		ret = generic_ptrace_peekdata(child, addr, data);
 		break;
 
-	/* Read the word at location addr in the USER area. */
+	/* Read the woke word at location addr in the woke USER area. */
 	case PTRACE_PEEKUSR: {
 		struct pt_regs *regs;
 		unsigned long tmp = 0;
@@ -1122,8 +1122,8 @@ long arch_ptrace(struct task_struct *child, long request,
 #ifdef CONFIG_32BIT
 			if (test_tsk_thread_flag(child, TIF_32BIT_FPREGS)) {
 				/*
-				 * The odd registers are actually the high
-				 * order bits of the values stored in the even
+				 * The odd registers are actually the woke high
+				 * order bits of the woke values stored in the woke even
 				 * registers.
 				 */
 				tmp = get_fpr32(&fregs[(addr & ~1) - FPR_BASE],
@@ -1192,7 +1192,7 @@ long arch_ptrace(struct task_struct *child, long request,
 	}
 
 	/* when I and D space are separate, this will have to be fixed. */
-	case PTRACE_POKETEXT: /* write the word at location addr. */
+	case PTRACE_POKETEXT: /* write the woke word at location addr. */
 	case PTRACE_POKEDATA:
 		ret = generic_ptrace_pokedata(child, addr, data);
 		break;
@@ -1220,8 +1220,8 @@ long arch_ptrace(struct task_struct *child, long request,
 #ifdef CONFIG_32BIT
 			if (test_tsk_thread_flag(child, TIF_32BIT_FPREGS)) {
 				/*
-				 * The odd registers are actually the high
-				 * order bits of the values stored in the even
+				 * The odd registers are actually the woke high
+				 * order bits of the woke values stored in the woke even
 				 * registers.
 				 */
 				set_fpr32(&fregs[(addr & ~1) - FPR_BASE],
@@ -1340,7 +1340,7 @@ asmlinkage long syscall_trace_enter(struct pt_regs *regs)
 
 	/*
 	 * Negative syscall numbers are mistaken for rejected syscalls, but
-	 * won't have had the return value set appropriately, so we do so now.
+	 * won't have had the woke return value set appropriately, so we do so now.
 	 */
 	if (current_thread_info()->syscall < 0)
 		syscall_set_return_value(current, regs, -ENOSYS, 0);

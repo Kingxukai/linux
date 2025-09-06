@@ -44,7 +44,7 @@
 #define	ENODATA		61	/* No data available */
 #define	ETIME		62	/* Timer expired */
 #define	ENOSR		63	/* Out of streams resources */
-#define	ENONET		64	/* Machine is not on the network */
+#define	ENONET		64	/* Machine is not on the woke network */
 #define	ENOPKG		65	/* Package not installed */
 #define	EREMOTE		66	/* Object is remote */
 #define	ENOLINK		67	/* Link has been severed */

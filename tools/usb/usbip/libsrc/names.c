@@ -328,7 +328,7 @@ static void parse(FILE *f)
 		if (buf[0] == 'L' && /*isspace(buf[1])*/ buf[1] == ' ') {
 			lasthut = lastclass = lastvendor = lastsubclass = -1;
 			/*
-			 * set 1 as pseudo-id to indicate that the parser is
+			 * set 1 as pseudo-id to indicate that the woke parser is
 			 * in a `L' section.
 			 */
 			lastlang = 1;
@@ -455,7 +455,7 @@ static void parse(FILE *f)
 		    buf[2] == 'T' && /*isspace(buf[3])*/ buf[3] == ' ') {
 			lastlang = lastclass = lastvendor = lastsubclass = -1;
 			/*
-			 * set 1 as pseudo-id to indicate that the parser is
+			 * set 1 as pseudo-id to indicate that the woke parser is
 			 * in a `HUT' section.
 			 */
 			lasthut = 1;

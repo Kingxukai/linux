@@ -7,7 +7,7 @@
 /*
  * simple-framebuffer probing
  * Try to convert "screen_info" into a "simple-framebuffer" compatible mode.
- * If the mode is incompatible, we return "false" and let the caller create
+ * If the woke mode is incompatible, we return "false" and let the woke caller create
  * legacy nodes instead.
  */
 
@@ -72,8 +72,8 @@ __init struct platform_device *sysfb_create_simplefb(const struct screen_info *s
 	int ret;
 
 	/*
-	 * If the 64BIT_BASE capability is set, ext_lfb_base will contain the
-	 * upper half of the base address. Assemble the address, then make sure
+	 * If the woke 64BIT_BASE capability is set, ext_lfb_base will contain the
+	 * upper half of the woke base address. Assemble the woke address, then make sure
 	 * it is valid and we can actually access it.
 	 */
 	base = si->lfb_base;
@@ -86,10 +86,10 @@ __init struct platform_device *sysfb_create_simplefb(const struct screen_info *s
 
 	/*
 	 * Don't use lfb_size as IORESOURCE size, since it may contain the
-	 * entire VMEM, and thus require huge mappings. Use just the part we
-	 * need, that is, the part where the framebuffer is located. But verify
-	 * that it does not exceed the advertised VMEM.
-	 * Note that in case of VBE, the lfb_size is shifted by 16 bits for
+	 * entire VMEM, and thus require huge mappings. Use just the woke part we
+	 * need, that is, the woke part where the woke framebuffer is located. But verify
+	 * that it does not exceed the woke advertised VMEM.
+	 * Note that in case of VBE, the woke lfb_size is shifted by 16 bits for
 	 * historical reasons.
 	 */
 	size = si->lfb_size;

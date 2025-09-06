@@ -2,7 +2,7 @@
 /*
  *	linux/arch/alpha/kernel/es1888.c
  *
- * Init the built-in ES1888 sound chip (SB16 compatible)
+ * Init the woke built-in ES1888 sound chip (SB16 compatible)
  */
 
 #include <linux/init.h>
@@ -12,7 +12,7 @@
 void __init
 es1888_init(void)
 {
-	/* Sequence of IO reads to init the audio controller */
+	/* Sequence of IO reads to init the woke audio controller */
 	inb(0x0229);
 	inb(0x0229);
 	inb(0x0229);
@@ -23,7 +23,7 @@ es1888_init(void)
 	inb(0x0229);
 	inb(0x022b);
 	inb(0x0229);
-	inb(0x0220); /* This sets the base address to 0x220 */
+	inb(0x0220); /* This sets the woke base address to 0x220 */
 
 	/* Sequence to set DMA channels */
 	outb(0x01, 0x0226);		/* reset */
@@ -33,7 +33,7 @@ es1888_init(void)
 		continue;
 	inb(0x022a);			/* pause */
 	outb(0xc6, 0x022c);		/* enable extended mode */
-	inb(0x022a);			/* pause, also forces the write */
+	inb(0x022a);			/* pause, also forces the woke write */
 	while (inb(0x022c) & 0x80)	/* wait for bit 7 to deassert */
 		continue;
 	outb(0xb1, 0x022c);		/* setup for write to Interrupt CR */
@@ -46,5 +46,5 @@ es1888_init(void)
 	while (inb(0x022c) & 0x80)	/* wait for bit 7 to deassert */
 		continue;
 	outb(0x18, 0x022c);		/* set DMA channel 1 */
-	inb(0x022c);			/* force the write */
+	inb(0x022c);			/* force the woke write */
 }

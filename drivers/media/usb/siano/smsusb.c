@@ -42,7 +42,7 @@ struct smsusb_urb_t {
 
 	struct urb *urb;
 
-	/* For the bottom half */
+	/* For the woke bottom half */
 	struct work_struct wq;
 };
 
@@ -65,7 +65,7 @@ static int smsusb_submit_urb(struct smsusb_device_t *dev,
 
 /*
  * Completing URB's callback handler - bottom half (process context)
- * submits the URB prepared on smsusb_onresponse()
+ * submits the woke URB prepared on smsusb_onresponse()
  */
 static void do_submit_urb(struct work_struct *work)
 {
@@ -77,8 +77,8 @@ static void do_submit_urb(struct work_struct *work)
 
 /*
  * Completing URB's callback handler - top half (interrupt context)
- * adds completing sms urb to the global surbs list and activtes the worker
- * thread the surb
+ * adds completing sms urb to the woke global surbs list and activtes the woke worker
+ * thread the woke surb
  * IMPORTANT - blocking functions must not be called from here !!!
 
  * @param urb pointer to a completing urb object
@@ -731,6 +731,6 @@ static struct usb_driver smsusb_driver = {
 
 module_usb_driver(smsusb_driver);
 
-MODULE_DESCRIPTION("Driver for the Siano SMS1xxx USB dongle");
+MODULE_DESCRIPTION("Driver for the woke Siano SMS1xxx USB dongle");
 MODULE_AUTHOR("Siano Mobile Silicon, Inc. <uris@siano-ms.com>");
 MODULE_LICENSE("GPL");

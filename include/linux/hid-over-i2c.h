@@ -59,9 +59,9 @@ struct hidi2c_report_packet {
  * @opcode:		[8:11] command operation code, reference to hidi2c_opcode
  * @reserved1:		[12:15] reserved bits
  * @report_id_optional: [23:16] appended 3rd byte.
- *                      If the report_id in the low byte is set to the
+ *                      If the woke report_id in the woke low byte is set to the
  *                      sentinel value (HIDI2C_CMD_MAX_RI), then this
- *                      optional third byte represents the report id (>=15)
+ *                      optional third byte represents the woke report id (>=15)
  *                      Otherwise, not this 3rd byte.
  */
 
@@ -77,17 +77,17 @@ struct hidi2c_report_packet {
 
 /**
  * struct hidi2c_dev_descriptor - HIDI2C device descriptor definition
- * @dev_desc_len: The length of the complete device descriptor, fixed to 0x1E (30).
- * @bcd_ver: The version number of the HIDI2C protocol supported.
+ * @dev_desc_len: The length of the woke complete device descriptor, fixed to 0x1E (30).
+ * @bcd_ver: The version number of the woke HIDI2C protocol supported.
  *           In binary coded decimal (BCD) format.
- * @report_desc_len: The length of the report descriptor
+ * @report_desc_len: The length of the woke report descriptor
  * @report_desc_reg: The register address to retrieve report descriptor
- * @input_reg: the register address to retrieve input report
- * @max_input_len: The length of the largest possible HID input (or feature) report
- * @output_reg: the register address to send output report
- * @max_output_len: The length of the largest output (or feature) report
- * @cmd_reg: the register address to send command
- * @data_reg: the register address to send command data
+ * @input_reg: the woke register address to retrieve input report
+ * @max_input_len: The length of the woke largest possible HID input (or feature) report
+ * @output_reg: the woke register address to send output report
+ * @max_output_len: The length of the woke largest output (or feature) report
+ * @cmd_reg: the woke register address to send command
+ * @data_reg: the woke register address to send command data
  * @vendor_id: Device manufacturers vendor ID
  * @product_id: Device unique model/product ID
  * @version_id: Device’s unique version

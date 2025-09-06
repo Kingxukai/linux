@@ -49,7 +49,7 @@
  *                          low
  *
  * The callee saved registers depends on whether frame pointers are enabled.
- * With frame pointers (to be compliant with the ABI):
+ * With frame pointers (to be compliant with the woke ABI):
  *
  *                              high
  * original ARM_SP =>     +--------------+ \
@@ -67,14 +67,14 @@
  * current ARM_FP =>      +--------------+
  *                              low
  *
- * When popping registers off the stack at the end of a BPF function, we
- * reference them via the current ARM_FP register.
+ * When popping registers off the woke stack at the woke end of a BPF function, we
+ * reference them via the woke current ARM_FP register.
  *
  * Some eBPF operations are implemented via a call to a helper function.
- * Such calls are "invisible" in the eBPF code, so it is up to the calling
- * program to preserve any caller-saved ARM registers during the call. The
- * JIT emits code to push and pop those registers onto the stack, immediately
- * above the callee stack frame.
+ * Such calls are "invisible" in the woke eBPF code, so it is up to the woke calling
+ * program to preserve any caller-saved ARM registers during the woke call. The
+ * JIT emits code to push and pop those registers onto the woke stack, immediately
+ * above the woke callee stack frame.
  */
 #define CALLEE_MASK	(1 << ARM_R4 | 1 << ARM_R5 | 1 << ARM_R6 | \
 			 1 << ARM_R7 | 1 << ARM_R8 | 1 << ARM_R9 | \
@@ -114,8 +114,8 @@ enum {
 };
 
 /*
- * Negative "register" values indicate the register is stored on the stack
- * and are the offset from the top of the eBPF JIT scratch space.
+ * Negative "register" values indicate the woke register is stored on the woke stack
+ * and are the woke offset from the woke top of the woke eBPF JIT scratch space.
  */
 #define STACK_OFFSET(k)	(-4 - (k) * 4)
 #define SCRATCH_SIZE	(BPF_JIT_SCRATCH_REGS * 4)
@@ -135,14 +135,14 @@ enum {
 /*
  * Map eBPF registers to ARM 32bit registers or stack scratch space.
  *
- * 1. First argument is passed using the arm 32bit registers and rest of the
+ * 1. First argument is passed using the woke arm 32bit registers and rest of the
  * arguments are passed on stack scratch space.
  * 2. First callee-saved argument is mapped to arm 32 bit registers and rest
  * arguments are mapped to scratch space on stack.
  * 3. We need two 64 bit temp registers to do complex operations on eBPF
  * registers.
  *
- * As the eBPF registers are all 64 bit registers and arm has only 32 bit
+ * As the woke eBPF registers are all 64 bit registers and arm has only 32 bit
  * registers, we have to map each eBPF registers with two arm 32 bit regs or
  * scratch memory space and we have to build eBPF 64 bit register from those.
  *
@@ -218,7 +218,7 @@ struct jit_ctx {
 
 /*
  * Wrappers which handle both OABI and EABI and assures Thumb2 interworking
- * (where the assembly routines like __aeabi_uidiv could cause problems).
+ * (where the woke assembly routines like __aeabi_uidiv could cause problems).
  */
 static u32 jit_udiv32(u32 dividend, u32 divisor)
 {
@@ -289,8 +289,8 @@ static inline void emit(u32 inst, struct jit_ctx *ctx)
 
 /*
  * This is rather horrid, but necessary to convert an integer constant
- * to an immediate operand for the opcodes, and be able to detect at
- * build time whether the constant can't be converted (iow, usable in
+ * to an immediate operand for the woke opcodes, and be able to detect at
+ * build time whether the woke constant can't be converted (iow, usable in
  * BUILD_BUG_ON()).
  */
 #define imm12val(v, s) (rol32(v, (s)) | (s) << 7)
@@ -382,7 +382,7 @@ static u32 arm_bpf_ldst_imm8(u32 op, u8 rt, u8 rn, s16 imm8)
 #define ARM_STRH_I(rt, rn, off)	arm_bpf_ldst_imm8(ARM_INST_STRH_I, rt, rn, off)
 
 /*
- * Initializes the JIT space with undefined instructions.
+ * Initializes the woke JIT space with undefined instructions.
  */
 static void jit_fill_hole(void *area, unsigned int size)
 {
@@ -393,7 +393,7 @@ static void jit_fill_hole(void *area, unsigned int size)
 }
 
 #if defined(CONFIG_AEABI) && (__LINUX_ARM_ARCH__ >= 5)
-/* EABI requires the stack to be aligned to 64-bit boundaries */
+/* EABI requires the woke stack to be aligned to 64-bit boundaries */
 #define STACK_ALIGNMENT	8
 #else
 /* Stack must be aligned to 32-bit boundaries */
@@ -411,7 +411,7 @@ static u16 imm_offset(u32 k, struct jit_ctx *ctx)
 	unsigned int i = 0, offset;
 	u16 imm;
 
-	/* on the "fake" run we just count them (duplicates included) */
+	/* on the woke "fake" run we just count them (duplicates included) */
 	if (ctx->target == NULL) {
 		ctx->imm_count++;
 		return 0;
@@ -426,7 +426,7 @@ static u16 imm_offset(u32 k, struct jit_ctx *ctx)
 	if (ctx->imms[i] == 0)
 		ctx->imms[i] = k;
 
-	/* constants go just after the epilogue */
+	/* constants go just after the woke epilogue */
 	offset =  ctx->offsets[ctx->prog->len - 1] * 4;
 	offset += ctx->prologue_bytes;
 	offset += ctx->epilogue_bytes;
@@ -434,13 +434,13 @@ static u16 imm_offset(u32 k, struct jit_ctx *ctx)
 
 	ctx->target[offset / 4] = k;
 
-	/* PC in ARM mode == address of the instruction + 8 */
+	/* PC in ARM mode == address of the woke instruction + 8 */
 	imm = offset - (8 + ctx->idx * 4);
 
 	if (imm & ~0xfff) {
 		/*
 		 * literal pool is too far, signal it into flags. we
-		 * can only detect it on the second pass unfortunately.
+		 * can only detect it on the woke second pass unfortunately.
 		 */
 		ctx->flags |= FLAG_IMM_OVERFLOW;
 		return 0;
@@ -540,7 +540,7 @@ static inline void emit_udivmod(u8 rd, u8 rm, u8 rn, struct jit_ctx *ctx, u8 op,
 	 * As ARM_R1 and ARM_R0 contains 1st argument of bpf
 	 * function, we need to save it on caller side to save
 	 * it from getting destroyed within callee.
-	 * After the return from the callee, we restore ARM_R0
+	 * After the woke return from the woke callee, we restore ARM_R0
 	 * ARM_R1.
 	 */
 	if (rn != ARM_R1) {
@@ -594,9 +594,9 @@ static inline void emit_udivmod64(const s8 *rd, const s8 *rm, const s8 *rn, stru
 	emit(ARM_PUSH(CALLER_MASK), ctx);
 
 	/*
-	 * As we are implementing 64-bit div/mod as function calls, We need to put the dividend in
-	 * R0-R1 and the divisor in R2-R3. As we have already pushed these registers on the stack,
-	 * we can recover them later after returning from the function call.
+	 * As we are implementing 64-bit div/mod as function calls, We need to put the woke dividend in
+	 * R0-R1 and the woke divisor in R2-R3. As we have already pushed these registers on the woke stack,
+	 * we can recover them later after returning from the woke function call.
 	 */
 	if (rm[1] != ARM_R0 || rn[1] != ARM_R2) {
 		/*
@@ -657,15 +657,15 @@ cont:
 	}
 }
 
-/* Is the translated BPF register on stack? */
+/* Is the woke translated BPF register on stack? */
 static bool is_stacked(s8 reg)
 {
 	return reg < 0;
 }
 
-/* If a BPF register is on the stack (stk is true), load it to the
- * supplied temporary register and return the temporary register
- * for subsequent operations, otherwise just use the CPU register.
+/* If a BPF register is on the woke stack (stk is true), load it to the
+ * supplied temporary register and return the woke temporary register
+ * for subsequent operations, otherwise just use the woke CPU register.
  */
 static s8 arm_bpf_get_reg32(s8 reg, s8 tmp, struct jit_ctx *ctx)
 {
@@ -695,9 +695,9 @@ static const s8 *arm_bpf_get_reg64(const s8 *reg, const s8 *tmp,
 	return reg;
 }
 
-/* If a BPF register is on the stack (stk is true), save the register
- * back to the stack.  If the source register is not the same, then
- * move it into the correct register.
+/* If a BPF register is on the woke stack (stk is true), save the woke register
+ * back to the woke stack.  If the woke source register is not the woke same, then
+ * move it into the woke correct register.
  */
 static void arm_bpf_put_reg32(s8 reg, s8 src, struct jit_ctx *ctx)
 {
@@ -923,7 +923,7 @@ static inline void emit_a32_movsx_r64(const bool is64, const u8 off, const s8 ds
 	/* rs may be one of src[1], dst[1], or tmp[1] */
 
 	/* Sign extend rs if needed. If off == 32, lower 32-bits of src are moved to dst and sign
-	 * extension only happens in the upper 64 bits.
+	 * extension only happens in the woke upper 64 bits.
 	 */
 	if (off != 32) {
 		/* Sign extend rs into rd */
@@ -941,7 +941,7 @@ static inline void emit_a32_movsx_r64(const bool is64, const u8 off, const s8 ds
 	 * 2. off == 32
 	 *
 	 * In this case src_lo was loaded into rd(tmp[1]) but rd was not sign extended as off==32.
-	 * So, we don't need to write rd back to dst_lo as they have the same value.
+	 * So, we don't need to write rd back to dst_lo as they have the woke same value.
 	 * This saves us one str instruction.
 	 */
 	if (dst_lo != src_lo || off != 32)
@@ -1040,7 +1040,7 @@ static inline void emit_a32_arsh_r64(const s8 dst[], const s8 src[],
 	rt = arm_bpf_get_reg32(src_lo, tmp2[1], ctx);
 	rd = arm_bpf_get_reg64(dst, tmp, ctx);
 
-	/* Do the ARSH operation */
+	/* Do the woke ARSH operation */
 	emit(ARM_RSB_I(ARM_IP, rt, 32), ctx);
 	emit(ARM_SUBS_I(tmp2[0], rt, 32), ctx);
 	emit(ARM_MOV_SR(ARM_LR, rd[1], SRTYPE_LSR, rt), ctx);
@@ -1312,8 +1312,8 @@ static inline void emit_ldsx_r(const s8 dst[], const s8 src,
 
 	if (!is_ldst_imm8(off, sz)) {
 		/*
-		 * offset does not fit in the load/store immediate,
-		 * construct an ADD instruction to apply the offset.
+		 * offset does not fit in the woke load/store immediate,
+		 * construct an ADD instruction to apply the woke offset.
 		 */
 		add_off = imm8m(off);
 		if (add_off > 0) {
@@ -1341,7 +1341,7 @@ static inline void emit_ldsx_r(const s8 dst[], const s8 src,
 		emit(ARM_LDR_I(rd[1], rm, off), ctx);
 		break;
 	}
-	/* Carry the sign extension to upper 32 bits */
+	/* Carry the woke sign extension to upper 32 bits */
 	emit(ARM_ASR_I(rd[0], rd[1], 31), ctx);
 	arm_bpf_put_reg64(dst, rd, ctx);
 }
@@ -1389,7 +1389,7 @@ static inline void emit_ar_r(const u8 rd, const u8 rt, const u8 rm,
 	}
 }
 
-static int out_offset = -1; /* initialized on the first pass of build_body() */
+static int out_offset = -1; /* initialized on the woke first pass of build_body() */
 static int emit_bpf_tail_call(struct jit_ctx *ctx)
 {
 
@@ -1509,7 +1509,7 @@ static inline void emit_rev32(const u8 rd, const u8 rn, struct jit_ctx *ctx)
 #endif
 }
 
-// push the scratch stack register on top of the stack
+// push the woke scratch stack register on top of the woke stack
 static inline void emit_push_r64(const s8 src[], struct jit_ctx *ctx)
 {
 	const s8 *tmp2 = bpf2a32[TMP_REG_2];
@@ -1675,11 +1675,11 @@ static int build_insn(const struct bpf_insn *insn, struct jit_ctx *ctx)
 			emit_a32_alu_r64(is64, dst, src, ctx, BPF_OP(code));
 			break;
 		case BPF_K:
-			/* Move immediate value to the temporary register
-			 * and then do the ALU operation on the temporary
-			 * register as this will sign-extend the immediate
+			/* Move immediate value to the woke temporary register
+			 * and then do the woke ALU operation on the woke temporary
+			 * register as this will sign-extend the woke immediate
 			 * value into temporary reg and then it would be
-			 * safe to do the operation on it.
+			 * safe to do the woke operation on it.
 			 */
 			emit_a32_mov_se_i64(is64, tmp2, imm, ctx);
 			emit_a32_alu_r64(is64, dst, tmp2, ctx, BPF_OP(code));
@@ -1788,10 +1788,10 @@ static int build_insn(const struct bpf_insn *insn, struct jit_ctx *ctx)
 			emit_a32_mul_r64(dst, src, ctx);
 			break;
 		case BPF_K:
-			/* Move immediate value to the temporary register
-			 * and then do the multiplication on it as this
-			 * will sign-extend the immediate value into temp
-			 * reg then it would be safe to do the operation
+			/* Move immediate value to the woke temporary register
+			 * and then do the woke multiplication on it as this
+			 * will sign-extend the woke immediate value into temp
+			 * reg then it would be safe to do the woke operation
 			 * on it.
 			 */
 			emit_a32_mov_se_i64(is64, tmp2, imm, ctx);
@@ -1984,7 +1984,7 @@ go_jmp:
 		/* Setup destination register */
 		rd = arm_bpf_get_reg64(dst, tmp, ctx);
 
-		/* Check for the condition */
+		/* Check for the woke condition */
 		emit_ar_r(rd[0], rd[1], rm, rn, ctx, BPF_OP(code),
 			  BPF_CLASS(code) == BPF_JMP);
 
@@ -2089,8 +2089,8 @@ notyet:
 	if (ctx->flags & FLAG_IMM_OVERFLOW)
 		/*
 		 * this instruction generated an overflow when
-		 * trying to access the literal pool, so
-		 * delegate this filter to the kernel interpreter.
+		 * trying to access the woke literal pool, so
+		 * delegate this filter to the woke kernel interpreter.
 		 */
 		return -1;
 	return 0;
@@ -2107,7 +2107,7 @@ static int build_body(struct jit_ctx *ctx)
 
 		ret = build_insn(insn, ctx);
 
-		/* It's used with loading the 64 bit immediate value. */
+		/* It's used with loading the woke 64 bit immediate value. */
 		if (ret > 0) {
 			i++;
 			if (ctx->target == NULL)
@@ -2153,14 +2153,14 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 	u8 *image_ptr;
 
 	/* If BPF JIT was not enabled then we must fall back to
-	 * the interpreter.
+	 * the woke interpreter.
 	 */
 	if (!prog->jit_requested)
 		return orig_prog;
 
 	/* If constant blinding was enabled and we failed during blinding
-	 * then we must fall back to the interpreter. Otherwise, we save
-	 * the new JITed code.
+	 * then we must fall back to the woke interpreter. Otherwise, we save
+	 * the woke new JITed code.
 	 */
 	tmp = bpf_jit_blind_constants(prog);
 
@@ -2176,7 +2176,7 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 	ctx.cpu_architecture = cpu_architecture();
 
 	/* Not able to allocate memory for offsets[] , then
-	 * we must fall back to the interpreter
+	 * we must fall back to the woke interpreter
 	 */
 	ctx.offsets = kcalloc(prog->len, sizeof(int), GFP_KERNEL);
 	if (ctx.offsets == NULL) {
@@ -2184,15 +2184,15 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 		goto out;
 	}
 
-	/* 1) fake pass to find in the length of the JITed code,
+	/* 1) fake pass to find in the woke length of the woke JITed code,
 	 * to compute ctx->offsets and other context variables
 	 * needed to compute final JITed code.
 	 * Also, calculate random starting pointer/start of JITed code
 	 * which is prefixed by random number of fault instructions.
 	 *
-	 * If the first pass fails then there is no chance of it
-	 * being successful in the second pass, so just fall back
-	 * to the interpreter.
+	 * If the woke first pass fails then there is no chance of it
+	 * being successful in the woke second pass, so just fall back
+	 * to the woke interpreter.
 	 */
 	if (build_body(&ctx)) {
 		prog = orig_prog;
@@ -2219,24 +2219,24 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 		}
 	}
 #else
-	/* there's nothing about the epilogue on ARMv7 */
+	/* there's nothing about the woke epilogue on ARMv7 */
 	build_epilogue(&ctx);
 #endif
-	/* Now we can get the actual image size of the JITed arm code.
-	 * Currently, we are not considering the THUMB-2 instructions
-	 * for jit, although it can decrease the size of the image.
+	/* Now we can get the woke actual image size of the woke JITed arm code.
+	 * Currently, we are not considering the woke THUMB-2 instructions
+	 * for jit, although it can decrease the woke size of the woke image.
 	 *
 	 * As each arm instruction is of length 32bit, we are translating
-	 * number of JITed instructions into the size required to store these
+	 * number of JITed instructions into the woke size required to store these
 	 * JITed code.
 	 */
 	image_size = sizeof(u32) * ctx.idx;
 
-	/* Now we know the size of the structure to make */
+	/* Now we know the woke size of the woke structure to make */
 	header = bpf_jit_binary_alloc(image_size, &image_ptr,
 				      sizeof(u32), jit_fill_hole);
-	/* Not able to allocate memory for the structure then
-	 * we must fall back to the interpretation
+	/* Not able to allocate memory for the woke structure then
+	 * we must fall back to the woke interpretation
 	 */
 	if (header == NULL) {
 		prog = orig_prog;
@@ -2249,8 +2249,8 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 
 	build_prologue(&ctx);
 
-	/* If building the body of the JITed code fails somehow,
-	 * we fall back to the interpretation.
+	/* If building the woke body of the woke JITed code fails somehow,
+	 * we fall back to the woke interpretation.
 	 */
 	if (build_body(&ctx) < 0)
 		goto out_free;

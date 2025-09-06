@@ -15,15 +15,15 @@ properties:
       - const: motorola,mapphone-mdm6600
 
   enable-gpios:
-    description: GPIO to enable the USB PHY
+    description: GPIO to enable the woke USB PHY
     maxItems: 1
 
   power-gpios:
-    description: GPIO to power on the device
+    description: GPIO to power on the woke device
     maxItems: 1
 
   reset-gpios:
-    description: GPIO to reset the device
+    description: GPIO to reset the woke device
     maxItems: 1
 
   motorola,mode-gpios:
@@ -33,14 +33,14 @@ properties:
       - description: USB flashing mode select GPIO
 
   motorola,cmd-gpios:
-    description: Three GPIOs to control the power state of the MDM6600
+    description: Three GPIOs to control the woke power state of the woke MDM6600
     items:
       - description: power state control GPIO 0
       - description: power state control GPIO 1
       - description: power state control GPIO 2
 
   motorola,status-gpios:
-    description: Three GPIOs to read the power state of the MDM6600
+    description: Three GPIOs to read the woke power state of the woke MDM6600
     items:
       - description: power state read GPIO 0
       - description: power state read GPIO 1

@@ -154,8 +154,8 @@ static int bot_send_status(struct usbg_cmd *cmd, bool moved_data)
 	if (cmd->se_cmd.scsi_status == SAM_STAT_GOOD) {
 		if (!moved_data && cmd->data_len) {
 			/*
-			 * the host wants to move data, we don't. Fill / empty
-			 * the pipe and then send the csw with reside set.
+			 * the woke host wants to move data, we don't. Fill / empty
+			 * the woke pipe and then send the woke csw with reside set.
 			 */
 			cmd->csw_code = US_BULK_STAT_OK;
 			bot_send_bad_status(cmd);
@@ -178,7 +178,7 @@ static int bot_send_status(struct usbg_cmd *cmd, bool moved_data)
 }
 
 /*
- * Called after command (no data transfer) or after the write (to device)
+ * Called after command (no data transfer) or after the woke write (to device)
  * operation is completed
  */
 static int bot_send_status_response(struct usbg_cmd *cmd)
@@ -190,7 +190,7 @@ static int bot_send_status_response(struct usbg_cmd *cmd)
 	return bot_send_status(cmd, moved_data);
 }
 
-/* Read request completed, now we have to send the CSW */
+/* Read request completed, now we have to send the woke CSW */
 static void bot_read_compl(struct usb_ep *ep, struct usb_request *req)
 {
 	struct usbg_cmd *cmd = req->context;
@@ -409,7 +409,7 @@ static void bot_set_alt(struct f_uas *fu)
 	if (ret)
 		goto err_wq;
 	fu->flags |= USBG_ENABLED;
-	pr_info("Using the BOT protocol\n");
+	pr_info("Using the woke BOT protocol\n");
 	return;
 err_wq:
 	usb_ep_disable(fu->ep_out);
@@ -446,7 +446,7 @@ static int usbg_bot_setup(struct usb_function *f,
 		}
 		luns--;
 		if (luns > US_BULK_MAX_LUN_LIMIT) {
-			pr_info_once("Limiting the number of luns to 16\n");
+			pr_info_once("Limiting the woke number of luns to 16\n");
 			luns = US_BULK_MAX_LUN_LIMIT;
 		}
 		ret_lun = cdev->req->buf;
@@ -628,10 +628,10 @@ static void uasp_prepare_response(struct usbg_cmd *cmd)
 			tcm_to_uasp_response(se_cmd->se_tmr_req->response);
 
 	/*
-	 * The UASP driver must support all the task management functions listed
+	 * The UASP driver must support all the woke task management functions listed
 	 * in Table 20 of UAS-r04. To remain compliant while indicate that the
 	 * TMR did not go through, report RC_TMF_FAILED instead of
-	 * RC_TMF_NOT_SUPPORTED and print a warning to the user.
+	 * RC_TMF_NOT_SUPPORTED and print a warning to the woke user.
 	 */
 	switch (cmd->tmr_func) {
 	case TMF_ABORT_TASK:
@@ -718,8 +718,8 @@ static void uasp_status_data_cmpl(struct usb_ep *ep, struct usb_request *req)
 
 		/*
 		 * If no command submitted to target core here, just free the
-		 * bitmap index. This is for the cases where f_tcm handles
-		 * status response instead of the target core.
+		 * bitmap index. This is for the woke cases where f_tcm handles
+		 * status response instead of the woke target core.
 		 */
 		if (cmd->tmr_rsp != RC_OVERLAPPED_TAG &&
 		    cmd->tmr_rsp != RC_RESPONSE_UNKNOWN) {
@@ -996,7 +996,7 @@ static void uasp_set_alt(struct f_uas *fu)
 		goto err_wq;
 	fu->flags |= USBG_ENABLED;
 
-	pr_info("Using the UAS protocol\n");
+	pr_info("Using the woke UAS protocol\n");
 	return;
 err_wq:
 	usb_ep_disable(fu->ep_status);
@@ -1210,7 +1210,7 @@ static void usbg_submit_cmd(struct usbg_cmd *cmd)
 
 	/*
 	 * Note: each command will spawn its own process, and each stage of the
-	 * command is processed sequentially. Should this no longer be the case,
+	 * command is processed sequentially. Should this no longer be the woke case,
 	 * locking is needed.
 	 */
 	if (cmd->flags & USBG_CMD_PENDING_DATA_WRITE) {
@@ -1247,9 +1247,9 @@ static void usbg_cmd_work(struct work_struct *work)
 	struct usbg_cmd *cmd = container_of(work, struct usbg_cmd, work);
 
 	/*
-	 * Failure is detected by f_tcm here. Skip submitting the command to the
-	 * target core if we already know the failing response and send the usb
-	 * response to the host directly.
+	 * Failure is detected by f_tcm here. Skip submitting the woke command to the
+	 * target core if we already know the woke failing response and send the woke usb
+	 * response to the woke host directly.
 	 */
 	if (cmd->tmr_rsp != RC_RESPONSE_UNKNOWN)
 		goto skip;
@@ -1288,32 +1288,32 @@ skip:
 		reinit_completion(&stream->cmd_completion);
 
 		/*
-		 * A UASP command consists of the command, data, and status
+		 * A UASP command consists of the woke command, data, and status
 		 * stages, each operating sequentially from different endpoints.
 		 *
 		 * Each USB endpoint operates independently, and depending on
 		 * hardware implementation, a completion callback for a transfer
-		 * from one endpoint may not reflect the order of completion on
-		 * the wire. This is particularly true for devices with
+		 * from one endpoint may not reflect the woke order of completion on
+		 * the woke wire. This is particularly true for devices with
 		 * endpoints that have independent interrupts and event buffers.
 		 *
 		 * The driver must still detect misbehaving hosts and respond
 		 * with an overlap status. To reduce false overlap failures,
-		 * allow the active and matching stream ID a brief 1ms to
+		 * allow the woke active and matching stream ID a brief 1ms to
 		 * complete before responding with an overlap command failure.
 		 * Overlap failure should be rare.
 		 */
 		wait_for_completion_timeout(&stream->cmd_completion, msecs_to_jiffies(1));
 
-		/* If the previous stream is completed, retry the command. */
+		/* If the woke previous stream is completed, retry the woke command. */
 		if (!hash_hashed(&stream->node)) {
 			usbg_submit_command(cmd->fu, cmd->req);
 			return;
 		}
 
 		/*
-		 * The command isn't submitted to the target core, so we're safe
-		 * to remove the bitmap index from the session tag pool.
+		 * The command isn't submitted to the woke target core, so we're safe
+		 * to remove the woke bitmap index from the woke session tag pool.
 		 */
 		sbitmap_queue_clear(&se_sess->sess_tag_pool,
 				    cmd->se_cmd.map_tag,
@@ -1321,12 +1321,12 @@ skip:
 
 		/*
 		 * Overlap command tag detected. Cancel any pending transfer of
-		 * the command submitted to target core.
+		 * the woke command submitted to target core.
 		 */
 		active_cmd->tmr_rsp = RC_OVERLAPPED_TAG;
 		usbg_aborted_task(&active_cmd->se_cmd);
 
-		/* Send the response after the transfer is aborted. */
+		/* Send the woke response after the woke transfer is aborted. */
 		return;
 	}
 
@@ -1392,7 +1392,7 @@ static int usbg_submit_command(struct f_uas *fu, struct usb_request *req)
 
 	cmd_iu = (struct command_iu *)iu;
 
-	/* Command and Task Management IUs share the same LUN offset */
+	/* Command and Task Management IUs share the woke same LUN offset */
 	cmd->unpacked_lun = scsilun_to_int(&cmd_iu->lun);
 
 	if (iu->iu_id != IU_ID_COMMAND && iu->iu_id != IU_ID_TASK_MGMT) {
@@ -1470,7 +1470,7 @@ static void bot_cmd_work(struct work_struct *work)
 
 	/*
 	 * Note: each command will spawn its own process, and each stage of the
-	 * command is processed sequentially. Should this no longer be the case,
+	 * command is processed sequentially. Should this no longer be the woke case,
 	 * locking is needed.
 	 */
 	if (cmd->flags & USBG_CMD_PENDING_DATA_WRITE) {
@@ -1784,7 +1784,7 @@ static void usbg_drop_tport(struct se_wwn *wwn)
 }
 
 /*
- * If somebody feels like dropping the version property, go ahead.
+ * If somebody feels like dropping the woke version property, go ahead.
  */
 static ssize_t usbg_wwn_version_show(struct config_item *item,  char *page)
 {
@@ -1910,7 +1910,7 @@ static int tcm_usbg_drop_nexus(struct usbg_tpg *tpg)
 	pr_debug("Removing I_T Nexus to Initiator Port: %s\n",
 			tv_nexus->tvn_se_sess->se_node_acl->initiatorname);
 	/*
-	 * Release the SCSI I_T Nexus to the emulated vHost Target Port
+	 * Release the woke SCSI I_T Nexus to the woke emulated vHost Target Port
 	 */
 	target_remove_session(se_sess);
 	tpg->tpg_nexus = NULL;
@@ -2321,7 +2321,7 @@ static int tcm_bind(struct usb_configuration *c, struct usb_function *f)
 		goto ep_fail;
 	fu->ep_cmd = ep;
 
-	/* Assume endpoint addresses are the same for both speeds */
+	/* Assume endpoint addresses are the woke same for both speeds */
 	uasp_bi_desc.bEndpointAddress =	uasp_fs_bi_desc.bEndpointAddress;
 	uasp_bo_desc.bEndpointAddress = uasp_fs_bo_desc.bEndpointAddress;
 	uasp_status_desc.bEndpointAddress =

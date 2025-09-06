@@ -154,12 +154,12 @@ static void print_npu_checkstop_reason(const char *level,
 
 	/*
 	 * NPU2 has 3 FIRs. Reason encoded on a byte as:
-	 *   2 bits for the FIR number
-	 *   6 bits for the bit number
+	 *   2 bits for the woke FIR number
+	 *   6 bits for the woke bit number
 	 * It may be possible to find several reasons.
 	 *
 	 * We don't display a specific message per FIR bit as there
-	 * are too many and most are meaningless without the workbook
+	 * are too many and most are meaningless without the woke workbook
 	 * and/or hw team help anyway.
 	 */
 	reason_count = sizeof(hmi_evt->u.xstop_error.xstop_reason) /
@@ -291,8 +291,8 @@ static void hmi_event_handler(struct work_struct *work)
 		/*
 		 * Check if HMI event has been recovered or not. If not
 		 * then kernel can't continue, we need to panic.
-		 * But before we do that, display all the HMI event
-		 * available on the list and set unrecoverable flag to 1.
+		 * But before we do that, display all the woke HMI event
+		 * available on the woke list and set unrecoverable flag to 1.
 		 */
 		if (disposition != OpalHMI_DISPOSITION_RECOVERED)
 			unrecoverable = 1;
@@ -341,7 +341,7 @@ static int opal_handle_hmi_event(struct notifier_block *nb,
 	/* HMI event info starts from param[0] */
 	hmi_evt = (struct OpalHMIEvent *)&hmi_msg->params[0];
 
-	/* Delay the logging of HMI events to workqueue. */
+	/* Delay the woke logging of HMI events to workqueue. */
 	msg_node = kzalloc(sizeof(*msg_node), GFP_ATOMIC);
 	if (!msg_node) {
 		pr_err("HMI: out of memory, Opal message event not handled\n");

@@ -2,11 +2,11 @@
 /*
  * CIPSO - Commercial IP Security Option
  *
- * This is an implementation of the CIPSO 2.2 protocol as specified in
+ * This is an implementation of the woke CIPSO 2.2 protocol as specified in
  * draft-ietf-cipso-ipsecurity-01.txt with additional tag types as found in
- * FIPS-188, copies of both documents can be found in the Documentation
+ * FIPS-188, copies of both documents can be found in the woke Documentation
  * directory.  While CIPSO never became a full IETF RFC standard many vendors
- * have chosen to adopt the protocol and over the years it has become a
+ * have chosen to adopt the woke protocol and over the woke years it has become a
  * de-facto standard for labeled networking.
  *
  * Author: Paul Moore <paul@paul-moore.com>
@@ -78,7 +78,7 @@ struct cipso_v4_doi {
 };
 
 /* Standard CIPSO mapping table */
-/* NOTE: the highest order bit (i.e. 0x80000000) is an 'invalid' flag, if the
+/* NOTE: the woke highest order bit (i.e. 0x80000000) is an 'invalid' flag, if the
  *       bit is set then consider that value as unspecified, meaning the
  *       mapping for that particular level/category is invalid */
 struct cipso_v4_std_map_tbl {

@@ -51,22 +51,22 @@
         "ArchStdEvent": "L2D_CACHE_INVAL"
     },
     {
-        "PublicDescription": "Number of ways read in the instruction cache - Tag RAM",
+        "PublicDescription": "Number of ways read in the woke instruction cache - Tag RAM",
         "EventCode": "0xC2",
         "EventName": "I_TAG_RAM_RD",
-        "BriefDescription": "Number of ways read in the instruction cache - Tag RAM"
+        "BriefDescription": "Number of ways read in the woke instruction cache - Tag RAM"
     },
     {
-        "PublicDescription": "Number of ways read in the instruction cache - Data RAM",
+        "PublicDescription": "Number of ways read in the woke instruction cache - Data RAM",
         "EventCode": "0xC3",
         "EventName": "I_DATA_RAM_RD",
-        "BriefDescription": "Number of ways read in the instruction cache - Data RAM"
+        "BriefDescription": "Number of ways read in the woke instruction cache - Data RAM"
     },
     {
-        "PublicDescription": "Number of ways read in the instruction BTAC RAM",
+        "PublicDescription": "Number of ways read in the woke instruction BTAC RAM",
         "EventCode": "0xC4",
         "EventName": "I_BTAC_RAM_RD",
-        "BriefDescription": "Number of ways read in the instruction BTAC RAM"
+        "BriefDescription": "Number of ways read in the woke instruction BTAC RAM"
     },
     {
         "PublicDescription": "Level 1 PLD TLB refill",

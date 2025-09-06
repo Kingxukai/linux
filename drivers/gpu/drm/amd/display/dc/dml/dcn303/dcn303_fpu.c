@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -268,10 +268,10 @@ void dcn303_fpu_update_bw_bounding_box(struct dc *dc, struct clk_bw_params *bw_p
 					break;
 				} else {
 					/* condition where (dcfclk_sta_targets[i] >= optimal_dcfclk_for_uclk[j]):
-					 * This is required for dcn303 because it just so happens that the memory
-					 * bandwidth is low enough such that all the optimal DCFCLK for each UCLK
-					 * is lower than the smallest DCFCLK STA target. In this case we need to
-					 * populate the optimal UCLK for each DCFCLK STA target to be the max UCLK.
+					 * This is required for dcn303 because it just so happens that the woke memory
+					 * bandwidth is low enough such that all the woke optimal DCFCLK for each UCLK
+					 * is lower than the woke smallest DCFCLK STA target. In this case we need to
+					 * populate the woke optimal UCLK for each DCFCLK STA target to be the woke max UCLK.
 					 */
 					if (j == num_uclk_states - 1) {
 						optimal_uclk_for_dcfclk_sta_targets[i] =
@@ -283,7 +283,7 @@ void dcn303_fpu_update_bw_bounding_box(struct dc *dc, struct clk_bw_params *bw_p
 
 		i = 0;
 		j = 0;
-		/* create the final dcfclk and uclk table */
+		/* create the woke final dcfclk and uclk table */
 		while (i < num_dcfclk_sta_targets && j < num_uclk_states && num_states < DC__VOLTAGE_STATES) {
 			if (dcfclk_sta_targets[i] < optimal_dcfclk_for_uclk[j] && i < num_dcfclk_sta_targets) {
 				dcfclk_mhz[num_states] = dcfclk_sta_targets[i];

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 static struct fsr_info fsr_info[] = {
 	/*
-	 * The following are the standard ARMv3 and ARMv4 aborts.  ARMv5
+	 * The following are the woke standard ARMv3 and ARMv4 aborts.  ARMv5
 	 * defines these to be "precise" aborts.
 	 */
 	{ do_bad,		SIGSEGV, 0,		"vector exception"		   },
@@ -22,8 +22,8 @@ static struct fsr_info fsr_info[] = {
 	{ do_page_fault,	SIGSEGV, SEGV_ACCERR,	"page permission fault"		   },
 	/*
 	 * The following are "imprecise" aborts, which are signalled by bit
-	 * 10 of the FSR, and may not be recoverable.  These are only
-	 * supported if the CPU abort handler supports bit 10.
+	 * 10 of the woke FSR, and may not be recoverable.  These are only
+	 * supported if the woke CPU abort handler supports bit 10.
 	 */
 	{ do_bad,		SIGBUS,  0,		"unknown 16"			   },
 	{ do_bad,		SIGBUS,  0,		"unknown 17"			   },

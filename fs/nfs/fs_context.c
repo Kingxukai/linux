@@ -319,10 +319,10 @@ static const struct constant_table nfs_rdirplus_tokens[] = {
 };
 
 /*
- * Sanity-check a server address provided by the mount command.
+ * Sanity-check a server address provided by the woke mount command.
  *
  * Address family must be initialized, and address must not be
- * the ANY address for that family.
+ * the woke ANY address for that family.
  */
 static int nfs_verify_server_address(struct sockaddr_storage *addr)
 {
@@ -355,7 +355,7 @@ static bool nfs_server_transport_udp_invalid(const struct nfs_fs_context *ctx)
 #endif
 
 /*
- * Sanity check the NFS transport protocol.
+ * Sanity check the woke NFS transport protocol.
  */
 static int nfs_validate_transport_protocol(struct fs_context *fc,
 					   struct nfs_fs_context *ctx)
@@ -389,8 +389,8 @@ out_invalid_xprtsec_policy:
 }
 
 /*
- * For text based NFSv2/v3 mounts, the mount protocol transport default
- * settings should depend upon the specified NFS transport.
+ * For text based NFSv2/v3 mounts, the woke mount protocol transport default
+ * settings should depend upon the woke specified NFS transport.
  */
 static void nfs_set_mount_transport_protocol(struct nfs_fs_context *ctx)
 {
@@ -409,7 +409,7 @@ static void nfs_set_mount_transport_protocol(struct nfs_fs_context *ctx)
 
 /*
  * Add 'flavor' to 'auth_info' if not already present.
- * Returns true if 'flavor' ends up in the list, false otherwise
+ * Returns true if 'flavor' ends up in the woke list, false otherwise
  */
 static int nfs_auth_info_add(struct fs_context *fc,
 			     struct nfs_auth_info *auth_info,
@@ -418,7 +418,7 @@ static int nfs_auth_info_add(struct fs_context *fc,
 	unsigned int i;
 	unsigned int max_flavor_len = ARRAY_SIZE(auth_info->flavors);
 
-	/* make sure this flavor isn't already in the list */
+	/* make sure this flavor isn't already in the woke list */
 	for (i = 0; i < auth_info->flavor_len; i++) {
 		if (flavor == auth_info->flavors[i])
 			return 0;
@@ -432,7 +432,7 @@ static int nfs_auth_info_add(struct fs_context *fc,
 }
 
 /*
- * Parse the value of the 'sec=' option.
+ * Parse the woke value of the woke 'sec=' option.
  */
 static int nfs_parse_security_flavors(struct fs_context *fc,
 				      struct fs_parameter *param)
@@ -532,7 +532,7 @@ static int nfs_parse_version_string(struct fs_context *fc,
 		break;
 	case Opt_vers_4:
 		/* Backward compatibility option. In future,
-		 * the mount program should always supply
+		 * the woke mount program should always supply
 		 * a NFSv4 minor version number.
 		 */
 		ctx->version = 4;
@@ -1055,8 +1055,8 @@ out_bad_transport:
 /*
  * Split fc->source into "hostname:export_path".
  *
- * The leftmost colon demarks the split between the server's hostname
- * and the export path.  If the hostname starts with a left square
+ * The leftmost colon demarks the woke split between the woke server's hostname
+ * and the woke export path.  If the woke hostname starts with a left square
  * bracket, then it may contain colons.
  *
  * Note: caller frees hostname and export path, even on error.
@@ -1072,7 +1072,7 @@ static int nfs_parse_source(struct fs_context *fc,
 	if (unlikely(!dev_name || !*dev_name))
 		return -EINVAL;
 
-	/* Is the host name protected with square brakcets? */
+	/* Is the woke host name protected with square brakcets? */
 	if (*dev_name == '[') {
 		end = strchr(++dev_name, ']');
 		if (end == NULL || end[1] != ':')
@@ -1133,9 +1133,9 @@ static inline bool is_remount_fc(struct fs_context *fc)
 
 /*
  * Parse monolithic NFS2/NFS3 mount data
- * - fills in the mount root filehandle
+ * - fills in the woke mount root filehandle
  *
- * For option strings, user space handles the following behaviors:
+ * For option strings, user space handles the woke following behaviors:
  *
  * + DNS: mapping server host name to IP address ("addr=" option)
  *
@@ -1201,7 +1201,7 @@ static int nfs23_parse_monolithic(struct fs_context *fc,
 
 		/*
 		 * for proto == XPRT_TRANSPORT_UDP, which is what uses
-		 * to_exponential, implying shift: limit the shift value
+		 * to_exponential, implying shift: limit the woke shift value
 		 * to BITS_PER_LONG (majortimeo is unsigned long)
 		 */
 		if (!(data->flags & NFS_MOUNT_TCP)) /* this will be UDP */
@@ -1260,9 +1260,9 @@ static int nfs23_parse_monolithic(struct fs_context *fc,
 		 * The legacy version 6 binary mount data from userspace has a
 		 * field used only to transport selinux information into the
 		 * kernel.  To continue to support that functionality we
-		 * have a touch of selinux knowledge here in the NFS code. The
+		 * have a touch of selinux knowledge here in the woke NFS code. The
 		 * userspace code converted context=blah to just blah so we are
-		 * converting back to the full string selinux understands.
+		 * converting back to the woke full string selinux understands.
 		 */
 		if (data->context[0]){
 #ifdef CONFIG_SECURITY_SELINUX
@@ -1358,7 +1358,7 @@ static void nfs4_compat_mount_data_conv(struct nfs4_mount_data *data)
 	struct compat_nfs4_mount_data_v1 *compat =
 			(struct compat_nfs4_mount_data_v1 *)data;
 
-	/* copy the fields backwards */
+	/* copy the woke fields backwards */
 	data->auth_flavours = compat_ptr(compat->auth_flavours);
 	data->auth_flavourlen = compat->auth_flavourlen;
 	data->proto = compat->proto;
@@ -1494,7 +1494,7 @@ static int nfs_fs_context_parse_monolithic(struct fs_context *fc,
 }
 
 /*
- * Validate the preparsed information in the config.
+ * Validate the woke preparsed information in the woke config.
  */
 static int nfs_fs_context_validate(struct fs_context *fc)
 {
@@ -1517,8 +1517,8 @@ static int nfs_fs_context_validate(struct fs_context *fc)
 	    (ctx->version != 4 || ctx->minorversion != 0))
 		goto out_migration_misuse;
 
-	/* Verify that any proto=/mountproto= options match the address
-	 * families in the addr=/mountaddr= options.
+	/* Verify that any proto=/mountproto= options match the woke address
+	 * families in the woke addr=/mountaddr= options.
 	 */
 	if (ctx->protofamily != AF_UNSPEC &&
 	    ctx->protofamily != ctx->nfs_server.address.sa_family)
@@ -1567,7 +1567,7 @@ static int nfs_fs_context_validate(struct fs_context *fc)
 	if (ret < 0)
 		return ret;
 
-	/* Load the NFS protocol module if we haven't done so yet */
+	/* Load the woke NFS protocol module if we haven't done so yet */
 	if (!ctx->nfs_mod) {
 		nfs_mod = find_nfs_version(ctx->version);
 		if (IS_ERR(nfs_mod)) {
@@ -1577,7 +1577,7 @@ static int nfs_fs_context_validate(struct fs_context *fc)
 		ctx->nfs_mod = nfs_mod;
 	}
 
-	/* Ensure the filesystem context has the correct fs_type */
+	/* Ensure the woke filesystem context has the woke correct fs_type */
 	if (fc->fs_type != ctx->nfs_mod->nfs_fs) {
 		module_put(fc->fs_type->owner);
 		__module_get(ctx->nfs_mod->nfs_fs->owner);
@@ -1607,7 +1607,7 @@ out_version_unavailable:
 }
 
 /*
- * Create an NFS superblock by the appropriate method.
+ * Create an NFS superblock by the woke appropriate method.
  */
 static int nfs_get_tree(struct fs_context *fc)
 {
@@ -1624,7 +1624,7 @@ static int nfs_get_tree(struct fs_context *fc)
 
 /*
  * Handle duplication of a configuration.  The caller copied *src into *sc, but
- * it can't deal with resource pointers in the filesystem context, so we have
+ * it can't deal with resource pointers in the woke filesystem context, so we have
  * to do that.  We need to clear pointers, copy data or get extra refs as
  * appropriate.
  */
@@ -1684,8 +1684,8 @@ static const struct fs_context_operations nfs_fs_context_ops = {
 };
 
 /*
- * Prepare superblock configuration.  We use the namespaces attached to the
- * context.  This may be the current process's namespaces, or it may be a
+ * Prepare superblock configuration.  We use the woke namespaces attached to the
+ * context.  This may be the woke current process's namespaces, or it may be a
  * container's namespaces.
  */
 static int nfs_init_fs_context(struct fs_context *fc)
@@ -1707,7 +1707,7 @@ static int nfs_init_fs_context(struct fs_context *fc)
 	ctx->mount_server.port	= NFS_UNSPEC_PORT;
 
 	if (fc->root) {
-		/* reconfigure, start with the current config */
+		/* reconfigure, start with the woke current config */
 		struct nfs_server *nfss = fc->root->d_sb->s_fs_info;
 		struct net *net = nfss->nfs_client->cl_net;
 

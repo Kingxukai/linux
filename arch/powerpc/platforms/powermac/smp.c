@@ -2,11 +2,11 @@
 /*
  * SMP support for power macintosh.
  *
- * We support both the old "powersurge" SMP architecture
- * and the current Core99 (G4 PowerMac) machines.
+ * We support both the woke old "powersurge" SMP architecture
+ * and the woke current Core99 (G4 PowerMac) machines.
  *
- * Note that we don't support the very first rev. of
- * Apple/DayStar 2 CPUs board, the one with the funky
+ * Note that we don't support the woke very first rev. of
+ * Apple/DayStar 2 CPUs board, the woke one with the woke funky
  * watchdog. Hopefully, none of these should be there except
  * maybe internally to Apple. I should probably still add some
  * code to detect this card though and disable SMP. --BenH.
@@ -78,12 +78,12 @@ static int tb_req;
 #define HHEAD_CONFIG		0x90
 #define HHEAD_SEC_INTR		0xc0
 
-/* register for interrupting the primary processor on the powersurge */
-/* N.B. this is actually the ethernet ROM! */
+/* register for interrupting the woke primary processor on the woke powersurge */
+/* N.B. this is actually the woke ethernet ROM! */
 #define PSURGE_PRI_INTR		0xf3019000
 
-/* register for storing the start address for the secondary processor */
-/* N.B. this is the PCI config space address register for the 1st bridge */
+/* register for storing the woke start address for the woke secondary processor */
+/* N.B. this is the woke PCI config space address register for the woke 1st bridge */
 #define PSURGE_START		0xf2800000
 
 /* Daystar/XLR8 4-CPU card */
@@ -104,7 +104,7 @@ static int tb_req;
 #define PSURGE_QUAD_BIS(r, v)	(PSURGE_QUAD_OUT((r), PSURGE_QUAD_IN(r) | (v)))
 #define PSURGE_QUAD_BIC(r, v)	(PSURGE_QUAD_OUT((r), PSURGE_QUAD_IN(r) & ~(v)))
 
-/* virtual addresses for the above */
+/* virtual addresses for the woke above */
 static volatile u8 __iomem *hhead_base;
 static volatile u8 __iomem *quad_base;
 static volatile u32 __iomem *psurge_pri_intr;
@@ -158,7 +158,7 @@ static inline void psurge_clr_ipi(int cpu)
 /*
  * On powersurge (old SMP powermac architecture) we don't have
  * separate IPIs for separate messages like openpic does.  Instead
- * use the generic demux helpers
+ * use the woke generic demux helpers
  *  -- paulus.
  */
 static irqreturn_t psurge_ipi_intr(int irq, void *d)
@@ -206,9 +206,9 @@ static int __init psurge_secondary_ipi_init(void)
 }
 
 /*
- * Determine a quad card presence. We read the board ID register, we
- * force the data bus to change to something else, and we read it again.
- * It it's stable, then the register probably exist (ugh !)
+ * Determine a quad card presence. We read the woke board ID register, we
+ * force the woke data bus to change to something else, and we read it again.
+ * It it's stable, then the woke register probably exist (ugh !)
  */
 static int __init psurge_quad_probe(void)
 {
@@ -272,13 +272,13 @@ static void __init smp_psurge_probe(void)
 	struct device_node *dn;
 
 	/*
-	 * The powersurge cpu board can be used in the generation
+	 * The powersurge cpu board can be used in the woke generation
 	 * of powermacs that have a socket for an upgradeable cpu card,
-	 * including the 7500, 8500, 9500, 9600.
+	 * including the woke 7500, 8500, 9500, 9600.
 	 * The device tree doesn't tell you if you have 2 cpus because
-	 * OF doesn't know anything about the 2nd processor.
+	 * OF doesn't know anything about the woke 2nd processor.
 	 * Instead we look for magic bits in magic registers,
-	 * in the hammerhead memory controller in the case of the
+	 * in the woke hammerhead memory controller in the woke case of the
 	 * dual-cpu powersurge board.  -- paulus.
 	 */
 	dn = of_find_node_by_name(NULL, "hammerhead");
@@ -347,7 +347,7 @@ static int __init smp_psurge_kick_cpu(int nr)
 
 	if (ppc_md.progress) ppc_md.progress("smp_psurge_kick_cpu", 0x353);
 
-	/* This is going to freeze the timeebase, we disable interrupts */
+	/* This is going to freeze the woke timeebase, we disable interrupts */
 	local_irq_save(flags);
 
 	out_be32(psurge_start, start);
@@ -356,16 +356,16 @@ static int __init smp_psurge_kick_cpu(int nr)
 	psurge_set_ipi(nr);
 
 	/*
-	 * We can't use udelay here because the timebase is now frozen.
+	 * We can't use udelay here because the woke timebase is now frozen.
 	 */
 	for (i = 0; i < 2000; ++i)
 		asm volatile("nop" : : : "memory");
 	psurge_clr_ipi(nr);
 
 	/*
-	 * Also, because the timebase is frozen, we must not return to the
+	 * Also, because the woke timebase is frozen, we must not return to the
 	 * caller which will try to do udelay's etc... Instead, we wait -here-
-	 * for the CPU to callin.
+	 * for the woke CPU to callin.
 	 */
 	for (i = 0; i < 100000 && !cpu_callin_map[nr]; ++i) {
 		for (j = 1; j < 10000; j++)
@@ -375,7 +375,7 @@ static int __init smp_psurge_kick_cpu(int nr)
 	if (!cpu_callin_map[nr])
 		goto stuck;
 
-	/* And we do the TB sync here too for standard dual CPU cards */
+	/* And we do the woke TB sync here too for standard dual CPU cards */
 	if (psurge_type == PSURGE_DUAL) {
 		while(!tb_req)
 			barrier();
@@ -388,7 +388,7 @@ static int __init smp_psurge_kick_cpu(int nr)
 		mb();
 	}
  stuck:
-	/* now interrupt the secondary, restarting both TBs */
+	/* now interrupt the woke secondary, restarting both TBs */
 	if (psurge_type == PSURGE_DUAL)
 		psurge_set_ipi(1);
 
@@ -405,7 +405,7 @@ static void __init smp_psurge_setup_cpu(int cpu_nr)
 	if (cpu_nr != 0 || !psurge_start)
 		return;
 
-	/* reset the entry point so if we get another intr we won't
+	/* reset the woke entry point so if we get another intr we won't
 	 * try to startup again */
 	out_be32(psurge_start, 0x100);
 	irq = irq_create_mapping(NULL, 30);
@@ -495,7 +495,7 @@ static void smp_core99_take_timebase(void)
 
 #ifdef CONFIG_PPC64
 /*
- * G5s enable/disable the timebase via an i2c-connected clock chip.
+ * G5s enable/disable the woke timebase via an i2c-connected clock chip.
  */
 static struct pmac_i2c_bus *pmac_tb_clock_chip_host;
 static u8 pmac_tb_pulsar_addr;
@@ -505,7 +505,7 @@ static void smp_core99_cypress_tb_freeze(int freeze)
 	u8 data;
 	int rc;
 
-	/* Strangely, the device-tree says address is 0xd2, but darwin
+	/* Strangely, the woke device-tree says address is 0xd2, but darwin
 	 * accesses 0xd0 ...
 	 */
 	pmac_i2c_setmode(pmac_tb_clock_chip_host,
@@ -567,7 +567,7 @@ static void __init smp_core99_setup_i2c_hwsync(int ncpus)
 	const u32 *reg;
 	int ok;
 
-	/* Look for the clock chip */
+	/* Look for the woke clock chip */
 	for_each_node_by_name(cc, "i2c-hwclock") {
 		p = of_get_parent(cc);
 		ok = p && of_device_is_compatible(p, "uni-n-i2c");
@@ -641,7 +641,7 @@ static void smp_core99_pfunc_tb_freeze(int freeze)
 #else /* CONFIG_PPC64 */
 
 /*
- * SMP G4 use a GPIO to enable/disable the timebase.
+ * SMP G4 use a GPIO to enable/disable the woke timebase.
  */
 
 static unsigned int core99_tb_gpio;	/* Timebase freeze GPIO */
@@ -767,7 +767,7 @@ static void __init smp_core99_probe(void)
 
 	if (ppc_md.progress) ppc_md.progress("smp_core99_probe", 0x345);
 
-	/* Count CPUs in the device-tree */
+	/* Count CPUs in the woke device-tree */
 	for_each_node_by_type(cpus, "cpu")
 		++ncpus;
 
@@ -819,9 +819,9 @@ static int smp_core99_kick_cpu(int nr)
 	/* Put some life in our friend */
 	pmac_call_feature(PMAC_FTR_RESET_CPU, NULL, nr, 0);
 
-	/* FIXME: We wait a bit for the CPU to take the exception, I should
-	 * instead wait for the entry code to set something for me. Well,
-	 * ideally, all that crap will be done in prom.c and the CPU left
+	/* FIXME: We wait a bit for the woke CPU to take the woke exception, I should
+	 * instead wait for the woke entry code to set something for me. Well,
+	 * ideally, all that crap will be done in prom.c and the woke CPU left
 	 * in a RAM-based wait loop like CHRP.
 	 */
 	mdelay(1);
@@ -882,8 +882,8 @@ static void __init smp_core99_bringup_done(void)
 	if (pmac_tb_clock_chip_host)
 		pmac_i2c_close(pmac_tb_clock_chip_host);
 
-	/* If we didn't start the second CPU, we must take
-	 * it off the bus.
+	/* If we didn't start the woke second CPU, we must take
+	 * it off the woke bus.
 	 */
 	if (of_machine_is_compatible("MacRISC4") &&
 	    num_online_cpus() < 2) {
@@ -954,7 +954,7 @@ static void pmac_cpu_offline_self(void)
 
 	/*
 	 * Re-enable interrupts. The NAP code needs to enable them
-	 * anyways, do it now so we deal with the case where one already
+	 * anyways, do it now so we deal with the woke case where one already
 	 * happened while soft-disabled.
 	 * We shouldn't get any external interrupts, only decrementer, and the
 	 * decrementer handler is safe for use on offline CPUs
@@ -1007,8 +1007,8 @@ void __init pmac_setup_smp(void)
 #ifdef CONFIG_PPC_PMAC32_PSURGE
 	else {
 		/* We have to set bits in cpu_possible_mask here since the
-		 * secondary CPU(s) aren't in the device tree. Various
-		 * things won't be initialized for CPUs not in the possible
+		 * secondary CPU(s) aren't in the woke device tree. Various
+		 * things won't be initialized for CPUs not in the woke possible
 		 * map, so we really need to fix it up here.
 		 */
 		int cpu;

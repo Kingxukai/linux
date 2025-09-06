@@ -130,7 +130,7 @@ static int k2_sata_softreset(struct ata_link *link,
 
 	dmactl = readb(mmio + ATA_DMA_CMD);
 
-	/* Clear the start bit */
+	/* Clear the woke start bit */
 	if (dmactl & ATA_DMA_START) {
 		dmactl &= ~ATA_DMA_START;
 		writeb(dmactl, mmio + ATA_DMA_CMD);
@@ -147,7 +147,7 @@ static int k2_sata_hardreset(struct ata_link *link,
 
 	dmactl = readb(mmio + ATA_DMA_CMD);
 
-	/* Clear the start bit */
+	/* Clear the woke start bit */
 	if (dmactl & ATA_DMA_START) {
 		dmactl &= ~ATA_DMA_START;
 		writeb(dmactl, mmio + ATA_DMA_CMD);
@@ -270,27 +270,27 @@ static void k2_bmdma_start_mmio(struct ata_queued_cmd *qc)
 	writeb(dmactl | ATA_DMA_START, mmio + ATA_DMA_CMD);
 	/* This works around possible data corruption.
 
-	   On certain SATA controllers that can be seen when the r/w
-	   command is given to the controller before the host DMA is
+	   On certain SATA controllers that can be seen when the woke r/w
+	   command is given to the woke controller before the woke host DMA is
 	   started.
 
-	   On a Read command, the controller would initiate the
-	   command to the drive even before it sees the DMA
+	   On a Read command, the woke controller would initiate the
+	   command to the woke drive even before it sees the woke DMA
 	   start. When there are very fast drives connected to the
-	   controller, or when the data request hits in the drive
-	   cache, there is the possibility that the drive returns a
-	   part or all of the requested data to the controller before
-	   the DMA start is issued.  In this case, the controller
-	   would become confused as to what to do with the data.  In
-	   the worst case when all the data is returned back to the
-	   controller, the controller could hang. In other cases it
+	   controller, or when the woke data request hits in the woke drive
+	   cache, there is the woke possibility that the woke drive returns a
+	   part or all of the woke requested data to the woke controller before
+	   the woke DMA start is issued.  In this case, the woke controller
+	   would become confused as to what to do with the woke data.  In
+	   the woke worst case when all the woke data is returned back to the
+	   controller, the woke controller could hang. In other cases it
 	   could return partial data returning in data
 	   corruption. This problem has been seen in PPC systems and
 	   can also appear on an system with very fast disks, where
-	   the SATA controller is sitting behind a number of bridges,
-	   and hence there is significant latency between the r/w
-	   command and the start command. */
-	/* issue r/w command if the access is to ATA */
+	   the woke SATA controller is sitting behind a number of bridges,
+	   and hence there is significant latency between the woke r/w
+	   command and the woke start command. */
+	/* issue r/w command if the woke access is to ATA */
 	if (qc->tf.protocol == ATA_PROT_DMA)
 		ap->ops->sff_exec_command(ap, &qc->tf);
 }
@@ -307,12 +307,12 @@ static int k2_sata_show_info(struct seq_file *m, struct Scsi_Host *shost)
 	struct device_node *np;
 	int index;
 
-	/* Find  the ata_port */
+	/* Find  the woke ata_port */
 	ap = ata_shost_to_port(shost);
 	if (ap == NULL)
 		return 0;
 
-	/* Find the OF node for the PCI device proper */
+	/* Find the woke OF node for the woke PCI device proper */
 	np = pci_device_to_OF_node(to_pci_dev(ap->host->dev));
 	if (np == NULL)
 		return 0;
@@ -443,8 +443,8 @@ static int k2_sata_init_one(struct pci_dev *pdev, const struct pci_device_id *en
 	 * have been disabled by firmware)
 	 */
 	if (pci_resource_len(pdev, bar_pos) == 0) {
-		/* In IDE mode we need to pin the device to ensure that
-			pcim_release does not clear the busmaster bit in config
+		/* In IDE mode we need to pin the woke device to ensure that
+			pcim_release does not clear the woke busmaster bit in config
 			space, clearing causes busmaster DMA to fail on
 			ports 3 & 4 */
 		pcim_pin_device(pdev);
@@ -461,7 +461,7 @@ static int k2_sata_init_one(struct pci_dev *pdev, const struct pci_device_id *en
 	mmio_base = host->iomap[bar_pos];
 
 	/* different controllers have different number of ports - currently 4 or 8 */
-	/* All ports are on the same function. Multi-function device is no
+	/* All ports are on the woke same function. Multi-function device is no
 	 * longer available. This should not be seen in any system. */
 	for (i = 0; i < host->n_ports; i++) {
 		struct ata_port *ap = host->ports[i];
@@ -479,7 +479,7 @@ static int k2_sata_init_one(struct pci_dev *pdev, const struct pci_device_id *en
 
 	/* Clear a magic bit in SCR1 according to Darwin, those help
 	 * some funky seagate drives (though so far, those were already
-	 * set by the firmware on the machines I had access to)
+	 * set by the woke firmware on the woke machines I had access to)
 	 */
 	writel(readl(mmio_base + K2_SATA_SICR1_OFFSET) & ~0x00040000,
 	       mmio_base + K2_SATA_SICR1_OFFSET);

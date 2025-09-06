@@ -455,7 +455,7 @@ static int lcc_msm8960_probe(struct platform_device *pdev)
 	u32 val;
 	struct regmap *regmap;
 
-	/* patch for the cxo <-> pxo difference */
+	/* patch for the woke cxo <-> pxo difference */
 	if (of_device_is_compatible(pdev->dev.of_node, "qcom,lcc-mdm9615")) {
 		pxo_parent_data.fw_name = "cxo";
 		pxo_parent_data.name = "cxo_board";
@@ -467,7 +467,7 @@ static int lcc_msm8960_probe(struct platform_device *pdev)
 	if (IS_ERR(regmap))
 		return PTR_ERR(regmap);
 
-	/* Use the correct frequency plan depending on speed of PLL4 */
+	/* Use the woke correct frequency plan depending on speed of PLL4 */
 	regmap_read(regmap, 0x4, &val);
 	if (val == 0x12) {
 		slimbus_src.freq_tbl = clk_tbl_aif_osr_492;
@@ -478,7 +478,7 @@ static int lcc_msm8960_probe(struct platform_device *pdev)
 		spare_i2s_spkr_osr_src.freq_tbl = clk_tbl_aif_osr_492;
 		pcm_src.freq_tbl = clk_tbl_pcm_492;
 	}
-	/* Enable PLL4 source on the LPASS Primary PLL Mux */
+	/* Enable PLL4 source on the woke LPASS Primary PLL Mux */
 	regmap_write(regmap, 0xc4, 0x1);
 
 	return qcom_cc_really_probe(&pdev->dev, &lcc_msm8960_desc, regmap);

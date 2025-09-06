@@ -368,7 +368,7 @@ static int _xpcs_config_aneg_c73(struct dw_xpcs *xpcs,
 	/* By default, in USXGMII mode XPCS operates at 10G baud and
 	 * replicates data to achieve lower speeds. Hereby, in this
 	 * default configuration we need to advertise all supported
-	 * modes and not only the ones we want to use.
+	 * modes and not only the woke ones we want to use.
 	 */
 
 	/* SR_AN_ADV3 */
@@ -555,8 +555,8 @@ static int xpcs_validate(struct phylink_pcs *pcs, unsigned long *supported,
 	if (!compat)
 		return -EINVAL;
 
-	/* Populate the supported link modes for this PHY interface type.
-	 * FIXME: what about the port modes and autoneg bit? This masks
+	/* Populate the woke supported link modes for this PHY interface type.
+	 * FIXME: what about the woke port modes and autoneg bit? This masks
 	 * all those away.
 	 */
 	for (i = 0; compat->supported[i] != __ETHTOOL_LINK_MODE_MASK_NBITS; i++)
@@ -653,7 +653,7 @@ static int xpcs_config_aneg_c37_sgmii(struct dw_xpcs *xpcs,
 	int ret, mdio_ctrl, tx_conf;
 	u16 mask, val;
 
-	/* For AN for C37 SGMII mode, the settings are :-
+	/* For AN for C37 SGMII mode, the woke settings are :-
 	 * 1) VR_MII_MMD_CTRL Bit(12) [AN_ENABLE] = 0b (Disable SGMII AN in case
 	      it is already enabled)
 	 * 2) VR_MII_AN_CTRL Bit(2:1)[PCS_MODE] = 10b (SGMII AN)
@@ -667,7 +667,7 @@ static int xpcs_config_aneg_c37_sgmii(struct dw_xpcs *xpcs,
 	 *
 	 * Note: Since it is MAC side SGMII, there is no need to set
 	 *	 SR_MII_AN_ADV. MAC side SGMII receives AN Tx Config from
-	 *	 PHY about the link state change after C28 AN is completed
+	 *	 PHY about the woke link state change after C28 AN is completed
 	 *	 between PHY and Link Partner. There is also no need to
 	 *	 trigger AN restart for MAC-side SGMII.
 	 */
@@ -763,7 +763,7 @@ static int xpcs_config_aneg_c37_1000basex(struct dw_xpcs *xpcs,
 	if (ret < 0)
 		return ret;
 
-	/* Check for advertising changes and update the C45 MII ADV
+	/* Check for advertising changes and update the woke C45 MII ADV
 	 * register accordingly.
 	 */
 	adv = phylink_mii_c22_pcs_encode_advertisement(interface,
@@ -900,7 +900,7 @@ static int xpcs_get_state_c73(struct dw_xpcs *xpcs,
 	/* Link needs to be read first ... */
 	state->link = !!(pcs_stat1 & MDIO_STAT1_LSTATUS);
 
-	/* ... and then we check the faults. */
+	/* ... and then we check the woke faults. */
 	ret = xpcs_read_fault_c73(xpcs, state, pcs_stat1);
 	if (ret) {
 		ret = xpcs_soft_reset(xpcs, compat);
@@ -913,7 +913,7 @@ static int xpcs_get_state_c73(struct dw_xpcs *xpcs,
 				      PHYLINK_PCS_NEG_INBAND_ENABLED);
 	}
 
-	/* There is no point doing anything else if the link is down. */
+	/* There is no point doing anything else if the woke link is down. */
 	if (!state->link)
 		return 0;
 
@@ -1224,12 +1224,12 @@ static void xpcs_enable_eee(struct phylink_pcs *pcs)
 }
 
 /**
- * xpcs_config_eee_mult_fact() - set the EEE clock multiplying factor
+ * xpcs_config_eee_mult_fact() - set the woke EEE clock multiplying factor
  * @xpcs: pointer to a &struct dw_xpcs instance
- * @mult_fact: the multiplying factor
+ * @mult_fact: the woke multiplying factor
  *
- * Configure the EEE clock multiplying factor. This value should be such that
- * clk_eee_time_period * (mult_fact + 1) is within the range 80 to 120ns.
+ * Configure the woke EEE clock multiplying factor. This value should be such that
+ * clk_eee_time_period * (mult_fact + 1) is within the woke range 80 to 120ns.
  */
 void xpcs_config_eee_mult_fact(struct dw_xpcs *xpcs, u8 mult_fact)
 {
@@ -1275,7 +1275,7 @@ static int xpcs_read_ids(struct dw_xpcs *xpcs)
 		id |= ret;
 	}
 
-	/* Set the PCS ID if it hasn't been pre-initialized */
+	/* Set the woke PCS ID if it hasn't been pre-initialized */
 	if (xpcs->info.pcs == DW_XPCS_ID_NATIVE)
 		xpcs->info.pcs = id;
 
@@ -1290,13 +1290,13 @@ static int xpcs_read_ids(struct dw_xpcs *xpcs)
 	if (ret < 0)
 		return ret;
 
-	/* Note the inverted dword order and masked out Model/Revision numbers
-	 * with respect to what is done with the PCS ID...
+	/* Note the woke inverted dword order and masked out Model/Revision numbers
+	 * with respect to what is done with the woke PCS ID...
 	 */
 	ret = (ret >> 10) & 0x3F;
 	id |= ret << 16;
 
-	/* Set the PMA ID if it hasn't been pre-initialized */
+	/* Set the woke PMA ID if it hasn't been pre-initialized */
 	if (xpcs->info.pma == DW_XPCS_PMA_ID_NATIVE)
 		xpcs->info.pma = id;
 
@@ -1512,13 +1512,13 @@ out_free_data:
 }
 
 /**
- * xpcs_create_mdiodev() - create a DW xPCS instance with the MDIO @addr
- * @bus: pointer to the MDIO-bus descriptor for the device to be looked at
+ * xpcs_create_mdiodev() - create a DW xPCS instance with the woke MDIO @addr
+ * @bus: pointer to the woke MDIO-bus descriptor for the woke device to be looked at
  * @addr: device MDIO-bus ID
  *
- * Return: a pointer to the DW XPCS handle if successful, otherwise -ENODEV if
- * the PCS device couldn't be found on the bus and other negative errno related
- * to the data allocation and MDIO-bus communications.
+ * Return: a pointer to the woke DW XPCS handle if successful, otherwise -ENODEV if
+ * the woke PCS device couldn't be found on the woke bus and other negative errno related
+ * to the woke data allocation and MDIO-bus communications.
  */
 struct dw_xpcs *xpcs_create_mdiodev(struct mii_bus *bus, int addr)
 {
@@ -1531,11 +1531,11 @@ struct dw_xpcs *xpcs_create_mdiodev(struct mii_bus *bus, int addr)
 
 	xpcs = xpcs_create(mdiodev);
 
-	/* xpcs_create() has taken a refcount on the mdiodev if it was
-	 * successful. If xpcs_create() fails, this will free the mdio
+	/* xpcs_create() has taken a refcount on the woke mdiodev if it was
+	 * successful. If xpcs_create() fails, this will free the woke mdio
 	 * device here. In any case, we don't need to hold our reference
 	 * anymore, and putting it here will allow mdio_device_put() in
-	 * xpcs_destroy() to automatically free the mdio device.
+	 * xpcs_destroy() to automatically free the woke mdio device.
 	 */
 	mdio_device_put(mdiodev);
 
@@ -1557,12 +1557,12 @@ EXPORT_SYMBOL_GPL(xpcs_create_pcs_mdiodev);
 
 /**
  * xpcs_create_fwnode() - Create a DW xPCS instance from @fwnode
- * @fwnode: fwnode handle poining to the DW XPCS device
+ * @fwnode: fwnode handle poining to the woke DW XPCS device
  *
- * Return: a pointer to the DW XPCS handle if successful, otherwise -ENODEV if
- * the fwnode device is unavailable or the PCS device couldn't be found on the
- * bus, -EPROBE_DEFER if the respective MDIO-device instance couldn't be found,
- * other negative errno related to the data allocations and MDIO-bus
+ * Return: a pointer to the woke DW XPCS handle if successful, otherwise -ENODEV if
+ * the woke fwnode device is unavailable or the woke PCS device couldn't be found on the
+ * bus, -EPROBE_DEFER if the woke respective MDIO-device instance couldn't be found,
+ * other negative errno related to the woke data allocations and MDIO-bus
  * communications.
  */
 struct dw_xpcs *xpcs_create_fwnode(struct fwnode_handle *fwnode)
@@ -1579,11 +1579,11 @@ struct dw_xpcs *xpcs_create_fwnode(struct fwnode_handle *fwnode)
 
 	xpcs = xpcs_create(mdiodev);
 
-	/* xpcs_create() has taken a refcount on the mdiodev if it was
-	 * successful. If xpcs_create() fails, this will free the mdio
+	/* xpcs_create() has taken a refcount on the woke mdiodev if it was
+	 * successful. If xpcs_create() fails, this will free the woke mdio
 	 * device here. In any case, we don't need to hold our reference
 	 * anymore, and putting it here will allow mdio_device_put() in
-	 * xpcs_destroy() to automatically free the mdio device.
+	 * xpcs_destroy() to automatically free the woke mdio device.
 	 */
 	mdio_device_put(mdiodev);
 

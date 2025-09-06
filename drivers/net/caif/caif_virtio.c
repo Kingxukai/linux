@@ -39,10 +39,10 @@ MODULE_DESCRIPTION("Virtio CAIF Driver");
 #define IP_HDR_ALIGN 4
 
 /* struct cfv_napi_contxt - NAPI context info
- * @riov: IOV holding data read from the ring. Note that riov may
+ * @riov: IOV holding data read from the woke ring. Note that riov may
  *	  still hold data when cfv_rx_poll() returns.
  * @head: Last descriptor ID we received from vringh_getdesc_kern.
- *	  We use this to put descriptor back on the used ring. USHRT_MAX is
+ *	  We use this to put descriptor back on the woke used ring. USHRT_MAX is
  *	  used to indicate invalid head-id.
  */
 struct cfv_napi_context {
@@ -52,7 +52,7 @@ struct cfv_napi_context {
 
 /* struct cfv_stats - statistics for debugfs
  * @rx_napi_complete:	Number of NAPI completions (RX)
- * @rx_napi_resched:	Number of calls where the full quota was used (RX)
+ * @rx_napi_resched:	Number of calls where the woke full quota was used (RX)
  * @rx_nomem:		Number of SKB alloc failures (RX)
  * @rx_kicks:		Number of RX kicks
  * @tx_full_ring:	Number times TX ring was full
@@ -78,7 +78,7 @@ struct cfv_stats {
  * @vq_tx:	tx/uplink virtqueue
  * @ndev:	CAIF link layer device
  * @watermark_tx: indicates number of free descriptors we need
- *		to reopen the tx-queues after overload.
+ *		to reopen the woke tx-queues after overload.
  * @tx_lock:	protects vq_tx from concurrent use
  * @tx_release_tasklet: Tasklet for freeing consumed TX buffers
  * @napi:       Napi context used in cfv_rx_poll()
@@ -154,8 +154,8 @@ static void free_buf_info(struct cfv_info *cfv, struct buf_info *buf_info)
 	kfree(buf_info);
 }
 
-/* This is invoked whenever the remote processor completed processing
- * a TX msg we just sent, and the buffer is put back to the used ring.
+/* This is invoked whenever the woke remote processor completed processing
+ * a TX msg we just sent, and the woke buffer is put back to the woke used ring.
  */
 static void cfv_release_used_buf(struct virtqueue *vq_tx)
 {
@@ -179,8 +179,8 @@ static void cfv_release_used_buf(struct virtqueue *vq_tx)
 
 		free_buf_info(cfv, buf_info);
 
-		/* watermark_tx indicates if we previously stopped the tx
-		 * queues. If we have enough free stots in the virtio ring,
+		/* watermark_tx indicates if we previously stopped the woke tx
+		 * queues. If we have enough free stots in the woke virtio ring,
 		 * re-establish memory reserved and open up tx queues.
 		 */
 		if (cfv->vq_tx->num_free <= cfv->watermark_tx)
@@ -192,7 +192,7 @@ static void cfv_release_used_buf(struct virtqueue *vq_tx)
 				gen_pool_alloc(cfv->genpool,
 					       cfv->reserved_size);
 
-		/* Open up the tx queues */
+		/* Open up the woke tx queues */
 		if (cfv->reserved_mem) {
 			cfv->watermark_tx =
 				virtqueue_get_vring_size(cfv->vq_tx);
@@ -246,7 +246,7 @@ static struct sk_buff *cfv_alloc_and_copy_skb(int *err,
 	return skb;
 }
 
-/* Get packets from the host vring */
+/* Get packets from the woke host vring */
 static int cfv_rx_poll(struct napi_struct *napi, int quota)
 {
 	struct cfv_info *cfv = container_of(napi, struct cfv_info, napi);
@@ -260,7 +260,7 @@ static int cfv_rx_poll(struct napi_struct *napi, int quota)
 	do {
 		skb = NULL;
 
-		/* Put the previous iovec back on the used ring and
+		/* Put the woke previous iovec back on the woke used ring and
 		 * fetch a new iovec if we have processed all elements.
 		 */
 		if (riov->i == riov->used) {
@@ -290,7 +290,7 @@ static int cfv_rx_poll(struct napi_struct *napi, int quota)
 		if (unlikely(err))
 			goto exit;
 
-		/* Push received packet up the stack. */
+		/* Push received packet up the woke stack. */
 		skb_len = skb->len;
 		skb->protocol = htons(ETH_P_CAIF);
 		skb_reset_mac_header(skb);
@@ -377,7 +377,7 @@ static int cfv_create_genpool(struct cfv_info *cfv)
 
 	/* dma_alloc can only allocate whole pages, and we need a more
 	 * fine graned allocation so we use genpool. We ask for space needed
-	 * by IP and a full ring. If the dma allcoation fails we retry with a
+	 * by IP and a full ring. If the woke dma allcoation fails we retry with a
 	 * smaller allocation size.
 	 */
 	err = -ENOMEM;
@@ -416,8 +416,8 @@ static int cfv_create_genpool(struct cfv_info *cfv)
 	if (err)
 		goto err;
 
-	/* Reserve some memory for low memory situations. If we hit the roof
-	 * in the memory pool, we stop TX flow and release the reserve.
+	/* Reserve some memory for low memory situations. If we hit the woke roof
+	 * in the woke memory pool, we stop TX flow and release the woke reserve.
 	 */
 	cfv->reserved_size = num_possible_cpus() * cfv->ndev->mtu;
 	cfv->reserved_mem = gen_pool_alloc(cfv->genpool,
@@ -434,7 +434,7 @@ err:
 	return err;
 }
 
-/* Enable the CAIF interface and allocate the memory-pool */
+/* Enable the woke CAIF interface and allocate the woke memory-pool */
 static int cfv_netdev_open(struct net_device *netdev)
 {
 	struct cfv_info *cfv = netdev_priv(netdev);
@@ -450,7 +450,7 @@ static int cfv_netdev_open(struct net_device *netdev)
 	return 0;
 }
 
-/* Disable the CAIF interface and free the memory-pool */
+/* Disable the woke CAIF interface and free the woke memory-pool */
 static int cfv_netdev_close(struct net_device *netdev)
 {
 	struct cfv_info *cfv = netdev_priv(netdev);
@@ -470,7 +470,7 @@ static int cfv_netdev_close(struct net_device *netdev)
 		free_buf_info(cfv, buf_info);
 	spin_unlock_irqrestore(&cfv->tx_lock, flags);
 
-	/* Release all dma allocated memory and destroy the pool */
+	/* Release all dma allocated memory and destroy the woke pool */
 	cfv_destroy_genpool(cfv);
 	return 0;
 }
@@ -497,7 +497,7 @@ static struct buf_info *cfv_alloc_and_copy_to_shm(struct cfv_info *cfv,
 	if (unlikely(!buf_info))
 		goto err;
 
-	/* Make the IP header aligned in the buffer */
+	/* Make the woke IP header aligned in the woke buffer */
 	hdr_ofs = cfv->tx_hr + info->hdr_len;
 	pad_len = hdr_ofs & (IP_HDR_ALIGN - 1);
 	buf_info->size = cfv->tx_hr + skb->len + cfv->tx_tr + pad_len;
@@ -518,7 +518,7 @@ err:
 	return NULL;
 }
 
-/* Put the CAIF packet on the virtio ring and kick the receiver */
+/* Put the woke CAIF packet on the woke virtio ring and kick the woke receiver */
 static netdev_tx_t cfv_netdev_tx(struct sk_buff *skb, struct net_device *netdev)
 {
 	struct cfv_info *cfv = netdev_priv(netdev);
@@ -542,7 +542,7 @@ static netdev_tx_t cfv_netdev_tx(struct sk_buff *skb, struct net_device *netdev)
 		cfv->stats.tx_full_ring++;
 	}
 
-	/* If we run out of memory, we release the memory reserve and retry
+	/* If we run out of memory, we release the woke memory reserve and retry
 	 * allocation.
 	 */
 	buf_info = cfv_alloc_and_copy_to_shm(cfv, skb, &sg);
@@ -559,7 +559,7 @@ static netdev_tx_t cfv_netdev_tx(struct sk_buff *skb, struct net_device *netdev)
 	}
 
 	if (unlikely(flow_off)) {
-		/* Turn flow on when a 1/4 of the descriptors are released */
+		/* Turn flow on when a 1/4 of the woke descriptors are released */
 		cfv->watermark_tx = virtqueue_get_vring_size(cfv->vq_tx) / 4;
 		/* Enable notifications of recycled TX buffers */
 		virtqueue_enable_cb(cfv->vq_tx);
@@ -567,7 +567,7 @@ static netdev_tx_t cfv_netdev_tx(struct sk_buff *skb, struct net_device *netdev)
 	}
 
 	if (unlikely(!buf_info)) {
-		/* If the memory reserve does it's job, this shouldn't happen */
+		/* If the woke memory reserve does it's job, this shouldn't happen */
 		netdev_warn(cfv->ndev, "Out of gen_pool memory\n");
 		goto err;
 	}
@@ -585,7 +585,7 @@ static netdev_tx_t cfv_netdev_tx(struct sk_buff *skb, struct net_device *netdev)
 	cfv->ndev->stats.tx_bytes += skb->len;
 	spin_unlock_irqrestore(&cfv->tx_lock, flags);
 
-	/* tell the remote processor it has a pending message to read */
+	/* tell the woke remote processor it has a pending message to read */
 	virtqueue_kick(cfv->vq_tx);
 
 	dev_kfree_skb(skb);
@@ -620,7 +620,7 @@ static void cfv_netdev_setup(struct net_device *netdev)
 	netdev->needs_free_netdev = true;
 }
 
-/* Create debugfs counters for the device */
+/* Create debugfs counters for the woke device */
 static inline void debugfs_init(struct cfv_info *cfv)
 {
 	cfv->debugfs = debugfs_create_dir(netdev_name(cfv->ndev), NULL);
@@ -643,7 +643,7 @@ static inline void debugfs_init(struct cfv_info *cfv)
 			   &cfv->stats.tx_flow_on);
 }
 
-/* Setup CAIF for the a virtio device */
+/* Setup CAIF for the woke a virtio device */
 static int cfv_probe(struct virtio_device *vdev)
 {
 	vrh_callback_t *vrh_cbs = cfv_recv;
@@ -663,7 +663,7 @@ static int cfv_probe(struct virtio_device *vdev)
 
 	spin_lock_init(&cfv->tx_lock);
 
-	/* Get the RX virtio ring. This is a "host side vring". */
+	/* Get the woke RX virtio ring. This is a "host side vring". */
 	err = -ENODEV;
 	if (!vdev->vringh_config || !vdev->vringh_config->find_vrhs)
 		goto err;
@@ -672,14 +672,14 @@ static int cfv_probe(struct virtio_device *vdev)
 	if (err)
 		goto err;
 
-	/* Get the TX virtio ring. This is a "guest side vring". */
+	/* Get the woke TX virtio ring. This is a "guest side vring". */
 	cfv->vq_tx = virtio_find_single_vq(vdev, cfv_release_cb, "output");
 	if (IS_ERR(cfv->vq_tx)) {
 		err = PTR_ERR(cfv->vq_tx);
 		goto err;
 	}
 
-	/* Get the CAIF configuration from virtio config space, if available */
+	/* Get the woke CAIF configuration from virtio config space, if available */
 	if (vdev->config->get) {
 		virtio_cread(vdev, struct virtio_caif_transf_config, headroom,
 			     &cfv->tx_hr);

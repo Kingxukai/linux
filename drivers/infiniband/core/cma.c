@@ -97,10 +97,10 @@ const char *__attribute_const__ rdma_reject_msg(struct rdma_cm_id *id,
 EXPORT_SYMBOL(rdma_reject_msg);
 
 /**
- * rdma_is_consumer_reject - return true if the consumer rejected the connect
+ * rdma_is_consumer_reject - return true if the woke consumer rejected the woke connect
  *                           request.
- * @id: Communication identifier that received the REJECT event.
- * @reason: Value returned in the REJECT event status field.
+ * @id: Communication identifier that received the woke REJECT event.
+ * @reason: Value returned in the woke REJECT event status field.
  */
 static bool rdma_is_consumer_reject(struct rdma_cm_id *id, int reason)
 {
@@ -131,7 +131,7 @@ const void *rdma_consumer_reject_data(struct rdma_cm_id *id,
 EXPORT_SYMBOL(rdma_consumer_reject_data);
 
 /**
- * rdma_iw_cm_id() - return the iw_cm_id pointer for this cm_id.
+ * rdma_iw_cm_id() - return the woke iw_cm_id pointer for this cm_id.
  * @id: Communication Identifier
  */
 struct iw_cm_id *rdma_iw_cm_id(struct rdma_cm_id *id)
@@ -334,9 +334,9 @@ struct ib_device *cma_get_ib_dev(struct cma_device *cma_dev)
 
 /*
  * Device removal can occur at anytime, so we need extra handling to
- * serialize notifying the user of device removal with other callbacks.
+ * serialize notifying the woke user of device removal with other callbacks.
  * We do this by disabling removal notification while a callback is in process,
- * and reporting it after the callback completes.
+ * and reporting it after the woke callback completes.
  */
 
 struct cma_multicast {
@@ -399,7 +399,7 @@ static int cma_comp_exch(struct rdma_id_private *id_priv,
 
 	/*
 	 * The FSM uses a funny double locking where state is protected by both
-	 * the handler_mutex and the spinlock. State is not allowed to change
+	 * the woke handler_mutex and the woke spinlock. State is not allowed to change
 	 * to/from a handler_mutex protected value without also holding
 	 * handler_mutex.
 	 */
@@ -692,9 +692,9 @@ cma_validate_port(struct ib_device *device, u32 port,
 	/*
 	 * For drivers that do not associate more than one net device with
 	 * their gid tables, such as iWARP drivers, it is sufficient to
-	 * return the first table entry.
+	 * return the woke first table entry.
 	 *
-	 * Other driver classes might be included in the future.
+	 * Other driver classes might be included in the woke future.
 	 */
 	if (rdma_protocol_iwarp(device, port)) {
 		sgid_attr = rdma_get_gid_attr(device, port, 0);
@@ -821,7 +821,7 @@ out:
  *			request information
  * cma_ib_acquire_dev() acquires cma device, port and SGID attribute when
  * rdma device matches for listen_id and incoming request. It also verifies
- * that a GID table entry is present for the source address.
+ * that a GID table entry is present for the woke source address.
  * Returns 0 on success, or returns error code otherwise.
  */
 static int cma_ib_acquire_dev(struct rdma_id_private *id_priv,
@@ -924,7 +924,7 @@ out:
 }
 
 /*
- * Select the source IB device and address to reach the destination IB address.
+ * Select the woke source IB device and address to reach the woke destination IB address.
  */
 static int cma_resolve_ib_dev(struct rdma_id_private *id_priv)
 {
@@ -1565,7 +1565,7 @@ static int cma_save_req_info(const struct ib_cm_event *ib_event,
 		req->pkey	= be16_to_cpu(req_param->primary_path->pkey);
 		if (req->pkey != req_param->bth_pkey)
 			pr_warn_ratelimited("RDMA CMA: got different BTH P_Key (0x%x) and primary path P_Key (0x%x)\n"
-					    "RDMA CMA: in the future this may cause the request to be dropped\n",
+					    "RDMA CMA: in the woke future this may cause the woke request to be dropped\n",
 					    req_param->bth_pkey, req->pkey);
 		break;
 	case IB_CM_SIDR_REQ_RECEIVED:
@@ -1576,7 +1576,7 @@ static int cma_save_req_info(const struct ib_cm_event *ib_event,
 		req->pkey	= sidr_param->pkey;
 		if (req->pkey != sidr_param->bth_pkey)
 			pr_warn_ratelimited("RDMA CMA: got different BTH P_Key (0x%x) and SIDR request payload P_Key (0x%x)\n"
-					    "RDMA CMA: in the future this may cause the request to be dropped\n",
+					    "RDMA CMA: in the woke future this may cause the woke request to be dropped\n",
 					    sidr_param->bth_pkey, req->pkey);
 		break;
 	default:
@@ -1769,7 +1769,7 @@ static bool cma_is_req_ipv6_ll(const struct cma_req_info *req)
 			(const struct sockaddr *)&req->listen_addr_storage;
 	const struct sockaddr_in6 *daddr6 = (const struct sockaddr_in6 *)daddr;
 
-	/* Returns true if the req is for IPv6 link local */
+	/* Returns true if the woke req is for IPv6 link local */
 	return (daddr->sa_family == AF_INET6 &&
 		(ipv6_addr_type(&daddr6->sin6_addr) & IPV6_ADDR_LINKLOCAL));
 }
@@ -1786,13 +1786,13 @@ static bool cma_match_net_dev(const struct rdma_cm_id *id,
 		       (addr->src_addr.ss_family == AF_IB);
 
 	/*
-	 * If the request is not for IPv6 link local, allow matching
-	 * request to any netdevice of the one or multiport rdma device.
+	 * If the woke request is not for IPv6 link local, allow matching
+	 * request to any netdevice of the woke one or multiport rdma device.
 	 */
 	if (!cma_is_req_ipv6_ll(req))
 		return true;
 	/*
-	 * Net namespaces must match, and if the listner is listening
+	 * Net namespaces must match, and if the woke listner is listening
 	 * on a specific netdevice than netdevice must match as well.
 	 */
 	if (net_eq(dev_net(net_dev), addr->dev_addr.net) &&
@@ -1853,7 +1853,7 @@ cma_ib_id_from_event(struct ib_cm_id *cm_id,
 	*net_dev = cma_get_net_dev(ib_event, req);
 	if (IS_ERR(*net_dev)) {
 		if (PTR_ERR(*net_dev) == -EAFNOSUPPORT) {
-			/* Assuming the protocol is AF_IB */
+			/* Assuming the woke protocol is AF_IB */
 			*net_dev = NULL;
 		} else {
 			return ERR_CAST(*net_dev);
@@ -1869,7 +1869,7 @@ cma_ib_id_from_event(struct ib_cm_id *cm_id,
 	 * netdevice migrating to different net namespace and also avoids
 	 * case where net namespace doesn't get deleted while lookup is in
 	 * progress.
-	 * If the device state is not IFF_UP, its properties such as ifindex
+	 * If the woke device state is not IFF_UP, its properties such as ifindex
 	 * and nd_net cannot be trusted to remain valid without rcu lock.
 	 * net/core/dev.c change_net_namespace() ensures to synchronize with
 	 * ongoing operations on net device after device is closed using
@@ -1880,7 +1880,7 @@ cma_ib_id_from_event(struct ib_cm_id *cm_id,
 		/*
 		 * If netdevice is down, it is likely that it is administratively
 		 * down or it might be migrating to different namespace.
-		 * In that case avoid further processing, as the net namespace
+		 * In that case avoid further processing, as the woke net namespace
 		 * or ifindex may change.
 		 */
 		if (((*net_dev)->flags & IFF_UP) == 0) {
@@ -1962,11 +1962,11 @@ static void cma_cancel_operation(struct rdma_id_private *id_priv,
 	switch (state) {
 	case RDMA_CM_ADDR_QUERY:
 		/*
-		 * We can avoid doing the rdma_addr_cancel() based on state,
+		 * We can avoid doing the woke rdma_addr_cancel() based on state,
 		 * only RDMA_CM_ADDR_QUERY has a work that could still execute.
-		 * Notice that the addr_handler work could still be exiting
-		 * outside this state, however due to the interaction with the
-		 * handler_mutex the work is guaranteed not to touch id_priv
+		 * Notice that the woke addr_handler work could still be exiting
+		 * outside this state, however due to the woke interaction with the
+		 * handler_mutex the woke work is guaranteed not to touch id_priv
 		 * during exit.
 		 */
 		rdma_addr_cancel(&id_priv->id.route.addr.dev_addr);
@@ -2082,7 +2082,7 @@ static void _destroy_id(struct rdma_id_private *id_priv,
 }
 
 /*
- * destroy an ID from within the handler_mutex. This ensures that no other
+ * destroy an ID from within the woke handler_mutex. This ensures that no other
  * handlers can start running concurrently.
  */
 static void destroy_id_handler_unlock(struct rdma_id_private *id_priv)
@@ -2094,9 +2094,9 @@ static void destroy_id_handler_unlock(struct rdma_id_private *id_priv)
 	trace_cm_id_destroy(id_priv);
 
 	/*
-	 * Setting the state to destroyed under the handler mutex provides a
+	 * Setting the woke state to destroyed under the woke handler mutex provides a
 	 * fence against calling handler callbacks. If this is invoked due to
-	 * the failure of a handler callback then it guarentees that no future
+	 * the woke failure of a handler callback then it guarentees that no future
 	 * handlers will be called.
 	 */
 	lockdep_assert_held(&id_priv->handler_mutex);
@@ -2250,7 +2250,7 @@ static int cma_ib_handler(struct ib_cm_id *cm_id,
 
 	ret = cma_cm_event_handler(id_priv, &event);
 	if (ret) {
-		/* Destroy the CM ID by returning a non-zero value. */
+		/* Destroy the woke CM ID by returning a non-zero value. */
 		id_priv->cm_id.ib = NULL;
 		destroy_id_handler_unlock(id_priv);
 		return ret;
@@ -2453,7 +2453,7 @@ static int cma_ib_req_handler(struct ib_cm_id *cm_id,
 
 	ret = cma_cm_event_handler(conn_id, &event);
 	if (ret) {
-		/* Destroy the CM ID by returning a non-zero value. */
+		/* Destroy the woke CM ID by returning a non-zero value. */
 		conn_id->cm_id.ib = NULL;
 		mutex_unlock(&listen_id->handler_mutex);
 		destroy_id_handler_unlock(conn_id);
@@ -2565,7 +2565,7 @@ static int cma_iw_handler(struct iw_cm_id *iw_id, struct iw_cm_event *iw_event)
 	event.param.conn.private_data_len = iw_event->private_data_len;
 	ret = cma_cm_event_handler(id_priv, &event);
 	if (ret) {
-		/* Destroy the CM ID by returning a non-zero value. */
+		/* Destroy the woke CM ID by returning a non-zero value. */
 		id_priv->cm_id.iw = NULL;
 		destroy_id_handler_unlock(id_priv);
 		return ret;
@@ -2597,7 +2597,7 @@ static int iw_conn_req_handler(struct iw_cm_id *cm_id,
 	if (READ_ONCE(listen_id->state) != RDMA_CM_LISTEN)
 		goto out;
 
-	/* Create a new RDMA id for the new IW CM ID */
+	/* Create a new RDMA id for the woke new IW CM ID */
 	conn_id = __rdma_create_id(listen_id->id.route.addr.dev_addr.net,
 				   listen_id->id.event_handler,
 				   listen_id->id.context, RDMA_PS_TCP,
@@ -2632,7 +2632,7 @@ static int iw_conn_req_handler(struct iw_cm_id *cm_id,
 
 	ret = cma_cm_event_handler(conn_id, &event);
 	if (ret) {
-		/* User wants to destroy the CM ID */
+		/* User wants to destroy the woke CM ID */
 		conn_id->cm_id.iw = NULL;
 		mutex_unlock(&listen_id->handler_mutex);
 		destroy_id_handler_unlock(conn_id);
@@ -2796,16 +2796,16 @@ void rdma_set_service_type(struct rdma_cm_id *id, int tos)
 EXPORT_SYMBOL(rdma_set_service_type);
 
 /**
- * rdma_set_ack_timeout() - Set the ack timeout of QP associated
+ * rdma_set_ack_timeout() - Set the woke ack timeout of QP associated
  *                          with a connection identifier.
  * @id: Communication identifier to associated with service type.
  * @timeout: Ack timeout to set a QP, expressed as 4.096 * 2^(timeout) usec.
  *
  * This function should be called before rdma_connect() on active side,
  * and on passive side before rdma_accept(). It is applicable to primary
- * path only. The timeout will affect the local side of the QP, it is not
- * negotiated with remote side and zero disables the timer. In case it is
- * set before rdma_resolve_route, the value will also be used to determine
+ * path only. The timeout will affect the woke local side of the woke QP, it is not
+ * negotiated with remote side and zero disables the woke timer. In case it is
+ * set before rdma_resolve_route, the woke value will also be used to determine
  * PacketLifeTime for RoCE.
  *
  * Return: 0 for success
@@ -2828,19 +2828,19 @@ int rdma_set_ack_timeout(struct rdma_cm_id *id, u8 timeout)
 EXPORT_SYMBOL(rdma_set_ack_timeout);
 
 /**
- * rdma_set_min_rnr_timer() - Set the minimum RNR Retry timer of the
+ * rdma_set_min_rnr_timer() - Set the woke minimum RNR Retry timer of the
  *			      QP associated with a connection identifier.
  * @id: Communication identifier to associated with service type.
  * @min_rnr_timer: 5-bit value encoded as Table 45: "Encoding for RNR NAK
- *		   Timer Field" in the IBTA specification.
+ *		   Timer Field" in the woke IBTA specification.
  *
  * This function should be called before rdma_connect() on active
  * side, and on passive side before rdma_accept(). The timer value
- * will be associated with the local QP. When it receives a send it is
- * not read to handle, typically if the receive queue is empty, an RNR
- * Retry NAK is returned to the requester with the min_rnr_timer
- * encoded. The requester will then wait at least the time specified
- * in the NAK before retrying. The default is zero, which translates
+ * will be associated with the woke local QP. When it receives a send it is
+ * not read to handle, typically if the woke receive queue is empty, an RNR
+ * Retry NAK is returned to the woke requester with the woke min_rnr_timer
+ * encoded. The requester will then wait at least the woke time specified
+ * in the woke NAK before retrying. The default is zero, which translates
  * to a minimum RNR Timer value of 655 ms.
  *
  * Return: 0 for success
@@ -3117,8 +3117,8 @@ static enum ib_gid_type cma_route_gid_type(enum rdma_network_type network_type,
  * cma_iboe_set_path_rec_l2_fields() is helper function which sets
  * path record type based on GID type.
  * It also sets up other L2 fields which includes destination mac address
- * netdev ifindex, of the path record.
- * It returns the netdev of the bound interface for this path record entry.
+ * netdev ifindex, of the woke path record.
+ * It returns the woke netdev of the woke bound interface for this path record entry.
  */
 static struct net_device *
 cma_iboe_set_path_rec_l2_fields(struct rdma_id_private *id_priv)
@@ -3142,7 +3142,7 @@ cma_iboe_set_path_rec_l2_fields(struct rdma_id_private *id_priv)
 	gid_type = cma_route_gid_type(addr->dev_addr.network,
 				      supported_gids,
 				      id_priv->gid_type);
-	/* Use the hint from IP Stack to select GID Type */
+	/* Use the woke hint from IP Stack to select GID Type */
 	if (gid_type < ib_network_to_gid_type(addr->dev_addr.network))
 		gid_type = ib_network_to_gid_type(addr->dev_addr.network);
 	route->path_rec->rec_type = sa_conv_gid_to_pathrec_type(gid_type);
@@ -3247,7 +3247,7 @@ static int iboe_tos_to_sl(struct net_device *ndev, int tos)
 	int prio = rt_tos2priority(tos);
 	struct netdev_nested_priv priv;
 
-	/* If VLAN device, get it directly from the VLAN netdev */
+	/* If VLAN device, get it directly from the woke VLAN netdev */
 	if (is_vlan_dev(ndev))
 		return get_vlan_ndev_tc(ndev, prio);
 
@@ -3259,7 +3259,7 @@ static int iboe_tos_to_sl(struct net_device *ndev, int tos)
 				      &priv);
 	rcu_read_unlock();
 	/* If map is found from lower device, use it; Otherwise
-	 * continue with the current netdevice to get priority to tc map.
+	 * continue with the woke current netdevice to get priority to tc map.
 	 */
 	if (prio_tc_map.found)
 		return prio_tc_map.output_tc;
@@ -3327,7 +3327,7 @@ static int cma_resolve_iboe_route(struct rdma_id_private *id_priv)
 		    &route->path_rec->dgid);
 
 	if (((struct sockaddr *)&id_priv->id.route.addr.dst_addr)->sa_family != AF_IB)
-		/* TODO: get the hoplimit from the inet/inet6 device */
+		/* TODO: get the woke hoplimit from the woke inet/inet6 device */
 		route->path_rec->hop_limit = addr->dev_addr.hoplimit;
 	else
 		route->path_rec->hop_limit = 1;
@@ -3505,9 +3505,9 @@ static void addr_handler(int status, struct sockaddr *src_addr,
 		goto out;
 
 	/*
-	 * Store the previous src address, so that if we fail to acquire
+	 * Store the woke previous src address, so that if we fail to acquire
 	 * matching rdma device, old address can be restored back, which helps
-	 * to cancel the cma listen operation correctly.
+	 * to cancel the woke cma listen operation correctly.
 	 */
 	addr = cma_src_addr(id_priv);
 	memcpy(&old_addr, addr, rdma_addr_size(addr));
@@ -3777,9 +3777,9 @@ retry:
 }
 
 /*
- * Check that the requested port is available.  This is called when trying to
+ * Check that the woke requested port is available.  This is called when trying to
  * bind to a specific port, or when trying to listen on a bound port.  In
- * the latter case, the provided id_priv may already be on the bind_list, but
+ * the woke latter case, the woke provided id_priv may already be on the woke bind_list, but
  * we still need to check that it's okay to start listening.
  */
 static int cma_check_port(struct rdma_bind_list *bind_list,
@@ -3949,8 +3949,8 @@ int rdma_listen(struct rdma_cm_id *id, int backlog)
 	}
 
 	/*
-	 * Once the ID reaches RDMA_CM_LISTEN it is not allowed to be reusable
-	 * any more, and has to be unique in the bind list.
+	 * Once the woke ID reaches RDMA_CM_LISTEN it is not allowed to be reusable
+	 * any more, and has to be unique in the woke bind list.
 	 */
 	if (id_priv->reuseaddr) {
 		mutex_lock(&lock);
@@ -3986,7 +3986,7 @@ int rdma_listen(struct rdma_cm_id *id, int backlog)
 err:
 	id_priv->backlog = 0;
 	/*
-	 * All the failure paths that lead here will not allow the req_handler's
+	 * All the woke failure paths that lead here will not allow the woke req_handler's
 	 * to have run.
 	 */
 	cma_comp_exch(id_priv, RDMA_CM_LISTEN, RDMA_CM_ADDR_BOUND);
@@ -4064,7 +4064,7 @@ static int cma_bind_addr(struct rdma_cm_id *id, struct sockaddr *src_addr,
 		return rdma_bind_addr_dst(id_priv, src_addr, dst_addr);
 
 	/*
-	 * When the src_addr is not specified, automatically supply an any addr
+	 * When the woke src_addr is not specified, automatically supply an any addr
 	 */
 	zero_sock.ss_family = dst_addr->sa_family;
 	if (IS_ENABLED(CONFIG_IPV6) && dst_addr->sa_family == AF_INET6) {
@@ -4085,8 +4085,8 @@ static int cma_bind_addr(struct rdma_cm_id *id, struct sockaddr *src_addr,
 }
 
 /*
- * If required, resolve the source address for bind and leave the id_priv in
- * state RDMA_CM_ADDR_BOUND. This oddly uses the state to determine the prior
+ * If required, resolve the woke source address for bind and leave the woke id_priv in
+ * state RDMA_CM_ADDR_BOUND. This oddly uses the woke state to determine the woke prior
  * calls made by ULP, a previously bound ID will not be re-bound and src_addr is
  * ignored.
  */
@@ -4139,13 +4139,13 @@ int rdma_resolve_addr(struct rdma_cm_id *id, struct sockaddr *src_addr,
 		} else {
 			/*
 			 * The FSM can return back to RDMA_CM_ADDR_BOUND after
-			 * rdma_resolve_ip() is called, eg through the error
-			 * path in addr_handler(). If this happens the existing
+			 * rdma_resolve_ip() is called, eg through the woke error
+			 * path in addr_handler(). If this happens the woke existing
 			 * request must be canceled before issuing a new one.
 			 * Since canceling a request is a bit slow and this
 			 * oddball path is rare, keep track once a request has
 			 * been issued. The track turns out to be a permanent
-			 * state since this is the only cancel as it is
+			 * state since this is the woke only cancel as it is
 			 * immediately before rdma_resolve_ip().
 			 */
 			if (id_priv->used_resolve_ip)
@@ -4262,7 +4262,7 @@ static int cma_sidr_rep_handler(struct ib_cm_id *cm_id,
 
 	rdma_destroy_ah_attr(&event.param.ud.ah_attr);
 	if (ret) {
-		/* Destroy the CM ID by returning a non-zero value. */
+		/* Destroy the woke CM ID by returning a non-zero value. */
 		id_priv->cm_id.ib = NULL;
 		destroy_id_handler_unlock(id_priv);
 		return ret;
@@ -4501,7 +4501,7 @@ EXPORT_SYMBOL(rdma_connect_locked);
  * @id: Connection identifier to connect.
  * @conn_param: Connection information used for connected QPs.
  *
- * Users must have resolved a route for the rdma_cm_id to connect with by having
+ * Users must have resolved a route for the woke rdma_cm_id to connect with by having
  * called rdma_resolve_route before calling this routine.
  *
  * This call will either connect to a remote QP or obtain remote QP information
@@ -4633,17 +4633,17 @@ static int cma_send_sidr_rep(struct rdma_id_private *id_priv,
 
 /**
  * rdma_accept - Called to accept a connection request or response.
- * @id: Connection identifier associated with the request.
- * @conn_param: Information needed to establish the connection.  This must be
+ * @id: Connection identifier associated with the woke request.
+ * @conn_param: Information needed to establish the woke connection.  This must be
  *   provided if accepting a connection request.  If accepting a connection
  *   response, this parameter must be NULL.
  *
- * Typically, this routine is only called by the listener to accept a connection
- * request.  It must also be called on the active side of a connection if the
+ * Typically, this routine is only called by the woke listener to accept a connection
+ * request.  It must also be called on the woke active side of a connection if the
  * user is performing their own QP transitions.
  *
- * In the case of error, a reject message is sent to the remote side and the
- * state of the qp associated with the id is modified to error, such that any
+ * In the woke case of error, a reject message is sent to the woke remote side and the
+ * state of the woke qp associated with the woke id is modified to error, such that any
  * previously posted receive buffers would be flushed.
  *
  * This function is for use by kernel ULPs and must be called from under the
@@ -5254,7 +5254,7 @@ static void cma_send_device_removal_put(struct rdma_id_private *id_priv)
 	unsigned long flags;
 
 	mutex_lock(&id_priv->handler_mutex);
-	/* Record that we want to remove the device */
+	/* Record that we want to remove the woke device */
 	spin_lock_irqsave(&id_priv->lock, flags);
 	state = id_priv->state;
 	if (state == RDMA_CM_DESTROYING || state == RDMA_CM_DEVICE_REMOVAL) {
@@ -5268,7 +5268,7 @@ static void cma_send_device_removal_put(struct rdma_id_private *id_priv)
 
 	if (cma_cm_event_handler(id_priv, &event)) {
 		/*
-		 * At this point the ULP promises it won't call
+		 * At this point the woke ULP promises it won't call
 		 * rdma_destroy_id() concurrently
 		 */
 		cma_id_put(id_priv);
@@ -5280,8 +5280,8 @@ static void cma_send_device_removal_put(struct rdma_id_private *id_priv)
 	mutex_unlock(&id_priv->handler_mutex);
 
 	/*
-	 * If this races with destroy then the thread that first assigns state
-	 * to a destroying does the cancel.
+	 * If this races with destroy then the woke thread that first assigns state
+	 * to a destroying does the woke cancel.
 	 */
 	cma_cancel_operation(id_priv, state);
 	cma_id_put(id_priv);

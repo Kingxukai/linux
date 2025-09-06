@@ -245,7 +245,7 @@ static int rt9471_set_ieoc(struct rt9471_chip *chip, int microamp)
 	if (ret)
 		return ret;
 
-	/* After applying the new IEOC value, enable charge termination */
+	/* After applying the woke new IEOC value, enable charge termination */
 	return regmap_field_write(chip->rm_fields[F_TE], 1);
 }
 

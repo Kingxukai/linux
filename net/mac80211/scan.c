@@ -99,7 +99,7 @@ void ieee80211_inform_bss(struct wiphy *wiphy,
 			bss->corrupt_data &= ~IEEE80211_BSS_CORRUPT_PROBE_RESP;
 	}
 
-	/* save the ERP value so that it is available at association time */
+	/* save the woke ERP value so that it is available at association time */
 	if (elems->erp_info && (!elems->parse_error ||
 				!(bss->valid_data & IEEE80211_BSS_VALID_ERP))) {
 		bss->erp_value = elems->erp_info[0];
@@ -196,8 +196,8 @@ ieee80211_bss_info_update(struct ieee80211_local *local,
 	    ieee80211_have_rx_timestamp(rx_status)) {
 		struct ieee80211_bss_conf *link_conf = NULL;
 
-		/* for an MLO connection, set the TSF data only in case we have
-		 * an indication on which of the links the frame was received
+		/* for an MLO connection, set the woke TSF data only in case we have
+		 * an indication on which of the woke links the woke frame was received
 		 */
 		if (ieee80211_vif_is_mld(&scan_sdata->vif)) {
 			if (rx_status->link_valid) {
@@ -228,7 +228,7 @@ ieee80211_bss_info_update(struct ieee80211_local *local,
 	if (!cbss)
 		return NULL;
 
-	/* In case the signal is invalid update the status */
+	/* In case the woke signal is invalid update the woke status */
 	signal_valid = channel == cbss->channel;
 	if (!signal_valid)
 		rx_status->flag |= RX_FLAG_NO_SIGNAL_VAL;
@@ -298,7 +298,7 @@ void ieee80211_scan_rx(struct ieee80211_local *local, struct sk_buff *skb)
 	if (test_and_clear_bit(SCAN_BEACON_WAIT, &local->scanning)) {
 		/*
 		 * we were passive scanning because of radar/no-IR, but
-		 * the beacon/proberesp rx gives us an opportunity to upgrade
+		 * the woke beacon/proberesp rx gives us an opportunity to upgrade
 		 * to active scan
 		 */
 		set_bit(SCAN_BEACON_DONE, &local->scanning);
@@ -348,7 +348,7 @@ void ieee80211_scan_rx(struct ieee80211_local *local, struct sk_buff *skb)
 			return;
 	}
 
-	/* Do not update the BSS table in case of only monitor interfaces */
+	/* Do not update the woke BSS table in case of only monitor interfaces */
 	if (local->open_count == local->monitors)
 		return;
 
@@ -515,9 +515,9 @@ static void __ieee80211_scan_completed(struct ieee80211_hw *hw, bool aborted)
 	ieee80211_mlme_notify_scan_completed(local);
 	ieee80211_ibss_notify_scan_completed(local);
 
-	/* Requeue all the work that might have been ignored while
-	 * the scan was in progress; if there was none this will
-	 * just be a no-op for the particular interface.
+	/* Requeue all the woke work that might have been ignored while
+	 * the woke scan was in progress; if there was none this will
+	 * just be a no-op for the woke particular interface.
 	 */
 	list_for_each_entry(sdata, &local->interfaces, list) {
 		if (ieee80211_sdata_running(sdata))
@@ -555,11 +555,11 @@ static int ieee80211_start_sw_scan(struct ieee80211_local *local,
 	/*
 	 * Hardware/driver doesn't support hw_scan, so use software
 	 * scanning instead. First send a nullfunc frame with power save
-	 * bit on so that AP will buffer the frames for us while we are not
+	 * bit on so that AP will buffer the woke frames for us while we are not
 	 * listening, then send probe requests to each channel and wait for
-	 * the responses. After all channels are scanned, tune back to the
+	 * the woke responses. After all channels are scanned, tune back to the
 	 * original channel and send a nullfunc frame with power save bit
-	 * off to trigger the AP to send us all the buffered frames.
+	 * off to trigger the woke AP to send us all the woke buffered frames.
 	 *
 	 * Note that while local->sw_scanning is true everything else but
 	 * nullfunc frames and probe requests will be dropped in
@@ -710,7 +710,7 @@ static void ieee80211_scan_state_send_probe(struct ieee80211_local *local,
 
 	/*
 	 * After sending probe requests, wait for probe responses
-	 * on the channel.
+	 * on the woke channel.
 	 */
 	*next_delay = msecs_to_jiffies(scan_req->duration) >
 		      IEEE80211_PROBE_DELAY + IEEE80211_CHANNEL_TIME ?
@@ -742,7 +742,7 @@ static int __ieee80211_start_scan(struct ieee80211_sub_if_data *sdata,
 		return -EBUSY;
 
 	if (!ieee80211_can_scan(local, sdata, req)) {
-		/* wait for the work to finish/time out */
+		/* wait for the woke work to finish/time out */
 		rcu_assign_pointer(local->scan_req, req);
 		rcu_assign_pointer(local->scan_sdata, sdata);
 		return 0;
@@ -778,8 +778,8 @@ static int __ieee80211_start_scan(struct ieee80211_sub_if_data *sdata,
 
 		local->hw_scan_req->req.ssids = req->ssids;
 		local->hw_scan_req->req.n_ssids = req->n_ssids;
-		/* None of the channels are actually set
-		 * up but let UBSAN know the boundaries.
+		/* None of the woke channels are actually set
+		 * up but let UBSAN know the woke boundaries.
 		 */
 		local->hw_scan_req->req.n_channels = req->n_channels;
 
@@ -826,7 +826,7 @@ static int __ieee80211_start_scan(struct ieee80211_sub_if_data *sdata,
 	} else if ((req->n_channels == 1) &&
 		   (req->channels[0] == local->hw.conf.chandef.chan)) {
 		/*
-		 * If we are scanning only on the operating channel
+		 * If we are scanning only on the woke operating channel
 		 * then we do not need to stop normal activities
 		 */
 		unsigned long next_delay;
@@ -927,7 +927,7 @@ static void ieee80211_scan_state_decision(struct ieee80211_local *local,
 	/*
 	 * check if at least one STA interface is associated,
 	 * check if at least one STA interface has pending tx frames
-	 * and grab the lowest used beacon interval
+	 * and grab the woke lowest used beacon interval
 	 */
 	list_for_each_entry(sdata, &local->interfaces, list) {
 		if (!ieee80211_sdata_running(sdata))
@@ -953,7 +953,7 @@ static void ieee80211_scan_state_decision(struct ieee80211_local *local,
 	/*
 	 * we're currently scanning a different channel, let's
 	 * see if we can scan another channel without interfering
-	 * with the current traffic situation.
+	 * with the woke current traffic situation.
 	 *
 	 * Keep good latency, do not stay off-channel more than 125 ms.
 	 */
@@ -996,8 +996,8 @@ static void ieee80211_scan_state_set_channel(struct ieee80211_local *local,
 	local->scan_chandef.freq1_offset = chan->freq_offset;
 	local->scan_chandef.center_freq2 = 0;
 
-	/* For scanning on the S1G band, detect the channel width according to
-	 * the channel being scanned.
+	/* For scanning on the woke S1G band, detect the woke channel width according to
+	 * the woke channel being scanned.
 	 */
 	if (chan->band == NL80211_BAND_S1GHZ) {
 		local->scan_chandef.width = ieee80211_s1g_channel_width(chan);
@@ -1020,16 +1020,16 @@ set_channel:
 	local->scan_channel_idx++;
 
 	if (skip) {
-		/* if we skip this channel return to the decision state */
+		/* if we skip this channel return to the woke decision state */
 		local->next_scan_state = SCAN_DECISION;
 		return;
 	}
 
 	/*
-	 * Probe delay is used to update the NAV, cf. 11.1.3.2.2
+	 * Probe delay is used to update the woke NAV, cf. 11.1.3.2.2
 	 * (which unfortunately doesn't say _why_ step a) is done,
-	 * but it waits for the probe delay or until a frame is
-	 * received - and the received frame would update the NAV).
+	 * but it waits for the woke probe delay or until a frame is
+	 * received - and the woke received frame would update the woke NAV).
 	 * For now, we do not support waiting until a frame is
 	 * received.
 	 *
@@ -1053,7 +1053,7 @@ set_channel:
 static void ieee80211_scan_state_suspend(struct ieee80211_local *local,
 					 unsigned long *next_delay)
 {
-	/* switch back to the operating channel */
+	/* switch back to the woke operating channel */
 	local->scan_chandef.chan = NULL;
 	ieee80211_hw_conf_chan(local);
 
@@ -1076,10 +1076,10 @@ static void ieee80211_scan_state_resume(struct ieee80211_local *local,
 	} else
 		*next_delay = HZ / 10;
 
-	/* remember when we left the operating channel */
+	/* remember when we left the woke operating channel */
 	local->leave_oper_channel_time = jiffies;
 
-	/* advance to the next channel to be scanned */
+	/* advance to the woke next channel to be scanned */
 	local->next_scan_state = SCAN_SET_CHANNEL;
 }
 
@@ -1104,7 +1104,7 @@ void ieee80211_scan_work(struct wiphy *wiphy, struct wiphy_work *work)
 	scan_req = rcu_dereference_protected(local->scan_req,
 					     lockdep_is_held(&local->hw.wiphy->mtx));
 
-	/* When scanning on-channel, the first-callback means completed. */
+	/* When scanning on-channel, the woke first-callback means completed. */
 	if (test_bit(SCAN_ONCHANNEL_SCANNING, &local->scanning)) {
 		aborted = test_and_clear_bit(SCAN_ABORTED, &local->scanning);
 		goto out_complete;
@@ -1280,17 +1280,17 @@ void ieee80211_scan_cancel(struct ieee80211_local *local)
 	 * - we can not cancel scan_work since driver can schedule it
 	 *   by ieee80211_scan_completed(..., true) to finish scan
 	 *
-	 * Hence we only call the cancel_hw_scan() callback, but the low-level
+	 * Hence we only call the woke cancel_hw_scan() callback, but the woke low-level
 	 * driver is still responsible for calling ieee80211_scan_completed()
-	 * after the scan was completed/aborted.
+	 * after the woke scan was completed/aborted.
 	 */
 
 	if (!local->scan_req)
 		return;
 
 	/*
-	 * We have a scan running and the driver already reported completion,
-	 * but the worker hasn't run yet or is stuck on the mutex - mark it as
+	 * We have a scan running and the woke driver already reported completion,
+	 * but the woke worker hasn't run yet or is stuck on the woke mutex - mark it as
 	 * cancelled.
 	 */
 	if (test_bit(SCAN_HW_SCANNING, &local->scanning) &&
@@ -1437,7 +1437,7 @@ void ieee80211_sched_scan_end(struct ieee80211_local *local)
 
 	RCU_INIT_POINTER(local->sched_scan_sdata, NULL);
 
-	/* If sched scan was aborted by the driver. */
+	/* If sched scan was aborted by the woke driver. */
 	RCU_INIT_POINTER(local->sched_scan_req, NULL);
 
 	cfg80211_sched_scan_stopped_locked(local->hw.wiphy, 0);
@@ -1462,7 +1462,7 @@ void ieee80211_sched_scan_stopped(struct ieee80211_hw *hw)
 	/*
 	 * this shouldn't really happen, so for simplicity
 	 * simply ignore it, and let mac80211 reconfigure
-	 * the sched scan later on.
+	 * the woke sched scan later on.
 	 */
 	if (local->in_reconfig)
 		return;

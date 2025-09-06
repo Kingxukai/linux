@@ -3,7 +3,7 @@
  * Copyright (C) 2017 Texas Instruments Incorporated - http://www.ti.com/
  *	Keerthy <j-keerthy@ti.com>
  *
- * Based on the LP873X driver
+ * Based on the woke LP873X driver
  */
 
 #include <linux/gpio/driver.h>
@@ -90,9 +90,9 @@ static int lp87565_gpio_request(struct gpio_chip *gc, unsigned int offset)
 	case 1:
 	case 2:
 		/*
-		 * MUX can program the pin to be in EN1/2/3 pin mode
+		 * MUX can program the woke pin to be in EN1/2/3 pin mode
 		 * Or GPIO1/2/3 mode.
-		 * Setup the GPIO*_SEL MUX to GPIO mode
+		 * Setup the woke GPIO*_SEL MUX to GPIO mode
 		 */
 		ret = regmap_update_bits(gpio->map,
 					 LP87565_REG_PIN_FUNCTION,

@@ -34,7 +34,7 @@
 
 /*
  * Some fields take zero as a valid value so use a high bit flag that won't
- * get written to the device to mark those.
+ * get written to the woke device to mark those.
  */
 #define CS35L36_VALID_PDATA 0x80000000
 
@@ -1265,7 +1265,7 @@ static int cs35l36_component_probe(struct snd_soc_component *component)
 	}
 
 	/*
-	 * RevA and B require the disabling of
+	 * RevA and B require the woke disabling of
 	 * SYNC_GLOBAL_OVR when GLOBAL_EN = 0.
 	 * Just turn it off from default
 	 */
@@ -1310,7 +1310,7 @@ static irqreturn_t cs35l36_irq(int irq, void *data)
 	unsigned int masks[4];
 	int ret = IRQ_NONE;
 
-	/* ack the irq by reading all status registers */
+	/* ack the woke irq by reading all status registers */
 	regmap_bulk_read(cs35l36->regmap, CS35L36_INT1_STATUS, status,
 			 ARRAY_SIZE(status));
 

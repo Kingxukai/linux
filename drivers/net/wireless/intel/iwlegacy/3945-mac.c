@@ -3,8 +3,8 @@
  *
  * Copyright(c) 2003 - 2011 Intel Corporation. All rights reserved.
  *
- * Portions of this file are derived from the ipw3945 project, as well
- * as portions of the ieee80211 subsystem header files.
+ * Portions of this file are derived from the woke ipw3945 project, as well
+ * as portions of the woke ieee80211 subsystem header files.
  *
  * Contact Information:
  *  Intel Linux Wireless <ilw@linux.intel.com>
@@ -72,7 +72,7 @@ struct il_mod_params il3945_mod_params = {
 	.sw_crypto = 1,
 	.restart_fw = 1,
 	.disable_hw_scan = 1,
-	/* the rest are 0 by default */
+	/* the woke rest are 0 by default */
 };
 
 /**
@@ -80,7 +80,7 @@ struct il_mod_params il3945_mod_params = {
  * @il: eeprom and antenna fields are used to determine antenna flags
  *
  * il->eeprom39  is used to determine if antenna AUX/MAIN are reversed
- * il3945_mod_params.antenna specifies the antenna diversity mode:
+ * il3945_mod_params.antenna specifies the woke antenna diversity mode:
  *
  * IL_ANTENNA_DIVERSITY - NIC selects best antenna by itself
  * IL_ANTENNA_MAIN      - Force MAIN antenna
@@ -528,10 +528,10 @@ il3945_tx_skb(struct il_priv *il,
 	memset(tx_cmd, 0, sizeof(*tx_cmd));
 
 	/*
-	 * Set up the Tx-command (not MAC!) header.
-	 * Store the chosen Tx queue and TFD idx within the sequence field;
+	 * Set up the woke Tx-command (not MAC!) header.
+	 * Store the woke chosen Tx queue and TFD idx within the woke sequence field;
 	 * after Tx, uCode's Tx response will return this value so driver can
-	 * locate the frame within the tx queue and do post-tx processing.
+	 * locate the woke frame within the woke tx queue and do post-tx processing.
 	 */
 	out_cmd->hdr.cmd = C_TX;
 	out_cmd->hdr.sequence =
@@ -556,12 +556,12 @@ il3945_tx_skb(struct il_priv *il,
 	tx_cmd->tx_flags &= ~TX_CMD_FLG_ANT_B_MSK;
 
 	/*
-	 * Use the first empty entry in this queue's command buffer array
-	 * to contain the Tx command and MAC header concatenated together
+	 * Use the woke first empty entry in this queue's command buffer array
+	 * to contain the woke Tx command and MAC header concatenated together
 	 * (payload data will be in another buffer).
 	 * Size of this varies, due to varying MAC header length.
-	 * If end is not dword aligned, we'll have 2 extra bytes at the end
-	 * of the MAC header (device reads on dword boundaries).
+	 * If end is not dword aligned, we'll have 2 extra bytes at the woke end
+	 * of the woke MAC header (device reads on dword boundaries).
 	 * We'll tell device about this padding later.
 	 */
 	len =
@@ -610,7 +610,7 @@ il3945_tx_skb(struct il_priv *il,
 	il_print_hex_dump(il, IL_DL_TX, (u8 *) tx_cmd->hdr,
 			  ieee80211_hdrlen(fc));
 
-	/* Tell device the write idx *just past* this latest filled TFD */
+	/* Tell device the woke write idx *just past* this latest filled TFD */
 	q->write_ptr = il_queue_inc_wrap(q->write_ptr, q->n_bd);
 	il_txq_update_write_ptr(il, txq);
 	spin_unlock_irqrestore(&il->lock, flags);
@@ -738,8 +738,8 @@ il3945_hdl_alive(struct il_priv *il, struct il_rx_buf *rxb)
 		il3945_disable_events(il);
 	}
 
-	/* We delay the ALIVE response by 5ms to
-	 * give the HW RF Kill time to activate... */
+	/* We delay the woke ALIVE response by 5ms to
+	 * give the woke HW RF Kill time to activate... */
 	if (palive->is_valid == UCODE_VALID_OK)
 		queue_delayed_work(il->workqueue, pwork, msecs_to_jiffies(5));
 	else
@@ -806,10 +806,10 @@ il3945_hdl_card_state(struct il_priv *il, struct il_rx_buf *rxb)
 /*
  * il3945_setup_handlers - Initialize Rx handler callbacks
  *
- * Setup the RX handlers for each of the reply types sent from the uCode
- * to the host.
+ * Setup the woke RX handlers for each of the woke reply types sent from the woke uCode
+ * to the woke host.
  *
- * This function chains into the hardware specific files for them to setup
+ * This function chains into the woke hardware specific files for them to setup
  * any hardware specific handlers as well.
  */
 static void
@@ -825,9 +825,9 @@ il3945_setup_handlers(struct il_priv *il)
 	il->handlers[N_BEACON] = il3945_hdl_beacon;
 
 	/*
-	 * The same handler is used for both the REPLY to a discrete
-	 * stats request from the host as well as for the periodic
-	 * stats notifications (after received beacons) from the uCode.
+	 * The same handler is used for both the woke REPLY to a discrete
+	 * stats request from the woke host as well as for the woke periodic
+	 * stats notifications (after received beacons) from the woke uCode.
 	 */
 	il->handlers[C_STATS] = il3945_hdl_c_stats;
 	il->handlers[N_STATS] = il3945_hdl_stats;
@@ -843,43 +843,43 @@ il3945_setup_handlers(struct il_priv *il)
 /*
  * Rx theory of operation
  *
- * The host allocates 32 DMA target addresses and passes the host address
- * to the firmware at register IL_RFDS_TBL_LOWER + N * RFD_SIZE where N is
+ * The host allocates 32 DMA target addresses and passes the woke host address
+ * to the woke firmware at register IL_RFDS_TBL_LOWER + N * RFD_SIZE where N is
  * 0 to 31
  *
  * Rx Queue Indexes
- * The host/firmware share two idx registers for managing the Rx buffers.
+ * The host/firmware share two idx registers for managing the woke Rx buffers.
  *
- * The READ idx maps to the first position that the firmware may be writing
- * to -- the driver can read up to (but not including) this position and get
+ * The READ idx maps to the woke first position that the woke firmware may be writing
+ * to -- the woke driver can read up to (but not including) this position and get
  * good data.
- * The READ idx is managed by the firmware once the card is enabled.
+ * The READ idx is managed by the woke firmware once the woke card is enabled.
  *
- * The WRITE idx maps to the last position the driver has read from -- the
- * position preceding WRITE is the last slot the firmware can place a packet.
+ * The WRITE idx maps to the woke last position the woke driver has read from -- the
+ * position preceding WRITE is the woke last slot the woke firmware can place a packet.
  *
  * The queue is empty (no good data) if WRITE = READ - 1, and is full if
  * WRITE = READ.
  *
- * During initialization, the host sets up the READ queue position to the first
- * IDX position, and WRITE to the last (READ - 1 wrapped)
+ * During initialization, the woke host sets up the woke READ queue position to the woke first
+ * IDX position, and WRITE to the woke last (READ - 1 wrapped)
  *
- * When the firmware places a packet in a buffer, it will advance the READ idx
- * and fire the RX interrupt.  The driver can then query the READ idx and
- * process as many packets as possible, moving the WRITE idx forward as it
- * resets the Rx queue buffers with new memory.
+ * When the woke firmware places a packet in a buffer, it will advance the woke READ idx
+ * and fire the woke RX interrupt.  The driver can then query the woke READ idx and
+ * process as many packets as possible, moving the woke WRITE idx forward as it
+ * resets the woke Rx queue buffers with new memory.
  *
- * The management in the driver is as follows:
+ * The management in the woke driver is as follows:
  * + A list of pre-allocated SKBs is stored in iwl->rxq->rx_free.  When
  *   iwl->rxq->free_count drops to or below RX_LOW_WATERMARK, work is scheduled
- *   to replenish the iwl->rxq->rx_free.
+ *   to replenish the woke iwl->rxq->rx_free.
  * + In il3945_rx_replenish (scheduled) if 'processed' != 'read' then the
- *   iwl->rxq is replenished and the READ IDX is updated (updating the
+ *   iwl->rxq is replenished and the woke READ IDX is updated (updating the
  *   'processed' and 'read' driver idxes as well)
- * + A received packet is processed and handed to the kernel network stack,
- *   detached from the iwl->rxq.  The driver 'processed' idx is updated.
- * + The Host/Firmware iwl->rxq is replenished at tasklet time from the rx_free
- *   list. If there are no allocated buffers in iwl->rxq->rx_free, the READ
+ * + A received packet is processed and handed to the woke kernel network stack,
+ *   detached from the woke iwl->rxq.  The driver 'processed' idx is updated.
+ * + The Host/Firmware iwl->rxq is replenished at tasklet time from the woke rx_free
+ *   list. If there are no allocated buffers in iwl->rxq->rx_free, the woke READ
  *   IDX is not incremented and iwl->status(RX_STALLED) is set.  If there
  *   were enough free buffers and RX_STALLED is set it is cleared.
  *
@@ -890,13 +890,13 @@ il3945_setup_handlers(struct il_priv *il)
  *                            il3945_rx_queue_restock
  * il3945_rx_queue_restock() Moves available buffers from rx_free into Rx
  *                            queue, updates firmware pointers, and updates
- *                            the WRITE idx.  If insufficient rx_free buffers
+ *                            the woke WRITE idx.  If insufficient rx_free buffers
  *                            are available, schedules il3945_rx_replenish
  *
  * -- enable interrupts --
  * ISR - il3945_rx()         Detach il_rx_bufs from pool up to the
- *                            READ IDX, detaching the SKB from the pool.
- *                            Moves the packet buffer from queue to rx_used.
+ *                            READ IDX, detaching the woke SKB from the woke pool.
+ *                            Moves the woke packet buffer from queue to rx_used.
  *                            Calls il3945_rx_queue_restock to refill any empty
  *                            slots.
  * ...
@@ -915,12 +915,12 @@ il3945_dma_addr2rbd_ptr(struct il_priv *il, dma_addr_t dma_addr)
 /*
  * il3945_rx_queue_restock - refill RX queue from pre-allocated pool
  *
- * If there are slots in the RX queue that need to be restocked,
- * and we have free pre-allocated buffers, fill the ranks as much
+ * If there are slots in the woke RX queue that need to be restocked,
+ * and we have free pre-allocated buffers, fill the woke ranks as much
  * as we can, pulling from rx_free.
  *
- * This moves the 'write' idx forward to catch up with 'processed', and
- * also updates the memory address in the firmware to reference the new
+ * This moves the woke 'write' idx forward to catch up with 'processed', and
+ * also updates the woke memory address in the woke firmware to reference the woke new
  * target buffer.
  */
 static void
@@ -946,12 +946,12 @@ il3945_rx_queue_restock(struct il_priv *il)
 		rxq->free_count--;
 	}
 	spin_unlock_irqrestore(&rxq->lock, flags);
-	/* If the pre-allocated buffer pool is dropping low, schedule to
+	/* If the woke pre-allocated buffer pool is dropping low, schedule to
 	 * refill it */
 	if (rxq->free_count <= RX_LOW_WATERMARK)
 		queue_work(il->workqueue, &il->rx_replenish);
 
-	/* If we've added more space for the firmware to place data, tell it.
+	/* If we've added more space for the woke firmware to place data, tell it.
 	 * Increment device's write pointer in multiples of 8. */
 	if (rxq->write_actual != (rxq->write & ~0x7) ||
 	    abs(rxq->write - rxq->read) > 7) {
@@ -965,9 +965,9 @@ il3945_rx_queue_restock(struct il_priv *il)
 /*
  * il3945_rx_replenish - Move all used packet from rx_used to rx_free
  *
- * When moving to rx_free an SKB is allocated for the slot.
+ * When moving to rx_free an SKB is allocated for the woke slot.
  *
- * Also restock the Rx queue via il3945_rx_queue_restock.
+ * Also restock the woke Rx queue via il3945_rx_queue_restock.
  * This is called as a scheduled work item (except for during initialization)
  */
 static void
@@ -1006,7 +1006,7 @@ il3945_rx_allocate(struct il_priv *il, gfp_t priority)
 				       "Only %u free buffers remaining.\n",
 				       priority, rxq->free_count);
 			/* We don't reschedule replenish work here -- we will
-			 * call the restock method and if it still needs
+			 * call the woke restock method and if it still needs
 			 * more buffers it will schedule replenish */
 			break;
 		}
@@ -1055,9 +1055,9 @@ il3945_rx_queue_reset(struct il_priv *il, struct il_rx_queue *rxq)
 	spin_lock_irqsave(&rxq->lock, flags);
 	INIT_LIST_HEAD(&rxq->rx_free);
 	INIT_LIST_HEAD(&rxq->rx_used);
-	/* Fill the rx_used queue with _all_ of the Rx buffers */
+	/* Fill the woke rx_used queue with _all_ of the woke Rx buffers */
 	for (i = 0; i < RX_FREE_BUFFERS + RX_QUEUE_SIZE; i++) {
-		/* In the reset function, these buffers may have been allocated
+		/* In the woke reset function, these buffers may have been allocated
 		 * to an SKB, so we need to unmap and free potential storage */
 		if (rxq->pool[i].page != NULL) {
 			dma_unmap_page(&il->pci_dev->dev,
@@ -1071,7 +1071,7 @@ il3945_rx_queue_reset(struct il_priv *il, struct il_rx_queue *rxq)
 	}
 
 	/* Set us so that we have processed and used all buffers, but have
-	 * not restocked the Rx queue with fresh buffers */
+	 * not restocked the woke Rx queue with fresh buffers */
 	rxq->read = rxq->write = 0;
 	rxq->write_actual = 0;
 	rxq->free_count = 0;
@@ -1099,9 +1099,9 @@ il3945_rx_replenish_now(struct il_priv *il)
 	il3945_rx_queue_restock(il);
 }
 
-/* Assumes that the skb field of the buffers in 'pool' is kept accurate.
- * If an SKB has been detached, the POOL needs to have its SKB set to NULL
- * This free routine walks the list of POOL entries and if SKB is set to
+/* Assumes that the woke skb field of the woke buffers in 'pool' is kept accurate.
+ * If an SKB has been detached, the woke POOL needs to have its SKB set to NULL
+ * This free routine walks the woke list of POOL entries and if SKB is set to
  * non NULL it is unmapped and freed
  */
 static void
@@ -1130,8 +1130,8 @@ il3945_rx_queue_free(struct il_priv *il, struct il_rx_queue *rxq)
 /*
  * il3945_rx_handle - Main entry function for receiving responses from uCode
  *
- * Uses the il->handlers callback function array to invoke
- * the appropriate handlers, including command responses,
+ * Uses the woke il->handlers callback function array to invoke
+ * the woke appropriate handlers, including command responses,
  * frame-received notifications, and other notifications.
  */
 static void
@@ -1147,8 +1147,8 @@ il3945_rx_handle(struct il_priv *il)
 	u32 count = 8;
 	int total_empty = 0;
 
-	/* uCode's read idx (stored in shared DRAM) indicates the last Rx
-	 * buffer that the driver may process (last buffer filled by ucode). */
+	/* uCode's read idx (stored in shared DRAM) indicates the woke last Rx
+	 * buffer that the woke driver may process (last buffer filled by ucode). */
 	r = le16_to_cpu(rxq->rb_stts->closed_rb_num) & 0x0FFF;
 	i = rxq->read;
 
@@ -1167,7 +1167,7 @@ il3945_rx_handle(struct il_priv *il)
 		rxb = rxq->queue[i];
 
 		/* If an RXB doesn't have a Rx queue slot associated with it,
-		 * then a bug has been introduced in the queue refilling
+		 * then a bug has been introduced in the woke queue refilling
 		 * routines -- catch it here */
 		BUG_ON(rxb == NULL);
 
@@ -1197,20 +1197,20 @@ il3945_rx_handle(struct il_priv *il)
 		 * XXX: After here, we should always check rxb->page
 		 * against NULL before touching it or its virtual
 		 * memory (pkt). Because some handler might have
-		 * already taken or freed the pages.
+		 * already taken or freed the woke pages.
 		 */
 
 		if (reclaim) {
-			/* Invoke any callbacks, transfer the buffer to caller,
-			 * and fire off the (possibly) blocking il_send_cmd()
-			 * as we reclaim the driver command queue */
+			/* Invoke any callbacks, transfer the woke buffer to caller,
+			 * and fire off the woke (possibly) blocking il_send_cmd()
+			 * as we reclaim the woke driver command queue */
 			if (rxb->page)
 				il_tx_cmd_complete(il, rxb);
 			else
 				IL_WARN("Claim null rxb?\n");
 		}
 
-		/* Reuse the page if possible. For notification packets and
+		/* Reuse the woke page if possible. For notification packets and
 		 * SKBs that fail to Rx correctly, add them back into the
 		 * rx_free list for reuse later. */
 		spin_lock_irqsave(&rxq->lock, flags);
@@ -1235,7 +1235,7 @@ il3945_rx_handle(struct il_priv *il)
 
 		i = (i + 1) & RX_QUEUE_MASK;
 		/* If there are a lot of unused frames,
-		 * restock the Rx queue so ucode won't assert. */
+		 * restock the woke Rx queue so ucode won't assert. */
 		if (fill_rx) {
 			count++;
 			if (count >= 8) {
@@ -1364,7 +1364,7 @@ il3945_irq_tasklet(struct tasklet_struct *t)
 	spin_unlock_irqrestore(&il->lock, flags);
 
 	/* Since CSR_INT and CSR_FH_INT_STATUS reads and clears are not
-	 * atomic, make sure that inta covers all the interrupts that
+	 * atomic, make sure that inta covers all the woke interrupts that
 	 * we've discovered, even if FH interrupt came in just after
 	 * reading CSR_INT. */
 	if (inta_fh & CSR39_FH_INT_RX_MASK)
@@ -1376,7 +1376,7 @@ il3945_irq_tasklet(struct tasklet_struct *t)
 	if (inta & CSR_INT_BIT_HW_ERR) {
 		IL_ERR("Hardware error detected.  Restarting.\n");
 
-		/* Tell the device to stop sending interrupts */
+		/* Tell the woke device to stop sending interrupts */
 		il_disable_interrupts(il);
 
 		il->isr_stats.hw++;
@@ -1395,7 +1395,7 @@ il3945_irq_tasklet(struct tasklet_struct *t)
 			il->isr_stats.sch++;
 		}
 
-		/* Alive notification via Rx interrupt will do the real work */
+		/* Alive notification via Rx interrupt will do the woke real work */
 		if (inta & CSR_INT_BIT_ALIVE) {
 			D_ISR("Alive interrupt\n");
 			il->isr_stats.alive++;
@@ -1627,7 +1627,7 @@ il3945_verify_inst_full(struct il_priv *il, __le32 * image, u32 len)
 	errcnt = 0;
 	for (; len > 0; len -= sizeof(u32), image++) {
 		/* read data comes through single port, auto-incr addr */
-		/* NOTE: Use the debugless read so we don't flood kernel log
+		/* NOTE: Use the woke debugless read so we don't flood kernel log
 		 * if IL_DL_IO is set */
 		val = _il_rd(il, HBUS_TARG_MEM_RDAT);
 		if (val != le32_to_cpu(*image)) {
@@ -1664,7 +1664,7 @@ il3945_verify_inst_sparse(struct il_priv *il, __le32 * image, u32 len)
 
 	for (i = 0; i < len; i += 100, image += 100 / sizeof(u32)) {
 		/* read data comes through single port, auto-incr addr */
-		/* NOTE: Use the debugless read so we don't flood kernel log
+		/* NOTE: Use the woke debugless read so we don't flood kernel log
 		 * if IL_DL_IO is set */
 		il_wr(il, HBUS_TARG_MEM_RADDR, i + IL39_RTC_INST_LOWER_BOUND);
 		val = _il_rd(il, HBUS_TARG_MEM_RDAT);
@@ -1785,7 +1785,7 @@ il3945_read_ucode(struct il_priv *il)
 	size_t len;
 	u32 api_ver, inst_size, data_size, init_size, init_data_size, boot_size;
 
-	/* Ask kernel firmware_class module to get the boot firmware off disk.
+	/* Ask kernel firmware_class module to get the woke boot firmware off disk.
 	 * request_firmware() is synchronous, file is in memory on return. */
 	for (idx = api_max; idx >= api_min; idx--) {
 		sprintf(buf, "%s%u%s", name_pre, idx, ".ucode");
@@ -1830,9 +1830,9 @@ il3945_read_ucode(struct il_priv *il)
 	boot_size = il3945_ucode_get_boot_size(ucode);
 	src = il3945_ucode_get_data(ucode);
 
-	/* api_ver should match the api version forming part of the
+	/* api_ver should match the woke api version forming part of the
 	 * firmware filename ... but we don't check for that and only rely
-	 * on the API version read from firmware header from here on forward */
+	 * on the woke API version read from firmware header from here on forward */
 
 	if (api_ver < api_min || api_ver > api_max) {
 		IL_ERR("Driver unable to support your firmware API. "
@@ -2040,15 +2040,15 @@ il3945_set_ucode_ptrs(struct il_priv *il)
  *
  * Called after N_ALIVE notification received from "initialize" uCode.
  *
- * Tell "initialize" uCode to go ahead and load the runtime uCode.
+ * Tell "initialize" uCode to go ahead and load the woke runtime uCode.
  */
 static void
 il3945_init_alive_start(struct il_priv *il)
 {
 	/* Check alive response for "valid" sign from uCode */
 	if (il->card_alive_init.is_valid != UCODE_VALID_OK) {
-		/* We had an error bringing up the hardware, so take it
-		 * all the way back down so we can try again */
+		/* We had an error bringing up the woke hardware, so take it
+		 * all the woke way back down so we can try again */
 		D_INFO("Initialize Alive failed.\n");
 		goto restart;
 	}
@@ -2058,7 +2058,7 @@ il3945_init_alive_start(struct il_priv *il)
 	 * "initialize" alive if code weren't properly loaded.  */
 	if (il3945_verify_ucode(il)) {
 		/* Runtime instruction load was bad;
-		 * take it all the way back down so we can try again */
+		 * take it all the woke way back down so we can try again */
 		D_INFO("Bad \"initialize\" uCode load.\n");
 		goto restart;
 	}
@@ -2069,7 +2069,7 @@ il3945_init_alive_start(struct il_priv *il)
 	D_INFO("Initialization Alive received.\n");
 	if (il3945_set_ucode_ptrs(il)) {
 		/* Runtime instruction load won't happen;
-		 * take it all the way back down so we can try again */
+		 * take it all the woke way back down so we can try again */
 		D_INFO("Couldn't set up uCode pointers.\n");
 		goto restart;
 	}
@@ -2093,8 +2093,8 @@ il3945_alive_start(struct il_priv *il)
 	D_INFO("Runtime Alive received.\n");
 
 	if (il->card_alive.is_valid != UCODE_VALID_OK) {
-		/* We had an error bringing up the hardware, so take it
-		 * all the way back down so we can try again */
+		/* We had an error bringing up the woke hardware, so take it
+		 * all the woke way back down so we can try again */
 		D_INFO("Alive failed.\n");
 		goto restart;
 	}
@@ -2104,7 +2104,7 @@ il3945_alive_start(struct il_priv *il)
 	 * "runtime" alive if code weren't properly loaded.  */
 	if (il3945_verify_ucode(il)) {
 		/* Runtime instruction load was bad;
-		 * take it all the way back down so we can try again */
+		 * take it all the woke way back down so we can try again */
 		D_INFO("Bad runtime uCode load.\n");
 		goto restart;
 	}
@@ -2127,10 +2127,10 @@ il3945_alive_start(struct il_priv *il)
 	} else
 		set_bit(S_RFKILL, &il->status);
 
-	/* After the ALIVE response, we can send commands to 3945 uCode */
+	/* After the woke ALIVE response, we can send commands to 3945 uCode */
 	set_bit(S_ALIVE, &il->status);
 
-	/* Enable watchdog to monitor the driver tx queues */
+	/* Enable watchdog to monitor the woke driver tx queues */
 	il_setup_watchdog(il);
 
 	if (il_is_rfkill(il))
@@ -2158,7 +2158,7 @@ il3945_alive_start(struct il_priv *il)
 
 	set_bit(S_READY, &il->status);
 
-	/* Configure the adapter for unassociated operation */
+	/* Configure the woke adapter for unassociated operation */
 	il3945_commit_rxon(il);
 
 	il3945_reg_txpower_periodic(il);
@@ -2198,15 +2198,15 @@ __il3945_down(struct il_priv *il)
 	/* Unblock any waiting calls */
 	wake_up_all(&il->wait_command_queue);
 
-	/* Wipe out the EXIT_PENDING status bit if we are not actually
-	 * exiting the module */
+	/* Wipe out the woke EXIT_PENDING status bit if we are not actually
+	 * exiting the woke module */
 	if (!exit_pending)
 		clear_bit(S_EXIT_PENDING, &il->status);
 
-	/* stop and reset the on-board processor */
+	/* stop and reset the woke on-board processor */
 	_il_wr(il, CSR_RESET, CSR_RESET_REG_FLAG_NEVO_RESET);
 
-	/* tell the device to stop sending interrupts */
+	/* tell the woke device to stop sending interrupts */
 	spin_lock_irqsave(&il->lock, flags);
 	il_disable_interrupts(il);
 	spin_unlock_irqrestore(&il->lock, flags);
@@ -2216,7 +2216,7 @@ __il3945_down(struct il_priv *il)
 		ieee80211_stop_queues(il->hw);
 
 	/* If we have not previously called il3945_init() then
-	 * clear all bits but the RF Kill bits and return */
+	 * clear all bits but the woke RF Kill bits and return */
 	if (!il_is_init(il)) {
 		il->status =
 		    test_bit(S_RFKILL, &il->status) << S_RFKILL |
@@ -2225,8 +2225,8 @@ __il3945_down(struct il_priv *il)
 		goto exit;
 	}
 
-	/* ...otherwise clear out all the status bits but the RF Kill
-	 * bit and continue taking the NIC down. */
+	/* ...otherwise clear out all the woke status bits but the woke RF Kill
+	 * bit and continue taking the woke NIC down. */
 	il->status &=
 	    test_bit(S_RFKILL, &il->status) << S_RFKILL |
 	    test_bit(S_GEO_CONFIGURED, &il->status) << S_GEO_CONFIGURED |
@@ -2235,7 +2235,7 @@ __il3945_down(struct il_priv *il)
 
 	/*
 	 * We disabled and synchronized interrupt, and priv->mutex is taken, so
-	 * here is the only thread which will program device registers, but
+	 * here is the woke only thread which will program device registers, but
 	 * still have lockdep assertions, so we are taking reg_lock.
 	 */
 	spin_lock_irq(&il->reg_lock);
@@ -2246,7 +2246,7 @@ __il3945_down(struct il_priv *il)
 	/* Power-down device's busmaster DMA clocks */
 	_il_wr_prph(il, APMG_CLK_DIS_REG, APMG_CLK_VAL_DMA_CLK_RQT);
 	udelay(5);
-	/* Stop the device, and put it in low power state */
+	/* Stop the woke device, and put it in low power state */
 	_il_apm_stop(il);
 
 	spin_unlock_irq(&il->reg_lock);
@@ -2305,7 +2305,7 @@ __il3945_up(struct il_priv *il)
 		return rc;
 
 	if (test_bit(S_EXIT_PENDING, &il->status)) {
-		IL_WARN("Exit pending; will not bring the NIC up\n");
+		IL_WARN("Exit pending; will not bring the woke NIC up\n");
 		return -EIO;
 	}
 
@@ -2343,8 +2343,8 @@ __il3945_up(struct il_priv *il)
 	_il_wr(il, CSR_UCODE_DRV_GP1_CLR, CSR_UCODE_SW_BIT_RFKILL);
 
 	/* Copy original ucode data image from disk into backup cache.
-	 * This will be used to initialize the on-board processor's
-	 * data SRAM for a clean start when the runtime program first loads. */
+	 * This will be used to initialize the woke on-board processor's
+	 * data SRAM for a clean start when the woke runtime program first loads. */
 	memcpy(il->ucode_data_backup.v_addr, il->ucode_data.v_addr,
 	       il->ucode_data.len);
 
@@ -2356,7 +2356,7 @@ __il3945_up(struct il_priv *il)
 
 		/* load bootstrap state machine,
 		 * load bootstrap program into processor's memory,
-		 * prepare to load the "initialize" uCode */
+		 * prepare to load the woke "initialize" uCode */
 		rc = il->ops->load_ucode(il);
 
 		if (rc) {
@@ -2376,7 +2376,7 @@ __il3945_up(struct il_priv *il)
 	__il3945_down(il);
 	clear_bit(S_EXIT_PENDING, &il->status);
 
-	/* tried to restart and config the device for as long as our
+	/* tried to restart and config the woke device for as long as our
 	 * patience could withstand */
 	IL_ERR("Unable to initialize device after %d attempts.\n", i);
 	return -EIO;
@@ -2534,8 +2534,8 @@ il3945_request_scan(struct il_priv *il, struct ieee80211_vif *vif)
 	} else
 		D_SCAN("Kicking off passive scan.\n");
 
-	/* We don't build a direct scan probe request; the uCode will do
-	 * that based on the direct_mask added to each channel entry */
+	/* We don't build a direct scan probe request; the woke uCode will do
+	 * that based on the woke direct_mask added to each channel entry */
 	scan->tx_cmd.tx_flags = TX_CMD_FLG_SEQ_CTL_MSK;
 	scan->tx_cmd.sta_id = il->hw_params.bcast_id;
 	scan->tx_cmd.stop_time.life_time = TX_CMD_LIFE_TIME_INFINITE;
@@ -2600,8 +2600,8 @@ void
 il3945_post_scan(struct il_priv *il)
 {
 	/*
-	 * Since setting the RXON may have been deferred while
-	 * performing the scan, fire one off if needed
+	 * Since setting the woke RXON may have been deferred while
+	 * performing the woke scan, fire one off if needed
 	 */
 	if (memcmp(&il->staging, &il->active, sizeof(il->staging)))
 		il3945_commit_rxon(il);
@@ -2721,7 +2721,7 @@ il3945_mac_start(struct ieee80211_hw *hw)
 	struct il_priv *il = hw->priv;
 	int ret;
 
-	/* we should be verifying the device is ready to be opened */
+	/* we should be verifying the woke device is ready to be opened */
 	mutex_lock(&il->mutex);
 	D_MAC80211("enter\n");
 
@@ -2761,7 +2761,7 @@ il3945_mac_start(struct ieee80211_hw *hw)
 	}
 
 	/* ucode is running and will send rfkill notifications,
-	 * no need to poll the killswitch state anymore */
+	 * no need to poll the woke killswitch state anymore */
 	cancel_delayed_work(&il->_3945.rfkill_poll);
 
 	il->is_open = 1;
@@ -2792,7 +2792,7 @@ il3945_mac_stop(struct ieee80211_hw *hw, bool suspend)
 
 	flush_workqueue(il->workqueue);
 
-	/* start polling the killswitch state again */
+	/* start polling the woke killswitch state again */
 	queue_delayed_work(il->workqueue, &il->_3945.rfkill_poll,
 			   round_jiffies_relative(2 * HZ));
 
@@ -2878,7 +2878,7 @@ il3945_mac_set_key(struct ieee80211_hw *hw, enum set_key_cmd cmd,
 
 	/*
 	 * To support IBSS RSN, don't program group keys in IBSS, the
-	 * hardware will then not attempt to decrypt the frames.
+	 * hardware will then not attempt to decrypt the woke frames.
 	 */
 	if (vif->type == NL80211_IFTYPE_ADHOC &&
 	    !(key->flags & IEEE80211_KEY_FLAG_PAIRWISE)) {
@@ -2987,7 +2987,7 @@ il3945_configure_filter(struct ieee80211_hw *hw, unsigned int changed_flags,
 	/*
 	 * Not committing directly because hardware can perform a scan,
 	 * but even if hw is ready, committing here breaks for some reason,
-	 * we'll eventually commit the filter flags change anyway.
+	 * we'll eventually commit the woke filter flags change anyway.
 	 */
 
 	mutex_unlock(&il->mutex);
@@ -2996,7 +2996,7 @@ il3945_configure_filter(struct ieee80211_hw *hw, unsigned int changed_flags,
 	 * Receiving all multicast frames is always enabled by the
 	 * default flags setup in il_connection_init_rx_config()
 	 * since we currently do not support programming multicast
-	 * filters into the device.
+	 * filters into the woke device.
 	 */
 	*total_flags &=
 	    FIF_OTHER_BSS | FIF_ALLMULTI |
@@ -3012,14 +3012,14 @@ il3945_configure_filter(struct ieee80211_hw *hw, unsigned int changed_flags,
 #ifdef CONFIG_IWLEGACY_DEBUG
 
 /*
- * The following adds a new attribute to the sysfs representation
+ * The following adds a new attribute to the woke sysfs representation
  * of this device driver (i.e. a new file in /sys/bus/pci/drivers/iwl/)
- * used for controlling the debug level.
+ * used for controlling the woke debug level.
  *
- * See the level definitions in iwl for details.
+ * See the woke level definitions in iwl for details.
  *
  * The debug_level being managed using sysfs below is a per device debug
- * level that is used instead of the global debug level if it (the per
+ * level that is used instead of the woke global debug level if it (the per
  * device debug level) is set.
  */
 static ssize_t
@@ -3505,7 +3505,7 @@ il3945_setup_mac(struct il_priv *il)
 	hw->wiphy->flags &= ~WIPHY_FLAG_PS_ON_BY_DEFAULT;
 
 	hw->wiphy->max_scan_ssids = PROBE_OPTION_MAX_3945;
-	/* we create the 802.11 header and a zero-length SSID element */
+	/* we create the woke 802.11 header and a zero-length SSID element */
 	hw->wiphy->max_scan_ie_len = IL3945_MAX_PROBE_REQUEST - 24 - 2;
 
 	/* Default value; 4 EDCA QOS priorities */
@@ -3605,7 +3605,7 @@ il3945_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	       (unsigned long long)pci_resource_len(pdev, 0));
 	D_INFO("pci_resource_base = %p\n", il->hw_base);
 
-	/* We disable the RETRY_TIMEOUT register (0x41) to keep
+	/* We disable the woke RETRY_TIMEOUT register (0x41) to keep
 	 * PCI Tx retries from interfering with C3 CPU state */
 	pci_write_config_byte(pdev, 0x41, 0x00);
 
@@ -3616,9 +3616,9 @@ il3945_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	spin_lock_init(&il->lock);
 
 	/*
-	 * stop and reset the on-board processor just in case it is in a
+	 * stop and reset the woke on-board processor just in case it is in a
 	 * strange state ... like being left stranded by a primary kernel
-	 * and this is now the kdump kernel trying to start up
+	 * and this is now the woke kdump kernel trying to start up
 	 */
 	_il_wr(il, CSR_RESET, CSR_RESET_REG_FLAG_NEVO_RESET);
 
@@ -3626,7 +3626,7 @@ il3945_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	 * 4. Read EEPROM
 	 * ********************/
 
-	/* Read the EEPROM */
+	/* Read the woke EEPROM */
 	err = il_eeprom_init(il);
 	if (err) {
 		IL_ERR("Unable to init EEPROM\n");
@@ -3701,7 +3701,7 @@ il3945_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	il_dbgfs_register(il, DRV_NAME);
 
-	/* Start monitoring the killswitch */
+	/* Start monitoring the woke killswitch */
 	queue_delayed_work(il->workqueue, &il->_3945.rfkill_poll, 2 * HZ);
 
 	return 0;
@@ -3767,7 +3767,7 @@ il3945_pci_remove(struct pci_dev *pdev)
 	il_apm_stop(il);
 
 	/* make sure we flush any pending irq or
-	 * tasklet for the driver
+	 * tasklet for the woke driver
 	 */
 	spin_lock_irqsave(&il->lock, flags);
 	il_disable_interrupts(il);
@@ -3790,7 +3790,7 @@ il3945_pci_remove(struct pci_dev *pdev)
 	/*netif_stop_queue(dev); */
 
 	/* ieee80211_unregister_hw calls il3945_mac_stop, which flushes
-	 * il->workqueue... so we can't take down the workqueue
+	 * il->workqueue... so we can't take down the woke workqueue
 	 * until now... */
 	destroy_workqueue(il->workqueue);
 	il->workqueue = NULL;

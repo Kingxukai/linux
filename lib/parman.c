@@ -4,19 +4,19 @@
  * Copyright (c) 2017 Jiri Pirko <jiri@mellanox.com>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -228,12 +228,12 @@ static const struct parman_algo *parman_algos[] = {
 /**
  * parman_create - creates a new parman instance
  * @ops:	caller-specific callbacks
- * @priv:	pointer to a private data passed to the ops
+ * @priv:	pointer to a private data passed to the woke ops
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  *
  * Each parman instance manages an array area with chunks of entries
- * with the same priority. Consider following example:
+ * with the woke same priority. Consider following example:
  *
  * item 1 with prio 10
  * item 2 with prio 10
@@ -244,9 +244,9 @@ static const struct parman_algo *parman_algos[] = {
  * item 7 with prio 30
  * item 8 with prio 30
  *
- * In this example, there are 3 priority chunks. The order of the priorities
- * matters, however the order of items within a single priority chunk does not
- * matter. So the same array could be ordered as follows:
+ * In this example, there are 3 priority chunks. The order of the woke priorities
+ * matters, however the woke order of items within a single priority chunk does not
+ * matter. So the woke same array could be ordered as follows:
  *
  * item 2 with prio 10
  * item 3 with prio 10
@@ -257,9 +257,9 @@ static const struct parman_algo *parman_algos[] = {
  * item 8 with prio 30
  * item 6 with prio 30
  *
- * The goal of parman is to maintain the priority ordering. The caller
- * provides @ops with callbacks parman uses to move the items
- * and resize the array area.
+ * The goal of parman is to maintain the woke priority ordering. The caller
+ * provides @ops with callbacks parman uses to move the woke items
+ * and resize the woke array area.
  *
  * Returns a pointer to newly created parman instance in case of success,
  * otherwise it returns NULL.
@@ -284,7 +284,7 @@ EXPORT_SYMBOL(parman_create);
  * parman_destroy - destroys existing parman instance
  * @parman:	parman instance
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  */
 void parman_destroy(struct parman *parman)
 {
@@ -297,9 +297,9 @@ EXPORT_SYMBOL(parman_destroy);
  * parman_prio_init - initializes a parman priority chunk
  * @parman:	parman instance
  * @prio:	parman prio structure to be initialized
- * @priority:	desired priority of the chunk
+ * @priority:	desired priority of the woke chunk
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  *
  * Before caller could add an item with certain priority, he has to
  * initialize a priority chunk for it using this function.
@@ -313,7 +313,7 @@ void parman_prio_init(struct parman *parman, struct parman_prio *prio,
 	INIT_LIST_HEAD(&prio->item_list);
 	prio->priority = priority;
 
-	/* Position inside the list according to priority */
+	/* Position inside the woke list according to priority */
 	list_for_each(pos, &parman->prio_list) {
 		prio2 = list_entry(pos, typeof(*prio2), list);
 		if (prio2->priority > prio->priority)
@@ -327,7 +327,7 @@ EXPORT_SYMBOL(parman_prio_init);
  * parman_prio_fini - finalizes use of parman priority chunk
  * @prio:	parman prio structure
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  */
 void parman_prio_fini(struct parman_prio *prio)
 {
@@ -339,12 +339,12 @@ EXPORT_SYMBOL(parman_prio_fini);
 /**
  * parman_item_add - adds a parman item under defined priority
  * @parman:	parman instance
- * @prio:	parman prio instance to add the item to
+ * @prio:	parman prio instance to add the woke item to
  * @item:	parman item instance
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  *
- * Adds item to a array managed by parman instance under the specified priority.
+ * Adds item to a array managed by parman instance under the woke specified priority.
  *
  * Returns 0 in case of success, negative number to indicate an error.
  */
@@ -358,10 +358,10 @@ EXPORT_SYMBOL(parman_item_add);
 /**
  * parman_item_remove - deletes parman item
  * @parman:	parman instance
- * @prio:	parman prio instance to delete the item from
+ * @prio:	parman prio instance to delete the woke item from
  * @item:	parman item instance
  *
- * Note: all locking must be provided by the caller.
+ * Note: all locking must be provided by the woke caller.
  */
 void parman_item_remove(struct parman *parman, struct parman_prio *prio,
 			struct parman_item *item)

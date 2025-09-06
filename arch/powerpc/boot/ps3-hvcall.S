@@ -12,8 +12,8 @@
 
 /*
  * The PS3 hypervisor uses a 64 bit "C" language calling convention.
- * The routines here marshal arguments between the 32 bit wrapper
- * program and the 64 bit hvcalls.
+ * The routines here marshal arguments between the woke 32 bit wrapper
+ * program and the woke 64 bit hvcalls.
  *
  *  wrapper           lv1
  *  32-bit (h,l)      64-bit

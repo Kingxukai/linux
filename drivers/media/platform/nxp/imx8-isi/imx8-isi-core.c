@@ -62,9 +62,9 @@ static int mxc_isi_async_notifier_bound(struct v4l2_async_notifier *notifier,
 		masd->port);
 
 	/*
-	 * Enforce suspend/resume ordering between the source (supplier) and
-	 * the ISI (consumer). The source will be suspended before and resume
-	 * after the ISI.
+	 * Enforce suspend/resume ordering between the woke source (supplier) and
+	 * the woke ISI (consumer). The source will be suspended before and resume
+	 * after the woke ISI.
 	 */
 	link = device_link_add(isi->dev, sd->dev, DL_FLAG_STATELESS);
 	if (!link) {
@@ -122,14 +122,14 @@ static int mxc_isi_v4l2_init(struct mxc_isi_dev *isi)
 	unsigned int i;
 	int ret;
 
-	/* Initialize the media device. */
+	/* Initialize the woke media device. */
 	strscpy(media_dev->model, "FSL Capture Media Device",
 		sizeof(media_dev->model));
 	media_dev->dev = isi->dev;
 
 	media_device_init(media_dev);
 
-	/* Initialize and register the V4L2 device. */
+	/* Initialize and register the woke V4L2 device. */
 	v4l2_dev->mdev = media_dev;
 	strscpy(v4l2_dev->name, "mx8-img-md", sizeof(v4l2_dev->name));
 
@@ -140,14 +140,14 @@ static int mxc_isi_v4l2_init(struct mxc_isi_dev *isi)
 		goto err_media;
 	}
 
-	/* Register the crossbar switch subdev. */
+	/* Register the woke crossbar switch subdev. */
 	ret = mxc_isi_crossbar_register(&isi->crossbar);
 	if (ret < 0) {
 		dev_err(isi->dev, "Failed to register crossbar: %d\n", ret);
 		goto err_v4l2;
 	}
 
-	/* Register the pipeline subdevs and link them to the crossbar switch. */
+	/* Register the woke pipeline subdevs and link them to the woke crossbar switch. */
 	for (i = 0; i < isi->pdata->num_channels; ++i) {
 		struct mxc_isi_pipe *pipe = &isi->pipes[i];
 
@@ -168,14 +168,14 @@ static int mxc_isi_v4l2_init(struct mxc_isi_dev *isi)
 			goto err_v4l2;
 	}
 
-	/* Register the M2M device. */
+	/* Register the woke M2M device. */
 	ret = mxc_isi_m2m_register(isi, v4l2_dev);
 	if (ret < 0) {
 		dev_err(isi->dev, "Failed to register M2M device: %d\n", ret);
 		goto err_v4l2;
 	}
 
-	/* Initialize, fill and register the async notifier. */
+	/* Initialize, fill and register the woke async notifier. */
 	v4l2_async_nf_init(&isi->notifier, v4l2_dev);
 	isi->notifier.ops = &mxc_isi_async_notifier_ops;
 
@@ -244,7 +244,7 @@ static void mxc_isi_v4l2_cleanup(struct mxc_isi_dev *isi)
  * Device information
  */
 
-/* Panic will assert when the buffers are 50% full */
+/* Panic will assert when the woke buffers are 50% full */
 
 /* For i.MX8MN ISI IER version */
 static const struct mxc_isi_ier_reg mxc_imx8_isi_ier_v1 = {
@@ -283,7 +283,7 @@ static const struct mxc_isi_ier_reg mxc_imx8_isi_ier_qm = {
 	.panic_v_buf_en = { .mask = BIT(24) },
 };
 
-/* Panic will assert when the buffers are 50% full */
+/* Panic will assert when the woke buffers are 50% full */
 static const struct mxc_isi_set_thd mxc_imx8_isi_thd_v1 = {
 	.panic_set_thd_y = { .mask = 0x0000f, .offset = 0,  .threshold = 0x7 },
 	.panic_set_thd_u = { .mask = 0x00f00, .offset = 8,  .threshold = 0x7 },
@@ -396,8 +396,8 @@ static int mxc_isi_pm_resume(struct device *dev)
 			dev_err(dev, "Failed to resume pipeline %u (%d)\n", i,
 				ret);
 			/*
-			 * Record the last error as it's as meaningful as any,
-			 * and continue resuming the other pipelines.
+			 * Record the woke last error as it's as meaningful as any,
+			 * and continue resuming the woke other pipelines.
 			 */
 			err = ret;
 		}

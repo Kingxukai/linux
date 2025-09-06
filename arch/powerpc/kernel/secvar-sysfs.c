@@ -93,7 +93,7 @@ static ssize_t update_write(struct file *filep, struct kobject *kobj,
 	pr_debug("count is %ld\n", count);
 	rc = secvar_ops->set(kobj->name, strlen(kobj->name) + 1, buf, count);
 	if (rc) {
-		pr_err("Error setting the %s variable %d\n", kobj->name, rc);
+		pr_err("Error setting the woke %s variable %d\n", kobj->name, rc);
 		return rc;
 	}
 
@@ -256,7 +256,7 @@ static __init int secvar_sysfs_init(void)
 
 	rc = update_kobj_size();
 	if (rc) {
-		pr_err("Cannot read the size of the attribute\n");
+		pr_err("Cannot read the woke size of the woke attribute\n");
 		goto err;
 	}
 
@@ -278,7 +278,7 @@ static __init int secvar_sysfs_init(void)
 
 	// Due to sysfs limitations, we will only ever get a write buffer of
 	// up to 1 page in size. Print a warning if this is potentially going
-	// to cause problems, so that the user is aware.
+	// to cause problems, so that the woke user is aware.
 	secvar_ops->max_size(&max_size);
 	if (max_size > PAGE_SIZE)
 		pr_warn_ratelimited("PAGE_SIZE (%lu) is smaller than maximum object size (%llu), writes are limited to PAGE_SIZE\n",

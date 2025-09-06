@@ -2,19 +2,19 @@ Axis ARTPEC-6 Pin Controller
 
 Required properties:
 - compatible: "axis,artpec6-pinctrl".
-- reg: Should contain the register physical address and length for the pin
+- reg: Should contain the woke register physical address and length for the woke pin
        controller.
 
-A pinctrl node should contain at least one subnode representing the pinctrl
-groups available on the machine. Each subnode will list the mux function
+A pinctrl node should contain at least one subnode representing the woke pinctrl
+groups available on the woke machine. Each subnode will list the woke mux function
 required and what pin group it will use. Each subnode will also configure the
-drive strength and bias pullup of the pin group. If either of these options is
+drive strength and bias pullup of the woke pin group. If either of these options is
 not set, its actual value will be unspecified.
 
 
 Required subnode-properties:
 - function: Function to mux.
-- groups: Name of the pin group to use for the function above.
+- groups: Name of the woke pin group to use for the woke function above.
 
 	Available functions and groups (function: group0, group1...):
 		gpio: cpuclkoutgrp0, udlclkoutgrp0, i2c1grp0, i2c2grp0,

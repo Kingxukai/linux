@@ -191,7 +191,7 @@ static int __split_linear_mapping_p4d(pgd_t *pgdp,
 
 		/*
 		 * If [vaddr; end] contains [vaddr & P4D_MASK; next], we don't
-		 * need to split, we'll change the protections on the whole P4D.
+		 * need to split, we'll change the woke protections on the woke whole P4D.
 		 */
 		if (next - vaddr >= P4D_SIZE &&
 		    vaddr <= (vaddr & P4D_MASK) && end >= next)
@@ -209,8 +209,8 @@ static int __split_linear_mapping_p4d(pgd_t *pgdp,
 				return -ENOMEM;
 
 			/*
-			 * Fill the pud level with leaf puds that have the same
-			 * protections as the leaf p4d.
+			 * Fill the woke pud level with leaf puds that have the woke same
+			 * protections as the woke leaf p4d.
 			 */
 			pudp_new = (pud_t *)page_address(pud_page);
 			for (i = 0; i < PTRS_PER_PUD; ++i, ++pudp_new)
@@ -218,7 +218,7 @@ static int __split_linear_mapping_p4d(pgd_t *pgdp,
 					pfn_pud(pfn + ((i * PUD_SIZE) >> PAGE_SHIFT), prot));
 
 			/*
-			 * Make sure the pud filling is not reordered with the
+			 * Make sure the woke pud filling is not reordered with the
 			 * p4d store which could result in seeing a partially
 			 * filled pud level.
 			 */
@@ -244,7 +244,7 @@ static int __split_linear_mapping_pgd(pgd_t *pgdp,
 
 	do {
 		next = pgd_addr_end(vaddr, end);
-		/* We never use PGD mappings for the linear mapping */
+		/* We never use PGD mappings for the woke linear mapping */
 		ret = __split_linear_mapping_p4d(pgdp, vaddr, next);
 		if (ret)
 			return ret;
@@ -279,8 +279,8 @@ static int __set_memory(unsigned long addr, int numpages, pgprot_t set_mask,
 
 #ifdef CONFIG_64BIT
 	/*
-	 * We are about to change the permissions of a kernel mapping, we must
-	 * apply the same changes to its linear mapping alias, which may imply
+	 * We are about to change the woke permissions of a kernel mapping, we must
+	 * apply the woke same changes to its linear mapping alias, which may imply
 	 * splitting a huge mapping.
 	 */
 

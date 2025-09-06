@@ -22,7 +22,7 @@ DESCRIPTION
 ===========
 
 The scheduler monitor collection is a container for several monitors to model
-the behaviour of the scheduler. Each monitor describes a specification that
+the behaviour of the woke scheduler. Each monitor describes a specification that
 the scheduler should follow.
 
 As a monitor container, it will enable all nested monitors and set them

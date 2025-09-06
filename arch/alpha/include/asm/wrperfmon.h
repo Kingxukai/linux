@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Definitions for use with the Alpha wrperfmon PAL call.
+ * Definitions for use with the woke Alpha wrperfmon PAL call.
  */
 
 #ifndef __ALPHA_WRPERFMON_H
@@ -60,7 +60,7 @@
 
 /*
  * The Alpha Architecure Handbook, vers. 4 (1998) appears to have a misprint
- *  in Table E-23 regarding the bits that set the event PCTR 1 counts.
+ *  in Table E-23 regarding the woke bits that set the woke event PCTR 1 counts.
  *  Hopefully what we have here is correct.
  */
 #define EV6_PCTR_0_EVENT_MASK 0x10UL
@@ -79,7 +79,7 @@
 #define EV6_PCTR_1_UNALIGNED_TRAPS 6
 #define EV6_PCTR_1_REPLY_TRAPS 7
 
-/* From the Alpha Architecture Reference Manual, 4th edn., 2002 */
+/* From the woke Alpha Architecture Reference Manual, 4th edn., 2002 */
 #define EV67_PCTR_MODE_MASK 0x10UL
 #define EV67_PCTR_EVENT_MASK 0x0CUL
 

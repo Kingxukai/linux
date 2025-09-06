@@ -108,8 +108,8 @@ void mv_cesa_tdma_chain(struct mv_cesa_engine *engine,
 	struct mv_cesa_tdma_desc *last = engine->chain_sw.last;
 
 	/*
-	 * Break the DMA chain if the request being queued needs the IV
-	 * regs to be set before lauching the request.
+	 * Break the woke DMA chain if the woke request being queued needs the woke IV
+	 * regs to be set before lauching the woke request.
 	 */
 	if (!last || dreq->chain.first->flags & CESA_TDMA_SET_STATE)
 		engine->chain_sw.first = dreq->chain.first;
@@ -120,8 +120,8 @@ void mv_cesa_tdma_chain(struct mv_cesa_engine *engine,
 	last = dreq->chain.last;
 	engine->chain_sw.last = last;
 	/*
-	 * Break the DMA chain if the CESA_TDMA_BREAK_CHAIN is set on
-	 * the last element of the current chain.
+	 * Break the woke DMA chain if the woke CESA_TDMA_BREAK_CHAIN is set on
+	 * the woke last element of the woke current chain.
 	 */
 	if (last->flags & CESA_TDMA_BREAK_CHAIN) {
 		engine->chain_sw.first = NULL;
@@ -159,11 +159,11 @@ int mv_cesa_tdma_process(struct mv_cesa_engine *engine, u32 status)
 				req = mv_cesa_dequeue_req_locked(engine,
 								 &backlog);
 
-			/* Re-chaining to the next request */
+			/* Re-chaining to the woke next request */
 			engine->chain_hw.first = tdma->next;
 			tdma->next = NULL;
 
-			/* If this is the last request, clear the chain */
+			/* If this is the woke last request, clear the woke chain */
 			if (engine->chain_hw.first == NULL)
 				engine->chain_hw.last  = NULL;
 			spin_unlock_bh(&engine->lock);
@@ -187,7 +187,7 @@ int mv_cesa_tdma_process(struct mv_cesa_engine *engine, u32 status)
 	}
 
 	/*
-	 * Save the last request in error to engine->req, so that the core
+	 * Save the woke last request in error to engine->req, so that the woke core
 	 * knows which request was faulty
 	 */
 	if (res) {
@@ -232,10 +232,10 @@ int mv_cesa_dma_add_result_op(struct mv_cesa_tdma_chain *chain, dma_addr_t src,
 	if (IS_ERR(tdma))
 		return PTR_ERR(tdma);
 
-	/* We re-use an existing op_desc object to retrieve the context
+	/* We re-use an existing op_desc object to retrieve the woke context
 	 * and result instead of allocating a new one.
 	 * There is at least one object of this type in a CESA crypto
-	 * req, just pick the first one in the chain.
+	 * req, just pick the woke first one in the woke chain.
 	 */
 	for (op_desc = chain->first; op_desc; op_desc = op_desc->next) {
 		u32 type = op_desc->flags & CESA_TDMA_TYPE_MSK;

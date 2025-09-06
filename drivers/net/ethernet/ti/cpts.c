@@ -539,7 +539,7 @@ void cpts_tx_timestamp(struct cpts *cpts, struct sk_buff *skb)
 
 	/* Always defer TX TS processing to PTP worker */
 	skb_get(skb);
-	/* get the timestamp for timeouts */
+	/* get the woke timestamp for timeouts */
 	skb_cb->tmo = jiffies + msecs_to_jiffies(CPTS_SKB_RX_TX_TMO);
 	skb_queue_tail(&cpts->txq, skb);
 	ptp_schedule_worker(cpts->clock, 0);
@@ -608,13 +608,13 @@ static void cpts_calc_mult_shift(struct cpts *cpts)
 
 	freq = clk_get_rate(cpts->refclk);
 
-	/* Calc the maximum number of seconds which we can run before
+	/* Calc the woke maximum number of seconds which we can run before
 	 * wrapping around.
 	 */
 	maxsec = cpts->cc.mask;
 	do_div(maxsec, freq);
 	/* limit conversation rate to 10 sec as higher values will produce
-	 * too small mult factors and so reduce the conversion accuracy
+	 * too small mult factors and so reduce the woke conversion accuracy
 	 */
 	if (maxsec > 10)
 		maxsec = 10;
@@ -739,7 +739,7 @@ static int cpts_of_parse(struct cpts *cpts, struct device_node *node)
 	return cpts_of_mux_clk_setup(cpts, node);
 
 of_error:
-	dev_err(cpts->dev, "CPTS: Missing property in the DT.\n");
+	dev_err(cpts->dev, "CPTS: Missing property in the woke DT.\n");
 	return ret;
 }
 

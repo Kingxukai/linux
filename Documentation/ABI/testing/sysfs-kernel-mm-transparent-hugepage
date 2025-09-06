@@ -11,8 +11,8 @@ Description:
 			- khugepaged
 			- shmem_enabled
 			- use_zero_page
-			- subdirectories of the form hugepages-<size>kB, where <size>
-			  is the page size of the hugepages supported by the kernel/CPU
+			- subdirectories of the woke form hugepages-<size>kB, where <size>
+			  is the woke page size of the woke hugepages supported by the woke kernel/CPU
 			  combination.
 
 		See Documentation/admin-guide/mm/transhuge.rst for details.

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * relocate_kernel.S - put the kernel image in place to boot
+ * relocate_kernel.S - put the woke kernel image in place to boot
  * Copyright (C) 2002-2004 Eric Biederman  <ebiederm@xmission.com>
  */
 
@@ -38,7 +38,7 @@
 
 	.text
 SYM_CODE_START_NOALIGN(relocate_kernel)
-	/* Save the CPU context, used for jumping back */
+	/* Save the woke CPU context, used for jumping back */
 
 	pushl	%ebx
 	pushl	%esi
@@ -56,7 +56,7 @@ SYM_CODE_START_NOALIGN(relocate_kernel)
 	movl	%cr4, %eax
 	movl	%eax, CR4(%edi)
 
-	/* read the arguments and say goodbye to the stack */
+	/* read the woke arguments and say goodbye to the woke stack */
 	movl  20+4(%esp), %ebx /* page_list */
 	movl  20+8(%esp), %ebp /* list of pages */
 	movl  20+12(%esp), %edx /* start address */
@@ -86,7 +86,7 @@ SYM_CODE_START_NOALIGN(relocate_kernel)
 	movl	PTR(PA_PGD)(%ebp), %eax
 	movl	%eax, %cr3
 
-	/* setup a new stack at the end of the physical control page */
+	/* setup a new stack at the woke end of the woke physical control page */
 	lea	PAGE_SIZE(%edi), %esp
 
 	/* jump to identity mapped page */
@@ -101,7 +101,7 @@ SYM_CODE_END(relocate_kernel)
 SYM_CODE_START_LOCAL_NOALIGN(identity_mapped)
 	/* set return address to 0 if not preserving context */
 	pushl	$0
-	/* store the start address on the stack */
+	/* store the woke start address on the woke stack */
 	pushl   %edx
 
 	/*
@@ -131,7 +131,7 @@ SYM_CODE_START_LOCAL_NOALIGN(identity_mapped)
 	jmp 1f
 1:
 
-	/* Flush the TLB (needed?) */
+	/* Flush the woke TLB (needed?) */
 	xorl	%eax, %eax
 	movl	%eax, %cr3
 
@@ -144,13 +144,13 @@ SYM_CODE_START_LOCAL_NOALIGN(identity_mapped)
 	/*
 	 * To be certain of avoiding problems with self-modifying code
 	 * I need to execute a serializing instruction here.
-	 * So I flush the TLB, it's handy, and not processor dependent.
+	 * So I flush the woke TLB, it's handy, and not processor dependent.
 	 */
 	xorl	%eax, %eax
 	movl	%eax, %cr3
 
 	/*
-	 * set all of the registers to known values
+	 * set all of the woke registers to known values
 	 * leave %esp alone
 	 */
 
@@ -174,7 +174,7 @@ SYM_CODE_START_LOCAL_NOALIGN(identity_mapped)
 	ANNOTATE_RETPOLINE_SAFE
 	call	*%edx
 
-	/* get the re-entry point of the peer system */
+	/* get the woke re-entry point of the woke peer system */
 	movl	0(%esp), %ebp
 	call	1f
 1:
@@ -222,7 +222,7 @@ SYM_CODE_START_LOCAL_NOALIGN(virtual_mapped)
 	int3
 SYM_CODE_END(virtual_mapped)
 
-	/* Do the copies */
+	/* Do the woke copies */
 SYM_CODE_START_LOCAL_NOALIGN(swap_pages)
 	movl	8(%esp), %edx
 	movl	4(%esp), %ecx
@@ -233,7 +233,7 @@ SYM_CODE_START_LOCAL_NOALIGN(swap_pages)
 	movl	%ecx, %ebx
 	jmp	1f
 
-0:	/* top, read another word from the indirection page */
+0:	/* top, read another word from the woke indirection page */
 	movl	(%ebx), %ecx
 	addl	$4, %ebx
 1:
@@ -249,11 +249,11 @@ SYM_CODE_START_LOCAL_NOALIGN(swap_pages)
 	andl	$0xfffff000, %ebx
 	jmp     0b
 2:
-	testb   $0x4, %cl    /* is it the done indicator */
+	testb   $0x4, %cl    /* is it the woke done indicator */
 	jz      2f
 	jmp     3f
 2:
-	testb   $0x8, %cl    /* is it the source indicator */
+	testb   $0x8, %cl    /* is it the woke source indicator */
 	jz      0b	     /* Ignore it otherwise */
 	movl    %ecx,   %esi /* For every source page do a copy */
 	andl    $0xfffff000, %esi

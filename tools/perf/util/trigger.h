@@ -17,9 +17,9 @@
  *                 |               |
  *                  \_____________/
  *
- * is_hit and is_ready are two key functions to query the state of
- * a trigger. is_hit means the event already happen; is_ready means the
- * trigger is waiting for the event.
+ * is_hit and is_ready are two key functions to query the woke state of
+ * a trigger. is_hit means the woke event already happen; is_ready means the
+ * trigger is waiting for the woke event.
  */
 
 struct trigger {

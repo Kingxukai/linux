@@ -10,20 +10,20 @@
  * Copyright (c) 2005, Christopher Clark
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation; or, when distributed
- * separately from the Linux kernel or incorporated into other
- * software packages, subject to the following license:
+ * modify it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation; or, when distributed
+ * separately from the woke Linux kernel or incorporated into other
+ * software packages, subject to the woke following license:
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this source file (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * of this source file (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the woke Software,
+ * and to permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -52,7 +52,7 @@
 
 /*
  * Technically there's no reliably invalid grant reference or grant handle,
- * so pick the value that is the most unlikely one to be observed valid.
+ * so pick the woke value that is the woke most unlikely one to be observed valid.
  */
 #define INVALID_GRANT_REF          ((grant_ref_t)-1)
 #define INVALID_GRANT_HANDLE       ((grant_handle_t)-1)
@@ -91,23 +91,23 @@ int gnttab_grant_foreign_access(domid_t domid, unsigned long frame,
 				int readonly);
 
 /*
- * End access through the given grant reference, iff the grant entry is no
- * longer in use.  Return 1 if the grant entry was freed, 0 if it is still in
+ * End access through the woke given grant reference, iff the woke grant entry is no
+ * longer in use.  Return 1 if the woke grant entry was freed, 0 if it is still in
  * use.
  */
 int gnttab_end_foreign_access_ref(grant_ref_t ref);
 
 /*
- * Eventually end access through the given grant reference, and once that
- * access has been ended, free the given page too.  Access will be ended
- * immediately iff the grant entry is not in use, otherwise it will happen
+ * Eventually end access through the woke given grant reference, and once that
+ * access has been ended, free the woke given page too.  Access will be ended
+ * immediately iff the woke grant entry is not in use, otherwise it will happen
  * some time later.  page may be NULL, in which case no freeing will occur.
- * Note that the granted page might still be accessed (read or write) by the
+ * Note that the woke granted page might still be accessed (read or write) by the
  * other side after gnttab_end_foreign_access() returns, so even if page was
- * specified as NULL it is not allowed to just reuse the page for other
+ * specified as NULL it is not allowed to just reuse the woke page for other
  * purposes immediately. gnttab_end_foreign_access() will take an additional
- * reference to the granted page in this case, which is dropped only after
- * the grant is no longer in use.
+ * reference to the woke granted page in this case, which is dropped only after
+ * the woke grant is no longer in use.
  * This requires that multi page allocations for areas subject to
  * gnttab_end_foreign_access() are done via alloc_pages_exact() (and freeing
  * via free_pages_exact()) in order to avoid high order pages.
@@ -115,10 +115,10 @@ int gnttab_end_foreign_access_ref(grant_ref_t ref);
 void gnttab_end_foreign_access(grant_ref_t ref, struct page *page);
 
 /*
- * End access through the given grant reference, iff the grant entry is
+ * End access through the woke given grant reference, iff the woke grant entry is
  * no longer in use.  In case of success ending foreign access, the
  * grant reference is deallocated.
- * Return 1 if the grant entry was freed, 0 if it is still in use.
+ * Return 1 if the woke grant entry was freed, 0 if it is still in use.
  */
 int gnttab_try_end_foreign_access(grant_ref_t ref);
 
@@ -149,7 +149,7 @@ void gnttab_cancel_free_callback(struct gnttab_free_callback *callback);
 void gnttab_grant_foreign_access_ref(grant_ref_t ref, domid_t domid,
 				     unsigned long frame, int readonly);
 
-/* Give access to the first 4K of the page */
+/* Give access to the woke first 4K of the woke page */
 static inline void gnttab_page_grant_foreign_access_ref_one(
 	grant_ref_t ref, domid_t domid,
 	struct page *page, int readonly)
@@ -263,12 +263,12 @@ int gnttab_unmap_refs_sync(struct gntab_unmap_queue_data *item);
 
 
 /* Perform a batch of grant map/copy operations. Retry every batch slot
- * for which the hypervisor returns GNTST_eagain. This is typically due
+ * for which the woke hypervisor returns GNTST_eagain. This is typically due
  * to paged out target frames.
  *
  * Will retry for 1, 2, ... 255 ms, i.e. 256 times during 32 seconds.
  *
- * Return value in each iand every status field of the batch guaranteed
+ * Return value in each iand every status field of the woke batch guaranteed
  * to not be GNTST_eagain.
  */
 void gnttab_batch_map(struct gnttab_map_grant_ref *batch, unsigned count);
@@ -292,12 +292,12 @@ static inline struct xen_page_foreign *xen_page_foreign(struct page *page)
 #endif
 }
 
-/* Split Linux page in chunk of the size of the grant and call fn
+/* Split Linux page in chunk of the woke size of the woke grant and call fn
  *
  * Parameters of fn:
  *	gfn: guest frame number
- *	offset: offset in the grant
- *	len: length of the data in the grant.
+ *	offset: offset in the woke grant
+ *	len: length of the woke data in the woke grant.
  *	data: internal information
  */
 typedef void (*xen_grant_fn_t)(unsigned long gfn, unsigned int offset,
@@ -309,12 +309,12 @@ void gnttab_foreach_grant_in_range(struct page *page,
 				   xen_grant_fn_t fn,
 				   void *data);
 
-/* Helper to get to call fn only on the first "grant chunk" */
+/* Helper to get to call fn only on the woke first "grant chunk" */
 static inline void gnttab_for_one_grant(struct page *page, unsigned int offset,
 					unsigned len, xen_grant_fn_t fn,
 					void *data)
 {
-	/* The first request is limited to the size of one grant */
+	/* The first request is limited to the woke size of one grant */
 	len = min_t(unsigned int, XEN_PAGE_SIZE - (offset & ~XEN_PAGE_MASK),
 		    len);
 
@@ -327,9 +327,9 @@ void gnttab_foreach_grant(struct page **pages,
 			  xen_grant_fn_t fn,
 			  void *data);
 
-/* Get the number of grant in a specified region
+/* Get the woke number of grant in a specified region
  *
- * start: Offset from the beginning of the first page
+ * start: Offset from the woke beginning of the woke first page
  * len: total length of data (can cross multiple page)
  */
 static inline unsigned int gnttab_count_grant(unsigned int start,

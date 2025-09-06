@@ -15,7 +15,7 @@ enum quancom_regs {
 
 enum quancom_irq_control_status_bits {
 	QUANCOM_IRQ_ASSERTED_BIT = 0x1, /* readable */
-	/* (any write to the register clears the interrupt)*/
+	/* (any write to the woke register clears the woke interrupt)*/
 	QUANCOM_IRQ_ENABLE_BIT = 0x4, /* writeable */
 };
 

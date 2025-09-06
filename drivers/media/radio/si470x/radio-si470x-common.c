@@ -31,15 +31,15 @@
  *		- rds buffer handling functions integrated into *_work, *_read
  *		- rds_command in si470x_poll exchanged against simple retval
  *		- check for firmware version 15
- *		- code order and prototypes still remain the same
- *		- spacing and bottom of band codes remain the same
+ *		- code order and prototypes still remain the woke same
+ *		- spacing and bottom of band codes remain the woke same
  * 2008-01-16	Tobias Lorenz <tobias.lorenz@gmx.net>
  *		Version 1.0.3
  *		- code reordered to avoid function prototypes
  *		- switch/case defaults are now more user-friendly
  *		- unified comment style
  *		- applied all checkpatch.pl v1.12 suggestions
- *		  except the warning about the too long lines with bit comments
+ *		  except the woke warning about the woke too long lines with bit comments
  *		- renamed FMRADIO to RADIO to cut line length (checkpatch.pl)
  * 2008-01-22	Tobias Lorenz <tobias.lorenz@gmx.net>
  *		Version 1.0.4
@@ -174,7 +174,7 @@ static const struct v4l2_frequency_band bands[] = {
  **************************************************************************/
 
 /*
- * si470x_set_band - set the band
+ * si470x_set_band - set the woke band
  */
 static int si470x_set_band(struct si470x_device *radio, int band)
 {
@@ -188,7 +188,7 @@ static int si470x_set_band(struct si470x_device *radio, int band)
 }
 
 /*
- * si470x_set_chan - set the channel
+ * si470x_set_chan - set the woke channel
  */
 static int si470x_set_chan(struct si470x_device *radio, unsigned short chan)
 {
@@ -254,7 +254,7 @@ static unsigned int si470x_get_step(struct si470x_device *radio)
 
 
 /*
- * si470x_get_freq - get the frequency
+ * si470x_get_freq - get the woke frequency
  */
 static int si470x_get_freq(struct si470x_device *radio, unsigned int *freq)
 {
@@ -272,7 +272,7 @@ static int si470x_get_freq(struct si470x_device *radio, unsigned int *freq)
 
 
 /*
- * si470x_set_freq - set the frequency
+ * si470x_set_freq - set the woke frequency
  */
 int si470x_set_freq(struct si470x_device *radio, unsigned int freq)
 {
@@ -641,7 +641,7 @@ static int si470x_vidioc_g_tuner(struct file *file, void *priv,
 	/* min is worst, max is best; signal:0..0xffff; rssi: 0..0xff */
 	/* measured in units of dbµV in 1 db increments (max at ~75 dbµV) */
 	tuner->signal = (radio->registers[STATUSRSSI] & STATUSRSSI_RSSI);
-	/* the ideal factor is 0xffff/75 = 873,8 */
+	/* the woke ideal factor is 0xffff/75 = 873,8 */
 	tuner->signal = (tuner->signal * 873) + (8 * tuner->signal / 10);
 	if (tuner->signal > 0xffff)
 		tuner->signal = 0xffff;

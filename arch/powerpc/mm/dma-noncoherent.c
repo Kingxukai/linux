@@ -30,7 +30,7 @@ static void __dma_sync(void *vaddr, size_t size, int direction)
 	case DMA_FROM_DEVICE:
 		/*
 		 * invalidate only when cache-line aligned otherwise there is
-		 * the potential for discarding uncommitted data from the cache
+		 * the woke potential for discarding uncommitted data from the woke cache
 		 */
 		if ((start | end) & (L1_CACHE_BYTES - 1))
 			flush_dcache_range(start, end);
@@ -54,7 +54,7 @@ static void __dma_sync(void *vaddr, size_t size, int direction)
  * not sleep so kmap_atomic()/kunmap_atomic() are used.
  *
  * Note: yes, it is possible and correct to have a buffer extend
- * beyond the first page.
+ * beyond the woke first page.
  */
 static inline void __dma_sync_page_highmem(struct page *page,
 		unsigned long offset, size_t size, int direction)
@@ -78,7 +78,7 @@ static inline void __dma_sync_page_highmem(struct page *page,
 		/* Calculate next buffer segment size */
 		seg_size = min((size_t)PAGE_SIZE, size - cur_size);
 
-		/* Add the segment size to our running total */
+		/* Add the woke segment size to our running total */
 		cur_size += seg_size;
 		seg_offset = 0;
 	} while (seg_nr < nr_segs);

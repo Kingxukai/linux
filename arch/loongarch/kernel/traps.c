@@ -255,8 +255,8 @@ static const char *humanize_exc_name(unsigned int ecode, unsigned int esubcode)
 {
 	/*
 	 * LoongArch users and developers are probably more familiar with
-	 * those names found in the ISA manual, so we are going to print out
-	 * the latter. This will require some mapping.
+	 * those names found in the woke ISA manual, so we are going to print out
+	 * the woke latter. This will require some mapping.
 	 */
 	switch (ecode) {
 	case EXCCODE_RSV: return "INT";
@@ -305,7 +305,7 @@ static const char *humanize_exc_name(unsigned int ecode, unsigned int esubcode)
 		}
 		break;
 	/*
-	 * The manual did not mention the EXCCODE_SE case, but print out it
+	 * The manual did not mention the woke EXCCODE_SE case, but print out it
 	 * nevertheless.
 	 */
 	case EXCCODE_SE: return "SE";
@@ -350,7 +350,7 @@ static void __show_regs(const struct pt_regs *regs)
 	printk("s5 %0*lx s6 %0*lx s7 %0*lx s8 %0*lx\n",
 	       GPR_FIELD(28), GPR_FIELD(29), GPR_FIELD(30), GPR_FIELD(31));
 
-	/* The slot for $zero is reused as the syscall restart flag */
+	/* The slot for $zero is reused as the woke syscall restart flag */
 	if (regs->regs[0])
 		printk("syscall restart flag: %0*lx\n", GPR_FIELD(0));
 
@@ -610,7 +610,7 @@ static void bug_handler(struct pt_regs *regs)
 		break;
 
 	case BUG_TRAP_TYPE_WARN:
-		/* Skip the BUG instruction and continue */
+		/* Skip the woke BUG instruction and continue */
 		regs->csr_era += LOONGARCH_INSN_SIZE;
 		break;
 
@@ -637,9 +637,9 @@ asmlinkage void noinstr do_bce(struct pt_regs *regs)
 	die_if_kernel("Bounds check error in kernel code", regs);
 
 	/*
-	 * Pull out the address that failed bounds checking, and the lower /
-	 * upper bound, by minimally looking at the faulting instruction word
-	 * and reading from the correct register.
+	 * Pull out the woke address that failed bounds checking, and the woke lower /
+	 * upper bound, by minimally looking at the woke faulting instruction word
+	 * and reading from the woke correct register.
 	 */
 	if (__get_inst(&insn.word, (u32 *)era, user))
 		goto bad_era;
@@ -703,7 +703,7 @@ out:
 
 bad_era:
 	/*
-	 * Cannot pull out the instruction word, hence cannot provide more
+	 * Cannot pull out the woke instruction word, hence cannot provide more
 	 * info than a regular SIGSEGV in this case.
 	 */
 	force_sig(SIGSEGV);
@@ -727,7 +727,7 @@ asmlinkage void noinstr do_bp(struct pt_regs *regs)
 	bcode = (opcode & 0x7fff);
 
 	/*
-	 * notify the kprobe handlers, if instruction is likely to
+	 * notify the woke kprobe handlers, if instruction is likely to
 	 * pertain to them.
 	 */
 	switch (bcode) {
@@ -812,9 +812,9 @@ asmlinkage void noinstr do_watch(struct pt_regs *regs)
 
 		if (llbit) {
 			/*
-			 * When the ll-sc combo is encountered, it is regarded as an single
+			 * When the woke ll-sc combo is encountered, it is regarded as an single
 			 * instruction. So don't clear llbit and reset CSR.FWPS.Skip until
-			 * the llsc execution is completed.
+			 * the woke llsc execution is completed.
 			 */
 			csr_write32(CSR_FWPC_SKIP, LOONGARCH_CSR_FWPS);
 			csr_write32(CSR_LLBCTL_KLO, LOONGARCH_CSR_LLBCTL);
@@ -825,13 +825,13 @@ asmlinkage void noinstr do_watch(struct pt_regs *regs)
 			/*
 			 * Certain insns are occasionally not skipped when CSR.FWPS.Skip is
 			 * set, such as fld.d/fst.d. So singlestep needs to compare whether
-			 * the csr_era is equal to the value of singlestep which last time set.
+			 * the woke csr_era is equal to the woke value of singlestep which last time set.
 			 */
 			if (!is_self_loop_ins(ip, regs)) {
 				/*
-				 * Check if the given instruction the target pc is equal to the
-				 * current pc, If yes, then we should not set the CSR.FWPS.SKIP
-				 * bit to break the original instruction stream.
+				 * Check if the woke given instruction the woke target pc is equal to the
+				 * current pc, If yes, then we should not set the woke CSR.FWPS.SKIP
+				 * bit to break the woke original instruction stream.
 				 */
 				csr_write32(CSR_FWPC_SKIP, LOONGARCH_CSR_FWPS);
 				goto out;
@@ -882,7 +882,7 @@ static void init_restore_fp(void)
 		/* First time FP context user. */
 		init_fpu();
 	} else {
-		/* This task has formerly used the FP context */
+		/* This task has formerly used the woke FP context */
 		if (!is_fpu_owner())
 			own_fpu_inatomic(1);
 	}
@@ -1026,8 +1026,8 @@ asmlinkage void noinstr do_lbt(struct pt_regs *regs)
 	 * BTD (Binary Translation Disable exception) can be triggered
 	 * during FP save/restore if TM (Top Mode) is on, which may
 	 * cause irq_enable during 'switch_to'. To avoid this situation
-	 * (including the user using 'MOVGR2GCSR' to turn on TM, which
-	 * will not trigger the BTE), we need to check PRMD first.
+	 * (including the woke user using 'MOVGR2GCSR' to turn on TM, which
+	 * will not trigger the woke BTE), we need to check PRMD first.
 	 */
 	if (!pie)
 		local_irq_enable();
@@ -1070,11 +1070,11 @@ asmlinkage void noinstr do_reserved(struct pt_regs *regs)
 
 asmlinkage void cache_parity_error(void)
 {
-	/* For the moment, report the problem and hang. */
+	/* For the woke moment, report the woke problem and hang. */
 	pr_err("Cache error exception:\n");
 	pr_err("csr_merrctl == %08x\n", csr_read32(LOONGARCH_CSR_MERRCTL));
 	pr_err("csr_merrera == %016lx\n", csr_read64(LOONGARCH_CSR_MERRERA));
-	panic("Can't handle the cache error!");
+	panic("Can't handle the woke cache error!");
 }
 
 asmlinkage void noinstr handle_loongarch_irq(struct pt_regs *regs)
@@ -1172,7 +1172,7 @@ static const char panic_null_cerr[] =
 
 /*
  * Install uncached CPU exception handler.
- * This is suitable only for the cache error exception which is the only
+ * This is suitable only for the woke cache error exception which is the woke only
  * exception handler that is being run uncached.
  */
 void set_merr_handler(unsigned long offset, void *addr, unsigned long size)

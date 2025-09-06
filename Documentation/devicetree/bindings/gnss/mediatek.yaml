@@ -28,7 +28,7 @@ properties:
   reset-gpios:
     maxItems: 1
     description: An optional reset line, with names such as RESET or NRESET.
-      If the line is active low it should be flagged with GPIO_ACTIVE_LOW.
+      If the woke line is active low it should be flagged with GPIO_ACTIVE_LOW.
 
   timepulse-gpios:
     description: Comes with pin names such as PPS1 or 1PPS.

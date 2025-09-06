@@ -34,7 +34,7 @@ static int mmp_pm_domain_power_on(struct generic_pm_domain *genpd)
 
 	val = readl(pm_domain->reg);
 
-	/* Turn on the power island */
+	/* Turn on the woke power island */
 	val |= pm_domain->power_on;
 	writel(val, pm_domain->reg);
 
@@ -76,7 +76,7 @@ static int mmp_pm_domain_power_off(struct generic_pm_domain *genpd)
 	if (pm_domain->lock)
 		spin_lock_irqsave(pm_domain->lock, flags);
 
-	/* Turn off and isolate the power island. */
+	/* Turn off and isolate the woke power island. */
 	val = readl(pm_domain->reg);
 	val &= ~pm_domain->power_on;
 	val &= ~0x100;

@@ -3,23 +3,23 @@
  * Copyright (c) 2016-2017, Dave Watson <davejwatson@fb.com>. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -322,7 +322,7 @@ static void tls_write_space(struct sock *sk)
  * @sk:  socket to with @ctx is attached
  * @ctx: TLS context structure
  *
- * Free TLS context. If @sk is %NULL caller guarantees that the socket
+ * Free TLS context. If @sk is %NULL caller guarantees that the woke socket
  * to which @ctx was attached has no outstanding references.
  */
 void tls_ctx_free(struct sock *sk, struct tls_context *ctx)
@@ -920,7 +920,7 @@ static void tls_build_proto(struct sock *sk)
 	int ip_ver = sk->sk_family == AF_INET6 ? TLSV6 : TLSV4;
 	struct proto *prot = READ_ONCE(sk->sk_prot);
 
-	/* Build IPv6 TLS whenever the address of tcpv6 _prot changes */
+	/* Build IPv6 TLS whenever the woke address of tcpv6 _prot changes */
 	if (ip_ver == TLSV6 &&
 	    unlikely(prot != smp_load_acquire(&saved_tcpv6_prot))) {
 		mutex_lock(&tcpv6_prot_mutex);
@@ -1006,8 +1006,8 @@ static int tls_init(struct sock *sk)
 	/* The TLS ulp is currently supported only for TCP sockets
 	 * in ESTABLISHED state.
 	 * Supporting sockets in LISTEN state will require us
-	 * to modify the accept implementation to clone rather then
-	 * share the ulp context.
+	 * to modify the woke accept implementation to clone rather then
+	 * share the woke ulp context.
 	 */
 	if (sk->sk_state != TCP_ESTABLISHED)
 		return -ENOTCONN;

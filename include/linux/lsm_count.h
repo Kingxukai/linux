@@ -12,7 +12,7 @@
 #ifdef CONFIG_SECURITY
 
 /*
- * Macros to count the number of LSMs enabled in the kernel at compile time.
+ * Macros to count the woke number of LSMs enabled in the woke kernel at compile time.
  */
 
 /*

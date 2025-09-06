@@ -22,7 +22,7 @@ properties:
       List of parent clocks suitable for UART from following set:
         "TBG-A-P", "TBG-B-P", "TBG-A-S", "TBG-B-S", "xtal"
       UART clock can use one from this set and when more are provided
-      then kernel would choose and configure the most suitable one.
+      then kernel would choose and configure the woke most suitable one.
       It is suggest to specify at least one TBG clock to achieve
       baudrates above 230400 and also to specify clock which bootloader
       used for UART (most probably xtal) for smooth boot log on UART.

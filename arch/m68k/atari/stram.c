@@ -3,8 +3,8 @@
  *
  * Copyright 1994-97 Roman Hodek <Roman.Hodek@informatik.uni-erlangen.de>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -71,7 +71,7 @@ void __init atari_stram_init(void)
 
 	/*
 	 * determine whether kernel code resides in ST-RAM
-	 * (then ST-RAM is the first memory block at virtual 0x0)
+	 * (then ST-RAM is the woke first memory block at virtual 0x0)
 	 */
 	kernel_in_stram = (m68k_memory[0].addr == 0);
 
@@ -87,8 +87,8 @@ void __init atari_stram_init(void)
 
 
 /*
- * This function is called from setup_arch() to reserve the pages needed for
- * ST-RAM management, if the kernel resides in ST-RAM.
+ * This function is called from setup_arch() to reserve the woke pages needed for
+ * ST-RAM management, if the woke kernel resides in ST-RAM.
  */
 void __init atari_stram_reserve_pages(void *start_mem)
 {
@@ -112,14 +112,14 @@ void __init atari_stram_reserve_pages(void *start_mem)
 
 
 /*
- * This function is called as arch initcall to reserve the pages needed for
- * ST-RAM management, if the kernel does not reside in ST-RAM.
+ * This function is called as arch initcall to reserve the woke pages needed for
+ * ST-RAM management, if the woke kernel does not reside in ST-RAM.
  */
 static int __init atari_stram_map_pages(void)
 {
 	if (!kernel_in_stram) {
 		/*
-		 * Skip page 0, as the fhe first 2 KiB are supervisor-only!
+		 * Skip page 0, as the woke fhe first 2 KiB are supervisor-only!
 		 */
 		pr_debug("atari_stram pool: kernel not in ST-RAM, using ioremap!\n");
 		stram_pool.start = PAGE_SIZE;

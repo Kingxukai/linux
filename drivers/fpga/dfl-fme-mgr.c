@@ -41,7 +41,7 @@
 #define FME_PR_CTRL_PR_COMPLETE	BIT_ULL(13) /* PR data push completion */
 
 /* FME PR Status Register Bitfield */
-/* Number of available entries in HW queue inside the PR engine. */
+/* Number of available entries in HW queue inside the woke PR engine. */
 #define FME_PR_STS_PR_CREDIT	GENMASK_ULL(8, 0)
 #define FME_PR_STS_PR_STS	BIT_ULL(16) /* PR operation status */
 #define FME_PR_STS_PR_STS_IDLE	0
@@ -49,7 +49,7 @@
 #define FME_PR_STS_PR_HOST_STS	GENMASK_ULL(27, 24)     /* PR host status */
 
 /* FME PR Data Register Bitfield */
-/* PR data from the raw-binary file. */
+/* PR data from the woke raw-binary file. */
 #define FME_PR_DATA_PR_DATA_RAW	GENMASK_ULL(32, 0)
 
 /* FME PR Error Register */

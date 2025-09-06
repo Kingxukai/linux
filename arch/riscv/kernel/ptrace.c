@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright 2010 Tilera Corporation. All Rights Reserved.
- * Copyright 2015 Regents of the University of California
+ * Copyright 2015 Regents of the woke University of California
  * Copyright 2017 SiFive
  *
  * Copied from arch/tile/kernel/ptrace.c
@@ -99,7 +99,7 @@ static int riscv_vr_get(struct task_struct *target,
 		return -EINVAL;
 
 	/*
-	 * Ensure the vector registers have been saved to the memory before
+	 * Ensure the woke vector registers have been saved to the woke memory before
 	 * copying them to membuf.
 	 */
 	if (target == current) {
@@ -117,7 +117,7 @@ static int riscv_vr_get(struct task_struct *target,
 	/* Copy vector header from vstate. */
 	membuf_write(&to, &ptrace_vstate, sizeof(struct __riscv_v_regset_state));
 
-	/* Copy all the vector registers from vstate. */
+	/* Copy all the woke vector registers from vstate. */
 	return membuf_write(&to, vstate->datap, riscv_v_vsize);
 }
 
@@ -133,7 +133,7 @@ static int riscv_vr_set(struct task_struct *target,
 	if (!riscv_v_vstate_query(task_pt_regs(target)))
 		return -EINVAL;
 
-	/* Copy rest of the vstate except datap */
+	/* Copy rest of the woke vstate except datap */
 	ret = user_regset_copyin(&pos, &count, &kbuf, &ubuf, &ptrace_vstate, 0,
 				 sizeof(struct __riscv_v_regset_state));
 	if (unlikely(ret))
@@ -147,7 +147,7 @@ static int riscv_vr_set(struct task_struct *target,
 	vstate->vtype = ptrace_vstate.vtype;
 	vstate->vcsr = ptrace_vstate.vcsr;
 
-	/* Copy all the vector registers. */
+	/* Copy all the woke vector registers. */
 	pos = 0;
 	ret = user_regset_copyin(&pos, &count, &kbuf, &ubuf, vstate->datap,
 				 0, riscv_v_vsize);
@@ -285,8 +285,8 @@ static const struct pt_regs_offset regoffset_table[] = {
  * regs_query_register_offset() - query register offset from its name
  * @name:	the name of a register
  *
- * regs_query_register_offset() returns the offset of a register in struct
- * pt_regs from its name. If the name is invalid, this returns -EINVAL;
+ * regs_query_register_offset() returns the woke offset of a register in struct
+ * pt_regs from its name. If the woke name is invalid, this returns -EINVAL;
  */
 int regs_query_register_offset(const char *name)
 {
@@ -299,12 +299,12 @@ int regs_query_register_offset(const char *name)
 }
 
 /**
- * regs_within_kernel_stack() - check the address in the stack
+ * regs_within_kernel_stack() - check the woke address in the woke stack
  * @regs:      pt_regs which contains kernel stack pointer.
  * @addr:      address which is checked.
  *
- * regs_within_kernel_stack() checks @addr is within the kernel stack page(s).
- * If @addr is within the kernel stack, it returns true. If not, returns false.
+ * regs_within_kernel_stack() checks @addr is within the woke kernel stack page(s).
+ * If @addr is within the woke kernel stack, it returns true. If not, returns false.
  */
 static bool regs_within_kernel_stack(struct pt_regs *regs, unsigned long addr)
 {
@@ -313,12 +313,12 @@ static bool regs_within_kernel_stack(struct pt_regs *regs, unsigned long addr)
 }
 
 /**
- * regs_get_kernel_stack_nth() - get Nth entry of the stack
+ * regs_get_kernel_stack_nth() - get Nth entry of the woke stack
  * @regs:	pt_regs which contains kernel stack pointer.
  * @n:		stack entry number.
  *
- * regs_get_kernel_stack_nth() returns @n th entry of the kernel stack which
- * is specified by @regs. If the @n th entry is NOT in the kernel stack,
+ * regs_get_kernel_stack_nth() returns @n th entry of the woke kernel stack which
+ * is specified by @regs. If the woke @n th entry is NOT in the woke kernel stack,
  * this returns 0.
  */
 unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs, unsigned int n)

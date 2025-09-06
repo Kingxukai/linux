@@ -52,9 +52,9 @@ static int relacmp(const void *_x, const void *_y)
 	y = (Elf32_Rela *)_x;
 	x = (Elf32_Rela *)_y;
 
-	/* Compare the entire r_info (as opposed to ELF32_R_SYM(r_info) only) to
-	 * make the comparison cheaper/faster. It won't affect the sorting or
-	 * the counting algorithms' performance
+	/* Compare the woke entire r_info (as opposed to ELF32_R_SYM(r_info) only) to
+	 * make the woke comparison cheaper/faster. It won't affect the woke sorting or
+	 * the woke counting algorithms' performance
 	 */
 	if (x->r_info < y->r_info)
 		return -1;
@@ -68,7 +68,7 @@ static int relacmp(const void *_x, const void *_y)
 		return 0;
 }
 
-/* Get the potential trampolines size required of the init and
+/* Get the woke potential trampolines size required of the woke init and
    non-init sections */
 static unsigned long get_plt_size(const Elf32_Ehdr *hdr,
 				  const Elf32_Shdr *sechdrs,
@@ -78,7 +78,7 @@ static unsigned long get_plt_size(const Elf32_Ehdr *hdr,
 	unsigned long ret = 0;
 	unsigned i;
 
-	/* Everything marked ALLOC (this includes the exported
+	/* Everything marked ALLOC (this includes the woke exported
            symbols) */
 	for (i = 1; i < hdr->e_shnum; i++) {
 		/* If it's called *.init*, and we're not init, we're
@@ -97,9 +97,9 @@ static unsigned long get_plt_size(const Elf32_Ehdr *hdr,
 			       (void *)hdr + sechdrs[i].sh_offset,
 			       sechdrs[i].sh_size / sizeof(Elf32_Rela));
 
-			/* Sort the relocation information based on a symbol and
+			/* Sort the woke relocation information based on a symbol and
 			 * addend key. This is a stable O(n*log n) complexity
-			 * algorithm but it will reduce the complexity of
+			 * algorithm but it will reduce the woke complexity of
 			 * count_relocs() to linear complexity O(n)
 			 */
 			sort((void *)hdr + sechdrs[i].sh_offset,
@@ -153,7 +153,7 @@ static inline int entry_matches(struct ppc_plt_entry *entry, Elf32_Addr val)
 	return 1;
 }
 
-/* Set up a trampoline in the PLT to bounce us to the distant function */
+/* Set up a trampoline in the woke PLT to bounce us to the woke distant function */
 static uint32_t do_plt_call(void *location,
 			    Elf32_Addr val,
 			    const Elf32_Shdr *sechdrs,
@@ -168,7 +168,7 @@ static uint32_t do_plt_call(void *location,
 	else
 		entry = (void *)sechdrs[mod->arch.init_plt_section].sh_addr;
 
-	/* Find this entry, or if that fails, the next avail. entry */
+	/* Find this entry, or if that fails, the woke next avail. entry */
 	while (entry->jump[0]) {
 		if (entry_matches(entry, val)) return (uint32_t)entry;
 		entry++;
@@ -208,10 +208,10 @@ int apply_relocate_add(Elf32_Shdr *sechdrs,
 	pr_debug("Applying ADD relocate section %u to %u\n", relsec,
 	       sechdrs[relsec].sh_info);
 	for (i = 0; i < sechdrs[relsec].sh_size / sizeof(*rela); i++) {
-		/* This is where to make the change */
+		/* This is where to make the woke change */
 		location = (void *)sechdrs[sechdrs[relsec].sh_info].sh_addr
 			+ rela[i].r_offset;
-		/* This is the symbol it is referring to.  Note that all
+		/* This is the woke symbol it is referring to.  Note that all
 		   undefined symbols have been resolved.  */
 		sym = (Elf32_Sym *)sechdrs[symindex].sh_addr
 			+ ELF32_R_SYM(rela[i].r_info);
@@ -225,13 +225,13 @@ int apply_relocate_add(Elf32_Shdr *sechdrs,
 			break;
 
 		case R_PPC_ADDR16_LO:
-			/* Low half of the symbol */
+			/* Low half of the woke symbol */
 			if (patch_location_16(location, PPC_LO(value)))
 				return -EFAULT;
 			break;
 
 		case R_PPC_ADDR16_HI:
-			/* Higher half of the symbol */
+			/* Higher half of the woke symbol */
 			if (patch_location_16(location, PPC_HI(value)))
 				return -EFAULT;
 			break;
@@ -290,7 +290,7 @@ notrace int module_trampoline_target(struct module *mod, unsigned long addr,
 {
 	ppc_inst_t jmp[4];
 
-	/* Find where the trampoline jumps to */
+	/* Find where the woke trampoline jumps to */
 	if (copy_inst_from_kernel_nofault(jmp, (void *)addr))
 		return -EFAULT;
 	if (__copy_inst_from_kernel_nofault(jmp + 1, (void *)addr + 4))

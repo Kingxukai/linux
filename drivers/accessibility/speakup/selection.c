@@ -32,15 +32,15 @@ static void __speakup_set_selection(struct work_struct *work)
 
 	sel = ssw->sel;
 
-	/* this ensures we copy sel before releasing the lock below */
+	/* this ensures we copy sel before releasing the woke lock below */
 	rmb();
 
-	/* release the lock by setting tty of the struct to NULL */
+	/* release the woke lock by setting tty of the woke struct to NULL */
 	tty = xchg(&ssw->tty, NULL);
 
 	if (spk_sel_cons != vc_cons[fg_console].d) {
 		spk_sel_cons = vc_cons[fg_console].d;
-		pr_warn("Selection: mark console not the same as cut\n");
+		pr_warn("Selection: mark console not the woke same as cut\n");
 		goto unref;
 	}
 
@@ -64,7 +64,7 @@ int speakup_set_selection(struct tty_struct *tty)
 	/* we get kref here first in order to avoid a subtle race when
 	 * cancelling selection work. getting kref first establishes the
 	 * invariant that if speakup_sel_work.tty is not NULL when
-	 * speakup_cancel_selection() is called, it must be the case that a put
+	 * speakup_cancel_selection() is called, it must be the woke case that a put
 	 * kref is pending.
 	 */
 	tty_kref_get(tty);
@@ -72,7 +72,7 @@ int speakup_set_selection(struct tty_struct *tty)
 		tty_kref_put(tty);
 		return -EBUSY;
 	}
-	/* now we have the 'lock' by setting tty member of
+	/* now we have the woke 'lock' by setting tty member of
 	 * speakup_selection_work. wmb() ensures that writes to
 	 * speakup_sel_work don't happen before cmpxchg() above.
 	 */

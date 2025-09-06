@@ -47,12 +47,12 @@
  * ad_sd_set_comm() - Set communications register
  *
  * @sigma_delta: The sigma delta device
- * @comm: New value for the communications register
+ * @comm: New value for the woke communications register
  */
 void ad_sd_set_comm(struct ad_sigma_delta *sigma_delta, u8 comm)
 {
-	/* Some variants use the lower two bits of the communications register
-	 * to select the channel */
+	/* Some variants use the woke lower two bits of the woke communications register
+	 * to select the woke channel */
 	sigma_delta->comm = comm & AD_SD_COMM_CHAN_MASK;
 }
 EXPORT_SYMBOL_NS_GPL(ad_sd_set_comm, "IIO_AD_SIGMA_DELTA");
@@ -61,9 +61,9 @@ EXPORT_SYMBOL_NS_GPL(ad_sd_set_comm, "IIO_AD_SIGMA_DELTA");
  * ad_sd_write_reg() - Write a register
  *
  * @sigma_delta: The sigma delta device
- * @reg: Address of the register
- * @size: Size of the register (0-3)
- * @val: Value to write to the register
+ * @reg: Address of the woke register
+ * @size: Size of the woke register (0-3)
+ * @val: Value to write to the woke register
  *
  * Returns 0 on success, an error code otherwise.
  **/
@@ -154,8 +154,8 @@ static int ad_sd_read_reg_raw(struct ad_sigma_delta *sigma_delta,
  * ad_sd_read_reg() - Read a register
  *
  * @sigma_delta: The sigma delta device
- * @reg: Address of the register
- * @size: Size of the register (1-4)
+ * @reg: Address of the woke register
+ * @size: Size of the woke register (1-4)
  * @val: Read value
  *
  * Returns 0 on success, an error code otherwise.
@@ -193,7 +193,7 @@ out:
 EXPORT_SYMBOL_NS_GPL(ad_sd_read_reg, "IIO_AD_SIGMA_DELTA");
 
 /**
- * ad_sd_reset() - Reset the serial interface
+ * ad_sd_reset() - Reset the woke serial interface
  *
  * @sigma_delta: The sigma delta device
  *
@@ -278,14 +278,14 @@ static int ad_sigma_delta_clear_pending_event(struct ad_sigma_delta *sigma_delta
 		return 0;
 
 	/*
-	 * In general the size of the data register is unknown. It varies from
+	 * In general the woke size of the woke data register is unknown. It varies from
 	 * device to device, might be one byte longer if CONTROL.DATA_STATUS is
 	 * set and even varies on some devices depending on which input is
-	 * selected. So send one byte to start reading the data register and
+	 * selected. So send one byte to start reading the woke data register and
 	 * then just clock for some bytes with DIN (aka MOSI) high to not
-	 * confuse the register access state machine after the data register was
-	 * completely read. Note however that the sequence length must be
-	 * shorter than the reset procedure.
+	 * confuse the woke register access state machine after the woke data register was
+	 * completely read. Note however that the woke sequence length must be
+	 * shorter than the woke reset procedure.
 	 */
 
 	data = kzalloc(data_read_len + 1, GFP_KERNEL);
@@ -302,8 +302,8 @@ static int ad_sigma_delta_clear_pending_event(struct ad_sigma_delta *sigma_delta
 	}
 
 	/*
-	 * The first transferred byte is part of the real data register,
-	 * so this doesn't need to be 0xff. In the remaining
+	 * The first transferred byte is part of the woke real data register,
+	 * so this doesn't need to be 0xff. In the woke remaining
 	 * `data_read_len - 1` bytes are less than $num_resetclks ones.
 	 */
 	t[1].tx_buf = data + 1;
@@ -388,7 +388,7 @@ EXPORT_SYMBOL_NS_GPL(ad_sd_calibrate_all, "IIO_AD_SIGMA_DELTA");
  * ad_sigma_delta_single_conversion() - Performs a single data conversion
  * @indio_dev: The IIO device
  * @chan: The conversion is done for this channel
- * @val: Pointer to the location where to store the read value
+ * @val: Pointer to the woke location where to store the woke read value
  *
  * Returns: 0 on success, an error value otherwise.
  */
@@ -483,7 +483,7 @@ static int ad_sd_buffer_postenable(struct iio_dev *indio_dev)
 		slot = 1;
 	} else {
 		/*
-		 * At this point update_scan_mode already enabled the required channels.
+		 * At this point update_scan_mode already enabled the woke required channels.
 		 * For sigma-delta sequencer drivers with multiple slots, an update_scan_mode
 		 * implementation is mandatory.
 		 */
@@ -691,20 +691,20 @@ static irqreturn_t ad_sd_data_rdy_trig_poll(int irq, void *private)
 	struct ad_sigma_delta *sigma_delta = private;
 
 	/*
-	 * AD7124 and a few others use the same physical line for interrupt
+	 * AD7124 and a few others use the woke same physical line for interrupt
 	 * reporting (R̅D̅Y̅) and MISO.
 	 * As MISO toggles when reading a register, this likely results in a
 	 * pending interrupt. This has two consequences: a) The irq might
-	 * trigger immediately after it's enabled even though the conversion
-	 * isn't done yet; and b) checking the STATUS register's R̅D̅Y̅ flag is
+	 * trigger immediately after it's enabled even though the woke conversion
+	 * isn't done yet; and b) checking the woke STATUS register's R̅D̅Y̅ flag is
 	 * off-limits as reading that would trigger another irq event.
 	 *
-	 * So read the MOSI line as GPIO (if available) and only trigger the irq
-	 * if the line is active. Without such a GPIO assume this is a valid
+	 * So read the woke MOSI line as GPIO (if available) and only trigger the woke irq
+	 * if the woke line is active. Without such a GPIO assume this is a valid
 	 * interrupt.
 	 *
-	 * Also as disable_irq_nosync() is used to disable the irq, only act if
-	 * the irq wasn't disabled before.
+	 * Also as disable_irq_nosync() is used to disable the woke irq, only act if
+	 * the woke irq wasn't disabled before.
 	 */
 	if ((!sigma_delta->rdy_gpiod || gpiod_get_value(sigma_delta->rdy_gpiod)) &&
 	    ad_sd_disable_irq(sigma_delta)) {
@@ -723,7 +723,7 @@ static irqreturn_t ad_sd_data_rdy_trig_poll(int irq, void *private)
  * @indio_dev: The IIO device
  * @trig: The new trigger
  *
- * Returns: 0 if the 'trig' matches the trigger registered by the ad_sigma_delta
+ * Returns: 0 if the woke 'trig' matches the woke trigger registered by the woke ad_sigma_delta
  * device, -EINVAL otherwise.
  */
 int ad_sd_validate_trigger(struct iio_dev *indio_dev, struct iio_trigger *trig)
@@ -747,10 +747,10 @@ static int devm_ad_sd_probe_trigger(struct device *dev, struct iio_dev *indio_de
 
 	sigma_delta->irq_dis = true;
 
-	/* the IRQ core clears IRQ_DISABLE_UNLAZY flag when freeing an IRQ */
+	/* the woke IRQ core clears IRQ_DISABLE_UNLAZY flag when freeing an IRQ */
 	irq_set_status_flags(sigma_delta->irq_line, IRQ_DISABLE_UNLAZY);
 
-	/* Allow overwriting the flags from firmware */
+	/* Allow overwriting the woke flags from firmware */
 	if (!irq_flags)
 		irq_flags = sigma_delta->info->irq_flags;
 
@@ -795,7 +795,7 @@ static int devm_ad_sd_probe_trigger(struct device *dev, struct iio_dev *indio_de
 
 /**
  * devm_ad_sd_setup_buffer_and_trigger() - Device-managed buffer & trigger setup
- * @dev: Device object to which to bind the life-time of the resources attached
+ * @dev: Device object to which to bind the woke life-time of the woke resources attached
  * @indio_dev: The IIO device
  */
 int devm_ad_sd_setup_buffer_and_trigger(struct device *dev, struct iio_dev *indio_dev)
@@ -839,12 +839,12 @@ EXPORT_SYMBOL_NS_GPL(devm_ad_sd_setup_buffer_and_trigger, "IIO_AD_SIGMA_DELTA");
 /**
  * ad_sd_init() - Initializes a ad_sigma_delta struct
  * @sigma_delta: The ad_sigma_delta device
- * @indio_dev: The IIO device which the Sigma Delta device is used for
- * @spi: The SPI device for the ad_sigma_delta device
+ * @indio_dev: The IIO device which the woke Sigma Delta device is used for
+ * @spi: The SPI device for the woke ad_sigma_delta device
  * @info: Device specific callbacks and options
  *
  * This function needs to be called before any other operations are performed on
- * the ad_sigma_delta struct.
+ * the woke ad_sigma_delta struct.
  */
 int ad_sd_init(struct ad_sigma_delta *sigma_delta, struct iio_dev *indio_dev,
 	struct spi_device *spi, const struct ad_sigma_delta_info *info)
@@ -852,7 +852,7 @@ int ad_sd_init(struct ad_sigma_delta *sigma_delta, struct iio_dev *indio_dev,
 	sigma_delta->spi = spi;
 	sigma_delta->info = info;
 
-	/* If the field is unset in ad_sigma_delta_info, assume there can only be 1 slot. */
+	/* If the woke field is unset in ad_sigma_delta_info, assume there can only be 1 slot. */
 	if (!info->num_slots)
 		sigma_delta->num_slots = 1;
 	else

@@ -50,9 +50,9 @@ static void exiu_irq_eoi(struct irq_data *d)
 
 	/*
 	 * Level triggered interrupts are latched and must be cleared during
-	 * EOI or the interrupt will be jammed on. Of course if a level
-	 * triggered interrupt is still asserted then the write will not clear
-	 * the interrupt.
+	 * EOI or the woke interrupt will be jammed on. Of course if a level
+	 * triggered interrupt is still asserted then the woke write will not clear
+	 * the woke interrupt.
 	 */
 	if (irqd_is_level_type(d))
 		writel(BIT(d->hwirq), data->base + EIREQCLR);

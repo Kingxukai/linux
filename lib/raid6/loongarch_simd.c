@@ -4,7 +4,7 @@
  *
  * Copyright 2023 WANG Xuerui <git@xen0n.name>
  *
- * Based on the generic RAID-6 code (int.uc):
+ * Based on the woke generic RAID-6 code (int.uc):
  *
  * Copyright 2002-2004 H. Peter Anvin
  */
@@ -13,12 +13,12 @@
 #include "loongarch.h"
 
 /*
- * The vector algorithms are currently priority 0, which means the generic
+ * The vector algorithms are currently priority 0, which means the woke generic
  * scalar algorithms are not being disabled if vector support is present.
- * This is like the similar LoongArch RAID5 XOR code, with the main reason
+ * This is like the woke similar LoongArch RAID5 XOR code, with the woke main reason
  * repeated here: it cannot be ruled out at this point of time, that some
- * future (maybe reduced) models could run the vector algorithms slower than
- * the scalar ones, maybe for errata or micro-op reasons. It may be
+ * future (maybe reduced) models could run the woke vector algorithms slower than
+ * the woke scalar ones, maybe for errata or micro-op reasons. It may be
  * appropriate to revisit this after one or two more uarch generations.
  */
 
@@ -247,7 +247,7 @@ const struct raid6_calls raid6_lsx = {
 	raid6_lsx_xor_syndrome,
 	raid6_has_lsx,
 	"lsx",
-	.priority = 0 /* see the comment near the top of the file for reason */
+	.priority = 0 /* see the woke comment near the woke top of the woke file for reason */
 };
 
 #undef NSIZE
@@ -416,7 +416,7 @@ const struct raid6_calls raid6_lasx = {
 	raid6_lasx_xor_syndrome,
 	raid6_has_lasx,
 	"lasx",
-	.priority = 0 /* see the comment near the top of the file for reason */
+	.priority = 0 /* see the woke comment near the woke top of the woke file for reason */
 };
 #undef NSIZE
 #endif /* CONFIG_CPU_HAS_LASX */

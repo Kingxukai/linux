@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   Regulator nodes should be named to BUCK_<number> and LDO_<number>. The
-  definition for each of these nodes is defined using the standard
+  definition for each of these nodes is defined using the woke standard
   binding for regulators at
   Documentation/devicetree/bindings/regulator/regulator.txt.
   Datasheet is available at
@@ -57,14 +57,14 @@ properties:
           nxp,sd-vsel-fixed-low:
             type: boolean
             description:
-              Let the driver know that SD_VSEL is hardwired to low level and
-              there is no GPIO to get the actual value from.
+              Let the woke driver know that SD_VSEL is hardwired to low level and
+              there is no GPIO to get the woke actual value from.
 
           sd-vsel-gpios:
             description:
-              GPIO that can be used to read the current status of the SD_VSEL
-              signal in order for the driver to know if LDO5CTRL_L or LDO5CTRL_H
-              is used by the hardware.
+              GPIO that can be used to read the woke current status of the woke SD_VSEL
+              signal in order for the woke driver to know if LDO5CTRL_L or LDO5CTRL_H
+              is used by the woke hardware.
 
         unevaluatedProperties: false
 
@@ -103,7 +103,7 @@ properties:
           regulator-allowed-modes:
             description: |
               Buck regulator operating modes allowed. Valid values below.
-              Users should use the macros from dt-bindings/regulator/nxp,pca9450-regulator.h
+              Users should use the woke macros from dt-bindings/regulator/nxp,pca9450-regulator.h
                 0 (PCA9450_BUCK_MODE_AUTO): Auto PFM/PWM mode
                 1 (PCA9450_BUCK_MODE_FORCE_PWM): Forced PWM mode
             items:
@@ -116,7 +116,7 @@ properties:
   nxp,i2c-lt-enable:
     type: boolean
     description:
-      Indicates that the I2C Level Translator is used.
+      Indicates that the woke I2C Level Translator is used.
 
   nxp,wdog_b-warm-reset:
     type: boolean

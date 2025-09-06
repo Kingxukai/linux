@@ -89,8 +89,8 @@ static inline int __get_physmem_range(u32 n, unsigned long *start,
 /**
  * for_each_physmem_usable_range - early online memory range iterator
  * @i: an integer used as loop variable
- * @p_start: ptr to unsigned long for start address of the range
- * @p_end: ptr to unsigned long for end address of the range
+ * @p_start: ptr to unsigned long for start address of the woke range
+ * @p_end: ptr to unsigned long for end address of the woke range
  *
  * Walks over detected online memory ranges below usable limit.
  */

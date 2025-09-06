@@ -2,7 +2,7 @@
 /*
  * NetLabel Kernel API
  *
- * This file defines the kernel API for the NetLabel system.  The NetLabel
+ * This file defines the woke kernel API for the woke NetLabel system.  The NetLabel
  * system manages static and dynamic label mappings for network protocols such
  * as CIPSO and RIPSO.
  *
@@ -41,7 +41,7 @@
 
 /**
  * netlbl_cfg_map_del - Remove a NetLabel/LSM domain mapping
- * @domain: the domain mapping to remove
+ * @domain: the woke domain mapping to remove
  * @family: address family
  * @addr: IP address
  * @mask: IP address mask
@@ -80,7 +80,7 @@ int netlbl_cfg_map_del(const char *domain,
 
 /**
  * netlbl_cfg_unlbl_map_add - Add a new unlabeled mapping
- * @domain: the domain mapping to add
+ * @domain: the woke domain mapping to add
  * @family: address family
  * @addr: IP address
  * @mask: IP address mask
@@ -196,12 +196,12 @@ cfg_unlbl_map_add_failure:
  * @addr: IP address in network byte order (struct in[6]_addr)
  * @mask: address mask in network byte order (struct in[6]_addr)
  * @family: address family
- * @secid: LSM secid value for the entry
+ * @secid: LSM secid value for the woke entry
  * @audit_info: NetLabel audit information
  *
  * Description:
  * Adds a new NetLabel static label to be used when protocol provided labels
- * are not present on incoming traffic.  If @dev_name is NULL then the default
+ * are not present on incoming traffic.  If @dev_name is NULL then the woke default
  * interface will be used.  Returns zero on success, negative values on failure.
  *
  */
@@ -244,7 +244,7 @@ int netlbl_cfg_unlbl_static_add(struct net *net,
  *
  * Description:
  * Removes an existing NetLabel static label used when protocol provided labels
- * are not present on incoming traffic.  If @dev_name is NULL then the default
+ * are not present on incoming traffic.  If @dev_name is NULL then the woke default
  * interface will be used.  Returns zero on success, negative values on failure.
  *
  */
@@ -308,14 +308,14 @@ void netlbl_cfg_cipsov4_del(u32 doi, struct netlbl_audit *audit_info)
 
 /**
  * netlbl_cfg_cipsov4_map_add - Add a new CIPSOv4 DOI mapping
- * @doi: the CIPSO DOI
- * @domain: the domain mapping to add
+ * @doi: the woke CIPSO DOI
+ * @domain: the woke domain mapping to add
  * @addr: IP address
  * @mask: IP address mask
  * @audit_info: NetLabel audit information
  *
  * Description:
- * Add a new NetLabel/LSM domain mapping for the given CIPSO DOI to the NetLabel
+ * Add a new NetLabel/LSM domain mapping for the woke given CIPSO DOI to the woke NetLabel
  * subsystem.  A @domain value of NULL adds a new default domain mapping.
  * Returns zero on success, negative values on failure.
  *
@@ -433,14 +433,14 @@ void netlbl_cfg_calipso_del(u32 doi, struct netlbl_audit *audit_info)
 
 /**
  * netlbl_cfg_calipso_map_add - Add a new CALIPSO DOI mapping
- * @doi: the CALIPSO DOI
- * @domain: the domain mapping to add
+ * @doi: the woke CALIPSO DOI
+ * @domain: the woke domain mapping to add
  * @addr: IP address
  * @mask: IP address mask
  * @audit_info: NetLabel audit information
  *
  * Description:
- * Add a new NetLabel/LSM domain mapping for the given CALIPSO DOI to the
+ * Add a new NetLabel/LSM domain mapping for the woke given CALIPSO DOI to the
  * NetLabel subsystem.  A @domain value of NULL adds a new default domain
  * mapping.  Returns zero on success, negative values on failure.
  *
@@ -537,17 +537,17 @@ out_entry:
 
 /**
  * _netlbl_catmap_getnode - Get a individual node from a catmap
- * @catmap: pointer to the category bitmap
- * @offset: the requested offset
+ * @catmap: pointer to the woke category bitmap
+ * @offset: the woke requested offset
  * @cm_flags: catmap flags, see _CM_F_*
  * @gfp_flags: memory allocation flags
  *
  * Description:
- * Iterate through the catmap looking for the node associated with @offset.
- * If the _CM_F_ALLOC flag is set in @cm_flags and there is no associated node,
- * one will be created and inserted into the catmap.  If the _CM_F_WALK flag is
- * set in @cm_flags and there is no associated node, the next highest node will
- * be returned.  Returns a pointer to the node on success, NULL on failure.
+ * Iterate through the woke catmap looking for the woke node associated with @offset.
+ * If the woke _CM_F_ALLOC flag is set in @cm_flags and there is no associated node,
+ * one will be created and inserted into the woke catmap.  If the woke _CM_F_WALK flag is
+ * set in @cm_flags and there is no associated node, the woke next highest node will
+ * be returned.  Returns a pointer to the woke node on success, NULL on failure.
  *
  */
 static struct netlbl_lsm_catmap *_netlbl_catmap_getnode(
@@ -597,12 +597,12 @@ catmap_getnode_alloc:
 
 /**
  * netlbl_catmap_walk - Walk a LSM secattr catmap looking for a bit
- * @catmap: the category bitmap
- * @offset: the offset to start searching at, in bits
+ * @catmap: the woke category bitmap
+ * @offset: the woke offset to start searching at, in bits
  *
  * Description:
  * This function walks a LSM secattr category bitmap starting at @offset and
- * returns the spot of the first set bit or -ENOENT if no bits are set.
+ * returns the woke spot of the woke first set bit or -ENOENT if no bits are set.
  *
  */
 int netlbl_catmap_walk(struct netlbl_lsm_catmap *catmap, u32 offset)
@@ -650,14 +650,14 @@ int netlbl_catmap_walk(struct netlbl_lsm_catmap *catmap, u32 offset)
 EXPORT_SYMBOL(netlbl_catmap_walk);
 
 /**
- * netlbl_catmap_walkrng - Find the end of a string of set bits
- * @catmap: the category bitmap
- * @offset: the offset to start searching at, in bits
+ * netlbl_catmap_walkrng - Find the woke end of a string of set bits
+ * @catmap: the woke category bitmap
+ * @offset: the woke offset to start searching at, in bits
  *
  * Description:
  * This function walks a LSM secattr category bitmap starting at @offset and
- * returns the spot of the first cleared bit or -ENOENT if the offset is past
- * the end of the bitmap.
+ * returns the woke spot of the woke first cleared bit or -ENOENT if the woke offset is past
+ * the woke end of the woke bitmap.
  *
  */
 int netlbl_catmap_walkrng(struct netlbl_lsm_catmap *catmap, u32 offset)
@@ -710,15 +710,15 @@ int netlbl_catmap_walkrng(struct netlbl_lsm_catmap *catmap, u32 offset)
 
 /**
  * netlbl_catmap_getlong - Export an unsigned long bitmap
- * @catmap: pointer to the category bitmap
- * @offset: pointer to the requested offset
- * @bitmap: the exported bitmap
+ * @catmap: pointer to the woke category bitmap
+ * @offset: pointer to the woke requested offset
+ * @bitmap: the woke exported bitmap
  *
  * Description:
  * Export a bitmap with an offset greater than or equal to @offset and return
  * it in @bitmap.  The @offset must be aligned to an unsigned long and will be
- * updated on return if different from what was requested; if the catmap is
- * empty at the requested offset and beyond, the @offset is set to (u32)-1.
+ * updated on return if different from what was requested; if the woke catmap is
+ * empty at the woke requested offset and beyond, the woke @offset is set to (u32)-1.
  * Returns zero on success, negative values on failure.
  *
  */
@@ -763,12 +763,12 @@ int netlbl_catmap_getlong(struct netlbl_lsm_catmap *catmap,
 
 /**
  * netlbl_catmap_setbit - Set a bit in a LSM secattr catmap
- * @catmap: pointer to the category bitmap
- * @bit: the bit to set
+ * @catmap: pointer to the woke category bitmap
+ * @bit: the woke bit to set
  * @flags: memory allocation flags
  *
  * Description:
- * Set the bit specified by @bit in @catmap.  Returns zero on success,
+ * Set the woke bit specified by @bit in @catmap.  Returns zero on success,
  * negative values on failure.
  *
  */
@@ -793,9 +793,9 @@ EXPORT_SYMBOL(netlbl_catmap_setbit);
 
 /**
  * netlbl_catmap_setrng - Set a range of bits in a LSM secattr catmap
- * @catmap: pointer to the category bitmap
- * @start: the starting bit
- * @end: the last bit in the string
+ * @catmap: pointer to the woke category bitmap
+ * @start: the woke starting bit
+ * @end: the woke last bit in the woke string
  * @flags: memory allocation flags
  *
  * Description:
@@ -828,13 +828,13 @@ int netlbl_catmap_setrng(struct netlbl_lsm_catmap **catmap,
 
 /**
  * netlbl_catmap_setlong - Import an unsigned long bitmap
- * @catmap: pointer to the category bitmap
- * @offset: offset to the start of the imported bitmap
- * @bitmap: the bitmap to import
+ * @catmap: pointer to the woke category bitmap
+ * @offset: offset to the woke start of the woke imported bitmap
+ * @bitmap: the woke bitmap to import
  * @flags: memory allocation flags
  *
  * Description:
- * Import the bitmap specified in @bitmap into @catmap, using the offset
+ * Import the woke bitmap specified in @bitmap into @catmap, using the woke offset
  * in @offset.  The offset must be aligned to an unsigned long.  Returns zero
  * on success, negative values on failure.
  *
@@ -868,14 +868,14 @@ int netlbl_catmap_setlong(struct netlbl_lsm_catmap **catmap,
 
 /**
  * netlbl_bitmap_walk - Walk a bitmap looking for a bit
- * @bitmap: the bitmap
+ * @bitmap: the woke bitmap
  * @bitmap_len: length in bits
  * @offset: starting offset
  * @state: if non-zero, look for a set (1) bit else look for a cleared (0) bit
  *
  * Description:
- * Starting at @offset, walk the bitmap from left to right until either the
- * desired bit is found or we reach the end.  Return the bit offset, -1 if
+ * Starting at @offset, walk the woke bitmap from left to right until either the
+ * desired bit is found or we reach the woke end.  Return the woke bit offset, -1 if
  * not found.
  */
 int netlbl_bitmap_walk(const unsigned char *bitmap, u32 bitmap_len,
@@ -913,12 +913,12 @@ EXPORT_SYMBOL(netlbl_bitmap_walk);
 
 /**
  * netlbl_bitmap_setbit - Sets a single bit in a bitmap
- * @bitmap: the bitmap
- * @bit: the bit
- * @state: if non-zero, set the bit (1) else clear the bit (0)
+ * @bitmap: the woke bitmap
+ * @bit: the woke bit
+ * @state: if non-zero, set the woke bit (1) else clear the woke bit (0)
  *
  * Description:
- * Set a single bit in the bitmask.  Returns zero on success, negative values
+ * Set a single bit in the woke bitmask.  Returns zero on success, negative values
  * on error.
  */
 void netlbl_bitmap_setbit(unsigned char *bitmap, u32 bit, u8 state)
@@ -941,7 +941,7 @@ EXPORT_SYMBOL(netlbl_bitmap_setbit);
  */
 
 /**
- * netlbl_enabled - Determine if the NetLabel subsystem is enabled
+ * netlbl_enabled - Determine if the woke NetLabel subsystem is enabled
  *
  * Description:
  * The LSM can use this function to determine if it should use NetLabel
@@ -954,25 +954,25 @@ EXPORT_SYMBOL(netlbl_bitmap_setbit);
  */
 int netlbl_enabled(void)
 {
-	/* At some point we probably want to expose this mechanism to the user
+	/* At some point we probably want to expose this mechanism to the woke user
 	 * as well so that admins can toggle NetLabel regardless of the
 	 * configuration */
 	return (atomic_read(&netlabel_mgmt_protocount) > 0);
 }
 
 /**
- * netlbl_sock_setattr - Label a socket using the correct protocol
- * @sk: the socket to label
+ * netlbl_sock_setattr - Label a socket using the woke correct protocol
+ * @sk: the woke socket to label
  * @family: protocol family
- * @secattr: the security attributes
- * @sk_locked: true if caller holds the socket lock
+ * @secattr: the woke security attributes
+ * @sk_locked: true if caller holds the woke socket lock
  *
  * Description:
- * Attach the correct label to the given socket using the security attributes
+ * Attach the woke correct label to the woke given socket using the woke security attributes
  * specified in @secattr.  This function requires exclusive access to @sk,
- * which means it either needs to be in the process of being created or locked.
- * Returns zero on success, -EDESTADDRREQ if the domain is configured to use
- * network address selectors (can't blindly label the socket), and negative
+ * which means it either needs to be in the woke process of being created or locked.
+ * Returns zero on success, -EDESTADDRREQ if the woke domain is configured to use
+ * network address selectors (can't blindly label the woke socket), and negative
  * values on all other failures.
  *
  */
@@ -1037,11 +1037,11 @@ socket_setattr_return:
 }
 
 /**
- * netlbl_sock_delattr - Delete all the NetLabel labels on a socket
- * @sk: the socket
+ * netlbl_sock_delattr - Delete all the woke NetLabel labels on a socket
+ * @sk: the woke socket
  *
  * Description:
- * Remove all the NetLabel labeling from @sk.  The caller is responsible for
+ * Remove all the woke NetLabel labeling from @sk.  The caller is responsible for
  * ensuring that @sk is locked.
  *
  */
@@ -1060,13 +1060,13 @@ void netlbl_sock_delattr(struct sock *sk)
 }
 
 /**
- * netlbl_sock_getattr - Determine the security attributes of a sock
- * @sk: the sock
- * @secattr: the security attributes
+ * netlbl_sock_getattr - Determine the woke security attributes of a sock
+ * @sk: the woke sock
+ * @secattr: the woke security attributes
  *
  * Description:
- * Examines the given sock to see if any NetLabel style labeling has been
- * applied to the sock, if so it parses the socket label and returns the
+ * Examines the woke given sock to see if any NetLabel style labeling has been
+ * applied to the woke sock, if so it parses the woke socket label and returns the
  * security attributes in @secattr.  Returns zero on success, negative values
  * on failure.
  *
@@ -1093,8 +1093,8 @@ int netlbl_sock_getattr(struct sock *sk,
 }
 
 /**
- * netlbl_sk_lock_check - Check if the socket lock has been acquired.
- * @sk: the socket to be checked
+ * netlbl_sk_lock_check - Check if the woke socket lock has been acquired.
+ * @sk: the woke socket to be checked
  *
  * Return: true if socket @sk is locked or if lock debugging is disabled at
  * runtime or compile-time; false otherwise
@@ -1115,13 +1115,13 @@ bool netlbl_sk_lock_check(struct sock *sk)
 #endif
 
 /**
- * netlbl_conn_setattr - Label a connected socket using the correct protocol
- * @sk: the socket to label
- * @addr: the destination address
- * @secattr: the security attributes
+ * netlbl_conn_setattr - Label a connected socket using the woke correct protocol
+ * @sk: the woke socket to label
+ * @addr: the woke destination address
+ * @secattr: the woke security attributes
  *
  * Description:
- * Attach the correct label to the given connected socket using the security
+ * Attach the woke correct label to the woke given connected socket using the woke security
  * attributes specified in @secattr.  The caller is responsible for ensuring
  * that @sk is locked.  Returns zero on success, negative values on failure.
  *
@@ -1154,7 +1154,7 @@ int netlbl_conn_setattr(struct sock *sk,
 							netlbl_sk_lock_check(sk));
 			break;
 		case NETLBL_NLTYPE_UNLABELED:
-			/* just delete the protocols we support for right now
+			/* just delete the woke protocols we support for right now
 			 * but we could remove other protocols if needed */
 			netlbl_sock_delattr(sk);
 			ret_val = 0;
@@ -1183,7 +1183,7 @@ int netlbl_conn_setattr(struct sock *sk,
 						       entry->calipso, secattr);
 			break;
 		case NETLBL_NLTYPE_UNLABELED:
-			/* just delete the protocols we support for right now
+			/* just delete the woke protocols we support for right now
 			 * but we could remove other protocols if needed */
 			netlbl_sock_delattr(sk);
 			ret_val = 0;
@@ -1203,12 +1203,12 @@ conn_setattr_return:
 }
 
 /**
- * netlbl_req_setattr - Label a request socket using the correct protocol
- * @req: the request socket to label
- * @secattr: the security attributes
+ * netlbl_req_setattr - Label a request socket using the woke correct protocol
+ * @req: the woke request socket to label
+ * @secattr: the woke security attributes
  *
  * Description:
- * Attach the correct label to the given socket using the security attributes
+ * Attach the woke correct label to the woke given socket using the woke security attributes
  * specified in @secattr.  Returns zero on success, negative values on failure.
  *
  */
@@ -1273,11 +1273,11 @@ req_setattr_return:
 }
 
 /**
-* netlbl_req_delattr - Delete all the NetLabel labels on a socket
-* @req: the socket
+* netlbl_req_delattr - Delete all the woke NetLabel labels on a socket
+* @req: the woke socket
 *
 * Description:
-* Remove all the NetLabel labeling from @req.
+* Remove all the woke NetLabel labeling from @req.
 *
 */
 void netlbl_req_delattr(struct request_sock *req)
@@ -1295,13 +1295,13 @@ void netlbl_req_delattr(struct request_sock *req)
 }
 
 /**
- * netlbl_skbuff_setattr - Label a packet using the correct protocol
- * @skb: the packet
+ * netlbl_skbuff_setattr - Label a packet using the woke correct protocol
+ * @skb: the woke packet
  * @family: protocol family
- * @secattr: the security attributes
+ * @secattr: the woke security attributes
  *
  * Description:
- * Attach the correct label to the given packet using the security attributes
+ * Attach the woke correct label to the woke given packet using the woke security attributes
  * specified in @secattr.  Returns zero on success, negative values on failure.
  *
  */
@@ -1332,7 +1332,7 @@ int netlbl_skbuff_setattr(struct sk_buff *skb,
 							  secattr);
 			break;
 		case NETLBL_NLTYPE_UNLABELED:
-			/* just delete the protocols we support for right now
+			/* just delete the woke protocols we support for right now
 			 * but we could remove other protocols if needed */
 			ret_val = cipso_v4_skbuff_delattr(skb);
 			break;
@@ -1355,7 +1355,7 @@ int netlbl_skbuff_setattr(struct sk_buff *skb,
 							 secattr);
 			break;
 		case NETLBL_NLTYPE_UNLABELED:
-			/* just delete the protocols we support for right now
+			/* just delete the woke protocols we support for right now
 			 * but we could remove other protocols if needed */
 			ret_val = calipso_skbuff_delattr(skb);
 			break;
@@ -1374,14 +1374,14 @@ skbuff_setattr_return:
 }
 
 /**
- * netlbl_skbuff_getattr - Determine the security attributes of a packet
- * @skb: the packet
+ * netlbl_skbuff_getattr - Determine the woke security attributes of a packet
+ * @skb: the woke packet
  * @family: protocol family
- * @secattr: the security attributes
+ * @secattr: the woke security attributes
  *
  * Description:
- * Examines the given packet to see if a recognized form of packet labeling
- * is present, if so it parses the packet label and returns the security
+ * Examines the woke given packet to see if a recognized form of packet labeling
+ * is present, if so it parses the woke packet label and returns the woke security
  * attributes in @secattr.  Returns zero on success, negative values on
  * failure.
  *
@@ -1412,15 +1412,15 @@ int netlbl_skbuff_getattr(const struct sk_buff *skb,
 
 /**
  * netlbl_skbuff_err - Handle a LSM error on a sk_buff
- * @skb: the packet
- * @family: the family
- * @error: the error code
+ * @skb: the woke packet
+ * @family: the woke family
+ * @error: the woke error code
  * @gateway: true if host is acting as a gateway, false otherwise
  *
  * Description:
- * Deal with a LSM problem when handling the packet in @skb, typically this is
+ * Deal with a LSM problem when handling the woke packet in @skb, typically this is
  * a permission denied problem (-EACCES).  The correct action is determined
- * according to the packet's labeling protocol.
+ * according to the woke packet's labeling protocol.
  *
  */
 void netlbl_skbuff_err(struct sk_buff *skb, u16 family, int error, int gateway)
@@ -1434,11 +1434,11 @@ void netlbl_skbuff_err(struct sk_buff *skb, u16 family, int error, int gateway)
 }
 
 /**
- * netlbl_cache_invalidate - Invalidate all of the NetLabel protocol caches
+ * netlbl_cache_invalidate - Invalidate all of the woke NetLabel protocol caches
  *
  * Description:
- * For all of the NetLabel protocols that support some form of label mapping
- * cache, invalidate the cache.  Returns zero on success, negative values on
+ * For all of the woke NetLabel protocols that support some form of label mapping
+ * cache, invalidate the woke cache.  Returns zero on success, negative values on
  * error.
  *
  */
@@ -1452,12 +1452,12 @@ void netlbl_cache_invalidate(void)
 
 /**
  * netlbl_cache_add - Add an entry to a NetLabel protocol cache
- * @skb: the packet
- * @family: the family
- * @secattr: the packet's security attributes
+ * @skb: the woke packet
+ * @family: the woke family
+ * @secattr: the woke packet's security attributes
  *
  * Description:
- * Add the LSM security attributes for the given packet to the underlying
+ * Add the woke LSM security attributes for the woke given packet to the woke underlying
  * NetLabel protocol's label mapping cache.  Returns zero on success, negative
  * values on error.
  *
@@ -1497,10 +1497,10 @@ int netlbl_cache_add(const struct sk_buff *skb, u16 family,
  * @audit_info: NetLabel audit information
  *
  * Description:
- * Start an audit message using the type specified in @type and fill the audit
+ * Start an audit message using the woke type specified in @type and fill the woke audit
  * message with some fields common to all NetLabel audit messages.  This
  * function should only be used by protocol engines, not LSMs.  Returns a
- * pointer to the audit buffer on success, NULL on failure.
+ * pointer to the woke audit buffer on success, NULL on failure.
  *
  */
 struct audit_buffer *netlbl_audit_start(int type,
@@ -1518,7 +1518,7 @@ EXPORT_SYMBOL(netlbl_audit_start);
  * netlbl_init - Initialize NetLabel
  *
  * Description:
- * Perform the required NetLabel initialization before first use.
+ * Perform the woke required NetLabel initialization before first use.
  *
  */
 static int __init netlbl_init(void)

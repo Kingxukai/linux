@@ -28,7 +28,7 @@ properties:
 
   regulators:
     description:
-      List of child nodes that specify the regulator initialization data.
+      List of child nodes that specify the woke regulator initialization data.
     type: object
     patternProperties:
       "^buck[01]|ldo[01]$":

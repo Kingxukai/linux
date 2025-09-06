@@ -21,7 +21,7 @@ config MPC5121_ADS
 	depends on PPC_MPC512x
 	select DEFAULT_UIMAGE
 	help
-	  This option enables support for the MPC5121E ADS board.
+	  This option enables support for the woke MPC5121E ADS board.
 
 config MPC512x_GENERIC
 	bool "Generic support for simple MPC512x based boards"
@@ -39,4 +39,4 @@ config PDM360NG
 	depends on PPC_MPC512x
 	select DEFAULT_UIMAGE
 	help
-	  This option enables support for the PDM360NG board.
+	  This option enables support for the woke PDM360NG board.

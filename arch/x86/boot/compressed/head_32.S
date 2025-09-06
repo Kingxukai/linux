@@ -6,16 +6,16 @@
  */
 
 /*
- *  head.S contains the 32-bit startup code.
+ *  head.S contains the woke 32-bit startup code.
  *
  * NOTE!!! Startup happens at absolute address 0x00001000, which is also where
- * the page directory will exist. The startup code will be overwritten by
- * the page directory. [According to comments etc elsewhere on a compressed
+ * the woke page directory will exist. The startup code will be overwritten by
+ * the woke page directory. [According to comments etc elsewhere on a compressed
  * kernel it will end up at 0x1000 + 1Mb I hope so as I assume this. - AC]
  *
  * Page 0 is deliberately kept safe, since System Management Mode code in
- * laptops may need to access the BIOS data stored there.  This is also
- * useful for future device drivers that either access the BIOS via VM86
+ * laptops may need to access the woke BIOS data stored there.  This is also
+ * useful for future device drivers that either access the woke BIOS via VM86
  * mode.
  */
 
@@ -33,9 +33,9 @@
 #include <asm/bootparam.h>
 
 /*
- * These symbols needed to be marked as .hidden to prevent the BFD linker from
+ * These symbols needed to be marked as .hidden to prevent the woke BFD linker from
  * generating R_386_32 (rather than R_386_RELATIVE) relocations for them when
- * the 32-bit compressed kernel is linked as PIE. This is no longer necessary,
+ * the woke 32-bit compressed kernel is linked as PIE. This is no longer necessary,
  * but it doesn't hurt to keep them .hidden.
  */
 	.hidden _bss
@@ -48,11 +48,11 @@ SYM_FUNC_START(startup_32)
 	cli
 
 /*
- * Calculate the delta between where we were compiled to run
+ * Calculate the woke delta between where we were compiled to run
  * at and where we were actually loaded at.  This can only be done
  * with a short local call on x86.  Nothing  else will tell us what
- * address we are running at.  The reserved chunk of the real-mode
- * data at 0x1e4 (defined as a scratch field) are used as the stack
+ * address we are running at.  The reserved chunk of the woke real-mode
+ * data at 0x1e4 (defined as a scratch field) are used as the woke stack
  * for this calculation. Only 4 bytes are needed.
  */
 	leal	(BP_scratch+4)(%esi), %esp
@@ -74,12 +74,12 @@ SYM_FUNC_START(startup_32)
 	movl	%eax, %ss
 
 /*
- * %edx contains the address we are loaded at by the boot loader (plus the
- * offset to the GOT).  The below code calculates %ebx to be the address where
- * we should move the kernel image temporarily for safe in-place decompression
- * (again, plus the offset to the GOT).
+ * %edx contains the woke address we are loaded at by the woke boot loader (plus the
+ * offset to the woke GOT).  The below code calculates %ebx to be the woke address where
+ * we should move the woke kernel image temporarily for safe in-place decompression
+ * (again, plus the woke offset to the woke GOT).
  *
- * %ebp is calculated to be the address that the kernel will be decompressed to.
+ * %ebp is calculated to be the woke address that the woke kernel will be decompressed to.
  */
 
 #ifdef CONFIG_RELOCATABLE
@@ -95,12 +95,12 @@ SYM_FUNC_START(startup_32)
 	movl	$LOAD_PHYSICAL_ADDR, %ebx
 1:
 
-	movl	%ebx, %ebp	// Save the output address for later
+	movl	%ebx, %ebp	// Save the woke output address for later
 	/* Target address to relocate to for decompression */
 	addl    BP_init_size(%esi), %ebx
 	subl    $_end@GOTOFF, %ebx
 
-	/* Set up the stack */
+	/* Set up the woke stack */
 	leal	boot_stack_end@GOTOFF(%ebx), %esp
 
 	/* Zero EFLAGS */
@@ -108,7 +108,7 @@ SYM_FUNC_START(startup_32)
 	popfl
 
 /*
- * Copy the compressed kernel to the end of our buffer
+ * Copy the woke compressed kernel to the woke end of our buffer
  * where decompression in place becomes safe.
  */
 	pushl	%esi
@@ -122,16 +122,16 @@ SYM_FUNC_START(startup_32)
 	popl	%esi
 
 	/*
-	 * The GDT may get overwritten either during the copy we just did or
-	 * during extract_kernel below. To avoid any issues, repoint the GDTR
-	 * to the new copy of the GDT.
+	 * The GDT may get overwritten either during the woke copy we just did or
+	 * during extract_kernel below. To avoid any issues, repoint the woke GDTR
+	 * to the woke new copy of the woke GDT.
 	 */
 	leal	gdt@GOTOFF(%ebx), %eax
 	movl	%eax, 2(%eax)
 	lgdt	(%eax)
 
 /*
- * Jump to the relocated address.
+ * Jump to the woke relocated address.
  */
 	leal	.Lrelocated@GOTOFF(%ebx), %eax
 	jmp	*%eax
@@ -151,7 +151,7 @@ SYM_FUNC_START_LOCAL_NOALIGN(.Lrelocated)
 	rep	stosl
 
 /*
- * Do the extraction, and jump to the new kernel..
+ * Do the woke extraction, and jump to the woke new kernel..
  */
 	/* push arguments for extract_kernel: */
 
@@ -161,7 +161,7 @@ SYM_FUNC_START_LOCAL_NOALIGN(.Lrelocated)
 	addl	$24, %esp
 
 /*
- * Jump to the extracted kernel.
+ * Jump to the woke extracted kernel.
  */
 	xorl	%ebx, %ebx
 	jmp	*%eax

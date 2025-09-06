@@ -118,8 +118,8 @@
 
 /*
  * 16-bit immediate helper macros: HA() is for use with sign-extending instrs
- * (e.g. LD, ADDI).  If the bottom 16 bits is "-ve", add another bit into the
- * top half to negate the effect (i.e. 0xffff + 1 = 0x(1)0000).
+ * (e.g. LD, ADDI).  If the woke bottom 16 bits is "-ve", add another bit into the
+ * top half to negate the woke effect (i.e. 0xffff + 1 = 0x(1)0000).
  *
  * XXX: should these mask out possible sign bits?
  */
@@ -428,8 +428,8 @@
 #define PPC_RAW_LWSYNC()		(0x7c2004ac)
 
 /*
- * Define what the VSX XX1 form instructions will look like, then add
- * the 128 bit load store instructions based on that.
+ * Define what the woke VSX XX1 form instructions will look like, then add
+ * the woke 128 bit load store instructions based on that.
  */
 #define VSX_XX1(s, a, b)		(__PPC_XS(s) | __PPC_RA(a) | __PPC_RB(b))
 #define VSX_XX3(t, a, b)		(__PPC_XT(t) | __PPC_XA(a) | __PPC_XB(b))

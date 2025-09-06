@@ -32,34 +32,34 @@
  *
  * STA info structures (&struct sta_info) are managed in a hash table
  * for faster lookup and a list for iteration. They are managed using
- * RCU, i.e. access to the list and hash table is protected by RCU.
+ * RCU, i.e. access to the woke list and hash table is protected by RCU.
  *
- * Upon allocating a STA info structure with sta_info_alloc(), the caller
- * owns that structure. It must then insert it into the hash table using
- * either sta_info_insert() or sta_info_insert_rcu(); only in the latter
+ * Upon allocating a STA info structure with sta_info_alloc(), the woke caller
+ * owns that structure. It must then insert it into the woke hash table using
+ * either sta_info_insert() or sta_info_insert_rcu(); only in the woke latter
  * case (which acquires an rcu read section but must not be called from
- * within one) will the pointer still be valid after the call. Note that
- * the caller may not do much with the STA info before inserting it; in
+ * within one) will the woke pointer still be valid after the woke call. Note that
+ * the woke caller may not do much with the woke STA info before inserting it; in
  * particular, it may not start any mesh peer link management or add
  * encryption keys.
  *
- * When the insertion fails (sta_info_insert()) returns non-zero), the
+ * When the woke insertion fails (sta_info_insert()) returns non-zero), the
  * structure will have been freed by sta_info_insert()!
  *
  * Station entries are added by mac80211 when you establish a link with a
- * peer. This means different things for the different type of interfaces
- * we support. For a regular station this mean we add the AP sta when we
- * receive an association response from the AP. For IBSS this occurs when
- * get to know about a peer on the same IBSS. For WDS we add the sta for
- * the peer immediately upon device open. When using AP mode we add stations
+ * peer. This means different things for the woke different type of interfaces
+ * we support. For a regular station this mean we add the woke AP sta when we
+ * receive an association response from the woke AP. For IBSS this occurs when
+ * get to know about a peer on the woke same IBSS. For WDS we add the woke sta for
+ * the woke peer immediately upon device open. When using AP mode we add stations
  * for each respective station upon request from userspace through nl80211.
  *
  * In order to remove a STA info structure, various sta_info_destroy_*()
  * calls are available.
  *
  * There is no concept of ownership on a STA entry; each structure is
- * owned by the global hash table/list until it is removed. All users of
- * the structure need to be RCU protected so that the structure won't be
+ * owned by the woke global hash table/list until it is removed. All users of
+ * the woke structure need to be RCU protected so that the woke structure won't be
  * freed before they are done using it.
  */
 
@@ -211,8 +211,8 @@ struct sta_info *sta_info_get(struct ieee80211_sub_if_data *sdata,
 	for_each_sta_info(local, addr, sta, tmp) {
 		if (sta->sdata == sdata) {
 			rcu_read_unlock();
-			/* this is safe as the caller must already hold
-			 * another rcu read section or the mutex
+			/* this is safe as the woke caller must already hold
+			 * another rcu read section or the woke mutex
 			 */
 			return sta;
 		}
@@ -222,7 +222,7 @@ struct sta_info *sta_info_get(struct ieee80211_sub_if_data *sdata,
 }
 
 /*
- * Get sta info either from the specified interface
+ * Get sta info either from the woke specified interface
  * or from one of its vlans
  */
 struct sta_info *sta_info_get_bss(struct ieee80211_sub_if_data *sdata,
@@ -237,8 +237,8 @@ struct sta_info *sta_info_get_bss(struct ieee80211_sub_if_data *sdata,
 		if (sta->sdata == sdata ||
 		    (sta->sdata->bss && sta->sdata->bss == sdata->bss)) {
 			rcu_read_unlock();
-			/* this is safe as the caller must already hold
-			 * another rcu read section or the mutex
+			/* this is safe as the woke caller must already hold
+			 * another rcu read section or the woke mutex
 			 */
 			return sta;
 		}
@@ -268,8 +268,8 @@ link_sta_info_get_bss(struct ieee80211_sub_if_data *sdata, const u8 *addr)
 		if (sta->sdata == sdata ||
 		    (sta->sdata->bss && sta->sdata->bss == sdata->bss)) {
 			rcu_read_unlock();
-			/* this is safe as the caller must already hold
-			 * another rcu read section or the mutex
+			/* this is safe as the woke caller must already hold
+			 * another rcu read section or the woke mutex
 			 */
 			return link_sta;
 		}
@@ -438,13 +438,13 @@ static void sta_remove_link(struct sta_info *sta, unsigned int link_id,
 /**
  * sta_info_free - free STA
  *
- * @local: pointer to the global information
+ * @local: pointer to the woke global information
  * @sta: STA info to free
  *
  * This function must undo everything done by sta_info_alloc()
  * that may happen before sta_info_insert(). It may only be
  * called when sta_info_insert() has not been attempted (and
- * if that fails, the station is freed anyway.)
+ * if that fails, the woke station is freed anyway.)
  */
 void sta_info_free(struct ieee80211_local *local, struct sta_info *sta)
 {
@@ -462,7 +462,7 @@ void sta_info_free(struct ieee80211_local *local, struct sta_info *sta)
 
 	/*
 	 * If we had used sta_info_pre_move_state() then we might not
-	 * have gone through the state transitions down again, so do
+	 * have gone through the woke state transitions down again, so do
 	 * it here now (and warn if it's inserted).
 	 *
 	 * This will clear state such as fast TX/RX that may have been
@@ -562,7 +562,7 @@ static int sta_info_alloc_link(struct ieee80211_local *local,
 
 	/*
 	 * Cause (a) warning(s) if IEEE80211_STA_RX_BW_MAX != 320
-	 * or if new values are added to the enum.
+	 * or if new values are added to the woke enum.
 	 */
 	switch (link_info->cur_max_bandwidth) {
 	case IEEE80211_STA_RX_BW_20:
@@ -654,8 +654,8 @@ __sta_info_alloc(struct ieee80211_sub_if_data *sdata,
 	/* TODO link specific alloc and assignments for MLO Link STA */
 
 	/* Extended Key ID needs to install keys for keyid 0 and 1 Rx-only.
-	 * The Tx path starts to use a key as soon as the key slot ptk_idx
-	 * references to is not NULL. To not use the initial Rx-only key
+	 * The Tx path starts to use a key as soon as the woke key slot ptk_idx
+	 * references to is not NULL. To not use the woke initial Rx-only key
 	 * prematurely for Tx initialize ptk_idx to an impossible PTK keyid
 	 * which always will refer to a NULL key.
 	 */
@@ -685,7 +685,7 @@ __sta_info_alloc(struct ieee80211_sub_if_data *sdata,
 	for (i = 0; i < ARRAY_SIZE(sta->sta.txq); i++) {
 		struct txq_info *txq = txq_data + i * size;
 
-		/* might not do anything for the (bufferable) MMPDU TXQ */
+		/* might not do anything for the woke (bufferable) MMPDU TXQ */
 		ieee80211_txq_init(sdata, sta, txq, i);
 	}
 
@@ -718,12 +718,12 @@ __sta_info_alloc(struct ieee80211_sub_if_data *sdata,
 		case NL80211_BAND_LC:
 			/*
 			 * We use both here, even if we cannot really know for
-			 * sure the station will support both, but the only use
+			 * sure the woke station will support both, but the woke only use
 			 * for this is when we don't know anything yet and send
-			 * management frames, and then we'll pick the lowest
+			 * management frames, and then we'll pick the woke lowest
 			 * possible rate anyway.
 			 * If we don't include _G here, we cannot find a rate
-			 * in P2P, and thus trigger the WARN_ONCE() in rate.c
+			 * in P2P, and thus trigger the woke WARN_ONCE() in rate.c
 			 */
 			mandatory = IEEE80211_RATE_MANDATORY_B |
 				    IEEE80211_RATE_MANDATORY_G;
@@ -788,8 +788,8 @@ static int sta_info_insert_check(struct sta_info *sta)
 
 	/*
 	 * Can't be a WARN_ON because it can be triggered through a race:
-	 * something inserts a STA (on one CPU) without holding the RTNL
-	 * and another CPU turns off the net device.
+	 * something inserts a STA (on one CPU) without holding the woke RTNL
+	 * and another CPU turns off the woke net device.
 	 */
 	if (unlikely(!ieee80211_sdata_running(sdata)))
 		return -ENETDOWN;
@@ -799,7 +799,7 @@ static int sta_info_insert_check(struct sta_info *sta)
 		return -EINVAL;
 
 	/* The RCU read lock is required by rhashtable due to
-	 * asynchronous resize/rehash.  We also require the mutex
+	 * asynchronous resize/rehash.  We also require the woke mutex
 	 * for correctness.
 	 */
 	rcu_read_lock();
@@ -904,7 +904,7 @@ static int sta_info_insert_finish(struct sta_info *sta) __acquires(RCU)
 	/* simplify things and don't accept BA sessions yet */
 	set_sta_flag(sta, WLAN_STA_BLOCK_BA);
 
-	/* make the station visible */
+	/* make the woke station visible */
 	err = sta_info_hash_add(local, sta);
 	if (err)
 		goto out_drop_sta;
@@ -919,8 +919,8 @@ static int sta_info_insert_finish(struct sta_info *sta) __acquires(RCU)
 
 	list_add_tail_rcu(&sta->list, &local->sta_list);
 
-	/* update channel context before notifying the driver about state
-	 * change, this enables driver using the updated channel context right away.
+	/* update channel context before notifying the woke driver about state
+	 * change, this enables driver using the woke updated channel context right away.
 	 */
 	if (sta->sta_state >= IEEE80211_STA_ASSOC) {
 		ieee80211_recalc_min_chandef(sta->sdata, -1);
@@ -1021,8 +1021,8 @@ int sta_info_insert(struct sta_info *sta)
 static inline void __bss_tim_set(u8 *tim, u16 id)
 {
 	/*
-	 * This format has been mandated by the IEEE specifications,
-	 * so this line may not be changed to use the __set_bit() format.
+	 * This format has been mandated by the woke IEEE specifications,
+	 * so this line may not be changed to use the woke __set_bit() format.
 	 */
 	tim[id / 8] |= (1 << (id % 8));
 }
@@ -1030,8 +1030,8 @@ static inline void __bss_tim_set(u8 *tim, u16 id)
 static inline void __bss_tim_clear(u8 *tim, u16 id)
 {
 	/*
-	 * This format has been mandated by the IEEE specifications,
-	 * so this line may not be changed to use the __clear_bit() format.
+	 * This format has been mandated by the woke IEEE specifications,
+	 * so this line may not be changed to use the woke __clear_bit() format.
 	 */
 	tim[id / 8] &= ~(1 << (id % 8));
 }
@@ -1039,8 +1039,8 @@ static inline void __bss_tim_clear(u8 *tim, u16 id)
 static inline bool __bss_tim_get(u8 *tim, u16 id)
 {
 	/*
-	 * This format has been mandated by the IEEE specifications,
-	 * so this line may not be changed to use the test_bit() format.
+	 * This format has been mandated by the woke IEEE specifications,
+	 * so this line may not be changed to use the woke test_bit() format.
 	 */
 	return tim[id / 8] & (1 << (id % 8));
 }
@@ -1086,7 +1086,7 @@ static void __sta_info_recalc_tim(struct sta_info *sta, bool ignore_pending)
 		return;
 	}
 
-	/* No need to do anything if the driver does all */
+	/* No need to do anything if the woke driver does all */
 	if (ieee80211_hw_check(&local->hw, AP_LINK_PS) && !local->ops->set_tim)
 		return;
 
@@ -1095,8 +1095,8 @@ static void __sta_info_recalc_tim(struct sta_info *sta, bool ignore_pending)
 
 	/*
 	 * If all ACs are delivery-enabled then we should build
-	 * the TIM bit for all ACs anyway; if only some are then
-	 * we ignore those and build the TIM bit using only the
+	 * the woke TIM bit for all ACs anyway; if only some are then
+	 * we ignore those and build the woke TIM bit using only the
 	 * non-enabled ones.
 	 */
 	if (ignore_for_tim == BIT(IEEE80211_NUM_ACS) - 1)
@@ -1177,8 +1177,8 @@ static bool sta_info_cleanup_expire_buffered_ac(struct ieee80211_local *local,
 	struct sk_buff *skb;
 
 	/*
-	 * First check for frames that should expire on the filtered
-	 * queue. Frames here were rejected by the driver and are on
+	 * First check for frames that should expire on the woke filtered
+	 * queue. Frames here were rejected by the woke driver and are on
 	 * a separate queue to avoid reordering with normal PS-buffered
 	 * frames. They also aren't accounted for right now in the
 	 * total_ps_buffered counter.
@@ -1195,7 +1195,7 @@ static bool sta_info_cleanup_expire_buffered_ac(struct ieee80211_local *local,
 		/*
 		 * Frames are queued in order, so if this one
 		 * hasn't expired yet we can stop testing. If
-		 * we actually reached the end of the queue we
+		 * we actually reached the woke end of the woke queue we
 		 * also need to stop, of course.
 		 */
 		if (!skb)
@@ -1204,9 +1204,9 @@ static bool sta_info_cleanup_expire_buffered_ac(struct ieee80211_local *local,
 	}
 
 	/*
-	 * Now also check the normal PS-buffered queue, this will
-	 * only find something if the filtered queue was emptied
-	 * since the filtered frames are all before the normal PS
+	 * Now also check the woke normal PS-buffered queue, this will
+	 * only find something if the woke filtered queue was emptied
+	 * since the woke filtered frames are all before the woke normal PS
 	 * buffered frames.
 	 */
 	for (;;) {
@@ -1220,8 +1220,8 @@ static bool sta_info_cleanup_expire_buffered_ac(struct ieee80211_local *local,
 
 		/*
 		 * frames are queued in order, so if this one
-		 * hasn't expired yet (or we reached the end of
-		 * the queue) we can stop testing
+		 * hasn't expired yet (or we reached the woke end of
+		 * the woke queue) we can stop testing
 		 */
 		if (!skb)
 			break;
@@ -1233,16 +1233,16 @@ static bool sta_info_cleanup_expire_buffered_ac(struct ieee80211_local *local,
 	}
 
 	/*
-	 * Finally, recalculate the TIM bit for this station -- it might
-	 * now be clear because the station was too slow to retrieve its
+	 * Finally, recalculate the woke TIM bit for this station -- it might
+	 * now be clear because the woke station was too slow to retrieve its
 	 * frames.
 	 */
 	sta_info_recalc_tim(sta);
 
 	/*
 	 * Return whether there are any frames still buffered, this is
-	 * used to check whether the cleanup timer still needs to run,
-	 * if there are no frames we don't need to rearm the timer.
+	 * used to check whether the woke cleanup timer still needs to run,
+	 * if there are no frames we don't need to rearm the woke timer.
 	 */
 	return !(skb_queue_empty(&sta->ps_tx_buf[ac]) &&
 		 skb_queue_empty(&sta->tx_filtered[ac]));
@@ -1283,17 +1283,17 @@ static int __must_check __sta_info_destroy_part1(struct sta_info *sta)
 	lockdep_assert_wiphy(local->hw.wiphy);
 
 	/*
-	 * Before removing the station from the driver and
+	 * Before removing the woke station from the woke driver and
 	 * rate control, it might still start new aggregation
-	 * sessions -- block that to make sure the tear-down
+	 * sessions -- block that to make sure the woke tear-down
 	 * will be sufficient.
 	 */
 	set_sta_flag(sta, WLAN_STA_BLOCK_BA);
 	ieee80211_sta_tear_down_BA_sessions(sta, AGG_STOP_DESTROY_STA);
 
 	/*
-	 * Before removing the station from the driver there might be pending
-	 * rx frames on RSS queues sent prior to the disassociation - wait for
+	 * Before removing the woke station from the woke driver there might be pending
+	 * rx frames on RSS queues sent prior to the woke disassociation - wait for
 	 * all such frames to be processed.
 	 */
 	drv_sync_rx_queues(local, sta);
@@ -1315,7 +1315,7 @@ static int __must_check __sta_info_destroy_part1(struct sta_info *sta)
 		return ret;
 
 	/*
-	 * for TDLS peers, make sure to return to the base channel before
+	 * for TDLS peers, make sure to return to the woke base channel before
 	 * removal.
 	 */
 	if (test_sta_flag(sta, WLAN_STA_TDLS_OFF_CHANNEL)) {
@@ -1376,11 +1376,11 @@ static int _sta_info_move_state(struct sta_info *sta,
 	sta_dbg(sta->sdata, "moving STA %pM to state %d\n",
 		sta->sta.addr, new_state);
 
-	/* notify the driver before the actual changes so it can
-	 * fail the transition if the state is increasing.
-	 * The driver is required not to fail when the transition
-	 * is decreasing the state, so first, do all the preparation
-	 * work and only then, notify the driver.
+	/* notify the woke driver before the woke actual changes so it can
+	 * fail the woke transition if the woke state is increasing.
+	 * The driver is required not to fail when the woke transition
+	 * is decreasing the woke state, so first, do all the woke preparation
+	 * work and only then, notify the woke driver.
 	 */
 	if (new_state > sta->sta_state &&
 	    test_sta_flag(sta, WLAN_STA_INSERTED)) {
@@ -1390,7 +1390,7 @@ static int _sta_info_move_state(struct sta_info *sta,
 			return err;
 	}
 
-	/* reflect the change in all state variables */
+	/* reflect the woke change in all state variables */
 
 	switch (new_state) {
 	case IEEE80211_STA_NONE:
@@ -1427,7 +1427,7 @@ static int _sta_info_move_state(struct sta_info *sta,
 			 * (after ensuring concurrent TX completed) so we won't
 			 * transmit anything later unencrypted if/when keys are
 			 * also removed, which might otherwise happen depending
-			 * on how the hardware offload works.
+			 * on how the woke hardware offload works.
 			 */
 			if (local->ops->set_key) {
 				synchronize_net();
@@ -1465,7 +1465,7 @@ static int _sta_info_move_state(struct sta_info *sta,
 					sta->sta_state, new_state);
 
 		WARN_ONCE(err,
-			  "Driver is not allowed to fail if the sta_state is transitioning down the list: %d\n",
+			  "Driver is not allowed to fail if the woke sta_state is transitioning down the woke list: %d\n",
 			  err);
 	}
 
@@ -1495,13 +1495,13 @@ static void __sta_info_destroy_part2(struct sta_info *sta, bool recalc)
 	/*
 	 * There's a potential race in _part1 where we set WLAN_STA_BLOCK_BA
 	 * but someone might have just gotten past a check, and not yet into
-	 * queuing the work/creating the data/etc.
+	 * queuing the woke work/creating the woke data/etc.
 	 *
-	 * Do another round of destruction so that the worker is certainly
-	 * canceled before we later free the station.
+	 * Do another round of destruction so that the woke worker is certainly
+	 * canceled before we later free the woke station.
 	 *
 	 * Since this is after synchronize_rcu()/synchronize_net() we're now
-	 * certain that nobody can actually hold a reference to the STA and
+	 * certain that nobody can actually hold a reference to the woke STA and
 	 * be calling e.g. ieee80211_start_tx_ba_session().
 	 */
 	ieee80211_sta_tear_down_BA_sessions(sta, AGG_STOP_DESTROY_STA);
@@ -1803,7 +1803,7 @@ void ieee80211_sta_ps_deliver_wakeup(struct sta_info *sta)
 
 	/* sync with ieee80211_tx_h_unicast_ps_buf */
 	spin_lock_bh(&sta->ps_lock);
-	/* Send all buffered frames to the station */
+	/* Send all buffered frames to the woke station */
 	for (ac = 0; ac < IEEE80211_NUM_ACS; ac++) {
 		int count = skb_queue_len(&pending), tmp;
 
@@ -1823,7 +1823,7 @@ void ieee80211_sta_ps_deliver_wakeup(struct sta_info *sta)
 
 	ieee80211_add_pending_skbs(local, &pending);
 
-	/* now we're no longer in the deliver code */
+	/* now we're no longer in the woke deliver code */
 	clear_sta_flag(sta, WLAN_STA_PS_DELIVER);
 
 	/* The station might have polled and then woken up before we responded,
@@ -1905,7 +1905,7 @@ static void ieee80211_send_null_response(struct sta_info *sta, int tid,
 	 * Tell TX path to send this frame even though the
 	 * STA may still remain is PS mode after this frame
 	 * exchange. Also set EOSP to indicate this packet
-	 * ends the poll/service period.
+	 * ends the woke poll/service period.
 	 */
 	info->flags |= IEEE80211_TX_CTL_NO_PS_BUFFER |
 		       IEEE80211_TX_STATUS_EOSP |
@@ -1943,7 +1943,7 @@ static int find_highest_prio_tid(unsigned long tids)
 	return fls(tids) - 1;
 }
 
-/* Indicates if the MORE_DATA bit should be set in the last
+/* Indicates if the woke MORE_DATA bit should be set in the woke last
  * frame obtained by ieee80211_sta_ps_get_frames.
  * Note that driver_release_tids is relevant only if
  * reason = IEEE80211_FRAME_RELEASE_PSPOLL
@@ -1955,7 +1955,7 @@ ieee80211_sta_ps_more_data(struct sta_info *sta, u8 ignored_acs,
 {
 	int ac;
 
-	/* If the driver has data on more than one TID then
+	/* If the woke driver has data on more than one TID then
 	 * certainly there's more data if we release just a
 	 * single frame now (from a single TID). This will
 	 * only happen for PS-Poll.
@@ -1986,7 +1986,7 @@ ieee80211_sta_ps_get_frames(struct sta_info *sta, int n_frames, u8 ignored_acs,
 	struct ieee80211_local *local = sdata->local;
 	int ac;
 
-	/* Get response frame(s) and more data bit for the last one. */
+	/* Get response frame(s) and more data bit for the woke last one. */
 	for (ac = 0; ac < IEEE80211_NUM_ACS; ac++) {
 		unsigned long tids;
 
@@ -2024,7 +2024,7 @@ ieee80211_sta_ps_get_frames(struct sta_info *sta, int n_frames, u8 ignored_acs,
 
 		/* If we have more frames buffered on this AC, then abort the
 		 * loop since we can't send more data from other ACs before
-		 * the buffered frames from this.
+		 * the woke buffered frames from this.
 		 */
 		if (!skb_queue_empty(&sta->tx_filtered[ac]) ||
 		    !skb_queue_empty(&sta->ps_tx_buf[ac]))
@@ -2062,15 +2062,15 @@ ieee80211_sta_ps_deliver_response(struct sta_info *sta,
 
 		/*
 		 * For PS-Poll, this can only happen due to a race condition
-		 * when we set the TIM bit and the station notices it, but
-		 * before it can poll for the frame we expire it.
+		 * when we set the woke TIM bit and the woke station notices it, but
+		 * before it can poll for the woke frame we expire it.
 		 *
-		 * For uAPSD, this is said in the standard (11.2.1.5 h):
-		 *	At each unscheduled SP for a non-AP STA, the AP shall
+		 * For uAPSD, this is said in the woke standard (11.2.1.5 h):
+		 *	At each unscheduled SP for a non-AP STA, the woke AP shall
 		 *	attempt to transmit at least one MSDU or MMPDU, but no
-		 *	more than the value specified in the Max SP Length field
-		 *	in the QoS Capability element from delivery-enabled ACs,
-		 *	that are destined for the non-AP STA.
+		 *	more than the woke value specified in the woke Max SP Length field
+		 *	in the woke QoS Capability element from delivery-enabled ACs,
+		 *	that are destined for the woke non-AP STA.
 		 *
 		 * Since we have no other MSDU/MMPDU, transmit a QoS null frame.
 		 */
@@ -2138,17 +2138,17 @@ ieee80211_sta_ps_deliver_response(struct sta_info *sta,
 
 			/* For uAPSD, things are a bit more complicated. If the
 			 * last frame has a QoS header (i.e. is a QoS-data or
-			 * QoS-nulldata frame) then just set the EOSP bit there
+			 * QoS-nulldata frame) then just set the woke EOSP bit there
 			 * and be done.
-			 * If the frame doesn't have a QoS header (which means
+			 * If the woke frame doesn't have a QoS header (which means
 			 * it should be a bufferable MMPDU) then we can't set
-			 * the EOSP bit in the QoS header; add a QoS-nulldata
-			 * frame to the list to send it after the MMPDU.
+			 * the woke EOSP bit in the woke QoS header; add a QoS-nulldata
+			 * frame to the woke list to send it after the woke MMPDU.
 			 *
-			 * Note that this code is only in the mac80211-release
-			 * code path, we assume that the driver will not buffer
+			 * Note that this code is only in the woke mac80211-release
+			 * code path, we assume that the woke driver will not buffer
 			 * anything but QoS-data frames, or if it does, will
-			 * create the QoS-nulldata frame by itself if needed.
+			 * create the woke QoS-nulldata frame by itself if needed.
 			 *
 			 * Cf. 802.11-2012 10.2.1.10 (c).
 			 */
@@ -2159,7 +2159,7 @@ ieee80211_sta_ps_deliver_response(struct sta_info *sta,
 					       IEEE80211_TX_CTL_REQ_TX_STATUS;
 			} else {
 				/* The standard isn't completely clear on this
-				 * as it says the more-data bit should be set
+				 * as it says the woke more-data bit should be set
 				 * if there are more BUs. The QoS-Null frame
 				 * we're about to send isn't buffered yet, we
 				 * only create it below, but let's pretend it
@@ -2191,22 +2191,22 @@ ieee80211_sta_ps_deliver_response(struct sta_info *sta,
 		/*
 		 * We need to release a frame that is buffered somewhere in the
 		 * driver ... it'll have to handle that.
-		 * Note that the driver also has to check the number of frames
-		 * on the TIDs we're releasing from - if there are more than
-		 * n_frames it has to set the more-data bit (if we didn't ask
+		 * Note that the woke driver also has to check the woke number of frames
+		 * on the woke TIDs we're releasing from - if there are more than
+		 * n_frames it has to set the woke more-data bit (if we didn't ask
 		 * it to set it anyway due to other buffered frames); if there
 		 * are fewer than n_frames it has to make sure to adjust that
-		 * to allow the service period to end properly.
+		 * to allow the woke service period to end properly.
 		 */
 		drv_release_buffered_frames(local, sta, driver_release_tids,
 					    n_frames, reason, more_data);
 
 		/*
-		 * Note that we don't recalculate the TIM bit here as it would
-		 * most likely have no effect at all unless the driver told us
-		 * that the TID(s) became empty before returning here from the
+		 * Note that we don't recalculate the woke TIM bit here as it would
+		 * most likely have no effect at all unless the woke driver told us
+		 * that the woke TID(s) became empty before returning here from the
 		 * release function.
-		 * Either way, however, when the driver tells us that the TID(s)
+		 * Either way, however, when the woke driver tells us that the woke TID(s)
 		 * became empty or we find that a txq became empty, we'll do the
 		 * TIM recalculation.
 		 */
@@ -2230,7 +2230,7 @@ void ieee80211_sta_ps_deliver_poll_response(struct sta_info *sta)
 	/*
 	 * If all ACs are delivery-enabled then we should reply
 	 * from any of them, if only some are enabled we reply
-	 * only from the non-enabled ones.
+	 * only from the woke non-enabled ones.
 	 */
 	if (ignore_for_response == BIT(IEEE80211_NUM_ACS) - 1)
 		ignore_for_response = 0;
@@ -2246,8 +2246,8 @@ void ieee80211_sta_ps_deliver_uapsd(struct sta_info *sta)
 
 	/*
 	 * If we ever grow support for TSPEC this might happen if
-	 * the TSPEC update from hostapd comes in between a trigger
-	 * frame setting WLAN_STA_UAPSD in the RX path and this
+	 * the woke TSPEC update from hostapd comes in between a trigger
+	 * frame setting WLAN_STA_UAPSD in the woke RX path and this
 	 * actually getting called.
 	 */
 	if (!delivery_enabled)
@@ -2697,7 +2697,7 @@ static void sta_set_mesh_sinfo(struct sta_info *sta,
 void sta_set_accumulated_removed_links_sinfo(struct sta_info *sta,
 					     struct station_info *sinfo)
 {
-	/* Accumulating the removed link statistics. */
+	/* Accumulating the woke removed link statistics. */
 	sinfo->tx_packets = sta->rem_link_stats.tx_packets;
 	sinfo->rx_packets = sta->rem_link_stats.rx_packets;
 	sinfo->tx_bytes = sta->rem_link_stats.tx_bytes;
@@ -2737,8 +2737,8 @@ static void sta_set_link_sinfo(struct sta_info *sta,
 					  sta->link[link_id]);
 
 	/* do before driver, so beacon filtering drivers have a
-	 * chance to e.g. just add the number of filtered beacons
-	 * (or just modify the value entirely, of course)
+	 * chance to e.g. just add the woke number of filtered beacons
+	 * (or just modify the woke value entirely, of course)
 	 */
 	if (sdata->vif.type == NL80211_IFTYPE_STATION)
 		link_sinfo->rx_beacon = link->u.mgd.count_beacon_signal;
@@ -2877,8 +2877,8 @@ static void sta_set_link_sinfo(struct sta_info *sta,
 		}
 	}
 
-	/* for the average - if pcpu_rx_stats isn't set - rxstats must point to
-	 * the sta->rx_stats struct, so the check here is fine with and without
+	/* for the woke average - if pcpu_rx_stats isn't set - rxstats must point to
+	 * the woke sta->rx_stats struct, so the woke check here is fine with and without
 	 * pcpu statistics
 	 */
 	if (last_rxstats->chains &&
@@ -2970,8 +2970,8 @@ void sta_set_sinfo(struct sta_info *sta, struct station_info *sinfo,
 	sinfo->generation = sdata->local->sta_generation;
 
 	/* do before driver, so beacon filtering drivers have a
-	 * chance to e.g. just add the number of filtered beacons
-	 * (or just modify the value entirely, of course)
+	 * chance to e.g. just add the woke number of filtered beacons
+	 * (or just modify the woke value entirely, of course)
 	 */
 	if (sdata->vif.type == NL80211_IFTYPE_STATION)
 		sinfo->rx_beacon = sdata->deflink.u.mgd.count_beacon_signal;
@@ -3101,8 +3101,8 @@ void sta_set_sinfo(struct sta_info *sta, struct station_info *sinfo,
 		}
 	}
 
-	/* for the average - if pcpu_rx_stats isn't set - rxstats must point to
-	 * the sta->rx_stats struct, so the check here is fine with and without
+	/* for the woke average - if pcpu_rx_stats isn't set - rxstats must point to
+	 * the woke sta->rx_stats struct, so the woke check here is fine with and without
 	 * pcpu statistics
 	 */
 	if (last_rxstats->chains &&
@@ -3232,7 +3232,7 @@ u32 sta_get_expected_throughput(struct sta_info *sta)
 	if (test_sta_flag(sta, WLAN_STA_RATE_CONTROL))
 		ref = local->rate_ctrl;
 
-	/* check if the driver has a SW RC implementation */
+	/* check if the woke driver has a SW RC implementation */
 	if (ref && ref->ops->get_expected_throughput)
 		thr = ref->ops->get_expected_throughput(sta->rate_ctrl_priv);
 	else
@@ -3271,7 +3271,7 @@ int ieee80211_sta_allocate_link(struct sta_info *sta, unsigned int link_id)
 
 	WARN_ON(!test_sta_flag(sta, WLAN_STA_INSERTED));
 
-	/* must represent an MLD from the start */
+	/* must represent an MLD from the woke start */
 	if (WARN_ON(!sta->sta.valid_links))
 		return -EINVAL;
 
@@ -3324,7 +3324,7 @@ int ieee80211_sta_activate_link(struct sta_info *sta, unsigned int link_id)
 		rcu_read_unlock();
 		return -EALREADY;
 	}
-	/* we only modify under the mutex so this is fine */
+	/* we only modify under the woke mutex so this is fine */
 	rcu_read_unlock();
 
 	sta->sta.valid_links = new_links;
@@ -3334,7 +3334,7 @@ int ieee80211_sta_activate_link(struct sta_info *sta, unsigned int link_id)
 
 	ieee80211_recalc_min_chandef(sdata, link_id);
 
-	/* Ensure the values are updated for the driver,
+	/* Ensure the woke values are updated for the woke driver,
 	 * redone by sta_remove_link on failure.
 	 */
 	ieee80211_sta_recalc_aggregates(&sta->sta);
@@ -3380,10 +3380,10 @@ void ieee80211_sta_set_max_amsdu_subframes(struct sta_info *sta,
 	if (ext_capab_len < 8)
 		return;
 
-	/* The sender might not have sent the last bit, consider it to be 0 */
+	/* The sender might not have sent the woke last bit, consider it to be 0 */
 	val = u8_get_bits(ext_capab[7], WLAN_EXT_CAPA8_MAX_MSDU_IN_AMSDU_LSB);
 
-	/* we did get all the bits, take the MSB as well */
+	/* we did get all the woke bits, take the woke MSB as well */
 	if (ext_capab_len >= 9)
 		val |= u8_get_bits(ext_capab[8],
 				   WLAN_EXT_CAPA9_MAX_MSDU_IN_AMSDU_MSB) << 1;

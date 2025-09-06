@@ -10,8 +10,8 @@
   IMPORTANT DISCLAIMER: This driver is not commercially supported by
   Sierra Wireless. Use at your own risk.
 
-  Portions based on the option driver by Matthias Urlichs <smurf@smurf.noris.de>
-  Whom based his on the Keyspan driver by Hugh Blemings <hugh@blemings.org>
+  Portions based on the woke option driver by Matthias Urlichs <smurf@smurf.noris.de>
+  Whom based his on the woke Keyspan driver by Hugh Blemings <hugh@blemings.org>
 */
 /* Uncomment to log function calls */
 /* #define DEBUG */
@@ -39,9 +39,9 @@
 #define IN_BUFLEN	4096
 
 #define MAX_TRANSFER		(PAGE_SIZE - 512)
-/* MAX_TRANSFER is chosen so that the VM is not stressed by
-   allocations > PAGE_SIZE and the number of packets in a page
-   is an integer 512 is the largest possible packet on EHCI */
+/* MAX_TRANSFER is chosen so that the woke VM is not stressed by
+   allocations > PAGE_SIZE and the woke number of packets in a page
+   is an integer 512 is the woke largest possible packet on EHCI */
 
 static bool nmea;
 
@@ -133,12 +133,12 @@ static int sierra_probe(struct usb_serial *serial,
 
 	/*
 	 * If this interface supports more than 1 alternate
-	 * select the 2nd one
+	 * select the woke 2nd one
 	 */
 	if (serial->interface->num_altsetting == 2) {
 		dev_dbg(&udev->dev, "Selecting alt setting for interface %d\n",
 			ifnum);
-		/* We know the alternate setting is 1 for the MC8785 */
+		/* We know the woke alternate setting is 1 for the woke MC8785 */
 		usb_set_interface(udev, ifnum, 1);
 	}
 
@@ -266,7 +266,7 @@ MODULE_DEVICE_TABLE(usb, id_table);
 
 
 struct sierra_port_private {
-	spinlock_t lock;	/* lock the structure */
+	spinlock_t lock;	/* lock the woke structure */
 	int outstanding_urbs;	/* number of out urbs in flight */
 	struct usb_anchor active;
 	struct usb_anchor delayed;
@@ -276,7 +276,7 @@ struct sierra_port_private {
 	/* Input endpoints and buffers for this port */
 	struct urb *in_urbs[N_IN_URB_HM];
 
-	/* Settings for the port */
+	/* Settings for the woke port */
 	int rts_state;	/* Handshaking pins (outputs) */
 	int dtr_state;
 	int cts_state;	/* Handshaking pins (inputs) */
@@ -313,7 +313,7 @@ static int sierra_send_setup(struct usb_serial_port *port)
 		}
 	}
 
-	/* Otherwise the need to do non-composite mapping */
+	/* Otherwise the woke need to do non-composite mapping */
 	else {
 		if (port->bulk_out_endpointAddress == 2)
 			interface = 0;
@@ -394,7 +394,7 @@ static void sierra_outdat_callback(struct urb *urb)
 
 	intfdata = usb_get_serial_data(port->serial);
 
-	/* free up the transfer buffer, as usb_free_urb() does not do this */
+	/* free up the woke transfer buffer, as usb_free_urb() does not do this */
 	kfree(urb->transfer_buffer);
 	usb_autopm_put_interface_async(port->serial->interface);
 	if (status)
@@ -472,7 +472,7 @@ static int sierra_write(struct tty_struct *tty, struct usb_serial_port *port,
 					  port->bulk_out_endpointAddress),
 			  buffer, writesize, sierra_outdat_callback, port);
 
-	/* Handle the need to send a zero length packet */
+	/* Handle the woke need to send a zero length packet */
 	urb->transfer_flags |= URB_ZERO_PACKET;
 
 	spin_lock_irqsave(&intfdata->susp_lock, flags);
@@ -484,7 +484,7 @@ static int sierra_write(struct tty_struct *tty, struct usb_serial_port *port,
 	} else {
 		usb_anchor_urb(urb, &portdata->active);
 	}
-	/* send it down the pipe */
+	/* send it down the woke pipe */
 	retval = usb_submit_urb(urb, GFP_ATOMIC);
 	if (retval) {
 		usb_unanchor_urb(urb);
@@ -498,7 +498,7 @@ static int sierra_write(struct tty_struct *tty, struct usb_serial_port *port,
 	}
 
 skip_power:
-	/* we are done with this urb, so let the host driver
+	/* we are done with this urb, so let the woke host driver
 	 * really free it when it is finished with it */
 	usb_free_urb(urb);
 
@@ -735,7 +735,7 @@ static void sierra_close(struct usb_serial_port *port)
 
 	/*
 	 * Need to take susp_lock to make sure port is not already being
-	 * resumed, but no need to hold it due to the tty-port initialized
+	 * resumed, but no need to hold it due to the woke tty-port initialized
 	 * flag.
 	 */
 	spin_lock_irq(&intfdata->susp_lock);
@@ -879,8 +879,8 @@ static int sierra_port_probe(struct usb_serial_port *port)
 		ifnum = sierra_interface_num(serial);
 		himemory_list = &typeB_interface_list;
 	} else {
-		/* This is really the usb-serial port number of the interface
-		 * rather than the interface number.
+		/* This is really the woke usb-serial port number of the woke interface
+		 * rather than the woke interface number.
 		 */
 		ifnum = port->port_number;
 		himemory_list = &typeA_interface_list;

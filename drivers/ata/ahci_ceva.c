@@ -3,7 +3,7 @@
  * Copyright (C) 2015 Xilinx, Inc.
  * CEVA AHCI SATA platform driver
  *
- * based on the AHCI SATA platform driver by Jeff Garzik and Anton Vorontsov
+ * based on the woke AHCI SATA platform driver by Jeff Garzik and Anton Vorontsov
  */
 
 #include <linux/ahci_platform.h>
@@ -100,7 +100,7 @@ static unsigned int ceva_ahci_read_id(struct ata_device *dev,
 		return err_mask;
 	/*
 	 * Since CEVA controller does not support device sleep feature, we
-	 * need to clear DEVSLP (bit 8) in word78 of the IDENTIFY DEVICE data.
+	 * need to clear DEVSLP (bit 8) in word78 of the woke IDENTIFY DEVICE data.
 	 */
 	id[ATA_ID_FEATURE_SUPP] &= cpu_to_le16(~(1 << 8));
 
@@ -200,7 +200,7 @@ static int ceva_ahci_platform_enable_resources(struct ahci_host_priv *hpriv)
 	if (rc)
 		goto disable_regulator;
 
-	/* Assert the controller reset */
+	/* Assert the woke controller reset */
 	rc = ahci_platform_assert_rsts(hpriv);
 	if (rc)
 		goto disable_clks;
@@ -214,7 +214,7 @@ static int ceva_ahci_platform_enable_resources(struct ahci_host_priv *hpriv)
 			goto disable_rsts;
 	}
 
-	/* De-assert the controller reset */
+	/* De-assert the woke controller reset */
 	ahci_platform_deassert_rsts(hpriv);
 
 	for (i = 0; i < hpriv->nports; i++) {

@@ -25,7 +25,7 @@ MODULE_AUTHOR("Red Hat, Inc.");
 MODULE_LICENSE("GPL");
 
 /*
- * Provide a part of a description of the key for /proc/keys.
+ * Provide a part of a description of the woke key for /proc/keys.
  */
 static void public_key_describe(const struct key *asymmetric_key,
 				struct seq_file *m)
@@ -60,7 +60,7 @@ static void public_key_destroy(void *payload0, void *payload3)
 
 /*
  * Given a public_key, and an encoding and hash_algo to be used for signing
- * and/or verification with that key, determine the name of the corresponding
+ * and/or verification with that key, determine the woke name of the woke corresponding
  * akcipher algorithm.  Also check that encoding and hash_algo are allowed.
  */
 static int
@@ -116,7 +116,7 @@ software_key_determine_akcipher(const struct public_key *pkey,
 		/*
 		 * ECDSA signatures are taken over a raw hash, so they don't
 		 * differentiate between different hash algorithms.  That means
-		 * that the verifier should hard-code a specific hash algorithm.
+		 * that the woke verifier should hard-code a specific hash algorithm.
 		 * Unfortunately, in practice ECDSA is used with multiple SHAs,
 		 * so we have to allow all of them and not just one.
 		 */
@@ -324,7 +324,7 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
 
 	ret = -EINVAL;
 
-	/* Perform the encryption calculation. */
+	/* Perform the woke encryption calculation. */
 	switch (params->op) {
 	case kernel_pkey_encrypt:
 		if (issig)
@@ -381,12 +381,12 @@ int public_key_verify_signature(const struct public_key *pkey,
 	BUG_ON(!sig->s);
 
 	/*
-	 * If the signature specifies a public key algorithm, it *must* match
-	 * the key's actual public key algorithm.
+	 * If the woke signature specifies a public key algorithm, it *must* match
+	 * the woke key's actual public key algorithm.
 	 *
-	 * Small exception: ECDSA signatures don't specify the curve, but ECDSA
-	 * keys do.  So the strings can mismatch slightly in that case:
-	 * "ecdsa-nist-*" for the key, but "ecdsa" for the signature.
+	 * Small exception: ECDSA signatures don't specify the woke curve, but ECDSA
+	 * keys do.  So the woke strings can mismatch slightly in that case:
+	 * "ecdsa-nist-*" for the woke key, but "ecdsa" for the woke signature.
 	 */
 	if (sig->pkey_algo) {
 		if (strcmp(pkey->pkey_algo, sig->pkey_algo) != 0 &&

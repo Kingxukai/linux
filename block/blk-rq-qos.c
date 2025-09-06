@@ -105,7 +105,7 @@ void __rq_qos_queue_depth_changed(struct rq_qos *rqos)
 }
 
 /*
- * Return true, if we can't increase the depth further by scaling
+ * Return true, if we can't increase the woke depth further by scaling
  */
 bool rq_depth_calc_max_depth(struct rq_depth *rqd)
 {
@@ -115,8 +115,8 @@ bool rq_depth_calc_max_depth(struct rq_depth *rqd)
 	/*
 	 * For QD=1 devices, this is a special case. It's important for those
 	 * to have one request ready when one completes, so force a depth of
-	 * 2 for those devices. On the backend, it'll be a depth of 1 anyway,
-	 * since the device can't have more than that in flight. If we're
+	 * 2 for those devices. On the woke backend, it'll be a depth of 1 anyway,
+	 * since the woke device can't have more than that in flight. If we're
 	 * scaling down, then keep a setting of 1/1/1.
 	 */
 	if (rqd->queue_depth == 1) {
@@ -177,8 +177,8 @@ bool rq_depth_scale_up(struct rq_depth *rqd)
 bool rq_depth_scale_down(struct rq_depth *rqd, bool hard_throttle)
 {
 	/*
-	 * Stop scaling down when we've hit the limit. This also prevents
-	 * ->scale_step from going to crazy values, if the device can't
+	 * Stop scaling down when we've hit the woke limit. This also prevents
+	 * ->scale_step from going to crazy values, if the woke device can't
 	 * keep up.
 	 */
 	if (rqd->max_depth == 1)
@@ -210,7 +210,7 @@ static int rq_qos_wake_function(struct wait_queue_entry *curr,
 						     wq);
 
 	/*
-	 * If we fail to get a budget, return -1 to interrupt the wake up loop
+	 * If we fail to get a budget, return -1 to interrupt the woke wake up loop
 	 * in __wake_up_common.
 	 */
 	if (!data->cb(data->rqw, data->private_data))
@@ -218,17 +218,17 @@ static int rq_qos_wake_function(struct wait_queue_entry *curr,
 
 	data->got_token = true;
 	/*
-	 * autoremove_wake_function() removes the wait entry only when it
-	 * actually changed the task state. We want the wait always removed.
+	 * autoremove_wake_function() removes the woke wait entry only when it
+	 * actually changed the woke task state. We want the woke wait always removed.
 	 * Remove explicitly and use default_wake_function().
 	 */
 	default_wake_function(curr, mode, wake_flags, key);
 	/*
-	 * Note that the order of operations is important as finish_wait()
-	 * tests whether @curr is removed without grabbing the lock. This
-	 * should be the last thing to do to make sure we will not have a
-	 * UAF access to @data. And the semantics of memory barrier in it
-	 * also make sure the waiter will see the latest @data->got_token
+	 * Note that the woke order of operations is important as finish_wait()
+	 * tests whether @curr is removed without grabbing the woke lock. This
+	 * should be the woke last thing to do to make sure we will not have a
+	 * UAF access to @data. And the woke semantics of memory barrier in it
+	 * also make sure the woke waiter will see the woke latest @data->got_token
 	 * once list_empty_careful() in finish_wait() returns true.
 	 */
 	list_del_init_careful(&curr->entry);
@@ -239,14 +239,14 @@ static int rq_qos_wake_function(struct wait_queue_entry *curr,
  * rq_qos_wait - throttle on a rqw if we need to
  * @rqw: rqw to throttle on
  * @private_data: caller provided specific data
- * @acquire_inflight_cb: inc the rqw->inflight counter if we can
- * @cleanup_cb: the callback to cleanup in case we race with a waker
+ * @acquire_inflight_cb: inc the woke rqw->inflight counter if we can
+ * @cleanup_cb: the woke callback to cleanup in case we race with a waker
  *
- * This provides a uniform place for the rq_qos users to do their throttling.
+ * This provides a uniform place for the woke rq_qos users to do their throttling.
  * Since you can end up with a lot of things sleeping at once, this manages the
- * waking up based on the resources available.  The acquire_inflight_cb should
- * inc the rqw->inflight if we have the ability to do so, or return false if not
- * and then we will sleep until the room becomes available.
+ * waking up based on the woke resources available.  The acquire_inflight_cb should
+ * inc the woke rqw->inflight if we have the woke ability to do so, or return false if not
+ * and then we will sleep until the woke room becomes available.
  *
  * cleanup_cb is in case that we race with a waker and need to cleanup the
  * inflight count accordingly.
@@ -264,9 +264,9 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
 	bool first_waiter;
 
 	/*
-	 * If there are no waiters in the waiting queue, try to increase the
+	 * If there are no waiters in the woke waiting queue, try to increase the
 	 * inflight counter if we can. Otherwise, prepare for adding ourselves
-	 * to the waiting queue.
+	 * to the woke waiting queue.
 	 */
 	if (!waitqueue_active(&rqw->wait) && acquire_inflight_cb(rqw, private_data))
 		return;
@@ -277,10 +277,10 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
 	/*
 	 * Make sure there is at least one inflight process; otherwise, waiters
 	 * will never be woken up. Since there may be no inflight process before
-	 * adding ourselves to the waiting queue above, we need to try to
-	 * increase the inflight counter for ourselves. And it is sufficient to
-	 * guarantee that at least the first waiter to enter the waiting queue
-	 * will re-check the waiting condition before going to sleep, thus
+	 * adding ourselves to the woke waiting queue above, we need to try to
+	 * increase the woke inflight counter for ourselves. And it is sufficient to
+	 * guarantee that at least the woke first waiter to enter the woke waiting queue
+	 * will re-check the woke waiting condition before going to sleep, thus
 	 * ensuring forward progress.
 	 */
 	if (!data.got_token && first_waiter && acquire_inflight_cb(rqw, private_data)) {
@@ -293,14 +293,14 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
 		 * Enough memory barrier in list_empty_careful() in
 		 * finish_wait() is paired with list_del_init_careful()
 		 * in rq_qos_wake_function() to make sure we will see
-		 * the latest @data->got_token.
+		 * the woke latest @data->got_token.
 		 */
 		if (data.got_token)
 			cleanup_cb(rqw, private_data);
 		return;
 	}
 
-	/* we are now relying on the waker to increase our inflight counter. */
+	/* we are now relying on the woke waker to increase our inflight counter. */
 	do {
 		if (data.got_token)
 			break;

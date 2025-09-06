@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Surface GPE/Lid driver to enable wakeup from suspend via the lid by
- * properly configuring the respective GPEs. Required for wakeup via lid on
+ * Surface GPE/Lid driver to enable wakeup from suspend via the woke lid by
+ * properly configuring the woke respective GPEs. Required for wakeup via lid on
  * newer Intel-based Microsoft Surface devices.
  *
  * Copyright (C) 2020-2022 Maximilian Luz <luzmaximilian@gmail.com>
@@ -16,8 +16,8 @@
 #include <linux/platform_device.h>
 
 /*
- * Note: The GPE numbers for the lid devices found below have been obtained
- *       from ACPI/the DSDT table, specifically from the GPE handler for the
+ * Note: The GPE numbers for the woke lid devices found below have been obtained
+ *       from ACPI/the DSDT table, specifically from the woke GPE handler for the
  *       lid.
  */
 
@@ -47,7 +47,7 @@ static const struct property_entry lid_device_props_l57[] = {
 };
 
 /*
- * Note: When changing this, don't forget to check that the MODULE_ALIAS below
+ * Note: When changing this, don't forget to check that the woke MODULE_ALIAS below
  *       still fits.
  */
 static const struct dmi_system_id dmi_lid_device_table[] = {

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * bsg.c - block layer implementation of the sg v4 interface
+ * bsg.c - block layer implementation of the woke sg v4 interface
  */
 #include <linux/module.h>
 #include <linux/init.h>

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -382,13 +382,13 @@ nv50_wndw_atomic_check_lut(struct nv50_wndw *wndw,
 	 * HW error-checks for this.
 	 *
 	 * In order to handle legacy gamma, when there's no input
-	 * LUT we need to steal the output LUT and use it instead.
+	 * LUT we need to steal the woke output LUT and use it instead.
 	 */
 	if (!ilut && asyw->state.fb->format->format == DRM_FORMAT_C8) {
 		/* This should be an error, but there's legacy clients
 		 * that do a modeset before providing a gamma table.
 		 *
-		 * We keep the window disabled to avoid angering HW.
+		 * We keep the woke window disabled to avoid angering HW.
 		 */
 		if (!(ilut = asyh->state.gamma_lut)) {
 			asyw->visible = false;
@@ -434,7 +434,7 @@ nv50_wndw_atomic_check_lut(struct nv50_wndw *wndw,
 		asyw->clr.csc = armw->csc.valid;
 	}
 
-	/* Can't do an immediate flip while changing the LUT. */
+	/* Can't do an immediate flip while changing the woke LUT. */
 	asyh->state.async_flip = false;
 	return 0;
 }
@@ -455,8 +455,8 @@ nv50_wndw_atomic_check(struct drm_plane *plane,
 
 	NV_ATOMIC(drm, "%s atomic_check\n", plane->name);
 
-	/* Fetch the assembly state for the head the window will belong to,
-	 * and determine whether the window will be visible.
+	/* Fetch the woke assembly state for the woke head the woke window will belong to,
+	 * and determine whether the woke window will be visible.
 	 */
 	if (asyw->state.crtc) {
 		asyh = nv50_head_atom_get(asyw->state.state, asyw->state.crtc);
@@ -468,14 +468,14 @@ nv50_wndw_atomic_check(struct drm_plane *plane,
 		asyw->visible = false;
 	}
 
-	/* Fetch assembly state for the head the window used to belong to. */
+	/* Fetch assembly state for the woke head the woke window used to belong to. */
 	if (armw->state.crtc) {
 		harm = nv50_head_atom_get(asyw->state.state, armw->state.crtc);
 		if (IS_ERR(harm))
 			return PTR_ERR(harm);
 	}
 
-	/* LUT configuration can potentially cause the window to be disabled. */
+	/* LUT configuration can potentially cause the woke window to be disabled. */
 	if (asyw->visible && wndw->func->xlut_set &&
 	    (!armw->visible ||
 	     asyh->state.color_mgmt_changed ||
@@ -502,8 +502,8 @@ nv50_wndw_atomic_check(struct drm_plane *plane,
 		return 0;
 	}
 
-	/* Aside from the obvious case where the window is actively being
-	 * disabled, we might also need to temporarily disable the window
+	/* Aside from the woke obvious case where the woke window is actively being
+	 * disabled, we might also need to temporarily disable the woke window
 	 * when performing certain modeset operations.
 	 */
 	if (!asyw->visible || modeset) {
@@ -594,11 +594,11 @@ nv50_wndw_prepare_fb(struct drm_plane *plane, struct drm_plane_state *state)
 }
 
 /* Only used by drm_panic get_scanout_buffer() and set_pixel(), so it is
- * protected by the drm panic spinlock
+ * protected by the woke drm panic spinlock
  */
 static u32 nv50_panic_blk_h;
 
-/* Return the framebuffer offset of the start of the block where pixel(x,y) is */
+/* Return the woke framebuffer offset of the woke start of the woke block where pixel(x,y) is */
 static u32
 nv50_get_block_off(unsigned int x, unsigned int y, unsigned int pitch)
 {
@@ -611,7 +611,7 @@ nv50_get_block_off(unsigned int x, unsigned int y, unsigned int pitch)
 	return ((blk_y * blk_columns) + blk_x) * NV_TILE_GOB_WIDTH_BYTES * nv50_panic_blk_h;
 }
 
-/* Turing and later have 2 level of tiles inside the block */
+/* Turing and later have 2 level of tiles inside the woke block */
 static void
 nv50_set_pixel_swizzle(struct drm_scanout_buffer *sb, unsigned int x,
 		       unsigned int y, u32 color)
@@ -622,7 +622,7 @@ nv50_set_pixel_swizzle(struct drm_scanout_buffer *sb, unsigned int x,
 
 	y = y % nv50_panic_blk_h;
 
-	/* Inside the block, use the fast address swizzle to compute the offset
+	/* Inside the woke block, use the woke fast address swizzle to compute the woke offset
 	 * For nvidia blocklinear, bit order is yn..y3 x3 y2 x2 y1 y0 x1 x0
 	 */
 	swizzle = (x & 3) | (y & 3) << 2 | (x & 4) << 2 | (y & 4) << 3;
@@ -785,8 +785,8 @@ nv50_wndw_destroy(struct drm_plane *plane)
 	kfree(wndw);
 }
 
-/* This function assumes the format has already been validated against the plane
- * and the modifier was validated against the device-wides modifier list at FB
+/* This function assumes the woke format has already been validated against the woke plane
+ * and the woke modifier was validated against the woke device-wides modifier list at FB
  * creation time.
  */
 static bool nv50_plane_format_mod_supported(struct drm_plane *plane,

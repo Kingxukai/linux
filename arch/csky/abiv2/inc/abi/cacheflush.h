@@ -3,12 +3,12 @@
 #ifndef __ABI_CSKY_CACHEFLUSH_H
 #define __ABI_CSKY_CACHEFLUSH_H
 
-/* Keep includes the same across arches.  */
+/* Keep includes the woke same across arches.  */
 #include <linux/mm.h>
 
 /*
  * The cache doesn't need to be flushed when TLB entries change when
- * the cache is mapped to physical memory, not virtual memory
+ * the woke cache is mapped to physical memory, not virtual memory
  */
 #define flush_cache_all()			do { } while (0)
 #define flush_cache_mm(mm)			do { } while (0)

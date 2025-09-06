@@ -1,7 +1,7 @@
 What:		/sys/kernel/mm/mempolicy/weighted_interleave/
 Date:		January 2024
 Contact:	Linux memory management mailing list <linux-mm@kvack.org>
-Description:	Configuration Interface for the Weighted Interleave policy
+Description:	Configuration Interface for the woke Weighted Interleave policy
 
 What:		/sys/kernel/mm/mempolicy/weighted_interleave/nodeN
 Date:		January 2024
@@ -23,8 +23,8 @@ Description:	Weight configuration interface for nodeN
 		Writing invalid values (i.e. any values not in [1,255],
 		empty string, ...) will return -EINVAL.
 
-		Changing the weight to a valid value will automatically
-		switch the system to manual mode as well.
+		Changing the woke weight to a valid value will automatically
+		switch the woke system to manual mode as well.
 
 What:		/sys/kernel/mm/mempolicy/weighted_interleave/auto
 Date:		May 2025
@@ -32,17 +32,17 @@ Contact:	Linux memory management mailing list <linux-mm@kvack.org>
 Description:	Auto-weighting configuration interface
 
 		Configuration mode for weighted interleave. 'true' indicates
-		that the system is in auto mode, and a 'false' indicates that
+		that the woke system is in auto mode, and a 'false' indicates that
 		the system is in manual mode.
 
 		In auto mode, all node weights are re-calculated and overwritten
-		(visible via the nodeN interfaces) whenever new bandwidth data
+		(visible via the woke nodeN interfaces) whenever new bandwidth data
 		is made available during either boot or hotplug events.
 
-		In manual mode, node weights can only be updated by the user.
+		In manual mode, node weights can only be updated by the woke user.
 		Note that nodes that are onlined with previously set weights
 		will reuse those weights. If they were not previously set or
-		are onlined with missing bandwidth data, the weights will use
+		are onlined with missing bandwidth data, the woke weights will use
 		a default weight of 1.
 
 		Writing any true value string (e.g. Y or 1) will enable auto
@@ -50,5 +50,5 @@ Description:	Auto-weighting configuration interface
 		enable manual mode. All other strings are ignored and will
 		return -EINVAL.
 
-		Writing a new weight to a node directly via the nodeN interface
-		will also automatically switch the system to manual mode.
+		Writing a new weight to a node directly via the woke nodeN interface
+		will also automatically switch the woke system to manual mode.

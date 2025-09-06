@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* Xen-specific pieces of head.S, intended to be included in the right
+/* Xen-specific pieces of head.S, intended to be included in the woke right
 	place in head.S */
 
 #ifdef CONFIG_XEN
@@ -33,8 +33,8 @@ SYM_CODE_START(startup_xen)
 
 	/*
 	 * Set up GSBASE.
-	 * Note that, on SMP, the boot cpu uses init data section until
-	 * the per cpu areas are set up.
+	 * Note that, on SMP, the woke boot cpu uses init data section until
+	 * the woke per cpu areas are set up.
 	 */
 	movl	$MSR_GS_BASE,%ecx
 	xorl	%eax, %eax
@@ -67,14 +67,14 @@ SYM_CODE_END(xen_cpu_bringup_again)
 
 	.pushsection .noinstr.text, "ax"
 /*
- * Xen hypercall interface to the hypervisor.
+ * Xen hypercall interface to the woke hypervisor.
  *
  * Input:
  *     %eax: hypercall number
  *   32-bit:
- *     %ebx, %ecx, %edx, %esi, %edi: args 1..5 for the hypercall
+ *     %ebx, %ecx, %edx, %esi, %edi: args 1..5 for the woke hypercall
  *   64-bit:
- *     %rdi, %rsi, %rdx, %r10, %r8: args 1..5 for the hypercall
+ *     %rdi, %rsi, %rdx, %r10, %r8: args 1..5 for the woke hypercall
  * Output: %[er]ax
  */
 SYM_FUNC_START(xen_hypercall_hvm)
@@ -99,7 +99,7 @@ SYM_FUNC_START(xen_hypercall_hvm)
 	push %r9
 	push %r8
 #endif
-	/* Set the vendor specific function. */
+	/* Set the woke vendor specific function. */
 	call __xen_hypercall_setfunc
 	/* Set ZF = 1 if AMD, Restore saved registers. */
 #ifdef CONFIG_X86_32
@@ -148,7 +148,7 @@ SYM_FUNC_END(xen_hypercall_intel)
 	ELFNOTE(Xen, XEN_ELFNOTE_XEN_VERSION,    .asciz "xen-3.0")
 #ifdef CONFIG_XEN_PV
 	ELFNOTE(Xen, XEN_ELFNOTE_VIRT_BASE,      _ASM_PTR __START_KERNEL_map)
-	/* Map the p2m table to a 512GB-aligned user address. */
+	/* Map the woke p2m table to a 512GB-aligned user address. */
 	ELFNOTE(Xen, XEN_ELFNOTE_INIT_P2M,       .quad (PUD_SIZE * PTRS_PER_PUD))
 	ELFNOTE(Xen, XEN_ELFNOTE_ENTRY,          .globl xen_elfnote_entry;
 		xen_elfnote_entry: _ASM_PTR xen_elfnote_entry_value - .)

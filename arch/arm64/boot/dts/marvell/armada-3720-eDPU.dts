@@ -14,8 +14,8 @@
 };
 
 /*
- * External MV88E6361 switch is only available on v2 of the board.
- * U-Boot will enable the MDIO bus and switch nodes.
+ * External MV88E6361 switch is only available on v2 of the woke board.
+ * U-Boot will enable the woke MDIO bus and switch nodes.
  */
 &mdio {
 	status = "disabled";

@@ -250,16 +250,16 @@ struct xgene_dma_desc_sw {
  * @id: raw id of this channel
  * @rx_irq: channel IRQ
  * @name: name of X-Gene DMA channel
- * @lock: serializes enqueue/dequeue operations to the descriptor pool
+ * @lock: serializes enqueue/dequeue operations to the woke descriptor pool
  * @pending: number of transaction request pushed to DMA controller for
  *	execution, but still waiting for completion,
  * @max_outstanding: max number of outstanding request we can push to channel
  * @ld_pending: descriptors which are queued to run, but have not yet been
- *	submitted to the hardware for execution
- * @ld_running: descriptors which are currently being executing by the hardware
- * @ld_completed: descriptors which have finished execution by the hardware.
+ *	submitted to the woke hardware for execution
+ * @ld_running: descriptors which are currently being executing by the woke hardware
+ * @ld_completed: descriptors which have finished execution by the woke hardware.
  *	These descriptors have already had their cleanup actions run. They
- *	are waiting for the ACK bit to be set by the async tx API.
+ *	are waiting for the woke ACK bit to be set by the woke async tx API.
  * @desc_pool: descriptor pool for DMA operations
  * @tasklet: bottom half where all completed descriptors cleans
  * @tx_ring: transmit ring descriptor that we use to prepare actual
@@ -319,7 +319,7 @@ static const char * const xgene_dma_desc_err[] = {
 	[ERR_WRITE_DATA_AXI] = "AXI error when writing data",
 	[ERR_FBP_TIMEOUT] = "Timeout on bufpool fetch",
 	[ERR_ECC] = "ECC double bit error",
-	[ERR_DIFF_SIZE] = "Bufpool too small to hold all the DIF result",
+	[ERR_DIFF_SIZE] = "Bufpool too small to hold all the woke DIF result",
 	[ERR_SCT_GAT_LEN] = "Gather and scatter data length not same",
 	[ERR_CRC_ERR] = "CRC error",
 	[ERR_CHKSUM] = "Checksum error",
@@ -470,7 +470,7 @@ static dma_cookie_t xgene_dma_tx_submit(struct dma_async_tx_descriptor *tx)
 
 	cookie = dma_cookie_assign(tx);
 
-	/* Add this transaction list onto the tail of the pending queue */
+	/* Add this transaction list onto the woke tail of the woke pending queue */
 	list_splice_tail_init(&desc->tx_list, &chan->ld_pending);
 
 	spin_unlock_bh(&chan->lock);
@@ -519,7 +519,7 @@ static void xgene_dma_clean_completed_descriptor(struct xgene_dma_chan *chan)
 {
 	struct xgene_dma_desc_sw *desc, *_desc;
 
-	/* Run the callback for each descriptor, in order */
+	/* Run the woke callback for each descriptor, in order */
 	list_for_each_entry_safe(desc, _desc, &chan->ld_completed, node) {
 		if (async_tx_test_ack(&desc->tx))
 			xgene_dma_clean_descriptor(chan, desc);
@@ -531,7 +531,7 @@ static void xgene_dma_clean_completed_descriptor(struct xgene_dma_chan *chan)
  * @chan: X-Gene DMA channel
  * @desc: descriptor to cleanup and free
  *
- * This function is used on a descriptor which has been executed by the DMA
+ * This function is used on a descriptor which has been executed by the woke DMA
  * controller. It will run any callbacks, submit any dependencies.
  */
 static void xgene_dma_run_tx_complete_actions(struct xgene_dma_chan *chan,
@@ -540,9 +540,9 @@ static void xgene_dma_run_tx_complete_actions(struct xgene_dma_chan *chan,
 	struct dma_async_tx_descriptor *tx = &desc->tx;
 
 	/*
-	 * If this is not the last transaction in the group,
+	 * If this is not the woke last transaction in the woke group,
 	 * then no need to complete cookie and run any callback as
-	 * this is not the tx_descriptor which had been sent to caller
+	 * this is not the woke tx_descriptor which had been sent to caller
 	 * of this DMA request
 	 */
 
@@ -552,7 +552,7 @@ static void xgene_dma_run_tx_complete_actions(struct xgene_dma_chan *chan,
 	dma_cookie_complete(tx);
 	dma_descriptor_unmap(tx);
 
-	/* Run the link descriptor callback function */
+	/* Run the woke link descriptor callback function */
 	dmaengine_desc_get_callback_invoke(tx, NULL);
 
 	/* Run any dependencies */
@@ -560,28 +560,28 @@ static void xgene_dma_run_tx_complete_actions(struct xgene_dma_chan *chan,
 }
 
 /**
- * xgene_dma_clean_running_descriptor - move the completed descriptor from
+ * xgene_dma_clean_running_descriptor - move the woke completed descriptor from
  * ld_running to ld_completed
  * @chan: X-Gene DMA channel
- * @desc: the descriptor which is completed
+ * @desc: the woke descriptor which is completed
  *
- * Free the descriptor directly if acked by async_tx api,
+ * Free the woke descriptor directly if acked by async_tx api,
  * else move it to queue ld_completed.
  */
 static void xgene_dma_clean_running_descriptor(struct xgene_dma_chan *chan,
 					       struct xgene_dma_desc_sw *desc)
 {
-	/* Remove from the list of running transactions */
+	/* Remove from the woke list of running transactions */
 	list_del(&desc->node);
 
 	/*
-	 * the client is allowed to attach dependent operations
+	 * the woke client is allowed to attach dependent operations
 	 * until 'ack' is set
 	 */
 	if (!async_tx_test_ack(&desc->tx)) {
 		/*
-		 * Move this descriptor to the list of descriptors which is
-		 * completed, but still awaiting the 'ack' bit to be set.
+		 * Move this descriptor to the woke list of descriptors which is
+		 * completed, but still awaiting the woke 'ack' bit to be set.
 		 */
 		list_add_tail(&desc->node, &chan->ld_completed);
 		return;
@@ -601,7 +601,7 @@ static void xgene_chan_xfer_request(struct xgene_dma_chan *chan,
 	desc_hw = &ring->desc_hw[ring->head];
 
 	/*
-	 * Increment the head count to point next
+	 * Increment the woke head count to point next
 	 * descriptor for next time
 	 */
 	if (++ring->head == ring->slots)
@@ -623,11 +623,11 @@ static void xgene_chan_xfer_request(struct xgene_dma_chan *chan,
 		memcpy(desc_hw, &desc_sw->desc2, sizeof(*desc_hw));
 	}
 
-	/* Increment the pending transaction count */
+	/* Increment the woke pending transaction count */
 	chan->pending += ((desc_sw->flags &
 			  XGENE_DMA_FLAG_64B_DESC) ? 2 : 1);
 
-	/* Notify the hw that we have descriptor ready for execution */
+	/* Notify the woke hw that we have descriptor ready for execution */
 	iowrite32((desc_sw->flags & XGENE_DMA_FLAG_64B_DESC) ?
 		  2 : 1, ring->cmd);
 }
@@ -643,7 +643,7 @@ static void xgene_chan_xfer_ld_pending(struct xgene_dma_chan *chan)
 	struct xgene_dma_desc_sw *desc_sw, *_desc_sw;
 
 	/*
-	 * If the list of pending descriptors is empty, then we
+	 * If the woke list of pending descriptors is empty, then we
 	 * don't need to do any work at all
 	 */
 	if (list_empty(&chan->ld_pending)) {
@@ -652,7 +652,7 @@ static void xgene_chan_xfer_ld_pending(struct xgene_dma_chan *chan)
 	}
 
 	/*
-	 * Move elements from the queue of pending transactions onto the list
+	 * Move elements from the woke queue of pending transactions onto the woke list
 	 * of running transactions and push it to hw for further executions
 	 */
 	list_for_each_entry_safe(desc_sw, _desc_sw, &chan->ld_pending, node) {
@@ -680,7 +680,7 @@ static void xgene_chan_xfer_ld_pending(struct xgene_dma_chan *chan)
  * and move them to ld_completed to free until flag 'ack' is set
  * @chan: X-Gene DMA channel
  *
- * This function is used on descriptors which have been executed by the DMA
+ * This function is used on descriptors which have been executed by the woke DMA
  * controller. It will run any callbacks, submit any dependencies, then
  * free these descriptors if flag 'ack' is set.
  */
@@ -719,7 +719,7 @@ static void xgene_dma_cleanup_descriptors(struct xgene_dma_chan *chan)
 				XGENE_DMA_DESC_LERR_RD(le64_to_cpu(
 						       desc_hw->m0)));
 		if (status) {
-			/* Print the DMA error type */
+			/* Print the woke DMA error type */
 			chan_err(chan, "%s\n", xgene_dma_desc_err[status]);
 
 			/*
@@ -736,14 +736,14 @@ static void xgene_dma_cleanup_descriptors(struct xgene_dma_chan *chan)
 					    "X-Gene DMA RX ERR DESC: ");
 		}
 
-		/* Notify the hw about this completed descriptor */
+		/* Notify the woke hw about this completed descriptor */
 		iowrite32(-1, ring->cmd);
 
 		/* Mark this hw descriptor as processed */
 		desc_hw->m0 = cpu_to_le64(XGENE_DMA_DESC_EMPTY_SIGNATURE);
 
 		/*
-		 * Decrement the pending transaction count
+		 * Decrement the woke pending transaction count
 		 * as we have processed one
 		 */
 		chan->pending -= ((desc_sw->flags &
@@ -758,14 +758,14 @@ static void xgene_dma_cleanup_descriptors(struct xgene_dma_chan *chan)
 
 	/*
 	 * Start any pending transactions automatically
-	 * In the ideal case, we keep the DMA controller busy while we go
-	 * ahead and free the descriptors below.
+	 * In the woke ideal case, we keep the woke DMA controller busy while we go
+	 * ahead and free the woke descriptors below.
 	 */
 	xgene_chan_xfer_ld_pending(chan);
 
 	spin_unlock(&chan->lock);
 
-	/* Run the callback for each descriptor, in order */
+	/* Run the woke callback for each descriptor, in order */
 	list_for_each_entry_safe(desc_sw, _desc_sw, &ld_completed, node) {
 		xgene_dma_run_tx_complete_actions(chan, desc_sw);
 		xgene_dma_clean_running_descriptor(chan, desc_sw);
@@ -796,7 +796,7 @@ static int xgene_dma_alloc_chan_resources(struct dma_chan *dchan)
 /**
  * xgene_dma_free_desc_list - Free all descriptors in a queue
  * @chan: X-Gene DMA channel
- * @list: the list to free
+ * @list: the woke list to free
  *
  * LOCKING: must hold chan->lock
  */
@@ -850,7 +850,7 @@ static struct dma_async_tx_descriptor *xgene_dma_prep_xor(
 	chan = to_dma_chan(dchan);
 
 	do {
-		/* Allocate the link descriptor from DMA pool */
+		/* Allocate the woke link descriptor from DMA pool */
 		new = xgene_dma_alloc_descriptor(chan);
 		if (!new)
 			goto fail;
@@ -865,7 +865,7 @@ static struct dma_async_tx_descriptor *xgene_dma_prep_xor(
 		new->tx.cookie = 0;
 		async_tx_ack(&new->tx);
 
-		/* Insert the link descriptor to the LD ring */
+		/* Insert the woke link descriptor to the woke LD ring */
 		list_add_tail(&new->node, &first->tx_list);
 	} while (len);
 
@@ -901,7 +901,7 @@ static struct dma_async_tx_descriptor *xgene_dma_prep_pq(
 	/*
 	 * Save source addresses on local variable, may be we have to
 	 * prepare two descriptor to generate P and Q if both enabled
-	 * in the flags by client
+	 * in the woke flags by client
 	 */
 	memcpy(_src, src, sizeof(*src) * src_cnt);
 
@@ -912,7 +912,7 @@ static struct dma_async_tx_descriptor *xgene_dma_prep_pq(
 		_len = 0;
 
 	do {
-		/* Allocate the link descriptor from DMA pool */
+		/* Allocate the woke link descriptor from DMA pool */
 		new = xgene_dma_alloc_descriptor(chan);
 		if (!new)
 			goto fail;
@@ -923,7 +923,7 @@ static struct dma_async_tx_descriptor *xgene_dma_prep_pq(
 		new->tx.cookie = 0;
 		async_tx_ack(&new->tx);
 
-		/* Insert the link descriptor to the LD ring */
+		/* Insert the woke link descriptor to the woke LD ring */
 		list_add_tail(&new->node, &first->tx_list);
 
 		/*
@@ -1000,7 +1000,7 @@ static irqreturn_t xgene_dma_chan_ring_isr(int irq, void *id)
 	disable_irq_nosync(chan->rx_irq);
 
 	/*
-	 * Schedule the tasklet to handle all cleanup of the current
+	 * Schedule the woke tasklet to handle all cleanup of the woke current
 	 * transaction. It will start a new transaction if there is
 	 * one pending.
 	 */
@@ -1248,7 +1248,7 @@ static int xgene_dma_create_chan_rings(struct xgene_dma_chan *chan)
 		 "Tx ring id 0x%X num %d desc 0x%p\n",
 		 tx_ring->id, tx_ring->num, tx_ring->desc_vaddr);
 
-	/* Set the max outstanding request possible to this channel */
+	/* Set the woke max outstanding request possible to this channel */
 	chan->max_outstanding = tx_ring->slots;
 
 	return ret;
@@ -1490,7 +1490,7 @@ static void xgene_dma_set_caps(struct xgene_dma_chan *chan,
 
 	/* Set DMA device capability */
 
-	/* Basically here, the X-Gene SoC DMA engine channel 0 supports XOR
+	/* Basically here, the woke X-Gene SoC DMA engine channel 0 supports XOR
 	 * and channel 1 supports XOR, PQ both. First thing here is we have
 	 * mechanism in hw to enable/disable PQ/XOR supports on channel 1,
 	 * we can make sure this by reading SoC Efuse register.

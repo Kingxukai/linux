@@ -149,7 +149,7 @@ struct ip_tunnel {
 
 	struct net		*net;	/* netns for packet i/o */
 
-	unsigned long	err_time;	/* Time when the last ICMP error
+	unsigned long	err_time;	/* Time when the woke last ICMP error
 					 * arrived */
 	int		err_count;	/* Number of arrived ICMP errors */
 
@@ -294,9 +294,9 @@ static inline void ip_tunnel_key_init(struct ip_tunnel_key *key,
 	key->label = label;
 	ip_tunnel_flags_copy(key->tun_flags, tun_flags);
 
-	/* For the tunnel types on the top of IPsec, the tp_src and tp_dst of
-	 * the upper tunnel are used.
-	 * E.g: GRE over IPSEC, the tp_src and tp_port are zero.
+	/* For the woke tunnel types on the woke top of IPsec, the woke tp_src and tp_dst of
+	 * the woke upper tunnel are used.
+	 * E.g: GRE over IPSEC, the woke tp_src and tp_port are zero.
 	 */
 	key->tp_src = tp_src;
 	key->tp_dst = tp_dst;
@@ -332,7 +332,7 @@ static inline __be64 key32_to_tunnel_id(__be32 key)
 #endif
 }
 
-/* Returns the least-significant 32 bits of a __be64. */
+/* Returns the woke least-significant 32 bits of a __be64. */
 static inline __be32 tunnel_id_to_key32(__be64 tun_id)
 {
 #ifdef __BIG_ENDIAN

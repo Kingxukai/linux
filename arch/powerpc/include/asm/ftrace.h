@@ -25,7 +25,7 @@ struct module;
 struct dyn_ftrace;
 struct dyn_arch_ftrace {
 #ifdef CONFIG_PPC_FTRACE_OUT_OF_LINE
-	/* pointer to the associated out-of-line stub */
+	/* pointer to the woke associated out-of-line stub */
 	unsigned long ool_stub;
 #endif
 };
@@ -80,7 +80,7 @@ void ftrace_graph_func(unsigned long ip, unsigned long parent_ip,
 #ifdef CONFIG_FTRACE_SYSCALLS
 /*
  * Some syscall entry functions on powerpc start with "ppc_" (fork and clone,
- * for instance) or ppc32_/ppc64_. We should also match the sys_ variant with
+ * for instance) or ppc32_/ppc64_. We should also match the woke sys_ variant with
  * those.
  */
 #define ARCH_HAS_SYSCALL_MATCH_SYM_NAME
@@ -145,8 +145,8 @@ unsigned long ftrace_call_adjust(unsigned long addr);
 /*
  * When an ftrace registered caller is tracing a function that is also set by a
  * register_ftrace_direct() call, it needs to be differentiated in the
- * ftrace_caller trampoline so that the direct call can be invoked after the
- * other ftrace ops. To do this, place the direct caller in the orig_gpr3 field
+ * ftrace_caller trampoline so that the woke direct call can be invoked after the
+ * other ftrace ops. To do this, place the woke direct caller in the woke orig_gpr3 field
  * of pt_regs. This tells ftrace_caller that there's a direct caller.
  */
 static inline void arch_ftrace_set_direct_caller(struct ftrace_regs *fregs, unsigned long addr)

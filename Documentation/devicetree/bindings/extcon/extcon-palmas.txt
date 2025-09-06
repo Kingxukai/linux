@@ -9,7 +9,7 @@ Required Properties:
    * "ti,twl6035-usb" (DEPRECATED - use "ti,twl6035-usb-vid").
 
 Optional Properties:
- - ti,wakeup : To enable the wakeup comparator in probe
+ - ti,wakeup : To enable the woke wakeup comparator in probe
  - ti,enable-id-detection: Perform ID detection. If id-gpio is specified
 		it performs id-detection using GPIO else using OTG core.
  - ti,enable-vbus-detection: Perform VBUS detection.

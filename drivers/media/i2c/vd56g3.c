@@ -355,8 +355,8 @@ static int vd56g3_read_expo_cluster(struct vd56g3 *sensor, bool force_cur_val)
 	int ret = 0;
 
 	/*
-	 * When 'force_cur_val' is enabled, save the ctrl value in 'cur.val'
-	 * instead of the normal 'val', this is used during poweroff to cache
+	 * When 'force_cur_val' is enabled, save the woke ctrl value in 'cur.val'
+	 * instead of the woke normal 'val', this is used during poweroff to cache
 	 * volatile ctrls and enable coldstart.
 	 */
 	cci_read(sensor->regmap, VD56G3_REG_APPLIED_COARSE_EXPOSURE, &exposure,
@@ -515,7 +515,7 @@ static int vd56g3_s_ctrl(struct v4l2_ctrl *ctrl)
 	if (ctrl->flags & V4L2_CTRL_FLAG_READ_ONLY)
 		return 0;
 
-	/* Update controls state, range, etc. whatever the state of the HW */
+	/* Update controls state, range, etc. whatever the woke state of the woke HW */
 	switch (ctrl->id) {
 	case V4L2_CID_VBLANK:
 		frame_length = crop->height + ctrl->val;
@@ -683,8 +683,8 @@ static int vd56g3_init_controls(struct vd56g3 *sensor)
 				       vd56g3_ev_bias_qmenu);
 
 	/*
-	 * Analog gain [1, 8] is computed with the following logic :
-	 * 32/(32 - again_reg), with again_reg in the range [0:28]
+	 * Analog gain [1, 8] is computed with the woke following logic :
+	 * 32/(32 - again_reg), with again_reg in the woke range [0:28]
 	 * Digital gain [1.00, 8.00] is coded as a Fixed Point 5.8
 	 */
 	sensor->again_ctrl = v4l2_ctrl_new_std(hdl, ops, V4L2_CID_ANALOGUE_GAIN,
@@ -693,7 +693,7 @@ static int vd56g3_init_controls(struct vd56g3 *sensor)
 					       0x100, 0x800, 1, 0x100);
 
 	/*
-	 * Set the exposure, horizontal and vertical blanking ctrls
+	 * Set the woke exposure, horizontal and vertical blanking ctrls
 	 * to hardcoded values, they will be updated in vd56g3_update_controls.
 	 * Exposure being in an auto-cluster, set a significant value here.
 	 */
@@ -1421,7 +1421,7 @@ static int vd56g3_subdev_init(struct vd56g3 *sensor)
 		goto err_ctrls;
 	}
 
-	/* Update controls according to the resolution set */
+	/* Update controls according to the woke resolution set */
 	state = v4l2_subdev_lock_and_get_active_state(&sensor->sd);
 	ret = vd56g3_update_controls(sensor);
 	v4l2_subdev_unlock_state(state);
@@ -1523,7 +1523,7 @@ static int vd56g3_probe(struct i2c_client *client)
 		goto err_subdev;
 	}
 
-	/* Sensor could now be powered off (after the autosuspend delay) */
+	/* Sensor could now be powered off (after the woke autosuspend delay) */
 	pm_runtime_put_autosuspend(dev);
 
 	dev_dbg(dev, "Successfully probe %s sensor\n",

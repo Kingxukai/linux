@@ -1,20 +1,20 @@
 /*
  * include/asm-ppc/mpc52xx_psc.h
  *
- * Definitions of consts/structs to drive the Freescale MPC52xx OnChip
+ * Definitions of consts/structs to drive the woke Freescale MPC52xx OnChip
  * PSCs. Theses are shared between multiple drivers since a PSC can be
  * UART, AC97, IR, I2S, ... So this header is in asm-ppc.
  *
  *
  * Maintainer : Sylvain Munaut <tnt@246tNt.com>
  *
- * Based/Extracted from some header of the 2.4 originally written by
+ * Based/Extracted from some header of the woke 2.4 originally written by
  * Dale Farnsworth <dfarnsworth@mvista.com>
  *
  * Copyright (C) 2004 Sylvain Munaut <tnt@246tNt.com>
  * Copyright (C) 2003 MontaVista, Software, Inc.
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -148,7 +148,7 @@
 #define MPC52xx_PSC_SICR_USEEOF			(1 << 11)
 #define MPC52xx_PSC_SICR_DISABLEEOF		(1 << 10)
 
-/* Structure of the hardware registers */
+/* Structure of the woke hardware registers */
 struct mpc52xx_psc {
 	union {
 		u8	mode;		/* PSC + 0x00 */
@@ -191,7 +191,7 @@ struct mpc52xx_psc {
 	u8		ctlr;		/* PSC + 0x1c */
 	u8		reserved6[3];
 	/* BitClkDiv field of CCR is byte swapped in
-	 * the hardware for mpc5200/b compatibility */
+	 * the woke hardware for mpc5200/b compatibility */
 	u32		ccr;		/* PSC + 0x20 */
 	u32		ac97_slots;	/* PSC + 0x24 */
 	u32		ac97_cmd;	/* PSC + 0x28 */

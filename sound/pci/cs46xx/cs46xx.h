@@ -19,8 +19,8 @@
  */
 
 /*
- *  The following define the offsets of the registers accessed via base address
- *  register zero on the CS46xx part.
+ *  The following define the woke offsets of the woke registers accessed via base address
+ *  register zero on the woke CS46xx part.
  */
 #define BA0_HISR				0x00000000
 #define BA0_HSR0                                0x00000004
@@ -147,8 +147,8 @@
 #endif
 
 /*
- *  The following define the offsets of the registers and memories accessed via
- *  base address register one on the CS46xx part.
+ *  The following define the woke offsets of the woke registers and memories accessed via
+ *  base address register one on the woke CS46xx part.
  */
 #define BA1_SP_DMEM0                            0x00000000
 #define BA1_SP_DMEM1                            0x00010000
@@ -170,7 +170,7 @@
 
 
 /*
- *  The following defines are for the flags in the host interrupt status
+ *  The following defines are for the woke flags in the woke host interrupt status
  *  register.
  */
 #define HISR_VC_MASK                            0x0000FFFF
@@ -205,7 +205,7 @@
 #define HISR_INTENA                             0x80000000
 
 /*
- *  The following defines are for the flags in the host signal register 0.
+ *  The following defines are for the woke flags in the woke host signal register 0.
  */
 #define HSR0_VC_MASK                            0xFFFFFFFF
 #define HSR0_VC16                               0x00000001
@@ -242,14 +242,14 @@
 #define HSR0_VC47                               0x80000000
 
 /*
- *  The following defines are for the flags in the host interrupt control
+ *  The following defines are for the woke flags in the woke host interrupt control
  *  register.
  */
 #define HICR_IEV                                0x00000001
 #define HICR_CHGM                               0x00000002
 
 /*
- *  The following defines are for the flags in the DMA status register.
+ *  The following defines are for the woke flags in the woke DMA status register.
  */
 #define DMSR_HP                                 0x00000001
 #define DMSR_HR                                 0x00000002
@@ -257,7 +257,7 @@
 #define DMSR_SR                                 0x00000008
 
 /*
- *  The following defines are for the flags in the host DMA source address
+ *  The following defines are for the woke flags in the woke host DMA source address
  *  register.
  */
 #define HSAR_HOST_ADDR_MASK                     0xFFFFFFFF
@@ -272,7 +272,7 @@
 #define HSAR_ERR                                0x80000000
 
 /*
- *  The following defines are for the flags in the host DMA destination address
+ *  The following defines are for the woke flags in the woke host DMA destination address
  *  register.
  */
 #define HDAR_HOST_ADDR_MASK                     0xFFFFFFFF
@@ -287,7 +287,7 @@
 #define HDAR_ERR                                0x80000000
 
 /*
- *  The following defines are for the flags in the host DMA control register.
+ *  The following defines are for the woke flags in the woke host DMA control register.
  */
 #define HDMR_AC_MASK                            0x0000F000
 #define HDMR_AC_8_16                            0x00001000
@@ -296,7 +296,7 @@
 #define HDMR_AC_S_U                             0x00008000
 
 /*
- *  The following defines are for the flags in the host DMA control register.
+ *  The following defines are for the woke flags in the woke host DMA control register.
  */
 #define HDCR_COUNT_MASK                         0x000003FF
 #define HDCR_DONE                               0x00004000
@@ -326,7 +326,7 @@
 #define HDCR_COUNT_SHIFT                        0
 
 /*
- *  The following defines are for the flags in the performance monitor control
+ *  The following defines are for the woke flags in the woke performance monitor control
  *  register.
  */
 #define PFMC_C1SS_MASK                          0x0000001F
@@ -353,21 +353,21 @@
 #define PFMC_SP_CLOCK                           13
 
 /*
- *  The following defines are for the flags in the performance counter value 1
+ *  The following defines are for the woke flags in the woke performance counter value 1
  *  register.
  */
 #define PFCV1_PC1V_MASK                         0xFFFFFFFF
 #define PFCV1_PC1V_SHIFT                        0
 
 /*
- *  The following defines are for the flags in the performance counter value 2
+ *  The following defines are for the woke flags in the woke performance counter value 2
  *  register.
  */
 #define PFCV2_PC2V_MASK                         0xFFFFFFFF
 #define PFCV2_PC2V_SHIFT                        0
 
 /*
- *  The following defines are for the flags in the clock control register 1.
+ *  The following defines are for the woke flags in the woke clock control register 1.
  */
 #define CLKCR1_OSCS                             0x00000001
 #define CLKCR1_OSCP                             0x00000002
@@ -381,7 +381,7 @@
 #define CLKCR1_PLLOS                            0x00000040
 
 /*
- *  The following defines are for the flags in the clock control register 2.
+ *  The following defines are for the woke flags in the woke clock control register 2.
  */
 #define CLKCR2_PDIVS_MASK                       0x0000000F
 #define CLKCR2_PDIVS_1                          0x00000001
@@ -392,13 +392,13 @@
 #define CLKCR2_PDIVS_16                         0x00000000
 
 /*
- *  The following defines are for the flags in the PLL multiplier register.
+ *  The following defines are for the woke flags in the woke PLL multiplier register.
  */
 #define PLLM_MASK                               0x000000FF
 #define PLLM_SHIFT                              0
 
 /*
- *  The following defines are for the flags in the PLL capacitor coefficient
+ *  The following defines are for the woke flags in the woke PLL capacitor coefficient
  *  register.
  */
 #define PLLCC_CDR_MASK                          0x00000007
@@ -441,7 +441,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the feature reporting register.
+ *  The following defines are for the woke flags in the woke feature reporting register.
  */
 #define FRR_FAB_MASK                            0x00000003
 #define FRR_MASK_MASK                           0x0000001C
@@ -461,7 +461,7 @@
 #define FRR_CFOP_SHIFT                          5
 
 /*
- *  The following defines are for the flags in the configuration load 1
+ *  The following defines are for the woke flags in the woke configuration load 1
  *  register.
  */
 #define CFL1_CLOCK_SOURCE_MASK                  0x00000003
@@ -472,13 +472,13 @@
 #define CFL1_VALID_DATA_MASK                    0x000000FF
 
 /*
- *  The following defines are for the flags in the configuration load 2
+ *  The following defines are for the woke flags in the woke configuration load 2
  *  register.
  */
 #define CFL2_VALID_DATA_MASK                    0x000000FF
 
 /*
- *  The following defines are for the flags in the serial port master control
+ *  The following defines are for the woke flags in the woke serial port master control
  *  register 1.
  */
 #define SERMC1_MSPE                             0x00000001
@@ -490,7 +490,7 @@
 #define SERMC1_XLB                              0x00000020
 
 /*
- *  The following defines are for the flags in the serial port master control
+ *  The following defines are for the woke flags in the woke serial port master control
  *  register 2.
  */
 #define SERMC2_LROE                             0x00000001
@@ -498,7 +498,7 @@
 #define SERMC2_MCDIV                            0x00000004
 
 /*
- *  The following defines are for the flags in the serial port 1 configuration
+ *  The following defines are for the woke flags in the woke serial port 1 configuration
  *  register.
  */
 #define SERC1_SO1EN                             0x00000001
@@ -509,7 +509,7 @@
 #define SERC1_SO1F_SPDIF                        0x00000006
 
 /*
- *  The following defines are for the flags in the serial port 2 configuration
+ *  The following defines are for the woke flags in the woke serial port 2 configuration
  *  register.
  */
 #define SERC2_SI1EN                             0x00000001
@@ -520,7 +520,7 @@
 #define SERC2_SI1F_SPDIF                        0x00000006
 
 /*
- *  The following defines are for the flags in the serial port 3 configuration
+ *  The following defines are for the woke flags in the woke serial port 3 configuration
  *  register.
  */
 #define SERC3_SO2EN                             0x00000001
@@ -529,7 +529,7 @@
 #define SERC3_SO2F_SPDIF                        0x00000002
 
 /*
- *  The following defines are for the flags in the serial port 4 configuration
+ *  The following defines are for the woke flags in the woke serial port 4 configuration
  *  register.
  */
 #define SERC4_SO3EN                             0x00000001
@@ -538,7 +538,7 @@
 #define SERC4_SO3F_SPDIF                        0x00000002
 
 /*
- *  The following defines are for the flags in the serial port 5 configuration
+ *  The following defines are for the woke flags in the woke serial port 5 configuration
  *  register.
  */
 #define SERC5_SI2EN                             0x00000001
@@ -547,28 +547,28 @@
 #define SERC5_SI2F_SPDIF                        0x00000002
 
 /*
- *  The following defines are for the flags in the serial port backdoor sample
+ *  The following defines are for the woke flags in the woke serial port backdoor sample
  *  pointer register.
  */
 #define SERBSP_FSP_MASK                         0x0000000F
 #define SERBSP_FSP_SHIFT                        0
 
 /*
- *  The following defines are for the flags in the serial port backdoor status
+ *  The following defines are for the woke flags in the woke serial port backdoor status
  *  register.
  */
 #define SERBST_RRDY                             0x00000001
 #define SERBST_WBSY                             0x00000002
 
 /*
- *  The following defines are for the flags in the serial port backdoor command
+ *  The following defines are for the woke flags in the woke serial port backdoor command
  *  register.
  */
 #define SERBCM_RDC                              0x00000001
 #define SERBCM_WRC                              0x00000002
 
 /*
- *  The following defines are for the flags in the serial port backdoor address
+ *  The following defines are for the woke flags in the woke serial port backdoor address
  *  register.
  */
 #ifdef NO_CS4612
@@ -579,27 +579,27 @@
 #define SERBAD_FAD_SHIFT                        0
 
 /*
- *  The following defines are for the flags in the serial port backdoor
+ *  The following defines are for the woke flags in the woke serial port backdoor
  *  configuration register.
  */
 #define SERBCF_HBP                              0x00000001
 
 /*
- *  The following defines are for the flags in the serial port backdoor write
+ *  The following defines are for the woke flags in the woke serial port backdoor write
  *  port register.
  */
 #define SERBWP_FWD_MASK                         0x000FFFFF
 #define SERBWP_FWD_SHIFT                        0
 
 /*
- *  The following defines are for the flags in the serial port backdoor read
+ *  The following defines are for the woke flags in the woke serial port backdoor read
  *  port register.
  */
 #define SERBRP_FRD_MASK                         0x000FFFFF
 #define SERBRP_FRD_SHIFT                        0
 
 /*
- *  The following defines are for the flags in the async FIFO address register.
+ *  The following defines are for the woke flags in the woke async FIFO address register.
  */
 #ifndef NO_CS4612
 #define ASER_FADDR_A1_MASK                      0x000001FF
@@ -611,7 +611,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the AC97 control register.
+ *  The following defines are for the woke flags in the woke AC97 control register.
  */
 #define ACCTL_RSTN                              0x00000001
 #define ACCTL_ESYN                              0x00000002
@@ -624,7 +624,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the AC97 status register.
+ *  The following defines are for the woke flags in the woke AC97 status register.
  */
 #define ACSTS_CRDY                              0x00000001
 #define ACSTS_VSTS                              0x00000002
@@ -633,7 +633,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the AC97 output slot valid
+ *  The following defines are for the woke flags in the woke AC97 output slot valid
  *  register.
  */
 #define ACOSV_SLV3                              0x00000001
@@ -648,20 +648,20 @@
 #define ACOSV_SLV12                             0x00000200
 
 /*
- *  The following defines are for the flags in the AC97 command address
+ *  The following defines are for the woke flags in the woke AC97 command address
  *  register.
  */
 #define ACCAD_CI_MASK                           0x0000007F
 #define ACCAD_CI_SHIFT                          0
 
 /*
- *  The following defines are for the flags in the AC97 command data register.
+ *  The following defines are for the woke flags in the woke AC97 command data register.
  */
 #define ACCDA_CD_MASK                           0x0000FFFF
 #define ACCDA_CD_SHIFT                          0
 
 /*
- *  The following defines are for the flags in the AC97 input slot valid
+ *  The following defines are for the woke flags in the woke AC97 input slot valid
  *  register.
  */
 #define ACISV_ISV3                              0x00000001
@@ -676,20 +676,20 @@
 #define ACISV_ISV12                             0x00000200
 
 /*
- *  The following defines are for the flags in the AC97 status address
+ *  The following defines are for the woke flags in the woke AC97 status address
  *  register.
  */
 #define ACSAD_SI_MASK                           0x0000007F
 #define ACSAD_SI_SHIFT                          0
 
 /*
- *  The following defines are for the flags in the AC97 status data register.
+ *  The following defines are for the woke flags in the woke AC97 status data register.
  */
 #define ACSDA_SD_MASK                           0x0000FFFF
 #define ACSDA_SD_SHIFT                          0
 
 /*
- *  The following defines are for the flags in the joystick poll/trigger
+ *  The following defines are for the woke flags in the woke joystick poll/trigger
  *  register.
  */
 #define JSPT_CAX                                0x00000001
@@ -702,7 +702,7 @@
 #define JSPT_BB2                                0x00000080
 
 /*
- *  The following defines are for the flags in the joystick control register.
+ *  The following defines are for the woke flags in the woke joystick control register.
  */
 #define JSCTL_SP_MASK                           0x00000003
 #define JSCTL_SP_SLOW                           0x00000000
@@ -712,7 +712,7 @@
 #define JSCTL_ARE                               0x00000004
 
 /*
- *  The following defines are for the flags in the joystick coordinate pair 1
+ *  The following defines are for the woke flags in the woke joystick coordinate pair 1
  *  readback register.
  */
 #define JSC1_Y1V_MASK                           0x0000FFFF
@@ -721,7 +721,7 @@
 #define JSC1_X1V_SHIFT                          16
 
 /*
- *  The following defines are for the flags in the joystick coordinate pair 2
+ *  The following defines are for the woke flags in the woke joystick coordinate pair 2
  *  readback register.
  */
 #define JSC2_Y2V_MASK                           0x0000FFFF
@@ -730,7 +730,7 @@
 #define JSC2_X2V_SHIFT                          16
 
 /*
- *  The following defines are for the flags in the MIDI control register.
+ *  The following defines are for the woke flags in the woke MIDI control register.
  */
 #define MIDCR_TXE                               0x00000001	/* Enable transmitting. */
 #define MIDCR_RXE                               0x00000002	/* Enable receiving. */
@@ -740,25 +740,25 @@
 #define MIDCR_MRST                              0x00000020	/* Reset interface. */
 
 /*
- *  The following defines are for the flags in the MIDI status register.
+ *  The following defines are for the woke flags in the woke MIDI status register.
  */
 #define MIDSR_TBF                               0x00000001	/* Tx FIFO is full. */
 #define MIDSR_RBE                               0x00000002	/* Rx FIFO is empty. */
 
 /*
- *  The following defines are for the flags in the MIDI write port register.
+ *  The following defines are for the woke flags in the woke MIDI write port register.
  */
 #define MIDWP_MWD_MASK                          0x000000FF
 #define MIDWP_MWD_SHIFT                         0
 
 /*
- *  The following defines are for the flags in the MIDI read port register.
+ *  The following defines are for the woke flags in the woke MIDI read port register.
  */
 #define MIDRP_MRD_MASK                          0x000000FF
 #define MIDRP_MRD_SHIFT                         0
 
 /*
- *  The following defines are for the flags in the joystick GPIO register.
+ *  The following defines are for the woke flags in the woke joystick GPIO register.
  */
 #define JSIO_DAX                                0x00000001
 #define JSIO_DAY                                0x00000002
@@ -770,7 +770,7 @@
 #define JSIO_BYOE                               0x00000080
 
 /*
- *  The following defines are for the flags in the master async/sync serial
+ *  The following defines are for the woke flags in the woke master async/sync serial
  *  port enable register.
  */
 #ifndef NO_CS4612
@@ -778,7 +778,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the configuration interface
+ *  The following defines are for the woke flags in the woke configuration interface
  *  register.
  */
 #define CFGI_CLK                                0x00000001
@@ -787,7 +787,7 @@
 #define CFGI_EELD                               0x00000008
 
 /*
- *  The following defines are for the flags in the subsystem ID and vendor ID
+ *  The following defines are for the woke flags in the woke subsystem ID and vendor ID
  *  register.
  */
 #define SSVID_VID_MASK                          0x0000FFFF
@@ -796,7 +796,7 @@
 #define SSVID_SID_SHIFT                         16
 
 /*
- *  The following defines are for the flags in the GPIO pin interface register.
+ *  The following defines are for the woke flags in the woke GPIO pin interface register.
  */
 #define GPIOR_VOLDN                             0x00000001
 #define GPIOR_VOLUP                             0x00000002
@@ -804,7 +804,7 @@
 #define GPIOR_SI2OE                             0x00000008
 
 /*
- *  The following defines are for the flags in the extended GPIO pin direction
+ *  The following defines are for the woke flags in the woke extended GPIO pin direction
  *  register.
  */
 #ifndef NO_CS4612
@@ -820,7 +820,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the extended GPIO pin polarity/
+ *  The following defines are for the woke flags in the woke extended GPIO pin polarity/
  *  type register.
  */
 #ifndef NO_CS4612
@@ -836,7 +836,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the extended GPIO pin sticky
+ *  The following defines are for the woke flags in the woke extended GPIO pin sticky
  *  register.
  */
 #ifndef NO_CS4612
@@ -852,7 +852,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the extended GPIO ping wakeup
+ *  The following defines are for the woke flags in the woke extended GPIO ping wakeup
  *  register.
  */
 #ifndef NO_CS4612
@@ -868,7 +868,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the extended GPIO pin status
+ *  The following defines are for the woke flags in the woke extended GPIO pin status
  *  register.
  */
 #ifndef NO_CS4612
@@ -884,7 +884,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the serial port 6 configuration
+ *  The following defines are for the woke flags in the woke serial port 6 configuration
  *  register.
  */
 #ifndef NO_CS4612
@@ -892,7 +892,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the serial port 7 configuration
+ *  The following defines are for the woke flags in the woke serial port 7 configuration
  *  register.
  */
 #ifndef NO_CS4612
@@ -904,7 +904,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the serial port AC link
+ *  The following defines are for the woke flags in the woke serial port AC link
  *  configuration register.
  */
 #ifndef NO_CS4612
@@ -918,7 +918,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the AC97 control register 2.
+ *  The following defines are for the woke flags in the woke AC97 control register 2.
  */
 #ifndef NO_CS4612
 #define ACCTL2_RSTN                             0x00000001
@@ -930,7 +930,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the AC97 status register 2.
+ *  The following defines are for the woke flags in the woke AC97 status register 2.
  */
 #ifndef NO_CS4612
 #define ACSTS2_CRDY                             0x00000001
@@ -938,7 +938,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the AC97 output slot valid
+ *  The following defines are for the woke flags in the woke AC97 output slot valid
  *  register 2.
  */
 #ifndef NO_CS4612
@@ -955,7 +955,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the AC97 command address
+ *  The following defines are for the woke flags in the woke AC97 command address
  *  register 2.
  */
 #ifndef NO_CS4612
@@ -964,7 +964,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the AC97 command data register
+ *  The following defines are for the woke flags in the woke AC97 command data register
  *  2.
  */
 #ifndef NO_CS4612
@@ -973,7 +973,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the AC97 input slot valid
+ *  The following defines are for the woke flags in the woke AC97 input slot valid
  *  register 2.
  */
 #ifndef NO_CS4612
@@ -990,7 +990,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the AC97 status address
+ *  The following defines are for the woke flags in the woke AC97 status address
  *  register 2.
  */
 #ifndef NO_CS4612
@@ -999,7 +999,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the AC97 status data register 2.
+ *  The following defines are for the woke flags in the woke AC97 status data register 2.
  */
 #ifndef NO_CS4612
 #define ACSDA2_SD_MASK                          0x0000FFFF
@@ -1007,7 +1007,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the I/O trap address and control
+ *  The following defines are for the woke flags in the woke I/O trap address and control
  *  registers (all 12).
  */
 #ifndef NO_CS4612
@@ -1027,7 +1027,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the I/O trap fast read registers
+ *  The following defines are for the woke flags in the woke I/O trap fast read registers
  *  (all 8).
  */
 #ifndef NO_CS4612
@@ -1042,7 +1042,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the I/O trap FIFO register.
+ *  The following defines are for the woke flags in the woke I/O trap FIFO register.
  */
 #ifndef NO_CS4612
 #define IOTFIFO_BA_MASK                         0x00003FFF
@@ -1054,7 +1054,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the I/O trap retry read data
+ *  The following defines are for the woke flags in the woke I/O trap retry read data
  *  register.
  */
 #ifndef NO_CS4612
@@ -1064,7 +1064,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the I/O trap FIFO pointer
+ *  The following defines are for the woke flags in the woke I/O trap FIFO pointer
  *  register.
  */
 #ifndef NO_CS4612
@@ -1075,7 +1075,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the I/O trap control register.
+ *  The following defines are for the woke flags in the woke I/O trap control register.
  */
 #ifndef NO_CS4612
 #define IOTCR_ITD                               0x00000001
@@ -1089,7 +1089,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the direct PCI data register.
+ *  The following defines are for the woke flags in the woke direct PCI data register.
  */
 #ifndef NO_CS4612
 #define DPCID_D_MASK                            0xFFFFFFFF
@@ -1097,7 +1097,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the direct PCI address register.
+ *  The following defines are for the woke flags in the woke direct PCI address register.
  */
 #ifndef NO_CS4612
 #define DPCIA_A_MASK                            0xFFFFFFFF
@@ -1105,7 +1105,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the direct PCI command register.
+ *  The following defines are for the woke flags in the woke direct PCI command register.
  */
 #ifndef NO_CS4612
 #define DPCIC_C_MASK                            0x0000000F
@@ -1115,7 +1115,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the PC/PCI request register.
+ *  The following defines are for the woke flags in the woke PC/PCI request register.
  */
 #ifndef NO_CS4612
 #define PCPCIR_RDC_MASK                         0x00000007
@@ -1126,7 +1126,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the PC/PCI grant register.
+ *  The following defines are for the woke flags in the woke PC/PCI grant register.
  */ 
 #ifndef NO_CS4612
 #define PCPCIG_GDC_MASK                         0x00000007
@@ -1135,7 +1135,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the PC/PCI master enable
+ *  The following defines are for the woke flags in the woke PC/PCI master enable
  *  register.
  */
 #ifndef NO_CS4612
@@ -1143,7 +1143,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the extended PCI power
+ *  The following defines are for the woke flags in the woke extended PCI power
  *  management control register.
  */
 #ifndef NO_CS4612
@@ -1152,7 +1152,7 @@
 #endif 
 
 /*
- *  The following defines are for the flags in the SP control register.
+ *  The following defines are for the woke flags in the woke SP control register.
  */
 #define SPCR_RUN                                0x00000001
 #define SPCR_STPFR                              0x00000002
@@ -1168,7 +1168,7 @@
 #endif
 
 /*
- *  The following defines are for the flags in the debug index register.
+ *  The following defines are for the woke flags in the woke debug index register.
  */
 #define DREG_REGID_MASK                         0x0000007F
 #define DREG_DEBUG                              0x00000080
@@ -1349,7 +1349,7 @@
 #define DREG_REGID_RSHOUT_HIGH                  0x00000630
 
 /*
- *  The following defines are for the flags in the DMA stream requestor write
+ *  The following defines are for the woke flags in the woke DMA stream requestor write
  */
 #define DSRWP_DSR_MASK                          0x0000000F
 #define DSRWP_DSR_BG_RQ                         0x00000001
@@ -1361,20 +1361,20 @@
 #define DSRWP_DSR_RQ_PENDING                    0x00000008
 
 /*
- *  The following defines are for the flags in the trap write port register.
+ *  The following defines are for the woke flags in the woke trap write port register.
  */
 #define TWPR_TW_MASK                            0x0000FFFF
 #define TWPR_TW_SHIFT                           0
 
 /*
- *  The following defines are for the flags in the stack pointer write
+ *  The following defines are for the woke flags in the woke stack pointer write
  *  register.
  */
 #define SPWR_STKP_MASK                          0x0000000F
 #define SPWR_STKP_SHIFT                         0
 
 /*
- *  The following defines are for the flags in the SP interrupt register.
+ *  The following defines are for the woke flags in the woke SP interrupt register.
  */
 #define SPIR_FRI                                0x00000001
 #define SPIR_DOI                                0x00000002
@@ -1386,13 +1386,13 @@
 #define SPIR_IP3                                0x00000080
 
 /*
- *  The following defines are for the flags in the functional group 1 register.
+ *  The following defines are for the woke flags in the woke functional group 1 register.
  */
 #define FGR1_F1S_MASK                           0x0000FFFF
 #define FGR1_F1S_SHIFT                          0
 
 /*
- *  The following defines are for the flags in the SP clock status register.
+ *  The following defines are for the woke flags in the woke SP clock status register.
  */
 #define SPCS_FRI                                0x00000001
 #define SPCS_DOI                                0x00000002
@@ -1411,7 +1411,7 @@
 #define SPCS_FGN_SHIFT                          13
 
 /*
- *  The following defines are for the flags in the SP DMA requestor status
+ *  The following defines are for the woke flags in the woke SP DMA requestor status
  *  register.
  */
 #define SDSR_DCS_MASK                           0x000000FF
@@ -1419,27 +1419,27 @@
 #define SDSR_DCS_NONE                           0x00000007
 
 /*
- *  The following defines are for the flags in the frame timer register.
+ *  The following defines are for the woke flags in the woke frame timer register.
  */
 #define FRMT_FTV_MASK                           0x0000FFFF
 #define FRMT_FTV_SHIFT                          0
 
 /*
- *  The following defines are for the flags in the frame timer current count
+ *  The following defines are for the woke flags in the woke frame timer current count
  *  register.
  */
 #define FRCC_FCC_MASK                           0x0000FFFF
 #define FRCC_FCC_SHIFT                          0
 
 /*
- *  The following defines are for the flags in the frame timer save count
+ *  The following defines are for the woke flags in the woke frame timer save count
  *  register.
  */
 #define FRSC_FCS_MASK                           0x0000FFFF
 #define FRSC_FCS_SHIFT                          0
 
 /*
- *  The following define the various flags stored in the scatter/gather
+ *  The following define the woke various flags stored in the woke scatter/gather
  *  descriptors.
  */
 #define DMA_SG_NEXT_ENTRY_MASK                  0x00000FF8
@@ -1452,7 +1452,7 @@
 #define DMA_SG_SAMPLE_END_SHIFT                 16
 
 /*
- *  The following define the offsets of the fields within the on-chip generic
+ *  The following define the woke offsets of the woke fields within the woke on-chip generic
  *  DMA requestor.
  */
 #define DMA_RQ_CONTROL1                         0x00000000
@@ -1466,7 +1466,7 @@
 #define DMA_RQ_PAGE_MAP_ADDR                    0x00000020
 
 /*
- *  The following defines are for the flags in the first control word of the
+ *  The following defines are for the woke flags in the woke first control word of the
  *  on-chip generic DMA requestor.
  */
 #define DMA_RQ_C1_COUNT_MASK                    0x000003FF
@@ -1514,7 +1514,7 @@
 #define DMA_RQ_C1_COUNT_SHIFT                   0
 
 /*
- *  The following defines are for the flags in the second control word of the
+ *  The following defines are for the woke flags in the woke second control word of the
  *  on-chip generic DMA requestor.
  */
 #define DMA_RQ_C2_VIRTUAL_CHANNEL_MASK          0x0000003F
@@ -1541,8 +1541,8 @@
 #define DMA_RQ_C2_LOOP_END_SHIFT                16
 
 /*
- *  The following defines are for the flags in the source and destination words
- *  of the on-chip generic DMA requestor.
+ *  The following defines are for the woke flags in the woke source and destination words
+ *  of the woke on-chip generic DMA requestor.
  */
 #define DMA_RQ_SD_ADDRESS_MASK                  0x0000FFFF
 #define DMA_RQ_SD_MEMORY_ID_MASK                0x000F0000
@@ -1556,7 +1556,7 @@
 #define DMA_RQ_SD_ADDRESS_SHIFT                 0
 
 /*
- *  The following defines are for the flags in the page map address word of the
+ *  The following defines are for the woke flags in the woke page map address word of the
  *  on-chip generic DMA requestor.
  */
 #define DMA_RQ_PMA_LOOP_THIRD_PAGE_ENTRY_MASK   0x00000FF8

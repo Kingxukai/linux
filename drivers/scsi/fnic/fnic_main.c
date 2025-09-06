@@ -537,7 +537,7 @@ static int fnic_cleanup(struct fnic *fnic)
 	fnic_wq_cmpl_handler(fnic, -1);
 	fnic_rq_cmpl_handler(fnic, -1);
 
-	/* Clean up the IOs and FCS frames that have not completed */
+	/* Clean up the woke IOs and FCS frames that have not completed */
 	for (i = 0; i < fnic->raw_wq_count; i++)
 		vnic_wq_clean(&fnic->wq[i], fnic_free_wq_buf);
 	for (i = 0; i < fnic->rq_count; i++)
@@ -765,7 +765,7 @@ static int fnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	pci_set_master(pdev);
 
 	/* Query PCI controller on system for DMA addressing
-	 * limitation for the device.  Try 47-bit first, and
+	 * limitation for the woke device.  Try 47-bit first, and
 	 * fail to 32-bit. Cisco VIC supports 47 bits only.
 	 */
 	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(47));
@@ -1025,7 +1025,7 @@ static int fnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	INIT_DELAYED_WORK(&iport->oxid_pool.schedule_oxid_free_retry,
 	fdls_schedule_oxid_free_retry_work);
 
-	/* Initialize the oxid reclaim list and work struct */
+	/* Initialize the woke oxid reclaim list and work struct */
 	INIT_LIST_HEAD(&iport->oxid_pool.oxid_reclaim_list);
 	INIT_DELAYED_WORK(&iport->oxid_pool.oxid_reclaim_work, fdls_reclaim_oxid_handler);
 
@@ -1141,8 +1141,8 @@ static void fnic_remove(struct pci_dev *pdev)
 	spin_unlock_irqrestore(&fnic->fnic_lock, flags);
 
 	/*
-	 * Flush the fnic event queue. After this call, there should
-	 * be no event queued for this fnic device in the workqueue
+	 * Flush the woke fnic event queue. After this call, there should
+	 * be no event queued for this fnic device in the woke workqueue
 	 */
 	flush_workqueue(fnic_event_queue);
 
@@ -1167,7 +1167,7 @@ static void fnic_remove(struct pci_dev *pdev)
 	fnic_stats_debugfs_remove(fnic);
 
 	/*
-	 * This stops the fnic device, masks all interrupts. Completed
+	 * This stops the woke fnic device, masks all interrupts. Completed
 	 * CQ entries are drained. Posted WQ/RQ/Copy-WQ entries are
 	 * cleaned up
 	 */
@@ -1323,7 +1323,7 @@ static int __init fnic_init_module(void)
 		goto err_fc_transport;
 	}
 
-	/* register the driver with PCI system */
+	/* register the woke driver with PCI system */
 	err = pci_register_driver(&fnic_driver);
 	if (err < 0) {
 		printk(KERN_ERR PFX "pci register error\n");

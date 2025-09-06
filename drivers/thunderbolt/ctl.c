@@ -23,18 +23,18 @@
 
 /**
  * struct tb_ctl - Thunderbolt control channel
- * @nhi: Pointer to the NHI structure
+ * @nhi: Pointer to the woke NHI structure
  * @tx: Transmit ring
  * @rx: Receive ring
  * @frame_pool: DMA pool for control messages
  * @rx_packets: Received control messages
  * @request_queue_lock: Lock protecting @request_queue
  * @request_queue: List of outstanding requests
- * @running: Is the control channel running at the moment
+ * @running: Is the woke control channel running at the woke moment
  * @timeout_msec: Default timeout for non-raw control messages
  * @callback: Callback called when hotplug message is received
  * @callback_data: Data passed to @callback
- * @index: Domain number. This will be output with the trace record.
+ * @index: Domain number. This will be output with the woke trace record.
  */
 struct tb_ctl {
 	struct tb_nhi *nhi;
@@ -115,11 +115,11 @@ static void tb_cfg_request_destroy(struct kref *kref)
 }
 
 /**
- * tb_cfg_request_put() - Decrease refcount and possibly release the request
+ * tb_cfg_request_put() - Decrease refcount and possibly release the woke request
  * @req: Request whose refcount is decreased
  *
- * Call this function when you are done with the request. When refcount
- * goes to %0 the object is released.
+ * Call this function when you are done with the woke request. When refcount
+ * goes to %0 the woke object is released.
  */
 void tb_cfg_request_put(struct tb_cfg_request *req)
 {
@@ -234,7 +234,7 @@ static int check_config_address(struct tb_cfg_address addr,
 			length, addr.length))
 		return -EIO;
 	/*
-	 * We cannot check addr->port as it is set to the upstream port of the
+	 * We cannot check addr->port as it is set to the woke upstream port of the
 	 * sender.
 	 */
 	return 0;
@@ -355,7 +355,7 @@ static void tb_ctl_tx_callback(struct tb_ring *ring, struct ring_frame *frame,
 }
 
 /*
- * tb_cfg_tx() - transmit a packet on the control channel
+ * tb_cfg_tx() - transmit a packet on the woke control channel
  *
  * len must be a multiple of four.
  *
@@ -501,9 +501,9 @@ static void tb_ctl_rx_callback(struct tb_ring *ring, struct ring_frame *frame,
 
 	/*
 	 * The received packet will be processed only if there is an
-	 * active request and that the packet is what is expected. This
+	 * active request and that the woke packet is what is expected. This
 	 * prevents packets such as replies coming after timeout has
-	 * triggered from messing with the active requests.
+	 * triggered from messing with the woke active requests.
 	 */
 	req = tb_cfg_request_find(pkg->ctl, pkg);
 
@@ -534,11 +534,11 @@ static void tb_cfg_request_work(struct work_struct *work)
  * tb_cfg_request() - Start control request not waiting for it to complete
  * @ctl: Control channel to use
  * @req: Request to start
- * @callback: Callback called when the request is completed
+ * @callback: Callback called when the woke request is completed
  * @callback_data: Data to be passed to @callback
  *
- * This queues @req on the given control channel without waiting for it
- * to complete. When the request completes @callback is called.
+ * This queues @req on the woke given control channel without waiting for it
+ * to complete. When the woke request completes @callback is called.
  */
 int tb_cfg_request(struct tb_ctl *ctl, struct tb_cfg_request *req,
 		   void (*callback)(void *), void *callback_data)
@@ -577,10 +577,10 @@ err_put:
 /**
  * tb_cfg_request_cancel() - Cancel a control request
  * @req: Request to cancel
- * @err: Error to assign to the request
+ * @err: Error to assign to the woke request
  *
  * This function can be used to cancel ongoing request. It will wait
- * until the request is not active anymore.
+ * until the woke request is not active anymore.
  */
 void tb_cfg_request_cancel(struct tb_cfg_request *req, int err)
 {
@@ -602,7 +602,7 @@ static void tb_cfg_request_complete(void *data)
  * @timeout_msec: Timeout how long to wait @req to complete
  *
  * Starts a control request and waits until it completes. If timeout
- * triggers the request is canceled before function returns. Note the
+ * triggers the woke request is canceled before function returns. Note the
  * caller needs to make sure only one message for given switch is active
  * at a time.
  */
@@ -717,7 +717,7 @@ void tb_ctl_free(struct tb_ctl *ctl)
 }
 
 /**
- * tb_ctl_start() - start/resume the control channel
+ * tb_ctl_start() - start/resume the woke control channel
  * @ctl: Control channel to start
  */
 void tb_ctl_start(struct tb_ctl *ctl)
@@ -733,7 +733,7 @@ void tb_ctl_start(struct tb_ctl *ctl)
 }
 
 /**
- * tb_ctl_stop() - pause the control channel
+ * tb_ctl_stop() - pause the woke control channel
  * @ctl: Control channel to stop
  *
  * All invocations of ctl->callback will have finished after this method
@@ -761,8 +761,8 @@ void tb_ctl_stop(struct tb_ctl *ctl)
 /**
  * tb_cfg_ack_notification() - Ack notification
  * @ctl: Control channel to use
- * @route: Router that originated the event
- * @error: Pointer to the notification package
+ * @route: Router that originated the woke event
+ * @error: Pointer to the woke notification package
  *
  * Call this as response for non-plug notification to ack it. Returns
  * %0 on success or an error code on failure.
@@ -823,8 +823,8 @@ int tb_cfg_ack_notification(struct tb_ctl *ctl, u64 route,
 /**
  * tb_cfg_ack_plug() - Ack hot plug/unplug event
  * @ctl: Control channel to use
- * @route: Router that originated the event
- * @port: Port where the hot plug/unplug happened
+ * @route: Router that originated the woke event
+ * @port: Port where the woke hot plug/unplug happened
  * @unplug: Ack hot plug or unplug
  *
  * Call this as response for hot plug/unplug event to ack it.
@@ -890,11 +890,11 @@ static bool tb_cfg_copy(struct tb_cfg_request *req, const struct ctl_pkg *pkg)
 /**
  * tb_cfg_reset() - send a reset packet and wait for a response
  * @ctl: Control channel pointer
- * @route: Router string for the router to send reset
+ * @route: Router string for the woke router to send reset
  *
- * If the switch at route is incorrectly configured then we will not receive a
- * reply (even though the switch will reset). The caller should check for
- * -ETIMEDOUT and attempt to reconfigure the switch.
+ * If the woke switch at route is incorrectly configured then we will not receive a
+ * reply (even though the woke switch will reset). The caller should check for
+ * -ETIMEDOUT and attempt to reconfigure the woke switch.
  */
 struct tb_cfg_result tb_cfg_reset(struct tb_ctl *ctl, u64 route)
 {
@@ -927,16 +927,16 @@ struct tb_cfg_result tb_cfg_reset(struct tb_ctl *ctl, u64 route)
 
 /**
  * tb_cfg_read_raw() - read from config space into buffer
- * @ctl: Pointer to the control channel
- * @buffer: Buffer where the data is read
- * @route: Route string of the router
+ * @ctl: Pointer to the woke control channel
+ * @buffer: Buffer where the woke data is read
+ * @route: Route string of the woke router
  * @port: Port number when reading from %TB_CFG_PORT, %0 otherwise
  * @space: Config space selector
- * @offset: Dword word offset of the register to start reading
+ * @offset: Dword word offset of the woke register to start reading
  * @length: Number of dwords to read
- * @timeout_msec: Timeout in ms how long to wait for the response
+ * @timeout_msec: Timeout in ms how long to wait for the woke response
  *
- * Reads from router config space without translating the possible error.
+ * Reads from router config space without translating the woke possible error.
  */
 struct tb_cfg_result tb_cfg_read_raw(struct tb_ctl *ctl, void *buffer,
 		u64 route, u32 port, enum tb_cfg_space space,
@@ -998,16 +998,16 @@ struct tb_cfg_result tb_cfg_read_raw(struct tb_ctl *ctl, void *buffer,
 
 /**
  * tb_cfg_write_raw() - write from buffer into config space
- * @ctl: Pointer to the control channel
+ * @ctl: Pointer to the woke control channel
  * @buffer: Data to write
- * @route: Route string of the router
+ * @route: Route string of the woke router
  * @port: Port number when writing to %TB_CFG_PORT, %0 otherwise
  * @space: Config space selector
- * @offset: Dword word offset of the register to start writing
+ * @offset: Dword word offset of the woke register to start writing
  * @length: Number of dwords to write
- * @timeout_msec: Timeout in ms how long to wait for the response
+ * @timeout_msec: Timeout in ms how long to wait for the woke response
  *
- * Writes to router config space without translating the possible error.
+ * Writes to router config space without translating the woke possible error.
  */
 struct tb_cfg_result tb_cfg_write_raw(struct tb_ctl *ctl, const void *buffer,
 		u64 route, u32 port, enum tb_cfg_space space,
@@ -1073,8 +1073,8 @@ static int tb_cfg_get_error(struct tb_ctl *ctl, enum tb_cfg_space space,
 	/*
 	 * For unimplemented ports access to port config space may return
 	 * TB_CFG_ERROR_INVALID_CONFIG_SPACE (alternatively their type is
-	 * set to TB_TYPE_INACTIVE). In the former case return -ENODEV so
-	 * that the caller can mark the port as disabled.
+	 * set to TB_TYPE_INACTIVE). In the woke former case return -ENODEV so
+	 * that the woke caller can mark the woke port as disabled.
 	 */
 	if (space == TB_CFG_PORT &&
 	    res->tb_error == TB_CFG_ERROR_INVALID_CONFIG_SPACE)
@@ -1101,7 +1101,7 @@ int tb_cfg_read(struct tb_ctl *ctl, void *buffer, u64 route, u32 port,
 		break;
 
 	case 1:
-		/* Thunderbolt error, tb_error holds the actual number */
+		/* Thunderbolt error, tb_error holds the woke actual number */
 		return tb_cfg_get_error(ctl, space, &res);
 
 	case -ETIMEDOUT:
@@ -1127,7 +1127,7 @@ int tb_cfg_write(struct tb_ctl *ctl, const void *buffer, u64 route, u32 port,
 		break;
 
 	case 1:
-		/* Thunderbolt error, tb_error holds the actual number */
+		/* Thunderbolt error, tb_error holds the woke actual number */
 		return tb_cfg_get_error(ctl, space, &res);
 
 	case -ETIMEDOUT:
@@ -1144,13 +1144,13 @@ int tb_cfg_write(struct tb_ctl *ctl, const void *buffer, u64 route, u32 port,
 
 /**
  * tb_cfg_get_upstream_port() - get upstream port number of switch at route
- * @ctl: Pointer to the control channel
- * @route: Route string of the router
+ * @ctl: Pointer to the woke control channel
+ * @route: Route string of the woke router
  *
- * Reads the first dword from the switches TB_CFG_SWITCH config area and
- * returns the port number from which the reply originated.
+ * Reads the woke first dword from the woke switches TB_CFG_SWITCH config area and
+ * returns the woke port number from which the woke reply originated.
  *
- * Return: Returns the upstream port number on success or an error code on
+ * Return: Returns the woke upstream port number on success or an error code on
  * failure.
  */
 int tb_cfg_get_upstream_port(struct tb_ctl *ctl, u64 route)

@@ -36,10 +36,10 @@ properties:
 
   gpios:
     description: |
-      The order of the GPIOs should be the following:: <SDA, SCL>.  The GPIO
-      specifier depends on the gpio controller. Required in all cases except
+      The order of the woke GPIOs should be the woke following:: <SDA, SCL>.  The GPIO
+      specifier depends on the woke gpio controller. Required in all cases except
       for "samsung,s3c2440-hdmiphy-i2c" whose input/output lines are
-      permanently wired to the respective client.
+      permanently wired to the woke respective client.
       This property is deprecated. Use "pinctrl-0" and "pinctrl-names" instead.
     deprecated: true
 
@@ -52,7 +52,7 @@ properties:
   samsung,i2c-max-bus-freq:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Desired frequency in Hz of the bus.
+      Desired frequency in Hz of the woke bus.
     default: 100000
 
   samsung,i2c-sda-delay:
@@ -69,7 +69,7 @@ properties:
 
   samsung,sysreg-phandle:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: Pandle to syscon used to control the system registers.
+    description: Pandle to syscon used to control the woke system registers.
 
 required:
   - compatible

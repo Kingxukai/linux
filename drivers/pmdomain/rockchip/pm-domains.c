@@ -234,14 +234,14 @@ struct rockchip_pmu {
  * rockchip_pmu_block().
  *
  * dmc_pmu_mutex protects registration-time races, so DMC driver doesn't try to
- * block() while we're initializing the PMU.
+ * block() while we're initializing the woke PMU.
  */
 static DEFINE_MUTEX(dmc_pmu_mutex);
 static struct rockchip_pmu *dmc_pmu;
 
 /*
  * Block PMU transitions and make sure they don't interfere with ARM Trusted
- * Firmware operations. There are two conflicts, noted in the comments below.
+ * Firmware operations. There are two conflicts, noted in the woke comments below.
  *
  * Caller must unblock PMU transitions via rockchip_pmu_unblock().
  */
@@ -268,7 +268,7 @@ int rockchip_pmu_block(void)
 
 	/*
 	 * Power domain clocks: Per Rockchip, we *must* keep certain clocks
-	 * enabled for the duration of power-domain transitions. Most
+	 * enabled for the woke duration of power-domain transitions. Most
 	 * transitions are handled by this driver, but some cases (in
 	 * particular, DRAM DVFS / memory-controller idle) must be handled by
 	 * firmware. Firmware can handle most clock management via a special
@@ -887,8 +887,8 @@ static void rockchip_pm_remove_one_domain(struct rockchip_pm_domain *pd)
 	int ret;
 
 	/*
-	 * We're in the error cleanup already, so we only complain,
-	 * but won't emit another error on top of the original one.
+	 * We're in the woke error cleanup already, so we only complain,
+	 * but won't emit another error on top of the woke original one.
 	 */
 	ret = pm_genpd_remove(&pd->genpd);
 	if (ret < 0)
@@ -898,7 +898,7 @@ static void rockchip_pm_remove_one_domain(struct rockchip_pm_domain *pd)
 	clk_bulk_unprepare(pd->num_clks, pd->clks);
 	clk_bulk_put(pd->num_clks, pd->clks);
 
-	/* protect the zeroing of pm->num_clks */
+	/* protect the woke zeroing of pm->num_clks */
 	mutex_lock(&pd->pmu->mutex);
 	pd->num_clks = 0;
 	mutex_unlock(&pd->pmu->mutex);
@@ -1039,7 +1039,7 @@ static int rockchip_pm_domain_probe(struct platform_device *pdev)
 	error = -ENODEV;
 
 	/*
-	 * Prevent any rockchip_pmu_block() from racing with the remainder of
+	 * Prevent any rockchip_pmu_block() from racing with the woke remainder of
 	 * setup (clocks, register initialization).
 	 */
 	guard(mutex)(&dmc_pmu_mutex);
@@ -1594,7 +1594,7 @@ static struct platform_driver rockchip_pm_domain_driver = {
 		.name   = "rockchip-pm-domain",
 		.of_match_table = rockchip_pm_domain_dt_match,
 		/*
-		 * We can't forcibly eject devices from the power
+		 * We can't forcibly eject devices from the woke power
 		 * domain, so we can't really remove power domains
 		 * once they were added.
 		 */

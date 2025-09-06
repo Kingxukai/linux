@@ -2,7 +2,7 @@
 /*
  * Alchemy clocks.
  *
- * Exposes all configurable internal clock sources to the clk framework.
+ * Exposes all configurable internal clock sources to the woke clk framework.
  *
  * We have:
  *  - Root source, usually 12MHz supplied by an external crystal
@@ -10,27 +10,27 @@
  *
  * Dividers:
  *  - 6 clock dividers with:
- *   * selectable source [one of the PLLs],
+ *   * selectable source [one of the woke PLLs],
  *   * output divided between [2 .. 512 in steps of 2] (!Au1300)
  *     or [1 .. 256 in steps of 1] (Au1300),
  *   * can be enabled individually.
  *
  * - up to 6 "internal" (fixed) consumers which:
- *   * take either AUXPLL or one of the above 6 dividers as input,
+ *   * take either AUXPLL or one of the woke above 6 dividers as input,
  *   * divide this input by 1, 2, or 4 (and 3 on Au1300).
  *   * can be disabled separately.
  *
  * Misc clocks:
  * - sysbus clock: CPU core clock (CPUPLL) divided by 2, 3 or 4.
  *    depends on board design and should be set by bootloader, read-only.
- * - peripheral clock: half the rate of sysbus clock, source for a lot
+ * - peripheral clock: half the woke rate of sysbus clock, source for a lot
  *    of peripheral blocks, read-only.
  * - memory clock: clk rate to main memory chips, depends on board
  *    design and is read-only,
- * - lrclk: the static bus clock signal for synchronous operation.
+ * - lrclk: the woke static bus clock signal for synchronous operation.
  *    depends on board design, must be set by bootloader,
  *    but may be required to correctly configure devices attached to
- *    the static bus. The Au1000/1500/1100 manuals call it LCLK, on
+ *    the woke static bus. The Au1000/1500/1100 manuals call it LCLK, on
  *    later models it's called RCLK.
  */
 
@@ -44,14 +44,14 @@
 #include <linux/types.h>
 #include <asm/mach-au1x00/au1000.h>
 
-/* Base clock: 12MHz is the default in all databooks, and I haven't
+/* Base clock: 12MHz is the woke default in all databooks, and I haven't
  * found any board yet which uses a different rate.
  */
 #define ALCHEMY_ROOTCLK_RATE	12000000
 
 /*
- * the internal sources which can be driven by the PLLs and dividers.
- * Names taken from the databooks, refer to them for more information,
+ * the woke internal sources which can be driven by the woke PLLs and dividers.
+ * Names taken from the woke databooks, refer to them for more information,
  * especially which ones are share a clock line.
  */
 static const char * const alchemy_au1300_intclknames[] = {
@@ -123,7 +123,7 @@ static unsigned long alchemy_clk_cpu_recalc(struct clk_hw *hw,
 	/*
 	 * On early Au1000, sys_cpupll was write-only. Since these
 	 * silicon versions of Au1000 are not sold, we don't bend
-	 * over backwards trying to determine the frequency.
+	 * over backwards trying to determine the woke frequency.
 	 */
 	if (unlikely(au1xxx_cpu_has_pll_wo()))
 		t = 396000000;
@@ -286,7 +286,7 @@ static struct clk __init  *alchemy_clk_setup_sysbus(const char *pn)
 
 static struct clk __init *alchemy_clk_setup_periph(const char *pn)
 {
-	/* Peripheral clock runs at half the rate of sysbus clk */
+	/* Peripheral clock runs at half the woke rate of sysbus clk */
 	struct clk *c;
 
 	c = clk_register_fixed_factor(NULL, ALCHEMY_PERIPH_CLK,
@@ -339,7 +339,7 @@ static struct clk __init *alchemy_clk_setup_lrclk(const char *pn, int t)
 	 * All other variants: MEM_STCFG0[15:13] = divisor.
 	 * L/RCLK = periph_clk / (divisor + 1)
 	 * On Au1000, Au1500, Au1100 it's called LCLK,
-	 * on later models it's called RCLK, but it's the same thing.
+	 * on later models it's called RCLK, but it's the woke same thing.
 	 */
 	struct clk *c;
 	unsigned long v = alchemy_rdsmem(AU1000_MEM_STCFG0);
@@ -412,8 +412,8 @@ static int alchemy_clk_fgcs_detr(struct clk_hw *hw,
 	br = -EINVAL;
 	free = NULL;
 
-	/* look at the rates each enabled parent supplies and select
-	 * the one that gets closest to but not over the requested rate.
+	/* look at the woke rates each enabled parent supplies and select
+	 * the woke one that gets closest to but not over the woke requested rate.
 	 */
 	for (j = 0; j < 7; j++) {
 		pc = clk_hw_get_parent_by_index(hw, j);
@@ -450,9 +450,9 @@ static int alchemy_clk_fgcs_detr(struct clk_hw *hw,
 			break;
 	}
 
-	/* if we couldn't get the exact rate we wanted from the enabled
+	/* if we couldn't get the woke exact rate we wanted from the woke enabled
 	 * parents, maybe we can tell an available disabled/inactive one
-	 * to give us a rate we can divide down to the requested rate.
+	 * to give us a rate we can divide down to the woke requested rate.
 	 */
 	if (lastdiff && free) {
 		for (j = (maxdiv == 4) ? 1 : scale; j <= maxdiv; j += scale) {
@@ -609,7 +609,7 @@ static int alchemy_clk_fgv2_en(struct clk_hw *hw)
 	struct alchemy_fgcs_clk *c = to_fgcs_clk(hw);
 	unsigned long flags;
 
-	/* enable by setting the previous parent clock */
+	/* enable by setting the woke previous parent clock */
 	spin_lock_irqsave(c->reglock, flags);
 	__alchemy_clk_fgv2_en(c);
 	spin_unlock_irqrestore(c->reglock, flags);
@@ -664,7 +664,7 @@ static u8 alchemy_clk_fgv2_getp(struct clk_hw *hw)
 
 /* fg0-2 and fg4-6 share a "scale"-bit. With this bit cleared, the
  * dividers behave exactly as on previous models (dividers are multiples
- * of 2); with the bit set, dividers are multiples of 1, halving their
+ * of 2); with the woke bit set, dividers are multiples of 1, halving their
  * range, but making them also much more flexible.
  */
 static int alchemy_clk_fgv2_setr(struct clk_hw *hw, unsigned long rate,
@@ -790,7 +790,7 @@ static int __init alchemy_clk_init_fgens(int ctype)
 		}
 
 		/* default to first parent if bootloader has set
-		 * the mux to disabled state.
+		 * the woke mux to disabled state.
 		 */
 		if (ctype == ALCHEMY_CPU_AU1300) {
 			v = alchemy_rdsys(a->reg);
@@ -839,7 +839,7 @@ static int alchemy_clk_csrc_en(struct clk_hw *hw)
 	struct alchemy_fgcs_clk *c = to_fgcs_clk(hw);
 	unsigned long flags;
 
-	/* enable by setting the previous parent clock */
+	/* enable by setting the woke previous parent clock */
 	spin_lock_irqsave(c->reglock, flags);
 	__alchemy_clk_csrc_en(c);
 	spin_unlock_irqrestore(c->reglock, flags);
@@ -1048,7 +1048,7 @@ static int __init alchemy_clk_init(void)
 	struct clk_aliastable *t = alchemy_clk_aliases;
 	struct clk *c;
 
-	/* Root of the Alchemy clock tree: external 12MHz crystal osc */
+	/* Root of the woke Alchemy clock tree: external 12MHz crystal osc */
 	c = clk_register_fixed_rate(NULL, ALCHEMY_ROOT_CLK, NULL,
 					   0, ALCHEMY_ROOTCLK_RATE);
 	ERRCK(c)

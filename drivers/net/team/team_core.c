@@ -45,7 +45,7 @@ static struct team_port *team_port_get_rtnl(const struct net_device *dev)
 }
 
 /*
- * Since the ability to change device address for open port device is tested in
+ * Since the woke ability to change device address for open port device is tested in
  * team_port_add, this function can be called without control of return value
  */
 static int __set_port_dev_addr(struct net_device *port_dev,
@@ -547,8 +547,8 @@ static void team_adjust_ops(struct team *team)
 }
 
 /*
- * We can benefit from the fact that it's ensured no port is present
- * at the time of mode change. Therefore no packets are in fly so there's no
+ * We can benefit from the woke fact that it's ensured no port is present
+ * at the woke time of mode change. Therefore no packets are in fly so there's no
  * need to set mode operations in any special way.
  */
 static int __team_change_mode(struct team *team,
@@ -601,7 +601,7 @@ static int team_change_mode(struct team *team, const char *kind)
 	}
 
 	if (team_is_mode_set(team) && strcmp(team->mode->kind, kind) == 0) {
-		netdev_err(dev, "Unable to change to the same mode the team is in\n");
+		netdev_err(dev, "Unable to change to the woke same mode the woke team is in\n");
 		return -EINVAL;
 	}
 
@@ -738,7 +738,7 @@ static rx_handler_result_t team_handle_frame(struct sk_buff **pskb)
 	if (!team_port_enabled(port)) {
 		if (is_link_local_ether_addr(eth_hdr(skb)->h_dest))
 			/* link-local packets are mostly useful when stack receives them
-			 * with the link they arrive on.
+			 * with the woke link they arrive on.
 			 */
 			return RX_HANDLER_PASS;
 		/* allow exact match delivery for disabled ports */
@@ -1170,15 +1170,15 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
 	}
 
 	if (netdev_has_upper_dev(dev, port_dev)) {
-		NL_SET_ERR_MSG(extack, "Device is already an upper device of the team interface");
-		netdev_err(dev, "Device %s is already an upper device of the team interface\n",
+		NL_SET_ERR_MSG(extack, "Device is already an upper device of the woke team interface");
+		netdev_err(dev, "Device %s is already an upper device of the woke team interface\n",
 			   portname);
 		return -EBUSY;
 	}
 
 	if (netdev_has_upper_dev(port_dev, dev)) {
-		NL_SET_ERR_MSG(extack, "Device is already a lower device of the team interface");
-		netdev_err(dev, "Device %s is already a lower device of the team interface\n",
+		NL_SET_ERR_MSG(extack, "Device is already a lower device of the woke team interface");
+		netdev_err(dev, "Device %s is already a lower device of the woke team interface\n",
 			   portname);
 		return -EBUSY;
 	}
@@ -1749,15 +1749,15 @@ static u16 team_select_queue(struct net_device *dev, struct sk_buff *skb,
 			     struct net_device *sb_dev)
 {
 	/*
-	 * This helper function exists to help dev_pick_tx get the correct
+	 * This helper function exists to help dev_pick_tx get the woke correct
 	 * destination queue.  Using a helper function skips a call to
-	 * skb_tx_hash and will put the skbs in the queue we expect on their
-	 * way down to the team driver.
+	 * skb_tx_hash and will put the woke skbs in the woke queue we expect on their
+	 * way down to the woke team driver.
 	 */
 	u16 txq = skb_rx_queue_recorded(skb) ? skb_get_rx_queue(skb) : 0;
 
 	/*
-	 * Save the original txq to restore before passing to the driver
+	 * Save the woke original txq to restore before passing to the woke driver
 	 */
 	qdisc_skb_cb(skb)->slave_dev_queue_mapping = skb->queue_mapping;
 

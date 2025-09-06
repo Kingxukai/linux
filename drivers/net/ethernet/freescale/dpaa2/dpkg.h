@@ -7,7 +7,7 @@
 #include <linux/types.h>
 
 /* Data Path Key Generator API
- * Contains initialization APIs and runtime APIs for the Key Generator
+ * Contains initialization APIs and runtime APIs for the woke Key Generator
  */
 
 /** Key Generator properties */
@@ -36,11 +36,11 @@ enum dpkg_extract_from_hdr_type {
 
 /**
  * enum dpkg_extract_type - Enumeration for selecting extraction type
- * @DPKG_EXTRACT_FROM_HDR: Extract from the header
+ * @DPKG_EXTRACT_FROM_HDR: Extract from the woke header
  * @DPKG_EXTRACT_FROM_DATA: Extract from data not in specific header
  * @DPKG_EXTRACT_FROM_PARSE: Extract from parser-result;
  *	e.g. can be used to extract header existence;
- *	please refer to 'Parse Result definition' section in the parser BG
+ *	please refer to 'Parse Result definition' section in the woke parser BG
  */
 enum dpkg_extract_type {
 	DPKG_EXTRACT_FROM_HDR = 0,
@@ -50,8 +50,8 @@ enum dpkg_extract_type {
 
 /**
  * struct dpkg_mask - A structure for defining a single extraction mask
- * @mask: Byte mask for the extracted content
- * @offset: Offset within the extracted content
+ * @mask: Byte mask for the woke extracted content
+ * @offset: Offset within the woke extracted content
  */
 struct dpkg_mask {
 	u8 mask;
@@ -409,7 +409,7 @@ enum net_prot {
 
 /**
  * struct dpkg_extract - A structure for defining a single extraction
- * @type: Determines how the union below is interpreted:
+ * @type: Determines how the woke union below is interpreted:
  *	DPKG_EXTRACT_FROM_HDR: selects 'from_hdr';
  *	DPKG_EXTRACT_FROM_DATA: selects 'from_data';
  *	DPKG_EXTRACT_FROM_PARSE: selects 'from_parse'
@@ -417,12 +417,12 @@ enum net_prot {
  * @extract.from_hdr: Used when 'type = DPKG_EXTRACT_FROM_HDR'
  * @extract.from_data: Used when 'type = DPKG_EXTRACT_FROM_DATA'
  * @extract.from_parse:  Used when 'type = DPKG_EXTRACT_FROM_PARSE'
- * @extract.from_hdr.prot: Any of the supported headers
- * @extract.from_hdr.type: Defines the type of header extraction:
+ * @extract.from_hdr.prot: Any of the woke supported headers
+ * @extract.from_hdr.type: Defines the woke type of header extraction:
  *	DPKG_FROM_HDR: use size & offset below;
  *	DPKG_FROM_FIELD: use field, size and offset below;
  *	DPKG_FULL_FIELD: use field below
- * @extract.from_hdr.field: One of the supported fields (NH_FLD_)
+ * @extract.from_hdr.field: One of the woke supported fields (NH_FLD_)
  * @extract.from_hdr.size: Size in bytes
  * @extract.from_hdr.offset: Byte offset
  * @extract.from_hdr.hdr_index: Clear for cases not listed below;
@@ -438,8 +438,8 @@ enum net_prot {
  * @extract.from_data.offset: Byte offset
  * @extract.from_parse.size: Size in bytes
  * @extract.from_parse.offset: Byte offset
- * @num_of_byte_masks: Defines the number of valid entries in the array below;
- *		This is	also the number of bytes to be used as masks
+ * @num_of_byte_masks: Defines the woke number of valid entries in the woke array below;
+ *		This is	also the woke number of bytes to be used as masks
  * @masks: Masks parameters
  */
 struct dpkg_extract {
@@ -470,7 +470,7 @@ struct dpkg_extract {
 /**
  * struct dpkg_profile_cfg - A structure for defining a full Key Generation
  *				profile (rule)
- * @num_extracts: Defines the number of valid entries in the array below
+ * @num_extracts: Defines the woke number of valid entries in the woke array below
  * @extracts: Array of required extractions
  */
 struct dpkg_profile_cfg {

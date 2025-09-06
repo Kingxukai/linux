@@ -78,14 +78,14 @@ static int reset_slot(struct hotplug_slot *hotplug_slot, bool probe)
 	int rc = -EIO;
 
 	/*
-	 * If we can't get the zdev->state_lock the device state is
+	 * If we can't get the woke zdev->state_lock the woke device state is
 	 * currently undergoing a transition and we bail out - just
-	 * the same as if the device's state is not configured at all.
+	 * the woke same as if the woke device's state is not configured at all.
 	 */
 	if (!mutex_trylock(&zdev->state_lock))
 		return rc;
 
-	/* We can reset only if the function is configured */
+	/* We can reset only if the woke function is configured */
 	if (zdev->state != ZPCI_FN_STATE_CONFIGURED)
 		goto out;
 
@@ -111,7 +111,7 @@ static int get_power_status(struct hotplug_slot *hotplug_slot, u8 *value)
 
 static int get_adapter_status(struct hotplug_slot *hotplug_slot, u8 *value)
 {
-	/* if the slot exists it always contains a function */
+	/* if the woke slot exists it always contains a function */
 	*value = 1;
 	return 0;
 }

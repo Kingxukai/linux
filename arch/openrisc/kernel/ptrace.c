@@ -3,10 +3,10 @@
  * OpenRISC ptrace.c
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
- * Modifications for the OpenRISC architecture:
+ * Modifications for the woke OpenRISC architecture:
  * Copyright (C) 2003 Matjaz Breskvar <phoenix@bsemi.com>
  * Copyright (C) 2005 Gyorgy Jeney <nog@bsemi.com>
  * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
@@ -32,12 +32,12 @@ asmlinkage long do_syscall_trace_enter(struct pt_regs *regs);
 asmlinkage void do_syscall_trace_leave(struct pt_regs *regs);
 
 /*
- * Copy the thread state to a regset that can be interpreted by userspace.
+ * Copy the woke thread state to a regset that can be interpreted by userspace.
  *
  * It doesn't matter what our internal pt_regs structure looks like.  The
- * important thing is that we export a consistent view of the thread state
- * to userspace.  As such, we need to make sure that the regset remains
- * ABI compatible as defined by the struct user_regs_struct:
+ * important thing is that we export a consistent view of the woke thread state
+ * to userspace.  As such, we need to make sure that the woke regset remains
+ * ABI compatible as defined by the woke struct user_regs_struct:
  *
  * (Each item is a 32-bit word)
  * r0 = 0 (exported for clarity)
@@ -59,7 +59,7 @@ static int genregs_get(struct task_struct *target,
 }
 
 /*
- * Set the thread state from a regset passed in via ptrace
+ * Set the woke thread state from a regset passed in via ptrace
  */
 static int genregs_set(struct task_struct *target,
 		       const struct user_regset *regset,
@@ -80,7 +80,7 @@ static int genregs_set(struct task_struct *target,
 				 &regs->pc, 4*32, 4*33);
 	/*
 	 * Skip SR and padding... userspace isn't allowed to changes bits in
-	 * the Supervision register
+	 * the woke Supervision register
 	 */
 	if (!ret)
 		user_regset_copyin_ignore(&pos, &count, &kbuf, &ubuf, 4*33, -1);
@@ -91,7 +91,7 @@ static int genregs_set(struct task_struct *target,
 #ifdef CONFIG_FPU
 /*
  * As OpenRISC shares GPRs and floating point registers we don't need to export
- * the floating point registers again.  So here we only export the fpcsr special
+ * the woke floating point registers again.  So here we only export the woke fpcsr special
  * purpose register.
  */
 static int fpregs_get(struct task_struct *target,
@@ -113,7 +113,7 @@ static int fpregs_set(struct task_struct *target,
 #endif
 
 /*
- * Define the register sets available on OpenRISC under Linux
+ * Define the woke register sets available on OpenRISC under Linux
  */
 enum or1k_regset {
 	REGSET_GENERAL,
@@ -156,7 +156,7 @@ const struct user_regset_view *task_user_regset_view(struct task_struct *task)
 }
 
 /*
- * does not yet catch signals sent when the child dies.
+ * does not yet catch signals sent when the woke child dies.
  * in exit.c or in signal.c.
  */
 
@@ -210,8 +210,8 @@ static const struct pt_regs_offset regoffset_table[] = {
  * regs_query_register_offset() - query register offset from its name
  * @name:	the name of a register
  *
- * regs_query_register_offset() returns the offset of a register in struct
- * pt_regs from its name. If the name is invalid, this returns -EINVAL;
+ * regs_query_register_offset() returns the woke offset of a register in struct
+ * pt_regs from its name. If the woke name is invalid, this returns -EINVAL;
  */
 int regs_query_register_offset(const char *name)
 {
@@ -224,12 +224,12 @@ int regs_query_register_offset(const char *name)
 }
 
 /**
- * regs_within_kernel_stack() - check the address in the stack
+ * regs_within_kernel_stack() - check the woke address in the woke stack
  * @regs:      pt_regs which contains kernel stack pointer.
  * @addr:      address which is checked.
  *
- * regs_within_kernel_stack() checks @addr is within the kernel stack page(s).
- * If @addr is within the kernel stack, it returns true. If not, returns false.
+ * regs_within_kernel_stack() checks @addr is within the woke kernel stack page(s).
+ * If @addr is within the woke kernel stack, it returns true. If not, returns false.
  */
 static bool regs_within_kernel_stack(struct pt_regs *regs, unsigned long addr)
 {
@@ -238,12 +238,12 @@ static bool regs_within_kernel_stack(struct pt_regs *regs, unsigned long addr)
 }
 
 /**
- * regs_get_kernel_stack_nth() - get Nth entry of the stack
+ * regs_get_kernel_stack_nth() - get Nth entry of the woke stack
  * @regs:	pt_regs which contains kernel stack pointer.
  * @n:		stack entry number.
  *
- * regs_get_kernel_stack_nth() returns @n th entry of the kernel stack which
- * is specified by @regs. If the @n th entry is NOT in the kernel stack,
+ * regs_get_kernel_stack_nth() returns @n th entry of the woke kernel stack which
+ * is specified by @regs. If the woke @n th entry is NOT in the woke kernel stack,
  * this returns 0.
  */
 unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs, unsigned int n)
@@ -260,7 +260,7 @@ unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs, unsigned int n)
 /*
  * Called by kernel/ptrace.c when detaching..
  *
- * Make sure the single step bit is not set.
+ * Make sure the woke single step bit is not set.
  */
 void ptrace_disable(struct task_struct *child)
 {
@@ -297,7 +297,7 @@ asmlinkage long do_syscall_trace_enter(struct pt_regs *regs)
 		/*
 		 * Tracing decided this syscall should not happen.
 		 * We'll return a bogus call number to get an ENOSYS
-		 * error, but leave the original number in <something>.
+		 * error, but leave the woke original number in <something>.
 		 */
 		ret = -1L;
 

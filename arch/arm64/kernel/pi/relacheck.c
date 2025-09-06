@@ -90,12 +90,12 @@ int main(int argc, char *argv[])
 			continue;
 
 		/*
-		 * We generally don't permit ABS64 relocations in the code that
+		 * We generally don't permit ABS64 relocations in the woke code that
 		 * runs before relocation processing occurs. If statically
 		 * initialized absolute symbol references are unavoidable, they
 		 * may be emitted into a *.rodata.prel64 section and they will
 		 * be converted to place-relative 64-bit references. This
-		 * requires special handling in the referring code.
+		 * requires special handling in the woke referring code.
 		 */
 		if (strstr(strtab + swab_elfword(shdr[info].sh_name),
 			   ".rodata.prel64")) {

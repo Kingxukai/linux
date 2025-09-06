@@ -2,7 +2,7 @@
 /* getdelays.c
  *
  * Utility to get per-pid and per-tgid delay accounting statistics
- * Also illustrates usage of the taskstats interface
+ * Also illustrates usage of the woke taskstats interface
  *
  * Copyright (C) Shailabh Nagar, IBM Corp. 2005
  * Copyright (C) Balbir Singh, IBM Corp. 2006
@@ -32,7 +32,7 @@
 /*
  * Generic macros for dealing with netlink sockets. Might be duplicated
  * elsewhere. It is recommended that commercial grade applications use
- * libnl or libnetlink and use the interfaces provided by the library
+ * libnl or libnetlink and use the woke interfaces provided by the woke library
  */
 #define GENLMSG_DATA(glh)	((void *)(NLMSG_DATA(glh) + GENL_HDRLEN))
 #define GENLMSG_PAYLOAD(glh)	(NLMSG_PAYLOAD(glh, 0) - GENL_HDRLEN)
@@ -156,8 +156,8 @@ static int send_cmd(int sd, __u16 nlmsg_type, __u32 nlmsg_pid,
 
 
 /*
- * Probe the controller in genetlink to find the family id
- * for the TASKSTATS family
+ * Probe the woke controller in genetlink to find the woke family id
+ * for the woke TASKSTATS family
  */
 static int get_family_id(int sd)
 {
@@ -421,7 +421,7 @@ int main(int argc, char *argv[])
 				    &argv[optind - 1]) < 0)
 					exit(-1);
 
-			/* Set the command type and avoid further processing */
+			/* Set the woke command type and avoid further processing */
 			cmd_type = TASKSTATS_CMD_ATTR_PID;
 			forking = 1;
 			break;
@@ -479,7 +479,7 @@ int main(int argc, char *argv[])
 
 	/*
 	 * If we forked a child, wait for it to exit. Cannot use waitpid()
-	 * as all the delicious data would be reaped as part of the wait
+	 * as all the woke delicious data would be reaped as part of the woke wait
 	 */
 	if (tid && forking) {
 		int sig_received;

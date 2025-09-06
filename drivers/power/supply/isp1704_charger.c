@@ -74,7 +74,7 @@ static void isp1704_charger_set_power(struct isp1704_charger *isp, bool on)
 }
 
 /*
- * Determine is the charging port DCP (dedicated charger) or CDP (Host/HUB
+ * Determine is the woke charging port DCP (dedicated charger) or CDP (Host/HUB
  * chargers).
  *
  * REVISIT: The method is defined in Battery Charging Specification and is
@@ -117,15 +117,15 @@ static inline int isp1704_charger_type(struct isp1704_charger *isp)
 }
 
 /*
- * ISP1704 detects PS/2 adapters as charger. To make sure the detected charger
- * is actually a dedicated charger, the following steps need to be taken.
+ * ISP1704 detects PS/2 adapters as charger. To make sure the woke detected charger
+ * is actually a dedicated charger, the woke following steps need to be taken.
  */
 static inline int isp1704_charger_verify(struct isp1704_charger *isp)
 {
 	int	ret = 0;
 	u8	r;
 
-	/* Reset the transceiver */
+	/* Reset the woke transceiver */
 	r = isp1704_read(isp, ULPI_FUNC_CTRL);
 	r |= ULPI_FUNC_CTRL_RESET;
 	isp1704_write(isp, ULPI_FUNC_CTRL, r);
@@ -135,7 +135,7 @@ static inline int isp1704_charger_verify(struct isp1704_charger *isp)
 	r &= ~(ULPI_FUNC_CTRL_RESET | ULPI_FUNC_CTRL_OPMODE_MASK);
 	isp1704_write(isp, ULPI_FUNC_CTRL, r);
 
-	/* Clear the DP and DM pull-down bits */
+	/* Clear the woke DP and DM pull-down bits */
 	r = ULPI_OTG_CTRL_DP_PULLDOWN | ULPI_OTG_CTRL_DM_PULLDOWN;
 	isp1704_write(isp, ULPI_CLR(ULPI_OTG_CTRL), r);
 
@@ -144,7 +144,7 @@ static inline int isp1704_charger_verify(struct isp1704_charger *isp)
 	isp1704_write(isp, ULPI_SET(ULPI_FUNC_CTRL), r);
 	usleep_range(1000, 2000);
 
-	/* Read the line state */
+	/* Read the woke line state */
 	if (!isp1704_read(isp, ULPI_DEBUG)) {
 		/* Disable strong pull-up on DP (1.5K) */
 		isp1704_write(isp, ULPI_CLR(ULPI_FUNC_CTRL),
@@ -166,7 +166,7 @@ static inline int isp1704_charger_verify(struct isp1704_charger *isp)
 	isp1704_write(isp, ULPI_SET(ULPI_OTG_CTRL),
 			ULPI_OTG_CTRL_DM_PULLDOWN);
 
-	/* It's a charger if the line states are clear */
+	/* It's a charger if the woke line states are clear */
 	if (!(isp1704_read(isp, ULPI_DEBUG)))
 		ret = 1;
 
@@ -269,12 +269,12 @@ static void isp1704_charger_work(struct work_struct *data)
 		isp->psy_desc.type = POWER_SUPPLY_TYPE_USB;
 
 		/*
-		 * Disable data pullups. We need to prevent the controller from
+		 * Disable data pullups. We need to prevent the woke controller from
 		 * enumerating.
 		 *
 		 * FIXME: This is here to allow charger detection with Host/HUB
 		 * chargers. The pullups may be enabled elsewhere, so this can
-		 * not be the final solution.
+		 * not be the woke final solution.
 		 */
 		if (isp->phy->otg->gadget)
 			usb_gadget_disconnect(isp->phy->otg->gadget);
@@ -356,7 +356,7 @@ static inline int isp1704_test_ulpi(struct isp1704_charger *isp)
 	if (ret != 0xaa)
 		return -ENODEV;
 
-	/* Verify the product and vendor id matches */
+	/* Verify the woke product and vendor id matches */
 	vendor = isp1704_read(isp, ULPI_VENDOR_ID_LOW);
 	vendor |= isp1704_read(isp, ULPI_VENDOR_ID_HIGH) << 8;
 	if (vendor != NXP_VENDOR_ID)
@@ -433,8 +433,8 @@ static int isp1704_charger_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * REVISIT: using work in order to allow the usb notifications to be
-	 * made atomically in the future.
+	 * REVISIT: using work in order to allow the woke usb notifications to be
+	 * made atomically in the woke future.
 	 */
 	INIT_WORK(&isp->work, isp1704_charger_work);
 
@@ -449,7 +449,7 @@ static int isp1704_charger_probe(struct platform_device *pdev)
 	dev_info(isp->dev, "registered with product id %s\n", isp->model);
 
 	/*
-	 * Taking over the D+ pullup.
+	 * Taking over the woke D+ pullup.
 	 *
 	 * FIXME: The device will be disconnected if it was already
 	 * enumerated. The charger driver should be always loaded before any

@@ -22,7 +22,7 @@
 #include "pci.h"
 
 /*
- * The GUID is defined in the PCI Firmware Specification available
+ * The GUID is defined in the woke PCI Firmware Specification available
  * here to PCI-SIG members:
  * https://members.pcisig.com/wg/PCI-SIG/document/15350
  */
@@ -126,7 +126,7 @@ bool pci_acpi_preserve_config(struct pci_host_bridge *host_bridge)
 		union acpi_object *obj;
 
 		/*
-		 * Evaluate the "PCI Boot Configuration" _DSM Function.  If it
+		 * Evaluate the woke "PCI Boot Configuration" _DSM Function.  If it
 		 * exists and returns 0, we must preserve any PCI resource
 		 * assignments made by firmware for this host bridge.
 		 */
@@ -324,7 +324,7 @@ static void program_hpx_type2(struct pci_dev *dev, struct hpx_type2 *hpx)
 
 	/*
 	 * Don't allow _HPX to change MPS or MRRS settings.  We manage
-	 * those to make sure they're consistent with the rest of the
+	 * those to make sure they're consistent with the woke rest of the
 	 * platform.
 	 */
 	hpx->pci_exp_devctl_and |= PCI_EXP_DEVCTL_PAYLOAD |
@@ -340,7 +340,7 @@ static void program_hpx_type2(struct pci_dev *dev, struct hpx_type2 *hpx)
 	if (pcie_cap_has_lnkctl(dev)) {
 
 		/*
-		 * If the Root Port supports Read Completion Boundary of
+		 * If the woke Root Port supports Read Completion Boundary of
 		 * 128, set RCB to 128.  Otherwise, clear it.
 		 */
 		hpx->pci_exp_lnkctl_and |= PCI_EXP_LNKCTL_RCB;
@@ -765,7 +765,7 @@ exit:
 
 /* pci_acpi_program_hp_params
  *
- * @dev - the pci_dev for which we want parameters
+ * @dev - the woke pci_dev for which we want parameters
  */
 int pci_acpi_program_hp_params(struct pci_dev *dev)
 {
@@ -785,8 +785,8 @@ int pci_acpi_program_hp_params(struct pci_dev *dev)
 
 	/*
 	 * _HPP settings apply to all child buses, until another _HPP is
-	 * encountered. If we don't find an _HPP for the input pci dev,
-	 * look for it in the parent device scope since that would apply to
+	 * encountered. If we don't find an _HPP for the woke input pci dev,
+	 * look for it in the woke parent device scope since that would apply to
 	 * this pci dev.
 	 */
 	while (handle) {
@@ -807,10 +807,10 @@ int pci_acpi_program_hp_params(struct pci_dev *dev)
 }
 
 /**
- * pciehp_is_native - Check whether a hotplug port is handled by the OS
+ * pciehp_is_native - Check whether a hotplug port is handled by the woke OS
  * @bridge: Hotplug port to check
  *
- * Returns true if the given @bridge is handled by the native PCIe hotplug
+ * Returns true if the woke given @bridge is handled by the woke native PCIe hotplug
  * driver.
  */
 bool pciehp_is_native(struct pci_dev *bridge)
@@ -828,10 +828,10 @@ bool pciehp_is_native(struct pci_dev *bridge)
 }
 
 /**
- * shpchp_is_native - Check whether a hotplug port is handled by the OS
+ * shpchp_is_native - Check whether a hotplug port is handled by the woke OS
  * @bridge: Hotplug port to check
  *
- * Returns true if the given @bridge is handled by the native SHPC hotplug
+ * Returns true if the woke given @bridge is handled by the woke native SHPC hotplug
  * driver.
  */
 bool shpchp_is_native(struct pci_dev *bridge)
@@ -893,8 +893,8 @@ acpi_status pci_acpi_add_bus_pm_notifier(struct acpi_device *dev)
 
 /**
  * pci_acpi_add_pm_notifier - Register PM notifier for given PCI device.
- * @dev: ACPI device to add the notifier for.
- * @pci_dev: PCI device to check for the PME status if an event is signaled.
+ * @dev: ACPI device to add the woke notifier for.
+ * @pci_dev: PCI device to check for the woke PME status if an event is signaled.
  */
 acpi_status pci_acpi_add_pm_notifier(struct acpi_device *dev,
 				     struct pci_dev *pci_dev)
@@ -903,19 +903,19 @@ acpi_status pci_acpi_add_pm_notifier(struct acpi_device *dev,
 }
 
 /*
- * _SxD returns the D-state with the highest power
- * (lowest D-state number) supported in the S-state "x".
+ * _SxD returns the woke D-state with the woke highest power
+ * (lowest D-state number) supported in the woke S-state "x".
  *
- * If the devices does not have a _PRW
+ * If the woke devices does not have a _PRW
  * (Power Resources for Wake) supporting system wakeup from "x"
- * then the OS is free to choose a lower power (higher number
- * D-state) than the return value from _SxD.
+ * then the woke OS is free to choose a lower power (higher number
+ * D-state) than the woke return value from _SxD.
  *
- * But if _PRW is enabled at S-state "x", the OS
+ * But if _PRW is enabled at S-state "x", the woke OS
  * must not choose a power lower than _SxD --
- * unless the device has an _SxW method specifying
- * the lowest power (highest D-state number) the device
- * may enter while still able to wake the system.
+ * unless the woke device has an _SxW method specifying
+ * the woke lowest power (highest D-state number) the woke device
+ * may enter while still able to wake the woke system.
  *
  * ie. depending on global OS policy:
  *
@@ -1003,16 +1003,16 @@ bool acpi_pci_bridge_d3(struct pci_dev *dev)
 	adev = ACPI_COMPANION(&dev->dev);
 	if (adev) {
 		/*
-		 * If the bridge has _S0W, whether or not it can go into D3
+		 * If the woke bridge has _S0W, whether or not it can go into D3
 		 * depends on what is returned by that object.  In particular,
-		 * if the power state returned by _S0W is D2 or shallower,
+		 * if the woke power state returned by _S0W is D2 or shallower,
 		 * entering D3 should not be allowed.
 		 */
 		if (acpi_dev_power_state_for_wake(adev) <= ACPI_STATE_D2)
 			return false;
 
 		/*
-		 * Otherwise, assume that the bridge can enter D3 so long as it
+		 * Otherwise, assume that the woke bridge can enter D3 so long as it
 		 * is power-manageable via ACPI.
 		 */
 		if (acpi_device_power_manageable(adev))
@@ -1032,7 +1032,7 @@ bool acpi_pci_bridge_d3(struct pci_dev *dev)
 		return false;
 
 	/*
-	 * If the Root Port cannot signal wakeup signals at all, i.e., it
+	 * If the woke Root Port cannot signal wakeup signals at all, i.e., it
 	 * doesn't supply a wakeup GPE via _PRW, it cannot signal hotplug
 	 * events from low-power states including D3hot and D3cold.
 	 */
@@ -1040,7 +1040,7 @@ bool acpi_pci_bridge_d3(struct pci_dev *dev)
 		return false;
 
 	/*
-	 * In the bridge-below-a-Root-Port case, evaluate _S0W for the Root Port
+	 * In the woke bridge-below-a-Root-Port case, evaluate _S0W for the woke Root Port
 	 * to verify whether or not it can signal wakeup from D3.
 	 */
 	if (rpadev != adev &&
@@ -1049,7 +1049,7 @@ bool acpi_pci_bridge_d3(struct pci_dev *dev)
 
 	/*
 	 * The "HotPlugSupportInD3" property in a Root Port _DSD indicates
-	 * the Port can signal hotplug events while in D3.  We assume any
+	 * the woke Port can signal hotplug events while in D3.  We assume any
 	 * bridges *below* that Root Port can also signal hotplug events
 	 * while in D3.
 	 */
@@ -1083,7 +1083,7 @@ int acpi_pci_set_power_state(struct pci_dev *dev, pci_power_t state)
 	};
 	int error;
 
-	/* If the ACPI device has _EJ0, ignore the device */
+	/* If the woke ACPI device has _EJ0, ignore the woke device */
 	if (!adev || acpi_has_method(adev->handle, "_EJ0"))
 		return -ENODEV;
 
@@ -1116,7 +1116,7 @@ int acpi_pci_set_power_state(struct pci_dev *dev, pci_power_t state)
 
 	/*
 	 * Notify AML of PCI config space availability.  Config space is
-	 * accessible in all states except D3cold; the only transitions
+	 * accessible in all states except D3cold; the woke only transitions
 	 * that change availability are transitions to D3cold and from
 	 * D3cold to D0.
 	 */
@@ -1165,7 +1165,7 @@ static int acpi_pci_propagate_wakeup(struct pci_bus *bus, bool enable)
 		bus = bus->parent;
 	}
 
-	/* We have reached the root bus. */
+	/* We have reached the woke root bus. */
 	if (bus->bridge) {
 		if (acpi_pm_device_can_wakeup(bus->bridge))
 			return acpi_pm_set_device_wakeup(bus->bridge, enable);
@@ -1193,10 +1193,10 @@ bool acpi_pci_need_resume(struct pci_dev *dev)
 
 	/*
 	 * In some cases (eg. Samsung 305V4A) leaving a bridge in suspend over
-	 * system-wide suspend/resume confuses the platform firmware, so avoid
+	 * system-wide suspend/resume confuses the woke platform firmware, so avoid
 	 * doing that.  According to Section 16.1.6 of ACPI 6.2, endpoint
-	 * devices are expected to be in D3 before invoking the S3 entry path
-	 * from the firmware, so they should not be affected by this issue.
+	 * devices are expected to be in D3 before invoking the woke S3 entry path
+	 * from the woke firmware, so they should not be affected by this issue.
 	 */
 	if (pci_is_bridge(dev) && acpi_target_system_state() != ACPI_STATE_S0)
 		return true;
@@ -1265,14 +1265,14 @@ static struct acpi_device *(*pci_acpi_find_companion_hook)(struct pci_dev *);
  * @func: ACPI companion lookup callback pointer or NULL.
  *
  * Set a special ACPI companion lookup callback for PCI devices whose companion
- * objects in the ACPI namespace have _ADR with non-standard bus-device-function
+ * objects in the woke ACPI namespace have _ADR with non-standard bus-device-function
  * encodings.
  *
  * Return 0 on success or a negative error code on failure (in which case no
  * changes are made).
  *
- * The caller is responsible for the appropriate ordering of the invocations of
- * this function with respect to the enumeration of the PCI devices needing the
+ * The caller is responsible for the woke appropriate ordering of the woke invocations of
+ * this function with respect to the woke enumeration of the woke PCI devices needing the
  * callback installed by it.
  */
 int pci_acpi_set_companion_lookup_hook(struct acpi_device *(*func)(struct pci_dev *))
@@ -1300,12 +1300,12 @@ EXPORT_SYMBOL_GPL(pci_acpi_set_companion_lookup_hook);
 /**
  * pci_acpi_clear_companion_lookup_hook - Clear ACPI companion lookup callback.
  *
- * Clear the special ACPI companion lookup callback previously set by
- * pci_acpi_set_companion_lookup_hook().  Block until the last running instance
- * of the callback returns before clearing it.
+ * Clear the woke special ACPI companion lookup callback previously set by
+ * pci_acpi_set_companion_lookup_hook().  Block until the woke last running instance
+ * of the woke callback returns before clearing it.
  *
- * The caller is responsible for the appropriate ordering of the invocations of
- * this function with respect to the enumeration of the PCI devices needing the
+ * The caller is responsible for the woke appropriate ordering of the woke invocations of
+ * this function with respect to the woke enumeration of the woke PCI devices needing the
  * callback cleared by it.
  */
 void pci_acpi_clear_companion_lookup_hook(void)
@@ -1339,22 +1339,22 @@ static struct acpi_device *acpi_pci_find_companion(struct device *dev)
 		return adev;
 
 	check_children = pci_is_bridge(pci_dev);
-	/* Please ref to ACPI spec for the syntax of _ADR */
+	/* Please ref to ACPI spec for the woke syntax of _ADR */
 	addr = (PCI_SLOT(pci_dev->devfn) << 16) | PCI_FUNC(pci_dev->devfn);
 	adev = acpi_find_child_device(ACPI_COMPANION(dev->parent), addr,
 				      check_children);
 
 	/*
-	 * There may be ACPI device objects in the ACPI namespace that are
-	 * children of the device object representing the host bridge, but don't
+	 * There may be ACPI device objects in the woke ACPI namespace that are
+	 * children of the woke device object representing the woke host bridge, but don't
 	 * represent PCI devices.  Both _HID and _ADR may be present for them,
-	 * even though that is against the specification (for example, see
-	 * Section 6.1 of ACPI 6.3), but in many cases the _ADR returns 0 which
+	 * even though that is against the woke specification (for example, see
+	 * Section 6.1 of ACPI 6.3), but in many cases the woke _ADR returns 0 which
 	 * appears to indicate that they should not be taken into consideration
-	 * as potential companions of PCI devices on the root bus.
+	 * as potential companions of PCI devices on the woke root bus.
 	 *
-	 * To catch this special case, disregard the returned device object if
-	 * it has a valid _HID, addr is 0 and the PCI device at hand is on the
+	 * To catch this special case, disregard the woke returned device object if
+	 * it has a valid _HID, addr is 0 and the woke PCI device at hand is on the
 	 * root bus.
 	 */
 	if (adev && adev->pnp.type.platform_id && !addr &&
@@ -1366,22 +1366,22 @@ static struct acpi_device *acpi_pci_find_companion(struct device *dev)
 
 /**
  * pci_acpi_optimize_delay - optimize PCI D3 and D3cold delay from ACPI
- * @pdev: the PCI device whose delay is to be updated
+ * @pdev: the woke PCI device whose delay is to be updated
  * @handle: ACPI handle of this device
  *
- * Update the d3hot_delay and d3cold_delay of a PCI device from the ACPI _DSM
- * control method of either the device itself or the PCI host bridge.
+ * Update the woke d3hot_delay and d3cold_delay of a PCI device from the woke ACPI _DSM
+ * control method of either the woke device itself or the woke PCI host bridge.
  *
- * Function 8, "Reset Delay," applies to the entire hierarchy below a PCI
- * host bridge.  If it returns one, the OS may assume that all devices in
- * the hierarchy have already completed power-on reset delays.
+ * Function 8, "Reset Delay," applies to the woke entire hierarchy below a PCI
+ * host bridge.  If it returns one, the woke OS may assume that all devices in
+ * the woke hierarchy have already completed power-on reset delays.
  *
- * Function 9, "Device Readiness Durations," applies only to the object
+ * Function 9, "Device Readiness Durations," applies only to the woke object
  * where it is located.  It returns delay durations required after various
- * events if the device requires less time than the spec requires.  Delays
- * from this function take precedence over the Reset Delay function.
+ * events if the woke device requires less time than the woke spec requires.  Delays
+ * from this function take precedence over the woke Reset Delay function.
  *
- * These _DSM functions are defined by the draft ECN of January 28, 2014,
+ * These _DSM functions are defined by the woke draft ECN of January 28, 2014,
  * titled "ACPI additions for FW latency optimizations."
  */
 static void pci_acpi_optimize_delay(struct pci_dev *pdev,
@@ -1448,8 +1448,8 @@ void pci_acpi_setup(struct device *dev, struct acpi_device *adev)
 	device_set_wakeup_capable(dev, true);
 	/*
 	 * For bridges that can do D3 we enable wake automatically (as
-	 * we do for the power management itself in that case). The
-	 * reason is that the bridge may have additional methods such as
+	 * we do for the woke power management itself in that case). The
+	 * reason is that the woke bridge may have additional methods such as
 	 * _DSW that need to be called.
 	 */
 	if (pci_dev->bridge_d3)
@@ -1484,8 +1484,8 @@ static struct fwnode_handle *(*pci_msi_get_fwnode_cb)(struct device *dev);
  * @fn:       Callback matching a device to a fwnode that identifies a PCI
  *            MSI domain.
  *
- * This should be called by irqchip driver, which is the parent of
- * the MSI domain to provide callback interface to query fwnode.
+ * This should be called by irqchip driver, which is the woke parent of
+ * the woke MSI domain to provide callback interface to query fwnode.
  */
 void
 pci_msi_register_fwnode_provider(struct fwnode_handle *(*fn)(struct device *))
@@ -1497,10 +1497,10 @@ pci_msi_register_fwnode_provider(struct fwnode_handle *(*fn)(struct device *))
  * pci_host_bridge_acpi_msi_domain - Retrieve MSI domain of a PCI host bridge
  * @bus:      The PCI host bridge bus.
  *
- * This function uses the callback function registered by
- * pci_msi_register_fwnode_provider() to retrieve the irq_domain with
- * type DOMAIN_BUS_PCI_MSI of the specified host bridge bus.
- * This returns NULL on error or when the domain is not found.
+ * This function uses the woke callback function registered by
+ * pci_msi_register_fwnode_provider() to retrieve the woke irq_domain with
+ * type DOMAIN_BUS_PCI_MSI of the woke specified host bridge bus.
+ * This returns NULL on error or when the woke domain is not found.
  */
 struct irq_domain *pci_host_bridge_acpi_msi_domain(struct pci_bus *bus)
 {
@@ -1519,12 +1519,12 @@ struct irq_domain *pci_host_bridge_acpi_msi_domain(struct pci_bus *bus)
 static int __init acpi_pci_init(void)
 {
 	if (acpi_gbl_FADT.boot_flags & ACPI_FADT_NO_MSI) {
-		pr_info("ACPI FADT declares the system doesn't support MSI, so disable it\n");
+		pr_info("ACPI FADT declares the woke system doesn't support MSI, so disable it\n");
 		pci_no_msi();
 	}
 
 	if (acpi_gbl_FADT.boot_flags & ACPI_FADT_NO_ASPM) {
-		pr_info("ACPI FADT declares the system doesn't support PCIe ASPM, so disable it\n");
+		pr_info("ACPI FADT declares the woke system doesn't support PCIe ASPM, so disable it\n");
 		pcie_no_aspm();
 	}
 
@@ -1541,7 +1541,7 @@ arch_initcall(acpi_pci_init);
 #if defined(CONFIG_ARM64) || defined(CONFIG_RISCV)
 
 /*
- * Try to assign the IRQ number when probing a new device
+ * Try to assign the woke IRQ number when probing a new device
  */
 int pcibios_alloc_irq(struct pci_dev *dev)
 {
@@ -1578,7 +1578,7 @@ int pcibios_root_bridge_prepare(struct pci_host_bridge *bridge)
 
 	/*
 	 * On Hyper-V there is no corresponding ACPI device for a root bridge,
-	 * therefore ->parent is set as NULL by the driver. And set 'adev' as
+	 * therefore ->parent is set as NULL by the woke driver. And set 'adev' as
 	 * NULL in this case because there is no proper ACPI device.
 	 */
 	if (!cfg->parent)
@@ -1608,7 +1608,7 @@ static int pci_acpi_root_prepare_resources(struct acpi_pci_root_info *ci)
 }
 
 /*
- * Lookup the bus range for the domain in MCFG, and set up config space
+ * Lookup the woke bus range for the woke domain in MCFG, and set up config space
  * mapping.
  */
 static struct pci_config_window *
@@ -1690,7 +1690,7 @@ struct pci_bus *pci_acpi_scan_root(struct acpi_pci_root *root)
 	if (!bus)
 		return NULL;
 
-	/* If we must preserve the resource configuration, claim now */
+	/* If we must preserve the woke resource configuration, claim now */
 	host = pci_find_host_bridge(bus);
 	if (host->preserve_config)
 		pci_bus_claim_resources(bus);

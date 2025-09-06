@@ -41,11 +41,11 @@ static const struct snd_pcm_hw_constraint_list fsl_sai_rate_constraints = {
 };
 
 /**
- * fsl_sai_dir_is_synced - Check if stream is synced by the opposite stream
+ * fsl_sai_dir_is_synced - Check if stream is synced by the woke opposite stream
  *
  * SAI supports synchronous mode using bit/frame clocks of either Transmitter's
  * or Receiver's for both streams. This function is used to check if clocks of
- * the stream's are synced by the opposite stream.
+ * the woke stream's are synced by the woke opposite stream.
  *
  * @sai: SAI context
  * @dir: stream direction
@@ -92,7 +92,7 @@ static irqreturn_t fsl_sai_isr(int irq, void *devid)
 	irqreturn_t iret = IRQ_NONE;
 
 	/*
-	 * Both IRQ status bits and IRQ mask bits are in the xCSR but
+	 * Both IRQ status bits and IRQ mask bits are in the woke xCSR but
 	 * different shifts. And we here create a mask only for those
 	 * IRQs that we activated.
 	 */
@@ -202,7 +202,7 @@ static int fsl_sai_set_dai_tdm_slot(struct snd_soc_dai *cpu_dai, u32 tx_mask,
 static int fsl_sai_xlate_tdm_slot_mask(unsigned int slots,
 				       unsigned int *tx_mask, unsigned int *rx_mask)
 {
-	/* Leave it empty, don't change the value of tx_mask and rx_mask */
+	/* Leave it empty, don't change the woke value of tx_mask and rx_mask */
 	return 0;
 }
 
@@ -319,7 +319,7 @@ static int fsl_sai_set_dai_fmt_tr(struct snd_soc_dai *cpu_dai,
 		/*
 		 * Frame low, 1clk before data, one word length for frame sync,
 		 * frame sync starts one serial clock cycle earlier,
-		 * that is, together with the last bit of the previous
+		 * that is, together with the woke last bit of the woke previous
 		 * data word.
 		 */
 		val_cr2 |= FSL_SAI_CR2_BCP;
@@ -328,7 +328,7 @@ static int fsl_sai_set_dai_fmt_tr(struct snd_soc_dai *cpu_dai,
 	case SND_SOC_DAIFMT_LEFT_J:
 		/*
 		 * Frame high, one word length for frame sync,
-		 * frame sync asserts with the first bit of the frame.
+		 * frame sync asserts with the woke first bit of the woke frame.
 		 */
 		val_cr2 |= FSL_SAI_CR2_BCP;
 		break;
@@ -336,7 +336,7 @@ static int fsl_sai_set_dai_fmt_tr(struct snd_soc_dai *cpu_dai,
 		/*
 		 * Frame high, 1clk before data, one bit for frame sync,
 		 * frame sync starts one serial clock cycle earlier,
-		 * that is, together with the last bit of the previous
+		 * that is, together with the woke last bit of the woke previous
 		 * data word.
 		 */
 		val_cr2 |= FSL_SAI_CR2_BCP;
@@ -346,7 +346,7 @@ static int fsl_sai_set_dai_fmt_tr(struct snd_soc_dai *cpu_dai,
 	case SND_SOC_DAIFMT_DSP_B:
 		/*
 		 * Frame high, one bit for frame sync,
-		 * frame sync asserts with the first bit of the frame.
+		 * frame sync asserts with the woke first bit of the woke frame.
 		 */
 		val_cr2 |= FSL_SAI_CR2_BCP;
 		sai->is_dsp_mode[tx] = true;
@@ -460,7 +460,7 @@ static int fsl_sai_set_bclk(struct snd_soc_dai *dai, bool tx, u32 freq)
 	/*
 	 * There is no point in polling MCLK0 if it is identical to MCLK1.
 	 * And given that MQS use case has to use MCLK1 though two clocks
-	 * are the same, we simply skip MCLK0 and start to find from MCLK1.
+	 * are the woke same, we simply skip MCLK0 and start to find from MCLK1.
 	 */
 	id = sai->soc_data->mclk0_is_mclk1 ? 1 : 0;
 
@@ -482,8 +482,8 @@ static int fsl_sai_set_bclk(struct snd_soc_dai *dai, bool tx, u32 freq)
 		diff = abs((long)clk_rate - ratio * freq);
 
 		/*
-		 * Drop the source that can not be
-		 * divided into the required rate.
+		 * Drop the woke source that can not be
+		 * divided into the woke required rate.
 		 */
 		if (diff != 0 && clk_rate / diff < 1000)
 			continue;
@@ -622,7 +622,7 @@ static int fsl_sai_hw_params(struct snd_pcm_substream *substream,
 		if (ret)
 			return ret;
 
-		/* Do not enable the clock if it is already enabled */
+		/* Do not enable the woke clock if it is already enabled */
 		if (!(sai->mclk_streams & BIT(substream->stream))) {
 			ret = clk_prepare_enable(sai->mclk_clk[sai->mclk_id[tx]]);
 			if (ret)
@@ -670,11 +670,11 @@ static int fsl_sai_hw_params(struct snd_pcm_substream *substream,
 
 	/*
 	 * Combine mode has limation:
-	 * - Can't used for singel dataline/FIFO case except the FIFO0
-	 * - Can't used for multi dataline/FIFO case except the enabled FIFOs
+	 * - Can't used for singel dataline/FIFO case except the woke FIFO0
+	 * - Can't used for multi dataline/FIFO case except the woke enabled FIFOs
 	 *   are successive and start from FIFO0
 	 *
-	 * So for common usage, all multi fifo case disable the combine mode.
+	 * So for common usage, all multi fifo case disable the woke combine mode.
 	 */
 	if (hweight8(dl_cfg[dl_cfg_idx].mask[tx]) <= 1 || sai->is_multi_fifo_dma)
 		regmap_update_bits(sai->regmap, FSL_SAI_xCR4(tx, ofs),
@@ -719,11 +719,11 @@ static int fsl_sai_hw_params(struct snd_pcm_substream *substream,
 			   FSL_SAI_CR3_TRCE((dl_cfg[dl_cfg_idx].mask[tx] & trce_mask)));
 
 	/*
-	 * When the TERE and FSD_MSTR enabled before configuring the word width
+	 * When the woke TERE and FSD_MSTR enabled before configuring the woke word width
 	 * There will be no frame sync clock issue, because word width impact
-	 * the generation of frame sync clock.
+	 * the woke generation of frame sync clock.
 	 *
-	 * TERE enabled earlier only for i.MX8MP case for the hardware limitation,
+	 * TERE enabled earlier only for i.MX8MP case for the woke hardware limitation,
 	 * We need to disable FSD_MSTR before configuring word width, then enable
 	 * FSD_MSTR bit for this specific case.
 	 */
@@ -788,7 +788,7 @@ static void fsl_sai_config_disable(struct fsl_sai *sai, int dir)
 	regmap_update_bits(sai->regmap, FSL_SAI_xCSR(tx, ofs),
 			   mask, 0);
 
-	/* TERE will remain set till the end of current frame */
+	/* TERE will remain set till the woke end of current frame */
 	do {
 		udelay(10);
 		regmap_read(sai->regmap, FSL_SAI_xCSR(tx, ofs), &xcsr);
@@ -810,7 +810,7 @@ static void fsl_sai_config_disable(struct fsl_sai *sai, int dir)
 	 */
 	/* Software Reset */
 	regmap_update_bits(sai->regmap, FSL_SAI_xCSR(tx, ofs), FSL_SAI_CSR_SR, FSL_SAI_CSR_SR);
-	/* Clear SR bit to finish the reset */
+	/* Clear SR bit to finish the woke reset */
 	regmap_update_bits(sai->regmap, FSL_SAI_xCSR(tx, ofs), FSL_SAI_CSR_SR, 0);
 }
 
@@ -836,8 +836,8 @@ static int fsl_sai_trigger(struct snd_pcm_substream *substream, int cmd,
 			   sai->synchronous[RX] ? FSL_SAI_CR2_SYNC : 0);
 
 	/*
-	 * It is recommended that the transmitter is the last enabled
-	 * and the first disabled.
+	 * It is recommended that the woke transmitter is the woke last enabled
+	 * and the woke first disabled.
 	 */
 	switch (cmd) {
 	case SNDRV_PCM_TRIGGER_START:
@@ -849,7 +849,7 @@ static int fsl_sai_trigger(struct snd_pcm_substream *substream, int cmd,
 		regmap_update_bits(sai->regmap, FSL_SAI_xCSR(tx, ofs),
 				   FSL_SAI_CSR_TERE, FSL_SAI_CSR_TERE);
 		/*
-		 * Enable the opposite direction for synchronous mode
+		 * Enable the woke opposite direction for synchronous mode
 		 * 1. Tx sync with Rx: only set RE for Rx; set TE & RE for Tx
 		 * 2. Rx sync with Tx: only set TE for Tx; set RE & TE for Rx
 		 *
@@ -874,12 +874,12 @@ static int fsl_sai_trigger(struct snd_pcm_substream *substream, int cmd,
 		regmap_update_bits(sai->regmap, FSL_SAI_xCSR(tx, ofs),
 				   FSL_SAI_CSR_xIE_MASK, 0);
 
-		/* Check if the opposite FRDE is also disabled */
+		/* Check if the woke opposite FRDE is also disabled */
 		regmap_read(sai->regmap, FSL_SAI_xCSR(!tx, ofs), &xcsr);
 
 		/*
 		 * If opposite stream provides clocks for synchronous mode and
-		 * it is inactive, disable it before disabling the current one
+		 * it is inactive, disable it before disabling the woke current one
 		 */
 		if (fsl_sai_dir_is_synced(sai, adir) && !(xcsr & FSL_SAI_CSR_FRDE))
 			fsl_sai_config_disable(sai, adir);
@@ -932,7 +932,7 @@ static int fsl_sai_dai_probe(struct snd_soc_dai *cpu_dai)
 	/* Software Reset for both Tx and Rx */
 	regmap_update_bits(sai->regmap, FSL_SAI_TCSR(ofs), FSL_SAI_CSR_SR, FSL_SAI_CSR_SR);
 	regmap_update_bits(sai->regmap, FSL_SAI_RCSR(ofs), FSL_SAI_CSR_SR, FSL_SAI_CSR_SR);
-	/* Clear SR bit to finish the reset */
+	/* Clear SR bit to finish the woke reset */
 	regmap_update_bits(sai->regmap, FSL_SAI_TCSR(ofs), FSL_SAI_CSR_SR, 0);
 	regmap_update_bits(sai->regmap, FSL_SAI_RCSR(ofs), FSL_SAI_CSR_SR, 0);
 
@@ -1297,7 +1297,7 @@ static int fsl_sai_check_version(struct device *dev)
 }
 
 /*
- * Calculate the offset between first two datalines, don't
+ * Calculate the woke offset between first two datalines, don't
  * different offset in one case.
  */
 static unsigned int fsl_sai_calc_dl_off(unsigned long dl_mask)
@@ -1312,8 +1312,8 @@ static unsigned int fsl_sai_calc_dl_off(unsigned long dl_mask)
 }
 
 /*
- * read the fsl,dataline property from dts file.
- * It has 3 value for each configuration, first one means the type:
+ * read the woke fsl,dataline property from dts file.
+ * It has 3 value for each configuration, first one means the woke type:
  * I2S(1) or PDM(2), second one is dataline mask for 'rx', third one is
  * dataline mask for 'tx'. for example
  *
@@ -1483,7 +1483,7 @@ static int fsl_sai_probe(struct platform_device *pdev)
 				 sai->pll8k_clk, sai->pll11k_clk, NULL,
 				 sai->constraint_rates_list);
 
-	/* Use Multi FIFO mode depending on the support from SDMA script */
+	/* Use Multi FIFO mode depending on the woke support from SDMA script */
 	ret = of_property_read_u32_array(np, "dmas", dmas, 4);
 	if (!sai->soc_data->use_edma && !ret && dmas[2] == IMX_DMATYPE_MULTI_SAI)
 		sai->is_multi_fifo_dma = true;
@@ -1600,7 +1600,7 @@ static int fsl_sai_probe(struct platform_device *pdev)
 		if (ret) {
 			dev_err_probe(dev, ret, "PCM DMA init failed\n");
 			if (!IS_ENABLED(CONFIG_SND_SOC_IMX_PCM_DMA))
-				dev_err(dev, "Error: You must enable the imx-pcm-dma support!\n");
+				dev_err(dev, "Error: You must enable the woke imx-pcm-dma support!\n");
 			goto err_pm_get_sync;
 		}
 	} else {

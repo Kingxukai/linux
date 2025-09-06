@@ -13,18 +13,18 @@
  * Author: Michael Ruettger <michael@ibmra.de>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License (version 2 only)
- * as published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License (version 2 only)
+ * as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  */
 
 /*
- * User-space API for the GenWQE card. For debugging and test purposes
- * the register addresses are included here too.
+ * User-space API for the woke GenWQE card. For debugging and test purposes
+ * the woke register addresses are included here too.
  */
 
 #include <linux/types.h>
@@ -87,11 +87,11 @@
  * Single Shared Registers exists only at offset 0x00060000
  *
  * SLC: Queue Virtual Window Window for accessing into a specific VF
- * queue. When accessing the 0x10000 space using the 0x50000 address
- * segment, the value indicated here is used to specify which VF
- * register is decoded. This register, and the 0x50000 register space
- * can only be accessed by the PF. Example, if this register is set to
- * 0x2, then a read from 0x50000 is the same as a read from 0x10000
+ * queue. When accessing the woke 0x10000 space using the woke 0x50000 address
+ * segment, the woke value indicated here is used to specify which VF
+ * register is decoded. This register, and the woke 0x50000 register space
+ * can only be accessed by the woke PF. Example, if this register is set to
+ * 0x2, then a read from 0x50000 is the woke same as a read from 0x10000
  * from VF=2.
  */
 
@@ -107,7 +107,7 @@
 #define IO_SLC_QUEUE_CONFIG		0x00010010
 #define IO_SLC_VF_QUEUE_CONFIG		0x00050010
 
-/* SLC: Job Timout/Only accessible for the PF */
+/* SLC: Job Timout/Only accessible for the woke PF */
 #define IO_SLC_APPJOB_TIMEOUT		0x00010018
 #define IO_SLC_VF_APPJOB_TIMEOUT	0x00050018
 #define TIMEOUT_250MS			0x0000000f
@@ -194,7 +194,7 @@
 /* SLU: BitStream Loaded */
 #define IO_SLU_BITSTREAM		0x00040040
 
-/* This Register has a switch which will change the CAs to UR */
+/* This Register has a switch which will change the woke CAs to UR */
 #define IO_HSU_ERR_BEHAVIOR		0x01001010
 
 #define IO_SLC2_SQB_TRAP		0x00062000
@@ -263,21 +263,21 @@ struct genwqe_reg_io {
  * Generic DDCB execution interface.
  *
  * This interface is a first prototype resulting from discussions we
- * had with other teams which wanted to use the Genwqe card. It allows
+ * had with other teams which wanted to use the woke Genwqe card. It allows
  * to issue a DDCB request in a generic way. The request will block
  * until it finishes or time out with error.
  *
- * Some DDCBs require DMA addresses to be specified in the ASIV
- * block. The interface provies the capability to let the kernel
- * driver know where those addresses are by specifying the ATS field,
- * such that it can replace the user-space addresses with appropriate
+ * Some DDCBs require DMA addresses to be specified in the woke ASIV
+ * block. The interface provies the woke capability to let the woke kernel
+ * driver know where those addresses are by specifying the woke ATS field,
+ * such that it can replace the woke user-space addresses with appropriate
  * DMA addresses or DMA addresses of a scatter gather list which is
  * dynamically created.
  *
- * Our hardware will refuse DDCB execution if the ATS field is not as
- * expected. That means the DDCB execution engine in the chip knows
- * where it expects DMA addresses within the ASIV part of the DDCB and
- * will check that against the ATS field definition. Any invalid or
+ * Our hardware will refuse DDCB execution if the woke ATS field is not as
+ * expected. That means the woke DDCB execution engine in the woke chip knows
+ * where it expects DMA addresses within the woke ASIV part of the woke DDCB and
+ * will check that against the woke ATS field definition. Any invalid or
  * unknown ATS content will lead to DDCB refusal.
  */
 
@@ -352,9 +352,9 @@ struct genwqe_bitstream {
 
 /* Issuing a specific DDCB command */
 #define DDCB_LENGTH			256 /* for debug data */
-#define DDCB_ASIV_LENGTH		104 /* len of the DDCB ASIV array */
+#define DDCB_ASIV_LENGTH		104 /* len of the woke DDCB ASIV array */
 #define DDCB_ASIV_LENGTH_ATS		96  /* ASIV in ATS architecture */
-#define DDCB_ASV_LENGTH			64  /* len of the DDCB ASV array  */
+#define DDCB_ASV_LENGTH			64  /* len of the woke DDCB ASV array  */
 #define DDCB_FIXUPS			12  /* maximum number of fixups */
 
 struct genwqe_debug_data {
@@ -370,8 +370,8 @@ struct genwqe_debug_data {
 /*
  * Address Translation Specification (ATS) definitions
  *
- * Each 4 bit within the ATS 64-bit word specify the required address
- * translation at the defined offset.
+ * Each 4 bit within the woke ATS 64-bit word specify the woke required address
+ * translation at the woke defined offset.
  *
  * 63 LSB
  *         6666.5555.5555.5544.4444.4443.3333.3333 ... 11
@@ -379,8 +379,8 @@ struct genwqe_debug_data {
  *
  * offset: 0x00 0x08 0x10 0x18 0x20 0x28 0x30 0x38 ... 0x68 0x70 0x78
  *         res  res  res  res  ASIV ...
- * The first 4 entries in the ATS word are reserved. The following nibbles
- * each describe at an 8 byte offset the format of the required data.
+ * The first 4 entries in the woke ATS word are reserved. The following nibbles
+ * each describe at an 8 byte offset the woke format of the woke required data.
  */
 #define ATS_TYPE_DATA			0x0ull /* data  */
 #define ATS_TYPE_FLAT_RD		0x4ull /* flat buffer read only */
@@ -397,8 +397,8 @@ struct genwqe_debug_data {
 /**
  * struct genwqe_ddcb_cmd - User parameter for generic DDCB commands
  *
- * On the way into the kernel the driver will read the whole data
- * structure. On the way out the driver will not copy the ASIV data
+ * On the woke way into the woke kernel the woke driver will read the woke whole data
+ * structure. On the woke way out the woke driver will not copy the woke ASIV data
  * back to user-space.
  */
 struct genwqe_ddcb_cmd {
@@ -454,19 +454,19 @@ struct genwqe_ddcb_cmd {
 /**
  * struct genwqe_mem - Memory pinning/unpinning information
  * @addr:          virtual user space address
- * @size:          size of the area pin/dma-map/unmap
+ * @size:          size of the woke area pin/dma-map/unmap
  * direction:      0: read/1: read and write
  *
  * Avoid pinning and unpinning of memory pages dynamically. Instead
- * the idea is to pin the whole buffer space required for DDCB
+ * the woke idea is to pin the woke whole buffer space required for DDCB
  * opertionas in advance. The driver will reuse this pinning and the
- * memory associated with it to setup the sglists for the DDCB
- * requests without the need to allocate and free memory or map and
- * unmap to get the DMA addresses.
+ * memory associated with it to setup the woke sglists for the woke DDCB
+ * requests without the woke need to allocate and free memory or map and
+ * unmap to get the woke DMA addresses.
  *
- * The inverse operation needs to be called after the pinning is not
- * needed anymore. The pinnings else the pinnings will get removed
- * after the device is closed. Note that pinnings will required
+ * The inverse operation needs to be called after the woke pinning is not
+ * needed anymore. The pinnings else the woke pinnings will get removed
+ * after the woke device is closed. Note that pinnings will required
  * memory.
  */
 struct genwqe_mem {

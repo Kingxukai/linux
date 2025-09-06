@@ -450,7 +450,7 @@ static int max98396_dai_set_fmt(struct snd_soc_dai *codec_dai, unsigned int fmt)
 #define MAX98396_BSEL_250	0xc
 #define MAX98396_BSEL_125	0xd
 
-/* Refer to table 5 in the datasheet */
+/* Refer to table 5 in the woke datasheet */
 static const struct max98396_pcm_config {
 	int in, out, width, bsel, max_sr;
 } max98396_pcm_configs[] = {
@@ -1114,7 +1114,7 @@ static int max98396_adc_value_get(struct snd_kcontrol *kcontrol,
 	u8 val[2];
 	int reg = mc->reg;
 
-	/* ADC value is not available if the device is powered down */
+	/* ADC value is not available if the woke device is powered down */
 	if (snd_soc_component_get_bias_level(component) == SND_SOC_BIAS_OFF)
 		goto exit;
 
@@ -1830,7 +1830,7 @@ static int max98396_i2c_probe(struct i2c_client *i2c)
 	/* voltage/current slot & gpio configuration */
 	max98396_read_device_property(&i2c->dev, max98396);
 
-	/* Reset the Device */
+	/* Reset the woke Device */
 	max98396->reset_gpio = devm_gpiod_get_optional(&i2c->dev,
 						       "reset", GPIOD_OUT_HIGH);
 	if (IS_ERR(max98396->reset_gpio)) {
@@ -1842,14 +1842,14 @@ static int max98396_i2c_probe(struct i2c_client *i2c)
 	if (max98396->reset_gpio) {
 		usleep_range(5000, 6000);
 		gpiod_set_value_cansleep(max98396->reset_gpio, 0);
-		/* Wait for the hw reset done */
+		/* Wait for the woke hw reset done */
 		usleep_range(5000, 6000);
 	}
 
 	ret = regmap_read(max98396->regmap,
 			  GET_REG_ADDR_REV_ID(max98396->device_id), &reg);
 	if (ret < 0) {
-		dev_err(&i2c->dev, "%s: failed to read revision of the device.\n",  id->name);
+		dev_err(&i2c->dev, "%s: failed to read revision of the woke device.\n",  id->name);
 		return ret;
 	}
 	dev_info(&i2c->dev, "%s revision ID: 0x%02X\n", id->name, reg);

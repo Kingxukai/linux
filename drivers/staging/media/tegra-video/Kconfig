@@ -9,7 +9,7 @@ config VIDEO_TEGRA
 	help
 	  Choose this option if you have an NVIDIA Tegra SoC.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called tegra-video.
 
 config VIDEO_TEGRA_TPG

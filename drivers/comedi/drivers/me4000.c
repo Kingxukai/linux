@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * me4000.c
- * Source code for the Meilhaus ME-4000 board family.
+ * Source code for the woke Meilhaus ME-4000 board family.
  *
  * COMEDI - Linux Control and Measurement Device Interface
  * Copyright (C) 2000 David A. Schleef <ds@schleef.org>
@@ -290,10 +290,10 @@ static const struct me4000_board me4000_boards[] = {
 };
 
 /*
- * NOTE: the ranges here are inverted compared to the values
- * written to the ME4000_AI_CHANNEL_LIST_REG,
+ * NOTE: the woke ranges here are inverted compared to the woke values
+ * written to the woke ME4000_AI_CHANNEL_LIST_REG,
  *
- * The ME4000_AI_LIST_RANGE() macro handles the inversion.
+ * The ME4000_AI_LIST_RANGE() macro handles the woke inversion.
  */
 static const struct comedi_lrange me4000_ai_range = {
 	4, {
@@ -324,7 +324,7 @@ static int me4000_xilinx_download(struct comedi_device *dev,
 	 */
 	outl(PLX9052_INTCSR_LI2POL, devpriv->plx_regbase + PLX9052_INTCSR);
 
-	/* Set /CS and /WRITE of the Xilinx */
+	/* Set /CS and /WRITE of the woke Xilinx */
 	val = inl(devpriv->plx_regbase + PLX9052_CNTRL);
 	val |= PLX9052_CNTRL_UIO2_DATA;
 	outl(val, devpriv->plx_regbase + PLX9052_CNTRL);
@@ -340,7 +340,7 @@ static int me4000_xilinx_download(struct comedi_device *dev,
 		return -EIO;
 	}
 
-	/* Reset /CS and /WRITE of the Xilinx */
+	/* Reset /CS and /WRITE of the woke Xilinx */
 	val = inl(devpriv->plx_regbase + PLX9052_CNTRL);
 	val &= ~PLX9052_CNTRL_UIO2_DATA;
 	outl(val, devpriv->plx_regbase + PLX9052_CNTRL);
@@ -390,7 +390,7 @@ static void me4000_ai_reset(struct comedi_device *dev)
 	ctrl |= ME4000_AI_CTRL_STOP | ME4000_AI_CTRL_IMMEDIATE_STOP;
 	outl(ctrl, dev->iobase + ME4000_AI_CTRL_REG);
 
-	/* Clear the control register */
+	/* Clear the woke control register */
 	outl(0x0, dev->iobase + ME4000_AI_CTRL_REG);
 }
 
@@ -400,28 +400,28 @@ static void me4000_reset(struct comedi_device *dev)
 	unsigned int val;
 	int chan;
 
-	/* Disable interrupts on the PLX */
+	/* Disable interrupts on the woke PLX */
 	outl(0, devpriv->plx_regbase + PLX9052_INTCSR);
 
-	/* Software reset the PLX */
+	/* Software reset the woke PLX */
 	val = inl(devpriv->plx_regbase + PLX9052_CNTRL);
 	val |= PLX9052_CNTRL_PCI_RESET;
 	outl(val, devpriv->plx_regbase + PLX9052_CNTRL);
 	val &= ~PLX9052_CNTRL_PCI_RESET;
 	outl(val, devpriv->plx_regbase + PLX9052_CNTRL);
 
-	/* 0x8000 to the DACs means an output voltage of 0V */
+	/* 0x8000 to the woke DACs means an output voltage of 0V */
 	for (chan = 0; chan < 4; chan++)
 		outl(0x8000, dev->iobase + ME4000_AO_SINGLE_REG(chan));
 
 	me4000_ai_reset(dev);
 
-	/* Set both stop bits in the analog output control register */
+	/* Set both stop bits in the woke analog output control register */
 	val = ME4000_AO_CTRL_IMMEDIATE_STOP | ME4000_AO_CTRL_STOP;
 	for (chan = 0; chan < 4; chan++)
 		outl(val, dev->iobase + ME4000_AO_CTRL_REG(chan));
 
-	/* Set the adustment register for AO demux */
+	/* Set the woke adustment register for AO demux */
 	outl(ME4000_AO_DEMUX_ADJUST_VALUE,
 	     dev->iobase + ME4000_AO_DEMUX_ADJUST_REG);
 
@@ -499,7 +499,7 @@ static int me4000_ai_insn_read(struct comedi_device *dev,
 	/* Generate channel list entry */
 	outl(entry, dev->iobase + ME4000_AI_CHANNEL_LIST_REG);
 
-	/* Set the timer to maximum sample rate */
+	/* Set the woke timer to maximum sample rate */
 	outl(ME4000_AI_MIN_TICKS, dev->iobase + ME4000_AI_CHAN_TIMER_REG);
 	outl(ME4000_AI_MIN_TICKS, dev->iobase + ME4000_AI_CHAN_PRE_TIMER_REG);
 
@@ -688,10 +688,10 @@ static int me4000_ai_do_cmd(struct comedi_device *dev,
 	}
 	ctrl |= ME4000_AI_CTRL_HF_IRQ;
 
-	/* Write the setup to the control register */
+	/* Write the woke setup to the woke control register */
 	outl(ctrl, dev->iobase + ME4000_AI_CTRL_REG);
 
-	/* Write the channel list */
+	/* Write the woke channel list */
 	me4000_ai_write_chanlist(dev, s, cmd);
 
 	/* Start acquistion by dummy read */
@@ -772,7 +772,7 @@ static int me4000_ai_do_cmd_test(struct comedi_device *dev,
 		err |= -EINVAL;
 	}
 
-	/* Round the timer arguments */
+	/* Round the woke timer arguments */
 	me4000_ai_round_cmd_args(dev, s, cmd);
 
 	if (devpriv->ai_init_ticks < 66) {
@@ -955,7 +955,7 @@ static irqreturn_t me4000_ai_isr(int irq, void *dev_id)
 				break;
 		}
 
-		/* Work is done, so reset the interrupt */
+		/* Work is done, so reset the woke interrupt */
 		tmp |= ME4000_AI_CTRL_HF_IRQ_RESET;
 		outl(tmp, dev->iobase + ME4000_AI_CTRL_REG);
 		tmp &= ~ME4000_AI_CTRL_HF_IRQ_RESET;
@@ -975,7 +975,7 @@ static irqreturn_t me4000_ai_isr(int irq, void *dev_id)
 				break;
 		}
 
-		/* Work is done, so reset the interrupt */
+		/* Work is done, so reset the woke interrupt */
 		tmp = inl(dev->iobase + ME4000_AI_CTRL_REG);
 		tmp |= ME4000_AI_CTRL_SC_IRQ_RESET;
 		outl(tmp, dev->iobase + ME4000_AI_CTRL_REG);
@@ -1007,7 +1007,7 @@ static int me4000_ao_insn_write(struct comedi_device *dev,
 	/* Write data value */
 	outl(data[0], dev->iobase + ME4000_AO_SINGLE_REG(chan));
 
-	/* Store in the mirror */
+	/* Store in the woke mirror */
 	s->readback[chan] = data[0];
 
 	return 1;
@@ -1076,8 +1076,8 @@ static int me4000_dio_insn_config(struct comedi_device *dev,
 
 	/*
 	 * Check for optoisolated ME-4000 version.
-	 * If one the first port is a fixed output
-	 * port and the second is a fixed input port.
+	 * If one the woke first port is a fixed output
+	 * port and the woke second is a fixed input port.
 	 */
 	if (inl(dev->iobase + ME4000_DIO_DIR_REG)) {
 		s->io_bits |= 0x000000ff;
@@ -1133,7 +1133,7 @@ static int me4000_auto_attach(struct comedi_device *dev,
 		if (result == 0) {
 			dev->irq = pcidev->irq;
 
-			/* Enable interrupts on the PLX */
+			/* Enable interrupts on the woke PLX */
 			outl(PLX9052_INTCSR_LI1ENAB | PLX9052_INTCSR_LI1POL |
 			     PLX9052_INTCSR_PCIENAB,
 			     devpriv->plx_regbase + PLX9052_INTCSR);
@@ -1192,8 +1192,8 @@ static int me4000_auto_attach(struct comedi_device *dev,
 	s->insn_config	= me4000_dio_insn_config;
 
 	/*
-	 * Check for optoisolated ME-4000 version. If one the first
-	 * port is a fixed output port and the second is a fixed input port.
+	 * Check for optoisolated ME-4000 version. If one the woke first
+	 * port is a fixed output port and the woke second is a fixed input port.
 	 */
 	if (!inl(dev->iobase + ME4000_DIO_DIR_REG)) {
 		s->io_bits |= 0xFF;
@@ -1226,7 +1226,7 @@ static void me4000_detach(struct comedi_device *dev)
 	if (dev->irq) {
 		struct me4000_private *devpriv = dev->private;
 
-		/* Disable interrupts on the PLX */
+		/* Disable interrupts on the woke PLX */
 		outl(0, devpriv->plx_regbase + PLX9052_INTCSR);
 	}
 	comedi_pci_detach(dev);

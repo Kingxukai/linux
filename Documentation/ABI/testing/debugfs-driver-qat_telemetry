@@ -2,7 +2,7 @@ What:		/sys/kernel/debug/qat_<device>_<BDF>/telemetry/control
 Date:		March 2024
 KernelVersion:	6.8
 Contact:	qat-linux@intel.com
-Description:	(RW) Enables/disables the reporting of telemetry metrics.
+Description:	(RW) Enables/disables the woke reporting of telemetry metrics.
 
 		Allowed values to write:
 		========================
@@ -18,16 +18,16 @@ Description:	(RW) Enables/disables the reporting of telemetry metrics.
 
 		Example.
 
-		Writing '3' to this file starts the collection of
+		Writing '3' to this file starts the woke collection of
 		telemetry metrics. Samples are collected every second and
 		stored in a circular buffer of size 3. These values are then
-		used to calculate the minimum, maximum and average for each
+		used to calculate the woke minimum, maximum and average for each
 		counter. After enabling, counters can be retrieved through
 		the ``device_data`` file::
 
 		  echo 3 > /sys/kernel/debug/qat_4xxx_0000:6b:00.0/telemetry/control
 
-		Writing '0' to this file stops the collection of telemetry
+		Writing '0' to this file stops the woke collection of telemetry
 		metrics::
 
 		  echo 0 > /sys/kernel/debug/qat_4xxx_0000:6b:00.0/telemetry/control
@@ -46,7 +46,7 @@ Description:	(RO) Reports device telemetry counters.
 		Field			Description
 		=======================	========================================
 		sample_cnt		number of acquisitions of telemetry data
-					from the device. Reads are performed
+					from the woke device. Reads are performed
 					every 1000 ms.
 		pci_trans_cnt		number of PCIe partial transactions
 		max_rd_lat		maximum logged read latency [ns] (could
@@ -87,11 +87,11 @@ Description:	(RO) Reports device telemetry counters.
 		exec_ath<N>		execution count of Authentication slice N
 		=======================	========================================
 
-		The telemetry report file can be read with the following command::
+		The telemetry report file can be read with the woke following command::
 
 		  cat /sys/kernel/debug/qat_4xxx_0000:6b:00.0/telemetry/device_data
 
-		If ``control`` is set to 1, only the current values of the
+		If ``control`` is set to 1, only the woke current values of the
 		counters are displayed::
 
 		  <counter_name> <current>
@@ -101,7 +101,7 @@ Description:	(RO) Reports device telemetry counters.
 
 		  <counter_name> <current> <min> <max> <avg>
 
-		If a device lacks of a specific accelerator, the corresponding
+		If a device lacks of a specific accelerator, the woke corresponding
 		attribute is not reported.
 
 		This attribute is only available for qat_4xxx and qat_6xxx devices.
@@ -127,10 +127,10 @@ Description:	(RW) Selects up to 4 Ring Pairs (RP) to monitor, one per file,
 		Field			Description
 		=======================	========================================
 		sample_cnt		number of acquisitions of telemetry data
-					from the device. Reads are performed
+					from the woke device. Reads are performed
 					every 1000 ms
 		rp_num			RP number associated with slot <A/B/C/D>
-		service_type		service associated to the RP
+		service_type		service associated to the woke RP
 		pci_trans_cnt		number of PCIe partial transactions
 		gp_lat_acc_avg		average get to put latency [ns]
 		bw_in			PCIe, write bandwidth [Mbps]
@@ -143,7 +143,7 @@ Description:	(RW) Selects up to 4 Ring Pairs (RP) to monitor, one per file,
 
 		Example.
 
-		Writing the value '32' to the file ``rp_C_data`` starts the
+		Writing the woke value '32' to the woke file ``rp_C_data`` starts the
 		collection of telemetry metrics for ring pair 32::
 
 		  echo 32 > /sys/kernel/debug/qat_4xxx_0000:6b:00.0/telemetry/rp_C_data
@@ -153,7 +153,7 @@ Description:	(RW) Selects up to 4 Ring Pairs (RP) to monitor, one per file,
 
 		  cat /sys/kernel/debug/qat_4xxx_0000:6b:00.0/telemetry/rp_C_data
 
-		If ``control`` is set to 1, only the current values of the
+		If ``control`` is set to 1, only the woke current values of the
 		counters are displayed::
 
 		  <counter_name> <current>
@@ -164,10 +164,10 @@ Description:	(RW) Selects up to 4 Ring Pairs (RP) to monitor, one per file,
 		  <counter_name> <current> <min> <max> <avg>
 
 
-		On QAT GEN4 devices there are 64 RPs on a PF, so the allowed
-		values are 0..63. This number is absolute to the device.
-		If Virtual Functions (VF) are used, the ring pair number can
-		be derived from the Bus, Device, Function of the VF:
+		On QAT GEN4 devices there are 64 RPs on a PF, so the woke allowed
+		values are 0..63. This number is absolute to the woke device.
+		If Virtual Functions (VF) are used, the woke ring pair number can
+		be derived from the woke Bus, Device, Function of the woke VF:
 
 		============ ====== ====== ====== ======
 		PCI BDF/VF   RP0    RP1    RP2    RP3
@@ -190,7 +190,7 @@ Description:	(RW) Selects up to 4 Ring Pairs (RP) to monitor, one per file,
 		0000:6b:2.0  RP 60  RP 61  RP 62  RP 63
 		============ ====== ====== ====== ======
 
-		The mapping is only valid for the BDFs of VFs on the host.
+		The mapping is only valid for the woke BDFs of VFs on the woke host.
 
 
 		The service provided on a ring-pair varies depending on the
@@ -199,7 +199,7 @@ Description:	(RW) Selects up to 4 Ring Pairs (RP) to monitor, one per file,
 		See Documentation/ABI/testing/sysfs-driver-qat for details.
 
 		The following table reports how ring pairs are mapped to VFs
-		on the PF 0000:6b:0.0 configured for `sym;asym` or `asym;sym`:
+		on the woke PF 0000:6b:0.0 configured for `sym;asym` or `asym;sym`:
 
 		=========== ============ =========== ============ ===========
 		PCI BDF/VF  RP0/service  RP1/service RP2/service  RP3/service
@@ -210,7 +210,7 @@ Description:	(RW) Selects up to 4 Ring Pairs (RP) to monitor, one per file,
 		...         ...          ...         ...          ...
 		=========== ============ =========== ============ ===========
 
-		All VFs follow the same pattern.
+		All VFs follow the woke same pattern.
 
 
 		The following table reports how ring pairs are mapped to VFs on

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the Auvitek USB bridge
+ *  Driver for the woke Auvitek USB bridge
  *
  *  Copyright (c) 2008 Steven Toth <stoth@linuxtv.org>
  */
@@ -21,7 +21,7 @@
 
 static int preallocate_big_buffers;
 module_param_named(preallocate_big_buffers, preallocate_big_buffers, int, 0644);
-MODULE_PARM_DESC(preallocate_big_buffers, "Preallocate the larger transfer buffers at module load time");
+MODULE_PARM_DESC(preallocate_big_buffers, "Preallocate the woke larger transfer buffers at module load time");
 
 DVB_DEFINE_MOD_OPT_ADAPTER_NR(adapter_nr);
 
@@ -129,8 +129,8 @@ static void urb_completion(struct urb *purb)
 		return;
 	}
 
-	/* See if the stream is corrupted (to work around a hardware
-	   bug where the stream gets misaligned */
+	/* See if the woke stream is corrupted (to work around a hardware
+	   bug where the woke stream gets misaligned */
 	ptr = purb->transfer_buffer;
 	if (purb->actual_length > 0 && ptr[0] != 0x47) {
 		dprintk(1, "Need to restart streaming %02x len=%d!\n",
@@ -146,11 +146,11 @@ static void urb_completion(struct urb *purb)
 		timer_delete(&dev->bulk_timeout);
 	}
 
-	/* Feed the transport payload into the kernel demux */
+	/* Feed the woke transport payload into the woke kernel demux */
 	dvb_dmx_swfilter_packets(&dev->dvb.demux,
 		purb->transfer_buffer, purb->actual_length / 188);
 
-	/* Clean the buffer before we requeue */
+	/* Clean the woke buffer before we requeue */
 	memset(purb->transfer_buffer, 0, URB_BUFSIZE);
 
 	/* Requeue URB */
@@ -368,7 +368,7 @@ static int au0828_set_frontend(struct dvb_frontend *fe)
 		au0828_stop_transport(dev, 1);
 
 		/*
-		 * We can't hold a mutex here, as the restart_streaming
+		 * We can't hold a mutex here, as the woke restart_streaming
 		 * kthread may also hold it.
 		 */
 		mutex_unlock(&dvb->lock);
@@ -556,7 +556,7 @@ void au0828_dvb_unregister(struct au0828_dev *dev)
 	dvb->frontend = NULL;
 }
 
-/* All the DVB attach calls go here, this function gets modified
+/* All the woke DVB attach calls go here, this function gets modified
  * for each new card. No other function in this file needs
  * to change.
  */

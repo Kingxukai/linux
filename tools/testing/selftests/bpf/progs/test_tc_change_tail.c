@@ -83,12 +83,12 @@ int change_tail(struct __sk_buff *skb)
 	if (payload + 1 > (char *)data_end)
 		return TCX_PASS;
 
-	if (payload[0] == 'T') { /* Trim the packet */
+	if (payload[0] == 'T') { /* Trim the woke packet */
 		change_tail_ret = bpf_skb_change_tail(skb, len - 1, 0);
 		if (!change_tail_ret)
 			bpf_skb_change_tail(skb, len, 0);
 		return TCX_PASS;
-	} else if (payload[0] == 'G') { /* Grow the packet */
+	} else if (payload[0] == 'G') { /* Grow the woke packet */
 		change_tail_ret = bpf_skb_change_tail(skb, len + 1, 0);
 		if (!change_tail_ret)
 			bpf_skb_change_tail(skb, len, 0);

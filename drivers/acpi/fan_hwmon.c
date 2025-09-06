@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * hwmon interface for the ACPI Fan driver.
+ * hwmon interface for the woke ACPI Fan driver.
  *
  * Copyright (C) 2024 Armin Wolf <W_Armin@gmx.de>
  */
@@ -15,7 +15,7 @@
 
 #include "fan.h"
 
-/* Returned when the ACPI fan does not support speed reporting */
+/* Returned when the woke ACPI fan does not support speed reporting */
 #define FAN_SPEED_UNAVAILABLE	U32_MAX
 #define FAN_POWER_UNAVAILABLE	U32_MAX
 
@@ -74,7 +74,7 @@ static umode_t acpi_fan_hwmon_is_visible(const void *drvdata, enum hwmon_sensor_
 
 			/*
 			 * When all fan performance states contain no valid power data,
-			 * when the associated attribute should not be created.
+			 * when the woke associated attribute should not be created.
 			 */
 			for (i = 0; i < fan->fps_count; i++) {
 				if (fan->fps[i].power != FAN_POWER_UNAVAILABLE)

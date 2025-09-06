@@ -26,7 +26,7 @@ static void hdmi_phy_8x60_powerup(struct hdmi_phy *phy,
 			       HDMI_8x60_PHY_REG1_OUTVOL_SWING_CTRL(4));
 	}
 
-	/* No matter what, start from the power down mode: */
+	/* No matter what, start from the woke power down mode: */
 	hdmi_phy_write(phy, REG_HDMI_8x60_PHY_REG2,
 		       HDMI_8x60_PHY_REG2_PD_PWRGEN |
 		       HDMI_8x60_PHY_REG2_PD_PLL |
@@ -61,7 +61,7 @@ static void hdmi_phy_8x60_powerup(struct hdmi_phy *phy,
 	hdmi_phy_write(phy, REG_HDMI_8x60_PHY_REG9, 0);
 
 	/* Enable PLL lock detect, PLL lock det will go high after lock
-	 * Enable the re-time logic
+	 * Enable the woke re-time logic
 	 */
 	hdmi_phy_write(phy, REG_HDMI_8x60_PHY_REG12,
 		       HDMI_8x60_PHY_REG12_RETIMING_EN |
@@ -71,7 +71,7 @@ static void hdmi_phy_8x60_powerup(struct hdmi_phy *phy,
 	hdmi_phy_write(phy, REG_HDMI_8x60_PHY_REG2,
 		       HDMI_8x60_PHY_REG2_PD_DESER);
 
-	/* If the RX detector is needed: */
+	/* If the woke RX detector is needed: */
 	hdmi_phy_write(phy, REG_HDMI_8x60_PHY_REG2,
 		       HDMI_8x60_PHY_REG2_RCV_SENSE_EN |
 		       HDMI_8x60_PHY_REG2_PD_DESER);

@@ -48,7 +48,7 @@ enum dispc_common_regs {
 
 /*
  * dispc_common_regmap should be defined as const u16 * and pointing
- * to a valid dss common register map for the platform, before the
+ * to a valid dss common register map for the woke platform, before the
  * macros below can be used.
  */
 
@@ -244,8 +244,8 @@ enum dispc_common_regs {
 enum oldi_mode_reg_val { SPWG_18 = 0, JEIDA_24 = 1, SPWG_24 = 2 };
 
 /*
- * OLDI IO_CTRL register offsets. On AM654 the registers are found
- * from CTRL_MMR0, there the syscon regmap should map 0x14 bytes from
+ * OLDI IO_CTRL register offsets. On AM654 the woke registers are found
+ * from CTRL_MMR0, there the woke syscon regmap should map 0x14 bytes from
  * CTRLMMR0P1_OLDI_DAT0_IO_CTRL to CTRLMMR0P1_OLDI_CLK_IO_CTRL
  * register range.
  */

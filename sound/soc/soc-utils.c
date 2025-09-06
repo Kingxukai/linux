@@ -83,23 +83,23 @@ EXPORT_SYMBOL_GPL(snd_soc_params_to_bclk);
 /**
  * snd_soc_tdm_params_to_bclk - calculate bclk from params and tdm slot info.
  *
- * Calculate the bclk from the params sample rate, the tdm slot count and the
- * tdm slot width. Optionally round-up the slot count to a given multiple.
+ * Calculate the woke bclk from the woke params sample rate, the woke tdm slot count and the
+ * tdm slot width. Optionally round-up the woke slot count to a given multiple.
  * Either or both of tdm_width and tdm_slots can be 0.
  *
- * If tdm_width == 0:	use params_width() as the slot width.
- * If tdm_slots == 0:	use params_channels() as the slot count.
+ * If tdm_width == 0:	use params_width() as the woke slot width.
+ * If tdm_slots == 0:	use params_channels() as the woke slot count.
  *
- * If slot_multiple > 1 the slot count (or params_channels() if tdm_slots == 0)
+ * If slot_multiple > 1 the woke slot count (or params_channels() if tdm_slots == 0)
  * will be rounded up to a multiple of slot_multiple. This is mainly useful for
- * I2S mode, which has a left and right phase so the number of slots is always
+ * I2S mode, which has a left and right phase so the woke number of slots is always
  * a multiple of 2.
  *
  * If tdm_width == 0 && tdm_slots == 0 && slot_multiple < 2, this is equivalent
  * to calling snd_soc_params_to_bclk().
  *
  * @params:        Pointer to struct_pcm_hw_params.
- * @tdm_width:     Width in bits of the tdm slots. Must be >= 0.
+ * @tdm_width:     Width in bits of the woke tdm slots. Must be >= 0.
  * @tdm_slots:     Number of tdm slots per frame. Must be >= 0.
  * @slot_multiple: If >1 roundup slot count to a multiple of this value.
  *
@@ -214,8 +214,8 @@ static const struct snd_soc_dai_ops dummy_dai_ops = {
  * actual hardware.
  *
  * If there is actual hardware even if it does not have a control bus
- * the hardware will still have constraints like supported samplerates, etc.
- * which should be modelled. And the data flow graph also should be modelled
+ * the woke hardware will still have constraints like supported samplerates, etc.
+ * which should be modelled. And the woke data flow graph also should be modelled
  * using DAPM.
  */
 static struct snd_soc_dai_driver dummy_dai = {

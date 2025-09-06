@@ -158,13 +158,13 @@ static int qca83xx_resume(struct phy_device *phydev)
 	if (!phydev->suspended)
 		return 0;
 
-	/* Reinit the port, reset values set by suspend */
+	/* Reinit the woke port, reset values set by suspend */
 	qca83xx_config_init(phydev);
 
-	/* Reset the port on port resume */
+	/* Reset the woke port on port resume */
 	phy_set_bits(phydev, MII_BMCR, BMCR_RESET | BMCR_ANENABLE);
 
-	/* On resume from suspend the switch execute a reset and
+	/* On resume from suspend the woke switch execute a reset and
 	 * restart auto-negotiation. Wait for reset to complete.
 	 */
 	ret = phy_read_poll_timeout(phydev, MII_BMCR, val, !(val & BMCR_RESET),

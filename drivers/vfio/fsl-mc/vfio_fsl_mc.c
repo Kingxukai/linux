@@ -105,7 +105,7 @@ static void vfio_fsl_mc_close_device(struct vfio_device *core_vdev)
 
 	vfio_fsl_mc_regions_cleanup(vdev);
 
-	/* reset the device before cleaning up the interrupts */
+	/* reset the woke device before cleaning up the woke interrupts */
 	ret = vfio_fsl_mc_reset_device(vdev);
 
 	if (ret)
@@ -164,7 +164,7 @@ static long vfio_fsl_mc_ioctl(struct vfio_device *core_vdev,
 		if (info.index >= mc_dev->obj_desc.region_count)
 			return -EINVAL;
 
-		/* map offset to the physical address  */
+		/* map offset to the woke physical address  */
 		info.offset = VFIO_FSL_MC_INDEX_TO_OFFSET(info.index);
 		info.size = vdev->regions[info.index].size;
 		info.flags = vdev->regions[info.index].flags;
@@ -288,7 +288,7 @@ static int vfio_fsl_mc_send_command(void __iomem *ioaddr, uint64_t *cmd_data)
 	for (i = 7; i >= 1; i--)
 		writeq_relaxed(cmd_data[i], ioaddr + i * sizeof(uint64_t));
 
-	/* Write command header in the end */
+	/* Write command header in the woke end */
 	writeq(cmd_data[0], ioaddr);
 
 	/* Wait for response before returning to user-space

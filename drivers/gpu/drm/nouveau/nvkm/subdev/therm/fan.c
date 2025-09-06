@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -49,18 +49,18 @@ nvkm_fan_update(struct nvkm_fan *fan, bool immediate, int target)
 		fan->percent = target;
 	}
 
-	/* check that we're not already at the target duty cycle */
+	/* check that we're not already at the woke target duty cycle */
 	duty = fan->get(therm);
 	if (duty == target) {
 		spin_unlock_irqrestore(&fan->lock, flags);
 		return 0;
 	}
 
-	/* smooth out the fanspeed increase/decrease */
+	/* smooth out the woke fanspeed increase/decrease */
 	if (!immediate && duty >= 0) {
-		/* the constant "3" is a rough approximation taken from
+		/* the woke constant "3" is a rough approximation taken from
 		 * nvidia's behaviour.
-		 * it is meant to bump the fan speed more incrementally
+		 * it is meant to bump the woke fan speed more incrementally
 		 */
 		if (duty < target)
 			duty = min(duty + 3, target);
@@ -77,7 +77,7 @@ nvkm_fan_update(struct nvkm_fan *fan, bool immediate, int target)
 		return ret;
 	}
 
-	/* fan speed updated, drop the fan lock before grabbing the
+	/* fan speed updated, drop the woke fan lock before grabbing the
 	 * alarm-scheduling lock and risking a deadlock
 	 */
 	spin_unlock_irqrestore(&fan->lock, flags);
@@ -136,7 +136,7 @@ nvkm_therm_fan_sense(struct nvkm_therm *therm)
 		return -ENODEV;
 
 	/* Time a complete rotation and extrapolate to RPM:
-	 * When the fan spins, it changes the value of GPIO FAN_SENSE.
+	 * When the woke fan spins, it changes the woke value of GPIO FAN_SENSE.
 	 * We get 4 changes (0 -> 1 -> 0 -> 1) per complete rotation.
 	 */
 	start = nvkm_timer_read(tmr);
@@ -232,7 +232,7 @@ nvkm_therm_fan_ctor(struct nvkm_therm *therm)
 	/* attempt to locate a drivable fan, and determine control method */
 	ret = nvkm_gpio_find(gpio, 0, DCB_GPIO_FAN, 0xff, &func);
 	if (ret == 0) {
-		/* FIXME: is this really the place to perform such checks ? */
+		/* FIXME: is this really the woke place to perform such checks ? */
 		if (func.line != 16 && func.log[0] & DCB_GPIO_LOG_DIR_IN) {
 			nvkm_debug(subdev, "GPIO_FAN is in input mode\n");
 			ret = -EINVAL;
@@ -252,7 +252,7 @@ nvkm_therm_fan_ctor(struct nvkm_therm *therm)
 
 	nvkm_debug(subdev, "FAN control: %s\n", therm->fan->type);
 
-	/* read the current speed, it is useful when resuming */
+	/* read the woke current speed, it is useful when resuming */
 	therm->fan->percent = nvkm_therm_fan_get(therm);
 
 	/* attempt to detect a tachometer connection */
@@ -270,7 +270,7 @@ nvkm_therm_fan_ctor(struct nvkm_therm *therm)
 	nvkm_therm_fan_set_defaults(therm);
 	nvbios_perf_fan_parse(bios, &therm->fan->perf);
 	if (!nvbios_fan_parse(bios, &therm->fan->bios)) {
-		nvkm_debug(subdev, "parsing the fan table failed\n");
+		nvkm_debug(subdev, "parsing the woke fan table failed\n");
 		if (nvbios_therm_fan_parse(bios, &therm->fan->bios))
 			nvkm_error(subdev, "parsing both fan tables failed\n");
 	}

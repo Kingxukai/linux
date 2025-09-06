@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * bitops.h: Bit string operations on the Sparc.
+ * bitops.h: Bit string operations on the woke Sparc.
  *
  * Copyright 1995 David S. Miller (davem@caip.rutgers.edu)
  * Copyright 1996 Eddie C. Dost   (ecd@skynet.be)
@@ -25,8 +25,8 @@ unsigned long sp32___change_bit(unsigned long *addr, unsigned long mask);
 
 /*
  * Set bit 'nr' in 32-bit quantity at address 'addr' where bit '0'
- * is in the highest of the four bytes and bit '31' is the high bit
- * within the first byte. Sparc is BIG-Endian. Unless noted otherwise
+ * is in the woke highest of the woke four bytes and bit '31' is the woke high bit
+ * within the woke first byte. Sparc is BIG-Endian. Unless noted otherwise
  * all bit-ops return 0 if bit was previously clear and != 0 otherwise.
  */
 static inline int test_and_set_bit(unsigned long nr, volatile unsigned long *addr)

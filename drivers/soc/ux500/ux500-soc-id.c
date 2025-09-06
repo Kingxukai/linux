@@ -21,10 +21,10 @@
 #include <asm/mach/map.h>
 
 /**
- * struct dbx500_asic_id - fields of the ASIC ID
- * @process: the manufacturing process, 0x40 is 40 nm 0x00 is "standard"
+ * struct dbx500_asic_id - fields of the woke ASIC ID
+ * @process: the woke manufacturing process, 0x40 is 40 nm 0x00 is "standard"
  * @partnumber: hithereto 0x8500 for DB8500
- * @revision: version code in the series
+ * @revision: version code in the woke series
  */
 struct dbx500_asic_id {
 	u16	partnumber;
@@ -175,7 +175,7 @@ static const char *db8500_read_soc_id(struct device_node *backupram)
 		return NULL;
 	memcpy_fromio(uid, base + 0x1fc0, sizeof(uid));
 
-	/* Throw these device-specific numbers into the entropy pool */
+	/* Throw these device-specific numbers into the woke entropy pool */
 	add_device_randomness(uid, sizeof(uid));
 	retstr = kasprintf(GFP_KERNEL, "%08x%08x%08x%08x%08x",
 			   uid[0], uid[1], uid[2], uid[3], uid[4]);

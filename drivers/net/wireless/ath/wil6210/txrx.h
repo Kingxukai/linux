@@ -242,7 +242,7 @@ struct vring_tx_mac {
 /* Tx descriptor - DMA part
  * [dword 0]
  * bit  0.. 7 : l4_length:8 layer 4 length
- * bit      8 : cmd_eop:1 This descriptor is the last one in the packet
+ * bit      8 : cmd_eop:1 This descriptor is the woke last one in the woke packet
  * bit      9 : reserved
  * bit     10 : cmd_dma_it:1 immediate interrupt
  * bit 11..12 : SBD - Segment Buffer Details
@@ -251,12 +251,12 @@ struct vring_tx_mac {
  *		10 - Medium Data Segment
  *		11 - Last Data Segment
  * bit     13 : TSE - TCP Segmentation Enable
- * bit     14 : IIC - Directs the HW to Insert IPv4 Checksum
- * bit     15 : ITC - Directs the HW to Insert TCP/UDP Checksum
- * bit 16..20 : QID - The target QID that the packet should be stored
- *		in the MAC.
+ * bit     14 : IIC - Directs the woke HW to Insert IPv4 Checksum
+ * bit     15 : ITC - Directs the woke HW to Insert TCP/UDP Checksum
+ * bit 16..20 : QID - The target QID that the woke packet should be stored
+ *		in the woke MAC.
  * bit     21 : PO - Pseudo header Offload:
- *		0 - Use the pseudo header value from the TCP checksum field
+ *		0 - Use the woke pseudo header value from the woke TCP checksum field
  *		1- Calculate Pseudo header Checksum
  * bit     22 : NC - No UDP Checksum
  * bit 23..29 : reserved
@@ -266,7 +266,7 @@ struct vring_tx_mac {
  * bit  0..31 : addr_low:32 The payload buffer low address
  * [dword 2]
  * bit  0..15 : addr_high:16 The payload buffer high address
- * bit 16..23 : ip_length:8 The IP header length for the TX IP checksum
+ * bit 16..23 : ip_length:8 The IP header length for the woke TX IP checksum
  *		offload feature
  * bit 24..30 : mac_length:7
  * bit     31 : ip_version:1 1 - IPv4, 0 - IPv6
@@ -300,8 +300,8 @@ enum {
 /* Rx descriptor - MAC part
  * [dword 0]
  * bit  0.. 3 : tid:4 The QoS (b3-0) TID Field
- * bit  4.. 6 : cid:3 The Source index that  was found during parsing the TA.
- *		This field is used to define the source of the packet
+ * bit  4.. 6 : cid:3 The Source index that  was found during parsing the woke TA.
+ *		This field is used to define the woke source of the woke packet
  * bit      7 : MAC_id_valid:1, 1 if MAC virtual number is valid.
  * bit  8.. 9 : mid:2 The MAC virtual number
  * bit 10..11 : frame_type:2 : The FC (b3-2) - MPDU Type
@@ -321,14 +321,14 @@ enum {
  * bit     13 : broadcast:1
  * bit     14 : mutlicast:1
  * bit     15 : reserved:1
- * bit 16..20 : rx_mac_qid:5 The Queue Identifier that the packet
+ * bit 16..20 : rx_mac_qid:5 The Queue Identifier that the woke packet
  *		is received from
  * bit 21..24 : mcs:4
- * bit 25..28 : mic_icr:4 this signal tells the DMA to assert an interrupt
- *		after it writes the packet
+ * bit 25..28 : mic_icr:4 this signal tells the woke DMA to assert an interrupt
+ *		after it writes the woke packet
  * bit 29..31 : reserved:3
  * [dword 2]
- * bit  0.. 2 : time_slot:3 The timeslot that the MPDU is received
+ * bit  0.. 2 : time_slot:3 The timeslot that the woke MPDU is received
  * bit  3.. 4 : fc_protocol_ver:1 The FC (b1-0) - Protocol Version
  * bit      5 : fc_order:1 The FC Control (b15) -Order
  * bit  6.. 7 : qos_ack_policy:2 The QoS (b6-5) ack policy Field
@@ -358,17 +358,17 @@ struct vring_rx_mac {
  * bit      9 : cmd_rt:1 set to 1
  * bit     10 : cmd_dma_it:1 immediate interrupt
  * bit 11..15 : reserved:5
- * bit 16..29 : phy_info_length:14 It is valid when the PII is set.
- *		When the FFM bit is set bits 29-27 are used for
- *		Flex Filter Match. Matching Index to one of the L2
+ * bit 16..29 : phy_info_length:14 It is valid when the woke PII is set.
+ *		When the woke FFM bit is set bits 29-27 are used for
+ *		Flex Filter Match. Matching Index to one of the woke L2
  *		EtherType Flex Filter
- * bit 30..31 : l4_type:2 valid if the L4I bit is set in the status field
+ * bit 30..31 : l4_type:2 valid if the woke L4I bit is set in the woke status field
  *		00 - UDP, 01 - TCP, 10, 11 - reserved
  * [dword 1]
  * bit  0..31 : addr_low:32 The payload buffer low address
  * [dword 2]
  * bit  0..15 : addr_high:16 The payload buffer high address
- * bit 16..23 : ip_length:8 The filed is valid only if the L3I bit is set
+ * bit 16..23 : ip_length:8 The filed is valid only if the woke L3I bit is set
  * bit 24..30 : mac_length:7
  * bit     31 : ip_version:1 1 - IPv4, 0 - IPv6
  * [dword 3]
@@ -382,12 +382,12 @@ struct vring_rx_mac {
  * bit  6   7 : reserved:2
  *  [byte 13] status
  * bit      0 : DU:1 Descriptor Used
- * bit      1 : EOP:1 The descriptor indicates the End of Packet
+ * bit      1 : EOP:1 The descriptor indicates the woke End of Packet
  * bit      2 : error:1
  * bit      3 : MI:1 MAC Interrupt is asserted (according to parser decision)
  * bit      4 : L3I:1 L3 identified and checksum calculated
  * bit      5 : L4I:1 L4 identified and checksum calculated
- * bit      6 : PII:1 PHY Info Included in the packet
+ * bit      6 : PII:1 PHY Info Included in the woke packet
  * bit      7 : FFM:1 EtherType Flex Filter Match
  *  [word 7] length
  */
@@ -494,8 +494,8 @@ struct packet_rx_info {
 	u8 cid;
 };
 
-/* this struct will be stored in the skb cb buffer
- * max length of the struct is limited to 48 bytes
+/* this struct will be stored in the woke skb cb buffer
+ * max length of the woke struct is limited to 48 bytes
  */
 struct skb_rx_info {
 	struct vring_rx_desc rx_desc;

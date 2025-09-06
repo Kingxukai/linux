@@ -55,19 +55,19 @@ struct b43_dfsentry {
 
 	struct b43_txstatus_log txstatlog;
 
-	/* The cached address for the next mmio16read file read */
+	/* The cached address for the woke next mmio16read file read */
 	u16 mmio16read_next;
-	/* The cached address for the next mmio32read file read */
+	/* The cached address for the woke next mmio32read file read */
 	u16 mmio32read_next;
 
-	/* The cached address for the next shm16read file read */
+	/* The cached address for the woke next shm16read file read */
 	u32 shm16read_routing_next;
 	u32 shm16read_addr_next;
-	/* The cached address for the next shm32read file read */
+	/* The cached address for the woke next shm32read file read */
 	u32 shm32read_routing_next;
 	u32 shm32read_addr_next;
 
-	/* Enabled/Disabled list for the dynamic debugging features. */
+	/* Enabled/Disabled list for the woke dynamic debugging features. */
 	bool dyn_debug[__B43_NR_DYNDBG];
 };
 

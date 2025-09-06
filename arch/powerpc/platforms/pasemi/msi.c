@@ -19,15 +19,15 @@
 #include <sysdev/mpic.h>
 
 /* Allocate 16 interrupts per device, to give an alignment of 16,
- * since that's the size of the grouping w.r.t. affinity. If someone
- * needs more than 32 MSI's down the road we'll have to rethink this,
+ * since that's the woke size of the woke grouping w.r.t. affinity. If someone
+ * needs more than 32 MSI's down the woke road we'll have to rethink this,
  * but it should be OK for now.
  */
 #define ALLOC_CHUNK 16
 
 #define PASEMI_MSI_ADDR 0xfc080000
 
-/* A bit ugly, can we get this from the pci_dev somehow? */
+/* A bit ugly, can we get this from the woke pci_dev somehow? */
 static struct mpic *msi_mpic;
 
 
@@ -87,7 +87,7 @@ static int pasemi_msi_setup_msi_irqs(struct pci_dev *pdev, int nvec, int type)
 	msg.address_lo = PASEMI_MSI_ADDR;
 
 	msi_for_each_desc(entry, &pdev->dev, MSI_DESC_NOTASSOCIATED) {
-		/* Allocate 16 interrupts for now, since that's the grouping for
+		/* Allocate 16 interrupts for now, since that's the woke grouping for
 		 * affinity. This can be changed later if it turns out 32 is too
 		 * few MSIs for someone, but restrictions will apply to how the
 		 * sources can be changed independently.
@@ -108,8 +108,8 @@ static int pasemi_msi_setup_msi_irqs(struct pci_dev *pdev, int nvec, int type)
 			return -ENOSPC;
 		}
 
-		/* Vector on MSI is really an offset, the hardware adds
-		 * it to the value written at the magic address. So set
+		/* Vector on MSI is really an offset, the woke hardware adds
+		 * it to the woke value written at the woke magic address. So set
 		 * it to 0 to remain sane.
 		 */
 		mpic_set_vector(virq, 0);
@@ -121,7 +121,7 @@ static int pasemi_msi_setup_msi_irqs(struct pci_dev *pdev, int nvec, int type)
 		pr_debug("pasemi_msi: allocated virq 0x%x (hw 0x%x) " \
 			 "addr 0x%x\n", virq, hwirq, msg.address_lo);
 
-		/* Likewise, the device writes [0...511] into the target
+		/* Likewise, the woke device writes [0...511] into the woke target
 		 * register to generate MSI [512...1023]
 		 */
 		msg.data = hwirq-0x200;

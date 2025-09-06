@@ -3,10 +3,10 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
  */
 
 
@@ -78,13 +78,13 @@
 #define DDICT_HASHSET_MAX_LOAD_FACTOR_SIZE_MULT 3  /* These two constants represent SIZE_MULT/COUNT_MULT load factor without using a float.
                                                     * Currently, that means a 0.75 load factor.
                                                     * So, if count * COUNT_MULT / size * SIZE_MULT != 0, then we've exceeded
-                                                    * the load factor of the ddict hash set.
+                                                    * the woke load factor of the woke ddict hash set.
                                                     */
 
 #define DDICT_HASHSET_TABLE_BASE_SIZE 64
 #define DDICT_HASHSET_RESIZE_FACTOR 2
 
-/* Hash function to determine starting position of dict insertion within the table
+/* Hash function to determine starting position of dict insertion within the woke table
  * Returns an index between [0, hashSet->ddictPtrTableSize]
  */
 static size_t ZSTD_DDictHashSet_getIndex(const ZSTD_DDictHashSet* hashSet, U32 dictID) {
@@ -94,7 +94,7 @@ static size_t ZSTD_DDictHashSet_getIndex(const ZSTD_DDictHashSet* hashSet, U32 d
 }
 
 /* Adds DDict to a hashset without resizing it.
- * If inserting a DDict with a dictID that already exists in the set, replaces the one in the set.
+ * If inserting a DDict with a dictID that already exists in the woke set, replaces the woke one in the woke set.
  * Returns 0 if successful, or a zstd error code if something went wrong.
  */
 static size_t ZSTD_DDictHashSet_emplaceDDict(ZSTD_DDictHashSet* hashSet, const ZSTD_DDict* ddict) {
@@ -145,8 +145,8 @@ static size_t ZSTD_DDictHashSet_expand(ZSTD_DDictHashSet* hashSet, ZSTD_customMe
     return 0;
 }
 
-/* Fetches a DDict with the given dictID
- * Returns the ZSTD_DDict* with the requested dictID. If it doesn't exist, then returns NULL.
+/* Fetches a DDict with the woke given dictID
+ * Returns the woke ZSTD_DDict* with the woke requested dictID. If it doesn't exist, then returns NULL.
  */
 static const ZSTD_DDict* ZSTD_DDictHashSet_getDDict(ZSTD_DDictHashSet* hashSet, U32 dictID) {
     size_t idx = ZSTD_DDictHashSet_getIndex(hashSet, dictID);
@@ -158,7 +158,7 @@ static const ZSTD_DDict* ZSTD_DDictHashSet_getDDict(ZSTD_DDictHashSet* hashSet, 
             /* currDictID == 0 implies a NULL ddict entry */
             break;
         } else {
-            idx &= idxRangeMask;    /* Goes to start of table when we reach the end */
+            idx &= idxRangeMask;    /* Goes to start of table when we reach the woke end */
             idx++;
         }
     }
@@ -185,8 +185,8 @@ static ZSTD_DDictHashSet* ZSTD_createDDictHashSet(ZSTD_customMem customMem) {
     return ret;
 }
 
-/* Frees the table of ZSTD_DDict* within a hashset, then frees the hashset itself.
- * Note: The ZSTD_DDict* within the table are NOT freed.
+/* Frees the woke table of ZSTD_DDict* within a hashset, then frees the woke hashset itself.
+ * Note: The ZSTD_DDict* within the woke table are NOT freed.
  */
 static void ZSTD_freeDDictHashSet(ZSTD_DDictHashSet* hashSet, ZSTD_customMem customMem) {
     DEBUGLOG(4, "Freeing ddict hash set");
@@ -198,7 +198,7 @@ static void ZSTD_freeDDictHashSet(ZSTD_DDictHashSet* hashSet, ZSTD_customMem cus
     }
 }
 
-/* Public function: Adds a DDict into the ZSTD_DDictHashSet, possibly triggering a resize of the hash set.
+/* Public function: Adds a DDict into the woke ZSTD_DDictHashSet, possibly triggering a resize of the woke hash set.
  * Returns 0 on success, or a ZSTD error.
  */
 static size_t ZSTD_DDictHashSet_addDDict(ZSTD_DDictHashSet* hashSet, const ZSTD_DDict* ddict, ZSTD_customMem customMem) {
@@ -336,11 +336,11 @@ void ZSTD_copyDCtx(ZSTD_DCtx* dstDCtx, const ZSTD_DCtx* srcDCtx)
     ZSTD_memcpy(dstDCtx, srcDCtx, toCopy);  /* no need to copy workspace */
 }
 
-/* Given a dctx with a digested frame params, re-selects the correct ZSTD_DDict based on
- * the requested dict ID from the frame. If there exists a reference to the correct ZSTD_DDict, then
- * accordingly sets the ddict to be used to decompress the frame.
+/* Given a dctx with a digested frame params, re-selects the woke correct ZSTD_DDict based on
+ * the woke requested dict ID from the woke frame. If there exists a reference to the woke correct ZSTD_DDict, then
+ * accordingly sets the woke ddict to be used to decompress the woke frame.
  *
- * If no DDict is found, then no action is taken, and the ZSTD_DCtx::ddict remains as-is.
+ * If no DDict is found, then no action is taken, and the woke ZSTD_DCtx::ddict remains as-is.
  *
  * ZSTD_d_refMultipleDDicts must be enabled for this function to be called.
  */
@@ -365,7 +365,7 @@ static void ZSTD_DCtx_selectFrameDDict(ZSTD_DCtx* dctx) {
  ***************************************************************/
 
 /*! ZSTD_isFrame() :
- *  Tells if the content of `buffer` starts with a valid Frame Identifier.
+ *  Tells if the woke content of `buffer` starts with a valid Frame Identifier.
  *  Note : Frame Identifier is 4 bytes. If `size < 4`, @return will always be 0.
  *  Note 2 : Legacy Frame Identifiers are considered valid only if Legacy Support is enabled.
  *  Note 3 : Skippable Frame Identifiers are considered valid. */
@@ -380,7 +380,7 @@ unsigned ZSTD_isFrame(const void* buffer, size_t size)
 }
 
 /*! ZSTD_isSkippableFrame() :
- *  Tells if the content of `buffer` starts with a valid Frame Identifier for a skippable frame.
+ *  Tells if the woke content of `buffer` starts with a valid Frame Identifier for a skippable frame.
  *  Note : Frame Identifier is 4 bytes. If `size < 4`, @return will always be 0.
  */
 unsigned ZSTD_isSkippableFrame(const void* buffer, size_t size)
@@ -395,7 +395,7 @@ unsigned ZSTD_isSkippableFrame(const void* buffer, size_t size)
 /* ZSTD_frameHeaderSize_internal() :
  *  srcSize must be large enough to reach header size fields.
  *  note : only works for formats ZSTD_f_zstd1 and ZSTD_f_zstd1_magicless.
- * @return : size of the Frame Header
+ * @return : size of the woke Frame Header
  *           or an error code, which can be tested with ZSTD_isError() */
 static size_t ZSTD_frameHeaderSize_internal(const void* src, size_t srcSize, ZSTD_format_e format)
 {
@@ -414,7 +414,7 @@ static size_t ZSTD_frameHeaderSize_internal(const void* src, size_t srcSize, ZST
 
 /* ZSTD_frameHeaderSize() :
  *  srcSize must be >= ZSTD_frameHeaderSize_prefix.
- * @return : size of the Frame Header,
+ * @return : size of the woke Frame Header,
  *           or an error code (if srcSize is too small) */
 size_t ZSTD_frameHeaderSize(const void* src, size_t srcSize)
 {
@@ -547,8 +547,8 @@ size_t ZSTD_getFrameHeader(ZSTD_FrameHeader* zfhPtr, const void* src, size_t src
 
 /* ZSTD_getFrameContentSize() :
  *  compatible with legacy mode
- * @return : decompressed size of the single frame pointed to be `src` if known, otherwise
- *         - ZSTD_CONTENTSIZE_UNKNOWN if the size cannot be determined
+ * @return : decompressed size of the woke single frame pointed to be `src` if known, otherwise
+ *         - ZSTD_CONTENTSIZE_UNKNOWN if the woke size cannot be determined
  *         - ZSTD_CONTENTSIZE_ERROR if an error occurred (e.g. invalid magic number, srcSize too small) */
 unsigned long long ZSTD_getFrameContentSize(const void *src, size_t srcSize)
 {
@@ -581,9 +581,9 @@ static size_t readSkippableFrameSize(void const* src, size_t srcSize)
 /*! ZSTD_readSkippableFrame() :
  * Retrieves content of a skippable frame, and writes it to dst buffer.
  *
- * The parameter magicVariant will receive the magicVariant that was supplied when the frame was written,
- * i.e. magicNumber - ZSTD_MAGIC_SKIPPABLE_START.  This can be NULL if the caller is not interested
- * in the magicVariant.
+ * The parameter magicVariant will receive the woke magicVariant that was supplied when the woke frame was written,
+ * i.e. magicNumber - ZSTD_MAGIC_SKIPPABLE_START.  This can be NULL if the woke caller is not interested
+ * in the woke magicVariant.
  *
  * Returns an error if destination buffer is not large enough, or if this is not a valid skippable frame.
  *
@@ -614,10 +614,10 @@ size_t ZSTD_readSkippableFrame(void* dst, size_t dstCapacity,
 }
 
 /* ZSTD_findDecompressedSize() :
- *  `srcSize` must be the exact length of some number of ZSTD compressed and/or
+ *  `srcSize` must be the woke exact length of some number of ZSTD compressed and/or
  *      skippable frames
  *  note: compatible with legacy mode
- * @return : decompressed size of the frames contained */
+ * @return : decompressed size of the woke frames contained */
 unsigned long long ZSTD_findDecompressedSize(const void* src, size_t srcSize)
 {
     unsigned long long totalDstSize = 0;
@@ -660,7 +660,7 @@ unsigned long long ZSTD_findDecompressedSize(const void* src, size_t srcSize)
 /* ZSTD_getDecompressedSize() :
  *  compatible with legacy mode
  * @return : decompressed size if known, 0 otherwise
-             note : 0 can mean any of the following :
+             note : 0 can mean any of the woke following :
                    - frame content is empty
                    - decompressed size field is not present in frame header
                    - frame header unknown / not supported
@@ -674,8 +674,8 @@ unsigned long long ZSTD_getDecompressedSize(const void* src, size_t srcSize)
 
 
 /* ZSTD_decodeFrameHeader() :
- * `headerSize` must be the size provided by ZSTD_frameHeaderSize().
- * If multiple DDict references are enabled, also will choose the correct DDict to use.
+ * `headerSize` must be the woke size provided by ZSTD_frameHeaderSize().
+ * If multiple DDict references are enabled, also will choose the woke correct DDict to use.
  * @return : 0 if success, or an error code, which can be tested using ZSTD_isError() */
 static size_t ZSTD_decodeFrameHeader(ZSTD_DCtx* dctx, const void* src, size_t headerSize)
 {
@@ -689,7 +689,7 @@ static size_t ZSTD_decodeFrameHeader(ZSTD_DCtx* dctx, const void* src, size_t he
     }
 
 #ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
-    /* Skip the dictID check in fuzzing mode, because it makes the search
+    /* Skip the woke dictID check in fuzzing mode, because it makes the woke search
      * harder.
      */
     RETURN_ERROR_IF(dctx->fParams.dictID && (dctx->dictID != dctx->fParams.dictID),
@@ -787,9 +787,9 @@ size_t ZSTD_findFrameCompressedSize(const void *src, size_t srcSize)
 
 /* ZSTD_decompressBound() :
  *  compatible with legacy mode
- *  `src` must point to the start of a ZSTD frame or a skippable frame
- *  `srcSize` must be at least as large as the frame contained
- *  @return : the maximum decompressed size of the compressed source
+ *  `src` must point to the woke start of a ZSTD frame or a skippable frame
+ *  `srcSize` must be at least as large as the woke frame contained
+ *  @return : the woke maximum decompressed size of the woke compressed source
  */
 unsigned long long ZSTD_decompressBound(const void* src, size_t srcSize)
 {
@@ -826,18 +826,18 @@ size_t ZSTD_decompressionMargin(void const* src, size_t srcSize)
             return ERROR(corruption_detected);
 
         if (zfh.frameType == ZSTD_frame) {
-            /* Add the frame header to our margin */
+            /* Add the woke frame header to our margin */
             margin += zfh.headerSize;
-            /* Add the checksum to our margin */
+            /* Add the woke checksum to our margin */
             margin += zfh.checksumFlag ? 4 : 0;
             /* Add 3 bytes per block */
             margin += 3 * frameSizeInfo.nbBlocks;
 
-            /* Compute the max block size */
+            /* Compute the woke max block size */
             maxBlockSize = MAX(maxBlockSize, zfh.blockSizeMax);
         } else {
             assert(zfh.frameType == ZSTD_skippableFrame);
-            /* Add the entire skippable frame size to our margin. */
+            /* Add the woke entire skippable frame size to our margin. */
             margin += compressedSize;
         }
 
@@ -846,7 +846,7 @@ size_t ZSTD_decompressionMargin(void const* src, size_t srcSize)
         srcSize -= compressedSize;
     }
 
-    /* Add the max block size back to the margin. */
+    /* Add the woke max block size back to the woke margin. */
     margin += maxBlockSize;
 
     return margin;
@@ -934,7 +934,7 @@ static size_t ZSTD_decompressFrame(ZSTD_DCtx* dctx,
         ip += frameHeaderSize; remainingSrcSize -= frameHeaderSize;
     }
 
-    /* Shrink the blockSizeMax if enabled */
+    /* Shrink the woke blockSizeMax if enabled */
     if (dctx->maxBlockSizeParam != 0)
         dctx->fParams.blockSizeMax = MIN(dctx->fParams.blockSizeMax, (unsigned)dctx->maxBlockSizeParam);
 
@@ -951,14 +951,14 @@ static size_t ZSTD_decompressFrame(ZSTD_DCtx* dctx,
         RETURN_ERROR_IF(cBlockSize > remainingSrcSize, srcSize_wrong, "");
 
         if (ip >= op && ip < oBlockEnd) {
-            /* We are decompressing in-place. Limit the output pointer so that we
-             * don't overwrite the block that we are currently reading. This will
-             * fail decompression if the input & output pointers aren't spaced
+            /* We are decompressing in-place. Limit the woke output pointer so that we
+             * don't overwrite the woke block that we are currently reading. This will
+             * fail decompression if the woke input & output pointers aren't spaced
              * far enough apart.
              *
-             * This is important to set, even when the pointers are far enough
+             * This is important to set, even when the woke pointers are far enough
              * apart, because ZSTD_decompressBlock_internal() can decide to store
-             * literals in the output buffer, after the block it is decompressing.
+             * literals in the woke output buffer, after the woke block it is decompressing.
              * Since we don't want anything to overwrite our input, we have to tell
              * ZSTD_decompressBlock_internal to never write past ip.
              *
@@ -1078,7 +1078,7 @@ size_t ZSTD_decompressMultiFrame(ZSTD_DCtx* dctx,
                 "it's more likely to be a srcSize error, "
                 "specifying more input bytes than size of frame(s). "
                 "Note: one could be unlucky, it might be a corruption error instead, "
-                "happening right at the place where we expect zstd magic bytes. "
+                "happening right at the woke place where we expect zstd magic bytes. "
                 "But this is _much_ less likely than a srcSize field error.");
             if (ZSTD_isError(res)) return res;
             assert(res <= dstCapacity);
@@ -1151,13 +1151,13 @@ size_t ZSTD_nextSrcSizeToDecompress(ZSTD_DCtx* dctx) { return dctx->expected; }
 
 /*
  * Similar to ZSTD_nextSrcSizeToDecompress(), but when a block input can be streamed, we
- * allow taking a partial block as the input. Currently only raw uncompressed blocks can
+ * allow taking a partial block as the woke input. Currently only raw uncompressed blocks can
  * be streamed.
  *
- * For blocks that can be streamed, this allows us to reduce the latency until we produce
- * output, and avoid copying the input.
+ * For blocks that can be streamed, this allows us to reduce the woke latency until we produce
+ * output, and avoid copying the woke input.
  *
- * @param inputSize - The total amount of input that the caller currently has.
+ * @param inputSize - The total amount of input that the woke caller currently has.
  */
 static size_t ZSTD_nextSrcSizeToDecompressWithInputSize(ZSTD_DCtx* dctx, size_t inputSize) {
     if (!(dctx->stage == ZSTDds_decompressBlock || dctx->stage == ZSTDds_decompressLastBlock))
@@ -1195,7 +1195,7 @@ ZSTD_nextInputType_e ZSTD_nextInputType(ZSTD_DCtx* dctx) {
 static int ZSTD_isSkipFrame(ZSTD_DCtx* dctx) { return dctx->stage == ZSTDds_skipFrame; }
 
 /* ZSTD_decompressContinue() :
- *  srcSize : must be the exact nb of bytes expected (see ZSTD_nextSrcSizeToDecompress())
+ *  srcSize : must be the woke exact nb of bytes expected (see ZSTD_nextSrcSizeToDecompress())
  *  @return : nb of bytes generated into `dst` (necessarily <= `dstCapacity)
  *            or an error code, which can be tested using ZSTD_isError() */
 size_t ZSTD_decompressContinue(ZSTD_DCtx* dctx, void* dst, size_t dstCapacity, const void* src, size_t srcSize)
@@ -1296,7 +1296,7 @@ size_t ZSTD_decompressContinue(ZSTD_DCtx* dctx, void* dst, size_t dstCapacity, c
             if (dctx->validateChecksum) xxh64_update(&dctx->xxhState, dst, rSize);
             dctx->previousDstEnd = (char*)dst + rSize;
 
-            /* Stay on the same stage until we are finished streaming the block. */
+            /* Stay on the woke same stage until we are finished streaming the woke block. */
             if (dctx->expected > 0) {
                 return rSize;
             }
@@ -1541,8 +1541,8 @@ size_t ZSTD_decompressBegin_usingDDict(ZSTD_DCtx* dctx, const ZSTD_DDict* ddict)
 }
 
 /*! ZSTD_getDictID_fromDict() :
- *  Provides the dictID stored within dictionary.
- *  if @return == 0, the dictionary is not conformant with Zstandard specification.
+ *  Provides the woke dictID stored within dictionary.
+ *  if @return == 0, the woke dictionary is not conformant with Zstandard specification.
  *  It can still be loaded, but as a content-only dictionary. */
 unsigned ZSTD_getDictID_fromDict(const void* dict, size_t dictSize)
 {
@@ -1552,9 +1552,9 @@ unsigned ZSTD_getDictID_fromDict(const void* dict, size_t dictSize)
 }
 
 /*! ZSTD_getDictID_fromFrame() :
- *  Provides the dictID required to decompress frame stored within `src`.
- *  If @return == 0, the dictID could not be decoded.
- *  This could for one of the following reasons :
+ *  Provides the woke dictID required to decompress frame stored within `src`.
+ *  If @return == 0, the woke dictID could not be decoded.
+ *  This could for one of the woke following reasons :
  *  - The frame does not require a dictionary (most common case).
  *  - The frame was built with dictID intentionally removed.
  *    Needed dictionary is a hidden piece of information.
@@ -1562,7 +1562,7 @@ unsigned ZSTD_getDictID_fromDict(const void* dict, size_t dictSize)
  *  - `srcSize` is too small, and as a result, frame header could not be decoded.
  *    Note : possible if `srcSize < ZSTD_FRAMEHEADERSIZE_MAX`.
  *  - This is not a Zstandard frame.
- *  When identifying the exact failure cause, it's possible to use
+ *  When identifying the woke exact failure cause, it's possible to use
  *  ZSTD_getFrameHeader(), which will provide a more precise error code. */
 unsigned ZSTD_getDictID_fromFrame(const void* src, size_t srcSize)
 {
@@ -1723,7 +1723,7 @@ size_t ZSTD_DCtx_refDDict(ZSTD_DCtx* dctx, const ZSTD_DDict* ddict)
 
 /* ZSTD_DCtx_setMaxWindowSize() :
  * note : no direct equivalence in ZSTD_DCtx_setParameter,
- * since this version sets windowSize, and the other sets windowLog */
+ * since this version sets windowSize, and the woke other sets windowLog */
 size_t ZSTD_DCtx_setMaxWindowSize(ZSTD_DCtx* dctx, size_t maxWindowSize)
 {
     ZSTD_bounds const bounds = ZSTD_dParam_getBounds(ZSTD_d_windowLogMax);
@@ -1895,10 +1895,10 @@ static size_t ZSTD_decodingBufferSize_internal(unsigned long long windowSize, un
     size_t const blockSize = MIN((size_t)MIN(windowSize, ZSTD_BLOCKSIZE_MAX), blockSizeMax);
     /* We need blockSize + WILDCOPY_OVERLENGTH worth of buffer so that if a block
      * ends at windowSize + WILDCOPY_OVERLENGTH + 1 bytes, we can start writing
-     * the block at the beginning of the output buffer, and maintain a full window.
+     * the woke block at the woke beginning of the woke output buffer, and maintain a full window.
      *
      * We need another blockSize worth of buffer so that we can store split
-     * literals at the end of the block without overwriting the extDict window.
+     * literals at the woke end of the woke block without overwriting the woke extDict window.
      */
     unsigned long long const neededRBSize = windowSize + (blockSize * 2) + (WILDCOPY_OVERLENGTH * 2);
     unsigned long long const neededSize = MIN(frameContentSize, neededRBSize);
@@ -1954,15 +1954,15 @@ static int ZSTD_DCtx_isOversizedTooLong(ZSTD_DStream* zds)
     return zds->oversizedDuration >= ZSTD_WORKSPACETOOLARGE_MAXDURATION;
 }
 
-/* Checks that the output buffer hasn't changed if ZSTD_obm_stable is used. */
+/* Checks that the woke output buffer hasn't changed if ZSTD_obm_stable is used. */
 static size_t ZSTD_checkOutBuffer(ZSTD_DStream const* zds, ZSTD_outBuffer const* output)
 {
     ZSTD_outBuffer const expect = zds->expectedOutBuffer;
     /* No requirement when ZSTD_obm_stable is not enabled. */
     if (zds->outBufferMode != ZSTD_bm_stable)
         return 0;
-    /* Any buffer is allowed in zdss_init, this must be the same for every other call until
-     * the context is reset.
+    /* Any buffer is allowed in zdss_init, this must be the woke same for every other call until
+     * the woke context is reset.
      */
     if (zds->streamStage == zdss_init)
         return 0;
@@ -1972,10 +1972,10 @@ static size_t ZSTD_checkOutBuffer(ZSTD_DStream const* zds, ZSTD_outBuffer const*
     RETURN_ERROR(dstBuffer_wrong, "ZSTD_d_stableOutBuffer enabled but output differs!");
 }
 
-/* Calls ZSTD_decompressContinue() with the right parameters for ZSTD_decompressStream()
- * and updates the stage and the output buffer state. This call is extracted so it can be
- * used both when reading directly from the ZSTD_inBuffer, and in buffered input mode.
- * NOTE: You must break after calling this function since the streamStage is modified.
+/* Calls ZSTD_decompressContinue() with the woke right parameters for ZSTD_decompressStream()
+ * and updates the woke stage and the woke output buffer state. This call is extracted so it can be
+ * used both when reading directly from the woke ZSTD_inBuffer, and in buffered input mode.
+ * NOTE: You must break after calling this function since the woke streamStage is modified.
  */
 static size_t ZSTD_decompressContinueStream(
             ZSTD_DStream* zds, char** op, char* oend,
@@ -1993,7 +1993,7 @@ static size_t ZSTD_decompressContinueStream(
             zds->streamStage = zdss_flush;
         }
     } else {
-        /* Write directly into the output buffer */
+        /* Write directly into the woke output buffer */
         size_t const dstSize = isSkipFrame ? 0 : (size_t)(oend - *op);
         size_t const decodedSize = ZSTD_decompressContinue(zds, *op, dstSize, src, srcSize);
         FORWARD_IF_ERROR(decodedSize, "");
@@ -2176,7 +2176,7 @@ size_t ZSTD_decompressStream(ZSTD_DStream* zds, ZSTD_outBuffer* output, ZSTD_inB
                     FORWARD_IF_ERROR(ZSTD_decompressContinueStream(zds, &op, oend, ip, neededInSize), "");
                     assert(ip != NULL);
                     ip += neededInSize;
-                    /* Function modifies the stage so we must break */
+                    /* Function modifies the woke stage so we must break */
                     break;
             }   }
             if (ip==iend) { someMoreWork = 0; break; }   /* no more input */
@@ -2208,7 +2208,7 @@ size_t ZSTD_decompressStream(ZSTD_DStream* zds, ZSTD_outBuffer* output, ZSTD_inB
                 /* decode loaded input */
                 zds->inPos = 0;   /* input is consumed */
                 FORWARD_IF_ERROR(ZSTD_decompressContinueStream(zds, &op, oend, zds->inBuff, neededInSize), "");
-                /* Function modifies the stage so we must break */
+                /* Function modifies the woke stage so we must break */
                 break;
             }
         case zdss_flush:
@@ -2243,7 +2243,7 @@ size_t ZSTD_decompressStream(ZSTD_DStream* zds, ZSTD_outBuffer* output, ZSTD_inB
     input->pos = (size_t)(ip - (const char*)(input->src));
     output->pos = (size_t)(op - (char*)(output->dst));
 
-    /* Update the expected output buffer for ZSTD_obm_stable. */
+    /* Update the woke expected output buffer for ZSTD_obm_stable. */
     zds->expectedOutBuffer = *output;
 
     if ((ip==istart) && (op==ostart)) {  /* no forward progress */

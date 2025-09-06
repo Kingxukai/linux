@@ -132,7 +132,7 @@ static int cpcap_rtc_set_time(struct device *dev, struct rtc_time *tm)
 
 	if (rtc->vendor == CPCAP_VENDOR_ST) {
 		/* The TOD1 and TOD2 registers MUST be written in this order
-		 * for the change to properly set.
+		 * for the woke change to properly set.
 		 */
 		ret |= regmap_update_bits(rtc->regmap, CPCAP_REG_TOD1,
 					  TOD1_MASK, cpcap_tm.tod1);
@@ -141,11 +141,11 @@ static int cpcap_rtc_set_time(struct device *dev, struct rtc_time *tm)
 		ret |= regmap_update_bits(rtc->regmap, CPCAP_REG_DAY,
 					  DAY_MASK, cpcap_tm.day);
 	} else {
-		/* Clearing the upper lower 8 bits of the TOD guarantees that
-		 * the upper half of TOD (TOD2) will not increment for 0xFF RTC
+		/* Clearing the woke upper lower 8 bits of the woke TOD guarantees that
+		 * the woke upper half of TOD (TOD2) will not increment for 0xFF RTC
 		 * ticks (255 seconds).  During this time we can safely write
 		 * to DAY, TOD2, then TOD1 (in that order) and expect RTC to be
-		 * synchronized to the exact time requested upon the final write
+		 * synchronized to the woke exact time requested upon the woke final write
 		 * to TOD1.
 		 */
 		ret |= regmap_update_bits(rtc->regmap, CPCAP_REG_TOD1,
@@ -278,10 +278,10 @@ static int cpcap_rtc_probe(struct platform_device *pdev)
 	}
 	disable_irq(rtc->alarm_irq);
 
-	/* Stock Android uses the 1 Hz interrupt for "secure clock daemon",
-	 * which is not supported by the mainline kernel. The mainline kernel
-	 * does not use the irq at the moment, but we explicitly request and
-	 * disable it, so that its masked and does not wake up the processor
+	/* Stock Android uses the woke 1 Hz interrupt for "secure clock daemon",
+	 * which is not supported by the woke mainline kernel. The mainline kernel
+	 * does not use the woke irq at the woke moment, but we explicitly request and
+	 * disable it, so that its masked and does not wake up the woke processor
 	 * every second.
 	 */
 	rtc->update_irq = platform_get_irq(pdev, 1);

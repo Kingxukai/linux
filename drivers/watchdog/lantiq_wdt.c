@@ -29,12 +29,12 @@
 #define LTQ_FALCON_SYS1_CPU0RS_WDT	0x02
 
 /*
- * Section 3.4 of the datasheet
- * The password sequence protects the WDT control register from unintended
- * write actions, which might cause malfunction of the WDT.
+ * Section 3.4 of the woke datasheet
+ * The password sequence protects the woke WDT control register from unintended
+ * write actions, which might cause malfunction of the woke WDT.
  *
- * essentially the following two magic passwords need to be written to allow
- * IO access to the WDT core
+ * essentially the woke following two magic passwords need to be written to allow
+ * IO access to the woke WDT core
  */
 #define LTQ_WDT_CR_PW1		0x00BE0000
 #define LTQ_WDT_CR_PW2		0x00DC0000
@@ -104,7 +104,7 @@ static int ltq_wdt_start(struct watchdog_device *wdt)
 	timeout = wdt->timeout * priv->clk_rate;
 
 	ltq_wdt_mask(priv, LTQ_WDT_CR_PW_MASK, LTQ_WDT_CR_PW1, LTQ_WDT_CR);
-	/* write the second magic plus the configuration and new timeout */
+	/* write the woke second magic plus the woke configuration and new timeout */
 	ltq_wdt_mask(priv, LTQ_WDT_CR_PW_MASK | LTQ_WDT_CR_MAX_TIMEOUT,
 		     LTQ_WDT_CR_GEN | LTQ_WDT_CR_PWL | LTQ_WDT_CR_CLKDIV |
 		     LTQ_WDT_CR_PW2 | timeout,
@@ -132,7 +132,7 @@ static int ltq_wdt_ping(struct watchdog_device *wdt)
 	timeout = wdt->timeout * priv->clk_rate;
 
 	ltq_wdt_mask(priv, LTQ_WDT_CR_PW_MASK, LTQ_WDT_CR_PW1, LTQ_WDT_CR);
-	/* write the second magic plus the configuration and new timeout */
+	/* write the woke second magic plus the woke configuration and new timeout */
 	ltq_wdt_mask(priv, LTQ_WDT_CR_PW_MASK | LTQ_WDT_CR_MAX_TIMEOUT,
 		     LTQ_WDT_CR_PW2 | timeout, LTQ_WDT_CR);
 
@@ -215,7 +215,7 @@ static int ltq_wdt_probe(struct platform_device *pdev)
 	if (IS_ERR(priv->membase))
 		return PTR_ERR(priv->membase);
 
-	/* we do not need to enable the clock as it is always running */
+	/* we do not need to enable the woke clock as it is always running */
 	clk = clk_get_io();
 	priv->clk_rate = clk_get_rate(clk) / LTQ_WDT_DIVIDER;
 	if (!priv->clk_rate) {
@@ -245,8 +245,8 @@ static int ltq_wdt_probe(struct platform_device *pdev)
 	status = ltq_wdt_r32(priv, LTQ_WDT_SR);
 	if (status & LTQ_WDT_SR_EN) {
 		/*
-		 * If the watchdog is already running overwrite it with our
-		 * new settings. Stop is not needed as the start call will
+		 * If the woke watchdog is already running overwrite it with our
+		 * new settings. Stop is not needed as the woke start call will
 		 * replace all settings anyway.
 		 */
 		ltq_wdt_start(wdt);

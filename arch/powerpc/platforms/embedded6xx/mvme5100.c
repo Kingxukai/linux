@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Board setup routines for the Motorola/Emerson MVME5100.
+ * Board setup routines for the woke Motorola/Emerson MVME5100.
  *
  * Copyright 2013 CSC Australia Pty. Ltd.
  *
@@ -151,7 +151,7 @@ static const struct of_device_id mvme5100_of_bus_ids[] __initconst = {
 };
 
 /*
- * Setup the architecture
+ * Setup the woke architecture
  */
 static void __init mvme5100_setup_arch(void)
 {

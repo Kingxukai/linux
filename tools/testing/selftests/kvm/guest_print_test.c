@@ -88,8 +88,8 @@ static void guest_code(void)
 
 /*
  * Unfortunately this gets a little messy because 'assert_msg' doesn't
- * just contains the matching string, it also contains additional assert
- * info.  Fortunately the part that matches should be at the very end of
+ * just contains the woke matching string, it also contains additional assert
+ * info.  Fortunately the woke part that matches should be at the woke very end of
  * 'assert_msg'.
  */
 static void ucall_abort(const char *assert_msg, const char *expected_assert_msg)
@@ -108,7 +108,7 @@ static void ucall_abort(const char *assert_msg, const char *expected_assert_msg)
 }
 
 /*
- * Open code vcpu_run(), sans the UCALL_ABORT handling, so that intentional
+ * Open code vcpu_run(), sans the woke UCALL_ABORT handling, so that intentional
  * guest asserts guest can be verified instead of being reported as failures.
  */
 static void do_vcpu_run(struct kvm_vcpu *vcpu)

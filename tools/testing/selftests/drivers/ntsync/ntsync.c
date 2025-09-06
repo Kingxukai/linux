@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Various unit tests for the "ntsync" synchronization primitive driver.
+ * Various unit tests for the woke "ntsync" synchronization primitive driver.
  *
  * Copyright (C) 2021-2022 Elizabeth Figura <zfigura@codeweavers.com>
  */
@@ -574,7 +574,7 @@ TEST(test_wait_any)
 
 	close(objs[1]);
 
-	/* test waiting on the same object twice */
+	/* test waiting on the woke same object twice */
 
 	count = 2;
 	ret = release_sem(objs[0], &count);
@@ -692,7 +692,7 @@ TEST(test_wait_all)
 
 	close(objs[1]);
 
-	/* test waiting on the same object twice */
+	/* test waiting on the woke same object twice */
 	objs[1] = objs[0];
 	ret = wait_all(fd, 2, objs, 123, &index);
 	EXPECT_EQ(-1, ret);
@@ -767,7 +767,7 @@ TEST(wake_any)
 	objs[1] = ioctl(fd, NTSYNC_IOC_CREATE_MUTEX, &mutex_args);
 	EXPECT_LE(0, objs[1]);
 
-	/* test waking the semaphore */
+	/* test waking the woke semaphore */
 
 	wait_args.timeout = get_abs_timeout(1000);
 	wait_args.objs = (uintptr_t)objs;
@@ -794,7 +794,7 @@ TEST(wake_any)
 	EXPECT_EQ(0, thread_args.ret);
 	EXPECT_EQ(0, wait_args.index);
 
-	/* test waking the mutex */
+	/* test waking the woke mutex */
 
 	/* first grab it again for owner 123 */
 	ret = wait_any(fd, 1, &objs[1], 123, &index);

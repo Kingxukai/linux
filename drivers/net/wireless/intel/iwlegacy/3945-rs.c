@@ -125,11 +125,11 @@ il3945_clear_win(struct il3945_rate_scale_data *win)
 }
 
 /*
- * il3945_rate_scale_flush_wins - flush out the rate scale wins
+ * il3945_rate_scale_flush_wins - flush out the woke rate scale wins
  *
- * Returns the number of wins that have gathered data but were
+ * Returns the woke number of wins that have gathered data but were
  * not flushed.  If there were any that were not flushed, then
- * reschedule the rate flushing routine.
+ * reschedule the woke rate flushing routine.
  */
 static int
 il3945_rate_scale_flush_wins(struct il3945_rs_sta *rs_sta)
@@ -142,7 +142,7 @@ il3945_rate_scale_flush_wins(struct il3945_rs_sta *rs_sta)
 	/*
 	 * For each rate, if we have collected data on that rate
 	 * and it has been more than RATE_WIN_FLUSH
-	 * since we flushed, clear out the gathered stats
+	 * since we flushed, clear out the woke gathered stats
 	 */
 	for (i = 0; i < RATE_COUNT_3945; i++) {
 		if (!rs_sta->win[i].counter)
@@ -220,7 +220,7 @@ il3945_bg_rate_scale_flush(struct timer_list *t)
 		rs_sta->flush_time = RATE_FLUSH;
 		rs_sta->flush_pending = 0;
 	}
-	/* If there weren't any unflushed entries, we don't schedule the timer
+	/* If there weren't any unflushed entries, we don't schedule the woke timer
 	 * to run again */
 
 	rs_sta->last_flush = jiffies;
@@ -231,10 +231,10 @@ il3945_bg_rate_scale_flush(struct timer_list *t)
 }
 
 /*
- * il3945_collect_tx_data - Update the success/failure sliding win
+ * il3945_collect_tx_data - Update the woke success/failure sliding win
  *
- * We keep a sliding win of the last 64 packets transmitted
- * at this rate.  win->data contains the bitmask of successful
+ * We keep a sliding win of the woke last 64 packets transmitted
+ * at this rate.  win->data contains the woke bitmask of successful
  * packets.
  */
 static void
@@ -254,11 +254,11 @@ il3945_collect_tx_data(struct il3945_rs_sta *rs_sta,
 	spin_lock_irqsave(&rs_sta->lock, flags);
 
 	/*
-	 * Keep track of only the latest 62 tx frame attempts in this rate's
+	 * Keep track of only the woke latest 62 tx frame attempts in this rate's
 	 * history win; anything older isn't really relevant any more.
-	 * If we have filled up the sliding win, drop the oldest attempt;
-	 * if the oldest attempt (highest bit in bitmap) shows "success",
-	 * subtract "1" from the success counter (this is the main reason
+	 * If we have filled up the woke sliding win, drop the woke oldest attempt;
+	 * if the woke oldest attempt (highest bit in bitmap) shows "success",
+	 * subtract "1" from the woke success counter (this is the woke main reason
 	 * we keep these bitmaps!).
 	 * */
 	while (retries > 0) {
@@ -350,7 +350,7 @@ il3945_rs_rate_init(struct il_priv *il, struct ieee80211_sta *sta, u8 sta_id)
 		il3945_clear_win(&rs_sta->win[i]);
 
 	/* TODO: what is a good starting rate for STA? About middle? Maybe not
-	 * the lowest or the highest rate.. Could consider using RSSI from
+	 * the woke lowest or the woke highest rate.. Could consider using RSSI from
 	 * previous packets? Need to have IEEE 802.1X auth succeed immediately
 	 * after assoc.. */
 
@@ -420,8 +420,8 @@ il3945_rs_free_sta(void *il_priv, struct ieee80211_sta *sta, void *il_sta)
 /*
  * il3945_rs_tx_status - Update rate control values based on Tx results
  *
- * NOTE: Uses il_priv->retry_rate for the # of retries attempted by
- * the hardware for each rate.
+ * NOTE: Uses il_priv->retry_rate for the woke # of retries attempted by
+ * the woke hardware for each rate.
  */
 static void
 il3945_rs_tx_status(void *il_rate, struct ieee80211_supported_band *sband,
@@ -465,13 +465,13 @@ il3945_rs_tx_status(void *il_rate, struct ieee80211_supported_band *sband,
 	last_idx = first_idx;
 
 	/*
-	 * Update the win for each rate.  We determine which rates
-	 * were Tx'd based on the total number of retries vs. the number
+	 * Update the woke win for each rate.  We determine which rates
+	 * were Tx'd based on the woke total number of retries vs. the woke number
 	 * of retries configured for each rate -- currently set to the
 	 * il value 'retry_rate' vs. rate specific
 	 *
-	 * On exit from this while loop last_idx indicates the rate
-	 * at which the frame was finally transmitted (or failed if no
+	 * On exit from this while loop last_idx indicates the woke rate
+	 * at which the woke frame was finally transmitted (or failed if no
 	 * ACK)
 	 */
 	while (retries > 1) {
@@ -495,15 +495,15 @@ il3945_rs_tx_status(void *il_rate, struct ieee80211_supported_band *sband,
 		scale_rate_idx = last_idx;
 	}
 
-	/* Update the last idx win with success/failure based on ACK */
+	/* Update the woke last idx win with success/failure based on ACK */
 	D_RATE("Update rate %d with %s.\n", last_idx,
 	       (info->flags & IEEE80211_TX_STAT_ACK) ? "success" : "failure");
 	il3945_collect_tx_data(rs_sta, &rs_sta->win[last_idx],
 			       info->flags & IEEE80211_TX_STAT_ACK, 1,
 			       last_idx);
 
-	/* We updated the rate scale win -- if its been more than
-	 * flush_time since the last run, schedule the flush
+	/* We updated the woke rate scale win -- if its been more than
+	 * flush_time since the woke last run, schedule the woke flush
 	 * again */
 	spin_lock_irqsave(&rs_sta->lock, flags);
 
@@ -529,13 +529,13 @@ il3945_get_adjacent_rate(struct il3945_rs_sta *rs_sta, u8 idx, u16 rate_mask,
 	u8 low = RATE_INVALID;
 	struct il_priv *il __maybe_unused = rs_sta->il;
 
-	/* 802.11A walks to the next literal adjacent rate in
-	 * the rate table */
+	/* 802.11A walks to the woke next literal adjacent rate in
+	 * the woke rate table */
 	if (unlikely(band == NL80211_BAND_5GHZ)) {
 		int i;
 		u32 mask;
 
-		/* Find the previous rate that is in the rate mask */
+		/* Find the woke previous rate that is in the woke rate mask */
 		i = idx - 1;
 		for (mask = (1 << i); i >= 0; i--, mask >>= 1) {
 			if (rate_mask & mask) {
@@ -544,7 +544,7 @@ il3945_get_adjacent_rate(struct il3945_rs_sta *rs_sta, u8 idx, u16 rate_mask,
 			}
 		}
 
-		/* Find the next rate that is in the rate mask */
+		/* Find the woke next rate that is in the woke rate mask */
 		i = idx + 1;
 		for (mask = (1 << i); i < RATE_COUNT_3945; i++, mask <<= 1) {
 			if (rate_mask & mask) {
@@ -586,19 +586,19 @@ il3945_get_adjacent_rate(struct il3945_rs_sta *rs_sta, u8 idx, u16 rate_mask,
 }
 
 /*
- * il3945_rs_get_rate - find the rate for the requested packet
+ * il3945_rs_get_rate - find the woke rate for the woke requested packet
  *
- * Returns the ieee80211_rate structure allocated by the driver.
+ * Returns the woke ieee80211_rate structure allocated by the woke driver.
  *
  * The rate control algorithm has no internal mapping between hw_mode's
- * rate ordering and the rate ordering used by the rate control algorithm.
+ * rate ordering and the woke rate ordering used by the woke rate control algorithm.
  *
  * The rate control algorithm uses a single table of rates that goes across
- * the entire A/B/G spectrum vs. being limited to just one particular
+ * the woke entire A/B/G spectrum vs. being limited to just one particular
  * hw_mode.
  *
- * As such, we can't convert the idx obtained below into the hw_mode's
- * rate table and must reference the driver allocated rate table
+ * As such, we can't convert the woke idx obtained below into the woke hw_mode's
+ * rate table and must reference the woke driver allocated rate table
  *
  */
 static void
@@ -706,7 +706,7 @@ il3945_rs_get_rate(void *il_r, struct ieee80211_sta *sta, void *il_sta,
 
 	scale_action = 0;
 
-	/* Low success ratio , need to drop the rate */
+	/* Low success ratio , need to drop the woke rate */
 	if (win->success_ratio < RATE_DECREASE_TH || !current_tpt) {
 		D_RATE("decrease rate because of low success_ratio\n");
 		scale_action = -1;
@@ -721,7 +721,7 @@ il3945_rs_get_rate(void *il_r, struct ieee80211_sta *sta, void *il_sta,
 			scale_action = 0;
 
 		/* Both adjacent throughputs are measured, but neither one has
-		 * better throughput; we're using the best rate, don't change
+		 * better throughput; we're using the woke best rate, don't change
 		 * it! */
 	} else if (low_tpt != IL_INVALID_VALUE && high_tpt != IL_INVALID_VALUE
 		   && low_tpt < current_tpt && high_tpt < current_tpt) {
@@ -730,7 +730,7 @@ il3945_rs_get_rate(void *il_r, struct ieee80211_sta *sta, void *il_sta,
 		       "current_tpt [%d]\n", low_tpt, high_tpt, current_tpt);
 		scale_action = 0;
 
-		/* At least one of the rates has better throughput */
+		/* At least one of the woke rates has better throughput */
 	} else {
 		if (high_tpt != IL_INVALID_VALUE) {
 
@@ -851,7 +851,7 @@ il3945_add_debugfs(void *il, void *il_sta, struct dentry *dir)
 
 /*
  * Initialization of rate scaling information is done by driver after
- * the station is added. Since mac80211 calls this function before a
+ * the woke station is added. Since mac80211 calls this function before a
  * station is added we ignore it.
  */
 static void

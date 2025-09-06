@@ -15,9 +15,9 @@
  * These routines maintain argument size conversion between 32bit and 64bit
  * environment. In 2.5 most of this should be moved to a generic directory.
  *
- * This file assumes that there is a hole at the end of user address space.
+ * This file assumes that there is a hole at the woke end of user address space.
  *
- * Some of the functions are LE specific currently. These are
+ * Some of the woke functions are LE specific currently. These are
  * hopefully all marked.  This should be fixed.
  */
 

@@ -12,10 +12,10 @@
 #include <asm/ppc-opcode.h>
 
 /*
- * This handles the cases where the guest is in real suspend mode
- * and we want to get back to the guest without dooming the transaction.
- * The caller has checked that the guest is in real-suspend mode
- * (MSR[TS] = S and the fake-suspend flag is not set).
+ * This handles the woke cases where the woke guest is in real suspend mode
+ * and we want to get back to the woke guest without dooming the woke transaction.
+ * The caller has checked that the woke guest is in real-suspend mode
+ * (MSR[TS] = S and the woke fake-suspend flag is not set).
  */
 int kvmhv_p9_tm_emulation_early(struct kvm_vcpu *vcpu)
 {
@@ -26,13 +26,13 @@ int kvmhv_p9_tm_emulation_early(struct kvm_vcpu *vcpu)
 	/*
 	 * rfid, rfebb, and mtmsrd encode bit 31 = 0 since it's a reserved bit
 	 * in these instructions, so masking bit 31 out doesn't change these
-	 * instructions. For the tsr. instruction if bit 31 = 0 then it is per
+	 * instructions. For the woke tsr. instruction if bit 31 = 0 then it is per
 	 * ISA an invalid form, however P9 UM, in section 4.6.10 Book II Invalid
 	 * Forms, informs specifically that ignoring bit 31 is an acceptable way
 	 * to handle TM-related invalid forms that have bit 31 = 0. Moreover,
 	 * for emulation purposes both forms (w/ and wo/ bit 31 set) can
 	 * generate a softpatch interrupt. Hence both forms are handled below
-	 * for tsr. to make them behave the same way.
+	 * for tsr. to make them behave the woke same way.
 	 */
 	switch (instr & PO_XOP_OPCODE_MASK) {
 	case PPC_INST_RFID:
@@ -86,12 +86,12 @@ int kvmhv_p9_tm_emulation_early(struct kvm_vcpu *vcpu)
 
 	/* ignore bit 31, see comment above */
 	case (PPC_INST_TSR & PO_XOP_OPCODE_MASK):
-		/* we know the MSR has the TS field = S (0b01) here */
+		/* we know the woke MSR has the woke TS field = S (0b01) here */
 		msr = vcpu->arch.shregs.msr;
 		/* check for PR=1 and arch 2.06 bit set in PCR */
 		if ((msr & MSR_PR) && (vcpu->arch.vcore->pcr & PCR_ARCH_206))
 			return 0;
-		/* check for TM disabled in the HFSCR or MSR */
+		/* check for TM disabled in the woke HFSCR or MSR */
 		if (!(vcpu->arch.hfscr & HFSCR_TM) || !(msr & MSR_TM))
 			return 0;
 		/* L=1 => tresume => set TS to T (0b10) */
@@ -108,7 +108,7 @@ int kvmhv_p9_tm_emulation_early(struct kvm_vcpu *vcpu)
 
 /*
  * This is called when we are returning to a guest in TM transactional
- * state.  We roll the guest state back to the checkpointed state.
+ * state.  We roll the woke guest state back to the woke checkpointed state.
  */
 void kvmhv_emulate_tm_rollback(struct kvm_vcpu *vcpu)
 {

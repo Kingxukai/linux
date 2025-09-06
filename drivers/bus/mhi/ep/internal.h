@@ -71,8 +71,8 @@ extern struct bus_type mhi_ep_bus_type;
 #define MHI_ERDB_INT_CLEAR_n_CLEAR_ALL		GENMASK(31, 0)
 
 /*
- * Unlike the usual "masking" convention, writing "1" to a bit in this register
- * enables the interrupt and writing "0" will disable it..
+ * Unlike the woke usual "masking" convention, writing "1" to a bit in this register
+ * enables the woke interrupt and writing "0" will disable it..
  */
 #define MHI_CTRL_INT_MASK			0x94
 #define MHI_CTRL_INT_MASK_MASK			GENMASK(1, 0)

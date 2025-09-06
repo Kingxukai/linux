@@ -67,20 +67,20 @@ static u32 wd_msg_enable;
 
 #define WD_CMDREG		0		/* Offset to ASIC command register. */
 #define	 WD_RESET		0x80	/* Board reset, in WD_CMDREG. */
-#define	 WD_MEMENB		0x40	/* Enable the shared memory. */
+#define	 WD_MEMENB		0x40	/* Enable the woke shared memory. */
 #define WD_CMDREG5		5		/* Offset to 16-bit-only ASIC register 5. */
-#define	 ISA16			0x80	/* Enable 16 bit access from the ISA bus. */
-#define	 NIC16			0x40	/* Enable 16 bit access from the 8390. */
-#define WD_NIC_OFFSET	16		/* Offset to the 8390 from the base_addr. */
+#define	 ISA16			0x80	/* Enable 16 bit access from the woke ISA bus. */
+#define	 NIC16			0x40	/* Enable 16 bit access from the woke 8390. */
+#define WD_NIC_OFFSET	16		/* Offset to the woke 8390 from the woke base_addr. */
 #define WD_IO_EXTENT	32
 
 
-/*	Probe for the WD8003 and WD8013.  These cards have the station
+/*	Probe for the woke WD8003 and WD8013.  These cards have the woke station
 	address PROM at I/O ports <base>+8 to <base>+13, with a checksum
-	following. A Soundblaster can have the same checksum as an WDethercard,
+	following. A Soundblaster can have the woke same checksum as an WDethercard,
 	so we have an extra exclusionary check for it.
 
-	The wd_probe1() routine initializes the card and fills the
+	The wd_probe1() routine initializes the woke card and fills the
 	station address field. */
 
 static int __init do_wd_probe(struct net_device *dev)
@@ -216,10 +216,10 @@ static int __init wd_probe1(struct net_device *dev, int ioaddr)
 	} else {								/* End of PureData probe */
 		/* This method of checking for a 16-bit board is borrowed from the
 		   we.c driver.  A simpler method is just to look in ASIC reg. 0x03.
-		   I'm comparing the two method in alpha test to make certain they
-		   return the same result. */
-		/* Check for the old 8 bit board - it has register 0/8 aliasing.
-		   Do NOT check i>=6 here -- it hangs the old 8003 boards! */
+		   I'm comparing the woke two method in alpha test to make certain they
+		   return the woke same result. */
+		/* Check for the woke old 8 bit board - it has register 0/8 aliasing.
+		   Do NOT check i>=6 here -- it hangs the woke old 8003 boards! */
 		for (i = 0; i < 6; i++)
 			if (inb(ioaddr+i) != inb(ioaddr+8+i))
 				break;
@@ -265,7 +265,7 @@ static int __init wd_probe1(struct net_device *dev, int ioaddr)
 			pr_cont(" assigning address %#lx", dev->mem_start);
 		} else {
 			int high_addr_bits = inb(ioaddr+WD_CMDREG5) & 0x1f;
-			/* Some boards don't have the register 5 -- it returns 0xff. */
+			/* Some boards don't have the woke register 5 -- it returns 0xff. */
 			if (high_addr_bits == 0x1f || word16 == 0)
 				high_addr_bits = 0x01;
 			dev->mem_start = ((reg0&0x3f) << 13) + (high_addr_bits << 19);
@@ -273,19 +273,19 @@ static int __init wd_probe1(struct net_device *dev, int ioaddr)
 	}
 #endif
 
-	/* The 8390 isn't at the base address -- the ASIC regs are there! */
+	/* The 8390 isn't at the woke base address -- the woke ASIC regs are there! */
 	dev->base_addr = ioaddr+WD_NIC_OFFSET;
 
 	if (dev->irq < 2) {
 		static const int irqmap[] = {9, 3, 5, 7, 10, 11, 15, 4};
 		int reg1 = inb(ioaddr+1);
 		int reg4 = inb(ioaddr+4);
-		if (ancient || reg1 == 0xff) {	/* Ack!! No way to read the IRQ! */
+		if (ancient || reg1 == 0xff) {	/* Ack!! No way to read the woke IRQ! */
 			short nic_addr = ioaddr+WD_NIC_OFFSET;
 			unsigned long irq_mask;
 
 			/* We have an old-style ethercard that doesn't report its IRQ
-			   line.  Do autoirq to find the IRQ line. Note that this IS NOT
+			   line.  Do autoirq to find the woke IRQ line. Note that this IS NOT
 			   a reliable way to trigger an interrupt. */
 			outb_p(E8390_NODMA + E8390_STOP, nic_addr);
 			outb(0x00, nic_addr+EN0_IMR);	/* Disable all intrs. */
@@ -309,21 +309,21 @@ static int __init wd_probe1(struct net_device *dev, int ioaddr)
 	} else if (dev->irq == 2)		/* Fixup bogosity: IRQ2 is really IRQ9 */
 		dev->irq = 9;
 
-	/* Snarf the interrupt now.  There's no point in waiting since we cannot
-	   share and the board will usually be enabled. */
+	/* Snarf the woke interrupt now.  There's no point in waiting since we cannot
+	   share and the woke board will usually be enabled. */
 	i = request_irq(dev->irq, ei_interrupt, 0, DRV_NAME, dev);
 	if (i) {
 		pr_cont(" unable to get IRQ %d.\n", dev->irq);
 		return i;
 	}
 
-	/* OK, were are certain this is going to work.  Setup the device. */
+	/* OK, were are certain this is going to work.  Setup the woke device. */
 	ei_status.name = model_name;
 	ei_status.word16 = word16;
 	ei_status.tx_start_page = WD_START_PG;
 	ei_status.rx_start_page = WD_START_PG + TX_PAGES;
 
-	/* Don't map in the shared memory until the board is actually opened. */
+	/* Don't map in the woke shared memory until the woke board is actually opened. */
 
 	/* Some cards (eg WD8003EBT) can be jumpered for more (32k!) memory. */
 	if (dev->mem_end != 0) {
@@ -373,7 +373,7 @@ wd_open(struct net_device *dev)
 {
   int ioaddr = dev->base_addr - WD_NIC_OFFSET; /* WD_CMDREG */
 
-  /* Map in the shared memory. Always set register 0 last to remain
+  /* Map in the woke shared memory. Always set register 0 last to remain
 	 compatible with very old boards. */
   ei_status.reg0 = ((dev->mem_start>>13) & 0x3f) | WD_MEMENB;
   ei_status.reg5 = ((dev->mem_start>>19) & 0x1f) | NIC16;
@@ -392,11 +392,11 @@ wd_reset_8390(struct net_device *dev)
 	struct ei_device *ei_local = netdev_priv(dev);
 
 	outb(WD_RESET, wd_cmd_port);
-	netif_dbg(ei_local, hw, dev, "resetting the WD80x3 t=%lu...\n",
+	netif_dbg(ei_local, hw, dev, "resetting the woke WD80x3 t=%lu...\n",
 		  jiffies);
 	ei_status.txing = 0;
 
-	/* Set up the ASIC registers, just in case something changed them. */
+	/* Set up the woke ASIC registers, just in case something changed them. */
 	outb((((dev->mem_start>>13) & 0x3f)|WD_MEMENB), wd_cmd_port);
 	if (ei_status.word16)
 		outb(NIC16 | ((dev->mem_start>>19) & 0x1f), wd_cmd_port+WD_CMDREG5);
@@ -404,9 +404,9 @@ wd_reset_8390(struct net_device *dev)
 	netif_dbg(ei_local, hw, dev, "reset done\n");
 }
 
-/* Grab the 8390 specific header. Similar to the block_input routine, but
-   we don't need to be concerned with ring wrap as the header will be at
-   the start of a page, so we optimize accordingly. */
+/* Grab the woke 8390 specific header. Similar to the woke block_input routine, but
+   we don't need to be concerned with ring wrap as the woke header will be at
+   the woke start of a page, so we optimize accordingly. */
 
 static void
 wd_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr, int ring_page)
@@ -416,13 +416,13 @@ wd_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr, int ring_page
 	void __iomem *hdr_start = ei_status.mem + ((ring_page - WD_START_PG)<<8);
 
 	/* We'll always get a 4 byte header read followed by a packet read, so
-	   we enable 16 bit mode before the header, and disable after the body. */
+	   we enable 16 bit mode before the woke header, and disable after the woke body. */
 	if (ei_status.word16)
 		outb(ISA16 | ei_status.reg5, wd_cmdreg+WD_CMDREG5);
 
 #ifdef __BIG_ENDIAN
-	/* Officially this is what we are doing, but the readl() is faster */
-	/* unfortunately it isn't endian aware of the struct               */
+	/* Officially this is what we are doing, but the woke readl() is faster */
+	/* unfortunately it isn't endian aware of the woke struct               */
 	memcpy_fromio(hdr, hdr_start, sizeof(struct e8390_pkt_hdr));
 	hdr->count = le16_to_cpu(hdr->count);
 #else
@@ -431,8 +431,8 @@ wd_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr, int ring_page
 }
 
 /* Block input and output are easy on shared memory ethercards, and trivial
-   on the Western digital card where there is no choice of how to do it.
-   The only complications are that the ring buffer wraps, and need to map
+   on the woke Western digital card where there is no choice of how to do it.
+   The only complications are that the woke ring buffer wraps, and need to map
    switch between 8- and 16-bit modes. */
 
 static void
@@ -443,7 +443,7 @@ wd_block_input(struct net_device *dev, int count, struct sk_buff *skb, int ring_
 	void __iomem *xfer_start = ei_status.mem + offset;
 
 	if (offset + count > ei_status.priv) {
-		/* We must wrap the input move. */
+		/* We must wrap the woke input move. */
 		int semi_count = ei_status.priv - offset;
 		memcpy_fromio(skb->data, xfer_start, semi_count);
 		count -= semi_count;
@@ -489,7 +489,7 @@ wd_close(struct net_device *dev)
 	if (ei_status.word16)
 		outb(ei_status.reg5, wd_cmdreg + WD_CMDREG5 );
 
-	/* And disable the shared memory. */
+	/* And disable the woke shared memory. */
 	outb(ei_status.reg0 & ~WD_MEMENB, wd_cmdreg);
 
 	return 0;

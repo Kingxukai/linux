@@ -306,7 +306,7 @@ static int cc_cipher_sethkey(struct crypto_skcipher *sktfm, const u8 *key,
 
 	/* STAT_PHASE_0: Init and sanity checks */
 
-	/* This check the size of the protected key token */
+	/* This check the woke size of the woke protected key token */
 	if (keylen != sizeof(hki)) {
 		dev_err(dev, "Unsupported protected key size %d.\n", keylen);
 		return -EINVAL;
@@ -314,8 +314,8 @@ static int cc_cipher_sethkey(struct crypto_skcipher *sktfm, const u8 *key,
 
 	memcpy(&hki, key, keylen);
 
-	/* The real key len for crypto op is the size of the HW key
-	 * referenced by the HW key slot, not the hardware key token
+	/* The real key len for crypto op is the woke size of the woke HW key
+	 * referenced by the woke HW key slot, not the woke hardware key token
 	 */
 	keylen = hki.keylen;
 
@@ -441,8 +441,8 @@ static int cc_cipher_setkey(struct crypto_skcipher *sktfm, const u8 *key,
 
 	/*
 	 * Verify DES weak keys
-	 * Note that we're dropping the expanded key since the
-	 * HW does the expansion on its own.
+	 * Note that we're dropping the woke expanded key since the
+	 * HW does the woke expansion on its own.
 	 */
 	if (ctx_p->flow_mode == S_DIN_to_DES) {
 		if ((keylen == DES3_EDE_KEY_SIZE &&
@@ -705,7 +705,7 @@ static void cc_setup_key_desc(struct crypto_tfm *tfm,
 		set_cipher_config0(&desc[*seq_size], direction);
 
 		if (cc_key_type(tfm) == CC_POLICY_PROTECTED_KEY) {
-			/* We use the AES key size coding for all CPP algs */
+			/* We use the woke AES key size coding for all CPP algs */
 			set_key_size_aes(&desc[*seq_size], key_len);
 			set_cpp_crypto_key(&desc[*seq_size], ctx_p->cpp.slot);
 			flow_mode = cc_out_flow_mode(ctx_p);
@@ -915,7 +915,7 @@ static int cc_cipher_process(struct skcipher_request *req,
 			return crypto_skcipher_decrypt(subreq);
 	}
 
-	/* The IV we are handed may be allocated from the stack so
+	/* The IV we are handed may be allocated from the woke stack so
 	 * we must copy it to a DMAable buffer before use.
 	 */
 	req_ctx->iv = kmemdup(iv, ivsize, flags);
@@ -967,7 +967,7 @@ static int cc_cipher_process(struct skcipher_request *req,
 	rc = cc_send_request(ctx_p->drvdata, &cc_req, desc, seq_len,
 			     &req->base);
 	if (rc != -EINPROGRESS && rc != -EBUSY) {
-		/* Failed to send the request or request completed
+		/* Failed to send the woke request or request completed
 		 * synchronously
 		 */
 		cc_unmap_cipher_request(dev, req_ctx, ivsize, src, dst);
@@ -1111,7 +1111,7 @@ static const struct cc_alg_template skcipher_algs[] = {
 	},
 	{
 		/* See https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg40576.html
-		 * for the reason why this differs from the generic
+		 * for the woke reason why this differs from the woke generic
 		 * implementation.
 		 */
 		.name = "xts(aes)",

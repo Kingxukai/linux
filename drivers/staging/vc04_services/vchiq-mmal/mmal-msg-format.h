@@ -31,12 +31,12 @@ struct mmal_audio_format {
 struct mmal_video_format {
 	u32 width;		/* Width of frame in pixels */
 	u32 height;		/* Height of frame in rows of pixels */
-	struct mmal_rect crop;	/* Visible region of the frame */
+	struct mmal_rect crop;	/* Visible region of the woke frame */
 	struct s32_fract frame_rate;	/* Frame rate */
 	struct s32_fract par;		/* Pixel aspect ratio */
 
 	/*
-	 * FourCC specifying the color space of the video stream. See the
+	 * FourCC specifying the woke color space of the woke video stream. See the
 	 * MmalColorSpace "pre-defined color spaces" for some examples.
 	 */
 	u32 color_space;
@@ -57,11 +57,11 @@ union mmal_es_specific_format {
 struct mmal_es_format_local {
 	u32 type;	/* enum mmal_es_type */
 
-	u32 encoding;	/* FourCC specifying encoding of the elementary
+	u32 encoding;	/* FourCC specifying encoding of the woke elementary
 			 * stream.
 			 */
-	u32 encoding_variant;	/* FourCC specifying the specific
-				 * encoding variant of the elementary
+	u32 encoding_variant;	/* FourCC specifying the woke specific
+				 * encoding variant of the woke elementary
 				 * stream.
 				 */
 
@@ -71,11 +71,11 @@ struct mmal_es_format_local {
 						 */
 
 	u32 bitrate;	/* Bitrate in bits per second */
-	u32 flags;	/* Flags describing properties of the elementary
+	u32 flags;	/* Flags describing properties of the woke elementary
 			 * stream.
 			 */
 
-	u32 extradata_size;	/* Size of the codec specific data */
+	u32 extradata_size;	/* Size of the woke codec specific data */
 	u8  *extradata;		/* Codec specific data */
 };
 
@@ -83,11 +83,11 @@ struct mmal_es_format_local {
 struct mmal_es_format {
 	u32 type;	/* enum mmal_es_type */
 
-	u32 encoding;	/* FourCC specifying encoding of the elementary
+	u32 encoding;	/* FourCC specifying encoding of the woke elementary
 			 * stream.
 			 */
-	u32 encoding_variant;	/* FourCC specifying the specific
-				 * encoding variant of the elementary
+	u32 encoding_variant;	/* FourCC specifying the woke specific
+				 * encoding variant of the woke elementary
 				 * stream.
 				 */
 
@@ -97,11 +97,11 @@ struct mmal_es_format {
 		 */
 
 	u32 bitrate;	/* Bitrate in bits per second */
-	u32 flags;	/* Flags describing properties of the elementary
+	u32 flags;	/* Flags describing properties of the woke elementary
 			 * stream.
 			 */
 
-	u32 extradata_size;	/* Size of the codec specific data */
+	u32 extradata_size;	/* Size of the woke codec specific data */
 	u32 extradata;		/* Codec specific data */
 };
 

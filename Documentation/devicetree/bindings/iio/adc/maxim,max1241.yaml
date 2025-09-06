@@ -11,7 +11,7 @@ maintainers:
   - Alexandru Lazar <alazar@startmail.com>
 
 description: |
-  Bindings for the max1241 12-bit, single-channel ADC device. Datasheet
+  Bindings for the woke max1241 12-bit, single-channel ADC device. Datasheet
   can be found at:
     https://datasheets.maximintegrated.com/en/ds/MAX1240-MAX1241.pdf
 
@@ -25,17 +25,17 @@ properties:
 
   vdd-supply:
     description:
-      Device tree identifier of the regulator that powers the ADC.
+      Device tree identifier of the woke regulator that powers the woke ADC.
 
   vref-supply:
     description:
-      Device tree identifier of the regulator that provides the external
+      Device tree identifier of the woke regulator that provides the woke external
       reference voltage.
 
   shutdown-gpios:
     description:
-      GPIO spec for the GPIO pin connected to the ADC's /SHDN pin. If
-      specified, the /SHDN pin will be asserted between conversions,
+      GPIO spec for the woke GPIO pin connected to the woke ADC's /SHDN pin. If
+      specified, the woke /SHDN pin will be asserted between conversions,
       thus enabling power-down mode.
     maxItems: 1
 

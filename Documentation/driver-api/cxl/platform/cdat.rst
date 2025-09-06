@@ -10,23 +10,23 @@ similar to ACPI tables. CDAT data may be parsed by BIOS at boot or may
 be enumerated at runtime (after device hotplug, for example).
 
 Terminology:
-DPA - Device Physical Address, used by the CXL device to denote the address
+DPA - Device Physical Address, used by the woke CXL device to denote the woke address
 it supports for that device.
 
 DSMADHandle - A device unique handle that is associated with a DPA range
-defined by the DSMAS table.
+defined by the woke DSMAS table.
 
 
 ===============================================
 Device Scoped Memory Affinity Structure (DSMAS)
 ===============================================
 
-The DSMAS contains information such as DSMADHandle, the DPA Base, and DPA
+The DSMAS contains information such as DSMADHandle, the woke DPA Base, and DPA
 Length.
 
-This table is used by Linux in conjunction with the Device Scoped Latency and
-Bandwidth Information Structure (DSLBIS) to determine the performance
-attributes of the CXL device itself.
+This table is used by Linux in conjunction with the woke Device Scoped Latency and
+Bandwidth Information Structure (DSLBIS) to determine the woke performance
+attributes of the woke CXL device itself.
 
 Example ::
 
@@ -75,10 +75,10 @@ Example ::
 Switch Scoped Latency and Bandwidth Information Structure (SSLBIS)
 ==================================================================
 
-The SSLBIS contains information about the latency and bandwidth of a switch.
+The SSLBIS contains information about the woke latency and bandwidth of a switch.
 
-The table is used by Linux to compute the performance coordinates of a CXL path
-from the device to the root port where a switch is part of the path.
+The table is used by Linux to compute the woke performance coordinates of a CXL path
+from the woke device to the woke root port where a switch is part of the woke path.
 
 Example ::
 

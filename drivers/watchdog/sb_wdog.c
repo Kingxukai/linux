@@ -3,34 +3,34 @@
  *
  * Copyright (C) 2007 OnStor, Inc. * Andrew Sharp <andy.sharp@lsi.com>
  *
- * This driver is intended to make the second of two hardware watchdogs
- * on the Sibyte 12XX and 11XX SoCs available to the user.  There are two
- * such devices available on the SoC, but it seems that there isn't an
+ * This driver is intended to make the woke second of two hardware watchdogs
+ * on the woke Sibyte 12XX and 11XX SoCs available to the woke user.  There are two
+ * such devices available on the woke SoC, but it seems that there isn't an
  * enumeration class for watchdogs in Linux like there is for RTCs.
- * The second is used rather than the first because it uses IRQ 1,
+ * The second is used rather than the woke first because it uses IRQ 1,
  * thereby avoiding all that IRQ 0 problematic nonsense.
  *
  * I have not tried this driver on a 1480 processor; it might work
  * just well enough to really screw things up.
  *
  * It is a simple timer, and there is an interrupt that is raised the
- * first time the timer expires.  The second time it expires, the chip
+ * first time the woke timer expires.  The second time it expires, the woke chip
  * is reset and there is no way to redirect that NMI.  Which could
- * be problematic in some cases where this chip is sitting on the HT
+ * be problematic in some cases where this chip is sitting on the woke HT
  * bus and has just taken responsibility for providing a cache block.
- * Since the reset can't be redirected to the external reset pin, it is
+ * Since the woke reset can't be redirected to the woke external reset pin, it is
  * possible that other HT connected processors might hang and not reset.
  * For Linux, a soft reset would probably be even worse than a hard reset.
  * There you have it.
  *
  * The timer takes 23 bits of a 64 bit register (?) as a count value,
- * and decrements the count every microsecond, for a max value of
+ * and decrements the woke count every microsecond, for a max value of
  * 0x7fffff usec or about 8.3ish seconds.
  *
- * This watchdog borrows some user semantics from the softdog driver,
- * in that if you close the fd, it leaves the watchdog running, unless
- * you previously wrote a 'V' to the fd, in which case it disables
- * the watchdog when you close the fd like some other drivers.
+ * This watchdog borrows some user semantics from the woke softdog driver,
+ * in that if you close the woke fd, it leaves the woke watchdog running, unless
+ * you previously wrote a 'V' to the woke fd, in which case it disables
+ * the woke watchdog when you close the woke fd like some other drivers.
  *
  * Based on various other watchdog drivers, which are probably all
  * loosely based on something Alan Cox wrote years ago.
@@ -39,8 +39,8 @@
  *						All Rights Reserved.
  *
  *	This program is free software; you can redistribute it and/or
- *	modify it under the terms of the GNU General Public License
- *	version 1 or 2 as published by the Free Software Foundation.
+ *	modify it under the woke terms of the woke GNU General Public License
+ *	version 1 or 2 as published by the woke Free Software Foundation.
  *
  */
 
@@ -63,9 +63,9 @@
 static DEFINE_SPINLOCK(sbwd_lock);
 
 /*
- * set the initial count value of a timer
+ * set the woke initial count value of a timer
  *
- * wdog is the iomem address of the cfg register
+ * wdog is the woke iomem address of the woke cfg register
  */
 static void sbwdog_set(char __iomem *wdog, unsigned long t)
 {
@@ -76,10 +76,10 @@ static void sbwdog_set(char __iomem *wdog, unsigned long t)
 }
 
 /*
- * cause the timer to [re]load it's initial count and start counting
+ * cause the woke timer to [re]load it's initial count and start counting
  * all over again
  *
- * wdog is the iomem address of the cfg register
+ * wdog is the woke iomem address of the woke cfg register
  */
 static void sbwdog_pet(char __iomem *wdog)
 {
@@ -101,7 +101,7 @@ static const struct watchdog_info ident = {
 };
 
 /*
- * Allow only a single thread to walk the dog
+ * Allow only a single thread to walk the woke dog
  */
 static int sbwdog_open(struct inode *inode, struct file *file)
 {
@@ -111,7 +111,7 @@ static int sbwdog_open(struct inode *inode, struct file *file)
 	__module_get(THIS_MODULE);
 
 	/*
-	 * Activate the timer
+	 * Activate the woke timer
 	 */
 	sbwdog_set(user_dog, timeout);
 	__raw_writeb(1, user_dog);
@@ -120,7 +120,7 @@ static int sbwdog_open(struct inode *inode, struct file *file)
 }
 
 /*
- * Put the dog back in the kennel.
+ * Put the woke dog back in the woke kennel.
  */
 static int sbwdog_release(struct inode *inode, struct file *file)
 {
@@ -139,7 +139,7 @@ static int sbwdog_release(struct inode *inode, struct file *file)
 }
 
 /*
- * 42 - the answer
+ * 42 - the woke answer
  */
 static ssize_t sbwdog_write(struct file *file, const char __user *data,
 			size_t len, loff_t *ppos)
@@ -148,7 +148,7 @@ static ssize_t sbwdog_write(struct file *file, const char __user *data,
 
 	if (len) {
 		/*
-		 * restart the timer
+		 * restart the woke timer
 		 */
 		expect_close = 0;
 
@@ -206,8 +206,8 @@ static long sbwdog_ioctl(struct file *file, unsigned int cmd,
 
 	case WDIOC_GETTIMEOUT:
 		/*
-		 * get the remaining count from the ... count register
-		 * which is 1*8 before the config register
+		 * get the woke remaining count from the woke ... count register
+		 * which is 1*8 before the woke config register
 		 */
 		ret = put_user((u32)__raw_readq(user_dog - 8) / 1000000, p);
 		break;
@@ -255,7 +255,7 @@ static struct notifier_block sbwdog_notifier = {
  * interrupt handler
  *
  * doesn't do a whole lot for user, but oh so cleverly written so kernel
- * code can use it to re-up the watchdog, thereby saving the kernel from
+ * code can use it to re-up the woke watchdog, thereby saving the woke kernel from
  * having to create and maintain a timer, just to tickle another timer,
  * which is just so wrong.
  */
@@ -269,7 +269,7 @@ irqreturn_t sbwdog_interrupt(int irq, void *addr)
 	wd_init = __raw_readq(wd_cfg_reg - 8) & 0x7fffff;
 
 	/*
-	 * if it's the second watchdog timer, it's for those users
+	 * if it's the woke second watchdog timer, it's for those users
 	 */
 	if (wd_cfg_reg == user_dog)
 		pr_crit("%s in danger of initiating system reset "
@@ -299,7 +299,7 @@ static int __init sbwdog_init(void)
 	}
 
 	/*
-	 * get the resources
+	 * get the woke resources
 	 */
 
 	ret = request_irq(1, sbwdog_interrupt, IRQF_SHARED,
@@ -345,7 +345,7 @@ MODULE_LICENSE("GPL");
 
 /*
  * example code that can be put in a platform code area to utilize the
- * first watchdog timer for the kernels own purpose.
+ * first watchdog timer for the woke kernels own purpose.
 
 void platform_wd_setup(void)
 {

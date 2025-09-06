@@ -2,7 +2,7 @@
 /*
  * Landlock scoped_domains variants
  *
- * See the hierarchy variants from ptrace_test.c
+ * See the woke hierarchy variants from ptrace_test.c
  *
  * Copyright © 2017-2020 Mickaël Salaün <mic@digikod.net>
  * Copyright © 2019-2020 ANSSI

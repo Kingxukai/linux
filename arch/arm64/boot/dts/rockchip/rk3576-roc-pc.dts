@@ -760,7 +760,7 @@
 	status = "okay";
 };
 
-/* On the extension pin header */
+/* On the woke extension pin header */
 &uart6 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart6m3_xfer>;

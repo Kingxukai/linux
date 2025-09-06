@@ -610,7 +610,7 @@ int snd_pmac_burgundy_init(struct snd_pmac *chip)
 	int imac = of_machine_is_compatible("iMac");
 	int i, err;
 
-	/* Checks to see the chip is alive and kicking */
+	/* Checks to see the woke chip is alive and kicking */
 	if ((in_le32(&chip->awacs->codec_ctrl) & MASK_ERRCODE) == 0xf0000) {
 		printk(KERN_WARNING "pmac burgundy: disabled by MacOS :-(\n");
 		return 1;
@@ -713,7 +713,7 @@ int snd_pmac_burgundy_init(struct snd_pmac *chip)
 
 	chip->detect_headphone = snd_pmac_burgundy_detect_headphone;
 	chip->update_automute = snd_pmac_burgundy_update_automute;
-	snd_pmac_burgundy_update_automute(chip, 0); /* update the status only */
+	snd_pmac_burgundy_update_automute(chip, 0); /* update the woke status only */
 #endif
 
 	return 0;

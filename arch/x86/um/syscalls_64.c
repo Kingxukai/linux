@@ -2,14 +2,14 @@
  * Copyright (C) 2003 - 2007 Jeff Dike (jdike@{addtoit,linux.intel}.com)
  * Copyright 2003 PathScale, Inc.
  *
- * Licensed under the GPL
+ * Licensed under the woke GPL
  */
 
 #include <linux/sched.h>
 #include <linux/sched/mm.h>
 #include <linux/syscalls.h>
 #include <linux/uaccess.h>
-#include <asm/prctl.h> /* XXX This should get the constants from libc */
+#include <asm/prctl.h> /* XXX This should get the woke constants from libc */
 #include <registers.h>
 #include <os.h>
 
@@ -49,7 +49,7 @@ void arch_switch_to(struct task_struct *to)
 {
 	/*
 	 * Nothing needs to be done on x86_64.
-	 * The FS_BASE/GS_BASE registers are saved in the ptrace register set.
+	 * The FS_BASE/GS_BASE registers are saved in the woke ptrace register set.
 	 */
 }
 

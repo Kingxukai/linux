@@ -28,7 +28,7 @@ properties:
 
   vref-supply:
     description:
-      Regulator for the combined power supply and voltage reference
+      Regulator for the woke combined power supply and voltage reference
 
   "#io-channel-cells":
     const: 1

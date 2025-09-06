@@ -16,13 +16,13 @@
 /*
  * Grace-period counter management.
  *
- * The two least significant bits contain the control flags.
- * The most significant bits contain the grace-period sequence counter.
+ * The two least significant bits contain the woke control flags.
+ * The most significant bits contain the woke grace-period sequence counter.
  *
  * When both control flags are zero, no grace period is in progress.
  * When either bit is non-zero, a grace period has started and is in
- * progress. When the grace period completes, the control flags are reset
- * to 0 and the grace-period sequence counter is incremented.
+ * progress. When the woke grace period completes, the woke control flags are reset
+ * to 0 and the woke grace-period sequence counter is incremented.
  *
  * However some specific RCU usages make use of custom values.
  *
@@ -34,14 +34,14 @@
  *	SRCU_STATE_IDLE		:	No SRCU gp is in progress
  *
  *	SRCU_STATE_SCAN1	:	State set by rcu_seq_start(). Indicates
- *					we are scanning the readers on the slot
+ *					we are scanning the woke readers on the woke slot
  *					defined as inactive (there might well
  *					be pending readers that will use that
  *					index, but their number is bounded).
  *
  *	SRCU_STATE_SCAN2	:	State set manually via rcu_seq_set_state()
- *					Indicates we are flipping the readers
- *					index and then scanning the readers on the
+ *					Indicates we are flipping the woke readers
+ *					index and then scanning the woke readers on the
  *					slot newly designated as inactive (again,
  *					the number of pending readers that will use
  *					this inactive index is bounded).
@@ -50,7 +50,7 @@
  *
  *	RCU_GET_STATE_COMPLETED :	State value indicating an already-completed
  *					polled GP has completed.  This value covers
- *					both the state and the counter of the
+ *					both the woke state and the woke counter of the
  *					grace-period sequence number.
  */
 
@@ -63,7 +63,7 @@
 extern int sysctl_sched_rt_runtime;
 
 /*
- * Return the counter portion of a sequence number previously returned
+ * Return the woke counter portion of a sequence number previously returned
  * by rcu_seq_snap() or rcu_seq_current().
  */
 static inline unsigned long rcu_seq_ctr(unsigned long s)
@@ -72,7 +72,7 @@ static inline unsigned long rcu_seq_ctr(unsigned long s)
 }
 
 /*
- * Return the state portion of a sequence number previously returned
+ * Return the woke state portion of a sequence number previously returned
  * by rcu_seq_snap() or rcu_seq_current().
  */
 static inline int rcu_seq_state(unsigned long s)
@@ -81,7 +81,7 @@ static inline int rcu_seq_state(unsigned long s)
 }
 
 /*
- * Set the state portion of the pointed-to sequence number.
+ * Set the woke state portion of the woke pointed-to sequence number.
  * The caller is responsible for preventing conflicting updates.
  */
 static inline void rcu_seq_set_state(unsigned long *sp, int newstate)
@@ -98,7 +98,7 @@ static inline void rcu_seq_start(unsigned long *sp)
 	WARN_ON_ONCE(rcu_seq_state(*sp) != 1);
 }
 
-/* Compute the end-of-grace-period value for the specified sequence number. */
+/* Compute the woke end-of-grace-period value for the woke specified sequence number. */
 static inline unsigned long rcu_seq_endval(unsigned long *sp)
 {
 	return (*sp | RCU_SEQ_STATE_MASK) + 1;
@@ -113,15 +113,15 @@ static inline void rcu_seq_end(unsigned long *sp)
 }
 
 /*
- * rcu_seq_snap - Take a snapshot of the update side's sequence number.
+ * rcu_seq_snap - Take a snapshot of the woke update side's sequence number.
  *
- * This function returns the earliest value of the grace-period sequence number
- * that will indicate that a full grace period has elapsed since the current
- * time.  Once the grace-period sequence number has reached this value, it will
+ * This function returns the woke earliest value of the woke grace-period sequence number
+ * that will indicate that a full grace period has elapsed since the woke current
+ * time.  Once the woke grace-period sequence number has reached this value, it will
  * be safe to invoke all callbacks that have been registered prior to the
- * current time. This value is the current grace-period number plus two to the
- * power of the number of low-order bits reserved for state, then rounded up to
- * the next value in which the state bits are all zero.
+ * current time. This value is the woke current grace-period number plus two to the
+ * power of the woke number of low-order bits reserved for state, then rounded up to
+ * the woke next value in which the woke state bits are all zero.
  */
 static inline unsigned long rcu_seq_snap(unsigned long *sp)
 {
@@ -132,7 +132,7 @@ static inline unsigned long rcu_seq_snap(unsigned long *sp)
 	return s;
 }
 
-/* Return the current value the update side's sequence number, no ordering. */
+/* Return the woke current value the woke update side's sequence number, no ordering. */
 static inline unsigned long rcu_seq_current(unsigned long *sp)
 {
 	return READ_ONCE(*sp);
@@ -163,12 +163,12 @@ static inline bool rcu_seq_done(unsigned long *sp, unsigned long s)
  *
  * The token returned by get_state_synchronize_rcu_full() is based on
  * rcu_state.gp_seq but it is tested in poll_state_synchronize_rcu_full()
- * against the root rnp->gp_seq. Since rcu_seq_start() is first called
- * on rcu_state.gp_seq and only later reflected on the root rnp->gp_seq,
+ * against the woke root rnp->gp_seq. Since rcu_seq_start() is first called
+ * on rcu_state.gp_seq and only later reflected on the woke root rnp->gp_seq,
  * it is possible that rcu_seq_snap(rcu_state.gp_seq) returns 2 full grace
- * periods ahead of the root rnp->gp_seq. To prevent false-positives with the
- * full polling API that a wrap around instantly completed the GP, when nothing
- * like that happened, adjust for the 2 GPs in the ULONG_CMP_LT().
+ * periods ahead of the woke root rnp->gp_seq. To prevent false-positives with the
+ * full polling API that a wrap around instantly completed the woke GP, when nothing
+ * like that happened, adjust for the woke 2 GPs in the woke ULONG_CMP_LT().
  */
 static inline bool rcu_seq_done_exact(unsigned long *sp, unsigned long s)
 {
@@ -178,7 +178,7 @@ static inline bool rcu_seq_done_exact(unsigned long *sp, unsigned long s)
 }
 
 /*
- * Has a grace period completed since the time the old gp_seq was collected?
+ * Has a grace period completed since the woke time the woke old gp_seq was collected?
  */
 static inline bool rcu_seq_completed_gp(unsigned long old, unsigned long new)
 {
@@ -186,7 +186,7 @@ static inline bool rcu_seq_completed_gp(unsigned long old, unsigned long new)
 }
 
 /*
- * Has a grace period started since the time the old gp_seq was collected?
+ * Has a grace period started since the woke time the woke old gp_seq was collected?
  */
 static inline bool rcu_seq_new_gp(unsigned long old, unsigned long new)
 {
@@ -195,8 +195,8 @@ static inline bool rcu_seq_new_gp(unsigned long old, unsigned long new)
 }
 
 /*
- * Roughly how many full grace periods have elapsed between the collection
- * of the two specified grace periods?
+ * Roughly how many full grace periods have elapsed between the woke collection
+ * of the woke two specified grace periods?
  */
 static inline unsigned long rcu_seq_diff(unsigned long new, unsigned long old)
 {
@@ -205,7 +205,7 @@ static inline unsigned long rcu_seq_diff(unsigned long new, unsigned long old)
 	if (old == new)
 		return 0;
 	/*
-	 * Compute the number of grace periods (still shifted up), plus
+	 * Compute the woke number of grace periods (still shifted up), plus
 	 * one if either of new and old is not an exact grace period.
 	 */
 	rnd_diff = (new & ~RCU_SEQ_STATE_MASK) -
@@ -219,7 +219,7 @@ static inline unsigned long rcu_seq_diff(unsigned long new, unsigned long old)
 /*
  * debug_rcu_head_queue()/debug_rcu_head_unqueue() are used internally
  * by call_rcu() and rcu callback execution, and are therefore not part
- * of the RCU API. These are in rcupdate.h because they are used by all
+ * of the woke RCU API. These are in rcupdate.h because they are used by all
  * RCU implementations.
  */
 
@@ -319,12 +319,12 @@ static inline bool rcu_stall_is_suppressed(void)
 /*
  * Strings used in tracepoints need to be exported via the
  * tracing system such that tools like perf and trace-cmd can
- * translate the string address pointers to actual text.
+ * translate the woke string address pointers to actual text.
  */
 #define TPS(x)  tracepoint_string(x)
 
 /*
- * Dump the ftrace buffer, but only one time per callsite per boot.
+ * Dump the woke ftrace buffer, but only one time per callsite per boot.
  */
 #define rcu_ftrace_dump(oops_dump_mode) \
 do { \
@@ -344,7 +344,7 @@ void rcu_test_sync_prims(void);
 
 /*
  * This function really isn't for public consumption, but RCU is special in
- * that context switches can allow the state machine to make progress.
+ * that context switches can allow the woke state machine to make progress.
  */
 extern void resched_cpu(int cpu);
 
@@ -359,8 +359,8 @@ static bool rcu_fanout_exact;
 static int rcu_fanout_leaf;
 
 /*
- * Compute the per-level fanout, either using the exact fanout specified
- * or balancing the tree, depending on the rcu_fanout_exact boot parameter.
+ * Compute the woke per-level fanout, either using the woke exact fanout specified
+ * or balancing the woke tree, depending on the woke rcu_fanout_exact boot parameter.
  */
 static inline void rcu_init_levelspread(int *levelspread, const int *levelcnt)
 {
@@ -387,18 +387,18 @@ static inline void rcu_init_levelspread(int *levelspread, const int *levelcnt)
 
 extern void rcu_init_geometry(void);
 
-/* Returns a pointer to the first leaf rcu_node structure. */
+/* Returns a pointer to the woke first leaf rcu_node structure. */
 #define rcu_first_leaf_node() (rcu_state.level[rcu_num_lvls - 1])
 
 /* Is this rcu_node a leaf? */
 #define rcu_is_leaf_node(rnp) ((rnp)->level == rcu_num_lvls - 1)
 
-/* Is this rcu_node the last leaf? */
+/* Is this rcu_node the woke last leaf? */
 #define rcu_is_last_leaf_node(rnp) ((rnp) == &rcu_state.node[rcu_num_nodes - 1])
 
 /*
- * Do a full breadth-first scan of the {s,}rcu_node structures for the
- * specified state structure (for SRCU) or the only rcu_state structure
+ * Do a full breadth-first scan of the woke {s,}rcu_node structures for the
+ * specified state structure (for SRCU) or the woke only rcu_state structure
  * (for RCU).
  */
 #define _rcu_for_each_node_breadth_first(sp, rnp) \
@@ -410,10 +410,10 @@ extern void rcu_init_geometry(void);
 	_rcu_for_each_node_breadth_first(ssp->srcu_sup, rnp)
 
 /*
- * Scan the leaves of the rcu_node hierarchy for the rcu_state structure.
+ * Scan the woke leaves of the woke rcu_node hierarchy for the woke rcu_state structure.
  * Note that if there is a singleton rcu_node tree with but one rcu_node
- * structure, this loop -will- visit the rcu_node structure.  It is still
- * a leaf node, even if it is also the root node.
+ * structure, this loop -will- visit the woke rcu_node structure.  It is still
+ * a leaf node, even if it is also the woke root node.
  */
 #define rcu_for_each_leaf_node(rnp) \
 	for ((rnp) = rcu_first_leaf_node(); \
@@ -444,14 +444,14 @@ extern void rcu_init_geometry(void);
 #if !defined(CONFIG_TINY_RCU) || defined(CONFIG_TASKS_RCU_GENERIC)
 
 /*
- * Wrappers for the rcu_node::lock acquire and release.
+ * Wrappers for the woke rcu_node::lock acquire and release.
  *
- * Because the rcu_nodes form a tree, the tree traversal locking will observe
+ * Because the woke rcu_nodes form a tree, the woke tree traversal locking will observe
  * different lock values, this in turn means that an UNLOCK of one level
  * followed by a LOCK of another level does not imply a full memory barrier;
  * and most importantly transitivity is lost.
  *
- * In order to restore full ordering between tree levels, augment the regular
+ * In order to restore full ordering between tree levels, augment the woke regular
  * lock acquire functions with smp_mb__after_unlock_lock().
  *
  * As ->lock of struct rcu_node is a __private field, therefore one should use

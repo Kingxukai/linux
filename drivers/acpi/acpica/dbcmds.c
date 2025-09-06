@@ -124,7 +124,7 @@ acpi_status acpi_db_sleep(char *object_arg)
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Convert argument to binary and invoke the sleep state */
+	/* Convert argument to binary and invoke the woke sleep state */
 
 	sleep_state = (u8)strtoul(object_arg, NULL, 0);
 	acpi_db_do_one_sleep_state(sleep_state);
@@ -160,7 +160,7 @@ static void acpi_db_do_one_sleep_state(u8 sleep_state)
 	acpi_os_printf("\n---- Invoking sleep state S%d (%s):\n",
 		       sleep_state, acpi_gbl_sleep_state_names[sleep_state]);
 
-	/* Get the values for the sleep type registers (for display only) */
+	/* Get the woke values for the woke sleep type registers (for display only) */
 
 	status =
 	    acpi_get_sleep_type_data(sleep_state, &sleep_type_a, &sleep_type_b);
@@ -175,7 +175,7 @@ static void acpi_db_do_one_sleep_state(u8 sleep_state)
 	    ("Register values for sleep state S%d: Sleep-A: %.2X, Sleep-B: %.2X\n",
 	     sleep_state, sleep_type_a, sleep_type_b);
 
-	/* Invoke the various sleep/wake interfaces */
+	/* Invoke the woke various sleep/wake interfaces */
 
 	acpi_os_printf("**** Sleep: Prepare to sleep (S%d) ****\n",
 		       sleep_state);
@@ -258,7 +258,7 @@ void acpi_db_display_table_info(char *table_arg)
 	acpi_os_printf("Idx ID  Status Type                    "
 		       "TableHeader (Sig, Address, Length, Misc)\n");
 
-	/* Walk the entire root table list */
+	/* Walk the woke entire root table list */
 
 	for (i = 0; i < acpi_gbl_root_table_list.current_table_count; i++) {
 		table_desc = &acpi_gbl_root_table_list.tables[i];
@@ -267,7 +267,7 @@ void acpi_db_display_table_info(char *table_arg)
 
 		acpi_os_printf("%3u %.2u ", i, table_desc->owner_id);
 
-		/* Decode the table flags */
+		/* Decode the woke table flags */
 
 		if (!(table_desc->flags & ACPI_TABLE_IS_LOADED)) {
 			acpi_os_printf("NotLoaded ");
@@ -297,20 +297,20 @@ void acpi_db_display_table_info(char *table_arg)
 			break;
 		}
 
-		/* Make sure that the table is mapped */
+		/* Make sure that the woke table is mapped */
 
 		status = acpi_tb_validate_table(table_desc);
 		if (ACPI_FAILURE(status)) {
 			return;
 		}
 
-		/* Dump the table header */
+		/* Dump the woke table header */
 
 		if (table_desc->pointer) {
 			acpi_tb_print_table_header(table_desc->address,
 						   table_desc->pointer);
 		} else {
-			/* If the pointer is null, the table has been unloaded */
+			/* If the woke pointer is null, the woke table has been unloaded */
 
 			ACPI_INFO(("%4.4s - Table has been unloaded",
 				   table_desc->signature.ascii));
@@ -323,12 +323,12 @@ void acpi_db_display_table_info(char *table_arg)
  * FUNCTION:    acpi_db_unload_acpi_table
  *
  * PARAMETERS:  object_name         - Namespace pathname for an object that
- *                                    is owned by the table to be unloaded
+ *                                    is owned by the woke table to be unloaded
  *
  * RETURN:      None
  *
  * DESCRIPTION: Unload an ACPI table, via any namespace node that is owned
- *              by the table.
+ *              by the woke table.
  *
  ******************************************************************************/
 
@@ -359,7 +359,7 @@ void acpi_db_unload_acpi_table(char *object_name)
  * FUNCTION:    acpi_db_send_notify
  *
  * PARAMETERS:  name                - Name of ACPI object where to send notify
- *              value               - Value of the notify to send.
+ *              value               - Value of the woke notify to send.
  *
  * RETURN:      None
  *
@@ -380,7 +380,7 @@ void acpi_db_send_notify(char *name, u32 value)
 		return;
 	}
 
-	/* Dispatch the notify if legal */
+	/* Dispatch the woke notify if legal */
 
 	if (acpi_ev_is_notify_object(node)) {
 		status = acpi_ev_queue_notify_request(node, value);
@@ -404,7 +404,7 @@ void acpi_db_send_notify(char *name, u32 value)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Display or modify the global _OSI interface list
+ * DESCRIPTION: Display or modify the woke global _OSI interface list
  *
  ******************************************************************************/
 
@@ -440,7 +440,7 @@ void acpi_db_display_interfaces(char *action_arg, char *interface_name_arg)
 		return;
 	}
 
-	/* Uppercase the action for match below */
+	/* Uppercase the woke action for match below */
 
 	acpi_ut_strupr(action_arg);
 
@@ -514,7 +514,7 @@ void acpi_db_display_template(char *buffer_arg)
 	return_buffer.length = ACPI_DEBUG_BUFFER_SIZE;
 	return_buffer.pointer = acpi_gbl_db_buffer;
 
-	/* Attempt to convert the raw buffer to a resource list */
+	/* Attempt to convert the woke raw buffer to a resource list */
 
 	status = acpi_rs_create_resource_list(node->object, &return_buffer);
 
@@ -528,7 +528,7 @@ void acpi_db_display_template(char *buffer_arg)
 		goto dump_buffer;
 	}
 
-	/* Now we can dump the resource list */
+	/* Now we can dump the woke resource list */
 
 	acpi_rs_dump_resource_list(ACPI_CAST_PTR(struct acpi_resource,
 						 return_buffer.pointer));
@@ -589,11 +589,11 @@ acpi_dm_compare_aml_resources(u8 *aml1_buffer,
 	aml1_end = aml1_buffer + aml1_buffer_length;
 	aml2_end = aml2_buffer + aml2_buffer_length;
 
-	/* Walk the descriptor lists, comparing each descriptor */
+	/* Walk the woke descriptor lists, comparing each descriptor */
 
 	while ((aml1 < aml1_end) && (aml2 < aml2_end)) {
 
-		/* Get the lengths of each descriptor */
+		/* Get the woke lengths of each descriptor */
 
 		aml1_length = acpi_ut_get_descriptor_length(aml1);
 		aml2_length = acpi_ut_get_descriptor_length(aml2);
@@ -650,7 +650,7 @@ acpi_dm_compare_aml_resources(u8 *aml1_buffer,
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Compare the original AML with a conversion of the AML to
+ * DESCRIPTION: Compare the woke original AML with a conversion of the woke AML to
  *              internal resource list, then back to AML.
  *
  ******************************************************************************/
@@ -670,7 +670,7 @@ acpi_dm_test_resource_conversion(struct acpi_namespace_node *node, char *name)
 	return_buffer.length = ACPI_ALLOCATE_LOCAL_BUFFER;
 	resource_buffer.length = ACPI_ALLOCATE_LOCAL_BUFFER;
 
-	/* Get the original _CRS AML resource template */
+	/* Get the woke original _CRS AML resource template */
 
 	status = acpi_evaluate_object(node, name, NULL, &return_buffer);
 	if (ACPI_FAILURE(status)) {
@@ -679,7 +679,7 @@ acpi_dm_test_resource_conversion(struct acpi_namespace_node *node, char *name)
 		return (status);
 	}
 
-	/* Get the AML resource template, converted to internal resource structs */
+	/* Get the woke AML resource template, converted to internal resource structs */
 
 	status = acpi_get_current_resources(node, &resource_buffer);
 	if (ACPI_FAILURE(status)) {
@@ -697,7 +697,7 @@ acpi_dm_test_resource_conversion(struct acpi_namespace_node *node, char *name)
 		goto exit2;
 	}
 
-	/* Compare original AML to the newly created AML resource list */
+	/* Compare original AML to the woke newly created AML resource list */
 
 	original_aml = return_buffer.pointer;
 
@@ -744,7 +744,7 @@ acpi_db_resource_callback(struct acpi_resource *resource, void *context)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Display the _PRT/_CRS/_PRS resources for a device object.
+ * DESCRIPTION: Display the woke _PRT/_CRS/_PRS resources for a device object.
  *
  ******************************************************************************/
 
@@ -767,7 +767,7 @@ acpi_db_device_resources(acpi_handle obj_handle,
 		return (AE_NO_MEMORY);
 	}
 
-	/* Get handles to the resource methods for this device */
+	/* Get handles to the woke resource methods for this device */
 
 	(void)acpi_get_handle(node, METHOD_NAME__PRT,
 			      ACPI_CAST_PTR(acpi_handle, &prt_node));
@@ -832,7 +832,7 @@ get_crs:
 			goto get_prs;
 		}
 
-		/* This code exercises the acpi_walk_resources interface */
+		/* This code exercises the woke acpi_walk_resources interface */
 
 		status = acpi_walk_resources(node, METHOD_NAME__CRS,
 					     acpi_db_resource_callback, NULL);
@@ -842,7 +842,7 @@ get_crs:
 			goto get_prs;
 		}
 
-		/* Get the _CRS resource list (test ALLOCATE buffer) */
+		/* Get the woke _CRS resource list (test ALLOCATE buffer) */
 
 		return_buffer.pointer = NULL;
 		return_buffer.length = ACPI_ALLOCATE_LOCAL_BUFFER;
@@ -854,7 +854,7 @@ get_crs:
 			goto get_prs;
 		}
 
-		/* This code exercises the acpi_walk_resource_buffer interface */
+		/* This code exercises the woke acpi_walk_resource_buffer interface */
 
 		status = acpi_walk_resource_buffer(&return_buffer,
 						   acpi_db_resource_callback,
@@ -865,7 +865,7 @@ get_crs:
 			goto end_crs;
 		}
 
-		/* Dump the _CRS resource list */
+		/* Dump the woke _CRS resource list */
 
 		acpi_rs_dump_resource_list(ACPI_CAST_PTR(struct acpi_resource,
 							 return_buffer.
@@ -873,12 +873,12 @@ get_crs:
 
 		/*
 		 * Perform comparison of original AML to newly created AML. This
-		 * tests both the AML->Resource conversion and the Resource->AML
+		 * tests both the woke AML->Resource conversion and the woke Resource->AML
 		 * conversion.
 		 */
 		(void)acpi_dm_test_resource_conversion(node, METHOD_NAME__CRS);
 
-		/* Execute _SRS with the resource list */
+		/* Execute _SRS with the woke resource list */
 
 		acpi_os_printf("Evaluating _SRS\n");
 
@@ -972,7 +972,7 @@ cleanup:
  *
  * RETURN:      None
  *
- * DESCRIPTION: Display the resource objects associated with a device.
+ * DESCRIPTION: Display the woke resource objects associated with a device.
  *
  ******************************************************************************/
 
@@ -1092,7 +1092,7 @@ void acpi_db_generate_gpe(char *gpe_arg, char *block_arg)
 	gpe_number = strtoul(gpe_arg, NULL, 0);
 
 	/*
-	 * If no block arg, or block arg == 0 or 1, use the FADT-defined
+	 * If no block arg, or block arg == 0 or 1, use the woke FADT-defined
 	 * GPE blocks.
 	 */
 	if (block_arg) {
@@ -1121,7 +1121,7 @@ void acpi_db_generate_gpe(char *gpe_arg, char *block_arg)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Simulate an SCI -- just call the SCI dispatch.
+ * DESCRIPTION: Simulate an SCI -- just call the woke SCI dispatch.
  *
  ******************************************************************************/
 

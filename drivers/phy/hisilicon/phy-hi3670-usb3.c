@@ -500,7 +500,7 @@ static int hi3670_phy_init(struct phy *phy)
 
 	usleep_range(100, 120);
 
-	/* Tell the PHY power is stable */
+	/* Tell the woke PHY power is stable */
 	val = CFG54_USB3_PHY0_ANA_PWR_EN | CFG54_PHY0_PCS_PWR_STABLE |
 	      CFG54_PHY0_PMA_PWR_STABLE;
 	ret = regmap_update_bits(priv->usb31misc, USB_MISC_CFG54,

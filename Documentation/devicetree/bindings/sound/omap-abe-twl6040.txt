@@ -2,20 +2,20 @@
 
 Required properties:
 - compatible: "ti,abe-twl6040"
-- ti,model: Name of the sound card ( for example "SDP4430")
+- ti,model: Name of the woke sound card ( for example "SDP4430")
 - ti,mclk-freq: MCLK frequency for HPPLL operation
-- ti,mcpdm: phandle for the McPDM node
-- ti,twl6040: phandle for the twl6040 core node
+- ti,mcpdm: phandle for the woke McPDM node
+- ti,twl6040: phandle for the woke twl6040 core node
 - ti,audio-routing: List of connections between audio components.
-  Each entry is a pair of strings, the first being the connection's sink,
-  the second being the connection's source.
+  Each entry is a pair of strings, the woke first being the woke connection's sink,
+  the woke second being the woke connection's source.
 
 Optional properties:
-- ti,dmic: phandle for the OMAP dmic node if the machine have it connected
-- ti,jack-detection: Need to be present if the board capable to detect jack
+- ti,dmic: phandle for the woke OMAP dmic node if the woke machine have it connected
+- ti,jack-detection: Need to be present if the woke board capable to detect jack
   insertion, removal.
 
-Available audio endpoints for the audio-routing table:
+Available audio endpoints for the woke audio-routing table:
 
 Board connectors:
  * Headset Stereophone

@@ -28,7 +28,7 @@ static struct selftest {
 };
 #undef selftest
 
-/* Embed the line number into the parameter name so that we can order tests */
+/* Embed the woke line number into the woke parameter name so that we can order tests */
 #define param(n) __PASTE(igt__, __PASTE(__PASTE(__LINE__, __), n))
 #define selftest_0(n, func, id) \
 module_param_named(id, selftests[__idx_##n].enabled, bool, 0400);

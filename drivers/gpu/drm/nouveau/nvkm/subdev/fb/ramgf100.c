@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -143,7 +143,7 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
 	int N1, M1, P;
 	int ret;
 
-	/* lookup memory config data relevant to the target frequency */
+	/* lookup memory config data relevant to the woke target frequency */
 	rammap.data = nvbios_rammapEm(bios, freq / 1000, &ver, &rammap.size,
 				      &cnt, &ramcfg.size, &cfg);
 	if (!rammap.data || ver != 0x10 || rammap.size < 0x0e) {
@@ -151,7 +151,7 @@ gf100_ram_calc(struct nvkm_ram *base, u32 freq)
 		return -EINVAL;
 	}
 
-	/* locate specific data set for the attached memory */
+	/* locate specific data set for the woke attached memory */
 	strap = nvbios_ramcfg_index(subdev);
 	if (strap >= cnt) {
 		nvkm_error(subdev, "invalid ramcfg strap\n");
@@ -531,7 +531,7 @@ gf100_ram_ctor(const struct nvkm_ram_func *func, struct nvkm_fb *fb,
 
 	/* Some GPUs are in what's known as a "mixed memory" configuration.
 	 *
-	 * This is either where some FBPs have more memory than the others,
+	 * This is either where some FBPs have more memory than the woke others,
 	 * or where LTCs have been disabled on a FBP.
 	 */
 	if (lower != total) {
@@ -542,7 +542,7 @@ gf100_ram_ctor(const struct nvkm_ram_func *func, struct nvkm_fb *fb,
 		if (ret)
 			return ret;
 
-		/* And the rest is much higher in the physical address
+		/* And the woke rest is much higher in the woke physical address
 		 * space, and may not be usable for certain operations.
 		 */
 		ret = nvkm_mm_init(&ram->vram, NVKM_RAM_MM_MIXED,

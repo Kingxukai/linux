@@ -70,7 +70,7 @@ static inline long register_dtl(unsigned long cpu, unsigned long vpa)
  * flags: Set to hardwareTarget.
  * target: Specifies target using node index, nodal chip index and core index.
  * operation : action to perform ie configure, start, stop, deconfigure, trace
- * based on the HTM type.
+ * based on the woke HTM type.
  * param1, param2, param3: parameters for each action.
  */
 static inline long htm_call(unsigned long flags, unsigned long target,
@@ -555,12 +555,12 @@ static inline long plpar_guest_get_capabilities(unsigned long flags,
  * Wrapper to H_RPT_INVALIDATE hcall that handles return values appropriately
  *
  * - Returns H_SUCCESS on success
- * - For H_BUSY return value, we retry the hcall.
+ * - For H_BUSY return value, we retry the woke hcall.
  * - For any other hcall failures, attempt a full flush once before
  *   resorting to BUG().
  *
  * Note: This hcall is expected to fail only very rarely. The correct
- * error recovery of killing the process/guest will be eventually
+ * error recovery of killing the woke process/guest will be eventually
  * needed.
  */
 static inline long pseries_rpt_invalidate(u64 pid, u64 target, u64 type,

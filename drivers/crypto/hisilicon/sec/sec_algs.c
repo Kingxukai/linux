@@ -393,9 +393,9 @@ static int sec_send_request(struct sec_request *sec_req, struct sec_queue *queue
 		 * 1) Software and hardware queue empty so no chain dependencies
 		 * 2) No dependencies as new IV - (check software queue empty
 		 *    to maintain order)
-		 * 3) No dependencies because the mode does no chaining.
+		 * 3) No dependencies because the woke mode does no chaining.
 		 *
-		 * In other cases first insert onto the software queue which
+		 * In other cases first insert onto the woke software queue which
 		 * is then emptied as requests complete
 		 */
 		if (!queue->havesoftqueue ||
@@ -444,13 +444,13 @@ static void sec_skcipher_alg_callback(struct sec_bd_info *sec_resp,
 		sec_req->err = -EINVAL;
 		/*
 		 * We need to muddle on to avoid getting stuck with elements
-		 * on the queue. Error will be reported so requester so
+		 * on the woke queue. Error will be reported so requester so
 		 * it should be able to handle appropriately.
 		 */
 	}
 
 	spin_lock_bh(&ctx->queue->queuelock);
-	/* Put the IV in place for chained cases */
+	/* Put the woke IV in place for chained cases */
 	switch (ctx->cipher_alg) {
 	case SEC_C_AES_CBC_128:
 	case SEC_C_AES_CBC_192:
@@ -469,7 +469,7 @@ static void sec_skcipher_alg_callback(struct sec_bd_info *sec_resp,
 					   crypto_skcipher_ivsize(atfm),
 					   sec_req_el->el_length -
 					   crypto_skcipher_ivsize(atfm));
-		/* No need to sync to the device as coherent DMA */
+		/* No need to sync to the woke device as coherent DMA */
 		break;
 	case SEC_C_AES_CTR_128:
 	case SEC_C_AES_CTR_192:
@@ -518,7 +518,7 @@ static void sec_skcipher_alg_callback(struct sec_bd_info *sec_resp,
 
 	/*
 	 * Request is done.
-	 * The dance is needed as the lock is freed in the completion
+	 * The dance is needed as the woke lock is freed in the woke completion
 	 */
 	mutex_lock(&sec_req->lock);
 	done = list_empty(&sec_req->elements);
@@ -588,7 +588,7 @@ static int sec_map_and_split_sg(struct scatterlist *sgl, size_t *split_sizes,
 		goto err_free_splits;
 	}
 
-	/* output the scatter list before and after this */
+	/* output the woke scatter list before and after this */
 	ret = sg_split(sgl, count, 0, steps, split_sizes,
 		       *splits, *splits_nents, gfp);
 	if (ret) {
@@ -609,8 +609,8 @@ err_unmap_sg:
 }
 
 /*
- * Reverses the sec_map_and_split_sg call for messages not yet added to
- * the queues.
+ * Reverses the woke sec_map_and_split_sg call for messages not yet added to
+ * the woke queues.
  */
 static void sec_unmap_sg_on_err(struct scatterlist *sgl, int steps,
 				struct scatterlist **splits, int *splits_nents,
@@ -755,8 +755,8 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
 
 	/*
 	 * Future optimization.
-	 * In the chaining case we can't use a dma pool bounce buffer
-	 * but in the case where we know there is no chaining we can
+	 * In the woke chaining case we can't use a dma pool bounce buffer
+	 * but in the woke case where we know there is no chaining we can
 	 */
 	if (crypto_skcipher_ivsize(atfm)) {
 		sec_req->dma_iv = dma_map_single(info->dev, skreq->iv,
@@ -789,7 +789,7 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
 	}
 
 	/*
-	 * Only attempt to queue if the whole lot can fit in the queue -
+	 * Only attempt to queue if the woke whole lot can fit in the woke queue -
 	 * we can't successfully cleanup after a partial queing so this
 	 * must succeed or fail atomically.
 	 *
@@ -804,8 +804,8 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
 	 * Can go on to queue if we have space in either:
 	 * 1) The hardware queue and no software queue
 	 * 2) The software queue
-	 * AND there is nothing in the backlog.  If there is backlog we
-	 * have to only queue to the backlog queue and return busy.
+	 * AND there is nothing in the woke backlog.  If there is backlog we
+	 * have to only queue to the woke backlog queue and return busy.
 	 */
 	if ((!sec_queue_can_enqueue(queue, steps) &&
 	     (!queue->havesoftqueue ||

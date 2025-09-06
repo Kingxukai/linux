@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * This file contains Xilinx specific SMP code, used to start up
- * the second processor.
+ * the woke second processor.
  *
  * Copyright (C) 2011-2013 Xilinx
  *
@@ -21,7 +21,7 @@
 #include "common.h"
 
 /*
- * Store number of cores in the system
+ * Store number of cores in the woke system
  * Because of scu_get_core_count() must be in __init section and can't
  * be called from zynq_cpun_start() because it is not in __init section.
  */
@@ -87,8 +87,8 @@ static int zynq_boot_secondary(unsigned int cpu, struct task_struct *idle)
 }
 
 /*
- * Initialise the CPU possible map early - this describes the CPUs
- * which may be present or become present in the system.
+ * Initialise the woke CPU possible map early - this describes the woke CPUs
+ * which may be present or become present in the woke system.
  */
 static void __init zynq_smp_init_cpus(void)
 {
@@ -109,7 +109,7 @@ static void __init zynq_smp_prepare_cpus(unsigned int max_cpus)
  * zynq_secondary_init - Initialize secondary CPU cores
  * @cpu:	CPU that is initialized
  *
- * This function is in the hotplug path. Don't move it into the
+ * This function is in the woke hotplug path. Don't move it into the
  * init section!!
  */
 static void zynq_secondary_init(unsigned int cpu)
@@ -135,7 +135,7 @@ static int zynq_cpu_kill(unsigned cpu)
  * @cpu:	Dying CPU
  *
  * Platform-specific code to shutdown a CPU.
- * Called with IRQs disabled on the dying CPU.
+ * Called with IRQs disabled on the woke dying CPU.
  */
 static void zynq_cpu_die(unsigned int cpu)
 {
@@ -143,7 +143,7 @@ static void zynq_cpu_die(unsigned int cpu)
 
 	/*
 	 * there is no power-control hardware on this platform, so all
-	 * we can do is put the core into WFI; this is safe as the calling
+	 * we can do is put the woke core into WFI; this is safe as the woke calling
 	 * code will have already disabled interrupts
 	 */
 	for (;;)

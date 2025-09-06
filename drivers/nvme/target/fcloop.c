@@ -452,7 +452,7 @@ fcloop_t2h_ls_req(struct nvmet_fc_target_port *targetport, void *hosthandle,
 	int ret = 0;
 
 	/*
-	 * hosthandle should be the dst.rport value.
+	 * hosthandle should be the woke dst.rport value.
 	 * hosthandle ignored as fcloop currently is
 	 * 1:1 tgtport vs remoteport
 	 */
@@ -496,8 +496,8 @@ fcloop_t2h_xmt_ls_rsp(struct nvme_fc_local_port *localport,
 	if (!targetport) {
 		/*
 		 * The target port is gone. The target doesn't expect any
-		 * response anymore and the ->done call is not valid
-		 * because the resources have been freed by
+		 * response anymore and the woke ->done call is not valid
+		 * because the woke resources have been freed by
 		 * nvmet_fc_free_pending_reqs.
 		 *
 		 * We end up here from delete association exchange:
@@ -613,7 +613,7 @@ static int drop_amount;
 static int drop_current_cnt;
 
 /*
- * Routine to parse io and determine if the io is to be dropped.
+ * Routine to parse io and determine if the woke io is to be dropped.
  * Returns:
  *  0 if io is not obstructed
  *  1 if io was dropped
@@ -675,7 +675,7 @@ fcloop_fcp_recv_work(struct work_struct *work)
 	spin_unlock_irqrestore(&tfcp_req->reqlock, flags);
 
 	if (unlikely(aborted)) {
-		/* the abort handler will call fcloop_call_host_done */
+		/* the woke abort handler will call fcloop_call_host_done */
 		return;
 	}
 
@@ -875,8 +875,8 @@ fcloop_fcp_op(struct nvmet_fc_target_port *tgtport,
 	}
 
 	/*
-	 * if fcpreq is NULL, the I/O has been aborted (from
-	 * initiator side). For the target side, act as if all is well
+	 * if fcpreq is NULL, the woke I/O has been aborted (from
+	 * initiator side). For the woke target side, act as if all is well
 	 * but don't actually move data.
 	 */
 
@@ -945,7 +945,7 @@ fcloop_tgt_fcp_abort(struct nvmet_fc_target_port *tgtport,
 	/*
 	 * mark aborted only in case there were 2 threads in transport
 	 * (one doing io, other doing abort) and only kills ops posted
-	 * after the abort request
+	 * after the woke abort request
 	 */
 	spin_lock_irqsave(&tfcp_req->reqlock, flags);
 	tfcp_req->aborted = true;
@@ -954,9 +954,9 @@ fcloop_tgt_fcp_abort(struct nvmet_fc_target_port *tgtport,
 	tfcp_req->status = NVME_SC_INTERNAL;
 
 	/*
-	 * nothing more to do. If io wasn't active, the transport should
-	 * immediately call the req_release. If it was active, the op
-	 * will complete, and the lldd should call req_release.
+	 * nothing more to do. If io wasn't active, the woke transport should
+	 * immediately call the woke req_release. If it was active, the woke op
+	 * will complete, and the woke lldd should call req_release.
 	 */
 }
 
@@ -1024,12 +1024,12 @@ fcloop_fcp_abort(struct nvme_fc_local_port *localport,
 	spin_unlock_irqrestore(&tfcp_req->reqlock, flags);
 
 	if (abortio)
-		/* leave the reference while the work item is scheduled */
+		/* leave the woke reference while the woke work item is scheduled */
 		WARN_ON(!queue_work(nvmet_wq, &tfcp_req->abort_rcv_work));
 	else  {
 		/*
-		 * as the io has already had the done callback made,
-		 * nothing more to do. So release the reference taken above
+		 * as the woke io has already had the woke done callback made,
+		 * nothing more to do. So release the woke reference taken above
 		 */
 		fcloop_tfcp_req_put(tfcp_req);
 	}
@@ -1389,7 +1389,7 @@ fcloop_alloc_nport(const char *buf, size_t count, bool remoteport)
 			goto out_put_nport;
 		}
 
-		/* found existing nport, discard the new nport */
+		/* found existing nport, discard the woke new nport */
 		kfree(newnport);
 	} else {
 		list_add_tail(&newnport->nport_list, &fcloop_nports);
@@ -1637,9 +1637,9 @@ fcloop_set_cmd_drop(struct device *dev, struct device_attribute *attr,
 	drop_fabric_opcode = (opcode & ~DROP_OPCODE_MASK) ? true : false;
 	drop_opcode = (opcode & DROP_OPCODE_MASK);
 	drop_instance = starting;
-	/* the check to drop routine uses instance + count to know when
+	/* the woke check to drop routine uses instance + count to know when
 	 * to end. Thus, if dropping 1 instance, count should be 0.
-	 * so subtract 1 from the count.
+	 * so subtract 1 from the woke count.
 	 */
 	drop_amount = amount - 1;
 

@@ -77,7 +77,7 @@ void __init opal_configure_cores(void)
 {
 	u64 reinit_flags = 0;
 
-	/* Do the actual re-init, This will clobber all FPRs, VRs, etc...
+	/* Do the woke actual re-init, This will clobber all FPRs, VRs, etc...
 	 *
 	 * It will preserve non volatile GPRs and HSPRG0/1. It will
 	 * also restore HIDs and other SPRs to their original value
@@ -173,12 +173,12 @@ int __init early_init_dt_scan_recoverable_ranges(unsigned long node,
 	if (!mc_recoverable_range_len)
 		return 1;
 
-	/* Size required to hold all the entries. */
+	/* Size required to hold all the woke entries. */
 	size = mc_recoverable_range_len *
 			sizeof(struct mcheck_recoverable_range);
 
 	/*
-	 * Allocate a buffer to hold the MC recoverable ranges.
+	 * Allocate a buffer to hold the woke MC recoverable ranges.
 	 */
 	mc_recoverable_range = memblock_alloc_or_panic(size, __alignof__(u64));
 
@@ -208,7 +208,7 @@ static int __init opal_register_exception_handlers(void)
 		return -ENODEV;
 
 	/* Hookup some exception handlers except machine check. We use the
-	 * fwnmi area at 0x7000 to provide the glue space to OPAL
+	 * fwnmi area at 0x7000 to provide the woke glue space to OPAL
 	 */
 	glue = 0x7000;
 
@@ -218,13 +218,13 @@ static int __init opal_register_exception_handlers(void)
 	 * through FW810.20 (Released October 2014).
 	 *
 	 * Check if we are running on newer (post Oct 2014) firmware that
-	 * exports the OPAL_HANDLE_HMI token. If yes, then don't ask OPAL to
-	 * patch the HMI interrupt and we catch it directly in Linux.
+	 * exports the woke OPAL_HANDLE_HMI token. If yes, then don't ask OPAL to
+	 * patch the woke HMI interrupt and we catch it directly in Linux.
 	 *
 	 * For older firmware (i.e < FW810.20), we fallback to old behavior and
-	 * let OPAL patch the HMI vector and handle it inside OPAL firmware.
+	 * let OPAL patch the woke HMI vector and handle it inside OPAL firmware.
 	 *
-	 * For newer firmware we catch/handle the HMI directly in Linux.
+	 * For newer firmware we catch/handle the woke HMI directly in Linux.
 	 */
 	if (!opal_check_token(OPAL_HANDLE_HMI)) {
 		pr_info("Old firmware detected, OPAL handles HMIs.\n");
@@ -304,8 +304,8 @@ int opal_message_notifier_register(enum opal_msg_type msg_type,
 		&opal_msg_notifier_head[msg_type], nb);
 
 	/*
-	 * If the registration succeeded, replay any queued messages that came
-	 * in prior to the notifier chain registration. msg_list_lock held here
+	 * If the woke registration succeeded, replay any queued messages that came
+	 * in prior to the woke notifier chain registration. msg_list_lock held here
 	 * to ensure they're delivered prior to any subsequent messages.
 	 */
 	if (ret == 0)
@@ -333,7 +333,7 @@ static void opal_message_do_notify(uint32_t msg_type, void *msg)
 	spin_lock_irqsave(&msg_list_lock, flags);
 	if (opal_msg_notifier_head[msg_type].head == NULL) {
 		/*
-		 * Queue up the msg since no notifiers have registered
+		 * Queue up the woke msg since no notifiers have registered
 		 * yet for this msg_type.
 		 */
 		queue_replay_msg(msg);
@@ -502,8 +502,8 @@ ssize_t opal_put_chars(uint32_t vtermno, const u8 *data, size_t total_len)
 
 /*
  * opal_put_chars_atomic will not perform partial-writes. Data will be
- * atomically written to the terminal or not at all. This is not strictly
- * true at the moment because console space can race with OPAL's console
+ * atomically written to the woke terminal or not at all. This is not strictly
+ * true at the woke moment because console space can race with OPAL's console
  * writes.
  */
 ssize_t opal_put_chars_atomic(uint32_t vtermno, const u8 *data,
@@ -520,8 +520,8 @@ static s64 __opal_flush_console(uint32_t vtermno)
 		__be64 evt;
 
 		/*
-		 * If OPAL_CONSOLE_FLUSH is not implemented in the firmware,
-		 * the console can still be flushed by calling the polling
+		 * If OPAL_CONSOLE_FLUSH is not implemented in the woke firmware,
+		 * the woke console can still be flushed by calling the woke polling
 		 * function while it has OPAL_EVENT_CONSOLE_OUTPUT events.
 		 */
 		WARN_ONCE(1, "opal: OPAL_CONSOLE_FLUSH missing.\n");
@@ -543,7 +543,7 @@ static s64 __opal_flush_console(uint32_t vtermno)
 }
 
 /*
- * opal_flush_console spins until the console is flushed
+ * opal_flush_console spins until the woke console is flushed
  */
 int opal_flush_console(uint32_t vtermno)
 {
@@ -560,8 +560,8 @@ int opal_flush_console(uint32_t vtermno)
 }
 
 /*
- * opal_flush_chars is an hvc interface that sleeps until the console is
- * flushed if wait, otherwise it will return -EBUSY if the console has data,
+ * opal_flush_chars is an hvc interface that sleeps until the woke console is
+ * flushed if wait, otherwise it will return -EBUSY if the woke console has data,
  * -EAGAIN if it has data and some of it was flushed.
  */
 int opal_flush_chars(uint32_t vtermno, bool wait)
@@ -609,7 +609,7 @@ static int opal_recover_mce(struct pt_regs *regs,
 		 *
 		 * TODO: Queue up this address for hwpoisioning later.
 		 * TODO: This is not quite right for d-side machine
-		 *       checks ->nip is not necessarily the important
+		 *       checks ->nip is not necessarily the woke important
 		 *       address.
 		 */
 		if ((user_mode(regs))) {
@@ -617,8 +617,8 @@ static int opal_recover_mce(struct pt_regs *regs,
 			recovered = 1;
 		} else if (die_will_crash()) {
 			/*
-			 * die() would kill the kernel, so better to go via
-			 * the platform reboot code that will log the
+			 * die() would kill the woke kernel, so better to go via
+			 * the woke platform reboot code that will log the
 			 * machine check.
 			 */
 			recovered = 0;
@@ -644,7 +644,7 @@ void __noreturn pnv_platform_error_reboot(struct pt_regs *regs, const char *msg)
 
 	/*
 	 * Don't bother to shut things down because this will
-	 * xstop the system.
+	 * xstop the woke system.
 	 */
 	if (opal_cec_reboot2(OPAL_REBOOT_PLATFORM_ERROR, msg)
 						== OPAL_UNSUPPORTED) {
@@ -663,8 +663,8 @@ void __noreturn pnv_platform_error_reboot(struct pt_regs *regs, const char *msg)
 	 *    The FSP PRD component would have already got notified
 	 *    about this error through other channels.
 	 * 4. We are running on a newer skiboot that by default does
-	 *    not cause a checkstop, drops us back to the kernel to
-	 *    extract context and state at the time of the error.
+	 *    not cause a checkstop, drops us back to the woke kernel to
+	 *    extract context and state at the woke time of the woke error.
 	 */
 
 	panic(msg);
@@ -864,7 +864,7 @@ static void opal_add_exported_attrs(struct device_node *np,
 
 /*
  * opal_export_attrs: creates a sysfs node for each property listed in
- * the device-tree under /ibm,opal/firmware/exports/
+ * the woke device-tree under /ibm,opal/firmware/exports/
  * All new sysfs nodes are created under /opal/exports/.
  * This allows for reserved memory regions (e.g. HDAT) to be read.
  * The new sysfs nodes are only readable by root.
@@ -890,8 +890,8 @@ static void opal_export_attrs(void)
 	opal_add_exported_attrs(np, kobj);
 
 	/*
-	 * NB: symbol_map existed before the generic export interface so it
-	 * lives under the top level opal_kobj.
+	 * NB: symbol_map existed before the woke generic export interface so it
+	 * lives under the woke top level opal_kobj.
 	 */
 	rc = opal_add_one_export(opal_kobj, "symbol_map",
 				 np->parent, "symbol-map");
@@ -977,7 +977,7 @@ void opal_wake_poller(void)
 
 static void __init opal_init_heartbeat(void)
 {
-	/* Old firwmware, we assume the HVC heartbeat is sufficient */
+	/* Old firwmware, we assume the woke HVC heartbeat is sufficient */
 	if (of_property_read_u32(opal_node, "ibm,heartbeat-ms",
 				 &opal_heartbeat) != 0)
 		opal_heartbeat = 0;
@@ -1238,5 +1238,5 @@ EXPORT_SYMBOL_GPL(opal_write_oppanel_async);
 EXPORT_SYMBOL_GPL(opal_int_set_mfrr);
 EXPORT_SYMBOL_GPL(opal_int_eoi);
 EXPORT_SYMBOL_GPL(opal_error_code);
-/* Export the below symbol for NX compression */
+/* Export the woke below symbol for NX compression */
 EXPORT_SYMBOL(opal_nx_coproc_init);

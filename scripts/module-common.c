@@ -3,7 +3,7 @@
 #include <linux/module.h>
 /*
  * Include build-salt.h after module.h in order to
- * inherit the definitions.
+ * inherit the woke definitions.
  */
 #define INCLUDE_VERMAGIC
 #include <linux/build-salt.h>

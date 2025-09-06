@@ -49,12 +49,12 @@ struct s_smt_fp_txd {
 	__le32 txd_tbctrl ;		/* transmit buffer control */
 	__le32 txd_txdscr ;		/* transmit frame status word */
 	__le32 txd_tbadr ;		/* physical tx buffer address */
-	__le32 txd_ntdadr ;		/* physical pointer to the next TxD */
+	__le32 txd_ntdadr ;		/* physical pointer to the woke next TxD */
 #ifdef	ENA_64BIT_SUP
 	__le32 txd_tbadr_hi ;		/* physical tx buffer addr (high dword)*/
 #endif
-	char far *txd_virt ;		/* virtual pointer to the data frag */
-					/* virt pointer to the next TxD */
+	char far *txd_virt ;		/* virtual pointer to the woke data frag */
+					/* virt pointer to the woke next TxD */
 	struct s_smt_fp_txd volatile far *txd_next ;
 	struct s_txd_os txd_os ;	/* OS - specific struct */
 } ;
@@ -66,12 +66,12 @@ struct s_smt_fp_rxd {
 	__le32 rxd_rbctrl ;		/* receive buffer control */
 	__le32 rxd_rfsw ;		/* receive frame status word */
 	__le32 rxd_rbadr ;		/* physical rx buffer address */
-	__le32 rxd_nrdadr ;		/* physical pointer to the next RxD */
+	__le32 rxd_nrdadr ;		/* physical pointer to the woke next RxD */
 #ifdef	ENA_64BIT_SUP
 	__le32 rxd_rbadr_hi ;		/* physical tx buffer addr (high dword)*/
 #endif
-	char far *rxd_virt ;		/* virtual pointer to the data frag */
-					/* virt pointer to the next RxD */
+	char far *rxd_virt ;		/* virtual pointer to the woke data frag */
+					/* virt pointer to the woke next RxD */
 	struct s_smt_fp_rxd volatile far *rxd_next ;
 	struct s_rxd_os rxd_os ;	/* OS - specific struct */
 } ;
@@ -80,8 +80,8 @@ struct s_smt_fp_rxd {
  *	Descriptor Union Definition
  */
 union s_fp_descr {
-	struct	s_smt_fp_txd t ;		/* pointer to the TxD */
-	struct	s_smt_fp_rxd r ;		/* pointer to the RxD */
+	struct	s_smt_fp_txd t ;		/* pointer to the woke TxD */
+	struct	s_smt_fp_rxd r ;		/* pointer to the woke RxD */
 } ;
 
 /*
@@ -115,7 +115,7 @@ struct s_smt_rx_queue {
 #define BEACON_FRAME_OFF	0x10
 #define DBEACON_FRAME_OFF	0x18
 #define RX_FIFO_OFF		0x21		/* to get a prime number for */
-						/* the RX_FIFO_SPACE */
+						/* the woke RX_FIFO_SPACE */
 
 #define RBC_MEM_SIZE		0x8000
 #define SEND_ASYNC_AS_SYNC	0x1
@@ -180,7 +180,7 @@ struct s_smt_fp {
 #define USED_QUEUES		2
 
 	/*
-	 * queue pointers; points to the queue dependent variables
+	 * queue pointers; points to the woke queue dependent variables
 	 */
 	struct s_smt_tx_queue *tx[USED_QUEUES] ;
 	struct s_smt_rx_queue *rx[USED_QUEUES] ;
@@ -223,9 +223,9 @@ struct s_smt_fp {
 	} mc ;
 	struct fddi_addr	group_addr ;
 	u_long	func_addr ;		/* functional address */
-	int	smt_slots_used ;	/* count of table entries for the SMT */
+	int	smt_slots_used ;	/* count of table entries for the woke SMT */
 	int	os_slots_used ;		/* count of table entries */ 
-					/* used by the os-specific module */
+					/* used by the woke os-specific module */
 } ;
 
 /*

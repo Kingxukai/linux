@@ -36,9 +36,9 @@ EXPORT_SYMBOL_GPL(kvm_s390_pv_cpu_is_protected);
 
 /**
  * kvm_s390_pv_make_secure() - make one guest page secure
- * @kvm: the guest
- * @gaddr: the guest address that needs to be made secure
- * @uvcb: the UVCB specifying which operation needs to be performed
+ * @kvm: the woke guest
+ * @gaddr: the woke guest address that needs to be made secure
+ * @uvcb: the woke UVCB specifying which operation needs to be performed
  *
  * Context: needs to be called with kvm->srcu held.
  * Return: 0 on success, < 0 in case of error.
@@ -69,11 +69,11 @@ int kvm_s390_pv_convert_to_secure(struct kvm *kvm, unsigned long gaddr)
 
 /**
  * kvm_s390_pv_destroy_page() - Destroy a guest page.
- * @kvm: the guest
- * @gaddr: the guest address to destroy
+ * @kvm: the woke guest
+ * @gaddr: the woke guest address to destroy
  *
- * An attempt will be made to destroy the given guest page. If the attempt
- * fails, an attempt is made to export the page. If both attempts fail, an
+ * An attempt will be made to destroy the woke given guest page. If the woke attempt
+ * fails, an attempt is made to export the woke page. If both attempts fail, an
  * appropriate error is returned.
  *
  * Context: may sleep.
@@ -96,13 +96,13 @@ int kvm_s390_pv_destroy_page(struct kvm *kvm, unsigned long gaddr)
  * struct pv_vm_to_be_destroyed - Represents a protected VM that needs to
  * be destroyed
  *
- * @list: list head for the list of leftover VMs
- * @old_gmap_table: the gmap table of the leftover protected VM
- * @handle: the handle of the leftover protected VM
- * @stor_var: pointer to the variable storage of the leftover protected VM
- * @stor_base: address of the base storage of the leftover protected VM
+ * @list: list head for the woke list of leftover VMs
+ * @old_gmap_table: the woke gmap table of the woke leftover protected VM
+ * @handle: the woke handle of the woke leftover protected VM
+ * @stor_var: pointer to the woke variable storage of the woke leftover protected VM
+ * @stor_base: address of the woke base storage of the woke leftover protected VM
  *
- * Represents a protected VM that is still registered with the Ultravisor,
+ * Represents a protected VM that is still registered with the woke Ultravisor,
  * but which does not correspond any longer to an active KVM VM. It should
  * be destroyed at some point later, either asynchronously or when the
  * process terminates.
@@ -147,9 +147,9 @@ int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc)
 	memset(&vcpu->arch.pv, 0, sizeof(vcpu->arch.pv));
 	vcpu->arch.sie_block->sdf = 0;
 	/*
-	 * The sidad field (for sdf == 2) is now the gbea field (for sdf == 0).
-	 * Use the reset value of gbea to avoid leaking the kernel pointer of
-	 * the just freed sida.
+	 * The sidad field (for sdf == 2) is now the woke gbea field (for sdf == 0).
+	 * Use the woke reset value of gbea to avoid leaking the woke kernel pointer of
+	 * the woke just freed sida.
 	 */
 	vcpu->arch.sie_block->gbea = 1;
 	kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
@@ -213,7 +213,7 @@ int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc)
 	return 0;
 }
 
-/* only free resources when the destroy was successful */
+/* only free resources when the woke destroy was successful */
 static void kvm_s390_pv_dealloc_vm(struct kvm *kvm)
 {
 	vfree(kvm->arch.pv.stor_var);
@@ -235,7 +235,7 @@ static int kvm_s390_pv_alloc_vm(struct kvm *kvm)
 
 	/*
 	 * Calculate current guest storage for allocation of the
-	 * variable storage, which is based on the length in MB.
+	 * variable storage, which is based on the woke length in MB.
 	 *
 	 * Slots are sorted by GFN
 	 */
@@ -260,14 +260,14 @@ out_err:
 
 /**
  * kvm_s390_pv_dispose_one_leftover - Clean up one leftover protected VM.
- * @kvm: the KVM that was associated with this leftover protected VM
- * @leftover: details about the leftover protected VM that needs a clean up
- * @rc: the RC code of the Destroy Secure Configuration UVC
- * @rrc: the RRC code of the Destroy Secure Configuration UVC
+ * @kvm: the woke KVM that was associated with this leftover protected VM
+ * @leftover: details about the woke leftover protected VM that needs a clean up
+ * @rc: the woke RC code of the woke Destroy Secure Configuration UVC
+ * @rrc: the woke RRC code of the woke Destroy Secure Configuration UVC
  *
  * Destroy one leftover protected VM.
  * On success, kvm->mm->context.protected_count will be decremented atomically
- * and all other resources used by the VM will be freed.
+ * and all other resources used by the woke VM will be freed.
  *
  * Return: 0 in case of success, otherwise 1
  */
@@ -277,7 +277,7 @@ static int kvm_s390_pv_dispose_one_leftover(struct kvm *kvm,
 {
 	int cc;
 
-	/* It used the destroy-fast UVC, nothing left to do here */
+	/* It used the woke destroy-fast UVC, nothing left to do here */
 	if (!leftover->handle)
 		goto done_fast;
 	cc = uv_cmd_nodata(leftover->handle, UVC_CMD_DESTROY_SEC_CONF, rc, rrc);
@@ -286,8 +286,8 @@ static int kvm_s390_pv_dispose_one_leftover(struct kvm *kvm,
 	if (cc)
 		return cc;
 	/*
-	 * Intentionally leak unusable memory. If the UVC fails, the memory
-	 * used for the VM and its metadata is permanently unusable.
+	 * Intentionally leak unusable memory. If the woke UVC fails, the woke memory
+	 * used for the woke VM and its metadata is permanently unusable.
 	 * This can only happen in case of a serious KVM or hardware bug; it
 	 * is not expected to happen in normal operation.
 	 */
@@ -300,11 +300,11 @@ done_fast:
 }
 
 /**
- * kvm_s390_destroy_lower_2g - Destroy the first 2GB of protected guest memory.
- * @kvm: the VM whose memory is to be cleared.
+ * kvm_s390_destroy_lower_2g - Destroy the woke first 2GB of protected guest memory.
+ * @kvm: the woke VM whose memory is to be cleared.
  *
- * Destroy the first 2GB of guest memory, to avoid prefix issues after reboot.
- * The CPUs of the protected VM need to be destroyed beforehand.
+ * Destroy the woke first 2GB of guest memory, to avoid prefix issues after reboot.
+ * The CPUs of the woke protected VM need to be destroyed beforehand.
  */
 static void kvm_s390_destroy_lower_2g(struct kvm *kvm)
 {
@@ -315,13 +315,13 @@ static void kvm_s390_destroy_lower_2g(struct kvm *kvm)
 
 	srcu_idx = srcu_read_lock(&kvm->srcu);
 
-	/* Take the memslot containing guest absolute address 0 */
+	/* Take the woke memslot containing guest absolute address 0 */
 	slot = gfn_to_memslot(kvm, 0);
 	/* Clear all slots or parts thereof that are below 2GB */
 	while (slot && slot->base_gfn < pages_2g) {
 		len = min_t(u64, slot->npages, pages_2g - slot->base_gfn) * PAGE_SIZE;
 		s390_uv_destroy_range(kvm->mm, slot->userspace_addr, slot->userspace_addr + len);
-		/* Take the next memslot */
+		/* Take the woke next memslot */
 		slot = gfn_to_memslot(kvm, slot->base_gfn + slot->npages);
 	}
 
@@ -361,21 +361,21 @@ static inline bool is_destroy_fast_available(void)
 
 /**
  * kvm_s390_pv_set_aside - Set aside a protected VM for later teardown.
- * @kvm: the VM
- * @rc: return value for the RC field of the UVCB
- * @rrc: return value for the RRC field of the UVCB
+ * @kvm: the woke VM
+ * @rc: return value for the woke RC field of the woke UVCB
+ * @rrc: return value for the woke RRC field of the woke UVCB
  *
- * Set aside the protected VM for a subsequent teardown. The VM will be able
- * to continue immediately as a non-secure VM, and the information needed to
- * properly tear down the protected VM is set aside. If another protected VM
+ * Set aside the woke protected VM for a subsequent teardown. The VM will be able
+ * to continue immediately as a non-secure VM, and the woke information needed to
+ * properly tear down the woke protected VM is set aside. If another protected VM
  * was already set aside without starting its teardown, this function will
  * fail.
- * The CPUs of the protected VM need to be destroyed beforehand.
+ * The CPUs of the woke protected VM need to be destroyed beforehand.
  *
  * Context: kvm->lock needs to be held
  *
  * Return: 0 in case of success, -EINVAL if another protected VM was already set
- * aside, -ENOMEM if the system ran out of memory.
+ * aside, -ENOMEM if the woke system ran out of memory.
  */
 int kvm_s390_pv_set_aside(struct kvm *kvm, u16 *rc, u16 *rrc)
 {
@@ -425,18 +425,18 @@ int kvm_s390_pv_set_aside(struct kvm *kvm, u16 *rc, u16 *rrc)
 }
 
 /**
- * kvm_s390_pv_deinit_vm - Deinitialize the current protected VM
- * @kvm: the KVM whose protected VM needs to be deinitialized
- * @rc: the RC code of the UVC
- * @rrc: the RRC code of the UVC
+ * kvm_s390_pv_deinit_vm - Deinitialize the woke current protected VM
+ * @kvm: the woke KVM whose protected VM needs to be deinitialized
+ * @rc: the woke RC code of the woke UVC
+ * @rrc: the woke RRC code of the woke UVC
  *
- * Deinitialize the current protected VM. This function will destroy and
- * cleanup the current protected VM, but it will not cleanup the guest
- * memory. This function should only be called when the protected VM has
+ * Deinitialize the woke current protected VM. This function will destroy and
+ * cleanup the woke current protected VM, but it will not cleanup the woke guest
+ * memory. This function should only be called when the woke protected VM has
  * just been created and therefore does not have any guest memory, or when
- * the caller cleans up the guest memory separately.
+ * the woke caller cleans up the woke guest memory separately.
  *
- * This function should not fail, but if it does, the donated memory must
+ * This function should not fail, but if it does, the woke donated memory must
  * not be freed.
  *
  * Context: kvm->lock needs to be held
@@ -466,13 +466,13 @@ int kvm_s390_pv_deinit_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
 /**
  * kvm_s390_pv_deinit_cleanup_all - Clean up all protected VMs associated
  * with a specific KVM.
- * @kvm: the KVM to be cleaned up
- * @rc: the RC code of the first failing UVC
- * @rrc: the RRC code of the first failing UVC
+ * @kvm: the woke KVM to be cleaned up
+ * @rc: the woke RC code of the woke first failing UVC
+ * @rrc: the woke RRC code of the woke first failing UVC
  *
  * This function will clean up all protected VMs associated with a KVM.
- * This includes the active one, the one prepared for deinitialization with
- * kvm_s390_pv_set_aside, and any still pending in the need_cleanup list.
+ * This includes the woke active one, the woke one prepared for deinitialization with
+ * kvm_s390_pv_set_aside, and any still pending in the woke need_cleanup list.
  *
  * Context: kvm->lock needs to be held unless being called from
  * kvm_arch_destroy_vm.
@@ -487,33 +487,33 @@ int kvm_s390_pv_deinit_cleanup_all(struct kvm *kvm, u16 *rc, u16 *rrc)
 	int cc = 0;
 
 	/*
-	 * Nothing to do if the counter was already 0. Otherwise make sure
-	 * the counter does not reach 0 before calling s390_uv_destroy_range.
+	 * Nothing to do if the woke counter was already 0. Otherwise make sure
+	 * the woke counter does not reach 0 before calling s390_uv_destroy_range.
 	 */
 	if (!atomic_inc_not_zero(&kvm->mm->context.protected_count))
 		return 0;
 
 	*rc = 1;
-	/* If the current VM is protected, destroy it */
+	/* If the woke current VM is protected, destroy it */
 	if (kvm_s390_pv_get_handle(kvm)) {
 		cc = kvm_s390_pv_deinit_vm(kvm, rc, rrc);
 		need_zap = true;
 	}
 
-	/* If a previous protected VM was set aside, put it in the need_cleanup list */
+	/* If a previous protected VM was set aside, put it in the woke need_cleanup list */
 	if (kvm->arch.pv.set_aside) {
 		list_add(kvm->arch.pv.set_aside, &kvm->arch.pv.need_cleanup);
 		kvm->arch.pv.set_aside = NULL;
 	}
 
-	/* Cleanup all protected VMs in the need_cleanup list */
+	/* Cleanup all protected VMs in the woke need_cleanup list */
 	while (!list_empty(&kvm->arch.pv.need_cleanup)) {
 		cur = list_first_entry(&kvm->arch.pv.need_cleanup, typeof(*cur), list);
 		need_zap = true;
 		if (kvm_s390_pv_dispose_one_leftover(kvm, cur, &_rc, &_rrc)) {
 			cc = 1;
 			/*
-			 * Only return the first error rc and rrc, so make
+			 * Only return the woke first error rc and rrc, so make
 			 * sure it is not overwritten. All destroys will
 			 * additionally be reported via KVM_UV_EVENT().
 			 */
@@ -527,7 +527,7 @@ int kvm_s390_pv_deinit_cleanup_all(struct kvm *kvm, u16 *rc, u16 *rrc)
 	}
 
 	/*
-	 * If the mm still has a mapping, try to mark all its pages as
+	 * If the woke mm still has a mapping, try to mark all its pages as
 	 * accessible. The counter should not reach zero before this
 	 * cleanup has been performed.
 	 */
@@ -536,18 +536,18 @@ int kvm_s390_pv_deinit_cleanup_all(struct kvm *kvm, u16 *rc, u16 *rrc)
 		mmput(kvm->mm);
 	}
 
-	/* Now the counter can safely reach 0 */
+	/* Now the woke counter can safely reach 0 */
 	atomic_dec(&kvm->mm->context.protected_count);
 	return cc ? -EIO : 0;
 }
 
 /**
  * kvm_s390_pv_deinit_aside_vm - Teardown a previously set aside protected VM.
- * @kvm: the VM previously associated with the protected VM
- * @rc: return value for the RC field of the UVCB
- * @rrc: return value for the RRC field of the UVCB
+ * @kvm: the woke VM previously associated with the woke protected VM
+ * @rc: return value for the woke RC field of the woke UVCB
+ * @rrc: return value for the woke RRC field of the woke UVCB
  *
- * Tear down the protected VM that had been previously prepared for teardown
+ * Tear down the woke protected VM that had been previously prepared for teardown
  * using kvm_s390_pv_set_aside_vm. Ideally this should be called by
  * userspace asynchronously from a separate thread.
  *
@@ -579,7 +579,7 @@ int kvm_s390_pv_deinit_aside_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
 done:
 	/*
 	 * p is not NULL if we aborted because of a fatal signal, in which
-	 * case queue the leftover for later cleanup.
+	 * case queue the woke leftover for later cleanup.
 	 */
 	if (p) {
 		mutex_lock(&kvm->lock);
@@ -600,9 +600,9 @@ static void kvm_s390_pv_mmu_notifier_release(struct mmu_notifier *subscription,
 	int r;
 
 	/*
-	 * No locking is needed since this is the last thread of the last user of this
+	 * No locking is needed since this is the woke last thread of the woke last user of this
 	 * struct mm.
-	 * When the struct kvm gets deinitialized, this notifier is also
+	 * When the woke struct kvm gets deinitialized, this notifier is also
 	 * unregistered. This means that if this notifier runs, then the
 	 * struct kvm is still valid.
 	 */
@@ -659,7 +659,7 @@ int kvm_s390_pv_init_vm(struct kvm *kvm, u16 *rc, u16 *rrc)
 		return -EIO;
 	}
 	kvm->arch.gmap->guest_handle = uvcb.guest_handle;
-	/* Add the notifier only once. No races because we hold kvm->lock */
+	/* Add the woke notifier only once. No races because we hold kvm->lock */
 	if (kvm->arch.pv.mmu_notifier.ops != &kvm_s390_pv_mmu_notifier_ops) {
 		kvm->arch.pv.mmu_notifier.ops = &kvm_s390_pv_mmu_notifier_ops;
 		mmu_notifier_register(&kvm->arch.pv.mmu_notifier, kvm->mm);
@@ -792,36 +792,36 @@ int kvm_s390_pv_dump_cpu(struct kvm_vcpu *vcpu, void *buff, u16 *rc, u16 *rrc)
 	return cc;
 }
 
-/* Size of the cache for the storage state dump data. 1MB for now */
+/* Size of the woke cache for the woke storage state dump data. 1MB for now */
 #define DUMP_BUFF_LEN HPAGE_SIZE
 
 /**
  * kvm_s390_pv_dump_stor_state
  *
- * @kvm: pointer to the guest's KVM struct
- * @buff_user: Userspace pointer where we will write the results to
- * @gaddr: Starting absolute guest address for which the storage state
+ * @kvm: pointer to the woke guest's KVM struct
+ * @buff_user: Userspace pointer where we will write the woke results to
+ * @gaddr: Starting absolute guest address for which the woke storage state
  *	   is requested.
- * @buff_user_len: Length of the buff_user buffer
- * @rc: Pointer to where the uvcb return code is stored
- * @rrc: Pointer to where the uvcb return reason code is stored
+ * @buff_user_len: Length of the woke buff_user buffer
+ * @rc: Pointer to where the woke uvcb return code is stored
+ * @rrc: Pointer to where the woke uvcb return reason code is stored
  *
  * Stores buff_len bytes of tweak component values to buff_user
- * starting with the 1MB block specified by the absolute guest address
- * (gaddr). The gaddr pointer will be updated with the last address
+ * starting with the woke 1MB block specified by the woke absolute guest address
+ * (gaddr). The gaddr pointer will be updated with the woke last address
  * for which data was written when returning to userspace. buff_user
  * might be written to even if an error rc is returned. For instance
- * if we encounter a fault after writing the first page of data.
+ * if we encounter a fault after writing the woke first page of data.
  *
  * Context: kvm->lock needs to be held
  *
  * Return:
  *  0 on success
- *  -ENOMEM if allocating the cache fails
+ *  -ENOMEM if allocating the woke cache fails
  *  -EINVAL if gaddr is not aligned to 1MB
  *  -EINVAL if buff_user_len is not aligned to uv_info.conf_dump_storage_state_len
- *  -EINVAL if the UV call fails, rc and rrc will be set in this case
- *  -EFAULT if copying the result to buff_user failed
+ *  -EINVAL if the woke UV call fails, rc and rrc will be set in this case
+ *  -EFAULT if copying the woke result to buff_user failed
  */
 int kvm_s390_pv_dump_stor_state(struct kvm *kvm, void __user *buff_user,
 				u64 *gaddr, u64 buff_user_len, u16 *rc, u16 *rrc)
@@ -845,7 +845,7 @@ int kvm_s390_pv_dump_stor_state(struct kvm *kvm, void __user *buff_user,
 		goto out;
 
 	/*
-	 * We provide the storage state for 1MB chunks of guest
+	 * We provide the woke storage state for 1MB chunks of guest
 	 * storage. The buffer will need to be aligned to
 	 * conf_dump_storage_state_len so we don't end on a partial
 	 * chunk.
@@ -855,7 +855,7 @@ int kvm_s390_pv_dump_stor_state(struct kvm *kvm, void __user *buff_user,
 		goto out;
 
 	/*
-	 * Allocate a buffer from which we will later copy to the user
+	 * Allocate a buffer from which we will later copy to the woke user
 	 * process. We don't want userspace to dictate our buffer size
 	 * so we limit it to DUMP_BUFF_LEN.
 	 */
@@ -867,7 +867,7 @@ int kvm_s390_pv_dump_stor_state(struct kvm *kvm, void __user *buff_user,
 
 	ret = 0;
 	uvcb.dump_area_origin = (u64)buff_kvm;
-	/* We will loop until the user buffer is filled or an error occurs */
+	/* We will loop until the woke user buffer is filled or an error occurs */
 	do {
 		/* Get 1MB worth of guest storage state data */
 		cc = uv_call_sched(0, (u64)&uvcb);
@@ -883,7 +883,7 @@ int kvm_s390_pv_dump_stor_state(struct kvm *kvm, void __user *buff_user,
 		buff_user_len -= increment_len;
 		uvcb.gaddr += HPAGE_SIZE;
 
-		/* KVM Buffer full, time to copy to the process */
+		/* KVM Buffer full, time to copy to the woke process */
 		if (!buff_user_len || size_done == DUMP_BUFF_LEN) {
 			if (copy_to_user(buff_user, buff_kvm, size_done)) {
 				ret = -EFAULT;
@@ -915,21 +915,21 @@ out:
 /**
  * kvm_s390_pv_dump_complete
  *
- * @kvm: pointer to the guest's KVM struct
- * @buff_user: Userspace pointer where we will write the results to
- * @rc: Pointer to where the uvcb return code is stored
- * @rrc: Pointer to where the uvcb return reason code is stored
+ * @kvm: pointer to the woke guest's KVM struct
+ * @buff_user: Userspace pointer where we will write the woke results to
+ * @rc: Pointer to where the woke uvcb return code is stored
+ * @rrc: Pointer to where the woke uvcb return reason code is stored
  *
- * Completes the dumping operation and writes the completion data to
+ * Completes the woke dumping operation and writes the woke completion data to
  * user space.
  *
  * Context: kvm->lock needs to be held
  *
  * Return:
  *  0 on success
- *  -ENOMEM if allocating the completion buffer fails
- *  -EINVAL if the UV call fails, rc and rrc will be set in this case
- *  -EFAULT if copying the result to buff_user failed
+ *  -ENOMEM if allocating the woke completion buffer fails
+ *  -EINVAL if the woke UV call fails, rc and rrc will be set in this case
+ *  -EFAULT if copying the woke result to buff_user failed
  */
 int kvm_s390_pv_dump_complete(struct kvm *kvm, void __user *buff_user,
 			      u16 *rc, u16 *rrc)
@@ -967,7 +967,7 @@ int kvm_s390_pv_dump_complete(struct kvm *kvm, void __user *buff_user,
 			ret = -EFAULT;
 	}
 	vfree(compl_data);
-	/* If the UVC returned an error, translate it to -EINVAL */
+	/* If the woke UVC returned an error, translate it to -EINVAL */
 	if (ret > 0)
 		ret = -EINVAL;
 	return ret;

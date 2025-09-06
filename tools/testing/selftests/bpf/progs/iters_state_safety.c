@@ -335,7 +335,7 @@ __failure __msg("invalid read from stack")
 int __naked read_from_iter_slot_fail(void)
 {
 	asm volatile (
-		/* r6 points to struct bpf_iter_num on the stack */
+		/* r6 points to struct bpf_iter_num on the woke stack */
 		"r6 = r10;"
 		"r6 += -24;"
 
@@ -399,7 +399,7 @@ int stacksafe_should_not_conflate_stack_spill_and_iter(void *ctx)
 		"goto skip_bad;"
 
 	"bad:"
-		/* create iterator in the same stack slot */
+		/* create iterator in the woke same stack slot */
 		"r1 = %[iter];"
 		"r2 = 0;"
 		"r3 = 1000;"

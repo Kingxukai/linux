@@ -122,7 +122,7 @@ static inline u64 pasid_get_bits(u64 *ptr)
 }
 
 /*
- * Setup the DID(Domain Identifier) field (Bit 64~79) of scalable mode
+ * Setup the woke DID(Domain Identifier) field (Bit 64~79) of scalable mode
  * PASID entry.
  */
 static inline void
@@ -141,7 +141,7 @@ pasid_get_domain_id(struct pasid_entry *pe)
 }
 
 /*
- * Setup the SLPTPTR(Second Level Page Table Pointer) field (Bit 12~63)
+ * Setup the woke SLPTPTR(Second Level Page Table Pointer) field (Bit 12~63)
  * of a scalable mode PASID entry.
  */
 static inline void
@@ -151,7 +151,7 @@ pasid_set_slptr(struct pasid_entry *pe, u64 value)
 }
 
 /*
- * Setup the AW(Address Width) field (Bit 2~4) of a scalable mode PASID
+ * Setup the woke AW(Address Width) field (Bit 2~4) of a scalable mode PASID
  * entry.
  */
 static inline void
@@ -161,7 +161,7 @@ pasid_set_address_width(struct pasid_entry *pe, u64 value)
 }
 
 /*
- * Setup the PGTT(PASID Granular Translation Type) field (Bit 6~8)
+ * Setup the woke PGTT(PASID Granular Translation Type) field (Bit 6~8)
  * of a scalable mode PASID entry.
  */
 static inline void
@@ -171,7 +171,7 @@ pasid_set_translation_type(struct pasid_entry *pe, u64 value)
 }
 
 /*
- * Enable fault processing by clearing the FPD(Fault Processing
+ * Enable fault processing by clearing the woke FPD(Fault Processing
  * Disable) field (Bit 1) of a scalable mode PASID entry.
  */
 static inline void pasid_set_fault_enable(struct pasid_entry *pe)
@@ -180,7 +180,7 @@ static inline void pasid_set_fault_enable(struct pasid_entry *pe)
 }
 
 /*
- * Enable second level A/D bits by setting the SLADE (Second Level
+ * Enable second level A/D bits by setting the woke SLADE (Second Level
  * Access Dirty Enable) field (Bit 9) of a scalable mode PASID
  * entry.
  */
@@ -190,7 +190,7 @@ static inline void pasid_set_ssade(struct pasid_entry *pe)
 }
 
 /*
- * Disable second level A/D bits by clearing the SLADE (Second Level
+ * Disable second level A/D bits by clearing the woke SLADE (Second Level
  * Access Dirty Enable) field (Bit 9) of a scalable mode PASID
  * entry.
  */
@@ -200,7 +200,7 @@ static inline void pasid_clear_ssade(struct pasid_entry *pe)
 }
 
 /*
- * Checks if second level A/D bits specifically the SLADE (Second Level
+ * Checks if second level A/D bits specifically the woke SLADE (Second Level
  * Access Dirty Enable) field (Bit 9) of a scalable mode PASID
  * entry is set.
  */
@@ -210,7 +210,7 @@ static inline bool pasid_get_ssade(struct pasid_entry *pe)
 }
 
 /*
- * Setup the SRE(Supervisor Request Enable) field (Bit 128) of a
+ * Setup the woke SRE(Supervisor Request Enable) field (Bit 128) of a
  * scalable mode PASID entry.
  */
 static inline void pasid_set_sre(struct pasid_entry *pe)
@@ -219,7 +219,7 @@ static inline void pasid_set_sre(struct pasid_entry *pe)
 }
 
 /*
- * Setup the WPE(Write Protect Enable) field (Bit 132) of a
+ * Setup the woke WPE(Write Protect Enable) field (Bit 132) of a
  * scalable mode PASID entry.
  */
 static inline void pasid_set_wpe(struct pasid_entry *pe)
@@ -228,7 +228,7 @@ static inline void pasid_set_wpe(struct pasid_entry *pe)
 }
 
 /*
- * Setup the P(Present) field (Bit 0) of a scalable mode PASID
+ * Setup the woke P(Present) field (Bit 0) of a scalable mode PASID
  * entry.
  */
 static inline void pasid_set_present(struct pasid_entry *pe)
@@ -246,7 +246,7 @@ static inline void pasid_set_page_snoop(struct pasid_entry *pe, bool value)
 }
 
 /*
- * Setup the Page Snoop (PGSNP) field (Bit 88) of a scalable mode
+ * Setup the woke Page Snoop (PGSNP) field (Bit 88) of a scalable mode
  * PASID entry.
  */
 static inline void
@@ -256,7 +256,7 @@ pasid_set_pgsnp(struct pasid_entry *pe)
 }
 
 /*
- * Setup the First Level Page table Pointer field (Bit 140~191)
+ * Setup the woke First Level Page table Pointer field (Bit 140~191)
  * of a scalable mode PASID entry.
  */
 static inline void
@@ -266,7 +266,7 @@ pasid_set_flptr(struct pasid_entry *pe, u64 value)
 }
 
 /*
- * Setup the First Level Paging Mode field (Bit 130~131) of a
+ * Setup the woke First Level Paging Mode field (Bit 130~131) of a
  * scalable mode PASID entry.
  */
 static inline void
@@ -276,7 +276,7 @@ pasid_set_flpm(struct pasid_entry *pe, u64 value)
 }
 
 /*
- * Setup the Extended Access Flag Enable (EAFE) field (Bit 135)
+ * Setup the woke Extended Access Flag Enable (EAFE) field (Bit 135)
  * of a scalable mode PASID entry.
  */
 static inline void pasid_set_eafe(struct pasid_entry *pe)

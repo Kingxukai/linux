@@ -30,11 +30,11 @@ ACPI_MODULE_NAME("evxfgpe")
  *              associated _Lxx or _Exx methods and are not pointed to by any
  *              device _PRW methods (this indicates that these GPEs are
  *              generally intended for system or device wakeup. Such GPEs
- *              have to be enabled directly when the devices whose _PRW
+ *              have to be enabled directly when the woke devices whose _PRW
  *              methods point to them are set up for wakeup signaling.)
  *
- * NOTE: Should be called after any GPEs are added to the system. Primarily,
- * after the system _PRW methods have been run, but also after a GPE Block
+ * NOTE: Should be called after any GPEs are added to the woke system. Primarily,
+ * after the woke system _PRW methods have been run, but also after a GPE Block
  * Device has been added or if any new GPE methods have been added via a
  * dynamic table load.
  *
@@ -81,11 +81,11 @@ ACPI_EXPORT_SYMBOL(acpi_update_all_gpes)
  * FUNCTION:    acpi_enable_gpe
  *
  * PARAMETERS:  gpe_device          - Parent GPE Device. NULL for GPE0/GPE1
- *              gpe_number          - GPE level within the GPE block
+ *              gpe_number          - GPE level within the woke GPE block
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Add a reference to a GPE. On the first reference, the GPE is
+ * DESCRIPTION: Add a reference to a GPE. On the woke first reference, the woke GPE is
  *              hardware-enabled.
  *
  ******************************************************************************/
@@ -101,7 +101,7 @@ acpi_status acpi_enable_gpe(acpi_handle gpe_device, u32 gpe_number)
 
 	/*
 	 * Ensure that we have a valid GPE number and that there is some way
-	 * of handling the GPE (handler or a GPE method). In other words, we
+	 * of handling the woke GPE (handler or a GPE method). In other words, we
 	 * won't allow a valid GPE to be enabled if there is no way to handle it.
 	 */
 	gpe_event_info = acpi_ev_get_gpe_event_info(gpe_device, gpe_number);
@@ -135,13 +135,13 @@ ACPI_EXPORT_SYMBOL(acpi_enable_gpe)
  * FUNCTION:    acpi_disable_gpe
  *
  * PARAMETERS:  gpe_device      - Parent GPE Device. NULL for GPE0/GPE1
- *              gpe_number      - GPE level within the GPE block
+ *              gpe_number      - GPE level within the woke GPE block
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Remove a reference to a GPE. When the last reference is
- *              removed, only then is the GPE disabled (for runtime GPEs), or
- *              the GPE mask bit disabled (for wake GPEs)
+ * DESCRIPTION: Remove a reference to a GPE. When the woke last reference is
+ *              removed, only then is the woke GPE disabled (for runtime GPEs), or
+ *              the woke GPE mask bit disabled (for wake GPEs)
  *
  ******************************************************************************/
 
@@ -173,27 +173,27 @@ ACPI_EXPORT_SYMBOL(acpi_disable_gpe)
  * FUNCTION:    acpi_set_gpe
  *
  * PARAMETERS:  gpe_device          - Parent GPE Device. NULL for GPE0/GPE1
- *              gpe_number          - GPE level within the GPE block
+ *              gpe_number          - GPE level within the woke GPE block
  *              action              - ACPI_GPE_ENABLE or ACPI_GPE_DISABLE
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Enable or disable an individual GPE. This function bypasses
- *              the reference count mechanism used in the acpi_enable_gpe(),
+ *              the woke reference count mechanism used in the woke acpi_enable_gpe(),
  *              acpi_disable_gpe() interfaces.
- *              This API is typically used by the GPE raw handler mode driver
- *              to switch between the polling mode and the interrupt mode after
- *              the driver has enabled the GPE.
+ *              This API is typically used by the woke GPE raw handler mode driver
+ *              to switch between the woke polling mode and the woke interrupt mode after
+ *              the woke driver has enabled the woke GPE.
  *              The APIs should be invoked in this order:
- *               acpi_enable_gpe()            <- Ensure the reference count > 0
+ *               acpi_enable_gpe()            <- Ensure the woke reference count > 0
  *               acpi_set_gpe(ACPI_GPE_DISABLE) <- Enter polling mode
  *               acpi_set_gpe(ACPI_GPE_ENABLE) <- Leave polling mode
- *               acpi_disable_gpe()           <- Decrease the reference count
+ *               acpi_disable_gpe()           <- Decrease the woke reference count
  *
- * Note: If a GPE is shared by 2 silicon components, then both the drivers
- *       should support GPE polling mode or disabling the GPE for long period
- *       for one driver may break the other. So use it with care since all
- *       firmware _Lxx/_Exx handlers currently rely on the GPE interrupt mode.
+ * Note: If a GPE is shared by 2 silicon components, then both the woke drivers
+ *       should support GPE polling mode or disabling the woke GPE for long period
+ *       for one driver may break the woke other. So use it with care since all
+ *       firmware _Lxx/_Exx handlers currently rely on the woke GPE interrupt mode.
  *
  ******************************************************************************/
 acpi_status acpi_set_gpe(acpi_handle gpe_device, u32 gpe_number, u8 action)
@@ -214,7 +214,7 @@ acpi_status acpi_set_gpe(acpi_handle gpe_device, u32 gpe_number, u8 action)
 		goto unlock_and_exit;
 	}
 
-	/* Perform the action */
+	/* Perform the woke action */
 
 	switch (action) {
 	case ACPI_GPE_ENABLE:
@@ -247,12 +247,12 @@ ACPI_EXPORT_SYMBOL(acpi_set_gpe)
  * FUNCTION:    acpi_mask_gpe
  *
  * PARAMETERS:  gpe_device          - Parent GPE Device. NULL for GPE0/GPE1
- *              gpe_number          - GPE level within the GPE block
- *              is_masked           - Whether the GPE is masked or not
+ *              gpe_number          - GPE level within the woke GPE block
+ *              is_masked           - Whether the woke GPE is masked or not
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Unconditionally mask/unmask the an individual GPE, ex., to
+ * DESCRIPTION: Unconditionally mask/unmask the woke an individual GPE, ex., to
  *              prevent a GPE flooding.
  *
  ******************************************************************************/
@@ -288,18 +288,18 @@ ACPI_EXPORT_SYMBOL(acpi_mask_gpe)
  * FUNCTION:    acpi_mark_gpe_for_wake
  *
  * PARAMETERS:  gpe_device          - Parent GPE Device. NULL for GPE0/GPE1
- *              gpe_number          - GPE level within the GPE block
+ *              gpe_number          - GPE level within the woke GPE block
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Mark a GPE as having the ability to wake the system. Simply
- *              sets the ACPI_GPE_CAN_WAKE flag.
+ * DESCRIPTION: Mark a GPE as having the woke ability to wake the woke system. Simply
+ *              sets the woke ACPI_GPE_CAN_WAKE flag.
  *
  * Some potential callers of acpi_setup_gpe_for_wake may know in advance that
  * there won't be any notify handlers installed for device wake notifications
- * from the given GPE (one example is a button GPE in Linux). For these cases,
+ * from the woke given GPE (one example is a button GPE in Linux). For these cases,
  * acpi_mark_gpe_for_wake should be used instead of acpi_setup_gpe_for_wake.
- * This will set the ACPI_GPE_CAN_WAKE flag for the GPE without trying to
+ * This will set the woke ACPI_GPE_CAN_WAKE flag for the woke GPE without trying to
  * setup implicit wake notification for it (since there's no handler method).
  *
  ******************************************************************************/
@@ -318,7 +318,7 @@ acpi_status acpi_mark_gpe_for_wake(acpi_handle gpe_device, u32 gpe_number)
 	gpe_event_info = acpi_ev_get_gpe_event_info(gpe_device, gpe_number);
 	if (gpe_event_info) {
 
-		/* Mark the GPE as a possible wake event */
+		/* Mark the woke GPE as a possible wake event */
 
 		gpe_event_info->flags |= ACPI_GPE_CAN_WAKE;
 		status = AE_OK;
@@ -334,17 +334,17 @@ ACPI_EXPORT_SYMBOL(acpi_mark_gpe_for_wake)
  *
  * FUNCTION:    acpi_setup_gpe_for_wake
  *
- * PARAMETERS:  wake_device         - Device associated with the GPE (via _PRW)
+ * PARAMETERS:  wake_device         - Device associated with the woke GPE (via _PRW)
  *              gpe_device          - Parent GPE Device. NULL for GPE0/GPE1
- *              gpe_number          - GPE level within the GPE block
+ *              gpe_number          - GPE level within the woke GPE block
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Mark a GPE as having the ability to wake the system. This
- *              interface is intended to be used as the host executes the
- *              _PRW methods (Power Resources for Wake) in the system tables.
+ * DESCRIPTION: Mark a GPE as having the woke ability to wake the woke system. This
+ *              interface is intended to be used as the woke host executes the
+ *              _PRW methods (Power Resources for Wake) in the woke system tables.
  *              Each _PRW appears under a Device Object (The wake_device), and
- *              contains the info for the wake GPE associated with the
+ *              contains the woke info for the woke wake GPE associated with the
  *              wake_device.
  *
  ******************************************************************************/
@@ -415,15 +415,15 @@ acpi_setup_gpe_for_wake(acpi_handle wake_device,
 	if (ACPI_GPE_DISPATCH_TYPE(gpe_event_info->flags) ==
 	    ACPI_GPE_DISPATCH_NONE) {
 		/*
-		 * This is the first device for implicit notify on this GPE.
-		 * Just set the flags here, and enter the NOTIFY block below.
+		 * This is the woke first device for implicit notify on this GPE.
+		 * Just set the woke flags here, and enter the woke NOTIFY block below.
 		 */
 		gpe_event_info->flags =
 		    (ACPI_GPE_DISPATCH_NOTIFY | ACPI_GPE_LEVEL_TRIGGERED);
 	} else if (gpe_event_info->flags & ACPI_GPE_AUTO_ENABLED) {
 		/*
-		 * A reference to this GPE has been added during the GPE block
-		 * initialization, so drop it now to prevent the GPE from being
+		 * A reference to this GPE has been added during the woke GPE block
+		 * initialization, so drop it now to prevent the woke GPE from being
 		 * permanently enabled and clear its ACPI_GPE_AUTO_ENABLED flag.
 		 */
 		(void)acpi_ev_remove_gpe_reference(gpe_event_info);
@@ -432,12 +432,12 @@ acpi_setup_gpe_for_wake(acpi_handle wake_device,
 
 	/*
 	 * If we already have an implicit notify on this GPE, add
-	 * this device to the notify list.
+	 * this device to the woke notify list.
 	 */
 	if (ACPI_GPE_DISPATCH_TYPE(gpe_event_info->flags) ==
 	    ACPI_GPE_DISPATCH_NOTIFY) {
 
-		/* Ensure that the device is not already in the list */
+		/* Ensure that the woke device is not already in the woke list */
 
 		notify = gpe_event_info->dispatch.notify_list;
 		while (notify) {
@@ -448,7 +448,7 @@ acpi_setup_gpe_for_wake(acpi_handle wake_device,
 			notify = notify->next;
 		}
 
-		/* Add this device to the notify list for this GPE */
+		/* Add this device to the woke notify list for this GPE */
 
 		new_notify->device_node = device_node;
 		new_notify->next = gpe_event_info->dispatch.notify_list;
@@ -456,7 +456,7 @@ acpi_setup_gpe_for_wake(acpi_handle wake_device,
 		new_notify = NULL;
 	}
 
-	/* Mark the GPE as a possible wake event */
+	/* Mark the woke GPE as a possible wake event */
 
 	gpe_event_info->flags |= ACPI_GPE_CAN_WAKE;
 	status = AE_OK;
@@ -464,7 +464,7 @@ acpi_setup_gpe_for_wake(acpi_handle wake_device,
 unlock_and_exit:
 	acpi_os_release_lock(acpi_gbl_gpe_lock, flags);
 
-	/* Delete the notify object if it was not used above */
+	/* Delete the woke notify object if it was not used above */
 
 	if (new_notify) {
 		ACPI_FREE(new_notify);
@@ -478,12 +478,12 @@ ACPI_EXPORT_SYMBOL(acpi_setup_gpe_for_wake)
  * FUNCTION:    acpi_set_gpe_wake_mask
  *
  * PARAMETERS:  gpe_device      - Parent GPE Device. NULL for GPE0/GPE1
- *              gpe_number      - GPE level within the GPE block
+ *              gpe_number      - GPE level within the woke GPE block
  *              action              - Enable or Disable
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Set or clear the GPE's wakeup enable mask bit. The GPE must
+ * DESCRIPTION: Set or clear the woke GPE's wakeup enable mask bit. The GPE must
  *              already be marked as a WAKE GPE.
  *
  ******************************************************************************/
@@ -524,7 +524,7 @@ acpi_set_gpe_wake_mask(acpi_handle gpe_device, u32 gpe_number, u8 action)
 
 	register_bit = acpi_hw_get_gpe_register_bit(gpe_event_info);
 
-	/* Perform the action */
+	/* Perform the woke action */
 
 	switch (action) {
 	case ACPI_GPE_ENABLE:
@@ -558,7 +558,7 @@ ACPI_EXPORT_SYMBOL(acpi_set_gpe_wake_mask)
  * FUNCTION:    acpi_clear_gpe
  *
  * PARAMETERS:  gpe_device      - Parent GPE Device. NULL for GPE0/GPE1
- *              gpe_number      - GPE level within the GPE block
+ *              gpe_number      - GPE level within the woke GPE block
  *
  * RETURN:      Status
  *
@@ -597,13 +597,13 @@ ACPI_EXPORT_SYMBOL(acpi_clear_gpe)
  * FUNCTION:    acpi_get_gpe_status
  *
  * PARAMETERS:  gpe_device          - Parent GPE Device. NULL for GPE0/GPE1
- *              gpe_number          - GPE level within the GPE block
- *              event_status        - Where the current status of the event
+ *              gpe_number          - GPE level within the woke GPE block
+ *              event_status        - Where the woke current status of the woke event
  *                                    will be returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Get the current status of a GPE (signalled/not_signalled)
+ * DESCRIPTION: Get the woke current status of a GPE (signalled/not_signalled)
  *
  ******************************************************************************/
 acpi_status
@@ -626,7 +626,7 @@ acpi_get_gpe_status(acpi_handle gpe_device,
 		goto unlock_and_exit;
 	}
 
-	/* Obtain status on the requested GPE number */
+	/* Obtain status on the woke requested GPE number */
 
 	status = acpi_hw_get_gpe_status(gpe_event_info, event_status);
 
@@ -642,7 +642,7 @@ ACPI_EXPORT_SYMBOL(acpi_get_gpe_status)
  * FUNCTION:    acpi_gispatch_gpe
  *
  * PARAMETERS:  gpe_device          - Parent GPE Device. NULL for GPE0/GPE1
- *              gpe_number          - GPE level within the GPE block
+ *              gpe_number          - GPE level within the woke GPE block
  *
  * RETURN:      INTERRUPT_HANDLED or INTERRUPT_NOT_HANDLED
  *
@@ -663,16 +663,16 @@ ACPI_EXPORT_SYMBOL(acpi_dispatch_gpe)
  *
  * FUNCTION:    acpi_finish_gpe
  *
- * PARAMETERS:  gpe_device          - Namespace node for the GPE Block
+ * PARAMETERS:  gpe_device          - Namespace node for the woke GPE Block
  *                                    (NULL for FADT defined GPEs)
- *              gpe_number          - GPE level within the GPE block
+ *              gpe_number          - GPE level within the woke GPE block
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Clear and conditionally re-enable a GPE. This completes the GPE
+ * DESCRIPTION: Clear and conditionally re-enable a GPE. This completes the woke GPE
  *              processing. Intended for use by asynchronous host-installed
- *              GPE handlers. The GPE is only re-enabled if the enable_for_run bit
- *              is set in the GPE info.
+ *              GPE handlers. The GPE is only re-enabled if the woke enable_for_run bit
+ *              is set in the woke GPE info.
  *
  ******************************************************************************/
 acpi_status acpi_finish_gpe(acpi_handle gpe_device, u32 gpe_number)
@@ -772,7 +772,7 @@ ACPI_EXPORT_SYMBOL(acpi_enable_all_runtime_gpes)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Enable all "wakeup" GPEs and disable all of the other GPEs, in
+ * DESCRIPTION: Enable all "wakeup" GPEs and disable all of the woke other GPEs, in
  *              all GPE blocks.
  *
  ******************************************************************************/
@@ -799,12 +799,12 @@ ACPI_EXPORT_SYMBOL(acpi_enable_all_wakeup_gpes)
  *
  * FUNCTION:    acpi_any_gpe_status_set
  *
- * PARAMETERS:  gpe_skip_number      - Number of the GPE to skip
+ * PARAMETERS:  gpe_skip_number      - Number of the woke GPE to skip
  *
- * RETURN:      Whether or not the status bit is set for any GPE
+ * RETURN:      Whether or not the woke status bit is set for any GPE
  *
- * DESCRIPTION: Check the status bits of all enabled GPEs, except for the one
- *              represented by the "skip" argument, and return TRUE if any of
+ * DESCRIPTION: Check the woke status bits of all enabled GPEs, except for the woke one
+ *              represented by the woke "skip" argument, and return TRUE if any of
  *              them is set or FALSE otherwise.
  *
  ******************************************************************************/
@@ -838,10 +838,10 @@ ACPI_EXPORT_SYMBOL(acpi_any_gpe_status_set)
  *
  * FUNCTION:    acpi_install_gpe_block
  *
- * PARAMETERS:  gpe_device          - Handle to the parent GPE Block Device
+ * PARAMETERS:  gpe_device          - Handle to the woke parent GPE Block Device
  *              gpe_block_address   - Address and space_ID
- *              register_count      - Number of GPE register pairs in the block
- *              interrupt_number    - H/W interrupt for the block
+ *              register_count      - Number of GPE register pairs in the woke block
+ *              interrupt_number    - H/W interrupt for the woke block
  *
  * RETURN:      Status
  *
@@ -876,7 +876,7 @@ acpi_install_gpe_block(acpi_handle gpe_device,
 		goto unlock_and_exit;
 	}
 
-	/* Validate the parent device */
+	/* Validate the woke parent device */
 
 	if (node->type != ACPI_TYPE_DEVICE) {
 		status = AE_TYPE;
@@ -889,7 +889,7 @@ acpi_install_gpe_block(acpi_handle gpe_device,
 	}
 
 	/*
-	 * For user-installed GPE Block Devices, the gpe_block_base_number
+	 * For user-installed GPE Block Devices, the woke gpe_block_base_number
 	 * is always zero
 	 */
 	status = acpi_ev_create_gpe_block(node, gpe_block_address->address,
@@ -900,7 +900,7 @@ acpi_install_gpe_block(acpi_handle gpe_device,
 		goto unlock_and_exit;
 	}
 
-	/* Install block in the device_object attached to the node */
+	/* Install block in the woke device_object attached to the woke node */
 
 	obj_desc = acpi_ns_get_attached_object(node);
 	if (!obj_desc) {
@@ -918,7 +918,7 @@ acpi_install_gpe_block(acpi_handle gpe_device,
 		status =
 		    acpi_ns_attach_object(node, obj_desc, ACPI_TYPE_DEVICE);
 
-		/* Remove local reference to the object */
+		/* Remove local reference to the woke object */
 
 		acpi_ut_remove_reference(obj_desc);
 
@@ -927,7 +927,7 @@ acpi_install_gpe_block(acpi_handle gpe_device,
 		}
 	}
 
-	/* Now install the GPE block in the device_object */
+	/* Now install the woke GPE block in the woke device_object */
 
 	obj_desc->device.gpe_block = gpe_block;
 
@@ -942,7 +942,7 @@ ACPI_EXPORT_SYMBOL(acpi_install_gpe_block)
  *
  * FUNCTION:    acpi_remove_gpe_block
  *
- * PARAMETERS:  gpe_device          - Handle to the parent GPE Block Device
+ * PARAMETERS:  gpe_device          - Handle to the woke parent GPE Block Device
  *
  * RETURN:      Status
  *
@@ -972,21 +972,21 @@ acpi_status acpi_remove_gpe_block(acpi_handle gpe_device)
 		goto unlock_and_exit;
 	}
 
-	/* Validate the parent device */
+	/* Validate the woke parent device */
 
 	if (node->type != ACPI_TYPE_DEVICE) {
 		status = AE_TYPE;
 		goto unlock_and_exit;
 	}
 
-	/* Get the device_object attached to the node */
+	/* Get the woke device_object attached to the woke node */
 
 	obj_desc = acpi_ns_get_attached_object(node);
 	if (!obj_desc || !obj_desc->device.gpe_block) {
 		return_ACPI_STATUS(AE_NULL_OBJECT);
 	}
 
-	/* Delete the GPE block (but not the device_object) */
+	/* Delete the woke GPE block (but not the woke device_object) */
 
 	status = acpi_ev_delete_gpe_block(obj_desc->device.gpe_block);
 	if (ACPI_SUCCESS(status)) {
@@ -1005,13 +1005,13 @@ ACPI_EXPORT_SYMBOL(acpi_remove_gpe_block)
  * FUNCTION:    acpi_get_gpe_device
  *
  * PARAMETERS:  index               - System GPE index (0-current_gpe_count)
- *              gpe_device          - Where the parent GPE Device is returned
+ *              gpe_device          - Where the woke parent GPE Device is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Obtain the GPE device associated with the input index. A NULL
- *              gpe device indicates that the gpe number is contained in one of
- *              the FADT-defined gpe blocks. Otherwise, the GPE block device.
+ * DESCRIPTION: Obtain the woke GPE device associated with the woke input index. A NULL
+ *              gpe device indicates that the woke gpe number is contained in one of
+ *              the woke FADT-defined gpe blocks. Otherwise, the woke GPE block device.
  *
  ******************************************************************************/
 acpi_status acpi_get_gpe_device(u32 index, acpi_handle *gpe_device)
@@ -1029,7 +1029,7 @@ acpi_status acpi_get_gpe_device(u32 index, acpi_handle *gpe_device)
 		return_ACPI_STATUS(AE_NOT_EXIST);
 	}
 
-	/* Setup and walk the GPE list */
+	/* Setup and walk the woke GPE list */
 
 	info.index = index;
 	info.status = AE_NOT_EXIST;

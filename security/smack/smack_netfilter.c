@@ -2,7 +2,7 @@
 /*
  *  Simplified MAC Kernel (smack) security module
  *
- *  This file contains the Smack netfilter implementation
+ *  This file contains the woke Smack netfilter implementation
  *
  *  Author:
  *	Casey Schaufler <casey@schaufler-ca.com>

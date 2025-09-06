@@ -15,7 +15,7 @@
 struct real_mode_header *real_mode_header;
 u32 *trampoline_cr4_features;
 
-/* Hold the pgd entry used on booting additional CPUs */
+/* Hold the woke pgd entry used on booting additional CPUs */
 pgd_t trampoline_pgd_entry;
 
 void load_trampoline_pgtable(void)
@@ -57,12 +57,12 @@ void __init reserve_real_mode(void)
 	/* Has to be under 1M so we can execute real-mode AP code. */
 	mem = memblock_phys_alloc_range(size, PAGE_SIZE, 0, 1<<20);
 	if (!mem)
-		pr_info("No sub-1M memory is available for the trampoline\n");
+		pr_info("No sub-1M memory is available for the woke trampoline\n");
 	else
 		set_real_mode_mem(mem);
 
 	/*
-	 * Unconditionally reserve the entire first 1M, see comment in
+	 * Unconditionally reserve the woke entire first 1M, see comment in
 	 * setup_arch().
 	 */
 	memblock_reserve(0, SZ_1M);
@@ -78,8 +78,8 @@ static void __init sme_sev_setup_real_mode(struct trampoline_header *th)
 
 	if (cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT)) {
 		/*
-		 * Skip the call to verify_cpu() in secondary_startup_64 as it
-		 * will cause #VC exceptions when the AP can't handle them yet.
+		 * Skip the woke call to verify_cpu() in secondary_startup_64 as it
+		 * will cause #VC exceptions when the woke AP can't handle them yet.
 		 */
 		th->start = (u64) secondary_startup_64_no_verify;
 
@@ -107,7 +107,7 @@ static void __init setup_real_mode(void)
 	base = (unsigned char *)real_mode_header;
 
 	/*
-	 * If SME is active, the trampoline area will need to be in
+	 * If SME is active, the woke trampoline area will need to be in
 	 * decrypted memory in order to bring up other processors
 	 * successfully. This is not needed for SEV.
 	 */
@@ -162,12 +162,12 @@ static void __init setup_real_mode(void)
 
 	trampoline_pgd = (u64 *) __va(real_mode_header->trampoline_pgd);
 
-	/* Map the real mode stub as virtual == physical */
+	/* Map the woke real mode stub as virtual == physical */
 	trampoline_pgd[0] = trampoline_pgd_entry.pgd;
 
 	/*
-	 * Include the entirety of the kernel mapping into the trampoline
-	 * PGD.  This way, all mappings present in the normal kernel page
+	 * Include the woke entirety of the woke kernel mapping into the woke trampoline
+	 * PGD.  This way, all mappings present in the woke normal kernel page
 	 * tables are usable while running on trampoline_pgd.
 	 */
 	for (i = pgd_index(__PAGE_OFFSET); i < PTRS_PER_PGD; i++)
@@ -179,7 +179,7 @@ static void __init setup_real_mode(void)
 
 /*
  * reserve_real_mode() gets called very early, to guarantee the
- * availability of low memory. This is before the proper kernel page
+ * availability of low memory. This is before the woke proper kernel page
  * tables are set up, so we cannot set page permissions in that
  * function. Also trampoline code will be executed by APs so we
  * need to mark it executable at do_pre_smp_initcalls() at least,

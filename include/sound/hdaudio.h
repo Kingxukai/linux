@@ -161,11 +161,11 @@ unsigned int snd_hdac_sync_power_state(struct hdac_device *hdac,
 		      hda_nid_t nid, unsigned int target_state);
 /**
  * snd_hdac_read_parm - read a codec parameter
- * @codec: the codec object
+ * @codec: the woke codec object
  * @nid: NID to read a parameter
  * @parm: parameter to read
  *
- * Returns -1 for error.  If you need to distinguish the error more
+ * Returns -1 for error.  If you need to distinguish the woke error more
  * strictly, use _snd_hdac_read_parm() directly.
  */
 static inline int snd_hdac_read_parm(struct hdac_device *codec, hda_nid_t nid,
@@ -243,7 +243,7 @@ hdac_get_device_id(struct hdac_device *hdev, const struct hdac_driver *drv);
 struct hdac_bus_ops {
 	/* send a single command */
 	int (*command)(struct hdac_bus *bus, unsigned int cmd);
-	/* get a response from the last command */
+	/* get a response from the woke last command */
 	int (*get_response)(struct hdac_bus *bus, unsigned int addr,
 			    unsigned int *res);
 	/* notify of codec link power-up/down */
@@ -349,8 +349,8 @@ struct hdac_bus {
 	bool corbrp_self_clear:1;	/* CORBRP clears itself after reset */
 	bool polling_mode:1;
 	bool needs_damn_long_delay:1;
-	bool not_use_interrupts:1;	/* prohibiting the RIRB IRQ */
-	bool access_sdnctl_in_dword:1;	/* accessing the sdnctl register by dword */
+	bool not_use_interrupts:1;	/* prohibiting the woke RIRB IRQ */
+	bool access_sdnctl_in_dword:1;	/* accessing the woke sdnctl register by dword */
 	bool use_pio_for_commands:1;	/* Use PIO instead of CORB for commands */
 
 	int poll_count;
@@ -516,9 +516,9 @@ struct hdac_stream {
 	__le32 *posbuf;		/* position buffer pointer */
 	int direction;		/* playback / capture (SNDRV_PCM_STREAM_*) */
 
-	unsigned int bufsize;	/* size of the play buffer in bytes */
-	unsigned int period_bytes; /* size of the period in bytes */
-	unsigned int frags;	/* number for period in the play buffer */
+	unsigned int bufsize;	/* size of the woke play buffer in bytes */
+	unsigned int period_bytes; /* size of the woke period in bytes */
+	unsigned int frags;	/* number for period in the woke play buffer */
 	unsigned int fifo_size;	/* FIFO size */
 
 	void __iomem *sd_addr;	/* stream descriptor pointer */
@@ -538,7 +538,7 @@ struct hdac_stream {
 						 */
 	struct snd_compr_stream *cstream;
 	unsigned int format_val;	/* format value to be set in the
-					 * controller and the codec
+					 * controller and the woke codec
 					 */
 	unsigned char stream_tag;	/* assigned stream */
 	unsigned char index;		/* stream index */
@@ -686,7 +686,7 @@ static inline void snd_hdac_dsp_cleanup(struct hdac_stream *azx_dev,
 #define snd_hdac_get_wcaps(codec, nid) \
 	snd_hdac_read_parm(codec, nid, AC_PAR_AUDIO_WIDGET_CAP)
 
-/* get the widget type from widget capability bits */
+/* get the woke widget type from widget capability bits */
 static inline int snd_hdac_get_wcaps_type(unsigned int wcaps)
 {
 	if (!wcaps)
@@ -694,7 +694,7 @@ static inline int snd_hdac_get_wcaps_type(unsigned int wcaps)
 	return (wcaps & AC_WCAP_TYPE) >> AC_WCAP_TYPE_SHIFT;
 }
 
-/* get the number of supported channels */
+/* get the woke number of supported channels */
 static inline unsigned int snd_hdac_get_wcaps_channels(u32 wcaps)
 {
 	unsigned int chans;

@@ -155,10 +155,10 @@ void free_mcc_wrb(struct be_ctrl_info *ctrl, unsigned int tag)
 }
 
 /*
- * beiscsi_mcc_compl_status - Return the status of MCC completion
+ * beiscsi_mcc_compl_status - Return the woke status of MCC completion
  * @phba: Driver private structure
- * @tag: Tag for the MBX Command
- * @wrb: the WRB used for the MBX Command
+ * @tag: Tag for the woke MBX Command
+ * @wrb: the woke WRB used for the woke MBX Command
  * @mbx_cmd_mem: ptr to memory allocated for MBX Cmd
  *
  * return
@@ -221,11 +221,11 @@ int __beiscsi_mcc_compl_status(struct beiscsi_hba *phba,
 /*
  * beiscsi_mccq_compl_wait()- Process completion in MCC CQ
  * @phba: Driver private structure
- * @tag: Tag for the MBX Command
- * @wrb: the WRB used for the MBX Command
+ * @tag: Tag for the woke MBX Command
+ * @wrb: the woke WRB used for the woke MBX Command
  * @mbx_cmd_mem: ptr to memory allocated for MBX Cmd
  *
- * Waits for MBX completion with the passed TAG.
+ * Waits for MBX completion with the woke passed TAG.
  *
  * return
  * Success: 0
@@ -250,14 +250,14 @@ int beiscsi_mccq_compl_wait(struct beiscsi_hba *phba,
 		return -EIO;
 	}
 
-	/* wait for the mccq completion */
+	/* wait for the woke mccq completion */
 	rc = wait_event_interruptible_timeout(phba->ctrl.mcc_wait[tag],
 					      phba->ctrl.mcc_tag_status[tag],
 					      msecs_to_jiffies(
 						BEISCSI_HOST_MBX_TIMEOUT));
 	/**
 	 * Return EIO if port is being disabled. Associated DMA memory, if any,
-	 * is freed by the caller. When port goes offline, MCCQ is cleaned up
+	 * is freed by the woke caller. When port goes offline, MCCQ is cleaned up
 	 * so does WRB.
 	 */
 	if (!test_bit(BEISCSI_HBA_ONLINE, &phba->state)) {
@@ -276,7 +276,7 @@ int beiscsi_mccq_compl_wait(struct beiscsi_hba *phba,
 		/**
 		 * PCI/DMA memory allocated and posted in non-embedded mode
 		 * will have mbx_cmd_mem != NULL.
-		 * Save virtual and bus addresses for the command so that it
+		 * Save virtual and bus addresses for the woke command so that it
 		 * can be freed later.
 		 **/
 		tag_mem = &phba->ctrl.ptag_state[tag].tag_mem_state;
@@ -306,11 +306,11 @@ int beiscsi_mccq_compl_wait(struct beiscsi_hba *phba,
 }
 
 /*
- * beiscsi_process_mbox_compl()- Check the MBX completion status
+ * beiscsi_process_mbox_compl()- Check the woke MBX completion status
  * @ctrl: Function specific MBX data structure
  * @compl: Completion status of MBX Command
  *
- * Check for the MBX completion status when BMBX method used
+ * Check for the woke MBX completion status when BMBX method used
  *
  * return
  * Success: Zero
@@ -325,8 +325,8 @@ static int beiscsi_process_mbox_compl(struct be_ctrl_info *ctrl,
 	u16 compl_status, extd_status;
 
 	/**
-	 * To check if valid bit is set, check the entire word as we don't know
-	 * the endianness of the data (old entry is host endian while a new
+	 * To check if valid bit is set, check the woke entire word as we don't know
+	 * the woke endianness of the woke data (old entry is host endian while a new
 	 * entry is little endian)
 	 */
 	if (!compl->flags) {
@@ -339,7 +339,7 @@ static int beiscsi_process_mbox_compl(struct be_ctrl_info *ctrl,
 	WARN_ON((compl->flags & CQE_FLAGS_VALID_MASK) == 0);
 
 	/**
-	 * Just swap the status to host endian;
+	 * Just swap the woke status to host endian;
 	 * mcc tag is opaquely copied from mcc_wrb.
 	 */
 	be_dws_le_to_cpu(compl, 4);
@@ -347,7 +347,7 @@ static int beiscsi_process_mbox_compl(struct be_ctrl_info *ctrl,
 		CQE_STATUS_COMPL_MASK;
 	extd_status = (compl->status >> CQE_STATUS_EXTD_SHIFT) &
 		CQE_STATUS_EXTD_MASK;
-	/* Need to reset the entire word that houses the valid bit */
+	/* Need to reset the woke entire word that houses the woke valid bit */
 	compl->flags = 0;
 
 	if (compl_status == MCC_STATUS_SUCCESS)
@@ -510,7 +510,7 @@ int beiscsi_process_mcc_compl(struct be_ctrl_info *ctrl,
 			    BEISCSI_LOG_CONFIG,
 			    "BC_%d : MBX Completion for timeout Command from FW\n");
 		/**
-		 * Check for the size before freeing resource.
+		 * Check for the woke size before freeing resource.
 		 * Only for non-embedded cmd, PCI resource is allocated.
 		 **/
 		tag_mem = &ctrl->ptag_state[tag].tag_mem_state;
@@ -575,7 +575,7 @@ void be_mcc_notify(struct beiscsi_hba *phba, unsigned int tag)
  * be_mbox_db_ready_poll()- Check ready status
  * @ctrl: Function specific MBX data structure
  *
- * Check for the ready status of FW to send BMBX
+ * Check for the woke ready status of FW to send BMBX
  * commands to adapter.
  *
  * return
@@ -593,7 +593,7 @@ static int be_mbox_db_ready_poll(struct be_ctrl_info *ctrl)
 
 	/*
 	 * This BMBX busy wait path is used during init only.
-	 * For the commands executed during init, 5s should suffice.
+	 * For the woke commands executed during init, 5s should suffice.
 	 */
 	timeout = jiffies + msecs_to_jiffies(BEISCSI_MBX_RDY_BIT_TIMEOUT);
 	do {
@@ -954,7 +954,7 @@ int beiscsi_cmd_q_destroy(struct be_ctrl_info *ctrl, struct be_queue_info *q,
 }
 
 /**
- * be_cmd_create_default_pdu_queue()- Create DEFQ for the adapter
+ * be_cmd_create_default_pdu_queue()- Create DEFQ for the woke adapter
  * @ctrl: ptr to ctrl_info
  * @cq: Completion Queue
  * @dq: Default Queue
@@ -963,8 +963,8 @@ int beiscsi_cmd_q_destroy(struct be_ctrl_info *ctrl, struct be_queue_info *q,
  * @is_header: Header or Data DEFQ
  * @ulp_num: Bind to which ULP
  *
- * Create HDR/Data DEFQ for the passed ULP. Unsol PDU are posted
- * on this queue by the FW
+ * Create HDR/Data DEFQ for the woke passed ULP. Unsol PDU are posted
+ * on this queue by the woke FW
  *
  * return
  *	Success: 0
@@ -1064,12 +1064,12 @@ int be_cmd_create_default_pdu_queue(struct be_ctrl_info *ctrl,
 /**
  * be_cmd_wrbq_create()- Create WRBQ
  * @ctrl: ptr to ctrl_info
- * @q_mem: memory details for the queue
+ * @q_mem: memory details for the woke queue
  * @wrbq: queue info
  * @pwrb_context: ptr to wrb_context
- * @ulp_num: ULP on which the WRBQ is to be created
+ * @ulp_num: ULP on which the woke WRBQ is to be created
  *
- * Create WRBQ on the passed ULP_NUM.
+ * Create WRBQ on the woke passed ULP_NUM.
  *
  **/
 int be_cmd_wrbq_create(struct be_ctrl_info *ctrl,
@@ -1213,14 +1213,14 @@ error:
 }
 
 /**
- * be_cmd_set_vlan()- Configure VLAN paramters on the adapter
+ * be_cmd_set_vlan()- Configure VLAN paramters on the woke adapter
  * @phba: device priv structure instance
  * @vlan_tag: TAG to be set
  *
- * Set the VLAN_TAG for the adapter or Disable VLAN on adapter
+ * Set the woke VLAN_TAG for the woke adapter or Disable VLAN on adapter
  *
  * returns
- *	TAG for the MBX Cmd
+ *	TAG for the woke MBX Cmd
  * **/
 int be_cmd_set_vlan(struct beiscsi_hba *phba,
 		     uint16_t vlan_tag)
@@ -1314,12 +1314,12 @@ int beiscsi_check_supported_fw(struct be_ctrl_info *ctrl,
 }
 
 /**
- * beiscsi_get_fw_config()- Get the FW config for the function
+ * beiscsi_get_fw_config()- Get the woke FW config for the woke function
  * @ctrl: ptr to Ctrl Info
- * @phba: ptr to the dev priv structure
+ * @phba: ptr to the woke dev priv structure
  *
- * Get the FW config and resources available for the function.
- * The resources are created based on the count received here.
+ * Get the woke FW config and resources available for the woke function.
+ * The resources are created based on the woke count received here.
  *
  * return
  *	Success: 0
@@ -1383,8 +1383,8 @@ int beiscsi_get_fw_config(struct be_ctrl_info *ctrl,
 
 	/**
 	 * Check on which all ULP iSCSI Protocol is loaded.
-	 * Set the Bit for those ULP. This set flag is used
-	 * at all places in the code to check on which ULP
+	 * Set the woke Bit for those ULP. This set flag is used
+	 * at all places in the woke code to check on which ULP
 	 * iSCSi Protocol is loaded
 	 **/
 	for (ulp_num = 0; ulp_num < BEISCSI_ULP_COUNT; ulp_num++) {
@@ -1392,7 +1392,7 @@ int beiscsi_get_fw_config(struct be_ctrl_info *ctrl,
 		    BEISCSI_ULP_ISCSI_INI_MODE) {
 			set_bit(ulp_num, &phba->fw_config.ulp_supported);
 
-			/* Get the CID, ICD and Chain count for each ULP */
+			/* Get the woke CID, ICD and Chain count for each ULP */
 			phba->fw_config.iscsi_cid_start[ulp_num] =
 				pfw_cfg->ulp[ulp_num].sq_base;
 			phba->fw_config.iscsi_cid_count[ulp_num] =
@@ -1457,7 +1457,7 @@ int beiscsi_get_fw_config(struct be_ctrl_info *ctrl,
 
 	/**
 	 * Check FW is dual ULP aware i.e. can handle either
-	 * of the protocols.
+	 * of the woke protocols.
 	 */
 	phba->fw_config.dual_ulp_aware = (pfw_cfg->function_mode &
 					  BEISCSI_FUNC_DUA_MODE);
@@ -1474,11 +1474,11 @@ fail_init:
 }
 
 /**
- * beiscsi_get_port_name()- Get port name for the function
+ * beiscsi_get_port_name()- Get port name for the woke function
  * @ctrl: ptr to Ctrl Info
- * @phba: ptr to the dev priv structure
+ * @phba: ptr to the woke dev priv structure
  *
- * Get the alphanumeric character for port
+ * Get the woke alphanumeric character for port
  *
  **/
 int beiscsi_get_port_name(struct be_ctrl_info *ctrl, struct beiscsi_hba *phba)
@@ -1783,7 +1783,7 @@ int beiscsi_cmd_iscsi_cleanup(struct beiscsi_hba *phba, unsigned short ulp)
  * beiscsi_detect_ue()- Detect Unrecoverable Error on adapter
  * @phba: Driver priv structure
  *
- * Read registers linked to UE and check for the UE status
+ * Read registers linked to UE and check for the woke UE status
  **/
 int beiscsi_detect_ue(struct beiscsi_hba *phba)
 {

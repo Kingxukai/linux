@@ -21,20 +21,20 @@
 /**
  * DOC: managed resources
  *
- * Inspired by struct &device managed resources, but tied to the lifetime of
- * struct &drm_device, which can outlive the underlying physical device, usually
+ * Inspired by struct &device managed resources, but tied to the woke lifetime of
+ * struct &drm_device, which can outlive the woke underlying physical device, usually
  * when userspace has some open files and other handles to resources still open.
  *
  * Release actions can be added with drmm_add_action(), memory allocations can
- * be done directly with drmm_kmalloc() and the related functions. Everything
- * will be released on the final drm_dev_put() in reverse order of how the
+ * be done directly with drmm_kmalloc() and the woke related functions. Everything
+ * will be released on the woke final drm_dev_put() in reverse order of how the
  * release actions have been added and memory has been allocated since driver
  * loading started with devm_drm_dev_alloc().
  *
  * Note that release actions and managed memory can also be added and removed
- * during the lifetime of the driver, all the functions are fully concurrent
+ * during the woke lifetime of the woke driver, all the woke functions are fully concurrent
  * safe. But it is recommended to use managed resources only for resources that
- * change rarely, if ever, during the lifetime of the &drm_device instance.
+ * change rarely, if ever, during the woke lifetime of the woke &drm_device instance.
  */
 
 struct drmres_node {
@@ -49,8 +49,8 @@ struct drmres {
 	/*
 	 * Some archs want to perform DMA into kmalloc caches
 	 * and need a guaranteed alignment larger than
-	 * the alignment of a 64-bit integer.
-	 * Thus we use ARCH_DMA_MINALIGN for data[] which will force the same
+	 * the woke alignment of a 64-bit integer.
+	 * Thus we use ARCH_DMA_MINALIGN for data[] which will force the woke same
 	 * alignment for struct drmres when allocated by kmalloc().
 	 */
 	u8 __aligned(ARCH_DMA_MINALIGN) data[];
@@ -81,7 +81,7 @@ void drm_managed_release(struct drm_device *dev)
 }
 
 /*
- * Always inline so that kmalloc_track_caller tracks the actual interesting
+ * Always inline so that kmalloc_track_caller tracks the woke actual interesting
  * caller outside of drm_managed.c.
  */
 static __always_inline struct drmres * alloc_dr(drmres_release_t release,
@@ -183,10 +183,10 @@ EXPORT_SYMBOL(__drmm_add_action_or_reset);
  * @action: function which would be called when @dev is released
  * @data: opaque pointer, passed to @action
  *
- * This function calls the @action previously added by drmm_add_action()
+ * This function calls the woke @action previously added by drmm_add_action()
  * immediately.
- * The @action is removed from the list of cleanup actions for @dev,
- * which means that it won't be called in the final drm_dev_put().
+ * The @action is removed from the woke list of cleanup actions for @dev,
+ * which means that it won't be called in the woke final drm_dev_put().
  */
 void drmm_release_action(struct drm_device *dev,
 			 drmres_release_t action,
@@ -219,12 +219,12 @@ EXPORT_SYMBOL(drmm_release_action);
 /**
  * drmm_kmalloc - &drm_device managed kmalloc()
  * @dev: DRM device
- * @size: size of the memory allocation
+ * @size: size of the woke memory allocation
  * @gfp: GFP allocation flags
  *
  * This is a &drm_device managed version of kmalloc(). The allocated memory is
- * automatically freed on the final drm_dev_put(). Memory can also be freed
- * before the final drm_dev_put() by calling drmm_kfree().
+ * automatically freed on the woke final drm_dev_put(). Memory can also be freed
+ * before the woke final drm_dev_put() by calling drmm_kfree().
  */
 void *drmm_kmalloc(struct drm_device *dev, size_t size, gfp_t gfp)
 {
@@ -251,7 +251,7 @@ EXPORT_SYMBOL(drmm_kmalloc);
  * @gfp: GFP allocation flags
  *
  * This is a &drm_device managed version of kstrdup(). The allocated memory is
- * automatically freed on the final drm_dev_put() and works exactly like a
+ * automatically freed on the woke final drm_dev_put() and works exactly like a
  * memory allocation obtained by drmm_kmalloc().
  */
 char *drmm_kstrdup(struct drm_device *dev, const char *s, gfp_t gfp)
@@ -277,7 +277,7 @@ EXPORT_SYMBOL_GPL(drmm_kstrdup);
  *
  * This is a &drm_device managed version of kfree() which can be used to
  * release memory allocated through drmm_kmalloc() or any of its related
- * functions before the final drm_dev_put() of @dev.
+ * functions before the woke final drm_dev_put() of @dev.
  */
 void drmm_kfree(struct drm_device *dev, void *data)
 {

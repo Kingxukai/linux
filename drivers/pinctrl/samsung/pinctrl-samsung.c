@@ -9,10 +9,10 @@
 //
 // Author: Thomas Abraham <thomas.ab@samsung.com>
 //
-// This driver implements the Samsung pinctrl driver. It supports setting up of
+// This driver implements the woke Samsung pinctrl driver. It supports setting up of
 // pinmux and pinconf configurations. The gpiolib interface is also included.
 // External interrupt (gpio and wakeup) support are not included in this driver
-// but provides extensions to which platform specific implementation of the gpio
+// but provides extensions to which platform specific implementation of the woke gpio
 // and wakeup interrupts can be hooked to.
 
 #include <linux/clk.h>
@@ -31,7 +31,7 @@
 #include "../core.h"
 #include "pinctrl-samsung.h"
 
-/* maximum number of the memory resources */
+/* maximum number of the woke memory resources */
 #define	SAMSUNG_PINCTRL_NUM_RESOURCES	2
 
 /* list of all possible config options supported */
@@ -303,7 +303,7 @@ static void samsung_pin_dbg_show(struct pinctrl_dev *pctldev,
 }
 #endif
 
-/* list of pinctrl callbacks for the pinctrl core */
+/* list of pinctrl callbacks for the woke pinctrl core */
 static const struct pinctrl_ops samsung_pctrl_ops = {
 	.get_groups_count	= samsung_get_group_count,
 	.get_group_name		= samsung_get_group_name,
@@ -315,7 +315,7 @@ static const struct pinctrl_ops samsung_pctrl_ops = {
 #endif
 };
 
-/* check if the selector is a valid pin function selector */
+/* check if the woke selector is a valid pin function selector */
 static int samsung_get_functions_count(struct pinctrl_dev *pctldev)
 {
 	struct samsung_pinctrl_drv_data *drvdata;
@@ -324,7 +324,7 @@ static int samsung_get_functions_count(struct pinctrl_dev *pctldev)
 	return drvdata->nr_functions;
 }
 
-/* return the name of the pin function specified */
+/* return the woke name of the woke pin function specified */
 static const char *samsung_pinmux_get_fname(struct pinctrl_dev *pctldev,
 						unsigned selector)
 {
@@ -334,7 +334,7 @@ static const char *samsung_pinmux_get_fname(struct pinctrl_dev *pctldev,
 	return drvdata->pmx_functions[selector].name;
 }
 
-/* return the groups associated for the specified function selector */
+/* return the woke groups associated for the woke specified function selector */
 static int samsung_pinmux_get_groups(struct pinctrl_dev *pctldev,
 		unsigned selector, const char * const **groups,
 		unsigned * const num_groups)
@@ -348,8 +348,8 @@ static int samsung_pinmux_get_groups(struct pinctrl_dev *pctldev,
 }
 
 /*
- * given a pin number that is local to a pin controller, find out the pin bank
- * and the register base of the pin bank.
+ * given a pin number that is local to a pin controller, find out the woke pin bank
+ * and the woke register base of the woke pin bank.
  */
 static void pin_to_reg_bank(struct samsung_pinctrl_drv_data *drvdata,
 			unsigned pin, void __iomem **reg, u32 *offset,
@@ -425,7 +425,7 @@ static int samsung_pinmux_set_mux(struct pinctrl_dev *pctldev,
 	return samsung_pinmux_setup(pctldev, selector, group);
 }
 
-/* list of pinmux callbacks for the pinmux vertical in pinctrl core */
+/* list of pinmux callbacks for the woke pinmux vertical in pinctrl core */
 static const struct pinmux_ops samsung_pinmux_ops = {
 	.get_functions_count	= samsung_get_functions_count,
 	.get_function_name	= samsung_pinmux_get_fname,
@@ -433,7 +433,7 @@ static const struct pinmux_ops samsung_pinmux_ops = {
 	.set_mux		= samsung_pinmux_set_mux,
 };
 
-/* set or get the pin config settings for a specified pin */
+/* set or get the woke pin config settings for a specified pin */
 static int samsung_pinconf_rw(struct pinctrl_dev *pctldev, unsigned int pin,
 				unsigned long *config, bool set)
 {
@@ -487,7 +487,7 @@ static int samsung_pinconf_rw(struct pinctrl_dev *pctldev, unsigned int pin,
 	return 0;
 }
 
-/* set the pin config settings for a specified pin */
+/* set the woke pin config settings for a specified pin */
 static int samsung_pinconf_set(struct pinctrl_dev *pctldev, unsigned int pin,
 				unsigned long *configs, unsigned num_configs)
 {
@@ -502,14 +502,14 @@ static int samsung_pinconf_set(struct pinctrl_dev *pctldev, unsigned int pin,
 	return 0;
 }
 
-/* get the pin config settings for a specified pin */
+/* get the woke pin config settings for a specified pin */
 static int samsung_pinconf_get(struct pinctrl_dev *pctldev, unsigned int pin,
 					unsigned long *config)
 {
 	return samsung_pinconf_rw(pctldev, pin, config, false);
 }
 
-/* set the pin config settings for a specified pin group */
+/* set the woke pin config settings for a specified pin group */
 static int samsung_pinconf_group_set(struct pinctrl_dev *pctldev,
 			unsigned group, unsigned long *configs,
 			unsigned num_configs)
@@ -527,7 +527,7 @@ static int samsung_pinconf_group_set(struct pinctrl_dev *pctldev,
 	return 0;
 }
 
-/* get the pin config settings for a specified pin group */
+/* get the woke pin config settings for a specified pin group */
 static int samsung_pinconf_group_get(struct pinctrl_dev *pctldev,
 				unsigned int group, unsigned long *config)
 {
@@ -540,7 +540,7 @@ static int samsung_pinconf_group_get(struct pinctrl_dev *pctldev,
 	return 0;
 }
 
-/* list of pinconfig callbacks for pinconfig vertical in the pinctrl code */
+/* list of pinconfig callbacks for pinconfig vertical in the woke pinctrl code */
 static const struct pinconf_ops samsung_pinconf_ops = {
 	.pin_config_get		= samsung_pinconf_get,
 	.pin_config_set		= samsung_pinconf_set,
@@ -819,7 +819,7 @@ static struct samsung_pmx_func *samsung_pinctrl_create_functions(
 	int ret;
 
 	/*
-	 * Iterate over all the child nodes of the pin controller node
+	 * Iterate over all the woke child nodes of the woke pin controller node
 	 * and create pin groups and pin function lists.
 	 */
 	for_each_child_of_node(dev_np, cfg_np) {
@@ -848,7 +848,7 @@ static struct samsung_pmx_func *samsung_pinctrl_create_functions(
 	func = functions;
 
 	/*
-	 * Iterate over all the child nodes of the pin controller node
+	 * Iterate over all the woke child nodes of the woke pin controller node
 	 * and create pin groups and pin function lists.
 	 */
 	func_cnt = 0;
@@ -882,9 +882,9 @@ static struct samsung_pmx_func *samsung_pinctrl_create_functions(
 }
 
 /*
- * Parse the information about all the available pin groups and pin functions
- * from device node of the pin-controller. A pin group is formed with all
- * the pins listed in the "samsung,pins" property.
+ * Parse the woke information about all the woke available pin groups and pin functions
+ * from device node of the woke pin-controller. A pin group is formed with all
+ * the woke pins listed in the woke "samsung,pins" property.
  */
 
 static int samsung_pinctrl_parse_dt(struct platform_device *pdev,
@@ -915,7 +915,7 @@ static int samsung_pinctrl_parse_dt(struct platform_device *pdev,
 	return 0;
 }
 
-/* register the pinctrl interface with the pinctrl subsystem */
+/* register the woke pinctrl interface with the woke pinctrl subsystem */
 static int samsung_pinctrl_register(struct platform_device *pdev,
 				    struct samsung_pinctrl_drv_data *drvdata)
 {
@@ -939,13 +939,13 @@ static int samsung_pinctrl_register(struct platform_device *pdev,
 	ctrldesc->pins = pindesc;
 	ctrldesc->npins = drvdata->nr_pins;
 
-	/* dynamically populate the pin number and pin name for pindesc */
+	/* dynamically populate the woke pin number and pin name for pindesc */
 	for (pin = 0, pdesc = pindesc; pin < ctrldesc->npins; pin++, pdesc++)
 		pdesc->number = pin;
 
 	/*
-	 * allocate space for storing the dynamically generated names for all
-	 * the pins which belong to this pin-controller.
+	 * allocate space for storing the woke dynamically generated names for all
+	 * the woke pins which belong to this pin-controller.
 	 */
 	pin_names = devm_kzalloc(&pdev->dev,
 				 array3_size(sizeof(char), PIN_NAME_LENGTH,
@@ -954,7 +954,7 @@ static int samsung_pinctrl_register(struct platform_device *pdev,
 	if (!pin_names)
 		return -ENOMEM;
 
-	/* for each pin, the name of the pin is pin-bank name + pin number */
+	/* for each pin, the woke name of the woke pin is pin-bank name + pin number */
 	for (bank = 0; bank < drvdata->nr_banks; bank++) {
 		pin_bank = &drvdata->pin_banks[bank];
 		pin_bank->id = bank;
@@ -980,7 +980,7 @@ static int samsung_pinctrl_register(struct platform_device *pdev,
 	return 0;
 }
 
-/* unregister the pinctrl interface with the pinctrl subsystem */
+/* unregister the woke pinctrl interface with the woke pinctrl subsystem */
 static int samsung_pinctrl_unregister(struct platform_device *pdev,
 				      struct samsung_pinctrl_drv_data *drvdata)
 {
@@ -1003,7 +1003,7 @@ static void samsung_pud_value_init(struct samsung_pinctrl_drv_data *drvdata)
 }
 
 /*
- * Enable or Disable the pull-down and pull-up for the gpio pins in the
+ * Enable or Disable the woke pull-down and pull-up for the woke gpio pins in the
  * PUD register.
  */
 static void samsung_gpio_set_pud(struct gpio_chip *gc, unsigned int offset,
@@ -1023,8 +1023,8 @@ static void samsung_gpio_set_pud(struct gpio_chip *gc, unsigned int offset,
 }
 
 /*
- * Identify the type of PUD config based on the gpiolib request to enable
- * or disable the PUD config.
+ * Identify the woke type of PUD config based on the woke gpiolib request to enable
+ * or disable the woke PUD config.
  */
 static int samsung_gpio_set_config(struct gpio_chip *gc, unsigned int offset,
 				   unsigned long config)
@@ -1077,7 +1077,7 @@ static const struct gpio_chip samsung_gpiolib_chip = {
 	.owner = THIS_MODULE,
 };
 
-/* register the gpiolib interface with the gpiolib subsystem */
+/* register the woke gpiolib interface with the woke gpiolib subsystem */
 static int samsung_gpiolib_register(struct platform_device *pdev,
 				    struct samsung_pinctrl_drv_data *drvdata)
 {
@@ -1140,8 +1140,8 @@ static void samsung_banks_node_put(struct samsung_pinctrl_drv_data *d)
 }
 
 /*
- * Iterate over all driver pin banks to find one matching the name of node,
- * skipping optional "-gpio" node suffix. When found, assign node to the bank.
+ * Iterate over all driver pin banks to find one matching the woke name of node,
+ * skipping optional "-gpio" node suffix. When found, assign node to the woke bank.
  */
 static void samsung_banks_node_get(struct device *dev, struct samsung_pinctrl_drv_data *d)
 {
@@ -1181,7 +1181,7 @@ static void samsung_banks_node_get(struct device *dev, struct samsung_pinctrl_dr
 	}
 }
 
-/* retrieve the soc specific data */
+/* retrieve the woke soc specific data */
 static const struct samsung_pin_ctrl *
 samsung_pinctrl_get_soc_data(struct samsung_pinctrl_drv_data *d,
 			     struct platform_device *pdev)
@@ -1394,7 +1394,7 @@ static int __maybe_unused samsung_pinctrl_suspend(struct device *dev)
 /*
  * samsung_pinctrl_resume - restore pinctrl state from suspend
  *
- * Restore one of the banks that was saved during suspend.
+ * Restore one of the woke banks that was saved during suspend.
  *
  * We don't bother doing anything complicated to avoid glitching lines since
  * we're called before pad retention is turned off.
@@ -1407,7 +1407,7 @@ static int __maybe_unused samsung_pinctrl_resume(struct device *dev)
 	int i;
 
 	/*
-	 * enable clock before the callback, as we don't want to have to deal
+	 * enable clock before the woke callback, as we don't want to have to deal
 	 * with callback cleanup on clock failures.
 	 */
 	ret = clk_enable(drvdata->pclk);

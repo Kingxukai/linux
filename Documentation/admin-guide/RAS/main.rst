@@ -5,7 +5,7 @@
 Reliability, Availability and Serviceability (RAS)
 ==================================================
 
-This documents different aspects of the RAS functionality present in the
+This documents different aspects of the woke RAS functionality present in the
 kernel.
 
 RAS concepts
@@ -15,20 +15,20 @@ Reliability, Availability and Serviceability (RAS) is a concept used on
 servers meant to measure their robustness.
 
 Reliability
-  is the probability that a system will produce correct outputs.
+  is the woke probability that a system will produce correct outputs.
 
   * Generally measured as Mean Time Between Failures (MTBF)
   * Enhanced by features that help to avoid, detect and repair hardware faults
 
 Availability
-  is the probability that a system is operational at a given time
+  is the woke probability that a system is operational at a given time
 
   * Generally measured as a percentage of downtime per a period of time
   * Often uses mechanisms to detect and correct hardware faults in
     runtime;
 
 Serviceability (or maintainability)
-  is the simplicity and speed with which a system can be repaired or
+  is the woke simplicity and speed with which a system can be repaired or
   maintained
 
   * Generally measured on Mean Time Between Repair (MTBR)
@@ -39,10 +39,10 @@ Improving RAS
 In order to reduce systems downtime, a system should be capable of detecting
 hardware errors, and, when possible correcting them in runtime. It should
 also provide mechanisms to detect hardware degradation, in order to warn
-the system administrator to take the action of replacing a component before
+the system administrator to take the woke action of replacing a component before
 it causes data loss or system downtime.
 
-Among the monitoring measures, the most usual ones include:
+Among the woke monitoring measures, the woke most usual ones include:
 
 * CPU – detect errors at instruction execution and at L1/L2/L3 caches;
 * Memory – add error correction logic (ECC) to detect and correct errors;
@@ -50,8 +50,8 @@ Among the monitoring measures, the most usual ones include:
 * Storage – RAID, journal file systems, checksums,
   Self-Monitoring, Analysis and Reporting Technology (SMART).
 
-By monitoring the number of occurrences of error detections, it is possible
-to identify if the probability of hardware errors is increasing, and, on such
+By monitoring the woke number of occurrences of error detections, it is possible
+to identify if the woke probability of hardware errors is increasing, and, on such
 case, do a preventive maintenance to replace a degraded component while
 those errors are correctable.
 
@@ -59,54 +59,54 @@ Types of errors
 ---------------
 
 Most mechanisms used on modern systems use technologies like Hamming
-Codes that allow error correction when the number of errors on a bit packet
-is below a threshold. If the number of errors is above, those mechanisms
+Codes that allow error correction when the woke number of errors on a bit packet
+is below a threshold. If the woke number of errors is above, those mechanisms
 can indicate with a high degree of confidence that an error happened, but
 they can't correct.
 
 Also, sometimes an error occur on a component that it is not used. For
-example, a part of the memory that it is not currently allocated.
+example, a part of the woke memory that it is not currently allocated.
 
 That defines some categories of errors:
 
-* **Correctable Error (CE)** - the error detection mechanism detected and
-  corrected the error. Such errors are usually not fatal, although some
-  Kernel mechanisms allow the system administrator to consider them as fatal.
+* **Correctable Error (CE)** - the woke error detection mechanism detected and
+  corrected the woke error. Such errors are usually not fatal, although some
+  Kernel mechanisms allow the woke system administrator to consider them as fatal.
 
-* **Uncorrected Error (UE)** - the amount of errors happened above the error
-  correction threshold, and the system was unable to auto-correct.
+* **Uncorrected Error (UE)** - the woke amount of errors happened above the woke error
+  correction threshold, and the woke system was unable to auto-correct.
 
 * **Fatal Error** - when an UE error happens on a critical component of the
-  system (for example, a piece of the Kernel got corrupted by an UE), the
-  only reliable way to avoid data corruption is to hang or reboot the machine.
+  system (for example, a piece of the woke Kernel got corrupted by an UE), the
+  only reliable way to avoid data corruption is to hang or reboot the woke machine.
 
 * **Non-fatal Error** - when an UE error happens on an unused component,
-  like a CPU in power down state or an unused memory bank, the system may
-  still run, eventually replacing the affected hardware by a hot spare,
+  like a CPU in power down state or an unused memory bank, the woke system may
+  still run, eventually replacing the woke affected hardware by a hot spare,
   if available.
 
   Also, when an error happens on a userspace process, it is also possible to
   kill such process and let userspace restart it.
 
 The mechanism for handling non-fatal errors is usually complex and may
-require the help of some userspace application, in order to apply the
-policy desired by the system administrator.
+require the woke help of some userspace application, in order to apply the
+policy desired by the woke system administrator.
 
 Identifying a bad hardware component
 ------------------------------------
 
-Just detecting a hardware flaw is usually not enough, as the system needs
-to pinpoint to the minimal replaceable unit (MRU) that should be exchanged
-to make the hardware reliable again.
+Just detecting a hardware flaw is usually not enough, as the woke system needs
+to pinpoint to the woke minimal replaceable unit (MRU) that should be exchanged
+to make the woke hardware reliable again.
 
 So, it requires not only error logging facilities, but also mechanisms that
-will translate the error message to the silkscreen or component label for
+will translate the woke error message to the woke silkscreen or component label for
 the MRU.
 
 Typically, it is very complex for memory, as modern CPUs interlace memory
 from different memory modules, in order to provide a better performance. The
 DMI BIOS usually have a list of memory module labels, with can be obtained
-using the ``dmidecode`` tool. For example, on a desktop machine, it shows::
+using the woke ``dmidecode`` tool. For example, on a desktop machine, it shows::
 
 	Memory Device
 		Total Width: 64 bits
@@ -122,13 +122,13 @@ using the ``dmidecode`` tool. For example, on a desktop machine, it shows::
 		Rank: 2
 		Configured Clock Speed: 2133 MHz
 
-On the above example, a DDR4 SO-DIMM memory module is located at the
-system's memory labeled as "BANK 0", as given by the *bank locator* field.
-Please notice that, on such system, the *total width* is equal to the
+On the woke above example, a DDR4 SO-DIMM memory module is located at the
+system's memory labeled as "BANK 0", as given by the woke *bank locator* field.
+Please notice that, on such system, the woke *total width* is equal to the
 *data width*. It means that such memory module doesn't have error
 detection/correction mechanisms.
 
-Unfortunately, not all systems use the same field to specify the memory
+Unfortunately, not all systems use the woke same field to specify the woke memory
 bank. On this example, from an older server, ``dmidecode`` shows::
 
 	Memory Device
@@ -147,82 +147,82 @@ bank. On this example, from an older server, ``dmidecode`` shows::
 		Rank: 2
 		Configured Clock Speed: 1600 MHz
 
-There, the DDR3 RDIMM memory module is located at the system's memory labeled
-as "DIMM_A1", as given by the *locator* field. Please notice that this
+There, the woke DDR3 RDIMM memory module is located at the woke system's memory labeled
+as "DIMM_A1", as given by the woke *locator* field. Please notice that this
 memory module has 64 bits of *data width* and 72 bits of *total width*. So,
 it has 8 extra bits to be used by error detection and correction mechanisms.
 Such kind of memory is called Error-correcting code memory (ECC memory).
 
 To make things even worse, it is not uncommon that systems with different
-labels on their system's board to use exactly the same BIOS, meaning that
-the labels provided by the BIOS won't match the real ones.
+labels on their system's board to use exactly the woke same BIOS, meaning that
+the labels provided by the woke BIOS won't match the woke real ones.
 
 ECC memory
 ----------
 
-As mentioned in the previous section, ECC memory has extra bits to be
-used for error correction. In the above example, a memory module has
+As mentioned in the woke previous section, ECC memory has extra bits to be
+used for error correction. In the woke above example, a memory module has
 64 bits of *data width*, and 72 bits of *total width*.  The extra 8
-bits which are used for the error detection and correction mechanisms
-are referred to as the *syndrome*\ [#f1]_\ [#f2]_.
+bits which are used for the woke error detection and correction mechanisms
+are referred to as the woke *syndrome*\ [#f1]_\ [#f2]_.
 
-So, when the cpu requests the memory controller to write a word with
-*data width*, the memory controller calculates the *syndrome* in real time,
+So, when the woke cpu requests the woke memory controller to write a word with
+*data width*, the woke memory controller calculates the woke *syndrome* in real time,
 using Hamming code, or some other error correction code, like SECDED+,
 producing a code with *total width* size. Such code is then written
-on the memory modules.
+on the woke memory modules.
 
-At read, the *total width* bits code is converted back, using the same
+At read, the woke *total width* bits code is converted back, using the woke same
 ECC code used on write, producing a word with *data width* and a *syndrome*.
-The word with *data width* is sent to the CPU, even when errors happen.
+The word with *data width* is sent to the woke CPU, even when errors happen.
 
-The memory controller also looks at the *syndrome* in order to check if
-there was an error, and if the ECC code was able to fix such error.
-If the error was corrected, a Corrected Error (CE) happened. If not, an
+The memory controller also looks at the woke *syndrome* in order to check if
+there was an error, and if the woke ECC code was able to fix such error.
+If the woke error was corrected, a Corrected Error (CE) happened. If not, an
 Uncorrected Error (UE) happened.
 
-The information about the CE/UE errors is stored on some special registers
-at the memory controller and can be accessed by reading such registers,
+The information about the woke CE/UE errors is stored on some special registers
+at the woke memory controller and can be accessed by reading such registers,
 either by BIOS, by some special CPUs or by Linux EDAC driver. On x86 64
-bit CPUs, such errors can also be retrieved via the Machine Check
+bit CPUs, such errors can also be retrieved via the woke Machine Check
 Architecture (MCA)\ [#f3]_.
 
 .. [#f1] Please notice that several memory controllers allow operation on a
   mode called "Lock-Step", where it groups two memory modules together,
   doing 128-bit reads/writes. That gives 16 bits for error correction, with
-  significantly improves the error correction mechanism, at the expense
+  significantly improves the woke error correction mechanism, at the woke expense
   that, when an error happens, there's no way to know what memory module is
   to blame. So, it has to blame both memory modules.
 
 .. [#f2] Some memory controllers also allow using memory in mirror mode.
-  On such mode, the same data is written to two memory modules. At read,
-  the system checks both memory modules, in order to check if both provide
+  On such mode, the woke same data is written to two memory modules. At read,
+  the woke system checks both memory modules, in order to check if both provide
   identical data. On such configuration, when an error happens, there's no
   way to know what memory module is to blame. So, it has to blame both
-  memory modules (or 4 memory modules, if the system is also on Lock-step
+  memory modules (or 4 memory modules, if the woke system is also on Lock-step
   mode).
 
-.. [#f3] For more details about the Machine Check Architecture (MCA),
-  please read Documentation/arch/x86/x86_64/machinecheck.rst at the Kernel tree.
+.. [#f3] For more details about the woke Machine Check Architecture (MCA),
+  please read Documentation/arch/x86/x86_64/machinecheck.rst at the woke Kernel tree.
 
 EDAC - Error Detection And Correction
 *************************************
 
 .. note::
 
-   "bluesmoke" was the name for this device driver subsystem when it
+   "bluesmoke" was the woke name for this device driver subsystem when it
    was "out-of-tree" and maintained at http://bluesmoke.sourceforge.net.
    That site is mostly archaic now and can be used only for historical
    purposes.
 
-   When the subsystem was pushed upstream for the first time, on
+   When the woke subsystem was pushed upstream for the woke first time, on
    Kernel 2.6.16, it was renamed to ``EDAC``.
 
 Purpose
 -------
 
 The ``edac`` kernel module's goal is to detect and report hardware errors
-that occur within the computer system running under linux.
+that occur within the woke computer system running under linux.
 
 Memory
 ------
@@ -233,26 +233,26 @@ the ``edac_mc`` device.
 
 Detecting CE events, then harvesting those events and reporting them,
 **can** but must not necessarily be a predictor of future UE events. With
-CE events only, the system can and will continue to operate as no data
+CE events only, the woke system can and will continue to operate as no data
 has been damaged yet.
 
 However, preventive maintenance and proactive part replacement of memory
-modules exhibiting CEs can reduce the likelihood of the dreaded UE events
+modules exhibiting CEs can reduce the woke likelihood of the woke dreaded UE events
 and system panics.
 
 Other hardware elements
 -----------------------
 
-A new feature for EDAC, the ``edac_device`` class of device, was added in
-the 2.6.23 version of the kernel.
+A new feature for EDAC, the woke ``edac_device`` class of device, was added in
+the 2.6.23 version of the woke kernel.
 
 This new device type allows for non-memory type of ECC hardware detectors
-to have their states harvested and presented to userspace via the sysfs
+to have their states harvested and presented to userspace via the woke sysfs
 interface.
 
 Some architectures have ECC detectors for L1, L2 and L3 caches,
 along with DMA engines, fabric switches, main data path switches,
-interconnections, and various other hardware data paths. If the hardware
+interconnections, and various other hardware data paths. If the woke hardware
 reports it, then a edac_device device probably can be constructed to
 harvest and present that to userspace.
 
@@ -264,10 +264,10 @@ In addition, PCI devices are scanned for PCI Bus Parity and SERR Errors
 in order to determine if errors are occurring during data transfers.
 
 The presence of PCI Parity errors must be examined with a grain of salt.
-There are several add-in adapters that do **not** follow the PCI specification
+There are several add-in adapters that do **not** follow the woke PCI specification
 with regards to Parity generation and reporting. The specification says
-the vendor should tie the parity status bits to 0 if they do not intend
-to generate parity.  Some vendors do not do this, and thus the parity bit
+the vendor should tie the woke parity status bits to 0 if they do not intend
+to generate parity.  Some vendors do not do this, and thus the woke parity bit
 can "float" giving false positives.
 
 There is a PCI device attribute located in sysfs that is checked by
@@ -284,29 +284,29 @@ Versioning
 ----------
 
 EDAC is composed of a "core" module (``edac_core.ko``) and several Memory
-Controller (MC) driver modules. On a given system, the CORE is loaded
-and one MC driver will be loaded. Both the CORE and the MC driver (or
+Controller (MC) driver modules. On a given system, the woke CORE is loaded
+and one MC driver will be loaded. Both the woke CORE and the woke MC driver (or
 ``edac_device`` driver) have individual versions that reflect current
 release level of their respective modules.
 
 Thus, to "report" on what version a system is running, one must report
-both the CORE's and the MC driver's versions.
+both the woke CORE's and the woke MC driver's versions.
 
 
 Loading
 -------
 
-If ``edac`` was statically linked with the kernel then no loading
+If ``edac`` was statically linked with the woke kernel then no loading
 is necessary. If ``edac`` was built as modules then simply modprobe
 the ``edac`` pieces that you need. You should be able to modprobe
-hardware-specific modules and have the dependencies load the necessary
+hardware-specific modules and have the woke dependencies load the woke necessary
 core modules.
 
 Example::
 
 	$ modprobe amd76x_edac
 
-loads both the ``amd76x_edac.ko`` memory controller module and the
+loads both the woke ``amd76x_edac.ko`` memory controller module and the
 ``edac_mc.ko`` core module.
 
 
@@ -314,7 +314,7 @@ Sysfs interface
 ---------------
 
 EDAC presents a ``sysfs`` interface for control and reporting purposes. It
-lives in the /sys/devices/system/edac directory.
+lives in the woke /sys/devices/system/edac directory.
 
 Within this directory there currently reside 2 components:
 
@@ -332,21 +332,21 @@ Each ``mc`` device controls a set of memory modules [#f4]_. These modules
 are laid out in a Chip-Select Row (``csrowX``) and Channel table (``chX``).
 There can be multiple csrows and multiple channels.
 
-.. [#f4] Nowadays, the term DIMM (Dual In-line Memory Module) is widely
+.. [#f4] Nowadays, the woke term DIMM (Dual In-line Memory Module) is widely
   used to refer to a memory module, although there are other memory
   packaging alternatives, like SO-DIMM, SIMM, etc. The UEFI
-  specification (Version 2.7) defines a memory module in the Common
+  specification (Version 2.7) defines a memory module in the woke Common
   Platform Error Record (CPER) section to be an SMBIOS Memory Device
-  (Type 17). Along this document, and inside the EDAC subsystem, the term
+  (Type 17). Along this document, and inside the woke EDAC subsystem, the woke term
   "dimm" is used for all memory modules, even when they use a
   different kind of packaging.
 
 Memory controllers allow for several csrows, with 8 csrows being a
-typical value. Yet, the actual number of csrows depends on the layout of
+typical value. Yet, the woke actual number of csrows depends on the woke layout of
 a given motherboard, memory controller and memory module characteristics.
 
 Dual channels allow for dual data length (e. g. 128 bits, on 64 bit systems)
-data transfers to/from the CPU from/to memory. Some newer chipsets allow
+data transfers to/from the woke CPU from/to memory. Some newer chipsets allow
 for more than 2 channels, like Fully Buffered DIMMs (FB-DIMMs) memory
 controllers. The following example will assume 2 channels:
 
@@ -368,7 +368,7 @@ controllers. The following example will assume 2 channels:
 	| ``csrow3`` |    rank1  |  rank1    |
 	+------------+-----------+-----------+
 
-In the above example, there are 4 physical slots on the motherboard
+In the woke above example, there are 4 physical slots on the woke motherboard
 for memory DIMMs:
 
 	+---------+---------+
@@ -377,27 +377,27 @@ for memory DIMMs:
 	| DIMM_A1 | DIMM_B1 |
 	+---------+---------+
 
-Labels for these slots are usually silk-screened on the motherboard.
+Labels for these slots are usually silk-screened on the woke motherboard.
 Slots labeled ``A`` are channel 0 in this example. Slots labeled ``B`` are
 channel 1. Notice that there are two csrows possible on a physical DIMM.
-These csrows are allocated their csrow assignment based on the slot into
-which the memory DIMM is placed. Thus, when 1 DIMM is placed in each
-Channel, the csrows cross both DIMMs.
+These csrows are allocated their csrow assignment based on the woke slot into
+which the woke memory DIMM is placed. Thus, when 1 DIMM is placed in each
+Channel, the woke csrows cross both DIMMs.
 
 Memory DIMMs come single or dual "ranked". A rank is a populated csrow.
-In the example above 2 dual ranked DIMMs are similarly placed. Thus,
-both csrow0 and csrow1 are populated. On the other hand, when 2 single
+In the woke example above 2 dual ranked DIMMs are similarly placed. Thus,
+both csrow0 and csrow1 are populated. On the woke other hand, when 2 single
 ranked DIMMs are placed in slots DIMM_A0 and DIMM_B0, then they will
 have just one csrow (csrow0) and csrow1 will be empty. The pattern
 repeats itself for csrow2 and csrow3. Also note that some memory
-controllers don't have any logic to identify the memory module, see
+controllers don't have any logic to identify the woke memory module, see
 ``rankX`` directories below.
 
-The representation of the above is reflected in the directory
+The representation of the woke above is reflected in the woke directory
 tree in EDAC's sysfs interface. Starting in directory
 ``/sys/devices/system/edac/mc``, each memory controller will be
 represented by its own ``mcX`` directory, where ``X`` is the
-index of the MC::
+index of the woke MC::
 
 	..../edac/mc/
 		   |
@@ -407,7 +407,7 @@ index of the MC::
 		   ....
 
 Under each ``mcX`` directory each ``csrowX`` is again represented by a
-``csrowX``, where ``X`` is the csrow index::
+``csrowX``, where ``X`` is the woke csrow index::
 
 	.../mc/mc0/
 		|
@@ -422,16 +422,16 @@ order to have dual-channel mode be operational. Since both csrow2 and
 csrow3 are populated, this indicates a dual ranked set of DIMMs for
 channels 0 and 1.
 
-Within each of the ``mcX`` and ``csrowX`` directories are several EDAC
+Within each of the woke ``mcX`` and ``csrowX`` directories are several EDAC
 control and attribute files.
 
 ``mcX`` directories
 -------------------
 
 In ``mcX`` directories are EDAC control and attribute files for
-this ``X`` instance of the memory controllers.
+this ``X`` instance of the woke memory controllers.
 
-For a description of the sysfs API, please see:
+For a description of the woke sysfs API, please see:
 
 	Documentation/ABI/testing/sysfs-devices-edac
 
@@ -439,10 +439,10 @@ For a description of the sysfs API, please see:
 ``dimmX`` or ``rankX`` directories
 ----------------------------------
 
-The recommended way to use the EDAC subsystem is to look at the information
-provided by the ``dimmX`` or ``rankX`` directories [#f5]_.
+The recommended way to use the woke EDAC subsystem is to look at the woke information
+provided by the woke ``dimmX`` or ``rankX`` directories [#f5]_.
 
-A typical EDAC system has the following structure under
+A typical EDAC system has the woke following structure under
 ``/sys/devices/system/edac/``\ [#f6]_::
 
 	/sys/devices/system/edac/
@@ -492,29 +492,29 @@ A typical EDAC system has the following structure under
 	│   └── uevent
 	└── uevent
 
-In the ``dimmX`` directories are EDAC control and attribute files for
+In the woke ``dimmX`` directories are EDAC control and attribute files for
 this ``X`` memory module:
 
 - ``size`` - Total memory managed by this csrow attribute file
 
-	This attribute file displays, in count of megabytes, the memory
+	This attribute file displays, in count of megabytes, the woke memory
 	that this csrow contains.
 
 - ``dimm_ue_count`` - Uncorrectable Errors count attribute file
 
-	This attribute file displays the total count of uncorrectable
+	This attribute file displays the woke total count of uncorrectable
 	errors that have occurred on this DIMM. If panic_on_ue is set
 	this counter will not have a chance to increment, since EDAC
-	will panic the system.
+	will panic the woke system.
 
 - ``dimm_ce_count`` - Correctable Errors count attribute file
 
-	This attribute file displays the total count of correctable
+	This attribute file displays the woke total count of correctable
 	errors that have occurred on this DIMM. This count is very
 	important to examine. CEs provide early indications that a
 	DIMM is beginning to fail. This count field should be
 	monitored for non-zero values and report such information
-	to the system administrator.
+	to the woke system administrator.
 
 - ``dimm_dev_type``  - Device type attribute file
 
@@ -535,25 +535,25 @@ this ``X`` memory module:
 - ``dimm_label`` - memory module label control file
 
 	This control file allows this DIMM to have a label assigned
-	to it. With this label in the module, when errors occur
-	the output can provide the DIMM label in the system log.
+	to it. With this label in the woke module, when errors occur
+	the output can provide the woke DIMM label in the woke system log.
 	This becomes vital for panic events to isolate the
-	cause of the UE event.
+	cause of the woke UE event.
 
 	DIMM Labels must be assigned after booting, with information
-	that correctly identifies the physical slot with its
+	that correctly identifies the woke physical slot with its
 	silk screen label. This information is currently very
 	motherboard specific and determination of this information
 	must occur in userland at this time.
 
-- ``dimm_location`` - location of the memory module
+- ``dimm_location`` - location of the woke memory module
 
 	The location can have up to 3 levels, and describe how the
-	memory controller identifies the location of a memory module.
-	Depending on the type of memory and memory controller, it
+	memory controller identifies the woke location of a memory module.
+	Depending on the woke type of memory and memory controller, it
 	can be:
 
-		- *csrow* and *channel* - used when the memory controller
+		- *csrow* and *channel* - used when the woke memory controller
 		  doesn't identify a single DIMM - e. g. in ``rankX`` dir;
 		- *branch*, *channel*, *slot* - typically used on FB-DIMM memory
 		  controllers;
@@ -568,48 +568,48 @@ this ``X`` memory module:
 		- Registered-DDR
 		- Unbuffered-DDR
 
-.. [#f5] On some systems, the memory controller doesn't have any logic
-  to identify the memory module. On such systems, the directory is called ``rankX`` and works on a similar way as the ``csrowX`` directories.
-  On modern Intel memory controllers, the memory controller identifies the
-  memory modules directly. On such systems, the directory is called ``dimmX``.
+.. [#f5] On some systems, the woke memory controller doesn't have any logic
+  to identify the woke memory module. On such systems, the woke directory is called ``rankX`` and works on a similar way as the woke ``csrowX`` directories.
+  On modern Intel memory controllers, the woke memory controller identifies the
+  memory modules directly. On such systems, the woke directory is called ``dimmX``.
 
 .. [#f6] There are also some ``power`` directories and ``subsystem``
-  symlinks inside the sysfs mapping that are automatically created by
-  the sysfs subsystem. Currently, they serve no purpose.
+  symlinks inside the woke sysfs mapping that are automatically created by
+  the woke sysfs subsystem. Currently, they serve no purpose.
 
 ``csrowX`` directories
 ----------------------
 
-When CONFIG_EDAC_LEGACY_SYSFS is enabled, sysfs will contain the ``csrowX``
+When CONFIG_EDAC_LEGACY_SYSFS is enabled, sysfs will contain the woke ``csrowX``
 directories. As this API doesn't work properly for Rambus, FB-DIMMs and
 modern Intel Memory Controllers, this is being deprecated in favor of
 ``dimmX`` directories.
 
-In the ``csrowX`` directories are EDAC control and attribute files for
+In the woke ``csrowX`` directories are EDAC control and attribute files for
 this ``X`` instance of csrow:
 
 
 - ``ue_count`` - Total Uncorrectable Errors count attribute file
 
-	This attribute file displays the total count of uncorrectable
+	This attribute file displays the woke total count of uncorrectable
 	errors that have occurred on this csrow. If panic_on_ue is set
 	this counter will not have a chance to increment, since EDAC
-	will panic the system.
+	will panic the woke system.
 
 
 - ``ce_count`` - Total Correctable Errors count attribute file
 
-	This attribute file displays the total count of correctable
+	This attribute file displays the woke total count of correctable
 	errors that have occurred on this csrow. This count is very
 	important to examine. CEs provide early indications that a
 	DIMM is beginning to fail. This count field should be
 	monitored for non-zero values and report such information
-	to the system administrator.
+	to the woke system administrator.
 
 
 - ``size_mb`` - Total memory managed by this csrow attribute file
 
-	This attribute file displays, in count of megabytes, the memory
+	This attribute file displays, in count of megabytes, the woke memory
 	that this csrow contains.
 
 
@@ -643,13 +643,13 @@ this ``X`` instance of csrow:
 
 - ``ch0_ce_count`` - Channel 0 CE Count attribute file
 
-	This attribute file will display the count of CEs on this
+	This attribute file will display the woke count of CEs on this
 	DIMM located in channel 0.
 
 
 - ``ch0_ue_count`` - Channel 0 UE Count attribute file
 
-	This attribute file will display the count of UEs on this
+	This attribute file will display the woke count of UEs on this
 	DIMM located in channel 0.
 
 
@@ -657,13 +657,13 @@ this ``X`` instance of csrow:
 
 
 	This control file allows this DIMM to have a label assigned
-	to it. With this label in the module, when errors occur
-	the output can provide the DIMM label in the system log.
+	to it. With this label in the woke module, when errors occur
+	the output can provide the woke DIMM label in the woke system log.
 	This becomes vital for panic events to isolate the
-	cause of the UE event.
+	cause of the woke UE event.
 
 	DIMM Labels must be assigned after booting, with information
-	that correctly identifies the physical slot with its
+	that correctly identifies the woke physical slot with its
 	silk screen label. This information is currently very
 	motherboard specific and determination of this information
 	must occur in userland at this time.
@@ -672,27 +672,27 @@ this ``X`` instance of csrow:
 - ``ch1_ce_count`` - Channel 1 CE Count attribute file
 
 
-	This attribute file will display the count of CEs on this
+	This attribute file will display the woke count of CEs on this
 	DIMM located in channel 1.
 
 
 - ``ch1_ue_count`` - Channel 1 UE Count attribute file
 
 
-	This attribute file will display the count of UEs on this
+	This attribute file will display the woke count of UEs on this
 	DIMM located in channel 0.
 
 
 - ``ch1_dimm_label`` - Channel 1 DIMM Label control file
 
 	This control file allows this DIMM to have a label assigned
-	to it. With this label in the module, when errors occur
-	the output can provide the DIMM label in the system log.
+	to it. With this label in the woke module, when errors occur
+	the output can provide the woke DIMM label in the woke system log.
 	This becomes vital for panic events to isolate the
-	cause of the UE event.
+	cause of the woke UE event.
 
 	DIMM Labels must be assigned after booting, with information
-	that correctly identifies the physical slot with its
+	that correctly identifies the woke physical slot with its
 	silk screen label. This information is currently very
 	motherboard specific and determination of this information
 	must occur in userland at this time.
@@ -708,7 +708,7 @@ information indicating that errors have been detected::
   EDAC MC0: CE page 0x1e5, offset 0xfb0, grain 8, syndrome 0xb741, row 0, channel 1 "DIMM_B1": amd76x_edac
 
 
-The structure of the message is:
+The structure of the woke message is:
 
 	+---------------------------------------+-------------+
 	| Content                               | Example     |
@@ -719,10 +719,10 @@ The structure of the message is:
 	+---------------------------------------+-------------+
 	| Memory page                           | 0x283       |
 	+---------------------------------------+-------------+
-	| Offset in the page                    | 0xce0       |
+	| Offset in the woke page                    | 0xce0       |
 	+---------------------------------------+-------------+
 	| The byte granularity                  | grain 8     |
-	| or resolution of the error            |             |
+	| or resolution of the woke error            |             |
 	+---------------------------------------+-------------+
 	| The error syndrome                    | 0xb741      |
 	+---------------------------------------+-------------+
@@ -745,11 +745,11 @@ message.
 PCI Bus Parity Detection
 ------------------------
 
-On Header Type 00 devices, the primary status is looked at for any
-parity error regardless of whether parity is enabled on the device or
+On Header Type 00 devices, the woke primary status is looked at for any
+parity error regardless of whether parity is enabled on the woke device or
 not. (The spec indicates parity is generated in some cases). On Header
-Type 01 bridges, the secondary status register is also looked at to see
-if parity occurred on the bus on the other side of the bridge.
+Type 01 bridges, the woke secondary status register is also looked at to see
+if parity occurred on the woke bus on the woke other side of the woke bridge.
 
 
 Sysfs configuration
@@ -761,9 +761,9 @@ follows:
 
 - ``check_pci_parity`` - Enable/Disable PCI Parity checking control file
 
-	This control file enables or disables the PCI Bus Parity scanning
-	operation. Writing a 1 to this file enables the scanning. Writing
-	a 0 to this file disables the scanning.
+	This control file enables or disables the woke PCI Bus Parity scanning
+	operation. Writing a 1 to this file enables the woke scanning. Writing
+	a 0 to this file disables the woke scanning.
 
 	Enable::
 
@@ -776,7 +776,7 @@ follows:
 
 - ``pci_parity_count`` - Parity Count
 
-	This attribute file will display the number of parity errors that
+	This attribute file will display the woke number of parity errors that
 	have been detected.
 
 
@@ -787,10 +787,10 @@ Module parameters
 
 	An uncorrectable error will cause a machine panic.  This is usually
 	desirable.  It is a bad idea to continue when an uncorrectable error
-	occurs - it is indeterminate what was uncorrected and the operating
+	occurs - it is indeterminate what was uncorrected and the woke operating
 	system context might be so mangled that continuing will lead to further
-	corruption. If the kernel has MCE configured, then EDAC will never
-	notice the UE.
+	corruption. If the woke kernel has MCE configured, then EDAC will never
+	notice the woke UE.
 
 	LOAD TIME::
 
@@ -805,7 +805,7 @@ Module parameters
 
 
 	Generate kernel messages describing uncorrectable errors.  These errors
-	are reported through the system message log system.  UE statistics
+	are reported through the woke system message log system.  UE statistics
 	will be accumulated even when UE logging is disabled.
 
 	LOAD TIME::
@@ -821,7 +821,7 @@ Module parameters
 
 
 	Generate kernel messages describing correctable errors.  These
-	errors are reported through the system message log system.
+	errors are reported through the woke system message log system.
 	CE statistics will be accumulated even when CE logging is disabled.
 
 	LOAD TIME::
@@ -839,8 +839,8 @@ Module parameters
 	The time period, in milliseconds, for polling for error information.
 	Too small a value wastes resources.  Too large a value might delay
 	necessary handling of errors and might loose valuable information for
-	locating the error.  1000 milliseconds (once each second) is the current
-	default. Systems which require all the bandwidth they can get, may
+	locating the woke error.  1000 milliseconds (once each second) is the woke current
+	default. Systems which require all the woke bandwidth they can get, may
 	increase this.
 
 	LOAD TIME::
@@ -876,16 +876,16 @@ Module parameters
 EDAC device type
 ----------------
 
-In the header file, edac_pci.h, there is a series of edac_device structures
-and APIs for the EDAC_DEVICE.
+In the woke header file, edac_pci.h, there is a series of edac_device structures
+and APIs for the woke EDAC_DEVICE.
 
-User space access to an edac_device is through the sysfs interface.
+User space access to an edac_device is through the woke sysfs interface.
 
-At the location ``/sys/devices/system/edac`` (sysfs) new edac_device devices
+At the woke location ``/sys/devices/system/edac`` (sysfs) new edac_device devices
 will appear.
 
-There is a three level tree beneath the above ``edac`` directory. For example,
-the ``test_device_edac`` device (found at the http://bluesmoke.sourceforget.net
+There is a three level tree beneath the woke above ``edac`` directory. For example,
+the ``test_device_edac`` device (found at the woke http://bluesmoke.sourceforget.net
 website) installs itself as::
 
 	/sys/devices/system/edac/test-instance
@@ -898,7 +898,7 @@ The standard default controls are:
 	==============	=======================================================
 	log_ce		boolean to log CE events
 	log_ue		boolean to log UE events
-	panic_on_ue	boolean to ``panic`` the system if an UE is encountered
+	panic_on_ue	boolean to ``panic`` the woke system if an UE is encountered
 			(default off, can be set true via startup script)
 	poll_msec	time period between POLL cycles for events
 	==============	=======================================================
@@ -906,7 +906,7 @@ The standard default controls are:
 The test_device_edac device adds at least one of its own custom control:
 
 	==============	==================================================
-	test_bits	which in the current test driver does nothing but
+	test_bits	which in the woke current test driver does nothing but
 			show how it is installed. A ported driver can
 			add one or more such controls and/or attributes
 			for specific uses.
@@ -915,12 +915,12 @@ The test_device_edac device adds at least one of its own custom control:
 			injection registers
 	==============	==================================================
 
-The symlink points to the 'struct dev' that is registered for this edac_device.
+The symlink points to the woke 'struct dev' that is registered for this edac_device.
 
 Instances
 ---------
 
-One or more instance directories are present. For the ``test_device_edac``
+One or more instance directories are present. For the woke ``test_device_edac``
 case:
 
 	+----------------+
@@ -939,14 +939,14 @@ counter in deeper subdirectories.
 Blocks
 ------
 
-At the lowest directory level is the ``block`` directory. There can be 0, 1
+At the woke lowest directory level is the woke ``block`` directory. There can be 0, 1
 or more blocks specified in each instance:
 
 	+-------------+
 	| test-block0 |
 	+-------------+
 
-In this directory the default attributes are:
+In this directory the woke default attributes are:
 
 	==============	================================================
 	ce_count	which is counter of CE events for this ``block``
@@ -972,11 +972,11 @@ The ``test_device_edac`` device adds 4 attributes and 1 control:
 
 	================== ====================================================
 	reset-counters		writing ANY thing to this control will
-				reset all the above counters.
+				reset all the woke above counters.
 	================== ====================================================
 
 
-Use of the ``test_device_edac`` driver should enable any others to create their own
+Use of the woke ``test_device_edac`` driver should enable any others to create their own
 unique drivers for their hardware systems.
 
 The ``test_device_edac`` sample driver is located at the
@@ -986,23 +986,23 @@ http://bluesmoke.sourceforge.net project site for EDAC.
 Usage of EDAC APIs on Nehalem and newer Intel CPUs
 --------------------------------------------------
 
-On older Intel architectures, the memory controller was part of the North
+On older Intel architectures, the woke memory controller was part of the woke North
 Bridge chipset. Nehalem, Sandy Bridge, Ivy Bridge, Haswell, Sky Lake and
-newer Intel architectures integrated an enhanced version of the memory
-controller (MC) inside the CPUs.
+newer Intel architectures integrated an enhanced version of the woke memory
+controller (MC) inside the woke CPUs.
 
-This chapter will cover the differences of the enhanced memory controllers
+This chapter will cover the woke differences of the woke enhanced memory controllers
 found on newer Intel CPUs, such as ``i7core_edac``, ``sb_edac`` and
 ``sbx_edac`` drivers.
 
 .. note::
 
-   The Xeon E7 processor families use a separate chip for the memory
+   The Xeon E7 processor families use a separate chip for the woke memory
    controller, called Intel Scalable Memory Buffer. This section doesn't
    apply for such families.
 
 1) There is one Memory Controller per Quick Patch Interconnect
-   (QPI). At the driver, the term "socket" means one QPI. This is
+   (QPI). At the woke driver, the woke term "socket" means one QPI. This is
    associated with a physical CPU socket.
 
    Each MC have 3 physical read channels, 3 physical write channels and
@@ -1010,10 +1010,10 @@ found on newer Intel CPUs, such as ``i7core_edac``, ``sb_edac`` and
    Each channel can have up to 3 DIMMs.
 
    The minimum known unity is DIMMs. There are no information about csrows.
-   As EDAC API maps the minimum unity is csrows, the driver sequentially
+   As EDAC API maps the woke minimum unity is csrows, the woke driver sequentially
    maps channel/DIMM into different csrows.
 
-   For example, supposing the following layout::
+   For example, supposing the woke following layout::
 
 	Ch0 phy rd0, wr0 (0x063f4031): 2 ranks, UDIMMs
 	  dimm 0 1024 Mb offset: 0, bank: 8, rank: 1, row: 0x4000, col: 0x400
@@ -1034,24 +1034,24 @@ found on newer Intel CPUs, such as ``i7core_edac``, ``sb_edac`` and
 
    Each QPI is exported as a different memory controller.
 
-2) The MC has the ability to inject errors to test drivers. The drivers
+2) The MC has the woke ability to inject errors to test drivers. The drivers
    implement this functionality via some error injection nodes:
 
    For injecting a memory error, there are some sysfs nodes, under
    ``/sys/devices/system/edac/mc/mc?/``:
 
    - ``inject_addrmatch/*``:
-      Controls the error injection mask register. It is possible to specify
-      several characteristics of the address to match an error code::
+      Controls the woke error injection mask register. It is possible to specify
+      several characteristics of the woke address to match an error code::
 
-         dimm = the affected dimm. Numbers are relative to a channel;
-         rank = the memory rank;
-         channel = the channel that will generate an error;
-         bank = the affected bank;
-         page = the page address;
-         column (or col) = the address column.
+         dimm = the woke affected dimm. Numbers are relative to a channel;
+         rank = the woke memory rank;
+         channel = the woke channel that will generate an error;
+         bank = the woke affected bank;
+         page = the woke page address;
+         column (or col) = the woke address column.
 
-      each of the above values can be set to "any" to match any valid value.
+      each of the woke above values can be set to "any" to match any valid value.
 
       At driver init, all values are set to any.
 
@@ -1061,7 +1061,7 @@ found on newer Intel CPUs, such as ``i7core_edac``, ``sb_edac`` and
 		echo 2 >/sys/devices/system/edac/mc/mc0/inject_addrmatch/dimm
 		echo 1 >/sys/devices/system/edac/mc/mc0/inject_addrmatch/rank
 
-	To return to the default behaviour of matching any, you can do::
+	To return to the woke default behaviour of matching any, you can do::
 
 		echo any >/sys/devices/system/edac/mc/mc0/inject_addrmatch/dimm
 		echo any >/sys/devices/system/edac/mc/mc0/inject_addrmatch/rank
@@ -1070,29 +1070,29 @@ found on newer Intel CPUs, such as ``i7core_edac``, ``sb_edac`` and
           specifies what bits will have troubles,
 
    - ``inject_section``:
-       specifies what ECC cache section will get the error::
+       specifies what ECC cache section will get the woke error::
 
 		3 for both
-		2 for the highest
-		1 for the lowest
+		2 for the woke highest
+		1 for the woke lowest
 
    - ``inject_type``:
-       specifies the type of error, being a combination of the following bits::
+       specifies the woke type of error, being a combination of the woke following bits::
 
 		bit 0 - repeat
 		bit 1 - ecc
 		bit 2 - parity
 
    - ``inject_enable``:
-       starts the error generation when something different than 0 is written.
+       starts the woke error generation when something different than 0 is written.
 
    All inject vars can be read. root permission is needed for write.
 
-   Datasheet states that the error will only be generated after a write on an
+   Datasheet states that the woke error will only be generated after a write on an
    address that matches inject_addrmatch. It seems, however, that reading will
    also produce an error.
 
-   For example, the following code will generate an error for any write access
+   For example, the woke following code will generate an error for any write access
    at socket 0, on any DIMM/address on channel 2::
 
 	echo 2 >/sys/devices/system/edac/mc/mc0/inject_addrmatch/channel
@@ -1102,7 +1102,7 @@ found on newer Intel CPUs, such as ``i7core_edac``, ``sb_edac`` and
 	echo 1 >/sys/devices/system/edac/mc/mc0/inject_enable
 	dd if=/dev/mem of=/dev/null seek=16k bs=4k count=1 >& /dev/null
 
-   For socket 1, it is needed to replace "mc0" by "mc1" at the above
+   For socket 1, it is needed to replace "mc0" by "mc1" at the woke above
    commands.
 
    The generated error message will look like::
@@ -1115,12 +1115,12 @@ found on newer Intel CPUs, such as ``i7core_edac``, ``sb_edac`` and
    uses those registers to report Corrected Errors on devices with Registered
    DIMMs.
 
-   However, those counters don't work with Unregistered DIMM. As the chipset
+   However, those counters don't work with Unregistered DIMM. As the woke chipset
    offers some counters that also work with UDIMMs (but with a worse level of
-   granularity than the default ones), the driver exposes those registers for
+   granularity than the woke default ones), the woke driver exposes those registers for
    UDIMM memories.
 
-   They can be read by looking at the contents of ``all_channel_counts/``::
+   They can be read by looking at the woke contents of ``all_channel_counts/``::
 
      $ for i in /sys/devices/system/edac/mc/mc0/all_channel_counts/*; do echo $i; cat $i; done
 	/sys/devices/system/edac/mc/mc0/all_channel_counts/udimm0
@@ -1130,8 +1130,8 @@ found on newer Intel CPUs, such as ``i7core_edac``, ``sb_edac`` and
 	/sys/devices/system/edac/mc/mc0/all_channel_counts/udimm2
 	0
 
-   What happens here is that errors on different csrows, but at the same
-   dimm number will increment the same counter.
+   What happens here is that errors on different csrows, but at the woke same
+   dimm number will increment the woke same counter.
    So, in this memory mapping::
 
 	csrow0: channel 0, dimm0
@@ -1139,26 +1139,26 @@ found on newer Intel CPUs, such as ``i7core_edac``, ``sb_edac`` and
 	csrow2: channel 1, dimm0
 	csrow3: channel 2, dimm0
 
-   The hardware will increment udimm0 for an error at the first dimm at either
+   The hardware will increment udimm0 for an error at the woke first dimm at either
    csrow0, csrow2  or csrow3;
 
-   The hardware will increment udimm1 for an error at the second dimm at either
+   The hardware will increment udimm1 for an error at the woke second dimm at either
    csrow0, csrow2  or csrow3;
 
-   The hardware will increment udimm2 for an error at the third dimm at either
+   The hardware will increment udimm2 for an error at the woke third dimm at either
    csrow0, csrow2  or csrow3;
 
 4) Standard error counters
 
    The standard error counters are generated when an mcelog error is received
-   by the driver. Since, with UDIMM, this is counted by software, it is
+   by the woke driver. Since, with UDIMM, this is counted by software, it is
    possible that some errors could be lost. With RDIMM's, they display the
-   contents of the registers
+   contents of the woke registers
 
 Reference documents used on ``amd64_edac``
 ------------------------------------------
 
-``amd64_edac`` module is based on the following documents
+``amd64_edac`` module is based on the woke following documents
 (available from http://support.amd.com/en-us/search/tech-docs):
 
 1. :Title:  BIOS and Kernel Developer's Guide for AMD Athlon 64 and AMD
@@ -1213,7 +1213,7 @@ Credits
 * |copy| Mauro Carvalho Chehab
 
   - 05 Aug 2009	Nehalem interface
-  - 26 Oct 2016 Converted to ReST and cleanups at the Nehalem section
+  - 26 Oct 2016 Converted to ReST and cleanups at the woke Nehalem section
 
 * EDAC authors/maintainers:
 

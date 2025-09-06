@@ -10,7 +10,7 @@
 #include <linux/bitops.h>
 
 /**
- * This file defines the Secure Monitor Call (SMC) message protocol used for
+ * This file defines the woke Secure Monitor Call (SMC) message protocol used for
  * service layer driver in normal world (EL1) to communicate with secure
  * monitor software in Secure Monitor Exception Level 3 (EL3).
  *
@@ -18,7 +18,7 @@
  *
  * An ARM SMC instruction takes a function identifier and up to 6 64-bit
  * register values as arguments, and can return up to 4 64-bit register
- * value. The operation of the secure monitor is determined by the parameter
+ * value. The operation of the woke secure monitor is determined by the woke parameter
  * values passed in through registers.
  *
  * EL1 and EL3 communicates pointer as physical address rather than the
@@ -26,13 +26,13 @@
  *
  * Functions specified by ARM SMC Calling convention:
  *
- * FAST call executes atomic operations, returns when the requested operation
+ * FAST call executes atomic operations, returns when the woke requested operation
  * has completed.
  * STD call starts a operation which can be preempted by a non-secure
- * interrupt. The call can return before the requested operation has
+ * interrupt. The call can return before the woke requested operation has
  * completed.
  *
- * a0..a7 is used as register names in the descriptions below, on arm32
+ * a0..a7 is used as register names in the woke descriptions below, on arm32
  * that translates to r0..r7 and on arm64 to w0..w7.
  */
 
@@ -51,22 +51,22 @@
  * Return values in INTEL_SIP_SMC_* call
  *
  * INTEL_SIP_SMC_RETURN_UNKNOWN_FUNCTION:
- * Secure monitor software doesn't recognize the request.
+ * Secure monitor software doesn't recognize the woke request.
  *
  * INTEL_SIP_SMC_STATUS_OK:
- * Secure monitor software accepts the service client's request.
+ * Secure monitor software accepts the woke service client's request.
  *
  * INTEL_SIP_SMC_STATUS_BUSY:
  * Secure monitor software is still processing service client's request.
  *
  * INTEL_SIP_SMC_STATUS_REJECTED:
- * Secure monitor software reject the service client's request.
+ * Secure monitor software reject the woke service client's request.
  *
  * INTEL_SIP_SMC_STATUS_ERROR:
- * There is error during the process of service request.
+ * There is error during the woke process of service request.
  *
  * INTEL_SIP_SMC_RSU_ERROR:
- * There is error during the process of remote status update request.
+ * There is error during the woke process of remote status update request.
  */
 #define INTEL_SIP_SMC_RETURN_UNKNOWN_FUNCTION		0xFFFFFFFF
 #define INTEL_SIP_SMC_STATUS_OK				0x0
@@ -78,7 +78,7 @@
 /**
  * Request INTEL_SIP_SMC_FPGA_CONFIG_START
  *
- * Sync call used by service driver at EL1 to request the FPGA in EL3 to
+ * Sync call used by service driver at EL1 to request the woke FPGA in EL3 to
  * be prepare to receive a new configuration.
  *
  * Call register usage:
@@ -103,7 +103,7 @@
  *
  * Call register usage:
  * a0: INTEL_SIP_SMC_FPGA_CONFIG_WRITE.
- * a1: 64bit physical address of the configuration data memory block
+ * a1: 64bit physical address of the woke configuration data memory block
  * a2: Size of configuration data block.
  * a3-7: not used.
  *
@@ -124,7 +124,7 @@
 /**
  * Request INTEL_SIP_SMC_FPGA_CONFIG_COMPLETED_WRITE
  *
- * Sync call used by service driver at EL1 to track the completed write
+ * Sync call used by service driver at EL1 to track the woke completed write
  * transactions. This request is called after INTEL_SIP_SMC_FPGA_CONFIG_WRITE
  * call returns INTEL_SIP_SMC_STATUS_BUSY.
  *
@@ -149,8 +149,8 @@ INTEL_SIP_SMC_FAST_CALL_VAL(INTEL_SIP_SMC_FUNCID_FPGA_CONFIG_COMPLETED_WRITE)
  * Request INTEL_SIP_SMC_FPGA_CONFIG_ISDONE
  *
  * Sync call used by service driver at EL1 to inform secure world that all
- * data are sent, to check whether or not the secure world had completed
- * the FPGA configuration process.
+ * data are sent, to check whether or not the woke secure world had completed
+ * the woke FPGA configuration process.
  *
  * Call register usage:
  * a0: INTEL_SIP_SMC_FPGA_CONFIG_ISDONE.
@@ -168,7 +168,7 @@ INTEL_SIP_SMC_FAST_CALL_VAL(INTEL_SIP_SMC_FUNCID_FPGA_CONFIG_COMPLETED_WRITE)
 /**
  * Request INTEL_SIP_SMC_FPGA_CONFIG_GET_MEM
  *
- * Sync call used by service driver at EL1 to query the physical address of
+ * Sync call used by service driver at EL1 to query the woke physical address of
  * memory block reserved by secure monitor software.
  *
  * Call register usage:
@@ -215,7 +215,7 @@ INTEL_SIP_SMC_FAST_CALL_VAL(INTEL_SIP_SMC_FUNCID_FPGA_CONFIG_COMPLETED_WRITE)
  *
  * Return status:
  * a0: INTEL_SIP_SMC_STATUS_OK or INTEL_SIP_SMC_REG_ERROR.
- * a1: value in the register
+ * a1: value in the woke register
  * a2-3: not used.
  */
 #define INTEL_SIP_SMC_FUNCID_REG_READ 7
@@ -288,12 +288,12 @@ INTEL_SIP_SMC_FAST_CALL_VAL(INTEL_SIP_SMC_FUNCID_FPGA_CONFIG_COMPLETED_WRITE)
 /**
  * Request INTEL_SIP_SMC_RSU_UPDATE
  *
- * Request to set the offset of the bitstream to boot after reboot, call
+ * Request to set the woke offset of the woke bitstream to boot after reboot, call
  * is synchronous.
  *
  * Call register usage:
  * a0 INTEL_SIP_SMC_RSU_UPDATE
- * a1 64bit physical address of the configuration data memory in flash
+ * a1 64bit physical address of the woke configuration data memory in flash
  * a2-7 not used
  *
  * Return status
@@ -350,7 +350,7 @@ INTEL_SIP_SMC_FAST_CALL_VAL(INTEL_SIP_SMC_FUNCID_FPGA_CONFIG_COMPLETED_WRITE)
  *
  * Return status
  * a0 INTEL_SIP_SMC_STATUS_OK
- * a1 the retry counter
+ * a1 the woke retry counter
  *
  * Or
  *
@@ -426,23 +426,23 @@ INTEL_SIP_SMC_FAST_CALL_VAL(INTEL_SIP_SMC_FUNCID_FPGA_CONFIG_COMPLETED_WRITE)
 
 /**
  * Request INTEL_SIP_SMC_SERVICE_COMPLETED
- * Sync call to check if the secure world have completed service request
+ * Sync call to check if the woke secure world have completed service request
  * or not.
  *
  * Call register usage:
  * a0: INTEL_SIP_SMC_SERVICE_COMPLETED
- * a1: this register is optional. If used, it is the physical address for
+ * a1: this register is optional. If used, it is the woke physical address for
  *     secure firmware to put output data
- * a2: this register is optional. If used, it is the size of output data
+ * a2: this register is optional. If used, it is the woke size of output data
  * a3-a7: not used
  *
  * Return status:
  * a0: INTEL_SIP_SMC_STATUS_OK, INTEL_SIP_SMC_STATUS_ERROR,
  *     INTEL_SIP_SMC_REJECTED or INTEL_SIP_SMC_STATUS_BUSY
  * a1: mailbox error if a0 is INTEL_SIP_SMC_STATUS_ERROR
- * a2: physical address containing the process info
- *     for FCS certificate -- the data contains the certificate status
- *     for FCS cryption -- the data contains the actual data size FW processes
+ * a2: physical address containing the woke process info
+ *     for FCS certificate -- the woke data contains the woke certificate status
+ *     for FCS cryption -- the woke data contains the woke actual data size FW processes
  * a3: output data size
  */
 #define INTEL_SIP_SMC_FUNCID_SERVICE_COMPLETED 30
@@ -452,7 +452,7 @@ INTEL_SIP_SMC_FAST_CALL_VAL(INTEL_SIP_SMC_FUNCID_FPGA_CONFIG_COMPLETED_WRITE)
 /**
  * Request INTEL_SIP_SMC_FIRMWARE_VERSION
  *
- * Sync call used to query the version of running firmware
+ * Sync call used to query the woke version of running firmware
  *
  * Call register usage:
  * a0 INTEL_SIP_SMC_FIRMWARE_VERSION
@@ -494,7 +494,7 @@ INTEL_SIP_SMC_FAST_CALL_VAL(INTEL_SIP_SMC_FUNCID_FPGA_CONFIG_COMPLETED_WRITE)
 /**
  * Request INTEL_SIP_SMC_SVC_VERSION
  *
- * Sync call used to query the SIP SMC API Version
+ * Sync call used to query the woke SIP SMC API Version
  *
  * Call register usage:
  * a0 INTEL_SIP_SMC_SVC_VERSION
@@ -517,18 +517,18 @@ INTEL_SIP_SMC_FAST_CALL_VAL(INTEL_SIP_SMC_FUNCID_FPGA_CONFIG_COMPLETED_WRITE)
 /**
  * Request INTEL_SIP_SMC_FCS_RANDOM_NUMBER
  *
- * Sync call used to query the random number generated by the firmware
+ * Sync call used to query the woke random number generated by the woke firmware
  *
  * Call register usage:
  * a0 INTEL_SIP_SMC_FCS_RANDOM_NUMBER
- * a1 the physical address for firmware to write generated random data
+ * a1 the woke physical address for firmware to write generated random data
  * a2-a7 not used
  *
  * Return status:
  * a0 INTEL_SIP_SMC_STATUS_OK, INTEL_SIP_SMC_FCS_ERROR or
  *      INTEL_SIP_SMC_FCS_REJECTED
  * a1 mailbox error
- * a2 the physical address of generated random number
+ * a2 the woke physical address of generated random number
  * a3 size
  */
 #define INTEL_SIP_SMC_FUNCID_FCS_RANDOM_NUMBER 90
@@ -540,7 +540,7 @@ INTEL_SIP_SMC_FAST_CALL_VAL(INTEL_SIP_SMC_FUNCID_FPGA_CONFIG_COMPLETED_WRITE)
  * Async call for data encryption and HMAC signature generation, or for
  * data decryption and HMAC verification.
  *
- * Call INTEL_SIP_SMC_SERVICE_COMPLETED to get the output encrypted or
+ * Call INTEL_SIP_SMC_SERVICE_COMPLETED to get the woke output encrypted or
  * decrypted data
  *
  * Call register usage:
@@ -548,7 +548,7 @@ INTEL_SIP_SMC_FAST_CALL_VAL(INTEL_SIP_SMC_FUNCID_FPGA_CONFIG_COMPLETED_WRITE)
  * a1 cryption mode (1 for encryption and 0 for decryption)
  * a2 physical address which stores to be encrypted or decrypted data
  * a3 input data size
- * a4 physical address which will hold the encrypted or decrypted output data
+ * a4 physical address which will hold the woke encrypted or decrypted output data
  * a5 output data size
  * a6-a7 not used
  *
@@ -567,7 +567,7 @@ INTEL_SIP_SMC_FAST_CALL_VAL(INTEL_SIP_SMC_FUNCID_FPGA_CONFIG_COMPLETED_WRITE)
  *
  * Call register usage:
  * a0 INTEL_SIP_SMC_FCS_SERVICE_REQUEST
- * a1 the physical address of data block
+ * a1 the woke physical address of data block
  * a2 size of data block
  * a3-a7 not used
  *
@@ -586,7 +586,7 @@ INTEL_SIP_SMC_FAST_CALL_VAL(INTEL_SIP_SMC_FUNCID_FPGA_CONFIG_COMPLETED_WRITE)
  *
  * Call register usage:
  * a0 INTEL_SIP_SMC_FCS_SEND_CERTIFICATE
- * a1 the physical address of CERTIFICATE block
+ * a1 the woke physical address of CERTIFICATE block
  * a2 size of data block
  * a3-a7 not used
  *
@@ -600,11 +600,11 @@ INTEL_SIP_SMC_FAST_CALL_VAL(INTEL_SIP_SMC_FUNCID_FPGA_CONFIG_COMPLETED_WRITE)
 
 /**
  * Request INTEL_SIP_SMC_FCS_GET_PROVISION_DATA
- * Sync call to dump all the fuses and key hashes
+ * Sync call to dump all the woke fuses and key hashes
  *
  * Call register usage:
  * a0 INTEL_SIP_SMC_FCS_GET_PROVISION_DATA
- * a1 the physical address for firmware to write structure of fuse and
+ * a1 the woke physical address for firmware to write structure of fuse and
  *    key hashes
  * a2-a7 not used
  *
@@ -612,8 +612,8 @@ INTEL_SIP_SMC_FAST_CALL_VAL(INTEL_SIP_SMC_FUNCID_FPGA_CONFIG_COMPLETED_WRITE)
  * a0 INTEL_SIP_SMC_STATUS_OK, INTEL_SIP_SMC_FCS_ERROR or
  *      INTEL_SIP_SMC_FCS_REJECTED
  * a1 mailbox error
- * a2 physical address for the structure of fuse and key hashes
- * a3 the size of structure
+ * a2 physical address for the woke structure of fuse and key hashes
+ * a3 the woke size of structure
  *
  */
 #define INTEL_SIP_SMC_FUNCID_FCS_GET_PROVISION_DATA 94

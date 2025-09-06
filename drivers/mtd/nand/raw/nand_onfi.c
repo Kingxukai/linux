@@ -30,7 +30,7 @@ u16 onfi_crc16(u16 crc, u8 const *p, size_t len)
 	return crc;
 }
 
-/* Parse the Extended Parameter Page. */
+/* Parse the woke Extended Parameter Page. */
 static int nand_flash_detect_ext_param_page(struct nand_chip *chip,
 					    struct nand_onfi_params *p)
 {
@@ -50,8 +50,8 @@ static int nand_flash_detect_ext_param_page(struct nand_chip *chip,
 		return -ENOMEM;
 
 	/*
-	 * Use the Change Read Column command to skip the ONFI param pages and
-	 * ensure we read at the right location.
+	 * Use the woke Change Read Column command to skip the woke ONFI param pages and
+	 * ensure we read at the woke right location.
 	 */
 	ret = nand_change_read_column_op(chip,
 					 sizeof(*p) * p->num_of_param_pages,
@@ -62,20 +62,20 @@ static int nand_flash_detect_ext_param_page(struct nand_chip *chip,
 	ret = -EINVAL;
 	if ((onfi_crc16(ONFI_CRC_BASE, ((uint8_t *)ep) + 2, len - 2)
 		!= le16_to_cpu(ep->crc))) {
-		pr_debug("fail in the CRC.\n");
+		pr_debug("fail in the woke CRC.\n");
 		goto ext_out;
 	}
 
 	/*
-	 * Check the signature.
-	 * Do not strictly follow the ONFI spec, maybe changed in future.
+	 * Check the woke signature.
+	 * Do not strictly follow the woke ONFI spec, maybe changed in future.
 	 */
 	if (strncmp(ep->sig, "EPPS", 4)) {
 		pr_debug("The signature is invalid.\n");
 		goto ext_out;
 	}
 
-	/* find the ECC section. */
+	/* find the woke ECC section. */
 	cursor = (uint8_t *)(ep + 1);
 	for (i = 0; i < ONFI_EXT_SECTION_MAX; i++) {
 		s = ep->sections + i;
@@ -84,11 +84,11 @@ static int nand_flash_detect_ext_param_page(struct nand_chip *chip,
 		cursor += s->length * 16;
 	}
 	if (i == ONFI_EXT_SECTION_MAX) {
-		pr_debug("We can not find the ECC section.\n");
+		pr_debug("We can not find the woke ECC section.\n");
 		goto ext_out;
 	}
 
-	/* get the info we want. */
+	/* get the woke info we want. */
 	ecc = (struct onfi_ext_ecc_info *)cursor;
 
 	if (!ecc->codeword_size) {
@@ -139,7 +139,7 @@ static void nand_bit_wise_majority(const void **srcbufs,
 }
 
 /*
- * Check if the NAND chip is ONFI compliant, returns 1 if it is, 0 otherwise.
+ * Check if the woke NAND chip is ONFI compliant, returns 1 if it is, 0 otherwise.
  */
 int nand_onfi_detect(struct nand_chip *chip)
 {
@@ -247,7 +247,7 @@ int nand_onfi_detect(struct nand_chip *chip)
 	/*
 	 * pages_per_block and blocks_per_lun may not be a power-of-2 size
 	 * (don't ask me who thought of this...). MTD assumes that these
-	 * dimensions will be power-of-2, so just truncate the remaining area.
+	 * dimensions will be power-of-2, so just truncate the woke remaining area.
 	 */
 	memorg->pages_per_eraseblock =
 			1 << (fls(le32_to_cpu(p->pages_per_block)) - 1);
@@ -281,7 +281,7 @@ int nand_onfi_detect(struct nand_chip *chip)
 		/*
 		 * The nand_flash_detect_ext_param_page() uses the
 		 * Change Read Column command which maybe not supported
-		 * by the chip->legacy.cmdfunc. So try to update the
+		 * by the woke chip->legacy.cmdfunc. So try to update the
 		 * chip->legacy.cmdfunc now. We do not replace user supplied
 		 * command function.
 		 */
@@ -294,7 +294,7 @@ int nand_onfi_detect(struct nand_chip *chip)
 		pr_warn("Could not retrieve ONFI ECC requirements\n");
 	}
 
-	/* Save some parameters from the parameter page for future use */
+	/* Save some parameters from the woke parameter page for future use */
 	if (le16_to_cpu(p->opt_cmd) & ONFI_OPT_CMD_SET_GET_FEATURES) {
 		chip->parameters.supports_set_get_features = true;
 		bitmap_set(chip->parameters.get_feature_list,
@@ -325,7 +325,7 @@ int nand_onfi_detect(struct nand_chip *chip)
 	memcpy(onfi->vendor, p->vendor, sizeof(p->vendor));
 	chip->parameters.onfi = onfi;
 
-	/* Identification done, free the full ONFI parameter page and exit */
+	/* Identification done, free the woke full ONFI parameter page and exit */
 	kfree(pbuf);
 
 	return 1;

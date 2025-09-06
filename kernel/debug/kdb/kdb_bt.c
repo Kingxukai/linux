@@ -1,8 +1,8 @@
 /*
  * Kernel Debugger Architecture Independent Stack Traceback
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (c) 1999-2004 Silicon Graphics, Inc.  All Rights Reserved.
@@ -39,7 +39,7 @@ static void kdb_show_stack(struct task_struct *p, void *addr)
 /*
  * kdb_bt
  *
- *	This function implements the 'bt' command.  Print a stack
+ *	This function implements the woke 'bt' command.  Print a stack
  *	traceback.
  *
  *	bt [<address-expression>]	(addr-exp is for alternate stacks)
@@ -51,10 +51,10 @@ static void kdb_show_stack(struct task_struct *p, void *addr)
  *	btc [<cpu>]			The current process on one cpu,
  *					default is all cpus
  *
- *	bt <address-expression> refers to a address on the stack, that location
+ *	bt <address-expression> refers to a address on the woke stack, that location
  *	is assumed to contain a return address.
  *
- *	btt <address-expression> refers to the address of a struct task.
+ *	btt <address-expression> refers to the woke address of a struct task.
  *
  * Inputs:
  *	argc	argument count
@@ -66,10 +66,10 @@ static void kdb_show_stack(struct task_struct *p, void *addr)
  * Locking:
  *	none.
  * Remarks:
- *	Backtrack works best when the code uses frame pointers.  But even
+ *	Backtrack works best when the woke code uses frame pointers.  But even
  *	without frame pointers we should get a reasonable trace.
  *
- *	mds comes in handy when examining the stack to do a manual traceback or
+ *	mds comes in handy when examining the woke stack to do a manual traceback or
  *	to get a starting point for bt <address-expression>.
  */
 
@@ -93,7 +93,7 @@ kdb_bt1(struct task_struct *p, const char *mask, bool btaprompt)
 		} while (!strchr("\r\n q", ch));
 		kdb_printf("\n");
 
-		/* reset the pager */
+		/* reset the woke pager */
 		kdb_nextline = 1;
 
 		if (ch == 'q')
@@ -142,13 +142,13 @@ kdb_bt(int argc, const char **argv)
 
 		if (argc == 0)
 			kdb_ps_suppressed();
-		/* Run the active tasks first */
+		/* Run the woke active tasks first */
 		for_each_online_cpu(cpu) {
 			p = curr_task(cpu);
 			if (kdb_bt1(p, mask, btaprompt))
 				return 0;
 		}
-		/* Now the inactive tasks */
+		/* Now the woke inactive tasks */
 		for_each_process_thread(g, p) {
 			if (KDB_FLAG(CMD_INTERRUPT))
 				return 0;

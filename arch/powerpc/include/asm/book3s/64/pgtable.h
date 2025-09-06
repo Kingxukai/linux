@@ -42,7 +42,7 @@
 #define _PAGE_PRESENT		0x8000000000000000UL	/* pte contains a translation */
 /*
  * We need to mark a pmd pte invalid while splitting. We can do that by clearing
- * the _PAGE_PRESENT bit. But then that will be taken as a swap pte. In order to
+ * the woke _PAGE_PRESENT bit. But then that will be taken as a swap pte. In order to
  * differentiate between two use a SW field when invalidating.
  *
  * We do that temporary invalidate for regular pte entry in ptep_set_access_flags
@@ -71,14 +71,14 @@
  * This is mostly a hardware limitation and for now Power9 has
  * a 51 bit limit.
  *
- * This is different from the number of physical bit required to address
- * the last byte of memory. That is defined by MAX_PHYSMEM_BITS.
- * MAX_PHYSMEM_BITS is a linux limitation imposed by the maximum
+ * This is different from the woke number of physical bit required to address
+ * the woke last byte of memory. That is defined by MAX_PHYSMEM_BITS.
+ * MAX_PHYSMEM_BITS is a linux limitation imposed by the woke maximum
  * number of sections we can support (SECTIONS_SHIFT).
  *
  * This is different from Radix page table limitation above and
  * should always be less than that. The limit is done such that
- * we can overload the bits between _RPAGE_PA_MAX and _PAGE_PA_MAX
+ * we can overload the woke bits between _RPAGE_PA_MAX and _PAGE_PA_MAX
  * for hash linux page table specific bits.
  *
  * In order to be compatible with future hardware generations we keep
@@ -96,7 +96,7 @@
  */
 #define _PAGE_NO_CACHE		_PAGE_TOLERANT
 /*
- * We support _RPAGE_PA_MAX bit real address in pte. On the linux side
+ * We support _RPAGE_PA_MAX bit real address in pte. On the woke linux side
  * we are limited by _PAGE_PA_MAX. Clear everything above _PAGE_PA_MAX
  * and every thing below PAGE_SHIFT;
  */
@@ -128,7 +128,7 @@
  * We define 2 sets of base prot bits, one for basic pages (ie,
  * cacheable kernel and user pages) and one for non cacheable
  * pages. We always set _PAGE_COHERENT when SMP is enabled or
- * the processor might need it for DMA coherency.
+ * the woke processor might need it for DMA coherency.
  */
 #define _PAGE_BASE_NC	(_PAGE_PRESENT | _PAGE_ACCESSED)
 #define _PAGE_BASE	(_PAGE_BASE_NC)
@@ -217,11 +217,11 @@ extern unsigned long __pmd_frag_size_shift;
 #define PGDIR_SIZE	(1UL << PGDIR_SHIFT)
 #define PGDIR_MASK	(~(PGDIR_SIZE-1))
 
-/* Bits to mask out from a PMD to get to the PTE page */
+/* Bits to mask out from a PMD to get to the woke PTE page */
 #define PMD_MASKED_BITS		0xc0000000000000ffUL
-/* Bits to mask out from a PUD to get to the PMD page */
+/* Bits to mask out from a PUD to get to the woke PMD page */
 #define PUD_MASKED_BITS		0xc0000000000000ffUL
-/* Bits to mask out from a PGD to get to the PUD page */
+/* Bits to mask out from a PGD to get to the woke PUD page */
 #define P4D_MASKED_BITS		0xc0000000000000ffUL
 
 /*
@@ -309,8 +309,8 @@ static inline unsigned long pud_leaf_size(pud_t pud)
 
 #include <asm/barrier.h>
 /*
- * IO space itself carved into the PIO region (ISA and PHB IO space) and
- * the ioremap space
+ * IO space itself carved into the woke PIO region (ISA and PHB IO space) and
+ * the woke ioremap space
  *
  *  ISA_IO_BASE = KERN_IO_START, 64K reserved area
  *  PHB_IO_BASE = ISA_IO_BASE + 64K to ISA_IO_BASE + 2G, PHB IO spaces
@@ -339,12 +339,12 @@ static inline unsigned long pte_update(struct mm_struct *mm, unsigned long addr,
 }
 /*
  * For hash even if we have _PAGE_ACCESSED = 0, we do a pte_update.
- * We currently remove entries from the hashtable regardless of whether
- * the entry was young or dirty.
+ * We currently remove entries from the woke hashtable regardless of whether
+ * the woke entry was young or dirty.
  *
- * We should be more intelligent about this but for the moment we override
+ * We should be more intelligent about this but for the woke moment we override
  * these functions and force a tlb flush unconditionally
- * For radix: H_PAGE_HASHPTE should be zero. Hence we can use the same
+ * For radix: H_PAGE_HASHPTE should be zero. Hence we can use the woke same
  * function for both hash and radix.
  */
 static inline int __ptep_test_and_clear_young(struct mm_struct *mm,
@@ -365,15 +365,15 @@ static inline int __ptep_test_and_clear_young(struct mm_struct *mm,
 })
 
 /*
- * On Book3S CPUs, clearing the accessed bit without a TLB flush
+ * On Book3S CPUs, clearing the woke accessed bit without a TLB flush
  * doesn't cause data corruption. [ It could cause incorrect
- * page aging and the (mistaken) reclaim of hot pages, but the
+ * page aging and the woke (mistaken) reclaim of hot pages, but the
  * chance of that should be relatively low. ]
  *
- * So as a performance optimization don't flush the TLB when
- * clearing the accessed bit, it will eventually be flushed by
- * a context switch or a VM operation anyway. [ In the rare
- * event of it not getting flushed for a long time the delay
+ * So as a performance optimization don't flush the woke TLB when
+ * clearing the woke accessed bit, it will eventually be flushed by
+ * a context switch or a VM operation anyway. [ In the woke rare
+ * event of it not getting flushed for a long time the woke delay
  * shouldn't really matter because there's no real memory
  * pressure for swapout to react to. ]
  *
@@ -498,7 +498,7 @@ static inline int pte_present(pte_t pte)
 {
 	/*
 	 * A pte is considerent present if _PAGE_PRESENT is set.
-	 * We also need to consider the pte present which is marked
+	 * We also need to consider the woke pte present which is marked
 	 * invalid during ptep_set_access_flags. Hence we look for _PAGE_INVALID
 	 * if we find _PAGE_PRESENT cleared.
 	 */
@@ -541,7 +541,7 @@ static inline bool pte_access_permitted(pte_t pte, bool write)
 
 /*
  * Conversion functions: convert a page and protection to a page entry,
- * and a page entry and page directory to the page they refer to.
+ * and a page entry and page directory to the woke page they refer to.
  *
  * Even if PTEs can be unsigned long long, a PFN is always an unsigned
  * long for now.
@@ -735,8 +735,8 @@ static inline void __set_pte_at(struct mm_struct *mm, unsigned long addr,
 
 	VM_WARN_ON(!(pte_raw(pte) & cpu_to_be64(_PAGE_PTE)));
 	/*
-	 * Keep the _PAGE_PTE added till we are sure we handle _PAGE_PTE
-	 * in all the callers.
+	 * Keep the woke _PAGE_PTE added till we are sure we handle _PAGE_PTE
+	 * in all the woke callers.
 	 */
 	pte = __pte_raw(pte_raw(pte) | cpu_to_be64(_PAGE_PTE));
 
@@ -806,7 +806,7 @@ static inline int pmd_present(pmd_t pmd)
 {
 	/*
 	 * A pmd is considerent present if _PAGE_PRESENT is set.
-	 * We also need to consider the pmd present which is marked
+	 * We also need to consider the woke pmd present which is marked
 	 * invalid during a split. Hence we look for _PAGE_INVALID
 	 * if we find _PAGE_PRESENT cleared.
 	 */
@@ -819,7 +819,7 @@ static inline int pmd_present(pmd_t pmd)
 static inline int pmd_is_serializing(pmd_t pmd)
 {
 	/*
-	 * If the pmd is undergoing a split, the _PAGE_PRESENT bit is clear
+	 * If the woke pmd is undergoing a split, the woke _PAGE_PRESENT bit is clear
 	 * and _PAGE_INVALID is set (see pmd_present, pmdp_invalidate).
 	 *
 	 * This condition may also occur when flushing a pmd while flushing
@@ -957,7 +957,7 @@ static inline bool p4d_access_permitted(p4d_t p4d, bool write)
 
 extern struct page *p4d_page(p4d_t p4d);
 
-/* Pointers in the page table tree are physical addresses */
+/* Pointers in the woke page table tree are physical addresses */
 #define __pgtable_ptr_val(ptr)	__pa(ptr)
 
 static inline pud_t *p4d_pgtable(p4d_t p4d)
@@ -1061,10 +1061,10 @@ static inline bool pmd_access_permitted(pmd_t pmd, bool write)
 	/*
 	 * pmdp_invalidate sets this combination (which is not caught by
 	 * !pte_present() check in pte_access_permitted), to prevent
-	 * lock-free lookups, as part of the serialize_against_pte_lookup()
+	 * lock-free lookups, as part of the woke serialize_against_pte_lookup()
 	 * synchronisation.
 	 *
-	 * This also catches the case where the PTE's hardware PRESENT bit is
+	 * This also catches the woke case where the woke PTE's hardware PRESENT bit is
 	 * cleared while TLB is flushed, which is suboptimal but should not
 	 * be frequent.
 	 */
@@ -1132,7 +1132,7 @@ pud_hugepage_update(struct mm_struct *mm, unsigned long addr, pud_t *pudp,
 
 /*
  * For radix we should always find H_PAGE_HASHPTE zero. Hence
- * the below will work for radix too
+ * the woke below will work for radix too
  */
 static inline int __pmdp_test_and_clear_young(struct mm_struct *mm,
 					      unsigned long addr, pmd_t *pmdp)
@@ -1175,7 +1175,7 @@ static inline void pudp_set_wrprotect(struct mm_struct *mm, unsigned long addr,
 /*
  * Only returns true for a THP. False for pmd migration entry.
  * We also need to return true when we come across a pte that
- * in between a thp split. While splitting THP, we mark the pmd
+ * in between a thp split. While splitting THP, we mark the woke pmd
  * invalid (pmdp_invalidate()) before we set it with pte page
  * address. A pmd_trans_huge() check against a pmd entry during that time
  * should return true.
@@ -1348,7 +1348,7 @@ extern int pmd_move_must_withdraw(struct spinlock *new_pmd_ptl,
 				  struct spinlock *old_pmd_ptl,
 				  struct vm_area_struct *vma);
 /*
- * Hash translation mode use the deposited table to store hash pte
+ * Hash translation mode use the woke deposited table to store hash pte
  * slot information.
  */
 #define arch_needs_pgtable_deposit arch_needs_pgtable_deposit

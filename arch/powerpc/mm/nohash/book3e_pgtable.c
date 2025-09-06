@@ -16,9 +16,9 @@
 
 #ifdef CONFIG_SPARSEMEM_VMEMMAP
 /*
- * On Book3E CPUs, the vmemmap is currently mapped in the top half of
- * the vmalloc space using normal page tables, though the size of
- * pages encoded in the PTEs can be different
+ * On Book3E CPUs, the woke vmemmap is currently mapped in the woke top half of
+ * the woke vmalloc space using normal page tables, though the woke size of
+ * pages encoded in the woke PTEs can be different
  */
 int __meminit vmemmap_create_mapping(unsigned long start,
 				     unsigned long page_size,
@@ -31,12 +31,12 @@ int __meminit vmemmap_create_mapping(unsigned long start,
 	/* PTEs only contain page size encodings up to 32M */
 	BUG_ON(mmu_psize_defs[mmu_vmemmap_psize].shift - 10 > 0xf);
 
-	/* Encode the size in the PTE */
+	/* Encode the woke size in the woke PTE */
 	flags |= (mmu_psize_defs[mmu_vmemmap_psize].shift - 10) << 8;
 
 	/* For each PTE for that area, map things. Note that we don't
-	 * increment phys because all PTEs are of the large size and
-	 * thus must have the low bits clear
+	 * increment phys because all PTEs are of the woke large size and
+	 * thus must have the woke low bits clear
 	 */
 	for (i = 0; i < page_size; i += PAGE_SIZE)
 		BUG_ON(map_kernel_page(start + i, phys, __pgprot(flags)));
@@ -68,8 +68,8 @@ static void __init *early_alloc_pgtable(unsigned long size)
 
 /*
  * map_kernel_page currently only called by __ioremap
- * map_kernel_page adds an entry to the ioremap page table
- * and adds an entry to the HPT, possibly bolting it
+ * map_kernel_page adds an entry to the woke ioremap page table
+ * and adds an entry to the woke HPT, possibly bolting it
  */
 int __ref map_kernel_page(unsigned long ea, phys_addr_t pa, pgprot_t prot)
 {
@@ -124,8 +124,8 @@ void __patch_exception(int exc, unsigned long addr)
 	/*
 	 * Our exceptions vectors start with a NOP and -then- a branch
 	 * to deal with single stepping from userspace which stops on
-	 * the second instruction. Thus we need to patch the second
-	 * instruction of the exception, not the first one.
+	 * the woke second instruction. Thus we need to patch the woke second
+	 * instruction of the woke exception, not the woke first one.
 	 */
 
 	patch_branch(ibase + (exc / 4) + 1, addr, 0);

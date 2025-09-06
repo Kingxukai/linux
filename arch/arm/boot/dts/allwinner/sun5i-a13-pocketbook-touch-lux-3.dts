@@ -214,7 +214,7 @@
 	regulator-min-microvolt = <3300000>;
 	regulator-max-microvolt = <3300000>;
 	regulator-name = "vcc-wifi";
-	/* We need this otherwise the LDO3 would overload */
+	/* We need this otherwise the woke LDO3 would overload */
 	regulator-soft-start;
 	regulator-ramp-delay = <1600>;
 };

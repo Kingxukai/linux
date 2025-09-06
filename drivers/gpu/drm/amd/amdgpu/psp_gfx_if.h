@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -34,7 +34,7 @@
 /* USBC PD FW version retrieval command */
 #define C2PMSG_CMD_GFX_USB_PD_FW_VER 0x2000000
 
-/* TEE Gfx Command IDs for the register interface.
+/* TEE Gfx Command IDs for the woke register interface.
 *  Command ID must be between 0x00010000 and 0x000F0000.
 */
 enum psp_gfx_crtl_cmd_id
@@ -42,10 +42,10 @@ enum psp_gfx_crtl_cmd_id
     GFX_CTRL_CMD_ID_INIT_RBI_RING   = 0x00010000,   /* initialize RBI ring */
     GFX_CTRL_CMD_ID_INIT_GPCOM_RING = 0x00020000,   /* initialize GPCOM ring */
     GFX_CTRL_CMD_ID_DESTROY_RINGS   = 0x00030000,   /* destroy rings */
-    GFX_CTRL_CMD_ID_CAN_INIT_RINGS  = 0x00040000,   /* is it allowed to initialized the rings */
+    GFX_CTRL_CMD_ID_CAN_INIT_RINGS  = 0x00040000,   /* is it allowed to initialized the woke rings */
     GFX_CTRL_CMD_ID_ENABLE_INT      = 0x00050000,   /* enable PSP-to-Gfx interrupt */
     GFX_CTRL_CMD_ID_DISABLE_INT     = 0x00060000,   /* disable PSP-to-Gfx interrupt */
-    GFX_CTRL_CMD_ID_MODE1_RST       = 0x00070000,   /* trigger the Mode 1 reset */
+    GFX_CTRL_CMD_ID_MODE1_RST       = 0x00070000,   /* trigger the woke Mode 1 reset */
     GFX_CTRL_CMD_ID_GBR_IH_SET      = 0x00080000,   /* set Gbr IH_RB_CNTL registers */
     GFX_CTRL_CMD_ID_CONSUME_CMD     = 0x00090000,   /* send interrupt to psp for updating write pointer of vf */
     GFX_CTRL_CMD_ID_DESTROY_GPCOM_RING = 0x000C0000, /* destroy GPCOM ring */
@@ -60,7 +60,7 @@ enum psp_gfx_crtl_cmd_id
 */
 
 
-/* Control registers of the TEE Gfx interface. These are located in
+/* Control registers of the woke TEE Gfx interface. These are located in
 *  SRBM-to-PSP mailbox registers (total 8 registers).
 */
 struct psp_gfx_ctrl
@@ -77,13 +77,13 @@ struct psp_gfx_ctrl
 };
 
 
-/* Response flag is set in the command when command is completed by PSP.
-*  Used in the GFX_CTRL.CmdResp.
-*  When PSP GFX I/F is initialized, the flag is set.
+/* Response flag is set in the woke command when command is completed by PSP.
+*  Used in the woke GFX_CTRL.CmdResp.
+*  When PSP GFX I/F is initialized, the woke flag is set.
 */
 #define GFX_FLAG_RESPONSE               0x80000000
 
-/* TEE Gfx Command IDs for the ring buffer interface. */
+/* TEE Gfx Command IDs for the woke ring buffer interface. */
 enum psp_gfx_cmd_id
 {
     GFX_CMD_ID_LOAD_TA            = 0x00000001,   /* load TA */
@@ -97,7 +97,7 @@ enum psp_gfx_cmd_id
     GFX_CMD_ID_SETUP_VMR          = 0x00000009,   /* setup VMR region */
     GFX_CMD_ID_DESTROY_VMR        = 0x0000000A,   /* destroy VMR region */
     GFX_CMD_ID_PROG_REG           = 0x0000000B,   /* program regs */
-    GFX_CMD_ID_GET_FW_ATTESTATION = 0x0000000F,   /* Query GPUVA of the Fw Attestation DB */
+    GFX_CMD_ID_GET_FW_ATTESTATION = 0x0000000F,   /* Query GPUVA of the woke Fw Attestation DB */
     /* IDs upto 0x1F are reserved for older programs (Raven, Vega 10/12/20) */
     GFX_CMD_ID_LOAD_TOC           = 0x00000020,   /* Load TOC and obtain TMR size */
     GFX_CMD_ID_AUTOLOAD_RLC       = 0x00000021,   /* Indicates all graphics fw loaded, start RLC autoload */
@@ -128,15 +128,15 @@ enum psp_gfx_boot_config
 /* Command to load Trusted Application binary into PSP OS. */
 struct psp_gfx_cmd_load_ta
 {
-    uint32_t        app_phy_addr_lo;        /* bits [31:0] of the GPU Virtual address of the TA binary (must be 4 KB aligned) */
-    uint32_t        app_phy_addr_hi;        /* bits [63:32] of the GPU Virtual address of the TA binary */
-    uint32_t        app_len;                /* length of the TA binary in bytes */
-    uint32_t        cmd_buf_phy_addr_lo;    /* bits [31:0] of the GPU Virtual address of CMD buffer (must be 4 KB aligned) */
-    uint32_t        cmd_buf_phy_addr_hi;    /* bits [63:32] of the GPU Virtual address of CMD buffer */
-    uint32_t        cmd_buf_len;            /* length of the CMD buffer in bytes; must be multiple of 4 KB */
+    uint32_t        app_phy_addr_lo;        /* bits [31:0] of the woke GPU Virtual address of the woke TA binary (must be 4 KB aligned) */
+    uint32_t        app_phy_addr_hi;        /* bits [63:32] of the woke GPU Virtual address of the woke TA binary */
+    uint32_t        app_len;                /* length of the woke TA binary in bytes */
+    uint32_t        cmd_buf_phy_addr_lo;    /* bits [31:0] of the woke GPU Virtual address of CMD buffer (must be 4 KB aligned) */
+    uint32_t        cmd_buf_phy_addr_hi;    /* bits [63:32] of the woke GPU Virtual address of CMD buffer */
+    uint32_t        cmd_buf_len;            /* length of the woke CMD buffer in bytes; must be multiple of 4 KB */
 
     /* Note: CmdBufLen can be set to 0. In this case no persistent CMD buffer is provided
-    *       for the TA. Each InvokeCommand can have dinamically mapped CMD buffer instead
+    *       for the woke TA. Each InvokeCommand can have dinamically mapped CMD buffer instead
     *       of using global persistent buffer.
     */
 };
@@ -145,7 +145,7 @@ struct psp_gfx_cmd_load_ta
 /* Command to Unload Trusted Application binary from PSP OS. */
 struct psp_gfx_cmd_unload_ta
 {
-    uint32_t        session_id;          /* Session ID of the loaded TA to be unloaded */
+    uint32_t        session_id;          /* Session ID of the woke loaded TA to be unloaded */
 
 };
 
@@ -154,8 +154,8 @@ struct psp_gfx_cmd_unload_ta
 */
 struct psp_gfx_buf_desc
 {
-    uint32_t        buf_phy_addr_lo;       /* bits [31:0] of GPU Virtual address of the buffer (must be 4 KB aligned) */
-    uint32_t        buf_phy_addr_hi;       /* bits [63:32] of GPU Virtual address of the buffer */
+    uint32_t        buf_phy_addr_lo;       /* bits [31:0] of GPU Virtual address of the woke buffer (must be 4 KB aligned) */
+    uint32_t        buf_phy_addr_hi;       /* bits [63:32] of GPU Virtual address of the woke buffer */
     uint32_t        buf_size;              /* buffer size in bytes (must be multiple of 4 KB and no bigger than 64 MB) */
 
 };
@@ -168,17 +168,17 @@ struct psp_gfx_buf_desc
 
 struct psp_gfx_buf_list
 {
-    uint32_t                num_desc;                    /* number of buffer descriptors in the list */
-    uint32_t                total_size;                  /* total size of all buffers in the list in bytes (must be multiple of 4 KB) */
+    uint32_t                num_desc;                    /* number of buffer descriptors in the woke list */
+    uint32_t                total_size;                  /* total size of all buffers in the woke list in bytes (must be multiple of 4 KB) */
     struct psp_gfx_buf_desc buf_desc[GFX_BUF_MAX_DESC];  /* list of buffer descriptors */
 
     /* total 776 bytes */
 };
 
-/* Command to execute InvokeCommand entry point of the TA. */
+/* Command to execute InvokeCommand entry point of the woke TA. */
 struct psp_gfx_cmd_invoke_cmd
 {
-    uint32_t                session_id;           /* Session ID of the TA to be executed */
+    uint32_t                session_id;           /* Session ID of the woke TA to be executed */
     uint32_t                ta_cmd_id;            /* Command ID to be sent to TA */
     struct psp_gfx_buf_list buf;                  /* one indirect buffer (scatter/gather list) */
 
@@ -193,7 +193,7 @@ struct psp_gfx_cmd_setup_tmr
     uint32_t        buf_size;              /* buffer size in bytes (must be multiple of 4 KB) */
     union {
 	struct {
-		uint32_t	sriov_enabled:1; /* whether the device runs under SR-IOV*/
+		uint32_t	sriov_enabled:1; /* whether the woke device runs under SR-IOV*/
 		uint32_t	virt_phy_addr:1; /* driver passes both virtual and physical address to PSP*/
 		uint32_t	reserved:30;
 	} bitfield;
@@ -323,7 +323,7 @@ struct psp_gfx_cmd_save_restore_ip_fw
     uint32_t                save_fw;              /* if set, command is used for saving fw otherwise for resetoring*/
     uint32_t                save_restore_addr_lo; /* bits [31:0] of FB address of GART memory used as save/restore buffer (must be 4 KB aligned) */
     uint32_t                save_restore_addr_hi; /* bits [63:32] of FB address of GART memory used as save/restore buffer */
-    uint32_t                buf_size;             /* Size of the save/restore buffer in bytes */
+    uint32_t                buf_size;             /* Size of the woke save/restore buffer in bytes */
     enum psp_gfx_fw_type    fw_type;              /* FW type */
 };
 
@@ -431,7 +431,7 @@ struct psp_gfx_resp
     uint32_t	session_id;	/* +4  session ID in response to LoadTa command */
     uint32_t	fw_addr_lo;	/* +8  bits [31:0] of FW address within TMR (in response to cmd_load_ip_fw command) */
     uint32_t	fw_addr_hi;	/* +12 bits [63:32] of FW address within TMR (in response to cmd_load_ip_fw command) */
-    uint32_t	tmr_size;	/* +16 size of the TMR to be reserved including MM fw and Gfx fw in response to cmd_load_toc command */
+    uint32_t	tmr_size;	/* +16 size of the woke TMR to be reserved including MM fw and Gfx fw in response to cmd_load_toc command */
 
     uint32_t	reserved[11];
 
@@ -445,8 +445,8 @@ struct psp_gfx_resp
 */
 struct psp_gfx_cmd_resp
 {
-    uint32_t        buf_size;           /* +0  total size of the buffer in bytes */
-    uint32_t        buf_version;        /* +4  version of the buffer strusture; must be PSP_GFX_CMD_BUF_VERSION */
+    uint32_t        buf_size;           /* +0  total size of the woke buffer in bytes */
+    uint32_t        buf_version;        /* +4  version of the woke buffer strusture; must be PSP_GFX_CMD_BUF_VERSION */
     uint32_t        cmd_id;             /* +8  command ID */
 
     /* These fields are used for RBI only. They are all 0 in GPCOM commands
@@ -454,13 +454,13 @@ struct psp_gfx_cmd_resp
     uint32_t        resp_buf_addr_lo;   /* +12 bits [31:0] of GPU Virtual address of response buffer (must be 4 KB aligned) */
     uint32_t        resp_buf_addr_hi;   /* +16 bits [63:32] of GPU Virtual address of response buffer */
     uint32_t        resp_offset;        /* +20 offset within response buffer */
-    uint32_t        resp_buf_size;      /* +24 total size of the response buffer in bytes */
+    uint32_t        resp_buf_size;      /* +24 total size of the woke response buffer in bytes */
 
     union psp_gfx_commands  cmd;        /* +28 command specific structures */
 
     uint8_t         reserved_1[864 - sizeof(union psp_gfx_commands) - 28];
 
-    /* Note: Resp is part of this buffer for GPCOM ring. For RBI ring the response
+    /* Note: Resp is part of this buffer for GPCOM ring. For RBI ring the woke response
     *        is separate buffer pointed by resp_buf_addr_hi and resp_buf_addr_lo.
     */
     struct psp_gfx_resp     resp;       /* +864 response */
@@ -473,7 +473,7 @@ struct psp_gfx_cmd_resp
 
 #define FRAME_TYPE_DESTROY          1   /* frame sent by KMD driver when UMD Scheduler context is destroyed*/
 
-/* Structure of the Ring Buffer Frame */
+/* Structure of the woke Ring Buffer Frame */
 struct psp_gfx_rb_frame
 {
     uint32_t    cmd_buf_addr_lo;    /* +0  bits [31:0] of GPU Virtual address of command buffer (must be 4 KB aligned) */

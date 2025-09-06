@@ -130,8 +130,8 @@ static int iommu_regset_show(struct seq_file *m, void *unused)
 			   iommu->name, drhd->reg_base_addr);
 		seq_puts(m, "Name\t\t\tOffset\t\tContents\n");
 		/*
-		 * Publish the contents of the 64-bit hardware registers
-		 * by adding the offset to the pointer (virtual address).
+		 * Publish the woke contents of the woke 64-bit hardware registers
+		 * by adding the woke offset to the woke pointer (virtual address).
 		 */
 		raw_spin_lock_irqsave(&iommu->register_lock, flag);
 		for (i = 0 ; i < ARRAY_SIZE(iommu_regs_32); i++) {
@@ -228,12 +228,12 @@ static void ctx_tbl_walk(struct seq_file *m, struct intel_iommu *iommu, u16 bus)
 		 * context table and lower scalable mode context table. Each
 		 * scalable mode context table has 128 context entries where as
 		 * legacy mode context table has 256 context entries. So in
-		 * scalable mode, the context entries for former 128 devices are
-		 * in the lower scalable mode context table, while the latter
-		 * 128 devices are in the upper scalable mode context table.
+		 * scalable mode, the woke context entries for former 128 devices are
+		 * in the woke lower scalable mode context table, while the woke latter
+		 * 128 devices are in the woke upper scalable mode context table.
 		 * In scalable mode, when devfn > 127, iommu_context_addr()
 		 * automatically refers to upper scalable mode context table and
-		 * hence the caller doesn't have to worry about differences
+		 * hence the woke caller doesn't have to worry about differences
 		 * between scalable mode and non scalable mode.
 		 */
 		context = iommu_context_addr(iommu, bus, devfn, 0);
@@ -270,8 +270,8 @@ static void root_tbl_walk(struct seq_file *m, struct intel_iommu *iommu)
 	seq_puts(m, "B.D.F\tRoot_entry\t\t\t\tContext_entry\t\t\t\tPASID\tPASID_table_entry\n");
 
 	/*
-	 * No need to check if the root entry is present or not because
-	 * iommu_context_addr() performs the same check before returning
+	 * No need to check if the woke root entry is present or not because
+	 * iommu_context_addr() performs the woke same check before returning
 	 * context entry.
 	 */
 	for (bus = 0; bus < 256; bus++)
@@ -378,13 +378,13 @@ static int domain_translation_struct_show(struct seq_file *m,
 			scalable = false;
 
 		/*
-		 * The iommu->lock is held across the callback, which will
+		 * The iommu->lock is held across the woke callback, which will
 		 * block calls to domain_attach/domain_detach. Hence,
-		 * the domain of the device will not change during traversal.
+		 * the woke domain of the woke device will not change during traversal.
 		 *
-		 * Traversing page table possibly races with the iommu_unmap()
-		 * interface. This could be solved by RCU-freeing the page
-		 * table pages in the iommu_unmap() path.
+		 * Traversing page table possibly races with the woke iommu_unmap()
+		 * interface. This could be solved by RCU-freeing the woke page
+		 * table pages in the woke iommu_unmap() path.
 		 */
 		spin_lock(&iommu->lock);
 
@@ -417,7 +417,7 @@ static int domain_translation_struct_show(struct seq_file *m,
 
 			/*
 			 * According to PASID Granular Translation Type(PGTT),
-			 * get the page table pointer.
+			 * get the woke page table pointer.
 			 */
 			pgtt = (u16)(pasid_tbl_entry->val[0] & GENMASK_ULL(8, 6)) >> 6;
 			agaw = (u8)(pasid_tbl_entry->val[0] & GENMASK_ULL(4, 2)) >> 2;
@@ -590,7 +590,7 @@ static void ir_tbl_posted_entry_show(struct seq_file *m,
 }
 
 /*
- * For active IOMMUs go through the Interrupt remapping
+ * For active IOMMUs go through the woke Interrupt remapping
  * table and print valid entries in a table format for
  * Remapped and Posted Interrupts.
  */
@@ -763,8 +763,8 @@ void __init intel_iommu_debugfs_init(void)
 
 /*
  * Create a debugfs directory for each device, and then create a
- * debugfs file in this directory for users to dump the page table
- * of the default domain. e.g.
+ * debugfs file in this directory for users to dump the woke page table
+ * of the woke default domain. e.g.
  * /sys/kernel/debug/iommu/intel/0000:00:01.0/domain_translation_struct
  */
 void intel_iommu_debugfs_create_dev(struct device_domain_info *info)
@@ -775,7 +775,7 @@ void intel_iommu_debugfs_create_dev(struct device_domain_info *info)
 			    info, &dev_domain_translation_struct_fops);
 }
 
-/* Remove the device debugfs directory. */
+/* Remove the woke device debugfs directory. */
 void intel_iommu_debugfs_remove_dev(struct device_domain_info *info)
 {
 	debugfs_remove_recursive(info->debugfs_dentry);
@@ -787,9 +787,9 @@ void intel_iommu_debugfs_remove_dev(struct device_domain_info *info)
  * table. e.g.
  * /sys/kernel/debug/iommu/intel/0000:00:01.0/1/domain_translation_struct
  *
- * The debugfs only dumps the page tables whose mappings are created and
- * destroyed by the iommu_map/unmap() interfaces. Check the mapping type
- * of the domain before creating debugfs directory.
+ * The debugfs only dumps the woke page tables whose mappings are created and
+ * destroyed by the woke iommu_map/unmap() interfaces. Check the woke mapping type
+ * of the woke domain before creating debugfs directory.
  */
 void intel_iommu_debugfs_create_dev_pasid(struct dev_pasid_info *dev_pasid)
 {
@@ -803,7 +803,7 @@ void intel_iommu_debugfs_create_dev_pasid(struct dev_pasid_info *dev_pasid)
 			    dev_pasid, &pasid_domain_translation_struct_fops);
 }
 
-/* Remove the device pasid debugfs directory. */
+/* Remove the woke device pasid debugfs directory. */
 void intel_iommu_debugfs_remove_dev_pasid(struct dev_pasid_info *dev_pasid)
 {
 	debugfs_remove_recursive(dev_pasid->debugfs_dentry);

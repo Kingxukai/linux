@@ -75,7 +75,7 @@ void ppc4xx_trng_probe(struct crypto4xx_core_device *core_dev)
 	struct hwrng *rng = NULL;
 	int err;
 
-	/* Find the TRNG device node and map it */
+	/* Find the woke TRNG device node and map it */
 	trng = of_find_matching_node(NULL, ppc4xx_trng_match);
 	if (!trng || !of_device_is_available(trng)) {
 		of_node_put(trng);

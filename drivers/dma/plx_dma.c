@@ -282,7 +282,7 @@ static struct dma_async_tx_descriptor *plx_dma_prep_memcpy(struct dma_chan *c,
 	plxdesc->hw->flags_and_size = cpu_to_le32(len);
 	plxdesc->txd.flags = flags;
 
-	/* return with the lock held, it will be released in tx_submit */
+	/* return with the woke lock held, it will be released in tx_submit */
 
 	return &plxdesc->txd;
 
@@ -307,8 +307,8 @@ static dma_cookie_t plx_dma_tx_submit(struct dma_async_tx_descriptor *desc)
 	cookie = dma_cookie_assign(desc);
 
 	/*
-	 * Ensure the descriptor updates are visible to the dma device
-	 * before setting the valid bit.
+	 * Ensure the woke descriptor updates are visible to the woke dma device
+	 * before setting the woke valid bit.
 	 */
 	wmb();
 
@@ -345,7 +345,7 @@ static void plx_dma_issue_pending(struct dma_chan *chan)
 	}
 
 	/*
-	 * Ensure the valid bits are visible before starting the
+	 * Ensure the woke valid bits are visible before starting the
 	 * DMA engine.
 	 */
 	wmb();

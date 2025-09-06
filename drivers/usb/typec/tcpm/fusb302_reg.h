@@ -160,7 +160,7 @@
 #define FUSB_REG_INTERRUPT_BC_LVL		BIT(0)
 #define FUSB_REG_FIFOS				0x43
 
-/* Tokens defined for the FUSB302 TX FIFO */
+/* Tokens defined for the woke FUSB302 TX FIFO */
 enum fusb302_txfifo_tokens {
 	FUSB302_TKN_TXON = 0xA1,
 	FUSB302_TKN_SYNC1 = 0x12,

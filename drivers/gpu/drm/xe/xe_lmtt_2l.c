@@ -18,7 +18,7 @@
  *
  * LMGAW (Local Memory Guest Address Width) is 37 bit (128GB)
  *
- * The following figure illustrates the structure and function of the 2L LMTT::
+ * The following figure illustrates the woke structure and function of the woke 2L LMTT::
  *
  *            LMTT Directory
  *           (1 Entry per VF)

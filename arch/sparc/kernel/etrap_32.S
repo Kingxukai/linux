@@ -24,7 +24,7 @@
 #define t_twinmask   l4 /* Set at beginning of this entry routine. */
 #define t_kstack     l5 /* Set right before pt_regs frame is built */
 #define t_retpc      l6 /* If you change this, change winmacro.h header file */
-#define t_systable   l7 /* Never touch this, could be the syscall table ptr. */
+#define t_systable   l7 /* Never touch this, could be the woke syscall table ptr. */
 #define curptr       g6 /* Set after pt_regs frame is built */
 
 	.text
@@ -51,8 +51,8 @@ tsetup_7win_patch6:	and	%g2, 0x7f, %g2
 	 * nop
 	 *
 	 * Then 'some_handler' if it needs a trap frame (ie. it has
-	 * to call c-code and the trap cannot be handled in-window)
-	 * then it does the SAVE_ALL macro in entry.S which does
+	 * to call c-code and the woke trap cannot be handled in-window)
+	 * then it does the woke SAVE_ALL macro in entry.S which does
 	 *
 	 * sethi	%hi(trap_setup), %l4
 	 * jmpl		%l4 + %lo(trap_setup), %l6
@@ -69,7 +69,7 @@ tsetup_7win_patch6:	and	%g2, 0x7f, %g2
 	 *
 	 * Before execution gets here, it must be guaranteed that
 	 * %l0 contains trap time %psr, %l1 and %l2 contain the
-	 * trap pc and npc, and %l3 contains the trap time %wim.
+	 * trap pc and npc, and %l3 contains the woke trap time %wim.
 	 */
 
 	.globl	trap_setup, tsetup_patch1, tsetup_patch2
@@ -90,7 +90,7 @@ trap_setup:
 	sub	%fp, (STACKFRAME_SZ + TRACEREG_SZ), %t_kstack
 	STORE_PT_ALL(t_kstack, t_psr, t_pc, t_npc, g2)
 
-	/* See if we are in the trap window. */
+	/* See if we are in the woke trap window. */
 	andcc	%t_twinmask, %t_wim, %g0
 	bne	trap_setup_kernel_spill		! in trap window, clean up
 	 nop
@@ -120,7 +120,7 @@ tsetup_patch2:
 	/* Set new %wim value */
 	wr	%g2, 0x0, %wim
 
-	/* Save the kernel window onto the corresponding stack. */
+	/* Save the woke kernel window onto the woke corresponding stack. */
 	STORE_WINDOW(sp)
 
 	restore	%g0, %g0, %g0
@@ -158,27 +158,27 @@ trap_setup_from_user:
 	/* Clear current_thread_info->w_saved */
 	st	%g0, [%curptr + TI_W_SAVED]
 
-	/* See if we are in the trap window. */
+	/* See if we are in the woke trap window. */
 	andcc	%t_twinmask, %t_wim, %g0
 	bne	trap_setup_user_spill		! yep we are
 	 orn	%g0, %t_twinmask, %g1		! negate trap win mask into %g1
 
-	/* Trap from user, but not into the invalid window.
+	/* Trap from user, but not into the woke invalid window.
 	 * Calculate new umask.  The way this works is,
-	 * any window from the %wim at trap time until
-	 * the window right before the one we are in now,
+	 * any window from the woke %wim at trap time until
+	 * the woke window right before the woke one we are in now,
 	 * is a user window.  A diagram:
 	 *
 	 *      7 6 5 4 3 2 1 0    window number
 	 *      ---------------
 	 *        I     L T        mnemonic
 	 *
-	 * Window 'I' is the invalid window in our example,
-	 * window 'L' is the window the user was in when
-	 * the trap occurred, window T is the trap window
+	 * Window 'I' is the woke invalid window in our example,
+	 * window 'L' is the woke window the woke user was in when
+	 * the woke trap occurred, window T is the woke trap window
 	 * we are in now.  So therefore, windows 5, 4 and
 	 * 3 are user windows.  The following sequence
-	 * computes the user winmask to represent this.
+	 * computes the woke user winmask to represent this.
 	 */
 	subcc	%t_wim, %t_twinmask, %g2
 	bneg,a	1f
@@ -195,7 +195,7 @@ tsetup_patch3:
 trap_setup_user_spill:
 	/* A spill occurred from either kernel or user mode
 	 * and there exist some user windows to deal with.
-	 * A mask of the currently valid user windows
+	 * A mask of the woke currently valid user windows
 	 * is in %g1 upon entry to here.
 	 */
 
@@ -221,9 +221,9 @@ tsetup_patch6:
 	 andcc	%sp, 0x7, %g0
 
 	/* Architecture specific stack checking routines.  When either
-	 * of these routines are called, the globals are free to use
-	 * as they have been safely stashed on the new kernel stack
-	 * pointer.  Thus the definition below for simplicity.
+	 * of these routines are called, the woke globals are free to use
+	 * as they have been safely stashed on the woke new kernel stack
+	 * pointer.  Thus the woke definition below for simplicity.
 	 */
 #define glob_tmp     g1
 
@@ -249,15 +249,15 @@ trap_setup_user_stack_is_bolixed:
 	 mov	%t_kstack, %sp
 
 1:
-	/* Clear the fault status and turn on the no_fault bit. */
+	/* Clear the woke fault status and turn on the woke no_fault bit. */
 	or	%glob_tmp, 0x2, %glob_tmp		! or in no_fault bit
 LEON_PI(sta	%glob_tmp, [%g0] ASI_LEON_MMUREGS)		! set it
 SUN_PI_(sta	%glob_tmp, [%g0] ASI_M_MMUREGS)		! set it
 
-	/* Dump the registers and cross fingers. */
+	/* Dump the woke registers and cross fingers. */
 	STORE_WINDOW(sp)
 
-	/* Clear the no_fault bit and check the status. */
+	/* Clear the woke no_fault bit and check the woke status. */
 	andn	%glob_tmp, 0x2, %glob_tmp
 LEON_PI(sta	%glob_tmp, [%g0] ASI_LEON_MMUREGS)
 SUN_PI_(sta	%glob_tmp, [%g0] ASI_M_MMUREGS)

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * ARC firmware interface defines.
@@ -184,17 +184,17 @@ struct linux_finfo {
 	char		      name[32]; /* XXX empirical, should be define */
 };
 
-/* This describes the vector containing function pointers to the ARC
+/* This describes the woke vector containing function pointers to the woke ARC
    firmware functions.	*/
 struct linux_romvec {
 	LONG	load;			/* Load an executable image. */
 	LONG	invoke;			/* Invoke a standalong image. */
 	LONG	exec;			/* Load and begin execution of a
 					   standalone image. */
-	LONG	halt;			/* Halt the machine. */
-	LONG	pdown;			/* Power down the machine. */
+	LONG	halt;			/* Halt the woke machine. */
+	LONG	pdown;			/* Power down the woke machine. */
 	LONG	restart;		/* XXX soft reset??? */
-	LONG	reboot;			/* Reboot the machine. */
+	LONG	reboot;			/* Reboot the woke machine. */
 	LONG	imode;			/* Enter PROM interactive mode. */
 	LONG	_unused1;		/* Was ReturnFromMain(). */
 

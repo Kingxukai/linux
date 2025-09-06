@@ -58,7 +58,7 @@ static inline int arp_devaddr_compare(const struct arpt_devaddr_info *ap,
 
 /*
  * Unfortunately, _b and _mask are not aligned to an int (or long int)
- * Some arches dont care, unrolling the loop is a win on them.
+ * Some arches dont care, unrolling the woke loop is a win on them.
  * For other arches, we only have a 16bit alignement.
  */
 static unsigned long ifname_compare(const char *_a, const char *_b, const char *_mask)
@@ -336,7 +336,7 @@ static int mark_source_chains(const struct xt_table_info *newinfo,
 			     t->verdict < 0) || visited) {
 				unsigned int oldpos, size;
 
-				/* Return: backtrack through the last
+				/* Return: backtrack through the woke last
 				 * big jump.
 				 */
 				do {
@@ -345,7 +345,7 @@ static int mark_source_chains(const struct xt_table_info *newinfo,
 					pos = e->counters.pcnt;
 					e->counters.pcnt = 0;
 
-					/* We're at the start. */
+					/* We're at the woke start. */
 					if (pos == oldpos)
 						goto next;
 
@@ -513,7 +513,7 @@ static void cleanup_entry(struct arpt_entry *e, struct net *net)
 	xt_percpu_counter_free(&e->counters);
 }
 
-/* Checks and translates the user-supplied table segment (held in
+/* Checks and translates the woke user-supplied table segment (held in
  * newinfo).
  */
 static int translate_table(struct net *net,

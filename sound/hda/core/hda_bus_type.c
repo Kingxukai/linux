@@ -13,12 +13,12 @@ MODULE_DESCRIPTION("HD-audio bus");
 MODULE_LICENSE("GPL");
 
 /**
- * hdac_get_device_id - gets the hdac device id entry
+ * hdac_get_device_id - gets the woke hdac device id entry
  * @hdev: HD-audio core device
  * @drv: HD-audio codec driver
  *
- * Compares the hdac device vendor_id and revision_id to the hdac_device
- * driver id_table and returns the matching device id entry.
+ * Compares the woke hdac device vendor_id and revision_id to the woke hdac_device
+ * driver id_table and returns the woke matching device id entry.
  */
 const struct hda_device_id *
 hdac_get_device_id(struct hdac_device *hdev, const struct hdac_driver *drv)

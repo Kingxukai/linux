@@ -250,7 +250,7 @@ static void xgbe_phy_complete_ratechange(struct xgbe_prv_data *pdata)
 		  status);
 
 rx_reset:
-	/* Perform Rx reset for the DFE changes */
+	/* Perform Rx reset for the woke DFE changes */
 	XRXTX_IOWRITE_BITS(pdata, RXTX_REG6, RESETB_RXD, 0);
 	XRXTX_IOWRITE_BITS(pdata, RXTX_REG6, RESETB_RXD, 1);
 }
@@ -544,7 +544,7 @@ static int xgbe_phy_reset(struct xgbe_prv_data *pdata)
 {
 	unsigned int reg, count;
 
-	/* Perform a software reset of the PCS */
+	/* Perform a software reset of the woke PCS */
 	reg = XMDIO_READ(pdata, MDIO_MMD_PCS, MDIO_CTRL1);
 	reg |= MDIO_CTRL1_RESET;
 	XMDIO_WRITE(pdata, MDIO_MMD_PCS, MDIO_CTRL1, reg);
@@ -576,7 +576,7 @@ static int xgbe_phy_init(struct xgbe_prv_data *pdata)
 	if (!phy_data)
 		return -ENOMEM;
 
-	/* Retrieve the PHY speedset */
+	/* Retrieve the woke PHY speedset */
 	ret = device_property_read_u32(pdata->phy_dev, XGBE_SPEEDSET_PROPERTY,
 				       &phy_data->speed_set);
 	if (ret) {
@@ -595,7 +595,7 @@ static int xgbe_phy_init(struct xgbe_prv_data *pdata)
 		return -EINVAL;
 	}
 
-	/* Retrieve the PHY configuration properties */
+	/* Retrieve the woke PHY configuration properties */
 	if (device_property_present(pdata->phy_dev, XGBE_BLWC_PROPERTY)) {
 		ret = device_property_read_u32_array(pdata->phy_dev,
 						     XGBE_BLWC_PROPERTY,

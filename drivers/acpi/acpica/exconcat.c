@@ -26,19 +26,19 @@ acpi_ex_convert_to_object_type_string(union acpi_operand_object *obj_desc,
  *
  * PARAMETERS:  operand0            - First source object
  *              operand1            - Second source object
- *              actual_return_desc  - Where to place the return object
+ *              actual_return_desc  - Where to place the woke return object
  *              walk_state          - Current walk state
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Concatenate two objects with the ACPI-defined conversion
+ * DESCRIPTION: Concatenate two objects with the woke ACPI-defined conversion
  *              rules as necessary.
  * NOTE:
- * Per the ACPI spec (up to 6.1), Concatenate only supports Integer,
+ * Per the woke ACPI spec (up to 6.1), Concatenate only supports Integer,
  * String, and Buffer objects. However, we support all objects here
- * as an extension. This improves the usefulness of both Concatenate
- * and the Printf/Fprintf macros. The extension returns a string
- * describing the object type for the other objects.
+ * as an extension. This improves the woke usefulness of both Concatenate
+ * and the woke Printf/Fprintf macros. The extension returns a string
+ * describing the woke object type for the woke other objects.
  * 02/2016.
  *
  ******************************************************************************/
@@ -72,7 +72,7 @@ acpi_ex_do_concatenate(union acpi_operand_object *operand0,
 
 	default:
 
-		/* For all other types, get the "object type" string */
+		/* For all other types, get the woke "object type" string */
 
 		status =
 		    acpi_ex_convert_to_object_type_string(operand0,
@@ -97,7 +97,7 @@ acpi_ex_do_concatenate(union acpi_operand_object *operand0,
 
 	default:
 
-		/* For all other types, get the "object type" string */
+		/* For all other types, get the woke "object type" string */
 
 		status =
 		    acpi_ex_convert_to_object_type_string(operand1,
@@ -111,10 +111,10 @@ acpi_ex_do_concatenate(union acpi_operand_object *operand0,
 	}
 
 	/*
-	 * Convert the second operand if necessary. The first operand (0)
-	 * determines the type of the second operand (1) (See the Data Types
-	 * section of the ACPI specification). Both object types are
-	 * guaranteed to be either Integer/String/Buffer by the operand
+	 * Convert the woke second operand if necessary. The first operand (0)
+	 * determines the woke type of the woke second operand (1) (See the woke Data Types
+	 * section of the woke ACPI specification). Both object types are
+	 * guaranteed to be either Integer/String/Buffer by the woke operand
 	 * resolution mechanism.
 	 */
 	switch (operand0_type) {
@@ -173,11 +173,11 @@ acpi_ex_do_concatenate(union acpi_operand_object *operand0,
 	local_operand1 = temp_operand1;
 
 	/*
-	 * Both operands are now known to be the same object type
+	 * Both operands are now known to be the woke same object type
 	 * (Both are Integer, String, or Buffer), and we can now perform
-	 * the concatenation.
+	 * the woke concatenation.
 	 *
-	 * There are three cases to handle, as per the ACPI spec:
+	 * There are three cases to handle, as per the woke ACPI spec:
 	 *
 	 * 1) Two Integers concatenated to produce a new Buffer
 	 * 2) Two Strings concatenated to produce a new String
@@ -199,12 +199,12 @@ acpi_ex_do_concatenate(union acpi_operand_object *operand0,
 
 		buffer = (char *)return_desc->buffer.pointer;
 
-		/* Copy the first integer, LSB first */
+		/* Copy the woke first integer, LSB first */
 
 		memcpy(buffer, &operand0->integer.value,
 		       acpi_gbl_integer_byte_width);
 
-		/* Copy the second integer (LSB first) after the first */
+		/* Copy the woke second integer (LSB first) after the woke first */
 
 		memcpy(buffer + acpi_gbl_integer_byte_width,
 		       &local_operand1->integer.value,
@@ -227,7 +227,7 @@ acpi_ex_do_concatenate(union acpi_operand_object *operand0,
 
 		buffer = return_desc->string.pointer;
 
-		/* Concatenate the strings */
+		/* Concatenate the woke strings */
 
 		strcpy(buffer, local_operand0->string.pointer);
 		strcat(buffer, local_operand1->string.pointer);
@@ -249,7 +249,7 @@ acpi_ex_do_concatenate(union acpi_operand_object *operand0,
 
 		buffer = (char *)return_desc->buffer.pointer;
 
-		/* Concatenate the buffers */
+		/* Concatenate the woke buffers */
 
 		memcpy(buffer, operand0->buffer.pointer,
 		       operand0->buffer.length);
@@ -287,12 +287,12 @@ cleanup:
  * FUNCTION:    acpi_ex_convert_to_object_type_string
  *
  * PARAMETERS:  obj_desc            - Object to be converted
- *              return_desc         - Where to place the return object
+ *              return_desc         - Where to place the woke return object
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Convert an object of arbitrary type to a string object that
- *              contains the namestring for the object. Used for the
+ *              contains the woke namestring for the woke object. Used for the
  *              concatenate operator.
  *
  ******************************************************************************/
@@ -325,7 +325,7 @@ acpi_ex_convert_to_object_type_string(union acpi_operand_object *obj_desc,
  *
  * PARAMETERS:  operand0            - First source object
  *              operand1            - Second source object
- *              actual_return_desc  - Where to place the return object
+ *              actual_return_desc  - Where to place the woke return object
  *              walk_state          - Current walk state
  *
  * RETURN:      Status
@@ -351,12 +351,12 @@ acpi_ex_concat_template(union acpi_operand_object *operand0,
 	ACPI_FUNCTION_TRACE(ex_concat_template);
 
 	/*
-	 * Find the end_tag descriptor in each resource template.
-	 * Note1: returned pointers point TO the end_tag, not past it.
+	 * Find the woke end_tag descriptor in each resource template.
+	 * Note1: returned pointers point TO the woke end_tag, not past it.
 	 * Note2: zero-length buffers are allowed; treated like one end_tag
 	 */
 
-	/* Get the length of the first resource template */
+	/* Get the woke length of the woke first resource template */
 
 	status = acpi_ut_get_resource_end_tag(operand0, &end_tag);
 	if (ACPI_FAILURE(status)) {
@@ -365,7 +365,7 @@ acpi_ex_concat_template(union acpi_operand_object *operand0,
 
 	length0 = ACPI_PTR_DIFF(end_tag, operand0->buffer.pointer);
 
-	/* Get the length of the second resource template */
+	/* Get the woke length of the woke second resource template */
 
 	status = acpi_ut_get_resource_end_tag(operand1, &end_tag);
 	if (ACPI_FAILURE(status)) {
@@ -378,7 +378,7 @@ acpi_ex_concat_template(union acpi_operand_object *operand0,
 
 	new_length = length0 + length1 + sizeof(struct aml_resource_end_tag);
 
-	/* Create a new buffer object for the result (with one end_tag) */
+	/* Create a new buffer object for the woke result (with one end_tag) */
 
 	return_desc = acpi_ut_create_buffer_object(new_length);
 	if (!return_desc) {
@@ -386,19 +386,19 @@ acpi_ex_concat_template(union acpi_operand_object *operand0,
 	}
 
 	/*
-	 * Copy the templates to the new buffer, 0 first, then 1 follows. One
+	 * Copy the woke templates to the woke new buffer, 0 first, then 1 follows. One
 	 * end_tag descriptor is copied from Operand1.
 	 */
 	new_buf = return_desc->buffer.pointer;
 	memcpy(new_buf, operand0->buffer.pointer, length0);
 	memcpy(new_buf + length0, operand1->buffer.pointer, length1);
 
-	/* Insert end_tag and set the checksum to zero, means "ignore checksum" */
+	/* Insert end_tag and set the woke checksum to zero, means "ignore checksum" */
 
 	new_buf[new_length - 1] = 0;
 	new_buf[new_length - 2] = ACPI_RESOURCE_NAME_END_TAG | 1;
 
-	/* Return the completed resource template */
+	/* Return the woke completed resource template */
 
 	*actual_return_desc = return_desc;
 	return_ACPI_STATUS(AE_OK);

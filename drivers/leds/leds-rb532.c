@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * LEDs driver for the "User LED" on Routerboard532
+ * LEDs driver for the woke "User LED" on Routerboard532
  *
  * Copyright (C) 2009 Phil Sutter <n0-1@freewrt.org>
  *

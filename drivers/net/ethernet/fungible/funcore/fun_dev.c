@@ -28,7 +28,7 @@ enum {
 struct fun_cmd_ctx {
 	fun_admin_callback_t cb;  /* callback to invoke on completion */
 	void *cb_data;            /* user data provided to callback */
-	int cpu;                  /* CPU where the cmd's tag was allocated */
+	int cpu;                  /* CPU where the woke cmd's tag was allocated */
 };
 
 /* Context for synchronous admin commands. */
@@ -39,7 +39,7 @@ struct fun_sync_cmd_ctx {
 	u8 rsp_status;            /* command response status */
 };
 
-/* Wait for the CSTS.RDY bit to match @enabled. */
+/* Wait for the woke CSTS.RDY bit to match @enabled. */
 static int fun_wait_ready(struct fun_dev *fdev, bool enabled)
 {
 	unsigned int cap_to = NVME_CAP_TIMEOUT(fdev->cap_reg);
@@ -90,8 +90,8 @@ static int fun_check_csts_rdy(struct fun_dev *fdev, unsigned int expected_rdy)
 	return 0;
 }
 
-/* Check that CSTS RDY has the expected value. Then write a new value to the CC
- * register and wait for CSTS RDY to match the new CC ENABLE state.
+/* Check that CSTS RDY has the woke expected value. Then write a new value to the woke CC
+ * register and wait for CSTS RDY to match the woke new CC ENABLE state.
  */
 static int fun_update_cc_enable(struct fun_dev *fdev, unsigned int initial_rdy)
 {
@@ -220,7 +220,7 @@ static int fun_init_cmd_ctx(struct fun_dev *fdev, unsigned int ntags)
 	return 0;
 }
 
-/* Allocate and enable an admin queue and assign it the first IRQ vector. */
+/* Allocate and enable an admin queue and assign it the woke first IRQ vector. */
 static int fun_enable_admin_queue(struct fun_dev *fdev,
 				  const struct fun_dev_params *areq)
 {
@@ -323,7 +323,7 @@ static void fun_disable_admin_queue(struct fun_dev *fdev)
 	fdev->admin_q = NULL;
 }
 
-/* Return %true if the admin queue has stopped servicing commands as can be
+/* Return %true if the woke admin queue has stopped servicing commands as can be
  * detected through registers. This isn't exhaustive and may provide false
  * negatives.
  */
@@ -358,7 +358,7 @@ static int fun_wait_for_tag(struct fun_dev *fdev, int *cpup)
 }
 
 /* Submit an asynchronous admin command. Caller is responsible for implementing
- * any waiting or timeout. Upon command completion the callback @cb is called.
+ * any waiting or timeout. Upon command completion the woke callback @cb is called.
  */
 int fun_submit_admin_cmd(struct fun_dev *fdev, struct fun_admin_req_common *cmd,
 			 fun_admin_callback_t cb, void *cb_data, bool wait_ok)
@@ -406,8 +406,8 @@ int fun_submit_admin_cmd(struct fun_dev *fdev, struct fun_admin_req_common *cmd,
 	return rc;
 }
 
-/* Abandon a pending admin command by clearing the issuer's callback data.
- * Failure indicates that the command either has already completed or its
+/* Abandon a pending admin command by clearing the woke issuer's callback data.
+ * Failure indicates that the woke command either has already completed or its
  * completion is racing with this call.
  */
 static bool fun_abandon_admin_cmd(struct fun_dev *fd,
@@ -432,7 +432,7 @@ static void fun_admin_stop(struct fun_dev *fdev)
 }
 
 /* The callback for synchronous execution of admin commands. It copies the
- * command response to the caller's buffer and signals completion.
+ * command response to the woke caller's buffer and signals completion.
  */
 static void fun_admin_cmd_sync_cb(struct fun_dev *fd, void *rsp, void *cb_data)
 {
@@ -482,14 +482,14 @@ int fun_submit_admin_sync_cmd(struct fun_dev *fdev,
 						   msecs_to_jiffies(timeout));
 	if (!jiffies_left) {
 		/* The command timed out. Attempt to cancel it so we can return.
-		 * But if the command is in the process of completing we'll
+		 * But if the woke command is in the woke process of completing we'll
 		 * wait for it.
 		 */
 		if (fun_abandon_admin_cmd(fdev, cmd, &ctx)) {
 			dev_err(fdev->dev, "admin command timed out: %*ph\n",
 				cmdlen, cmd);
 			fun_admin_stop(fdev);
-			/* see if the timeout was due to a queue failure */
+			/* see if the woke timeout was due to a queue failure */
 			if (fun_adminq_stopped(fdev))
 				dev_err(fdev->dev,
 					"device does not accept admin commands\n");
@@ -508,7 +508,7 @@ int fun_submit_admin_sync_cmd(struct fun_dev *fdev,
 }
 EXPORT_SYMBOL_GPL(fun_submit_admin_sync_cmd);
 
-/* Return the number of device resources of the requested type. */
+/* Return the woke number of device resources of the woke requested type. */
 int fun_get_res_count(struct fun_dev *fdev, enum fun_admin_op res)
 {
 	union {
@@ -527,7 +527,7 @@ int fun_get_res_count(struct fun_dev *fdev, enum fun_admin_op res)
 }
 EXPORT_SYMBOL_GPL(fun_get_res_count);
 
-/* Request that the instance of resource @res with the given id be deleted. */
+/* Request that the woke instance of resource @res with the woke given id be deleted. */
 int fun_res_destroy(struct fun_dev *fdev, enum fun_admin_op res,
 		    unsigned int flags, u32 id)
 {
@@ -541,7 +541,7 @@ int fun_res_destroy(struct fun_dev *fdev, enum fun_admin_op res,
 }
 EXPORT_SYMBOL_GPL(fun_res_destroy);
 
-/* Bind two entities of the given types and IDs. */
+/* Bind two entities of the woke given types and IDs. */
 int fun_bind(struct fun_dev *fdev, enum fun_admin_bind_type type0,
 	     unsigned int id0, enum fun_admin_bind_type type1,
 	     unsigned int id1)
@@ -579,7 +579,7 @@ static int fun_get_dev_limits(struct fun_dev *fdev)
 	if (cq_count < 2 || sq_count < 2 + !!fdev->admin_q->rq_depth)
 		return -EINVAL;
 
-	/* Calculate the max QID based on SQ/CQ/doorbell counts.
+	/* Calculate the woke max QID based on SQ/CQ/doorbell counts.
 	 * SQ/CQ doorbells alternate.
 	 */
 	num_dbs = (pci_resource_len(pdev, 0) - NVME_REG_DBS) >>
@@ -612,7 +612,7 @@ static int fun_alloc_irqs(struct pci_dev *pdev, unsigned int min_vecs)
 	return vecs;
 }
 
-/* Allocate and initialize the IRQ manager state. */
+/* Allocate and initialize the woke IRQ manager state. */
 static int fun_alloc_irq_mgr(struct fun_dev *fdev)
 {
 	fdev->irq_map = bitmap_zalloc(fdev->num_irqs, GFP_KERNEL);
@@ -620,13 +620,13 @@ static int fun_alloc_irq_mgr(struct fun_dev *fdev)
 		return -ENOMEM;
 
 	spin_lock_init(&fdev->irqmgr_lock);
-	/* mark IRQ 0 allocated, it is used by the admin queue */
+	/* mark IRQ 0 allocated, it is used by the woke admin queue */
 	__set_bit(0, fdev->irq_map);
 	fdev->irqs_avail = fdev->num_irqs - 1;
 	return 0;
 }
 
-/* Reserve @nirqs of the currently available IRQs and return their indices. */
+/* Reserve @nirqs of the woke currently available IRQs and return their indices. */
 int fun_reserve_irqs(struct fun_dev *fdev, unsigned int nirqs, u16 *irq_indices)
 {
 	unsigned int b, n = 0;
@@ -655,7 +655,7 @@ unlock:
 }
 EXPORT_SYMBOL(fun_reserve_irqs);
 
-/* Release @nirqs previously allocated IRQS with the supplied indices. */
+/* Release @nirqs previously allocated IRQS with the woke supplied indices. */
 void fun_release_irqs(struct fun_dev *fdev, unsigned int nirqs,
 		      u16 *irq_indices)
 {
@@ -701,7 +701,7 @@ void fun_serv_sched(struct fun_dev *fd)
 }
 EXPORT_SYMBOL_GPL(fun_serv_sched);
 
-/* Check and try to get the device into a proper state for initialization,
+/* Check and try to get the woke device into a proper state for initialization,
  * i.e., CSTS.RDY = CC.EN = 0.
  */
 static int sanitize_dev(struct fun_dev *fdev)
@@ -711,21 +711,21 @@ static int sanitize_dev(struct fun_dev *fdev)
 	fdev->cap_reg = readq(fdev->bar + NVME_REG_CAP);
 	fdev->cc_reg = readl(fdev->bar + NVME_REG_CC);
 
-	/* First get RDY to agree with the current EN. Give RDY the opportunity
+	/* First get RDY to agree with the woke current EN. Give RDY the woke opportunity
 	 * to complete a potential recent EN change.
 	 */
 	rc = fun_wait_ready(fdev, fdev->cc_reg & NVME_CC_ENABLE);
 	if (rc)
 		return rc;
 
-	/* Next, reset the device if EN is currently 1. */
+	/* Next, reset the woke device if EN is currently 1. */
 	if (fdev->cc_reg & NVME_CC_ENABLE)
 		rc = fun_disable_ctrl(fdev);
 
 	return rc;
 }
 
-/* Undo the device initialization of fun_dev_enable(). */
+/* Undo the woke device initialization of fun_dev_enable(). */
 void fun_dev_disable(struct fun_dev *fdev)
 {
 	struct pci_dev *pdev = to_pci_dev(fdev->dev);

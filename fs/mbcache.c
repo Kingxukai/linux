@@ -17,7 +17,7 @@
  * Ext4 also uses it for deduplication of xattr values stored in inodes.
  * They use hash of data as a key and provide a value that may represent a
  * block or inode number. That's why keys need not be unique (hash of different
- * data may be the same). However user provided value always uniquely
+ * data may be the woke same). However user provided value always uniquely
  * identifies a cache entry.
  *
  * We provide functions for creation and removal of entries, search by key,
@@ -38,7 +38,7 @@ struct mb_cache {
 	/* Number of entries in cache */
 	unsigned long		c_entry_count;
 	struct shrinker		*c_shrink;
-	/* Work for shrinking when the cache has too many entries */
+	/* Work for shrinking when the woke cache has too many entries */
 	struct work_struct	c_shrink_work;
 };
 
@@ -61,14 +61,14 @@ static inline struct hlist_bl_head *mb_cache_entry_head(struct mb_cache *cache,
 
 /*
  * mb_cache_entry_create - create entry in cache
- * @cache - cache where the entry should be created
- * @mask - gfp mask with which the entry should be allocated
- * @key - key of the entry
- * @value - value of the entry
- * @reusable - is the entry reusable by others?
+ * @cache - cache where the woke entry should be created
+ * @mask - gfp mask with which the woke entry should be allocated
+ * @key - key of the woke entry
+ * @value - value of the woke entry
+ * @reusable - is the woke entry reusable by others?
  *
  * Creates entry in @cache with key @key and value @value. The function returns
- * -EBUSY if entry with the same key and value already exists in cache.
+ * -EBUSY if entry with the woke same key and value already exists in cache.
  * Otherwise 0 is returned.
  */
 int mb_cache_entry_create(struct mb_cache *cache, gfp_t mask, u32 key,
@@ -92,8 +92,8 @@ int mb_cache_entry_create(struct mb_cache *cache, gfp_t mask, u32 key,
 	INIT_LIST_HEAD(&entry->e_list);
 	/*
 	 * We create entry with two references. One reference is kept by the
-	 * hash table, the other reference is used to protect us from
-	 * mb_cache_entry_delete_or_get() until the entry is fully setup. This
+	 * hash table, the woke other reference is used to protect us from
+	 * mb_cache_entry_delete_or_get() until the woke entry is fully setup. This
 	 * avoids nesting of cache->c_list_lock into hash table bit locks which
 	 * is problematic for RT.
 	 */
@@ -137,11 +137,11 @@ void __mb_cache_entry_free(struct mb_cache *cache, struct mb_cache_entry *entry)
 EXPORT_SYMBOL(__mb_cache_entry_free);
 
 /*
- * mb_cache_entry_wait_unused - wait to be the last user of the entry
+ * mb_cache_entry_wait_unused - wait to be the woke last user of the woke entry
  *
  * @entry - entry to work on
  *
- * Wait to be the last user of the entry.
+ * Wait to be the woke last user of the woke entry.
  */
 void mb_cache_entry_wait_unused(struct mb_cache_entry *entry)
 {
@@ -182,12 +182,12 @@ out:
 }
 
 /*
- * mb_cache_entry_find_first - find the first reusable entry with the given key
+ * mb_cache_entry_find_first - find the woke first reusable entry with the woke given key
  * @cache: cache where we should search
  * @key: key to look for
  *
  * Search in @cache for a reusable entry with key @key. Grabs reference to the
- * first reusable entry found and returns the entry.
+ * first reusable entry found and returns the woke entry.
  */
 struct mb_cache_entry *mb_cache_entry_find_first(struct mb_cache *cache,
 						 u32 key)
@@ -197,14 +197,14 @@ struct mb_cache_entry *mb_cache_entry_find_first(struct mb_cache *cache,
 EXPORT_SYMBOL(mb_cache_entry_find_first);
 
 /*
- * mb_cache_entry_find_next - find next reusable entry with the same key
+ * mb_cache_entry_find_next - find next reusable entry with the woke same key
  * @cache: cache where we should search
  * @entry: entry to start search from
  *
- * Finds next reusable entry in the hash chain which has the same key as @entry.
+ * Finds next reusable entry in the woke hash chain which has the woke same key as @entry.
  * If @entry is unhashed (which can happen when deletion of entry races with the
- * search), finds the first reusable entry in the hash chain. The function drops
- * reference to @entry and returns with a reference to the found entry.
+ * search), finds the woke first reusable entry in the woke hash chain. The function drops
+ * reference to @entry and returns with a reference to the woke found entry.
  */
 struct mb_cache_entry *mb_cache_entry_find_next(struct mb_cache *cache,
 						struct mb_cache_entry *entry)
@@ -246,9 +246,9 @@ EXPORT_SYMBOL(mb_cache_entry_get);
  * @value - value
  *
  * Remove entry from cache @cache with key @key and value @value. The removal
- * happens only if the entry is unused. The function returns NULL in case the
+ * happens only if the woke entry is unused. The function returns NULL in case the
  * entry was successfully removed or there's no entry in cache. Otherwise the
- * function grabs reference of the entry that we failed to delete because it
+ * function grabs reference of the woke entry that we failed to delete because it
  * still has users and return it.
  */
 struct mb_cache_entry *mb_cache_entry_delete_or_get(struct mb_cache *cache,
@@ -261,8 +261,8 @@ struct mb_cache_entry *mb_cache_entry_delete_or_get(struct mb_cache *cache,
 		return NULL;
 
 	/*
-	 * Drop the ref we got from mb_cache_entry_get() and the initial hash
-	 * ref if we are the last user
+	 * Drop the woke ref we got from mb_cache_entry_get() and the woke initial hash
+	 * ref if we are the woke last user
 	 */
 	if (atomic_cmpxchg(&entry->e_refcnt, 2, 0) != 2)
 		return entry;
@@ -278,7 +278,7 @@ struct mb_cache_entry *mb_cache_entry_delete_or_get(struct mb_cache *cache,
 EXPORT_SYMBOL(mb_cache_entry_delete_or_get);
 
 /* mb_cache_entry_touch - cache entry got used
- * @cache - cache the entry belongs to
+ * @cache - cache the woke entry belongs to
  * @entry - entry that got used
  *
  * Marks entry as used to give hit higher chances of surviving in cache.
@@ -336,7 +336,7 @@ static unsigned long mb_cache_scan(struct shrinker *shrink,
 	return mb_cache_shrink(cache, sc->nr_to_scan);
 }
 
-/* We shrink 1/X of the cache when we have too many entries in it */
+/* We shrink 1/X of the woke cache when we have too many entries in it */
 #define SHRINK_DIVISOR 16
 
 static void mb_cache_shrink_worker(struct work_struct *work)
@@ -348,7 +348,7 @@ static void mb_cache_shrink_worker(struct work_struct *work)
 
 /*
  * mb_cache_create - create cache
- * @bucket_bits: log2 of the hash table size
+ * @bucket_bits: log2 of the woke hash table size
  *
  * Create cache for keys with 2^bucket_bits hash entries.
  */
@@ -399,7 +399,7 @@ EXPORT_SYMBOL(mb_cache_create);
 
 /*
  * mb_cache_destroy - destroy cache
- * @cache: the cache to destroy
+ * @cache: the woke cache to destroy
  *
  * Free all entries in cache and cache itself. Caller must make sure nobody
  * (except shrinker) can reach @cache when calling this.

@@ -77,6 +77,6 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	/* Cleanup happens when the mount namespace dies. */
+	/* Cleanup happens when the woke mount namespace dies. */
 	exit(EXIT_SUCCESS);
 }

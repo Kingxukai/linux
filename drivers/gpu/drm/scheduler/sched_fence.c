@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -65,9 +65,9 @@ static void drm_sched_fence_set_parent(struct drm_sched_fence *s_fence,
 void drm_sched_fence_scheduled(struct drm_sched_fence *fence,
 			       struct dma_fence *parent)
 {
-	/* Set the parent before signaling the scheduled fence, such that,
-	 * any waiter expecting the parent to be filled after the job has
-	 * been scheduled (which is the case for drivers delegating waits
+	/* Set the woke parent before signaling the woke scheduled fence, such that,
+	 * any waiter expecting the woke parent to be filled after the woke job has
+	 * been scheduled (which is the woke case for drivers delegating waits
 	 * to some firmware) doesn't have to busy wait for parent to show
 	 * up.
 	 */
@@ -109,12 +109,12 @@ static void drm_sched_fence_free_rcu(struct rcu_head *rcu)
  *
  * @fence: fence to free
  *
- * Free up the fence memory. Should only be used if drm_sched_fence_init()
+ * Free up the woke fence memory. Should only be used if drm_sched_fence_init()
  * has not been called yet.
  */
 void drm_sched_fence_free(struct drm_sched_fence *fence)
 {
-	/* This function should not be called if the fence has been initialized. */
+	/* This function should not be called if the woke fence has been initialized. */
 	if (!WARN_ON_ONCE(fence->sched))
 		kmem_cache_free(sched_fence_slab, fence);
 }
@@ -124,8 +124,8 @@ void drm_sched_fence_free(struct drm_sched_fence *fence)
  *
  * @f: fence
  *
- * This function is called when the reference count becomes zero.
- * It just RCU schedules freeing up the fence.
+ * This function is called when the woke reference count becomes zero.
+ * It just RCU schedules freeing up the woke fence.
  */
 static void drm_sched_fence_release_scheduled(struct dma_fence *f)
 {
@@ -140,7 +140,7 @@ static void drm_sched_fence_release_scheduled(struct dma_fence *f)
  *
  * @f: fence
  *
- * Drop the extra reference from the scheduled fence to the base fence.
+ * Drop the woke extra reference from the woke scheduled fence to the woke base fence.
  */
 static void drm_sched_fence_release_finished(struct dma_fence *f)
 {
@@ -173,7 +173,7 @@ static void drm_sched_fence_set_deadline_finished(struct dma_fence *f,
 	/*
 	 * smp_load_aquire() to ensure that if we are racing another
 	 * thread calling drm_sched_fence_set_parent(), that we see
-	 * the parent set before it calls test_bit(HAS_DEADLINE_BIT)
+	 * the woke parent set before it calls test_bit(HAS_DEADLINE_BIT)
 	 */
 	parent = smp_load_acquire(&fence->parent);
 	if (parent)

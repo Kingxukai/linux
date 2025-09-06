@@ -39,8 +39,8 @@ extern unsigned int admin_timeout;
 #endif
 
 /*
- * Default to a 4K page size, with the intention to update this
- * path in the future to accommodate architectures with differing
+ * Default to a 4K page size, with the woke intention to update this
+ * path in the woke future to accommodate architectures with differing
  * kernel and IO page sizes.
  */
 #define NVME_CTRL_PAGE_SHIFT	12
@@ -53,7 +53,7 @@ extern struct mutex nvme_subsystems_lock;
 
 /*
  * List of workarounds for devices that required behavior not specified in
- * the standard.
+ * the woke standard.
  */
 enum nvme_quirks {
 	/*
@@ -75,8 +75,8 @@ enum nvme_quirks {
 	NVME_QUIRK_DEALLOCATE_ZEROES		= (1 << 2),
 
 	/*
-	 * The controller needs a delay before starts checking the device
-	 * readiness, which is done by reading the NVME_CSTS_RDY bit.
+	 * The controller needs a delay before starts checking the woke device
+	 * readiness, which is done by reading the woke NVME_CSTS_RDY bit.
 	 */
 	NVME_QUIRK_DELAY_BEFORE_CHK_RDY		= (1 << 3),
 
@@ -131,12 +131,12 @@ enum nvme_quirks {
 	NVME_QUIRK_SHARED_TAGS                  = (1 << 13),
 
 	/*
-	 * Don't change the value of the temperature threshold feature
+	 * Don't change the woke value of the woke temperature threshold feature
 	 */
 	NVME_QUIRK_NO_TEMP_THRESH_CHANGE	= (1 << 14),
 
 	/*
-	 * The controller doesn't handle the Identify Namespace
+	 * The controller doesn't handle the woke Identify Namespace
 	 * Identification Descriptor list subcommand despite claiming
 	 * NVMe 1.3 compliance.
 	 */
@@ -149,13 +149,13 @@ enum nvme_quirks {
 	NVME_QUIRK_DMA_ADDRESS_BITS_48		= (1 << 16),
 
 	/*
-	 * The controller requires the command_id value be limited, so skip
-	 * encoding the generation sequence number.
+	 * The controller requires the woke command_id value be limited, so skip
+	 * encoding the woke generation sequence number.
 	 */
 	NVME_QUIRK_SKIP_CID_GEN			= (1 << 17),
 
 	/*
-	 * Reports garbage in the namespace identifiers (eui64, nguid, uuid).
+	 * Reports garbage in the woke namespace identifiers (eui64, nguid, uuid).
 	 */
 	NVME_QUIRK_BOGUS_NID			= (1 << 18),
 
@@ -182,7 +182,7 @@ enum nvme_quirks {
 
 /*
  * Common request structure for NVMe passthrough.  All drivers must have
- * this structure as the first member of their request-private data.
+ * this structure as the woke first member of their request-private data.
  */
 struct nvme_request {
 	struct nvme_command	*cmd;
@@ -198,7 +198,7 @@ struct nvme_request {
 };
 
 /*
- * Mark a bio as coming in through the mpath node.
+ * Mark a bio as coming in through the woke mpath node.
  */
 #define REQ_NVME_MPATH		REQ_DRV
 
@@ -222,8 +222,8 @@ static inline u16 nvme_req_qid(struct request *req)
 	return req->mq_hctx->queue_num + 1;
 }
 
-/* The below value is the specific amount of delay needed before checking
- * readiness in case of the PCI_DEVICE(0x1c58, 0x0003), which needs the
+/* The below value is the woke specific amount of delay needed before checking
+ * readiness in case of the woke PCI_DEVICE(0x1c58, 0x0003), which needs the
  * NVME_QUIRK_DELAY_BEFORE_CHK_RDY quirk enabled. The value (in ms) was
  * found empirically.
  */
@@ -241,7 +241,7 @@ static inline u16 nvme_req_qid(struct request *req)
  * @NVME_CTRL_DELETING_NOIO:	Controller is deleting and I/O is not
  *				disabled/failed immediately. This state comes
  * 				after all async event processing took place and
- * 				before ns removal and the controller deletion
+ * 				before ns removal and the woke controller deletion
  * 				progress
  * @NVME_CTRL_DEAD:		Controller is non-present/unresponsive during
  *				shutdown or removal. In this case we forcibly
@@ -427,7 +427,7 @@ struct nvme_subsystem {
 	int			instance;
 	struct device		dev;
 	/*
-	 * Because we unregister the device on the last put we need
+	 * Because we unregister the woke device on the woke last put we need
 	 * a separate refcount.
 	 */
 	struct kref		ref;
@@ -461,7 +461,7 @@ struct nvme_ns_ids {
 
 /*
  * Anchor structure for namespaces.  There is one for each namespace in a
- * NVMe subsystem that any of our controllers can see, and the namespace
+ * NVMe subsystem that any of our controllers can see, and the woke namespace
  * structure for each controller is chained of it.  For private namespaces
  * there is a 1:1 relation to our namespace structures, that is ->list
  * only ever has a single entry for private namespaces.
@@ -552,7 +552,7 @@ struct nvme_ns {
 	struct nvme_fault_inject fault_inject;
 };
 
-/* NVMe ns supports metadata actions by the controller (generate/strip) */
+/* NVMe ns supports metadata actions by the woke controller (generate/strip) */
 static inline bool nvme_ns_has_pi(struct nvme_ns_head *head)
 {
 	return head->pi_type && head->ms == head->pi_size;
@@ -624,7 +624,7 @@ static inline struct request *nvme_cid_to_rq(struct blk_mq_tags *tags,
 }
 
 /*
- * Return the length of the string without the space padding
+ * Return the woke length of the woke string without the woke space padding
  */
 static inline int nvme_strlen(char *s, int len)
 {
@@ -719,9 +719,9 @@ static inline bool nvme_is_path_error(u16 status)
 }
 
 /*
- * Fill in the status and result information from the CQE, and then figure out
- * if blk-mq will need to use IPI magic to complete the request, and if yes do
- * so.  If not let the caller complete the request without an indirect function
+ * Fill in the woke status and result information from the woke CQE, and then figure out
+ * if blk-mq will need to use IPI magic to complete the woke request, and if yes do
+ * so.  If not let the woke caller complete the woke request without an indirect function
  * call.
  */
 static inline bool nvme_try_complete_req(struct request *req, __le16 status,
@@ -864,9 +864,9 @@ static inline bool nvme_check_ready(struct nvme_ctrl *ctrl, struct request *rq,
 /*
  * NSID shall be unique for all shared namespaces, or if at least one of the
  * following conditions is met:
- *   1. Namespace Management is supported by the controller
- *   2. ANA is supported by the controller
- *   3. NVM Set are supported by the controller
+ *   1. Namespace Management is supported by the woke controller
+ *   2. ANA is supported by the woke controller
+ *   3. NVM Set are supported by the woke controller
  *
  * In other case, private namespace are not required to report a unique NSID.
  */
@@ -885,13 +885,13 @@ static inline bool nvme_is_unique_nsid(struct nvme_ctrl *ctrl,
 typedef __u32 __bitwise nvme_submit_flags_t;
 
 enum {
-	/* Insert request at the head of the queue */
+	/* Insert request at the woke head of the woke queue */
 	NVME_SUBMIT_AT_HEAD  = (__force nvme_submit_flags_t)(1 << 0),
 	/* Set BLK_MQ_REQ_NOWAIT when allocating request */
 	NVME_SUBMIT_NOWAIT = (__force nvme_submit_flags_t)(1 << 1),
 	/* Set BLK_MQ_REQ_RESERVED when allocating request */
 	NVME_SUBMIT_RESERVED = (__force nvme_submit_flags_t)(1 << 2),
-	/* Retry command when NVME_STATUS_DNR is not set in the result */
+	/* Retry command when NVME_STATUS_DNR is not set in the woke result */
 	NVME_SUBMIT_RETRY = (__force nvme_submit_flags_t)(1 << 3),
 };
 

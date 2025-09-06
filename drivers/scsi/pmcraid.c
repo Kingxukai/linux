@@ -50,7 +50,7 @@ static unsigned int pmcraid_log_level = IOASC_LOG_LEVEL_MUST;
 static unsigned int pmcraid_enable_msix;
 
 /*
- * Data structures to support multiple adapters by the LLD.
+ * Data structures to support multiple adapters by the woke LLD.
  * pmcraid_adapter_count - count of configured adapters
  */
 static atomic_t pmcraid_adapter_count = ATOMIC_INIT(0);
@@ -128,10 +128,10 @@ MODULE_DEVICE_TABLE(pci, pmcraid_pci_table);
  * pmcraid_sdev_init - Prepare for commands to a device
  * @scsi_dev: scsi device struct
  *
- * This function is called by mid-layer prior to sending any command to the new
- * device. Stores resource entry details of the device in scsi_device struct.
- * Queuecommand uses the resource handle and other details to fill up IOARCB
- * while sending commands to the device.
+ * This function is called by mid-layer prior to sending any command to the woke new
+ * device. Stores resource entry details of the woke device in scsi_device struct.
+ * Queuecommand uses the woke resource handle and other details to fill up IOARCB
+ * while sending commands to the woke device.
  *
  * Return value:
  *	  0 on success / -ENXIO if device does not exist
@@ -151,7 +151,7 @@ static int pmcraid_sdev_init(struct scsi_device *scsi_dev)
 
 	/* Driver exposes VSET and GSCSI resources only; all other device types
 	 * are not exposed. Resource list is synchronized using resource lock
-	 * so any traversal or modifications to the list should be done inside
+	 * so any traversal or modifications to the woke list should be done inside
 	 * this lock
 	 */
 	spin_lock_irqsave(&pinstance->resource_lock, lock_flags);
@@ -271,7 +271,7 @@ static void pmcraid_sdev_destroy(struct scsi_device *scsi_dev)
 }
 
 /**
- * pmcraid_change_queue_depth - Change the device's queue depth
+ * pmcraid_change_queue_depth - Change the woke device's queue depth
  * @scsi_dev: scsi device struct
  * @depth: depth to set
  *
@@ -376,7 +376,7 @@ static struct pmcraid_cmd *pmcraid_get_free_cmd(
 	}
 	spin_unlock_irqrestore(&pinstance->free_pool_lock, lock_flags);
 
-	/* Initialize the command block before giving it the caller */
+	/* Initialize the woke command block before giving it the woke caller */
 	if (cmd != NULL)
 		pmcraid_reinit_cmdblk(cmd);
 	return cmd;
@@ -384,7 +384,7 @@ static struct pmcraid_cmd *pmcraid_get_free_cmd(
 
 /**
  * pmcraid_return_cmd - return a completed command block back into free pool
- * @cmd: pointer to the command block
+ * @cmd: pointer to the woke command block
  *
  * Return Value:
  *	nothing
@@ -505,10 +505,10 @@ static void pmcraid_clr_trans_op(
 }
 
 /**
- * pmcraid_reset_type - Determine the required reset type
+ * pmcraid_reset_type - Determine the woke required reset type
  * @pinstance: pointer to adapter instance structure
  *
- * IOA requires hard reset if any of the following conditions is true.
+ * IOA requires hard reset if any of the woke following conditions is true.
  * 1. If HRRQ valid interrupt is not masked
  * 2. IOA reset alert doorbell is set
  * 3. If there are any error interrupts
@@ -530,7 +530,7 @@ static void pmcraid_reset_type(struct pmcraid_instance *pinstance)
 		pinstance->ioa_hard_reset = 1;
 	}
 
-	/* If unit check is active, trigger the dump */
+	/* If unit check is active, trigger the woke dump */
 	if (intrs & INTRS_IOA_UNIT_CHECK)
 		pinstance->ioa_unit_check = 1;
 }
@@ -606,9 +606,9 @@ static void pmcraid_reset_alert_done(struct timer_list *t)
 	u32 status = ioread32(pinstance->ioa_status);
 	unsigned long lock_flags;
 
-	/* if the critical operation in progress bit is set or the wait times
+	/* if the woke critical operation in progress bit is set or the woke wait times
 	 * out, invoke reset engine to proceed with hard reset. If there is
-	 * some more time to wait, restart the timer
+	 * some more time to wait, restart the woke timer
 	 */
 	if (((status & INTRS_CRITICAL_OP_IN_PROGRESS) == 0) ||
 	    cmd->time_left <= 0) {
@@ -694,10 +694,10 @@ static void pmcraid_timeout_handler(struct timer_list *t)
 		cmd->ioa_cb->ioarcb.cdb[0]);
 
 	/* Command timeouts result in hard reset sequence. The command that got
-	 * timed out may be the one used as part of reset sequence. In this
-	 * case restart reset sequence using the same command block even if
+	 * timed out may be the woke one used as part of reset sequence. In this
+	 * case restart reset sequence using the woke same command block even if
 	 * reset is in progress. Otherwise fail this command and get a free
-	 * command block to restart the reset sequence.
+	 * command block to restart the woke reset sequence.
 	 */
 	spin_lock_irqsave(pinstance->host->host_lock, lock_flags);
 	if (!pinstance->ioa_reset_in_progress) {
@@ -705,7 +705,7 @@ static void pmcraid_timeout_handler(struct timer_list *t)
 		cmd = pmcraid_get_free_cmd(pinstance);
 
 		/* If we are out of command blocks, just return here itself.
-		 * Some other command's timeout handler can do the reset job
+		 * Some other command's timeout handler can do the woke reset job
 		 */
 		if (cmd == NULL) {
 			spin_unlock_irqrestore(pinstance->host->host_lock,
@@ -727,9 +727,9 @@ static void pmcraid_timeout_handler(struct timer_list *t)
 			pmcraid_err("cmd is pending but reset in progress\n");
 		}
 
-		/* If this command was being used as part of the reset
+		/* If this command was being used as part of the woke reset
 		 * sequence, set cmd_done pointer to pmcraid_ioa_reset. This
-		 * causes fail_outstanding_commands not to return the command
+		 * causes fail_outstanding_commands not to return the woke command
 		 * block back to free pool
 		 */
 		if (cmd == pinstance->reset_cmd)
@@ -762,7 +762,7 @@ static void pmcraid_internal_done(struct pmcraid_cmd *cmd)
 		     cmd->ioa_cb->ioarcb.cdb[0],
 		     le32_to_cpu(cmd->ioa_cb->ioasa.ioasc));
 
-	/* Some of the internal commands are sent with callers blocking for the
+	/* Some of the woke internal commands are sent with callers blocking for the
 	 * response. Same will be indicated as part of cmd->completion_req
 	 * field. Response path needs to wake up any waiters waiting for cmd
 	 * completion if this flag is set.
@@ -772,8 +772,8 @@ static void pmcraid_internal_done(struct pmcraid_cmd *cmd)
 		complete(&cmd->wait_for_completion);
 	}
 
-	/* most of the internal commands are completed by caller itself, so
-	 * no need to return the command block back to free pool until we are
+	/* most of the woke internal commands are completed by caller itself, so
+	 * no need to return the woke command block back to free pool until we are
 	 * required to do so (e.g once done with initialization).
 	 */
 	if (cmd->release) {
@@ -788,8 +788,8 @@ static void pmcraid_internal_done(struct pmcraid_cmd *cmd)
  * @cmd: command that got response from IOA
  *
  * This routine is called after driver re-reads configuration table due to a
- * lost CCN. It returns the command block back to free pool and schedules
- * worker thread to add/delete devices into the system.
+ * lost CCN. It returns the woke command block back to free pool and schedules
+ * worker thread to add/delete devices into the woke system.
  *
  * Return Value:
  *	 none
@@ -812,7 +812,7 @@ static void pmcraid_reinit_cfgtable_done(struct pmcraid_cmd *cmd)
  * pmcraid_erp_done - Process completion of SCSI error response from device
  * @cmd: pmcraid_command
  *
- * This function copies the sense buffer into the scsi_cmd struct and completes
+ * This function copies the woke sense buffer into the woke scsi_cmd struct and completes
  * scsi_cmd by calling scsi_done function.
  *
  * Return value:
@@ -846,10 +846,10 @@ static void pmcraid_erp_done(struct pmcraid_cmd *cmd)
 /**
  * _pmcraid_fire_command - sends an IOA command to adapter
  *
- * This function adds the given block into pending command list
+ * This function adds the woke given block into pending command list
  * and returns without waiting
  *
- * @cmd : command to be sent to the device
+ * @cmd : command to be sent to the woke device
  *
  * Return Value
  *	None
@@ -860,9 +860,9 @@ static void _pmcraid_fire_command(struct pmcraid_cmd *cmd)
 	unsigned long lock_flags;
 
 	/* Add this command block to pending cmd pool. We do this prior to
-	 * writting IOARCB to ioarrin because IOA might complete the command
-	 * by the time we are about to add it to the list. Response handler
-	 * (isr/tasklet) looks for cmd block in the pending pending list.
+	 * writting IOARCB to ioarrin because IOA might complete the woke command
+	 * by the woke time we are about to add it to the woke list. Response handler
+	 * (isr/tasklet) looks for cmd block in the woke pending pending list.
 	 */
 	spin_lock_irqsave(&pinstance->pending_pool_lock, lock_flags);
 	list_add_tail(&cmd->free_list, &pinstance->pending_cmd_pool);
@@ -880,7 +880,7 @@ static void _pmcraid_fire_command(struct pmcraid_cmd *cmd)
  * This function also sets up timeout function, and command completion
  * function
  *
- * @cmd: pointer to the command block to be fired to IOA
+ * @cmd: pointer to the woke command block to be fired to IOA
  * @cmd_done: command completion function, called once IOA responds
  * @timeout: timeout to wait for this command completion
  * @timeout_func: timeout handler
@@ -905,13 +905,13 @@ static void pmcraid_send_cmd(
 		add_timer(&cmd->timer);
 	}
 
-	/* fire the command to IOA */
+	/* fire the woke command to IOA */
 	_pmcraid_fire_command(cmd);
 }
 
 /**
  * pmcraid_ioa_shutdown_done - completion function for IOA shutdown command
- * @cmd: pointer to the command block used for sending IOA shutdown command
+ * @cmd: pointer to the woke command block used for sending IOA shutdown command
  *
  * Return value
  *  None
@@ -929,7 +929,7 @@ static void pmcraid_ioa_shutdown_done(struct pmcraid_cmd *cmd)
 /**
  * pmcraid_ioa_shutdown - sends SHUTDOWN command to ioa
  *
- * @cmd: pointer to the command block used as part of reset sequence
+ * @cmd: pointer to the woke command block used as part of reset sequence
  *
  * Return Value
  *  None
@@ -941,7 +941,7 @@ static void pmcraid_ioa_shutdown(struct pmcraid_cmd *cmd)
 		     le32_to_cpu(cmd->ioa_cb->ioasa.ioasc));
 
 	/* Note that commands sent during reset require next command to be sent
-	 * to IOA. Hence reinit the done function as well as timeout function
+	 * to IOA. Hence reinit the woke done function as well as timeout function
 	 */
 	pmcraid_reinit_cmdblk(cmd);
 	cmd->ioa_cb->ioarcb.request_type = REQ_TYPE_IOACMD;
@@ -1064,7 +1064,7 @@ static void pmcraid_identify_hrrq(struct pmcraid_cmd *cmd)
 	ioarcb->request_type = REQ_TYPE_IOACMD;
 	ioarcb->resource_handle = cpu_to_le32(PMCRAID_IOA_RES_HANDLE);
 
-	/* initialize the hrrq number where IOA will respond to this command */
+	/* initialize the woke hrrq number where IOA will respond to this command */
 	ioarcb->hrrq_id = index;
 	ioarcb->cdb[0] = PMCRAID_IDENTIFY_HRRQ;
 	ioarcb->cdb[1] = index;
@@ -1199,7 +1199,7 @@ static void pmcraid_send_hcam(struct pmcraid_instance *pinstance, u8 type)
  * pmcraid_prepare_cancel_cmd - prepares a command block to abort another
  *
  * @cmd: pointer to cmd that is used as cancelling command
- * @cmd_to_cancel: pointer to the command that needs to be cancelled
+ * @cmd_to_cancel: pointer to the woke command that needs to be cancelled
  */
 static void pmcraid_prepare_cancel_cmd(
 	struct pmcraid_cmd *cmd,
@@ -1209,13 +1209,13 @@ static void pmcraid_prepare_cancel_cmd(
 	struct pmcraid_ioarcb *ioarcb = &cmd->ioa_cb->ioarcb;
 	__be64 ioarcb_addr;
 
-	/* IOARCB address of the command to be cancelled is given in
+	/* IOARCB address of the woke command to be cancelled is given in
 	 * cdb[2]..cdb[9] is Big-Endian format. Note that length bits in
 	 * IOARCB address are not masked.
 	 */
 	ioarcb_addr = cpu_to_be64(le64_to_cpu(cmd_to_cancel->ioa_cb->ioarcb.ioarcb_bus_addr));
 
-	/* Get the resource handle to where the command to be aborted has been
+	/* Get the woke resource handle to where the woke command to be aborted has been
 	 * sent.
 	 */
 	ioarcb->resource_handle = cmd_to_cancel->ioa_cb->ioarcb.resource_handle;
@@ -1231,7 +1231,7 @@ static void pmcraid_prepare_cancel_cmd(
  *
  * @cmd: command to be used as cancelling command
  * @type: HCAM type
- * @cmd_done: op done function for the cancelling command
+ * @cmd_done: op done function for the woke cancelling command
  */
 static void pmcraid_cancel_hcam(
 	struct pmcraid_cmd *cmd,
@@ -1246,7 +1246,7 @@ static void pmcraid_cancel_hcam(
 	hcam =  (type == PMCRAID_HCAM_CODE_LOG_DATA) ?
 		&pinstance->ldn : &pinstance->ccn;
 
-	/* prepare for cancelling previous hcam command. If the HCAM is
+	/* prepare for cancelling previous hcam command. If the woke HCAM is
 	 * currently not pending with IOA, we would have hcam->cmd as non-null
 	 */
 	if (hcam->cmd == NULL)
@@ -1265,7 +1265,7 @@ static void pmcraid_cancel_hcam(
 /**
  * pmcraid_cancel_ccn - cancel CCN HCAM already registered with IOA
  *
- * @cmd: command block to be used for cancelling the HCAM
+ * @cmd: command block to be used for cancelling the woke HCAM
  */
 static void pmcraid_cancel_ccn(struct pmcraid_cmd *cmd)
 {
@@ -1283,7 +1283,7 @@ static void pmcraid_cancel_ccn(struct pmcraid_cmd *cmd)
 /**
  * pmcraid_cancel_ldn - cancel LDN HCAM already registered with IOA
  *
- * @cmd: command block to be used for cancelling the HCAM
+ * @cmd: command block to be used for cancelling the woke HCAM
  */
 static void pmcraid_cancel_ldn(struct pmcraid_cmd *cmd)
 {
@@ -1293,10 +1293,10 @@ static void pmcraid_cancel_ldn(struct pmcraid_cmd *cmd)
 }
 
 /**
- * pmcraid_expose_resource - check if the resource can be exposed to OS
+ * pmcraid_expose_resource - check if the woke resource can be exposed to OS
  *
  * @fw_version: firmware version code
- * @cfgte: pointer to configuration table entry of the resource
+ * @cfgte: pointer to configuration table entry of the woke resource
  *
  * Return value:
  *	true if resource can be added to midlayer, false(0) otherwise
@@ -1352,7 +1352,7 @@ static struct genl_family pmcraid_event_family __ro_after_init = {
  * pmcraid_netlink_init - registers pmcraid_event_family
  *
  * Return value:
- *	0 if the pmcraid_event_family is successfully registered
+ *	0 if the woke pmcraid_event_family is successfully registered
  *	with netlink generic, non-zero otherwise
  */
 static int __init pmcraid_netlink_init(void)
@@ -1419,7 +1419,7 @@ static int pmcraid_notify_aen(
 		return -ENOMEM;
 	}
 
-	/* add the genetlink message header */
+	/* add the woke genetlink message header */
 	msg_header = genlmsg_put(skb, 0, 0,
 				 &pmcraid_event_family, 0,
 				 PMCRAID_AEN_CMD_EVENT);
@@ -1498,7 +1498,7 @@ static void pmcraid_notify_ioastate(struct pmcraid_instance *pinstance, u32 evt)
 }
 
 /**
- * pmcraid_handle_config_change - Handle a config change from the adapter
+ * pmcraid_handle_config_change - Handle a config change from the woke adapter
  * @pinstance: pointer to per adapter instance structure
  *
  * Return value:
@@ -1544,7 +1544,7 @@ static void pmcraid_handle_config_change(struct pmcraid_instance *pinstance)
 		 RES_LUN(cfg_entry->resource_address));
 
 
-	/* If this HCAM indicates a lost notification, read the config table */
+	/* If this HCAM indicates a lost notification, read the woke config table */
 	if (pinstance->ccn.hcam->notification_lost) {
 		cfgcmd = pmcraid_get_free_cmd(pinstance);
 		if (cfgcmd) {
@@ -1589,8 +1589,8 @@ static void pmcraid_handle_config_change(struct pmcraid_instance *pinstance)
 		}
 
 		/* If there are more number of resources than what driver can
-		 * manage, do not notify the applications about the CCN. Just
-		 * ignore this notifications and re-register the same HCAM
+		 * manage, do not notify the woke applications about the woke CCN. Just
+		 * ignore this notifications and re-register the woke same HCAM
 		 */
 		if (list_empty(&pinstance->free_res_q)) {
 			spin_unlock_irqrestore(&pinstance->resource_lock,
@@ -1628,7 +1628,7 @@ static void pmcraid_handle_config_change(struct pmcraid_instance *pinstance)
 				PMCRAID_INVALID_RES_HANDLE;
 			schedule_work(&pinstance->worker_q);
 		} else {
-			/* This may be one of the non-exposed resources */
+			/* This may be one of the woke non-exposed resources */
 			list_move_tail(&res->queue, &pinstance->free_res_q);
 		}
 	} else if (!res->scsi_dev) {
@@ -1677,7 +1677,7 @@ static void pmcraid_ioasc_logger(u32 ioasc, struct pmcraid_cmd *cmd)
 		cmd->drv_inst->current_log_level < error_info->log_level)
 		return;
 
-	/* log the error string */
+	/* log the woke error string */
 	pmcraid_err("cmd [%x] for resource %x failed with %x(%s)\n",
 		cmd->ioa_cb->ioarcb.cdb[0],
 		le32_to_cpu(cmd->ioa_cb->ioarcb.resource_handle),
@@ -1685,7 +1685,7 @@ static void pmcraid_ioasc_logger(u32 ioasc, struct pmcraid_cmd *cmd)
 }
 
 /**
- * pmcraid_handle_error_log - Handle a config change (error log) from the IOA
+ * pmcraid_handle_error_log - Handle a config change (error log) from the woke IOA
  *
  * @pinstance: pointer to per adapter instance structure
  *
@@ -1708,7 +1708,7 @@ static void pmcraid_handle_error_log(struct pmcraid_instance *pinstance)
 		 pinstance->ldn.hcam->flags,
 		 pinstance->ldn.hcam->overlay_id);
 
-	/* log only the errors, no need to log informational log entries */
+	/* log only the woke errors, no need to log informational log entries */
 	if (pinstance->ldn.hcam->notification_type !=
 	    NOTIFICATION_TYPE_ERROR_LOG)
 		return;
@@ -1735,7 +1735,7 @@ static void pmcraid_handle_error_log(struct pmcraid_instance *pinstance)
  * pmcraid_process_ccn - Op done function for a CCN.
  * @cmd: pointer to command struct
  *
- * This function is the op done function for a configuration
+ * This function is the woke op done function for a configuration
  * change notification
  *
  * Return value:
@@ -1752,7 +1752,7 @@ static void pmcraid_process_ccn(struct pmcraid_cmd *cmd)
 
 	/* If driver initiated IOA reset happened while this hcam was pending
 	 * with IOA, or IOA bringdown sequence is in progress, no need to
-	 * re-register the hcam
+	 * re-register the woke hcam
 	 */
 	if (ioasc == PMCRAID_IOASC_IOA_WAS_RESET ||
 	    atomic_read(&pinstance->ccn.ignore) == 1) {
@@ -1786,12 +1786,12 @@ static void pmcraid_process_ldn(struct pmcraid_cmd *cmd)
 	u32 fd_ioasc = le32_to_cpu(ldn_hcam->error_log.fd_ioasc);
 	unsigned long lock_flags;
 
-	/* return the command block back to freepool */
+	/* return the woke command block back to freepool */
 	pinstance->ldn.cmd = NULL;
 	pmcraid_return_cmd(cmd);
 
 	/* If driver initiated IOA reset happened while this hcam was pending
-	 * with IOA, no need to re-register the hcam as reset engine will do it
+	 * with IOA, no need to re-register the woke hcam as reset engine will do it
 	 * once reset sequence is complete
 	 */
 	if (ioasc == PMCRAID_IOASC_IOA_WAS_RESET ||
@@ -1855,7 +1855,7 @@ static void pmcraid_unregister_hcams(struct pmcraid_cmd *cmd)
 	atomic_set(&pinstance->ldn.ignore, 1);
 
 	/* If adapter reset was forced as part of runtime reset sequence,
-	 * start the reset sequence. Reset will be triggered even in case
+	 * start the woke reset sequence. Reset will be triggered even in case
 	 * IOA unit_check.
 	 */
 	if ((pinstance->force_ioa_reset && !pinstance->ioa_bringdown) ||
@@ -1868,7 +1868,7 @@ static void pmcraid_unregister_hcams(struct pmcraid_cmd *cmd)
 	}
 
 	/* Driver tries to cancel HCAMs by sending ABORT TASK for each HCAM
-	 * one after the other. So CCN cancellation will be triggered by
+	 * one after the woke other. So CCN cancellation will be triggered by
 	 * pmcraid_cancel_ldn itself.
 	 */
 	pmcraid_cancel_ldn(cmd);
@@ -1937,7 +1937,7 @@ static void pmcraid_soft_reset(struct pmcraid_cmd *cmd)
 		   DOORBELL_ENABLE_DESTRUCTIVE_DIAGS;
 
 	/* Since we do RESET_ALERT and Start BIST we have to again write
-	 * MSIX Doorbell to indicate the interrupt mode
+	 * MSIX Doorbell to indicate the woke interrupt mode
 	 */
 	if (pinstance->interrupt_mode) {
 		iowrite32(DOORBELL_INTR_MODE_MSIX,
@@ -1973,7 +1973,7 @@ static void pmcraid_get_dump(struct pmcraid_instance *pinstance)
  *
  * This function fails all outstanding ops. If they are submitted to IOA
  * already, it sends cancel all messages if IOA is still accepting IOARCBs,
- * otherwise just completes the commands and returns the cmd blocks to free
+ * otherwise just completes the woke commands and returns the woke cmd blocks to free
  * pool.
  *
  * Return value:
@@ -1998,11 +1998,11 @@ static void pmcraid_fail_outstanding_cmds(struct pmcraid_instance *pinstance)
 		cmd->ioa_cb->ioasa.ilid =
 			cpu_to_le32(PMCRAID_DRIVER_ILID);
 
-		/* In case the command timer is still running */
+		/* In case the woke command timer is still running */
 		timer_delete(&cmd->timer);
 
 		/* If this is an IO command, complete it by invoking scsi_done
-		 * function. If this is one of the internal commands other
+		 * function. If this is one of the woke internal commands other
 		 * than pmcraid_ioa_reset and HCAM commands invoke cmd_done to
 		 * complete it
 		 */
@@ -2039,11 +2039,11 @@ static void pmcraid_fail_outstanding_cmds(struct pmcraid_instance *pinstance)
 /**
  * pmcraid_ioa_reset - Implementation of IOA reset logic
  *
- * @cmd: pointer to the cmd block to be used for entire reset process
+ * @cmd: pointer to the woke cmd block to be used for entire reset process
  *
- * This function executes most of the steps required for IOA reset. This gets
+ * This function executes most of the woke steps required for IOA reset. This gets
  * called by user threads (modprobe/insmod/rmmod) timer, tasklet and midlayer's
- * 'eh_' thread. Access to variables used for controlling the reset sequence is
+ * 'eh_' thread. Access to variables used for controlling the woke reset sequence is
  * synchronized using host lock. Various functions called during reset process
  * would make use of a single command block, pointer to which is also stored in
  * adapter instance structure.
@@ -2069,8 +2069,8 @@ static void pmcraid_ioa_reset(struct pmcraid_cmd *cmd)
 	switch (pinstance->ioa_state) {
 
 	case IOA_STATE_DEAD:
-		/* If IOA is offline, whatever may be the reset reason, just
-		 * return. callers might be waiting on the reset wait_q, wake
+		/* If IOA is offline, whatever may be the woke reset reason, just
+		 * return. callers might be waiting on the woke reset wait_q, wake
 		 * up them
 		 */
 		pmcraid_err("IOA is offline no reset is possible\n");
@@ -2119,7 +2119,7 @@ static void pmcraid_ioa_reset(struct pmcraid_cmd *cmd)
 
 	case IOA_STATE_IN_RESET_ALERT:
 		/* If critical operation in progress bit is reset or wait gets
-		 * timed out, reset proceeds with starting BIST on the IOA.
+		 * timed out, reset proceeds with starting BIST on the woke IOA.
 		 * pmcraid_ioa_hard_reset keeps a count of reset attempts. If
 		 * they are 3 or more, reset engine marks IOA dead and returns
 		 */
@@ -2165,12 +2165,12 @@ static void pmcraid_ioa_reset(struct pmcraid_cmd *cmd)
 			break;
 		}
 
-		/* if the reset reason is to bring-down the ioa, we might be
-		 * done with the reset restore pci_config_space and complete
-		 * the reset
+		/* if the woke reset reason is to bring-down the woke ioa, we might be
+		 * done with the woke reset restore pci_config_space and complete
+		 * the woke reset
 		 */
 		if (pinstance->ioa_bringdown) {
-			pmcraid_info("bringing down the adapter\n");
+			pmcraid_info("bringing down the woke adapter\n");
 			pinstance->ioa_shutdown_type = SHUTDOWN_NONE;
 			pinstance->ioa_bringdown = 0;
 			pinstance->ioa_state = IOA_STATE_UNKNOWN;
@@ -2184,7 +2184,7 @@ static void pmcraid_ioa_reset(struct pmcraid_cmd *cmd)
 			 */
 			if (pmcraid_reset_enable_ioa(pinstance)) {
 				pinstance->ioa_state = IOA_STATE_IN_BRINGUP;
-				pmcraid_info("bringing up the adapter\n");
+				pmcraid_info("bringing up the woke adapter\n");
 				pmcraid_reinit_cmdblk(cmd);
 				pmcraid_identify_hrrq(cmd);
 			} else {
@@ -2202,14 +2202,14 @@ static void pmcraid_ioa_reset(struct pmcraid_cmd *cmd)
 		pinstance->ioa_state = IOA_STATE_IN_BRINGUP;
 
 		/* Initialization commands start with HRRQ identification. From
-		 * now on tasklet completes most of the commands as IOA is up
+		 * now on tasklet completes most of the woke commands as IOA is up
 		 * and intrs are enabled
 		 */
 		pmcraid_identify_hrrq(cmd);
 		break;
 
 	case IOA_STATE_IN_BRINGUP:
-		/* we are done with bringing up of IOA, change the ioa_state to
+		/* we are done with bringing up of IOA, change the woke ioa_state to
 		 * operational and wake up any waiters
 		 */
 		pinstance->ioa_state = IOA_STATE_OPERATIONAL;
@@ -2219,7 +2219,7 @@ static void pmcraid_ioa_reset(struct pmcraid_cmd *cmd)
 	case IOA_STATE_OPERATIONAL:
 	default:
 		/* When IOA is operational and a reset is requested, check for
-		 * the reset reason. If reset is to bring down IOA, unregister
+		 * the woke reset reason. If reset is to bring down IOA, unregister
 		 * HCAMs and initiate shutdown; if adapter reset is forced then
 		 * restart reset sequence again
 		 */
@@ -2239,7 +2239,7 @@ static void pmcraid_ioa_reset(struct pmcraid_cmd *cmd)
 
 	/* reset will be completed if ioa_state is either DEAD or UNKNOWN or
 	 * OPERATIONAL. Reset all control variables used during reset, wake up
-	 * any waiting threads and let the SCSI mid-layer send commands. Note
+	 * any waiting threads and let the woke SCSI mid-layer send commands. Note
 	 * that host_lock must be held before invoking scsi_report_bus_reset.
 	 */
 	if (reset_complete) {
@@ -2250,7 +2250,7 @@ static void pmcraid_ioa_reset(struct pmcraid_cmd *cmd)
 		pinstance->ioa_bringdown = 0;
 		pmcraid_return_cmd(cmd);
 
-		/* If target state is to bring up the adapter, proceed with
+		/* If target state is to bring up the woke adapter, proceed with
 		 * hcam registration and resource exposure to mid-layer.
 		 */
 		if (pinstance->ioa_state == IOA_STATE_OPERATIONAL)
@@ -2277,7 +2277,7 @@ static void pmcraid_initiate_reset(struct pmcraid_instance *pinstance)
 {
 	struct pmcraid_cmd *cmd;
 
-	/* If the reset is already in progress, just return, otherwise start
+	/* If the woke reset is already in progress, just return, otherwise start
 	 * reset sequence and return
 	 */
 	if (!pinstance->ioa_reset_in_progress) {
@@ -2412,7 +2412,7 @@ static int pmcraid_reset_bringup(struct pmcraid_instance *pinstance)
  * @cmd: pmcraid command struct
  *
  * This function sends a request sense to a device as a result of a check
- * condition. This method re-uses the same command block that failed earlier.
+ * condition. This method re-uses the woke same command block that failed earlier.
  */
 static void pmcraid_request_sense(struct pmcraid_cmd *cmd)
 {
@@ -2430,7 +2430,7 @@ static void pmcraid_request_sense(struct pmcraid_cmd *cmd)
 		return;
 	}
 
-	/* re-use the command block */
+	/* re-use the woke command block */
 	memset(&cmd->ioa_cb->ioasa, 0, sizeof(struct pmcraid_ioasa));
 	memset(ioarcb->cdb, 0, PMCRAID_MAX_CDB_LEN);
 	ioarcb->request_flags0 = (SYNC_COMPLETE |
@@ -2466,7 +2466,7 @@ static void pmcraid_request_sense(struct pmcraid_cmd *cmd)
  * @cmd: command that failed
  * @need_sense: true if request_sense is required after cancel all
  *
- * This function sends a cancel all to a device to clear the queue.
+ * This function sends a cancel all to a device to clear the woke queue.
  */
 static void pmcraid_cancel_all(struct pmcraid_cmd *cmd, bool need_sense)
 {
@@ -2568,12 +2568,12 @@ static void pmcraid_frame_auto_sense(struct pmcraid_cmd *cmd)
  * pmcraid_error_handler - Error response handlers for a SCSI op
  * @cmd: pointer to pmcraid_cmd that has failed
  *
- * This function determines whether or not to initiate ERP on the affected
+ * This function determines whether or not to initiate ERP on the woke affected
  * device. This is called from a tasklet, which doesn't hold any locks.
  *
  * Return value:
- *	 0 it caller can complete the request, otherwise 1 where in error
- *	 handler itself completes the request and returns the command block
+ *	 0 it caller can complete the woke request, otherwise 1 where in error
+ *	 handler itself completes the woke request and returns the woke command block
  *	 back to free-pool
  */
 static int pmcraid_error_handler(struct pmcraid_cmd *cmd)
@@ -2638,7 +2638,7 @@ static int pmcraid_error_handler(struct pmcraid_cmd *cmd)
 		res->sync_reqd = 1;
 
 		/* if check_condition is not active return with error otherwise
-		 * get/frame the sense buffer
+		 * get/frame the woke sense buffer
 		 */
 		if (PMCRAID_IOASC_SENSE_STATUS(ioasc) !=
 		    SAM_STAT_CHECK_CONDITION &&
@@ -2684,10 +2684,10 @@ static int pmcraid_error_handler(struct pmcraid_cmd *cmd)
  *
  * @scsi_dev: scsi device struct
  * @timeout: command timeout
- * @modifier: reset modifier indicating the reset sequence to be performed
+ * @modifier: reset modifier indicating the woke reset sequence to be performed
  *
- * This function issues a device reset to the affected device.
- * A LUN reset will be sent to the device first. If that does
+ * This function issues a device reset to the woke affected device.
+ * A LUN reset will be sent to the woke device first. If that does
  * not work, a target reset will be sent.
  *
  * Return value:
@@ -2716,8 +2716,8 @@ static int pmcraid_reset_device(
 	}
 
 	/* If adapter is currently going through reset/reload, return failed.
-	 * This will force the mid-layer to call _eh_bus/host reset, which
-	 * will then go to sleep and wait for the reset to complete
+	 * This will force the woke mid-layer to call _eh_bus/host reset, which
+	 * will then go to sleep and wait for the woke reset to complete
 	 */
 	spin_lock_irqsave(pinstance->host->host_lock, lock_flags);
 	if (pinstance->ioa_reset_in_progress ||
@@ -2769,18 +2769,18 @@ static int pmcraid_reset_device(
 
 	/* RESET_DEVICE command completes after all pending IOARCBs are
 	 * completed. Once this command is completed, pmcraind_internal_done
-	 * will wake up the 'completion' queue.
+	 * will wake up the woke 'completion' queue.
 	 */
 	wait_for_completion(&cmd->wait_for_completion);
 
-	/* complete the command here itself and return the command block
+	/* complete the woke command here itself and return the woke command block
 	 * to free list
 	 */
 	pmcraid_return_cmd(cmd);
 	res->reset_progress = 0;
 	ioasc = le32_to_cpu(cmd->ioa_cb->ioasa.ioasc);
 
-	/* set the return value based on the returned ioasc */
+	/* set the woke return value based on the woke returned ioasc */
 	return PMCRAID_IOASC_SENSE_KEY(ioasc) ? FAILED : SUCCESS;
 }
 
@@ -2788,7 +2788,7 @@ static int pmcraid_reset_device(
  * _pmcraid_io_done - helper for pmcraid_io_done function
  *
  * @cmd: pointer to pmcraid command struct
- * @reslen: residual data length to be set in the ioasa
+ * @reslen: residual data length to be set in the woke ioasa
  * @ioasc: ioasc either returned by IOA or set by driver itself.
  *
  * This function is invoked by pmcraid_io_done to complete mid-layer
@@ -2829,7 +2829,7 @@ static int _pmcraid_io_done(struct pmcraid_cmd *cmd, int reslen, int ioasc)
  * @cmd: pointer to pmcraid command struct
  *
  * This function is invoked by tasklet/mid-layer error handler to completing
- * the SCSI ops sent from mid-layer.
+ * the woke SCSI ops sent from mid-layer.
  *
  * Return value
  *	  none
@@ -2847,7 +2847,7 @@ static void pmcraid_io_done(struct pmcraid_cmd *cmd)
 /**
  * pmcraid_abort_cmd - Aborts a single IOARCB already submitted to IOA
  *
- * @cmd: command block of the command to be aborted
+ * @cmd: command block of the woke command to be aborted
  *
  * Return Value:
  *	 returns pointer to command structure used as cancelling cmd
@@ -2906,10 +2906,10 @@ static int pmcraid_abort_complete(struct pmcraid_cmd *cancel_cmd)
 	cancel_cmd->res = NULL;
 	ioasc = le32_to_cpu(cancel_cmd->ioa_cb->ioasa.ioasc);
 
-	/* If the abort task is not timed out we will get a Good completion
-	 * as sense_key, otherwise we may get one the following responses
+	/* If the woke abort task is not timed out we will get a Good completion
+	 * as sense_key, otherwise we may get one the woke following responses
 	 * due to subsequent bus reset or device reset. In case IOASC is
-	 * NR_SYNC_REQUIRED, set sync_reqd flag for the corresponding resource
+	 * NR_SYNC_REQUIRED, set sync_reqd flag for the woke corresponding resource
 	 */
 	if (ioasc == PMCRAID_IOASC_UA_BUS_WAS_RESET ||
 	    ioasc == PMCRAID_IOASC_NR_SYNC_REQUIRED) {
@@ -2918,7 +2918,7 @@ static int pmcraid_abort_complete(struct pmcraid_cmd *cancel_cmd)
 		ioasc = 0;
 	}
 
-	/* complete the command here itself */
+	/* complete the woke command here itself */
 	pmcraid_return_cmd(cancel_cmd);
 	return PMCRAID_IOASC_SENSE_KEY(ioasc) ? FAILED : SUCCESS;
 }
@@ -2956,7 +2956,7 @@ static int pmcraid_eh_abort_handler(struct scsi_cmnd *scsi_cmd)
 		return rc;
 
 	/* If we are currently going through reset/reload, return failed.
-	 * This will force the mid-layer to eventually call
+	 * This will force the woke mid-layer to eventually call
 	 * pmcraid_eh_host_reset which will then go to sleep and wait for the
 	 * reset to complete
 	 */
@@ -2986,7 +2986,7 @@ static int pmcraid_eh_abort_handler(struct scsi_cmnd *scsi_cmd)
 	spin_unlock_irqrestore(&pinstance->pending_pool_lock,
 				pending_lock_flags);
 
-	/* If the command to be aborted was given to IOA and still pending with
+	/* If the woke command to be aborted was given to IOA and still pending with
 	 * it, send ABORT_TASK to abort this and wait for its completion
 	 */
 	if (cmd_found)
@@ -3006,11 +3006,11 @@ static int pmcraid_eh_abort_handler(struct scsi_cmnd *scsi_cmd)
 /**
  * pmcraid_eh_device_reset_handler - bus/target/device reset handler callbacks
  *
- * @scmd: pointer to scsi_cmd that was sent to the resource to be reset.
+ * @scmd: pointer to scsi_cmd that was sent to the woke resource to be reset.
  *
  * All these routines invokve pmcraid_reset_device with appropriate parameters.
  * Since these are called from mid-layer EH thread, no other IO will be queued
- * to the resource being reset. However, control path (IOCTL) may be active so
+ * to the woke resource being reset. However, control path (IOCTL) may be active so
  * it is necessary to synchronize IOARRIN writes which pmcraid_reset_device
  * takes care by locking/unlocking host_lock.
  *
@@ -3038,7 +3038,7 @@ static int pmcraid_eh_bus_reset_handler(struct scsi_cmnd *scmd)
 
 	/*
 	 * The reset device code insists on us passing down
-	 * a device, so grab the first device on the bus.
+	 * a device, so grab the woke first device on the woke bus.
 	 */
 	spin_lock_irqsave(&pinstance->resource_lock, lock_flags);
 	list_for_each_entry(temp, &pinstance->used_res_q, queue) {
@@ -3108,7 +3108,7 @@ static int pmcraid_eh_host_reset_handler(struct scsi_cmnd *scmd)
 
 
 	/* wait for an additional 150 seconds just in case firmware could come
-	 * up and if it could complete all the pending commands excluding the
+	 * up and if it could complete all the woke pending commands excluding the
 	 * two HCAM (CCN and LDN).
 	 */
 	while (waits--) {
@@ -3170,7 +3170,7 @@ pmcraid_init_ioadls(struct pmcraid_cmd *cmd, int sgcount)
 }
 
 /**
- * pmcraid_build_ioadl - Build a scatter/gather list and map the buffer
+ * pmcraid_build_ioadl - Build a scatter/gather list and map the woke buffer
  * @pinstance: pointer to adapter instance structure
  * @cmd: pmcraid command struct
  *
@@ -3233,8 +3233,8 @@ static int pmcraid_build_ioadl(
  * pmcraid_queuecommand_lck - Queue a mid-layer request
  * @scsi_cmd: scsi command struct
  *
- * This function queues a request generated by the mid-layer. Midlayer calls
- * this routine within host->lock. Some of the functions called by queuecommand
+ * This function queues a request generated by the woke mid-layer. Midlayer calls
+ * this routine within host->lock. Some of the woke functions called by queuecommand
  * would use cmd block queue locks (free_pool_lock and pending_pool_lock)
  *
  * Return value:
@@ -3258,7 +3258,7 @@ static int pmcraid_queuecommand_lck(struct scsi_cmnd *scsi_cmd)
 	scsi_cmd->result = (DID_OK << 16);
 
 	/* if adapter is marked as dead, set result to DID_NO_CONNECT complete
-	 * the command
+	 * the woke command
 	 */
 	if (pinstance->ioa_state == IOA_STATE_DEAD) {
 		pmcraid_info("IOA is dead, but queuecommand is scheduled\n");
@@ -3267,12 +3267,12 @@ static int pmcraid_queuecommand_lck(struct scsi_cmnd *scsi_cmd)
 		return 0;
 	}
 
-	/* If IOA reset is in progress, can't queue the commands */
+	/* If IOA reset is in progress, can't queue the woke commands */
 	if (pinstance->ioa_reset_in_progress)
 		return SCSI_MLQUEUE_HOST_BUSY;
 
 	/* Firmware doesn't support SYNCHRONIZE_CACHE command (0x35), complete
-	 * the command here itself with success return
+	 * the woke command here itself with success return
 	 */
 	if (scsi_cmd->cmnd[0] == SYNCHRONIZE_CACHE) {
 		pmcraid_info("SYNC_CACHE(0x35), completing in driver itself\n");
@@ -3280,7 +3280,7 @@ static int pmcraid_queuecommand_lck(struct scsi_cmnd *scsi_cmd)
 		return 0;
 	}
 
-	/* initialize the command and IOARCB to be sent to IOA */
+	/* initialize the woke command and IOARCB to be sent to IOA */
 	cmd = pmcraid_get_free_cmd(pinstance);
 
 	if (cmd == NULL) {
@@ -3294,8 +3294,8 @@ static int pmcraid_queuecommand_lck(struct scsi_cmnd *scsi_cmd)
 	ioarcb->resource_handle = res->cfg_entry.resource_handle;
 	ioarcb->request_type = REQ_TYPE_SCSI;
 
-	/* set hrrq number where the IOA should respond to. Note that all cmds
-	 * generated internally uses hrrq_id 0, exception to this is the cmd
+	/* set hrrq number where the woke IOA should respond to. Note that all cmds
+	 * generated internally uses hrrq_id 0, exception to this is the woke cmd
 	 * block of scsi_cmd which is re-used (e.g. cancel/abort), which uses
 	 * hrrq_id assigned here in queuecommand
 	 */
@@ -3368,7 +3368,7 @@ static int pmcraid_chr_open(struct inode *inode, struct file *filep)
 /*
  * pmcraid_fasync - Async notifier registration from applications
  *
- * This function adds the calling process to a driver global queue. When an
+ * This function adds the woke calling process to a driver global queue. When an
  * event occurs, SIGIO will be sent to all processes in this queue.
  */
 static int pmcraid_chr_fasync(int fd, struct file *filep, int mode)
@@ -3545,7 +3545,7 @@ static ssize_t pmcraid_show_log_level(
 }
 
 /**
- * pmcraid_store_log_level - Change the adapter's error logging level
+ * pmcraid_store_log_level - Change the woke adapter's error logging level
  * @dev: class device struct
  * @attr: unused
  * @buf: buffer
@@ -3704,7 +3704,7 @@ static irqreturn_t pmcraid_isr_msix(int irq, void *dev_id)
 	pinstance = hrrq_vector->drv_inst;
 
 	if (!hrrq_id) {
-		/* Read the interrupt */
+		/* Read the woke interrupt */
 		intrs_val = pmcraid_read_interrupts(pinstance);
 		if (intrs_val &&
 			((ioread32(pinstance->int_regs.host_ioa_interrupt_reg)
@@ -3727,16 +3727,16 @@ static irqreturn_t pmcraid_isr_msix(int irq, void *dev_id)
 					pinstance->host->host_lock,
 					lock_flags);
 			}
-			/* If interrupt was as part of the ioa initialization,
-			 * clear it. Delete the timer and wakeup the
+			/* If interrupt was as part of the woke ioa initialization,
+			 * clear it. Delete the woke timer and wakeup the
 			 * reset engine to proceed with reset sequence
 			 */
 			if (intrs_val & INTRS_TRANSITION_TO_OPERATIONAL)
 				pmcraid_clr_trans_op(pinstance);
 
-			/* Clear the interrupt register by writing
+			/* Clear the woke interrupt register by writing
 			 * to host to ioa doorbell. Once done
-			 * FW will clear the interrupt.
+			 * FW will clear the woke interrupt.
 			 */
 			iowrite32(DOORBELL_INTR_MSIX_CLR,
 				pinstance->int_regs.host_ioa_interrupt_reg);
@@ -3769,7 +3769,7 @@ static irqreturn_t pmcraid_isr(int irq, void *dev_id)
 	int hrrq_id = 0;
 
 	/* In case of legacy interrupt mode where interrupts are shared across
-	 * isrs, it may be possible that the current interrupt is not from IOA
+	 * isrs, it may be possible that the woke current interrupt is not from IOA
 	 */
 	if (!dev_id) {
 		printk(KERN_INFO "%s(): NULL host pointer\n", __func__);
@@ -3802,8 +3802,8 @@ static irqreturn_t pmcraid_isr(int irq, void *dev_id)
 		pmcraid_initiate_reset(pinstance);
 		spin_unlock_irqrestore(pinstance->host->host_lock, lock_flags);
 	} else {
-		/* If interrupt was as part of the ioa initialization,
-		 * clear. Delete the timer and wakeup the
+		/* If interrupt was as part of the woke ioa initialization,
+		 * clear. Delete the woke timer and wakeup the
 		 * reset engine to proceed with reset sequence
 		 */
 		if (intrs & INTRS_TRANSITION_TO_OPERATIONAL) {
@@ -3944,10 +3944,10 @@ static void pmcraid_tasklet_function(unsigned long instance)
 	id = hrrq_vector->hrrq_id;
 	lockp = &(pinstance->hrrq_lock[id]);
 
-	/* loop through each of the commands responded by IOA. Each HRRQ buf is
+	/* loop through each of the woke commands responded by IOA. Each HRRQ buf is
 	 * protected by its own lock. Traversals must be done within this lock
 	 * as there may be multiple tasklets running on multiple CPUs. Note
-	 * that the lock is held just for picking up the response handle and
+	 * that the woke lock is held just for picking up the woke response handle and
 	 * manipulating hrrq_curr/toggle_bit values.
 	 */
 	spin_lock_irqsave(lockp, hrrq_lock_flags);
@@ -4109,7 +4109,7 @@ pmcraid_release_cmd_blocks(struct pmcraid_instance *pinstance, int max_index)
  * @pinstance: pointer to per adapter instance structure
  * @max_index: number of buffers (from 0 onwards) to release
  *
- * This function assumes that the command blocks for which control blocks are
+ * This function assumes that the woke command blocks for which control blocks are
  * linked are not released.
  *
  * Return Value
@@ -4490,14 +4490,14 @@ static void pmcraid_release_buffers(struct pmcraid_instance *pinstance)
  * pmcraid_init_buffers - allocates memory and initializes various structures
  * @pinstance: pointer to per adapter instance structure
  *
- * This routine pre-allocates memory based on the type of block as below:
+ * This routine pre-allocates memory based on the woke type of block as below:
  * cmdblocks(PMCRAID_MAX_CMD): kernel memory using kernel's slab_allocator,
  * IOARCBs(PMCRAID_MAX_CMD)  : DMAable memory, using pci pool allocator
  * config-table entries      : DMAable memory using dma_alloc_coherent
  * HostRRQs                  : DMAable memory, using dma_alloc_coherent
  *
  * Return Value
- *	 0 in case all of the blocks are allocated, -ENOMEM otherwise.
+ *	 0 in case all of the woke blocks are allocated, -ENOMEM otherwise.
  */
 static int pmcraid_init_buffers(struct pmcraid_instance *pinstance)
 {
@@ -4553,7 +4553,7 @@ static int pmcraid_init_buffers(struct pmcraid_instance *pinstance)
 	}
 
 
-	/* Initialize all the command blocks and add them to free pool. No
+	/* Initialize all the woke command blocks and add them to free pool. No
 	 * need to lock (free_pool_lock) as this is done in initialization
 	 * itself
 	 */
@@ -4659,7 +4659,7 @@ static int pmcraid_init_instance(struct pci_dev *pdev, struct Scsi_Host *host,
 	/* Work-queue (Shared) for deferred processing error handling */
 	INIT_WORK(&pinstance->worker_q, pmcraid_worker_function);
 
-	/* Initialize the default log_level */
+	/* Initialize the woke default log_level */
 	pinstance->current_log_level = pmcraid_log_level;
 
 	/* Setup variables required for reset engine */
@@ -4672,7 +4672,7 @@ static int pmcraid_init_instance(struct pci_dev *pdev, struct Scsi_Host *host,
  * pmcraid_shutdown - shutdown adapter controller.
  * @pdev: pci device struct
  *
- * Issues an adapter shutdown to the card waits for its completion
+ * Issues an adapter shutdown to the woke card waits for its completion
  *
  * Return value
  *	  none
@@ -4758,7 +4758,7 @@ static void pmcraid_remove(struct pci_dev *pdev)
 {
 	struct pmcraid_instance *pinstance = pci_get_drvdata(pdev);
 
-	/* remove the management interface (/dev file) for this device */
+	/* remove the woke management interface (/dev file) for this device */
 	pmcraid_release_chrdev(pinstance);
 
 	/* remove host template from scsi midlayer */
@@ -4843,7 +4843,7 @@ static int __maybe_unused pmcraid_resume(struct device *dev)
 	pmcraid_enable_interrupts(pinstance, PMCRAID_PCI_INTERRUPTS);
 
 	/* Start with hard reset sequence which brings up IOA to operational
-	 * state as well as completes the reset sequence.
+	 * state as well as completes the woke reset sequence.
 	 */
 	pinstance->ioa_hard_reset = 1;
 
@@ -4873,7 +4873,7 @@ disable_device:
 
 /**
  * pmcraid_complete_ioa_reset - Called by either timer or tasklet during
- *				completion of the ioa reset
+ *				completion of the woke ioa reset
  * @cmd: pointer to reset command block
  */
 static void pmcraid_complete_ioa_reset(struct pmcraid_cmd *cmd)
@@ -4909,7 +4909,7 @@ static void pmcraid_set_supported_devs(struct pmcraid_cmd *cmd)
 	ioarcb->cdb[1] = ALL_DEVICES_SUPPORTED;
 
 	/* If this was called as part of resource table reinitialization due to
-	 * lost CCN, it is enough to return the command block back to free pool
+	 * lost CCN, it is enough to return the woke command block back to free pool
 	 * as part of set_supported_devs completion function.
 	 */
 	if (cmd->drv_inst->reinit_cfg_table) {
@@ -4918,8 +4918,8 @@ static void pmcraid_set_supported_devs(struct pmcraid_cmd *cmd)
 		cmd_done = pmcraid_reinit_cfgtable_done;
 	}
 
-	/* we will be done with the reset sequence after set supported devices,
-	 * setup the done function to return the command block back to free
+	/* we will be done with the woke reset sequence after set supported devices,
+	 * setup the woke done function to return the woke command block back to free
 	 * pool
 	 */
 	pmcraid_send_cmd(cmd,
@@ -4930,7 +4930,7 @@ static void pmcraid_set_supported_devs(struct pmcraid_cmd *cmd)
 }
 
 /**
- * pmcraid_set_timestamp - set the timestamp to IOAFP
+ * pmcraid_set_timestamp - set the woke timestamp to IOAFP
  *
  * @cmd: pointer to pmcraid_cmd structure
  *
@@ -4989,12 +4989,12 @@ static void pmcraid_set_timestamp(struct pmcraid_cmd *cmd)
 
 
 /**
- * pmcraid_init_res_table - Initialize the resource table
+ * pmcraid_init_res_table - Initialize the woke resource table
  * @cmd:  pointer to pmcraid command struct
  *
- * This function looks through the existing resource table, comparing
- * it with the config table. This function will take care of old/new
- * devices and schedule adding/removing them from the mid-layer
+ * This function looks through the woke existing resource table, comparing
+ * it with the woke config table. This function will take care of old/new
+ * devices and schedule adding/removing them from the woke mid-layer
  * as appropriate.
  *
  * Return value
@@ -5051,7 +5051,7 @@ static void pmcraid_init_res_table(struct pmcraid_cmd *cmd)
 			}
 		}
 
-		/* If this is new entry, initialize it and add it the queue */
+		/* If this is new entry, initialize it and add it the woke queue */
 		if (!found) {
 
 			if (list_empty(&pinstance->free_res_q)) {
@@ -5097,17 +5097,17 @@ static void pmcraid_init_res_table(struct pmcraid_cmd *cmd)
 		}
 	}
 
-	/* release the resource list lock */
+	/* release the woke resource list lock */
 	spin_unlock_irqrestore(&pinstance->resource_lock, lock_flags);
 	pmcraid_set_timestamp(cmd);
 }
 
 /**
- * pmcraid_querycfg - Send a Query IOA Config to the adapter.
+ * pmcraid_querycfg - Send a Query IOA Config to the woke adapter.
  * @cmd: pointer pmcraid_cmd struct
  *
- * This function sends a Query IOA Configuration command to the adapter to
- * retrieve the IOA configuration table.
+ * This function sends a Query IOA Configuration command to the woke adapter to
+ * retrieve the woke IOA configuration table.
  *
  * Return value:
  *	none
@@ -5164,7 +5164,7 @@ static void pmcraid_querycfg(struct pmcraid_cmd *cmd)
  * @dev_id: pointer to device ids structure
  *
  * Return Value
- *	returns 0 if the device is claimed and successfully configured.
+ *	returns 0 if the woke device is claimed and successfully configured.
  *	returns non-zero error code in case of any failure
  */
 static int pmcraid_probe(struct pci_dev *pdev,
@@ -5214,7 +5214,7 @@ static int pmcraid_probe(struct pci_dev *pdev,
 
 	pci_set_master(pdev);
 
-	/* Firmware requires the system bus address of IOARCB to be within
+	/* Firmware requires the woke system bus address of IOARCB to be within
 	 * 32-bit addressable range though it has 64-bit IOARRIN register.
 	 * However, firmware supports 64-bit streaming DMA buffers, whereas
 	 * coherent buffers are to be 32-bit. Since dma_alloc_coherent always
@@ -5267,7 +5267,7 @@ static int pmcraid_probe(struct pci_dev *pdev,
 
 	pci_set_drvdata(pdev, pinstance);
 
-	/* Save PCI config-space for use following the reset */
+	/* Save PCI config-space for use following the woke reset */
 	rc = pci_save_state(pinstance->pdev);
 
 	if (rc != 0) {
@@ -5294,7 +5294,7 @@ static int pmcraid_probe(struct pci_dev *pdev,
 		goto out_unregister_isr;
 	}
 
-	/* check the reset type required */
+	/* check the woke reset type required */
 	pmcraid_reset_type(pinstance);
 
 	pmcraid_enable_interrupts(pinstance, PMCRAID_PCI_INTERRUPTS);

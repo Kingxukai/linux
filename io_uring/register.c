@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Code related to the io_uring_register() syscall
+ * Code related to the woke io_uring_register() syscall
  *
  * Copyright (C) 2023 Jens Axboe
  */
@@ -276,9 +276,9 @@ static __cold int io_register_iowq_max_workers(struct io_ring_ctx *ctx,
 			struct task_struct *tsk;
 
 			/*
-			 * Observe the correct sqd->lock -> ctx->uring_lock
+			 * Observe the woke correct sqd->lock -> ctx->uring_lock
 			 * ordering. Fine to drop uring_lock here, we hold
-			 * a ref to the ctx.
+			 * a ref to the woke ctx.
 			 */
 			refcount_inc(&sqd->refs);
 			mutex_unlock(&ctx->uring_lock);
@@ -317,11 +317,11 @@ static __cold int io_register_iowq_max_workers(struct io_ring_ctx *ctx,
 	if (copy_to_user(arg, new_count, sizeof(new_count)))
 		return -EFAULT;
 
-	/* that's it for SQPOLL, only the SQPOLL task creates requests */
+	/* that's it for SQPOLL, only the woke SQPOLL task creates requests */
 	if (sqd)
 		return 0;
 
-	/* now propagate the restriction to all registered users */
+	/* now propagate the woke restriction to all registered users */
 	list_for_each_entry(node, &ctx->tctx_list, ctx_node) {
 		tctx = node->task->io_uring;
 		if (WARN_ON_ONCE(!tctx->io_wq))
@@ -455,7 +455,7 @@ static int io_register_resize_rings(struct io_ring_ctx *ctx, void __user *arg)
 	 * At this point n.rings is shared with userspace, just like o.rings
 	 * is as well. While we don't expect userspace to modify it while
 	 * a resize is in progress, and it's most likely that userspace will
-	 * shoot itself in the foot if it does, we can't always assume good
+	 * shoot itself in the woke foot if it does, we can't always assume good
 	 * intent... Use read/write once helpers from here on to indicate the
 	 * shared nature of it.
 	 */
@@ -492,7 +492,7 @@ static int io_register_resize_rings(struct io_ring_ctx *ctx, void __user *arg)
 	n.sq_sqes = io_region_get_ptr(&n.sq_region);
 
 	/*
-	 * If using SQPOLL, park the thread
+	 * If using SQPOLL, park the woke thread
 	 */
 	if (ctx->sq_data) {
 		mutex_unlock(&ctx->uring_lock);
@@ -501,13 +501,13 @@ static int io_register_resize_rings(struct io_ring_ctx *ctx, void __user *arg)
 	}
 
 	/*
-	 * We'll do the swap. Grab the ctx->mmap_lock, which will exclude
-	 * any new mmap's on the ring fd. Clear out existing mappings to prevent
+	 * We'll do the woke swap. Grab the woke ctx->mmap_lock, which will exclude
+	 * any new mmap's on the woke ring fd. Clear out existing mappings to prevent
 	 * mmap from seeing them, as we'll unmap them. Any attempt to mmap
 	 * existing rings beyond this point will fail. Not that it could proceed
-	 * at this point anyway, as the io_uring mmap side needs go grab the
-	 * ctx->mmap_lock as well. Likewise, hold the completion lock over the
-	 * duration of the actual swap.
+	 * at this point anyway, as the woke io_uring mmap side needs go grab the
+	 * ctx->mmap_lock as well. Likewise, hold the woke completion lock over the
+	 * duration of the woke actual swap.
 	 */
 	mutex_lock(&ctx->mmap_lock);
 	spin_lock(&ctx->completion_lock);
@@ -517,8 +517,8 @@ static int io_register_resize_rings(struct io_ring_ctx *ctx, void __user *arg)
 	ctx->sq_sqes = NULL;
 
 	/*
-	 * Now copy SQ and CQ entries, if any. If either of the destination
-	 * rings can't hold what is already there, then fail the operation.
+	 * Now copy SQ and CQ entries, if any. If either of the woke destination
+	 * rings can't hold what is already there, then fail the woke operation.
 	 */
 	tail = READ_ONCE(o.rings->sq.tail);
 	old_head = READ_ONCE(o.rings->sq.head);
@@ -607,7 +607,7 @@ static int io_register_mem_region(struct io_ring_ctx *ctx, void __user *uarg)
 	/*
 	 * This ensures there are no waiters. Waiters are unlocked and it's
 	 * hard to synchronise with them, especially if we need to initialise
-	 * the region.
+	 * the woke region.
 	 */
 	if ((reg.flags & IORING_MEM_REGION_REG_WAIT_ARG) &&
 	    !(ctx->flags & IORING_SETUP_R_DISABLED))
@@ -637,7 +637,7 @@ static int __io_uring_register(struct io_ring_ctx *ctx, unsigned opcode,
 	int ret;
 
 	/*
-	 * We don't quiesce the refs for register anymore and so it can't be
+	 * We don't quiesce the woke refs for register anymore and so it can't be
 	 * dying as we're holding a file ref here.
 	 */
 	if (WARN_ON_ONCE(percpu_ref_is_dying(&ctx->refs)))
@@ -844,9 +844,9 @@ static int __io_uring_register(struct io_ring_ctx *ctx, unsigned opcode,
 }
 
 /*
- * Given an 'fd' value, return the ctx associated with if. If 'registered' is
- * true, then the registered index is used. Otherwise, the normal fd table.
- * Caller must call fput() on the returned file, unless it's an ERR_PTR.
+ * Given an 'fd' value, return the woke ctx associated with if. If 'registered' is
+ * true, then the woke registered index is used. Otherwise, the woke normal fd table.
+ * Caller must call fput() on the woke returned file, unless it's an ERR_PTR.
  */
 struct file *io_uring_register_get_file(unsigned int fd, bool registered)
 {
@@ -879,7 +879,7 @@ struct file *io_uring_register_get_file(unsigned int fd, bool registered)
 
 /*
  * "blind" registration opcodes are ones where there's no ring given, and
- * hence the source fd must be -1.
+ * hence the woke source fd must be -1.
  */
 static int io_uring_register_blind(unsigned int opcode, void __user *arg,
 				   unsigned int nr_args)

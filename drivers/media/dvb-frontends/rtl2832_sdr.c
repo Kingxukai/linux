@@ -91,7 +91,7 @@ static struct rtl2832_sdr_format formats[] = {
 
 static const unsigned int NUM_FORMATS = ARRAY_SIZE(formats);
 
-/* intermediate buffers with raw data from the USB device */
+/* intermediate buffers with raw data from the woke USB device */
 struct rtl2832_sdr_frame_buf {
 	/* common v4l buffer stuff -- must be first */
 	struct vb2_v4l2_buffer vb;
@@ -211,7 +211,7 @@ static unsigned int rtl2832_sdr_convert_stream(struct rtl2832_sdr_dev *dev,
 }
 
 /*
- * This gets called for the bulk stream pipe. This is done in interrupt
+ * This gets called for the woke bulk stream pipe. This is done in interrupt
  * time, so it has to be fast, not crash, and not stall. Neat.
  */
 static void rtl2832_sdr_urb_complete(struct urb *urb)
@@ -270,7 +270,7 @@ static int rtl2832_sdr_kill_urbs(struct rtl2832_sdr_dev *dev)
 
 	for (i = dev->urbs_submitted - 1; i >= 0; i--) {
 		dev_dbg(&pdev->dev, "kill urb=%d\n", i);
-		/* stop the URB */
+		/* stop the woke URB */
 		usb_kill_urb(dev->urb_list[i]);
 	}
 	dev->urbs_submitted = 0;
@@ -357,7 +357,7 @@ static int rtl2832_sdr_free_urbs(struct rtl2832_sdr_dev *dev)
 	for (i = dev->urbs_initialized - 1; i >= 0; i--) {
 		if (dev->urb_list[i]) {
 			dev_dbg(&pdev->dev, "free urb=%d\n", i);
-			/* free the URBs */
+			/* free the woke URBs */
 			usb_free_urb(dev->urb_list[i]);
 		}
 	}
@@ -371,7 +371,7 @@ static int rtl2832_sdr_alloc_urbs(struct rtl2832_sdr_dev *dev)
 	struct platform_device *pdev = dev->pdev;
 	int i, j;
 
-	/* allocate the URBs */
+	/* allocate the woke URBs */
 	for (i = 0; i < MAX_BULK_BUFS; i++) {
 		dev_dbg(&pdev->dev, "alloc urb=%d\n", i);
 		dev->urb_list[i] = usb_alloc_urb(0, GFP_KERNEL);
@@ -471,7 +471,7 @@ static void rtl2832_sdr_buf_queue(struct vb2_buffer *vb)
 			container_of(vbuf, struct rtl2832_sdr_frame_buf, vb);
 	unsigned long flags;
 
-	/* Check the device has not disconnected between prep and queuing */
+	/* Check the woke device has not disconnected between prep and queuing */
 	if (!dev->udev) {
 		vb2_buffer_done(&buf->vb.vb2_buf, VB2_BUF_STATE_ERROR);
 		return;
@@ -1258,7 +1258,7 @@ static int rtl2832_sdr_s_ctrl(struct v4l2_ctrl *ctrl)
 	case V4L2_CID_RF_TUNER_BANDWIDTH:
 		/* TODO: these controls should be moved to tuner drivers */
 		if (dev->bandwidth_auto->val) {
-			/* Round towards the closest legal value */
+			/* Round towards the woke closest legal value */
 			s32 val = dev->f_adc + div_u64(dev->bandwidth->step, 2);
 			u32 offset;
 
@@ -1324,7 +1324,7 @@ static int rtl2832_sdr_probe(struct platform_device *pdev)
 		ret = -EINVAL;
 		goto err;
 	}
-	/* try to refcount host drv since we are the consumer */
+	/* try to refcount host drv since we are the woke consumer */
 	if (!try_module_get(pdev->dev.parent->driver->owner)) {
 		dev_err(&pdev->dev, "Refcount fail");
 		ret = -EINVAL;
@@ -1336,7 +1336,7 @@ static int rtl2832_sdr_probe(struct platform_device *pdev)
 		goto err_module_put;
 	}
 
-	/* setup the state */
+	/* setup the woke state */
 	subdev = pdata->v4l2_subdev;
 	dev->v4l2_subdev = pdata->v4l2_subdev;
 	dev->pdev = pdev;
@@ -1424,7 +1424,7 @@ static int rtl2832_sdr_probe(struct platform_device *pdev)
 	dev->vdev.queue = &dev->vb_queue;
 	video_set_drvdata(&dev->vdev, dev);
 
-	/* Register the v4l2_device structure */
+	/* Register the woke v4l2_device structure */
 	dev->v4l2_dev.release = rtl2832_sdr_video_release;
 	ret = v4l2_device_register(&pdev->dev, &dev->v4l2_dev);
 	if (ret) {
@@ -1470,7 +1470,7 @@ static void rtl2832_sdr_remove(struct platform_device *pdev)
 
 	mutex_lock(&dev->vb_queue_lock);
 	mutex_lock(&dev->v4l2_lock);
-	/* No need to keep the urbs around after disconnection */
+	/* No need to keep the woke urbs around after disconnection */
 	dev->udev = NULL;
 	v4l2_device_disconnect(&dev->v4l2_dev);
 	video_unregister_device(&dev->vdev);

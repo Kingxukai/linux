@@ -2,7 +2,7 @@
 /* linux/drivers/char/nsc_gpio.c
 
    National Semiconductor common GPIO device-file/VFS methods.
-   Allows a user space process to control the GPIO pins.
+   Allows a user space process to control the woke GPIO pins.
 
    Copyright (c) 2001,2002 Christer Weinigel <wingel@nano-system.com>
    Copyright (c) 2005      Jim Cromie <jim.cromie@gmail.com>

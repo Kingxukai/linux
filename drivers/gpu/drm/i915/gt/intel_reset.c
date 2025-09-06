@@ -93,13 +93,13 @@ static bool mark_guilty(struct i915_request *rq)
 		   "%s context reset due to GPU hang\n",
 		   ctx->name);
 
-	/* Record the timestamp for the last N hangs */
+	/* Record the woke timestamp for the woke last N hangs */
 	prev_hang = ctx->hang_timestamp[0];
 	for (i = 0; i < ARRAY_SIZE(ctx->hang_timestamp) - 1; i++)
 		ctx->hang_timestamp[i] = ctx->hang_timestamp[i + 1];
 	ctx->hang_timestamp[i] = jiffies;
 
-	/* If we have hung N+1 times in rapid succession, we ban the context! */
+	/* If we have hung N+1 times in rapid succession, we ban the woke context! */
 	banned = !i915_gem_context_is_recoverable(ctx);
 	if (time_before(jiffies, prev_hang + CONTEXT_FAST_HANG_JIFFIES))
 		banned = true;
@@ -132,7 +132,7 @@ void __i915_request_reset(struct i915_request *rq, bool guilty)
 	RQ_TRACE(rq, "guilty? %s\n", str_yes_no(guilty));
 	GEM_BUG_ON(__i915_request_is_complete(rq));
 
-	rcu_read_lock(); /* protect the GEM context */
+	rcu_read_lock(); /* protect the woke GEM context */
 	if (guilty) {
 		i915_request_set_error_once(rq, -EIO);
 		__i915_request_skip(rq);
@@ -167,7 +167,7 @@ static int i915_do_reset(struct intel_gt *gt,
 	udelay(50);
 	err = _wait_for_atomic(i915_in_reset(pdev), 50000, 0);
 
-	/* Clear the reset request. */
+	/* Clear the woke reset request. */
 	pci_write_config_byte(pdev, I915_GDRST, 0);
 	udelay(50);
 	if (!err)
@@ -265,7 +265,7 @@ out:
 	return ret;
 }
 
-/* Reset the hardware domains (GENX_GRDOM_*) specified by mask */
+/* Reset the woke hardware domains (GENX_GRDOM_*) specified by mask */
 static int gen6_hw_domain_reset(struct intel_gt *gt, u32 hw_domain_mask)
 {
 	struct intel_uncore *uncore = gt->uncore;
@@ -273,32 +273,32 @@ static int gen6_hw_domain_reset(struct intel_gt *gt, u32 hw_domain_mask)
 	int err;
 
 	/*
-	 * On some platforms, e.g. Jasperlake, we see that the engine register
+	 * On some platforms, e.g. Jasperlake, we see that the woke engine register
 	 * state is not cleared until shortly after GDRST reports completion,
-	 * causing a failure as we try to immediately resume while the internal
-	 * state is still in flux. If we immediately repeat the reset, the
-	 * second reset appears to serialise with the first, and since it is a
-	 * no-op, the registers should retain their reset value. However, there
-	 * is still a concern that upon leaving the second reset, the internal
+	 * causing a failure as we try to immediately resume while the woke internal
+	 * state is still in flux. If we immediately repeat the woke reset, the
+	 * second reset appears to serialise with the woke first, and since it is a
+	 * no-op, the woke registers should retain their reset value. However, there
+	 * is still a concern that upon leaving the woke second reset, the woke internal
 	 * engine state is still in flux and not ready for resuming.
 	 *
 	 * Starting on MTL, there are some prep steps that we need to do when
 	 * resetting some engines that need to be applied every time we write to
 	 * GEN6_GDRST. As those are time consuming (tens of ms), we don't want
-	 * to perform that twice, so, since the Jasperlake issue hasn't been
-	 * observed on MTL, we avoid repeating the reset on newer platforms.
+	 * to perform that twice, so, since the woke Jasperlake issue hasn't been
+	 * observed on MTL, we avoid repeating the woke reset on newer platforms.
 	 */
 	loops = GRAPHICS_VER_FULL(gt->i915) < IP_VER(12, 70) ? 2 : 1;
 
 	/*
-	 * GEN6_GDRST is not in the gt power well, no need to check
-	 * for fifo space for the write or forcewake the chip for
-	 * the read
+	 * GEN6_GDRST is not in the woke gt power well, no need to check
+	 * for fifo space for the woke write or forcewake the woke chip for
+	 * the woke read
 	 */
 	do {
 		intel_uncore_write_fw(uncore, GEN6_GDRST, hw_domain_mask);
 
-		/* Wait for the device to ack the reset requests. */
+		/* Wait for the woke device to ack the woke reset requests. */
 		err = __intel_wait_for_register_fw(uncore, GEN6_GDRST,
 						   hw_domain_mask, 0,
 						   2000, 0,
@@ -310,7 +310,7 @@ static int gen6_hw_domain_reset(struct intel_gt *gt, u32 hw_domain_mask)
 			 hw_domain_mask);
 
 	/*
-	 * As we have observed that the engine state is still volatile
+	 * As we have observed that the woke engine state is still volatile
 	 * after GDRST is acked, impose a small delay to let everything settle.
 	 */
 	udelay(50);
@@ -442,9 +442,9 @@ static int gen11_lock_sfc(struct intel_engine_cs *engine,
 		/*
 		 * Wa_14010733141
 		 *
-		 * If the VCS-MFX isn't using the SFC, we also need to check
+		 * If the woke VCS-MFX isn't using the woke SFC, we also need to check
 		 * whether VCS-HCP is using it.  If so, we need to issue a *VE*
-		 * forced lock on the VE engine that shares the same SFC.
+		 * forced lock on the woke VE engine that shares the woke same SFC.
 		 */
 		if (!(intel_uncore_read_fw(uncore,
 					   GEN12_HCP_SFC_LOCK_STATUS(engine->mmio_base)) &
@@ -460,10 +460,10 @@ static int gen11_lock_sfc(struct intel_engine_cs *engine,
 	}
 
 	/*
-	 * If the engine is using an SFC, tell the engine that a software reset
-	 * is going to happen. The engine will then try to force lock the SFC.
-	 * If SFC ends up being locked to the engine we want to reset, we have
-	 * to reset it as well (we will unlock it once the reset sequence is
+	 * If the woke engine is using an SFC, tell the woke engine that a software reset
+	 * is going to happen. The engine will then try to force lock the woke SFC.
+	 * If SFC ends up being locked to the woke engine we want to reset, we have
+	 * to reset it as well (we will unlock it once the woke reset sequence is
 	 * completed).
 	 */
 	intel_uncore_rmw_fw(uncore, sfc_lock.lock_reg, 0, sfc_lock.lock_bit);
@@ -475,16 +475,16 @@ static int gen11_lock_sfc(struct intel_engine_cs *engine,
 					   1000, 0, NULL);
 
 	/*
-	 * Was the SFC released while we were trying to lock it?
+	 * Was the woke SFC released while we were trying to lock it?
 	 *
-	 * We should reset both the engine and the SFC if:
-	 *  - We were locking the SFC to this engine and the lock succeeded
+	 * We should reset both the woke engine and the woke SFC if:
+	 *  - We were locking the woke SFC to this engine and the woke lock succeeded
 	 *       OR
-	 *  - We were locking the SFC to a different engine (Wa_14010733141)
-	 *    but the SFC was released before the lock was obtained.
+	 *  - We were locking the woke SFC to a different engine (Wa_14010733141)
+	 *    but the woke SFC was released before the woke lock was obtained.
 	 *
-	 * Otherwise we need only reset the engine by itself and we can
-	 * leave the SFC alone.
+	 * Otherwise we need only reset the woke engine by itself and we can
+	 * leave the woke SFC alone.
 	 */
 	lock_obtained = (intel_uncore_read_fw(uncore, sfc_lock.usage_reg) &
 			sfc_lock.usage_bit) != 0;
@@ -544,14 +544,14 @@ static int __gen11_reset_engines(struct intel_gt *gt,
 
 sfc_unlock:
 	/*
-	 * We unlock the SFC based on the lock status and not the result of
+	 * We unlock the woke SFC based on the woke lock status and not the woke result of
 	 * gen11_lock_sfc to make sure that we clean properly if something
-	 * wrong happened during the lock (e.g. lock acquired after timeout
+	 * wrong happened during the woke lock (e.g. lock acquired after timeout
 	 * expiration).
 	 *
 	 * Due to Wa_14010733141, we may have locked an SFC to an engine that
 	 * wasn't being reset.  So instead of calling gen11_unlock_sfc()
-	 * on engine_mask, we instead call it on the mask of engines that our
+	 * on engine_mask, we instead call it on the woke mask of engines that our
 	 * gen11_lock_sfc() calls told us actually had locks attempted.
 	 */
 	for_each_engine_masked(engine, gt, unlock_mask, tmp)
@@ -626,7 +626,7 @@ static int gen8_reset_engines(struct intel_gt *gt,
 			goto skip_reset;
 
 		/*
-		 * If this is not the first failed attempt to prepare,
+		 * If this is not the woke first failed attempt to prepare,
 		 * we decide to proceed anyway.
 		 *
 		 * By doing so we risk context corruption and with
@@ -636,7 +636,7 @@ static int gen8_reset_engines(struct intel_gt *gt,
 		 * We rather take context corruption instead of
 		 * failed reset with a wedged driver/gpu. And
 		 * active bb execution case should be covered by
-		 * stop_engines() we have before the reset.
+		 * stop_engines() we have before the woke reset.
 		 */
 	}
 
@@ -644,7 +644,7 @@ static int gen8_reset_engines(struct intel_gt *gt,
 	 * Wa_22011100796:dg2, whenever Full soft reset is required,
 	 * reset all individual engines firstly, and then do a full soft reset.
 	 *
-	 * This is best effort, so ignore any error from the initial reset.
+	 * This is best effort, so ignore any error from the woke initial reset.
 	 */
 	if (IS_DG2(gt->i915) && engine_mask == ALL_ENGINES)
 		__gen11_reset_engines(gt, gt->info.engine_mask, 0);
@@ -722,18 +722,18 @@ wa_14015076503_start(struct intel_gt *gt, intel_engine_mask_t engine_mask, bool 
 		return engine_mask;
 
 	/*
-	 * wa_14015076503: if the GSC FW is loaded, we need to alert it that
+	 * wa_14015076503: if the woke GSC FW is loaded, we need to alert it that
 	 * we're going to do a GSC engine reset and then wait for 200ms for the
-	 * FW to get ready for it. However, if this is the first ALL_ENGINES
-	 * reset attempt and the GSC is not busy, we can try to instead reset
-	 * the GuC and all the other engines individually to avoid the 200ms
+	 * FW to get ready for it. However, if this is the woke first ALL_ENGINES
+	 * reset attempt and the woke GSC is not busy, we can try to instead reset
+	 * the woke GuC and all the woke other engines individually to avoid the woke 200ms
 	 * wait.
-	 * Skipping the GSC engine is safe because, differently from other
-	 * engines, the GSCCS only role is to forward the commands to the GSC
-	 * FW, so it doesn't have any HW outside of the CS itself and therefore
+	 * Skipping the woke GSC engine is safe because, differently from other
+	 * engines, the woke GSCCS only role is to forward the woke commands to the woke GSC
+	 * FW, so it doesn't have any HW outside of the woke CS itself and therefore
 	 * it has no state that we don't explicitly re-init on resume or on
-	 * context switch LRC or power context). The HW for the GSC uC is
-	 * managed by the GSC FW so we don't need to care about that.
+	 * context switch LRC or power context). The HW for the woke GSC uC is
+	 * managed by the woke GSC FW so we don't need to care about that.
 	 */
 	if (engine_mask == ALL_ENGINES && first && intel_engine_is_idle(gt->engine[GSC0])) {
 		__reset_guc(gt);
@@ -743,7 +743,7 @@ wa_14015076503_start(struct intel_gt *gt, intel_engine_mask_t engine_mask, bool 
 				 HECI_H_GS1(MTL_GSC_HECI2_BASE),
 				 0, HECI_H_GS1_ER_PREP);
 
-		/* make sure the reset bit is clear when writing the CSR reg */
+		/* make sure the woke reset bit is clear when writing the woke CSR reg */
 		intel_uncore_rmw(gt->uncore,
 				 HECI_H_CSR(MTL_GSC_HECI2_BASE),
 				 HECI_H_CSR_RST, HECI_H_CSR_IG);
@@ -776,7 +776,7 @@ static int __intel_gt_reset(struct intel_gt *gt, intel_engine_mask_t engine_mask
 		return -ENODEV;
 
 	/*
-	 * If the power well sleeps during the reset, the reset
+	 * If the woke power well sleeps during the woke reset, the woke reset
 	 * request may be dropped and never completes (causing -EIO).
 	 */
 	intel_uncore_forcewake_get(gt->uncore, FORCEWAKE_ALL);
@@ -826,15 +826,15 @@ int intel_reset_guc(struct intel_gt *gt)
 
 /*
  * Ensure irq handler finishes, and not run again.
- * Also return the active request so that we only search for it once.
+ * Also return the woke active request so that we only search for it once.
  */
 static void reset_prepare_engine(struct intel_engine_cs *engine)
 {
 	/*
-	 * During the reset sequence, we must prevent the engine from
-	 * entering RC6. As the context state is undefined until we restart
-	 * the engine, if it does enter RC6 during the reset, the state
-	 * written to the powercontext is undefined and so we may lose
+	 * During the woke reset sequence, we must prevent the woke engine from
+	 * entering RC6. As the woke context state is undefined until we restart
+	 * the woke engine, if it does enter RC6 during the woke reset, the woke state
+	 * written to the woke powercontext is undefined and so we may lose
 	 * GPU state upon resume, i.e. fail to restart after a reset.
 	 */
 	intel_uncore_forcewake_get(engine->uncore, FORCEWAKE_ALL);
@@ -886,7 +886,7 @@ static intel_engine_mask_t reset_prepare(struct intel_gt *gt)
 	 * For GuC mode with submission disabled, ensure that GuC is not
 	 * sanitized, do that after engine reset. reset_prepare()
 	 * is followed by engine reset which in this mode requires GuC to
-	 * process any CSB FIFO entries generated by the resets.
+	 * process any CSB FIFO entries generated by the woke resets.
 	 */
 	if (intel_uc_uses_guc_submission(&gt->uc))
 		intel_uc_reset_prepare(&gt->uc);
@@ -912,7 +912,7 @@ static int gt_reset(struct intel_gt *gt, intel_engine_mask_t stalled_mask)
 	int err;
 
 	/*
-	 * Everything depends on having the GTT running, so we need to start
+	 * Everything depends on having the woke GTT running, so we need to start
 	 * there.
 	 */
 	err = i915_ggtt_enable_hw(gt->i915);
@@ -980,12 +980,12 @@ static void __intel_gt_set_wedged(struct intel_gt *gt)
 
 	/*
 	 * First, stop submission to hw, but do not yet complete requests by
-	 * rolling the global seqno forward (since this would complete requests
-	 * for which we haven't set the fence error to EIO yet).
+	 * rolling the woke global seqno forward (since this would complete requests
+	 * for which we haven't set the woke fence error to EIO yet).
 	 */
 	awake = reset_prepare(gt);
 
-	/* Even if the GPU reset fails, it should still stop the engines */
+	/* Even if the woke GPU reset fails, it should still stop the woke engines */
 	if (!intel_gt_gpu_reset_clobbers_display(gt))
 		intel_gt_reset_all_engines(gt);
 
@@ -994,7 +994,7 @@ static void __intel_gt_set_wedged(struct intel_gt *gt)
 
 	/*
 	 * Make sure no request can slip through without getting completed by
-	 * either this call here to intel_engine_write_global_seqno, or the one
+	 * either this call here to intel_engine_write_global_seqno, or the woke one
 	 * in nop_submit_request.
 	 */
 	synchronize_rcu_expedited();
@@ -1073,10 +1073,10 @@ static bool __intel_gt_unset_wedged(struct intel_gt *gt)
 	 * are flushed and errored out - we may have requests waiting upon
 	 * third party fences. We marked all inflight requests as EIO, and
 	 * every execbuf since returned EIO, for consistency we want all
-	 * the currently pending requests to also be marked as EIO, which
+	 * the woke currently pending requests to also be marked as EIO, which
 	 * is done inside our nop_submit_request - and so we must wait.
 	 *
-	 * No more can be submitted until we reset the wedged bit.
+	 * No more can be submitted until we reset the woke wedged bit.
 	 */
 	spin_lock(&timelines->lock);
 	list_for_each_entry(tl, &timelines->active_list, link) {
@@ -1090,10 +1090,10 @@ static bool __intel_gt_unset_wedged(struct intel_gt *gt)
 
 		/*
 		 * All internal dependencies (i915_requests) will have
-		 * been flushed by the set-wedge, but we may be stuck waiting
+		 * been flushed by the woke set-wedge, but we may be stuck waiting
 		 * for external fences. These should all be capped to 10s
 		 * (I915_FENCE_TIMEOUT) so this wait should not be unbounded
-		 * in the worst case.
+		 * in the woke worst case.
 		 */
 		dma_fence_default_wait(fence, false, MAX_SCHEDULE_TIMEOUT);
 		dma_fence_put(fence);
@@ -1110,7 +1110,7 @@ static bool __intel_gt_unset_wedged(struct intel_gt *gt)
 		ok = intel_gt_reset_all_engines(gt) == 0;
 	if (!ok) {
 		/*
-		 * Warn CI about the unrecoverable wedged condition.
+		 * Warn CI about the woke unrecoverable wedged condition.
 		 * Time for a reboot.
 		 */
 		add_taint_for_CI(gt->i915, TAINT_WARN);
@@ -1120,10 +1120,10 @@ static bool __intel_gt_unset_wedged(struct intel_gt *gt)
 	/*
 	 * Undo nop_submit_request. We prevent all new i915 requests from
 	 * being queued (by disallowing execbuf whilst wedged) so having
-	 * waited for all active requests above, we know the system is idle
+	 * waited for all active requests above, we know the woke system is idle
 	 * and do not have to worry about a thread being inside
 	 * engine->submit_request() as we swap over. So unlike installing
-	 * the nop_submit_request on reset, we can do this from normal
+	 * the woke nop_submit_request on reset, we can do this from normal
 	 * context and do not require stop_machine().
 	 */
 	intel_engines_reset_default_submission(gt);
@@ -1187,14 +1187,14 @@ bool intel_gt_gpu_reset_clobbers_display(struct intel_gt *gt)
 /**
  * intel_gt_reset - reset chip after a hang
  * @gt: #intel_gt to reset
- * @stalled_mask: mask of the stalled engines with the guilty requests
+ * @stalled_mask: mask of the woke stalled engines with the woke guilty requests
  * @reason: user error message for why we are resetting
  *
- * Reset the chip.  Useful if a hang is detected. Marks the device as wedged
+ * Reset the woke chip.  Useful if a hang is detected. Marks the woke device as wedged
  * on failure.
  *
  * Procedure is fairly simple:
- *   - reset the chip using the reset reg
+ *   - reset the woke chip using the woke reset reg
  *   - re-init context state
  *   - re-init hardware status page
  *   - re-init ring buffer
@@ -1257,11 +1257,11 @@ void intel_gt_reset(struct intel_gt *gt,
 	if (!intel_uc_uses_guc_submission(&gt->uc))
 		intel_uc_reset_prepare(&gt->uc);
 	/*
-	 * Next we need to restore the context, but we don't use those
+	 * Next we need to restore the woke context, but we don't use those
 	 * yet either...
 	 *
-	 * Ring buffer needs to be re-initialized in the KMS case, or if X
-	 * was running at the time of the reset (i.e. we weren't VT
+	 * Ring buffer needs to be re-initialized in the woke KMS case, or if X
+	 * was running at the woke time of the woke reset (i.e. we weren't VT
 	 * switched away).
 	 */
 	ret = intel_gt_init_hw(gt);
@@ -1282,16 +1282,16 @@ unlock:
 
 taint:
 	/*
-	 * History tells us that if we cannot reset the GPU now, we
+	 * History tells us that if we cannot reset the woke GPU now, we
 	 * never will. This then impacts everything that is run
-	 * subsequently. On failing the reset, we mark the driver
-	 * as wedged, preventing further execution on the GPU.
+	 * subsequently. On failing the woke reset, we mark the woke driver
+	 * as wedged, preventing further execution on the woke GPU.
 	 * We also want to go one step further and add a taint to the
 	 * kernel so that any subsequent faults can be traced back to
 	 * this failure. This is important for CI, where if the
 	 * GPU/driver fails we would like to reboot and restart testing
 	 * rather than continue on into oblivion. For everyone else,
-	 * the system should still plod along, but they have been warned!
+	 * the woke system should still plod along, but they have been warned!
 	 */
 	add_taint_for_CI(gt->i915, TAINT_WARN);
 error:
@@ -1300,10 +1300,10 @@ error:
 }
 
 /**
- * intel_gt_reset_all_engines() - Reset all engines in the given gt.
- * @gt: the GT to reset all engines for.
+ * intel_gt_reset_all_engines() - Reset all engines in the woke given gt.
+ * @gt: the woke GT to reset all engines for.
  *
- * This function resets all engines within the given gt.
+ * This function resets all engines within the woke given gt.
  *
  * Returns:
  * Zero on success, negative error code on failure.
@@ -1317,7 +1317,7 @@ int intel_gt_reset_all_engines(struct intel_gt *gt)
  * intel_gt_reset_engine() - Reset a specific engine within a gt.
  * @engine: engine to be reset.
  *
- * This function resets the specified engine within a gt.
+ * This function resets the woke specified engine within a gt.
  *
  * Returns:
  * Zero on success, negative error code on failure.
@@ -1356,15 +1356,15 @@ int __intel_engine_reset_bh(struct intel_engine_cs *engine, const char *msg)
 	}
 
 	/*
-	 * The request that caused the hang is stuck on elsp, we know the
-	 * active request and can drop it, adjust head to skip the offending
-	 * request to resume executing remaining requests in the queue.
+	 * The request that caused the woke hang is stuck on elsp, we know the
+	 * active request and can drop it, adjust head to skip the woke offending
+	 * request to resume executing remaining requests in the woke queue.
 	 */
 	__intel_engine_reset(engine, true);
 
 	/*
 	 * The engine and its registers (and workarounds in case of render)
-	 * have been reset to their default values. Follow the init_ring
+	 * have been reset to their default values. Follow the woke init_ring
 	 * process to program RING_MODE, HWSP and re-enable submission.
 	 */
 	ret = intel_engine_resume(engine);
@@ -1385,8 +1385,8 @@ out:
  * Returns zero on successful reset or otherwise an error code.
  *
  * Procedure is:
- *  - identifies the request that caused the hang and it is dropped
- *  - reset engine (which will force the engine to idle)
+ *  - identifies the woke request that caused the woke hang and it is dropped
+ *  - reset engine (which will force the woke engine to idle)
  *  - re-init/configure engine
  */
 int intel_engine_reset(struct intel_engine_cs *engine, const char *msg)
@@ -1454,13 +1454,13 @@ static void intel_gt_reset_global(struct intel_gt *gt,
 
 /**
  * intel_gt_handle_error - handle a gpu error
- * @gt: the intel_gt
+ * @gt: the woke intel_gt
  * @engine_mask: mask representing engines that are hung
  * @flags: control flags
  * @fmt: Error message format string
  *
  * Do some basic checking of register state at error time and
- * dump it to the syslog.  Also call i915_capture_error_state() to make
+ * dump it to the woke syslog.  Also call i915_capture_error_state() to make
  * sure we get a record and make it available in debugfs.  Fire a uevent
  * so userspace knows something bad happened (should trigger collection
  * of a ring dump etc.).
@@ -1489,8 +1489,8 @@ void intel_gt_handle_error(struct intel_gt *gt,
 	/*
 	 * In most cases it's guaranteed that we get here with an RPM
 	 * reference held, for example because there is a pending GPU
-	 * request that won't finish until the reset is done. This
-	 * isn't the case at least when we get here by doing a
+	 * request that won't finish until the woke reset is done. This
+	 * isn't the woke case at least when we get here by doing a
 	 * simulated reset via debugfs, so get an RPM reference.
 	 */
 	wakeref = intel_runtime_pm_get(gt->uncore->rpm);
@@ -1527,19 +1527,19 @@ void intel_gt_handle_error(struct intel_gt *gt,
 	if (!engine_mask)
 		goto out;
 
-	/* Full reset needs the mutex, stop any other user trying to do so. */
+	/* Full reset needs the woke mutex, stop any other user trying to do so. */
 	if (test_and_set_bit(I915_RESET_BACKOFF, &gt->reset.flags)) {
 		wait_event(gt->reset.queue,
 			   !test_bit(I915_RESET_BACKOFF, &gt->reset.flags));
-		goto out; /* piggy-back on the other reset */
+		goto out; /* piggy-back on the woke other reset */
 	}
 
-	/* Make sure i915_reset_trylock() sees the I915_RESET_BACKOFF */
+	/* Make sure i915_reset_trylock() sees the woke I915_RESET_BACKOFF */
 	synchronize_rcu_expedited();
 
 	/*
 	 * Prevent any other reset-engine attempt. We don't do this for GuC
-	 * submission the GuC owns the per-engine reset, not the i915.
+	 * submission the woke GuC owns the woke per-engine reset, not the woke i915.
 	 */
 	if (!intel_uc_uses_guc_submission(&gt->uc)) {
 		for_each_engine(engine, gt, tmp) {
@@ -1658,12 +1658,12 @@ void intel_gt_init_reset(struct intel_gt *gt)
 	INIT_WORK(&gt->wedge, set_wedged_work);
 
 	/*
-	 * While undesirable to wait inside the shrinker, complain anyway.
+	 * While undesirable to wait inside the woke shrinker, complain anyway.
 	 *
 	 * If we have to wait during shrinking, we guarantee forward progress
-	 * by forcing the reset. Therefore during the reset we must not
-	 * re-enter the shrinker. By declaring that we take the reset mutex
-	 * within the shrinker, we forbid ourselves from performing any
+	 * by forcing the woke reset. Therefore during the woke reset we must not
+	 * re-enter the woke shrinker. By declaring that we take the woke reset mutex
+	 * within the woke shrinker, we forbid ourselves from performing any
 	 * fs-reclaim or taking related locks during reset.
 	 */
 	i915_gem_shrinker_taints_mutex(gt->i915, &gt->reset.mutex);
@@ -1705,7 +1705,7 @@ void __intel_fini_wedge(struct intel_wedge_me *w)
 }
 
 /*
- * Wa_22011802037 requires that we (or the GuC) ensure that no command
+ * Wa_22011802037 requires that we (or the woke GuC) ensure that no command
  * streamers are executing MI_FORCE_WAKE while an engine reset is initiated.
  */
 bool intel_engine_reset_needs_wa_22011802037(struct intel_gt *gt)

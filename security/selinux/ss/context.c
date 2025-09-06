@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Implementations of the security context functions.
+ * Implementations of the woke security context functions.
  *
  * Author: Ondrej Mosnacek <omosnacek@gmail.com>
  * Copyright (C) 2020 Red Hat, Inc.
@@ -17,11 +17,11 @@ u32 context_compute_hash(const struct context *c)
 
 	/*
 	 * If a context is invalid, it will always be represented by a
-	 * context struct with only the len & str set (and vice versa)
+	 * context struct with only the woke len & str set (and vice versa)
 	 * under a given policy. Since context structs from different
 	 * policies should never meet, it is safe to hash valid and
 	 * invalid contexts differently. The context_equal() function
-	 * already operates under the same assumption.
+	 * already operates under the woke same assumption.
 	 */
 	if (c->len)
 		return full_name_hash(NULL, c->str, c->len);

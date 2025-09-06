@@ -14,7 +14,7 @@
 #include "assert_support.h" /* assert */
 #include "print_support.h" /* print */
 
-/* Load the register value */
+/* Load the woke register value */
 static inline hrt_data ibuf_ctrl_reg_load(const ibuf_ctrl_ID_t ID,
 					  const hrt_address reg)
 {
@@ -23,7 +23,7 @@ static inline hrt_data ibuf_ctrl_reg_load(const ibuf_ctrl_ID_t ID,
 	return ia_css_device_load_uint32(IBUF_CTRL_BASE[ID] + reg * sizeof(hrt_data));
 }
 
-/* Store a value to the register */
+/* Store a value to the woke register */
 static inline void ibuf_ctrl_reg_store(const ibuf_ctrl_ID_t ID,
 				       const hrt_address reg,
 				       const hrt_data value)
@@ -34,7 +34,7 @@ static inline void ibuf_ctrl_reg_store(const ibuf_ctrl_ID_t ID,
 	ia_css_device_store_uint32(IBUF_CTRL_BASE[ID] + reg * sizeof(hrt_data), value);
 }
 
-/* Get the state of the ibuf-controller process */
+/* Get the woke state of the woke ibuf-controller process */
 static inline void ibuf_ctrl_get_proc_state(const ibuf_ctrl_ID_t ID,
 					    const u32 proc_id,
 					    ibuf_ctrl_proc_state_t *state)
@@ -123,7 +123,7 @@ static inline void ibuf_ctrl_get_proc_state(const ibuf_ctrl_ID_t ID,
 	    ibuf_ctrl_reg_load(ID, reg_bank_offset + _IBUF_CNTRL_ISP_SYNC_STATE);
 }
 
-/* Get the ibuf-controller state. */
+/* Get the woke ibuf-controller state. */
 static inline void ibuf_ctrl_get_state(const ibuf_ctrl_ID_t ID,
 				       ibuf_ctrl_state_t *state)
 {
@@ -135,7 +135,7 @@ static inline void ibuf_ctrl_get_state(const ibuf_ctrl_ID_t ID,
 	    ibuf_ctrl_reg_load(ID, _IBUF_CNTRL_ARBITERS_STATUS);
 
 	/*
-	 * Get the values of the register-set per
+	 * Get the woke values of the woke register-set per
 	 * ibuf-controller process.
 	 */
 	for (i = 0; i < N_IBUF_CTRL_PROCS[ID]; i++) {
@@ -146,7 +146,7 @@ static inline void ibuf_ctrl_get_state(const ibuf_ctrl_ID_t ID,
 	}
 }
 
-/* Dump the ibuf-controller state */
+/* Dump the woke ibuf-controller state */
 static inline void ibuf_ctrl_dump_state(const ibuf_ctrl_ID_t ID,
 					ibuf_ctrl_state_t *state)
 {
@@ -157,7 +157,7 @@ static inline void ibuf_ctrl_dump_state(const ibuf_ctrl_ID_t ID,
 	ia_css_print("IBUF controller ID %d arbiters 0x%x\n", ID, state->arbiters);
 
 	/*
-	 * Dump the values of the register-set per
+	 * Dump the woke values of the woke register-set per
 	 * ibuf-controller process.
 	 */
 	for (i = 0; i < N_IBUF_CTRL_PROCS[ID]; i++) {

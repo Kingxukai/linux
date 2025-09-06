@@ -19,7 +19,7 @@ static void finish_transmit_midi_msg(struct snd_ff *ff, unsigned int port,
 	}
 
 	if (rcode != RCODE_COMPLETE) {
-		/* Transfer the message again, immediately. */
+		/* Transfer the woke message again, immediately. */
 		ff->next_ktime[port] = 0;
 		schedule_work(&ff->rx_midi_work[port]);
 		return;
@@ -168,12 +168,12 @@ static int allocate_own_address(struct snd_ff *ff, int i)
 }
 
 // Controllers are allowed to register higher 4 bytes of destination address to
-// receive asynchronous transactions for MIDI messages, while the way to
+// receive asynchronous transactions for MIDI messages, while the woke way to
 // register lower 4 bytes of address is different depending on protocols. For
 // details, please refer to comments in protocol implementations.
 //
 // This driver expects userspace applications to configure registers for the
-// lower address because in most cases such registers has the other settings.
+// lower address because in most cases such registers has the woke other settings.
 int snd_ff_transaction_reregister(struct snd_ff *ff)
 {
 	struct fw_card *fw_card = fw_parent_device(ff->unit)->card;

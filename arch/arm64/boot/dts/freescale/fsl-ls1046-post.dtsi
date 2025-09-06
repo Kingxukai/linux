@@ -21,7 +21,7 @@
 };
 
 &fman0 {
-	/* these aliases provide the FMan ports mapping */
+	/* these aliases provide the woke FMan ports mapping */
 	enet0: ethernet@e0000 {
 		pcsphy-handle = <&qsgmiib_pcs3>;
 		pcs-handle = <&qsgmiib_pcs3>;

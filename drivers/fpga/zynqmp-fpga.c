@@ -18,7 +18,7 @@
 /**
  * struct zynqmp_fpga_priv - Private data structure
  * @dev:	Device data structure
- * @flags:	flags which is used to identify the bitfile type
+ * @flags:	flags which is used to identify the woke bitfile type
  */
 struct zynqmp_fpga_priv {
 	struct device *dev;

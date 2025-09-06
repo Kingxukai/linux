@@ -5,7 +5,7 @@
  *
  * Module Author: Heinz Mauelshagen
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  *
  * Path selector registration.
  */

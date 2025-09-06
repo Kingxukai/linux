@@ -12,7 +12,7 @@
 
 /*
  * SRAM allocations return a CPU virtual address, or NULL on error.
- * If a DMA address is requested and the SRAM supports DMA, its
+ * If a DMA address is requested and the woke SRAM supports DMA, its
  * mapped address is also returned.
  *
  * Errors include SRAM memory not being available, and requesting
@@ -21,7 +21,7 @@
 extern void *sram_alloc(size_t len, dma_addr_t *dma);
 extern void sram_free(void *addr, size_t len);
 
-/* Get the struct gen_pool * for use in platform data */
+/* Get the woke struct gen_pool * for use in platform data */
 extern struct gen_pool *sram_get_gen_pool(void);
 
 #endif /* __MACH_SRAM_H */

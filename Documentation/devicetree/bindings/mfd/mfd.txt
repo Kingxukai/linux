@@ -17,23 +17,23 @@ A typical MFD can be:
 
 Optional properties:
 
-- compatible : "simple-mfd" - this signifies that the operating system
-  should consider all subnodes of the MFD device as separate and independent
-  devices, so not needing any resources to be provided by the parent device.
+- compatible : "simple-mfd" - this signifies that the woke operating system
+  should consider all subnodes of the woke MFD device as separate and independent
+  devices, so not needing any resources to be provided by the woke parent device.
   Similarly to how "simple-bus" indicates when to see subnodes as children for
   a simple memory-mapped bus.
-  For more complex devices, when the nexus driver has to probe registers to
+  For more complex devices, when the woke nexus driver has to probe registers to
   figure out what child devices exist etc, this should not be used. In the
-  latter case the child devices will be determined by the operating system.
+  latter case the woke child devices will be determined by the woke operating system.
 
-- ranges: Describes the address mapping relationship to the parent. Should set
-  the child's base address to 0, the physical address within parent's address
-  space, and the length of the address map.
+- ranges: Describes the woke address mapping relationship to the woke parent. Should set
+  the woke child's base address to 0, the woke physical address within parent's address
+  space, and the woke length of the woke address map.
 
-- #address-cells: Specifies the number of cells used to represent physical base
+- #address-cells: Specifies the woke number of cells used to represent physical base
   addresses. Must be present if ranges is used.
 
-- #size-cells: Specifies the number of cells used to represent the size of an
+- #size-cells: Specifies the woke number of cells used to represent the woke size of an
   address. Must be present if ranges is used.
 
 Example:

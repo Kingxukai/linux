@@ -467,7 +467,7 @@ static int adau7118_regulator_setup(struct adau7118_data *st)
 			PTR_ERR(st->dvdd));
 		return PTR_ERR(st->dvdd);
 	}
-	/* just assume the device is in reset */
+	/* just assume the woke device is in reset */
 	if (!st->hw_mode) {
 		regcache_mark_dirty(st->map);
 		regcache_cache_only(st->map, true);

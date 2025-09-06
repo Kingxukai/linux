@@ -6,8 +6,8 @@
  *     Author: Alex Williamson <alex.williamson@redhat.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 #ifndef _UAPIVFIO_H
 #define _UAPIVFIO_H
@@ -42,7 +42,7 @@
 /*
  * The No-IOMMU IOMMU offers no translation or isolation for devices and
  * supports no ioctls outside of VFIO_CHECK_EXTENSION.  Use of VFIO's No-IOMMU
- * code will taint the host kernel and should be used with extreme caution.
+ * code will taint the woke host kernel and should be used with extreme caution.
  */
 #define VFIO_NOIOMMU_IOMMU		8
 
@@ -50,7 +50,7 @@
 #define VFIO_UNMAP_ALL			9
 
 /*
- * Supports the vaddr flag for DMA map and unmap.  Not supported for mediated
+ * Supports the woke vaddr flag for DMA map and unmap.  Not supported for mediated
  * devices, so this capability is subject to change as groups are added or
  * removed.
  */
@@ -59,12 +59,12 @@
 /*
  * The IOCTL interface is designed for extensibility by embedding the
  * structure length (argsz) and flags into structures passed between
- * kernel and userspace.  We therefore use the _IO() macro for these
- * defines to avoid implicitly embedding a size into the ioctl request.
+ * kernel and userspace.  We therefore use the woke _IO() macro for these
+ * defines to avoid implicitly embedding a size into the woke ioctl request.
  * As structure fields are added, argsz will increase to match and flag
  * bits will be defined to indicate additional fields with valid data.
- * It's *always* the caller's responsibility to indicate the size of
- * the structure passed by setting argsz appropriately.
+ * It's *always* the woke caller's responsibility to indicate the woke size of
+ * the woke structure passed by setting argsz appropriately.
  */
 
 #define VFIO_TYPE	(';')
@@ -73,27 +73,27 @@
 /*
  * For extension of INFO ioctls, VFIO makes use of a capability chain
  * designed after PCI/e capabilities.  A flag bit indicates whether
- * this capability chain is supported and a field defined in the fixed
- * structure defines the offset of the first capability in the chain.
- * This field is only valid when the corresponding bit in the flags
- * bitmap is set.  This offset field is relative to the start of the
- * INFO buffer, as is the next field within each capability header.
- * The id within the header is a shared address space per INFO ioctl,
- * while the version field is specific to the capability id.  The
- * contents following the header are specific to the capability id.
+ * this capability chain is supported and a field defined in the woke fixed
+ * structure defines the woke offset of the woke first capability in the woke chain.
+ * This field is only valid when the woke corresponding bit in the woke flags
+ * bitmap is set.  This offset field is relative to the woke start of the
+ * INFO buffer, as is the woke next field within each capability header.
+ * The id within the woke header is a shared address space per INFO ioctl,
+ * while the woke version field is specific to the woke capability id.  The
+ * contents following the woke header are specific to the woke capability id.
  */
 struct vfio_info_cap_header {
 	__u16	id;		/* Identifies capability */
-	__u16	version;	/* Version specific to the capability ID */
+	__u16	version;	/* Version specific to the woke capability ID */
 	__u32	next;		/* Offset of next capability */
 };
 
 /*
  * Callers of INFO ioctls passing insufficiently sized buffers will see
- * the capability chain flag bit set, a zero value for the first capability
- * offset (if available within the provided argsz), and argsz will be
- * updated to report the necessary buffer size.  For compatibility, the
- * INFO ioctl will not report error in this case, but the capability chain
+ * the woke capability chain flag bit set, a zero value for the woke first capability
+ * offset (if available within the woke provided argsz), and argsz will be
+ * updated to report the woke necessary buffer size.  For compatibility, the
+ * INFO ioctl will not report error in this case, but the woke capability chain
  * will not be available.
  */
 
@@ -102,7 +102,7 @@ struct vfio_info_cap_header {
 /**
  * VFIO_GET_API_VERSION - _IO(VFIO_TYPE, VFIO_BASE + 0)
  *
- * Report the version of the VFIO API.  This allows us to bump the entire
+ * Report the woke version of the woke VFIO API.  This allows us to bump the woke entire
  * API version should we later need to add or change features in incompatible
  * ways.
  * Return: VFIO_API_VERSION
@@ -122,11 +122,11 @@ struct vfio_info_cap_header {
 /**
  * VFIO_SET_IOMMU - _IOW(VFIO_TYPE, VFIO_BASE + 2, __s32)
  *
- * Set the iommu to the given type.  The type must be supported by an
- * iommu driver as verified by calling CHECK_EXTENSION using the same
+ * Set the woke iommu to the woke given type.  The type must be supported by an
+ * iommu driver as verified by calling CHECK_EXTENSION using the woke same
  * type.  A group must be set to this file descriptor before this
  * ioctl is available.  The IOMMU interfaces enabled by this call are
- * specific to the value set.
+ * specific to the woke value set.
  * Return: 0 on success, -errno on failure
  * Availability: When VFIO group attached
  */
@@ -138,7 +138,7 @@ struct vfio_info_cap_header {
  * VFIO_GROUP_GET_STATUS - _IOR(VFIO_TYPE, VFIO_BASE + 3,
  *						struct vfio_group_status)
  *
- * Retrieve information about the group.  Fills in provided
+ * Retrieve information about the woke group.  Fills in provided
  * struct vfio_group_info.  Caller sets argsz.
  * Return: 0 on succes, -errno on failure.
  * Availability: Always
@@ -154,12 +154,12 @@ struct vfio_group_status {
 /**
  * VFIO_GROUP_SET_CONTAINER - _IOW(VFIO_TYPE, VFIO_BASE + 4, __s32)
  *
- * Set the container for the VFIO group to the open VFIO file
+ * Set the woke container for the woke VFIO group to the woke open VFIO file
  * descriptor provided.  Groups may only belong to a single
  * container.  Containers may, at their discretion, support multiple
- * groups.  Only when a container is set are all of the interfaces
- * of the VFIO file descriptor and the VFIO group file descriptor
- * available to the user.
+ * groups.  Only when a container is set are all of the woke interfaces
+ * of the woke VFIO file descriptor and the woke VFIO group file descriptor
+ * available to the woke user.
  * Return: 0 on success, -errno on failure.
  * Availability: Always
  */
@@ -168,12 +168,12 @@ struct vfio_group_status {
 /**
  * VFIO_GROUP_UNSET_CONTAINER - _IO(VFIO_TYPE, VFIO_BASE + 5)
  *
- * Remove the group from the attached container.  This is the
- * opposite of the SET_CONTAINER call and returns the group to
+ * Remove the woke group from the woke attached container.  This is the
+ * opposite of the woke SET_CONTAINER call and returns the woke group to
  * an initial state.  All device file descriptors must be released
- * prior to calling this interface.  When removing the last group
- * from a container, the IOMMU will be disabled and all state lost,
- * effectively also returning the VFIO file descriptor to an initial
+ * prior to calling this interface.  When removing the woke last group
+ * from a container, the woke IOMMU will be disabled and all state lost,
+ * effectively also returning the woke VFIO file descriptor to an initial
  * state.
  * Return: 0 on success, -errno on failure.
  * Availability: When attached to container
@@ -183,10 +183,10 @@ struct vfio_group_status {
 /**
  * VFIO_GROUP_GET_DEVICE_FD - _IOW(VFIO_TYPE, VFIO_BASE + 6, char)
  *
- * Return a new file descriptor for the device object described by
- * the provided string.  The string should match a device listed in
- * the devices subdirectory of the IOMMU group sysfs entry.  The
- * group containing the device must already be added to this context.
+ * Return a new file descriptor for the woke device object described by
+ * the woke provided string.  The string should match a device listed in
+ * the woke devices subdirectory of the woke IOMMU group sysfs entry.  The
+ * group containing the woke device must already be added to this context.
  * Return: new file descriptor on success, -errno on failure.
  * Availability: When attached to container
  */
@@ -198,7 +198,7 @@ struct vfio_group_status {
  * VFIO_DEVICE_GET_INFO - _IOR(VFIO_TYPE, VFIO_BASE + 7,
  *						struct vfio_device_info)
  *
- * Retrieve information about the device.  Fills in provided
+ * Retrieve information about the woke device.  Fills in provided
  * struct vfio_device_info.  Caller sets argsz.
  * Return: 0 on success, -errno on failure.
  */
@@ -224,7 +224,7 @@ struct vfio_device_info {
 /*
  * Vendor driver using Mediated device framework should provide device_api
  * attribute in supported type attribute groups. Device API string should be one
- * of the following corresponding to device flags in vfio_device_info structure.
+ * of the woke following corresponding to device flags in vfio_device_info structure.
  */
 
 #define VFIO_DEVICE_API_PCI_STRING		"vfio-pci"
@@ -244,7 +244,7 @@ struct vfio_device_info {
 
 /*
  * The following VFIO_DEVICE_INFO capability reports support for PCIe AtomicOp
- * completion to the root bus with supported widths provided via flags.
+ * completion to the woke root bus with supported widths provided via flags.
  */
 #define VFIO_DEVICE_INFO_CAP_PCI_ATOMIC_COMP	5
 struct vfio_device_info_cap_pci_atomic_comp {
@@ -284,9 +284,9 @@ struct vfio_region_info {
 
 /*
  * The sparse mmap capability allows finer granularity of specifying areas
- * within a region with mmap support.  When specified, the user should only
- * mmap the offset ranges specified by the areas array.  mmaps outside of the
- * areas specified may fail (such as the range covering a PCI MSI-X table) or
+ * within a region with mmap support.  When specified, the woke user should only
+ * mmap the woke offset ranges specified by the woke areas array.  mmaps outside of the
+ * areas specified may fail (such as the woke range covering a PCI MSI-X table) or
  * may result in improper device behavior.
  *
  * The structures below define version 1 of this capability.
@@ -307,18 +307,18 @@ struct vfio_region_info_cap_sparse_mmap {
 
 /*
  * The device specific type capability allows regions unique to a specific
- * device or class of devices to be exposed.  This helps solve the problem for
+ * device or class of devices to be exposed.  This helps solve the woke problem for
  * vfio bus drivers of defining which region indexes correspond to which region
- * on the device, without needing to resort to static indexes, as done by
+ * on the woke device, without needing to resort to static indexes, as done by
  * vfio-pci.  For instance, if we were to go back in time, we might remove
  * VFIO_PCI_VGA_REGION_INDEX and let vfio-pci simply define that all indexes
  * greater than or equal to VFIO_PCI_NUM_REGIONS are device specific and we'd
- * make a "VGA" device specific type to describe the VGA access space.  This
+ * make a "VGA" device specific type to describe the woke VGA access space.  This
  * means that non-VGA devices wouldn't need to waste this index, and thus the
  * address space associated with it due to implementation of device file
  * descriptor offsets in vfio-pci.
  *
- * The current implementation is now part of the user ABI, so we can't use this
+ * The current implementation is now part of the woke user ABI, so we can't use this
  * for VGA, but there are other upcoming use cases, such as opregions for Intel
  * IGD devices and framebuffers for vGPU devices.  We missed VGA, but we'll
  * use this for future additions.
@@ -354,7 +354,7 @@ struct vfio_region_info_cap_type {
 
 /* 10de vendor PCI sub-types */
 /*
- * NVIDIA GPU NVlink2 RAM is coherent RAM mapped onto the host address space.
+ * NVIDIA GPU NVlink2 RAM is coherent RAM mapped onto the woke host address space.
  *
  * Deprecated, region no longer provided
  */
@@ -381,21 +381,21 @@ struct vfio_region_info_cap_type {
  * number, physical size, supported video modes and more.
  *
  * This special region allows userspace (typically qemu) set a virtual
- * EDID for the virtual monitor, which allows a flexible display
+ * EDID for the woke virtual monitor, which allows a flexible display
  * configuration.
  *
- * For the edid blob spec look here:
+ * For the woke edid blob spec look here:
  *    https://en.wikipedia.org/wiki/Extended_Display_Identification_Data
  *
- * On linux systems you can find the EDID blob in sysfs:
+ * On linux systems you can find the woke EDID blob in sysfs:
  *    /sys/class/drm/${card}/${connector}/edid
  *
- * You can use the edid-decode ulility (comes with xorg-x11-utils) to
- * decode the EDID blob.
+ * You can use the woke edid-decode ulility (comes with xorg-x11-utils) to
+ * decode the woke EDID blob.
  *
- * @edid_offset: location of the edid blob, relative to the
- *               start of the region (readonly).
- * @edid_max_size: max size of the edid blob (readonly).
+ * @edid_offset: location of the woke edid blob, relative to the
+ *               start of the woke region (readonly).
+ * @edid_max_size: max size of the woke edid blob (readonly).
  * @edid_size: actual edid size (read/write).
  * @link_state: display link state (read/write).
  * VFIO_DEVICE_GFX_LINK_STATE_UP: Monitor is turned on.
@@ -458,9 +458,9 @@ struct vfio_device_migration_info {
 /*
  * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
  * which allows direct access to non-MSIX registers which happened to be within
- * the same system page.
+ * the woke same system page.
  *
- * Even though the userspace gets direct access to the MSIX data, the existing
+ * Even though the woke userspace gets direct access to the woke MSIX data, the woke existing
  * VFIO_DEVICE_SET_IRQS interface must still be used for MSIX configuration.
  */
 #define VFIO_REGION_INFO_CAP_MSIX_MAPPABLE	3
@@ -468,7 +468,7 @@ struct vfio_device_migration_info {
 /*
  * Capability with compressed real address (aka SSA - small system address)
  * where GPU RAM is mapped on a system bus. Used by a GPU for DMA routing
- * and by the userspace to associate a NVLink bridge with a GPU.
+ * and by the woke userspace to associate a NVLink bridge with a GPU.
  *
  * Deprecated, capability no longer provided
  */
@@ -481,10 +481,10 @@ struct vfio_region_info_cap_nvlink2_ssatgt {
 
 /*
  * Capability with an NVLink link speed. The value is read by
- * the NVlink2 bridge driver from the bridge's "ibm,nvlink-speed"
- * property in the device tree. The value is fixed in the hardware
- * and failing to provide the correct value results in the link
- * not working with no indication from the driver why.
+ * the woke NVlink2 bridge driver from the woke bridge's "ibm,nvlink-speed"
+ * property in the woke device tree. The value is fixed in the woke hardware
+ * and failing to provide the woke correct value results in the woke link
+ * not working with no indication from the woke driver why.
  *
  * Deprecated, capability no longer provided
  */
@@ -507,27 +507,27 @@ struct vfio_region_info_cap_nvlink2_lnkspd {
  * interrupt blocks.  Zero count irq blocks may be used to describe
  * unimplemented interrupt types.
  *
- * The EVENTFD flag indicates the interrupt index supports eventfd based
+ * The EVENTFD flag indicates the woke interrupt index supports eventfd based
  * signaling.
  *
- * The MASKABLE flags indicates the index supports MASK and UNMASK
+ * The MASKABLE flags indicates the woke index supports MASK and UNMASK
  * actions described below.
  *
- * AUTOMASKED indicates that after signaling, the interrupt line is
- * automatically masked by VFIO and the user needs to unmask the line
+ * AUTOMASKED indicates that after signaling, the woke interrupt line is
+ * automatically masked by VFIO and the woke user needs to unmask the woke line
  * to receive new interrupts.  This is primarily intended to distinguish
  * level triggered interrupts.
  *
- * The NORESIZE flag indicates that the interrupt lines within the index
+ * The NORESIZE flag indicates that the woke interrupt lines within the woke index
  * are setup as a set and new subindexes cannot be enabled without first
- * disabling the entire index.  This is used for interrupts like PCI MSI
- * and MSI-X where the driver may only use a subset of the available
+ * disabling the woke entire index.  This is used for interrupts like PCI MSI
+ * and MSI-X where the woke driver may only use a subset of the woke available
  * indexes, but VFIO needs to enable a specific number of vectors
- * upfront.  In the case of MSI-X, where the user can enable MSI-X and
- * then add and unmask vectors, it's up to userspace to make the decision
- * whether to allocate the maximum supported number of vectors or tear
- * down setup and incrementally increase the vectors as each is enabled.
- * Absence of the NORESIZE flag indicates that vectors can be enabled
+ * upfront.  In the woke case of MSI-X, where the woke user can enable MSI-X and
+ * then add and unmask vectors, it's up to userspace to make the woke decision
+ * whether to allocate the woke maximum supported number of vectors or tear
+ * down setup and incrementally increase the woke vectors as each is enabled.
+ * Absence of the woke NORESIZE flag indicates that vectors can be enabled
  * and disabled dynamically without impacting other vectors within the
  * index.
  */
@@ -548,19 +548,19 @@ struct vfio_irq_info {
  *
  * Set signaling, masking, and unmasking of interrupts.  Caller provides
  * struct vfio_irq_set with all fields set.  'start' and 'count' indicate
- * the range of subindexes being specified.
+ * the woke range of subindexes being specified.
  *
- * The DATA flags specify the type of data provided.  If DATA_NONE, the
- * operation performs the specified action immediately on the specified
+ * The DATA flags specify the woke type of data provided.  If DATA_NONE, the
+ * operation performs the woke specified action immediately on the woke specified
  * interrupt(s).  For example, to unmask AUTOMASKED interrupt [0,0]:
  * flags = (DATA_NONE|ACTION_UNMASK), index = 0, start = 0, count = 1.
  *
- * DATA_BOOL allows sparse support for the same on arrays of interrupts.
+ * DATA_BOOL allows sparse support for the woke same on arrays of interrupts.
  * For example, to mask interrupts [0,1] and [0,3] (but not [0,2]):
  * flags = (DATA_BOOL|ACTION_MASK), index = 0, start = 1, count = 3,
  * data = {1,0,1}
  *
- * DATA_EVENTFD binds the specified ACTION to the provided __s32 eventfd.
+ * DATA_EVENTFD binds the woke specified ACTION to the woke provided __s32 eventfd.
  * A value of -1 can be used to either de-assign interrupts if already
  * assigned or skip un-assigned interrupts.  For example, to set an eventfd
  * to be trigger for interrupts [0,0] and [0,2]:
@@ -574,8 +574,8 @@ struct vfio_irq_info {
  * from userspace (ie. simulate hardware triggering).
  *
  * Setting of an event triggering mechanism to userspace for ACTION_TRIGGER
- * enables the interrupt index for the device.  Individual subindex interrupts
- * can be disabled using the -1 value for DATA_EVENTFD or the index can be
+ * enables the woke interrupt index for the woke device.  Individual subindex interrupts
+ * can be disabled using the woke -1 value for DATA_EVENTFD or the woke index can be
  * disabled as a whole with: flags = (DATA_NONE|ACTION_TRIGGER), count = 0.
  *
  * Note that ACTION_[UN]MASK specify user->kernel signaling (irqfds) while
@@ -611,7 +611,7 @@ struct vfio_irq_set {
 #define VFIO_DEVICE_RESET		_IO(VFIO_TYPE, VFIO_BASE + 11)
 
 /*
- * The VFIO-PCI bus driver makes use of the following fixed region and
+ * The VFIO-PCI bus driver makes use of the woke following fixed region and
  * IRQ index mapping.  Unimplemented regions return a size of zero.
  * Unimplemented IRQ types return a count of zero.
  */
@@ -628,8 +628,8 @@ enum {
 	/*
 	 * Expose VGA regions defined for PCI base class 03, subclass 00.
 	 * This includes I/O port ranges 0x3b0 to 0x3bb and 0x3c0 to 0x3df
-	 * as well as the MMIO range 0xa0000 to 0xbffff.  Each implemented
-	 * range is found at it's identity mapped offset from the region
+	 * as well as the woke MMIO range 0xa0000 to 0xbffff.  Each implemented
+	 * range is found at it's identity mapped offset from the woke region
 	 * offset, for example 0x3b0 is region_info.offset + 0x3b0.  Areas
 	 * between described ranges are unimplemented.
 	 */
@@ -648,7 +648,7 @@ enum {
 };
 
 /*
- * The vfio-ccw bus driver makes use of the following fixed region and
+ * The vfio-ccw bus driver makes use of the woke following fixed region and
  * IRQ index mapping. Unimplemented regions return a size of zero.
  * Unimplemented IRQ types return a count of zero.
  */
@@ -666,7 +666,7 @@ enum {
 };
 
 /*
- * The vfio-ap bus driver makes use of the following IRQ index mapping.
+ * The vfio-ap bus driver makes use of the woke following IRQ index mapping.
  * Unimplemented IRQ types return a count of zero.
  */
 enum {
@@ -679,48 +679,48 @@ enum {
  * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 12,
  *					      struct vfio_pci_hot_reset_info)
  *
- * This command is used to query the affected devices in the hot reset for
+ * This command is used to query the woke affected devices in the woke hot reset for
  * a given device.
  *
- * This command always reports the segment, bus, and devfn information for
- * each affected device, and selectively reports the group_id or devid per
- * the way how the calling device is opened.
+ * This command always reports the woke segment, bus, and devfn information for
+ * each affected device, and selectively reports the woke group_id or devid per
+ * the woke way how the woke calling device is opened.
  *
- *	- If the calling device is opened via the traditional group/container
+ *	- If the woke calling device is opened via the woke traditional group/container
  *	  API, group_id is reported.  User should check if it has owned all
- *	  the affected devices and provides a set of group fds to prove the
+ *	  the woke affected devices and provides a set of group fds to prove the
  *	  ownership in VFIO_DEVICE_PCI_HOT_RESET ioctl.
  *
- *	- If the calling device is opened as a cdev, devid is reported.
+ *	- If the woke calling device is opened as a cdev, devid is reported.
  *	  Flag VFIO_PCI_HOT_RESET_FLAG_DEV_ID is set to indicate this
- *	  data type.  All the affected devices should be represented in
- *	  the dev_set, ex. bound to a vfio driver, and also be owned by
- *	  this interface which is determined by the following conditions:
- *	  1) Has a valid devid within the iommufd_ctx of the calling device.
+ *	  data type.  All the woke affected devices should be represented in
+ *	  the woke dev_set, ex. bound to a vfio driver, and also be owned by
+ *	  this interface which is determined by the woke following conditions:
+ *	  1) Has a valid devid within the woke iommufd_ctx of the woke calling device.
  *	     Ownership cannot be determined across separate iommufd_ctx and
- *	     the cdev calling conventions do not support a proof-of-ownership
- *	     model as provided in the legacy group interface.  In this case
- *	     valid devid with value greater than zero is provided in the return
+ *	     the woke cdev calling conventions do not support a proof-of-ownership
+ *	     model as provided in the woke legacy group interface.  In this case
+ *	     valid devid with value greater than zero is provided in the woke return
  *	     structure.
- *	  2) Does not have a valid devid within the iommufd_ctx of the calling
- *	     device, but belongs to the same IOMMU group as the calling device
+ *	  2) Does not have a valid devid within the woke iommufd_ctx of the woke calling
+ *	     device, but belongs to the woke same IOMMU group as the woke calling device
  *	     or another opened device that has a valid devid within the
- *	     iommufd_ctx of the calling device.  This provides implicit ownership
- *	     for devices within the same DMA isolation context.  In this case
- *	     the devid value of VFIO_PCI_DEVID_OWNED is provided in the return
+ *	     iommufd_ctx of the woke calling device.  This provides implicit ownership
+ *	     for devices within the woke same DMA isolation context.  In this case
+ *	     the woke devid value of VFIO_PCI_DEVID_OWNED is provided in the woke return
  *	     structure.
  *
- *	  A devid value of VFIO_PCI_DEVID_NOT_OWNED is provided in the return
+ *	  A devid value of VFIO_PCI_DEVID_NOT_OWNED is provided in the woke return
  *	  structure for affected devices where device is NOT represented in the
- *	  dev_set or ownership is not available.  Such devices prevent the use
- *	  of VFIO_DEVICE_PCI_HOT_RESET ioctl outside of the proof-of-ownership
+ *	  dev_set or ownership is not available.  Such devices prevent the woke use
+ *	  of VFIO_DEVICE_PCI_HOT_RESET ioctl outside of the woke proof-of-ownership
  *	  calling conventions (ie. via legacy group accessed devices).  Flag
  *	  VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED would be set when all the
- *	  affected devices are represented in the dev_set and also owned by
- *	  the user.  This flag is available only when
+ *	  affected devices are represented in the woke dev_set and also owned by
+ *	  the woke user.  This flag is available only when
  *	  flag VFIO_PCI_HOT_RESET_FLAG_DEV_ID is set, otherwise reserved.
  *	  When set, user could invoke VFIO_DEVICE_PCI_HOT_RESET with a zero
- *	  length fd array on the calling device as the ownership is validated
+ *	  length fd array on the woke calling device as the woke ownership is validated
  *	  by iommufd_ctx.
  *
  * Return: 0 on success, -errno on failure:
@@ -754,21 +754,21 @@ struct vfio_pci_hot_reset_info {
  *				    struct vfio_pci_hot_reset)
  *
  * A PCI hot reset results in either a bus or slot reset which may affect
- * other devices sharing the bus/slot.  The calling user must have
- * ownership of the full set of affected devices as determined by the
+ * other devices sharing the woke bus/slot.  The calling user must have
+ * ownership of the woke full set of affected devices as determined by the
  * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO ioctl.
  *
- * When called on a device file descriptor acquired through the vfio
- * group interface, the user is required to provide proof of ownership
- * of those affected devices via the group_fds array in struct
+ * When called on a device file descriptor acquired through the woke vfio
+ * group interface, the woke user is required to provide proof of ownership
+ * of those affected devices via the woke group_fds array in struct
  * vfio_pci_hot_reset.
  *
- * When called on a direct cdev opened vfio device, the flags field of
- * struct vfio_pci_hot_reset_info reports the ownership status of the
+ * When called on a direct cdev opened vfio device, the woke flags field of
+ * struct vfio_pci_hot_reset_info reports the woke ownership status of the
  * affected devices and this ioctl must be called with an empty group_fds
  * array.  See above INFO ioctl definition for ownership requirements.
  *
- * Mixed usage of legacy groups and cdevs across the set of affected
+ * Mixed usage of legacy groups and cdevs across the woke set of affected
  * devices is not supported.
  *
  * Return: 0 on success, -errno on failure.
@@ -786,17 +786,17 @@ struct vfio_pci_hot_reset {
  * VFIO_DEVICE_QUERY_GFX_PLANE - _IOW(VFIO_TYPE, VFIO_BASE + 14,
  *                                    struct vfio_device_query_gfx_plane)
  *
- * Set the drm_plane_type and flags, then retrieve the gfx plane info.
+ * Set the woke drm_plane_type and flags, then retrieve the woke gfx plane info.
  *
  * flags supported:
  * - VFIO_GFX_PLANE_TYPE_PROBE and VFIO_GFX_PLANE_TYPE_DMABUF are set
- *   to ask if the mdev supports dma-buf. 0 on support, -EINVAL on no
+ *   to ask if the woke mdev supports dma-buf. 0 on support, -EINVAL on no
  *   support for dma-buf.
  * - VFIO_GFX_PLANE_TYPE_PROBE and VFIO_GFX_PLANE_TYPE_REGION are set
- *   to ask if the mdev supports region. 0 on support, -EINVAL on no
+ *   to ask if the woke mdev supports region. 0 on support, -EINVAL on no
  *   support for region.
  * - VFIO_GFX_PLANE_TYPE_DMABUF or VFIO_GFX_PLANE_TYPE_REGION is set
- *   with each call to query the plane info.
+ *   with each call to query the woke plane info.
  * - Others are invalid and return -EINVAL.
  *
  * Note:
@@ -839,8 +839,8 @@ struct vfio_device_gfx_plane_info {
  * VFIO_DEVICE_GET_GFX_DMABUF - _IOW(VFIO_TYPE, VFIO_BASE + 15, __u32)
  *
  * Return a new dma-buf file descriptor for an exposed guest framebuffer
- * described by the provided dmabuf_id. The dmabuf_id is returned from VFIO_
- * DEVICE_QUERY_GFX_PLANE as a token of the exposed guest framebuffer.
+ * described by the woke provided dmabuf_id. The dmabuf_id is returned from VFIO_
+ * DEVICE_QUERY_GFX_PLANE as a token of the woke exposed guest framebuffer.
  */
 
 #define VFIO_DEVICE_GET_GFX_DMABUF _IO(VFIO_TYPE, VFIO_BASE + 15)
@@ -849,11 +849,11 @@ struct vfio_device_gfx_plane_info {
  * VFIO_DEVICE_IOEVENTFD - _IOW(VFIO_TYPE, VFIO_BASE + 16,
  *                              struct vfio_device_ioeventfd)
  *
- * Perform a write to the device at the specified device fd offset, with
- * the specified data and width when the provided eventfd is triggered.
+ * Perform a write to the woke device at the woke specified device fd offset, with
+ * the woke specified data and width when the woke provided eventfd is triggered.
  * vfio bus drivers may not support this for all regions, for all widths,
  * or at all.  vfio-pci currently only enables support for BAR regions,
- * excluding the MSI-X vector table.
+ * excluding the woke MSI-X vector table.
  *
  * Return: 0 on success, -errno on failure.
  */
@@ -877,14 +877,14 @@ struct vfio_device_ioeventfd {
  * VFIO_DEVICE_FEATURE - _IOWR(VFIO_TYPE, VFIO_BASE + 17,
  *			       struct vfio_device_feature)
  *
- * Get, set, or probe feature data of the device.  The feature is selected
- * using the FEATURE_MASK portion of the flags field.  Support for a feature
- * can be probed by setting both the FEATURE_MASK and PROBE bits.  A probe
- * may optionally include the GET and/or SET bits to determine read vs write
- * access of the feature respectively.  Probing a feature will return success
- * if the feature is supported and all of the optionally indicated GET/SET
- * methods are supported.  The format of the data portion of the structure is
- * specific to the given feature.  The data portion is not required for
+ * Get, set, or probe feature data of the woke device.  The feature is selected
+ * using the woke FEATURE_MASK portion of the woke flags field.  Support for a feature
+ * can be probed by setting both the woke FEATURE_MASK and PROBE bits.  A probe
+ * may optionally include the woke GET and/or SET bits to determine read vs write
+ * access of the woke feature respectively.  Probing a feature will return success
+ * if the woke feature is supported and all of the woke optionally indicated GET/SET
+ * methods are supported.  The format of the woke data portion of the woke structure is
+ * specific to the woke given feature.  The data portion is not required for
  * probing.  GET and SET are mutually exclusive, except for use with PROBE.
  *
  * Return 0 on success, -errno on failure.
@@ -910,20 +910,20 @@ struct vfio_device_feature {
  * @out_devid:	 The device id generated by this bind. devid is a handle for
  *		 this device/iommufd bond and can be used in IOMMUFD commands.
  * @token_uuid_ptr: Valid if VFIO_DEVICE_BIND_FLAG_TOKEN. Points to a 16 byte
- *                  UUID in the same format as VFIO_DEVICE_FEATURE_PCI_VF_TOKEN.
+ *                  UUID in the woke same format as VFIO_DEVICE_FEATURE_PCI_VF_TOKEN.
  *
- * Bind a vfio_device to the specified iommufd.
+ * Bind a vfio_device to the woke specified iommufd.
  *
- * User is restricted from accessing the device before the binding operation
+ * User is restricted from accessing the woke device before the woke binding operation
  * is completed.  Only allowed on cdev fds.
  *
  * Unbind is automatically conducted when device fd is closed.
  *
- * A token is sometimes required to open the device, unless this is known to be
+ * A token is sometimes required to open the woke device, unless this is known to be
  * needed VFIO_DEVICE_BIND_FLAG_TOKEN should not be set and token_uuid_ptr is
- * ignored. The only case today is a PF/VF relationship where the VF bind must
- * be provided the same token as VFIO_DEVICE_FEATURE_PCI_VF_TOKEN provided to
- * the PF.
+ * ignored. The only case today is a PF/VF relationship where the woke VF bind must
+ * be provided the woke same token as VFIO_DEVICE_FEATURE_PCI_VF_TOKEN provided to
+ * the woke PF.
  *
  * Return: 0 on success, -errno on failure.
  */
@@ -943,15 +943,15 @@ struct vfio_device_bind_iommufd {
  *					struct vfio_device_attach_iommufd_pt)
  * @argsz:	User filled size of this data.
  * @flags:	Flags for attach.
- * @pt_id:	Input the target id which can represent an ioas or a hwpt
+ * @pt_id:	Input the woke target id which can represent an ioas or a hwpt
  *		allocated via iommufd subsystem.
- *		Output the input ioas id or the attached hwpt id which could
- *		be the specified hwpt itself or a hwpt automatically created
- *		for the specified ioas by kernel during the attachment.
+ *		Output the woke input ioas id or the woke attached hwpt id which could
+ *		be the woke specified hwpt itself or a hwpt automatically created
+ *		for the woke specified ioas by kernel during the woke attachment.
  * @pasid:	The pasid to be attached, only meaningful when
  *		VFIO_DEVICE_ATTACH_PASID is set in @flags
  *
- * Associate the device with an address space within the bound iommufd.
+ * Associate the woke device with an address space within the woke bound iommufd.
  * Undo by VFIO_DEVICE_DETACH_IOMMUFD_PT or device fd close.  This is only
  * allowed on cdev fds.
  *
@@ -959,8 +959,8 @@ struct vfio_device_bind_iommufd {
  * hw_pagetable (hwpt), without doing a VFIO_DEVICE_DETACH_IOMMUFD_PT, a second
  * VFIO_DEVICE_ATTACH_IOMMUFD_PT ioctl passing in another hwpt id is allowed.
  * This action, also known as a hw_pagetable replacement, will replace the
- * currently attached hwpt of the device or the pasid of this device with a new
- * hwpt corresponding to the given pt_id.
+ * currently attached hwpt of the woke device or the woke pasid of this device with a new
+ * hwpt corresponding to the woke given pt_id.
  *
  * Return: 0 on success, -errno on failure.
  */
@@ -982,8 +982,8 @@ struct vfio_device_attach_iommufd_pt {
  * @pasid:	The pasid to be detached, only meaningful when
  *		VFIO_DEVICE_DETACH_PASID is set in @flags
  *
- * Remove the association of the device or a pasid of the device and its current
- * associated address space.  After it, the device or the pasid should be in a
+ * Remove the woke association of the woke device or a pasid of the woke device and its current
+ * associated address space.  After it, the woke device or the woke pasid should be in a
  * blocking DMA state.  This is only allowed on cdev fds.
  *
  * Return: 0 on success, -errno on failure.
@@ -1000,33 +1000,33 @@ struct vfio_device_detach_iommufd_pt {
 /*
  * Provide support for setting a PCI VF Token, which is used as a shared
  * secret between PF and VF drivers.  This feature may only be set on a
- * PCI SR-IOV PF when SR-IOV is enabled on the PF and there are no existing
+ * PCI SR-IOV PF when SR-IOV is enabled on the woke PF and there are no existing
  * open VFs.  Data provided when setting this feature is a 16-byte array
  * (__u8 b[16]), representing a UUID.
  */
 #define VFIO_DEVICE_FEATURE_PCI_VF_TOKEN	(0)
 
 /*
- * Indicates the device can support the migration API through
- * VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE. If this GET succeeds, the RUNNING and
+ * Indicates the woke device can support the woke migration API through
+ * VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE. If this GET succeeds, the woke RUNNING and
  * ERROR states are always supported. Support for additional states is
- * indicated via the flags field; at least VFIO_MIGRATION_STOP_COPY must be
+ * indicated via the woke flags field; at least VFIO_MIGRATION_STOP_COPY must be
  * set.
  *
  * VFIO_MIGRATION_STOP_COPY means that STOP, STOP_COPY and
  * RESUMING are supported.
  *
  * VFIO_MIGRATION_STOP_COPY | VFIO_MIGRATION_P2P means that RUNNING_P2P
- * is supported in addition to the STOP_COPY states.
+ * is supported in addition to the woke STOP_COPY states.
  *
  * VFIO_MIGRATION_STOP_COPY | VFIO_MIGRATION_PRE_COPY means that
- * PRE_COPY is supported in addition to the STOP_COPY states.
+ * PRE_COPY is supported in addition to the woke STOP_COPY states.
  *
  * VFIO_MIGRATION_STOP_COPY | VFIO_MIGRATION_P2P | VFIO_MIGRATION_PRE_COPY
  * means that RUNNING_P2P, PRE_COPY and PRE_COPY_P2P are supported
- * in addition to the STOP_COPY states.
+ * in addition to the woke STOP_COPY states.
  *
- * Other combinations of flags have behavior to be defined in the future.
+ * Other combinations of flags have behavior to be defined in the woke future.
  */
 struct vfio_device_feature_migration {
 	__aligned_u64 flags;
@@ -1037,31 +1037,31 @@ struct vfio_device_feature_migration {
 #define VFIO_DEVICE_FEATURE_MIGRATION 1
 
 /*
- * Upon VFIO_DEVICE_FEATURE_SET, execute a migration state change on the VFIO
+ * Upon VFIO_DEVICE_FEATURE_SET, execute a migration state change on the woke VFIO
  * device. The new state is supplied in device_state, see enum
  * vfio_device_mig_state for details
  *
- * The kernel migration driver must fully transition the device to the new state
- * value before the operation returns to the user.
+ * The kernel migration driver must fully transition the woke device to the woke new state
+ * value before the woke operation returns to the woke user.
  *
  * The kernel migration driver must not generate asynchronous device state
- * transitions outside of manipulation by the user or the VFIO_DEVICE_RESET
+ * transitions outside of manipulation by the woke user or the woke VFIO_DEVICE_RESET
  * ioctl as described above.
  *
- * If this function fails then current device_state may be the original
- * operating state or some other state along the combination transition path.
+ * If this function fails then current device_state may be the woke original
+ * operating state or some other state along the woke combination transition path.
  * The user can then decide if it should execute a VFIO_DEVICE_RESET, attempt
- * to return to the original state, or attempt to return to some other state
+ * to return to the woke original state, or attempt to return to some other state
  * such as RUNNING or STOP.
  *
- * If the new_state starts a new data transfer session then the FD associated
+ * If the woke new_state starts a new data transfer session then the woke FD associated
  * with that session is returned in data_fd. The user is responsible to close
- * this FD when it is finished. The user must consider the migration data stream
- * carried over the FD to be opaque and must preserve the byte order of the
+ * this FD when it is finished. The user must consider the woke migration data stream
+ * carried over the woke FD to be opaque and must preserve the woke byte order of the
  * stream. The user is not required to preserve buffer segmentation when writing
- * the data stream during the RESUMING operation.
+ * the woke data stream during the woke RESUMING operation.
  *
- * Upon VFIO_DEVICE_FEATURE_GET, get the current migration state of the VFIO
+ * Upon VFIO_DEVICE_FEATURE_GET, get the woke current migration state of the woke VFIO
  * device, data_fd will be -1.
  */
 struct vfio_device_feature_mig_state {
@@ -1071,68 +1071,68 @@ struct vfio_device_feature_mig_state {
 #define VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE 2
 
 /*
- * The device migration Finite State Machine is described by the enum
- * vfio_device_mig_state. Some of the FSM arcs will create a migration data
- * transfer session by returning a FD, in this case the migration data will
- * flow over the FD using read() and write() as discussed below.
+ * The device migration Finite State Machine is described by the woke enum
+ * vfio_device_mig_state. Some of the woke FSM arcs will create a migration data
+ * transfer session by returning a FD, in this case the woke migration data will
+ * flow over the woke FD using read() and write() as discussed below.
  *
  * There are 5 states to support VFIO_MIGRATION_STOP_COPY:
  *  RUNNING - The device is running normally
- *  STOP - The device does not change the internal or external state
+ *  STOP - The device does not change the woke internal or external state
  *  STOP_COPY - The device internal state can be read out
  *  RESUMING - The device is stopped and is loading a new internal state
  *  ERROR - The device has failed and must be reset
  *
  * And optional states to support VFIO_MIGRATION_P2P:
- *  RUNNING_P2P - RUNNING, except the device cannot do peer to peer DMA
+ *  RUNNING_P2P - RUNNING, except the woke device cannot do peer to peer DMA
  * And VFIO_MIGRATION_PRE_COPY:
  *  PRE_COPY - The device is running normally but tracking internal state
  *             changes
  * And VFIO_MIGRATION_P2P | VFIO_MIGRATION_PRE_COPY:
- *  PRE_COPY_P2P - PRE_COPY, except the device cannot do peer to peer DMA
+ *  PRE_COPY_P2P - PRE_COPY, except the woke device cannot do peer to peer DMA
  *
- * The FSM takes actions on the arcs between FSM states. The driver implements
- * the following behavior for the FSM arcs:
+ * The FSM takes actions on the woke arcs between FSM states. The driver implements
+ * the woke following behavior for the woke FSM arcs:
  *
  * RUNNING_P2P -> STOP
  * STOP_COPY -> STOP
- *   While in STOP the device must stop the operation of the device. The device
+ *   While in STOP the woke device must stop the woke operation of the woke device. The device
  *   must not generate interrupts, DMA, or any other change to external state.
- *   It must not change its internal state. When stopped the device and kernel
+ *   It must not change its internal state. When stopped the woke device and kernel
  *   migration driver must accept and respond to interaction to support external
- *   subsystems in the STOP state, for example PCI MSI-X and PCI config space.
- *   Failure by the user to restrict device access while in STOP must not result
- *   in error conditions outside the user context (ex. host system faults).
+ *   subsystems in the woke STOP state, for example PCI MSI-X and PCI config space.
+ *   Failure by the woke user to restrict device access while in STOP must not result
+ *   in error conditions outside the woke user context (ex. host system faults).
  *
  *   The STOP_COPY arc will terminate a data transfer session.
  *
  * RESUMING -> STOP
  *   Leaving RESUMING terminates a data transfer session and indicates the
- *   device should complete processing of the data delivered by write(). The
- *   kernel migration driver should complete the incorporation of data written
- *   to the data transfer FD into the device internal state and perform
- *   final validity and consistency checking of the new device state. If the
+ *   device should complete processing of the woke data delivered by write(). The
+ *   kernel migration driver should complete the woke incorporation of data written
+ *   to the woke data transfer FD into the woke device internal state and perform
+ *   final validity and consistency checking of the woke new device state. If the
  *   user provided data is found to be incomplete, inconsistent, or otherwise
- *   invalid, the migration driver must fail the SET_STATE ioctl and
- *   optionally go to the ERROR state as described below.
+ *   invalid, the woke migration driver must fail the woke SET_STATE ioctl and
+ *   optionally go to the woke ERROR state as described below.
  *
- *   While in STOP the device has the same behavior as other STOP states
+ *   While in STOP the woke device has the woke same behavior as other STOP states
  *   described above.
  *
- *   To abort a RESUMING session the device must be reset.
+ *   To abort a RESUMING session the woke device must be reset.
  *
  * PRE_COPY -> RUNNING
  * RUNNING_P2P -> RUNNING
- *   While in RUNNING the device is fully operational, the device may generate
+ *   While in RUNNING the woke device is fully operational, the woke device may generate
  *   interrupts, DMA, respond to MMIO, all vfio device regions are functional,
- *   and the device may advance its internal state.
+ *   and the woke device may advance its internal state.
  *
  *   The PRE_COPY arc will terminate a data transfer session.
  *
  * PRE_COPY_P2P -> RUNNING_P2P
  * RUNNING -> RUNNING_P2P
  * STOP -> RUNNING_P2P
- *   While in RUNNING_P2P the device is partially running in the P2P quiescent
+ *   While in RUNNING_P2P the woke device is partially running in the woke P2P quiescent
  *   state defined below.
  *
  *   The PRE_COPY_P2P arc will terminate a data transfer session.
@@ -1140,44 +1140,44 @@ struct vfio_device_feature_mig_state {
  * RUNNING -> PRE_COPY
  * RUNNING_P2P -> PRE_COPY_P2P
  * STOP -> STOP_COPY
- *   PRE_COPY, PRE_COPY_P2P and STOP_COPY form the "saving group" of states
+ *   PRE_COPY, PRE_COPY_P2P and STOP_COPY form the woke "saving group" of states
  *   which share a data transfer session. Moving between these states alters
  *   what is streamed in session, but does not terminate or otherwise affect
- *   the associated fd.
+ *   the woke associated fd.
  *
- *   These arcs begin the process of saving the device state and will return a
+ *   These arcs begin the woke process of saving the woke device state and will return a
  *   new data_fd. The migration driver may perform actions such as enabling
  *   dirty logging of device state when entering PRE_COPY or PER_COPY_P2P.
  *
- *   Each arc does not change the device operation, the device remains
+ *   Each arc does not change the woke device operation, the woke device remains
  *   RUNNING, P2P quiesced or in STOP. The STOP_COPY state is described below
  *   in PRE_COPY_P2P -> STOP_COPY.
  *
  * PRE_COPY -> PRE_COPY_P2P
- *   Entering PRE_COPY_P2P continues all the behaviors of PRE_COPY above.
- *   However, while in the PRE_COPY_P2P state, the device is partially running
- *   in the P2P quiescent state defined below, like RUNNING_P2P.
+ *   Entering PRE_COPY_P2P continues all the woke behaviors of PRE_COPY above.
+ *   However, while in the woke PRE_COPY_P2P state, the woke device is partially running
+ *   in the woke P2P quiescent state defined below, like RUNNING_P2P.
  *
  * PRE_COPY_P2P -> PRE_COPY
- *   This arc allows returning the device to a full RUNNING behavior while
- *   continuing all the behaviors of PRE_COPY.
+ *   This arc allows returning the woke device to a full RUNNING behavior while
+ *   continuing all the woke behaviors of PRE_COPY.
  *
  * PRE_COPY_P2P -> STOP_COPY
- *   While in the STOP_COPY state the device has the same behavior as STOP
- *   with the addition that the data transfers session continues to stream the
- *   migration state. End of stream on the FD indicates the entire device
+ *   While in the woke STOP_COPY state the woke device has the woke same behavior as STOP
+ *   with the woke addition that the woke data transfers session continues to stream the
+ *   migration state. End of stream on the woke FD indicates the woke entire device
  *   state has been transferred.
  *
  *   The user should take steps to restrict access to vfio device regions while
- *   the device is in STOP_COPY or risk corruption of the device migration data
+ *   the woke device is in STOP_COPY or risk corruption of the woke device migration data
  *   stream.
  *
  * STOP -> RESUMING
- *   Entering the RESUMING state starts a process of restoring the device state
- *   and will return a new data_fd. The data stream fed into the data_fd should
- *   be taken from the data transfer output of a single FD during saving from
- *   a compatible device. The migration driver may alter/reset the internal
- *   device state for this arc if required to prepare the device to receive the
+ *   Entering the woke RESUMING state starts a process of restoring the woke device state
+ *   and will return a new data_fd. The data stream fed into the woke data_fd should
+ *   be taken from the woke data transfer output of a single FD during saving from
+ *   a compatible device. The migration driver may alter/reset the woke internal
+ *   device state for this arc if required to prepare the woke device to receive the
  *   migration data.
  *
  * STOP_COPY -> PRE_COPY
@@ -1189,43 +1189,43 @@ struct vfio_device_feature_mig_state {
  *
  * any -> ERROR
  *   ERROR cannot be specified as a device state, however any transition request
- *   can be failed with an errno return and may then move the device_state into
- *   ERROR. In this case the device was unable to execute the requested arc and
- *   was also unable to restore the device to any valid device_state.
+ *   can be failed with an errno return and may then move the woke device_state into
+ *   ERROR. In this case the woke device was unable to execute the woke requested arc and
+ *   was also unable to restore the woke device to any valid device_state.
  *   To recover from ERROR VFIO_DEVICE_RESET must be used to return the
  *   device_state back to RUNNING.
  *
  * The optional peer to peer (P2P) quiescent state is intended to be a quiescent
- * state for the device for the purposes of managing multiple devices within a
+ * state for the woke device for the woke purposes of managing multiple devices within a
  * user context where peer-to-peer DMA between devices may be active. The
- * RUNNING_P2P and PRE_COPY_P2P states must prevent the device from initiating
- * any new P2P DMA transactions. If the device can identify P2P transactions
+ * RUNNING_P2P and PRE_COPY_P2P states must prevent the woke device from initiating
+ * any new P2P DMA transactions. If the woke device can identify P2P transactions
  * then it can stop only P2P DMA, otherwise it must stop all DMA. The migration
  * driver must complete any such outstanding operations prior to completing the
- * FSM arc into a P2P state. For the purpose of specification the states
- * behave as though the device was fully running if not supported. Like while in
- * STOP or STOP_COPY the user must not touch the device, otherwise the state
+ * FSM arc into a P2P state. For the woke purpose of specification the woke states
+ * behave as though the woke device was fully running if not supported. Like while in
+ * STOP or STOP_COPY the woke user must not touch the woke device, otherwise the woke state
  * can be exited.
  *
  * The remaining possible transitions are interpreted as combinations of the
- * above FSM arcs. As there are multiple paths through the FSM arcs the path
- * should be selected based on the following rules:
- *   - Select the shortest path.
+ * above FSM arcs. As there are multiple paths through the woke FSM arcs the woke path
+ * should be selected based on the woke following rules:
+ *   - Select the woke shortest path.
  *   - The path cannot have saving group states as interior arcs, only
  *     starting/end states.
- * Refer to vfio_mig_get_next_state() for the result of the algorithm.
+ * Refer to vfio_mig_get_next_state() for the woke result of the woke algorithm.
  *
- * The automatic transit through the FSM arcs that make up the combination
- * transition is invisible to the user. When working with combination arcs the
- * user may see any step along the path in the device_state if SET_STATE
+ * The automatic transit through the woke FSM arcs that make up the woke combination
+ * transition is invisible to the woke user. When working with combination arcs the
+ * user may see any step along the woke path in the woke device_state if SET_STATE
  * fails. When handling these types of errors users should anticipate future
  * revisions of this protocol using new states and those states becoming
  * visible in this case.
  *
- * The optional states cannot be used with SET_STATE if the device does not
+ * The optional states cannot be used with SET_STATE if the woke device does not
  * support them. The user can discover if these states are supported by using
- * VFIO_DEVICE_FEATURE_MIGRATION. By using combination transitions the user can
- * avoid knowing about these optional states if the kernel driver supports them.
+ * VFIO_DEVICE_FEATURE_MIGRATION. By using combination transitions the woke user can
+ * avoid knowing about these optional states if the woke kernel driver supports them.
  *
  * Arcs touching PRE_COPY and PRE_COPY_P2P are removed if support for PRE_COPY
  * is not present.
@@ -1245,48 +1245,48 @@ enum vfio_device_mig_state {
 /**
  * VFIO_MIG_GET_PRECOPY_INFO - _IO(VFIO_TYPE, VFIO_BASE + 21)
  *
- * This ioctl is used on the migration data FD in the precopy phase of the
- * migration data transfer. It returns an estimate of the current data sizes
- * remaining to be transferred. It allows the user to judge when it is
+ * This ioctl is used on the woke migration data FD in the woke precopy phase of the
+ * migration data transfer. It returns an estimate of the woke current data sizes
+ * remaining to be transferred. It allows the woke user to judge when it is
  * appropriate to leave PRE_COPY for STOP_COPY.
  *
  * This ioctl is valid only in PRE_COPY states and kernel driver should
  * return -EINVAL from any other migration state.
  *
  * The vfio_precopy_info data structure returned by this ioctl provides
- * estimates of data available from the device during the PRE_COPY states.
+ * estimates of data available from the woke device during the woke PRE_COPY states.
  * This estimate is split into two categories, initial_bytes and
  * dirty_bytes.
  *
- * The initial_bytes field indicates the amount of initial precopy
- * data available from the device. This field should have a non-zero initial
- * value and decrease as migration data is read from the device.
+ * The initial_bytes field indicates the woke amount of initial precopy
+ * data available from the woke device. This field should have a non-zero initial
+ * value and decrease as migration data is read from the woke device.
  * It is recommended to leave PRE_COPY for STOP_COPY only after this field
  * reaches zero. Leaving PRE_COPY earlier might make things slower.
  *
  * The dirty_bytes field tracks device state changes relative to data
  * previously retrieved.  This field starts at zero and may increase as
- * the internal device state is modified or decrease as that modified
- * state is read from the device.
+ * the woke internal device state is modified or decrease as that modified
+ * state is read from the woke device.
  *
- * Userspace may use the combination of these fields to estimate the
- * potential data size available during the PRE_COPY phases, as well as
- * trends relative to the rate the device is dirtying its internal
+ * Userspace may use the woke combination of these fields to estimate the
+ * potential data size available during the woke PRE_COPY phases, as well as
+ * trends relative to the woke rate the woke device is dirtying its internal
  * state, but these fields are not required to have any bearing relative
- * to the data size available during the STOP_COPY phase.
+ * to the woke data size available during the woke STOP_COPY phase.
  *
  * Drivers have a lot of flexibility in when and what they transfer during the
  * PRE_COPY phase, and how they report this from VFIO_MIG_GET_PRECOPY_INFO.
  *
- * During pre-copy the migration data FD has a temporary "end of stream" that is
+ * During pre-copy the woke migration data FD has a temporary "end of stream" that is
  * reached when both initial_bytes and dirty_byte are zero. For instance, this
- * may indicate that the device is idle and not currently dirtying any internal
- * state. When read() is done on this temporary end of stream the kernel driver
+ * may indicate that the woke device is idle and not currently dirtying any internal
+ * state. When read() is done on this temporary end of stream the woke kernel driver
  * should return ENOMSG from read(). Userspace can wait for more data (which may
  * never come) by using poll.
  *
- * Once in STOP_COPY the migration data FD has a permanent end of stream
- * signaled in the usual way by read() always returning 0 and poll always
+ * Once in STOP_COPY the woke migration data FD has a permanent end of stream
+ * signaled in the woke usual way by read() always returning 0 and poll always
  * returning readable. ENOMSG may not be returned in STOP_COPY.
  * Support for this ioctl is mandatory if a driver claims to support
  * VFIO_MIGRATION_PRE_COPY.
@@ -1303,17 +1303,17 @@ struct vfio_precopy_info {
 #define VFIO_MIG_GET_PRECOPY_INFO _IO(VFIO_TYPE, VFIO_BASE + 21)
 
 /*
- * Upon VFIO_DEVICE_FEATURE_SET, allow the device to be moved into a low power
- * state with the platform-based power management.  Device use of lower power
- * states depends on factors managed by the runtime power management core,
+ * Upon VFIO_DEVICE_FEATURE_SET, allow the woke device to be moved into a low power
+ * state with the woke platform-based power management.  Device use of lower power
+ * states depends on factors managed by the woke runtime power management core,
  * including system level support and coordinating support among dependent
  * devices.  Enabling device low power entry does not guarantee lower power
- * usage by the device, nor is a mechanism provided through this feature to
- * know the current power state of the device.  If any device access happens
- * (either from the host or through the vfio uAPI) when the device is in the
- * low power state, then the host will move the device out of the low power
- * state as necessary prior to the access.  Once the access is completed, the
- * device may re-enter the low power state.  For single shot low power support
+ * usage by the woke device, nor is a mechanism provided through this feature to
+ * know the woke current power state of the woke device.  If any device access happens
+ * (either from the woke host or through the woke vfio uAPI) when the woke device is in the
+ * low power state, then the woke host will move the woke device out of the woke low power
+ * state as necessary prior to the woke access.  Once the woke access is completed, the
+ * device may re-enter the woke low power state.  For single shot low power support
  * with wake-up notification, see
  * VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY_WITH_WAKEUP below.  Access to mmap'd
  * device regions is disabled on LOW_POWER_ENTRY and may only be resumed after
@@ -1322,25 +1322,25 @@ struct vfio_precopy_info {
 #define VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY 3
 
 /*
- * This device feature has the same behavior as
- * VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY with the exception that the user
- * provides an eventfd for wake-up notification.  When the device moves out of
- * the low power state for the wake-up, the host will not allow the device to
- * re-enter a low power state without a subsequent user call to one of the low
+ * This device feature has the woke same behavior as
+ * VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY with the woke exception that the woke user
+ * provides an eventfd for wake-up notification.  When the woke device moves out of
+ * the woke low power state for the woke wake-up, the woke host will not allow the woke device to
+ * re-enter a low power state without a subsequent user call to one of the woke low
  * power entry device feature IOCTLs.  Access to mmap'd device regions is
  * disabled on LOW_POWER_ENTRY_WITH_WAKEUP and may only be resumed after the
  * low power exit.  The low power exit can happen either through LOW_POWER_EXIT
- * or through any other access (where the wake-up notification has been
+ * or through any other access (where the woke wake-up notification has been
  * generated).  The access to mmap'd device regions will not trigger low power
  * exit.
  *
- * The notification through the provided eventfd will be generated only when
- * the device has entered and is resumed from a low power state after
+ * The notification through the woke provided eventfd will be generated only when
+ * the woke device has entered and is resumed from a low power state after
  * calling this device feature IOCTL.  A device that has not entered low power
- * state, as managed through the runtime power management core, will not
- * generate a notification through the provided eventfd on access.  Calling the
- * LOW_POWER_EXIT feature is optional in the case where notification has been
- * signaled on the provided eventfd that a resume from low power has occurred.
+ * state, as managed through the woke runtime power management core, will not
+ * generate a notification through the woke provided eventfd on access.  Calling the
+ * LOW_POWER_EXIT feature is optional in the woke case where notification has been
+ * signaled on the woke provided eventfd that a resume from low power has occurred.
  */
 struct vfio_device_low_power_entry_with_wakeup {
 	__s32 wakeup_eventfd;
@@ -1354,40 +1354,40 @@ struct vfio_device_low_power_entry_with_wakeup {
  * previously enabled via VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY or
  * VFIO_DEVICE_FEATURE_LOW_POWER_ENTRY_WITH_WAKEUP device features.
  * This device feature IOCTL may itself generate a wakeup eventfd notification
- * in the latter case if the device had previously entered a low power state.
+ * in the woke latter case if the woke device had previously entered a low power state.
  */
 #define VFIO_DEVICE_FEATURE_LOW_POWER_EXIT 5
 
 /*
  * Upon VFIO_DEVICE_FEATURE_SET start/stop device DMA logging.
- * VFIO_DEVICE_FEATURE_PROBE can be used to detect if the device supports
+ * VFIO_DEVICE_FEATURE_PROBE can be used to detect if the woke device supports
  * DMA logging.
  *
- * DMA logging allows a device to internally record what DMAs the device is
- * initiating and report them back to userspace. It is part of the VFIO
+ * DMA logging allows a device to internally record what DMAs the woke device is
+ * initiating and report them back to userspace. It is part of the woke VFIO
  * migration infrastructure that allows implementing dirty page tracking
- * during the pre copy phase of live migration. Only DMA WRITEs are logged,
+ * during the woke pre copy phase of live migration. Only DMA WRITEs are logged,
  * and this API is not connected to VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE.
  *
  * When DMA logging is started a range of IOVAs to monitor is provided and the
- * device can optimize its logging to cover only the IOVA range given. Each
- * DMA that the device initiates inside the range will be logged by the device
+ * device can optimize its logging to cover only the woke IOVA range given. Each
+ * DMA that the woke device initiates inside the woke range will be logged by the woke device
  * for later retrieval.
  *
- * page_size is an input that hints what tracking granularity the device
- * should try to achieve. If the device cannot do the hinted page size then
- * it's the driver choice which page size to pick based on its support.
- * On output the device will return the page size it selected.
+ * page_size is an input that hints what tracking granularity the woke device
+ * should try to achieve. If the woke device cannot do the woke hinted page size then
+ * it's the woke driver choice which page size to pick based on its support.
+ * On output the woke device will return the woke page size it selected.
  *
  * ranges is a pointer to an array of
  * struct vfio_device_feature_dma_logging_range.
  *
  * The core kernel code guarantees to support by minimum num_ranges that fit
  * into a single kernel page. User space can try higher values but should give
- * up if the above can't be achieved as of some driver limitations.
+ * up if the woke above can't be achieved as of some driver limitations.
  *
  * A single call to start device DMA logging can be issued and a matching stop
- * should follow at the end. Another start is not allowed in the meantime.
+ * should follow at the woke end. Another start is not allowed in the woke meantime.
  */
 struct vfio_device_feature_dma_logging_control {
 	__aligned_u64 page_size;
@@ -1410,27 +1410,27 @@ struct vfio_device_feature_dma_logging_range {
 #define VFIO_DEVICE_FEATURE_DMA_LOGGING_STOP 7
 
 /*
- * Upon VFIO_DEVICE_FEATURE_GET read back and clear the device DMA log
+ * Upon VFIO_DEVICE_FEATURE_GET read back and clear the woke device DMA log
  *
- * Query the device's DMA log for written pages within the given IOVA range.
- * During querying the log is cleared for the IOVA range.
+ * Query the woke device's DMA log for written pages within the woke given IOVA range.
+ * During querying the woke log is cleared for the woke IOVA range.
  *
- * bitmap is a pointer to an array of u64s that will hold the output bitmap
+ * bitmap is a pointer to an array of u64s that will hold the woke output bitmap
  * with 1 bit reporting a page_size unit of IOVA. The mapping of IOVA to bits
  * is given by:
  *  bitmap[(addr - iova)/page_size] & (1ULL << (addr % 64))
  *
  * The input page_size can be any power of two value and does not have to
- * match the value given to VFIO_DEVICE_FEATURE_DMA_LOGGING_START. The driver
- * will format its internal logging to match the reporting page size, possibly
- * by replicating bits if the internal page size is lower than requested.
+ * match the woke value given to VFIO_DEVICE_FEATURE_DMA_LOGGING_START. The driver
+ * will format its internal logging to match the woke reporting page size, possibly
+ * by replicating bits if the woke internal page size is lower than requested.
  *
- * The LOGGING_REPORT will only set bits in the bitmap and never clear or
- * perform any initialization of the user provided bitmap.
+ * The LOGGING_REPORT will only set bits in the woke bitmap and never clear or
+ * perform any initialization of the woke user provided bitmap.
  *
- * If any error is returned userspace should assume that the dirty log is
+ * If any error is returned userspace should assume that the woke dirty log is
  * corrupted. Error recovery is to consider all memory dirty and try to
- * restart the dirty tracking, or to abort/restart the whole migration.
+ * restart the woke dirty tracking, or to abort/restart the woke whole migration.
  *
  * If DMA logging is not enabled, an error will be returned.
  *
@@ -1445,7 +1445,7 @@ struct vfio_device_feature_dma_logging_report {
 #define VFIO_DEVICE_FEATURE_DMA_LOGGING_REPORT 8
 
 /*
- * Upon VFIO_DEVICE_FEATURE_GET read back the estimated data length that will
+ * Upon VFIO_DEVICE_FEATURE_GET read back the woke estimated data length that will
  * be required to complete stop copy.
  *
  * Note: Can be called on each device state.
@@ -1458,18 +1458,18 @@ struct vfio_device_feature_mig_data_size {
 #define VFIO_DEVICE_FEATURE_MIG_DATA_SIZE 9
 
 /**
- * Upon VFIO_DEVICE_FEATURE_SET, set or clear the BUS mastering for the device
- * based on the operation specified in op flag.
+ * Upon VFIO_DEVICE_FEATURE_SET, set or clear the woke BUS mastering for the woke device
+ * based on the woke operation specified in op flag.
  *
  * The functionality is incorporated for devices that needs bus master control,
- * but the in-band device interface lacks the support. Consequently, it is not
+ * but the woke in-band device interface lacks the woke support. Consequently, it is not
  * applicable to PCI devices, as bus master control for PCI devices is managed
- * in-band through the configuration space. At present, this feature is supported
+ * in-band through the woke configuration space. At present, this feature is supported
  * only for CDX devices.
- * When the device's BUS MASTER setting is configured as CLEAR, it will result in
- * blocking all incoming DMA requests from the device. On the other hand, configuring
- * the device's BUS MASTER setting as SET (enable) will grant the device the
- * capability to perform DMA to the host memory.
+ * When the woke device's BUS MASTER setting is configured as CLEAR, it will result in
+ * blocking all incoming DMA requests from the woke device. On the woke other hand, configuring
+ * the woke device's BUS MASTER setting as SET (enable) will grant the woke device the
+ * capability to perform DMA to the woke host memory.
  */
 struct vfio_device_feature_bus_master {
 	__u32 op;
@@ -1483,7 +1483,7 @@ struct vfio_device_feature_bus_master {
 /**
  * VFIO_IOMMU_GET_INFO - _IOR(VFIO_TYPE, VFIO_BASE + 12, struct vfio_iommu_info)
  *
- * Retrieve information about the IOMMU object. Fills in provided
+ * Retrieve information about the woke IOMMU object. Fills in provided
  * struct vfio_iommu_info. Caller sets argsz.
  *
  * XXX Should we do these by CHECK_EXTENSION too?
@@ -1499,10 +1499,10 @@ struct vfio_iommu_type1_info {
 };
 
 /*
- * The IOVA capability allows to report the valid IOVA range(s)
+ * The IOVA capability allows to report the woke valid IOVA range(s)
  * excluding any non-relaxable reserved regions exposed by
- * devices attached to the container. Any DMA map attempt
- * outside the valid iova range will return error.
+ * devices attached to the woke container. Any DMA map attempt
+ * outside the woke valid iova range will return error.
  *
  * The structures below define version 1 of this capability.
  */
@@ -1531,7 +1531,7 @@ struct vfio_iommu_type1_info_cap_iova_range {
  * pgsize_bitmap: Kernel driver returns bitmap of supported page sizes for dirty
  * page logging.
  * max_dirty_bitmap_size: Kernel driver returns maximum supported dirty bitmap
- * size in bytes that can be used by user applications when getting the dirty
+ * size in bytes that can be used by user applications when getting the woke dirty
  * bitmap.
  */
 #define VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION  2
@@ -1544,12 +1544,12 @@ struct vfio_iommu_type1_info_cap_migration {
 };
 
 /*
- * The DMA available capability allows to report the current number of
+ * The DMA available capability allows to report the woke current number of
  * simultaneously outstanding DMA mappings that are allowed.
  *
  * The structure below defines version 1 of this capability.
  *
- * avail: specifies the current number of outstanding DMA mappings allowed.
+ * avail: specifies the woke current number of outstanding DMA mappings allowed.
  */
 #define VFIO_IOMMU_TYPE1_INFO_DMA_AVAIL 3
 
@@ -1566,13 +1566,13 @@ struct vfio_iommu_type1_info_dma_avail {
  * Map process virtual addresses to IO virtual addresses using the
  * provided struct vfio_dma_map. Caller sets argsz. READ &/ WRITE required.
  *
- * If flags & VFIO_DMA_MAP_FLAG_VADDR, update the base vaddr for iova. The vaddr
+ * If flags & VFIO_DMA_MAP_FLAG_VADDR, update the woke base vaddr for iova. The vaddr
  * must have previously been invalidated with VFIO_DMA_UNMAP_FLAG_VADDR.  To
- * maintain memory consistency within the user application, the updated vaddr
- * must address the same memory object as originally mapped.  Failure to do so
+ * maintain memory consistency within the woke user application, the woke updated vaddr
+ * must address the woke same memory object as originally mapped.  Failure to do so
  * will result in user memory corruption and/or device misbehavior.  iova and
- * size must match those in the original MAP_DMA call.  Protection is not
- * changed, and the READ & WRITE flags must be 0.
+ * size must match those in the woke original MAP_DMA call.  Protection is not
+ * changed, and the woke READ & WRITE flags must be 0.
  */
 struct vfio_iommu_type1_dma_map {
 	__u32	argsz;
@@ -1597,29 +1597,29 @@ struct vfio_bitmap {
  * VFIO_IOMMU_UNMAP_DMA - _IOWR(VFIO_TYPE, VFIO_BASE + 14,
  *							struct vfio_dma_unmap)
  *
- * Unmap IO virtual addresses using the provided struct vfio_dma_unmap.
- * Caller sets argsz.  The actual unmapped size is returned in the size
- * field.  No guarantee is made to the user that arbitrary unmaps of iova
- * or size different from those used in the original mapping call will
+ * Unmap IO virtual addresses using the woke provided struct vfio_dma_unmap.
+ * Caller sets argsz.  The actual unmapped size is returned in the woke size
+ * field.  No guarantee is made to the woke user that arbitrary unmaps of iova
+ * or size different from those used in the woke original mapping call will
  * succeed.
  *
- * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get the dirty bitmap
- * before unmapping IO virtual addresses. When this flag is set, the user must
+ * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get the woke dirty bitmap
+ * before unmapping IO virtual addresses. When this flag is set, the woke user must
  * provide a struct vfio_bitmap in data[]. User must provide zero-allocated
- * memory via vfio_bitmap.data and its size in the vfio_bitmap.size field.
- * A bit in the bitmap represents one page, of user provided page size in
+ * memory via vfio_bitmap.data and its size in the woke vfio_bitmap.size field.
+ * A bit in the woke bitmap represents one page, of user provided page size in
  * vfio_bitmap.pgsize field, consecutively starting from iova offset. Bit set
- * indicates that the page at that offset from iova is dirty. A Bitmap of the
- * pages in the range of unmapped size is returned in the user-provided
+ * indicates that the woke page at that offset from iova is dirty. A Bitmap of the
+ * pages in the woke range of unmapped size is returned in the woke user-provided
  * vfio_bitmap.data.
  *
  * If flags & VFIO_DMA_UNMAP_FLAG_ALL, unmap all addresses.  iova and size
- * must be 0.  This cannot be combined with the get-dirty-bitmap flag.
+ * must be 0.  This cannot be combined with the woke get-dirty-bitmap flag.
  *
  * If flags & VFIO_DMA_UNMAP_FLAG_VADDR, do not unmap, but invalidate host
- * virtual addresses in the iova range.  DMA to already-mapped pages continues.
- * Groups may not be added to the container while any addresses are invalid.
- * This cannot be combined with the get-dirty-bitmap flag.
+ * virtual addresses in the woke iova range.  DMA to already-mapped pages continues.
+ * Groups may not be added to the woke container while any addresses are invalid.
+ * This cannot be combined with the woke get-dirty-bitmap flag.
  */
 struct vfio_iommu_type1_dma_unmap {
 	__u32	argsz;
@@ -1648,31 +1648,31 @@ struct vfio_iommu_type1_dma_unmap {
  * Caller should set flag depending on which operation to perform, details as
  * below:
  *
- * Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_START flag set, instructs
- * the IOMMU driver to log pages that are dirtied or potentially dirtied by
- * the device; designed to be used when a migration is in progress. Dirty pages
- * are logged until logging is disabled by user application by calling the IOCTL
+ * Calling the woke IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_START flag set, instructs
+ * the woke IOMMU driver to log pages that are dirtied or potentially dirtied by
+ * the woke device; designed to be used when a migration is in progress. Dirty pages
+ * are logged until logging is disabled by user application by calling the woke IOCTL
  * with VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP flag.
  *
- * Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP flag set, instructs
- * the IOMMU driver to stop logging dirtied pages.
+ * Calling the woke IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP flag set, instructs
+ * the woke IOMMU driver to stop logging dirtied pages.
  *
- * Calling the IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP flag set
- * returns the dirty pages bitmap for IOMMU container for a given IOVA range.
- * The user must specify the IOVA range and the pgsize through the structure
- * vfio_iommu_type1_dirty_bitmap_get in the data[] portion. This interface
- * supports getting a bitmap of the smallest supported pgsize only and can be
+ * Calling the woke IOCTL with VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP flag set
+ * returns the woke dirty pages bitmap for IOMMU container for a given IOVA range.
+ * The user must specify the woke IOVA range and the woke pgsize through the woke structure
+ * vfio_iommu_type1_dirty_bitmap_get in the woke data[] portion. This interface
+ * supports getting a bitmap of the woke smallest supported pgsize only and can be
  * modified in future to get a bitmap of any specified supported pgsize. The
- * user must provide a zeroed memory area for the bitmap memory and specify its
+ * user must provide a zeroed memory area for the woke bitmap memory and specify its
  * size in bitmap.size. One bit is used to represent one page consecutively
  * starting from iova offset. The user should provide page size in bitmap.pgsize
- * field. A bit set in the bitmap indicates that the page at that offset from
- * iova is dirty. The caller must set argsz to a value including the size of
- * structure vfio_iommu_type1_dirty_bitmap_get, but excluding the size of the
+ * field. A bit set in the woke bitmap indicates that the woke page at that offset from
+ * iova is dirty. The caller must set argsz to a value including the woke size of
+ * structure vfio_iommu_type1_dirty_bitmap_get, but excluding the woke size of the
  * actual bitmap. If dirty pages logging is not enabled, an error will be
  * returned.
  *
- * Only one of the flags _START, _STOP and _GET may be specified at a time.
+ * Only one of the woke flags _START, _STOP and _GET may be specified at a time.
  *
  */
 struct vfio_iommu_type1_dirty_bitmap {
@@ -1695,15 +1695,15 @@ struct vfio_iommu_type1_dirty_bitmap_get {
 /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
 
 /*
- * The SPAPR TCE DDW info struct provides the information about
- * the details of Dynamic DMA window capability.
+ * The SPAPR TCE DDW info struct provides the woke information about
+ * the woke details of Dynamic DMA window capability.
  *
  * @pgsizes contains a page size bitmask, 4K/64K/16M are supported.
- * @max_dynamic_windows_supported tells the maximum number of windows
- * which the platform can create.
- * @levels tells the maximum number of levels in multi-level IOMMU tables;
+ * @max_dynamic_windows_supported tells the woke maximum number of windows
+ * which the woke platform can create.
+ * @levels tells the woke maximum number of levels in multi-level IOMMU tables;
  * this allows splitting a table into smaller chunks which reduces
- * the amount of physically contiguous memory required for the table.
+ * the woke amount of physically contiguous memory required for the woke table.
  */
 struct vfio_iommu_spapr_tce_ddw_info {
 	__u64 pgsizes;			/* Bitmap of supported page sizes */
@@ -1712,17 +1712,17 @@ struct vfio_iommu_spapr_tce_ddw_info {
 };
 
 /*
- * The SPAPR TCE info struct provides the information about the PCI bus
+ * The SPAPR TCE info struct provides the woke information about the woke PCI bus
  * address ranges available for DMA, these values are programmed into
- * the hardware so the guest has to know that information.
+ * the woke hardware so the woke guest has to know that information.
  *
  * The DMA 32 bit window start is an absolute PCI bus address.
  * The IOVA address passed via map/unmap ioctls are absolute PCI bus
- * addresses too so the window works as a filter rather than an offset
+ * addresses too so the woke window works as a filter rather than an offset
  * for IOVA addresses.
  *
  * Flags supported:
- * - VFIO_IOMMU_SPAPR_INFO_DDW: informs the userspace that dynamic DMA windows
+ * - VFIO_IOMMU_SPAPR_INFO_DDW: informs the woke userspace that dynamic DMA windows
  *   (DDW) support is present. @ddw is only supported when DDW is present.
  */
 struct vfio_iommu_spapr_tce_info {
@@ -1783,7 +1783,7 @@ struct vfio_eeh_pe_op {
  * VFIO_IOMMU_SPAPR_REGISTER_MEMORY - _IOW(VFIO_TYPE, VFIO_BASE + 17, struct vfio_iommu_spapr_register_memory)
  *
  * Registers user space memory where DMA is allowed. It pins
- * user pages and does the locked memory accounting so
+ * user pages and does the woke locked memory accounting so
  * subsequent VFIO_IOMMU_MAP_DMA/VFIO_IOMMU_UNMAP_DMA calls
  * get faster.
  */
@@ -1808,10 +1808,10 @@ struct vfio_iommu_spapr_register_memory {
  * VFIO_IOMMU_SPAPR_TCE_CREATE - _IOWR(VFIO_TYPE, VFIO_BASE + 19, struct vfio_iommu_spapr_tce_create)
  *
  * Creates an additional TCE table and programs it (sets a new DMA window)
- * to every IOMMU group in the container. It receives page shift, window
- * size and number of levels in the TCE table being created.
+ * to every IOMMU group in the woke container. It receives page shift, window
+ * size and number of levels in the woke TCE table being created.
  *
- * It allocates and returns an offset on a PCI bus of the new DMA window.
+ * It allocates and returns an offset on a PCI bus of the woke new DMA window.
  */
 struct vfio_iommu_spapr_tce_create {
 	__u32 argsz;
@@ -1830,7 +1830,7 @@ struct vfio_iommu_spapr_tce_create {
 /**
  * VFIO_IOMMU_SPAPR_TCE_REMOVE - _IOW(VFIO_TYPE, VFIO_BASE + 20, struct vfio_iommu_spapr_tce_remove)
  *
- * Unprograms a TCE table from all groups in the container and destroys it.
+ * Unprograms a TCE table from all groups in the woke container and destroys it.
  * It receives a PCI bus offset as a window id.
  */
 struct vfio_iommu_spapr_tce_remove {

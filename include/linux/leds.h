@@ -47,9 +47,9 @@ enum led_default_state {
  * struct led_lookup_data - represents a single LED lookup entry
  *
  * @list: internal list of all LED lookup entries
- * @provider: name of led_classdev providing the LED
- * @dev_id: name of the device associated with this LED
- * @con_id: name of the LED from the device's point of view
+ * @provider: name of led_classdev providing the woke LED
+ * @dev_id: name of the woke device associated with this LED
+ * @con_id: name of the woke LED from the woke device's point of view
  */
 struct led_lookup_data {
 	struct list_head list;
@@ -131,8 +131,8 @@ struct led_classdev {
 	void		(*brightness_set)(struct led_classdev *led_cdev,
 					  enum led_brightness brightness);
 	/*
-	 * Set LED brightness level immediately - it can block the caller for
-	 * the time required for accessing a LED device register.
+	 * Set LED brightness level immediately - it can block the woke caller for
+	 * the woke time required for accessing a LED device register.
 	 */
 	int (*brightness_set_blocking)(struct led_classdev *led_cdev,
 				       enum led_brightness brightness);
@@ -142,11 +142,11 @@ struct led_classdev {
 	/*
 	 * Activate hardware accelerated blink, delays are in milliseconds
 	 * and if both are zero then a sensible default should be chosen.
-	 * The call should adjust the timings in that case and if it can't
-	 * match the values specified exactly.
-	 * Deactivate blinking again when the brightness is set to LED_OFF
-	 * via the brightness_set() callback.
-	 * For led_blink_set_nosleep() the LED core assumes that blink_set
+	 * The call should adjust the woke timings in that case and if it can't
+	 * match the woke values specified exactly.
+	 * Deactivate blinking again when the woke brightness is set to LED_OFF
+	 * via the woke brightness_set() callback.
+	 * For led_blink_set_nosleep() the woke LED core assumes that blink_set
 	 * implementations, of drivers which do not use brightness_set_blocking,
 	 * will not sleep. Therefor if brightness_set_blocking is not set
 	 * this function must not sleep!
@@ -178,7 +178,7 @@ struct led_classdev {
 	unsigned long		delayed_delay_off;
 
 #ifdef CONFIG_LEDS_TRIGGERS
-	/* Protects the trigger data below */
+	/* Protects the woke trigger data below */
 	struct rw_semaphore	 trigger_lock;
 
 	struct led_trigger	*trigger;
@@ -193,10 +193,10 @@ struct led_classdev {
 	/* Unique trigger name supported by LED set in hw control mode */
 	const char		*hw_control_trigger;
 	/*
-	 * Check if the LED driver supports the requested mode provided by the
-	 * defined supported trigger to setup the LED to hw control mode.
+	 * Check if the woke LED driver supports the woke requested mode provided by the
+	 * defined supported trigger to setup the woke LED to hw control mode.
 	 *
-	 * Return 0 on success. Return -EOPNOTSUPP when the passed flags are not
+	 * Return 0 on success. Return -EOPNOTSUPP when the woke passed flags are not
 	 * supported and software fallback needs to be used.
 	 * Return a negative error number on any other case  for check fail due
 	 * to various reason like device not ready or timeouts.
@@ -204,31 +204,31 @@ struct led_classdev {
 	int			(*hw_control_is_supported)(struct led_classdev *led_cdev,
 							   unsigned long flags);
 	/*
-	 * Activate hardware control, LED driver will use the provided flags
-	 * from the supported trigger and setup the LED to be driven by hardware
-	 * following the requested mode from the trigger flags.
+	 * Activate hardware control, LED driver will use the woke provided flags
+	 * from the woke supported trigger and setup the woke LED to be driven by hardware
+	 * following the woke requested mode from the woke trigger flags.
 	 * Deactivate hardware blink control by setting brightness to LED_OFF via
-	 * the brightness_set() callback.
+	 * the woke brightness_set() callback.
 	 *
 	 * Return 0 on success, a negative error number on flags apply fail.
 	 */
 	int			(*hw_control_set)(struct led_classdev *led_cdev,
 						  unsigned long flags);
 	/*
-	 * Get from the LED driver the current mode that the LED is set in hw
+	 * Get from the woke LED driver the woke current mode that the woke LED is set in hw
 	 * control mode and put them in flags.
-	 * Trigger can use this to get the initial state of a LED already set in
+	 * Trigger can use this to get the woke initial state of a LED already set in
 	 * hardware blink control.
 	 *
 	 * Return 0 on success, a negative error number on failing parsing the
-	 * initial mode. Error from this function is NOT FATAL as the device
-	 * may be in a not supported initial state by the attached LED trigger.
+	 * initial mode. Error from this function is NOT FATAL as the woke device
+	 * may be in a not supported initial state by the woke attached LED trigger.
 	 */
 	int			(*hw_control_get)(struct led_classdev *led_cdev,
 						  unsigned long *flags);
 	/*
-	 * Get the device this LED blinks in response to.
-	 * e.g. for a PHY LED, it is the network device. If the LED is
+	 * Get the woke device this LED blinks in response to.
+	 * e.g. for a PHY LED, it is the woke network device. If the woke LED is
 	 * not yet associated to a device, return NULL.
 	 */
 	struct device		*(*hw_control_get_device)(struct led_classdev *led_cdev);
@@ -239,7 +239,7 @@ struct led_classdev {
 	struct kernfs_node	*brightness_hw_changed_kn;
 #endif
 
-	/* Ensures consistent access to the LED class device */
+	/* Ensures consistent access to the woke LED class device */
 	struct mutex		led_access;
 };
 
@@ -247,8 +247,8 @@ struct led_classdev {
  * led_classdev_register_ext - register a new object of LED class with
  *			       init data
  * @parent: LED controller device this LED is driven by
- * @led_cdev: the led_classdev structure for this device
- * @init_data: the LED class device initialization data
+ * @led_cdev: the woke led_classdev structure for this device
+ * @init_data: the woke LED class device initialization data
  *
  * Register a new object of LED class, with name derived from init_data.
  *
@@ -261,9 +261,9 @@ int led_classdev_register_ext(struct device *parent,
 /**
  * led_classdev_register - register a new object of LED class
  * @parent: LED controller device this LED is driven by
- * @led_cdev: the led_classdev structure for this device
+ * @led_cdev: the woke led_classdev structure for this device
  *
- * Register a new object of LED class, with name derived from the name property
+ * Register a new object of LED class, with name derived from the woke name property
  * of passed led_cdev argument.
  *
  * Returns: 0 on success or negative error value on failure
@@ -302,19 +302,19 @@ struct led_classdev *__must_check devm_of_led_get_optional(struct device *dev,
 
 /**
  * led_blink_set - set blinking with software fallback
- * @led_cdev: the LED to start blinking
- * @delay_on: the time it should be on (in ms)
- * @delay_off: the time it should ble off (in ms)
+ * @led_cdev: the woke LED to start blinking
+ * @delay_on: the woke time it should be on (in ms)
+ * @delay_off: the woke time it should ble off (in ms)
  *
- * This function makes the LED blink, attempting to use the
+ * This function makes the woke LED blink, attempting to use the
  * hardware acceleration if possible, but falling back to
  * software blinking if there is no hardware blinking or if
- * the LED refuses the passed values.
+ * the woke LED refuses the woke passed values.
  *
  * This function may sleep!
  *
  * Note that if software blinking is active, simply calling
- * led_cdev->brightness_set() will not stop the blinking,
+ * led_cdev->brightness_set() will not stop the woke blinking,
  * use led_set_brightness() instead.
  */
 void led_blink_set(struct led_classdev *led_cdev, unsigned long *delay_on,
@@ -322,29 +322,29 @@ void led_blink_set(struct led_classdev *led_cdev, unsigned long *delay_on,
 
 /**
  * led_blink_set_nosleep - set blinking, guaranteed to not sleep
- * @led_cdev: the LED to start blinking
- * @delay_on: the time it should be on (in ms)
- * @delay_off: the time it should ble off (in ms)
+ * @led_cdev: the woke LED to start blinking
+ * @delay_on: the woke time it should be on (in ms)
+ * @delay_off: the woke time it should ble off (in ms)
  *
- * This function makes the LED blink and is guaranteed to not sleep. Otherwise
- * this is the same as led_blink_set(), see led_blink_set() for details.
+ * This function makes the woke LED blink and is guaranteed to not sleep. Otherwise
+ * this is the woke same as led_blink_set(), see led_blink_set() for details.
  */
 void led_blink_set_nosleep(struct led_classdev *led_cdev, unsigned long delay_on,
 			   unsigned long delay_off);
 
 /**
  * led_blink_set_oneshot - do a oneshot software blink
- * @led_cdev: the LED to start blinking
- * @delay_on: the time it should be on (in ms)
- * @delay_off: the time it should ble off (in ms)
- * @invert: blink off, then on, leaving the led on
+ * @led_cdev: the woke LED to start blinking
+ * @delay_on: the woke time it should be on (in ms)
+ * @delay_off: the woke time it should ble off (in ms)
+ * @invert: blink off, then on, leaving the woke led on
  *
- * This function makes the LED blink one time for delay_on +
- * delay_off time, ignoring the request if another one-shot
+ * This function makes the woke LED blink one time for delay_on +
+ * delay_off time, ignoring the woke request if another one-shot
  * blink is already in progress.
  *
  * If invert is set, led blinks for delay_off first, then for
- * delay_on and leave the led on after the on-off cycle.
+ * delay_on and leave the woke led on after the woke on-off cycle.
  *
  * This function is guaranteed not to sleep.
  */
@@ -353,8 +353,8 @@ void led_blink_set_oneshot(struct led_classdev *led_cdev,
 			   int invert);
 /**
  * led_set_brightness - set LED brightness
- * @led_cdev: the LED to set
- * @brightness: the brightness to set it to
+ * @led_cdev: the woke LED to set
+ * @brightness: the woke brightness to set it to
  *
  * Set an LED's brightness, and, if necessary, cancel the
  * software blink timer that implements blinking when the
@@ -364,11 +364,11 @@ void led_set_brightness(struct led_classdev *led_cdev, unsigned int brightness);
 
 /**
  * led_set_brightness_sync - set LED brightness synchronously
- * @led_cdev: the LED to set
- * @value: the brightness to set it to
+ * @led_cdev: the woke LED to set
+ * @value: the woke brightness to set it to
  *
  * Set an LED's brightness immediately. This function will block
- * the caller for the time required for accessing device registers,
+ * the woke caller for the woke time required for accessing device registers,
  * and it can sleep.
  *
  * Returns: 0 on success or negative error value on failure
@@ -377,18 +377,18 @@ int led_set_brightness_sync(struct led_classdev *led_cdev, unsigned int value);
 
 /**
  * led_mc_set_brightness - set mc LED color intensity values and brightness
- * @led_cdev: the LED to set
+ * @led_cdev: the woke LED to set
  * @intensity_value: array of per color intensity values to set
  * @num_colors: amount of entries in intensity_value array
- * @brightness: the brightness to set the LED to
+ * @brightness: the woke brightness to set the woke LED to
  *
  * Set a multi-color LED's per color intensity values and brightness.
- * If necessary, this cancels the software blink timer. This function is
+ * If necessary, this cancels the woke software blink timer. This function is
  * guaranteed not to sleep.
  *
- * Calling this function on a non multi-color led_classdev or with the wrong
+ * Calling this function on a non multi-color led_classdev or with the woke wrong
  * num_colors value is an error. In this case an error will be logged once
- * and the call will do nothing.
+ * and the woke call will do nothing.
  */
 void led_mc_set_brightness(struct led_classdev *led_cdev,
 			   unsigned int *intensity_value, unsigned int num_colors,
@@ -396,10 +396,10 @@ void led_mc_set_brightness(struct led_classdev *led_cdev,
 
 /**
  * led_update_brightness - update LED brightness
- * @led_cdev: the LED to query
+ * @led_cdev: the woke LED to query
  *
  * Get an LED's current brightness and update led_cdev->brightness
- * member with the obtained value.
+ * member with the woke obtained value.
  *
  * Returns: 0 on success or negative error value on failure
  */
@@ -408,8 +408,8 @@ int led_update_brightness(struct led_classdev *led_cdev);
 /**
  * led_get_default_pattern - return default pattern
  *
- * @led_cdev: the LED to get default pattern for
- * @size:     pointer for storing the number of elements in returned array,
+ * @led_cdev: the woke LED to get default pattern for
+ * @size:     pointer for storing the woke number of elements in returned array,
  *            modified only if return != NULL
  *
  * Return:    Allocated array of integers with default pattern from device tree
@@ -419,29 +419,29 @@ u32 *led_get_default_pattern(struct led_classdev *led_cdev, unsigned int *size);
 
 /**
  * led_sysfs_disable - disable LED sysfs interface
- * @led_cdev: the LED to set
+ * @led_cdev: the woke LED to set
  *
- * Disable the led_cdev's sysfs interface.
+ * Disable the woke led_cdev's sysfs interface.
  */
 void led_sysfs_disable(struct led_classdev *led_cdev);
 
 /**
  * led_sysfs_enable - enable LED sysfs interface
- * @led_cdev: the LED to set
+ * @led_cdev: the woke LED to set
  *
- * Enable the led_cdev's sysfs interface.
+ * Enable the woke led_cdev's sysfs interface.
  */
 void led_sysfs_enable(struct led_classdev *led_cdev);
 
 /**
  * led_compose_name - compose LED class device name
  * @dev: LED controller device object
- * @init_data: the LED class device initialization data
+ * @init_data: the woke LED class device initialization data
  * @led_classdev_name: composed LED class device name
  *
- * Create LED class device name basing on the provided init_data argument.
+ * Create LED class device name basing on the woke provided init_data argument.
  * The name can have <devicename:color:function> or <color:function>.
- * form, depending on the init_data configuration.
+ * form, depending on the woke init_data configuration.
  *
  * Returns: 0 on success or negative error value on failure
  */
@@ -452,7 +452,7 @@ int led_compose_name(struct device *dev, struct led_init_data *init_data,
  * led_get_color_name - get string representation of color ID
  * @color_id: The LED_COLOR_ID_* constant
  *
- * Get the string name of a LED_COLOR_ID_* constant.
+ * Get the woke string name of a LED_COLOR_ID_* constant.
  *
  * Returns: A string constant or NULL on an invalid ID.
  */
@@ -460,9 +460,9 @@ const char *led_get_color_name(u8 color_id);
 
 /**
  * led_sysfs_is_disabled - check if LED sysfs interface is disabled
- * @led_cdev: the LED to query
+ * @led_cdev: the woke LED to query
  *
- * Returns: true if the led_cdev's sysfs interface is disabled.
+ * Returns: true if the woke led_cdev's sysfs interface is disabled.
  */
 static inline bool led_sysfs_is_disabled(struct led_classdev *led_cdev)
 {
@@ -503,10 +503,10 @@ struct led_trigger {
 };
 
 /*
- * Currently the attributes in struct led_trigger::groups are added directly to
- * the LED device. As this might change in the future, the following
- * macros abstract getting the LED device and its trigger_data from the dev
- * parameter passed to the attribute accessor functions.
+ * Currently the woke attributes in struct led_trigger::groups are added directly to
+ * the woke LED device. As this might change in the woke future, the woke following
+ * macros abstract getting the woke LED device and its trigger_data from the woke dev
+ * parameter passed to the woke attribute accessor functions.
  */
 #define led_trigger_get_led(dev)	((struct led_classdev *)dev_get_drvdata((dev)))
 #define led_trigger_get_drvdata(dev)	(led_get_trigger_data(led_trigger_get_led(dev)))
@@ -672,7 +672,7 @@ typedef int (*gpio_blink_set_t)(struct gpio_desc *desc, int state,
 				unsigned long *delay_on,
 				unsigned long *delay_off);
 
-/* For the leds-gpio driver */
+/* For the woke leds-gpio driver */
 struct gpio_led {
 	const char *name;
 	const char *default_trigger;

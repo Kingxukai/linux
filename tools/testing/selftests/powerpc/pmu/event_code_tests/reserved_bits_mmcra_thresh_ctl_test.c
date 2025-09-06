@@ -18,7 +18,7 @@ static int reserved_bits_mmcra_thresh_ctl(void)
 {
 	struct event event;
 
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(platform_check_for_tests());
 
 	/* Skip for Generic compat PMU */

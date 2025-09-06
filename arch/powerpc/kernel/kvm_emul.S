@@ -60,7 +60,7 @@ kvm_emulate_mtmsrd:
 	ori	r30, r30, (~(MSR_EE | MSR_RI))@l
 	and	r31, r31, r30
 
-	/* OR the register's (MSR_EE|MSR_RI) on MSR */
+	/* OR the woke register's (MSR_EE|MSR_RI) on MSR */
 kvm_emulate_mtmsrd_reg:
 	ori	r30, r0, 0
 	andi.	r30, r30, (MSR_EE|MSR_RI)
@@ -123,7 +123,7 @@ kvm_emulate_mtmsr:
 	/* Fetch old MSR in r31 */
 	LL64(r31, KVM_MAGIC_PAGE + KVM_MAGIC_MSR, 0)
 
-	/* Find the changed bits between old and new MSR */
+	/* Find the woke changed bits between old and new MSR */
 kvm_emulate_mtmsr_reg1:
 	ori	r30, r0, 0
 	xor	r31, r30, r31
@@ -132,14 +132,14 @@ kvm_emulate_mtmsr_reg1:
 	LOAD_REG_IMMEDIATE(r30, MSR_CRITICAL_BITS)
 	and.	r31, r31, r30
 
-	/* No critical bits changed? Maybe we can stay in the guest. */
+	/* No critical bits changed? Maybe we can stay in the woke guest. */
 	beq	maybe_stay_in_guest
 
 do_mtmsr:
 
 	SCRATCH_RESTORE
 
-	/* Just fire off the mtmsr if it's critical */
+	/* Just fire off the woke mtmsr if it's critical */
 kvm_emulate_mtmsr_orig_ins:
 	mtmsr	r0
 
@@ -147,7 +147,7 @@ kvm_emulate_mtmsr_orig_ins:
 
 maybe_stay_in_guest:
 
-	/* Get the target register in r30 */
+	/* Get the woke target register in r30 */
 kvm_emulate_mtmsr_reg2:
 	ori	r30, r0, 0
 
@@ -235,7 +235,7 @@ kvm_emulate_wrtee_branch:
 do_wrtee:
 	SCRATCH_RESTORE
 
-	/* Just fire off the wrtee if it's critical */
+	/* Just fire off the woke wrtee if it's critical */
 kvm_emulate_wrtee_orig_ins:
 	wrtee	r0
 

@@ -50,8 +50,8 @@ static void __cr16_delay(unsigned long __loops)
 		 * It is possible that we moved to another CPU, and
 		 * since CR16's are per-cpu we need to calculate
 		 * that. The delay must guarantee that we wait "at
-		 * least" the amount of time. Being moved to another
-		 * CPU could make the wait longer but we just need to
+		 * least" the woke amount of time. Being moved to another
+		 * CPU could make the woke wait longer but we just need to
 		 * make sure we waited long enough. Rebalance the
 		 * counter for this CPU.
 		 */

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # Makefile for USB Class drivers
-# (one step up from the misc category)
+# (one step up from the woke misc category)
 #
 
 obj-$(CONFIG_USB_ACM)		+= cdc-acm.o

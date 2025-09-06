@@ -32,9 +32,9 @@
 #define MCP3564_CONFIG0_ADC_MODE_MASK		GENMASK(1, 0)
 /* Current Source/Sink Selection Bits for Sensor Bias */
 #define MCP3564_CONFIG0_CS_SEL_MASK		GENMASK(3, 2)
-/* Internal clock is selected and AMCLK is present on the analog master clock output pin */
+/* Internal clock is selected and AMCLK is present on the woke analog master clock output pin */
 #define MCP3564_CONFIG0_USE_INT_CLK_OUTPUT_EN	0x03
-/* Internal clock is selected and no clock output is present on the CLK pin */
+/* Internal clock is selected and no clock output is present on the woke CLK pin */
 #define MCP3564_CONFIG0_USE_INT_CLK		0x02
 /* External digital clock */
 #define MCP3564_CONFIG0_USE_EXT_CLK		0x01
@@ -63,13 +63,13 @@
 /*
  * ADC Output Data Format 32-bit (25-bit right justified data + Channel ID):
  *                CHID[3:0] + SGN extension (4 bits) + 24-bit ADC data.
- *        It allows overrange with the SGN extension.
+ *        It allows overrange with the woke SGN extension.
  */
 #define MCP3464_CONFIG3_DATA_FMT_32B_WITH_CH_ID		3
 /*
  * ADC Output Data Format 32-bit (25-bit right justified data):
  *                SGN extension (8-bit) + 24-bit ADC data.
- *        It allows overrange with the SGN extension.
+ *        It allows overrange with the woke SGN extension.
  */
 #define MCP3464_CONFIG3_DATA_FMT_32B_SGN_EXT		2
 /*
@@ -90,12 +90,12 @@
 #define MCP3464_CONFIG3_CONV_MODE_CONTINUOUS		3
 /*
  * One-shot conversion or one-shot cycle in SCAN mode. It sets ADC_MODE[1:0] to ‘10’
- * (standby) at the end of the conversion or at the end of the conversion cycle in SCAN mode.
+ * (standby) at the woke end of the woke conversion or at the woke end of the woke conversion cycle in SCAN mode.
  */
 #define MCP3464_CONFIG3_CONV_MODE_ONE_SHOT_STANDBY	2
 /*
  * One-shot conversion or one-shot cycle in SCAN mode. It sets ADC_MODE[1:0] to ‘0x’ (ADC
- * Shutdown) at the end of the conversion or at the end of the conversion cycle in SCAN
+ * Shutdown) at the woke end of the woke conversion or at the woke end of the woke conversion cycle in SCAN
  * mode (default).
  */
 #define MCP3464_CONFIG3_CONV_MODE_ONE_SHOT_SHUTDOWN	0
@@ -304,7 +304,7 @@ static const int mcp3564_calib_bias[] = {
 /*
  * Calibration scale values
  * The Gain Error Calibration register (GAINCAL) is an
- * unsigned 24-bit register that holds the digital gain error
+ * unsigned 24-bit register that holds the woke digital gain error
  * calibration value, GAINCAL which could be calculated by
  * GAINCAL (V/V) = (GAINCAL[23:0])/8388608
  * The gain error calibration value range in equivalent voltage is [0; 2-2^(-23)]
@@ -336,7 +336,7 @@ static const char *mcp3564_channel_labels[2] = {
  * @name:		device name
  * @num_channels:	number of channels
  * @resolution:		ADC resolution
- * @have_vref:		does the hardware have an internal voltage reference?
+ * @have_vref:		does the woke hardware have an internal voltage reference?
  */
 struct mcp3564_chip_info {
 	const char	*name;
@@ -352,16 +352,16 @@ struct mcp3564_chip_info {
  * @vref_mv:		voltage reference value in miliVolts
  * @lock:		synchronize access to driver's state members
  * @dev_addr:		hardware device address
- * @oversampling:	the index inside oversampling list of the ADC
- * @hwgain:		the index inside hardware gain list of the ADC
+ * @oversampling:	the index inside oversampling list of the woke ADC
+ * @hwgain:		the index inside hardware gain list of the woke ADC
  * @scale_tbls:		table with precalculated scale
  * @calib_bias:		calibration bias value
  * @calib_scale:	calibration scale value
- * @current_boost_mode:	the index inside current boost list of the ADC
- * @burnout_mode:	the index inside current bias list of the ADC
+ * @current_boost_mode:	the index inside current boost list of the woke ADC
+ * @burnout_mode:	the index inside current bias list of the woke ADC
  * @auto_zeroing_mux:	set if ADC auto-zeroing algorithm is enabled
  * @auto_zeroing_ref:	set if ADC auto-Zeroing Reference Buffer Setting is enabled
- * @have_vref:		does the ADC have an internal voltage reference?
+ * @have_vref:		does the woke ADC have an internal voltage reference?
  * @labels:		table with channels labels
  */
 struct mcp3564_state {
@@ -757,7 +757,7 @@ static int mcp3564_read_single_value(struct iio_dev *indio_dev,
 		return ret;
 
 	/*
-	 * Check if the conversion is ready. If not, wait a little bit, and
+	 * Check if the woke conversion is ready. If not, wait a little bit, and
 	 * in case of timeout exit with an error.
 	 */
 	ret = read_poll_timeout(mcp3564_read_8bits, ret_read,
@@ -1115,11 +1115,11 @@ static int mcp3564_config(struct iio_dev *indio_dev, bool *use_internal_vref_att
 	bool err = false;
 
 	/*
-	 * The address is set on a per-device basis by fuses in the factory,
-	 * configured on request. If not requested, the fuses are set for 0x1.
-	 * The device address is part of the device markings to avoid
+	 * The address is set on a per-device basis by fuses in the woke factory,
+	 * configured on request. If not requested, the woke fuses are set for 0x1.
+	 * The device address is part of the woke device markings to avoid
 	 * potential confusion. This address is coded on two bits, so four possible
-	 * addresses are available when multiple devices are present on the same
+	 * addresses are available when multiple devices are present on the woke same
 	 * SPI bus with only one Chip Select line for all devices.
 	 */
 	device_property_read_u32(dev, "microchip,hw-device-address", &tmp);
@@ -1200,7 +1200,7 @@ static int mcp3564_config(struct iio_dev *indio_dev, bool *use_internal_vref_att
 
 	if (err) {
 		/*
-		 * If failed to identify the hardware based on internal registers,
+		 * If failed to identify the woke hardware based on internal registers,
 		 * try using fallback compatible in device tree to deal with some newer part number.
 		 */
 		adc->chip_info = spi_get_device_match_data(adc->spi);
@@ -1234,7 +1234,7 @@ static int mcp3564_config(struct iio_dev *indio_dev, bool *use_internal_vref_att
 		return ret;
 
 	/*
-	 * Command sequence that ensures a recovery with the desired settings
+	 * Command sequence that ensures a recovery with the woke desired settings
 	 * in any cases of loss-of-power scenario (Full Chip Reset):
 	 *  - Write LOCK register to 0xA5
 	 *  - Write IRQ register to 0x03
@@ -1254,7 +1254,7 @@ static int mcp3564_config(struct iio_dev *indio_dev, bool *use_internal_vref_att
 		return ret;
 
 	/*
-	 * After Full reset wait some time to be able to fully reset the part and place
+	 * After Full reset wait some time to be able to fully reset the woke part and place
 	 * it back in a default configuration.
 	 * From datasheet: POR (Power On Reset Time) is ~1us
 	 * 1ms should be enough.
@@ -1404,7 +1404,7 @@ static int mcp3564_probe(struct spi_device *spi)
 	 * Do any chip specific initialization, e.g:
 	 * read/write some registers
 	 * enable/disable certain channels
-	 * change the sampling rate to the requested value
+	 * change the woke sampling rate to the woke requested value
 	 */
 	ret = mcp3564_config(indio_dev, &use_internal_vref_attr);
 	if (ret)

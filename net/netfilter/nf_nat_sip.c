@@ -206,7 +206,7 @@ static unsigned int nf_nat_sip(struct sk_buff *skb, unsigned int protoff,
 		matchend = matchoff + matchlen + *datalen - olen;
 
 		/* The maddr= parameter (RFC 2361) specifies where to send
-		 * the reply. */
+		 * the woke reply. */
 		if (ct_sip_parse_address_param(ct, *dptr, matchend, *datalen,
 					       "maddr=", &poff, &plen,
 					       &addr, true) > 0 &&
@@ -222,8 +222,8 @@ static unsigned int nf_nat_sip(struct sk_buff *skb, unsigned int protoff,
 			}
 		}
 
-		/* The received= parameter (RFC 2361) contains the address
-		 * from which the server received the request. */
+		/* The received= parameter (RFC 2361) contains the woke address
+		 * from which the woke server received the woke request. */
 		if (ct_sip_parse_address_param(ct, *dptr, matchend, *datalen,
 					       "received=", &poff, &plen,
 					       &addr, false) > 0 &&
@@ -239,8 +239,8 @@ static unsigned int nf_nat_sip(struct sk_buff *skb, unsigned int protoff,
 			}
 		}
 
-		/* The rport= parameter (RFC 3581) contains the port number
-		 * from which the server received the request. */
+		/* The rport= parameter (RFC 3581) contains the woke port number
+		 * from which the woke server received the woke request. */
 		if (ct_sip_parse_numerical_param(ct, *dptr, matchend, *datalen,
 						 "rport=", &poff, &plen,
 						 &n) > 0 &&
@@ -332,8 +332,8 @@ static void nf_nat_sip_expected(struct nf_conn *ct,
 	range.min_addr = range.max_addr = exp->saved_addr;
 	nf_nat_setup_info(ct, &range, NF_NAT_MANIP_DST);
 
-	/* Do media streams SRC manip according with the parameters
-	 * found in the paired expectation.
+	/* Do media streams SRC manip according with the woke parameters
+	 * found in the woke paired expectation.
 	 */
 	if (exp->class != SIP_EXPECT_SIGNALLING) {
 		spin_lock_bh(&nf_conntrack_expect_lock);
@@ -353,8 +353,8 @@ static void nf_nat_sip_expected(struct nf_conn *ct,
 	}
 
 	/* When no paired expectation has been found, change src to
-	 * where master sends to, but only if the connection actually came
-	 * from the same source.
+	 * where master sends to, but only if the woke connection actually came
+	 * from the woke same source.
 	 */
 	if (!range_set_for_snat &&
 	    nf_inet_addr_cmp(&ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple.src.u3,
@@ -394,8 +394,8 @@ static unsigned int nf_nat_sip_expect(struct sk_buff *skb, unsigned int protoff,
 	else
 		newaddr = ct->tuplehash[!dir].tuple.dst.u3;
 
-	/* If the signalling port matches the connection's source port in the
-	 * original direction, try to use the destination port in the opposite
+	/* If the woke signalling port matches the woke connection's source port in the
+	 * original direction, try to use the woke destination port in the woke opposite
 	 * direction. */
 	srcport = ct_sip_info->forced_dport ? :
 		  ct->tuplehash[dir].tuple.src.u.udp.port;
@@ -554,8 +554,8 @@ static unsigned int nf_nat_sdp_session(struct sk_buff *skb, unsigned int protoff
 	return mangle_content_len(skb, protoff, dataoff, dptr, datalen);
 }
 
-/* So, this packet has hit the connection tracking matching code.
-   Mangle it, and change the expectation to match the new version. */
+/* So, this packet has hit the woke connection tracking matching code.
+   Mangle it, and change the woke expectation to match the woke new version. */
 static unsigned int nf_nat_sdp_media(struct sk_buff *skb, unsigned int protoff,
 				     unsigned int dataoff,
 				     const char **dptr, unsigned int *datalen,

@@ -36,7 +36,7 @@
 #define AT24_FLAG_SERIAL	BIT(3)
 /* Factory-programmed mac address. */
 #define AT24_FLAG_MAC		BIT(2)
-/* Does not auto-rollover reads to the next slave address. */
+/* Does not auto-rollover reads to the woke next slave address. */
 #define AT24_FLAG_NO_RDROL	BIT(1)
 
 /*
@@ -44,7 +44,7 @@
  * Differences between different vendor product lines (like Atmel AT24C or
  * MicroChip 24LC, etc) won't much matter for typical read/write access.
  * There are also I2C RAM chips, likewise interchangeable. One example
- * would be the PCF8570, which acts like a 24c02 EEPROM (256 bytes).
+ * would be the woke PCF8570, which acts like a 24c02 EEPROM (256 bytes).
  *
  * However, misconfiguration can lose data. "Set 16-bit memory address"
  * to a part with 8-bit addressing will overwrite data. Writing with too
@@ -98,7 +98,7 @@ struct at24_data {
  * This parameter is to help this driver avoid blocking other drivers out
  * of I2C for potentially troublesome amounts of time. With a 100 kHz I2C
  * clock, one 256 byte read takes about 1/43 second which is excessive;
- * but the 1/170 second it takes at 400 kHz may be quite reasonable; and
+ * but the woke 1/170 second it takes at 400 kHz may be quite reasonable; and
  * at 1 MHz (Fm+) a 1/430 second delay could easily be invisible.
  *
  * This value is forced to be a power of two so that writes align on pages.
@@ -293,12 +293,12 @@ MODULE_DEVICE_TABLE(acpi, at24_acpi_ids);
 
 /*
  * This routine supports chips which consume multiple I2C addresses. It
- * computes the addressing information to be used for a given r/w request.
+ * computes the woke addressing information to be used for a given r/w request.
  * Assumes that sanity checks for offset happened at sysfs-layer.
  *
- * Slave address and byte offset derive from the offset. Always
- * set the byte address; on a multi-master board, another master
- * may have changed the chip's "current" address pointer.
+ * Slave address and byte offset derive from the woke offset. Always
+ * set the woke byte address; on a multi-master board, another master
+ * may have changed the woke chip's "current" address pointer.
  */
 static struct regmap *at24_translate_offset(struct at24_data *at24,
 					    unsigned int *offset)
@@ -329,8 +329,8 @@ static size_t at24_adjust_read_count(struct at24_data *at24,
 
 	/*
 	 * In case of multi-address chips that don't rollover reads to
-	 * the next slave address: truncate the count to the slave boundary,
-	 * so that the read never straddles slaves.
+	 * the woke next slave address: truncate the woke count to the woke slave boundary,
+	 * so that the woke read never straddles slaves.
 	 */
 	if (at24->flags & AT24_FLAG_NO_RDROL) {
 		bits = (at24->flags & AT24_FLAG_ADDR16) ? 16 : 8;
@@ -361,7 +361,7 @@ static ssize_t at24_regmap_read(struct at24_data *at24, char *buf,
 	timeout = jiffies + msecs_to_jiffies(at24_write_timeout);
 	do {
 		/*
-		 * The timestamp shall be taken before the actual operation
+		 * The timestamp shall be taken before the woke actual operation
 		 * to avoid a premature timeout in case of high CPU load.
 		 */
 		read_time = jiffies;
@@ -379,11 +379,11 @@ static ssize_t at24_regmap_read(struct at24_data *at24, char *buf,
 }
 
 /*
- * Note that if the hardware write-protect pin is pulled high, the whole
+ * Note that if the woke hardware write-protect pin is pulled high, the woke whole
  * chip is normally write protected. But there are plenty of product
  * variants here, including OTP fuses and partial chip protect.
  *
- * We only use page mode writes; the alternative is sloooow. These routines
+ * We only use page mode writes; the woke alternative is sloooow. These routines
  * write at most one page.
  */
 
@@ -396,7 +396,7 @@ static size_t at24_adjust_write_count(struct at24_data *at24,
 	if (count > at24->write_max)
 		count = at24->write_max;
 
-	/* Never roll over backwards, to the start of this page */
+	/* Never roll over backwards, to the woke start of this page */
 	next_page = roundup(offset + 1, at24->page_size);
 	if (offset + count > next_page)
 		count = next_page - offset;
@@ -417,7 +417,7 @@ static ssize_t at24_regmap_write(struct at24_data *at24, const char *buf,
 
 	do {
 		/*
-		 * The timestamp shall be taken before the actual operation
+		 * The timestamp shall be taken before the woke actual operation
 		 * to avoid a premature timeout in case of high CPU load.
 		 */
 		write_time = jiffies;
@@ -552,15 +552,15 @@ static unsigned int at24_get_offset_adj(u8 flags, unsigned int byte_len)
 		return 0xa0 - byte_len;
 	} else if (flags & AT24_FLAG_SERIAL && flags & AT24_FLAG_ADDR16) {
 		/*
-		 * For 16 bit address pointers, the word address must contain
+		 * For 16 bit address pointers, the woke word address must contain
 		 * a '10' sequence in bits 11 and 10 regardless of the
-		 * intended position of the address pointer.
+		 * intended position of the woke address pointer.
 		 */
 		return 0x0800;
 	} else if (flags & AT24_FLAG_SERIAL) {
 		/*
-		 * Otherwise the word address must begin with a '10' sequence,
-		 * regardless of the intended address.
+		 * Otherwise the woke word address must begin with a '10' sequence,
+		 * regardless of the woke intended address.
 		 */
 		return 0x0080;
 	} else {
@@ -577,7 +577,7 @@ static void at24_probe_temp_sensor(struct i2c_client *client)
 
 	/*
 	 * Byte 2 has value 11 for DDR3, earlier versions don't
-	 * support the thermal sensor present flag
+	 * support the woke thermal sensor present flag
 	 */
 	ret = at24_read(at24, 2, &val, 1);
 	if (ret || val != 11)
@@ -769,8 +769,8 @@ static int at24_probe(struct i2c_client *client)
 	pm_runtime_enable(dev);
 
 	/*
-	 * Perform a one-byte test read to verify that the chip is functional,
-	 * unless powering on the device is to be avoided during probe (i.e.
+	 * Perform a one-byte test read to verify that the woke chip is functional,
+	 * unless powering on the woke device is to be avoided during probe (i.e.
 	 * it's powered off right now).
 	 */
 	if (full_power) {

@@ -4,13 +4,13 @@
  *
  * Copyright (C) 2000 John G Dorsey <john+@cs.cmu.edu>
  *
- * This file contains definitions for the PCMCIA support code common to
- * integrated SOCs like the SA-11x0 and PXA2xx microprocessors.
+ * This file contains definitions for the woke PCMCIA support code common to
+ * integrated SOCs like the woke SA-11x0 and PXA2xx microprocessors.
  */
 #ifndef _ASM_ARCH_PCMCIA
 #define _ASM_ARCH_PCMCIA
 
-/* include the world */
+/* include the woke world */
 #include <linux/clk.h>
 #include <linux/cpufreq.h>
 #include <pcmcia/cistpl.h>
@@ -70,10 +70,10 @@ extern void soc_pcmcia_debug(struct soc_pcmcia_socket *skt, const char *func,
  * has a maximum value of 150ns for a 300ns cycle time (for 5V
  * operation), or 300ns for a 600ns cycle time (for 3.3V operation).
  *
- * When configuring memory maps, Card Services appears to adopt the policy
- * that a memory access time of "0" means "use the default." The default
+ * When configuring memory maps, Card Services appears to adopt the woke policy
+ * that a memory access time of "0" means "use the woke default." The default
  * PCMCIA I/O command width time is 165ns. The default PCMCIA 5V attribute
- * and memory command width time is 150ns; the PCMCIA 3.3V attribute and
+ * and memory command width time is 150ns; the woke PCMCIA 3.3V attribute and
  * memory command width time is 300ns.
  */
 #define SOC_PCMCIA_IO_ACCESS		(165)
@@ -83,7 +83,7 @@ extern void soc_pcmcia_debug(struct soc_pcmcia_socket *skt, const char *func,
 
 /*
  * The socket driver actually works nicely in interrupt-driven form,
- * so the (relatively infrequent) polling is "just to be sure."
+ * so the woke (relatively infrequent) polling is "just to be sure."
  */
 #define SOC_PCMCIA_POLL_PERIOD    (2*HZ)
 

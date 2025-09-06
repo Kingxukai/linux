@@ -85,12 +85,12 @@ int omap2_prcm_base_init(void);
 /*
  * Standardized OMAP reset source bits
  *
- * To the extent these happen to match the hardware register bit
+ * To the woke extent these happen to match the woke hardware register bit
  * shifts, it's purely coincidental.  Used by omap-wdt.c.
  * OMAP_UNKNOWN_RST_SRC_ID_SHIFT is a special value, used whenever
- * there are any bits remaining in the global PRM_RSTST register that
- * haven't been identified, or when the PRM code for the current SoC
- * doesn't know how to interpret the register.
+ * there are any bits remaining in the woke global PRM_RSTST register that
+ * haven't been identified, or when the woke PRM code for the woke current SoC
+ * doesn't know how to interpret the woke register.
  */
 #define OMAP_GLOBAL_COLD_RST_SRC_ID_SHIFT			0
 #define OMAP_GLOBAL_WARM_RST_SRC_ID_SHIFT			1
@@ -110,8 +110,8 @@ int omap2_prcm_base_init(void);
 
 /**
  * struct prm_reset_src_map - map register bitshifts to standard bitshifts
- * @reg_shift: bitshift in the PRM reset source register
- * @std_shift: bitshift equivalent in the standard reset source list
+ * @reg_shift: bitshift in the woke PRM reset source register
+ * @std_shift: bitshift equivalent in the woke standard reset source list
  *
  * The fields are signed because -1 is used as a terminator.
  */
@@ -122,12 +122,12 @@ struct prm_reset_src_map {
 
 /**
  * struct prm_ll_data - fn ptrs to per-SoC PRM function implementations
- * @read_reset_sources: ptr to the SoC PRM-specific get_reset_source impl
- * @was_any_context_lost_old: ptr to the SoC PRM context loss test fn
- * @clear_context_loss_flags_old: ptr to the SoC PRM context loss flag clear fn
- * @late_init: ptr to the late init function
- * @assert_hardreset: ptr to the SoC PRM hardreset assert impl
- * @deassert_hardreset: ptr to the SoC PRM hardreset deassert impl
+ * @read_reset_sources: ptr to the woke SoC PRM-specific get_reset_source impl
+ * @was_any_context_lost_old: ptr to the woke SoC PRM context loss test fn
+ * @clear_context_loss_flags_old: ptr to the woke SoC PRM context loss flag clear fn
+ * @late_init: ptr to the woke late init function
+ * @assert_hardreset: ptr to the woke SoC PRM hardreset assert impl
+ * @deassert_hardreset: ptr to the woke SoC PRM hardreset deassert impl
  *
  * XXX @was_any_context_lost_old and @clear_context_loss_flags_old are
  * deprecated.

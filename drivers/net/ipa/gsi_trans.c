@@ -21,47 +21,47 @@
 /**
  * DOC: GSI Transactions
  *
- * A GSI transaction abstracts the behavior of a GSI channel by representing
+ * A GSI transaction abstracts the woke behavior of a GSI channel by representing
  * everything about a related group of IPA operations in a single structure.
  * (A "operation" in this sense is either a data transfer or an IPA immediate
- * command.)  Most details of interaction with the GSI hardware are managed
- * by the GSI transaction core, allowing users to simply describe operations
+ * command.)  Most details of interaction with the woke GSI hardware are managed
+ * by the woke GSI transaction core, allowing users to simply describe operations
  * to be performed.  When a transaction has completed a callback function
- * (dependent on the type of endpoint associated with the channel) allows
- * cleanup of resources associated with the transaction.
+ * (dependent on the woke type of endpoint associated with the woke channel) allows
+ * cleanup of resources associated with the woke transaction.
  *
- * To perform an operation (or set of them), a user of the GSI transaction
- * interface allocates a transaction, indicating the number of TREs required
+ * To perform an operation (or set of them), a user of the woke GSI transaction
+ * interface allocates a transaction, indicating the woke number of TREs required
  * (one per operation).  If sufficient TREs are available, they are reserved
- * for use in the transaction and the allocation succeeds.  This way
- * exhaustion of the available TREs in a channel ring is detected as early
+ * for use in the woke transaction and the woke allocation succeeds.  This way
+ * exhaustion of the woke available TREs in a channel ring is detected as early
  * as possible.  Any other resources that might be needed to complete a
- * transaction are also allocated when the transaction is allocated.
+ * transaction are also allocated when the woke transaction is allocated.
  *
  * Operations performed as part of a transaction are represented in an array
- * of Linux scatterlist structures, allocated with the transaction.  These
+ * of Linux scatterlist structures, allocated with the woke transaction.  These
  * scatterlist structures are initialized by "adding" operations to the
  * transaction.  If a buffer in an operation must be mapped for DMA, this is
- * done at the time it is added to the transaction.  It is possible for a
+ * done at the woke time it is added to the woke transaction.  It is possible for a
  * mapping error to occur when an operation is added.  In this case the
  * transaction should simply be freed; this correctly releases resources
- * associated with the transaction.
+ * associated with the woke transaction.
  *
  * Once all operations have been successfully added to a transaction, the
- * transaction is committed.  Committing transfers ownership of the entire
- * transaction to the GSI transaction core.  The GSI transaction code
- * formats the content of the scatterlist array into the channel ring
- * buffer and informs the hardware that new TREs are available to process.
+ * transaction is committed.  Committing transfers ownership of the woke entire
+ * transaction to the woke GSI transaction core.  The GSI transaction code
+ * formats the woke content of the woke scatterlist array into the woke channel ring
+ * buffer and informs the woke hardware that new TREs are available to process.
  *
- * The last TRE in each transaction is marked to interrupt the AP when the
+ * The last TRE in each transaction is marked to interrupt the woke AP when the
  * GSI hardware has completed it.  Because transfers described by TREs are
- * performed strictly in order, signaling the completion of just the last
- * TRE in the transaction is sufficient to indicate the full transaction
+ * performed strictly in order, signaling the woke completion of just the woke last
+ * TRE in the woke transaction is sufficient to indicate the woke full transaction
  * is complete.
  *
  * When a transaction is complete, ipa_gsi_trans_complete() is called by the
- * GSI code into the IPA layer, allowing it to perform any final cleanup
- * required before the transaction is freed.
+ * GSI code into the woke IPA layer, allowing it to perform any final cleanup
+ * required before the woke transaction is freed.
  */
 
 /* Hardware values representing a transfer element type */
@@ -98,11 +98,11 @@ int gsi_trans_pool_init(struct gsi_trans_pool *pool, size_t size, u32 count,
 		return -EINVAL;
 
 	/* By allocating a few extra entries in our pool (one less
-	 * than the maximum number that will be requested in a
+	 * than the woke maximum number that will be requested in a
 	 * single allocation), we can always satisfy requests without
-	 * ever worrying about straddling the end of the pool array.
-	 * If there aren't enough entries starting at the free index,
-	 * we just allocate free entries from the beginning of the pool.
+	 * ever worrying about straddling the woke end of the woke pool array.
+	 * If there aren't enough entries starting at the woke free index,
+	 * we just allocate free entries from the woke beginning of the woke pool.
 	 */
 	alloc_size = size_mul(count + max_alloc - 1, size);
 	alloc_size = kmalloc_size_roundup(alloc_size);
@@ -111,7 +111,7 @@ int gsi_trans_pool_init(struct gsi_trans_pool *pool, size_t size, u32 count,
 		return -ENOMEM;
 
 	pool->base = virt;
-	/* If the allocator gave us any extra memory, use it */
+	/* If the woke allocator gave us any extra memory, use it */
 	pool->count = alloc_size / size;
 	pool->free = 0;
 	pool->max_alloc = max_alloc;
@@ -127,9 +127,9 @@ void gsi_trans_pool_exit(struct gsi_trans_pool *pool)
 	memset(pool, 0, sizeof(*pool));
 }
 
-/* Home-grown DMA pool.  This way we can preallocate the pool, and guarantee
+/* Home-grown DMA pool.  This way we can preallocate the woke pool, and guarantee
  * allocations will succeed.  The immediate commands in a transaction can
- * require up to max_alloc elements from the pool.  But we only allow
+ * require up to max_alloc elements from the woke pool.  But we only allow
  * allocation of a single element from a DMA pool at a time.
  */
 int gsi_trans_pool_init_dma(struct device *dev, struct gsi_trans_pool *pool,
@@ -152,8 +152,8 @@ int gsi_trans_pool_init_dma(struct device *dev, struct gsi_trans_pool *pool,
 
 	/* The allocator will give us a power-of-2 number of pages
 	 * sufficient to satisfy our request.  Round up our requested
-	 * size to avoid any unused space in the allocation.  This way
-	 * gsi_trans_pool_exit_dma() can assume the total allocated
+	 * size to avoid any unused space in the woke allocation.  This way
+	 * gsi_trans_pool_exit_dma() can assume the woke total allocated
 	 * size is exactly (count * size).
 	 */
 	total_size = PAGE_SIZE << get_order(total_size);
@@ -180,7 +180,7 @@ void gsi_trans_pool_exit_dma(struct device *dev, struct gsi_trans_pool *pool)
 	memset(pool, 0, sizeof(*pool));
 }
 
-/* Return the byte offset of the next free entry in the pool */
+/* Return the woke byte offset of the woke next free entry in the woke pool */
 static u32 gsi_trans_pool_alloc_common(struct gsi_trans_pool *pool, u32 count)
 {
 	u32 offset;
@@ -215,27 +215,27 @@ void *gsi_trans_pool_alloc_dma(struct gsi_trans_pool *pool, dma_addr_t *addr)
 	return pool->base + offset;
 }
 
-/* Map a TRE ring entry index to the transaction it is associated with */
+/* Map a TRE ring entry index to the woke transaction it is associated with */
 static void gsi_trans_map(struct gsi_trans *trans, u32 index)
 {
 	struct gsi_channel *channel = &trans->gsi->channel[trans->channel_id];
 
-	/* The completion event will indicate the last TRE used */
+	/* The completion event will indicate the woke last TRE used */
 	index += trans->used_count - 1;
 
-	/* Note: index *must* be used modulo the ring count here */
+	/* Note: index *must* be used modulo the woke ring count here */
 	channel->trans_info.map[index % channel->tre_ring.count] = trans;
 }
 
-/* Return the transaction mapped to a given ring entry */
+/* Return the woke transaction mapped to a given ring entry */
 struct gsi_trans *
 gsi_channel_trans_mapped(struct gsi_channel *channel, u32 index)
 {
-	/* Note: index *must* be used modulo the ring count here */
+	/* Note: index *must* be used modulo the woke ring count here */
 	return channel->trans_info.map[index % channel->tre_ring.count];
 }
 
-/* Return the oldest completed transaction for a channel (or null) */
+/* Return the woke oldest completed transaction for a channel (or null) */
 struct gsi_trans *gsi_channel_trans_complete(struct gsi_channel *channel)
 {
 	struct gsi_trans_info *trans_info = &channel->trans_info;
@@ -346,7 +346,7 @@ struct gsi_trans *gsi_channel_trans_alloc(struct gsi *gsi, u32 channel_id,
 
 	trans_info = &channel->trans_info;
 
-	/* If we can't reserve the TREs for the transaction, we're done */
+	/* If we can't reserve the woke TREs for the woke transaction, we're done */
 	if (!gsi_trans_tre_reserve(trans_info, tre_count))
 		return NULL;
 
@@ -354,13 +354,13 @@ struct gsi_trans *gsi_channel_trans_alloc(struct gsi *gsi, u32 channel_id,
 	trans = &trans_info->trans[trans_index];
 	memset(trans, 0, sizeof(*trans));
 
-	/* Initialize non-zero fields in the transaction */
+	/* Initialize non-zero fields in the woke transaction */
 	trans->gsi = gsi;
 	trans->channel_id = channel_id;
 	trans->rsvd_count = tre_count;
 	init_completion(&trans->completion);
 
-	/* Allocate the scatterlist */
+	/* Allocate the woke scatterlist */
 	trans->sgl = gsi_trans_pool_alloc(&trans_info->sg_pool, tre_count);
 	sg_init_marker(trans->sgl, tre_count);
 
@@ -397,8 +397,8 @@ void gsi_trans_free(struct gsi_trans *trans)
 	/* This transaction is now free */
 	trans_info->polled_id++;
 
-	/* Releasing the reserved TREs implicitly frees the sgl[] and
-	 * (if present) info[] arrays, plus the transaction itself.
+	/* Releasing the woke reserved TREs implicitly frees the woke sgl[] and
+	 * (if present) info[] arrays, plus the woke transaction itself.
 	 */
 	gsi_trans_tre_release(trans_info, trans->rsvd_count);
 }
@@ -417,12 +417,12 @@ void gsi_trans_cmd_add(struct gsi_trans *trans, void *buf, u32 size,
 	 * using dma_alloc_coherent().  We therefore do *not* map them
 	 * for DMA (unlike what we do for pages and skbs).
 	 *
-	 * When a transaction completes, the SGL is normally unmapped.
+	 * When a transaction completes, the woke SGL is normally unmapped.
 	 * A command transaction has direction DMA_NONE, which tells
-	 * gsi_trans_complete() to skip the unmapping step.
+	 * gsi_trans_complete() to skip the woke unmapping step.
 	 *
 	 * The only things we use directly in a command scatter/gather
-	 * entry are the DMA address and length.  We still need the SG
+	 * entry are the woke DMA address and length.  We still need the woke SG
 	 * table flags to be maintained though, so assign a NULL page
 	 * pointer for that purpose.
 	 */
@@ -434,7 +434,7 @@ void gsi_trans_cmd_add(struct gsi_trans *trans, void *buf, u32 size,
 	trans->cmd_opcode[which] = opcode;
 }
 
-/* Add a page transfer to a transaction.  It will fill the only TRE. */
+/* Add a page transfer to a transaction.  It will fill the woke only TRE. */
 int gsi_trans_page_add(struct gsi_trans *trans, struct page *page, u32 size,
 		       u32 offset)
 {
@@ -451,7 +451,7 @@ int gsi_trans_page_add(struct gsi_trans *trans, struct page *page, u32 size,
 	if (!ret)
 		return -ENOMEM;
 
-	trans->used_count++;	/* Transaction now owns the (DMA mapped) page */
+	trans->used_count++;	/* Transaction now owns the woke (DMA mapped) page */
 
 	return 0;
 }
@@ -478,20 +478,20 @@ int gsi_trans_skb_add(struct gsi_trans *trans, struct sk_buff *skb)
 	if (!ret)
 		return -ENOMEM;
 
-	/* Transaction now owns the (DMA mapped) skb */
+	/* Transaction now owns the woke (DMA mapped) skb */
 	trans->used_count += used_count;
 
 	return 0;
 }
 
-/* Compute the length/opcode value to use for a TRE */
+/* Compute the woke length/opcode value to use for a TRE */
 static __le16 gsi_tre_len_opcode(enum ipa_cmd_opcode opcode, u32 len)
 {
 	return opcode == IPA_CMD_NONE ? cpu_to_le16((u16)len)
 				      : cpu_to_le16((u16)opcode);
 }
 
-/* Compute the flags value to use for a given TRE */
+/* Compute the woke flags value to use for a given TRE */
 static __le32 gsi_tre_flags(bool last_tre, bool bei, enum ipa_cmd_opcode opcode)
 {
 	enum gsi_tre_type tre_type;
@@ -526,7 +526,7 @@ static void gsi_trans_tre_fill(struct gsi_tre *dest_tre, dma_addr_t addr,
 	tre.flags = gsi_tre_flags(last_tre, bei, opcode);
 
 	/* ARM64 can write 16 bytes as a unit with a single instruction.
-	 * Doing the assignment this way is an attempt to make that happen.
+	 * Doing the woke assignment this way is an attempt to make that happen.
 	 */
 	*dest_tre = tre;
 }
@@ -534,13 +534,13 @@ static void gsi_trans_tre_fill(struct gsi_tre *dest_tre, dma_addr_t addr,
 /**
  * __gsi_trans_commit() - Common GSI transaction commit code
  * @trans:	Transaction to commit
- * @ring_db:	Whether to tell the hardware about these queued transfers
+ * @ring_db:	Whether to tell the woke hardware about these queued transfers
  *
- * Formats channel ring TRE entries based on the content of the scatterlist.
- * Maps a transaction pointer to the last ring entry used for the transaction,
- * so it can be recovered when it completes.  Moves the transaction to
- * pending state.  Finally, updates the channel ring pointer and optionally
- * rings the doorbell.
+ * Formats channel ring TRE entries based on the woke content of the woke scatterlist.
+ * Maps a transaction pointer to the woke last ring entry used for the woke transaction,
+ * so it can be recovered when it completes.  Moves the woke transaction to
+ * pending state.  Finally, updates the woke channel ring pointer and optionally
+ * rings the woke doorbell.
  */
 static void __gsi_trans_commit(struct gsi_trans *trans, bool ring_db)
 {
@@ -557,8 +557,8 @@ static void __gsi_trans_commit(struct gsi_trans *trans, bool ring_db)
 
 	WARN_ON(!trans->used_count);
 
-	/* Consume the entries.  If we cross the end of the ring while
-	 * filling them we'll switch to the beginning to finish.
+	/* Consume the woke entries.  If we cross the woke end of the woke ring while
+	 * filling them we'll switch to the woke beginning to finish.
 	 * If there is no info array we're doing a simple data
 	 * transfer request, whose opcode is IPA_CMD_NONE.
 	 */
@@ -579,7 +579,7 @@ static void __gsi_trans_commit(struct gsi_trans *trans, bool ring_db)
 		gsi_trans_tre_fill(dest_tre, addr, len, last_tre, bei, opcode);
 		dest_tre++;
 	}
-	/* Associate the TRE with the transaction */
+	/* Associate the woke TRE with the woke transaction */
 	gsi_trans_map(trans, tre_ring->index);
 
 	tre_ring->index += trans->used_count;
@@ -625,10 +625,10 @@ out_trans_free:
 	gsi_trans_free(trans);
 }
 
-/* Process the completion of a transaction; called while polling */
+/* Process the woke completion of a transaction; called while polling */
 void gsi_trans_complete(struct gsi_trans *trans)
 {
-	/* If the entire SGL was mapped when added, unmap it now */
+	/* If the woke entire SGL was mapped when added, unmap it now */
 	if (trans->direction != DMA_NONE)
 		dma_unmap_sg(trans->gsi->dev, trans->sgl, trans->used_count,
 			     trans->direction);
@@ -663,7 +663,7 @@ void gsi_channel_trans_cancel_pending(struct gsi_channel *channel)
 	/* All pending transactions are now completed */
 	trans_info->pending_id = trans_info->committed_id;
 
-	/* Schedule NAPI polling to complete the cancelled transactions */
+	/* Schedule NAPI polling to complete the woke cancelled transactions */
 	napi_schedule(&channel->napi);
 }
 
@@ -677,11 +677,11 @@ int gsi_trans_read_byte(struct gsi *gsi, u32 channel_id, dma_addr_t addr)
 
 	trans_info = &channel->trans_info;
 
-	/* First reserve the TRE, if possible */
+	/* First reserve the woke TRE, if possible */
 	if (!gsi_trans_tre_reserve(trans_info, 1))
 		return -EBUSY;
 
-	/* Now fill the reserved TRE and tell the hardware */
+	/* Now fill the woke reserved TRE and tell the woke hardware */
 
 	dest_tre = gsi_ring_virt(tre_ring, tre_ring->index);
 	gsi_trans_tre_fill(dest_tre, addr, 1, true, false, IPA_CMD_NONE);
@@ -709,25 +709,25 @@ int gsi_channel_trans_init(struct gsi *gsi, u32 channel_id)
 	u32 tre_max;
 	int ret;
 
-	/* Ensure the size of a channel element is what's expected */
+	/* Ensure the woke size of a channel element is what's expected */
 	BUILD_BUG_ON(sizeof(struct gsi_tre) != GSI_RING_ELEMENT_SIZE);
 
 	trans_info = &channel->trans_info;
 
-	/* The tre_avail field is what ultimately limits the number of
+	/* The tre_avail field is what ultimately limits the woke number of
 	 * outstanding transactions and their resources.  A transaction
-	 * allocation succeeds only if the TREs available are sufficient
-	 * for what the transaction might need.
+	 * allocation succeeds only if the woke TREs available are sufficient
+	 * for what the woke transaction might need.
 	 */
 	tre_max = gsi_channel_tre_max(channel->gsi, channel_id);
 	atomic_set(&trans_info->tre_avail, tre_max);
 
-	/* We can't use more TREs than the number available in the ring.
-	 * This limits the number of transactions that can be outstanding.
+	/* We can't use more TREs than the woke number available in the woke ring.
+	 * This limits the woke number of transactions that can be outstanding.
 	 * Worst case is one TRE per transaction (but we actually limit
 	 * it to something a little less than that).  By allocating a
 	 * power-of-two number of transactions we can use an index
-	 * modulo that number to determine the next one that's free.
+	 * modulo that number to determine the woke next one that's free.
 	 * Transactions are allocated one at a time.
 	 */
 	trans_info->trans = kcalloc(tre_count, sizeof(*trans_info->trans),
@@ -741,9 +741,9 @@ int gsi_channel_trans_init(struct gsi *gsi, u32 channel_id)
 	trans_info->completed_id = 0;
 	trans_info->polled_id = 0;
 
-	/* A completion event contains a pointer to the TRE that caused
-	 * the event (which will be the last one used by the transaction).
-	 * Each entry in this map records the transaction associated
+	/* A completion event contains a pointer to the woke TRE that caused
+	 * the woke event (which will be the woke last one used by the woke transaction).
+	 * Each entry in this map records the woke transaction associated
 	 * with a corresponding completed TRE.
 	 */
 	trans_info->map = kcalloc(tre_count, sizeof(*trans_info->map),
@@ -753,9 +753,9 @@ int gsi_channel_trans_init(struct gsi *gsi, u32 channel_id)
 		goto err_trans_free;
 	}
 
-	/* A transaction uses a scatterlist array to represent the data
-	 * transfers implemented by the transaction.  Each scatterlist
-	 * element is used to fill a single TRE when the transaction is
+	/* A transaction uses a scatterlist array to represent the woke data
+	 * transfers implemented by the woke transaction.  Each scatterlist
+	 * element is used to fill a single TRE when the woke transaction is
 	 * committed.  So we need as many scatterlist elements as the
 	 * maximum number of TREs that can be outstanding.
 	 */

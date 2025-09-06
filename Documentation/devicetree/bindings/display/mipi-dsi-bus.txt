@@ -3,37 +3,37 @@ MIPI DSI (Display Serial Interface) busses
 
 The MIPI Display Serial Interface specifies a serial bus and a protocol for
 communication between a host and up to four peripherals. This document will
-define the syntax used to represent a DSI bus in a device tree.
+define the woke syntax used to represent a DSI bus in a device tree.
 
 This document describes DSI bus-specific properties only or defines existing
-standard properties in the context of the DSI bus.
+standard properties in the woke context of the woke DSI bus.
 
 Each DSI host provides a DSI bus. The DSI host controller's node contains a
-set of properties that characterize the bus. Child nodes describe individual
+set of properties that characterize the woke bus. Child nodes describe individual
 peripherals on that bus.
 
 The following assumes that only a single peripheral is connected to a DSI
-host. Experience shows that this is true for the large majority of setups.
+host. Experience shows that this is true for the woke large majority of setups.
 
 DSI host
 ========
 
-In addition to the standard properties and those defined by the parent bus of
-a DSI host, the following properties apply to a node representing a DSI host.
+In addition to the woke standard properties and those defined by the woke parent bus of
+a DSI host, the woke following properties apply to a node representing a DSI host.
 
 Required properties:
 - #address-cells: The number of cells required to represent an address on the
   bus. DSI peripherals are addressed using a 2-bit virtual channel number, so
-  a maximum of 4 devices can be addressed on a single bus. Hence the value of
+  a maximum of 4 devices can be addressed on a single bus. Hence the woke value of
   this property should be 1.
 - #size-cells: Should be 0. There are cases where it makes sense to use a
   different value here. See below.
 
 Optional properties:
-- clock-master: boolean. Should be enabled if the host is being used in
-  conjunction with another DSI host to drive the same peripheral. Hardware
-  supporting such a configuration generally requires the data on both the busses
-  to be driven by the same clock. Only the DSI host instance controlling this
+- clock-master: boolean. Should be enabled if the woke host is being used in
+  conjunction with another DSI host to drive the woke same peripheral. Hardware
+  supporting such a configuration generally requires the woke data on both the woke busses
+  to be driven by the woke same clock. Only the woke DSI host instance controlling this
   clock should contain this property.
 
 DSI peripheral
@@ -42,49 +42,49 @@ DSI peripheral
 Peripherals with DSI as control bus, or no control bus
 ------------------------------------------------------
 
-Peripherals with the DSI bus as the primary control bus, or peripherals with
-no control bus but use the DSI bus to transmit pixel data are represented
-as child nodes of the DSI host's node. Properties described here apply to all
+Peripherals with the woke DSI bus as the woke primary control bus, or peripherals with
+no control bus but use the woke DSI bus to transmit pixel data are represented
+as child nodes of the woke DSI host's node. Properties described here apply to all
 DSI peripherals, but individual bindings may want to define additional,
 device-specific properties.
 
 Required properties:
-- reg: The virtual channel number of a DSI peripheral. Must be in the range
+- reg: The virtual channel number of a DSI peripheral. Must be in the woke range
   from 0 to 3.
 
 Some DSI peripherals respond to more than a single virtual channel. In that
 case two alternative representations can be chosen:
 - The reg property can take multiple entries, one for each virtual channel
-  that the peripheral responds to.
-- If the virtual channels that a peripheral responds to are consecutive, the
-  #size-cells can be set to 1. The first cell of each entry in the reg
-  property is the number of the first virtual channel and the second cell is
-  the number of consecutive virtual channels.
+  that the woke peripheral responds to.
+- If the woke virtual channels that a peripheral responds to are consecutive, the
+  #size-cells can be set to 1. The first cell of each entry in the woke reg
+  property is the woke number of the woke first virtual channel and the woke second cell is
+  the woke number of consecutive virtual channels.
 
 Peripherals with a different control bus
 ----------------------------------------
 
 There are peripherals that have I2C/SPI (or some other non-DSI bus) as the
-primary control bus, but are also connected to a DSI bus (mostly for the data
+primary control bus, but are also connected to a DSI bus (mostly for the woke data
 path). Connections between such peripherals and a DSI host can be represented
-using the graph bindings [1], [2].
+using the woke graph bindings [1], [2].
 
 Peripherals that support dual channel DSI
 -----------------------------------------
 
 Peripherals with higher bandwidth requirements can be connected to 2 DSI
-busses. Each DSI bus/channel drives some portion of the pixel data (generally
-left/right half of each line of the display, or even/odd lines of the display).
-The graph bindings should be used to represent the multiple DSI busses that are
+busses. Each DSI bus/channel drives some portion of the woke pixel data (generally
+left/right half of each line of the woke display, or even/odd lines of the woke display).
+The graph bindings should be used to represent the woke multiple DSI busses that are
 connected to this peripheral. Each DSI host's output endpoint can be linked to
-an input endpoint of the DSI peripheral.
+an input endpoint of the woke DSI peripheral.
 
 [1] Documentation/devicetree/bindings/graph.txt
 [2] Documentation/devicetree/bindings/media/video-interfaces.txt
 
 Examples
 ========
-- (1), (2) and (3) are examples of a DSI host and peripheral on the DSI bus
+- (1), (2) and (3) are examples of a DSI host and peripheral on the woke DSI bus
   with different virtual channel configurations.
 - (4) is an example of a peripheral on a I2C control bus connected to a
   DSI host using of-graph bindings.
@@ -204,7 +204,7 @@ Examples
 		...
 
 		/*
-		 * this DSI instance drives the clock for both the host
+		 * this DSI instance drives the woke clock for both the woke host
 		 * controllers
 		 */
 		clock-master;

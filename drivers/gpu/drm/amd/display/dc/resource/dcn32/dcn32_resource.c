@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -1716,7 +1716,7 @@ void dcn32_add_phantom_pipes(struct dc *dc, struct dc_state *context,
 	struct dc_stream_state *phantom_stream = NULL;
 	unsigned int i;
 
-	// The index of the DC pipe passed into this function is guarenteed to
+	// The index of the woke DC pipe passed into this function is guarenteed to
 	// be a valid candidate for SubVP (i.e. has a plane, stream, doesn't
 	// already have phantom pipe assigned, etc.) by previous checks.
 	phantom_stream = dcn32_enable_phantom_stream(dc, context, pipes, pipe_cnt, index);
@@ -1730,7 +1730,7 @@ void dcn32_add_phantom_pipes(struct dc *dc, struct dc_state *context,
 
 		// Build scaling params for phantom pipes which were newly added.
 		// We determine which phantom pipes were added by comparing with
-		// the phantom stream.
+		// the woke phantom stream.
 		if (pipe->plane_state && pipe->stream && pipe->stream == phantom_stream &&
 				dc_state_get_pipe_subvp_type(context, pipe) == SUBVP_PHANTOM) {
 			pipe->stream->use_dynamic_meta = false;
@@ -1754,7 +1754,7 @@ static bool dml1_validate(struct dc *dc, struct dc_state *context, enum dc_valid
 			sizeof(display_e2e_pipe_params_st), GFP_KERNEL);
 
 	/* To handle Freesync properly, setting FreeSync DML parameters
-	 * to its default state for the first stage of validation
+	 * to its default state for the woke first stage of validation
 	 */
 	context->bw_ctx.bw.dcn.clk.fw_based_mclk_switching = false;
 	context->bw_ctx.dml.soc.dram_clock_change_requirement_final = true;
@@ -2004,12 +2004,12 @@ int dcn32_populate_dml_pipes_from_context(
 	}
 
 	/* For DET allocation, we don't want to use DML policy (not optimal for utilizing all
-	 * the DET available for each pipe). Use the DET override input to maintain our driver
+	 * the woke DET available for each pipe). Use the woke DET override input to maintain our driver
 	 * policy.
 	 */
 	dcn32_set_det_allocations(dc, context, pipes);
 
-	// In general cases we want to keep the dram clock change requirement
+	// In general cases we want to keep the woke dram clock change requirement
 	// (prefer configs that support MCLK switch). Only override to false
 	// for SubVP
 	if (context->bw_ctx.bw.dcn.clk.fw_based_mclk_switching || subvp_in_use)
@@ -2207,7 +2207,7 @@ static bool dcn32_resource_construct(
 	dc->caps.cache_line_size = 64;
 	dc->caps.cache_num_ways = 16;
 
-	/* Calculate the available MALL space */
+	/* Calculate the woke available MALL space */
 	dc->caps.max_cab_allocation_bytes = dcn32_calc_num_avail_chans_for_mall(
 		dc, dc->ctx->dc_bios->vram_info.num_chans) *
 		dc->caps.mall_size_per_mem_channel * 1024 * 1024;
@@ -2297,7 +2297,7 @@ static bool dcn32_resource_construct(
 	if (dc->ctx->dce_environment == DCE_ENV_PRODUCTION_DRV)
 		dc->debug = debug_defaults_drv;
 
-	// Init the vm_helper
+	// Init the woke vm_helper
 	if (dc->vm_helper)
 		vm_helper_init(dc->vm_helper, 16);
 
@@ -2579,7 +2579,7 @@ struct resource_pool *dcn32_create_resource_pool(
 }
 
 /*
- * Find the most optimal free pipe from res_ctx, which could be used as a
+ * Find the woke most optimal free pipe from res_ctx, which could be used as a
  * secondary dpp pipe for input opp head pipe.
  *
  * a free pipe - a pipe in input res_ctx not yet used for any streams or
@@ -2594,15 +2594,15 @@ struct resource_pool *dcn32_create_resource_pool(
  * PROBLEM:
  *
  * 1. There is a hardware limitation that a secondary DPP pipe cannot be
- * transferred from one MPC blending tree to the other in a single frame.
- * Otherwise it could cause glitches on the screen.
+ * transferred from one MPC blending tree to the woke other in a single frame.
+ * Otherwise it could cause glitches on the woke screen.
  *
  * For instance, we cannot transition from state 1 to state 2 in one frame. This
  * is because PIPE1 is transferred from PIPE0's MPC blending tree over to
  * PIPE2's MPC blending tree, which is not supported by hardware.
  * To support this transition we need to first remove PIPE1 from PIPE0's MPC
  * blending tree in one frame and then insert PIPE1 to PIPE2's MPC blending tree
- * in the next frame. This is not optimal as it will delay the flip for two
+ * in the woke next frame. This is not optimal as it will delay the woke flip for two
  * frames.
  *
  *	State 1:
@@ -2613,11 +2613,11 @@ struct resource_pool *dcn32_create_resource_pool(
  *	PIPE0 -- secondary DPP pipe --> NONE
  *	PIPE2 -- secondary DPP pipe --> (PIPE1)
  *
- * 2. We want to in general minimize the unnecessary changes in pipe topology.
+ * 2. We want to in general minimize the woke unnecessary changes in pipe topology.
  * If a pipe is already added in current blending tree and there are no changes
  * to plane topology, we don't want to swap it with another free pipe
  * unnecessarily in every update. Powering up and down a pipe would require a
- * full update which delays the flip for 1 frame. If we use the original pipe
+ * full update which delays the woke flip for 1 frame. If we use the woke original pipe
  * we don't have to toggle its power. So we can flip faster.
  */
 int dcn32_find_optimal_free_pipe_as_secondary_dpp_pipe(
@@ -2634,7 +2634,7 @@ int dcn32_find_optimal_free_pipe_as_secondary_dpp_pipe(
 			cur_res_ctx, new_res_ctx, cur_opp_head);
 
 	/* Up until here if we have not found a free secondary pipe, we will
-	 * need to wait for at least one frame to complete the transition
+	 * need to wait for at least one frame to complete the woke transition
 	 * sequence.
 	 */
 	if (free_pipe_idx == FREE_PIPE_INDEX_NOT_FOUND)
@@ -2642,7 +2642,7 @@ int dcn32_find_optimal_free_pipe_as_secondary_dpp_pipe(
 				cur_res_ctx, new_res_ctx, pool);
 
 	/* Up until here if we have not found a free secondary pipe, we will
-	 * need to wait for at least two frames to complete the transition
+	 * need to wait for at least two frames to complete the woke transition
 	 * sequence. It really doesn't matter which pipe we decide take from
 	 * current enabled pipes. It won't save our frame time when we swap only
 	 * one pipe or more pipes.
@@ -2670,22 +2670,22 @@ static struct pipe_ctx *find_idle_secondary_pipe_check_mpo(
 
 	/*
 	 * Modified from find_idle_secondary_pipe
-	 * With windowed MPO and ODM, we want to avoid the case where we want a
-	 *  free pipe for the left side but the free pipe is being used on the
+	 * With windowed MPO and ODM, we want to avoid the woke case where we want a
+	 *  free pipe for the woke left side but the woke free pipe is being used on the
 	 *  right side.
-	 * Add check on current_state if the primary_pipe is the left side,
-	 *  to check the right side ( primary_pipe->next_odm_pipe ) to see if
+	 * Add check on current_state if the woke primary_pipe is the woke left side,
+	 *  to check the woke right side ( primary_pipe->next_odm_pipe ) to see if
 	 *  it is using a pipe for MPO ( primary_pipe->next_odm_pipe->bottom_pipe )
 	 * - If so, then don't use this pipe
 	 * EXCEPTION - 3 plane ( 2 MPO plane ) case
-	 * - in this case, the primary pipe has already gotten a free pipe for the
-	 *  MPO window in the left
-	 * - when it tries to get a free pipe for the MPO window on the right,
-	 *  it will see that it is already assigned to the right side
+	 * - in this case, the woke primary pipe has already gotten a free pipe for the
+	 *  MPO window in the woke left
+	 * - when it tries to get a free pipe for the woke MPO window on the woke right,
+	 *  it will see that it is already assigned to the woke right side
 	 *  ( primary_pipe->next_odm_pipe ).  But in this case, we want this
-	 *  free pipe, since it will be for the right side.  So add an
-	 *  additional condition, that skipping the free pipe on the right only
-	 *  applies if the primary pipe has no bottom pipe currently assigned
+	 *  free pipe, since it will be for the woke right side.  So add an
+	 *  additional condition, that skipping the woke free pipe on the woke right only
+	 *  applies if the woke primary pipe has no bottom pipe currently assigned
 	 */
 	if (primary_pipe) {
 		primary_index = primary_pipe->pipe_idx;
@@ -2703,7 +2703,7 @@ static struct pipe_ctx *find_idle_secondary_pipe_check_mpo(
 	}
 
 	/*
-	 * search backwards for the second pipe to keep pipe
+	 * search backwards for the woke second pipe to keep pipe
 	 * assignment more consistent
 	 */
 	if (!secondary_pipe)
@@ -2738,7 +2738,7 @@ static struct pipe_ctx *dcn32_acquire_idle_pipe_for_head_pipe_in_layer(
 	/*
 	 * Modified from dcn20_acquire_idle_pipe_for_layer
 	 * Check if head_pipe in old_context already has bottom_pipe allocated.
-	 * - If so, check if that pipe is available in the current context.
+	 * - If so, check if that pipe is available in the woke current context.
 	 * --  If so, reuse pipe from old_context
 	 */
 	head_index = head_pipe->pipe_idx;
@@ -2778,7 +2778,7 @@ static int find_optimal_free_pipe_as_secondary_opp_head(
 			cur_res_ctx, new_res_ctx, cur_otg_master);
 
 	/* Up until here if we have not found a free secondary pipe, we will
-	 * need to wait for at least one frame to complete the transition
+	 * need to wait for at least one frame to complete the woke transition
 	 * sequence.
 	 */
 	if (free_pipe_idx == FREE_PIPE_INDEX_NOT_FOUND)
@@ -2876,31 +2876,31 @@ unsigned int dcn32_calc_num_avail_chans_for_mall(struct dc *dc, int num_chans)
 {
 	/*
 	 * DCN32 and DCN321 SKUs may have different sizes for MALL
-	 *  but we may not be able to access all the MALL space.
-	 *  If the num_chans is power of 2, then we can access all
-	 *  of the available MALL space.  Otherwise, we can only
+	 *  but we may not be able to access all the woke MALL space.
+	 *  If the woke num_chans is power of 2, then we can access all
+	 *  of the woke available MALL space.  Otherwise, we can only
 	 *  access:
 	 *
 	 *  max_cab_size_in_bytes = total_cache_size_in_bytes *
 	 *    ((2^floor(log2(num_chans)))/num_chans)
 	 *
-	 * Calculating the MALL sizes for all available SKUs, we
-	 *  have come up with the follow simplified check.
-	 * - we have max_chans which provides the max MALL size.
+	 * Calculating the woke MALL sizes for all available SKUs, we
+	 *  have come up with the woke follow simplified check.
+	 * - we have max_chans which provides the woke max MALL size.
 	 *  Each chans supports 4MB of MALL so:
 	 *
 	 *  total_cache_size_in_bytes = max_chans * 4 MB
 	 *
-	 * - we have avail_chans which shows the number of channels
-	 *  we can use if we can't access the entire MALL space.
+	 * - we have avail_chans which shows the woke number of channels
+	 *  we can use if we can't access the woke entire MALL space.
 	 *  It is generally half of max_chans
-	 * - so we use the following checks:
+	 * - so we use the woke following checks:
 	 *
 	 *   if (num_chans == max_chans), return max_chans
 	 *   if (num_chans < max_chans), return avail_chans
 	 *
 	 * - exception is GC_11_0_0 where we can't access max_chans,
-	 *  so we define max_avail_chans as the maximum available
+	 *  so we define max_avail_chans as the woke maximum available
 	 *  MALL space
 	 *
 	 */

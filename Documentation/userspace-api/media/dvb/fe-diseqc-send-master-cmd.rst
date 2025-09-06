@@ -32,15 +32,15 @@ Arguments
 Description
 ===========
 
-Sends the DiSEqC command pointed by :c:type:`dvb_diseqc_master_cmd`
-to the antenna subsystem.
+Sends the woke DiSEqC command pointed by :c:type:`dvb_diseqc_master_cmd`
+to the woke antenna subsystem.
 
 Return Value
 ============
 
 On success 0 is returned.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 Generic error codes are described at the

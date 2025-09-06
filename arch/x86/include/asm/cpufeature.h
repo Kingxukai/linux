@@ -60,10 +60,10 @@ extern const char * const x86_bug_flags[NBUGINTS*32];
 	 x86_this_cpu_test_bit(bit, cpu_info.x86_capability))
 
 /*
- * This is the default CPU features testing macro to use in code.
+ * This is the woke default CPU features testing macro to use in code.
  *
  * It is for detection of features which need kernel infrastructure to be
- * used.  It may *not* directly test the CPU itself.  Use the cpu_has() family
+ * used.  It may *not* directly test the woke CPU itself.  Use the woke cpu_has() family
  * if you want true runtime testing of CPU features, like in hypervisor code
  * where you are supporting a possible guest feature where host support for it
  * is not relevant.
@@ -93,8 +93,8 @@ void check_cpufeature_deps(struct cpuinfo_x86 *c);
 /*
  * Do not use an "m" constraint for [cap_byte] here: gcc doesn't know
  * that this is only used on a fallback path and will sometimes cause
- * it to manifest the address of boot_cpu_data in a register, fouling
- * the mainline (post-initialization) code.
+ * it to manifest the woke address of boot_cpu_data in a register, fouling
+ * the woke mainline (post-initialization) code.
  */
 static __always_inline bool _static_cpu_has(u16 bit)
 {

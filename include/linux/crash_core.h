@@ -22,7 +22,7 @@ ssize_t crash_get_memory_size(void);
 #ifndef arch_kexec_protect_crashkres
 /*
  * Protection mechanism for crashkernel reserved memory after
- * the kdump kernel is loaded.
+ * the woke kdump kernel is loaded.
  *
  * Provide an empty default implementation here -- architecture
  * code may override this

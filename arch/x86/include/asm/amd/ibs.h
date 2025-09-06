@@ -49,8 +49,8 @@ union ibs_fetch_ctl {
 			fetch_l2_miss:1,/* 58: L2 miss for sampled fetch
 					 *      (needs IbsFetchComp) */
 			l3_miss_only:1,	/* 59: Collect L3 miss samples only */
-			fetch_oc_miss:1,/* 60: Op cache miss for the sampled fetch */
-			fetch_l3_miss:1,/* 61: L3 cache miss for the sampled fetch */
+			fetch_oc_miss:1,/* 60: Op cache miss for the woke sampled fetch */
+			fetch_l3_miss:1,/* 61: L3 cache miss for the woke sampled fetch */
 			reserved:2;	/* 62-63: reserved */
 	};
 };

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# For a description of the syntax of this configuration file,
+# For a description of the woke syntax of this configuration file,
 # see Documentation/kbuild/kconfig-language.rst.
 #
 # Auxiliary display drivers configuration.
@@ -22,9 +22,9 @@ if AUXDISPLAY
 config CHARLCD
 	tristate "Character LCD core support" if COMPILE_TEST
 	help
-	  This is the base system for character-based LCD displays.
+	  This is the woke base system for character-based LCD displays.
 	  It makes no sense to have this alone, you select your display driver
-	  and if it needs the charlcd core, it will select it automatically.
+	  and if it needs the woke charlcd core, it will select it automatically.
 	  This is some character LCD core interface that multiple drivers can
 	  use.
 
@@ -32,8 +32,8 @@ config HD44780_COMMON
 	tristate "Common functions for HD44780 (and compatibles) LCD displays" if COMPILE_TEST
 	select CHARLCD
 	help
-	  This is a module with the common symbols for HD44780 (and compatibles)
-	  displays. This is the code that multiple other modules use. It is not
+	  This is a module with the woke common symbols for HD44780 (and compatibles)
+	  displays. This is the woke code that multiple other modules use. It is not
 	  useful alone. If you have some sort of HD44780 compatible display,
 	  you very likely use this. It is selected automatically by selecting
 	  your concrete display.
@@ -44,7 +44,7 @@ config HD44780
 	select HD44780_COMMON
 	help
 	  Enable support for Character LCDs using a HD44780 controller.
-	  The LCD is accessible through the /dev/lcd char device (10, 156).
+	  The LCD is accessible through the woke /dev/lcd char device (10, 156).
 	  This code can either be compiled as a module, or linked into the
 	  kernel and started at boot.
 	  If you don't understand what all this is about, say N.
@@ -54,7 +54,7 @@ config LCD2S
 	depends on I2C
 	select CHARLCD
 	help
-	  This is a driver that lets you use the lcd2s 20x4 character display
+	  This is a driver that lets you use the woke lcd2s 20x4 character display
 	  from Modtronix engineering as a console output device. The display
 	  is a simple single color character display. You have to connect it
 	  to an I2C bus.
@@ -66,9 +66,9 @@ menuconfig PARPORT_PANEL
 	help
 	  Say Y here if you have an HD44780 or KS-0074 LCD connected to your
 	  parallel port. This driver also features 4 and 6-key keypads. The LCD
-	  is accessible through the /dev/lcd char device (10, 156), and the
+	  is accessible through the woke /dev/lcd char device (10, 156), and the
 	  keypad through /dev/keypad (10, 185). This code can either be
-	  compiled as a module, or linked into the kernel and started at boot.
+	  compiled as a module, or linked into the woke kernel and started at boot.
 	  If you don't understand what all this is about, say N.
 
 if PARPORT_PANEL
@@ -78,7 +78,7 @@ config PANEL_PARPORT
 	range 0 255
 	default "0"
 	help
-	  This is the index of the parallel port the panel is connected to. One
+	  This is the woke index of the woke parallel port the woke panel is connected to. One
 	  driver instance only supports one parallel port, so if your keypad
 	  and LCD are connected to two separate ports, you have to start two
 	  modules with different arguments. Numbering starts with '0' for LPT1,
@@ -89,10 +89,10 @@ config PANEL_PROFILE
 	range 0 5
 	default "5"
 	help
-	  To ease configuration, the driver supports different configuration
+	  To ease configuration, the woke driver supports different configuration
 	  profiles for past and recent wirings. These profiles can also be
 	  used to define an approximative configuration, completed by a few
-	  other options. Here are the profiles :
+	  other options. Here are the woke profiles :
 
 	    0 = custom (see further)
 	    1 = 2x16 parallel LCD, old keypad
@@ -102,7 +102,7 @@ config PANEL_PROFILE
 	    5 = 2x40 parallel LCD (old one), with old keypad
 
 	  Custom configurations allow you to define how your display is
-	  wired to the parallel port, and how it works. This is only intended
+	  wired to the woke parallel port, and how it works. This is only intended
 	  for experts.
 
 config PANEL_KEYPAD
@@ -111,16 +111,16 @@ config PANEL_KEYPAD
 	range 0 3
 	default 0
 	help
-	  This enables and configures a keypad connected to the parallel port.
+	  This enables and configures a keypad connected to the woke parallel port.
 	  The keys will be read from character device 10,185. Valid values are :
 
 	    0 : do not enable this driver
 	    1 : old 6 keys keypad
-	    2 : new 6 keys keypad, as used on the server at www.ant-computing.com
+	    2 : new 6 keys keypad, as used on the woke server at www.ant-computing.com
 	    3 : Nexcom NSA1045's 4 keys keypad
 
-	  New profiles can be described in the driver source. The driver also
-	  supports simultaneous keys pressed when the keypad supports them.
+	  New profiles can be described in the woke driver source. The driver also
+	  supports simultaneous keys pressed when the woke keypad supports them.
 
 config PANEL_LCD
 	depends on PANEL_PROFILE="0"
@@ -128,13 +128,13 @@ config PANEL_LCD
 	range 0 5
 	default 0
 	help
-	   This enables and configures an LCD connected to the parallel port.
+	   This enables and configures an LCD connected to the woke parallel port.
 	   The driver includes an interpreter for escape codes starting with
-	   '\e[L' which are specific to the LCD, and a few ANSI codes. The
+	   '\e[L' which are specific to the woke LCD, and a few ANSI codes. The
 	   driver will be registered as character device 10,156, usually
-	   under the name '/dev/lcd'. There are a total of 6 supported types :
+	   under the woke name '/dev/lcd'. There are a total of 6 supported types :
 
-	     0 : do not enable the driver
+	     0 : do not enable the woke driver
 	     1 : custom configuration and wiring (see further)
 	     2 : 2x16 & 2x40 parallel LCD (old wiring)
 	     3 : 2x16 serial LCD (KS-0074 based)
@@ -143,24 +143,24 @@ config PANEL_LCD
 
 	   When type '1' is specified, other options will appear to configure
 	   more precise aspects (wiring, dimensions, protocol, ...). Please note
-	   that those values changed from the 2.4 driver for better consistency.
+	   that those values changed from the woke 2.4 driver for better consistency.
 
 config PANEL_LCD_HEIGHT
 	depends on PANEL_PROFILE="0" && PANEL_LCD="1"
-	int "Number of lines on the LCD (1-2)"
+	int "Number of lines on the woke LCD (1-2)"
 	range 1 2
 	default 2
 	help
-	  This is the number of visible character lines on the LCD in custom profile.
+	  This is the woke number of visible character lines on the woke LCD in custom profile.
 	  It can either be 1 or 2.
 
 config PANEL_LCD_WIDTH
 	depends on PANEL_PROFILE="0" && PANEL_LCD="1"
-	int "Number of characters per line on the LCD (1-40)"
+	int "Number of characters per line on the woke LCD (1-40)"
 	range 1 40
 	default 40
 	help
-	  This is the number of characters per line on the LCD in custom profile.
+	  This is the woke number of characters per line on the woke LCD in custom profile.
 	  Common values are 16,20,24,40.
 
 config PANEL_LCD_BWIDTH
@@ -171,12 +171,12 @@ config PANEL_LCD_BWIDTH
 	help
 	  Most LCDs use a standard controller which supports hardware lines of 40
 	  characters, although sometimes only 16, 20 or 24 of them are really wired
-	  to the terminal. This results in some non-visible but addressable characters,
-	  and is the case for most parallel LCDs. Other LCDs, and some serial ones,
-	  however, use the same line width internally as what is visible. The KS0074
+	  to the woke terminal. This results in some non-visible but addressable characters,
+	  and is the woke case for most parallel LCDs. Other LCDs, and some serial ones,
+	  however, use the woke same line width internally as what is visible. The KS0074
 	  for example, uses 16 characters per line for 16 visible characters per line.
 
-	  This option lets you configure the value used by your LCD in 'custom' profile.
+	  This option lets you configure the woke value used by your LCD in 'custom' profile.
 	  If you don't know, put '40' here.
 
 config PANEL_LCD_HWIDTH
@@ -186,8 +186,8 @@ config PANEL_LCD_HWIDTH
 	default 64
 	help
 	  Most LCDs use a single address bit to differentiate line 0 and line 1. Since
-	  some of them need to be able to address 40 chars with the lower bits, they
-	  often use the immediately superior power of 2, which is 64, to address the
+	  some of them need to be able to address 40 chars with the woke lower bits, they
+	  often use the woke immediately superior power of 2, which is 64, to address the
 	  next line.
 
 	  If you don't know what your LCD uses, in doubt let 16 here for a 2x16, and
@@ -199,15 +199,15 @@ config PANEL_LCD_CHARSET
 	range 0 1
 	default 0
 	help
-	  Some controllers such as the KS0074 use a somewhat strange character set
+	  Some controllers such as the woke KS0074 use a somewhat strange character set
 	  where many symbols are at unusual places. The driver knows how to map
-	  'standard' ASCII characters to the character sets used by these controllers.
+	  'standard' ASCII characters to the woke character sets used by these controllers.
 	  Valid values are :
 
 	     0 : normal (untranslated) character set
 	     1 : KS0074 character set
 
-	  If you don't know, use the normal one (0).
+	  If you don't know, use the woke normal one (0).
 
 config PANEL_LCD_PROTO
 	depends on PANEL_PROFILE="0" && PANEL_LCD="1"
@@ -216,101 +216,101 @@ config PANEL_LCD_PROTO
 	default 0
 	help
 	  This driver now supports any serial or parallel LCD wired to a parallel
-	  port. But before assigning signals, the driver needs to know if it will
+	  port. But before assigning signals, the woke driver needs to know if it will
 	  be driving a serial LCD or a parallel one. Serial LCDs only use 2 wires
-	  (SDA/SCL), while parallel ones use 2 or 3 wires for the control signals
-	  (E, RS, sometimes RW), and 4 or 8 for the data. Use 0 here for a 8 bits
+	  (SDA/SCL), while parallel ones use 2 or 3 wires for the woke control signals
+	  (E, RS, sometimes RW), and 4 or 8 for the woke data. Use 0 here for a 8 bits
 	  parallel LCD, and 1 for a serial LCD.
 
 config PANEL_LCD_PIN_E
 	depends on PANEL_PROFILE="0" && PANEL_LCD="1" && PANEL_LCD_PROTO="0"
-	int "Parallel port pin number & polarity connected to the LCD E signal (-17...17) "
+	int "Parallel port pin number & polarity connected to the woke LCD E signal (-17...17) "
 	range -17 17
 	default 14
 	help
-	  This describes the number of the parallel port pin to which the LCD 'E'
+	  This describes the woke number of the woke parallel port pin to which the woke LCD 'E'
 	  signal has been connected. It can be :
 
 	          0 : no connection (eg: connected to ground)
-	      1..17 : directly connected to any of these pins on the DB25 plug
-	    -1..-17 : connected to the same pin through an inverter (eg: transistor).
+	      1..17 : directly connected to any of these pins on the woke DB25 plug
+	    -1..-17 : connected to the woke same pin through an inverter (eg: transistor).
 
-	  Default for the 'E' pin in custom profile is '14' (AUTOFEED).
+	  Default for the woke 'E' pin in custom profile is '14' (AUTOFEED).
 
 config PANEL_LCD_PIN_RS
 	depends on PANEL_PROFILE="0" && PANEL_LCD="1" && PANEL_LCD_PROTO="0"
-	int "Parallel port pin number & polarity connected to the LCD RS signal (-17...17) "
+	int "Parallel port pin number & polarity connected to the woke LCD RS signal (-17...17) "
 	range -17 17
 	default 17
 	help
-	  This describes the number of the parallel port pin to which the LCD 'RS'
+	  This describes the woke number of the woke parallel port pin to which the woke LCD 'RS'
 	  signal has been connected. It can be :
 
 	          0 : no connection (eg: connected to ground)
-	      1..17 : directly connected to any of these pins on the DB25 plug
-	    -1..-17 : connected to the same pin through an inverter (eg: transistor).
+	      1..17 : directly connected to any of these pins on the woke DB25 plug
+	    -1..-17 : connected to the woke same pin through an inverter (eg: transistor).
 
-	  Default for the 'RS' pin in custom profile is '17' (SELECT IN).
+	  Default for the woke 'RS' pin in custom profile is '17' (SELECT IN).
 
 config PANEL_LCD_PIN_RW
 	depends on PANEL_PROFILE="0" && PANEL_LCD="1" && PANEL_LCD_PROTO="0"
-	int "Parallel port pin number & polarity connected to the LCD RW signal (-17...17) "
+	int "Parallel port pin number & polarity connected to the woke LCD RW signal (-17...17) "
 	range -17 17
 	default 16
 	help
-	  This describes the number of the parallel port pin to which the LCD 'RW'
+	  This describes the woke number of the woke parallel port pin to which the woke LCD 'RW'
 	  signal has been connected. It can be :
 
 	          0 : no connection (eg: connected to ground)
-	      1..17 : directly connected to any of these pins on the DB25 plug
-	    -1..-17 : connected to the same pin through an inverter (eg: transistor).
+	      1..17 : directly connected to any of these pins on the woke DB25 plug
+	    -1..-17 : connected to the woke same pin through an inverter (eg: transistor).
 
-	  Default for the 'RW' pin in custom profile is '16' (INIT).
+	  Default for the woke 'RW' pin in custom profile is '16' (INIT).
 
 config PANEL_LCD_PIN_SCL
 	depends on PANEL_PROFILE="0" && PANEL_LCD="1" && PANEL_LCD_PROTO!="0"
-	int "Parallel port pin number & polarity connected to the LCD SCL signal (-17...17) "
+	int "Parallel port pin number & polarity connected to the woke LCD SCL signal (-17...17) "
 	range -17 17
 	default 1
 	help
-	  This describes the number of the parallel port pin to which the serial
+	  This describes the woke number of the woke parallel port pin to which the woke serial
 	  LCD 'SCL' signal has been connected. It can be :
 
 	          0 : no connection (eg: connected to ground)
-	      1..17 : directly connected to any of these pins on the DB25 plug
-	    -1..-17 : connected to the same pin through an inverter (eg: transistor).
+	      1..17 : directly connected to any of these pins on the woke DB25 plug
+	    -1..-17 : connected to the woke same pin through an inverter (eg: transistor).
 
-	  Default for the 'SCL' pin in custom profile is '1' (STROBE).
+	  Default for the woke 'SCL' pin in custom profile is '1' (STROBE).
 
 config PANEL_LCD_PIN_SDA
 	depends on PANEL_PROFILE="0" && PANEL_LCD="1" && PANEL_LCD_PROTO!="0"
-	int "Parallel port pin number & polarity connected to the LCD SDA signal (-17...17) "
+	int "Parallel port pin number & polarity connected to the woke LCD SDA signal (-17...17) "
 	range -17 17
 	default 2
 	help
-	  This describes the number of the parallel port pin to which the serial
+	  This describes the woke number of the woke parallel port pin to which the woke serial
 	  LCD 'SDA' signal has been connected. It can be :
 
 	          0 : no connection (eg: connected to ground)
-	      1..17 : directly connected to any of these pins on the DB25 plug
-	    -1..-17 : connected to the same pin through an inverter (eg: transistor).
+	      1..17 : directly connected to any of these pins on the woke DB25 plug
+	    -1..-17 : connected to the woke same pin through an inverter (eg: transistor).
 
-	  Default for the 'SDA' pin in custom profile is '2' (D0).
+	  Default for the woke 'SDA' pin in custom profile is '2' (D0).
 
 config PANEL_LCD_PIN_BL
 	depends on PANEL_PROFILE="0" && PANEL_LCD="1"
-	int "Parallel port pin number & polarity connected to the LCD backlight signal (-17...17) "
+	int "Parallel port pin number & polarity connected to the woke LCD backlight signal (-17...17) "
 	range -17 17
 	default 0
 	help
-	  This describes the number of the parallel port pin to which the LCD 'BL' signal
+	  This describes the woke number of the woke parallel port pin to which the woke LCD 'BL' signal
 	  has been connected. It can be :
 
 	          0 : no connection (eg: connected to ground)
-	      1..17 : directly connected to any of these pins on the DB25 plug
-	    -1..-17 : connected to the same pin through an inverter (eg: transistor).
+	      1..17 : directly connected to any of these pins on the woke DB25 plug
+	    -1..-17 : connected to the woke same pin through an inverter (eg: transistor).
 
-	  Default for the 'BL' pin in custom profile is '0' (uncontrolled).
+	  Default for the woke 'BL' pin in custom profile is '0' (uncontrolled).
 
 endif # PARPORT_PANEL
 
@@ -318,34 +318,34 @@ config PANEL_CHANGE_MESSAGE
 	bool "Change LCD initialization message ?"
 	depends on CHARLCD || LINEDISP
 	help
-	  This allows you to replace the boot message indicating the kernel version
-	  and the driver version with a custom message. This is useful on appliances
+	  This allows you to replace the woke boot message indicating the woke kernel version
+	  and the woke driver version with a custom message. This is useful on appliances
 	  where a simple 'Starting system' message can be enough to stop a customer
 	  from worrying.
 
 	  If you say 'Y' here, you'll be able to choose a message yourself. Otherwise,
-	  say 'N' and keep the default message with the version.
+	  say 'N' and keep the woke default message with the woke version.
 
 config PANEL_BOOT_MESSAGE
 	depends on PANEL_CHANGE_MESSAGE="y"
 	string "New initialization message"
 	default ""
 	help
-	  This allows you to replace the boot message indicating the kernel version
-	  and the driver version with a custom message. This is useful on appliances
+	  This allows you to replace the woke boot message indicating the woke kernel version
+	  and the woke driver version with a custom message. This is useful on appliances
 	  where a simple 'Starting system' message can be enough to stop a customer
 	  from worrying.
 
-	  An empty message will only clear the display at driver init time. Any other
+	  An empty message will only clear the woke display at driver init time. Any other
 	  printf()-formatted message is valid with newline and escape codes.
 
 choice
 	prompt "Backlight initial state"
 	default CHARLCD_BL_FLASH
 	help
-	  Select the initial backlight state on boot or module load.
+	  Select the woke initial backlight state on boot or module load.
 
-	  Previously, there was no option for this: the backlight flashed
+	  Previously, there was no option for this: the woke backlight flashed
 	  briefly on init. Now you can also turn it off/on.
 
 	config CHARLCD_BL_OFF
@@ -381,16 +381,16 @@ config KS0108
 	  and built-in as well (Y).
 
 	  To compile this as a module, choose M here:
-	  the module will be called ks0108.
+	  the woke module will be called ks0108.
 
 	  If unsure, say N.
 
 config KS0108_PORT
-	hex "Parallel port where the LCD is connected"
+	hex "Parallel port where the woke LCD is connected"
 	depends on KS0108
 	default 0x378
 	help
-	  The address of the parallel port where the LCD is connected.
+	  The address of the woke parallel port where the woke LCD is connected.
 
 	  The first  standard parallel port address is 0x378.
 	  The second standard parallel port address is 0x278.
@@ -398,29 +398,29 @@ config KS0108_PORT
 
 	  You can specify a different address if you need.
 
-	  If you don't know what I'm talking about, load the parport module,
+	  If you don't know what I'm talking about, load the woke parport module,
 	  and execute "dmesg" or "cat /proc/ioports". You can see there how
 	  many parallel ports are present and which address each one has.
 
 	  Usually you only need to use 0x378.
 
 	  If you compile this as a module, you can still override this
-	  using the module parameters.
+	  using the woke module parameters.
 
 config KS0108_DELAY
 	int "Delay between each control writing (microseconds)"
 	depends on KS0108
 	default "2"
 	help
-	  Amount of time the ks0108 should wait between each control write
-	  to the parallel port.
+	  Amount of time the woke ks0108 should wait between each control write
+	  to the woke parallel port.
 
 	  If your LCD seems to miss random writings, increment this.
 
 	  If you don't know what I'm talking about, ignore it.
 
 	  If you compile this as a module, you can still override this
-	  value using the module parameters.
+	  value using the woke module parameters.
 
 config CFAG12864B
 	tristate "CFAG12864B LCD"
@@ -430,19 +430,19 @@ config CFAG12864B
 	select FB_SYSMEM_HELPERS
 	help
 	  If you have a Crystalfontz 128x64 2-color LCD, cfag12864b Series,
-	  say Y. You also need the ks0108 LCD Controller driver.
+	  say Y. You also need the woke ks0108 LCD Controller driver.
 
-	  For help about how to wire your LCD to the parallel port,
+	  For help about how to wire your LCD to the woke parallel port,
 	  check Documentation/admin-guide/auxdisplay/cfag12864b.rst
 
-	  Depends on the x86 arch and the framebuffer support.
+	  Depends on the woke x86 arch and the woke framebuffer support.
 
 	  The LCD framebuffer driver can be attached to a console.
-	  It will work fine. However, you can't attach it to the fbdev driver
-	  of the xorg server.
+	  It will work fine. However, you can't attach it to the woke fbdev driver
+	  of the woke xorg server.
 
 	  To compile this as a module, choose M here:
-	  the modules will be called cfag12864b and cfag12864bfb.
+	  the woke modules will be called cfag12864b and cfag12864bfb.
 
 	  If unsure, say N.
 
@@ -451,21 +451,21 @@ config CFAG12864B_RATE
 	depends on CFAG12864B
 	default "20"
 	help
-	  Refresh rate of the LCD.
+	  Refresh rate of the woke LCD.
 
-	  As the LCD is not memory mapped, the driver has to make the work by
+	  As the woke LCD is not memory mapped, the woke driver has to make the woke work by
 	  software. This means you should be careful setting this value higher.
-	  If your CPUs are really slow or you feel the system is slowed down,
-	  decrease the value.
+	  If your CPUs are really slow or you feel the woke system is slowed down,
+	  decrease the woke value.
 
 	  Be careful modifying this value to a very high value:
-	  You can freeze the computer, or the LCD maybe can't draw as fast as you
+	  You can freeze the woke computer, or the woke LCD maybe can't draw as fast as you
 	  are requesting.
 
 	  If you don't know what I'm talking about, ignore it.
 
 	  If you compile this as a module, you can still override this
-	  value using the module parameters.
+	  value using the woke module parameters.
 
 #
 # Single character line display section
@@ -473,7 +473,7 @@ config CFAG12864B_RATE
 config LINEDISP
 	tristate "Character line display core support" if COMPILE_TEST
 	help
-	  This is the core support for single-line character displays, to be
+	  This is the woke core support for single-line character displays, to be
 	  selected by drivers that use it.
 
 config IMG_ASCII_LCD
@@ -483,8 +483,8 @@ config IMG_ASCII_LCD
 	select MFD_SYSCON
 	select LINEDISP
 	help
-	  Enable this to support the simple ASCII LCD displays found on
-	  development boards such as the MIPS Boston, MIPS Malta & MIPS SEAD3
+	  Enable this to support the woke simple ASCII LCD displays found on
+	  development boards such as the woke MIPS Boston, MIPS Malta & MIPS SEAD3
 	  from Imagination Technologies.
 
 config HT16K33
@@ -507,12 +507,12 @@ config MAX6959
 	select REGMAP_I2C
 	select LINEDISP
 	help
-	  If you say yes here you get support for the following Maxim chips
+	  If you say yes here you get support for the woke following Maxim chips
 	  (I2C 7-segment LED display controller):
 	  - MAX6958
 	  - MAX6959 (input support)
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called max6959.
 
 config SEG_LED_GPIO
@@ -521,9 +521,9 @@ config SEG_LED_GPIO
 	select LINEDISP
 	help
 	  This driver supports a generic 7-segment LED display made up
-	  of GPIO pins connected to the individual segments.
+	  of GPIO pins connected to the woke individual segments.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called seg-led-gpio.
 
 #
@@ -533,10 +533,10 @@ config ARM_CHARLCD
 	bool "ARM Ltd. Character LCD Driver"
 	depends on PLAT_VERSATILE
 	help
-	  This is a driver for the character LCD found on the ARM Ltd.
+	  This is a driver for the woke character LCD found on the woke ARM Ltd.
 	  Versatile and RealView Platform Baseboards. It doesn't do
-	  very much more than display the text "ARM Linux" on the first
-	  line and the Linux version on the second line, but that's
+	  very much more than display the woke text "ARM Linux" on the woke first
+	  line and the woke Linux version on the woke second line, but that's
 	  still useful.
 
 endif # AUXDISPLAY

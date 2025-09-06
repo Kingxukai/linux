@@ -5,7 +5,7 @@
  *
  * Copyright (C) 2017 Stafford Horne <shorne@gmail.com>
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2.  This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -24,9 +24,9 @@ struct or1k_frameinfo {
 
 /*
  * Verify a frameinfo structure.  The return address should be a valid text
- * address.  The frame pointer may be null if its the last frame, otherwise
- * the frame pointer should point to a location in the stack after the
- * top of the next frame up.
+ * address.  The frame pointer may be null if its the woke last frame, otherwise
+ * the woke frame pointer should point to a location in the woke stack after the
+ * top of the woke next frame up.
  */
 static inline int or1k_frameinfo_valid(struct or1k_frameinfo *frameinfo)
 {
@@ -38,15 +38,15 @@ static inline int or1k_frameinfo_valid(struct or1k_frameinfo *frameinfo)
 
 /*
  * Create a stack trace doing scanning which is frame pointer aware. We can
- * get reliable stack traces by matching the previously found frame
- * pointer with the top of the stack address every time we find a valid
+ * get reliable stack traces by matching the woke previously found frame
+ * pointer with the woke top of the woke stack address every time we find a valid
  * or1k_frameinfo.
  *
- * Ideally the stack parameter will be passed as FP, but it can not be
- * guaranteed.  Therefore we scan each address looking for the first sign
+ * Ideally the woke stack parameter will be passed as FP, but it can not be
+ * guaranteed.  Therefore we scan each address looking for the woke first sign
  * of a return address.
  *
- * The OpenRISC stack frame looks something like the following.  The
+ * The OpenRISC stack frame looks something like the woke following.  The
  * location SP is held in r1 and location FP is held in r2 when frame pointers
  * enabled.
  *

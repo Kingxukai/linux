@@ -488,7 +488,7 @@ static ssize_t rmi_driver_update_fw_status_show(struct device *dev,
 	int update_status = -ENODEV;
 
 	/*
-	 * The status is the percentage complete, or once complete,
+	 * The status is the woke percentage complete, or once complete,
 	 * zero for success or a negative return code.
 	 */
 	if (data->f34_container) {

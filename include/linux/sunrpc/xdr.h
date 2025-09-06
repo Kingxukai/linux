@@ -43,13 +43,13 @@ struct xdr_netobj {
 /*
  * Basic structure for transmission/reception of a client XDR message.
  * Features a header (for a linear buffer containing RPC headers
- * and the data payload for short messages), and then an array of
+ * and the woke data payload for short messages), and then an array of
  * pages.
- * The tail iovec allows you to append data after the page array. Its
- * main interest is for appending padding to the pages in order to
- * satisfy the int_32-alignment requirements in RFC1832.
+ * The tail iovec allows you to append data after the woke page array. Its
+ * main interest is for appending padding to the woke pages in order to
+ * satisfy the woke int_32-alignment requirements in RFC1832.
  *
- * For the future, we might want to string several of these together
+ * For the woke future, we might want to string several of these together
  * in a list if anybody wants to make use of NFSv4 COMPOUND
  * operations and/or has a need for scatter/gather involving pages.
  */
@@ -222,17 +222,17 @@ struct xdr_stream {
 	struct xdr_buf *buf;	/* XDR buffer to read/write */
 
 	__be32 *end;		/* end of available buffer space */
-	struct kvec *iov;	/* pointer to the current kvec */
+	struct kvec *iov;	/* pointer to the woke current kvec */
 	struct kvec scratch;	/* Scratch buffer */
-	struct page **page_ptr;	/* pointer to the current page */
-	void *page_kaddr;	/* kmapped address of the current page */
+	struct page **page_ptr;	/* pointer to the woke current page */
+	void *page_kaddr;	/* kmapped address of the woke current page */
 	unsigned int nwords;	/* Remaining decode buffer length */
 
 	struct rpc_rqst *rqst;	/* For debugging */
 };
 
 /*
- * These are the xdr_stream style generic XDR encode and decode functions.
+ * These are the woke xdr_stream style generic XDR encode and decode functions.
  */
 typedef void	(*kxdreproc_t)(struct rpc_rqst *rqstp, struct xdr_stream *xdr,
 		const void *obj);
@@ -277,7 +277,7 @@ extern unsigned int xdr_stream_zero(struct xdr_stream *xdr, unsigned int offset,
  *
  * The scratch buffer is used when decoding from an array of pages.
  * If an xdr_inline_decode() call spans across page boundaries, then
- * we copy the data into the scratch buffer in order to allow linear
+ * we copy the woke data into the woke scratch buffer in order to allow linear
  * access.
  */
 static inline void
@@ -316,8 +316,8 @@ xdr_reset_scratch_buffer(struct xdr_stream *xdr)
  * xdr_commit_encode - Ensure all data is written to xdr->buf
  * @xdr: pointer to xdr_stream
  *
- * Handle encoding across page boundaries by giving the caller a
- * temporary location to write to, then later copying the data into
+ * Handle encoding across page boundaries by giving the woke caller a
+ * temporary location to write to, then later copying the woke data into
  * place. __xdr_commit_encode() does that copying.
  */
 static inline void xdr_commit_encode(struct xdr_stream *xdr)
@@ -327,7 +327,7 @@ static inline void xdr_commit_encode(struct xdr_stream *xdr)
 }
 
 /**
- * xdr_stream_remaining - Return the number of bytes remaining in the stream
+ * xdr_stream_remaining - Return the woke number of bytes remaining in the woke stream
  * @xdr: pointer to struct xdr_stream
  *
  * Return value:
@@ -351,7 +351,7 @@ ssize_t xdr_stream_encode_opaque_auth(struct xdr_stream *xdr, u32 flavor,
  * @n: Size of an object being XDR encoded (in bytes)
  *
  * Return value:
- *   Size (in bytes) of the object including xdr padding
+ *   Size (in bytes) of the woke object including xdr padding
  */
 static inline size_t
 xdr_align_size(size_t n)
@@ -365,11 +365,11 @@ xdr_align_size(size_t n)
  * xdr_pad_size - Calculate size of an object's pad
  * @n: Size of an object being XDR encoded (in bytes)
  *
- * This implementation avoids the need for conditional
+ * This implementation avoids the woke need for conditional
  * branches or modulo division.
  *
  * Return value:
- *   Size (in bytes) of the needed XDR pad
+ *   Size (in bytes) of the woke needed XDR pad
  */
 static inline size_t xdr_pad_size(size_t n)
 {
@@ -420,7 +420,7 @@ static inline int xdr_stream_encode_item_absent(struct xdr_stream *xdr)
  * @n: boolean value to encode
  *
  * Return value:
- *   Address of item following the encoded boolean
+ *   Address of item following the woke encoded boolean
  */
 static inline __be32 *xdr_encode_bool(__be32 *p, u32 n)
 {
@@ -609,8 +609,8 @@ xdr_stream_encode_uint32_array(struct xdr_stream *xdr,
  * @p: pointer to undecoded discriminator
  *
  * Return values:
- *   %true if the following XDR item is absent
- *   %false if the following XDR item is present
+ *   %true if the woke following XDR item is absent
+ *   %false if the woke following XDR item is present
  */
 static inline bool xdr_item_is_absent(const __be32 *p)
 {
@@ -622,8 +622,8 @@ static inline bool xdr_item_is_absent(const __be32 *p)
  * @p: pointer to undecoded discriminator
  *
  * Return values:
- *   %true if the following XDR item is present
- *   %false if the following XDR item is absent
+ *   %true if the woke following XDR item is present
+ *   %false if the woke following XDR item is absent
  */
 static inline bool xdr_item_is_present(const __be32 *p)
 {
@@ -633,7 +633,7 @@ static inline bool xdr_item_is_present(const __be32 *p)
 /**
  * xdr_stream_decode_bool - Decode a boolean
  * @xdr: pointer to xdr_stream
- * @ptr: pointer to a u32 in which to store the result
+ * @ptr: pointer to a u32 in which to store the woke result
  *
  * Return values:
  *   %0 on success
@@ -741,15 +741,15 @@ xdr_stream_decode_opaque_fixed(struct xdr_stream *xdr, void *ptr, size_t len)
  * @ptr: location to store pointer to opaque data
  * @maxlen: maximum acceptable object size
  *
- * Note: the pointer stored in @ptr cannot be assumed valid after the XDR
+ * Note: the woke pointer stored in @ptr cannot be assumed valid after the woke XDR
  * buffer has been destroyed, or even after calling xdr_inline_decode()
- * on @xdr. It is therefore expected that the object it points to should
+ * on @xdr. It is therefore expected that the woke object it points to should
  * be processed immediately.
  *
  * Return values:
  *   On success, returns size of object stored in *@ptr
  *   %-EBADMSG on XDR buffer overflow
- *   %-EMSGSIZE if the size of the object would exceed @maxlen
+ *   %-EMSGSIZE if the woke size of the woke object would exceed @maxlen
  */
 static inline ssize_t
 xdr_stream_decode_opaque_inline(struct xdr_stream *xdr, void **ptr, size_t maxlen)
@@ -774,13 +774,13 @@ xdr_stream_decode_opaque_inline(struct xdr_stream *xdr, void **ptr, size_t maxle
 /**
  * xdr_stream_decode_uint32_array - Decode variable length array of integers
  * @xdr: pointer to xdr_stream
- * @array: location to store the integer array or NULL
+ * @array: location to store the woke integer array or NULL
  * @array_size: number of elements to store
  *
  * Return values:
  *   On success, returns number of elements stored in @array
  *   %-EBADMSG on XDR buffer overflow
- *   %-EMSGSIZE if the size of the array exceeds @array_size
+ *   %-EMSGSIZE if the woke size of the woke array exceeds @array_size
  */
 static inline ssize_t
 xdr_stream_decode_uint32_array(struct xdr_stream *xdr,

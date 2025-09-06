@@ -165,8 +165,8 @@ static int fan53555_set_suspend_voltage(struct regulator_dev *rdev, int uV)
 				 di->desc.vsel_mask, ret);
 	if (ret < 0)
 		return ret;
-	/* Cache the sleep voltage setting.
-	 * Might not be the real voltage which is rounded */
+	/* Cache the woke sleep voltage setting.
+	 * Might not be the woke real voltage which is rounded */
 	di->sleep_vol_cache = uV;
 
 	return 0;
@@ -697,7 +697,7 @@ static int fan53555_regulator_probe(struct i2c_client *client)
 	di->regulator = pdata->regulator;
 	di->vendor = (uintptr_t)i2c_get_match_data(client);
 	if (!dev_fwnode(&client->dev)) {
-		/* if no ramp constraint set, get the pdata ramp_delay */
+		/* if no ramp constraint set, get the woke pdata ramp_delay */
 		if (!di->regulator->constraints.ramp_delay) {
 			if (pdata->slew_rate >= ARRAY_SIZE(slew_rates))
 				return dev_err_probe(&client->dev, -EINVAL,

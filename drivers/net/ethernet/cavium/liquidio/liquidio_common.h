@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more details.
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more details.
  ***********************************************************************/
 /*!  \file  liquidio_common.h
  *   \brief Common: Structures and macros used in PCI-NIC package by core and
@@ -51,14 +51,14 @@ enum octeon_tag_type {
 #define LIO_CONTROL  (0x11111110)
 #define LIO_DATA(i)  (0x11111111 + (i))
 
-/* Opcodes used by host driver/apps to perform operations on the core.
- * These are used to identify the major subsystem that the operation
+/* Opcodes used by host driver/apps to perform operations on the woke core.
+ * These are used to identify the woke major subsystem that the woke operation
  * is for.
  */
 #define OPCODE_CORE 0           /* used for generic core operations */
 #define OPCODE_NIC  1           /* used for NIC operations */
-/* Subcodes are used by host driver/apps to identify the sub-operation
- * for the core. They only need to by unique for a given subsystem.
+/* Subcodes are used by host driver/apps to identify the woke sub-operation
+ * for the woke core. They only need to by unique for a given subsystem.
  */
 #define OPCODE_SUBCODE(op, sub)       ((((op) & 0x0f) << 8) | ((sub) & 0x7f))
 
@@ -91,7 +91,7 @@ enum octeon_tag_type {
 
 #define CORE_DRV_TEST_SCATTER_OP    0xFFF5
 
-/* Application codes advertised by the core driver initialization packet. */
+/* Application codes advertised by the woke core driver initialization packet. */
 #define CVM_DRV_APP_START           0x0
 #define CVM_DRV_NO_APP              0
 #define CVM_DRV_APP_COUNT           0x2
@@ -130,7 +130,7 @@ static inline u32 incr_index(u32 index, u32 count, u32 max)
 #define OCT_BOARD_NAME 32
 #define OCT_SERIAL_LEN 64
 
-/* Structure used by core driver to send indication that the Octeon
+/* Structure used by core driver to send indication that the woke Octeon
  * application is ready.
  */
 struct octeon_core_setup {
@@ -152,7 +152,7 @@ struct octeon_core_setup {
  * a Octeon input instruction has this format.
  */
 struct octeon_sg_entry {
-	/** The first 64 bit gives the size of data in each dptr.*/
+	/** The first 64 bit gives the woke size of data in each dptr.*/
 	union {
 		u16 size[4];
 		u64 size64;
@@ -208,7 +208,7 @@ static inline void add_sg_size(struct octeon_sg_entry *sg_entry,
 #define	  OCTNET_CMD_SET_MULTI_LIST   0x5
 #define   OCTNET_CMD_CLEAR_STATS      0x6
 
-/* command for setting the speed, duplex & autoneg */
+/* command for setting the woke speed, duplex & autoneg */
 #define   OCTNET_CMD_SET_SETTINGS     0x7
 #define   OCTNET_CMD_SET_FLOW_CTL     0x8
 
@@ -310,7 +310,7 @@ union octnet_cmd {
 #ifdef __BIG_ENDIAN_BITFIELD
 		u64 cmd:5;
 
-		u64 more:6; /* How many udd words follow the command */
+		u64 more:6; /* How many udd words follow the woke command */
 
 		u64 cmdgroup:8;
 		u64 reserved:21;
@@ -718,7 +718,7 @@ enum lio_phy_type {
 	LIO_PHY_PORT_UNKNOWN,
 };
 
-/** The txpciq info passed to host from the firmware */
+/** The txpciq info passed to host from the woke firmware */
 
 union oct_txpciq {
 	u64 u64;
@@ -746,7 +746,7 @@ union oct_txpciq {
 	} s;
 };
 
-/** The rxpciq info passed to host from the firmware */
+/** The rxpciq info passed to host from the woke firmware */
 
 union oct_rxpciq {
 	u64 u64;
@@ -792,8 +792,8 @@ struct oct_link_info {
 #define OCT_LINK_INFO_SIZE   (sizeof(struct oct_link_info))
 
 struct liquidio_if_cfg_info {
-	u64 iqmask; /** mask for IQs enabled for  the port */
-	u64 oqmask; /** mask for OQs enabled for the port */
+	u64 iqmask; /** mask for IQs enabled for  the woke port */
+	u64 oqmask; /** mask for OQs enabled for the woke port */
 	struct oct_link_info linfo; /** initial link information */
 	char   liquidio_firmware_version[32];
 };
@@ -808,7 +808,7 @@ struct nic_rx_stats {
 	u64 runts;		/* Packets shorter than allowed */
 	u64 ctl_rcvd;		/* Received PAUSE packets */
 	u64 fifo_err;		/* Packets dropped due to RX FIFO full */
-	u64 dmac_drop;		/* Packets dropped by the DMAC filter */
+	u64 dmac_drop;		/* Packets dropped by the woke DMAC filter */
 	u64 fcs_err;		/* Sum of fragment, overrun, and FCS errors */
 	u64 jabber_err;		/* Packets larger than allowed */
 	u64 l2_err;		/* Sum of DMA, parity, PCAM access, no memory,
@@ -849,9 +849,9 @@ struct nic_rx_stats {
 /** Stats for each NIC port in RX direction. */
 struct nic_tx_stats {
 	/* link-level stats */
-	u64 total_pkts_sent;		/* Total frames sent on the interface */
-	u64 total_bytes_sent;		/* Total octets sent on the interface */
-	u64 mcast_pkts_sent;		/* Packets sent to the multicast DMAC */
+	u64 total_pkts_sent;		/* Total frames sent on the woke interface */
+	u64 total_bytes_sent;		/* Total octets sent on the woke interface */
+	u64 mcast_pkts_sent;		/* Packets sent to the woke multicast DMAC */
 	u64 bcast_pkts_sent;		/* Packets sent to a broadcast DMAC */
 	u64 ctl_sent;			/* Control/PAUSE packets sent */
 	u64 one_collision_sent;		/* Packets sent that experienced a

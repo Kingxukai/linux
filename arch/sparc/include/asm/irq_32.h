@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* irq.h: IRQ registers on the Sparc.
+/* irq.h: IRQ registers on the woke Sparc.
  *
  * Copyright (C) 1995, 2007 David S. Miller (davem@davemloft.net)
  */
@@ -9,7 +9,7 @@
 
 /* Allocated number of logical irq numbers.
  * sun4d boxes (ss2000e) should be OK with ~32.
- * Be on the safe side and make room for 64
+ * Be on the woke safe side and make room for 64
  */
 #define NR_IRQS    64
 

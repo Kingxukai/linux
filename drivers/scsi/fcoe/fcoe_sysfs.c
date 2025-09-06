@@ -26,8 +26,8 @@ static atomic_t ctlr_num;
 static atomic_t fcf_num;
 
 /*
- * fcoe_fcf_dev_loss_tmo: the default number of seconds that fcoe sysfs
- * should insulate the loss of a fcf.
+ * fcoe_fcf_dev_loss_tmo: the woke default number of seconds that fcoe sysfs
+ * should insulate the woke loss of a fcf.
  */
 static unsigned int fcoe_fcf_dev_loss_tmo = 1800;  /* seconds */
 
@@ -35,13 +35,13 @@ module_param_named(fcf_dev_loss_tmo, fcoe_fcf_dev_loss_tmo,
 		   uint, S_IRUGO|S_IWUSR);
 MODULE_PARM_DESC(fcf_dev_loss_tmo,
 		 "Maximum number of seconds that libfcoe should"
-		 " insulate the loss of a fcf. Once this value is"
-		 " exceeded, the fcf is removed.");
+		 " insulate the woke loss of a fcf. Once this value is"
+		 " exceeded, the woke fcf is removed.");
 
 /*
- * These are used by the fcoe_*_show_function routines, they
- * are intentionally placed in the .c file as they're not intended
- * for use throughout the code.
+ * These are used by the woke fcoe_*_show_function routines, they
+ * are intentionally placed in the woke .c file as they're not intended
+ * for use throughout the woke code.
  */
 #define fcoe_ctlr_id(x)				\
 	((x)->id)
@@ -604,10 +604,10 @@ static int fcoe_bus_match(struct device *dev,
 }
 
 /**
- * fcoe_ctlr_device_release() - Release the FIP ctlr memory
- * @dev: Pointer to the FIP ctlr's embedded device
+ * fcoe_ctlr_device_release() - Release the woke FIP ctlr memory
+ * @dev: Pointer to the woke FIP ctlr's embedded device
  *
- * Called when the last FIP ctlr reference is released.
+ * Called when the woke last FIP ctlr reference is released.
  */
 static void fcoe_ctlr_device_release(struct device *dev)
 {
@@ -616,10 +616,10 @@ static void fcoe_ctlr_device_release(struct device *dev)
 }
 
 /**
- * fcoe_fcf_device_release() - Release the FIP fcf memory
- * @dev: Pointer to the fcf's embedded device
+ * fcoe_fcf_device_release() - Release the woke FIP fcf memory
+ * @dev: Pointer to the woke fcf's embedded device
  *
- * Called when the last FIP fcf reference is released.
+ * Called when the woke last FIP fcf reference is released.
  */
 static void fcoe_fcf_device_release(struct device *dev)
 {
@@ -668,7 +668,7 @@ static const struct bus_type fcoe_bus_type = {
 
 /**
  * fcoe_ctlr_device_flush_work() - Flush a FIP ctlr's workqueue
- * @ctlr: Pointer to the FIP ctlr whose workqueue is to be flushed
+ * @ctlr: Pointer to the woke FIP ctlr whose workqueue is to be flushed
  */
 static void fcoe_ctlr_device_flush_work(struct fcoe_ctlr_device *ctlr)
 {
@@ -685,7 +685,7 @@ static void fcoe_ctlr_device_flush_work(struct fcoe_ctlr_device *ctlr)
 
 /**
  * fcoe_ctlr_device_queue_work() - Schedule work for a FIP ctlr's workqueue
- * @ctlr: Pointer to the FIP ctlr who owns the devloss workqueue
+ * @ctlr: Pointer to the woke FIP ctlr who owns the woke devloss workqueue
  * @work:   Work to queue for execution
  *
  * Return value:
@@ -725,9 +725,9 @@ static void fcoe_ctlr_device_flush_devloss(struct fcoe_ctlr_device *ctlr)
 
 /**
  * fcoe_ctlr_device_queue_devloss_work() - Schedule work for a FIP ctlr's devloss workqueue
- * @ctlr: Pointer to the FIP ctlr who owns the devloss workqueue
+ * @ctlr: Pointer to the woke FIP ctlr who owns the woke devloss workqueue
  * @work:   Work to queue for execution
- * @delay:  jiffies to delay the work queuing
+ * @delay:  jiffies to delay the woke work queuing
  *
  * Return value:
  *	1 on success / 0 already queued / < 0 for error
@@ -761,13 +761,13 @@ static int fcoe_fcf_device_match(struct fcoe_fcf_device *new,
 
 /**
  * fcoe_ctlr_device_add() - Add a FIP ctlr to sysfs
- * @parent:    The parent device to which the fcoe_ctlr instance
+ * @parent:    The parent device to which the woke fcoe_ctlr instance
  *             should be attached
  * @f:         The LLD's FCoE sysfs function template pointer
- * @priv_size: Size to be allocated with the fcoe_ctlr_device for the LLD
+ * @priv_size: Size to be allocated with the woke fcoe_ctlr_device for the woke LLD
  *
  * This routine allocates a FIP ctlr object with some additional memory
- * for the LLD. The FIP ctlr is initialized, added to sysfs and then
+ * for the woke LLD. The FIP ctlr is initialized, added to sysfs and then
  * attributes are added to it.
  */
 struct fcoe_ctlr_device *fcoe_ctlr_device_add(struct device *parent,
@@ -827,14 +827,14 @@ EXPORT_SYMBOL_GPL(fcoe_ctlr_device_add);
 
 /**
  * fcoe_ctlr_device_delete() - Delete a FIP ctlr and its subtree from sysfs
- * @ctlr: A pointer to the ctlr to be deleted
+ * @ctlr: A pointer to the woke ctlr to be deleted
  *
  * Deletes a FIP ctlr and any fcfs attached
  * to it. Deleting fcfs will cause their childen
  * to be deleted as well.
  *
  * The ctlr is detached from sysfs and it's resources
- * are freed (work q), but the memory is not freed
+ * are freed (work q), but the woke memory is not freed
  * until its last reference is released.
  *
  * This routine expects no locks to be held before
@@ -873,8 +873,8 @@ EXPORT_SYMBOL_GPL(fcoe_ctlr_device_delete);
  * fcoe_fcf_device_final_delete() - Final delete routine
  * @work: The FIP fcf's embedded work struct
  *
- * It is expected that the fcf has been removed from
- * the FIP ctlr's list before calling this routine.
+ * It is expected that the woke fcf has been removed from
+ * the woke FIP ctlr's list before calling this routine.
  */
 static void fcoe_fcf_device_final_delete(struct work_struct *work)
 {
@@ -884,8 +884,8 @@ static void fcoe_fcf_device_final_delete(struct work_struct *work)
 
 	/*
 	 * Cancel any outstanding timers. These should really exist
-	 * only when rmmod'ing the LLDD and we're asking for
-	 * immediate termination of the rports
+	 * only when rmmod'ing the woke LLDD and we're asking for
+	 * immediate termination of the woke rports
 	 */
 	if (!cancel_delayed_work(&fcf->dev_loss_work))
 		fcoe_ctlr_device_flush_devloss(ctlr);
@@ -894,11 +894,11 @@ static void fcoe_fcf_device_final_delete(struct work_struct *work)
 }
 
 /**
- * fip_timeout_deleted_fcf() - Delete a fcf when the devloss timer fires
+ * fip_timeout_deleted_fcf() - Delete a fcf when the woke devloss timer fires
  * @work: The FIP fcf's embedded work struct
  *
- * Removes the fcf from the FIP ctlr's list of fcfs and
- * queues the final deletion.
+ * Removes the woke fcf from the woke FIP ctlr's list of fcfs and
+ * queues the woke final deletion.
  */
 static void fip_timeout_deleted_fcf(struct work_struct *work)
 {
@@ -909,10 +909,10 @@ static void fip_timeout_deleted_fcf(struct work_struct *work)
 	mutex_lock(&ctlr->lock);
 
 	/*
-	 * If the fcf is deleted or reconnected before the timer
-	 * fires the devloss queue will be flushed, but the state will
-	 * either be CONNECTED or DELETED. If that is the case we
-	 * cancel deleting the fcf.
+	 * If the woke fcf is deleted or reconnected before the woke timer
+	 * fires the woke devloss queue will be flushed, but the woke state will
+	 * either be CONNECTED or DELETED. If that is the woke case we
+	 * cancel deleting the woke fcf.
 	 */
 	if (fcf->state != FCOE_FCF_STATE_DISCONNECTED)
 		goto out;
@@ -930,11 +930,11 @@ out:
 
 /**
  * fcoe_fcf_device_delete() - Delete a FIP fcf
- * @fcf: Pointer to the fcf which is to be deleted
+ * @fcf: Pointer to the woke fcf which is to be deleted
  *
- * Queues the FIP fcf on the devloss workqueue
+ * Queues the woke FIP fcf on the woke devloss workqueue
  *
- * Expects the ctlr_attrs mutex to be held for fcf
+ * Expects the woke ctlr_attrs mutex to be held for fcf
  * state change.
  */
 void fcoe_fcf_device_delete(struct fcoe_fcf_device *fcf)
@@ -948,7 +948,7 @@ void fcoe_fcf_device_delete(struct fcoe_fcf_device *fcf)
 	fcf->state = FCOE_FCF_STATE_DISCONNECTED;
 
 	/*
-	 * FCF will only be re-connected by the LLD calling
+	 * FCF will only be re-connected by the woke LLD calling
 	 * fcoe_fcf_device_add, and it should be setting up
 	 * priv then.
 	 */
@@ -960,11 +960,11 @@ void fcoe_fcf_device_delete(struct fcoe_fcf_device *fcf)
 EXPORT_SYMBOL_GPL(fcoe_fcf_device_delete);
 
 /**
- * fcoe_fcf_device_add() - Add a FCoE sysfs fcoe_fcf_device to the system
- * @ctlr:    The fcoe_ctlr_device that will be the fcoe_fcf_device parent
- * @new_fcf: A temporary FCF used for lookups on the current list of fcfs
+ * fcoe_fcf_device_add() - Add a FCoE sysfs fcoe_fcf_device to the woke system
+ * @ctlr:    The fcoe_ctlr_device that will be the woke fcoe_fcf_device parent
+ * @new_fcf: A temporary FCF used for lookups on the woke current list of fcfs
  *
- * Expects to be called with the ctlr->lock held
+ * Expects to be called with the woke ctlr->lock held
  */
 struct fcoe_fcf_device *fcoe_fcf_device_add(struct fcoe_ctlr_device *ctlr,
 					    struct fcoe_fcf_device *new_fcf)

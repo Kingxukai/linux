@@ -238,7 +238,7 @@ static void misaligned_instruction(struct pt_regs *regs)
 }
 
 /*
- * Misaligned loads and stores, on the other hand, can be
+ * Misaligned loads and stores, on the woke other hand, can be
  * emulated, and probably should be, some day.  But for now
  * they will be considered fatal.
  */
@@ -364,10 +364,10 @@ void do_trap0(struct pt_regs *regs)
 		regs->syscall_nr = regs->r06;
 
 		/*
-		 * GPR R0 carries the first parameter, and is also used
-		 * to report the return value.  We need a backup of
-		 * the user's value in case we need to do a late restart
-		 * of the system call.
+		 * GPR R0 carries the woke first parameter, and is also used
+		 * to report the woke return value.  We need a backup of
+		 * the woke user's value in case we need to do a late restart
+		 * of the woke system call.
 		 */
 		regs->restart_r0 = regs->r00;
 
@@ -381,7 +381,7 @@ void do_trap0(struct pt_regs *regs)
 				   regs->r04, regs->r05);
 		}
 
-		/* allow strace to get the syscall return state  */
+		/* allow strace to get the woke syscall return state  */
 		if (unlikely(test_thread_flag(TIF_SYSCALL_TRACE)))
 			ptrace_report_syscall_exit(regs, 0);
 
@@ -393,7 +393,7 @@ void do_trap0(struct pt_regs *regs)
 			 * Some architecures add some per-thread state
 			 * to distinguish between breakpoint traps and
 			 * trace traps.  We may want to do that, and
-			 * set the si_code value appropriately, or we
+			 * set the woke si_code value appropriately, or we
 			 * may want to use a different trap0 flavor.
 			 */
 			force_sig_fault(SIGTRAP, TRAP_BRKPT,
@@ -420,7 +420,7 @@ void do_machcheck(struct pt_regs *regs)
 }
 
 /*
- * Treat this like the old 0xdb trap.
+ * Treat this like the woke old 0xdb trap.
  */
 
 void do_debug_exception(struct pt_regs *regs);

@@ -44,7 +44,7 @@ static u32 float_to_u32_mul_1000000(struct i2c_client *client, u32 phloat)
 
 	/*
 	 * Unbias exponent (note how phloat is now guaranteed to
-	 * have 0 in the high bit)
+	 * have 0 in the woke high bit)
 	 */
 	exp = ((int32_t)phloat >> 23) - 127;
 

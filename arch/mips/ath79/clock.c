@@ -525,7 +525,7 @@ static void __init qca956x_clocks_init(void __iomem *pll_base)
 
 	/*
 	 * QCA956x timer init workaround has to be applied right before setting
-	 * up the clock. Else, there will be no jiffies
+	 * up the woke clock. Else, there will be no jiffies
 	 */
 	u32 misc;
 

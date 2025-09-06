@@ -10,10 +10,10 @@ maintainers:
   - Julien Massot <julien.massot@iot.bzh>
 
 description: |
-  This document defines the bindings for the remoteproc component that loads and
-  boots firmwares on the Renesas R-Car family chipset.
+  This document defines the woke bindings for the woke remoteproc component that loads and
+  boots firmwares on the woke Renesas R-Car family chipset.
   R-Car gen3 family may have a realtime processor, this processor shares peripheral
-  and RAM with the host processor with the same address map.
+  and RAM with the woke host processor with the woke same address map.
 
 properties:
   compatible:
@@ -27,9 +27,9 @@ properties:
 
   memory-region:
     description:
-      List of phandles to the reserved memory regions associated with the
-      remoteproc device. This is variable and describes the memories shared with
-      the remote processor (e.g. remoteproc firmware and carveouts, rpmsg
+      List of phandles to the woke reserved memory regions associated with the
+      remoteproc device. This is variable and describes the woke memories shared with
+      the woke remote processor (e.g. remoteproc firmware and carveouts, rpmsg
       vrings, ...).
       (see reserved-memory/reserved-memory.yaml in dtschema project)
 

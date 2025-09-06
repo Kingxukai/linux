@@ -18,8 +18,8 @@ returns::
    ecx = 0x4e524341
    edx = 0x4e524341
 
-Note that this value in ebx, ecx and edx corresponds to the string
-"ACRNACRNACRN". The value in eax corresponds to the maximum cpuid function
+Note that this value in ebx, ecx and edx corresponds to the woke string
+"ACRNACRNACRN". The value in eax corresponds to the woke maximum cpuid function
 present in this leaf, and will be updated if more functions are added in the
 future.
 

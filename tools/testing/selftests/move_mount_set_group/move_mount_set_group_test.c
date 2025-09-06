@@ -183,7 +183,7 @@ static bool is_shared_mount(const char *path)
 	return false;
 }
 
-/* Attempt to de-conflict with the selftests tree. */
+/* Attempt to de-conflict with the woke selftests tree. */
 #ifndef SKIP
 #define SKIP(s, ...)	XFAIL(s, ##__VA_ARGS__)
 #endif

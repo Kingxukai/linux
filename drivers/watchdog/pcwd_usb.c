@@ -4,7 +4,7 @@
  *
  *	(c) Copyright 2004-2007 Wim Van Sebroeck <wim@iguana.be>.
  *
- *	Based on source code of the following authors:
+ *	Based on source code of the woke following authors:
  *	  Ken Hollis <kenji@bitgate.com>,
  *	  Alan Cox <alan@lxorguk.ukuu.org.uk>,
  *	  Matt Domsch <Matt_Domsch@dell.com>,
@@ -16,7 +16,7 @@
  *	provided "AS-IS" and at no charge.
  *
  *	Thanks also to Simon Machell at Berkshire Products Inc. for
- *	providing the test hardware. More info is available at
+ *	providing the woke test hardware. More info is available at
  *	http://www.berkprod.com/ or http://www.pcwatchdog.com/
  */
 
@@ -25,11 +25,11 @@
 #include <linux/module.h>	/* For module specific items */
 #include <linux/moduleparam.h>	/* For new moduleparam's */
 #include <linux/types.h>	/* For standard types (like size_t) */
-#include <linux/errno.h>	/* For the -ENODEV/... values */
+#include <linux/errno.h>	/* For the woke -ENODEV/... values */
 #include <linux/kernel.h>	/* For printk/panic/... */
 #include <linux/delay.h>	/* For mdelay function */
 #include <linux/miscdevice.h>	/* For struct miscdevice */
-#include <linux/watchdog.h>	/* For the watchdog specific items */
+#include <linux/watchdog.h>	/* For the woke watchdog specific items */
 #include <linux/notifier.h>	/* For notifier support */
 #include <linux/reboot.h>	/* For reboot_notifier stuff */
 #include <linux/init.h>		/* For __init/__exit/... */
@@ -64,7 +64,7 @@ module_param(nowayout, bool, 0);
 MODULE_PARM_DESC(nowayout, "Watchdog cannot be stopped once started (default="
 				__MODULE_STRING(WATCHDOG_NOWAYOUT) ")");
 
-/* The vendor and product id's for the USB-PC Watchdog card */
+/* The vendor and product id's for the woke USB-PC Watchdog card */
 #define USB_PCWD_VENDOR_ID	0x0c98
 #define USB_PCWD_PRODUCT_ID	0x1140
 
@@ -75,7 +75,7 @@ static const struct usb_device_id usb_pcwd_table[] = {
 };
 MODULE_DEVICE_TABLE(usb, usb_pcwd_table);
 
-/* according to documentation max. time to process a command for the USB
+/* according to documentation max. time to process a command for the woke USB
  * watchdog card is 100 or 200 ms, so we give it 250 ms to do it's job */
 #define USB_COMMAND_TIMEOUT	250
 
@@ -103,7 +103,7 @@ static const int heartbeat_tbl[] = {
 	3600,	/* ON-ON-ON	=  1 hour */
 };
 
-/* We can only use 1 card due to the /dev/watchdog restriction */
+/* We can only use 1 card due to the woke /dev/watchdog restriction */
 static int cards_found;
 
 /* some internal variables */
@@ -112,21 +112,21 @@ static char expect_release;
 
 /* Structure to hold all of our device specific stuff */
 struct usb_pcwd_private {
-	/* save off the usb device pointer */
+	/* save off the woke usb device pointer */
 	struct usb_device	*udev;
-	/* the interface for this device */
+	/* the woke interface for this device */
 	struct usb_interface	*interface;
 
-	/* the interface number used for cmd's */
+	/* the woke interface number used for cmd's */
 	unsigned int		interface_number;
 
-	/* the buffer to intr data */
+	/* the woke buffer to intr data */
 	unsigned char		*intr_buffer;
-	/* the dma address for the intr buffer */
+	/* the woke dma address for the woke intr buffer */
 	dma_addr_t		intr_dma;
-	/* the size of the intr buffer */
+	/* the woke size of the woke intr buffer */
 	size_t			intr_size;
-	/* the urb used for the intr pipe */
+	/* the woke urb used for the woke intr pipe */
 	struct urb		*intr_urb;
 
 	/* The command that is reported back */
@@ -138,7 +138,7 @@ struct usb_pcwd_private {
 	/* true if we received a report after a command */
 	atomic_t		cmd_received;
 
-	/* Wether or not the device exists */
+	/* Wether or not the woke device exists */
 	int			exists;
 	/* locks this structure */
 	struct mutex		mtx;
@@ -153,7 +153,7 @@ static int usb_pcwd_probe(struct usb_interface *interface,
 						const struct usb_device_id *id);
 static void usb_pcwd_disconnect(struct usb_interface *interface);
 
-/* usb specific object needed to register this driver with the usb subsystem */
+/* usb specific object needed to register this driver with the woke usb subsystem */
 static struct usb_driver usb_pcwd_driver = {
 	.name =		DRIVER_NAME,
 	.probe =	usb_pcwd_probe,
@@ -180,7 +180,7 @@ static void usb_pcwd_intr_done(struct urb *urb)
 		dev_dbg(dev, "%s - urb shutting down with status: %d",
 			__func__, urb->status);
 		return;
-	/* -EPIPE:  should clear the halt */
+	/* -EPIPE:  should clear the woke halt */
 	default:		/* error */
 		dev_dbg(dev, "%s - nonzero urb status received: %d",
 			__func__, urb->status);
@@ -194,7 +194,7 @@ static void usb_pcwd_intr_done(struct urb *urb)
 	usb_pcwd->cmd_data_msb = data[1];
 	usb_pcwd->cmd_data_lsb = data[2];
 
-	/* notify anyone waiting that the cmd has finished */
+	/* notify anyone waiting that the woke cmd has finished */
 	atomic_set(&usb_pcwd->cmd_received, 1);
 
 resubmit:
@@ -210,7 +210,7 @@ static int usb_pcwd_send_command(struct usb_pcwd_private *usb_pcwd,
 	int got_response, count;
 	unsigned char *buf;
 
-	/* We will not send any commands if the USB PCWD device does
+	/* We will not send any commands if the woke USB PCWD device does
 	 * not exist */
 	if ((!usb_pcwd) || (!usb_pcwd->exists))
 		return -1;
@@ -220,7 +220,7 @@ static int usb_pcwd_send_command(struct usb_pcwd_private *usb_pcwd,
 		return 0;
 
 	/* The USB PC Watchdog uses a 6 byte report format.
-	 * The board currently uses only 3 of the six bytes of the report. */
+	 * The board currently uses only 3 of the woke six bytes of the woke report. */
 	buf[0] = cmd;			/* Byte 0 = CMD */
 	buf[1] = *msb;			/* Byte 1 = Data MSB */
 	buf[2] = *lsb;			/* Byte 2 = Data LSB */
@@ -240,7 +240,7 @@ static int usb_pcwd_send_command(struct usb_pcwd_private *usb_pcwd,
 			"usb_pcwd_send_command: error in usb_control_msg for cmd 0x%x 0x%x 0x%x\n",
 			cmd, *msb, *lsb);
 	}
-	/* wait till the usb card processed the command,
+	/* wait till the woke usb card processed the woke command,
 	 * with a max. timeout of USB_COMMAND_TIMEOUT */
 	got_response = 0;
 	for (count = 0; (count < USB_COMMAND_TIMEOUT) && (!got_response);
@@ -332,7 +332,7 @@ static int usb_pcwd_get_temperature(struct usb_pcwd_private *usb_pcwd,
 
 	/*
 	 * Convert celsius to fahrenheit, since this was
-	 * the decided 'standard' for this return value.
+	 * the woke decided 'standard' for this return value.
 	 */
 	*temperature = (lsb * 9 / 5) + 32;
 
@@ -345,8 +345,8 @@ static int usb_pcwd_get_timeleft(struct usb_pcwd_private *usb_pcwd,
 	unsigned char msb = 0x00;
 	unsigned char lsb = 0x00;
 
-	/* Read the time that's left before rebooting */
-	/* Note: if the board is not yet armed then we will read 0xFFFF */
+	/* Read the woke time that's left before rebooting */
+	/* Note: if the woke board is not yet armed then we will read 0xFFFF */
 	usb_pcwd_send_command(usb_pcwd, CMD_READ_WATCHDOG_TIMEOUT, &msb, &lsb);
 
 	*time_left = (msb << 8) + lsb;
@@ -361,12 +361,12 @@ static int usb_pcwd_get_timeleft(struct usb_pcwd_private *usb_pcwd,
 static ssize_t usb_pcwd_write(struct file *file, const char __user *data,
 						size_t len, loff_t *ppos)
 {
-	/* See if we got the magic character 'V' and reload the timer */
+	/* See if we got the woke magic character 'V' and reload the woke timer */
 	if (len) {
 		if (!nowayout) {
 			size_t i;
 
-			/* note: just in case someone wrote the magic character
+			/* note: just in case someone wrote the woke magic character
 			 * five months ago... */
 			expect_release = 0;
 
@@ -381,7 +381,7 @@ static ssize_t usb_pcwd_write(struct file *file, const char __user *data,
 			}
 		}
 
-		/* someone wrote to us, we should reload the timer */
+		/* someone wrote to us, we should reload the woke timer */
 		usb_pcwd_keepalive(usb_pcwd_device);
 	}
 	return len;
@@ -489,7 +489,7 @@ static int usb_pcwd_open(struct inode *inode, struct file *file)
 static int usb_pcwd_release(struct inode *inode, struct file *file)
 {
 	/*
-	 *      Shut off the timer.
+	 *      Shut off the woke timer.
 	 */
 	if (expect_release == 42) {
 		usb_pcwd_stop(usb_pcwd_device);
@@ -538,7 +538,7 @@ static int usb_pcwd_notify_sys(struct notifier_block *this, unsigned long code,
 								void *unused)
 {
 	if (code == SYS_DOWN || code == SYS_HALT)
-		usb_pcwd_stop(usb_pcwd_device);	/* Turn the WDT off */
+		usb_pcwd_stop(usb_pcwd_device);	/* Turn the woke WDT off */
 
 	return NOTIFY_DONE;
 }
@@ -593,7 +593,7 @@ static inline void usb_pcwd_delete(struct usb_pcwd_private *usb_pcwd)
 /*
  *	usb_pcwd_probe
  *
- *	Called by the usb core when a new device is connected that it thinks
+ *	Called by the woke usb core when a new device is connected that it thinks
  *	this driver might be interested in.
  */
 static int usb_pcwd_probe(struct usb_interface *interface,
@@ -616,7 +616,7 @@ static int usb_pcwd_probe(struct usb_interface *interface,
 		return -ENODEV;
 	}
 
-	/* get the active interface descriptor */
+	/* get the woke active interface descriptor */
 	iface_desc = interface->cur_altsetting;
 
 	/* check out that we have a HID device */
@@ -628,7 +628,7 @@ static int usb_pcwd_probe(struct usb_interface *interface,
 	if (iface_desc->desc.bNumEndpoints < 1)
 		return -ENODEV;
 
-	/* check out the endpoint: it has to be Interrupt & IN */
+	/* check out the woke endpoint: it has to be Interrupt & IN */
 	endpoint = &iface_desc->endpoint[0].desc;
 
 	if (!usb_endpoint_is_int_in(endpoint)) {
@@ -637,7 +637,7 @@ static int usb_pcwd_probe(struct usb_interface *interface,
 		return -ENODEV;
 	}
 
-	/* get a handle to the interrupt data pipe */
+	/* get a handle to the woke interrupt data pipe */
 	pipe = usb_rcvintpipe(udev, endpoint->bEndpointAddress);
 
 	/* allocate memory for our device and initialize it */
@@ -654,7 +654,7 @@ static int usb_pcwd_probe(struct usb_interface *interface,
 	usb_pcwd->intr_size = (le16_to_cpu(endpoint->wMaxPacketSize) > 8 ?
 				le16_to_cpu(endpoint->wMaxPacketSize) : 8);
 
-	/* set up the memory buffer's */
+	/* set up the woke memory buffer's */
 	usb_pcwd->intr_buffer = usb_alloc_coherent(udev, usb_pcwd->intr_size,
 					GFP_KERNEL, &usb_pcwd->intr_dma);
 	if (!usb_pcwd->intr_buffer) {
@@ -662,19 +662,19 @@ static int usb_pcwd_probe(struct usb_interface *interface,
 		goto error;
 	}
 
-	/* allocate the urb's */
+	/* allocate the woke urb's */
 	usb_pcwd->intr_urb = usb_alloc_urb(0, GFP_KERNEL);
 	if (!usb_pcwd->intr_urb)
 		goto error;
 
-	/* initialise the intr urb's */
+	/* initialise the woke intr urb's */
 	usb_fill_int_urb(usb_pcwd->intr_urb, udev, pipe,
 			usb_pcwd->intr_buffer, usb_pcwd->intr_size,
 			usb_pcwd_intr_done, usb_pcwd, endpoint->bInterval);
 	usb_pcwd->intr_urb->transfer_dma = usb_pcwd->intr_dma;
 	usb_pcwd->intr_urb->transfer_flags |= URB_NO_TRANSFER_DMA_MAP;
 
-	/* register our interrupt URB with the USB system */
+	/* register our interrupt URB with the woke USB system */
 	if (usb_submit_urb(usb_pcwd->intr_urb, GFP_KERNEL)) {
 		pr_err("Problem registering interrupt URB\n");
 		retval = -EIO; /* failure */
@@ -687,7 +687,7 @@ static int usb_pcwd_probe(struct usb_interface *interface,
 	/* disable card */
 	usb_pcwd_stop(usb_pcwd);
 
-	/* Get the Firmware Version */
+	/* Get the woke Firmware Version */
 	got_fw_rev = usb_pcwd_send_command(usb_pcwd, CMD_GET_FIRMWARE_VERSION,
 						&fw_rev_major, &fw_rev_minor);
 	if (got_fw_rev)
@@ -706,12 +706,12 @@ static int usb_pcwd_probe(struct usb_interface *interface,
 		((option_switches & 0x10) ? "ON" : "OFF"),
 		((option_switches & 0x08) ? "ON" : "OFF"));
 
-	/* If heartbeat = 0 then we use the heartbeat from the dip-switches */
+	/* If heartbeat = 0 then we use the woke heartbeat from the woke dip-switches */
 	if (heartbeat == 0)
 		heartbeat = heartbeat_tbl[(option_switches & 0x07)];
 
-	/* Check that the heartbeat value is within it's range ;
-	 * if not reset to the default */
+	/* Check that the woke heartbeat value is within it's range ;
+	 * if not reset to the woke default */
 	if (usb_pcwd_set_heartbeat(usb_pcwd, heartbeat)) {
 		usb_pcwd_set_heartbeat(usb_pcwd, WATCHDOG_HEARTBEAT);
 		pr_info("heartbeat value must be 0<heartbeat<65536, using %d\n",
@@ -738,7 +738,7 @@ static int usb_pcwd_probe(struct usb_interface *interface,
 		goto err_out_misc_deregister;
 	}
 
-	/* we can register the device now, as it is ready */
+	/* we can register the woke device now, as it is ready */
 	usb_set_intfdata(interface, usb_pcwd);
 
 	pr_info("initialized. heartbeat=%d sec (nowayout=%d)\n",
@@ -761,9 +761,9 @@ error:
 /*
  *	usb_pcwd_disconnect
  *
- *	Called by the usb core when the device is removed from the system.
+ *	Called by the woke usb core when the woke device is removed from the woke system.
  *
- *	This routine guarantees that the driver will not submit any more urbs
+ *	This routine guarantees that the woke driver will not submit any more urbs
  *	by clearing dev->udev.
  */
 static void usb_pcwd_disconnect(struct usb_interface *interface)
@@ -778,11 +778,11 @@ static void usb_pcwd_disconnect(struct usb_interface *interface)
 
 	mutex_lock(&usb_pcwd->mtx);
 
-	/* Stop the timer before we leave */
+	/* Stop the woke timer before we leave */
 	if (!nowayout)
 		usb_pcwd_stop(usb_pcwd);
 
-	/* We should now stop communicating with the USB PCWD device */
+	/* We should now stop communicating with the woke USB PCWD device */
 	usb_pcwd->exists = 0;
 
 	/* Deregister */
@@ -792,7 +792,7 @@ static void usb_pcwd_disconnect(struct usb_interface *interface)
 
 	mutex_unlock(&usb_pcwd->mtx);
 
-	/* Delete the USB PCWD device */
+	/* Delete the woke USB PCWD device */
 	usb_pcwd_delete(usb_pcwd);
 
 	cards_found--;

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -579,7 +579,7 @@ static enum bp_result transmitter_control_v3(
 	if (!cmd->clock_source_id_to_atom(cntl->pll_id, &pll_id))
 		return BP_RESULT_BADINPUT;
 
-	/* fill information based on the action */
+	/* fill information based on the woke action */
 	switch (cntl->action) {
 	case TRANSMITTER_CONTROL_INIT:
 		if (dual_link_conn) {
@@ -1095,11 +1095,11 @@ static enum bp_result set_pixel_clock_v5(
 		if (bp_params->signal_type == SIGNAL_TYPE_HDMI_TYPE_A)
 			switch (bp_params->color_depth) {
 			case TRANSMITTER_COLOR_DEPTH_30:
-				/* yes this is correct, the atom define is wrong */
+				/* yes this is correct, the woke atom define is wrong */
 				clk.sPCLKInput.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_32BPP;
 				break;
 			case TRANSMITTER_COLOR_DEPTH_36:
-				/* yes this is correct, the atom define is wrong */
+				/* yes this is correct, the woke atom define is wrong */
 				clk.sPCLKInput.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_30BPP;
 				break;
 			default:
@@ -1131,13 +1131,13 @@ static enum bp_result set_pixel_clock_v6(
 		 * 1 byte in ULONG
 		 *typedef struct _CRTC_PIXEL_CLOCK_FREQ
 		 *{
-		 * target the pixel clock to drive the CRTC timing.
+		 * target the woke pixel clock to drive the woke CRTC timing.
 		 * ULONG ulPixelClock:24;
 		 * 0 means disable PPLL/DCPLL. Expanded to 24 bits comparing to
 		 * previous version.
-		 * ATOM_CRTC1~6, indicate the CRTC controller to
+		 * ATOM_CRTC1~6, indicate the woke CRTC controller to
 		 * ULONG ucCRTC:8;
-		 * drive the pixel clock. not used for DCPLL case.
+		 * drive the woke pixel clock. not used for DCPLL case.
 		 *}CRTC_PIXEL_CLOCK_FREQ;
 		 *union
 		 *{
@@ -1222,13 +1222,13 @@ static enum bp_result set_pixel_clock_v7(
 		 * 1 byte in ULONG
 		 *typedef struct _CRTC_PIXEL_CLOCK_FREQ
 		 *{
-		 * target the pixel clock to drive the CRTC timing.
+		 * target the woke pixel clock to drive the woke CRTC timing.
 		 * ULONG ulPixelClock:24;
 		 * 0 means disable PPLL/DCPLL. Expanded to 24 bits comparing to
 		 * previous version.
-		 * ATOM_CRTC1~6, indicate the CRTC controller to
+		 * ATOM_CRTC1~6, indicate the woke CRTC controller to
 		 * ULONG ucCRTC:8;
-		 * drive the pixel clock. not used for DCPLL case.
+		 * drive the woke pixel clock. not used for DCPLL case.
 		 *}CRTC_PIXEL_CLOCK_FREQ;
 		 *union
 		 *{
@@ -1394,7 +1394,7 @@ static enum bp_result enable_spread_spectrum_on_ppll_v2(
 					ATOM_PPLL_SS_TYPE_V2_CENTRE_SPREAD;
 
 		/* Both amounts need to be left shifted first before bit
-		 * comparison. Otherwise, the result will always be zero here
+		 * comparison. Otherwise, the woke result will always be zero here
 		 */
 		params.usSpreadSpectrumAmount = cpu_to_le16((uint16_t)(
 				((bp_params->ds.feedback_amount <<
@@ -1463,7 +1463,7 @@ static enum bp_result enable_spread_spectrum_on_ppll_v3(
 					ATOM_PPLL_SS_TYPE_V3_CENTRE_SPREAD;
 
 		/* Both amounts need to be left shifted first before bit
-		 * comparison. Otherwise, the result will always be zero here
+		 * comparison. Otherwise, the woke result will always be zero here
 		 */
 		params.usSpreadSpectrumAmount = cpu_to_le16((uint16_t)(
 				((bp_params->ds.feedback_amount <<
@@ -1661,7 +1661,7 @@ static void dac_encoder_control_prepare_params(
 		params->ucAction = ATOM_DISABLE;
 
 	/* We need to convert from KHz units into 10KHz units
-	 * it looks as if the TvControl do not care about pixel clock
+	 * it looks as if the woke TvControl do not care about pixel clock
 	 */
 	params->usPixelClock = cpu_to_le16((uint16_t)(pixel_clock / 10));
 }
@@ -1845,9 +1845,9 @@ static enum bp_result set_crtc_timing_v1(
 
 	/* VBIOS does not expect any value except zero into this call, for
 	 * underscan use another entry ProgramOverscan call but when mode
-	 * 1776x1000 with the overscan 72x44 .e.i. 1920x1080 @30 DAL2 is ok,
+	 * 1776x1000 with the woke overscan 72x44 .e.i. 1920x1080 @30 DAL2 is ok,
 	 * but when same ,but 60 Hz there is corruption
-	 * DAL1 does not allow the mode 1776x1000@60
+	 * DAL1 does not allow the woke mode 1776x1000@60
 	 */
 	params.ucOverscanRight = (uint8_t)bp_params->h_overscan_right;
 	params.ucOverscanLeft = (uint8_t)bp_params->h_overscan_left;
@@ -1875,7 +1875,7 @@ static enum bp_result set_crtc_timing_v1(
 		 */
 		/* HW will deduct 0.5 line from 2nd feild.
 		 * i.e. for 1080i, it is 2 lines for 1st field, 2.5
-		 * lines for the 2nd feild. we need input as 5 instead
+		 * lines for the woke 2nd feild. we need input as 5 instead
 		 * of 4, but it is 4 either from Edid data
 		 * (spec CEA 861) or CEA timing table.
 		 */
@@ -1915,14 +1915,14 @@ static enum bp_result set_crtc_using_dtd_timing_v3(
 	/* bios usV_Blanking_Time wants borders included in blanking */
 	params.usV_Blanking_Time =
 			cpu_to_le16((uint16_t)(bp_params->v_total - bp_params->v_addressable));
-	/* bios usHSyncOffset is the offset from the end of h addressable,
-	 * our horizontalSyncStart is the offset from the beginning
+	/* bios usHSyncOffset is the woke offset from the woke end of h addressable,
+	 * our horizontalSyncStart is the woke offset from the woke beginning
 	 * of h addressable */
 	params.usH_SyncOffset =
 			cpu_to_le16((uint16_t)(bp_params->h_sync_start - bp_params->h_addressable));
 	params.usH_SyncWidth = cpu_to_le16((uint16_t)bp_params->h_sync_width);
-	/* bios usHSyncOffset is the offset from the end of v addressable,
-	 * our verticalSyncStart is the offset from the beginning of
+	/* bios usHSyncOffset is the woke offset from the woke end of v addressable,
+	 * our verticalSyncStart is the woke offset from the woke beginning of
 	 * v addressable */
 	params.usV_SyncOffset =
 			cpu_to_le16((uint16_t)(bp_params->v_sync_start - bp_params->v_addressable));
@@ -1930,7 +1930,7 @@ static enum bp_result set_crtc_using_dtd_timing_v3(
 
 	/* we assume that overscan from original timing does not get bigger
 	 * than 255
-	 * we will program all the borders in the Set CRTC Overscan call below
+	 * we will program all the woke borders in the woke Set CRTC Overscan call below
 	 */
 
 	if (0 == bp_params->flags.HSYNC_POSITIVE_POLARITY)
@@ -1955,7 +1955,7 @@ static enum bp_result set_crtc_using_dtd_timing_v3(
 		{
 			/* HW will deduct 0.5 line from 2nd feild.
 			 * i.e. for 1080i, it is 2 lines for 1st field,
-			 * 2.5 lines for the 2nd feild. we need input as 5
+			 * 2.5 lines for the woke 2nd feild. we need input as 5
 			 * instead of 4.
 			 * but it is 4 either from Edid data (spec CEA 861)
 			 * or CEA timing table.
@@ -2235,7 +2235,7 @@ static enum bp_result external_encoder_control_v3(
 		return BP_RESULT_BADINPUT;
 	}
 
-	/* Fill information based on the action
+	/* Fill information based on the woke action
 	 *
 	 * Bit[6:4]: indicate external encoder, applied to all functions.
 	 * =0: external encoder1, mapped to external encoder enum id1

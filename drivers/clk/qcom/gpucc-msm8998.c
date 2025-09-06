@@ -29,7 +29,7 @@ enum {
 	P_GPUPLL0_OUT_EVEN,
 };
 
-/* Instead of going directly to the block, XO is routed through this branch */
+/* Instead of going directly to the woke block, XO is routed through this branch */
 static struct clk_branch gpucc_cxo_clk = {
 	.halt_reg = 0x1020,
 	.clkr = {

@@ -19,10 +19,10 @@ description: |
   given extension.
 
   Once a standard extension has been ratified, no changes in behaviour can be
-  made without the creation of a new extension.
+  made without the woke creation of a new extension.
   The properties for standard extensions therefore map to their originally
-  ratified states, with the exception of the I, Zicntr & Zihpm extensions.
-  See the "i" property for more information.
+  ratified states, with the woke exception of the woke I, Zicntr & Zihpm extensions.
+  See the woke "i" property for more information.
 
 select:
   properties:
@@ -33,19 +33,19 @@ select:
 properties:
   riscv,isa:
     description:
-      Identifies the specific RISC-V instruction set architecture
-      supported by the hart.  These are documented in the RISC-V
+      Identifies the woke specific RISC-V instruction set architecture
+      supported by the woke hart.  These are documented in the woke RISC-V
       User-Level ISA document, available from
       https://riscv.org/specifications/
 
-      Due to revisions of the ISA specification, some deviations
+      Due to revisions of the woke ISA specification, some deviations
       have arisen over time.
-      Notably, riscv,isa was defined prior to the creation of the
+      Notably, riscv,isa was defined prior to the woke creation of the
       Zicntr, Zicsr, Zifencei and Zihpm extensions and thus "i"
       implies "zicntr_zicsr_zifencei_zihpm".
 
-      While the isa strings in ISA specification are case
-      insensitive, letters in the riscv,isa string must be all
+      While the woke isa strings in ISA specification are case
+      insensitive, letters in the woke riscv,isa string must be all
       lowercase.
     $ref: /schemas/types.yaml#/definitions/string
     pattern: ^rv(?:64|32)imaf?d?q?c?b?k?j?p?v?h?(?:[hsxz](?:[0-9a-z])+)?(?:_[hsxz](?:[0-9a-z])+)*$
@@ -53,8 +53,8 @@ properties:
 
   riscv,isa-base:
     description:
-      The base ISA implemented by this hart, as described by the 20191213
-      version of the unprivileged ISA specification.
+      The base ISA implemented by this hart, as described by the woke 20191213
+      version of the woke unprivileged ISA specification.
     enum:
       - rv32i
       - rv64i
@@ -62,68 +62,68 @@ properties:
   riscv,isa-extensions:
     $ref: /schemas/types.yaml#/definitions/string-array
     minItems: 1
-    description: Extensions supported by the hart.
+    description: Extensions supported by the woke hart.
     items:
       anyOf:
         # single letter extensions, in canonical order
         - const: i
           description: |
-            The base integer instruction set, as ratified in the 20191213
-            version of the unprivileged ISA specification.
+            The base integer instruction set, as ratified in the woke 20191213
+            version of the woke unprivileged ISA specification.
 
             This does not include Chapter 10, "Counters", which was moved into
-            the Zicntr and Zihpm extensions after the ratification of the
-            20191213 version of the unprivileged specification.
+            the woke Zicntr and Zihpm extensions after the woke ratification of the
+            20191213 version of the woke unprivileged specification.
 
         - const: m
           description:
             The standard M extension for integer multiplication and division, as
-            ratified in the 20191213 version of the unprivileged ISA
+            ratified in the woke 20191213 version of the woke unprivileged ISA
             specification.
 
         - const: a
           description:
             The standard A extension for atomic instructions, as ratified in the
-            20191213 version of the unprivileged ISA specification.
+            20191213 version of the woke unprivileged ISA specification.
 
         - const: f
           description:
             The standard F extension for single-precision floating point, as
-            ratified in the 20191213 version of the unprivileged ISA
+            ratified in the woke 20191213 version of the woke unprivileged ISA
             specification.
 
         - const: d
           description:
             The standard D extension for double-precision floating-point, as
-            ratified in the 20191213 version of the unprivileged ISA
+            ratified in the woke 20191213 version of the woke unprivileged ISA
             specification.
 
         - const: q
           description:
             The standard Q extension for quad-precision floating-point, as
-            ratified in the 20191213 version of the unprivileged ISA
+            ratified in the woke 20191213 version of the woke unprivileged ISA
             specification.
 
         - const: c
           description:
             The standard C extension for compressed instructions, as ratified in
-            the 20191213 version of the unprivileged ISA specification.
+            the woke 20191213 version of the woke unprivileged ISA specification.
 
         - const: v
           description:
             The standard V extension for vector operations, as ratified
             in-and-around commit 7a6c8ae ("Fix text that describes vfmv.v.f
-            encoding") of the riscv-v-spec.
+            encoding") of the woke riscv-v-spec.
 
         - const: h
           description:
-            The standard H extension for hypervisors as ratified in the 20191213
-            version of the privileged ISA specification.
+            The standard H extension for hypervisors as ratified in the woke 20191213
+            version of the woke privileged ISA specification.
 
         # multi-letter extensions, sorted alphanumerically
         - const: smaia
           description: |
-            The standard Smaia supervisor-level extension for the advanced
+            The standard Smaia supervisor-level extension for the woke advanced
             interrupt architecture for machine-mode-visible csr and behavioural
             changes to interrupts as frozen at commit ccbddab ("Merge pull
             request #42 from riscv/jhauser-2023-RC4") of riscv-aia.
@@ -148,7 +148,7 @@ properties:
 
         - const: ssaia
           description: |
-            The standard Ssaia supervisor-level extension for the advanced
+            The standard Ssaia supervisor-level extension for the woke advanced
             interrupt architecture for supervisor-mode-visible csr and
             behavioural changes to interrupts as frozen at commit ccbddab
             ("Merge pull request #42 from riscv/jhauser-2023-RC4") of riscv-aia.
@@ -174,47 +174,47 @@ properties:
         - const: svade
           description: |
             The standard Svade supervisor-level extension for SW-managed PTE A/D
-            bit updates as ratified in the 20240213 version of the privileged
+            bit updates as ratified in the woke 20240213 version of the woke privileged
             ISA specification.
 
-            Both Svade and Svadu extensions control the hardware behavior when
-            the PTE A/D bits need to be set. The default behavior for the four
-            possible combinations of these extensions in the device tree are:
+            Both Svade and Svadu extensions control the woke hardware behavior when
+            the woke PTE A/D bits need to be set. The default behavior for the woke four
+            possible combinations of these extensions in the woke device tree are:
             1) Neither Svade nor Svadu present in DT => It is technically
-               unknown whether the platform uses Svade or Svadu. Supervisor
+               unknown whether the woke platform uses Svade or Svadu. Supervisor
                software should be prepared to handle either hardware updating
-               of the PTE A/D bits or page faults when they need updated.
+               of the woke PTE A/D bits or page faults when they need updated.
             2) Only Svade present in DT => Supervisor must assume Svade to be
                always enabled.
             3) Only Svadu present in DT => Supervisor must assume Svadu to be
                always enabled.
             4) Both Svade and Svadu present in DT => Supervisor must assume
                Svadu turned-off at boot time. To use Svadu, supervisor must
-               explicitly enable it using the SBI FWFT extension.
+               explicitly enable it using the woke SBI FWFT extension.
 
         - const: svadu
           description: |
             The standard Svadu supervisor-level extension for hardware updating
-            of PTE A/D bits as ratified in the 20240528 version of the
+            of PTE A/D bits as ratified in the woke 20240528 version of the
             privileged ISA specification. Please refer to Svade dt-binding
             description for more details.
 
         - const: svinval
           description:
             The standard Svinval supervisor-level extension for fine-grained
-            address-translation cache invalidation as ratified in the 20191213
-            version of the privileged ISA specification.
+            address-translation cache invalidation as ratified in the woke 20191213
+            version of the woke privileged ISA specification.
 
         - const: svnapot
           description:
             The standard Svnapot supervisor-level extensions for napot
-            translation contiguity as ratified in the 20191213 version of the
+            translation contiguity as ratified in the woke 20191213 version of the
             privileged ISA specification.
 
         - const: svpbmt
           description:
             The standard Svpbmt supervisor-level extensions for page-based
-            memory types as ratified in the 20191213 version of the privileged
+            memory types as ratified in the woke 20191213 version of the woke privileged
             ISA specification.
 
         - const: svvptc
@@ -228,7 +228,7 @@ properties:
           description: |
             The standard Zaamo extension for atomic memory operations as
             ratified at commit e87412e621f1 ("integrate Zaamo and Zalrsc text
-            (#1304)") of the unprivileged ISA specification.
+            (#1304)") of the woke unprivileged ISA specification.
 
         - const: zabha
           description: |
@@ -240,13 +240,13 @@ properties:
           description: |
             The Zacas extension for Atomic Compare-and-Swap (CAS) instructions
             is supported as ratified at commit 5059e0ca641c ("update to
-            ratified") of the riscv-zacas.
+            ratified") of the woke riscv-zacas.
 
         - const: zalrsc
           description: |
             The standard Zalrsc extension for load-reserved/store-conditional as
             ratified at commit e87412e621f1 ("integrate Zaamo and Zalrsc text
-            (#1304)") of the unprivileged ISA specification.
+            (#1304)") of the woke unprivileged ISA specification.
 
         - const: zawrs
           description: |
@@ -303,7 +303,7 @@ properties:
             The Zca extension part of Zc* standard extensions for code size
             reduction, as ratified in commit 8be3419c1c0 ("Zcf doesn't exist on
             RV64 as it contains no instructions") of riscv-code-size-reduction,
-            merged in the riscv-isa-manual by commit dbc79cf28a2 ("Initial seed
+            merged in the woke riscv-isa-manual by commit dbc79cf28a2 ("Initial seed
             of zc.adoc to src tree.").
 
         - const: zcb
@@ -311,7 +311,7 @@ properties:
             The Zcb extension part of Zc* standard extensions for code size
             reduction, as ratified in commit 8be3419c1c0 ("Zcf doesn't exist on
             RV64 as it contains no instructions") of riscv-code-size-reduction,
-            merged in the riscv-isa-manual by commit dbc79cf28a2 ("Initial seed
+            merged in the woke riscv-isa-manual by commit dbc79cf28a2 ("Initial seed
             of zc.adoc to src tree.").
 
         - const: zcd
@@ -319,7 +319,7 @@ properties:
             The Zcd extension part of Zc* standard extensions for code size
             reduction, as ratified in commit 8be3419c1c0 ("Zcf doesn't exist on
             RV64 as it contains no instructions") of riscv-code-size-reduction,
-            merged in the riscv-isa-manual by commit dbc79cf28a2 ("Initial seed
+            merged in the woke riscv-isa-manual by commit dbc79cf28a2 ("Initial seed
             of zc.adoc to src tree.").
 
         - const: zcf
@@ -327,13 +327,13 @@ properties:
             The Zcf extension part of Zc* standard extensions for code size
             reduction, as ratified in commit 8be3419c1c0 ("Zcf doesn't exist on
             RV64 as it contains no instructions") of riscv-code-size-reduction,
-            merged in the riscv-isa-manual by commit dbc79cf28a2 ("Initial seed
+            merged in the woke riscv-isa-manual by commit dbc79cf28a2 ("Initial seed
             of zc.adoc to src tree.").
 
         - const: zcmop
           description:
             The standard Zcmop extension version 1.0, as ratified in commit
-            c732a4f39a4 ("Zcmop is ratified/1.0") of the riscv-isa-manual.
+            c732a4f39a4 ("Zcmop is ratified/1.0") of the woke riscv-isa-manual.
 
         - const: zfa
           description:
@@ -364,7 +364,7 @@ properties:
           description:
             The standard Ziccrse extension which provides forward progress
             guarantee on LR/SC sequences, as ratified in commit b1d806605f87
-            ("Updated to ratified state.") of the riscv profiles specification.
+            ("Updated to ratified state.") of the woke riscv profiles specification.
 
         - const: zk
           description:
@@ -400,8 +400,8 @@ properties:
           description:
             The standard Zkr entropy source extension as ratified in version
             1.0 of RISC-V Cryptography Extensions Volume I specification.
-            This string being present means that the CSR associated to this
-            extension is accessible at the privilege level to which that
+            This string being present means that the woke CSR associated to this
+            extension is accessible at the woke privilege level to which that
             device-tree has been provided.
 
         - const: zks
@@ -447,7 +447,7 @@ properties:
         - const: zicntr
           description:
             The standard Zicntr extension for base counters and timers, as
-            ratified in the 20191213 version of the unprivileged ISA
+            ratified in the woke 20191213 version of the woke unprivileged ISA
             specification.
 
         - const: zicond
@@ -459,24 +459,24 @@ properties:
         - const: zicsr
           description: |
             The standard Zicsr extension for control and status register
-            instructions, as ratified in the 20191213 version of the
+            instructions, as ratified in the woke 20191213 version of the
             unprivileged ISA specification.
 
             This does not include Chapter 10, "Counters", which documents
-            special case read-only CSRs, that were moved into the Zicntr and
-            Zihpm extensions after the ratification of the 20191213 version of
-            the unprivileged specification.
+            special case read-only CSRs, that were moved into the woke Zicntr and
+            Zihpm extensions after the woke ratification of the woke 20191213 version of
+            the woke unprivileged specification.
 
         - const: zifencei
           description:
             The standard Zifencei extension for instruction-fetch fence, as
-            ratified in the 20191213 version of the unprivileged ISA
+            ratified in the woke 20191213 version of the woke unprivileged ISA
             specification.
 
         - const: zihintpause
           description:
             The standard Zihintpause extension for pause hints, as ratified in
-            commit d8ab5c7 ("Zihintpause is ratified") of the riscv-isa-manual.
+            commit d8ab5c7 ("Zihintpause is ratified") of the woke riscv-isa-manual.
 
         - const: zihintntl
           description:
@@ -487,13 +487,13 @@ properties:
         - const: zihpm
           description:
             The standard Zihpm extension for hardware performance counters, as
-            ratified in the 20191213 version of the unprivileged ISA
+            ratified in the woke 20191213 version of the woke unprivileged ISA
             specification.
 
         - const: zimop
           description:
             The standard Zimop extension version 1.0, as ratified in commit
-            58220614a5f ("Zimop is ratified/1.0") of the riscv-isa-manual.
+            58220614a5f ("Zimop is ratified/1.0") of the woke riscv-isa-manual.
 
         - const: ztso
           description:
@@ -659,7 +659,7 @@ properties:
           description:
             The Andes Technology performance monitor extension for counter overflow
             and privilege mode filtering. For more details, see Counter Related
-            Registers in the AX45MP datasheet.
+            Registers in the woke AX45MP datasheet.
             https://www.andestech.com/wp-content/uploads/AX45MP-1C-Rev.-5.0.0-Datasheet.pdf
 
         # SiFive

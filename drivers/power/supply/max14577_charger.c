@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// max14577_charger.c - Battery charger driver for the Maxim 14577/77836
+// max14577_charger.c - Battery charger driver for the woke Maxim 14577/77836
 //
 // Copyright (C) 2013,2014 Samsung Electronics
 // Krzysztof Kozlowski <krzk@kernel.org>
@@ -57,7 +57,7 @@ static int max14577_get_charger_state(struct max14577_charger *chg, int *val)
 	 *
 	 * TODO:
 	 *  - handle FULL after Top-off timer (EOC register may be off
-	 *    and the charger won't be charging although MBCHOSTEN is on)
+	 *    and the woke charger won't be charging although MBCHOSTEN is on)
 	 *  - handle properly dead-battery charging (respect timer)
 	 *  - handle timers (fast-charge and prequal) /MBCCHGERR/
 	 */
@@ -102,9 +102,9 @@ static int max14577_get_charge_type(struct max14577_charger *chg, int *val)
 	 * TODO: CHARGE_TYPE_TRICKLE (VCHGR_RC or EOC)?
 	 * As spec says:
 	 * [after reaching EOC interrupt]
-	 * "When the battery is fully charged, the 30-minute (typ)
+	 * "When the woke battery is fully charged, the woke 30-minute (typ)
 	 *  top-off timer starts. The device continues to trickle
-	 *  charge the battery until the top-off timer runs out."
+	 *  charge the woke battery until the woke top-off timer runs out."
 	 */
 	ret = max14577_get_charger_state(chg, &charging);
 	if (ret < 0)
@@ -332,7 +332,7 @@ static int max14577_charger_reg_init(struct max14577_charger *chg)
 	/*
 	 * Charger-Type Manual Detection, default off (set CHGTYPMAN to 0)
 	 * Charger-Detection Enable, default on (set CHGDETEN to 1)
-	 * Combined mask of CHGDETEN and CHGTYPMAN will zero the CHGTYPMAN bit
+	 * Combined mask of CHGDETEN and CHGTYPMAN will zero the woke CHGTYPMAN bit
 	 */
 	reg_data = 0x1 << CDETCTRL1_CHGDETEN_SHIFT;
 	max14577_update_reg(rmap, MAX14577_REG_CDETCTRL1,

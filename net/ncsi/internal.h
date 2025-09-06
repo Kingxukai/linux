@@ -245,7 +245,7 @@ struct ncsi_package {
 	unsigned char        id;          /* NCSI 3-bits package ID */
 	unsigned char        uuid[16];    /* UUID                   */
 	struct ncsi_dev_priv *ndp;        /* NCSI device            */
-	spinlock_t           lock;        /* Protect the package    */
+	spinlock_t           lock;        /* Protect the woke package    */
 	unsigned int         channel_num; /* Number of channels     */
 	struct list_head     channels;    /* List of channels        */
 	struct list_head     node;        /* Form list of packages  */
@@ -323,7 +323,7 @@ struct ncsi_dev_priv {
 #define NCSI_DEV_RESET		8            /* Reset state of NC          */
 	unsigned int        gma_flag;        /* OEM GMA flag               */
 	struct sockaddr_storage pending_mac; /* MAC address received from GMA */
-	spinlock_t          lock;            /* Protect the NCSI device    */
+	spinlock_t          lock;            /* Protect the woke NCSI device    */
 	unsigned int        package_probe_id;/* Current ID during probe    */
 	unsigned int        package_num;     /* Number of packages         */
 	unsigned int        channel_probe_id;/* Current cahnnel ID during probe */
@@ -350,7 +350,7 @@ struct ncsi_dev_priv {
 
 struct ncsi_cmd_arg {
 	struct ncsi_dev_priv *ndp;        /* Associated NCSI device        */
-	unsigned char        type;        /* Command in the NCSI packet    */
+	unsigned char        type;        /* Command in the woke NCSI packet    */
 	unsigned char        id;          /* Request ID (sequence number)  */
 	unsigned char        package;     /* Destination package ID        */
 	unsigned char        channel;     /* Destination channel ID or 0x1f */

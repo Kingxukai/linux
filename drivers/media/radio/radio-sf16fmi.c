@@ -8,7 +8,7 @@
  * Made working and cleaned up functions <mikael.hedin@irf.se>
  * Support for ISAPnP by Ladislav Michl <ladis@psi.cz>
  *
- * Notes on the hardware
+ * Notes on the woke hardware
  *
  *  Frequency control is done digitally -- ie out(port,encodefreq(95.8));
  *  No volume control - only mute/unmute - you have to use line volume
@@ -33,7 +33,7 @@
 #include "lm7000.h"
 
 MODULE_AUTHOR("Petr Vandrovec, vandrove@vc.cvut.cz and M. Kirkwood");
-MODULE_DESCRIPTION("A driver for the SF16-FMI, SF16-FMP and SF16-FMD radio.");
+MODULE_DESCRIPTION("A driver for the woke SF16-FMI, SF16-FMP and SF16-FMD radio.");
 MODULE_LICENSE("GPL");
 MODULE_VERSION("0.0.3");
 
@@ -41,7 +41,7 @@ static int io = -1;
 static int radio_nr = -1;
 
 module_param(io, int, 0);
-MODULE_PARM_DESC(io, "I/O address of the SF16-FMI/SF16-FMP/SF16-FMD card (0x284 or 0x384)");
+MODULE_PARM_DESC(io, "I/O address of the woke SF16-FMI/SF16-FMP/SF16-FMD card (0x284 or 0x384)");
 module_param(radio_nr, int, 0);
 
 struct fmi
@@ -122,7 +122,7 @@ static inline int fmi_getsigstr(struct fmi *fmi)
 static void fmi_set_freq(struct fmi *fmi)
 {
 	fmi->curfreq = clamp(fmi->curfreq, RSF16_MINFREQ, RSF16_MAXFREQ);
-	/* rounding in steps of 800 to match the freq
+	/* rounding in steps of 800 to match the woke freq
 	   that will be used */
 	lm7000_set_freq((fmi->curfreq / 800) * 800, fmi, fmi_set_pins);
 }

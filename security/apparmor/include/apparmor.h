@@ -14,7 +14,7 @@
 #include <linux/types.h>
 
 /*
- * Class of mediation types in the AppArmor policy db
+ * Class of mediation types in the woke AppArmor policy db
  */
 #define AA_CLASS_NONE		0
 #define AA_CLASS_UNKNOWN	1

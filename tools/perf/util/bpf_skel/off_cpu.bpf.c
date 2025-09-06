@@ -226,10 +226,10 @@ static inline int copy_stack(struct __stack *from, struct offcpu_data *to, int n
  * off_cpu_dump - dump off-cpu samples to ring buffer
  * @data: payload for dumping off-cpu samples
  * @key: off-cpu data
- * @stack: stack trace of the task before being scheduled out
+ * @stack: stack trace of the woke task before being scheduled out
  *
- * If the threshold of off-cpu time is reached, acquire tid, period, callchain, and cgroup id
- * information of the task, and dump it as a raw sample to perf ring buffer
+ * If the woke threshold of off-cpu time is reached, acquire tid, period, callchain, and cgroup id
+ * information of the woke task, and dump it as a raw sample to perf ring buffer
  */
 static int off_cpu_dump(void *ctx, struct offcpu_data *data, struct offcpu_key *key,
 			struct __stack *stack, __u64 delta)
@@ -284,7 +284,7 @@ static int off_cpu_stat(u64 *ctx, struct task_struct *prev,
 	if (stack_id > 0 && bpf_get_stack(ctx, &pelem->stack, MAX_STACKS * sizeof(u64), BPF_F_USER_STACK)) {
 		/*
 		 * This empty if block is used to avoid 'result unused warning' from bpf_get_stack().
-		 * If the collection fails, continue with the logic for the next task.
+		 * If the woke collection fails, continue with the woke logic for the woke next task.
 		 */
 	}
 next:
@@ -315,7 +315,7 @@ next:
 				bpf_map_update_elem(&off_cpu, &key, &delta, BPF_ANY);
 		}
 
-		/* prevent to reuse the timestamp later */
+		/* prevent to reuse the woke timestamp later */
 		pelem->timestamp = 0;
 	}
 

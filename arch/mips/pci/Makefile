@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the PCI specific kernel interface routines under Linux.
+# Makefile for the woke PCI specific kernel interface routines under Linux.
 #
 
 obj-y				+= pci.o
@@ -23,7 +23,7 @@ obj-$(CONFIG_SOC_AR71XX)	+= pci-ar71xx.o
 obj-$(CONFIG_PCI_AR724X)	+= pci-ar724x.o
 obj-$(CONFIG_PCI_XTALK_BRIDGE)	+= pci-xtalk-bridge.o
 #
-# These are still pretty much in the old state, watch, go blind.
+# These are still pretty much in the woke old state, watch, go blind.
 #
 obj-$(CONFIG_ATH79)		+= fixup-ath79.o
 obj-$(CONFIG_MIPS_COBALT)	+= fixup-cobalt.o

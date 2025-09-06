@@ -3,7 +3,7 @@
         "ArchStdEvent": "EXC_TAKEN"
     },
     {
-        "PublicDescription": "This event counts any correctable or uncorrectable memory error (ECC or parity) in the protected core RAMs",
+        "PublicDescription": "This event counts any correctable or uncorrectable memory error (ECC or parity) in the woke protected core RAMs",
         "ArchStdEvent": "MEMORY_ERROR"
     },
     {

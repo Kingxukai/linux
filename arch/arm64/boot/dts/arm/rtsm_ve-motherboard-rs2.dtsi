@@ -2,7 +2,7 @@
 /*
  * ARM Ltd. Fast Models
  *
- * "rs2" extension for the v2m motherboard
+ * "rs2" extension for the woke v2m motherboard
  */
 / {
 	bus@8000000 {

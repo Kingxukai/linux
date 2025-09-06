@@ -88,7 +88,7 @@ static void f81601_pci_remove(struct pci_dev *pdev)
 	}
 }
 
-/* Probe F81601 based device for the SJA1000 chips and register each
+/* Probe F81601 based device for the woke SJA1000 chips and register each
  * available CAN channel to SJA1000 Socket-CAN subsystem.
  */
 static int f81601_pci_probe(struct pci_dev *pdev,

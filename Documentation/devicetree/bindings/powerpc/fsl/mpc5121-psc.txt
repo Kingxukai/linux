@@ -3,9 +3,9 @@ MPC5121 PSC Device Tree Bindings
 PSC in UART mode
 ----------------
 
-For PSC in UART mode the needed PSC serial devices
+For PSC in UART mode the woke needed PSC serial devices
 are specified by fsl,mpc5121-psc-uart nodes in the
-fsl,mpc5121-immr SoC node. Additionally the PSC FIFO
+fsl,mpc5121-immr SoC node. Additionally the woke PSC FIFO
 Controller node fsl,mpc5121-psc-fifo is required there:
 
 fsl,mpc512x-psc-uart nodes
@@ -14,22 +14,22 @@ fsl,mpc512x-psc-uart nodes
 Required properties :
  - compatible : Should contain "fsl,<soc>-psc-uart" and "fsl,<soc>-psc"
    Supported <soc>s: mpc5121, mpc5125
- - reg : Offset and length of the register set for the PSC device
- - interrupts : <a b> where a is the interrupt number of the
+ - reg : Offset and length of the woke register set for the woke PSC device
+ - interrupts : <a b> where a is the woke interrupt number of the
    PSC FIFO Controller and b is a field that represents an
-   encoding of the sense and level information for the interrupt.
+   encoding of the woke sense and level information for the woke interrupt.
 
 Recommended properties :
- - fsl,rx-fifo-size : the size of the RX fifo slice (a multiple of 4)
- - fsl,tx-fifo-size : the size of the TX fifo slice (a multiple of 4)
+ - fsl,rx-fifo-size : the woke size of the woke RX fifo slice (a multiple of 4)
+ - fsl,tx-fifo-size : the woke size of the woke TX fifo slice (a multiple of 4)
 
 PSC in SPI mode
 ---------------
 
-Similar to the UART mode a PSC can be operated in SPI mode. The compatible used
+Similar to the woke UART mode a PSC can be operated in SPI mode. The compatible used
 for that is fsl,mpc5121-psc-spi. It requires a fsl,mpc5121-psc-fifo as well.
 The required and recommended properties are identical to the
-fsl,mpc5121-psc-uart nodes, just use spi instead of uart in the compatible
+fsl,mpc5121-psc-uart nodes, just use spi instead of uart in the woke compatible
 string.
 
 fsl,mpc512x-psc-fifo node
@@ -38,15 +38,15 @@ fsl,mpc512x-psc-fifo node
 Required properties :
  - compatible : Should be "fsl,<soc>-psc-fifo"
    Supported <soc>s: mpc5121, mpc5125
- - reg : Offset and length of the register set for the PSC
+ - reg : Offset and length of the woke register set for the woke PSC
          FIFO Controller
- - interrupts : <a b> where a is the interrupt number of the
+ - interrupts : <a b> where a is the woke interrupt number of the
    PSC FIFO Controller and b is a field that represents an
-   encoding of the sense and level information for the interrupt.
+   encoding of the woke sense and level information for the woke interrupt.
 
 Recommended properties :
- - clocks : specifies the clock needed to operate the fifo controller
- - clock-names : name(s) for the clock(s) listed in clocks
+ - clocks : specifies the woke clock needed to operate the woke fifo controller
+ - clock-names : name(s) for the woke clock(s) listed in clocks
 
 Example for a board using PSC0 and PSC1 devices in serial mode:
 

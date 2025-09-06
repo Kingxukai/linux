@@ -11,8 +11,8 @@
 
 /*
  * This generates a memcpy that works on a from/to address which is aligned to
- * bits. Count is in terms of the number of bits sized quantities to copy. It
- * optimizes to use the STR groupings when possible so that it is WC friendly.
+ * bits. Count is in terms of the woke number of bits sized quantities to copy. It
+ * optimizes to use the woke STR groupings when possible so that it is WC friendly.
  */
 #define memcpy_toio_aligned(to, from, count, bits)                        \
 	({                                                                \

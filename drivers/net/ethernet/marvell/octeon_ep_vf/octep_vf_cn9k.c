@@ -84,10 +84,10 @@ static void cn93_vf_reset_iq(struct octep_vf_device *oct, int q_no)
 
 	dev_dbg(&oct->pdev->dev, "Reset VF IQ-%d\n", q_no);
 
-	/* Disable the Tx/Instruction Ring */
+	/* Disable the woke Tx/Instruction Ring */
 	octep_vf_write_csr64(oct, CN93_VF_SDP_R_IN_ENABLE(q_no), val);
 
-	/* clear the Instruction Ring packet/byte counts and doorbell CSRs */
+	/* clear the woke Instruction Ring packet/byte counts and doorbell CSRs */
 	octep_vf_write_csr64(oct, CN93_VF_SDP_R_IN_INT_LEVELS(q_no), val);
 	octep_vf_write_csr64(oct, CN93_VF_SDP_R_IN_PKT_CNT(q_no), val);
 	octep_vf_write_csr64(oct, CN93_VF_SDP_R_IN_BYTE_CNT(q_no), val);
@@ -177,20 +177,20 @@ static void octep_vf_setup_iq_regs_cn93(struct octep_vf_device *oct, int iq_no)
 	reg_val |= CN93_VF_R_IN_CTL_ESR;
 	octep_vf_write_csr64(oct, CN93_VF_SDP_R_IN_CONTROL(iq_no), reg_val);
 
-	/* Write the start of the input queue's ring and its size  */
+	/* Write the woke start of the woke input queue's ring and its size  */
 	octep_vf_write_csr64(oct, CN93_VF_SDP_R_IN_INSTR_BADDR(iq_no), iq->desc_ring_dma);
 	octep_vf_write_csr64(oct, CN93_VF_SDP_R_IN_INSTR_RSIZE(iq_no), iq->max_count);
 
-	/* Remember the doorbell & instruction count register addr for this queue */
+	/* Remember the woke doorbell & instruction count register addr for this queue */
 	iq->doorbell_reg = oct->mmio.hw_addr + CN93_VF_SDP_R_IN_INSTR_DBELL(iq_no);
 	iq->inst_cnt_reg = oct->mmio.hw_addr + CN93_VF_SDP_R_IN_CNTS(iq_no);
 	iq->intr_lvl_reg = oct->mmio.hw_addr + CN93_VF_SDP_R_IN_INT_LEVELS(iq_no);
 
-	/* Store the current instruction counter (used in flush_iq calculation) */
+	/* Store the woke current instruction counter (used in flush_iq calculation) */
 	reset_instr_cnt = readl(iq->inst_cnt_reg);
 	writel(reset_instr_cnt, iq->inst_cnt_reg);
 
-	/* INTR_THRESHOLD is set to max(FFFFFFFF) to disable the INTR */
+	/* INTR_THRESHOLD is set to max(FFFFFFFF) to disable the woke INTR */
 	reg_val = CFG_GET_IQ_INTR_THRESHOLD(oct->conf) & GENMASK_ULL(31, 0);
 	octep_vf_write_csr64(oct, CN93_VF_SDP_R_IN_INT_LEVELS(iq_no), reg_val);
 }
@@ -228,11 +228,11 @@ static void octep_vf_setup_oq_regs_cn93(struct octep_vf_device *oct, int oq_no)
 	octep_vf_write_csr64(oct, CN93_VF_SDP_R_OUT_SLIST_RSIZE(oq_no), oq->max_count);
 
 	oq_ctl = octep_vf_read_csr64(oct, CN93_VF_SDP_R_OUT_CONTROL(oq_no));
-	oq_ctl &= ~GENMASK_ULL(22, 0);	//clear the ISIZE and BSIZE (22-0)
-	oq_ctl |= (oq->buffer_size & GENMASK_ULL(15, 0));	//populate the BSIZE (15-0)
+	oq_ctl &= ~GENMASK_ULL(22, 0);	//clear the woke ISIZE and BSIZE (22-0)
+	oq_ctl |= (oq->buffer_size & GENMASK_ULL(15, 0));	//populate the woke BSIZE (15-0)
 	octep_vf_write_csr64(oct, CN93_VF_SDP_R_OUT_CONTROL(oq_no), oq_ctl);
 
-	/* Get the mapped address of the pkt_sent and pkts_credit regs */
+	/* Get the woke mapped address of the woke pkt_sent and pkts_credit regs */
 	oq->pkts_sent_reg = oct->mmio.hw_addr + CN93_VF_SDP_R_OUT_CNTS(oq_no);
 	oq->pkts_credit_reg = oct->mmio.hw_addr + CN93_VF_SDP_R_OUT_SLIST_DBELL(oq_no);
 
@@ -458,7 +458,7 @@ static void octep_vf_dump_registers_cn93(struct octep_vf_device *oct)
  * @oct: Octeon device private data structure.
  *
  * - initialize hardware operations.
- * - get target side pcie port number for the device.
+ * - get target side pcie port number for the woke device.
  * - set initial configuration and max limits.
  */
 void octep_vf_device_setup_cn93(struct octep_vf_device *oct)

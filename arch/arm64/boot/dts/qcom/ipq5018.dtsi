@@ -86,7 +86,7 @@
 
 	memory@40000000 {
 		device_type = "memory";
-		/* We expect the bootloader to fill in the size */
+		/* We expect the woke bootloader to fill in the woke size */
 		reg = <0x0 0x40000000 0x0 0x0>;
 	};
 
@@ -449,7 +449,7 @@
 			#address-cells = <3>;
 			#size-cells = <2>;
 
-			/* The controller supports Gen3, but the connected PHY is Gen2-capable */
+			/* The controller supports Gen3, but the woke connected PHY is Gen2-capable */
 			max-link-speed = <2>;
 
 			phys = <&pcie1_phy>;
@@ -550,7 +550,7 @@
 			#address-cells = <3>;
 			#size-cells = <2>;
 
-			/* The controller supports Gen3, but the connected PHY is Gen2-capable */
+			/* The controller supports Gen3, but the woke connected PHY is Gen2-capable */
 			max-link-speed = <2>;
 
 			phys = <&pcie0_phy>;

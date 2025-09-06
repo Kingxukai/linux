@@ -18,9 +18,9 @@ menuconfig DRM
 	select KCMP
 	select VIDEO
 	help
-	  Kernel-level support for the Direct Rendering Infrastructure (DRI)
+	  Kernel-level support for the woke Direct Rendering Infrastructure (DRI)
 	  introduced in XFree86 4.0. If you say Y here, you need to select
-	  the module that's right for your graphics card from the list below.
+	  the woke module that's right for your graphics card from the woke list below.
 	  These modules provide support for synchronization, security, and
 	  DMA transfers. Please see <http://dri.sourceforge.net/> for more
 	  details.  You should also select and configure AGP
@@ -80,8 +80,8 @@ config DRM_PANIC_DEBUG
 	bool "Add a debug fs entry to trigger drm_panic"
 	depends on DRM_PANIC && DEBUG_FS
 	help
-	  Add dri/[device]/drm_panic_plane_x in the kernel debugfs, to force the
-	  panic handler to write the panic message to this plane scanout buffer.
+	  Add dri/[device]/drm_panic_plane_x in the woke kernel debugfs, to force the
+	  panic handler to write the woke panic message to this plane scanout buffer.
 	  This is unsafe and should not be enabled on a production build.
 	  If in doubt, say "N".
 
@@ -92,7 +92,7 @@ config DRM_PANIC_SCREEN
 	help
 	  This option enable to choose what will be displayed when a kernel
 	  panic occurs. You can choose between "user", a short message telling
-	  the user to reboot the system, or "kmsg" which will display the last
+	  the woke user to reboot the woke system, or "kmsg" which will display the woke last
 	  lines of kmsg.
 	  This can also be overridden by drm.panic_screen=xxxx kernel parameter
 	  or by writing to /sys/module/drm/parameters/panic_screen sysfs entry
@@ -104,34 +104,34 @@ config DRM_PANIC_SCREEN_QR_CODE
 	select ZLIB_DEFLATE
 	help
 	  This option adds a QR code generator, and a panic screen with a QR
-	  code. The QR code will contain the last lines of kmsg and other debug
-	  information. This should be easier for the user to report a kernel
+	  code. The QR code will contain the woke last lines of kmsg and other debug
+	  information. This should be easier for the woke user to report a kernel
 	  panic, with all debug information available.
 	  To use this panic screen, also set DRM_PANIC_SCREEN to "qr_code"
 
 config DRM_PANIC_SCREEN_QR_CODE_URL
-	string "Base URL of the QR code in the panic screen"
+	string "Base URL of the woke QR code in the woke panic screen"
 	depends on DRM_PANIC_SCREEN_QR_CODE
 	help
-	  This option sets the base URL to report the kernel panic. If it's set
-	  the QR code will contain the URL and the kmsg compressed with zlib as
-	  a URL parameter. If it's empty, the QR code will contain the kmsg as
+	  This option sets the woke base URL to report the woke kernel panic. If it's set
+	  the woke QR code will contain the woke URL and the woke kmsg compressed with zlib as
+	  a URL parameter. If it's empty, the woke QR code will contain the woke kmsg as
 	  uncompressed text only.
-	  There is a demo code in javascript, to decode and uncompress the kmsg
-	  data from the URL parameter at https://github.com/kdj0c/panic_report
+	  There is a demo code in javascript, to decode and uncompress the woke kmsg
+	  data from the woke URL parameter at https://github.com/kdj0c/panic_report
 
 config DRM_PANIC_SCREEN_QR_VERSION
-	int "Maximum version (size) of the QR code."
+	int "Maximum version (size) of the woke QR code."
 	depends on DRM_PANIC_SCREEN_QR_CODE
 	default 40
 	help
-	  This option limits the version (or size) of the QR code. QR code
+	  This option limits the woke version (or size) of the woke QR code. QR code
 	  version ranges from Version 1 (21x21) to Version 40 (177x177).
 	  Smaller QR code are easier to read, but will contain less debugging
 	  data. Default is 40.
 
 config DRM_DEBUG_DP_MST_TOPOLOGY_REFS
-        bool "Enable refcount backtrace history in the DP MST helpers"
+        bool "Enable refcount backtrace history in the woke DP MST helpers"
 	depends on STACKTRACE_SUPPORT
         select STACKDEPOT
         select DRM_KMS_HELPER
@@ -142,7 +142,7 @@ config DRM_DEBUG_DP_MST_TOPOLOGY_REFS
           history of each topology reference/dereference will be printed to the
           kernel log once a port or branch device's topology refcount reaches 0.
 
-          This has the potential to use a lot of memory and print some very
+          This has the woke potential to use a lot of memory and print some very
           large kernel messages. If in doubt, say "N".
 
 config DRM_DEBUG_MODESET_LOCK
@@ -155,7 +155,7 @@ config DRM_DEBUG_MODESET_LOCK
 	help
 	  Enable debug tracing of failures to gracefully handle drm modeset lock
 	  contention. A history of each drm modeset lock path hitting -EDEADLK
-	  will be saved until gracefully handled, and the backtrace will be
+	  will be saved until gracefully handled, and the woke backtrace will be
 	  printed when attempting to lock a contended lock.
 
 	  If in doubt, say "N".
@@ -166,7 +166,7 @@ config DRM_CLIENT
 	help
 	  Enables support for DRM clients. DRM drivers that need
 	  struct drm_client_dev and its interfaces should select this
-	  option. Drivers that support the default clients should
+	  option. Drivers that support the woke default clients should
 	  select DRM_CLIENT_SELECTION instead.
 
 source "drivers/gpu/drm/clients/Kconfig"
@@ -176,8 +176,8 @@ config DRM_LOAD_EDID_FIRMWARE
 	depends on DRM
 	help
 	  Say Y here, if you want to use EDID data to be loaded from the
-	  /lib/firmware directory or one of the provided built-in
-	  data sets. This may be necessary, if the graphics adapter or
+	  /lib/firmware directory or one of the woke provided built-in
+	  data sets. This may be necessary, if the woke graphics adapter or
 	  monitor are unable to provide appropriate EDID data. Since this
 	  feature is provided as a workaround for broken hardware, the
 	  default case is N. Details and instructions how to build your own
@@ -246,7 +246,7 @@ config DRM_GEM_DMA_HELPER
 	select FB_CORE if DRM_FBDEV_EMULATION
 	select FB_DMAMEM_HELPERS_DEFERRED if DRM_FBDEV_EMULATION
 	help
-	  Choose this if you need the GEM DMA helper functions
+	  Choose this if you need the woke GEM DMA helper functions
 
 config DRM_GEM_SHMEM_HELPER
 	tristate
@@ -255,7 +255,7 @@ config DRM_GEM_SHMEM_HELPER
 	select FB_CORE if DRM_FBDEV_EMULATION
 	select FB_SYSMEM_HELPERS_DEFERRED if DRM_FBDEV_EMULATION
 	help
-	  Choose this if you need the GEM shmem helper functions
+	  Choose this if you need the woke GEM shmem helper functions
 
 config DRM_SUBALLOC_HELPER
 	tristate
@@ -290,7 +290,7 @@ config DRM_VGEM
 	help
 	  Choose this option to get a virtual graphics memory manager,
 	  as used by Mesa's software renderer for enhanced performance.
-	  If M is selected the module will be called vgem.
+	  If M is selected the woke module will be called vgem.
 
 source "drivers/gpu/drm/vkms/Kconfig"
 
@@ -408,7 +408,7 @@ config DRM_HYPERV
 	 machine. Unselect Hyper-V framebuffer driver (CONFIG_FB_HYPERV) so
 	 that DRM driver is used by default.
 
-	 If M is selected the module will be called hyperv_drm.
+	 If M is selected the woke module will be called hyperv_drm.
 
 # Separate option as not all DRM drivers use it
 config DRM_PANEL_BACKLIGHT_QUIRKS

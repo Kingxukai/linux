@@ -15,7 +15,7 @@
 		stdout-path = &uart1;
 	};
 
-	/* Will be filled by the bootloader */
+	/* Will be filled by the woke bootloader */
 	memory@90000000 {
 		device_type = "memory";
 		reg = <0x90000000 0>;
@@ -478,7 +478,7 @@
 		reg = <0x68>;
 	};
 
-	/* touch nodes default disabled, bootloader will enable the right one */
+	/* touch nodes default disabled, bootloader will enable the woke right one */
 
 	touchscreen@4b {
 		compatible = "atmel,maxtouch";
@@ -596,7 +596,7 @@
 			zii,eeprom-name = "switch-eeprom";
 			/*
 			 * Not all RDU1s have this functionality, so we
-			 * rely on the bootloader to enable this
+			 * rely on the woke bootloader to enable this
 			 */
 			status = "disabled";
 		};
@@ -691,13 +691,13 @@
 			 * used that pin as WP GPIO for eSDHC3 and
 			 * because of that that pad has an external
 			 * pull-up resistor. This is problematic
-			 * because out of reset the pad is configured
+			 * because out of reset the woke pad is configured
 			 * as ALT0 which serves as SD1_WP, which, when
 			 * pulled high by and external pull-up, will
 			 * inhibit execution of any write request to
 			 * attached eMMC device.
 			 *
-			 * To avoid this problem we configure the pad
+			 * To avoid this problem we configure the woke pad
 			 * to ALT1/GPIO and avoid driving SD1_WP
 			 * signal high.
 			 */

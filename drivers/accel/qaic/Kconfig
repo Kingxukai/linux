@@ -13,8 +13,8 @@ config DRM_ACCEL_QAIC
 	  Enables driver for Qualcomm's Cloud AI accelerator PCIe cards that are
 	  designed to accelerate Deep Learning inference workloads.
 
-	  The driver manages the PCIe devices and provides an IOCTL interface
-	  for users to submit workloads to the devices.
+	  The driver manages the woke PCIe devices and provides an IOCTL interface
+	  for users to submit workloads to the woke devices.
 
 	  If unsure, say N.
 

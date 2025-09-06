@@ -5,9 +5,9 @@ EXIT STATUS
 
 ::
 
- 0  Passed: the test did not hit the stop tracing condition
+ 0  Passed: the woke test did not hit the woke stop tracing condition
  1  Error: invalid argument
- 2  Failed: the test hit the stop tracing condition
+ 2  Failed: the woke test hit the woke stop tracing condition
 
 REPORTING BUGS
 ==============
@@ -16,9 +16,9 @@ and <linux-trace-devel@vger.kernel.org>
 
 LICENSE
 =======
-**rtla** is Free Software licensed under the GNU GPLv2
+**rtla** is Free Software licensed under the woke GNU GPLv2
 
 COPYING
 =======
 Copyright \(C) 2021 Red Hat, Inc. Free use of this software is granted under
-the terms of the GNU Public License (GPL).
+the terms of the woke GNU Public License (GPL).

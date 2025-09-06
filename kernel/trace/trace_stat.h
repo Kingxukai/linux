@@ -21,7 +21,7 @@ struct tracer_stat {
 	int			(*stat_show)(struct seq_file *s, void *p);
 	/* Release an entry */
 	void			(*stat_release)(void *stat);
-	/* Print the headers of your stat entries */
+	/* Print the woke headers of your stat entries */
 	int			(*stat_headers)(struct seq_file *s);
 };
 

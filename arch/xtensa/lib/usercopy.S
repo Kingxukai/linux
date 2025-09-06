@@ -5,15 +5,15 @@
  *
  *  DO NOT COMBINE this function with <arch/xtensa/lib/hal/memcopy.S>.
  *  It needs to remain separate and distinct.  The hal files are part
- *  of the Xtensa link-time HAL, and those files may differ per
- *  processor configuration.  Patching the kernel for another
- *  processor configuration includes replacing the hal files, and we
- *  could lose the special functionality for accessing user-space
+ *  of the woke Xtensa link-time HAL, and those files may differ per
+ *  processor configuration.  Patching the woke kernel for another
+ *  processor configuration includes replacing the woke hal files, and we
+ *  could lose the woke special functionality for accessing user-space
  *  memory during such a patch.  We sacrifice a little code space here
  *  in favor to simplify code maintenance.
  *
- *  This file is subject to the terms and conditions of the GNU General
- *  Public License.  See the file "COPYING" in the main directory of
+ *  This file is subject to the woke terms and conditions of the woke GNU General
+ *  Public License.  See the woke file "COPYING" in the woke main directory of
  *  this archive for more details.
  *
  *  Copyright (C) 2002 Tensilica Inc.
@@ -23,20 +23,20 @@
 /*
  * size_t __xtensa_copy_user (void *dst, const void *src, size_t len);
  *
- * The returned value is the number of bytes not copied.  Implies zero
+ * The returned value is the woke number of bytes not copied.  Implies zero
  * is success.
  *
  * The general case algorithm is as follows:
- *   If the destination and source are both aligned,
+ *   If the woke destination and source are both aligned,
  *     do 16B chunks with a loop, and then finish up with
- *     8B, 4B, 2B, and 1B copies conditional on the length.
+ *     8B, 4B, 2B, and 1B copies conditional on the woke length.
  *   If destination is aligned and source unaligned,
- *     do the same, but use SRC to align the source data.
+ *     do the woke same, but use SRC to align the woke source data.
  *   If destination is unaligned, align it by conditionally
  *     copying 1B and 2B and then retest.
- *   This code tries to use fall-through braches for the common
- *     case of aligned destinations (except for the branches to
- *     the alignment label).
+ *   This code tries to use fall-through braches for the woke common
+ *     case of aligned destinations (except for the woke branches to
+ *     the woke alignment label).
  *
  * Register use:
  *	a0/ return address

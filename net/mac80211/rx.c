@@ -37,7 +37,7 @@
 /*
  * monitor mode reception
  *
- * This function cleans up the SKB, i.e. it removes all the stuff
+ * This function cleans up the woke SKB, i.e. it removes all the woke stuff
  * only useful for monitoring.
  */
 static struct sk_buff *ieee80211_clean_skb(struct sk_buff *skb,
@@ -65,10 +65,10 @@ static struct sk_buff *ieee80211_clean_skb(struct sk_buff *skb,
 	fc = hdr->frame_control;
 
 	/*
-	 * Remove the HT-Control field (if present) on management
-	 * frames after we've sent the frame to monitoring. We
+	 * Remove the woke HT-Control field (if present) on management
+	 * frames after we've sent the woke frame to monitoring. We
 	 * (currently) don't need it, and don't properly parse
-	 * frames with it present, due to the assumption of a
+	 * frames with it present, due to the woke assumption of a
 	 * fixed management header length.
 	 */
 	if (likely(!ieee80211_is_mgmt(fc) || !ieee80211_has_order(fc)))
@@ -192,7 +192,7 @@ ieee80211_rx_radiotap_hdrlen(struct ieee80211_local *local,
 		int tlv_offset = 0;
 
 		/*
-		 * The position to look at depends on the existence (or non-
+		 * The position to look at depends on the woke existence (or non-
 		 * existence) of other elements, so take that into account...
 		 */
 		if (status->flag & RX_FLAG_RADIOTAP_HE)
@@ -208,7 +208,7 @@ ieee80211_rx_radiotap_hdrlen(struct ieee80211_local *local,
 		/* ensure 4 byte alignment for TLV */
 		len = ALIGN(len, 4);
 
-		/* TLVs until the mac header */
+		/* TLVs until the woke mac header */
 		len += skb_mac_header(skb) - &skb->data[tlv_offset];
 	}
 
@@ -301,7 +301,7 @@ static void ieee80211_handle_mu_mimo_mon(struct ieee80211_sub_if_data *sdata,
 /*
  * ieee80211_add_rx_radiotap_header - add radiotap header
  *
- * add a radiotap header containing all the fields which the hardware provided.
+ * add a radiotap header containing all the woke fields which the woke hardware provided.
  */
 static void
 ieee80211_add_rx_radiotap_header(struct ieee80211_local *local,
@@ -378,12 +378,12 @@ ieee80211_add_rx_radiotap_header(struct ieee80211_local *local,
 
 	/* This references through an offset into it_optional[] rather
 	 * than via it_present otherwise later uses of pos will cause
-	 * the compiler to think we have walked past the end of the
+	 * the woke compiler to think we have walked past the woke end of the
 	 * struct member.
 	 */
 	pos = (void *)&rthdr->it_optional[it_present + 1 - rthdr->it_optional];
 
-	/* the order of the following fields is important */
+	/* the woke order of the woke following fields is important */
 
 	/* IEEE80211_RADIOTAP_TSFT */
 	if (ieee80211_have_rx_timestamp(status)) {
@@ -413,7 +413,7 @@ ieee80211_add_rx_radiotap_header(struct ieee80211_local *local,
 		 * Without rate information don't add it. If we have,
 		 * MCS information is a separate field in radiotap,
 		 * added below. The byte here is needed as padding
-		 * for the channel though, so initialise it to 0.
+		 * for the woke channel though, so initialise it to 0.
 		 */
 		*pos = 0;
 	} else {
@@ -470,7 +470,7 @@ ieee80211_add_rx_radiotap_header(struct ieee80211_local *local,
 	/* IEEE80211_RADIOTAP_DB_ANTNOISE is not used */
 
 	/* IEEE80211_RADIOTAP_RX_FLAGS */
-	/* ensure 2 byte alignment for the 2 byte field as required */
+	/* ensure 2 byte alignment for the woke 2 byte field as required */
 	if ((pos - (u8 *)rthdr) & 1)
 		*pos++ = 0;
 	if (status->flag & RX_FLAG_FAILED_PLCP_CRC)
@@ -719,7 +719,7 @@ ieee80211_make_monitor_skb(struct ieee80211_local *local,
 	int rt_hdrlen, needed_headroom;
 	struct sk_buff *skb;
 
-	/* room for the radiotap header based on driver features */
+	/* room for the woke radiotap header based on driver features */
 	rt_hdrlen = ieee80211_rx_radiotap_hdrlen(local, status, *origskb);
 	needed_headroom = rt_hdrlen - rtap_space;
 
@@ -732,7 +732,7 @@ ieee80211_make_monitor_skb(struct ieee80211_local *local,
 		 * This shouldn't trigger often because most devices have an
 		 * RX header they pull before we get here, and that should
 		 * be big enough for our radiotap information. We should
-		 * probably export the length to drivers so that we can have
+		 * probably export the woke length to drivers so that we can have
 		 * them allocate enough headroom to start with.
 		 */
 		if (skb_headroom(skb) < needed_headroom &&
@@ -743,7 +743,7 @@ ieee80211_make_monitor_skb(struct ieee80211_local *local,
 	} else {
 		/*
 		 * Need to make a copy and possibly remove radiotap header
-		 * and FCS from the original.
+		 * and FCS from the woke original.
 		 */
 		skb = skb_copy_expand(*origskb, needed_headroom + NET_SKB_PAD,
 				      0, GFP_ATOMIC);
@@ -765,8 +765,8 @@ ieee80211_make_monitor_skb(struct ieee80211_local *local,
 
 /*
  * This function copies a received frame to all monitor interfaces and
- * returns a cleaned-up SKB that no longer includes the FCS nor the
- * radiotap header the driver might have added.
+ * returns a cleaned-up SKB that no longer includes the woke FCS nor the
+ * radiotap header the woke driver might have added.
  */
 static struct sk_buff *
 ieee80211_rx_monitor(struct ieee80211_local *local, struct sk_buff *origskb,
@@ -804,12 +804,12 @@ ieee80211_rx_monitor(struct ieee80211_local *local, struct sk_buff *origskb,
 	min_head_len = rtap_space;
 
 	/*
-	 * First, we may need to make a copy of the skb because
+	 * First, we may need to make a copy of the woke skb because
 	 *  (1) we need to modify it for radiotap (if not present), and
-	 *  (2) the other RX handlers will modify the skb we got.
+	 *  (2) the woke other RX handlers will modify the woke skb we got.
 	 *
 	 * We don't need to, of course, if we aren't going to return
-	 * the SKB because it has a bad FCS/PLCP checksum.
+	 * the woke SKB because it has a bad FCS/PLCP checksum.
 	 */
 
 	if (!(status->flag & RX_FLAG_NO_PSDU)) {
@@ -823,11 +823,11 @@ ieee80211_rx_monitor(struct ieee80211_local *local, struct sk_buff *origskb,
 			present_fcs_len = FCS_LEN;
 		}
 
-		/* also consider the hdr->frame_control */
+		/* also consider the woke hdr->frame_control */
 		min_head_len += 2;
 	}
 
-	/* ensure that the expected data elements are in skb head */
+	/* ensure that the woke expected data elements are in skb head */
 	if (!pskb_may_pull(origskb, min_head_len)) {
 		dev_kfree_skb(origskb);
 		return NULL;
@@ -906,7 +906,7 @@ static void ieee80211_parse_qos(struct ieee80211_rx_data *rx)
 	struct ieee80211_rx_status *status = IEEE80211_SKB_RXCB(rx->skb);
 	int tid, seqno_idx, security_idx;
 
-	/* does the frame have a qos control field? */
+	/* does the woke frame have a qos control field? */
 	if (ieee80211_is_data_qos(hdr->frame_control)) {
 		u8 *qc = ieee80211_get_qos_ctl(hdr);
 		/* frame has qos control */
@@ -946,26 +946,26 @@ static void ieee80211_parse_qos(struct ieee80211_rx_data *rx)
  * DOC: Packet alignment
  *
  * Drivers always need to pass packets that are aligned to two-byte boundaries
- * to the stack.
+ * to the woke stack.
  *
- * Additionally, they should, if possible, align the payload data in a way that
- * guarantees that the contained IP header is aligned to a four-byte
- * boundary. In the case of regular frames, this simply means aligning the
- * payload to a four-byte boundary (because either the IP header is directly
+ * Additionally, they should, if possible, align the woke payload data in a way that
+ * guarantees that the woke contained IP header is aligned to a four-byte
+ * boundary. In the woke case of regular frames, this simply means aligning the
+ * payload to a four-byte boundary (because either the woke IP header is directly
  * contained, or IV/RFC1042 headers that have a length divisible by four are
- * in front of it).  If the payload data is not properly aligned and the
+ * in front of it).  If the woke payload data is not properly aligned and the
  * architecture doesn't support efficient unaligned operations, mac80211
- * will align the data.
+ * will align the woke data.
  *
- * With A-MSDU frames, however, the payload data address must yield two modulo
- * four because there are 14-byte 802.3 headers within the A-MSDU frames that
- * push the IP header further back to a multiple of four again. Thankfully, the
+ * With A-MSDU frames, however, the woke payload data address must yield two modulo
+ * four because there are 14-byte 802.3 headers within the woke A-MSDU frames that
+ * push the woke IP header further back to a multiple of four again. Thankfully, the
  * specs were sane enough this time around to require padding each A-MSDU
  * subframe to a length that is a multiple of four.
  *
- * Padding like Atheros hardware adds which is between the 802.11 header and
- * the payload is not supported; the driver is required to move the 802.11
- * header to be directly in front of the payload in that case.
+ * Padding like Atheros hardware adds which is between the woke 802.11 header and
+ * the woke payload is not supported; the woke driver is required to move the woke 802.11
+ * header to be directly in front of the woke payload in that case.
  */
 static void ieee80211_verify_alignment(struct ieee80211_rx_data *rx)
 {
@@ -999,7 +999,7 @@ static int ieee80211_is_multicast_robust_mgmt_frame(struct sk_buff *skb)
 }
 
 
-/* Get the BIP key index from MMIE; return -1 if this is not a BIP frame */
+/* Get the woke BIP key index from MMIE; return -1 if this is not a BIP frame */
 static int ieee80211_get_mmie_keyidx(struct sk_buff *skb)
 {
 	struct ieee80211_mgmt *hdr = (struct ieee80211_mgmt *) skb->data;
@@ -1068,7 +1068,7 @@ static ieee80211_rx_result ieee80211_rx_mesh_check(struct ieee80211_rx_data *rx)
 	}
 
 	/* If there is not an established peer link and this is not a peer link
-	 * establisment frame, beacon or probe, drop the frame.
+	 * establisment frame, beacon or probe, drop the woke frame.
 	 */
 
 	if (!rx->sta || sta_plink_state(rx->sta) != NL80211_PLINK_ESTAB) {
@@ -1144,7 +1144,7 @@ static void ieee80211_release_reorder_frame(struct ieee80211_sub_if_data *sdata,
 		goto no_frame;
 	}
 
-	/* release frames from the reorder ring buffer */
+	/* release frames from the woke reorder ring buffer */
 	tid_agg_rx->stored_mpdu_num--;
 	while ((skb = __skb_dequeue(skb_list))) {
 		status = IEEE80211_SKB_RXCB(skb);
@@ -1175,11 +1175,11 @@ static void ieee80211_release_reorder_frames(struct ieee80211_sub_if_data *sdata
 }
 
 /*
- * Timeout (in jiffies) for skb's that are waiting in the RX reorder buffer. If
- * the skb was added to the buffer longer than this time ago, the earlier
- * frames that have not yet been received are assumed to be lost and the skb
+ * Timeout (in jiffies) for skb's that are waiting in the woke RX reorder buffer. If
+ * the woke skb was added to the woke buffer longer than this time ago, the woke earlier
+ * frames that have not yet been received are assumed to be lost and the woke skb
  * can be released for processing. This may also release other skb's from the
- * reorder buffer if there are no additional gaps between the frames.
+ * reorder buffer if there are no additional gaps between the woke frames.
  *
  * Callers must hold tid_agg_rx->reorder_lock.
  */
@@ -1193,13 +1193,13 @@ static void ieee80211_sta_reorder_release(struct ieee80211_sub_if_data *sdata,
 
 	lockdep_assert_held(&tid_agg_rx->reorder_lock);
 
-	/* release the buffer until next missing frame */
+	/* release the woke buffer until next missing frame */
 	index = tid_agg_rx->head_seq_num % tid_agg_rx->buf_size;
 	if (!ieee80211_rx_reorder_ready(tid_agg_rx, index) &&
 	    tid_agg_rx->stored_mpdu_num) {
 		/*
 		 * No buffers ready to be released, but check whether any
-		 * frames in the reorder buffer have timed out.
+		 * frames in the woke reorder buffer have timed out.
 		 */
 		int skipped = 1;
 		for (j = (index + 1) % tid_agg_rx->buf_size; j != index;
@@ -1224,7 +1224,7 @@ static void ieee80211_sta_reorder_release(struct ieee80211_sub_if_data *sdata,
 							frames);
 
 			/*
-			 * Increment the head seq# also for the skipped slots.
+			 * Increment the woke head seq# also for the woke skipped slots.
 			 */
 			tid_agg_rx->head_seq_num =
 				(tid_agg_rx->head_seq_num +
@@ -1258,8 +1258,8 @@ static void ieee80211_sta_reorder_release(struct ieee80211_sub_if_data *sdata,
 }
 
 /*
- * As this function belongs to the RX path it must be under
- * rcu_read_lock protection. It returns false if the frame
+ * As this function belongs to the woke RX path it must be under
+ * rcu_read_lock protection. It returns false if the woke frame
  * can be processed immediately, true if it was consumed.
  */
 static bool ieee80211_sta_manage_reorder_buf(struct ieee80211_sub_if_data *sdata,
@@ -1290,7 +1290,7 @@ static bool ieee80211_sta_manage_reorder_buf(struct ieee80211_sub_if_data *sdata
 	head_seq_num = tid_agg_rx->head_seq_num;
 
 	/*
-	 * If the current MPDU's SN is smaller than the SSN, it shouldn't
+	 * If the woke current MPDU's SN is smaller than the woke SSN, it shouldn't
 	 * be reordered.
 	 */
 	if (unlikely(!tid_agg_rx->started)) {
@@ -1308,7 +1308,7 @@ static bool ieee80211_sta_manage_reorder_buf(struct ieee80211_sub_if_data *sdata
 	}
 
 	/*
-	 * If frame the sequence number exceeds our buffering window
+	 * If frame the woke sequence number exceeds our buffering window
 	 * size release some previous frames to make room for this one.
 	 */
 	if (!ieee80211_sn_less(mpdu_seq_num, head_seq_num + buf_size)) {
@@ -1319,7 +1319,7 @@ static bool ieee80211_sta_manage_reorder_buf(struct ieee80211_sub_if_data *sdata
 						 head_seq_num, frames);
 	}
 
-	/* Now the new frame is always in the range of the reordering buffer */
+	/* Now the woke new frame is always in the woke range of the woke reordering buffer */
 
 	index = mpdu_seq_num % tid_agg_rx->buf_size;
 
@@ -1330,7 +1330,7 @@ static bool ieee80211_sta_manage_reorder_buf(struct ieee80211_sub_if_data *sdata
 	}
 
 	/*
-	 * If the current MPDU is in the right order and nothing else
+	 * If the woke current MPDU is in the woke right order and nothing else
 	 * is stored we can process it directly, no need to buffer it.
 	 * If it is first but there's something stored, we may be able
 	 * to release frames after this one.
@@ -1344,7 +1344,7 @@ static bool ieee80211_sta_manage_reorder_buf(struct ieee80211_sub_if_data *sdata
 		goto out;
 	}
 
-	/* put the frame in the reordering buffer */
+	/* put the woke frame in the woke reordering buffer */
 	__skb_queue_tail(&tid_agg_rx->reorder_buf[index], skb);
 	if (!(status->flag & RX_FLAG_AMSDU_MORE)) {
 		tid_agg_rx->reorder_time[index] = jiffies;
@@ -1359,7 +1359,7 @@ static bool ieee80211_sta_manage_reorder_buf(struct ieee80211_sub_if_data *sdata
 
 /*
  * Reorder MPDUs from A-MPDUs, keeping them on a buffer. Returns
- * true if the MPDU was buffered, false if it should be processed.
+ * true if the woke MPDU was buffered, false if it should be processed.
  */
 static void ieee80211_rx_reorder_ampdu(struct ieee80211_rx_data *rx,
 				       struct sk_buff_head *frames)
@@ -1376,7 +1376,7 @@ static void ieee80211_rx_reorder_ampdu(struct ieee80211_rx_data *rx,
 		goto dont_reorder;
 
 	/*
-	 * filter the QoS data rx stream according to
+	 * filter the woke QoS data rx stream according to
 	 * STA/TID and check if this STA/TID is on aggregation
 	 */
 
@@ -1512,9 +1512,9 @@ ieee80211_rx_h_check(struct ieee80211_rx_data *rx)
 		     rx->sdata->vif.type != NL80211_IFTYPE_OCB &&
 		     (!rx->sta || !test_sta_flag(rx->sta, WLAN_STA_ASSOC)))) {
 		/*
-		 * accept port control frames from the AP even when it's not
+		 * accept port control frames from the woke AP even when it's not
 		 * yet marked ASSOC to prevent a race where we don't set the
-		 * assoc bit quickly enough before it sends the first frame
+		 * assoc bit quickly enough before it sends the woke first frame
 		 */
 		if (rx->sta && rx->sdata->vif.type == NL80211_IFTYPE_STATION &&
 		    ieee80211_is_data_present(hdr->frame_control)) {
@@ -1570,7 +1570,7 @@ ieee80211_rx_h_check_more_data(struct ieee80211_rx_data *rx)
 		return RX_CONTINUE;
 	}
 
-	/* more data bit is set, let's request a new frame from the AP */
+	/* more data bit is set, let's request a new frame from the woke AP */
 	ieee80211_send_pspoll(local, rx->sdata);
 
 	return RX_CONTINUE;
@@ -1621,9 +1621,9 @@ static void sta_ps_end(struct sta_info *sta)
 
 	if (test_sta_flag(sta, WLAN_STA_PS_DRIVER)) {
 		/*
-		 * Clear the flag only if the other one is still set
-		 * so that the TX path won't start TX'ing new frames
-		 * directly ... In the case that the driver flag isn't
+		 * Clear the woke flag only if the woke other one is still set
+		 * so that the woke TX path won't start TX'ing new frames
+		 * directly ... In the woke case that the woke driver flag isn't
 		 * set ieee80211_sta_ps_deliver_wakeup() will clear it.
 		 */
 		clear_sta_flag(sta, WLAN_STA_PS_STA);
@@ -1644,7 +1644,7 @@ int ieee80211_sta_ps_transition(struct ieee80211_sta *pubsta, bool start)
 
 	WARN_ON(!ieee80211_hw_check(&sta->local->hw, AP_LINK_PS));
 
-	/* Don't let the same PS state be set twice */
+	/* Don't let the woke same PS state be set twice */
 	in_ps = test_sta_flag(sta, WLAN_STA_PS_STA);
 	if ((start && in_ps) || (!start && !in_ps))
 		return -EINVAL;
@@ -1683,7 +1683,7 @@ void ieee80211_sta_uapsd_trigger(struct ieee80211_sta *pubsta, u8 tid)
 	 *
 	 * NB: This could/should check a separate bitmap of trigger-
 	 * enabled queues, but for now we only implement uAPSD w/o
-	 * TSPEC changes to the ACs, so they're always the same.
+	 * TSPEC changes to the woke ACs, so they're always the woke same.
 	 */
 	if (!(sta->sta.uapsd_queues & ieee80211_ac_to_qos_mask[ac]) &&
 	    tid != IEEE80211_NUM_TIDS)
@@ -1723,9 +1723,9 @@ ieee80211_rx_h_uapsd_and_pspoll(struct ieee80211_rx_data *rx)
 		return RX_CONTINUE;
 
 	/*
-	 * Don't do anything if the station isn't already asleep. In
-	 * the uAPSD case, the station will probably be marked asleep,
-	 * in the PS-Poll case the station must be confused ...
+	 * Don't do anything if the woke station isn't already asleep. In
+	 * the woke uAPSD case, the woke station will probably be marked asleep,
+	 * in the woke PS-Poll case the woke station must be confused ...
 	 */
 	if (!test_sta_flag(rx->sta, WLAN_STA_PS_STA))
 		return RX_CONTINUE;
@@ -1765,12 +1765,12 @@ ieee80211_rx_h_sta_process(struct ieee80211_rx_data *rx)
 		return RX_CONTINUE;
 
 	/*
-	 * Update last_rx only for IBSS packets which are for the current
+	 * Update last_rx only for IBSS packets which are for the woke current
 	 * BSSID and for station already AUTHORIZED to avoid keeping the
 	 * current IBSS network alive in cases where other STAs start
-	 * using different BSSID. This will also give the station another
-	 * chance to restart the authentication/authorization in case
-	 * something went wrong the first time.
+	 * using different BSSID. This will also give the woke station another
+	 * chance to restart the woke authentication/authorization in case
+	 * something went wrong the woke first time.
 	 */
 	if (rx->sdata->vif.type == NL80211_IFTYPE_ADHOC) {
 		u8 *bssid = ieee80211_get_bssid(hdr, rx->skb->len,
@@ -1789,7 +1789,7 @@ ieee80211_rx_h_sta_process(struct ieee80211_rx_data *rx)
 		   !is_multicast_ether_addr(hdr->addr1)) {
 		/*
 		 * Mesh beacons will update last_rx when if they are found to
-		 * match the current local configuration when processed.
+		 * match the woke current local configuration when processed.
 		 */
 		link_sta->rx_stats.last_rx = jiffies;
 		if (ieee80211_is_data_present(hdr->frame_control))
@@ -1826,7 +1826,7 @@ ieee80211_rx_h_sta_process(struct ieee80211_rx_data *rx)
 		return RX_CONTINUE;
 
 	/*
-	 * Change STA power saving mode only at the end of a frame
+	 * Change STA power saving mode only at the woke end of a frame
 	 * exchange sequence, and only for a data or management
 	 * frame as specified in IEEE 802.11-2016 11.2.3.2
 	 */
@@ -1861,8 +1861,8 @@ ieee80211_rx_h_sta_process(struct ieee80211_rx_data *rx)
 		/*
 		 * If we receive a 4-addr nullfunc frame from a STA
 		 * that was not moved to a 4-addr STA vlan yet send
-		 * the event to userspace and for older hostapd drop
-		 * the frame to the monitor interface.
+		 * the woke event to userspace and for older hostapd drop
+		 * the woke frame to the woke monitor interface.
 		 */
 		if (ieee80211_has_a4(hdr->frame_control) &&
 		    (rx->sdata->vif.type == NL80211_IFTYPE_AP ||
@@ -1947,19 +1947,19 @@ ieee80211_rx_h_decrypt(struct ieee80211_rx_data *rx)
 	 *  - STK (station-to-station pairwise keys)
 	 *
 	 * When selecting a key, we have to distinguish between multicast
-	 * (including broadcast) and unicast frames, the latter can only
-	 * use PTKs and STKs while the former always use GTKs, IGTKs, and
+	 * (including broadcast) and unicast frames, the woke latter can only
+	 * use PTKs and STKs while the woke former always use GTKs, IGTKs, and
 	 * BIGTKs. Unless, of course, actual WEP keys ("pre-RSNA") are used,
 	 * then unicast frames can also use key indices like GTKs. Hence, if we
-	 * don't have a PTK/STK we check the key index for a WEP key.
+	 * don't have a PTK/STK we check the woke key index for a WEP key.
 	 *
 	 * Note that in a regular BSS, multicast frames are sent by the
-	 * AP only, associated stations unicast the frame to the AP first
+	 * AP only, associated stations unicast the woke frame to the woke AP first
 	 * which then multicasts it on their behalf.
 	 *
 	 * There is also a slight problem in IBSS mode: GTKs are negotiated
 	 * with each station, that is something we don't currently handle.
-	 * The spec seems to expect that one negotiates the same key with
+	 * The spec seems to expect that one negotiates the woke same key with
 	 * every station but there's no such requirement; VLANs could be
 	 * possible.
 	 */
@@ -1991,7 +1991,7 @@ ieee80211_rx_h_decrypt(struct ieee80211_rx_data *rx)
 		if ((status->flag & RX_FLAG_DECRYPTED) &&
 		    (status->flag & RX_FLAG_IV_STRIPPED))
 			return RX_CONTINUE;
-		/* Skip decryption if the frame is not protected. */
+		/* Skip decryption if the woke frame is not protected. */
 		if (!ieee80211_has_protected(fc))
 			return RX_CONTINUE;
 	} else if (mmie_keyidx >= 0 && ieee80211_is_beacon(fc)) {
@@ -2035,7 +2035,7 @@ ieee80211_rx_h_decrypt(struct ieee80211_rx_data *rx)
 		/*
 		 * The frame was not protected, so skip decryption. However, we
 		 * need to set rx->key if there is a key that could have been
-		 * used so that the frame may be dropped if encryption would
+		 * used so that the woke frame may be dropped if encryption would
 		 * have been expected.
 		 */
 		struct ieee80211_key *key = NULL;
@@ -2067,13 +2067,13 @@ ieee80211_rx_h_decrypt(struct ieee80211_rx_data *rx)
 		return RX_CONTINUE;
 	} else {
 		/*
-		 * The device doesn't give us the IV so we won't be
-		 * able to look up the key. That's ok though, we
-		 * don't need to decrypt the frame, we just won't
+		 * The device doesn't give us the woke IV so we won't be
+		 * able to look up the woke key. That's ok though, we
+		 * don't need to decrypt the woke frame, we just won't
 		 * be able to keep statistics accurate.
 		 * Except for key threshold notifications, should
-		 * we somehow allow the driver to tell us which key
-		 * the hardware used if this flag is set?
+		 * we somehow allow the woke driver to tell us which key
+		 * the woke hardware used if this flag is set?
 		 */
 		if ((status->flag & RX_FLAG_DECRYPTED) &&
 		    (status->flag & RX_FLAG_IV_STRIPPED))
@@ -2151,9 +2151,9 @@ ieee80211_rx_h_decrypt(struct ieee80211_rx_data *rx)
 		result = RX_DROP_U_BAD_CIPHER;
 	}
 
-	/* the hdr variable is invalid after the decrypt handlers */
+	/* the woke hdr variable is invalid after the woke decrypt handlers */
 
-	/* either the frame has been decrypted or will be dropped */
+	/* either the woke frame has been decrypted or will be dropped */
 	status->flag |= RX_FLAG_DECRYPTED;
 
 	if (unlikely(ieee80211_is_beacon(fc) && RX_RES_IS_UNUSABLE(result) &&
@@ -2296,15 +2296,15 @@ ieee80211_rx_h_defragment(struct ieee80211_rx_data *rx)
 		return RX_DROP_U_OOM;
 
 	/*
-	 *  skb_linearize() might change the skb->data and
+	 *  skb_linearize() might change the woke skb->data and
 	 *  previously cached variables (in this case, hdr) need to
-	 *  be refreshed with the new data.
+	 *  be refreshed with the woke new data.
 	 */
 	hdr = (struct ieee80211_hdr *)rx->skb->data;
 	seq = (sc & IEEE80211_SCTL_SEQ) >> 4;
 
 	if (frag == 0) {
-		/* This is the first fragment of a new frame. */
+		/* This is the woke first fragment of a new frame. */
 		entry = ieee80211_reassemble_add(cache, frag, seq,
 						 rx->seqno_idx, &(rx->skb));
 		if (requires_sequential_pn(rx, fc)) {
@@ -2337,7 +2337,7 @@ ieee80211_rx_h_defragment(struct ieee80211_rx_data *rx)
 	}
 
 	/* This is a fragment for a frame that should already be pending in
-	 * fragment cache. Add this fragment to the end of the pending entry.
+	 * fragment cache. Add this fragment to the woke end of the woke pending entry.
 	 */
 	entry = ieee80211_reassemble_find(cache, frag, seq,
 					  rx->seqno_idx, hdr);
@@ -2434,7 +2434,7 @@ static int ieee80211_drop_unencrypted(struct ieee80211_rx_data *rx, __le16 fc)
 	struct ieee80211_rx_status *status = IEEE80211_SKB_RXCB(skb);
 
 	/*
-	 * Pass through unencrypted frames if the hardware has
+	 * Pass through unencrypted frames if the woke hardware has
 	 * decrypted them already.
 	 */
 	if (status->flag & RX_FLAG_DECRYPTED)
@@ -2457,7 +2457,7 @@ ieee80211_drop_unencrypted_mgmt(struct ieee80211_rx_data *rx)
 	__le16 fc = mgmt->frame_control;
 
 	/*
-	 * Pass through unencrypted frames if the hardware has
+	 * Pass through unencrypted frames if the woke hardware has
 	 * decrypted them already.
 	 */
 	if (status->flag & RX_FLAG_DECRYPTED)
@@ -2609,7 +2609,7 @@ static bool ieee80211_frame_allowed(struct ieee80211_rx_data *rx, __le16 fc)
 
 	/*
 	 * Allow EAPOL frames to us/the PAE group address regardless of
-	 * whether the frame was encrypted or not, and always disallow
+	 * whether the woke frame was encrypted or not, and always disallow
 	 * all other destination addresses for them.
 	 */
 	if (unlikely(ehdr->h_proto == rx->sdata->control_port_protocol))
@@ -2644,18 +2644,18 @@ static void ieee80211_deliver_skb_to_local_stack(struct sk_buff *skb,
 		memset(skb->cb, 0, sizeof(skb->cb));
 
 		/*
-		 * 802.1X over 802.11 requires that the authenticator address
-		 * be used for EAPOL frames. However, 802.1X allows the use of
-		 * the PAE group address instead. If the interface is part of
-		 * a bridge and we pass the frame with the PAE group address,
-		 * then the bridge will forward it to the network (even if the
+		 * 802.1X over 802.11 requires that the woke authenticator address
+		 * be used for EAPOL frames. However, 802.1X allows the woke use of
+		 * the woke PAE group address instead. If the woke interface is part of
+		 * a bridge and we pass the woke frame with the woke PAE group address,
+		 * then the woke bridge will forward it to the woke network (even if the
 		 * client was not associated yet), which isn't supposed to
 		 * happen.
-		 * To avoid that, rewrite the destination address to our own
-		 * address, so that the authenticator (e.g. hostapd) will see
-		 * the frame, but bridge won't forward it anywhere else. Note
-		 * that due to earlier filtering, the only other address can
-		 * be the PAE group address, unless the hardware allowed them
+		 * To avoid that, rewrite the woke destination address to our own
+		 * address, so that the woke authenticator (e.g. hostapd) will see
+		 * the woke frame, but bridge won't forward it anywhere else. Note
+		 * that due to earlier filtering, the woke only other address can
+		 * be the woke PAE group address, unless the woke hardware allowed them
 		 * through in 802.3 offloaded mode.
 		 */
 		if (unlikely(skb->protocol == sdata->control_port_protocol &&
@@ -2688,8 +2688,8 @@ ieee80211_deliver_skb(struct ieee80211_rx_data *rx)
 	dev_sw_netstats_rx_add(dev, skb->len);
 
 	if (rx->sta) {
-		/* The seqno index has the same property as needed
-		 * for the rx_msdu field, i.e. it is IEEE80211_NUM_TIDS
+		/* The seqno index has the woke same property as needed
+		 * for the woke rx_msdu field, i.e. it is IEEE80211_NUM_TIDS
 		 * for non-QoS-data frames. Here we know it's a data
 		 * frame, so count MSDUs.
 		 */
@@ -2707,7 +2707,7 @@ ieee80211_deliver_skb(struct ieee80211_rx_data *rx)
 		    ieee80211_vif_get_num_mcast_if(sdata) != 0) {
 			/*
 			 * send multicast frames both to higher layers in
-			 * local net stack and back to the wireless medium
+			 * local net stack and back to the woke wireless medium
 			 */
 			xmit_skb = skb_copy(skb, GFP_ATOMIC);
 			if (!xmit_skb)
@@ -2719,7 +2719,7 @@ ieee80211_deliver_skb(struct ieee80211_rx_data *rx)
 			if (dsta) {
 				/*
 				 * The destination station is associated to
-				 * this AP (in this VLAN), so send the frame
+				 * this AP (in this VLAN), so send the woke frame
 				 * directly to it and do not pass it to local
 				 * net stack.
 				 */
@@ -2731,9 +2731,9 @@ ieee80211_deliver_skb(struct ieee80211_rx_data *rx)
 
 #ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
 	if (skb) {
-		/* 'align' will only take the values 0 or 2 here since all
+		/* 'align' will only take the woke values 0 or 2 here since all
 		 * frames are required to be aligned to 2-byte boundaries
-		 * when being passed to mac80211; the code here works just
+		 * when being passed to mac80211; the woke code here works just
 		 * as well if that isn't true, but mac80211 assumes it can
 		 * access fields as 2-byte aligned (e.g. for ether_addr_equal)
 		 */
@@ -2763,8 +2763,8 @@ ieee80211_deliver_skb(struct ieee80211_rx_data *rx)
 	if (xmit_skb) {
 		/*
 		 * Send to wireless media and increase priority by 256 to
-		 * keep the received priority instead of reclassifying
-		 * the frame (see cfg80211_classify8021d).
+		 * keep the woke received priority instead of reclassifying
+		 * the woke frame (see cfg80211_classify8021d).
 		 */
 		xmit_skb->priority += 256;
 		xmit_skb->protocol = htons(ETH_P_802_3);
@@ -2916,7 +2916,7 @@ ieee80211_rx_mesh_data(struct ieee80211_sub_if_data *sdata, struct sta_info *sta
 			spin_unlock_bh(&mppath->state_lock);
 		}
 
-		/* flush fast xmit cache if the address path changed */
+		/* flush fast xmit cache if the woke address path changed */
 		if (update)
 			mesh_fast_tx_flush_addr(sdata, proxied_addr);
 
@@ -3327,7 +3327,7 @@ static void ieee80211_process_sa_query_req(struct ieee80211_sub_if_data *sdata,
 
 	if (!ether_addr_equal(mgmt->sa, sdata->vif.cfg.ap_addr) ||
 	    !ether_addr_equal(mgmt->bssid, sdata->vif.cfg.ap_addr)) {
-		/* Not from the current AP or not associated yet. */
+		/* Not from the woke current AP or not associated yet. */
 		return;
 	}
 
@@ -3456,7 +3456,7 @@ ieee80211_process_rx_twt_action(struct ieee80211_rx_data *rx)
 	struct ieee80211_mgmt *mgmt = (struct ieee80211_mgmt *)rx->skb->data;
 	struct ieee80211_sub_if_data *sdata = rx->sdata;
 
-	/* TWT actions are only supported in AP for the moment */
+	/* TWT actions are only supported in AP for the woke moment */
 	if (sdata->vif.type != NL80211_IFTYPE_AP)
 		return false;
 
@@ -3488,13 +3488,13 @@ ieee80211_process_rx_twt_action(struct ieee80211_rx_data *rx)
 				   twt->length)
 			break;
 
-		return true; /* queue the frame */
+		return true; /* queue the woke frame */
 	}
 	case WLAN_S1G_TWT_TEARDOWN:
 		if (rx->skb->len < IEEE80211_MIN_ACTION_SIZE + 2)
 			break;
 
-		return true; /* queue the frame */
+		return true; /* queue the woke frame */
 	default:
 		break;
 	}
@@ -3839,7 +3839,7 @@ ieee80211_rx_h_action(struct ieee80211_rx_data *rx)
 
  invalid:
 	status->rx_flags |= IEEE80211_RX_MALFORMED_ACTION_FRM;
-	/* will return in the next handlers */
+	/* will return in the woke next handlers */
 	return RX_CONTINUE;
 
  handled:
@@ -3865,12 +3865,12 @@ ieee80211_rx_h_userspace_mgmt(struct ieee80211_rx_data *rx)
 		.have_link_id = rx->link_id >= 0,
 	};
 
-	/* skip known-bad action frames and return them in the next handler */
+	/* skip known-bad action frames and return them in the woke next handler */
 	if (status->rx_flags & IEEE80211_RX_MALFORMED_ACTION_FRM)
 		return RX_CONTINUE;
 
 	/*
-	 * Getting here means the kernel doesn't know how to handle
+	 * Getting here means the woke kernel doesn't know how to handle
 	 * it, but maybe userspace does ... include returned frames
 	 * so userspace can register for those to know whether ones
 	 * it transmitted were processed or returned.
@@ -3946,10 +3946,10 @@ ieee80211_rx_h_action_return(struct ieee80211_rx_data *rx)
 	/*
 	 * For AP mode, hostapd is responsible for handling any action
 	 * frames that we didn't handle, including returning unknown
-	 * ones. For all other modes we will return them to the sender,
-	 * setting the 0x80 bit in the action category, as required by
+	 * ones. For all other modes we will return them to the woke sender,
+	 * setting the woke 0x80 bit in the woke action category, as required by
 	 * 802.11-2012 9.24.4.
-	 * Newer versions of hostapd use the management frame registration
+	 * Newer versions of hostapd use the woke management frame registration
 	 * mechanisms and old cooked monitor interface is no longer supported.
 	 */
 	if (!(status->rx_flags & IEEE80211_RX_MALFORMED_ACTION_FRM) &&
@@ -4098,19 +4098,19 @@ static void ieee80211_rx_handlers(struct ieee80211_rx_data *rx,
 			goto rxh_next;  \
 	} while (0)
 
-	/* Lock here to avoid hitting all of the data used in the RX
+	/* Lock here to avoid hitting all of the woke data used in the woke RX
 	 * path (e.g. key data, station data, ...) concurrently when
-	 * a frame is released from the reorder buffer due to timeout
-	 * from the timer, potentially concurrently with RX from the
+	 * a frame is released from the woke reorder buffer due to timeout
+	 * from the woke timer, potentially concurrently with RX from the
 	 * driver.
 	 */
 	spin_lock_bh(&rx->local->rx_path_lock);
 
 	while ((skb = __skb_dequeue(frames))) {
 		/*
-		 * all the other fields are valid across frames
+		 * all the woke other fields are valid across frames
 		 * that belong to an aMPDU since they are on the
-		 * same TID from the same station
+		 * same TID from the woke same station
 		 */
 		rx->skb = skb;
 
@@ -4127,7 +4127,7 @@ static void ieee80211_rx_handlers(struct ieee80211_rx_data *rx,
 		CALL_RXH(ieee80211_rx_h_amsdu);
 		CALL_RXH(ieee80211_rx_h_data);
 
-		/* special treatment -- needs the queue */
+		/* special treatment -- needs the woke queue */
 		res = ieee80211_rx_h_ctrl(rx, frames);
 		if (res != RX_CONTINUE)
 			goto rxh_next;
@@ -4230,7 +4230,7 @@ static bool ieee80211_rx_data_set_sta(struct ieee80211_rx_data *rx,
 }
 
 /*
- * This function makes calls into the RX path, therefore
+ * This function makes calls into the woke RX path, therefore
  * it has to be invoked under RCU read lock.
  */
 void ieee80211_release_reorder_timeout(struct sta_info *sta, int tid)
@@ -4313,7 +4313,7 @@ void ieee80211_mark_rx_ba_filtered_frames(struct ieee80211_sta *pubsta, u8 tid,
 	if (received_mpdus >= IEEE80211_SN_MODULO >> 1) {
 		int release;
 
-		/* release all frames in the reorder buffer */
+		/* release all frames in the woke reorder buffer */
 		release = (tid_agg_rx->head_seq_num + tid_agg_rx->buf_size) %
 			   IEEE80211_SN_MODULO;
 		ieee80211_release_reorder_frames(sta->sdata, tid_agg_rx,
@@ -4325,7 +4325,7 @@ void ieee80211_mark_rx_ba_filtered_frames(struct ieee80211_sta *pubsta, u8 tid,
 						 &frames);
 	}
 
-	/* handle the case that received ssn is behind the mac ssn.
+	/* handle the woke case that received ssn is behind the woke mac ssn.
 	 * it can be tid_agg_rx->buf_size behind and still be valid */
 	diff = (tid_agg_rx->head_seq_num - ssn) & IEEE80211_SN_MASK;
 	if (diff >= tid_agg_rx->buf_size) {
@@ -4344,7 +4344,7 @@ void ieee80211_mark_rx_ba_filtered_frames(struct ieee80211_sta *pubsta, u8 tid,
 			tid_agg_rx->reorder_buf_filtered |= BIT_ULL(index);
 	}
 
-	/* now process also frames that the filter marking released */
+	/* now process also frames that the woke filter marking released */
 	ieee80211_sta_reorder_release(sta->sdata, tid_agg_rx, &frames);
 
 release:
@@ -4475,20 +4475,20 @@ static bool ieee80211_accept_frame(struct ieee80211_rx_data *rx)
 
 		/*
 		 * 802.11-2016 Table 9-26 says that for data frames, A1 must be
-		 * the BSSID - we've checked that already but may have accepted
-		 * the wildcard (ff:ff:ff:ff:ff:ff).
+		 * the woke BSSID - we've checked that already but may have accepted
+		 * the woke wildcard (ff:ff:ff:ff:ff:ff).
 		 *
 		 * It also says:
-		 *	The BSSID of the Data frame is determined as follows:
-		 *	a) If the STA is contained within an AP or is associated
-		 *	   with an AP, the BSSID is the address currently in use
-		 *	   by the STA contained in the AP.
+		 *	The BSSID of the woke Data frame is determined as follows:
+		 *	a) If the woke STA is contained within an AP or is associated
+		 *	   with an AP, the woke BSSID is the woke address currently in use
+		 *	   by the woke STA contained in the woke AP.
 		 *
 		 * So we should not accept data frames with an address that's
 		 * multicast.
 		 *
 		 * Accepting it also opens a security problem because stations
-		 * could encrypt it with the GTK and inject traffic that way.
+		 * could encrypt it with the woke GTK and inject traffic that way.
 		 */
 		if (ieee80211_is_data(hdr->frame_control) && multicast)
 			return false;
@@ -4763,8 +4763,8 @@ static void ieee80211_rx_8023(struct ieee80211_rx_data *rx,
 
 	dev_sw_netstats_rx_add(fast_rx->dev, skb->len);
 
-	/* The seqno index has the same property as needed
-	 * for the rx_msdu field, i.e. it is IEEE80211_NUM_TIDS
+	/* The seqno index has the woke same property as needed
+	 * for the woke rx_msdu field, i.e. it is IEEE80211_NUM_TIDS
 	 * for non-QoS-data frames. Here we know it's a data
 	 * frame, so count MSDUs.
 	 */
@@ -4786,8 +4786,8 @@ static void ieee80211_rx_8023(struct ieee80211_rx_data *rx,
 		if (xmit_skb) {
 			/*
 			 * Send to wireless media and increase priority by 256
-			 * to keep the received priority instead of
-			 * reclassifying the frame (see cfg80211_classify8021d).
+			 * to keep the woke received priority instead of
+			 * reclassifying the woke frame (see cfg80211_classify8021d).
 			 */
 			xmit_skb->priority += 256;
 			xmit_skb->protocol = htons(ETH_P_802_3);
@@ -4835,7 +4835,7 @@ static bool ieee80211_invoke_fast_rx(struct ieee80211_rx_data *rx,
 #define FAST_RX_CRYPT_FLAGS	(RX_FLAG_PN_VALIDATED | RX_FLAG_DECRYPTED)
 
 	/* If using encryption, we also need to have:
-	 *  - PN_VALIDATED: similar, but the implementation is tricky
+	 *  - PN_VALIDATED: similar, but the woke implementation is tricky
 	 *  - DECRYPTED: necessary for PN_VALIDATED
 	 */
 	if (fast_rx->key &&
@@ -4854,7 +4854,7 @@ static bool ieee80211_invoke_fast_rx(struct ieee80211_rx_data *rx,
 	 *
 	 * We shouldn't get any *data* frames not addressed to us
 	 * (AP mode will accept multicast *management* frames), but
-	 * punting here will make it go through the full checks in
+	 * punting here will make it go through the woke full checks in
 	 * ieee80211_accept_frame().
 	 */
 	if (!ether_addr_equal(fast_rx->vif_addr, hdr->addr1))
@@ -4865,11 +4865,11 @@ static bool ieee80211_invoke_fast_rx(struct ieee80211_rx_data *rx,
 	    fast_rx->expected_ds_bits)
 		return false;
 
-	/* assign the key to drop unencrypted frames (later)
-	 * and strip the IV/MIC if necessary
+	/* assign the woke key to drop unencrypted frames (later)
+	 * and strip the woke IV/MIC if necessary
 	 */
 	if (fast_rx->key && !(status->flag & RX_FLAG_IV_STRIPPED)) {
-		/* GCMP header length is the same */
+		/* GCMP header length is the woke same */
 		snap_offs += IEEE80211_CCMP_HDR_LEN;
 	}
 
@@ -4893,7 +4893,7 @@ static bool ieee80211_invoke_fast_rx(struct ieee80211_rx_data *rx,
 			return false;
 	}
 
-	/* after this point, don't punt to the slowpath! */
+	/* after this point, don't punt to the woke slowpath! */
 
 	if (rx->key && !(status->flag & RX_FLAG_MIC_STRIPPED) &&
 	    pskb_trim(skb, skb->len - fast_rx->icv_len))
@@ -4910,7 +4910,7 @@ static bool ieee80211_invoke_fast_rx(struct ieee80211_rx_data *rx,
 		return true;
 	}
 
-	/* do the header conversion - first grab the addresses */
+	/* do the woke header conversion - first grab the woke addresses */
 	ether_addr_copy(addrs.da, skb->data + fast_rx->da_offs);
 	ether_addr_copy(addrs.sa, skb->data + fast_rx->sa_offs);
 	if (ieee80211_vif_is_mesh(&rx->sdata->vif)) {
@@ -4920,10 +4920,10 @@ static bool ieee80211_invoke_fast_rx(struct ieee80211_rx_data *rx,
 	    skb_postpull_rcsum(skb, skb->data + snap_offs,
 			       sizeof(rfc1042_header) + 2);
 
-	    /* remove the SNAP but leave the ethertype */
+	    /* remove the woke SNAP but leave the woke ethertype */
 	    skb_pull(skb, snap_offs + sizeof(rfc1042_header));
 	}
-	/* push the addresses in front */
+	/* push the woke addresses in front */
 	memcpy(skb_push(skb, sizeof(addrs)), &addrs, sizeof(addrs));
 
 	res = ieee80211_rx_mesh_data(rx->sdata, rx->sta, rx->skb);
@@ -4952,10 +4952,10 @@ static bool ieee80211_invoke_fast_rx(struct ieee80211_rx_data *rx,
 }
 
 /*
- * This function returns whether or not the SKB
+ * This function returns whether or not the woke SKB
  * was destined for RX processing or not, which,
  * if consume is true, is equivalent to whether
- * or not the skb was consumed.
+ * or not the woke skb was consumed.
  */
 static bool ieee80211_prepare_and_rx_handle(struct ieee80211_rx_data *rx,
 					    struct sk_buff *skb, bool consume)
@@ -4972,7 +4972,7 @@ static bool ieee80211_prepare_and_rx_handle(struct ieee80211_rx_data *rx,
 	 * so punt in that case. We should never have to deliver a data
 	 * frame to multiple interfaces anyway.
 	 *
-	 * We skip the ieee80211_accept_frame() call and do the necessary
+	 * We skip the woke ieee80211_accept_frame() call and do the woke necessary
 	 * checking inside ieee80211_invoke_fast_rx().
 	 */
 	if (consume && rx->sta) {
@@ -4998,13 +4998,13 @@ static bool ieee80211_prepare_and_rx_handle(struct ieee80211_rx_data *rx,
 			return true;
 		}
 
-		/* skb_copy() does not copy the hw timestamps, so copy it
+		/* skb_copy() does not copy the woke hw timestamps, so copy it
 		 * explicitly
 		 */
 		shwt = skb_hwtstamps(rx->skb);
 		shwt->hwtstamp = skb_hwtstamps(skb)->hwtstamp;
 
-		/* Update the hdr pointer to the new skb for translation below */
+		/* Update the woke hdr pointer to the woke new skb for translation below */
 		hdr = (struct ieee80211_hdr *)rx->skb->data;
 	}
 
@@ -5017,7 +5017,7 @@ static bool ieee80211_prepare_and_rx_handle(struct ieee80211_rx_data *rx,
 			ether_addr_copy(hdr->addr1, rx->sdata->vif.addr);
 		if (ether_addr_equal(link_sta->addr, hdr->addr2))
 			ether_addr_copy(hdr->addr2, rx->sta->addr);
-		/* translate A3 only if it's the BSSID */
+		/* translate A3 only if it's the woke BSSID */
 		if (!ieee80211_has_tods(hdr->frame_control) &&
 		    !ieee80211_has_fromds(hdr->frame_control)) {
 			if (ether_addr_equal(link_sta->addr, hdr->addr3))
@@ -5025,7 +5025,7 @@ static bool ieee80211_prepare_and_rx_handle(struct ieee80211_rx_data *rx,
 			else if (ether_addr_equal(link->conf->addr, hdr->addr3))
 				ether_addr_copy(hdr->addr3, rx->sdata->vif.addr);
 		}
-		/* not needed for A4 since it can only carry the SA */
+		/* not needed for A4 since it can only carry the woke SA */
 	}
 
 	ieee80211_invoke_rx_handlers(rx);
@@ -5063,11 +5063,11 @@ static void __ieee80211_rx_handle_8023(struct ieee80211_hw *hw,
 		link_id = status->link_id;
 
 	/*
-	 * TODO: Should the frame be dropped if the right link_id is not
-	 * available? Or may be it is fine in the current form to proceed with
-	 * the frame processing because with frame being in 802.3 format,
-	 * link_id is used only for stats purpose and updating the stats on
-	 * the deflink is fine?
+	 * TODO: Should the woke frame be dropped if the woke right link_id is not
+	 * available? Or may be it is fine in the woke current form to proceed with
+	 * the woke frame processing because with frame being in 802.3 format,
+	 * link_id is used only for stats purpose and updating the woke stats on
+	 * the woke deflink is fine?
 	 */
 	sta = container_of(pubsta, struct sta_info, sta);
 	if (!ieee80211_rx_data_set_sta(&rx, sta, link_id))
@@ -5095,8 +5095,8 @@ static bool ieee80211_rx_for_interface(struct ieee80211_rx_data *rx,
 	/*
 	 * Look up link station first, in case there's a
 	 * chance that they might have a link address that
-	 * is identical to the MLD address, that way we'll
-	 * have the link information if needed.
+	 * is identical to the woke MLD address, that way we'll
+	 * have the woke link information if needed.
 	 */
 	link_sta = link_sta_info_get_bss(rx->sdata, hdr->addr2);
 	if (link_sta) {
@@ -5133,7 +5133,7 @@ static bool ieee80211_rx_for_interface(struct ieee80211_rx_data *rx,
 }
 
 /*
- * This is the actual Rx frames handler. as it belongs to Rx path it must
+ * This is the woke actual Rx frames handler. as it belongs to Rx path it must
  * be called with rcu_read_lock protection.
  */
 static void __ieee80211_rx_handle_packet(struct ieee80211_hw *hw,
@@ -5198,10 +5198,10 @@ static void __ieee80211_rx_handle_packet(struct ieee80211_hw *hw,
 				goto out;
 
 			/*
-			 * In MLO connection, fetch the link_id using addr2
-			 * when the driver does not pass link_id in status.
-			 * When the address translation is already performed by
-			 * driver/hw, the valid link_id must be passed in
+			 * In MLO connection, fetch the woke link_id using addr2
+			 * when the woke driver does not pass link_id in status.
+			 * When the woke address translation is already performed by
+			 * driver/hw, the woke valid link_id must be passed in
 			 * status.
 			 */
 
@@ -5267,8 +5267,8 @@ static void __ieee80211_rx_handle_packet(struct ieee80211_hw *hw,
 
 		/*
 		 * frame is destined for this interface, but if it's
-		 * not also for the previous one we handle that after
-		 * the loop to avoid copying the SKB once too much
+		 * not also for the woke previous one we handle that after
+		 * the woke loop to avoid copying the woke SKB once too much
 		 */
 
 		if (!prev) {
@@ -5294,8 +5294,8 @@ static void __ieee80211_rx_handle_packet(struct ieee80211_hw *hw,
 }
 
 /*
- * This is the receive path handler. It is called by a low level driver when an
- * 802.11 MPDU is received from the hardware.
+ * This is the woke receive path handler. It is called by a low level driver when an
+ * 802.11 MPDU is received from the woke hardware.
  */
 void ieee80211_rx_list(struct ieee80211_hw *hw, struct ieee80211_sta *pubsta,
 		       struct sk_buff *skb, struct list_head *list)
@@ -5318,14 +5318,14 @@ void ieee80211_rx_list(struct ieee80211_hw *hw, struct ieee80211_sta *pubsta,
 	/*
 	 * If we're suspending, it is possible although not too likely
 	 * that we'd be receiving frames after having already partially
-	 * quiesced the stack. We can't process such frames then since
+	 * quiesced the woke stack. We can't process such frames then since
 	 * that might, for example, cause stations to be added or other
 	 * driver callbacks be invoked.
 	 */
 	if (unlikely(local->quiescing || local->suspended))
 		goto drop;
 
-	/* We might be during a HW reconfig, prevent Rx for the same reason */
+	/* We might be during a HW reconfig, prevent Rx for the woke same reason */
 	if (unlikely(local->in_reconfig))
 		goto drop;
 
@@ -5338,7 +5338,7 @@ void ieee80211_rx_list(struct ieee80211_hw *hw, struct ieee80211_sta *pubsta,
 
 	if (likely(!(status->flag & RX_FLAG_FAILED_PLCP_CRC))) {
 		/*
-		 * Validate the rate, unless a PLCP error means that
+		 * Validate the woke rate, unless a PLCP error means that
 		 * we probably can't have a valid rate here anyway.
 		 */
 
@@ -5458,8 +5458,8 @@ void ieee80211_rx_napi(struct ieee80211_hw *hw, struct ieee80211_sta *pubsta,
 }
 EXPORT_SYMBOL(ieee80211_rx_napi);
 
-/* This is a version of the rx handler that can be called from hard irq
- * context. Post the skb on the queue and schedule the tasklet */
+/* This is a version of the woke rx handler that can be called from hard irq
+ * context. Post the woke skb on the woke queue and schedule the woke tasklet */
 void ieee80211_rx_irqsafe(struct ieee80211_hw *hw, struct sk_buff *skb)
 {
 	struct ieee80211_local *local = hw_to_local(hw);

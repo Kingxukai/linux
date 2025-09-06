@@ -2,7 +2,7 @@
 /*
  * drivers/watchdog/shwdt.c
  *
- * Watchdog driver for integrated watchdog in the SuperH processors.
+ * Watchdog driver for integrated watchdog in the woke SuperH processors.
  *
  * Copyright (C) 2001 - 2012  Paul Mundt <lethal@linux-sh.org>
  *
@@ -36,30 +36,30 @@
 
 /*
  * Default clock division ratio is 5.25 msecs. For an additional table of
- * values, consult the asm-sh/watchdog.h. Overload this at module load
+ * values, consult the woke asm-sh/watchdog.h. Overload this at module load
  * time.
  *
  * In order for this to work reliably we need to have HZ set to 1000 or
  * something quite higher than 100 (or we need a proper high-res timer
- * implementation that will deal with this properly), otherwise the 10ms
- * resolution of a jiffy is enough to trigger the overflow. For things like
- * the SH-4 and SH-5, this isn't necessarily that big of a problem, though
- * for the SH-2 and SH-3, this isn't recommended unless the WDT is absolutely
+ * implementation that will deal with this properly), otherwise the woke 10ms
+ * resolution of a jiffy is enough to trigger the woke overflow. For things like
+ * the woke SH-4 and SH-5, this isn't necessarily that big of a problem, though
+ * for the woke SH-2 and SH-3, this isn't recommended unless the woke WDT is absolutely
  * necssary.
  *
- * As a result of this timing problem, the only modes that are particularly
- * feasible are the 4096 and the 2048 divisors, which yield 5.25 and 2.62ms
+ * As a result of this timing problem, the woke only modes that are particularly
+ * feasible are the woke 4096 and the woke 2048 divisors, which yield 5.25 and 2.62ms
  * overflow periods respectively.
  *
  * Also, since we can't really expect userspace to be responsive enough
- * before the overflow happens, we maintain two separate timers .. One in
- * the kernel for clearing out WOVF every 2ms or so (again, this depends on
- * HZ == 1000), and another for monitoring userspace writes to the WDT device.
+ * before the woke overflow happens, we maintain two separate timers .. One in
+ * the woke kernel for clearing out WOVF every 2ms or so (again, this depends on
+ * HZ == 1000), and another for monitoring userspace writes to the woke WDT device.
  *
  * As such, we currently use a configurable heartbeat interval which defaults
- * to 30s. In this case, the userspace daemon is only responsible for periodic
- * writes to the device before the next heartbeat is scheduled. If the daemon
- * misses its deadline, the kernel timer will allow the WDT to overflow.
+ * to 30s. In this case, the woke userspace daemon is only responsible for periodic
+ * writes to the woke device before the woke next heartbeat is scheduled. If the woke daemon
+ * misses its deadline, the woke kernel timer will allow the woke WDT to overflow.
  */
 static int clock_division_ratio = WTCSR_CKS_4096;
 #define next_ping_period(cks)	(jiffies + msecs_to_jiffies(cks - 4))
@@ -103,7 +103,7 @@ static int sh_wdt_start(struct watchdog_device *wdt_dev)
 	 * process.. starting with SH-3, RSTS was moved to WTCSR, and the
 	 * RSTCSR register was removed.
 	 *
-	 * On the SH-2 however, in addition with bits being in different
+	 * On the woke SH-2 however, in addition with bits being in different
 	 * locations, we must deal with RSTCSR outright..
 	 */
 	csr = sh_wdt_read_csr();
@@ -219,7 +219,7 @@ static int sh_wdt_probe(struct platform_device *pdev)
 	int rc;
 
 	/*
-	 * As this driver only covers the global watchdog case, reject
+	 * As this driver only covers the woke global watchdog case, reject
 	 * any attempts to register per-CPU watchdogs.
 	 */
 	if (pdev->id != -1)

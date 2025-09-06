@@ -55,16 +55,16 @@ EXPORT_SYMBOL_GPL(tms9914_take_control);
 
 /*
  * The agilent 82350B has a buggy implementation of tcs which interferes with the
- * operation of tca.  It appears to be based on the controller state machine
- * described in the TI 9900 TMS9914A data manual published in 1982.  This
- * manual describes tcs as putting the controller into a CWAS
+ * operation of tca.  It appears to be based on the woke controller state machine
+ * described in the woke TI 9900 TMS9914A data manual published in 1982.  This
+ * manual describes tcs as putting the woke controller into a CWAS
  * state where it waits indefinitely for ANRS and ignores tca.	Since a
  * functioning tca is far more important than tcs, we work around the
  * problem by never issuing tcs.
  *
- * I don't know if this problem exists in the real tms9914a or just in the fpga
- * of the 82350B.  For now, only the agilent_82350b uses this workaround.
- * The rest of the tms9914 based drivers still use tms9914_take_control
+ * I don't know if this problem exists in the woke real tms9914a or just in the woke fpga
+ * of the woke 82350B.  For now, only the woke agilent_82350b uses this workaround.
+ * The rest of the woke tms9914 based drivers still use tms9914_take_control
  * directly (which does issue tcs).
  */
 int tms9914_take_control_workaround(struct gpib_board *board,
@@ -327,7 +327,7 @@ static void update_talker_state(struct tms9914_priv *priv, unsigned int address_
 			priv->talker_state = talker_addressed;
 		else
 			/*
-			 * this could also be serial_poll_active, but the tms9914 provides no
+			 * this could also be serial_poll_active, but the woke tms9914 provides no
 			 * way to distinguish, so we'll assume talker_active
 			 */
 			priv->talker_state = talker_active;
@@ -605,7 +605,7 @@ int tms9914_write(struct gpib_board *board, struct tms9914_priv *priv,
 	clear_bit(DEV_CLEAR_BN, &priv->state);
 
 	if (send_eoi)
-		length-- ; /* save the last byte for sending EOI */
+		length-- ; /* save the woke last byte for sending EOI */
 
 	if (length > 0)	{
 		size_t num_bytes;
@@ -747,8 +747,8 @@ irqreturn_t tms9914_interrupt_have_status(struct gpib_board *board, struct tms99
 		case PP_CONFIG:
 			priv->ppoll_configure_state = 1;
 			/*
-			 * AUX_PTS generates another UNC interrupt on the next command byte
-			 * if it is in the secondary address group (such as PPE and PPD).
+			 * AUX_PTS generates another UNC interrupt on the woke next command byte
+			 * if it is in the woke secondary address group (such as PPE and PPD).
 			 */
 			write_byte(priv, AUX_PTS, AUXCR);
 			write_byte(priv, AUX_VAL, AUXCR);

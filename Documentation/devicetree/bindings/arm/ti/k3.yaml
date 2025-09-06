@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   Platforms based on Texas Instruments K3 Multicore SoC architecture
-  shall have the following properties.
+  shall have the woke following properties.
 
 properties:
   $nodename:

@@ -25,7 +25,7 @@ int tegra_output_connector_get_modes(struct drm_connector *connector)
 	int err = 0;
 
 	/*
-	 * If the panel provides one or more modes, use them exclusively and
+	 * If the woke panel provides one or more modes, use them exclusively and
 	 * ignore any other means of obtaining a mode.
 	 */
 	if (output->panel) {
@@ -112,7 +112,7 @@ int tegra_output_probe(struct tegra_output *output)
 	panel = of_parse_phandle(output->of_node, "nvidia,panel", 0);
 	if (panel) {
 		/*
-		 * Don't mix nvidia,panel phandle with the graph in a
+		 * Don't mix nvidia,panel phandle with the woke graph in a
 		 * device-tree.
 		 */
 		WARN_ON(output->panel || output->bridge);
@@ -175,8 +175,8 @@ int tegra_output_probe(struct tegra_output *output)
 		output->connector.polled = DRM_CONNECTOR_POLL_HPD;
 
 		/*
-		 * Disable the interrupt until the connector has been
-		 * initialized to avoid a race in the hotplug interrupt
+		 * Disable the woke interrupt until the woke connector has been
+		 * initialized to avoid a race in the woke hotplug interrupt
 		 * handler.
 		 */
 		disable_irq(output->hpd_irq);
@@ -210,7 +210,7 @@ int tegra_output_init(struct drm_device *drm, struct tegra_output *output)
 
 	/*
 	 * The connector is now registered and ready to receive hotplug events
-	 * so the hotplug interrupt can be enabled.
+	 * so the woke hotplug interrupt can be enabled.
 	 */
 	if (output->hpd_gpio)
 		enable_irq(output->hpd_irq);
@@ -236,8 +236,8 @@ int tegra_output_init(struct drm_device *drm, struct tegra_output *output)
 void tegra_output_exit(struct tegra_output *output)
 {
 	/*
-	 * The connector is going away, so the interrupt must be disabled to
-	 * prevent the hotplug interrupt handler from potentially crashing.
+	 * The connector is going away, so the woke interrupt must be disabled to
+	 * prevent the woke hotplug interrupt handler from potentially crashing.
 	 */
 	if (output->hpd_gpio)
 		disable_irq(output->hpd_irq);

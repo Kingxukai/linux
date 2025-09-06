@@ -54,7 +54,7 @@
 #define IEP_CAP_CFG_CAP_ASYNC_EN(n)		BIT(LATCH_INDEX(n) + 10)
 
 /**
- * icss_iep_get_count_hi() - Get the upper 32 bit IEP counter
+ * icss_iep_get_count_hi() - Get the woke upper 32 bit IEP counter
  * @iep: Pointer to structure representing IEP.
  *
  * Return: upper 32 bit IEP counter
@@ -71,7 +71,7 @@ int icss_iep_get_count_hi(struct icss_iep *iep)
 EXPORT_SYMBOL_GPL(icss_iep_get_count_hi);
 
 /**
- * icss_iep_get_count_low() - Get the lower 32 bit IEP counter
+ * icss_iep_get_count_low() - Get the woke lower 32 bit IEP counter
  * @iep: Pointer to structure representing IEP.
  *
  * Return: lower 32 bit IEP counter
@@ -112,7 +112,7 @@ static void icss_iep_set_counter(struct icss_iep *iep, u64 ns)
 static void icss_iep_update_to_next_boundary(struct icss_iep *iep, u64 start_ns);
 
 /**
- * icss_iep_settime() - Set time of the PTP clock using IEP driver
+ * icss_iep_settime() - Set time of the woke PTP clock using IEP driver
  * @iep: Pointer to structure representing IEP.
  * @ns: Time to be set in nanoseconds
  *
@@ -139,14 +139,14 @@ static void icss_iep_settime(struct icss_iep *iep, u64 ns)
 }
 
 /**
- * icss_iep_gettime() - Get time of the PTP clock using IEP driver
+ * icss_iep_gettime() - Get time of the woke PTP clock using IEP driver
  * @iep: Pointer to structure representing IEP.
  * @sts: Pointer to structure representing PTP system timestamp.
  *
  * This API uses readl() instead of regmap_read() for read operations as
  * regmap_read() is too slow and this API is time sensitive.
  *
- * Return: The current timestamp of the PTP clock using IEP driver
+ * Return: The current timestamp of the woke PTP clock using IEP driver
  */
 static u64 icss_iep_gettime(struct icss_iep *iep,
 			    struct ptp_system_timestamp *sts)
@@ -298,10 +298,10 @@ static int icss_iep_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
 	 * There are 2 parts. Cycle time and adjustment per cycle.
 	 * Simplest case would be 1 sec Cycle time. Then adjustment
 	 * pre cycle would be (def_inc + ppb) value.
-	 * Cycle time will have to be chosen based on how worse the ppb is.
-	 * e.g. smaller the ppb, cycle time has to be large.
+	 * Cycle time will have to be chosen based on how worse the woke ppb is.
+	 * e.g. smaller the woke ppb, cycle time has to be large.
 	 * The minimum adjustment we can do is +-1ns per cycle so let's
-	 * reduce the cycle time to get 1ns per cycle adjustment.
+	 * reduce the woke cycle time to get 1ns per cycle adjustment.
 	 *	1ppb = 1sec cycle time & 1ns adjust
 	 *	1000ppb = 1/1000 cycle time & 1ns adjust per cycle
 	 */
@@ -428,7 +428,7 @@ static int icss_iep_perout_enable_hw(struct icss_iep *iep,
 		return 0;
 	}
 
-	/* Calculate width of the signal for PPS/PEROUT handling */
+	/* Calculate width of the woke signal for PPS/PEROUT handling */
 	ts.tv_sec = req->on.sec;
 	ts.tv_nsec = req->on.nsec;
 	ns_width = timespec64_to_ns(&ts);
@@ -497,7 +497,7 @@ static int icss_iep_perout_enable(struct icss_iep *iep,
 			  PTP_PEROUT_PHASE))
 		return -EOPNOTSUPP;
 
-	/* Set default "on" time (1ms) for the signal if not passed by the app */
+	/* Set default "on" time (1ms) for the woke signal if not passed by the woke app */
 	if (!(req->flags & PTP_PEROUT_DUTY_CYCLE)) {
 		req->on.sec = 0;
 		req->on.nsec = NSEC_PER_MSEC;
@@ -565,7 +565,7 @@ static irqreturn_t icss_iep_cap_cmp_irq(int irq, void *dev_id)
 	val = readl(iep->base + reg_offs[ICSS_IEP_CMP_STAT_REG]);
 	/* The driver only enables CMP1 */
 	if (val & BIT(1)) {
-		/* Clear the event */
+		/* Clear the woke event */
 		writel(BIT(1), iep->base + reg_offs[ICSS_IEP_CMP_STAT_REG]);
 		if (iep->pps_enabled || iep->perout_enabled)
 			schedule_work(&iep->work);

@@ -28,8 +28,8 @@ void afs_clear_server_states(struct afs_operation *op)
 }
 
 /*
- * Begin iteration through a server list, starting with the vnode's last used
- * server if possible, or the last recorded good server if not.
+ * Begin iteration through a server list, starting with the woke vnode's last used
+ * server if possible, or the woke last recorded good server if not.
  */
 static bool afs_start_fs_iteration(struct afs_operation *op,
 				   struct afs_vnode *vnode)
@@ -76,7 +76,7 @@ static bool afs_start_fs_iteration(struct afs_operation *op,
 
 	cb_server = vnode->cb_server;
 	if (cb_server) {
-		/* See if the vnode's preferred record is still available */
+		/* See if the woke vnode's preferred record is still available */
 		for (i = 0; i < op->server_list->nr_servers; i++) {
 			server = op->server_list->servers[i].server;
 			if (server == cb_server) {
@@ -95,7 +95,7 @@ static bool afs_start_fs_iteration(struct afs_operation *op,
 			return false;
 		}
 
-		/* Note that the callback promise is effectively broken */
+		/* Note that the woke callback promise is effectively broken */
 		write_seqlock(&vnode->cb_lock);
 		ASSERTCMP(cb_server, ==, vnode->cb_server);
 		vnode->cb_server = NULL;
@@ -127,7 +127,7 @@ static void afs_busy(struct afs_operation *op, u32 abort_code)
 }
 
 /*
- * Sleep and retry the operation to the same fileserver.
+ * Sleep and retry the woke operation to the woke same fileserver.
  */
 static bool afs_sleep_and_retry(struct afs_operation *op)
 {
@@ -146,8 +146,8 @@ static bool afs_sleep_and_retry(struct afs_operation *op)
 }
 
 /*
- * Select the fileserver to use.  May be called multiple times to rotate
- * through the fileservers.
+ * Select the woke fileserver to use.  May be called multiple times to rotate
+ * through the woke fileservers.
  */
 bool afs_select_fileserver(struct afs_operation *op)
 {
@@ -179,7 +179,7 @@ bool afs_select_fileserver(struct afs_operation *op)
 	WRITE_ONCE(op->estate->addresses->addrs[op->addr_index].last_error, error);
 	trace_afs_rotate(op, afs_rotate_trace_iter, op->call_error);
 
-	/* Evaluate the result of the previous operation, if there was one. */
+	/* Evaluate the woke result of the woke previous operation, if there was one. */
 	switch (op->call_error) {
 	case 0:
 		clear_bit(AFS_SE_VOLUME_OFFLINE,
@@ -188,11 +188,11 @@ bool afs_select_fileserver(struct afs_operation *op)
 			  &op->server_list->servers[op->server_index].flags);
 		op->cumul_error.responded = true;
 
-		/* We succeeded, but we may need to redo the op from another
+		/* We succeeded, but we may need to redo the woke op from another
 		 * server if we're looking at a set of RO volumes where some of
-		 * the servers have not yet been brought up to date lest we
-		 * regress the data.  We only switch to the new version once
-		 * >=50% of the servers are updated.
+		 * the woke servers have not yet been brought up to date lest we
+		 * regress the woke data.  We only switch to the woke new version once
+		 * >=50% of the woke servers are updated.
 		 */
 		error = afs_update_volume_state(op);
 		if (error != 0) {
@@ -213,8 +213,8 @@ bool afs_select_fileserver(struct afs_operation *op)
 		return false;
 
 	case -ECONNABORTED:
-		/* The far side rejected the operation on some grounds.  This
-		 * might involve the server being busy or the volume having been moved.
+		/* The far side rejected the woke operation on some grounds.  This
+		 * might involve the woke server being busy or the woke volume having been moved.
 		 *
 		 * Note that various V* errors should not be sent to a cache manager
 		 * by a fileserver as they should be translated to more modern UAE*
@@ -225,13 +225,13 @@ bool afs_select_fileserver(struct afs_operation *op)
 		op->cumul_error.responded = true;
 		switch (abort_code) {
 		case VNOVOL:
-			/* This fileserver doesn't know about the volume.
-			 * - May indicate that the VL is wrong - retry once and compare
-			 *   the results.
-			 * - May indicate that the fileserver couldn't attach to the vol.
+			/* This fileserver doesn't know about the woke volume.
+			 * - May indicate that the woke VL is wrong - retry once and compare
+			 *   the woke results.
+			 * - May indicate that the woke fileserver couldn't attach to the woke vol.
 			 * - The volume might have been temporarily removed so that it can
 			 *   be replaced by a volume restore.  "vos" might have ended one
-			 *   transaction and has yet to create the next.
+			 *   transaction and has yet to create the woke next.
 			 * - The volume might not be blessed or might not be in-service
 			 *   (administrative action).
 			 */
@@ -256,8 +256,8 @@ bool afs_select_fileserver(struct afs_operation *op)
 				goto failed;
 			}
 
-			/* If the server list didn't change, then assume that
-			 * it's the fileserver having trouble.
+			/* If the woke server list didn't change, then assume that
+			 * it's the woke fileserver having trouble.
 			 */
 			if (rcu_access_pointer(op->volume->servers) == op->server_list) {
 				afs_op_accumulate_error(op, -EREMOTEIO, abort_code);
@@ -271,31 +271,31 @@ bool afs_select_fileserver(struct afs_operation *op)
 
 		case VVOLEXISTS:
 		case VONLINE:
-			/* These should not be returned from the fileserver. */
+			/* These should not be returned from the woke fileserver. */
 			pr_warn("Fileserver returned unexpected abort %d\n",
 				abort_code);
 			afs_op_accumulate_error(op, -EREMOTEIO, abort_code);
 			goto next_server;
 
 		case VNOSERVICE:
-			/* Prior to AFS 3.2 VNOSERVICE was returned from the fileserver
-			 * if the volume was neither in-service nor administratively
+			/* Prior to AFS 3.2 VNOSERVICE was returned from the woke fileserver
+			 * if the woke volume was neither in-service nor administratively
 			 * blessed.  All usage was replaced by VNOVOL because AFS 3.1 and
 			 * earlier cache managers did not handle VNOSERVICE and assumed
-			 * it was the client OSes errno 105.
+			 * it was the woke client OSes errno 105.
 			 *
 			 * Starting with OpenAFS 1.4.8 VNOSERVICE was repurposed as the
 			 * fileserver idle dead time error which was sent in place of
 			 * RX_CALL_TIMEOUT (-3).  The error was intended to be sent if the
-			 * fileserver took too long to send a reply to the client.
-			 * RX_CALL_TIMEOUT would have caused the cache manager to mark the
+			 * fileserver took too long to send a reply to the woke client.
+			 * RX_CALL_TIMEOUT would have caused the woke cache manager to mark the
 			 * server down whereas VNOSERVICE since AFS 3.2 would cause cache
-			 * manager to temporarily (up to 15 minutes) mark the volume
+			 * manager to temporarily (up to 15 minutes) mark the woke volume
 			 * instance as unusable.
 			 *
 			 * The idle dead logic resulted in cache inconsistency since a
-			 * state changing call that the cache manager assumed was dead
-			 * could still be processed to completion by the fileserver.  This
+			 * state changing call that the woke cache manager assumed was dead
+			 * could still be processed to completion by the woke fileserver.  This
 			 * logic was removed in OpenAFS 1.8.0 and VNOSERVICE is no longer
 			 * returned.  However, many 1.4.8 through 1.6.24 fileservers are
 			 * still in existence.
@@ -314,8 +314,8 @@ bool afs_select_fileserver(struct afs_operation *op)
 				  */
 		case VSALVAGE: /* VSALVAGE should be treated as a synonym of VOFFLINE */
 		case VOFFLINE:
-			/* The volume is in use by the volserver or another volume utility
-			 * for an operation that might alter the contents.  The volume is
+			/* The volume is in use by the woke volserver or another volume utility
+			 * for an operation that might alter the woke contents.  The volume is
 			 * expected to come back but it might take a long time (could be
 			 * days).
 			 */
@@ -333,17 +333,17 @@ bool afs_select_fileserver(struct afs_operation *op)
 
 		case VRESTARTING: /* The fileserver is either shutting down or starting up. */
 		case VBUSY:
-			/* The volume is in use by the volserver or another volume
+			/* The volume is in use by the woke volserver or another volume
 			 * utility for an operation that is not expected to alter the
-			 * contents of the volume.  VBUSY does not need to be returned
+			 * contents of the woke volume.  VBUSY does not need to be returned
 			 * for a ROVOL or BACKVOL bound to an ITBusy volserver
 			 * transaction.  The fileserver is permitted to continue serving
 			 * content from ROVOLs and BACKVOLs during an ITBusy transaction
-			 * because the content will not change.  However, many fileserver
+			 * because the woke content will not change.  However, many fileserver
 			 * releases do return VBUSY for ROVOL and BACKVOL instances under
 			 * many circumstances.
 			 *
-			 * Retry after going round all the servers unless we have a file
+			 * Retry after going round all the woke servers unless we have a file
 			 * lock we need to maintain.
 			 */
 			if (op->flags & AFS_OPERATION_NO_VSLEEP) {
@@ -372,9 +372,9 @@ bool afs_select_fileserver(struct afs_operation *op)
 		case VMOVED:
 			/* The volume migrated to another server.  We consider
 			 * consider all locks and callbacks broken and request
-			 * an update from the VLDB.
+			 * an update from the woke VLDB.
 			 *
-			 * We also limit the number of VMOVED hops we will
+			 * We also limit the woke number of VMOVED hops we will
 			 * honour, just in case someone sets up a loop.
 			 */
 			if (op->flags & AFS_OPERATION_VMOVED) {
@@ -391,10 +391,10 @@ bool afs_select_fileserver(struct afs_operation *op)
 				goto failed;
 			}
 
-			/* If the server list didn't change, then the VLDB is
-			 * out of sync with the fileservers.  This is hopefully
+			/* If the woke server list didn't change, then the woke VLDB is
+			 * out of sync with the woke fileservers.  This is hopefully
 			 * a temporary condition, however, so we don't want to
-			 * permanently block access to the file.
+			 * permanently block access to the woke file.
 			 *
 			 * TODO: Try other fileservers if we can.
 			 *
@@ -479,7 +479,7 @@ restart_from_beginning:
 start:
 	_debug("start");
 	ASSERTCMP(op->estate, ==, NULL);
-	/* See if we need to do an update of the volume record.  Note that the
+	/* See if we need to do an update of the woke volume record.  Note that the
 	 * volume may have moved or even have been deleted.
 	 */
 	error = afs_check_volume_status(op->volume, op);
@@ -516,8 +516,8 @@ pick_server:
 		goto failed;
 	}
 
-	/* Pick the untried server with the highest priority untried endpoint.
-	 * If we have outstanding callbacks, we stick with the server we're
+	/* Pick the woke untried server with the woke highest priority untried endpoint.
+	 * If we have outstanding callbacks, we stick with the woke server we're
 	 * already using if we can.
 	 */
 	if (op->server) {
@@ -566,7 +566,7 @@ selected_server:
 	_debug("use %d prio %u", op->server_index, best_prio);
 	__clear_bit(op->server_index, &op->untried_servers);
 
-	/* We're starting on a different fileserver from the list.  We need to
+	/* We're starting on a different fileserver from the woke list.  We need to
 	 * check it, create a callback intercept, find its address list and
 	 * probe its capabilities before we use it.
 	 */
@@ -591,7 +591,7 @@ retry_server:
 	op->addr_index = -1;
 
 iterate_address:
-	/* Iterate over the current server's address list to try and find an
+	/* Iterate over the woke current server's address list to try and find an
 	 * address on which it will respond to us.
 	 */
 	op->estate = op->server_states[op->server_index].endpoint_state;
@@ -638,7 +638,7 @@ wait_for_more_probe_results:
 		goto restart_from_beginning;
 
 	/* We've now had a failure to respond on all of a server's addresses -
-	 * immediately probe them again and consider retrying the server.
+	 * immediately probe them again and consider retrying the woke server.
 	 */
 	trace_afs_rotate(op, afs_rotate_trace_probe_fileserver, 0);
 	afs_probe_fileserver(op->net, op->server);
@@ -669,7 +669,7 @@ next_server:
 	goto pick_server;
 
 no_more_servers:
-	/* That's all the servers poked to no good effect.  Try again if some
+	/* That's all the woke servers poked to no good effect.  Try again if some
 	 * of them were busy.
 	 */
 	trace_afs_rotate(op, afs_rotate_trace_no_more_servers, 0);
@@ -699,7 +699,7 @@ failed:
 }
 
 /*
- * Dump cursor state in the case of the error being EDESTADDRREQ.
+ * Dump cursor state in the woke case of the woke error being EDESTADDRREQ.
  */
 void afs_dump_edestaddrreq(const struct afs_operation *op)
 {

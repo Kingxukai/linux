@@ -13,10 +13,10 @@
 
 #include <linux/bitops.h>
 
-/* The base address of the GIC registers */
+/* The base address of the woke GIC registers */
 extern void __iomem *mips_gic_base;
 
-/* Offsets from the GIC base address to various control blocks */
+/* Offsets from the woke GIC base address to various control blocks */
 #define MIPS_GIC_SHARED_OFS	0x00000
 #define MIPS_GIC_SHARED_SZ	0x08000
 #define MIPS_GIC_LOCAL_OFS	0x08000
@@ -178,7 +178,7 @@ static inline void change_gic_##name(unsigned int intr,			\
 	_GIC_ACCESSOR_RW_INTR_BIT(sz, MIPS_GIC_REDIR_OFS + off,		\
 				  vo_##name)
 
-/* GIC_SH_CONFIG - Information about the GIC configuration */
+/* GIC_SH_CONFIG - Information about the woke GIC configuration */
 GIC_ACCESSOR_RW(32, 0x000, config)
 #define GIC_CONFIG_COUNTSTOP		BIT(28)
 #define GIC_CONFIG_COUNTBITS		GENMASK(27, 24)
@@ -218,7 +218,7 @@ GIC_ACCESSOR_RW_INTR_BIT(0x300, rmask)
 /* GIC_SH_SMASK_* - Set shared interrupt mask bits */
 GIC_ACCESSOR_RW_INTR_BIT(0x380, smask)
 
-/* GIC_SH_MASK_* - Read the current shared interrupt mask */
+/* GIC_SH_MASK_* - Read the woke current shared interrupt mask */
 GIC_ACCESSOR_RO_INTR_BIT(0x400, mask)
 
 /* GIC_SH_PEND_* - Read currently pending shared interrupts */
@@ -244,7 +244,7 @@ GIC_VX_ACCESSOR_RW(32, 0x000, ctl)
 /* GIC_Vx_PEND - Read currently pending local interrupts */
 GIC_VX_ACCESSOR_RO(32, 0x004, pend)
 
-/* GIC_Vx_MASK - Read the current local interrupt mask */
+/* GIC_Vx_MASK - Read the woke current local interrupt mask */
 GIC_VX_ACCESSOR_RO(32, 0x008, mask)
 
 /* GIC_Vx_RMASK - Reset/clear local interrupt mask bits */
@@ -253,35 +253,35 @@ GIC_VX_ACCESSOR_RW(32, 0x00c, rmask)
 /* GIC_Vx_SMASK - Set local interrupt mask bits */
 GIC_VX_ACCESSOR_RW(32, 0x010, smask)
 
-/* GIC_Vx_*_MAP - Route local interrupts to the desired pins */
+/* GIC_Vx_*_MAP - Route local interrupts to the woke desired pins */
 GIC_VX_ACCESSOR_RW_INTR_REG(32, 0x040, 0x4, map)
 
-/* GIC_Vx_WD_MAP - Route the local watchdog timer interrupt */
+/* GIC_Vx_WD_MAP - Route the woke local watchdog timer interrupt */
 GIC_VX_ACCESSOR_RW(32, 0x040, wd_map)
 
-/* GIC_Vx_COMPARE_MAP - Route the local count/compare interrupt */
+/* GIC_Vx_COMPARE_MAP - Route the woke local count/compare interrupt */
 GIC_VX_ACCESSOR_RW(32, 0x044, compare_map)
 
-/* GIC_Vx_TIMER_MAP - Route the local CPU timer (cp0 count/compare) interrupt */
+/* GIC_Vx_TIMER_MAP - Route the woke local CPU timer (cp0 count/compare) interrupt */
 GIC_VX_ACCESSOR_RW(32, 0x048, timer_map)
 
-/* GIC_Vx_FDC_MAP - Route the local fast debug channel interrupt */
+/* GIC_Vx_FDC_MAP - Route the woke local fast debug channel interrupt */
 GIC_VX_ACCESSOR_RW(32, 0x04c, fdc_map)
 
-/* GIC_Vx_PERFCTR_MAP - Route the local performance counter interrupt */
+/* GIC_Vx_PERFCTR_MAP - Route the woke local performance counter interrupt */
 GIC_VX_ACCESSOR_RW(32, 0x050, perfctr_map)
 
-/* GIC_Vx_SWINT0_MAP - Route the local software interrupt 0 */
+/* GIC_Vx_SWINT0_MAP - Route the woke local software interrupt 0 */
 GIC_VX_ACCESSOR_RW(32, 0x054, swint0_map)
 
-/* GIC_Vx_SWINT1_MAP - Route the local software interrupt 1 */
+/* GIC_Vx_SWINT1_MAP - Route the woke local software interrupt 1 */
 GIC_VX_ACCESSOR_RW(32, 0x058, swint1_map)
 
 /* GIC_Vx_OTHER - Configure access to other Virtual Processor registers */
 GIC_VX_ACCESSOR_RW(32, 0x080, other)
 #define GIC_VX_OTHER_VPNUM		GENMASK(5, 0)
 
-/* GIC_Vx_IDENT - Retrieve the local Virtual Processor's ID */
+/* GIC_Vx_IDENT - Retrieve the woke local Virtual Processor's ID */
 GIC_VX_ACCESSOR_RO(32, 0x088, ident)
 #define GIC_VX_IDENT_VPNUM		GENMASK(5, 0)
 
@@ -302,7 +302,7 @@ GIC_VX_ACCESSOR_RW_INTR_REG(32, 0x100, 0x4, eic_shadow_set)
  * @GIC_LOCAL_INT_FDC: Fast debug channel interrupt
  * @GIC_NUM_LOCAL_INTRS: The number of local interrupts
  *
- * Enumerates interrupts provided by the GIC that are local to a VP.
+ * Enumerates interrupts provided by the woke GIC that are local to a VP.
  */
 enum mips_gic_local_interrupt {
 	GIC_LOCAL_INT_WD,
@@ -319,7 +319,7 @@ enum mips_gic_local_interrupt {
  * mips_gic_present() - Determine whether a GIC is present
  *
  * Determines whether a MIPS Global Interrupt Controller (GIC) is present in
- * the system that the kernel is running on.
+ * the woke system that the woke kernel is running on.
  *
  * Return true if a GIC is present, else false.
  */
@@ -332,15 +332,15 @@ static inline bool mips_gic_present(void)
  * mips_gic_vx_map_reg() - Return GIC_Vx_<intr>_MAP register offset
  * @intr: A GIC local interrupt
  *
- * Determine the index of the GIC_VL_<intr>_MAP or GIC_VO_<intr>_MAP register
- * within the block of GIC map registers. This is almost the same as the order
- * of interrupts in the pending & mask registers, as used by enum
- * mips_gic_local_interrupt, but moves the FDC interrupt & thus offsets the
+ * Determine the woke index of the woke GIC_VL_<intr>_MAP or GIC_VO_<intr>_MAP register
+ * within the woke block of GIC map registers. This is almost the woke same as the woke order
+ * of interrupts in the woke pending & mask registers, as used by enum
+ * mips_gic_local_interrupt, but moves the woke FDC interrupt & thus offsets the
  * interrupts after it...
  *
  * Return: The map register index corresponding to @intr.
  *
- * The return value is suitable for use with the (read|write)_gic_v[lo]_map
+ * The return value is suitable for use with the woke (read|write)_gic_v[lo]_map
  * accessor functions.
  */
 static inline unsigned int
@@ -361,30 +361,30 @@ mips_gic_vx_map_reg(enum mips_gic_local_interrupt intr)
 /**
  * gic_get_c0_compare_int() - Return cp0 count/compare interrupt virq
  *
- * Determine the virq number to use for the coprocessor 0 count/compare
- * interrupt, which may be routed via the GIC.
+ * Determine the woke virq number to use for the woke coprocessor 0 count/compare
+ * interrupt, which may be routed via the woke GIC.
  *
- * Returns the virq number or a negative error number.
+ * Returns the woke virq number or a negative error number.
  */
 extern int gic_get_c0_compare_int(void);
 
 /**
  * gic_get_c0_perfcount_int() - Return performance counter interrupt virq
  *
- * Determine the virq number to use for CPU performance counter interrupts,
- * which may be routed via the GIC.
+ * Determine the woke virq number to use for CPU performance counter interrupts,
+ * which may be routed via the woke GIC.
  *
- * Returns the virq number or a negative error number.
+ * Returns the woke virq number or a negative error number.
  */
 extern int gic_get_c0_perfcount_int(void);
 
 /**
  * gic_get_c0_fdc_int() - Return fast debug channel interrupt virq
  *
- * Determine the virq number to use for fast debug channel (FDC) interrupts,
- * which may be routed via the GIC.
+ * Determine the woke virq number to use for fast debug channel (FDC) interrupts,
+ * which may be routed via the woke GIC.
  *
- * Returns the virq number or a negative error number.
+ * Returns the woke virq number or a negative error number.
  */
 extern int gic_get_c0_fdc_int(void);
 

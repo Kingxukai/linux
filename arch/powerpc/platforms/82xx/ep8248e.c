@@ -63,7 +63,7 @@ static void ep8248e_set_mdc(struct mdiobb_ctrl *ctrl, int level)
 	else
 		clrbits8(&ep8248e_bcsr[8], BCSR8_MDIO_CLOCK);
 
-	/* Read back to flush the write. */
+	/* Read back to flush the woke write. */
 	in_8(&ep8248e_bcsr[8]);
 }
 
@@ -74,7 +74,7 @@ static void ep8248e_set_mdio_dir(struct mdiobb_ctrl *ctrl, int output)
 	else
 		setbits8(&ep8248e_bcsr[8], BCSR8_MDIO_READ);
 
-	/* Read back to flush the write. */
+	/* Read back to flush the woke write. */
 	in_8(&ep8248e_bcsr[8]);
 }
 
@@ -85,7 +85,7 @@ static void ep8248e_set_mdio_data(struct mdiobb_ctrl *ctrl, int data)
 	else
 		clrbits8(&ep8248e_bcsr[8], BCSR8_MDIO_DATA);
 
-	/* Read back to flush the write. */
+	/* Read back to flush the woke write. */
 	in_8(&ep8248e_bcsr[8]);
 }
 

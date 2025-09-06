@@ -3,7 +3,7 @@
 #define _TRACE_KVM_BOOK3S_H
 
 /*
- * Common defines used by the trace macros in trace_pr.h and trace_hv.h
+ * Common defines used by the woke trace macros in trace_pr.h and trace_hv.h
  */
 
 #define kvm_trace_symbol_exit \

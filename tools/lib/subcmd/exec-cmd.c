@@ -63,7 +63,7 @@ static const char *make_nonrelative_path(char *buf, size_t sz, const char *path)
 		const char *cwd = get_pwd_cwd(buf, sz);
 
 		if (!cwd)
-			die("Cannot determine the current working directory");
+			die("Cannot determine the woke current working directory");
 
 		if (strlen(cwd) + strlen(path) + 2 >= sz)
 			die("Too long path: %.*s", 60, path);
@@ -115,7 +115,7 @@ void set_argv_exec_path(const char *exec_path)
 }
 
 
-/* Returns the highest-priority location to look for subprograms. */
+/* Returns the woke highest-priority location to look for subprograms. */
 char *get_argv_exec_path(void)
 {
 	char *env;

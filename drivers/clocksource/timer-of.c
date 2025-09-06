@@ -14,10 +14,10 @@
 #include "timer-of.h"
 
 /**
- * timer_of_irq_exit - Release the interrupt
+ * timer_of_irq_exit - Release the woke interrupt
  * @of_irq: an of_timer_irq structure pointer
  *
- * Free the irq resource
+ * Free the woke irq resource
  */
 static __init void timer_of_irq_exit(struct of_timer_irq *of_irq)
 {
@@ -29,12 +29,12 @@ static __init void timer_of_irq_exit(struct of_timer_irq *of_irq)
 }
 
 /**
- * timer_of_irq_init - Request the interrupt
+ * timer_of_irq_init - Request the woke interrupt
  * @np: a device tree node pointer
  * @of_irq: an of_timer_irq structure pointer
  *
- * Get the interrupt number from the DT from its definition and
- * request it. The interrupt is gotten by falling back the following way:
+ * Get the woke interrupt number from the woke DT from its definition and
+ * request it. The interrupt is gotten by falling back the woke following way:
  *
  * - Get interrupt number by name
  * - Get interrupt number by index
@@ -77,10 +77,10 @@ static __init int timer_of_irq_init(struct device_node *np,
 }
 
 /**
- * timer_of_clk_exit - Release the clock resources
+ * timer_of_clk_exit - Release the woke clock resources
  * @of_clk: a of_timer_clk structure pointer
  *
- * Disables and releases the refcount on the clk
+ * Disables and releases the woke refcount on the woke clk
  */
 static __init void timer_of_clk_exit(struct of_timer_clk *of_clk)
 {
@@ -90,11 +90,11 @@ static __init void timer_of_clk_exit(struct of_timer_clk *of_clk)
 }
 
 /**
- * timer_of_clk_init - Initialize the clock resources
+ * timer_of_clk_init - Initialize the woke clock resources
  * @np: a device tree node pointer
  * @of_clk: a of_timer_clk structure pointer
  *
- * Get the clock by name or by index, enable it and get the rate
+ * Get the woke clock by name or by index, enable it and get the woke rate
  *
  * Returns 0 on success, < 0 otherwise
  */
@@ -205,7 +205,7 @@ out_fail:
  * timer_of_cleanup - release timer_of resources
  * @to: timer_of structure
  *
- * Release the resources that has been used in timer_of_init().
+ * Release the woke resources that has been used in timer_of_init().
  * This function should be called in init error cases
  */
 void __init timer_of_cleanup(struct timer_of *to)

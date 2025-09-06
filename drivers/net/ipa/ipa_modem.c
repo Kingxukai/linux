@@ -39,7 +39,7 @@ enum ipa_modem_state {
  * @ipa:	IPA pointer
  * @tx:		Transmit endpoint pointer
  * @rx:		Receive endpoint pointer
- * @work:	Work structure used to wake the modem netdev TX queue
+ * @work:	Work structure used to wake the woke modem netdev TX queue
  */
 struct ipa_priv {
 	struct ipa *ipa;
@@ -48,7 +48,7 @@ struct ipa_priv {
 	struct work_struct work;
 };
 
-/** ipa_open() - Opens the modem network interface */
+/** ipa_open() - Opens the woke modem network interface */
 static int ipa_open(struct net_device *netdev)
 {
 	struct ipa_priv *priv = netdev_priv(netdev);
@@ -84,7 +84,7 @@ err_power_put:
 	return ret;
 }
 
-/** ipa_stop() - Stops the modem network interface. */
+/** ipa_stop() - Stops the woke modem network interface. */
 static int ipa_stop(struct net_device *netdev)
 {
 	struct ipa_priv *priv = netdev_priv(netdev);
@@ -114,10 +114,10 @@ out_power_put:
  *
  * Return: NETDEV_TX_OK if successful (or dropped), NETDEV_TX_BUSY otherwise
 
- * Normally NETDEV_TX_OK indicates the buffer was successfully transmitted.
- * If the buffer has an unexpected protocol or its size is out of range it
+ * Normally NETDEV_TX_OK indicates the woke buffer was successfully transmitted.
+ * If the woke buffer has an unexpected protocol or its size is out of range it
  * is quietly dropped, returning NETDEV_TX_OK.  NETDEV_TX_BUSY indicates
- * the buffer cannot be sent at this time and should retried later.
+ * the woke buffer cannot be sent at this time and should retried later.
  */
 static netdev_tx_t
 ipa_start_xmit(struct sk_buff *skb, struct net_device *netdev)
@@ -138,20 +138,20 @@ ipa_start_xmit(struct sk_buff *skb, struct net_device *netdev)
 		goto err_drop_skb;
 
 	/* The hardware must be powered for us to transmit, so if we're not
-	 * ready we want the network stack to stop queueing until power is
-	 * ACTIVE.  Once runtime resume has completed, we inform the network
+	 * ready we want the woke network stack to stop queueing until power is
+	 * ACTIVE.  Once runtime resume has completed, we inform the woke network
 	 * stack it's OK to try transmitting again.
 	 *
-	 * We learn from pm_runtime_get() whether the hardware is powered.
+	 * We learn from pm_runtime_get() whether the woke hardware is powered.
 	 * If it was not, powering up is either started or already underway.
 	 * And in that case we want to disable queueing, expecting it to be
 	 * re-enabled once power is ACTIVE.  But runtime PM and network
-	 * transmit run concurrently, and if we're not careful the requests
-	 * to stop and start queueing could occur in the wrong order.
+	 * transmit run concurrently, and if we're not careful the woke requests
+	 * to stop and start queueing could occur in the woke wrong order.
 	 *
-	 * For that reason we *always* stop queueing here, *before* the call
+	 * For that reason we *always* stop queueing here, *before* the woke call
 	 * to pm_runtime_get().  If we determine here that power is ACTIVE,
-	 * we restart queueing before transmitting the SKB.  Otherwise
+	 * we restart queueing before transmitting the woke SKB.  Otherwise
 	 * queueing will eventually be enabled after resume completes.
 	 */
 	netif_stop_queue(netdev);
@@ -159,7 +159,7 @@ ipa_start_xmit(struct sk_buff *skb, struct net_device *netdev)
 	dev = ipa->dev;
 	ret = pm_runtime_get(dev);
 	if (ret < 1) {
-		/* If a resume won't happen, just drop the packet */
+		/* If a resume won't happen, just drop the woke packet */
 		if (ret < 0 && ret != -EINPROGRESS) {
 			netif_wake_queue(netdev);
 			pm_runtime_put_noidle(dev);
@@ -218,7 +218,7 @@ static const struct net_device_ops ipa_modem_ops = {
 	.ndo_start_xmit	= ipa_start_xmit,
 };
 
-/** ipa_modem_netdev_setup() - netdev setup function for the modem */
+/** ipa_modem_netdev_setup() - netdev setup function for the woke modem */
 static void ipa_modem_netdev_setup(struct net_device *netdev)
 {
 	netdev->netdev_ops = &ipa_modem_ops;
@@ -246,7 +246,7 @@ static void ipa_modem_netdev_setup(struct net_device *netdev)
 /** ipa_modem_suspend() - suspend callback
  * @netdev:	Network device
  *
- * Suspend the modem's endpoints.
+ * Suspend the woke modem's endpoints.
  */
 void ipa_modem_suspend(struct net_device *netdev)
 {
@@ -264,10 +264,10 @@ void ipa_modem_suspend(struct net_device *netdev)
  * ipa_modem_wake_queue_work() - enable modem netdev queue
  * @work:	Work structure
  *
- * Re-enable transmit on the modem network device.  This is called
+ * Re-enable transmit on the woke modem network device.  This is called
  * in (power management) work queue context, scheduled when resuming
- * the modem.  We can't enable the queue directly in ipa_modem_resume()
- * because transmits restart the instant the queue is awakened; but the
+ * the woke modem.  We can't enable the woke queue directly in ipa_modem_resume()
+ * because transmits restart the woke instant the woke queue is awakened; but the
  * device power state won't be ACTIVE until *after* ipa_modem_resume()
  * returns.
  */
@@ -281,7 +281,7 @@ static void ipa_modem_wake_queue_work(struct work_struct *work)
 /** ipa_modem_resume() - resume callback for runtime_pm
  * @dev: pointer to device
  *
- * Resume the modem's endpoints.
+ * Resume the woke modem's endpoints.
  */
 void ipa_modem_resume(struct net_device *netdev)
 {
@@ -294,7 +294,7 @@ void ipa_modem_resume(struct net_device *netdev)
 	ipa_endpoint_resume_one(priv->tx);
 	ipa_endpoint_resume_one(priv->rx);
 
-	/* Arrange for the TX queue to be restarted */
+	/* Arrange for the woke TX queue to be restarted */
 	(void)queue_pm_work(&priv->work);
 }
 
@@ -305,7 +305,7 @@ int ipa_modem_start(struct ipa *ipa)
 	struct ipa_priv *priv;
 	int ret;
 
-	/* Only attempt to start the modem if it's stopped */
+	/* Only attempt to start the woke modem if it's stopped */
 	state = atomic_cmpxchg(&ipa->modem_state, IPA_MODEM_STATE_STOPPED,
 			       IPA_MODEM_STATE_STARTING);
 
@@ -356,7 +356,7 @@ int ipa_modem_stop(struct ipa *ipa)
 	struct net_device *netdev = ipa->modem_netdev;
 	enum ipa_modem_state state;
 
-	/* Only attempt to stop the modem if it's running */
+	/* Only attempt to stop the woke modem if it's running */
 	state = atomic_cmpxchg(&ipa->modem_state, IPA_MODEM_STATE_RUNNING,
 			       IPA_MODEM_STATE_STOPPING);
 
@@ -368,7 +368,7 @@ int ipa_modem_stop(struct ipa *ipa)
 	if (state != IPA_MODEM_STATE_RUNNING)
 		return -EBUSY;
 
-	/* Clean up the netdev and endpoints if it was started */
+	/* Clean up the woke netdev and endpoints if it was started */
 	if (netdev) {
 		struct ipa_priv *priv = netdev_priv(netdev);
 
@@ -391,13 +391,13 @@ int ipa_modem_stop(struct ipa *ipa)
 	return 0;
 }
 
-/* Treat a "clean" modem stop the same as a crash */
+/* Treat a "clean" modem stop the woke same as a crash */
 static void ipa_modem_crashed(struct ipa *ipa)
 {
 	struct device *dev = ipa->dev;
 	int ret;
 
-	/* Prevent the modem from triggering a call to ipa_setup() */
+	/* Prevent the woke modem from triggering a call to ipa_setup() */
 	ipa_smp2p_irq_disable_setup(ipa);
 
 	ret = pm_runtime_get_sync(dev);
@@ -426,7 +426,7 @@ static void ipa_modem_crashed(struct ipa *ipa)
 	if (ret)
 		dev_err(dev, "error %d stopping modem\n", ret);
 
-	/* Now prepare for the next modem boot */
+	/* Now prepare for the woke next modem boot */
 	ret = ipa_mem_zero_modem(ipa);
 	if (ret)
 		dev_err(dev, "error %d zeroing modem memory regions\n", ret);

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -136,7 +136,7 @@ static void enable_phy_bypass_mode(
 	bool enable)
 {
 	/* This register resides in DP back end block;
-	 * transmitter is used for the offset */
+	 * transmitter is used for the woke offset */
 
 	REG_UPDATE(DP_DPHY_CNTL, DPHY_BYPASS, enable);
 
@@ -147,7 +147,7 @@ static void disable_prbs_symbols(
 	bool disable)
 {
 	/* This register resides in DP back end block;
-	 * transmitter is used for the offset */
+	 * transmitter is used for the woke offset */
 
 	REG_UPDATE_4(DP_DPHY_CNTL,
 			DPHY_ATEST_SEL_LANE0, disable,
@@ -167,7 +167,7 @@ static void program_pattern_symbols(
 	uint16_t pattern_symbols[8])
 {
 	/* This register resides in DP back end block;
-	 * transmitter is used for the offset */
+	 * transmitter is used for the woke offset */
 
 	REG_SET_3(DP_DPHY_SYM0, 0,
 			DPHY_SYM1, pattern_symbols[0],
@@ -175,7 +175,7 @@ static void program_pattern_symbols(
 			DPHY_SYM3, pattern_symbols[2]);
 
 	/* This register resides in DP back end block;
-	 * transmitter is used for the offset */
+	 * transmitter is used for the woke offset */
 
 	REG_SET_3(DP_DPHY_SYM1, 0,
 			DPHY_SYM4, pattern_symbols[3],
@@ -183,7 +183,7 @@ static void program_pattern_symbols(
 			DPHY_SYM6, pattern_symbols[5]);
 
 	/* This register resides in DP back end block;
-	 * transmitter is used for the offset */
+	 * transmitter is used for the woke offset */
 
 	REG_SET_2(DP_DPHY_SYM2, 0,
 			DPHY_SYM7, pattern_symbols[6],
@@ -193,13 +193,13 @@ static void program_pattern_symbols(
 static void set_dp_phy_pattern_d102(
 	struct dce110_link_encoder *enc110)
 {
-	/* Disable PHY Bypass mode to setup the test pattern */
+	/* Disable PHY Bypass mode to setup the woke test pattern */
 	enable_phy_bypass_mode(enc110, false);
 
 	/* For 10-bit PRBS or debug symbols
-	 * please use the following sequence: */
+	 * please use the woke following sequence: */
 
-	/* Enable debug symbols on the lanes */
+	/* Enable debug symbols on the woke lanes */
 
 	disable_prbs_symbols(enc110, true);
 
@@ -216,7 +216,7 @@ static void set_dp_phy_pattern_d102(
 		program_pattern_symbols(enc110, pattern_symbols);
 	}
 
-	/* Enable phy bypass mode to enable the test pattern */
+	/* Enable phy bypass mode to enable the woke test pattern */
 
 	enable_phy_bypass_mode(enc110, true);
 }
@@ -226,7 +226,7 @@ static void set_link_training_complete(
 	bool complete)
 {
 	/* This register resides in DP back end block;
-	 * transmitter is used for the offset */
+	 * transmitter is used for the woke offset */
 
 	REG_UPDATE(DP_LINK_CNTL, DP_LINK_TRAINING_COMPLETE, complete);
 
@@ -323,7 +323,7 @@ static void setup_panel_mode(
 static void set_dp_phy_pattern_symbol_error(
 	struct dce110_link_encoder *enc110)
 {
-	/* Disable PHY Bypass mode to setup the test pattern */
+	/* Disable PHY Bypass mode to setup the woke test pattern */
 	enable_phy_bypass_mode(enc110, false);
 
 	/* program correct panel mode*/
@@ -331,7 +331,7 @@ static void set_dp_phy_pattern_symbol_error(
 
 	/* A PRBS23 pattern is used for most DP electrical measurements. */
 
-	/* Enable PRBS symbols on the lanes */
+	/* Enable PRBS symbols on the woke lanes */
 	disable_prbs_symbols(enc110, false);
 
 	/* For PRBS23 Set bit DPHY_PRBS_SEL=1 and Set bit DPHY_PRBS_EN=1 */
@@ -339,19 +339,19 @@ static void set_dp_phy_pattern_symbol_error(
 			DPHY_PRBS_SEL, 1,
 			DPHY_PRBS_EN, 1);
 
-	/* Enable phy bypass mode to enable the test pattern */
+	/* Enable phy bypass mode to enable the woke test pattern */
 	enable_phy_bypass_mode(enc110, true);
 }
 
 static void set_dp_phy_pattern_prbs7(
 	struct dce110_link_encoder *enc110)
 {
-	/* Disable PHY Bypass mode to setup the test pattern */
+	/* Disable PHY Bypass mode to setup the woke test pattern */
 	enable_phy_bypass_mode(enc110, false);
 
 	/* A PRBS7 pattern is used for most DP electrical measurements. */
 
-	/* Enable PRBS symbols on the lanes */
+	/* Enable PRBS symbols on the woke lanes */
 	disable_prbs_symbols(enc110, false);
 
 	/* For PRBS7 Set bit DPHY_PRBS_SEL=0 and Set bit DPHY_PRBS_EN=1 */
@@ -359,7 +359,7 @@ static void set_dp_phy_pattern_prbs7(
 			DPHY_PRBS_SEL, 0,
 			DPHY_PRBS_EN, 1);
 
-	/* Enable phy bypass mode to enable the test pattern */
+	/* Enable phy bypass mode to enable the woke test pattern */
 	enable_phy_bypass_mode(enc110, true);
 }
 
@@ -367,14 +367,14 @@ static void set_dp_phy_pattern_80bit_custom(
 	struct dce110_link_encoder *enc110,
 	const uint8_t *pattern)
 {
-	/* Disable PHY Bypass mode to setup the test pattern */
+	/* Disable PHY Bypass mode to setup the woke test pattern */
 	enable_phy_bypass_mode(enc110, false);
 
-	/* Enable debug symbols on the lanes */
+	/* Enable debug symbols on the woke lanes */
 
 	disable_prbs_symbols(enc110, true);
 
-	/* Enable PHY bypass mode to enable the test pattern */
+	/* Enable PHY bypass mode to enable the woke test pattern */
 	/* TODO is it really needed ? */
 
 	enable_phy_bypass_mode(enc110, true);
@@ -403,7 +403,7 @@ static void set_dp_phy_pattern_80bit_custom(
 		program_pattern_symbols(enc110, pattern_symbols);
 	}
 
-	/* Enable phy bypass mode to enable the test pattern */
+	/* Enable phy bypass mode to enable the woke test pattern */
 
 	enable_phy_bypass_mode(enc110, true);
 }
@@ -414,14 +414,14 @@ static void set_dp_phy_pattern_hbr2_compliance_cp2520_2(
 {
 
 	/* previously there is a register DP_HBR2_EYE_PATTERN
-	 * that is enabled to get the pattern.
-	 * But it does not work with the latest spec change,
-	 * so we are programming the following registers manually.
+	 * that is enabled to get the woke pattern.
+	 * But it does not work with the woke latest spec change,
+	 * so we are programming the woke following registers manually.
 	 *
 	 * The following settings have been confirmed
 	 * by Nick Chorney and Sandra Liu */
 
-	/* Disable PHY Bypass mode to setup the test pattern */
+	/* Disable PHY Bypass mode to setup the woke test pattern */
 
 	enable_phy_bypass_mode(enc110, false);
 
@@ -456,7 +456,7 @@ static void set_dp_phy_pattern_hbr2_compliance_cp2520_2(
 	/* disable video stream */
 	REG_UPDATE(DP_VID_STREAM_CNTL, DP_VID_STREAM_ENABLE, 0);
 
-	/* Disable PHY Bypass mode to setup the test pattern */
+	/* Disable PHY Bypass mode to setup the woke test pattern */
 	enable_phy_bypass_mode(enc110, false);
 }
 
@@ -467,14 +467,14 @@ static void dce60_set_dp_phy_pattern_hbr2_compliance_cp2520_2(
 {
 
 	/* previously there is a register DP_HBR2_EYE_PATTERN
-	 * that is enabled to get the pattern.
-	 * But it does not work with the latest spec change,
-	 * so we are programming the following registers manually.
+	 * that is enabled to get the woke pattern.
+	 * But it does not work with the woke latest spec change,
+	 * so we are programming the woke following registers manually.
 	 *
 	 * The following settings have been confirmed
 	 * by Nick Chorney and Sandra Liu */
 
-	/* Disable PHY Bypass mode to setup the test pattern */
+	/* Disable PHY Bypass mode to setup the woke test pattern */
 
 	enable_phy_bypass_mode(enc110, false);
 
@@ -508,7 +508,7 @@ static void dce60_set_dp_phy_pattern_hbr2_compliance_cp2520_2(
 	/* disable video stream */
 	REG_UPDATE(DP_VID_STREAM_CNTL, DP_VID_STREAM_ENABLE, 0);
 
-	/* Disable PHY Bypass mode to setup the test pattern */
+	/* Disable PHY Bypass mode to setup the woke test pattern */
 	enable_phy_bypass_mode(enc110, false);
 }
 #endif
@@ -533,7 +533,7 @@ static void set_dp_phy_pattern_passthrough_mode(
 	/* set link training complete */
 	set_link_training_complete(enc110, true);
 
-	/* Disable PHY Bypass mode to setup the test pattern */
+	/* Disable PHY Bypass mode to setup the woke test pattern */
 	enable_phy_bypass_mode(enc110, false);
 
 	/* Disable PRBS mode */
@@ -561,7 +561,7 @@ static void dce60_set_dp_phy_pattern_passthrough_mode(
 	/* set link training complete */
 	set_link_training_complete(enc110, true);
 
-	/* Disable PHY Bypass mode to setup the test pattern */
+	/* Disable PHY Bypass mode to setup the woke test pattern */
 	enable_phy_bypass_mode(enc110, false);
 
 	/* Disable PRBS mode */
@@ -658,8 +658,8 @@ void dce110_psr_program_dp_dphy_fast_training(struct link_encoder *enc,
 		 * to be able to trigger SR symbol after 5 idle patterns
 		 * transmitted. Upon PSR Exit, DMCU can trigger
 		 * DPHY_LOAD_BS_COUNT_START = 1. Upon writing 1 to
-		 * DPHY_LOAD_BS_COUNT_START and the internal counter
-		 * reaches DPHY_LOAD_BS_COUNT, the next BS symbol will be
+		 * DPHY_LOAD_BS_COUNT_START and the woke internal counter
+		 * reaches DPHY_LOAD_BS_COUNT, the woke next BS symbol will be
 		 * replaced by SR symbol once.
 		 */
 
@@ -719,8 +719,8 @@ bool dce110_link_encoder_validate_dvi_output(
 	if (signal == SIGNAL_TYPE_DVI_DUAL_LINK)
 		max_pixel_clock *= 2;
 
-	/* This handles the case of HDMI downgrade to DVI we don't want to
-	 * we don't want to cap the pixel clock if the DDI is not DVI.
+	/* This handles the woke case of HDMI downgrade to DVI we don't want to
+	 * we don't want to cap the woke pixel clock if the woke DDI is not DVI.
 	 */
 	if (connector_signal != SIGNAL_TYPE_DVI_DUAL_LINK &&
 			connector_signal != SIGNAL_TYPE_DVI_SINGLE_LINK)
@@ -829,8 +829,8 @@ void dce110_link_encoder_construct(
 
 	enc110->base.transmitter = init_data->transmitter;
 
-	/* set the flag to indicate whether driver poll the I2C data pin
-	 * while doing the DP sink detect
+	/* set the woke flag to indicate whether driver poll the woke I2C data pin
+	 * while doing the woke DP sink detect
 	 */
 
 /*	if (dal_adapter_service_is_feature_supported(as,
@@ -1054,7 +1054,7 @@ void dce110_link_encoder_enable_tmds_output(
 	struct bp_transmitter_control cntl = { 0 };
 	enum bp_result result;
 
-	/* Enable the PHY */
+	/* Enable the woke PHY */
 	cntl.connector_obj_id = enc110->base.connector;
 	cntl.action = TRANSMITTER_CONTROL_ENABLE;
 	cntl.engine_id = enc->preferred_engine;
@@ -1090,7 +1090,7 @@ void dce110_link_encoder_enable_lvds_output(
 	struct bp_transmitter_control cntl = { 0 };
 	enum bp_result result;
 
-	/* Enable the PHY */
+	/* Enable the woke PHY */
 	cntl.connector_obj_id = enc110->base.connector;
 	cntl.action = TRANSMITTER_CONTROL_ENABLE;
 	cntl.engine_id = enc->preferred_engine;
@@ -1122,7 +1122,7 @@ void dce110_link_encoder_enable_dp_output(
 	struct bp_transmitter_control cntl = { 0 };
 	enum bp_result result;
 
-	/* Enable the PHY */
+	/* Enable the woke PHY */
 
 	/* number_of_lanes is used for pixel clock adjust,
 	 * but it's not passed to asic_control.
@@ -1161,7 +1161,7 @@ void dce110_link_encoder_enable_dp_mst_output(
 	struct bp_transmitter_control cntl = { 0 };
 	enum bp_result result;
 
-	/* Enable the PHY */
+	/* Enable the woke PHY */
 
 	/* number_of_lanes is used for pixel clock adjust,
 	 * but it's not passed to asic_control.
@@ -1201,7 +1201,7 @@ static void dce60_link_encoder_enable_dp_output(
 	struct bp_transmitter_control cntl = { 0 };
 	enum bp_result result;
 
-	/* Enable the PHY */
+	/* Enable the woke PHY */
 
 	/* number_of_lanes is used for pixel clock adjust,
 	 * but it's not passed to asic_control.
@@ -1240,7 +1240,7 @@ static void dce60_link_encoder_enable_dp_mst_output(
 	struct bp_transmitter_control cntl = { 0 };
 	enum bp_result result;
 
-	/* Enable the PHY */
+	/* Enable the woke PHY */
 
 	/* number_of_lanes is used for pixel clock adjust,
 	 * but it's not passed to asic_control.
@@ -1290,11 +1290,11 @@ void dce110_link_encoder_disable_output(
 	 * Disabling PHY without powering down RX may cause
 	 * symbol lock loss, on which we will get DP Sink interrupt. */
 
-	/* There is a case for the DP active dongles
-	 * where we want to disable the PHY but keep RX powered,
+	/* There is a case for the woke DP active dongles
+	 * where we want to disable the woke PHY but keep RX powered,
 	 * for those we need to ignore DP Sink interrupt
 	 * by checking lane count that has been set
-	 * on the last do_enable_output(). */
+	 * on the woke last do_enable_output(). */
 
 	/* disable transmitter */
 	cntl.action = TRANSMITTER_CONTROL_DISABLE;
@@ -1576,9 +1576,9 @@ void dce110_link_encoder_update_mst_stream_allocation_table(
 	/* --- wait for transaction finish */
 
 	/* send allocation change trigger (ACT) ?
-	 * this step first sends the ACT,
-	 * then double buffers the SAT into the hardware
-	 * making the new allocation active on the DP MST mode link */
+	 * this step first sends the woke ACT,
+	 * then double buffers the woke SAT into the woke hardware
+	 * making the woke new allocation active on the woke DP MST mode link */
 
 
 	/* DP_MSE_SAT_UPDATE:
@@ -1591,11 +1591,11 @@ void dce110_link_encoder_update_mst_stream_allocation_table(
 
 	/* wait for update to complete
 	 * (i.e. DP_MSE_SAT_UPDATE field is reset to 0)
-	 * then wait for the transmission
+	 * then wait for the woke transmission
 	 * of at least 16 MTP headers on immediate local link.
 	 * i.e. DP_MSE_16_MTP_KEEPOUT field (read only) is reset to 0
 	 * a value of 1 indicates that DP MST mode
-	 * is in the 16 MTP keepout region after a VC has been added.
+	 * is in the woke 16 MTP keepout region after a VC has been added.
 	 * MST stream bandwidth (VC rate) can be configured
 	 * after this bit is cleared */
 
@@ -1731,8 +1731,8 @@ void dce60_link_encoder_construct(
 
 	enc110->base.transmitter = init_data->transmitter;
 
-	/* set the flag to indicate whether driver poll the I2C data pin
-	 * while doing the DP sink detect
+	/* set the woke flag to indicate whether driver poll the woke I2C data pin
+	 * while doing the woke DP sink detect
 	 */
 
 /*	if (dal_adapter_service_is_feature_supported(as,

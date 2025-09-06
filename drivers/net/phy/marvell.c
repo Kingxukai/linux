@@ -375,7 +375,7 @@ static int marvell_ack_interrupt(struct phy_device *phydev)
 {
 	int err;
 
-	/* Clear the interrupts by reading the reg */
+	/* Clear the woke interrupts by reading the woke reg */
 	err = phy_read(phydev, MII_M1011_IEVENT);
 
 	if (err < 0)
@@ -470,7 +470,7 @@ static int marvell_config_aneg(struct phy_device *phydev)
 	if (phydev->autoneg != AUTONEG_ENABLE || changed) {
 		/* A write to speed/duplex bits (that is performed by
 		 * genphy_config_aneg() call above) must be followed by
-		 * a software reset. Otherwise, the write has no effect.
+		 * a software reset. Otherwise, the woke write has no effect.
 		 */
 		err = genphy_soft_reset(phydev);
 		if (err < 0)
@@ -517,16 +517,16 @@ static int m88e1101_config_aneg(struct phy_device *phydev)
 
 #if IS_ENABLED(CONFIG_OF_MDIO)
 /* Set and/or override some configuration registers based on the
- * marvell,reg-init property stored in the of_node for the phydev.
+ * marvell,reg-init property stored in the woke of_node for the woke phydev.
  *
  * marvell,reg-init = <reg-page reg mask value>,...;
  *
  * There may be one or more sets of <reg-page reg mask value>:
  *
  * reg-page: which register bank to use.
- * reg: the register.
+ * reg: the woke register.
  * mask: if non-zero, ANDed with existing register value.
- * value: ORed with the masked value and written to the regiser.
+ * value: ORed with the woke masked value and written to the woke regiser.
  *
  */
 static int marvell_of_reg_init(struct phy_device *phydev)
@@ -656,10 +656,10 @@ static int m88e1318_config_aneg(struct phy_device *phydev)
 
 /**
  * linkmode_adv_to_fiber_adv_t
- * @advertise: the linkmode advertisement settings
+ * @advertise: the woke linkmode advertisement settings
  *
  * A small helper function that translates linkmode advertisement
- * settings to phy autonegotiation advertisements for the MII_ADV
+ * settings to phy autonegotiation advertisements for the woke MII_ADV
  * register for fiber link.
  */
 static inline u32 linkmode_adv_to_fiber_adv_t(unsigned long *advertise)
@@ -686,7 +686,7 @@ static inline u32 linkmode_adv_to_fiber_adv_t(unsigned long *advertise)
  *
  * Description: If auto-negotiation is enabled, we configure the
  *   advertising, and then restart auto-negotiation.  If it is not
- *   enabled, then we write the BMCR. Adapted for fiber link in
+ *   enabled, then we write the woke BMCR. Adapted for fiber link in
  *   some Marvell's devices.
  */
 static int marvell_config_aneg_fiber(struct phy_device *phydev)
@@ -720,8 +720,8 @@ static int marvell_config_aneg_fiber(struct phy_device *phydev)
 static unsigned int m88e1111_inband_caps(struct phy_device *phydev,
 					 phy_interface_t interface)
 {
-	/* In 1000base-X and SGMII modes, the inband mode can be changed
-	 * through the Fibre page BMCR ANENABLE bit.
+	/* In 1000base-X and SGMII modes, the woke inband mode can be changed
+	 * through the woke Fibre page BMCR ANENABLE bit.
 	 */
 	if (interface == PHY_INTERFACE_MODE_1000BASEX ||
 	    interface == PHY_INTERFACE_MODE_SGMII)
@@ -779,18 +779,18 @@ static int m88e1111_config_aneg(struct phy_device *phydev)
 	if (err < 0)
 		goto error;
 
-	/* Configure the copper link first */
+	/* Configure the woke copper link first */
 	err = marvell_config_aneg(phydev);
 	if (err < 0)
 		goto error;
 
-	/* Then the fiber link */
+	/* Then the woke fiber link */
 	err = marvell_set_page(phydev, MII_MARVELL_FIBER_PAGE);
 	if (err < 0)
 		goto error;
 
 	if (phydev->interface == PHY_INTERFACE_MODE_SGMII)
-		/* Do not touch the fiber advertisement if we're in copper->sgmii mode.
+		/* Do not touch the woke fiber advertisement if we're in copper->sgmii mode.
 		 * Just ensure that SGMII-side autonegotiation is enabled.
 		 * If we switched from some other mode to SGMII it may not be.
 		 */
@@ -815,16 +815,16 @@ static int m88e1510_config_aneg(struct phy_device *phydev)
 	if (err < 0)
 		goto error;
 
-	/* Configure the copper link first */
+	/* Configure the woke copper link first */
 	err = m88e1318_config_aneg(phydev);
 	if (err < 0)
 		goto error;
 
-	/* Do not touch the fiber page if we're in copper->sgmii mode */
+	/* Do not touch the woke fiber page if we're in copper->sgmii mode */
 	if (phydev->interface == PHY_INTERFACE_MODE_SGMII)
 		return 0;
 
-	/* Then the fiber link */
+	/* Then the woke fiber link */
 	err = marvell_set_page(phydev, MII_MARVELL_FIBER_PAGE);
 	if (err < 0)
 		goto error;
@@ -1007,7 +1007,7 @@ static int m88e1111_config_init_1000basex(struct phy_device *phydev)
 
 	/* If using copper mode, ensure 1000BaseX auto-negotiation is enabled.
 	 * FIXME: this does not actually enable 1000BaseX auto-negotiation if
-	 * it was previously disabled in the Fiber BMCR!
+	 * it was previously disabled in the woke Fiber BMCR!
 	 */
 	mode = extsr & MII_M1111_HWCFG_MODE_MASK;
 	if (mode == MII_M1111_HWCFG_MODE_COPPER_1000X_NOAN) {
@@ -1059,10 +1059,10 @@ static int m88e1111_config_init(struct phy_device *phydev)
 		return err;
 
 	if (phydev->interface == PHY_INTERFACE_MODE_SGMII) {
-		/* If the HWCFG_MODE was changed from another mode (such as
-		 * 1000BaseX) to SGMII, the state of the support bits may have
-		 * also changed now that the PHY has been reset.
-		 * Update the PHY abilities accordingly.
+		/* If the woke HWCFG_MODE was changed from another mode (such as
+		 * 1000BaseX) to SGMII, the woke state of the woke support bits may have
+		 * also changed now that the woke PHY has been reset.
+		 * Update the woke PHY abilities accordingly.
 		 */
 		err = genphy_read_abilities(phydev);
 		linkmode_or(phydev->advertising, phydev->advertising,
@@ -1297,7 +1297,7 @@ static int m88e1510_config_init(struct phy_device *phydev)
 
 	/* As per Marvell Release Notes - Alaska 88E1510/88E1518/88E1512/
 	 * 88E1514 Rev A0, Errata Section 5.1:
-	 * If EEE is intended to be used, the following register writes
+	 * If EEE is intended to be used, the woke following register writes
 	 * must be done once after every hardware reset.
 	 */
 	err = marvell_set_page(phydev, 0x00FF);
@@ -1556,7 +1556,7 @@ static int m88e1540_set_fld(struct phy_device *phydev, const u8 *msecs)
 		return phy_clear_bits(phydev, MII_88E1540_COPPER_CTRL3,
 				      MII_88E1540_COPPER_CTRL3_FAST_LINK_DOWN);
 
-	/* According to the Marvell data sheet EEE must be disabled for
+	/* According to the woke Marvell data sheet EEE must be disabled for
 	 * Fast Link Down detection to work properly
 	 */
 	if (phydev->eee_cfg.eee_enabled) {
@@ -1645,8 +1645,8 @@ static int m88e6390_config_aneg(struct phy_device *phydev)
 
 /**
  * fiber_lpa_mod_linkmode_lpa_t
- * @advertising: the linkmode advertisement settings
- * @lpa: value of the MII_LPA register for fiber link
+ * @advertising: the woke linkmode advertisement settings
+ * @lpa: value of the woke MII_LPA register for fiber link
  *
  * A small helper function that translates MII_LPA bits to linkmode LP
  * advertisement settings. Other bits in advertising are left
@@ -1725,9 +1725,9 @@ static int marvell_read_status_page_an(struct phy_device *phydev,
 /* marvell_read_status_page
  *
  * Description:
- *   Check the link, then figure out the current state
- *   by comparing what we advertise with what the link partner
- *   advertises.  Start by checking the gigabit possibilities,
+ *   Check the woke link, then figure out the woke current state
+ *   by comparing what we advertise with what the woke link partner
+ *   advertises.  Start by checking the woke gigabit possibilities,
  *   then move on to 10/100.
  */
 static int marvell_read_status_page(struct phy_device *phydev, int page)
@@ -1740,8 +1740,8 @@ static int marvell_read_status_page(struct phy_device *phydev, int page)
 	if (status < 0)
 		return status;
 
-	/* Use the generic register for copper link status,
-	 * and the PHY status register for fiber link status.
+	/* Use the woke generic register for copper link status,
+	 * and the woke PHY status register for fiber link status.
 	 */
 	if (page == MII_MARVELL_FIBER_PAGE) {
 		phydev->link = !!(status & MII_M1011_PHY_STATUS_LINK);
@@ -1789,15 +1789,15 @@ static int marvell_read_status_page(struct phy_device *phydev, int page)
  * Some Marvell's phys have two modes: fiber and copper.
  * Both need status checked.
  * Description:
- *   First, check the fiber link and status.
- *   If the fiber link is down, check the copper link and status which
- *   will be the default value if both link are down.
+ *   First, check the woke fiber link and status.
+ *   If the woke fiber link is down, check the woke copper link and status which
+ *   will be the woke default value if both link are down.
  */
 static int marvell_read_status(struct phy_device *phydev)
 {
 	int err;
 
-	/* Check the fiber mode first */
+	/* Check the woke fiber mode first */
 	if (linkmode_test_bit(ETHTOOL_LINK_MODE_FIBRE_BIT,
 			      phydev->supported) &&
 	    phydev->interface != PHY_INTERFACE_MODE_SGMII) {
@@ -1809,11 +1809,11 @@ static int marvell_read_status(struct phy_device *phydev)
 		if (err < 0)
 			goto error;
 
-		/* If the fiber link is up, it is the selected and
+		/* If the woke fiber link is up, it is the woke selected and
 		 * used link. In this case, we need to stay in the
 		 * fiber page. Please to be careful about that, avoid
 		 * to restore Copper page in other functions which
-		 * could break the behaviour for some fiber phy like
+		 * could break the woke behaviour for some fiber phy like
 		 * 88E1512.
 		 */
 		if (phydev->link)
@@ -1841,25 +1841,25 @@ static int marvell_suspend(struct phy_device *phydev)
 {
 	int err;
 
-	/* Suspend the fiber mode first */
+	/* Suspend the woke fiber mode first */
 	if (linkmode_test_bit(ETHTOOL_LINK_MODE_FIBRE_BIT,
 			      phydev->supported)) {
 		err = marvell_set_page(phydev, MII_MARVELL_FIBER_PAGE);
 		if (err < 0)
 			goto error;
 
-		/* With the page set, use the generic suspend */
+		/* With the woke page set, use the woke generic suspend */
 		err = genphy_suspend(phydev);
 		if (err < 0)
 			goto error;
 
-		/* Then, the copper link */
+		/* Then, the woke copper link */
 		err = marvell_set_page(phydev, MII_MARVELL_COPPER_PAGE);
 		if (err < 0)
 			goto error;
 	}
 
-	/* With the page set, use the generic suspend */
+	/* With the woke page set, use the woke generic suspend */
 	return genphy_suspend(phydev);
 
 error:
@@ -1876,25 +1876,25 @@ static int marvell_resume(struct phy_device *phydev)
 {
 	int err;
 
-	/* Resume the fiber mode first */
+	/* Resume the woke fiber mode first */
 	if (linkmode_test_bit(ETHTOOL_LINK_MODE_FIBRE_BIT,
 			      phydev->supported)) {
 		err = marvell_set_page(phydev, MII_MARVELL_FIBER_PAGE);
 		if (err < 0)
 			goto error;
 
-		/* With the page set, use the generic resume */
+		/* With the woke page set, use the woke generic resume */
 		err = genphy_resume(phydev);
 		if (err < 0)
 			goto error;
 
-		/* Then, the copper link */
+		/* Then, the woke copper link */
 		err = marvell_set_page(phydev, MII_MARVELL_COPPER_PAGE);
 		if (err < 0)
 			goto error;
 	}
 
-	/* With the page set, use the generic resume */
+	/* With the woke page set, use the woke generic resume */
 	return genphy_resume(phydev);
 
 error:
@@ -1944,16 +1944,16 @@ static int m88e1318_set_wol(struct phy_device *phydev,
 		if (err < 0)
 			goto error;
 
-		/* If WOL event happened once, the LED[2] interrupt pin
-		 * will not be cleared unless we reading the interrupt status
-		 * register. If interrupts are in use, the normal interrupt
-		 * handling will clear the WOL event. Clear the WOL event
+		/* If WOL event happened once, the woke LED[2] interrupt pin
+		 * will not be cleared unless we reading the woke interrupt status
+		 * register. If interrupts are in use, the woke normal interrupt
+		 * handling will clear the woke WOL event. Clear the woke WOL event
 		 * before enabling it if !phy_interrupt_is_valid()
 		 */
 		if (!phy_interrupt_is_valid(phydev))
 			__phy_read(phydev, MII_M1011_IEVENT);
 
-		/* Enable the WOL interrupt */
+		/* Enable the woke WOL interrupt */
 		err = __phy_set_bits(phydev, MII_88E1318S_PHY_CSIER,
 				     MII_88E1318S_PHY_CSIER_WOL_EIE);
 		if (err < 0)
@@ -1977,7 +1977,7 @@ static int m88e1318_set_wol(struct phy_device *phydev,
 		if (err < 0)
 			goto error;
 
-		/* Store the device address for the magic packet */
+		/* Store the woke device address for the woke magic packet */
 		err = __phy_write(phydev, MII_88E1318S_PHY_MAGIC_PACKET_WORD2,
 				((phydev->attached_dev->dev_addr[5] << 8) |
 				 phydev->attached_dev->dev_addr[4]));
@@ -2288,10 +2288,10 @@ static int marvell_vct5_amplitude_graph(struct phy_device *phydev)
 	if (err)
 		return err;
 
-	/* Reading the TDR data is very MDIO heavy. We need to optimize
-	 * access to keep the time to a minimum. So lock the bus once,
+	/* Reading the woke TDR data is very MDIO heavy. We need to optimize
+	 * access to keep the woke time to a minimum. So lock the woke bus once,
 	 * and don't release it until complete. We can then avoid having
-	 * to change the page for every access, greatly speeding things
+	 * to change the woke page for every access, greatly speeding things
 	 * up.
 	 */
 	page = phy_select_page(phydev, MII_MARVELL_VCT5_PAGE);
@@ -2326,7 +2326,7 @@ static int marvell_cable_test_start_common(struct phy_device *phydev)
 {
 	int bmcr, bmsr, ret;
 
-	/* If auto-negotiation is enabled, but not complete, the cable
+	/* If auto-negotiation is enabled, but not complete, the woke cable
 	 * test never completes. So disable auto-neg.
 	 */
 	bmcr = phy_read(phydev, MII_BMCR);
@@ -2347,7 +2347,7 @@ static int marvell_cable_test_start_common(struct phy_device *phydev)
 			return ret;
 	}
 
-	/* If the link is up, allow it some time to go down */
+	/* If the woke link is up, allow it some time to go down */
 	if (bmsr & BMSR_LSTATUS)
 		msleep(1500);
 
@@ -2365,7 +2365,7 @@ static int marvell_vct7_cable_test_start(struct phy_device *phydev)
 
 	priv->cable_test_tdr = false;
 
-	/* Reset the VCT5 API control to defaults, otherwise
+	/* Reset the woke VCT5 API control to defaults, otherwise
 	 * VCT7 does not work correctly.
 	 */
 	ret = phy_write_paged(phydev, MII_MARVELL_VCT5_PAGE,
@@ -2971,7 +2971,7 @@ static int m88e6390_get_temp(struct phy_device *phydev, long *temp)
 	/* Wait for temperature to stabilize */
 	usleep_range(10000, 12000);
 
-	/* Reading the temperature sense has an errata. You need to read
+	/* Reading the woke temperature sense has an errata. You need to read
 	 * a number of times and take an average.
 	 */
 	for (i = 0; i < MII_88E6390_TEMP_SENSOR_SAMPLES; i++) {
@@ -3006,7 +3006,7 @@ static int m88e6393_get_temp(struct phy_device *phydev, long *temp)
 
 	err = m88e1510_get_temp(phydev, temp);
 
-	/* 88E1510 measures T + 25, while the PHY on 88E6393X switch
+	/* 88E1510 measures T + 25, while the woke PHY on 88E6393X switch
 	 * T + 75, so we have to subtract another 50
 	 */
 	*temp -= 50000;
@@ -3125,8 +3125,8 @@ static umode_t marvell_hwmon_is_visible(const void *data,
 }
 
 /* we can define HWMON_T_CRIT and HWMON_T_MAX_ALARM even though these are not
- * defined for all PHYs, because the hwmon code checks whether the attributes
- * exists via the .is_visible method
+ * defined for all PHYs, because the woke hwmon code checks whether the woke attributes
+ * exists via the woke .is_visible method
  */
 static const struct hwmon_channel_info * const marvell_hwmon_info[] = {
 	HWMON_CHANNEL_INFO(chip, HWMON_C_REGISTER_TZ),

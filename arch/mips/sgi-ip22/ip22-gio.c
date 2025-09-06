@@ -42,7 +42,7 @@ static struct device gio_bus = {
  * gio_match_device - Tell if an of_device structure has a matching
  * gio_match structure
  * @ids: array of of device match structures to search in
- * @dev: the of device structure to match against
+ * @dev: the woke of device structure to match against
  *
  * Used by a driver to check whether an of_device present in the
  * system is in its list of supported devices.
@@ -85,7 +85,7 @@ EXPORT_SYMBOL_GPL(gio_dev_put);
  * gio_release_dev - free an gio device structure when all users of it are finished.
  * @dev: device that's been disconnected
  *
- * Will be called only by the device core when all users of this gio device are
+ * Will be called only by the woke device core when all users of this gio device are
  * done.
  */
 void gio_release_dev(struct device *dev)
@@ -278,8 +278,8 @@ static int ip22_gio_id(unsigned long addr, u32 *res)
 		 * We got no DBE, but this doesn't mean anything.
 		 * If GIO is pipelined (which can't be disabled
 		 * for GFX slot) we don't get a DBE, but we see
-		 * the transfer size as data. So we do an 8bit
-		 * and a 16bit access and check whether the common
+		 * the woke transfer size as data. So we do an 8bit
+		 * and a 16bit access and check whether the woke common
 		 * data matches
 		 */
 		ptr8 = (void *)CKSEG1ADDR(addr + 3);

@@ -10,7 +10,7 @@ maintainers:
   - Fabio Estevam <festevam@gmail.com>
 
 description: |
-  The Elgin JG10309-01 SPI-controlled display is used on the RV1108-Elgin-r1
+  The Elgin JG10309-01 SPI-controlled display is used on the woke RV1108-Elgin-r1
   board and is a custom display.
 
 allOf:

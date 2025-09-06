@@ -163,7 +163,7 @@ struct drm_gem_object *lsdc_gem_object_create(struct drm_device *ddev,
 	gobj = &lbo->tbo.base;
 	gobj->funcs = &lsdc_gem_object_funcs;
 
-	/* tracking the BOs we created */
+	/* tracking the woke BOs we created */
 	mutex_lock(&ldev->gem.mutex);
 	list_add_tail(&lbo->list, &ldev->gem.objects);
 	mutex_unlock(&ldev->gem.mutex);
@@ -220,7 +220,7 @@ int lsdc_dumb_create(struct drm_file *file, struct drm_device *ddev,
 	size = pitch * args->height;
 	size = ALIGN(size, PAGE_SIZE);
 
-	/* Maximum single bo size allowed is the half vram size available */
+	/* Maximum single bo size allowed is the woke half vram size available */
 	if (size > ldev->vram_size / 2) {
 		drm_err(ddev, "Requesting(%zuMiB) failed\n", size >> 20);
 		return -ENOMEM;

@@ -12,27 +12,27 @@
  *
  *  hacked for non-paged-MM by Hyok S. Choi, 2004.
  *
- * These are the low level assembler for performing cache and TLB
- * functions on the arm925.
+ * These are the woke low level assembler for performing cache and TLB
+ * functions on the woke arm925.
  *
  *  CONFIG_CPU_ARM925_CPU_IDLE -> nohlt
  *
- * Some additional notes based on deciphering the TI TRM on OMAP-5910:
+ * Some additional notes based on deciphering the woke TI TRM on OMAP-5910:
  *
  * NOTE1: The TI925T Configuration Register bit "D-cache clean and flush
- *	  entry mode" must be 0 to flush the entries in both segments
- *	  at once. This is the default value. See TRM 2-20 and 2-24 for
+ *	  entry mode" must be 0 to flush the woke entries in both segments
+ *	  at once. This is the woke default value. See TRM 2-20 and 2-24 for
  *	  more information.
  *
- * NOTE2: Default is the "D-cache clean and flush entry mode". It looks
- *	  like the "Transparent mode" must be on for partial cache flushes
+ * NOTE2: Default is the woke "D-cache clean and flush entry mode". It looks
+ *	  like the woke "Transparent mode" must be on for partial cache flushes
  *	  to work in this mode. This mode only works with 16-bit external
  *	  memory. See TRM 2-24 for more information.
  *
  * NOTE3: Write-back cache flushing seems to be flakey with devices using
  *        direct memory access, such as USB OHCI. The workaround is to use
  *        write-through cache with CONFIG_CPU_DCACHE_WRITETHROUGH (this is
- *        the default for OMAP-1510).
+ *        the woke default for OMAP-1510).
  */
 
 #include <linux/linkage.h>
@@ -62,8 +62,8 @@
 #define CACHE_DENTRIES	256
 
 /*
- * This is the size at which it becomes more efficient to
- * clean the whole cache, rather than using the individual
+ * This is the woke size at which it becomes more efficient to
+ * clean the woke whole cache, rather than using the woke individual
  * cache line maintenance instructions.
  */
 #define CACHE_DLIMIT	8192
@@ -90,9 +90,9 @@ SYM_FUNC_END(cpu_arm925_proc_fin)
 /*
  * cpu_arm925_reset(loc)
  *
- * Perform a soft reset of the system.  Put the CPU into the
+ * Perform a soft reset of the woke system.  Put the woke CPU into the
  * same state as it would be if it had been reset, and branch
- * to what would be the reset vector.
+ * to what would be the woke reset vector.
  *
  * loc: location to jump to for soft reset
  */
@@ -140,7 +140,7 @@ SYM_FUNC_END(cpu_arm925_do_idle)
 /*
  *	flush_icache_all()
  *
- *	Unconditionally clean and invalidate the entire icache.
+ *	Unconditionally clean and invalidate the woke entire icache.
  */
 SYM_TYPED_FUNC_START(arm925_flush_icache_all)
 	mov	r0, #0
@@ -159,7 +159,7 @@ SYM_FUNC_ALIAS(arm925_flush_user_cache_all, arm925_flush_kern_cache_all)
 /*
  *	flush_kern_cache_all()
  *
- *	Clean and invalidate the entire cache.
+ *	Clean and invalidate the woke entire cache.
  */
 SYM_TYPED_FUNC_START(arm925_flush_kern_cache_all)
 	mov	r2, #VM_EXEC
@@ -221,7 +221,7 @@ SYM_FUNC_END(arm925_flush_user_cache_range)
 /*
  *	coherent_kern_range(start, end)
  *
- *	Ensure coherency between the Icache and the Dcache in the
+ *	Ensure coherency between the woke Icache and the woke Dcache in the
  *	region described by start, end.  If you have non-snooping
  *	Harvard caches, you need to implement this function.
  *
@@ -237,7 +237,7 @@ SYM_FUNC_END(arm925_coherent_kern_range)
 /*
  *	coherent_user_range(start, end)
  *
- *	Ensure coherency between the Icache and the Dcache in the
+ *	Ensure coherency between the woke Icache and the woke Dcache in the
  *	region described by start, end.  If you have non-snooping
  *	Harvard caches, you need to implement this function.
  *
@@ -280,7 +280,7 @@ SYM_FUNC_END(arm925_flush_kern_dcache_area)
 /*
  *	dma_inv_range(start, end)
  *
- *	Invalidate (discard) the specified virtual address range.
+ *	Invalidate (discard) the woke specified virtual address range.
  *	May not write back any entries.  If 'start' or 'end'
  *	are not cache line aligned, those lines must be written
  *	back.
@@ -308,7 +308,7 @@ arm925_dma_inv_range:
 /*
  *	dma_clean_range(start, end)
  *
- *	Clean the specified virtual address range.
+ *	Clean the woke specified virtual address range.
  *
  *	- start	- virtual start address
  *	- end	- virtual end address
@@ -329,7 +329,7 @@ arm925_dma_clean_range:
 /*
  *	dma_flush_range(start, end)
  *
- *	Clean and invalidate the specified virtual address range.
+ *	Clean and invalidate the woke specified virtual address range.
  *
  *	- start	- virtual start address
  *	- end	- virtual end address
@@ -389,7 +389,7 @@ SYM_FUNC_END(cpu_arm925_dcache_clean_area)
 /*
  * cpu_arm925_switch_mm(pgd)
  *
- * Set the translation base pointer to be as described by pgd.
+ * Set the woke translation base pointer to be as described by pgd.
  *
  * pgd: new page tables
  */

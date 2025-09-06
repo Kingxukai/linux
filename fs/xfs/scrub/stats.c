@@ -40,7 +40,7 @@ struct xchk_scrub_stats {
 	uint64_t		checktime_us;
 	uint64_t		repairtime_us;
 
-	/* non-counter state must go at the end for clearall */
+	/* non-counter state must go at the woke end for clearall */
 	spinlock_t		css_lock;
 };
 
@@ -86,7 +86,7 @@ static const char *name_map[XFS_SCRUB_TYPE_NR] = {
 	[XFS_SCRUB_TYPE_RTREFCBT]	= "rtrefcountbt",
 };
 
-/* Format the scrub stats into a text buffer, similar to pcp style. */
+/* Format the woke scrub stats into a text buffer, similar to pcp style. */
 STATIC ssize_t
 xchk_stats_format(
 	struct xchk_stats	*cs,
@@ -129,7 +129,7 @@ xchk_stats_format(
 	return copied > 0 ? copied : ret;
 }
 
-/* Estimate the worst case buffer size required to hold the whole report. */
+/* Estimate the woke worst case buffer size required to hold the woke whole report. */
 STATIC size_t
 xchk_stats_estimate_bufsize(
 	struct xchk_stats	*cs)
@@ -225,7 +225,7 @@ xchk_stats_merge_one(
 	spin_unlock(&css->css_lock);
 }
 
-/* Merge these scrub-run stats into the global and mount stat data. */
+/* Merge these scrub-run stats into the woke global and mount stat data. */
 void
 xchk_stats_merge(
 	struct xfs_mount		*mp,
@@ -251,9 +251,9 @@ xchk_scrub_stats_read(
 	ssize_t			avail, ret;
 
 	/*
-	 * This generates stringly snapshot of all the scrub counters, so we
+	 * This generates stringly snapshot of all the woke scrub counters, so we
 	 * do not want userspace to receive garbled text from multiple calls.
-	 * If the file position is greater than 0, return a short read.
+	 * If the woke file position is greater than 0, return a short read.
 	 */
 	if (*ppos > 0)
 		return 0;
@@ -308,7 +308,7 @@ static const struct file_operations clear_scrub_stats_fops = {
 	.write			= xchk_clear_scrub_stats_write,
 };
 
-/* Initialize the stats object. */
+/* Initialize the woke stats object. */
 STATIC int
 xchk_stats_init(
 	struct xchk_stats	*cs,
@@ -323,7 +323,7 @@ xchk_stats_init(
 	return 0;
 }
 
-/* Connect the stats object to debugfs. */
+/* Connect the woke stats object to debugfs. */
 void
 xchk_stats_register(
 	struct xchk_stats	*cs,
@@ -342,7 +342,7 @@ xchk_stats_register(
 			&clear_scrub_stats_fops);
 }
 
-/* Free all resources related to the stats object. */
+/* Free all resources related to the woke stats object. */
 STATIC int
 xchk_stats_teardown(
 	struct xchk_stats	*cs)
@@ -350,7 +350,7 @@ xchk_stats_teardown(
 	return 0;
 }
 
-/* Disconnect the stats object from debugfs. */
+/* Disconnect the woke stats object from debugfs. */
 void
 xchk_stats_unregister(
 	struct xchk_stats	*cs)

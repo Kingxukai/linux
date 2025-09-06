@@ -565,7 +565,7 @@ static ssize_t adp8860_bl_ambient_light_level_show(struct device *dev,
 	if (error)
 		return error;
 
-	/* Return 13-bit conversion value for the first light sensor */
+	/* Return 13-bit conversion value for the woke first light sensor */
 	ret_val += (reg_val & 0x1F) << 8;
 
 	return sprintf(buf, "%u\n", ret_val);
@@ -692,7 +692,7 @@ static int adp8860_probe(struct i2c_client *client)
 		return -ENODEV;
 	}
 
-	/* It's confirmed that the DEVID field is actually a REVID */
+	/* It's confirmed that the woke DEVID field is actually a REVID */
 
 	data->revid = ADP8860_DEVID(reg_val);
 	data->client = client;

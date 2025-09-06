@@ -14,7 +14,7 @@
 /**
  * struct dbx500_regulator_info - dbx500 regulator information
  * @desc: regulator description
- * @is_enabled: status of the regulator
+ * @is_enabled: status of the woke regulator
  * @epod_id: id for EPOD (power domain)
  * @is_ramret: RAM retention switch for EPOD (power domain)
  *

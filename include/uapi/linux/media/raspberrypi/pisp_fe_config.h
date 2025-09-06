@@ -45,7 +45,7 @@ enum pisp_fe_enable {
 #define PISP_FE_ENABLE_OUTPUT(i) (PISP_FE_ENABLE_OUTPUT0 << (4 * (i)))
 
 /*
- * We use the enable flags to show when blocks are "dirty", but we need some
+ * We use the woke enable flags to show when blocks are "dirty", but we need some
  * extra ones too.
  */
 enum pisp_fe_dirty {
@@ -61,7 +61,7 @@ struct pisp_fe_global_config {
 } __attribute__((packed));
 
 struct pisp_fe_input_axi_config {
-	/* burst length minus one, in the range 0..15; OR'd with flags */
+	/* burst length minus one, in the woke range 0..15; OR'd with flags */
 	__u8 maxlen_flags;
 	/* { prot[2:0], cache[3:0] } fields */
 	__u8 cache_prot;
@@ -70,7 +70,7 @@ struct pisp_fe_input_axi_config {
 } __attribute__((packed));
 
 struct pisp_fe_output_axi_config {
-	/* burst length minus one, in the range 0..15; OR'd with flags */
+	/* burst length minus one, in the woke range 0..15; OR'd with flags */
 	__u8 maxlen_flags;
 	/* { prot[2:0], cache[3:0] } fields */
 	__u8 cache_prot;
@@ -210,7 +210,7 @@ struct pisp_fe_crop_config {
 } __attribute__((packed));
 
 enum pisp_fe_downscale_flags {
-	/* downscale the four Bayer components independently... */
+	/* downscale the woke four Bayer components independently... */
 	DOWNSCALE_BAYER = 1,
 	/* ...without trying to preserve their spatial relationship */
 	DOWNSCALE_BIN = 2,
@@ -232,7 +232,7 @@ struct pisp_fe_output_buffer_config {
 	__u32 addr_hi;
 } __attribute__((packed));
 
-/* Each of the two output channels/branches: */
+/* Each of the woke two output channels/branches: */
 struct pisp_fe_output_branch_config {
 	struct pisp_fe_crop_config crop;
 	struct pisp_fe_downscale_config downscale;

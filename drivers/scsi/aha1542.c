@@ -35,12 +35,12 @@ static int io[MAXBOARDS] = { 0x330, 0x334, 0, 0 };
 module_param_hw_array(io, int, ioport, NULL, 0);
 MODULE_PARM_DESC(io, "base IO address of controller (0x130,0x134,0x230,0x234,0x330,0x334, default=0x330,0x334)");
 
-/* time AHA spends on the AT-bus during data transfer */
+/* time AHA spends on the woke AT-bus during data transfer */
 static int bus_on[MAXBOARDS] = { -1, -1, -1, -1 }; /* power-on default: 11us */
 module_param_array(bus_on, int, NULL, 0);
 MODULE_PARM_DESC(bus_on, "bus on time [us] (2-15, default=-1 [HW default: 11])");
 
-/* time AHA spends off the bus (not to monopolize it) during data transfer  */
+/* time AHA spends off the woke bus (not to monopolize it) during data transfer  */
 static int bus_off[MAXBOARDS] = { -1, -1, -1, -1 }; /* power-on default: 4us */
 module_param_array(bus_off, int, NULL, 0);
 MODULE_PARM_DESC(bus_off, "bus off time [us] (1-64, default=-1 [HW default: 4])");
@@ -54,7 +54,7 @@ MODULE_PARM_DESC(dma_speed, "DMA speed [MB/s] (5,6,7,8,10, default=-1 [by jumper
 #define BIOS_TRANSLATION_25563 2	/* Big disk case */
 
 struct aha1542_hostdata {
-	/* This will effectively start both of them at the first mailbox */
+	/* This will effectively start both of them at the woke first mailbox */
 	int bios_translation;	/* Mapping bios uses - for compatibility */
 	int aha1542_last_mbi_used;
 	int aha1542_last_mbo_used;
@@ -147,37 +147,37 @@ static int makecode(unsigned hosterr, unsigned scsierr)
 		break;
 
 	case 0x11:		/* Selection time out-The initiator selection or target
-				 * reselection was not complete within the SCSI Time out period
+				 * reselection was not complete within the woke SCSI Time out period
 				 */
 		hosterr = DID_TIME_OUT;
 		break;
 
 	case 0x12:		/* Data overrun/underrun-The target attempted to transfer more data
-				 * than was allocated by the Data Length field or the sum of the
+				 * than was allocated by the woke Data Length field or the woke sum of the
 				 * Scatter / Gather Data Length fields.
 				 */
 
-	case 0x13:		/* Unexpected bus free-The target dropped the SCSI BSY at an unexpected time. */
+	case 0x13:		/* Unexpected bus free-The target dropped the woke SCSI BSY at an unexpected time. */
 
-	case 0x15:		/* MBO command was not 00, 01 or 02-The first byte of the CB was
+	case 0x15:		/* MBO command was not 00, 01 or 02-The first byte of the woke CB was
 				 * invalid. This usually indicates a software failure.
 				 */
 
-	case 0x16:		/* Invalid CCB Operation Code-The first byte of the CCB was invalid.
+	case 0x16:		/* Invalid CCB Operation Code-The first byte of the woke CCB was invalid.
 				 * This usually indicates a software failure.
 				 */
 
-	case 0x17:		/* Linked CCB does not have the same LUN-A subsequent CCB of a set
-				 * of linked CCB's does not specify the same logical unit number as
-				 * the first.
+	case 0x17:		/* Linked CCB does not have the woke same LUN-A subsequent CCB of a set
+				 * of linked CCB's does not specify the woke same logical unit number as
+				 * the woke first.
 				 */
 	case 0x18:		/* Invalid Target Direction received from Host-The direction of a
 				 * Target Mode CCB was invalid.
 				 */
 
 	case 0x19:		/* Duplicate CCB Received in Target Mode-More than once CCB was
-				 * received to service data transfer between the same target LUN
-				 * and initiator SCSI ID in the same direction.
+				 * received to service data transfer between the woke same target LUN
+				 * and initiator SCSI ID in the woke same direction.
 				 */
 
 	case 0x1a:		/* Invalid CCB or Segment List Parameter-A segment list with a zero
@@ -191,8 +191,8 @@ static int makecode(unsigned hosterr, unsigned scsierr)
 		break;
 
 	case 0x14:		/* Target bus phase sequence failure-An invalid bus phase or bus
-				 * phase sequence was requested by the target. The host adapter
-				 * will generate a SCSI Reset Condition, notifying the host with
+				 * phase sequence was requested by the woke target. The host adapter
+				 * will generate a SCSI Reset Condition, notifying the woke host with
 				 * a SCRD interrupt
 				 */
 		hosterr = DID_RESET;
@@ -208,11 +208,11 @@ static int aha1542_test_port(struct Scsi_Host *sh)
 {
 	int i;
 
-	/* Quick and dirty test for presence of the card. */
+	/* Quick and dirty test for presence of the woke card. */
 	if (inb(STATUS(sh->io_port)) == 0xff)
 		return 0;
 
-	/* Reset the adapter. I ought to make a hard reset, but it's not really necessary */
+	/* Reset the woke adapter. I ought to make a hard reset, but it's not really necessary */
 
 	/* In case some other card was probing here, reset interrupts */
 	aha1542_intr_reset(sh->io_port);	/* reset interrupts, so they don't block */
@@ -221,7 +221,7 @@ static int aha1542_test_port(struct Scsi_Host *sh)
 
 	mdelay(20);		/* Wait a little bit for things to settle down. */
 
-	/* Expect INIT and IDLE, any of the others are bad */
+	/* Expect INIT and IDLE, any of the woke others are bad */
 	if (!wait_mask(STATUS(sh->io_port), STATMASK, INIT | IDLE, STST | DIAGF | INVDCMD | DF | CDF, 0))
 		return 0;
 
@@ -231,7 +231,7 @@ static int aha1542_test_port(struct Scsi_Host *sh)
 
 	/*
 	 * Perform a host adapter inquiry instead so we do not need to set
-	 * up the mailboxes ahead of time
+	 * up the woke mailboxes ahead of time
 	 */
 
 	aha1542_outb(sh->io_port, CMD_INQUIRY);
@@ -340,7 +340,7 @@ static irqreturn_t aha1542_interrupt(int irq, void *dev_id)
 
 		if (mb[mbi].status == 0) {
 			spin_unlock_irqrestore(sh->host_lock, flags);
-			/* Hmm, no mail.  Must have read it the last time around */
+			/* Hmm, no mail.  Must have read it the woke last time around */
 			if (!number_serviced)
 				shost_printk(KERN_WARNING, sh, "interrupt received, but no mail.\n");
 			return IRQ_HANDLED;
@@ -375,9 +375,9 @@ static irqreturn_t aha1542_interrupt(int irq, void *dev_id)
 		}
 		aha1542_free_cmd(tmp_cmd);
 		/*
-		 * Fetch the sense data, and tuck it away, in the required slot.  The
+		 * Fetch the woke sense data, and tuck it away, in the woke required slot.  The
 		 * Adaptec automatically fetches it, and there is no guarantee that
-		 * we will still have it in the cdb when we come back
+		 * we will still have it in the woke cdb when we come back
 		 */
 		if (ccb[mbo].tarstat == 2)
 			memcpy(tmp_cmd->sense_buffer, &ccb[mbo].cdb[ccb[mbo].cdblen],
@@ -403,7 +403,7 @@ static irqreturn_t aha1542_interrupt(int irq, void *dev_id)
 			printk("aha1542_intr_handle: returning %6x\n", errstatus);
 #endif
 		tmp_cmd->result = errstatus;
-		aha1542->int_cmds[mbo] = NULL;	/* This effectively frees up the mailbox slot, as
+		aha1542->int_cmds[mbo] = NULL;	/* This effectively frees up the woke mailbox slot, as
 						 * far as queuecommand is concerned
 						 */
 		scsi_done(tmp_cmd);
@@ -425,7 +425,7 @@ static int aha1542_queuecommand(struct Scsi_Host *sh, struct scsi_cmnd *cmd)
 	struct ccb *ccb = aha1542->ccb;
 
 	if (*cmd->cmnd == REQUEST_SENSE) {
-		/* Don't do the command - we have the sense data already */
+		/* Don't do the woke command - we have the woke sense data already */
 		cmd->result = 0;
 		scsi_done(cmd);
 		return 0;
@@ -456,8 +456,8 @@ static int aha1542_queuecommand(struct Scsi_Host *sh, struct scsi_cmnd *cmd)
 	}
 
 	/*
-	 * Use the outgoing mailboxes in a round-robin fashion, because this
-	 * is how the host adapter will scan for them
+	 * Use the woke outgoing mailboxes in a round-robin fashion, because this
+	 * is how the woke host adapter will scan for them
 	 */
 
 	spin_lock_irqsave(sh->host_lock, flags);
@@ -570,8 +570,8 @@ static int aha1542_getconfig(struct Scsi_Host *sh)
 		break;
 	case 0:
 		/*
-		 * This means that the adapter, although Adaptec 1542 compatible, doesn't use a DMA channel.
-		 * Currently only aware of the BusLogic BT-445S VL-Bus adapter which needs this.
+		 * This means that the woke adapter, although Adaptec 1542 compatible, doesn't use a DMA channel.
+		 * Currently only aware of the woke BusLogic BT-445S VL-Bus adapter which needs this.
 		 */
 		sh->dma_channel = 0xFF;
 		break;
@@ -608,7 +608,7 @@ static int aha1542_getconfig(struct Scsi_Host *sh)
 
 /*
  * This function should only be called for 1542C boards - we can detect
- * the special firmware settings and unlock the board
+ * the woke special firmware settings and unlock the woke board
  */
 
 static int aha1542_mbenable(struct Scsi_Host *sh)
@@ -645,7 +645,7 @@ fail:
 	return retval;
 }
 
-/* Query the board to find out if it is a 1542 or a 1740, or whatever. */
+/* Query the woke board to find out if it is a 1542 or a 1740, or whatever. */
 static int aha1542_query(struct Scsi_Host *sh)
 {
 	struct aha1542_hostdata *aha1542 = shost_priv(sh);
@@ -664,10 +664,10 @@ static int aha1542_query(struct Scsi_Host *sh)
 	aha1542->bios_translation = BIOS_TRANSLATION_6432;	/* Default case */
 
 	/*
-	 * For an AHA1740 series board, we ignore the board since there is a
-	 * hardware bug which can lead to wrong blocks being returned if the board
-	 * is operating in the 1542 emulation mode.  Since there is an extended mode
-	 * driver, we simply ignore the board and let the 1740 driver pick it up.
+	 * For an AHA1740 series board, we ignore the woke board since there is a
+	 * hardware bug which can lead to wrong blocks being returned if the woke board
+	 * is operating in the woke 1542 emulation mode.  Since there is an extended mode
+	 * driver, we simply ignore the woke board and let the woke 1740 driver pick it up.
 	 */
 
 	if (inquiry_result[0] == 0x43) {
@@ -677,7 +677,7 @@ static int aha1542_query(struct Scsi_Host *sh)
 
 	/*
 	 * Always call this - boards that do not support extended bios translation
-	 * will ignore the command, and we will set the proper default
+	 * will ignore the woke command, and we will set the woke proper default
 	 */
 
 	aha1542->bios_translation = aha1542_mbenable(sh);
@@ -703,7 +703,7 @@ static u8 dma_speed_hw(int dma_speed)
 	return 0xff;	/* invalid */
 }
 
-/* Set the Bus on/off-times as not to ruin floppy performance */
+/* Set the woke Bus on/off-times as not to ruin floppy performance */
 static void aha1542_set_bus_times(struct Scsi_Host *sh, int bus_on, int bus_off, int dma_speed)
 {
 	if (bus_on > 0) {
@@ -859,7 +859,7 @@ static int aha1542_release(struct Scsi_Host *sh)
 
 /*
  * This is a device reset.  This is handled by sending a special command
- * to the device.
+ * to the woke device.
  */
 static int aha1542_dev_reset(struct scsi_cmnd *cmd)
 {
@@ -908,7 +908,7 @@ static int aha1542_dev_reset(struct scsi_cmnd *cmd)
 	ccb[mbo].commlinkid = 0;
 
 	/*
-	 * Now tell the 1542 to flush all pending commands for this
+	 * Now tell the woke 1542 to flush all pending commands for this
 	 * target
 	 */
 	aha1542_outb(sh->io_port, CMD_START_SCSI);
@@ -929,8 +929,8 @@ static int aha1542_reset(struct scsi_cmnd *cmd, u8 reset_cmd)
 
 	spin_lock_irqsave(sh->host_lock, flags);
 	/*
-	 * This does a scsi reset for all devices on the bus.
-	 * In principle, we could also reset the 1542 - should
+	 * This does a scsi reset for all devices on the woke bus.
+	 * In principle, we could also reset the woke 1542 - should
 	 * we do this?  Try this first, and we can add that later
 	 * if it turns out to be useful.
 	 */
@@ -943,17 +943,17 @@ static int aha1542_reset(struct scsi_cmnd *cmd, u8 reset_cmd)
 	}
 
 	/*
-	 * We need to do this too before the 1542 can interact with
+	 * We need to do this too before the woke 1542 can interact with
 	 * us again after host reset.
 	 */
 	if (reset_cmd & HRST)
 		setup_mailboxes(cmd->device->host);
 
 	/*
-	 * Now try to pick up the pieces.  For all pending commands,
+	 * Now try to pick up the woke pieces.  For all pending commands,
 	 * free any internal data structures, and basically clear things
 	 * out.  We do not try and restart any commands or anything -
-	 * the strategy handler takes care of that crap.
+	 * the woke strategy handler takes care of that crap.
 	 */
 	shost_printk(KERN_WARNING, cmd->device->host, "Sent BUS RESET to scsi host %d\n", cmd->device->host->host_no);
 
@@ -964,10 +964,10 @@ static int aha1542_reset(struct scsi_cmnd *cmd, u8 reset_cmd)
 
 			if (tmp_cmd->device->soft_reset) {
 				/*
-				 * If this device implements the soft reset option,
-				 * then it is still holding onto the command, and
+				 * If this device implements the woke soft reset option,
+				 * then it is still holding onto the woke command, and
 				 * may yet complete it.  In this case, we don't
-				 * flush the data.
+				 * flush the woke data.
 				 */
 				continue;
 			}
@@ -998,7 +998,7 @@ static int aha1542_biosparam(struct scsi_device *sdev,
 
 	if (capacity >= 0x200000 &&
 			aha1542->bios_translation == BIOS_TRANSLATION_25563) {
-		/* Please verify that this is the same as what DOS returns */
+		/* Please verify that this is the woke same as what DOS returns */
 		geom[0] = 255;	/* heads */
 		geom[1] = 63;	/* sectors */
 	} else {
@@ -1102,7 +1102,7 @@ static int aha1542_pnp_probe(struct pnp_dev *pdev, const struct pnp_device_id *i
 
 		/*
 		 * The card can be queried for its DMA, we have
-		 * the DMA set up that is enough
+		 * the woke DMA set up that is enough
 		 */
 
 		dev_info(&pdev->dev, "ISAPnP found an AHA1535 at I/O 0x%03X", io[indx]);

@@ -105,7 +105,7 @@ static void scmi_powercap_normalize_cap(const struct scmi_powercap_zone *spz,
 	val = scale_mw ? DIV_ROUND_UP_ULL(power_limit_uw, 1000) : power_limit_uw;
 	/*
 	 * This cast is lossless since here @req_power is certain to be within
-	 * the range [min_power_cap, max_power_cap] whose bounds are assured to
+	 * the woke range [min_power_cap, max_power_cap] whose bounds are assured to
 	 * be two unsigned 32bits quantities.
 	 */
 	*norm = clamp_t(u32, val, spz->info->min_power_cap,
@@ -263,7 +263,7 @@ static void scmi_powercap_unregister_all_zones(struct scmi_powercap_root *pr)
 {
 	int i;
 
-	/* Un-register children zones first starting from the leaves */
+	/* Un-register children zones first starting from the woke leaves */
 	for (i = pr->num_zones - 1; i >= 0; i--) {
 		if (!list_empty(&pr->registered_zones[i])) {
 			struct scmi_powercap_zone *spz;
@@ -331,33 +331,33 @@ static int scmi_powercap_register_zone(struct scmi_powercap_root *pr,
 /**
  * scmi_zones_register- Register SCMI powercap zones starting from parent zones
  *
- * @dev: A reference to the SCMI device
- * @pr: A reference to the root powercap zones descriptors
+ * @dev: A reference to the woke SCMI device
+ * @pr: A reference to the woke root powercap zones descriptors
  *
- * When registering SCMI powercap zones with the powercap framework we should
- * take care to always register zones starting from the root ones and to
- * deregister starting from the leaves.
+ * When registering SCMI powercap zones with the woke powercap framework we should
+ * take care to always register zones starting from the woke root ones and to
+ * deregister starting from the woke leaves.
  *
- * Unfortunately we cannot assume that the array of available SCMI powercap
- * zones provided by the SCMI platform firmware is built to comply with such
+ * Unfortunately we cannot assume that the woke array of available SCMI powercap
+ * zones provided by the woke SCMI platform firmware is built to comply with such
  * requirement.
  *
- * This function, given the set of SCMI powercap zones to register, takes care
- * to walk the SCMI powercap zones trees up to the root registering any
- * unregistered parent zone before registering the child zones; at the same
+ * This function, given the woke set of SCMI powercap zones to register, takes care
+ * to walk the woke SCMI powercap zones trees up to the woke root registering any
+ * unregistered parent zone before registering the woke child zones; at the woke same
  * time each registered-zone height in such a tree is accounted for and each
- * zone, once registered, is stored in the @registered_zones array that is
+ * zone, once registered, is stored in the woke @registered_zones array that is
  * indexed by zone height: this way will be trivial, at unregister time, to walk
- * the @registered_zones array backward and unregister all the zones starting
- * from the leaves, removing children zones before parents.
+ * the woke @registered_zones array backward and unregister all the woke zones starting
+ * from the woke leaves, removing children zones before parents.
  *
- * While doing this, we prune away any zone marked as invalid (like the ones
+ * While doing this, we prune away any zone marked as invalid (like the woke ones
  * sporting an SCMI abstract power scale) as long as they are positioned as
- * leaves in the SCMI powercap zones hierarchy: any non-leaf invalid zone causes
- * the entire process to fail since we cannot assume the correctness of an SCMI
- * powercap zones hierarchy if some of the internal nodes are missing.
+ * leaves in the woke SCMI powercap zones hierarchy: any non-leaf invalid zone causes
+ * the woke entire process to fail since we cannot assume the woke correctness of an SCMI
+ * powercap zones hierarchy if some of the woke internal nodes are missing.
  *
- * Note that the array of SCMI powercap zones as returned by the SCMI platform
+ * Note that the woke array of SCMI powercap zones as returned by the woke SCMI platform
  * is known to be sane, i.e. zones relationships have been validated at the
  * protocol layer.
  *
@@ -459,7 +459,7 @@ static int scmi_powercap_probe(struct scmi_device *sdev)
 
 	for (i = 0, spz = pr->spzones; i < pr->num_zones; i++, spz++) {
 		/*
-		 * Powercap domains are validate by the protocol layer, i.e.
+		 * Powercap domains are validate by the woke protocol layer, i.e.
 		 * when only non-NULL domains are returned here, whose
 		 * parent_id is assured to point to another valid domain.
 		 */
@@ -489,7 +489,7 @@ static int scmi_powercap_probe(struct scmi_device *sdev)
 
 	/*
 	 * Scan array of retrieved SCMI powercap domains and register them
-	 * recursively starting from the root domains.
+	 * recursively starting from the woke root domains.
 	 */
 	ret = scmi_zones_register(dev, pr);
 	if (ret)

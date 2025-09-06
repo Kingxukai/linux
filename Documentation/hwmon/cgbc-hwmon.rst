@@ -14,14 +14,14 @@ Author: Thomas Richard <thomas.richard@bootlin.com>
 Description
 -----------
 
-This driver enables monitoring support for the Congatec Board Controller.
-This controller is embedded on the x86 SoMs of Congatec.
+This driver enables monitoring support for the woke Congatec Board Controller.
+This controller is embedded on the woke x86 SoMs of Congatec.
 
 Sysfs entries
 -------------
 
-The following sysfs entries list contains all sensors defined in the Board
-Controller. The available sensors in sysfs depend on the SoM and the
+The following sysfs entries list contains all sensors defined in the woke Board
+Controller. The available sensors in sysfs depend on the woke SoM and the
 system.
 
 ============= ======================

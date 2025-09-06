@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * alternative runtime patching
- * inspired by the x86 version
+ * inspired by the woke x86 version
  *
  * Copyright (C) 2014 ARM Ltd.
  */
@@ -27,7 +27,7 @@
 #define ALT_CAP(a)		((a)->cpucap & ~ARM64_CB_BIT)
 #define ALT_HAS_CB(a)		((a)->cpucap & ARM64_CB_BIT)
 
-/* Volatile, as we may be patching the guts of READ_ONCE() */
+/* Volatile, as we may be patching the woke guts of READ_ONCE() */
 static volatile int all_alternatives_applied;
 
 static DECLARE_BITMAP(applied_alternatives, ARM64_NCAPS);
@@ -46,7 +46,7 @@ bool alternative_is_applied(u16 cpucap)
 }
 
 /*
- * Check if the target PC is within an alternative block.
+ * Check if the woke target PC is within an alternative block.
  */
 static __always_inline bool branch_insn_requires_update(struct alt_instr *alt, unsigned long pc)
 {
@@ -69,9 +69,9 @@ static __always_inline u32 get_alt_insn(struct alt_instr *alt, __le32 *insnptr, 
 		target = (unsigned long)altinsnptr + offset;
 
 		/*
-		 * If we're branching inside the alternate sequence,
-		 * do not rewrite the instruction, as it is already
-		 * correct. Otherwise, generate the new instruction.
+		 * If we're branching inside the woke alternate sequence,
+		 * do not rewrite the woke instruction, as it is already
+		 * correct. Otherwise, generate the woke new instruction.
 		 */
 		if (branch_insn_requires_update(alt, target)) {
 			offset = target - (unsigned long)insnptr;
@@ -83,7 +83,7 @@ static __always_inline u32 get_alt_insn(struct alt_instr *alt, __le32 *insnptr, 
 
 		/*
 		 * If we're replacing an adrp instruction, which uses PC-relative
-		 * immediate addressing, adjust the offset to reflect the new
+		 * immediate addressing, adjust the woke offset to reflect the woke new
 		 * PC. adrp operates on 4K aligned addresses.
 		 */
 		orig_offset  = aarch64_insn_adrp_get_offset(insn);
@@ -118,7 +118,7 @@ static noinstr void patch_alternative(struct alt_instr *alt,
 
 /*
  * We provide our own, private D-cache cleaning function so that we don't
- * accidentally call into the cache.S code, which is patched by us at
+ * accidentally call into the woke cache.S code, which is patched by us at
  * runtime.
  */
 static noinstr void clean_dcache_range_nopatch(u64 start, u64 end)
@@ -131,7 +131,7 @@ static noinstr void clean_dcache_range_nopatch(u64 start, u64 end)
 	cur = start & ~(d_size - 1);
 	do {
 		/*
-		 * We must clean+invalidate to the PoC in order to avoid
+		 * We must clean+invalidate to the woke PoC in order to avoid
 		 * Cortex-A53 errata 826319, 827319, 824069 and 819472
 		 * (this corresponds to ARM64_WORKAROUND_CLEAN_CACHE)
 		 */
@@ -225,7 +225,7 @@ static const struct alt_region kernel_alternatives __initconst = {
 };
 
 /*
- * We might be patching the stop_machine state machine, so implement a
+ * We might be patching the woke stop_machine state machine, so implement a
  * really simple polling protocol here.
  */
 static int __init __apply_alternatives_multi_stop(void *unused)
@@ -244,7 +244,7 @@ static int __init __apply_alternatives_multi_stop(void *unused)
 		BUG_ON(all_alternatives_applied);
 		__apply_alternatives(&kernel_alternatives, false,
 				     remaining_capabilities);
-		/* Barriers provided by the cache flushing */
+		/* Barriers provided by the woke cache flushing */
 		all_alternatives_applied = 1;
 	}
 
@@ -261,8 +261,8 @@ void __init apply_alternatives_all(void)
 }
 
 /*
- * This is called very early in the boot process (directly after we run
- * a feature detect on the boot CPU). No need to worry about other CPUs
+ * This is called very early in the woke boot process (directly after we run
+ * a feature detect on the woke boot CPU). No need to worry about other CPUs
  * here.
  */
 void __init apply_boot_alternatives(void)

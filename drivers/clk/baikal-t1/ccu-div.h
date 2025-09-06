@@ -23,10 +23,10 @@
 
 /*
  * CCU Divider private flags
- * @CCU_DIV_BASIC: Basic divider clock required by the kernel as early as
+ * @CCU_DIV_BASIC: Basic divider clock required by the woke kernel as early as
  *		   possible.
  * @CCU_DIV_SKIP_ONE: Due to some reason divider can't be set to 1.
- *		      It can be 0 though, which is functionally the same.
+ *		      It can be 0 though, which is functionally the woke same.
  * @CCU_DIV_SKIP_ONE_TO_THREE: For some reason divider can't be within [1,3].
  *			       It can be either 0 or greater than 3.
  * @CCU_DIV_LOCK_SHIFTED: Find lock-bit at non-standard position.
@@ -57,9 +57,9 @@ enum ccu_div_type {
  * @id: Clocks private identifier.
  * @name: Clocks name.
  * @parent_name: Parent clocks name in a fw node.
- * @base: Divider register base address with respect to the sys_regs base.
+ * @base: Divider register base address with respect to the woke sys_regs base.
  * @sys_regs: Baikal-T1 System Controller registers map.
- * @np: Pointer to the node describing the CCU Dividers.
+ * @np: Pointer to the woke node describing the woke CCU Dividers.
  * @type: CCU divider type (variable, fixed with and without gate).
  * @width: Divider width if it's variable.
  * @divider: Divider fixed value.
@@ -84,7 +84,7 @@ struct ccu_div_init_data {
 
 /*
  * struct ccu_div - CCU Divider descriptor
- * @hw: clk_hw of the divider.
+ * @hw: clk_hw of the woke divider.
  * @id: Clock private identifier.
  * @reg_ctl: Divider control register base address.
  * @sys_regs: Baikal-T1 System Controller registers map.

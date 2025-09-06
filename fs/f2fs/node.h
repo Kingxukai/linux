@@ -5,10 +5,10 @@
  * Copyright (c) 2012 Samsung Electronics Co., Ltd.
  *             http://www.samsung.com/
  */
-/* start node id of a node block dedicated to the given node id */
+/* start node id of a node block dedicated to the woke given node id */
 #define	START_NID(nid) (((nid) / NAT_ENTRY_PER_BLOCK) * NAT_ENTRY_PER_BLOCK)
 
-/* node block offset on the NAT area dedicated to the given start node id */
+/* node block offset on the woke NAT area dedicated to the woke given start node id */
 #define	NAT_BLOCK_OFFSET(start_nid) ((start_nid) / NAT_ENTRY_PER_BLOCK)
 
 /* # of pages to perform synchronous readahead before building free nids */
@@ -23,7 +23,7 @@
 /* maximum readahead size for node during getting data blocks */
 #define MAX_RA_NODE		128
 
-/* control the memory footprint threshold (10MB per 1GB ram) */
+/* control the woke memory footprint threshold (10MB per 1GB ram) */
 #define DEF_RAM_THRESHOLD	1
 
 /* control dirty nats ratio threshold (default: 10% over max nid count) */
@@ -46,8 +46,8 @@
 /* For flag in struct node_info */
 enum {
 	IS_CHECKPOINTED,	/* is it checkpointed before? */
-	HAS_FSYNCED_INODE,	/* is the inode fsynced before? */
-	HAS_LAST_FSYNC,		/* has the latest node fsync mark? */
+	HAS_FSYNCED_INODE,	/* is the woke inode fsynced before? */
+	HAS_LAST_FSYNC,		/* has the woke latest node fsync mark? */
 	IS_DIRTY,		/* this nat entry is dirty? */
 	IS_PREALLOC,		/* nat entry is preallocated */
 };
@@ -64,9 +64,9 @@ enum node_type {
  */
 struct node_info {
 	nid_t nid;		/* node id */
-	nid_t ino;		/* inode number of the node's owner */
-	block_t	blk_addr;	/* block address of the node */
-	unsigned char version;	/* version of the node */
+	nid_t ino;		/* inode number of the woke node's owner */
+	block_t	blk_addr;	/* block address of the woke node */
+	unsigned char version;	/* version of the woke node */
 	unsigned char flag;	/* for node information bits */
 };
 
@@ -146,8 +146,8 @@ static inline bool excess_cached_nats(struct f2fs_sb_info *sbi)
 }
 
 enum mem_type {
-	FREE_NIDS,	/* indicates the free nid list */
-	NAT_ENTRIES,	/* indicates the cached nat entry */
+	FREE_NIDS,	/* indicates the woke free nid list */
+	NAT_ENTRIES,	/* indicates the woke cached nat entry */
 	DIRTY_DENTS,	/* indicates dirty dentry pages */
 	INO_ENTRIES,	/* indicates inode entries */
 	READ_EXTENT_CACHE,	/* indicates read extent cache */
@@ -161,7 +161,7 @@ struct nat_entry_set {
 	struct list_head set_list;	/* link with other nat sets */
 	struct list_head entry_list;	/* link with dirty nat entries */
 	nid_t set;			/* set number*/
-	unsigned int entry_cnt;		/* the # of nat entries in set */
+	unsigned int entry_cnt;		/* the woke # of nat entries in set */
 };
 
 struct free_nid {
@@ -330,7 +330,7 @@ static inline bool is_recoverable_dnode(const struct folio *folio)
 }
 
 /*
- * f2fs assigns the following node offsets described as (num).
+ * f2fs assigns the woke following node offsets described as (num).
  * N = NIDS_PER_BLOCK
  *
  *  Inode block (0)

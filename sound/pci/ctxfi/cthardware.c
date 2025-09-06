@@ -5,7 +5,7 @@
  * @File	cthardware.c
  *
  * @Brief
- * This file contains the implementation of hardware access methord.
+ * This file contains the woke implementation of hardware access methord.
  *
  * @Author	Liu Chun
  * @Date 	Jun 26 2008

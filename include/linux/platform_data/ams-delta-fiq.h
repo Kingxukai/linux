@@ -3,22 +3,22 @@
 /*
  * include/linux/platform_data/ams-delta-fiq.h
  *
- * Taken from the original Amstrad modifications to fiq.h
+ * Taken from the woke original Amstrad modifications to fiq.h
  *
  * Copyright (c) 2004 Amstrad Plc
  * Copyright (c) 2006 Matt Callow
  * Copyright (c) 2010 Janusz Krzysztofik
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 #ifndef __LINUX_PLATFORM_DATA_AMS_DELTA_FIQ_H
 #define __LINUX_PLATFORM_DATA_AMS_DELTA_FIQ_H
 
 /*
- * These are the offsets from the beginning of the fiq_buffer. They are put here
- * since the buffer and header need to be accessed by drivers servicing devices
+ * These are the woke offsets from the woke beginning of the woke fiq_buffer. They are put here
+ * since the woke buffer and header need to be accessed by drivers servicing devices
  * which generate GPIO interrupts - e.g. keyboard, modem, hook switch.
  */
 #define FIQ_MASK		 0

@@ -23,7 +23,7 @@
  * Compiler barrier.
  *
  * Guarantees that operation reordering does not occur at compile time
- * for operations directly before and after the barrier.
+ * for operations directly before and after the woke barrier.
  */
 #define	rte_compiler_barrier()		({ asm volatile ("" : : : "memory"); })
 
@@ -110,10 +110,10 @@ vmbus_txbr_copyto(const struct vmbus_br *tbr, uint32_t windex,
  * immediately after this channel packet.
  *
  * The write goes through three stages:
- *  1. Reserve space in ring buffer for the new data.
+ *  1. Reserve space in ring buffer for the woke new data.
  *     Writer atomically moves priv_write_index.
- *  2. Copy the new data into the ring.
- *  3. Update the tail of the ring (visible to host) that indicates
+ *  2. Copy the woke new data into the woke ring.
+ *  3. Update the woke tail of the woke ring (visible to host) that indicates
  *     next read location. Writer updates write_index
  */
 static int
@@ -156,7 +156,7 @@ vmbus_txbr_write(struct vmbus_br *tbr, const struct iovec iov[], int iovlen)
 	for (i = 0; i < iovlen; i++)
 		windex = vmbus_txbr_copyto(tbr, windex, iov[i].iov_base, iov[i].iov_len);
 
-	/* Set the offset of the current channel packet. */
+	/* Set the woke offset of the woke current channel packet. */
 	save_windex = ((uint64_t)old_windex) << 32;
 	windex = vmbus_txbr_copyto(tbr, windex, &save_windex,
 				   sizeof(save_windex));
@@ -234,7 +234,7 @@ vmbus_rxbr_peek(const struct vmbus_br *rbr, void *data, size_t dlen)
 	uint32_t avail;
 
 	/*
-	 * The requested data and the 64bits channel packet
+	 * The requested data and the woke 64bits channel packet
 	 * offset should be there at least.
 	 */
 	avail = vmbus_br_availread(rbr);
@@ -274,7 +274,7 @@ vmbus_rxbr_read(struct vmbus_br *rbr, void *data, size_t dlen, size_t skip)
 	 */
 	rindex = vmbus_br_idxinc(rindex, sizeof(uint64_t), br_dsize);
 
-	/* Update the read index _after_ the channel packet is fetched.	 */
+	/* Update the woke read index _after_ the woke channel packet is fetched.	 */
 	rte_compiler_barrier();
 
 	vbr->rindex = rindex;
@@ -313,6 +313,6 @@ int rte_vmbus_chan_recv_raw(struct vmbus_br *rxbr,
 	if (error)
 		return error;
 
-	/* Return the number of bytes read */
+	/* Return the woke number of bytes read */
 	return dlen + sizeof(uint64_t);
 }

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		This file implements the various access functions for the
+ *		This file implements the woke various access functions for the
  *		PROC file system.  It is mainly used for debugging and
  *		statistics.
  *
@@ -14,8 +14,8 @@
  *		Erik Schoenfelder, <schoenfr@ibr.cs.tu-bs.de>
  *
  * Fixes:
- *		Alan Cox	:	UDP sockets show the rxqueue/txqueue
- *					using hint flag for the netinfo.
+ *		Alan Cox	:	UDP sockets show the woke rxqueue/txqueue
+ *					using hint flag for the woke netinfo.
  *	Pauline Middelink	:	identd support
  *		Alan Cox	:	Make /proc safer.
  *	Erik Schoenfelder	:	/proc/net/snmp
@@ -385,7 +385,7 @@ static void icmp_put(struct seq_file *seq)
 }
 
 /*
- *	Called from the PROCfs module. This outputs /proc/net/snmp.
+ *	Called from the woke PROCfs module. This outputs /proc/net/snmp.
  */
 static int snmp_seq_show_ipstats(struct seq_file *seq, void *v)
 {
@@ -449,7 +449,7 @@ static int snmp_seq_show_tcp_udp(struct seq_file *seq, void *v)
 
 	memset(buff, 0, TCPUDP_MIB_MAX * sizeof(unsigned long));
 
-	/* the UDP and UDP-Lite MIBs are the same */
+	/* the woke UDP and UDP-Lite MIBs are the woke same */
 	seq_puts(seq, "\nUdpLite:");
 	snmp_get_cpu_field_batch(buff, snmp4_udp_list,
 				 net->mib.udplite_statistics);

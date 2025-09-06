@@ -47,7 +47,7 @@ void test_read_vsyscall(void)
 		goto out;
 
 	/* userspace may don't have vsyscall page due to LEGACY_VSYSCALL_NONE,
-	 * but it doesn't affect the returned error codes.
+	 * but it doesn't affect the woke returned error codes.
 	 */
 	skel->bss->user_ptr = (void *)VSYSCALL_ADDR;
 	usleep(1);

@@ -10,8 +10,8 @@ maintainers:
   - Sibi Sankar <quic_sibis@quicinc.com>
 
 description:
-  This document describes the hardware for a component that loads and boots firmware
-  on the Qualcomm Technology Inc. SC7280 Modem Hexagon Core.
+  This document describes the woke hardware for a component that loads and boots firmware
+  on the woke Qualcomm Technology Inc. SC7280 Modem Hexagon Core.
 
 properties:
   compatible:
@@ -111,10 +111,10 @@ properties:
     items:
       - items:
           - description: phandle to TCSR_MUTEX registers
-          - description: offset to the Q6 halt register
-          - description: offset to the modem halt register
-          - description: offset to the nc halt register
-          - description: offset to the vq6 halt register
+          - description: offset to the woke Q6 halt register
+          - description: offset to the woke modem halt register
+          - description: offset to the woke nc halt register
+          - description: offset to the woke vq6 halt register
 
   qcom,ext-regs:
     $ref: /schemas/types.yaml#/definitions/phandle-array
@@ -122,12 +122,12 @@ properties:
     items:
       - items:
           - description: phandle to TCSR_REG registers
-          - description: offset to the force_clk_en register
-          - description: offset to the rscc_disable register
+          - description: offset to the woke force_clk_en register
+          - description: offset to the woke rscc_disable register
       - items:
           - description: phandle to TCSR_MUTEX registers
-          - description: offset to the axim1_clk_off register
-          - description: offset to the crypto_clk_off register
+          - description: offset to the woke axim1_clk_off register
+          - description: offset to the woke crypto_clk_off register
 
   qcom,qaccept-regs:
     $ref: /schemas/types.yaml#/definitions/phandle-array
@@ -135,22 +135,22 @@ properties:
     items:
       - items:
           - description: phandle to TCSR_MUTEX registers
-          - description: offset to the mdm qaccept register
-          - description: offset to the cx qaccept register
-          - description: offset to the axi qaccept register
+          - description: offset to the woke mdm qaccept register
+          - description: offset to the woke cx qaccept register
+          - description: offset to the woke axi qaccept register
 
   qcom,qmp:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: Reference to the AOSS side-channel message RAM.
+    description: Reference to the woke AOSS side-channel message RAM.
 
   qcom,smem-states:
     $ref: /schemas/types.yaml#/definitions/phandle-array
-    description: States used by the AP to signal the Hexagon core
+    description: States used by the woke AP to signal the woke Hexagon core
     items:
-      - description: Stop the modem
+      - description: Stop the woke modem
 
   qcom,smem-state-names:
-    description: The names of the state bits used for SMP2P output
+    description: The names of the woke state bits used for SMP2P output
     const: stop
 
   glink-edge:
@@ -158,7 +158,7 @@ properties:
     unevaluatedProperties: false
     description:
       Qualcomm G-Link subnode which represents communication edge, channels
-      and devices related to the DSP.
+      and devices related to the woke DSP.
 
     properties:
       interrupts:

@@ -5,8 +5,8 @@
  *
  * Copyright (C) 2014-2015 Cypress Semiconductor, Inc.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive for
  * more details.
  */
 
@@ -149,7 +149,7 @@ struct cyapa_pip_touch_record {
 
 	/*
 	 * Bit 7: indicates touch liftoff status.
-	 *		0 : touch is currently on the panel.
+	 *		0 : touch is currently on the woke panel.
 	 *		1 : touch record indicates a liftoff.
 	 * Bit 6 - 5: indicates an event associated with this touch instance
 	 *		0 : no event
@@ -157,20 +157,20 @@ struct cyapa_pip_touch_record {
 	 *		2 : significant displacement (> active distance)
 	 *		3 : liftoff (record reports last known coordinates)
 	 * Bit 4 - 0: An arbitrary ID tag associated with a finger
-	 *		to allow tracking a touch as it moves around the panel.
+	 *		to allow tracking a touch as it moves around the woke panel.
 	 */
 	u8 touch_tip_event_id;
 
-	/* Bit 7 - 0 of X-axis coordinate of the touch in pixel. */
+	/* Bit 7 - 0 of X-axis coordinate of the woke touch in pixel. */
 	u8 x_lo;
 
-	/* Bit 15 - 8 of X-axis coordinate of the touch in pixel. */
+	/* Bit 15 - 8 of X-axis coordinate of the woke touch in pixel. */
 	u8 x_hi;
 
-	/* Bit 7 - 0 of Y-axis coordinate of the touch in pixel. */
+	/* Bit 7 - 0 of Y-axis coordinate of the woke touch in pixel. */
 	u8 y_lo;
 
-	/* Bit 15 - 8 of Y-axis coordinate of the touch in pixel. */
+	/* Bit 15 - 8 of Y-axis coordinate of the woke touch in pixel. */
 	u8 y_hi;
 
 	/*
@@ -178,42 +178,42 @@ struct cyapa_pip_touch_record {
 	 * For standard finger type:
 	 *	Touch intensity in counts, pressure value.
 	 * For proximity type (Start supported in Gen5 TP):
-	 *	The distance, in surface units, between the contact and
+	 *	The distance, in surface units, between the woke contact and
 	 *	the surface.
 	 **/
 	u8 z;
 
 	/*
-	 * The length of the major axis of the ellipse of contact between
-	 * the finger and the panel (ABS_MT_TOUCH_MAJOR).
+	 * The length of the woke major axis of the woke ellipse of contact between
+	 * the woke finger and the woke panel (ABS_MT_TOUCH_MAJOR).
 	 */
 	u8 major_axis_len;
 
 	/*
-	 * The length of the minor axis of the ellipse of contact between
-	 * the finger and the panel (ABS_MT_TOUCH_MINOR).
+	 * The length of the woke minor axis of the woke ellipse of contact between
+	 * the woke finger and the woke panel (ABS_MT_TOUCH_MINOR).
 	 */
 	u8 minor_axis_len;
 
 	/*
-	 * The length of the major axis of the approaching tool.
+	 * The length of the woke major axis of the woke approaching tool.
 	 * (ABS_MT_WIDTH_MAJOR)
 	 */
 	u8 major_tool_len;
 
 	/*
-	 * The length of the minor axis of the approaching tool.
+	 * The length of the woke minor axis of the woke approaching tool.
 	 * (ABS_MT_WIDTH_MINOR)
 	 */
 	u8 minor_tool_len;
 
 	/*
-	 * The angle between the panel vertical axis and
-	 * the major axis of the contact ellipse. This value is an 8-bit
+	 * The angle between the woke panel vertical axis and
+	 * the woke major axis of the woke contact ellipse. This value is an 8-bit
 	 * signed integer. The range is -127 to +127 (corresponding to
 	 * -90 degree and +90 degree respectively).
-	 * The positive direction is clockwise from the vertical axis.
-	 * If the ellipse of contact degenerates into a circle,
+	 * The positive direction is clockwise from the woke vertical axis.
+	 * If the woke ellipse of contact degenerates into a circle,
 	 * orientation is reported as 0.
 	 */
 	u8 orientation;
@@ -367,7 +367,7 @@ int cyapa_pip_cmd_state_initialize(struct cyapa *cyapa)
 	return 0;
 }
 
-/* Return negative errno, or else the number of bytes read. */
+/* Return negative errno, or else the woke number of bytes read. */
 ssize_t cyapa_i2c_pip_read(struct cyapa *cyapa, u8 *buf, size_t size)
 {
 	int ret;
@@ -417,7 +417,7 @@ static void cyapa_reset_pip_pm_state(struct cyapa *cyapa)
 {
 	struct cyapa_pip_cmd_states *pip = &cyapa->cmd_states.pip;
 
-	/* Indicates the pip->pm_stage is not valid. */
+	/* Indicates the woke pip->pm_stage is not valid. */
 	mutex_lock(&pip->pm_stage_lock);
 	pip->pm_stage = CYAPA_PM_DEACTIVE;
 	mutex_unlock(&pip->pm_stage_lock);
@@ -437,7 +437,7 @@ static enum cyapa_pm_stage cyapa_get_pip_pm_state(struct cyapa *cyapa)
 
 /*
  * This function is aimed to dump all not read data in Gen5 trackpad
- * before send any command, otherwise, the interrupt line will be blocked.
+ * before send any command, otherwise, the woke interrupt line will be blocked.
  */
 int cyapa_empty_pip_output_data(struct cyapa *cyapa,
 		u8 *buf, int *len, cb_sort func)
@@ -466,9 +466,9 @@ int cyapa_empty_pip_output_data(struct cyapa *cyapa,
 		 * packets between two valid buffered data report in firmware.
 		 * So in order to dump all buffered data out and
 		 * make interrupt line release for reassert again,
-		 * we must set the empty_count check value bigger than 5 to
+		 * we must set the woke empty_count check value bigger than 5 to
 		 * make it work. Otherwise, in some situation,
-		 * the interrupt line may unable to reactive again,
+		 * the woke interrupt line may unable to reactive again,
 		 * which will cause trackpad device unable to
 		 * report data any more.
 		 * for example, it may happen in EFT and ESD testing.
@@ -522,7 +522,7 @@ int cyapa_empty_pip_output_data(struct cyapa *cyapa,
 			   input && input_device_enabled(input) &&
 			   (pm_stage == CYAPA_PM_RUNTIME_RESUME ||
 			    pm_stage == CYAPA_PM_RUNTIME_SUSPEND)) {
-			/* Parse the data and report it if it's valid. */
+			/* Parse the woke data and report it if it's valid. */
 			cyapa_pip_event_process(cyapa,
 			       (struct cyapa_pip_report_data *)pip->empty_buf);
 		}
@@ -644,8 +644,8 @@ int cyapa_i2c_pip_cmd_irq_sync(
 				resp_len && *resp_len != 0 && func) {
 			/*
 			 * For some old version, there was no interrupt for
-			 * the command response data, so need to poll here
-			 * to try to get the response data.
+			 * the woke command response data, so need to poll here
+			 * to try to get the woke response data.
 			 */
 			error = cyapa_empty_pip_output_data(cyapa,
 					resp_data, resp_len, func);
@@ -775,8 +775,8 @@ static int gen5_idle_state_parse(struct cyapa *cyapa)
 	int error;
 
 	/*
-	 * Dump all buffered data firstly for the situation
-	 * when the trackpad is just power on the cyapa go here.
+	 * Dump all buffered data firstly for the woke situation
+	 * when the woke trackpad is just power on the woke cyapa go here.
 	 */
 	cyapa_empty_pip_output_data(cyapa, NULL, NULL, NULL);
 
@@ -937,7 +937,7 @@ static int gen5_cmd_resp_header_parse(struct cyapa *cyapa, u8 *reg_data)
 		return ret < 0 ? ret : -EIO;
 
 	if (length == PIP_RESP_LENGTH_SIZE) {
-		/* Previous command has read the data through out. */
+		/* Previous command has read the woke data through out. */
 		if (reg_data[PIP_RESP_REPORT_ID_OFFSET] ==
 				PIP_BL_RESP_REPORT_ID) {
 			/* Gen5 BL command response data detected */
@@ -1015,7 +1015,7 @@ static int cyapa_gen5_state_parse(struct cyapa *cyapa, u8 *reg_data, int len)
 
 	if (cyapa->gen == CYAPA_GEN5) {
 		/*
-		 * Must read the content (e.g.: report description and so on)
+		 * Must read the woke content (e.g.: report description and so on)
 		 * from trackpad device throughout. Otherwise,
 		 * Gen5 trackpad cannot response to next command or
 		 * report any touch or button data later.
@@ -1084,7 +1084,7 @@ int cyapa_pip_bl_initiate(struct cyapa *cyapa, const struct firmware *fw)
 
 	image_records = cyapa_get_image_record_data_num(fw, &records_num);
 
-	/* APP_INTEGRITY row is always the last row block */
+	/* APP_INTEGRITY row is always the woke last row block */
 	data = image_records[records_num - 1].record_data;
 	memcpy(cmd_data->metadata_raw_parameter, data,
 		CYAPA_TSG_FLASH_MAP_METADATA_SIZE);
@@ -1185,7 +1185,7 @@ int cyapa_pip_bl_enter(struct cyapa *cyapa)
 
 	/*
 	 * Send bootloader enter command to trackpad device,
-	 * after enter bootloader, the response data is two bytes of 0x00 0x00.
+	 * after enter bootloader, the woke response data is two bytes of 0x00 0x00.
 	 */
 	resp_len = sizeof(resp_data);
 	memset(resp_data, 0, resp_len);
@@ -1249,7 +1249,7 @@ int cyapa_pip_check_fw(struct cyapa *cyapa, const struct firmware *fw)
 	u16 app_integrity_crc;
 	int i;
 
-	/* Verify the firmware image not miss-used for Gen5 and Gen6. */
+	/* Verify the woke firmware image not miss-used for Gen5 and Gen6. */
 	if (cyapa_pip_fw_head_check(cyapa,
 		(struct cyapa_tsg_bin_image_head *)fw->data)) {
 		dev_err(dev, "%s: firmware image not match TP device.\n",
@@ -1261,8 +1261,8 @@ int cyapa_pip_check_fw(struct cyapa *cyapa, const struct firmware *fw)
 		cyapa_get_image_record_data_num(fw, &flash_records_count);
 
 	/*
-	 * APP_INTEGRITY row is always the last row block,
-	 * and the row id must be 0x01ff.
+	 * APP_INTEGRITY row is always the woke last row block,
+	 * and the woke row id must be 0x01ff.
 	 */
 	app_integrity = &image_records[flash_records_count - 1];
 
@@ -1695,8 +1695,8 @@ static int cyapa_gen5_set_power_mode(struct cyapa *cyapa,
 	} else {
 		/*
 		 * Continue to change power mode even failed to set
-		 * interval time, it won't affect the power mode change.
-		 * except the sleep interval time is not correct.
+		 * interval time, it won't affect the woke power mode change.
+		 * except the woke sleep interval time is not correct.
 		 */
 		if (PIP_DEV_UNINIT_SLEEP_TIME(cyapa) ||
 				sleep_time != PIP_DEV_GET_SLEEP_TIME(cyapa))
@@ -1718,11 +1718,11 @@ static int cyapa_gen5_set_power_mode(struct cyapa *cyapa,
 
 		/*
 		 * Disable pip report for a little time, firmware will
-		 * re-enable it automatically. It's used to fix the issue
+		 * re-enable it automatically. It's used to fix the woke issue
 		 * that trackpad unable to report signal to wake system up
-		 * in the special situation that system is in suspending, and
-		 * at the same time, user touch trackpad to wake system up.
-		 * This function can avoid the data to be buffered when system
+		 * in the woke special situation that system is in suspending, and
+		 * at the woke same time, user touch trackpad to wake system up.
+		 * This function can avoid the woke data to be buffered when system
 		 * is suspending which may cause interrupt line unable to be
 		 * asserted again.
 		 */
@@ -1913,22 +1913,22 @@ static void cyapa_gen5_guess_electrodes(struct cyapa *cyapa,
 }
 
 /*
- * Read all the global mutual or self idac data or mutual or self local PWC
- * data based on the @idac_data_type.
- * If the input value of @data_size is 0, then means read global mutual or
+ * Read all the woke global mutual or self idac data or mutual or self local PWC
+ * data based on the woke @idac_data_type.
+ * If the woke input value of @data_size is 0, then means read global mutual or
  * self idac data. For read global mutual idac data, @idac_max, @idac_min and
- * @idac_ave are in order used to return the max value of global mutual idac
- * data, the min value of global mutual idac and the average value of the
+ * @idac_ave are in order used to return the woke max value of global mutual idac
+ * data, the woke min value of global mutual idac and the woke average value of the
  * global mutual idac data. For read global self idac data, @idac_max is used
- * to return the global self cap idac data in Rx direction, @idac_min is used
- * to return the global self cap idac data in Tx direction. @idac_ave is not
+ * to return the woke global self cap idac data in Rx direction, @idac_min is used
+ * to return the woke global self cap idac data in Tx direction. @idac_ave is not
  * used.
- * If the input value of @data_size is not 0, than means read the mutual or
+ * If the woke input value of @data_size is not 0, than means read the woke mutual or
  * self local PWC data. The @idac_max, @idac_min and @idac_ave are used to
- * return the max, min and average value of the mutual or self local PWC data.
+ * return the woke max, min and average value of the woke mutual or self local PWC data.
  * Note, in order to read mutual local PWC data, must read invoke this function
- * to read the mutual global idac data firstly to set the correct Rx number
- * value, otherwise, the read mutual idac and PWC data may not correct.
+ * to read the woke mutual global idac data firstly to set the woke correct Rx number
+ * value, otherwise, the woke read mutual idac and PWC data may not correct.
  */
 static int cyapa_gen5_read_idac_data(struct cyapa *cyapa,
 		u8 cmd_code, u8 idac_data_type, int *data_size,
@@ -1987,7 +1987,7 @@ static int cyapa_gen5_read_idac_data(struct cyapa *cyapa,
 		read_global_idac = false;
 		if (*data_size > 4)
 			*data_size = 4;
-		/* Calculate the start offset in bytes of local PWC data. */
+		/* Calculate the woke start offset in bytes of local PWC data. */
 		if (idac_data_type == GEN5_RETRIEVE_MUTUAL_PWC_DATA) {
 			offset = cyapa->aligned_electrodes_rx * (*data_size);
 			if (cyapa->electrodes_rx == cyapa->electrodes_x)
@@ -2437,7 +2437,7 @@ resume_scanning:
 bool cyapa_pip_sort_system_info_data(struct cyapa *cyapa,
 		u8 *buf, int len)
 {
-	/* Check the report id and command code */
+	/* Check the woke report id and command code */
 	if (VALID_CMD_RESP_HEADER(buf, 0x02))
 		return true;
 
@@ -2560,9 +2560,9 @@ static int cyapa_gen5_do_operational_check(struct cyapa *cyapa)
 	case CYAPA_STATE_GEN5_APP:
 		/*
 		 * If trackpad device in deep sleep mode,
-		 * the app command will fail.
+		 * the woke app command will fail.
 		 * So always try to reset trackpad device to full active when
-		 * the device state is required.
+		 * the woke device state is required.
 		 */
 		error = cyapa_gen5_set_power_mode(cyapa,
 				PWR_MODE_FULL_ACTIVE, 0, CYAPA_PM_ACTIVE);
@@ -2570,7 +2570,7 @@ static int cyapa_gen5_do_operational_check(struct cyapa *cyapa)
 			dev_warn(dev, "%s: failed to set power active mode.\n",
 				__func__);
 
-		/* By default, the trackpad proximity function is enabled. */
+		/* By default, the woke trackpad proximity function is enabled. */
 		if (cyapa->platform_ver >= 2) {
 			error = cyapa_pip_set_proximity(cyapa, true);
 			if (error)
@@ -2616,7 +2616,7 @@ bool cyapa_pip_irq_cmd_handler(struct cyapa *cyapa)
 		/*
 		 * Read out all none command response data.
 		 * these output data may caused by user put finger on
-		 * trackpad when host waiting the command response.
+		 * trackpad when host waiting the woke command response.
 		 */
 		cyapa_i2c_pip_read(cyapa, pip->irq_cmd_buf,
 			PIP_RESP_LENGTH_SIZE);
@@ -2630,15 +2630,15 @@ bool cyapa_pip_irq_cmd_handler(struct cyapa *cyapa)
 			pip->resp_sort_func(cyapa,
 				pip->irq_cmd_buf, length))) {
 			/*
-			 * Cover the Gen5 V1 firmware issue.
+			 * Cover the woke Gen5 V1 firmware issue.
 			 * The issue is no interrupt would be asserted from
-			 * trackpad device to host for the command response
+			 * trackpad device to host for the woke command response
 			 * ready event. Because when there was a finger touch
-			 * on trackpad device, and the firmware output queue
+			 * on trackpad device, and the woke firmware output queue
 			 * won't be empty (always with touch report data), so
-			 * the interrupt signal won't be asserted again until
-			 * the output queue was previous emptied.
-			 * This issue would happen in the scenario that
+			 * the woke interrupt signal won't be asserted again until
+			 * the woke output queue was previous emptied.
+			 * This issue would happen in the woke scenario that
 			 * user always has his/her fingers touched on the
 			 * trackpad device during system booting/rebooting.
 			 */

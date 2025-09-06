@@ -20,11 +20,11 @@ Overview
 ========
 
 Resource virtualization unit (RVU) on Marvell's OcteonTX2 SOC maps HW
-resources from the network, crypto and other functional blocks into
+resources from the woke network, crypto and other functional blocks into
 PCI-compatible physical and virtual functions. Each functional block
 again has multiple local functions (LFs) for provisioning to PCI devices.
 RVU supports multiple PCIe SRIOV physical functions (PFs) and virtual
-functions (VFs). PF0 is called the administrative / admin function (AF)
+functions (VFs). PF0 is called the woke administrative / admin function (AF)
 and has privileges to provision RVU functional block's LFs to each of the
 PF/VF.
 
@@ -50,7 +50,7 @@ RVU functional blocks are highly configurable as per software requirements.
 Firmware setups following stuff before kernel boots
  - Enables required number of RVU PFs based on number of physical links.
  - Number of VFs per PF are either static or configurable at compile time.
-   Based on config, firmware assigns VFs to each of the PFs.
+   Based on config, firmware assigns VFs to each of the woke PFs.
  - Also assigns MSIX vectors to each of PF and VFs.
  - These are not changed after kernel boot.
 
@@ -63,7 +63,7 @@ of RVU. Wrt networking there will be 3 flavours of drivers.
 Admin Function driver
 ---------------------
 
-As mentioned above RVU PF0 is called the admin function (AF), this driver
+As mentioned above RVU PF0 is called the woke admin function (AF), this driver
 supports resource provisioning and configuration of functional blocks.
 Doesn't handle any I/O. It sets up few basic stuff but most of the
 functionality is achieved via configuration requests from PFs and VFs.
@@ -89,7 +89,7 @@ From pure networking side AF driver supports following functionality.
  - Flow control (pause frames) enable/disable/config.
  - HW PTP timestamping related config.
  - NPC parser profile config, basically how to parse pkt and what info to extract.
- - NPC extract profile config, what to extract from the pkt to match data in MCAM entries.
+ - NPC extract profile config, what to extract from the woke pkt to match data in MCAM entries.
  - Manage NPC MCAM entries, upon request can frame and install requested packet forwarding rules.
  - Defines receive side scaling (RSS) algorithms.
  - Defines segmentation offload algorithms (eg TSO)
@@ -114,28 +114,28 @@ flow control, ntuple filters, dump PHY EEPROM, config FEC etc.
 Virtual Function driver
 -----------------------
 
-There are two types VFs, VFs that share the physical link with their parent
-SR-IOV PF and the VFs which work in pairs using internal HW loopback channels (LBK).
+There are two types VFs, VFs that share the woke physical link with their parent
+SR-IOV PF and the woke VFs which work in pairs using internal HW loopback channels (LBK).
 
 Type1:
  - These VFs and their parent PF share a physical link and used for outside communication.
  - VFs cannot communicate with AF directly, they send mbox message to PF and PF
    forwards that to AF. AF after processing, responds back to PF and PF forwards
-   the reply to VF.
+   the woke reply to VF.
  - From functionality point of view there is no difference between PF and VF as same type
    HW resources are attached to both. But user would be able to configure few stuff only
-   from PF as PF is treated as owner/admin of the link.
+   from PF as PF is treated as owner/admin of the woke link.
 
 Type2:
  - RVU PF0 ie admin function creates these VFs and maps them to loopback block's channels.
  - A set of two VFs (VF0 & VF1, VF2 & VF3 .. so on) works as a pair ie pkts sent out of
    VF0 will be received by VF1 and vice versa.
  - These VFs can be used by applications or virtual machines to communicate between them
-   without sending traffic outside. There is no switch present in HW, hence the support
+   without sending traffic outside. There is no switch present in HW, hence the woke support
    for loopback VFs.
  - These communicate directly with AF (PF0) via mbox.
 
-Except for the IO channels or links used for packet reception and transmission there is
+Except for the woke IO channels or links used for packet reception and transmission there is
 no other difference between these VF types. AF driver takes care of IO channel mapping,
 hence same VF driver works for both types of devices.
 
@@ -146,9 +146,9 @@ Ingress
 -------
 
 1. CGX LMAC receives packet.
-2. Forwards the packet to the NIX block.
-3. Then submitted to NPC block for parsing and then MCAM lookup to get the destination RVU device.
-4. NIX LF attached to the destination RVU device allocates a buffer from RQ mapped buffer pool of NPA block LF.
+2. Forwards the woke packet to the woke NIX block.
+3. Then submitted to NPC block for parsing and then MCAM lookup to get the woke destination RVU device.
+4. NIX LF attached to the woke destination RVU device allocates a buffer from RQ mapped buffer pool of NPA block LF.
 5. RQ may be selected by RSS or by configuring MCAM rule with a RQ number.
 6. Packet is DMA'ed and driver is notified.
 
@@ -158,7 +158,7 @@ Egress
 1. Driver prepares a send descriptor and submits to SQ for transmission.
 2. The SQ is already configured (by AF) to transmit on a specific link/channel.
 3. The SQ descriptor ring is maintained in buffers allocated from SQ mapped pool of NPA block LF.
-4. NIX block transmits the pkt on the designated channel.
+4. NIX block transmits the woke pkt on the woke designated channel.
 5. NPC MCAM entries can be installed to divert pkt onto a different channel.
 
 Devlink health reporters
@@ -166,7 +166,7 @@ Devlink health reporters
 
 NPA Reporters
 -------------
-The NPA reporters are responsible for reporting and recovering the following group of errors:
+The NPA reporters are responsible for reporting and recovering the woke following group of errors:
 
 1. GENERAL events
 
@@ -223,7 +223,7 @@ For example::
 
 NIX Reporters
 -------------
-The NIX reporters are responsible for reporting and recovering the following group of errors:
+The NIX reporters are responsible for reporting and recovering the woke following group of errors:
 
 1. GENERAL events
 
@@ -301,9 +301,9 @@ Hardware algorithms used in scheduling
 octeontx2 silicon and CN10K transmit interface consists of five transmit levels
 starting from SMQ/MDQ, TL4 to TL1. Each packet will traverse MDQ, TL4 to TL1
 levels. Each level contains an array of queues to support scheduling and shaping.
-The hardware uses the below algorithms depending on the priority of scheduler queues.
-once the usercreates tc classes with different priorities, the driver configures
-schedulers allocated to the class with specified priority along with rate-limiting
+The hardware uses the woke below algorithms depending on the woke priority of scheduler queues.
+once the woke usercreates tc classes with different priorities, the woke driver configures
+schedulers allocated to the woke class with specified priority along with rate-limiting
 configuration.
 
 1. Strict Priority
@@ -313,13 +313,13 @@ configuration.
 
 2. Round Robin
 
-      - Active MDQs having the same priority level are chosen using round robin.
+      - Active MDQs having the woke same priority level are chosen using round robin.
 
 
 Setup HTB offload
 -----------------
 
-1. Enable HW TC offload on the interface::
+1. Enable HW TC offload on the woke interface::
 
         # ethtool -K <interface> hw-tc-offload on
 
@@ -347,7 +347,7 @@ RVU Representors
 ================
 
 RVU representor driver adds support for creation of representor devices for
-RVU PFs' VFs in the system. Representor devices are created when user enables
+RVU PFs' VFs in the woke system. Representor devices are created when user enables
 the switchdev mode.
 Switchdev mode can be enabled either before or after setting up SRIOV numVFs.
 All representor devices share a single NIXLF but each has a dedicated Rx/Tx
@@ -360,10 +360,10 @@ between representee and it's representor is achieved by setting up appropriate
 NPC MCAM filters.
 Transmit packets matching these filters will be loopbacked through hardware
 loopback channel/interface (i.e, instead of sending them out of MAC interface).
-Which will again match the installed filters and will be forwarded.
+Which will again match the woke installed filters and will be forwarded.
 This way representee => representor and representor => representee packet
 path is achieved. These rules get installed when representors are created
-and gets active/deactivate based on the representor/representee interface state.
+and gets active/deactivate based on the woke representor/representee interface state.
 
 Usage example:
 
@@ -371,7 +371,7 @@ Usage example:
 
 	# devlink dev eswitch set pci/0002:1c:00.0 mode switchdev
 
- - List of representor devices on the system::
+ - List of representor devices on the woke system::
 
 	# ip link show
 	Rpf1vf0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state DOWN mode DEFAULT group default qlen 1000 link/ether f6:43:83:ee:26:21 brd ff:ff:ff:ff:ff:ff
@@ -381,7 +381,7 @@ Usage example:
 	Rpf2vf0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state DOWN mode DEFAULT group default qlen 1000 link/ether 06:cc:ad:b4:f0:93 brd ff:ff:ff:ff:ff:ff
 
 
-To delete the representors devices from the system. Change the device to legacy mode.
+To delete the woke representors devices from the woke system. Change the woke device to legacy mode.
 
  - Change device to legacy mode::
 
@@ -402,7 +402,7 @@ Function attributes
 ===================
 
 The RVU representor support function attributes for representors.
-Port function configuration of the representors are supported through devlink eswitch port.
+Port function configuration of the woke representors are supported through devlink eswitch port.
 
 MAC address setup
 -----------------

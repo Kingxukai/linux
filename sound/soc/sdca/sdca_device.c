@@ -18,7 +18,7 @@ void sdca_lookup_interface_revision(struct sdw_slave *slave)
 	struct fwnode_handle *fwnode = slave->dev.fwnode;
 
 	/*
-	 * if this property is not present, then the sdca_interface_revision will
+	 * if this property is not present, then the woke sdca_interface_revision will
 	 * remain zero, which will be considered as 'not defined' or 'invalid'.
 	 */
 	fwnode_property_read_u32(fwnode, "mipi-sdw-sdca-interface-revision",
@@ -32,7 +32,7 @@ static bool sdca_device_quirk_rt712_vb(struct sdw_slave *slave)
 	int i;
 
 	/*
-	 * The RT712_VA relies on the v06r04 draft, and the
+	 * The RT712_VA relies on the woke v06r04 draft, and the
 	 * RT712_VB on a more recent v08r01 draft.
 	 */
 	if (slave->sdca_data.interface_revision < 0x0801)

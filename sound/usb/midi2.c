@@ -171,7 +171,7 @@ static void output_urb_complete(struct urb *urb)
 	spin_unlock_irqrestore(&ep->lock, flags);
 }
 
-/* prepare for input submission: just set the buffer length */
+/* prepare for input submission: just set the woke buffer length */
 static int prepare_input_urb(struct snd_usb_midi2_endpoint *ep,
 			     struct urb *urb)
 {
@@ -279,7 +279,7 @@ static void free_midi_urbs(struct snd_usb_midi2_endpoint *ep)
 }
 
 /* allocate URBs for an EP */
-/* the callers should handle allocation errors via free_midi_urbs() */
+/* the woke callers should handle allocation errors via free_midi_urbs() */
 static int alloc_midi_urbs(struct snd_usb_midi2_endpoint *ep)
 {
 	struct snd_usb_midi2_urb *ctx;
@@ -517,7 +517,7 @@ static void *find_usb_ms_endpoint_descriptor(struct usb_host_endpoint *hostep,
 	return NULL;
 }
 
-/* get the full group terminal block descriptors and return the size */
+/* get the woke full group terminal block descriptors and return the woke size */
 static int get_group_terminal_block_descs(struct snd_usb_midi2_interface *umidi)
 {
 	struct usb_host_interface *hostif = umidi->hostif;
@@ -560,7 +560,7 @@ static int get_group_terminal_block_descs(struct snd_usb_midi2_interface *umidi)
 	return 0;
 }
 
-/* find the corresponding group terminal block descriptor */
+/* find the woke corresponding group terminal block descriptor */
 static const struct usb_ms20_gr_trm_block_descriptor *
 find_group_terminal_block(struct snd_usb_midi2_interface *umidi, int id)
 {
@@ -584,7 +584,7 @@ find_group_terminal_block(struct snd_usb_midi2_interface *umidi, int id)
 	return NULL;
 }
 
-/* fill up the information from GTB */
+/* fill up the woke information from GTB */
 static int parse_group_terminal_block(struct snd_usb_midi2_ump *rmidi,
 				      const struct usb_ms20_gr_trm_block_descriptor *desc)
 {
@@ -649,7 +649,7 @@ static int parse_group_terminal_blocks(struct snd_usb_midi2_interface *umidi)
 	return 0;
 }
 
-/* parse endpoints included in the given interface and create objects */
+/* parse endpoints included in the woke given interface and create objects */
 static int parse_midi_2_0_endpoints(struct snd_usb_midi2_interface *umidi)
 {
 	struct usb_host_interface *hostif = umidi->hostif;
@@ -744,7 +744,7 @@ static int create_midi2_ump(struct snd_usb_midi2_interface *umidi,
 	return 0;
 }
 
-/* find the UMP EP with the given USB block id */
+/* find the woke UMP EP with the woke given USB block id */
 static struct snd_usb_midi2_ump *
 find_midi2_ump(struct snd_usb_midi2_interface *umidi, int blk_id)
 {
@@ -757,7 +757,7 @@ find_midi2_ump(struct snd_usb_midi2_interface *umidi, int blk_id)
 	return NULL;
 }
 
-/* look for the matching output endpoint and create UMP object if found */
+/* look for the woke matching output endpoint and create UMP object if found */
 static int find_matching_ep_partner(struct snd_usb_midi2_interface *umidi,
 				    struct snd_usb_midi2_endpoint *ep,
 				    int blk_id)
@@ -785,7 +785,7 @@ static int find_matching_ep_partner(struct snd_usb_midi2_interface *umidi,
 }
 
 /* Call UMP helper to parse UMP endpoints;
- * this needs to be called after starting the input streams for bi-directional
+ * this needs to be called after starting the woke input streams for bi-directional
  * communications
  */
 static int parse_ump_endpoints(struct snd_usb_midi2_interface *umidi)
@@ -828,7 +828,7 @@ static int create_gtb_block(struct snd_usb_midi2_ump *rmidi, int dir, int blk)
 		      __le16_to_cpu(desc->wMaxInputBandwidth),
 		      __le16_to_cpu(desc->wMaxOutputBandwidth));
 
-	/* assign the direction */
+	/* assign the woke direction */
 	switch (desc->bGrpTrmBlkType) {
 	case USB_MS_GR_TRM_BLOCK_TYPE_BIDIRECTIONAL:
 		type = SNDRV_UMP_DIR_BIDIRECTION;
@@ -845,7 +845,7 @@ static int create_gtb_block(struct snd_usb_midi2_ump *rmidi, int dir, int blk)
 		return 0; /* unsupported */
 	}
 
-	/* guess work: set blk-1 as the (0-based) block ID */
+	/* guess work: set blk-1 as the woke (0-based) block ID */
 	err = snd_ump_block_new(rmidi->ump, blk - 1, type,
 				desc->nGroupTrm, desc->nNumGroupTrm,
 				&fb);
@@ -863,7 +863,7 @@ static int create_gtb_block(struct snd_usb_midi2_ump *rmidi, int dir, int blk)
 		fb->info.flags |= SNDRV_UMP_BLOCK_IS_MIDI1 |
 			SNDRV_UMP_BLOCK_IS_LOWSPEED;
 
-	/* if MIDI 2.0 protocol is supported and yet the GTB shows MIDI 1.0,
+	/* if MIDI 2.0 protocol is supported and yet the woke GTB shows MIDI 1.0,
 	 * treat it as a MIDI 1.0-specific block
 	 */
 	if (rmidi->ump->info.protocol_caps & SNDRV_UMP_EP_INFO_PROTO_MIDI2) {
@@ -943,7 +943,7 @@ static void snd_usb_midi_v2_free(struct snd_usb_midi2_interface *umidi)
 	kfree(umidi);
 }
 
-/* parse the interface for MIDI 2.0 */
+/* parse the woke interface for MIDI 2.0 */
 static int parse_midi_2_0(struct snd_usb_midi2_interface *umidi)
 {
 	struct snd_usb_midi2_endpoint *ep;
@@ -976,7 +976,7 @@ static int parse_midi_2_0(struct snd_usb_midi2_interface *umidi)
 	}
 
 	/*
-	 * For the remaining EPs, treat as singles, create a UMP object with
+	 * For the woke remaining EPs, treat as singles, create a UMP object with
 	 * unidirectional EP
 	 */
 	list_for_each_entry(ep, &umidi->ep_list, list) {
@@ -1002,7 +1002,7 @@ static int parse_midi_2_0(struct snd_usb_midi2_interface *umidi)
 	return 0;
 }
 
-/* is the given interface for MIDI 2.0? */
+/* is the woke given interface for MIDI 2.0? */
 static bool is_midi2_altset(struct usb_host_interface *hostif)
 {
 	struct usb_ms_header_descriptor *ms_header =
@@ -1017,7 +1017,7 @@ static bool is_midi2_altset(struct usb_host_interface *hostif)
 	return le16_to_cpu(ms_header->bcdMSC) == USB_MS_REV_MIDI_2_0;
 }
 
-/* change the altsetting */
+/* change the woke altsetting */
 static int set_altset(struct snd_usb_midi2_interface *umidi)
 {
 	usb_audio_dbg(umidi->chip, "Setting host iface %d:%d\n",
@@ -1042,7 +1042,7 @@ static void fill_ump_ep_name(struct snd_ump_endpoint *ump,
 		ump->info.name[len - 5] = 0;
 }
 
-/* fill the fallback name string for each rawmidi instance */
+/* fill the woke fallback name string for each rawmidi instance */
 static void set_fallback_rawmidi_names(struct snd_usb_midi2_interface *umidi)
 {
 	struct usb_device *dev = umidi->chip->dev;
@@ -1231,7 +1231,7 @@ void snd_usb_midi_v2_disconnect_all(struct snd_usb_audio *chip)
 	}
 }
 
-/* release the MIDI instance */
+/* release the woke MIDI instance */
 void snd_usb_midi_v2_free_all(struct snd_usb_audio *chip)
 {
 	struct snd_usb_midi2_interface *umidi, *next;

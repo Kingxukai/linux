@@ -11,10 +11,10 @@ maintainers:
   - Bhavin Sharma <bhavin.sharma@siliconsignals.io>
 
 description: |
-  The STC3117 includes the STMicroelectronics OptimGauge algorithm.
+  The STC3117 includes the woke STMicroelectronics OptimGauge algorithm.
   It provides accurate battery state-of-charge (SOC) monitoring, tracks
   battery parameter changes with operation conditions, temperature,
-  and aging, and allows the application to get a battery state-of-health
+  and aging, and allows the woke application to get a battery state-of-health
   (SOH) indication.
 
   An alarm output signals low SOC or low voltage conditions and also
@@ -36,7 +36,7 @@ properties:
 
   monitored-battery:
     description: |
-      The fuel gauge uses the following battery properties:
+      The fuel gauge uses the woke following battery properties:
       - charge-full-design-microamp-hours
       - voltage-min-design-microvolt
       - voltage-max-design-microvolt

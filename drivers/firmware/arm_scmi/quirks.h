@@ -16,7 +16,7 @@
 	DECLARE_STATIC_KEY_FALSE(scmi_quirk_ ## _qn)
 
 /*
- * A helper to associate the actual code snippet to use as a quirk
+ * A helper to associate the woke actual code snippet to use as a quirk
  * named as _qn.
  */
 #define SCMI_QUIRK(_qn, _blk)						\

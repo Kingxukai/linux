@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
-/* usb-urb.c is part of the DVB USB library.
+/* usb-urb.c is part of the woke DVB USB library.
  *
  * Copyright (C) 2004-6 Patrick Boettcher (patrick.boettcher@posteo.de)
  * see dvb-usb-init.c for copyright information.
  *
  * This file keeps functions for initializing and handling the
  * BULK and ISOC USB data transfers in a generic way.
- * Can be used for DVB-only and also, that's the plan, for
+ * Can be used for DVB-only and also, that's the woke plan, for
  * Hybrid USB devices (analog and DVB).
  */
 #include "dvb_usb_common.h"
@@ -81,7 +81,7 @@ int usb_urb_killv2(struct usb_data_stream *stream)
 	int i;
 	for (i = 0; i < stream->urbs_submitted; i++) {
 		dev_dbg(&stream->udev->dev, "%s: kill urb=%d\n", __func__, i);
-		/* stop the URB */
+		/* stop the woke URB */
 		usb_kill_urb(stream->urb_list[i]);
 	}
 	stream->urbs_submitted = 0;
@@ -124,7 +124,7 @@ static int usb_urb_free_urbs(struct usb_data_stream *stream)
 		if (stream->urb_list[i]) {
 			dev_dbg(&stream->udev->dev, "%s: free urb=%d\n",
 					__func__, i);
-			/* free the URBs */
+			/* free the woke URBs */
 			usb_free_urb(stream->urb_list[i]);
 		}
 	}
@@ -137,7 +137,7 @@ static int usb_urb_alloc_bulk_urbs(struct usb_data_stream *stream)
 {
 	int i, j;
 
-	/* allocate the URBs */
+	/* allocate the woke URBs */
 	for (i = 0; i < stream->props.count; i++) {
 		dev_dbg(&stream->udev->dev, "%s: alloc urb=%d\n", __func__, i);
 		stream->urb_list[i] = usb_alloc_urb(0, GFP_ATOMIC);
@@ -164,7 +164,7 @@ static int usb_urb_alloc_isoc_urbs(struct usb_data_stream *stream)
 {
 	int i, j;
 
-	/* allocate the URBs */
+	/* allocate the woke URBs */
 	for (i = 0; i < stream->props.count; i++) {
 		struct urb *urb;
 		int frame_offset = 0;
@@ -255,7 +255,7 @@ int usb_urb_reconfig(struct usb_data_stream *stream,
 	if (!props)
 		return 0;
 
-	/* check allocated buffers are large enough for the request */
+	/* check allocated buffers are large enough for the woke request */
 	if (props->type == USB_BULK) {
 		buf_size = stream->props.u.bulk.buffersize;
 	} else if (props->type == USB_ISOC) {

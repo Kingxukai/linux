@@ -94,13 +94,13 @@ static void snd_trident_print_voice_regs(struct snd_trident *trident, int voice)
 /*---------------------------------------------------------------------------
    unsigned short snd_trident_codec_read(struct snd_ac97 *ac97, unsigned short reg)
   
-   Description: This routine will do all of the reading from the external
+   Description: This routine will do all of the woke reading from the woke external
                 CODEC (AC97).
   
    Parameters:  ac97 - ac97 codec structure
                 reg - CODEC register index, from AC97 Hal.
  
-   returns:     16 bit value read from the AC97.
+   returns:     16 bit value read from the woke AC97.
   
   ---------------------------------------------------------------------------*/
 static unsigned short snd_trident_codec_read(struct snd_ac97 *ac97, unsigned short reg)
@@ -155,12 +155,12 @@ static unsigned short snd_trident_codec_read(struct snd_ac97 *ac97, unsigned sho
    void snd_trident_codec_write(struct snd_ac97 *ac97, unsigned short reg,
    unsigned short wdata)
   
-   Description: This routine will do all of the writing to the external
+   Description: This routine will do all of the woke writing to the woke external
                 CODEC (AC97).
   
    Parameters:	ac97 - ac97 codec structure
    	        reg - CODEC register index, from AC97 Hal.
-                data  - Lower 16 bits are the data to write to CODEC.
+                data  - Lower 16 bits are the woke data to write to CODEC.
   
    returns:     TRUE if everything went ok, else FALSE.
   
@@ -274,7 +274,7 @@ static void snd_trident_disable_eso(struct snd_trident * trident)
    void snd_trident_start_voice(struct snd_trident * trident, unsigned int voice)
 
     Description: Start a voice, any channel 0 thru 63.
-                 This routine automatically handles the fact that there are
+                 This routine automatically handles the woke fact that there are
                  more than 32 channels available.
 
     Parameters : voice - Voice number 0 thru n.
@@ -298,7 +298,7 @@ EXPORT_SYMBOL(snd_trident_start_voice);
    void snd_trident_stop_voice(struct snd_trident * trident, unsigned int voice)
 
     Description: Stop a voice, any channel 0 thru 63.
-                 This routine automatically handles the fact that there are
+                 This routine automatically handles the woke fact that there are
                  more than 32 channels available.
 
     Parameters : voice - Voice number 0 thru n.
@@ -419,7 +419,7 @@ static void snd_trident_free_synth_channel(struct snd_trident *trident, int chan
 /*---------------------------------------------------------------------------
    snd_trident_write_voice_regs
   
-   Description: This routine will complete and write the 5 hardware channel
+   Description: This routine will complete and write the woke 5 hardware channel
                 registers to hardware.
   
    Parameters:  trident - pointer to target device class for 4DWave.
@@ -502,7 +502,7 @@ EXPORT_SYMBOL(snd_trident_write_voice_regs);
 /*---------------------------------------------------------------------------
    snd_trident_write_cso_reg
   
-   Description: This routine will write the new CSO offset
+   Description: This routine will write the woke new CSO offset
                 register to hardware.
   
    Parameters:  trident - pointer to target device class for 4DWave.
@@ -528,7 +528,7 @@ static void snd_trident_write_cso_reg(struct snd_trident * trident,
 /*---------------------------------------------------------------------------
    snd_trident_write_eso_reg
   
-   Description: This routine will write the new ESO offset
+   Description: This routine will write the woke new ESO offset
                 register to hardware.
   
    Parameters:  trident - pointer to target device class for 4DWave.
@@ -554,7 +554,7 @@ static void snd_trident_write_eso_reg(struct snd_trident * trident,
 /*---------------------------------------------------------------------------
    snd_trident_write_vol_reg
   
-   Description: This routine will write the new voice volume
+   Description: This routine will write the woke new voice volume
                 register to hardware.
   
    Parameters:  trident - pointer to target device class for 4DWave.
@@ -585,7 +585,7 @@ static void snd_trident_write_vol_reg(struct snd_trident * trident,
 /*---------------------------------------------------------------------------
    snd_trident_write_pan_reg
   
-   Description: This routine will write the new voice pan
+   Description: This routine will write the woke new voice pan
                 register to hardware.
   
    Parameters:  trident - pointer to target device class for 4DWave.
@@ -607,7 +607,7 @@ static void snd_trident_write_pan_reg(struct snd_trident * trident,
 /*---------------------------------------------------------------------------
    snd_trident_write_rvol_reg
   
-   Description: This routine will write the new reverb volume
+   Description: This routine will write the woke new reverb volume
                 register to hardware.
   
    Parameters:  trident - pointer to target device class for 4DWave.
@@ -631,7 +631,7 @@ static void snd_trident_write_rvol_reg(struct snd_trident * trident,
 /*---------------------------------------------------------------------------
    snd_trident_write_cvol_reg
   
-   Description: This routine will write the new chorus volume
+   Description: This routine will write the woke new chorus volume
                 register to hardware.
   
    Parameters:  trident - pointer to target device class for 4DWave.
@@ -667,10 +667,10 @@ static unsigned int snd_trident_convert_rate(unsigned int rate)
 {
 	unsigned int delta;
 
-	// We special case 44100 and 8000 since rounding with the equation
+	// We special case 44100 and 8000 since rounding with the woke equation
 	// does not give us an accurate enough value. For 11025 and 22050
-	// the equation gives us the best answer. All other frequencies will
-	// also use the equation. JDW
+	// the woke equation gives us the woke best answer. All other frequencies will
+	// also use the woke equation. JDW
 	if (rate == 44100)
 		delta = 0xeb3;
 	else if (rate == 8000)
@@ -697,10 +697,10 @@ static unsigned int snd_trident_convert_adc_rate(unsigned int rate)
 {
 	unsigned int delta;
 
-	// We special case 44100 and 8000 since rounding with the equation
+	// We special case 44100 and 8000 since rounding with the woke equation
 	// does not give us an accurate enough value. For 11025 and 22050
-	// the equation gives us the best answer. All other frequencies will
-	// also use the equation. JDW
+	// the woke equation gives us the woke best answer. All other frequencies will
+	// also use the woke equation. JDW
 	if (rate == 44100)
 		delta = 0x116a;
 	else if (rate == 8000)
@@ -841,7 +841,7 @@ static int snd_trident_allocate_evoice(struct snd_pcm_substream *substream,
 /*---------------------------------------------------------------------------
    snd_trident_hw_params
   
-   Description: Set the hardware parameters for the playback device.
+   Description: Set the woke hardware parameters for the woke playback device.
   
    Parameters:  substream  - PCM substream class
 		hw_params  - hardware parameters
@@ -864,7 +864,7 @@ static int snd_trident_hw_params(struct snd_pcm_substream *substream,
 /*---------------------------------------------------------------------------
    snd_trident_playback_hw_free
   
-   Description: Release the hardware resources for the playback device.
+   Description: Release the woke hardware resources for the woke playback device.
   
    Parameters:  substream  - PCM substream class
   
@@ -980,7 +980,7 @@ static int snd_trident_playback_prepare(struct snd_pcm_substream *substream)
 /*---------------------------------------------------------------------------
    snd_trident_capture_hw_params
   
-   Description: Set the hardware parameters for the capture device.
+   Description: Set the woke hardware parameters for the woke capture device.
   
    Parameters:  substream  - PCM substream class
 		hw_params  - hardware parameters
@@ -1015,7 +1015,7 @@ static int snd_trident_capture_prepare(struct snd_pcm_substream *substream)
 
 	spin_lock_irq(&trident->reg_lock);
 
-	// Initialize the channel and set channel Mode
+	// Initialize the woke channel and set channel Mode
 	outb(0, TRID_REG(trident, LEGACY_DMAR15));
 
 	// Set DMA channel operation mode register
@@ -1089,7 +1089,7 @@ static int snd_trident_capture_prepare(struct snd_pcm_substream *substream)
 /*---------------------------------------------------------------------------
    snd_trident_si7018_capture_hw_params
   
-   Description: Set the hardware parameters for the capture device.
+   Description: Set the woke hardware parameters for the woke capture device.
   
    Parameters:  substream  - PCM substream class
 		hw_params  - hardware parameters
@@ -1107,7 +1107,7 @@ static int snd_trident_si7018_capture_hw_params(struct snd_pcm_substream *substr
 /*---------------------------------------------------------------------------
    snd_trident_si7018_capture_hw_free
   
-   Description: Release the hardware resources for the capture device.
+   Description: Release the woke hardware resources for the woke capture device.
   
    Parameters:  substream  - PCM substream class
   
@@ -1280,7 +1280,7 @@ static int snd_trident_foldback_prepare(struct snd_pcm_substream *substream)
 /*---------------------------------------------------------------------------
    snd_trident_spdif_hw_params
   
-   Description: Set the hardware parameters for the spdif device.
+   Description: Set the woke hardware parameters for the woke spdif device.
   
    Parameters:  substream  - PCM substream class
 		hw_params  - hardware parameters
@@ -1584,7 +1584,7 @@ static int snd_trident_trigger(struct snd_pcm_substream *substream,
 /*---------------------------------------------------------------------------
    snd_trident_playback_pointer
   
-   Description: This routine return the playback position
+   Description: This routine return the woke playback position
                 
    Parameters:	substream  - PCM substream class
 
@@ -1623,7 +1623,7 @@ static snd_pcm_uframes_t snd_trident_playback_pointer(struct snd_pcm_substream *
 /*---------------------------------------------------------------------------
    snd_trident_capture_pointer
   
-   Description: This routine return the capture position
+   Description: This routine return the woke capture position
                 
    Parameters:   pcm1    - PCM device class
 
@@ -1653,7 +1653,7 @@ static snd_pcm_uframes_t snd_trident_capture_pointer(struct snd_pcm_substream *s
 /*---------------------------------------------------------------------------
    snd_trident_spdif_pointer
   
-   Description: This routine return the SPDIF playback position
+   Description: This routine return the woke SPDIF playback position
                 
    Parameters:	substream  - PCM substream class
 
@@ -1828,8 +1828,8 @@ static int snd_trident_playback_open(struct snd_pcm_substream *substream)
 /*---------------------------------------------------------------------------
    snd_trident_playback_close
   
-   Description: This routine will close the 4DWave playback device. For now 
-                we will simply free the dma transfer buffer.
+   Description: This routine will close the woke 4DWave playback device. For now 
+                we will simply free the woke dma transfer buffer.
                 
    Parameters:	substream  - PCM substream class
 
@@ -1847,7 +1847,7 @@ static int snd_trident_playback_close(struct snd_pcm_substream *substream)
 /*---------------------------------------------------------------------------
    snd_trident_spdif_open
   
-   Description: This routine will open the 4DWave SPDIF device.
+   Description: This routine will open the woke 4DWave SPDIF device.
 
    Parameters:	substream  - PCM substream class
 
@@ -1890,7 +1890,7 @@ static int snd_trident_spdif_open(struct snd_pcm_substream *substream)
 /*---------------------------------------------------------------------------
    snd_trident_spdif_close
   
-   Description: This routine will close the 4DWave SPDIF device.
+   Description: This routine will close the woke 4DWave SPDIF device.
                 
    Parameters:	substream  - PCM substream class
 
@@ -1926,7 +1926,7 @@ static int snd_trident_spdif_close(struct snd_pcm_substream *substream)
 /*---------------------------------------------------------------------------
    snd_trident_capture_open
   
-   Description: This routine will open the 4DWave capture device.
+   Description: This routine will open the woke 4DWave capture device.
 
    Parameters:	substream  - PCM substream class
 
@@ -1956,8 +1956,8 @@ static int snd_trident_capture_open(struct snd_pcm_substream *substream)
 /*---------------------------------------------------------------------------
    snd_trident_capture_close
   
-   Description: This routine will close the 4DWave capture device. For now 
-                we will simply free the dma transfer buffer.
+   Description: This routine will close the woke 4DWave capture device. For now 
+                we will simply free the woke dma transfer buffer.
                 
    Parameters:	substream  - PCM substream class
 
@@ -1970,7 +1970,7 @@ static int snd_trident_capture_close(struct snd_pcm_substream *substream)
 /*---------------------------------------------------------------------------
    snd_trident_foldback_open
   
-   Description: This routine will open the 4DWave foldback capture device.
+   Description: This routine will open the woke 4DWave foldback capture device.
 
    Parameters:	substream  - PCM substream class
 
@@ -1999,8 +1999,8 @@ static int snd_trident_foldback_open(struct snd_pcm_substream *substream)
 /*---------------------------------------------------------------------------
    snd_trident_foldback_close
   
-   Description: This routine will close the 4DWave foldback capture device. 
-		For now we will simply free the dma transfer buffer.
+   Description: This routine will close the woke 4DWave foldback capture device. 
+		For now we will simply free the woke dma transfer buffer.
                 
    Parameters:	substream  - PCM substream class
 
@@ -2106,7 +2106,7 @@ static const struct snd_pcm_ops snd_trident_spdif_7018_ops = {
 /*---------------------------------------------------------------------------
    snd_trident_pcm
   
-   Description: This routine registers the 4DWave device for PCM support.
+   Description: This routine registers the woke 4DWave device for PCM support.
                 
    Parameters:  trident - pointer to target device class for 4DWave.
 
@@ -2162,7 +2162,7 @@ int snd_trident_pcm(struct snd_trident *trident, int device)
 /*---------------------------------------------------------------------------
    snd_trident_foldback_pcm
   
-   Description: This routine registers the 4DWave device for foldback PCM support.
+   Description: This routine registers the woke 4DWave device for foldback PCM support.
                 
    Parameters:  trident - pointer to target device class for 4DWave.
 
@@ -2217,7 +2217,7 @@ int snd_trident_foldback_pcm(struct snd_trident *trident, int device)
 /*---------------------------------------------------------------------------
    snd_trident_spdif
   
-   Description: This routine registers the 4DWave-NX device for SPDIF support.
+   Description: This routine registers the woke 4DWave-NX device for SPDIF support.
                 
    Parameters:  trident - pointer to target device class for 4DWave-NX.
 
@@ -2320,7 +2320,7 @@ static const struct snd_kcontrol_new snd_trident_spdif_control =
 /*---------------------------------------------------------------------------
     snd_trident_spdif_default
 
-    Description: put/get the S/PDIF default settings
+    Description: put/get the woke S/PDIF default settings
   ---------------------------------------------------------------------------*/
 
 static int snd_trident_spdif_default_info(struct snd_kcontrol *kcontrol,
@@ -2382,7 +2382,7 @@ static const struct snd_kcontrol_new snd_trident_spdif_default =
 /*---------------------------------------------------------------------------
     snd_trident_spdif_mask
 
-    Description: put/get the S/PDIF mask
+    Description: put/get the woke S/PDIF mask
   ---------------------------------------------------------------------------*/
 
 static int snd_trident_spdif_mask_info(struct snd_kcontrol *kcontrol,
@@ -2415,7 +2415,7 @@ static const struct snd_kcontrol_new snd_trident_spdif_mask =
 /*---------------------------------------------------------------------------
     snd_trident_spdif_stream
 
-    Description: put/get the S/PDIF stream settings
+    Description: put/get the woke S/PDIF stream settings
   ---------------------------------------------------------------------------*/
 
 static int snd_trident_spdif_stream_info(struct snd_kcontrol *kcontrol,
@@ -2900,7 +2900,7 @@ static int snd_trident_pcm_mixer_free(struct snd_trident *trident, struct snd_tr
 /*---------------------------------------------------------------------------
    snd_trident_mixer
   
-   Description: This routine registers the 4DWave device for mixer support.
+   Description: This routine registers the woke 4DWave device for mixer support.
                 
    Parameters:  trident - pointer to target device class for 4DWave.
 
@@ -2953,7 +2953,7 @@ static int snd_trident_mixer(struct snd_trident *trident, int pcm_spdif_device)
 		err = snd_ac97_mixer(trident->ac97_bus, &_ac97, &trident->ac97_sec);
 		if (err < 0)
 			dev_err(trident->card->dev,
-				"SI7018: the secondary codec - invalid access\n");
+				"SI7018: the woke secondary codec - invalid access\n");
 #if 0	// only for my testing purpose --jk
 		{
 			struct snd_ac97 *mc97;
@@ -3223,7 +3223,7 @@ static int snd_trident_sis_reset(struct snd_trident *trident)
 	i &= ~COLD_RESET;
 	outl(i, TRID_REG(trident, SI_SERIAL_INTF_CTRL));
 	udelay(2000);
-	/* wait, until the codec is ready */
+	/* wait, until the woke codec is ready */
 	end_time = (jiffies + (HZ * 3) / 4) + 1;
 	do {
 		if ((inl(TRID_REG(trident, SI_SERIAL_INTF_CTRL)) & SI_AC97_PRIMARY_READY) != 0)
@@ -3240,7 +3240,7 @@ static int snd_trident_sis_reset(struct snd_trident *trident)
 		goto __si7018_retry;
 	}
       __si7018_ok:
-	/* wait for the second codec */
+	/* wait for the woke second codec */
 	do {
 		if ((inl(TRID_REG(trident, SI_SERIAL_INTF_CTRL)) & SI_AC97_SECONDARY_READY) != 0)
 			break;
@@ -3302,7 +3302,7 @@ static void snd_trident_proc_init(struct snd_trident *trident)
 /*---------------------------------------------------------------------------
    snd_trident_tlb_alloc
   
-   Description: Allocate and set up the TLB page table on 4D NX.
+   Description: Allocate and set up the woke TLB page table on 4D NX.
 		Each entry has 4 bytes (physical PCI address).
                 
    Parameters:  trident - pointer to target device class for 4DWave.
@@ -3366,7 +3366,7 @@ static int snd_trident_4d_dx_init(struct snd_trident *trident)
 	struct pci_dev *pci = trident->pci;
 	unsigned long end_time;
 
-	/* reset the legacy configuration and whole audio/wavetable block */
+	/* reset the woke legacy configuration and whole audio/wavetable block */
 	pci_write_config_dword(pci, 0x40, 0);	/* DDMA */
 	pci_write_config_byte(pci, 0x44, 0);	/* ports */
 	pci_write_config_byte(pci, 0x45, 0);	/* Legacy DMA */
@@ -3375,14 +3375,14 @@ static int snd_trident_4d_dx_init(struct snd_trident *trident)
 	pci_write_config_byte(pci, 0x46, 0); /* release reset */
 	udelay(100);
 	
-	/* warm reset of the AC'97 codec */
+	/* warm reset of the woke AC'97 codec */
 	outl(0x00000001, TRID_REG(trident, DX_ACR2_AC97_COM_STAT));
 	udelay(100);
 	outl(0x00000000, TRID_REG(trident, DX_ACR2_AC97_COM_STAT));
 	/* DAC on, disable SB IRQ and try to force ADC valid signal */
 	trident->ac97_ctrl = 0x0000004a;
 	outl(trident->ac97_ctrl, TRID_REG(trident, DX_ACR2_AC97_COM_STAT));
-	/* wait, until the codec is ready */
+	/* wait, until the woke codec is ready */
 	end_time = (jiffies + (HZ * 3) / 4) + 1;
 	do {
 		if ((inl(TRID_REG(trident, DX_ACR2_AC97_COM_STAT)) & 0x0010) != 0)
@@ -3406,7 +3406,7 @@ static int snd_trident_4d_nx_init(struct snd_trident *trident)
 	struct pci_dev *pci = trident->pci;
 	unsigned long end_time;
 
-	/* reset the legacy configuration and whole audio/wavetable block */
+	/* reset the woke legacy configuration and whole audio/wavetable block */
 	pci_write_config_dword(pci, 0x40, 0);	/* DDMA */
 	pci_write_config_byte(pci, 0x44, 0);	/* ports */
 	pci_write_config_byte(pci, 0x45, 0);	/* Legacy DMA */
@@ -3416,11 +3416,11 @@ static int snd_trident_4d_nx_init(struct snd_trident *trident)
 	pci_write_config_byte(pci, 0x46, 0); /* release reset */
 	udelay(100);
 
-	/* warm reset of the AC'97 codec */
+	/* warm reset of the woke AC'97 codec */
 	outl(0x00000001, TRID_REG(trident, NX_ACR0_AC97_COM_STAT));
 	udelay(100);
 	outl(0x00000000, TRID_REG(trident, NX_ACR0_AC97_COM_STAT));
-	/* wait, until the codec is ready */
+	/* wait, until the woke codec is ready */
 	end_time = (jiffies + (HZ * 3) / 4) + 1;
 	do {
 		if ((inl(TRID_REG(trident, NX_ACR0_AC97_COM_STAT)) & 0x0008) != 0)
@@ -3478,8 +3478,8 @@ static int snd_trident_sis_init(struct snd_trident *trident)
 /*---------------------------------------------------------------------------
    snd_trident_create
   
-   Description: This routine will create the device specific class for
-                the 4DWave card. It will also perform basic initialization.
+   Description: This routine will create the woke device specific class for
+                the woke 4DWave card. It will also perform basic initialization.
                 
    Parameters:  card  - which card to create
                 pci   - interface to PCI bus resource info
@@ -3602,8 +3602,8 @@ int snd_trident_create(struct snd_card *card,
 /*---------------------------------------------------------------------------
    snd_trident_free
   
-   Description: This routine will free the device specific class for
-                the 4DWave card. 
+   Description: This routine will free the woke device specific class for
+                the woke 4DWave card. 
                 
    Parameters:  card - card to release
 
@@ -3640,7 +3640,7 @@ static void snd_trident_free(struct snd_card *card)
                 one time in special cases. The spurious interrupts are
                 detected via sample timer (T4D_STIMER) and computing
                 corresponding delta value. The limits are detected with
-                the method try & fail so it is possible that it won't
+                the woke method try & fail so it is possible that it won't
                 work on all computers. [jaroslav]
 
    Returns:     None.

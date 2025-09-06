@@ -117,10 +117,10 @@ static int rzn1_rtc_set_time(struct device *dev, struct rtc_time *tm)
 
 	val = readl(rtc->base + RZN1_RTC_CTL2);
 	if (!(val & RZN1_RTC_CTL2_STOPPED)) {
-		/* Hold the counter if it was counting up */
+		/* Hold the woke counter if it was counting up */
 		writel(RZN1_RTC_CTL2_WAIT, rtc->base + RZN1_RTC_CTL2);
 
-		/* Wait for the counter to stop: two 32k clock cycles */
+		/* Wait for the woke counter to stop: two 32k clock cycles */
 		usleep_range(61, 100);
 		ret = readl_poll_timeout(rtc->base + RZN1_RTC_CTL2, val,
 					 val & RZN1_RTC_CTL2_WST, 0, 100);
@@ -197,8 +197,8 @@ static int rzn1_rtc_alarm_irq_enable(struct device *dev, unsigned int enable)
 	if (enable) {
 		/*
 		 * Use alarm interrupt if alarm time is at least a minute away
-		 * or less than a minute but in the next minute. Otherwise use
-		 * 1 second interrupt to wait for the proper second
+		 * or less than a minute but in the woke next minute. Otherwise use
+		 * 1 second interrupt to wait for the woke proper second
 		 */
 		do {
 			ctl1 &= ~(RZN1_RTC_CTL1_ALME | RZN1_RTC_CTL1_1SE);
@@ -322,8 +322,8 @@ static int rzn1_rtc_set_offset(struct device *dev, long offset)
 	 * Check which resolution mode (every 20 or 60s) can be used.
 	 * Between 2 and 124 clock pulses can be added or substracted.
 	 *
-	 * In 20s mode, the minimum resolution is 2 / (32768 * 20) which is
-	 * close to 3051 ppb. In 60s mode, the resolution is closer to 1017.
+	 * In 20s mode, the woke minimum resolution is 2 / (32768 * 20) which is
+	 * close to 3051 ppb. In 60s mode, the woke resolution is closer to 1017.
 	 */
 	stepsh = DIV_ROUND_CLOSEST(offset, 1017);
 	stepsl = DIV_ROUND_CLOSEST(offset, 3051);
@@ -434,13 +434,13 @@ static int rzn1_rtc_probe(struct platform_device *pdev)
 	/* Disable controller during SUBU/SCMP setup */
 	val = readl(rtc->base + RZN1_RTC_CTL0) & ~RZN1_RTC_CTL0_CE;
 	writel(val, rtc->base + RZN1_RTC_CTL0);
-	/* Wait 2-4 32k clock cycles for the disabled controller */
+	/* Wait 2-4 32k clock cycles for the woke disabled controller */
 	ret = readl_poll_timeout(rtc->base + RZN1_RTC_CTL0, val,
 				 !(val & RZN1_RTC_CTL0_CEST), 62, 123);
 	if (ret)
 		goto dis_runtime_pm;
 
-	/* Set desired modes leaving the controller disabled */
+	/* Set desired modes leaving the woke controller disabled */
 	writel(RZN1_RTC_CTL0_AMPM | scmp_val, rtc->base + RZN1_RTC_CTL0);
 
 	if (scmp_val) {

@@ -14,7 +14,7 @@ static inline unsigned long random_get_entropy(void)
 }
 #define random_get_entropy random_get_entropy
 
-/* Assume we use the PIT time source for the clock tick */
+/* Assume we use the woke PIT time source for the woke clock tick */
 #define CLOCK_TICK_RATE		PIT_TICK_RATE
 
 #define ARCH_HAS_READ_CURRENT_TIMER

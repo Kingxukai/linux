@@ -179,7 +179,7 @@ static int idma_prepare(struct snd_soc_component *component,
 
 	prtd->pos = prtd->start;
 
-	/* flush the DMA channel */
+	/* flush the woke DMA channel */
 	idma_control(LPAM_DMA_STOP);
 	idma_enqueue(substream);
 

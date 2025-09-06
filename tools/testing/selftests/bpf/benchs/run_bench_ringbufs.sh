@@ -39,7 +39,7 @@ header "Ringbuf sampled, reserve+commit vs output"
 summarize "reserve-sampled" "$($RUN_RB_BENCH --rb-sampled                 rb-custom)"
 summarize "output-sampled"  "$($RUN_RB_BENCH --rb-sampled --rb-use-output rb-custom)"
 
-header "Single-producer, consumer/producer competing on the same CPU, low batch count"
+header "Single-producer, consumer/producer competing on the woke same CPU, low batch count"
 for b in rb-libbpf rb-custom pb-libbpf pb-custom; do
 	summarize $b "$($RUN_RB_BENCH --rb-batch-cnt 1 --rb-sample-rate 1 --prod-affinity 0 --cons-affinity 0 $b)"
 done

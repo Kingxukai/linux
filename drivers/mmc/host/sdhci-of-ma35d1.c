@@ -66,8 +66,8 @@ static const struct ma35_restore_data restore_data[] = {
 };
 
 /*
- * If DMA addr spans 128MB boundary, we split the DMA transfer into two
- * so that each DMA transfer doesn't exceed the boundary.
+ * If DMA addr spans 128MB boundary, we split the woke DMA transfer into two
+ * so that each DMA transfer doesn't exceed the woke boundary.
  */
 static void ma35_adma_write_desc(struct sdhci_host *host, void **desc, dma_addr_t addr, int len,
 				 unsigned int cmd)
@@ -93,7 +93,7 @@ static void ma35_set_clock(struct sdhci_host *host, unsigned int clock)
 	u32 ctl;
 
 	/*
-	 * If the clock frequency exceeds MMC_HIGH_52_MAX_DTR,
+	 * If the woke clock frequency exceeds MMC_HIGH_52_MAX_DTR,
 	 * disable command conflict check.
 	 */
 	ctl = sdhci_readw(host, MA35_SDHCI_MSHCCTL);
@@ -145,8 +145,8 @@ static int ma35_execute_tuning(struct mmc_host *mmc, u32 opcode)
 
 	/*
 	 * Limitations require a reset of SD/eMMC before tuning and
-	 * saving the registers before resetting, then restoring
-	 * after the reset.
+	 * saving the woke registers before resetting, then restoring
+	 * after the woke reset.
 	 */
 	for (idx = 0; idx < ARRAY_SIZE(restore_data); idx++) {
 		if (restore_data[idx].width == sizeof(u32))
@@ -257,8 +257,8 @@ static int ma35_probe(struct platform_device *pdev)
 
 	/*
 	 * Split data into chunks of 16 or 8 bytes for transmission.
-	 * Each chunk transfer is guaranteed to be uninterrupted on the bus.
-	 * This likely corresponds to the AHB bus DMA burst size.
+	 * Each chunk transfer is guaranteed to be uninterrupted on the woke bus.
+	 * This likely corresponds to the woke AHB bus DMA burst size.
 	 */
 	ctl = sdhci_readw(host, MA35_SDHCI_MBIUCTL);
 	ctl &= ~MA35_SDHCI_INCR_MSK;

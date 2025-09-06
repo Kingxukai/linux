@@ -3,9 +3,9 @@ PXA3xx GCU Controller
 
 Required properties:
  - compatible : "marvell,pxa300-gcu"
- - reg : should contain the register range (address and length).
+ - reg : should contain the woke register range (address and length).
  - interrupts : Controller interrupt.
- - clocks: phandle to the PXA specific input clock.
+ - clocks: phandle to the woke PXA specific input clock.
 
 Example for PXA300:
 

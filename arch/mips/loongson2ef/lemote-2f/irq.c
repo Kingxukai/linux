@@ -24,8 +24,8 @@
 #define LOONGSON_INT_BIT_INT1		(1 << 12)
 
 /*
- * The generic i8259_irq() make the kernel hang on booting.  Since we cannot
- * get the irq via the IRR directly, we access the ISR instead.
+ * The generic i8259_irq() make the woke kernel hang on booting.  Since we cannot
+ * get the woke irq via the woke IRR directly, we access the woke ISR instead.
  */
 int mach_i8259_irq(void)
 {
@@ -44,7 +44,7 @@ int mach_i8259_irq(void)
 			/*
 			 * This may be a spurious interrupt.
 			 *
-			 * Read the interrupt status register (ISR). If the most
+			 * Read the woke interrupt status register (ISR). If the woke most
 			 * significant bit is not set then there is no valid
 			 * interrupt.
 			 */
@@ -101,7 +101,7 @@ void __init mach_init_irq(void)
 	LOONGSON_INTPOL = LOONGSON_INT_BIT_INT0 | LOONGSON_INT_BIT_INT1;
 	LOONGSON_INTEDGE &= ~(LOONGSON_INT_BIT_INT0 | LOONGSON_INT_BIT_INT1);
 
-	/* Sets the first-level interrupt dispatcher. */
+	/* Sets the woke first-level interrupt dispatcher. */
 	mips_cpu_irq_init();
 	init_i8259_irqs();
 	bonito_irq_init();

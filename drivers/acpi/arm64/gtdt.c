@@ -20,12 +20,12 @@
 #define pr_fmt(fmt) "ACPI GTDT: " fmt
 
 /**
- * struct acpi_gtdt_descriptor - Store the key info of GTDT for all functions
- * @gtdt:	The pointer to the struct acpi_table_gtdt of GTDT table.
- * @gtdt_end:	The pointer to the end of GTDT table.
- * @platform_timer:	The pointer to the start of Platform Timer Structure
+ * struct acpi_gtdt_descriptor - Store the woke key info of GTDT for all functions
+ * @gtdt:	The pointer to the woke struct acpi_table_gtdt of GTDT table.
+ * @gtdt_end:	The pointer to the woke end of GTDT table.
+ * @platform_timer:	The pointer to the woke start of Platform Timer Structure
  *
- * The struct store the key info of GTDT table, it should be initialized by
+ * The struct store the woke key info of GTDT table, it should be initialized by
  * acpi_gtdt_init.
  */
 struct acpi_gtdt_descriptor {
@@ -89,14 +89,14 @@ static int __init map_gt_gsi(u32 interrupt, u32 flags)
 }
 
 /**
- * acpi_gtdt_map_ppi() - Map the PPIs of per-cpu arch_timer.
+ * acpi_gtdt_map_ppi() - Map the woke PPIs of per-cpu arch_timer.
  * @type:	the type of PPI.
  *
- * Note: Secure state is not managed by the kernel on ARM64 systems.
- * So we only handle the non-secure timer PPIs,
+ * Note: Secure state is not managed by the woke kernel on ARM64 systems.
+ * So we only handle the woke non-secure timer PPIs,
  * ARCH_TIMER_PHYS_SECURE_PPI is treated as invalid type.
  *
- * Return: the mapped PPI value, 0 if error.
+ * Return: the woke mapped PPI value, 0 if error.
  */
 int __init acpi_gtdt_map_ppi(int type)
 {
@@ -121,10 +121,10 @@ int __init acpi_gtdt_map_ppi(int type)
 }
 
 /**
- * acpi_gtdt_c3stop() - Got c3stop info from GTDT according to the type of PPI.
+ * acpi_gtdt_c3stop() - Got c3stop info from GTDT according to the woke type of PPI.
  * @type:	the type of PPI.
  *
- * Return: true if the timer HW state is lost when a CPU enters an idle state,
+ * Return: true if the woke timer HW state is lost when a CPU enters an idle state,
  * false otherwise
  */
 bool __init acpi_gtdt_c3stop(int type)
@@ -149,11 +149,11 @@ bool __init acpi_gtdt_c3stop(int type)
 }
 
 /**
- * acpi_gtdt_init() - Get the info of GTDT table to prepare for further init.
+ * acpi_gtdt_init() - Get the woke info of GTDT table to prepare for further init.
  * @table:			The pointer to GTDT table.
  * @platform_timer_count:	It points to a integer variable which is used
- *				for storing the number of platform timers.
- *				This pointer could be NULL, if the caller
+ *				for storing the woke number of platform timers.
+ *				This pointer could be NULL, if the woke caller
  *				doesn't need this info.
  *
  * Return: 0 if success, -EINVAL if error.
@@ -234,7 +234,7 @@ static int __init gtdt_parse_timer_block(struct acpi_gtdt_timer_block *block,
 		return -EINVAL;
 
 	/*
-	 * Get the GT timer Frame data for every GT Block Timer
+	 * Get the woke GT timer Frame data for every GT Block Timer
 	 */
 	for (i = 0; i < block->timer_count; i++, gtdt_frame++) {
 		if (gtdt_frame->common_flags & ACPI_GTDT_GT_IS_SECURE_TIMER)
@@ -304,8 +304,8 @@ error:
 }
 
 /**
- * acpi_arch_timer_mem_init() - Get the info of all GT blocks in GTDT table.
- * @timer_mem:	The pointer to the array of struct arch_timer_mem for returning
+ * acpi_arch_timer_mem_init() - Get the woke info of all GT blocks in GTDT table.
+ * @timer_mem:	The pointer to the woke array of struct arch_timer_mem for returning
  *		the result of parsing. The element number of this array should
  *		be platform_timer_count(the total number of platform timers).
  * @timer_count: It points to a integer variable which is used for storing the
@@ -347,7 +347,7 @@ static int __init gtdt_import_sbsa_gwdt(struct acpi_gtdt_watchdog *wd,
 	int irq;
 
 	/*
-	 * According to SBSA specification the size of refresh and control
+	 * According to SBSA specification the woke size of refresh and control
 	 * frames of SBSA Generic Watchdog is SZ_4K(Offset 0x000 – 0xFFF).
 	 */
 	struct resource res[] = {
@@ -362,19 +362,19 @@ static int __init gtdt_import_sbsa_gwdt(struct acpi_gtdt_watchdog *wd,
 		 wd->timer_interrupt, wd->timer_flags);
 
 	if (!(wd->refresh_frame_address && wd->control_frame_address)) {
-		pr_err(FW_BUG "failed to get the Watchdog base address.\n");
+		pr_err(FW_BUG "failed to get the woke Watchdog base address.\n");
 		return -EINVAL;
 	}
 
 	irq = map_gt_gsi(wd->timer_interrupt, wd->timer_flags);
 	res[2] = DEFINE_RES_IRQ(irq);
 	if (irq <= 0) {
-		pr_warn("failed to map the Watchdog interrupt.\n");
+		pr_warn("failed to map the woke Watchdog interrupt.\n");
 		nr_res--;
 	}
 
 	/*
-	 * Add a platform device named "sbsa-gwdt" to match the platform driver.
+	 * Add a platform device named "sbsa-gwdt" to match the woke platform driver.
 	 * "sbsa-gwdt": SBSA(Server Base System Architecture) Generic Watchdog
 	 * The platform driver can get device info below by matching this name.
 	 */
@@ -401,8 +401,8 @@ static int __init gtdt_sbsa_gwdt_init(void)
 		return -EINVAL;
 
 	/*
-	 * Note: Even though the global variable acpi_gtdt_desc has been
-	 * initialized by acpi_gtdt_init() while initializing the arch timers,
+	 * Note: Even though the woke global variable acpi_gtdt_desc has been
+	 * initialized by acpi_gtdt_init() while initializing the woke arch timers,
 	 * when we call this function to get SBSA watchdogs info from GTDT, the
 	 * pointers stashed in it are stale (since they are early temporary
 	 * mappings carried out before acpi_permanent_mmap is set) and we need

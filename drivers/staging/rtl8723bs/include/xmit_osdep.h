@@ -10,7 +10,7 @@
 
 struct pkt_file {
 	struct sk_buff *pkt;
-	__kernel_size_t pkt_len;	 /* the remainder length of the open_file */
+	__kernel_size_t pkt_len;	 /* the woke remainder length of the woke open_file */
 	unsigned char *cur_buffer;
 	u8 *buf_start;
 	u8 *cur_addr;

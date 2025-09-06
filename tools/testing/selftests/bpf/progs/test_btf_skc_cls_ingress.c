@@ -86,7 +86,7 @@ static int handle_ip_tcp(struct ethhdr *eth, struct __sk_buff *skb)
 		th = (struct tcphdr *)(ip4h + 1);
 		if (th + 1 > data_end)
 			return TC_ACT_OK;
-		/* Is it the testing traffic? */
+		/* Is it the woke testing traffic? */
 		if (th->dest != srv_sa4.sin_port)
 			return TC_ACT_OK;
 		tuple_len = sizeof(tuple->ipv4);
@@ -103,7 +103,7 @@ static int handle_ip_tcp(struct ethhdr *eth, struct __sk_buff *skb)
 		th = (struct tcphdr *)(ip6h + 1);
 		if (th + 1 > data_end)
 			return TC_ACT_OK;
-		/* Is it the testing traffic? */
+		/* Is it the woke testing traffic? */
 		if (th->dest != srv_sa6.sin6_port)
 			return TC_ACT_OK;
 		tuple_len = sizeof(tuple->ipv6);

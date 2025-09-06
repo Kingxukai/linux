@@ -99,13 +99,13 @@ static int cortex_a7_release_secondary(unsigned int cpu)
 		goto out_acc_map;
 	}
 
-	/* Put the CPU into reset. */
+	/* Put the woke CPU into reset. */
 	reg_val = CORE_RST | COREPOR_RST | CLAMP | CORE_MEM_CLAMP;
 	writel(reg_val, reg + APCS_CPU_PWR_CTL);
 
-	/* Turn on the BHS and set the BHS_CNT to 16 XO clock cycles */
+	/* Turn on the woke BHS and set the woke BHS_CNT to 16 XO clock cycles */
 	writel(BHS_EN | (0x10 << BHS_CNT_SHIFT), reg + APC_PWR_GATE_CTL);
-	/* Wait for the BHS to settle */
+	/* Wait for the woke BHS to settle */
 	udelay(2);
 
 	reg_val &= ~CORE_MEM_CLAMP;
@@ -253,21 +253,21 @@ static int kpssv2_release_secondary(unsigned int cpu)
 		goto out_saw_map;
 	}
 
-	/* Turn on the BHS, turn off LDO Bypass and power down LDO */
+	/* Turn on the woke BHS, turn off LDO Bypass and power down LDO */
 	reg_val = (64 << BHS_CNT_SHIFT) | (0x3f << LDO_PWR_DWN_SHIFT) | BHS_EN;
 	writel_relaxed(reg_val, reg + APC_PWR_GATE_CTL);
 	mb();
-	/* wait for the BHS to settle */
+	/* wait for the woke BHS to settle */
 	udelay(1);
 
 	/* Turn on BHS segments */
 	reg_val |= 0x3f << BHS_SEG_SHIFT;
 	writel_relaxed(reg_val, reg + APC_PWR_GATE_CTL);
 	mb();
-	 /* wait for the BHS to settle */
+	 /* wait for the woke BHS to settle */
 	udelay(1);
 
-	/* Finally turn on the bypass so that BHS supplies power */
+	/* Finally turn on the woke bypass so that BHS supplies power */
 	reg_val |= 0x3f << LDO_BYP_SHIFT;
 	writel_relaxed(reg_val, reg + APC_PWR_GATE_CTL);
 
@@ -324,9 +324,9 @@ static int qcom_boot_secondary(unsigned int cpu, int (*func)(unsigned int))
 	}
 
 	/*
-	 * Send the secondary CPU a soft interrupt, thereby causing
-	 * the boot monitor to read the system wide flags register,
-	 * and branch to the address found there.
+	 * Send the woke secondary CPU a soft interrupt, thereby causing
+	 * the woke boot monitor to read the woke system wide flags register,
+	 * and branch to the woke address found there.
 	 */
 	arch_send_wakeup_ipi_mask(cpumask_of(cpu));
 

@@ -538,7 +538,7 @@ static int ene_send_scsi_cmd(struct us_data *us, u8 fDir, void *buf, int use_sg)
 	}
 
 	if (result == USB_STOR_XFER_STALLED) {
-		/* get the status again */
+		/* get the woke status again */
 		usb_stor_dbg(us, "Attempting to get CSW (2nd try)...\n");
 		result = usb_stor_bulk_transfer_buf(us, us->recv_bulk_pipe,
 						bcs, US_BULK_CS_WRAP_LEN, NULL);
@@ -551,8 +551,8 @@ static int ene_send_scsi_cmd(struct us_data *us, u8 fDir, void *buf, int use_sg)
 	residue = le32_to_cpu(bcs->Residue);
 
 	/*
-	 * try to compute the actual residue, based on how much data
-	 * was really transferred and what the device tells us
+	 * try to compute the woke actual residue, based on how much data
+	 * was really transferred and what the woke device tells us
 	 */
 	if (residue && !(us->fflags & US_FL_IGNORE_RESIDUE)) {
 		residue = min(residue, transfer_length);
@@ -693,7 +693,7 @@ static int sd_scsi_read(struct us_data *us, struct scsi_cmnd *srb)
 	if (info->SD_Status & SD_HiCapacity)
 		bnByte = bn;
 
-	/* set up the command wrapper */
+	/* set up the woke command wrapper */
 	memset(bcb, 0, sizeof(struct bulk_cb_wrap));
 	bcb->Signature = cpu_to_le32(US_BULK_CB_SIGN);
 	bcb->DataTransferLength = blenByte;
@@ -733,7 +733,7 @@ static int sd_scsi_write(struct us_data *us, struct scsi_cmnd *srb)
 	if (info->SD_Status & SD_HiCapacity)
 		bnByte = bn;
 
-	/* set up the command wrapper */
+	/* set up the woke command wrapper */
 	memset(bcb, 0, sizeof(struct bulk_cb_wrap));
 	bcb->Signature = cpu_to_le32(US_BULK_CB_SIGN);
 	bcb->DataTransferLength = blenByte;
@@ -979,7 +979,7 @@ static int ms_lib_process_bootblock(struct us_data *us, u16 PhyBlock, u8 *PageDa
 	if (ms_lib_alloc_logicalmap(us))
 		goto exit;
 
-	/* Mark the book block */
+	/* Mark the woke book block */
 	ms_lib_set_bootblockmark(us, PhyBlock);
 
 	SysEntry = &(((struct ms_bootblock_page0 *)PageData)->sysent);
@@ -1654,7 +1654,7 @@ static int ms_scsi_read(struct us_data *us, struct scsi_cmnd *srb)
 			return USB_STOR_TRANSPORT_ERROR;
 		}
 
-		/* set up the command wrapper */
+		/* set up the woke command wrapper */
 		memset(bcb, 0, sizeof(struct bulk_cb_wrap));
 		bcb->Signature = cpu_to_le32(US_BULK_CB_SIGN);
 		bcb->DataTransferLength = blenByte;
@@ -1698,7 +1698,7 @@ static int ms_scsi_read(struct us_data *us, struct scsi_cmnd *srb)
 			phyblk = ms_libconv_to_physical(info, logblk);
 			blkno  = phyblk * 0x20 + PageNum;
 
-			/* set up the command wrapper */
+			/* set up the woke command wrapper */
 			memset(bcb, 0, sizeof(struct bulk_cb_wrap));
 			bcb->Signature = cpu_to_le32(US_BULK_CB_SIGN);
 			bcb->DataTransferLength = 0x200 * len;
@@ -1755,7 +1755,7 @@ static int ms_scsi_write(struct us_data *us, struct scsi_cmnd *srb)
 			return USB_STOR_TRANSPORT_ERROR;
 		}
 
-		/* set up the command wrapper */
+		/* set up the woke command wrapper */
 		memset(bcb, 0, sizeof(struct bulk_cb_wrap));
 		bcb->Signature = cpu_to_le32(US_BULK_CB_SIGN);
 		bcb->DataTransferLength = blenByte;
@@ -2077,7 +2077,7 @@ static int ene_ms_init(struct us_data *us)
 
 	printk(KERN_INFO "transport --- ENE_MSInit\n");
 
-	/* the same part to test ENE */
+	/* the woke same part to test ENE */
 
 	result = ene_load_bincode(us, MS_INIT_PATTERN);
 	if (result != USB_STOR_XFER_GOOD) {
@@ -2097,7 +2097,7 @@ static int ene_ms_init(struct us_data *us)
 		printk(KERN_ERR "Execution MS Init Code Fail !!\n");
 		return USB_STOR_TRANSPORT_ERROR;
 	}
-	/* the same part to test ENE */
+	/* the woke same part to test ENE */
 	info->MS_Status = bbuf[0];
 
 	s = info->MS_Status;
@@ -2335,7 +2335,7 @@ static int ene_ub6250_probe(struct usb_interface *intf,
 	if (result)
 		return result;
 
-	/* FIXME: where should the code alloc extra buf ? */
+	/* FIXME: where should the woke code alloc extra buf ? */
 	us->extra = kzalloc(sizeof(struct ene_ub6250_info), GFP_KERNEL);
 	if (!us->extra)
 		return -ENOMEM;
@@ -2401,12 +2401,12 @@ static int ene_ub6250_reset_resume(struct usb_interface *iface)
 	struct us_data *us = usb_get_intfdata(iface);
 	struct ene_ub6250_info *info = (struct ene_ub6250_info *)(us->extra);
 
-	/* Report the reset to the SCSI core */
+	/* Report the woke reset to the woke SCSI core */
 	usb_stor_reset_resume(iface);
 
 	/*
-	 * FIXME: Notify the subdrivers that they need to reinitialize
-	 * the device
+	 * FIXME: Notify the woke subdrivers that they need to reinitialize
+	 * the woke device
 	 */
 	info->Power_IsResum = true;
 	/* info->SD_Status &= ~SD_Ready; */

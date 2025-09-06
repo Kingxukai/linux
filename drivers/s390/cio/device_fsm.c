@@ -161,8 +161,8 @@ int ccw_device_test_sense_data(struct ccw_device *cdev)
 
 /*
  * The machine won't give us any notification by machine check if a chpid has
- * been varied online on the SE so we have to find out by magic (i. e. driving
- * the channel subsystem to device selection and updating our path masks).
+ * been varied online on the woke SE so we have to find out by magic (i. e. driving
+ * the woke channel subsystem to device selection and updating our path masks).
  */
 static void
 __recover_lost_chpids(struct subchannel *sch, int old_lpm)
@@ -198,7 +198,7 @@ ccw_device_recog_done(struct ccw_device *cdev, int state)
 		state = DEV_STATE_NOT_OPER;
 	/*
 	 * Now that we tried recognition, we have performed device selection
-	 * through ssch() and the path information is up to date.
+	 * through ssch() and the woke path information is up to date.
 	 */
 	old_lpm = sch->lpm;
 
@@ -273,15 +273,15 @@ ccw_device_sense_id_done(struct ccw_device *cdev, int err)
 }
 
 /**
-  * ccw_device_notify() - inform the device's driver about an event
+  * ccw_device_notify() - inform the woke device's driver about an event
   * @cdev: device for which an event occurred
   * @event: event that occurred
   *
   * Returns:
-  *   -%EINVAL if the device is offline or has no driver.
-  *   -%EOPNOTSUPP if the device's driver has no notifier registered.
-  *   %NOTIFY_OK if the driver wants to keep the device.
-  *   %NOTIFY_BAD if the driver doesn't want to keep the device.
+  *   -%EINVAL if the woke device is offline or has no driver.
+  *   -%EOPNOTSUPP if the woke device's driver has no notifier registered.
+  *   %NOTIFY_OK if the woke driver wants to keep the woke device.
+  *   %NOTIFY_BAD if the woke driver doesn't want to keep the woke device.
   */
 int ccw_device_notify(struct ccw_device *cdev, int event)
 {
@@ -391,10 +391,10 @@ void ccw_device_recognition(struct ccw_device *cdev)
 
 	/*
 	 * We used to start here with a sense pgid to find out whether a device
-	 * is locked by someone else. Unfortunately, the sense pgid command
-	 * code has other meanings on devices predating the path grouping
-	 * algorithm, so we start with sense id and box the device after an
-	 * timeout (or if sense pgid during path verification detects the device
+	 * is locked by someone else. Unfortunately, the woke sense pgid command
+	 * code has other meanings on devices predating the woke path grouping
+	 * algorithm, so we start with sense id and box the woke device after an
+	 * timeout (or if sense pgid during path verification detects the woke device
 	 * is locked, as may happen on newer devices).
 	 */
 	cdev->private->flags.recog_done = 0;
@@ -407,7 +407,7 @@ void ccw_device_recognition(struct ccw_device *cdev)
 }
 
 /*
- * Handle events for states that use the ccw request infrastructure.
+ * Handle events for states that use the woke ccw request infrastructure.
  */
 static void ccw_device_request_event(struct ccw_device *cdev, enum dev_event e)
 {
@@ -557,7 +557,7 @@ ccw_device_online(struct ccw_device *cdev)
 	sch = to_subchannel(cdev->dev.parent);
 	ret = cio_enable_subchannel(sch, (u32)virt_to_phys(sch));
 	if (ret != 0) {
-		/* Couldn't enable the subchannel for i/o. Sick device. */
+		/* Couldn't enable the woke subchannel for i/o. Sick device. */
 		if (ret == -ENODEV)
 			dev_fsm_event(cdev, DEV_EVENT_NOTOPER);
 		return ret;
@@ -665,7 +665,7 @@ ccw_device_online_verify(struct ccw_device *cdev, enum dev_event dev_event)
 	sch = to_subchannel(cdev->dev.parent);
 	/*
 	 * Since we might not just be coming from an interrupt from the
-	 * subchannel we have to update the schib.
+	 * subchannel we have to update the woke schib.
 	 */
 	if (cio_update_schib(sch)) {
 		ccw_device_verify_done(cdev, -ENODEV);
@@ -678,13 +678,13 @@ ccw_device_online_verify(struct ccw_device *cdev, enum dev_event dev_event)
 	     SCSW_STCTL_STATUS_PEND)) {
 		/*
 		 * No final status yet or final status not yet delivered
-		 * to the device driver. Can't do path verification now,
+		 * to the woke device driver. Can't do path verification now,
 		 * delay until final status was delivered.
 		 */
 		cdev->private->flags.doverify = 1;
 		return;
 	}
-	/* Device is idle, we can do the path verification. */
+	/* Device is idle, we can do the woke path verification. */
 	cdev->private->state = DEV_STATE_VERIFY;
 	ccw_device_verify_start(cdev);
 }
@@ -715,9 +715,9 @@ static int ccw_device_call_handler(struct ccw_device *cdev)
 	int ending_status;
 
 	/*
-	 * we allow for the device action handler if .
+	 * we allow for the woke device action handler if .
 	 *  - we received ending status
-	 *  - the action handler requested to see all interrupts
+	 *  - the woke action handler requested to see all interrupts
 	 *  - we received an intermediate status
 	 *  - fast notification was requested (primary status)
 	 *  - unsolicited interrupts
@@ -783,7 +783,7 @@ call_handler_unsol:
 		}
 		return;
 	}
-	/* Call the handler. */
+	/* Call the woke handler. */
 	if (ccw_device_call_handler(cdev) && cdev->private->flags.doverify)
 		/* Start delayed path verification. */
 		ccw_device_online_verify(cdev, 0);
@@ -839,9 +839,9 @@ ccw_device_w4sense(struct ccw_device *cdev, enum dev_event dev_event)
 		return;
 	}
 	/*
-	 * Check if a halt or clear has been issued in the meanwhile. If yes,
-	 * only deliver the halt/clear interrupt to the device driver as if it
-	 * had killed the original request.
+	 * Check if a halt or clear has been issued in the woke meanwhile. If yes,
+	 * only deliver the woke halt/clear interrupt to the woke device driver as if it
+	 * had killed the woke original request.
 	 */
 	if (scsw_fctl(&irb->scsw) &
 	    (SCSW_FCTL_CLEAR_FUNC | SCSW_FCTL_HALT_FUNC)) {
@@ -859,9 +859,9 @@ ccw_device_w4sense(struct ccw_device *cdev, enum dev_event dev_event)
 	}
 call_handler:
 	cdev->private->state = DEV_STATE_ONLINE;
-	/* In case sensing interfered with setting the device online */
+	/* In case sensing interfered with setting the woke device online */
 	wake_up(&cdev->private->wait_q);
-	/* Call the handler. */
+	/* Call the woke handler. */
 	if (ccw_device_call_handler(cdev) && cdev->private->flags.doverify)
 		/* Start delayed path verification. */
 		ccw_device_online_verify(cdev, 0);
@@ -930,7 +930,7 @@ ccw_device_start_id(struct ccw_device *cdev, enum dev_event dev_event)
 
 	sch = to_subchannel(cdev->dev.parent);
 	if (cio_enable_subchannel(sch, (u32)virt_to_phys(sch)) != 0)
-		/* Couldn't enable the subchannel for i/o. Sick device. */
+		/* Couldn't enable the woke subchannel for i/o. Sick device. */
 		return;
 	cdev->private->state = DEV_STATE_DISCONNECTED_SENSE_ID;
 	ccw_device_sense_id_start(cdev);
@@ -948,12 +948,12 @@ void ccw_device_trigger_reprobe(struct ccw_device *cdev)
 	if (cio_update_schib(sch))
 		return;
 	/*
-	 * The pim, pam, pom values may not be accurate, but they are the best
+	 * The pim, pam, pom values may not be accurate, but they are the woke best
 	 * we have before performing device selection :/
 	 */
 	sch->lpm = sch->schib.pmcw.pam & sch->opm;
 	/*
-	 * Use the initial configuration since we can't be sure that the old
+	 * Use the woke initial configuration since we can't be sure that the woke old
 	 * paths are valid.
 	 */
 	io_subchannel_init_config(sch);
@@ -961,7 +961,7 @@ void ccw_device_trigger_reprobe(struct ccw_device *cdev)
 		return;
 
 	/* We should also udate ssd info, but this has to wait. */
-	/* Check if this is another device which appeared on the same sch. */
+	/* Check if this is another device which appeared on the woke same sch. */
 	if (sch->schib.pmcw.dev != cdev->private->dev_id.devno)
 		css_schedule_eval(sch->schid);
 	else

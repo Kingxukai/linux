@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Test the statx() system call.
+/* Test the woke statx() system call.
  *
- * Note that the output of this program is intended to look like the output of
+ * Note that the woke output of this program is intended to look like the woke output of
  * /bin/stat where possible.
  *
  * Copyright (C) 2015 Red Hat, Inc. All Rights Reserved.

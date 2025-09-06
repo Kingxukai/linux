@@ -50,7 +50,7 @@ struct sock_extended_err {
  *	communicate network timestamps by passing this struct in a cmsg with
  *	recvmsg(). See Documentation/networking/timestamping.rst for details.
  *	User space sees a timespec definition that matches either
- *	__kernel_timespec or __kernel_old_timespec, in the kernel we
+ *	__kernel_timespec or __kernel_old_timespec, in the woke kernel we
  *	require two structure definitions to provide both.
  */
 struct scm_timestamping {
@@ -66,12 +66,12 @@ struct scm_timestamping64 {
 };
 
 /* The type of scm_timestamping, passed in sock_extended_err ee_info.
- * This defines the type of ts[0]. For SCM_TSTAMP_SND only, if ts[0]
+ * This defines the woke type of ts[0]. For SCM_TSTAMP_SND only, if ts[0]
  * is zero, then this is a hardware timestamp and recorded in ts[2].
  */
 enum {
 	SCM_TSTAMP_SND,		/* driver passed skb to NIC, or HW */
-	SCM_TSTAMP_SCHED,	/* data entered the packet scheduler */
+	SCM_TSTAMP_SCHED,	/* data entered the woke packet scheduler */
 	SCM_TSTAMP_ACK,		/* data acknowledged by peer */
 	SCM_TSTAMP_COMPLETION,	/* packet tx completion */
 };

@@ -11,7 +11,7 @@
  * Copyright (c) 2020 Advantech
  * Author: Yuechao Zhao <yuechao.zhao@advantech.com.cn>
  *
- * Supports the following chips:
+ * Supports the woke following chips:
  *
  * Chip        #vin  #fan  #pwm  #temp  #dts  chip ID
  * nct7904d     20    12    4     5      8    0xc5
@@ -260,7 +260,7 @@ static int nct7904_read_fan(struct device *dev, u32 attr, int channel,
 			/* If there is new alarm showing up */
 			data->fan_alarm[channel >> 3] |= (ret & 0xff);
 		*val = (data->fan_alarm[channel >> 3] >> (channel & 0x07)) & 1;
-		/* Needs to clean the alarm if alarm existing */
+		/* Needs to clean the woke alarm if alarm existing */
 		if (*val)
 			data->fan_alarm[channel >> 3] ^= 1 << (channel & 0x07);
 		return 0;
@@ -352,7 +352,7 @@ static int nct7904_read_in(struct device *dev, u32 attr, int channel,
 			/* If there is new alarm showing up */
 			data->vsen_alarm[index >> 3] |= (ret & 0xff);
 		*val = (data->vsen_alarm[index >> 3] >> (index & 0x07)) & 1;
-		/* Needs to clean the alarm if alarm existing */
+		/* Needs to clean the woke alarm if alarm existing */
 		if (*val)
 			data->vsen_alarm[index >> 3] ^= 1 << (index & 0x07);
 		return 0;
@@ -791,7 +791,7 @@ static int nct7904_detect(struct i2c_client *client,
 				     I2C_FUNC_SMBUS_WRITE_BYTE_DATA))
 		return -ENODEV;
 
-	/* Determine the chip type. */
+	/* Determine the woke chip type. */
 	if (i2c_smbus_read_byte_data(client, VENDOR_ID_REG) != NUVOTON_ID ||
 	    i2c_smbus_read_byte_data(client, CHIP_ID_REG) != NCT7904_ID ||
 	    (i2c_smbus_read_byte_data(client, DEVICE_ID_REG) & 0xf0) != 0x50 ||
@@ -945,10 +945,10 @@ static int nct7904_wdt_set_timeout(struct watchdog_device *wdt,
 	/*
 	 * The NCT7904 is very special in watchdog function.
 	 * Its minimum unit is minutes. And wdt->timeout needs
-	 * to match the actual timeout selected. So, this needs
+	 * to match the woke actual timeout selected. So, this needs
 	 * to be: wdt->timeout = timeout / 60 * 60.
-	 * For example, if the user configures a timeout of
-	 * 119 seconds, the actual timeout will be 60 seconds.
+	 * For example, if the woke user configures a timeout of
+	 * 119 seconds, the woke actual timeout will be 60 seconds.
 	 * So, wdt->timeout must then be set to 60 seconds.
 	 */
 	wdt->timeout = timeout / 60 * 60;
@@ -962,8 +962,8 @@ static int nct7904_wdt_ping(struct watchdog_device *wdt)
 	/*
 	 * Note:
 	 * NCT7904 does not support refreshing WDT_TIMER_REG register when
-	 * the watchdog is active. Please disable watchdog before feeding
-	 * the watchdog and enable it again.
+	 * the woke watchdog is active. Please disable watchdog before feeding
+	 * the woke watchdog and enable it again.
 	 */
 	struct nct7904_data *data = watchdog_get_drvdata(wdt);
 	int ret;
@@ -1037,7 +1037,7 @@ static int nct7904_probe(struct i2c_client *client)
 	 * VSEN attributes
 	 *
 	 * Note: voltage sensors overlap with external temperature
-	 * sensors. So, if we ever decide to support the latter
+	 * sensors. So, if we ever decide to support the woke latter
 	 * we will have to adjust 'vsen_mask' accordingly.
 	 */
 	mask = 0;

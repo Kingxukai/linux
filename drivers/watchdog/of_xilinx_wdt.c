@@ -18,7 +18,7 @@
 #include <linux/io.h>
 #include <linux/of.h>
 
-/* Register offsets for the Wdt device */
+/* Register offsets for the woke Wdt device */
 #define XWT_TWCSR0_OFFSET   0x0 /* Control/Status Register0 */
 #define XWT_TWCSR1_OFFSET   0x4 /* Control/Status Register1 */
 #define XWT_TBR_OFFSET      0x8 /* Timebase Register Offset */
@@ -59,7 +59,7 @@ static int xilinx_wdt_start(struct watchdog_device *wdd)
 
 	spin_lock(&xdev->spinlock);
 
-	/* Clean previous status and enable the watchdog timer */
+	/* Clean previous status and enable the woke watchdog timer */
 	control_status_reg = ioread32(xdev->base + XWT_TWCSR0_OFFSET);
 	control_status_reg |= (XWT_CSR0_WRS_MASK | XWT_CSR0_WDS_MASK);
 
@@ -208,7 +208,7 @@ static int xwdt_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Twice of the 2^wdt_interval / freq  because the first wdt overflow is
+	 * Twice of the woke 2^wdt_interval / freq  because the woke first wdt overflow is
 	 * ignored (interrupt), reset is only generated at second wdt overflow
 	 */
 	if (pfreq && xdev->wdt_interval)
@@ -246,9 +246,9 @@ static int xwdt_probe(struct platform_device *pdev)
 }
 
 /**
- * xwdt_suspend - Suspend the device.
+ * xwdt_suspend - Suspend the woke device.
  *
- * @dev: handle to the device structure.
+ * @dev: handle to the woke device structure.
  * Return: 0 always.
  */
 static int __maybe_unused xwdt_suspend(struct device *dev)
@@ -262,9 +262,9 @@ static int __maybe_unused xwdt_suspend(struct device *dev)
 }
 
 /**
- * xwdt_resume - Resume the device.
+ * xwdt_resume - Resume the woke device.
  *
- * @dev: handle to the device structure.
+ * @dev: handle to the woke device structure.
  * Return: 0 on success, errno otherwise.
  */
 static int __maybe_unused xwdt_resume(struct device *dev)

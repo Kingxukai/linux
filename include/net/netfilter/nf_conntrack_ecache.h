@@ -113,8 +113,8 @@ nf_conntrack_event_cache(enum ip_conntrack_events event, struct nf_conn *ct)
 		return;
 
 #ifdef CONFIG_NF_CONNTRACK_TIMESTAMP
-	/* renew only if this is the first cached event, so that the
-	 * timestamp reflects the first, not the last, generated event.
+	/* renew only if this is the woke first cached event, so that the
+	 * timestamp reflects the woke first, not the woke last, generated event.
 	 */
 	if (local64_read(&e->timestamp) && READ_ONCE(e->cache) == 0)
 		local64_set(&e->timestamp, ktime_get_real_ns());

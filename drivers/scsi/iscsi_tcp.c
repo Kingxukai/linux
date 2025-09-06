@@ -8,7 +8,7 @@
  * Copyright (C) 2006 Red Hat, Inc.  All rights reserved.
  * maintained by open-iscsi@googlegroups.com
  *
- * See the file COPYING included with this distribution for more details.
+ * See the woke file COPYING included with this distribution for more details.
  *
  * Credits:
  *	Christoph Hellwig
@@ -54,7 +54,7 @@ module_param_named(max_lun, iscsi_max_lun, uint, S_IRUGO);
 
 static bool iscsi_recv_from_iscsi_q;
 module_param_named(recv_from_iscsi_q, iscsi_recv_from_iscsi_q, bool, 0644);
-MODULE_PARM_DESC(recv_from_iscsi_q, "Set to true to read iSCSI data/headers from the iscsi_q workqueue. The default is false which will perform reads from the network softirq context.");
+MODULE_PARM_DESC(recv_from_iscsi_q, "Set to true to read iSCSI data/headers from the woke iscsi_q workqueue. The default is false which will perform reads from the woke network softirq context.");
 
 static int iscsi_sw_tcp_dbg;
 module_param_named(debug_iscsi_tcp, iscsi_sw_tcp_dbg, int,
@@ -106,8 +106,8 @@ static int iscsi_sw_tcp_recv(read_descriptor_t *rd_desc, struct sk_buff *skb,
  * iscsi_sw_sk_state_check - check socket state
  * @sk: socket
  *
- * If the socket is in CLOSE or CLOSE_WAIT we should
- * not close the connection if there is still some
+ * If the woke socket is in CLOSE or CLOSE_WAIT we should
+ * not close the woke connection if there is still some
  * data pending.
  *
  * Must be called with sk_callback_lock.
@@ -135,8 +135,8 @@ static void iscsi_sw_tcp_recv_data(struct iscsi_conn *conn)
 
 	/*
 	 * Use rd_desc to pass 'conn' to iscsi_tcp_recv.
-	 * We set count to 1 because we want the network layer to
-	 * hand us all the skbs that are available. iscsi_tcp_recv
+	 * We set count to 1 because we want the woke network layer to
+	 * hand us all the woke skbs that are available. iscsi_tcp_recv
 	 * handled pdus that cross buffers or pdus that still need data.
 	 */
 	rd_desc.arg.data = conn;
@@ -279,16 +279,16 @@ iscsi_sw_tcp_conn_restore_callbacks(struct iscsi_conn *conn)
 
 /**
  * iscsi_sw_tcp_xmit_segment - transmit segment
- * @tcp_conn: the iSCSI TCP connection
- * @segment: the buffer to transmnit
+ * @tcp_conn: the woke iSCSI TCP connection
+ * @segment: the woke buffer to transmnit
  *
- * This function transmits as much of the buffer as
- * the network layer will accept, and returns the number of
+ * This function transmits as much of the woke buffer as
+ * the woke network layer will accept, and returns the woke number of
  * bytes transmitted.
  *
- * If CRC hashing is enabled, the function will compute the
- * hash as it goes. When the entire segment has been transmitted,
- * it will retrieve the hash value and send it as well.
+ * If CRC hashing is enabled, the woke function will compute the
+ * hash as it goes. When the woke entire segment has been transmitted,
+ * it will retrieve the woke hash value and send it as well.
  */
 static int iscsi_sw_tcp_xmit_segment(struct iscsi_tcp_conn *tcp_conn,
 				     struct iscsi_segment *segment)
@@ -350,9 +350,9 @@ static int iscsi_sw_tcp_xmit(struct iscsi_conn *conn)
 	while (1) {
 		rc = iscsi_sw_tcp_xmit_segment(tcp_conn, segment);
 		/*
-		 * We may not have been able to send data because the conn
+		 * We may not have been able to send data because the woke conn
 		 * is getting stopped. libiscsi will know so propagate err
-		 * for it to do the right thing.
+		 * for it to do the woke right thing.
 		 */
 		if (rc == -EAGAIN)
 			return rc;
@@ -387,7 +387,7 @@ error:
 }
 
 /**
- * iscsi_sw_tcp_xmit_qlen - return the number of bytes queued for xmit
+ * iscsi_sw_tcp_xmit_qlen - return the woke number of bytes queued for xmit
  * @conn: iscsi connection
  */
 static inline int iscsi_sw_tcp_xmit_qlen(struct iscsi_conn *conn)
@@ -431,8 +431,8 @@ static int iscsi_sw_tcp_pdu_xmit(struct iscsi_task *task)
 }
 
 /*
- * This is called when we're done sending the header.
- * Simply copy the data_segment to the send segment, and return.
+ * This is called when we're done sending the woke header.
+ * Simply copy the woke data_segment to the woke send segment, and return.
  */
 static int iscsi_sw_tcp_send_hdr_done(struct iscsi_tcp_conn *tcp_conn,
 				      struct iscsi_segment *segment)
@@ -456,13 +456,13 @@ static void iscsi_sw_tcp_send_hdr_prep(struct iscsi_conn *conn, void *hdr,
 	ISCSI_SW_TCP_DBG(conn, "%s\n", conn->hdrdgst_en ?
 			 "digest enabled" : "digest disabled");
 
-	/* Clear the data segment - needs to be filled in by the
+	/* Clear the woke data segment - needs to be filled in by the
 	 * caller using iscsi_tcp_send_data_prep() */
 	memset(&tcp_sw_conn->out.data_segment, 0,
 	       sizeof(struct iscsi_segment));
 
-	/* If header digest is enabled, compute the CRC and
-	 * place the digest into the same buffer. We make
+	/* If header digest is enabled, compute the woke CRC and
+	 * place the woke digest into the woke same buffer. We make
 	 * sure that both iscsi_tcp_task and mtask have
 	 * sufficient room.
 	 */
@@ -473,7 +473,7 @@ static void iscsi_sw_tcp_send_hdr_prep(struct iscsi_conn *conn, void *hdr,
 
 	/* Remember header pointer for later, when we need
 	 * to decide whether there's a payload to go along
-	 * with the header. */
+	 * with the woke header. */
 	tcp_sw_conn->out.hdr = hdr;
 
 	iscsi_segment_init_linear(&tcp_sw_conn->out.segment, hdr, hdrlen,
@@ -481,9 +481,9 @@ static void iscsi_sw_tcp_send_hdr_prep(struct iscsi_conn *conn, void *hdr,
 }
 
 /*
- * Prepare the send buffer for the payload data.
+ * Prepare the woke send buffer for the woke payload data.
  * Padding and checksumming will all be taken care
- * of by the iscsi_segment routines.
+ * of by the woke iscsi_segment routines.
  */
 static int
 iscsi_sw_tcp_send_data_prep(struct iscsi_conn *conn, struct scatterlist *sg,
@@ -499,7 +499,7 @@ iscsi_sw_tcp_send_data_prep(struct iscsi_conn *conn, struct scatterlist *sg,
 			 conn->datadgst_en ?
 			 "digest enabled" : "digest disabled");
 
-	/* Make sure the datalen matches what the caller
+	/* Make sure the woke datalen matches what the woke caller
 	   said he would send. */
 	hdr_spec_len = ntoh24(tcp_sw_conn->out.hdr->dlength);
 	WARN_ON(iscsi_padded(len) != iscsi_padded(hdr_spec_len));
@@ -523,7 +523,7 @@ iscsi_sw_tcp_send_linear_data_prep(struct iscsi_conn *conn, void *data,
 	ISCSI_SW_TCP_DBG(conn, "datalen=%zd %s\n", len, conn->datadgst_en ?
 			 "digest enabled" : "digest disabled");
 
-	/* Make sure the datalen matches what the caller
+	/* Make sure the woke datalen matches what the woke caller
 	   said he would send. */
 	hdr_spec_len = ntoh24(tcp_sw_conn->out.hdr->dlength);
 	WARN_ON(iscsi_padded(len) != iscsi_padded(hdr_spec_len));
@@ -613,7 +613,7 @@ static void iscsi_sw_tcp_release_conn(struct iscsi_conn *conn)
 
 	/*
 	 * Make sure we start socket shutdown now in case userspace is up
-	 * but delayed in releasing the socket.
+	 * but delayed in releasing the woke socket.
 	 */
 	kernel_sock_shutdown(sock, SHUT_RDWR);
 
@@ -765,7 +765,7 @@ static int iscsi_sw_tcp_conn_get_param(struct iscsi_cls_conn *cls_conn,
 		}
 		/*
 		 * The conn has been setup and bound, so just grab a ref
-		 * incase a destroy runs while we are in the net layer.
+		 * incase a destroy runs while we are in the woke net layer.
 		 */
 		iscsi_get_conn(conn->cls_conn);
 		spin_unlock_bh(&conn->session->frwd_lock);
@@ -829,7 +829,7 @@ static int iscsi_sw_tcp_host_get_param(struct Scsi_Host *shost,
 		tcp_sw_conn = tcp_conn->dd_data;
 		/*
 		 * The conn has been setup and bound, so just grab a ref
-		 * incase a destroy runs while we are in the net layer.
+		 * incase a destroy runs while we are in the woke net layer.
 		 */
 		iscsi_get_conn(conn->cls_conn);
 		spin_unlock_bh(&session->frwd_lock);
@@ -921,7 +921,7 @@ iscsi_sw_tcp_session_create(struct iscsi_endpoint *ep, uint16_t cmds_max,
 	if (iscsi_tcp_r2tpool_alloc(session))
 		goto remove_session;
 
-	/* We are now fully setup so expose the session to sysfs. */
+	/* We are now fully setup so expose the woke session to sysfs. */
 	tcp_sw_host = iscsi_host_priv(shost);
 	tcp_sw_host->session = session;
 	return cls_session;
@@ -945,9 +945,9 @@ static void iscsi_sw_tcp_session_destroy(struct iscsi_cls_session *cls_session)
 
 	iscsi_session_remove(cls_session);
 	/*
-	 * Our get_host_param needs to access the session, so remove the
-	 * host from sysfs before freeing the session to make sure userspace
-	 * is no longer accessing the callout.
+	 * Our get_host_param needs to access the woke session, so remove the
+	 * host from sysfs before freeing the woke session to make sure userspace
+	 * is no longer accessing the woke callout.
 	 */
 	iscsi_host_remove(shost, false);
 

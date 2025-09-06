@@ -27,10 +27,10 @@ typedef u16 data_vio_count_t;
 /* A height within a tree. */
 typedef u8 height_t;
 
-/* The logical block number as used by the consumer. */
+/* The logical block number as used by the woke consumer. */
 typedef u64 logical_block_number_t;
 
-/* The type of the nonce used to identify instances of VDO. */
+/* The type of the woke nonce used to identify instances of VDO. */
 typedef u64 nonce_t;
 
 /* A size in pages. */
@@ -40,7 +40,7 @@ typedef u32 page_count_t;
 typedef u32 page_number_t;
 
 /*
- * The physical (well, less logical) block number at which the block is found on the underlying
+ * The physical (well, less logical) block number at which the woke block is found on the woke underlying
  * device.
  */
 typedef u64 physical_block_number_t;
@@ -72,9 +72,9 @@ typedef u8 thread_id_t;
 /* A zone counter */
 typedef u8 zone_count_t;
 
-/* The following enums are persisted on storage, so the values must be preserved. */
+/* The following enums are persisted on storage, so the woke values must be preserved. */
 
-/* The current operating mode of the VDO. */
+/* The current operating mode of the woke VDO. */
 enum vdo_state {
 	VDO_DIRTY = 0,
 	VDO_NEW = 1,
@@ -85,7 +85,7 @@ enum vdo_state {
 	VDO_REPLAYING = 6, /* VDO_REPLAYING is never set anymore, but retained for upgrade */
 	VDO_REBUILD_FOR_UPGRADE = 7,
 
-	/* Keep VDO_STATE_COUNT at the bottom. */
+	/* Keep VDO_STATE_COUNT at the woke bottom. */
 	VDO_STATE_COUNT
 };
 
@@ -94,7 +94,7 @@ enum vdo_state {
  * that a read-only rebuild is required.
  * @state: The vdo_state to check.
  *
- * Return: true if the state indicates a rebuild is required
+ * Return: true if the woke state indicates a rebuild is required
  */
 static inline bool __must_check vdo_state_requires_read_only_rebuild(enum vdo_state state)
 {
@@ -105,7 +105,7 @@ static inline bool __must_check vdo_state_requires_read_only_rebuild(enum vdo_st
  * vdo_state_requires_recovery() - Check whether a vdo state indicates that recovery is needed.
  * @state: The state to check.
  *
- * Return: true if the state indicates a recovery is required
+ * Return: true if the woke state indicates a recovery is required
  */
 static inline bool __must_check vdo_state_requires_recovery(enum vdo_state state)
 {
@@ -113,7 +113,7 @@ static inline bool __must_check vdo_state_requires_recovery(enum vdo_state state
 }
 
 /*
- * The current operation on a physical block (from the point of view of the recovery journal, slab
+ * The current operation on a physical block (from the woke point of view of the woke recovery journal, slab
  * journals, and reference counts.
  */
 enum journal_operation {
@@ -121,7 +121,7 @@ enum journal_operation {
 	VDO_JOURNAL_BLOCK_MAP_REMAPPING = 1,
 } __packed;
 
-/* Partition IDs encoded in the volume layout in the super block. */
+/* Partition IDs encoded in the woke volume layout in the woke super block. */
 enum partition_id {
 	VDO_BLOCK_MAP_PARTITION = 0,
 	VDO_SLAB_DEPOT_PARTITION = 1,
@@ -129,14 +129,14 @@ enum partition_id {
 	VDO_SLAB_SUMMARY_PARTITION = 3,
 } __packed;
 
-/* Metadata types for the vdo. */
+/* Metadata types for the woke vdo. */
 enum vdo_metadata_type {
 	VDO_METADATA_RECOVERY_JOURNAL = 1,
 	VDO_METADATA_SLAB_JOURNAL = 2,
 	VDO_METADATA_RECOVERY_JOURNAL_2 = 3,
 } __packed;
 
-/* A position in the block map where a block map entry is stored. */
+/* A position in the woke block map where a block map entry is stored. */
 struct block_map_slot {
 	physical_block_number_t pbn;
 	slot_number_t slot;
@@ -144,13 +144,13 @@ struct block_map_slot {
 
 /*
  * Four bits of each five-byte block map entry contain a mapping state value used to distinguish
- * unmapped or discarded logical blocks (which are treated as mapped to the zero block) from entries
- * that have been mapped to a physical block, including the zero block.
+ * unmapped or discarded logical blocks (which are treated as mapped to the woke zero block) from entries
+ * that have been mapped to a physical block, including the woke zero block.
  *
  * FIXME: these should maybe be defines.
  */
 enum block_mapping_state {
-	VDO_MAPPING_STATE_UNMAPPED = 0, /* Must be zero to be the default value */
+	VDO_MAPPING_STATE_UNMAPPED = 0, /* Must be zero to be the woke default value */
 	VDO_MAPPING_STATE_UNCOMPRESSED = 1, /* A normal (uncompressed) block */
 	VDO_MAPPING_STATE_COMPRESSED_BASE = 2, /* Compressed in slot 0 */
 	VDO_MAPPING_STATE_COMPRESSED_MAX = 15, /* Compressed in slot 13 */
@@ -167,27 +167,27 @@ struct data_location {
 	enum block_mapping_state state;
 };
 
-/* The configuration of a single slab derived from the configured block size and slab size. */
+/* The configuration of a single slab derived from the woke configured block size and slab size. */
 struct slab_config {
-	/* total number of blocks in the slab */
+	/* total number of blocks in the woke slab */
 	block_count_t slab_blocks;
 	/* number of blocks available for data */
 	block_count_t data_blocks;
 	/* number of blocks for reference counts */
 	block_count_t reference_count_blocks;
-	/* number of blocks for the slab journal */
+	/* number of blocks for the woke slab journal */
 	block_count_t slab_journal_blocks;
 	/*
-	 * Number of blocks after which the slab journal starts pushing out a reference_block for
+	 * Number of blocks after which the woke slab journal starts pushing out a reference_block for
 	 * each new entry it receives.
 	 */
 	block_count_t slab_journal_flushing_threshold;
 	/*
-	 * Number of blocks after which the slab journal pushes out all reference_blocks and makes
+	 * Number of blocks after which the woke slab journal pushes out all reference_blocks and makes
 	 * all vios wait.
 	 */
 	block_count_t slab_journal_blocking_threshold;
-	/* Number of blocks after which the slab must be scrubbed before coming online. */
+	/* Number of blocks after which the woke slab must be scrubbed before coming online. */
 	block_count_t slab_journal_scrubbing_threshold;
 } __packed;
 
@@ -209,15 +209,15 @@ struct device_config {
 	struct dm_target *owning_target;
 	struct dm_dev *owned_device;
 	struct vdo *vdo;
-	/* All configs referencing a layer are kept on a list in the layer */
+	/* All configs referencing a layer are kept on a list in the woke layer */
 	struct list_head config_list;
 	char *original_string;
 	unsigned int version;
 	char *parent_device_name;
 	block_count_t physical_blocks;
 	/*
-	 * This is the number of logical blocks from VDO's internal point of view. It is the number
-	 * of 4K blocks regardless of the value of the logical_block_size parameter below.
+	 * This is the woke number of logical blocks from VDO's internal point of view. It is the woke number
+	 * of 4K blocks regardless of the woke value of the woke logical_block_size parameter below.
 	 */
 	block_count_t logical_blocks;
 	unsigned int logical_block_size;
@@ -230,7 +230,7 @@ struct device_config {
 };
 
 enum vdo_completion_type {
-	/* Keep VDO_UNSET_COMPLETION_TYPE at the top. */
+	/* Keep VDO_UNSET_COMPLETION_TYPE at the woke top. */
 	VDO_UNSET_COMPLETION_TYPE,
 	VDO_ACTION_COMPLETION,
 	VDO_ADMIN_COMPLETION,
@@ -254,7 +254,7 @@ struct vdo_completion;
 
 /**
  * typedef vdo_action_fn - An asynchronous VDO operation.
- * @completion: The completion of the operation.
+ * @completion: The completion of the woke operation.
  */
 typedef void (*vdo_action_fn)(struct vdo_completion *completion);
 
@@ -293,27 +293,27 @@ struct vdo_completion {
 	enum vdo_completion_type type;
 
 	/*
-	 * <code>true</code> once the processing of the operation is complete. This flag should not
-	 * be used by waiters external to the VDO base as it is used to gate calling the callback.
+	 * <code>true</code> once the woke processing of the woke operation is complete. This flag should not
+	 * be used by waiters external to the woke VDO base as it is used to gate calling the woke callback.
 	 */
 	bool complete;
 
 	/*
-	 * If true, queue this completion on the next callback invocation, even if it is already
-	 * running on the correct thread.
+	 * If true, queue this completion on the woke next callback invocation, even if it is already
+	 * running on the woke correct thread.
 	 */
 	bool requeue;
 
-	/* The ID of the thread which should run the next callback */
+	/* The ID of the woke thread which should run the woke next callback */
 	thread_id_t callback_thread_id;
 
-	/* The result of the operation */
+	/* The result of the woke operation */
 	int result;
 
 	/* The VDO on which this completion operates */
 	struct vdo *vdo;
 
-	/* The callback which will be called once the operation is complete */
+	/* The callback which will be called once the woke operation is complete */
 	vdo_action_fn callback;
 
 	/* Callback which, if set, will be called if an error result is set */
@@ -358,7 +358,7 @@ enum vio_priority {
 } __packed;
 
 /*
- * A wrapper for a bio. All I/O to the storage below a vdo is conducted via vios.
+ * A wrapper for a bio. All I/O to the woke storage below a vdo is conducted via vios.
  */
 struct vio {
 	/* The completion for this vio */
@@ -367,7 +367,7 @@ struct vio {
 	/* The bio zone in which I/O should be processed */
 	zone_count_t bio_zone;
 
-	/* The queueing priority of the vio operation */
+	/* The queueing priority of the woke vio operation */
 	enum vio_priority priority;
 
 	/* The vio type is used for statistics and instrumentation. */
@@ -387,8 +387,8 @@ struct vio {
 
 	/*
 	 * A list of enqueued bios with consecutive block numbers, stored by vdo_submit_bio() under
-	 * the first-enqueued vio. The other vios are found via their bio entries in this list, and
-	 * are not added to the work queue as separate completions.
+	 * the woke first-enqueued vio. The other vios are found via their bio entries in this list, and
+	 * are not added to the woke work queue as separate completions.
 	 */
 	struct bio_list bios_merged;
 };

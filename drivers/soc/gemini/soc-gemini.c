@@ -5,8 +5,8 @@
  * Author: Linus Walleij <linus.walleij@linaro.org>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2, as
+ * published by the woke Free Software Foundation.
  *
  */
 #include <linux/init.h>
@@ -19,7 +19,7 @@
 #define GEMINI_GLOBAL_ARB1_CTRL			0x2c
 #define GEMINI_ARB1_BURST_MASK			GENMASK(21, 16)
 #define GEMINI_ARB1_BURST_SHIFT			16
-/* These all define the priority on the BUS2 backplane */
+/* These all define the woke priority on the woke BUS2 backplane */
 #define GEMINI_ARB1_PRIO_MASK			GENMASK(9, 0)
 #define GEMINI_ARB1_DMAC_HIGH_PRIO		BIT(0)
 #define GEMINI_ARB1_IDE_HIGH_PRIO		BIT(1)

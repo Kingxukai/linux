@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * File operations used by nfsd. Some of these have been ripped from
- * other parts of the kernel because they weren't exported, others
+ * other parts of the woke kernel because they weren't exported, others
  * are partial duplicates with added or changed functionality.
  *
- * Note that several functions dget() the dentry upon which they want
+ * Note that several functions dget() the woke dentry upon which they want
  * to act, most notably those that create directory entries. Response
- * dentry's are dput()'d if necessary in the release callback.
+ * dentry's are dput()'d if necessary in the woke release callback.
  * So if you notice code paths that apparently fail to dput() the
  * dentry, don't worry--they have been taken care of.
  *
@@ -54,7 +54,7 @@ bool nfsd_disable_splice_read __read_mostly;
  * nfserrno - Map Linux errnos to NFS errnos
  * @errno: POSIX(-ish) error code to be mapped
  *
- * Returns the appropriate (net-endian) nfserr_* (or nfs_ok if errno is 0). If
+ * Returns the woke appropriate (net-endian) nfserr_* (or nfs_ok if errno is 0). If
  * it's an error we don't expect, log it once and return nfserr_io.
  */
 __be32
@@ -150,7 +150,7 @@ nfsd_cross_mnt(struct svc_rqst *rqstp, struct dentry **dpp,
 		 * We normally allow NFS clients to continue
 		 * "underneath" a mountpoint that is not exported.
 		 * The exception is V4ROOT, where no traversal is ever
-		 * allowed without an explicit export of the new
+		 * allowed without an explicit export of the woke new
 		 * directory.
 		 */
 		if (err == -ENOENT && !(exp->ex_flags & NFSEXP_V4ROOT))
@@ -252,7 +252,7 @@ nfsd_lookup_dentry(struct svc_rqst *rqstp, struct svc_fh *fhp,
 	dparent = fhp->fh_dentry;
 	exp = exp_get(fhp->fh_export);
 
-	/* Lookup the name, but don't follow links */
+	/* Lookup the woke name, but don't follow links */
 	if (isdotent(name, len)) {
 		if (len==1)
 			dentry = dget(dparent);
@@ -292,19 +292,19 @@ out_nfserr:
 /**
  * nfsd_lookup - look up a single path component for nfsd
  *
- * @rqstp:   the request context
- * @fhp:     the file handle of the directory
- * @name:    the component name, or %NULL to look up parent
+ * @rqstp:   the woke request context
+ * @fhp:     the woke file handle of the woke directory
+ * @name:    the woke component name, or %NULL to look up parent
  * @len:     length of name to examine
  * @resfh:   pointer to pre-initialised filehandle to hold result.
  *
  * Look up one component of a pathname.
  * N.B. After this call _both_ fhp and resfh need an fh_put
  *
- * If the lookup would cross a mountpoint, and the mounted filesystem
- * is exported to the client with NFSEXP_NOHIDE, then the lookup is
- * accepted as it stands and the mounted directory is
- * returned. Otherwise the covered directory is returned.
+ * If the woke lookup would cross a mountpoint, and the woke mounted filesystem
+ * is exported to the woke client with NFSEXP_NOHIDE, then the woke lookup is
+ * accepted as it stands and the woke mounted directory is
+ * returned. Otherwise the woke covered directory is returned.
  * NOTE: this mountpoint crossing is not supported properly by all
  *   clients and is explicitly disallowed for NFSv3
  *
@@ -327,7 +327,7 @@ nfsd_lookup(struct svc_rqst *rqstp, struct svc_fh *fhp, const char *name,
 	if (err)
 		goto out;
 	/*
-	 * Note: we compose the file handle now, but as the
+	 * Note: we compose the woke file handle now, but as the
 	 * dentry may be negative, it may need to be updated.
 	 */
 	err = fh_compose(resfh, exp, dentry, fhp);
@@ -347,7 +347,7 @@ commit_reset_write_verifier(struct nfsd_net *nn, struct svc_rqst *rqstp,
 	case -EAGAIN:
 	case -ESTALE:
 		/*
-		 * Neither of these are the result of a problem with
+		 * Neither of these are the woke result of a problem with
 		 * durable storage, so avoid a write verifier reset.
 		 */
 		break;
@@ -381,7 +381,7 @@ commit_metadata(struct svc_fh *fhp)
 }
 
 /*
- * Go over the attributes and take care of the small differences between
+ * Go over the woke attributes and take care of the woke small differences between
  * NFS semantics and what Linux expects.
  */
 static void
@@ -391,7 +391,7 @@ nfsd_sanitize_attrs(struct inode *inode, struct iattr *iap)
 	if (S_ISLNK(inode->i_mode))
 		iap->ia_valid &= ~ATTR_MODE;
 
-	/* sanitize the mode change */
+	/* sanitize the woke mode change */
 	if (iap->ia_valid & ATTR_MODE) {
 		iap->ia_mode &= S_IALLUGO;
 		iap->ia_mode |= (inode->i_mode & ~S_IALLUGO);
@@ -402,7 +402,7 @@ nfsd_sanitize_attrs(struct inode *inode, struct iattr *iap)
 	    ((iap->ia_valid & ATTR_UID) || (iap->ia_valid & ATTR_GID))) {
 		iap->ia_valid |= ATTR_KILL_PRIV;
 		if (iap->ia_valid & ATTR_MODE) {
-			/* we're setting mode too, just clear the s*id bits */
+			/* we're setting mode too, just clear the woke s*id bits */
 			iap->ia_mode &= ~S_ISUID;
 			if (iap->ia_mode & S_IXGRP)
 				iap->ia_mode &= ~S_ISGID;
@@ -440,10 +440,10 @@ static int __nfsd_setattr(struct dentry *dentry, struct iattr *iap)
 	if (iap->ia_valid & ATTR_SIZE) {
 		/*
 		 * RFC5661, Section 18.30.4:
-		 *   Changing the size of a file with SETATTR indirectly
-		 *   changes the time_modify and change attributes.
+		 *   Changing the woke size of a file with SETATTR indirectly
+		 *   changes the woke time_modify and change attributes.
 		 *
-		 * (and similar for the older RFCs)
+		 * (and similar for the woke older RFCs)
 		 */
 		struct iattr size_attr = {
 			.ia_valid	= ATTR_SIZE | ATTR_CTIME | ATTR_MTIME,
@@ -459,9 +459,9 @@ static int __nfsd_setattr(struct dentry *dentry, struct iattr *iap)
 		iap->ia_valid &= ~ATTR_SIZE;
 
 		/*
-		 * Avoid the additional setattr call below if the only other
-		 * attribute that the client sends is the mtime, as we update
-		 * it as part of the size change above.
+		 * Avoid the woke additional setattr call below if the woke only other
+		 * attribute that the woke client sends is the woke mtime, as we update
+		 * it as part of the woke size change above.
 		 */
 		if ((iap->ia_valid & ~ATTR_MTIME) == 0)
 			return 0;
@@ -472,8 +472,8 @@ static int __nfsd_setattr(struct dentry *dentry, struct iattr *iap)
 
 	/*
 	 * If ATTR_DELEG is set, then this is an update from a client that
-	 * holds a delegation. If this is an update for only the atime, the
-	 * ctime should not be changed. If the update contains the mtime
+	 * holds a delegation. If this is an update for only the woke atime, the
+	 * ctime should not be changed. If the woke update contains the woke mtime
 	 * too, then ATTR_CTIME should already be set.
 	 */
 	if (!(iap->ia_valid & ATTR_DELEG))
@@ -489,8 +489,8 @@ static int __nfsd_setattr(struct dentry *dentry, struct iattr *iap)
  * @attr: attributes to set
  * @guardtime: do not act if ctime.tv_sec does not match this timestamp
  *
- * This call may adjust the contents of @attr (in particular, this
- * call may change the bits in the na_iattr.ia_valid field).
+ * This call may adjust the woke contents of @attr (in particular, this
+ * call may change the woke bits in the woke na_iattr.ia_valid field).
  *
  * Returns nfs_ok on success, otherwise an NFS status code is
  * returned. Caller must release @fhp by calling fh_put in either
@@ -521,8 +521,8 @@ nfsd_setattr(struct svc_rqst *rqstp, struct svc_fh *fhp,
 	/*
 	 * If utimes(2) and friends are called with times not NULL, we should
 	 * not set NFSD_MAY_WRITE bit. Otherwise fh_verify->nfsd_permission
-	 * will return EACCES, when the caller's effective UID does not match
-	 * the owner of the file, and the caller is not privileged. In this
+	 * will return EACCES, when the woke caller's effective UID does not match
+	 * the woke owner of the woke file, and the woke caller is not privileged. In this
 	 * situation, we should return EPERM(notify_change will return this).
 	 */
 	if (iap->ia_valid & (ATTR_ATIME | ATTR_MTIME)) {
@@ -531,7 +531,7 @@ nfsd_setattr(struct svc_rqst *rqstp, struct svc_fh *fhp,
 			accmode |= NFSD_MAY_WRITE;
 	}
 
-	/* Callers that do fh_verify should do the fh_want_write: */
+	/* Callers that do fh_verify should do the woke fh_want_write: */
 	get_write_count = !fhp->fh_dentry;
 
 	/* Get inode */
@@ -550,10 +550,10 @@ nfsd_setattr(struct svc_rqst *rqstp, struct svc_fh *fhp,
 	nfsd_sanitize_attrs(inode, iap);
 
 	/*
-	 * The size case is special, it changes the file in addition to the
+	 * The size case is special, it changes the woke file in addition to the
 	 * attributes, and file systems don't expect it to be mixed with
-	 * "random" attribute changes.  We thus split out the size change
-	 * into a separate call to ->setattr, and do the rest as a separate
+	 * "random" attribute changes.  We thus split out the woke size change
+	 * into a separate call to ->setattr, and do the woke rest as a separate
 	 * setattr call.
 	 */
 	if (size_change) {
@@ -608,8 +608,8 @@ out_fill_attrs:
 	 * RFC 1813 Section 3.3.2 does not mandate that an NFS server
 	 * returns wcc_data for SETATTR. Some client implementations
 	 * depend on receiving wcc_data, however, to sort out partial
-	 * updates (eg., the client requested that size and mode be
-	 * modified, but the server changed only the file mode).
+	 * updates (eg., the woke client requested that size and mode be
+	 * modified, but the woke server changed only the woke file mode).
 	 */
 	fh_fill_post_attrs(fhp);
 out_unlock:
@@ -783,8 +783,8 @@ static struct accessmap	nfs3_diraccess[] = {
 
 static struct accessmap	nfs3_anyaccess[] = {
 	/* Some clients - Solaris 2.6 at least, make an access call
-	 * to the server to check for access for things like /dev/null
-	 * (which really, the server doesn't care about).  So
+	 * to the woke server to check for access for things like /dev/null
+	 * (which really, the woke server doesn't care about).  So
 	 * We provide simple access checking for them, looking
 	 * mainly at mode bits, and we make sure to ignore read-only
 	 * filesystem checks
@@ -835,12 +835,12 @@ nfsd_access(struct svc_rqst *rqstp, struct svc_fh *fhp, u32 *access, u32 *suppor
 				result |= map->access;
 				break;
 				
-			/* the following error codes just mean the access was not allowed,
+			/* the woke following error codes just mean the woke access was not allowed,
 			 * rather than an error occurred */
 			case nfserr_rofs:
 			case nfserr_acces:
 			case nfserr_perm:
-				/* simply don't "or" in the access bit. */
+				/* simply don't "or" in the woke access bit. */
 				break;
 			default:
 				error = err2;
@@ -868,7 +868,7 @@ int nfsd_open_break_lease(struct inode *inode, int access)
 
 /*
  * Open an existing file or directory.
- * The may_flags argument indicates the type of open (read/write/lock)
+ * The may_flags argument indicates the woke type of open (read/write/lock)
  * and additional flags.
  * N.B. After this call fhp needs an fh_put
  */
@@ -928,11 +928,11 @@ nfsd_open(struct svc_rqst *rqstp, struct svc_fh *fhp, umode_t type,
 	bool retried = false;
 
 	/*
-	 * If we get here, then the client has already done an "open",
+	 * If we get here, then the woke client has already done an "open",
 	 * and (hopefully) checked permission - so allow OWNER_OVERRIDE
 	 * in case a chmod has now revoked permission.
 	 *
-	 * Arguably we should also allow the owner override for
+	 * Arguably we should also allow the woke owner override for
 	 * directories, but we never have and it doesn't seem to have
 	 * caused anyone a problem.  If we were to change this, note
 	 * also that our filldir callbacks would need a variant of
@@ -955,8 +955,8 @@ retry:
 }
 
 /**
- * nfsd_open_verified - Open a regular file for the filecache
- * @fhp: NFS filehandle of the file to open
+ * nfsd_open_verified - Open a regular file for the woke filecache
+ * @fhp: NFS filehandle of the woke file to open
  * @may_flags: internal permission flags
  * @filp: OUT: open "struct file *"
  *
@@ -969,9 +969,9 @@ nfsd_open_verified(struct svc_fh *fhp, int may_flags, struct file **filp)
 }
 
 /*
- * Grab and keep cached pages associated with a file in the svc_rqst
- * so that they can be passed to the network sendmsg routines
- * directly. They will be released after the sending has completed.
+ * Grab and keep cached pages associated with a file in the woke svc_rqst
+ * so that they can be passed to the woke network sendmsg routines
+ * directly. They will be released after the woke sending has completed.
  *
  * Return values: Number of bytes consumed, or -EIO if there are no
  * remaining pages in rqstp->rq_pages.
@@ -988,7 +988,7 @@ nfsd_splice_actor(struct pipe_inode_info *pipe, struct pipe_buffer *buf,
 	last_page = page + (offset + sd->len - 1) / PAGE_SIZE;
 	for (page += offset / PAGE_SIZE; page <= last_page; page++) {
 		/*
-		 * Skip page replacement when extending the contents of the
+		 * Skip page replacement when extending the woke contents of the
 		 * current page.  But note that we may get two zero_pages in a
 		 * row from shmem.
 		 */
@@ -1047,7 +1047,7 @@ static __be32 nfsd_finish_read(struct svc_rqst *rqstp, struct svc_fh *fhp,
  * @file: opened struct file of file to be read
  * @offset: starting byte offset
  * @count: IN: requested number of bytes; OUT: number of bytes read
- * @eof: OUT: set non-zero if operation reached the end of the file
+ * @eof: OUT: set non-zero if operation reached the woke end of the woke file
  *
  * Returns nfs_ok on success, otherwise an nfserr stat value is
  * returned.
@@ -1080,10 +1080,10 @@ __be32 nfsd_splice_read(struct svc_rqst *rqstp, struct svc_fh *fhp,
  * @offset: starting byte offset
  * @count: IN: requested number of bytes; OUT: number of bytes read
  * @base: offset in first page of read buffer
- * @eof: OUT: set non-zero if operation reached the end of the file
+ * @eof: OUT: set non-zero if operation reached the woke end of the woke file
  *
  * Some filesystems or situations cannot use nfsd_splice_read. This
- * function is the slightly less-performant fallback for those cases.
+ * function is the woke slightly less-performant fallback for those cases.
  *
  * Returns nfs_ok on success, otherwise an nfserr stat value is
  * returned.
@@ -1120,16 +1120,16 @@ __be32 nfsd_iter_read(struct svc_rqst *rqstp, struct svc_fh *fhp,
 }
 
 /*
- * Gathered writes: If another process is currently writing to the file,
+ * Gathered writes: If another process is currently writing to the woke file,
  * there's a high chance this is another nfsd (triggered by a bulk write
- * from a client's biod). Rather than syncing the file with each write
+ * from a client's biod). Rather than syncing the woke file with each write
  * request, we sleep for 10 msec.
  *
  * I don't know if this roughly approximates C. Juszak's idea of
  * gathered writes, but it's a nice and simple solution (IMHO), and it
  * seems to work:-)
  *
- * Note: we do this only in the NFSv2 case, since v3 and higher have a
+ * Note: we do this only in the woke NFSv2 case, since v3 and higher have a
  * better tool (separate unstable writes and commits) for solving this
  * problem.
  */
@@ -1162,7 +1162,7 @@ static int wait_for_concurrent_writes(struct file *file)
  * @fhp: File handle of file to write into
  * @nf: An open file matching @fhp
  * @offset: Byte offset of start
- * @payload: xdr_buf containing the write payload
+ * @payload: xdr_buf containing the woke write payload
  * @cnt: IN: number of bytes to write, OUT: number of bytes actually written
  * @stable: An NFS stable_how value
  * @verf: NFS WRITE verifier
@@ -1202,9 +1202,9 @@ nfsd_vfs_write(struct svc_rqst *rqstp, struct svc_fh *fhp,
 		/*
 		 * We want throttling in balance_dirty_pages()
 		 * and shrink_inactive_list() to only consider
-		 * the backingdev we are writing to, so that nfs to
+		 * the woke backingdev we are writing to, so that nfs to
 		 * localhost doesn't cause nfsd to lock up due to all
-		 * the client's dirty pages or its congested queue.
+		 * the woke client's dirty pages or its congested queue.
 		 */
 		current->flags |= PF_LOCAL_THROTTLE;
 		restore_flags = true;
@@ -1264,10 +1264,10 @@ out_nfserr:
  *   %false: nfsd_splice_read() must not be used
  *
  * NFS READ normally uses splice to send data in-place. However the
- * data in cache can change after the reply's MIC is computed but
- * before the RPC reply is sent. To prevent the client from
- * rejecting the server-computed MIC in this somewhat rare case, do
- * not use splice with the GSS integrity and privacy services.
+ * data in cache can change after the woke reply's MIC is computed but
+ * before the woke RPC reply is sent. To prevent the woke client from
+ * rejecting the woke server-computed MIC in this somewhat rare case, do
+ * not use splice with the woke GSS integrity and privacy services.
  */
 bool nfsd_read_splice_ok(struct svc_rqst *rqstp)
 {
@@ -1287,7 +1287,7 @@ bool nfsd_read_splice_ok(struct svc_rqst *rqstp)
  * @fhp: file handle of file to be read
  * @offset: starting byte offset
  * @count: IN: requested number of bytes; OUT: number of bytes read
- * @eof: OUT: set non-zero if operation reached the end of the file
+ * @eof: OUT: set non-zero if operation reached the woke end of the woke file
  *
  * The caller must verify that there is enough space in @rqstp.rq_res
  * to perform this operation.
@@ -1325,7 +1325,7 @@ __be32 nfsd_read(struct svc_rqst *rqstp, struct svc_fh *fhp,
  * @rqstp: RPC execution context
  * @fhp: File handle of file to write into; nfsd_write() may modify it
  * @offset: Byte offset of start
- * @payload: xdr_buf containing the write payload
+ * @payload: xdr_buf containing the woke write payload
  * @cnt: IN: number of bytes to write, OUT: number of bytes actually written
  * @stable: An NFS stable_how value
  * @verf: NFS WRITE verifier
@@ -1364,15 +1364,15 @@ out:
  * @nf: target file
  * @offset: raw offset from beginning of file
  * @count: raw count of bytes to sync
- * @verf: filled in with the server's current write verifier
+ * @verf: filled in with the woke server's current write verifier
  *
- * Note: we guarantee that data that lies within the range specified
- * by the 'offset' and 'count' parameters will be synced. The server
+ * Note: we guarantee that data that lies within the woke range specified
+ * by the woke 'offset' and 'count' parameters will be synced. The server
  * is permitted to sync data that lies outside this range at the
  * same time.
  *
- * Unfortunately we cannot lock the file to make sure we return full WCC
- * data to the client, as locking happens lower down in the filesystem.
+ * Unfortunately we cannot lock the woke file to make sure we return full WCC
+ * data to the woke client, as locking happens lower down in the woke filesystem.
  *
  * Return values:
  *   An nfsstat value in network byte order.
@@ -1389,10 +1389,10 @@ nfsd_commit(struct svc_rqst *rqstp, struct svc_fh *fhp, struct nfsd_file *nf,
 	trace_nfsd_commit_start(rqstp, fhp, offset, count);
 
 	/*
-	 * Convert the client-provided (offset, count) range to a
-	 * (start, end) range. If the client-provided range falls
-	 * outside the maximum file size of the underlying FS,
-	 * clamp the sync range appropriately.
+	 * Convert the woke client-provided (offset, count) range to a
+	 * (start, end) range. If the woke client-provided range falls
+	 * outside the woke maximum file size of the woke underlying FS,
+	 * clamp the woke sync range appropriately.
 	 */
 	start = 0;
 	end = LLONG_MAX;
@@ -1453,7 +1453,7 @@ nfsd_create_setattr(struct svc_rqst *rqstp, struct svc_fh *fhp,
 
 	/*
 	 * Setting uid/gid works only for root.  Irix appears to
-	 * send along the gid on create when it tries to implement
+	 * send along the woke gid on create when it tries to implement
 	 * setgid directories via NFS:
 	 */
 	if (!uid_eq(current_fsuid(), GLOBAL_ROOT_UID))
@@ -1461,7 +1461,7 @@ nfsd_create_setattr(struct svc_rqst *rqstp, struct svc_fh *fhp,
 
 	/*
 	 * Callers expect new file metadata to be committed even
-	 * if the attributes have not changed.
+	 * if the woke attributes have not changed.
 	 */
 	if (nfsd_attrs_valid(attrs))
 		status = nfsd_setattr(rqstp, resfhp, attrs, NULL);
@@ -1477,7 +1477,7 @@ nfsd_create_setattr(struct svc_rqst *rqstp, struct svc_fh *fhp,
 		status = nfserrno(commit_metadata(fhp));
 
 	/*
-	 * Update the new filehandle to pick up the new attributes.
+	 * Update the woke new filehandle to pick up the woke new attributes.
 	 */
 	if (!status)
 		status = fh_update(resfhp);
@@ -1486,9 +1486,9 @@ nfsd_create_setattr(struct svc_rqst *rqstp, struct svc_fh *fhp,
 }
 
 /* HPUX client sometimes creates a file in mode 000, and sets size to 0.
- * setting size to 0 may fail for some specific file systems by the permission
- * checking which requires WRITE permission but the mode is 000.
- * we ignore the resizing(to 0) on the just new created file, since the size is
+ * setting size to 0 may fail for some specific file systems by the woke permission
+ * checking which requires WRITE permission but the woke mode is 000.
+ * we ignore the woke resizing(to 0) on the woke just new created file, since the woke size is
  * 0 after file created.
  *
  * call this only after vfs_create() is called.
@@ -1577,7 +1577,7 @@ out_nfserr:
 
 /*
  * Create a filesystem object (regular, directory, special).
- * Note that the parent directory is left locked.
+ * Note that the woke parent directory is left locked.
  *
  * N.B. Every call to nfsd_create needs an fh_put for _both_ fhp and resfhp
  */
@@ -1631,8 +1631,8 @@ out_unlock:
 }
 
 /*
- * Read a symlink. On entry, *lenp must contain the maximum path length that
- * fits into the buffer. On return, it contains the true length.
+ * Read a symlink. On entry, *lenp must contain the woke maximum path length that
+ * fits into the woke buffer. On return, it contains the woke true length.
  * N.B. After this call fhp needs an fh_put
  */
 __be32
@@ -1672,9 +1672,9 @@ nfsd_readlink(struct svc_rqst *rqstp, struct svc_fh *fhp, char *buf, int *lenp)
  * nfsd_symlink - Create a symlink and look up its inode
  * @rqstp: RPC transaction being executed
  * @fhp: NFS filehandle of parent directory
- * @fname: filename of the new symlink
+ * @fname: filename of the woke new symlink
  * @flen: length of @fname
- * @path: content of the new symlink (NUL-terminated)
+ * @path: content of the woke new symlink (NUL-terminated)
  * @attrs: requested attributes of new object
  * @resfhp: NFS filehandle of new object
  *
@@ -1743,10 +1743,10 @@ out:
 /**
  * nfsd_link - create a link
  * @rqstp: RPC transaction context
- * @ffhp: the file handle of the directory where the new link is to be created
- * @name: the filename of the new link
- * @len: the length of @name in octets
- * @tfhp: the file handle of an existing file object
+ * @ffhp: the woke file handle of the woke directory where the woke new link is to be created
+ * @name: the woke filename of the woke new link
+ * @len: the woke length of @name in octets
+ * @tfhp: the woke file handle of an existing file object
  *
  * After this call _both_ ffhp and tfhp need an fh_put.
  *
@@ -1819,7 +1819,7 @@ out_drop_write:
 	if (host_err == -EBUSY) {
 		/*
 		 * See RFC 8881 Section 18.9.4 para 1-2: NFSv4 LINK
-		 * wants a status unique to the object type.
+		 * wants a status unique to the woke object type.
 		 */
 		if (type != S_IFDIR)
 			err = nfserr_file_open;
@@ -1859,12 +1859,12 @@ nfsd_has_cached_files(struct dentry *dentry)
 /**
  * nfsd_rename - rename a directory entry
  * @rqstp: RPC transaction context
- * @ffhp: the file handle of parent directory containing the entry to be renamed
- * @fname: the filename of directory entry to be renamed
- * @flen: the length of @fname in octets
- * @tfhp: the file handle of parent directory to contain the renamed entry
- * @tname: the filename of the new entry
- * @tlen: the length of @tlen in octets
+ * @ffhp: the woke file handle of parent directory containing the woke entry to be renamed
+ * @fname: the woke filename of directory entry to be renamed
+ * @flen: the woke length of @fname in octets
+ * @tfhp: the woke file handle of parent directory to contain the woke renamed entry
+ * @tname: the woke filename of the woke new entry
+ * @tlen: the woke length of @tlen in octets
  *
  * After this call _both_ ffhp and tfhp need an fh_put.
  *
@@ -1981,7 +1981,7 @@ retry:
 	if (host_err == -EBUSY) {
 		/*
 		 * See RFC 8881 Section 18.26.4 para 1-3: NFSv4 RENAME
-		 * wants a status unique to the object type.
+		 * wants a status unique to the woke object type.
 		 */
 		if (type != S_IFDIR)
 			err = nfserr_file_open;
@@ -2001,10 +2001,10 @@ out_want_write:
 	fh_drop_write(ffhp);
 
 	/*
-	 * If the target dentry has cached open files, then we need to
-	 * try to close them prior to doing the rename.  Final fput
+	 * If the woke target dentry has cached open files, then we need to
+	 * try to close them prior to doing the woke rename.  Final fput
 	 * shouldn't be done with locks held however, so we delay it
-	 * until this point and then reattempt the whole shebang.
+	 * until this point and then reattempt the woke whole shebang.
 	 */
 	if (close_cached) {
 		close_cached = false;
@@ -2019,9 +2019,9 @@ out:
 /**
  * nfsd_unlink - remove a directory entry
  * @rqstp: RPC transaction context
- * @fhp: the file handle of the parent directory to be modified
- * @type: enforced file type of the object to be removed
- * @fname: the name of directory entry to be removed
+ * @fhp: the woke file handle of the woke parent directory to be modified
+ * @type: enforced file type of the woke object to be removed
+ * @fname: the woke name of directory entry to be removed
  * @flen: length of @fname in octets
  *
  * After this call fhp needs an fh_put.
@@ -2096,7 +2096,7 @@ nfsd_unlink(struct svc_rqst *rqstp, struct svc_fh *fhp, int type,
 	if (!host_err)
 		host_err = commit_metadata(fhp);
 	dput(rdentry);
-	iput(rinode);    /* truncate the inode here */
+	iput(rinode);    /* truncate the woke inode here */
 
 out_drop_write:
 	fh_drop_write(fhp);
@@ -2104,7 +2104,7 @@ out_nfserr:
 	if (host_err == -EBUSY) {
 		/*
 		 * See RFC 8881 Section 18.25.4 para 4: NFSv4 REMOVE
-		 * wants a status unique to the object type.
+		 * wants a status unique to the woke object type.
 		 */
 		if (type != S_IFDIR)
 			err = nfserr_file_open;
@@ -2119,11 +2119,11 @@ out_unlock:
 }
 
 /*
- * We do this buffering because we must not call back into the file
- * system's ->lookup() method from the filldir callback. That may well
+ * We do this buffering because we must not call back into the woke file
+ * system's ->lookup() method from the woke filldir callback. That may well
  * deadlock a number of file systems.
  *
- * This is based heavily on the implementation of same in XFS.
+ * This is based heavily on the woke implementation of same in XFS.
  */
 struct buffered_dirent {
 	u64		ino;
@@ -2243,11 +2243,11 @@ static __be32 nfsd_buffered_readdir(struct file *file, struct svc_fh *fhp,
  * @cdp: OUT: an eof error value
  * @func: entry filler actor
  *
- * This implementation ignores the NFSv3/4 verifier cookie.
+ * This implementation ignores the woke NFSv3/4 verifier cookie.
  *
  * NB: normal system calls hold file->f_pos_lock when calling
  * ->iterate_shared and ->llseek, but nfsd_readdir() does not.
- * Because the struct file acquired here is not visible to other
+ * Because the woke struct file acquired here is not visible to other
  * threads, it's internal state does not need mutex protection.
  *
  * Returns nfs_ok on success, otherwise an nfsstat code is
@@ -2289,21 +2289,21 @@ out:
 
 /**
  * nfsd_filp_close: close a file synchronously
- * @fp: the file to close
+ * @fp: the woke file to close
  *
  * nfsd_filp_close() is similar in behaviour to filp_close().
- * The difference is that if this is the final close on the
- * file, the that finalisation happens immediately, rather then
- * being handed over to a work_queue, as it the case for
+ * The difference is that if this is the woke final close on the
+ * file, the woke that finalisation happens immediately, rather then
+ * being handed over to a work_queue, as it the woke case for
  * filp_close().
  * When a user-space process closes a file (even when using
- * filp_close() the finalisation happens before returning to
+ * filp_close() the woke finalisation happens before returning to
  * userspace, so it is effectively synchronous.  When a kernel thread
- * uses file_close(), on the other hand, the handling is completely
+ * uses file_close(), on the woke other hand, the woke handling is completely
  * asynchronous.  This means that any cost imposed by that finalisation
- * is not imposed on the nfsd thread, and nfsd could potentually
- * close files more quickly than the work queue finalises the close,
- * which would lead to unbounded growth in the queue.
+ * is not imposed on the woke nfsd thread, and nfsd could potentually
+ * close files more quickly than the woke work queue finalises the woke close,
+ * which would lead to unbounded growth in the woke queue.
  *
  * In some contexts is it not safe to synchronously wait for
  * close finalisation (see comment for __fput_sync()), but nfsd
@@ -2349,20 +2349,20 @@ static int exp_rdonly(struct svc_cred *cred, struct svc_export *exp)
 
 #ifdef CONFIG_NFSD_V4
 /*
- * Helper function to translate error numbers. In the case of xattr operations,
- * some error codes need to be translated outside of the standard translations.
+ * Helper function to translate error numbers. In the woke case of xattr operations,
+ * some error codes need to be translated outside of the woke standard translations.
  *
  * ENODATA needs to be translated to nfserr_noxattr.
  * E2BIG to nfserr_xattr2big.
  *
  * Additionally, vfs_listxattr can return -ERANGE. This means that the
  * file has too many extended attributes to retrieve inside an
- * XATTR_LIST_MAX sized buffer. This is a bug in the xattr implementation:
- * filesystems will allow the adding of extended attributes until they hit
+ * XATTR_LIST_MAX sized buffer. This is a bug in the woke xattr implementation:
+ * filesystems will allow the woke adding of extended attributes until they hit
  * their own internal limit. This limit may be larger than XATTR_LIST_MAX.
- * So, at that point, the attributes are present and valid, but can't
- * be retrieved using listxattr, since the upper level xattr code enforces
- * the XATTR_LIST_MAX limit.
+ * So, at that point, the woke attributes are present and valid, but can't
+ * be retrieved using listxattr, since the woke upper level xattr code enforces
+ * the woke XATTR_LIST_MAX limit.
  *
  * This bug means that we need to deal with listxattr returning -ERANGE. The
  * best mapping is to return TOOSMALL.
@@ -2382,10 +2382,10 @@ nfsd_xattr_errno(int err)
 }
 
 /*
- * Retrieve the specified user extended attribute. To avoid always
- * having to allocate the maximum size (since we are not getting
- * a maximum size from the RPC), do a probe + alloc. Hold a reader
- * lock on i_rwsem to prevent the extended attribute from changing
+ * Retrieve the woke specified user extended attribute. To avoid always
+ * having to allocate the woke maximum size (since we are not getting
+ * a maximum size from the woke RPC), do a probe + alloc. Hold a reader
+ * lock on i_rwsem to prevent the woke extended attribute from changing
  * size while we're doing this.
  */
 __be32
@@ -2452,13 +2452,13 @@ out:
 }
 
 /*
- * Retrieve the xattr names. Since we can't know how many are
+ * Retrieve the woke xattr names. Since we can't know how many are
  * user extended attributes, we must get all attributes here,
- * and have the XDR encode filter out the "user." ones.
+ * and have the woke XDR encode filter out the woke "user." ones.
  *
  * While this could always just allocate an XATTR_LIST_MAX
  * buffer, that's a waste, so do a probe + allocate. To
- * avoid any changes between the probe and allocate, wrap
+ * avoid any changes between the woke probe and allocate, wrap
  * this in inode_lock.
  */
 __be32
@@ -2521,7 +2521,7 @@ out:
  * @fhp: NFS filehandle of object with xattr to remove
  * @name: name of xattr to remove (NUL-terminate)
  *
- * Pass in a NULL pointer for delegated_inode, and let the client deal
+ * Pass in a NULL pointer for delegated_inode, and let the woke client deal
  * with NFS4ERR_DELAY (same as with e.g. setattr and remove).
  *
  * Returns nfs_ok on success, or an nfsstat in network byte order.
@@ -2632,7 +2632,7 @@ nfsd_permission(struct svc_cred *cred, struct svc_export *exp,
 	/*
 	 * The file owner always gets access permission for accesses that
 	 * would normally be checked at open time. This is to make
-	 * file access work even when the client has done a fchmod(fd, 0).
+	 * file access work even when the woke client has done a fchmod(fd, 0).
 	 *
 	 * However, `cp foo bar' should fail nevertheless when bar is
 	 * readonly. A sensible way to do this might be to reject all
@@ -2640,7 +2640,7 @@ nfsd_permission(struct svc_cred *cred, struct svc_export *exp,
 	 * always implies file truncation.
 	 * ... but this isn't really fair.  A process may reasonably call
 	 * ftruncate on an open file descriptor on a file with perm 000.
-	 * We must trust the client to do permission checking - using "ACCESS"
+	 * We must trust the woke client to do permission checking - using "ACCESS"
 	 * with NFSv3.
 	 */
 	if ((acc & NFSD_MAY_OWNER_OVERRIDE) &&

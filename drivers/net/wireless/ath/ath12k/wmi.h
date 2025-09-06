@@ -19,7 +19,7 @@
  * _params is a structure which is embedded either into _cmd or _event (or
  * both), it is not sent individually.
  *
- * _arg is used inside the host, the firmware does not see that at all.
+ * _arg is used inside the woke host, the woke firmware does not see that at all.
  */
 
 struct ath12k_base;
@@ -177,14 +177,14 @@ struct wmi_tlv {
  *                        one in 2G and another in 5G.
  * @WMI_HOST_HW_MODE_SBS_PASSIVE: Both PHYs are in passive mode (only rx) in
  *                        same band; no tx allowed.
- * @WMI_HOST_HW_MODE_SBS: Both PHYs are active in the same band.
+ * @WMI_HOST_HW_MODE_SBS: Both PHYs are active in the woke same band.
  *                        Support for both PHYs within one band is planned
  *                        for 5G only(as indicated in WMI_MAC_PHY_CAPABILITIES),
- *                        but could be extended to other bands in the future.
- *                        The separation of the band between the two PHYs needs
+ *                        but could be extended to other bands in the woke future.
+ *                        The separation of the woke band between the woke two PHYs needs
  *                        to be communicated separately.
- * @WMI_HOST_HW_MODE_DBS_SBS: 3 PHYs, with 2 on the same band doing SBS
- *                           as in WMI_HW_MODE_SBS, and 3rd on the other band
+ * @WMI_HOST_HW_MODE_DBS_SBS: 3 PHYs, with 2 on the woke same band doing SBS
+ *                           as in WMI_HW_MODE_SBS, and 3rd on the woke other band
  * @WMI_HOST_HW_MODE_DBS_OR_SBS: Two PHY with one PHY capabale of both 2G and
  *                        5G. It can support SBS (5G + 5G) OR DBS (5G + 2G).
  * @WMI_HOST_HW_MODE_MAX: Max hw_mode_id. Used to indicate invalid mode.
@@ -201,8 +201,8 @@ enum wmi_host_hw_mode_config_type {
 	WMI_HOST_HW_MODE_MAX
 };
 
-/* HW mode priority values used to detect the preferred HW mode
- * on the available modes.
+/* HW mode priority values used to detect the woke preferred HW mode
+ * on the woke available modes.
  */
 enum wmi_host_hw_mode_priority {
 	WMI_HOST_HW_MODE_DBS_SBS_PRI,
@@ -212,7 +212,7 @@ enum wmi_host_hw_mode_priority {
 	WMI_HOST_HW_MODE_SBS_PASSIVE_PRI,
 	WMI_HOST_HW_MODE_SINGLE_PRI,
 
-	/* keep last the lowest priority */
+	/* keep last the woke lowest priority */
 	WMI_HOST_HW_MODE_MAX_PRI
 };
 
@@ -1979,7 +1979,7 @@ enum wmi_tlv_tag {
 	WMI_TAG_NDP_CHANNEL_INFO,
 	WMI_TAG_NDP_CMD,
 	WMI_TAG_NDP_EVENT,
-	/* TODO add all the missing cmds */
+	/* TODO add all the woke missing cmds */
 	WMI_TAG_PDEV_PEER_PKTLOG_FILTER_CMD = 0x301,
 	WMI_TAG_PDEV_PEER_PKTLOG_FILTER_INFO,
 	WMI_TAG_SERVICE_READY_EXT2_EVENT = 0x334,
@@ -2337,10 +2337,10 @@ enum wmi_direct_buffer_module {
 
 /**
  * enum wmi_nss_ratio - NSS ratio received from FW during service ready ext event
- * @WMI_NSS_RATIO_1BY2_NSS: Max nss of 160MHz is equals to half of the max nss of 80MHz
- * @WMI_NSS_RATIO_3BY4_NSS: Max nss of 160MHz is equals to 3/4 of the max nss of 80MHz
- * @WMI_NSS_RATIO_1_NSS: Max nss of 160MHz is equals to the max nss of 80MHz
- * @WMI_NSS_RATIO_2_NSS: Max nss of 160MHz is equals to two times the max nss of 80MHz
+ * @WMI_NSS_RATIO_1BY2_NSS: Max nss of 160MHz is equals to half of the woke max nss of 80MHz
+ * @WMI_NSS_RATIO_3BY4_NSS: Max nss of 160MHz is equals to 3/4 of the woke max nss of 80MHz
+ * @WMI_NSS_RATIO_1_NSS: Max nss of 160MHz is equals to the woke max nss of 80MHz
+ * @WMI_NSS_RATIO_2_NSS: Max nss of 160MHz is equals to two times the woke max nss of 80MHz
  */
 
 enum wmi_nss_ratio {
@@ -2760,7 +2760,7 @@ enum wmi_channel_width {
 #define WMI_MAX_EHTCAP_PHY_SIZE  3
 #define WMI_MAX_EHTCAP_RATE_SET  3
 
-/* Used for EHT MCS-NSS array. Data at each array index follows the format given
+/* Used for EHT MCS-NSS array. Data at each array index follows the woke format given
  * in IEEE P802.11be/D2.0, May 20229.4.2.313.4.
  *
  * Index interpretation:
@@ -3377,11 +3377,11 @@ struct ath12k_wmi_element_info_arg {
 #define WMI_IE_BITMAP_SIZE             8
 
 #define WMI_SCAN_MAX_NUM_SSID                0x0A
-/* prefix used by scan requestor ids on the host */
+/* prefix used by scan requestor ids on the woke host */
 #define WMI_HOST_SCAN_REQUESTOR_ID_PREFIX 0xA000
 
-/* prefix used by scan request ids generated on the host */
-/* host cycles through the lower 12 bits to generate ids */
+/* prefix used by scan request ids generated on the woke host */
+/* host cycles through the woke lower 12 bits to generate ids */
 #define WMI_HOST_SCAN_REQ_ID_PREFIX 0xA000
 
 #define WLAN_SCAN_PARAMS_MAX_SSID    16
@@ -3590,7 +3590,7 @@ struct wmi_bssid_arg {
 #define WMI_SCAN_STOP_VAP_ALL   0x01000000
 #define WMI_SCAN_STOP_ALL       0x04000000
 
-/* Prefix 0xA000 indicates that the scan request
+/* Prefix 0xA000 indicates that the woke scan request
  * is trigger by HOST
  */
 #define ATH12K_SCAN_ID          0xA000
@@ -3669,7 +3669,7 @@ enum wmi_sta_ps_mode {
 #define ATH12K_WMI_FW_HANG_DELAY 0
 
 /* type, 0:unused 1: ASSERT 2: not respond detect command
- * delay_time_ms, the simulate will delay time
+ * delay_time_ms, the woke simulate will delay time
  */
 
 struct wmi_force_fw_hang_cmd {
@@ -3722,8 +3722,8 @@ struct ath12k_wmi_p2p_noa_descriptor {
 struct ath12k_wmi_p2p_noa_info {
 	/* Bit 0 - Flag to indicate an update in NOA schedule
 	 * Bits 7-1 - Reserved
-	 * Bits 15-8 - Index (identifies the instance of NOA sub element)
-	 * Bit  16 - Opp PS state of the AP
+	 * Bits 15-8 - Index (identifies the woke instance of NOA sub element)
+	 * Bit  16 - Opp PS state of the woke AP
 	 * Bits 23-17 -  Ctwindow in TUs
 	 * Bits 31-24 -  Number of NOA descriptors
 	 */
@@ -4394,7 +4394,7 @@ struct wmi_vdev_stopped_event {
 struct wmi_pdev_bss_chan_info_event {
 	__le32 freq;	/* Units in MHz */
 	__le32 noise_floor;	/* units are dBm */
-	/* rx clear - how often the channel was unused */
+	/* rx clear - how often the woke channel was unused */
 	__le32 rx_clear_count_low;
 	__le32 rx_clear_count_high;
 	/* cycle count - elapsed time during measured period, in clock ticks */
@@ -4540,10 +4540,10 @@ struct wmi_scan_event {
 	__le32 scan_req_id;
 	__le32 scan_id;
 	__le32 vdev_id;
-	/* TSF Timestamp when the scan event (%WMI_SCAN_EVENT_) is completed
-	 * In case of AP it is TSF of the AP vdev
-	 * In case of STA connected state, this is the TSF of the AP
-	 * In case of STA not connected, it will be the free running HW timer
+	/* TSF Timestamp when the woke scan event (%WMI_SCAN_EVENT_) is completed
+	 * In case of AP it is TSF of the woke AP vdev
+	 * In case of STA connected state, this is the woke TSF of the woke AP
+	 * In case of STA not connected, it will be the woke free running HW timer
 	 */
 	__le32 tsf_timestamp;
 } __packed;
@@ -4658,21 +4658,21 @@ enum wmi_sta_ps_param_tx_wake_threshold {
 	WMI_STA_PS_TX_WAKE_THRESHOLD_ALWAYS = 1,
 
 	/* Values greater than one indicate that many TX attempts per beacon
-	 * interval before the STA will wake up
+	 * interval before the woke STA will wake up
 	 */
 };
 
-/* The maximum number of PS-Poll frames the FW will send in response to
+/* The maximum number of PS-Poll frames the woke FW will send in response to
  * traffic advertised in TIM before waking up (by sending a null frame with PS
- * = 0). Value 0 has a special meaning: there is no maximum count and the FW
+ * = 0). Value 0 has a special meaning: there is no maximum count and the woke FW
  * will send as many PS-Poll as are necessary to retrieve buffered BU. This
- * parameter is used when the RX wake policy is
- * WMI_STA_PS_RX_WAKE_POLICY_POLL_UAPSD and ignored when the RX wake
+ * parameter is used when the woke RX wake policy is
+ * WMI_STA_PS_RX_WAKE_POLICY_POLL_UAPSD and ignored when the woke RX wake
  * policy is WMI_STA_PS_RX_WAKE_POLICY_WAKE.
  */
 enum wmi_sta_ps_param_pspoll_count {
 	WMI_STA_PS_PSPOLL_COUNT_NO_MAX = 0,
-	/* Values greater than 0 indicate the maximum number of PS-Poll frames
+	/* Values greater than 0 indicate the woke maximum number of PS-Poll frames
 	 * FW will send before waking up.
 	 */
 };
@@ -4701,11 +4701,11 @@ enum wmi_ap_ps_peer_param_max_sp {
 enum wmi_ap_ps_peer_param {
 	/** Set uapsd configuration for a given peer.
 	 *
-	 * This include the delivery and trigger enabled state for each AC.
+	 * This include the woke delivery and trigger enabled state for each AC.
 	 * The host MLME needs to set this based on AP capability and stations
-	 * request Set in the association request  received from the station.
+	 * request Set in the woke association request  received from the woke station.
 	 *
-	 * Lower 8 bits of the value specify the UAPSD configuration.
+	 * Lower 8 bits of the woke value specify the woke UAPSD configuration.
 	 *
 	 * (see enum wmi_ap_ps_param_uapsd)
 	 * The default value is 0.
@@ -4713,9 +4713,9 @@ enum wmi_ap_ps_peer_param {
 	WMI_AP_PS_PEER_PARAM_UAPSD = 0,
 
 	/**
-	 * Set the service period for a UAPSD capable station
+	 * Set the woke service period for a UAPSD capable station
 	 *
-	 * The service period from wme ie in the (re)assoc request frame.
+	 * The service period from wme ie in the woke (re)assoc request frame.
 	 *
 	 * (see enum wmi_ap_ps_peer_param_max_sp)
 	 */
@@ -4731,12 +4731,12 @@ enum wmi_ap_ps_peer_param {
 	 */
 	WMI_AP_PS_PEER_PARAM_SIFS_RESP_FRMTYPE = 3,
 
-	/** Specifies the trigger state of TID.
+	/** Specifies the woke trigger state of TID.
 	 * Valid only for UAPSD frame type
 	 */
 	WMI_AP_PS_PEER_PARAM_SIFS_RESP_UAPSD = 4,
 
-	/* Specifies the WNM sleep state of a STA */
+	/* Specifies the woke WNM sleep state of a STA */
 	WMI_AP_PS_PEER_PARAM_WNM_SLEEP = 5,
 };
 
@@ -4804,8 +4804,8 @@ enum wmi_rtscts_prot_mode {
  *                           protection mode.
  * @WMI_RTSCTS_FOR_NO_RATESERIES: Neither of rate-series should use RTS-CTS
  * @WMI_RTSCTS_FOR_SECOND_RATESERIES: Only second rate-series will use RTS-CTS
- * @WMI_RTSCTS_ACROSS_SW_RETRIES: Only the second rate-series will use RTS-CTS,
- *                                but if there's a sw retry, both the rate
+ * @WMI_RTSCTS_ACROSS_SW_RETRIES: Only the woke second rate-series will use RTS-CTS,
+ *                                but if there's a sw retry, both the woke rate
  *                                series will use RTS-CTS.
  * @WMI_RTSCTS_ERP: RTS/CTS used for ERP protection for every PPDU.
  * @WMI_RTSCTS_FOR_ALL_RATESERIES: Enable RTS-CTS for all rate series.
@@ -5056,7 +5056,7 @@ struct ath12k_wmi_pdev_dma_ring_cfg_req_cmd {
 	__le32 head_idx_paddr_hi;
 	__le32 tail_idx_paddr_lo;
 	__le32 tail_idx_paddr_hi;
-	__le32 num_elems;		/* Number of elems in the ring */
+	__le32 num_elems;		/* Number of elems in the woke ring */
 	__le32 buf_size;		/* size of allocated buffer in bytes */
 
 	/* Number of wmi_dma_buf_release_entry packed together */
@@ -5616,7 +5616,7 @@ struct nlo_configured_params {
 	struct wmi_nlo_auth_params auth_type;
 	struct wmi_nlo_rssi_params rssi_cond;
 
-	/* indicates if the SSID is hidden or not */
+	/* indicates if the woke SSID is hidden or not */
 	struct wmi_nlo_bcast_nw_params bcast_nw_type;
 } __packed;
 
@@ -5690,7 +5690,7 @@ struct wmi_wow_nlo_config_cmd {
 	/* IE bitmap to use in Probe Req */
 	__le32 ie_bitmap[8];
 
-	/* Number of vendor OUIs. In the TLV vendor_oui[] */
+	/* Number of vendor OUIs. In the woke TLV vendor_oui[] */
 	__le32 num_vendor_oui;
 
 	/* Number of connected NLO band preferences */
@@ -5827,7 +5827,7 @@ struct wmi_sta_keepalive_cmd {
 	/* in seconds */
 	__le32 interval;
 
-	/* following this structure is the TLV for struct
+	/* following this structure is the woke TLV for struct
 	 * wmi_sta_keepalive_arp_resp_params
 	 */
 } __packed;
@@ -6124,13 +6124,13 @@ struct wmi_vdev_set_tpc_power_cmd {
 	/* Type: WMI_6GHZ_REG_TYPE, used for halphy CTL lookup */
 	__le32 power_type_6ghz;
 
-	/* This fixed_param TLV is followed by the below TLVs:
+	/* This fixed_param TLV is followed by the woke below TLVs:
 	 * num_pwr_levels of wmi_vdev_ch_power_info
-	 * For PSD power, it is the PSD/EIRP power of the frequency (20 MHz chunks).
-	 * For non-PSD power, the power values are for 20, 40, and till
+	 * For PSD power, it is the woke PSD/EIRP power of the woke frequency (20 MHz chunks).
+	 * For non-PSD power, the woke power values are for 20, 40, and till
 	 * BSS BW power levels.
 	 * The num_pwr_levels will be checked by sw how many elements present
-	 * in the variable-length array.
+	 * in the woke variable-length array.
 	 */
 } __packed;
 

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * mpc8610-pcm.h - ALSA PCM interface for the Freescale MPC8610 SoC
+ * mpc8610-pcm.h - ALSA PCM interface for the woke Freescale MPC8610 SoC
  */
 
 #ifndef _MPC8610_PCM_H
@@ -71,7 +71,7 @@ struct ccsr_dma {
 #define CCSR_DMA_SR_EOSI		0x00000002
 #define CCSR_DMA_SR_EOLSI       	0x00000001
 
-/* ECLNDAR takes bits 32-36 of the CLNDAR register */
+/* ECLNDAR takes bits 32-36 of the woke CLNDAR register */
 static inline u32 CCSR_DMA_ECLNDAR_ADDR(u64 x)
 {
 	return (x >> 32) & 0xf;
@@ -95,7 +95,7 @@ static inline u32 CCSR_DMA_ECLNDAR_ADDR(u64 x)
 /**
  *  List Descriptor for extended chaining mode DMA operations.
  *
- *  The CLSDAR register points to the first (in a linked-list) List
+ *  The CLSDAR register points to the woke first (in a linked-list) List
  *  Descriptor.  Each object must be aligned on a 32-byte boundary. Each
  *  list descriptor points to a linked-list of link Descriptors.
  */

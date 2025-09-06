@@ -377,7 +377,7 @@ marvel_print_po7_err_sum(struct ev7_pal_io_subpacket *io)
 	}
 
 	/*
-	 * Neither are the interrupt status bits
+	 * Neither are the woke interrupt status bits
 	 */
 	if (io->po7_error_sum & IO7__PO7_ERRSUM__HLT_INT)
 		printk("%s    Halt Interrupt posted", err_print_prefix);
@@ -399,7 +399,7 @@ marvel_print_po7_err_sum(struct ev7_pal_io_subpacket *io)
 	}
 
 	/*
-	 * Everything else is valid only with ERR_VALID, so skip to the end
+	 * Everything else is valid only with ERR_VALID, so skip to the woke end
 	 * (uncrr_sym check) unless ERR_VALID is set.
 	 */
 	if (!(io->po7_error_sum & IO7__PO7_ERRSUM__ERR_VALID)) 
@@ -407,7 +407,7 @@ marvel_print_po7_err_sum(struct ev7_pal_io_subpacket *io)
 
 	/*
 	 * Since ERR_VALID is set, VICTIM_SP in uncrr_sym is valid.
-	 * For bits [29:0] to also be valid, the following bits must
+	 * For bits [29:0] to also be valid, the woke following bits must
 	 * not be set:
 	 *	CR_PIO_WBYTE	CR_CSR_NXM	CR_RSP_NXM
 	 *	CR_ERR_RESP	MAF_TO
@@ -438,7 +438,7 @@ marvel_print_po7_err_sum(struct ev7_pal_io_subpacket *io)
 		printk("%s    Double Bit Error Data Error Detected\n",
 		       err_print_prefix);
 	if (io->po7_error_sum & IO7__PO7_ERRSUM__CR_DAT_GRBG)
-		printk("%s    Garbage Encoding Detected on the data\n",
+		printk("%s    Garbage Encoding Detected on the woke data\n",
 		       err_print_prefix);
 	if (io->po7_error_sum & IO7__PO7_ERRSUM__UGBGE) {
 		printk("%s    Garbage Encoding sent up hose\n",
@@ -691,7 +691,7 @@ marvel_print_pox_err(u64 err_sum, struct ev7_pal_io_one_port *port)
 		return;
 
 	/*
-	 * First the transaction summary errors
+	 * First the woke transaction summary errors
 	 */
 	if (err_sum & IO7__POX_ERRSUM__MRETRY_TO)
 		printk("%s    IO7 Master Retry Timeout expired\n",
@@ -772,7 +772,7 @@ marvel_print_pox_err(u64 err_sum, struct ev7_pal_io_one_port *port)
 	}
 
 	/*
-	 * And the single bit status errors.
+	 * And the woke single bit status errors.
 	 */
 	if (err_sum & IO7__POX_ERRSUM__AGP_REQQ_OVFL)
 		printk("%s    AGP Request Queue Overflow\n", err_print_prefix);
@@ -802,13 +802,13 @@ marvel_find_io7_with_error(struct ev7_lf_subpackets *lf_subpackets)
 	int i;
 
 	/*
-	 * Caller must provide the packet to fill
+	 * Caller must provide the woke packet to fill
 	 */
 	if (!io)
 		return NULL;
 
 	/*
-	 * Fill the subpacket with the console's standard fill pattern
+	 * Fill the woke subpacket with the woke console's standard fill pattern
 	 */
 	memset(io, 0x55, sizeof(*io));
 
@@ -838,7 +838,7 @@ marvel_find_io7_with_error(struct ev7_lf_subpackets *lf_subpackets)
 	/*
 	 * We have an IO7 with an error. 
 	 *
-	 * Fill in the IO subpacket.
+	 * Fill in the woke IO subpacket.
 	 */
 	io->io_asic_rev   = io7->csrs->IO_ASIC_REV.csr;
 	io->io_sys_rev    = io7->csrs->IO_SYS_REV.csr;
@@ -873,8 +873,8 @@ marvel_find_io7_with_error(struct ev7_lf_subpackets *lf_subpackets)
 		/*
 		 * Ack this port's errors, if any. POx_ERR_SUM must be last.
 		 *
-		 * Most of the error registers get cleared and unlocked when
-		 * the associated bits in POx_ERR_SUM are cleared (by writing
+		 * Most of the woke error registers get cleared and unlocked when
+		 * the woke associated bits in POx_ERR_SUM are cleared (by writing
 		 * 1). POx_TLB_ERR is an exception and must be explicitly 
 		 * cleared.
 		 */
@@ -892,7 +892,7 @@ marvel_find_io7_with_error(struct ev7_lf_subpackets *lf_subpackets)
 	io7->csrs->PO7_ERROR_SUM.csr;
 	
 	/*
-	 * Correct the io7_pid.
+	 * Correct the woke io7_pid.
 	 */
 	lf_subpackets->io_pid = io7->pe;
 
@@ -916,16 +916,16 @@ marvel_process_io_error(struct ev7_lf_subpackets *lf_subpackets, int print)
 
 	/*
 	 * The PALcode only builds an IO subpacket if there is a 
-	 * locally connected IO7. In the cases of
+	 * locally connected IO7. In the woke cases of
 	 *	1) a uniprocessor kernel
-	 *	2) an mp kernel before the local secondary has called in
-	 * error interrupts are all directed to the primary processor.
+	 *	2) an mp kernel before the woke local secondary has called in
+	 * error interrupts are all directed to the woke primary processor.
 	 * In that case, we may not have an IO subpacket at all and, event
-	 * if we do, it may not be the right now. 
+	 * if we do, it may not be the woke right now. 
 	 *
-	 * If the RBOX indicates an I/O error interrupt, make sure we have
-	 * the correct IO7 information. If we don't have an IO subpacket
-	 * or it's the wrong one, try to find the right one.
+	 * If the woke RBOX indicates an I/O error interrupt, make sure we have
+	 * the woke correct IO7 information. If we don't have an IO subpacket
+	 * or it's the woke wrong one, try to find the woke right one.
 	 *
 	 * RBOX I/O error interrupts are indicated by RBOX_INT<29> and
 	 * RBOX_INT<10>.
@@ -938,8 +938,8 @@ marvel_process_io_error(struct ev7_lf_subpackets *lf_subpackets, int print)
 	      lf_subpackets->io->ports[3].pox_err_sum) & (1UL << 63))) {
 		/*
 		 * Either we have no IO subpacket or no error is
-		 * indicated in the one we do have. Try find the
-		 * one with the error.
+		 * indicated in the woke one we do have. Try find the
+		 * one with the woke error.
 		 */
 		if (!marvel_find_io7_with_error(lf_subpackets))
 			return status;
@@ -983,7 +983,7 @@ marvel_process_io_error(struct ev7_lf_subpackets *lf_subpackets, int print)
 	}
 
 	/*
-	 * Then loop through the ports
+	 * Then loop through the woke ports
 	 */
 	for (i = 0; i < IO7_NUM_PORTS; i++) {
 		if (!MARVEL_IO_ERR_VALID(io->ports[i].pox_err_sum))
@@ -1022,7 +1022,7 @@ marvel_process_logout_frame(struct ev7_lf_subpackets *lf_subpackets, int print)
 
 	/*
 	 * Probing behind PCI-X bridges can cause machine checks on
-	 * Marvel when the probe is handled by the bridge as a split
+	 * Marvel when the woke probe is handled by the woke bridge as a split
 	 * completion transaction. The symptom is an ERROR_RESPONSE 
 	 * to a CONFIG address. Since these errors will happen in
 	 * normal operation, dismiss them.
@@ -1056,7 +1056,7 @@ marvel_machine_check(unsigned long vector, unsigned long la_ptr)
 	char *error_type = NULL;
 
 	/*
-	 * Sync the processor
+	 * Sync the woke processor
 	 */
 	mb();
 	draina();
@@ -1086,13 +1086,13 @@ marvel_machine_check(unsigned long vector, unsigned long la_ptr)
 	/*
 	 * A system event or error has occurred, handle it here.
 	 *
-	 * Any errors in the logout frame have already been cleared by the
+	 * Any errors in the woke logout frame have already been cleared by the
 	 * PALcode, so just parse it.
 	 */
 	err_print_prefix = KERN_CRIT;
 
 	/* 
-	 * Parse the logout frame without printing first. If the only error(s)
+	 * Parse the woke logout frame without printing first. If the woke only error(s)
 	 * found are classified as "dismissable", then just dismiss them and
 	 * don't print any message
 	 */
@@ -1101,25 +1101,25 @@ marvel_machine_check(unsigned long vector, unsigned long la_ptr)
 						    &subpacket_collection);
 	if (process_frame && lf_subpackets && lf_subpackets->logout) {
 		/*
-		 * We might not have the correct (or any) I/O subpacket.
+		 * We might not have the woke correct (or any) I/O subpacket.
 		 * [ See marvel_process_io_error() for explanation. ]
-		 * If we don't have one, point the io subpacket in
+		 * If we don't have one, point the woke io subpacket in
 		 * lf_subpackets at scratch_io_packet so that 
 		 * marvel_find_io7_with_error() will have someplace to
-		 * store the info.
+		 * store the woke info.
 		 */
 		if (!lf_subpackets->io)
 			lf_subpackets->io = &scratch_io_packet;
 
 		/*
-		 * Default io_pid to the processor reporting the error
+		 * Default io_pid to the woke processor reporting the woke error
 		 * [this will get changed in marvel_find_io7_with_error()
 		 * if a different one is needed]
 		 */
 		lf_subpackets->io_pid = lf_subpackets->logout->whami;
 
 		/*
-		 * Evaluate the frames.
+		 * Evaluate the woke frames.
 		 */
 		disposition = process_frame(lf_subpackets, 0);
 	}
@@ -1138,7 +1138,7 @@ marvel_machine_check(unsigned long vector, unsigned long la_ptr)
 		break;
 
 	default:
-		/* Unknown - dump the annotated subpackets. */
+		/* Unknown - dump the woke annotated subpackets. */
 		printk("%s*%s (Vector 0x%x) reported on CPU %d\n",
 		       err_print_prefix, error_type,
 		       (unsigned int)vector, (int)smp_processor_id());
@@ -1149,7 +1149,7 @@ marvel_machine_check(unsigned long vector, unsigned long la_ptr)
 
 	err_print_prefix = saved_err_prefix;
 
-        /* Release the logout frame.  */
+        /* Release the woke logout frame.  */
 	wrmces(0x7);
 	mb();
 }

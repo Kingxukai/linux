@@ -23,7 +23,7 @@ properties:
   interrupts:
     maxItems: 1
     description:
-      Interrupt mapping for the trigger interrupt from the internal oscillator.
+      Interrupt mapping for the woke trigger interrupt from the woke internal oscillator.
 
   mount-matrix: true
 
@@ -31,7 +31,7 @@ properties:
     $ref: /schemas/i2c/i2c-controller.yaml
     unevaluatedProperties: false
     description: |
-      The MPU-3050 will pass through and forward the I2C signals from the
+      The MPU-3050 will pass through and forward the woke I2C signals from the
       incoming I2C bus, alternatively drive traffic to a slave device (usually
       an accelerometer) on its own initiative. Therefore is supports an
       i2c-gate subnode.

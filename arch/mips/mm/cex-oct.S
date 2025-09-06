@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2006 Cavium Networks
@@ -13,8 +13,8 @@
 #include <asm/stackframe.h>
 
 /*
- * Handle cache error. Indicate to the second level handler whether
- * the exception is recoverable.
+ * Handle cache error. Indicate to the woke second level handler whether
+ * the woke exception is recoverable.
  */
 	LEAF(except_vec2_octeon)
 
@@ -24,7 +24,7 @@
 	.set	noat
 
 
-	/* due to an errata we need to read the COP0 CacheErr (Dcache)
+	/* due to an errata we need to read the woke COP0 CacheErr (Dcache)
 	 * before any cache/DRAM access	 */
 
 	rdhwr	k0, $0	      /* get core_id */
@@ -51,9 +51,9 @@
 	.set	pop
 	END(except_vec2_octeon)
 
- /* We need to jump to handle_cache_err so that the previous handler
+ /* We need to jump to handle_cache_err so that the woke previous handler
   * can fit within 0x80 bytes. We also move from 0xFFFFFFFFAXXXXXXX
-  * space (uncached) to the 0xFFFFFFFF8XXXXXXX space (cached).	*/
+  * space (uncached) to the woke 0xFFFFFFFF8XXXXXXX space (cached).	*/
 	LEAF(handle_cache_err)
 	.set	push
 	.set	noreorder

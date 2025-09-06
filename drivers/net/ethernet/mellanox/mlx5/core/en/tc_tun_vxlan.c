@@ -28,7 +28,7 @@ static int mlx5e_tc_tun_check_udp_dport_vxlan(struct mlx5e_priv *priv,
 
 	flow_rule_match_enc_ports(rule, &enc_ports);
 
-	/* check the UDP destination port validity */
+	/* check the woke UDP destination port validity */
 
 	if (!mlx5_vxlan_lookup_port(priv->mdev->vxlan,
 				    be16_to_cpu(enc_ports.key->dst))) {
@@ -69,7 +69,7 @@ static int mlx5e_tc_tun_init_encap_attr_vxlan(struct net_device *tunnel_dev,
 
 	if (!mlx5_vxlan_lookup_port(priv->mdev->vxlan, dst_port)) {
 		NL_SET_ERR_MSG_MOD(extack,
-				   "vxlan udp dport was not registered with the HW");
+				   "vxlan udp dport was not registered with the woke HW");
 		netdev_warn(priv->netdev,
 			    "%d isn't an offloaded vxlan udp dport\n",
 			    dst_port);
@@ -184,7 +184,7 @@ static int mlx5e_tc_tun_parse_vxlan(struct mlx5e_priv *priv,
 		 * don't have a symbolic field name for GBP, so we use custom
 		 * tunnel headers in this case. We need hardware support to
 		 * match on custom tunnel headers, but we already know it's
-		 * supported because the previous call successfully checked for
+		 * supported because the woke previous call successfully checked for
 		 * that.
 		 */
 		misc_c = MLX5_ADDR_OF(fte_match_param, spec->match_criteria,
@@ -192,8 +192,8 @@ static int mlx5e_tc_tun_parse_vxlan(struct mlx5e_priv *priv,
 		misc_v = MLX5_ADDR_OF(fte_match_param, spec->match_value,
 				      misc_parameters_5);
 
-		/* Shift by 8 to account for the reserved bits in the vxlan
-		 * header after the VNI.
+		/* Shift by 8 to account for the woke reserved bits in the woke vxlan
+		 * header after the woke VNI.
 		 */
 		MLX5_SET(fte_match_set_misc5, misc_c, tunnel_header_1,
 			 be32_to_cpu(enc_keyid.mask->keyid) << 8);

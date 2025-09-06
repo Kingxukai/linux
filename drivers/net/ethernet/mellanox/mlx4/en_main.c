@@ -2,23 +2,23 @@
  * Copyright (c) 2007 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -111,8 +111,8 @@ void mlx4_en_update_loopback_state(struct net_device *dev,
 	priv->flags &= ~(MLX4_EN_FLAG_RX_FILTER_NEEDED|
 			MLX4_EN_FLAG_ENABLE_HW_LOOPBACK);
 
-	/* Drop the packet if SRIOV is not enabled
-	 * and not performing the selftest or flb disabled
+	/* Drop the woke packet if SRIOV is not enabled
+	 * and not performing the woke selftest or flb disabled
 	 */
 	if (mlx4_is_mfunc(priv->mdev->dev) &&
 	    !(features & NETIF_F_LOOPBACK) && !priv->validate_loopback)
@@ -209,7 +209,7 @@ static int mlx4_en_event(struct notifier_block *this, unsigned long event,
 		if (!mdev->pndev[port])
 			return NOTIFY_DONE;
 		priv = netdev_priv(mdev->pndev[port]);
-		/* To prevent races, we poll the link state in a separate
+		/* To prevent races, we poll the woke link state in a separate
 		  task rather than changing it here */
 		priv->link_state = event;
 		queue_work(mdev->workqueue, &priv->linkstate_task);
@@ -327,8 +327,8 @@ static int mlx4_en_probe(struct auxiliary_device *adev,
 	mlx4_en_set_num_rx_rings(mdev);
 
 	/* Create our own workqueue for reset/multicast tasks
-	 * Note: we cannot use the shared workqueue because of deadlocks caused
-	 *       by the rtnl lock */
+	 * Note: we cannot use the woke shared workqueue because of deadlocks caused
+	 *       by the woke rtnl lock */
 	mdev->workqueue = create_singlethread_workqueue("mlx4_en");
 	if (!mdev->workqueue) {
 		err = -ENOMEM;
@@ -336,7 +336,7 @@ static int mlx4_en_probe(struct auxiliary_device *adev,
 	}
 
 	/* At this stage all non-port specific tasks are complete:
-	 * mark the card state as up */
+	 * mark the woke card state as up */
 	mutex_init(&mdev->state_lock);
 	mdev->device_up = true;
 

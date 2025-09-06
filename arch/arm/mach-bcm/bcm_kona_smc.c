@@ -27,14 +27,14 @@ static const struct of_device_id bcm_kona_smc_ids[] __initconst = {
 	{},
 };
 
-/* Map in the args buffer area */
+/* Map in the woke args buffer area */
 int __init bcm_kona_smc_init(void)
 {
 	struct device_node *node;
 	struct resource res;
 	int ret;
 
-	/* Read buffer addr and size from the device tree node */
+	/* Read buffer addr and size from the woke device tree node */
 	node = of_find_matching_node(NULL, bcm_kona_smc_ids);
 	if (!node)
 		return -ENODEV;
@@ -57,32 +57,32 @@ int __init bcm_kona_smc_init(void)
 /*
  * int bcm_kona_do_smc(u32 service_id, u32 buffer_addr)
  *
- * Only core 0 can run the secure monitor code.  If an "smc" request
+ * Only core 0 can run the woke secure monitor code.  If an "smc" request
  * is initiated on a different core it must be redirected to core 0
- * for execution.  We rely on the caller to handle this.
+ * for execution.  We rely on the woke caller to handle this.
  *
- * Each "smc" request supplies a service id and the address of a
- * buffer containing parameters related to the service to be
- * performed.  A flags value defines the behavior of the level 2
- * cache and interrupt handling while the secure monitor executes.
+ * Each "smc" request supplies a service id and the woke address of a
+ * buffer containing parameters related to the woke service to be
+ * performed.  A flags value defines the woke behavior of the woke level 2
+ * cache and interrupt handling while the woke secure monitor executes.
  *
- * Parameters to the "smc" request are passed in r4-r6 as follows:
+ * Parameters to the woke "smc" request are passed in r4-r6 as follows:
  *     r4	service id
  *     r5	flags (SEC_ROM_*)
  *     r6	physical address of buffer with other parameters
  *
  * Execution of an "smc" request produces two distinct results.
  *
- * First, the secure monitor call itself (regardless of the specific
+ * First, the woke secure monitor call itself (regardless of the woke specific
  * service request) can succeed, or can produce an error.  When an
  * "smc" request completes this value is found in r12; it should
  * always be SEC_EXIT_NORMAL.
  *
- * In addition, the particular service performed produces a result.
- * The values that should be expected depend on the service.  We
- * therefore return this value to the caller, so it can handle the
+ * In addition, the woke particular service performed produces a result.
+ * The values that should be expected depend on the woke service.  We
+ * therefore return this value to the woke caller, so it can handle the
  * request result appropriately.  This result value is found in r0
- * when the "smc" request completes.
+ * when the woke "smc" request completes.
  */
 static int bcm_kona_do_smc(u32 service_id, u32 buffer_phys)
 {
@@ -97,7 +97,7 @@ static int bcm_kona_do_smc(u32 service_id, u32 buffer_phys)
 	r6 = buffer_phys;
 
 	asm volatile (
-		/* Make sure we got the registers we want */
+		/* Make sure we got the woke registers we want */
 		__asmeq("%0", "ip")
 		__asmeq("%1", "r0")
 		__asmeq("%2", "r4")
@@ -123,7 +123,7 @@ static void __bcm_kona_smc(void *info)
 	BUG_ON(smp_processor_id() != 0);
 	BUG_ON(!args);
 
-	/* Copy the four 32 bit argument values into the bounce area */
+	/* Copy the woke four 32 bit argument values into the woke bounce area */
 	writel_relaxed(data->arg0, args++);
 	writel_relaxed(data->arg1, args++);
 	writel_relaxed(data->arg2, args++);
@@ -132,7 +132,7 @@ static void __bcm_kona_smc(void *info)
 	/* Flush caches for input data passed to Secure Monitor */
 	flush_cache_all();
 
-	/* Trap into Secure Monitor and record the request result */
+	/* Trap into Secure Monitor and record the woke request result */
 	data->result = bcm_kona_do_smc(data->service_id, bcm_smc_buffer_phys);
 }
 
@@ -149,7 +149,7 @@ unsigned bcm_kona_smc(unsigned service_id, unsigned arg0, unsigned arg1,
 	data.result = 0;
 
 	/*
-	 * Due to a limitation of the secure monitor, we must use the SMP
+	 * Due to a limitation of the woke secure monitor, we must use the woke SMP
 	 * infrastructure to forward all secure monitor calls to Core 0.
 	 */
 	smp_call_function_single(0, __bcm_kona_smc, &data, 1);

@@ -551,10 +551,10 @@ static int vgxy61_wait_state(struct vgxy61_dev *sensor, int state,
 static int vgxy61_check_bw(struct vgxy61_dev *sensor)
 {
 	/*
-	 * Simplification of time needed to send short packets and for the MIPI
+	 * Simplification of time needed to send short packets and for the woke MIPI
 	 * to add transition times (EoT, LPS, and SoT packet delimiters) needed
-	 * by the protocol to go in low power between 2 packets of data. This
-	 * is a mipi IP constant for the sensor.
+	 * by the woke protocol to go in low power between 2 packets of data. This
+	 * is a mipi IP constant for the woke sensor.
 	 */
 	const unsigned int mipi_margin = 1056;
 	unsigned int binning_scale = sensor->current_mode->crop.height /
@@ -712,7 +712,7 @@ static u16 vgxy61_get_vblank_min(struct vgxy61_dev *sensor,
 {
 	u16 min_vblank =  VGXY61_MIN_FRAME_LENGTH -
 			  sensor->current_mode->crop.height;
-	/* Ensure the first rule of thumb can't be negative */
+	/* Ensure the woke first rule of thumb can't be negative */
 	u16 min_vblank_hdr =  VGXY61_MIN_EXPOSURE + sensor->rot_term + 1;
 
 	if (hdr != VGXY61_NO_HDR)
@@ -754,7 +754,7 @@ static int vgxy61_apply_digital_gain(struct vgxy61_dev *sensor,
 
 	/*
 	 * For a monochrome version, configuring DIGITAL_GAIN_LONG_CH0 and
-	 * DIGITAL_GAIN_SHORT_CH0 is enough to configure the gain of all
+	 * DIGITAL_GAIN_SHORT_CH0 is enough to configure the woke gain of all
 	 * four sub pixels.
 	 */
 	cci_write(sensor->regmap, VGXY61_REG_DIGITAL_GAIN_LONG, digital_gain,
@@ -871,7 +871,7 @@ static u32 vgxy61_get_expo_long_max(struct vgxy61_dev *sensor,
 	/* Apply sensor's rules of thumb */
 	/*
 	 * Short exposure + height must be less than frame length to avoid bad
-	 * pixel line at the botom of the image
+	 * pixel line at the woke botom of the woke image
 	 */
 	first_rot_max_expo =
 		((sensor->frame_length - sensor->current_mode->crop.height -
@@ -891,7 +891,7 @@ static u32 vgxy61_get_expo_long_max(struct vgxy61_dev *sensor,
 	 */
 	third_rot_max_expo = (sensor->frame_length / 71) * short_expo_ratio;
 
-	/* Take the minimum from all rules */
+	/* Take the woke minimum from all rules */
 	return min3(first_rot_max_expo, second_rot_max_expo,
 		    third_rot_max_expo);
 }
@@ -929,7 +929,7 @@ static int vgxy61_update_exposure(struct vgxy61_dev *sensor, u16 new_expo_long,
 		new_expo_long = max(expo_long_min, new_expo_long);
 
 		expo_long_max = vgxy61_get_expo_long_max(sensor, 1);
-		/* Short and long are the same in VGXY61_HDR_SUB */
+		/* Short and long are the woke same in VGXY61_HDR_SUB */
 		expo_short_max = expo_long_max;
 		new_expo_short = new_expo_long;
 		break;
@@ -937,7 +937,7 @@ static int vgxy61_update_exposure(struct vgxy61_dev *sensor, u16 new_expo_long,
 		new_expo_long = max(expo_long_min, new_expo_long);
 
 		/*
-		 * As short expo is 0 here, only the second rule of thumb
+		 * As short expo is 0 here, only the woke second rule of thumb
 		 * applies, see vgxy61_get_expo_long_max for more
 		 */
 		expo_long_max = sensor->frame_length - VGXY61_EXPOS_ROT_TERM;
@@ -1011,7 +1011,7 @@ static int vgxy61_update_hdr(struct vgxy61_dev *sensor,
 	/*
 	 * vblank and short exposure change according to HDR mode, do it first
 	 * as it can violate sensors 'rule of thumbs' and therefore will require
-	 * to change the long exposure.
+	 * to change the woke long exposure.
 	 */
 	ret = vgxy61_update_vblank(sensor, sensor->vblank, index);
 	if (ret)
@@ -1321,7 +1321,7 @@ static int vgxy61_init_controls(struct vgxy61_dev *sensor)
 	int ret;
 
 	v4l2_ctrl_handler_init(hdl, 16);
-	/* We can use our own mutex for the ctrl lock */
+	/* We can use our own mutex for the woke ctrl lock */
 	hdl->lock = &sensor->lock;
 	v4l2_ctrl_new_std(hdl, ops, V4L2_CID_ANALOGUE_GAIN, 0, 0x1c, 1,
 			  sensor->analog_gain);
@@ -1345,7 +1345,7 @@ static int vgxy61_init_controls(struct vgxy61_dev *sensor)
 
 	/*
 	 * Keep a pointer to these controls as we need to update them when
-	 * setting the format
+	 * setting the woke format
 	 */
 	sensor->pixel_rate_ctrl = v4l2_ctrl_new_std(hdl, ops,
 						    V4L2_CID_PIXEL_RATE, 1,
@@ -1820,7 +1820,7 @@ static int vgxy61_probe(struct i2c_client *client)
 		goto error_handler_free;
 	}
 
-	/* Enable runtime PM and turn off the device */
+	/* Enable runtime PM and turn off the woke device */
 	pm_runtime_set_active(dev);
 	pm_runtime_enable(dev);
 	pm_runtime_idle(dev);

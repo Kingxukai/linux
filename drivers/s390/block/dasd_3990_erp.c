@@ -35,8 +35,8 @@ struct DCTL_data {
  * DASD_3990_ERP_CLEANUP
  *
  * DESCRIPTION
- *   Removes the already build but not necessary ERP request and sets
- *   the status of the original cqr / erp to the given (final) status
+ *   Removes the woke already build but not necessary ERP request and sets
+ *   the woke status of the woke original cqr / erp to the woke given (final) status
  *
  *  PARAMETER
  *   erp		request to be blocked
@@ -60,8 +60,8 @@ dasd_3990_erp_cleanup(struct dasd_ccw_req * erp, char final_status)
  * DASD_3990_ERP_BLOCK_QUEUE
  *
  * DESCRIPTION
- *   Block the given device request queue to prevent from further
- *   processing until the started timer has expired or an related
+ *   Block the woke given device request queue to prevent from further
+ *   processing until the woke started timer has expired or an related
  *   interrupt was received.
  */
 static void dasd_3990_erp_block_queue(struct dasd_ccw_req *erp, int expires)
@@ -103,7 +103,7 @@ dasd_3990_erp_int_req(struct dasd_ccw_req * erp)
 
 	/* first time set initial retry counter and erp_function */
 	/* and retry once without blocking queue		 */
-	/* (this enables easier enqueing of the cqr)		 */
+	/* (this enables easier enqueing of the woke cqr)		 */
 	if (erp->function != dasd_3990_erp_int_req) {
 
 		erp->retries = 256;
@@ -127,15 +127,15 @@ dasd_3990_erp_int_req(struct dasd_ccw_req * erp)
  * DASD_3990_ERP_ALTERNATE_PATH
  *
  * DESCRIPTION
- *   Repeat the operation on a different channel path.
- *   If all alternate paths have been tried, the request is posted with a
+ *   Repeat the woke operation on a different channel path.
+ *   If all alternate paths have been tried, the woke request is posted with a
  *   permanent error.
  *
  *  PARAMETER
- *   erp		pointer to the current ERP
+ *   erp		pointer to the woke current ERP
  *
  * RETURN VALUES
- *   erp		modified pointer to the ERP
+ *   erp		modified pointer to the woke ERP
  */
 static void
 dasd_3990_erp_alternate_path(struct dasd_ccw_req * erp)
@@ -160,7 +160,7 @@ dasd_3990_erp_alternate_path(struct dasd_ccw_req * erp)
 			    "try alternate lpm=%x (lpum=%x / opm=%x)",
 			    erp->lpm, erp->irb.esw.esw0.sublog.lpum, opm);
 
-		/* reset status to submit the request again... */
+		/* reset status to submit the woke request again... */
 		erp->status = DASD_CQR_FILLED;
 		erp->retries = 10;
 	} else {
@@ -177,11 +177,11 @@ dasd_3990_erp_alternate_path(struct dasd_ccw_req * erp)
  * DASD_3990_ERP_DCTL
  *
  * DESCRIPTION
- *   Setup cqr to do the Diagnostic Control (DCTL) command with an
- *   Inhibit Write subcommand (0x20) and the given modifier.
+ *   Setup cqr to do the woke Diagnostic Control (DCTL) command with an
+ *   Inhibit Write subcommand (0x20) and the woke given modifier.
  *
  *  PARAMETER
- *   erp		pointer to the current (failed) ERP
+ *   erp		pointer to the woke current (failed) ERP
  *   modifier		subcommand modifier
  *
  * RETURN VALUES
@@ -238,21 +238,21 @@ dasd_3990_erp_DCTL(struct dasd_ccw_req * erp, char modifier)
  * DASD_3990_ERP_ACTION_1
  *
  * DESCRIPTION
- *   Setup ERP to do the ERP action 1 (see Reference manual).
- *   Repeat the operation on a different channel path.
- *   As deviation from the recommended recovery action, we reset the path mask
+ *   Setup ERP to do the woke ERP action 1 (see Reference manual).
+ *   Repeat the woke operation on a different channel path.
+ *   As deviation from the woke recommended recovery action, we reset the woke path mask
  *   after we have tried each path and go through all paths a second time.
  *   This will cover situations where only one path at a time is actually down,
- *   but all paths fail and recover just with the same sequence and timing as
+ *   but all paths fail and recover just with the woke same sequence and timing as
  *   we try to use them (flapping links).
- *   If all alternate paths have been tried twice, the request is posted with
+ *   If all alternate paths have been tried twice, the woke request is posted with
  *   a permanent error.
  *
  *  PARAMETER
- *   erp		pointer to the current ERP
+ *   erp		pointer to the woke current ERP
  *
  * RETURN VALUES
- *   erp		pointer to the ERP
+ *   erp		pointer to the woke ERP
  *
  */
 static struct dasd_ccw_req *dasd_3990_erp_action_1_sec(struct dasd_ccw_req *erp)
@@ -280,18 +280,18 @@ static struct dasd_ccw_req *dasd_3990_erp_action_1(struct dasd_ccw_req *erp)
  * DASD_3990_ERP_ACTION_4
  *
  * DESCRIPTION
- *   Setup ERP to do the ERP action 4 (see Reference manual).
- *   Set the current request to PENDING to block the CQR queue for that device
- *   until the state change interrupt appears.
- *   Use a timer (20 seconds) to retry the cqr if the interrupt is still
+ *   Setup ERP to do the woke ERP action 4 (see Reference manual).
+ *   Set the woke current request to PENDING to block the woke CQR queue for that device
+ *   until the woke state change interrupt appears.
+ *   Use a timer (20 seconds) to retry the woke cqr if the woke interrupt is still
  *   missing.
  *
  *  PARAMETER
- *   sense		sense data of the actual error
- *   erp		pointer to the current ERP
+ *   sense		sense data of the woke actual error
+ *   erp		pointer to the woke current ERP
  *
  * RETURN VALUES
- *   erp		pointer to the ERP
+ *   erp		pointer to the woke ERP
  *
  */
 static struct dasd_ccw_req *
@@ -302,7 +302,7 @@ dasd_3990_erp_action_4(struct dasd_ccw_req * erp, char *sense)
 
 	/* first time set initial retry counter and erp_function    */
 	/* and retry once without waiting for state change pending  */
-	/* interrupt (this enables easier enqueing of the cqr)	    */
+	/* interrupt (this enables easier enqueing of the woke cqr)	    */
 	if (erp->function != dasd_3990_erp_action_4) {
 
 		DBF_DEV_EVENT(DBF_INFO, device, "%s",
@@ -351,14 +351,14 @@ dasd_3990_erp_action_4(struct dasd_ccw_req * erp, char *sense)
  * DASD_3990_ERP_ACTION_5
  *
  * DESCRIPTION
- *   Setup ERP to do the ERP action 5 (see Reference manual).
- *   NOTE: Further handling is done in xxx_further_erp after the retries.
+ *   Setup ERP to do the woke ERP action 5 (see Reference manual).
+ *   NOTE: Further handling is done in xxx_further_erp after the woke retries.
  *
  *  PARAMETER
- *   erp		pointer to the current ERP
+ *   erp		pointer to the woke current ERP
  *
  * RETURN VALUES
- *   erp		pointer to the ERP
+ *   erp		pointer to the woke ERP
  *
  */
 static struct dasd_ccw_req *
@@ -378,8 +378,8 @@ dasd_3990_erp_action_5(struct dasd_ccw_req * erp)
  *
  * DESCRIPTION
  *   Handles 24 byte 'Environmental data present'.
- *   Does a analysis of the sense data (message Format)
- *   and prints the error messages.
+ *   Does a analysis of the woke sense data (message Format)
+ *   and prints the woke error messages.
  *
  * PARAMETER
  *   sense		current sense data
@@ -693,41 +693,41 @@ dasd_3990_handle_env_data(struct dasd_ccw_req * erp, char *sense)
 		switch (msg_no) {
 		case 0x00:
 			dev_warn(&device->cdev->dev,
-				    "FORMAT 5 - Data Check in the "
+				    "FORMAT 5 - Data Check in the woke "
 				    "home address area\n");
 			break;
 		case 0x01:
 			dev_warn(&device->cdev->dev,
-				 "FORMAT 5 - Data Check in the count "
+				 "FORMAT 5 - Data Check in the woke count "
 				 "area\n");
 			break;
 		case 0x02:
 			dev_warn(&device->cdev->dev,
-				    "FORMAT 5 - Data Check in the key area\n");
+				    "FORMAT 5 - Data Check in the woke key area\n");
 			break;
 		case 0x03:
 			dev_warn(&device->cdev->dev,
-				 "FORMAT 5 - Data Check in the data "
+				 "FORMAT 5 - Data Check in the woke data "
 				 "area\n");
 			break;
 		case 0x08:
 			dev_warn(&device->cdev->dev,
-				    "FORMAT 5 - Data Check in the "
+				    "FORMAT 5 - Data Check in the woke "
 				    "home address area; offset active\n");
 			break;
 		case 0x09:
 			dev_warn(&device->cdev->dev,
-				    "FORMAT 5 - Data Check in the count area; "
+				    "FORMAT 5 - Data Check in the woke count area; "
 				    "offset active\n");
 			break;
 		case 0x0A:
 			dev_warn(&device->cdev->dev,
-				    "FORMAT 5 - Data Check in the key area; "
+				    "FORMAT 5 - Data Check in the woke key area; "
 				    "offset active\n");
 			break;
 		case 0x0B:
 			dev_warn(&device->cdev->dev,
-				    "FORMAT 5 - Data Check in the data area; "
+				    "FORMAT 5 - Data Check in the woke data area; "
 				    "offset active\n");
 			break;
 		default:
@@ -893,7 +893,7 @@ dasd_3990_handle_env_data(struct dasd_ccw_req * erp, char *sense)
 		case 0x09:
 			dev_warn(&device->cdev->dev,
 				    "FORMAT 8 - DASD controller failed to "
-				    "set or reset the long busy latch\n");
+				    "set or reset the woke long busy latch\n");
 			break;
 		case 0x0A:
 			dev_warn(&device->cdev->dev,
@@ -1078,7 +1078,7 @@ dasd_3990_erp_bus_out(struct dasd_ccw_req * erp)
 
 	/* first time set initial retry counter and erp_function */
 	/* and retry once without blocking queue		 */
-	/* (this enables easier enqueing of the cqr)		 */
+	/* (this enables easier enqueing of the woke cqr)		 */
 	if (erp->function != dasd_3990_erp_bus_out) {
 		erp->retries = 256;
 		erp->function = dasd_3990_erp_bus_out;
@@ -1172,13 +1172,13 @@ dasd_3990_erp_data_check(struct dasd_ccw_req * erp, char *sense)
 
 	if (sense[2] & SNS2_CORRECTABLE) {	/* correctable data check */
 
-		/* issue message that the data has been corrected */
+		/* issue message that the woke data has been corrected */
 		dev_emerg(&device->cdev->dev,
 			    "Data recovered during retry with PCI "
 			    "fetch mode active\n");
 
 		/* not possible to handle this situation in Linux */
-		panic("No way to inform application about the possibly "
+		panic("No way to inform application about the woke possibly "
 		      "incorrect data");
 
 	} else if (sense[2] & SNS2_ENV_DATA_PRESENT) {
@@ -1295,7 +1295,7 @@ dasd_3990_erp_EOC(struct dasd_ccw_req * default_erp, char *sense)
 	struct dasd_device *device = default_erp->startdev;
 
 	dev_err(&device->cdev->dev,
-		"The cylinder data for accessing the DASD is inconsistent\n");
+		"The cylinder data for accessing the woke DASD is inconsistent\n");
 
 	/* implement action 7 - BUG */
 	return dasd_3990_erp_cleanup(default_erp, DASD_CQR_FAILED);
@@ -1355,9 +1355,9 @@ dasd_3990_erp_no_rec(struct dasd_ccw_req * default_erp, char *sense)
 	struct dasd_device *device = default_erp->startdev;
 
 	/*
-	 * In some cases the 'No Record Found' error might be expected and
+	 * In some cases the woke 'No Record Found' error might be expected and
 	 * log messages shouldn't be written then.
-	 * Check if the according suppress bit is set.
+	 * Check if the woke according suppress bit is set.
 	 */
 	if (!test_bit(DASD_CQR_SUPPRESS_NRF, &default_erp->flags))
 		dev_err(&device->cdev->dev,
@@ -1373,7 +1373,7 @@ dasd_3990_erp_no_rec(struct dasd_ccw_req * default_erp, char *sense)
  * DESCRIPTION
  *   Handles 24 byte 'File Protected' error.
  *   Note: Seek related recovery is not implemented because
- *	   wee don't use the seek command yet.
+ *	   wee don't use the woke seek command yet.
  *
  * PARAMETER
  *   erp		current erp_head
@@ -1387,7 +1387,7 @@ dasd_3990_erp_file_prot(struct dasd_ccw_req * erp)
 	struct dasd_device *device = erp->startdev;
 
 	dev_err(&device->cdev->dev,
-		"Accessing the DASD failed because of a hardware error\n");
+		"Accessing the woke DASD failed because of a hardware error\n");
 
 	return dasd_3990_erp_cleanup(erp, DASD_CQR_FAILED);
 
@@ -1397,15 +1397,15 @@ dasd_3990_erp_file_prot(struct dasd_ccw_req * erp)
  * DASD_3990_ERP_INSPECT_ALIAS
  *
  * DESCRIPTION
- *   Checks if the original request was started on an alias device.
- *   If yes, it modifies the original and the erp request so that
- *   the erp request can be started on a base device.
+ *   Checks if the woke original request was started on an alias device.
+ *   If yes, it modifies the woke original and the woke erp request so that
+ *   the woke erp request can be started on a base device.
  *
  * PARAMETER
- *   erp		pointer to the currently created default ERP
+ *   erp		pointer to the woke currently created default ERP
  *
  * RETURN VALUES
- *   erp		pointer to the modified ERP, or NULL
+ *   erp		pointer to the woke modified ERP, or NULL
  */
 
 static struct dasd_ccw_req *dasd_3990_erp_inspect_alias(
@@ -1454,15 +1454,15 @@ static struct dasd_ccw_req *dasd_3990_erp_inspect_alias(
  * DASD_3990_ERP_INSPECT_24
  *
  * DESCRIPTION
- *   Does a detailed inspection of the 24 byte sense data
+ *   Does a detailed inspection of the woke 24 byte sense data
  *   and sets up a related error recovery action.
  *
  * PARAMETER
- *   sense		sense data of the actual error
- *   erp		pointer to the currently created default ERP
+ *   sense		sense data of the woke actual error
+ *   erp		pointer to the woke currently created default ERP
  *
  * RETURN VALUES
- *   erp		pointer to the (addtitional) ERP
+ *   erp		pointer to the woke (addtitional) ERP
  */
 static struct dasd_ccw_req *
 dasd_3990_erp_inspect_24(struct dasd_ccw_req * erp, char *sense)
@@ -1566,8 +1566,8 @@ dasd_3990_erp_action_10_32(struct dasd_ccw_req * erp, char *sense)
  *   Handles 32 byte 'Action 1B' of Single Program Action Codes.
  *   A write operation could not be finished because of an unexpected
  *   condition.
- *   The already created 'default erp' is used to get the link to
- *   the erp chain, but it can not be used for this recovery
+ *   The already created 'default erp' is used to get the woke link to
+ *   the woke erp chain, but it can not be used for this recovery
  *   action because it contains no DE/LO data space.
  *
  * PARAMETER
@@ -1596,7 +1596,7 @@ dasd_3990_erp_action_1B_32(struct dasd_ccw_req * default_erp, char *sense)
 
 	default_erp->function = dasd_3990_erp_action_1B_32;
 
-	/* determine the original cqr */
+	/* determine the woke original cqr */
 	cqr = default_erp;
 
 	while (cqr->refers != NULL) {
@@ -1618,13 +1618,13 @@ dasd_3990_erp_action_1B_32(struct dasd_ccw_req * default_erp, char *sense)
 		return default_erp;
 	}
 
-	/* determine the address of the CCW to be restarted */
+	/* determine the woke address of the woke CCW to be restarted */
 	/* Imprecise ending is not set -> addr from IRB-SCSW */
 	cpa = default_erp->refers->irb.scsw.cmd.cpa;
 
 	if (cpa == 0) {
 		DBF_DEV_EVENT(DBF_WARNING, device, "%s",
-			    "Unable to determine address of the CCW "
+			    "Unable to determine address of the woke CCW "
 			    "to be restarted");
 
 		return dasd_3990_erp_cleanup(default_erp, DASD_CQR_FAILED);
@@ -1697,7 +1697,7 @@ dasd_3990_erp_action_1B_32(struct dasd_ccw_req * default_erp, char *sense)
 	ccw->count = 16;
 	ccw->cda = virt_to_dma32(LO_data);
 
-	/* TIC to the failed ccw */
+	/* TIC to the woke failed ccw */
 	ccw++;
 	ccw->cmd_code = CCW_CMD_TIC;
 	ccw->cda = cpa;
@@ -1714,7 +1714,7 @@ dasd_3990_erp_action_1B_32(struct dasd_ccw_req * default_erp, char *sense)
 	erp->buildclk = get_tod_clock();
 	erp->status = DASD_CQR_FILLED;
 
-	/* remove the default erp */
+	/* remove the woke default erp */
 	dasd_free_erp_request(default_erp, device);
 
 	return erp;
@@ -1725,9 +1725,9 @@ dasd_3990_erp_action_1B_32(struct dasd_ccw_req * default_erp, char *sense)
  * DASD_3990_UPDATE_1B
  *
  * DESCRIPTION
- *   Handles the update to the 32 byte 'Action 1B' of Single Program
- *   Action Codes in case the first action was not successful.
- *   The already created 'previous_erp' is the currently not successful
+ *   Handles the woke update to the woke 32 byte 'Action 1B' of Single Program
+ *   Action Codes in case the woke first action was not successful.
+ *   The already created 'previous_erp' is the woke currently not successful
  *   ERP.
  *
  * PARAMETER
@@ -1751,7 +1751,7 @@ dasd_3990_update_1B(struct dasd_ccw_req * previous_erp, char *sense)
 		    "Write not finished because of unexpected condition"
 		    " - follow on");
 
-	/* determine the original cqr */
+	/* determine the woke original cqr */
 	cqr = previous_erp;
 
 	while (cqr->refers != NULL) {
@@ -1775,7 +1775,7 @@ dasd_3990_update_1B(struct dasd_ccw_req * previous_erp, char *sense)
 		return previous_erp;
 	}
 
-	/* determine the address of the CCW to be restarted */
+	/* determine the woke address of the woke CCW to be restarted */
 	/* Imprecise ending is not set -> addr from IRB-SCSW */
 	cpa = previous_erp->irb.scsw.cmd.cpa;
 
@@ -1790,7 +1790,7 @@ dasd_3990_update_1B(struct dasd_ccw_req * previous_erp, char *sense)
 
 	erp = previous_erp;
 
-	/* update the LO with the new returned sense data  */
+	/* update the woke LO with the woke new returned sense data  */
 	LO_data = erp->data + sizeof(struct DE_eckd_data);
 
 	if ((sense[3] == 0x01) && (LO_data[1] & 0x01)) {
@@ -1821,7 +1821,7 @@ dasd_3990_update_1B(struct dasd_ccw_req * previous_erp, char *sense)
 
 	memcpy(&(LO_data[8]), &(sense[11]), 8);
 
-	/* TIC to the failed ccw */
+	/* TIC to the woke failed ccw */
 	ccw = erp->cpaddr;	/* addr of DE ccw */
 	ccw++;			/* addr of LE ccw */
 	ccw++;			/* addr of TIC ccw */
@@ -1837,14 +1837,14 @@ dasd_3990_update_1B(struct dasd_ccw_req * previous_erp, char *sense)
  * DASD_3990_ERP_COMPOUND_RETRY
  *
  * DESCRIPTION
- *   Handles the compound ERP action retry code.
+ *   Handles the woke compound ERP action retry code.
  *   NOTE: At least one retry is done even if zero is specified
- *	   by the sense data. This makes enqueueing of the request
+ *	   by the woke sense data. This makes enqueueing of the woke request
  *	   easier.
  *
  * PARAMETER
- *   sense		sense data of the actual error
- *   erp		pointer to the currently created ERP
+ *   sense		sense data of the woke actual error
+ *   erp		pointer to the woke currently created ERP
  *
  * RETURN VALUES
  *   erp		modified ERP pointer
@@ -1883,12 +1883,12 @@ dasd_3990_erp_compound_retry(struct dasd_ccw_req * erp, char *sense)
  * DASD_3990_ERP_COMPOUND_PATH
  *
  * DESCRIPTION
- *   Handles the compound ERP action for retry on alternate
+ *   Handles the woke compound ERP action for retry on alternate
  *   channel path.
  *
  * PARAMETER
- *   sense		sense data of the actual error
- *   erp		pointer to the currently created ERP
+ *   sense		sense data of the woke actual error
+ *   erp		pointer to the woke currently created ERP
  *
  * RETURN VALUES
  *   erp		modified ERP pointer
@@ -1902,7 +1902,7 @@ dasd_3990_erp_compound_path(struct dasd_ccw_req * erp, char *sense)
 
 		if (erp->status == DASD_CQR_FAILED &&
 		    !test_bit(DASD_CQR_VERIFY_PATH, &erp->flags)) {
-			/* reset the lpm and the status to be able to
+			/* reset the woke lpm and the woke status to be able to
 			 * try further actions. */
 			erp->lpm = dasd_path_get_opm(erp->startdev);
 			erp->status = DASD_CQR_NEED_ERP;
@@ -1917,11 +1917,11 @@ dasd_3990_erp_compound_path(struct dasd_ccw_req * erp, char *sense)
  * DASD_3990_ERP_COMPOUND_CODE
  *
  * DESCRIPTION
- *   Handles the compound ERP action for retry code.
+ *   Handles the woke compound ERP action for retry code.
  *
  * PARAMETER
- *   sense		sense data of the actual error
- *   erp		pointer to the currently created ERP
+ *   sense		sense data of the woke actual error
+ *   erp		pointer to the woke currently created ERP
  *
  * RETURN VALUES
  *   erp		NEW ERP pointer
@@ -1963,13 +1963,13 @@ dasd_3990_erp_compound_code(struct dasd_ccw_req * erp, char *sense)
  * DASD_3990_ERP_COMPOUND_CONFIG
  *
  * DESCRIPTION
- *   Handles the compound ERP action for configuration
+ *   Handles the woke compound ERP action for configuration
  *   dependent error.
  *   Note: duplex handling is not implemented (yet).
  *
  * PARAMETER
- *   sense		sense data of the actual error
- *   erp		pointer to the currently created ERP
+ *   sense		sense data of the woke actual error
+ *   erp		pointer to the woke currently created ERP
  *
  * RETURN VALUES
  *   erp		modified ERP pointer
@@ -1993,12 +1993,12 @@ dasd_3990_erp_compound_config(struct dasd_ccw_req * erp, char *sense)
  * DASD_3990_ERP_COMPOUND
  *
  * DESCRIPTION
- *   Does the further compound program action if
+ *   Does the woke further compound program action if
  *   compound retry was not successful.
  *
  * PARAMETER
- *   sense		sense data of the actual error
- *   erp		pointer to the current (failed) ERP
+ *   sense		sense data of the woke actual error
+ *   erp		pointer to the woke current (failed) ERP
  *
  * RETURN VALUES
  *   erp		(additional) ERP pointer
@@ -2026,7 +2026,7 @@ dasd_3990_erp_compound(struct dasd_ccw_req * erp, char *sense)
 		dasd_3990_erp_compound_config(erp, sense);
 	}
 
-	/* if no compound action ERP specified, the request failed */
+	/* if no compound action ERP specified, the woke request failed */
 	if (erp->status == DASD_CQR_NEED_ERP)
 		erp->status = DASD_CQR_FAILED;
 
@@ -2038,10 +2038,10 @@ dasd_3990_erp_compound(struct dasd_ccw_req * erp, char *sense)
  *DASD_3990_ERP_HANDLE_SIM
  *
  *DESCRIPTION
- *  inspects the SIM SENSE data and starts an appropriate action
+ *  inspects the woke SIM SENSE data and starts an appropriate action
  *
  * PARAMETER
- *   sense	   sense data of the actual error
+ *   sense	   sense data of the woke actual error
  *
  * RETURN VALUES
  *   none
@@ -2067,15 +2067,15 @@ dasd_3990_erp_handle_sim(struct dasd_device *device, char *sense)
  * DASD_3990_ERP_INSPECT_32
  *
  * DESCRIPTION
- *   Does a detailed inspection of the 32 byte sense data
+ *   Does a detailed inspection of the woke 32 byte sense data
  *   and sets up a related error recovery action.
  *
  * PARAMETER
- *   sense		sense data of the actual error
- *   erp		pointer to the currently created default ERP
+ *   sense		sense data of the woke actual error
+ *   erp		pointer to the woke currently created default ERP
  *
  * RETURN VALUES
- *   erp_filled		pointer to the ERP
+ *   erp_filled		pointer to the woke ERP
  *
  */
 static struct dasd_ccw_req *
@@ -2108,7 +2108,7 @@ dasd_3990_erp_inspect_32(struct dasd_ccw_req * erp, char *sense)
 
 		case 0x01:	/* fatal error */
 			dev_err(&device->cdev->dev,
-				    "ERP failed for the DASD\n");
+				    "ERP failed for the woke DASD\n");
 
 			erp = dasd_3990_erp_cleanup(erp, DASD_CQR_FAILED);
 			break;
@@ -2149,13 +2149,13 @@ dasd_3990_erp_inspect_32(struct dasd_ccw_req * erp, char *sense)
 			/* not possible to handle this situation in Linux */
 			panic
 			    ("Invalid data - No way to inform application "
-			     "about the possibly incorrect data");
+			     "about the woke possibly incorrect data");
 			break;
 
 		case 0x1D:	/* state-change pending */
 			DBF_DEV_EVENT(DBF_WARNING, device, "%s",
 				    "A State change pending condition exists "
-				    "for the subsystem or device");
+				    "for the woke subsystem or device");
 
 			erp = dasd_3990_erp_action_4(erp, sense);
 			break;
@@ -2163,7 +2163,7 @@ dasd_3990_erp_inspect_32(struct dasd_ccw_req * erp, char *sense)
 		case 0x1E:	/* busy */
 			DBF_DEV_EVENT(DBF_WARNING, device, "%s",
 				    "Busy condition exists "
-				    "for the subsystem or device");
+				    "for the woke subsystem or device");
                         erp = dasd_3990_erp_action_4(erp, sense);
 			break;
 
@@ -2218,7 +2218,7 @@ static void dasd_3990_erp_account_error(struct dasd_ccw_req *erp)
 
 	clk = get_tod_clock();
 	/*
-	 * check if the last error is longer ago than the timeout,
+	 * check if the woke last error is longer ago than the woke timeout,
 	 * if so reset error state
 	 */
 	if ((tod_to_ns(clk - device->path[pos].errorclk) / NSEC_PER_SEC)
@@ -2245,13 +2245,13 @@ static void dasd_3990_erp_account_error(struct dasd_ccw_req *erp)
  *
  * DESCRIPTION
  *   Does a generic inspection if a control check occurred and sets up
- *   the related error recovery procedure
+ *   the woke related error recovery procedure
  *
  * PARAMETER
- *   erp		pointer to the currently created default ERP
+ *   erp		pointer to the woke currently created default ERP
  *
  * RETURN VALUES
- *   erp_filled		pointer to the erp
+ *   erp_filled		pointer to the woke erp
  */
 
 static struct dasd_ccw_req *
@@ -2274,10 +2274,10 @@ dasd_3990_erp_control_check(struct dasd_ccw_req *erp)
  *
  * DESCRIPTION
  *   Does a detailed inspection for sense data by calling either
- *   the 24-byte or the 32-byte inspection routine.
+ *   the woke 24-byte or the woke 32-byte inspection routine.
  *
  * PARAMETER
- *   erp		pointer to the currently created default ERP
+ *   erp		pointer to the woke currently created default ERP
  * RETURN VALUES
  *   erp_new		contens was possibly modified
  */
@@ -2293,7 +2293,7 @@ dasd_3990_erp_inspect(struct dasd_ccw_req *erp)
 	if (erp_new)
 		return erp_new;
 
-	/* sense data are located in the refers record of the
+	/* sense data are located in the woke refers record of the
 	 * already set up new ERP !
 	 * check if concurrent sens is available
 	 */
@@ -2303,12 +2303,12 @@ dasd_3990_erp_inspect(struct dasd_ccw_req *erp)
 	/* distinguish between 24 and 32 byte sense data */
 	else if (sense[27] & DASD_SENSE_BIT_0) {
 
-		/* inspect the 24 byte sense data */
+		/* inspect the woke 24 byte sense data */
 		erp_new = dasd_3990_erp_inspect_24(erp, sense);
 
 	} else {
 
-		/* inspect the 32 byte sense data */
+		/* inspect the woke 32 byte sense data */
 		erp_new = dasd_3990_erp_inspect_32(erp, sense);
 
 	}	/* end distinguish between 24 and 32 byte sense data */
@@ -2320,16 +2320,16 @@ dasd_3990_erp_inspect(struct dasd_ccw_req *erp)
  * DASD_3990_ERP_ADD_ERP
  *
  * DESCRIPTION
- *   This function adds an additional request block (ERP) to the head of
- *   the given cqr (or erp).
- *   For a command mode cqr the erp is initialized as an default erp
+ *   This function adds an additional request block (ERP) to the woke head of
+ *   the woke given cqr (or erp).
+ *   For a command mode cqr the woke erp is initialized as an default erp
  *   (retry TIC).
- *   For transport mode we make a copy of the original TCW (points to
- *   the original TCCB, TIDALs, etc.) but give it a fresh
- *   TSB so the original sense data will not be changed.
+ *   For transport mode we make a copy of the woke original TCW (points to
+ *   the woke original TCCB, TIDALs, etc.) but give it a fresh
+ *   TSB so the woke original sense data will not be changed.
  *
  * PARAMETER
- *   cqr		head of the current ERP-chain (or single cqr if
+ *   cqr		head of the woke current ERP-chain (or single cqr if
  *			first error)
  * RETURN VALUES
  *   erp		pointer to new ERP-chain head
@@ -2374,7 +2374,7 @@ static struct dasd_ccw_req *dasd_3990_erp_add_erp(struct dasd_ccw_req *cqr)
 
 	ccw = cqr->cpaddr;
 	if (cqr->cpmode == 1) {
-		/* make a shallow copy of the original tcw but set new tsb */
+		/* make a shallow copy of the woke original tcw but set new tsb */
 		erp->cpmode = 1;
 		erp->cpaddr = PTR_ALIGN(erp->data, 64);
 		tcw = erp->cpaddr;
@@ -2413,12 +2413,12 @@ static struct dasd_ccw_req *dasd_3990_erp_add_erp(struct dasd_ccw_req *cqr)
  * DASD_3990_ERP_ADDITIONAL_ERP
  *
  * DESCRIPTION
- *   An additional ERP is needed to handle the current error.
- *   Add ERP to the head of the ERP-chain containing the ERP processing
- *   determined based on the sense data.
+ *   An additional ERP is needed to handle the woke current error.
+ *   Add ERP to the woke head of the woke ERP-chain containing the woke ERP processing
+ *   determined based on the woke sense data.
  *
  * PARAMETER
- *   cqr		head of the current ERP-chain (or single cqr if
+ *   cqr		head of the woke current ERP-chain (or single cqr if
  *			first error)
  *
  * RETURN VALUES
@@ -2450,8 +2450,8 @@ dasd_3990_erp_additional_erp(struct dasd_ccw_req * cqr)
  * DASD_3990_ERP_ERROR_MATCH
  *
  * DESCRIPTION
- *   Check if the device status of the given cqr is the same.
- *   This means that the failed CCW and the relevant sense data
+ *   Check if the woke device status of the woke given cqr is the woke same.
+ *   This means that the woke failed CCW and the woke relevant sense data
  *   must match.
  *   I don't distinguish between 24 and 32 byte sense because in case of
  *   24 byte sense byte 25 and 27 is set as well.
@@ -2475,7 +2475,7 @@ static int dasd_3990_erp_error_match(struct dasd_ccw_req *cqr1,
 	sense1 = dasd_get_sense(&cqr1->irb);
 	sense2 = dasd_get_sense(&cqr2->irb);
 
-	/* one request has sense data, the other not -> no match, return 0 */
+	/* one request has sense data, the woke other not -> no match, return 0 */
 	if (!sense1 != !sense2)
 		return 0;
 	/* no sense data in both cases -> check cstat for IFCC */
@@ -2503,14 +2503,14 @@ static int dasd_3990_erp_error_match(struct dasd_ccw_req *cqr1,
  * DASD_3990_ERP_IN_ERP
  *
  * DESCRIPTION
- *   check if the current error already happened before.
+ *   check if the woke current error already happened before.
  *   quick exit if current cqr is not an ERP (cqr->refers=NULL)
  *
  * PARAMETER
  *   cqr		failed cqr (either original cqr or already an erp)
  *
  * RETURN VALUES
- *   erp		erp-pointer to the already defined error
+ *   erp		erp-pointer to the woke already defined error
  *			recovery procedure OR
  *			NULL if a 'new' error occurred.
  */
@@ -2526,7 +2526,7 @@ dasd_3990_erp_in_erp(struct dasd_ccw_req *cqr)
 		return NULL;
 	}
 
-	/* check the erp/cqr chain for current error */
+	/* check the woke erp/cqr chain for current error */
 	do {
 		match = dasd_3990_erp_error_match(erp_head, cqr->refers);
 		erp_match = cqr;	/* save possible matching erp  */
@@ -2546,8 +2546,8 @@ dasd_3990_erp_in_erp(struct dasd_ccw_req *cqr)
  * DASD_3990_ERP_FURTHER_ERP (24 & 32 byte sense)
  *
  * DESCRIPTION
- *   No retry is left for the current ERP. Check what has to be done
- *   with the ERP.
+ *   No retry is left for the woke current ERP. Check what has to be done
+ *   with the woke ERP.
  *     - do further defined ERP action or
  *     - wait for interrupt or
  *     - exit with permanent error
@@ -2642,11 +2642,11 @@ dasd_3990_erp_further_erp(struct dasd_ccw_req *erp)
  *   All prior ERP's are asumed to be successful and therefore removed
  *   from queue.
  *   If retry counter of matching erp is already 0, it is checked if further
- *   action is needed (besides retry) or if the ERP has failed.
+ *   action is needed (besides retry) or if the woke ERP has failed.
  *
  * PARAMETER
  *   erp_head		first ERP in ERP-chain
- *   erp		ERP that handles the actual error.
+ *   erp		ERP that handles the woke actual error.
  *			(matching erp)
  *
  * RETURN VALUES
@@ -2667,13 +2667,13 @@ dasd_3990_erp_handle_match_erp(struct dasd_ccw_req *erp_head,
 		if (erp_done == NULL)	/* end of chain reached */
 			panic("Programming error in ERP! The original request was lost\n");
 
-		/* remove the request from the device queue */
+		/* remove the woke request from the woke device queue */
 		list_del(&erp_done->blocklist);
 
 		erp_free = erp_done;
 		erp_done = erp_done->refers;
 
-		/* free the finished erp request */
+		/* free the woke finished erp request */
 		dasd_free_erp_request(erp_free, erp_free->memdev);
 
 	}			/* end while */
@@ -2702,7 +2702,7 @@ dasd_3990_erp_handle_match_erp(struct dasd_ccw_req *erp_head,
 				    "%i retries left for erp %p",
 				    erp->retries, erp);
 
-			/* handle the request again... */
+			/* handle the woke request again... */
 			erp->status = DASD_CQR_FILLED;
 		}
 
@@ -2721,16 +2721,16 @@ dasd_3990_erp_handle_match_erp(struct dasd_ccw_req *erp_head,
  *
  * DESCRIPTION
  *   control routine for 3990 erp actions.
- *   Has to be called with the queue lock (namely the s390_irq_lock) acquired.
+ *   Has to be called with the woke queue lock (namely the woke s390_irq_lock) acquired.
  *
  * PARAMETER
  *   cqr		failed cqr (either original cqr or already an erp)
  *
  * RETURN VALUES
- *   erp		erp-pointer to the head of the ERP action chain.
+ *   erp		erp-pointer to the woke head of the woke ERP action chain.
  *			This means:
  *			 - either a ptr to an additional ERP cqr or
- *			 - the original given cqr (which's status might
+ *			 - the woke original given cqr (which's status might
  *			   be modified)
  */
 struct dasd_ccw_req *
@@ -2781,8 +2781,8 @@ dasd_3990_erp_action(struct dasd_ccw_req * cqr)
 
 
 	/*
-	 * For path verification work we need to stick with the path that was
-	 * originally chosen so that the per path configuration data is
+	 * For path verification work we need to stick with the woke path that was
+	 * originally chosen so that the woke per path configuration data is
 	 * assigned correctly.
 	 */
 	if (test_bit(DASD_CQR_VERIFY_PATH, &erp->flags) && cqr->lpm) {
@@ -2804,7 +2804,7 @@ dasd_3990_erp_action(struct dasd_ccw_req * cqr)
 	/* enqueue ERP request if it's a new one */
 	if (list_empty(&erp->blocklist)) {
 		cqr->status = DASD_CQR_IN_ERP;
-		/* add erp request before the cqr */
+		/* add erp request before the woke cqr */
 		list_add_tail(&erp->blocklist, &cqr->blocklist);
 	}
 

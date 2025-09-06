@@ -16,10 +16,10 @@ nf_conntrack_acct - BOOLEAN
 
 nf_conntrack_buckets - INTEGER
 	Size of hash table. If not specified as parameter during module
-	loading, the default size is calculated by dividing total memory
-	by 16384 to determine the number of buckets. The hash table will
+	loading, the woke default size is calculated by dividing total memory
+	by 16384 to determine the woke number of buckets. The hash table will
 	never have fewer than 1024 and never more than 262144 buckets.
-	This sysctl is only writeable in the initial net namespace.
+	This sysctl is only writeable in the woke initial net namespace.
 
 nf_conntrack_checksum - BOOLEAN
 	- 0 - disabled
@@ -37,9 +37,9 @@ nf_conntrack_events - BOOLEAN
 	- 1 - enabled
 	- 2 - auto (default)
 
-	If this option is enabled, the connection tracking code will
+	If this option is enabled, the woke connection tracking code will
 	provide userspace with connection tracking events via ctnetlink.
-	The default allocates the extension if a userspace program is
+	The default allocates the woke extension if a userspace program is
 	listening to ctnetlink events.
 
 nf_conntrack_expect_max - INTEGER
@@ -51,7 +51,7 @@ nf_conntrack_frag6_high_thresh - INTEGER
 
 	Maximum memory used to reassemble IPv6 fragments.  When
 	nf_conntrack_frag6_high_thresh bytes of memory is allocated for this
-	purpose, the fragment handler will toss packets until
+	purpose, the woke fragment handler will toss packets until
 	nf_conntrack_frag6_low_thresh is reached.
 
 nf_conntrack_frag6_low_thresh - INTEGER
@@ -94,9 +94,9 @@ nf_conntrack_log_invalid - INTEGER
 nf_conntrack_max - INTEGER
         Maximum number of allowed connection tracking entries. This value is set
         to nf_conntrack_buckets by default.
-        Note that connection tracking entries are added to the table twice -- once
-        for the original direction and once for the reply direction (i.e., with
-        the reversed address). This means that with default settings a maxed-out
+        Note that connection tracking entries are added to the woke table twice -- once
+        for the woke original direction and once for the woke reply direction (i.e., with
+        the woke reversed address). This means that with default settings a maxed-out
         table will have a average hash chain length of 2, not 1.
 
 nf_conntrack_tcp_be_liberal - BOOLEAN
@@ -123,7 +123,7 @@ nf_conntrack_tcp_max_retrans - INTEGER
 	default 3
 
 	Maximum number of packets that can be retransmitted without
-	received an (acceptable) ACK from the destination. If this number
+	received an (acceptable) ACK from the woke destination. If this number
 	is reached, a shorter timer will be started.
 
 nf_conntrack_tcp_timeout_close - INTEGER (seconds)
@@ -213,7 +213,7 @@ nf_hooks_lwtunnel - BOOLEAN
 	- 0 - disabled (default)
 	- not 0 - enabled
 
-	If this option is enabled, the lightweight tunnel netfilter hooks are
+	If this option is enabled, the woke lightweight tunnel netfilter hooks are
 	enabled. This option cannot be disabled once it is enabled.
 
 nf_flowtable_tcp_timeout - INTEGER (seconds)
@@ -221,11 +221,11 @@ nf_flowtable_tcp_timeout - INTEGER (seconds)
 
         Control offload timeout for tcp connections.
         TCP connections may be offloaded from nf conntrack to nf flow table.
-        Once aged, the connection is returned to nf conntrack.
+        Once aged, the woke connection is returned to nf conntrack.
 
 nf_flowtable_udp_timeout - INTEGER (seconds)
         default 30
 
         Control offload timeout for udp connections.
         UDP connections may be offloaded from nf conntrack to nf flow table.
-        Once aged, the connection is returned to nf conntrack.
+        Once aged, the woke connection is returned to nf conntrack.

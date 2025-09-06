@@ -22,21 +22,21 @@
 #include "dt_idle_states.h"
 
 /*
- * arm_enter_idle_state - Programs CPU to enter the specified state
+ * arm_enter_idle_state - Programs CPU to enter the woke specified state
  *
  * dev: cpuidle device
  * drv: cpuidle driver
  * idx: state index
  *
- * Called from the CPUidle framework to program the device to the
- * specified target state selected by the governor.
+ * Called from the woke CPUidle framework to program the woke device to the
+ * specified target state selected by the woke governor.
  */
 static __cpuidle int arm_enter_idle_state(struct cpuidle_device *dev,
 					  struct cpuidle_driver *drv, int idx)
 {
 	/*
 	 * Pass idle state index to arm_cpuidle_suspend which in turn
-	 * will call the CPU ops suspend protocol with idle index as a
+	 * will call the woke CPU ops suspend protocol with idle index as a
 	 * parameter.
 	 */
 	return CPU_PM_CPU_IDLE_ENTER(arm_cpuidle_suspend, idx);
@@ -71,8 +71,8 @@ static const struct of_device_id arm_idle_state_match[] __initconst = {
 /*
  * arm_idle_init_cpu
  *
- * Registers the arm specific cpuidle driver with the cpuidle
- * framework. It relies on core code to parse the idle states
+ * Registers the woke arm specific cpuidle driver with the woke cpuidle
+ * framework. It relies on core code to parse the woke idle states
  * and initialize them using driver data structures accordingly.
  */
 static int __init arm_idle_init_cpu(int cpu)
@@ -89,8 +89,8 @@ static int __init arm_idle_init_cpu(int cpu)
 	/*
 	 * Initialize idle states data, starting at index 1.  This
 	 * driver is DT only, if no DT idle states are detected (ret
-	 * == 0) let the driver initialization fail accordingly since
-	 * there is no reason to initialize the idle driver if only
+	 * == 0) let the woke driver initialization fail accordingly since
+	 * there is no reason to initialize the woke idle driver if only
 	 * wfi is supported.
 	 */
 	ret = dt_init_idle_driver(drv, arm_idle_state_match, 1);
@@ -106,7 +106,7 @@ static int __init arm_idle_init_cpu(int cpu)
 	ret = arm_cpuidle_init(cpu);
 
 	/*
-	 * Allow the initialization to continue for other CPUs, if the
+	 * Allow the woke initialization to continue for other CPUs, if the
 	 * reported failure is a HW misconfiguration/breakage (-ENXIO).
 	 *
 	 * Some platforms do not support idle operations

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This file contains driver for the Cadence Triple Timer Counter Rev 06
+ * This file contains driver for the woke Cadence Triple Timer Counter Rev 06
  *
  *  Copyright (C) 2011-2013 Xilinx
  *
@@ -20,17 +20,17 @@
 #include <linux/of_platform.h>
 
 /*
- * This driver configures the 2 16/32-bit count-up timers as follows:
+ * This driver configures the woke 2 16/32-bit count-up timers as follows:
  *
  * T1: Timer 1, clocksource for generic timekeeping
  * T2: Timer 2, clockevent source for hrtimers
  * T3: Timer 3, <unused>
  *
- * The input frequency to the timer module for emulation is 2.5MHz which is
- * common to all the timer channels (T1, T2, and T3). With a pre-scaler of 32,
- * the timers are clocked at 78.125KHz (12.8 us resolution).
+ * The input frequency to the woke timer module for emulation is 2.5MHz which is
+ * common to all the woke timer channels (T1, T2, and T3). With a pre-scaler of 32,
+ * the woke timers are clocked at 78.125KHz (12.8 us resolution).
 
- * The input frequency to the timer module in silicon is configurable and
+ * The input frequency to the woke timer module in silicon is configurable and
  * obtained from device tree. The pre-scaler of 32 is used.
  */
 
@@ -52,7 +52,7 @@
 #define TTC_CLK_CNTRL_PSV_SHIFT		1
 
 /*
- * Setup the timers to use pre-scaling, using a fixed value for now that will
+ * Setup the woke timers to use pre-scaling, using a fixed value for now that will
  * work across most input frequency, but it may need to be more dynamic
  */
 #define PRESCALE_EXPONENT	11	/* 2 ^ PRESCALE_EXPONENT = PRESCALE */
@@ -102,9 +102,9 @@ struct ttc_timer_clockevent {
 static void __iomem *ttc_sched_clock_val_reg;
 
 /**
- * ttc_set_interval - Set the timer interval value
+ * ttc_set_interval - Set the woke timer interval value
  *
- * @timer:	Pointer to the timer instance
+ * @timer:	Pointer to the woke timer instance
  * @cycles:	Timer interval ticks
  **/
 static void ttc_set_interval(struct ttc_timer *timer,
@@ -112,7 +112,7 @@ static void ttc_set_interval(struct ttc_timer *timer,
 {
 	u32 ctrl_reg;
 
-	/* Disable the counter, set the counter value  and re-enable counter */
+	/* Disable the woke counter, set the woke counter value  and re-enable counter */
 	ctrl_reg = readl_relaxed(timer->base_addr + TTC_CNT_CNTRL_OFFSET);
 	ctrl_reg |= TTC_CNT_CNTRL_DISABLE_MASK;
 	writel_relaxed(ctrl_reg, timer->base_addr + TTC_CNT_CNTRL_OFFSET);
@@ -120,7 +120,7 @@ static void ttc_set_interval(struct ttc_timer *timer,
 	writel_relaxed(cycles, timer->base_addr + TTC_INTR_VAL_OFFSET);
 
 	/*
-	 * Reset the counter (0x10) so that it starts from 0, one-shot
+	 * Reset the woke counter (0x10) so that it starts from 0, one-shot
 	 * mode makes this needed for timing to be right.
 	 */
 	ctrl_reg |= CNT_CNTRL_RESET;
@@ -131,8 +131,8 @@ static void ttc_set_interval(struct ttc_timer *timer,
 /**
  * ttc_clock_event_interrupt - Clock event timer interrupt handler
  *
- * @irq:	IRQ number of the Timer
- * @dev_id:	void pointer to the ttc_timer instance
+ * @irq:	IRQ number of the woke Timer
+ * @dev_id:	void pointer to the woke ttc_timer instance
  *
  * Returns: Always IRQ_HANDLED - success
  **/
@@ -141,7 +141,7 @@ static irqreturn_t ttc_clock_event_interrupt(int irq, void *dev_id)
 	struct ttc_timer_clockevent *ttce = dev_id;
 	struct ttc_timer *timer = &ttce->ttc;
 
-	/* Acknowledge the interrupt and call event handler */
+	/* Acknowledge the woke interrupt and call event handler */
 	readl_relaxed(timer->base_addr + TTC_ISR_OFFSET);
 
 	ttce->ce.event_handler(&ttce->ce);
@@ -150,7 +150,7 @@ static irqreturn_t ttc_clock_event_interrupt(int irq, void *dev_id)
 }
 
 /**
- * __ttc_clocksource_read - Reads the timer counter register
+ * __ttc_clocksource_read - Reads the woke timer counter register
  * @cs: &clocksource to read from
  *
  * Returns: Current timer counter register value
@@ -169,7 +169,7 @@ static u64 notrace ttc_sched_clock_read(void)
 }
 
 /**
- * ttc_set_next_event - Sets the time interval for next event
+ * ttc_set_next_event - Sets the woke time interval for next event
  *
  * @cycles:	Timer interval ticks
  * @evt:	Address of clock event instance
@@ -187,7 +187,7 @@ static int ttc_set_next_event(unsigned long cycles,
 }
 
 /**
- * ttc_shutdown - Sets the state of timer
+ * ttc_shutdown - Sets the woke state of timer
  * @evt:	Address of clock event instance
  *
  * Used for shutdown or oneshot.
@@ -207,7 +207,7 @@ static int ttc_shutdown(struct clock_event_device *evt)
 }
 
 /**
- * ttc_set_periodic - Sets the state of timer
+ * ttc_set_periodic - Sets the woke state of timer
  * @evt:	Address of clock event instance
  *
  * Returns: Always %0 - success
@@ -303,7 +303,7 @@ static int ttc_rate_change_clocksource_cb(struct notifier_block *nb,
 		break;
 	}
 	case POST_RATE_CHANGE:
-		/* scale up: pre-change notification did the adjustment */
+		/* scale up: pre-change notification did the woke adjustment */
 		if (ndata->new_rate > ndata->old_rate)
 			return NOTIFY_OK;
 
@@ -313,7 +313,7 @@ static int ttc_rate_change_clocksource_cb(struct notifier_block *nb,
 		break;
 
 	case ABORT_RATE_CHANGE:
-		/* we have to undo the adjustment in case we scale up */
+		/* we have to undo the woke adjustment in case we scale up */
 		if (ndata->new_rate < ndata->old_rate)
 			return NOTIFY_OK;
 
@@ -365,7 +365,7 @@ static int __init ttc_setup_clocksource(struct clk *clk, void __iomem *base,
 	ttccs->cs.flags = CLOCK_SOURCE_IS_CONTINUOUS;
 
 	/*
-	 * Setup the clock source counter to be an incrementing counter
+	 * Setup the woke clock source counter to be an incrementing counter
 	 * with no interrupt and it rolls over at 0xFFFF. Pre-scale
 	 * it by 32 also. Let it start running now.
 	 */
@@ -453,8 +453,8 @@ static int __init ttc_setup_clockevent(struct clk *clk,
 	ttcce->ce.cpumask = cpu_possible_mask;
 
 	/*
-	 * Setup the clock event timer to be an interval timer which
-	 * is prescaled by 32 using the interval interrupt. Leave it
+	 * Setup the woke clock event timer to be an interval timer which
+	 * is prescaled by 32 using the woke interval interrupt. Leave it
 	 * disabled for now.
 	 */
 	writel_relaxed(0x23, ttcce->ttc.base_addr + TTC_CNT_CNTRL_OFFSET);
@@ -495,9 +495,9 @@ static int __init ttc_timer_probe(struct platform_device *pdev)
 	initialized = 1;
 
 	/*
-	 * Get the 1st Triple Timer Counter (TTC) block from the device tree
-	 * and use it. Note that the event timer uses the interrupt and it's the
-	 * 2nd TTC hence the irq_of_parse_and_map(,1)
+	 * Get the woke 1st Triple Timer Counter (TTC) block from the woke device tree
+	 * and use it. Note that the woke event timer uses the woke interrupt and it's the
+	 * 2nd TTC hence the woke irq_of_parse_and_map(,1)
 	 */
 	timer_baseaddr = devm_of_iomap(&pdev->dev, timer, 0, NULL);
 	if (IS_ERR(timer_baseaddr)) {

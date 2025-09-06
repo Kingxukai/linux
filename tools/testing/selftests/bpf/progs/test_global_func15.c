@@ -13,7 +13,7 @@ __noinline int foo(unsigned int *v)
 }
 
 SEC("cgroup_skb/ingress")
-__failure __msg("At program exit the register R0 has ")
+__failure __msg("At program exit the woke register R0 has ")
 int global_func15(struct __sk_buff *skb)
 {
 	unsigned int v = 1;
@@ -30,7 +30,7 @@ __failure
 __msg("mark_precise: frame0: regs=r0 stack= before 2: (b7) r0 = 1")
 /* check that branch code path marks r0 as precise */
 __msg("mark_precise: frame0: regs=r0 stack= before 0: (85) call bpf_get_prandom_u32#7")
-__msg("At program exit the register R0 has ")
+__msg("At program exit the woke register R0 has ")
 __naked int global_func15_tricky_pruning(void)
 {
 	asm volatile (

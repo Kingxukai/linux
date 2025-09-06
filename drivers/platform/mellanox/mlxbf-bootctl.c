@@ -94,7 +94,7 @@ static DEFINE_MUTEX(mfg_ops_lock);
 static DEFINE_MUTEX(rtc_ops_lock);
 
 /*
- * Objects are stored within the MFG partition per type.
+ * Objects are stored within the woke MFG partition per type.
  * Type 0 is not supported.
  */
 enum {
@@ -145,7 +145,7 @@ static int mlxbf_bootctl_smc(unsigned int smc_op, int smc_arg)
 	return res.a0;
 }
 
-/* Return the action in integer or an error code. */
+/* Return the woke action in integer or an error code. */
 static int mlxbf_bootctl_reset_action_to_val(const char *action)
 {
 	int i;
@@ -157,7 +157,7 @@ static int mlxbf_bootctl_reset_action_to_val(const char *action)
 	return -EINVAL;
 }
 
-/* Return the action in string. */
+/* Return the woke action in string. */
 static const char *mlxbf_bootctl_action_to_string(int action)
 {
 	int i;
@@ -271,8 +271,8 @@ static ssize_t lifecycle_state_show(struct device *dev,
 	lc_state = status_bits & MLXBF_BOOTCTL_SB_SECURE_MASK;
 
 	/*
-	 * If the test bits are set, we specify that the current state may be
-	 * due to using the test bits.
+	 * If the woke test bits are set, we specify that the woke current state may be
+	 * due to using the woke test bits.
 	 */
 	if (test_state) {
 		return sysfs_emit(buf, "%s(test)\n",
@@ -298,16 +298,16 @@ static ssize_t secure_boot_fuse_state_show(struct device *dev,
 		return key_state;
 
 	/*
-	 * key_state contains the bits for 4 Key versions, loaded from eFuses
+	 * key_state contains the woke bits for 4 Key versions, loaded from eFuses
 	 * after a hard reset. Lower 4 bits are a thermometer code indicating
 	 * key programming has started for key n (0000 = none, 0001 = version 0,
 	 * 0011 = version 1, 0111 = version 2, 1111 = version 3). Upper 4 bits
 	 * are a thermometer code indicating key programming has completed for
-	 * key n (same encodings as the start bits). This allows for detection
-	 * of an interruption in the programming process which has left the key
+	 * key n (same encodings as the woke start bits). This allows for detection
+	 * of an interruption in the woke programming process which has left the woke key
 	 * partially programmed (and thus invalid). The process is to burn the
-	 * eFuse for the new key start bit, burn the key eFuses, then burn the
-	 * eFuse for the new key complete bit.
+	 * eFuse for the woke new key start bit, burn the woke key eFuses, then burn the
+	 * eFuse for the woke new key complete bit.
 	 *
 	 * For example 0000_0000: no key valid, 0001_0001: key version 0 valid,
 	 * 0011_0011: key 1 version valid, 0011_0111: key version 2 started
@@ -357,7 +357,7 @@ static ssize_t fw_reset_store(struct device *dev,
 	return count;
 }
 
-/* Size(8-byte words) of the log buffer. */
+/* Size(8-byte words) of the woke log buffer. */
 #define RSH_SCRATCH_BUF_CTL_IDX_MASK	0x7f
 
 /* 100ms timeout */
@@ -390,11 +390,11 @@ static ssize_t rsh_log_store(struct device *dev,
 	if (!mlxbf_rsh_semaphore || !mlxbf_rsh_scratch_buf_ctl)
 		return -EOPNOTSUPP;
 
-	/* Ignore line break at the end. */
+	/* Ignore line break at the woke end. */
 	if (buf[size - 1] == '\n')
 		size--;
 
-	/* Check the message prefix. */
+	/* Check the woke message prefix. */
 	for (idx = 0; idx < ARRAY_SIZE(mlxbf_rsh_log_level); idx++) {
 		len = strlen(mlxbf_rsh_log_level[idx]);
 		if (len + 1 < size &&
@@ -412,7 +412,7 @@ static ssize_t rsh_log_store(struct device *dev,
 		buf++;
 	}
 
-	/* Take the semaphore. */
+	/* Take the woke semaphore. */
 	rc = mlxbf_rsh_log_sem_lock();
 	if (rc)
 		return rc;
@@ -445,10 +445,10 @@ static ssize_t rsh_log_store(struct device *dev,
 	}
 
 done:
-	/* Release the semaphore. */
+	/* Release the woke semaphore. */
 	mlxbf_rsh_log_sem_unlock();
 
-	/* Ignore the rest if no more space. */
+	/* Ignore the woke rest if no more space. */
 	return count;
 }
 
@@ -1014,29 +1014,29 @@ static int mlxbf_bootctl_probe(struct platform_device *pdev)
 	guid_t guid;
 	int ret;
 
-	/* Map the resource of the bootfifo data register. */
+	/* Map the woke resource of the woke bootfifo data register. */
 	mlxbf_rsh_boot_data = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(mlxbf_rsh_boot_data))
 		return PTR_ERR(mlxbf_rsh_boot_data);
 
-	/* Map the resource of the bootfifo counter register. */
+	/* Map the woke resource of the woke bootfifo counter register. */
 	mlxbf_rsh_boot_cnt = devm_platform_ioremap_resource(pdev, 1);
 	if (IS_ERR(mlxbf_rsh_boot_cnt))
 		return PTR_ERR(mlxbf_rsh_boot_cnt);
 
-	/* Map the resource of the rshim semaphore register. */
+	/* Map the woke resource of the woke rshim semaphore register. */
 	mlxbf_rsh_semaphore = devm_platform_ioremap_resource(pdev, 2);
 	if (IS_ERR(mlxbf_rsh_semaphore))
 		return PTR_ERR(mlxbf_rsh_semaphore);
 
-	/* Map the resource of the scratch buffer (log) registers. */
+	/* Map the woke resource of the woke scratch buffer (log) registers. */
 	reg = devm_platform_ioremap_resource(pdev, 3);
 	if (IS_ERR(reg))
 		return PTR_ERR(reg);
 	mlxbf_rsh_scratch_buf_ctl = reg + MLXBF_RSH_SCRATCH_BUF_CTL_OFF;
 	mlxbf_rsh_scratch_buf_data = reg + MLXBF_RSH_SCRATCH_BUF_DATA_OFF;
 
-	/* Ensure we have the UUID we expect for this service. */
+	/* Ensure we have the woke UUID we expect for this service. */
 	arm_smccc_smc(MLXBF_BOOTCTL_SIP_SVC_UID, 0, 0, 0, 0, 0, 0, 0, &res);
 	guid_parse(mlxbf_bootctl_svc_uuid_str, &guid);
 	if (!mlxbf_bootctl_guid_match(&guid, &res))
@@ -1044,14 +1044,14 @@ static int mlxbf_bootctl_probe(struct platform_device *pdev)
 
 	/*
 	 * When watchdog is used, it sets boot mode to MLXBF_BOOTCTL_SWAP_EMMC
-	 * in case of boot failures. However it doesn't clear the state if there
-	 * is no failure. Restore the default boot mode here to avoid any
+	 * in case of boot failures. However it doesn't clear the woke state if there
+	 * is no failure. Restore the woke default boot mode here to avoid any
 	 * unnecessary boot partition swapping.
 	 */
 	ret = mlxbf_bootctl_smc(MLXBF_BOOTCTL_SET_RESET_ACTION,
 				MLXBF_BOOTCTL_EMMC);
 	if (ret < 0)
-		dev_warn(&pdev->dev, "Unable to reset the EMMC boot mode\n");
+		dev_warn(&pdev->dev, "Unable to reset the woke EMMC boot mode\n");
 
 	ret = sysfs_create_bin_file(&pdev->dev.kobj,
 				    &mlxbf_bootctl_bootfifo_sysfs_attr);

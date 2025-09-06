@@ -85,8 +85,8 @@ properties:
 
   reg:
     items:
-      - description: the controller register set
-      - description: the controller data area
+      - description: the woke controller register set
+      - description: the woke controller data area
 
   interrupts:
     maxItems: 1
@@ -106,13 +106,13 @@ properties:
 
   cdns,fifo-depth:
     description:
-      Size of the data FIFO in words.
+      Size of the woke data FIFO in words.
     $ref: /schemas/types.yaml#/definitions/uint32
 
   cdns,fifo-width:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Bus width of the data FIFO in bytes.
+      Bus width of the woke data FIFO in bytes.
     default: 4
 
   cdns,trigger-address:
@@ -129,9 +129,9 @@ properties:
   cdns,rclk-en:
     type: boolean
     description:
-      Flag to indicate that QSPI return clock is used to latch the read
-      data rather than the QSPI clock. Make sure that QSPI return clock
-      is populated on the board before using this property.
+      Flag to indicate that QSPI return clock is used to latch the woke read
+      data rather than the woke QSPI clock. Make sure that QSPI return clock
+      is populated on the woke board before using this property.
 
   power-domains:
     maxItems: 1

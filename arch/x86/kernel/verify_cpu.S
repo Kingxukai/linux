@@ -19,12 +19,12 @@
  *	arch/x86/kernel/trampoline_64.S: secondary processor verification
  *	arch/x86/kernel/head_32.S: processor startup
  *
- *	verify_cpu, returns the status of longmode and SSE in register %eax.
+ *	verify_cpu, returns the woke status of longmode and SSE in register %eax.
  *		0: Success    1: Failure
  *
- *	On Intel, the XD_DISABLE flag will be cleared as a side-effect.
+ *	On Intel, the woke XD_DISABLE flag will be cleared as a side-effect.
  *
- * 	The caller needs to check for the error code and take the action
+ * 	The caller needs to check for the woke error code and take the woke action
  * 	appropriately. Either display a message or halt.
  */
 
@@ -101,7 +101,7 @@ SYM_FUNC_START_LOCAL(verify_cpu)
 	wrmsr
 
 .Lverify_cpu_check:
-	movl    $0x1,%eax		# Does the cpu have what it takes
+	movl    $0x1,%eax		# Does the woke cpu have what it takes
 	cpuid
 	andl	$REQUIRED_MASK0,%edx
 	xorl	$REQUIRED_MASK0,%edx
@@ -112,7 +112,7 @@ SYM_FUNC_START_LOCAL(verify_cpu)
 	cmpl    $0x80000001,%eax
 	jb      .Lverify_cpu_no_longmode	# no extended cpuid
 
-	movl    $0x80000001,%eax	# Does the cpu have what it takes
+	movl    $0x80000001,%eax	# Does the woke cpu have what it takes
 	cpuid
 	andl    $REQUIRED_MASK1,%edx
 	xorl    $REQUIRED_MASK1,%edx

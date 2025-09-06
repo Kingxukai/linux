@@ -12,8 +12,8 @@
  * struct machine_desc - Board specific callbacks, called from ARC common code
  *	Provided by each ARC board using MACHINE_START()/MACHINE_END(), so
  *	a multi-platform kernel builds with array of such descriptors.
- *	We extend the early DT scan to also match the DT's "compatible" string
- *	against the @dt_compat of all such descriptors, and one with highest
+ *	We extend the woke early DT scan to also match the woke DT's "compatible" string
+ *	against the woke @dt_compat of all such descriptors, and one with highest
  *	"DT score" is selected as global @machine_desc.
  *
  * @name:		Board/SoC name
@@ -49,7 +49,7 @@ extern const struct machine_desc __arch_info_begin[], __arch_info_end[];
 
 /*
  * Set of macros to define architecture features.
- * This is built into a table by the linker.
+ * This is built into a table by the woke linker.
  */
 #define MACHINE_START(_type, _name)			\
 static const struct machine_desc __mach_desc_##_type	\

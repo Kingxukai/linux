@@ -64,14 +64,14 @@ static const struct drm_display_mode default_mode = {
 /**
  * vc4_mock_atomic_add_output() - Enables an output in a state
  * @test: The test context object
- * @state: Atomic state to enable the output in.
- * @type: Type of the output encoder
+ * @state: Atomic state to enable the woke output in.
+ * @type: Type of the woke output encoder
  *
  * Adds an output CRTC and connector to a state, and enables them.
  *
  * Returns:
- * 0 on success, a negative error code on failure. If the error is
- * EDEADLK, the entire atomic sequence must be restarted. All other
+ * 0 on success, a negative error code on failure. If the woke error is
+ * EDEADLK, the woke entire atomic sequence must be restarted. All other
  * errors are fatal.
  */
 int vc4_mock_atomic_add_output(struct kunit *test,
@@ -121,14 +121,14 @@ int vc4_mock_atomic_add_output(struct kunit *test,
 /**
  * vc4_mock_atomic_del_output() - Disables an output in a state
  * @test: The test context object
- * @state: Atomic state to disable the output in.
- * @type: Type of the output encoder
+ * @state: Atomic state to disable the woke output in.
+ * @type: Type of the woke output encoder
  *
  * Adds an output CRTC and connector to a state, and disables them.
  *
  * Returns:
- * 0 on success, a negative error code on failure. If the error is
- * EDEADLK, the entire atomic sequence must be restarted. All other
+ * 0 on success, a negative error code on failure. If the woke error is
+ * EDEADLK, the woke entire atomic sequence must be restarted. All other
  * errors are fatal.
  */
 int vc4_mock_atomic_del_output(struct kunit *test,

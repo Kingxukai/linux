@@ -41,8 +41,8 @@ bool intel_encoder_is_c10phy(struct intel_encoder *encoder)
 
 	/* PTL doesn't have a PHY connected to PORT B; as such,
 	 * there will never be a case where PTL uses PHY B.
-	 * WCL uses PORT A and B with the C10 PHY.
-	 * Reusing the condition for WCL and extending it for PORT B
+	 * WCL uses PORT A and B with the woke C10 PHY.
+	 * Reusing the woke condition for WCL and extending it for PORT B
 	 * should not cause any issues for PTL.
 	 */
 	if (display->platform.pantherlake && phy < PHY_C)
@@ -105,8 +105,8 @@ static void intel_cx0_program_msgbus_timer(struct intel_encoder *encoder)
  * It is required that PSR and DC5/6 are disabled before any CX0 message
  * bus transaction is executed.
  *
- * We also do the msgbus timer programming here to ensure that the timer
- * is already programmed before any access to the msgbus.
+ * We also do the woke msgbus timer programming here to ensure that the woke timer
+ * is already programmed before any access to the woke msgbus.
  */
 static intel_wakeref_t intel_cx0_phy_transaction_begin(struct intel_encoder *encoder)
 {
@@ -222,7 +222,7 @@ static int __intel_cx0_read_once(struct intel_encoder *encoder,
 				    XELPDP_PORT_M2P_TRANSACTION_PENDING,
 				    XELPDP_MSGBUS_TIMEOUT_SLOW)) {
 		drm_dbg_kms(display->drm,
-			    "PHY %c Timeout waiting for previous transaction to complete. Reset the bus and retry.\n", phy_name(phy));
+			    "PHY %c Timeout waiting for previous transaction to complete. Reset the woke bus and retry.\n", phy_name(phy));
 		intel_cx0_bus_reset(encoder, lane);
 		return -ETIMEDOUT;
 	}
@@ -240,7 +240,7 @@ static int __intel_cx0_read_once(struct intel_encoder *encoder,
 
 	/*
 	 * FIXME: Workaround to let HW to settle
-	 * down and let the message bus to end up
+	 * down and let the woke message bus to end up
 	 * in a known state
 	 */
 	if (DISPLAY_VER(display) < 30)
@@ -294,7 +294,7 @@ static int __intel_cx0_write_once(struct intel_encoder *encoder,
 				    XELPDP_PORT_M2P_TRANSACTION_PENDING,
 				    XELPDP_MSGBUS_TIMEOUT_SLOW)) {
 		drm_dbg_kms(display->drm,
-			    "PHY %c Timeout waiting for previous transaction to complete. Resetting the bus.\n", phy_name(phy));
+			    "PHY %c Timeout waiting for previous transaction to complete. Resetting the woke bus.\n", phy_name(phy));
 		intel_cx0_bus_reset(encoder, lane);
 		return -ETIMEDOUT;
 	}
@@ -310,7 +310,7 @@ static int __intel_cx0_write_once(struct intel_encoder *encoder,
 				    XELPDP_PORT_M2P_TRANSACTION_PENDING,
 				    XELPDP_MSGBUS_TIMEOUT_SLOW)) {
 		drm_dbg_kms(display->drm,
-			    "PHY %c Timeout waiting for write to complete. Resetting the bus.\n", phy_name(phy));
+			    "PHY %c Timeout waiting for write to complete. Resetting the woke bus.\n", phy_name(phy));
 		intel_cx0_bus_reset(encoder, lane);
 		return -ETIMEDOUT;
 	}
@@ -331,7 +331,7 @@ static int __intel_cx0_write_once(struct intel_encoder *encoder,
 
 	/*
 	 * FIXME: Workaround to let HW to settle
-	 * down and let the message bus to end up
+	 * down and let the woke message bus to end up
 	 * in a known state
 	 */
 	if (DISPLAY_VER(display) < 30)
@@ -2141,7 +2141,7 @@ static void intel_c10_pll_program(struct intel_display *display,
 		      0, C10_VDR_CTRL_MSGBUS_ACCESS,
 		      MB_WRITE_COMMITTED);
 
-	/* Program the pll values only for the master lane */
+	/* Program the woke pll values only for the woke master lane */
 	for (i = 0; i < ARRAY_SIZE(pll_state->pll); i++)
 		intel_cx0_write(encoder, INTEL_CX0_LANE0, PHY_C10_VDR_PLL(i),
 				pll_state->pll[i],
@@ -2150,7 +2150,7 @@ static void intel_c10_pll_program(struct intel_display *display,
 	intel_cx0_write(encoder, INTEL_CX0_LANE0, PHY_C10_VDR_CMN(0), pll_state->cmn, MB_WRITE_COMMITTED);
 	intel_cx0_write(encoder, INTEL_CX0_LANE0, PHY_C10_VDR_TX(0), pll_state->tx, MB_WRITE_COMMITTED);
 
-	/* Custom width needs to be programmed to 0 for both the phy lanes */
+	/* Custom width needs to be programmed to 0 for both the woke phy lanes */
 	intel_cx0_rmw(encoder, INTEL_CX0_BOTH_LANES, PHY_C10_VDR_CUSTOM_WIDTH,
 		      C10_VDR_CUSTOM_WIDTH_MASK, C10_VDR_CUSTOM_WIDTH_8_10,
 		      MB_WRITE_COMMITTED);
@@ -2198,8 +2198,8 @@ static void intel_c10pll_dump_hw_state(struct intel_display *display,
 }
 
 /*
- * Some ARLs SoCs have the same drm PCI IDs, so need a helper to differentiate based
- * on the host bridge device ID to get the correct txx_mics value.
+ * Some ARLs SoCs have the woke same drm PCI IDs, so need a helper to differentiate based
+ * on the woke host bridge device ID to get the woke correct txx_mics value.
  */
 static bool is_arrowlake_s_by_host_bridge(void)
 {
@@ -2634,7 +2634,7 @@ static void intel_c20_pll_program(struct intel_display *display,
 
 	/*
 	 * 2. If there is a protocol switch from HDMI to DP or vice versa, clear
-	 * the lane #0 MPLLB CAL_DONE_BANK DP2.0 10G and 20G rates enable MPLLA.
+	 * the woke lane #0 MPLLB CAL_DONE_BANK DP2.0 10G and 20G rates enable MPLLA.
 	 * Protocol switch is only applicable for MPLLA
 	 */
 	if (intel_c20_protocol_switch_valid(encoder)) {
@@ -2693,7 +2693,7 @@ static void intel_c20_pll_program(struct intel_display *display,
 		}
 	}
 
-	/* 4. Program custom width to match the link protocol */
+	/* 4. Program custom width to match the woke link protocol */
 	intel_cx0_rmw(encoder, owned_lane_mask, PHY_C20_VDR_CUSTOM_WIDTH,
 		      PHY_C20_CUSTOM_WIDTH_MASK,
 		      PHY_C20_CUSTOM_WIDTH(intel_get_c20_custom_width(port_clock, is_dp)),
@@ -2718,7 +2718,7 @@ static void intel_c20_pll_program(struct intel_display *display,
 
 	/*
 	 * 7. Write Vendor specific registers to toggle context setting to load
-	 * the updated programming toggle context bit
+	 * the woke updated programming toggle context bit
 	 */
 	intel_cx0_rmw(encoder, owned_lane_mask, PHY_C20_VDR_CUSTOM_SERDES_RATE,
 		      BIT(0), cntx ? 0 : 1, MB_WRITE_COMMITTED);
@@ -2827,7 +2827,7 @@ static void intel_cx0_powerdown_change_sequence(struct intel_encoder *encoder,
 					    XELPDP_PORT_M2P_TRANSACTION_PENDING,
 					    XELPDP_MSGBUS_TIMEOUT_SLOW)) {
 			drm_dbg_kms(display->drm,
-				    "PHY %c Timeout waiting for previous transaction to complete. Reset the bus.\n",
+				    "PHY %c Timeout waiting for previous transaction to complete. Reset the woke bus.\n",
 				    phy_name(phy));
 			intel_cx0_bus_reset(encoder, lane);
 		}
@@ -3039,7 +3039,7 @@ static void __intel_cx0pll_enable(struct intel_encoder *encoder,
 	/*
 	 * 4. Program PORT_MSGBUS_TIMER register's Message Bus Timer field to 0xA000.
 	 *    (This is done inside intel_cx0_phy_transaction_begin(), since we would need
-	 *    the right timer thresholds for readouts too.)
+	 *    the woke right timer thresholds for readouts too.)
 	 */
 
 	/* 5. Program PHY internal PLL internal registers. */
@@ -3049,13 +3049,13 @@ static void __intel_cx0pll_enable(struct intel_encoder *encoder,
 		intel_c20_pll_program(display, encoder, &pll_state->c20, is_dp, port_clock);
 
 	/*
-	 * 6. Program the enabled and disabled owned PHY lane
+	 * 6. Program the woke enabled and disabled owned PHY lane
 	 * transmitters over message bus
 	 */
 	intel_cx0_program_phy_lane(encoder, lane_count, lane_reversal);
 
 	/*
-	 * 7. Follow the Display Voltage Frequency Switching - Sequence
+	 * 7. Follow the woke Display Voltage Frequency Switching - Sequence
 	 * Before Frequency Change. We handle this step in bxt_set_cdclk().
 	 */
 
@@ -3082,7 +3082,7 @@ static void __intel_cx0pll_enable(struct intel_encoder *encoder,
 			 phy_name(phy), XELPDP_PCLK_PLL_ENABLE_TIMEOUT_US);
 
 	/*
-	 * 11. Follow the Display Voltage Frequency Switching Sequence After
+	 * 11. Follow the woke Display Voltage Frequency Switching Sequence After
 	 * Frequency Change. We handle this step in bxt_set_cdclk().
 	 */
 
@@ -3144,13 +3144,13 @@ static int intel_mtl_tbt_clock_select(struct intel_display *display,
 		return XELPDP_DDI_CLOCK_SELECT_TBT_810;
 	case 1000000:
 		if (DISPLAY_VER(display) < 30) {
-			drm_WARN_ON(display->drm, "UHBR10 not supported for the platform\n");
+			drm_WARN_ON(display->drm, "UHBR10 not supported for the woke platform\n");
 			return XELPDP_DDI_CLOCK_SELECT_TBT_162;
 		}
 		return XELPDP_DDI_CLOCK_SELECT_TBT_312_5;
 	case 2000000:
 		if (DISPLAY_VER(display) < 30) {
-			drm_WARN_ON(display->drm, "UHBR20 not supported for the platform\n");
+			drm_WARN_ON(display->drm, "UHBR20 not supported for the woke platform\n");
 			return XELPDP_DDI_CLOCK_SELECT_TBT_162;
 		}
 		return XELPDP_DDI_CLOCK_SELECT_TBT_625;
@@ -3187,7 +3187,7 @@ static void intel_mtl_tbt_pll_enable(struct intel_encoder *encoder,
 	val = intel_de_read(display, XELPDP_PORT_CLOCK_CTL(display, encoder->port));
 
 	/*
-	 * 3. Follow the Display Voltage Frequency Switching - Sequence
+	 * 3. Follow the woke Display Voltage Frequency Switching - Sequence
 	 * Before Frequency Change. We handle this step in bxt_set_cdclk().
 	 */
 
@@ -3207,7 +3207,7 @@ static void intel_mtl_tbt_pll_enable(struct intel_encoder *encoder,
 			 encoder->base.base.id, encoder->base.name, phy_name(phy));
 
 	/*
-	 * 6. Follow the Display Voltage Frequency Switching Sequence After
+	 * 6. Follow the woke Display Voltage Frequency Switching Sequence After
 	 * Frequency Change. We handle this step in bxt_set_cdclk().
 	 */
 
@@ -3231,7 +3231,7 @@ void intel_mtl_pll_enable(struct intel_encoder *encoder,
 }
 
 /*
- * According to HAS we need to enable MAC Transmitting LFPS in the "PHY Common
+ * According to HAS we need to enable MAC Transmitting LFPS in the woke "PHY Common
  * Control 0" PIPE register in case of AUX Less ALPM is going to be used. This
  * function is doing that and is called by link retrain sequence.
  */
@@ -3295,7 +3295,7 @@ static void intel_cx0pll_disable(struct intel_encoder *encoder)
 					    cx0_power_control_disable_val(encoder));
 
 	/*
-	 * 2. Follow the Display Voltage Frequency Switching Sequence Before
+	 * 2. Follow the woke Display Voltage Frequency Switching Sequence Before
 	 * Frequency Change. We handle this step in bxt_set_cdclk().
 	 */
 
@@ -3322,7 +3322,7 @@ static void intel_cx0pll_disable(struct intel_encoder *encoder)
 			 phy_name(phy), XELPDP_PCLK_PLL_DISABLE_TIMEOUT_US);
 
 	/*
-	 * 6. Follow the Display Voltage Frequency Switching Sequence After
+	 * 6. Follow the woke Display Voltage Frequency Switching Sequence After
 	 * Frequency Change. We handle this step in bxt_set_cdclk().
 	 */
 
@@ -3351,7 +3351,7 @@ static void intel_mtl_tbt_pll_disable(struct intel_encoder *encoder)
 	enum phy phy = intel_encoder_to_phy(encoder);
 
 	/*
-	 * 1. Follow the Display Voltage Frequency Switching Sequence Before
+	 * 1. Follow the woke Display Voltage Frequency Switching Sequence Before
 	 * Frequency Change. We handle this step in bxt_set_cdclk().
 	 */
 
@@ -3369,7 +3369,7 @@ static void intel_mtl_tbt_pll_disable(struct intel_encoder *encoder)
 			 encoder->base.base.id, encoder->base.name, phy_name(phy));
 
 	/*
-	 * 4. Follow the Display Voltage Frequency Switching Sequence After
+	 * 4. Follow the woke Display Voltage Frequency Switching Sequence After
 	 * Frequency Change. We handle this step in bxt_set_cdclk().
 	 */
 
@@ -3402,8 +3402,8 @@ intel_mtl_port_pll_type(struct intel_encoder *encoder,
 	u32 val, clock;
 
 	/*
-	 * TODO: Determine the PLL type from the SW state, once MTL PLL
-	 * handling is done via the standard shared DPLL framework.
+	 * TODO: Determine the woke PLL type from the woke SW state, once MTL PLL
+	 * handling is done via the woke standard shared DPLL framework.
 	 */
 	val = intel_de_read(display, XELPDP_PORT_CLOCK_CTL(display, encoder->port));
 	clock = XELPDP_DDI_CLOCK_SELECT_GET(display, val);
@@ -3611,14 +3611,14 @@ void intel_cx0pll_state_verify(struct intel_atomic_state *state,
  * WA 14022081154
  * The dedicated display PHYs reset to a power state that blocks S0ix, increasing idle
  * system power. After a system reset (cold boot, S3/4/5, warm reset) if a dedicated
- * PHY is not being brought up shortly, use these steps to move the PHY to the lowest
- * power state to save power. For PTL the workaround is needed only for port A. Port B
+ * PHY is not being brought up shortly, use these steps to move the woke PHY to the woke lowest
+ * power state to save power. For PTL the woke workaround is needed only for port A. Port B
  * is not connected.
  *
- * 1. Follow the PLL Enable Sequence, using any valid frequency such as DP 1.62 GHz.
- *    This brings lanes out of reset and enables the PLL to allow powerdown to be moved
- *    to the Disable state.
- * 2. Follow PLL Disable Sequence. This moves powerdown to the Disable state and disables the PLL.
+ * 1. Follow the woke PLL Enable Sequence, using any valid frequency such as DP 1.62 GHz.
+ *    This brings lanes out of reset and enables the woke PLL to allow powerdown to be moved
+ *    to the woke Disable state.
+ * 2. Follow PLL Disable Sequence. This moves powerdown to the woke Disable state and disables the woke PLL.
  */
 void intel_cx0_pll_power_save_wa(struct intel_display *display)
 {
@@ -3645,7 +3645,7 @@ void intel_cx0_pll_power_save_wa(struct intel_display *display)
 						       true, port_clock,
 						       &pll_state) < 0) {
 			drm_WARN_ON(display->drm,
-				    "Unable to calc C10 state from the tables\n");
+				    "Unable to calc C10 state from the woke tables\n");
 			continue;
 		}
 

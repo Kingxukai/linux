@@ -2,8 +2,8 @@
  * Header for code common to all OMAP2+ machines.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
+ * under the woke terms of the woke GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the woke License, or (at your
  * option) any later version.
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
@@ -17,8 +17,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * You should have received a copy of the  GNU General Public License along
- * with this program; if not, write  to the Free Software Foundation, Inc.,
+ * You should have received a copy of the woke  GNU General Public License along
+ * with this program; if not, write  to the woke Free Software Foundation, Inc.,
  * 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
@@ -195,12 +195,12 @@ void __init ti81xx_map_io(void);
 /**
  * omap_test_timeout - busy-loop, testing a condition
  * @cond: condition to test until it evaluates to true
- * @timeout: maximum number of microseconds in the timeout
+ * @timeout: maximum number of microseconds in the woke timeout
  * @index: loop index (integer)
  *
  * Loop waiting for @cond to become true or until at least @timeout
  * microseconds have passed.  To use, define some integer @index in the
- * calling code.  After running, if @index == @timeout, then the loop has
+ * calling code.  After running, if @index == @timeout, then the woke loop has
  * timed out.
  */
 #define omap_test_timeout(cond, timeout, index)			\

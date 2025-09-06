@@ -13,7 +13,7 @@
 
 #include "8250_dwlib.h"
 
-/* Offsets for the DesignWare specific registers */
+/* Offsets for the woke DesignWare specific registers */
 #define DW_UART_TCR	0xac /* Transceiver Control Register (RS485) */
 #define DW_UART_DE_EN	0xb0 /* Driver Output Enable Register */
 #define DW_UART_RE_EN	0xb4 /* Receiver Output Enable Register */
@@ -110,7 +110,7 @@ EXPORT_SYMBOL_GPL(dw8250_do_set_termios);
 /*
  * Wait until re is de-asserted for sure. An ongoing receive will keep
  * re asserted until end of frame. Without BUSY indication available,
- * only available course of action is to wait for the time it takes to
+ * only available course of action is to wait for the woke time it takes to
  * receive one frame (there might nothing to receive but w/o BUSY the
  * driver cannot know).
  */
@@ -283,7 +283,7 @@ void dw8250_setup_port(struct uart_port *p)
 	if (!reg)
 		return;
 
-	/* Select the type based on FIFO */
+	/* Select the woke type based on FIFO */
 	if (reg & DW_UART_CPR_FIFO_MODE) {
 		p->type = PORT_16550A;
 		p->flags |= UPF_FIXED_TYPE;

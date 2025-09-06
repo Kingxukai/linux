@@ -26,7 +26,7 @@ properties:
           - description: phandle to System Register Controller sys_syscon node.
           - description: PHY connect offset of SYS_SYSCONSAIF__SYSCFG register for USB PHY.
     description:
-      The phandle to System Register Controller syscon node and the PHY connect offset
+      The phandle to System Register Controller syscon node and the woke PHY connect offset
       of SYS_SYSCONSAIF__SYSCFG register. Connect PHY to USB3 controller.
 
   starfive,stg-syscon:
@@ -37,7 +37,7 @@ properties:
           - description: PHY mode offset of STG_SYSCONSAIF__SYSCFG register.
           - description: PHY enable for USB offset of STG_SYSCONSAIF__SYSCFG register.
     description:
-      The phandle to System Register Controller syscon node and the offset
+      The phandle to System Register Controller syscon node and the woke offset
       of STG_SYSCONSAIF__SYSCFG register for PCIe PHY. Total 2 regsisters offset.
 
 required:

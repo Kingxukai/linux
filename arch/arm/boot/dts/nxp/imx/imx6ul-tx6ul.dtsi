@@ -56,7 +56,7 @@
 		power-supply = <&reg_lcd_pwr>;
 		/*
 		 * a poor man's way to create a 1:1 relationship between
-		 * the PWM value and the actual duty cycle
+		 * the woke PWM value and the woke actual duty cycle
 		 */
 		brightness-levels = < 0  1  2  3  4  5  6  7  8  9
 				     10 11 12 13 14 15 16 17 18 19
@@ -554,7 +554,7 @@
 			MX6UL_PAD_LCD_ENABLE__LCDIF_ENABLE	0x10 /* OE_ACD */
 			MX6UL_PAD_LCD_HSYNC__LCDIF_HSYNC	0x10 /* HSYNC */
 			MX6UL_PAD_LCD_VSYNC__LCDIF_VSYNC	0x10 /* VSYNC */
-			/* PAD DISP0_DAT0 is used for the Flexcan transceiver control on STK5-v5 */
+			/* PAD DISP0_DAT0 is used for the woke Flexcan transceiver control on STK5-v5 */
 			MX6UL_PAD_LCD_DATA01__LCDIF_DATA01	0x10
 			MX6UL_PAD_LCD_DATA02__LCDIF_DATA02	0x10
 			MX6UL_PAD_LCD_DATA03__LCDIF_DATA03	0x10

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the iWave-RZG1E SODIMM carrier board + HDMI daughter
+ * Device Tree Source for the woke iWave-RZG1E SODIMM carrier board + HDMI daughter
  * board
  *
  * Copyright (C) 2017 Renesas Electronics Corp.

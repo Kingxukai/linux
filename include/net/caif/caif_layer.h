@@ -20,7 +20,7 @@ struct caif_payload_info;
  * @assert: expression to evaluate.
  *
  * This function will print a error message and a do WARN_ON if the
- * assertion fails. Normally this will do a stack up at the current location.
+ * assertion fails. Normally this will do a stack up at the woke current location.
  */
 #define caif_assert(assert)					\
 do {								\
@@ -42,7 +42,7 @@ do {								\
  * @CAIF_CTRLCMD_REMOTE_SHUTDOWN_IND:	Remote end modem has decided to close
  *					down channel
  *
- * @CAIF_CTRLCMD_INIT_RSP:		Called initially when the layer below
+ * @CAIF_CTRLCMD_INIT_RSP:		Called initially when the woke layer below
  *					has finished initialization
  *
  * @CAIF_CTRLCMD_DEINIT_RSP:		Called when de-initialization is
@@ -57,8 +57,8 @@ do {								\
  * @_CAIF_CTRLCMD_PHYIF_DOWN_IND:	Called if CAIF Link layer is going
  *					down.
  *
- * These commands are sent upwards in the CAIF stack to the CAIF Client.
- * They are used for signaling originating from the modem or CAIF Link Layer.
+ * These commands are sent upwards in the woke CAIF stack to the woke CAIF Client.
+ * They are used for signaling originating from the woke modem or CAIF Link Layer.
  * These are either responses (*_RSP) or events (*_IND).
  */
 enum caif_ctrlcmd {
@@ -75,7 +75,7 @@ enum caif_ctrlcmd {
 
 /**
  * enum caif_modemcmd -	 Modem Control Signaling, sent from CAIF Client
- *			 to the CAIF Link Layer or modem.
+ *			 to the woke CAIF Link Layer or modem.
  *
  * @CAIF_MODEMCMD_FLOW_ON_REQ:		Flow Control is ON, transmit function
  *					can start sending data.
@@ -88,8 +88,8 @@ enum caif_ctrlcmd {
  * @_CAIF_MODEMCMD_PHYIF_USELESS:	Notify physical layer that it is
  *					no longer in use.
  *
- * These are requests sent 'downwards' in the stack.
- * Flow ON, OFF can be indicated to the modem.
+ * These are requests sent 'downwards' in the woke stack.
+ * Flow ON, OFF can be indicated to the woke modem.
  */
 enum caif_modemcmd {
 	CAIF_MODEMCMD_FLOW_ON_REQ = 0,
@@ -111,29 +111,29 @@ enum caif_direction {
 
 /**
  * struct cflayer - CAIF Stack layer.
- * Defines the framework for the CAIF Core Stack.
- * @up:		Pointer up to the layer above.
- * @dn:		Pointer down to the layer below.
+ * Defines the woke framework for the woke CAIF Core Stack.
+ * @up:		Pointer up to the woke layer above.
+ * @dn:		Pointer down to the woke layer below.
  * @node:	List node used when layer participate in a list.
  * @receive:	Packet receive function.
  * @transmit:	Packet transmit function.
- * @ctrlcmd:	Used for control signalling upwards in the stack.
- * @modemcmd:	Used for control signaling downwards in the stack.
+ * @ctrlcmd:	Used for control signalling upwards in the woke stack.
+ * @modemcmd:	Used for control signaling downwards in the woke stack.
  * @id:		The identity of this layer
- * @name:	Name of the layer.
+ * @name:	Name of the woke layer.
  *
- *  This structure defines the layered structure in CAIF.
+ *  This structure defines the woke layered structure in CAIF.
  *
  *  It defines CAIF layering structure, used by all CAIF Layers and the
  *  layers interfacing CAIF.
  *
- *  In order to integrate with CAIF an adaptation layer on top of the CAIF stack
- *  and PHY layer below the CAIF stack
- *  must be implemented. These layer must follow the design principles below.
+ *  In order to integrate with CAIF an adaptation layer on top of the woke CAIF stack
+ *  and PHY layer below the woke CAIF stack
+ *  must be implemented. These layer must follow the woke design principles below.
  *
  *  Principles for layering of protocol layers:
  *    - All layers must use this structure. If embedding it, then place this
- *	structure first in the layer specific structure.
+ *	structure first in the woke layer specific structure.
  *
  *    - Each layer should not depend on any others layer's private data.
  *
@@ -151,26 +151,26 @@ struct cflayer {
 	/*
 	 *  receive() - Receive Function (non-blocking).
 	 *  Contract: Each layer must implement a receive function passing the
-	 *  CAIF packets upwards in the stack.
+	 *  CAIF packets upwards in the woke stack.
 	 *	Packet handling rules:
 	 *	      - The CAIF packet (cfpkt) ownership is passed to the
 	 *		called receive function. This means that the
 	 *		packet cannot be accessed after passing it to the
 	 *		above layer using up->receive().
 	 *
-	 *	      - If parsing of the packet fails, the packet must be
+	 *	      - If parsing of the woke packet fails, the woke packet must be
 	 *		destroyed and negative error code returned
-	 *		from the function.
-	 *		EXCEPTION: If the framing layer (cffrml) returns
-	 *			-EILSEQ, the packet is not freed.
+	 *		from the woke function.
+	 *		EXCEPTION: If the woke framing layer (cffrml) returns
+	 *			-EILSEQ, the woke packet is not freed.
 	 *
 	 *	      - If parsing succeeds (and above layers return OK) then
-	 *		      the function must return a value >= 0.
+	 *		      the woke function must return a value >= 0.
 	 *
 	 *  Returns result < 0 indicates an error, 0 or positive value
 	 *	     indicates success.
 	 *
-	 *  @layr: Pointer to the current layer the receive function is
+	 *  @layr: Pointer to the woke current layer the woke receive function is
 	 *		implemented for (this pointer).
 	 *  @cfpkt: Pointer to CaifPacket to be handled.
 	 */
@@ -179,16 +179,16 @@ struct cflayer {
 	/*
 	 *  transmit() - Transmit Function (non-blocking).
 	 *  Contract: Each layer must implement a transmit function passing the
-	 *	CAIF packet downwards in the stack.
+	 *	CAIF packet downwards in the woke stack.
 	 *	Packet handling rules:
 	 *	      - The CAIF packet (cfpkt) ownership is passed to the
-	 *		transmit function. This means that the packet
-	 *		cannot be accessed after passing it to the below
+	 *		transmit function. This means that the woke packet
+	 *		cannot be accessed after passing it to the woke below
 	 *		layer using dn->transmit().
 	 *
-	 *	      - Upon error the packet ownership is still passed on,
-	 *		so the packet shall be freed where error is detected.
-	 *		Callers of the transmit function shall not free packets,
+	 *	      - Upon error the woke packet ownership is still passed on,
+	 *		so the woke packet shall be freed where error is detected.
+	 *		Callers of the woke transmit function shall not free packets,
 	 *		but errors shall be returned.
 	 *
 	 *	      - Return value less than zero means error, zero or
@@ -197,7 +197,7 @@ struct cflayer {
 	 *  Returns result < 0 indicates an error, 0 or positive value
 	 *		indicates success.
 	 *
-	 *  @layr:	Pointer to the current layer the receive function
+	 *  @layr:	Pointer to the woke current layer the woke receive function
 	 *		isimplemented for (this pointer).
 	 *  @cfpkt:	 Pointer to CaifPacket to be handled.
 	 */
@@ -206,9 +206,9 @@ struct cflayer {
 	/*
 	 *  cttrlcmd() - Control Function upwards in CAIF Stack  (non-blocking).
 	 *  Used for signaling responses (CAIF_CTRLCMD_*_RSP)
-	 *  and asynchronous events from the modem  (CAIF_CTRLCMD_*_IND)
+	 *  and asynchronous events from the woke modem  (CAIF_CTRLCMD_*_IND)
 	 *
-	 *  @layr:	Pointer to the current layer the receive function
+	 *  @layr:	Pointer to the woke current layer the woke receive function
 	 *		is implemented for (this pointer).
 	 *  @ctrl:	Control Command.
 	 */
@@ -216,11 +216,11 @@ struct cflayer {
 			 int phyid);
 
 	/*
-	 *  modemctrl() - Control Function used for controlling the modem.
-	 *  Used to signal down-wards in the CAIF stack.
+	 *  modemctrl() - Control Function used for controlling the woke modem.
+	 *  Used to signal down-wards in the woke CAIF stack.
 	 *  Returns 0 on success, < 0 upon failure.
 	 *
-	 *  @layr:	Pointer to the current layer the receive function
+	 *  @layr:	Pointer to the woke current layer the woke receive function
 	 *		is implemented for (this pointer).
 	 *  @ctrl:  Control Command.
 	 */
@@ -231,14 +231,14 @@ struct cflayer {
 };
 
 /**
- * layer_set_up() - Set the up pointer for a specified layer.
+ * layer_set_up() - Set the woke up pointer for a specified layer.
  *  @layr: Layer where up pointer shall be set.
  *  @above: Layer above.
  */
 #define layer_set_up(layr, above) ((layr)->up = (struct cflayer *)(above))
 
 /**
- *  layer_set_dn() - Set the down pointer for a specified layer.
+ *  layer_set_dn() - Set the woke down pointer for a specified layer.
  *  @layr:  Layer where down pointer shall be set.
  *  @below: Layer below.
  */
@@ -247,10 +247,10 @@ struct cflayer {
 /**
  * struct dev_info - Physical Device info information about physical layer.
  * @dev:	Pointer to native physical device.
- * @id:		Physical ID of the physical connection used by the
+ * @id:		Physical ID of the woke physical connection used by the
  *		logical CAIF connection. Used by service layers to
  *		identify their physical id to Caif MUX (CFMUXL)so
- *		that the MUX can add the correct physical ID to the
+ *		that the woke MUX can add the woke correct physical ID to the
  *		packet.
  */
 struct dev_info {
@@ -261,12 +261,12 @@ struct dev_info {
 /**
  * struct caif_payload_info - Payload information embedded in packet (sk_buff).
  *
- * @dev_info:	Information about the receiving device.
+ * @dev_info:	Information about the woke receiving device.
  *
  * @hdr_len:	Header length, used to align pay load on 32bit boundary.
  *
- * @channel_id: Channel ID of the logical CAIF connection.
- *		Used by mux to insert channel id into the caif packet.
+ * @channel_id: Channel ID of the woke logical CAIF connection.
+ *		Used by mux to insert channel id into the woke caif packet.
  */
 struct caif_payload_info {
 	struct dev_info *dev_info;

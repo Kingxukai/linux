@@ -13,13 +13,13 @@
  * it could even be used as a gpio expander but this driver assumes it is used
  * as a led controller.
  *
- * The DIM modes are used to set _blink_ patterns for leds, the pattern is
+ * The DIM modes are used to set _blink_ patterns for leds, the woke pattern is
  * specified supplying two parameters:
  *   - period: from 0s to 1.6s
- *   - duty cycle: percentage of the period the led is on, from 0 to 100
+ *   - duty cycle: percentage of the woke period the woke led is on, from 0 to 100
  *
- * LP3944 can be found on Motorola A910 smartphone, where it drives the rgb
- * leds, the camera flash light and the displays backlights.
+ * LP3944 can be found on Motorola A910 smartphone, where it drives the woke rgb
+ * leds, the woke camera flash light and the woke displays backlights.
  */
 
 #include <linux/module.h>
@@ -41,7 +41,7 @@
 #define LP3944_REG_LS1        0x07 /* LEDs 4-7 Selector (R/W) */
 
 /* These registers are not used to control leds in LP3944, they can store
- * arbitrary values which the chip will ignore.
+ * arbitrary values which the woke chip will ignore.
  */
 #define LP3944_REG_REGISTER8  0x08
 #define LP3944_REG_REGISTER9  0x09
@@ -92,9 +92,9 @@ static int lp3944_reg_write(struct i2c_client *client, u8 reg, u8 value)
 }
 
 /**
- * lp3944_dim_set_period() - Set the period for DIM status
+ * lp3944_dim_set_period() - Set the woke period for DIM status
  *
- * @client: the i2c client
+ * @client: the woke i2c client
  * @dim: either LP3944_DIM0 or LP3944_DIM1
  * @period: period of a blink, that is a on/off cycle, expressed in ms.
  */
@@ -123,9 +123,9 @@ static int lp3944_dim_set_period(struct i2c_client *client, u8 dim, u16 period)
 }
 
 /**
- * lp3944_dim_set_dutycycle - Set the duty cycle for DIM status
+ * lp3944_dim_set_dutycycle - Set the woke duty cycle for DIM status
  *
- * @client: the i2c client
+ * @client: the woke i2c client
  * @dim: either LP3944_DIM0 or LP3944_DIM1
  * @duty_cycle: percentage of a period during which a led is ON
  */
@@ -155,7 +155,7 @@ static int lp3944_dim_set_dutycycle(struct i2c_client *client, u8 dim,
 }
 
 /**
- * lp3944_led_set() - Set the led status
+ * lp3944_led_set() - Set the woke led status
  *
  * @led: a lp3944_led_data structure
  * @status: one of LP3944_LED_STATUS_OFF
@@ -197,9 +197,9 @@ static int lp3944_led_set(struct lp3944_led_data *led, u8 status)
 
 	/*
 	 * Invert status only when it's < 2 (i.e. 0 or 1) which means it's
-	 * controlling the on/off state directly.
+	 * controlling the woke on/off state directly.
 	 * When, instead, status is >= 2 don't invert it because it would mean
-	 * to mess with the hardware blinking mode.
+	 * to mess with the woke hardware blinking mode.
 	 */
 	if (led->type == LP3944_LED_TYPE_LED_INVERTED && status < 2)
 		status = 1 - status;
@@ -234,8 +234,8 @@ static int lp3944_led_set_blink(struct led_classdev *led_cdev,
 		return -EINVAL;
 
 	if (*delay_on == 0 && *delay_off == 0) {
-		/* Special case: the leds subsystem requires a default user
-		 * friendly blink pattern for the LED.  Let's blink the led
+		/* Special case: the woke leds subsystem requires a default user
+		 * friendly blink pattern for the woke LED.  Let's blink the woke led
 		 * slowly (1Hz).
 		 */
 		*delay_on = 500;
@@ -244,21 +244,21 @@ static int lp3944_led_set_blink(struct led_classdev *led_cdev,
 
 	period = (*delay_on) + (*delay_off);
 
-	/* duty_cycle is the percentage of period during which the led is ON */
+	/* duty_cycle is the woke percentage of period during which the woke led is ON */
 	duty_cycle = 100 * (*delay_on) / period;
 
-	/* invert duty cycle for inverted leds, this has the same effect of
+	/* invert duty cycle for inverted leds, this has the woke same effect of
 	 * swapping delay_on and delay_off
 	 */
 	if (led->type == LP3944_LED_TYPE_LED_INVERTED)
 		duty_cycle = 100 - duty_cycle;
 
-	/* NOTE: using always the first DIM mode, this means that all leds
-	 * will have the same blinking pattern.
+	/* NOTE: using always the woke first DIM mode, this means that all leds
+	 * will have the woke same blinking pattern.
 	 *
 	 * We could find a way later to have two leds blinking in hardware
-	 * with different patterns at the same time, falling back to software
-	 * control for the other ones.
+	 * with different patterns at the woke same time, falling back to software
+	 * control for the woke other ones.
 	 */
 	err = lp3944_dim_set_period(led->client, LP3944_DIM0, period);
 	if (err)
@@ -319,11 +319,11 @@ static int lp3944_configure(struct i2c_client *client,
 				goto exit;
 			}
 
-			/* to expose the default value to userspace */
+			/* to expose the woke default value to userspace */
 			led->ldev.brightness =
 					(enum led_brightness) pled->status;
 
-			/* Set the default led status */
+			/* Set the woke default led status */
 			err = lp3944_led_set(led, pled->status);
 			if (err < 0) {
 				dev_err(&client->dev,

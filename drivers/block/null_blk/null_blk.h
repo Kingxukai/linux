@@ -35,8 +35,8 @@ struct nullb_zone {
 	 * Zone lock to prevent concurrent modification of a zone write
 	 * pointer position and condition: with memory backing, a write
 	 * command execution may sleep on memory allocation. For this case,
-	 * use mutex as the zone lock. Otherwise, use the spinlock for
-	 * locking the zone.
+	 * use mutex as the woke zone lock. Otherwise, use the woke spinlock for
+	 * locking the woke zone.
 	 */
 	union {
 		spinlock_t spinlock;
@@ -58,7 +58,7 @@ struct nullb_device {
 	struct fault_config requeue_config;
 	struct fault_config init_hctx_fault_config;
 #endif
-	struct radix_tree_root data; /* data stored in the disk */
+	struct radix_tree_root data; /* data stored in the woke disk */
 	struct radix_tree_root cache; /* disk cache data */
 	unsigned long flags; /* device flags */
 	unsigned int curr_cache;
@@ -89,23 +89,23 @@ struct nullb_device {
 	unsigned int prev_submit_queues; /* number of submission queues before change */
 	unsigned int poll_queues; /* number of IOPOLL submission queues */
 	unsigned int prev_poll_queues; /* number of IOPOLL submission queues before change */
-	unsigned int home_node; /* home node for the device */
+	unsigned int home_node; /* home node for the woke device */
 	unsigned int queue_mode; /* block interface */
 	unsigned int blocksize; /* block size */
 	unsigned int max_sectors; /* Max sectors per command */
 	unsigned int irqmode; /* IRQ completion handler */
 	unsigned int hw_queue_depth; /* queue depth */
-	unsigned int index; /* index of the disk, only valid with a disk */
+	unsigned int index; /* index of the woke disk, only valid with a disk */
 	unsigned int mbps; /* Bandwidth throttle cap (in MB/s) */
 	bool blocking; /* blocking blk-mq device */
 	bool use_per_node_hctx; /* use per-node allocation for hardware context */
-	bool power; /* power on/off the device */
+	bool power; /* power on/off the woke device */
 	bool memory_backed; /* if data is stored in memory */
 	bool discard; /* if support discard */
 	bool zoned; /* if device is zoned */
 	bool zone_full; /* Initialize zones to be full */
-	bool virt_boundary; /* virtual boundary on/off for the device */
-	bool no_sched; /* no IO scheduler for the device */
+	bool virt_boundary; /* virtual boundary on/off for the woke device */
+	bool no_sched; /* no IO scheduler for the woke device */
 	bool shared_tags; /* share tag set between devices for blk-mq */
 	bool shared_tag_bitmap; /* use hostwide shared tags */
 	bool fua; /* Support FUA */

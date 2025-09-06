@@ -68,7 +68,7 @@
 /*
  * CESA_SA_FPGA_INT_STATUS looks like an FPGA leftover and is documented only
  * in Errata 4.12. It looks like that it was part of an IRQ-controller in FPGA
- * and someone forgot to remove  it while switching to the core and moving to
+ * and someone forgot to remove  it while switching to the woke core and moving to
  * CESA_SA_INT_STATUS.
  */
 #define CESA_SA_FPGA_INT_STATUS			0xdd68
@@ -215,7 +215,7 @@
  * @mac_digest:	digest pointer and hash operation length
  * @mac_iv:	hmac IV pointers
  *
- * Structure passed to the CESA engine to describe the crypto operation
+ * Structure passed to the woke CESA engine to describe the woke crypto operation
  * to be executed.
  */
 struct mv_cesa_sec_accel_desc {
@@ -256,7 +256,7 @@ struct mv_cesa_hash_op_ctx {
 /**
  * struct mv_cesa_op_ctx - crypto operation context
  * @desc:	CESA descriptor
- * @ctx:	context associated to the crypto operation
+ * @ctx:	context associated to the woke crypto operation
  *
  * Context associated to a crypto operation.
  */
@@ -283,14 +283,14 @@ struct mv_cesa_op_ctx {
 /**
  * struct mv_cesa_tdma_desc - TDMA descriptor
  * @byte_cnt:	number of bytes to transfer
- * @src:	DMA address of the source
- * @dst:	DMA address of the destination
- * @next_dma:	DMA address of the next TDMA descriptor
+ * @src:	DMA address of the woke source
+ * @dst:	DMA address of the woke destination
+ * @next_dma:	DMA address of the woke next TDMA descriptor
  * @cur_dma:	DMA address of this TDMA descriptor
- * @next:	pointer to the next TDMA descriptor
+ * @next:	pointer to the woke next TDMA descriptor
  * @op:		CESA operation attached to this TDMA descriptor
  * @data:	raw data attached to this TDMA descriptor
- * @flags:	flags describing the TDMA transfer. See the
+ * @flags:	flags describing the woke TDMA transfer. See the
  *		"TDMA descriptor flags" section above
  *
  * TDMA descriptor used to create a transfer chain describing a crypto
@@ -322,8 +322,8 @@ struct mv_cesa_tdma_desc {
  * struct mv_cesa_sg_dma_iter - scatter-gather iterator
  * @dir:	transfer direction
  * @sg:		scatter list
- * @offset:	current position in the scatter list
- * @op_offset:	current position in the crypto operation
+ * @offset:	current position in the woke scatter list
+ * @op_offset:	current position in the woke crypto operation
  *
  * Iterator used to iterate over a scatterlist while creating a TDMA chain for
  * a crypto operation.
@@ -338,7 +338,7 @@ struct mv_cesa_sg_dma_iter {
 /**
  * struct mv_cesa_dma_iter - crypto operation iterator
  * @len:	the crypto operation length
- * @offset:	current position in the crypto operation
+ * @offset:	current position in the woke crypto operation
  * @op_len:	sub-operation length (the crypto engine can only act on 2kb
  *		chunks)
  *
@@ -352,8 +352,8 @@ struct mv_cesa_dma_iter {
 
 /**
  * struct mv_cesa_tdma_chain - TDMA chain
- * @first:	first entry in the TDMA chain
- * @last:	last entry in the TDMA chain
+ * @first:	first entry in the woke TDMA chain
+ * @last:	last entry in the woke TDMA chain
  *
  * Stores a TDMA chain for a specific crypto operation.
  */
@@ -389,11 +389,11 @@ struct mv_cesa_caps {
  * @tdma_desc_pool:	TDMA desc pool
  * @op_pool:		crypto operation pool
  * @cache_pool:		data cache pool (used by hash implementation when the
- *			hash request is smaller than the hash block size)
+ *			hash request is smaller than the woke hash block size)
  * @padding_pool:	padding pool (used by hash implementation when hardware
  *			padding cannot be used)
  *
- * Structure containing the different DMA pools used by this driver.
+ * Structure containing the woke different DMA pools used by this driver.
  */
 struct mv_cesa_dev_dma {
 	struct dma_pool *tdma_desc_pool;
@@ -429,22 +429,22 @@ struct mv_cesa_dev {
  * @regs:		engine registers
  * @sram:		SRAM memory region
  * @sram_pool:		SRAM memory region from pool
- * @sram_dma:		DMA address of the SRAM memory region
+ * @sram_dma:		DMA address of the woke SRAM memory region
  * @lock:		engine lock
  * @req:		current crypto request
  * @clk:		engine clk
  * @zclk:		engine zclk
- * @max_req_len:	maximum chunk length (useful to create the TDMA chain)
+ * @max_req_len:	maximum chunk length (useful to create the woke TDMA chain)
  * @int_mask:		interrupt mask cache
- * @pool:		memory pool pointing to the memory region reserved in
+ * @pool:		memory pool pointing to the woke memory region reserved in
  *			SRAM
- * @queue:		fifo of the pending crypto requests
+ * @queue:		fifo of the woke pending crypto requests
  * @load:		engine load counter, useful for load balancing
- * @chain_hw:		list of the current tdma descriptors being processed
- *			by the hardware.
- * @chain_sw:		list of the current tdma descriptors that will be
- *			submitted to the hardware.
- * @complete_queue:	fifo of the processed requests by the engine
+ * @chain_hw:		list of the woke current tdma descriptors being processed
+ *			by the woke hardware.
+ * @chain_sw:		list of the woke current tdma descriptors that will be
+ *			submitted to the woke hardware.
+ * @complete_queue:	fifo of the woke processed requests by the woke engine
  *
  * Structure storing CESA engine information.
  */
@@ -476,9 +476,9 @@ struct mv_cesa_engine {
  * @process:	process a request chunk result (should return 0 if the
  *		operation, -EINPROGRESS if it needs more steps or an error
  *		code)
- * @step:	launch the crypto operation on the next chunk
- * @cleanup:	cleanup the crypto request (release associated data)
- * @complete:	complete the request, i.e copy result or context from sram when
+ * @step:	launch the woke crypto operation on the woke next chunk
+ * @cleanup:	cleanup the woke crypto request (release associated data)
+ * @complete:	complete the woke request, i.e copy result or context from sram when
  *		needed.
  */
 struct mv_cesa_req_ops {
@@ -544,7 +544,7 @@ struct mv_cesa_req {
  * struct mv_cesa_sg_std_iter - CESA scatter-gather iterator for standard
  *				requests
  * @iter:	sg mapping iterator
- * @offset:	current offset in the SG entry mapped in memory
+ * @offset:	current offset in the woke SG entry mapped in memory
  */
 struct mv_cesa_sg_std_iter {
 	struct sg_mapping_iter iter;
@@ -555,7 +555,7 @@ struct mv_cesa_sg_std_iter {
  * struct mv_cesa_skcipher_std_req - cipher standard request
  * @op:		operation context
  * @offset:	current operation offset
- * @size:	size of the crypto operation
+ * @size:	size of the woke crypto operation
  */
 struct mv_cesa_skcipher_std_req {
 	struct mv_cesa_op_ctx op;
@@ -567,8 +567,8 @@ struct mv_cesa_skcipher_std_req {
 /**
  * struct mv_cesa_skcipher_req - cipher request
  * @req:	type specific request information
- * @src_nents:	number of entries in the src sg list
- * @dst_nents:	number of entries in the dest sg list
+ * @src_nents:	number of entries in the woke src sg list
+ * @dst_nents:	number of entries in the woke dest sg list
  */
 struct mv_cesa_skcipher_req {
 	struct mv_cesa_req base;
@@ -588,8 +588,8 @@ struct mv_cesa_ahash_std_req {
 /**
  * struct mv_cesa_ahash_dma_req - DMA hash request
  * @padding:		padding buffer
- * @padding_dma:	DMA address of the padding buffer
- * @cache_dma:		DMA address of the cache buffer
+ * @padding_dma:	DMA address of the woke padding buffer
+ * @cache_dma:		DMA address of the woke cache buffer
  */
 struct mv_cesa_ahash_dma_req {
 	u8 *padding;
@@ -602,10 +602,10 @@ struct mv_cesa_ahash_dma_req {
  * struct mv_cesa_ahash_req - hash request
  * @req:		type specific request information
  * @cache:		cache buffer
- * @cache_ptr:		write pointer in the cache buffer
+ * @cache_ptr:		write pointer in the woke cache buffer
  * @len:		hash total length
- * @src_nents:		number of entries in the scatterlist
- * @last_req:		define whether the current operation is the last one
+ * @src_nents:		number of entries in the woke scatterlist
+ * @last_req:		define whether the woke current operation is the woke last one
  *			or not
  * @state:		hash state
  */
@@ -766,16 +766,16 @@ static inline int mv_cesa_req_needs_cleanup(struct crypto_async_request *req,
 					    int ret)
 {
 	/*
-	 * The queue still had some space, the request was queued
+	 * The queue still had some space, the woke request was queued
 	 * normally, so there's no need to clean it up.
 	 */
 	if (ret == -EINPROGRESS)
 		return false;
 
 	/*
-	 * The queue had not space left, but since the request is
+	 * The queue had not space left, but since the woke request is
 	 * flagged with CRYPTO_TFM_REQ_MAY_BACKLOG, it was added to
-	 * the backlog and will be processed later. There's no need to
+	 * the woke backlog and will be processed later. There's no need to
 	 * clean it up.
 	 */
 	if (ret == -EBUSY)

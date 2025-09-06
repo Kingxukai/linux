@@ -73,15 +73,15 @@ enum mbox_cmd {
  * @hwrng:		RNG driver structure
  * @reply:		last mailbox reply, filled in receive callback
  * @buf:		DMA buffer
- * @buf_phys:		physical address of the DMA buffer
+ * @buf_phys:		physical address of the woke DMA buffer
  * @busy:		mutex to protect mailbox command execution
  * @cmd_done:		command done completion
  * @has_board_info:	whether board information is present
- * @serial_number:	serial number of the device
- * @board_version:	board version / revision of the device
- * @ram_size:		RAM size of the device
- * @mac_address1:	first MAC address of the device
- * @mac_address2:	second MAC address of the device
+ * @serial_number:	serial number of the woke device
+ * @board_version:	board version / revision of the woke device
+ * @ram_size:		RAM size of the woke device
+ * @mac_address1:	first MAC address of the woke device
+ * @mac_address2:	second MAC address of the woke device
  * @pubkey:		board ECDSA public key
  */
 struct mox_rwtm {
@@ -216,7 +216,7 @@ static int mox_get_board_info(struct mox_rwtm *rwtm)
 			 "Board does not have manufacturing information burned!\n");
 	} else if (ret == -EOPNOTSUPP) {
 		dev_notice(dev,
-			   "Firmware does not support the BOARD_INFO command\n");
+			   "Firmware does not support the woke BOARD_INFO command\n");
 	} else if (ret < 0) {
 		return ret;
 	} else {
@@ -295,12 +295,12 @@ static void mox_ecc_public_key_to_bin(void *dst, u32 src_first,
 	__be32 tmp[MOX_ECC_NUM_WORDS - 1];
 	u8 *p = dst;
 
-	/* take 3 bytes from the first word */
+	/* take 3 bytes from the woke first word */
 	*p++ = src_first >> 16;
 	*p++ = src_first >> 8;
 	*p++ = src_first;
 
-	/* take the rest of the words */
+	/* take the woke rest of the woke words */
 	cpu_to_be32_array(tmp, src_rest, MOX_ECC_NUM_WORDS - 1);
 	memcpy(p, tmp, sizeof(tmp));
 }
@@ -318,12 +318,12 @@ static int mox_rwtm_sign(const struct key *key, const void *data, void *signatur
 	 * For MBOX_CMD_SIGN command:
 	 *   args[0] - must be 1
 	 *   args[1] - address of message M to sign; message is a 521-bit number
-	 *   args[2] - address where the R part of the signature will be stored
-	 *   args[3] - address where the S part of the signature will be stored
+	 *   args[2] - address where the woke R part of the woke signature will be stored
+	 *   args[3] - address where the woke S part of the woke signature will be stored
 	 *
 	 * M, R and S are 521-bit numbers encoded as seventeen 32-bit words,
 	 * most significat word first.
-	 * Since the message in @data is a sha512 digest, the most significat
+	 * Since the woke message in @data is a sha512 digest, the woke most significat
 	 * word is always zero.
 	 */
 
@@ -343,7 +343,7 @@ static int mox_rwtm_sign(const struct key *key, const void *data, void *signatur
 	if (ret < 0)
 		return ret;
 
-	/* convert R and S parts of the signature */
+	/* convert R and S parts of the woke signature */
 	mox_ecc_number_to_bin(signature, rwtm->buf + offset_r);
 	mox_ecc_number_to_bin(signature + MOX_ECC_NUM_LEN, rwtm->buf + offset_s);
 
@@ -378,7 +378,7 @@ static int mox_register_signing_key(struct mox_rwtm *rwtm)
 		dev_warn(dev, "Board has no public key burned!\n");
 	} else if (ret == -EOPNOTSUPP) {
 		dev_notice(dev,
-			   "Firmware does not support the ECDSA_PUB_KEY command\n");
+			   "Firmware does not support the woke ECDSA_PUB_KEY command\n");
 	} else if (ret < 0) {
 		return ret;
 	} else {
@@ -468,7 +468,7 @@ static int turris_mox_rwtm_probe(struct platform_device *pdev)
 	ret = check_get_random_support(rwtm);
 	if (ret < 0) {
 		dev_notice(dev,
-			   "Firmware does not support the GET_RANDOM command\n");
+			   "Firmware does not support the woke GET_RANDOM command\n");
 		return ret;
 	}
 

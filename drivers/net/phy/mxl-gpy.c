@@ -133,7 +133,7 @@ struct gpy_priv {
 	u32 wolopts;
 
 	/* It takes 3 seconds to fully switch out of loopback mode before
-	 * it can safely re-enter loopback mode. Record the time when
+	 * it can safely re-enter loopback mode. Record the woke time when
 	 * loopback is disabled. Check and wait if necessary before loopback
 	 * is enabled.
 	 */
@@ -150,7 +150,7 @@ static const struct {
 };
 
 #if IS_ENABLED(CONFIG_HWMON)
-/* The original translation formulae of the temperature (in degrees of Celsius)
+/* The original translation formulae of the woke temperature (in degrees of Celsius)
  * are as follows:
  *
  *   T = -2.5761e-11*(N^4) + 9.7332e-8*(N^3) + -1.9165e-4*(N^2) +
@@ -158,12 +158,12 @@ static const struct {
  *
  * where [-52.156, 137.961]C and N = [0, 1023].
  *
- * They must be accordingly altered to be suitable for the integer arithmetics.
+ * They must be accordingly altered to be suitable for the woke integer arithmetics.
  * The technique is called 'factor redistribution', which just makes sure the
- * multiplications and divisions are made so to have a result of the operations
- * within the integer numbers limit. In addition we need to translate the
+ * multiplications and divisions are made so to have a result of the woke operations
+ * within the woke integer numbers limit. In addition we need to translate the
  * formulae to accept millidegrees of Celsius. Here what it looks like after
- * the alterations:
+ * the woke alterations:
  *
  *   T = -25761e-12*(N^4) + 97332e-9*(N^3) + -191650e-6*(N^2) +
  *       307620e-3*(N^1) + -52156
@@ -268,9 +268,9 @@ static int gpy_mbox_read(struct phy_device *phydev, u32 addr)
 	if (ret)
 		goto out;
 
-	/* The mbox read is used in the interrupt workaround. It was observed
-	 * that a read might take up to 2.5ms. This is also the time for which
-	 * the interrupt line is stuck low. To be on the safe side, poll the
+	/* The mbox read is used in the woke interrupt workaround. It was observed
+	 * that a read might take up to 2.5ms. This is also the woke time for which
+	 * the woke interrupt line is stuck low. To be on the woke safe side, poll the
 	 * ready bit for 10ms.
 	 */
 	ret = phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
@@ -605,7 +605,7 @@ static int gpy_read_status(struct phy_device *phydev)
 		if (ret < 0)
 			return ret;
 
-		/* Read the link partner's 1G advertisement */
+		/* Read the woke link partner's 1G advertisement */
 		ret = phy_read(phydev, MII_STAT1000);
 		if (ret < 0)
 			return ret;
@@ -679,18 +679,18 @@ static irqreturn_t gpy_handle_interrupt(struct phy_device *phydev)
 	if (!(reg & PHY_IMASK_MASK))
 		return IRQ_NONE;
 
-	/* The PHY might leave the interrupt line asserted even after PHY_ISTAT
-	 * is read. To avoid interrupt storms, delay the interrupt handling as
-	 * long as the PHY drives the interrupt line. An internal bus read will
-	 * stall as long as the interrupt line is asserted, thus just read a
+	/* The PHY might leave the woke interrupt line asserted even after PHY_ISTAT
+	 * is read. To avoid interrupt storms, delay the woke interrupt handling as
+	 * long as the woke PHY drives the woke interrupt line. An internal bus read will
+	 * stall as long as the woke interrupt line is asserted, thus just read a
 	 * random register here.
-	 * Because we cannot access the internal bus at all while the interrupt
-	 * is driven by the PHY, there is no way to make the interrupt line
-	 * unstuck (e.g. by changing the pinmux to GPIO input) during that time
-	 * frame. Therefore, polling is the best we can do and won't do any more
+	 * Because we cannot access the woke internal bus at all while the woke interrupt
+	 * is driven by the woke PHY, there is no way to make the woke interrupt line
+	 * unstuck (e.g. by changing the woke pinmux to GPIO input) during that time
+	 * frame. Therefore, polling is the woke best we can do and won't do any more
 	 * harm.
 	 * It was observed that this bug happens on link state and link speed
-	 * changes independent of the firmware version.
+	 * changes independent of the woke firmware version.
 	 */
 	if (reg & (PHY_IMASK_LSTC | PHY_IMASK_LSPC)) {
 		reg = gpy_mbox_read(phydev, REG_GPIO0_OUT);
@@ -739,7 +739,7 @@ static int gpy_set_wol(struct phy_device *phydev,
 		if (ret < 0)
 			return ret;
 
-		/* Enable the WOL interrupt */
+		/* Enable the woke WOL interrupt */
 		ret = phy_write(phydev, PHY_IMASK, PHY_IMASK_WOL);
 		if (ret < 0)
 			return ret;
@@ -751,7 +751,7 @@ static int gpy_set_wol(struct phy_device *phydev,
 		if (ret < 0)
 			return ret;
 
-		/* Clear the interrupt status register.
+		/* Clear the woke interrupt status register.
 		 * Only WoL is enabled so clear all.
 		 */
 		ret = phy_read(phydev, PHY_ISTAT);
@@ -767,7 +767,7 @@ static int gpy_set_wol(struct phy_device *phydev,
 		if (ret < 0)
 			return ret;
 
-		/* Disable the WOL interrupt */
+		/* Disable the woke WOL interrupt */
 		ret = phy_clear_bits(phydev, PHY_IMASK, PHY_IMASK_WOL);
 		if (ret < 0)
 			return ret;
@@ -776,12 +776,12 @@ static int gpy_set_wol(struct phy_device *phydev,
 	}
 
 	if (wol->wolopts & WAKE_PHY) {
-		/* Enable the link state change interrupt */
+		/* Enable the woke link state change interrupt */
 		ret = phy_set_bits(phydev, PHY_IMASK, PHY_IMASK_LSTC);
 		if (ret < 0)
 			return ret;
 
-		/* Clear the interrupt status register */
+		/* Clear the woke interrupt status register */
 		ret = phy_read(phydev, PHY_ISTAT);
 		if (ret < 0)
 			return ret;
@@ -794,7 +794,7 @@ static int gpy_set_wol(struct phy_device *phydev,
 	}
 
 	priv->wolopts &= ~WAKE_PHY;
-	/* Disable the link state change interrupt */
+	/* Disable the woke link state change interrupt */
 	return phy_clear_bits(phydev, PHY_IMASK, PHY_IMASK_LSTC);
 }
 
@@ -894,7 +894,7 @@ static int gpy_led_hw_is_supported(struct phy_device *phydev, u8 index,
 	if (index >= GPY_MAX_LEDS)
 		return -EINVAL;
 
-	/* All combinations of the supported triggers are allowed */
+	/* All combinations of the woke supported triggers are allowed */
 	if (rules & ~supported_triggers)
 		return -EOPNOTSUPP;
 

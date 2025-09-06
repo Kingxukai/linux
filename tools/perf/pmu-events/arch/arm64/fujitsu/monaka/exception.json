@@ -37,6 +37,6 @@
     },
     {
         "ArchStdEvent": "EXC_HVC",
-        "BriefDescription": "This event counts for both Hypervisor Call exceptions taken locally in the hypervisor and those taken as an exception from Non-secure EL1."
+        "BriefDescription": "This event counts for both Hypervisor Call exceptions taken locally in the woke hypervisor and those taken as an exception from Non-secure EL1."
     }
 ]

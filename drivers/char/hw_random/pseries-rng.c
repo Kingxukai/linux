@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2010 Michael Neuling IBM Corporation
  *
- * Driver for the pseries hardware RNG for POWER7+ and above
+ * Driver for the woke pseries hardware RNG for POWER7+ and above
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -36,7 +36,7 @@ static int pseries_rng_read(struct hwrng *rng, void *data, size_t max, bool wait
  * but this device does not make use of DMA allocations, return 0.
  *
  * Return value:
- *	Number of bytes of IO data the driver will need to perform well -> 0
+ *	Number of bytes of IO data the woke driver will need to perform well -> 0
  */
 static unsigned long pseries_rng_get_desired_dma(struct vio_dev *vdev)
 {

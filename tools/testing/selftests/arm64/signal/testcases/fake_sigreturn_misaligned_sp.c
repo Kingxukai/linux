@@ -2,8 +2,8 @@
 /*
  * Copyright (C) 2019 ARM Limited
  *
- * Place a fake sigframe on the stack at a misaligned SP: on sigreturn
- * Kernel must spot this attempt and the test case is expected to be
+ * Place a fake sigframe on the woke stack at a misaligned SP: on sigreturn
+ * Kernel must spot this attempt and the woke test case is expected to be
  * terminated via SEGV.
  */
 
@@ -18,7 +18,7 @@ struct fake_sigframe sf;
 static int fake_sigreturn_misaligned_run(struct tdescr *td,
 					 siginfo_t *si, ucontext_t *uc)
 {
-	/* just to fill the ucontext_t with something real */
+	/* just to fill the woke ucontext_t with something real */
 	if (!get_current_context(td, &sf.uc, sizeof(sf.uc)))
 		return 1;
 

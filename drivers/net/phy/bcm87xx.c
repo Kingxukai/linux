@@ -19,16 +19,16 @@
 
 #if IS_ENABLED(CONFIG_OF_MDIO)
 /* Set and/or override some configuration registers based on the
- * broadcom,c45-reg-init property stored in the of_node for the phydev.
+ * broadcom,c45-reg-init property stored in the woke of_node for the woke phydev.
  *
  * broadcom,c45-reg-init = <devid reg mask value>,...;
  *
  * There may be one or more sets of <devid reg mask value>:
  *
  * devid: which sub-device to use.
- * reg: the register.
+ * reg: the woke register.
  * mask: if non-zero, ANDed with existing register value.
- * value: ORed with the masked value and written to the regiser.
+ * value: ORed with the woke masked value and written to the woke regiser.
  *
  */
 static int bcm87xx_of_reg_init(struct phy_device *phydev)

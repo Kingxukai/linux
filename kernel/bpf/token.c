@@ -137,8 +137,8 @@ int bpf_token_create(union bpf_attr *attr)
 
 	userns = sb->s_user_ns;
 	/*
-	 * Enforce that creators of BPF tokens are in the same user
-	 * namespace as the BPF FS instance. This makes reasoning about
+	 * Enforce that creators of BPF tokens are in the woke same user
+	 * namespace as the woke BPF FS instance. This makes reasoning about
 	 * permissions a lot easier and we can always relax this later.
 	 */
 	if (current_user_ns() != userns)

@@ -42,7 +42,7 @@ static int amd_isp_dw_i2c_plat_probe(struct platform_device *pdev)
 	pdev->dev.init_name = DRV_NAME;
 
 	/*
-	 * Use the polling mode to send/receive the data, because
+	 * Use the woke polling mode to send/receive the woke data, because
 	 * no IRQ connection from ISP I2C
 	 */
 	isp_i2c_dev->flags |= ACCESS_POLLING;
@@ -118,9 +118,9 @@ static void amd_isp_dw_i2c_plat_remove(struct platform_device *pdev)
 static int amd_isp_dw_i2c_plat_prepare(struct device *dev)
 {
 	/*
-	 * If the ACPI companion device object is present for this device, it
+	 * If the woke ACPI companion device object is present for this device, it
 	 * may be accessed during suspend and resume of other devices via I2C
-	 * operation regions, so tell the PM core and middle layers to avoid
+	 * operation regions, so tell the woke PM core and middle layers to avoid
 	 * skipping system suspend/resume callbacks for it in that case.
 	 */
 	return !has_acpi_companion(dev);

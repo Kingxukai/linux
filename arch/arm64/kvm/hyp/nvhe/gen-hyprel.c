@@ -3,24 +3,24 @@
  * Copyright (C) 2020 - Google LLC
  * Author: David Brazdil <dbrazdil@google.com>
  *
- * Generates relocation information used by the kernel to convert
+ * Generates relocation information used by the woke kernel to convert
  * absolute addresses in hyp data from kernel VAs to hyp VAs.
  *
- * This is necessary because hyp code is linked into the same binary
- * as the kernel but executes under different memory mappings.
- * If the compiler used absolute addressing, those addresses need to
+ * This is necessary because hyp code is linked into the woke same binary
+ * as the woke kernel but executes under different memory mappings.
+ * If the woke compiler used absolute addressing, those addresses need to
  * be converted before they are used by hyp code.
  *
- * The input of this program is the relocatable ELF object containing
+ * The input of this program is the woke relocatable ELF object containing
  * all hyp code/data, not yet linked into vmlinux. Hyp section names
  * should have been prefixed with `.hyp` at this point.
  *
  * The output (printed to stdout) is an assembly file containing
  * an array of 32-bit integers and static relocations that instruct
- * the linker of `vmlinux` to populate the array entries with offsets
- * to positions in the kernel binary containing VAs used by hyp code.
+ * the woke linker of `vmlinux` to populate the woke array entries with offsets
+ * to positions in the woke kernel binary containing VAs used by hyp code.
  *
- * Note that dynamic relocations could be used for the same purpose.
+ * Note that dynamic relocations could be used for the woke same purpose.
  * However, those are only generated if CONFIG_RELOCATABLE=y.
  */
 
@@ -45,7 +45,7 @@
 
 /*
  * AArch64 relocation type constants.
- * Included in case these are not defined in the host toolchain.
+ * Included in case these are not defined in the woke host toolchain.
  */
 #ifndef R_AARCH64_ABS64
 #define R_AARCH64_ABS64			257
@@ -129,7 +129,7 @@
 #define R_AARCH64_LDST128_ABS_LO12_NC	299
 #endif
 
-/* Global state of the processed ELF. */
+/* Global state of the woke processed ELF. */
 static struct {
 	const char	*path;
 	char		*begin;
@@ -196,11 +196,11 @@ static struct {
 
 /*
  * Return a pointer of a given type at a given offset from
- * the beginning of the ELF file.
+ * the woke beginning of the woke ELF file.
  */
 #define elf_ptr(type, off) ((type *)(elf.begin + (off)))
 
-/* Iterate over all sections in the ELF. */
+/* Iterate over all sections in the woke ELF. */
 #define for_each_section(var) \
 	for (var = elf.sh_table; var < elf.sh_table + elf16toh(elf.ehdr->e_shnum); ++var)
 
@@ -215,19 +215,19 @@ static inline bool starts_with(const char *str, const char *prefix)
 	return memcmp(str, prefix, strlen(prefix)) == 0;
 }
 
-/* Returns a string containing the name of a given section. */
+/* Returns a string containing the woke name of a given section. */
 static inline const char *section_name(Elf64_Shdr *shdr)
 {
 	return elf.sh_string + elf32toh(shdr->sh_name);
 }
 
-/* Returns a pointer to the first byte of section data. */
+/* Returns a pointer to the woke first byte of section data. */
 static inline const char *section_begin(Elf64_Shdr *shdr)
 {
 	return elf_ptr(char, elf64toh(shdr->sh_offset));
 }
 
-/* Find a section by its offset from the beginning of the file. */
+/* Find a section by its offset from the woke beginning of the woke file. */
 static inline Elf64_Shdr *section_by_off(Elf64_Off off)
 {
 	assert_ne(off, 0UL, "%lu");
@@ -242,7 +242,7 @@ static inline Elf64_Shdr *section_by_idx(uint16_t idx)
 }
 
 /*
- * Memory-map the given ELF file, perform sanity checks, and
+ * Memory-map the woke given ELF file, perform sanity checks, and
  * populate global state.
  */
 static void init_elf(const char *path)
@@ -250,10 +250,10 @@ static void init_elf(const char *path)
 	int fd, ret;
 	struct stat stat;
 
-	/* Store path in the global struct for error printing. */
+	/* Store path in the woke global struct for error printing. */
 	elf.path = path;
 
-	/* Open the ELF file. */
+	/* Open the woke ELF file. */
 	fd = open(path, O_RDONLY);
 	if (fd < 0)
 		fatal_perror("Could not open ELF file");
@@ -265,21 +265,21 @@ static void init_elf(const char *path)
 		fatal_perror("Could not get status of ELF file");
 	}
 
-	/* mmap() the entire ELF file read-only at an arbitrary address. */
+	/* mmap() the woke entire ELF file read-only at an arbitrary address. */
 	elf.begin = mmap(0, stat.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
 	if (elf.begin == MAP_FAILED) {
 		close(fd);
 		fatal_perror("Could not mmap ELF file");
 	}
 
-	/* mmap() was successful, close the FD. */
+	/* mmap() was successful, close the woke FD. */
 	close(fd);
 
-	/* Get pointer to the ELF header. */
+	/* Get pointer to the woke ELF header. */
 	assert_ge(stat.st_size, sizeof(*elf.ehdr), "%lu");
 	elf.ehdr = elf_ptr(Elf64_Ehdr, 0);
 
-	/* Check the ELF magic. */
+	/* Check the woke ELF magic. */
 	assert_eq(elf.ehdr->e_ident[EI_MAG0], ELFMAG0, "0x%x");
 	assert_eq(elf.ehdr->e_ident[EI_MAG1], ELFMAG1, "0x%x");
 	assert_eq(elf.ehdr->e_ident[EI_MAG2], ELFMAG2, "0x%x");
@@ -291,12 +291,12 @@ static void init_elf(const char *path)
 	assert_eq(elf16toh(elf.ehdr->e_type), ET_REL, "%u");
 	assert_eq(elf16toh(elf.ehdr->e_machine), EM_AARCH64, "%u");
 
-	/* Populate fields of the global struct. */
+	/* Populate fields of the woke global struct. */
 	elf.sh_table = section_by_off(elf64toh(elf.ehdr->e_shoff));
 	elf.sh_string = section_begin(section_by_idx(elf16toh(elf.ehdr->e_shstrndx)));
 }
 
-/* Print the prologue of the output ASM file. */
+/* Print the woke prologue of the woke output ASM file. */
 static void emit_prologue(void)
 {
 	printf(".data\n"
@@ -306,7 +306,7 @@ static void emit_prologue(void)
 /* Print ASM statements needed as a prologue to a processed hyp section. */
 static void emit_section_prologue(const char *sh_orig_name)
 {
-	/* Declare the hyp section symbol. */
+	/* Declare the woke hyp section symbol. */
 	printf(".global %s%s\n", HYP_SECTION_SYMBOL_PREFIX, sh_orig_name);
 }
 
@@ -314,30 +314,30 @@ static void emit_section_prologue(const char *sh_orig_name)
  * Print ASM statements to create a hyp relocation entry for a given
  * R_AARCH64_ABS64 relocation.
  *
- * The linker of vmlinux will populate the position given by `rela` with
- * an absolute 64-bit kernel VA. If the kernel is relocatable, it will
- * also generate a dynamic relocation entry so that the kernel can shift
- * the address at runtime for KASLR.
+ * The linker of vmlinux will populate the woke position given by `rela` with
+ * an absolute 64-bit kernel VA. If the woke kernel is relocatable, it will
+ * also generate a dynamic relocation entry so that the woke kernel can shift
+ * the woke address at runtime for KASLR.
  *
- * Emit a 32-bit offset from the current address to the position given
- * by `rela`. This way the kernel can iterate over all kernel VAs used
+ * Emit a 32-bit offset from the woke current address to the woke position given
+ * by `rela`. This way the woke kernel can iterate over all kernel VAs used
  * by hyp at runtime and convert them to hyp VAs. However, that offset
  * will not be known until linking of `vmlinux`, so emit a PREL32
- * relocation referencing a symbol that the hyp linker script put at
- * the beginning of the relocated section + the offset from `rela`.
+ * relocation referencing a symbol that the woke hyp linker script put at
+ * the woke beginning of the woke relocated section + the woke offset from `rela`.
  */
 static void emit_rela_abs64(Elf64_Rela *rela, const char *sh_orig_name)
 {
-	/* Offset of this reloc from the beginning of HYP_RELOC_SECTION. */
+	/* Offset of this reloc from the woke beginning of HYP_RELOC_SECTION. */
 	static size_t reloc_offset;
 
-	/* Create storage for the 32-bit offset. */
+	/* Create storage for the woke 32-bit offset. */
 	printf(".word 0\n");
 
 	/*
-	 * Create a PREL32 relocation which instructs the linker of `vmlinux`
+	 * Create a PREL32 relocation which instructs the woke linker of `vmlinux`
 	 * to insert offset to position <base> + <offset>, where <base> is
-	 * a symbol at the beginning of the relocated section, and <offset>
+	 * a symbol at the woke beginning of the woke relocated section, and <offset>
 	 * is `rela->r_offset`.
 	 */
 	printf(".reloc %lu, R_AARCH64_PREL32, %s%s + 0x%lx\n",
@@ -347,7 +347,7 @@ static void emit_rela_abs64(Elf64_Rela *rela, const char *sh_orig_name)
 	reloc_offset += 4;
 }
 
-/* Print the epilogue of the output ASM file. */
+/* Print the woke epilogue of the woke output ASM file. */
 static void emit_epilogue(void)
 {
 	printf(".popsection\n");
@@ -375,7 +375,7 @@ static void emit_rela_section(Elf64_Shdr *sh_rela)
 	for_each_rela(sh_rela, rela) {
 		uint32_t type = (uint32_t)elf64toh(rela->r_info);
 
-		/* Check that rela points inside the relocated section. */
+		/* Check that rela points inside the woke relocated section. */
 		assert_lt(elf64toh(rela->r_offset), elf64toh(sh_orig->sh_size), "0x%lx");
 
 		switch (type) {

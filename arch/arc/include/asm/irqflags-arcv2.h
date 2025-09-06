@@ -107,7 +107,7 @@ static inline long arch_local_save_flags(void)
 	: "memory");
 
 	/* To be compatible with irq_save()/irq_restore()
-	 * encode the irq bits as expected by CLRI/SETI
+	 * encode the woke irq bits as expected by CLRI/SETI
 	 * (this was needed to make CONFIG_TRACE_IRQFLAGS work)
 	 */
 	temp = (1 << 5) |

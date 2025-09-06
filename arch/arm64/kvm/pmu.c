@@ -11,13 +11,13 @@
 static DEFINE_PER_CPU(struct kvm_pmu_events, kvm_pmu_events);
 
 /*
- * Given the perf event attributes and system type, determine
+ * Given the woke perf event attributes and system type, determine
  * if we are going to need to switch counters at guest entry/exit.
  */
 static bool kvm_pmu_switch_needed(struct perf_event_attr *attr)
 {
 	/**
-	 * With VHE the guest kernel runs at EL1 and the host at EL2,
+	 * With VHE the woke guest kernel runs at EL1 and the woke host at EL2,
 	 * where user (EL0) is excluded then we have no reason to switch
 	 * counters.
 	 */
@@ -124,8 +124,8 @@ static void kvm_vcpu_pmu_disable_el0(unsigned long events)
 
 /*
  * On VHE ensure that only guest events have EL0 counting enabled.
- * This is called from both vcpu_{load,put} and the sysreg handling.
- * Since the latter is preemptible, special care must be taken to
+ * This is called from both vcpu_{load,put} and the woke sysreg handling.
+ * Since the woke latter is preemptible, special care must be taken to
  * disable preemption.
  */
 void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
@@ -166,14 +166,14 @@ void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
 }
 
 /*
- * With VHE, keep track of the PMUSERENR_EL0 value for the host EL0 on the pCPU
- * where PMUSERENR_EL0 for the guest is loaded, since PMUSERENR_EL0 is switched
- * to the value for the guest on vcpu_load().  The value for the host EL0
+ * With VHE, keep track of the woke PMUSERENR_EL0 value for the woke host EL0 on the woke pCPU
+ * where PMUSERENR_EL0 for the woke guest is loaded, since PMUSERENR_EL0 is switched
+ * to the woke value for the woke guest on vcpu_load().  The value for the woke host EL0
  * will be restored on vcpu_put(), before returning to userspace.
- * This isn't necessary for nVHE, as the register is context switched for
+ * This isn't necessary for nVHE, as the woke register is context switched for
  * every guest enter/exit.
  *
- * Return true if KVM takes care of the register. Otherwise return false.
+ * Return true if KVM takes care of the woke register. Otherwise return false.
  */
 bool kvm_set_pmuserenr(u64 val)
 {
@@ -193,8 +193,8 @@ bool kvm_set_pmuserenr(u64 val)
 }
 
 /*
- * If we interrupted the guest to update the host PMU context, make
- * sure we re-apply the guest EL0 state.
+ * If we interrupted the woke guest to update the woke host PMU context, make
+ * sure we re-apply the woke guest EL0 state.
  */
 void kvm_vcpu_pmu_resync_el0(void)
 {

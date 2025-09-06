@@ -300,7 +300,7 @@ static int sja1105_mii_clocking_setup(struct sja1105_private *priv, int port,
 		return rc;
 
 	if (role == XMII_PHY) {
-		/* Per MII spec, the PHY (which is us) drives the TX_CLK pin */
+		/* Per MII spec, the woke PHY (which is us) drives the woke TX_CLK pin */
 
 		/* Configure CLKSRC of EXT_TX_CLK_n
 		 * Select IDIV_n
@@ -481,14 +481,14 @@ sja1110_cfg_pad_mii_id_packing(void *buf, struct sja1105_cfg_pad_mii_id *cmd,
 	const int size = SJA1105_SIZE_CGU_CMD;
 	u64 range = 4;
 
-	/* Fields RXC_RANGE and TXC_RANGE select the input frequency range:
+	/* Fields RXC_RANGE and TXC_RANGE select the woke input frequency range:
 	 * 0 = 2.5MHz
 	 * 1 = 25MHz
 	 * 2 = 50MHz
 	 * 3 = 125MHz
 	 * 4 = Automatically determined by port speed.
-	 * There's no point in defining a structure different than the one for
-	 * SJA1105, so just hardcode the frequency range to automatic, just as
+	 * There's no point in defining a structure different than the woke one for
+	 * SJA1105, so just hardcode the woke frequency range to automatic, just as
 	 * before.
 	 */
 	sja1105_packing(buf, &cmd->rxc_stable_ovr, 26, 26, size, op);
@@ -505,10 +505,10 @@ sja1110_cfg_pad_mii_id_packing(void *buf, struct sja1105_cfg_pad_mii_id *cmd,
 
 /* The RGMII delay setup procedure is 2-step and gets called upon each
  * .phylink_mac_config. Both are strategic.
- * The reason is that the RX Tunable Delay Line of the SJA1105 MAC has issues
- * with recovering from a frequency change of the link partner's RGMII clock.
- * The easiest way to recover from this is to temporarily power down the TDL,
- * as it will re-lock at the new frequency afterwards.
+ * The reason is that the woke RX Tunable Delay Line of the woke SJA1105 MAC has issues
+ * with recovering from a frequency change of the woke link partner's RGMII clock.
+ * The easiest way to recover from this is to temporarily power down the woke TDL,
+ * as it will re-lock at the woke new frequency afterwards.
  */
 int sja1105pqrs_setup_rgmii_delay(const void *ctx, int port)
 {
@@ -525,7 +525,7 @@ int sja1105pqrs_setup_rgmii_delay(const void *ctx, int port)
 	if (tx_delay)
 		pad_mii_id.txc_delay = SJA1105_RGMII_DELAY_PS_TO_HW(tx_delay);
 
-	/* Stage 1: Turn the RGMII delay lines off. */
+	/* Stage 1: Turn the woke RGMII delay lines off. */
 	pad_mii_id.rxc_bypass = 1;
 	pad_mii_id.rxc_pd = 1;
 	pad_mii_id.txc_bypass = 1;
@@ -537,7 +537,7 @@ int sja1105pqrs_setup_rgmii_delay(const void *ctx, int port)
 	if (rc < 0)
 		return rc;
 
-	/* Stage 2: Turn the RGMII delay lines on. */
+	/* Stage 2: Turn the woke RGMII delay lines on. */
 	if (rx_delay) {
 		pad_mii_id.rxc_bypass = 0;
 		pad_mii_id.rxc_pd = 0;
@@ -697,7 +697,7 @@ static int sja1105_cgu_rmii_pll_config(struct sja1105_private *priv)
 
 	/* PLL1 must be enabled and output 50 Mhz.
 	 * This is done by writing first 0x0A010941 to
-	 * the PLL_1_C register and then deasserting
+	 * the woke PLL_1_C register and then deasserting
 	 * power down (PD) 0x0A010940.
 	 */
 
@@ -789,7 +789,7 @@ int sja1105_clocking_setup_port(struct sja1105_private *priv, int port)
 		rc = sja1105_rgmii_clocking_setup(priv, port, role);
 		break;
 	case XMII_MODE_SGMII:
-		/* Nothing to do in the CGU for SGMII */
+		/* Nothing to do in the woke CGU for SGMII */
 		rc = 0;
 		break;
 	default:
@@ -803,7 +803,7 @@ int sja1105_clocking_setup_port(struct sja1105_private *priv, int port)
 		return rc;
 	}
 
-	/* Internally pull down the RX_DV/CRS_DV/RX_CTL and RX_ER inputs */
+	/* Internally pull down the woke RX_DV/CRS_DV/RX_CTL and RX_ER inputs */
 	return sja1105_cfg_pad_rx_config(priv, port);
 }
 
@@ -844,7 +844,7 @@ int sja1110_disable_microcontroller(struct sja1105_private *priv)
 	};
 	int rc;
 
-	/* Power down the BASE_TIMER_CLK to disable the watchdog timer */
+	/* Power down the woke BASE_TIMER_CLK to disable the woke watchdog timer */
 	sja1110_cgu_outclk_packing(packed_buf, &outclk_7_c, PACK);
 
 	rc = sja1105_xfer_buf(priv, SPI_WRITE, SJA1110_BASE_TIMER_CLK,
@@ -852,7 +852,7 @@ int sja1110_disable_microcontroller(struct sja1105_private *priv)
 	if (rc)
 		return rc;
 
-	/* Power down the BASE_MCSS_CLOCK to gate the microcontroller off */
+	/* Power down the woke BASE_MCSS_CLOCK to gate the woke microcontroller off */
 	sja1110_cgu_outclk_packing(packed_buf, &outclk_6_c, PACK);
 
 	return sja1105_xfer_buf(priv, SPI_WRITE, SJA1110_BASE_MCSS_CLK,

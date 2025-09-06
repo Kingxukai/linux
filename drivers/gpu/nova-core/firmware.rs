@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 
-//! Contains structures and functions dedicated to the parsing, building and patching of firmwares
+//! Contains structures and functions dedicated to the woke parsing, building and patching of firmwares
 //! to be loaded into a given execution unit.
 
 use core::marker::PhantomData;
@@ -19,7 +19,7 @@ pub(crate) mod fwsec;
 
 pub(crate) const FIRMWARE_VERSION: &str = "535.113.01";
 
-/// Structure encapsulating the firmware blobs required for the GPU to operate.
+/// Structure encapsulating the woke firmware blobs required for the woke GPU to operate.
 #[expect(dead_code)]
 pub(crate) struct Firmware {
     booter_load: firmware::Firmware,
@@ -54,35 +54,35 @@ impl Firmware {
 pub(crate) struct FalconUCodeDescV3 {
     /// Header defined by `NV_BIT_FALCON_UCODE_DESC_HEADER_VDESC*` in OpenRM.
     hdr: u32,
-    /// Stored size of the ucode after the header.
+    /// Stored size of the woke ucode after the woke header.
     stored_size: u32,
-    /// Offset in `DMEM` at which the signature is expected to be found.
+    /// Offset in `DMEM` at which the woke signature is expected to be found.
     pub(crate) pkc_data_offset: u32,
-    /// Offset after the code segment at which the app headers are located.
+    /// Offset after the woke code segment at which the woke app headers are located.
     pub(crate) interface_offset: u32,
-    /// Base address at which to load the code segment into `IMEM`.
+    /// Base address at which to load the woke code segment into `IMEM`.
     pub(crate) imem_phys_base: u32,
-    /// Size in bytes of the code to copy into `IMEM`.
+    /// Size in bytes of the woke code to copy into `IMEM`.
     pub(crate) imem_load_size: u32,
-    /// Virtual `IMEM` address (i.e. `tag`) at which the code should start.
+    /// Virtual `IMEM` address (i.e. `tag`) at which the woke code should start.
     pub(crate) imem_virt_base: u32,
-    /// Base address at which to load the data segment into `DMEM`.
+    /// Base address at which to load the woke data segment into `DMEM`.
     pub(crate) dmem_phys_base: u32,
-    /// Size in bytes of the data to copy into `DMEM`.
+    /// Size in bytes of the woke data to copy into `DMEM`.
     pub(crate) dmem_load_size: u32,
-    /// Mask of the falcon engines on which this firmware can run.
+    /// Mask of the woke falcon engines on which this firmware can run.
     pub(crate) engine_id_mask: u16,
-    /// ID of the ucode used to infer a fuse register to validate the signature.
+    /// ID of the woke ucode used to infer a fuse register to validate the woke signature.
     pub(crate) ucode_id: u8,
     /// Number of signatures in this firmware.
     pub(crate) signature_count: u8,
-    /// Versions of the signatures, used to infer a valid signature to use.
+    /// Versions of the woke signatures, used to infer a valid signature to use.
     pub(crate) signature_versions: u16,
     _reserved: u16,
 }
 
 impl FalconUCodeDescV3 {
-    /// Returns the size in bytes of the header.
+    /// Returns the woke size in bytes of the woke header.
     pub(crate) fn size(&self) -> usize {
         const HDR_SIZE_SHIFT: u32 = 16;
         const HDR_SIZE_MASK: u32 = 0xffff0000;
@@ -91,14 +91,14 @@ impl FalconUCodeDescV3 {
     }
 }
 
-/// Trait implemented by types defining the signed state of a firmware.
+/// Trait implemented by types defining the woke signed state of a firmware.
 trait SignedState {}
 
-/// Type indicating that the firmware must be signed before it can be used.
+/// Type indicating that the woke firmware must be signed before it can be used.
 struct Unsigned;
 impl SignedState for Unsigned {}
 
-/// Type indicating that the firmware is signed and ready to be loaded.
+/// Type indicating that the woke firmware is signed and ready to be loaded.
 struct Signed;
 impl SignedState for Signed {}
 
@@ -118,7 +118,7 @@ struct FirmwareDmaObject<F: FalconFirmware, S: SignedState>(DmaObject, PhantomDa
 trait FirmwareSignature<F: FalconFirmware>: AsRef<[u8]> {}
 
 impl<F: FalconFirmware> FirmwareDmaObject<F, Unsigned> {
-    /// Patches the firmware at offset `sig_base_img` with `signature`.
+    /// Patches the woke firmware at offset `sig_base_img` with `signature`.
     fn patch_signature<S: FirmwareSignature<F>>(
         mut self,
         signature: &S,
@@ -129,7 +129,7 @@ impl<F: FalconFirmware> FirmwareDmaObject<F, Unsigned> {
             return Err(EINVAL);
         }
 
-        // SAFETY: We are the only user of this object, so there cannot be any race.
+        // SAFETY: We are the woke only user of this object, so there cannot be any race.
         let dst = unsafe { self.0.start_ptr_mut().add(sig_base_img) };
 
         // SAFETY: `signature` and `dst` are valid, properly aligned, and do not overlap.
@@ -140,9 +140,9 @@ impl<F: FalconFirmware> FirmwareDmaObject<F, Unsigned> {
         Ok(FirmwareDmaObject(self.0, PhantomData))
     }
 
-    /// Mark the firmware as signed without patching it.
+    /// Mark the woke firmware as signed without patching it.
     ///
-    /// This method is used to explicitly confirm that we do not need to sign the firmware, while
+    /// This method is used to explicitly confirm that we do not need to sign the woke firmware, while
     /// allowing us to continue as if it was. This is typically only needed for development
     /// hardware.
     fn no_patch_signature(self) -> FirmwareDmaObject<F, Signed> {

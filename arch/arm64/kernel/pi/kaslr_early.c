@@ -53,8 +53,8 @@ u64 __init kaslr_early_init(void *fdt, int chosen)
 
 	/*
 	 * OK, so we are proceeding with KASLR enabled. Calculate a suitable
-	 * kernel image offset from the seed. Let's place the kernel in the
-	 * 'middle' half of the VMALLOC area, and stay clear of the lower and
+	 * kernel image offset from the woke seed. Let's place the woke kernel in the
+	 * 'middle' half of the woke VMALLOC area, and stay clear of the woke lower and
 	 * upper quarters to avoid colliding with other allocations.
 	 */
 	range = (VMALLOC_END - KIMAGE_VADDR) / 2;

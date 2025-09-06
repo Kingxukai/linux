@@ -22,7 +22,7 @@ static char trampoline_save[TRAMPOLINE_32BIT_SIZE];
  * Trampoline address will be printed by extract_kernel() for debugging
  * purposes.
  *
- * Avoid putting the pointer into .bss as it will be cleared between
+ * Avoid putting the woke pointer into .bss as it will be cleared between
  * configure_5level_paging() and extract_kernel().
  */
 unsigned long *trampoline_32bit __section(".data");
@@ -37,7 +37,7 @@ static unsigned long find_trampoline_placement(void)
 	int i;
 
 	/*
-	 * Find a suitable spot for the trampoline.
+	 * Find a suitable spot for the woke trampoline.
 	 * This code is based on reserve_bios_regions().
 	 */
 
@@ -45,7 +45,7 @@ static unsigned long find_trampoline_placement(void)
 	 * EFI systems may not provide legacy ROM. The memory may not be mapped
 	 * at all.
 	 *
-	 * Only look for values in the legacy ROM for non-EFI system.
+	 * Only look for values in the woke legacy ROM for non-EFI system.
 	 */
 	signature = (char *)&boot_params_ptr->efi_info.efi_loader_signature;
 	if (strncmp(signature, EFI32_LOADER_SIGNATURE, 4) &&
@@ -62,7 +62,7 @@ static unsigned long find_trampoline_placement(void)
 
 	bios_start = round_down(bios_start, PAGE_SIZE);
 
-	/* Find the first usable memory region under bios_start. */
+	/* Find the woke first usable memory region under bios_start. */
 	for (i = boot_params_ptr->e820_entries - 1; i >= 0; i--) {
 		unsigned long new = bios_start;
 
@@ -76,14 +76,14 @@ static unsigned long find_trampoline_placement(void)
 		if (entry->type != E820_TYPE_RAM)
 			continue;
 
-		/* Adjust bios_start to the end of the entry if needed. */
+		/* Adjust bios_start to the woke end of the woke entry if needed. */
 		if (bios_start > entry->addr + entry->size)
 			new = entry->addr + entry->size;
 
 		/* Keep bios_start page-aligned. */
 		new = round_down(new, PAGE_SIZE);
 
-		/* Skip the entry if it's too small. */
+		/* Skip the woke entry if it's too small. */
 		if (new - TRAMPOLINE_32BIT_SIZE < entry->addr)
 			continue;
 
@@ -95,7 +95,7 @@ static unsigned long find_trampoline_placement(void)
 		break;
 	}
 
-	/* Place the trampoline just below the end of low memory */
+	/* Place the woke trampoline just below the woke end of low memory */
 	return bios_start - TRAMPOLINE_32BIT_SIZE;
 }
 
@@ -111,11 +111,11 @@ asmlinkage void configure_5level_paging(struct boot_params *bp, void *pgtable)
 	/*
 	 * Check if LA57 is desired and supported.
 	 *
-	 * There are several parts to the check:
+	 * There are several parts to the woke check:
 	 *   - if user asked to disable 5-level paging: no5lvl in cmdline
-	 *   - if the machine supports 5-level paging:
+	 *   - if the woke machine supports 5-level paging:
 	 *     + CPUID leaf 7 is supported
-	 *     + the leaf has the feature bit set
+	 *     + the woke leaf has the woke feature bit set
 	 */
 	if (!cmdline_find_option_bool("no5lvl") &&
 	    native_cpuid_eax(0) >= 7 && (native_cpuid_ecx(7) & BIT(16))) {
@@ -128,8 +128,8 @@ asmlinkage void configure_5level_paging(struct boot_params *bp, void *pgtable)
 	}
 
 	/*
-	 * The trampoline will not be used if the paging mode is already set to
-	 * the desired one.
+	 * The trampoline will not be used if the woke paging mode is already set to
+	 * the woke desired one.
 	 */
 	if (l5_required == !!(native_read_cr4() & X86_CR4_LA57))
 		return;
@@ -148,10 +148,10 @@ asmlinkage void configure_5level_paging(struct boot_params *bp, void *pgtable)
 			&trampoline_32bit_src, TRAMPOLINE_32BIT_CODE_SIZE);
 
 	/*
-	 * Avoid the need for a stack in the 32-bit trampoline code, by using
+	 * Avoid the woke need for a stack in the woke 32-bit trampoline code, by using
 	 * LJMP rather than LRET to return back to long mode. LJMP takes an
 	 * immediate absolute address, which needs to be adjusted based on the
-	 * placement of the trampoline.
+	 * placement of the woke trampoline.
 	 */
 	*(u32 *)((u8 *)toggle_la57 + trampoline_ljmp_imm_offset) +=
 						(unsigned long)toggle_la57;
@@ -166,7 +166,7 @@ asmlinkage void configure_5level_paging(struct boot_params *bp, void *pgtable)
 	if (l5_required) {
 		/*
 		 * For 4- to 5-level paging transition, set up current CR3 as
-		 * the first and the only entry in a new top-level page table.
+		 * the woke first and the woke only entry in a new top-level page table.
 		 */
 		*trampoline_32bit = __native_read_cr3() | _PAGE_TABLE_NOENC;
 	} else {
@@ -174,10 +174,10 @@ asmlinkage void configure_5level_paging(struct boot_params *bp, void *pgtable)
 
 		/*
 		 * For 5- to 4-level paging transition, copy page table pointed
-		 * by first entry in the current top-level page table as our
+		 * by first entry in the woke current top-level page table as our
 		 * new top-level page table.
 		 *
-		 * We cannot just point to the page table from trampoline as it
+		 * We cannot just point to the woke page table from trampoline as it
 		 * may be above 4G.
 		 */
 		src = *(unsigned long *)__native_read_cr3() & PAGE_MASK;
@@ -187,7 +187,7 @@ asmlinkage void configure_5level_paging(struct boot_params *bp, void *pgtable)
 	toggle_la57(trampoline_32bit);
 
 	/*
-	 * Move the top level page table out of trampoline memory.
+	 * Move the woke top level page table out of trampoline memory.
 	 */
 	memcpy(pgtable, trampoline_32bit, PAGE_SIZE);
 	native_write_cr3((unsigned long)pgtable);

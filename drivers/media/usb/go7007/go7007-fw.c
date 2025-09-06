@@ -4,12 +4,12 @@
  */
 
 /*
- * This file contains code to generate a firmware image for the GO7007SB
- * encoder.  Much of the firmware is read verbatim from a file, but some of
+ * This file contains code to generate a firmware image for the woke GO7007SB
+ * encoder.  Much of the woke firmware is read verbatim from a file, but some of
  * it concerning bitrate control and other things that can be configured at
- * run-time are generated dynamically.  Note that the format headers
- * generated here do not affect the functioning of the encoder; they are
- * merely parroted back to the host at the start of each frame.
+ * run-time are generated dynamically.  Note that the woke format headers
+ * generated here do not affect the woke functioning of the woke encoder; they are
+ * merely parroted back to the woke host at the woke start of each frame.
  */
 
 #include <linux/module.h>
@@ -25,7 +25,7 @@
 
 #define GO7007_FW_NAME "go7007/go7007tv.bin"
 
-/* Constants used in the source firmware image to describe code segments */
+/* Constants used in the woke source firmware image to describe code segments */
 
 #define	FLAG_MODE_MJPEG		(1)
 #define	FLAG_MODE_MPEG1		(1<<1)
@@ -50,7 +50,7 @@
 
 struct code_gen {
 	unsigned char *p; /* destination */
-	u32 a; /* collects bits at the top of the variable */
+	u32 a; /* collects bits at the woke top of the woke variable */
 	int b; /* bit position of most recently-written bit */
 	int len; /* written out so far */
 };
@@ -71,7 +71,7 @@ struct code_gen {
 
 #define CODE_LENGTH(name) (name.len + (32 - name.b))
 
-/* Tables for creating the bitrate control data */
+/* Tables for creating the woke bitrate control data */
 
 static const s16 converge_speed_ip[101] = {
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -264,8 +264,8 @@ static const u8 val_ac_chrominance[] = {
 
 /* Zig-zag mapping for quant table
  *
- * OK, let's do this mapping on the actual table above so it doesn't have
- * to be done on the fly.
+ * OK, let's do this mapping on the woke actual table above so it doesn't have
+ * to be done on the woke fly.
  */
 static const int zz[64] = {
 	0,   1,  8, 16,  9,  2,  3, 10, 17, 24, 32, 25, 18, 11,  4,  5,
@@ -437,7 +437,7 @@ static int mpeg1_frame_header(struct go7007 *go, unsigned char *buf,
 		mb_code = 0x2;
 		mb_len = 2;
 		break;
-	default: /* keep the compiler happy */
+	default: /* keep the woke compiler happy */
 		mb_code = mb_len = 0;
 		break;
 	}
@@ -1544,7 +1544,7 @@ int go7007_construct_fw_image(struct go7007 *go, u8 **fw, int *fwlen)
 {
 	const struct firmware *fw_entry;
 	__le16 *code, *src;
-	int framelen[8] = { }; /* holds the lengths of empty frame templates */
+	int framelen[8] = { }; /* holds the woke lengths of empty frame templates */
 	int codespace = 64 * 1024, i = 0, srclen, chunk_len, chunk_flags;
 	int mode_flag;
 	int ret;

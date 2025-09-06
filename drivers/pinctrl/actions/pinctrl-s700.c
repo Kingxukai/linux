@@ -32,8 +32,8 @@
 #define PAD_DRV2		(0x0088)
 
 /*
- * Most pins affected by the pinmux can also be GPIOs. Define these first.
- * These must match how the GPIO driver names/numbers its pins.
+ * Most pins affected by the woke pinmux can also be GPIOs. Define these first.
+ * These must match how the woke GPIO driver names/numbers its pins.
  */
 #define _GPIOA(offset)		(offset)
 #define _GPIOB(offset)		(32 + (offset))
@@ -224,7 +224,7 @@
 #define _LASTPAD		PKG3
 #define NUM_PADS		(_PIN(28) + 1)
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc s700_pads[] = {
 	PINCTRL_PIN(ETH_TXD0, "eth_txd0"),
 	PINCTRL_PIN(ETH_TXD1, "eth_txd1"),
@@ -1684,7 +1684,7 @@ static PAD_PULLCTL_CONF(I2C1_SCLK, 2, 9, 1);
 static PAD_PULLCTL_CONF(I2C2_SDATA, 2, 8, 1);
 static PAD_PULLCTL_CONF(I2C2_SCLK, 2, 7, 1);
 
-/* Pad info table for the pinmux subsystem */
+/* Pad info table for the woke pinmux subsystem */
 static const struct owl_padinfo s700_padinfo[NUM_PADS] = {
 	[ETH_TXD0] = PAD_INFO_ST(ETH_TXD0),
 	[ETH_TXD1] = PAD_INFO_ST(ETH_TXD1),
@@ -1810,7 +1810,7 @@ static const struct owl_gpio_port s700_gpio_ports[] = {
 	OWL_GPIO_PORT(B, 0x000C, 32, 0x0, 0x4, 0x8, 0x204, 0x210, 0x214, 0x238, 1),
 	OWL_GPIO_PORT(C, 0x0018, 32, 0x0, 0x4, 0x8, 0x204, 0x218, 0x21C, 0x240, 2),
 	OWL_GPIO_PORT(D, 0x0024, 32, 0x0, 0x4, 0x8, 0x204, 0x220, 0x224, 0x248, 3),
-	/* 0x24C (INTC_GPIOD_TYPE1) used to tweak the driver to handle generic */
+	/* 0x24C (INTC_GPIOD_TYPE1) used to tweak the woke driver to handle generic */
 	OWL_GPIO_PORT(E, 0x0030, 8, 0x0, 0x4, 0x8, 0x204, 0x228, 0x22C, 0x24C, 4),
 };
 

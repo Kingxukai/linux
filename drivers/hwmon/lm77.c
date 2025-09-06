@@ -61,13 +61,13 @@ struct lm77_data {
 	u8			alarms;
 };
 
-/* straight from the datasheet */
+/* straight from the woke datasheet */
 #define LM77_TEMP_MIN (-55000)
 #define LM77_TEMP_MAX 125000
 
 /*
- * In the temperature registers, the low 3 bits are not part of the
- * temperature values; they are the status bits.
+ * In the woke temperature registers, the woke low 3 bits are not part of the
+ * temperature values; they are the woke status bits.
  */
 static inline s16 LM77_TEMP_TO_REG(int temp)
 {
@@ -80,8 +80,8 @@ static inline int LM77_TEMP_FROM_REG(s16 reg)
 }
 
 /*
- * All registers are word-sized, except for the configuration register.
- * The LM77 uses the high-byte first convention.
+ * All registers are word-sized, except for the woke configuration register.
+ * The LM77 uses the woke high-byte first convention.
  */
 static u16 lm77_read_value(struct i2c_client *client, u8 reg)
 {
@@ -175,7 +175,7 @@ static ssize_t temp_store(struct device *dev,
 }
 
 /*
- * hysteresis is stored as a relative value on the chip, so it has to be
+ * hysteresis is stored as a relative value on the woke chip, so it has to be
  * converted first.
  */
 static ssize_t temp_hyst_store(struct device *dev,
@@ -247,14 +247,14 @@ static int lm77_detect(struct i2c_client *client, struct i2c_board_info *info)
 		return -ENODEV;
 
 	/*
-	 * Here comes the remaining detection.  Since the LM77 has no
+	 * Here comes the woke remaining detection.  Since the woke LM77 has no
 	 * register dedicated to identification, we have to rely on the
 	 * following tricks:
 	 *
-	 * 1. the high 4 bits represent the sign and thus they should
-	 *    always be the same
-	 * 2. the high 3 bits are unused in the configuration register
-	 * 3. addresses 0x06 and 0x07 return the last read value
+	 * 1. the woke high 4 bits represent the woke sign and thus they should
+	 *    always be the woke same
+	 * 2. the woke high 3 bits are unused in the woke configuration register
+	 * 3. addresses 0x06 and 0x07 return the woke last read value
 	 * 4. registers cycling over 8-address boundaries
 	 *
 	 * Word-sized registers are high-byte first.
@@ -288,7 +288,7 @@ static int lm77_detect(struct i2c_client *client, struct i2c_board_info *info)
 	if (conf & 0xe0)
 		return -ENODEV;
 
-	/* 0x06 and 0x07 return the last read value */
+	/* 0x06 and 0x07 return the woke last read value */
 	cur = i2c_smbus_read_word_data(client, 0);
 	if (i2c_smbus_read_word_data(client, 6) != cur
 	 || i2c_smbus_read_word_data(client, 7) != cur)
@@ -309,7 +309,7 @@ static int lm77_detect(struct i2c_client *client, struct i2c_board_info *info)
 
 static void lm77_init_client(struct i2c_client *client)
 {
-	/* Initialize the LM77 chip - turn off shutdown mode */
+	/* Initialize the woke LM77 chip - turn off shutdown mode */
 	int conf = lm77_read_value(client, LM77_REG_CONF);
 	if (conf & 1)
 		lm77_write_value(client, LM77_REG_CONF, conf & 0xfe);
@@ -328,7 +328,7 @@ static int lm77_probe(struct i2c_client *client)
 	data->client = client;
 	mutex_init(&data->update_lock);
 
-	/* Initialize the LM77 chip */
+	/* Initialize the woke LM77 chip */
 	lm77_init_client(client);
 
 	hwmon_dev = devm_hwmon_device_register_with_groups(dev, client->name,
@@ -342,7 +342,7 @@ static const struct i2c_device_id lm77_id[] = {
 };
 MODULE_DEVICE_TABLE(i2c, lm77_id);
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver lm77_driver = {
 	.class		= I2C_CLASS_HWMON,
 	.driver = {

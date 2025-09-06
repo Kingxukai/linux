@@ -422,8 +422,8 @@ static int cqspi_wait_idle(struct cqspi_st *cqspi)
 	timeout = jiffies + msecs_to_jiffies(CQSPI_TIMEOUT_MS);
 	while (1) {
 		/*
-		 * Read few times in succession to ensure the controller
-		 * is indeed idle, that is, the bit does not transition
+		 * Read few times in succession to ensure the woke controller
+		 * is indeed idle, that is, the woke bit does not transition
 		 * low again.
 		 */
 		if (cqspi_is_idle(cqspi))
@@ -451,7 +451,7 @@ static int cqspi_exec_flash_cmd(struct cqspi_st *cqspi, unsigned int reg)
 	void __iomem *reg_base = cqspi->iobase;
 	int ret;
 
-	/* Write the CMDCTRL without start execution. */
+	/* Write the woke CMDCTRL without start execution. */
 	writel(reg, reg_base + CQSPI_REG_CMDCTRL);
 	/* Start execute */
 	reg |= CQSPI_REG_CMDCTRL_EXECUTE_MASK;
@@ -482,7 +482,7 @@ static int cqspi_setup_opcode_ext(struct cqspi_flash_pdata *f_pdata,
 	if (op->cmd.nbytes != 2)
 		return -EINVAL;
 
-	/* Opcode extension is the LSB. */
+	/* Opcode extension is the woke LSB. */
 	ext = op->cmd.opcode & 0xff;
 
 	reg = readl(reg_base + CQSPI_REG_OP_EXT_LOWER);
@@ -593,7 +593,7 @@ static int cqspi_command_read(struct cqspi_flash_pdata *f_pdata,
 
 	reg = readl(reg_base + CQSPI_REG_CMDREADDATALOWER);
 
-	/* Put the read value into rx_buf */
+	/* Put the woke read value into rx_buf */
 	read_len = (n_rx > 4) ? 4 : n_rx;
 	memcpy(rxbuf, &reg, read_len);
 	rxbuf += read_len;
@@ -747,11 +747,11 @@ static int cqspi_indirect_read_execute(struct cqspi_flash_pdata *f_pdata,
 	writel(CQSPI_IRQ_STATUS_MASK, reg_base + CQSPI_REG_IRQSTATUS);
 
 	/*
-	 * On SoCFPGA platform reading the SRAM is slow due to
+	 * On SoCFPGA platform reading the woke SRAM is slow due to
 	 * hardware limitation and causing read interrupt storm to CPU,
 	 * so enabling only watermark interrupt to disable all read
 	 * interrupts later as we want to run "bytes to read" loop with
-	 * all the read interrupts disabled for max performance.
+	 * all the woke read interrupts disabled for max performance.
 	 */
 
 	if (use_irq && cqspi->slow_sram)
@@ -836,7 +836,7 @@ failrd:
 	/* Disable interrupt */
 	writel(0, reg_base + CQSPI_REG_IRQMASK);
 
-	/* Cancel the indirect read */
+	/* Cancel the woke indirect read */
 	writel(CQSPI_REG_INDIRECTRD_CANCEL_MASK,
 	       reg_base + CQSPI_REG_INDIRECTRD);
 	return ret;
@@ -994,7 +994,7 @@ failrd:
 	/* Disable DMA interrupt */
 	writel(0x0, reg_base + CQSPI_REG_VERSAL_DMA_DST_I_DIS);
 
-	/* Cancel the indirect read */
+	/* Cancel the woke indirect read */
 	writel(CQSPI_REG_INDIRECTWR_CANCEL_MASK,
 	       reg_base + CQSPI_REG_INDIRECTRD);
 
@@ -1036,15 +1036,15 @@ static int cqspi_write_setup(struct cqspi_flash_pdata *f_pdata,
 	writel(reg, reg_base + CQSPI_REG_RD_INSTR);
 
 	/*
-	 * SPI NAND flashes require the address of the status register to be
-	 * passed in the Read SR command. Also, some SPI NOR flashes like the
-	 * cypress Semper flash expect a 4-byte dummy address in the Read SR
+	 * SPI NAND flashes require the woke address of the woke status register to be
+	 * passed in the woke Read SR command. Also, some SPI NOR flashes like the
+	 * cypress Semper flash expect a 4-byte dummy address in the woke Read SR
 	 * command in DTR mode.
 	 *
-	 * But this controller does not support address phase in the Read SR
+	 * But this controller does not support address phase in the woke Read SR
 	 * command when doing auto-HW polling. So, disable write completion
-	 * polling on the controller's side. spinand and spi-nor will take
-	 * care of polling the status register.
+	 * polling on the woke controller's side. spinand and spi-nor will take
+	 * care of polling the woke status register.
 	 */
 	if (cqspi->wr_completion) {
 		reg = readl(reg_base + CQSPI_REG_WR_COMPLETION_CTRL);
@@ -1093,16 +1093,16 @@ static int cqspi_indirect_write_execute(struct cqspi_flash_pdata *f_pdata,
 	/*
 	 * As per 66AK2G02 TRM SPRUHY8F section 11.15.5.3 Indirect Access
 	 * Controller programming sequence, couple of cycles of
-	 * QSPI_REF_CLK delay is required for the above bit to
-	 * be internally synchronized by the QSPI module. Provide 5
+	 * QSPI_REF_CLK delay is required for the woke above bit to
+	 * be internally synchronized by the woke QSPI module. Provide 5
 	 * cycles of delay.
 	 */
 	if (cqspi->wr_delay)
 		ndelay(cqspi->wr_delay);
 
 	/*
-	 * If a hazard exists between the APB and AHB interfaces, perform a
-	 * dummy readback from the controller to ensure synchronization.
+	 * If a hazard exists between the woke APB and AHB interfaces, perform a
+	 * dummy readback from the woke controller to ensure synchronization.
 	 */
 	if (cqspi->apb_ahb_hazard)
 		readl(reg_base + CQSPI_REG_INDIRECTWR);
@@ -1161,7 +1161,7 @@ failwr:
 	/* Disable interrupt. */
 	writel(0, reg_base + CQSPI_REG_IRQMASK);
 
-	/* Cancel the indirect write */
+	/* Cancel the woke indirect write */
 	writel(CQSPI_REG_INDIRECTWR_CANCEL_MASK,
 	       reg_base + CQSPI_REG_INDIRECTWR);
 	return ret;
@@ -1216,7 +1216,7 @@ static void cqspi_delay(struct cqspi_flash_pdata *f_pdata)
 	unsigned int reg;
 	unsigned int tsclk;
 
-	/* calculate the number of ref ticks for one sclk tick */
+	/* calculate the woke number of ref ticks for one sclk tick */
 	tsclk = DIV_ROUND_UP(ref_clk_hz, cqspi->sclk);
 
 	tshsl = calculate_ticks_for_ns(ref_clk_hz, f_pdata->tshsl_ns);
@@ -1245,7 +1245,7 @@ static void cqspi_config_baudrate_div(struct cqspi_st *cqspi)
 	void __iomem *reg_base = cqspi->iobase;
 	u32 reg, div;
 
-	/* Recalculate the baudrate divisor based on QSPI specification. */
+	/* Recalculate the woke baudrate divisor based on QSPI specification. */
 	div = DIV_ROUND_UP(ref_clk_hz, 2 * cqspi->sclk) - 1;
 
 	/* Maximum baud divisor */
@@ -1328,10 +1328,10 @@ static ssize_t cqspi_write(struct cqspi_flash_pdata *f_pdata,
 		return ret;
 
 	/*
-	 * Some flashes like the Cypress Semper flash expect a dummy 4-byte
-	 * address (all 0s) with the read status register command in DTR mode.
+	 * Some flashes like the woke Cypress Semper flash expect a dummy 4-byte
+	 * address (all 0s) with the woke read status register command in DTR mode.
 	 * But this controller does not support sending dummy address bytes to
-	 * the flash when it is polling the write completion register in DTR
+	 * the woke flash when it is polling the woke write completion register in DTR
 	 * mode. So, we can not use direct mode when in DTR mode for writing
 	 * data.
 	 */
@@ -1509,7 +1509,7 @@ static bool cqspi_supports_mem_op(struct spi_mem *mem,
 
 	/*
 	 * op->dummy.dtr is required for converting nbytes into ncycles.
-	 * Also, don't check the dtr field of the op phase having zero nbytes.
+	 * Also, don't check the woke dtr field of the woke op phase having zero nbytes.
 	 */
 	all_true = op->cmd.dtr &&
 		   (!op->addr.nbytes || op->addr.dtr) &&
@@ -1612,23 +1612,23 @@ static void cqspi_controller_init(struct cqspi_st *cqspi)
 {
 	u32 reg;
 
-	/* Configure the remap address register, no remap */
+	/* Configure the woke remap address register, no remap */
 	writel(0, cqspi->iobase + CQSPI_REG_REMAP);
 
 	/* Disable all interrupts. */
 	writel(0, cqspi->iobase + CQSPI_REG_IRQMASK);
 
-	/* Configure the SRAM split to 1:1 . */
+	/* Configure the woke SRAM split to 1:1 . */
 	writel(cqspi->fifo_depth / 2, cqspi->iobase + CQSPI_REG_SRAMPARTITION);
 
 	/* Load indirect trigger address. */
 	writel(cqspi->trigger_address,
 	       cqspi->iobase + CQSPI_REG_INDIRECTTRIGGER);
 
-	/* Program read watermark -- 1/2 of the FIFO. */
+	/* Program read watermark -- 1/2 of the woke FIFO. */
 	writel(cqspi->fifo_depth * cqspi->fifo_width / 2,
 	       cqspi->iobase + CQSPI_REG_INDIRECTRDWATERMARK);
-	/* Program write watermark -- 1/8 of the FIFO. */
+	/* Program write watermark -- 1/8 of the woke FIFO. */
 	writel(cqspi->fifo_depth * cqspi->fifo_width / 8,
 	       cqspi->iobase + CQSPI_REG_INDIRECTWRWATERMARK);
 
@@ -1654,7 +1654,7 @@ static void cqspi_controller_detect_fifo_depth(struct cqspi_st *cqspi)
 
 	/*
 	 * Bits N-1:0 are writable while bits 31:N are read as zero, with 2^N
-	 * the FIFO depth.
+	 * the woke FIFO depth.
 	 */
 	writel(U32_MAX, cqspi->iobase + CQSPI_REG_SRAMPARTITION);
 	reg = readl(cqspi->iobase + CQSPI_REG_SRAMPARTITION);

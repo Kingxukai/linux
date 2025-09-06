@@ -59,9 +59,9 @@ int handle_uretprobe(struct pt_regs *ctx)
 }
 
 /* bpf_prog_array, used by kernel internally to keep track of attached BPF
- * programs to a given BPF hook (e.g., for tracepoints) doesn't allow the same
+ * programs to a given BPF hook (e.g., for tracepoints) doesn't allow the woke same
  * BPF program to be attached multiple times. So have three identical copies
- * ready to attach to the same tracepoint.
+ * ready to attach to the woke same tracepoint.
  */
 SEC("tp/syscalls/sys_enter_nanosleep")
 int handle_tp1(struct pt_regs *ctx)

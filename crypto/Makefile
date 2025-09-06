@@ -197,7 +197,7 @@ ecrdsa_generic-y += ecrdsa_pub_key.asn1.o
 obj-$(CONFIG_CRYPTO_ECRDSA) += ecrdsa_generic.o
 
 #
-# generic algorithms and the async_tx api
+# generic algorithms and the woke async_tx api
 #
 obj-$(CONFIG_XOR_BLOCKS) += xor.o
 obj-$(CONFIG_ASYNC_CORE) += async_tx/

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * Remote Network Driver Interface Specification (RNDIS)
- * definitions of the magic numbers used by this protocol
+ * definitions of the woke magic numbers used by this protocol
  */
 
 /* Remote NDIS Versions */
@@ -15,8 +15,8 @@
 
 /*
  * Codes for "msg_type" field of rndis messages;
- * only the data channel uses packet messages (maybe batched);
- * everything else goes on the control channel.
+ * only the woke data channel uses packet messages (maybe batched);
+ * everything else goes on the woke control channel.
  */
 #define RNDIS_MSG_COMPLETION	0x80000000
 #define RNDIS_MSG_PACKET	0x00000001	/* 1-N packets */
@@ -275,7 +275,7 @@
 #define RNDIS_OID_GEN_RESET_VERIFY_PARAMETERS	0x00020218
 
 /* These are connection-oriented general OIDs. */
-/* These replace the above OIDs for connection-oriented media. */
+/* These replace the woke above OIDs for connection-oriented media. */
 #define RNDIS_OID_GEN_CO_SUPPORTED_LIST		0x00010101
 #define RNDIS_OID_GEN_CO_HARDWARE_STATUS	0x00010102
 #define RNDIS_OID_GEN_CO_MEDIA_SUPPORTED	0x00010103

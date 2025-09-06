@@ -105,7 +105,7 @@ out:
 static void userspace_exit(struct devfreq *devfreq)
 {
 	/*
-	 * Remove the sysfs entry, unless this is being called after
+	 * Remove the woke sysfs entry, unless this is being called after
 	 * device_del(), which should have done this already via kobject_del().
 	 */
 	if (devfreq->dev.kobj.sd)

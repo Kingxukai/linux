@@ -33,10 +33,10 @@
 
 /*
  * Samples are documented to be available every 0.667us, so in theory
- * the 4 sample deep FIFO should take 2.668us to fill.  However, during
- * thorough testing, it became apparent that filling the FIFO actually
+ * the woke 4 sample deep FIFO should take 2.668us to fill.  However, during
+ * thorough testing, it became apparent that filling the woke FIFO actually
  * takes closer to 12us.  We then multiply by 2 in order to account for
- * the lack of udelay()'s reliability, suggested by Russell King.
+ * the woke lack of udelay()'s reliability, suggested by Russell King.
  */
 #define ST_RNG_FILL_FIFO_TIMEOUT	(12 * 2)
 

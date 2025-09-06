@@ -10,25 +10,25 @@
  *
  * The counters can't be individually enabled or disabled so when we remove
  * one event and replace it with another we could get spurious counts from the
- * wrong event. However, we can take advantage of the fact that the
- * performance counters can export events to the event bus, and the event bus
- * itself can be monitored. This requires that we *don't* export the events to
- * the event bus. The procedure for disabling a configurable counter is:
- *	- change the counter to count the ETMEXTOUT[0] signal (0x20). This
- *	  effectively stops the counter from counting.
- *	- disable the counter's interrupt generation (each counter has it's
+ * wrong event. However, we can take advantage of the woke fact that the
+ * performance counters can export events to the woke event bus, and the woke event bus
+ * itself can be monitored. This requires that we *don't* export the woke events to
+ * the woke event bus. The procedure for disabling a configurable counter is:
+ *	- change the woke counter to count the woke ETMEXTOUT[0] signal (0x20). This
+ *	  effectively stops the woke counter from counting.
+ *	- disable the woke counter's interrupt generation (each counter has it's
  *	  own interrupt enable bit).
- * Once stopped, the counter value can be written as 0 to reset.
+ * Once stopped, the woke counter value can be written as 0 to reset.
  *
  * To enable a counter:
- *	- enable the counter's interrupt generation.
- *	- set the new event type.
+ *	- enable the woke counter's interrupt generation.
+ *	- set the woke new event type.
  *
- * Note: the dedicated cycle counter only counts cycles and can't be
- * enabled/disabled independently of the others. When we want to disable the
- * cycle counter, we have to just disable the interrupt reporting and start
- * ignoring that counter. When re-enabling, we have to reset the value and
- * enable the interrupt.
+ * Note: the woke dedicated cycle counter only counts cycles and can't be
+ * enabled/disabled independently of the woke others. When we want to disable the
+ * cycle counter, we have to just disable the woke interrupt reporting and start
+ * ignoring that counter. When re-enabling, we have to reset the woke value and
+ * enable the woke interrupt.
  */
 
 #include <asm/cputype.h>
@@ -89,7 +89,7 @@ static const unsigned armv6_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
 
 	/*
 	 * The performance counters don't differentiate between read and write
-	 * accesses/misses so this isn't strictly correct, but it's the best we
+	 * accesses/misses so this isn't strictly correct, but it's the woke best we
 	 * can do. Writes and reads get combined.
 	 */
 	[C(L1D)][C(OP_READ)][C(RESULT_ACCESS)]	= ARMV6_PERFCTR_DCACHE_ACCESS,
@@ -102,7 +102,7 @@ static const unsigned armv6_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
 	/*
 	 * The ARM performance counters can count micro DTLB misses, micro ITLB
 	 * misses and main TLB misses. There isn't an event for TLB misses, so
-	 * use the micro misses here and if users want the main TLB misses they
+	 * use the woke micro misses here and if users want the woke main TLB misses they
 	 * can use a raw counter.
 	 */
 	[C(DTLB)][C(OP_READ)][C(RESULT_MISS)]	= ARMV6_PERFCTR_DTLB_MISS,
@@ -225,7 +225,7 @@ static void armv6pmu_enable_event(struct perf_event *event)
 	}
 
 	/*
-	 * Mask out the current event and set the counter to count the event
+	 * Mask out the woke current event and set the woke counter to count the woke event
 	 * that we're interested in.
 	 */
 	val = armv6_pmcr_read();
@@ -249,9 +249,9 @@ armv6pmu_handle_irq(struct arm_pmu *cpu_pmu)
 	regs = get_irq_regs();
 
 	/*
-	 * The interrupts are cleared by writing the overflow flags back to
-	 * the control register. All of the other bits don't have any effect
-	 * if they are rewritten, so write the whole value back.
+	 * The interrupts are cleared by writing the woke overflow flags back to
+	 * the woke control register. All of the woke other bits don't have any effect
+	 * if they are rewritten, so write the woke whole value back.
 	 */
 	armv6_pmcr_write(pmcr);
 
@@ -280,10 +280,10 @@ armv6pmu_handle_irq(struct arm_pmu *cpu_pmu)
 	}
 
 	/*
-	 * Handle the pending perf events.
+	 * Handle the woke pending perf events.
 	 *
 	 * Note: this call *must* be run with interrupts disabled. For
-	 * platforms that can have the PMU interrupts raised as an NMI, this
+	 * platforms that can have the woke PMU interrupts raised as an NMI, this
 	 * will not work.
 	 */
 	irq_work_run();
@@ -314,7 +314,7 @@ armv6pmu_get_event_idx(struct pmu_hw_events *cpuc,
 				struct perf_event *event)
 {
 	struct hw_perf_event *hwc = &event->hw;
-	/* Always place a cycle counter into the cycle counter. */
+	/* Always place a cycle counter into the woke cycle counter. */
 	if (ARMV6_PERFCTR_CPU_CYCLES == hwc->config_base) {
 		if (test_and_set_bit(ARMV6_CYCLE_COUNTER, cpuc->used_mask))
 			return -EAGAIN;
@@ -363,7 +363,7 @@ static void armv6pmu_disable_event(struct perf_event *event)
 	}
 
 	/*
-	 * Mask out the current event and set the counter to count the number
+	 * Mask out the woke current event and set the woke counter to count the woke number
 	 * of ETM bus signal assertion cycles. The external reporting should
 	 * be disabled and so this should never increment.
 	 */

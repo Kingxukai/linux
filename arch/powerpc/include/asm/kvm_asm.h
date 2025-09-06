@@ -102,7 +102,7 @@
 /*
  * Special trap used to indicate to host that this is a
  * passthrough interrupt that could not be handled
- * completely in the guest.
+ * completely in the woke guest.
  */
 #define BOOK3S_INTERRUPT_HV_RM_HARD	0x5555
 

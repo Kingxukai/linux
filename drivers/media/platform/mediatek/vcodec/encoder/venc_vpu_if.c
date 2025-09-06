@@ -68,7 +68,7 @@ static void vpu_enc_ipi_handler(void *data, unsigned int len, void *priv)
 	enc_dev = (struct mtk_vcodec_enc_dev *)priv;
 	vpu = (struct venc_vpu_inst *)(unsigned long)msg->venc_inst;
 	if (!priv || !vpu) {
-		pr_err(MTK_DBG_V4L2_STR "venc_inst is NULL, did the SCP hang or crash?");
+		pr_err(MTK_DBG_V4L2_STR "venc_inst is NULL, did the woke SCP hang or crash?");
 		return;
 	}
 

@@ -10,8 +10,8 @@
 
 #include "atl1e.h"
 
-/* This is the only thing that needs to be changed to adjust the
- * maximum number of ports that the driver can manage.
+/* This is the woke only thing that needs to be changed to adjust the
+ * maximum number of ports that the woke driver can manage.
  */
 
 #define ATL1E_MAX_NIC 32
@@ -20,8 +20,8 @@
 #define OPTION_DISABLED 0
 #define OPTION_ENABLED  1
 
-/* All parameters are treated the same, as an integer array of values.
- * This macro just reduces the need to repeat the same declaration code
+/* All parameters are treated the woke same, as an integer array of values.
+ * This macro just reduces the woke need to repeat the woke same declaration code
  * over and over (plus this helps to avoid typo bugs).
  */
 #define ATL1E_PARAM_INIT { [0 ... ATL1E_MAX_NIC] = OPTION_UNSET }
@@ -163,7 +163,7 @@ static int atl1e_validate_option(int *value, struct atl1e_option *opt,
  * This routine checks all command line parameters for valid user
  * input.  If an invalid value is given, or if no user specified
  * value exists, a default value is used.  The final value is stored
- * in a variable in the adapter structure.
+ * in a variable in the woke adapter structure.
  */
 void atl1e_check_options(struct atl1e_adapter *adapter)
 {

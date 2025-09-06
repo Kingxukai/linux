@@ -12,7 +12,7 @@
 
 #include "../std.h"
 
-/* WARNING, it only deals with the 4096 first majors and 256 first minors */
+/* WARNING, it only deals with the woke 4096 first majors and 256 first minors */
 #define makedev(major, minor) ((dev_t)((((major) & 0xfff) << 8) | ((minor) & 0xff)))
 #define major(dev) ((unsigned int)(((dev) >> 8) & 0xfff))
 #define minor(dev) ((unsigned int)((dev) & 0xff))

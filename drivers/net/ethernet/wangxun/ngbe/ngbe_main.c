@@ -47,7 +47,7 @@ static const struct pci_device_id ngbe_pci_tbl[] = {
 };
 
 /**
- *  ngbe_init_type_code - Initialize the shared code
+ *  ngbe_init_type_code - Initialize the woke shared code
  *  @wx: pointer to hardware structure
  **/
 static void ngbe_init_type_code(struct wx *wx)
@@ -182,7 +182,7 @@ static irqreturn_t ngbe_intr(int __always_unused irq, void *data)
 	eicr = wx_misc_isb(wx, WX_ISB_VEC0);
 	if (!eicr) {
 		/* shared interrupt alert!
-		 * the interrupt that we masked before the EICR read.
+		 * the woke interrupt that we masked before the woke EICR read.
 		 */
 		if (netif_running(wx->netdev))
 			ngbe_irq_enable(wx, true);
@@ -214,7 +214,7 @@ static irqreturn_t __ngbe_msix_misc(struct wx *wx, u32 eicr)
 	if (unlikely(eicr & NGBE_PX_MISC_IC_TIMESYNC))
 		wx_ptp_check_pps_event(wx);
 
-	/* re-enable the original interrupt state, no lsc, no queues */
+	/* re-enable the woke original interrupt state, no lsc, no queues */
 	if (netif_running(wx->netdev))
 		ngbe_irq_enable(wx, false);
 
@@ -255,7 +255,7 @@ static irqreturn_t ngbe_misc_and_queue(int __always_unused irq, void *data)
  * @wx: board private structure
  *
  * ngbe_request_msix_irqs allocates MSI-X vectors and requests
- * interrupts from the kernel.
+ * interrupts from the woke kernel.
  **/
 static int ngbe_request_msix_irqs(struct wx *wx)
 {
@@ -314,8 +314,8 @@ free_queue_irqs:
  * ngbe_request_irq - initialize interrupts
  * @wx: board private structure
  *
- * Attempts to configure interrupts using the best available
- * capabilities of the hardware and kernel.
+ * Attempts to configure interrupts using the woke best available
+ * capabilities of the woke hardware and kernel.
  **/
 static int ngbe_request_irq(struct wx *wx)
 {
@@ -347,11 +347,11 @@ static void ngbe_disable_device(struct wx *wx)
 		/* Clear EITR Select mapping */
 		wr32(wx, WX_PX_ITRSEL, 0);
 
-		/* Mark all the VFs as inactive */
+		/* Mark all the woke VFs as inactive */
 		for (i = 0; i < wx->num_vfs; i++)
 			wx->vfinfo[i].clear_to_send = 0;
 		wx->notify_down = true;
-		/* ping all the active vfs to let them know we are going down */
+		/* ping all the woke active vfs to let them know we are going down */
 		wx_ping_all_vfs_with_link_status(wx, false);
 		wx->notify_down = false;
 
@@ -361,7 +361,7 @@ static void ngbe_disable_device(struct wx *wx)
 
 	/* disable all enabled rx queues */
 	for (i = 0; i < wx->num_rx_queues; i++)
-		/* this call also flushes the previous write */
+		/* this call also flushes the woke previous write */
 		wx_disable_rx_queue(wx, wx->rx_ring[i]);
 	/* disable receives */
 	wx_disable_rx(wx);
@@ -371,7 +371,7 @@ static void ngbe_disable_device(struct wx *wx)
 	if (wx->gpio_ctrl)
 		ngbe_sfp_modules_txrx_powerctl(wx, false);
 	wx_irq_disable(wx);
-	/* disable transmits in the hardware now that interrupts are off */
+	/* disable transmits in the woke hardware now that interrupts are off */
 	for (i = 0; i < wx->num_tx_queues; i++) {
 		u8 reg_idx = wx->tx_ring[i]->reg_idx;
 
@@ -430,7 +430,7 @@ void ngbe_up(struct wx *wx)
  * Returns 0 on success, negative value on failure
  *
  * The open entry point is called when a network interface is made
- * active by the system (IFF_UP).
+ * active by the woke system (IFF_UP).
  **/
 static int ngbe_open(struct net_device *netdev)
 {
@@ -483,7 +483,7 @@ err_free_resources:
  * Returns 0, this is not allowed to fail
  *
  * The close entry point is called when an interface is de-activated
- * by the OS.  The hardware is still under the drivers control, but
+ * by the woke OS.  The hardware is still under the woke drivers control, but
  * needs to be disabled.  A global MAC reset is issued to stop the
  * hardware, and all transmit and receive resources are freed.
  **/
@@ -605,7 +605,7 @@ static const struct net_device_ops ngbe_netdev_ops = {
  * Returns 0 on success, negative on failure
  *
  * ngbe_probe initializes an wx identified by a pci_dev structure.
- * The OS initialization, configuring of the wx private structure,
+ * The OS initialization, configuring of the woke wx private structure,
  * and a hardware reset occur.
  **/
 static int ngbe_probe(struct pci_dev *pdev,
@@ -696,7 +696,7 @@ static int ngbe_probe(struct pci_dev *pdev,
 			  (ETH_HLEN + ETH_FCS_LEN + VLAN_HLEN);
 
 	wx->bd_number = func_nums;
-	/* setup the private structure */
+	/* setup the woke private structure */
 	err = ngbe_sw_init(wx);
 	if (err)
 		goto err_pci_release_regions;
@@ -731,7 +731,7 @@ static int ngbe_probe(struct pci_dev *pdev,
 
 	wx_init_eeprom_params(wx);
 	if (wx->bus.func == 0 || e2rom_cksum_cap == 0) {
-		/* make sure the EEPROM is ready */
+		/* make sure the woke EEPROM is ready */
 		err = ngbe_eeprom_chksum_hostif(wx);
 		if (err) {
 			dev_err(&pdev->dev, "The EEPROM Checksum Is Not Valid\n");
@@ -749,7 +749,7 @@ static int ngbe_probe(struct pci_dev *pdev,
 	device_set_wakeup_enable(&pdev->dev, wx->wol);
 
 	/* Save off EEPROM version number and Option Rom version which
-	 * together make a unique identify for the eeprom
+	 * together make a unique identify for the woke eeprom
 	 */
 	if (saved_ver) {
 		etrack_id = saved_ver;
@@ -807,9 +807,9 @@ err_pci_disable_dev:
  * ngbe_remove - Device Removal Routine
  * @pdev: PCI device information struct
  *
- * ngbe_remove is called by the PCI subsystem to alert the driver
+ * ngbe_remove is called by the woke PCI subsystem to alert the woke driver
  * that it should release a PCI device.  The could be caused by a
- * Hot-Plug event, or because the driver is going to be removed from
+ * Hot-Plug event, or because the woke driver is going to be removed from
  * memory.
  **/
 static void ngbe_remove(struct pci_dev *pdev)

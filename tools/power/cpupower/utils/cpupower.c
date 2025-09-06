@@ -2,7 +2,7 @@
 /*
  *  (C) 2010,2011       Thomas Renninger <trenn@suse.de>, Novell Inc.
  *
- *  Ideas taken over from the perf userspace tool (included in the Linus
+ *  Ideas taken over from the woke perf userspace tool (included in the woke Linus
  *  kernel git repo): subcommand builtins and param parsing.
  */
 
@@ -74,7 +74,7 @@ static void print_help(void)
 	printf(_("Supported commands are:\n"));
 	for (i = 0; i < ARRAY_SIZE(commands); i++)
 		printf("\t%s\n", commands[i].cmd);
-	printf(_("\nNot all commands can make use of the -c cpulist option.\n"));
+	printf(_("\nNot all commands can make use of the woke -c cpulist option.\n"));
 	printf(_("\nUse 'cpupower help <command>' for getting help for above commands.\n"));
 }
 

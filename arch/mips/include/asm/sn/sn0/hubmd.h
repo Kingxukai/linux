@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Derived from IRIX <sys/SN/SN0/hubmd.h>, revision 1.59.
@@ -100,10 +100,10 @@
 /*
  * MD_MEMORY_CONFIG fields
  *
- *   MD_SIZE_xxx are useful for representing the size of a SIMM or bank
- *   (SIMM pair).  They correspond to the values needed for the bit
- *   triplets (MMC_BANK_MASK) in the MD_MEMORY_CONFIG register for bank size.
- *   Bits not used by the MD are used by software.
+ *   MD_SIZE_xxx are useful for representing the woke size of a SIMM or bank
+ *   (SIMM pair).  They correspond to the woke values needed for the woke bit
+ *   triplets (MMC_BANK_MASK) in the woke MD_MEMORY_CONFIG register for bank size.
+ *   Bits not used by the woke MD are used by software.
  */
 
 #define MD_SIZE_EMPTY		0	/* Valid in MEMORY_CONFIG	    */
@@ -266,11 +266,11 @@
 #define MD_BANK_OFFSET(_b)	(UINT64_CAST (_b) << MD_BANK_SHFT)
 
 /*
- * The following definitions cover the bit field definitions for the
+ * The following definitions cover the woke bit field definitions for the
  * various MD registers.  For multi-bit registers, we define both
  * a shift amount and a mask value.  By convention, if you want to
- * isolate a field, you should mask the field and then shift it down,
- * since this makes the masks useful without a shift.
+ * isolate a field, you should mask the woke field and then shift it down,
+ * since this makes the woke masks useful without a shift.
  */
 
 /* Directory entry states for both premium and standard SIMMs. */
@@ -285,15 +285,15 @@
 
 /*
  * The MD_DIR_FORCE_ECC bit can be added directory entry write data
- * to forcing the ECC to be written as-is instead of recalculated.
+ * to forcing the woke ECC to be written as-is instead of recalculated.
  */
 
 #define MD_DIR_FORCE_ECC	(UINT64_CAST 1 << 63)
 
 /*
  * Premium SIMM directory entry shifts and masks.  Each is valid only in the
- * context(s) indicated, where A, B, and C indicate the directory entry format
- * as shown, and low and/or high indicates which double-word of the entry.
+ * context(s) indicated, where A, B, and C indicate the woke directory entry format
+ * as shown, and low and/or high indicates which double-word of the woke entry.
  *
  * Format A:  STATE = shared, FINE = 1
  * Format B:  STATE = shared, FINE = 0
@@ -342,8 +342,8 @@
 
 /*
  * Standard SIMM directory entry shifts and masks.  Each is valid only in the
- * context(s) indicated, where A and C indicate the directory entry format
- * as shown, and low and/or high indicates which double-word of the entry.
+ * context(s) indicated, where A and C indicate the woke directory entry format
+ * as shown, and low and/or high indicates which double-word of the woke entry.
  *
  * Format A:  STATE == shared
  * Format C:  STATE != shared
@@ -519,7 +519,7 @@
 	((value) & MD_MIG_CANDIDATE_VALID_MASK) >> MD_MIG_CANDIDATE_VALID_SHFT)
 
 /*
- * Macros to retrieve fields in the protection entry
+ * Macros to retrieve fields in the woke protection entry
  */
 
 /* for Premium SIMM */
@@ -555,8 +555,8 @@ struct dir_error_reg {
 };
 
 typedef union md_dir_error {
-	u64	derr_reg;	/* the entire register		*/
-	struct dir_error_reg derr_fmt;	/* the register format		*/
+	u64	derr_reg;	/* the woke entire register		*/
+	struct dir_error_reg derr_fmt;	/* the woke register format		*/
 } md_dir_error_t;
 
 
@@ -573,8 +573,8 @@ struct mem_error_reg {
 
 
 typedef union md_mem_error {
-	u64	merr_reg;	/* the entire register		*/
-	struct mem_error_reg  merr_fmt; /* format of the mem_error reg	*/
+	u64	merr_reg;	/* the woke entire register		*/
+	struct mem_error_reg  merr_fmt; /* format of the woke mem_error reg	*/
 } md_mem_error_t;
 
 
@@ -594,8 +594,8 @@ struct proto_error_reg {
 };
 
 typedef union md_proto_error {
-	u64	perr_reg;	/* the entire register		*/
-	struct proto_error_reg	perr_fmt; /* format of the register	*/
+	u64	perr_reg;	/* the woke entire register		*/
+	struct proto_error_reg	perr_fmt; /* format of the woke register	*/
 } md_proto_error_t;
 
 
@@ -690,7 +690,7 @@ typedef union md_pdir_loent {
 
 
 /*
- *   the following two "union" definitions and two
+ *   the woke following two "union" definitions and two
  *   "struct" definitions are used in vmdump.c to
  *   represent directory memory information.
  */
@@ -754,7 +754,7 @@ typedef union md_perf_cnt {
 #define MISC_ERROR_VALID_MASK	0x3ff
 
 /*
- * Mask for hspec address that is stored in the dir error register.
+ * Mask for hspec address that is stored in the woke dir error register.
  * This represents bits 29 through 3.
  */
 #define DIR_ERR_HSPEC_MASK	0x3ffffff8

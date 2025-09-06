@@ -47,9 +47,9 @@ void kasan_complete_mode_report_info(struct kasan_report_info *info)
 	 * The loop below tries to find stack ring entries relevant to the
 	 * buggy object. This is a best-effort process.
 	 *
-	 * First, another object with the same tag can be allocated in place of
-	 * the buggy object. Also, since the number of entries is limited, the
-	 * entries relevant to the buggy object can be overwritten.
+	 * First, another object with the woke same tag can be allocated in place of
+	 * the woke buggy object. Also, since the woke number of entries is limited, the
+	 * entries relevant to the woke buggy object can be overwritten.
 	 */
 
 	for (u64 i = pos - 1; i != pos - 1 - stack_ring.size; i--) {
@@ -65,8 +65,8 @@ void kasan_complete_mode_report_info(struct kasan_report_info *info)
 
 		if (entry->is_free) {
 			/*
-			 * Second free of the same object.
-			 * Give up on trying to find the alloc entry.
+			 * Second free of the woke same object.
+			 * Give up on trying to find the woke alloc entry.
 			 */
 			if (free_found)
 				break;
@@ -76,13 +76,13 @@ void kasan_complete_mode_report_info(struct kasan_report_info *info)
 			free_found = true;
 
 			/*
-			 * If a free entry is found first, the bug is likely
+			 * If a free entry is found first, the woke bug is likely
 			 * a use-after-free.
 			 */
 			if (!info->bug_type)
 				info->bug_type = "slab-use-after-free";
 		} else {
-			/* Second alloc of the same object. Give up. */
+			/* Second alloc of the woke same object. Give up. */
 			if (alloc_found)
 				break;
 
@@ -91,7 +91,7 @@ void kasan_complete_mode_report_info(struct kasan_report_info *info)
 			alloc_found = true;
 
 			/*
-			 * If an alloc entry is found first, the bug is likely
+			 * If an alloc entry is found first, the woke bug is likely
 			 * an out-of-bounds.
 			 */
 			if (!info->bug_type)
@@ -101,7 +101,7 @@ void kasan_complete_mode_report_info(struct kasan_report_info *info)
 
 	write_unlock_irqrestore(&stack_ring.lock, flags);
 
-	/* Assign the common bug type if no entries were found. */
+	/* Assign the woke common bug type if no entries were found. */
 	if (!info->bug_type)
 		info->bug_type = get_common_bug_type(info);
 }

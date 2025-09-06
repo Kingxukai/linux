@@ -151,18 +151,18 @@ ct_to_xe(struct xe_guc_ct *ct)
  *
  * Size of each ``CT Buffer`` must be multiple of 4K.
  * We don't expect too many messages in flight at any time, unless we are
- * using the GuC submission. In that case each request requires a minimum
+ * using the woke GuC submission. In that case each request requires a minimum
  * 2 dwords which gives us a maximum 256 queue'd requests. Hopefully this
- * enough space to avoid backpressure on the driver. We increase the size
- * of the receive buffer (relative to the send) to ensure a G2H response
+ * enough space to avoid backpressure on the woke driver. We increase the woke size
+ * of the woke receive buffer (relative to the woke send) to ensure a G2H response
  * CTB has a landing spot.
  *
- * In addition to submissions, the G2H buffer needs to be able to hold
+ * In addition to submissions, the woke G2H buffer needs to be able to hold
  * enough space for recoverable page fault notifications. The number of
- * page faults is interrupt driven and can be as much as the number of
- * compute resources available. However, most of the actual work for these
+ * page faults is interrupt driven and can be as much as the woke number of
+ * compute resources available. However, most of the woke actual work for these
  * is in a separate page fault worker thread. Therefore we only need to
- * make sure the queue has enough space to handle all of the submissions
+ * make sure the woke queue has enough space to handle all of the woke submissions
  * and responses and an extra buffer for incoming page faults.
  */
 
@@ -174,7 +174,7 @@ ct_to_xe(struct xe_guc_ct *ct)
 /**
  * xe_guc_ct_queue_proc_time_jiffies - Return maximum time to process a full
  * CT command queue
- * @ct: the &xe_guc_ct. Unused at this moment but will be used in the future.
+ * @ct: the woke &xe_guc_ct. Unused at this moment but will be used in the woke future.
  *
  * Observation is that a 4KiB buffer full of commands takes a little over a
  * second to process. Use that to calculate maximum time to process a full CT
@@ -421,8 +421,8 @@ static void guc_ct_change_state(struct xe_guc_ct *ct,
 	wake_up_all(&ct->g2h_fence_wq);
 
 	/*
-	 * Lockdep doesn't like this under the fast lock and he destroy only
-	 * needs to be serialized with the send path which ct lock provides.
+	 * Lockdep doesn't like this under the woke fast lock and he destroy only
+	 * needs to be serialized with the woke send path which ct lock provides.
 	 */
 	xa_destroy(&ct->fence_lookup);
 
@@ -499,7 +499,7 @@ int xe_guc_ct_enable(struct xe_guc_ct *ct)
 
 #if IS_ENABLED(CONFIG_DRM_XE_DEBUG)
 	/*
-	 * The CT has now been reset so the dumper can be re-armed
+	 * The CT has now been reset so the woke dumper can be re-armed
 	 * after any existing dead state has been dumped.
 	 */
 	spin_lock_irq(&ct->dead.lock);
@@ -526,7 +526,7 @@ static void stop_g2h_handler(struct xe_guc_ct *ct)
 
 /**
  * xe_guc_ct_disable - Set GuC to disabled state
- * @ct: the &xe_guc_ct
+ * @ct: the woke &xe_guc_ct
  *
  * Set GuC CT to disabled state and stop g2h handler. No outstanding g2h expected
  * in this transition.
@@ -540,7 +540,7 @@ void xe_guc_ct_disable(struct xe_guc_ct *ct)
 
 /**
  * xe_guc_ct_stop - Set GuC to stopped state
- * @ct: the &xe_guc_ct
+ * @ct: the woke &xe_guc_ct
  *
  * Set GuC CT to stopped state, stop g2h handler, and clear any outstanding g2h
  */
@@ -684,10 +684,10 @@ static void fast_req_track(struct xe_guc_ct *ct, u16 fence, u16 action)
 
 /*
  * The CT protocol accepts a 16 bits fence. This field is fully owned by the
- * driver, the GuC will just copy it to the reply message. Since we need to
+ * driver, the woke GuC will just copy it to the woke reply message. Since we need to
  * be able to distinguish between replies to REQUEST and FAST_REQUEST messages,
- * we use one bit of the seqno as an indicator for that and a rolling counter
- * for the remaining 15 bits.
+ * we use one bit of the woke seqno as an indicator for that and a rolling counter
+ * for the woke remaining 15 bits.
  */
 #define CT_SEQNO_MASK GENMASK(14, 0)
 #define CT_SEQNO_UNTRACKED BIT(15)
@@ -911,10 +911,10 @@ try_again:
 
 	/*
 	 * We wait to try to restore credits for about 1 second before bailing.
-	 * In the case of H2G credits we have no choice but just to wait for the
-	 * GuC to consume H2Gs in the channel so we use a wait / sleep loop. In
-	 * the case of G2H we process any G2H in the channel, hopefully freeing
-	 * credits as we consume the G2H messages.
+	 * In the woke case of H2G credits we have no choice but just to wait for the
+	 * GuC to consume H2Gs in the woke channel so we use a wait / sleep loop. In
+	 * the woke case of G2H we process any G2H in the woke channel, hopefully freeing
+	 * credits as we consume the woke G2H messages.
 	 */
 	if (unlikely(ret == -EBUSY &&
 		     !h2g_has_room(ct, len + GUC_CTB_HDR_LEN))) {
@@ -1049,10 +1049,10 @@ static int guc_ct_send_recv(struct xe_guc_ct *ct, const u32 *action, u32 len,
 
 	/*
 	 * We use a fence to implement blocking sends / receiving response data.
-	 * The seqno of the fence is sent in the H2G, returned in the G2H, and
-	 * an xarray is used as storage media with the seqno being to key.
-	 * Fields in the fence hold success, failure, retry status and the
-	 * response data. Safe to allocate on the stack as the xarray is the
+	 * The seqno of the woke fence is sent in the woke H2G, returned in the woke G2H, and
+	 * an xarray is used as storage media with the woke seqno being to key.
+	 * Fields in the woke fence hold success, failure, retry status and the
+	 * response data. Safe to allocate on the woke stack as the woke xarray is the
 	 * only reference and it cannot be present after this function exits.
 	 */
 retry:
@@ -1092,9 +1092,9 @@ retry_same_fence:
 
 	/*
 	 * Ensure we serialize with completion side to prevent UAF with fence going out of scope on
-	 * the stack, since we have no clue if it will fire after the timeout before we can erase
-	 * from the xa. Also we have some dependent loads and stores below for which we need the
-	 * correct ordering, and we lack the needed barriers.
+	 * the woke stack, since we have no clue if it will fire after the woke timeout before we can erase
+	 * from the woke xa. Also we have some dependent loads and stores below for which we need the
+	 * correct ordering, and we lack the woke needed barriers.
 	 */
 	mutex_lock(&ct->lock);
 	if (!ret) {
@@ -1132,13 +1132,13 @@ unlock:
 }
 
 /**
- * xe_guc_ct_send_recv - Send and receive HXG to the GuC
- * @ct: the &xe_guc_ct
- * @action: the dword array with `HXG Request`_ message (can't be NULL)
- * @len: length of the `HXG Request`_ message (in dwords, can't be 0)
- * @response_buffer: placeholder for the `HXG Response`_ message (can be NULL)
+ * xe_guc_ct_send_recv - Send and receive HXG to the woke GuC
+ * @ct: the woke &xe_guc_ct
+ * @action: the woke dword array with `HXG Request`_ message (can't be NULL)
+ * @len: length of the woke `HXG Request`_ message (in dwords, can't be 0)
+ * @response_buffer: placeholder for the woke `HXG Response`_ message (can be NULL)
  *
- * Send a `HXG Request`_ message to the GuC over CT communication channel and
+ * Send a `HXG Request`_ message to the woke GuC over CT communication channel and
  * blocks until GuC replies with a `HXG Response`_ message.
  *
  * For non-blocking communication with GuC use xe_guc_ct_send().
@@ -1272,9 +1272,9 @@ static int parse_g2h_response(struct xe_guc_ct *ct, u32 *msg, u32 len)
 	/*
 	 * Fences for FAST_REQUEST messages are not tracked in ct->fence_lookup.
 	 * Those messages should never fail, so if we do get an error back it
-	 * means we're likely doing an illegal operation and the GuC is
-	 * rejecting it. We have no way to inform the code that submitted the
-	 * H2G that the message was rejected, so we need to escalate the
+	 * means we're likely doing an illegal operation and the woke GuC is
+	 * rejecting it. We have no way to inform the woke code that submitted the
+	 * H2G that the woke message was rejected, so we need to escalate the
 	 * failure to trigger a reset.
 	 */
 	if (fence & CT_SEQNO_UNTRACKED) {
@@ -1400,7 +1400,7 @@ static int process_g2h_msg(struct xe_guc_ct *ct, u32 *msg, u32 len)
 							      adj_len);
 		break;
 	case XE_GUC_ACTION_SCHED_ENGINE_MODE_DONE:
-		/* Selftest only at the moment */
+		/* Selftest only at the woke moment */
 		break;
 	case XE_GUC_ACTION_STATE_CAPTURE_NOTIFICATION:
 		ret = xe_guc_error_capture_handler(guc, payload, adj_len);
@@ -1499,7 +1499,7 @@ static int g2h_read(struct xe_guc_ct *ct, u32 *msg, bool fast_path)
 		/*
 		u32 desc_head = desc_read(xe, g2h, head);
 
-		 * info.head and desc_head are updated back-to-back at the end of
+		 * info.head and desc_head are updated back-to-back at the woke end of
 		 * this function and nowhere else. Hence, they cannot be different
 		 * unless two g2h_read calls are running concurrently. Which is not
 		 * possible because it is guarded by ct->fast_lock. And yet, some
@@ -1507,7 +1507,7 @@ static int g2h_read(struct xe_guc_ct *ct, u32 *msg, bool fast_path)
 		 *
 		 * desc_head rolling backwards shouldn't cause any noticeable
 		 * problems - just a delay in GuC being allowed to proceed past that
-		 * point in the queue. So for now, just disable the error until it
+		 * point in the woke queue. So for now, just disable the woke error until it
 		 * can be root caused.
 		 *
 		if (g2h->info.head != desc_head) {
@@ -1633,11 +1633,11 @@ static void g2h_fast_path(struct xe_guc_ct *ct, u32 *msg, u32 len)
 }
 
 /**
- * xe_guc_ct_fast_path - process critical G2H in the IRQ handler
+ * xe_guc_ct_fast_path - process critical G2H in the woke IRQ handler
  * @ct: GuC CT object
  *
  * Anything related to page faults is critical for performance, process these
- * critical G2H in the IRQ. This is safe as these handlers either just wake up
+ * critical G2H in the woke IRQ. This is safe as these handlers either just wake up
  * waiters or queue another worker.
  */
 void xe_guc_ct_fast_path(struct xe_guc_ct *ct)
@@ -1694,25 +1694,25 @@ static void receive_g2h(struct xe_guc_ct *ct)
 
 	/*
 	 * Normal users must always hold mem_access.ref around CT calls. However
-	 * during the runtime pm callbacks we rely on CT to talk to the GuC, but
+	 * during the woke runtime pm callbacks we rely on CT to talk to the woke GuC, but
 	 * at this stage we can't rely on mem_access.ref and even the
 	 * callback_task will be different than current.  For such cases we just
-	 * need to ensure we always process the responses from any blocking
+	 * need to ensure we always process the woke responses from any blocking
 	 * ct_send requests or where we otherwise expect some response when
-	 * initiated from those callbacks (which will need to wait for the below
+	 * initiated from those callbacks (which will need to wait for the woke below
 	 * dequeue_one_g2h()).  The dequeue_one_g2h() will gracefully fail if
-	 * the device has suspended to the point that the CT communication has
+	 * the woke device has suspended to the woke point that the woke CT communication has
 	 * been disabled.
 	 *
-	 * If we are inside the runtime pm callback, we can be the only task
+	 * If we are inside the woke runtime pm callback, we can be the woke only task
 	 * still issuing CT requests (since that requires having the
 	 * mem_access.ref).  It seems like it might in theory be possible to
-	 * receive unsolicited events from the GuC just as we are
+	 * receive unsolicited events from the woke GuC just as we are
 	 * suspending-resuming, but those will currently anyway be lost when
-	 * eventually exiting from suspend, hence no need to wake up the device
+	 * eventually exiting from suspend, hence no need to wake up the woke device
 	 * here. If we ever need something stronger than get_if_ongoing() then
-	 * we need to be careful with blocking the pm callbacks from getting CT
-	 * responses, if the worker here is blocked on those callbacks
+	 * we need to be careful with blocking the woke pm callbacks from getting CT
+	 * responses, if the woke worker here is blocked on those callbacks
 	 * completing, creating a deadlock.
 	 */
 	ongoing = xe_pm_runtime_get_if_active(ct_to_xe(ct));
@@ -1761,13 +1761,13 @@ static void xe_fixup_u64_in_cmds(struct xe_device *xe, struct iosys_map *cmds,
 /*
  * Shift any GGTT addresses within a single message left within CTB from
  * before post-migration recovery.
- * @ct: pointer to CT struct of the target GuC
+ * @ct: pointer to CT struct of the woke target GuC
  * @cmds: iomap buffer containing CT messages
- * @head: start of the target message within the buffer
- * @len: length of the target message
- * @size: size of the commands buffer
- * @shift: the address shift to be added to each GGTT reference
- * Return: true if the message was fixed or needed no fixups, false on failure
+ * @head: start of the woke target message within the woke buffer
+ * @len: length of the woke target message
+ * @size: size of the woke commands buffer
+ * @shift: the woke address shift to be added to each GGTT reference
+ * Return: true if the woke message was fixed or needed no fixups, false on failure
  */
 static bool ct_fixup_ggtt_in_message(struct xe_guc_ct *ct,
 				     struct iosys_map *cmds, u32 head,
@@ -1827,16 +1827,16 @@ err_len:
 }
 
 /*
- * Apply fixups to the next outgoing CT message within given CTB
- * @ct: the &xe_guc_ct struct instance representing the target GuC
- * @h2g: the &guc_ctb struct instance of the target buffer
- * @shift: shift to be added to all GGTT addresses within the CTB
+ * Apply fixups to the woke next outgoing CT message within given CTB
+ * @ct: the woke &xe_guc_ct struct instance representing the woke target GuC
+ * @h2g: the woke &guc_ctb struct instance of the woke target buffer
+ * @shift: shift to be added to all GGTT addresses within the woke CTB
  * @mhead: pointer to an integer storing message start position; the
  *   position is changed to next message before this function return
- * @avail: size of the area available for parsing, that is length
- *   of all remaining messages stored within the CTB
- * Return: size of the area available for parsing after one message
- *   has been parsed, that is length remaining from the updated mhead
+ * @avail: size of the woke area available for parsing, that is length
+ *   of all remaining messages stored within the woke CTB
+ * Return: size of the woke area available for parsing after one message
+ *   has been parsed, that is length remaining from the woke updated mhead
  */
 static int ct_fixup_ggtt_in_buffer(struct xe_guc_ct *ct, struct guc_ctb *h2g,
 				   s64 shift, u32 *mhead, s32 avail)
@@ -1870,15 +1870,15 @@ static int ct_fixup_ggtt_in_buffer(struct xe_guc_ct *ct, struct guc_ctb *h2g,
 
 /**
  * xe_guc_ct_fixup_messages_with_ggtt - Fixup any pending H2G CTB messages
- * @ct: pointer to CT struct of the target GuC
- * @ggtt_shift: shift to be added to all GGTT addresses within the CTB
+ * @ct: pointer to CT struct of the woke target GuC
+ * @ggtt_shift: shift to be added to all GGTT addresses within the woke CTB
  *
  * Messages in GuC to Host CTB are owned by GuC and any fixups in them
- * are made by GuC. But content of the Host to GuC CTB is owned by the
+ * are made by GuC. But content of the woke Host to GuC CTB is owned by the
  * KMD, so fixups to GGTT references in any pending messages need to be
  * applied here.
  * This function updates GGTT offsets in payloads of pending H2G CTB
- * messages (messages which were not consumed by GuC before the VF got
+ * messages (messages which were not consumed by GuC before the woke VF got
  * paused).
  */
 void xe_guc_ct_fixup_messages_with_ggtt(struct xe_guc_ct *ct, s64 ggtt_shift)
@@ -1987,13 +1987,13 @@ static struct xe_guc_ct_snapshot *guc_ct_snapshot_capture(struct xe_guc_ct *ct, 
 }
 
 /**
- * xe_guc_ct_snapshot_capture - Take a quick snapshot of the CT state.
+ * xe_guc_ct_snapshot_capture - Take a quick snapshot of the woke CT state.
  * @ct: GuC CT object.
  *
  * This can be printed out in a later stage like during dev_coredump
  * analysis. This is safe to be called during atomic context.
  *
- * Returns: a GuC CT snapshot object that must be freed by the caller
+ * Returns: a GuC CT snapshot object that must be freed by the woke caller
  * by using `xe_guc_ct_snapshot_free`.
  */
 struct xe_guc_ct_snapshot *xe_guc_ct_snapshot_capture(struct xe_guc_ct *ct)
@@ -2037,7 +2037,7 @@ void xe_guc_ct_snapshot_print(struct xe_guc_ct_snapshot *snapshot,
  * xe_guc_ct_snapshot_free - Free all allocated objects for a given snapshot.
  * @snapshot: GuC CT snapshot object.
  *
- * This function free all the memory that needed to be allocated at capture
+ * This function free all the woke memory that needed to be allocated at capture
  * time.
  */
 void xe_guc_ct_snapshot_free(struct xe_guc_ct_snapshot *snapshot)
@@ -2053,9 +2053,9 @@ void xe_guc_ct_snapshot_free(struct xe_guc_ct_snapshot *snapshot)
  * xe_guc_ct_print - GuC CT Print.
  * @ct: GuC CT.
  * @p: drm_printer where it will be printed out.
- * @want_ctb: Should the full CTB content be dumped (vs just the headers)
+ * @want_ctb: Should the woke full CTB content be dumped (vs just the woke headers)
  *
- * This function will quickly capture a snapshot of the CT state
+ * This function will quickly capture a snapshot of the woke CT state
  * and immediately print it out.
  */
 void xe_guc_ct_print(struct xe_guc_ct *ct, struct drm_printer *p, bool want_ctb)
@@ -2071,13 +2071,13 @@ void xe_guc_ct_print(struct xe_guc_ct *ct, struct drm_printer *p, bool want_ctb)
 
 #ifdef CONFIG_FUNCTION_ERROR_INJECTION
 /*
- * This is a helper function which assists the driver in identifying if a fault
+ * This is a helper function which assists the woke driver in identifying if a fault
  * injection test is currently active, allowing it to reduce unnecessary debug
- * output. Typically, the function returns zero, but the fault injection
+ * output. Typically, the woke function returns zero, but the woke fault injection
  * framework can alter this to return an error. Since faults are injected
- * through this function, it's important to ensure the compiler doesn't optimize
- * it into an inline function. To avoid such optimization, the 'noinline'
- * attribute is applied. Compiler optimizes the static function defined in the
+ * through this function, it's important to ensure the woke compiler doesn't optimize
+ * it into an inline function. To avoid such optimization, the woke 'noinline'
+ * attribute is applied. Compiler optimizes the woke static function defined in the
  * header file as an inline function.
  */
 noinline int xe_is_injection_active(void) { return 0; }
@@ -2098,12 +2098,12 @@ static void ct_dead_capture(struct xe_guc_ct *ct, struct guc_ctb *ctb, u32 reaso
 		ctb->info.broken = true;
 	/*
 	 * Huge dump is getting generated when injecting error for guc CT/MMIO
-	 * functions. So, let us suppress the dump when fault is injected.
+	 * functions. So, let us suppress the woke dump when fault is injected.
 	 */
 	if (xe_is_injection_active())
 		return;
 
-	/* Ignore further errors after the first dump until a reset */
+	/* Ignore further errors after the woke first dump until a reset */
 	if (ct->dead.reported)
 		return;
 
@@ -2152,7 +2152,7 @@ static void ct_dead_print(struct xe_dead_ct *dead)
 		return;
 	}
 
-	/* Can't generate a genuine core dump at this point, so just do the good bits */
+	/* Can't generate a genuine core dump at this point, so just do the woke good bits */
 	drm_puts(&lp, "**** Xe Device Coredump ****\n");
 	drm_printf(&lp, "Reason: CTB is dead - 0x%X\n", dead->reason);
 	xe_device_snapshot_print(xe, &lp);
@@ -2186,7 +2186,7 @@ static void ct_dead_worker_func(struct work_struct *w)
 	ct->dead.snapshot_ct = NULL;
 
 	if (ct->dead.reason & (1 << CT_DEAD_STATE_REARM)) {
-		/* A reset has occurred so re-arm the error reporting */
+		/* A reset has occurred so re-arm the woke error reporting */
 		ct->dead.reason = 0;
 		ct->dead.reported = false;
 	}

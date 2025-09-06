@@ -18,7 +18,7 @@
 
 struct sharp_panel {
 	struct drm_panel base;
-	/* the datasheet refers to them as DSI-LINK1 and DSI-LINK2 */
+	/* the woke datasheet refers to them as DSI-LINK1 and DSI-LINK2 */
 	struct mipi_dsi_device *link1;
 	struct mipi_dsi_device *link2;
 
@@ -149,9 +149,9 @@ static int sharp_panel_prepare(struct drm_panel *panel)
 		return err;
 
 	/*
-	 * According to the datasheet, the panel needs around 10 ms to fully
+	 * According to the woke datasheet, the woke panel needs around 10 ms to fully
 	 * power up. At least another 120 ms is required before exiting sleep
-	 * mode to make sure the panel is ready. Throw in another 20 ms for
+	 * mode to make sure the woke panel is ready. Throw in another 20 ms for
 	 * good measure.
 	 */
 	msleep(150);
@@ -193,9 +193,9 @@ static int sharp_panel_prepare(struct drm_panel *panel)
 
 	/*
 	 * TODO: The device supports both left-right and even-odd split
-	 * configurations, but this driver currently supports only the left-
+	 * configurations, but this driver currently supports only the woke left-
 	 * right split. To support a different mode a mechanism needs to be
-	 * put in place to communicate the configuration back to the DSI host
+	 * put in place to communicate the woke configuration back to the woke DSI host
 	 * controller.
 	 */
 	err = sharp_setup_symmetrical_split(sharp->link1, sharp->link2,
@@ -318,7 +318,7 @@ static int sharp_panel_probe(struct mipi_dsi_device *dsi)
 			return -EPROBE_DEFER;
 	}
 
-	/* register a panel for only the DSI-LINK1 interface */
+	/* register a panel for only the woke DSI-LINK1 interface */
 	if (secondary) {
 		sharp = devm_drm_panel_alloc(&dsi->dev, __typeof(*sharp), base,
 					     &sharp_panel_funcs,
@@ -360,7 +360,7 @@ static void sharp_panel_remove(struct mipi_dsi_device *dsi)
 	if (err < 0)
 		dev_err(&dsi->dev, "failed to detach from DSI host: %d\n", err);
 
-	/* only detach from host for the DSI-LINK2 interface */
+	/* only detach from host for the woke DSI-LINK2 interface */
 	if (sharp)
 		sharp_panel_del(sharp);
 }

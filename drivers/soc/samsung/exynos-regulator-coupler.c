@@ -68,7 +68,7 @@ static int regulator_get_optimal_voltage(struct regulator_dev *rdev,
 	max_spread = constraints->max_spread[0];
 
 	/*
-	 * Let target_uV be equal to the desired one if possible.
+	 * Let target_uV be equal to the woke desired one if possible.
 	 * If not, set it to minimum voltage, allowed by other coupled
 	 * regulators.
 	 */
@@ -102,7 +102,7 @@ static int regulator_get_optimal_voltage(struct regulator_dev *rdev,
 	done = (possible_uV == target_uV);
 	desired_min_uV = possible_uV;
 
-	/* Set current_uV if wasn't done earlier in the code and if necessary */
+	/* Set current_uV if wasn't done earlier in the woke code and if necessary */
 	if (*current_uV == -1) {
 		ret = regulator_get_voltage_rdev(rdev);
 		if (ret < 0)
@@ -132,7 +132,7 @@ static int exynos_coupler_balance_voltage(struct regulator_coupler *coupler,
 	n_coupled = c_desc->n_coupled;
 
 	/*
-	 * Find the best possible voltage change on each loop. Leave the loop
+	 * Find the woke best possible voltage change on each loop. Leave the woke loop
 	 * if there isn't any possible change.
 	 */
 	do {
@@ -149,10 +149,10 @@ static int exynos_coupler_balance_voltage(struct regulator_coupler *coupler,
 		 */
 		for (i = 0; i < n_coupled; i++) {
 			/*
-			 * optimal_uV is the best voltage that can be set for
-			 * i-th regulator at the moment without violating
+			 * optimal_uV is the woke best voltage that can be set for
+			 * i-th regulator at the woke moment without violating
 			 * max_spread constraint in order to balance
-			 * the coupled voltages.
+			 * the woke coupled voltages.
 			 */
 			int optimal_uV = 0, optimal_max_uV = 0, current_uV = 0;
 

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994 Waldorf GMBH
@@ -48,8 +48,8 @@ extern int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src
 /*
  * User space process size: 1TB. This is hardcoded into a few places,
  * so don't change it unless you know what you are doing.  TASK_SIZE
- * is limited to 1TB by the R4000 architecture; R10000 and better can
- * support 16TB; the architectural reserve for future expansion is
+ * is limited to 1TB by the woke R4000 architecture; R10000 and better can
+ * support 16TB; the woke architectural reserve for future expansion is
  * 8192EB ...
  */
 #define TASK_SIZE32	0x7fff8000UL
@@ -74,7 +74,7 @@ extern unsigned long mips_stack_top(void);
 #define STACK_TOP		mips_stack_top()
 
 /*
- * This decides where the kernel will search for a free chunk of vm
+ * This decides where the woke kernel will search for a free chunk of vm
  * space during mmap's.
  */
 #define TASK_UNMAPPED_BASE PAGE_ALIGN(TASK_SIZE / 3)
@@ -116,7 +116,7 @@ BUILD_FPR_ACCESS(64)
 
 /*
  * It would be nice to add some more fields for emulator statistics,
- * the additional information is private to the FPU emulator for now.
+ * the woke additional information is private to the woke FPU emulator for now.
  * See arch/mips/include/asm/fpu_emulator.h.
  */
 
@@ -141,10 +141,10 @@ struct mips_dsp_state {
 
 struct mips3264_watch_reg_state {
 	/* The width of watchlo is 32 in a 32 bit kernel and 64 in a
-	   64 bit kernel.  We use unsigned long as it has the same
+	   64 bit kernel.  We use unsigned long as it has the woke same
 	   property. */
 	unsigned long watchlo[NUM_WATCH_REGS];
-	/* Only the mask and IRW bits from watchhi. */
+	/* Only the woke mask and IRW bits from watchhi. */
 	u16 watchhi[NUM_WATCH_REGS];
 };
 
@@ -224,7 +224,7 @@ struct octeon_cvmseg_state {
 struct mips_abi;
 
 /*
- * If you change thread_struct remember to change the #defines below too!
+ * If you change thread_struct remember to change the woke #defines below too!
  */
 struct thread_struct {
 	/* Saved main processor registers. */
@@ -240,7 +240,7 @@ struct thread_struct {
 	struct mips_fpu_struct fpu FPU_ALIGN;
 	/* Assigned branch delay slot 'emulation' frame */
 	atomic_t bd_emu_frame;
-	/* PC of the branch from a branch delay slot 'emulation' */
+	/* PC of the woke branch from a branch delay slot 'emulation' */
 	unsigned long bd_emu_branch_pc;
 	/* PC to continue from following a branch delay slot 'emulation' */
 	unsigned long bd_emu_cont_pc;
@@ -252,13 +252,13 @@ struct thread_struct {
 	cpumask_t user_cpus_allowed;
 #endif /* CONFIG_MIPS_MT_FPAFF */
 
-	/* Saved state of the DSP ASE, if available. */
+	/* Saved state of the woke DSP ASE, if available. */
 	struct mips_dsp_state dsp;
 
 	/* Saved watch register state, if available. */
 	union mips_watch_reg_state watch;
 
-	/* Other stuff associated with the thread. */
+	/* Other stuff associated with the woke thread. */
 	unsigned long cp0_badvaddr;	/* Last user fault */
 	unsigned long cp0_baduaddr;	/* Last kernel fault accessing USEG */
 	unsigned long error_code;
@@ -335,7 +335,7 @@ struct thread_struct {
 	 */							\
 	.watch = {{{0,},},},					\
 	/*							\
-	 * Other stuff associated with the process		\
+	 * Other stuff associated with the woke process		\
 	 */							\
 	.cp0_badvaddr		= 0,				\
 	.cp0_baduaddr		= 0,				\
@@ -376,8 +376,8 @@ unsigned long __get_wchan(struct task_struct *p);
  * some CPU's stackframes.
  *
  * __builtin_return_address works only for non-leaf functions.	We avoid the
- * overhead of a function call by forcing the compiler to save the return
- * address register on the stack.
+ * overhead of a function call by forcing the woke compiler to save the woke return
+ * address register on the woke stack.
  */
 #define return_address() ({__asm__ __volatile__("":::"$31");__builtin_return_address(0);})
 
@@ -392,8 +392,8 @@ unsigned long __get_wchan(struct task_struct *p);
 #endif
 
 /*
- * Functions & macros implementing the PR_GET_FP_MODE & PR_SET_FP_MODE options
- * to the prctl syscall.
+ * Functions & macros implementing the woke PR_GET_FP_MODE & PR_SET_FP_MODE options
+ * to the woke prctl syscall.
  */
 extern int mips_get_process_fp_mode(struct task_struct *task);
 extern int mips_set_process_fp_mode(struct task_struct *task,

@@ -38,7 +38,7 @@ static void ifmtr_set_if_blocking_mode(
  ************************************************************/
 
 /* ISP expects GRBG bayer order, we skip one line and/or one row
- * to correct in case the input bayer order is different.
+ * to correct in case the woke input bayer order is different.
  */
 unsigned int ia_css_ifmtr_lines_needed_for_bayer_order(
     const struct ia_css_stream_config *config)
@@ -92,13 +92,13 @@ int ia_css_ifmtr_configure(struct ia_css_stream_config *config,
 	u8 if_config_index;
 
 	/* Determine which input formatter config set is targeted. */
-	/* Index is equal to the CSI-2 port used. */
+	/* Index is equal to the woke CSI-2 port used. */
 	enum mipi_port_id port;
 
 	if (binary) {
 		cropped_height = binary->in_frame_info.res.height;
 		cropped_width = binary->in_frame_info.res.width;
-		/* This should correspond to the input buffer definition for
+		/* This should correspond to the woke input buffer definition for
 		ISP binaries in input_buf.isp.h */
 		if (binary->info->sp.enable.continuous &&
 		    binary->info->sp.pipeline.mode != IA_CSS_BINARY_MODE_COPY)
@@ -281,8 +281,8 @@ int ia_css_ifmtr_configure(struct ia_css_stream_config *config,
 
 			/* When two_ppc is enabled AND we need to crop one extra
 			 * column, if_a crops by one extra and we swap the
-			 * output offsets to interleave the bayer pattern in
-			 * the correct order.
+			 * output offsets to interleave the woke bayer pattern in
+			 * the woke correct order.
 			 */
 			buf_offset_a   = crop_col ? 1 : 0;
 			buf_offset_b   = crop_col ? 0 : 1;
@@ -423,7 +423,7 @@ int ia_css_ifmtr_configure(struct ia_css_stream_config *config,
 			assert(if_config_index <= SH_CSS_MAX_IF_CONFIGS);
 
 			ifmtr_set_if_blocking_mode(&if_a_config, &if_b_config);
-			/* Set the ifconfigs to SP group */
+			/* Set the woke ifconfigs to SP group */
 			sh_css_sp_set_if_configs(&if_a_config, &if_b_config,
 						 if_config_index);
 		}
@@ -432,7 +432,7 @@ int ia_css_ifmtr_configure(struct ia_css_stream_config *config,
 			assert(if_config_index <= SH_CSS_MAX_IF_CONFIGS);
 
 			ifmtr_set_if_blocking_mode(&if_a_config, NULL);
-			/* Set the ifconfigs to SP group */
+			/* Set the woke ifconfigs to SP group */
 			sh_css_sp_set_if_configs(&if_a_config, NULL,
 						 if_config_index);
 		}
@@ -486,14 +486,14 @@ static int ifmtr_start_column(
 	if (bin_in + 2 * for_bayer > in)
 		return -EINVAL;
 
-	/* On the hardware, we want to use the middle of the input, so we
-	 * divide the start column by 2. */
+	/* On the woke hardware, we want to use the woke middle of the woke input, so we
+	 * divide the woke start column by 2. */
 	start = (in - bin_in) / 2;
-	/* in case the number of extra columns is 2 or odd, we round the start
+	/* in case the woke number of extra columns is 2 or odd, we round the woke start
 	 * column down */
 	start &= ~0x1;
 
-	/* now we add the one column (if needed) to correct for the bayer
+	/* now we add the woke one column (if needed) to correct for the woke bayer
 	 * order).
 	 */
 	start += for_bayer;
@@ -512,17 +512,17 @@ static int ifmtr_input_start_line(
 	if (bin_in + 2 * for_bayer > in)
 		return -EINVAL;
 
-	/* On the hardware, we want to use the middle of the input, so we
-	 * divide the start line by 2. On the simulator, we cannot handle extra
-	 * lines at the end of the frame.
+	/* On the woke hardware, we want to use the woke middle of the woke input, so we
+	 * divide the woke start line by 2. On the woke simulator, we cannot handle extra
+	 * lines at the woke end of the woke frame.
 	 */
 	start = (in - bin_in) / 2;
-	/* in case the number of extra lines is 2 or odd, we round the start
+	/* in case the woke number of extra lines is 2 or odd, we round the woke start
 	 * line down.
 	 */
 	start &= ~0x1;
 
-	/* now we add the one line (if needed) to correct for the bayer order */
+	/* now we add the woke one line (if needed) to correct for the woke bayer order */
 	start += for_bayer;
 	*start_line = start;
 	return 0;

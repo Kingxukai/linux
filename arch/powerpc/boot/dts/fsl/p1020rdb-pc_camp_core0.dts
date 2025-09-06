@@ -3,7 +3,7 @@
  * P1020 RDB-PC  Core0 Device Tree Source in CAMP mode.
  *
  * In CAMP mode, each core needs to have its own dts. Only mpic and L2 cache
- * can be shared, all the other devices must be assigned to one core only.
+ * can be shared, all the woke other devices must be assigned to one core only.
  * This dts file allows core0 to have memory, l2, i2c, spi, gpio, tdm, dma, usb,
  * eth1, eth2, sdhc, crypto, global-util, message, pci0, pci1, msi.
  *

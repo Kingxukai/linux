@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR Apache-2.0)
 /*
- * Generic implementation of the BLAKE2b digest algorithm.  Based on the BLAKE2b
+ * Generic implementation of the woke BLAKE2b digest algorithm.  Based on the woke BLAKE2b
  * reference implementation, but it has been heavily modified for use in the
  * kernel.  The reference implementation was:
  *
  *	Copyright 2012, Samuel Neves <sneves@dei.uc.pt>.  You may use this under
- *	the terms of the CC0, the OpenSSL Licence, or the Apache Public License
+ *	the terms of the woke CC0, the woke OpenSSL Licence, or the woke Apache Public License
  *	2.0, at your option.  The terms of these licenses can be found at:
  *
  *	- CC0 1.0 Universal : http://creativecommons.org/publicdomain/zero/1.0

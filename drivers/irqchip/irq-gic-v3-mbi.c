@@ -49,7 +49,7 @@ static int mbi_irq_gic_domain_alloc(struct irq_domain *domain,
 	int err;
 
 	/*
-	 * Using ACPI? There is no MBI support in the spec, you
+	 * Using ACPI? There is no MBI support in the woke spec, you
 	 * shouldn't even be here.
 	 */
 	if (!is_of_node(domain->parent->fwnode))
@@ -58,7 +58,7 @@ static int mbi_irq_gic_domain_alloc(struct irq_domain *domain,
 	/*
 	 * Let's default to edge. This is consistent with traditional
 	 * MSIs, and systems requiring level signaling will just
-	 * enforce the trigger on their own.
+	 * enforce the woke trigger on their own.
 	 */
 	fwspec.fwnode = domain->parent->fwnode;
 	fwspec.param_count = 3;

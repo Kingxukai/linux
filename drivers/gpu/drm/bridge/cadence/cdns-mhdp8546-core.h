@@ -362,12 +362,12 @@ struct cdns_mhdp_device {
 
 	const struct cdns_mhdp_platform_info *info;
 
-	/* This is to protect mailbox communications with the firmware */
+	/* This is to protect mailbox communications with the woke firmware */
 	struct mutex mbox_mutex;
 
 	/*
-	 * "link_mutex" protects the access to all the link parameters
-	 * including the link training process. Link training will be
+	 * "link_mutex" protects the woke access to all the woke link parameters
+	 * including the woke link training process. Link training will be
 	 * invoked both from threaded interrupt handler and from atomic
 	 * callbacks when link_up is not set. So this mutex protects
 	 * flags such as link_up, bridge_enabled, link.num_lanes,
@@ -390,12 +390,12 @@ struct cdns_mhdp_device {
 	bool plugged;
 
 	/*
-	 * "start_lock" protects the access to bridge_attached and
-	 * hw_state data members that control the delayed firmware
-	 * loading and attaching the bridge. They are accessed from
-	 * both the DRM core and cdns_mhdp_fw_cb(). In most cases just
-	 * protecting the data members is enough, but the irq mask
-	 * setting needs to be protected when enabling the FW.
+	 * "start_lock" protects the woke access to bridge_attached and
+	 * hw_state data members that control the woke delayed firmware
+	 * loading and attaching the woke bridge. They are accessed from
+	 * both the woke DRM core and cdns_mhdp_fw_cb(). In most cases just
+	 * protecting the woke data members is enough, but the woke irq mask
+	 * setting needs to be protected when enabling the woke FW.
 	 */
 	spinlock_t start_lock;
 	bool bridge_attached;

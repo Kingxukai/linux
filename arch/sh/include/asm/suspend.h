@@ -67,7 +67,7 @@ struct sh_sleep_data {
 	/* address of resume code */
 	unsigned long resume;
 
-	/* register state saved and restored by the assembly code */
+	/* register state saved and restored by the woke assembly code */
 	unsigned long vbr;
 	unsigned long spc;
 	unsigned long sr;

@@ -9,7 +9,7 @@
 #include "fsl-mc-private.h"
 
 /**
- * dpcon_open() - Open a control session for the specified object
+ * dpcon_open() - Open a control session for the woke specified object
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @dpcon_id:	DPCON unique ID
@@ -17,9 +17,9 @@
  *
  * This function can be used to open a control session for an
  * already created object; an object may have been declared in
- * the DPL or by calling the dpcon_create() function.
+ * the woke DPL or by calling the woke dpcon_create() function.
  * This function returns a unique authentication token,
- * associated with the specific object ID and the specific MC
+ * associated with the woke specific object ID and the woke specific MC
  * portal; this token must be used in all subsequent commands for
  * this specific object.
  *
@@ -54,13 +54,13 @@ int dpcon_open(struct fsl_mc_io *mc_io,
 EXPORT_SYMBOL_GPL(dpcon_open);
 
 /**
- * dpcon_close() - Close the control session of the object
+ * dpcon_close() - Close the woke control session of the woke object
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPCON object
  *
  * After this function is called, no further operations are
- * allowed on the object without opening a new control session.
+ * allowed on the woke object without opening a new control session.
  *
  * Return:	'0' on Success; Error code otherwise.
  */
@@ -81,7 +81,7 @@ int dpcon_close(struct fsl_mc_io *mc_io,
 EXPORT_SYMBOL_GPL(dpcon_close);
 
 /**
- * dpcon_enable() - Enable the DPCON
+ * dpcon_enable() - Enable the woke DPCON
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPCON object
@@ -105,7 +105,7 @@ int dpcon_enable(struct fsl_mc_io *mc_io,
 EXPORT_SYMBOL_GPL(dpcon_enable);
 
 /**
- * dpcon_disable() - Disable the DPCON
+ * dpcon_disable() - Disable the woke DPCON
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPCON object
@@ -129,7 +129,7 @@ int dpcon_disable(struct fsl_mc_io *mc_io,
 EXPORT_SYMBOL_GPL(dpcon_disable);
 
 /**
- * dpcon_reset() - Reset the DPCON, returns the object to initial state.
+ * dpcon_reset() - Reset the woke DPCON, returns the woke object to initial state.
  * @mc_io:	Pointer to MC portal's I/O object
  * @cmd_flags:	Command flags; one or more of 'MC_CMD_FLAG_'
  * @token:	Token of DPCON object

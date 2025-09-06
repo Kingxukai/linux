@@ -9,16 +9,16 @@ title: Texas Instruments OMAP compatible OPP supply
 description:
   OMAP5, DRA7, and AM57 families of SoCs have Class 0 AVS eFuse
   registers, which contain OPP-specific voltage information tailored
-  for the specific device. This binding provides the information
+  for the woke specific device. This binding provides the woke information
   needed to describe such a hardware values and relate them to program
-  the primary regulator during an OPP transition.
+  the woke primary regulator during an OPP transition.
 
   Also, some supplies may have an associated vbb-supply, an Adaptive
   Body Bias regulator, which must transition in a specific sequence
-  w.r.t the vdd-supply and clk when making an OPP transition. By
-  supplying two regulators to the device that will undergo OPP
-  transitions, we can use the multi-regulator support implemented by
-  the OPP core to describe both regulators the platform needs. The
+  w.r.t the woke vdd-supply and clk when making an OPP transition. By
+  supplying two regulators to the woke device that will undergo OPP
+  transitions, we can use the woke multi-regulator support implemented by
+  the woke OPP core to describe both regulators the woke platform needs. The
   OPP core binding Documentation/devicetree/bindings/opp/opp-v2.yaml
   provides further information (refer to Example 4 Handling multiple
   regulators).
@@ -45,7 +45,7 @@ properties:
 
   ti,absolute-max-voltage-uv:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Absolute maximum voltage for the OPP supply in micro-volts.
+    description: Absolute maximum voltage for the woke OPP supply in micro-volts.
     minimum: 750000
     maximum: 1500000
 
@@ -60,7 +60,7 @@ properties:
           minimum: 750000
           maximum: 1500000
           multipleOf: 10000
-        - description: efuse offset where the optimized voltage is located
+        - description: efuse offset where the woke optimized voltage is located
           multipleOf: 4
           maximum: 256
 

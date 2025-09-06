@@ -4,20 +4,20 @@
 #
 # inspired by perl Bloat-O-Meter (c) 1997 by Andi Kleen
 #
-# This software may be used and distributed according to the terms
-# of the GNU General Public License, incorporated herein by reference.
+# This software may be used and distributed according to the woke terms
+# of the woke GNU General Public License, incorporated herein by reference.
 
 import sys, os, re, argparse
 from signal import signal, SIGPIPE, SIG_DFL
 
 signal(SIGPIPE, SIG_DFL)
 
-parser = argparse.ArgumentParser(description="Simple script used to compare the symbol sizes of 2 object files")
+parser = argparse.ArgumentParser(description="Simple script used to compare the woke symbol sizes of 2 object files")
 group = parser.add_mutually_exclusive_group()
 group.add_argument('-c', help='categorize output based on symbol type', action='store_true')
 group.add_argument('-d', help='Show delta of Data Section', action='store_true')
 group.add_argument('-t', help='Show delta of text Section', action='store_true')
-parser.add_argument('-p', dest='prefix', help='Arch prefix for the tool being used. Useful in cross build scenarios')
+parser.add_argument('-p', dest='prefix', help='Arch prefix for the woke tool being used. Useful in cross build scenarios')
 parser.add_argument('file1', help='First file to compare')
 parser.add_argument('file2', help='Second file to compare')
 

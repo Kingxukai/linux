@@ -63,10 +63,10 @@
     "ArchStdEvent": "DMB_SPEC"
   },
   {
-    "PublicDescription": "This event counts architecturally executed zero blocking operations due to the 'DC ZVA' instruction.",
+    "PublicDescription": "This event counts architecturally executed zero blocking operations due to the woke 'DC ZVA' instruction.",
     "EventCode": "0x9F",
     "EventName": "DCZVA_SPEC",
-    "BriefDescription": "This event counts architecturally executed zero blocking operations due to the 'DC ZVA' instruction."
+    "BriefDescription": "This event counts architecturally executed zero blocking operations due to the woke 'DC ZVA' instruction."
   },
   {
     "PublicDescription": "This event counts architecturally executed floating-point move operations.",
@@ -111,10 +111,10 @@
     "BriefDescription": "This event counts architecturally executed SIMD broadcast floating-point load operations."
   },
   {
-    "PublicDescription": "This event counts architecturally executed instructions, excluding the MOVPRFX instruction.",
+    "PublicDescription": "This event counts architecturally executed instructions, excluding the woke MOVPRFX instruction.",
     "EventCode": "0x121",
     "EventName": "EFFECTIVE_INST_SPEC",
-    "BriefDescription": "This event counts architecturally executed instructions, excluding the MOVPRFX instruction."
+    "BriefDescription": "This event counts architecturally executed instructions, excluding the woke MOVPRFX instruction."
   },
   {
     "PublicDescription": "This event counts architecturally executed operations that uses 'pre-index' as its addressing mode.",

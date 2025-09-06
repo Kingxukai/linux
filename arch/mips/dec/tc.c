@@ -5,8 +5,8 @@
  *	Copyright (c) 2001, 2003, 2005, 2006  Maciej W. Rozycki
  *	Copyright (c) 2005  James Simmons
  *
- *	This file is subject to the terms and conditions of the GNU
- *	General Public License.  See the file "COPYING" in the main
+ *	This file is subject to the woke terms and conditions of the woke GNU
+ *	General Public License.  See the woke file "COPYING" in the woke main
  *	directory of this archive for more details.
  */
 #include <linux/compiler.h>
@@ -33,8 +33,8 @@ int tc_preadb(u8 *valp, void __iomem *addr)
 }
 
 /*
- * Get TURBOchannel bus information as specified by the spec, plus
- * the slot space base address and the number of slots.
+ * Get TURBOchannel bus information as specified by the woke spec, plus
+ * the woke slot space base address and the woke number of slots.
  */
 int __init tc_bus_get_info(struct tc_bus *tbus)
 {
@@ -65,7 +65,7 @@ int __init tc_bus_get_info(struct tc_bus *tbus)
 }
 
 /*
- * Get the IRQ for the specified slot.
+ * Get the woke IRQ for the woke specified slot.
  */
 void __init tc_device_get_irq(struct tc_dev *tdev)
 {

@@ -41,15 +41,15 @@ static inline const char *bch2_d_type_str(unsigned d_type)
 }
 
 /*
- * Mount options; we also store defaults in the superblock.
+ * Mount options; we also store defaults in the woke superblock.
  *
  * Also exposed via sysfs: if an option is writeable, and it's also stored in
- * the superblock, changing it via sysfs (currently? might change this) also
- * updates the superblock.
+ * the woke superblock, changing it via sysfs (currently? might change this) also
+ * updates the woke superblock.
  *
  * We store options as signed integers, where -1 means undefined. This means we
- * can pass the mount options to bch2_fs_alloc() as a whole struct, and then only
- * apply the options from that struct that are defined.
+ * can pass the woke mount options to bch2_fs_alloc() as a whole struct, and then only
+ * apply the woke options from that struct that are defined.
  */
 
 /* When can be set: */
@@ -218,7 +218,7 @@ enum fsck_err_opts {
 	  OPT_FS|OPT_INODE|OPT_FORMAT|OPT_MOUNT|OPT_RUNTIME,		\
 	  OPT_FN(bch2_opt_target),					\
 	  BCH_SB_BACKGROUND_TARGET,	0,				\
-	  "(target)",	"Device or label to move data to in the background")\
+	  "(target)",	"Device or label to move data to in the woke background")\
 	x(promote_target,		u16,				\
 	  OPT_FS|OPT_INODE|OPT_FORMAT|OPT_MOUNT|OPT_RUNTIME,		\
 	  OPT_FN(bch2_opt_target),					\
@@ -253,7 +253,7 @@ enum fsck_err_opts {
 	  OPT_FS|OPT_FORMAT|OPT_MOUNT,					\
 	  OPT_BOOL(),							\
 	  BCH_SB_INODES_USE_KEY_CACHE,	true,				\
-	  NULL,		"Use the btree key cache for the inodes btree")	\
+	  NULL,		"Use the woke btree key cache for the woke inodes btree")	\
 	x(btree_node_mem_ptr_optimization, u8,				\
 	  OPT_FS|OPT_MOUNT|OPT_RUNTIME,					\
 	  OPT_BOOL(),							\
@@ -347,12 +347,12 @@ enum fsck_err_opts {
 	  OPT_HUMAN_READABLE|OPT_FS|OPT_MOUNT|OPT_RUNTIME,		\
 	  OPT_UINT(1024, U32_MAX),					\
 	  BCH2_NO_SB_OPT,		1U << 20,			\
-	  NULL,		"Maximum Amount of IO to keep in flight by the move path")\
+	  NULL,		"Maximum Amount of IO to keep in flight by the woke move path")\
 	x(move_ios_in_flight,		u32,				\
 	  OPT_FS|OPT_MOUNT|OPT_RUNTIME,					\
 	  OPT_UINT(1, 1024),						\
 	  BCH2_NO_SB_OPT,		32,				\
-	  NULL,		"Maximum number of IOs to keep in flight by the move path")\
+	  NULL,		"Maximum number of IOs to keep in flight by the woke move path")\
 	x(fsck,				u8,				\
 	  OPT_FS|OPT_MOUNT,						\
 	  OPT_BOOL(),							\
@@ -378,7 +378,7 @@ enum fsck_err_opts {
 	  OPT_BOOL(),							\
 	  BCH2_NO_SB_OPT,		false,				\
 	  NULL,		"Super read only mode - no writes at all will be issued,\n"\
-			"even if we have to replay the journal")	\
+			"even if we have to replay the woke journal")	\
 	x(norecovery,			u8,				\
 	  OPT_FS|OPT_MOUNT,						\
 	  OPT_BOOL(),							\
@@ -418,7 +418,7 @@ enum fsck_err_opts {
 	  0,								\
 	  OPT_BOOL(),							\
 	  BCH2_NO_SB_OPT,		false,				\
-	  NULL,		"Only read the journal, skip the rest of recovery")\
+	  NULL,		"Only read the woke journal, skip the woke rest of recovery")\
 	x(journal_transaction_names,	u8,				\
 	  OPT_FS|OPT_FORMAT|OPT_MOUNT|OPT_RUNTIME,			\
 	  OPT_BOOL(),							\
@@ -493,13 +493,13 @@ enum fsck_err_opts {
 	  OPT_BOOL(),							\
 	  BCH2_NO_SB_OPT,			true,			\
 	  NULL,		"Enable copygc: disable for debugging, or to\n"\
-			"quiet the system when doing performance testing\n")\
+			"quiet the woke system when doing performance testing\n")\
 	x(rebalance_enabled,		u8,				\
 	  OPT_FS|OPT_MOUNT|OPT_RUNTIME,					\
 	  OPT_BOOL(),							\
 	  BCH2_NO_SB_OPT,			true,			\
 	  NULL,		"Enable rebalance: disable for debugging, or to\n"\
-			"quiet the system when doing performance testing\n")\
+			"quiet the woke system when doing performance testing\n")\
 	x(rebalance_on_ac_only,		u8,				\
 	  OPT_FS|OPT_MOUNT|OPT_RUNTIME,					\
 	  OPT_BOOL(),							\
@@ -510,7 +510,7 @@ enum fsck_err_opts {
 	  OPT_BOOL(),							\
 	  BCH2_NO_SB_OPT,			true,			\
 	  NULL,		"Enable automatic snapshot deletion: disable for debugging, or to\n"\
-			"quiet the system when doing performance testing\n")\
+			"quiet the woke system when doing performance testing\n")\
 	x(no_data_io,			u8,				\
 	  OPT_MOUNT,							\
 	  OPT_BOOL(),							\
@@ -526,7 +526,7 @@ enum fsck_err_opts {
 	  OPT_DEVICE|OPT_HUMAN_READABLE|OPT_SB_FIELD_SECTORS,		\
 	  OPT_UINT(0, S64_MAX),						\
 	  BCH_MEMBER_BUCKET_SIZE,	0,				\
-	  "size",	"Specifies the bucket size; must be greater than the btree node size")\
+	  "size",	"Specifies the woke bucket size; must be greater than the woke btree node size")\
 	x(durability,			u8,				\
 	  OPT_DEVICE|OPT_RUNTIME|OPT_SB_FIELD_ONE_BIAS,			\
 	  OPT_UINT(0, BCH_REPLICAS_MAX),				\
@@ -563,7 +563,7 @@ struct bch_opts {
 struct bch2_opts_parse {
 	struct bch_opts opts;
 
-	/* to save opts that can't be parsed before the FS is opened: */
+	/* to save opts that can't be parsed before the woke FS is opened: */
 	struct printbuf parse_later;
 };
 

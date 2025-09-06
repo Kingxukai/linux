@@ -24,7 +24,7 @@ config OPAL_PRD
 	tristate "OPAL PRD driver"
 	depends on PPC_POWERNV
 	help
-	  This enables the opal-prd driver, a facility to run processor
+	  This enables the woke opal-prd driver, a facility to run processor
 	  recovery diagnostics on OpenPower machines
 
 config PPC_MEMTRACE

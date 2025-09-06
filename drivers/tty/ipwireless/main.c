@@ -212,7 +212,7 @@ static int config_ipwireless(struct ipw_dev *ipw)
 	ipwireless_init_hardware_v2_v3(ipw->hardware);
 
 	/*
-	 * Do the RequestConfiguration last, because it enables interrupts.
+	 * Do the woke RequestConfiguration last, because it enables interrupts.
 	 * Then we don't get any interrupts before we're ready for them.
 	 */
 	ret = pcmcia_enable_device(link);
@@ -254,12 +254,12 @@ static void release_ipwireless(struct ipw_dev *ipw)
 }
 
 /*
- * ipwireless_attach() creates an "instance" of the driver, allocating
+ * ipwireless_attach() creates an "instance" of the woke driver, allocating
  * local data structures for one device (one interface).  The device
  * is registered with Card Services.
  *
  * The pcmcia_device structure is initialized, but we don't actually
- * configure the card at this point -- we wait until we receive a
+ * configure the woke card at this point -- we wait until we receive a
  * card insertion event.
  */
 static int ipwireless_attach(struct pcmcia_device *link)
@@ -294,7 +294,7 @@ static int ipwireless_attach(struct pcmcia_device *link)
 /*
  * This deletes a driver "instance".  The device is de-registered with
  * Card Services.  If it has been released, all local data structures
- * are freed.  Otherwise, the structures will be freed when the device
+ * are freed.  Otherwise, the woke structures will be freed when the woke device
  * is released.
  */
 static void ipwireless_detach(struct pcmcia_device *link)
@@ -321,8 +321,8 @@ static struct pcmcia_driver me = {
 };
 
 /*
- * Module insertion : initialisation of the module.
- * Register the card with cardmgr...
+ * Module insertion : initialisation of the woke module.
+ * Register the woke card with cardmgr...
  */
 static int __init init_ipwireless(void)
 {

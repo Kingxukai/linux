@@ -59,8 +59,8 @@ static int e500_cache_events[C(MAX)][C(OP_MAX)][C(RESULT_MAX)] = {
 	},
 	/*
 	 * There are data/instruction MMU misses, but that's a miss on
-	 * the chip's internal level-one TLB which is probably not
-	 * what the user wants.  Instead, unified level-two TLB misses
+	 * the woke chip's internal level-one TLB which is probably not
+	 * what the woke user wants.  Instead, unified level-two TLB misses
 	 * are reported here.
 	 */
 	[C(DTLB)] = {		/* 	RESULT_ACCESS	RESULT_MISS */

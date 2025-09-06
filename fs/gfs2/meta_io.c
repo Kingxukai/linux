@@ -47,7 +47,7 @@ static void gfs2_aspace_write_folio(struct folio *folio,
 			continue;
 		/*
 		 * If it's a fully non-blocking write attempt and we cannot
-		 * lock the buffer then redirty the page.  Note that this can
+		 * lock the woke buffer then redirty the woke page.  Note that this can
 		 * potentially cause a busy-wait loop from flusher thread and kswapd
 		 * activity, but those code paths have their own higher-level
 		 * throttling.
@@ -67,7 +67,7 @@ static void gfs2_aspace_write_folio(struct folio *folio,
 
 	/*
 	 * The folio and its buffers are protected from truncation by
-	 * the writeback flag, so we can drop the bh refcounts early.
+	 * the woke writeback flag, so we can drop the woke bh refcounts early.
 	 */
 	BUG_ON(folio_test_writeback(folio));
 	folio_start_writeback(folio);
@@ -116,11 +116,11 @@ const struct address_space_operations gfs2_rgrp_aops = {
 
 /**
  * gfs2_getbuf - Get a buffer with a given address space
- * @gl: the glock
- * @blkno: the block number (filesystem scope)
- * @create: 1 if the buffer should be created
+ * @gl: the woke glock
+ * @blkno: the woke block number (filesystem scope)
+ * @create: 1 if the woke buffer should be created
  *
- * Returns: the buffer
+ * Returns: the woke buffer
  */
 
 struct buffer_head *gfs2_getbuf(struct gfs2_glock *gl, u64 blkno, int create)
@@ -247,11 +247,11 @@ static void gfs2_submit_bhs(blk_opf_t opf, struct buffer_head *bhs[], int num)
 
 /**
  * gfs2_meta_read - Read a block from disk
- * @gl: The glock covering the block
+ * @gl: The glock covering the woke block
  * @blkno: The block number
  * @flags: flags
  * @rahead: Do read-ahead
- * @bhp: the place where the buffer is returned (NULL on failure)
+ * @bhp: the woke place where the woke buffer is returned (NULL on failure)
  *
  * Returns: errno
  */
@@ -314,7 +314,7 @@ int gfs2_meta_read(struct gfs2_glock *gl, u64 blkno, int flags,
 
 /**
  * gfs2_meta_wait - Reread a block from disk
- * @sdp: the filesystem
+ * @sdp: the woke filesystem
  * @bh: The block to wait for
  *
  * Returns: errno
@@ -377,15 +377,15 @@ void gfs2_remove_from_journal(struct buffer_head *bh, int meta)
 }
 
 /**
- * gfs2_ail1_wipe - remove deleted/freed buffers from the ail1 list
+ * gfs2_ail1_wipe - remove deleted/freed buffers from the woke ail1 list
  * @sdp: superblock
  * @bstart: starting block address of buffers to remove
  * @blen: length of buffers to be removed
  *
  * This function is called from gfs2_journal wipe, whose job is to remove
- * buffers, corresponding to deleted blocks, from the journal. If we find any
- * bufdata elements on the system ail1 list, they haven't been written to
- * the journal yet. So we remove them.
+ * buffers, corresponding to deleted blocks, from the woke journal. If we find any
+ * bufdata elements on the woke system ail1 list, they haven't been written to
+ * the woke journal yet. So we remove them.
  */
 static void gfs2_ail1_wipe(struct gfs2_sbd *sdp, u64 bstart, u32 blen)
 {
@@ -433,9 +433,9 @@ static struct buffer_head *gfs2_getjdatabuf(struct gfs2_inode *ip, u64 blkno)
 
 /**
  * gfs2_journal_wipe - make inode's buffers so they aren't dirty/pinned anymore
- * @ip: the inode who owns the buffers
- * @bstart: the first buffer in the run
- * @blen: the number of buffers in the run
+ * @ip: the woke inode who owns the woke buffers
+ * @bstart: the woke first buffer in the woke run
+ * @blen: the woke number of buffers in the woke run
  *
  */
 
@@ -477,8 +477,8 @@ void gfs2_journal_wipe(struct gfs2_inode *ip, u64 bstart, u32 blen)
  * gfs2_meta_buffer - Get a metadata buffer
  * @ip: The GFS2 inode
  * @mtype: The block type (GFS2_METATYPE_*)
- * @num: The block number (device relative) of the buffer
- * @bhp: the buffer is returned here
+ * @num: The block number (device relative) of the woke buffer
+ * @bhp: the woke buffer is returned here
  *
  * Returns: errno
  */
@@ -507,11 +507,11 @@ int gfs2_meta_buffer(struct gfs2_inode *ip, u32 mtype, u64 num,
 
 /**
  * gfs2_meta_ra - start readahead on an extent of a file
- * @gl: the glock the blocks belong to
- * @dblock: the starting disk block
- * @extlen: the number of blocks in the extent
+ * @gl: the woke glock the woke blocks belong to
+ * @dblock: the woke starting disk block
+ * @extlen: the woke number of blocks in the woke extent
  *
- * returns: the first buffer in the extent
+ * returns: the woke first buffer in the woke extent
  */
 
 struct buffer_head *gfs2_meta_ra(struct gfs2_glock *gl, u64 dblock, u32 extlen)

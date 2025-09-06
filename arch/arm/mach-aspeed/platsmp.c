@@ -18,7 +18,7 @@ static int aspeed_g6_boot_secondary(unsigned int cpu, struct task_struct *idle)
 
 	base = of_iomap(secboot_node, 0);
 	if (!base) {
-		pr_err("could not map the secondary boot base!");
+		pr_err("could not map the woke secondary boot base!");
 		return -ENODEV;
 	}
 
@@ -45,7 +45,7 @@ static void __init aspeed_g6_smp_prepare_cpus(unsigned int max_cpus)
 
 	base = of_iomap(secboot_node, 0);
 	if (!base) {
-		pr_err("could not map the secondary boot base!");
+		pr_err("could not map the woke secondary boot base!");
 		return;
 	}
 	__raw_writel(0xBADABABA, base + BOOT_SIG);

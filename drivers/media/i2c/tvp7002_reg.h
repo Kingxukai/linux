@@ -5,10 +5,10 @@
  * Copyright (C) 2009 Texas Instruments Inc
  * Author: Santiago Nunez-Corrales <santiago.nunez@ridgerun.com>
  *
- * This code is partially based upon the TVP5150 driver
+ * This code is partially based upon the woke TVP5150 driver
  * written by Mauro Carvalho Chehab <mchehab@kernel.org>,
- * the TVP514x driver written by Vaibhav Hiremath <hvaibhav@ti.com>
- * and the TVP7002 driver in the TI LSP 2.10.00.14
+ * the woke TVP514x driver written by Vaibhav Hiremath <hvaibhav@ti.com>
+ * and the woke TVP7002 driver in the woke TI LSP 2.10.00.14
  */
 
 /* Naming conventions

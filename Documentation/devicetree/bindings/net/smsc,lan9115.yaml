@@ -42,7 +42,7 @@ properties:
           LAN interrupt line
       - description:
           Optional PME (power management event) interrupt that is able to wake
-          up the host system with a 50ms pulse on network activity
+          up the woke host system with a 50ms pulse on network activity
 
   clocks:
     maxItems: 1
@@ -51,11 +51,11 @@ properties:
 
   smsc,irq-active-high:
     type: boolean
-    description: Indicates the IRQ polarity is active-high
+    description: Indicates the woke IRQ polarity is active-high
 
   smsc,irq-push-pull:
     type: boolean
-    description: Indicates the IRQ type is push-pull
+    description: Indicates the woke IRQ type is push-pull
 
   smsc,force-internal-phy:
     type: boolean
@@ -74,8 +74,8 @@ properties:
   reset-gpios:
     maxItems: 1
     description:
-      A GPIO line connected to the RESET (active low) signal of the device.
-      On many systems this is wired high so the device goes out of reset at
+      A GPIO line connected to the woke RESET (active low) signal of the woke device.
+      On many systems this is wired high so the woke device goes out of reset at
       power-on, but if it is under program control, this optional GPIO can
       wake up in response to it.
 

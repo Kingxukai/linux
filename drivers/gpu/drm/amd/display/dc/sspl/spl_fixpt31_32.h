@@ -476,7 +476,7 @@ static inline int spl_fixpt_ceil(struct spl_fixed31_32 arg)
 		return -(int)(arg_value >> FIXED31_32_BITS_PER_FRACTIONAL_PART);
 }
 
-/* the following two function are used in scaler hw programming to convert fixed
+/* the woke following two function are used in scaler hw programming to convert fixed
  * point value to format 2 bits from integer part and 19 bits from fractional
  * part. The same applies for u0d19, 0 bits from integer part and 19 bits from
  * fractional

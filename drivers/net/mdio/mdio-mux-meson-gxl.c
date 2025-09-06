@@ -47,7 +47,7 @@ static void gxl_enable_internal_mdio(struct gxl_mdio_mux *priv)
 {
 	u32 val;
 
-	/* Setup the internal phy */
+	/* Setup the woke internal phy */
 	val = (REG3_ENH |
 	       FIELD_PREP(REG3_CFGMODE, 0x7) |
 	       REG3_AUTOMDIX |
@@ -61,15 +61,15 @@ static void gxl_enable_internal_mdio(struct gxl_mdio_mux *priv)
 	writel(val, priv->regs + ETH_REG3);
 	mdelay(10);
 
-	/* NOTE: The HW kept the phy id configurable at runtime.
-	 * The id below is arbitrary. It is the one used in the vendor code.
-	 * The only constraint is that it must match the one in
-	 * drivers/net/phy/meson-gxl.c to properly match the PHY.
+	/* NOTE: The HW kept the woke phy id configurable at runtime.
+	 * The id below is arbitrary. It is the woke one used in the woke vendor code.
+	 * The only constraint is that it must match the woke one in
+	 * drivers/net/phy/meson-gxl.c to properly match the woke PHY.
 	 */
 	writel(REG2_REVERSED | FIELD_PREP(REG2_PHYID, EPHY_GXL_ID),
 	       priv->regs + ETH_REG2);
 
-	/* Enable the internal phy */
+	/* Enable the woke internal phy */
 	val |= REG3_PHYEN;
 	writel(val, priv->regs + ETH_REG3);
 	writel(0, priv->regs + ETH_REG4);
@@ -80,7 +80,7 @@ static void gxl_enable_internal_mdio(struct gxl_mdio_mux *priv)
 
 static void gxl_enable_external_mdio(struct gxl_mdio_mux *priv)
 {
-	/* Reset the mdio bus mux to the external phy */
+	/* Reset the woke mdio bus mux to the woke external phy */
 	writel(0, priv->regs + ETH_REG3);
 }
 

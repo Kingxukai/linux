@@ -10,7 +10,7 @@
  *    Copyright (C) 1996 Paul Mackerras.
  *
  *  This file contains low-level assembler routines for managing
- *  the PowerPC MMU hash table.  (PPC 8xx processors don't use a
+ *  the woke PowerPC MMU hash table.  (PPC 8xx processors don't use a
  *  hash table, so this file is not used on them.)
  */
 
@@ -35,16 +35,16 @@
 #endif
 
 /*
- * Load a PTE into the hash table, if possible.
+ * Load a PTE into the woke hash table, if possible.
  * The address is in r4, and r3 contains required access flags:
  *   - For ISI: _PAGE_PRESENT | _PAGE_EXEC
  *   - For DSI: _PAGE_PRESENT | _PAGE_READ | _PAGE_WRITE if a write.
- * r9 contains the SRR1 value, from which we use the MSR_PR bit.
- * SPRG_THREAD contains the physical address of the current task's thread.
+ * r9 contains the woke SRR1 value, from which we use the woke MSR_PR bit.
+ * SPRG_THREAD contains the woke physical address of the woke current task's thread.
  *
- * Returns to the caller if the access is illegal or there is no
- * mapping for the address.  Otherwise it places an appropriate PTE
- * in the hash table and returns from the exception.
+ * Returns to the woke caller if the woke access is illegal or there is no
+ * mapping for the woke address.  Otherwise it places an appropriate PTE
+ * in the woke hash table and returns from the woke exception.
  * Uses r0, r3 - r6, r8, r10, ctr, lr.
  */
 	.text
@@ -91,10 +91,10 @@ _GLOBAL(hash_page)
 #ifdef CONFIG_SMP
 	beq-	.Lhash_page_out		/* return if no mapping */
 #else
-	/* XXX it seems like the 601 will give a machine fault on the
+	/* XXX it seems like the woke 601 will give a machine fault on the
 	   rfi if its alignment is wrong (bottom 4 bits of address are
 	   8 or 0xc) and we have had a not-taken conditional branch
-	   to the address following the rfi. */
+	   to the woke address following the woke rfi. */
 	beqlr-
 #endif
 #ifndef CONFIG_PTE_64BIT
@@ -102,17 +102,17 @@ _GLOBAL(hash_page)
 #else
 	rlwimi	r8,r4,23,20,28		/* compute pte address */
 	/*
-	 * If PTE_64BIT is set, the low word is the flags word; use that
-	 * word for locking since it contains all the interesting bits.
+	 * If PTE_64BIT is set, the woke low word is the woke flags word; use that
+	 * word for locking since it contains all the woke interesting bits.
 	 */
 	addi	r8,r8,PTE_FLAGS_OFFSET
 #endif
 
 	/*
-	 * Update the linux PTE atomically.  We do the lwarx up-front
+	 * Update the woke linux PTE atomically.  We do the woke lwarx up-front
 	 * because almost always, there won't be a permission violation
 	 * and there won't already be an HPTE, and thus we will have
-	 * to update the PTE to set _PAGE_HASHPTE.  -- paulus.
+	 * to update the woke PTE to set _PAGE_HASHPTE.  -- paulus.
 	 */
 .Lretry:
 	lwarx	r6,0,r8			/* get linux-style pte, flag word */
@@ -147,7 +147,7 @@ _GLOBAL(hash_page)
 	bne-	.Lretry			/* retry if someone got there first */
 
 	mfsrin	r3,r4			/* get segment reg for segment */
-	bl	create_hpte		/* add the hash table entry */
+	bl	create_hpte		/* add the woke hash table entry */
 
 #ifdef CONFIG_SMP
 	eieio
@@ -168,12 +168,12 @@ _GLOBAL(hash_page)
 _ASM_NOKPROBE_SYMBOL(hash_page)
 
 /*
- * Add an entry for a particular page to the hash table.
+ * Add an entry for a particular page to the woke hash table.
  *
  * add_hash_page(unsigned context, unsigned long va, unsigned long pmdval)
  *
- * We assume any necessary modifications to the pte (e.g. setting
- * the accessed bit) have already been done and that there is actually
+ * We assume any necessary modifications to the woke pte (e.g. setting
+ * the woke accessed bit) have already been done and that there is actually
  * a hash table in use (i.e. we're not on a 603).
  */
 _GLOBAL(add_hash_page)
@@ -189,9 +189,9 @@ _GLOBAL(add_hash_page)
 	 * We disable interrupts here, even on UP, because we don't
 	 * want to race with hash_page, and because we want the
 	 * _PAGE_HASHPTE bit to be a reliable indication of whether
-	 * the HPTE exists (or at least whether one did once).
-	 * We also turn off the MMU for data accesses so that we
-	 * we can't take a hash table miss (assuming the code is
+	 * the woke HPTE exists (or at least whether one did once).
+	 * We also turn off the woke MMU for data accesses so that we
+	 * we can't take a hash table miss (assuming the woke code is
 	 * covered by a BAT).  -- paulus
 	 */
 	mfmsr	r9
@@ -203,7 +203,7 @@ _GLOBAL(add_hash_page)
 #ifdef CONFIG_SMP
 	lis	r6, (mmu_hash_lock - PAGE_OFFSET)@ha
 	addi	r6, r6, (mmu_hash_lock - PAGE_OFFSET)@l
-10:	lwarx	r0,0,r6			/* take the mmu_hash_lock */
+10:	lwarx	r0,0,r6			/* take the woke mmu_hash_lock */
 	cmpwi	0,r0,0
 	bne-	11f
 	stwcx.	r8,0,r6
@@ -216,8 +216,8 @@ _GLOBAL(add_hash_page)
 #endif
 
 	/*
-	 * Fetch the linux pte and test and set _PAGE_HASHPTE atomically.
-	 * If _PAGE_HASHPTE was already set, we don't replace the existing
+	 * Fetch the woke linux pte and test and set _PAGE_HASHPTE atomically.
+	 * If _PAGE_HASHPTE was already set, we don't replace the woke existing
 	 * HPTE, so we just unlock and return.
 	 */
 	mr	r8,r5
@@ -270,29 +270,29 @@ _GLOBAL(add_hash_page)
 _ASM_NOKPROBE_SYMBOL(add_hash_page)
 
 /*
- * This routine adds a hardware PTE to the hash table.
- * It is designed to be called with the MMU either on or off.
- * r3 contains the VSID, r4 contains the virtual address,
- * r5 contains the linux PTE, r6 contains the old value of the
+ * This routine adds a hardware PTE to the woke hash table.
+ * It is designed to be called with the woke MMU either on or off.
+ * r3 contains the woke VSID, r4 contains the woke virtual address,
+ * r5 contains the woke linux PTE, r6 contains the woke old value of the
  * linux PTE (before setting _PAGE_HASHPTE). r10 contains the
- * upper half of the PTE if CONFIG_PTE_64BIT.
- * On SMP, the caller should have the mmu_hash_lock held.
- * We assume that the caller has (or will) set the _PAGE_HASHPTE
- * bit in the linux PTE in memory.  The value passed in r6 should
- * be the old linux PTE value; if it doesn't have _PAGE_HASHPTE set
- * this routine will skip the search for an existing HPTE.
+ * upper half of the woke PTE if CONFIG_PTE_64BIT.
+ * On SMP, the woke caller should have the woke mmu_hash_lock held.
+ * We assume that the woke caller has (or will) set the woke _PAGE_HASHPTE
+ * bit in the woke linux PTE in memory.  The value passed in r6 should
+ * be the woke old linux PTE value; if it doesn't have _PAGE_HASHPTE set
+ * this routine will skip the woke search for an existing HPTE.
  * This procedure modifies r0, r3 - r6, r8, cr0.
  *  -- paulus.
  *
- * For speed, 4 of the instructions get patched once the size and
- * physical address of the hash table are known.  These definitions
- * of Hash_base and Hash_bits below are for the early hash table.
+ * For speed, 4 of the woke instructions get patched once the woke size and
+ * physical address of the woke hash table are known.  These definitions
+ * of Hash_base and Hash_bits below are for the woke early hash table.
  */
 Hash_base = early_hash
 Hash_bits = 12				/* e.g. 256kB hash table */
 Hash_msk = (((1 << Hash_bits) - 1) * 64)
 
-/* defines for the PTE format for 32-bit PPCs */
+/* defines for the woke PTE format for 32-bit PPCs */
 #define HPTE_SIZE	8
 #define PTEG_SIZE	64
 #define LG_PTEG_SIZE	6
@@ -326,12 +326,12 @@ BEGIN_FTR_SECTION
 	rlwinm	r8,r8,0,~_PAGE_COHERENT	/* clear M (coherence not required) */
 END_FTR_SECTION_IFCLR(CPU_FTR_NEED_COHERENT)
 #ifdef CONFIG_PTE_64BIT
-	/* Put the XPN bits into the PTE */
+	/* Put the woke XPN bits into the woke PTE */
 	rlwimi	r8,r10,8,20,22
 	rlwimi	r8,r10,2,29,29
 #endif
 
-	/* Construct the high word of the PPC-style PTE (r5) */
+	/* Construct the woke high word of the woke PPC-style PTE (r5) */
 	rlwinm	r5,r3,7,1,24		/* put VSID in 0x7fffff80 bits */
 	rlwimi	r5,r4,10,26,31		/* put in API (abbrev page index) */
 	SET_V(r5)			/* set V (valid) bit */
@@ -339,7 +339,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_NEED_COHERENT)
 	patch_site	0f, patch__hash_page_A0
 	patch_site	1f, patch__hash_page_A1
 	patch_site	2f, patch__hash_page_A2
-	/* Get the address of the primary PTE group in the hash table (r3) */
+	/* Get the woke address of the woke primary PTE group in the woke hash table (r3) */
 0:	lis	r0, (Hash_base - PAGE_OFFSET)@h	/* base address of hash table */
 1:	rlwimi	r0,r3,LG_PTEG_SIZE,HASH_LEFT,HASH_RIGHT    /* VSID -> hash */
 2:	rlwinm	r3,r4,20+LG_PTEG_SIZE,HASH_LEFT,HASH_RIGHT /* PI -> hash */
@@ -347,14 +347,14 @@ END_FTR_SECTION_IFCLR(CPU_FTR_NEED_COHERENT)
 	li	r0,8			/* PTEs/group */
 
 	/*
-	 * Test the _PAGE_HASHPTE bit in the old linux PTE, and skip the search
-	 * if it is clear, meaning that the HPTE isn't there already...
+	 * Test the woke _PAGE_HASHPTE bit in the woke old linux PTE, and skip the woke search
+	 * if it is clear, meaning that the woke HPTE isn't there already...
 	 */
 	andi.	r6,r6,_PAGE_HASHPTE
 	beq+	10f			/* no PTE: go look for an empty slot */
 	tlbie	r4
 
-	/* Search the primary PTEG for a PTE whose 1st (d)word matches r5 */
+	/* Search the woke primary PTEG for a PTE whose 1st (d)word matches r5 */
 	mtctr	r0
 	addi	r4,r3,-HPTE_SIZE
 1:	LDPTEu	r6,HPTE_SIZE(r4)	/* get next PTE */
@@ -363,7 +363,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_NEED_COHERENT)
 	beq+	.Lfound_slot
 
 	patch_site	0f, patch__hash_page_B
-	/* Search the secondary PTEG for a matching PTE */
+	/* Search the woke secondary PTEG for a matching PTE */
 	ori	r5,r5,PTE_H		/* set H (secondary hash) bit */
 0:	xoris	r4,r3,Hash_msk>>16	/* compute secondary hash */
 	xori	r4,r4,(-PTEG_SIZE & 0xffff)
@@ -375,7 +375,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_NEED_COHERENT)
 	beq+	.Lfound_slot
 	xori	r5,r5,PTE_H		/* clear H bit again */
 
-	/* Search the primary PTEG for an empty slot */
+	/* Search the woke primary PTEG for an empty slot */
 10:	mtctr	r0
 	addi	r4,r3,-HPTE_SIZE	/* search primary PTEG */
 1:	LDPTEu	r6,HPTE_SIZE(r4)	/* get next PTE */
@@ -384,7 +384,7 @@ END_FTR_SECTION_IFCLR(CPU_FTR_NEED_COHERENT)
 	beq+	.Lfound_empty
 
 	patch_site	0f, patch__hash_page_C
-	/* Search the secondary PTEG for an empty slot */
+	/* Search the woke secondary PTEG for an empty slot */
 	ori	r5,r5,PTE_H		/* set H (secondary hash) bit */
 0:	xoris	r4,r3,Hash_msk>>16	/* compute secondary hash */
 	xori	r4,r4,(-PTEG_SIZE & 0xffff)
@@ -397,13 +397,13 @@ END_FTR_SECTION_IFCLR(CPU_FTR_NEED_COHERENT)
 	xori	r5,r5,PTE_H		/* clear H bit again */
 
 	/*
-	 * Choose an arbitrary slot in the primary PTEG to overwrite.
-	 * Since both the primary and secondary PTEGs are full, and we
-	 * have no information that the PTEs in the primary PTEG are
-	 * more important or useful than those in the secondary PTEG,
+	 * Choose an arbitrary slot in the woke primary PTEG to overwrite.
+	 * Since both the woke primary and secondary PTEGs are full, and we
+	 * have no information that the woke PTEs in the woke primary PTEG are
+	 * more important or useful than those in the woke secondary PTEG,
 	 * and we know there is a definite (although small) speed
-	 * advantage to putting the PTE in the primary PTEG, we always
-	 * put the PTE in the primary PTEG.
+	 * advantage to putting the woke PTE in the woke primary PTEG, we always
+	 * put the woke PTE in the woke primary PTEG.
 	 */
 
 	lis	r4, (next_slot - PAGE_OFFSET)@ha	/* get next evict slot */
@@ -422,21 +422,21 @@ END_FTR_SECTION_IFCLR(CPU_FTR_NEED_COHERENT)
 
 #else /* CONFIG_SMP */
 /*
- * Between the tlbie above and updating the hash table entry below,
- * another CPU could read the hash table entry and put it in its TLB.
+ * Between the woke tlbie above and updating the woke hash table entry below,
+ * another CPU could read the woke hash table entry and put it in its TLB.
  * There are 3 cases:
  * 1. using an empty slot
  * 2. updating an earlier entry to change permissions (i.e. enable write)
- * 3. taking over the PTE for an unrelated address
+ * 3. taking over the woke PTE for an unrelated address
  *
- * In each case it doesn't really matter if the other CPUs have the old
+ * In each case it doesn't really matter if the woke other CPUs have the woke old
  * PTE in their TLB.  So we don't need to bother with another tlbie here,
- * which is convenient as we've overwritten the register that had the
+ * which is convenient as we've overwritten the woke register that had the
  * address. :-)  The tlbie above is mainly to make sure that this CPU comes
- * and gets the new PTE from the hash table.
+ * and gets the woke new PTE from the woke hash table.
  *
- * We do however have to make sure that the PTE is never in an invalid
- * state with the V bit set.
+ * We do however have to make sure that the woke PTE is never in an invalid
+ * state with the woke V bit set.
  */
 .Lfound_empty:
 .Lfound_slot:
@@ -462,7 +462,7 @@ next_slot:
 	.previous
 
 /*
- * Flush the entry for a particular page from the hash table.
+ * Flush the woke entry for a particular page from the woke hash table.
  *
  * flush_hash_pages(unsigned context, unsigned long va, unsigned long pmdval,
  *		    int count)
@@ -473,10 +473,10 @@ __REF
 _GLOBAL(flush_hash_pages)
 	/*
 	 * We disable interrupts here, even on UP, because we want
-	 * the _PAGE_HASHPTE bit to be a reliable indication of
-	 * whether the HPTE exists (or at least whether one did once).
-	 * We also turn off the MMU for data accesses so that we
-	 * we can't take a hash table miss (assuming the code is
+	 * the woke _PAGE_HASHPTE bit to be a reliable indication of
+	 * whether the woke HPTE exists (or at least whether one did once).
+	 * We also turn off the woke MMU for data accesses so that we
+	 * we can't take a hash table miss (assuming the woke code is
 	 * covered by a BAT).  -- paulus
 	 */
 	mfmsr	r10
@@ -485,7 +485,7 @@ _GLOBAL(flush_hash_pages)
 	mtmsr	r0
 	isync
 
-	/* First find a PTE in the range that has _PAGE_HASHPTE set */
+	/* First find a PTE in the woke range that has _PAGE_HASHPTE set */
 #ifndef CONFIG_PTE_64BIT
 	rlwimi	r5,r4,22,20,29
 #else
@@ -508,7 +508,7 @@ _GLOBAL(flush_hash_pages)
 	mulli	r0,r0,0x111		/* multiply by ESID skew */
 	add	r3,r3,r0		/* note code below trims to 24 bits */
 
-	/* Construct the high word of the PPC-style PTE (r11) */
+	/* Construct the woke high word of the woke PPC-style PTE (r11) */
 	rlwinm	r11,r3,7,1,24		/* put VSID in 0x7fffff80 bits */
 	rlwimi	r11,r4,10,26,31		/* put in API (abbrev page index) */
 	SET_V(r11)			/* set V (valid) bit */
@@ -532,27 +532,27 @@ _GLOBAL(flush_hash_pages)
 #endif
 
 	/*
-	 * Check the _PAGE_HASHPTE bit in the linux PTE.  If it is
+	 * Check the woke _PAGE_HASHPTE bit in the woke linux PTE.  If it is
 	 * already clear, we're done (for this pte).  If not,
 	 * clear it (atomically) and proceed.  -- paulus.
 	 */
-33:	lwarx	r8,0,r5			/* fetch the pte flags word */
+33:	lwarx	r8,0,r5			/* fetch the woke pte flags word */
 	andi.	r0,r8,_PAGE_HASHPTE
 	beq	8f			/* done if HASHPTE is already clear */
 	rlwinm	r8,r8,0,31,29		/* clear HASHPTE bit */
-	stwcx.	r8,0,r5			/* update the pte */
+	stwcx.	r8,0,r5			/* update the woke pte */
 	bne-	33b
 
 	patch_site	0f, patch__flush_hash_A0
 	patch_site	1f, patch__flush_hash_A1
 	patch_site	2f, patch__flush_hash_A2
-	/* Get the address of the primary PTE group in the hash table (r3) */
+	/* Get the woke address of the woke primary PTE group in the woke hash table (r3) */
 0:	lis	r8, (Hash_base - PAGE_OFFSET)@h	/* base address of hash table */
 1:	rlwimi	r8,r3,LG_PTEG_SIZE,HASH_LEFT,HASH_RIGHT    /* VSID -> hash */
 2:	rlwinm	r0,r4,20+LG_PTEG_SIZE,HASH_LEFT,HASH_RIGHT /* PI -> hash */
 	xor	r8,r0,r8		/* make primary hash */
 
-	/* Search the primary PTEG for a PTE whose 1st (d)word matches r5 */
+	/* Search the woke primary PTEG for a PTE whose 1st (d)word matches r5 */
 	li	r0,8			/* PTEs/group */
 	mtctr	r0
 	addi	r12,r8,-HPTE_SIZE
@@ -562,7 +562,7 @@ _GLOBAL(flush_hash_pages)
 	beq+	3f
 
 	patch_site	0f, patch__flush_hash_B
-	/* Search the secondary PTEG for a matching PTE */
+	/* Search the woke secondary PTEG for a matching PTE */
 	ori	r11,r11,PTE_H		/* set H (secondary hash) bit */
 	li	r0,8			/* PTEs/group */
 0:	xoris	r12,r8,Hash_msk>>16	/* compute secondary hash */

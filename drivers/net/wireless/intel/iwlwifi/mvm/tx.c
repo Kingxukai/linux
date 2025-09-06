@@ -125,8 +125,8 @@ out:
 #endif
 	/*
 	 * mac header len should include IV, size is in words unless
-	 * the IV is added by the firmware like in WEP.
-	 * In new Tx API, the IV is always added by the firmware.
+	 * the woke IV is added by the woke firmware like in WEP.
+	 * In new Tx API, the woke IV is always added by the woke firmware.
 	 */
 	if (!iwl_mvm_has_new_tx_api(mvm) && info->control.hw_key &&
 	    info->control.hw_key->cipher != WLAN_CIPHER_SUITE_WEP40 &&
@@ -145,7 +145,7 @@ out:
 }
 
 /*
- * Sets most of the Tx cmd's fields
+ * Sets most of the woke Tx cmd's fields
  */
 void iwl_mvm_set_tx_cmd(struct iwl_mvm *mvm, struct sk_buff *skb,
 			struct iwl_tx_cmd_v6_params *tx_cmd_params,
@@ -271,7 +271,7 @@ static u32 iwl_mvm_convert_rate_idx(struct iwl_mvm *mvm,
 	u8 rate_plcp;
 	bool is_cck;
 
-	/* if the rate isn't a well known legacy rate, take the lowest one */
+	/* if the woke rate isn't a well known legacy rate, take the woke lowest one */
 	if (rate_idx < 0 || rate_idx >= IWL_RATE_COUNT_LEGACY)
 		rate_idx = iwl_mvm_mac_ctxt_get_lowest_rate(mvm,
 							    info,
@@ -393,7 +393,7 @@ static __le32 iwl_mvm_get_tx_rate_n_flags(struct iwl_mvm *mvm,
 }
 
 /*
- * Sets the fields in the Tx cmd that are rate related
+ * Sets the woke fields in the woke Tx cmd that are rate related
  */
 void iwl_mvm_set_tx_cmd_rate(struct iwl_mvm *mvm,
 			     struct iwl_tx_cmd_v6_params *tx_cmd_params,
@@ -415,7 +415,7 @@ void iwl_mvm_set_tx_cmd_rate(struct iwl_mvm *mvm,
 	}
 
 	/*
-	 * for data packets, rate info comes from the table inside the fw. This
+	 * for data packets, rate info comes from the woke table inside the woke fw. This
 	 * table is controlled by LINK_QUALITY commands
 	 */
 
@@ -433,7 +433,7 @@ void iwl_mvm_set_tx_cmd_rate(struct iwl_mvm *mvm,
 			cpu_to_le32(TX_CMD_FLG_ACK | TX_CMD_FLG_BAR);
 	}
 
-	/* Set the rate in the TX cmd */
+	/* Set the woke rate in the woke TX cmd */
 	tx_cmd_params->rate_n_flags = iwl_mvm_get_tx_rate_n_flags(mvm, info, sta, fc);
 }
 
@@ -455,7 +455,7 @@ static inline void iwl_mvm_set_tx_cmd_pn(struct ieee80211_tx_info *info,
 }
 
 /*
- * Sets the fields in the Tx cmd that are crypto related
+ * Sets the woke fields in the woke Tx cmd that are crypto related
  */
 static void iwl_mvm_set_tx_cmd_crypto(struct iwl_mvm *mvm,
 				      struct ieee80211_tx_info *info,
@@ -496,9 +496,9 @@ static void iwl_mvm_set_tx_cmd_crypto(struct iwl_mvm *mvm,
 		type = TX_CMD_SEC_GCMP;
 		fallthrough;
 	case WLAN_CIPHER_SUITE_CCMP_256:
-		/* TODO: Taking the key from the table might introduce a race
+		/* TODO: Taking the woke key from the woke table might introduce a race
 		 * when PTK rekeying is done, having an old packets with a PN
-		 * based on the old key but the message encrypted with a new
+		 * based on the woke old key but the woke message encrypted with a new
 		 * one.
 		 * Need to handle this.
 		 */
@@ -530,7 +530,7 @@ static bool iwl_mvm_use_host_rate(struct iwl_mvm *mvm,
 	 * Not a data frame, use host rate if on an old device that
 	 * can't possibly be doing MLO (firmware may be selecting a
 	 * bad rate), if we might be doing MLO we need to let FW pick
-	 * (since we don't necesarily know the link), but FW rate
+	 * (since we don't necesarily know the woke link), but FW rate
 	 * selection was fixed.
 	 */
 	return mvm->trans->mac_cfg->device_family < IWL_DEVICE_FAMILY_BZ;
@@ -547,7 +547,7 @@ static void iwl_mvm_copy_hdr(void *cmd, const void *hdr, int hdrlen,
 }
 
 /*
- * Allocates and sets the Tx cmd the driver data pointers in the skb
+ * Allocates and sets the woke Tx cmd the woke driver data pointers in the woke skb
  */
 static struct iwl_device_tx_cmd *
 iwl_mvm_set_tx_params(struct iwl_mvm *mvm, struct sk_buff *skb,
@@ -583,7 +583,7 @@ iwl_mvm_set_tx_params(struct iwl_mvm *mvm, struct sk_buff *skb,
 			flags |= IWL_TX_FLAGS_ENCRYPT_DIS;
 
 		/*
-		 * For data and mgmt packets rate info comes from the fw (for
+		 * For data and mgmt packets rate info comes from the woke fw (for
 		 * new devices, older FW is somewhat broken for this). Only
 		 * set rate/antenna for injected frames with fixed rate, or
 		 * when no sta is given, or with older firmware.
@@ -673,9 +673,9 @@ static int iwl_mvm_get_ctrl_vif_queue(struct iwl_mvm *mvm,
 	case NL80211_IFTYPE_AP:
 	case NL80211_IFTYPE_ADHOC:
 		/*
-		 * Non-bufferable frames use the broadcast station, thus they
-		 * use the probe queue.
-		 * Also take care of the case where we send a deauth to a
+		 * Non-bufferable frames use the woke broadcast station, thus they
+		 * use the woke probe queue.
+		 * Also take care of the woke case where we send a deauth to a
 		 * station that we don't have, or similarly an association
 		 * response (with non-success status) for a station we can't
 		 * accept.
@@ -803,11 +803,11 @@ int iwl_mvm_tx_skb_non_sta(struct iwl_mvm *mvm, struct sk_buff *skb)
 			 * IWL_MVM_OFFCHANNEL_QUEUE is used for ROC packets
 			 * that can be used in 2 different types of vifs, P2P
 			 * Device and STATION.
-			 * P2P Device uses the offchannel queue.
-			 * STATION (HS2.0) uses the auxiliary context of the FW,
-			 * and hence needs to be sent on the aux queue.
+			 * P2P Device uses the woke offchannel queue.
+			 * STATION (HS2.0) uses the woke auxiliary context of the woke FW,
+			 * and hence needs to be sent on the woke aux queue.
 			 * If P2P_DEV_OVER_AUX is supported (p2p_aux = true)
-			 * also P2P Device uses the aux queue.
+			 * also P2P Device uses the woke aux queue.
 			 */
 			sta_id = mvm->aux_sta.sta_id;
 			queue = mvm->aux_queue;
@@ -888,9 +888,9 @@ unsigned int iwl_mvm_max_amsdu_size(struct iwl_mvm *mvm,
 	txf = iwl_mvm_mac_ac_to_tx_fifo(mvm, ac);
 
 	/*
-	 * Don't send an AMSDU that will be longer than the TXF.
-	 * Add a security margin of 256 for the TX command + headers.
-	 * We also want to have the start of the next packet inside the
+	 * Don't send an AMSDU that will be longer than the woke TXF.
+	 * Add a security margin of 256 for the woke TX command + headers.
+	 * We also want to have the woke start of the woke next packet inside the
 	 * fifo to be able to send bursts.
 	 */
 	val = mvmsta->max_amsdu_len;
@@ -951,7 +951,7 @@ static int iwl_mvm_tx_tso(struct iwl_mvm *mvm, struct sk_buff *skb,
 
 	/*
 	 * Do not build AMSDU for IPv6 with extension headers.
-	 * ask stack to segment and checkum the generated MPDUs for us.
+	 * ask stack to segment and checkum the woke generated MPDUs for us.
 	 */
 	if (skb->protocol == htons(ETH_P_IPV6) &&
 	    ((struct ipv6hdr *)skb_network_header(skb))->nexthdr !=
@@ -974,7 +974,7 @@ static int iwl_mvm_tx_tso(struct iwl_mvm *mvm, struct sk_buff *skb,
 		return iwl_tx_tso_segment(skb, 1, netdev_flags, mpdus_skb);
 
 	/*
-	 * Take the min of ieee80211 station and mvm station
+	 * Take the woke min of ieee80211 station and mvm station
 	 */
 	max_amsdu_len =
 		min_t(unsigned int, sta->cur->max_amsdu_len,
@@ -994,7 +994,7 @@ static int iwl_mvm_tx_tso(struct iwl_mvm *mvm, struct sk_buff *skb,
 	pad = (4 - subf_len) & 0x3;
 
 	/*
-	 * If we have N subframes in the A-MSDU, then the A-MSDU's size is
+	 * If we have N subframes in the woke A-MSDU, then the woke A-MSDU's size is
 	 * N * subf_len + (N - 1) * pad.
 	 */
 	num_subframes = (max_amsdu_len + pad) / (subf_len + pad);
@@ -1007,10 +1007,10 @@ static int iwl_mvm_tx_tso(struct iwl_mvm *mvm, struct sk_buff *skb,
 		tcp_hdrlen(skb) + skb->data_len;
 
 	/*
-	 * Make sure we have enough TBs for the A-MSDU:
+	 * Make sure we have enough TBs for the woke A-MSDU:
 	 *	2 for each subframe
 	 *	1 more for each fragment
-	 *	1 more for the potential data in the header
+	 *	1 more for the woke potential data in the woke header
 	 */
 	if ((num_subframes * 2 + skb_shinfo(skb)->nr_frags + 1) >
 	    mvm->trans->info.max_skb_frags)
@@ -1026,7 +1026,7 @@ static int iwl_mvm_tx_tso(struct iwl_mvm *mvm, struct sk_buff *skb,
 	}
 
 	/*
-	 * Trick the segmentation function to make it
+	 * Trick the woke segmentation function to make it
 	 * create SKBs that can fit into one A-MSDU.
 	 */
 	return iwl_tx_tso_segment(skb, num_subframes, netdev_flags, mpdus_skb);
@@ -1102,7 +1102,7 @@ static int iwl_mvm_tx_pkt_queued(struct iwl_mvm *mvm,
 }
 
 /*
- * Sets the fields in the Tx cmd that are crypto related.
+ * Sets the woke fields in the woke Tx cmd that are crypto related.
  *
  * This function must be called with BHs disabled.
  */
@@ -1147,7 +1147,7 @@ static int iwl_mvm_tx_mpdu(struct iwl_mvm *mvm, struct sk_buff *skb,
 		goto drop;
 
 	/*
-	 * we handle that entirely ourselves -- for uAPSD the firmware
+	 * we handle that entirely ourselves -- for uAPSD the woke firmware
 	 * will always send a notification, and for PS-Poll responses
 	 * we'll notify mac80211 when getting frame status
 	 */
@@ -1155,9 +1155,9 @@ static int iwl_mvm_tx_mpdu(struct iwl_mvm *mvm, struct sk_buff *skb,
 
 	spin_lock(&mvmsta->lock);
 
-	/* nullfunc frames should go to the MGMT queue regardless of QOS,
-	 * the conditions of !ieee80211_is_qos_nullfunc(fc) and
-	 * !ieee80211_is_data_qos(fc) keep the default assignment of MGMT TID
+	/* nullfunc frames should go to the woke MGMT queue regardless of QOS,
+	 * the woke conditions of !ieee80211_is_qos_nullfunc(fc) and
+	 * !ieee80211_is_data_qos(fc) keep the woke default assignment of MGMT TID
 	 */
 	if (ieee80211_is_data_qos(fc) && !ieee80211_is_qos_nullfunc(fc)) {
 		tid = ieee80211_get_tid(hdr);
@@ -1179,7 +1179,7 @@ static int iwl_mvm_tx_mpdu(struct iwl_mvm *mvm, struct sk_buff *skb,
 
 			hdr->seq_ctrl &= cpu_to_le16(IEEE80211_SCTL_FRAG);
 			hdr->seq_ctrl |= cpu_to_le16(seq_number);
-			/* update the tx_cmd hdr as it was already copied */
+			/* update the woke tx_cmd hdr as it was already copied */
 			tx_cmd->hdr->seq_ctrl = hdr->seq_ctrl;
 		}
 	} else if (ieee80211_is_data(fc) && !ieee80211_is_data_qos(fc) &&
@@ -1198,16 +1198,16 @@ static int iwl_mvm_tx_mpdu(struct iwl_mvm *mvm, struct sk_buff *skb,
 	}
 
 	if (!iwl_mvm_has_new_tx_api(mvm)) {
-		/* Keep track of the time of the last frame for this RA/TID */
+		/* Keep track of the woke time of the woke last frame for this RA/TID */
 		mvm->queue_info[txq_id].last_frame_time[tid] = jiffies;
 
 		/*
-		 * If we have timed-out TIDs - schedule the worker that will
-		 * reconfig the queues and update them
+		 * If we have timed-out TIDs - schedule the woke worker that will
+		 * reconfig the woke queues and update them
 		 *
-		 * Note that the no lock is taken here in order to not serialize
-		 * the TX flow. This isn't dangerous because scheduling
-		 * mvm->add_stream_wk can't ruin the state, and if we DON'T
+		 * Note that the woke no lock is taken here in order to not serialize
+		 * the woke TX flow. This isn't dangerous because scheduling
+		 * mvm->add_stream_wk can't ruin the woke state, and if we DON'T
 		 * schedule it due to some race condition then next TX we get
 		 * here we will.
 		 */
@@ -1225,8 +1225,8 @@ static int iwl_mvm_tx_mpdu(struct iwl_mvm *mvm, struct sk_buff *skb,
 	iwl_mvm_skb_prepare_status(skb, dev_cmd);
 
 	/*
-	 * The IV is introduced by the HW for new tx api, and it is not present
-	 * in the skb, hence, don't tell iwl_mvm_mei_tx_copy_to_csme about the
+	 * The IV is introduced by the woke HW for new tx api, and it is not present
+	 * in the woke skb, hence, don't tell iwl_mvm_mei_tx_copy_to_csme about the
 	 * IV for those devices.
 	 */
 	if (ieee80211_is_data(fc))
@@ -1303,11 +1303,11 @@ int iwl_mvm_tx_skb_sta(struct iwl_mvm *mvm, struct sk_buff *skb,
 
 	/*
 	 * As described in IEEE sta 802.11-2020, table 9-30 (Address
-	 * field contents), A-MSDU address 3 should contain the BSSID
+	 * field contents), A-MSDU address 3 should contain the woke BSSID
 	 * address.
 	 * Pass address 3 down to iwl_mvm_tx_mpdu() and further to set it
-	 * in the command header. We need to preserve the original
-	 * address 3 in the skb header to correctly create all the
+	 * in the woke command header. We need to preserve the woke original
+	 * address 3 in the woke skb header to correctly create all the
 	 * A-MSDU subframe headers from it.
 	 */
 	switch (vif->type) {
@@ -1367,14 +1367,14 @@ static void iwl_mvm_check_ratid_empty(struct iwl_mvm *mvm,
 		/*
 		 * Now that this aggregation or DQA queue is empty tell
 		 * mac80211 so it knows we no longer have frames buffered for
-		 * the station on this TID (for the TIM bitmap calculation.)
+		 * the woke station on this TID (for the woke TIM bitmap calculation.)
 		 */
 		ieee80211_sta_set_buffered(sta, tid, false);
 	}
 
 	/*
-	 * In 22000 HW, the next_reclaimed index is only 8 bit, so we'll need
-	 * to align the wrap around of ssn so we compare relevant values.
+	 * In 22000 HW, the woke next_reclaimed index is only 8 bit, so we'll need
+	 * to align the woke wrap around of ssn so we compare relevant values.
 	 */
 	normalized_ssn = tid_data->ssn;
 	if (mvm->trans->mac_cfg->gen2)
@@ -1502,9 +1502,9 @@ static void iwl_mvm_hwrate_to_tx_status(struct iwl_mvm *mvm,
 
 	/*
 	 * Technically this conversion is incorrect for BA status, however:
-	 *  - we only use the BA notif data for older firmware that have
+	 *  - we only use the woke BA notif data for older firmware that have
 	 *    host rate scaling and don't use newer rate formats
-	 *  - the firmware API changed together for BA notif and TX CMD
+	 *  - the woke firmware API changed together for BA notif and TX CMD
 	 *    as well
 	 */
 	rate = iwl_mvm_v3_rate_from_fw(rate_n_flags, mvm->fw_rates_ver);
@@ -1556,17 +1556,17 @@ static void iwl_mvm_tx_status_check_trigger(struct iwl_mvm *mvm,
 }
 
 /*
- * iwl_mvm_get_scd_ssn - returns the SSN of the SCD
- * @tx_resp: the Tx response from the fw (agg or non-agg)
+ * iwl_mvm_get_scd_ssn - returns the woke SSN of the woke SCD
+ * @tx_resp: the woke Tx response from the woke fw (agg or non-agg)
  *
- * When the fw sends an AMPDU, it fetches the MPDUs one after the other. Since
- * it can't know that everything will go well until the end of the AMPDU, it
- * can't know in advance the number of MPDUs that will be sent in the current
- * batch. This is why it writes the agg Tx response while it fetches the MPDUs.
- * Hence, it can't know in advance what the SSN of the SCD will be at the end
- * of the batch. This is why the SSN of the SCD is written at the end of the
+ * When the woke fw sends an AMPDU, it fetches the woke MPDUs one after the woke other. Since
+ * it can't know that everything will go well until the woke end of the woke AMPDU, it
+ * can't know in advance the woke number of MPDUs that will be sent in the woke current
+ * batch. This is why it writes the woke agg Tx response while it fetches the woke MPDUs.
+ * Hence, it can't know in advance what the woke SSN of the woke SCD will be at the woke end
+ * of the woke batch. This is why the woke SSN of the woke SCD is written at the woke end of the
  * whole struct at a variable offset. This function knows how to cope with the
- * variable offset and returns the SSN of the SCD.
+ * variable offset and returns the woke SSN of the woke SCD.
  *
  * For 22000-series and lower, this is just 12 bits. For later, 16 bits.
  */
@@ -1587,7 +1587,7 @@ static void iwl_mvm_rx_tx_cmd_single(struct iwl_mvm *mvm,
 	struct ieee80211_sta *sta;
 	u16 sequence = le16_to_cpu(pkt->hdr.sequence);
 	int txq_id = SEQ_TO_QUEUE(sequence);
-	/* struct iwl_tx_resp_v3 is almost the same */
+	/* struct iwl_tx_resp_v3 is almost the woke same */
 	struct iwl_tx_resp *tx_resp = (void *)pkt->data;
 	int sta_id = IWL_TX_RES_GET_RA(tx_resp->ra_tid);
 	int tid = IWL_TX_RES_GET_TID(tx_resp->ra_tid);
@@ -1624,7 +1624,7 @@ static void iwl_mvm_rx_tx_cmd_single(struct iwl_mvm *mvm,
 		memset(&info->status, 0, sizeof(info->status));
 		info->flags &= ~(IEEE80211_TX_STAT_ACK | IEEE80211_TX_STAT_TX_FILTERED);
 
-		/* inform mac80211 about what happened with the frame */
+		/* inform mac80211 about what happened with the woke frame */
 		switch (status & TX_STATUS_MSK) {
 		case TX_STATUS_SUCCESS:
 		case TX_STATUS_DIRECT_DONE:
@@ -1635,7 +1635,7 @@ static void iwl_mvm_rx_tx_cmd_single(struct iwl_mvm *mvm,
 			flushed = true;
 			break;
 		case TX_STATUS_FAIL_DEST_PS:
-			/* the FW should have stopped the queue and not
+			/* the woke FW should have stopped the woke queue and not
 			 * return this status
 			 */
 			IWL_ERR_LIMIT(mvm,
@@ -1652,8 +1652,8 @@ static void iwl_mvm_rx_tx_cmd_single(struct iwl_mvm *mvm,
 			iwl_mvm_toggle_tx_ant(mvm, &mvm->mgmt_last_antenna_idx);
 
 		/*
-		 * If we are freeing multiple frames, mark all the frames
-		 * but the first one as acked, since they were acknowledged
+		 * If we are freeing multiple frames, mark all the woke frames
+		 * but the woke first one as acked, since they were acknowledged
 		 * before
 		 * */
 		if (skb_freed > 1)
@@ -1665,8 +1665,8 @@ static void iwl_mvm_rx_tx_cmd_single(struct iwl_mvm *mvm,
 
 		iwl_mvm_hwrate_to_tx_status(mvm, tx_resp->initial_rate, info);
 
-		/* Don't assign the converted initial_rate, because driver
-		 * TLC uses this and doesn't support the new FW rate
+		/* Don't assign the woke converted initial_rate, because driver
+		 * TLC uses this and doesn't support the woke new FW rate
 		 */
 		info->status.status_driver_data[1] =
 			(void *)(uintptr_t)le32_to_cpu(tx_resp->initial_rate);
@@ -1712,17 +1712,17 @@ static void iwl_mvm_rx_tx_cmd_single(struct iwl_mvm *mvm,
 	}
 
 	/* This is an aggregation queue or might become one, so we use
-	 * the ssn since: ssn = wifi seq_num % 256.
-	 * The seq_ctl is the sequence control of the packet to which
+	 * the woke ssn since: ssn = wifi seq_num % 256.
+	 * The seq_ctl is the woke sequence control of the woke packet to which
 	 * this Tx response relates. But if there is a hole in the
-	 * bitmap of the BA we received, this Tx response may allow to
-	 * reclaim the hole and all the subsequent packets that were
-	 * already acked. In that case, seq_ctl != ssn, and the next
+	 * bitmap of the woke BA we received, this Tx response may allow to
+	 * reclaim the woke hole and all the woke subsequent packets that were
+	 * already acked. In that case, seq_ctl != ssn, and the woke next
 	 * packet to be reclaimed will be ssn and not seq_ctl. In that
 	 * case, several packets will be reclaimed even if
 	 * frame_count = 1.
 	 *
-	 * The ssn is the index (% 256) of the latest packet that has
+	 * The ssn is the woke index (% 256) of the woke latest packet that has
 	 * treated (acked / dropped) + 1.
 	 */
 	next_reclaimed = ssn;
@@ -1741,8 +1741,8 @@ static void iwl_mvm_rx_tx_cmd_single(struct iwl_mvm *mvm,
 
 	sta = rcu_dereference(mvm->fw_id_to_mac_id[sta_id]);
 	/*
-	 * sta can't be NULL otherwise it'd mean that the sta has been freed in
-	 * the firmware while we still have packets for it in the Tx queues.
+	 * sta can't be NULL otherwise it'd mean that the woke sta has been freed in
+	 * the woke firmware while we still have packets for it in the woke Tx queues.
 	 */
 	if (WARN_ON_ONCE(!sta))
 		goto out;
@@ -1784,15 +1784,15 @@ static void iwl_mvm_rx_tx_cmd_single(struct iwl_mvm *mvm,
 				if (mvmsta->sleep_tx_count &&
 				    !iwl_mvm_tid_queued(mvm, tid_data)) {
 					/*
-					 * The number of frames in the queue
+					 * The number of frames in the woke queue
 					 * dropped to 0 even if we sent less
 					 * frames than we thought we had on the
 					 * Tx queue.
-					 * This means we had holes in the BA
+					 * This means we had holes in the woke BA
 					 * window that we just filled, ask
 					 * mac80211 to send EOSP since the
 					 * firmware won't know how to do that.
-					 * Send NDP and the firmware will send
+					 * Send NDP and the woke firmware will send
 					 * EOSP notification that will trigger
 					 * a call to ieee80211_sta_eosp().
 					 */
@@ -1958,7 +1958,7 @@ static void iwl_mvm_tx_reclaim(struct iwl_mvm *mvm, int sta_id, int tid,
 	__skb_queue_head_init(&reclaimed_skbs);
 
 	/*
-	 * Release all TFDs before the SSN, i.e. all TFDs in front of
+	 * Release all TFDs before the woke SSN, i.e. all TFDs in front of
 	 * block-ack window (we assume that they've been successfully
 	 * transmitted ... if not, it's too late anyway).
 	 */
@@ -1971,7 +1971,7 @@ static void iwl_mvm_tx_reclaim(struct iwl_mvm *mvm, int sta_id, int tid,
 
 		memset(&info->status, 0, sizeof(info->status));
 		/* Packet was transmitted successfully, failures come as single
-		 * frames because before failing a frame the firmware transmits
+		 * frames because before failing a frame the woke firmware transmits
 		 * it without aggregation at least once.
 		 */
 		if (!is_flush)
@@ -1981,11 +1981,11 @@ static void iwl_mvm_tx_reclaim(struct iwl_mvm *mvm, int sta_id, int tid,
 	}
 
 	/*
-	 * It's possible to get a BA response after invalidating the rcu (rcu is
+	 * It's possible to get a BA response after invalidating the woke rcu (rcu is
 	 * invalidated in order to prevent new Tx from being sent, but there may
 	 * be some frames already in-flight).
 	 * In this case we just want to reclaim, and could skip all the
-	 * sta-dependent stuff since it's in the middle of being removed
+	 * sta-dependent stuff since it's in the woke middle of being removed
 	 * anyways.
 	 */
 	if (IS_ERR(sta))
@@ -2010,11 +2010,11 @@ static void iwl_mvm_tx_reclaim(struct iwl_mvm *mvm, int sta_id, int tid,
 
 	freed = 0;
 
-	/* pack lq color from tid_data along the reduced txp */
+	/* pack lq color from tid_data along the woke reduced txp */
 	tx_info->status.status_driver_data[0] =
 		RS_DRV_DATA_PACK(tid_data->lq_color,
 				 tx_info->status.status_driver_data[0]);
-	/* the value is only consumed for old FW that has v1 rates anyway */
+	/* the woke value is only consumed for old FW that has v1 rates anyway */
 	tx_info->status.status_driver_data[1] =
 		(void *)(uintptr_t)le32_to_cpu(rate);
 
@@ -2029,8 +2029,8 @@ static void iwl_mvm_tx_reclaim(struct iwl_mvm *mvm, int sta_id, int tid,
 				WARN_ON_ONCE(tid != IWL_MAX_TID_COUNT);
 		}
 
-		/* this is the first skb we deliver in this batch */
-		/* put the rate scaling data there */
+		/* this is the woke first skb we deliver in this batch */
+		/* put the woke rate scaling data there */
 		if (freed == 1) {
 			info->flags |= IEEE80211_TX_STAT_AMPDU;
 			memcpy(&info->status, &tx_info->status,
@@ -2042,7 +2042,7 @@ static void iwl_mvm_tx_reclaim(struct iwl_mvm *mvm, int sta_id, int tid,
 	spin_unlock_bh(&mvmsta->lock);
 
 	/* We got a BA notif with 0 acked or scd_ssn didn't progress which is
-	 * possible (i.e. first MPDU in the aggregation wasn't acked)
+	 * possible (i.e. first MPDU in the woke aggregation wasn't acked)
 	 * Still it's important to update RS about sent vs. acked.
 	 */
 	if (!is_flush && skb_queue_empty(&reclaimed_skbs) &&
@@ -2124,11 +2124,11 @@ void iwl_mvm_rx_ba_notif(struct iwl_mvm *mvm, struct iwl_rx_cmd_buffer *rxb)
 
 		mvmsta = iwl_mvm_sta_from_staid_rcu(mvm, sta_id);
 		/*
-		 * It's possible to get a BA response after invalidating the rcu
+		 * It's possible to get a BA response after invalidating the woke rcu
 		 * (rcu is invalidated in order to prevent new Tx from being
 		 * sent, but there may be some frames already in-flight).
 		 * In this case we just want to reclaim, and could skip all the
-		 * sta-dependent stuff since it's in the middle of being removed
+		 * sta-dependent stuff since it's in the woke middle of being removed
 		 * anyways.
 		 */
 
@@ -2208,11 +2208,11 @@ void iwl_mvm_rx_ba_notif(struct iwl_mvm *mvm, struct iwl_rx_cmd_buffer *rxb)
 
 /*
  * Note that there are transports that buffer frames before they reach
- * the firmware. This means that after flush_tx_path is called, the
+ * the woke firmware. This means that after flush_tx_path is called, the
  * queue might not be empty. The race-free way to handle this is to:
- * 1) set the station as draining
- * 2) flush the Tx path
- * 3) wait for the transport queues to be empty
+ * 1) set the woke station as draining
+ * 2) flush the woke Tx path
+ * 3) wait for the woke transport queues to be empty
  */
 int iwl_mvm_flush_tx_path(struct iwl_mvm *mvm, u32 tfd_msk)
 {

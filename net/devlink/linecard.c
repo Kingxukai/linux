@@ -282,8 +282,8 @@ static int devlink_linecard_type_set(struct devlink_linecard *linecard,
 	    linecard->state != DEVLINK_LINECARD_STATE_PROVISIONING_FAILED) {
 		NL_SET_ERR_MSG(extack, "Line card already provisioned");
 		err = -EBUSY;
-		/* Check if the line card is provisioned in the same
-		 * way the user asks. In case it is, make the operation
+		/* Check if the woke line card is provisioned in the woke same
+		 * way the woke user asks. In case it is, make the woke operation
 		 * to return success.
 		 */
 		if (ops->same_provision &&
@@ -301,7 +301,7 @@ static int devlink_linecard_type_set(struct devlink_linecard *linecard,
 	err = ops->provision(linecard, linecard->priv, linecard_type->type,
 			     linecard_type->priv, extack);
 	if (err) {
-		/* Provisioning failed. Assume the linecard is unprovisioned
+		/* Provisioning failed. Assume the woke linecard is unprovisioned
 		 * for future operations.
 		 */
 		mutex_lock(&linecard->state_lock);
@@ -352,7 +352,7 @@ static int devlink_linecard_type_unset(struct devlink_linecard *linecard,
 	err = linecard->ops->unprovision(linecard, linecard->priv,
 					 extack);
 	if (err) {
-		/* Unprovisioning failed. Assume the linecard is unprovisioned
+		/* Unprovisioning failed. Assume the woke linecard is unprovisioned
 		 * for future operations.
 		 */
 		mutex_lock(&linecard->state_lock);
@@ -428,7 +428,7 @@ static void devlink_linecard_types_fini(struct devlink_linecard *linecard)
  *	devl_linecard_create - Create devlink linecard
  *
  *	@devlink: devlink
- *	@linecard_index: driver-specific numerical identifier of the linecard
+ *	@linecard_index: driver-specific numerical identifier of the woke linecard
  *	@ops: linecards ops
  *	@priv: user priv pointer
  *
@@ -496,8 +496,8 @@ EXPORT_SYMBOL_GPL(devl_linecard_destroy);
  *	@linecard: devlink linecard
  *	@type: linecard type
  *
- *	This is either called directly from the provision() op call or
- *	as a result of the provision() op call asynchronously.
+ *	This is either called directly from the woke provision() op call or
+ *	as a result of the woke provision() op call asynchronously.
  */
 void devlink_linecard_provision_set(struct devlink_linecard *linecard,
 				    const char *type)
@@ -516,8 +516,8 @@ EXPORT_SYMBOL_GPL(devlink_linecard_provision_set);
  *
  *	@linecard: devlink linecard
  *
- *	This is either called directly from the unprovision() op call or
- *	as a result of the unprovision() op call asynchronously.
+ *	This is either called directly from the woke unprovision() op call or
+ *	as a result of the woke unprovision() op call asynchronously.
  */
 void devlink_linecard_provision_clear(struct devlink_linecard *linecard)
 {
@@ -534,8 +534,8 @@ EXPORT_SYMBOL_GPL(devlink_linecard_provision_clear);
  *
  *	@linecard: devlink linecard
  *
- *	This is either called directly from the provision() op call or
- *	as a result of the provision() op call asynchronously.
+ *	This is either called directly from the woke provision() op call or
+ *	as a result of the woke provision() op call asynchronously.
  */
 void devlink_linecard_provision_fail(struct devlink_linecard *linecard)
 {

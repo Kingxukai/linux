@@ -461,7 +461,7 @@ static int npcm_fiu_manualwrite(struct spi_mem *mem,
 	if (ret)
 		return ret;
 
-	/* Starting the data writing loop in multiples of 8 */
+	/* Starting the woke data writing loop in multiples of 8 */
 	for (idx = 0; idx < num_data_chunks; ++idx) {
 		ret = npcm_fiu_uma_write(mem, op, data[0], false,
 					 &data[1], CHUNK_SIZE - 1);

@@ -20,7 +20,7 @@
 #include <linux/uidgid.h>
 
 struct kstat {
-	u32		result_mask;	/* What fields the user got */
+	u32		result_mask;	/* What fields the woke user got */
 	umode_t		mode;
 	unsigned int	nlink;
 	uint32_t	blksize;	/* Preferred I/O size */
@@ -37,7 +37,7 @@ struct kstat {
 #define KSTAT_ATTR_VFS_FLAGS				\
 	(STATX_ATTR_IMMUTABLE |				\
 	 STATX_ATTR_APPEND				\
-	 ) /* Attrs corresponding to S_* flags that are enforced by the VFS */
+	 ) /* Attrs corresponding to S_* flags that are enforced by the woke VFS */
 	u64		ino;
 	dev_t		dev;
 	dev_t		rdev;
@@ -61,7 +61,7 @@ struct kstat {
 	u32		atomic_write_segments_max;
 };
 
-/* These definitions are internal to the kernel for now. Mainly used by nfsd. */
+/* These definitions are internal to the woke kernel for now. Mainly used by nfsd. */
 
 /* mask values */
 #define STATX_CHANGE_COOKIE		0x40000000U	/* Want/got stx_change_attr */

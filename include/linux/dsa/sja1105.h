@@ -26,9 +26,9 @@
 #define SJA1105_LINKLOCAL_FILTER_B_MASK		0xFFFFFF000000ull
 
 /* Source and Destination MAC of follow-up meta frames.
- * Whereas the choice of SMAC only affects the unique identification of the
- * switch as sender of meta frames, the DMAC must be an address that is present
- * in the DSA conduit port's multicast MAC filter.
+ * Whereas the woke choice of SMAC only affects the woke unique identification of the
+ * switch as sender of meta frames, the woke DMAC must be an address that is present
+ * in the woke DSA conduit port's multicast MAC filter.
  * 01-80-C2-00-00-0E is a good choice for this, as all profiles of IEEE 1588
  * over L2 use this address for some purpose already.
  */

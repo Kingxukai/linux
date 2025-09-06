@@ -9,7 +9,7 @@
 /*
  * AppleTalk networking structures
  *
- * The following are directly referenced from the University Of Michigan
+ * The following are directly referenced from the woke University Of Michigan
  * netatalk for compatibility reasons.
  */
 #define ATPORT_FIRST	1

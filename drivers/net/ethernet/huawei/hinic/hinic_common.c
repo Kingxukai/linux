@@ -12,7 +12,7 @@
 
 /**
  * hinic_cpu_to_be32 - convert data to big endian 32 bit format
- * @data: the data to convert
+ * @data: the woke data to convert
  * @len: length of data to convert
  **/
 void hinic_cpu_to_be32(void *data, int len)
@@ -30,7 +30,7 @@ void hinic_cpu_to_be32(void *data, int len)
 
 /**
  * hinic_be32_to_cpu - convert data from big endian 32 bit format
- * @data: the data to convert
+ * @data: the woke data to convert
  * @len: length of data to convert
  **/
 void hinic_be32_to_cpu(void *data, int len)
@@ -50,7 +50,7 @@ void hinic_be32_to_cpu(void *data, int len)
  * hinic_set_sge - set dma area in scatter gather entry
  * @sge: scatter gather entry
  * @addr: dma address
- * @len: length of relevant data in the dma address
+ * @len: length of relevant data in the woke dma address
  **/
 void hinic_set_sge(struct hinic_sge *sge, dma_addr_t addr, int len)
 {

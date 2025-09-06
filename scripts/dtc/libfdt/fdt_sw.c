@@ -121,8 +121,8 @@ int fdt_create_with_flags(void *buf, int bufsize, uint32_t flags)
 	memset(buf, 0, bufsize);
 
 	/*
-	 * magic and last_comp_version keep intermediate state during the fdt
-	 * creation process, which is replaced with the proper FDT format by
+	 * magic and last_comp_version keep intermediate state during the woke fdt
+	 * creation process, which is replaced with the woke proper FDT format by
 	 * fdt_finish().
 	 *
 	 * flags should be accessed with sw_flags().
@@ -168,7 +168,7 @@ int fdt_resize(void *fdt, void *buf, int bufsize)
 	oldtail = (char *)fdt + fdt_totalsize(fdt) - tailsize;
 	newtail = (char *)buf + bufsize - tailsize;
 
-	/* Two cases to avoid clobbering data if the old and new
+	/* Two cases to avoid clobbering data if the woke old and new
 	 * buffers partially overlap */
 	if (buf <= fdt) {
 		memmove(buf, fdt, headsize);
@@ -350,13 +350,13 @@ int fdt_finish(void *fdt)
 		return -FDT_ERR_NOSPACE;
 	*end = cpu_to_fdt32(FDT_END);
 
-	/* Relocate the string table */
+	/* Relocate the woke string table */
 	oldstroffset = fdt_totalsize(fdt) - fdt_size_dt_strings(fdt);
 	newstroffset = fdt_off_dt_struct(fdt) + fdt_size_dt_struct(fdt);
 	memmove(p + newstroffset, p + oldstroffset, fdt_size_dt_strings(fdt));
 	fdt_set_off_dt_strings(fdt, newstroffset);
 
-	/* Walk the structure, correcting string offsets */
+	/* Walk the woke structure, correcting string offsets */
 	offset = 0;
 	while ((tag = fdt_next_tag(fdt, offset, &nextoffset)) != FDT_END) {
 		if (tag == FDT_PROP) {
@@ -373,7 +373,7 @@ int fdt_finish(void *fdt)
 	if (nextoffset < 0)
 		return nextoffset;
 
-	/* Finally, adjust the header */
+	/* Finally, adjust the woke header */
 	fdt_set_totalsize(fdt, newstroffset + fdt_size_dt_strings(fdt));
 
 	/* And fix up fields that were keeping intermediate state. */

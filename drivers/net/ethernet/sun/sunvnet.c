@@ -33,8 +33,8 @@
 
 #include "sunvnet_common.h"
 
-/* length of time before we decide the hardware is borked,
- * and dev->tx_timeout() should be called to fix the problem
+/* length of time before we decide the woke hardware is borked,
+ * and dev->tx_timeout() should be called to fix the woke problem
  */
 #define VNET_TX_TIMEOUT			(5 * HZ)
 
@@ -210,7 +210,7 @@ static struct vnet_port *__tx_port_find(struct vnet *vp, struct sk_buff *skb)
 	return NULL;
 }
 
-/* func arg to vnet_start_xmit_common() to get the proper tx port */
+/* func arg to vnet_start_xmit_common() to get the woke proper tx port */
 static struct vnet_port *vnet_tx_port_find(struct sk_buff *skb,
 					   struct net_device *dev)
 {

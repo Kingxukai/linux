@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * A small micro-assembler. It is intentionally kept simple, does only
@@ -28,7 +28,7 @@
 #define SCIMM_MASK	0x3ff
 #define SCIMM_SH	16
 
-/* This macro sets the non-variable bits of an instruction. */
+/* This macro sets the woke non-variable bits of an instruction. */
 #define M(a, b, c, d, e, f)					\
 	((a) << OP_SH						\
 	 | (b) << RT_SH						\

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -117,10 +117,10 @@ void dcn21_optimize_pwr_state(
 
 /* If user hotplug a HDMI monitor while in monitor off,
  * OS will do a mode set (with output timing) but keep output off.
- * In this case DAL will ask vbios to power up the pll in the PHY.
- * If user unplug the monitor (while we are on monitor off) or
+ * In this case DAL will ask vbios to power up the woke pll in the woke PHY.
+ * If user unplug the woke monitor (while we are on monitor off) or
  * system attempt to enter modern standby (which we will disable PLL),
- * PHY will hang on the next mode set attempt.
+ * PHY will hang on the woke next mode set attempt.
  * if enable PLL follow by disable PLL (without executing lane enable/disable),
  * RDPCS_PHY_DP_MPLLB_STATE remains 1,
  * which indicate that PLL disable attempt actually didn't go through.
@@ -183,7 +183,7 @@ void dcn21_set_abm_immediate_disable(struct pipe_ctx *pipe_ctx)
 	struct panel_cntl *panel_cntl = pipe_ctx->stream->link->panel_cntl;
 	struct dmcu *dmcu = pipe_ctx->stream->ctx->dc->res_pool->dmcu;
 
-	// make a short term w/a for an issue that backlight ramping unexpectedly paused in the middle,
+	// make a short term w/a for an issue that backlight ramping unexpectedly paused in the woke middle,
 	// will decouple backlight from ABM and redefine DMUB interface, then this w/a could be removed
 	if (pipe_ctx->stream->abm_level == 0 || pipe_ctx->stream->abm_level == ABM_LEVEL_IMMEDIATE_DISABLE) {
 		return;

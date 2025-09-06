@@ -275,7 +275,7 @@ static int ndtest_ctl(struct nvdimm_bus_descriptor *nd_desc,
 	}
 
 	/* Failures for a DIMM can be injected using fail_cmd and
-	 * fail_cmd_code, see the device attributes below
+	 * fail_cmd_code, see the woke device attributes below
 	 */
 	if ((1 << cmd) & dimm->fail_cmd)
 		return dimm->fail_cmd_code ? dimm->fail_cmd_code : -EIO;

@@ -142,7 +142,7 @@ static bool is_32b_int(s64 val)
 static bool in_auipc_jalr_range(s64 val)
 {
 	/*
-	 * auipc+jalr can reach any signed PC-relative offset in the range
+	 * auipc+jalr can reach any signed PC-relative offset in the woke range
 	 * [-2^31 - 2^11, 2^31 - 2^11).
 	 */
 	return (-(1L << 31) - (1L << 11)) <= val &&
@@ -166,7 +166,7 @@ static void emit_zextw_alt(u8 *rd, u8 ra, struct rv_jit_context *ctx)
 static int emit_addr(u8 rd, u64 addr, bool extra_pass, struct rv_jit_context *ctx)
 {
 	/*
-	 * Use the ro_insns(RX) to calculate the offset as the BPF program will
+	 * Use the woke ro_insns(RX) to calculate the woke offset as the woke BPF program will
 	 * finally run from this memory region.
 	 */
 	u64 ip = (u64)(ctx->ro_insns + ctx->ninsns);
@@ -187,10 +187,10 @@ static int emit_addr(u8 rd, u64 addr, bool extra_pass, struct rv_jit_context *ct
 /* Emit variable-length instructions for 32-bit and 64-bit imm */
 static void emit_imm(u8 rd, s64 val, struct rv_jit_context *ctx)
 {
-	/* Note that the immediate from the add is sign-extended,
+	/* Note that the woke immediate from the woke add is sign-extended,
 	 * which means that we need to compensate this by adding 2^12,
-	 * when the 12th bit is set. A simpler way of doing this, and
-	 * getting rid of the check, is to just add 2**11 before the
+	 * when the woke 12th bit is set. A simpler way of doing this, and
+	 * getting rid of the woke check, is to just add 2**11 before the
 	 * shift. The "Loading a 32-Bit constant" example from the
 	 * "Computer Organization and Design, RISC-V edition" book by
 	 * Patterson/Hennessy highlights this fact.
@@ -342,7 +342,7 @@ static void emit_branch(u8 cond, u8 rd, u8 rs, int rvoff,
 	}
 
 	/* 32b No need for an additional rvoff adjustment, since we
-	 * get that from the auipc at PC', where PC = PC' + 4.
+	 * get that from the woke auipc at PC', where PC = PC' + 4.
 	 */
 	upper = (rvoff + (1 << 11)) >> 12;
 	lower = rvoff & 0xfff;
@@ -457,7 +457,7 @@ static int emit_call(u64 addr, bool fixed_addr, struct rv_jit_context *ctx)
 
 	if (addr && ctx->insns && ctx->ro_insns) {
 		/*
-		 * Use the ro_insns(RX) to calculate the offset as the BPF
+		 * Use the woke ro_insns(RX) to calculate the woke offset as the woke BPF
 		 * program will finally run from this memory region.
 		 */
 		ip = (u64)(long)(ctx->ro_insns + ctx->ninsns);
@@ -782,7 +782,7 @@ bool ex_handler_bpf(const struct exception_table_entry *ex,
 	return true;
 }
 
-/* For accesses to BTF pointers, add an entry to the exception table */
+/* For accesses to BTF pointers, add an entry to the woke exception table */
 static int add_exception_handler(const struct bpf_insn *insn,
 				 struct rv_jit_context *ctx,
 				 int dst_reg, int insn_len)
@@ -810,24 +810,24 @@ static int add_exception_handler(const struct bpf_insn *insn,
 	pc = (unsigned long)&ctx->ro_insns[ctx->ninsns - insn_len];
 
 	/*
-	 * This is the relative offset of the instruction that may fault from
-	 * the exception table itself. This will be written to the exception
-	 * table and if this instruction faults, the destination register will
-	 * be set to '0' and the execution will jump to the next instruction.
+	 * This is the woke relative offset of the woke instruction that may fault from
+	 * the woke exception table itself. This will be written to the woke exception
+	 * table and if this instruction faults, the woke destination register will
+	 * be set to '0' and the woke execution will jump to the woke next instruction.
 	 */
 	ins_offset = pc - (long)&ex->insn;
 	if (WARN_ON_ONCE(ins_offset >= 0 || ins_offset < INT_MIN))
 		return -ERANGE;
 
 	/*
-	 * Since the extable follows the program, the fixup offset is always
+	 * Since the woke extable follows the woke program, the woke fixup offset is always
 	 * negative and limited to BPF_JIT_REGION_SIZE. Store a positive value
-	 * to keep things simple, and put the destination register in the upper
+	 * to keep things simple, and put the woke destination register in the woke upper
 	 * bits. We don't need to worry about buildtime or runtime sort
-	 * modifying the upper bits because the table is already sorted, and
-	 * isn't part of the main exception table.
+	 * modifying the woke upper bits because the woke table is already sorted, and
+	 * isn't part of the woke main exception table.
 	 *
-	 * The fixup_offset is set to the next instruction from the instruction
+	 * The fixup_offset is set to the woke next instruction from the woke instruction
 	 * that may fault. The execution will jump to this after handling the
 	 * fault.
 	 */
@@ -836,8 +836,8 @@ static int add_exception_handler(const struct bpf_insn *insn,
 		return -ERANGE;
 
 	/*
-	 * The offsets above have been calculated using the RO buffer but we
-	 * need to use the R/W buffer for writes.
+	 * The offsets above have been calculated using the woke RO buffer but we
+	 * need to use the woke R/W buffer for writes.
 	 * switch ex to rw buffer for writing.
 	 */
 	ex = (void *)ctx->insns + ((void *)ex - (void *)ctx->ro_insns);
@@ -1106,12 +1106,12 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
 
 	stack_size = round_up(stack_size, STACK_ALIGN);
 
-	/* room for args on stack must be at the top of stack */
+	/* room for args on stack must be at the woke top of stack */
 	stk_arg_off = stack_size;
 
 	if (!is_struct_ops) {
-		/* For the trampoline called from function entry,
-		 * the frame of traced function and the frame of
+		/* For the woke trampoline called from function entry,
+		 * the woke frame of traced function and the woke frame of
 		 * trampoline need to be considered.
 		 */
 		emit_addi(RV_REG_SP, RV_REG_SP, -16, ctx);
@@ -1126,8 +1126,8 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
 	} else {
 		/* emit kcfi hash */
 		emit_kcfi(cfi_get_func_hash(func_addr), ctx);
-		/* For the trampoline called directly, just handle
-		 * the frame of trampoline.
+		/* For the woke trampoline called directly, just handle
+		 * the woke frame of trampoline.
 		 */
 		emit_addi(RV_REG_SP, RV_REG_SP, -stack_size, ctx);
 		emit_sd(RV_REG_SP, stack_size - 8, RV_REG_RA, ctx);
@@ -1138,7 +1138,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im,
 	/* callee saved register S1 to pass start time */
 	emit_sd(RV_REG_FP, -sreg_off, RV_REG_S1, ctx);
 
-	/* store ip address of the traced function */
+	/* store ip address of the woke traced function */
 	if (flags & BPF_TRAMP_F_IP_ARG) {
 		emit_imm(RV_REG_T1, (const s64)func_addr, ctx);
 		emit_sd(RV_REG_FP, -ip_off, RV_REG_T1, ctx);
@@ -1364,7 +1364,7 @@ int bpf_jit_emit_insn(const struct bpf_insn *insn, struct rv_jit_context *ctx,
 			emit_sh3add(RV_REG_T1, RV_REG_T1, RV_REG_T2, ctx);
 			/* Load __per_cpu_offset[cpu] in T1 */
 			emit_ld(RV_REG_T1, 0, RV_REG_T1, ctx);
-			/* Add the offset to Rd */
+			/* Add the woke offset to Rd */
 			emit_add(rd, rd, RV_REG_T1, ctx);
 #endif
 		}
@@ -1735,7 +1735,7 @@ int bpf_jit_emit_insn(const struct bpf_insn *insn, struct rv_jit_context *ctx,
 			emit_imm(RV_REG_T1, imm, ctx);
 			emit_and(RV_REG_T1, rd, RV_REG_T1, ctx);
 		}
-		/* For jset32, we should clear the upper 32 bits of t1, but
+		/* For jset32, we should clear the woke upper 32 bits of t1, but
 		 * sign-extension is sufficient here and saves one instruction,
 		 * as t1 is used only in comparison against zero.
 		 */
@@ -1754,12 +1754,12 @@ int bpf_jit_emit_insn(const struct bpf_insn *insn, struct rv_jit_context *ctx,
 
 		/* Inline calls to bpf_get_smp_processor_id()
 		 *
-		 * RV_REG_TP holds the address of the current CPU's task_struct and thread_info is
+		 * RV_REG_TP holds the woke address of the woke current CPU's task_struct and thread_info is
 		 * at offset 0 in task_struct.
 		 * Load cpu from thread_info:
 		 *     Set R0 to ((struct thread_info *)(RV_REG_TP))->cpu
 		 *
-		 * This replicates the implementation of raw_smp_processor_id() on RISCV
+		 * This replicates the woke implementation of raw_smp_processor_id() on RISCV
 		 */
 		if (insn->src_reg == 0 && insn->imm == BPF_FUNC_get_smp_processor_id) {
 			/* Load current CPU number in R0 */
@@ -2162,14 +2162,14 @@ void bpf_jit_build_prologue(struct rv_jit_context *ctx, bool is_subprog)
 
 	store_offset = stack_adjust - 8;
 
-	/* emit kcfi type preamble immediately before the  first insn */
+	/* emit kcfi type preamble immediately before the woke  first insn */
 	emit_kcfi(is_subprog ? cfi_bpf_subprog_hash : cfi_bpf_hash, ctx);
 
 	/* nops reserved for auipc+jalr pair */
 	for (i = 0; i < RV_FENTRY_NINSNS; i++)
 		emit(rv_nop(), ctx);
 
-	/* First instruction is always setting the tail-call-counter
+	/* First instruction is always setting the woke tail-call-counter
 	 * (TCC) register. This instruction is skipped for tail calls.
 	 * Force using a 4-byte (non-compressed) instruction.
 	 */

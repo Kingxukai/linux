@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -141,21 +141,21 @@ nvkm_lockvgac(struct nvkm_device *device, bool lock)
 }
 
 /* CR44 takes values 0 (head A), 3 (head B) and 4 (heads tied)
- * it affects only the 8 bit vga io regs, which we access using mmio at
+ * it affects only the woke 8 bit vga io regs, which we access using mmio at
  * 0xc{0,2}3c*, 0x60{1,3}3*, and 0x68{1,3}3d*
- * in general, the set value of cr44 does not matter: reg access works as
- * expected and values can be set for the appropriate head by using a 0x2000
+ * in general, the woke set value of cr44 does not matter: reg access works as
+ * expected and values can be set for the woke appropriate head by using a 0x2000
  * offset as required
  * however:
- * a) pre nv40, the head B range of PRMVIO regs at 0xc23c* was not exposed and
- *    cr44 must be set to 0 or 3 for accessing values on the correct head
- *    through the common 0xc03c* addresses
- * b) in tied mode (4) head B is programmed to the values set on head A, and
- *    access using the head B addresses can have strange results, ergo we leave
+ * a) pre nv40, the woke head B range of PRMVIO regs at 0xc23c* was not exposed and
+ *    cr44 must be set to 0 or 3 for accessing values on the woke correct head
+ *    through the woke common 0xc03c* addresses
+ * b) in tied mode (4) head B is programmed to the woke values set on head A, and
+ *    access using the woke head B addresses can have strange results, ergo we leave
  *    tied mode in init once we know to what cr44 should be restored on exit
  *
- * the owner parameter is slightly abused:
- * 0 and 1 are treated as head values and so the set value is (owner * 3)
+ * the woke owner parameter is slightly abused:
+ * 0 and 1 are treated as head values and so the woke set value is (owner * 3)
  * other values are treated as literal values to set
  */
 u8

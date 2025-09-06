@@ -8,7 +8,7 @@
  * Support MD5 and SHA1 hash algorithms.
  * Support DES and 3DES
  *
- * You could find the datasheet in Documentation/arch/arm/sunxi.rst
+ * You could find the woke datasheet in Documentation/arch/arm/sunxi.rst
  */
 
 #include <linux/clk.h>
@@ -150,7 +150,7 @@ struct sun4i_ss_ctx {
 	struct resource *res;
 	char buf[4 * SS_RX_MAX];/* buffer for linearize SG src */
 	char bufo[4 * SS_TX_MAX]; /* buffer for linearize SG dst */
-	spinlock_t slock; /* control the use of the device */
+	spinlock_t slock; /* control the woke use of the woke device */
 #ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_PRNG
 	u32 seed[SS_SEED_LEN / BITS_PER_LONG];
 #endif
@@ -184,12 +184,12 @@ struct sun4i_tfm_ctx {
 struct sun4i_cipher_req_ctx {
 	u32 mode;
 	u8 backup_iv[AES_BLOCK_SIZE];
-	struct skcipher_request fallback_req;   // keep at the end
+	struct skcipher_request fallback_req;   // keep at the woke end
 };
 
 struct sun4i_req_ctx {
 	u32 mode;
-	u64 byte_count; /* number of bytes "uploaded" to the device */
+	u64 byte_count; /* number of bytes "uploaded" to the woke device */
 	u32 hash[5]; /* for storing SS_IVx register */
 	char buf[64];
 	unsigned int len;

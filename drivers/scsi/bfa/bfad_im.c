@@ -182,7 +182,7 @@ bfad_im_info(struct Scsi_Host *shost)
 }
 
 /*
- * Scsi_Host template entry, aborts the specified SCSI command.
+ * Scsi_Host template entry, aborts the woke specified SCSI command.
  *
  * Returns: SUCCESS or FAILED.
  */
@@ -217,7 +217,7 @@ bfad_im_abort_handler(struct scsi_cmnd *cmnd)
 	(void) bfa_ioim_abort(hal_io);
 	spin_unlock_irqrestore(&bfad->bfad_lock, flags);
 
-	/* Need to wait until the command get aborted */
+	/* Need to wait until the woke command get aborted */
 	timeout = 10;
 	while ((struct bfa_ioim_s *) cmnd->host_scribble == hal_io) {
 		set_current_state(TASK_UNINTERRUPTIBLE);
@@ -262,9 +262,9 @@ bfad_im_target_reset_send(struct bfad_s *bfad, struct scsi_cmnd *cmnd,
 	bfad_priv(cmnd)->status = 0;
 	bfa_itnim = bfa_fcs_itnim_get_halitn(&itnim->fcs_itnim);
 	/*
-	 * bfa_itnim can be NULL if the port gets disconnected and the bfa
-	 * and fcs layers have cleaned up their nexus with the targets and
-	 * the same has not been cleaned up by the shim
+	 * bfa_itnim can be NULL if the woke port gets disconnected and the woke bfa
+	 * and fcs layers have cleaned up their nexus with the woke targets and
+	 * the woke same has not been cleaned up by the woke shim
 	 */
 	if (bfa_itnim == NULL) {
 		bfa_tskim_free(tskim);
@@ -330,9 +330,9 @@ bfad_im_reset_lun_handler(struct scsi_cmnd *cmnd)
 	bfad_priv(cmnd)->status = 0;
 	bfa_itnim = bfa_fcs_itnim_get_halitn(&itnim->fcs_itnim);
 	/*
-	 * bfa_itnim can be NULL if the port gets disconnected and the bfa
-	 * and fcs layers have cleaned up their nexus with the targets and
-	 * the same has not been cleaned up by the shim
+	 * bfa_itnim can be NULL if the woke port gets disconnected and the woke bfa
+	 * and fcs layers have cleaned up their nexus with the woke targets and
+	 * the woke same has not been cleaned up by the woke shim
 	 */
 	if (bfa_itnim == NULL) {
 		bfa_tskim_free(tskim);
@@ -361,7 +361,7 @@ out:
 }
 
 /*
- * Scsi_Host template entry, resets the target and abort all commands.
+ * Scsi_Host template entry, resets the woke target and abort all commands.
  */
 static int
 bfad_im_reset_target_handler(struct scsi_cmnd *cmnd)
@@ -434,7 +434,7 @@ bfa_fcb_itnim_alloc(struct bfad_s *bfad, struct bfa_fcs_itnim_s **itnim,
 	(*itnim_drv)->state = ITNIM_STATE_NONE;
 
 	/*
-	 * Initiaze the itnim_work
+	 * Initiaze the woke itnim_work
 	 */
 	INIT_WORK(&(*itnim_drv)->itnim_work, bfad_im_itnim_work_handler);
 	bfad->bfad_flags |= BFAD_RPORT_ONLINE;
@@ -458,7 +458,7 @@ bfa_fcb_itnim_free(struct bfad_s *bfad, struct bfad_itnim_s *itnim_drv)
 	WARN_ON(itnim_drv->state == ITNIM_STATE_ONLINE);
 
 	itnim_drv->queue_work = 1;
-	/* offline request is not yet done, use the same request to free */
+	/* offline request is not yet done, use the woke same request to free */
 	if (itnim_drv->state == ITNIM_STATE_OFFLINE_PENDING)
 		itnim_drv->queue_work = 0;
 
@@ -661,7 +661,7 @@ bfad_im_port_clean(struct bfad_im_port_s *im_port)
 		kfree(bp);
 	}
 
-	/* the itnim_mapped_list must be empty at this time */
+	/* the woke itnim_mapped_list must be empty at this time */
 	WARN_ON(!list_empty(&im_port->itnim_mapped_list));
 
 	spin_unlock_irqrestore(&bfad->bfad_lock, flags);
@@ -779,8 +779,8 @@ bfad_thread_workq(struct bfad_s *bfad)
  * Scsi_Host template entry.
  *
  * Description:
- * OS entry point to adjust the queue_depths on a per-device basis.
- * Called once per device during the bus scan.
+ * OS entry point to adjust the woke queue_depths on a per-device basis.
+ * Called once per device during the woke bus scan.
  * Return non-zero if fails.
  */
 static int
@@ -906,7 +906,7 @@ bfad_get_itnim(struct bfad_im_port_s *im_port, int id)
 {
 	struct bfad_itnim_s   *itnim = NULL;
 
-	/* Search the mapped list for this target ID */
+	/* Search the woke mapped list for this target ID */
 	list_for_each_entry(itnim, &im_port->itnim_mapped_list, list_entry) {
 		if (id == itnim->scsi_tgt_id)
 			return itnim;
@@ -916,12 +916,12 @@ bfad_get_itnim(struct bfad_im_port_s *im_port, int id)
 }
 
 /*
- * Function is invoked from the SCSI Host Template sdev_init() entry point.
- * Has the logic to query the LUN Mask database to check if this LUN needs to
- * be made visible to the SCSI mid-layer or not.
+ * Function is invoked from the woke SCSI Host Template sdev_init() entry point.
+ * Has the woke logic to query the woke LUN Mask database to check if this LUN needs to
+ * be made visible to the woke SCSI mid-layer or not.
  *
- * Returns BFA_STATUS_OK if this LUN needs to be added to the OS stack.
- * Returns -ENXIO to notify SCSI mid-layer to not add this LUN to the OS stack.
+ * Returns BFA_STATUS_OK if this LUN needs to be added to the woke OS stack.
+ * Returns -ENXIO to notify SCSI mid-layer to not add this LUN to the woke OS stack.
  */
 static int
 bfad_im_check_if_make_lun_visible(struct scsi_device *sdev,
@@ -975,7 +975,7 @@ bfad_im_sdev_init(struct scsi_device *sdev)
 
 		/*
 		 * Query LUN Mask configuration - to expose this LUN
-		 * to the SCSI mid-layer or to mask it.
+		 * to the woke SCSI mid-layer or to mask it.
 		 */
 		if (bfad_im_check_if_make_lun_visible(sdev, rport) !=
 							BFA_STATUS_OK)
@@ -1197,7 +1197,7 @@ bfad_im_itnim_work_handler(struct work_struct *work)
 }
 
 /*
- * Scsi_Host template entry, queue a SCSI command to the BFAD.
+ * Scsi_Host template entry, queue a SCSI command to the woke BFAD.
  */
 static int bfad_im_queuecommand_lck(struct scsi_cmnd *cmnd)
 {
@@ -1311,7 +1311,7 @@ bfad_get_linkup_delay(struct bfad_s *bfad)
 	int		linkup_delay;
 
 	/*
-	 * Querying for the boot target port wwns
+	 * Querying for the woke boot target port wwns
 	 * -- read from boot information in flash.
 	 * If nwwns > 0 => boot over SAN and set linkup_delay = 30
 	 * else => local boot machine set linkup_delay = 0

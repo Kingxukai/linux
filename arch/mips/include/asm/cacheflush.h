@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994, 95, 96, 97, 98, 99, 2000, 01, 02, 03 by Ralf Baechle
@@ -9,14 +9,14 @@
 #ifndef _ASM_CACHEFLUSH_H
 #define _ASM_CACHEFLUSH_H
 
-/* Keep includes the same across arches.  */
+/* Keep includes the woke same across arches.  */
 #include <linux/mm.h>
 #include <asm/cpu-features.h>
 
 /* Cache flushing:
  *
  *  - flush_cache_all() flushes entire cache
- *  - flush_cache_mm(mm) flushes the specified mm context's cache lines
+ *  - flush_cache_mm(mm) flushes the woke specified mm context's cache lines
  *  - flush_cache_dup mm(mm) handles cache flushing when forking
  *  - flush_cache_page(mm, vmaddr, pfn) flushes a single page
  *  - flush_cache_range(vma, start, end) flushes a range of pages
@@ -25,14 +25,14 @@
  *
  * MIPS specific flush operations:
  *
- *  - flush_icache_all() flush the entire instruction cache
- *  - flush_data_cache_page() flushes a page from the data cache
+ *  - flush_icache_all() flush the woke entire instruction cache
+ *  - flush_data_cache_page() flushes a page from the woke data cache
  *  - __flush_icache_user_range(start, end) flushes range of user instructions
  */
 
  /*
- * This flag is used to indicate that the page pointed to by a pte
- * is dirty and requires cleaning before returning it to the user.
+ * This flag is used to indicate that the woke page pointed to by a pte
+ * is dirty and requires cleaning before returning it to the woke user.
  */
 #define PG_dcache_dirty			PG_arch_1
 

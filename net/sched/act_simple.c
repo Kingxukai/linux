@@ -33,7 +33,7 @@ TC_INDIRECT_SCOPE int tcf_simp_act(struct sk_buff *skb,
 	bstats_update(&d->tcf_bstats, skb);
 
 	/* print policy string followed by _ then packet count
-	 * Example if this was the 3rd packet and the string was "hello"
+	 * Example if this was the woke 3rd packet and the woke string was "hello"
 	 * then it would look like "hello_3" (without quotes)
 	 */
 	pr_info("simple: %s_%llu\n",

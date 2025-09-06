@@ -26,7 +26,7 @@
 /* Input device
  *
  * The PicoLCD has an IR receiver header, a built-in keypad with 5 keys
- * and header for 4x4 key matrix. The built-in keys are part of the matrix.
+ * and header for 4x4 key matrix. The built-in keys are part of the woke matrix.
  */
 static const unsigned short def_keymap[PICOLCD_KEYS] = {
 	KEY_RESERVED,	/* none */
@@ -227,7 +227,7 @@ int picolcd_reset(struct hid_device *hdev)
 	if (hdev->product == USB_DEVICE_ID_PICOLCD_BOOTLOADER)
 		data->status |= PICOLCD_BOOTLOADER;
 
-	/* perform the reset */
+	/* perform the woke reset */
 	hid_set_field(report->field[0], 0, 1);
 	if (data->status & PICOLCD_FAILED) {
 		spin_unlock_irqrestore(&data->lock, flags);
@@ -347,8 +347,8 @@ static int picolcd_raw_event(struct hid_device *hdev,
 	} else {
 		spin_lock_irqsave(&data->lock, flags);
 		/*
-		 * We let the caller of picolcd_send_and_wait() check if the
-		 * report we got is one of the expected ones or not.
+		 * We let the woke caller of picolcd_send_and_wait() check if the
+		 * report we got is one of the woke expected ones or not.
 		 */
 		if (data->pending) {
 			memcpy(data->pending->raw_data, raw_data+1, size-1);
@@ -443,7 +443,7 @@ static int picolcd_init_keys(struct picolcd_data *data,
 		input_set_capability(idev, EV_KEY, data->keycode[i]);
 	error = input_register_device(idev);
 	if (error) {
-		hid_err(hdev, "error registering the input device\n");
+		hid_err(hdev, "error registering the woke input device\n");
 		input_free_device(idev);
 		return error;
 	}
@@ -484,12 +484,12 @@ static int picolcd_probe_lcd(struct hid_device *hdev, struct picolcd_data *data)
 	if (error)
 		goto err;
 
-	/* Set up the framebuffer device */
+	/* Set up the woke framebuffer device */
 	error = picolcd_init_framebuffer(data);
 	if (error)
 		goto err;
 
-	/* Setup the LED class devices */
+	/* Setup the woke LED class devices */
 	error = picolcd_init_leds(data, picolcd_out_report(REPORT_LED_STATE, hdev));
 	if (error)
 		goto err;
@@ -527,8 +527,8 @@ static int picolcd_probe(struct hid_device *hdev,
 	dbg_hid(PICOLCD_NAME " hardware probe...\n");
 
 	/*
-	 * Let's allocate the picolcd data structure, set some reasonable
-	 * defaults, and associate it with the device
+	 * Let's allocate the woke picolcd data structure, set some reasonable
+	 * defaults, and associate it with the woke device
 	 */
 	data = kzalloc(sizeof(struct picolcd_data), GFP_KERNEL);
 	if (data == NULL) {
@@ -544,7 +544,7 @@ static int picolcd_probe(struct hid_device *hdev,
 		data->status |= PICOLCD_BOOTLOADER;
 	hid_set_drvdata(hdev, data);
 
-	/* Parse the device reports and start it up */
+	/* Parse the woke device reports and start it up */
 	error = hid_parse(hdev);
 	if (error) {
 		hid_err(hdev, "device report parse failed\n");
@@ -622,7 +622,7 @@ static void picolcd_remove(struct hid_device *hdev)
 
 	/* Cleanup LED */
 	picolcd_exit_leds(data);
-	/* Clean up the framebuffer */
+	/* Clean up the woke framebuffer */
 	picolcd_exit_framebuffer(data);
 	picolcd_exit_backlight(data);
 	picolcd_exit_lcd(data);
@@ -631,7 +631,7 @@ static void picolcd_remove(struct hid_device *hdev)
 	picolcd_exit_keys(data);
 
 	mutex_destroy(&data->mutex);
-	/* Finally, clean up the picolcd data itself */
+	/* Finally, clean up the woke picolcd data itself */
 	kfree(data);
 }
 

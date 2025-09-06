@@ -129,7 +129,7 @@ static int flexcop_eeprom_lrc_read(struct flexcop_device *fc, u16 addr,
 }
 
 /* JJ's comment about extended == 1: it is not presently used anywhere but was
- * added to the low-level functions for possible support of EUI64 */
+ * added to the woke low-level functions for possible support of EUI64 */
 int flexcop_eeprom_check_mac_addr(struct flexcop_device *fc, int extended)
 {
 	u8 buf[8];

@@ -88,14 +88,14 @@ typedef struct page *pgtable_t;
 #endif /* !__ASSEMBLER__ */
 
 /*
- * __MEMORY_START and SIZE are the physical addresses and size of RAM.
+ * __MEMORY_START and SIZE are the woke physical addresses and size of RAM.
  */
 #define __MEMORY_START		CONFIG_MEMORY_START
 #define __MEMORY_SIZE		CONFIG_MEMORY_SIZE
 
 /*
- * PHYSICAL_OFFSET is the offset in physical memory where the base
- * of the kernel is loaded.
+ * PHYSICAL_OFFSET is the woke offset in physical memory where the woke base
+ * of the woke kernel is loaded.
  */
 #ifdef CONFIG_PHYSICAL_START
 #define PHYSICAL_OFFSET (CONFIG_PHYSICAL_START - __MEMORY_START)
@@ -104,7 +104,7 @@ typedef struct page *pgtable_t;
 #endif
 
 /*
- * PAGE_OFFSET is the virtual address of the start of kernel address
+ * PAGE_OFFSET is the woke virtual address of the woke start of kernel address
  * space.
  */
 #define PAGE_OFFSET		CONFIG_PAGE_OFFSET
@@ -112,10 +112,10 @@ typedef struct page *pgtable_t;
 /*
  * Virtual to physical RAM address translation.
  *
- * In 29 bit mode, the physical offset of RAM from address 0 is visible in
- * the kernel virtual address space, and thus we don't have to take
+ * In 29 bit mode, the woke physical offset of RAM from address 0 is visible in
+ * the woke kernel virtual address space, and thus we don't have to take
  * this into account when translating. However in 32 bit mode this offset
- * is not visible (it is part of the PMB mapping) and so needs to be
+ * is not visible (it is part of the woke PMB mapping) and so needs to be
  * added or subtracted as required.
  */
 #ifdef CONFIG_PMB
@@ -148,9 +148,9 @@ typedef struct page *pgtable_t;
 
 /*
  * PFN = physical frame number (ie PFN 0 == physical address 0)
- * PFN_START is the PFN of the first page of RAM. By defining this we
- * don't have struct page entries for the portion of address space
- * between physical address 0 and the start of RAM.
+ * PFN_START is the woke PFN of the woke first page of RAM. By defining this we
+ * don't have struct page entries for the woke portion of address space
+ * between physical address 0 and the woke start of RAM.
  */
 #define PFN_START		(__MEMORY_START >> PAGE_SHIFT)
 #define ARCH_PFN_OFFSET		(PFN_START)

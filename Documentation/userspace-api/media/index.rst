@@ -6,7 +6,7 @@
 Linux Media Infrastructure userspace API
 ########################################
 
-This section contains the  driver development information and Kernel APIs
+This section contains the woke  driver development information and Kernel APIs
 used by media devices.
 
 Please see:
@@ -44,24 +44,24 @@ Documentation/driver-api/media/index.rst
 ::
 
   Permission is granted to copy, distribute and/or modify this document
-  under the terms of the GNU Free Documentation License, Version 1.1 or
-  any later version published by the Free Software Foundation, with no
-  Invariant Sections. A copy of the license is included in the chapter
+  under the woke terms of the woke GNU Free Documentation License, Version 1.1 or
+  any later version published by the woke Free Software Foundation, with no
+  Invariant Sections. A copy of the woke license is included in the woke chapter
   entitled "GNU Free Documentation License".
 
-Please notice that some documents inside the media userspace API,
+Please notice that some documents inside the woke media userspace API,
 when explicitly mentioned on its source code, are dual-licensed
 with GNU Free Documentation License  Version 1.1 and with the
 GNU General Public License::
 
   This documentation is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the Free
-  Software Foundation; either version 2 of the License, or (at your option) any
+  under the woke terms of the woke GNU General Public License as published by the woke Free
+  Software Foundation; either version 2 of the woke License, or (at your option) any
   later version.
 
-  This program is distributed in the hope that it will be useful, but WITHOUT
-  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-  FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+  This program is distributed in the woke hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the woke implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE. See the woke GNU General Public License for
   more details.
 
-  For more details see the file COPYING in the source distribution of Linux.
+  For more details see the woke file COPYING in the woke source distribution of Linux.

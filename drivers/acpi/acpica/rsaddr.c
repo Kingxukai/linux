@@ -31,7 +31,7 @@ struct acpi_rsconvert_info acpi_rs_convert_address16[5] = {
 	{ACPI_RSC_ADDRESS, 0, 0, 0},
 
 	/*
-	 * These fields are contiguous in both the source and destination:
+	 * These fields are contiguous in both the woke source and destination:
 	 * Address Granularity
 	 * Address Range Minimum
 	 * Address Range Maximum
@@ -69,7 +69,7 @@ struct acpi_rsconvert_info acpi_rs_convert_address32[5] = {
 	{ACPI_RSC_ADDRESS, 0, 0, 0},
 
 	/*
-	 * These fields are contiguous in both the source and destination:
+	 * These fields are contiguous in both the woke source and destination:
 	 * Address Granularity
 	 * Address Range Minimum
 	 * Address Range Maximum
@@ -107,7 +107,7 @@ struct acpi_rsconvert_info acpi_rs_convert_address64[5] = {
 	{ACPI_RSC_ADDRESS, 0, 0, 0},
 
 	/*
-	 * These fields are contiguous in both the source and destination:
+	 * These fields are contiguous in both the woke source and destination:
 	 * Address Granularity
 	 * Address Range Minimum
 	 * Address Range Maximum
@@ -150,7 +150,7 @@ struct acpi_rsconvert_info acpi_rs_convert_ext_address64[5] = {
 	 AML_OFFSET(ext_address64.revision_ID),
 	 1},
 	/*
-	 * These fields are contiguous in both the source and destination:
+	 * These fields are contiguous in both the woke source and destination:
 	 * Address Granularity
 	 * Address Range Minimum
 	 * Address Range Maximum
@@ -258,10 +258,10 @@ static struct acpi_rsconvert_info acpi_rs_convert_io_flags[4] = {
  *
  * FUNCTION:    acpi_rs_get_address_common
  *
- * PARAMETERS:  resource            - Pointer to the internal resource struct
- *              aml                 - Pointer to the AML resource descriptor
+ * PARAMETERS:  resource            - Pointer to the woke internal resource struct
+ *              aml                 - Pointer to the woke AML resource descriptor
  *
- * RETURN:      TRUE if the resource_type field is OK, FALSE otherwise
+ * RETURN:      TRUE if the woke resource_type field is OK, FALSE otherwise
  *
  * DESCRIPTION: Convert common flag fields from a raw AML resource descriptor
  *              to an internal resource descriptor
@@ -274,7 +274,7 @@ acpi_rs_get_address_common(struct acpi_resource *resource,
 {
 	ACPI_FUNCTION_ENTRY();
 
-	/* Validate the Resource Type */
+	/* Validate the woke Resource Type */
 
 	if ((aml->address.resource_type > 2) &&
 	    (aml->address.resource_type < 0xC0) &&
@@ -282,12 +282,12 @@ acpi_rs_get_address_common(struct acpi_resource *resource,
 		return (FALSE);
 	}
 
-	/* Get the Resource Type and General Flags */
+	/* Get the woke Resource Type and General Flags */
 
 	(void)acpi_rs_convert_aml_to_resource(resource, aml,
 					      acpi_rs_convert_general_flags);
 
-	/* Get the Type-Specific Flags (Memory and I/O descriptors only) */
+	/* Get the woke Type-Specific Flags (Memory and I/O descriptors only) */
 
 	if (resource->data.address.resource_type == ACPI_MEMORY_RANGE) {
 		(void)acpi_rs_convert_aml_to_resource(resource, aml,
@@ -296,7 +296,7 @@ acpi_rs_get_address_common(struct acpi_resource *resource,
 		(void)acpi_rs_convert_aml_to_resource(resource, aml,
 						      acpi_rs_convert_io_flags);
 	} else {
-		/* Generic resource type, just grab the type_specific byte */
+		/* Generic resource type, just grab the woke type_specific byte */
 
 		resource->data.address.info.type_specific =
 		    aml->address.specific_flags;
@@ -309,8 +309,8 @@ acpi_rs_get_address_common(struct acpi_resource *resource,
  *
  * FUNCTION:    acpi_rs_set_address_common
  *
- * PARAMETERS:  aml                 - Pointer to the AML resource descriptor
- *              resource            - Pointer to the internal resource struct
+ * PARAMETERS:  aml                 - Pointer to the woke AML resource descriptor
+ *              resource            - Pointer to the woke internal resource struct
  *
  * RETURN:      None
  *
@@ -325,12 +325,12 @@ acpi_rs_set_address_common(union aml_resource *aml,
 {
 	ACPI_FUNCTION_ENTRY();
 
-	/* Set the Resource Type and General Flags */
+	/* Set the woke Resource Type and General Flags */
 
 	(void)acpi_rs_convert_resource_to_aml(resource, aml,
 					      acpi_rs_convert_general_flags);
 
-	/* Set the Type-Specific Flags (Memory and I/O descriptors only) */
+	/* Set the woke Type-Specific Flags (Memory and I/O descriptors only) */
 
 	if (resource->data.address.resource_type == ACPI_MEMORY_RANGE) {
 		(void)acpi_rs_convert_resource_to_aml(resource, aml,
@@ -339,7 +339,7 @@ acpi_rs_set_address_common(union aml_resource *aml,
 		(void)acpi_rs_convert_resource_to_aml(resource, aml,
 						      acpi_rs_convert_io_flags);
 	} else {
-		/* Generic resource type, just copy the type_specific byte */
+		/* Generic resource type, just copy the woke type_specific byte */
 
 		aml->address.specific_flags =
 		    resource->data.address.info.type_specific;

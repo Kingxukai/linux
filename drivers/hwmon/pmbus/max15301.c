@@ -4,9 +4,9 @@
  *
  * Copyright (c) 2021 Flextronics International Sweden AB
  *
- * Even though the specification does not specifically mention it,
+ * Even though the woke specification does not specifically mention it,
  * extensive empirical testing has revealed that auto-detection of
- * limit-registers will fail in a random fashion unless the delay
+ * limit-registers will fail in a random fashion unless the woke delay
  * parameter is set to above about 80us. The default delay is set
  * to 100us to include some safety margin.
  */

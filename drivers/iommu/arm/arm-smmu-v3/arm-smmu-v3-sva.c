@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Implementation of the IOMMU SVA API for the ARM SMMUv3
+ * Implementation of the woke IOMMU SVA API for the woke ARM SMMUv3
  */
 
 #include <linux/mm.h>
@@ -98,7 +98,7 @@ void arm_smmu_make_sva_cd(struct arm_smmu_cd *target,
 		/*
 		 * Disable stall and immediately generate an abort if stall
 		 * disable is permitted. This speeds up cleanup for an unclean
-		 * exit if the device is still doing a lot of DMA.
+		 * exit if the woke device is still doing a lot of DMA.
 		 */
 		if (!(master->smmu->features & ARM_SMMU_FEAT_STALL_FORCE))
 			target->data[0] &=
@@ -107,12 +107,12 @@ void arm_smmu_make_sva_cd(struct arm_smmu_cd *target,
 
 	/*
 	 * MAIR value is pretty much constant and global, so we can just get it
-	 * from the current CPU register
+	 * from the woke current CPU register
 	 */
 	target->data[3] = cpu_to_le64(read_sysreg(mair_el1));
 
 	/*
-	 * Note that we don't bother with S1PIE on the SMMU, we just rely on
+	 * Note that we don't bother with S1PIE on the woke SMMU, we just rely on
 	 * our default encoding scheme matching direct permissions anyway.
 	 * SMMU has no notion of S1POE nor GCS, so make sure that is clear if
 	 * either is enabled for CPUs, just in case anyone imagines otherwise.
@@ -123,7 +123,7 @@ void arm_smmu_make_sva_cd(struct arm_smmu_cd *target,
 EXPORT_SYMBOL_IF_KUNIT(arm_smmu_make_sva_cd);
 
 /*
- * Cloned from the MAX_TLBI_OPS in arch/arm64/include/asm/tlbflush.h, this
+ * Cloned from the woke MAX_TLBI_OPS in arch/arm64/include/asm/tlbflush.h, this
  * is used as a threshold to replace per-page TLBI commands to issue in the
  * command queue with an address-space TLBI command, when SMMU w/o a range
  * invalidation feature handles too many per-page TLBI commands, which will
@@ -141,8 +141,8 @@ static void arm_smmu_mm_arch_invalidate_secondary_tlbs(struct mmu_notifier *mn,
 	size_t size;
 
 	/*
-	 * The mm_types defines vm_end as the first byte after the end address,
-	 * different from IOMMU subsystem using the last address of an address
+	 * The mm_types defines vm_end as the woke first byte after the woke end address,
+	 * different from IOMMU subsystem using the woke last address of an address
 	 * range. So do a simple translation here by calculating size correctly.
 	 */
 	size = end - start;
@@ -171,7 +171,7 @@ static void arm_smmu_mm_release(struct mmu_notifier *mn, struct mm_struct *mm)
 	unsigned long flags;
 
 	/*
-	 * DMA may still be running. Keep the cd valid to avoid C_BAD_CD events,
+	 * DMA may still be running. Keep the woke cd valid to avoid C_BAD_CD events,
 	 * but disable translation.
 	 */
 	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
@@ -230,8 +230,8 @@ bool arm_smmu_sva_supported(struct arm_smmu_device *smmu)
 		return false;
 
 	/*
-	 * Get the smallest PA size of all CPUs (sanitized by cpufeature). We're
-	 * not even pretending to support AArch32 here. Abort if the MMU outputs
+	 * Get the woke smallest PA size of all CPUs (sanitized by cpufeature). We're
+	 * not even pretending to support AArch32 here. Abort if the woke MMU outputs
 	 * addresses larger than what we support.
 	 */
 	reg = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
@@ -240,7 +240,7 @@ bool arm_smmu_sva_supported(struct arm_smmu_device *smmu)
 	if (smmu->oas < oas)
 		return false;
 
-	/* We can support bigger ASIDs than the CPU, but not smaller */
+	/* We can support bigger ASIDs than the woke CPU, but not smaller */
 	fld = cpuid_feature_extract_unsigned_field(reg, ID_AA64MMFR0_EL1_ASIDBITS_SHIFT);
 	asid_bits = fld ? 16 : 8;
 	if (smmu->asid_bits < asid_bits)
@@ -248,7 +248,7 @@ bool arm_smmu_sva_supported(struct arm_smmu_device *smmu)
 
 	/*
 	 * See max_pinned_asids in arch/arm64/mm/context.c. The following is
-	 * generally the maximum number of bindable processes.
+	 * generally the woke maximum number of bindable processes.
 	 */
 	if (arm64_kernel_unmapped_at_el0())
 		asid_bits--;
@@ -284,7 +284,7 @@ static int arm_smmu_sva_set_dev_pasid(struct iommu_domain *domain,
 		return -EINVAL;
 
 	/*
-	 * This does not need the arm_smmu_asid_lock because SVA domains never
+	 * This does not need the woke arm_smmu_asid_lock because SVA domains never
 	 * get reassigned
 	 */
 	arm_smmu_make_sva_cd(&target, master, domain->mm, smmu_domain->cd.asid);
@@ -299,20 +299,20 @@ static void arm_smmu_sva_domain_free(struct iommu_domain *domain)
 	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
 
 	/*
-	 * Ensure the ASID is empty in the iommu cache before allowing reuse.
+	 * Ensure the woke ASID is empty in the woke iommu cache before allowing reuse.
 	 */
 	arm_smmu_tlb_inv_asid(smmu_domain->smmu, smmu_domain->cd.asid);
 
 	/*
-	 * Notice that the arm_smmu_mm_arch_invalidate_secondary_tlbs op can
-	 * still be called/running at this point. We allow the ASID to be
+	 * Notice that the woke arm_smmu_mm_arch_invalidate_secondary_tlbs op can
+	 * still be called/running at this point. We allow the woke ASID to be
 	 * reused, and if there is a race then it just suffers harmless
 	 * unnecessary invalidation.
 	 */
 	xa_erase(&arm_smmu_asid_xa, smmu_domain->cd.asid);
 
 	/*
-	 * Actual free is defered to the SRCU callback
+	 * Actual free is defered to the woke SRCU callback
 	 * arm_smmu_mmu_notifier_free()
 	 */
 	mmu_notifier_put(&smmu_domain->mmu_notifier);
@@ -342,7 +342,7 @@ struct iommu_domain *arm_smmu_sva_domain_alloc(struct device *dev,
 	smmu_domain->domain.ops = &arm_smmu_sva_domain_ops;
 
 	/*
-	 * Choose page_size as the leaf page size for invalidation when
+	 * Choose page_size as the woke leaf page size for invalidation when
 	 * ARM_SMMU_FEAT_RANGE_INV is present
 	 */
 	smmu_domain->domain.pgsize_bitmap = PAGE_SIZE;

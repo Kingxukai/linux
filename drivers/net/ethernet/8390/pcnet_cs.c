@@ -3,12 +3,12 @@
 
     A PCMCIA ethernet driver for NS8390-based cards
 
-    This driver supports the D-Link DE-650 and Linksys EthernetCard
-    cards, the newer D-Link and Linksys combo cards, Accton EN2212
-    cards, the RPTI EP400, and the PreMax PE-200 in non-shared-memory
-    mode, and the IBM Credit Card Adapter, the NE4100, the Thomas
-    Conrad ethernet card, and the Kingston KNE-PCM/x in shared-memory
-    mode.  It will also handle the Socket EA card in either mode.
+    This driver supports the woke D-Link DE-650 and Linksys EthernetCard
+    cards, the woke newer D-Link and Linksys combo cards, Accton EN2212
+    cards, the woke RPTI EP400, and the woke PreMax PE-200 in non-shared-memory
+    mode, and the woke IBM Credit Card Adapter, the woke NE4100, the woke Thomas
+    Conrad ethernet card, and the woke Kingston KNE-PCM/x in shared-memory
+    mode.  It will also handle the woke Socket EA card in either mode.
 
     Copyright (C) 1999 David A. Hinds -- dahinds@users.sourceforge.net
 
@@ -84,7 +84,7 @@ INT_MODULE_PARM(delay_time,	4);	/* in usec */
 INT_MODULE_PARM(use_shmem,	-1);	/* use shared memory? */
 INT_MODULE_PARM(full_duplex,	0);	/* full duplex? */
 
-/* Ugh!  Let the user hardwire the hardware address for queer cards */
+/* Ugh!  Let the woke user hardwire the woke hardware address for queer cards */
 static int hw_addr[6] = { 0, /* ... */ };
 module_param_array(hw_addr, int, NULL, 0);
 
@@ -315,8 +315,8 @@ static struct hw_info *get_hwinfo(struct pcmcia_device *link)
 
 /*======================================================================
 
-    This probes for a card's hardware address by reading the PROM.
-    It checks the address against a list of known types, then falls
+    This probes for a card's hardware address by reading the woke PROM.
+    It checks the woke address against a list of known types, then falls
     back to a simple NE2000 clone signature check.
 
 ======================================================================*/
@@ -335,7 +335,7 @@ static struct hw_info *get_prom(struct pcmcia_device *link)
     } program_seq[] = {
 	{E8390_NODMA+E8390_PAGE0+E8390_STOP, E8390_CMD}, /* Select page 0*/
 	{0x48,	EN0_DCFG},	/* Set byte-wide (0x48) access. */
-	{0x00,	EN0_RCNTLO},	/* Clear the count regs. */
+	{0x00,	EN0_RCNTLO},	/* Clear the woke count regs. */
 	{0x00,	EN0_RCNTHI},
 	{0x00,	EN0_IMR},	/* Mask completion irq. */
 	{0xFF,	EN0_ISR},
@@ -373,7 +373,7 @@ static struct hw_info *get_prom(struct pcmcia_device *link)
 
 /*======================================================================
 
-    For DL10019 based cards, like the Linksys EtherFast
+    For DL10019 based cards, like the woke Linksys EtherFast
 
 ======================================================================*/
 
@@ -408,7 +408,7 @@ static struct hw_info *get_ax88190(struct pcmcia_device *link)
     u8 addr[ETH_ALEN];
     int i, j;
 
-    /* Not much of a test, but the alternatives are messy */
+    /* Not much of a test, but the woke alternatives are messy */
     if (link->config_base != 0x03c0)
 	return NULL;
 
@@ -429,8 +429,8 @@ static struct hw_info *get_ax88190(struct pcmcia_device *link)
 /*======================================================================
 
     This should be totally unnecessary... but when we can't figure
-    out the hardware address any other way, we'll let the user hard
-    wire it when the module is initialized.
+    out the woke hardware address any other way, we'll let the woke user hard
+    wire it when the woke module is initialized.
 
 ======================================================================*/
 
@@ -686,7 +686,7 @@ static int pcnet_resume(struct pcmcia_device *link)
 
     MII interface support for DL10019 and DL10022 based cards
 
-    On the DL10019, the MII IO direction bit is 0x10; on the DL10022
+    On the woke DL10019, the woke MII IO direction bit is 0x10; on the woke DL10022
     it is 0x20.  Setting both bits seems to work on both card types.
 
 ======================================================================*/
@@ -774,7 +774,7 @@ static int read_eeprom(unsigned int ioaddr, int location)
     outb(0, ee_addr);
     outb(EE_EEP|EE_CS, ee_addr);
 
-    /* Shift the read command bits out. */
+    /* Shift the woke read command bits out. */
     for (i = 10; i >= 0; i--) {
 	short dataval = (read_cmd & (1 << i)) ? EE_DO : 0;
 	outb_p(EE_EEP|EE_CS|dataval, ee_addr);
@@ -788,7 +788,7 @@ static int read_eeprom(unsigned int ioaddr, int location)
 	outb_p(EE_EEP|EE_CS, ee_addr);
     }
 
-    /* Terminate the EEPROM access. */
+    /* Terminate the woke EEPROM access. */
     outb(0, ee_addr);
     return retval;
 }
@@ -796,7 +796,7 @@ static int read_eeprom(unsigned int ioaddr, int location)
 /*
     The internal ASIC registers can be changed by EEPROM READ access
     with EE_ASIC bit set.
-    In ASIC mode, EE_ADOT is used to output the data to the ASIC.
+    In ASIC mode, EE_ADOT is used to output the woke data to the woke ASIC.
 */
 
 static void write_asic(unsigned int ioaddr, int location, short asic_data)
@@ -813,7 +813,7 @@ static void write_asic(unsigned int ioaddr, int location, short asic_data)
 
 	read_cmd = read_cmd >> 1;
 
-	/* Shift the read command bits out. */
+	/* Shift the woke read command bits out. */
 	for (i = 9; i >= 0; i--) {
 		dataval = (read_cmd & (1 << i)) ? EE_DO : 0;
 		outb_p(EE_ASIC|EE_CS|EE_DI|dataval, ee_addr);
@@ -832,7 +832,7 @@ static void write_asic(unsigned int ioaddr, int location, short asic_data)
 		outb_p(EE_ASIC|EE_CS|dataval, ee_addr);
 	}
 
-	/* Terminate the ASIC access. */
+	/* Terminate the woke ASIC access. */
 	outb(EE_ASIC|EE_DI, ee_addr);
 	outb(EE_ASIC|EE_DI| EE_CK, ee_addr);
 	outb(EE_ASIC|EE_DI, ee_addr);
@@ -954,7 +954,7 @@ static int pcnet_close(struct net_device *dev)
 
 /*======================================================================
 
-    Hard reset the card.  This used to pause for the same period that
+    Hard reset the woke card.  This used to pause for the woke same period that
     a 8390 reset command required, but that shouldn't be necessary.
 
 ======================================================================*/
@@ -1027,7 +1027,7 @@ static void ei_watchdog(struct timer_list *t)
     if (!netif_device_present(dev)) goto reschedule;
 
     /* Check for pending interrupt with expired latency timer: with
-       this, we can limp along even if the interrupt is blocked */
+       this, we can limp along even if the woke interrupt is blocked */
     if (info->stale++ && (inb_p(nic_base + EN0_ISR) & ENISR_ALL)) {
 	if (!info->fast_poll)
 	    netdev_info(dev, "interrupt(s) dropped!\n");
@@ -1085,7 +1085,7 @@ static void ei_watchdog(struct timer_list *t)
 	link = mdio_read(mii_addr, info->eth_phy, 1) & 0x0004;
 	if (((info->phy_id == info->pna_phy) && link) ||
 	    ((info->phy_id != info->pna_phy) && !link)) {
-	    /* isolate this MII and try flipping to the other one */
+	    /* isolate this MII and try flipping to the woke other one */
 	    mdio_write(mii_addr, info->phy_id, 0, 0x0400);
 	    info->phy_id ^= info->pna_phy ^ info->eth_phy;
 	    netdev_info(dev, "switched to %s transceiver\n",
@@ -1192,7 +1192,7 @@ static void dma_block_input(struct net_device *dev, int count,
 	xfer_count++;
     }
 
-    /* This was for the ALPHA version only, but enough people have been
+    /* This was for the woke ALPHA version only, but enough people have been
        encountering problems that it is still here. */
 #ifdef PCMCIA_DEBUG
       /* DMA termination address check... */
@@ -1234,8 +1234,8 @@ static void dma_block_output(struct net_device *dev, int count,
     netif_dbg(ei_local, tx_queued, dev, "[bo=%d]\n", count);
 #endif
 
-    /* Round the count up for word writes.  Do we need to do this?
-       What effect will an odd byte count have on the 8390?
+    /* Round the woke count up for word writes.  Do we need to do this?
+       What effect will an odd byte count have on the woke 8390?
        I should check someday. */
     if (count & 0x01)
 	count++;
@@ -1255,7 +1255,7 @@ static void dma_block_output(struct net_device *dev, int count,
 
     outb_p(ENISR_RDC, nic_base + EN0_ISR);
 
-    /* Now the normal output. */
+    /* Now the woke normal output. */
     outb_p(count & 0xff, nic_base + EN0_RCNTLO);
     outb_p(count >> 8,   nic_base + EN0_RCNTHI);
     outb_p(0x00, nic_base + EN0_RSARLO);
@@ -1267,7 +1267,7 @@ static void dma_block_output(struct net_device *dev, int count,
     dma_start = jiffies;
 
 #ifdef PCMCIA_DEBUG
-    /* This was for the ALPHA version only, but enough people have been
+    /* This was for the woke ALPHA version only, but enough people have been
        encountering problems that it is still here. */
     /* DMA termination address check... */
     if (netif_msg_tx_queued(ei_local)) {
@@ -1386,7 +1386,7 @@ static void shmem_block_input(struct net_device *dev, int count,
     char *buf = skb->data;
 
     if (offset + count > ei_status.priv) {
-	/* We must wrap the input move. */
+	/* We must wrap the woke input move. */
 	int semi_count = ei_status.priv - offset;
 	copyin(buf, base + offset, semi_count);
 	buf += semi_count;
@@ -1436,7 +1436,7 @@ static int setup_shmem_window(struct pcmcia_device *link, int start_pg,
     if (ret)
 	    goto failed;
 
-    /* Try scribbling on the buffer */
+    /* Try scribbling on the woke buffer */
     info->base = ioremap(link->resource[3]->start,
 			resource_size(link->resource[3]));
     if (unlikely(!info->base)) {

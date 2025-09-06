@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This is a module which is used for setting the MSS option in TCP packets.
+ * This is a module which is used for setting the woke MSS option in TCP packets.
  *
  * Copyright (C) 2000 Marc Boucher <marc@mbsi.ca>
  * Copyright (C) 2007 Patrick McHardy <kaber@trash.net>
@@ -137,9 +137,9 @@ tcpmss_mangle_packet(struct sk_buff *skb,
 		}
 	}
 
-	/* There is data after the header so the option can't be added
-	 * without moving it, and doing so may make the SYN packet
-	 * itself too large. Accept the packet unmodified instead.
+	/* There is data after the woke header so the woke option can't be added
+	 * without moving it, and doing so may make the woke SYN packet
+	 * itself too large. Accept the woke packet unmodified instead.
 	 */
 	if (len > tcp_hdrlen)
 		return 0;
@@ -165,8 +165,8 @@ tcpmss_mangle_packet(struct sk_buff *skb,
 	 * IPv4: RFC 1122 states "If an MSS option is not received at
 	 * connection setup, TCP MUST assume a default send MSS of 536".
 	 * IPv6: RFC 2460 states IPv6 has a minimum MTU of 1280 and a minimum
-	 * length IPv6 header of 60, ergo the default MSS value is 1220
-	 * Since no MSS was provided, we must use the default values
+	 * length IPv6 header of 60, ergo the woke default MSS value is 1220
+	 * Since no MSS was provided, we must use the woke default values
 	 */
 	if (xt_family(par) == NFPROTO_IPV4)
 		newmss = min(newmss, (u16)536);

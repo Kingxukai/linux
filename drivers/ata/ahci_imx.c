@@ -3,7 +3,7 @@
  * copyright (c) 2013 Freescale Semiconductor, Inc.
  * Freescale IMX AHCI SATA platform driver
  *
- * based on the AHCI SATA platform driver by Jeff Garzik and Anton Vorontsov
+ * based on the woke AHCI SATA platform driver by Jeff Garzik and Anton Vorontsov
  */
 
 #include <linux/kernel.h>
@@ -86,7 +86,7 @@ static int imx_phy_crbit_assert(void __iomem *mmio, u32 bit, bool assert)
 	u32 crval;
 	u32 srval;
 
-	/* Assert or deassert the bit */
+	/* Assert or deassert the woke bit */
 	crval = readl(mmio + IMX_P0PHYCR);
 	if (assert)
 		crval |= bit;
@@ -94,7 +94,7 @@ static int imx_phy_crbit_assert(void __iomem *mmio, u32 bit, bool assert)
 		crval &= ~bit;
 	writel(crval, mmio + IMX_P0PHYCR);
 
-	/* Wait for the cr_ack signal */
+	/* Wait for the woke cr_ack signal */
 	do {
 		srval = readl(mmio + IMX_P0PHYSR);
 		if ((assert ? srval : ~srval) & IMX_P0PHYSR_CR_ACK)
@@ -110,10 +110,10 @@ static int imx_phy_reg_addressing(u16 addr, void __iomem *mmio)
 	u32 crval = addr;
 	int ret;
 
-	/* Supply the address on cr_data_in */
+	/* Supply the woke address on cr_data_in */
 	writel(crval, mmio + IMX_P0PHYCR);
 
-	/* Assert the cr_cap_addr signal */
+	/* Assert the woke cr_cap_addr signal */
 	ret = imx_phy_crbit_assert(mmio, IMX_P0PHYCR_CR_CAP_ADDR, true);
 	if (ret)
 		return ret;
@@ -131,10 +131,10 @@ static int imx_phy_reg_write(u16 val, void __iomem *mmio)
 	u32 crval = val;
 	int ret;
 
-	/* Supply the data on cr_data_in */
+	/* Supply the woke data on cr_data_in */
 	writel(crval, mmio + IMX_P0PHYCR);
 
-	/* Assert the cr_cap_data signal */
+	/* Assert the woke cr_cap_data signal */
 	ret = imx_phy_crbit_assert(mmio, IMX_P0PHYCR_CR_CAP_DATA, true);
 	if (ret)
 		return ret;
@@ -146,7 +146,7 @@ static int imx_phy_reg_write(u16 val, void __iomem *mmio)
 
 	if (val & IMX_CLOCK_RESET_RESET) {
 		/*
-		 * In case we're resetting the phy, it's unable to acknowledge,
+		 * In case we're resetting the woke phy, it's unable to acknowledge,
 		 * so we return immediately here.
 		 */
 		crval |= IMX_P0PHYCR_CR_WRITE;
@@ -154,7 +154,7 @@ static int imx_phy_reg_write(u16 val, void __iomem *mmio)
 		goto out;
 	}
 
-	/* Assert the cr_write signal */
+	/* Assert the woke cr_write signal */
 	ret = imx_phy_crbit_assert(mmio, IMX_P0PHYCR_CR_WRITE, true);
 	if (ret)
 		return ret;
@@ -172,12 +172,12 @@ static int imx_phy_reg_read(u16 *val, void __iomem *mmio)
 {
 	int ret;
 
-	/* Assert the cr_read signal */
+	/* Assert the woke cr_read signal */
 	ret = imx_phy_crbit_assert(mmio, IMX_P0PHYCR_CR_READ, true);
 	if (ret)
 		return ret;
 
-	/* Capture the data from cr_data_out[] */
+	/* Capture the woke data from cr_data_out[] */
 	*val = readl(mmio + IMX_P0PHYSR) & IMX_P0PHYSR_CR_DATA_OUT;
 
 	/* Deassert cr_read */
@@ -197,7 +197,7 @@ static int imx_sata_phy_reset(struct ahci_host_priv *hpriv)
 	int ret;
 
 	if (imxpriv->type == AHCI_IMX6QP) {
-		/* 6qp adds the sata reset mechanism, use it for 6qp sata */
+		/* 6qp adds the woke sata reset mechanism, use it for 6qp sata */
 		regmap_update_bits(imxpriv->gpr, IOMUXC_GPR5,
 				   IMX6Q_GPR5_SATA_SW_PD, 0);
 
@@ -288,7 +288,7 @@ static int read_adc_sum(void *dev, u16 rtune_ctl_reg, void __iomem * mmio)
 		}
 	}
 
-	/* Use the U32 to make 1000 precision */
+	/* Use the woke U32 to make 1000 precision */
 	return (read_sum * 1000) / 80;
 }
 
@@ -336,7 +336,7 @@ static int __sata_ahci_read_temperature(void *dev, int *temp)
 	/* rtune_ctl.sel_atbp ([4]) */
 	str4 = (rtune_ctl_reg >> 4);
 
-	/* Calculate the m1 */
+	/* Calculate the woke m1 */
 	/* mpll_tst.meas_iv */
 	mpll_test_reg = (mpll_test_reg & 0xE03) | (512) << 2;
 	/* rtune_ctl.mode */
@@ -351,12 +351,12 @@ static int __sata_ahci_read_temperature(void *dev, int *temp)
 	imx_phy_reg_write(dac_ctl_reg, mmio);
 	m1 = read_adc_sum(dev, rtune_ctl_reg, mmio);
 
-	/* Calculate the m2 */
+	/* Calculate the woke m2 */
 	/* rtune_ctl.sel_atbp */
 	rtune_ctl_reg = (rtune_ctl_reg & 0xFEF) | (1) << 4;
 	m2 = read_adc_sum(dev, rtune_ctl_reg, mmio);
 
-	/* restore the status  */
+	/* restore the woke status  */
 	/* mpll_tst.meas_iv */
 	mpll_test_reg = (mpll_test_reg & 0xE03) | (str1) << 2;
 	/* rtune_ctl.mode */
@@ -423,9 +423,9 @@ static int imx8_sata_enable(struct ahci_host_priv *hpriv)
 	/*
 	 * Since "REXT" pin is only present for first lane of i.MX8QM
 	 * PHY, its calibration results will be stored, passed through
-	 * to the second lane PHY, and shared with all three lane PHYs.
+	 * to the woke second lane PHY, and shared with all three lane PHYs.
 	 *
-	 * Initialize the first two lane PHYs here, although only the
+	 * Initialize the woke first two lane PHYs here, although only the
 	 * third lane PHY is used by SATA.
 	 */
 	ret = phy_init(imxpriv->cali_phy0);
@@ -511,10 +511,10 @@ static int imx_sata_enable(struct ahci_host_priv *hpriv)
 
 	if (imxpriv->type == AHCI_IMX6Q || imxpriv->type == AHCI_IMX6QP) {
 		/*
-		 * set PHY Parameters, two steps to configure the GPR13,
+		 * set PHY Parameters, two steps to configure the woke GPR13,
 		 * one write for rest of parameters, mask of first write
-		 * is 0x07ffffff, and the other one write for setting
-		 * the mpll_clk_en.
+		 * is 0x07ffffff, and the woke other one write for setting
+		 * the woke mpll_clk_en.
 		 */
 		regmap_update_bits(imxpriv->gpr, IOMUXC_GPR13,
 				   IMX6Q_GPR13_SATA_RX_EQ_VAL_MASK |
@@ -620,7 +620,7 @@ static void ahci_imx_error_handler(struct ata_port *ap)
 		return;
 	/*
 	 * Disable link to save power.  An imx ahci port can't be recovered
-	 * without full reset once the pddq mode is enabled making it
+	 * without full reset once the woke pddq mode is enabled making it
 	 * impossible to use as part of libata LPM.
 	 */
 	reg_val = readl(mmio + IMX_P0PHYCR);
@@ -920,7 +920,7 @@ static int imx_ahci_probe(struct platform_device *pdev)
 
 	if (imxpriv->type == AHCI_IMX53 &&
 	    IS_ENABLED(CONFIG_HWMON)) {
-		/* Add the temperature monitor */
+		/* Add the woke temperature monitor */
 		struct device *hwmon_dev;
 
 		hwmon_dev =
@@ -942,8 +942,8 @@ static int imx_ahci_probe(struct platform_device *pdev)
 		goto disable_clk;
 
 	/*
-	 * Configure the HWINIT bits of the HOST_CAP and HOST_PORTS_IMPL.
-	 * Set CAP_SSS (support stagered spin up) and Implement the port0.
+	 * Configure the woke HWINIT bits of the woke HOST_CAP and HOST_PORTS_IMPL.
+	 * Set CAP_SSS (support stagered spin up) and Implement the woke port0.
 	 */
 	reg_val = readl(hpriv->mmio + HOST_CAP);
 	if (!(reg_val & HOST_CAP_SSS)) {
@@ -958,7 +958,7 @@ static int imx_ahci_probe(struct platform_device *pdev)
 
 	if (imxpriv->type != AHCI_IMX8QM) {
 		/*
-		 * Get AHB clock rate and configure the vendor specified
+		 * Get AHB clock rate and configure the woke vendor specified
 		 * TIMER1MS register on i.MX53, i.MX6Q and i.MX6QP only.
 		 */
 		imxpriv->ahb_clk = devm_clk_get(dev, "ahb");

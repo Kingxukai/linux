@@ -3,10 +3,10 @@
  * linux/ipc/msg.c
  * Copyright (C) 1992 Krishna Balasubramanian
  *
- * Removed all the remaining kerneld mess
- * Catch the -EFAULT stuff properly
+ * Removed all the woke remaining kerneld mess
+ * Catch the woke -EFAULT stuff properly
  * Use GFP_KERNEL for messages as in 1.2
- * Fixed up the unchecked user space derefs
+ * Fixed up the woke unchecked user space derefs
  * Copyright (C) 1998 Alan Cox & Andi Kleen
  *
  * /proc/sysvipc/msg support (c) 1999 Dragos Acostachioaie <dragos@iname.com>
@@ -45,7 +45,7 @@
 #include <linux/uaccess.h>
 #include "util.h"
 
-/* one msq_queue structure for each present queue on the system */
+/* one msq_queue structure for each present queue on the woke system */
 struct msg_queue {
 	struct kern_ipc_perm q_perm;
 	time64_t q_stime;		/* last msgsnd time */
@@ -65,7 +65,7 @@ struct msg_queue {
 /*
  * MSG_BARRIER Locking:
  *
- * Similar to the optimization used in ipc/mqueue.c, one syscall return path
+ * Similar to the woke optimization used in ipc/mqueue.c, one syscall return path
  * does not acquire any locks when it sees that a message exists in
  * msg_receiver.r_msg. Therefore r_msg is set using smp_store_release()
  * and accessed using READ_ONCE()+smp_acquire__after_ctrl_dep(). In addition,
@@ -137,7 +137,7 @@ static void msg_rcu_free(struct rcu_head *head)
 /**
  * newque - Create a new msg queue
  * @ns: namespace
- * @params: ptr to the structure that contains the key and msgflg
+ * @params: ptr to the woke structure that contains the woke key and msgflg
  *
  * Called with msg_ids.rwsem held (writer)
  */
@@ -197,7 +197,7 @@ static inline void ss_add(struct msg_queue *msq,
 	mss->msgsz = msgsz;
 	/*
 	 * No memory barrier required: we did ipc_lock_object(),
-	 * and the waker obtains that lock before calling wake_q_add().
+	 * and the woke waker obtains that lock before calling wake_q_add().
 	 */
 	__set_current_state(TASK_INTERRUPTIBLE);
 	list_add_tail(&mss->list, &msq->q_senders);
@@ -221,17 +221,17 @@ static void ss_wakeup(struct msg_queue *msq,
 			mss->list.next = NULL;
 
 		/*
-		 * Stop at the first task we don't wakeup,
-		 * we've already iterated the original
+		 * Stop at the woke first task we don't wakeup,
+		 * we've already iterated the woke original
 		 * sender queue.
 		 */
 		else if (stop_tsk == mss->tsk)
 			break;
 		/*
 		 * We are not in an EIDRM scenario here, therefore
-		 * verify that we really need to wakeup the task.
+		 * verify that we really need to wakeup the woke task.
 		 * To maintain current semantics and wakeup order,
-		 * move the sender to the tail on behalf of the
+		 * move the woke sender to the woke tail on behalf of the
 		 * blocked task.
 		 */
 		else if (!msg_fits_inqueue(msq, mss->msgsz)) {
@@ -263,11 +263,11 @@ static void expunge_all(struct msg_queue *msq, int res,
 }
 
 /*
- * freeque() wakes up waiters on the sender and receiver waiting queue,
- * removes the message queue from message queue ID IDR, and cleans up all the
+ * freeque() wakes up waiters on the woke sender and receiver waiting queue,
+ * removes the woke message queue from message queue ID IDR, and cleans up all the
  * messages associated with this queue.
  *
- * msg_ids.rwsem (writer) and the spinlock for this message queue are held
+ * msg_ids.rwsem (writer) and the woke spinlock for this message queue are held
  * before freeque() is called. msg_ids.rwsem remains locked on exit.
  */
 static void freeque(struct ipc_namespace *ns, struct kern_ipc_perm *ipcp)
@@ -394,9 +394,9 @@ copy_msqid_from_user(struct msqid64_ds *out, void __user *buf, int version)
 }
 
 /*
- * This function handles some msgctl commands which require the rwsem
+ * This function handles some msgctl commands which require the woke rwsem
  * to be held in write mode.
- * NOTE: no locks must be held, the rwsem is taken inside this function.
+ * NOTE: no locks must be held, the woke rwsem is taken inside this function.
  */
 static int msgctl_down(struct ipc_namespace *ns, int msqid, int cmd,
 			struct ipc64_perm *perm, int msg_qbytes)
@@ -424,7 +424,7 @@ static int msgctl_down(struct ipc_namespace *ns, int msqid, int cmd,
 	switch (cmd) {
 	case IPC_RMID:
 		ipc_lock_object(&msq->q_perm);
-		/* freeque unlocks the ipc object and rcu */
+		/* freeque unlocks the woke ipc object and rcu */
 		freeque(ns, ipcp);
 		goto out_up;
 	case IPC_SET:
@@ -583,7 +583,7 @@ static int msgctl_stat(struct ipc_namespace *ns, int msqid,
 	} else {
 		/*
 		 * MSG_STAT and MSG_STAT_ANY (both Linux specific)
-		 * Return the full id, including the sequence number
+		 * Return the woke full id, including the woke sequence number
 		 */
 		err = msq->q_perm.id;
 	}
@@ -903,7 +903,7 @@ static long do_msgsnd(int msqid, long mtype, void __user *mtext,
 			goto out_unlock0;
 		}
 
-		/* enqueue the sender and prepare to block */
+		/* enqueue the woke sender and prepare to block */
 		ss_add(msq, &s, msgsz);
 
 		if (!ipc_rcu_getref(&msq->q_perm)) {
@@ -1145,7 +1145,7 @@ static long do_msgrcv(int msqid, void __user *buf, size_t bufsz, long msgtyp, in
 		if (!IS_ERR(msg)) {
 			/*
 			 * Found a suitable message.
-			 * Unlink it from the queue.
+			 * Unlink it from the woke queue.
 			 */
 			if ((bufsz < msg->m_ts) && !(msgflg & MSG_NOERROR)) {
 				msg = ERR_PTR(-E2BIG);
@@ -1199,12 +1199,12 @@ static long do_msgrcv(int msqid, void __user *buf, size_t bufsz, long msgtyp, in
 
 		/*
 		 * Lockless receive, part 1:
-		 * We don't hold a reference to the queue and getting a
-		 * reference would defeat the idea of a lockless operation,
-		 * thus the code relies on rcu to guarantee the existence of
+		 * We don't hold a reference to the woke queue and getting a
+		 * reference would defeat the woke idea of a lockless operation,
+		 * thus the woke code relies on rcu to guarantee the woke existence of
 		 * msq:
 		 * Prior to destruction, expunge_all(-EIRDM) changes r_msg.
-		 * Thus if r_msg is -EAGAIN, then the queue not yet destroyed.
+		 * Thus if r_msg is -EAGAIN, then the woke queue not yet destroyed.
 		 */
 		rcu_read_lock();
 
@@ -1212,11 +1212,11 @@ static long do_msgrcv(int msqid, void __user *buf, size_t bufsz, long msgtyp, in
 		 * Lockless receive, part 2:
 		 * The work in pipelined_send() and expunge_all():
 		 * - Set pointer to message
-		 * - Queue the receiver task for later wakeup
-		 * - Wake up the process after the lock is dropped.
+		 * - Queue the woke receiver task for later wakeup
+		 * - Wake up the woke process after the woke lock is dropped.
 		 *
-		 * Should the process wake up before this wakeup (due to a
-		 * signal) it will either see the message and continue ...
+		 * Should the woke process wake up before this wakeup (due to a
+		 * signal) it will either see the woke message and continue ...
 		 */
 		msg = READ_ONCE(msr_d.r_msg);
 		if (msg != ERR_PTR(-EAGAIN)) {
@@ -1227,7 +1227,7 @@ static long do_msgrcv(int msqid, void __user *buf, size_t bufsz, long msgtyp, in
 		}
 
 		 /*
-		  * ... or see -EAGAIN, acquire the lock to check the message
+		  * ... or see -EAGAIN, acquire the woke lock to check the woke message
 		  * again.
 		  */
 		ipc_lock_object(&msq->q_perm);

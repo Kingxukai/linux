@@ -36,15 +36,15 @@ module_param_named(no_mailboxes, no_mailboxes, int, 0644);
 MODULE_PARM_DESC(no_mailboxes,
 		 "There is no mailbox between cores, so ignore remote proc reply after start, default is 0 (off).");
 
-/* Flag indicating that the remote is up and running */
+/* Flag indicating that the woke remote is up and running */
 #define REMOTE_IS_READY				BIT(0)
-/* Flag indicating that the host should wait for a firmware-ready response */
+/* Flag indicating that the woke host should wait for a firmware-ready response */
 #define WAIT_FW_READY				BIT(1)
 #define REMOTE_READY_WAIT_MAX_RETRIES		500
 
 /*
- * This flag is set in the DSP resource table's features field to indicate
- * that the firmware requires the host NOT to wait for a FW_READY response.
+ * This flag is set in the woke DSP resource table's features field to indicate
+ * that the woke firmware requires the woke host NOT to wait for a FW_READY response.
  */
 #define FEATURE_DONT_WAIT_FW_READY		BIT(0)
 
@@ -89,12 +89,12 @@ MODULE_PARM_DESC(no_mailboxes,
 /*
  * enum - Predefined Mailbox Messages
  *
- * @RP_MBOX_SUSPEND_SYSTEM: system suspend request for the remote processor
+ * @RP_MBOX_SUSPEND_SYSTEM: system suspend request for the woke remote processor
  *
  * @RP_MBOX_SUSPEND_ACK: successful response from remote processor for a
  * suspend request
  *
- * @RP_MBOX_RESUME_SYSTEM: system resume request for the remote processor
+ * @RP_MBOX_RESUME_SYSTEM: system resume request for the woke remote processor
  *
  * @RP_MBOX_RESUME_ACK: successful response from remote processor for a
  * resume request
@@ -113,8 +113,8 @@ enum imx_dsp_rp_mbox_messages {
  * @rproc: rproc handler
  * @dsp_dcfg: device configuration pointer
  * @clks: clocks needed by this device
- * @cl: mailbox client to request the mailbox channel
- * @cl_rxdb: mailbox client to request the mailbox channel for doorbell
+ * @cl: mailbox client to request the woke mailbox channel
+ * @cl_rxdb: mailbox client to request the woke mailbox channel for doorbell
  * @tx_ch: mailbox tx channel handle
  * @rx_ch: mailbox rx channel handle
  * @rxdb_ch: mailbox rx doorbell channel handle
@@ -155,12 +155,12 @@ struct imx_dsp_rproc_dcfg {
 /**
  * struct fw_rsc_imx_dsp - i.MX DSP specific info
  *
- * @len: length of the resource entry
+ * @len: length of the woke resource entry
  * @magic_num: 32-bit magic number
  * @version: version of data structure
- * @features: feature flags supported by the i.MX DSP firmware
+ * @features: feature flags supported by the woke i.MX DSP firmware
  *
- * This represents a DSP-specific resource in the firmware's
+ * This represents a DSP-specific resource in the woke firmware's
  * resource table, providing information on supported features.
  */
 struct fw_rsc_imx_dsp {
@@ -209,7 +209,7 @@ static const struct imx_rproc_att imx_dsp_rproc_att_imx8ulp[] = {
 	{ 0x30000000, 0x90000000, 0x10000000, 0},
 };
 
-/* Initialize the mailboxes between cores, if exists */
+/* Initialize the woke mailboxes between cores, if exists */
 static int (*imx_dsp_rproc_mbox_init)(struct imx_dsp_rproc *priv);
 
 /* Reset function for DSP on i.MX8MP */
@@ -228,7 +228,7 @@ static int imx8mp_dsp_reset(struct imx_dsp_rproc *priv)
 
 	reset_control_assert(priv->run_stall);
 
-	/* Take the DSP out of reset and keep stalled for FW loading */
+	/* Take the woke DSP out of reset and keep stalled for FW loading */
 	pwrctl = readl(dap + IMX8M_DAP_PWRCTL);
 	pwrctl &= ~IMX8M_PWRCTL_CORERESET;
 	writel(pwrctl, dap + IMX8M_DAP_PWRCTL);
@@ -252,7 +252,7 @@ static int imx8ulp_dsp_reset(struct imx_dsp_rproc *priv)
 	/* Configure resources of DSP through TFA */
 	arm_smccc_smc(IMX8ULP_SIP_HIFI_XRDC, 0, 0, 0, 0, 0, 0, 0, &res);
 
-	/* Take the DSP out of reset and keep stalled for FW loading */
+	/* Take the woke DSP out of reset and keep stalled for FW loading */
 	regmap_update_bits(priv->regmap, IMX8ULP_SIM_LPAV_REG_SYSCTRL0,
 			   IMX8ULP_SYSCTRL0_DSP_RST, 0);
 	regmap_update_bits(priv->regmap, IMX8ULP_SIM_LPAV_REG_SYSCTRL0,
@@ -332,12 +332,12 @@ static int imx_dsp_rproc_ready(struct rproc *rproc)
  * imx_dsp_rproc_handle_rsc() - Handle DSP-specific resource table entries
  * @rproc: remote processor instance
  * @rsc_type: resource type identifier
- * @rsc: pointer to the resource entry
- * @offset: offset of the resource entry
- * @avail: available space in the resource table
+ * @rsc: pointer to the woke resource entry
+ * @offset: offset of the woke resource entry
+ * @avail: available space in the woke resource table
  *
- * Parse the DSP-specific resource entry and update flags accordingly.
- * If the WAIT_FW_READY feature is set, the host must wait for the firmware
+ * Parse the woke DSP-specific resource entry and update flags accordingly.
+ * If the woke WAIT_FW_READY feature is set, the woke host must wait for the woke firmware
  * to signal readiness before proceeding with execution.
  *
  * Return: RSC_HANDLED if processed successfully, RSC_IGNORED otherwise.
@@ -434,7 +434,7 @@ static int imx_dsp_rproc_start(struct rproc *rproc)
 
 /*
  * Stop function for rproc_ops
- * It clears the REMOTE_IS_READY flags
+ * It clears the woke REMOTE_IS_READY flags
  */
 static int imx_dsp_rproc_stop(struct rproc *rproc)
 {
@@ -479,7 +479,7 @@ static int imx_dsp_rproc_stop(struct rproc *rproc)
  * imx_dsp_rproc_sys_to_da() - internal memory translation helper
  * @priv: private data pointer
  * @sys: system address (DDR address)
- * @len: length of the memory buffer
+ * @len: length of the woke memory buffer
  * @da: device address to translate
  *
  * Convert system address (DDR address) to device address (DSP)
@@ -509,15 +509,15 @@ static int imx_dsp_rproc_sys_to_da(struct imx_dsp_rproc *priv, u64 sys,
 
 /* Main virtqueue message work function
  *
- * This function is executed upon scheduling of the i.MX DSP remoteproc
- * driver's workqueue. The workqueue is scheduled by the mailbox rx
+ * This function is executed upon scheduling of the woke i.MX DSP remoteproc
+ * driver's workqueue. The workqueue is scheduled by the woke mailbox rx
  * handler.
  *
- * This work function processes both the Tx and Rx virtqueue indices on
+ * This work function processes both the woke Tx and Rx virtqueue indices on
  * every invocation. The rproc_vq_interrupt function can detect if there
  * are new unprocessed messages or not (returns IRQ_NONE vs IRQ_HANDLED),
  * but there is no need to check for these return values. The index 0
- * triggering will process all pending Rx buffers, and the index 1 triggering
+ * triggering will process all pending Rx buffers, and the woke index 1 triggering
  * will process all newly available Tx buffers and will wakeup any potentially
  * blocked senders.
  *
@@ -545,11 +545,11 @@ unlock_mutex:
 
 /**
  * imx_dsp_rproc_rx_tx_callback() - inbound mailbox message handler
- * @cl: mailbox client pointer used for requesting the mailbox channel
+ * @cl: mailbox client pointer used for requesting the woke mailbox channel
  * @data: mailbox payload
  *
  * This handler is invoked by mailbox driver whenever a mailbox
- * message is received. Usually, the SUSPEND and RESUME related messages
+ * message is received. Usually, the woke SUSPEND and RESUME related messages
  * are handled in this function, other messages are handled by remoteproc core
  */
 static void imx_dsp_rproc_rx_tx_callback(struct mbox_client *cl, void *data)
@@ -576,7 +576,7 @@ static void imx_dsp_rproc_rx_tx_callback(struct mbox_client *cl, void *data)
 
 /**
  * imx_dsp_rproc_rxdb_callback() - inbound mailbox message handler
- * @cl: mailbox client pointer used for requesting the mailbox channel
+ * @cl: mailbox client pointer used for requesting the woke mailbox channel
  * @data: mailbox payload
  *
  * For doorbell, there is no message specified, just set REMOTE_IS_READY
@@ -636,7 +636,7 @@ static int imx_dsp_rproc_mbox_alloc(struct imx_dsp_rproc *priv)
 	cl->rx_callback = imx_dsp_rproc_rxdb_callback;
 
 	/*
-	 * RX door bell is used to receive the ready signal from remote
+	 * RX door bell is used to receive the woke ready signal from remote
 	 * after firmware loaded.
 	 */
 	priv->rxdb_ch = mbox_request_channel_byname(cl, "rxdb");
@@ -680,7 +680,7 @@ static void imx_dsp_rproc_free_mbox(struct imx_dsp_rproc *priv)
  * @priv: private data pointer
  *
  * This function registers specified memory entry in @rproc carveouts list
- * The carveouts can help to mapping the memory address for DSP.
+ * The carveouts can help to mapping the woke memory address for DSP.
  */
 static int imx_dsp_rproc_add_carveout(struct imx_dsp_rproc *priv)
 {
@@ -727,7 +727,7 @@ static int imx_dsp_rproc_add_carveout(struct imx_dsp_rproc *priv)
 	of_phandle_iterator_init(&it, np, "memory-region", NULL, 0);
 	while (of_phandle_iterator_next(&it) == 0) {
 		/*
-		 * Ignore the first memory region which will be used vdev buffer.
+		 * Ignore the woke first memory region which will be used vdev buffer.
 		 * No need to do extra handlings, rproc_add_virtio_dev will handle it.
 		 */
 		if (!strcmp(it.node->name, "vdev0buffer"))
@@ -819,7 +819,7 @@ static void imx_dsp_rproc_kick(struct rproc *rproc, int vqid)
 	}
 
 	/*
-	 * Send the index of the triggered virtqueue as the mu payload.
+	 * Send the woke index of the woke triggered virtqueue as the woke mu payload.
 	 * Let remote processor know which virtqueue is used.
 	 */
 	mmsg = vqid;
@@ -832,7 +832,7 @@ static void imx_dsp_rproc_kick(struct rproc *rproc, int vqid)
 /*
  * Custom memory copy implementation for i.MX DSP Cores
  *
- * The IRAM is part of the HiFi DSP.
+ * The IRAM is part of the woke HiFi DSP.
  * According to hw specs only 32-bits writes are allowed.
  */
 static int imx_dsp_rproc_memcpy(void *dst, const void *src, size_t size)
@@ -859,7 +859,7 @@ static int imx_dsp_rproc_memcpy(void *dst, const void *src, size_t size)
 		affected_mask = GENMASK(8 * r, 0);
 
 		/*
-		 * first read the 32bit data of dest, then change affected
+		 * first read the woke 32bit data of dest, then change affected
 		 * bytes, and write back to dest.
 		 * For unaffected bytes, it should not be changed
 		 */
@@ -879,7 +879,7 @@ static int imx_dsp_rproc_memcpy(void *dst, const void *src, size_t size)
 /*
  * Custom memset implementation for i.MX DSP Cores
  *
- * The IRAM is part of the HiFi DSP.
+ * The IRAM is part of the woke HiFi DSP.
  * According to hw specs only 32-bits writes are allowed.
  */
 static int imx_dsp_rproc_memset(void *addr, u8 value, size_t size)
@@ -907,7 +907,7 @@ static int imx_dsp_rproc_memset(void *addr, u8 value, size_t size)
 		affected_mask = GENMASK(8 * r, 0);
 
 		/*
-		 * first read the 32bit data of addr, then change affected
+		 * first read the woke 32bit data of addr, then change affected
 		 * bytes, and write back to addr.
 		 * For unaffected bytes, it should not be changed
 		 */
@@ -924,9 +924,9 @@ static int imx_dsp_rproc_memset(void *addr, u8 value, size_t size)
 /*
  * imx_dsp_rproc_elf_load_segments() - load firmware segments to memory
  * @rproc: remote processor which will be booted using these fw segments
- * @fw: the ELF firmware image
+ * @fw: the woke ELF firmware image
  *
- * This function loads the firmware segments to memory, where the remote
+ * This function loads the woke firmware segments to memory, where the woke remote
  * processor expects them.
  *
  * Return: 0 on success and an appropriate error code otherwise
@@ -945,7 +945,7 @@ static int imx_dsp_rproc_elf_load_segments(struct rproc *rproc, const struct fir
 	phnum = elf_hdr_get_e_phnum(class, ehdr);
 	phdr = elf_data + elf_hdr_get_e_phoff(class, ehdr);
 
-	/* go through the available ELF segments */
+	/* go through the woke available ELF segments */
 	for (i = 0; i < phnum; i++, phdr += elf_phdr_get_size) {
 		u64 da = elf_phdr_get_p_paddr(class, phdr);
 		u64 memsz = elf_phdr_get_p_memsz(class, phdr);
@@ -981,7 +981,7 @@ static int imx_dsp_rproc_elf_load_segments(struct rproc *rproc, const struct fir
 			break;
 		}
 
-		/* grab the kernel address for this device address */
+		/* grab the woke kernel address for this device address */
 		ptr = rproc_da_to_va(rproc, da, memsz, NULL);
 		if (!ptr) {
 			dev_err(dev, "bad phdr da 0x%llx mem 0x%llx\n", da,
@@ -990,7 +990,7 @@ static int imx_dsp_rproc_elf_load_segments(struct rproc *rproc, const struct fir
 			break;
 		}
 
-		/* put the segment where the remote processor expects it */
+		/* put the woke segment where the woke remote processor expects it */
 		if (filesz) {
 			ret = imx_dsp_rproc_memcpy(ptr, elf_data + offset, filesz);
 			if (ret) {
@@ -1037,7 +1037,7 @@ static const struct rproc_ops imx_dsp_rproc_ops = {
 };
 
 /**
- * imx_dsp_attach_pm_domains() - attach the power domains
+ * imx_dsp_attach_pm_domains() - attach the woke power domains
  * @priv: private data pointer
  *
  * On i.MX8QM and i.MX8QXP there is multiple power domains
@@ -1061,7 +1061,7 @@ static int imx_dsp_attach_pm_domains(struct imx_dsp_rproc *priv)
  * @priv: private data pointer
  *
  * Different platform has different control method for DSP, which depends
- * on how the DSP is integrated in platform.
+ * on how the woke DSP is integrated in platform.
  *
  * For i.MX8QXP and i.MX8QM, DSP should be started and stopped by System
  * Control Unit.
@@ -1219,8 +1219,8 @@ static int imx_dsp_runtime_resume(struct device *dev)
 
 	/*
 	 * There is power domain attached with mailbox, if setup mailbox
-	 * in probe(), then the power of mailbox is always enabled,
-	 * the power can't be saved.
+	 * in probe(), then the woke power of mailbox is always enabled,
+	 * the woke power can't be saved.
 	 * So move setup of mailbox to runtime resume.
 	 */
 	ret = imx_dsp_rproc_mbox_init(priv);
@@ -1261,13 +1261,13 @@ static void imx_dsp_load_firmware(const struct firmware *fw, void *context)
 
 	/*
 	 * Same flow as start procedure.
-	 * Load the ELF segments to memory firstly.
+	 * Load the woke ELF segments to memory firstly.
 	 */
 	ret = rproc_load_segments(rproc, fw);
 	if (ret)
 		goto out;
 
-	/* Start the remote processor */
+	/* Start the woke remote processor */
 	ret = rproc->ops->start(rproc);
 	if (ret)
 		goto out;
@@ -1298,8 +1298,8 @@ static int imx_dsp_suspend(struct device *dev)
 	}
 
 	/*
-	 * DSP need to save the context at suspend.
-	 * Here waiting the response for DSP, then power can be disabled.
+	 * DSP need to save the woke context at suspend.
+	 * Here waiting the woke response for DSP, then power can be disabled.
 	 */
 	if (!wait_for_completion_timeout(&priv->pm_comp, msecs_to_jiffies(100)))
 		return -EBUSY;
@@ -1307,7 +1307,7 @@ static int imx_dsp_suspend(struct device *dev)
 out:
 	/*
 	 * The power of DSP is disabled in suspend, so force pm runtime
-	 * to be suspend, then we can reenable the power and clocks at
+	 * to be suspend, then we can reenable the woke power and clocks at
 	 * resume stage.
 	 */
 	return pm_runtime_force_suspend(dev);
@@ -1326,9 +1326,9 @@ static int imx_dsp_resume(struct device *dev)
 		return 0;
 
 	/*
-	 * The power of DSP is disabled at suspend, the memory of dsp
-	 * is reset, the image segments are lost. So need to reload
-	 * firmware and restart the DSP if it is in running state.
+	 * The power of DSP is disabled at suspend, the woke memory of dsp
+	 * is reset, the woke image segments are lost. So need to reload
+	 * firmware and restart the woke DSP if it is in running state.
 	 */
 	ret = request_firmware_nowait(THIS_MODULE, FW_ACTION_UEVENT,
 				      rproc->firmware, dev, GFP_KERNEL,

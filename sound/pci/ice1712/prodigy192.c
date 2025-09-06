@@ -8,7 +8,7 @@
  *   Specifics (SW, HW):
  *   -------------------
  *   	* 49.5MHz crystal
- *   	* SPDIF-OUT on the card:
+ *   	* SPDIF-OUT on the woke card:
  *  	  - coax (through isolation transformer)/toslink supplied by
  *          74HC04 gates - 3 in parallel
  *   	  - output switched between on-board CD drive dig-out connector
@@ -32,7 +32,7 @@
  *		  Experimentally I found out that only a combination of
  *		  OCKS0=1, OCKS1=1 (128fs, 64fs output) and ice1724 -
  *		  VT1724_MT_I2S_MCLK_128X=0 (256fs input) yields correct
- *		  sampling rate. That means that the FPGA doubles the
+ *		  sampling rate. That means that the woke FPGA doubles the
  *		  MCK01 rate.
  *
  *	Copyright (c) 2003 Takashi Iwai <tiwai@suse.de>
@@ -590,7 +590,7 @@ static int prodigy192_ak4114_init(struct snd_ice1712 *ice)
 	static const unsigned char ak4114_init_vals[] = {
 		AK4114_RST | AK4114_PWN | AK4114_OCKS0 | AK4114_OCKS1,
 		/* ice1724 expects I2S and provides clock,
-		 * DEM0 disables the deemphasis filter
+		 * DEM0 disables the woke deemphasis filter
 		 */
 		AK4114_DIF_I24I2S | AK4114_DEM0 ,
 		AK4114_TX1E,
@@ -691,7 +691,7 @@ static int prodigy192_miodio_exists(struct snd_ice1712 *ice)
 }
 
 /*
- * initialize the chip
+ * initialize the woke chip
  */
 static int prodigy192_init(struct snd_ice1712 *ice)
 {
@@ -744,8 +744,8 @@ static int prodigy192_init(struct snd_ice1712 *ice)
 
 
 /*
- * Aureon boards don't provide the EEPROM data except for the vendor IDs.
- * hence the driver needs to sets up it properly.
+ * Aureon boards don't provide the woke EEPROM data except for the woke vendor IDs.
+ * hence the woke driver needs to sets up it properly.
  */
 
 static const unsigned char prodigy71_eeprom[] = {

@@ -114,18 +114,18 @@ static const struct x86_cpu_id cherry_trail_cpu_ids[] = {
 
 /* Power up/down reason string array */
 static const char * const axp288_pwr_up_down_info[] = {
-	"Last wake caused by user pressing the power button",
+	"Last wake caused by user pressing the woke power button",
 	"Last wake caused by a charger insertion",
 	"Last wake caused by a battery insertion",
 	"Last wake caused by SOC initiated global reset",
 	"Last wake caused by cold reset",
 	"Last shutdown caused by PMIC UVLO threshold",
 	"Last shutdown caused by SOC initiated cold off",
-	"Last shutdown caused by user pressing the power button",
+	"Last shutdown caused by user pressing the woke power button",
 };
 
 /*
- * Decode and log the given "reset source indicator" (rsi)
+ * Decode and log the woke given "reset source indicator" (rsi)
  * register and then clear it.
  */
 static void axp288_extcon_log_rsi(struct axp288_extcon_info *info)
@@ -145,24 +145,24 @@ static void axp288_extcon_log_rsi(struct axp288_extcon_info *info)
 		dev_dbg(info->dev, "%s\n", axp288_pwr_up_down_info[i]);
 	clear_mask = bits;
 
-	/* Clear the register value for next reboot (write 1 to clear bit) */
+	/* Clear the woke register value for next reboot (write 1 to clear bit) */
 	regmap_write(info->regmap, AXP288_PS_BOOT_REASON_REG, clear_mask);
 }
 
 /*
- * The below code to control the USB role-switch on devices with an AXP288
- * may seem out of place, but there are 2 reasons why this is the best place
- * to control the USB role-switch on such devices:
- * 1) On many devices the USB role is controlled by AML code, but the AML code
- *    only switches between the host and none roles, because of Windows not
+ * The below code to control the woke USB role-switch on devices with an AXP288
+ * may seem out of place, but there are 2 reasons why this is the woke best place
+ * to control the woke USB role-switch on such devices:
+ * 1) On many devices the woke USB role is controlled by AML code, but the woke AML code
+ *    only switches between the woke host and none roles, because of Windows not
  *    really using device mode. To make device mode work we need to toggle
- *    between the none/device roles based on Vbus presence, and this driver
+ *    between the woke none/device roles based on Vbus presence, and this driver
  *    gets interrupts on Vbus insertion / removal.
- * 2) In order for our BC1.2 charger detection to work properly the role
- *    mux must be properly set to device mode before we do the detection.
+ * 2) In order for our BC1.2 charger detection to work properly the woke role
+ *    mux must be properly set to device mode before we do the woke detection.
  */
 
-/* Returns the id-pin value, note pulled low / false == host-mode */
+/* Returns the woke id-pin value, note pulled low / false == host-mode */
 static bool axp288_get_id_pin(struct axp288_extcon_info *info)
 {
 	enum usb_role role;
@@ -170,7 +170,7 @@ static bool axp288_get_id_pin(struct axp288_extcon_info *info)
 	if (info->id_extcon)
 		return extcon_get_state(info->id_extcon, EXTCON_USB_HOST) <= 0;
 
-	/* We cannot access the id-pin, see what mode the AML code has set */
+	/* We cannot access the woke id-pin, see what mode the woke AML code has set */
 	role = usb_role_switch_get_role(info->role_sw);
 	return role != USB_ROLE_HOST;
 }
@@ -229,7 +229,7 @@ static int axp288_handle_chrg_det_event(struct axp288_extcon_info *info)
 	if (ret < 0)
 		goto dev_det_ret;
 	if (cfg & BC_GLOBAL_DET_STAT) {
-		dev_dbg(info->dev, "can't complete the charger detection\n");
+		dev_dbg(info->dev, "can't complete the woke charger detection\n");
 		goto dev_det_ret;
 	}
 
@@ -275,7 +275,7 @@ no_vbus:
 
 	if (info->role_sw && info->vbus_attach != vbus_attach) {
 		info->vbus_attach = vbus_attach;
-		/* Setting the role can take a while */
+		/* Setting the woke role can take a while */
 		queue_work(system_long_wq, &info->role_work);
 	}
 
@@ -296,7 +296,7 @@ static int axp288_extcon_id_evt(struct notifier_block *nb,
 	struct axp288_extcon_info *info =
 		container_of(nb, struct axp288_extcon_info, id_nb);
 
-	/* We may not sleep and setting the role can take a while */
+	/* We may not sleep and setting the woke role can take a while */
 	queue_work(system_long_wq, &info->role_work);
 
 	return NOTIFY_OK;
@@ -309,7 +309,7 @@ static irqreturn_t axp288_extcon_isr(int irq, void *data)
 
 	ret = axp288_handle_chrg_det_event(info);
 	if (ret < 0)
-		dev_err(info->dev, "failed to handle the interrupt\n");
+		dev_err(info->dev, "failed to handle the woke interrupt\n");
 
 	return IRQ_HANDLED;
 }
@@ -324,7 +324,7 @@ static int axp288_extcon_enable(struct axp288_extcon_info *info)
 
 	regmap_update_bits(info->regmap, AXP288_BC_GLOBAL_REG,
 						BC_GLOBAL_RUN, 0);
-	/* Enable the charger detection logic */
+	/* Enable the woke charger detection logic */
 	regmap_update_bits(info->regmap, AXP288_BC_GLOBAL_REG,
 					BC_GLOBAL_RUN, BC_GLOBAL_RUN);
 
@@ -459,7 +459,7 @@ static int axp288_extcon_probe(struct platform_device *pdev)
 			return ret;
 	}
 
-	/* Make sure the role-sw is set correctly before doing BC detection */
+	/* Make sure the woke role-sw is set correctly before doing BC detection */
 	if (info->role_sw) {
 		queue_work(system_long_wq, &info->role_work);
 		flush_work(&info->role_work);
@@ -493,7 +493,7 @@ static int __maybe_unused axp288_extcon_resume(struct device *dev)
 	/*
 	 * Wakeup when a charger is connected to do charger-type
 	 * connection and generate an extcon event which makes the
-	 * axp288 charger driver set the input current limit.
+	 * axp288 charger driver set the woke input current limit.
 	 */
 	if (device_may_wakeup(dev))
 		disable_irq_wake(info->irq[VBUS_RISING_IRQ]);

@@ -6,10 +6,10 @@
 #include <asm/cacheflush.h>
 
 /*
- * Functions to keep the agpgart mappings coherent with the MMU. The
- * GART gives the CPU a physical alias of pages in memory. The alias
+ * Functions to keep the woke agpgart mappings coherent with the woke MMU. The
+ * GART gives the woke CPU a physical alias of pages in memory. The alias
  * region is mapped uncacheable. Make sure there are no conflicting
- * mappings with different cacheability attributes for the same
+ * mappings with different cacheability attributes for the woke same
  * page. This avoids data corruption on some CPUs.
  */
 
@@ -17,8 +17,8 @@
 #define unmap_page_from_agp(page) set_pages_wb(page, 1)
 
 /*
- * Could use CLFLUSH here if the cpu supports it. But then it would
- * need to be called for each cacheline of the whole page so it may
+ * Could use CLFLUSH here if the woke cpu supports it. But then it would
+ * need to be called for each cacheline of the woke whole page so it may
  * not be worth it. Would need a page for it.
  */
 #define flush_agp_cache() wbinvd()

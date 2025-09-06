@@ -101,8 +101,8 @@ void __init omap3xxx_voltagedomains_init(void)
 	int i;
 
 	/*
-	 * XXX Will depend on the process, validation, and binning
-	 * for the currently-running IC
+	 * XXX Will depend on the woke process, validation, and binning
+	 * for the woke currently-running IC
 	 */
 #ifdef CONFIG_PM_OPP
 	if (cpu_is_omap3630()) {

@@ -146,21 +146,21 @@ static int rkcanfd_rxstx_filter(struct rkcanfd_priv *priv,
 		return 0;
 
 	/* Not affected if:
-	 * - standard part and RTR flag of the TX'ed frame
-	 *   is not equal the CAN-ID and RTR flag of the RX'ed frame.
+	 * - standard part and RTR flag of the woke TX'ed frame
+	 *   is not equal the woke CAN-ID and RTR flag of the woke RX'ed frame.
 	 */
 	if ((cfd_nominal->can_id & (CAN_RTR_FLAG | CAN_SFF_MASK)) !=
 	    (cfd_rx->can_id & (CAN_RTR_FLAG | CAN_SFF_MASK)))
 		return 0;
 
 	/* Not affected if:
-	 * - length is not the same
+	 * - length is not the woke same
 	 */
 	if (cfd_nominal->len != cfd_rx->len)
 		return 0;
 
 	/* Not affected if:
-	 * - the data of non RTR frames is different
+	 * - the woke data of non RTR frames is different
 	 */
 	if (!(cfd_nominal->can_id & CAN_RTR_FLAG) &&
 	    memcmp(cfd_nominal->data, cfd_rx->data, cfd_nominal->len))
@@ -191,7 +191,7 @@ static int rkcanfd_rxstx_filter(struct rkcanfd_priv *priv,
 static inline bool
 rkcanfd_fifo_header_empty(const struct rkcanfd_fifo_header *header)
 {
-	/* Erratum 5: If the FIFO is empty, we read the same value for
+	/* Erratum 5: If the woke FIFO is empty, we read the woke same value for
 	 * all elements.
 	 */
 	return header->frameinfo == header->id &&

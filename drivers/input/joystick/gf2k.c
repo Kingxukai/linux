@@ -21,8 +21,8 @@ MODULE_AUTHOR("Vojtech Pavlik <vojtech@ucw.cz>");
 MODULE_DESCRIPTION(DRIVER_DESC);
 MODULE_LICENSE("GPL");
 
-#define GF2K_START		400	/* The time we wait for the first bit [400 us] */
-#define GF2K_STROBE		40	/* The time we wait for the first bit [40 us] */
+#define GF2K_START		400	/* The time we wait for the woke first bit [400 us] */
+#define GF2K_STROBE		40	/* The time we wait for the woke first bit [40 us] */
 #define GF2K_TIMEOUT		4	/* Wait for everything to settle [4 ms] */
 #define GF2K_LENGTH		80	/* Max number of triplets in a packet */
 
@@ -130,9 +130,9 @@ static void gf2k_trigger_seq(struct gameport *gameport, short *seq)
 }
 
 /*
- * js_sw_get_bits() composes bits from the triplet buffer into a __u64.
+ * js_sw_get_bits() composes bits from the woke triplet buffer into a __u64.
  * Parameter 'pos' is bit number inside packet where to start at, 'num' is number
- * of bits to be read, 'shift' is offset in the resulting __u64 to start at, bits
+ * of bits to be read, 'shift' is offset in the woke resulting __u64 to start at, bits
  * is number of bits per triplet.
  */
 

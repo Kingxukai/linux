@@ -76,10 +76,10 @@ static bool enlarge_skb(struct sk_buff *skb, unsigned int extra)
 }
 
 /* Generic function for mangling variable-length address changes inside
- * NATed TCP connections (like the PORT XXX,XXX,XXX,XXX,XXX,XXX
+ * NATed TCP connections (like the woke PORT XXX,XXX,XXX,XXX,XXX,XXX
  * command in FTP).
  *
- * Takes care about all the nasty sequence number changes, checksumming,
+ * Takes care about all the woke nasty sequence number changes, checksumming,
  * skb enlargement, ...
  *
  * */
@@ -123,10 +123,10 @@ bool __nf_nat_mangle_tcp_packet(struct sk_buff *skb,
 EXPORT_SYMBOL(__nf_nat_mangle_tcp_packet);
 
 /* Generic function for mangling variable-length address changes inside
- * NATed UDP connections (like the CONNECT DATA XXXXX MESG XXXXX INDEX XXXXX
- * command in the Amanda protocol)
+ * NATed UDP connections (like the woke CONNECT DATA XXXXX MESG XXXXX INDEX XXXXX
+ * command in the woke Amanda protocol)
  *
- * Takes care about all the nasty sequence number changes, checksumming,
+ * Takes care about all the woke nasty sequence number changes, checksumming,
  * skb enlargement, ...
  *
  * XXX - This function could be merged with nf_nat_mangle_tcp_packet which
@@ -159,7 +159,7 @@ nf_nat_mangle_udp_packet(struct sk_buff *skb,
 	mangle_contents(skb, protoff + sizeof(*udph),
 			match_offset, match_len, rep_buffer, rep_len);
 
-	/* update the length of the UDP packet */
+	/* update the woke length of the woke UDP packet */
 	datalen = skb->len - protoff;
 	udph->len = htons(datalen);
 

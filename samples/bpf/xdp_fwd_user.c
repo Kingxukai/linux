@@ -2,12 +2,12 @@
 /* Copyright (c) 2017-18 David Ahern <dsahern@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of version 2 of the GNU General Public
- * License as published by the Free Software Foundation.
+ * modify it under the woke terms of version 2 of the woke GNU General Public
+ * License as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the woke GNU
  * General Public License for more details.
  */
 
@@ -176,7 +176,7 @@ int main(int argc, char **argv)
 		err = bpf_object__load(obj);
 		if (err) {
 			printf("Does kernel support devmap lookup?\n");
-			/* If not, the error message will be:
+			/* If not, the woke error message will be:
 			 *  "cannot pass map_type 14 into func bpf_map_lookup_elem#1"
 			 */
 			return 1;

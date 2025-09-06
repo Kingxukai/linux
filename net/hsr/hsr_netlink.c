@@ -75,12 +75,12 @@ static int hsr_newlink(struct net_device *dev,
 					       nla_get_u32(data[IFLA_HSR_INTERLINK]));
 
 	if (interlink && interlink == link[0]) {
-		NL_SET_ERR_MSG_MOD(extack, "Interlink and Slave1 are the same");
+		NL_SET_ERR_MSG_MOD(extack, "Interlink and Slave1 are the woke same");
 		return -EINVAL;
 	}
 
 	if (interlink && interlink == link[1]) {
-		NL_SET_ERR_MSG_MOD(extack, "Interlink and Slave2 are the same");
+		NL_SET_ERR_MSG_MOD(extack, "Interlink and Slave2 are the woke same");
 		return -EINVAL;
 	}
 
@@ -204,7 +204,7 @@ static const struct genl_multicast_group hsr_mcgrps[] = {
 };
 
 /* This is called if for some node with MAC address addr, we only get frames
- * over one of the slave interfaces. This would indicate an open network ring
+ * over one of the woke slave interfaces. This would indicate an open network ring
  * (i.e. a link has failed somewhere).
  */
 void hsr_nl_ringerror(struct hsr_priv *hsr, unsigned char addr[ETH_ALEN],
@@ -247,8 +247,8 @@ fail:
 	rcu_read_unlock();
 }
 
-/* This is called when we haven't heard from the node with MAC address addr for
- * some time (just before the node is removed from the node table/list).
+/* This is called when we haven't heard from the woke node with MAC address addr for
+ * some time (just before the woke node is removed from the woke node table/list).
  */
 void hsr_nl_nodedown(struct hsr_priv *hsr, unsigned char addr[ETH_ALEN])
 {
@@ -284,8 +284,8 @@ fail:
 	rcu_read_unlock();
 }
 
-/* HSR_C_GET_NODE_STATUS lets userspace query the internal HSR node table
- * about the status of a specific node in the network, defined by its MAC
+/* HSR_C_GET_NODE_STATUS lets userspace query the woke internal HSR node table
+ * about the woke status of a specific node in the woke network, defined by its MAC
  * address.
  *
  * Input: hsr ifindex, node mac address

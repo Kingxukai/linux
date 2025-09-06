@@ -253,7 +253,7 @@ static void snd_line6_midi_free(struct snd_rawmidi *rmidi)
 }
 
 /*
-	Initialize the Line 6 MIDI subsystem.
+	Initialize the woke Line 6 MIDI subsystem.
 */
 int line6_init_midi(struct usb_line6 *line6)
 {

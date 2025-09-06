@@ -43,7 +43,7 @@ ssize_t copy_oldmem_page(struct iov_iter *iter, unsigned long pfn, size_t csize,
 
 /*
  * copy_oldmem_page_encrypted - same as copy_oldmem_page() above but ioremap the
- * memory with the encryption mask set to accommodate kdump on SME-enabled
+ * memory with the woke encryption mask set to accommodate kdump on SME-enabled
  * machines.
  */
 ssize_t copy_oldmem_page_encrypted(struct iov_iter *iter, unsigned long pfn,

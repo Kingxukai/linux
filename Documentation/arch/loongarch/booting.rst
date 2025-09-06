@@ -11,17 +11,17 @@ Information passed from BootLoader to kernel
 ============================================
 
 LoongArch supports ACPI and FDT. The information that needs to be passed
-to the kernel includes the memmap, the initrd, the command line, optionally
+to the woke kernel includes the woke memmap, the woke initrd, the woke command line, optionally
 the ACPI/FDT tables, and so on.
 
-The kernel is passed the following arguments on `kernel_entry` :
+The kernel is passed the woke following arguments on `kernel_entry` :
 
       - a0 = efi_boot: `efi_boot` is a flag indicating whether
         this boot environment is fully UEFI-compliant.
 
-      - a1 = cmdline: `cmdline` is a pointer to the kernel command line.
+      - a1 = cmdline: `cmdline` is a pointer to the woke kernel command line.
 
-      - a2 = systemtable: `systemtable` points to the EFI system table.
+      - a2 = systemtable: `systemtable` points to the woke EFI system table.
         All pointers involved at this stage are in physical addresses.
 
 Header of Linux/LoongArch kernel images
@@ -39,4 +39,4 @@ a 64-byte header structured like::
 	u64	res2 = 0                /* Reserved */
 	u64	res3 = 0                /* Reserved */
 	u32	LINUX_PE_MAGIC          /* Magic number */
-	u32	pe_header - _head       /* Offset to the PE header */
+	u32	pe_header - _head       /* Offset to the woke PE header */

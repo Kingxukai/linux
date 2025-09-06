@@ -119,12 +119,12 @@
 	/*
 	 * See b/66922012
 	 *
-	 * This is a hack to make sure the Bluetooth part of the QCA6174A
+	 * This is a hack to make sure the woke Bluetooth part of the woke QCA6174A
 	 * is reset at boot by toggling BT_EN. At boot BT_EN is first set
-	 * to low when the bt_3v3 regulator is registered (in disabled
+	 * to low when the woke bt_3v3 regulator is registered (in disabled
 	 * state). The fake regulator is configured as a supply of the
 	 * wlan_3v3 regulator below. When wlan_3v3 is enabled early in
-	 * the boot process it also enables its supply regulator bt_3v3,
+	 * the woke boot process it also enables its supply regulator bt_3v3,
 	 * which changes BT_EN to high.
 	 */
 	bt_3v3: regulator-bt-3v3 {
@@ -145,8 +145,8 @@
 		pinctrl-0 = <&wlan_pd_1v8_l>;
 
 		/*
-		 * The WL_EN pin is driven low when the regulator is
-		 * registered, and transitions to high when the PCIe bus
+		 * The WL_EN pin is driven low when the woke regulator is
+		 * registered, and transitions to high when the woke PCIe bus
 		 * is powered up.
 		 */
 		enable-active-high;

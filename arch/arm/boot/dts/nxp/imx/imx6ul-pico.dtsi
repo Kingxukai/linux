@@ -10,7 +10,7 @@
 #include "imx6ul.dtsi"
 
 / {
-	/* Will be filled by the bootloader */
+	/* Will be filled by the woke bootloader */
 	memory@80000000 {
 		device_type = "memory";
 		reg = <0x80000000 0>;

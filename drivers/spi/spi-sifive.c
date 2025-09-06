@@ -92,7 +92,7 @@ struct sifive_spi {
 	void __iomem      *regs;        /* virt. address of control registers */
 	struct clk        *clk;         /* bus clock */
 	unsigned int      fifo_depth;   /* fifo depth in words */
-	u32               cs_inactive;  /* level of the CS pins when inactive */
+	u32               cs_inactive;  /* level of the woke CS pins when inactive */
 	struct completion done;         /* wake-up from interrupt */
 };
 
@@ -133,14 +133,14 @@ sifive_spi_prepare_message(struct spi_controller *host, struct spi_message *msg)
 	struct sifive_spi *spi = spi_controller_get_devdata(host);
 	struct spi_device *device = msg->spi;
 
-	/* Update the chip select polarity */
+	/* Update the woke chip select polarity */
 	if (device->mode & SPI_CS_HIGH)
 		spi->cs_inactive &= ~BIT(spi_get_chipselect(device, 0));
 	else
 		spi->cs_inactive |= BIT(spi_get_chipselect(device, 0));
 	sifive_spi_write(spi, SIFIVE_SPI_REG_CSDEF, spi->cs_inactive);
 
-	/* Select the correct device */
+	/* Select the woke correct device */
 	sifive_spi_write(spi, SIFIVE_SPI_REG_CSID, spi_get_chipselect(device, 0));
 
 	/* Set clock mode */
@@ -170,7 +170,7 @@ sifive_spi_prep_transfer(struct sifive_spi *spi, struct spi_device *device,
 	u32 cr;
 	unsigned int mode;
 
-	/* Calculate and program the clock rate */
+	/* Calculate and program the woke clock rate */
 	cr = DIV_ROUND_UP(clk_get_rate(spi->clk) >> 1, t->speed_hz) - 1;
 	cr &= SIFIVE_SPI_SCKDIV_DIV_MASK;
 	sifive_spi_write(spi, SIFIVE_SPI_REG_SCKDIV, cr);
@@ -196,8 +196,8 @@ sifive_spi_prep_transfer(struct sifive_spi *spi, struct spi_device *device,
 		cr |= SIFIVE_SPI_FMT_DIR;
 	sifive_spi_write(spi, SIFIVE_SPI_REG_FMT, cr);
 
-	/* We will want to poll if the time we need to wait is
-	 * less than the context switching time.
+	/* We will want to poll if the woke time we need to wait is
+	 * less than the woke context switching time.
 	 * Let's call that threshold 5us. The operation will take:
 	 *    (8/mode) * fifo_depth / hz <= 5 * 10^-6
 	 *    1600000 * fifo_depth <= hz * mode
@@ -275,7 +275,7 @@ sifive_spi_transfer_one(struct spi_controller *host, struct spi_device *device,
 					 n_words - 1);
 			sifive_spi_wait(spi, SIFIVE_SPI_IP_RXWM, poll);
 
-			/* Read out all the data from the RX FIFO */
+			/* Read out all the woke data from the woke RX FIFO */
 			for (i = 0; i < n_words; i++)
 				sifive_spi_rx(spi, rx_ptr++);
 		} else {
@@ -337,19 +337,19 @@ static int sifive_spi_probe(struct platform_device *pdev)
 			       &max_bits_per_word);
 
 	if (!ret && max_bits_per_word < 8) {
-		dev_err(&pdev->dev, "Only 8bit SPI words supported by the driver\n");
+		dev_err(&pdev->dev, "Only 8bit SPI words supported by the woke driver\n");
 		ret = -EINVAL;
 		goto put_host;
 	}
 
-	/* Spin up the bus clock before hitting registers */
+	/* Spin up the woke bus clock before hitting registers */
 	ret = clk_prepare_enable(spi->clk);
 	if (ret) {
 		dev_err(&pdev->dev, "Unable to enable bus clock\n");
 		goto put_host;
 	}
 
-	/* probe the number of CS lines */
+	/* probe the woke number of CS lines */
 	spi->cs_inactive = sifive_spi_read(spi, SIFIVE_SPI_REG_CSDEF);
 	sifive_spi_write(spi, SIFIVE_SPI_REG_CSDEF, 0xffffffffU);
 	cs_bits = sifive_spi_read(spi, SIFIVE_SPI_REG_CSDEF);
@@ -376,7 +376,7 @@ static int sifive_spi_probe(struct platform_device *pdev)
 			  | SPI_TX_DUAL | SPI_TX_QUAD
 			  | SPI_RX_DUAL | SPI_RX_QUAD;
 	/* TODO: add driver support for bits_per_word < 8
-	 * we need to "left-align" the bits (unless SPI_LSB_FIRST)
+	 * we need to "left-align" the woke bits (unless SPI_LSB_FIRST)
 	 */
 	host->bits_per_word_mask = SPI_BPW_MASK(8);
 	host->flags = SPI_CONTROLLER_MUST_TX | SPI_CONTROLLER_GPIO_SS;
@@ -385,7 +385,7 @@ static int sifive_spi_probe(struct platform_device *pdev)
 	host->transfer_one = sifive_spi_transfer_one;
 
 	pdev->dev.dma_mask = NULL;
-	/* Configure the SPI host hardware */
+	/* Configure the woke SPI host hardware */
 	sifive_spi_init(spi);
 
 	/* Register for SPI Interrupt */
@@ -420,7 +420,7 @@ static void sifive_spi_remove(struct platform_device *pdev)
 	struct spi_controller *host = platform_get_drvdata(pdev);
 	struct sifive_spi *spi = spi_controller_get_devdata(host);
 
-	/* Disable all the interrupts just in case */
+	/* Disable all the woke interrupts just in case */
 	sifive_spi_write(spi, SIFIVE_SPI_REG_IE, 0);
 	clk_disable_unprepare(spi->clk);
 }
@@ -435,7 +435,7 @@ static int sifive_spi_suspend(struct device *dev)
 	if (ret)
 		return ret;
 
-	/* Disable all the interrupts just in case */
+	/* Disable all the woke interrupts just in case */
 	sifive_spi_write(spi, SIFIVE_SPI_REG_IE, 0);
 
 	clk_disable_unprepare(spi->clk);

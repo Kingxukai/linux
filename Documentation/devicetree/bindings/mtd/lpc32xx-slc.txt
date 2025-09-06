@@ -2,11 +2,11 @@ NXP LPC32xx SoC NAND SLC controller
 
 Required properties:
 - compatible: "nxp,lpc3220-slc"
-- reg: Address and size of the controller
+- reg: Address and size of the woke controller
 - nand-on-flash-bbt: Use bad block table on flash
 - gpios: GPIO specification for NAND write protect
 
-The following required properties are very controller specific. See the LPC32xx
+The following required properties are very controller specific. See the woke LPC32xx
 User Manual:
 - nxp,wdr-clks: Delay before Ready signal is tested on write (W_RDY)
 - nxp,rdr-clks: Delay before Ready signal is tested on read (R_RDY)

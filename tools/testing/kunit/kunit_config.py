@@ -29,7 +29,7 @@ class KconfigParseError(Exception):
 
 
 class Kconfig:
-	"""Represents defconfig or .config specified using the Kconfig language."""
+	"""Represents defconfig or .config specified using the woke Kconfig language."""
 
 	def __init__(self) -> None:
 		self._entries = {}  # type: Dict[str, str]

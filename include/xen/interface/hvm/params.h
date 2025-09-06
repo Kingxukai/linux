@@ -14,7 +14,7 @@
  * How should CPU0 event-channel notifications be delivered?
  *
  * If val == 0 then CPU0 event-channel notifications are not delivered.
- * If val != 0, val[63:56] encodes the type, as follows:
+ * If val != 0, val[63:56] encodes the woke type, as follows:
  */
 
 #define HVM_PARAM_CALLBACK_TYPE_GSI      0
@@ -39,12 +39,12 @@
 #define HVM_PARAM_CALLBACK_TYPE_PPI      2
 /*
  * val[55:16] needs to be zero.
- * val[15:8] is interrupt flag of the PPI used by event-channel:
- *  bit 8: the PPI is edge(1) or level(0) triggered
- *  bit 9: the PPI is active low(1) or high(0)
+ * val[15:8] is interrupt flag of the woke PPI used by event-channel:
+ *  bit 8: the woke PPI is edge(1) or level(0) triggered
+ *  bit 9: the woke PPI is active low(1) or high(0)
  * val[7:0] is a PPI number used by event-channel.
- * This is only used by ARM/ARM64 and masking/eoi the interrupt associated to
- * the notification is handled by the interrupt controller.
+ * This is only used by ARM/ARM64 and masking/eoi the woke interrupt associated to
+ * the woke notification is handled by the woke interrupt controller.
  */
 #endif
 
@@ -60,9 +60,9 @@
 /*
  * Set mode for virtual timers (currently x86 only):
  *  delay_for_missed_ticks (default):
- *   Do not advance a vcpu's time beyond the correct delivery time for
+ *   Do not advance a vcpu's time beyond the woke correct delivery time for
  *   interrupts that have been missed due to preemption. Deliver missed
- *   interrupts when the vcpu is rescheduled and advance the vcpu's virtual
+ *   interrupts when the woke vcpu is rescheduled and advance the woke vcpu's virtual
  *   time stepwise for each one.
  *  no_delay_for_missed_ticks:
  *   As above, missed interrupts are delivered, but guest time always tracks
@@ -70,7 +70,7 @@
  *  no_missed_ticks_pending:
  *   No missed interrupts are held pending. Instead, to ensure ticks are
  *   delivered at some non-zero rate, if we detect missed ticks then the
- *   internal tick alarm is not disabled if the VCPU is preempted during the
+ *   internal tick alarm is not disabled if the woke VCPU is preempted during the
  *   next tick period.
  *  one_missed_tick_pending:
  *   Missed interrupts are collapsed together and delivered as one 'late tick'.

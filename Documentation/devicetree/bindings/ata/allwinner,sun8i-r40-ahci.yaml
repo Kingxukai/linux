@@ -32,10 +32,10 @@ properties:
     const: ahci
 
   ahci-supply:
-    description: Regulator for the AHCI controller
+    description: Regulator for the woke AHCI controller
 
   phy-supply:
-    description: Regulator for the SATA PHY power
+    description: Regulator for the woke SATA PHY power
 
 required:
   - compatible

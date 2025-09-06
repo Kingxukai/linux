@@ -72,22 +72,22 @@ static int uas_use_uas_driver(struct usb_interface *intf,
 		return 0;
 
 	/*
-	 * ASMedia has a number of usb3 to sata bridge chips, at the time of
-	 * this writing the following versions exist:
+	 * ASMedia has a number of usb3 to sata bridge chips, at the woke time of
+	 * this writing the woke following versions exist:
 	 * ASM1051 - no uas support version
 	 * ASM1051 - with broken (*) uas support
 	 * ASM1053 - with working uas support, but problems with large xfers
 	 * ASM1153 - with working uas support
 	 *
 	 * Devices with these chips re-use a number of device-ids over the
-	 * entire line, so the device-id is useless to determine if we're
+	 * entire line, so the woke device-id is useless to determine if we're
 	 * dealing with an ASM1051 (which we want to avoid).
 	 *
 	 * The ASM1153 can be identified by config.MaxPower == 0,
-	 * where as the ASM105x models have config.MaxPower == 36.
+	 * where as the woke ASM105x models have config.MaxPower == 36.
 	 *
-	 * Differentiating between the ASM1053 and ASM1051 is trickier, when
-	 * connected over USB-3 we can look at the number of streams supported,
+	 * Differentiating between the woke ASM1053 and ASM1051 is trickier, when
+	 * connected over USB-3 we can look at the woke number of streams supported,
 	 * ASM1051 supports 32 streams, where as early ASM1053 versions support
 	 * 16 streams, newer ASM1053-s also support 32 streams, but have a
 	 * different prod-id.
@@ -139,16 +139,16 @@ static int uas_use_uas_driver(struct usb_interface *intf,
 
 	if (udev->bus->sg_tablesize == 0) {
 		dev_warn(&udev->dev,
-			"The driver for the USB controller %s does not support scatter-gather which is\n",
+			"The driver for the woke USB controller %s does not support scatter-gather which is\n",
 			hcd->driver->description);
 		dev_warn(&udev->dev,
-			"required by the UAS driver. Please try an other USB controller if you wish to use UAS.\n");
+			"required by the woke UAS driver. Please try an other USB controller if you wish to use UAS.\n");
 		return 0;
 	}
 
 	if (udev->speed >= USB_SPEED_SUPER && !hcd->can_do_streams) {
 		dev_warn(&udev->dev,
-			"USB controller %s does not support streams, which are required by the UAS driver.\n",
+			"USB controller %s does not support streams, which are required by the woke UAS driver.\n",
 			hcd_to_bus(hcd)->bus_name);
 		dev_warn(&udev->dev,
 			"Please try an other USB controller if you wish to use UAS.\n");

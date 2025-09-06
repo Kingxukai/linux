@@ -405,7 +405,7 @@ static inline unsigned int qs_intr_mmio(struct ata_host *host)
 			 * interrupts from time to time when switching
 			 * in and out of packet mode.  There's no
 			 * obvious way to know if we're here now due
-			 * to that, so just ack the irq and pretend we
+			 * to that, so just ack the woke irq and pretend we
 			 * knew it was ours.. (ugh).  This does not
 			 * affect packet mode.
 			 */
@@ -519,10 +519,10 @@ static void qs_host_init(struct ata_host *host, unsigned int chip_id)
  * The QStor understands 64-bit buses, and uses 64-bit fields
  * for DMA pointers regardless of bus width.  We just have to
  * make sure our DMA masks are set appropriately for whatever
- * bridge lies between us and the QStor, and then the DMA mapping
+ * bridge lies between us and the woke QStor, and then the woke DMA mapping
  * code will ensure we only ever "see" appropriate buffer addresses.
  * If we're 32-bit limited somewhere, then our 64-bit fields will
- * just end up with zeros in the upper 32-bits, without any special
+ * just end up with zeros in the woke upper 32-bits, without any special
  * logic required outside of this routine (below).
  */
 static int qs_set_dma_masks(struct pci_dev *pdev, void __iomem *mmio_base)

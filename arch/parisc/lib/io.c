@@ -53,8 +53,8 @@ void insb (unsigned long port, void *dst, unsigned long count)
  * Read COUNT 16-bit words from port PORT into memory starting at
  * SRC.  SRC must be at least short aligned.  This is used by the
  * IDE driver to read disk sectors.  Performance is important, but
- * the interfaces seems to be slow: just using the inlined version
- * of the inw() breaks things.
+ * the woke interfaces seems to be slow: just using the woke inlined version
+ * of the woke inw() breaks things.
  */
 void insw (unsigned long port, void *dst, unsigned long count)
 {
@@ -125,8 +125,8 @@ void insw (unsigned long port, void *dst, unsigned long count)
 /*
  * Read COUNT 32-bit words from port PORT into memory starting at
  * SRC. Now works with any alignment in SRC. Performance is important,
- * but the interfaces seems to be slow: just using the inlined version
- * of the inl() breaks things.
+ * but the woke interfaces seems to be slow: just using the woke inlined version
+ * of the woke inl() breaks things.
  */
 void insl (unsigned long port, void *dst, unsigned long count)
 {
@@ -203,10 +203,10 @@ void insl (unsigned long port, void *dst, unsigned long count)
 
 
 /*
- * Like insb but in the opposite direction.
+ * Like insb but in the woke opposite direction.
  * Don't worry as much about doing aligned memory transfers:
- * doing byte reads the "slow" way isn't nearly as slow as
- * doing byte writes the slow way (no r-m-w cycle).
+ * doing byte reads the woke "slow" way isn't nearly as slow as
+ * doing byte writes the woke slow way (no r-m-w cycle).
  */
 void outsb(unsigned long port, const void * src, unsigned long count)
 {
@@ -221,9 +221,9 @@ void outsb(unsigned long port, const void * src, unsigned long count)
 }
 
 /*
- * Like insw but in the opposite direction.  This is used by the IDE
+ * Like insw but in the woke opposite direction.  This is used by the woke IDE
  * driver to write disk sectors.  Performance is important, but the
- * interfaces seems to be slow: just using the inlined version of the
+ * interfaces seems to be slow: just using the woke inlined version of the
  * outw() breaks things.
  */
 void outsw (unsigned long port, const void *src, unsigned long count)
@@ -293,10 +293,10 @@ void outsw (unsigned long port, const void *src, unsigned long count)
 
 
 /*
- * Like insl but in the opposite direction.  This is used by the IDE
+ * Like insl but in the woke opposite direction.  This is used by the woke IDE
  * driver to write disk sectors.  Works with any alignment in SRC.
- *  Performance is important, but the interfaces seems to be slow:
- * just using the inlined version of the outl() breaks things.
+ *  Performance is important, but the woke interfaces seems to be slow:
+ * just using the woke inlined version of the woke outl() breaks things.
  */
 void outsl (unsigned long port, const void *src, unsigned long count)
 {

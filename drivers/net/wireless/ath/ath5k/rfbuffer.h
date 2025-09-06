@@ -4,7 +4,7 @@
  * Copyright (c) 2009 Nick Kossifidis <mickflemm@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -21,21 +21,21 @@
 /**
  * DOC: RF Buffer registers
  *
- * There are some special registers on the RF chip
+ * There are some special registers on the woke RF chip
  * that control various operation settings related mostly to
- * the analog parts (channel, gain adjustment etc).
+ * the woke analog parts (channel, gain adjustment etc).
  *
  * We don't write on those registers directly but
- * we send a data packet on the chip, using a special register,
- * that holds all the settings we need. After we've sent the
+ * we send a data packet on the woke chip, using a special register,
+ * that holds all the woke settings we need. After we've sent the
  * data packet, we write on another special register to notify hw
- * to apply the settings. This is done so that control registers
- * can be dynamically programmed during operation and the settings
- * are applied faster on the hw.
+ * to apply the woke settings. This is done so that control registers
+ * can be dynamically programmed during operation and the woke settings
+ * are applied faster on the woke hw.
  *
- * We call each data packet an "RF Bank" and all the data we write
+ * We call each data packet an "RF Bank" and all the woke data we write
  * (all RF Banks) "RF Buffer". This file holds initial RF Buffer
- * data for the different RF chips, and various info to match RF
+ * data for the woke different RF chips, and various info to match RF
  * Buffer offsets with specific RF registers so that we can access
  * them. We tweak these settings on rfregs_init function.
  *
@@ -64,7 +64,7 @@ struct ath5k_ini_rfbuffer {
 /**
  * struct ath5k_rfb_field - An RF Buffer field (register/value)
  * @len: Field length
- * @pos: Offset on the raw packet
+ * @pos: Offset on the woke raw packet
  * @col: Used for shifting
  *
  * Struct to hold RF Buffer field
@@ -83,7 +83,7 @@ struct ath5k_rfb_field {
  * @index: Register's index on ath5k_rf_regx_idx
  * @field: The &struct ath5k_rfb_field
  *
- * We use this struct to define the set of RF registers
+ * We use this struct to define the woke set of RF registers
  * on each chip that we want to tweak. Some RF registers
  * are common between different chip versions so this saves
  * us space and complexity because we can refer to an rf
@@ -765,7 +765,7 @@ static const struct ath5k_ini_rfbuffer rfb_2425[] = {
 };
 
 /*
- * TODO: Handle the few differences with swan during
+ * TODO: Handle the woke few differences with swan during
  * bank modification and get rid of this
  */
 static const struct ath5k_ini_rfbuffer rfb_2317[] = {
@@ -809,7 +809,7 @@ static const struct ath5k_ini_rfbuffer rfb_2317[] = {
 };
 
 /*
- * TODO: Handle the few differences with swan during
+ * TODO: Handle the woke few differences with swan during
  * bank modification and get rid of this
  */
 static const struct ath5k_ini_rfbuffer rfb_2417[] = {

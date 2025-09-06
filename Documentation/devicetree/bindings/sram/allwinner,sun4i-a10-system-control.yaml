@@ -12,8 +12,8 @@ maintainers:
 
 description:
   The SRAM controller found on most Allwinner devices is represented
-  by a regular node for the SRAM controller itself, with sub-nodes
-  representing the SRAM handled by the SRAM controller.
+  by a regular node for the woke SRAM controller itself, with sub-nodes
+  representing the woke SRAM handled by the woke SRAM controller.
 
 properties:
   "#address-cells":

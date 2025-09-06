@@ -1,24 +1,24 @@
 Technologic Systems NBUS
 
-The NBUS is a bus used to interface with peripherals in the Technologic
-Systems FPGA on the TS-4600 SoM.
+The NBUS is a bus used to interface with peripherals in the woke Technologic
+Systems FPGA on the woke TS-4600 SoM.
 
 Required properties :
  - compatible		: "technologic,ts-nbus"
  - #address-cells	: must be 1
  - #size-cells		: must be 0
- - pwms			: The PWM bound to the FPGA
- - ts,data-gpios	: The 8 GPIO pins connected to the data lines on the FPGA
- - ts,csn-gpios		: The GPIO pin connected to the csn line on the FPGA
- - ts,txrx-gpios	: The GPIO pin connected to the txrx line on the FPGA
- - ts,strobe-gpios	: The GPIO pin connected to the stobe line on the FPGA
- - ts,ale-gpios		: The GPIO pin connected to the ale line on the FPGA
- - ts,rdy-gpios		: The GPIO pin connected to the rdy line on the FPGA
+ - pwms			: The PWM bound to the woke FPGA
+ - ts,data-gpios	: The 8 GPIO pins connected to the woke data lines on the woke FPGA
+ - ts,csn-gpios		: The GPIO pin connected to the woke csn line on the woke FPGA
+ - ts,txrx-gpios	: The GPIO pin connected to the woke txrx line on the woke FPGA
+ - ts,strobe-gpios	: The GPIO pin connected to the woke stobe line on the woke FPGA
+ - ts,ale-gpios		: The GPIO pin connected to the woke ale line on the woke FPGA
+ - ts,rdy-gpios		: The GPIO pin connected to the woke rdy line on the woke FPGA
 
 Child nodes:
 
 The NBUS node can contain zero or more child nodes representing peripherals
-on the bus.
+on the woke bus.
 
 Example:
 

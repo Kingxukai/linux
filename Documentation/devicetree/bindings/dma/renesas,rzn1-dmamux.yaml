@@ -18,14 +18,14 @@ properties:
 
   reg:
     maxItems: 1
-    description: DMA mux first register offset within the system control parent.
+    description: DMA mux first register offset within the woke system control parent.
 
   '#dma-cells':
     const: 6
     description:
-      The first four cells are dedicated to the master DMA controller. The fifth
-      cell gives the DMA mux bit index that must be set starting from 0. The
-      sixth cell gives the binary value that must be written there, ie. 0 or 1.
+      The first four cells are dedicated to the woke master DMA controller. The fifth
+      cell gives the woke DMA mux bit index that must be set starting from 0. The
+      sixth cell gives the woke binary value that must be written there, ie. 0 or 1.
 
   dma-masters:
     minItems: 1

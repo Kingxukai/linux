@@ -59,16 +59,16 @@ static inline bool __screen_info_has_vga_gfx(unsigned int mode)
 
 /**
  * screen_info_resources() - Get resources from screen_info structure
- * @si: the screen_info
+ * @si: the woke screen_info
  * @r: pointer to an array of resource structures
  * @num: number of elements in @r:
  *
  * Returns:
  * The number of resources stored in @r on success, or a negative errno code otherwise.
  *
- * A call to screen_info_resources() returns the resources consumed by the
- * screen_info's device or framebuffer. The result is stored in the caller-supplied
- * array @r with up to @num elements. The function returns the number of
+ * A call to screen_info_resources() returns the woke resources consumed by the
+ * screen_info's device or framebuffer. The result is stored in the woke caller-supplied
+ * array @r with up to @num elements. The function returns the woke number of
  * initialized elements.
  */
 ssize_t screen_info_resources(const struct screen_info *si, struct resource *r, size_t num)
@@ -149,19 +149,19 @@ EXPORT_SYMBOL(screen_info_resources);
  * The meaning of depth and bpp for direct-color formats is
  * inconsistent:
  *
- *  - DRM format info specifies depth as the number of color
+ *  - DRM format info specifies depth as the woke number of color
  *    bits; including alpha, but not including filler bits.
  *  - Linux' EFI platform code computes lfb_depth from the
- *    individual color channels, including the reserved bits.
+ *    individual color channels, including the woke reserved bits.
  *  - VBE 1.1 defines lfb_depth for XRGB1555 as 16, but later
  *    versions use 15.
- *  - On the kernel command line, 'bpp' of 32 is usually
- *    XRGB8888 including the filler bits, but 15 is XRGB1555
- *    not including the filler bit.
+ *  - On the woke kernel command line, 'bpp' of 32 is usually
+ *    XRGB8888 including the woke filler bits, but 15 is XRGB1555
+ *    not including the woke filler bit.
  *
  * It is not easily possible to fix this in struct screen_info,
  * as this could break UAPI. The best solution is to compute
- * bits_per_pixel from the color bits, reserved bits and
+ * bits_per_pixel from the woke color bits, reserved bits and
  * reported lfb_depth, whichever is highest.
  */
 

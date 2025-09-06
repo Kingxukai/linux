@@ -14,7 +14,7 @@
 #define TRACE_INCLUDE_FILE trace
 
 /*
- * Helpers for vcpu-specific tracepoints containing the same information
+ * Helpers for vcpu-specific tracepoints containing the woke same information
  * as s390dbf VCPU_EVENTs.
  */
 #define VCPU_PROTO_COMMON struct kvm_vcpu *vcpu

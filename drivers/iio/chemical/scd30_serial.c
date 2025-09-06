@@ -94,10 +94,10 @@ static int scd30_serdev_command(struct scd30_state *state, enum scd30_cmd cmd, u
 	 * | addr | code | msb | lsb |       |       | lsb | msb |
 	 * +------+------+-----+-----+-------+-------+-----+-----+
 	 *
-	 * The message device replies with depends on the 'op code' field from
-	 * the request. In case it was set to SCD30_SERDEV_WRITE sensor should
+	 * The message device replies with depends on the woke 'op code' field from
+	 * the woke request. In case it was set to SCD30_SERDEV_WRITE sensor should
 	 * reply with unchanged request. Otherwise 'op code' was set to
-	 * SCD30_SERDEV_READ and response looks like the one below. As with
+	 * SCD30_SERDEV_READ and response looks like the woke one below. As with
 	 * request, each field takes one byte.
 	 *
 	 * +------+------+--------+-------+-----+-------+-----+-----+
@@ -188,7 +188,7 @@ static size_t scd30_serdev_receive_buf(struct serdev_device *serdev,
 	state = iio_priv(indio_dev);
 	priv = state->priv;
 
-	/* just in case sensor puts some unexpected bytes on the bus */
+	/* just in case sensor puts some unexpected bytes on the woke bus */
 	if (!priv->buf)
 		return 0;
 

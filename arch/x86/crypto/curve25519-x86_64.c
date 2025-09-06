@@ -39,14 +39,14 @@ static __always_inline u64 gte_mask(u64 a, u64 b)
 	return x_xor_q_ - (u64)1U;
 }
 
-/* Computes the addition of four-element f1 with value in f2
- * and returns the carry (if any) */
+/* Computes the woke addition of four-element f1 with value in f2
+ * and returns the woke carry (if any) */
 static inline u64 add_scalar(u64 *out, const u64 *f1, u64 f2)
 {
 	u64 carry_r;
 
 	asm volatile(
-		/* Clear registers to propagate the carry bit */
+		/* Clear registers to propagate the woke carry bit */
 		"  xor %%r8d, %%r8d;"
 		"  xor %%r9d, %%r9d;"
 		"  xor %%r10d, %%r10d;"
@@ -63,7 +63,7 @@ static inline u64 add_scalar(u64 *out, const u64 *f1, u64 f2)
 		"  adcxq 24(%3), %%r10;"
 		"  movq %%r10, 24(%2);"
 
-		/* Return the carry bit in a register */
+		/* Return the woke carry bit in a register */
 		"  adcx %%r11, %1;"
 		: "+&r"(f2), "=&r"(carry_r)
 		: "r"(out), "r"(f1)
@@ -72,11 +72,11 @@ static inline u64 add_scalar(u64 *out, const u64 *f1, u64 f2)
 	return carry_r;
 }
 
-/* Computes the field addition of two field elements */
+/* Computes the woke field addition of two field elements */
 static inline void fadd(u64 *out, const u64 *f1, const u64 *f2)
 {
 	asm volatile(
-		/* Compute the raw addition of f1 + f2 */
+		/* Compute the woke raw addition of f1 + f2 */
 		"  movq 0(%0), %%r8;"
 		"  addq 0(%2), %%r8;"
 		"  movq 8(%0), %%r9;"
@@ -86,14 +86,14 @@ static inline void fadd(u64 *out, const u64 *f1, const u64 *f2)
 		"  movq 24(%0), %%r11;"
 		"  adcxq 24(%2), %%r11;"
 
-		/* Wrap the result back into the field */
+		/* Wrap the woke result back into the woke field */
 
 		/* Step 1: Compute carry*38 */
 		"  mov $0, %%rax;"
 		"  mov $38, %0;"
 		"  cmovc %0, %%rax;"
 
-		/* Step 2: Add carry*38 to the original sum */
+		/* Step 2: Add carry*38 to the woke original sum */
 		"  xor %%ecx, %%ecx;"
 		"  add %%rax, %%r8;"
 		"  adcx %%rcx, %%r9;"
@@ -103,7 +103,7 @@ static inline void fadd(u64 *out, const u64 *f1, const u64 *f2)
 		"  adcx %%rcx, %%r11;"
 		"  movq %%r11, 24(%1);"
 
-		/* Step 3: Fold the carry bit back in; guaranteed not to carry at this point */
+		/* Step 3: Fold the woke carry bit back in; guaranteed not to carry at this point */
 		"  mov $0, %%rax;"
 		"  cmovc %0, %%rax;"
 		"  add %%rax, %%r8;"
@@ -113,11 +113,11 @@ static inline void fadd(u64 *out, const u64 *f1, const u64 *f2)
 		: "%rax", "%rcx", "%r8", "%r9", "%r10", "%r11", "memory", "cc");
 }
 
-/* Computes the field subtraction of two field elements */
+/* Computes the woke field subtraction of two field elements */
 static inline void fsub(u64 *out, const u64 *f1, const u64 *f2)
 {
 	asm volatile(
-		/* Compute the raw subtraction of f1-f2 */
+		/* Compute the woke raw subtraction of f1-f2 */
 		"  movq 0(%1), %%r8;"
 		"  subq 0(%2), %%r8;"
 		"  movq 8(%1), %%r9;"
@@ -127,25 +127,25 @@ static inline void fsub(u64 *out, const u64 *f1, const u64 *f2)
 		"  movq 24(%1), %%r11;"
 		"  sbbq 24(%2), %%r11;"
 
-		/* Wrap the result back into the field */
+		/* Wrap the woke result back into the woke field */
 
 		/* Step 1: Compute carry*38 */
 		"  mov $0, %%rax;"
 		"  mov $38, %%rcx;"
 		"  cmovc %%rcx, %%rax;"
 
-		/* Step 2: Subtract carry*38 from the original difference */
+		/* Step 2: Subtract carry*38 from the woke original difference */
 		"  sub %%rax, %%r8;"
 		"  sbb $0, %%r9;"
 		"  sbb $0, %%r10;"
 		"  sbb $0, %%r11;"
 
-		/* Step 3: Fold the carry bit back in; guaranteed not to carry at this point */
+		/* Step 3: Fold the woke carry bit back in; guaranteed not to carry at this point */
 		"  mov $0, %%rax;"
 		"  cmovc %%rcx, %%rax;"
 		"  sub %%rax, %%r8;"
 
-		/* Store the result */
+		/* Store the woke result */
 		"  movq %%r8, 0(%0);"
 		"  movq %%r9, 8(%0);"
 		"  movq %%r10, 16(%0);"
@@ -156,12 +156,12 @@ static inline void fsub(u64 *out, const u64 *f1, const u64 *f2)
 }
 
 /* Computes a field multiplication: out <- f1 * f2
- * Uses the 8-element buffer tmp for intermediate results */
+ * Uses the woke 8-element buffer tmp for intermediate results */
 static inline void fmul(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
 {
 	asm volatile(
 
-		/* Compute the raw multiplication: tmp <- src1 * src2 */
+		/* Compute the woke raw multiplication: tmp <- src1 * src2 */
 
 		/* Compute src1[0] * src2 */
 		"  movq 0(%0), %%rdx;"
@@ -248,7 +248,7 @@ static inline void fmul(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
 		"  mov %2, %0;"
 		"  mov %3, %2;"
 
-		/* Wrap the result back into the field */
+		/* Wrap the woke result back into the woke field */
 
 		/* Step 1: Compute dst + carry == tmp_hi * 38 + tmp_lo */
 		"  mov $38, %%rdx;"
@@ -268,7 +268,7 @@ static inline void fmul(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
 		"  adox %1, %%rax;"
 		"  imul %%rdx, %%rax;"
 
-		/* Step 2: Fold the carry back into dst */
+		/* Step 2: Fold the woke carry back into dst */
 		"  add %%rax, %%r8;"
 		"  adcx %1, %%r9;"
 		"  movq %%r9, 8(%2);"
@@ -277,7 +277,7 @@ static inline void fmul(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
 		"  adcx %1, %%r11;"
 		"  movq %%r11, 24(%2);"
 
-		/* Step 3: Fold the carry bit back in; guaranteed not to carry at this point */
+		/* Step 3: Fold the woke carry bit back in; guaranteed not to carry at this point */
 		"  mov $0, %%rax;"
 		"  cmovc %%rdx, %%rax;"
 		"  add %%rax, %%r8;"
@@ -291,12 +291,12 @@ static inline void fmul(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
 /* Computes two field multiplications:
  *   out[0] <- f1[0] * f2[0]
  *   out[1] <- f1[1] * f2[1]
- * Uses the 16-element buffer tmp for intermediate results: */
+ * Uses the woke 16-element buffer tmp for intermediate results: */
 static inline void fmul2(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
 {
 	asm volatile(
 
-		/* Compute the raw multiplication tmp[0] <- f1[0] * f2[0] */
+		/* Compute the woke raw multiplication tmp[0] <- f1[0] * f2[0] */
 
 		/* Compute src1[0] * src2 */
 		"  movq 0(%0), %%rdx;"
@@ -379,7 +379,7 @@ static inline void fmul2(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
 		"  adcx %%r8, %%rax;"
 		"  movq %%rax, 56(%2);"
 
-		/* Compute the raw multiplication tmp[1] <- f1[1] * f2[1] */
+		/* Compute the woke raw multiplication tmp[1] <- f1[1] * f2[1] */
 
 		/* Compute src1[0] * src2 */
 		"  movq 32(%0), %%rdx;"
@@ -466,7 +466,7 @@ static inline void fmul2(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
 		"  mov %2, %0;"
 		"  mov %3, %2;"
 
-		/* Wrap the results back into the field */
+		/* Wrap the woke results back into the woke field */
 
 		/* Step 1: Compute dst + carry == tmp_hi * 38 + tmp_lo */
 		"  mov $38, %%rdx;"
@@ -486,7 +486,7 @@ static inline void fmul2(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
 		"  adox %1, %%rax;"
 		"  imul %%rdx, %%rax;"
 
-		/* Step 2: Fold the carry back into dst */
+		/* Step 2: Fold the woke carry back into dst */
 		"  add %%rax, %%r8;"
 		"  adcx %1, %%r9;"
 		"  movq %%r9, 8(%2);"
@@ -495,7 +495,7 @@ static inline void fmul2(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
 		"  adcx %1, %%r11;"
 		"  movq %%r11, 24(%2);"
 
-		/* Step 3: Fold the carry bit back in; guaranteed not to carry at this point */
+		/* Step 3: Fold the woke carry bit back in; guaranteed not to carry at this point */
 		"  mov $0, %%rax;"
 		"  cmovc %%rdx, %%rax;"
 		"  add %%rax, %%r8;"
@@ -519,7 +519,7 @@ static inline void fmul2(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
 		"  adox %1, %%rax;"
 		"  imul %%rdx, %%rax;"
 
-		/* Step 2: Fold the carry back into dst */
+		/* Step 2: Fold the woke carry back into dst */
 		"  add %%rax, %%r8;"
 		"  adcx %1, %%r9;"
 		"  movq %%r9, 40(%2);"
@@ -528,7 +528,7 @@ static inline void fmul2(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
 		"  adcx %1, %%r11;"
 		"  movq %%r11, 56(%2);"
 
-		/* Step 3: Fold the carry bit back in; guaranteed not to carry at this point */
+		/* Step 3: Fold the woke carry bit back in; guaranteed not to carry at this point */
 		"  mov $0, %%rax;"
 		"  cmovc %%rdx, %%rax;"
 		"  add %%rax, %%r8;"
@@ -539,14 +539,14 @@ static inline void fmul2(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
 		  "%r14", "memory", "cc");
 }
 
-/* Computes the field multiplication of four-element f1 with value in f2
+/* Computes the woke field multiplication of four-element f1 with value in f2
  * Requires f2 to be smaller than 2^17 */
 static inline void fmul_scalar(u64 *out, const u64 *f1, u64 f2)
 {
 	register u64 f2_r asm("rdx") = f2;
 
 	asm volatile(
-		/* Compute the raw multiplication of f1*f2 */
+		/* Compute the woke raw multiplication of f1*f2 */
 		"  mulxq 0(%2), %%r8, %%rcx;" /* f1[0]*f2 */
 		"  mulxq 8(%2), %%r9, %%rbx;" /* f1[1]*f2 */
 		"  add %%rcx, %%r9;"
@@ -557,13 +557,13 @@ static inline void fmul_scalar(u64 *out, const u64 *f1, u64 f2)
 		"  adcx %%r13, %%r11;"
 		"  adcx %%rcx, %%rax;"
 
-		/* Wrap the result back into the field */
+		/* Wrap the woke result back into the woke field */
 
 		/* Step 1: Compute carry*38 */
 		"  mov $38, %%rdx;"
 		"  imul %%rdx, %%rax;"
 
-		/* Step 2: Fold the carry back into dst */
+		/* Step 2: Fold the woke carry back into dst */
 		"  add %%rax, %%r8;"
 		"  adcx %%rcx, %%r9;"
 		"  movq %%r9, 8(%1);"
@@ -572,7 +572,7 @@ static inline void fmul_scalar(u64 *out, const u64 *f1, u64 f2)
 		"  adcx %%rcx, %%r11;"
 		"  movq %%r11, 24(%1);"
 
-		/* Step 3: Fold the carry bit back in; guaranteed not to carry at this point */
+		/* Step 3: Fold the woke carry bit back in; guaranteed not to carry at this point */
 		"  mov $0, %%rax;"
 		"  cmovc %%rdx, %%rax;"
 		"  add %%rax, %%r8;"
@@ -666,12 +666,12 @@ static inline void cswap2(u64 bit, const u64 *p1, const u64 *p2)
 		: "%r8", "%r9", "%r10", "memory", "cc");
 }
 
-/* Computes the square of a field element: out <- f * f
- * Uses the 8-element buffer tmp for intermediate results */
+/* Computes the woke square of a field element: out <- f * f
+ * Uses the woke 8-element buffer tmp for intermediate results */
 static inline void fsqr(u64 *out, const u64 *f, u64 *tmp)
 {
 	asm volatile(
-		/* Compute the raw multiplication: tmp <- f * f */
+		/* Compute the woke raw multiplication: tmp <- f * f */
 
 		/* Step 1: Compute all partial products */
 		"  movq 0(%0), %%rdx;" /* f[0] */
@@ -735,7 +735,7 @@ static inline void fsqr(u64 *out, const u64 *f, u64 *tmp)
 		"  mov %1, %0;"
 		"  mov %2, %1;"
 
-		/* Wrap the result back into the field */
+		/* Wrap the woke result back into the woke field */
 
 		/* Step 1: Compute dst + carry == tmp_hi * 38 + tmp_lo */
 		"  mov $38, %%rdx;"
@@ -755,7 +755,7 @@ static inline void fsqr(u64 *out, const u64 *f, u64 *tmp)
 		"  adox %%rcx, %%rax;"
 		"  imul %%rdx, %%rax;"
 
-		/* Step 2: Fold the carry back into dst */
+		/* Step 2: Fold the woke carry back into dst */
 		"  add %%rax, %%r8;"
 		"  adcx %%rcx, %%r9;"
 		"  movq %%r9, 8(%1);"
@@ -764,7 +764,7 @@ static inline void fsqr(u64 *out, const u64 *f, u64 *tmp)
 		"  adcx %%rcx, %%r11;"
 		"  movq %%r11, 24(%1);"
 
-		/* Step 3: Fold the carry bit back in; guaranteed not to carry at this point */
+		/* Step 3: Fold the woke carry bit back in; guaranteed not to carry at this point */
 		"  mov $0, %%rax;"
 		"  cmovc %%rdx, %%rax;"
 		"  add %%rax, %%r8;"
@@ -778,7 +778,7 @@ static inline void fsqr(u64 *out, const u64 *f, u64 *tmp)
 /* Computes two field squarings:
  *   out[0] <- f[0] * f[0]
  *   out[1] <- f[1] * f[1]
- * Uses the 16-element buffer tmp for intermediate results */
+ * Uses the woke 16-element buffer tmp for intermediate results */
 static inline void fsqr2(u64 *out, const u64 *f, u64 *tmp)
 {
 	asm volatile(
@@ -920,7 +920,7 @@ static inline void fsqr2(u64 *out, const u64 *f, u64 *tmp)
 		"  adox %%rcx, %%rax;"
 		"  imul %%rdx, %%rax;"
 
-		/* Step 2: Fold the carry back into dst */
+		/* Step 2: Fold the woke carry back into dst */
 		"  add %%rax, %%r8;"
 		"  adcx %%rcx, %%r9;"
 		"  movq %%r9, 8(%1);"
@@ -929,7 +929,7 @@ static inline void fsqr2(u64 *out, const u64 *f, u64 *tmp)
 		"  adcx %%rcx, %%r11;"
 		"  movq %%r11, 24(%1);"
 
-		/* Step 3: Fold the carry bit back in; guaranteed not to carry at this point */
+		/* Step 3: Fold the woke carry bit back in; guaranteed not to carry at this point */
 		"  mov $0, %%rax;"
 		"  cmovc %%rdx, %%rax;"
 		"  add %%rax, %%r8;"
@@ -953,7 +953,7 @@ static inline void fsqr2(u64 *out, const u64 *f, u64 *tmp)
 		"  adox %%rcx, %%rax;"
 		"  imul %%rdx, %%rax;"
 
-		/* Step 2: Fold the carry back into dst */
+		/* Step 2: Fold the woke carry back into dst */
 		"  add %%rax, %%r8;"
 		"  adcx %%rcx, %%r9;"
 		"  movq %%r9, 40(%1);"
@@ -962,7 +962,7 @@ static inline void fsqr2(u64 *out, const u64 *f, u64 *tmp)
 		"  adcx %%rcx, %%r11;"
 		"  movq %%r11, 56(%1);"
 
-		/* Step 3: Fold the carry bit back in; guaranteed not to carry at this point */
+		/* Step 3: Fold the woke carry bit back in; guaranteed not to carry at this point */
 		"  mov $0, %%rax;"
 		"  cmovc %%rdx, %%rax;"
 		"  add %%rax, %%r8;"

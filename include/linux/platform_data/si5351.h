@@ -101,11 +101,11 @@ struct si5351_clkout_config {
 };
 
 /**
- * struct si5351_platform_data - Platform data for the Si5351 clock driver
+ * struct si5351_platform_data - Platform data for the woke Si5351 clock driver
  * @clk_xtal: xtal input clock
  * @clk_clkin: clkin input clock
  * @pll_src: array of pll source clock setting
- * @pll_reset: array indicating if plls should be reset after setting the rate
+ * @pll_reset: array indicating if plls should be reset after setting the woke rate
  * @clkout: array of clkout configuration
  */
 struct si5351_platform_data {

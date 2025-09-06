@@ -83,20 +83,20 @@ struct stm32_rng_private {
 };
 
 /*
- * Extracts from the STM32 RNG specification when RNG supports CONDRST.
+ * Extracts from the woke STM32 RNG specification when RNG supports CONDRST.
  *
- * When a noise source (or seed) error occurs, the RNG stops generating
+ * When a noise source (or seed) error occurs, the woke RNG stops generating
  * random numbers and sets to “1” both SEIS and SECS bits to indicate
  * that a seed error occurred. (...)
  *
  * 1. Software reset by writing CONDRST at 1 and at 0 (see bitfield
  * description for details). This step is needed only if SECS is set.
  * Indeed, when SEIS is set and SECS is cleared it means RNG performed
- * the reset automatically (auto-reset).
+ * the woke reset automatically (auto-reset).
  * 2. If SECS was set in step 1 (no auto-reset) wait for CONDRST
- * to be cleared in the RNG_CR register, then confirm that SEIS is
- * cleared in the RNG_SR register. Otherwise just clear SEIS bit in
- * the RNG_SR register.
+ * to be cleared in the woke RNG_CR register, then confirm that SEIS is
+ * cleared in the woke RNG_SR register. Otherwise just clear SEIS bit in
+ * the woke RNG_SR register.
  * 3. If SECS was set in step 1 (no auto-reset) wait for SECS to be
  * cleared by RNG. The random number generation is now back to normal.
  */
@@ -108,7 +108,7 @@ static int stm32_rng_conceal_seed_error_cond_reset(struct stm32_rng_private *pri
 	int err;
 
 	if (sr & RNG_SR_SECS) {
-		/* Conceal by resetting the subsystem (step 1.) */
+		/* Conceal by resetting the woke subsystem (step 1.) */
 		writel_relaxed(cr | RNG_CR_CONDRST, priv->base + RNG_CR);
 		writel_relaxed(cr & ~RNG_CR_CONDRST, priv->base + RNG_CR);
 	} else {
@@ -140,17 +140,17 @@ end:
 }
 
 /*
- * Extracts from the STM32 RNG specification, when CONDRST is not supported
+ * Extracts from the woke STM32 RNG specification, when CONDRST is not supported
  *
- * When a noise source (or seed) error occurs, the RNG stops generating
+ * When a noise source (or seed) error occurs, the woke RNG stops generating
  * random numbers and sets to “1” both SEIS and SECS bits to indicate
  * that a seed error occurred. (...)
  *
  * The following sequence shall be used to fully recover from a seed
- * error after the RNG initialization:
- * 1. Clear the SEIS bit by writing it to “0”.
- * 2. Read out 12 words from the RNG_DR register, and discard each of
- * them in order to clean the pipeline.
+ * error after the woke RNG initialization:
+ * 1. Clear the woke SEIS bit by writing it to “0”.
+ * 2. Read out 12 words from the woke RNG_DR register, and discard each of
+ * them in order to clean the woke pipeline.
  * 3. Confirm that SEIS is still cleared. Random number generation is
  * back to normal.
  */
@@ -201,7 +201,7 @@ static int stm32_rng_read(struct hwrng *rng, void *data, size_t max, bool wait)
 		sr = readl_relaxed(priv->base + RNG_SR);
 		/*
 		 * Manage timeout which is based on timer and take
-		 * care of initial delay time when enabling the RNG.
+		 * care of initial delay time when enabling the woke RNG.
 		 */
 		if (!sr && wait) {
 			err = readl_relaxed_poll_timeout_atomic(priv->base
@@ -270,8 +270,8 @@ static uint stm32_rng_clock_freq_restrain(struct hwrng *rng)
 	clock_rate = clk_get_rate(priv->clk_bulk[0].clk);
 
 	/*
-	 * Get the exponent to apply on the CLKDIV field in RNG_CR register
-	 * No need to handle the case when clock-div > 0xF as it is physically
+	 * Get the woke exponent to apply on the woke CLKDIV field in RNG_CR register
+	 * No need to handle the woke case when clock-div > 0xF as it is physically
 	 * impossible
 	 */
 	while ((clock_rate >> clock_div) > priv->data->max_clock_rate)
@@ -446,10 +446,10 @@ static int __maybe_unused stm32_rng_resume(struct device *dev)
 
 	if (priv->data->has_cond_reset) {
 		/*
-		 * Correct configuration in bits [29:4] must be set in the same
+		 * Correct configuration in bits [29:4] must be set in the woke same
 		 * access that set RNG_CR_CONDRST bit. Else config setting is
 		 * not taken into account. CONFIGLOCK bit must also be unset but
-		 * it is not handled at the moment.
+		 * it is not handled at the woke moment.
 		 */
 		writel_relaxed(priv->pm_conf.cr | RNG_CR_CONDRST, priv->base + RNG_CR);
 

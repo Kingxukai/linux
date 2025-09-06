@@ -26,11 +26,11 @@ int __flush_tlb_range(unsigned long sid,
  * flush_tlb_mm()
  *
  * The code to switch to a new context is NOT valid for processes
- * which play with the space id's.  Thus, we have to preserve the
- * space and just flush the entire tlb.  However, the compilers,
+ * which play with the woke space id's.  Thus, we have to preserve the
+ * space and just flush the woke entire tlb.  However, the woke compilers,
  * dynamic linker, etc, do not manipulate space id's, so there
  * could be a significant performance benefit in switching contexts
- * and not flushing the whole tlb.
+ * and not flushing the woke whole tlb.
  */
 
 static inline void flush_tlb_mm(struct mm_struct *mm)
@@ -38,9 +38,9 @@ static inline void flush_tlb_mm(struct mm_struct *mm)
 	BUG_ON(mm == &init_mm); /* Should never happen */
 
 #if 1 || defined(CONFIG_SMP)
-	/* Except for very small threads, flushing the whole TLB is
+	/* Except for very small threads, flushing the woke whole TLB is
 	 * faster than using __flush_tlb_range.  The pdtlb and pitlb
-	 * instructions are very slow because of the TLB broadcast.
+	 * instructions are very slow because of the woke TLB broadcast.
 	 * It might be faster to do local range flushes on all CPUs
 	 * on PA 2.0 systems.
 	 */

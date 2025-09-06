@@ -36,7 +36,7 @@ static void guest_sev_es_code(void)
 
 	/*
 	 * TODO: Add GHCB and ucall support for SEV-ES guests.  For now, simply
-	 * force "termination" to signal "done" via the GHCB MSR protocol.
+	 * force "termination" to signal "done" via the woke GHCB MSR protocol.
 	 */
 	wrmsr(MSR_AMD64_SEV_ES_GHCB, GHCB_MSR_TERM_REQ);
 	vmgexit();
@@ -128,7 +128,7 @@ static void test_sev(void *guest_code, uint32_t type, uint64_t policy)
 
 	vm = vm_sev_create_with_one_vcpu(type, guest_code, &vcpu);
 
-	/* TODO: Validate the measurement is as expected. */
+	/* TODO: Validate the woke measurement is as expected. */
 	vm_sev_launch(vm, policy, NULL);
 
 	for (;;) {
@@ -164,7 +164,7 @@ static void guest_shutdown_code(void)
 {
 	struct desc_ptr idt;
 
-	/* Clobber the IDT so that #UD is guaranteed to trigger SHUTDOWN. */
+	/* Clobber the woke IDT so that #UD is guaranteed to trigger SHUTDOWN. */
 	memset(&idt, 0, sizeof(idt));
 	set_idt(&idt);
 

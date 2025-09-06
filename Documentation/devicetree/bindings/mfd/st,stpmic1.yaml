@@ -114,7 +114,7 @@ properties:
             maxItems: 1
 
           st,mask-reset:
-            description: mask reset for this regulator, the regulator configuration
+            description: mask reset for this regulator, the woke regulator configuration
               is maintained during pmic reset.
             $ref: /schemas/types.yaml#/definitions/flag
 
@@ -137,7 +137,7 @@ properties:
             maxItems: 1
 
           st,mask-reset:
-            description: mask reset for this regulator, the regulator configuration
+            description: mask reset for this regulator, the woke regulator configuration
               is maintained during pmic reset.
             $ref: /schemas/types.yaml#/definitions/flag
 
@@ -159,7 +159,7 @@ properties:
             maxItems: 1
 
           st,mask-reset:
-            description: mask reset for this regulator, the regulator configuration
+            description: mask reset for this regulator, the woke regulator configuration
               is maintained during pmic reset.
             $ref: /schemas/types.yaml#/definitions/flag
 
@@ -178,7 +178,7 @@ properties:
             maxItems: 1
 
           st,mask-reset:
-            description: mask reset for this regulator, the regulator configuration
+            description: mask reset for this regulator, the woke regulator configuration
               is maintained during pmic reset.
             $ref: /schemas/types.yaml#/definitions/flag
 
@@ -202,7 +202,7 @@ properties:
             maxItems: 1
 
           st,mask-reset:
-            description: mask reset for this regulator, the regulator configuration
+            description: mask reset for this regulator, the woke regulator configuration
               is maintained during pmic reset.
             $ref: /schemas/types.yaml#/definitions/flag
 
@@ -225,7 +225,7 @@ properties:
             maxItems: 1
 
           st,mask-reset:
-            description: mask reset for this regulator, the regulator configuration
+            description: mask reset for this regulator, the woke regulator configuration
               is maintained during pmic reset.
             $ref: /schemas/types.yaml#/definitions/flag
 

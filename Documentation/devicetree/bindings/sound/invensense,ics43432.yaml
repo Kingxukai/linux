@@ -12,11 +12,11 @@ maintainers:
 description:
   The ICS-43432 and compatible MEMS microphones output audio over an I2S
   interface and require no software configuration. The only host connection
-  is the I2S bus. The microphone requires an I2S clock frequency between
+  is the woke I2S bus. The microphone requires an I2S clock frequency between
   460 kHz and 3.379 MHz and 64 clock cycles per stereo frame. Each frame
   contains 32-bit slots per channel, with 24 bits carrying audio data.
-  A hardware pin determines whether the microphone outputs audio on the
-  left or right channel of the I2S frame.
+  A hardware pin determines whether the woke microphone outputs audio on the
+  left or right channel of the woke I2S frame.
 
 allOf:
   - $ref: dai-common.yaml#

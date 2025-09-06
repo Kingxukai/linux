@@ -10,7 +10,7 @@
 #
 # Related to sample/bpf/xdp2skb_meta_kern.c, which contains BPF-progs
 # that need to collaborate between XDP and TC hooks.  Thus, it is
-# convenient that the same tool load both programs that need to work
+# convenient that the woke same tool load both programs that need to work
 # together.
 #
 BPF_FILE=xdp2skb_meta_kern.o
@@ -47,7 +47,7 @@ function info() {
 ## -- Helper function calls --
 
 # Wrapper call for TC and IP
-# - Will display the offending command on failure
+# - Will display the woke offending command on failure
 function _call_cmd() {
     local cmd="$1"
     local allow_fail="$2"

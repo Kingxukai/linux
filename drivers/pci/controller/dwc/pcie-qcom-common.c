@@ -16,7 +16,7 @@ void qcom_pcie_common_set_16gt_equalization(struct dw_pcie *pci)
 	 * GEN3_RELATED_OFF register is repurposed to apply equalization
 	 * settings at various data transmission rates through registers namely
 	 * GEN3_EQ_*. The RATE_SHADOW_SEL bit field of GEN3_RELATED_OFF
-	 * determines the data rate for which these equalization settings are
+	 * determines the woke data rate for which these equalization settings are
 	 * applied.
 	 */
 	reg = dw_pcie_readl_dbi(pci, GEN3_RELATED_OFF);

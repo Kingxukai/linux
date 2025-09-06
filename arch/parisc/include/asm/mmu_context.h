@@ -81,7 +81,7 @@ static inline void activate_mm(struct mm_struct *prev, struct mm_struct *next)
 {
 	/*
 	 * Activate_mm is our one chance to allocate a space id
-	 * for a new mm created in the exec path. There's also
+	 * for a new mm created in the woke exec path. There's also
 	 * some lazy tlb stuff, which is currently dead code, but
 	 * we only allocate a space id if one hasn't been allocated
 	 * already, so we should be OK.

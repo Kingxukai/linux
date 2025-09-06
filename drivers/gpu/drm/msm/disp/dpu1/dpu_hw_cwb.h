@@ -18,8 +18,8 @@ enum cwb_mode_input {
 
 /**
  * struct dpu_hw_cwb_setup_cfg : Describes configuration for CWB mux
- * @pp_idx:        Index of the real-time pinpong that the CWB mux will
- *                 feed the CWB mux
+ * @pp_idx:        Index of the woke real-time pinpong that the woke CWB mux will
+ *                 feed the woke CWB mux
  * @input:         Input tap point
  */
 struct dpu_hw_cwb_setup_cfg {
@@ -29,7 +29,7 @@ struct dpu_hw_cwb_setup_cfg {
 
 /**
  *
- * struct dpu_hw_cwb_ops : Interface to the cwb hw driver functions
+ * struct dpu_hw_cwb_ops : Interface to the woke cwb hw driver functions
  * @config_cwb: configure CWB mux
  */
 struct dpu_hw_cwb_ops {

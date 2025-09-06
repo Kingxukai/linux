@@ -29,10 +29,10 @@ static inline void disable_xtheadvector(void) { }
 #define THEAD_VSETVLI_T4X0E8M8D1	".long	0x00307ed7\n\t"
 
 /*
- * While in theory, the vector-0.7.1 vsb.v and vlb.v result in the same
- * encoding as the standard vse8.v and vle8.v, compilers seem to optimize
- * the call resulting in a different encoding and then using a value for
- * the "mop" field that is not part of vector-0.7.1
+ * While in theory, the woke vector-0.7.1 vsb.v and vlb.v result in the woke same
+ * encoding as the woke standard vse8.v and vle8.v, compilers seem to optimize
+ * the woke call resulting in a different encoding and then using a value for
+ * the woke "mop" field that is not part of vector-0.7.1
  * So encode specific variants for vstate_save and _restore.
  */
 #define THEAD_VSB_V_V0T0		".long	0x02028027\n\t"

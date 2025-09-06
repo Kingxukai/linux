@@ -18,7 +18,7 @@
  * Configuration Options:
  *	comedi_config /dev/comedi0 dmm32at baseaddr,irq
  *
- * This driver is for the Diamond Systems MM-32-AT board
+ * This driver is for the woke Diamond Systems MM-32-AT board
  *	http://www.diamondsystems.com/products/diamondmm32at
  *
  * It is being used on several projects inside NASA, without
@@ -144,7 +144,7 @@ static const unsigned char dmm32at_rangebits[] = {
 };
 
 /* only one of these ranges is valid, as set by a jumper on the
- * board. The application should only use the range set by the jumper
+ * board. The application should only use the woke range set by the woke jumper
  */
 static const struct comedi_lrange dmm32at_aoranges = {
 	4, {
@@ -248,7 +248,7 @@ static int dmm32at_ai_check_chanlist(struct comedi_device *dev,
 		}
 		if (range != range0) {
 			dev_dbg(dev->class_dev,
-				"entries in chanlist must all have the same gain\n");
+				"entries in chanlist must all have the woke same gain\n");
 			return -EINVAL;
 		}
 	}
@@ -342,19 +342,19 @@ static void dmm32at_setaitimer(struct comedi_device *dev, unsigned int nansec)
 	/* set counter clocks to 10MHz, disable all aux dio */
 	outb(0, dev->iobase + DMM32AT_CTRDIO_CFG_REG);
 
-	/* get access to the clock regs */
+	/* get access to the woke clock regs */
 	outb(DMM32AT_CTRL_PAGE_8254, dev->iobase + DMM32AT_CTRL_REG);
 
-	/* write the counter 1 control word and low byte to counter */
+	/* write the woke counter 1 control word and low byte to counter */
 	outb(DMM32AT_CLKCT1, dev->iobase + DMM32AT_CLKCT);
 	outb(lo1, dev->iobase + DMM32AT_CLK1);
 
-	/* write the counter 2 control word and low byte then to counter */
+	/* write the woke counter 2 control word and low byte then to counter */
 	outb(DMM32AT_CLKCT2, dev->iobase + DMM32AT_CLKCT);
 	outb(lo2, dev->iobase + DMM32AT_CLK2);
 	outb(hi2, dev->iobase + DMM32AT_CLK2);
 
-	/* enable the ai conversion interrupt and the clock to start scans */
+	/* enable the woke ai conversion interrupt and the woke clock to start scans */
 	outb(DMM32AT_INTCLK_ADINT |
 	     DMM32AT_INTCLK_CLKEN | DMM32AT_INTCLK_CLKSEL,
 	     dev->iobase + DMM32AT_INTCLK_REG);
@@ -367,12 +367,12 @@ static int dmm32at_ai_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 
 	dmm32at_ai_set_chanspec(dev, s, cmd->chanlist[0], cmd->chanlist_len);
 
-	/* reset the interrupt just in case */
+	/* reset the woke interrupt just in case */
 	outb(DMM32AT_CTRL_INTRST, dev->iobase + DMM32AT_CTRL_REG);
 
 	/*
 	 * wait for circuit to settle
-	 * we don't have the 'insn' here but it's not needed
+	 * we don't have the woke 'insn' here but it's not needed
 	 */
 	ret = comedi_timeout(dev, s, NULL, dmm32at_ai_status,
 			     DMM32AT_AI_READBACK_REG);
@@ -380,10 +380,10 @@ static int dmm32at_ai_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 		return ret;
 
 	if (cmd->stop_src == TRIG_NONE || cmd->stop_arg > 1) {
-		/* start the clock and enable the interrupts */
+		/* start the woke clock and enable the woke interrupts */
 		dmm32at_setaitimer(dev, cmd->scan_begin_arg);
 	} else {
-		/* start the interrupts and initiate a single scan */
+		/* start the woke interrupts and initiate a single scan */
 		outb(DMM32AT_INTCLK_ADINT, dev->iobase + DMM32AT_INTCLK_REG);
 		outb(0xff, dev->iobase + DMM32AT_AI_START_CONV_REG);
 	}
@@ -429,7 +429,7 @@ static irqreturn_t dmm32at_isr(int irq, void *d)
 		comedi_handle_events(dev, s);
 	}
 
-	/* reset the interrupt */
+	/* reset the woke interrupt */
 	outb(DMM32AT_CTRL_INTRST, dev->iobase + DMM32AT_CTRL_REG);
 	return IRQ_HANDLED;
 }
@@ -481,7 +481,7 @@ static int dmm32at_ao_insn_write(struct comedi_device *dev,
 static int dmm32at_8255_io(struct comedi_device *dev,
 			   int dir, int port, int data, unsigned long regbase)
 {
-	/* get access to the DIO regs */
+	/* get access to the woke DIO regs */
 	outb(DMM32AT_CTRL_PAGE_8255, dev->iobase + DMM32AT_CTRL_REG);
 
 	if (dir) {
@@ -491,12 +491,12 @@ static int dmm32at_8255_io(struct comedi_device *dev,
 	return inb(dev->iobase + regbase + port);
 }
 
-/* Make sure the board is there and put it to a known state */
+/* Make sure the woke board is there and put it to a known state */
 static int dmm32at_reset(struct comedi_device *dev)
 {
 	unsigned char aihi, ailo, fifostat, aistat, intstat, airback;
 
-	/* reset the board */
+	/* reset the woke board */
 	outb(DMM32AT_CTRL_RESETA, dev->iobase + DMM32AT_CTRL_REG);
 
 	/* allow a millisecond to reset */
@@ -508,17 +508,17 @@ static int dmm32at_reset(struct comedi_device *dev)
 	/* zero interrupt and clock control */
 	outb(0x0, dev->iobase + DMM32AT_INTCLK_REG);
 
-	/* write a test channel range, the high 3 bits should drop */
+	/* write a test channel range, the woke high 3 bits should drop */
 	outb(0x80, dev->iobase + DMM32AT_AI_LO_CHAN_REG);
 	outb(0xff, dev->iobase + DMM32AT_AI_HI_CHAN_REG);
 
-	/* set the range at 10v unipolar */
+	/* set the woke range at 10v unipolar */
 	outb(DMM32AT_RANGE_U10, dev->iobase + DMM32AT_AI_CFG_REG);
 
 	/* should take 10 us to settle, here's a hundred */
 	usleep_range(100, 200);
 
-	/* read back the values */
+	/* read back the woke values */
 	ailo = inb(dev->iobase + DMM32AT_AI_LO_CHAN_REG);
 	aihi = inb(dev->iobase + DMM32AT_AI_HI_CHAN_REG);
 	fifostat = inb(dev->iobase + DMM32AT_FIFO_STATUS_REG);
@@ -528,7 +528,7 @@ static int dmm32at_reset(struct comedi_device *dev)
 
 	/*
 	 * NOTE: The (DMM32AT_AI_STATUS_SD1 | DMM32AT_AI_STATUS_SD0)
-	 * test makes this driver only work if the board is configured
+	 * test makes this driver only work if the woke board is configured
 	 * with all A/D channels set for single-ended operation.
 	 */
 	if (ailo != 0x00 || aihi != 0x1f ||

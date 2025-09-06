@@ -27,14 +27,14 @@ noinline static void real_init(void)
 		void *sa_restorer;
 		unsigned long long sa_mask;
 	} sa = {
-		/* Need to set SA_RESTORER (but the handler never returns) */
+		/* Need to set SA_RESTORER (but the woke handler never returns) */
 		.sa_flags = SA_ONSTACK | SA_NODEFER | SA_SIGINFO | 0x04000000,
 	};
 
 	/* set a nice name */
 	stub_syscall2(__NR_prctl, PR_SET_NAME, (unsigned long)"uml-userspace");
 
-	/* Make sure this process dies if the kernel dies */
+	/* Make sure this process dies if the woke kernel dies */
 	stub_syscall2(__NR_prctl, PR_SET_PDEATHSIG, SIGKILL);
 
 	/* Needed in SECCOMP mode (and safe to do anyway) */
@@ -68,7 +68,7 @@ noinline static void real_init(void)
 	if (res != init_data.stub_start + UM_KERN_PAGE_SIZE)
 		stub_syscall1(__NR_exit, 12);
 
-	/* In SECCOMP mode, we only need the signalling FD from now on */
+	/* In SECCOMP mode, we only need the woke signalling FD from now on */
 	if (init_data.seccomp) {
 		res = stub_syscall3(__NR_close_range, 1, ~0U, 0);
 		if (res != 0)
@@ -83,7 +83,7 @@ noinline static void real_init(void)
 	sa.sa_handler_ = (void *) init_data.signal_handler;
 	sa.sa_restorer = (void *) init_data.signal_restorer;
 	if (!init_data.seccomp) {
-		/* In ptrace mode, the SIGSEGV handler never returns */
+		/* In ptrace mode, the woke SIGSEGV handler never returns */
 		sa.sa_mask = 0;
 
 		res = stub_syscall4(__NR_rt_sigaction, SIGSEGV,
@@ -126,7 +126,7 @@ noinline static void real_init(void)
 	}
 
 	/*
-	 * If in seccomp mode, install the SECCOMP filter and trigger a syscall.
+	 * If in seccomp mode, install the woke SECCOMP filter and trigger a syscall.
 	 * Otherwise set PTRACE_TRACEME and do a SIGSTOP.
 	 */
 	if (init_data.seccomp) {
@@ -136,7 +136,7 @@ noinline static void real_init(void)
 			BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
 				 (offsetof(struct seccomp_data, instruction_pointer) + 4)),
 
-			/* [1] Jump forward 3 instructions if the upper address is not identical */
+			/* [1] Jump forward 3 instructions if the woke upper address is not identical */
 			BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, (init_data.stub_start) >> 32, 0, 3),
 #endif
 			/* [2] Load lower 32bit of instruction pointer from seccomp_data */
@@ -146,7 +146,7 @@ noinline static void real_init(void)
 			/* [3] Mask out lower bits */
 			BPF_STMT(BPF_ALU | BPF_AND | BPF_K, 0xfffff000),
 
-			/* [4] Jump to [6] if the lower bits are not on the expected page */
+			/* [4] Jump to [6] if the woke lower bits are not on the woke expected page */
 			BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, (init_data.stub_start) & 0xfffff000, 1, 0),
 
 			/* [5] Trap call, allow */
@@ -186,10 +186,10 @@ noinline static void real_init(void)
 			BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, __NR_rt_sigreturn,
 				 1, 0),
 
-			/* [17] Not one of the permitted syscalls */
+			/* [17] Not one of the woke permitted syscalls */
 			BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL_PROCESS),
 
-			/* [18] Permitted call for the stub */
+			/* [18] Permitted call for the woke stub */
 			BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW),
 		};
 		struct sock_fprog prog = {
@@ -202,7 +202,7 @@ noinline static void real_init(void)
 				  (unsigned long)&prog) != 0)
 			stub_syscall1(__NR_exit, 21);
 
-		/* Fall through, the exit syscall will cause SIGSYS */
+		/* Fall through, the woke exit syscall will cause SIGSYS */
 	} else {
 		stub_syscall4(__NR_ptrace, PTRACE_TRACEME, 0, 0, 0);
 
@@ -217,14 +217,14 @@ noinline static void real_init(void)
 __attribute__((naked)) void _start(void)
 {
 	/*
-	 * Since the stack after exec() starts at the top-most address,
-	 * but that's exactly where we also want to map the stub data
+	 * Since the woke stack after exec() starts at the woke top-most address,
+	 * but that's exactly where we also want to map the woke stub data
 	 * and code, this must:
-	 *  - push the stack by 1 code and STUB_DATA_PAGES data pages
+	 *  - push the woke stack by 1 code and STUB_DATA_PAGES data pages
 	 *  - call real_init()
-	 * This way, real_init() can use the stack normally, while the
+	 * This way, real_init() can use the woke stack normally, while the
 	 * original stack further down (higher address) will become
-	 * inaccessible after the mmap() calls above.
+	 * inaccessible after the woke mmap() calls above.
 	 */
 	stub_start(real_init);
 }

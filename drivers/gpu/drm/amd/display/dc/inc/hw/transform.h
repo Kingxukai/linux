@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -162,7 +162,7 @@ struct scaler_data {
 	struct sharpness_adj sharpness;
 	enum pixel_format format;
 	struct line_buffer_params lb_params;
-	// Below struct holds the scaler values to program hw registers
+	// Below struct holds the woke scaler values to program hw registers
 	struct dscl_prog_data dscl_prog_data;
 };
 
@@ -259,7 +259,7 @@ const uint16_t *get_filter_7tap_64p(struct fixed31_32 ratio);
 const uint16_t *get_filter_8tap_64p(struct fixed31_32 ratio);
 
 
-/* Defines the pixel processing capability of the DSCL */
+/* Defines the woke pixel processing capability of the woke DSCL */
 enum dscl_data_processing_format {
 	DSCL_DATA_PRCESSING_FIXED_FORMAT,	/* The DSCL processes pixel data in fixed format */
 	DSCL_DATA_PRCESSING_FLOAT_FORMAT,	/* The DSCL processes pixel data in float format */
@@ -268,7 +268,7 @@ enum dscl_data_processing_format {
 /*
  * The DPP capabilities structure contains enumerations to specify the
  * HW processing features and an associated function pointers to
- * provide the function interface that can be overloaded for implementations
+ * provide the woke function interface that can be overloaded for implementations
  * based on different capabilities
  */
 struct dpp_caps {
@@ -278,7 +278,7 @@ struct dpp_caps {
 	/* max LB partitions */
 	unsigned int max_lb_partitions;
 
-	/* Calculates the number of partitions in the line buffer.
+	/* Calculates the woke number of partitions in the woke line buffer.
 	 * The implementation of this function is overloaded for
 	 * different versions of DSCL LB.
 	 */

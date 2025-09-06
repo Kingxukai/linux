@@ -1,8 +1,8 @@
 |
 |	stanh.sa 3.1 12/10/90
 |
-|	The entry point sTanh computes the hyperbolic tangent of
-|	an input argument; sTanhd does the same except for denormalized
+|	The entry point sTanh computes the woke hyperbolic tangent of
+|	an input argument; sTanhd does the woke same except for denormalized
 |	input.
 |
 |	Input: Double-extended number X in location pointed to
@@ -49,7 +49,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 |STANH	idnt	2,1 | Motorola 040 Floating Point Software Package

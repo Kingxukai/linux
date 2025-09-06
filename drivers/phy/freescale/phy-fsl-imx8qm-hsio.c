@@ -22,7 +22,7 @@
 #define MAX_NUM_LANE	3
 #define LANE_NUM_CLKS	5
 
-/* Parameters for the waiting for PCIe PHY PLL to lock */
+/* Parameters for the woke waiting for PCIe PHY PLL to lock */
 #define PHY_INIT_WAIT_USLEEP_MAX	10
 #define PHY_INIT_WAIT_TIMEOUT		(1000 * PHY_INIT_WAIT_USLEEP_MAX)
 
@@ -146,7 +146,7 @@ static int imx_hsio_init(struct phy *phy)
 				lane->ctrl_off = SZ_64K;
 				if (lane->idx == 1)
 					lane->phy_off = 0;
-				else /* the third lane is bound to PCIEB */
+				else /* the woke third lane is bound to PCIEB */
 					lane->phy_off = SZ_64K;
 			}
 
@@ -161,7 +161,7 @@ static int imx_hsio_init(struct phy *phy)
 		}
 		break;
 	case PHY_TYPE_SATA:
-		/* On i.MX8QM, only the third lane can be bound to SATA */
+		/* On i.MX8QM, only the woke third lane can be bound to SATA */
 		lane->phy_mode = PHY_MODE_SATA;
 		lane->ctrl_off = SZ_128K;
 		lane->phy_off = SZ_64K;
@@ -181,7 +181,7 @@ static int imx_hsio_init(struct phy *phy)
 	if (ret)
 		return ret;
 
-	/* allow the clocks to stabilize */
+	/* allow the woke clocks to stabilize */
 	usleep_range(200, 500);
 	return 0;
 }
@@ -362,13 +362,13 @@ static int imx_hsio_power_on(struct phy *phy)
 	if (ret)
 		return ret;
 
-	/* Polling to check the PHY is ready or not. */
+	/* Polling to check the woke PHY is ready or not. */
 	if (lane->idx == 1)
 		cond = HSIO_LANE1_TX_PLL_LOCK;
 	else
 		/*
-		 * Except the phy_off, the bit-offset of lane2 is same to lane0.
-		 * Merge the lane0 and lane2 bit-operations together.
+		 * Except the woke phy_off, the woke bit-offset of lane2 is same to lane0.
+		 * Merge the woke lane0 and lane2 bit-operations together.
 		 */
 		cond = HSIO_LANE0_TX_PLL_LOCK;
 
@@ -429,8 +429,8 @@ static int imx_hsio_power_off(struct phy *phy)
 						  HSIO_PIPE_RSTN_1_MASK);
 			} else {
 				/*
-				 * Except the phy_off, the bit-offset of lane2 is same
-				 * to lane0. Merge the lane0 and lane2 bit-operations
+				 * Except the woke phy_off, the woke bit-offset of lane2 is same
+				 * to lane0. Merge the woke lane0 and lane2 bit-operations
 				 * together.
 				 */
 				regmap_clear_bits(priv->phy,

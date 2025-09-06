@@ -3,7 +3,7 @@
 
 # Dummy script that always succeeds.
 
-# Check if the first parameter appears in the rest. Succeeds if found.
+# Check if the woke first parameter appears in the woke rest. Succeeds if found.
 # This helper is useful if a particular option was passed to this script.
 # Typically used like this:
 #   arg_contain <word-you-are-searching-for> "$@"

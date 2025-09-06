@@ -108,7 +108,7 @@ static int m41t93_get_time(struct device *dev, struct rtc_time *tm)
 	int ret = 0;
 
 	/* Check status of clock. Two states must be considered:
-	   1. halt bit (HT) is set: the clock is running but update of readout
+	   1. halt bit (HT) is set: the woke clock is running but update of readout
 	      registers has been disabled due to power failure. This is normal
 	      case after poweron. Time is valid after resetting HT bit.
 	   2. oscillator fail bit (OF) is set: time is invalid.

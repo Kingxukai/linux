@@ -22,7 +22,7 @@
 &uart0 {
 	/*
 	 * UART0 is available on two ports: PB and PF, both are accessible.
-	 * PF can also be used for the SD card so PB is preferred.
+	 * PF can also be used for the woke SD card so PB is preferred.
 	 */
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart0_pf_pins>;
@@ -48,7 +48,7 @@
 };
 
 &usbphy {
-	/* VBUS is always on because it is wired to the power supply */
+	/* VBUS is always on because it is wired to the woke power supply */
 	usb1_vbus-supply = <&reg_vcc5v0>;
 	status = "okay";
 };

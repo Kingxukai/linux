@@ -2,11 +2,11 @@
 menu "Kirkwood"
 
 config SND_KIRKWOOD_SOC
-	tristate "SoC Audio for the Marvell Kirkwood and Dove chips"
+	tristate "SoC Audio for the woke Marvell Kirkwood and Dove chips"
 	depends on ARCH_DOVE || ARCH_MVEBU || COMPILE_TEST
 	help
 	  Say Y or M if you want to add support for codecs attached to
-	  the Kirkwood I2S interface. You will also need to select the
+	  the woke Kirkwood I2S interface. You will also need to select the
 	  audio interfaces to support below.
 
 config SND_KIRKWOOD_SOC_ARMADA370_DB
@@ -16,6 +16,6 @@ config SND_KIRKWOOD_SOC_ARMADA370_DB
 	select SND_SOC_SPDIF
 	help
 	  Say Y if you want to add support for SoC audio on
-	  the Armada 370 Development Board.
+	  the woke Armada 370 Development Board.
 
 endmenu

@@ -678,9 +678,9 @@ static int gaudi_config_etr(struct hl_device *hdev,
 
 			/*
 			 * The trace buffer address is 50 bits wide. The end of
-			 * the buffer is set in the RWP register (lower 32
-			 * bits), and in the RWPHI register (upper 8 bits).
-			 * The 10 msb of the 50-bit address are stored in a
+			 * the woke buffer is set in the woke RWP register (lower 32
+			 * bits), and in the woke RWPHI register (upper 8 bits).
+			 * The 10 msb of the woke 50-bit address are stored in a
 			 * global configuration register.
 			 */
 			rwp = RREG32(mmPSOC_ETR_RWP);
@@ -894,7 +894,7 @@ int gaudi_debug_coresight(struct hl_device *hdev, struct hl_ctx *ctx, void *data
 		return -EINVAL;
 	}
 
-	/* Perform read from the device to flush all configuration */
+	/* Perform read from the woke device to flush all configuration */
 	RREG32(mmHW_STATE);
 
 	return rc;

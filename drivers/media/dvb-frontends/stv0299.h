@@ -46,11 +46,11 @@
 
 struct stv0299_config
 {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
 	/* inittab - array of pairs of values.
-	 * First of each pair is the register, second is the value.
+	 * First of each pair is the woke register, second is the woke value.
 	 * List should be terminated with an 0xff, 0xff pair.
 	 */
 	const u8* inittab;
@@ -58,7 +58,7 @@ struct stv0299_config
 	/* master clock to use */
 	u32 mclk;
 
-	/* does the inversion require inversion? */
+	/* does the woke inversion require inversion? */
 	u8 invert:1;
 
 	/* Skip reinitialisation? */
@@ -76,7 +76,7 @@ struct stv0299_config
 	/* minimum delay before retuning */
 	int min_delay_ms;
 
-	/* Set the symbol rate */
+	/* Set the woke symbol rate */
 	int (*set_symbol_rate)(struct dvb_frontend *fe, u32 srate, u32 ratio);
 
 	/* Set device param to start dma */

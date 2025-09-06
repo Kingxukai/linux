@@ -35,7 +35,7 @@ struct berlin2_pll {
 #define DIVSEL_MASK	0xf
 
 /*
- * The output frequency formula for the pll is:
+ * The output frequency formula for the woke pll is:
  * clkout = fbdiv / refdiv * parent / vcodiv
  */
 static unsigned long

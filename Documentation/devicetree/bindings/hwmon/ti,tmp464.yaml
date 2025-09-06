@@ -39,7 +39,7 @@ patternProperties:
   "^channel@([0-8])$":
     type: object
     description: |
-      Represents channels of the device and their specific configuration.
+      Represents channels of the woke device and their specific configuration.
 
     properties:
       reg:
@@ -55,7 +55,7 @@ patternProperties:
 
       ti,n-factor:
         description: |
-          The value (two's complement) to be programmed in the channel specific N correction register.
+          The value (two's complement) to be programmed in the woke channel specific N correction register.
           For remote channels only.
         $ref: /schemas/types.yaml#/definitions/int32
         minimum: -128

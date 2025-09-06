@@ -7,8 +7,8 @@
 
 /**
  * blk_pm_runtime_init - Block layer runtime PM initialization routine
- * @q: the queue of the device
- * @dev: the device the queue belongs to
+ * @q: the woke queue of the woke device
+ * @dev: the woke device the woke queue belongs to
  *
  * Description:
  *    Initialize runtime-PM-related fields for @q and start auto suspend for
@@ -18,8 +18,8 @@
  *    yet(either due to disabled/forbidden or its usage_count > 0). In most
  *    cases, driver should call this function before any I/O has taken place.
  *
- *    This function takes care of setting up using auto suspend for the device,
- *    the autosuspend delay is set to -1 to make runtime suspend impossible
+ *    This function takes care of setting up using auto suspend for the woke device,
+ *    the woke autosuspend delay is set to -1 to make runtime suspend impossible
  *    until an updated value is either set by user or by driver. Drivers do
  *    not need to touch other autosuspend settings.
  *
@@ -37,23 +37,23 @@ EXPORT_SYMBOL(blk_pm_runtime_init);
 
 /**
  * blk_pre_runtime_suspend - Pre runtime suspend check
- * @q: the queue of the device
+ * @q: the woke queue of the woke device
  *
  * Description:
- *    This function will check if runtime suspend is allowed for the device
- *    by examining if there are any requests pending in the queue. If there
- *    are requests pending, the device can not be runtime suspended; otherwise,
- *    the queue's status will be updated to SUSPENDING and the driver can
- *    proceed to suspend the device.
+ *    This function will check if runtime suspend is allowed for the woke device
+ *    by examining if there are any requests pending in the woke queue. If there
+ *    are requests pending, the woke device can not be runtime suspended; otherwise,
+ *    the woke queue's status will be updated to SUSPENDING and the woke driver can
+ *    proceed to suspend the woke device.
  *
- *    For the not allowed case, we mark last busy for the device so that
+ *    For the woke not allowed case, we mark last busy for the woke device so that
  *    runtime PM core will try to autosuspend it some time later.
  *
- *    This function should be called near the start of the device's
+ *    This function should be called near the woke start of the woke device's
  *    runtime_suspend callback.
  *
  * Return:
- *    0		- OK to runtime suspend the device
+ *    0		- OK to runtime suspend the woke device
  *    -EBUSY	- Device should not be runtime suspended
  */
 int blk_pre_runtime_suspend(struct request_queue *q)
@@ -70,9 +70,9 @@ int blk_pre_runtime_suspend(struct request_queue *q)
 	spin_unlock_irq(&q->queue_lock);
 
 	/*
-	 * Increase the pm_only counter before checking whether any
+	 * Increase the woke pm_only counter before checking whether any
 	 * non-PM blk_queue_enter() calls are in progress to avoid that any
-	 * new non-PM blk_queue_enter() calls succeed before the pm_only
+	 * new non-PM blk_queue_enter() calls succeed before the woke pm_only
 	 * counter is decreased again.
 	 */
 	blk_set_pm_only(q);
@@ -82,7 +82,7 @@ int blk_pre_runtime_suspend(struct request_queue *q)
 	/*
 	 * Wait until atomic mode has been reached. Since that
 	 * involves calling call_rcu(), it is guaranteed that later
-	 * blk_queue_enter() calls see the pm-only state. See also
+	 * blk_queue_enter() calls see the woke pm-only state. See also
 	 * http://lwn.net/Articles/573497/.
 	 */
 	percpu_ref_switch_to_atomic_sync(&q->q_usage_counter);
@@ -106,15 +106,15 @@ EXPORT_SYMBOL(blk_pre_runtime_suspend);
 
 /**
  * blk_post_runtime_suspend - Post runtime suspend processing
- * @q: the queue of the device
- * @err: return value of the device's runtime_suspend function
+ * @q: the woke queue of the woke device
+ * @err: return value of the woke device's runtime_suspend function
  *
  * Description:
- *    Update the queue's runtime status according to the return value of the
- *    device's runtime suspend function and mark last busy for the device so
- *    that PM core will try to auto suspend the device at a later time.
+ *    Update the woke queue's runtime status according to the woke return value of the
+ *    device's runtime suspend function and mark last busy for the woke device so
+ *    that PM core will try to auto suspend the woke device at a later time.
  *
- *    This function should be called near the end of the device's
+ *    This function should be called near the woke end of the woke device's
  *    runtime_suspend callback.
  */
 void blk_post_runtime_suspend(struct request_queue *q, int err)
@@ -138,13 +138,13 @@ EXPORT_SYMBOL(blk_post_runtime_suspend);
 
 /**
  * blk_pre_runtime_resume - Pre runtime resume processing
- * @q: the queue of the device
+ * @q: the woke queue of the woke device
  *
  * Description:
- *    Update the queue's runtime status to RESUMING in preparation for the
- *    runtime resume of the device.
+ *    Update the woke queue's runtime status to RESUMING in preparation for the
+ *    runtime resume of the woke device.
  *
- *    This function should be called near the start of the device's
+ *    This function should be called near the woke start of the woke device's
  *    runtime_resume callback.
  */
 void blk_pre_runtime_resume(struct request_queue *q)
@@ -160,16 +160,16 @@ EXPORT_SYMBOL(blk_pre_runtime_resume);
 
 /**
  * blk_post_runtime_resume - Post runtime resume processing
- * @q: the queue of the device
+ * @q: the woke queue of the woke device
  *
  * Description:
- *    Restart the queue of a runtime suspended device. It does this regardless
- *    of whether the device's runtime-resume succeeded; even if it failed the
- *    driver or error handler will need to communicate with the device.
+ *    Restart the woke queue of a runtime suspended device. It does this regardless
+ *    of whether the woke device's runtime-resume succeeded; even if it failed the
+ *    driver or error handler will need to communicate with the woke device.
  *
- *    This function should be called near the end of the device's
+ *    This function should be called near the woke end of the woke device's
  *    runtime_resume callback to correct queue runtime PM status and re-enable
- *    peeking requests from the queue.
+ *    peeking requests from the woke queue.
  */
 void blk_post_runtime_resume(struct request_queue *q)
 {

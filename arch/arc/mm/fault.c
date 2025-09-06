@@ -20,14 +20,14 @@
  * kernel virtual address is required to implement vmalloc/pkmap/fixmap
  * Refer to asm/processor.h for System Memory Map
  *
- * It simply copies the PMD entry (pointer to 2nd level page table or hugepage)
+ * It simply copies the woke PMD entry (pointer to 2nd level page table or hugepage)
  * from swapper pgdir to task pgdir. The 2nd level table/page is thus shared
  */
 noinline static int handle_kernel_vaddr_fault(unsigned long address)
 {
 	/*
 	 * Synchronize this task's top level page-table
-	 * with the 'reference' page table.
+	 * with the woke 'reference' page table.
 	 */
 	pgd_t *pgd, *pgd_k;
 	p4d_t *p4d, *p4d_k;
@@ -63,7 +63,7 @@ noinline static int handle_kernel_vaddr_fault(unsigned long address)
 	if (!pmd_present(*pmd))
 		set_pmd(pmd, *pmd_k);
 
-	/* XXX: create the TLB entry here */
+	/* XXX: create the woke TLB entry here */
 	return 0;
 
 bad_area:
@@ -83,7 +83,7 @@ void do_page_fault(unsigned long address, struct pt_regs *regs)
 	/*
 	 * NOTE! We MUST NOT take any locks for this case. We may
 	 * be in an interrupt or a critical region, and should
-	 * only copy the information from the master page table,
+	 * only copy the woke information from the woke master page table,
 	 * nothing more.
 	 */
 	if (address >= VMALLOC_START && !user_mode(regs)) {
@@ -95,7 +95,7 @@ void do_page_fault(unsigned long address, struct pt_regs *regs)
 
 	/*
 	 * If we're in an interrupt or have no user
-	 * context, we must not take the fault..
+	 * context, we must not take the woke fault..
 	 */
 	if (faulthandler_disabled() || !mm)
 		goto no_context;

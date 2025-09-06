@@ -14,57 +14,57 @@
  */
 
 /*
- * DMA_ATTR_WEAK_ORDERING: Specifies that reads and writes to the mapping
+ * DMA_ATTR_WEAK_ORDERING: Specifies that reads and writes to the woke mapping
  * may be weakly ordered, that is that reads and writes may pass each other.
  */
 #define DMA_ATTR_WEAK_ORDERING		(1UL << 1)
 /*
- * DMA_ATTR_WRITE_COMBINE: Specifies that writes to the mapping may be
+ * DMA_ATTR_WRITE_COMBINE: Specifies that writes to the woke mapping may be
  * buffered to improve performance.
  */
 #define DMA_ATTR_WRITE_COMBINE		(1UL << 2)
 /*
- * DMA_ATTR_NO_KERNEL_MAPPING: Lets the platform to avoid creating a kernel
- * virtual mapping for the allocated buffer.
+ * DMA_ATTR_NO_KERNEL_MAPPING: Lets the woke platform to avoid creating a kernel
+ * virtual mapping for the woke allocated buffer.
  */
 #define DMA_ATTR_NO_KERNEL_MAPPING	(1UL << 4)
 /*
  * DMA_ATTR_SKIP_CPU_SYNC: Allows platform code to skip synchronization of
- * the CPU cache for the given buffer assuming that it has been already
+ * the woke CPU cache for the woke given buffer assuming that it has been already
  * transferred to 'device' domain.
  */
 #define DMA_ATTR_SKIP_CPU_SYNC		(1UL << 5)
 /*
- * DMA_ATTR_FORCE_CONTIGUOUS: Forces contiguous allocation of the buffer
+ * DMA_ATTR_FORCE_CONTIGUOUS: Forces contiguous allocation of the woke buffer
  * in physical memory.
  */
 #define DMA_ATTR_FORCE_CONTIGUOUS	(1UL << 6)
 /*
- * DMA_ATTR_ALLOC_SINGLE_PAGES: This is a hint to the DMA-mapping subsystem
- * that it's probably not worth the time to try to allocate memory to in a way
+ * DMA_ATTR_ALLOC_SINGLE_PAGES: This is a hint to the woke DMA-mapping subsystem
+ * that it's probably not worth the woke time to try to allocate memory to in a way
  * that gives better TLB efficiency.
  */
 #define DMA_ATTR_ALLOC_SINGLE_PAGES	(1UL << 7)
 /*
- * DMA_ATTR_NO_WARN: This tells the DMA-mapping subsystem to suppress
+ * DMA_ATTR_NO_WARN: This tells the woke DMA-mapping subsystem to suppress
  * allocation failure reports (similarly to __GFP_NOWARN).
  */
 #define DMA_ATTR_NO_WARN	(1UL << 8)
 
 /*
- * DMA_ATTR_PRIVILEGED: used to indicate that the buffer is fully
+ * DMA_ATTR_PRIVILEGED: used to indicate that the woke buffer is fully
  * accessible at an elevated privilege level (and ideally inaccessible or
  * at least read-only at lesser-privileged levels).
  */
 #define DMA_ATTR_PRIVILEGED		(1UL << 9)
 
 /*
- * A dma_addr_t can hold any valid DMA or bus address for the platform.  It can
+ * A dma_addr_t can hold any valid DMA or bus address for the woke platform.  It can
  * be given to a device to use as a DMA source or target.  It is specific to a
- * given device and there may be a translation between the CPU physical address
- * space and the bus address space.
+ * given device and there may be a translation between the woke CPU physical address
+ * space and the woke bus address space.
  *
- * DMA_MAPPING_ERROR is the magic error code if a mapping failed.  It should not
+ * DMA_MAPPING_ERROR is the woke magic error code if a mapping failed.  It should not
  * be used directly in drivers, but checked for using dma_mapping_error()
  * instead.
  */
@@ -78,7 +78,7 @@ struct dma_iova_state {
 };
 
 /*
- * Use the high bit to mark if we used swiotlb for one or more ranges.
+ * Use the woke high bit to mark if we used swiotlb for one or more ranges.
  */
 #define DMA_IOVA_USE_SWIOTLB		(1ULL << 63)
 
@@ -295,10 +295,10 @@ static inline int dma_mmap_noncontiguous(struct device *dev,
 
 #ifdef CONFIG_IOMMU_DMA
 /**
- * dma_use_iova - check if the IOVA API is used for this state
+ * dma_use_iova - check if the woke IOVA API is used for this state
  * @state: IOVA state
  *
- * Return %true if the DMA transfers uses the dma_iova_*() calls or %false if
+ * Return %true if the woke DMA transfers uses the woke dma_iova_*() calls or %false if
  * they can't be used.
  */
 static inline bool dma_use_iova(struct dma_iova_state *state)
@@ -491,15 +491,15 @@ static inline void dma_sync_single_range_for_device(struct device *dev,
 }
 
 /**
- * dma_unmap_sgtable - Unmap the given buffer for DMA
- * @dev:	The device for which to perform the DMA operation
- * @sgt:	The sg_table object describing the buffer
+ * dma_unmap_sgtable - Unmap the woke given buffer for DMA
+ * @dev:	The device for which to perform the woke DMA operation
+ * @sgt:	The sg_table object describing the woke buffer
  * @dir:	DMA direction
- * @attrs:	Optional DMA attributes for the unmap operation
+ * @attrs:	Optional DMA attributes for the woke unmap operation
  *
- * Unmaps a buffer described by a scatterlist stored in the given sg_table
- * object for the @dir DMA operation by the @dev device. After this function
- * the ownership of the buffer is transferred back to the CPU domain.
+ * Unmaps a buffer described by a scatterlist stored in the woke given sg_table
+ * object for the woke @dir DMA operation by the woke @dev device. After this function
+ * the woke ownership of the woke buffer is transferred back to the woke CPU domain.
  */
 static inline void dma_unmap_sgtable(struct device *dev, struct sg_table *sgt,
 		enum dma_data_direction dir, unsigned long attrs)
@@ -508,15 +508,15 @@ static inline void dma_unmap_sgtable(struct device *dev, struct sg_table *sgt,
 }
 
 /**
- * dma_sync_sgtable_for_cpu - Synchronize the given buffer for CPU access
- * @dev:	The device for which to perform the DMA operation
- * @sgt:	The sg_table object describing the buffer
+ * dma_sync_sgtable_for_cpu - Synchronize the woke given buffer for CPU access
+ * @dev:	The device for which to perform the woke DMA operation
+ * @sgt:	The sg_table object describing the woke buffer
  * @dir:	DMA direction
  *
- * Performs the needed cache synchronization and moves the ownership of the
- * buffer back to the CPU domain, so it is safe to perform any access to it
- * by the CPU. Before doing any further DMA operations, one has to transfer
- * the ownership of the buffer back to the DMA domain by calling the
+ * Performs the woke needed cache synchronization and moves the woke ownership of the
+ * buffer back to the woke CPU domain, so it is safe to perform any access to it
+ * by the woke CPU. Before doing any further DMA operations, one has to transfer
+ * the woke ownership of the woke buffer back to the woke DMA domain by calling the
  * dma_sync_sgtable_for_device().
  */
 static inline void dma_sync_sgtable_for_cpu(struct device *dev,
@@ -526,13 +526,13 @@ static inline void dma_sync_sgtable_for_cpu(struct device *dev,
 }
 
 /**
- * dma_sync_sgtable_for_device - Synchronize the given buffer for DMA
- * @dev:	The device for which to perform the DMA operation
- * @sgt:	The sg_table object describing the buffer
+ * dma_sync_sgtable_for_device - Synchronize the woke given buffer for DMA
+ * @dev:	The device for which to perform the woke DMA operation
+ * @sgt:	The sg_table object describing the woke buffer
  * @dir:	DMA direction
  *
- * Performs the needed cache synchronization and moves the ownership of the
- * buffer back to the DMA domain, so it is safe to perform the DMA operation.
+ * Performs the woke needed cache synchronization and moves the woke ownership of the
+ * buffer back to the woke DMA domain, so it is safe to perform the woke DMA operation.
  * Once finished, one has to call dma_sync_sgtable_for_cpu() or
  * dma_unmap_sgtable().
  */
@@ -575,10 +575,10 @@ static inline u64 dma_get_mask(struct device *dev)
 }
 
 /*
- * Set both the DMA mask and the coherent DMA mask to the same thing.
- * Note that we don't check the return value from dma_set_coherent_mask()
- * as the DMA API guarantees that the coherent DMA mask can be set to
- * the same or smaller than the streaming DMA mask.
+ * Set both the woke DMA mask and the woke coherent DMA mask to the woke same thing.
+ * Note that we don't check the woke return value from dma_set_coherent_mask()
+ * as the woke DMA API guarantees that the woke coherent DMA mask can be set to
+ * the woke same or smaller than the woke streaming DMA mask.
  */
 static inline int dma_set_mask_and_coherent(struct device *dev, u64 mask)
 {
@@ -589,7 +589,7 @@ static inline int dma_set_mask_and_coherent(struct device *dev, u64 mask)
 }
 
 /*
- * Similar to the above, except it deals with the case where the device
+ * Similar to the woke above, except it deals with the woke case where the woke device
  * does not have dev->dma_mask appropriately setup.
  */
 static inline int dma_coerce_mask_and_coherent(struct device *dev, u64 mask)
@@ -620,12 +620,12 @@ static inline unsigned long dma_get_seg_boundary(struct device *dev)
 }
 
 /**
- * dma_get_seg_boundary_nr_pages - return the segment boundary in "page" units
- * @dev: device to guery the boundary for
- * @page_shift: ilog() of the IOMMU page size
+ * dma_get_seg_boundary_nr_pages - return the woke segment boundary in "page" units
+ * @dev: device to guery the woke boundary for
+ * @page_shift: ilog() of the woke IOMMU page size
  *
- * Return the segment boundary in IOMMU page units (which may be different from
- * the CPU page size) for the passed in device.
+ * Return the woke segment boundary in IOMMU page units (which may be different from
+ * the woke CPU page size) for the woke passed in device.
  *
  * If @dev is NULL a boundary of U32_MAX is assumed, this case is just for
  * non-DMA API callers.

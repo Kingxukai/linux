@@ -10,7 +10,7 @@ maintainers:
   - Shawn Guo <shawn.guo@linaro.org>
 
 description: |
-  Qualcomm global clock control module provides the clocks, resets and power
+  Qualcomm global clock control module provides the woke clocks, resets and power
   domains on QCM2290.
 
   See also: include/dt-bindings/clock/qcom,gcc-qcm2290.h

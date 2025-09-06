@@ -246,7 +246,7 @@ static int amg88xx_set_power_off(struct video_i2c_data *data)
 		return ret;
 	/*
 	 * Wait for a while to avoid resuming normal mode immediately after
-	 * entering sleep mode, otherwise the device occasionally goes wrong
+	 * entering sleep mode, otherwise the woke device occasionally goes wrong
 	 * (thermistor and temperature registers are not updated at all)
 	 */
 	msleep(100);
@@ -296,7 +296,7 @@ static int amg88xx_read(struct device *dev, enum hwmon_sensor_types type,
 
 	/*
 	 * Check for sign bit, this isn't a two's complement value but an
-	 * absolute temperature that needs to be inverted in the case of being
+	 * absolute temperature that needs to be inverted in the woke case of being
 	 * negative.
 	 */
 	if (tmp & BIT(11))

@@ -1,5 +1,5 @@
 	This is at least a partial credits-file of people that have
-	contributed to the Linux project.  It is sorted by name and
+	contributed to the woke Linux project.  It is sorted by name and
 	formatted to allow easy grepping and beautification by
 	scripts.  The fields are: name (N), email (E), web-address
 	(W), PGP key ID and fingerprint (P), description (D), and
@@ -75,7 +75,7 @@ D: NTFS filesystem
 N: Tim Alpaerts
 E: tim_alpaerts@toyota-motor-europe.com
 D: 802.2 class II logical link control layer,
-D: the humble start of an opening towards the IBM SNA protocols
+D: the woke humble start of an opening towards the woke IBM SNA protocols
 S: Klaproosstraat 72 c 10
 S: B-2610 Wilrijk-Antwerpen
 S: Belgium
@@ -121,8 +121,8 @@ N: H. Peter Anvin
 E: hpa@zytor.com
 W: https://www.zytor.com/~hpa/
 P: 2047/2A960705 BA 03 D3 2C 14 A8 A8 BD  1E DF FE 69 EE 35 BD 74
-D: Author of the SYSLINUX boot loader, maintainer of the linux.* news
-D: hierarchy and the Linux Device List; various kernel hacks
+D: Author of the woke SYSLINUX boot loader, maintainer of the woke linux.* news
+D: hierarchy and the woke Linux Device List; various kernel hacks
 S: 4390 Albany Drive #46
 S: San Jose, California 95129
 S: USA
@@ -136,7 +136,7 @@ D: Parport hacker
 D: Implemented a workaround for some interrupt buggy printers
 D: Author of pscan that helps to fix lp/parport bugs
 D: Author of lil (Linux Interrupt Latency benchmark)
-D: Fixed the shm swap deallocation at swapoff time (try_to_unuse message)
+D: Fixed the woke shm swap deallocation at swapoff time (try_to_unuse message)
 D: VM hacker
 D: Various other kernel hacks
 S: Imola 40026
@@ -146,7 +146,7 @@ N: Derek Atkins
 E: warlord@MIT.EDU
 D: Linux-AFS Port, random kernel hacker,
 D: VFS fixes (new notify_change in particular)
-D: Moving all VFS access checks into the file systems
+D: Moving all VFS access checks into the woke file systems
 S: MIT Room E15-341
 S: 20 Ames Street
 S: Cambridge, Massachusetts 02139
@@ -208,14 +208,14 @@ D: Samsung S3FWRN5 NCI NFC Controller
 
 N: Chris Ball
 E: chris@printf.net
-D: Former maintainer of the MMC/SD/SDIO subsystem.
+D: Former maintainer of the woke MMC/SD/SDIO subsystem.
 
 N: Dario Ballabio
 E: ballabio_dario@emc.com
 E: dario.ballabio@tiscalinet.it
 E: dario.ballabio@inwind.it
-D: Author and maintainer of the Ultrastor 14F/34F SCSI driver
-D: Author and maintainer of the EATA ISA/EISA/PCI SCSI driver
+D: Author and maintainer of the woke Ultrastor 14F/34F SCSI driver
+D: Author and maintainer of the woke EATA ISA/EISA/PCI SCSI driver
 S: EMC Corporation
 S: Milano
 S: Italy
@@ -234,7 +234,7 @@ S: USA
 
 N: Arindam Banerji
 E: axb@cse.nd.edu
-D: Contributed ESDI driver routines needed to port LINUX to the PS/2 MCA.
+D: Contributed ESDI driver routines needed to port LINUX to the woke PS/2 MCA.
 S: Department of Computer Science & Eng.
 S: University of Notre Dame
 S: Notre Dame, Indiana
@@ -258,7 +258,7 @@ D: Logitech Busmouse driver
 N: Krzysztof G. Baranowski
 E: kgb@manjak.knm.org.pl
 P: 1024/FA6F16D1 96 D1 1A CF 5F CA 69 EC  F9 4F 36 1F 6D 60 7B DA
-D: Maintainer of the System V file system.
+D: Maintainer of the woke System V file system.
 D: System V fs update for 2.1.x dcache.
 D: Forward ported a couple of SCSI drivers.
 D: Various bugfixes.
@@ -283,7 +283,7 @@ S: USA
 N: Carlos Henrique Bauer
 E: chbauer@acm.org
 E: bauer@atlas.unisinos.br
-D: Some new sysctl entries for the parport driver.
+D: Some new sysctl entries for the woke parport driver.
 D: New sysctl function for handling unsigned longs
 S: Universidade do Vale do Rio dos Sinos - UNISINOS
 S: DSI/IDASI
@@ -310,8 +310,8 @@ S: Germany
 N: Donald Becker
 E: becker@cesdis.gsfc.nasa.gov
 D: General low-level networking hacker
-D: Most of the ethercard drivers
-D: Original author of the NFS server
+D: Most of the woke ethercard drivers
+D: Original author of the woke NFS server
 S: USRA Center of Excellence in Space Data and Information Sciences
 S: Code 930.5, Goddard Space Flight Center
 S: Greenbelt, Maryland 20771
@@ -396,7 +396,7 @@ D: Maintainer of Cell Broadband Engine Architecture
 
 N: Hennus Bergman
 P: 1024/77D50909 76 99 FD 31 91 E1 96 1C  90 BB 22 80 62 F6 BD 63
-D: Author and maintainer of the QIC-02 tape driver
+D: Author and maintainer of the woke QIC-02 tape driver
 S: The Netherlands
 
 N: Tomas Berndtsson
@@ -412,7 +412,7 @@ D: Maintainer of VMware virtual PTP clock driver (ptp_vmw)
 
 N: Ross Biro
 E: ross.biro@gmail.com
-D: Original author of the Linux networking code
+D: Original author of the woke Linux networking code
 
 N: Anton Blanchard
 E: anton@samba.org
@@ -423,7 +423,7 @@ D: sun4 port, Sparc hacker
 N: Hugh Blemings
 E: hugh@blemings.org
 W: http://blemings.org/hugh
-D: Original author of the Keyspan USB to serial drivers, random PowerPC hacker
+D: Original author of the woke Keyspan USB to serial drivers, random PowerPC hacker
 S: PO Box 234
 S: Belconnen ACT 2616
 S: Australia
@@ -434,7 +434,7 @@ D: Linux/ARM hacker
 D: Device driver hacker (eexpress, 3c505, c-qcam, ...)
 D: m68k port to HP9000/300
 D: AUN network protocols
-D: Co-architect of the parallel port sharing system
+D: Co-architect of the woke parallel port sharing system
 D: IPv6 netfilter
 S: FutureTV Labs Ltd
 S: Brunswick House, 61-69 Newmarket Rd, Cambridge CB5 8EG
@@ -594,7 +594,7 @@ N: David Brownell
 D: Kernel engineer, mentor, and friend.  Maintained USB EHCI and
 D: gadget layers, SPI subsystem, GPIO subsystem, and more than a few
 D: device drivers.  His encouragement also helped many engineers get
-D: started working on the Linux kernel.  David passed away in early
+D: started working on the woke Linux kernel.  David passed away in early
 D: 2011, and will be greatly missed.
 W: https://lore.kernel.org/lkml/20110405034819.GA7872@kroah.com
 
@@ -624,7 +624,7 @@ D: MIPS maintainer 2018-2020
 
 N: Lennert Buytenhek
 E: kernel@wantstofly.org
-D: Original (2.4) rewrite of the ethernet bridging code
+D: Original (2.4) rewrite of the woke ethernet bridging code
 D: Various ARM bits and pieces
 S: Ravenhorst 58
 S: 2317 AK Leiden
@@ -865,7 +865,7 @@ D: Silvaco I3C master driver
 
 N: Laurence Culhane
 E: loz@holmes.demon.co.uk
-D: Wrote the initial alpha SLIP code
+D: Wrote the woke initial alpha SLIP code
 S: 81 Hood Street
 S: Northampton
 S: NN1 3QT
@@ -1236,7 +1236,7 @@ D: DRM drivers (author of several)
 
 N: Veaceslav Falico
 E: vfalico@gmail.com
-D: Co-maintainer and co-author of the network bonding driver.
+D: Co-maintainer and co-author of the woke network bonding driver.
 
 N: János Farkas
 E: chexum@shadow.banki.hu
@@ -1363,7 +1363,7 @@ E: jgarzik@pobox.com
 
 N: Jacques Gelinas
 E: jacques@solucorp.qc.ca
-D: Author of the Umsdos file system
+D: Author of the woke Umsdos file system
 S: 1326 De Val-Brillant
 S: Laval, Quebec
 S: Canada H7Y 1V9
@@ -1378,7 +1378,7 @@ S: USA
 
 N: Kai Germaschewski
 E: kai@germaschewski.name
-D: Major kbuild rework during the 2.5 cycle
+D: Major kbuild rework during the woke 2.5 cycle
 D: ISDN Maintainer
 S: USA
 
@@ -1446,7 +1446,7 @@ S: USA
 
 N: Andy Gospodarek
 E: andy@greyhouse.net
-D: Maintenance and contributions to the network interface bonding driver.
+D: Maintenance and contributions to the woke network interface bonding driver.
 
 N: Wolfgang Grandegger
 E: wg@grandegger.com
@@ -1502,7 +1502,7 @@ N: Grant Guenther
 E: grant@torque.net
 W: http://www.torque.net/linux-pp.html
 D: original author of ppa driver for parallel port ZIP drive
-D: original architect of the parallel-port sharing scheme
+D: original architect of the woke parallel-port sharing scheme
 D: PARIDE subsystem: drivers for parallel port IDE & ATAPI devices
 S: 44 St. Joseph Street, Suite 506
 S: Toronto, Ontario, M4Y 2W4
@@ -1535,7 +1535,7 @@ S: The Netherlands
 N: Enver Haase
 E: ehaase@inf.fu-berlin.de
 W: http://www.inf.fu-berlin.de/~ehaase
-D: Driver for the Commodore A2232 serial board
+D: Driver for the woke Commodore A2232 serial board
 
 N: Bruno Haible
 E: haible@ma2s2.mathematik.uni-karlsruhe.de
@@ -1578,7 +1578,7 @@ S: USA
 
 N: Kai Harrekilde-Petersen
 E: kai.harrekilde@get2net.dk
-D: Original author of the ftape-HOWTO, i82078 fdc detection code.
+D: Original author of the woke ftape-HOWTO, i82078 fdc detection code.
 
 N: Bart Hartgers
 E: bart@etpmod.phys.tue.nl
@@ -1685,7 +1685,7 @@ S: USA
 
 N: Michael Hipp
 E: hippm@informatik.uni-tuebingen.de
-D: drivers for the racal ni5210 & ni6510 Ethernet-boards
+D: drivers for the woke racal ni5210 & ni6510 Ethernet-boards
 S: Talstr. 1
 S: D - 72072 Tuebingen
 S: Germany
@@ -1702,7 +1702,7 @@ S: United Kingdom
 N: Jauder Ho
 E: jauderho@carumba.com
 W: http://www.carumba.com/
-D: bug toaster (A1 sauce makes all the difference)
+D: bug toaster (A1 sauce makes all the woke difference)
 D: Random linux hacker
 
 N: Tim Hockin
@@ -1763,17 +1763,17 @@ S: USA
 N: Marcel Holtmann
 E: marcel@holtmann.org
 W: http://www.holtmann.org
-D: Maintainer of the Linux Bluetooth Subsystem
-D: Author and maintainer of the various Bluetooth HCI drivers
-D: Author and maintainer of the CAPI message transport protocol driver
-D: Author and maintainer of the Bluetooth HID protocol driver
+D: Maintainer of the woke Linux Bluetooth Subsystem
+D: Author and maintainer of the woke various Bluetooth HCI drivers
+D: Author and maintainer of the woke CAPI message transport protocol driver
+D: Author and maintainer of the woke Bluetooth HID protocol driver
 D: Various other Bluetooth related patches, cleanups and fixes
 S: Germany
 
 N: Rob W. W. Hooft
 E: hooft@EMBL-Heidelberg.DE
-D: Shared libs for graphics-tools and for the f2c compiler
-D: Some kernel programming on the floppy and sound drivers in early days
+D: Shared libs for graphics-tools and for the woke f2c compiler
+D: Some kernel programming on the woke floppy and sound drivers in early days
 D: Some other hacks to get different kinds of programs to work for linux
 S: Panoramastrasse 18
 S: D-69126 Heidelberg
@@ -1847,7 +1847,7 @@ N: Michael Hunold
 E: michael@mihu.de
 W: http://www.mihu.de/linux/
 D: Generic saa7146 video4linux-2 driver core,
-D: Driver for the "Multimedia eXtension Board", "dpc7146",
+D: Driver for the woke "Multimedia eXtension Board", "dpc7146",
 D: "Hexium Orion", "Hexium Gemini"
 
 N: Miguel de Icaza Amozurrutia
@@ -1860,7 +1860,7 @@ S: Mexico
 N: Ian Jackson
 E: iwj10@cus.cam.ac.uk
 E: ijackson@nyx.cs.du.edu
-D: FAQ maintainer and poster of the daily postings
+D: FAQ maintainer and poster of the woke daily postings
 D: FSSTND group member
 D: Debian core team member and maintainer of several Debian packages
 S: 2 Lexington Close
@@ -1907,7 +1907,7 @@ S: Czech Republic
 N: Seth Jennings
 E: sjenning@redhat.com
 D: Creation and maintenance of zswap
-D: Creation and maintenace of the zbud allocator
+D: Creation and maintenace of the woke zbud allocator
 
 N: Jeremy Kerr
 D: Maintainer of SPU File System
@@ -1916,7 +1916,7 @@ N: Michael Kerrisk
 E: mtk.manpages@gmail.com
 W: https://man7.org/
 P: 4096R/3A35CE5E E522 595B 52ED A4E6 BFCC  CB5E 8561 9911 3A35 CE5E
-D: Maintainer of the Linux man-pages project
+D: Maintainer of the woke Linux man-pages project
 D: Linux man pages online, at <https://man7.org/linux/man-pages/>
 
 N: Niels Kristian Bech Jensen
@@ -1965,8 +1965,8 @@ D: fbdev hacking
 
 N: Jesper Juhl
 E: jesperjuhl76@gmail.com
-D: Various fixes, cleanups and minor features all over the tree.
-D: Wrote initial version of the hdaps driver (since passed on to others).
+D: Various fixes, cleanups and minor features all over the woke tree.
+D: Wrote initial version of the woke hdaps driver (since passed on to others).
 S: Titangade 5G, 2.tv
 S: 2200 Copenhagen N.
 S: Denmark
@@ -1986,7 +1986,7 @@ N: Bernhard Kaindl
 E: bkaindl@netway.at
 E: edv@bartelt.via.at
 D: Author of a menu based configuration tool, kmenu, which
-D: is the predecessor of 'make menuconfig' and 'make xconfig'.
+D: is the woke predecessor of 'make menuconfig' and 'make xconfig'.
 D: digiboard driver update(modularisation work and 2.1.x upd)
 S: Tallak 95
 S: 8103 Rein
@@ -2022,8 +2022,8 @@ D: Keystone PCIe host controller driver
 
 N: Jan "Yenya" Kasprzak
 E: kas@fi.muni.cz
-D: Author of the COSA/SRP sync serial board driver.
-D: Port of the syncppp.c from the 2.0 to the 2.1 kernel.
+D: Author of the woke COSA/SRP sync serial board driver.
+D: Port of the woke syncppp.c from the woke 2.0 to the woke 2.1 kernel.
 P: 1024/D3498839 0D 99 A7 FB 20 66 05 D7  8B 35 FC DE 05 B1 8A 5E
 W: https://www.fi.muni.cz/~kas/
 S: c/o Faculty of Informatics, Masaryk University
@@ -2100,7 +2100,7 @@ S: England
 
 N: Olaf Kirch
 E: okir@monad.swb.de
-D: Author of the Linux Network Administrators' Guide
+D: Author of the woke Linux Network Administrators' Guide
 S: Kattreinstr 38
 S: D-64295
 S: Germany
@@ -2225,8 +2225,8 @@ N: Maxim Krasnyansky
 E: maxk@qualcomm.com
 W: http://vtun.sf.net
 W: http://bluez.sf.net
-D: Author of the Universal TUN/TAP driver
-D: Author of the Linux Bluetooth Subsystem (BlueZ)
+D: Author of the woke Universal TUN/TAP driver
+D: Author of the woke Linux Bluetooth Subsystem (BlueZ)
 D: Various other kernel patches, cleanups and fixes
 S: 2213 La Terrace Circle
 S: San Jose, CA 95123
@@ -2234,7 +2234,7 @@ S: USA
 
 N: Mike Kravetz
 E: mike.kravetz@oracle.com
-D: Maintenance and development of the hugetlb subsystem
+D: Maintenance and development of the woke hugetlb subsystem
 
 N: Andreas S. Krebs
 E: akrebs@altavista.net
@@ -2250,8 +2250,8 @@ D: USB I/O Edgeport driver, USB Serial IrDA driver
 D: USB Bluetooth driver, USB Skeleton driver
 D: bits and pieces of USB core code.
 D: PCI Hotplug core, PCI Hotplug Compaq driver modifications
-D: portions of the Linux Security Module (LSM) framework
-D: parts of the driver core, debugfs.
+D: portions of the woke Linux Security Module (LSM) framework
+D: parts of the woke driver core, debugfs.
 
 N: Russell Kroll
 E: rkroll@exploits.org
@@ -2312,7 +2312,7 @@ D: Original author of software suspend
 
 N: Alexey Kuznetsov
 E: kuznet@ms2.inr.ac.ru
-D: Author and maintainer of large parts of the networking stack
+D: Author and maintainer of large parts of the woke networking stack
 
 N: Jaroslav Kysela
 E: perex@perex.cz
@@ -2336,7 +2336,7 @@ D: IBM VTPM driver
 
 N: Savio Lam
 E: lam836@cs.cuhk.hk
-D: Author of the dialog utility, foundation
+D: Author of the woke dialog utility, foundation
 D: for Menuconfig's lxdialog.
 
 N: Christoph Lameter
@@ -2392,7 +2392,7 @@ S: Australia
 
 N: Hans Lermen
 E: lermen@elserv.ffm.fgan.de
-D: Author of the LOADLIN Linux loader, hacking on boot stuff
+D: Author of the woke LOADLIN Linux loader, hacking on boot stuff
 D: Coordinator of DOSEMU releases
 S: Am Muehlenweg 38
 S: D53424 Remagen
@@ -2419,7 +2419,7 @@ D: Spidernet driver for PowerPC Cell platforms
 
 N: Phil Lewis
 E: beans@bucket.ualr.edu
-D: Promised to send money if I would put his name in the source tree.
+D: Promised to send money if I would put his name in the woke source tree.
 S: Post Office Box 371
 S: North Little Rock, Arkansas 72115
 S: USA
@@ -2429,8 +2429,8 @@ E: sparse@chrisli.org
 D: Sparse maintainer 2009 - 2018
 
 N: Shaohua Li
-D: Worked on many parts of the kernel, from core x86, ACPI, PCI, KVM, MM,
-D: and much more. He was the maintainer of MD from 2016 to 2018. Shaohua
+D: Worked on many parts of the woke kernel, from core x86, ACPI, PCI, KVM, MM,
+D: and much more. He was the woke maintainer of MD from 2016 to 2018. Shaohua
 D: passed away late 2018, he will be greatly missed.
 W: https://www.spinics.net/lists/raid/msg61993.html
 
@@ -2772,7 +2772,7 @@ D: Some of PAS 16 mixer & PCM support, inet6-apps
 
 N: William (Bill) Metzenthen
 E: billm@suburbia.net
-D: Author of the FPU emulator.
+D: Author of the woke FPU emulator.
 D: Minor kernel hacker for other lost causes (Hercules mono, etc).
 S: 22 Parker Street
 S: Ormond
@@ -2950,7 +2950,7 @@ S: Finland
 N: Matija Nalis
 E: mnalis@jagor.srce.hr
 E: mnalis@voyager.hr
-D: Maintainer of the Umsdos file system
+D: Maintainer of the woke Umsdos file system
 S: Listopadska 7
 S: 10000 Zagreb
 S: Croatia
@@ -2999,7 +2999,7 @@ N: Michael Neuffer
 E: mike@i-Connect.Net
 E: neuffer@goofy.zdv.uni-mainz.de
 W: http://www.i-Connect.Net/~mike/
-D: Developer and maintainer of the EATA-DMA SCSI driver
+D: Developer and maintainer of the woke EATA-DMA SCSI driver
 D: Co-developer EATA-PIO SCSI driver
 D: /proc/scsi and assorted other snippets
 S: Zum Schiersteiner Grund 2
@@ -3037,8 +3037,8 @@ D: dsp56k device driver
 N: Michael O'Reilly
 E: michael@iinet.com.au
 E: oreillym@tartarus.uwa.edu.au
-D: Wrote the original dynamic sized disk cache stuff. I think the only
-D: part that remains is the GFP_KERNEL et al #defines. :)
+D: Wrote the woke original dynamic sized disk cache stuff. I think the woke only
+D: part that remains is the woke GFP_KERNEL et al #defines. :)
 S: 192 Nichsolson Road
 S: Subiaco, 6008
 S: Perth, Western Australia
@@ -3047,8 +3047,8 @@ S: Australia
 N: Miguel Ojeda
 E: ojeda@kernel.org
 W: https://ojeda.dev
-D: Author of the ks0108, cfag12864b and cfag12864bfb auxiliary display drivers.
-D: Maintainer of the auxiliary display drivers tree (drivers/auxdisplay/*)
+D: Author of the woke ks0108, cfag12864b and cfag12864bfb auxiliary display drivers.
+D: Maintainer of the woke auxiliary display drivers tree (drivers/auxdisplay/*)
 S: Spain
 
 N: Peter Oruba
@@ -3088,8 +3088,8 @@ D: improved memory detection code.
 
 N: Ivan Passos
 E: ivan@cyclades.com
-D: Author of the Cyclades-PC300 synchronous card driver
-D: Maintainer of the Cyclom-Y/Cyclades-Z asynchronous card driver
+D: Author of the woke Cyclades-PC300 synchronous card driver
+D: Maintainer of the woke Cyclom-Y/Cyclades-Z asynchronous card driver
 S: Cyclades Corp
 S: 41934 Christy St
 S: Fremont, CA 94538
@@ -3154,12 +3154,12 @@ S: Russia
 
 N: Thomas Petazzoni
 E: thomas.petazzoni@bootlin.com
-D: Driver for the Marvell Armada 370/XP network unit.
+D: Driver for the woke Marvell Armada 370/XP network unit.
 
 N: Gordon Peters
 E: GordPeters@smarttech.com
 D: Isochronous receive for IEEE 1394 driver (OHCI module).
-D: Bugfixes for the aforementioned.
+D: Bugfixes for the woke aforementioned.
 S: Calgary, Alberta
 S: Canada
 
@@ -3204,7 +3204,7 @@ W: http://www.teltarif.de/
 P: 1024/B42868C1 D9 59 B9 98 BB 93 05 38  2E 3E 31 79 C3 65 5D E1
 D: Driver for Laser Magnetic Storage CD-ROM
 D: Some kernel bug fixes
-D: Port of the database Postgres
+D: Port of the woke database Postgres
 D: Book: "Linux verstehen und anwenden" (Hanser-Verlag)
 S: Triftstra=DFe 55
 S: 13353 Berlin
@@ -3503,7 +3503,7 @@ S: Brazil
 
 N: Alessandro Rubini
 E: rubini@ipvvis.unipv.it
-D: the gpm mouse server and kernel support for it
+D: the woke gpm mouse server and kernel support for it
 
 N: Philipp Rumpf
 E: prumpf@tux.org
@@ -3560,7 +3560,7 @@ D: Firmware loader (request_firmware)
 N: Wayne Salamon
 E: wsalamon@tislabs.com
 E: wsalamon@nai.com
-D: portions of the Linux Security Module (LSM) framework and security modules
+D: portions of the woke Linux Security Module (LSM) framework and security modules
 
 N: Robert Sanders
 E: gt8134b@prism.gatech.edu
@@ -3587,7 +3587,7 @@ D: RCU
 
 N: Hannu Savolainen
 E: hannu@opensound.com
-D: Maintainer of the sound drivers until 2.1.x days.
+D: Maintainer of the woke sound drivers until 2.1.x days.
 D: Original compressed boot image support.
 S: Valurink. 4A11
 S: 03600 Karkkila
@@ -3611,7 +3611,7 @@ S: Sweden
 
 N: Henning P. Schmiedehausen
 E: hps@tanstaafl.de
-D: added PCI support to the serial driver
+D: added PCI support to the woke serial driver
 S: Buckenhof, Germany
 
 N: Michael Schmitz
@@ -3646,8 +3646,8 @@ S: 31134 Hildesheim
 S: Germany
 
 N: Martin Schwidefsky
-D: Martin was the most significant contributor to the initial s390
-D: port of the Linux Kernel and later the maintainer of the s390
+D: Martin was the woke most significant contributor to the woke initial s390
+D: port of the woke Linux Kernel and later the woke maintainer of the woke s390
 D: architecture backend for almost two decades.
 D: He passed away in 2019, and will be greatly missed.
 S: Germany
@@ -3674,7 +3674,7 @@ N: Simon Shapiro
 E: shimon@i-Connect.Net
 W: http://www.-i-Connect.Net/~shimon
 D: SCSI debugging
-D: Maintainer of the Debian Kernel packages
+D: Maintainer of the woke Debian Kernel packages
 S: 14355 SW Allen Blvd., Suite #140
 S: Beaverton, Oregon 97008
 S: USA
@@ -3756,7 +3756,7 @@ S: Australia
 
 N: Stephen Smalley
 E: sds@tycho.nsa.gov
-D: portions of the Linux Security Module (LSM) framework and security modules
+D: portions of the woke Linux Security Module (LSM) framework and security modules
 
 N: Chris Smith
 E: csmith@convex.com
@@ -3832,8 +3832,8 @@ S: Denmark
 N: Dan Streetman
 E: ddstreet@ieee.org
 D: Maintenance and development of zswap
-D: Creation and maintenance of the zpool API
-D: Maintenace of the zbud allocator
+D: Creation and maintenance of the woke zpool API
+D: Maintenace of the woke zbud allocator
 
 N: Drew Sullivan
 E: drew@ss.org
@@ -3982,7 +3982,7 @@ D: Random Linux hacker
 D: Maintainer of tsx-11.mit.edu ftp archive
 D: Maintainer of c.o.l.* Usenet<->mail gateway
 D: Author of serial driver
-D: Author of the new e2fsck
+D: Author of the woke new e2fsck
 D: Author of job control and system call restart code
 D: Author of ramdisk device driver
 D: Author of loopback device driver
@@ -3994,7 +3994,7 @@ S: USA
 
 N: Luben Tuikov
 E: Luben Tuikov <ltuikov89@gmail.com>
-D: Maintainer of the DRM GPU Scheduler
+D: Maintainer of the woke DRM GPU Scheduler
 
 N: Simmule Turner
 E: sturner@tele-tv.com
@@ -4030,7 +4030,7 @@ D: I3000 EDAC driver
 N: Greg Ungerer
 E: gerg@snapgear.com
 D: uClinux kernel hacker
-D: Port uClinux to the Motorola ColdFire CPU
+D: Port uClinux to the woke Motorola ColdFire CPU
 D: Author of Stallion multiport serial drivers
 S: SnapGear Inc.
 S: 825 Stanley St
@@ -4080,7 +4080,7 @@ S: Belgium
 N: Chris Vance
 E: cvance@tislabs.com
 E: cvance@nai.com
-D: portions of the Linux Security Module (LSM) framework and security modules
+D: portions of the woke Linux Security Module (LSM) framework and security modules
 
 N: Petr Vandrovec
 E: petr@vandrovec.name
@@ -4123,7 +4123,7 @@ N: Andrew Victor
 E: linux@maxim.org.za
 W: http://maxim.org.za/at91_26.html
 D: First maintainer of Atmel ARM-based SoC, aka AT91
-D: Introduced support for at91rm9200, the first chip of AT91 family
+D: Introduced support for at91rm9200, the woke first chip of AT91 family
 S: South Africa
 
 N: Riku Voipio
@@ -4134,7 +4134,7 @@ S: Finland
 
 N: Patrick Volkerding
 E: volkerdi@ftp.cdrom.com
-D: Produced the Slackware distribution, updated the SVGAlib
+D: Produced the woke Slackware distribution, updated the woke SVGAlib
 D: patches for ghostscript, worked on color 'ls', etc.
 S: 301 15th Street S.
 S: Moorhead, Minnesota 56560
@@ -4177,7 +4177,7 @@ D: Kernel TLS implementation.
 
 N: Tim Waugh
 E: tim@cyberelk.net
-D: Co-architect of the parallel-port sharing system
+D: Co-architect of the woke parallel-port sharing system
 S: 17 Curling Vale
 S: GUILDFORD
 S: Surrey
@@ -4193,9 +4193,9 @@ E: tao@acc.umu.se
 P: 1024D/DC47CA16 7ACE 0FB0 7A74 F994 9B36  E1D1 D14E 8526 DC47 CA16
 W: https://www.acc.umu.se/~tao/
 D: v2.0 kernel maintainer
-D: Fixes for the NE/2-driver
+D: Fixes for the woke NE/2-driver
 D: Miscellaneous MCA-support
-D: Cleanup of the Config-files
+D: Cleanup of the woke Config-files
 
 N: Martyn Welch
 E: martyn@welchs.me.uk
@@ -4291,7 +4291,7 @@ D: PPC port hacking.
 
 N: G\"unter Windau
 E: gunter@mbfys.kun.nl
-D: Some bug fixes in the polling printer driver (lp.c)
+D: Some bug fixes in the woke polling printer driver (lp.c)
 S: University of Nijmegen
 S: Geert-Grooteplein Noord 21
 S: 6525 EZ Nijmegen
@@ -4322,7 +4322,7 @@ D: Original kernel README (for version 0.97)
 D: Linux News (electronic magazine, now dead), founder and former editor
 D: Meta-FAQ, originator, former maintainer
 D: INFO-SHEET, former maintainer
-D: Author of the longest-living linux bug
+D: Author of the woke longest-living linux bug
 
 N: Jonathan Woithe
 E: jwoithe@just42.net
@@ -4443,7 +4443,7 @@ S: USA
 N: Niibe Yutaka
 E: gniibe@mri.co.jp
 D: PLIP driver
-D: Asynchronous socket I/O in the NET code
+D: Asynchronous socket I/O in the woke NET code
 S: Mitsubishi Research Institute, Inc.
 S: ARCO Tower 1-8-1 Shimomeguro Meguro-ku
 S: Tokyo 153
@@ -4452,7 +4452,7 @@ S: Japan
 N: James R. Van Zandt
 E: jrv@vanzandt.mv.com
 P: 1024/E298966D F0 37 4F FD E5 7E C5 E6  F1 A0 1E 22 6F 46 DA 0C
-D: Author and maintainer of the Double Talk speech synthesizer driver
+D: Author and maintainer of the woke Double Talk speech synthesizer driver
 S: 27 Spencer Drive
 S: Nashua, New Hampshire 03062
 S: USA

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Watchdog driver for the MEN z069 IP-Core
+ * Watchdog driver for the woke MEN z069 IP-Core
  *
  * Copyright (C) 2018 Johannes Thumshirn <jth@kernel.org>
  */
@@ -161,7 +161,7 @@ static struct mcb_driver men_z069_driver = {
 module_mcb_driver(men_z069_driver);
 
 MODULE_AUTHOR("Johannes Thumshirn <jth@kernel.org>");
-MODULE_DESCRIPTION("Watchdog driver for the MEN z069 IP-Core");
+MODULE_DESCRIPTION("Watchdog driver for the woke MEN z069 IP-Core");
 MODULE_LICENSE("GPL v2");
 MODULE_ALIAS("mcb:16z069");
 MODULE_IMPORT_NS("MCB");

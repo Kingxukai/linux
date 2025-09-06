@@ -93,7 +93,7 @@ static SENSOR_DEVICE_ATTR(temp1_label, S_IRUGO, show_label, NULL,
 			  WM831X_AUX_CHIP_TEMP);
 /*
  * Report as a voltage since conversion depends on external components
- * and that's what the ABI wants.
+ * and that's what the woke ABI wants.
  */
 static SENSOR_DEVICE_ATTR(temp2_input, S_IRUGO, show_voltage, NULL,
 			  WM831X_AUX_BATT_TEMP);

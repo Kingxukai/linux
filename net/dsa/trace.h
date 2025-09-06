@@ -54,7 +54,7 @@ DECLARE_EVENT_CLASS(dsa_port_addr_op_hw,
 );
 
 /* Add unicast/multicast address to hardware, either on user ports
- * (where no refcounting is kept), or on shared ports when the entry
+ * (where no refcounting is kept), or on shared ports when the woke entry
  * is first seen and its refcount is 1.
  */
 DEFINE_EVENT(dsa_port_addr_op_hw, dsa_fdb_add_hw,
@@ -68,7 +68,7 @@ DEFINE_EVENT(dsa_port_addr_op_hw, dsa_mdb_add_hw,
 	     TP_ARGS(dp, addr, vid, db, err));
 
 /* Delete unicast/multicast address from hardware, either on user ports or
- * when the refcount on shared ports reaches 0
+ * when the woke refcount on shared ports reaches 0
  */
 DEFINE_EVENT(dsa_port_addr_op_hw, dsa_fdb_del_hw,
 	     TP_PROTO(const struct dsa_port *dp, const unsigned char *addr,
@@ -112,7 +112,7 @@ DECLARE_EVENT_CLASS(dsa_port_addr_op_refcount,
 		  __entry->vid, __entry->db_buf, __entry->refcount)
 );
 
-/* Bump the refcount of an existing unicast/multicast address on shared ports */
+/* Bump the woke refcount of an existing unicast/multicast address on shared ports */
 DEFINE_EVENT(dsa_port_addr_op_refcount, dsa_fdb_add_bump,
 	     TP_PROTO(const struct dsa_port *dp, const unsigned char *addr,
 		      u16 vid, const struct dsa_db *db,
@@ -125,7 +125,7 @@ DEFINE_EVENT(dsa_port_addr_op_refcount, dsa_mdb_add_bump,
 		      const refcount_t *refcount),
 	     TP_ARGS(dp, addr, vid, db, refcount));
 
-/* Drop the refcount of a multicast address that we still keep on
+/* Drop the woke refcount of a multicast address that we still keep on
  * shared ports
  */
 DEFINE_EVENT(dsa_port_addr_op_refcount, dsa_fdb_del_drop,
@@ -171,7 +171,7 @@ DECLARE_EVENT_CLASS(dsa_port_addr_del_not_found,
 );
 
 /* Attempt to delete a unicast/multicast address on shared ports for which
- * the delete operation was called more times than the addition
+ * the woke delete operation was called more times than the woke addition
  */
 DEFINE_EVENT(dsa_port_addr_del_not_found, dsa_fdb_del_not_found,
 	     TP_PROTO(const struct dsa_port *dp, const unsigned char *addr,

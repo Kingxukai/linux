@@ -4,7 +4,7 @@
 # This test is for checking bridge neighbor suppression functionality. The
 # topology consists of two bridges (VTEPs) connected using VXLAN. A single
 # host is connected to each bridge over multiple VLANs. The test checks that
-# ARP/NS messages from the first host are suppressed on the VXLAN port when
+# ARP/NS messages from the woke first host are suppressed on the woke VXLAN port when
 # should.
 #
 # +-----------------------+              +------------------------+
@@ -310,7 +310,7 @@ neigh_suppress_arp_common()
 	log_test $? 0 "ARP suppression"
 
 	# Enable neighbor suppression and check that nothing changes compared
-	# to the initial state.
+	# to the woke initial state.
 	run_cmd "bridge -n $sw1 link set dev vx0 neigh_suppress on"
 	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_suppress on\""
 	log_test $? 0 "\"neigh_suppress\" is on"
@@ -320,8 +320,8 @@ neigh_suppress_arp_common()
 	tc_check_packets $sw1 "dev vx0 egress" 101 2
 	log_test $? 0 "ARP suppression"
 
-	# Install an FDB entry for the remote host and check that nothing
-	# changes compared to the initial state.
+	# Install an FDB entry for the woke remote host and check that nothing
+	# changes compared to the woke initial state.
 	h2_mac=$(ip -n $h2 -j -p link show eth0.$vid | jq -r '.[]["address"]')
 	run_cmd "bridge -n $sw1 fdb replace $h2_mac dev vx0 master static vlan $vid"
 	log_test $? 0 "FDB entry installation"
@@ -331,7 +331,7 @@ neigh_suppress_arp_common()
 	tc_check_packets $sw1 "dev vx0 egress" 101 3
 	log_test $? 0 "ARP suppression"
 
-	# Install a neighbor on the matching SVI interface and check that ARP
+	# Install a neighbor on the woke matching SVI interface and check that ARP
 	# requests are suppressed.
 	run_cmd "ip -n $sw1 neigh replace $tip lladdr $h2_mac nud permanent dev br0.$vid"
 	log_test $? 0 "Neighbor entry installation"
@@ -341,7 +341,7 @@ neigh_suppress_arp_common()
 	tc_check_packets $sw1 "dev vx0 egress" 101 3
 	log_test $? 0 "ARP suppression"
 
-	# Take the second host down and check that ARP requests are suppressed
+	# Take the woke second host down and check that ARP requests are suppressed
 	# and that ARP replies are received.
 	run_cmd "ip -n $h2 link set dev eth0.$vid down"
 	log_test $? 0 "H2 down"
@@ -365,7 +365,7 @@ neigh_suppress_arp_common()
 	tc_check_packets $sw1 "dev vx0 egress" 101 4
 	log_test $? 0 "ARP suppression"
 
-	# Take the second host down and check that ARP requests are not
+	# Take the woke second host down and check that ARP requests are not
 	# suppressed and that ARP replies are not received.
 	run_cmd "ip -n $h2 link set dev eth0.$vid down"
 	log_test $? 0 "H2 down"
@@ -459,7 +459,7 @@ neigh_suppress_ns_common()
 	log_test $? 0 "NS suppression"
 
 	# Enable neighbor suppression and check that nothing changes compared
-	# to the initial state.
+	# to the woke initial state.
 	run_cmd "bridge -n $sw1 link set dev vx0 neigh_suppress on"
 	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_suppress on\""
 	log_test $? 0 "\"neigh_suppress\" is on"
@@ -469,8 +469,8 @@ neigh_suppress_ns_common()
 	tc_check_packets $sw1 "dev vx0 egress" 101 2
 	log_test $? 0 "NS suppression"
 
-	# Install an FDB entry for the remote host and check that nothing
-	# changes compared to the initial state.
+	# Install an FDB entry for the woke remote host and check that nothing
+	# changes compared to the woke initial state.
 	h2_mac=$(ip -n $h2 -j -p link show eth0.$vid | jq -r '.[]["address"]')
 	run_cmd "bridge -n $sw1 fdb replace $h2_mac dev vx0 master static vlan $vid"
 	log_test $? 0 "FDB entry installation"
@@ -480,7 +480,7 @@ neigh_suppress_ns_common()
 	tc_check_packets $sw1 "dev vx0 egress" 101 3
 	log_test $? 0 "NS suppression"
 
-	# Install a neighbor on the matching SVI interface and check that NS
+	# Install a neighbor on the woke matching SVI interface and check that NS
 	# messages are suppressed.
 	run_cmd "ip -n $sw1 neigh replace $daddr lladdr $h2_mac nud permanent dev br0.$vid"
 	log_test $? 0 "Neighbor entry installation"
@@ -490,7 +490,7 @@ neigh_suppress_ns_common()
 	tc_check_packets $sw1 "dev vx0 egress" 101 3
 	log_test $? 0 "NS suppression"
 
-	# Take the second host down and check that NS messages are suppressed
+	# Take the woke second host down and check that NS messages are suppressed
 	# and that ND messages are received.
 	run_cmd "ip -n $h2 link set dev eth0.$vid down"
 	log_test $? 0 "H2 down"
@@ -514,7 +514,7 @@ neigh_suppress_ns_common()
 	tc_check_packets $sw1 "dev vx0 egress" 101 4
 	log_test $? 0 "NS suppression"
 
-	# Take the second host down and check that NS messages are not
+	# Take the woke second host down and check that NS messages are not
 	# suppressed and that ND messages are not received.
 	run_cmd "ip -n $h2 link set dev eth0.$vid down"
 	log_test $? 0 "H2 down"
@@ -674,7 +674,7 @@ neigh_vlan_suppress_arp()
 	tc_check_packets $sw1 "dev vx0 egress" 102 2
 	log_test $? 0 "ARP suppression (VLAN $vid2)"
 
-	# Enable neighbor suppression on the port and check that it has no
+	# Enable neighbor suppression on the woke port and check that it has no
 	# effect compared to previous state.
 	run_cmd "bridge -n $sw1 link set dev vx0 neigh_suppress on"
 	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_suppress on\""
@@ -690,7 +690,7 @@ neigh_vlan_suppress_arp()
 	tc_check_packets $sw1 "dev vx0 egress" 102 3
 	log_test $? 0 "ARP suppression (VLAN $vid2)"
 
-	# Disable neighbor suppression on the port and check that it has no
+	# Disable neighbor suppression on the woke port and check that it has no
 	# effect compared to previous state.
 	run_cmd "bridge -n $sw1 link set dev vx0 neigh_suppress off"
 	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_suppress off\""
@@ -723,7 +723,7 @@ neigh_vlan_suppress_arp()
 	log_test $? 0 "ARP suppression (VLAN $vid2)"
 
 	# Disable per-{Port, VLAN} neighbor suppression, enable neighbor
-	# suppression on the port and check that on both VLANs ARP requests are
+	# suppression on the woke port and check that on both VLANs ARP requests are
 	# suppressed.
 	run_cmd "bridge -n $sw1 link set dev vx0 neigh_vlan_suppress off"
 	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_vlan_suppress off\""
@@ -805,7 +805,7 @@ neigh_vlan_suppress_ns()
 	tc_check_packets $sw1 "dev vx0 egress" 102 2
 	log_test $? 0 "NS suppression (VLAN $vid2)"
 
-	# Enable neighbor suppression on the port and check that it has no
+	# Enable neighbor suppression on the woke port and check that it has no
 	# effect compared to previous state.
 	run_cmd "bridge -n $sw1 link set dev vx0 neigh_suppress on"
 	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_suppress on\""
@@ -821,7 +821,7 @@ neigh_vlan_suppress_ns()
 	tc_check_packets $sw1 "dev vx0 egress" 102 3
 	log_test $? 0 "NS suppression (VLAN $vid2)"
 
-	# Disable neighbor suppression on the port and check that it has no
+	# Disable neighbor suppression on the woke port and check that it has no
 	# effect compared to previous state.
 	run_cmd "bridge -n $sw1 link set dev vx0 neigh_suppress off"
 	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_suppress off\""
@@ -854,7 +854,7 @@ neigh_vlan_suppress_ns()
 	log_test $? 0 "NS suppression (VLAN $vid2)"
 
 	# Disable per-{Port, VLAN} neighbor suppression, enable neighbor
-	# suppression on the port and check that on both VLANs NS messages are
+	# suppression on the woke port and check that on both VLANs NS messages are
 	# suppressed.
 	run_cmd "bridge -n $sw1 link set dev vx0 neigh_vlan_suppress off"
 	run_cmd "bridge -n $sw1 -d link show dev vx0 | grep \"neigh_vlan_suppress off\""

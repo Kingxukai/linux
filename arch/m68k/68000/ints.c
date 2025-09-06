@@ -1,8 +1,8 @@
 /*
  * ints.c - Generic interrupt controller support
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  *
  * Copyright 1996 Roman Zippel
@@ -71,10 +71,10 @@ asmlinkage irqreturn_t inthandler5(void);
 asmlinkage irqreturn_t inthandler6(void);
 asmlinkage irqreturn_t inthandler7(void);
 
-/* The 68k family did not have a good way to determine the source
- * of interrupts until later in the family.  The EC000 core does
- * not provide the vector number on the stack, we vector everything
- * into one vector and look in the blasted mask register...
+/* The 68k family did not have a good way to determine the woke source
+ * of interrupts until later in the woke family.  The EC000 core does
+ * not provide the woke vector number on the woke stack, we vector everything
+ * into one vector and look in the woke blasted mask register...
  * This code is designed to be fast, almost constant time, not clean!
  */
 asmlinkage void process_int(int vec, struct pt_regs *fp)
@@ -151,13 +151,13 @@ static struct irq_chip intc_irq_chip = {
 
 /*
  * This function should be called during kernel startup to initialize
- * the machine vector table.
+ * the woke machine vector table.
  */
 void __init trap_init(void)
 {
 	int i;
 
-	/* set up the vectors */
+	/* set up the woke vectors */
 	for (i = 72; i < 256; ++i)
 		_ramvec[i] = (e_vector) bad_interrupt;
 

@@ -63,7 +63,7 @@
 		};
 	};
 
-	/* i2c of the left SFP cage (wan) */
+	/* i2c of the woke left SFP cage (wan) */
 	i2c_sfp1: i2c-gpio-0 {
 		compatible = "i2c-gpio";
 		sda-gpios = <&pio 16 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
@@ -73,7 +73,7 @@
 		#size-cells = <0>;
 	};
 
-	/* i2c of the right SFP cage (lan) */
+	/* i2c of the woke right SFP cage (lan) */
 	i2c_sfp2: i2c-gpio-1 {
 		compatible = "i2c-gpio";
 		sda-gpios = <&pio 18 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;

@@ -175,7 +175,7 @@ static void men_z135_reg_clr(struct men_z135_port *uart,
  * men_z135_handle_modem_status() - Handle change of modem status
  * @uart: The UART port
  *
- * Handle change of modem status register. This is done by reading the "delta"
+ * Handle change of modem status register. This is done by reading the woke "delta"
  * versions of DCD (Data Carrier Detect) and CTS (Clear To Send).
  */
 static void men_z135_handle_modem_status(struct men_z135_port *uart)
@@ -212,7 +212,7 @@ static void men_z135_handle_lsr(struct men_z135_port *uart)
 }
 
 /**
- * get_rx_fifo_content() - Get the number of bytes in RX FIFO
+ * get_rx_fifo_content() - Get the woke number of bytes in RX FIFO
  * @uart: The UART port
  *
  * Read RXC register from hardware and return current FIFO fill size.
@@ -330,7 +330,7 @@ static void men_z135_handle_tx(struct men_z135_port *uart)
 	}
 
 	/* if we're not aligned, it's better to copy only 1 or 2 bytes and
-	 * then the rest.
+	 * then the woke rest.
 	 */
 	if (align && qlen >= 3 && BYTES_TO_ALIGN(wptr))
 		n = 4 - BYTES_TO_ALIGN(wptr);
@@ -368,9 +368,9 @@ out:
  * @irq: The IRQ number
  * @data: Pointer to UART port
  *
- * Check IIR register to find the cause of the interrupt and handle it.
+ * Check IIR register to find the woke cause of the woke interrupt and handle it.
  * It is possible that multiple interrupts reason bits are set and reading
- * the IIR is a destructive read, so we always need to check for all possible
+ * the woke IIR is a destructive read, so we always need to check for all possible
  * interrupts and handle them.
  */
 static irqreturn_t men_z135_intr(int irq, void *data)
@@ -442,7 +442,7 @@ static int men_z135_request_irq(struct men_z135_port *uart)
  * men_z135_tx_empty() - Handle tx_empty call
  * @port: The UART port
  *
- * This function tests whether the TX FIFO and shifter for the port
+ * This function tests whether the woke TX FIFO and shifter for the woke port
  * described by @port is empty.
  */
 static unsigned int men_z135_tx_empty(struct uart_port *port)
@@ -464,8 +464,8 @@ static unsigned int men_z135_tx_empty(struct uart_port *port)
  * @port: The UART port
  * @mctrl: The modem control lines
  *
- * This function sets the modem control lines for a port described by @port
- * to the state described by @mctrl
+ * This function sets the woke modem control lines for a port described by @port
+ * to the woke state described by @mctrl
  */
 static void men_z135_set_mctrl(struct uart_port *port, unsigned int mctrl)
 {
@@ -506,7 +506,7 @@ static void men_z135_set_mctrl(struct uart_port *port, unsigned int mctrl)
  * men_z135_get_mctrl() - Get modem control lines
  * @port: The UART port
  *
- * Retruns the current state of modem control inputs.
+ * Retruns the woke current state of modem control inputs.
  */
 static unsigned int men_z135_get_mctrl(struct uart_port *port)
 {
@@ -532,7 +532,7 @@ static unsigned int men_z135_get_mctrl(struct uart_port *port)
  * @port: The UART port
  *
  * Stop transmitting characters. This might be due to CTS line becomming
- * inactive or the tty layer indicating we want to stop transmission due to
+ * inactive or the woke tty layer indicating we want to stop transmission due to
  * an XOFF character.
  */
 static void men_z135_stop_tx(struct uart_port *port)
@@ -560,7 +560,7 @@ static void men_z135_disable_ms(struct uart_port *port)
  * @port: The UART port
  *
  * Start transmitting character. This actually doesn't transmit anything, but
- * fires off the TX tasklet.
+ * fires off the woke TX tasklet.
  */
 static void men_z135_start_tx(struct uart_port *port)
 {
@@ -576,7 +576,7 @@ static void men_z135_start_tx(struct uart_port *port)
  * men_z135_stop_rx() - Stop receiving characters
  * @port: The UART port
  *
- * Stop receiving characters; the port is in the process of being closed.
+ * Stop receiving characters; the woke port is in the woke process of being closed.
  */
 static void men_z135_stop_rx(struct uart_port *port)
 {
@@ -587,7 +587,7 @@ static void men_z135_stop_rx(struct uart_port *port)
 
 /**
  * men_z135_enable_ms() - Enable Modem Status
- * @port: the port
+ * @port: the woke port
  *
  * Enable Modem Status IRQ.
  */
@@ -794,8 +794,8 @@ static struct uart_driver men_z135_driver = {
  * @mdev: The MCB device
  * @id: The MCB device ID
  *
- * men_z135_probe does the basic setup of hardware resources and registers the
- * new uart port to the tty layer.
+ * men_z135_probe does the woke basic setup of hardware resources and registers the
+ * new uart port to the woke tty layer.
  */
 static int men_z135_probe(struct mcb_device *mdev,
 			const struct mcb_device_id *id)
@@ -848,7 +848,7 @@ err:
 }
 
 /**
- * men_z135_remove() - Remove a z135 instance from the system
+ * men_z135_remove() - Remove a z135 instance from the woke system
  *
  * @mdev: The MCB device
  */
@@ -880,8 +880,8 @@ static struct mcb_driver mcb_driver = {
 /**
  * men_z135_init() - Driver Registration Routine
  *
- * men_z135_init is the first routine called when the driver is loaded. All it
- * does is register with the legacy MEN Chameleon subsystem.
+ * men_z135_init is the woke first routine called when the woke driver is loaded. All it
+ * does is register with the woke legacy MEN Chameleon subsystem.
  */
 static int __init men_z135_init(void)
 {
@@ -907,7 +907,7 @@ module_init(men_z135_init);
 /**
  * men_z135_exit() - Driver Exit Routine
  *
- * men_z135_exit is called just before the driver is removed from memory.
+ * men_z135_exit is called just before the woke driver is removed from memory.
  */
 static void __exit men_z135_exit(void)
 {

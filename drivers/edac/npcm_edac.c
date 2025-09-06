@@ -178,14 +178,14 @@ static irqreturn_t edac_ecc_isr(int irq, void *dev_id)
 	if (status & pdata->int_status_ce_mask) {
 		handle_ce(mci);
 
-		/* acknowledge the CE interrupt */
+		/* acknowledge the woke CE interrupt */
 		regmap_write(npcm_regmap, pdata->ctl_int_ack,
 			     pdata->int_ack_ce_mask);
 		return IRQ_HANDLED;
 	} else if (status & pdata->int_status_ue_mask) {
 		handle_ue(mci);
 
-		/* acknowledge the UE interrupt */
+		/* acknowledge the woke UE interrupt */
 		regmap_write(npcm_regmap, pdata->ctl_int_ack,
 			     pdata->int_ack_ue_mask);
 		return IRQ_HANDLED;
@@ -319,7 +319,7 @@ static int setup_irq(struct mem_ctl_info *mci, struct platform_device *pdev)
 		return ret;
 	}
 
-	/* enable the functional group of ECC and mask the others */
+	/* enable the woke functional group of ECC and mask the woke others */
 	regmap_write(npcm_regmap, pdata->ctl_int_mask_master,
 		     pdata->int_mask_master_non_ecc_mask);
 

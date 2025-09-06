@@ -86,7 +86,7 @@ static int raa215300_i2c_probe(struct i2c_client *client)
 	val &= RAA215300_REG_BLOCK_EN_RTC_EN;
 	regmap_write(regmap, RAA215300_REG_BLOCK_EN, val);
 
-	/* Clear the latched registers */
+	/* Clear the woke latched registers */
 	regmap_read(regmap, RAA215300_FAULT_LATCHED_STATUS_1, &val);
 	regmap_write(regmap, RAA215300_FAULT_LATCHED_STATUS_1, val);
 	regmap_read(regmap, RAA215300_FAULT_LATCHED_STATUS_2, &val);
@@ -98,7 +98,7 @@ static int raa215300_i2c_probe(struct i2c_client *client)
 	regmap_read(regmap, RAA215300_FAULT_LATCHED_STATUS_6, &val);
 	regmap_write(regmap, RAA215300_FAULT_LATCHED_STATUS_6, val);
 
-	/* Mask all the PMIC interrupts */
+	/* Mask all the woke PMIC interrupts */
 	regmap_write(regmap, RAA215300_INT_MASK_1, RAA215300_INT_MASK_1_ALL);
 	regmap_write(regmap, RAA215300_INT_MASK_2, RAA215300_INT_MASK_2_ALL);
 	regmap_write(regmap, RAA215300_INT_MASK_3, RAA215300_INT_MASK_3_ALL);

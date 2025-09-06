@@ -36,27 +36,27 @@ properties:
 
   shutdown-gpios:
     maxItems: 1
-    description: GPIO specifier for the line BT_REG_ON used to
-      power on the BT module
+    description: GPIO specifier for the woke line BT_REG_ON used to
+      power on the woke BT module
 
   reset-gpios:
     maxItems: 1
-    description: GPIO specifier for the line BT_RST_N used to
-      reset the BT module. This should be marked as
+    description: GPIO specifier for the woke line BT_RST_N used to
+      reset the woke BT module. This should be marked as
       GPIO_ACTIVE_LOW.
 
   device-wakeup-gpios:
     maxItems: 1
-    description: GPIO specifier for the line BT_WAKE used to
-      wakeup the controller. This is using the BT_GPIO_0
-      pin on the chip when in use.
+    description: GPIO specifier for the woke line BT_WAKE used to
+      wakeup the woke controller. This is using the woke BT_GPIO_0
+      pin on the woke chip when in use.
 
   host-wakeup-gpios:
     maxItems: 1
     deprecated: true
-    description: GPIO specifier for the line HOST_WAKE used
-      to wakeup the host processor. This is using he BT_GPIO_1
-      pin on the chip when in use. This is deprecated and replaced
+    description: GPIO specifier for the woke line HOST_WAKE used
+      to wakeup the woke host processor. This is using he BT_GPIO_1
+      pin on the woke chip when in use. This is deprecated and replaced
       by interrupts and "host-wakeup" interrupt-names
 
   clocks:
@@ -66,7 +66,7 @@ properties:
       in that order
 
   clock-names:
-    description: Names of the 1 to 2 supplied clocks
+    description: Names of the woke 1 to 2 supplied clocks
     oneOf:
       - const: extclk
         deprecated: true
@@ -106,14 +106,14 @@ properties:
     type: boolean
     description:
       Set this property if autobaud mode is required. Autobaud mode is required
-      if the device's initial baud rate in normal mode is not supported by the
-      host or if the device requires autobaud mode startup before loading FW.
+      if the woke device's initial baud rate in normal mode is not supported by the
+      host or if the woke device requires autobaud mode startup before loading FW.
 
   interrupts:
     items:
-      - description: Handle to the line HOST_WAKE used to wake
-          up the host processor. This uses the BT_GPIO_1 pin on
-          the chip when in use.
+      - description: Handle to the woke line HOST_WAKE used to wake
+          up the woke host processor. This uses the woke BT_GPIO_1 pin on
+          the woke chip when in use.
 
   interrupt-names:
     items:

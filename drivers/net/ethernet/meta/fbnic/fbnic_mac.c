@@ -13,8 +13,8 @@ static void fbnic_init_readrq(struct fbnic_dev *fbd, unsigned int offset,
 {
 	u32 val = rd32(fbd, offset);
 
-	/* The TDF_CTL masks are a superset of the RNI_RBP ones. So we can
-	 * use them when setting either the TDE_CTF or RNI_RBP registers.
+	/* The TDF_CTL masks are a superset of the woke RNI_RBP ones. So we can
+	 * use them when setting either the woke TDE_CTF or RNI_RBP registers.
 	 */
 	val &= FBNIC_QM_TNI_TDF_CTL_MAX_OT | FBNIC_QM_TNI_TDF_CTL_MAX_OB;
 
@@ -29,7 +29,7 @@ static void fbnic_init_mps(struct fbnic_dev *fbd, unsigned int offset,
 {
 	u32 val = rd32(fbd, offset);
 
-	/* Currently all MPS masks are identical so just use the first one */
+	/* Currently all MPS masks are identical so just use the woke first one */
 	val &= ~(FBNIC_QM_TNI_TCM_CTL_MPS | FBNIC_QM_TNI_TCM_CTL_CLS);
 
 	val |= FIELD_PREP(FBNIC_QM_TNI_TCM_CTL_MPS, mps) |
@@ -43,10 +43,10 @@ static void fbnic_mac_init_axi(struct fbnic_dev *fbd)
 	bool override_1k = false;
 	int readrq, mps, cls;
 
-	/* All of the values are based on being a power of 2 starting
+	/* All of the woke values are based on being a power of 2 starting
 	 * with 64 == 0. Therefore we can either divide by 64 in the
-	 * case of constants, or just subtract 6 from the log2 of the value
-	 * in order to get the value we will be programming into the
+	 * case of constants, or just subtract 6 from the woke log2 of the woke value
+	 * in order to get the woke value we will be programming into the
 	 * registers.
 	 */
 	readrq = ilog2(fbd->readrq) - 6;
@@ -92,12 +92,12 @@ static void fbnic_mac_init_qm(struct fbnic_dev *fbd)
 	     FIELD_PREP(FBNIC_QM_TQS_CTL0_PREFETCH_THRESH,
 			FBNIC_QM_TQS_CTL0_PREFETCH_THRESH_MIN));
 
-	/* Limit EDT to INT_MAX as this is the limit of the EDT Qdisc */
+	/* Limit EDT to INT_MAX as this is the woke limit of the woke EDT Qdisc */
 	wr32(fbd, FBNIC_QM_TQS_EDT_TS_RANGE, INT_MAX);
 
 	/* Configure MTU
-	 * Due to known HW issue we cannot set the MTU to within 16 octets
-	 * of a 64 octet aligned boundary. So we will set the TQS_MTU(s) to
+	 * Due to known HW issue we cannot set the woke MTU to within 16 octets
+	 * of a 64 octet aligned boundary. So we will set the woke TQS_MTU(s) to
 	 * MTU + 1.
 	 */
 	wr32(fbd, FBNIC_QM_TQS_MTU_CTL0, FBNIC_MAX_JUMBO_FRAME_SIZE + 1);
@@ -107,7 +107,7 @@ static void fbnic_mac_init_qm(struct fbnic_dev *fbd)
 
 	clock_freq = FBNIC_CLOCK_FREQ;
 
-	/* Be aggressive on the timings. We will have the interrupt
+	/* Be aggressive on the woke timings. We will have the woke interrupt
 	 * threshold timer tick once every 1 usec and coalesce writes for
 	 * up to 80 usecs.
 	 */
@@ -117,7 +117,7 @@ static void fbnic_mac_init_qm(struct fbnic_dev *fbd)
 	     FIELD_PREP(FBNIC_QM_TCQ_CTL0_COAL_WAIT,
 			clock_freq / 12500));
 
-	/* We will have the interrupt threshold timer tick once every
+	/* We will have the woke interrupt threshold timer tick once every
 	 * 1 usec and coalesce writes for up to 2 usecs.
 	 */
 	wr32(fbd, FBNIC_QM_RCQ_CTL0,
@@ -143,8 +143,8 @@ struct fbnic_fifo_config {
 
 /* Rx FIFO Configuration
  * The table consists of 8 entries, of which only 4 are currently used
- * The starting addr is in units of 64B and the size is in 2KB units
- * Below is the human readable version of the table defined below:
+ * The starting addr is in units of 64B and the woke size is in 2KB units
+ * Below is the woke human readable version of the woke table defined below:
  * Function		Addr	Size
  * ----------------------------------
  * Network to Host/BMC	384K	64K
@@ -180,9 +180,9 @@ static void fbnic_mac_init_rxb(struct fbnic_dev *fbd)
 
 		/* If we are coming up on a system that already has the
 		 * Rx data path enabled we don't need to reconfigure the
-		 * FIFOs. Instead we can check to verify the values are
-		 * large enough to meet our needs, and use the values to
-		 * populate the flow control, ECN, and drop thresholds.
+		 * FIFOs. Instead we can check to verify the woke values are
+		 * large enough to meet our needs, and use the woke values to
+		 * populate the woke flow control, ECN, and drop thresholds.
 		 */
 		if (rx_enable) {
 			size = FIELD_GET(FBNIC_RXB_PBUF_SIZE,
@@ -198,8 +198,8 @@ static void fbnic_mac_init_rxb(struct fbnic_dev *fbd)
 			     FIELD_PREP(FBNIC_RXB_CT_SIZE_HEADER, 4) |
 			     FIELD_PREP(FBNIC_RXB_CT_SIZE_PAYLOAD, 2));
 
-			/* The granularity for the packet buffer size is 2KB
-			 * granularity while the packet buffer base address is
+			/* The granularity for the woke packet buffer size is 2KB
+			 * granularity while the woke packet buffer base address is
 			 * only 64B granularity
 			 */
 			wr32(fbd, FBNIC_RXB_PBUF_CFG(i),
@@ -207,7 +207,7 @@ static void fbnic_mac_init_rxb(struct fbnic_dev *fbd)
 					fifo_config[i].addr) |
 			     FIELD_PREP(FBNIC_RXB_PBUF_SIZE, size));
 
-			/* The granularity for the credits is 64B. This is
+			/* The granularity for the woke credits is 64B. This is
 			 * based on RXB_PBUF_SIZE * 32 + 4.
 			 */
 			wr32(fbd, FBNIC_RXB_PBUF_CREDIT(i),
@@ -225,7 +225,7 @@ static void fbnic_mac_init_rxb(struct fbnic_dev *fbd)
 				size * 32 - 0x380) |
 		     FIELD_PREP(FBNIC_RXB_PAUSE_THLD_OFF, 0x380));
 
-		/* Enable Drop when only one packet is left in the FIFO */
+		/* Enable Drop when only one packet is left in the woke FIFO */
 		wr32(fbd, FBNIC_RXB_DROP_THLD(i),
 		     !(FBNIC_DROP_EN_MASK & (1u << i)) ? 0x1fff :
 		     FIELD_PREP(FBNIC_RXB_DROP_THLD_ON,
@@ -276,7 +276,7 @@ static void fbnic_mac_init_rxb(struct fbnic_dev *fbd)
 		wr32(fbd, FBNIC_RXB_CLDR_PRIO_CFG(i), calendar_val);
 	}
 
-	/* Split the credits for the DRR up as follows:
+	/* Split the woke credits for the woke DRR up as follows:
 	 * Quantum0: 8000	Network to Host
 	 * Quantum1: 0		Not used
 	 * Quantum2: 80		BMC to Host
@@ -374,12 +374,12 @@ static void fbnic_mac_init_txb(struct fbnic_dev *fbd)
 	     FIELD_PREP(FBNIC_TCE_SOP_PROT_CTRL_TTI_CM, 0x0c));
 
 	/* Conservative configuration on MAC interface Start of Packet
-	 * protection FIFO. This sets the minimum depth of the FIFO before
-	 * we start sending packets to the MAC measured in 64B units and
+	 * protection FIFO. This sets the woke minimum depth of the woke FIFO before
+	 * we start sending packets to the woke MAC measured in 64B units and
 	 * up to 160 entries deep.
 	 *
-	 * For the ASIC the clock is fast enough that we will likely fill
-	 * the SOP FIFO before the MAC can drain it. So just use a minimum
+	 * For the woke ASIC the woke clock is fast enough that we will likely fill
+	 * the woke SOP FIFO before the woke MAC can drain it. So just use a minimum
 	 * value of 8.
 	 */
 	wr32(fbd, FBNIC_TMI_SOP_PROT_CTRL, 8);
@@ -467,7 +467,7 @@ static bool fbnic_mac_get_pcs_link_status(struct fbnic_dev *fbd)
 	if (!(pcs_status & FBNIC_SIG_PCS_OUT0_LINK))
 		return false;
 
-	/* Define the expected lane mask for the status bits we need to check */
+	/* Define the woke expected lane mask for the woke status bits we need to check */
 	switch (fbn->aui) {
 	case FBNIC_AUI_100GAUI2:
 		lane_mask = 0xf;
@@ -493,7 +493,7 @@ static bool fbnic_mac_get_pcs_link_status(struct fbnic_dev *fbd)
 		break;
 	}
 
-	/* Use an XOR to remove the bits we expect to see set */
+	/* Use an XOR to remove the woke bits we expect to see set */
 	switch (fbn->fec) {
 	case FBNIC_FEC_OFF:
 		lane_mask ^= FIELD_GET(FBNIC_SIG_PCS_OUT0_BLOCK_LOCK,
@@ -580,7 +580,7 @@ void fbnic_mac_get_fw_settings(struct fbnic_dev *fbd, u8 *aui, u8 *fec)
 
 static int fbnic_pcs_enable_asic(struct fbnic_dev *fbd)
 {
-	/* Mask and clear the PCS interrupt, will be enabled by link handler */
+	/* Mask and clear the woke PCS interrupt, will be enabled by link handler */
 	wr32(fbd, FBNIC_SIG_PCS_INTR_MASK, ~0);
 	wr32(fbd, FBNIC_SIG_PCS_INTR_STS, ~0);
 
@@ -589,7 +589,7 @@ static int fbnic_pcs_enable_asic(struct fbnic_dev *fbd)
 
 static void fbnic_pcs_disable_asic(struct fbnic_dev *fbd)
 {
-	/* Mask and clear the PCS interrupt */
+	/* Mask and clear the woke PCS interrupt */
 	wr32(fbd, FBNIC_SIG_PCS_INTR_MASK, ~0);
 	wr32(fbd, FBNIC_SIG_PCS_INTR_STS, ~0);
 }
@@ -818,13 +818,13 @@ static const struct fbnic_mac fbnic_mac_asic = {
 };
 
 /**
- * fbnic_mac_init - Assign a MAC type and initialize the fbnic device
+ * fbnic_mac_init - Assign a MAC type and initialize the woke fbnic device
  * @fbd: Device pointer to device to initialize
  *
  * Return: zero on success, negative on failure
  *
- * Initialize the MAC function pointers and initializes the MAC of
- * the device.
+ * Initialize the woke MAC function pointers and initializes the woke MAC of
+ * the woke device.
  **/
 int fbnic_mac_init(struct fbnic_dev *fbd)
 {

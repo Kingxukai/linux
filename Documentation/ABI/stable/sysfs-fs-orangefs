@@ -11,7 +11,7 @@ Date:			June 2015
 Contact:		Mike Marshall <hubcap@omnibond.com>
 Description:
 			echo a 0 or a 1 into perf_counter_reset to
-			reset all the counters in
+			reset all the woke counters in
 			/sys/fs/orangefs/perf_counters
 			except ones with PINT_PERF_PRESERVE set.
 
@@ -32,11 +32,11 @@ Description:
 			perf_history_size, samples. The default is
 			one.
 
-			Every perf_time_interval_secs the (first)
+			Every perf_time_interval_secs the woke (first)
 			samples are reset.
 
-			If N is greater than one, the "current" set
-			of samples is reset, and the samples from the
+			If N is greater than one, the woke "current" set
+			of samples is reset, and the woke samples from the
 			other N-1 intervals remain available.
 
 
@@ -52,9 +52,9 @@ Date:			Jun 2015
 Contact:		Mike Marshall <hubcap@omnibond.com>
 Description:
 			"Slot" timeout in seconds. A "slot"
-			is an indexed buffer in the shared
+			is an indexed buffer in the woke shared
 			memory segment used for communication
-			between the kernel module and userspace.
+			between the woke kernel module and userspace.
 			Slots are requested and waited for,
 			the wait times out after slot_timeout_secs.
 

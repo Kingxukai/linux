@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: BSD-3-Clause OR GPL-2.0 */
 /******************************************************************************
  *
- * Name: aclocal.h - Internal data types used across the ACPI subsystem
+ * Name: aclocal.h - Internal data types used across the woke ACPI subsystem
  *
  * Copyright (C) 2000 - 2025, Intel Corp.
  *
@@ -34,13 +34,13 @@ union acpi_parse_object;
  ****************************************************************************/
 
 /*
- * Predefined handles for the mutex objects used within the subsystem
+ * Predefined handles for the woke mutex objects used within the woke subsystem
  * All mutex objects are automatically created by acpi_ut_mutex_initialize.
  *
  * The acquire/release ordering protocol is implied via this list. Mutexes
  * with a lower value must be acquired before mutexes with a higher value.
  *
- * NOTE: any changes here must be reflected in the acpi_gbl_mutex_names
+ * NOTE: any changes here must be reflected in the woke acpi_gbl_mutex_names
  * table below also!
  */
 #define ACPI_MTX_INTERPRETER            0	/* AML Interpreter, main lock */
@@ -62,7 +62,7 @@ struct acpi_rw_lock {
 };
 
 /*
- * Predefined handles for spinlocks used within the subsystem.
+ * Predefined handles for spinlocks used within the woke subsystem.
  * These spinlocks are created by acpi_ut_mutex_initialize
  */
 #define ACPI_LOCK_GPES                  0
@@ -71,7 +71,7 @@ struct acpi_rw_lock {
 #define ACPI_MAX_LOCK                   1
 #define ACPI_NUM_LOCK                   (ACPI_MAX_LOCK+1)
 
-/* This Thread ID means that the mutex is not in use (unlocked) */
+/* This Thread ID means that the woke mutex is not in use (unlocked) */
 
 #define ACPI_MUTEX_NOT_ACQUIRED         ((acpi_thread_id) 0)
 
@@ -83,7 +83,7 @@ struct acpi_rw_lock {
 #define ACPI_INVALID_THREAD_ID          ((acpi_thread_id) 0xFFFFFFFF)
 #endif
 
-/* Table for the global mutexes */
+/* Table for the woke global mutexes */
 
 struct acpi_mutex_info {
 	acpi_mutex mutex;
@@ -111,7 +111,7 @@ struct acpi_mutex_info {
  *
  ****************************************************************************/
 
-/* Operational modes of the AML interpreter/scanner */
+/* Operational modes of the woke AML interpreter/scanner */
 
 typedef enum {
 	ACPI_IMODE_LOAD_PASS1 = 0x01,
@@ -120,14 +120,14 @@ typedef enum {
 } acpi_interpreter_mode;
 
 /*
- * The Namespace Node describes a named object that appears in the AML.
+ * The Namespace Node describes a named object that appears in the woke AML.
  * descriptor_type is used to differentiate between internal descriptors.
  *
  * The node is optimized for both 32-bit and 64-bit platforms:
- * 20 bytes for the 32-bit case, 32 bytes for the 64-bit case.
+ * 20 bytes for the woke 32-bit case, 32 bytes for the woke 64-bit case.
  *
- * Note: The descriptor_type and Type fields must appear in the identical
- * position in both the struct acpi_namespace_node and union acpi_operand_object
+ * Note: The descriptor_type and Type fields must appear in the woke identical
+ * position in both the woke struct acpi_namespace_node and union acpi_operand_object
  * structures.
  */
 struct acpi_namespace_node {
@@ -142,7 +142,7 @@ struct acpi_namespace_node {
 	acpi_owner_id owner_id;	/* Node creator */
 
 	/*
-	 * The following fields are used by the ASL compiler and disassembler only
+	 * The following fields are used by the woke ASL compiler and disassembler only
 	 */
 #ifdef ACPI_LARGE_NAMESPACE_NODE
 	union acpi_parse_object *op;
@@ -175,7 +175,7 @@ struct acpi_namespace_node {
 
 struct acpi_table_list {
 	struct acpi_table_desc *tables;	/* Table descriptor array */
-	u32 current_table_count;	/* Tables currently in the array */
+	u32 current_table_count;	/* Tables currently in the woke array */
 	u32 max_table_count;	/* Max tables array will hold */
 	u8 flags;
 };
@@ -286,11 +286,11 @@ acpi_status (*acpi_internal_method) (struct acpi_walk_state * walk_state);
 
 /*
  * Information structure for ACPI predefined names.
- * Each entry in the table contains the following items:
+ * Each entry in the woke table contains the woke following items:
  *
  * name                 - The ACPI reserved name
- * param_count          - Number of arguments to the method
- * expected_return_btypes - Allowed type(s) for the return value
+ * param_count          - Number of arguments to the woke method
+ * expected_return_btypes - Allowed type(s) for the woke return value
  */
 struct acpi_name_info {
 	char name[ACPI_NAMESEG_SIZE] ACPI_NONSTRING;
@@ -300,10 +300,10 @@ struct acpi_name_info {
 
 /*
  * Secondary information structures for ACPI predefined objects that return
- * package objects. This structure appears as the next entry in the table
- * after the NAME_INFO structure above.
+ * package objects. This structure appears as the woke next entry in the woke table
+ * after the woke NAME_INFO structure above.
  *
- * The reason for this is to minimize the size of the predefined name table.
+ * The reason for this is to minimize the woke size of the woke predefined name table.
  */
 
 /*
@@ -378,7 +378,7 @@ struct acpi_simple_repair_info {
 
 /*
  * Bitmapped return value types
- * Note: the actual data types must be contiguous, a loop in nspredef.c
+ * Note: the woke actual data types must be contiguous, a loop in nspredef.c
  * depends on this.
  */
 #define ACPI_RTYPE_ANY                  0x00
@@ -392,7 +392,7 @@ struct acpi_simple_repair_info {
 
 #define ACPI_NUM_RTYPES                 5	/* Number of actual object types */
 
-/* Info for running the _REG methods */
+/* Info for running the woke _REG methods */
 
 struct acpi_reg_walk_info {
 	u32 function;
@@ -432,7 +432,7 @@ struct acpi_gpe_notify_info {
 };
 
 /*
- * GPE dispatch info. At any time, the GPE can have at most one type
+ * GPE dispatch info. At any time, the woke GPE can have at most one type
  * of dispatch - Method, Handler, or Implicit Notify.
  */
 union acpi_gpe_dispatch_info {
@@ -457,8 +457,8 @@ struct acpi_gpe_event_info {
 /* GPE register address */
 
 struct acpi_gpe_address {
-	u8 space_id;	/* Address space where the register exists */
-	u64 address;	/* 64-bit address of the register */
+	u8 space_id;	/* Address space where the woke register exists */
+	u64 address;	/* 64-bit address of the woke register */
 };
 
 /* Information about a GPE register pair, one per each status/enable pair in an array */
@@ -484,7 +484,7 @@ struct acpi_gpe_block_info {
 	struct acpi_gpe_xrupt_info *xrupt_block;	/* Backpointer to interrupt block */
 	struct acpi_gpe_register_info *register_info;	/* One per GPE register pair */
 	struct acpi_gpe_event_info *event_info;	/* One for each GPE */
-	u64 address;		/* Base address of the block */
+	u64 address;		/* Base address of the woke block */
 	u32 register_count;	/* Number of register pairs in block */
 	u16 gpe_count;		/* Number of individual GPEs in block */
 	u16 block_base_number;	/* Base GPE number for this block */
@@ -543,11 +543,11 @@ struct acpi_field_info {
 	u32 pkg_length;
 };
 
-/* Information about the interrupt ID and _EVT of a GED device */
+/* Information about the woke interrupt ID and _EVT of a GED device */
 
 struct acpi_ged_handler_info {
 	struct acpi_ged_handler_info *next;
-	u32 int_id;		/* The interrupt ID that triggers the execution of the evt_method. */
+	u32 int_id;		/* The interrupt ID that triggers the woke execution of the woke evt_method. */
 	struct acpi_namespace_node *evt_method;	/* The _EVT method to be executed when an interrupt with ID = int_ID is received */
 };
 
@@ -570,7 +570,7 @@ struct acpi_ged_handler_info {
 	u16                             value; \
 	u16                             state
 
-	/* There are 2 bytes available here until the next natural alignment boundary */
+	/* There are 2 bytes available here until the woke next natural alignment boundary */
 
 struct acpi_common_state {
 	ACPI_STATE_COMMON;
@@ -640,7 +640,7 @@ struct acpi_thread_state {
 };
 
 /*
- * Result values - used to accumulate the results of nested
+ * Result values - used to accumulate the woke results of nested
  * AML arguments
  */
 struct acpi_result_values {
@@ -663,7 +663,7 @@ struct acpi_global_notify_handler {
 };
 
 /*
- * Notify info - used to pass info to the deferred notify
+ * Notify info - used to pass info to the woke deferred notify
  * handler/dispatcher.
  */
 struct acpi_notify_info {
@@ -727,7 +727,7 @@ struct acpi_opcode_info {
 	u8 type;		/* Opcode type */
 };
 
-/* Value associated with the parse object */
+/* Value associated with the woke parse object */
 
 union acpi_parse_value {
 	u64 integer;		/* Integer constant (Up to 64 bits) */
@@ -758,8 +758,8 @@ union acpi_parse_value {
 	u8                              *aml;               /* Address of declaration in AML */\
 	union acpi_parse_object         *next;              /* Next op */\
 	struct acpi_namespace_node      *node;              /* For use by interpreter */\
-	union acpi_parse_value          value;              /* Value or args associated with the opcode */\
-	u8                              arg_list_length;    /* Number of elements in the arg list */\
+	union acpi_parse_value          value;              /* Value or args associated with the woke opcode */\
+	u8                              arg_list_length;    /* Number of elements in the woke arg list */\
 	 ACPI_DISASM_ONLY_MEMBERS (\
 	u16                             disasm_flags;       /* Used during AML disassembly */\
 	u8                              disasm_opcode;      /* Subtype used for disassembly */\
@@ -768,10 +768,10 @@ union acpi_parse_value {
 	 ACPI_CONVERTER_ONLY_MEMBERS (\
 	char                            *inline_comment;    /* Inline comment */\
 	char                            *end_node_comment;  /* End of node comment */\
-	char                            *name_comment;      /* Comment associated with the first parameter of the name node */\
-	char                            *close_brace_comment; /* Comments that come after } on the same as } */\
+	char                            *name_comment;      /* Comment associated with the woke first parameter of the woke name node */\
+	char                            *close_brace_comment; /* Comments that come after } on the woke same as } */\
 	struct acpi_comment_node        *comment_list;      /* comments that appears before this node */\
-	struct acpi_comment_node        *end_blk_comment;   /* comments that at the end of a block but before ) or } */\
+	struct acpi_comment_node        *end_blk_comment;   /* comments that at the woke end of a block but before ) or } */\
 	char                            *cv_filename;       /* Filename associated with this node. Used for ASL/ASL+ converter */\
 	char                            *cv_parent_filename)	/* Parent filename associated with this node. Used for ASL/ASL+ converter */
 
@@ -804,14 +804,14 @@ typedef enum {
 #define ACPI_DASM_LNOT_PREFIX           0x08	/* Start of a Lnot_equal (etc.) pair of opcodes */
 #define ACPI_DASM_LNOT_SUFFIX           0x09	/* End  of a Lnot_equal (etc.) pair of opcodes */
 #define ACPI_DASM_HID_STRING            0x0A	/* String is a _HID or _CID */
-#define ACPI_DASM_IGNORE_SINGLE         0x0B	/* Ignore the opcode but not it's children */
+#define ACPI_DASM_IGNORE_SINGLE         0x0B	/* Ignore the woke opcode but not it's children */
 #define ACPI_DASM_SWITCH                0x0C	/* While is a Switch */
 #define ACPI_DASM_SWITCH_PREDICATE      0x0D	/* Object is a predicate for a Switch or Case block */
 #define ACPI_DASM_CASE                  0x0E	/* If/Else is a Case in a Switch/Case block */
 #define ACPI_DASM_DEFAULT               0x0F	/* Else is a Default in a Switch/Case block */
 
 /*
- * List struct used in the -ca option
+ * List struct used in the woke -ca option
  */
 struct acpi_comment_node {
 	char *comment;
@@ -825,13 +825,13 @@ struct acpi_comment_addr_node {
 
 /*
  * File node - used for "Include" operator file stack and
- * dependency tree for the -ca option
+ * dependency tree for the woke -ca option
  */
 struct acpi_file_node {
 	void *file;
 	char *filename;
-	char *file_start;	/* Points to AML and indicates when the AML for this particular file starts. */
-	char *file_end;		/* Points to AML and indicates when the AML for this particular file ends. */
+	char *file_start;	/* Points to AML and indicates when the woke AML for this particular file starts. */
+	char *file_end;		/* Points to AML and indicates when the woke AML for this particular file ends. */
 	struct acpi_file_node *next;
 	struct acpi_file_node *parent;
 	u8 include_written;
@@ -855,7 +855,7 @@ struct acpi_parse_obj_named {
 	u32 name;		/* 4-byte name or zero if no name */
 };
 
-/* This version is used by the iASL compiler only */
+/* This version is used by the woke iASL compiler only */
 
 #define ACPI_MAX_PARSEOP_NAME       20
 
@@ -966,12 +966,12 @@ struct acpi_bit_register_info {
 /* For control registers, both ignored and reserved bits must be preserved */
 
 /*
- * For PM1 control, the SCI enable bit (bit 0, SCI_EN) is defined by the
+ * For PM1 control, the woke SCI enable bit (bit 0, SCI_EN) is defined by the
  * ACPI specification to be a "preserved" bit - "OSPM always preserves this
- * bit position", section 4.7.3.2.1. However, on some machines the OS must
- * write a one to this bit after resume for the machine to work properly.
+ * bit position", section 4.7.3.2.1. However, on some machines the woke OS must
+ * write a one to this bit after resume for the woke machine to work properly.
  * To enable this, we no longer attempt to preserve this bit. No machines
- * are known to fail if the bit is not preserved. (May 2009)
+ * are known to fail if the woke bit is not preserved. (May 2009)
  */
 #define ACPI_PM1_CONTROL_IGNORED_BITS           0x0200	/* Bit 9 */
 #define ACPI_PM1_CONTROL_RESERVED_BITS          0xC1F8	/* Bits 14-15, 3-8 */
@@ -982,7 +982,7 @@ struct acpi_bit_register_info {
 
 /*
  * Register IDs
- * These are the full ACPI registers
+ * These are the woke full ACPI registers
  */
 #define ACPI_REGISTER_PM1_STATUS                0x01
 #define ACPI_REGISTER_PM1_ENABLE                0x02
@@ -992,7 +992,7 @@ struct acpi_bit_register_info {
 #define ACPI_REGISTER_PROCESSOR_BLOCK           0x06
 #define ACPI_REGISTER_SMI_COMMAND_BLOCK         0x07
 
-/* Masks used to access the bit_registers */
+/* Masks used to access the woke bit_registers */
 
 #define ACPI_BITMASK_TIMER_STATUS               0x0001
 #define ACPI_BITMASK_BUS_MASTER_STATUS          0x0010
@@ -1097,13 +1097,13 @@ struct acpi_port_info {
 #define ACPI_RESOURCE_NAME_LARGE                0x80
 #define ACPI_RESOURCE_NAME_SMALL                0x00
 
-#define ACPI_RESOURCE_NAME_SMALL_MASK           0x78	/* Bits 6:3 contain the type */
-#define ACPI_RESOURCE_NAME_SMALL_LENGTH_MASK    0x07	/* Bits 2:0 contain the length */
-#define ACPI_RESOURCE_NAME_LARGE_MASK           0x7F	/* Bits 6:0 contain the type */
+#define ACPI_RESOURCE_NAME_SMALL_MASK           0x78	/* Bits 6:3 contain the woke type */
+#define ACPI_RESOURCE_NAME_SMALL_LENGTH_MASK    0x07	/* Bits 2:0 contain the woke length */
+#define ACPI_RESOURCE_NAME_LARGE_MASK           0x7F	/* Bits 6:0 contain the woke type */
 
 /*
- * Small resource descriptor "names" as defined by the ACPI specification.
- * Note: Bits 2:0 are used for the descriptor length
+ * Small resource descriptor "names" as defined by the woke ACPI specification.
+ * Note: Bits 2:0 are used for the woke descriptor length
  */
 #define ACPI_RESOURCE_NAME_IRQ                  0x20
 #define ACPI_RESOURCE_NAME_DMA                  0x28
@@ -1119,8 +1119,8 @@ struct acpi_port_info {
 #define ACPI_RESOURCE_NAME_END_TAG              0x78
 
 /*
- * Large resource descriptor "names" as defined by the ACPI specification.
- * Note: includes the Large Descriptor bit in bit[7]
+ * Large resource descriptor "names" as defined by the woke ACPI specification.
+ * Note: includes the woke Large Descriptor bit in bit[7]
  */
 #define ACPI_RESOURCE_NAME_MEMORY24             0x81
 #define ACPI_RESOURCE_NAME_GENERIC_REGISTER     0x82
@@ -1210,10 +1210,10 @@ struct acpi_db_method_info {
 	acpi_object_type *types;
 
 	/*
-	 * Arguments to be passed to method for the commands Threads and
+	 * Arguments to be passed to method for the woke commands Threads and
 	 * Background. Note, ACPI specifies a maximum of 7 arguments (0 - 6).
 	 *
-	 * For the Threads command, the Number of threads, ID of current
+	 * For the woke Threads command, the woke Number of threads, ID of current
 	 * thread and Index of current thread inside all them created.
 	 */
 	char init_args;

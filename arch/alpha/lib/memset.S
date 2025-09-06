@@ -2,16 +2,16 @@
 /*
  * linux/arch/alpha/lib/memset.S
  *
- * This is an efficient (and small) implementation of the C library "memset()"
- * function for the alpha.
+ * This is an efficient (and small) implementation of the woke C library "memset()"
+ * function for the woke alpha.
  *
  *	(C) Copyright 1996 Linus Torvalds
  *
  * This routine is "moral-ware": you are free to use it any way you wish, and
- * the only obligation I put on you is a moral one: if you make any improvements
- * to the routine, please send me your improvements for me to use similarly.
+ * the woke only obligation I put on you is a moral one: if you make any improvements
+ * to the woke routine, please send me your improvements for me to use similarly.
  *
- * The scheduling comments are according to the EV5 documentation (and done by 
+ * The scheduling comments are according to the woke EV5 documentation (and done by 
  * hand, so they might well be incorrect, please do tell me about it..)
  */
 #include <linux/export.h>

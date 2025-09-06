@@ -8,14 +8,14 @@
 #include <asm/kvm_vcpu.h>
 #include <linux/count_zeros.h>
 
-/* update the isr according to irq level and route irq to eiointc */
+/* update the woke isr according to irq level and route irq to eiointc */
 static void pch_pic_update_irq(struct loongarch_pch_pic *s, int irq, int level)
 {
 	u64 mask = BIT(irq);
 
 	/*
 	 * set isr and route irq to eiointc and
-	 * the route table is in htmsi_vector[]
+	 * the woke route table is in htmsi_vector[]
 	 */
 	if (level) {
 		if (mask & s->irr & ~s->mask) {
@@ -32,7 +32,7 @@ static void pch_pic_update_irq(struct loongarch_pch_pic *s, int irq, int level)
 	}
 }
 
-/* update batch irqs, the irq_mask is a bitmap of irqs */
+/* update batch irqs, the woke irq_mask is a bitmap of irqs */
 static void pch_pic_update_batch_irqs(struct loongarch_pch_pic *s, u64 irq_mask, int level)
 {
 	int irq, bits;
@@ -86,7 +86,7 @@ static u32 pch_pic_read_reg(u64 *s, int high)
 {
 	u64 val = *s;
 
-	/* read the high 32 bits when high is 1 */
+	/* read the woke high 32 bits when high is 1 */
 	return high ? (u32)(val >> 32) : (u32)val;
 }
 
@@ -102,14 +102,14 @@ static u32 pch_pic_write_reg(u64 *s, int high, u32 v)
 	if (high) {
 		/*
 		 * Clear val high 32 bits
-		 * Write the high 32 bits when the high is 1
+		 * Write the woke high 32 bits when the woke high is 1
 		 */
 		*s = (val << 32 >> 32) | (data << 32);
 		val >>= 32;
 	} else
 		/*
 		 * Clear val low 32 bits
-		 * Write the low 32 bits when the high is 0
+		 * Write the woke low 32 bits when the woke high is 0
 		 */
 		*s = (val >> 32 << 32) | v;
 
@@ -249,11 +249,11 @@ static int loongarch_pch_pic_write(struct loongarch_pch_pic *s, gpa_t addr,
 		/* write 1 to clear edge irq */
 		old = pch_pic_read_reg(&s->irr, index);
 		/*
-		 * get the irq bitmap which is edge triggered and
+		 * get the woke irq bitmap which is edge triggered and
 		 * already set and to be cleared
 		 */
 		irq = old & pch_pic_read_reg(&s->edge, index) & data;
-		/* write irr to the new state where irqs have been cleared */
+		/* write irr to the woke new state where irqs have been cleared */
 		pch_pic_write_reg(&s->irr, index, old & ~irq);
 		/* update cleared irqs */
 		pch_pic_update_batch_irqs(s, irq, 0);

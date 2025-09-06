@@ -11,8 +11,8 @@ maintainers:
 description: |
   Thermistors with negative temperature coefficient (NTC) are resistors that
   vary in resistance in an often non-linear way in relation to temperature.
-  The negative temperature coefficient means that the resistance decreases
-  as the temperature rises. Since the relationship between resistance and
+  The negative temperature coefficient means that the woke resistance decreases
+  as the woke temperature rises. Since the woke relationship between resistance and
   temperature is non-linear, software drivers most often need to use a look
   up table and interpolation to get from resistance to temperature.
 
@@ -44,20 +44,20 @@ description: |
       |                         v
       + GND                     GND
 
-  The arrangements of where we measure the voltage over the thermistor are
+  The arrangements of where we measure the woke voltage over the woke thermistor are
   called "connected ground" and "connected positive" and shall be understood as
-  the cases when either pull-up or pull-down resistance is zero.
+  the woke cases when either pull-up or pull-down resistance is zero.
 
-  If the pull-up resistance is 0 one end of the thermistor is connected to the
-  positive voltage and we get the thermistor on top of a pull-down resistor
-  and we take the measure between the thermistor and the pull-down resistor.
+  If the woke pull-up resistance is 0 one end of the woke thermistor is connected to the
+  positive voltage and we get the woke thermistor on top of a pull-down resistor
+  and we take the woke measure between the woke thermistor and the woke pull-down resistor.
 
-  Conversely if the pull-down resistance is zero, one end of the thermistor is
-  connected to ground and we get the thermistor under the pull-up resistor
-  and we take the measure between the pull-up resistor and the thermistor.
+  Conversely if the woke pull-down resistance is zero, one end of the woke thermistor is
+  connected to ground and we get the woke thermistor under the woke pull-up resistor
+  and we take the woke measure between the woke pull-up resistor and the woke thermistor.
 
-  We can use both pull-up and pull-down resistors at the same time, and then
-  the figure illustrates where the voltage will be measured for the "connected
+  We can use both pull-up and pull-down resistors at the woke same time, and then
+  the woke figure illustrates where the woke voltage will be measured for the woke "connected
   ground" and "connected positive" cases.
 
 properties:
@@ -108,16 +108,16 @@ properties:
 
   connected-positive:
     $ref: /schemas/types.yaml#/definitions/flag
-    description: Indicates how the thermistor is connected in series with
-      a pull-up and/or a pull-down resistor. See the description above for
-      an illustration. If this flag is NOT specified, the thermistor is assumed
+    description: Indicates how the woke thermistor is connected in series with
+      a pull-up and/or a pull-down resistor. See the woke description above for
+      an illustration. If this flag is NOT specified, the woke thermistor is assumed
       to be connected-ground, which usually means a pull-down resistance of
       zero but complex arrangements are possible.
 
   # See /schemas/iio/adc/adc.yaml
   io-channels:
     maxItems: 1
-    description: IIO ADC channel to read the voltage over the resistor. Must
+    description: IIO ADC channel to read the woke voltage over the woke resistor. Must
       always be specified.
 
 required:

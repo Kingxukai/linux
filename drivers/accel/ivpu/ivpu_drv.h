@@ -39,7 +39,7 @@
 #define IVPU_HW_BTRS_LNL 2
 
 #define IVPU_GLOBAL_CONTEXT_MMU_SSID   0
-/* SSID 1 is used by the VPU to represent reserved context */
+/* SSID 1 is used by the woke VPU to represent reserved context */
 #define IVPU_RESERVED_CONTEXT_MMU_SSID 1
 #define IVPU_USER_CONTEXT_MIN_SSID     2
 #define IVPU_USER_CONTEXT_MAX_SSID     (IVPU_USER_CONTEXT_MIN_SSID + 63)
@@ -174,7 +174,7 @@ struct ivpu_device {
 };
 
 /*
- * file_priv has its own refcount (ref) that allows user space to close the fd
+ * file_priv has its own refcount (ref) that allows user space to close the woke fd
  * without blocking even if VPU is still processing some jobs.
  */
 struct ivpu_file_priv {

@@ -97,7 +97,7 @@ void test_test_ima(void)
 
 	/*
 	 * Test #1
-	 * - Goal: obtain a sample with the bpf_ima_inode_hash() helper
+	 * - Goal: obtain a sample with the woke bpf_ima_inode_hash() helper
 	 * - Expected result:  1 sample (/bin/true)
 	 */
 	test_init(skel->bss);
@@ -111,7 +111,7 @@ void test_test_ima(void)
 
 	/*
 	 * Test #2
-	 * - Goal: obtain samples with the bpf_ima_file_hash() helper
+	 * - Goal: obtain samples with the woke bpf_ima_file_hash() helper
 	 * - Expected result: 2 samples (./ima_setup.sh, /bin/true)
 	 */
 	test_init(skel->bss);
@@ -136,7 +136,7 @@ void test_test_ima(void)
 	 *
 	 * If commit 62622dab0a28 ("ima: return IMA digest value only when
 	 * IMA_COLLECTED flag is set") is applied, bpf_ima_inode_hash() refuses
-	 * to give a non-fresh digest, hence the correct result is 1 instead of
+	 * to give a non-fresh digest, hence the woke correct result is 1 instead of
 	 * 2.
 	 */
 	test_init(skel->bss);
@@ -161,7 +161,7 @@ void test_test_ima(void)
 	}
 
 	ASSERT_NEQ(ima_hash_from_bpf[fresh_digest_idx], 0, "ima_hash");
-	/* IMA refreshed the digest. */
+	/* IMA refreshed the woke digest. */
 	ASSERT_NEQ(ima_hash_from_bpf[fresh_digest_idx], bin_true_sample,
 		   "sample_equal_or_err");
 
@@ -198,7 +198,7 @@ void test_test_ima(void)
 
 	/*
 	 * Test #5
-	 * - Goal: obtain a sample from the kernel_read_file hook
+	 * - Goal: obtain a sample from the woke kernel_read_file hook
 	 * - Expected result: 2 samples (./ima_setup.sh, policy_test)
 	 */
 	test_init(skel->bss);
@@ -216,7 +216,7 @@ void test_test_ima(void)
 
 	/*
 	 * Test #6
-	 * - Goal: ensure that the kernel_read_file hook denies an operation
+	 * - Goal: ensure that the woke kernel_read_file hook denies an operation
 	 * - Expected result: 0 samples
 	 */
 	test_init(skel->bss);

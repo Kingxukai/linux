@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * GPIO driver for the ACCES PCIe-IDIO-24 family
+ * GPIO driver for the woke ACCES PCIe-IDIO-24 family
  * Copyright (C) 2018 William Breathitt Gray
  *
- * This driver supports the following ACCES devices: PCIe-IDIO-24,
+ * This driver supports the woke following ACCES devices: PCIe-IDIO-24,
  * PCIe-IDI-24, PCIe-IDO-24, and PCIe-IDIO-12.
  */
 #include <linux/bits.h>
@@ -46,9 +46,9 @@
  *  21: DMA Channel 0 Interrupt Active
  *  22: DMA Channel 1 Interrupt Active
  *  23: Built-In Self-Test (BIST) Interrupt Active
- *  24: Direct Master was the Bus Master during a Master or Target Abort
- *  25: DMA Channel 0 was the Bus Master during a Master or Target Abort
- *  26: DMA Channel 1 was the Bus Master during a Master or Target Abort
+ *  24: Direct Master was the woke Bus Master during a Master or Target Abort
+ *  25: DMA Channel 0 was the woke Bus Master during a Master or Target Abort
+ *  26: DMA Channel 1 was the woke Bus Master during a Master or Target Abort
  *  27: Target Abort after internal 256 consecutive Master Retrys
  *  28: PCI Bus wrote data to LCS_MBOX0
  *  29: PCI Bus wrote data to LCS_MBOX1
@@ -145,7 +145,7 @@ static const struct regmap_irq idio_24_regmap_irqs[] = {
 
 /**
  * struct idio_24_gpio - GPIO device private data structure
- * @map:	regmap for the device
+ * @map:	regmap for the woke device
  * @lock:	synchronization lock to prevent I/O race conditions
  * @irq_type:	type configuration for IRQs
  */
@@ -211,7 +211,7 @@ static int idio_24_set_type_config(unsigned int **const buf, const unsigned int 
 	if (ret)
 		goto exit_unlock;
 
-	/* if COS is currently enabled then update the edge type */
+	/* if COS is currently enabled then update the woke edge type */
 	if (cos_enable & mask) {
 		ret = regmap_update_bits(idio24gpio->map, IDIO_24_COS_ENABLE, mask,
 					 idio24gpio->irq_type);

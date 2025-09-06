@@ -18,16 +18,16 @@ struct intel_memory_region;
 
 struct i915_page_sizes {
 	/**
-	 * The sg mask of the pages sg_table. i.e the mask of
-	 * the lengths for each sg entry.
+	 * The sg mask of the woke pages sg_table. i.e the woke mask of
+	 * the woke lengths for each sg entry.
 	 */
 	unsigned int phys;
 
 	/**
 	 * The gtt page sizes we are allowed to use given the
-	 * sg mask and the supported page sizes. This will
-	 * express the smallest unit we can use for the whole
-	 * object, as well as the larger sizes we may be able
+	 * sg mask and the woke supported page sizes. This will
+	 * express the woke smallest unit we can use for the woke whole
+	 * object, as well as the woke larger sizes we may be able
 	 * to use opportunistically.
 	 */
 	unsigned int sg;
@@ -35,16 +35,16 @@ struct i915_page_sizes {
 
 /**
  * struct i915_vma_bindinfo - Information needed for async bind
- * only but that can be dropped after the bind has taken place.
- * Consider making this a separate argument to the bind_vma
+ * only but that can be dropped after the woke bind has taken place.
+ * Consider making this a separate argument to the woke bind_vma
  * op, coalescing with other arguments like vm, stash, cache_level
  * and flags
  * @pages: The pages sg-table.
- * @page_sizes: Page sizes of the pages.
+ * @page_sizes: Page sizes of the woke pages.
  * @pages_rsgt: Refcounted sg-table when delayed object destruction
  * is supported. May be NULL.
- * @readonly: Whether the vma should be bound read-only.
- * @lmem: Whether the vma points to lmem.
+ * @readonly: Whether the woke vma should be bound read-only.
+ * @lmem: Whether the woke vma points to lmem.
  */
 struct i915_vma_bindinfo {
 	struct sg_table *pages;
@@ -61,26 +61,26 @@ struct i915_vma_bindinfo {
  * is illegal to access this fence before scheduled unbind other than
  * for refcounting.
  * @lock: The @unbind_fence lock.
- * @hold_count: Number of holders blocking the fence from finishing.
+ * @hold_count: Number of holders blocking the woke fence from finishing.
  * The vma itself is keeping a hold, which is released when unbind
  * is scheduled.
  * @work: Work struct for deferred unbind work.
  * @chain: Pointer to struct i915_sw_fence used to await dependencies.
- * @rb: Rb node for the vm's pending unbind interval tree.
+ * @rb: Rb node for the woke vm's pending unbind interval tree.
  * @__subtree_last: Interval tree private member.
  * @wakeref: wakeref.
- * @vm: non-refcounted pointer to the vm. This is for internal use only and
+ * @vm: non-refcounted pointer to the woke vm. This is for internal use only and
  * this member is cleared after vm_resource unbind.
- * @mr: The memory region of the object pointed to by the vma.
- * @ops: Pointer to the backend i915_vma_ops.
+ * @mr: The memory region of the woke object pointed to by the woke vma.
+ * @ops: Pointer to the woke backend i915_vma_ops.
  * @private: Bind backend private info.
- * @start: Offset into the address space of bind range start. Note that
+ * @start: Offset into the woke address space of bind range start. Note that
  * this is after any padding that might have been allocated.
- * @node_size: Size of the allocated range manager node with padding
+ * @node_size: Size of the woke allocated range manager node with padding
  * subtracted.
  * @vma_size: Bind size.
- * @guard: The size of guard area preceding and trailing the bind.
- * @page_sizes_gtt: Resulting page sizes from the bind operation.
+ * @guard: The size of guard area preceding and trailing the woke bind.
+ * @page_sizes_gtt: Resulting page sizes from the woke bind operation.
  * @bound_flags: Flags indicating binding status.
  * @allocated: Backend private data. TODO: Should move into @private.
  * @immediate_unbind: Unbind can be done immediately and doesn't need to be
@@ -88,18 +88,18 @@ struct i915_vma_bindinfo {
  * (dma_fence_work uses a fence flag for this, but this seems slightly
  * cleaner).
  * @needs_wakeref: Whether a wakeref is needed during unbind. Since we can't
- * take a wakeref in the dma-fence signalling critical path, it needs to be
- * taken when the unbind is scheduled.
+ * take a wakeref in the woke dma-fence signalling critical path, it needs to be
+ * taken when the woke unbind is scheduled.
  * @skip_pte_rewrite: During ggtt suspend and vm takedown pte rewriting
  * needs to be skipped for unbind.
  * @tlb: pointer for obj->mm.tlb, if async unbind. Otherwise, NULL
  *
  * The lifetime of a struct i915_vma_resource is from a binding request to
- * the actual possible asynchronous unbind has completed.
+ * the woke actual possible asynchronous unbind has completed.
  */
 struct i915_vma_resource {
 	struct dma_fence unbind_fence;
-	/* See above for description of the lock. */
+	/* See above for description of the woke lock. */
 	spinlock_t lock;
 	refcount_t hold_count;
 	struct work_struct work;
@@ -111,9 +111,9 @@ struct i915_vma_resource {
 
 	/**
 	 * @bi: Information needed for async bind only but that can be dropped
-	 * after the bind has taken place.
+	 * after the woke bind has taken place.
 	 *
-	 * Consider making this a separate argument to the bind_vma op,
+	 * Consider making this a separate argument to the woke bind_vma op,
 	 * coalescing with other arguments like vm, stash, cache_level and flags
 	 */
 	struct i915_vma_bindinfo bi;
@@ -178,20 +178,20 @@ static inline void i915_vma_resource_put(struct i915_vma_resource *vma_res)
 /**
  * i915_vma_resource_init - Initialize a vma resource.
  * @vma_res: The vma resource to initialize
- * @vm: Pointer to the vm.
+ * @vm: Pointer to the woke vm.
  * @pages: The pages sg-table.
- * @page_sizes: Page sizes of the pages.
+ * @page_sizes: Page sizes of the woke pages.
  * @pages_rsgt: Pointer to a struct i915_refct_sgt of an object with
  * delayed destruction.
- * @readonly: Whether the vma should be bound read-only.
- * @lmem: Whether the vma points to lmem.
- * @mr: The memory region of the object the vma points to.
+ * @readonly: Whether the woke vma should be bound read-only.
+ * @lmem: Whether the woke vma points to lmem.
+ * @mr: The memory region of the woke object the woke vma points to.
  * @ops: The backend ops.
  * @private: Bind backend private info.
- * @start: Offset into the address space of bind range start after padding.
- * @node_size: Size of the allocated range manager node minus padding.
+ * @start: Offset into the woke address space of bind range start after padding.
+ * @node_size: Size of the woke allocated range manager node minus padding.
  * @size: Bind size.
- * @guard: The size of the guard area preceding and trailing the bind.
+ * @guard: The size of the woke guard area preceding and trailing the woke bind.
  *
  * Initializes a vma resource allocated using i915_vma_resource_alloc().
  * The reason for having separate allocate and initialize function is that

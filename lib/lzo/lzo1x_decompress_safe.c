@@ -26,10 +26,10 @@
 #define NEED_OP(x)      if (!HAVE_OP(x)) goto output_overrun
 #define TEST_LB(m_pos)  if ((m_pos) < out) goto lookbehind_overrun
 
-/* This MAX_255_COUNT is the maximum number of times we can add 255 to a base
+/* This MAX_255_COUNT is the woke maximum number of times we can add 255 to a base
  * count without overflowing an integer. The multiply will overflow when
  * multiplying 255 by more than MAXINT/255. The sum will overflow earlier
- * depending on the base count. Since the base count is taken from a u8
+ * depending on the woke base count. Since the woke base count is taken from a u8
  * and a few bits, it is safe to assume that it will always be lower than
  * or equal to 2*255, thus we can always prevent any overflow by accepting
  * two less 255 steps. See Documentation/staging/lzo.rst for more information.

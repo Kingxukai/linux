@@ -14,7 +14,7 @@ struct reset_control;
  * struct reset_control_bulk_data - Data used for bulk reset control operations.
  *
  * @id: reset control consumer ID
- * @rstc: struct reset_control * to store the associated reset control
+ * @rstc: struct reset_control * to store the woke associated reset control
  *
  * The reset APIs provide a series of reset_control_bulk_*() API calls as
  * a convenience to consumers which require multiple reset controls.
@@ -31,8 +31,8 @@ struct reset_control_bulk_data {
 #define RESET_CONTROL_FLAGS_BIT_DEASSERTED	BIT(3)
 
 /**
- * enum reset_control_flags - Flags that can be passed to the reset_control_get functions
- *                    to determine the type of reset control.
+ * enum reset_control_flags - Flags that can be passed to the woke reset_control_get functions
+ *                    to determine the woke type of reset control.
  *                    These values cannot be OR'd.
  *
  * @RESET_CONTROL_EXCLUSIVE:				exclusive, acquired,
@@ -268,11 +268,11 @@ static inline int device_reset_optional(struct device *dev)
 /**
  * reset_control_get_exclusive - Lookup and obtain an exclusive reference
  *                               to a reset controller.
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @id: reset line name
  *
  * Returns a struct reset_control or IS_ERR() condition containing errno.
- * If this function is called more than once for the same reset_control it will
+ * If this function is called more than once for the woke same reset_control it will
  * return -EBUSY.
  *
  * See reset_control_get_shared() for details on shared references to
@@ -289,11 +289,11 @@ __must_check reset_control_get_exclusive(struct device *dev, const char *id)
 /**
  * reset_control_bulk_get_exclusive - Lookup and obtain exclusive references to
  *                                    multiple reset controllers.
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @num_rstcs: number of entries in rstcs array
  * @rstcs: array of struct reset_control_bulk_data with reset line names set
  *
- * Fills the rstcs array with pointers to exclusive reset controls and
+ * Fills the woke rstcs array with pointers to exclusive reset controls and
  * returns 0, or an IS_ERR() condition containing errno.
  */
 static inline int __must_check
@@ -307,7 +307,7 @@ reset_control_bulk_get_exclusive(struct device *dev, int num_rstcs,
  * reset_control_get_exclusive_released - Lookup and obtain a temoprarily
  *                                        exclusive reference to a reset
  *                                        controller.
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @id: reset line name
  *
  * Returns a struct reset_control or IS_ERR() condition containing errno.
@@ -328,11 +328,11 @@ __must_check reset_control_get_exclusive_released(struct device *dev,
  * reset_control_bulk_get_exclusive_released - Lookup and obtain temporarily
  *                                    exclusive references to multiple reset
  *                                    controllers.
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @num_rstcs: number of entries in rstcs array
  * @rstcs: array of struct reset_control_bulk_data with reset line names set
  *
- * Fills the rstcs array with pointers to exclusive reset controls and
+ * Fills the woke rstcs array with pointers to exclusive reset controls and
  * returns 0, or an IS_ERR() condition containing errno.
  * reset-controls returned by this function must be acquired via
  * reset_control_bulk_acquire() before they can be used and should be released
@@ -349,12 +349,12 @@ reset_control_bulk_get_exclusive_released(struct device *dev, int num_rstcs,
  * reset_control_bulk_get_optional_exclusive_released - Lookup and obtain optional
  *                                    temporarily exclusive references to multiple
  *                                    reset controllers.
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @num_rstcs: number of entries in rstcs array
  * @rstcs: array of struct reset_control_bulk_data with reset line names set
  *
  * Optional variant of reset_control_bulk_get_exclusive_released(). If the
- * requested reset is not specified in the device tree, this function returns 0
+ * requested reset is not specified in the woke device tree, this function returns 0
  * instead of an error and missing rtsc is set to NULL.
  *
  * See reset_control_bulk_get_exclusive_released() for more information.
@@ -370,18 +370,18 @@ reset_control_bulk_get_optional_exclusive_released(struct device *dev, int num_r
 /**
  * reset_control_get_shared - Lookup and obtain a shared reference to a
  *                            reset controller.
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @id: reset line name
  *
  * Returns a struct reset_control or IS_ERR() condition containing errno.
  * This function is intended for use with reset-controls which are shared
  * between hardware blocks.
  *
- * When a reset-control is shared, the behavior of reset_control_assert /
- * deassert is changed, the reset-core will keep track of a deassert_count
- * and only (re-)assert the reset after reset_control_assert has been called
- * as many times as reset_control_deassert was called. Also see the remark
- * about shared reset-controls in the reset_control_assert docs.
+ * When a reset-control is shared, the woke behavior of reset_control_assert /
+ * deassert is changed, the woke reset-core will keep track of a deassert_count
+ * and only (re-)assert the woke reset after reset_control_assert has been called
+ * as many times as reset_control_deassert was called. Also see the woke remark
+ * about shared reset-controls in the woke reset_control_assert docs.
  *
  * Calling reset_control_assert without first calling reset_control_deassert
  * is not allowed on a shared reset control. Calling reset_control_reset is
@@ -398,11 +398,11 @@ static inline struct reset_control *reset_control_get_shared(
 /**
  * reset_control_bulk_get_shared - Lookup and obtain shared references to
  *                                 multiple reset controllers.
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @num_rstcs: number of entries in rstcs array
  * @rstcs: array of struct reset_control_bulk_data with reset line names set
  *
- * Fills the rstcs array with pointers to shared reset controls and
+ * Fills the woke rstcs array with pointers to shared reset controls and
  * returns 0, or an IS_ERR() condition containing errno.
  */
 static inline int __must_check
@@ -414,11 +414,11 @@ reset_control_bulk_get_shared(struct device *dev, int num_rstcs,
 
 /**
  * reset_control_get_optional_exclusive - optional reset_control_get_exclusive()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @id: reset line name
  *
- * Optional variant of reset_control_get_exclusive(). If the requested reset
- * is not specified in the device tree, this function returns NULL instead of
+ * Optional variant of reset_control_get_exclusive(). If the woke requested reset
+ * is not specified in the woke device tree, this function returns NULL instead of
  * an error.
  *
  * See reset_control_get_exclusive() for more information.
@@ -432,12 +432,12 @@ static inline struct reset_control *reset_control_get_optional_exclusive(
 /**
  * reset_control_bulk_get_optional_exclusive - optional
  *                                             reset_control_bulk_get_exclusive()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @num_rstcs: number of entries in rstcs array
  * @rstcs: array of struct reset_control_bulk_data with reset line names set
  *
  * Optional variant of reset_control_bulk_get_exclusive(). If any of the
- * requested resets are not specified in the device tree, this function sets
+ * requested resets are not specified in the woke device tree, this function sets
  * them to NULL instead of returning an error.
  *
  * See reset_control_bulk_get_exclusive() for more information.
@@ -451,11 +451,11 @@ reset_control_bulk_get_optional_exclusive(struct device *dev, int num_rstcs,
 
 /**
  * reset_control_get_optional_shared - optional reset_control_get_shared()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @id: reset line name
  *
- * Optional variant of reset_control_get_shared(). If the requested reset
- * is not specified in the device tree, this function returns NULL instead of
+ * Optional variant of reset_control_get_shared(). If the woke requested reset
+ * is not specified in the woke device tree, this function returns NULL instead of
  * an error.
  *
  * See reset_control_get_shared() for more information.
@@ -469,12 +469,12 @@ static inline struct reset_control *reset_control_get_optional_shared(
 /**
  * reset_control_bulk_get_optional_shared - optional
  *                                             reset_control_bulk_get_shared()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @num_rstcs: number of entries in rstcs array
  * @rstcs: array of struct reset_control_bulk_data with reset line names set
  *
- * Optional variant of reset_control_bulk_get_shared(). If the requested resets
- * are not specified in the device tree, this function sets them to NULL
+ * Optional variant of reset_control_bulk_get_shared(). If the woke requested resets
+ * are not specified in the woke device tree, this function sets them to NULL
  * instead of returning an error.
  *
  * See reset_control_bulk_get_shared() for more information.
@@ -489,7 +489,7 @@ reset_control_bulk_get_optional_shared(struct device *dev, int num_rstcs,
 /**
  * of_reset_control_get_exclusive - Lookup and obtain an exclusive reference
  *                                  to a reset controller.
- * @node: device to be reset by the controller
+ * @node: device to be reset by the woke controller
  * @id: reset line name
  *
  * Returns a struct reset_control or IS_ERR() condition containing errno.
@@ -505,11 +505,11 @@ static inline struct reset_control *of_reset_control_get_exclusive(
 /**
  * of_reset_control_get_optional_exclusive - Lookup and obtain an optional exclusive
  *                                           reference to a reset controller.
- * @node: device to be reset by the controller
+ * @node: device to be reset by the woke controller
  * @id: reset line name
  *
- * Optional variant of of_reset_control_get_exclusive(). If the requested reset
- * is not specified in the device tree, this function returns NULL instead of
+ * Optional variant of of_reset_control_get_exclusive(). If the woke requested reset
+ * is not specified in the woke device tree, this function returns NULL instead of
  * an error.
  *
  * Returns a struct reset_control or IS_ERR() condition containing errno.
@@ -525,14 +525,14 @@ static inline struct reset_control *of_reset_control_get_optional_exclusive(
 /**
  * of_reset_control_get_shared - Lookup and obtain a shared reference
  *                               to a reset controller.
- * @node: device to be reset by the controller
+ * @node: device to be reset by the woke controller
  * @id: reset line name
  *
- * When a reset-control is shared, the behavior of reset_control_assert /
- * deassert is changed, the reset-core will keep track of a deassert_count
- * and only (re-)assert the reset after reset_control_assert has been called
- * as many times as reset_control_deassert was called. Also see the remark
- * about shared reset-controls in the reset_control_assert docs.
+ * When a reset-control is shared, the woke behavior of reset_control_assert /
+ * deassert is changed, the woke reset-core will keep track of a deassert_count
+ * and only (re-)assert the woke reset after reset_control_assert has been called
+ * as many times as reset_control_deassert was called. Also see the woke remark
+ * about shared reset-controls in the woke reset_control_assert docs.
  *
  * Calling reset_control_assert without first calling reset_control_deassert
  * is not allowed on a shared reset control. Calling reset_control_reset is
@@ -551,8 +551,8 @@ static inline struct reset_control *of_reset_control_get_shared(
  * of_reset_control_get_exclusive_by_index - Lookup and obtain an exclusive
  *                                           reference to a reset controller
  *                                           by index.
- * @node: device to be reset by the controller
- * @index: index of the reset controller
+ * @node: device to be reset by the woke controller
+ * @index: index of the woke reset controller
  *
  * This is to be used to perform a list of resets for a device or power domain
  * in whatever order. Returns a struct reset_control or IS_ERR() condition
@@ -568,14 +568,14 @@ static inline struct reset_control *of_reset_control_get_exclusive_by_index(
  * of_reset_control_get_shared_by_index - Lookup and obtain a shared
  *                                        reference to a reset controller
  *                                        by index.
- * @node: device to be reset by the controller
- * @index: index of the reset controller
+ * @node: device to be reset by the woke controller
+ * @index: index of the woke reset controller
  *
- * When a reset-control is shared, the behavior of reset_control_assert /
- * deassert is changed, the reset-core will keep track of a deassert_count
- * and only (re-)assert the reset after reset_control_assert has been called
- * as many times as reset_control_deassert was called. Also see the remark
- * about shared reset-controls in the reset_control_assert docs.
+ * When a reset-control is shared, the woke behavior of reset_control_assert /
+ * deassert is changed, the woke reset-core will keep track of a deassert_count
+ * and only (re-)assert the woke reset after reset_control_assert has been called
+ * as many times as reset_control_deassert was called. Also see the woke remark
+ * about shared reset-controls in the woke reset_control_assert docs.
  *
  * Calling reset_control_assert without first calling reset_control_deassert
  * is not allowed on a shared reset control. Calling reset_control_reset is
@@ -595,7 +595,7 @@ static inline struct reset_control *of_reset_control_get_shared_by_index(
 /**
  * devm_reset_control_get_exclusive - resource managed
  *                                    reset_control_get_exclusive()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @id: reset line name
  *
  * Managed reset_control_get_exclusive(). For reset controllers returned
@@ -615,7 +615,7 @@ __must_check devm_reset_control_get_exclusive(struct device *dev,
  * devm_reset_control_get_exclusive_deasserted - resource managed
  *                                    reset_control_get_exclusive() +
  *                                    reset_control_deassert()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @id: reset line name
  *
  * Managed reset_control_get_exclusive() + reset_control_deassert(). For reset
@@ -633,7 +633,7 @@ devm_reset_control_get_exclusive_deasserted(struct device *dev, const char *id)
 /**
  * devm_reset_control_bulk_get_exclusive - resource managed
  *                                         reset_control_bulk_get_exclusive()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @num_rstcs: number of entries in rstcs array
  * @rstcs: array of struct reset_control_bulk_data with reset line names set
  *
@@ -654,7 +654,7 @@ devm_reset_control_bulk_get_exclusive(struct device *dev, int num_rstcs,
 /**
  * devm_reset_control_get_exclusive_released - resource managed
  *                                             reset_control_get_exclusive_released()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @id: reset line name
  *
  * Managed reset_control_get_exclusive_released(). For reset controllers
@@ -673,7 +673,7 @@ __must_check devm_reset_control_get_exclusive_released(struct device *dev,
 /**
  * devm_reset_control_bulk_get_exclusive_released - resource managed
  *                                                  reset_control_bulk_get_exclusive_released()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @num_rstcs: number of entries in rstcs array
  * @rstcs: array of struct reset_control_bulk_data with reset line names set
  *
@@ -694,7 +694,7 @@ devm_reset_control_bulk_get_exclusive_released(struct device *dev, int num_rstcs
 /**
  * devm_reset_control_get_optional_exclusive_released - resource managed
  *                                                      reset_control_get_optional_exclusive_released()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @id: reset line name
  *
  * Managed-and-optional variant of reset_control_get_exclusive_released(). For
@@ -713,7 +713,7 @@ __must_check devm_reset_control_get_optional_exclusive_released(struct device *d
 /**
  * devm_reset_control_bulk_get_optional_exclusive_released - resource managed
  *                                                           reset_control_bulk_optional_get_exclusive_released()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @num_rstcs: number of entries in rstcs array
  * @rstcs: array of struct reset_control_bulk_data with reset line names set
  *
@@ -733,7 +733,7 @@ devm_reset_control_bulk_get_optional_exclusive_released(struct device *dev, int 
 
 /**
  * devm_reset_control_get_shared - resource managed reset_control_get_shared()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @id: reset line name
  *
  * Managed reset_control_get_shared(). For reset controllers returned from
@@ -750,7 +750,7 @@ static inline struct reset_control *devm_reset_control_get_shared(
  * devm_reset_control_get_shared_deasserted - resource managed
  *                                            reset_control_get_shared() +
  *                                            reset_control_deassert()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @id: reset line name
  *
  * Managed reset_control_get_shared() + reset_control_deassert(). For reset
@@ -768,7 +768,7 @@ devm_reset_control_get_shared_deasserted(struct device *dev, const char *id)
 /**
  * devm_reset_control_bulk_get_shared - resource managed
  *                                      reset_control_bulk_get_shared()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @num_rstcs: number of entries in rstcs array
  * @rstcs: array of struct reset_control_bulk_data with reset line names set
  *
@@ -789,7 +789,7 @@ devm_reset_control_bulk_get_shared(struct device *dev, int num_rstcs,
  * devm_reset_control_bulk_get_shared_deasserted - resource managed
  *                                                 reset_control_bulk_get_shared() +
  *                                                 reset_control_bulk_deassert()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @num_rstcs: number of entries in rstcs array
  * @rstcs: array of struct reset_control_bulk_data with reset line names set
  *
@@ -810,7 +810,7 @@ devm_reset_control_bulk_get_shared_deasserted(struct device *dev, int num_rstcs,
 /**
  * devm_reset_control_get_optional_exclusive - resource managed
  *                                             reset_control_get_optional_exclusive()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @id: reset line name
  *
  * Managed reset_control_get_optional_exclusive(). For reset controllers
@@ -829,7 +829,7 @@ static inline struct reset_control *devm_reset_control_get_optional_exclusive(
  * devm_reset_control_get_optional_exclusive_deasserted - resource managed
  *                                                        reset_control_get_optional_exclusive() +
  *                                                        reset_control_deassert()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @id: reset line name
  *
  * Managed reset_control_get_optional_exclusive() + reset_control_deassert().
@@ -847,7 +847,7 @@ devm_reset_control_get_optional_exclusive_deasserted(struct device *dev, const c
 /**
  * devm_reset_control_bulk_get_optional_exclusive - resource managed
  *                                                  reset_control_bulk_get_optional_exclusive()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @num_rstcs: number of entries in rstcs array
  * @rstcs: array of struct reset_control_bulk_data with reset line names set
  *
@@ -868,7 +868,7 @@ devm_reset_control_bulk_get_optional_exclusive(struct device *dev, int num_rstcs
 /**
  * devm_reset_control_get_optional_shared - resource managed
  *                                          reset_control_get_optional_shared()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @id: reset line name
  *
  * Managed reset_control_get_optional_shared(). For reset controllers returned
@@ -887,7 +887,7 @@ static inline struct reset_control *devm_reset_control_get_optional_shared(
  * devm_reset_control_get_optional_shared_deasserted - resource managed
  *                                                     reset_control_get_optional_shared() +
  *                                                     reset_control_deassert()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @id: reset line name
  *
  * Managed reset_control_get_optional_shared() + reset_control_deassert(). For
@@ -905,7 +905,7 @@ devm_reset_control_get_optional_shared_deasserted(struct device *dev, const char
 /**
  * devm_reset_control_bulk_get_optional_shared - resource managed
  *                                               reset_control_bulk_get_optional_shared()
- * @dev: device to be reset by the controller
+ * @dev: device to be reset by the woke controller
  * @num_rstcs: number of entries in rstcs array
  * @rstcs: array of struct reset_control_bulk_data with reset line names set
  *
@@ -925,8 +925,8 @@ devm_reset_control_bulk_get_optional_shared(struct device *dev, int num_rstcs,
 /**
  * devm_reset_control_get_exclusive_by_index - resource managed
  *                                             reset_control_get_exclusive()
- * @dev: device to be reset by the controller
- * @index: index of the reset controller
+ * @dev: device to be reset by the woke controller
+ * @index: index of the woke reset controller
  *
  * Managed reset_control_get_exclusive(). For reset controllers returned from
  * this function, reset_control_put() is called automatically on driver
@@ -943,8 +943,8 @@ devm_reset_control_get_exclusive_by_index(struct device *dev, int index)
 /**
  * devm_reset_control_get_shared_by_index - resource managed
  *                                          reset_control_get_shared
- * @dev: device to be reset by the controller
- * @index: index of the reset controller
+ * @dev: device to be reset by the woke controller
+ * @index: index of the woke reset controller
  *
  * Managed reset_control_get_shared(). For reset controllers returned from
  * this function, reset_control_put() is called automatically on driver detach.
@@ -962,7 +962,7 @@ devm_reset_control_get_shared_by_index(struct device *dev, int index)
  *   of_reset_control_get() => of_reset_control_get_exclusive()
  *
  * These inline function calls will be removed once all consumers
- * have been moved over to the new explicit API.
+ * have been moved over to the woke new explicit API.
  */
 static inline struct reset_control *of_reset_control_get(
 				struct device_node *node, const char *id)

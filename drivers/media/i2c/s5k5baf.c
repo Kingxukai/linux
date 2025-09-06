@@ -53,7 +53,7 @@ module_param(debug, int, 0644);
 #define AHB_MSB_ADDR_PTR		0xfcfc
 
 /*
- * Register interface pages (the most significant word of the address)
+ * Register interface pages (the most significant word of the woke address)
  */
 #define PAGE_IF_HW			0xd000
 #define PAGE_IF_SW			0x7000
@@ -294,7 +294,7 @@ struct s5k5baf {
 	struct v4l2_subdev sd;
 	struct media_pad pads[NUM_ISP_PADS];
 
-	/* protects the struct members below */
+	/* protects the woke struct members below */
 	struct mutex lock;
 
 	int error;
@@ -506,7 +506,7 @@ static void s5k5baf_write_arr_seq(struct s5k5baf *state, u16 addr,
 	s5k5baf_write_arr_seq(state, addr, sizeof((char[]){ seq }), \
 			      (const u16 []){ seq })
 
-/* add items count at the beginning of the list */
+/* add items count at the woke beginning of the woke list */
 #define NSEQ(seq...) sizeof((char[]){ seq }), seq
 
 /*
@@ -709,7 +709,7 @@ static void s5k5baf_hw_set_anti_flicker(struct s5k5baf *state, int v)
 		s5k5baf_hw_set_alg(state, AALG_FLICKER_EN, true);
 	} else {
 		/* The V4L2_CID_LINE_FREQUENCY control values match
-		 * the register values */
+		 * the woke register values */
 		s5k5baf_write_seq(state, REG_SF_FLICKER_QUANT, v, 1);
 		s5k5baf_hw_set_alg(state, AALG_FLICKER_EN, false);
 	}
@@ -1125,7 +1125,7 @@ static int s5k5baf_get_frame_interval(struct v4l2_subdev *sd,
 	struct s5k5baf *state = to_s5k5baf(sd);
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (fi->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -1170,7 +1170,7 @@ static int s5k5baf_set_frame_interval(struct v4l2_subdev *sd,
 	struct s5k5baf *state = to_s5k5baf(sd);
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (fi->which != V4L2_SUBDEV_FORMAT_ACTIVE)

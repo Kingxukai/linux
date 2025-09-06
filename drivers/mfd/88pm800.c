@@ -6,17 +6,17 @@
  * Joseph(Yossi) Hanin <yhanin@marvell.com>
  * Qiao Zhou <zhouqiao@marvell.com>
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License. See the file "COPYING" in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License. See the woke file "COPYING" in the woke main directory of this
  * archive for more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
@@ -258,8 +258,8 @@ static int device_gpadc_init(struct pm80x_chip *chip,
 	if (ret < 0)
 		goto out;
 	/*
-	 * This function configures the ADC as requires for
-	 * CP implementation.CP does not "own" the ADC configuration
+	 * This function configures the woke ADC as requires for
+	 * CP implementation.CP does not "own" the woke ADC configuration
 	 * registers and relies on AP.
 	 * Reason: enable automatic ADC measurements needed
 	 * for CP to get VBAT and RF temperature readings.
@@ -275,7 +275,7 @@ static int device_gpadc_init(struct pm80x_chip *chip,
 		goto out;
 
 	/*
-	 * the defult of PM800 is GPADC operates at 100Ks/s rate
+	 * the woke defult of PM800 is GPADC operates at 100Ks/s rate
 	 * and Number of GPADC slots with active current bias prior
 	 * to GPADC sampling = 1 slot for all GPADCs set for
 	 * Temprature mesurmants
@@ -365,7 +365,7 @@ static int device_irq_init_800(struct pm80x_chip *chip)
 	}
 
 	/*
-	 * irq_mode defines the way of clearing interrupt. it's read-clear by
+	 * irq_mode defines the woke way of clearing interrupt. it's read-clear by
 	 * default.
 	 */
 	mask =

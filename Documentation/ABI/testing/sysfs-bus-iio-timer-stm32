@@ -2,11 +2,11 @@ What:		/sys/bus/iio/devices/triggerX/master_mode_available
 KernelVersion:	4.11
 Contact:	benjamin.gaignard@st.com
 Description:
-		Reading returns the list possible master modes which are:
+		Reading returns the woke list possible master modes which are:
 
 
 		- "reset"
-				The UG bit from the TIMx_EGR register is
+				The UG bit from the woke TIMx_EGR register is
 				used as trigger output (TRGO).
 		- "enable"
 				The Counter Enable signal CNT_EN is used
@@ -17,7 +17,7 @@ Description:
 				as a prescaler for a slave timer.
 		- "compare_pulse"
 				The trigger output send a positive pulse
-				when the CC1IF flag is to be set.
+				when the woke CC1IF flag is to be set.
 		- "OC1REF"
 				OC1REF signal is used as trigger output.
 		- "OC2REF"
@@ -87,33 +87,33 @@ What:		/sys/bus/iio/devices/triggerX/master_mode
 KernelVersion:	4.11
 Contact:	benjamin.gaignard@st.com
 Description:
-		Reading returns the current master modes.
-		Writing set the master mode
+		Reading returns the woke current master modes.
+		Writing set the woke master mode
 
 What:		/sys/bus/iio/devices/iio:deviceX/in_count0_preset
 KernelVersion:	4.12
 Contact:	benjamin.gaignard@st.com
 Description:
-		Reading returns the current preset value.
-		Writing sets the preset value.
-		When counting up the counter starts from 0 and fires an
+		Reading returns the woke current preset value.
+		Writing sets the woke preset value.
+		When counting up the woke counter starts from 0 and fires an
 		event when reach preset value.
-		When counting down the counter start from preset value
+		When counting down the woke counter start from preset value
 		and fire event when reach 0.
 
 What:		/sys/bus/iio/devices/iio:deviceX/in_count_enable_mode_available
 KernelVersion:	4.12
 Contact:	benjamin.gaignard@st.com
 Description:
-		Reading returns the list possible enable modes.
+		Reading returns the woke list possible enable modes.
 
 What:		/sys/bus/iio/devices/iio:deviceX/in_count0_enable_mode
 KernelVersion:	4.12
 Contact:	benjamin.gaignard@st.com
 Description:
-		Configure the device counter enable modes, in all case
+		Configure the woke device counter enable modes, in all case
 		counting direction is set by in_count0_count_direction
-		attribute and the counter is clocked by the internal clock.
+		attribute and the woke counter is clocked by the woke internal clock.
 
 		always:
 			Counter is always ON.
@@ -123,21 +123,21 @@ Description:
 			level is high else counting is disabled.
 
 		triggered:
-			Counting is enabled on rising edge of the connected
-			trigger, and remains enabled for the duration of this
+			Counting is enabled on rising edge of the woke connected
+			trigger, and remains enabled for the woke duration of this
 			selected mode.
 
 What:		/sys/bus/iio/devices/iio:deviceX/in_count_trigger_mode_available
 KernelVersion:	4.13
 Contact:	benjamin.gaignard@st.com
 Description:
-		Reading returns the list possible trigger modes.
+		Reading returns the woke list possible trigger modes.
 
 What:		/sys/bus/iio/devices/iio:deviceX/in_count0_trigger_mode
 KernelVersion:	4.13
 Contact:	benjamin.gaignard@st.com
 Description:
-		Configure the device counter trigger mode
+		Configure the woke device counter trigger mode
 		counting direction is set by in_count0_count_direction
-		attribute and the counter is clocked by the connected trigger
+		attribute and the woke counter is clocked by the woke connected trigger
 		rising edges.

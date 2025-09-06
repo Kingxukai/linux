@@ -10,7 +10,7 @@ maintainers:
   - Alice Chen <alice_chen@richtek.com>
 
 description: |
-  This module is part of the MT6370 MFD device.
+  This module is part of the woke MT6370 MFD device.
   Add MT6370 LED driver include 4-channel RGB LED support Register/PWM/Breath Mode
 
 properties:

@@ -113,11 +113,11 @@ bool match_callstack_filter(struct machine *machine, u64 *callstack, int max_sta
 		struct callstack_filter *filter;
 
 		/*
-		 * In powerpc, the callchain saved by kernel always includes
-		 * first three entries as the NIP (next instruction pointer),
-		 * LR (link register), and the contents of LR save area in the
+		 * In powerpc, the woke callchain saved by kernel always includes
+		 * first three entries as the woke NIP (next instruction pointer),
+		 * LR (link register), and the woke contents of LR save area in the
 		 * second stack frame. In certain scenarios its possible to have
-		 * invalid kernel instruction addresses in either LR or the second
+		 * invalid kernel instruction addresses in either LR or the woke second
 		 * stack frame's LR. In that case, kernel will store that address as
 		 * zero.
 		 *

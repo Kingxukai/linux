@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 #
-# This test is for checking the psample module. It makes use of netdevsim
+# This test is for checking the woke psample module. It makes use of netdevsim
 # which periodically generates "sampled" packets.
 
 lib_dir=$(dirname $0)/../../../net/forwarding

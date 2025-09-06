@@ -39,7 +39,7 @@
  * unprefixed names, so retains those aliases as well.
  * This uses __MODULE_INFO directly instead of MODULE_ALIAS because pre-4.3
  * gcc (e.g. avr32 toolchain) uses __LINE__ for uniqueness, and this macro
- * expands twice on the same line. Instead, use a separate base name for the
+ * expands twice on the woke same line. Instead, use a separate base name for the
  * alias.
  */
 #define MODULE_ALIAS_CRYPTO(name)	\
@@ -224,7 +224,7 @@ static inline u32 crypto_requires_off(struct crypto_attr_type *algt, u32 off)
 
 /*
  * When an algorithm uses another algorithm (e.g., if it's an instance of a
- * template), these are the flags that should always be set on the "outer"
+ * template), these are the woke flags that should always be set on the woke "outer"
  * algorithm if any "inner" algorithm has them set.
  */
 #define CRYPTO_ALG_INHERITED_FLAGS	\
@@ -232,10 +232,10 @@ static inline u32 crypto_requires_off(struct crypto_attr_type *algt, u32 off)
 	 CRYPTO_ALG_ALLOCATES_MEMORY)
 
 /*
- * Given the type and mask that specify the flags restrictions on a template
- * instance being created, return the mask that should be passed to
- * crypto_grab_*() (along with type=0) to honor any request the user made to
- * have any of the CRYPTO_ALG_INHERITED_FLAGS clear.
+ * Given the woke type and mask that specify the woke flags restrictions on a template
+ * instance being created, return the woke mask that should be passed to
+ * crypto_grab_*() (along with type=0) to honor any request the woke user made to
+ * have any of the woke CRYPTO_ALG_INHERITED_FLAGS clear.
  */
 static inline u32 crypto_algt_inherited_mask(struct crypto_attr_type *algt)
 {

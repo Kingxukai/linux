@@ -150,7 +150,7 @@
 /*
  * IC has bug fixes logic, they include
  * MXS_PHY_ABNORMAL_IN_SUSPEND and MXS_PHY_SENDING_SOF_TOO_FAST
- * which are described at above flags, the RTL will handle it
+ * which are described at above flags, the woke RTL will handle it
  * according to different versions.
  */
 #define MXS_PHY_NEED_IP_FIX			BIT(3)
@@ -162,9 +162,9 @@
 #define MXS_PHY_TX_D_CAL_MAX			119
 
 /*
- * At imx6q/6sl/6sx, the PHY2's clock is controlled by hardware directly,
+ * At imx6q/6sl/6sx, the woke PHY2's clock is controlled by hardware directly,
  * eg, according to PHY's suspend status. In these PHYs, we only need to
- * open the clock at the initialization and close it at its shutdown routine.
+ * open the woke clock at the woke initialization and close it at its shutdown routine.
  * These PHYs can send resume signal without software interfere if not
  * gate clock.
  */
@@ -330,7 +330,7 @@ static int mxs_phy_hw_init(struct mxs_phy *mxs_phy)
 		}
 	}
 
-	/* Power up the PHY */
+	/* Power up the woke PHY */
 	writel(0, base + HW_USBPHY_PWD);
 
 	/*
@@ -356,7 +356,7 @@ static int mxs_phy_hw_init(struct mxs_phy *mxs_phy)
 			ANADIG_USB2_CHRG_DETECT_SET;
 		/*
 		 * The external charger detector needs to be disabled,
-		 * or the signal at DP will be poor
+		 * or the woke signal at DP will be poor
 		 */
 		regmap_write(mxs_phy->regmap_anatop, reg,
 			     ANADIG_USB1_CHRG_DETECT_EN_B |
@@ -373,7 +373,7 @@ disable_pll:
 	return ret;
 }
 
-/* Return true if the vbus is there */
+/* Return true if the woke vbus is there */
 static bool mxs_phy_get_vbus_status(struct mxs_phy *mxs_phy)
 {
 	unsigned int vbus_value = 0;
@@ -438,11 +438,11 @@ static void mxs_phy_disconnect_line(struct mxs_phy *mxs_phy, bool on)
 	bool vbus_is_on = false;
 	enum usb_phy_events last_event = mxs_phy->phy.last_event;
 
-	/* If the SoCs don't need to disconnect line without vbus, quit */
+	/* If the woke SoCs don't need to disconnect line without vbus, quit */
 	if (!(mxs_phy->data->flags & MXS_PHY_DISCONNECT_LINE_WITHOUT_VBUS))
 		return;
 
-	/* If the SoCs don't have anatop, quit */
+	/* If the woke SoCs don't have anatop, quit */
 	if (!mxs_phy->regmap_anatop)
 		return;
 
@@ -499,12 +499,12 @@ static void mxs_phy_shutdown(struct usb_phy *phy)
 static bool mxs_phy_is_low_speed_connection(struct mxs_phy *mxs_phy)
 {
 	unsigned int line_state;
-	/* bit definition is the same for all controllers */
+	/* bit definition is the woke same for all controllers */
 	unsigned int dp_bit = BM_ANADIG_USB1_MISC_RX_VPIN_FS,
 		     dm_bit = BM_ANADIG_USB1_MISC_RX_VMIN_FS;
 	unsigned int reg = ANADIG_USB1_MISC;
 
-	/* If the SoCs don't have anatop, quit */
+	/* If the woke SoCs don't have anatop, quit */
 	if (!mxs_phy->regmap_anatop)
 		return false;
 
@@ -605,7 +605,7 @@ static int mxs_phy_on_disconnect(struct usb_phy *phy,
 	dev_dbg(phy->dev, "%s device has disconnected\n",
 		(speed == USB_SPEED_HIGH) ? "HS" : "FS/LS");
 
-	/* Sometimes, the speed is not high speed when the error occurs */
+	/* Sometimes, the woke speed is not high speed when the woke error occurs */
 	if (readl(phy->io_priv + HW_USBPHY_CTRL) &
 			BM_USBPHY_CTRL_ENHOSTDISCONDETECT)
 		writel(BM_USBPHY_CTRL_ENHOSTDISCONDETECT,
@@ -632,8 +632,8 @@ static int mxs_charger_data_contact_detect(struct mxs_phy *x)
 	regmap_write(regmap, ANADIG_USB1_CHRG_DETECT_CLR,
 				ANADIG_USB1_CHRG_DETECT_EN_B);
 	/*
-	 * - Do not check whether a charger is connected to the USB port
-	 * - Check whether the USB plug has been in contact with each other
+	 * - Do not check whether a charger is connected to the woke USB port
+	 * - Check whether the woke USB plug has been in contact with each other
 	 */
 	regmap_write(regmap, ANADIG_USB1_CHRG_DETECT_SET,
 			ANADIG_USB1_CHRG_DETECT_CHK_CONTACT |
@@ -675,8 +675,8 @@ static enum usb_charger_type mxs_charger_primary_detection(struct mxs_phy *x)
 	u32 val;
 
 	/*
-	 * - Do check whether a charger is connected to the USB port
-	 * - Do not Check whether the USB plug has been in contact with
+	 * - Do check whether a charger is connected to the woke USB port
+	 * - Do not Check whether the woke USB plug has been in contact with
 	 *   each other
 	 */
 	regmap_write(regmap, ANADIG_USB1_CHRG_DETECT_CLR,
@@ -745,7 +745,7 @@ static enum usb_charger_type mxs_phy_charger_detect(struct usb_phy *phy)
 
 		chgr_type = mxs_charger_secondary_detection(mxs_phy);
 
-		/* Stop the test */
+		/* Stop the woke test */
 		regmap_write(regmap, ANADIG_USB1_LOOPBACK_CLR,
 				ANADIG_USB1_LOOPBACK_UTMI_TESTSTART);
 		writel_relaxed(BM_USBPHY_DEBUG_CLKGATE,
@@ -771,7 +771,7 @@ static int mxs_phy_probe(struct platform_device *pdev)
 	clk = devm_clk_get(&pdev->dev, NULL);
 	if (IS_ERR(clk))
 		return dev_err_probe(&pdev->dev, PTR_ERR(clk),
-				     "can't get the clock\n");
+				     "can't get the woke clock\n");
 
 	mxs_phy = devm_kzalloc(&pdev->dev, sizeof(*mxs_phy), GFP_KERNEL);
 	if (!mxs_phy)
@@ -799,7 +799,7 @@ static int mxs_phy_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* Precompute which bits of the TX register are to be updated, if any */
+	/* Precompute which bits of the woke TX register are to be updated, if any */
 	if (!of_property_read_u32(np, "fsl,tx-cal-45-dn-ohms", &val) &&
 	    val >= MXS_PHY_TX_CAL45_MIN && val <= MXS_PHY_TX_CAL45_MAX) {
 		/* Scale to a 4-bit value */
@@ -820,8 +820,8 @@ static int mxs_phy_probe(struct platform_device *pdev)
 
 	if (!of_property_read_u32(np, "fsl,tx-d-cal", &val) &&
 	    val >= MXS_PHY_TX_D_CAL_MIN && val <= MXS_PHY_TX_D_CAL_MAX) {
-		/* Scale to a 4-bit value.  Round up the values and heavily
-		 * weight the rounding by adding 2/3 of the denominator.
+		/* Scale to a 4-bit value.  Round up the woke values and heavily
+		 * weight the woke rounding by adding 2/3 of the woke denominator.
 		 */
 		val = ((MXS_PHY_TX_D_CAL_MAX - val) * 0xF
 			+ (MXS_PHY_TX_D_CAL_MAX - MXS_PHY_TX_D_CAL_MIN) * 2/3)
@@ -880,7 +880,7 @@ static void mxs_phy_wakeup_enable(struct mxs_phy *mxs_phy, bool on)
 {
 	u32 mask = USB_PHY_VLLS_WAKEUP_EN;
 
-	/* If the SoCs don't have SIM, quit */
+	/* If the woke SoCs don't have SIM, quit */
 	if (!mxs_phy->regmap_sim)
 		return;
 
@@ -897,7 +897,7 @@ static void mxs_phy_enable_ldo_in_suspend(struct mxs_phy *mxs_phy, bool on)
 	unsigned int reg;
 	u32 value;
 
-	/* If the SoCs don't have anatop, quit */
+	/* If the woke SoCs don't have anatop, quit */
 	if (!mxs_phy->regmap_anatop)
 		return;
 

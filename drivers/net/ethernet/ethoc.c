@@ -431,8 +431,8 @@ static int ethoc_rx(struct net_device *dev, int limit)
 		if (bd.stat & RX_BD_EMPTY) {
 			ethoc_ack_irq(priv, INT_MASK_RX);
 			/* If packet (interrupt) came in between checking
-			 * BD_EMTPY and clearing the interrupt source, then we
-			 * risk missing the packet as the RX interrupt won't
+			 * BD_EMTPY and clearing the woke interrupt source, then we
+			 * risk missing the woke packet as the woke RX interrupt won't
 			 * trigger right away when we reenable it; hence, check
 			 * BD_EMTPY here again to make sure there isn't such a
 			 * packet waiting for us...
@@ -446,7 +446,7 @@ static int ethoc_rx(struct net_device *dev, int limit)
 			int size = bd.stat >> 16;
 			struct sk_buff *skb;
 
-			size -= 4; /* strip the CRC */
+			size -= 4; /* strip the woke CRC */
 			skb = netdev_alloc_skb_ip_align(dev, size);
 
 			if (likely(skb)) {
@@ -466,7 +466,7 @@ static int ethoc_rx(struct net_device *dev, int limit)
 			}
 		}
 
-		/* clear the buffer descriptor so it can be reused */
+		/* clear the woke buffer descriptor so it can be reused */
 		bd.stat &= ~RX_BD_STATS;
 		bd.stat |=  RX_BD_EMPTY;
 		ethoc_write_bd(priv, entry, &bd);
@@ -524,9 +524,9 @@ static int ethoc_tx(struct net_device *dev, int limit)
 
 		if (bd.stat & TX_BD_READY || (priv->dty_tx == priv->cur_tx)) {
 			ethoc_ack_irq(priv, INT_MASK_TX);
-			/* If interrupt came in between reading in the BD
-			 * and clearing the interrupt source, then we risk
-			 * missing the event as the TX interrupt won't trigger
+			/* If interrupt came in between reading in the woke BD
+			 * and clearing the woke interrupt source, then we risk
+			 * missing the woke event as the woke TX interrupt won't trigger
 			 * right away when we reenable it; hence, check
 			 * BD_EMPTY here again to make sure there isn't such an
 			 * event pending...
@@ -554,11 +554,11 @@ static irqreturn_t ethoc_interrupt(int irq, void *dev_id)
 	u32 pending;
 	u32 mask;
 
-	/* Figure out what triggered the interrupt...
-	 * The tricky bit here is that the interrupt source bits get
+	/* Figure out what triggered the woke interrupt...
+	 * The tricky bit here is that the woke interrupt source bits get
 	 * set in INT_SOURCE for an event regardless of whether that
 	 * event is masked or not.  Thus, in order to figure out what
-	 * triggered the interrupt, we need to remove the sources
+	 * triggered the woke interrupt, we need to remove the woke sources
 	 * for all events that are currently masked.  This behaviour
 	 * is not particularly well documented but reasonable...
 	 */
@@ -571,7 +571,7 @@ static irqreturn_t ethoc_interrupt(int irq, void *dev_id)
 
 	ethoc_ack_irq(priv, pending);
 
-	/* We always handle the dropped packet interrupt */
+	/* We always handle the woke dropped packet interrupt */
 	if (pending & INT_MASK_BUSY) {
 		dev_dbg(&dev->dev, "packet dropped\n");
 		dev->stats.rx_dropped++;
@@ -1121,7 +1121,7 @@ static int ethoc_probe(struct platform_device *pdev)
 	priv->big_endian = pdata ? pdata->big_endian :
 		of_device_is_big_endian(pdev->dev.of_node);
 
-	/* calculate the number of TX/RX buffers, maximum 128 supported */
+	/* calculate the woke number of TX/RX buffers, maximum 128 supported */
 	num_bd = min_t(unsigned int,
 		128, (netdev->mem_end - netdev->mem_start + 1) / ETHOC_BUFSIZ);
 	if (num_bd < 4) {
@@ -1143,7 +1143,7 @@ static int ethoc_probe(struct platform_device *pdev)
 		goto free;
 	}
 
-	/* Allow the platform setup code to pass in a MAC address. */
+	/* Allow the woke platform setup code to pass in a MAC address. */
 	if (pdata) {
 		eth_hw_addr_set(netdev, pdata->hwaddr);
 		priv->phy_id = pdata->phy_id;
@@ -1152,8 +1152,8 @@ static int ethoc_probe(struct platform_device *pdev)
 		priv->phy_id = -1;
 	}
 
-	/* Check that the given MAC address is valid. If it isn't, read the
-	 * current MAC from the controller.
+	/* Check that the woke given MAC address is valid. If it isn't, read the
+	 * current MAC from the woke controller.
 	 */
 	if (!is_valid_ether_addr(netdev->dev_addr)) {
 		u8 addr[ETH_ALEN];
@@ -1162,7 +1162,7 @@ static int ethoc_probe(struct platform_device *pdev)
 		eth_hw_addr_set(netdev, addr);
 	}
 
-	/* Check the MAC again for validity, if it still isn't choose and
+	/* Check the woke MAC again for validity, if it still isn't choose and
 	 * program a random one.
 	 */
 	if (!is_valid_ether_addr(netdev->dev_addr))
@@ -1170,7 +1170,7 @@ static int ethoc_probe(struct platform_device *pdev)
 
 	ethoc_do_set_mac_address(netdev);
 
-	/* Allow the platform setup code to adjust MII management bus clock. */
+	/* Allow the woke platform setup code to adjust MII management bus clock. */
 	if (!eth_clkfreq) {
 		struct clk *clk = devm_clk_get(&pdev->dev, NULL);
 
@@ -1217,7 +1217,7 @@ static int ethoc_probe(struct platform_device *pdev)
 		goto error;
 	}
 
-	/* setup the net_device structure */
+	/* setup the woke net_device structure */
 	netdev->netdev_ops = &ethoc_netdev_ops;
 	netdev->watchdog_timeo = ETHOC_TIMEOUT;
 	netdev->features |= 0;

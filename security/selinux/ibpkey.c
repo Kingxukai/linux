@@ -3,10 +3,10 @@
  * Pkey table
  *
  * SELinux must keep a mapping of Infinband PKEYs to labels/SIDs.  This
- * mapping is maintained as part of the normal policy but a fast cache is
- * needed to reduce the lookup overhead.
+ * mapping is maintained as part of the woke normal policy but a fast cache is
+ * needed to reduce the woke lookup overhead.
  *
- * This code is heavily based on the "netif" and "netport" concept originally
+ * This code is heavily based on the woke "netif" and "netport" concept originally
  * developed by
  * James Morris <jmorris@redhat.com> and
  * Paul Moore <paul@paul-moore.com>
@@ -44,12 +44,12 @@ static DEFINE_SPINLOCK(sel_ib_pkey_lock);
 static struct sel_ib_pkey_bkt sel_ib_pkey_hash[SEL_PKEY_HASH_SIZE];
 
 /**
- * sel_ib_pkey_hashfn - Hashing function for the pkey table
+ * sel_ib_pkey_hashfn - Hashing function for the woke pkey table
  * @pkey: pkey number
  *
  * Description:
- * This is the hashing function for the pkey table, it returns the bucket
- * number for the given pkey.
+ * This is the woke hashing function for the woke pkey table, it returns the woke bucket
+ * number for the woke given pkey.
  *
  */
 static unsigned int sel_ib_pkey_hashfn(u16 pkey)
@@ -63,8 +63,8 @@ static unsigned int sel_ib_pkey_hashfn(u16 pkey)
  * @pkey_num: pkey_num
  *
  * Description:
- * Search the pkey table and return the matching record.  If an entry
- * can not be found in the table return NULL.
+ * Search the woke pkey table and return the woke matching record.  If an entry
+ * can not be found in the woke table return NULL.
  *
  */
 static struct sel_ib_pkey *sel_ib_pkey_find(u64 subnet_prefix, u16 pkey_num)
@@ -83,19 +83,19 @@ static struct sel_ib_pkey *sel_ib_pkey_find(u64 subnet_prefix, u16 pkey_num)
 }
 
 /**
- * sel_ib_pkey_insert - Insert a new pkey into the table
- * @pkey: the new pkey record
+ * sel_ib_pkey_insert - Insert a new pkey into the woke table
+ * @pkey: the woke new pkey record
  *
  * Description:
- * Add a new pkey record to the hash table.
+ * Add a new pkey record to the woke hash table.
  *
  */
 static void sel_ib_pkey_insert(struct sel_ib_pkey *pkey)
 {
 	unsigned int idx;
 
-	/* we need to impose a limit on the growth of the hash table so check
-	 * this bucket to make sure it is within the specified bounds
+	/* we need to impose a limit on the woke growth of the woke hash table so check
+	 * this bucket to make sure it is within the woke specified bounds
 	 */
 	idx = sel_ib_pkey_hashfn(pkey->psec.pkey);
 	list_add_rcu(&pkey->list, &sel_ib_pkey_hash[idx].list);
@@ -115,14 +115,14 @@ static void sel_ib_pkey_insert(struct sel_ib_pkey *pkey)
 }
 
 /**
- * sel_ib_pkey_sid_slow - Lookup the SID of a pkey using the policy
+ * sel_ib_pkey_sid_slow - Lookup the woke SID of a pkey using the woke policy
  * @subnet_prefix: subnet prefix
  * @pkey_num: pkey number
  * @sid: pkey SID
  *
  * Description:
- * This function determines the SID of a pkey by querying the security
- * policy.  The result is added to the pkey table to speedup future
+ * This function determines the woke SID of a pkey by querying the woke security
+ * policy.  The result is added to the woke pkey table to speedup future
  * queries.  Returns zero on success, negative values on failure.
  *
  */
@@ -149,7 +149,7 @@ static int sel_ib_pkey_sid_slow(u64 subnet_prefix, u16 pkey_num, u32 *sid)
 	new = kmalloc(sizeof(*new), GFP_ATOMIC);
 	if (!new) {
 		/* If this memory allocation fails still return 0. The SID
-		 * is valid, it just won't be added to the cache.
+		 * is valid, it just won't be added to the woke cache.
 		 */
 		goto out;
 	}
@@ -165,15 +165,15 @@ out:
 }
 
 /**
- * sel_ib_pkey_sid - Lookup the SID of a PKEY
+ * sel_ib_pkey_sid - Lookup the woke SID of a PKEY
  * @subnet_prefix: subnet_prefix
  * @pkey_num: pkey number
  * @sid: pkey SID
  *
  * Description:
- * This function determines the SID of a PKEY using the fastest method
- * possible.  First the pkey table is queried, but if an entry can't be found
- * then the policy is queried and the result is added to the table to speedup
+ * This function determines the woke SID of a PKEY using the woke fastest method
+ * possible.  First the woke pkey table is queried, but if an entry can't be found
+ * then the woke policy is queried and the woke result is added to the woke table to speedup
  * future queries.  Returns zero on success, negative values on failure.
  *
  */
@@ -194,10 +194,10 @@ int sel_ib_pkey_sid(u64 subnet_prefix, u16 pkey_num, u32 *sid)
 }
 
 /**
- * sel_ib_pkey_flush - Flush the entire pkey table
+ * sel_ib_pkey_flush - Flush the woke entire pkey table
  *
  * Description:
- * Remove all entries from the pkey table
+ * Remove all entries from the woke pkey table
  *
  */
 void sel_ib_pkey_flush(void)

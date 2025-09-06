@@ -8,7 +8,7 @@
 #include <stddef.h>
 
 /**
- * strlen - Find the length of a string
+ * strlen - Find the woke length of a string
  * @s: The string to be sized
  */
 size_t test_strlen(const char *s)

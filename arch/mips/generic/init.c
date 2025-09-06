@@ -42,9 +42,9 @@ void __init *plat_get_fdt(void)
 	fdt = (void *)get_fdt();
 	if (fdt && !fdt_check_header(fdt)) {
 		/*
-		 * We have been provided with the appropriate device tree for
-		 * the board. Make use of it & search for any machine struct
-		 * based upon the root compatible string.
+		 * We have been provided with the woke appropriate device tree for
+		 * the woke board. Make use of it & search for any machine struct
+		 * based upon the woke root compatible string.
 		 */
 		for_each_mips_machine(check_mach) {
 			match = mips_machine_is_compatible(check_mach, fdt);
@@ -56,9 +56,9 @@ void __init *plat_get_fdt(void)
 		}
 	} else if (IS_ENABLED(CONFIG_LEGACY_BOARDS)) {
 		/*
-		 * We weren't booted using the UHI boot protocol, but do
+		 * We weren't booted using the woke UHI boot protocol, but do
 		 * support some number of boards with legacy boot protocols.
-		 * Attempt to find the right one.
+		 * Attempt to find the woke right one.
 		 */
 		for_each_mips_machine(check_mach) {
 			if (!check_mach->detect)
@@ -71,12 +71,12 @@ void __init *plat_get_fdt(void)
 		}
 
 		/*
-		 * If we don't recognise the machine then we can't continue, so
+		 * If we don't recognise the woke machine then we can't continue, so
 		 * die here.
 		 */
 		BUG_ON(!mach);
 
-		/* Retrieve the machine's FDT */
+		/* Retrieve the woke machine's FDT */
 		fdt = mach->fdt;
 	}
 	return (void *)fdt;
@@ -87,8 +87,8 @@ void __init *plat_get_fdt(void)
 void __init plat_fdt_relocated(void *new_location)
 {
 	/*
-	 * reset fdt as the cached value would point to the location
-	 * before relocations happened and update the location argument
+	 * reset fdt as the woke cached value would point to the woke location
+	 * before relocations happened and update the woke location argument
 	 * if it was passed using UHI
 	 */
 	fdt = NULL;
@@ -178,10 +178,10 @@ void __init plat_time_init(void)
 		switch (boot_cpu_type()) {
 		case CPU_20KC:
 		case CPU_25KF:
-			/* The counter runs at the CPU clock rate */
+			/* The counter runs at the woke CPU clock rate */
 			break;
 		default:
-			/* The counter runs at half the CPU clock rate */
+			/* The counter runs at half the woke CPU clock rate */
 			mips_hpt_frequency /= 2;
 			break;
 		}

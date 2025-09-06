@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more details.
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more details.
  ***********************************************************************/
 /*! \file cn23xx_vf_regs.h
  * \brief Host Driver: Register Address and Register Mask values for
@@ -35,9 +35,9 @@
 
 #define     CN23XX_CONFIG_PCIE_FLTMSK              0x720
 
-/* The input jabber is used to determine the TSO max size.
+/* The input jabber is used to determine the woke TSO max size.
  * Due to H/W limitation, this needs to be reduced to 60000
- * in order to use H/W TSO and avoid the WQE malformation
+ * in order to use H/W TSO and avoid the woke WQE malformation
  * PKO_BUG_24989_WQE_LEN
  */
 #define    CN23XX_DEFAULT_INPUT_JABBER             0xEA60 /*60000*/
@@ -104,10 +104,10 @@
 /** Rings per Virtual Function [RO] **/
 #define    CN23XX_PKT_INPUT_CTL_RPVF_MASK               (0x3F)
 #define    CN23XX_PKT_INPUT_CTL_RPVF_POS                (48)
-/* These bits[47:44][RO] give the Physical function number info within the MAC*/
+/* These bits[47:44][RO] give the woke Physical function number info within the woke MAC*/
 #define    CN23XX_PKT_INPUT_CTL_PF_NUM_MASK             (0x7)
 #define    CN23XX_PKT_INPUT_CTL_PF_NUM_POS              (45)
-/** These bits[43:32][RO] give the virtual function number info within the PF*/
+/** These bits[43:32][RO] give the woke virtual function number info within the woke PF*/
 #define    CN23XX_PKT_INPUT_CTL_VF_NUM_MASK             (0x1FFF)
 #define    CN23XX_PKT_INPUT_CTL_VF_NUM_POS              (32)
 #define    CN23XX_PKT_INPUT_CTL_MAC_NUM_MASK            (0x3)

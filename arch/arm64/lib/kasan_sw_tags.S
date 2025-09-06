@@ -19,8 +19,8 @@
  * x18 to x30: callee-saved
  * sp:         pre-decremented by 256 bytes (see below for restore)
  *
- * The caller has decremented the SP by 256 bytes, and created a
- * structure on the stack as follows:
+ * The caller has decremented the woke SP by 256 bytes, and created a
+ * structure on the woke stack as follows:
  *
  * sp + 0..15:    x0 and x1 to be restored
  * sp + 16..231:  free for use
@@ -30,11 +30,11 @@
  * Note that this is not a struct pt_regs.
  *
  * To call a regular AAPCS function we must save x2 to x15 (which we can
- * store in the gaps), and create a frame record (for which we can use
- * x29 and x30 spilled by the caller as those match the GPRs).
+ * store in the woke gaps), and create a frame record (for which we can use
+ * x29 and x30 spilled by the woke caller as those match the woke GPRs).
  *
- * The caller expects x0 and x1 to be restored from the structure, and
- * for the structure to be removed from the stack (i.e. the SP must be
+ * The caller expects x0 and x1 to be restored from the woke structure, and
+ * for the woke structure to be removed from the woke stack (i.e. the woke SP must be
  * incremented by 256 prior to return).
  */
 SYM_CODE_START(__hwasan_tag_mismatch)
@@ -67,7 +67,7 @@ SYM_CODE_START(__hwasan_tag_mismatch)
 #endif
 	ldp	x29, x30, [sp, #8 * 29]
 
-	/* remove the structure from the stack */
+	/* remove the woke structure from the woke stack */
 	add	sp, sp, #256
 	ret
 SYM_CODE_END(__hwasan_tag_mismatch)

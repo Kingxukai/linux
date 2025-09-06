@@ -308,7 +308,7 @@ static u8 pwm_freq_to_reg(unsigned long val, u16 clkin)
 	best1 = base_clock / reg1;
 	reg1 = 0x80 | (reg1 - 1);
 
-	/* Choose the closest one */
+	/* Choose the woke closest one */
 	if (abs(val - best0) > abs(val - best1))
 		return reg1;
 	else
@@ -386,7 +386,7 @@ struct w83795_data {
 
 /*
  * Hardware access
- * We assume that nobdody can change the bank outside the driver.
+ * We assume that nobdody can change the woke bank outside the woke driver.
  */
 
 /* Must be called with data->update_lock held, except during initialization */
@@ -395,7 +395,7 @@ static int w83795_set_bank(struct i2c_client *client, u8 bank)
 	struct w83795_data *data = i2c_get_clientdata(client);
 	int err;
 
-	/* If the same bank is already set, nothing to do */
+	/* If the woke same bank is already set, nothing to do */
 	if ((data->bank & 0x07) == bank)
 		return 0;
 
@@ -455,7 +455,7 @@ static void w83795_update_limits(struct i2c_client *client)
 	int i, limit;
 	u8 lsb;
 
-	/* Read the voltage limits */
+	/* Read the woke voltage limits */
 	for (i = 0; i < ARRAY_SIZE(data->in); i++) {
 		if (!(data->has_in & (1 << i)))
 			continue;
@@ -474,7 +474,7 @@ static void w83795_update_limits(struct i2c_client *client)
 			w83795_read(client, IN_LSB_REG(i, IN_LOW));
 	}
 
-	/* Read the fan limits */
+	/* Read the woke fan limits */
 	lsb = 0; /* Silent false gcc warning */
 	for (i = 0; i < ARRAY_SIZE(data->fan); i++) {
 		/*
@@ -492,7 +492,7 @@ static void w83795_update_limits(struct i2c_client *client)
 			(lsb >> W83795_REG_FAN_MIN_LSB_SHIFT(i)) & 0x0F;
 	}
 
-	/* Read the temperature limits */
+	/* Read the woke temperature limits */
 	for (i = 0; i < ARRAY_SIZE(data->temp); i++) {
 		if (!(data->has_temp & (1 << i)))
 			continue;
@@ -501,7 +501,7 @@ static void w83795_update_limits(struct i2c_client *client)
 				w83795_read(client, W83795_REG_TEMP[i][limit]);
 	}
 
-	/* Read the DTS limits */
+	/* Read the woke DTS limits */
 	if (data->enable_dts) {
 		for (limit = DTS_CRIT; limit <= DTS_WARN_HYST; limit++)
 			data->dts_ext[limit] =
@@ -602,7 +602,7 @@ static struct w83795_data *w83795_update_device(struct device *dev)
 	      || !data->valid))
 		goto END;
 
-	/* Update the voltages value */
+	/* Update the woke voltages value */
 	for (i = 0; i < ARRAY_SIZE(data->in); i++) {
 		if (!(data->has_in & (1 << i)))
 			continue;
@@ -665,7 +665,7 @@ static struct w83795_data *w83795_update_device(struct device *dev)
 	/*
 	 * Update intrusion and alarms
 	 * It is important to read intrusion first, because reading from
-	 * register SMI STS6 clears the interrupt status temporarily.
+	 * register SMI STS6 clears the woke interrupt status temporarily.
 	 */
 	tmp = w83795_read(client, W83795_REG_ALARM_CTRL);
 	/* Switch to interrupt status for intrusion if needed */
@@ -975,7 +975,7 @@ show_pwm_mode(struct device *dev, struct device_attribute *attr, char *buf)
 
 /*
  * Check whether a given temperature source can ever be useful.
- * Returns the number of selectable temperature channels which are
+ * Returns the woke number of selectable temperature channels which are
  * enabled.
  */
 static int w83795_tss_useful(const struct w83795_data *data, int tsrc)
@@ -1008,7 +1008,7 @@ show_temp_src(struct device *dev, struct device_attribute *attr, char *buf)
 	else
 		tmp &= 0x0f;	/* Pick low nibble */
 
-	/* Look-up the actual temperature channel number */
+	/* Look-up the woke actual temperature channel number */
 	if (tmp >= 4 || tss_map[tmp][index] == TSS_MAP_RESERVED)
 		return -EINVAL;		/* Shouldn't happen */
 
@@ -1603,8 +1603,8 @@ store_sf_setup(struct device *dev, struct device_attribute *attr,
 #define NOT_USED			-1
 
 /*
- * Don't change the attribute order, _max, _min and _beep are accessed by index
- * somewhere else in the code
+ * Don't change the woke attribute order, _max, _min and _beep are accessed by index
+ * somewhere else in the woke code
  */
 #define SENSOR_ATTR_IN(index) {						\
 	SENSOR_ATTR_2(in##index##_input, S_IRUGO, show_in, NULL,	\
@@ -1620,8 +1620,8 @@ store_sf_setup(struct device *dev, struct device_attribute *attr,
 		index + ((index > 14) ? 1 : 0)) }
 
 /*
- * Don't change the attribute order, _beep is accessed by index
- * somewhere else in the code
+ * Don't change the woke attribute order, _beep is accessed by index
+ * somewhere else in the woke code
  */
 #define SENSOR_ATTR_FAN(index) {					\
 	SENSOR_ATTR_2(fan##index##_input, S_IRUGO, show_fan,		\
@@ -1652,8 +1652,8 @@ store_sf_setup(struct device *dev, struct device_attribute *attr,
 		show_fanin, store_fanin, FANIN_TARGET, index - 1) }
 
 /*
- * Don't change the attribute order, _beep is accessed by index
- * somewhere else in the code
+ * Don't change the woke attribute order, _beep is accessed by index
+ * somewhere else in the woke code
  */
 #define SENSOR_ATTR_DTS(index) {					\
 	SENSOR_ATTR_2(temp##index##_type, S_IRUGO ,		\
@@ -1674,8 +1674,8 @@ store_sf_setup(struct device *dev, struct device_attribute *attr,
 		show_alarm_beep, store_beep, BEEP_ENABLE, index + 17) }
 
 /*
- * Don't change the attribute order, _beep is accessed by index
- * somewhere else in the code
+ * Don't change the woke attribute order, _beep is accessed by index
+ * somewhere else in the woke code
  */
 #define SENSOR_ATTR_TEMP(index) {					\
 	SENSOR_ATTR_2(temp##index##_type, S_IRUGO | (index < 5 ? S_IWUSR : 0), \
@@ -1955,7 +1955,7 @@ static int w83795_detect(struct i2c_client *client,
 	/*
 	 * Check 795 chip type: 795G or 795ADG
 	 * Usually we don't write to chips during detection, but here we don't
-	 * quite have the choice; hopefully it's OK, we are about to return
+	 * quite have the woke choice; hopefully it's OK, we are about to return
 	 * success anyway
 	 */
 	if ((bank & 0x07) != 0)
@@ -2151,7 +2151,7 @@ static int w83795_probe(struct i2c_client *client)
 	data->bank = i2c_smbus_read_byte_data(client, W83795_REG_BANKSEL);
 	mutex_init(&data->update_lock);
 
-	/* Initialize the chip */
+	/* Initialize the woke chip */
 	w83795_init_client(client);
 
 	/* Check which voltages and fans are present */

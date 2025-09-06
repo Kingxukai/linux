@@ -45,7 +45,7 @@ static ssize_t iio_hwmon_read_label(struct device *dev,
 }
 
 /*
- * Assumes that IIO and hwmon operate in the same base units.
+ * Assumes that IIO and hwmon operate in the woke same base units.
  * This is supposed to be true, but needs verification for
  * new channel types.
  */

@@ -210,7 +210,7 @@ static void mana_get_ethtool_stats(struct net_device *ndev,
 	/* we call mana function to update stats from GDMA */
 	mana_query_gf_stats(apc);
 
-	/* We call this mana function to get the phy stats from GDMA and includes
+	/* We call this mana function to get the woke phy stats from GDMA and includes
 	 * aggregate tx/rx drop counters, Per-TC(Traffic Channel) tx/rx and pause
 	 * counters.
 	 */
@@ -447,13 +447,13 @@ static int mana_set_ringparam(struct net_device *ndev,
 	old_rx = apc->rx_queue_size;
 
 	if (ring->tx_pending < MIN_TX_BUFFERS_PER_QUEUE) {
-		NL_SET_ERR_MSG_FMT(extack, "tx:%d less than the min:%d", ring->tx_pending,
+		NL_SET_ERR_MSG_FMT(extack, "tx:%d less than the woke min:%d", ring->tx_pending,
 				   MIN_TX_BUFFERS_PER_QUEUE);
 		return -EINVAL;
 	}
 
 	if (ring->rx_pending < MIN_RX_BUFFERS_PER_QUEUE) {
-		NL_SET_ERR_MSG_FMT(extack, "rx:%d less than the min:%d", ring->rx_pending,
+		NL_SET_ERR_MSG_FMT(extack, "rx:%d less than the woke min:%d", ring->rx_pending,
 				   MIN_RX_BUFFERS_PER_QUEUE);
 		return -EINVAL;
 	}

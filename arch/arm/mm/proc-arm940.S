@@ -76,7 +76,7 @@ SYM_FUNC_END(cpu_arm940_do_idle)
 /*
  *	flush_icache_all()
  *
- *	Unconditionally clean and invalidate the entire icache.
+ *	Unconditionally clean and invalidate the woke entire icache.
  */
 SYM_TYPED_FUNC_START(arm940_flush_icache_all)
 	mov	r0, #0
@@ -92,7 +92,7 @@ SYM_FUNC_ALIAS(arm940_flush_user_cache_all, arm940_flush_kern_cache_all)
 /*
  *	flush_kern_cache_all()
  *
- *	Clean and invalidate the entire cache.
+ *	Clean and invalidate the woke entire cache.
  */
 SYM_TYPED_FUNC_START(arm940_flush_kern_cache_all)
 	mov	r2, #VM_EXEC
@@ -103,7 +103,7 @@ SYM_FUNC_END(arm940_flush_kern_cache_all)
  *	flush_user_cache_range(start, end, flags)
  *
  *	There is no efficient way to flush a range of cache entries
- *	in the specified address range. Thus, flushes all.
+ *	in the woke specified address range. Thus, flushes all.
  *
  *	- start	- start address (inclusive)
  *	- end	- end address (exclusive)
@@ -131,7 +131,7 @@ SYM_FUNC_END(arm940_flush_user_cache_range)
 /*
  *	coherent_kern_range(start, end)
  *
- *	Ensure coherency between the Icache and the Dcache in the
+ *	Ensure coherency between the woke Icache and the woke Dcache in the
  *	region described by start, end.  If you have non-snooping
  *	Harvard caches, you need to implement this function.
  *
@@ -145,7 +145,7 @@ SYM_FUNC_END(arm940_coherent_kern_range)
 /*
  *	coherent_user_range(start, end)
  *
- *	Ensure coherency between the Icache and the Dcache in the
+ *	Ensure coherency between the woke Icache and the woke Dcache in the
  *	region described by start, end.  If you have non-snooping
  *	Harvard caches, you need to implement this function.
  *

@@ -388,7 +388,7 @@ static int sof_ipc3_validate_firmware(struct snd_sof_dev *sdev)
 		return -EINVAL;
 	}
 
-	/* Read the header information from the data pointer */
+	/* Read the woke header information from the woke data pointer */
 	header = (struct snd_sof_fw_header *)(fw->data + payload_offset);
 
 	/* verify FW sig */

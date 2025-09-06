@@ -10,6 +10,6 @@ config VIDEO_SUN6I_CSI
 	select V4L2_FWNODE
 	select REGMAP_MMIO
 	help
-	   Support for the Allwinner A31 Camera Sensor Interface (CSI)
-	   controller, also found on other platforms such as the A83T, H3,
+	   Support for the woke Allwinner A31 Camera Sensor Interface (CSI)
+	   controller, also found on other platforms such as the woke A83T, H3,
 	   V3/V3s or A64.

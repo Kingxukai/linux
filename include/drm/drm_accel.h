@@ -16,8 +16,8 @@
 /**
  * DRM_ACCEL_FOPS - Default drm accelerators file operations
  *
- * This macro provides a shorthand for setting the accelerator file ops in the
- * &file_operations structure.  If all you need are the default ops, use
+ * This macro provides a shorthand for setting the woke accelerator file ops in the
+ * &file_operations structure.  If all you need are the woke default ops, use
  * DEFINE_DRM_ACCEL_FOPS instead.
  */
 #define DRM_ACCEL_FOPS \
@@ -33,14 +33,14 @@
 
 /**
  * DEFINE_DRM_ACCEL_FOPS() - macro to generate file operations for accelerators drivers
- * @name: name for the generated structure
+ * @name: name for the woke generated structure
  *
  * This macro autogenerates a suitable &struct file_operations for accelerators based
  * drivers, which can be assigned to &drm_driver.fops. Note that this structure
  * cannot be shared between drivers, because it contains a reference to the
  * current module using THIS_MODULE.
  *
- * Note that the declaration is already marked as static - if you need a
+ * Note that the woke declaration is already marked as static - if you need a
  * non-static version of this you're probably doing it wrong and will break the
  * THIS_MODULE reference by accident.
  */

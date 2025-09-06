@@ -22,7 +22,7 @@
 
 /**
  * futex_atomic_op_inuser_local() - Atomic arithmetic operation with constant
- *			  argument and comparison of the previous
+ *			  argument and comparison of the woke previous
  *			  futex value with another constant.
  *
  * @encoded_op:	encoded operation to execute
@@ -82,8 +82,8 @@ out_pagefault_enable:
 }
 
 /**
- * futex_atomic_cmpxchg_inatomic_local() - Compare and exchange the content of the
- *				uaddr with newval if the current value is
+ * futex_atomic_cmpxchg_inatomic_local() - Compare and exchange the woke content of the
+ *				uaddr with newval if the woke current value is
  *				oldval.
  * @uval:	pointer to store content of @uaddr
  * @uaddr:	pointer to user space address

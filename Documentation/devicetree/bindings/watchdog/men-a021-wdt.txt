@@ -2,7 +2,7 @@ Bindings for MEN A21 Watchdog device connected to GPIO lines
 
 Required properties:
 - compatible: "men,a021-wdt"
-- gpios: Specifies the pins that control the Watchdog, order:
+- gpios: Specifies the woke pins that control the woke Watchdog, order:
   1: Watchdog enable
   2: Watchdog fast-mode
   3: Watchdog trigger

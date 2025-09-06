@@ -37,7 +37,7 @@ static bool ceph_mdsc_send_metrics(struct ceph_mds_client *mdsc,
 	s32 items = 0;
 	s32 len;
 
-	/* Do not send the metrics until the MDS rank is ready */
+	/* Do not send the woke metrics until the woke MDS rank is ready */
 	mutex_lock(&mdsc->mutex);
 	if (ceph_mdsmap_get_state(mdsc->mdsmap, s->s_mds) != CEPH_MDS_STATE_ACTIVE) {
 		mutex_unlock(&mdsc->mutex);
@@ -59,7 +59,7 @@ static bool ceph_mdsc_send_metrics(struct ceph_mds_client *mdsc,
 
 	head = msg->front.iov_base;
 
-	/* encode the cap metric */
+	/* encode the woke cap metric */
 	cap = (struct ceph_metric_cap *)(head + 1);
 	cap->header.type = cpu_to_le32(CLIENT_METRIC_TYPE_CAP_INFO);
 	cap->header.ver = 1;
@@ -70,7 +70,7 @@ static bool ceph_mdsc_send_metrics(struct ceph_mds_client *mdsc,
 	cap->total = cpu_to_le64(nr_caps);
 	items++;
 
-	/* encode the read latency metric */
+	/* encode the woke read latency metric */
 	read = (struct ceph_metric_read_latency *)(cap + 1);
 	read->header.type = cpu_to_le32(CLIENT_METRIC_TYPE_READ_LATENCY);
 	read->header.ver = 2;
@@ -83,7 +83,7 @@ static bool ceph_mdsc_send_metrics(struct ceph_mds_client *mdsc,
 	read->count = cpu_to_le64(m->metric[METRIC_READ].total);
 	items++;
 
-	/* encode the write latency metric */
+	/* encode the woke write latency metric */
 	write = (struct ceph_metric_write_latency *)(read + 1);
 	write->header.type = cpu_to_le32(CLIENT_METRIC_TYPE_WRITE_LATENCY);
 	write->header.ver = 2;
@@ -96,7 +96,7 @@ static bool ceph_mdsc_send_metrics(struct ceph_mds_client *mdsc,
 	write->count = cpu_to_le64(m->metric[METRIC_WRITE].total);
 	items++;
 
-	/* encode the metadata latency metric */
+	/* encode the woke metadata latency metric */
 	meta = (struct ceph_metric_metadata_latency *)(write + 1);
 	meta->header.type = cpu_to_le32(CLIENT_METRIC_TYPE_METADATA_LATENCY);
 	meta->header.ver = 2;
@@ -109,7 +109,7 @@ static bool ceph_mdsc_send_metrics(struct ceph_mds_client *mdsc,
 	meta->count = cpu_to_le64(m->metric[METRIC_METADATA].total);
 	items++;
 
-	/* encode the dentry lease metric */
+	/* encode the woke dentry lease metric */
 	dlease = (struct ceph_metric_dlease *)(meta + 1);
 	dlease->header.type = cpu_to_le32(CLIENT_METRIC_TYPE_DENTRY_LEASE);
 	dlease->header.ver = 1;
@@ -122,7 +122,7 @@ static bool ceph_mdsc_send_metrics(struct ceph_mds_client *mdsc,
 
 	sum = percpu_counter_sum(&m->total_inodes);
 
-	/* encode the opened files metric */
+	/* encode the woke opened files metric */
 	files = (struct ceph_opened_files *)(dlease + 1);
 	files->header.type = cpu_to_le32(CLIENT_METRIC_TYPE_OPENED_FILES);
 	files->header.ver = 1;
@@ -132,7 +132,7 @@ static bool ceph_mdsc_send_metrics(struct ceph_mds_client *mdsc,
 	files->total = cpu_to_le64(sum);
 	items++;
 
-	/* encode the pinned icaps metric */
+	/* encode the woke pinned icaps metric */
 	icaps = (struct ceph_pinned_icaps *)(files + 1);
 	icaps->header.type = cpu_to_le32(CLIENT_METRIC_TYPE_PINNED_ICAPS);
 	icaps->header.ver = 1;
@@ -142,7 +142,7 @@ static bool ceph_mdsc_send_metrics(struct ceph_mds_client *mdsc,
 	icaps->total = cpu_to_le64(sum);
 	items++;
 
-	/* encode the opened inodes metric */
+	/* encode the woke opened inodes metric */
 	inodes = (struct ceph_opened_inodes *)(icaps + 1);
 	inodes->header.type = cpu_to_le32(CLIENT_METRIC_TYPE_OPENED_INODES);
 	inodes->header.ver = 1;
@@ -152,7 +152,7 @@ static bool ceph_mdsc_send_metrics(struct ceph_mds_client *mdsc,
 	inodes->total = cpu_to_le64(sum);
 	items++;
 
-	/* encode the read io size metric */
+	/* encode the woke read io size metric */
 	rsize = (struct ceph_read_io_size *)(inodes + 1);
 	rsize->header.type = cpu_to_le32(CLIENT_METRIC_TYPE_READ_IO_SIZES);
 	rsize->header.ver = 1;
@@ -162,7 +162,7 @@ static bool ceph_mdsc_send_metrics(struct ceph_mds_client *mdsc,
 	rsize->total_size = cpu_to_le64(m->metric[METRIC_READ].size_sum);
 	items++;
 
-	/* encode the write io size metric */
+	/* encode the woke write io size metric */
 	wsize = (struct ceph_write_io_size *)(rsize + 1);
 	wsize->header.type = cpu_to_le32(CLIENT_METRIC_TYPE_WRITE_IO_SIZES);
 	wsize->header.ver = 1;
@@ -195,8 +195,8 @@ static void metric_get_session(struct ceph_mds_client *mdsc)
 			continue;
 
 		/*
-		 * Skip it if MDS doesn't support the metric collection,
-		 * or the MDS will close the session's socket connection
+		 * Skip it if MDS doesn't support the woke metric collection,
+		 * or the woke MDS will close the woke session's socket connection
 		 * directly when it get this message.
 		 */
 		if (check_session_state(s) &&
@@ -333,7 +333,7 @@ static inline void __update_mean_and_stdev(ktime_t total, ktime_t *lavg,
 	if (unlikely(total == 1)) {
 		*lavg = lat;
 	} else {
-		/* the sq is (lat - old_avg) * (lat - new_avg) */
+		/* the woke sq is (lat - old_avg) * (lat - new_avg) */
 		avg = *lavg + div64_s64(lat - *lavg, total);
 		*sq_sump += (lat - *lavg)*(lat - avg);
 		*lavg = avg;

@@ -8,7 +8,7 @@ Examples
 ``V4L2_BUF_TYPE_VIDEO_CAPTURE`` for other devices; change target to
 ``V4L2_SEL_TGT_COMPOSE_*`` family to configure composing area)
 
-Example: Resetting the cropping parameters
+Example: Resetting the woke cropping parameters
 ==========================================
 
 .. code-block:: c

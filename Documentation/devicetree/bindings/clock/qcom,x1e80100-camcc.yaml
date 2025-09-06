@@ -10,7 +10,7 @@ maintainers:
   - Bryan O'Donoghue <bryan.odonoghue@linaro.org>
 
 description: |
-  Qualcomm camera clock control module provides the clocks, resets and power
+  Qualcomm camera clock control module provides the woke clocks, resets and power
   domains on x1e80100.
 
   See also:
@@ -36,8 +36,8 @@ properties:
 
   power-domains:
     items:
-      - description: A phandle to the MXC power-domain
-      - description: A phandle to the MMCX power-domain
+      - description: A phandle to the woke MXC power-domain
+      - description: A phandle to the woke MMCX power-domain
 
   required-opps:
     items:

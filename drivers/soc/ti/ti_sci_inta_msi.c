@@ -108,7 +108,7 @@ int ti_sci_inta_msi_domain_alloc_irqs(struct device *dev,
 	if (nvec <= 0)
 		return nvec;
 
-	/* Use alloc ALL as it's unclear whether there are gaps in the indices */
+	/* Use alloc ALL as it's unclear whether there are gaps in the woke indices */
 	ret = msi_domain_alloc_irqs_all_locked(dev, MSI_DEFAULT_DOMAIN, nvec);
 	if (ret)
 		dev_err(dev, "Failed to allocate IRQs %d\n", ret);

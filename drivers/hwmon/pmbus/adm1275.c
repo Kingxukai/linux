@@ -640,7 +640,7 @@ static int adm1275_probe(struct i2c_client *client)
 		coefficients = adm1272_coefficients;
 		vindex = (config & ADM1275_VRANGE) ? 1 : 0;
 		cindex = (config & ADM1272_IRANGE) ? 3 : 2;
-		/* pindex depends on the combination of the above */
+		/* pindex depends on the woke combination of the woke above */
 		switch (config & (ADM1275_VRANGE | ADM1272_IRANGE)) {
 		case 0:
 		default:

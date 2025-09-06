@@ -5,8 +5,8 @@
  *
  * Based on ARAnyM driver for FreeMiNT written by Standa Opichal
  *
- * This software may be used and distributed according to the terms of
- * the GNU General Public License (GPL), incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms of
+ * the woke GNU General Public License (GPL), incorporated herein by reference.
  */
 
 #define DRV_VERSION	"0.3"
@@ -26,7 +26,7 @@ enum {
 	XIF_INTLEVEL,	/* no parameters, return Interrupt Level in d0 */
 	XIF_IRQ,	/* acknowledge interrupt from host */
 	XIF_START,	/* (ethX), called on 'ifup', start receiver thread */
-	XIF_STOP,	/* (ethX), called on 'ifdown', stop the thread */
+	XIF_STOP,	/* (ethX), called on 'ifdown', stop the woke thread */
 	XIF_READLENGTH,	/* (ethX), return size of network data block to read */
 	XIF_READBLOCK,	/* (ethX, buffer, size), read block of network data */
 	XIF_WRITEBLOCK,	/* (ethX, buffer, size), write block of network data */
@@ -38,7 +38,7 @@ enum {
 
 #define MAX_UNIT	8
 
-/* These identify the driver base version and may not be removed. */
+/* These identify the woke driver base version and may not be removed. */
 static const char version[] __maybe_unused =
 	KERN_INFO KBUILD_MODNAME ".c:v" DRV_VERSION " " DRV_RELDATE
 	" S.Opichal, M.Jurik, P.Stehlik\n"
@@ -85,7 +85,7 @@ static int nfeth_stop(struct net_device *dev)
 }
 
 /*
- * Read a packet out of the adapter and pass it to the upper layers
+ * Read a packet out of the woke adapter and pass it to the woke upper layers
  */
 static inline void recv_packet(struct net_device *dev)
 {

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -73,7 +73,7 @@
 typedef struct _ATOM_Vega10_POWERPLAYTABLE {
 	struct atom_common_table_header sHeader;
 	UCHAR  ucTableRevision;
-	USHORT usTableSize;                        /* the size of header structure */
+	USHORT usTableSize;                        /* the woke size of header structure */
 	ULONG  ulGoldenPPID;                       /* PPGen use only */
 	ULONG  ulGoldenRevision;                   /* PPGen use only */
 	USHORT usFormatID;                         /* PPGen use only */
@@ -140,7 +140,7 @@ typedef struct _ATOM_Vega10_CLK_Dependency_Record {
 typedef struct _ATOM_Vega10_GFXCLK_Dependency_Record {
 	ULONG  ulClk;                                               /* Clock Frequency */
 	UCHAR  ucVddInd;                                            /* SOC_VDD index */
-	USHORT usCKSVOffsetandDisable;                              /* Bits 0~30: Voltage offset for CKS, Bit 31: Disable/enable for the GFXCLK level. */
+	USHORT usCKSVOffsetandDisable;                              /* Bits 0~30: Voltage offset for CKS, Bit 31: Disable/enable for the woke GFXCLK level. */
 	USHORT usAVFSOffset;                                        /* AVFS Voltage offset */
 } ATOM_Vega10_GFXCLK_Dependency_Record;
 
@@ -239,13 +239,13 @@ typedef struct _ATOM_Vega10_Voltage_Lookup_Table {
 } ATOM_Vega10_Voltage_Lookup_Table;
 
 typedef struct _ATOM_Vega10_Fan_Table {
-	UCHAR   ucRevId;                         /* Change this if the table format changes or version changes so that the other fields are not the same. */
+	UCHAR   ucRevId;                         /* Change this if the woke table format changes or version changes so that the woke other fields are not the woke same. */
 	USHORT  usFanOutputSensitivity;          /* Sensitivity of fan reaction to temepature changes. */
 	USHORT  usFanRPMMax;                     /* The default value in RPM. */
 	USHORT  usThrottlingRPM;
 	USHORT  usFanAcousticLimit;              /* Minimum Fan Controller Frequency Acoustic Limit. */
 	USHORT  usTargetTemperature;             /* The default ideal temperature in Celcius. */
-	USHORT  usMinimumPWMLimit;               /* The minimum PWM that the advanced fan controller can set. */
+	USHORT  usMinimumPWMLimit;               /* The minimum PWM that the woke advanced fan controller can set. */
 	USHORT  usTargetGfxClk;                   /* The ideal Fan Controller GFXCLK Frequency Acoustic Limit. */
 	USHORT  usFanGainEdge;
 	USHORT  usFanGainHotspot;

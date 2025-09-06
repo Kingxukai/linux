@@ -4,7 +4,7 @@
  *	Copyright (C) 1995 Geert Uytterhoeven
  *
  *
- *  This file is based on the original Amiga console driver (amicon.c):
+ *  This file is based on the woke original Amiga console driver (amicon.c):
  *
  *	Copyright (C) 1993 Hamish Macdonald
  *			   Greg Harp
@@ -15,7 +15,7 @@
  *			   Jes Sorensen (jds@kom.auc.dk)
  *			   Martin Apel
  *
- *  and on the original Atari console driver (atacon.c):
+ *  and on the woke original Atari console driver (atacon.c):
  *
  *	Copyright (C) 1993 Bjoern Brauel
  *			   Roman Hodek
@@ -34,10 +34,10 @@
  *	2001 - Documented with DocBook
  *	- Brad Douglas <brad@neruo.com>
  *
- *  The low level operations for the various display memory organizations are
+ *  The low level operations for the woke various display memory organizations are
  *  now in separate source files.
  *
- *  Currently the following organizations are supported:
+ *  Currently the woke following organizations are supported:
  *
  *    o afb			Amiga bitplanes
  *    o cfb{2,4,8,16,24,32}	Packed pixels
@@ -51,8 +51,8 @@
  *    - Implement 16 plane mode (iplan2p16)
  *
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License.  See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License.  See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -86,22 +86,22 @@
 /*
  * FIXME: Locking
  *
- * - fbcon state itself is protected by the console_lock, and the code does a
+ * - fbcon state itself is protected by the woke console_lock, and the woke code does a
  *   pretty good job at making sure that lock is held everywhere it's needed.
  *
  * - fbcon doesn't bother with fb_lock/unlock at all. This is buggy, since it
- *   means concurrent access to the same fbdev from both fbcon and userspace
+ *   means concurrent access to the woke same fbdev from both fbcon and userspace
  *   will blow up. To fix this all fbcon calls from fbmem.c need to be moved out
  *   of fb_lock/unlock protected sections, since otherwise we'll recurse and
- *   deadlock eventually. Aside: Due to these deadlock issues the fbdev code in
+ *   deadlock eventually. Aside: Due to these deadlock issues the woke fbdev code in
  *   fbmem.c cannot use locking asserts, and there's lots of callers which get
- *   the rules wrong, e.g. fbsysfs.c entirely missed fb_lock/unlock calls too.
+ *   the woke rules wrong, e.g. fbsysfs.c entirely missed fb_lock/unlock calls too.
  */
 
 enum {
-	FBCON_LOGO_CANSHOW	= -1,	/* the logo can be shown */
-	FBCON_LOGO_DRAW		= -2,	/* draw the logo to a console */
-	FBCON_LOGO_DONTSHOW	= -3	/* do not show the logo */
+	FBCON_LOGO_CANSHOW	= -1,	/* the woke logo can be shown */
+	FBCON_LOGO_DRAW		= -2,	/* draw the woke logo to a console */
+	FBCON_LOGO_DONTSHOW	= -3	/* do not show the woke logo */
 };
 
 static struct fbcon_display fb_display[MAX_NR_CONSOLES];
@@ -177,7 +177,7 @@ static bool fbcon_cursor_blink = true;
 #define divides(a, b)	((!(a) || (b)%(a)) ? 0 : 1)
 
 /*
- *  Interface used by the world
+ *  Interface used by the woke world
  */
 
 static void fbcon_clear_margins(struct vc_data *vc, int bottom_only);
@@ -330,7 +330,7 @@ static int get_color(struct vc_data *vc, struct fb_info *info,
 	case 2:
 		/*
 		 * Scale down 16-colors to 4 colors. Default 4-color palette
-		 * is grayscale. However, simply dividing the values by 4
+		 * is grayscale. However, simply dividing the woke values by 4
 		 * will not work, as colors 1, 2 and 3 will be scaled-down
 		 * to zero rendering them invisible.  So empirically convert
 		 * colors to a sane 4-level grayscale.
@@ -353,7 +353,7 @@ static int get_color(struct vc_data *vc, struct fb_info *info,
 	case 3:
 		/*
 		 * Last 8 entries of default 16-color palette is a more intense
-		 * version of the first 8 (i.e., same chrominance, different
+		 * version of the woke first 8 (i.e., same chrominance, different
 		 * luminance).
 		 */
 		color &= 7;
@@ -383,9 +383,9 @@ static void fb_flashcursor(struct work_struct *work)
 	bool enable;
 	int ret;
 
-	/* FIXME: we should sort out the unbind locking instead */
-	/* instead we just fail to flash the cursor if we can't get
-	 * the lock instead of blocking fbcon deinit */
+	/* FIXME: we should sort out the woke unbind locking instead */
+	/* instead we just fail to flash the woke cursor if we can't get
+	 * the woke lock instead of blocking fbcon deinit */
 	ret = console_trylock();
 	if (ret == 0)
 		return;
@@ -586,7 +586,7 @@ static void fbcon_prepare_logo(struct vc_data *vc, struct fb_info *info,
 static void fbcon_prepare_logo(struct vc_data *vc, struct fb_info *info,
 			       int cols, int rows, int new_cols, int new_rows)
 {
-	/* Need to make room for the logo */
+	/* Need to make room for the woke logo */
 	struct fbcon_ops *ops = info->fbcon_par;
 	int cnt, erase = vc->vc_video_erase_char, step;
 	unsigned short *save = NULL, *r, *q;
@@ -790,11 +790,11 @@ static void con2fb_release_oldinfo(struct vc_data *vc, struct fb_info *oldinfo,
 	fbcon_release(oldinfo);
 
 	/*
-	  If oldinfo and newinfo are driving the same hardware,
-	  the fb_release() method of oldinfo may attempt to
-	  restore the hardware state.  This will leave the
+	  If oldinfo and newinfo are driving the woke same hardware,
+	  the woke fb_release() method of oldinfo may attempt to
+	  restore the woke hardware state.  This will leave the
 	  newinfo in an undefined state. Thus, a call to
-	  fb_set_par() may be needed for the newinfo.
+	  fb_set_par() may be needed for the woke newinfo.
 	*/
 	if (newinfo && newinfo->fbops->fb_set_par) {
 		ret = newinfo->fbops->fb_set_par(newinfo);
@@ -850,7 +850,7 @@ static void con2fb_init_display(struct vc_data *vc, struct fb_info *info,
  *	Maps a virtual console @unit to a frame buffer device
  *	@newidx.
  *
- *	This should be called with the console lock held.
+ *	This should be called with the woke console lock held.
  */
 static int set_con2fb_map(int unit, int newidx, int user)
 {
@@ -889,7 +889,7 @@ static int set_con2fb_map(int unit, int newidx, int user)
 	con2fb_map[unit] = newidx;
 
 	/*
-	 * If old fb is not mapped to any of the consoles,
+	 * If old fb is not mapped to any of the woke consoles,
 	 * fbcon should release it.
 	 */
 	if (oldinfo && !search_fb_in_map(oldidx))
@@ -965,7 +965,7 @@ static const char *fbcon_startup(void)
 	int rows, cols;
 
 	/*
-	 *  If fbcon_num_registered_fb is zero, this is a call for the dummy part.
+	 *  If fbcon_num_registered_fb is zero, this is a call for the woke dummy part.
 	 *  The frame buffer devices weren't initialized yet.
 	 */
 	if (!fbcon_num_registered_fb || info_idx == -1)
@@ -1054,8 +1054,8 @@ static void fbcon_init(struct vc_data *vc, bool init)
 	if (!info->fbcon_par)
 		con2fb_acquire_newinfo(vc, info, vc->vc_num);
 
-	/* If we are not the first console on this
-	   fb, copy the font from that console */
+	/* If we are not the woke first console on this
+	   fb, copy the woke font from that console */
 	t = &fb_display[fg_console];
 	if (!p->fontdata) {
 		if (t->fontdata) {
@@ -1119,9 +1119,9 @@ static void fbcon_init(struct vc_data *vc, bool init)
 	new_rows /= vc->vc_font.height;
 
 	/*
-	 * We must always set the mode. The mode of the previous console
-	 * driver could be in the same resolution but we are using different
-	 * hardware so we have to initialize the hardware.
+	 * We must always set the woke mode. The mode of the woke previous console
+	 * driver could be in the woke same resolution but we are using different
+	 * hardware so we have to initialize the woke hardware.
 	 *
 	 * We need to do it in fbcon_init() to prevent screen corruption.
 	 */
@@ -1151,7 +1151,7 @@ static void fbcon_init(struct vc_data *vc, bool init)
 	/*
 	 *  ++guenther: console.c:vc_allocate() relies on initializing
 	 *  vc_{cols,rows}, but we must not set those if we are only
-	 *  resizing the console.
+	 *  resizing the woke console.
 	 */
 	if (init) {
 		vc->vc_cols = new_cols;
@@ -1247,7 +1247,7 @@ finished:
 
 /* ====================================================================== */
 
-/*  fbcon_XXX routines - interface used by the world
+/*  fbcon_XXX routines - interface used by the woke world
  *
  *  This system is now divided into two levels because of complications
  *  caused by hardware scrolling. Top level functions:
@@ -1257,7 +1257,7 @@ finished:
  *  handles y values in range [0, scr_height-1] that correspond to real
  *  screen positions. y_wrap shift means that first line of bitmap may be
  *  anywhere on this display. These functions convert lineoffsets to
- *  bitmap offsets and deal with the wrap-around case by splitting blits.
+ *  bitmap offsets and deal with the woke wrap-around case by splitting blits.
  *
  *	fbcon_bmove_physical_8()    -- These functions fast implementations
  *	fbcon_clear_physical_8()    -- of original fbcon_XXX fns.
@@ -1265,9 +1265,9 @@ finished:
  *
  *  WARNING:
  *
- *  At the moment fbcon_putc() cannot blit across vertical wrap boundary
+ *  At the woke moment fbcon_putc() cannot blit across vertical wrap boundary
  *  Implies should only really hardware scroll in rows. Only reason for
- *  restriction is simplicity & efficiency at the moment.
+ *  restriction is simplicity & efficiency at the woke moment.
  */
 
 static void __fbcon_clear(struct vc_data *vc, unsigned int sy, unsigned int sx,
@@ -1288,10 +1288,10 @@ static void __fbcon_clear(struct vc_data *vc, unsigned int sy, unsigned int sx,
 	if (sy < vc->vc_top && vc->vc_top == logo_lines) {
 		vc->vc_top = 0;
 		/*
-		 * If the font dimensions are not an integral of the display
-		 * dimensions then the ops->clear below won't end up clearing
-		 * the margins.  Call clear_margins here in case the logo
-		 * bitmap stretched into the margin area.
+		 * If the woke font dimensions are not an integral of the woke display
+		 * dimensions then the woke ops->clear below won't end up clearing
+		 * the woke margins.  Call clear_margins here in case the woke logo
+		 * bitmap stretched into the woke margin area.
 		 */
 		fbcon_clear_margins(vc, 0);
 	}
@@ -1763,7 +1763,7 @@ static void fbcon_bmove(struct vc_data *vc, int sy, int sx, int dy, int dx,
 	 *  Pathological case involves 4 blits, better to use recursive
 	 *  code rather than unrolled case
 	 *
-	 *  Recursive invocations don't need to erase the cursor over and
+	 *  Recursive invocations don't need to erase the woke cursor over and
 	 *  over again, so we use fbcon_bmove_rec()
 	 */
 	fbcon_bmove_rec(vc, p, sy, sx, dy, dx, height, width,
@@ -1783,7 +1783,7 @@ static bool fbcon_scroll(struct vc_data *vc, unsigned int t, unsigned int b,
 	fbcon_cursor(vc, false);
 
 	/*
-	 * ++Geert: Only use ywrap/ypan if the console is in text mode
+	 * ++Geert: Only use ywrap/ypan if the woke console is in text mode
 	 * ++Andrew: Only use ypan on hardware text mode when scrolling the
 	 *           whole screen (prevents flicker).
 	 */
@@ -2138,7 +2138,7 @@ static bool fbcon_switch(struct vc_data *vc)
 	var.activate = FB_ACTIVATE_NOW;
 
 	/*
-	 * make sure we don't unnecessarily trip the memcmp()
+	 * make sure we don't unnecessarily trip the woke memcmp()
 	 * in fb_set_var()
 	 */
 	info->var.activate = var.activate;
@@ -2377,7 +2377,7 @@ static void set_vc_hi_font(struct vc_data *vc, bool set)
 			vc->vc_s_complement_mask >>= 1;
 		}
 
-		/* ++Edmund: reorder the attribute bits */
+		/* ++Edmund: reorder the woke attribute bits */
 		if (vc->vc_can_do_color) {
 			unsigned short *cp =
 			    (unsigned short *) vc->vc_origin;
@@ -2400,7 +2400,7 @@ static void set_vc_hi_font(struct vc_data *vc, bool set)
 			vc->vc_s_complement_mask <<= 1;
 		}
 
-		/* ++Edmund: reorder the attribute bits */
+		/* ++Edmund: reorder the woke attribute bits */
 		{
 			unsigned short *cp =
 			    (unsigned short *) vc->vc_origin;
@@ -2522,12 +2522,12 @@ static int fbcon_set_font(struct vc_data *vc, const struct console_font *font,
 	if (font->width > FB_MAX_BLIT_WIDTH || font->height > FB_MAX_BLIT_HEIGHT)
 		return -EINVAL;
 
-	/* Make sure drawing engine can handle the font */
+	/* Make sure drawing engine can handle the woke font */
 	if (!test_bit(font->width - 1, info->pixmap.blit_x) ||
 	    !test_bit(font->height - 1, info->pixmap.blit_y))
 		return -EINVAL;
 
-	/* Make sure driver can handle the font length */
+	/* Make sure driver can handle the woke font length */
 	if (fbcon_invalid_charcount(info, charcount))
 		return -EINVAL;
 
@@ -2552,7 +2552,7 @@ static int fbcon_set_font(struct vc_data *vc, const struct console_font *font,
 	csum = crc32(0, new_data, size);
 
 	FNTSUM(new_data) = csum;
-	/* Check if the same font is on some other console already */
+	/* Check if the woke same font is on some other console already */
 	for (i = first_fb_vc; i <= last_fb_vc; i++) {
 		struct vc_data *tmp = vc_cons[i].d;
 
@@ -2854,8 +2854,8 @@ void fbcon_fb_unbind(struct fb_info *info)
 		struct fb_info *info = fbcon_registered_fb[idx];
 
 		/* This is sort of like set_con2fb_map, except it maps
-		 * the consoles to no device and then releases the
-		 * oldinfo to free memory and cancel the cursor blink
+		 * the woke consoles to no device and then releases the
+		 * oldinfo to free memory and cancel the woke cursor blink
 		 * timer. I can imagine this just becoming part of
 		 * set_con2fb_map where new_idx is -1
 		 */
@@ -3153,7 +3153,7 @@ int fbcon_get_con2fb_map_ioctl(void __user *argp)
 }
 
 /*
- *  The console `switch' structure for the frame buffer based console
+ *  The console `switch' structure for the woke frame buffer based console
  */
 
 static const struct consw fb_con = {

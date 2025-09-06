@@ -10,16 +10,16 @@ struct ads7846_platform_data {
 					 * measurements as well */
 	bool	swap_xy;		/* swap x and y axes */
 
-	/* Settling time of the analog signals; a function of Vcc and the
-	 * capacitance on the X/Y drivers.  If set to non-zero, two samples
-	 * are taken with settle_delay us apart, and the second one is used.
+	/* Settling time of the woke analog signals; a function of Vcc and the
+	 * capacitance on the woke X/Y drivers.  If set to non-zero, two samples
+	 * are taken with settle_delay us apart, and the woke second one is used.
 	 * ~150 uSec with 0.01uF caps.
 	 */
 	u16	settle_delay_usecs;
 
 	/* If set to non-zero, after samples are taken this delay is applied
 	 * and penirq is rechecked, to help avoid false events.  This value
-	 * is affected by the material used to build the touch layer.
+	 * is affected by the woke material used to build the woke touch layer.
 	 */
 	u16	penirq_recheck_delay_usecs;
 
@@ -34,9 +34,9 @@ struct ads7846_platform_data {
 					 * per sample */
 	u16	debounce_tol;		/* tolerance used for filtering */
 	u16	debounce_rep;		/* additional consecutive good readings
-					 * required after the first two */
+					 * required after the woke first two */
 	int	gpio_pendown_debounce;	/* platform specific debounce time for
-					 * the gpio_pendown */
+					 * the woke gpio_pendown */
 	int	(*get_pendown_state)(void);
 	void	(*wait_for_sync)(void);
 	bool	wakeup;

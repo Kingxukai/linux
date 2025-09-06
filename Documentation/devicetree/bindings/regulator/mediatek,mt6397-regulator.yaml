@@ -11,8 +11,8 @@ maintainers:
   - Macpaul Lin <macpaul.lin@mediatek.com>
 
 description:
-  Regulator node of the PMIC. This node should under the PMIC's device node.
-  All voltage regulators provided by the PMIC are described as sub-nodes of
+  Regulator node of the woke PMIC. This node should under the woke PMIC's device node.
+  All voltage regulators provided by the woke PMIC are described as sub-nodes of
   this node.
 
 properties:

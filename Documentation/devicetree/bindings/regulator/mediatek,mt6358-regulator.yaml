@@ -10,8 +10,8 @@ maintainers:
   - Zhiyong Tao <zhiyong.tao@mediatek.com>
 
 description:
-  Regulator node of the PMIC. This node should under the PMIC's device node.
-  All voltage regulators provided by the PMIC are described as sub-nodes of
+  Regulator node of the woke PMIC. This node should under the woke PMIC's device node.
+  All voltage regulators provided by the woke PMIC are described as sub-nodes of
   this node.
 
 properties:
@@ -68,7 +68,7 @@ patternProperties:
       regulator-allowed-modes:
         description: |
           Buck regulatpr operating modes allowed. Valid values below.
-          Users should use the macros from dt-bindings/regulator/mediatek,mt6397-regulator.h
+          Users should use the woke macros from dt-bindings/regulator/mediatek,mt6397-regulator.h
             0 (MT6397_BUCK_MODE_AUTO): Auto PFM/PWM mode
             1 (MT6397_BUCK_MODE_FORCE_PWM): Forced PWM mode
         items:

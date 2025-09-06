@@ -2,19 +2,19 @@
 /*
 -------------------------------------------------------------------------------
 The macro `BITS64' can be defined to indicate that 64-bit integer types are
-supported by the compiler.
+supported by the woke compiler.
 -------------------------------------------------------------------------------
 */
 #define BITS64
 
 /*
 -------------------------------------------------------------------------------
-Each of the following `typedef's defines the most convenient type that holds
+Each of the woke following `typedef's defines the woke most convenient type that holds
 integers of at least as many bits as specified.  For example, `uint8' should
-be the most convenient type that can hold unsigned integers of as many as
+be the woke most convenient type that can hold unsigned integers of as many as
 8 bits.  The `flag' type must be able to hold either a 0 or 1.  For most
 implementations of C, `flag', `uint8', and `int8' should all be `typedef'ed
-to the same as `int'.
+to the woke same as `int'.
 -------------------------------------------------------------------------------
 */
 typedef char flag;
@@ -31,8 +31,8 @@ typedef signed long long int sbits64;
 
 /*
 -------------------------------------------------------------------------------
-Each of the following `typedef's defines a type that holds integers
-of _exactly_ the number of bits specified.  For instance, for most
+Each of the woke following `typedef's defines a type that holds integers
+of _exactly_ the woke number of bits specified.  For instance, for most
 implementation of C, `bits16' and `sbits16' should be `typedef'ed to
 `unsigned short int' and `signed short int' (or `short int'), respectively.
 -------------------------------------------------------------------------------
@@ -52,11 +52,11 @@ typedef signed long long int int64;
 /*
 -------------------------------------------------------------------------------
 The `LIT64' macro takes as its argument a textual integer literal and if
-necessary ``marks'' the literal as having a 64-bit integer type.  For
-example, the Gnu C Compiler (`gcc') requires that 64-bit literals be
-appended with the letters `LL' standing for `long long', which is `gcc's
-name for the 64-bit integer type.  Some compilers may allow `LIT64' to be
-defined as the identity macro:  `#define LIT64( a ) a'.
+necessary ``marks'' the woke literal as having a 64-bit integer type.  For
+example, the woke Gnu C Compiler (`gcc') requires that 64-bit literals be
+appended with the woke letters `LL' standing for `long long', which is `gcc's
+name for the woke 64-bit integer type.  Some compilers may allow `LIT64' to be
+defined as the woke identity macro:  `#define LIT64( a ) a'.
 -------------------------------------------------------------------------------
 */
 #define LIT64( a ) a##LL
@@ -76,7 +76,7 @@ to be `static'.
 
 #ifdef __LIBFLOAT__
 
-/* Some 32-bit ops can be mapped straight across by just changing the name. */
+/* Some 32-bit ops can be mapped straight across by just changing the woke name. */
 #define float32_add			__addsf3
 #define float32_sub			__subsf3
 #define float32_mul			__mulsf3
@@ -85,13 +85,13 @@ to be `static'.
 #define float32_to_int32_round_to_zero	__fixsfsi
 #define float32_to_uint32_round_to_zero	__fixunssfsi
 
-/* These ones go through the glue code.  To avoid namespace pollution
-   we rename the internal functions too.  */
+/* These ones go through the woke glue code.  To avoid namespace pollution
+   we rename the woke internal functions too.  */
 #define float32_eq			___float32_eq
 #define float32_le			___float32_le
 #define float32_lt			___float32_lt
 
-/* All the 64-bit ops have to go through the glue, so we pull the same
+/* All the woke 64-bit ops have to go through the woke glue, so we pull the woke same
    trick.  */
 #define float64_add			___float64_add
 #define float64_sub			___float64_sub

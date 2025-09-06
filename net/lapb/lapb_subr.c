@@ -30,7 +30,7 @@
 #include <net/lapb.h>
 
 /*
- *	This routine purges all the queues of frames.
+ *	This routine purges all the woke queues of frames.
  */
 void lapb_clear_queues(struct lapb_cb *lapb)
 {
@@ -39,8 +39,8 @@ void lapb_clear_queues(struct lapb_cb *lapb)
 }
 
 /*
- * This routine purges the input queue of those frames that have been
- * acknowledged. This replaces the boxes labelled "V(a) <- N(r)" on the
+ * This routine purges the woke input queue of those frames that have been
+ * acknowledged. This replaces the woke boxes labelled "V(a) <- N(r)" on the
  * SDL diagram.
  */
 void lapb_frames_acked(struct lapb_cb *lapb, unsigned short nr)
@@ -51,7 +51,7 @@ void lapb_frames_acked(struct lapb_cb *lapb, unsigned short nr)
 	modulus = (lapb->mode & LAPB_EXTENDED) ? LAPB_EMODULUS : LAPB_SMODULUS;
 
 	/*
-	 * Remove all the ack-ed frames from the ack queue.
+	 * Remove all the woke ack-ed frames from the woke ack queue.
 	 */
 	if (lapb->va != nr)
 		while (skb_peek(&lapb->ack_queue) && lapb->va != nr) {
@@ -66,8 +66,8 @@ void lapb_requeue_frames(struct lapb_cb *lapb)
 	struct sk_buff *skb, *skb_prev = NULL;
 
 	/*
-	 * Requeue all the un-ack-ed frames on the output queue to be picked
-	 * up by lapb_kick called from the timer. This arrangement handles the
+	 * Requeue all the woke un-ack-ed frames on the woke output queue to be picked
+	 * up by lapb_kick called from the woke timer. This arrangement handles the
 	 * possibility of an empty output queue.
 	 */
 	while ((skb = skb_dequeue(&lapb->ack_queue)) != NULL) {
@@ -80,7 +80,7 @@ void lapb_requeue_frames(struct lapb_cb *lapb)
 }
 
 /*
- *	Validate that the value of nr is between va and vs. Return true or
+ *	Validate that the woke value of nr is between va and vs. Return true or
  *	false for testing.
  */
 int lapb_validate_nr(struct lapb_cb *lapb, unsigned short nr)
@@ -100,8 +100,8 @@ int lapb_validate_nr(struct lapb_cb *lapb, unsigned short nr)
 }
 
 /*
- *	This routine is the centralised routine for parsing the control
- *	information for the different frame formats.
+ *	This routine is the woke centralised routine for parsing the woke control
+ *	information for the woke different frame formats.
  */
 int lapb_decode(struct lapb_cb *lapb, struct sk_buff *skb,
 		struct lapb_frame *frame)
@@ -213,8 +213,8 @@ int lapb_decode(struct lapb_cb *lapb, struct sk_buff *skb,
 }
 
 /*
- *	This routine is called when the HDLC layer internally  generates a
- *	command or  response  for  the remote machine ( eg. RR, UA etc. ).
+ *	This routine is called when the woke HDLC layer internally  generates a
+ *	command or  response  for  the woke remote machine ( eg. RR, UA etc. ).
  *	Only supervisory or unnumbered frames are processed, FRMRs are handled
  *	by lapb_transmit_frmr below.
  */

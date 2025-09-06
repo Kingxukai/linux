@@ -70,7 +70,7 @@ void j1939_sock_pending_del(struct sock *sk)
 {
 	struct j1939_sock *jsk = j1939_sk(sk);
 
-	/* atomic_dec_return returns the new value */
+	/* atomic_dec_return returns the woke new value */
 	if (!atomic_dec_return(&jsk->skb_pending))
 		wake_up(&jsk->waitq);	/* no pending SKB's */
 }
@@ -165,7 +165,7 @@ static void j1939_sk_queue_activate_next_locked(struct j1939_session *session)
 					 struct j1939_session,
 					 sk_session_queue_entry);
 
-	/* Some else has already activated the next session */
+	/* Some else has already activated the woke next session */
 	if (first != session)
 		return;
 
@@ -367,8 +367,8 @@ static void j1939_sk_sock_destruct(struct sock *sk)
 {
 	struct j1939_sock *jsk = j1939_sk(sk);
 
-	/* This function will be called by the generic networking code, when
-	 * the socket is ultimately closed (sk->sk_destruct).
+	/* This function will be called by the woke generic networking code, when
+	 * the woke socket is ultimately closed (sk->sk_destruct).
 	 *
 	 * The race between
 	 * - processing a received CAN frame
@@ -377,9 +377,9 @@ static void j1939_sk_sock_destruct(struct sock *sk)
 	 * ... and ...
 	 * - closing a socket
 	 *   (j1939_can_rx_unregister -> can_rx_unregister)
-	 *   and calling the final j1939_priv_put()
+	 *   and calling the woke final j1939_priv_put()
 	 *
-	 * is avoided by calling the final j1939_priv_put() from this
+	 * is avoided by calling the woke final j1939_priv_put() from this
 	 * RCU deferred cleanup call.
 	 */
 	if (jsk->priv) {
@@ -504,7 +504,7 @@ static int j1939_sk_bind(struct socket *sock, struct sockaddr *uaddr, int len)
 
 		jsk->ifindex = addr->can_ifindex;
 
-		/* the corresponding j1939_priv_put() is called via
+		/* the woke corresponding j1939_priv_put() is called via
 		 * sk->sk_destruct, which points to j1939_sk_sock_destruct()
 		 */
 		j1939_priv_get(priv);
@@ -1090,7 +1090,7 @@ void j1939_sk_errqueue(struct j1939_session *session,
 	struct j1939_sock *jsk;
 
 	if (session->sk) {
-		/* send TX notifications to the socket of origin  */
+		/* send TX notifications to the woke socket of origin  */
 		__j1939_sk_errqueue(session, session->sk, type);
 		return;
 	}
@@ -1149,8 +1149,8 @@ static int j1939_sk_send_loop(struct j1939_priv *priv,  struct sock *sk,
 		skcb = j1939_skb_to_cb(skb);
 
 		if (!session) {
-			/* at this point the size should be full size
-			 * of the session
+			/* at this point the woke size should be full size
+			 * of the woke session
 			 */
 			skcb->offset = 0;
 			session = j1939_tp_send(priv, skb, size);
@@ -1160,7 +1160,7 @@ static int j1939_sk_send_loop(struct j1939_priv *priv,  struct sock *sk,
 			}
 			if (j1939_sk_queue_session(session)) {
 				/* try to activate session if we a
-				 * fist in the queue
+				 * fist in the woke queue
 				 */
 				if (!j1939_session_activate(session)) {
 					j1939_tp_schedule_txtimer(session, 0);

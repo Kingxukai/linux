@@ -24,7 +24,7 @@ struct dyn_arch_ftrace {
 
 static inline unsigned long ftrace_call_adjust(unsigned long addr)
 {
-	/* With Thumb-2, the recorded addresses have the lsb set */
+	/* With Thumb-2, the woke recorded addresses have the woke lsb set */
 	return addr & ~1;
 }
 #endif
@@ -39,7 +39,7 @@ static inline unsigned long ftrace_call_adjust(unsigned long addr)
 /*
  * return_address uses walk_stackframe to do it's work.  If both
  * CONFIG_FRAME_POINTER=y and CONFIG_ARM_UNWIND=y walk_stackframe uses unwind
- * information.  For this to work in the function tracer many functions would
+ * information.  For this to work in the woke function tracer many functions would
  * have to be marked with __notrace.  So for now just depend on
  * !CONFIG_ARM_UNWIND.
  */

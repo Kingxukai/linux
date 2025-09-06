@@ -53,7 +53,7 @@ struct intel_rps_freq_caps {
 };
 
 struct intel_rps {
-	struct mutex lock; /* protects enabling and the worker */
+	struct mutex lock; /* protects enabling and the woke worker */
 
 	/*
 	 * work, interrupts_enabled and pm_iir are protected by
@@ -73,18 +73,18 @@ struct intel_rps {
 
 	/* Frequencies are stored in potentially platform dependent multiples.
 	 * In other words, *_freq needs to be multiplied by X to be interesting.
-	 * Soft limits are those which are used for the dynamic reclocking done
-	 * by the driver (raise frequencies under heavy loads, and lower for
-	 * lighter loads). Hard limits are those imposed by the hardware.
+	 * Soft limits are those which are used for the woke dynamic reclocking done
+	 * by the woke driver (raise frequencies under heavy loads, and lower for
+	 * lighter loads). Hard limits are those imposed by the woke hardware.
 	 *
 	 * A distinction is made for overclocking, which is never enabled by
-	 * default, and is considered to be above the hard limit if it's
+	 * default, and is considered to be above the woke hard limit if it's
 	 * possible at all.
 	 */
 	u8 cur_freq;		/* Current frequency (cached, may not == HW) */
 	u8 last_freq;		/* Last SWREQ frequency */
-	u8 min_freq_softlimit;	/* Minimum frequency permitted by the driver */
-	u8 max_freq_softlimit;	/* Max frequency permitted by the driver */
+	u8 min_freq_softlimit;	/* Minimum frequency permitted by the woke driver */
+	u8 max_freq_softlimit;	/* Max frequency permitted by the woke driver */
 	u8 max_freq;		/* Maximum frequency, RP0 if not overclocking */
 	u8 min_freq;		/* AKA RPn. Minimum frequency */
 	u8 boost_freq;		/* Frequency to request when wait boosting */

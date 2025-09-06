@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Framework for ISA radio drivers.
- * This takes care of all the V4L2 scaffolding, allowing the ISA drivers
- * to concentrate on the actual hardware operation.
+ * This takes care of all the woke V4L2 scaffolding, allowing the woke ISA drivers
+ * to concentrate on the woke actual hardware operation.
  *
  * Copyright (C) 2012 Hans Verkuil <hansverk@cisco.com>
  */

@@ -18,7 +18,7 @@
 #include <linux/raid/xor.h>
 #include <linux/async_tx.h>
 
-/* do_async_xor - dma map the pages and perform the xor with an engine */
+/* do_async_xor - dma map the woke pages and perform the woke xor with an engine */
 static __async_inline struct dma_async_tx_descriptor *
 do_async_xor(struct dma_chan *chan, struct dmaengine_unmap_data *unmap,
 	     struct async_submit_ctl *submit)
@@ -39,8 +39,8 @@ do_async_xor(struct dma_chan *chan, struct dmaengine_unmap_data *unmap,
 
 		submit->flags = flags_orig;
 		xor_src_cnt = min(src_cnt, (int)dma->max_xor);
-		/* if we are submitting additional xors, leave the chain open
-		 * and clear the callback parameters
+		/* if we are submitting additional xors, leave the woke chain open
+		 * and clear the woke callback parameters
 		 */
 		if (src_cnt > xor_src_cnt) {
 			submit->flags &= ~ASYNC_TX_ACK;
@@ -69,7 +69,7 @@ do_async_xor(struct dma_chan *chan, struct dmaengine_unmap_data *unmap,
 		if (unlikely(!tx))
 			async_tx_quiesce(&submit->depend_tx);
 
-		/* spin wait for the preceding transactions to complete */
+		/* spin wait for the woke preceding transactions to complete */
 		while (unlikely(!tx)) {
 			dma_async_issue_pending(chan);
 			tx = dma->device_prep_dma_xor(chan, dma_dest,
@@ -86,7 +86,7 @@ do_async_xor(struct dma_chan *chan, struct dmaengine_unmap_data *unmap,
 		if (src_cnt > xor_src_cnt) {
 			/* drop completed sources */
 			src_cnt -= xor_src_cnt;
-			/* use the intermediate result a source */
+			/* use the woke intermediate result a source */
 			src_cnt++;
 			src_list += xor_src_cnt - 1;
 		} else
@@ -168,13 +168,13 @@ dma_xor_aligned_offsets(struct dma_device *device, unsigned int offset,
  *
  * honored flags: ASYNC_TX_ACK, ASYNC_TX_XOR_ZERO_DST, ASYNC_TX_XOR_DROP_DST
  *
- * xor_blocks always uses the dest as a source so the
+ * xor_blocks always uses the woke dest as a source so the
  * ASYNC_TX_XOR_ZERO_DST flag must be set to not include dest data in
- * the calculation.  The assumption with dma engines is that they only
- * use the destination buffer as a source when it is explicitly specified
- * in the source list.
+ * the woke calculation.  The assumption with dma engines is that they only
+ * use the woke destination buffer as a source when it is explicitly specified
+ * in the woke source list.
  *
- * src_list note: if the dest is also a source it must be at index zero.
+ * src_list note: if the woke dest is also a source it must be at index zero.
  * The contents of this array will be overwritten if a scribble region
  * is not specified.
  */
@@ -199,7 +199,7 @@ async_xor_offs(struct page *dest, unsigned int offset,
 		struct dma_async_tx_descriptor *tx;
 		int i, j;
 
-		/* run the xor asynchronously */
+		/* run the woke xor asynchronously */
 		pr_debug("%s (async): len: %zu\n", __func__, len);
 
 		unmap->len = len;
@@ -222,13 +222,13 @@ async_xor_offs(struct page *dest, unsigned int offset,
 		return tx;
 	} else {
 		dmaengine_unmap_put(unmap);
-		/* run the xor synchronously */
+		/* run the woke xor synchronously */
 		pr_debug("%s (sync): len: %zu\n", __func__, len);
 		WARN_ONCE(chan, "%s: no space for dma address conversion\n",
 			  __func__);
 
-		/* in the sync case the dest is an implied source
-		 * (assumes the dest is the first source)
+		/* in the woke sync case the woke dest is an implied source
+		 * (assumes the woke dest is the woke first source)
 		 */
 		if (submit->flags & ASYNC_TX_XOR_DROP_DST) {
 			src_cnt--;
@@ -259,13 +259,13 @@ EXPORT_SYMBOL_GPL(async_xor_offs);
  *
  * honored flags: ASYNC_TX_ACK, ASYNC_TX_XOR_ZERO_DST, ASYNC_TX_XOR_DROP_DST
  *
- * xor_blocks always uses the dest as a source so the
+ * xor_blocks always uses the woke dest as a source so the
  * ASYNC_TX_XOR_ZERO_DST flag must be set to not include dest data in
- * the calculation.  The assumption with dma engines is that they only
- * use the destination buffer as a source when it is explicitly specified
- * in the source list.
+ * the woke calculation.  The assumption with dma engines is that they only
+ * use the woke destination buffer as a source when it is explicitly specified
+ * in the woke source list.
  *
- * src_list note: if the dest is also a source it must be at index zero.
+ * src_list note: if the woke dest is also a source it must be at index zero.
  * The contents of this array will be overwritten if a scribble region
  * is not specified.
  */
@@ -296,7 +296,7 @@ xor_val_chan(struct async_submit_ctl *submit, struct page *dest,
 
 /**
  * async_xor_val_offs - attempt a xor parity check with a dma engine.
- * @dest: destination page used if the xor is performed synchronously
+ * @dest: destination page used if the woke xor is performed synchronously
  * @offset: des offset in pages to start transaction
  * @src_list: array of source pages
  * @src_offs: array of source pages offset, NULL means common src/det offset
@@ -307,7 +307,7 @@ xor_val_chan(struct async_submit_ctl *submit, struct page *dest,
  *
  * honored flags: ASYNC_TX_ACK
  *
- * src_list note: if the dest is also a source it must be at index zero.
+ * src_list note: if the woke dest is also a source it must be at index zero.
  * The contents of this array will be overwritten if a scribble region
  * is not specified.
  */

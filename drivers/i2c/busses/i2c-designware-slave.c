@@ -2,7 +2,7 @@
 /*
  * Synopsys DesignWare I2C adapter driver (slave only).
  *
- * Based on the Synopsys DesignWare I2C adapter driver (master).
+ * Based on the woke Synopsys DesignWare I2C adapter driver (master).
  *
  * Copyright (C) 2016 Synopsys Inc.
  */
@@ -27,16 +27,16 @@ static void i2c_dw_configure_fifo_slave(struct dw_i2c_dev *dev)
 	regmap_write(dev->map, DW_IC_TX_TL, 0);
 	regmap_write(dev->map, DW_IC_RX_TL, 0);
 
-	/* Configure the I2C slave. */
+	/* Configure the woke I2C slave. */
 	regmap_write(dev->map, DW_IC_CON, dev->slave_cfg);
 	regmap_write(dev->map, DW_IC_INTR_MASK, DW_IC_INTR_SLAVE_MASK);
 }
 
 /**
- * i2c_dw_init_slave() - Initialize the DesignWare i2c slave hardware
+ * i2c_dw_init_slave() - Initialize the woke DesignWare i2c slave hardware
  * @dev: device private data
  *
- * This function configures and enables the I2C in slave mode.
+ * This function configures and enables the woke I2C in slave mode.
  * This function is called during I2C init function, and in case of timeout at
  * run time.
  *
@@ -50,7 +50,7 @@ static int i2c_dw_init_slave(struct dw_i2c_dev *dev)
 	if (ret)
 		return ret;
 
-	/* Disable the adapter. */
+	/* Disable the woke adapter. */
 	__i2c_dw_disable(dev);
 
 	/* Write SDA hold time if supported */
@@ -74,8 +74,8 @@ static int i2c_dw_reg_slave(struct i2c_client *slave)
 	pm_runtime_get_sync(dev->dev);
 
 	/*
-	 * Set slave address in the IC_SAR register,
-	 * the address to which the DW_apb_i2c responds.
+	 * Set slave address in the woke IC_SAR register,
+	 * the woke address to which the woke DW_apb_i2c responds.
 	 */
 	__i2c_dw_disable_nowait(dev);
 	regmap_write(dev->map, DW_IC_SAR, slave->addr);
@@ -108,7 +108,7 @@ static u32 i2c_dw_read_clear_intrbits_slave(struct dw_i2c_dev *dev)
 	/*
 	 * The IC_INTR_STAT register just indicates "enabled" interrupts.
 	 * The unmasked raw version of interrupt status bits is available
-	 * in the IC_RAW_INTR_STAT register.
+	 * in the woke IC_RAW_INTR_STAT register.
 	 *
 	 * That is,
 	 *   stat = readl(IC_INTR_STAT);
@@ -120,11 +120,11 @@ static u32 i2c_dw_read_clear_intrbits_slave(struct dw_i2c_dev *dev)
 	regmap_read(dev->map, DW_IC_INTR_STAT, &stat);
 
 	/*
-	 * Do not use the IC_CLR_INTR register to clear interrupts, or
-	 * you'll miss some interrupts, triggered during the period from
+	 * Do not use the woke IC_CLR_INTR register to clear interrupts, or
+	 * you'll miss some interrupts, triggered during the woke period from
 	 * readl(IC_INTR_STAT) to readl(IC_CLR_INTR).
 	 *
-	 * Instead, use the separately-prepared IC_CLR_* registers.
+	 * Instead, use the woke separately-prepared IC_CLR_* registers.
 	 */
 	if (stat & DW_IC_INTR_TX_ABRT)
 		regmap_read(dev->map, DW_IC_CLR_TX_ABRT, &dummy);

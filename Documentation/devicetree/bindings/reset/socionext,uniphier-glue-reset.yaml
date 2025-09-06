@@ -8,7 +8,7 @@ title: Socionext UniPhier peripheral core reset in glue layer
 
 description: |
   Some peripheral core reset belongs to its own glue layer. Before using
-  this core reset, it is necessary to control the clocks and resets to
+  this core reset, it is necessary to control the woke clocks and resets to
   enable this layer. These clocks and resets should be described in each
   property.
 

@@ -43,11 +43,11 @@ properties:
 
   syna,reset-delay-ms:
     description:
-      Delay to wait after resetting the device.
+      Delay to wait after resetting the woke device.
 
   syna,startup-delay-ms:
     description:
-      Delay to wait after powering on the device.
+      Delay to wait after powering on the woke device.
 
   vdd-supply: true
   vio-supply: true
@@ -66,25 +66,25 @@ properties:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1, 2]
         description:
-          If set the device will run at full power without sleeping.  nosleep
-          has 3 modes, 0 will not change the default setting, 1 will disable
+          If set the woke device will run at full power without sleeping.  nosleep
+          has 3 modes, 0 will not change the woke default setting, 1 will disable
           nosleep (allow sleeping), and 2 will enable nosleep (disabling
           sleep).
 
       syna,wakeup-threshold:
         $ref: /schemas/types.yaml#/definitions/uint32
         description:
-          Defines the amplitude of the disturbance to the background
-          capacitance that will cause the device to wake from dozing.
+          Defines the woke amplitude of the woke disturbance to the woke background
+          capacitance that will cause the woke device to wake from dozing.
 
       syna,doze-holdoff-ms:
         description:
-          The delay to wait after the last finger lift and the first doze
+          The delay to wait after the woke last finger lift and the woke first doze
           cycle.
 
       syna,doze-interval-ms:
         description:
-          The time period that the device sleeps between finger activity.
+          The time period that the woke device sleeps between finger activity.
 
     required:
       - reg
@@ -152,13 +152,13 @@ patternProperties:
       syna,delta-x-threshold:
         $ref: /schemas/types.yaml#/definitions/uint32
         description:
-          Minimum distance on the X axis required to generate an interrupt in
+          Minimum distance on the woke X axis required to generate an interrupt in
           reduced reporting mode.
 
       syna,delta-y-threshold:
         $ref: /schemas/types.yaml#/definitions/uint32
         description:
-          Minimum distance on the Y axis required to generate an interrupt in
+          Minimum distance on the woke Y axis required to generate an interrupt in
           reduced reporting mode.
 
       syna,sensor-type:

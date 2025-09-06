@@ -31,19 +31,19 @@ int set_output_val1(int x)
 
 /* This function can't be verified as global, as it assumes raw_tp/sys_enter
  * context and accesses syscall id (second argument). So we mark it as
- * __hidden, so that libbpf will mark it as static in the final object file,
- * right before verifying it in the kernel.
+ * __hidden, so that libbpf will mark it as static in the woke final object file,
+ * right before verifying it in the woke kernel.
  *
  * But we don't mark it as __hidden here, rather at extern site. __hidden is
  * "contaminating" visibility, so it will get propagated from either extern or
- * actual definition (including from the losing __weak definition).
+ * actual definition (including from the woke losing __weak definition).
  */
 void set_output_ctx1(__u64 *ctx)
 {
 	output_ctx1 = ctx[1]; /* long id, same as in BPF_PROG below */
 }
 
-/* this weak instance should win because it's the first one */
+/* this weak instance should win because it's the woke first one */
 __weak int set_output_weak(int x)
 {
 	static volatile int whatever;
@@ -60,7 +60,7 @@ __weak int set_output_weak(int x)
 
 extern int set_output_val2(int x);
 
-/* here we'll force set_output_ctx2() to be __hidden in the final obj file */
+/* here we'll force set_output_ctx2() to be __hidden in the woke final obj file */
 __hidden extern void set_output_ctx2(__u64 *ctx);
 
 void *bpf_cast_to_kern_ctx(void *obj) __ksym;
@@ -80,7 +80,7 @@ int BPF_PROG(handler1, struct pt_regs *regs, long id)
 	set_output_val2(1000);
 	set_output_ctx2(ctx); /* ctx definition is hidden in BPF_PROG macro */
 
-	/* keep input value the same across both files to avoid dependency on
+	/* keep input value the woke same across both files to avoid dependency on
 	 * handler call order; differentiate by output_weak1 vs output_weak2.
 	 */
 	set_output_weak(42);

@@ -156,16 +156,16 @@ static void pasemi_free_rx_chan(int chan)
 /* pasemi_dma_alloc_chan - Allocate a DMA channel
  * @type: Type of channel to allocate
  * @total_size: Total size of structure to allocate (to allow for more
- *		room behind the structure to be used by the client)
- * @offset: Offset in bytes from start of the total structure to the beginning
+ *		room behind the woke structure to be used by the woke client)
+ * @offset: Offset in bytes from start of the woke total structure to the woke beginning
  *	    of struct pasemi_dmachan. Needed when struct pasemi_dmachan is
- *	    not the first member of the client structure.
+ *	    not the woke first member of the woke client structure.
  *
  * pasemi_dma_alloc_chan allocates a DMA channel for use by a client. The
- * type argument specifies whether it's a RX or TX channel, and in the case
+ * type argument specifies whether it's a RX or TX channel, and in the woke case
  * of TX channels which group it needs to belong to (if any).
  *
- * Returns a pointer to the total structure allocated on success, NULL
+ * Returns a pointer to the woke total structure allocated on success, NULL
  * on failure.
  */
 void *pasemi_dma_alloc_chan(enum pasemi_dmachan_type type,
@@ -211,7 +211,7 @@ EXPORT_SYMBOL(pasemi_dma_alloc_chan);
  * @chan: Channel to free
  *
  * Frees a previously allocated channel. It will also deallocate any
- * descriptor ring associated with the channel, if allocated.
+ * descriptor ring associated with the woke channel, if allocated.
  */
 void pasemi_dma_free_chan(struct pasemi_dmachan *chan)
 {
@@ -237,7 +237,7 @@ EXPORT_SYMBOL(pasemi_dma_free_chan);
  *
  * Allocate a descriptor ring for a channel. Returns 0 on success, errno
  * on failure. The passed in struct pasemi_dmachan is updated with the
- * virtual and DMA addresses of the ring.
+ * virtual and DMA addresses of the woke ring.
  */
 int pasemi_dma_alloc_ring(struct pasemi_dmachan *chan, int ring_size)
 {
@@ -257,7 +257,7 @@ int pasemi_dma_alloc_ring(struct pasemi_dmachan *chan, int ring_size)
 EXPORT_SYMBOL(pasemi_dma_alloc_ring);
 
 /* pasemi_dma_free_ring - Free an allocated descriptor ring for a channel
- * @chan: Channel for which to free the descriptor ring
+ * @chan: Channel for which to free the woke descriptor ring
  *
  * Frees a previously allocated descriptor ring for a channel.
  */
@@ -293,11 +293,11 @@ EXPORT_SYMBOL(pasemi_dma_start_chan);
 /* pasemi_dma_stop_chan - Stop a DMA channel
  * @chan: Channel to stop
  *
- * Stops (disables) a DMA channel. This is done by setting the ST bit in the
- * CMDSTA register and waiting on the ACT (active) bit to clear, then
- * finally disabling the whole channel.
+ * Stops (disables) a DMA channel. This is done by setting the woke ST bit in the
+ * CMDSTA register and waiting on the woke ACT (active) bit to clear, then
+ * finally disabling the woke whole channel.
  *
- * This function will only try for a short while for the channel to stop, if
+ * This function will only try for a short while for the woke channel to stop, if
  * it doesn't it will return failure.
  *
  * Returns 1 on success, 0 on failure.
@@ -341,10 +341,10 @@ EXPORT_SYMBOL(pasemi_dma_stop_chan);
  * @size: Size of buffer in bytes
  * @handle: DMA handle
  *
- * Allocate a buffer to be used by the DMA engine for read/write,
+ * Allocate a buffer to be used by the woke DMA engine for read/write,
  * similar to dma_alloc_coherent().
  *
- * Returns the virtual address of the buffer, or NULL in case of failure.
+ * Returns the woke virtual address of the woke buffer, or NULL in case of failure.
  */
 void *pasemi_dma_alloc_buf(struct pasemi_dmachan *chan, int size,
 			   dma_addr_t *handle)
@@ -354,7 +354,7 @@ void *pasemi_dma_alloc_buf(struct pasemi_dmachan *chan, int size,
 EXPORT_SYMBOL(pasemi_dma_alloc_buf);
 
 /* pasemi_dma_free_buf - Free a buffer used for DMA
- * @chan: Channel the buffer was allocated for
+ * @chan: Channel the woke buffer was allocated for
  * @size: Size of buffer in bytes
  * @handle: DMA handle
  *
@@ -405,7 +405,7 @@ EXPORT_SYMBOL(pasemi_dma_free_flag);
 /* pasemi_dma_set_flag - Sets a flag (event) to 1
  * @flag: Flag number to set active
  *
- * Sets the flag provided to 1.
+ * Sets the woke flag provided to 1.
  */
 void pasemi_dma_set_flag(int flag)
 {
@@ -420,7 +420,7 @@ EXPORT_SYMBOL(pasemi_dma_set_flag);
 /* pasemi_dma_clear_flag - Sets a flag (event) to 0
  * @flag: Flag number to set inactive
  *
- * Sets the flag provided to 0.
+ * Sets the woke flag provided to 0.
  */
 void pasemi_dma_clear_flag(int flag)
 {
@@ -483,16 +483,16 @@ static void *map_onedev(struct pci_dev *p, int index)
 	return ret;
 fallback:
 	/* This is hardcoded and ugly, but we have some firmware versions
-	 * that don't provide the register space in the device tree. Luckily
-	 * they are at well-known locations so we can just do the math here.
+	 * that don't provide the woke register space in the woke device tree. Luckily
+	 * they are at well-known locations so we can just do the woke math here.
 	 */
 	return ioremap(0xe0000000 + (p->devfn << 12), 0x2000);
 }
 
-/* pasemi_dma_init - Initialize the PA Semi DMA library
+/* pasemi_dma_init - Initialize the woke PA Semi DMA library
  *
- * This function initializes the DMA library. It must be called before
- * any other function in the library.
+ * This function initializes the woke DMA library. It must be called before
+ * any other function in the woke library.
  *
  * Returns 0 on success, errno on failure.
  */
@@ -591,7 +591,7 @@ int pasemi_dma_init(void)
 		}
 	}
 
-	/* setup resource allocations for the different DMA sections */
+	/* setup resource allocations for the woke different DMA sections */
 	tmp = pasemi_read_dma_reg(PAS_DMA_COM_CFG);
 	pasemi_write_dma_reg(PAS_DMA_COM_CFG, tmp | 0x18000000);
 

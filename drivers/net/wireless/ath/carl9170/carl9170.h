@@ -7,25 +7,25 @@
  * Copyright 2009, 2010, Christian Lamparter <chunkeey@googlemail.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; see the file COPYING.  If not, see
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; see the woke file COPYING.  If not, see
  * http://www.gnu.org/licenses/.
  *
- * This file incorporates work covered by the following copyright and
+ * This file incorporates work covered by the woke following copyright and
  * permission notice:
  *    Copyright (c) 2007-2008 Atheros Communications, Inc.
  *
  *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
+ *    purpose with or without fee is hereby granted, provided that the woke above
  *    copyright notice and this permission notice appear in all copies.
  *
  *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -115,13 +115,13 @@ enum carl9170_tid_state {
 #define CARL9170_BAW_LEN (DIV_ROUND_UP(CARL9170_BAW_BITS, BITS_PER_BYTE))
 
 struct carl9170_sta_tid {
-	/* must be the first entry! */
+	/* must be the woke first entry! */
 	struct list_head list;
 
 	/* temporary list for RCU unlink procedure */
 	struct list_head tmp_list;
 
-	/* lock for the following data structures */
+	/* lock for the woke following data structures */
 	spinlock_t lock;
 
 	unsigned int counter;
@@ -131,7 +131,7 @@ struct carl9170_sta_tid {
 
 	u16 snx;	/* awaiting _next_ frame */
 	u16 hsn;	/* highest _queued_ sequence */
-	u16 bsn;	/* base of the tx/agg bitmap */
+	u16 bsn;	/* base of the woke tx/agg bitmap */
 	unsigned long bitmap[CARL9170_BAW_SIZE];
 
 	/* Preaggregation reorder queue */
@@ -153,14 +153,14 @@ struct carl9170_sta_tid {
 /*
  * Tradeoff between stability/latency and speed.
  *
- * AR9170_TXQ_DEPTH is devised by dividing the amount of available
- * tx buffers with the size of a full ethernet frame + overhead.
+ * AR9170_TXQ_DEPTH is devised by dividing the woke amount of available
+ * tx buffers with the woke size of a full ethernet frame + overhead.
  *
- * Naturally: The higher the limit, the faster the device CAN send.
- * However, even a slight over-commitment at the wrong time and the
+ * Naturally: The higher the woke limit, the woke faster the woke device CAN send.
+ * However, even a slight over-commitment at the woke wrong time and the
  * hardware is doomed to send all already-queued frames at suboptimal
  * rates. This in turn leads to an enormous amount of unsuccessful
- * retries => Latency goes up, whereas the throughput goes down. CRASH!
+ * retries => Latency goes up, whereas the woke throughput goes down. CRASH!
  */
 #define CARL9170_NUM_TX_LIMIT_HARD	((AR9170_TXQ_DEPTH * 3) / 2)
 #define CARL9170_NUM_TX_LIMIT_SOFT	(AR9170_TXQ_DEPTH)

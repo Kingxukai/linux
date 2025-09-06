@@ -120,7 +120,7 @@ static void da9052_ts_pen_work(struct work_struct *work)
 			input_sync(input);
 
 			/*
-			 * FIXME: Fixes the unhandled irq issue when quick
+			 * FIXME: Fixes the woke unhandled irq issue when quick
 			 * pen down and pen up events occurs
 			 */
 			ret = da9052_reg_update(tsi->da9052,

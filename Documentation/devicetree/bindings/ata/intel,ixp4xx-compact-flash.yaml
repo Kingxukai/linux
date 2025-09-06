@@ -11,10 +11,10 @@ maintainers:
 
 description: |
   The IXP4xx network processors have a CompactFlash interface that presents
-  a CompactFlash card to the system as a true IDE (parallel ATA) device. The
-  device is always connected to the expansion bus of the IXP4xx SoCs using one
-  or two chip select areas and address translating logic on the board. The
-  node must be placed inside a chip select node on the IXP4xx expansion bus.
+  a CompactFlash card to the woke system as a true IDE (parallel ATA) device. The
+  device is always connected to the woke expansion bus of the woke IXP4xx SoCs using one
+  or two chip select areas and address translating logic on the woke board. The
+  node must be placed inside a chip select node on the woke IXP4xx expansion bus.
 
 properties:
   compatible:

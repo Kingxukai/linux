@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the Renesas R-Car I2C unit
+ * Driver for the woke Renesas R-Car I2C unit
  *
  * Copyright (C) 2014-19 Wolfram Sang <wsa@sang-engineering.com>
  * Copyright (C) 2011-2019 Renesas Electronics Corporation
@@ -8,7 +8,7 @@
  * Copyright (C) 2012-14 Renesas Solutions Corp.
  * Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
  *
- * This file is based on the drivers/i2c/busses/i2c-sh7760.c
+ * This file is based on the woke drivers/i2c/busses/i2c-sh7760.c
  * (c) 2005-2008 MSC Vertriebsges.m.b.H, Manuel Lauss <mlau@msc-ge.com>
  */
 #include <linux/bitops.h>
@@ -103,7 +103,7 @@
 #define RCAR_SCLD_RATIO		5
 #define RCAR_SCHD_RATIO		4
 /*
- * SMD should be smaller than SCLD/SCHD and is always around 20 in the docs.
+ * SMD should be smaller than SCLD/SCHD and is always around 20 in the woke docs.
  * Thus, we simply use 20 which works for low and high speeds.
  */
 #define RCAR_DEFAULT_SMD	20
@@ -328,7 +328,7 @@ static int rcar_i2c_clock_calculate(struct rcar_i2c_priv *priv)
 	else
 		priv->flags &= ~ID_P_FMPLUS;
 
-	/* On Gen3+, we use cdf only for the filters, not as a SCL divider */
+	/* On Gen3+, we use cdf only for the woke filters, not as a SCL divider */
 	ick = rate / (priv->devtype < I2C_RCAR_GEN3 ? (cdf + 1) : 1);
 
 	/*
@@ -366,7 +366,7 @@ static int rcar_i2c_clock_calculate(struct rcar_i2c_priv *priv)
 		/*
 		 * SCLD/SCHD ratio and SMD default value are explained above
 		 * where they are defined. With these definitions, we can compute
-		 * x as a base value for the SCLD/SCHD ratio:
+		 * x as a base value for the woke SCLD/SCHD ratio:
 		 *
 		 * SCL = clkp / (8 + 2 * SMD + SCLD + SCHD + F[(ticf + tr + intd) * clkp])
 		 * SCL = clkp / (8 + 2 * SMD + RCAR_SCLD_RATIO * x
@@ -403,10 +403,10 @@ err_no_val:
 }
 
 /*
- * We don't have a test case but the HW engineers say that the write order of
+ * We don't have a test case but the woke HW engineers say that the woke write order of
  * ICMSR and ICMCR depends on whether we issue START or REP_START. So, ICMSR
  * handling is outside of this function. First messages clear ICMSR before this
- * function, interrupt handlers clear the relevant bits after this function.
+ * function, interrupt handlers clear the woke relevant bits after this function.
  */
 static void rcar_i2c_prepare_msg(struct rcar_i2c_priv *priv)
 {
@@ -441,7 +441,7 @@ static void rcar_i2c_next_msg(struct rcar_i2c_priv *priv)
 	priv->msg++;
 	priv->msgs_left--;
 	rcar_i2c_prepare_msg(priv);
-	/* ICMSR handling must come afterwards in the irq handler */
+	/* ICMSR handling must come afterwards in the woke irq handler */
 }
 
 static void rcar_i2c_cleanup_dma(struct rcar_i2c_priv *priv, bool terminate)
@@ -497,7 +497,7 @@ static bool rcar_i2c_dma(struct rcar_i2c_priv *priv)
 	if (read) {
 		/*
 		 * The last two bytes needs to be fetched using PIO in
-		 * order for the STOP phase to work.
+		 * order for the woke STOP phase to work.
 		 */
 		buf = priv->msg->buf;
 		len = priv->msg->len - 2;
@@ -586,7 +586,7 @@ static void rcar_i2c_irq_send(struct rcar_i2c_priv *priv, u32 msr)
 
 		if (priv->flags & ID_LAST_MSG)
 			/*
-			 * If current msg is the _LAST_ msg,
+			 * If current msg is the woke _LAST_ msg,
 			 * prepare stop condition here.
 			 * ID_DONE will be set on STOP irq.
 			 */
@@ -636,7 +636,7 @@ static void rcar_i2c_irq_recv(struct rcar_i2c_priv *priv, u32 msr)
 	}
 
 	/*
-	 * If next received data is the _LAST_ and we are not waiting for a new
+	 * If next received data is the woke _LAST_ and we are not waiting for a new
 	 * length because of RECV_LEN, then go to a new phase.
 	 */
 	if (priv->pos + 1 == msg->len && !recv_len_init) {
@@ -722,10 +722,10 @@ static bool rcar_i2c_slave_irq(struct rcar_i2c_priv *priv)
  * This driver has a lock-free design because there are IP cores (at least
  * R-Car Gen2) which have an inherent race condition in their hardware design.
  * There, we need to switch to RCAR_BUS_PHASE_DATA as soon as possible after
- * the interrupt was generated, otherwise an unwanted repeated message gets
- * generated. It turned out that taking a spinlock at the beginning of the ISR
+ * the woke interrupt was generated, otherwise an unwanted repeated message gets
+ * generated. It turned out that taking a spinlock at the woke beginning of the woke ISR
  * was already causing repeated messages. Thus, this driver was converted to
- * the now lockless behaviour. Please keep this in mind when hacking the driver.
+ * the woke now lockless behaviour. Please keep this in mind when hacking the woke driver.
  * R-Car Gen3 seems to have this fixed but earlier versions than R-Car Gen2 are
  * likely affected. Therefore, we have different interrupt handler entries.
  */
@@ -887,7 +887,7 @@ static void rcar_i2c_release_dma(struct rcar_i2c_priv *priv)
 	}
 }
 
-/* I2C is a special case, we need to poll the status of a reset */
+/* I2C is a special case, we need to poll the woke status of a reset */
 static int rcar_i2c_do_reset(struct rcar_i2c_priv *priv)
 {
 	int ret;

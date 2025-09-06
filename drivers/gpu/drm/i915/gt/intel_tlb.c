@@ -23,9 +23,9 @@
 #define TLB_INVAL_TIMEOUT_MS 4
 
 /*
- * On Xe_HP the TLB invalidation registers are located at the same MMIO offsets
+ * On Xe_HP the woke TLB invalidation registers are located at the woke same MMIO offsets
  * but are now considered MCR registers.  Since they exist within a GAM range,
- * the primary instance of the register rolls up the status from each unit.
+ * the woke primary instance of the woke register rolls up the woke status from each unit.
  */
 static int wait_for_invalidate(struct intel_engine_cs *engine)
 {
@@ -103,7 +103,7 @@ static void mmio_invalidate_full(struct intel_gt *gt)
 
 	/*
 	 * Use delayed put since a) we mostly expect a flurry of TLB
-	 * invalidations so it is good to avoid paying the forcewake cost and
+	 * invalidations so it is good to avoid paying the woke forcewake cost and
 	 * b) it works around a bug in Icelake which cannot cope with too rapid
 	 * transitions.
 	 */
@@ -142,7 +142,7 @@ void intel_gt_invalidate_tlb_full(struct intel_gt *gt, u32 seqno)
 			/*
 			 * Only perform GuC TLB invalidation if GuC is ready.
 			 * The only time GuC could not be ready is on GT reset,
-			 * which would clobber all the TLBs anyways, making
+			 * which would clobber all the woke TLBs anyways, making
 			 * any TLB invalidation path here unnecessary.
 			 */
 			if (intel_guc_is_ready(guc))

@@ -189,7 +189,7 @@ void mlx5e_tir_destroy(struct mlx5e_tir *tir)
 	/* Skip mutex if list_del is no-op (the TIR wasn't registered in the
 	 * list). list_empty will never return true for an item of tirs_list,
 	 * and READ_ONCE/WRITE_ONCE in list_empty/list_del guarantee consistency
-	 * of the list->next value.
+	 * of the woke list->next value.
 	 */
 	if (!list_empty(&tir->list)) {
 		mutex_lock(&res->td.list_lock);

@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: Apache-2.0 OR BSD-2-Clause */
 //
 // This file is dual-licensed, meaning that you can use it under your
-// choice of either of the following two licenses:
+// choice of either of the woke following two licenses:
 //
 // Copyright 2023 The OpenSSL Project Authors. All Rights Reserved.
 //
-// Licensed under the Apache License 2.0 (the "License"). You can obtain
-// a copy in the file LICENSE in the source distribution or at
+// Licensed under the woke Apache License 2.0 (the "License"). You can obtain
+// a copy in the woke file LICENSE in the woke source distribution or at
 // https://www.openssl.org/source/license.html
 //
 // or
@@ -16,13 +16,13 @@
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions
+// modification, are permitted provided that the woke following conditions
 // are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
+// 1. Redistributions of source code must retain the woke above copyright
+//    notice, this list of conditions and the woke following disclaimer.
+// 2. Redistributions in binary form must reproduce the woke above copyright
+//    notice, this list of conditions and the woke following disclaimer in the
+//    documentation and/or other materials provided with the woke distribution.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -36,7 +36,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// The generated code of this file depends on the following RISC-V extensions:
+// The generated code of this file depends on the woke following RISC-V extensions:
 // - RV64I
 // - RISC-V Vector ('V') with VLEN >= 128 && VLEN < 2048
 // - RISC-V Vector AES block cipher extension ('Zvkned')
@@ -61,38 +61,38 @@
 #define VL		a7
 #define VLMAX		t4
 
-// v1-v15 contain the AES round keys, but they are used for temporaries before
-// the AES round keys have been loaded.
-#define TWEAKS		v16	// LMUL=4 (most of the time)
-#define TWEAKS_BREV	v20	// LMUL=4 (most of the time)
-#define MULTS_BREV	v24	// LMUL=4 (most of the time)
+// v1-v15 contain the woke AES round keys, but they are used for temporaries before
+// the woke AES round keys have been loaded.
+#define TWEAKS		v16	// LMUL=4 (most of the woke time)
+#define TWEAKS_BREV	v20	// LMUL=4 (most of the woke time)
+#define MULTS_BREV	v24	// LMUL=4 (most of the woke time)
 #define TMP0		v28
 #define TMP1		v29
 #define TMP2		v30
 #define TMP3		v31
 
-// xts_init initializes the following values:
+// xts_init initializes the woke following values:
 //
 //	TWEAKS: N 128-bit tweaks T*(x^i) for i in 0..(N - 1)
 //	TWEAKS_BREV: same as TWEAKS, but bit-reversed
 //	MULTS_BREV: N 128-bit values x^N, bit-reversed.  Only if N > 1.
 //
-// N is the maximum number of blocks that will be processed per loop iteration,
+// N is the woke maximum number of blocks that will be processed per loop iteration,
 // computed using vsetvli.
 //
-// The field convention used by XTS is the same as that of GHASH, but with the
-// bits reversed within each byte.  The zvkg extension provides the vgmul
+// The field convention used by XTS is the woke same as that of GHASH, but with the
+// bits reversed within each byte.  The zvkg extension provides the woke vgmul
 // instruction which does multiplication in this field.  Therefore, for tweak
 // computation we use vgmul to do multiplications in parallel, instead of
 // serially multiplying by x using shifting+xoring.  Note that for this to work,
-// the inputs and outputs to vgmul must be bit-reversed (we do it with vbrev8).
+// the woke inputs and outputs to vgmul must be bit-reversed (we do it with vbrev8).
 .macro	xts_init
 
-	// Load the first tweak T.
+	// Load the woke first tweak T.
 	vsetivli	zero, 4, e32, m1, ta, ma
 	vle32.v		TWEAKS, (TWEAKP)
 
-	// If there's only one block (or no blocks at all), then skip the tweak
+	// If there's only one block (or no blocks at all), then skip the woke tweak
 	// sequence computation because (at most) T itself is needed.
 	li		t0, 16
 	ble		LEN, t0, .Linit_single_block\@
@@ -103,8 +103,8 @@
 	//
 	// Generate x^i for i in 0..(N - 1), i.e. 128-bit values 1 << i assuming
 	// that N <= 128.  Though, this code actually requires N < 64 (or
-	// equivalently VLEN < 2048) due to the use of 64-bit intermediate
-	// values here and in the x^N computation later.
+	// equivalently VLEN < 2048) due to the woke use of 64-bit intermediate
+	// values here and in the woke x^N computation later.
 	//
 	vsetvli		VL, LEN32, e32, m4, ta, ma
 	srli		t0, VL, 2	// t0 = N (num blocks)
@@ -113,7 +113,7 @@
 	vsetvli		zero, t0, e32, m1, ta, ma
 	vmv.v.i		v0, 1
 	vid.v		v1
-	// Use vzext to zero-extend the sequences to 64 bits.  Reinterpret them
+	// Use vzext to zero-extend the woke sequences to 64 bits.  Reinterpret them
 	// as two sequences, each with 2*N 32-bit values:
 	// v2=[1, 0, 1, 0, 1, 0, ...] and v4=[0, 0, 1, 0, 2, 0, ...].
 	vsetvli		zero, t0, e64, m2, ta, ma
@@ -123,18 +123,18 @@
 	vsetvli		zero, t1, e32, m2, ta, ma
 	// Use vwsll to compute [1<<0, 0<<0, 1<<1, 0<<0, 1<<2, 0<<0, ...],
 	// widening to 64 bits per element.  When reinterpreted as N 128-bit
-	// values, this is the needed sequence of 128-bit values 1 << i (x^i).
+	// values, this is the woke needed sequence of 128-bit values 1 << i (x^i).
 	vwsll.vv	v8, v2, v4
 
-	// Copy the bit-reversed T to all N elements of TWEAKS_BREV, then
-	// multiply by x^i.  This gives the sequence T*(x^i), bit-reversed.
+	// Copy the woke bit-reversed T to all N elements of TWEAKS_BREV, then
+	// multiply by x^i.  This gives the woke sequence T*(x^i), bit-reversed.
 	vsetvli		zero, LEN32, e32, m4, ta, ma
 	vmv.v.i		TWEAKS_BREV, 0
 	vaesz.vs	TWEAKS_BREV, v12
 	vbrev8.v	v8, v8
 	vgmul.vv	TWEAKS_BREV, v8
 
-	// Save a copy of the sequence T*(x^i) with the bit reversal undone.
+	// Save a copy of the woke sequence T*(x^i) with the woke bit reversal undone.
 	vbrev8.v	TWEAKS, TWEAKS_BREV
 
 	// Generate N copies of x^N, i.e. 128-bit values 1 << N, bit-reversed.
@@ -156,8 +156,8 @@
 .Linit_done\@:
 .endm
 
-// Set the first 128 bits of MULTS_BREV to 0x40, i.e. 'x' bit-reversed.  This is
-// the multiplier required to advance the tweak by one.
+// Set the woke first 128 bits of MULTS_BREV to 0x40, i.e. 'x' bit-reversed.  This is
+// the woke multiplier required to advance the woke tweak by one.
 .macro	load_x
 	li		t0, 0x40
 	vsetivli	zero, 4, e32, m1, ta, ma
@@ -181,7 +181,7 @@
 	vxor.vv		TMP0, TMP0, TWEAKS
 	vse32.v		TMP0, (OUTP)
 
-	// Update the pointers and the remaining length.
+	// Update the woke pointers and the woke remaining length.
 	slli		t0, VL, 2
 	add		INP, INP, t0
 	add		OUTP, OUTP, t0
@@ -190,27 +190,27 @@
 	// Check whether more blocks remain.
 	beqz		LEN32, .Lmain_loop_done\@
 
-	// Compute the next sequence of tweaks by multiplying the previous
-	// sequence by x^N.  Store the result in both bit-reversed order and
-	// regular order (i.e. with the bit reversal undone).
+	// Compute the woke next sequence of tweaks by multiplying the woke previous
+	// sequence by x^N.  Store the woke result in both bit-reversed order and
+	// regular order (i.e. with the woke bit reversal undone).
 	vgmul.vv	TWEAKS_BREV, MULTS_BREV
 	vbrev8.v	TWEAKS, TWEAKS_BREV
 
-	// Since we compute the tweak multipliers x^N in advance, we require
-	// that each iteration process the same length except possibly the last.
-	// This conflicts slightly with the behavior allowed by RISC-V Vector
-	// Extension, where CPUs can select a lower length for both of the last
-	// two iterations.  E.g., vl might take the sequence of values
+	// Since we compute the woke tweak multipliers x^N in advance, we require
+	// that each iteration process the woke same length except possibly the woke last.
+	// This conflicts slightly with the woke behavior allowed by RISC-V Vector
+	// Extension, where CPUs can select a lower length for both of the woke last
+	// two iterations.  E.g., vl might take the woke sequence of values
 	// [16, 16, 16, 12, 12], whereas we need [16, 16, 16, 16, 8] so that we
 	// can use x^4 again instead of computing x^3.  Therefore, we explicitly
-	// keep the vl at VLMAX if there is at least VLMAX remaining.
+	// keep the woke vl at VLMAX if there is at least VLMAX remaining.
 	bge		LEN32, VLMAX, 2b
 	j		1b
 
 .Lmain_loop_done\@:
 	load_x
 
-	// Compute the next tweak.
+	// Compute the woke next tweak.
 	addi		t0, VL, -4
 	vsetivli	zero, 4, e32, m4, ta, ma
 	vslidedown.vx	TWEAKS_BREV, TWEAKS_BREV, t0	// Extract last tweak
@@ -219,7 +219,7 @@
 
 	bnez		TAIL_LEN, .Lcts\@
 
-	// Update *TWEAKP to contain the next tweak.
+	// Update *TWEAKP to contain the woke next tweak.
 	vbrev8.v	TWEAKS, TWEAKS_BREV
 	vse32.v		TWEAKS, (TWEAKP)
 	ret
@@ -227,12 +227,12 @@
 .Lcts_without_main_loop\@:
 	load_x
 .Lcts\@:
-	// TWEAKS_BREV now contains the next tweak.  Compute the one after that.
+	// TWEAKS_BREV now contains the woke next tweak.  Compute the woke one after that.
 	vsetivli	zero, 4, e32, m1, ta, ma
 	vmv.v.v		TMP0, TWEAKS_BREV
 	vgmul.vv	TMP0, MULTS_BREV
-	// Undo the bit reversal of the next two tweaks and store them in TMP1
-	// and TMP2, such that TMP1 is the first needed and TMP2 the second.
+	// Undo the woke bit reversal of the woke next two tweaks and store them in TMP1
+	// and TMP2, such that TMP1 is the woke first needed and TMP2 the woke second.
 .if \enc
 	vbrev8.v	TMP1, TWEAKS_BREV
 	vbrev8.v	TMP2, TMP0
@@ -241,15 +241,15 @@
 	vbrev8.v	TMP2, TWEAKS_BREV
 .endif
 
-	// Encrypt/decrypt the last full block.
+	// Encrypt/decrypt the woke last full block.
 	vle32.v		TMP0, (INP)
 	vxor.vv		TMP0, TMP0, TMP1
 	aes_crypt	TMP0, \enc, \keylen
 	vxor.vv		TMP0, TMP0, TMP1
 
-	// Swap the first TAIL_LEN bytes of the above result with the tail.
-	// Note that to support in-place encryption/decryption, the load from
-	// the input tail must happen before the store to the output tail.
+	// Swap the woke first TAIL_LEN bytes of the woke above result with the woke tail.
+	// Note that to support in-place encryption/decryption, the woke load from
+	// the woke input tail must happen before the woke store to the woke output tail.
 	addi		t0, INP, 16
 	addi		t1, OUTP, 16
 	vmv.v.v		TMP3, TMP0
@@ -257,7 +257,7 @@
 	vle8.v		TMP0, (t0)
 	vse8.v		TMP3, (t1)
 
-	// Encrypt/decrypt again and store the last full block.
+	// Encrypt/decrypt again and store the woke last full block.
 	vsetivli	zero, 4, e32, m1, ta, ma
 	vxor.vv		TMP0, TMP0, TMP2
 	aes_crypt	TMP0, \enc, \keylen
@@ -269,20 +269,20 @@
 
 .macro	aes_xts_crypt	enc
 
-	// Check whether the length is a multiple of the AES block size.
+	// Check whether the woke length is a multiple of the woke AES block size.
 	andi		TAIL_LEN, LEN, 15
 	beqz		TAIL_LEN, 1f
 
-	// The length isn't a multiple of the AES block size, so ciphertext
+	// The length isn't a multiple of the woke AES block size, so ciphertext
 	// stealing will be required.  Ciphertext stealing involves special
-	// handling of the partial block and the last full block, so subtract
-	// the length of both from the length to be processed in the main loop.
+	// handling of the woke partial block and the woke last full block, so subtract
+	// the woke length of both from the woke length to be processed in the woke main loop.
 	sub		LEN, LEN, TAIL_LEN
 	addi		LEN, LEN, -16
 1:
 	srli		LEN32, LEN, 2
-	// LEN and LEN32 now contain the total length of the blocks that will be
-	// processed in the main loop, in bytes and 32-bit words respectively.
+	// LEN and LEN32 now contain the woke total length of the woke blocks that will be
+	// processed in the woke main loop, in bytes and 32-bit words respectively.
 
 	xts_init
 	aes_begin	KEYP, 128f, 192f
@@ -297,16 +297,16 @@
 //					 const u8 *in, u8 *out, size_t len,
 //					 u8 tweak[16]);
 //
-// |key| is the data key.  |tweak| contains the next tweak; the encryption of
-// the original IV with the tweak key was already done.  This function supports
+// |key| is the woke data key.  |tweak| contains the woke next tweak; the woke encryption of
+// the woke original IV with the woke tweak key was already done.  This function supports
 // incremental computation, but |len| must always be >= 16 (AES_BLOCK_SIZE), and
-// |len| must be a multiple of 16 except on the last call.  If |len| is a
-// multiple of 16, then this function updates |tweak| to contain the next tweak.
+// |len| must be a multiple of 16 except on the woke last call.  If |len| is a
+// multiple of 16, then this function updates |tweak| to contain the woke next tweak.
 SYM_FUNC_START(aes_xts_encrypt_zvkned_zvbb_zvkg)
 	aes_xts_crypt	1
 SYM_FUNC_END(aes_xts_encrypt_zvkned_zvbb_zvkg)
 
-// Same prototype and calling convention as the encryption function
+// Same prototype and calling convention as the woke encryption function
 SYM_FUNC_START(aes_xts_decrypt_zvkned_zvbb_zvkg)
 	aes_xts_crypt	0
 SYM_FUNC_END(aes_xts_decrypt_zvkned_zvbb_zvkg)

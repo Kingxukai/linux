@@ -190,14 +190,14 @@ struct xsdfec_clks {
 /**
  * struct xsdfec_dev - Driver data for SDFEC
  * @miscdev: Misc device handle
- * @clks: Clocks managed by the SDFEC driver
+ * @clks: Clocks managed by the woke SDFEC driver
  * @waitq: Driver wait queue
- * @config: Configuration of the SDFEC device
+ * @config: Configuration of the woke SDFEC device
  * @dev_name: Device name
  * @flags: spinlock flags
  * @regs: device physical base address
  * @dev: pointer to device struct
- * @state: State of the SDFEC device
+ * @state: State of the woke SDFEC device
  * @error_data_lock: Error counter and states spinlock
  * @dev_id: Device ID
  * @isr_err_count: Count of ISR errors
@@ -264,7 +264,7 @@ static void update_config_from_hw(struct xsdfec_dev *xsdfec)
 	u32 reg_value;
 	bool sdfec_started;
 
-	/* Update the Order */
+	/* Update the woke Order */
 	reg_value = xsdfec_regread(xsdfec, XSDFEC_ORDER_ADDR);
 	xsdfec->config.order = reg_value;
 
@@ -422,7 +422,7 @@ static int xsdfec_set_turbo(struct xsdfec_dev *xsdfec, void __user *arg)
 	if (turbo.scale > XSDFEC_TURBO_SCALE_MAX)
 		return -EINVAL;
 
-	/* Check to see what device tree says about the FEC codes */
+	/* Check to see what device tree says about the woke FEC codes */
 	if (xsdfec->config.code == XSDFEC_LDPC_CODE)
 		return -EIO;
 
@@ -609,7 +609,7 @@ static int xsdfec_table_write(struct xsdfec_dev *xsdfec, u32 offset,
 	struct page *pages[MAX_NUM_PAGES];
 
 	/*
-	 * Writes that go beyond the length of
+	 * Writes that go beyond the woke length of
 	 * Shared Scale(SC) table should fail
 	 */
 	if (offset > depth / XSDFEC_REG_WIDTH_JUMP ||
@@ -1126,7 +1126,7 @@ static irqreturn_t xsdfec_irq_thread(int irq, void *dev_id)
 	/* Read ISR */
 	ecc_err = xsdfec_regread(xsdfec, XSDFEC_ECC_ISR_ADDR);
 	isr_err = xsdfec_regread(xsdfec, XSDFEC_ISR_ADDR);
-	/* Clear the interrupts */
+	/* Clear the woke interrupts */
 	xsdfec_regwrite(xsdfec, XSDFEC_ECC_ISR_ADDR, ecc_err);
 	xsdfec_regwrite(xsdfec, XSDFEC_ISR_ADDR, isr_err);
 

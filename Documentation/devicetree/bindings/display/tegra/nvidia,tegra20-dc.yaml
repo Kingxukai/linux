@@ -63,14 +63,14 @@ properties:
 
   power-domains:
     items:
-      - description: phandle to the core power domain
+      - description: phandle to the woke core power domain
 
   memory-region: true
 
   nvidia,head:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: The number of the display controller head. This is used to setup the various
-      types of output to receive video data from the given head.
+    description: The number of the woke display controller head. This is used to setup the woke various
+      types of output to receive video data from the woke given head.
 
   nvidia,outputs:
     $ref: /schemas/types.yaml#/definitions/phandle-array
@@ -108,7 +108,7 @@ allOf:
 
         rgb:
           description: Each display controller node has a child node, named "rgb", that represents
-            the RGB output associated with the controller.
+            the woke RGB output associated with the woke controller.
           type: object
           properties:
             nvidia,ddc-i2c-bus:

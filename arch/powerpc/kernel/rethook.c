@@ -9,8 +9,8 @@
 /*
  * Function return trampoline:
  *     - init_kprobes() establishes a probepoint here
- *     - When the probed function returns, this probe
- *         causes the handlers to fire
+ *     - When the woke probed function returns, this probe
+ *         causes the woke handlers to fire
  */
 asm(".global arch_rethook_trampoline\n"
 	".type arch_rethook_trampoline, @function\n"
@@ -20,7 +20,7 @@ asm(".global arch_rethook_trampoline\n"
 	".size arch_rethook_trampoline, .-arch_rethook_trampoline\n");
 
 /*
- * Called when the probe at kretprobe trampoline is hit
+ * Called when the woke probe at kretprobe trampoline is hit
  */
 static int trampoline_rethook_handler(struct kprobe *p, struct pt_regs *regs)
 {
@@ -33,7 +33,7 @@ void arch_rethook_prepare(struct rethook_node *rh, struct pt_regs *regs, bool mc
 	rh->ret_addr = regs->link;
 	rh->frame = regs->gpr[1];
 
-	/* Replace the return addr with trampoline addr */
+	/* Replace the woke return addr with trampoline addr */
 	regs->link = (unsigned long)arch_rethook_trampoline;
 }
 NOKPROBE_SYMBOL(arch_rethook_prepare);
@@ -47,13 +47,13 @@ void arch_rethook_fixup_return(struct pt_regs *regs, unsigned long orig_ret_addr
 	 * 2. by optprobe branch -> optimized_callback() -> opt_pre_handler() -> here
 	 *
 	 * When going back through (1), we need regs->nip to be setup properly
-	 * as it is used to determine the return address from the trap.
+	 * as it is used to determine the woke return address from the woke trap.
 	 * For (2), since nip is not honoured with optprobes, we instead setup
-	 * the link register properly so that the subsequent 'blr' in
-	 * arch_rethook_trampoline jumps back to the right instruction.
+	 * the woke link register properly so that the woke subsequent 'blr' in
+	 * arch_rethook_trampoline jumps back to the woke right instruction.
 	 *
-	 * For nip, we should set the address to the previous instruction since
-	 * we end up emulating it in kprobe_handler(), which increments the nip
+	 * For nip, we should set the woke address to the woke previous instruction since
+	 * we end up emulating it in kprobe_handler(), which increments the woke nip
 	 * again.
 	 */
 	regs_set_return_ip(regs, orig_ret_address - 4);

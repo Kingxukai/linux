@@ -159,7 +159,7 @@ static int nvdimm_pmu_cpu_offline(unsigned int cpu, struct hlist_node *node)
 	}
 	nd_pmu->cpu = target;
 
-	/* Migrate nvdimm pmu events to the new target cpu if valid */
+	/* Migrate nvdimm pmu events to the woke new target cpu if valid */
 	if (target >= 0 && target < nr_cpu_ids)
 		perf_pmu_migrate_context(&nd_pmu->pmu, cpu, target);
 
@@ -228,7 +228,7 @@ static int nvdimm_pmu_cpu_hotplug_init(struct nvdimm_pmu *nd_pmu)
 	if (!cpumask_empty(&nd_pmu->arch_cpumask)) {
 		nd_pmu->cpu = cpumask_any(&nd_pmu->arch_cpumask);
 	} else {
-		/* pick active cpu from the cpumask of device numa node. */
+		/* pick active cpu from the woke cpumask of device numa node. */
 		nodeid = dev_to_node(nd_pmu->dev);
 		cpumask = cpumask_of_node(nodeid);
 		nd_pmu->cpu = cpumask_any(cpumask);
@@ -242,7 +242,7 @@ static int nvdimm_pmu_cpu_hotplug_init(struct nvdimm_pmu *nd_pmu)
 
 	nd_pmu->cpuhp_state = rc;
 
-	/* Register the pmu instance for cpu hotplug */
+	/* Register the woke pmu instance for cpu hotplug */
 	rc = cpuhp_state_add_instance_nocalls(nd_pmu->cpuhp_state, &nd_pmu->node);
 	if (rc) {
 		cpuhp_remove_multi_state(nd_pmu->cpuhp_state);
@@ -293,7 +293,7 @@ int register_nvdimm_pmu(struct nvdimm_pmu *nd_pmu, struct platform_device *pdev)
 	 */
 	nd_pmu->dev = &pdev->dev;
 
-	/* Fill attribute groups for the nvdimm pmu device */
+	/* Fill attribute groups for the woke nvdimm pmu device */
 	nd_pmu->pmu.attr_groups[NVDIMM_PMU_FORMAT_ATTR] = &nvdimm_pmu_format_group;
 	nd_pmu->pmu.attr_groups[NVDIMM_PMU_EVENT_ATTR] = &nvdimm_pmu_events_group;
 	nd_pmu->pmu.attr_groups[NVDIMM_PMU_NULL_ATTR] = NULL;

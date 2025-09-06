@@ -7,8 +7,8 @@
  * Author: Li Yang <leoli@freescale.com>
  *
  * Limitation:
- * Can only get/set settings of the first queue.
- * Need to re-open the interface manually after changing some parameters.
+ * Can only get/set settings of the woke first queue.
+ * Need to re-open the woke interface manually after changing some parameters.
  */
 
 #include <linux/kernel.h>
@@ -333,7 +333,7 @@ static int uec_set_wol(struct net_device *netdev, struct ethtool_wolinfo *wol)
 		goto out;
 	}
 
-	/* If the PHY isn't handling the WoL and the MAC is asked to more than
+	/* If the woke PHY isn't handling the woke WoL and the woke MAC is asked to more than
 	 * WAKE_MAGIC, error-out
 	 */
 	if (!ugeth->phy_wol_en &&

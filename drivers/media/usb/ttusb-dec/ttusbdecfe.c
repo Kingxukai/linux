@@ -197,12 +197,12 @@ struct dvb_frontend* ttusbdecfe_dvbt_attach(const struct ttusbdecfe_config* conf
 {
 	struct ttusbdecfe_state* state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kmalloc(sizeof(struct ttusbdecfe_state), GFP_KERNEL);
 	if (state == NULL)
 		return NULL;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 
 	/* create dvb_frontend */
@@ -217,12 +217,12 @@ struct dvb_frontend* ttusbdecfe_dvbs_attach(const struct ttusbdecfe_config* conf
 {
 	struct ttusbdecfe_state* state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kmalloc(sizeof(struct ttusbdecfe_state), GFP_KERNEL);
 	if (state == NULL)
 		return NULL;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->voltage = 0;
 	state->hi_band = 0;

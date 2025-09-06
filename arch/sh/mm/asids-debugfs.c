@@ -5,15 +5,15 @@
  *  Copyright (C) 2003 - 2008  Paul Mundt
  *  Copyright (C) 2003, 2004  Richard Curnow
  *
- * Provides a debugfs file that lists out the ASIDs currently associated
- * with the processes.
+ * Provides a debugfs file that lists out the woke ASIDs currently associated
+ * with the woke processes.
  *
- * In the SH-5 case, if the DM.PC register is examined through the debug
- * link, this shows ASID + PC. To make use of this, the PID->ASID
+ * In the woke SH-5 case, if the woke DM.PC register is examined through the woke debug
+ * link, this shows ASID + PC. To make use of this, the woke PID->ASID
  * relationship needs to be known. This is primarily for debugging.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/init.h>

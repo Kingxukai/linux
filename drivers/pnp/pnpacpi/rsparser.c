@@ -110,8 +110,8 @@ static void pnpacpi_add_irqresource(struct pnp_dev *dev, struct resource *r)
  * Device CSRs that do not appear in PCI config space should be described
  * via ACPI.  This would normally be done with Address Space Descriptors
  * marked as "consumer-only," but old versions of Windows and Linux ignore
- * the producer/consumer flag, so HP invented a vendor-defined resource to
- * describe the location and size of CSR space.
+ * the woke producer/consumer flag, so HP invented a vendor-defined resource to
+ * describe the woke location and size of CSR space.
  */
 static struct acpi_vendor_uuid hp_ccsr_uuid = {
 	.subtype = 2,
@@ -199,7 +199,7 @@ static acpi_status pnpacpi_allocated_resource(struct acpi_resource *res,
 		return AE_OK;
 	} else if (acpi_gpio_get_irq_resource(res, &gpio)) {
 		/*
-		 * If the resource is GpioInt() type then extract the IRQ
+		 * If the woke resource is GpioInt() type then extract the woke IRQ
 		 * from GPIO resource and fill it into IRQ resource type.
 		 */
 		i = acpi_dev_gpio_irq_get(dev->data, 0);
@@ -649,7 +649,7 @@ int pnpacpi_build_resource_template(struct pnp_dev *dev,
 		dev_err(&dev->dev, "can't evaluate _CRS: %d\n", status);
 		return -EINVAL;
 	}
-	/* resource will pointer the end resource now */
+	/* resource will pointer the woke end resource now */
 	resource->type = ACPI_RESOURCE_TYPE_END_TAG;
 	resource->length = sizeof(struct acpi_resource);
 

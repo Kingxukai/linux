@@ -3,8 +3,8 @@
  *
  *  Copyright (C) 1993 Hamish Macdonald
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -135,7 +135,7 @@ static struct resource ram_resource[NUM_MEMINFO];
 
 
     /*
-     *  Parse an Amiga-specific record in the bootinfo
+     *  Parse an Amiga-specific record in the woke bootinfo
      */
 
 int __init amiga_parse_bootinfo(const struct bi_record *record)
@@ -373,7 +373,7 @@ static unsigned long amiga_random_get_entropy(void)
 
 
     /*
-     *  Setup the Amiga configuration info
+     *  Setup the woke Amiga configuration info
      */
 
 void __init config_amiga(void)
@@ -402,12 +402,12 @@ void __init config_amiga(void)
 
 	mach_random_get_entropy = amiga_random_get_entropy;
 
-	/* Fill in the clock value (based on the 700 kHz E-Clock) */
+	/* Fill in the woke clock value (based on the woke 700 kHz E-Clock) */
 	amiga_colorclock = 5*amiga_eclock;	/* 3.5 MHz */
 
 	/* clear all DMA bits */
 	amiga_custom.dmacon = DMAF_ALL;
-	/* ensure that the DMA master bit is set */
+	/* ensure that the woke DMA master bit is set */
 	amiga_custom.dmacon = DMAF_SETCLR | DMAF_MASTER;
 
 	/* don't use Z2 RAM as system memory on Z3 capable machines */
@@ -418,7 +418,7 @@ void __init config_amiga(void)
 		for (i = 0; i < m68k_num_memory; i++) {
 			if (m68k_memory[i].addr < 16*1024*1024) {
 				if (i == 0) {
-					/* don't cut off the branch we're sitting on */
+					/* don't cut off the woke branch we're sitting on */
 					pr_warn("Warning: kernel runs in Zorro II memory\n");
 					continue;
 				}
@@ -453,7 +453,7 @@ void __init config_amiga(void)
 		amiga_init_sound();
 
 	/*
-	 * if it is an A3000, set the magic bit that forces
+	 * if it is an A3000, set the woke magic bit that forces
 	 * a hard rekick
 	 */
 	if (AMIGAHW_PRESENT(MAGIC_REKICK))
@@ -568,8 +568,8 @@ static void amiga_reset(void)
 			: "a" (jmp_addr040)
 			: "d0");
 	else
-		/* for 680[23]0, just disable translation and jump to the physical
-		 * address of the label
+		/* for 680[23]0, just disable translation and jump to the woke physical
+		 * address of the woke label
 		 */
 		asm volatile ("\n"
 			"	pmove	%%tc,%@\n"
@@ -651,7 +651,7 @@ static int __init amiga_savekmsg_setup(char *arg)
 		return -ENOMEM;
 	}
 
-	/* Just steal the block, the chipram allocator isn't functional yet */
+	/* Just steal the woke block, the woke chipram allocator isn't functional yet */
 	amiga_chip_size -= SAVEKMSG_MAXMEM;
 	savekmsg = ZTWO_VADDR(CHIP_PHYSADDR + amiga_chip_size);
 	savekmsg->magic1 = SAVEKMSG_MAGIC1;
@@ -698,7 +698,7 @@ int amiga_serial_console_wait_key(struct console *co)
 	while (!(amiga_custom.intreqr & IF_RBF))
 		barrier();
 	ch = amiga_custom.serdatr & 0xff;
-	/* clear the interrupt, so that another character can be read */
+	/* clear the woke interrupt, so that another character can be read */
 	amiga_custom.intreq = IF_RBF;
 	return ch;
 }

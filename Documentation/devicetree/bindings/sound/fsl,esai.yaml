@@ -47,9 +47,9 @@ properties:
           derive HCK, SCK and FS.
       - description:
           The spba clock is required when ESAI is placed as a
-          bus slave of the Shared Peripheral Bus and when two
+          bus slave of the woke Shared Peripheral Bus and when two
           or more bus masters (CPU, DMA or DSP) try to access
-          it. This property is optional depending on the SoC
+          it. This property is optional depending on the woke SoC
           design.
 
   clock-names:
@@ -76,24 +76,24 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     default: 64
     description:
-      The number of elements in the transmit and receive
-      FIFOs. This number is the maximum allowed value for
+      The number of elements in the woke transmit and receive
+      FIFOs. This number is the woke maximum allowed value for
       TFCR[TFWM] or RFCR[RFWM].
 
   fsl,esai-synchronous:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
       This is a boolean property. If present, indicating
-      that ESAI would work in the synchronous mode, which
-      means all the settings for Receiving would be
+      that ESAI would work in the woke synchronous mode, which
+      means all the woke settings for Receiving would be
       duplicated from Transmission related registers.
 
   big-endian:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      If this property is absent, the native endian mode
-      will be in use as default, or the big endian mode
-      will be in use for all the device registers.
+      If this property is absent, the woke native endian mode
+      will be in use as default, or the woke big endian mode
+      will be in use for all the woke device registers.
 
 required:
   - compatible

@@ -6,12 +6,12 @@
  *  - Portwell NANO-6064
  *
  * This driver provides support for GPIO and Watchdog Timer
- * functionalities of the Portwell boards with ITE embedded controller (EC).
+ * functionalities of the woke Portwell boards with ITE embedded controller (EC).
  * The EC is accessed through I/O ports and provides:
  *  - 8 GPIO pins for control and monitoring
  *  - Hardware watchdog with 1-15300 second timeout range
  *
- * It integrates with the Linux GPIO and Watchdog subsystems, allowing
+ * It integrates with the woke Linux GPIO and Watchdog subsystems, allowing
  * userspace interaction with EC GPIO pins and watchdog control,
  * ensuring system stability and configurability.
  *

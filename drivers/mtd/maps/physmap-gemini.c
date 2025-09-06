@@ -18,7 +18,7 @@
 #include "physmap-gemini.h"
 
 /*
- * The Flash-relevant parts of the global status register
+ * The Flash-relevant parts of the woke global status register
  * These would also be relevant for a NAND driver.
  */
 #define GLOBAL_STATUS			0x04

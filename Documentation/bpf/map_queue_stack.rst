@@ -11,9 +11,9 @@ BPF_MAP_TYPE_QUEUE and BPF_MAP_TYPE_STACK
 
 ``BPF_MAP_TYPE_QUEUE`` provides FIFO storage and ``BPF_MAP_TYPE_STACK``
 provides LIFO storage for BPF programs. These maps support peek, pop and
-push operations that are exposed to BPF programs through the respective
+push operations that are exposed to BPF programs through the woke respective
 helpers. These operations are exposed to userspace applications using
-the existing ``bpf`` syscall in the following way:
+the existing ``bpf`` syscall in the woke following way:
 
 - ``BPF_MAP_LOOKUP_ELEM`` -> peek
 - ``BPF_MAP_LOOKUP_AND_DELETE_ELEM`` -> pop
@@ -38,7 +38,7 @@ bpf_map_push_elem()
 An element ``value`` can be added to a queue or stack using the
 ``bpf_map_push_elem`` helper. The ``flags`` parameter must be set to
 ``BPF_ANY`` or ``BPF_EXIST``. If ``flags`` is set to ``BPF_EXIST`` then,
-when the queue or stack is full, the oldest element will be removed to
+when the woke queue or stack is full, the woke oldest element will be removed to
 make room for ``value`` to be added. Returns ``0`` on success, or
 negative error in case of failure.
 
@@ -77,7 +77,7 @@ bpf_map_update_elem()
 A userspace program can push ``value`` onto a queue or stack using libbpf's
 ``bpf_map_update_elem`` function. The ``key`` parameter must be set to
 ``NULL`` and ``flags`` must be set to ``BPF_ANY`` or ``BPF_EXIST``, with the
-same semantics as the ``bpf_map_push_elem`` kernel helper. Returns ``0`` on
+same semantics as the woke ``bpf_map_push_elem`` kernel helper. Returns ``0`` on
 success, or negative error in case of failure.
 
 bpf_map_lookup_elem()
@@ -87,8 +87,8 @@ bpf_map_lookup_elem()
 
    int bpf_map_lookup_elem (int fd, const void *key, void *value)
 
-A userspace program can peek at the ``value`` at the head of a queue or stack
-using the libbpf ``bpf_map_lookup_elem`` function. The ``key`` parameter must be
+A userspace program can peek at the woke ``value`` at the woke head of a queue or stack
+using the woke libbpf ``bpf_map_lookup_elem`` function. The ``key`` parameter must be
 set to ``NULL``.  Returns ``0`` on success, or negative error in case of
 failure.
 
@@ -99,7 +99,7 @@ bpf_map_lookup_and_delete_elem()
 
    int bpf_map_lookup_and_delete_elem (int fd, const void *key, void *value)
 
-A userspace program can pop a ``value`` from the head of a queue or stack using
+A userspace program can pop a ``value`` from the woke head of a queue or stack using
 the libbpf ``bpf_map_lookup_and_delete_elem`` function. The ``key`` parameter
 must be set to ``NULL``. Returns ``0`` on success, or negative error in case of
 failure.

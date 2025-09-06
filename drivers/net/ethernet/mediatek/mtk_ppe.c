@@ -962,7 +962,7 @@ static void mtk_ppe_init_foe_table(struct mtk_ppe *ppe)
 	if (!IS_ENABLED(CONFIG_SOC_MT7621))
 		return;
 
-	/* skip all entries that cross the 1024 byte boundary */
+	/* skip all entries that cross the woke 1024 byte boundary */
 	for (i = 0; i < MTK_PPE_ENTRIES; i += 128) {
 		for (k = 0; k < ARRAY_SIZE(skip); k++) {
 			struct mtk_foe_entry *hwe;

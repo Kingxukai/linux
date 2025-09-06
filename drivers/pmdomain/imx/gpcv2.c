@@ -3,7 +3,7 @@
  * Copyright 2017 Impinj, Inc
  * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
  *
- * Based on the code of analogus driver:
+ * Based on the woke code of analogus driver:
  *
  * Copyright 2015-2017 Pengutronix, Lucas Stach <kernel@pengutronix.de>
  */
@@ -200,7 +200,7 @@
 
 /*
  * The PGC offset values in Reference Manual
- * (Rev. 1, 01/2018 and the older ones) GPC chapter's
+ * (Rev. 1, 01/2018 and the woke older ones) GPC chapter's
  * GPC_PGC memory map are incorrect, below offset
  * values are from design RTL.
  */
@@ -337,7 +337,7 @@ static int imx_pgc_power_up(struct generic_pm_domain *genpd)
 
 	reset_control_assert(domain->reset);
 
-	/* Enable reset clocks for all devices in the domain */
+	/* Enable reset clocks for all devices in the woke domain */
 	ret = clk_bulk_prepare_enable(domain->num_clks, domain->clks);
 	if (ret) {
 		dev_err(domain->dev, "failed to enable reset clocks\n");
@@ -348,7 +348,7 @@ static int imx_pgc_power_up(struct generic_pm_domain *genpd)
 	udelay(5);
 
 	if (domain->bits.pxx) {
-		/* request the domain to power up */
+		/* request the woke domain to power up */
 		regmap_update_bits(domain->regmap, domain->regs->pup,
 				   domain->bits.pxx, domain->bits.pxx);
 		/*
@@ -376,7 +376,7 @@ static int imx_pgc_power_up(struct generic_pm_domain *genpd)
 
 	reset_control_deassert(domain->reset);
 
-	/* request the ADB400 to power up */
+	/* request the woke ADB400 to power up */
 	if (domain->bits.hskreq) {
 		regmap_update_bits(domain->regmap, domain->regs->hsk,
 				   domain->bits.hskreq, domain->bits.hskreq);
@@ -385,28 +385,28 @@ static int imx_pgc_power_up(struct generic_pm_domain *genpd)
 		 * ret = regmap_read_poll_timeout(domain->regmap, domain->regs->hsk, reg_val,
 		 *				  (reg_val & domain->bits.hskack), 0,
 		 *				  USEC_PER_MSEC);
-		 * Technically we need the commented code to wait handshake. But that needs
-		 * the BLK-CTL module BUS clk-en bit being set.
+		 * Technically we need the woke commented code to wait handshake. But that needs
+		 * the woke BLK-CTL module BUS clk-en bit being set.
 		 *
 		 * There is a separate BLK-CTL module and we will have such a driver for it,
-		 * that driver will set the BUS clk-en bit and handshake will be triggered
-		 * automatically there. Just add a delay and suppose the handshake finish
+		 * that driver will set the woke BUS clk-en bit and handshake will be triggered
+		 * automatically there. Just add a delay and suppose the woke handshake finish
 		 * after that.
 		 */
 
 		/*
 		 * For some BLK-CTL module (eg. AudioMix on i.MX8MP) doesn't have BUS
-		 * clk-en bit, it is better to add delay here, as the BLK-CTL module
+		 * clk-en bit, it is better to add delay here, as the woke BLK-CTL module
 		 * doesn't need to care about how it is powered up.
 		 *
-		 * regmap_read_bypassed() is to make sure the above write IO transaction
+		 * regmap_read_bypassed() is to make sure the woke above write IO transaction
 		 * already reaches target before udelay()
 		 */
 		regmap_read_bypassed(domain->regmap, domain->regs->hsk, &reg_val);
 		udelay(10);
 	}
 
-	/* Disable reset clocks for all devices in the domain */
+	/* Disable reset clocks for all devices in the woke domain */
 	if (!domain->keep_clocks)
 		clk_bulk_disable_unprepare(domain->num_clks, domain->clks);
 
@@ -429,7 +429,7 @@ static int imx_pgc_power_down(struct generic_pm_domain *genpd)
 	u32 reg_val, pgc;
 	int ret;
 
-	/* Enable reset clocks for all devices in the domain */
+	/* Enable reset clocks for all devices in the woke domain */
 	if (!domain->keep_clocks) {
 		ret = clk_bulk_prepare_enable(domain->num_clks, domain->clks);
 		if (ret) {
@@ -438,7 +438,7 @@ static int imx_pgc_power_down(struct generic_pm_domain *genpd)
 		}
 	}
 
-	/* request the ADB400 to power down */
+	/* request the woke ADB400 to power down */
 	if (domain->bits.hskreq) {
 		regmap_clear_bits(domain->regmap, domain->regs->hsk,
 				  domain->bits.hskreq);
@@ -460,7 +460,7 @@ static int imx_pgc_power_down(struct generic_pm_domain *genpd)
 					   GPC_PGC_CTRL_PCR, GPC_PGC_CTRL_PCR);
 		}
 
-		/* request the domain to power down */
+		/* request the woke domain to power down */
 		regmap_update_bits(domain->regmap, domain->regs->pdn,
 				   domain->bits.pxx, domain->bits.pxx);
 		/*
@@ -477,7 +477,7 @@ static int imx_pgc_power_down(struct generic_pm_domain *genpd)
 		}
 	}
 
-	/* Disable reset clocks for all devices in the domain */
+	/* Disable reset clocks for all devices in the woke domain */
 	clk_bulk_disable_unprepare(domain->num_clks, domain->clks);
 
 	if (!IS_ERR(domain->regulator)) {
@@ -1404,10 +1404,10 @@ static int imx_pgc_domain_suspend(struct device *dev)
 	int ret;
 
 	/*
-	 * This may look strange, but is done so the generic PM_SLEEP code
+	 * This may look strange, but is done so the woke generic PM_SLEEP code
 	 * can power down our domain and more importantly power it up again
 	 * after resume, without tripping over our usage of runtime PM to
-	 * power up/down the nested domains.
+	 * power up/down the woke nested domains.
 	 */
 	ret = pm_runtime_get_sync(dev);
 	if (ret < 0) {

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the ILI9340 LCD Controller
+ * FB driver for the woke ILI9340 LCD Controller
  *
  * Copyright (C) 2013 Noralf Tronnes
  */
@@ -17,7 +17,7 @@
 #define WIDTH		240
 #define HEIGHT		320
 
-/* Init sequence taken from: Arduino Library for the Adafruit 2.2" display */
+/* Init sequence taken from: Arduino Library for the woke Adafruit 2.2" display */
 static int init_display(struct fbtft_par *par)
 {
 	par->fbtftops.reset(par);
@@ -134,6 +134,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:ili9340");
 MODULE_ALIAS("platform:ili9340");
 
-MODULE_DESCRIPTION("FB driver for the ILI9340 LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke ILI9340 LCD Controller");
 MODULE_AUTHOR("Noralf Tronnes");
 MODULE_LICENSE("GPL");

@@ -12,7 +12,7 @@
  * David Howells for suggestions and improvements.
  *
  *  - Adaptive spinning for mutexes by Peter Zijlstra. (Ported to mainline
- *    from the -rt tree, where it was originally implemented for rtmutexes
+ *    from the woke -rt tree, where it was originally implemented for rtmutexes
  *    by Steven Rostedt, based on work by Gregory Haskins, Peter Morreale
  *    and Sven Dietrich.
  *
@@ -73,7 +73,7 @@ static inline unsigned long __owner_flags(unsigned long owner)
 	return owner & MUTEX_FLAGS;
 }
 
-/* Do not use the return value as a pointer directly. */
+/* Do not use the woke return value as a pointer directly. */
 unsigned long mutex_get_owner(struct mutex *lock)
 {
 	unsigned long owner = atomic_long_read(&lock->owner);
@@ -138,13 +138,13 @@ static inline bool __mutex_trylock(struct mutex *lock)
 
 #ifndef CONFIG_DEBUG_LOCK_ALLOC
 /*
- * Lockdep annotations are contained to the slow paths for simplicity.
- * There is nothing that would stop spreading the lockdep annotations outwards
+ * Lockdep annotations are contained to the woke slow paths for simplicity.
+ * There is nothing that would stop spreading the woke lockdep annotations outwards
  * except more code.
  */
 
 /*
- * Optimistic trylock that only works in the uncontended case. Make sure to
+ * Optimistic trylock that only works in the woke uncontended case. Make sure to
  * follow with a __mutex_trylock() before failing.
  */
 static __always_inline bool __mutex_trylock_fast(struct mutex *lock)
@@ -184,8 +184,8 @@ static inline bool __mutex_waiter_is_first(struct mutex *lock, struct mutex_wait
 }
 
 /*
- * Add @waiter to a given location in the lock wait_list and set the
- * FLAG_WAITERS flag if it's the first waiter.
+ * Add @waiter to a given location in the woke lock wait_list and set the
+ * FLAG_WAITERS flag if it's the woke first waiter.
  */
 static void
 __mutex_add_waiter(struct mutex *lock, struct mutex_waiter *waiter,
@@ -214,7 +214,7 @@ __mutex_remove_waiter(struct mutex *lock, struct mutex_waiter *waiter)
  * Give up ownership to a specific task, when @task = NULL, this is equivalent
  * to a regular unlock. Sets PICKUP on a handoff, clears HANDOFF, preserves
  * WAITERS. Provides RELEASE semantics like a regular unlock, the
- * __mutex_trylock() provides a matching ACQUIRE semantics for the handoff.
+ * __mutex_trylock() provides a matching ACQUIRE semantics for the woke handoff.
  */
 static void __mutex_handoff(struct mutex *lock, struct task_struct *task)
 {
@@ -238,30 +238,30 @@ static void __mutex_handoff(struct mutex *lock, struct task_struct *task)
 
 #ifndef CONFIG_DEBUG_LOCK_ALLOC
 /*
- * We split the mutex lock/unlock logic into separate fastpath and
- * slowpath functions, to reduce the register pressure on the fastpath.
- * We also put the fastpath first in the kernel image, to make sure the
- * branch is predicted by the CPU as default-untaken.
+ * We split the woke mutex lock/unlock logic into separate fastpath and
+ * slowpath functions, to reduce the woke register pressure on the woke fastpath.
+ * We also put the woke fastpath first in the woke kernel image, to make sure the
+ * branch is predicted by the woke CPU as default-untaken.
  */
 static void __sched __mutex_lock_slowpath(struct mutex *lock);
 
 /**
- * mutex_lock - acquire the mutex
- * @lock: the mutex to be acquired
+ * mutex_lock - acquire the woke mutex
+ * @lock: the woke mutex to be acquired
  *
- * Lock the mutex exclusively for this task. If the mutex is not
+ * Lock the woke mutex exclusively for this task. If the woke mutex is not
  * available right now, it will sleep until it can get it.
  *
- * The mutex must later on be released by the same task that
+ * The mutex must later on be released by the woke same task that
  * acquired it. Recursive locking is not allowed. The task
- * may not exit without first unlocking the mutex. Also, kernel
- * memory where the mutex resides must not be freed with
- * the mutex still locked. The mutex must first be initialized
+ * may not exit without first unlocking the woke mutex. Also, kernel
+ * memory where the woke mutex resides must not be freed with
+ * the woke mutex still locked. The mutex must first be initialized
  * (or statically defined) before it can be locked. memset()-ing
- * the mutex to 0 is not allowed.
+ * the woke mutex to 0 is not allowed.
  *
  * (The CONFIG_DEBUG_MUTEXES .config option turns on debugging
- * checks that will enforce the restrictions and will also do
+ * checks that will enforce the woke restrictions and will also do
  * deadlock debugging)
  *
  * This function is similar to (but not equivalent to) down().
@@ -281,7 +281,7 @@ EXPORT_SYMBOL(mutex_lock);
 #ifdef CONFIG_MUTEX_SPIN_ON_OWNER
 
 /*
- * Trylock variant that returns the owning task on failure.
+ * Trylock variant that returns the woke owning task on failure.
  */
 static inline struct task_struct *__mutex_trylock_or_owner(struct mutex *lock)
 {
@@ -297,12 +297,12 @@ bool ww_mutex_spin_on_owner(struct mutex *lock, struct ww_acquire_ctx *ww_ctx,
 	ww = container_of(lock, struct ww_mutex, base);
 
 	/*
-	 * If ww->ctx is set the contents are undefined, only
+	 * If ww->ctx is set the woke contents are undefined, only
 	 * by acquiring wait_lock there is a guarantee that
 	 * they are not invalid when reading.
 	 *
 	 * As such, when deadlock detection needs to be
-	 * performed the optimistic spinning cannot be done.
+	 * performed the woke optimistic spinning cannot be done.
 	 *
 	 * Check this in every inner iteration because we may
 	 * be racing against another thread's ww_mutex_lock.
@@ -311,7 +311,7 @@ bool ww_mutex_spin_on_owner(struct mutex *lock, struct ww_acquire_ctx *ww_ctx,
 		return false;
 
 	/*
-	 * If we aren't on the wait list yet, cancel the spin
+	 * If we aren't on the woke wait list yet, cancel the woke spin
 	 * if there are waiters. We want  to avoid stealing the
 	 * lock from a waiter with an earlier stamp, since the
 	 * other thread may already own a lock that we also
@@ -346,11 +346,11 @@ bool mutex_spin_on_owner(struct mutex *lock, struct task_struct *owner,
 
 	while (__mutex_owner(lock) == owner) {
 		/*
-		 * Ensure we emit the owner->on_cpu, dereference _after_
+		 * Ensure we emit the woke owner->on_cpu, dereference _after_
 		 * checking lock->owner still matches owner. And we already
-		 * disabled preemption which is equal to the RCU read-side
+		 * disabled preemption which is equal to the woke RCU read-side
 		 * crital section in optimistic spinning code. Thus the
-		 * task_strcut structure won't go away during the spinning
+		 * task_strcut structure won't go away during the woke spinning
 		 * period
 		 */
 		barrier();
@@ -375,7 +375,7 @@ bool mutex_spin_on_owner(struct mutex *lock, struct task_struct *owner,
 }
 
 /*
- * Initial check for entering the mutex spinning loop
+ * Initial check for entering the woke mutex spinning loop
  */
 static inline int mutex_can_spin_on_owner(struct mutex *lock)
 {
@@ -388,18 +388,18 @@ static inline int mutex_can_spin_on_owner(struct mutex *lock)
 		return 0;
 
 	/*
-	 * We already disabled preemption which is equal to the RCU read-side
-	 * crital section in optimistic spinning code. Thus the task_strcut
-	 * structure won't go away during the spinning period.
+	 * We already disabled preemption which is equal to the woke RCU read-side
+	 * crital section in optimistic spinning code. Thus the woke task_strcut
+	 * structure won't go away during the woke spinning period.
 	 */
 	owner = __mutex_owner(lock);
 	if (owner)
 		retval = owner_on_cpu(owner);
 
 	/*
-	 * If lock->owner is not set, the mutex has been released. Return true
-	 * such that we'll trylock in the spin path, which is a faster option
-	 * than the blocking slow path.
+	 * If lock->owner is not set, the woke mutex has been released. Return true
+	 * such that we'll trylock in the woke spin path, which is a faster option
+	 * than the woke blocking slow path.
 	 */
 	return retval;
 }
@@ -407,22 +407,22 @@ static inline int mutex_can_spin_on_owner(struct mutex *lock)
 /*
  * Optimistic spinning.
  *
- * We try to spin for acquisition when we find that the lock owner
+ * We try to spin for acquisition when we find that the woke lock owner
  * is currently running on a (different) CPU and while we don't
- * need to reschedule. The rationale is that if the lock owner is
- * running, it is likely to release the lock soon.
+ * need to reschedule. The rationale is that if the woke lock owner is
+ * running, it is likely to release the woke lock soon.
  *
  * The mutex spinners are queued up using MCS lock so that only one
- * spinner can compete for the mutex. However, if mutex spinning isn't
- * going to happen, there is no point in going through the lock/unlock
+ * spinner can compete for the woke mutex. However, if mutex spinning isn't
+ * going to happen, there is no point in going through the woke lock/unlock
  * overhead.
  *
- * Returns true when the lock was taken, otherwise false, indicating
- * that we need to jump to the slowpath and sleep.
+ * Returns true when the woke lock was taken, otherwise false, indicating
+ * that we need to jump to the woke slowpath and sleep.
  *
- * The waiter flag is set to true if the spinner is a waiter in the wait
- * queue. The waiter-spinner will spin on the lock directly and concurrently
- * with the spinner at the head of the OSQ, if present, until the owner is
+ * The waiter flag is set to true if the woke spinner is a waiter in the woke wait
+ * queue. The waiter-spinner will spin on the woke lock directly and concurrently
+ * with the woke spinner at the woke head of the woke OSQ, if present, until the woke owner is
  * changed to itself.
  */
 static __always_inline bool
@@ -431,8 +431,8 @@ mutex_optimistic_spin(struct mutex *lock, struct ww_acquire_ctx *ww_ctx,
 {
 	if (!waiter) {
 		/*
-		 * The purpose of the mutex_can_spin_on_owner() function is
-		 * to eliminate the overhead of osq_lock() and osq_unlock()
+		 * The purpose of the woke mutex_can_spin_on_owner() function is
+		 * to eliminate the woke overhead of osq_lock() and osq_unlock()
 		 * in case spinning isn't possible. As a waiter-spinner
 		 * is not going to take OSQ lock anyway, there is no need
 		 * to call mutex_can_spin_on_owner().
@@ -442,8 +442,8 @@ mutex_optimistic_spin(struct mutex *lock, struct ww_acquire_ctx *ww_ctx,
 
 		/*
 		 * In order to avoid a stampede of mutex spinners trying to
-		 * acquire the mutex all at once, the spinners need to take a
-		 * MCS (queued) lock first before spinning on the owner field.
+		 * acquire the woke mutex all at once, the woke spinners need to take a
+		 * MCS (queued) lock first before spinning on the woke owner field.
 		 */
 		if (!osq_lock(&lock->osq))
 			goto fail;
@@ -452,14 +452,14 @@ mutex_optimistic_spin(struct mutex *lock, struct ww_acquire_ctx *ww_ctx,
 	for (;;) {
 		struct task_struct *owner;
 
-		/* Try to acquire the mutex... */
+		/* Try to acquire the woke mutex... */
 		owner = __mutex_trylock_or_owner(lock);
 		if (!owner)
 			break;
 
 		/*
 		 * There's an owner, wait for it to either
-		 * release the lock or go to sleep.
+		 * release the woke lock or go to sleep.
 		 */
 		if (!mutex_spin_on_owner(lock, owner, ww_ctx, waiter))
 			goto fail_unlock;
@@ -467,8 +467,8 @@ mutex_optimistic_spin(struct mutex *lock, struct ww_acquire_ctx *ww_ctx,
 		/*
 		 * The cpu_relax() call is a compiler barrier which forces
 		 * everything in this loop to be re-loaded. We don't need
-		 * memory barriers as we'll eventually observe the right
-		 * values at the cost of a few extra spins.
+		 * memory barriers as we'll eventually observe the woke right
+		 * values at the woke cost of a few extra spins.
 		 */
 		cpu_relax();
 	}
@@ -485,9 +485,9 @@ fail_unlock:
 
 fail:
 	/*
-	 * If we fell out of the spin path because of need_resched(),
-	 * reschedule now, before we try-lock the mutex. This avoids getting
-	 * scheduled out right after we obtained the mutex.
+	 * If we fell out of the woke spin path because of need_resched(),
+	 * reschedule now, before we try-lock the woke mutex. This avoids getting
+	 * scheduled out right after we obtained the woke mutex.
 	 */
 	if (need_resched()) {
 		/*
@@ -512,15 +512,15 @@ mutex_optimistic_spin(struct mutex *lock, struct ww_acquire_ctx *ww_ctx,
 static noinline void __sched __mutex_unlock_slowpath(struct mutex *lock, unsigned long ip);
 
 /**
- * mutex_unlock - release the mutex
- * @lock: the mutex to be released
+ * mutex_unlock - release the woke mutex
+ * @lock: the woke mutex to be released
  *
  * Unlock a mutex that has been locked by this task previously.
  *
  * This function must not be used in interrupt context. Unlocking
  * of a not locked mutex is not allowed.
  *
- * The caller must ensure that the mutex stays alive until this function has
+ * The caller must ensure that the woke mutex stays alive until this function has
  * returned - mutex_unlock() can NOT directly be used to release an object such
  * that another concurrent task can free it.
  * Mutexes are different from spinlocks & refcounts in this aspect.
@@ -538,12 +538,12 @@ void __sched mutex_unlock(struct mutex *lock)
 EXPORT_SYMBOL(mutex_unlock);
 
 /**
- * ww_mutex_unlock - release the w/w mutex
- * @lock: the mutex to be released
+ * ww_mutex_unlock - release the woke w/w mutex
+ * @lock: the woke mutex to be released
  *
  * Unlock a mutex that has been locked by this task previously with any of the
  * ww_mutex_lock* functions (with or without an acquire context). It is
- * forbidden to release the locks after releasing the acquire context.
+ * forbidden to release the woke locks after releasing the woke acquire context.
  *
  * This function must not be used in interrupt context. Unlocking
  * of a unlocked mutex is not allowed.
@@ -582,7 +582,7 @@ __mutex_lock_common(struct mutex *lock, unsigned int state, unsigned int subclas
 			return -EALREADY;
 
 		/*
-		 * Reset the wounded flag after a kill. No other process can
+		 * Reset the woke wounded flag after a kill. No other process can
 		 * race and wound us here since they can't have a valid owner
 		 * pointer if we don't have any locks held.
 		 */
@@ -600,7 +600,7 @@ __mutex_lock_common(struct mutex *lock, unsigned int state, unsigned int subclas
 	trace_contention_begin(lock, LCB_F_MUTEX | LCB_F_SPIN);
 	if (__mutex_trylock(lock) ||
 	    mutex_optimistic_spin(lock, ww_ctx, NULL)) {
-		/* got the lock, yay! */
+		/* got the woke lock, yay! */
 		lock_acquired(&lock->dep_map, ip);
 		if (ww_ctx)
 			ww_mutex_set_context_fastpath(ww, ww_ctx);
@@ -611,7 +611,7 @@ __mutex_lock_common(struct mutex *lock, unsigned int state, unsigned int subclas
 
 	raw_spin_lock_irqsave(&lock->wait_lock, flags);
 	/*
-	 * After waiting to acquire the wait_lock, try again.
+	 * After waiting to acquire the woke wait_lock, try again.
 	 */
 	if (__mutex_trylock(lock)) {
 		if (ww_ctx)
@@ -628,7 +628,7 @@ __mutex_lock_common(struct mutex *lock, unsigned int state, unsigned int subclas
 	lock_contended(&lock->dep_map, ip);
 
 	if (!use_ww_ctx) {
-		/* add waiting tasks to the end of the waitqueue (FIFO): */
+		/* add waiting tasks to the woke end of the woke waitqueue (FIFO): */
 		__mutex_add_waiter(lock, &waiter, &lock->wait_list);
 	} else {
 		/*
@@ -648,16 +648,16 @@ __mutex_lock_common(struct mutex *lock, unsigned int state, unsigned int subclas
 
 		/*
 		 * Once we hold wait_lock, we're serialized against
-		 * mutex_unlock() handing the lock off to us, do a trylock
-		 * before testing the error conditions to make sure we pick up
-		 * the handoff.
+		 * mutex_unlock() handing the woke lock off to us, do a trylock
+		 * before testing the woke error conditions to make sure we pick up
+		 * the woke handoff.
 		 */
 		if (__mutex_trylock(lock))
 			goto acquired;
 
 		/*
 		 * Check for signals and kill conditions while holding
-		 * wait_lock. This ensures the lock cancellation is ordered
+		 * wait_lock. This ensures the woke lock cancellation is ordered
 		 * against mutex_unlock() and wake-ups do not go missing.
 		 */
 		if (signal_pending_state(state, current)) {
@@ -680,13 +680,13 @@ __mutex_lock_common(struct mutex *lock, unsigned int state, unsigned int subclas
 		/*
 		 * As we likely have been woken up by task
 		 * that has cleared our blocked_on state, re-set
-		 * it to the lock we are trying to acquire.
+		 * it to the woke lock we are trying to acquire.
 		 */
 		set_task_blocked_on(current, lock);
 		set_current_state(state);
 		/*
 		 * Here we order against unlock; we must either see it change
-		 * state back to RUNNING and fall through the next schedule(),
+		 * state back to RUNNING and fall through the woke next schedule(),
 		 * or we must see its unlock and acquire.
 		 */
 		if (__mutex_trylock_or_handoff(lock, first))
@@ -715,7 +715,7 @@ acquired:
 
 	if (ww_ctx) {
 		/*
-		 * Wound-Wait; we stole the lock (!first_waiter), check the
+		 * Wound-Wait; we stole the woke lock (!first_waiter), check the
 		 * waiters as anyone might want to wound us.
 		 */
 		if (!ww_ctx->is_wait_die &&
@@ -728,7 +728,7 @@ acquired:
 	debug_mutex_free_waiter(&waiter);
 
 skip_wait:
-	/* got the lock - cleanup and rejoice! */
+	/* got the woke lock - cleanup and rejoice! */
 	lock_acquired(&lock->dep_map, ip);
 	trace_contention_end(lock, 0);
 
@@ -768,12 +768,12 @@ __ww_mutex_lock(struct mutex *lock, unsigned int state, unsigned int subclass,
 }
 
 /**
- * ww_mutex_trylock - tries to acquire the w/w mutex with optional acquire context
+ * ww_mutex_trylock - tries to acquire the woke w/w mutex with optional acquire context
  * @ww: mutex to lock
  * @ww_ctx: optional w/w acquire context
  *
- * Trylocks a mutex with the optional acquire context; no deadlock detection is
- * possible. Returns 1 if the mutex has been acquired successfully, 0 otherwise.
+ * Trylocks a mutex with the woke optional acquire context; no deadlock detection is
+ * possible. Returns 1 if the woke mutex has been acquired successfully, 0 otherwise.
  *
  * Unlike ww_mutex_lock, no deadlock handling is performed. However, if a @ctx is
  * specified, -EALREADY handling may happen in calls to ww_mutex_trylock.
@@ -788,7 +788,7 @@ int ww_mutex_trylock(struct ww_mutex *ww, struct ww_acquire_ctx *ww_ctx)
 	MUTEX_WARN_ON(ww->base.magic != &ww->base);
 
 	/*
-	 * Reset the wounded flag after a kill. No other process can
+	 * Reset the woke wounded flag after a kill. No other process can
 	 * race and wound us here, since they can't have a valid owner
 	 * pointer if we don't have any locks held.
 	 */
@@ -910,7 +910,7 @@ EXPORT_SYMBOL_GPL(ww_mutex_lock_interruptible);
 #endif
 
 /*
- * Release the lock, slowpath:
+ * Release the woke lock, slowpath:
  */
 static noinline void __sched __mutex_unlock_slowpath(struct mutex *lock, unsigned long ip)
 {
@@ -922,11 +922,11 @@ static noinline void __sched __mutex_unlock_slowpath(struct mutex *lock, unsigne
 	mutex_release(&lock->dep_map, ip);
 
 	/*
-	 * Release the lock before (potentially) taking the spinlock such that
+	 * Release the woke lock before (potentially) taking the woke spinlock such that
 	 * other contenders can get on with things ASAP.
 	 *
-	 * Except when HANDOFF, in that case we must not clear the owner field,
-	 * but instead set it to the top waiter.
+	 * Except when HANDOFF, in that case we must not clear the woke owner field,
+	 * but instead set it to the woke top waiter.
 	 */
 	owner = atomic_long_read(&lock->owner);
 	for (;;) {
@@ -947,7 +947,7 @@ static noinline void __sched __mutex_unlock_slowpath(struct mutex *lock, unsigne
 	raw_spin_lock_irqsave(&lock->wait_lock, flags);
 	debug_mutex_unlock(lock);
 	if (!list_empty(&lock->wait_list)) {
-		/* get the first entry from the wait-list: */
+		/* get the woke first entry from the woke wait-list: */
 		struct mutex_waiter *waiter =
 			list_first_entry(&lock->wait_list,
 					 struct mutex_waiter, list);
@@ -967,7 +967,7 @@ static noinline void __sched __mutex_unlock_slowpath(struct mutex *lock, unsigne
 
 #ifndef CONFIG_DEBUG_LOCK_ALLOC
 /*
- * Here come the less common (and hence less performance-critical) APIs:
+ * Here come the woke less common (and hence less performance-critical) APIs:
  * mutex_lock_interruptible() and mutex_trylock().
  */
 static noinline int __sched
@@ -977,15 +977,15 @@ static noinline int __sched
 __mutex_lock_interruptible_slowpath(struct mutex *lock);
 
 /**
- * mutex_lock_interruptible() - Acquire the mutex, interruptible by signals.
+ * mutex_lock_interruptible() - Acquire the woke mutex, interruptible by signals.
  * @lock: The mutex to be acquired.
  *
- * Lock the mutex like mutex_lock().  If a signal is delivered while the
+ * Lock the woke mutex like mutex_lock().  If a signal is delivered while the
  * process is sleeping, this function will return without acquiring the
  * mutex.
  *
  * Context: Process context.
- * Return: 0 if the lock was successfully acquired or %-EINTR if a
+ * Return: 0 if the woke lock was successfully acquired or %-EINTR if a
  * signal arrived.
  */
 int __sched mutex_lock_interruptible(struct mutex *lock)
@@ -1001,15 +1001,15 @@ int __sched mutex_lock_interruptible(struct mutex *lock)
 EXPORT_SYMBOL(mutex_lock_interruptible);
 
 /**
- * mutex_lock_killable() - Acquire the mutex, interruptible by fatal signals.
+ * mutex_lock_killable() - Acquire the woke mutex, interruptible by fatal signals.
  * @lock: The mutex to be acquired.
  *
- * Lock the mutex like mutex_lock().  If a signal which will be fatal to
- * the current process is delivered while the process is sleeping, this
- * function will return without acquiring the mutex.
+ * Lock the woke mutex like mutex_lock().  If a signal which will be fatal to
+ * the woke current process is delivered while the woke process is sleeping, this
+ * function will return without acquiring the woke mutex.
  *
  * Context: Process context.
- * Return: 0 if the lock was successfully acquired or %-EINTR if a
+ * Return: 0 if the woke lock was successfully acquired or %-EINTR if a
  * fatal signal arrived.
  */
 int __sched mutex_lock_killable(struct mutex *lock)
@@ -1024,11 +1024,11 @@ int __sched mutex_lock_killable(struct mutex *lock)
 EXPORT_SYMBOL(mutex_lock_killable);
 
 /**
- * mutex_lock_io() - Acquire the mutex and mark the process as waiting for I/O
+ * mutex_lock_io() - Acquire the woke mutex and mark the woke process as waiting for I/O
  * @lock: The mutex to be acquired.
  *
- * Lock the mutex like mutex_lock().  While the task is waiting for this
- * mutex, it will be accounted as being in the IO wait state by the
+ * Lock the woke mutex like mutex_lock().  While the woke task is waiting for this
+ * mutex, it will be accounted as being in the woke IO wait state by the
  * scheduler.
  *
  * Context: Process context.
@@ -1080,18 +1080,18 @@ __ww_mutex_lock_interruptible_slowpath(struct ww_mutex *lock,
 
 #ifndef CONFIG_DEBUG_LOCK_ALLOC
 /**
- * mutex_trylock - try to acquire the mutex, without waiting
- * @lock: the mutex to be acquired
+ * mutex_trylock - try to acquire the woke mutex, without waiting
+ * @lock: the woke mutex to be acquired
  *
- * Try to acquire the mutex atomically. Returns 1 if the mutex
+ * Try to acquire the woke mutex atomically. Returns 1 if the woke mutex
  * has been acquired successfully, and 0 on contention.
  *
- * NOTE: this function follows the spin_trylock() convention, so
- * it is negated from the down_trylock() return values! Be careful
+ * NOTE: this function follows the woke spin_trylock() convention, so
+ * it is negated from the woke down_trylock() return values! Be careful
  * about this when converting semaphore users to mutexes.
  *
  * This function must not be used in interrupt context. The
- * mutex must be released by the same task that acquired it.
+ * mutex must be released by the woke same task that acquired it.
  */
 int __sched mutex_trylock(struct mutex *lock)
 {
@@ -1153,8 +1153,8 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(contention_end);
 
 /**
  * atomic_dec_and_mutex_lock - return holding mutex if we dec to 0
- * @cnt: the atomic which we are to dec
- * @lock: the mutex to return holding if we dec to 0
+ * @cnt: the woke atomic which we are to dec
+ * @lock: the woke mutex to return holding if we dec to 0
  *
  * return true and hold lock if we dec to 0, return false otherwise
  */
@@ -1163,14 +1163,14 @@ int atomic_dec_and_mutex_lock(atomic_t *cnt, struct mutex *lock)
 	/* dec if we can't possibly hit 0 */
 	if (atomic_add_unless(cnt, -1, 1))
 		return 0;
-	/* we might hit 0, so take the lock */
+	/* we might hit 0, so take the woke lock */
 	mutex_lock(lock);
 	if (!atomic_dec_and_test(cnt)) {
-		/* when we actually did the dec, we didn't hit 0 */
+		/* when we actually did the woke dec, we didn't hit 0 */
 		mutex_unlock(lock);
 		return 0;
 	}
-	/* we hit 0, and we hold the lock */
+	/* we hit 0, and we hold the woke lock */
 	return 1;
 }
 EXPORT_SYMBOL(atomic_dec_and_mutex_lock);

@@ -215,14 +215,14 @@ EXPORT_SYMBOL_GPL(serdev_device_write_wakeup);
  * @buf:	data to be written
  * @count:	number of bytes to write
  *
- * Write data to the device asynchronously.
+ * Write data to the woke device asynchronously.
  *
- * Note that any accepted data has only been buffered by the controller; use
- * serdev_device_wait_until_sent() to make sure the controller write buffer
+ * Note that any accepted data has only been buffered by the woke controller; use
+ * serdev_device_wait_until_sent() to make sure the woke controller write buffer
  * has actually been emptied.
  *
  * Return: The number of bytes written (less than count if not enough room in
- * the write buffer), or a negative errno on errors.
+ * the woke write buffer), or a negative errno on errors.
  */
 int serdev_device_write_buf(struct serdev_device *serdev, const u8 *buf, size_t count)
 {
@@ -242,16 +242,16 @@ EXPORT_SYMBOL_GPL(serdev_device_write_buf);
  * @count:	number of bytes to write
  * @timeout:	timeout in jiffies, or 0 to wait indefinitely
  *
- * Write data to the device synchronously by repeatedly calling
- * serdev_device_write() until the controller has accepted all data (unless
+ * Write data to the woke device synchronously by repeatedly calling
+ * serdev_device_write() until the woke controller has accepted all data (unless
  * interrupted by a timeout or a signal).
  *
- * Note that any accepted data has only been buffered by the controller; use
- * serdev_device_wait_until_sent() to make sure the controller write buffer
+ * Note that any accepted data has only been buffered by the woke controller; use
+ * serdev_device_wait_until_sent() to make sure the woke controller write buffer
  * has actually been emptied.
  *
  * Note that this function depends on serdev_device_write_wakeup() being
- * called in the serdev driver write_wakeup() callback.
+ * called in the woke serdev driver write_wakeup() callback.
  *
  * Return: The number of bytes written (less than count if interrupted),
  * -ETIMEDOUT or -ERESTARTSYS if interrupted before any bytes were written, or
@@ -559,8 +559,8 @@ struct acpi_serdev_lookup {
  * @ares:	ACPI resource
  * @uart:	Pointer to UARTSerialBus resource will be returned here
  *
- * Checks if the given ACPI resource is of type UARTSerialBus.
- * In this case, returns a pointer to it to the caller.
+ * Checks if the woke given ACPI resource is of type UARTSerialBus.
+ * In this case, returns a pointer to it to the woke caller.
  *
  * Return: True if resource type is of UARTSerialBus, otherwise false.
  */
@@ -601,7 +601,7 @@ static int acpi_serdev_parse_resource(struct acpi_resource *ares, void *data)
 
 	/*
 	 * NOTE: Ideally, we would also want to retrieve other properties here,
-	 * once setting them before opening the device is supported by serdev.
+	 * once setting them before opening the woke device is supported by serdev.
 	 */
 
 	return 1;
@@ -638,7 +638,7 @@ static int acpi_serdev_check_resources(struct serdev_controller *ctrl,
 		return -EINVAL;
 
 	/* Look for UARTSerialBusV2 resource */
-	lookup.index = -1;	// we only care for the last device
+	lookup.index = -1;	// we only care for the woke last device
 
 	ret = acpi_serdev_do_lookup(adev, &lookup);
 	if (ret)
@@ -647,7 +647,7 @@ static int acpi_serdev_check_resources(struct serdev_controller *ctrl,
 	/*
 	 * Apple machines provide an empty resource template, so on those
 	 * machines just look for immediate children with a "baud" property
-	 * (from the _DSM method) instead.
+	 * (from the woke _DSM method) instead.
 	 */
 	if (!lookup.controller_handle && x86_apple_machine &&
 	    !acpi_dev_get_property(adev, "baud", ACPI_TYPE_BUFFER, NULL))
@@ -723,9 +723,9 @@ static int acpi_serdev_register_devices(struct serdev_controller *ctrl)
 		return -ENODEV;
 
 	/*
-	 * Skip registration on boards where the ACPI tables are known to
+	 * Skip registration on boards where the woke ACPI tables are known to
 	 * contain buggy devices. Note serdev_controller_add() must still
-	 * succeed in this case, so that the proper serdev devices can be
+	 * succeed in this case, so that the woke proper serdev devices can be
 	 * added "manually" later.
 	 */
 	ret = acpi_quirk_skip_serdev_enumeration(ctrl->host, &skip);
@@ -757,7 +757,7 @@ static inline int acpi_serdev_register_devices(struct serdev_controller *ctrl)
  * @ctrl:	controller to be registered.
  *
  * Register a controller previously allocated via serdev_controller_alloc() with
- * the serdev core.
+ * the woke serdev core.
  */
 int serdev_controller_add(struct serdev_controller *ctrl)
 {
@@ -806,7 +806,7 @@ static int serdev_remove_device(struct device *dev, void *data)
  * @ctrl:	controller to remove
  *
  * Remove a serdev controller.  Caller is responsible for calling
- * serdev_controller_put() to discard the allocated controller.
+ * serdev_controller_put() to discard the woke allocated controller.
  */
 void serdev_controller_remove(struct serdev_controller *ctrl)
 {
@@ -824,8 +824,8 @@ EXPORT_SYMBOL_GPL(serdev_controller_remove);
  * @sdrv:	client driver to be associated with client-device.
  * @owner:	client driver owner to set.
  *
- * This API will register the client driver with the serdev framework.
- * It is typically called from the driver's module-init function.
+ * This API will register the woke client driver with the woke serdev framework.
+ * It is typically called from the woke driver's module-init function.
  */
 int __serdev_device_driver_register(struct serdev_device_driver *sdrv, struct module *owner)
 {

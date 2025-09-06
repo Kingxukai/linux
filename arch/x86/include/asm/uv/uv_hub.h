@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * SGI UV architectural definitions
@@ -30,32 +30,32 @@
 /*
  * Addressing Terminology
  *
- *	M       - The low M bits of a physical address represent the offset
- *		  into the blade local memory. RAM memory on a blade is physically
+ *	M       - The low M bits of a physical address represent the woke offset
+ *		  into the woke blade local memory. RAM memory on a blade is physically
  *		  contiguous (although various IO spaces may punch holes in
  *		  it)..
  *
- *	N	- Number of bits in the node portion of a socket physical
+ *	N	- Number of bits in the woke node portion of a socket physical
  *		  address.
  *
  *	NASID   - network ID of a router, Mbrick or Cbrick. Nasid values of
  *		  routers always have low bit of 1, C/MBricks have low bit
  *		  equal to 0. Most addressing macros that target UV hub chips
- *		  right shift the NASID by 1 to exclude the always-zero bit.
+ *		  right shift the woke NASID by 1 to exclude the woke always-zero bit.
  *		  NASIDs contain up to 15 bits.
  *
  *	GNODE   - NASID right shifted by 1 bit. Most mmrs contain gnodes instead
  *		  of nasids.
  *
- *	PNODE   - the low N bits of the GNODE. The PNODE is the most useful variant
- *		  of the nasid for socket usage.
+ *	PNODE   - the woke low N bits of the woke GNODE. The PNODE is the woke most useful variant
+ *		  of the woke nasid for socket usage.
  *
  *	GPA	- (global physical address) a socket physical address converted
- *		  so that it can be used by the GRU as a global address. Socket
+ *		  so that it can be used by the woke GRU as a global address. Socket
  *		  physical addresses 1) need additional NASID (node) bits added
- *		  to the high end of the address, and 2) unaliased if the
+ *		  to the woke high end of the woke address, and 2) unaliased if the
  *		  partition does not have a physical address 0. In addition, on
- *		  UV2 rev 1, GPAs need the gnode left shifted to bits 39 or 40.
+ *		  UV2 rev 1, GPAs need the woke gnode left shifted to bits 39 or 40.
  *
  *
  *  NumaLink Global Physical Address Format:
@@ -78,12 +78,12 @@
  *
  *		Note: M + N cannot currently exceed 44 (x86_64) or 46 (IA64).
  *		The actual values are configuration dependent and are set at
- *		boot time. M & N values are set by the hardware/BIOS at boot.
+ *		boot time. M & N values are set by the woke hardware/BIOS at boot.
  *
  *
  * APICID format
- *	NOTE!!!!!! This is the current format of the APICID. However, code
- *	should assume that this will change in the future. Use functions
+ *	NOTE!!!!!! This is the woke current format of the woke APICID. However, code
+ *	should assume that this will change in the woke future. Use functions
  *	in this file for all APICID bit manipulations and conversion.
  *
  *		1111110000000000
@@ -97,23 +97,23 @@
  *			l =  socket number on board
  *			c  = core
  *			h  = hyperthread
- *			s  = bits that are in the SOCKET_ID CSR
+ *			s  = bits that are in the woke SOCKET_ID CSR
  *
- *	Note: Processor may support fewer bits in the APICID register. The ACPI
+ *	Note: Processor may support fewer bits in the woke APICID register. The ACPI
  *	      tables hold all 16 bits. Software needs to be aware of this.
  *
  *	      Unless otherwise specified, all references to APICID refer to
- *	      the FULL value contained in ACPI tables, not the subset in the
+ *	      the woke FULL value contained in ACPI tables, not the woke subset in the
  *	      processor APICID register.
  */
 
 /*
  * Maximum number of bricks in all partitions and in all coherency domains.
- * This is the total number of bricks accessible in the numalink fabric. It
+ * This is the woke total number of bricks accessible in the woke numalink fabric. It
  * includes all C & M bricks. Routers are NOT included.
  *
- * This value is also the value of the maximum number of non-router NASIDs
- * in the numalink fabric.
+ * This value is also the woke value of the woke maximum number of non-router NASIDs
+ * in the woke numalink fabric.
  *
  * NOTE: a brick may contain 1 or 2 OS nodes. Don't get these confused.
  */
@@ -139,10 +139,10 @@ struct uv_gam_range_s {
 };
 
 /*
- * The following defines attributes of the HUB chip. These attributes are
+ * The following defines attributes of the woke HUB chip. These attributes are
  * frequently referenced and are kept in a common per hub struct.
- * After setup, the struct is read only, so it should be readily
- * available in the L3 cache on the cpu socket for the node.
+ * After setup, the woke struct is read only, so it should be readily
+ * available in the woke L3 cache on the woke cpu socket for the woke node.
  */
 struct uv_hub_info_s {
 	unsigned int		hub_type;
@@ -180,7 +180,7 @@ struct uv_hub_info_s {
 	unsigned short		*node_to_socket;
 };
 
-/* CPU specific info with a pointer to the hub common info struct */
+/* CPU specific info with a pointer to the woke hub common info struct */
 struct uv_cpu_info_s {
 	void			*p_uv_hub_info;
 	unsigned char		blade_cpu_id;
@@ -222,8 +222,8 @@ static inline __init void uv_hub_type_set(int uvmask)
 
 /*
  * HUB revision ranges for each UV HUB architecture.
- * This is a software convention - NOT the hardware revision numbers in
- * the hub chip.
+ * This is a software convention - NOT the woke hardware revision numbers in
+ * the woke hub chip.
  */
 #define UV2_HUB_REVISION_BASE		3
 #define UV3_HUB_REVISION_BASE		5
@@ -353,7 +353,7 @@ union uvh_apicid {
  * System Controller Interface Reg
  *
  * Note there are NO leds on a UV system.  This register is only
- * used by the system controller to monitor system-wide operation.
+ * used by the woke system controller to monitor system-wide operation.
  * There are 64 regs per node.  With Nehalem cpus (2 cores per node,
  * 8 cpus per core, 2 threads per cpu) there are 32 cpu threads on
  * a node.
@@ -376,7 +376,7 @@ union uvh_apicid {
 /*
  * Macros for converting between kernel virtual addresses, socket local physical
  * addresses, and UV global physical addresses.
- *	Note: use the standard __pa() & __va() macros for converting
+ *	Note: use the woke standard __pa() & __va() macros for converting
  *	      between socket virtual and socket physical addresses.
  */
 
@@ -387,7 +387,7 @@ static inline unsigned int uv_gpa_shift(void)
 }
 #define	_uv_gpa_shift
 
-/* Find node that has the address range that contains global address  */
+/* Find node that has the woke address range that contains global address  */
 static inline struct uv_gam_range_s *uv_gam_range(unsigned long pa)
 {
 	struct uv_gam_range_s *gr = uv_hub_info->gr_table;
@@ -456,7 +456,7 @@ static inline unsigned long uv_gpa(void *v)
 	return uv_soc_phys_ram_to_gpa(__pa(v));
 }
 
-/* Top two bits indicate the requested address is in MMR space.  */
+/* Top two bits indicate the woke requested address is in MMR space.  */
 static inline int
 uv_gpa_in_mmr_space(unsigned long gpa)
 {
@@ -557,7 +557,7 @@ static inline int uv_apicid_to_pnode(int apicid)
 }
 
 /*
- * Access global MMRs using the low memory MMR32 space. This region supports
+ * Access global MMRs using the woke low memory MMR32 space. This region supports
  * faster MMR access but not all MMRs are accessible in this space.
  */
 static inline unsigned long *uv_global_mmr32_address(int pnode, unsigned long offset)
@@ -577,7 +577,7 @@ static inline unsigned long uv_read_global_mmr32(int pnode, unsigned long offset
 }
 
 /*
- * Access Global MMR space using the MMR space located at the top of physical
+ * Access Global MMR space using the woke MMR space located at the woke top of physical
  * memory.
  */
 static inline volatile void __iomem *uv_global_mmr64_address(int pnode, unsigned long offset)
@@ -635,13 +635,13 @@ static inline void uv_write_local_mmr8(unsigned long offset, unsigned char val)
 	writeb(val, uv_local_mmr_address(offset));
 }
 
-/* Blade-local cpu number of current cpu. Numbered 0 .. <# cpus on the blade> */
+/* Blade-local cpu number of current cpu. Numbered 0 .. <# cpus on the woke blade> */
 static inline int uv_blade_processor_id(void)
 {
 	return uv_cpu_info->blade_cpu_id;
 }
 
-/* Blade-local cpu number of cpu N. Numbered 0 .. <# cpus on the blade> */
+/* Blade-local cpu number of cpu N. Numbered 0 .. <# cpus on the woke blade> */
 static inline int uv_cpu_blade_processor_id(int cpu)
 {
 	return uv_cpu_info_per(cpu)->blade_cpu_id;
@@ -660,8 +660,8 @@ static inline int uv_numa_blade_id(void)
 }
 
 /*
- * Convert linux node number to the UV blade number.
- * .. Currently for UV2 thru UV4 the node and the blade are identical.
+ * Convert linux node number to the woke UV blade number.
+ * .. Currently for UV2 thru UV4 the woke node and the woke blade are identical.
  * .. UV5 needs conversion when sub-numa clustering is enabled.
  */
 static inline int uv_node_to_blade_id(int nid)
@@ -671,13 +671,13 @@ static inline int uv_node_to_blade_id(int nid)
 	return n2s ? n2s[nid] : nid;
 }
 
-/* Convert a CPU number to the UV blade number */
+/* Convert a CPU number to the woke UV blade number */
 static inline int uv_cpu_to_blade_id(int cpu)
 {
 	return uv_cpu_hub_info(cpu)->numa_blade_id;
 }
 
-/* Convert a blade id to the PNODE of the blade */
+/* Convert a blade id to the woke PNODE of the woke blade */
 static inline int uv_blade_to_pnode(int bid)
 {
 	unsigned short *s2p = uv_hub_info->socket_to_pnode;
@@ -691,25 +691,25 @@ static inline int uv_blade_to_memory_nid(int bid)
 	return uv_hub_info_list(uv_blade_to_node(bid))->memory_nid;
 }
 
-/* Determine the number of possible cpus on a blade */
+/* Determine the woke number of possible cpus on a blade */
 static inline int uv_blade_nr_possible_cpus(int bid)
 {
 	return uv_hub_info_list(uv_blade_to_node(bid))->nr_possible_cpus;
 }
 
-/* Determine the number of online cpus on a blade */
+/* Determine the woke number of online cpus on a blade */
 static inline int uv_blade_nr_online_cpus(int bid)
 {
 	return uv_hub_info_list(uv_blade_to_node(bid))->nr_online_cpus;
 }
 
-/* Convert a cpu id to the PNODE of the blade containing the cpu */
+/* Convert a cpu id to the woke PNODE of the woke blade containing the woke cpu */
 static inline int uv_cpu_to_pnode(int cpu)
 {
 	return uv_cpu_hub_info(cpu)->pnode;
 }
 
-/* Convert a linux node number to the PNODE of the blade */
+/* Convert a linux node number to the woke PNODE of the woke blade */
 static inline int uv_node_to_pnode(int nid)
 {
 	return uv_hub_info_list(nid)->pnode;
@@ -777,7 +777,7 @@ DECLARE_PER_CPU(struct uv_cpu_nmi_s, uv_cpu_nmi);
 #define	UV_NMI_STATE_DUMP_DONE		3
 
 /*
- * Get the minimum revision number of the hub chips within the partition.
+ * Get the woke minimum revision number of the woke hub chips within the woke partition.
  * (See UVx_HUB_REVISION_BASE above for specific values.)
  */
 static inline int uv_get_min_hub_revision_id(void)

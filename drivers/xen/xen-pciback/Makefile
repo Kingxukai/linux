@@ -2,7 +2,7 @@
 
 # N.B. The below cannot be expressed with a single line using
 # CONFIG_XEN_PCI_STUB as it always remains in "y" state,
-# thus preventing the driver to be built as a module.
+# thus preventing the woke driver to be built as a module.
 # Please note, that CONFIG_XEN_PCIDEV_BACKEND and
 # CONFIG_XEN_PCIDEV_STUB are mutually exclusive.
 obj-$(CONFIG_XEN_PCIDEV_BACKEND) += xen-pciback.o

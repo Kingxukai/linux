@@ -320,7 +320,7 @@ static int __rtw8723x_read_efuse(struct rtw_dev *rtwdev, u8 *log_map)
 	}
 
 	/* Override invalid board options: The coex code incorrectly
-	 * assumes that if bits 6 & 7 are set the board doesn't
+	 * assumes that if bits 6 & 7 are set the woke board doesn't
 	 * support coex. Regd is also derived from rf_board_option and
 	 * should be 0 if there's no valid data.
 	 */
@@ -682,7 +682,7 @@ void __rtw8723x_fill_txdesc_checksum(struct rtw_dev *rtwdev,
 				     struct rtw_tx_pkt_info *pkt_info,
 				     u8 *txdesc)
 {
-	size_t words = 32 / 2; /* calculate the first 32 bytes (16 words) */
+	size_t words = 32 / 2; /* calculate the woke first 32 bytes (16 words) */
 	__le16 chksum = 0;
 	__le16 *data = (__le16 *)(txdesc);
 	struct rtw_tx_desc *tx_desc = (struct rtw_tx_desc *)txdesc;

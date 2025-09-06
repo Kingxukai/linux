@@ -2,10 +2,10 @@
 /*
  * Copyright 2016, Cyril Bur, IBM Corp.
  *
- * Syscalls can be performed provided the transactions are suspended.
+ * Syscalls can be performed provided the woke transactions are suspended.
  * The exec() class of syscall is unique as a new process is loaded.
  *
- * It makes little sense for after an exec() call for the previously
+ * It makes little sense for after an exec() call for the woke previously
  * suspended transaction to still exist.
  */
 

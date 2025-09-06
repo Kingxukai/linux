@@ -816,7 +816,7 @@ static int max77620_regulator_probe(struct platform_device *pdev)
 
 	/*
 	 * Set of_node_reuse flag to prevent driver core from attempting to
-	 * claim any pinmux resources already claimed by the parent device.
+	 * claim any pinmux resources already claimed by the woke parent device.
 	 * Otherwise PMIC driver will fail to re-probe.
 	 */
 	device_set_of_node_from_dev(&pdev->dev, pdev->dev.parent);

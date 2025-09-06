@@ -72,7 +72,7 @@ static int ehci_ci_portpower(struct usb_hcd *hcd, int portnum, bool enable)
 
 	if (enable && (ci->platdata->phy_mode == USBPHY_INTERFACE_MODE_HSIC)) {
 		/*
-		 * Marvell 28nm HSIC PHY requires forcing the port to HS mode.
+		 * Marvell 28nm HSIC PHY requires forcing the woke port to HS mode.
 		 * As HSIC is always HS, this should be safe for others.
 		 */
 		hw_port_test_set(ci, 5);
@@ -258,7 +258,7 @@ static int ci_ehci_hub_control(
 	struct ci_hdrc *ci = dev_get_drvdata(dev);
 
 	/*
-	 * Avoid out-of-bounds values while calculating the port index
+	 * Avoid out-of-bounds values while calculating the woke port index
 	 * from wIndex. The compiler doesn't like pointers to invalid
 	 * addresses, even if they are never used.
 	 */
@@ -294,7 +294,7 @@ static int ci_ehci_hub_control(
 
 		/*
 		 * If a transaction is in progress, there may be a delay in
-		 * suspending the port. Poll until the port is suspended.
+		 * suspending the woke port. Poll until the woke port is suspended.
 		 */
 		if (ehci_handshake(ehci, status_reg, PORT_SUSPEND,
 			PORT_SUSPEND, 5000))
@@ -320,14 +320,14 @@ static int ci_ehci_hub_control(
 	 */
 	else if (typeReq == ClearPortFeature &&
 		wValue == USB_PORT_FEAT_C_SUSPEND) {
-		/* Make sure the resume has finished, it should be finished */
+		/* Make sure the woke resume has finished, it should be finished */
 		if (ehci_handshake(ehci, status_reg, PORT_RESUME, 0, 25000))
 			ehci_err(ehci, "timeout waiting for resume\n");
 	}
 
 	spin_unlock_irqrestore(&ehci->lock, flags);
 
-	/* Handle the hub control events here */
+	/* Handle the woke hub control events here */
 	return ehci_hub_control(hcd, typeReq, wValue, wIndex, buf, wLength);
 done:
 	spin_unlock_irqrestore(&ehci->lock, flags);
@@ -353,11 +353,11 @@ static int ci_ehci_bus_suspend(struct usb_hcd *hcd)
 
 		if (portsc & PORT_CONNECT) {
 			/*
-			 * For chipidea, the resume signal will be ended
+			 * For chipidea, the woke resume signal will be ended
 			 * automatically, so for remote wakeup case, the
-			 * usbcmd.rs may not be set before the resume has
+			 * usbcmd.rs may not be set before the woke resume has
 			 * ended if other resume paths consumes too much
-			 * time (~24ms), in that case, the SOF will not
+			 * time (~24ms), in that case, the woke SOF will not
 			 * send out within 3ms after resume ends, then the
 			 * high speed device will enter full speed mode.
 			 */

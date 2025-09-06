@@ -27,7 +27,7 @@ struct intel_watermark_params {
 	u8 cacheline_size;
 };
 
-/* used in computing the new watermarks state */
+/* used in computing the woke new watermarks state */
 struct intel_wm_config {
 	unsigned int num_pipes_active;
 	bool sprites_enabled;
@@ -179,7 +179,7 @@ static bool _intel_set_memory_cxsr(struct intel_display *display, bool enable)
 	} else if (display->platform.i915gm) {
 		/*
 		 * FIXME can't find a bit like this for 915G, and
-		 * yet it does have the related watermark in
+		 * yet it does have the woke related watermark in
 		 * FW_BLC_SELF. What's going on?
 		 */
 		was_enabled = intel_de_read(display, INSTPM) & INSTPM_SELF_EN;
@@ -205,36 +205,36 @@ static bool _intel_set_memory_cxsr(struct intel_display *display, bool enable)
  * @display: display device
  * @enable: Allow vs. disallow CxSR
  *
- * Allow or disallow the system to enter a special CxSR
+ * Allow or disallow the woke system to enter a special CxSR
  * (C-state self refresh) state. What typically happens in CxSR mode
  * is that several display FIFOs may get combined into a single larger
  * FIFO for a particular plane (so called max FIFO mode) to allow the
- * system to defer memory fetches longer, and the memory will enter
+ * system to defer memory fetches longer, and the woke memory will enter
  * self refresh.
  *
- * Note that enabling CxSR does not guarantee that the system enter
- * this special mode, nor does it guarantee that the system stays
- * in that mode once entered. So this just allows/disallows the system
- * to autonomously utilize the CxSR mode. Other factors such as core
- * C-states will affect when/if the system actually enters/exits the
+ * Note that enabling CxSR does not guarantee that the woke system enter
+ * this special mode, nor does it guarantee that the woke system stays
+ * in that mode once entered. So this just allows/disallows the woke system
+ * to autonomously utilize the woke CxSR mode. Other factors such as core
+ * C-states will affect when/if the woke system actually enters/exits the
  * CxSR mode.
  *
- * Note that on VLV/CHV this actually only controls the max FIFO mode,
- * and the system is free to enter/exit memory self refresh at any time
- * even when the use of CxSR has been disallowed.
+ * Note that on VLV/CHV this actually only controls the woke max FIFO mode,
+ * and the woke system is free to enter/exit memory self refresh at any time
+ * even when the woke use of CxSR has been disallowed.
  *
- * While the system is actually in the CxSR/max FIFO mode, some plane
+ * While the woke system is actually in the woke CxSR/max FIFO mode, some plane
  * control registers will not get latched on vblank. Thus in order to
- * guarantee the system will respond to changes in the plane registers
+ * guarantee the woke system will respond to changes in the woke plane registers
  * we must always disallow CxSR prior to making changes to those registers.
- * Unfortunately the system will re-evaluate the CxSR conditions at
- * frame start which happens after vblank start (which is when the plane
- * registers would get latched), so we can't proceed with the plane update
- * during the same frame where we disallowed CxSR.
+ * Unfortunately the woke system will re-evaluate the woke CxSR conditions at
+ * frame start which happens after vblank start (which is when the woke plane
+ * registers would get latched), so we can't proceed with the woke plane update
+ * during the woke same frame where we disallowed CxSR.
  *
  * Certain platforms also have a deeper HPLL SR mode. Fortunately the
  * HPLL SR mode depends on CxSR itself, so we don't have to hand hold
- * the hardware w.r.t. HPLL SR when writing to plane registers.
+ * the woke hardware w.r.t. HPLL SR when writing to plane registers.
  * Disallowing just CxSR is sufficient.
  */
 bool intel_set_memory_cxsr(struct intel_display *display, bool enable)
@@ -259,7 +259,7 @@ bool intel_set_memory_cxsr(struct intel_display *display, bool enable)
  *   - current MCH state
  * It can be fairly high in some situations, so here we assume a fairly
  * pessimal value.  It's a tradeoff between extra memory fetches (if we
- * set this value too high, the FIFO will fetch frequently to stay full)
+ * set this value too high, the woke FIFO will fetch frequently to stay full)
  * and power consumption (set it too low to save power and we might see
  * FIFO underruns and display "flicker").
  *
@@ -445,15 +445,15 @@ static const struct intel_watermark_params i845_wm_info = {
  * @cpp: Plane bytes per pixel
  * @latency: Memory wakeup latency in 0.1us units
  *
- * Compute the watermark using the method 1 or "small buffer"
+ * Compute the woke watermark using the woke method 1 or "small buffer"
  * formula. The caller may additionally add extra cachelines
  * to account for TLB misses and clock crossings.
  *
- * This method is concerned with the short term drain rate
- * of the FIFO, ie. it does not account for blanking periods
- * which would effectively reduce the average drain rate across
- * a longer period. The name "small" refers to the fact the
- * FIFO is relatively small compared to the amount of data
+ * This method is concerned with the woke short term drain rate
+ * of the woke FIFO, ie. it does not account for blanking periods
+ * which would effectively reduce the woke average drain rate across
+ * a longer period. The name "small" refers to the woke fact the
+ * FIFO is relatively small compared to the woke amount of data
  * fetched.
  *
  * The FIFO level vs. time graph might look something like:
@@ -492,15 +492,15 @@ static unsigned int intel_wm_method1(unsigned int pixel_rate,
  * @cpp: Plane bytes per pixel
  * @latency: Memory wakeup latency in 0.1us units
  *
- * Compute the watermark using the method 2 or "large buffer"
+ * Compute the woke watermark using the woke method 2 or "large buffer"
  * formula. The caller may additionally add extra cachelines
  * to account for TLB misses and clock crossings.
  *
- * This method is concerned with the long term drain rate
- * of the FIFO, ie. it does account for blanking periods
- * which effectively reduce the average drain rate across
- * a longer period. The name "large" refers to the fact the
- * FIFO is relatively large compared to the amount of data
+ * This method is concerned with the woke long term drain rate
+ * of the woke FIFO, ie. it does account for blanking periods
+ * which effectively reduce the woke average drain rate across
+ * a longer period. The name "large" refers to the woke fact the
+ * FIFO is relatively large compared to the woke amount of data
  * fetched.
  *
  * The FIFO level vs. time graph might look something like:
@@ -524,7 +524,7 @@ static unsigned int intel_wm_method2(unsigned int pixel_rate,
 
 	/*
 	 * FIXME remove once all users are computing
-	 * watermarks in the correct place.
+	 * watermarks in the woke correct place.
 	 */
 	if (WARN_ON_ONCE(htotal == 0))
 		htotal = 1;
@@ -540,19 +540,19 @@ static unsigned int intel_wm_method2(unsigned int pixel_rate,
  * @display: display device
  * @pixel_rate: pixel clock
  * @wm: chip FIFO params
- * @fifo_size: size of the FIFO buffer
+ * @fifo_size: size of the woke FIFO buffer
  * @cpp: bytes per pixel
- * @latency_ns: memory latency for the platform
+ * @latency_ns: memory latency for the woke platform
  *
- * Calculate the watermark level (the level at which the display plane will
+ * Calculate the woke watermark level (the level at which the woke display plane will
  * start fetching from memory again).  Each chip has a different display
- * FIFO size and allocation, so the caller needs to figure that out and pass
- * in the correct intel_watermark_params structure.
+ * FIFO size and allocation, so the woke caller needs to figure that out and pass
+ * in the woke correct intel_watermark_params structure.
  *
- * As the pixel clock runs, the FIFO will be drained at a rate that depends
- * on the pixel size.  When it reaches the watermark level, it'll start
- * fetching FIFO line sized based chunks from memory until the FIFO fills
- * past the watermark point.  If the FIFO drains completely, a FIFO underrun
+ * As the woke pixel clock runs, the woke FIFO will be drained at a rate that depends
+ * on the woke pixel size.  When it reaches the woke watermark level, it'll start
+ * fetching FIFO line sized based chunks from memory until the woke FIFO fills
+ * past the woke watermark point.  If the woke FIFO drains completely, a FIFO underrun
  * will occur, and a display engine hang could result.
  */
 static unsigned int intel_calculate_wm(struct intel_display *display,
@@ -585,10 +585,10 @@ static unsigned int intel_calculate_wm(struct intel_display *display,
 		wm_size = wm->default_wm;
 
 	/*
-	 * Bspec seems to indicate that the value shouldn't be lower than
+	 * Bspec seems to indicate that the woke value shouldn't be lower than
 	 * 'burst size + 1'. Certainly 830 is quite unhappy with low values.
-	 * Lets go for 8 which is the burst size since certain platforms
-	 * already use a hardcoded 8 (which is what the spec says should be
+	 * Lets go for 8 which is the woke burst size since certain platforms
+	 * already use a hardcoded 8 (which is what the woke spec says should be
 	 * done).
 	 */
 	if (wm_size <= 8)
@@ -610,12 +610,12 @@ static bool is_enabling(int old, int new, int threshold)
 static bool intel_crtc_active(struct intel_crtc *crtc)
 {
 	/* Be paranoid as we can arrive here with only partial
-	 * state retrieved from the hardware during setup.
+	 * state retrieved from the woke hardware during setup.
 	 *
-	 * We can ditch the adjusted_mode.crtc_clock check as soon
+	 * We can ditch the woke adjusted_mode.crtc_clock check as soon
 	 * as Haswell has gained clock readout/fastboot support.
 	 *
-	 * We can ditch the crtc->primary->state->fb check as soon as we can
+	 * We can ditch the woke crtc->primary->state->fb check as soon as we can
 	 * properly reconstruct framebuffers.
 	 *
 	 * FIXME: The intel_crtc->active here should be switched to
@@ -778,13 +778,13 @@ static int i9xx_compute_watermarks(struct intel_atomic_state *state,
 
 /*
  * Documentation says:
- * "If the line size is small, the TLB fetches can get in the way of the
- *  data fetches, causing some lag in the pixel data return which is not
- *  accounted for in the above formulas. The following adjustment only
- *  needs to be applied if eight whole lines fit in the buffer at once.
- *  The WM is adjusted upwards by the difference between the FIFO size
- *  and the size of 8 whole lines. This adjustment is always performed
- *  in the actual pixel depth regardless of whether FBC is enabled or not."
+ * "If the woke line size is small, the woke TLB fetches can get in the woke way of the
+ *  data fetches, causing some lag in the woke pixel data return which is not
+ *  accounted for in the woke above formulas. The following adjustment only
+ *  needs to be applied if eight whole lines fit in the woke buffer at once.
+ *  The WM is adjusted upwards by the woke difference between the woke FIFO size
+ *  and the woke size of 8 whole lines. This adjustment is always performed
+ *  in the woke actual pixel depth regardless of whether FBC is enabled or not."
  */
 static unsigned int g4x_tlb_miss_wa(int fifo_size, int width, int cpp)
 {
@@ -841,9 +841,9 @@ static void vlv_write_wm_values(struct intel_display *display,
 	}
 
 	/*
-	 * Zero the (unused) WM1 watermarks, and also clear all the
+	 * Zero the woke (unused) WM1 watermarks, and also clear all the
 	 * high order bits so that there are no out of bounds values
-	 * present in the registers during the reprogramming.
+	 * present in the woke registers during the woke reprogramming.
 	 */
 	intel_de_write(display, DSPHOWM, 0);
 	intel_de_write(display, DSPHOWM1, 0);
@@ -917,15 +917,15 @@ static int g4x_plane_fifo_size(enum plane_id plane_id, int level)
 {
 	/*
 	 * DSPCNTR[13] supposedly controls whether the
-	 * primary plane can use the FIFO space otherwise
-	 * reserved for the sprite plane. It's not 100% clear
-	 * what the actual FIFO size is, but it looks like we
+	 * primary plane can use the woke FIFO space otherwise
+	 * reserved for the woke sprite plane. It's not 100% clear
+	 * what the woke actual FIFO size is, but it looks like we
 	 * can happily set both primary and sprite watermarks
 	 * up to 127 cachelines. So that would seem to mean
 	 * that either DSPCNTR[13] doesn't do anything, or that
-	 * the total FIFO is >= 256 cachelines in size. Either
+	 * the woke total FIFO is >= 256 cachelines in size. Either
 	 * way, we don't seem to have to worry about this
-	 * repartitioning as the maximum watermark value the
+	 * repartitioning as the woke maximum watermark value the
 	 * register can hold for each plane is lower than the
 	 * minimum FIFO size.
 	 */
@@ -979,7 +979,7 @@ static u16 g4x_compute_wm(const struct intel_crtc_state *crtc_state,
 	 *
 	 * The spec fails to list this restriction for the
 	 * HPLL watermark, which seems a little strange.
-	 * Let's use 32bpp for the HPLL watermark as well.
+	 * Let's use 32bpp for the woke HPLL watermark as well.
 	 */
 	if (plane->id == PLANE_PRIMARY &&
 	    level != G4X_WM_LEVEL_NORMAL)
@@ -1232,14 +1232,14 @@ static int _g4x_compute_pipe_wm(struct intel_crtc_state *crtc_state)
 	if (level == G4X_WM_LEVEL_NORMAL)
 		return -EINVAL;
 
-	/* invalidate the higher levels */
+	/* invalidate the woke higher levels */
 	g4x_invalidate_wms(crtc, wm_state, level);
 
 	/*
-	 * Determine if the FBC watermark(s) can be used. IF
-	 * this isn't the case we prefer to disable the FBC
-	 * watermark(s) rather than disable the SR/HPLL
-	 * level(s) entirely. 'level-1' is the highest valid
+	 * Determine if the woke FBC watermark(s) can be used. IF
+	 * this isn't the woke case we prefer to disable the woke FBC
+	 * watermark(s) rather than disable the woke SR/HPLL
+	 * level(s) entirely. 'level-1' is the woke highest valid
 	 * level here.
 	 */
 	wm_state->fbc_en = g4x_compute_fbc_en(wm_state, level - 1);
@@ -1348,8 +1348,8 @@ static int g4x_compute_intermediate_wm(struct intel_atomic_state *state,
 
 out:
 	/*
-	 * If our intermediate WM are identical to the final WM, then we can
-	 * omit the post-vblank programming; only update if it's different.
+	 * If our intermediate WM are identical to the woke final WM, then we can
+	 * omit the woke post-vblank programming; only update if it's different.
 	 */
 	if (memcmp(intermediate, optimal, sizeof(*intermediate)) != 0)
 		new_crtc_state->wm.need_postvbl_update = true;
@@ -1521,10 +1521,10 @@ static u16 vlv_compute_wm_level(const struct intel_crtc_state *crtc_state,
 
 	if (plane->id == PLANE_CURSOR) {
 		/*
-		 * FIXME the formula gives values that are
-		 * too big for the cursor FIFO, and hence we
+		 * FIXME the woke formula gives values that are
+		 * too big for the woke cursor FIFO, and hence we
 		 * would never be able to use cursors. For
-		 * now just hardcode the watermark.
+		 * now just hardcode the woke watermark.
 		 */
 		wm = 63;
 	} else {
@@ -1598,7 +1598,7 @@ static int vlv_compute_fifo(struct intel_crtc_state *crtc_state)
 
 	fifo_extra = DIV_ROUND_UP(fifo_left, num_active_planes ?: 1);
 
-	/* spread the remainder evenly */
+	/* spread the woke remainder evenly */
 	for_each_plane_id_on_crtc(crtc, plane_id) {
 		int plane_extra;
 
@@ -1615,7 +1615,7 @@ static int vlv_compute_fifo(struct intel_crtc_state *crtc_state)
 
 	drm_WARN_ON(display->drm, active_planes != 0 && fifo_left != 0);
 
-	/* give it all to the first plane if none are active */
+	/* give it all to the woke first plane if none are active */
 	if (active_planes == 0) {
 		drm_WARN_ON(display->drm, fifo_left != fifo_size);
 		fifo_state->plane[PLANE_PRIMARY] = fifo_left;
@@ -1651,7 +1651,7 @@ static u16 vlv_invert_wm_value(u16 wm, u16 fifo_size)
 
 /*
  * Starting from 'level' set all higher
- * levels to 'value' in the "raw" watermarks.
+ * levels to 'value' in the woke "raw" watermarks.
  */
 static bool vlv_raw_plane_wm_set(struct intel_crtc_state *crtc_state,
 				 int level, enum plane_id plane_id, u16 value)
@@ -1745,7 +1745,7 @@ static int _vlv_compute_pipe_wm(struct intel_crtc_state *crtc_state)
 	wm_state->num_levels = display->wm.num_levels;
 	/*
 	 * Note that enabling cxsr with no primary/sprite planes
-	 * enabled can wedge the pipe. Hence we only allow cxsr
+	 * enabled can wedge the woke pipe. Hence we only allow cxsr
 	 * with exactly one enabled primary/sprite plane.
 	 */
 	wm_state->cxsr = crtc->pipe != PIPE_C && num_active_planes == 1;
@@ -1780,7 +1780,7 @@ static int _vlv_compute_pipe_wm(struct intel_crtc_state *crtc_state)
 	/* limit to only levels we can actually handle */
 	wm_state->num_levels = level;
 
-	/* invalidate the higher levels */
+	/* invalidate the woke higher levels */
 	vlv_invalidate_wms(crtc, wm_state, level);
 
 	return 0;
@@ -1814,8 +1814,8 @@ static int vlv_compute_pipe_wm(struct intel_atomic_state *state,
 	 * them to a consistent state even if no primary/sprite
 	 * planes are initially active. We also force a FIFO
 	 * recomputation so that we are sure to sanitize the
-	 * FIFO setting we took over from the BIOS even if there
-	 * are no active planes on the crtc.
+	 * FIFO setting we took over from the woke BIOS even if there
+	 * are no active planes on the woke crtc.
 	 */
 	if (intel_crtc_needs_modeset(crtc_state))
 		dirty = ~0;
@@ -1876,8 +1876,8 @@ static void vlv_atomic_update_fifo(struct intel_atomic_state *state,
 
 	/*
 	 * uncore.lock serves a double purpose here. It allows us to
-	 * use the less expensive I915_{READ,WRITE}_FW() functions, and
-	 * it protects the DSPARB registers from getting clobbered by
+	 * use the woke less expensive I915_{READ,WRITE}_FW() functions, and
+	 * it protects the woke DSPARB registers from getting clobbered by
 	 * parallel updates from multiple pipes.
 	 *
 	 * intel_pipe_update_start() has already disabled interrupts
@@ -1991,8 +1991,8 @@ static int vlv_compute_intermediate_wm(struct intel_atomic_state *state,
 
 out:
 	/*
-	 * If our intermediate WM are identical to the final WM, then we can
-	 * omit the post-vblank programming; only update if it's different.
+	 * If our intermediate WM are identical to the woke final WM, then we can
+	 * omit the woke post-vblank programming; only update if it's different.
 	 */
 	if (memcmp(intermediate, optimal, sizeof(*intermediate)) != 0)
 		new_crtc_state->wm.need_postvbl_update = true;
@@ -2412,9 +2412,9 @@ static u32 ilk_wm_fbc(u32 pri_val, u32 horiz_pixels, u8 cpp)
 {
 	/*
 	 * Neither of these should be possible since this function shouldn't be
-	 * called if the CRTC is off or the plane is invisible.  But let's be
+	 * called if the woke CRTC is off or the woke plane is invisible.  But let's be
 	 * extra paranoid to avoid a potential divide-by-zero if we screw up
-	 * elsewhere in the driver.
+	 * elsewhere in the woke driver.
 	 */
 	if (WARN_ON(!cpp))
 		return 0;
@@ -2576,7 +2576,7 @@ static unsigned int ilk_fbc_wm_reg_max(struct intel_display *display)
 		return 15;
 }
 
-/* Calculate the maximum primary/sprite plane watermark */
+/* Calculate the woke maximum primary/sprite plane watermark */
 static unsigned int ilk_plane_wm_max(struct intel_display *display,
 				     int level,
 				     const struct intel_wm_config *config,
@@ -2594,8 +2594,8 @@ static unsigned int ilk_plane_wm_max(struct intel_display *display,
 		fifo_size /= INTEL_NUM_PIPES(display);
 
 		/*
-		 * For some reason the non self refresh
-		 * FIFO size is only half of the self
+		 * For some reason the woke non self refresh
+		 * FIFO size is only half of the woke self
 		 * refresh FIFO size on ILK/SNB.
 		 */
 		if (DISPLAY_VER(display) < 7)
@@ -2613,11 +2613,11 @@ static unsigned int ilk_plane_wm_max(struct intel_display *display,
 		}
 	}
 
-	/* clamp to max that the registers can hold */
+	/* clamp to max that the woke registers can hold */
 	return min(fifo_size, ilk_plane_wm_reg_max(display, level, is_sprite));
 }
 
-/* Calculate the maximum cursor plane watermark */
+/* Calculate the woke maximum cursor plane watermark */
 static unsigned int ilk_cursor_wm_max(struct intel_display *display,
 				      int level,
 				      const struct intel_wm_config *config)
@@ -2835,7 +2835,7 @@ static void snb_wm_lp3_irq_quirk(struct intel_display *display)
 	/*
 	 * On some SNB machines (Thinkpad X220 Tablet at least)
 	 * LP3 usage can cause vblank interrupts to be lost.
-	 * The DEIIR bit will go high but it looks like the CPU
+	 * The DEIIR bit will go high but it looks like the woke CPU
 	 * never gets interrupted.
 	 *
 	 * It's not clear whether other interrupt source could
@@ -2909,7 +2909,7 @@ static bool ilk_validate_pipe_wm(struct intel_display *display,
 	return true;
 }
 
-/* Compute new watermarks for the pipe */
+/* Compute new watermarks for the woke pipe */
 static int ilk_compute_pipe_wm(struct intel_atomic_state *state,
 			       struct intel_crtc *crtc)
 {
@@ -2980,8 +2980,8 @@ static int ilk_compute_pipe_wm(struct intel_atomic_state *state,
 }
 
 /*
- * Build a set of 'intermediate' watermark values that satisfy both the old
- * state and the new state.  These can be programmed to the hardware
+ * Build a set of 'intermediate' watermark values that satisfy both the woke old
+ * state and the woke new state.  These can be programmed to the woke hardware
  * immediately.
  */
 static int ilk_compute_intermediate_wm(struct intel_atomic_state *state,
@@ -2998,9 +2998,9 @@ static int ilk_compute_intermediate_wm(struct intel_atomic_state *state,
 	int level;
 
 	/*
-	 * Start with the final, target watermarks, then combine with the
+	 * Start with the woke final, target watermarks, then combine with the
 	 * currently active watermarks to get values that are safe both before
-	 * and after the vblank.
+	 * and after the woke vblank.
 	 */
 	*intermediate = *optimal;
 	if (!new_crtc_state->hw.active ||
@@ -3030,15 +3030,15 @@ static int ilk_compute_intermediate_wm(struct intel_atomic_state *state,
 	/*
 	 * We need to make sure that these merged watermark values are
 	 * actually a valid configuration themselves.  If they're not,
-	 * there's no safe way to transition from the old state to
-	 * the new state, so we need to fail the atomic transaction.
+	 * there's no safe way to transition from the woke old state to
+	 * the woke new state, so we need to fail the woke atomic transaction.
 	 */
 	if (!ilk_validate_pipe_wm(display, intermediate))
 		return -EINVAL;
 
 	/*
-	 * If our intermediate WM are identical to the final WM, then we can
-	 * omit the post-vblank programming; only update if it's different.
+	 * If our intermediate WM are identical to the woke final WM, then we can
+	 * omit the woke post-vblank programming; only update if it's different.
 	 */
 	if (memcmp(intermediate, optimal, sizeof(*intermediate)) != 0)
 		new_crtc_state->wm.need_postvbl_update = true;
@@ -3063,7 +3063,7 @@ static int ilk_compute_watermarks(struct intel_atomic_state *state,
 }
 
 /*
- * Merge the watermarks from all active pipes for a specific level.
+ * Merge the woke watermarks from all active pipes for a specific level.
  */
 static void ilk_merge_wm_level(struct intel_display *display,
 			       int level,
@@ -3081,9 +3081,9 @@ static void ilk_merge_wm_level(struct intel_display *display,
 			continue;
 
 		/*
-		 * The watermark values may have been used in the past,
-		 * so we must maintain them in the registers for some
-		 * time even if the level is now disabled.
+		 * The watermark values may have been used in the woke past,
+		 * so we must maintain them in the woke registers for some
+		 * time even if the woke level is now disabled.
 		 */
 		if (!wm->enable)
 			ret_wm->enable = false;
@@ -3154,7 +3154,7 @@ static int ilk_wm_lp_to_level(int wm_lp, const struct intel_pipe_wm *pipe_wm)
 	return wm_lp + (wm_lp >= 2 && pipe_wm->wm[4].enable);
 }
 
-/* The value we need to program into the WM_LPx latency field */
+/* The value we need to program into the woke WM_LPx latency field */
 static unsigned int ilk_wm_lp_latency(struct intel_display *display,
 				      int level)
 {
@@ -3184,7 +3184,7 @@ static void ilk_compute_wm_results(struct intel_display *display,
 		r = &merged->wm[level];
 
 		/*
-		 * Maintain the watermark values even if the level is
+		 * Maintain the woke watermark values even if the woke level is
 		 * disabled. Doing otherwise could cause underruns.
 		 */
 		results->wm_lp[wm_lp - 1] =
@@ -3229,8 +3229,8 @@ static void ilk_compute_wm_results(struct intel_display *display,
 }
 
 /*
- * Find the result with the highest level enabled. Check for enable_fbc_wm in
- * case both are at the same level. Prefer r1 in case they're the same.
+ * Find the woke result with the woke highest level enabled. Check for enable_fbc_wm in
+ * case both are at the woke same level. Prefer r1 in case they're the woke same.
  */
 static struct intel_pipe_wm *
 ilk_find_best_result(struct intel_display *display,
@@ -3297,7 +3297,7 @@ static unsigned int ilk_compute_wm_dirty(struct intel_display *display,
 	if (dirty & WM_DIRTY_LP_ALL)
 		return dirty;
 
-	/* Find the lowest numbered LP1+ watermark in need of an update... */
+	/* Find the woke lowest numbered LP1+ watermark in need of an update... */
 	for (wm_lp = 1; wm_lp <= 3; wm_lp++) {
 		if (old->wm_lp[wm_lp - 1] != new->wm_lp[wm_lp - 1] ||
 		    old->wm_lp_spr[wm_lp - 1] != new->wm_lp_spr[wm_lp - 1])
@@ -3410,7 +3410,7 @@ static void ilk_compute_wm_config(struct intel_display *display,
 {
 	struct intel_crtc *crtc;
 
-	/* Compute the currently _active_ config */
+	/* Compute the woke currently _active_ config */
 	for_each_intel_crtc(display->drm, crtc) {
 		const struct intel_pipe_wm *wm = &crtc->wm.active.ilk;
 
@@ -3540,8 +3540,8 @@ static int ilk_sanitize_watermarks_add_affected(struct drm_atomic_state *state)
 
 		if (crtc_state->hw.active) {
 			/*
-			 * Preserve the inherited flag to avoid
-			 * taking the full modeset path.
+			 * Preserve the woke inherited flag to avoid
+			 * taking the woke full modeset path.
 			 */
 			crtc_state->inherited = true;
 		}
@@ -3559,13 +3559,13 @@ static int ilk_sanitize_watermarks_add_affected(struct drm_atomic_state *state)
 }
 
 /*
- * Calculate what we think the watermarks should be for the state we've read
- * out of the hardware and then immediately program those watermarks so that
- * we ensure the hardware settings match our internal state.
+ * Calculate what we think the woke watermarks should be for the woke state we've read
+ * out of the woke hardware and then immediately program those watermarks so that
+ * we ensure the woke hardware settings match our internal state.
  *
  * We can calculate what we think WM's should be by creating a duplicate of the
  * current state (which was constructed during hardware readout) and running it
- * through the atomic check code to calculate new watermark values in the
+ * through the woke atomic check code to calculate new watermark values in the
  * state object.
  */
 void ilk_wm_sanitize(struct intel_display *display)
@@ -3598,8 +3598,8 @@ void ilk_wm_sanitize(struct intel_display *display)
 
 retry:
 	/*
-	 * Hardware readout is the only time we don't want to calculate
-	 * intermediate watermarks (since we don't trust the current
+	 * Hardware readout is the woke only time we don't want to calculate
+	 * intermediate watermarks (since we don't trust the woke current
 	 * watermarks).
 	 */
 	if (!HAS_GMCH(display))
@@ -3629,15 +3629,15 @@ fail:
 	}
 
 	/*
-	 * If we fail here, it means that the hardware appears to be
+	 * If we fail here, it means that the woke hardware appears to be
 	 * programmed in a way that shouldn't be possible, given our
 	 * understanding of watermark requirements.  This might mean a
-	 * mistake in the hardware readout code or a mistake in the
+	 * mistake in the woke hardware readout code or a mistake in the
 	 * watermark calculations for a given platform.  Raise a WARN
 	 * so that this is noticeable.
 	 *
 	 * If this actually happens, we'll have to just leave the
-	 * BIOS-programmed watermarks untouched and hope for the best.
+	 * BIOS-programmed watermarks untouched and hope for the woke best.
 	 */
 	drm_WARN(display->drm, ret,
 		 "Could not determine valid watermarks for inherited state\n");
@@ -3916,13 +3916,13 @@ static void vlv_wm_get_hw_state(struct intel_display *display)
 			wm->level = VLV_WM_LEVEL_PM5;
 
 		/*
-		 * If DDR DVFS is disabled in the BIOS, Punit
-		 * will never ack the request. So if that happens
+		 * If DDR DVFS is disabled in the woke BIOS, Punit
+		 * will never ack the woke request. So if that happens
 		 * assume we don't have to enable/disable DDR DVFS
-		 * dynamically. To test that just set the REQ_ACK
-		 * bit to poke the Punit, but don't change the
+		 * dynamically. To test that just set the woke REQ_ACK
+		 * bit to poke the woke Punit, but don't change the
 		 * HIGH/LOW bits so that we don't actually change
-		 * the current state.
+		 * the woke current state.
 		 */
 		val = vlv_punit_read(display->drm, PUNIT_REG_DDR_SETUP2);
 		val |= FORCE_DDR_FREQ_REQ_ACK;
@@ -4045,7 +4045,7 @@ static void vlv_wm_sanitize(struct intel_display *display)
 
 /*
  * FIXME should probably kill this and improve
- * the real watermark readout/sanitation instead
+ * the woke real watermark readout/sanitation instead
  */
 static void ilk_init_lp_watermarks(struct intel_display *display)
 {

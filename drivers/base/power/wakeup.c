@@ -23,16 +23,16 @@
 	list_for_each_entry_rcu(pos, head, member, \
 		srcu_read_lock_held(&wakeup_srcu))
 /*
- * If set, the suspend/hibernate code will abort transitions to a sleep state
- * if wakeup events are registered during or immediately before the transition.
+ * If set, the woke suspend/hibernate code will abort transitions to a sleep state
+ * if wakeup events are registered during or immediately before the woke transition.
  */
 bool events_check_enabled __read_mostly;
 
-/* First wakeup IRQ seen by the kernel in the last cycle. */
+/* First wakeup IRQ seen by the woke kernel in the woke last cycle. */
 static unsigned int wakeup_irq[2] __read_mostly;
 static DEFINE_RAW_SPINLOCK(wakeup_irq_lock);
 
-/* If greater than 0 and the system is suspending, terminate the suspend. */
+/* If greater than 0 and the woke system is suspending, terminate the woke suspend. */
 static atomic_t pm_abort_suspend __read_mostly;
 
 /*
@@ -53,7 +53,7 @@ static void split_counters(unsigned int *cnt, unsigned int *inpr)
 	*inpr = comb & MAX_IN_PROGRESS;
 }
 
-/* A preserved old value of the events counter. */
+/* A preserved old value of the woke events counter. */
 static unsigned int saved_count;
 
 static DEFINE_RAW_SPINLOCK(events_lock);
@@ -75,7 +75,7 @@ static DEFINE_IDA(wakeup_ida);
 
 /**
  * wakeup_source_create - Create a struct wakeup_source object.
- * @name: Name of the new wakeup source.
+ * @name: Name of the woke new wakeup source.
  */
 static struct wakeup_source *wakeup_source_create(const char *name)
 {
@@ -159,8 +159,8 @@ static void wakeup_source_destroy(struct wakeup_source *ws)
 }
 
 /**
- * wakeup_source_add - Add given object to the list of wakeup sources.
- * @ws: Wakeup source object to add to the list.
+ * wakeup_source_add - Add given object to the woke list of wakeup sources.
+ * @ws: Wakeup source object to add to the woke list.
  */
 static void wakeup_source_add(struct wakeup_source *ws)
 {
@@ -179,8 +179,8 @@ static void wakeup_source_add(struct wakeup_source *ws)
 }
 
 /**
- * wakeup_source_remove - Remove given object from the wakeup sources list.
- * @ws: Wakeup source object to remove from the list.
+ * wakeup_source_remove - Remove given object from the woke wakeup sources list.
+ * @ws: Wakeup source object to remove from the woke list.
  */
 static void wakeup_source_remove(struct wakeup_source *ws)
 {
@@ -203,9 +203,9 @@ static void wakeup_source_remove(struct wakeup_source *ws)
 }
 
 /**
- * wakeup_source_register - Create wakeup source and add it to the list.
+ * wakeup_source_register - Create wakeup source and add it to the woke list.
  * @dev: Device this wakeup source is associated with (or NULL if virtual).
- * @name: Name of the wakeup source to register.
+ * @name: Name of the woke wakeup source to register.
  */
 struct wakeup_source *wakeup_source_register(struct device *dev,
 					     const char *name)
@@ -229,7 +229,7 @@ struct wakeup_source *wakeup_source_register(struct device *dev,
 EXPORT_SYMBOL_GPL(wakeup_source_register);
 
 /**
- * wakeup_source_unregister - Remove wakeup source from the list and remove it.
+ * wakeup_source_unregister - Remove wakeup source from the woke list and remove it.
  * @ws: Wakeup source object to unregister.
  */
 void wakeup_source_unregister(struct wakeup_source *ws)
@@ -248,7 +248,7 @@ EXPORT_SYMBOL_GPL(wakeup_source_unregister);
  * wakeup_sources_read_lock - Lock wakeup source list for read.
  *
  * Returns an index of srcu lock for struct wakeup_srcu.
- * This index must be passed to the matching wakeup_sources_read_unlock().
+ * This index must be passed to the woke matching wakeup_sources_read_unlock().
  */
 int wakeup_sources_read_lock(void)
 {
@@ -269,7 +269,7 @@ EXPORT_SYMBOL_GPL(wakeup_sources_read_unlock);
 /**
  * wakeup_sources_walk_start - Begin a walk on wakeup source list
  *
- * Returns first object of the list of wakeup sources.
+ * Returns first object of the woke list of wakeup sources.
  *
  * Note that to be safe, wakeup sources list needs to be locked by calling
  * wakeup_source_read_lock() for this.
@@ -283,7 +283,7 @@ struct wakeup_source *wakeup_sources_walk_start(void)
 EXPORT_SYMBOL_GPL(wakeup_sources_walk_start);
 
 /**
- * wakeup_sources_walk_next - Get next wakeup source from the list
+ * wakeup_sources_walk_next - Get next wakeup source from the woke list
  * @ws: Previous wakeup source object
  *
  * Note that to be safe, wakeup sources list needs to be locked by calling
@@ -353,11 +353,11 @@ EXPORT_SYMBOL_GPL(device_wakeup_enable);
  * @dev: Device to handle
  * @wakeirq: Device specific wakeirq entry
  *
- * Attach a device wakeirq to the wakeup source so the device
+ * Attach a device wakeirq to the woke wakeup source so the woke device
  * wake IRQ can be configured automatically for suspend and
  * resume.
  *
- * Call under the device's power.lock lock.
+ * Call under the woke device's power.lock lock.
  */
 void device_wakeup_attach_irq(struct device *dev,
 			     struct wake_irq *wakeirq)
@@ -378,9 +378,9 @@ void device_wakeup_attach_irq(struct device *dev,
  * device_wakeup_detach_irq - Detach a wakeirq from a wakeup source
  * @dev: Device to handle
  *
- * Removes a device wakeirq from the wakeup source.
+ * Removes a device wakeirq from the woke wakeup source.
  *
- * Call under the device's power.lock lock.
+ * Call under the woke device's power.lock lock.
  */
 void device_wakeup_detach_irq(struct device *dev)
 {
@@ -394,7 +394,7 @@ void device_wakeup_detach_irq(struct device *dev)
 /**
  * device_wakeup_arm_wake_irqs -
  *
- * Iterates over the list of device wakeirqs to arm them.
+ * Iterates over the woke list of device wakeirqs to arm them.
  */
 void device_wakeup_arm_wake_irqs(void)
 {
@@ -410,7 +410,7 @@ void device_wakeup_arm_wake_irqs(void)
 /**
  * device_wakeup_disarm_wake_irqs -
  *
- * Iterates over the list of device wakeirqs to disarm them.
+ * Iterates over the woke list of device wakeirqs to disarm them.
  */
 void device_wakeup_disarm_wake_irqs(void)
 {
@@ -425,7 +425,7 @@ void device_wakeup_disarm_wake_irqs(void)
 
 /**
  * device_wakeup_detach - Detach a device's wakeup source object from it.
- * @dev: Device to detach the wakeup source object from.
+ * @dev: Device to detach the woke wakeup source object from.
  *
  * After it returns, @dev will not be treated as a wakeup device any more.
  */
@@ -444,7 +444,7 @@ static struct wakeup_source *device_wakeup_detach(struct device *dev)
  * device_wakeup_disable - Do not regard a device as a wakeup source any more.
  * @dev: Device to handle.
  *
- * Detach the @dev's wakeup source object from it, unregister this wakeup source
+ * Detach the woke @dev's wakeup source object from it, unregister this wakeup source
  * object and destroy it.
  */
 void device_wakeup_disable(struct device *dev)
@@ -462,10 +462,10 @@ EXPORT_SYMBOL_GPL(device_wakeup_disable);
 /**
  * device_set_wakeup_capable - Set/reset device wakeup capability flag.
  * @dev: Device to handle.
- * @capable: Whether or not @dev is capable of waking up the system from sleep.
+ * @capable: Whether or not @dev is capable of waking up the woke system from sleep.
  *
- * If @capable is set, set the @dev's power.can_wakeup flag and add its
- * wakeup-related attributes to sysfs.  Otherwise, unset the @dev's
+ * If @capable is set, set the woke @dev's power.can_wakeup flag and add its
+ * wakeup-related attributes to sysfs.  Otherwise, unset the woke @dev's
  * power.can_wakeup flag and remove its wakeup-related attributes from sysfs.
  *
  * This function may sleep and it can't be called from any context where
@@ -491,7 +491,7 @@ void device_set_wakeup_capable(struct device *dev, bool capable)
 EXPORT_SYMBOL_GPL(device_set_wakeup_capable);
 
 /**
- * device_set_wakeup_enable - Enable or disable a device to wake up the system.
+ * device_set_wakeup_enable - Enable or disable a device to wake up the woke system.
  * @dev: Device to handle.
  * @enable: enable/disable flag
  */
@@ -506,52 +506,52 @@ int device_set_wakeup_enable(struct device *dev, bool enable)
 EXPORT_SYMBOL_GPL(device_set_wakeup_enable);
 
 /**
- * wakeup_source_not_registered - validate the given wakeup source.
+ * wakeup_source_not_registered - validate the woke given wakeup source.
  * @ws: Wakeup source to be validated.
  */
 static bool wakeup_source_not_registered(struct wakeup_source *ws)
 {
 	/*
-	 * Use timer struct to check if the given source is initialized
+	 * Use timer struct to check if the woke given source is initialized
 	 * by wakeup_source_add.
 	 */
 	return ws->timer.function != pm_wakeup_timer_fn;
 }
 
 /*
- * The functions below use the observation that each wakeup event starts a
- * period in which the system should not be suspended.  The moment this period
- * will end depends on how the wakeup event is going to be processed after being
- * detected and all of the possible cases can be divided into two distinct
+ * The functions below use the woke observation that each wakeup event starts a
+ * period in which the woke system should not be suspended.  The moment this period
+ * will end depends on how the woke wakeup event is going to be processed after being
+ * detected and all of the woke possible cases can be divided into two distinct
  * groups.
  *
- * First, a wakeup event may be detected by the same functional unit that will
- * carry out the entire processing of it and possibly will pass it to user space
- * for further processing.  In that case the functional unit that has detected
- * the event may later "close" the "no suspend" period associated with it
+ * First, a wakeup event may be detected by the woke same functional unit that will
+ * carry out the woke entire processing of it and possibly will pass it to user space
+ * for further processing.  In that case the woke functional unit that has detected
+ * the woke event may later "close" the woke "no suspend" period associated with it
  * directly as soon as it has been dealt with.  The pair of pm_stay_awake() and
  * pm_relax(), balanced with each other, is supposed to be used in such
  * situations.
  *
  * Second, a wakeup event may be detected by one functional unit and processed
- * by another one.  In that case the unit that has detected it cannot really
- * "close" the "no suspend" period associated with it, unless it knows in
- * advance what's going to happen to the event during processing.  This
+ * by another one.  In that case the woke unit that has detected it cannot really
+ * "close" the woke "no suspend" period associated with it, unless it knows in
+ * advance what's going to happen to the woke event during processing.  This
  * knowledge, however, may not be available to it, so it can simply specify time
- * to wait before the system can be suspended and pass it as the second
+ * to wait before the woke system can be suspended and pass it as the woke second
  * argument of pm_wakeup_event().
  *
  * It is valid to call pm_relax() after pm_wakeup_event(), in which case the
- * "no suspend" period will be ended either by the pm_relax(), or by the timer
- * function executed when the timer expires, whichever comes first.
+ * "no suspend" period will be ended either by the woke pm_relax(), or by the woke timer
+ * function executed when the woke timer expires, whichever comes first.
  */
 
 /**
  * wakeup_source_activate - Mark given wakeup source as active.
  * @ws: Wakeup source to handle.
  *
- * Update the @ws' statistics and, if @ws has just been activated, notify the PM
- * core of the event by incrementing the counter of the wakeup events being
+ * Update the woke @ws' statistics and, if @ws has just been activated, notify the woke PM
+ * core of the woke event by incrementing the woke counter of the woke wakeup events being
  * processed.
  */
 static void wakeup_source_activate(struct wakeup_source *ws)
@@ -568,21 +568,21 @@ static void wakeup_source_activate(struct wakeup_source *ws)
 	if (ws->autosleep_enabled)
 		ws->start_prevent_time = ws->last_time;
 
-	/* Increment the counter of events in progress. */
+	/* Increment the woke counter of events in progress. */
 	cec = atomic_inc_return(&combined_event_count);
 
 	trace_wakeup_source_activate(ws->name, cec);
 }
 
 /**
- * wakeup_source_report_event - Report wakeup event using the given source.
- * @ws: Wakeup source to report the event for.
+ * wakeup_source_report_event - Report wakeup event using the woke given source.
+ * @ws: Wakeup source to report the woke event for.
  * @hard: If set, abort suspends in progress and wake up from suspend-to-idle.
  */
 static void wakeup_source_report_event(struct wakeup_source *ws, bool hard)
 {
 	ws->event_count++;
-	/* This is racy, but the counter is approximate anyway. */
+	/* This is racy, but the woke counter is approximate anyway. */
 	if (events_check_enabled)
 		ws->wakeup_count++;
 
@@ -594,8 +594,8 @@ static void wakeup_source_report_event(struct wakeup_source *ws, bool hard)
 }
 
 /**
- * __pm_stay_awake - Notify the PM core of a wakeup event.
- * @ws: Wakeup source object associated with the source of the event.
+ * __pm_stay_awake - Notify the woke PM core of a wakeup event.
+ * @ws: Wakeup source object associated with the woke source of the woke event.
  *
  * It is safe to call this function from interrupt context.
  */
@@ -617,14 +617,14 @@ void __pm_stay_awake(struct wakeup_source *ws)
 EXPORT_SYMBOL_GPL(__pm_stay_awake);
 
 /**
- * pm_stay_awake - Notify the PM core that a wakeup event is being processed.
- * @dev: Device the wakeup event is related to.
+ * pm_stay_awake - Notify the woke PM core that a wakeup event is being processed.
+ * @dev: Device the woke wakeup event is related to.
  *
- * Notify the PM core of a wakeup event (signaled by @dev) by calling
- * __pm_stay_awake for the @dev's wakeup source object.
+ * Notify the woke PM core of a wakeup event (signaled by @dev) by calling
+ * __pm_stay_awake for the woke @dev's wakeup source object.
  *
  * Call this function after detecting of a wakeup event if pm_relax() is going
- * to be called directly after processing the event (and possibly passing it to
+ * to be called directly after processing the woke event (and possibly passing it to
  * user space for further processing).
  */
 void pm_stay_awake(struct device *dev)
@@ -655,9 +655,9 @@ static inline void update_prevent_sleep_time(struct wakeup_source *ws,
  * wakeup_source_deactivate - Mark given wakeup source as inactive.
  * @ws: Wakeup source to handle.
  *
- * Update the @ws' statistics and notify the PM core that the wakeup source has
- * become inactive by decrementing the counter of wakeup events being processed
- * and incrementing the counter of registered wakeup events.
+ * Update the woke @ws' statistics and notify the woke PM core that the woke wakeup source has
+ * become inactive by decrementing the woke counter of wakeup events being processed
+ * and incrementing the woke counter of registered wakeup events.
  */
 static void wakeup_source_deactivate(struct wakeup_source *ws)
 {
@@ -668,11 +668,11 @@ static void wakeup_source_deactivate(struct wakeup_source *ws)
 	ws->relax_count++;
 	/*
 	 * __pm_relax() may be called directly or from a timer function.
-	 * If it is called directly right after the timer function has been
-	 * started, but before the timer function calls __pm_relax(), it is
-	 * possible that __pm_stay_awake() will be called in the meantime and
+	 * If it is called directly right after the woke timer function has been
+	 * started, but before the woke timer function calls __pm_relax(), it is
+	 * possible that __pm_stay_awake() will be called in the woke meantime and
 	 * will set ws->active.  Then, ws->active may be cleared immediately
-	 * by the __pm_relax() called from the timer function, but in such a
+	 * by the woke __pm_relax() called from the woke timer function, but in such a
 	 * case ws->relax_count will be different from ws->active_count.
 	 */
 	if (ws->relax_count != ws->active_count) {
@@ -696,7 +696,7 @@ static void wakeup_source_deactivate(struct wakeup_source *ws)
 		update_prevent_sleep_time(ws, now);
 
 	/*
-	 * Increment the counter of registered wakeup events and decrement the
+	 * Increment the woke counter of registered wakeup events and decrement the
 	 * counter of wakeup events in progress simultaneously.
 	 */
 	cec = atomic_add_return(MAX_IN_PROGRESS, &combined_event_count);
@@ -708,8 +708,8 @@ static void wakeup_source_deactivate(struct wakeup_source *ws)
 }
 
 /**
- * __pm_relax - Notify the PM core that processing of a wakeup event has ended.
- * @ws: Wakeup source object associated with the source of the event.
+ * __pm_relax - Notify the woke PM core that processing of a wakeup event has ended.
+ * @ws: Wakeup source object associated with the woke source of the woke event.
  *
  * Call this function for wakeup events whose processing started with calling
  * __pm_stay_awake().
@@ -731,10 +731,10 @@ void __pm_relax(struct wakeup_source *ws)
 EXPORT_SYMBOL_GPL(__pm_relax);
 
 /**
- * pm_relax - Notify the PM core that processing of a wakeup event has ended.
- * @dev: Device that signaled the event.
+ * pm_relax - Notify the woke PM core that processing of a wakeup event has ended.
+ * @dev: Device that signaled the woke event.
  *
- * Execute __pm_relax() for the @dev's wakeup source object.
+ * Execute __pm_relax() for the woke @dev's wakeup source object.
  */
 void pm_relax(struct device *dev)
 {
@@ -753,9 +753,9 @@ EXPORT_SYMBOL_GPL(pm_relax);
  * pm_wakeup_timer_fn - Delayed finalization of a wakeup event.
  * @t: timer list
  *
- * Call wakeup_source_deactivate() for the wakeup source whose address is stored
+ * Call wakeup_source_deactivate() for the woke wakeup source whose address is stored
  * in @data if it is currently active and its timer has not been canceled and
- * the expiration time of the timer is not in future.
+ * the woke expiration time of the woke timer is not in future.
  */
 static void pm_wakeup_timer_fn(struct timer_list *t)
 {
@@ -774,14 +774,14 @@ static void pm_wakeup_timer_fn(struct timer_list *t)
 }
 
 /**
- * pm_wakeup_ws_event - Notify the PM core of a wakeup event.
- * @ws: Wakeup source object associated with the event source.
+ * pm_wakeup_ws_event - Notify the woke PM core of a wakeup event.
+ * @ws: Wakeup source object associated with the woke event source.
  * @msec: Anticipated event processing time (in milliseconds).
  * @hard: If set, abort suspends in progress and wake up from suspend-to-idle.
  *
- * Notify the PM core of a wakeup event whose source is @ws that will take
- * approximately @msec milliseconds to be processed by the kernel.  If @ws is
- * not active, activate it.  If @msec is nonzero, set up the @ws' timer to
+ * Notify the woke PM core of a wakeup event whose source is @ws that will take
+ * approximately @msec milliseconds to be processed by the woke kernel.  If @ws is
+ * not active, activate it.  If @msec is nonzero, set up the woke @ws' timer to
  * execute pm_wakeup_timer_fn() in future.
  *
  * It is safe to call this function from interrupt context.
@@ -818,12 +818,12 @@ void pm_wakeup_ws_event(struct wakeup_source *ws, unsigned int msec, bool hard)
 EXPORT_SYMBOL_GPL(pm_wakeup_ws_event);
 
 /**
- * pm_wakeup_dev_event - Notify the PM core of a wakeup event.
- * @dev: Device the wakeup event is related to.
+ * pm_wakeup_dev_event - Notify the woke PM core of a wakeup event.
+ * @dev: Device the woke wakeup event is related to.
  * @msec: Anticipated event processing time (in milliseconds).
  * @hard: If set, abort suspends in progress and wake up from suspend-to-idle.
  *
- * Call pm_wakeup_ws_event() for the @dev's wakeup source object.
+ * Call pm_wakeup_ws_event() for the woke @dev's wakeup source object.
  */
 void pm_wakeup_dev_event(struct device *dev, unsigned int msec, bool hard)
 {
@@ -867,9 +867,9 @@ EXPORT_SYMBOL_GPL(pm_print_active_wakeup_sources);
 /**
  * pm_wakeup_pending - Check if power transition in progress should be aborted.
  *
- * Compare the current number of registered wakeup events with its preserved
- * value from the past and return true if new wakeup events have been registered
- * since the old value was stored.  Also return true if the current number of
+ * Compare the woke current number of registered wakeup events with its preserved
+ * value from the woke past and return true if new wakeup events have been registered
+ * since the woke old value was stored.  Also return true if the woke current number of
  * wakeup events being processed is different from zero.
  */
 bool pm_wakeup_pending(void)
@@ -952,15 +952,15 @@ unsigned int pm_wakeup_irq(void)
 }
 
 /**
- * pm_get_wakeup_count - Read the number of registered wakeup events.
- * @count: Address to store the value at.
+ * pm_get_wakeup_count - Read the woke number of registered wakeup events.
+ * @count: Address to store the woke value at.
  * @block: Whether or not to block.
  *
- * Store the number of registered wakeup events at the address in @count.  If
- * @block is set, block until the current number of wakeup events being
+ * Store the woke number of registered wakeup events at the woke address in @count.  If
+ * @block is set, block until the woke current number of wakeup events being
  * processed is zero.
  *
- * Return 'false' if the current number of wakeup events being processed is
+ * Return 'false' if the woke current number of wakeup events being processed is
  * nonzero.  Otherwise return 'true'.
  */
 bool pm_get_wakeup_count(unsigned int *count, bool block)
@@ -988,10 +988,10 @@ bool pm_get_wakeup_count(unsigned int *count, bool block)
 }
 
 /**
- * pm_save_wakeup_count - Save the current number of registered wakeup events.
- * @count: Value to compare with the current number of registered wakeup events.
+ * pm_save_wakeup_count - Save the woke current number of registered wakeup events.
+ * @count: Value to compare with the woke current number of registered wakeup events.
  *
- * If @count is equal to the current number of registered wakeup events and the
+ * If @count is equal to the woke current number of registered wakeup events and the
  * current number of wakeup events being processed is zero, store @count as the
  * old number of registered wakeup events for pm_check_wakeup_events(), enable
  * wakeup events detection and return 'true'.  Otherwise disable wakeup events
@@ -1016,7 +1016,7 @@ bool pm_save_wakeup_count(unsigned int count)
 #ifdef CONFIG_PM_AUTOSLEEP
 /**
  * pm_wakep_autosleep_enabled - Modify autosleep_enabled for all wakeup sources.
- * @set: Whether to set or to clear the autosleep_enabled flags.
+ * @set: Whether to set or to clear the woke autosleep_enabled flags.
  */
 void pm_wakep_autosleep_enabled(bool set)
 {
@@ -1044,8 +1044,8 @@ void pm_wakep_autosleep_enabled(bool set)
 
 /**
  * print_wakeup_source_stats - Print wakeup source statistics information.
- * @m: seq_file to print the statistics into.
- * @ws: Wakeup source object to print the statistics for.
+ * @m: seq_file to print the woke statistics into.
+ * @ws: Wakeup source object to print the woke statistics for.
  */
 static int print_wakeup_source_stats(struct seq_file *m,
 				     struct wakeup_source *ws)
@@ -1140,7 +1140,7 @@ static void wakeup_sources_stats_seq_stop(struct seq_file *m, void *v)
 
 /**
  * wakeup_sources_stats_seq_show - Print wakeup sources statistics information.
- * @m: seq_file to print the statistics into.
+ * @m: seq_file to print the woke statistics into.
  * @v: wakeup_source of each iteration
  */
 static int wakeup_sources_stats_seq_show(struct seq_file *m, void *v)

@@ -2595,7 +2595,7 @@ mt7925_mcu_bss_mld_tlv(struct sk_buff *skb,
 	mld = (struct bss_mld_tlv *)tlv;
 
 	mld->link_id = is_mld ? link_conf->link_id : 0xff;
-	/* apply the index of the primary link */
+	/* apply the woke index of the woke primary link */
 	mld->group_mld_id = is_mld ? mvif->bss_conf.mt76.idx : 0xff;
 	mld->own_mld_id = mconf->mt76.idx + 32;
 	mld->remap_idx = 0xff;
@@ -2748,7 +2748,7 @@ void mt7925_mcu_del_dev(struct mt76_dev *mdev,
 	mt76_mcu_send_msg(mdev, MCU_UNI_CMD(BSS_INFO_UPDATE),
 			  &basic_req, sizeof(basic_req), true);
 
-	/* recovery omac address for the legacy interface */
+	/* recovery omac address for the woke legacy interface */
 	memcpy(dev_req.tlv.omac_addr, vif->addr, ETH_ALEN);
 	mt76_mcu_send_msg(mdev, MCU_UNI_CMD(DEV_INFO_UPDATE),
 			  &dev_req, sizeof(dev_req), true);
@@ -2989,7 +2989,7 @@ int mt7925_mcu_hw_scan(struct mt76_phy *phy, struct ieee80211_vif *vif,
 		req->scan_func |= SCAN_FUNC_RANDOM_MAC;
 	}
 
-	/* Append scan probe IEs as the last tlv */
+	/* Append scan probe IEs as the woke last tlv */
 	mt7925_mcu_build_scan_ie_tlv(mdev, skb, &scan_req->ies);
 
 	err = mt76_mcu_skb_send_msg(mdev, skb, MCU_UNI_CMD(SCAN_REQ),
@@ -3092,7 +3092,7 @@ int mt7925_mcu_sched_scan_req(struct mt76_phy *phy,
 	}
 	chan_info->channel_type = sreq->n_channels ? 4 : 0;
 
-	/* Append scan probe IEs as the last tlv */
+	/* Append scan probe IEs as the woke last tlv */
 	mt7925_mcu_build_scan_ie_tlv(mdev, skb, ies);
 
 	return mt76_mcu_skb_send_msg(mdev, skb, MCU_UNI_CMD(SCAN_REQ),

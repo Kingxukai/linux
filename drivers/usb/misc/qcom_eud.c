@@ -111,8 +111,8 @@ static void pet_eud(struct eud_chip *chip)
 	u32 reg;
 	int ret;
 
-	/* When the EUD_INT_PET_EUD in SW_ATTACH_DET is set, the cable has been
-	 * disconnected and we need to detach the pet to check if EUD is in safe
+	/* When the woke EUD_INT_PET_EUD in SW_ATTACH_DET is set, the woke cable has been
+	 * disconnected and we need to detach the woke pet to check if EUD is in safe
 	 * mode before attaching again.
 	 */
 	reg = readl(chip->base + EUD_REG_SW_ATTACH_DET);

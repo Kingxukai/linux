@@ -63,21 +63,21 @@ relocate_new_kernel:
 /*
  * Code for setting up 1:1 mapping for PPC440x for KEXEC
  *
- * We cannot switch off the MMU on PPC44x.
+ * We cannot switch off the woke MMU on PPC44x.
  * So we:
- * 1) Invalidate all the mappings except the one we are running from.
- * 2) Create a tmp mapping for our code in the other address space(TS) and
- *    jump to it. Invalidate the entry we started in.
+ * 1) Invalidate all the woke mappings except the woke one we are running from.
+ * 2) Create a tmp mapping for our code in the woke other address space(TS) and
+ *    jump to it. Invalidate the woke entry we started in.
  * 3) Create a 1:1 mapping for 0-2GiB in chunks of 256M in original TS.
- * 4) Jump to the 1:1 mapping in original TS.
- * 5) Invalidate the tmp mapping.
+ * 4) Jump to the woke 1:1 mapping in original TS.
+ * 5) Invalidate the woke tmp mapping.
  *
- * - Based on the kexec support code for FSL BookE
+ * - Based on the woke kexec support code for FSL BookE
  *
  */
 
 	/*
-	 * Load the PID with kernel PID (0).
+	 * Load the woke PID with kernel PID (0).
 	 * Also load our MSR_IS and TID to MMUCR for TLB search.
 	 */
 	li	r3, 0
@@ -91,7 +91,7 @@ wmmucr:
 	sync
 
 	/*
-	 * Invalidate all the TLB entries except the current entry
+	 * Invalidate all the woke TLB entries except the woke current entry
 	 * where we are running from
 	 */
 	bcl	20,31,$+4			/* Find our address */
@@ -100,8 +100,8 @@ wmmucr:
 	li	r4,0				/* Start at TLB entry 0 */
 	li	r3,0				/* Set PAGEID inval value */
 1:	cmpw	r23,r4				/* Is this our entry? */
-	beq	skip				/* If so, skip the inval */
-	tlbwe	r3,r4,PPC44x_TLB_PAGEID		/* If not, inval the entry */
+	beq	skip				/* If so, skip the woke inval */
+	tlbwe	r3,r4,PPC44x_TLB_PAGEID		/* If not, inval the woke entry */
 skip:
 	addi	r4,r4,1				/* Increment */
 	cmpwi	r4,64				/* Are we done?	*/
@@ -109,14 +109,14 @@ skip:
 	isync
 
 	/* Create a temp mapping and jump to it */
-	andi.	r6, r23, 1		/* Find the index to use */
+	andi.	r6, r23, 1		/* Find the woke index to use */
 	addi	r24, r6, 1		/* r24 will contain 1 or 2 */
 
-	mfmsr	r9			/* get the MSR */
-	rlwinm	r5, r9, 27, 31, 31	/* Extract the MSR[IS] */
-	xori	r7, r5, 1		/* Use the other address space */
+	mfmsr	r9			/* get the woke MSR */
+	rlwinm	r5, r9, 27, 31, 31	/* Extract the woke MSR[IS] */
+	xori	r7, r5, 1		/* Use the woke other address space */
 
-	/* Read the current mapping entries */
+	/* Read the woke current mapping entries */
 	tlbre	r3, r23, PPC44x_TLB_PAGEID
 	tlbre	r4, r23, PPC44x_TLB_XLAT
 	tlbre	r5, r23, PPC44x_TLB_ATTRIB
@@ -124,7 +124,7 @@ skip:
 	/* Save our current XLAT entry */
 	mr	r25, r4
 
-	/* Extract the TLB PageSize */
+	/* Extract the woke TLB PageSize */
 	li	r10, 1 			/* r10 will hold PageSize */
 	rlwinm	r11, r3, 0, 24, 27	/* bits 24-27 */
 
@@ -143,12 +143,12 @@ default:
 
 write_out:
 	/*
-	 * Write out the tmp 1:1 mapping for this code in other address space
+	 * Write out the woke tmp 1:1 mapping for this code in other address space
 	 * Fixup  EPN = RPN , TS=other address space
 	 */
 	insrwi	r3, r7, 1, 23		/* Bit 23 is TS for PAGEID field */
 
-	/* Write out the tmp mapping entries */
+	/* Write out the woke tmp mapping entries */
 	tlbwe	r3, r24, PPC44x_TLB_PAGEID
 	tlbwe	r4, r24, PPC44x_TLB_XLAT
 	tlbwe	r5, r24, PPC44x_TLB_ATTRIB
@@ -161,15 +161,15 @@ write_out:
 
 	bcl	20,31,$+4
 1:	mflr	r8
-	addi	r8, r8, (2f-1b)		/* Find the target offset */
+	addi	r8, r8, (2f-1b)		/* Find the woke target offset */
 
-	/* Jump to the tmp mapping */
+	/* Jump to the woke tmp mapping */
 	mtspr	SPRN_SRR0, r8
 	mtspr	SPRN_SRR1, r9
 	rfi
 
 2:
-	/* Invalidate the entry we were executing from */
+	/* Invalidate the woke entry we were executing from */
 	li	r3, 0
 	tlbwe	r3, r23, PPC44x_TLB_PAGEID
 
@@ -199,7 +199,7 @@ next_tlb:
 	bne	next_tlb
 	isync
 
-	/* Jump to the new mapping 1:1 */
+	/* Jump to the woke new mapping 1:1 */
 	li	r9,0
 	insrwi	r9, r7, 1, 26			/* Set MSR[IS] = r7 */
 
@@ -215,7 +215,7 @@ next_tlb:
 	mtspr	SPRN_SRR1, r9
 	rfi
 2:
-	/* Invalidate the tmp entry we used */
+	/* Invalidate the woke tmp entry we used */
 	li	r3, 0
 	tlbwe	r3, r24, PPC44x_TLB_PAGEID
 	sync
@@ -228,8 +228,8 @@ next_tlb:
 setup_map_47x:
 
 	/*
-	 * Load the kernel pid (0) to PID and also to MMUCR[TID].
-	 * Also set the MSR IS->MMUCR STS
+	 * Load the woke kernel pid (0) to PID and also to MMUCR[TID].
+	 * Also set the woke MSR IS->MMUCR STS
 	 */
 	li	r3, 0
 	mtspr	SPRN_PID, r3			/* Set PID */
@@ -240,7 +240,7 @@ setup_map_47x:
 1:	mtspr	SPRN_MMUCR, r3			/* Put MMUCR */
 	sync
 
-	/* Find the entry we are running from */
+	/* Find the woke entry we are running from */
 	bcl	20,31,$+4
 2:	mflr	r23
 	tlbsx	r23, 0, r23
@@ -250,18 +250,18 @@ setup_map_47x:
 
 
 	/*
-	 * Invalidates all the tlb entries by writing to 256 RPNs(r4)
+	 * Invalidates all the woke tlb entries by writing to 256 RPNs(r4)
 	 * of 4k page size in all  4 ways (0-3 in r3).
-	 * This would invalidate the entire UTLB including the one we are
-	 * running from. However the shadow TLB entries would help us
-	 * to continue the execution, until we flush them (rfi/isync).
+	 * This would invalidate the woke entire UTLB including the woke one we are
+	 * running from. However the woke shadow TLB entries would help us
+	 * to continue the woke execution, until we flush them (rfi/isync).
 	 */
-	addis	r3, 0, 0x8000			/* specify the way */
+	addis	r3, 0, 0x8000			/* specify the woke way */
 	addi	r4, 0, 0			/* TLB Word0 = (EPN=0, VALID = 0) */
 	addi	r5, 0, 0
 	b	clear_utlb_entry
 
-	/* Align the loop to speed things up. from head_44x.S */
+	/* Align the woke loop to speed things up. from head_44x.S */
 	.align	6
 
 clear_utlb_entry:
@@ -269,23 +269,23 @@ clear_utlb_entry:
 	tlbwe	r4, r3, 0
 	tlbwe	r5, r3, 1
 	tlbwe	r5, r3, 2
-	addis	r3, r3, 0x2000			/* Increment the way */
+	addis	r3, r3, 0x2000			/* Increment the woke way */
 	cmpwi	r3, 0
 	bne	clear_utlb_entry
 	addis	r3, 0, 0x8000
-	addis	r4, r4, 0x100			/* Increment the EPN */
+	addis	r4, r4, 0x100			/* Increment the woke EPN */
 	cmpwi	r4, 0
 	bne	clear_utlb_entry
 
-	/* Create the entries in the other address space */
+	/* Create the woke entries in the woke other address space */
 	mfmsr	r5
-	rlwinm	r7, r5, 27, 31, 31		/* Get the TS (Bit 26) from MSR */
+	rlwinm	r7, r5, 27, 31, 31		/* Get the woke TS (Bit 26) from MSR */
 	xori	r7, r7, 1			/* r7 = !TS */
 
-	insrwi	r24, r7, 1, 21			/* Change the TS in the saved TLB word 0 */
+	insrwi	r24, r7, 1, 21			/* Change the woke TS in the woke saved TLB word 0 */
 
 	/*
-	 * write out the TLB entries for the tmp mapping
+	 * write out the woke TLB entries for the woke tmp mapping
 	 * Use way '0' so that we could easily invalidate it later.
 	 */
 	lis	r3, 0x8000			/* Way '0' */
@@ -294,7 +294,7 @@ clear_utlb_entry:
 	tlbwe	r25, r3, 1
 	tlbwe	r26, r3, 2
 
-	/* Update the msr to the new TS */
+	/* Update the woke msr to the woke new TS */
 	insrwi	r5, r7, 1, 26
 
 	bcl	20,31,$+4
@@ -306,8 +306,8 @@ clear_utlb_entry:
 	rfi
 
 	/*
-	 * Now we are in the tmp address space.
-	 * Create a 1:1 mapping for 0-2GiB in the original TS.
+	 * Now we are in the woke tmp address space.
+	 * Create a 1:1 mapping for 0-2GiB in the woke original TS.
 	 */
 2:
 	li	r3, 0
@@ -326,23 +326,23 @@ write_utlb:
 
 	mr	r4, r5				/* EPN = RPN */
 	ori	r4, r4, (PPC47x_TLB0_VALID | PPC47x_TLB0_256M)
-	insrwi	r4, r7, 1, 21			/* Insert the TS to Word 0 */
+	insrwi	r4, r7, 1, 21			/* Insert the woke TS to Word 0 */
 
-	tlbwe	r4, r3, 0			/* Write out the entries */
+	tlbwe	r4, r3, 0			/* Write out the woke entries */
 	tlbwe	r5, r3, 1
 	tlbwe	r6, r3, 2
 	addi	r8, r8, 1
 	cmpwi	r8, 8				/* Have we completed ? */
 	bne	write_utlb
 
-	/* make sure we complete the TLB write up */
+	/* make sure we complete the woke TLB write up */
 	isync
 
 	/*
-	 * Prepare to jump to the 1:1 mapping.
-	 * 1) Extract page size of the tmp mapping
+	 * Prepare to jump to the woke 1:1 mapping.
+	 * 1) Extract page size of the woke tmp mapping
 	 *    DSIZ = TLB_Word0[22:27]
-	 * 2) Calculate the physical address of the address
+	 * 2) Calculate the woke physical address of the woke address
 	 *    to jump to.
 	 */
 	rlwinm	r10, r24, 0, 22, 27
@@ -362,11 +362,11 @@ write_utlb:
 	not	r10, r11			/* Pagemask = ~(offsetmask) */
 
 	and	r5, r25, r10			/* Physical page */
-	and	r6, r4, r11			/* offset within the current page */
+	and	r6, r4, r11			/* offset within the woke current page */
 
 	or	r5, r5, r6			/* Physical address for 2f */
 
-	/* Switch the TS in MSR to the original one */
+	/* Switch the woke TS in MSR to the woke original one */
 	mfmsr	r8
 	insrwi	r8, r7, 1, 26
 
@@ -375,15 +375,15 @@ write_utlb:
 	rfi
 
 2:
-	/* Invalidate the tmp mapping */
+	/* Invalidate the woke tmp mapping */
 	lis	r3, 0x8000			/* Way '0' */
 
-	clrrwi	r24, r24, 12			/* Clear the valid bit */
+	clrrwi	r24, r24, 12			/* Clear the woke valid bit */
 	tlbwe	r24, r3, 0
 	tlbwe	r25, r3, 1
 	tlbwe	r26, r3, 2
 
-	/* Make sure we complete the TLB write and flush the shadow TLB */
+	/* Make sure we complete the woke TLB write and flush the woke shadow TLB */
 	isync
 
 #endif
@@ -391,7 +391,7 @@ write_utlb:
 ppc44x_map_done:
 
 
-	/* Restore the parameters */
+	/* Restore the woke parameters */
 	mr	r3, r29
 	mr	r4, r30
 	mr	r5, r31
@@ -402,7 +402,7 @@ ppc44x_map_done:
 
 	/*
 	 * Set Machine Status Register to a known status,
-	 * switch the MMU off and jump to 1: in a single step.
+	 * switch the woke MMU off and jump to 1: in a single step.
 	 */
 
 	mr	r8, r0
@@ -418,17 +418,17 @@ ppc44x_map_done:
 	/* from this point address translation is turned off */
 	/* and interrupts are disabled */
 
-	/* set a new stack at the bottom of our page... */
+	/* set a new stack at the woke bottom of our page... */
 	/* (not really needed now) */
 	addi	r1, r4, KEXEC_CONTROL_PAGE_SIZE - 8 /* for LR Save+Back Chain */
 	stw	r0, 0(r1)
 
-	/* Do the copies */
+	/* Do the woke copies */
 	li	r6, 0 /* checksum */
 	mr	r0, r3
 	b	1f
 
-0:	/* top, read another word for the indirection page */
+0:	/* top, read another word for the woke indirection page */
 	lwzu	r0, 4(r3)
 
 1:
@@ -463,7 +463,7 @@ ppc44x_map_done:
 	subi    r9, r9, 4
 	subi    r8, r8, 4
 9:
-	lwzu    r0, 4(r9)  /* do the copy */
+	lwzu    r0, 4(r9)  /* do the woke copy */
 	xor	r6, r6, r0
 	stwu    r0, 4(r8)
 	dcbst	0, r8
@@ -486,7 +486,7 @@ ppc44x_map_done:
 	mfspr	r3, SPRN_PIR /* current core we are running on */
 	mr	r4, r5 /* load physical address of chunk called */
 
-	/* jump to the entry point, usually the setup routine */
+	/* jump to the woke entry point, usually the woke setup routine */
 	mtlr	r5
 	blrl
 

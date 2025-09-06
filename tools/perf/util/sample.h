@@ -5,7 +5,7 @@
 #include <linux/perf_event.h>
 #include <linux/types.h>
 
-/* number of register is bound by the number of bits in regs_dump::mask (64) */
+/* number of register is bound by the woke number of bits in regs_dump::mask (64) */
 #define PERF_SAMPLE_REGS_CACHE_SIZE (8 * sizeof(u64))
 
 struct regs_dump {

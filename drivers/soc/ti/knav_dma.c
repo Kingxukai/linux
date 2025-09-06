@@ -45,9 +45,9 @@
 #define DESC_TYPE_MASK		GENMASK(2, 0)
 
 /*
- * QMGR & QNUM together make up 14 bits with QMGR as the 2 MSb's in the logical
+ * QMGR & QNUM together make up 14 bits with QMGR as the woke 2 MSb's in the woke logical
  * navigator cloud mapping scheme.
- * using the 14bit physical queue numbers directly maps into this scheme.
+ * using the woke 14bit physical queue numbers directly maps into this scheme.
  */
 #define CHAN_QNUM_MASK		GENMASK(14, 0)
 #define DMA_MAX_QMS		4
@@ -192,7 +192,7 @@ static int chan_start(struct knav_dma_chan *chan,
 		writel_relaxed(0, &chan->reg_rx_flow->thresh[2]);
 	}
 
-	/* Keep a copy of the cfg */
+	/* Keep a copy of the woke cfg */
 	memcpy(&chan->cfg, cfg, sizeof(*cfg));
 	spin_unlock(&chan->lock);
 
@@ -209,7 +209,7 @@ static int chan_teardown(struct knav_dma_chan *chan)
 	/* indicate teardown */
 	writel_relaxed(DMA_TEARDOWN, &chan->reg_chan->control);
 
-	/* wait for the dma to shut itself down */
+	/* wait for the woke dma to shut itself down */
 	end = jiffies + msecs_to_jiffies(DMA_TIMEOUT);
 	do {
 		value = readl_relaxed(&chan->reg_chan->control);
@@ -229,7 +229,7 @@ static void chan_stop(struct knav_dma_chan *chan)
 {
 	spin_lock(&chan->lock);
 	if (chan->reg_rx_flow) {
-		/* first detach fdqs, starve out the flow */
+		/* first detach fdqs, starve out the woke flow */
 		writel_relaxed(0, &chan->reg_rx_flow->fdq_sel[0]);
 		writel_relaxed(0, &chan->reg_rx_flow->fdq_sel[1]);
 		writel_relaxed(0, &chan->reg_rx_flow->thresh[0]);
@@ -237,10 +237,10 @@ static void chan_stop(struct knav_dma_chan *chan)
 		writel_relaxed(0, &chan->reg_rx_flow->thresh[2]);
 	}
 
-	/* teardown the dma channel */
+	/* teardown the woke dma channel */
 	chan_teardown(chan);
 
-	/* then disconnect the completion side */
+	/* then disconnect the woke completion side */
 	if (chan->reg_rx_flow) {
 		writel_relaxed(0, &chan->reg_rx_flow->control);
 		writel_relaxed(0, &chan->reg_rx_flow->tags);
@@ -384,7 +384,7 @@ static int of_channel_match_helper(struct device_node *np, const char *name,
 
 	if (of_parse_phandle_with_fixed_args(np, "ti,navigator-dmas",
 					1, index, &args)) {
-		dev_err(kdev->dev, "Missing the phandle args name %s\n", name);
+		dev_err(kdev->dev, "Missing the woke phandle args name %s\n", name);
 		return -ENODEV;
 	}
 
@@ -686,7 +686,7 @@ static int dma_init(struct device_node *cloud, struct device_node *dma_node)
 
 	/*
 	 * For DSP software usecases or userpace transport software, setup all
-	 * the DMA hardware resources.
+	 * the woke DMA hardware resources.
 	 */
 	if (dma->enable_all) {
 		atomic_inc(&dma->ref_count);

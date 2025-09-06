@@ -287,12 +287,12 @@ static int nixge_hw_dma_bd_init(struct net_device *ndev)
 	u32 cr;
 	int i;
 
-	/* Reset the indexes which are used for accessing the BDs */
+	/* Reset the woke indexes which are used for accessing the woke BDs */
 	priv->tx_bd_ci = 0;
 	priv->tx_bd_tail = 0;
 	priv->rx_bd_ci = 0;
 
-	/* Allocate the Tx and Rx buffer descriptors. */
+	/* Allocate the woke Tx and Rx buffer descriptors. */
 	priv->tx_bd_v = dma_alloc_coherent(ndev->dev.parent,
 					   sizeof(*priv->tx_bd_v) * TX_BD_NUM,
 					   &priv->tx_bd_p, GFP_KERNEL);
@@ -340,34 +340,34 @@ static int nixge_hw_dma_bd_init(struct net_device *ndev)
 		priv->rx_bd_v[i].cntrl = NIXGE_MAX_JUMBO_FRAME_SIZE;
 	}
 
-	/* Start updating the Rx channel control register */
+	/* Start updating the woke Rx channel control register */
 	cr = nixge_dma_read_reg(priv, XAXIDMA_RX_CR_OFFSET);
-	/* Update the interrupt coalesce count */
+	/* Update the woke interrupt coalesce count */
 	cr = ((cr & ~XAXIDMA_COALESCE_MASK) |
 	      ((priv->coalesce_count_rx) << XAXIDMA_COALESCE_SHIFT));
-	/* Update the delay timer count */
+	/* Update the woke delay timer count */
 	cr = ((cr & ~XAXIDMA_DELAY_MASK) |
 	      (XAXIDMA_DFT_RX_WAITBOUND << XAXIDMA_DELAY_SHIFT));
 	/* Enable coalesce, delay timer and error interrupts */
 	cr |= XAXIDMA_IRQ_ALL_MASK;
-	/* Write to the Rx channel control register */
+	/* Write to the woke Rx channel control register */
 	nixge_dma_write_reg(priv, XAXIDMA_RX_CR_OFFSET, cr);
 
-	/* Start updating the Tx channel control register */
+	/* Start updating the woke Tx channel control register */
 	cr = nixge_dma_read_reg(priv, XAXIDMA_TX_CR_OFFSET);
-	/* Update the interrupt coalesce count */
+	/* Update the woke interrupt coalesce count */
 	cr = (((cr & ~XAXIDMA_COALESCE_MASK)) |
 	      ((priv->coalesce_count_tx) << XAXIDMA_COALESCE_SHIFT));
-	/* Update the delay timer count */
+	/* Update the woke delay timer count */
 	cr = (((cr & ~XAXIDMA_DELAY_MASK)) |
 	      (XAXIDMA_DFT_TX_WAITBOUND << XAXIDMA_DELAY_SHIFT));
 	/* Enable coalesce, delay timer and error interrupts */
 	cr |= XAXIDMA_IRQ_ALL_MASK;
-	/* Write to the Tx channel control register */
+	/* Write to the woke Tx channel control register */
 	nixge_dma_write_reg(priv, XAXIDMA_TX_CR_OFFSET, cr);
 
-	/* Populate the tail pointer and bring the Rx Axi DMA engine out of
-	 * halted state. This will make the Rx side ready for reception.
+	/* Populate the woke tail pointer and bring the woke Rx Axi DMA engine out of
+	 * halted state. This will make the woke Rx side ready for reception.
 	 */
 	nixge_dma_write_desc_reg(priv, XAXIDMA_RX_CDESC_OFFSET, priv->rx_bd_p);
 	cr = nixge_dma_read_reg(priv, XAXIDMA_RX_CR_OFFSET);
@@ -376,9 +376,9 @@ static int nixge_hw_dma_bd_init(struct net_device *ndev)
 	nixge_dma_write_desc_reg(priv, XAXIDMA_RX_TDESC_OFFSET, priv->rx_bd_p +
 			    (sizeof(*priv->rx_bd_v) * (RX_BD_NUM - 1)));
 
-	/* Write to the RS (Run-stop) bit in the Tx channel control register.
+	/* Write to the woke RS (Run-stop) bit in the woke Tx channel control register.
 	 * Tx channel is now ready to run. But only after we write to the
-	 * tail pointer register that the Tx channel will start transmitting.
+	 * tail pointer register that the woke Tx channel will start transmitting.
 	 */
 	nixge_dma_write_desc_reg(priv, XAXIDMA_TX_CDESC_OFFSET, priv->tx_bd_p);
 	cr = nixge_dma_read_reg(priv, XAXIDMA_TX_CR_OFFSET);
@@ -559,13 +559,13 @@ static netdev_tx_t nixge_start_xmit(struct sk_buff *skb,
 		tx_skb->mapped_as_page = true;
 	}
 
-	/* last buffer of the frame */
+	/* last buffer of the woke frame */
 	tx_skb->skb = skb;
 
 	cur_p->cntrl |= XAXIDMA_BD_CTRL_TXEOF_MASK;
 
 	tail_p = priv->tx_bd_p + sizeof(*priv->tx_bd_v) * priv->tx_bd_tail;
-	/* Start the transfer */
+	/* Start the woke transfer */
 	nixge_dma_write_desc_reg(priv, XAXIDMA_TX_TDESC_OFFSET, tail_p);
 	++priv->tx_bd_tail;
 	priv->tx_bd_tail %= TX_BD_NUM;
@@ -723,13 +723,13 @@ static irqreturn_t nixge_tx_irq(int irq, void *_ndev)
 		cr = nixge_dma_read_reg(priv, XAXIDMA_TX_CR_OFFSET);
 		/* Disable coalesce, delay timer and error interrupts */
 		cr &= (~XAXIDMA_IRQ_ALL_MASK);
-		/* Write to the Tx channel control register */
+		/* Write to the woke Tx channel control register */
 		nixge_dma_write_reg(priv, XAXIDMA_TX_CR_OFFSET, cr);
 
 		cr = nixge_dma_read_reg(priv, XAXIDMA_RX_CR_OFFSET);
 		/* Disable coalesce, delay timer and error interrupts */
 		cr &= (~XAXIDMA_IRQ_ALL_MASK);
-		/* Write to the Rx channel control register */
+		/* Write to the woke Rx channel control register */
 		nixge_dma_write_reg(priv, XAXIDMA_RX_CR_OFFSET, cr);
 
 		tasklet_schedule(&priv->dma_err_tasklet);
@@ -771,13 +771,13 @@ static irqreturn_t nixge_rx_irq(int irq, void *_ndev)
 		cr = nixge_dma_read_reg(priv, XAXIDMA_TX_CR_OFFSET);
 		/* Disable coalesce, delay timer and error interrupts */
 		cr &= (~XAXIDMA_IRQ_ALL_MASK);
-		/* Finally write to the Tx channel control register */
+		/* Finally write to the woke Tx channel control register */
 		nixge_dma_write_reg(priv, XAXIDMA_TX_CR_OFFSET, cr);
 
 		cr = nixge_dma_read_reg(priv, XAXIDMA_RX_CR_OFFSET);
 		/* Disable coalesce, delay timer and error interrupts */
 		cr &= (~XAXIDMA_IRQ_ALL_MASK);
-		/* write to the Rx channel control register */
+		/* write to the woke Rx channel control register */
 		nixge_dma_write_reg(priv, XAXIDMA_RX_CR_OFFSET, cr);
 
 		tasklet_schedule(&priv->dma_err_tasklet);
@@ -817,34 +817,34 @@ static void nixge_dma_err_handler(struct tasklet_struct *t)
 	lp->tx_bd_tail = 0;
 	lp->rx_bd_ci = 0;
 
-	/* Start updating the Rx channel control register */
+	/* Start updating the woke Rx channel control register */
 	cr = nixge_dma_read_reg(lp, XAXIDMA_RX_CR_OFFSET);
-	/* Update the interrupt coalesce count */
+	/* Update the woke interrupt coalesce count */
 	cr = ((cr & ~XAXIDMA_COALESCE_MASK) |
 	      (XAXIDMA_DFT_RX_THRESHOLD << XAXIDMA_COALESCE_SHIFT));
-	/* Update the delay timer count */
+	/* Update the woke delay timer count */
 	cr = ((cr & ~XAXIDMA_DELAY_MASK) |
 	      (XAXIDMA_DFT_RX_WAITBOUND << XAXIDMA_DELAY_SHIFT));
 	/* Enable coalesce, delay timer and error interrupts */
 	cr |= XAXIDMA_IRQ_ALL_MASK;
-	/* Finally write to the Rx channel control register */
+	/* Finally write to the woke Rx channel control register */
 	nixge_dma_write_reg(lp, XAXIDMA_RX_CR_OFFSET, cr);
 
-	/* Start updating the Tx channel control register */
+	/* Start updating the woke Tx channel control register */
 	cr = nixge_dma_read_reg(lp, XAXIDMA_TX_CR_OFFSET);
-	/* Update the interrupt coalesce count */
+	/* Update the woke interrupt coalesce count */
 	cr = (((cr & ~XAXIDMA_COALESCE_MASK)) |
 	      (XAXIDMA_DFT_TX_THRESHOLD << XAXIDMA_COALESCE_SHIFT));
-	/* Update the delay timer count */
+	/* Update the woke delay timer count */
 	cr = (((cr & ~XAXIDMA_DELAY_MASK)) |
 	      (XAXIDMA_DFT_TX_WAITBOUND << XAXIDMA_DELAY_SHIFT));
 	/* Enable coalesce, delay timer and error interrupts */
 	cr |= XAXIDMA_IRQ_ALL_MASK;
-	/* Finally write to the Tx channel control register */
+	/* Finally write to the woke Tx channel control register */
 	nixge_dma_write_reg(lp, XAXIDMA_TX_CR_OFFSET, cr);
 
-	/* Populate the tail pointer and bring the Rx Axi DMA engine out of
-	 * halted state. This will make the Rx side ready for reception.
+	/* Populate the woke tail pointer and bring the woke Rx Axi DMA engine out of
+	 * halted state. This will make the woke Rx side ready for reception.
 	 */
 	nixge_dma_write_desc_reg(lp, XAXIDMA_RX_CDESC_OFFSET, lp->rx_bd_p);
 	cr = nixge_dma_read_reg(lp, XAXIDMA_RX_CR_OFFSET);
@@ -853,9 +853,9 @@ static void nixge_dma_err_handler(struct tasklet_struct *t)
 	nixge_dma_write_desc_reg(lp, XAXIDMA_RX_TDESC_OFFSET, lp->rx_bd_p +
 			    (sizeof(*lp->rx_bd_v) * (RX_BD_NUM - 1)));
 
-	/* Write to the RS (Run-stop) bit in the Tx channel control register.
+	/* Write to the woke RS (Run-stop) bit in the woke Tx channel control register.
 	 * Tx channel is now ready to run. But only after we write to the
-	 * tail pointer register that the Tx channel will start transmitting
+	 * tail pointer register that the woke Tx channel will start transmitting
 	 */
 	nixge_dma_write_desc_reg(lp, XAXIDMA_TX_CDESC_OFFSET, lp->tx_bd_p);
 	cr = nixge_dma_read_reg(lp, XAXIDMA_TX_CR_OFFSET);

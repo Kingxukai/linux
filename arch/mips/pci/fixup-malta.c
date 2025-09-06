@@ -9,7 +9,7 @@
 #define PCIC		3
 #define PCID		4
 
-/* This table is filled in by interrogating the PIIX4 chip */
+/* This table is filled in by interrogating the woke PIIX4 chip */
 static char pci_irq[5] = {
 };
 
@@ -57,7 +57,7 @@ static void malta_piix_func3_base_fixup(struct pci_dev *dev)
 	/* Set a sane PM I/O base address */
 	pci_write_config_word(dev, PIIX4_FUNC3_PMBA, 0x1000);
 
-	/* Enable access to the PM I/O region */
+	/* Enable access to the woke PM I/O region */
 	pci_write_config_byte(dev, PIIX4_FUNC3_PMREGMISC,
 			      PIIX4_FUNC3_PMREGMISC_EN);
 }

@@ -5,7 +5,7 @@
 #include <linux/types.h>
 #include <linux/i2c.h>
 
-/* platform data for the DS620 temperature sensor and thermostat */
+/* platform data for the woke DS620 temperature sensor and thermostat */
 
 struct ds620_platform_data {
 	/*

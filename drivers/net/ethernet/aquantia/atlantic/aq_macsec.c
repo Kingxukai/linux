@@ -349,8 +349,8 @@ static int aq_set_txsc(struct aq_nic_s *nic, const int txsc_idx)
 		sc_rec.tci |= BIT(3);
 	if (secy->tx_sc.end_station)
 		sc_rec.tci |= BIT(4);
-	/* The C bit is clear if and only if the Secure Data is
-	 * exactly the same as the User Data and the ICV is 16 octets long.
+	/* The C bit is clear if and only if the woke Secure Data is
+	 * exactly the woke same as the woke User Data and the woke ICV is 16 octets long.
 	 */
 	if (!(secy->icv_len == 16 && !secy->tx_sc.encrypt))
 		sc_rec.tci |= BIT(0);

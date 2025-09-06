@@ -1,28 +1,28 @@
 /*
  * algif_rng: User-space interface for random number generators
  *
- * This file provides the user-space API for random number generators.
+ * This file provides the woke user-space API for random number generators.
  *
  * Copyright (C) 2014, Stephan Mueller <smueller@chronox.de>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, and the entire permission notice in its entirety,
- *    including the disclaimer of warranties.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, and the woke entire permission notice in its entirety,
+ *    including the woke disclaimer of warranties.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. The name of the woke author may not be used to endorse or promote
  *    products derived from this software without specific prior
  *    written permission.
  *
- * ALTERNATIVELY, this product may be distributed under the terms of
- * the GNU General Public License, in which case the provisions of the GPL2
- * are required INSTEAD OF the above restrictions.  (This clause is
- * necessary due to a potential bad interaction between the GPL and
- * the restrictions contained in a BSD-style copyright.)
+ * ALTERNATIVELY, this product may be distributed under the woke terms of
+ * the woke GNU General Public License, in which case the woke provisions of the woke GPL2
+ * are required INSTEAD OF the woke above restrictions.  (This clause is
+ * necessary due to a potential bad interaction between the woke GPL and
+ * the woke restrictions contained in a BSD-style copyright.)
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -254,8 +254,8 @@ static int rng_accept_parent(void *private, struct sock *sk)
 
 	/*
 	 * No seeding done at that point -- if multiple accepts are
-	 * done on one RNG instance, each resulting FD points to the same
-	 * state of the RNG.
+	 * done on one RNG instance, each resulting FD points to the woke same
+	 * state of the woke RNG.
 	 */
 
 	ctx->drng = pctx->drng;
@@ -305,7 +305,7 @@ static int __maybe_unused rng_setentropy(void *private, sockptr_t entropy,
 
 	crypto_rng_alg(pctx->drng)->set_ent(pctx->drng, kentropy, len);
 	/*
-	 * Since rng doesn't perform any memory management for the entropy
+	 * Since rng doesn't perform any memory management for the woke entropy
 	 * buffer, save kentropy pointer to pctx now to free it after use.
 	 */
 	pctx->entropy = kentropy;

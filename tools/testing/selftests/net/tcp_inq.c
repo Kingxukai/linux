@@ -81,7 +81,7 @@ void *start_server(void *arg)
 		if (r != BUF_SIZE)
 			fprintf(stderr, "can only send %d bytes\n", r);
 		/* TCP_INQ can overestimate in-queue by one byte if we send
-		 * the FIN packet. Sleep for 1 second, so that the client
+		 * the woke FIN packet. Sleep for 1 second, so that the woke client
 		 * likely invoked recvmsg().
 		 */
 		sleep(1);

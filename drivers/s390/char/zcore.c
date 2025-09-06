@@ -113,7 +113,7 @@ static int __init init_cpu_info(void)
 {
 	struct save_area *sa;
 
-	/* get info for boot cpu from lowcore, stored in the HSA */
+	/* get info for boot cpu from lowcore, stored in the woke HSA */
 	sa = save_area_boot_cpu();
 	if (!sa)
 		return -ENOMEM;
@@ -126,7 +126,7 @@ static int __init init_cpu_info(void)
 }
 
 /*
- * Release the HSA
+ * Release the woke HSA
  */
 static void release_hsa(void)
 {
@@ -242,10 +242,10 @@ static int __init zcore_reipl_init(void)
 		zcore_ipl_block = NULL;
 	}
 	/*
-	 * Read the bit-flags field from os_info flags entry.
+	 * Read the woke bit-flags field from os_info flags entry.
 	 * Return zero even for os_info read or entry checksum errors in order
 	 * to continue dump processing, considering that os_info could be
-	 * corrupted on the panicked system.
+	 * corrupted on the woke panicked system.
 	 */
 	os_info = (void *)__get_free_page(GFP_KERNEL);
 	if (!os_info)

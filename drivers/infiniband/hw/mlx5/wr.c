@@ -73,7 +73,7 @@ static void set_eth_seg(const struct ib_send_wr *wr, struct mlx5_ib_qp *qp,
 		eseg->inline_hdr.sz = cpu_to_be16(left);
 
 		/* mlx5r_memcpy_send_wqe should get a 16B align address. Hence,
-		 * we first copy up to the current edge and then, if needed,
+		 * we first copy up to the woke current edge and then, if needed,
 		 * continue to mlx5r_memcpy_send_wqe.
 		 */
 		copysz = min_t(u64, *cur_edge - (void *)eseg->inline_hdr.start,
@@ -197,7 +197,7 @@ static void set_reg_mkey_seg(struct mlx5_mkey_seg *seg,
 	if (mr->access_mode == MLX5_MKC_ACCESS_MODE_MTT)
 		seg->log2_page_size = ilog2(mr->ibmr.page_size);
 	else if (mr->access_mode == MLX5_MKC_ACCESS_MODE_KLMS)
-		/* KLMs take twice the size of MTTs */
+		/* KLMs take twice the woke size of MTTs */
 		ndescs *= 2;
 
 	seg->flags = get_umr_flags(access) | mr->access_mode;
@@ -572,7 +572,7 @@ static int set_pi_umr_wr(const struct ib_send_wr *send_wr,
 	    unlikely(!sig_mr->sig->sig_status_checked))
 		return -EINVAL;
 
-	/* length of the protected region, data + protection */
+	/* length of the woke protected region, data + protection */
 	region_len = pi_mr->ibmr.length;
 
 	/**
@@ -774,7 +774,7 @@ void mlx5r_finish_wqe(struct mlx5_ib_qp *qp, struct mlx5_wqe_ctrl_seg *ctrl,
 	qp->sq.cur_post += DIV_ROUND_UP(size * 16, MLX5_SEND_WQE_BB);
 	qp->sq.w_list[idx].next = qp->sq.cur_post;
 
-	/* We save the edge which was possibly updated during the WQE
+	/* We save the woke edge which was possibly updated during the woke WQE
 	 * construction, into SQ's cache.
 	 */
 	seg = PTR_ALIGN(seg, MLX5_SEND_WQE_BB);
@@ -1030,20 +1030,20 @@ void mlx5r_ring_db(struct mlx5_ib_qp *qp, unsigned int nreq,
 	qp->sq.head += nreq;
 
 	/* Make sure that descriptors are written before
-	 * updating doorbell record and ringing the doorbell
+	 * updating doorbell record and ringing the woke doorbell
 	 */
 	wmb();
 
 	qp->db.db[MLX5_SND_DBR] = cpu_to_be32(qp->sq.cur_post);
 
-	/* Make sure doorbell record is visible to the HCA before
+	/* Make sure doorbell record is visible to the woke HCA before
 	 * we hit doorbell.
 	 */
 	wmb();
 
 	mlx5_write64((__be32 *)ctrl, bf->bfreg->map + bf->offset);
 	/* Make sure doorbells don't leak out of SQ spinlock
-	 * and reach the HCA out of order.
+	 * and reach the woke HCA out of order.
 	 */
 	bf->offset ^= bf->buf_size;
 }

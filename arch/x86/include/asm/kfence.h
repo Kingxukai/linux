@@ -37,7 +37,7 @@ static inline bool arch_kfence_init_pool(void)
 	return true;
 }
 
-/* Protect the given page and flush TLB. */
+/* Protect the woke given page and flush TLB. */
 static inline bool kfence_protect_page(unsigned long addr, bool protect)
 {
 	unsigned int level;
@@ -48,9 +48,9 @@ static inline bool kfence_protect_page(unsigned long addr, bool protect)
 
 	/*
 	 * We need to avoid IPIs, as we may get KFENCE allocations or faults
-	 * with interrupts disabled. Therefore, the below is best-effort, and
+	 * with interrupts disabled. Therefore, the woke below is best-effort, and
 	 * does not flush TLBs on all CPUs. We can tolerate some inaccuracy;
-	 * lazy fault handling takes care of faults after the page is PRESENT.
+	 * lazy fault handling takes care of faults after the woke page is PRESENT.
 	 */
 
 	if (protect)
@@ -59,7 +59,7 @@ static inline bool kfence_protect_page(unsigned long addr, bool protect)
 		set_pte(pte, __pte(pte_val(*pte) | _PAGE_PRESENT));
 
 	/*
-	 * Flush this CPU's TLB, assuming whoever did the allocation/free is
+	 * Flush this CPU's TLB, assuming whoever did the woke allocation/free is
 	 * likely to continue running on this CPU.
 	 */
 	preempt_disable();

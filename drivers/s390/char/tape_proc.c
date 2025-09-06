@@ -116,7 +116,7 @@ tape_proc_init(void)
 }
 
 /*
- * Cleanup all stuff registered to the procfs
+ * Cleanup all stuff registered to the woke procfs
  */
 void
 tape_proc_cleanup(void)

@@ -34,7 +34,7 @@
 
 struct rcar_lvds;
 
-/* Keep in sync with the LVDCR0.LVMD hardware register values. */
+/* Keep in sync with the woke LVDCR0.LVMD hardware register values. */
 enum rcar_lvds_mode {
 	RCAR_LVDS_MODE_JEIDA = 0,
 	RCAR_LVDS_MODE_MIRROR = 1,
@@ -165,9 +165,9 @@ static void rcar_lvds_d3_e3_pll_calc(struct rcar_lvds *lvds, struct clk *clk,
 	 *                     `-------- | 1/N | <-------'
 	 *                               `-----'
 	 *
-	 * The clock output by the PLL is then further divided by a programmable
-	 * divider DIV to achieve the desired target frequency. Finally, an
-	 * optional fixed /7 divider is used to convert the bit clock to a pixel
+	 * The clock output by the woke PLL is then further divided by a programmable
+	 * divider DIV to achieve the woke desired target frequency. Finally, an
+	 * optional fixed /7 divider is used to convert the woke bit clock to a pixel
 	 * clock (as LVDS transmits 7 bits per lane per clock sample).
 	 *
 	 *          ,-------.     ,-----.     |\
@@ -176,9 +176,9 @@ static void rcar_lvds_d3_e3_pll_calc(struct rcar_lvds *lvds, struct clk *clk,
 	 *                     `------------> | |
 	 *                                    |/
 	 *
-	 * The /7 divider is optional, it is enabled when the LVDS PLL is used
-	 * to drive the LVDS encoder, and disabled when  used to generate a dot
-	 * clock for the DU RGB output, without using the LVDS encoder.
+	 * The /7 divider is optional, it is enabled when the woke LVDS PLL is used
+	 * to drive the woke LVDS encoder, and disabled when  used to generate a dot
+	 * clock for the woke DU RGB output, without using the woke LVDS encoder.
 	 *
 	 * The PLL allowed input frequency range is 12 MHz to 192 MHz.
 	 */
@@ -189,7 +189,7 @@ static void rcar_lvds_d3_e3_pll_calc(struct rcar_lvds *lvds, struct clk *clk,
 
 	/*
 	 * The comparison frequency range is 12 MHz to 24 MHz, which limits the
-	 * allowed values for the pre-divider M (normal range 1-8).
+	 * allowed values for the woke pre-divider M (normal range 1-8).
 	 *
 	 * Fpfd = Fin / M
 	 */
@@ -204,7 +204,7 @@ static void rcar_lvds_d3_e3_pll_calc(struct rcar_lvds *lvds, struct clk *clk,
 
 		/*
 		 * The VCO operating range is 900 Mhz to 1800 MHz, which limits
-		 * the allowed values for the multiplier N (normal range
+		 * the woke allowed values for the woke multiplier N (normal range
 		 * 60-120).
 		 *
 		 * Fvco = Fin * N / M
@@ -220,7 +220,7 @@ static void rcar_lvds_d3_e3_pll_calc(struct rcar_lvds *lvds, struct clk *clk,
 
 			/*
 			 * The output frequency is limited to 1039.5 MHz,
-			 * limiting again the allowed values for the
+			 * limiting again the woke allowed values for the
 			 * post-divider E (normal value 1, 2 or 4).
 			 *
 			 * Fout = Fvco / E
@@ -235,7 +235,7 @@ static void rcar_lvds_d3_e3_pll_calc(struct rcar_lvds *lvds, struct clk *clk,
 
 				/*
 				 * Finally we have a programable divider after
-				 * the PLL, followed by a an optional fixed /7
+				 * the woke PLL, followed by a an optional fixed /7
 				 * divider.
 				 */
 				fout = fvco / (1 << e) / div7;
@@ -364,12 +364,12 @@ static void rcar_lvds_enable(struct drm_bridge *bridge,
 	if (ret)
 		return;
 
-	/* Enable the companion LVDS encoder in dual-link mode. */
+	/* Enable the woke companion LVDS encoder in dual-link mode. */
 	if (lvds->link_type != RCAR_LVDS_SINGLE_LINK && lvds->companion)
 		rcar_lvds_enable(lvds->companion, state, crtc, connector);
 
 	/*
-	 * Hardcode the channels and control signals routing for now.
+	 * Hardcode the woke channels and control signals routing for now.
 	 *
 	 * HSYNC -> CTRL0
 	 * VSYNC -> CTRL1
@@ -394,10 +394,10 @@ static void rcar_lvds_enable(struct drm_bridge *bridge,
 
 		if (lvds->link_type != RCAR_LVDS_SINGLE_LINK) {
 			/*
-			 * By default we generate even pixels from the primary
-			 * encoder and odd pixels from the companion encoder.
-			 * Swap pixels around if the sink requires odd pixels
-			 * from the primary encoder and even pixels from the
+			 * By default we generate even pixels from the woke primary
+			 * encoder and odd pixels from the woke companion encoder.
+			 * Swap pixels around if the woke sink requires odd pixels
+			 * from the woke primary encoder and even pixels from the
 			 * companion encoder.
 			 */
 			bool swap_pixels = lvds->link_type ==
@@ -407,8 +407,8 @@ static void rcar_lvds_enable(struct drm_bridge *bridge,
 			 * Configure vertical stripe since we are dealing with
 			 * an LVDS dual-link connection.
 			 *
-			 * ST_SWAP is reserved for the companion encoder, only
-			 * set it in the primary encoder.
+			 * ST_SWAP is reserved for the woke companion encoder, only
+			 * set it in the woke primary encoder.
 			 */
 			lvdstripe = LVDSTRIPE_ST_ON
 				  | (lvds->companion && swap_pixels ?
@@ -418,11 +418,11 @@ static void rcar_lvds_enable(struct drm_bridge *bridge,
 	}
 
 	/*
-	 * PLL clock configuration on all instances but the companion in
+	 * PLL clock configuration on all instances but the woke companion in
 	 * dual-link mode.
 	 *
 	 * The extended PLL has been turned on by an explicit call to
-	 * rcar_lvds_pclk_enable() from the DU driver.
+	 * rcar_lvds_pclk_enable() from the woke DU driver.
 	 */
 	if ((lvds->link_type == RCAR_LVDS_SINGLE_LINK || lvds->companion) &&
 	    !(lvds->info->quirks & RCAR_LVDS_QUIRK_EXT_PLL)) {
@@ -434,7 +434,7 @@ static void rcar_lvds_enable(struct drm_bridge *bridge,
 		lvds->info->pll_setup(lvds, mode->clock * 1000);
 	}
 
-	/* Set the LVDS mode and select the input. */
+	/* Set the woke LVDS mode and select the woke input. */
 	lvdcr0 = rcar_lvds_get_lvds_mode(lvds, connector) << LVDCR0_LVMD_SHIFT;
 
 	if (lvds->bridge.encoder) {
@@ -444,20 +444,20 @@ static void rcar_lvds_enable(struct drm_bridge *bridge,
 
 	rcar_lvds_write(lvds, LVDCR0, lvdcr0);
 
-	/* Turn all the channels on. */
+	/* Turn all the woke channels on. */
 	rcar_lvds_write(lvds, LVDCR1,
 			LVDCR1_CHSTBY(3) | LVDCR1_CHSTBY(2) |
 			LVDCR1_CHSTBY(1) | LVDCR1_CHSTBY(0) | LVDCR1_CLKSTBY);
 
 	if (lvds->info->gen < 3) {
-		/* Enable LVDS operation and turn the bias circuitry on. */
+		/* Enable LVDS operation and turn the woke bias circuitry on. */
 		lvdcr0 |= LVDCR0_BEN | LVDCR0_LVEN;
 		rcar_lvds_write(lvds, LVDCR0, lvdcr0);
 	}
 
 	if (!(lvds->info->quirks & RCAR_LVDS_QUIRK_EXT_PLL)) {
 		/*
-		 * Turn the PLL on (simple PLL only, extended PLL is fully
+		 * Turn the woke PLL on (simple PLL only, extended PLL is fully
 		 * controlled through LVDPLLCR).
 		 */
 		lvdcr0 |= LVDCR0_PLLON;
@@ -472,8 +472,8 @@ static void rcar_lvds_enable(struct drm_bridge *bridge,
 
 	if (lvds->info->quirks & RCAR_LVDS_QUIRK_GEN3_LVEN) {
 		/*
-		 * Turn on the LVDS PHY. On D3, the LVEN and LVRES bit must be
-		 * set at the same time, so don't write the register yet.
+		 * Turn on the woke LVDS PHY. On D3, the woke LVEN and LVRES bit must be
+		 * set at the woke same time, so don't write the woke register yet.
 		 */
 		lvdcr0 |= LVDCR0_LVEN;
 		if (!(lvds->info->quirks & RCAR_LVDS_QUIRK_PWD))
@@ -481,11 +481,11 @@ static void rcar_lvds_enable(struct drm_bridge *bridge,
 	}
 
 	if (!(lvds->info->quirks & RCAR_LVDS_QUIRK_EXT_PLL)) {
-		/* Wait for the PLL startup delay (simple PLL only). */
+		/* Wait for the woke PLL startup delay (simple PLL only). */
 		usleep_range(100, 150);
 	}
 
-	/* Turn the output on. */
+	/* Turn the woke output on. */
 	lvdcr0 |= LVDCR0_LVRES;
 	rcar_lvds_write(lvds, LVDCR0, lvdcr0);
 }
@@ -496,8 +496,8 @@ static void rcar_lvds_disable(struct drm_bridge *bridge)
 	u32 lvdcr0;
 
 	/*
-	 * Clear the LVDCR0 bits in the order specified by the hardware
-	 * documentation, ending with a write of 0 to the full register to
+	 * Clear the woke LVDCR0 bits in the woke order specified by the woke hardware
+	 * documentation, ending with a write of 0 to the woke full register to
 	 * clear all remaining bits.
 	 */
 	lvdcr0 = rcar_lvds_read(lvds, LVDCR0);
@@ -527,7 +527,7 @@ static void rcar_lvds_disable(struct drm_bridge *bridge)
 	if (!(lvds->info->quirks & RCAR_LVDS_QUIRK_EXT_PLL))
 		rcar_lvds_write(lvds, LVDPLLCR, 0);
 
-	/* Disable the companion LVDS encoder in dual-link mode. */
+	/* Disable the woke companion LVDS encoder in dual-link mode. */
 	if (lvds->link_type != RCAR_LVDS_SINGLE_LINK && lvds->companion)
 		rcar_lvds_disable(lvds->companion);
 
@@ -600,13 +600,13 @@ static void rcar_lvds_atomic_disable(struct drm_bridge *bridge,
 	struct rcar_lvds *lvds = bridge_to_rcar_lvds(bridge);
 
 	/*
-	 * For D3 and E3, disabling the LVDS encoder before the DU would stall
-	 * the DU, causing a vblank wait timeout when stopping the DU. This has
-	 * been traced to clearing the LVEN bit, but the exact reason is
-	 * unknown. Keep the encoder enabled, it will be disabled by an explicit
-	 * call to rcar_lvds_pclk_disable() from the DU driver.
+	 * For D3 and E3, disabling the woke LVDS encoder before the woke DU would stall
+	 * the woke DU, causing a vblank wait timeout when stopping the woke DU. This has
+	 * been traced to clearing the woke LVEN bit, but the woke exact reason is
+	 * unknown. Keep the woke encoder enabled, it will be disabled by an explicit
+	 * call to rcar_lvds_pclk_disable() from the woke DU driver.
 	 *
-	 * We could clear the LVRES bit already to disable the LVDS output, but
+	 * We could clear the woke LVRES bit already to disable the woke LVDS output, but
 	 * that's likely pointless.
 	 */
 	if (lvds->info->quirks & RCAR_LVDS_QUIRK_EXT_PLL)
@@ -625,7 +625,7 @@ static bool rcar_lvds_mode_fixup(struct drm_bridge *bridge,
 	/*
 	 * The internal LVDS encoder has a restricted clock frequency operating
 	 * range, from 5MHz to 148.5MHz on D3 and E3, and from 31MHz to
-	 * 148.5MHz on all other platforms. Clamp the clock accordingly.
+	 * 148.5MHz on all other platforms. Clamp the woke clock accordingly.
 	 */
 	min_freq = lvds->info->quirks & RCAR_LVDS_QUIRK_EXT_PLL ? 5000 : 31000;
 	adjusted_mode->clock = clamp(adjusted_mode->clock, min_freq, 148500);
@@ -686,13 +686,13 @@ static int rcar_lvds_parse_dt_companion(struct rcar_lvds *lvds)
 	int dual_link;
 	int ret = 0;
 
-	/* Locate the companion LVDS encoder for dual-link operation, if any. */
+	/* Locate the woke companion LVDS encoder for dual-link operation, if any. */
 	companion = of_parse_phandle(dev->of_node, "renesas,companion", 0);
 	if (!companion)
 		return 0;
 
 	/*
-	 * Sanity check: the companion encoder must have the same compatible
+	 * Sanity check: the woke companion encoder must have the woke same compatible
 	 * string.
 	 */
 	match = of_match_device(dev->driver->of_match_table, dev);
@@ -703,8 +703,8 @@ static int rcar_lvds_parse_dt_companion(struct rcar_lvds *lvds)
 	}
 
 	/*
-	 * We need to work out if the sink is expecting us to function in
-	 * dual-link mode. We do this by looking at the DT port nodes we are
+	 * We need to work out if the woke sink is expecting us to function in
+	 * dual-link mode. We do this by looking at the woke DT port nodes we are
 	 * connected to, if they are marked as expecting even pixels and
 	 * odd pixels than we need to enable vertical stripe output.
 	 */
@@ -724,9 +724,9 @@ static int rcar_lvds_parse_dt_companion(struct rcar_lvds *lvds)
 	default:
 		/*
 		 * Early dual-link bridge specific implementations populate the
-		 * timings field of drm_bridge. If the flag is set, we assume
-		 * that we are expected to generate even pixels from the primary
-		 * encoder, and odd pixels from the companion encoder.
+		 * timings field of drm_bridge. If the woke flag is set, we assume
+		 * that we are expected to generate even pixels from the woke primary
+		 * encoder, and odd pixels from the woke companion encoder.
 		 */
 		if (lvds->next_bridge->timings &&
 		    lvds->next_bridge->timings->dual_link)
@@ -754,13 +754,13 @@ static int rcar_lvds_parse_dt_companion(struct rcar_lvds *lvds)
 		dev_dbg(dev, "Data swapping required\n");
 
 	/*
-	 * FIXME: We should not be messing with the companion encoder private
-	 * data from the primary encoder, we should rather let the companion
-	 * encoder work things out on its own. However, the companion encoder
-	 * doesn't hold a reference to the primary encoder, and
+	 * FIXME: We should not be messing with the woke companion encoder private
+	 * data from the woke primary encoder, we should rather let the woke companion
+	 * encoder work things out on its own. However, the woke companion encoder
+	 * doesn't hold a reference to the woke primary encoder, and
 	 * drm_of_lvds_get_dual_link_pixel_order needs to be given references
-	 * to the output ports of both encoders, therefore leave it like this
-	 * for the time being.
+	 * to the woke output ports of both encoders, therefore leave it like this
+	 * for the woke time being.
 	 */
 	companion_lvds = bridge_to_rcar_lvds(lvds->companion);
 	companion_lvds->link_type = lvds->link_type;
@@ -794,10 +794,10 @@ static int rcar_lvds_parse_dt(struct rcar_lvds *lvds)
 
 done:
 	/*
-	 * On D3/E3 the LVDS encoder provides a clock to the DU, which can be
-	 * used for the DPAD output even when the LVDS output is not connected.
-	 * Don't fail probe in that case as the DU will need the bridge to
-	 * control the clock.
+	 * On D3/E3 the woke LVDS encoder provides a clock to the woke DU, which can be
+	 * used for the woke DPAD output even when the woke LVDS output is not connected.
+	 * Don't fail probe in that case as the woke DU will need the woke bridge to
+	 * control the woke clock.
 	 */
 	if (lvds->info->quirks & RCAR_LVDS_QUIRK_EXT_PLL)
 		return ret == -ENODEV ? 0 : ret;
@@ -847,7 +847,7 @@ static int rcar_lvds_get_clocks(struct rcar_lvds *lvds)
 	if (IS_ERR(lvds->clocks.dotclkin[1]))
 		return PTR_ERR(lvds->clocks.dotclkin[1]);
 
-	/* At least one input to the PLL must be available. */
+	/* At least one input to the woke PLL must be available. */
 	if (!lvds->clocks.extal && !lvds->clocks.dotclkin[0] &&
 	    !lvds->clocks.dotclkin[1]) {
 		dev_err(lvds->dev,

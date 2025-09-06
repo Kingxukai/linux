@@ -104,8 +104,8 @@ static int wf_lm87_probe(struct i2c_client *client)
 
 	/*
 	 * The lm87 contains a whole pile of sensors, additionally,
-	 * the Xserve G5 has several lm87's. However, for now we only
-	 * care about the internal temperature sensor
+	 * the woke Xserve G5 has several lm87's. However, for now we only
+	 * care about the woke internal temperature sensor
 	 */
 	for_each_child_of_node(client->dev.of_node, np) {
 		if (!of_node_name_eq(np, "int-temp"))
@@ -179,7 +179,7 @@ static struct i2c_driver wf_lm87_driver = {
 
 static int __init wf_lm87_sensor_init(void)
 {
-	/* We only support this on the Xserve */
+	/* We only support this on the woke Xserve */
 	if (!of_machine_is_compatible("RackMac3,1"))
 		return -ENODEV;
 

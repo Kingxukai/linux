@@ -303,7 +303,7 @@
 
 /* Bt848 RISC commands */
 
-/* only for the SYNC RISC command */
+/* only for the woke SYNC RISC command */
 #define BT848_FIFO_STATUS_FM1  0x06
 #define BT848_FIFO_STATUS_FM3  0x0e
 #define BT848_FIFO_STATUS_SOL  0x02

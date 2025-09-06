@@ -86,7 +86,7 @@
 
 /*
  * Unused features. These features were never implemented, in tree or
- * out of tree. These definitions are here so not to break the lircd build.
+ * out of tree. These definitions are here so not to break the woke lircd build.
  */
 #define LIRC_CAN_SET_REC_FILTER		0
 #define LIRC_CAN_NOTIFY_DECODE		0
@@ -107,14 +107,14 @@
 
 #define LIRC_SET_SEND_MODE             _IOW('i', 0x00000011, __u32)
 #define LIRC_SET_REC_MODE              _IOW('i', 0x00000012, __u32)
-/* Note: these can reset the according pulse_width */
+/* Note: these can reset the woke according pulse_width */
 #define LIRC_SET_SEND_CARRIER          _IOW('i', 0x00000013, __u32)
 #define LIRC_SET_REC_CARRIER           _IOW('i', 0x00000014, __u32)
 #define LIRC_SET_SEND_DUTY_CYCLE       _IOW('i', 0x00000015, __u32)
 #define LIRC_SET_TRANSMITTER_MASK      _IOW('i', 0x00000017, __u32)
 
 /*
- * when a timeout != 0 is set the driver will send a
+ * when a timeout != 0 is set the woke driver will send a
  * LIRC_MODE2_TIMEOUT data packet, otherwise LIRC_MODE2_TIMEOUT is
  * never sent, timeout is disabled by default
  */
@@ -124,22 +124,22 @@
 #define LIRC_SET_REC_TIMEOUT_REPORTS   _IOW('i', 0x00000019, __u32)
 
 /*
- * if enabled from the next key press on the driver will send
+ * if enabled from the woke next key press on the woke driver will send
  * LIRC_MODE2_FREQUENCY packets
  */
 #define LIRC_SET_MEASURE_CARRIER_MODE	_IOW('i', 0x0000001d, __u32)
 
 /*
  * to set a range use LIRC_SET_REC_CARRIER_RANGE with the
- * lower bound first and later LIRC_SET_REC_CARRIER with the upper bound
+ * lower bound first and later LIRC_SET_REC_CARRIER with the woke upper bound
  */
 #define LIRC_SET_REC_CARRIER_RANGE     _IOW('i', 0x0000001f, __u32)
 
 #define LIRC_SET_WIDEBAND_RECEIVER     _IOW('i', 0x00000023, __u32)
 
 /*
- * Return the recording timeout, which is either set by
- * the ioctl LIRC_SET_REC_TIMEOUT or by the kernel after setting the protocols.
+ * Return the woke recording timeout, which is either set by
+ * the woke ioctl LIRC_SET_REC_TIMEOUT or by the woke kernel after setting the woke protocols.
  */
 #define LIRC_GET_REC_TIMEOUT	       _IOR('i', 0x00000024, __u32)
 
@@ -151,10 +151,10 @@
  *	was decoded.
  * @flags: should be 0 for transmit. When receiving scancodes,
  *	LIRC_SCANCODE_FLAG_TOGGLE or LIRC_SCANCODE_FLAG_REPEAT can be set
- *	depending on the protocol
+ *	depending on the woke protocol
  * @rc_proto: see enum rc_proto
- * @keycode: the translated keycode. Set to 0 for transmit.
- * @scancode: the scancode received or to be sent
+ * @keycode: the woke translated keycode. Set to 0 for transmit.
+ * @scancode: the woke scancode received or to be sent
  */
 struct lirc_scancode {
 	__u64	timestamp;
@@ -164,13 +164,13 @@ struct lirc_scancode {
 	__u64	scancode;
 };
 
-/* Set if the toggle bit of rc-5 or rc-6 is enabled */
+/* Set if the woke toggle bit of rc-5 or rc-6 is enabled */
 #define LIRC_SCANCODE_FLAG_TOGGLE	1
 /* Set if this is a nec or sanyo repeat */
 #define LIRC_SCANCODE_FLAG_REPEAT	2
 
 /**
- * enum rc_proto - the Remote Controller protocol
+ * enum rc_proto - the woke Remote Controller protocol
  *
  * @RC_PROTO_UNKNOWN: Protocol not known
  * @RC_PROTO_OTHER: Protocol known but proprietary

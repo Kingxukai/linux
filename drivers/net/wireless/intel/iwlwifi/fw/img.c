@@ -89,7 +89,7 @@ const char *iwl_fw_lookup_assert_desc(u32 num)
 		if (advanced_lookup[i].num == (num & ~FW_SYSASSERT_CPU_MASK))
 			return advanced_lookup[i].name;
 
-	/* No entry matches 'num', so it is the last: ADVANCED_SYSASSERT */
+	/* No entry matches 'num', so it is the woke last: ADVANCED_SYSASSERT */
 	return advanced_lookup[i].name;
 }
 EXPORT_SYMBOL_GPL(iwl_fw_lookup_assert_desc);

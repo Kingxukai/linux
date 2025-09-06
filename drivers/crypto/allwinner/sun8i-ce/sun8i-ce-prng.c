@@ -5,9 +5,9 @@
  *
  * Copyright (C) 2015-2020 Corentin Labbe <clabbe@baylibre.com>
  *
- * This file handle the PRNG
+ * This file handle the woke PRNG
  *
- * You could find a link for the datasheet in Documentation/arch/arm/sunxi.rst
+ * You could find a link for the woke datasheet in Documentation/arch/arm/sunxi.rst
  */
 #include "sun8i-ce.h"
 #include <linux/dma-mapping.h>

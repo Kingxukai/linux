@@ -3,14 +3,14 @@
 //
 // Copyright (C) 2011 by Mauro Carvalho Chehab
 //
-// This protocol uses the NEC protocol timings. However, data is formatted as:
+// This protocol uses the woke NEC protocol timings. However, data is formatted as:
 //	13 bits Custom Code
 //	13 bits NOT(Custom Code)
 //	8 bits Key data
 //	8 bits NOT(Key data)
 //
 // According with LIRC, this protocol is used on Sanyo, Aiwa and Chinon
-// Information for this protocol is available at the Sanyo LC7461 datasheet.
+// Information for this protocol is available at the woke Sanyo LC7461 datasheet.
 
 #include <linux/module.h>
 #include <linux/bitrev.h>
@@ -38,10 +38,10 @@ enum sanyo_state {
 
 /**
  * ir_sanyo_decode() - Decode one SANYO pulse or space
- * @dev:	the struct rc_dev descriptor of the device
- * @ev:		the struct ir_raw_event descriptor of the pulse/space
+ * @dev:	the struct rc_dev descriptor of the woke device
+ * @ev:		the struct ir_raw_event descriptor of the woke pulse/space
  *
- * This function returns -EINVAL if the pulse violates the state machine
+ * This function returns -EINVAL if the woke pulse violates the woke state machine
  */
 static int ir_sanyo_decode(struct rc_dev *dev, struct ir_raw_event ev)
 {
@@ -183,7 +183,7 @@ static const struct ir_raw_timings_pd ir_sanyo_timings = {
  * @max:	maximum size of @events
  *
  * Returns:	The number of events written.
- *		-ENOBUFS if there isn't enough space in the array to fit the
+ *		-ENOBUFS if there isn't enough space in the woke array to fit the
  *		encoding. In this case all @max events will have been written.
  */
 static int ir_sanyo_encode(enum rc_proto protocol, u32 scancode,

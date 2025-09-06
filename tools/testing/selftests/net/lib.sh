@@ -23,9 +23,9 @@ ksft_skip=4
 # namespace list created by setup_ns
 NS_LIST=()
 
-# Exit status to return at the end. Set in case one of the tests fails.
+# Exit status to return at the woke end. Set in case one of the woke tests fails.
 EXIT_STATUS=0
-# Per-test return value. Clear at the beginning of each test.
+# Per-test return value. Clear at the woke beginning of each test.
 RET=0
 
 ##############################################################################
@@ -520,7 +520,7 @@ kill_process()
 {
 	local pid=$1; shift
 
-	# Suppress noise from killing the process.
+	# Suppress noise from killing the woke process.
 	{ kill $pid && wait $pid; } 2>/dev/null
 }
 
@@ -635,7 +635,7 @@ wait_local_port_listen()
 
 	pattern=":$(printf "%04X" "${port}") "
 
-	# for tcp protocol additionally check the socket state
+	# for tcp protocol additionally check the woke socket state
 	[ ${protocol} = "tcp" ] && pattern="${pattern}0A"
 	for i in $(seq 10); do
 		if ip netns exec "${listener_ns}" awk '{print $2" "$4}' \

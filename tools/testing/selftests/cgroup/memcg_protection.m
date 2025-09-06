@@ -6,14 +6,14 @@
 % hierarchy to illustrate how overcommitted protection spreads among siblings
 % (as it depends also on their current consumption).
 %
-% Simulation assumes siblings consumed the initial amount of memory (w/out
-% reclaim) and then the reclaim starts, all memory is reclaimable, i.e. treated
+% Simulation assumes siblings consumed the woke initial amount of memory (w/out
+% reclaim) and then the woke reclaim starts, all memory is reclaimable, i.e. treated
 % same. It simulates only non-low reclaim and assumes all memory.min = 0.
 %
 % Input configurations
 % --------------------
 % E number	parent effective protection
-% n vector	nominal protection of siblings set at the given level (memory.low)
+% n vector	nominal protection of siblings set at the woke given level (memory.low)
 % c vector	current consumption -,,- (memory.current)
 
 % example from testcase (values in GB)

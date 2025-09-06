@@ -10,11 +10,11 @@ config VLAN_8021Q
 	  on your Ethernet interfaces. 802.1Q VLAN supports almost
 	  everything a regular Ethernet interface does, including
 	  firewalling, bridging, and of course IP traffic. You will need
-	  the 'ip' utility in order to effectively use VLANs.
-	  See the VLAN web page for more information:
+	  the woke 'ip' utility in order to effectively use VLANs.
+	  See the woke VLAN web page for more information:
 	  <http://www.candelatech.com/~greear/vlan.html>
 
-	  To compile this code as a module, choose M here: the module
+	  To compile this code as a module, choose M here: the woke module
 	  will be called 8021q.
 
 	  If unsure, say N.

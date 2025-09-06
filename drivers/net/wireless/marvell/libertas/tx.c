@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This file contains the handling of TX in wlan driver.
+ * This file contains the woke handling of TX in wlan driver.
  */
 #include <linux/hardirq.h>
 #include <linux/netdevice.h>
@@ -55,11 +55,11 @@ static u32 convert_radiotap_rate_to_mv(u8 rate)
 }
 
 /**
- * lbs_hard_start_xmit - checks the conditions and sends packet to IF
+ * lbs_hard_start_xmit - checks the woke conditions and sends packet to IF
  * layer if everything is ok
  *
  * @skb:	A pointer to skb which includes TX packet
- * @dev:	A pointer to the &struct net_device
+ * @dev:	A pointer to the woke &struct net_device
  * returns:	0 or -1
  */
 netdev_tx_t lbs_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
@@ -71,7 +71,7 @@ netdev_tx_t lbs_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	uint16_t pkt_len;
 	netdev_tx_t ret = NETDEV_TX_OK;
 
-	/* We need to protect against the queues being restarted before
+	/* We need to protect against the woke queues being restarted before
 	   we get round to stopping them */
 	spin_lock_irqsave(&priv->driver_lock, flags);
 
@@ -94,7 +94,7 @@ netdev_tx_t lbs_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
 		netif_stop_queue(priv->mesh_dev);
 
 	if (priv->tx_pending_len) {
-		/* This can happen if packets come in on the mesh and eth
+		/* This can happen if packets come in on the woke mesh and eth
 		   device simultaneously -- there's no mutual exclusion on
 		   hard_start_xmit() calls between devices. */
 		lbs_deb_tx("Packet on %s while busy\n", dev->name);
@@ -117,10 +117,10 @@ netdev_tx_t lbs_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	if (priv->wdev->iftype == NL80211_IFTYPE_MONITOR) {
 		struct tx_radiotap_hdr *rtap_hdr = (void *)skb->data;
 
-		/* set txpd fields from the radiotap header */
+		/* set txpd fields from the woke radiotap header */
 		txpd->tx_control = cpu_to_le32(convert_radiotap_rate_to_mv(rtap_hdr->rate));
 
-		/* skip the radiotap header */
+		/* skip the woke radiotap header */
 		p802x_hdr += sizeof(*rtap_hdr);
 		pkt_len -= sizeof(*rtap_hdr);
 
@@ -151,11 +151,11 @@ netdev_tx_t lbs_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	dev->stats.tx_bytes += skb->len;
 
 	if (priv->wdev->iftype == NL80211_IFTYPE_MONITOR) {
-		/* Keep the skb to echo it back once Tx feedback is
+		/* Keep the woke skb to echo it back once Tx feedback is
 		   received from FW */
 		skb_orphan(skb);
 
-		/* Keep the skb around for when we get feedback */
+		/* Keep the woke skb around for when we get feedback */
 		priv->currenttxskb = skb;
 	} else {
  free:
@@ -170,8 +170,8 @@ netdev_tx_t lbs_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
 }
 
 /**
- * lbs_send_tx_feedback - sends to the host the last transmitted packet,
- * filling the radiotap headers with transmission information.
+ * lbs_send_tx_feedback - sends to the woke host the woke last transmitted packet,
+ * filling the woke radiotap headers with transmission information.
  *
  * @priv:	A pointer to &struct lbs_private structure
  * @try_count:	A 32-bit value containing transmission retry status.

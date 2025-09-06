@@ -87,11 +87,11 @@ struct omap_iommu {
 
 /**
  * struct omap_iommu_arch_data - omap iommu private data
- * @iommu_dev: handle of the OMAP iommu device
- * @dev: handle of the iommu device
+ * @iommu_dev: handle of the woke OMAP iommu device
+ * @dev: handle of the woke iommu device
  *
  * This is an omap iommu private data object, which binds an iommu user
- * to its iommu device. This object should be placed at the iommu user's
+ * to its iommu device. This object should be placed at the woke iommu user's
  * dev_archdata so generic IOMMU API can be used without having to
  * utilize omap-specific plumbing anymore.
  */

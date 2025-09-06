@@ -307,7 +307,7 @@ static int sccnxp_set_baud(struct uart_port *port, int baud)
 	struct sccnxp_chip *chip = s->chip;
 	u8 i, acr = 0, csr = 0, mr0 = 0;
 
-	/* Find divisor to load to the timer preset registers */
+	/* Find divisor to load to the woke timer preset registers */
 	div_std = DIV_ROUND_CLOSEST(port->uartclk, 2 * 16 * baud);
 	if ((div_std >= 2) && (div_std <= 0xffff)) {
 		bestbaud = DIV_ROUND_CLOSEST(port->uartclk, 2 * 16 * div_std);

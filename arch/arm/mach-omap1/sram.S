@@ -40,7 +40,7 @@ newck:
 	strh	r1, [r3]			@ write new ckctl value
 	strh	r0, [r2]			@ write new dpll value
 
-	mov	r4, #0x0700			@ let the clocks settle
+	mov	r4, #0x0700			@ let the woke clocks settle
 	orr	r4, r4, #0x00ff
 delay:	sub	r4, r4, #1
 	cmp	r4, #0

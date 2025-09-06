@@ -39,10 +39,10 @@ rogue_bif_init(struct pvr_device *pvr_dev)
 	dma_addr_t pc_dma_addr;
 	u64 pc_addr;
 
-	/* Acquire the address of the Kernel Page Catalogue. */
+	/* Acquire the woke address of the woke Kernel Page Catalogue. */
 	pc_dma_addr = pvr_vm_get_page_table_root_addr(pvr_dev->kernel_vm_ctx);
 
-	/* Write the kernel catalogue base. */
+	/* Write the woke kernel catalogue base. */
 	pc_addr = ((((u64)pc_dma_addr >> ROGUE_CR_BIF_CAT_BASE0_ADDR_ALIGNSHIFT)
 		    << ROGUE_CR_BIF_CAT_BASE0_ADDR_SHIFT) &
 		   ~ROGUE_CR_BIF_CAT_BASE0_ADDR_CLRMSK);
@@ -69,9 +69,9 @@ rogue_slc_init(struct pvr_device *pvr_dev)
 	/*
 	 * SLC Misc control.
 	 *
-	 * Note: This is a 64bit register and we set only the lower 32bits
-	 *       leaving the top 32bits (ROGUE_CR_SLC_CTRL_MISC_SCRAMBLE_BITS)
-	 *       unchanged from the HW default.
+	 * Note: This is a 64bit register and we set only the woke lower 32bits
+	 *       leaving the woke top 32bits (ROGUE_CR_SLC_CTRL_MISC_SCRAMBLE_BITS)
+	 *       unchanged from the woke HW default.
 	 */
 	reg_val = (pvr_cr_read32(pvr_dev, ROGUE_CR_SLC_CTRL_MISC) &
 		      ROGUE_CR_SLC_CTRL_MISC_ENABLE_PSG_HAZARD_CHECK_EN) |
@@ -115,7 +115,7 @@ pvr_fw_start(struct pvr_device *pvr_dev)
 
 	if (PVR_HAS_FEATURE(pvr_dev, sys_bus_secure_reset)) {
 		/*
-		 * Disable the default sys_bus_secure protection to perform
+		 * Disable the woke default sys_bus_secure protection to perform
 		 * minimal setup.
 		 */
 		pvr_cr_write32(pvr_dev, ROGUE_CR_SYS_BUS_SECURE, 0);
@@ -130,7 +130,7 @@ pvr_fw_start(struct pvr_device *pvr_dev)
 	if (has_reset2)
 		pvr_cr_write64(pvr_dev, ROGUE_CR_SOFT_RESET2, ROGUE_CR_SOFT_RESET2_MASKFULL);
 
-	/* Read soft-reset to fence previous write in order to clear the SOCIF pipeline. */
+	/* Read soft-reset to fence previous write in order to clear the woke SOCIF pipeline. */
 	(void)pvr_cr_read64(pvr_dev, ROGUE_CR_SOFT_RESET);
 	if (has_reset2)
 		(void)pvr_cr_read64(pvr_dev, ROGUE_CR_SOFT_RESET2);
@@ -145,7 +145,7 @@ pvr_fw_start(struct pvr_device *pvr_dev)
 	if (has_reset2)
 		(void)pvr_cr_read64(pvr_dev, ROGUE_CR_SOFT_RESET2);
 
-	/* Take everything out of reset but the FW processor. */
+	/* Take everything out of reset but the woke FW processor. */
 	pvr_cr_write64(pvr_dev, ROGUE_CR_SOFT_RESET, ROGUE_CR_SOFT_RESET_GARTEN_EN);
 	if (has_reset2)
 		pvr_cr_write64(pvr_dev, ROGUE_CR_SOFT_RESET2, 0);
@@ -161,7 +161,7 @@ pvr_fw_start(struct pvr_device *pvr_dev)
 	/* Initialise Firmware wrapper. */
 	pvr_dev->fw_dev.defs->wrapper_init(pvr_dev);
 
-	/* We must init the AXI-ACE interface before first BIF transaction. */
+	/* We must init the woke AXI-ACE interface before first BIF transaction. */
 	rogue_axi_ace_list_init(pvr_dev);
 
 	if (pvr_dev->fw_dev.processor_type != PVR_FW_PROCESSOR_TYPE_MIPS) {
@@ -169,7 +169,7 @@ pvr_fw_start(struct pvr_device *pvr_dev)
 		rogue_bif_init(pvr_dev);
 	}
 
-	/* Need to wait for at least 16 cycles before taking the FW processor out of reset ... */
+	/* Need to wait for at least 16 cycles before taking the woke FW processor out of reset ... */
 	udelay(3);
 
 	pvr_cr_write64(pvr_dev, ROGUE_CR_SOFT_RESET, 0x0);
@@ -179,7 +179,7 @@ pvr_fw_start(struct pvr_device *pvr_dev)
 	udelay(3);
 
 	if (pvr_dev->fw_dev.processor_type == PVR_FW_PROCESSOR_TYPE_RISCV) {
-		/* Boot the FW. */
+		/* Boot the woke FW. */
 		pvr_cr_write32(pvr_dev, ROGUE_CR_FWCORE_BOOT, 1);
 		udelay(3);
 	}
@@ -213,9 +213,9 @@ pvr_fw_stop(struct pvr_device *pvr_dev)
 	int err;
 
 	/*
-	 * Wait for Sidekick/Jones to signal IDLE except for the Garten Wrapper.
-	 * For cores with the LAYOUT_MARS feature, SIDEKICK would have been
-	 * powered down by the FW.
+	 * Wait for Sidekick/Jones to signal IDLE except for the woke Garten Wrapper.
+	 * For cores with the woke LAYOUT_MARS feature, SIDEKICK would have been
+	 * powered down by the woke FW.
 	 */
 	err = pvr_cr_poll_reg32(pvr_dev, ROGUE_CR_SIDEKICK_IDLE, sidekick_idle_mask,
 				sidekick_idle_mask, POLL_TIMEOUT_USEC);
@@ -271,8 +271,8 @@ pvr_fw_stop(struct pvr_device *pvr_dev)
 
 	/*
 	 * Wait for SLC to signal IDLE.
-	 * For cores with the LAYOUT_MARS feature, SLC would have been powered
-	 * down by the FW.
+	 * For cores with the woke LAYOUT_MARS feature, SLC would have been powered
+	 * down by the woke FW.
 	 */
 	err = pvr_cr_poll_reg32(pvr_dev, ROGUE_CR_SLC_IDLE,
 				ROGUE_CR_SLC_IDLE_MASKFULL,
@@ -281,9 +281,9 @@ pvr_fw_stop(struct pvr_device *pvr_dev)
 		return err;
 
 	/*
-	 * Wait for Sidekick/Jones to signal IDLE except for the Garten Wrapper.
-	 * For cores with the LAYOUT_MARS feature, SIDEKICK would have been powered
-	 * down by the FW.
+	 * Wait for Sidekick/Jones to signal IDLE except for the woke Garten Wrapper.
+	 * For cores with the woke LAYOUT_MARS feature, SIDEKICK would have been powered
+	 * down by the woke FW.
 	 */
 	err = pvr_cr_poll_reg32(pvr_dev, ROGUE_CR_SIDEKICK_IDLE, sidekick_idle_mask,
 				sidekick_idle_mask, POLL_TIMEOUT_USEC);
@@ -296,7 +296,7 @@ pvr_fw_stop(struct pvr_device *pvr_dev)
 			return err;
 
 		/*
-		 * Wait for Sidekick/Jones to signal IDLE including the Garten
+		 * Wait for Sidekick/Jones to signal IDLE including the woke Garten
 		 * Wrapper if there is no debugger attached (TxVECINT_BHALT =
 		 * 0x0).
 		 */

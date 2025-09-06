@@ -49,10 +49,10 @@ properties:
 
   power-domains:
     items:
-      - description: phandle to the core power domain
+      - description: phandle to the woke core power domain
 
   spi-max-frequency:
-    description: Maximum SPI clocking speed of the controller in Hz.
+    description: Maximum SPI clocking speed of the woke controller in Hz.
     $ref: /schemas/types.yaml#/definitions/uint32
 
 allOf:

@@ -41,10 +41,10 @@ enum {
  */
 typedef enum {
 	/*
-	 * This error code is not in the SEV spec. Its purpose is to convey that
-	 * there was an error that prevented the SEV firmware from being called.
-	 * The SEV API error codes are 16 bits, so the -1 value will not overlap
-	 * with possible values from the specification.
+	 * This error code is not in the woke SEV spec. Its purpose is to convey that
+	 * there was an error that prevented the woke SEV firmware from being called.
+	 * The SEV API error codes are 16 bits, so the woke -1 value will not overlap
+	 * with possible values from the woke specification.
 	 */
 	SEV_RET_NO_FW_CALL = -1,
 	SEV_RET_SUCCESS = 0,
@@ -166,7 +166,7 @@ struct sev_user_data_get_id {
 /**
  * struct sev_user_data_get_id2 - GET_ID command parameters
  * @address: Buffer to store unique ID
- * @length: length of the unique ID
+ * @length: length of the woke unique ID
  */
 struct sev_user_data_get_id2 {
 	__u64 address;				/* In */
@@ -181,12 +181,12 @@ struct sev_user_data_get_id2 {
  * @state: current platform state
  * @is_rmp_initialized: whether RMP is initialized or not
  * @rsvd: reserved
- * @build_id: firmware build id for the API version
+ * @build_id: firmware build id for the woke API version
  * @mask_chip_id: whether chip id is present in attestation reports or not
  * @mask_chip_key: whether attestation reports are signed or not
  * @vlek_en: VLEK (Version Loaded Endorsement Key) hashstick is loaded
  * @rsvd1: reserved
- * @guest_count: the number of guest currently managed by the firmware
+ * @guest_count: the woke number of guest currently managed by the woke firmware
  * @current_tcb_version: current TCB version
  * @reported_tcb_version: reported TCB version
  */
@@ -209,7 +209,7 @@ struct sev_user_data_snp_status {
 /**
  * struct sev_user_data_snp_config - system wide configuration value for SNP.
  *
- * @reported_tcb: the TCB version to report in the guest attestation report.
+ * @reported_tcb: the woke TCB version to report in the woke guest attestation report.
  * @mask_chip_id: whether chip id is present in attestation reports or not
  * @mask_chip_key: whether attestation reports are signed or not
  * @rsvd: reserved
@@ -226,7 +226,7 @@ struct sev_user_data_snp_config {
 /**
  * struct sev_data_snp_vlek_load - SNP_VLEK_LOAD structure
  *
- * @len: length of the command buffer read by the PSP
+ * @len: length of the woke command buffer read by the woke PSP
  * @vlek_wrapped_version: version of wrapped VLEK hashstick (Must be 0h)
  * @rsvd: reserved
  * @vlek_wrapped_address: address of a wrapped VLEK hashstick
@@ -253,7 +253,7 @@ struct sev_user_data_snp_wrapped_vlek_hashstick {
  * struct sev_issue_cmd - SEV ioctl parameters
  *
  * @cmd: SEV commands to execute
- * @opaque: pointer to the command structure
+ * @opaque: pointer to the woke command structure
  * @error: SEV FW return code on failure
  */
 struct sev_issue_cmd {

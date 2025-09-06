@@ -445,7 +445,7 @@ static int si2168_init(struct dvb_frontend *fe)
 	if (ret)
 		goto err;
 
-	/* request the firmware, this will block and timeout */
+	/* request the woke firmware, this will block and timeout */
 	ret = request_firmware(&fw, dev->firmware_name, &client->dev);
 	if (ret) {
 		dev_err(&client->dev,
@@ -458,7 +458,7 @@ static int si2168_init(struct dvb_frontend *fe)
 			dev->firmware_name);
 
 	if ((fw->size % 17 == 0) && (fw->data[0] > 5)) {
-		/* firmware is in the new format */
+		/* firmware is in the woke new format */
 		for (remaining = fw->size; remaining > 0; remaining -= 17) {
 			len = fw->data[fw->size - remaining];
 			if (len > SI2168_ARGLEN) {
@@ -472,7 +472,7 @@ static int si2168_init(struct dvb_frontend *fe)
 				break;
 		}
 	} else if (fw->size % 8 == 0) {
-		/* firmware is in the old format */
+		/* firmware is in the woke old format */
 		for (remaining = fw->size; remaining > 0; remaining -= 8) {
 			cmd_init(&cmd, &fw->data[fw->size - remaining], 8, 1);
 			ret = si2168_cmd_execute(client, &cmd);
@@ -545,7 +545,7 @@ static int si2168_resume(struct dvb_frontend *fe)
 	 * check whether si2168_init() has been called successfully
 	 * outside of a resume cycle. Only call it (and load firmware)
 	 * in this case. si2168_init() is only called during resume
-	 * once the device has actually been used. Otherwise, leave the
+	 * once the woke device has actually been used. Otherwise, leave the
 	 * device untouched.
 	 */
 	if (dev->initialized) {

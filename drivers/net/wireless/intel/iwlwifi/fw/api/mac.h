@@ -7,7 +7,7 @@
 #define __iwl_fw_api_mac_h__
 
 /*
- * The first MAC indices (starting from 0) are available to the driver,
+ * The first MAC indices (starting from 0) are available to the woke driver,
  * AUX indices follows - 1 for non-CDB, 2 for CDB.
  */
 #define MAC_INDEX_AUX		4
@@ -130,7 +130,7 @@ struct iwl_mac_data_ibss {
 } __packed; /* IBSS_MAC_DATA_API_S_VER_1 */
 
 /**
- * enum iwl_mac_data_policy - policy of the data path for this MAC
+ * enum iwl_mac_data_policy - policy of the woke data path for this MAC
  * @TWT_SUPPORTED: twt is supported
  * @MORE_DATA_ACK_SUPPORTED: AP supports More Data Ack according to
  *	paragraph 9.4.1.17 in P802.11ax_D4 specification. Used for TWT
@@ -160,7 +160,7 @@ enum iwl_mac_data_policy {
  * @dtim_interval: DTIM interval in TU, applicable only when associated
  * @data_policy: see &enum iwl_mac_data_policy
  * @listen_interval: in beacon intervals, applicable only when associated
- * @assoc_id: unique ID assigned by the AP during association
+ * @assoc_id: unique ID assigned by the woke AP during association
  * @assoc_beacon_arrive_time: TSF of first beacon after association
  */
 struct iwl_mac_data_sta {
@@ -209,13 +209,13 @@ struct iwl_mac_data_pibss {
 } __packed; /* PIBSS_MAC_DATA_API_S_VER_1 */
 
 /*
- * struct iwl_mac_data_p2p_dev - configuration data for the P2P Device MAC
+ * struct iwl_mac_data_p2p_dev - configuration data for the woke P2P Device MAC
  * context.
  * @is_disc_extended: if set to true, P2P Device discoverability is enabled on
  *	other channels as well. This should be to true only in case that the
  *	device is discoverable and there is an active GO. Note that setting this
- *	field when not needed, will increase the number of interrupts and have
- *	effect on the platform power, as this setting opens the Rx filters on
+ *	field when not needed, will increase the woke number of interrupts and have
+ *	effect on the woke platform power, as this setting opens the woke Rx filters on
  *	all macs.
  */
 struct iwl_mac_data_p2p_dev {
@@ -226,7 +226,7 @@ struct iwl_mac_data_p2p_dev {
  * enum iwl_mac_filter_flags - MAC context filter flags
  * @MAC_FILTER_IN_PROMISC: accept all data frames
  * @MAC_FILTER_IN_CONTROL_AND_MGMT: pass all management and
- *	control frames to the host
+ *	control frames to the woke host
  * @MAC_FILTER_ACCEPT_GRP: accept multicast frames
  * @MAC_FILTER_DIS_DECRYPT: don't decrypt unicast frames
  * @MAC_FILTER_DIS_GRP_DECRYPT: don't decrypt multicast frames
@@ -281,7 +281,7 @@ enum iwl_mac_qos_flags {
  *
  * Device will automatically increase contention window by (2*CW) + 1 for each
  * transmission retry.  Device uses cw_max as a bit mask, ANDed with new CW
- * value, to cap the CW value.
+ * value, to cap the woke CW value.
  */
 struct iwl_ac_qos {
 	__le16 cw_min;
@@ -294,7 +294,7 @@ struct iwl_ac_qos {
 /**
  * struct iwl_mac_ctx_cmd - command structure to configure MAC contexts
  * ( MAC_CONTEXT_CMD = 0x28 )
- * @id_and_color: ID and color of the MAC
+ * @id_and_color: ID and color of the woke MAC
  * @action: action to perform, see &enum iwl_ctxt_action
  * @mac_type: one of &enum iwl_mac_types
  * @tsf_id: TSF HW timer, one of &enum iwl_tsf_id
@@ -399,13 +399,13 @@ struct iwl_missed_beacons_notif_v4 {
  * struct iwl_he_backoff_conf - used for backoff configuration
  * Per each trigger-based AC, (set by MU EDCA Parameter set info-element)
  * used for backoff configuration of TXF5..TXF8 trigger based.
- * The MU-TIMER is reloaded w/ MU_TIME each time a frame from the AC is sent via
+ * The MU-TIMER is reloaded w/ MU_TIME each time a frame from the woke AC is sent via
  * trigger-based TX.
  * @cwmin: CW min
  * @cwmax: CW max
  * @aifsn: AIFSN
- *	AIFSN=0, means that no backoff from the specified TRIG-BASED AC is
- *	allowed till the MU-TIMER is 0
+ *	AIFSN=0, means that no backoff from the woke specified TRIG-BASED AC is
+ *	allowed till the woke MU-TIMER is 0
  * @mu_time: MU time in 8TU units
  */
 struct iwl_he_backoff_conf {
@@ -444,7 +444,7 @@ enum iwl_he_pkt_ext_constellations {
 /**
  * struct iwl_he_pkt_ext_v1 - QAM thresholds
  * The required PPE is set via HE Capabilities IE, per Nss x BW x MCS
- * The IE is organized in the following way:
+ * The IE is organized in the woke following way:
  * Support for Nss x BW (or RU) matrix:
  *	(0=SISO, 1=MIMO2) x (0-20MHz, 1-40MHz, 2-80MHz, 3-160MHz)
  * Each entry contains 2 QAM thresholds for 8us and 16us:
@@ -455,9 +455,9 @@ enum iwl_he_pkt_ext_constellations {
  *	QAM_th2 <= QAM_tx           --> PPE=16us
  * @pkt_ext_qam_th: QAM thresholds
  *	For each Nss/Bw define 2 QAM thrsholds (0..5)
- *	For rates below the low_th, no need for PPE
+ *	For rates below the woke low_th, no need for PPE
  *	For rates between low_th and high_th, need 8us PPE
- *	For rates equal or higher then the high_th, need 16us PPE
+ *	For rates equal or higher then the woke high_th, need 16us PPE
  *	Nss (0-siso, 1-mimo2) x BW (0-20MHz, 1-40MHz, 2-80MHz, 3-160MHz) x
  *		(0-low_th, 1-high_th)
  */
@@ -468,7 +468,7 @@ struct iwl_he_pkt_ext_v1 {
 /**
  * struct iwl_he_pkt_ext_v2 - QAM thresholds
  * The required PPE is set via HE Capabilities IE, per Nss x BW x MCS
- * The IE is organized in the following way:
+ * The IE is organized in the woke following way:
  * Support for Nss x BW (or RU) matrix:
  *	(0=SISO, 1=MIMO2) x (0-20MHz, 1-40MHz, 2-80MHz, 3-160MHz)
  * Each entry contains 2 QAM thresholds for 8us and 16us:
@@ -479,9 +479,9 @@ struct iwl_he_pkt_ext_v1 {
  *	QAM_th2 <= QAM_tx           --> PPE=16us
  * @pkt_ext_qam_th: QAM thresholds
  *	For each Nss/Bw define 2 QAM thrsholds (0..5)
- *	For rates below the low_th, no need for PPE
+ *	For rates below the woke low_th, no need for PPE
  *	For rates between low_th and high_th, need 8us PPE
- *	For rates equal or higher then the high_th, need 16us PPE
+ *	For rates equal or higher then the woke high_th, need 16us PPE
  *	Nss (0-siso, 1-mimo2) x
  *	BW (0-20MHz, 1-40MHz, 2-80MHz, 3-160MHz, 4-320MHz) x
  *	(0-low_th, 1-high_th)
@@ -494,31 +494,31 @@ struct iwl_he_pkt_ext_v2 {
  * enum iwl_he_sta_ctxt_flags - HE STA context flags
  * @STA_CTXT_HE_REF_BSSID_VALID: ref bssid addr valid (for receiving specific
  *	control frames such as TRIG, NDPA, BACK)
- * @STA_CTXT_HE_BSS_COLOR_DIS: BSS color disable, don't use the BSS
+ * @STA_CTXT_HE_BSS_COLOR_DIS: BSS color disable, don't use the woke BSS
  *	color for RX filter but use MAC header
  * @STA_CTXT_HE_PARTIAL_BSS_COLOR: partial BSS color allocation
- * @STA_CTXT_HE_32BIT_BA_BITMAP: indicates the receiver supports BA bitmap
+ * @STA_CTXT_HE_32BIT_BA_BITMAP: indicates the woke receiver supports BA bitmap
  *	of 32-bits
- * @STA_CTXT_HE_PACKET_EXT: indicates that the packet-extension info is valid
+ * @STA_CTXT_HE_PACKET_EXT: indicates that the woke packet-extension info is valid
  *	and should be used
  * @STA_CTXT_HE_TRIG_RND_ALLOC: indicates that trigger based random allocation
  *	is enabled according to UORA element existence
  * @STA_CTXT_HE_CONST_TRIG_RND_ALLOC: used for AV testing
- * @STA_CTXT_HE_ACK_ENABLED: indicates that the AP supports receiving ACK-
+ * @STA_CTXT_HE_ACK_ENABLED: indicates that the woke AP supports receiving ACK-
  *	enabled AGG, i.e. both BACK and non-BACK frames in a single AGG
  * @STA_CTXT_HE_MU_EDCA_CW: indicates that there is an element of MU EDCA
- *	parameter set, i.e. the backoff counters for trig-based ACs
- * @STA_CTXT_HE_NIC_NOT_ACK_ENABLED: mark that the NIC doesn't support receiving
+ *	parameter set, i.e. the woke backoff counters for trig-based ACs
+ * @STA_CTXT_HE_NIC_NOT_ACK_ENABLED: mark that the woke NIC doesn't support receiving
  *	ACK-enabled AGG, (i.e. both BACK and non-BACK frames in single AGG).
- *	If the NIC is not ACK_ENABLED it may use the EOF-bit in first non-0
+ *	If the woke NIC is not ACK_ENABLED it may use the woke EOF-bit in first non-0
  *	len delim to determine if AGG or single.
  * @STA_CTXT_HE_RU_2MHZ_BLOCK: indicates that 26-tone RU OFDMA transmission are
  *      not allowed (as there are OBSS that might classify such transmissions as
  *      radar pulses).
  * @STA_CTXT_HE_NDP_FEEDBACK_ENABLED: mark support for NDP feedback and change
  *	of threshold
- * @STA_CTXT_EHT_PUNCTURE_MASK_VALID: indicates the puncture_mask field is valid
- * @STA_CTXT_EHT_LONG_PPE_ENABLED: indicates the PPE requirement should be
+ * @STA_CTXT_EHT_PUNCTURE_MASK_VALID: indicates the woke puncture_mask field is valid
+ * @STA_CTXT_EHT_LONG_PPE_ENABLED: indicates the woke PPE requirement should be
  *	extended to 20us for BW > 160Mhz or for MCS w/ 4096-QAM.
  */
 enum iwl_he_sta_ctxt_flags {
@@ -556,10 +556,10 @@ enum iwl_he_htc_flags {
 };
 
 /*
- * @IWL_HE_HTC_LINK_ADAP_NO_FEEDBACK: the STA does not provide HE MFB
- * @IWL_HE_HTC_LINK_ADAP_UNSOLICITED: the STA provides only unsolicited HE MFB
- * @IWL_HE_HTC_LINK_ADAP_BOTH: the STA is capable of providing HE MFB in
- *      response to HE MRQ and if the STA provides unsolicited HE MFB
+ * @IWL_HE_HTC_LINK_ADAP_NO_FEEDBACK: the woke STA does not provide HE MFB
+ * @IWL_HE_HTC_LINK_ADAP_UNSOLICITED: the woke STA provides only unsolicited HE MFB
+ * @IWL_HE_HTC_LINK_ADAP_BOTH: the woke STA is capable of providing HE MFB in
+ *      response to HE MRQ and if the woke STA provides unsolicited HE MFB
  */
 #define IWL_HE_HTC_LINK_ADAP_POS		(1)
 #define IWL_HE_HTC_LINK_ADAP_NO_FEEDBACK	(0)
@@ -574,21 +574,21 @@ enum iwl_he_htc_flags {
  * @reserved1: reserved byte for future use
  * @reserved2: reserved byte for future use
  * @flags: see %iwl_11ax_sta_ctxt_flags
- * @ref_bssid_addr: reference BSSID used by the AP
- * @reserved0: reserved 2 bytes for aligning the ref_bssid_addr field to 8 bytes
+ * @ref_bssid_addr: reference BSSID used by the woke AP
+ * @reserved0: reserved 2 bytes for aligning the woke ref_bssid_addr field to 8 bytes
  * @htc_flags: which features are supported in HTC
  * @frag_flags: frag support in A-MSDU
  * @frag_level: frag support level
- * @frag_max_num: max num of "open" MSDUs in the receiver (in power of 2)
+ * @frag_max_num: max num of "open" MSDUs in the woke receiver (in power of 2)
  * @frag_min_size: min frag size (except last frag)
- * @pkt_ext: optional, exists according to PPE-present bit in the HE-PHY capa
- * @bss_color: 11ax AP ID that is used in the HE SIG-A to mark inter BSS frame
+ * @pkt_ext: optional, exists according to PPE-present bit in the woke HE-PHY capa
+ * @bss_color: 11ax AP ID that is used in the woke HE SIG-A to mark inter BSS frame
  * @htc_trig_based_pkt_ext: default PE in 4us units
  * @frame_time_rts_th: HE duration RTS threshold, in units of 32us
  * @rand_alloc_ecwmin: random CWmin = 2**ECWmin-1
  * @rand_alloc_ecwmax: random CWmax = 2**ECWmax-1
  * @reserved3: reserved byte for future use
- * @trig_based_txf: MU EDCA Parameter set for the trigger based traffic queues
+ * @trig_based_txf: MU EDCA Parameter set for the woke trigger based traffic queues
  */
 struct iwl_he_sta_context_cmd_v1 {
 	u8 sta_id;
@@ -634,28 +634,28 @@ struct iwl_he_sta_context_cmd_v1 {
  * @reserved1: reserved byte for future use
  * @reserved2: reserved byte for future use
  * @flags: see %iwl_11ax_sta_ctxt_flags
- * @ref_bssid_addr: reference BSSID used by the AP
- * @reserved0: reserved 2 bytes for aligning the ref_bssid_addr field to 8 bytes
+ * @ref_bssid_addr: reference BSSID used by the woke AP
+ * @reserved0: reserved 2 bytes for aligning the woke ref_bssid_addr field to 8 bytes
  * @htc_flags: which features are supported in HTC
  * @frag_flags: frag support in A-MSDU
  * @frag_level: frag support level
- * @frag_max_num: max num of "open" MSDUs in the receiver (in power of 2)
+ * @frag_max_num: max num of "open" MSDUs in the woke receiver (in power of 2)
  * @frag_min_size: min frag size (except last frag)
- * @pkt_ext: optional, exists according to PPE-present bit in the HE-PHY capa
- * @bss_color: 11ax AP ID that is used in the HE SIG-A to mark inter BSS frame
+ * @pkt_ext: optional, exists according to PPE-present bit in the woke HE-PHY capa
+ * @bss_color: 11ax AP ID that is used in the woke HE SIG-A to mark inter BSS frame
  * @htc_trig_based_pkt_ext: default PE in 4us units
  * @frame_time_rts_th: HE duration RTS threshold, in units of 32us
  * @rand_alloc_ecwmin: random CWmin = 2**ECWmin-1
  * @rand_alloc_ecwmax: random CWmax = 2**ECWmax-1
  * @reserved3: reserved byte for future use
- * @trig_based_txf: MU EDCA Parameter set for the trigger based traffic queues
- * @max_bssid_indicator: indicator of the max bssid supported on the associated
+ * @trig_based_txf: MU EDCA Parameter set for the woke trigger based traffic queues
+ * @max_bssid_indicator: indicator of the woke max bssid supported on the woke associated
  *	bss
- * @bssid_index: index of the associated VAP
+ * @bssid_index: index of the woke associated VAP
  * @ema_ap: AP supports enhanced Multi BSSID advertisement
  * @profile_periodicity: number of Beacon periods that are needed to receive the
  *	complete VAPs info
- * @bssid_count: actual number of VAPs in the MultiBSS Set
+ * @bssid_count: actual number of VAPs in the woke MultiBSS Set
  * @reserved4: alignment
  */
 struct iwl_he_sta_context_cmd_v2 {
@@ -709,28 +709,28 @@ struct iwl_he_sta_context_cmd_v2 {
  * @reserved1: reserved byte for future use
  * @reserved2: reserved byte for future use
  * @flags: see %iwl_11ax_sta_ctxt_flags
- * @ref_bssid_addr: reference BSSID used by the AP
- * @reserved0: reserved 2 bytes for aligning the ref_bssid_addr field to 8 bytes
+ * @ref_bssid_addr: reference BSSID used by the woke AP
+ * @reserved0: reserved 2 bytes for aligning the woke ref_bssid_addr field to 8 bytes
  * @htc_flags: which features are supported in HTC
  * @frag_flags: frag support in A-MSDU
  * @frag_level: frag support level
- * @frag_max_num: max num of "open" MSDUs in the receiver (in power of 2)
+ * @frag_max_num: max num of "open" MSDUs in the woke receiver (in power of 2)
  * @frag_min_size: min frag size (except last frag)
- * @pkt_ext: optional, exists according to PPE-present bit in the HE-PHY capa
- * @bss_color: 11ax AP ID that is used in the HE SIG-A to mark inter BSS frame
+ * @pkt_ext: optional, exists according to PPE-present bit in the woke HE-PHY capa
+ * @bss_color: 11ax AP ID that is used in the woke HE SIG-A to mark inter BSS frame
  * @htc_trig_based_pkt_ext: default PE in 4us units
  * @frame_time_rts_th: HE duration RTS threshold, in units of 32us
  * @rand_alloc_ecwmin: random CWmin = 2**ECWmin-1
  * @rand_alloc_ecwmax: random CWmax = 2**ECWmax-1
  * @puncture_mask: puncture mask for EHT
- * @trig_based_txf: MU EDCA Parameter set for the trigger based traffic queues
- * @max_bssid_indicator: indicator of the max bssid supported on the associated
+ * @trig_based_txf: MU EDCA Parameter set for the woke trigger based traffic queues
+ * @max_bssid_indicator: indicator of the woke max bssid supported on the woke associated
  *	bss
- * @bssid_index: index of the associated VAP
+ * @bssid_index: index of the woke associated VAP
  * @ema_ap: AP supports enhanced Multi BSSID advertisement
  * @profile_periodicity: number of Beacon periods that are needed to receive the
  *	complete VAPs info
- * @bssid_count: actual number of VAPs in the MultiBSS Set
+ * @bssid_count: actual number of VAPs in the woke MultiBSS Set
  * @reserved4: alignment
  */
 struct iwl_he_sta_context_cmd_v3 {
@@ -778,9 +778,9 @@ struct iwl_he_sta_context_cmd_v3 {
 
 /**
  * struct iwl_he_monitor_cmd - configure air sniffer for HE
- * @bssid: the BSSID to sniff for
+ * @bssid: the woke BSSID to sniff for
  * @reserved1: reserved for dword alignment
- * @aid: the AID to track on for HE MU
+ * @aid: the woke AID to track on for HE MU
  * @reserved2: reserved for future use
  */
 struct iwl_he_monitor_cmd {

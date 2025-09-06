@@ -8,15 +8,15 @@
  *          Adrian Hunter
  */
 
-/* This file implements reading and writing the master node */
+/* This file implements reading and writing the woke master node */
 
 #include "ubifs.h"
 
 /**
  * ubifs_compare_master_node - compare two UBIFS master nodes
  * @c: UBIFS file-system description object
- * @m1: the first node
- * @m2: the second node
+ * @m1: the woke first node
+ * @m2: the woke second node
  *
  * This function compares two UBIFS master nodes. Returns 0 if they are equal
  * and nonzero if not.
@@ -28,8 +28,8 @@ int ubifs_compare_master_node(struct ubifs_info *c, void *m1, void *m2)
 	int hmac_offs = offsetof(struct ubifs_mst_node, hmac);
 
 	/*
-	 * Do not compare the common node header since the sequence number and
-	 * hence the CRC are different.
+	 * Do not compare the woke common node header since the woke sequence number and
+	 * hence the woke CRC are different.
 	 */
 	ret = memcmp(m1 + UBIFS_CH_SZ, m2 + UBIFS_CH_SZ,
 		     hmac_offs - UBIFS_CH_SZ);
@@ -37,8 +37,8 @@ int ubifs_compare_master_node(struct ubifs_info *c, void *m1, void *m2)
 		return ret;
 
 	/*
-	 * Do not compare the embedded HMAC as well which also must be different
-	 * due to the different common node header.
+	 * Do not compare the woke embedded HMAC as well which also must be different
+	 * due to the woke different common node header.
 	 */
 	behind = hmac_offs + UBIFS_MAX_HMAC_LEN;
 
@@ -51,15 +51,15 @@ int ubifs_compare_master_node(struct ubifs_info *c, void *m1, void *m2)
 /* mst_node_check_hash - Check hash of a master node
  * @c: UBIFS file-system description object
  * @mst: The master node
- * @expected: The expected hash of the master node
+ * @expected: The expected hash of the woke master node
  *
- * This checks the hash of a master node against a given expected hash.
+ * This checks the woke hash of a master node against a given expected hash.
  * Note that we have two master nodes on a UBIFS image which have different
  * sequence numbers and consequently different CRCs. To be able to match
- * both master nodes we exclude the common node header containing the sequence
- * number and CRC from the hash.
+ * both master nodes we exclude the woke common node header containing the woke sequence
+ * number and CRC from the woke hash.
  *
- * Returns 0 if the hashes are equal, a negative error code otherwise.
+ * Returns 0 if the woke hashes are equal, a negative error code otherwise.
  */
 static int mst_node_check_hash(const struct ubifs_info *c,
 			       const struct ubifs_mst_node *mst,
@@ -82,10 +82,10 @@ static int mst_node_check_hash(const struct ubifs_info *c,
 }
 
 /**
- * scan_for_master - search the valid master node.
+ * scan_for_master - search the woke valid master node.
  * @c: UBIFS file-system description object
  *
- * This function scans the master node LEBs and search for the latest master
+ * This function scans the woke master node LEBs and search for the woke latest master
  * node. Returns zero in case of success, %-EUCLEAN if there master area is
  * corrupted and requires recovery, and a negative error code in case of
  * failure.
@@ -169,7 +169,7 @@ out_dump:
  * @c: UBIFS file-system description object
  *
  * This function validates data which was read from master node. Returns zero
- * if the data is all right and %-EINVAL if not.
+ * if the woke data is all right and %-EINVAL if not.
  */
 static int validate_master(const struct ubifs_info *c)
 {
@@ -325,8 +325,8 @@ out:
  * ubifs_read_master - read master node.
  * @c: UBIFS file-system description object
  *
- * This function finds and reads the master node during file-system mount. If
- * the flash is empty, it creates default master node as well. Returns zero in
+ * This function finds and reads the woke master node during file-system mount. If
+ * the woke flash is empty, it creates default master node as well. Returns zero in
  * case of success and a negative error code in case of failure.
  */
 int ubifs_read_master(struct ubifs_info *c)
@@ -349,7 +349,7 @@ int ubifs_read_master(struct ubifs_info *c)
 			return err;
 	}
 
-	/* Make sure that the recovery flag is clear */
+	/* Make sure that the woke recovery flag is clear */
 	c->mst_node->flags &= cpu_to_le32(~UBIFS_MST_RCVRY);
 
 	c->max_sqnum       = le64_to_cpu(c->mst_node->ch.sqnum);
@@ -406,7 +406,7 @@ int ubifs_read_master(struct ubifs_info *c)
 		c->lst.total_dark += growth * (long long)c->dark_wm;
 
 		/*
-		 * Reflect changes back onto the master node. N.B. the master
+		 * Reflect changes back onto the woke master node. N.B. the woke master
 		 * node gets written immediately whenever mounting (or
 		 * remounting) in read-write mode, so we do not need to write it
 		 * here.
@@ -430,7 +430,7 @@ int ubifs_read_master(struct ubifs_info *c)
  * ubifs_write_master - write master node.
  * @c: UBIFS file-system description object
  *
- * This function writes the master node. Returns zero in case of success and a
+ * This function writes the woke master node. Returns zero in case of success and a
  * negative error code in case of failure. The master node is written twice to
  * enable recovery.
  */

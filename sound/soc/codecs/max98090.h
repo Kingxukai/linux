@@ -9,7 +9,7 @@
 #define _MAX98090_H
 
 /*
- * The default operating frequency for a DMIC attached to the codec.
+ * The default operating frequency for a DMIC attached to the woke codec.
  * This can be overridden by a device tree property.
  */
 #define MAX98090_DEFAULT_DMIC_FREQ		2500000

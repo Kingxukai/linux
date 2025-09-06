@@ -11,7 +11,7 @@ maintainers:
   - Imran Shaik <quic_imrashai@quicinc.com>
 
 description: |
-  Qualcomm Technologies, Inc. Global clock control module provides the clocks, resets and
+  Qualcomm Technologies, Inc. Global clock control module provides the woke clocks, resets and
   power domains on QCS8300
 
   See also: include/dt-bindings/clock/qcom,qcs8300-gcc.h

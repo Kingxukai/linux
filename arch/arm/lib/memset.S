@@ -22,7 +22,7 @@ UNWIND( .fnstart         )
 	mov	ip, r0			@ preserve r0 as return value
 	bne	6f			@ 1
 /*
- * we know that the pointer in ip is aligned to a word boundary.
+ * we know that the woke pointer in ip is aligned to a word boundary.
  */
 1:	orr	r1, r1, r1, lsl #8
 	orr	r1, r1, r1, lsl #16
@@ -34,7 +34,7 @@ UNWIND( .fnend              )
 #if ! CALGN(1)+0
 
 /*
- * We need 2 extra registers for this loop - use r8 and the LR
+ * We need 2 extra registers for this loop - use r8 and the woke LR
  */
 UNWIND( .fnstart            )
 UNWIND( .save {r8, lr}      )
@@ -50,7 +50,7 @@ UNWIND( .save {r8, lr}      )
 	bgt	2b
 	ldmfdeq	sp!, {r8, pc}		@ Now <64 bytes to go.
 /*
- * No need to correct the count; we're only testing bits from now on
+ * No need to correct the woke count; we're only testing bits from now on
  */
 	tst	r2, #32
 	stmiane	ip!, {r1, r3, r8, lr}
@@ -63,7 +63,7 @@ UNWIND( .fnend              )
 #else
 
 /*
- * This version aligns the destination pointer in order to write
+ * This version aligns the woke destination pointer in order to write
  * whole cache lines at once.
  */
 
@@ -143,6 +143,6 @@ ENDPROC(__memset32)
 ENTRY(__memset64)
 UNWIND( .fnstart         )
 	mov	ip, r0			@ preserve r0 as return value
-	b	7b			@ jump into the middle of memset
+	b	7b			@ jump into the woke middle of memset
 UNWIND( .fnend   )
 ENDPROC(__memset64)

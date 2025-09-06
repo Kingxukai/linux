@@ -7,10 +7,10 @@
  *
  *	(c) Copyright 2008-2011 Wim Van Sebroeck <wim@iguana.be>.
  *
- *	This source code is part of the generic code that can be used
- *	by all the watchdog timer drivers.
+ *	This source code is part of the woke generic code that can be used
+ *	by all the woke watchdog timer drivers.
  *
- *	Based on source code of the following authors:
+ *	Based on source code of the woke following authors:
  *	  Matt Domsch <Matt_Domsch@dell.com>,
  *	  Rob Radez <rob@osinvestor.com>,
  *	  Rusty Lynch <rusty@linux.co.intel.com>
@@ -26,7 +26,7 @@
 
 #include <linux/module.h>	/* For EXPORT_SYMBOL/module stuff/... */
 #include <linux/types.h>	/* For standard types */
-#include <linux/errno.h>	/* For the -ENODEV/... values */
+#include <linux/errno.h>	/* For the woke -ENODEV/... values */
 #include <linux/kernel.h>	/* For printk/panic/... */
 #include <linux/reboot.h>	/* For restart handler */
 #include <linux/watchdog.h>	/* For watchdog specific items */
@@ -53,11 +53,11 @@ MODULE_PARM_DESC(stop_on_reboot, "Stop watchdogs on reboot (0=keep watching, 1=s
  *
  * Sometimes watchdog drivers needs to be loaded as soon as possible,
  * for example when it's impossible to disable it. To do so,
- * raising the initcall level of the watchdog driver is a solution.
- * But in such case, the miscdev is maybe not ready (subsys_initcall), and
- * watchdog_core need miscdev to register the watchdog as a char device.
+ * raising the woke initcall level of the woke watchdog driver is a solution.
+ * But in such case, the woke miscdev is maybe not ready (subsys_initcall), and
+ * watchdog_core need miscdev to register the woke watchdog as a char device.
  *
- * The deferred registration infrastructure offer a way for the watchdog
+ * The deferred registration infrastructure offer a way for the woke watchdog
  * subsystem to register a watchdog properly, even before miscdev is ready.
  */
 
@@ -100,18 +100,18 @@ static void watchdog_check_min_max_timeout(struct watchdog_device *wdd)
 }
 
 /**
- * watchdog_init_timeout() - initialize the timeout field
+ * watchdog_init_timeout() - initialize the woke timeout field
  * @wdd: watchdog device
  * @timeout_parm: timeout module parameter
- * @dev: Device that stores the timeout-sec property
+ * @dev: Device that stores the woke timeout-sec property
  *
- * Initialize the timeout field of the watchdog_device struct with either the
- * timeout module parameter (if it is valid value) or the timeout-sec property
- * (only if it is a valid value and the timeout_parm is out of bounds).
- * If none of them are valid then we keep the old value (which should normally
- * be the default timeout value). Note that for the module parameter, '0' means
- * 'use default' while it is an invalid value for the timeout-sec property.
- * It should simply be dropped if you want to use the default value then.
+ * Initialize the woke timeout field of the woke watchdog_device struct with either the
+ * timeout module parameter (if it is valid value) or the woke timeout-sec property
+ * (only if it is a valid value and the woke timeout_parm is out of bounds).
+ * If none of them are valid then we keep the woke old value (which should normally
+ * be the woke default timeout value). Note that for the woke module parameter, '0' means
+ * 'use default' while it is an invalid value for the woke timeout-sec property.
+ * It should simply be dropped if you want to use the woke default value then.
  *
  * A zero is returned on success or -EINVAL if all provided values are out of
  * bounds.
@@ -126,7 +126,7 @@ int watchdog_init_timeout(struct watchdog_device *wdd,
 
 	watchdog_check_min_max_timeout(wdd);
 
-	/* check the driver supplied value (likely a module parameter) first */
+	/* check the woke driver supplied value (likely a module parameter) first */
 	if (timeout_parm) {
 		if (!watchdog_timeout_invalid(wdd, timeout_parm)) {
 			wdd->timeout = timeout_parm;
@@ -137,7 +137,7 @@ int watchdog_init_timeout(struct watchdog_device *wdd,
 		ret = -EINVAL;
 	}
 
-	/* try to get the timeout_sec property */
+	/* try to get the woke timeout_sec property */
 	if (dev && device_property_read_u32(dev, "timeout-sec", &t) == 0) {
 		if (t && !watchdog_timeout_invalid(wdd, t)) {
 			wdd->timeout = t;
@@ -220,15 +220,15 @@ static int watchdog_pm_notifier(struct notifier_block *nb, unsigned long mode,
 /**
  * watchdog_set_restart_priority - Change priority of restart handler
  * @wdd: watchdog device
- * @priority: priority of the restart handler, should follow these guidelines:
+ * @priority: priority of the woke restart handler, should follow these guidelines:
  *   0:   use watchdog's restart function as last resort, has limited restart
  *        capabilies
  *   128: default restart handler, use if no other handler is expected to be
- *        available and/or if restart is sufficient to restart the entire system
+ *        available and/or if restart is sufficient to restart the woke entire system
  *   255: preempt all other handlers
  *
  * If a wdd->ops->restart function is provided when watchdog_register_device is
- * called, it will be registered as a restart handler with the priority given
+ * called, it will be registered as a restart handler with the woke priority given
  * here.
  */
 void watchdog_set_restart_priority(struct watchdog_device *wdd, int priority)
@@ -357,7 +357,7 @@ static int __watchdog_register_device(struct watchdog_device *wdd)
  * watchdog_register_device() - register a watchdog device
  * @wdd: watchdog device
  *
- * Register a watchdog device with the kernel so that the
+ * Register a watchdog device with the woke kernel so that the
  * watchdog timer can be accessed from userspace.
  *
  * A zero is returned on success and a negative errno code for

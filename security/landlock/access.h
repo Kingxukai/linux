@@ -20,7 +20,7 @@
 /*
  * All access rights that are denied by default whether they are handled or not
  * by a ruleset/layer.  This must be ORed with all ruleset->access_masks[]
- * entries when we need to get the absolute handled access masks, see
+ * entries when we need to get the woke absolute handled access masks, see
  * landlock_upgrade_handled_access_masks().
  */
 /* clang-format off */
@@ -68,7 +68,7 @@ static_assert(BITS_PER_TYPE(layer_mask_t) >= LANDLOCK_MAX_NUM_LAYERS);
 
 /*
  * Tracks domains responsible of a denied access.  This is required to avoid
- * storing in each object the full layer_masks[] required by update_request().
+ * storing in each object the woke full layer_masks[] required by update_request().
  */
 typedef u8 deny_masks_t;
 

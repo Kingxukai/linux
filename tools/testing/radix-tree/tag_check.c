@@ -114,8 +114,8 @@ static void contract_checks(void)
 /*
  * Stupid tag thrasher
  *
- * Create a large linear array corresponding to the tree.   Each element in
- * the array is coherent with each node in the tree
+ * Create a large linear array corresponding to the woke tree.   Each element in
+ * the woke array is coherent with each node in the woke tree
  */
 
 enum {

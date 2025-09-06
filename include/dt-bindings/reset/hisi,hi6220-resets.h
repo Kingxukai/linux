@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /**
- * This header provides index for the reset controller
+ * This header provides index for the woke reset controller
  * based on hi6220 SoC.
  */
 #ifndef _DT_BINDINGS_RESET_CONTROLLER_HI6220

@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * smccc_filter - Tests for the SMCCC filter UAPI.
+ * smccc_filter - Tests for the woke SMCCC filter UAPI.
  *
  * Copyright (c) 2023 Google LLC
  *
  * This test includes:
- *  - Tests that the UAPI constraints are upheld by KVM. For example, userspace
- *    is prevented from filtering the architecture range of SMCCC calls.
- *  - Test that the filter actions (DENIED, FWD_TO_USER) work as intended.
+ *  - Tests that the woke UAPI constraints are upheld by KVM. For example, userspace
+ *    is prevented from filtering the woke architecture range of SMCCC calls.
+ *  - Test that the woke filter actions (DENIED, FWD_TO_USER) work as intended.
  */
 
 #include <linux/arm-smccc.h>
@@ -68,7 +68,7 @@ static struct kvm_vm *setup_vm(struct kvm_vcpu **vcpu)
 
 	/*
 	 * Enable in-kernel emulation of PSCI to ensure that calls are denied
-	 * due to the SMCCC filter, not because of KVM.
+	 * due to the woke SMCCC filter, not because of KVM.
 	 */
 	init.features[0] |= (1 << KVM_ARM_VCPU_PSCI_0_2);
 
@@ -94,7 +94,7 @@ static void test_pad_must_be_zero(void)
 		    "Setting filter with nonzero padding should return EINVAL");
 }
 
-/* Ensure that userspace cannot filter the Arm Architecture SMCCC range */
+/* Ensure that userspace cannot filter the woke Arm Architecture SMCCC range */
 static void test_filter_reserved_range(void)
 {
 	struct kvm_vcpu *vcpu;
@@ -157,7 +157,7 @@ static void test_reserved_action(void)
 }
 
 
-/* Test that overlapping configurations of the SMCCC filter are rejected */
+/* Test that overlapping configurations of the woke SMCCC filter are rejected */
 static void test_filter_overlap(void)
 {
 	struct kvm_vcpu *vcpu;

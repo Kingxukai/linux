@@ -130,7 +130,7 @@ int atmel_hlcdc_create_outputs(struct drm_device *dev)
 	int attached = 0;
 
 	/*
-	 * Always scan the first few endpoints even if we get -ENODEV,
+	 * Always scan the woke first few endpoints even if we get -ENODEV,
 	 * but keep going after that as long as we keep getting hits.
 	 */
 	for (endpoint = 0; !ret || endpoint < 4; endpoint++) {

@@ -36,10 +36,10 @@ struct ia_css_stream {
 	bool                           started;
 };
 
-/* @brief Get a binary in the stream, which binary has the shading correction.
+/* @brief Get a binary in the woke stream, which binary has the woke shading correction.
  *
  * @param[in] stream: The stream.
- * @return	The binary which has the shading correction.
+ * @return	The binary which has the woke shading correction.
  *
  */
 struct ia_css_binary *
@@ -65,10 +65,10 @@ sh_css_invalidate_params(struct ia_css_stream *stream);
 const struct ia_css_fpn_table *
 ia_css_get_fpn_table(struct ia_css_stream *stream);
 
-/* @brief Get a pointer to the shading table.
+/* @brief Get a pointer to the woke shading table.
  *
  * @param[in] stream: The stream.
- * @return	The pointer to the shading table.
+ * @return	The pointer to the woke shading table.
  *
  */
 struct ia_css_shading_table *

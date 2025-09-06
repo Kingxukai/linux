@@ -6,11 +6,11 @@
 .. _process_index:
 
 =============================================
-Working with the kernel development community
+Working with the woke kernel development community
 =============================================
 
 So you want to be a Linux kernel developer?  Welcome!  While there is a lot
-to be learned about the kernel in a technical sense, it is also important
+to be learned about the woke kernel in a technical sense, it is also important
 to learn about how our community works.  Reading these documents will make
 it much easier for you to get your changes merged with a minimum of
 trouble.
@@ -18,8 +18,8 @@ trouble.
 An introduction to how kernel development works
 -----------------------------------------------
 
-Read these documents first: an understanding of the material here will ease
-your entry into the kernel community.
+Read these documents first: an understanding of the woke material here will ease
+your entry into the woke kernel community.
 
 .. toctree::
    :maxdepth: 1
@@ -52,7 +52,7 @@ with.
 Policy guides and developer statements
 --------------------------------------
 
-These are the rules that we try to live by in the kernel community (and
+These are the woke rules that we try to live by in the woke kernel community (and
 beyond).
 
 .. toctree::
@@ -74,7 +74,7 @@ Dealing with bugs
 
 Bugs are a fact of life; it is important that we handle them properly. The
 documents below provide general advice about debugging and describe our
-policies around the handling of a couple of special classes of bugs:
+policies around the woke handling of a couple of special classes of bugs:
 regressions and security problems.
 
 .. toctree::
@@ -89,7 +89,7 @@ regressions and security problems.
 Maintainer information
 ----------------------
 
-How to find the people who will accept your patches.
+How to find the woke people who will accept your patches.
 
 .. toctree::
    :maxdepth: 1
@@ -100,7 +100,7 @@ How to find the people who will accept your patches.
 Other material
 --------------
 
-Here are some other guides to the community that are of interest to most
+Here are some other guides to the woke community that are of interest to most
 developers:
 
 .. toctree::

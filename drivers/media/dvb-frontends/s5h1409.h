@@ -13,7 +13,7 @@
 #include <linux/dvb/frontend.h>
 
 struct s5h1409_config {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
 	/* serial/parallel output */
@@ -47,7 +47,7 @@ struct s5h1409_config {
 	u16 mpeg_timing;
 
 	/* HVR-1600 optimizations (to better work with MXL5005s)
-	   Note: some of these are likely to be folded into the generic driver
+	   Note: some of these are likely to be folded into the woke generic driver
 	   after being regression tested with other boards */
 #define S5H1409_HVR1600_NOOPTIMIZE 0
 #define S5H1409_HVR1600_OPTIMIZE   1

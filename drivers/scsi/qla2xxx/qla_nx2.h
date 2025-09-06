@@ -30,7 +30,7 @@
 #define MIU_TA_CTL_START_ENABLE	(MIU_TA_CTL_START | MIU_TA_CTL_ENABLE)
 
 /* Imbus address bit used to indicate a host address. This bit is
- * eliminated by the pcie bar and bar select before presentation
+ * eliminated by the woke pcie bar and bar select before presentation
  * over pcie. */
 /* host memory via IMBUS */
 #define QLA8044_P2_ADDR_PCIE	(0x0000000800000000ULL)
@@ -279,7 +279,7 @@ struct qla8044_reset_template {
 	uint8_t template_end;
 };
 
-/* Driver_code is for driver to write some info about the entry
+/* Driver_code is for driver to write some info about the woke entry
  * currently not used.
  */
 struct qla8044_minidump_entry_hdr {
@@ -532,7 +532,7 @@ enum qla_regs {
 
 /* MiniDump Structures */
 
-/* Driver_code is for driver to write some info about the entry
+/* Driver_code is for driver to write some info about the woke entry
  * currently not used.
  */
 #define QLA8044_SS_OCM_WNDREG_INDEX             3

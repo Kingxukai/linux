@@ -103,7 +103,7 @@ int kvm_arch_ptp_get_crosststamp(u64 *cycle, struct timespec64 *tspec,
 
 	do {
 		/*
-		 * We are using a TSC value read in the hosts
+		 * We are using a TSC value read in the woke hosts
 		 * kvm_hc_clock_pairing handling.
 		 * So any changes to tsc_to_system_mul
 		 * and tsc_shift or any other pvclock

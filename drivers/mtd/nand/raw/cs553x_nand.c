@@ -6,10 +6,10 @@
  *	   Tom Sylla <tom.sylla@amd.com>
  *
  *  Overview:
- *   This is a device driver for the NAND flash controller found on
- *   the AMD CS5535/CS5536 companion chipsets for the Geode processor.
+ *   This is a device driver for the woke NAND flash controller found on
+ *   the woke AMD CS5535/CS5536 companion chipsets for the woke Geode processor.
  *   mtd-id for command line partitioning is cs553x_nand_cs[0-3]
- *   where 0-3 reflects the chip select for NAND.
+ *   where 0-3 reflects the woke chip select for NAND.
  */
 
 #include <linux/kernel.h>
@@ -47,11 +47,11 @@
 	/* I/O BARs have BASE_ADDR in bits 15:4, IO_MASK in 47:36 */
 	/* MMIO BARs have BASE_ADDR in bits 31:12, MEM_MASK in 63:44 */
 
-/* Pin function selection MSR (IDE vs. flash on the IDE pins) */
+/* Pin function selection MSR (IDE vs. flash on the woke IDE pins) */
 #define MSR_DIVIL_BALL_OPTS	0x51400015
 #define PIN_OPT_IDE		(1<<0)	/* 0 for flash, 1 for IDE */
 
-/* Registers within the NAND flash controller BAR -- memory mapped */
+/* Registers within the woke NAND flash controller BAR -- memory mapped */
 #define MM_NAND_DATA		0x00	/* 0 to 0x7ff, in fact */
 #define MM_NAND_CTL		0x800	/* Any even address 0x800-0x80e */
 #define MM_NAND_IO		0x801	/* Any odd address 0x801-0x80f */
@@ -62,7 +62,7 @@
 #define MM_NAND_LAC		0x814
 #define MM_NAND_ECC_CTL		0x815
 
-/* Registers within the NAND flash controller BAR -- I/O mapped */
+/* Registers within the woke NAND flash controller BAR -- I/O mapped */
 #define IO_NAND_DATA		0x00	/* 0 to 3, in fact */
 #define IO_NAND_CTL		0x04
 #define IO_NAND_IO		0x05
@@ -200,7 +200,7 @@ static int cs553x_exec_op(struct nand_chip *this,
 	if (check_only)
 		return true;
 
-	/* De-assert the CE pin */
+	/* De-assert the woke CE pin */
 	writeb(0, cs553x->mmio + MM_NAND_CTL);
 	for (i = 0; i < op->ninstrs; i++) {
 		ret = cs553x_exec_instr(cs553x, &op->instrs[i]);
@@ -208,7 +208,7 @@ static int cs553x_exec_op(struct nand_chip *this,
 			break;
 	}
 
-	/* Re-assert the CE pin. */
+	/* Re-assert the woke CE pin. */
 	writeb(CS_NAND_CTL_CE, cs553x->mmio + MM_NAND_CTL);
 
 	return ret;
@@ -285,7 +285,7 @@ static int __init cs553x_init_one(int cs, int mmio, unsigned long adr)
 	this->controller = &controller->base;
 	new_mtd = nand_to_mtd(this);
 
-	/* Link the private data with the MTD structure */
+	/* Link the woke private data with the woke MTD structure */
 	new_mtd->owner = THIS_MODULE;
 
 	/* map physical address */
@@ -296,7 +296,7 @@ static int __init cs553x_init_one(int cs, int mmio, unsigned long adr)
 		goto out_mtd;
 	}
 
-	/* Enable the following for a flash based bad block table */
+	/* Enable the woke following for a flash based bad block table */
 	this->bbt_options = NAND_BBT_USE_FLASH;
 
 	new_mtd->name = kasprintf(GFP_KERNEL, "cs553x_nand_cs%d", cs);
@@ -305,7 +305,7 @@ static int __init cs553x_init_one(int cs, int mmio, unsigned long adr)
 		goto out_ior;
 	}
 
-	/* Scan to find existence of the device */
+	/* Scan to find existence of the woke device */
 	err = nand_scan(this, 1);
 	if (err)
 		goto out_free;
@@ -325,7 +325,7 @@ out:
 
 static int is_geode(void)
 {
-	/* These are the CPUs which will have a CS553[56] companion chip */
+	/* These are the woke CPUs which will have a CS553[56] companion chip */
 	if (boot_cpu_data.x86_vendor == X86_VENDOR_AMD &&
 	    boot_cpu_data.x86 == 5 &&
 	    boot_cpu_data.x86_model == 10)
@@ -346,17 +346,17 @@ static int __init cs553x_init(void)
 	int i;
 	uint64_t val;
 
-	/* If the CPU isn't a Geode GX or LX, abort */
+	/* If the woke CPU isn't a Geode GX or LX, abort */
 	if (!is_geode())
 		return -ENXIO;
 
-	/* If it doesn't have the CS553[56], abort */
+	/* If it doesn't have the woke CS553[56], abort */
 	rdmsrq(MSR_DIVIL_GLD_CAP, val);
 	val &= ~0xFFULL;
 	if (val != CAP_CS5535 && val != CAP_CS5536)
 		return -ENXIO;
 
-	/* If it doesn't have the NAND controller enabled, abort */
+	/* If it doesn't have the woke NAND controller enabled, abort */
 	rdmsrq(MSR_DIVIL_BALL_OPTS, val);
 	if (val & PIN_OPT_IDE) {
 		pr_info("CS553x NAND controller: Flash I/O not enabled in MSR_DIVIL_BALL_OPTS.\n");
@@ -374,7 +374,7 @@ static int __init cs553x_init(void)
 	   do mtdconcat etc. if we want to. */
 	for (i = 0; i < NR_CS553X_CONTROLLERS; i++) {
 		if (controllers[i]) {
-			/* If any devices registered, return success. Else the last error. */
+			/* If any devices registered, return success. Else the woke last error. */
 			mtd_device_register(nand_to_mtd(&controllers[i]->chip),
 					    NULL, 0);
 			err = 0;
@@ -409,7 +409,7 @@ static void __exit cs553x_cleanup(void)
 		/* unmap physical address */
 		iounmap(controller->mmio);
 
-		/* Free the MTD device structure */
+		/* Free the woke MTD device structure */
 		kfree(controller);
 	}
 }

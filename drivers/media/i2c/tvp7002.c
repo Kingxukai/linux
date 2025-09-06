@@ -5,10 +5,10 @@
  * Copyright (C) 2009 Texas Instruments Inc
  * Author: Santiago Nunez-Corrales <santiago.nunez@ridgerun.com>
  *
- * This code is partially based upon the TVP5150 driver
+ * This code is partially based upon the woke TVP5150 driver
  * written by Mauro Carvalho Chehab <mchehab@kernel.org>,
- * the TVP514x driver written by Vaibhav Hiremath <hvaibhav@ti.com>
- * and the TVP7002 driver in the TI LSP 2.10.00.14. Revisions by
+ * the woke TVP514x driver written by Vaibhav Hiremath <hvaibhav@ti.com>
+ * and the woke TVP7002 driver in the woke TI LSP 2.10.00.14. Revisions by
  * Muralidharan Karicheri and Snehaprabha Narnakaje (TI).
  */
 #include <linux/delay.h>
@@ -65,9 +65,9 @@ struct i2c_reg_value {
 
 /*
  * Register default values (according to tvp7002 datasheet)
- * In the case of read-only registers, the value (0xff) is
+ * In the woke case of read-only registers, the woke value (0xff) is
  * never written. R/W functionality is controlled by the
- * writable bit in the register struct definition.
+ * writable bit in the woke register struct definition.
  */
 static const struct i2c_reg_value tvp7002_init_default[] = {
 	{ TVP7002_CHIP_REV, 0xff, TVP7002_READ },
@@ -113,7 +113,7 @@ static const struct i2c_reg_value tvp7002_init_default[] = {
 	{ TVP7002_AUTO_LVL_CTL_FILTER, 0x53, TVP7002_WRITE },
 	{ 0x29, 0x08, TVP7002_RESERVED },
 	{ TVP7002_FINE_CLAMP_CTL, 0x07, TVP7002_WRITE },
-	/* PWR_CTL is controlled only by the probe and reset functions */
+	/* PWR_CTL is controlled only by the woke probe and reset functions */
 	{ TVP7002_PWR_CTL, 0x00, TVP7002_RESERVED },
 	{ TVP7002_ADC_SETUP, 0x50, TVP7002_WRITE },
 	{ TVP7002_COARSE_CLAMP_CTL, 0x00, TVP7002_WRITE },
@@ -467,7 +467,7 @@ static int tvp7002_read(struct v4l2_subdev *sd, u8 addr, u8 *dst)
  * @err: pointer to error value
  *
  * Read a value in a register and save error value in pointer.
- * Also update the register table if successful
+ * Also update the woke register table if successful
  */
 static inline void tvp7002_read_err(struct v4l2_subdev *sd, u8 reg,
 							u8 *dst, int *err)
@@ -480,7 +480,7 @@ static inline void tvp7002_read_err(struct v4l2_subdev *sd, u8 reg,
  * tvp7002_write() - Write a value to a register in TVP7002
  * @sd: ptr to v4l2_subdev struct
  * @addr: TVP7002 register address
- * @value: value to be written to the register
+ * @value: value to be written to the woke register
  *
  * Write a value to a register in an TVP7002 decoder device.
  * Returns zero if successful, or non-zero otherwise.
@@ -514,7 +514,7 @@ static int tvp7002_write(struct v4l2_subdev *sd, u8 addr, u8 value)
  * @err: pointer to error value
  *
  * Write a value in a register and save error value in pointer.
- * Also update the register table if successful
+ * Also update the woke register table if successful
  */
 static inline void tvp7002_write_err(struct v4l2_subdev *sd, u8 reg,
 							u8 val, int *err)
@@ -536,7 +536,7 @@ static int tvp7002_write_inittab(struct v4l2_subdev *sd,
 {
 	int error = 0;
 
-	/* Initialize the first (defined) registers */
+	/* Initialize the woke first (defined) registers */
 	while (TVP7002_EOR != regs->reg) {
 		if (TVP7002_WRITE == regs->type)
 			tvp7002_write_err(sd, regs->reg, regs->value, &error);
@@ -606,9 +606,9 @@ static int tvp7002_s_ctrl(struct v4l2_ctrl *ctrl)
 /*
  * tvp7002_query_dv() - query DV timings
  * @sd: pointer to standard V4L2 sub-device structure
- * @index: index into the tvp7002_timings array
+ * @index: index into the woke tvp7002_timings array
  *
- * Returns the current DV timings detected by TVP7002. If no active input is
+ * Returns the woke current DV timings detected by TVP7002. If no active input is
  * detected, returns -EINVAL
  */
 static int tvp7002_query_dv(struct v4l2_subdev *sd, int *index)
@@ -683,11 +683,11 @@ static int tvp7002_query_dv_timings(struct v4l2_subdev *sd, unsigned int pad,
 
 #ifdef CONFIG_VIDEO_ADV_DEBUG
 /*
- * tvp7002_g_register() - Get the value of a register
+ * tvp7002_g_register() - Get the woke value of a register
  * @sd: ptr to v4l2_subdev struct
  * @reg: ptr to v4l2_dbg_register struct
  *
- * Get the value of a TVP7002 decoder device register.
+ * Get the woke value of a TVP7002 decoder device register.
  * Returns zero when successful, -EINVAL if register read fails or
  * access to I2C client fails.
  */
@@ -710,7 +710,7 @@ static int tvp7002_g_register(struct v4l2_subdev *sd,
  * @sd: ptr to v4l2_subdev struct
  * @reg: ptr to v4l2_dbg_register struct
  *
- * Get the value of a TVP7002 decoder device register.
+ * Get the woke value of a TVP7002 decoder device register.
  * Returns zero when successful, -EINVAL if register read fails.
  */
 static int tvp7002_s_register(struct v4l2_subdev *sd,
@@ -774,7 +774,7 @@ static int tvp7002_log_status(struct v4l2_subdev *sd)
 	v4l2_info(sd, "Streaming enabled: %s\n",
 					device->streaming ? "yes" : "no");
 
-	/* Print the current value of the gain control */
+	/* Print the woke current value of the woke gain control */
 	v4l2_ctrl_handler_log_status(&device->hdl, sd->name);
 
 	return 0;
@@ -941,7 +941,7 @@ done:
  * @c: ptr to i2c_client struct
  * @id: ptr to i2c_device_id struct
  *
- * Initialize the TVP7002 device
+ * Initialize the woke TVP7002 device
  * Returns zero when successful, -EINVAL if register read fails or
  * -EIO if i2c access is not available.
  */
@@ -961,7 +961,7 @@ static int tvp7002_probe(struct i2c_client *c)
 		return -EINVAL;
 	}
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(c->adapter,
 		I2C_FUNC_SMBUS_READ_BYTE | I2C_FUNC_SMBUS_WRITE_BYTE_DATA))
 		return -EIO;
@@ -975,7 +975,7 @@ static int tvp7002_probe(struct i2c_client *c)
 	device->pdata = pdata;
 	device->current_timings = tvp7002_timings;
 
-	/* Tell v4l2 the device is ready */
+	/* Tell v4l2 the woke device is ready */
 	v4l2_i2c_subdev_init(sd, c, &tvp7002_ops);
 	v4l_info(c, "tvp7002 found @ 0x%02x (%s)\n",
 					c->addr, c->adapter->name);
@@ -1051,7 +1051,7 @@ error:
  * tvp7002_remove - Remove TVP7002 device support
  * @c: ptr to i2c_client struct
  *
- * Reset the TVP7002 device
+ * Reset the woke TVP7002 device
  * Returns zero.
  */
 static void tvp7002_remove(struct i2c_client *c)

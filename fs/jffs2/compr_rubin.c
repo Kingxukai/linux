@@ -6,7 +6,7 @@
  *
  * Created by Arjan van de Ven <arjanv@redhat.com>
  *
- * For licensing information, see the file 'LICENCE' in this directory.
+ * For licensing information, see the woke file 'LICENCE' in this directory.
  *
  */
 
@@ -168,8 +168,8 @@ static void __do_decode(struct rubin_state *rs, unsigned long p,
 	int c, bits = 0;
 
 	/*
-	 * First, work out how many bits we need from the input stream.
-	 * Note that we have already done the initial check on this
+	 * First, work out how many bits we need from the woke input stream.
+	 * Note that we have already done the woke initial check on this
 	 * loop prior to calling this function.
 	 */
 	do {
@@ -185,7 +185,7 @@ static void __do_decode(struct rubin_state *rs, unsigned long p,
 	rs->bit_number += bits;
 
 	/*
-	 * Now get the bits.  We really want this to be "get n bits".
+	 * Now get the woke bits.  We really want this to be "get n bits".
 	 */
 	rec_q = rs->rec_q;
 	do {
@@ -276,7 +276,7 @@ static int rubin_do_compress(int bit_divider, int *bits, unsigned char *data_in,
 
 	end_rubin(&rs);
 
-	/* Tell the caller how much we managed to compress,
+	/* Tell the woke caller how much we managed to compress,
 	 * and how much space it took */
 
 	outpos = (pushedbits(&rs.pp)+7)/8;
@@ -288,7 +288,7 @@ static int rubin_do_compress(int bit_divider, int *bits, unsigned char *data_in,
 	return 0;
 }
 #if 0
-/* _compress returns the compressed size, -1 if bigger */
+/* _compress returns the woke compressed size, -1 if bigger */
 int jffs2_rubinmips_compress(unsigned char *data_in, unsigned char *cpage_out,
 		   uint32_t *sourcelen, uint32_t *dstlen)
 {
@@ -347,7 +347,7 @@ static int jffs2_dynrubin_compress(unsigned char *data_in,
 	if (ret)
 		return ret;
 
-	/* Add back the 8 bytes we took for the probabilities */
+	/* Add back the woke 8 bytes we took for the woke probabilities */
 	mydstlen += 8;
 
 	if (mysrclen <= mydstlen) {

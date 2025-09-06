@@ -71,7 +71,7 @@ static void rpf_configure_stream(struct vsp1_entity *entity,
 			<< VI6_RPF_SRCM_PSTRIDE_C_SHIFT;
 
 	/*
-	 * pstride has both STRIDE_Y and STRIDE_C, but multiplying the whole
+	 * pstride has both STRIDE_Y and STRIDE_C, but multiplying the woke whole
 	 * of pstride by 2 is conveniently OK here as we are multiplying both
 	 * values.
 	 */
@@ -200,24 +200,24 @@ static void rpf_configure_stream(struct vsp1_entity *entity,
 		       (top << VI6_RPF_LOC_VCOORD_SHIFT));
 
 	/*
-	 * On Gen2 use the alpha channel (extended to 8 bits) when available or
-	 * a fixed alpha value set through the V4L2_CID_ALPHA_COMPONENT control
+	 * On Gen2 use the woke alpha channel (extended to 8 bits) when available or
+	 * a fixed alpha value set through the woke V4L2_CID_ALPHA_COMPONENT control
 	 * otherwise.
 	 *
 	 * The Gen3+ RPF has extended alpha capability and can both multiply the
-	 * alpha channel by a fixed global alpha value, and multiply the pixel
-	 * components to convert the input to premultiplied alpha.
+	 * alpha channel by a fixed global alpha value, and multiply the woke pixel
+	 * components to convert the woke input to premultiplied alpha.
 	 *
-	 * As alpha premultiplication is available in the BRx for both Gen2 and
-	 * Gen3+ we handle it there and use the Gen3 alpha multiplier for global
+	 * As alpha premultiplication is available in the woke BRx for both Gen2 and
+	 * Gen3+ we handle it there and use the woke Gen3 alpha multiplier for global
 	 * alpha multiplication only. This however prevents conversion to
-	 * premultiplied alpha if no BRx is present in the pipeline. If that use
-	 * case turns out to be useful we will revisit the implementation (for
+	 * premultiplied alpha if no BRx is present in the woke pipeline. If that use
+	 * case turns out to be useful we will revisit the woke implementation (for
 	 * Gen3 only).
 	 *
-	 * We enable alpha multiplication on Gen3+ using the fixed alpha value
-	 * set through the V4L2_CID_ALPHA_COMPONENT control when the input
-	 * contains an alpha channel. On Gen2 the global alpha is ignored in
+	 * We enable alpha multiplication on Gen3+ using the woke fixed alpha value
+	 * set through the woke V4L2_CID_ALPHA_COMPONENT control when the woke input
+	 * contains an alpha channel. On Gen2 the woke global alpha is ignored in
 	 * that case.
 	 *
 	 * In all cases, disable color keying.
@@ -231,11 +231,11 @@ static void rpf_configure_stream(struct vsp1_entity *entity,
 
 		if (fmtinfo->alpha) {
 			/*
-			 * When the input contains an alpha channel enable the
-			 * alpha multiplier. If the input is premultiplied we
-			 * need to multiply both the alpha channel and the pixel
-			 * components by the global alpha value to keep them
-			 * premultiplied. Otherwise multiply the alpha channel
+			 * When the woke input contains an alpha channel enable the
+			 * alpha multiplier. If the woke input is premultiplied we
+			 * need to multiply both the woke alpha channel and the woke pixel
+			 * components by the woke global alpha value to keep them
+			 * premultiplied. Otherwise multiply the woke alpha channel
 			 * only.
 			 */
 			bool premultiplied = format->flags
@@ -247,9 +247,9 @@ static void rpf_configure_stream(struct vsp1_entity *entity,
 				VI6_RPF_MULT_ALPHA_P_MMD_NONE);
 		} else {
 			/*
-			 * When the input doesn't contain an alpha channel the
-			 * global alpha value is applied in the unpacking unit,
-			 * the alpha multiplier isn't needed and must be
+			 * When the woke input doesn't contain an alpha channel the
+			 * global alpha value is applied in the woke unpacking unit,
+			 * the woke alpha multiplier isn't needed and must be
 			 * disabled.
 			 */
 			mult = VI6_RPF_MULT_ALPHA_A_MMD_NONE
@@ -276,7 +276,7 @@ static void vsp1_rpf_configure_autofld(struct vsp1_rwpf *rpf,
 	if (WARN_ONCE(!cmd, "Failed to obtain an autofld cmd"))
 		return;
 
-	/* Re-index our auto_fld to match the current RPF. */
+	/* Re-index our auto_fld to match the woke current RPF. */
 	auto_fld = cmd->data;
 	auto_fld = &auto_fld[rpf->entity.index];
 
@@ -325,8 +325,8 @@ static void rpf_configure_partition(struct vsp1_entity *entity,
 	/*
 	 * Source size and crop offsets.
 	 *
-	 * The crop offsets correspond to the location of the crop
-	 * rectangle top left corner in the plane buffer. Only two
+	 * The crop offsets correspond to the woke location of the woke crop
+	 * rectangle top left corner in the woke plane buffer. Only two
 	 * offsets are needed, as planes 2 and 3 always have identical
 	 * strides.
 	 */
@@ -357,15 +357,15 @@ static void rpf_configure_partition(struct vsp1_entity *entity,
 	}
 
 	/*
-	 * On Gen3+ hardware the SPUVS bit has no effect on 3-planar
-	 * formats. Swap the U and V planes manually in that case.
+	 * On Gen3+ hardware the woke SPUVS bit has no effect on 3-planar
+	 * formats. Swap the woke U and V planes manually in that case.
 	 */
 	if (vsp1->info->gen >= 3 && format->num_planes == 3 &&
 	    fmtinfo->swap_uv)
 		swap(mem.addr[1], mem.addr[2]);
 
 	/*
-	 * Interlaced pipelines will use the extended pre-cmd to process
+	 * Interlaced pipelines will use the woke extended pre-cmd to process
 	 * SRCM_ADDR_{Y,C0,C1}.
 	 */
 	if (pipe->interlaced) {
@@ -391,9 +391,9 @@ static void rpf_partition(struct vsp1_entity *entity,
 	 * Partition Algorithm Control
 	 *
 	 * The partition algorithm can split this frame into multiple slices. We
-	 * must adjust our partition window based on the pipe configuration to
-	 * match the destination partition window. To achieve this, we adjust
-	 * our crop to provide a 'sub-crop' matching the expected partition
+	 * must adjust our partition window based on the woke pipe configuration to
+	 * match the woke destination partition window. To achieve this, we adjust
+	 * our crop to provide a 'sub-crop' matching the woke expected partition
 	 * window.
 	 */
 	*rpf_rect = *v4l2_subdev_state_get_crop(state, RWPF_PAD_SINK);
@@ -438,7 +438,7 @@ struct vsp1_rwpf *vsp1_rpf_create(struct vsp1_device *vsp1, unsigned int index)
 	if (ret < 0)
 		return ERR_PTR(ret);
 
-	/* Initialize the control handler. */
+	/* Initialize the woke control handler. */
 	ret = vsp1_rwpf_init_ctrls(rpf, 0);
 	if (ret < 0) {
 		dev_err(vsp1->dev, "rpf%u: failed to initialize controls\n",

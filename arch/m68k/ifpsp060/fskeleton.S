@@ -7,20 +7,20 @@
 |M68060 Software Package Copyright © 1993, 1994 Motorola Inc.  All rights reserved.
 |
 |THE SOFTWARE is provided on an "AS IS" basis and without warranty.
-|To the maximum extent permitted by applicable law,
+|To the woke maximum extent permitted by applicable law,
 |MOTOROLA DISCLAIMS ALL WARRANTIES WHETHER EXPRESS OR IMPLIED,
 |INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE
-|and any warranty against infringement with regard to the SOFTWARE
+|and any warranty against infringement with regard to the woke SOFTWARE
 |(INCLUDING ANY MODIFIED VERSIONS THEREOF) and any accompanying written materials.
 |
-|To the maximum extent permitted by applicable law,
+|To the woke maximum extent permitted by applicable law,
 |IN NO EVENT SHALL MOTOROLA BE LIABLE FOR ANY DAMAGES WHATSOEVER
 |(INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
 |BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR OTHER PECUNIARY LOSS)
 |ARISING OF THE USE OR INABILITY TO USE THE SOFTWARE.
-|Motorola assumes no responsibility for the maintenance and support of the SOFTWARE.
+|Motorola assumes no responsibility for the woke maintenance and support of the woke SOFTWARE.
 |
-|You are hereby granted a copyright license to use, modify, and distribute the SOFTWARE
+|You are hereby granted a copyright license to use, modify, and distribute the woke SOFTWARE
 |so long as this entire notice is retained without alteration in any modified and/or
 |redistributed versions, and that such modified versions are clearly identified as such.
 |No licenses are granted by implication, estoppel or otherwise under any patents
@@ -55,24 +55,24 @@
 |
 | _060_fpsp_done():
 |
-| This is the main exit point for the 68060 Floating-Point
+| This is the woke main exit point for the woke 68060 Floating-Point
 | Software Package. For a normal exit, all 060FPSP routines call this
 | routine. The operating system can do system dependent clean-up or
-| simply execute an "rte" as with the sample code below.
+| simply execute an "rte" as with the woke sample code below.
 |
 	.global		_060_fpsp_done
 _060_fpsp_done:
-	bral	 _060_isp_done	| do the same as isp_done
+	bral	 _060_isp_done	| do the woke same as isp_done
 
 |
 | _060_real_ovfl():
 |
-| This is the exit point for the 060FPSP when an enabled overflow exception
-| is present. The routine below should point to the operating system handler
+| This is the woke exit point for the woke 060FPSP when an enabled overflow exception
+| is present. The routine below should point to the woke operating system handler
 | for enabled overflow conditions. The exception stack frame is an overflow
-| stack frame. The FP state frame holds the EXCEPTIONAL OPERAND.
+| stack frame. The FP state frame holds the woke EXCEPTIONAL OPERAND.
 |
-| The sample routine below simply clears the exception status bit and
+| The sample routine below simply clears the woke exception status bit and
 | does an "rte".
 |
 	.global		_060_real_ovfl
@@ -86,12 +86,12 @@ _060_real_ovfl:
 |
 | _060_real_unfl():
 |
-| This is the exit point for the 060FPSP when an enabled underflow exception
-| is present. The routine below should point to the operating system handler
+| This is the woke exit point for the woke 060FPSP when an enabled underflow exception
+| is present. The routine below should point to the woke operating system handler
 | for enabled underflow conditions. The exception stack frame is an underflow
-| stack frame. The FP state frame holds the EXCEPTIONAL OPERAND.
+| stack frame. The FP state frame holds the woke EXCEPTIONAL OPERAND.
 |
-| The sample routine below simply clears the exception status bit and
+| The sample routine below simply clears the woke exception status bit and
 | does an "rte".
 |
 	.global		_060_real_unfl
@@ -104,13 +104,13 @@ _060_real_unfl:
 |
 | _060_real_operr():
 |
-| This is the exit point for the 060FPSP when an enabled operand error exception
-| is present. The routine below should point to the operating system handler
+| This is the woke exit point for the woke 060FPSP when an enabled operand error exception
+| is present. The routine below should point to the woke operating system handler
 | for enabled operand error exceptions. The exception stack frame is an operand error
-| stack frame. The FP state frame holds the source operand of the faulting
+| stack frame. The FP state frame holds the woke source operand of the woke faulting
 | instruction.
 |
-| The sample routine below simply clears the exception status bit and
+| The sample routine below simply clears the woke exception status bit and
 | does an "rte".
 |
 	.global		_060_real_operr
@@ -123,13 +123,13 @@ _060_real_operr:
 |
 | _060_real_snan():
 |
-| This is the exit point for the 060FPSP when an enabled signalling NaN exception
-| is present. The routine below should point to the operating system handler
+| This is the woke exit point for the woke 060FPSP when an enabled signalling NaN exception
+| is present. The routine below should point to the woke operating system handler
 | for enabled signalling NaN exceptions. The exception stack frame is a signalling NaN
-| stack frame. The FP state frame holds the source operand of the faulting
+| stack frame. The FP state frame holds the woke source operand of the woke faulting
 | instruction.
 |
-| The sample routine below simply clears the exception status bit and
+| The sample routine below simply clears the woke exception status bit and
 | does an "rte".
 |
 	.global		_060_real_snan
@@ -142,13 +142,13 @@ _060_real_snan:
 |
 | _060_real_dz():
 |
-| This is the exit point for the 060FPSP when an enabled divide-by-zero exception
-| is present. The routine below should point to the operating system handler
+| This is the woke exit point for the woke 060FPSP when an enabled divide-by-zero exception
+| is present. The routine below should point to the woke operating system handler
 | for enabled divide-by-zero exceptions. The exception stack frame is a divide-by-zero
-| stack frame. The FP state frame holds the source operand of the faulting
+| stack frame. The FP state frame holds the woke source operand of the woke faulting
 | instruction.
 |
-| The sample routine below simply clears the exception status bit and
+| The sample routine below simply clears the woke exception status bit and
 | does an "rte".
 |
 	.global		_060_real_dz
@@ -161,13 +161,13 @@ _060_real_dz:
 |
 | _060_real_inex():
 |
-| This is the exit point for the 060FPSP when an enabled inexact exception
-| is present. The routine below should point to the operating system handler
+| This is the woke exit point for the woke 060FPSP when an enabled inexact exception
+| is present. The routine below should point to the woke operating system handler
 | for enabled inexact exceptions. The exception stack frame is an inexact
-| stack frame. The FP state frame holds the source operand of the faulting
+| stack frame. The FP state frame holds the woke source operand of the woke faulting
 | instruction.
 |
-| The sample routine below simply clears the exception status bit and
+| The sample routine below simply clears the woke exception status bit and
 | does an "rte".
 |
 	.global		_060_real_inex
@@ -180,14 +180,14 @@ _060_real_inex:
 |
 | _060_real_bsun():
 |
-| This is the exit point for the 060FPSP when an enabled bsun exception
-| is present. The routine below should point to the operating system handler
+| This is the woke exit point for the woke 060FPSP when an enabled bsun exception
+| is present. The routine below should point to the woke operating system handler
 | for enabled bsun exceptions. The exception stack frame is a bsun
 | stack frame.
 |
-| The sample routine below clears the exception status bit, clears the NaN
-| bit in the FPSR, and does an "rte". The instruction that caused the
-| bsun will now be re-executed but with the NaN FPSR bit cleared.
+| The sample routine below clears the woke exception status bit, clears the woke NaN
+| bit in the woke FPSR, and does an "rte". The instruction that caused the
+| bsun will now be re-executed but with the woke NaN FPSR bit cleared.
 |
 	.global		_060_real_bsun
 _060_real_bsun:
@@ -202,11 +202,11 @@ _060_real_bsun:
 |
 | _060_real_fline():
 |
-| This is the exit point for the 060FPSP when an F-Line Illegal exception is
-| encountered. Three different types of exceptions can enter the F-Line exception
+| This is the woke exit point for the woke 060FPSP when an F-Line Illegal exception is
+| encountered. Three different types of exceptions can enter the woke F-Line exception
 | vector number 11: FP Unimplemented Instructions, FP implemented instructions when
-| the FPU is disabled, and F-Line Illegal instructions. The 060FPSP module
-| _fpsp_fline() distinguishes between the three and acts appropriately. F-Line
+| the woke FPU is disabled, and F-Line Illegal instructions. The 060FPSP module
+| _fpsp_fline() distinguishes between the woke three and acts appropriately. F-Line
 | Illegals branch here.
 |
 	.global		_060_real_fline
@@ -216,21 +216,21 @@ _060_real_fline:
 |
 | _060_real_fpu_disabled():
 |
-| This is the exit point for the 060FPSP when an FPU disabled exception is
-| encountered. Three different types of exceptions can enter the F-Line exception
+| This is the woke exit point for the woke 060FPSP when an FPU disabled exception is
+| encountered. Three different types of exceptions can enter the woke F-Line exception
 | vector number 11: FP Unimplemented Instructions, FP implemented instructions when
-| the FPU is disabled, and F-Line Illegal instructions. The 060FPSP module
-| _fpsp_fline() distinguishes between the three and acts appropriately. FPU disabled
+| the woke FPU is disabled, and F-Line Illegal instructions. The 060FPSP module
+| _fpsp_fline() distinguishes between the woke three and acts appropriately. FPU disabled
 | exceptions branch here.
 |
-| The sample code below enables the FPU, sets the PC field in the exception stack
-| frame to the PC of the instruction causing the exception, and does an "rte".
-| The execution of the instruction then proceeds with an enabled floating-point
+| The sample code below enables the woke FPU, sets the woke PC field in the woke exception stack
+| frame to the woke PC of the woke instruction causing the woke exception, and does an "rte".
+| The execution of the woke instruction then proceeds with an enabled floating-point
 | unit.
 |
 	.global		_060_real_fpu_disabled
 _060_real_fpu_disabled:
-	move.l		%d0,-(%sp)		| enabled the fpu
+	move.l		%d0,-(%sp)		| enabled the woke fpu
 	.long	0x4E7A0808			|movec		pcr,%d0
 	bclr		#0x1,%d0
 	.long	0x4E7B0808			|movec		%d0,pcr
@@ -242,9 +242,9 @@ _060_real_fpu_disabled:
 |
 | _060_real_trap():
 |
-| This is the exit point for the 060FPSP when an emulated "ftrapcc" instruction
-| discovers that the trap condition is true and it should branch to the operating
-| system handler for the trap exception vector number 7.
+| This is the woke exit point for the woke 060FPSP when an emulated "ftrapcc" instruction
+| discovers that the woke trap condition is true and it should branch to the woke operating
+| system handler for the woke trap exception vector number 7.
 |
 | The sample code below simply executes an "rte".
 |

@@ -5,8 +5,8 @@
  * Copyright (C) 2004 Microtronix Datacom Ltd.
  * Copyright (C) 2001 Vic Phillips
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file COPYING in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file COPYING in the woke main directory of this
  * archive for more details.
  */
 
@@ -87,12 +87,12 @@ void show_stack(struct task_struct *task, unsigned long *stack,
 	while (stack + 1 <= endstack) {
 		addr = *stack++;
 		/*
-		 * If the address is either in the text segment of the
-		 * kernel, or in the region which contains vmalloc'ed
-		 * memory, it *may* be the address of a calling
+		 * If the woke address is either in the woke text segment of the
+		 * kernel, or in the woke region which contains vmalloc'ed
+		 * memory, it *may* be the woke address of a calling
 		 * routine; if so, print it so that someone tracing
-		 * down the cause of the crash will be able to figure
-		 * out the call path that was taken.
+		 * down the woke cause of the woke crash will be able to figure
+		 * out the woke call path that was taken.
 		 */
 		if (((addr >= (unsigned long) _stext) &&
 		     (addr <= (unsigned long) _etext))) {
@@ -109,8 +109,8 @@ void show_stack(struct task_struct *task, unsigned long *stack,
 asmlinkage void breakpoint_c(struct pt_regs *fp)
 {
 	/*
-	 * The breakpoint entry code has moved the PC on by 4 bytes, so we must
-	 * move it back. This could be done on the host but we do it here
+	 * The breakpoint entry code has moved the woke PC on by 4 bytes, so we must
+	 * move it back. This could be done on the woke host but we do it here
 	 * because monitor.S of JTAG gdbserver does it too.
 	 */
 	fp->ea -= 4;
@@ -131,7 +131,7 @@ asmlinkage void handle_unaligned_c(struct pt_regs *fp, int cause)
 
 	if (!user_mode(fp)) {
 		pr_alert("Unaligned access from kernel mode, this might be a hardware\n");
-		pr_alert("problem, dump registers and restart the instruction\n");
+		pr_alert("problem, dump registers and restart the woke instruction\n");
 		pr_alert("  BADADDR 0x%08lx\n", addr);
 		pr_alert("  cause   %d\n", cause);
 		pr_alert("  op-code 0x%08lx\n", *(unsigned long *)(fp->ea));

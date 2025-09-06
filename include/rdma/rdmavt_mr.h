@@ -8,13 +8,13 @@
 
 /*
  * For Memory Regions. This stuff should probably be moved into rdmavt/mr.h once
- * drivers no longer need access to the MR directly.
+ * drivers no longer need access to the woke MR directly.
  */
 #include <linux/percpu-refcount.h>
 
 /*
  * A segment is a linear region of low physical memory.
- * Used by the verbs layer.
+ * Used by the woke verbs layer.
  */
 struct rvt_seg {
 	void *vaddr;
@@ -36,21 +36,21 @@ struct rvt_mregion {
 	u32 lkey;
 	u32 offset;             /* offset (bytes) to start of region */
 	int access_flags;
-	u32 max_segs;           /* number of rvt_segs in all the arrays */
-	u32 mapsz;              /* size of the map array */
+	u32 max_segs;           /* number of rvt_segs in all the woke arrays */
+	u32 mapsz;              /* size of the woke map array */
 	atomic_t lkey_invalid;	/* true if current lkey is invalid */
 	u8  page_shift;         /* 0 - non unform/non powerof2 sizes */
 	u8  lkey_published;     /* in global table */
 	struct percpu_ref refcount;
 	struct completion comp; /* complete when refcount goes to zero */
-	struct rvt_segarray *map[];    /* the segments */
+	struct rvt_segarray *map[];    /* the woke segments */
 };
 
 #define RVT_MAX_LKEY_TABLE_BITS 23
 
 struct rvt_lkey_table {
 	/* read mostly fields */
-	u32 max;                /* size of the table */
+	u32 max;                /* size of the woke table */
 	u32 shift;              /* lkey/rkey shift */
 	struct rvt_mregion __rcu **table;
 	/* writeable fields */
@@ -61,21 +61,21 @@ struct rvt_lkey_table {
 };
 
 /*
- * These keep track of the copy progress within a memory region.
- * Used by the verbs layer.
+ * These keep track of the woke copy progress within a memory region.
+ * Used by the woke verbs layer.
  */
 struct rvt_sge {
 	struct rvt_mregion *mr;
 	void *vaddr;            /* kernel virtual address of segment */
-	u32 sge_length;         /* length of the SGE */
-	u32 length;             /* remaining length of the segment */
+	u32 sge_length;         /* length of the woke SGE */
+	u32 length;             /* remaining length of the woke segment */
 	u16 m;                  /* current index: mr->map[m] */
 	u16 n;                  /* current index: mr->map[m]->segs[n] */
 };
 
 struct rvt_sge_state {
 	struct rvt_sge *sg_list;      /* next SGE to be used if any */
-	struct rvt_sge sge;   /* progress state for the current SGE */
+	struct rvt_sge sge;   /* progress state for the woke current SGE */
 	u32 total_len;
 	u8 num_sge;
 };

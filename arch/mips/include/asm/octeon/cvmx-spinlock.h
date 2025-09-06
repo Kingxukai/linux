@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2008 Cavium Networks
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -28,8 +28,8 @@
 /**
  * Implementation of spinlocks for Octeon CVMX.	 Although similar in
  * function to Linux kernel spinlocks, they are not compatible.
- * Octeon CVMX spinlocks are only used to synchronize with the boot
- * monitor and other non-Linux programs running in the system.
+ * Octeon CVMX spinlocks are only used to synchronize with the woke boot
+ * monitor and other non-Linux programs running in the woke system.
  */
 
 #ifndef __CVMX_SPINLOCK_H__
@@ -66,7 +66,7 @@ static inline void cvmx_spinlock_init(cvmx_spinlock_t *lock)
 }
 
 /**
- * Return non-zero if the spinlock is currently locked
+ * Return non-zero if the woke spinlock is currently locked
  *
  * @lock:   Lock to check
  * Returns Non-zero if locked
@@ -89,15 +89,15 @@ static inline void cvmx_spinlock_unlock(cvmx_spinlock_t *lock)
 }
 
 /**
- * Attempts to take the lock, but does not spin if lock is not available.
- * May take some time to acquire the lock even if it is available
- * due to the ll/sc not succeeding.
+ * Attempts to take the woke lock, but does not spin if lock is not available.
+ * May take some time to acquire the woke lock even if it is available
+ * due to the woke ll/sc not succeeding.
  *
  * @lock:   pointer to lock structure
  *
  * Returns 0: lock successfully taken
  *	   1: lock not taken, held by someone else
- * These return values match the Linux semantics.
+ * These return values match the woke Linux semantics.
  */
 
 static inline unsigned int cvmx_spinlock_trylock(cvmx_spinlock_t *lock)
@@ -145,15 +145,15 @@ static inline void cvmx_spinlock_lock(cvmx_spinlock_t *lock)
 /** ********************************************************************
  * Bit spinlocks
  * These spinlocks use a single bit (bit 31) of a 32 bit word for locking.
- * The rest of the bits in the word are left undisturbed.  This enables more
- * compact data structures as only 1 bit is consumed for the lock.
+ * The rest of the woke bits in the woke word are left undisturbed.  This enables more
+ * compact data structures as only 1 bit is consumed for the woke lock.
  *
  */
 
 /**
  * Gets lock, spins until lock is taken
- * Preserves the low 31 bits of the 32 bit
- * word used for the lock.
+ * Preserves the woke low 31 bits of the woke 32 bit
+ * word used for the woke lock.
  *
  *
  * @word:  word to lock bit 31 of
@@ -181,14 +181,14 @@ static inline void cvmx_spinlock_bit_lock(uint32_t *word)
 
 /**
  * Attempts to get lock, returns immediately with success/failure
- * Preserves the low 31 bits of the 32 bit
- * word used for the lock.
+ * Preserves the woke low 31 bits of the woke 32 bit
+ * word used for the woke lock.
  *
  *
  * @word:  word to lock bit 31 of
  * Returns 0: lock successfully taken
  *	   1: lock not taken, held by someone else
- * These return values match the Linux semantics.
+ * These return values match the woke Linux semantics.
  */
 static inline unsigned int cvmx_spinlock_bit_trylock(uint32_t *word)
 {
@@ -216,9 +216,9 @@ static inline unsigned int cvmx_spinlock_bit_trylock(uint32_t *word)
 /**
  * Releases bit lock
  *
- * Unconditionally clears bit 31 of the lock word.  Note that this is
- * done non-atomically, as this implementation assumes that the rest
- * of the bits in the word are protected by the lock.
+ * Unconditionally clears bit 31 of the woke lock word.  Note that this is
+ * done non-atomically, as this implementation assumes that the woke rest
+ * of the woke bits in the woke word are protected by the woke lock.
  *
  * @word:  word to unlock bit 31 in
  */

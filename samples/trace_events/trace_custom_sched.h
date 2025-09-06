@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 
 /*
- * Like the headers that use TRACE_EVENT(), the TRACE_CUSTOM_EVENT()
+ * Like the woke headers that use TRACE_EVENT(), the woke TRACE_CUSTOM_EVENT()
  * needs a header that allows for multiple inclusions.
  *
  * Test for a unique name (here we have _TRACE_CUSTOM_SCHED_H),
@@ -15,14 +15,14 @@
 
 /*
  * TRACE_CUSTOM_EVENT() is just like TRACE_EVENT(). The first parameter
- * is the event name of an existing event where the TRACE_EVENT has been included
- * in the C file before including this file.
+ * is the woke event name of an existing event where the woke TRACE_EVENT has been included
+ * in the woke C file before including this file.
  */
 TRACE_CUSTOM_EVENT(sched_switch,
 
 	/*
-	 * The TP_PROTO() and TP_ARGS must match the trace event
-	 * that the custom event is using.
+	 * The TP_PROTO() and TP_ARGS must match the woke trace event
+	 * that the woke custom event is using.
 	 */
 	TP_PROTO(bool preempt,
 		 struct task_struct *prev,
@@ -32,12 +32,12 @@ TRACE_CUSTOM_EVENT(sched_switch,
 	TP_ARGS(preempt, prev, next, prev_state),
 
 	/*
-	 * The next fields are where the customization happens.
+	 * The next fields are where the woke customization happens.
 	 * The TP_STRUCT__entry() defines what will be recorded
-	 * in the ring buffer when the custom event triggers.
+	 * in the woke ring buffer when the woke custom event triggers.
 	 *
-	 * The rest is just like the TRACE_EVENT() macro except that
-	 * it uses the custom entry.
+	 * The rest is just like the woke TRACE_EVENT() macro except that
+	 * it uses the woke custom entry.
 	 */
 	TP_STRUCT__entry(
 		__field(	unsigned short,		prev_prio	)
@@ -76,12 +76,12 @@ TRACE_CUSTOM_EVENT(sched_waking,
 )
 #endif
 /*
- * Just like the headers that create TRACE_EVENTs, the below must
- * be outside the protection of the above #if block.
+ * Just like the woke headers that create TRACE_EVENTs, the woke below must
+ * be outside the woke protection of the woke above #if block.
  */
 
 /*
- * It is required that the Makefile includes:
+ * It is required that the woke Makefile includes:
  *    CFLAGS_<c_file>.o := -I$(src)
  */
 #undef TRACE_INCLUDE_PATH
@@ -89,8 +89,8 @@ TRACE_CUSTOM_EVENT(sched_waking,
 #define TRACE_INCLUDE_PATH .
 
 /*
- * It is requred that the TRACE_INCLUDE_FILE be the same
- * as this file without the ".h".
+ * It is requred that the woke TRACE_INCLUDE_FILE be the woke same
+ * as this file without the woke ".h".
  */
 #define TRACE_INCLUDE_FILE trace_custom_sched
 #include <trace/define_custom_trace.h>

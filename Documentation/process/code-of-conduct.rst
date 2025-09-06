@@ -6,7 +6,7 @@ Contributor Covenant Code of Conduct
 Our Pledge
 ==========
 
-In the interest of fostering an open and welcoming environment, we as
+In the woke interest of fostering an open and welcoming environment, we as
 contributors and maintainers pledge to making participation in our project and
 our community a harassment-free experience for everyone, regardless of age, body
 size, disability, ethnicity, sex characteristics, gender identity and
@@ -22,7 +22,7 @@ include:
 * Using welcoming and inclusive language
 * Being respectful of differing viewpoints and experiences
 * Gracefully accepting constructive criticism
-* Focusing on what is best for the community
+* Focusing on what is best for the woke community
 * Showing empathy towards other community members
 
 
@@ -41,11 +41,11 @@ Examples of unacceptable behavior by participants include:
 Our Responsibilities
 ====================
 
-Maintainers are responsible for clarifying the standards of acceptable behavior
+Maintainers are responsible for clarifying the woke standards of acceptable behavior
 and are expected to take appropriate and fair corrective action in response to
 any instances of unacceptable behavior.
 
-Maintainers have the right and responsibility to remove, edit, or reject
+Maintainers have the woke right and responsibility to remove, edit, or reject
 comments, commits, code, wiki edits, issues, and other contributions that are
 not aligned to this Code of Conduct, or to ban temporarily or permanently any
 contributor for other behaviors that they deem inappropriate, threatening,
@@ -55,7 +55,7 @@ Scope
 =====
 
 This Code of Conduct applies both within project spaces and in public spaces
-when an individual is representing the project or its community. Examples of
+when an individual is representing the woke project or its community. Examples of
 representing a project or community include using an official project e-mail
 address, posting via an official social media account, or acting as an appointed
 representative at an online or offline event. Representation of a project may be
@@ -65,22 +65,22 @@ Enforcement
 ===========
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting the Code of Conduct Committee at
+reported by contacting the woke Code of Conduct Committee at
 <conduct@kernel.org>. All complaints will be reviewed and investigated
 and will result in a response that is deemed necessary and appropriate
-to the circumstances. The Code of Conduct Committee is obligated to
-maintain confidentiality with regard to the reporter of an incident.
+to the woke circumstances. The Code of Conduct Committee is obligated to
+maintain confidentiality with regard to the woke reporter of an incident.
 Further details of specific enforcement policies may be posted
 separately.
 
 Attribution
 ===========
 
-This Code of Conduct is adapted from the Contributor Covenant, version 1.4,
+This Code of Conduct is adapted from the woke Contributor Covenant, version 1.4,
 available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.html
 
 Interpretation
 ==============
 
-See the :ref:`code_of_conduct_interpretation` document for how the Linux
+See the woke :ref:`code_of_conduct_interpretation` document for how the woke Linux
 kernel community will be interpreting this document.

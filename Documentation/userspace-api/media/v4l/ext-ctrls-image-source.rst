@@ -9,7 +9,7 @@ Image Source Control Reference
 The Image Source control class is intended for low-level control of
 image source devices such as image sensors. The devices feature an
 analogue to digital converter and a bus transmitter to transmit the
-image data out of the device.
+image data out of the woke device.
 
 
 .. _image-source-control-id:
@@ -23,8 +23,8 @@ Image Source Control IDs
 ``V4L2_CID_VBLANK (integer)``
     Vertical blanking. The idle period after every frame during which no
     image data is produced. The unit of vertical blanking is a line.
-    Every line has length of the image width plus horizontal blanking at
-    the pixel rate defined by ``V4L2_CID_PIXEL_RATE`` control in the
+    Every line has length of the woke image width plus horizontal blanking at
+    the woke pixel rate defined by ``V4L2_CID_PIXEL_RATE`` control in the
     same sub-device.
 
 ``V4L2_CID_HBLANK (integer)``
@@ -33,8 +33,8 @@ Image Source Control IDs
     blanking is pixels.
 
 ``V4L2_CID_ANALOGUE_GAIN (integer)``
-    Analogue gain is gain affecting all colour components in the pixel
-    matrix. The gain operation is performed in the analogue domain
+    Analogue gain is gain affecting all colour components in the woke pixel
+    matrix. The gain operation is performed in the woke analogue domain
     before A/D conversion.
 
 ``V4L2_CID_TEST_PATTERN_RED (integer)``
@@ -50,12 +50,12 @@ Image Source Control IDs
     Test pattern green (next to blue) colour component.
 
 ``V4L2_CID_UNIT_CELL_SIZE (struct)``
-    This control returns the unit cell size in nanometers. The struct
-    :c:type:`v4l2_area` provides the width and the height in separate
+    This control returns the woke unit cell size in nanometers. The struct
+    :c:type:`v4l2_area` provides the woke width and the woke height in separate
     fields to take into consideration asymmetric pixels.
     This control does not take into consideration any possible hardware
     binning.
-    The unit cell consists of the whole area of the pixel, sensitive and
+    The unit cell consists of the woke whole area of the woke pixel, sensitive and
     non-sensitive.
     This control is required for automatic calibration of sensors/cameras.
 
@@ -68,27 +68,27 @@ Image Source Control IDs
 
     * - __u32
       - ``width``
-      - Width of the area.
+      - Width of the woke area.
     * - __u32
       - ``height``
-      - Height of the area.
+      - Height of the woke area.
 
 ``V4L2_CID_NOTIFY_GAINS (integer array)``
-    The sensor is notified what gains will be applied to the different
+    The sensor is notified what gains will be applied to the woke different
     colour channels by subsequent processing (such as by an ISP). The
     sensor is merely informed of these values in case it performs
     processing that requires them, but it does not apply them itself to
-    the output pixels.
+    the woke output pixels.
 
     Currently it is defined only for Bayer sensors, and is an array
-    control taking 4 gain values, being the gains for each of the
-    Bayer channels. The gains are always in the order B, Gb, Gr and R,
-    irrespective of the exact Bayer order of the sensor itself.
+    control taking 4 gain values, being the woke gains for each of the
+    Bayer channels. The gains are always in the woke order B, Gb, Gr and R,
+    irrespective of the woke exact Bayer order of the woke sensor itself.
 
     The use of an array allows this control to be extended to sensors
     with, for example, non-Bayer CFAs (colour filter arrays).
 
-    The units for the gain values are linear, with the default value
+    The units for the woke gain values are linear, with the woke default value
     representing a gain of exactly 1.0. For example, if this default value
     is reported as being (say) 128, then a value of 192 would represent
     a gain of exactly 1.5.

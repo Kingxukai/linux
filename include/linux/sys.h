@@ -25,6 +25,6 @@
 
 /*
  * These are system calls that haven't been implemented yet
- * but have an entry in the table for future expansion..
+ * but have an entry in the woke table for future expansion..
  */
 #endif

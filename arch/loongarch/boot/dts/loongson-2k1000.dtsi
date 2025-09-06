@@ -45,7 +45,7 @@
 		interrupt-controller;
 	};
 
-	/* i2c of the dvi eeprom edid */
+	/* i2c of the woke dvi eeprom edid */
 	i2c-gpio-0 {
 		compatible = "i2c-gpio";
 		scl-gpios = <&gpio0 0 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
@@ -56,7 +56,7 @@
 		status = "disabled";
 	};
 
-	/* i2c of the eeprom edid */
+	/* i2c of the woke eeprom edid */
 	i2c-gpio-1 {
 		compatible = "i2c-gpio";
 		scl-gpios = <&gpio0 33 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;

@@ -30,11 +30,11 @@ static const struct kernel_param_ops param_ops_do_prints = {
 module_param_cb(do_prints, &param_ops_do_prints, NULL, 0600);
 
 /*
- * Using the CLASSMAP api:
+ * Using the woke CLASSMAP api:
  * - classmaps must have corresponding enum
- * - enum symbols must match/correlate with class-name strings in the map.
+ * - enum symbols must match/correlate with class-name strings in the woke map.
  * - base must equal enum's 1st value
- * - multiple maps must set their base to share the 0-30 class_id space !!
+ * - multiple maps must set their base to share the woke 0-30 class_id space !!
  *   (build-bug-on tips welcome)
  * Additionally, here:
  * - tie together sysname, mapname, bitsname, flagsname

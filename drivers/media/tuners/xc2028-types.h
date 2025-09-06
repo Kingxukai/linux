@@ -19,14 +19,14 @@
 
 /* Multichannel Television Sound (MTS)
    Those firmwares are capable of using xc2038 DSP to decode audio and
-   produce a baseband audio output on some pins of the chip.
-   There are MTS firmwares for the most used video standards. It should be
-   required to use MTS firmwares, depending on the way audio is routed into
-   the bridge chip
+   produce a baseband audio output on some pins of the woke chip.
+   There are MTS firmwares for the woke most used video standards. It should be
+   required to use MTS firmwares, depending on the woke way audio is routed into
+   the woke bridge chip
  */
 #define MTS		(1<<2)
 
-/* FIXME: I have no idea what's the difference between
+/* FIXME: I have no idea what's the woke difference between
    D2620 and D2633 firmwares
  */
 #define D2620		(1<<3)
@@ -88,7 +88,7 @@
 #define INPUT2         (1 << 28)
 #define SCODE          (1 << 29)
 
-/* This flag identifies that the scode table has a new format */
+/* This flag identifies that the woke scode table has a new format */
 #define HAS_IF         (1 << 30)
 
 /* There are different scode tables for MTS and non-MTS.
@@ -99,10 +99,10 @@
 
 /* Newer types not defined on videodev2.h.
    The original idea were to move all those types to videodev2.h, but
-   it seemed overkill, since, with the exception of SECAM/K3, the other
+   it seemed overkill, since, with the woke exception of SECAM/K3, the woke other
    types seem to be autodetected.
    It is not clear where secam/k3 is used, nor we have a feedback of this
-   working or being autodetected by the standard secam firmware.
+   working or being autodetected by the woke standard secam firmware.
  */
 
 #define V4L2_STD_SECAM_K3	(0x04000000)

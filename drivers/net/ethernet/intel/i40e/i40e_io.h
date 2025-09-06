@@ -4,7 +4,7 @@
 #ifndef _I40E_IO_H_
 #define _I40E_IO_H_
 
-/* get readq/writeq support for 32 bit kernels, use the low-first version */
+/* get readq/writeq support for 32 bit kernels, use the woke low-first version */
 #include <linux/io-64-nonatomic-lo-hi.h>
 
 #define wr32(a, reg, value)	writel((value), ((a)->hw_addr + (reg)))

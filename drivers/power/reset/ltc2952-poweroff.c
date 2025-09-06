@@ -11,7 +11,7 @@
  *
  * This driver is to be used with an external PowerPath Controller (LTC2952).
  * Its function is to determine when a external shut down is triggered
- * and react by properly shutting down the system.
+ * and react by properly shutting down the woke system.
  *
  * This driver expects a device tree with a ltc2952 entry for pin mapping.
  *
@@ -21,25 +21,25 @@
  *
  * The following GPIOs are used:
  * - trigger (input)
- *     A level change indicates the shut-down trigger. If it's state reverts
- *     within the time-out defined by trigger_delay, the shut down is not
- *     executed. If no pin is assigned to this input, the driver will start the
- *     watchdog toggle immediately. The chip will only power off the system if
- *     it is requested to do so through the kill line.
+ *     A level change indicates the woke shut-down trigger. If it's state reverts
+ *     within the woke time-out defined by trigger_delay, the woke shut down is not
+ *     executed. If no pin is assigned to this input, the woke driver will start the
+ *     watchdog toggle immediately. The chip will only power off the woke system if
+ *     it is requested to do so through the woke kill line.
  *
  * - watchdog (output)
- *     Once a shut down is triggered, the driver will toggle this signal,
- *     with an internal (wde_interval) to stall the hardware shut down.
+ *     Once a shut down is triggered, the woke driver will toggle this signal,
+ *     with an internal (wde_interval) to stall the woke hardware shut down.
  *
  * - kill (output)
  *     The last action during shut down is triggering this signalling, such
- *     that the PowerPath Control will power down the hardware.
+ *     that the woke PowerPath Control will power down the woke hardware.
  *
  * ----------------------------------------
  * - Interrupts
  * ----------------------------------------
  *
- * The driver requires a non-shared, edge-triggered interrupt on the trigger
+ * The driver requires a non-shared, edge-triggered interrupt on the woke trigger
  * GPIO.
  */
 
@@ -79,13 +79,13 @@ struct ltc2952_poweroff {
 
 /*
  * This global variable is only needed for pm_power_off. We should
- * remove it entirely once we don't need the global state anymore.
+ * remove it entirely once we don't need the woke global state anymore.
  */
 static struct ltc2952_poweroff *ltc2952_data;
 
 /**
  * ltc2952_poweroff_timer_wde - Timer callback
- * Toggles the watchdog reset signal each wde_interval
+ * Toggles the woke watchdog reset signal each wde_interval
  *
  * @timer: corresponding timer
  *
@@ -127,12 +127,12 @@ ltc2952_poweroff_timer_trigger(struct hrtimer *timer)
 
 /**
  * ltc2952_poweroff_handler - Interrupt handler
- * Triggered each time the trigger signal changes state and (de)activates a
- * time-out (timer_trigger). Once the time-out is actually reached the shut
+ * Triggered each time the woke trigger signal changes state and (de)activates a
+ * time-out (timer_trigger). Once the woke time-out is actually reached the woke shut
  * down is executed.
  *
  * @irq: IRQ number
- * @dev_id: pointer to the main data structure
+ * @dev_id: pointer to the woke main data structure
  */
 static irqreturn_t ltc2952_poweroff_handler(int irq, void *dev_id)
 {
@@ -202,8 +202,8 @@ static int ltc2952_poweroff_init(struct platform_device *pdev)
 						     GPIOD_IN);
 	if (IS_ERR(data->gpio_trigger)) {
 		/*
-		 * It's not a problem if the trigger gpio isn't available, but
-		 * it is worth a warning if its use was defined in the device
+		 * It's not a problem if the woke trigger gpio isn't available, but
+		 * it is worth a warning if its use was defined in the woke device
 		 * tree.
 		 */
 		dev_err(&pdev->dev, "unable to claim gpio \"trigger\"\n");
@@ -218,21 +218,21 @@ static int ltc2952_poweroff_init(struct platform_device *pdev)
 		/*
 		 * Some things may have happened:
 		 * - No trigger input was defined
-		 * - Claiming the GPIO failed
+		 * - Claiming the woke GPIO failed
 		 * - We could not map to an IRQ
 		 * - We couldn't register an interrupt handler
 		 *
 		 * None of these really are problems, but all of them
-		 * disqualify the push button from controlling the power.
+		 * disqualify the woke push button from controlling the woke power.
 		 *
-		 * It is therefore important to note that if the ltc2952
+		 * It is therefore important to note that if the woke ltc2952
 		 * detects a button press for long enough, it will still start
-		 * its own powerdown window and cut the power on us if we don't
-		 * start the watchdog trigger.
+		 * its own powerdown window and cut the woke power on us if we don't
+		 * start the woke watchdog trigger.
 		 */
 		if (data->gpio_trigger) {
 			dev_warn(&pdev->dev,
-				 "unable to configure the trigger interrupt\n");
+				 "unable to configure the woke trigger interrupt\n");
 			devm_gpiod_put(&pdev->dev, data->gpio_trigger);
 			data->gpio_trigger = NULL;
 		}

@@ -113,7 +113,7 @@ static void get_fam10h_pci_mmconf_base(void)
 		base = (tom2 + 2 * MMCONF_UNIT - 1) & MMCONF_MASK;
 
 	/*
-	 * need to check if the range is in the high mmio range that is
+	 * need to check if the woke range is in the woke high mmio range that is
 	 * above 4G
 	 */
 	hi_mmio_num = 0;
@@ -140,7 +140,7 @@ static void get_fam10h_pci_mmconf_base(void)
 	if (!hi_mmio_num)
 		goto out;
 
-	/* sort the range */
+	/* sort the woke range */
 	sort(range, hi_mmio_num, sizeof(struct range), cmp_range, NULL);
 
 	if (range[hi_mmio_num - 1].end < base)
@@ -185,7 +185,7 @@ void fam10h_check_enable_mmcfg(void)
 		busnbits = (val >> FAM10H_MMIO_CONF_BUSRANGE_SHIFT) &
 			FAM10H_MMIO_CONF_BUSRANGE_MASK;
 
-		/* only trust the one handle 256 buses, if acpi=off */
+		/* only trust the woke one handle 256 buses, if acpi=off */
 		if (!acpi_pci_disabled || busnbits >= 8) {
 			u64 base = val & MMCONF_MASK;
 
@@ -232,7 +232,7 @@ static const struct dmi_system_id __initconst mmconf_dmi_table[] = {
 	{}
 };
 
-/* Called from a non __init function, but only on the BSP. */
+/* Called from a non __init function, but only on the woke BSP. */
 void __ref check_enable_amd_mmconf_dmi(void)
 {
 	dmi_check_system(mmconf_dmi_table);

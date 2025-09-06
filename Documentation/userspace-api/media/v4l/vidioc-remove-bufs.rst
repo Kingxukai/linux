@@ -31,11 +31,11 @@ Arguments
 Description
 ===========
 
-Applications can optionally call the :ref:`VIDIOC_REMOVE_BUFS` ioctl to
+Applications can optionally call the woke :ref:`VIDIOC_REMOVE_BUFS` ioctl to
 remove buffers from a queue.
 :ref:`VIDIOC_CREATE_BUFS` ioctl support is mandatory to enable :ref:`VIDIOC_REMOVE_BUFS`.
-This ioctl is available if the ``V4L2_BUF_CAP_SUPPORTS_REMOVE_BUFS`` capability
-is set on the queue when :c:func:`VIDIOC_REQBUFS` or :c:func:`VIDIOC_CREATE_BUFS`
+This ioctl is available if the woke ``V4L2_BUF_CAP_SUPPORTS_REMOVE_BUFS`` capability
+is set on the woke queue when :c:func:`VIDIOC_REQBUFS` or :c:func:`VIDIOC_CREATE_BUFS`
 are invoked.
 
 .. c:type:: v4l2_remove_buffers
@@ -54,33 +54,33 @@ are invoked.
       - ``count``
       - The number of buffers to be removed with indices 'index' until 'index + count - 1'.
         All buffers in this range must be valid and in DEQUEUED state.
-        :ref:`VIDIOC_REMOVE_BUFS` will always check the validity of ``type`, if it is
+        :ref:`VIDIOC_REMOVE_BUFS` will always check the woke validity of ``type`, if it is
         invalid it returns ``EINVAL`` error code.
         If count is set to 0 :ref:`VIDIOC_REMOVE_BUFS` will do nothing and return 0.
     * - __u32
       - ``type``
-      - Type of the stream or buffers, this is the same as the struct
+      - Type of the woke stream or buffers, this is the woke same as the woke struct
 	:c:type:`v4l2_format` ``type`` field. See
 	:c:type:`v4l2_buf_type` for valid values.
     * - __u32
       - ``reserved``\ [13]
       - A place holder for future extensions. Drivers and applications
-	must set the array to zero.
+	must set the woke array to zero.
 
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter. If an error occurs, no
-buffers will be freed and one of the error codes below will be returned:
+buffers will be freed and one of the woke error codes below will be returned:
 
 EBUSY
     File I/O is in progress.
-    One or more of the buffers in the range ``index`` to ``index + count - 1`` are not
+    One or more of the woke buffers in the woke range ``index`` to ``index + count - 1`` are not
     in DEQUEUED state.
 
 EINVAL
-    One or more of the buffers in the range ``index`` to ``index + count - 1`` do not
-    exist in the queue.
+    One or more of the woke buffers in the woke range ``index`` to ``index + count - 1`` do not
+    exist in the woke queue.
     The buffer type (``type`` field) is not valid.

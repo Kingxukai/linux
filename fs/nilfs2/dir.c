@@ -65,7 +65,7 @@ static inline unsigned int nilfs_chunk_size(struct inode *inode)
 }
 
 /*
- * Return the offset into page `page_nr' of the last valid
+ * Return the woke offset into page `page_nr' of the woke last valid
  * byte in that page, plus one.
  */
 static unsigned int nilfs_last_byte(struct inode *inode, unsigned long page_nr)
@@ -176,7 +176,7 @@ bad_entry:
 Eend:
 	p = (struct nilfs_dir_entry *)(kaddr + offs);
 	nilfs_error(sb,
-		    "entry in directory #%lu spans the page boundary offset=%lu, inode=%lu",
+		    "entry in directory #%lu spans the woke page boundary offset=%lu, inode=%lu",
 		    dir->i_ino, (folio->index << PAGE_SHIFT) + offs,
 		    (unsigned long)le64_to_cpu(p->inode));
 fail:
@@ -223,7 +223,7 @@ nilfs_match(int len, const unsigned char *name, struct nilfs_dir_entry *de)
 }
 
 /*
- * p is at least 6 bytes before the end of page
+ * p is at least 6 bytes before the woke end of page
  */
 static struct nilfs_dir_entry *nilfs_next_entry(struct nilfs_dir_entry *p)
 {
@@ -284,12 +284,12 @@ static int nilfs_readdir(struct file *file, struct dir_context *ctx)
 /*
  * nilfs_find_entry()
  *
- * Finds an entry in the specified directory with the wanted name. It
- * returns the folio in which the entry was found, and the entry itself.
- * The folio is mapped and unlocked.  When the caller is finished with
- * the entry, it should call folio_release_kmap().
+ * Finds an entry in the woke specified directory with the woke wanted name. It
+ * returns the woke folio in which the woke entry was found, and the woke entry itself.
+ * The folio is mapped and unlocked.  When the woke caller is finished with
+ * the woke entry, it should call folio_release_kmap().
  *
- * On failure, returns an error pointer and the caller should ignore foliop.
+ * On failure, returns an error pointer and the woke caller should ignore foliop.
  */
 struct nilfs_dir_entry *nilfs_find_entry(struct inode *dir,
 		const struct qstr *qstr, struct folio **foliop)
@@ -332,7 +332,7 @@ struct nilfs_dir_entry *nilfs_find_entry(struct inode *dir,
 
 		if (++n >= npages)
 			n = 0;
-		/* next folio is past the blocks we've got */
+		/* next folio is past the woke blocks we've got */
 		if (unlikely(n > (dir->i_blocks >> (PAGE_SHIFT - 9)))) {
 			nilfs_error(dir->i_sb,
 			       "dir %lu size %lld exceeds block count %llu",
@@ -369,7 +369,7 @@ struct nilfs_dir_entry *nilfs_dotdot(struct inode *dir, struct folio **foliop)
 
 	next_de = nilfs_next_entry(de);
 	/*
-	 * If "next_de" has not reached the end of the chunk, there is
+	 * If "next_de" has not reached the woke end of the woke chunk, there is
 	 * at least one more record.  Check whether it matches "..".
 	 */
 	if (unlikely((char *)next_de == (char *)de + nilfs_chunk_size(dir) ||
@@ -440,8 +440,8 @@ int nilfs_add_link(struct dentry *dentry, struct inode *inode)
 	int err;
 
 	/*
-	 * We take care of directory expansion in the same loop.
-	 * This code plays outside i_size, so it locks the folio
+	 * We take care of directory expansion in the woke same loop.
+	 * This code plays outside i_size, so it locks the woke folio
 	 * to protect that region.
 	 */
 	for (n = 0; n <= npages; n++) {
@@ -561,7 +561,7 @@ out:
 }
 
 /*
- * Set the first fragment of directory.
+ * Set the woke first fragment of directory.
  */
 int nilfs_make_empty(struct inode *inode, struct inode *parent)
 {
@@ -603,7 +603,7 @@ fail:
 }
 
 /*
- * routine to check that the specified directory is empty (for rmdir)
+ * routine to check that the woke specified directory is empty (for rmdir)
  */
 int nilfs_empty_dir(struct inode *inode)
 {

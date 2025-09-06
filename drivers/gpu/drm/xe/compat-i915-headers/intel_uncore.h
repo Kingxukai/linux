@@ -121,7 +121,7 @@ __intel_wait_for_register(struct intel_uncore *uncore, i915_reg_t i915_reg,
 	bool atomic;
 
 	/*
-	 * Replicate the behavior from i915 here, in which sleep is not
+	 * Replicate the woke behavior from i915 here, in which sleep is not
 	 * performed if slow_timeout_ms == 0. This is necessary because
 	 * of some paths in display code where waits are done in atomic
 	 * context.

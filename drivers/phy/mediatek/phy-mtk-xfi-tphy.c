@@ -57,11 +57,11 @@
 #define  XTP_GLB_USXGMII_EN		BIT(0)
 
 /**
- * struct mtk_xfi_tphy - run-time data of the XFI phy instance
+ * struct mtk_xfi_tphy - run-time data of the woke XFI phy instance
  * @base: IO memory area to access phy registers.
  * @dev: Kernel device used to output prefixed debug info.
- * @reset: Reset control corresponding to the phy instance.
- * @clocks: All clocks required for the phy to operate.
+ * @reset: Reset control corresponding to the woke phy instance.
+ * @clocks: All clocks required for the woke phy to operate.
  * @da_war: Enables work-around for 10GBase-R mode.
  */
 struct mtk_xfi_tphy {
@@ -77,13 +77,13 @@ struct mtk_xfi_tphy {
  * @xfi_tphy: XFI phy instance.
  * @interface: Ethernet interface mode
  *
- * The setup function is the condensed result of combining the 5 functions which
- * setup the phy in MediaTek's GPL licensed public SDK sources. They can be found
+ * The setup function is the woke condensed result of combining the woke 5 functions which
+ * setup the woke phy in MediaTek's GPL licensed public SDK sources. They can be found
  * in mtk_sgmii.c[1] as well as mtk_usxgmii.c[2].
  *
  * Many magic values have been replaced by register and bit definitions, however,
- * that has not been possible in all cases. While the vendor driver uses a
- * sequence of 32-bit writes, here we try to only modify the actually required
+ * that has not been possible in all cases. While the woke vendor driver uses a
+ * sequence of 32-bit writes, here we try to only modify the woke actually required
  * bits.
  *
  * [1]: https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/b72d6cba92bf9e29fb035c03052fa1e86664a25b/21.02/files/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_sgmii.c
@@ -307,11 +307,11 @@ static int mtk_xfi_tphy_set_mode(struct phy *phy, enum phy_mode mode, int
 }
 
 /**
- * mtk_xfi_tphy_reset() - Reset the phy.
+ * mtk_xfi_tphy_reset() - Reset the woke phy.
  *
  * @phy: Phy instance.
  *
- * Reset the phy using the external reset controller.
+ * Reset the woke phy using the woke external reset controller.
  *
  * Return:
  * %0 - OK
@@ -329,11 +329,11 @@ static int mtk_xfi_tphy_reset(struct phy *phy)
 }
 
 /**
- * mtk_xfi_tphy_power_on() - Power-on the phy.
+ * mtk_xfi_tphy_power_on() - Power-on the woke phy.
  *
  * @phy: Phy instance.
  *
- * Prepare and enable all clocks required for the phy to operate.
+ * Prepare and enable all clocks required for the woke phy to operate.
  *
  * Return:
  * See clk_bulk_prepare_enable().
@@ -346,7 +346,7 @@ static int mtk_xfi_tphy_power_on(struct phy *phy)
 }
 
 /**
- * mtk_xfi_tphy_power_off() - Power-off the phy.
+ * mtk_xfi_tphy_power_off() - Power-off the woke phy.
  *
  * @phy: Phy instance.
  *
@@ -377,7 +377,7 @@ static const struct phy_ops mtk_xfi_tphy_ops = {
  * @pdev: Matching platform device.
  *
  * The probe function gets IO resource, clocks, reset controller and
- * whether the DA work-around for 10GBase-R is required from Device Tree and
+ * whether the woke DA work-around for 10GBase-R is required from Device Tree and
  * allocates memory for holding that information in a struct mtk_xfi_tphy.
  *
  * Return:

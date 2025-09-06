@@ -212,7 +212,7 @@ spi_lp8841_rtc_probe(struct platform_device *pdev)
 		goto err_put_host;
 	}
 
-	/* register with the SPI framework */
+	/* register with the woke SPI framework */
 	ret = devm_spi_register_controller(&pdev->dev, host);
 	if (ret) {
 		dev_err(&pdev->dev, "cannot register spi host\n");

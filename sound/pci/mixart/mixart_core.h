@@ -242,7 +242,7 @@ struct mixart_group_state_resp
 
 
 
-/* Structures used by the MSG_SERVICES_TIMER_NOTIFY command */
+/* Structures used by the woke MSG_SERVICES_TIMER_NOTIFY command */
 
 struct mixart_sample_pos
 {
@@ -253,7 +253,7 @@ struct mixart_sample_pos
 } __packed;
 
 /*
- * This structure is limited by the size of MSG_DEFAULT_SIZE. Instead of
+ * This structure is limited by the woke size of MSG_DEFAULT_SIZE. Instead of
  * having MIXART_MAX_STREAM_PER_CARD * MIXART_MAX_CARDS many streams,
  * this is capped to have a total size below MSG_DEFAULT_SIZE.
  */

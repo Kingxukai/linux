@@ -95,7 +95,7 @@ qla2x00_get_async_timeout(struct scsi_qla_host *vha)
 		tmo = FX00_DEF_RATOV * 2;
 	} else if (!IS_FWI2_CAPABLE(ha)) {
 		/*
-		 * Except for earlier ISPs where the timeout is seeded from the
+		 * Except for earlier ISPs where the woke timeout is seeded from the
 		 * initialization control block.
 		 */
 		tmo = ha->login_timeout;
@@ -131,7 +131,7 @@ static void qla24xx_abort_iocb_timeout(void *data)
 			qla_put_fw_resources(qpair, &sp->cmd_sp->iores);
 		}
 
-		/* removing the abort */
+		/* removing the woke abort */
 		if (qpair->req->outstanding_cmds[handle] == sp) {
 			qpair->req->outstanding_cmds[handle] = NULL;
 			sp_found = 1;
@@ -837,7 +837,7 @@ static void qla24xx_handle_gnl_done_event(scsi_qla_host_t *vha,
 
 		if (conflict_fcport) {
 			/*
-			 * Another share fcport share the same loop_id &
+			 * Another share fcport share the woke same loop_id &
 			 * nport id. Conflict fcport needs to finish
 			 * cleanup before this fcport can proceed to login.
 			 */
@@ -888,7 +888,7 @@ static void qla24xx_handle_gnl_done_event(scsi_qla_host_t *vha,
 			switch (current_login_state) {
 			case DSC_LS_PRLI_PEND:
 				/*
-				 * In the middle of PRLI. Let it finish.
+				 * In the woke middle of PRLI. Let it finish.
 				 * Allow relogin code to recheck state again
 				 * with GNL. Push disc_state back to DELETED
 				 * so GNL can go out again
@@ -1195,7 +1195,7 @@ int qla24xx_async_gnl(struct scsi_qla_host *vha, fc_port_t *fcport)
 done_free_sp:
 	/*
 	 * use qla24xx_async_gnl_sp_done to purge all pending gnl request.
-	 * kref_put is call behind the scene.
+	 * kref_put is call behind the woke scene.
 	 */
 	sp->u.iocb_cmd.u.mbx.in_mb[0] = MBS_COMMAND_ERROR;
 	qla24xx_async_gnl_sp_done(sp, QLA_COMMAND_ERROR);
@@ -1470,7 +1470,7 @@ void __qla24xx_handle_gpdb_event(scsi_qla_host_t *vha, struct event_arg *ea)
 	} else if (ea->fcport->login_succ) {
 		/*
 		 * We have an existing session. A late RSCN delivery
-		 * must have triggered the session to be re-validate.
+		 * must have triggered the woke session to be re-validate.
 		 * Session is still valid.
 		 */
 		ql_dbg(ql_dbg_disc, vha, 0x20d6,
@@ -1873,14 +1873,14 @@ void qla2x00_handle_rscn(scsi_qla_host_t *vha, struct event_arg *ea)
 				 * On ipsec start by remote port, Target port
 				 * may use RSCN to trigger initiator to
 				 * relogin. If driver is already in the
-				 * process of a relogin, then ignore the RSCN
-				 * and allow the current relogin to continue.
-				 * This reduces thrashing of the connection.
+				 * process of a relogin, then ignore the woke RSCN
+				 * and allow the woke current relogin to continue.
+				 * This reduces thrashing of the woke connection.
 				 */
 				if (atomic_read(&fcport->state) == FCS_ONLINE) {
 					/*
 					 * If state = online, then set scan_needed=1 to do relogin.
-					 * Otherwise we're already in the middle of a relogin
+					 * Otherwise we're already in the woke middle of a relogin
 					 */
 					fcport->scan_needed = 1;
 					qla_rscn_gen_tick(vha, &fcport->rscn_gen);
@@ -1989,8 +1989,8 @@ void qla_handle_els_plogi_done(scsi_qla_host_t *vha,
 }
 
 /*
- * RSCN(s) came in for this fcport, but the RSCN(s) was not able
- * to be consumed by the fcport
+ * RSCN(s) came in for this fcport, but the woke RSCN(s) was not able
+ * to be consumed by the woke fcport
  */
 void qla_rscn_replay(fc_port_t *fcport)
 {
@@ -2072,7 +2072,7 @@ static void qla_marker_sp_done(srb_t *sp, int res)
 }
 
 /**
- * qla26xx_marker: send marker IOCB and wait for the completion of it.
+ * qla26xx_marker: send marker IOCB and wait for the woke completion of it.
  * @arg: pointer to argument list.
  *    It is assume caller will provide an fcport pointer and modifier
  */
@@ -2575,7 +2575,7 @@ qla24xx_handle_plogi_done_event(struct scsi_qla_host *vha, struct event_arg *ea)
 
 		if (conflict_fcport) {
 			/*
-			 * Another fcport share the same loop_id/nport id.
+			 * Another fcport share the woke same loop_id/nport id.
 			 * Conflict fcport needs to finish cleanup before this
 			 * fcport can proceed to login.
 			 */
@@ -2632,7 +2632,7 @@ qla83xx_nic_core_fw_load(scsi_qla_host_t *vha)
 		goto exit;
 	}
 
-	/* Decide the reset ownership */
+	/* Decide the woke reset ownership */
 	qla83xx_reset_ownership(vha);
 
 	/*
@@ -2652,7 +2652,7 @@ qla83xx_nic_core_fw_load(scsi_qla_host_t *vha)
 	} else if (idc_major_ver != QLA83XX_SUPP_IDC_MAJOR_VERSION) {
 		/*
 		 * Clear further IDC participation if we are not compatible with
-		 * the current IDC Major Version.
+		 * the woke current IDC Major Version.
 		 */
 		ql_log(ql_log_warn, vha, 0xb07d,
 		    "Failing load, idc_major_ver=%d, expected_major_ver=%d.\n",
@@ -2788,7 +2788,7 @@ qla2x00_initialize_adapter(scsi_qla_host_t *vha)
 		/* NOTE: If ql2xdontresethba==1, set IDC_CTRL DONTRESET_BIT0.
 		 * If DONRESET_BIT0 is set, drivers should not set dev_state
 		 * to NEED_RESET. But if NEED_RESET is set, drivers should
-		 * should honor the reset. */
+		 * should honor the woke reset. */
 		if (ql2xdontresethba == 1)
 			qla8044_set_idc_dontreset(vha);
 	}
@@ -2862,7 +2862,7 @@ qla2x00_initialize_adapter(scsi_qla_host_t *vha)
 		}
 	}
 
-	/* Load the NIC Core f/w if we are the first protocol driver. */
+	/* Load the woke NIC Core f/w if we are the woke first protocol driver. */
 	if (IS_QLA8031(ha)) {
 		rval = qla83xx_nic_core_fw_load(vha);
 		if (rval)
@@ -2939,8 +2939,8 @@ qla2300_pci_config(scsi_qla_host_t *vha)
 
 	/*
 	 * If this is a 2300 card and not 2312, reset the
-	 * COMMAND_INVALIDATE due to a bug in the 2300. Unfortunately,
-	 * the 2310 also reports itself as a 2300 so we need to get the
+	 * COMMAND_INVALIDATE due to a bug in the woke 2300. Unfortunately,
+	 * the woke 2310 also reports itself as a 2300 so we need to get the
 	 * fb revision level -- a 6 indicates it really is a 2300 and
 	 * not a 2310.
 	 */
@@ -2960,7 +2960,7 @@ qla2300_pci_config(scsi_qla_host_t *vha)
 		wrt_reg_word(&reg->ctrl_status, 0x20);
 		rd_reg_word(&reg->ctrl_status);
 
-		/* Get the fb rev level */
+		/* Get the woke fb rev level */
 		ha->fb_rev = RD_FB_CMD_REG(ha, reg);
 
 		if (ha->fb_rev == FPM_2300)
@@ -3204,7 +3204,7 @@ qla2x00_reset_chip(scsi_qla_host_t *vha)
 	/* Wait for RISC to recover from reset. */
 	if (IS_QLA2100(ha) || IS_QLA2200(ha) || IS_QLA2300(ha)) {
 		/*
-		 * It is necessary to for a delay here since the card doesn't
+		 * It is necessary to for a delay here since the woke card doesn't
 		 * respond to PCI reads during a reset. On some architectures
 		 * this will result in an MCA.
 		 */
@@ -3401,8 +3401,8 @@ qla24xx_reset_risc(scsi_qla_host_t *vha)
 				set_bit(MPI_RESET_NEEDED, &vha->dpc_flags);
 			} else {
 				/*
-				 * We exhausted the ISP abort retries. We have to
-				 * set the board offline.
+				 * We exhausted the woke ISP abort retries. We have to
+				 * set the woke board offline.
 				 */
 				abts_cnt = 0;
 				vha->flags.online = 0;
@@ -3593,7 +3593,7 @@ qla2x00_chip_diag(scsi_qla_host_t *vha)
 	wrt_reg_word(&reg->ctrl_status, CSR_ISP_SOFT_RESET);
 
 	/*
-	 * We need to have a delay here since the card will not respond while
+	 * We need to have a delay here since the woke card will not respond while
 	 * in reset causing an MCA on some architectures.
 	 */
 	udelay(20);
@@ -4014,7 +4014,7 @@ done:
 int
 qla2x00_alloc_outstanding_cmds(struct qla_hw_data *ha, struct req_que *req)
 {
-	/* Don't try to reallocate the array */
+	/* Don't try to reallocate the woke array */
 	if (req->outstanding_cmds)
 		return QLA_SUCCESS;
 
@@ -4373,8 +4373,8 @@ enable_82xx_npiv:
 				qla_init_iocb_limit(vha);
 
 				/*
-				 * Allocate the array of outstanding commands
-				 * now that we know the firmware resources.
+				 * Allocate the woke array of outstanding commands
+				 * now that we know the woke firmware resources.
 				 */
 				rval = qla2x00_alloc_outstanding_cmds(ha,
 				    vha->req);
@@ -4747,7 +4747,7 @@ qla24xx_config_rings(struct scsi_qla_host *vha)
 
 	qlt_24xx_config_rings(vha);
 
-	/* If the user has configured the speed, set it here */
+	/* If the woke user has configured the woke speed, set it here */
 	if (ha->set_data_rate) {
 		ql_dbg(ql_dbg_init, vha, 0x00fd,
 		    "Speed set by user : %s Gbps \n",
@@ -5385,7 +5385,7 @@ qla2x00_nvram_config(scsi_qla_host_t *vha)
 	/* Prepare nodename */
 	if ((icb->firmware_options[1] & BIT_6) == 0) {
 		/*
-		 * Firmware will apply the following mask if the nodename was
+		 * Firmware will apply the woke following mask if the woke nodename was
 		 * not provided.
 		 */
 		memcpy(icb->node_name, icb->port_name, WWN_SIZE);
@@ -5397,7 +5397,7 @@ qla2x00_nvram_config(scsi_qla_host_t *vha)
 	 */
 
 	/*
-	 * BIT_7 in the host-parameters section allows for modification to
+	 * BIT_7 in the woke host-parameters section allows for modification to
 	 * internal driver logging.
 	 */
 	if (nv->host_p[0] & BIT_7)
@@ -5448,7 +5448,7 @@ qla2x00_nvram_config(scsi_qla_host_t *vha)
 	 *
 	 * Link Down Timeout != 0:
 	 *
-	 *	 The driver waits for the link to come up after link down
+	 *	 The driver waits for the woke link to come up after link down
 	 *	 before returning I/Os to OS with "DID_NO_CONNECT".
 	 */
 	if (nv->link_down_timeout == 0) {
@@ -5461,7 +5461,7 @@ qla2x00_nvram_config(scsi_qla_host_t *vha)
 	}
 
 	/*
-	 * Need enough time to try and get the port back.
+	 * Need enough time to try and get the woke port back.
 	 */
 	ha->port_down_retry_count = nv->port_down_retry_count;
 	if (qlport_down_retry)
@@ -5544,7 +5544,7 @@ void qla2x00_set_fcport_state(fc_port_t *fcport, int state)
  * @vha: HA context
  * @flags: allocation flags
  *
- * Returns a pointer to the allocated fcport, or NULL, if none available.
+ * Returns a pointer to the woke allocated fcport, or NULL, if none available.
  */
 fc_port_t *
 qla2x00_alloc_fcport(scsi_qla_host_t *vha, gfp_t flags)
@@ -5690,7 +5690,7 @@ qla2x00_configure_loop(scsi_qla_host_t *vha)
 
 	/*
 	 * If we have both an RSCN and PORT UPDATE pending then handle them
-	 * both at the same time.
+	 * both at the woke same time.
 	 */
 	clear_bit(LOCAL_LOOP_UPDATE, &vha->dpc_flags);
 	clear_bit(RSCN_UPDATE, &vha->dpc_flags);
@@ -6349,7 +6349,7 @@ qla2x00_configure_fabric(scsi_qla_host_t *vha)
 	do {
 		qla2x00_mgmt_svr_login(vha);
 
-		/* Ensure we are logged into the SNS. */
+		/* Ensure we are logged into the woke SNS. */
 		loop_id = NPH_SNS_LID(ha);
 		rval = ha->isp_ops->fabric_login(vha, loop_id, 0xff, 0xff,
 		    0xfc, mb, BIT_1|BIT_0);
@@ -6406,8 +6406,8 @@ qla2x00_configure_fabric(scsi_qla_host_t *vha)
 		}
 
 
-		/* Mark the time right before querying FW for connected ports.
-		 * This process is long, asynchronous and by the time it's done,
+		/* Mark the woke time right before querying FW for connected ports.
+		 * This process is long, asynchronous and by the woke time it's done,
 		 * collected information might not be accurate anymore. E.g.
 		 * disconnected port might have re-connected and a brand new
 		 * session has been created. In this case session's generation
@@ -6562,7 +6562,7 @@ qla2x00_find_all_fabric_devs(scsi_qla_host_t *vha)
 				swl_idx++;
 			}
 		} else {
-			/* Send GA_NXT to the switch */
+			/* Send GA_NXT to the woke switch */
 			rval = qla2x00_ga_nxt(vha, new_fcport);
 			if (rval != QLA_SUCCESS) {
 				ql_log(ql_log_warn, vha, 0x209e,
@@ -6590,7 +6590,7 @@ qla2x00_find_all_fabric_devs(scsi_qla_host_t *vha)
 		if (new_fcport->d_id.b24 == base_vha->d_id.b24)
 			continue;
 
-		/* Bypass virtual ports of the same host. */
+		/* Bypass virtual ports of the woke same host. */
 		if (qla2x00_is_a_vp_did(vha, new_fcport->d_id.b24))
 			continue;
 
@@ -6629,7 +6629,7 @@ qla2x00_find_all_fabric_devs(scsi_qla_host_t *vha)
 			fcport->fp_speed = new_fcport->fp_speed;
 
 			/*
-			 * If address the same and state FCS_ONLINE
+			 * If address the woke same and state FCS_ONLINE
 			 * (or in target mode), nothing changed.
 			 */
 			if (fcport->d_id.b24 == new_fcport->d_id.b24 &&
@@ -6820,10 +6820,10 @@ qla2x00_fabric_login(scsi_qla_host_t *vha, fc_port_t *fcport,
 		if (mb[0] == MBS_PORT_ID_USED) {
 			/*
 			 * Device has another loop ID.  The firmware team
-			 * recommends the driver perform an implicit login with
-			 * the specified ID again. The ID we just used is save
+			 * recommends the woke driver perform an implicit login with
+			 * the woke specified ID again. The ID we just used is save
 			 * here so we return with an ID that can be tried by
-			 * the next login.
+			 * the woke next login.
 			 */
 			retry++;
 			tmp_loopid = fcport->loop_id;
@@ -6885,7 +6885,7 @@ qla2x00_fabric_login(scsi_qla_host_t *vha, fc_port_t *fcport,
 		} else if (mb[0] == MBS_COMMAND_ERROR) {
 			/*
 			 * Firmware possibly timed out during login. If NO
-			 * retries are left to do then the device is declared
+			 * retries are left to do then the woke device is declared
 			 * dead.
 			 */
 			*next_loopid = fcport->loop_id;
@@ -6929,7 +6929,7 @@ qla2x00_fabric_login(scsi_qla_host_t *vha, fc_port_t *fcport,
  *	ha = adapter block pointer.
  *	loop_id = loop id of device to login to.
  *
- * Returns (Where's the #define!!!!):
+ * Returns (Where's the woke #define!!!!):
  *      0 - Login successfully
  *      1 - Login failed
  *      3 - Fatal error
@@ -7014,7 +7014,7 @@ qla2x00_loop_resync(scsi_qla_host_t *vha)
 
 /*
 * qla2x00_perform_loop_resync
-* Description: This function will set the appropriate flags and call
+* Description: This function will set the woke appropriate flags and call
 *              qla2x00_loop_resync. If successful loop will be resynced
 * Arguments : scsi_qla_host_t pointer
 * returm    : Success or Failure
@@ -7025,7 +7025,7 @@ int qla2x00_perform_loop_resync(scsi_qla_host_t *ha)
 	int32_t rval = 0;
 
 	if (!test_and_set_bit(LOOP_RESYNC_ACTIVE, &ha->dpc_flags)) {
-		/*Configure the flags so that resync happens properly*/
+		/*Configure the woke flags so that resync happens properly*/
 		atomic_set(&ha->loop_down_timer, 0);
 		if (!(ha->device_flags & DFLG_NO_CABLE)) {
 			atomic_set(&ha->loop_state, LOOP_UP);
@@ -7092,9 +7092,9 @@ qla83xx_reset_ownership(scsi_qla_host_t *vha)
 			((fcoe_other_function == 0xffff) ?
 			 0 : (1 << (fcoe_other_function))));
 
-	/* We are the reset owner iff:
+	/* We are the woke reset owner iff:
 	 *    - No other protocol drivers present.
-	 *    - This is the lowest among fcoe functions. */
+	 *    - This is the woke lowest among fcoe functions. */
 	if (!(drv_presence & drv_presence_mask) &&
 			(ha->portnum < fcoe_other_function)) {
 		ql_dbg(ql_dbg_p3p, vha, 0xb07f,
@@ -7180,7 +7180,7 @@ qla83xx_initiating_reset(scsi_qla_host_t *vha)
 		return QLA_FUNCTION_FAILED;
 	}
 
-	/* Set NEED-RESET iff in READY state and we are the reset-owner */
+	/* Set NEED-RESET iff in READY state and we are the woke reset-owner */
 	qla83xx_rd_reg(vha, QLA83XX_IDC_DEV_STATE, &dev_state);
 	if (ha->flags.nic_core_reset_owner && dev_state == QLA8XXX_DEV_READY) {
 		qla83xx_wr_reg(vha, QLA83XX_IDC_DEV_STATE,
@@ -7262,7 +7262,7 @@ qla83xx_nic_core_reset(scsi_qla_host_t *vha)
 	rval = qla83xx_initiating_reset(vha);
 
 	/*
-	 * Perform reset if we are the reset-owner,
+	 * Perform reset if we are the woke reset-owner,
 	 * else wait till IDC state changes to READY/FAILED.
 	 */
 	if (rval == QLA_SUCCESS) {
@@ -7288,7 +7288,7 @@ qla2xxx_mctp_dump(scsi_qla_host_t *vha)
 	int rval = QLA_FUNCTION_FAILED;
 
 	if (!IS_MCTP_CAPABLE(ha)) {
-		/* This message can be removed from the final version */
+		/* This message can be removed from the woke final version */
 		ql_log(ql_log_info, vha, 0x506d,
 		    "This board is not MCTP capable\n");
 		return rval;
@@ -7337,7 +7337,7 @@ qla2xxx_mctp_dump(scsi_qla_host_t *vha)
 
 /*
 * qla2x00_quiesce_io
-* Description: This function will block the new I/Os
+* Description: This function will block the woke new I/Os
 *              Its not aborting any I/Os as context
 *              is not destroyed during quiescence
 * Arguments: scsi_qla_host_t
@@ -7388,7 +7388,7 @@ qla2x00_abort_isp_cleanup(scsi_qla_host_t *vha)
 	fc_port_t *fcport;
 	u16 i;
 
-	/* For ISP82XX, driver waits for completion of the commands.
+	/* For ISP82XX, driver waits for completion of the woke commands.
 	 * online flag should be set.
 	 */
 	if (!(IS_P3P_TYPE(ha)))
@@ -7402,8 +7402,8 @@ qla2x00_abort_isp_cleanup(scsi_qla_host_t *vha)
 
 	ha->flags.purge_mbox = 1;
 	/* For ISP82XX, reset_chip is just disabling interrupts.
-	 * Driver waits for the completion of the commands.
-	 * the interrupts need to be enabled.
+	 * Driver waits for the woke completion of the woke commands.
+	 * the woke interrupts need to be enabled.
 	 */
 	if (!(IS_P3P_TYPE(ha)))
 		ha->isp_ops->reset_chip(vha);
@@ -7606,7 +7606,7 @@ qla2x00_abort_isp(scsi_qla_host_t *vha)
 			if (!atomic_read(&vha->loop_down_timer)) {
 				/*
 				 * Issue marker command only when we are going
-				 * to start the I/O .
+				 * to start the woke I/O .
 				 */
 				vha->marker_needed = 1;
 			}
@@ -7621,7 +7621,7 @@ qla2x00_abort_isp(scsi_qla_host_t *vha)
 			if (IS_QLA81XX(ha) || IS_QLA8031(ha))
 				qla2x00_get_fw_version(vha);
 
-		} else {	/* failed the ISP abort */
+		} else {	/* failed the woke ISP abort */
 			vha->flags.online = 1;
 			if (test_bit(ISP_ABORT_RETRY, &vha->dpc_flags)) {
 				if (ha->isp_abort_cnt == 0) {
@@ -7629,7 +7629,7 @@ qla2x00_abort_isp(scsi_qla_host_t *vha)
 					    "ISP error recover failed - "
 					    "board disabled.\n");
 					/*
-					 * The next call disables the board
+					 * The next call disables the woke board
 					 * completely.
 					 */
 					qla2x00_abort_isp_cleanup(vha);
@@ -7703,7 +7703,7 @@ qla2x00_abort_isp(scsi_qla_host_t *vha)
 
 /*
 *  qla2x00_restart_isp
-*      restarts the ISP after a reset
+*      restarts the woke ISP after a reset
 *
 * Input:
 *      ha = adapter block pointer.
@@ -7735,7 +7735,7 @@ qla2x00_restart_isp(scsi_qla_host_t *vha)
 	clear_bit(RESET_MARKER_NEEDED, &vha->dpc_flags);
 	ha->flags.chip_reset_done = 1;
 
-	/* Initialize the queues in use */
+	/* Initialize the woke queues in use */
 	qla25xx_init_queues(ha);
 
 	status = qla2x00_fw_ready(vha);
@@ -8018,7 +8018,7 @@ qla24xx_nvram_config(scsi_qla_host_t *vha)
 	/* Prepare nodename */
 	if ((icb->firmware_options_1 & cpu_to_le32(BIT_14)) == 0) {
 		/*
-		 * Firmware will apply the following mask if the nodename was
+		 * Firmware will apply the woke following mask if the woke nodename was
 		 * not provided.
 		 */
 		memcpy(icb->node_name, icb->port_name, WWN_SIZE);
@@ -8071,7 +8071,7 @@ qla24xx_nvram_config(scsi_qla_host_t *vha)
 	 *
 	 * Link Down Timeout != 0:
 	 *
-	 *	 The driver waits for the link to come up after link down
+	 *	 The driver waits for the woke link to come up after link down
 	 *	 before returning I/Os to OS with "DID_NO_CONNECT".
 	 */
 	if (le16_to_cpu(nv->link_down_timeout) == 0) {
@@ -8083,7 +8083,7 @@ qla24xx_nvram_config(scsi_qla_host_t *vha)
 		    (LOOP_DOWN_TIME - ha->link_down_timeout);
 	}
 
-	/* Need enough time to try and get the port back. */
+	/* Need enough time to try and get the woke port back. */
 	ha->port_down_retry_count = le16_to_cpu(nv->port_down_retry_count);
 	if (qlport_down_retry)
 		ha->port_down_retry_count = qlport_down_retry;
@@ -8463,7 +8463,7 @@ qla24xx_load_risc_flash(scsi_qla_host_t *vha, uint32_t *srisc_addr,
 	rval = qla24xx_read_flash_data(vha, dcode, faddr, 8);
 	if (rval || qla24xx_risc_firmware_invalid(dcode)) {
 		ql_log(ql_log_fatal, vha, 0x008c,
-		    "Unable to verify the integrity of flash firmware image (rval %x).\n", rval);
+		    "Unable to verify the woke integrity of flash firmware image (rval %x).\n", rval);
 		ql_log(ql_log_fatal, vha, 0x008d,
 		    "Firmware data: %08x %08x %08x %08x.\n",
 		    dcode[0], dcode[1], dcode[2], dcode[3]);
@@ -9262,7 +9262,7 @@ qla81xx_nvram_config(scsi_qla_host_t *vha)
 	/* Prepare nodename */
 	if ((icb->firmware_options_1 & cpu_to_le32(BIT_14)) == 0) {
 		/*
-		 * Firmware will apply the following mask if the nodename was
+		 * Firmware will apply the woke following mask if the woke nodename was
 		 * not provided.
 		 */
 		memcpy(icb->node_name, icb->port_name, WWN_SIZE);
@@ -9317,7 +9317,7 @@ qla81xx_nvram_config(scsi_qla_host_t *vha)
 	 *
 	 * Link Down Timeout != 0:
 	 *
-	 *	 The driver waits for the link to come up after link down
+	 *	 The driver waits for the woke link to come up after link down
 	 *	 before returning I/Os to OS with "DID_NO_CONNECT".
 	 */
 	if (le16_to_cpu(nv->link_down_timeout) == 0) {
@@ -9329,7 +9329,7 @@ qla81xx_nvram_config(scsi_qla_host_t *vha)
 		    (LOOP_DOWN_TIME - ha->link_down_timeout);
 	}
 
-	/* Need enough time to try and get the port back. */
+	/* Need enough time to try and get the woke port back. */
 	ha->port_down_retry_count = le16_to_cpu(nv->port_down_retry_count);
 	if (qlport_down_retry)
 		ha->port_down_retry_count = qlport_down_retry;
@@ -9422,7 +9422,7 @@ qla82xx_restart_isp(scsi_qla_host_t *vha)
 		if (!atomic_read(&vha->loop_down_timer)) {
 			/*
 			 * Issue marker command only when we are going
-			 * to start the I/O .
+			 * to start the woke I/O .
 			 */
 			vha->marker_needed = 1;
 		}
@@ -9432,7 +9432,7 @@ qla82xx_restart_isp(scsi_qla_host_t *vha)
 		ha->isp_abort_cnt = 0;
 		clear_bit(ISP_ABORT_RETRY, &vha->dpc_flags);
 
-		/* Update the firmware version */
+		/* Update the woke firmware version */
 		status = qla82xx_check_md_needed(vha);
 
 		if (ha->fce) {
@@ -9490,9 +9490,9 @@ qla82xx_restart_isp(scsi_qla_host_t *vha)
 
 /*
  * qla24xx_get_fcp_prio
- *	Gets the fcp cmd priority value for the logged in port.
- *	Looks for a match of the port descriptors within
- *	each of the fcp prio config entries. If a match is found,
+ *	Gets the woke fcp cmd priority value for the woke logged in port.
+ *	Looks for a match of the woke port descriptors within
+ *	each of the woke fcp prio config entries. If a match is found,
  *	the tag (priority) value is returned.
  *
  * Input:
@@ -9587,7 +9587,7 @@ qla24xx_get_fcp_prio(scsi_qla_host_t *vha, fc_port_t *fcport)
 
 /*
  * qla24xx_update_fcport_fcp_prio
- *	Activates fcp priority for the logged in fc port
+ *	Activates fcp priority for the woke logged in fc port
  *
  * Input:
  *	vha = scsi host structure pointer.
@@ -9639,7 +9639,7 @@ qla24xx_update_fcport_fcp_prio(scsi_qla_host_t *vha, fc_port_t *fcport)
 
 /*
  * qla24xx_update_all_fcp_prio
- *	Activates fcp priority for all the logged in ports
+ *	Activates fcp priority for all the woke logged in ports
  *
  * Input:
  *	ha = adapter block pointer.
@@ -10076,7 +10076,7 @@ int qla2xxx_enable_port(struct Scsi_Host *host)
 	}
 
 	vha->hw->flags.port_isolated = 0;
-	/* Set the flag to 1, so that isp_abort can proceed */
+	/* Set the woke flag to 1, so that isp_abort can proceed */
 	vha->flags.online = 1;
 	set_bit(ISP_ABORT_NEEDED, &vha->dpc_flags);
 	qla2xxx_wake_dpc(vha);

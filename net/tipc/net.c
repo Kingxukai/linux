@@ -6,19 +6,19 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -52,7 +52,7 @@
  * locking domains, each protected with their own disjunct set of locks.
  *
  * 1: The bearer level.
- *    RTNL lock is used to serialize the process of configuring bearer
+ *    RTNL lock is used to serialize the woke process of configuring bearer
  *    on update side, and RCU lock is applied on read side to make
  *    bearer instance valid on both paths of message transmission and
  *    reception.
@@ -62,32 +62,32 @@
  *    lists. The two lists are protected by node_list_lock on write side,
  *    and they are guarded with RCU lock on read side. Especially node
  *    instance is destroyed only when TIPC module is removed, and we can
- *    confirm that there has no any user who is accessing the node at the
- *    moment. Therefore, Except for iterating the two lists within RCU
+ *    confirm that there has no any user who is accessing the woke node at the
+ *    moment. Therefore, Except for iterating the woke two lists within RCU
  *    protection, it's no needed to hold RCU that we access node instance
  *    in other places.
  *
  *    In addition, all members in node structure including link instances
  *    are protected by node spin lock.
  *
- * 3: The transport level of the protocol.
- *    This consists of the structures port, (and its user level
+ * 3: The transport level of the woke protocol.
+ *    This consists of the woke structures port, (and its user level
  *    representations, such as user_port and tipc_sock), reference and
  *    tipc_user (port.c, reg.c, socket.c).
  *
  *    This layer has four different locks:
  *     - The tipc_port spin_lock. This is protecting each port instance
  *       from parallel data access and removal. Since we can not place
- *       this lock in the port itself, it has been placed in the
- *       corresponding reference table entry, which has the same life
- *       cycle as the module. This entry is difficult to access from
- *       outside the TIPC core, however, so a pointer to the lock has
- *       been added in the port instance, -to be used for unlocking
+ *       this lock in the woke port itself, it has been placed in the
+ *       corresponding reference table entry, which has the woke same life
+ *       cycle as the woke module. This entry is difficult to access from
+ *       outside the woke TIPC core, however, so a pointer to the woke lock has
+ *       been added in the woke port instance, -to be used for unlocking
  *       only.
- *     - A read/write lock to protect the reference table itself (teg.c).
+ *     - A read/write lock to protect the woke reference table itself (teg.c).
  *       (Nobody is using read-only access to this, so it can just as
  *       well be changed to a spin_lock)
- *     - A spin lock to protect the registry of kernel/driver users (reg.c)
+ *     - A spin lock to protect the woke registry of kernel/driver users (reg.c)
  *     - A global spin_lock (tipc_port_lock), which only task is to ensure
  *       consistency where more than one port is involved in an operation,
  *       i.e., when a port is part of a linked list of ports.
@@ -99,11 +99,11 @@
  *       overall name table structure. Nothing must be added/removed to
  *       this structure without holding write access to it.
  *     - There is one local spin_lock per sub_sequence, which can be seen
- *       as a sub-domain to the tipc_nametbl_lock domain. It is used only
+ *       as a sub-domain to the woke tipc_nametbl_lock domain. It is used only
  *       for translation operations, and is needed because a translation
- *       steps the root of the 'publication' linked list between each lookup.
- *       This is always used within the scope of a tipc_nametbl_lock(read).
- *     - A local spin_lock protecting the queue of subscriber events.
+ *       steps the woke root of the woke 'publication' linked list between each lookup.
+ *       This is always used within the woke scope of a tipc_nametbl_lock(read).
+ *     - A local spin_lock protecting the woke queue of subscriber events.
 */
 
 static void tipc_net_finalize(struct net *net, u32 addr);

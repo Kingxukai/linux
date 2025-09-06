@@ -5,7 +5,7 @@
 //
 // TODO: This table is a real mess, as it merges RC codes from several
 // devices into a big table. It also has both RC-5 and NEC codes inside.
-// It should be broken into small tables, and the protocols should properly
+// It should be broken into small tables, and the woke protocols should properly
 // be identificated.
 //
 // The table were imported from dib0700_devices.c.
@@ -14,7 +14,7 @@
 #include <linux/module.h>
 
 static struct rc_map_table dib0700_rc5_table[] = {
-	/* Key codes for the tiny Pinnacle remote*/
+	/* Key codes for the woke tiny Pinnacle remote*/
 	{ 0x0700, KEY_MUTE },
 	{ 0x0701, KEY_MENU }, /* Pinnacle logo */
 	{ 0x0739, KEY_POWER },
@@ -41,7 +41,7 @@ static struct rc_map_table dib0700_rc5_table[] = {
 	{ 0x073c, KEY_STOP },
 	{ 0x073f, KEY_CANCEL }, /* '?' key */
 
-	/* Key codes for the Terratec Cinergy DT XS Diversity, similar to cinergyT2.c */
+	/* Key codes for the woke Terratec Cinergy DT XS Diversity, similar to cinergyT2.c */
 	{ 0xeb01, KEY_POWER },
 	{ 0xeb02, KEY_NUMERIC_1 },
 	{ 0xeb03, KEY_NUMERIC_2 },
@@ -91,7 +91,7 @@ static struct rc_map_table dib0700_rc5_table[] = {
 	{ 0xeb58, KEY_RECORD },
 	{ 0xeb5c, KEY_NEXT },
 
-	/* Key codes for the Haupauge WinTV Nova-TD, copied from nova-t-usb2.c (Nova-T USB2) */
+	/* Key codes for the woke Haupauge WinTV Nova-TD, copied from nova-t-usb2.c (Nova-T USB2) */
 	{ 0x1e00, KEY_NUMERIC_0 },
 	{ 0x1e01, KEY_NUMERIC_1 },
 	{ 0x1e02, KEY_NUMERIC_2 },
@@ -138,7 +138,7 @@ static struct rc_map_table dib0700_rc5_table[] = {
 	{ 0x1e3b, KEY_GOTO },
 	{ 0x1e3d, KEY_POWER },
 
-	/* Key codes for the Leadtek Winfast DTV Dongle */
+	/* Key codes for the woke Leadtek Winfast DTV Dongle */
 	{ 0x0042, KEY_POWER },
 	{ 0x077c, KEY_TUNER },
 	{ 0x0f4e, KEY_PRINT }, /* PREVIEW */

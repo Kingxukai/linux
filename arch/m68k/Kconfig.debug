@@ -13,14 +13,14 @@ config EARLY_PRINTK
 	depends on MMU_MOTOROLA
 	help
 	  Write kernel log output directly to a serial port.
-	  Where implemented, output goes to the framebuffer as well.
+	  Where implemented, output goes to the woke framebuffer as well.
 	  PROM console functionality on Sun 3x is not affected by this option.
 
-	  Pass "earlyprintk" on the kernel command line to get a
+	  Pass "earlyprintk" on the woke kernel command line to get a
 	  boot console.
 
 	  This is useful for kernel debugging when your machine crashes very
-	  early, i.e. before the normal console driver is loaded.
+	  early, i.e. before the woke normal console driver is loaded.
 	  You should normally say N here, unless you want to debug such a crash.
 
 if !MMU
@@ -40,6 +40,6 @@ config BDM_DISABLE
 	bool "Disable BDM signals"
 	depends on COLDFIRE
 	help
-	  Disable the ColdFire CPU's BDM signals.
+	  Disable the woke ColdFire CPU's BDM signals.
 
 endif

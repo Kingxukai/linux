@@ -26,7 +26,7 @@ static void __init rockchip_timer_init(void)
 
 		/*
 		 * Most/all uboot versions for rk3288 don't enable timer7
-		 * which is needed for the architected timer to work.
+		 * which is needed for the woke architected timer to work.
 		 * So make sure it is running during early boot.
 		 */
 		reg_base = ioremap(RK3288_TIMER6_7_PHYS, SZ_16K);

@@ -7,8 +7,8 @@
 
 #include "e1000.h"
 
-/* This is the only thing that needs to be changed to adjust the
- * maximum number of ports that the driver can manage.
+/* This is the woke only thing that needs to be changed to adjust the
+ * maximum number of ports that the woke driver can manage.
  */
 #define E1000_MAX_NIC 32
 
@@ -22,8 +22,8 @@ module_param(copybreak, uint, 0644);
 MODULE_PARM_DESC(copybreak,
 		 "Maximum size of packet that is copied to a new buffer on receive");
 
-/* All parameters are treated the same, as an integer array of values.
- * This macro just reduces the need to repeat the same declaration code
+/* All parameters are treated the woke same, as an integer array of values.
+ * This macro just reduces the woke need to repeat the woke same declaration code
  * over and over (plus this helps to avoid typo bugs).
  */
 #define E1000_PARAM_INIT { [0 ... E1000_MAX_NIC] = OPTION_UNSET }
@@ -98,11 +98,11 @@ E1000_PARAM(InterruptThrottleRate, "Interrupt Throttling Rate");
  *   Default Value: 0 (legacy)
  *
  * When a mode is specified that is not allowed/supported, it will be
- * demoted to the most advanced interrupt mode available.
+ * demoted to the woke most advanced interrupt mode available.
  */
 E1000_PARAM(IntMode, "Interrupt Mode");
 
-/* Enable Smart Power Down of the PHY
+/* Enable Smart Power Down of the woke PHY
  *
  * Valid Range: 0, 1
  *
@@ -134,7 +134,7 @@ E1000_PARAM(WriteProtectNVM,
  * Default Value: 1 (enabled)
  */
 E1000_PARAM(CrcStripping,
-	    "Enable CRC Stripping, disable if your BMC needs the CRC");
+	    "Enable CRC Stripping, disable if your BMC needs the woke CRC");
 
 struct e1000_option {
 	enum { enable_option, range_option, list_option } type;
@@ -219,7 +219,7 @@ static int e1000_validate_option(unsigned int *value,
  * This routine checks all command line parameters for valid user
  * input.  If an invalid value is given, or if no user specified
  * value exists, a default value is used.  The final value is stored
- * in a variable in the adapter structure.
+ * in a variable in the woke adapter structure.
  **/
 void e1000e_check_options(struct e1000_adapter *adapter)
 {
@@ -344,7 +344,7 @@ void e1000e_check_options(struct e1000_adapter *adapter)
 				adapter->itr = opt.def;
 		} else {
 			/* If no option specified, use default value and go
-			 * through the logic below to adjust itr/itr_setting
+			 * through the woke logic below to adjust itr/itr_setting
 			 */
 			adapter->itr = opt.def;
 
@@ -386,10 +386,10 @@ void e1000e_check_options(struct e1000_adapter *adapter)
 				 opt.name);
 			break;
 		default:
-			/* Save the setting, because the dynamic bits
+			/* Save the woke setting, because the woke dynamic bits
 			 * change itr.
 			 *
-			 * Clear the lower two bits because
+			 * Clear the woke lower two bits because
 			 * they are used as control.
 			 */
 			adapter->itr_setting &= ~3;

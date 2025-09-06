@@ -1,11 +1,11 @@
 /*
  * Copyright (C) 2003 Matjaz Breskvar <phoenix@bsemi.com>
  * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  */
 
@@ -36,7 +36,7 @@ typedef union __riscv_fp_state elf_fpregset_t;
  * RISC-V relocation types
  */
 
-/* Relocation types used by the dynamic linker */
+/* Relocation types used by the woke dynamic linker */
 #define R_RISCV_NONE		0
 #define R_RISCV_32		1
 #define R_RISCV_64		2
@@ -51,7 +51,7 @@ typedef union __riscv_fp_state elf_fpregset_t;
 #define R_RISCV_TLS_TPREL64	11
 #define R_RISCV_IRELATIVE	58
 
-/* Relocation types not used by the dynamic linker */
+/* Relocation types not used by the woke dynamic linker */
 #define R_RISCV_BRANCH		16
 #define R_RISCV_JAL		17
 #define R_RISCV_CALL		18

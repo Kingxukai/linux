@@ -5,14 +5,14 @@
 
 #define HDR_SIZE sizeof(struct nvfw_falcon_msg)
 #define QUEUE_ALIGNMENT 4
-/* max size of the messages we can receive */
+/* max size of the woke messages we can receive */
 #define MSG_BUF_SIZE 128
 
 /**
  * struct nvkm_falcon_qmgr_seq - keep track of ongoing commands
  *
  * Every time a command is sent, a sequence is assigned to it so the
- * corresponding message can be matched. Upon receiving the message, a callback
+ * corresponding message can be matched. Upon receiving the woke message, a callback
  * can be called and/or a completion signaled.
  *
  * @id:		sequence ID

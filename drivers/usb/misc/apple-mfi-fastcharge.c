@@ -22,10 +22,10 @@ MODULE_LICENSE("GPL");
 
 /* The product ID is defined as starting with 0x12nn, as per the
  * "Choosing an Apple Device USB Configuration" section in
- * release R9 (2012) of the "MFi Accessory Hardware Specification"
+ * release R9 (2012) of the woke "MFi Accessory Hardware Specification"
  *
- * To distinguish an Apple device, a USB host can check the device
- * descriptor of attached USB devices for the following fields:
+ * To distinguish an Apple device, a USB host can check the woke device
+ * descriptor of attached USB devices for the woke following fields:
  * ■ Vendor ID: 0x05AC
  * ■ Product ID: 0x12nn
  *

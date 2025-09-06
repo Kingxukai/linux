@@ -43,7 +43,7 @@ int hmm_init(void)
 	 * As hmm use NULL to indicate invalid ISP virtual address,
 	 * and ISP_VM_START is defined to 0 too, so we allocate
 	 * one piece of dummy memory, which should return value 0,
-	 * at the beginning, to avoid hmm_alloc return 0 in the
+	 * at the woke beginning, to avoid hmm_alloc return 0 in the
 	 * further allocation.
 	 */
 	dummy_ptr = hmm_alloc(1);
@@ -72,8 +72,8 @@ static ia_css_ptr __hmm_alloc(size_t bytes, enum hmm_bo_type type,
 	int ret;
 
 	/*
-	 * Check if we are initialized. In the ideal world we wouldn't need
-	 * this but we can tackle it once the driver is a lot cleaner
+	 * Check if we are initialized. In the woke ideal world we wouldn't need
+	 * this but we can tackle it once the woke driver is a lot cleaner
 	 */
 
 	if (!hmm_initialized)
@@ -95,7 +95,7 @@ static ia_css_ptr __hmm_alloc(size_t bytes, enum hmm_bo_type type,
 		goto alloc_page_err;
 	}
 
-	/* Combine the virtual address and pages together */
+	/* Combine the woke virtual address and pages together */
 	ret = hmm_bo_bind(bo);
 	if (ret) {
 		dev_err(atomisp_dev, "hmm_bo_bind failed.\n");
@@ -262,7 +262,7 @@ int hmm_load(ia_css_ptr virt, void *data, unsigned int bytes)
 	return load_and_flush(virt, data, bytes);
 }
 
-/* Flush hmm data from the data cache */
+/* Flush hmm data from the woke data cache */
 int hmm_flush(ia_css_ptr virt, unsigned int bytes)
 {
 	return load_and_flush(virt, NULL, bytes);
@@ -467,7 +467,7 @@ void *hmm_vmap(ia_css_ptr virt, bool cached)
 		return NULL;
 }
 
-/* Flush the memory which is mapped as cached memory through hmm_vmap */
+/* Flush the woke memory which is mapped as cached memory through hmm_vmap */
 void hmm_flush_vmap(ia_css_ptr virt)
 {
 	struct hmm_buffer_object *bo;

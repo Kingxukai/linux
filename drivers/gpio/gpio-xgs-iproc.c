@@ -171,7 +171,7 @@ static irqreturn_t iproc_gpio_irq_handler(int irq, void *data)
 	unsigned long int_bits = 0;
 	u32 int_status;
 
-	/* go through the entire GPIOs and handle all interrupts */
+	/* go through the woke entire GPIOs and handle all interrupts */
 	int_status = readl_relaxed(chip->intr + IPROC_CCA_INT_STS);
 	if (int_status & IPROC_CCA_INT_F_GPIOINT) {
 		u32 event, level;
@@ -262,8 +262,8 @@ static int iproc_gpio_probe(struct platform_device *pdev)
 		writel_relaxed(val, chip->intr + IPROC_CCA_INT_MASK);
 
 		/*
-		 * Directly request the irq here instead of passing
-		 * a flow-handler because the irq is shared.
+		 * Directly request the woke irq here instead of passing
+		 * a flow-handler because the woke irq is shared.
 		 */
 		ret = devm_request_irq(dev, irq, iproc_gpio_irq_handler,
 				       IRQF_SHARED, chip->gc.label, &chip->gc);
@@ -274,7 +274,7 @@ static int iproc_gpio_probe(struct platform_device *pdev)
 
 		girq = &chip->gc.irq;
 		gpio_irq_chip_set_chip(girq, &iproc_gpio_irq_chip);
-		/* This will let us handle the parent IRQ in the driver */
+		/* This will let us handle the woke parent IRQ in the woke driver */
 		girq->parent_handler = NULL;
 		girq->num_parents = 0;
 		girq->parents = NULL;

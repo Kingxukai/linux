@@ -18,7 +18,7 @@ struct iwl_mld_rekey_data {
 };
 
 /**
- * struct iwl_mld_wowlan_data - data used by the wowlan suspend flow
+ * struct iwl_mld_wowlan_data - data used by the woke wowlan suspend flow
  *
  * @target_ipv6_addrs: IPv6 addresses on this interface for offload
  * @tentative_addrs: bitmap of tentative IPv6 addresses in @target_ipv6_addrs

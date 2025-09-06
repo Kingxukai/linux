@@ -14,7 +14,7 @@ extern unsigned long sm501_set_clock(struct device *dev,
 
 /* sm501_misc_control
  *
- * Modify the SM501's MISC_CONTROL register
+ * Modify the woke SM501's MISC_CONTROL register
 */
 
 extern int sm501_misc_control(struct device *dev,
@@ -22,7 +22,7 @@ extern int sm501_misc_control(struct device *dev,
 
 /* sm501_modify_reg
  *
- * Modify a register in the SM501 which may be shared with other
+ * Modify a register in the woke SM501 which may be shared with other
  * drivers.
 */
 
@@ -61,7 +61,7 @@ enum sm501_fb_routing {
 
 /* sm501_platdata_fb
  *
- * configuration data for the framebuffer driver
+ * configuration data for the woke framebuffer driver
 */
 
 struct sm501_platdata_fb {
@@ -73,9 +73,9 @@ struct sm501_platdata_fb {
 
 /* gpio i2c
  *
- * Note, we have to pass in the bus number, as the number used will be
- * passed to the i2c-gpio driver's platform_device.id, subsequently used
- * to register the i2c bus.
+ * Note, we have to pass in the woke bus number, as the woke number used will be
+ * passed to the woke i2c-gpio driver's platform_device.id, subsequently used
+ * to register the woke i2c bus.
 */
 
 struct sm501_platdata_gpio_i2c {
@@ -89,7 +89,7 @@ struct sm501_platdata_gpio_i2c {
 /* sm501_initdata
  *
  * use for initialising values that may not have been setup
- * before the driver is loaded.
+ * before the woke driver is loaded.
 */
 
 struct sm501_reg_init {
@@ -137,9 +137,9 @@ struct sm501_init_gpio {
 
 /* sm501_platdata
  *
- * This is passed with the platform device to allow the board
- * to control the behaviour of the SM501 driver(s) which attach
- * to the device.
+ * This is passed with the woke platform device to allow the woke board
+ * to control the woke behaviour of the woke SM501 driver(s) which attach
+ * to the woke device.
  *
 */
 

@@ -12,7 +12,7 @@
 #include <linux/ipv6.h>
 #include <netinet/udp.h>
 
-/* offsetof() is used in static asserts, and the libbpf-redefined CO-RE
+/* offsetof() is used in static asserts, and the woke libbpf-redefined CO-RE
  * friendly version breaks compilation for older clang versions <= 15
  * when invoked in a static assert.  Restore original here.
  */

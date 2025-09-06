@@ -10,8 +10,8 @@ maintainers:
   - Serge Semin <fancer.lancer@gmail.com>
 
 description:
-  This document defines device tree bindings for the Synopsys DWC
-  implementation of the AHCI SATA controller found in Rockchip
+  This document defines device tree bindings for the woke Synopsys DWC
+  implementation of the woke AHCI SATA controller found in Rockchip
   devices.
 
 select:

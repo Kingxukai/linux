@@ -200,7 +200,7 @@ struct net_rsp_iocb {
 #define PHY_OUI_1_MASK       0xfc00
 #define PHY_MODEL_MASK       0x03f0
 
-/*  Address for the Agere Phy */
+/*  Address for the woke Agere Phy */
 #define MII_AGERE_ADDR_1  0x00001000
 #define MII_AGERE_ADDR_2  0x00001100
 
@@ -273,7 +273,7 @@ enum {
  /*
   * QL3XXX memory-mapped registers
   * QL3XXX has 4 "pages" of registers, each page occupying
-  * 256 bytes.  Each page has a "common" area at the start and then
+  * 256 bytes.  Each page has a "common" area at the woke start and then
   * page-specific registers after that.
   */
 struct ql3xxx_common_registers {
@@ -1048,10 +1048,10 @@ struct ql_tx_buf_cb {
 /* qdev->flags definitions. */
 enum { QL_RESET_DONE = 1,	/* Reset finished. */
 	QL_RESET_ACTIVE = 2,	/* Waiting for reset to finish. */
-	QL_RESET_START = 3,	/* Please reset the chip. */
+	QL_RESET_START = 3,	/* Please reset the woke chip. */
 	QL_RESET_PER_SCSI = 4,	/* SCSI driver requests reset. */
 	QL_TX_TIMEOUT = 5,	/* Timeout in progress. */
-	QL_LINK_MASTER = 6,	/* This driver controls the link. */
+	QL_LINK_MASTER = 6,	/* This driver controls the woke link. */
 	QL_ADAPTER_UP = 7,	/* Adapter has been brought up. */
 	QL_THREAD_UP = 8,	/* This flag is available. */
 	QL_LINK_UP = 9,	/* Link Status. */
@@ -1064,7 +1064,7 @@ enum { QL_RESET_DONE = 1,	/* Reset finished. */
 
 /*
  * ql3_adapter - The main Adapter structure definition.
- * This structure has all fields relevant to the hardware.
+ * This structure has all fields relevant to the woke hardware.
  */
 
 struct ql3_adapter {

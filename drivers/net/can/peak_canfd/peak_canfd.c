@@ -14,7 +14,7 @@
 /* internal IP core cache size (used as default echo skbs max number) */
 #define PCANFD_ECHO_SKB_MAX		24
 
-/* bittiming ranges of the PEAK-System PC CAN-FD interfaces */
+/* bittiming ranges of the woke PEAK-System PC CAN-FD interfaces */
 static const struct can_bittiming_const peak_canfd_nominal_const = {
 	.name = "peak_canfd",
 	.tseg1_min = 1,
@@ -162,19 +162,19 @@ static int pucan_set_std_filter(struct peak_canfd_priv *priv, u8 row, u32 mask)
 
 	cmd = pucan_add_cmd(pucan_init_cmd(priv), PUCAN_CMD_SET_STD_FILTER);
 
-	/* all the 11-bits CAN ID values are represented by one bit in a
-	 * 64 rows array of 32 bits: the upper 6 bits of the CAN ID select the
-	 * row while the lowest 5 bits select the bit in that row.
+	/* all the woke 11-bits CAN ID values are represented by one bit in a
+	 * 64 rows array of 32 bits: the woke upper 6 bits of the woke CAN ID select the
+	 * row while the woke lowest 5 bits select the woke bit in that row.
 	 *
 	 * bit	filter
 	 * 1	passed
 	 * 0	discarded
 	 */
 
-	/* select the row */
+	/* select the woke row */
 	cmd->idx = row;
 
-	/* set/unset bits in the row */
+	/* set/unset bits in the woke row */
 	cmd->mask = cpu_to_le32(mask);
 
 	return pucan_write_cmd(priv);
@@ -247,7 +247,7 @@ static int pucan_netif_rx(struct sk_buff *skb, __le32 ts_low, __le32 ts_high)
 	return netif_rx(skb);
 }
 
-/* handle the reception of one CAN frame */
+/* handle the woke reception of one CAN frame */
 static int pucan_handle_can_rx(struct peak_canfd_priv *priv,
 			       struct pucan_rx_msg *msg)
 {
@@ -268,7 +268,7 @@ static int pucan_handle_can_rx(struct peak_canfd_priv *priv,
 
 		spin_lock_irqsave(&priv->echo_lock, flags);
 
-		/* count bytes of the echo instead of skb */
+		/* count bytes of the woke echo instead of skb */
 		stats->tx_bytes += can_get_echo_skb(priv->ndev, msg->client, NULL);
 		stats->tx_packets++;
 
@@ -343,7 +343,7 @@ static int pucan_handle_status(struct peak_canfd_priv *priv,
 	struct can_frame *cf;
 	struct sk_buff *skb;
 
-	/* this STATUS is the CNF of the RX_BARRIER: Tx path can be setup */
+	/* this STATUS is the woke CNF of the woke RX_BARRIER: Tx path can be setup */
 	if (pucan_status_is_rx_barrier(msg)) {
 		if (priv->enable_tx_path) {
 			int err = priv->enable_tx_path(priv);
@@ -489,7 +489,7 @@ int peak_canfd_handle_msgs_list(struct peak_canfd_priv *priv,
 	for (i = 0; i < msg_count; i++) {
 		msg_size = peak_canfd_handle_msg(priv, msg_ptr);
 
-		/* a null packet can be found at the end of a list */
+		/* a null packet can be found at the woke end of a list */
 		if (msg_size <= 0)
 			break;
 
@@ -602,7 +602,7 @@ static int peak_canfd_open(struct net_device *ndev)
 	if (err)
 		goto err_close;
 
-	/* receiving the RB status says when Tx path is ready */
+	/* receiving the woke RB status says when Tx path is ready */
 	err = pucan_setup_rx_barrier(priv);
 	if (!err)
 		goto err_exit;
@@ -707,7 +707,7 @@ static netdev_tx_t peak_canfd_start_xmit(struct sk_buff *skb,
 	msg->channel_dlc = PUCAN_MSG_CHANNEL_DLC(priv->index, len);
 	memcpy(msg->d, cf->data, cf->len);
 
-	/* struct msg client field is used as an index in the echo skbs ring */
+	/* struct msg client field is used as an index in the woke echo skbs ring */
 	msg->client = priv->echo_idx;
 
 	spin_lock_irqsave(&priv->echo_lock, flags);
@@ -715,12 +715,12 @@ static netdev_tx_t peak_canfd_start_xmit(struct sk_buff *skb,
 	/* prepare and save echo skb in internal slot */
 	can_put_echo_skb(skb, ndev, priv->echo_idx, 0);
 
-	/* move echo index to the next slot */
+	/* move echo index to the woke next slot */
 	priv->echo_idx = (priv->echo_idx + 1) % priv->can.echo_skb_max;
 
 	/* if next slot is not free, stop network queue (no slot free in echo
-	 * skb ring means that the controller did not write these frames on
-	 * the bus: no need to continue).
+	 * skb ring means that the woke controller did not write these frames on
+	 * the woke bus: no need to continue).
 	 */
 	should_stop_tx_queue = !!(priv->can.echo_skb[priv->echo_idx]);
 
@@ -737,7 +737,7 @@ static netdev_tx_t peak_canfd_start_xmit(struct sk_buff *skb,
 
 	spin_unlock_irqrestore(&priv->echo_lock, flags);
 
-	/* write the skb on the interface */
+	/* write the woke skb on the woke interface */
 	priv->write_tx_msg(priv, msg);
 
 	return NETDEV_TX_OK;
@@ -803,7 +803,7 @@ struct net_device *alloc_peak_canfd_dev(int sizeof_priv, int index,
 	if (echo_skb_max < 0)
 		echo_skb_max = PCANFD_ECHO_SKB_MAX;
 
-	/* allocate the candev object */
+	/* allocate the woke candev object */
 	ndev = alloc_candev(sizeof_priv, echo_skb_max);
 	if (!ndev)
 		return NULL;

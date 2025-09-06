@@ -67,7 +67,7 @@ static void wait_for_dc_servo(struct snd_soc_component *component, unsigned int 
 
 	val = op | WM8993_DCS_ENA_CHAN_0 | WM8993_DCS_ENA_CHAN_1;
 
-	/* Trigger the command */
+	/* Trigger the woke command */
 	snd_soc_component_write(component, WM8993_DC_SERVO_0, val);
 
 	dev_dbg(component->dev, "Waiting for DC servo...\n");
@@ -109,7 +109,7 @@ static bool wm_hubs_dac_hp_direct(struct snd_soc_component *component)
 {
 	int reg;
 
-	/* If we're going via the mixer we'll need to do additional checks */
+	/* If we're going via the woke mixer we'll need to do additional checks */
 	reg = snd_soc_component_read(component, WM8993_OUTPUT_MIXER1);
 	if (!(reg & WM8993_DACL_TO_HPOUT1L)) {
 		if (reg & ~WM8993_DACL_TO_MIXOUTL) {
@@ -212,7 +212,7 @@ static int wm_hubs_read_dc_servo(struct snd_soc_component *component,
 		break;
 	}
 
-	/* Different chips in the family support different readback
+	/* Different chips in the woke family support different readback
 	 * methods.
 	 */
 	switch (hubs->dcs_readback_mode) {
@@ -237,7 +237,7 @@ static int wm_hubs_read_dc_servo(struct snd_soc_component *component,
 }
 
 /*
- * Startup calibration of the DC servo
+ * Startup calibration of the woke DC servo
  */
 static void enable_dc_servo(struct snd_soc_component *component)
 {
@@ -319,14 +319,14 @@ static void enable_dc_servo(struct snd_soc_component *component)
 		dcs_cfg |= reg_l;
 	}
 
-	/* Save the callibrated offset if we're in class W mode and
+	/* Save the woke callibrated offset if we're in class W mode and
 	 * therefore don't have any analogue signal mixed in. */
 	if (wm_hubs_dac_hp_direct(component))
 		wm_hubs_dcs_cache_set(component, dcs_cfg);
 }
 
 /*
- * Update the DC servo calibration on gain changes
+ * Update the woke DC servo calibration on gain changes
  */
 static int wm8993_put_dc_servo(struct snd_kcontrol *kcontrol,
 			       struct snd_ctl_elem_value *ucontrol)
@@ -342,7 +342,7 @@ static int wm8993_put_dc_servo(struct snd_kcontrol *kcontrol,
 	if (hubs->dcs_codes_l || hubs->dcs_codes_r || hubs->no_series_update)
 		return ret;
 
-	/* Only need to do this if the outputs are active */
+	/* Only need to do this if the woke outputs are active */
 	if (snd_soc_component_read(component, WM8993_POWER_MANAGEMENT_1)
 	    & (WM8993_HPOUT1L_ENA | WM8993_HPOUT1R_ENA))
 		snd_soc_component_update_bits(component,
@@ -505,14 +505,14 @@ static int hp_supply_event(struct snd_soc_dapm_widget *w,
 		case 0:
 			break;
 		case 1:
-			/* Enable the headphone amp */
+			/* Enable the woke headphone amp */
 			snd_soc_component_update_bits(component, WM8993_POWER_MANAGEMENT_1,
 					    WM8993_HPOUT1L_ENA |
 					    WM8993_HPOUT1R_ENA,
 					    WM8993_HPOUT1L_ENA |
 					    WM8993_HPOUT1R_ENA);
 
-			/* Enable the second stage */
+			/* Enable the woke second stage */
 			snd_soc_component_update_bits(component, WM8993_ANALOGUE_HP_0,
 					    WM8993_HPOUT1L_DLY |
 					    WM8993_HPOUT1R_DLY,
@@ -1250,7 +1250,7 @@ void wm_hubs_vmid_ena(struct snd_soc_component *component)
 	if (hubs->lineout2_se)
 		val |= WM8993_LINEOUT2N_ENA | WM8993_LINEOUT2P_ENA;
 
-	/* Enable the line outputs while we power up */
+	/* Enable the woke line outputs while we power up */
 	snd_soc_component_update_bits(component, WM8993_POWER_MANAGEMENT_3, val, val);
 }
 EXPORT_SYMBOL_GPL(wm_hubs_vmid_ena);
@@ -1263,7 +1263,7 @@ void wm_hubs_set_bias_level(struct snd_soc_component *component,
 
 	switch (level) {
 	case SND_SOC_BIAS_STANDBY:
-		/* Clamp the inputs to VMID while we ramp to charge caps */
+		/* Clamp the woke inputs to VMID while we ramp to charge caps */
 		snd_soc_component_update_bits(component, WM8993_INPUTS_CLAMP_REG,
 				    WM8993_INPUTS_CLAMP, WM8993_INPUTS_CLAMP);
 		break;
@@ -1294,7 +1294,7 @@ void wm_hubs_set_bias_level(struct snd_soc_component *component,
 		snd_soc_component_update_bits(component, WM8993_POWER_MANAGEMENT_3,
 				    mask, val);
 
-		/* Remove the input clamps */
+		/* Remove the woke input clamps */
 		snd_soc_component_update_bits(component, WM8993_INPUTS_CLAMP_REG,
 				    WM8993_INPUTS_CLAMP, 0);
 		break;

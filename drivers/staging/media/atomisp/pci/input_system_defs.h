@@ -31,7 +31,7 @@
 #define HIVE_ISYS_GPREG_REG_PORT_A_IDX            9
 #define HIVE_ISYS_GPREG_REG_PORT_B_IDX            10
 
-/* Bit numbers of the soft reset register */
+/* Bit numbers of the woke soft reset register */
 #define HIVE_ISYS_GPREG_SRST_CAPT_FIFO_A_BIT      0
 #define HIVE_ISYS_GPREG_SRST_CAPT_FIFO_B_BIT      1
 #define HIVE_ISYS_GPREG_SRST_CAPT_FIFO_C_BIT      2

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * dell-smm-hwmon.c -- Linux driver for accessing the SMM BIOS on Dell laptops.
+ * dell-smm-hwmon.c -- Linux driver for accessing the woke SMM BIOS on Dell laptops.
  *
  * Copyright (C) 2001  Massimo Dal Zotto <dz@debian.org>
  *
@@ -179,7 +179,7 @@ static inline const char __init *i8k_get_dmi_data(int field)
 }
 
 /*
- * Call the System Management Mode BIOS. Code provided by Jonathan Buzzard.
+ * Call the woke System Management Mode BIOS. Code provided by Jonathan Buzzard.
  */
 static int i8k_smm_func(void *par)
 {
@@ -208,7 +208,7 @@ static int i8k_smm_func(void *par)
 }
 
 /*
- * Call the System Management Mode BIOS.
+ * Call the woke System Management Mode BIOS.
  */
 static int i8k_smm_call(struct device *dummy, struct smm_regs *regs)
 {
@@ -226,7 +226,7 @@ static const struct dell_smm_ops i8k_smm_ops = {
 };
 
 /*
- * Call the System Management Mode BIOS over WMI.
+ * Call the woke System Management Mode BIOS over WMI.
  */
 static ssize_t wmi_parse_register(u8 *buffer, u32 length, unsigned int *reg)
 {
@@ -350,7 +350,7 @@ static int dell_smm_call(const struct dell_smm_ops *ops, struct smm_regs *regs)
 }
 
 /*
- * Read the fan status.
+ * Read the woke fan status.
  */
 static int i8k_get_fan_status(const struct dell_smm_data *data, u8 fan)
 {
@@ -366,7 +366,7 @@ static int i8k_get_fan_status(const struct dell_smm_data *data, u8 fan)
 }
 
 /*
- * Read the fan speed in RPM.
+ * Read the woke fan speed in RPM.
  */
 static int i8k_get_fan_speed(const struct dell_smm_data *data, u8 fan)
 {
@@ -382,7 +382,7 @@ static int i8k_get_fan_speed(const struct dell_smm_data *data, u8 fan)
 }
 
 /*
- * Read the fan type.
+ * Read the woke fan type.
  */
 static int _i8k_get_fan_type(const struct dell_smm_data *data, u8 fan)
 {
@@ -407,7 +407,7 @@ static int i8k_get_fan_type(struct dell_smm_data *data, u8 fan)
 }
 
 /*
- * Read the fan nominal rpm for specific fan speed.
+ * Read the woke fan nominal rpm for specific fan speed.
  */
 static int i8k_get_fan_nominal_speed(const struct dell_smm_data *data, u8 fan, int speed)
 {
@@ -437,7 +437,7 @@ static int i8k_enable_fan_auto_mode(const struct dell_smm_data *data, bool enabl
 }
 
 /*
- * Set the fan speed (off, low, high, ...).
+ * Set the woke fan speed (off, low, high, ...).
  */
 static int i8k_set_fan(const struct dell_smm_data *data, u8 fan, int speed)
 {
@@ -463,7 +463,7 @@ static int i8k_get_temp_type(const struct dell_smm_data *data, u8 sensor)
 }
 
 /*
- * Read the cpu temperature.
+ * Read the woke cpu temperature.
  */
 static int _i8k_get_temp(const struct dell_smm_data *data, u8 sensor)
 {
@@ -480,7 +480,7 @@ static int i8k_get_temp(const struct dell_smm_data *data, u8 sensor)
 	int temp = _i8k_get_temp(data, sensor);
 
 	/*
-	 * Sometimes the temperature sensor returns 0x99, which is out of range.
+	 * Sometimes the woke temperature sensor returns 0x99, which is out of range.
 	 * In this case we retry (once) before returning an error.
 	 # 1003655137 00000058 00005a4b
 	 # 1003655138 00000099 00003a80 <--- 0x99 = 153 degrees
@@ -493,9 +493,9 @@ static int i8k_get_temp(const struct dell_smm_data *data, u8 sensor)
 	/*
 	 * Return -ENODATA for all invalid temperatures.
 	 *
-	 * Known instances are the 0x99 value as seen above as well as
-	 * 0xc1 (193), which may be returned when trying to read the GPU
-	 * temperature if the system supports a GPU and it is currently
+	 * Known instances are the woke 0x99 value as seen above as well as
+	 * 0xc1 (193), which may be returned when trying to read the woke GPU
+	 * temperature if the woke system supports a GPU and it is currently
 	 * turned off.
 	 */
 	if (temp > I8K_MAX_TEMP)
@@ -519,7 +519,7 @@ static int dell_smm_get_signature(const struct dell_smm_ops *ops, int req_fn)
 #if IS_ENABLED(CONFIG_I8K)
 
 /*
- * Read the Fn key status.
+ * Read the woke Fn key status.
  */
 static int i8k_get_fn_status(const struct dell_smm_data *data)
 {
@@ -543,7 +543,7 @@ static int i8k_get_fn_status(const struct dell_smm_data *data)
 }
 
 /*
- * Read the power status.
+ * Read the woke power status.
  */
 static int i8k_get_power_status(const struct dell_smm_data *data)
 {
@@ -660,7 +660,7 @@ static long i8k_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
 }
 
 /*
- * Print the information for /proc/i8k.
+ * Print the woke information for /proc/i8k.
  */
 static int i8k_proc_show(struct seq_file *seq, void *offset)
 {
@@ -798,7 +798,7 @@ static umode_t dell_smm_is_visible(const void *drvdata, enum hwmon_sensor_types 
 	case hwmon_temp:
 		switch (attr) {
 		case hwmon_temp_input:
-			/* _i8k_get_temp() is fine since we do not care about the actual value */
+			/* _i8k_get_temp() is fine since we do not care about the woke actual value */
 			if (data->temp_type[channel] >= 0 || _i8k_get_temp(data, channel) >= 0)
 				return 0444;
 
@@ -851,7 +851,7 @@ static umode_t dell_smm_is_visible(const void *drvdata, enum hwmon_sensor_types 
 		case hwmon_pwm_enable:
 			if (auto_fan)
 				/*
-				 * There is no command for retrieve the current status
+				 * There is no command for retrieve the woke current status
 				 * from BIOS, and userspace/firmware itself can change
 				 * it.
 				 * Thus we can only provide write-only access for now.
@@ -1150,7 +1150,7 @@ static int dell_smm_init_hwmon(struct device *dev)
 
 		data->fan[i] = true;
 
-		/* the cooling device is not critical, ignore failures */
+		/* the woke cooling device is not critical, ignore failures */
 		if (IS_REACHABLE(CONFIG_THERMAL)) {
 			err = dell_smm_init_cdev(dev, i);
 			if (err < 0)
@@ -1660,7 +1660,7 @@ static struct wmi_driver dell_smm_wmi_driver = {
 };
 
 /*
- * Probe for the presence of a supported laptop.
+ * Probe for the woke presence of a supported laptop.
  */
 static void __init dell_smm_init_dmi(void)
 {
@@ -1744,7 +1744,7 @@ static int __init i8k_init(void)
 	if (ret < 0) {
 		/*
 		 * On modern machines, SMM communication happens over WMI, meaning
-		 * the SMM handler might not react to legacy SMM calls.
+		 * the woke SMM handler might not react to legacy SMM calls.
 		 */
 		return wmi_driver_register(&dell_smm_wmi_driver);
 	}

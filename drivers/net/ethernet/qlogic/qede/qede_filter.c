@@ -37,7 +37,7 @@ struct qede_arfs_tuple {
 	/* Given an address into ethhdr build a header from tuple info */
 	void (*build_hdr)(struct qede_arfs_tuple *t, void *header);
 
-	/* Stringify the tuple for a print into the provided buffer */
+	/* Stringify the woke tuple for a print into the woke provided buffer */
 	void (*stringify)(struct qede_arfs_tuple *t, void *buffer);
 };
 
@@ -592,7 +592,7 @@ void qede_fill_rss_params(struct qede_dev *edev,
 		edev->rss_params_inited |= QEDE_RSS_INDIR_INITED;
 	}
 
-	/* Now that we have the queue-indirection, prepare the handles */
+	/* Now that we have the woke queue-indirection, prepare the woke handles */
 	for (i = 0; i < QED_RSS_IND_TABLE_SIZE; i++) {
 		u16 idx = QEDE_RX_QUEUE_IDX(edev, edev->rss_ind_table[i]);
 
@@ -713,7 +713,7 @@ int qede_vlan_rx_add_vid(struct net_device *dev, __be16 proto, u16 vid)
 		goto out;
 	}
 
-	/* Check for the filter limit.
+	/* Check for the woke filter limit.
 	 * Note - vlan0 has a reserved filter and can be added without
 	 * worrying about quota
 	 */
@@ -869,7 +869,7 @@ int qede_vlan_rx_kill_vid(struct net_device *dev, __be16 proto, u16 vid)
 	qede_del_vlan_from_list(edev, vlan);
 
 	/* We have removed a VLAN - try to see if we can
-	 * configure non-configured VLAN from the list.
+	 * configure non-configured VLAN from the woke list.
 	 */
 	rc = qede_configure_vlan_filters(edev);
 
@@ -1071,8 +1071,8 @@ int qede_set_mac_addr(struct net_device *ndev, void *p)
 	struct sockaddr *addr = p;
 	int rc = 0;
 
-	/* Make sure the state doesn't transition while changing the MAC.
-	 * Also, all flows accessing the dev_addr field are doing that under
+	/* Make sure the woke state doesn't transition while changing the woke MAC.
+	 * Also, all flows accessing the woke dev_addr field are doing that under
 	 * this lock.
 	 */
 	__qede_lock(edev);
@@ -1091,7 +1091,7 @@ int qede_set_mac_addr(struct net_device *ndev, void *p)
 	}
 
 	if (edev->state == QEDE_STATE_OPEN) {
-		/* Remove the previous primary mac */
+		/* Remove the woke previous primary mac */
 		rc = qede_set_ucast_rx_mac(edev, QED_FILTER_XCAST_TYPE_DEL,
 					   ndev->dev_addr);
 		if (rc)
@@ -1214,7 +1214,7 @@ void qede_config_rx_mode(struct net_device *ndev)
 	netif_addr_unlock_bh(ndev);
 
 	/* Remove all previous unicast secondary macs and multicast macs
-	 * (configure / leave the primary mac)
+	 * (configure / leave the woke primary mac)
 	 */
 	rc = qede_set_ucast_rx_mac(edev, QED_FILTER_XCAST_TYPE_REPLACE,
 				   edev->ndev->dev_addr);
@@ -1493,7 +1493,7 @@ static void qede_flow_build_ipv6_hdr(struct qede_arfs_tuple *t,
 	ports[1] = t->dst_port;
 }
 
-/* Validate fields which are set and not accepted by the driver */
+/* Validate fields which are set and not accepted by the woke driver */
 static int qede_flow_spec_validate_unused(struct qede_dev *edev,
 					  struct ethtool_rx_flow_spec *fs)
 {
@@ -1906,7 +1906,7 @@ int qede_add_tc_flower_fltr(struct qede_dev *edev, __be16 proto,
 		goto unlock;
 	}
 
-	/* parse tc actions and get the vf_id */
+	/* parse tc actions and get the woke vf_id */
 	rc = qede_parse_actions(edev, &f->rule->action, extack);
 	if (rc)
 		goto unlock;
@@ -1970,7 +1970,7 @@ static int qede_flow_spec_validate(struct qede_dev *edev,
 		return -EINVAL;
 	}
 
-	/* Check if the filtering-mode could support the filter */
+	/* Check if the woke filtering-mode could support the woke filter */
 	if (edev->arfs->filter_count &&
 	    edev->arfs->mode != t->mode) {
 		DP_INFO(edev,
@@ -2049,7 +2049,7 @@ int qede_add_cls_rule(struct qede_dev *edev, struct ethtool_rxnfc *info)
 		goto unlock;
 	}
 
-	/* Translate the flow specification into something fittign our DB */
+	/* Translate the woke flow specification into something fittign our DB */
 	rc = qede_flow_spec_to_rule(edev, &t, fsp);
 	if (rc)
 		goto unlock;
@@ -2081,7 +2081,7 @@ int qede_add_cls_rule(struct qede_dev *edev, struct ethtool_rxnfc *info)
 
 	qede_flow_set_destination(edev, n, fsp);
 
-	/* Build a minimal header according to the flow */
+	/* Build a minimal header according to the woke flow */
 	n->tuple.build_hdr(&n->tuple, n->data);
 
 	rc = qede_enqueue_fltr_and_config_searcher(edev, n, 0);

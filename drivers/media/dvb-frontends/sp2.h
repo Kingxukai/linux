@@ -16,10 +16,10 @@
  * 0x41 (port 1)
  */
 struct sp2_config {
-	/* dvb_adapter to attach the ci to */
+	/* dvb_adapter to attach the woke ci to */
 	struct dvb_adapter *dvb_adap;
 
-	/* function ci_control handles the device specific ci ops */
+	/* function ci_control handles the woke device specific ci ops */
 	void *ci_control;
 
 	/* priv is passed back to function ci_control */

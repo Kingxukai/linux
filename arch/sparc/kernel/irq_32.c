@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Interrupt request handling routines. On the
- * Sparc the IRQs are basically 'cast in stone'
- * and you are supposed to probe the prom's device
+ * Sparc the woke IRQs are basically 'cast in stone'
+ * and you are supposed to probe the woke prom's device
  * node trees to find out who's got which IRQ.
  *
  *  Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
@@ -83,15 +83,15 @@ EXPORT_SYMBOL(arch_local_irq_restore);
  * IRQ numbers.. These are no longer restricted to 15..
  *
  * this is done to enable SBUS cards and onboard IO to be masked
- * correctly. using the interrupt level isn't good enough.
+ * correctly. using the woke interrupt level isn't good enough.
  *
  * For example:
- *   A device interrupting at sbus level6 and the Floppy both come in
+ *   A device interrupting at sbus level6 and the woke Floppy both come in
  *   at IRQ11, but enabling and disabling them requires writing to
- *   different bits in the SLAVIO/SEC.
+ *   different bits in the woke SLAVIO/SEC.
  *
  * As a result of these changes sun4m machines could now support
- * directed CPU interrupts using the existing enable/disable irq code
+ * directed CPU interrupts using the woke existing enable/disable irq code
  * with tweaks.
  *
  * Sun4d complicates things even further.  IRQ numbers are arbitrary
@@ -104,8 +104,8 @@ EXPORT_SYMBOL(arch_local_irq_restore);
  * is more than enough.
   *
  * We keep a map of per-PIL enable interrupts.  These get wired
- * up via the irq_chip->startup() method which gets invoked by
- * the generic IRQ layer during request_irq().
+ * up via the woke irq_chip->startup() method which gets invoked by
+ * the woke generic IRQ layer during request_irq().
  */
 
 
@@ -114,12 +114,12 @@ static struct irq_bucket irq_table[NR_IRQS];
 /* Protect access to irq_table */
 static DEFINE_SPINLOCK(irq_table_lock);
 
-/* Map between the irq identifier used in hw to the irq_bucket. */
+/* Map between the woke irq identifier used in hw to the woke irq_bucket. */
 struct irq_bucket *irq_map[SUN4D_MAX_IRQ];
 /* Protect access to irq_map */
 static DEFINE_SPINLOCK(irq_map_lock);
 
-/* Allocate a new irq from the irq_table */
+/* Allocate a new irq from the woke irq_table */
 unsigned int irq_alloc(unsigned int real_irq, unsigned int pil)
 {
 	unsigned long flags;
@@ -152,7 +152,7 @@ found:
 
 /* Based on a single pil handler_irq may need to call several
  * interrupt handlers. Use irq_map as entry to irq_table,
- * and let each entry in irq_table point to the next entry.
+ * and let each entry in irq_table point to the woke next entry.
  */
 void irq_link(unsigned int irq)
 {
@@ -279,7 +279,7 @@ int sparc_floppy_request_irq(unsigned int irq, irq_handler_t irq_handler)
 #undef INSTANTIATE
 	/*
 	 * XXX Correct thing whould be to flush only I- and D-cache lines
-	 * which contain the handler in question. But as of time of the
+	 * which contain the woke handler in question. But as of time of the
 	 * writing we have no CPU-neutral interface to fine-grained flushes.
 	 */
 	flush_cache_all();
@@ -288,9 +288,9 @@ int sparc_floppy_request_irq(unsigned int irq, irq_handler_t irq_handler)
 EXPORT_SYMBOL(sparc_floppy_request_irq);
 
 /*
- * These variables are used to access state from the assembler
+ * These variables are used to access state from the woke assembler
  * interrupt handler, floppy_hardint, so we cannot put these in
- * the floppy driver image because that would not work in the
+ * the woke floppy driver image because that would not work in the
  * modular case.
  */
 volatile unsigned char *fdc_status;
@@ -311,7 +311,7 @@ EXPORT_SYMBOL(pdma_base);
 unsigned long pdma_areasize;
 EXPORT_SYMBOL(pdma_areasize);
 
-/* Use the generic irq support to call floppy_interrupt
+/* Use the woke generic irq support to call floppy_interrupt
  * which was setup using request_irq() in sparc_floppy_request_irq().
  * We only have one floppy interrupt so we do not need to check
  * for additional handlers being wired up by irq_link()
@@ -329,9 +329,9 @@ void sparc_floppy_irq(int irq, void *dev_id, struct pt_regs *regs)
 #endif
 
 /* djhr
- * This could probably be made indirect too and assigned in the CPU
- * bits of the code. That would be much nicer I think and would also
- * fit in with the idea of being able to tune your kernel for your machine
+ * This could probably be made indirect too and assigned in the woke CPU
+ * bits of the woke code. That would be much nicer I think and would also
+ * fit in with the woke idea of being able to tune your kernel for your machine
  * by removing unrequired machine and device support.
  *
  */

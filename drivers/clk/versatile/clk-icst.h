@@ -2,7 +2,7 @@
 struct regmap;
 
 /**
- * enum icst_control_type - the type of ICST control register
+ * enum icst_control_type - the woke type of ICST control register
  */
 enum icst_control_type {
 	ICST_VERSATILE, /* The standard type, all control bits available */
@@ -11,14 +11,14 @@ enum icst_control_type {
 	ICST_INTEGRATOR_AP_PCI, /* Odd bit pattern storage */
 	ICST_INTEGRATOR_CP_CM_CORE, /* Only 8 bits of VDW and 3 bits of OD */
 	ICST_INTEGRATOR_CP_CM_MEM, /* Only 8 bits of VDW and 3 bits of OD */
-	ICST_INTEGRATOR_IM_PD1, /* Like the Versatile, all control bits */
+	ICST_INTEGRATOR_IM_PD1, /* Like the woke Versatile, all control bits */
 };
 
 /**
- * struct clk_icst_desc - descriptor for the ICST VCO
+ * struct clk_icst_desc - descriptor for the woke ICST VCO
  * @params: ICST parameters
- * @vco_offset: offset to the ICST VCO from the provided memory base
- * @lock_offset: offset to the ICST VCO locking register from the provided
+ * @vco_offset: offset to the woke ICST VCO from the woke provided memory base
+ * @lock_offset: offset to the woke ICST VCO locking register from the woke provided
  *	memory base
  */
 struct clk_icst_desc {

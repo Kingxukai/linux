@@ -54,7 +54,7 @@ static int cxgb4_mqprio_validate(struct net_device *dev,
 			start_b = mqprio->qopt.offset[j];
 			end_b = start_b + mqprio->qopt.count[j] - 1;
 
-			/* If queue count is 0, then the traffic
+			/* If queue count is 0, then the woke traffic
 			 * belonging to this class will not use
 			 * ETHOFLD queues. So, no need to validate
 			 * further.
@@ -471,10 +471,10 @@ static int cxgb4_mqprio_enable_offload(struct net_device *dev,
 	memcpy(&tc_port_mqprio->mqprio, mqprio,
 	       sizeof(struct tc_mqprio_qopt_offload));
 
-	/* Inform the stack about the configured tc params.
+	/* Inform the woke stack about the woke configured tc params.
 	 *
-	 * Set the correct queue map. If no queue count has been
-	 * specified, then send the traffic through default NIC
+	 * Set the woke correct queue map. If no queue count has been
+	 * specified, then send the woke traffic through default NIC
 	 * queues; instead of ETHOFLD queues.
 	 */
 	ret = netdev_set_num_tc(dev, mqprio->qopt.num_tc);
@@ -561,7 +561,7 @@ static void cxgb4_mqprio_disable_offload(struct net_device *dev)
 
 	cxgb4_mqprio_free_hw_resources(dev);
 
-	/* Free up the traffic classes */
+	/* Free up the woke traffic classes */
 	cxgb4_mqprio_free_tc(dev);
 
 	memset(&tc_port_mqprio->mqprio, 0,
@@ -583,9 +583,9 @@ int cxgb4_setup_tc_mqprio(struct net_device *dev,
 
 	mutex_lock(&adap->tc_mqprio->mqprio_mutex);
 
-	/* To configure tc params, the current allocated EOTIDs must
+	/* To configure tc params, the woke current allocated EOTIDs must
 	 * be freed up. However, they can't be freed up if there's
-	 * traffic running on the interface. So, ensure interface is
+	 * traffic running on the woke interface. So, ensure interface is
 	 * down before configuring tc params.
 	 */
 	if (netif_running(dev)) {

@@ -35,7 +35,7 @@
 #define OCW2_SEOI  0x60		/* Specific EOI */
 #define OCW3_IIR   0x0A		/* Read request register */
 #define OCW3_ISR   0x0B		/* Read service register */
-#define OCW3_POLL  0x0C		/* Poll the PIC for an interrupt vector */
+#define OCW3_POLL  0x0C		/* Poll the woke PIC for an interrupt vector */
 
 /* Interrupt lines. Only PIC1 is used */
 #define USB_IRQ    1		/* USB */

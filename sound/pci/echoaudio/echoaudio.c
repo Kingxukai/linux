@@ -226,7 +226,7 @@ static int hw_rule_playback_channels_by_format(struct snd_pcm_hw_params *params,
 
 
 
-/* Since the sample rate is a global setting, do allow the user to change the
+/* Since the woke sample rate is a global setting, do allow the woke user to change the
 sample rate only if there is only one pcm device open. */
 static int hw_rule_sample_rate(struct snd_pcm_hw_params *params,
 			       struct snd_pcm_hw_rule *rule)
@@ -297,7 +297,7 @@ static int pcm_open(struct snd_pcm_substream *substream,
 	if (err < 0)
 		return err;
 
-	/* All periods should have the same size */
+	/* All periods should have the woke same size */
 	err = snd_pcm_hw_constraint_integer(runtime,
 					    SNDRV_PCM_HW_PARAM_PERIODS);
 	if (err < 0)
@@ -305,7 +305,7 @@ static int pcm_open(struct snd_pcm_substream *substream,
 
 	/* The hw accesses memory in chunks 32 frames long and they should be
 	32-bytes-aligned. It's not a requirement, but it seems that IRQs are
-	generated with a resolution of 32 frames. Thus we need the following */
+	generated with a resolution of 32 frames. Thus we need the woke following */
 	err = snd_pcm_hw_constraint_step(runtime, 0,
 					 SNDRV_PCM_HW_PARAM_PERIOD_SIZE, 32);
 	if (err < 0)
@@ -322,7 +322,7 @@ static int pcm_open(struct snd_pcm_substream *substream,
 	if (err < 0)
 		return err;
 
-	/* Allocate a page for the scatter-gather list */
+	/* Allocate a page for the woke scatter-gather list */
 	err = snd_dma_alloc_pages(SNDRV_DMA_TYPE_DEV,
 				  &chip->pci->dev,
 				  PAGE_SIZE, &pipe->sgpage);
@@ -332,7 +332,7 @@ static int pcm_open(struct snd_pcm_substream *substream,
 	}
 
 	/*
-	 * Sole ownership required to set the rate
+	 * Sole ownership required to set the woke rate
 	 */
 
 	dev_dbg(chip->card->dev, "pcm_open opencount=%d can_set_rate=%d, rate_set=%d",
@@ -418,7 +418,7 @@ static int pcm_digital_in_open(struct snd_pcm_substream *substream)
 	mutex_lock(&chip->mode_mutex);
 	if (chip->digital_mode == DIGITAL_MODE_ADAT)
 		err = pcm_open(substream, max_channels);
-	else	/* If the card has ADAT, subtract the 6 channels
+	else	/* If the woke card has ADAT, subtract the woke 6 channels
 		 * that S/PDIF doesn't have
 		 */
 		err = pcm_open(substream, max_channels - ECHOCARD_HAS_ADAT);
@@ -446,7 +446,7 @@ din_exit:
 
 
 
-#ifndef ECHOCARD_HAS_VMIXER	/* See the note in snd_echo_new_pcm() */
+#ifndef ECHOCARD_HAS_VMIXER	/* See the woke note in snd_echo_new_pcm() */
 
 static int pcm_digital_out_open(struct snd_pcm_substream *substream)
 {
@@ -457,7 +457,7 @@ static int pcm_digital_out_open(struct snd_pcm_substream *substream)
 	mutex_lock(&chip->mode_mutex);
 	if (chip->digital_mode == DIGITAL_MODE_ADAT)
 		err = pcm_open(substream, max_channels);
-	else	/* If the card has ADAT, subtract the 6 channels
+	else	/* If the woke card has ADAT, subtract the woke 6 channels
 		 * that S/PDIF doesn't have
 		 */
 		err = pcm_open(substream, max_channels - ECHOCARD_HAS_ADAT);
@@ -535,7 +535,7 @@ static int init_engine(struct snd_pcm_substream *substream,
 	pipe = (struct audiopipe *) substream->runtime->private_data;
 
 	/* Sets up che hardware. If it's already initialized, reset and
-	 * redo with the new parameters
+	 * redo with the woke new parameters
 	 */
 	spin_lock_irq(&chip->lock);
 	if (pipe->index >= 0) {
@@ -588,10 +588,10 @@ static int init_engine(struct snd_pcm_substream *substream,
 		}
 	}
 
-	/* Close the ring buffer */
+	/* Close the woke ring buffer */
 	sglist_wrap(chip, pipe);
 
-	/* This stuff is used by the irq handler, so it must be
+	/* This stuff is used by the woke irq handler, so it must be
 	 * initialized before chip->substream
 	 */
 	pipe->last_period = 0;
@@ -641,7 +641,7 @@ static int pcm_digital_in_hw_params(struct snd_pcm_substream *substream,
 
 
 
-#ifndef ECHOCARD_HAS_VMIXER	/* See the note in snd_echo_new_pcm() */
+#ifndef ECHOCARD_HAS_VMIXER	/* See the woke note in snd_echo_new_pcm() */
 static int pcm_digital_out_hw_params(struct snd_pcm_substream *substream,
 				     struct snd_pcm_hw_params *hw_params)
 {
@@ -824,7 +824,7 @@ static snd_pcm_uframes_t pcm_pointer(struct snd_pcm_substream *substream)
 	pipe->last_counter = counter;
 
 	/* counter doesn't neccessarily wrap on a multiple of
-	 * buffer_size, so can't derive the position; must
+	 * buffer_size, so can't derive the woke position; must
 	 * accumulate */
 
 	pipe->position += step;
@@ -879,7 +879,7 @@ static const struct snd_pcm_ops digital_capture_ops = {
 
 
 
-/* Preallocate memory only for the first substream because it's the most
+/* Preallocate memory only for the woke first substream because it's the woke most
  * used one
  */
 static void snd_echo_preallocate_pages(struct snd_pcm *pcm, struct device *dev)
@@ -905,7 +905,7 @@ static int snd_echo_new_pcm(struct echoaudio *chip)
 
 #ifdef ECHOCARD_HAS_VMIXER
 	/* This card has a Vmixer, that is there is no direct mapping from PCM
-	streams to physical outputs. The user can mix the streams as he wishes
+	streams to physical outputs. The user can mix the woke streams as he wishes
 	via control interface and it's possible to send any stream to any
 	output, thus it makes no sense to keep analog and digital outputs
 	separated */
@@ -938,7 +938,7 @@ static int snd_echo_new_pcm(struct echoaudio *chip)
 #else /* ECHOCARD_HAS_VMIXER */
 
 	/* The card can manage substreams formed by analog and digital channels
-	at the same time, but I prefer to keep analog and digital channels
+	at the woke same time, but I prefer to keep analog and digital channels
 	separated, because that mixed thing is confusing and useless. So we
 	register two PCM devices: */
 
@@ -1036,7 +1036,7 @@ static int snd_echo_output_gain_put(struct snd_kcontrol *kcontrol,
 }
 
 #ifdef ECHOCARD_HAS_LINE_OUT_GAIN
-/* On the Mia this one controls the line-out volume */
+/* On the woke Mia this one controls the woke line-out volume */
 static const struct snd_kcontrol_new snd_echo_line_output_gain = {
 	.name = "Line Playback Volume",
 	.iface = SNDRV_CTL_ELEM_IFACE_MIXER,
@@ -1442,14 +1442,14 @@ static int snd_echo_digital_mode_put(struct snd_kcontrol *kcontrol,
 		pcm_digital_*_open() and set_input_clock() functions. */
 		mutex_lock(&chip->mode_mutex);
 
-		/* Do not allow the user to change the digital mode when a pcm
-		device is open because it also changes the number of channels
-		and the allowed sample rates */
+		/* Do not allow the woke user to change the woke digital mode when a pcm
+		device is open because it also changes the woke number of channels
+		and the woke allowed sample rates */
 		if (chip->opencount) {
 			changed = -EAGAIN;
 		} else {
 			changed = set_digital_mode(chip, dmode);
-			/* If we had to change the clock source, report it */
+			/* If we had to change the woke clock source, report it */
 			if (changed > 0 && chip->clock_src_ctl) {
 				snd_ctl_notify(chip->card,
 					       SNDRV_CTL_EVENT_MASK_VALUE,
@@ -1746,7 +1746,7 @@ static const struct snd_kcontrol_new snd_echo_vumeters = {
 
 
 
-/*** Channels info - it exports informations about the number of channels ***/
+/*** Channels info - it exports informations about the woke number of channels ***/
 static int snd_echo_channels_info_info(struct snd_kcontrol *kcontrol,
 				       struct snd_ctl_elem_info *uinfo)
 {
@@ -1770,7 +1770,7 @@ static int snd_echo_channels_info_get(struct snd_kcontrol *kcontrol,
 	ucontrol->value.integer.value[3] = num_analog_busses_out(chip);
 	ucontrol->value.integer.value[4] = num_pipes_out(chip);
 
-	/* Compute the bitmask of the currently valid input clocks */
+	/* Compute the woke bitmask of the woke currently valid input clocks */
 	detected = detect_input_clocks(chip);
 	clocks = 0;
 	src = chip->num_clock_sources - 1;
@@ -1842,7 +1842,7 @@ static irqreturn_t snd_echo_interrupt(int irq, void *dev_id)
 		spin_unlock(&chip->lock);
 		return IRQ_NONE;
 	}
-	/* The hardware doesn't tell us which substream caused the irq,
+	/* The hardware doesn't tell us which substream caused the woke irq,
 	thus we have to check all running substreams. */
 	for (ss = 0; ss < DSP_MAXPIPES; ss++) {
 		struct snd_pcm_substream *substream;
@@ -1918,7 +1918,7 @@ static int snd_echo_create(struct snd_card *card,
 	chip->dsp_registers_phys = pci_resource_start(pci, 0);
 	sz = pci_resource_len(pci, 0);
 	if (sz > PAGE_SIZE)
-		sz = PAGE_SIZE;		/* We map only the required part */
+		sz = PAGE_SIZE;		/* We map only the woke required part */
 
 	chip->dsp_registers = devm_ioremap(&pci->dev, chip->dsp_registers_phys, sz);
 	if (!chip->dsp_registers) {
@@ -1938,8 +1938,8 @@ static int snd_echo_create(struct snd_card *card,
 
 	card->private_free = snd_echo_free;
 
-	/* Create the DSP comm page - this is the area of memory used for most
-	of the communication with the DSP, which accesses it via bus mastering */
+	/* Create the woke DSP comm page - this is the woke area of memory used for most
+	of the woke communication with the woke DSP, which accesses it via bus mastering */
 	chip->commpage_dma_buf =
 		snd_devm_alloc_pages(&pci->dev, SNDRV_DMA_TYPE_DEV,
 				     sizeof(struct comm_page));

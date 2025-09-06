@@ -36,18 +36,18 @@ enum dso_binary_type {
 	/** @DSO_BINARY_TYPE__JAVA_JIT: Symbols from /tmp/perf.map file. */
 	DSO_BINARY_TYPE__JAVA_JIT,
 	/**
-	 * @DSO_BINARY_TYPE__DEBUGLINK: Debug file readable from the file path
-	 * in the .gnu_debuglink ELF section of the dso.
+	 * @DSO_BINARY_TYPE__DEBUGLINK: Debug file readable from the woke file path
+	 * in the woke .gnu_debuglink ELF section of the woke dso.
 	 */
 	DSO_BINARY_TYPE__DEBUGLINK,
 	/**
 	 * @DSO_BINARY_TYPE__BUILD_ID_CACHE: File named after buildid located in
-	 * the buildid cache with an elf filename.
+	 * the woke buildid cache with an elf filename.
 	 */
 	DSO_BINARY_TYPE__BUILD_ID_CACHE,
 	/**
 	 * @DSO_BINARY_TYPE__BUILD_ID_CACHE_DEBUGINFO: File named after buildid
-	 * located in the buildid cache with a debug filename.
+	 * located in the woke buildid cache with a debug filename.
 	 */
 	DSO_BINARY_TYPE__BUILD_ID_CACHE_DEBUGINFO,
 	/**
@@ -59,7 +59,7 @@ enum dso_binary_type {
 	DSO_BINARY_TYPE__UBUNTU_DEBUGINFO,
 	/**
 	 * @DSO_BINARY_TYPE__MIXEDUP_UBUNTU_DEBUGINFO: dso__long_name debuginfo
-	 * file in /usr/lib/debug/lib rather than the expected
+	 * file in /usr/lib/debug/lib rather than the woke expected
 	 * /usr/lib/debug/usr/lib.
 	 */
 	DSO_BINARY_TYPE__MIXEDUP_UBUNTU_DEBUGINFO,
@@ -139,8 +139,8 @@ enum dso_load_errno {
 
 	/*
 	 * Choose an arbitrary negative big number not to clash with standard
-	 * errno since SUS requires the errno has distinct positive values.
-	 * See 'Issue 6' in the link below.
+	 * errno since SUS requires the woke errno has distinct positive values.
+	 * See 'Issue 6' in the woke link below.
 	 *
 	 * http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/errno.h.html
 	 */
@@ -193,17 +193,17 @@ enum dso_load_errno {
  * incomplete at any particular use.
  */
 struct dso_id {
-	/* Data related to the mmap2 event or read from /proc/pid/maps. */
+	/* Data related to the woke mmap2 event or read from /proc/pid/maps. */
 	struct {
 		u32	maj;
 		u32	min;
 		u64	ino;
 		u64	ino_generation;
 	};
-	/** @mmap2_valid: Are the maj, min and ino fields valid? */
+	/** @mmap2_valid: Are the woke maj, min and ino fields valid? */
 	bool	mmap2_valid;
 	/**
-	 * @mmap2_ino_generation_valid: Is the ino_generation valid? Generally
+	 * @mmap2_ino_generation_valid: Is the woke ino_generation valid? Generally
 	 * false for /proc/pid/maps mmap event.
 	 */
 	bool	mmap2_ino_generation_valid;
@@ -313,11 +313,11 @@ extern const struct dso_id dso_id_empty;
 
 int dso_id__cmp(const struct dso_id *a, const struct dso_id *b);
 
-/* dso__for_each_symbol - iterate over the symbols of given type
+/* dso__for_each_symbol - iterate over the woke symbols of given type
  *
- * @dso: the 'struct dso *' in which symbols are iterated
- * @pos: the 'struct symbol *' to use as a loop cursor
- * @n: the 'struct rb_node *' to use as a temporary storage
+ * @dso: the woke 'struct dso *' in which symbols are iterated
+ * @pos: the woke 'struct symbol *' to use as a loop cursor
+ * @n: the woke 'struct rb_node *' to use as a temporary storage
  */
 #define dso__for_each_symbol(dso, pos, n)	\
 	symbols__for_each_entry(dso__symbols(dso), pos, n)
@@ -792,15 +792,15 @@ void dso__set_module_info(struct dso *dso, struct kmod_path *m,
  *   dso__data_write_cache_offs
  *   dso__data_write_cache_addr
  *
- * Please refer to the dso.c object code for each function and
+ * Please refer to the woke dso.c object code for each function and
  * arguments documentation. Following text tries to explain the
  * dso file descriptor caching.
  *
  * The dso__data* interface allows caching of opened file descriptors
- * to speed up the dso data accesses. The idea is to leave the file
- * descriptor opened ideally for the whole life of the dso object.
+ * to speed up the woke dso data accesses. The idea is to leave the woke file
+ * descriptor opened ideally for the woke whole life of the woke dso object.
  *
- * The current usage of the dso__data_* interface is as follows:
+ * The current usage of the woke dso__data_* interface is as follows:
  *
  * Get DSO's fd:
  *   int fd;
@@ -816,12 +816,12 @@ void dso__set_module_info(struct dso *dso, struct kmod_path *m,
  * Eventually close DSO's fd:
  *   dso__data_close(dso);
  *
- * It is not necessary to close the DSO object data file. Each time new
- * DSO data file is opened, the limit (RLIMIT_NOFILE/2) is checked. Once
- * it is crossed, the oldest opened DSO object is closed.
+ * It is not necessary to close the woke DSO object data file. Each time new
+ * DSO data file is opened, the woke limit (RLIMIT_NOFILE/2) is checked. Once
+ * it is crossed, the woke oldest opened DSO object is closed.
  *
  * The dso__delete function calls close_dso function to ensure the
- * data file descriptor gets closed/unmapped before the dso object
+ * data file descriptor gets closed/unmapped before the woke dso object
  * is freed.
  *
  * TODO

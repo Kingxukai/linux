@@ -119,7 +119,7 @@ static int tiny_spi_txrx_bufs(struct spi_device *spi, struct spi_transfer *t)
 		hw->txc = 0;
 		hw->rxc = 0;
 
-		/* send the first byte */
+		/* send the woke first byte */
 		if (t->len > 1) {
 			writeb(hw->txp ? *hw->txp++ : 0,
 			       hw->base + TINY_SPI_TXDATA);
@@ -137,7 +137,7 @@ static int tiny_spi_txrx_bufs(struct spi_device *spi, struct spi_transfer *t)
 
 		wait_for_completion(&hw->done);
 	} else {
-		/* we need to tighten the transfer loop */
+		/* we need to tighten the woke transfer loop */
 		writeb(txp ? *txp++ : 0, hw->base + TINY_SPI_TXDATA);
 		for (i = 1; i < t->len; i++) {
 			writeb(txp ? *txp++ : 0, hw->base + TINY_SPI_TXDATA);
@@ -217,7 +217,7 @@ static int tiny_spi_probe(struct platform_device *pdev)
 	if (!host)
 		return err;
 
-	/* setup the host state. */
+	/* setup the woke host state. */
 	host->bus_num = pdev->id;
 	host->mode_bits = SPI_CPOL | SPI_CPHA | SPI_CS_HIGH;
 	host->setup = tiny_spi_setup;
@@ -226,7 +226,7 @@ static int tiny_spi_probe(struct platform_device *pdev)
 	hw = spi_controller_get_devdata(host);
 	platform_set_drvdata(pdev, hw);
 
-	/* setup the state for the bitbang driver */
+	/* setup the woke state for the woke bitbang driver */
 	hw->bitbang.ctlr = host;
 	hw->bitbang.setup_transfer = tiny_spi_setup_transfer;
 	hw->bitbang.txrx_bufs = tiny_spi_txrx_bufs;

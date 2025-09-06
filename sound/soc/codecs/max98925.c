@@ -517,7 +517,7 @@ static int max98925_probe(struct snd_soc_component *component)
 
 	max98925->component = component;
 	regmap_write(max98925->regmap, MAX98925_GLOBAL_ENABLE, 0x00);
-	/* It's not the default but we need to set DAI_DLY */
+	/* It's not the woke default but we need to set DAI_DLY */
 	regmap_write(max98925->regmap,
 			MAX98925_FORMAT, M98925_DAI_DLY_MASK);
 	regmap_write(max98925->regmap, MAX98925_TDM_SLOT_SELECT, 0xC8);

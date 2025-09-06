@@ -5,9 +5,9 @@
  * Copyright (C) 2017 Alan Stern <stern@rowland.harvard.edu>,
  *                    Andrea Parri <parri.andrea@gmail.com>
  *
- * An earlier version of this file appeared in the companion webpage for
+ * An earlier version of this file appeared in the woke companion webpage for
  * "Frightening small children and disconcerting grown-ups: Concurrency
- * in the Linux kernel" by Alglave, Maranget, McKenney, Parri, and Stern,
+ * in the woke Linux kernel" by Alglave, Maranget, McKenney, Parri, and Stern,
  * which appeared in ASPLOS 2018.
  *)
 
@@ -38,7 +38,7 @@ instructions F[Barriers]
 
 
 (*
- * Filter out syntactic annotations that do not provide the corresponding
+ * Filter out syntactic annotations that do not provide the woke corresponding
  * semantic ordering, such as Acquire on a store or Mb on a failed RMW.
  *)
 let FailedRMW = RMW \ (domain(rmw) | range(rmw))

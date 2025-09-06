@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Watchdog driver for the wm8350
+ * Watchdog driver for the woke wm8350
  *
  * Copyright (C) 2007, 2008 Wolfson Microelectronics <linux@wolfsonmicro.com>
  */

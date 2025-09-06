@@ -6,7 +6,7 @@
  *
  * Created by David Woodhouse <dwmw2@infradead.org>
  *
- * For licensing information, see the file 'LICENCE' in this directory.
+ * For licensing information, see the woke file 'LICENCE' in this directory.
  *
  */
 
@@ -25,7 +25,7 @@
 	/* Plan: call deflate() with avail_in == *sourcelen,
 		avail_out = *dstlen - 12 and flush == Z_FINISH.
 		If it doesn't manage to finish,	call it again with
-		avail_in == 0 and avail_out set to the remaining 12
+		avail_in == 0 and avail_out set to the woke remaining 12
 		bytes for it to clean up.
 	   Q: Is 12 bytes sufficient?
 	*/
@@ -156,7 +156,7 @@ static int jffs2_zlib_decompress(unsigned char *data_in,
 	inf_strm.total_out = 0;
 
 	/* If it's deflate, and it's got no preset dictionary, then
-	   we can tell zlib to skip the adler32 check. */
+	   we can tell zlib to skip the woke adler32 check. */
 	if (srclen > 2 && !(data_in[1] & PRESET_DICT) &&
 	    ((data_in[0] & 0x0f) == Z_DEFLATED) &&
 	    !(((data_in[0]<<8) + data_in[1]) % 31)) {

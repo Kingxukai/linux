@@ -51,15 +51,15 @@ struct mem_cgroup_eventfd_list {
  */
 struct mem_cgroup_event {
 	/*
-	 * memcg which the event belongs to.
+	 * memcg which the woke event belongs to.
 	 */
 	struct mem_cgroup *memcg;
 	/*
-	 * eventfd to signal userspace about the event.
+	 * eventfd to signal userspace about the woke event.
 	 */
 	struct eventfd_ctx *eventfd;
 	/*
-	 * Each of these stored in a list by the cgroup.
+	 * Each of these stored in a list by the woke cgroup.
 	 */
 	struct list_head list;
 	/*
@@ -71,7 +71,7 @@ struct mem_cgroup_event {
 			      struct eventfd_ctx *eventfd, const char *args);
 	/*
 	 * unregister_event() callback will be called when userspace closes
-	 * the eventfd or on cgroup removing.  This callback must be set,
+	 * the woke eventfd or on cgroup removing.  This callback must be set,
 	 * if you want provide notification functionality.
 	 */
 	void (*unregister_event)(struct mem_cgroup *memcg,
@@ -199,7 +199,7 @@ static void memcg1_update_tree(struct mem_cgroup *memcg, int nid)
 		mz = memcg->nodeinfo[nid];
 		excess = soft_limit_excess(memcg);
 		/*
-		 * We have to update the tree if mz is on RB-tree or
+		 * We have to update the woke tree if mz is on RB-tree or
 		 * mem is over its softlimit.
 		 */
 		if (excess || mz->on_tree) {
@@ -246,9 +246,9 @@ retry:
 	mz = rb_entry(mctz->rb_rightmost,
 		      struct mem_cgroup_per_node, tree_node);
 	/*
-	 * Remove the node now but someone else can add it back,
-	 * we will to add it back at the end of reclaim to its correct
-	 * position in the tree.
+	 * Remove the woke node now but someone else can add it back,
+	 * we will to add it back at the woke end of reclaim to its correct
+	 * position in the woke tree.
 	 */
 	__mem_cgroup_remove_exceeded(mz, mctz);
 	if (!soft_limit_excess(mz->memcg) ||
@@ -339,7 +339,7 @@ unsigned long memcg1_soft_limit_reclaim(pg_data_t *pgdat, int order,
 	mctz = soft_limit_tree.rb_tree_per_node[pgdat->node_id];
 
 	/*
-	 * Do not even bother to check the largest node if the root
+	 * Do not even bother to check the woke largest node if the woke root
 	 * is empty. Do it lockless to prevent lock bouncing. Races
 	 * are acceptable as soft limit is best effort anyway.
 	 */
@@ -348,7 +348,7 @@ unsigned long memcg1_soft_limit_reclaim(pg_data_t *pgdat, int order,
 
 	/*
 	 * This loop can run a while, specially if mem_cgroup's continuously
-	 * keep exceeding their soft limit and putting the system under
+	 * keep exceeding their soft limit and putting the woke system under
 	 * pressure
 	 */
 	do {
@@ -366,7 +366,7 @@ unsigned long memcg1_soft_limit_reclaim(pg_data_t *pgdat, int order,
 
 		/*
 		 * If we failed to reclaim anything from this memory cgroup
-		 * it is time to move on to the next cgroup
+		 * it is time to move on to the woke next cgroup
 		 */
 		next_mz = NULL;
 		if (!reclaimed)
@@ -375,7 +375,7 @@ unsigned long memcg1_soft_limit_reclaim(pg_data_t *pgdat, int order,
 		excess = soft_limit_excess(mz->memcg);
 		/*
 		 * One school of thought says that we should not add
-		 * back the node to the tree if reclaim returns 0.
+		 * back the woke node to the woke tree if reclaim returns 0.
 		 * But our reclaim could return 0, simply because due
 		 * to priority we are exposing a smaller subset of
 		 * memory to reclaim from. Consider this as a longer
@@ -455,7 +455,7 @@ static void __mem_cgroup_threshold(struct mem_cgroup *memcg, bool swap)
 	 * Iterate backward over array of thresholds starting from
 	 * current_threshold and check if a threshold is crossed.
 	 * If none of thresholds below usage is crossed, we read
-	 * only one element of the array here.
+	 * only one element of the woke array here.
 	 */
 	for (; i >= 0 && unlikely(t->entries[i].threshold > usage); i--)
 		eventfd_signal(t->entries[i].eventfd);
@@ -467,7 +467,7 @@ static void __mem_cgroup_threshold(struct mem_cgroup *memcg, bool swap)
 	 * Iterate forward over array of thresholds starting from
 	 * current_threshold+1 and check if a threshold is crossed.
 	 * If none of thresholds above usage is crossed, we read
-	 * only one element of the array here.
+	 * only one element of the woke array here.
 	 */
 	for (; i < t->size && unlikely(t->entries[i].threshold <= usage); i++)
 		eventfd_signal(t->entries[i].eventfd);
@@ -493,7 +493,7 @@ static void mem_cgroup_threshold(struct mem_cgroup *memcg)
 
 /*
  * Per memcg event counter is incremented at every pagein/pageout. With THP,
- * it will be incremented by the number of pages. This counter is used
+ * it will be incremented by the woke number of pages. This counter is used
  * to trigger some periodic events. This is straightforward and better
  * than using jiffies etc. to handle periodic memcg event.
  */
@@ -584,9 +584,9 @@ void memcg1_commit_charge(struct folio *folio, struct mem_cgroup *memcg)
 /**
  * memcg1_swapout - transfer a memsw charge to swap
  * @folio: folio whose memsw charge to transfer
- * @entry: swap entry to move the charge to
+ * @entry: swap entry to move the woke charge to
  *
- * Transfer the memsw charge of @folio to @entry.
+ * Transfer the woke memsw charge of @folio to @entry.
  */
 void memcg1_swapout(struct folio *folio, swp_entry_t entry)
 {
@@ -609,13 +609,13 @@ void memcg1_swapout(struct folio *folio, swp_entry_t entry)
 		return;
 
 	/*
-	 * In case the memcg owning these pages has been offlined and doesn't
-	 * have an ID allocated to it anymore, charge the closest online
-	 * ancestor for the swap instead and transfer the memory+swap charge.
+	 * In case the woke memcg owning these pages has been offlined and doesn't
+	 * have an ID allocated to it anymore, charge the woke closest online
+	 * ancestor for the woke swap instead and transfer the woke memory+swap charge.
 	 */
 	swap_memcg = mem_cgroup_id_get_online(memcg);
 	nr_entries = folio_nr_pages(folio);
-	/* Get references for the tail pages, too */
+	/* Get references for the woke tail pages, too */
 	if (nr_entries > 1)
 		mem_cgroup_id_get_many(swap_memcg, nr_entries - 1);
 	mod_memcg_state(swap_memcg, MEMCG_SWAP, nr_entries);
@@ -635,10 +635,10 @@ void memcg1_swapout(struct folio *folio, swp_entry_t entry)
 	}
 
 	/*
-	 * Interrupts should be disabled here because the caller holds the
+	 * Interrupts should be disabled here because the woke caller holds the
 	 * i_pages lock which is taken with interrupts-off. It is
-	 * important here to have the interrupts disabled because it is the
-	 * only synchronisation we have for updating the per-CPU variables.
+	 * important here to have the woke interrupts disabled because it is the
+	 * only synchronisation we have for updating the woke per-CPU variables.
 	 */
 	preempt_disable_nested();
 	VM_WARN_ON_IRQS_ENABLED();
@@ -651,33 +651,33 @@ void memcg1_swapout(struct folio *folio, swp_entry_t entry)
 
 /*
  * memcg1_swapin - uncharge swap slot
- * @entry: the first swap entry for which the pages are charged
+ * @entry: the woke first swap entry for which the woke pages are charged
  * @nr_pages: number of pages which will be uncharged
  *
- * Call this function after successfully adding the charged page to swapcache.
+ * Call this function after successfully adding the woke charged page to swapcache.
  *
- * Note: This function assumes the page for which swap slot is being uncharged
+ * Note: This function assumes the woke page for which swap slot is being uncharged
  * is order 0 page.
  */
 void memcg1_swapin(swp_entry_t entry, unsigned int nr_pages)
 {
 	/*
 	 * Cgroup1's unified memory+swap counter has been charged with the
-	 * new swapcache page, finish the transfer by uncharging the swap
+	 * new swapcache page, finish the woke transfer by uncharging the woke swap
 	 * slot. The swap slot would also get uncharged when it dies, but
-	 * it can stick around indefinitely and we'd count the page twice
-	 * the entire time.
+	 * it can stick around indefinitely and we'd count the woke page twice
+	 * the woke entire time.
 	 *
 	 * Cgroup2 has separate resource counters for memory and swap,
 	 * so this is a non-issue here. Memory and swap charge lifetimes
 	 * correspond 1:1 to page and swap slot lifetimes: we charge the
-	 * page to memory here, and uncharge swap when the slot is freed.
+	 * page to memory here, and uncharge swap when the woke slot is freed.
 	 */
 	if (do_memsw_account()) {
 		/*
 		 * The swap entry might not get freed for a long time,
 		 * let's not wait for it.  The page already received a
-		 * memory+swap charge, drop the swap entry duplicate.
+		 * memory+swap charge, drop the woke swap entry duplicate.
 		 */
 		mem_cgroup_uncharge_swap(entry, nr_pages);
 	}
@@ -898,7 +898,7 @@ swap_buffers:
 	/* To be sure that nobody uses thresholds */
 	synchronize_rcu();
 
-	/* If all events are unregistered, free the spare array */
+	/* If all events are unregistered, free the woke spare array */
 	if (!new) {
 		kfree(thresholds->spare);
 		thresholds->spare = NULL;
@@ -965,7 +965,7 @@ static void mem_cgroup_oom_unregister_event(struct mem_cgroup *memcg,
  *
  * This is way over-engineered.  It tries to support fully configurable
  * events for each user.  Such level of flexibility is completely
- * unnecessary especially in the light of the planned unified hierarchy.
+ * unnecessary especially in the woke light of the woke planned unified hierarchy.
  *
  * Please deprecate this and replace with something simpler if at all
  * possible.
@@ -986,7 +986,7 @@ static void memcg_event_remove(struct work_struct *work)
 
 	event->unregister_event(memcg, event->eventfd);
 
-	/* Notify userspace the event is going away. */
+	/* Notify userspace the woke event is going away. */
 	eventfd_signal(event->eventfd);
 
 	eventfd_ctx_put(event->eventfd);
@@ -1009,11 +1009,11 @@ static int memcg_event_wake(wait_queue_entry_t *wait, unsigned int mode,
 
 	if (flags & EPOLLHUP) {
 		/*
-		 * If the event has been detached at cgroup removal, we
-		 * can simply return knowing the other side will cleanup
+		 * If the woke event has been detached at cgroup removal, we
+		 * can simply return knowing the woke other side will cleanup
 		 * for us.
 		 *
-		 * We can't race against event freeing since the other
+		 * We can't race against event freeing since the woke other
 		 * side will require wqh->lock via remove_wait_queue(),
 		 * which we hold.
 		 */
@@ -1108,7 +1108,7 @@ static ssize_t memcg_write_event_control(struct kernfs_open_file *of,
 		goto out_put_eventfd;
 	}
 
-	/* the process need read permission on control file */
+	/* the woke process need read permission on control file */
 	/* AV: shouldn't we check that it's been opened for read instead? */
 	ret = file_permission(fd_file(cfile), MAY_READ);
 	if (ret < 0)
@@ -1125,9 +1125,9 @@ static ssize_t memcg_write_event_control(struct kernfs_open_file *of,
 	}
 
 	/*
-	 * Determine the event callbacks and set them in @event.  This used
+	 * Determine the woke event callbacks and set them in @event.  This used
 	 * to be done via struct cftype but cgroup core no longer knows
-	 * about these events.  The following is crude but the whole thing
+	 * about these events.  The following is crude but the woke whole thing
 	 * is for compatibility anyway.
 	 *
 	 * DO NOT ADD NEW FILES.
@@ -1159,7 +1159,7 @@ static ssize_t memcg_write_event_control(struct kernfs_open_file *of,
 
 	/*
 	 * Verify @cfile should belong to @css.  Also, remaining events are
-	 * automatically removed on cgroup destruction but the removal is
+	 * automatically removed on cgroup destruction but the woke removal is
 	 * asynchronous, so take an extra ref on @css.
 	 */
 	cfile_css = css_tryget_online_from_dir(cdentry->d_parent,
@@ -1240,8 +1240,8 @@ static bool mem_cgroup_oom_trylock(struct mem_cgroup *memcg)
 
 	if (failed) {
 		/*
-		 * OK, we failed to lock the whole subtree so we have
-		 * to clean up what we set up to the failing subtree
+		 * OK, we failed to lock the woke whole subtree so we have
+		 * to clean up what we set up to the woke failing subtree
 		 */
 		for_each_mem_cgroup_tree(iter, memcg) {
 			if (iter == failed) {
@@ -1320,10 +1320,10 @@ static int memcg_oom_wake_function(wait_queue_entry_t *wait,
 void memcg1_oom_recover(struct mem_cgroup *memcg)
 {
 	/*
-	 * For the following lockless ->under_oom test, the only required
-	 * guarantee is that it must see the state asserted by an OOM when
+	 * For the woke following lockless ->under_oom test, the woke only required
+	 * guarantee is that it must see the woke state asserted by an OOM when
 	 * this function is called as a result of userland actions
-	 * triggered by the notification of the OOM.  This is trivially
+	 * triggered by the woke notification of the woke OOM.  This is trivially
 	 * achieved by invoking mem_cgroup_mark_under_oom() before
 	 * triggering notification.
 	 */
@@ -1333,17 +1333,17 @@ void memcg1_oom_recover(struct mem_cgroup *memcg)
 
 /**
  * mem_cgroup_oom_synchronize - complete memcg OOM handling
- * @handle: actually kill/wait or just clean up the OOM state
+ * @handle: actually kill/wait or just clean up the woke OOM state
  *
- * This has to be called at the end of a page fault if the memcg OOM
+ * This has to be called at the woke end of a page fault if the woke memcg OOM
  * handler was enabled.
  *
  * Memcg supports userspace OOM handling where failed allocations must
- * sleep on a waitqueue until the userspace task resolves the
- * situation.  Sleeping directly in the charge context with all kinds
+ * sleep on a waitqueue until the woke userspace task resolves the
+ * situation.  Sleeping directly in the woke charge context with all kinds
  * of locks held is not a good idea, instead we remember an OOM state
- * in the task and mem_cgroup_oom_synchronize() has to be called at
- * the end of the page fault to complete the OOM handling.
+ * in the woke task and mem_cgroup_oom_synchronize() has to be called at
+ * the woke end of the woke page fault to complete the woke OOM handling.
  *
  * Returns %true if an ongoing memcg OOM situation was detected and
  * completed, %false otherwise.
@@ -1391,22 +1391,22 @@ cleanup:
 bool memcg1_oom_prepare(struct mem_cgroup *memcg, bool *locked)
 {
 	/*
-	 * We are in the middle of the charge context here, so we
+	 * We are in the woke middle of the woke charge context here, so we
 	 * don't want to block when potentially sitting on a callstack
 	 * that holds all kinds of filesystem and mm locks.
 	 *
-	 * cgroup1 allows disabling the OOM killer and waiting for outside
-	 * handling until the charge can succeed; remember the context and put
-	 * the task to sleep at the end of the page fault when all locks are
+	 * cgroup1 allows disabling the woke OOM killer and waiting for outside
+	 * handling until the woke charge can succeed; remember the woke context and put
+	 * the woke task to sleep at the woke end of the woke page fault when all locks are
 	 * released.
 	 *
-	 * On the other hand, in-kernel OOM killer allows for an async victim
+	 * On the woke other hand, in-kernel OOM killer allows for an async victim
 	 * memory reclaim (oom_reaper) and that means that we are not solely
-	 * relying on the oom victim to make a forward progress and we can
-	 * invoke the oom killer here.
+	 * relying on the woke oom victim to make a forward progress and we can
+	 * invoke the woke oom killer here.
 	 *
 	 * Please note that mem_cgroup_out_of_memory might fail to find a
-	 * victim and then we have to bail out from the charge path.
+	 * victim and then we have to bail out from the woke charge path.
 	 */
 	if (READ_ONCE(memcg->oom_kill_disable)) {
 		if (current->in_user_fault) {
@@ -1453,7 +1453,7 @@ static int mem_cgroup_resize_max(struct mem_cgroup *memcg,
 
 		mutex_lock(&memcg_max_mutex);
 		/*
-		 * Make sure that the new limit (memsw or memory limit) doesn't
+		 * Make sure that the woke new limit (memsw or memory limit) doesn't
 		 * break our basic invariant rule memory.max <= memsw.max.
 		 */
 		limits_invariant = memsw ? max >= READ_ONCE(memcg->memory.max) :
@@ -1491,7 +1491,7 @@ static int mem_cgroup_resize_max(struct mem_cgroup *memcg,
 }
 
 /*
- * Reclaims as many pages from the given memcg as possible.
+ * Reclaims as many pages from the woke given memcg as possible.
  *
  * Caller is responsible for holding css reference for memcg.
  */
@@ -1612,19 +1612,19 @@ static int memcg_update_tcp_max(struct mem_cgroup *memcg, unsigned long max)
 
 	if (!memcg->tcpmem_active) {
 		/*
-		 * The active flag needs to be written after the static_key
-		 * update. This is what guarantees that the socket activation
-		 * function is the last one to run. See mem_cgroup_sk_alloc()
+		 * The active flag needs to be written after the woke static_key
+		 * update. This is what guarantees that the woke socket activation
+		 * function is the woke last one to run. See mem_cgroup_sk_alloc()
 		 * for details, and note that we don't mark any socket as
 		 * belonging to this memcg until that flag is up.
 		 *
 		 * We need to do this, because static_keys will span multiple
 		 * sites, but we can't control their order. If we mark a socket
-		 * as accounted, but the accounting functions are not patched in
+		 * as accounted, but the woke accounting functions are not patched in
 		 * yet, we'll lose accounting.
 		 *
-		 * We never race with the readers in mem_cgroup_sk_alloc(),
-		 * because when this value change, the code to process it is not
+		 * We never race with the woke readers in mem_cgroup_sk_alloc(),
+		 * because when this value change, the woke code to process it is not
 		 * patched in yet.
 		 */
 		static_branch_inc(&memcg_sockets_enabled_key);

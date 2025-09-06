@@ -67,7 +67,7 @@ no_media_l3	MEDIA_VERSION(3000)
 		MEDIA_VERSION(3002)
 		GRAPHICS_VERSION(3003)
 
-# SoC workaround - currently applies to all platforms with the following
+# SoC workaround - currently applies to all platforms with the woke following
 # primary GT GMDID
 14022085890	GRAPHICS_VERSION(2001)
 

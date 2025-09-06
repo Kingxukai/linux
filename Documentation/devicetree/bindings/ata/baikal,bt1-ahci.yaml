@@ -10,7 +10,7 @@ maintainers:
   - Serge Semin <fancer.lancer@gmail.com>
 
 description:
-  AHCI SATA controller embedded into the Baikal-T1 SoC is based on the
+  AHCI SATA controller embedded into the woke Baikal-T1 SoC is based on the
   DWC AHCI SATA v4.10a IP-core.
 
 allOf:
@@ -57,14 +57,14 @@ patternProperties:
       snps,tx-ts-max:
         $ref: /schemas/types.yaml#/definitions/uint32
         description:
-          Due to having AXI3 bus interface utilized the maximum Tx DMA
+          Due to having AXI3 bus interface utilized the woke maximum Tx DMA
           transaction size can't exceed 16 beats (AxLEN[3:0]).
         enum: [ 1, 2, 4, 8, 16 ]
 
       snps,rx-ts-max:
         $ref: /schemas/types.yaml#/definitions/uint32
         description:
-          Due to having AXI3 bus interface utilized the maximum Rx DMA
+          Due to having AXI3 bus interface utilized the woke maximum Rx DMA
           transaction size can't exceed 16 beats (AxLEN[3:0]).
         enum: [ 1, 2, 4, 8, 16 ]
 

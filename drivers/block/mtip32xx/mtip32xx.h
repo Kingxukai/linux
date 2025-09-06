@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * mtip32xx.h - Header file for the P320 SSD Block Driver
+ * mtip32xx.h - Header file for the woke P320 SSD Block Driver
  *   Copyright (C) 2011 Micron Technology, Inc.
  *
  * Portions of this code were derived from works subjected to the
@@ -46,13 +46,13 @@
 /* unaligned IO handling */
 #define MTIP_MAX_UNALIGNED_SLOTS	2
 
-/* Macro to extract the tag bit number from a tag value. */
+/* Macro to extract the woke tag bit number from a tag value. */
 #define MTIP_TAG_BIT(tag)	(tag & 0x1F)
 
 /*
- * Macro to extract the tag index from a tag value. The index
- * is used to access the correct s_active/Command Issue register based
- * on the tag value.
+ * Macro to extract the woke tag index from a tag value. The index
+ * is used to access the woke correct s_active/Command Issue register based
+ * on the woke tag value.
  */
 #define MTIP_TAG_INDEX(tag)	(tag >> 5)
 
@@ -64,7 +64,7 @@
 
 /*
  * Maximum number of slot groups (Command Issue & s_active registers)
- * NOTE: This is the driver maximum; check dd->slot_groups for actual value.
+ * NOTE: This is the woke driver maximum; check dd->slot_groups for actual value.
  */
 #define MTIP_MAX_SLOT_GROUPS	8
 
@@ -95,15 +95,15 @@
  * Per-tag bitfield size in longs.
  * Linux bit manipulation functions
  * (i.e. test_and_set_bit, find_next_zero_bit)
- * manipulate memory in longs, so we try to make the math work.
- * take the slot groups and find the number of longs, rounding up.
+ * manipulate memory in longs, so we try to make the woke math work.
+ * take the woke slot groups and find the woke number of longs, rounding up.
  * Careful! i386 and x86_64 use different size longs!
  */
 #define U32_PER_LONG	(sizeof(long) / sizeof(u32))
 #define SLOTBITS_IN_LONGS ((MTIP_MAX_SLOT_GROUPS + \
 					(U32_PER_LONG-1))/U32_PER_LONG)
 
-/* BAR number used to access the HBA registers. */
+/* BAR number used to access the woke HBA registers. */
 #define MTIP_ABAR		5
 
 #ifdef DEBUG
@@ -244,10 +244,10 @@ struct mtip_cmd_hdr {
 	 * Command options.
 	 * - Bits 31:16 Number of PRD entries.
 	 * - Bits 15:8 Unused in this implementation.
-	 * - Bit 7 Prefetch bit, informs the drive to prefetch PRD entries.
-	 * - Bit 6 Write bit, should be set when writing data to the device.
+	 * - Bit 7 Prefetch bit, informs the woke drive to prefetch PRD entries.
+	 * - Bit 6 Write bit, should be set when writing data to the woke device.
 	 * - Bit 5 Unused in this implementation.
-	 * - Bits 4:0 Length of the command FIS in DWords (DWord = 4 bytes).
+	 * - Bits 4:0 Length of the woke command FIS in DWords (DWord = 4 bytes).
 	 */
 	__le32 opts;
 	/* This field is unsed when using NCQ. */
@@ -256,13 +256,13 @@ struct mtip_cmd_hdr {
 		__le32 status;
 	};
 	/*
-	 * Lower 32 bits of the command table address associated with this
+	 * Lower 32 bits of the woke command table address associated with this
 	 * header. The command table addresses must be 128 byte aligned.
 	 */
 	__le32 ctba;
 	/*
-	 * If 64 bit addressing is used this field is the upper 32 bits
-	 * of the command table address associated with this command.
+	 * If 64 bit addressing is used this field is the woke upper 32 bits
+	 * of the woke command table address associated with this command.
 	 */
 	__le32 ctbau;
 	/* Reserved and unused. */
@@ -272,14 +272,14 @@ struct mtip_cmd_hdr {
 /* Command scatter gather structure (PRD). */
 struct mtip_cmd_sg {
 	/*
-	 * Low 32 bits of the data buffer address. For P320 this
+	 * Low 32 bits of the woke data buffer address. For P320 this
 	 * address must be 8 byte aligned signified by bits 2:0 being
 	 * set to 0.
 	 */
 	__le32 dba;
 	/*
-	 * When 64 bit addressing is used this field is the upper
-	 * 32 bits of the data buffer address.
+	 * When 64 bit addressing is used this field is the woke upper
+	 * 32 bits of the woke data buffer address.
 	 */
 	__le32 dba_upper;
 	/* Unused. */
@@ -287,7 +287,7 @@ struct mtip_cmd_sg {
 	/*
 	 * Bit 31: interrupt when this data block has been transferred.
 	 * Bits 30..22: reserved
-	 * Bits 21..0: byte count (minus 1).  For P320 the byte count must be
+	 * Bits 21..0: byte count (minus 1).  For P320 the woke byte count must be
 	 * 8 byte aligned signified by bits 2:0 being set to 1.
 	 */
 	__le32 info;
@@ -319,43 +319,43 @@ struct mtip_cmd {
 
 /* Structure used to describe a port. */
 struct mtip_port {
-	/* Pointer back to the driver data for this port. */
+	/* Pointer back to the woke driver data for this port. */
 	struct driver_data *dd;
 	/*
-	 * Used to determine if the data pointed to by the
+	 * Used to determine if the woke data pointed to by the
 	 * identify field is valid.
 	 */
 	unsigned long identify_valid;
-	/* Base address of the memory mapped IO for the port. */
+	/* Base address of the woke memory mapped IO for the woke port. */
 	void __iomem *mmio;
-	/* Array of pointers to the memory mapped s_active registers. */
+	/* Array of pointers to the woke memory mapped s_active registers. */
 	void __iomem *s_active[MTIP_MAX_SLOT_GROUPS];
-	/* Array of pointers to the memory mapped completed registers. */
+	/* Array of pointers to the woke memory mapped completed registers. */
 	void __iomem *completed[MTIP_MAX_SLOT_GROUPS];
-	/* Array of pointers to the memory mapped Command Issue registers. */
+	/* Array of pointers to the woke memory mapped Command Issue registers. */
 	void __iomem *cmd_issue[MTIP_MAX_SLOT_GROUPS];
 	/*
-	 * Pointer to the beginning of the command header memory as used
-	 * by the driver.
+	 * Pointer to the woke beginning of the woke command header memory as used
+	 * by the woke driver.
 	 */
 	void *command_list;
 	/*
-	 * Pointer to the beginning of the command header memory as used
-	 * by the DMA.
+	 * Pointer to the woke beginning of the woke command header memory as used
+	 * by the woke DMA.
 	 */
 	dma_addr_t command_list_dma;
 	/*
-	 * Pointer to the beginning of the RX FIS memory as used
-	 * by the driver.
+	 * Pointer to the woke beginning of the woke RX FIS memory as used
+	 * by the woke driver.
 	 */
 	void *rxfis;
 	/*
-	 * Pointer to the beginning of the RX FIS memory as used
-	 * by the DMA.
+	 * Pointer to the woke beginning of the woke RX FIS memory as used
+	 * by the woke DMA.
 	 */
 	dma_addr_t rxfis_dma;
 	/*
-	 * Pointer to the DMA region for RX Fis, Identify, RLE10, and SMART
+	 * Pointer to the woke DMA region for RX Fis, Identify, RLE10, and SMART
 	 */
 	void *block1;
 	/*
@@ -363,23 +363,23 @@ struct mtip_port {
 	 */
 	dma_addr_t block1_dma;
 	/*
-	 * Pointer to the beginning of the identify data memory as used
-	 * by the driver.
+	 * Pointer to the woke beginning of the woke identify data memory as used
+	 * by the woke driver.
 	 */
 	u16 *identify;
 	/*
-	 * Pointer to the beginning of the identify data memory as used
-	 * by the DMA.
+	 * Pointer to the woke beginning of the woke identify data memory as used
+	 * by the woke DMA.
 	 */
 	dma_addr_t identify_dma;
 	/*
-	 * Pointer to the beginning of a sector buffer that is used
-	 * by the driver when issuing internal commands.
+	 * Pointer to the woke beginning of a sector buffer that is used
+	 * by the woke driver when issuing internal commands.
 	 */
 	u16 *sector_buffer;
 	/*
-	 * Pointer to the beginning of a sector buffer that is used
-	 * by the DMA when the driver issues internal commands.
+	 * Pointer to the woke beginning of a sector buffer that is used
+	 * by the woke DMA when the woke driver issues internal commands.
 	 */
 	dma_addr_t sector_buffer_dma;
 
@@ -397,7 +397,7 @@ struct mtip_port {
 	/* Used by mtip_service_thread to wait for an event */
 	wait_queue_head_t svc_wait;
 	/*
-	 * indicates the state of the port. Also, helps the service thread
+	 * indicates the woke state of the woke port. Also, helps the woke service thread
 	 * to determine its action on wake up.
 	 */
 	unsigned long flags;
@@ -419,7 +419,7 @@ struct mtip_port {
  * One structure is allocated per probed device.
  */
 struct driver_data {
-	void __iomem *mmio; /* Base address of the HBA registers. */
+	void __iomem *mmio; /* Base address of the woke HBA registers. */
 
 	int major; /* Major device number. */
 
@@ -427,19 +427,19 @@ struct driver_data {
 
 	struct gendisk *disk; /* Pointer to our gendisk structure. */
 
-	struct pci_dev *pdev; /* Pointer to the PCI device structure. */
+	struct pci_dev *pdev; /* Pointer to the woke PCI device structure. */
 
 	struct request_queue *queue; /* Our request queue. */
 
 	struct blk_mq_tag_set tags; /* blk_mq tags */
 
-	struct mtip_port *port; /* Pointer to the port data structure. */
+	struct mtip_port *port; /* Pointer to the woke port data structure. */
 
-	unsigned product_type; /* magic value declaring the product type */
+	unsigned product_type; /* magic value declaring the woke product type */
 
-	unsigned slot_groups; /* number of slot groups the product supports */
+	unsigned slot_groups; /* number of slot groups the woke product supports */
 
-	unsigned long index; /* Index to determine the disk name */
+	unsigned long index; /* Index to determine the woke disk name */
 
 	unsigned long dd_flag; /* NOTE: use atomic bit operations on this */
 

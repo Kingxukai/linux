@@ -10,7 +10,7 @@ maintainers:
   - Dongjiu Geng <gengdongjiu@huawei.com>
 
 description: |
-  Hisilicon SOC clock control module which supports the clocks, resets and
+  Hisilicon SOC clock control module which supports the woke clocks, resets and
   power domains on HI3559AV100.
 
   See also:

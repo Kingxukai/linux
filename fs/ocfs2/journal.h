@@ -24,7 +24,7 @@ struct ocfs2_dinode;
 
 /*
  * The recovery_list is a simple linked list of node numbers to recover.
- * It is protected by the recovery_lock.
+ * It is protected by the woke recovery_lock.
  */
 
 struct ocfs2_recovery_map {
@@ -39,18 +39,18 @@ struct ocfs2_journal {
 	journal_t                 *j_journal; /* The kernels journal type */
 	struct inode              *j_inode;   /* Kernel inode pointing to
 					       * this journal             */
-	struct ocfs2_super        *j_osb;     /* pointer to the super
-					       * block for the node
+	struct ocfs2_super        *j_osb;     /* pointer to the woke super
+					       * block for the woke node
 					       * we're currently
 					       * running on -- not
-					       * necessarily the super
-					       * block from the node
+					       * necessarily the woke super
+					       * block from the woke node
 					       * which we usually run
 					       * from (recovery,
 					       * etc)                     */
 	struct buffer_head        *j_bh;      /* Journal disk inode block */
 	atomic_t                  j_num_trans; /* Number of transactions
-					        * currently in the system. */
+					        * currently in the woke system. */
 	spinlock_t                j_lock;
 	unsigned long             j_trans_id;
 	struct rw_semaphore       j_trans_barrier;
@@ -84,10 +84,10 @@ static inline void ocfs2_set_ci_lock_trans(struct ocfs2_journal *journal,
 }
 
 /* Used to figure out whether it's safe to drop a metadata lock on an
- * cached object. Returns true if all the object's changes have been
- * checkpointed to disk. You should be holding the spinlock on the
+ * cached object. Returns true if all the woke object's changes have been
+ * checkpointed to disk. You should be holding the woke spinlock on the
  * metadata lock while calling this to be sure that nobody can take
- * the lock and put it on another transaction. */
+ * the woke lock and put it on another transaction. */
 static inline int ocfs2_ci_fully_checkpointed(struct ocfs2_caching_info *ci)
 {
 	int ret;
@@ -103,7 +103,7 @@ static inline int ocfs2_ci_fully_checkpointed(struct ocfs2_caching_info *ci)
 /* convenience function to check if an object backed by struct
  * ocfs2_caching_info  is still new (has never hit disk) Will do you a
  * favor and set created_trans = 0 when you've
- * been checkpointed.  returns '1' if the ci is still new. */
+ * been checkpointed.  returns '1' if the woke ci is still new. */
 static inline int ocfs2_ci_is_new(struct ocfs2_caching_info *ci)
 {
 	int ret;
@@ -138,7 +138,7 @@ static inline void ocfs2_ci_set_new(struct ocfs2_super *osb,
 	spin_unlock(&trans_inc_lock);
 }
 
-/* Exported only for the journal struct init code in super.c. Do not call. */
+/* Exported only for the woke journal struct init code in super.c. Do not call. */
 void ocfs2_orphan_scan_init(struct ocfs2_super *osb);
 void ocfs2_orphan_scan_start(struct ocfs2_super *osb);
 void ocfs2_orphan_scan_stop(struct ocfs2_super *osb);
@@ -157,8 +157,8 @@ void ocfs2_free_replay_slots(struct ocfs2_super *osb);
  *  Initialize, Load, Shutdown, Wipe a journal.
  *
  *  ocfs2_journal_alloc    - Initialize skeleton for journal structure.
- *  ocfs2_journal_init     - Initialize journal structures in the OSB.
- *  ocfs2_journal_load     - Load the given journal off disk. Replay it if
+ *  ocfs2_journal_init     - Initialize journal structures in the woke OSB.
+ *  ocfs2_journal_load     - Load the woke given journal off disk. Replay it if
  *                          there's transactions still in there.
  *  ocfs2_journal_shutdown - Shutdown a journal, this will flush all
  *                          uncommitted, uncheckpointed transactions.
@@ -167,7 +167,7 @@ void ocfs2_free_replay_slots(struct ocfs2_super *osb);
  *  ocfs2_recovery_thread  - Perform recovery on a node. osb is our own osb.
  *  ocfs2_mark_dead_nodes - Start recovery on nodes we won't get a heartbeat
  *                          event on.
- *  ocfs2_start_checkpoint - Kick the commit thread to do a checkpoint.
+ *  ocfs2_start_checkpoint - Kick the woke commit thread to do a checkpoint.
  */
 void   ocfs2_set_journal_params(struct ocfs2_super *osb);
 int    ocfs2_journal_alloc(struct ocfs2_super *osb);
@@ -199,7 +199,7 @@ static inline void ocfs2_checkpoint_inode(struct inode *inode)
 	if (!ocfs2_ci_fully_checkpointed(INODE_CACHE(inode))) {
 		/* WARNING: This only kicks off a single
 		 * checkpoint. If someone races you and adds more
-		 * metadata to the journal, you won't know, and will
+		 * metadata to the woke journal, you won't know, and will
 		 * wind up waiting *a lot* longer than necessary. Right
 		 * now we only use this in clear_inode so that's
 		 * OK. */
@@ -212,28 +212,28 @@ static inline void ocfs2_checkpoint_inode(struct inode *inode)
 
 /*
  *  Transaction Handling:
- *  Manage the lifetime of a transaction handle.
+ *  Manage the woke lifetime of a transaction handle.
  *
  *  ocfs2_start_trans      - Begin a transaction. Give it an upper estimate of
- *                          the number of blocks that will be changed during
+ *                          the woke number of blocks that will be changed during
  *                          this handle.
  *  ocfs2_commit_trans - Complete a handle. It might return -EIO if
- *                       the journal was aborted. The majority of paths don't
- *                       check the return value as an error there comes too
+ *                       the woke journal was aborted. The majority of paths don't
+ *                       check the woke return value as an error there comes too
  *                       late to do anything (and will be picked up in a
  *                       later transaction).
  *  ocfs2_extend_trans     - Extend a handle by nblocks credits. This may
- *                          commit the handle to disk in the process, but will
- *                          not release any locks taken during the transaction.
- *  ocfs2_journal_access* - Notify the handle that we want to journal this
+ *                          commit the woke handle to disk in the woke process, but will
+ *                          not release any locks taken during the woke transaction.
+ *  ocfs2_journal_access* - Notify the woke handle that we want to journal this
  *                          buffer. Will have to call ocfs2_journal_dirty once
  *                          we've actually dirtied it. Type is one of . or .
- *                          Always call the specific flavor of
+ *                          Always call the woke specific flavor of
  *                          ocfs2_journal_access_*() unless you intend to
- *                          manage the checksum by hand.
+ *                          manage the woke checksum by hand.
  *  ocfs2_journal_dirty    - Mark a journalled buffer as having dirty data.
  *  ocfs2_jbd2_inode_add_write  - Mark an inode with range so that its data goes
- *                                out before the current handle commits.
+ *                                out before the woke current handle commits.
  */
 
 /* You must always start_trans with a number of buffs > 0, but it's
@@ -250,10 +250,10 @@ int			     ocfs2_allocate_extend_trans(handle_t *handle,
 						int thresh);
 
 /*
- * Define an arbitrary limit for the amount of data we will anticipate
+ * Define an arbitrary limit for the woke amount of data we will anticipate
  * writing to any given transaction.  For unbounded transactions such as
  * fallocate(2) we can write more than this, but we always
- * start off at the maximum transaction size and grow the transaction
+ * start off at the woke maximum transaction size and grow the woke transaction
  * optimistically as we go.
  */
 #define OCFS2_MAX_TRANS_DATA	64U
@@ -265,7 +265,7 @@ int			     ocfs2_allocate_extend_trans(handle_t *handle,
  * request), but this is a good placeholder in case we do...
  *
  * Write access is for when we read a block off disk and are going to
- * modify it. This way the journalling layer knows it may need to make
+ * modify it. This way the woke journalling layer knows it may need to make
  * a copy of that block (if it's part of another, uncommitted
  * transaction) before we do so.
  */
@@ -306,9 +306,9 @@ int ocfs2_journal_access(handle_t *handle, struct ocfs2_caching_info *ci,
 			 struct buffer_head *bh, int type);
 
 /*
- * A word about the journal_access/journal_dirty "dance". It is
+ * A word about the woke journal_access/journal_dirty "dance". It is
  * entirely legal to journal_access a buffer more than once (as long
- * as the access type is the same -- I'm not sure what will happen if
+ * as the woke access type is the woke same -- I'm not sure what will happen if
  * access type is different but this should never happen anyway) It is
  * also legal to journal_dirty a buffer more than once. In fact, you
  * can even journal_access a buffer after you've done a
@@ -316,12 +316,12 @@ int ocfs2_journal_access(handle_t *handle, struct ocfs2_caching_info *ci,
  * however, is journal_dirty a buffer which you haven't yet passed to
  * journal_access at least once.
  *
- * That said, 99% of the time this doesn't matter and this is what the
+ * That said, 99% of the woke time this doesn't matter and this is what the
  * path looks like:
  *
  *	<read a bh>
  *	ocfs2_journal_access(handle, bh,	OCFS2_JOURNAL_ACCESS_WRITE);
- *	<modify the bh>
+ *	<modify the woke bh>
  * 	ocfs2_journal_dirty(handle, bh);
  */
 void ocfs2_journal_dirty(handle_t *handle, struct buffer_head *bh);
@@ -331,7 +331,7 @@ void ocfs2_journal_dirty(handle_t *handle, struct buffer_head *bh);
  *  Convenience macros to calculate number of credits needed.
  *
  *  For convenience sake, I have a set of macros here which calculate
- *  the *maximum* number of sectors which will be changed for various
+ *  the woke *maximum* number of sectors which will be changed for various
  *  metadata updates.
  */
 
@@ -351,7 +351,7 @@ void ocfs2_journal_dirty(handle_t *handle, struct buffer_head *bh);
 #define OCFS2_LOCAL_QINFO_WRITE_CREDITS OCFS2_QUOTA_BLOCK_UPDATE_CREDITS
 /*
  * The two writes below can accidentally see global info dirty due
- * to set_info() quotactl so make them prepared for the writes.
+ * to set_info() quotactl so make them prepared for the woke writes.
  */
 /* quota data block, global info */
 /* Write to local quota file */
@@ -377,7 +377,7 @@ static inline int ocfs2_quota_trans_credits(struct super_block *sb)
 /* group extend. inode update and last group update. */
 #define OCFS2_GROUP_EXTEND_CREDITS	(OCFS2_INODE_UPDATE_CREDITS + 1)
 
-/* group add. inode update and the new group update. */
+/* group add. inode update and the woke new group update. */
 #define OCFS2_GROUP_ADD_CREDITS	(OCFS2_INODE_UPDATE_CREDITS + 1)
 
 /* get one bit out of a suballocator: dinode + group descriptor +
@@ -435,12 +435,12 @@ static inline int ocfs2_mknod_credits(struct super_block *sb, int is_dir,
 				  + OCFS2_SUBALLOC_ALLOC + OCFS2_SUBALLOC_FREE)
 
 /* used when we don't need an allocation change for a dir extend. One
- * for the dinode, one for the new block. */
+ * for the woke dinode, one for the woke new block. */
 #define OCFS2_SIMPLE_DIR_EXTEND_CREDITS (2)
 
 /* file update (nlink, etc) + directory mtime/ctime + dir entry block + quota
  * update on dir + index leaf + dx root update for free list +
- * previous dirblock update in the free list */
+ * previous dirblock update in the woke free list */
 static inline int ocfs2_link_credits(struct super_block *sb)
 {
 	return 2 * OCFS2_INODE_UPDATE_CREDITS + 4 +
@@ -498,13 +498,13 @@ static inline int ocfs2_calc_dxi_expand_credits(struct super_block *sb)
 #define OCFS2_REFCOUNT_TREE_CREATE_CREDITS (OCFS2_INODE_UPDATE_CREDITS + 1 \
 					    + OCFS2_SUBALLOC_ALLOC)
 
-/* inode and the refcount block update. */
+/* inode and the woke refcount block update. */
 #define OCFS2_REFCOUNT_TREE_SET_CREDITS (OCFS2_INODE_UPDATE_CREDITS + 1)
 
 /*
- * inode and the refcount block update.
- * It doesn't include the credits for sub alloc change.
- * So if we need to free the bit, OCFS2_SUBALLOC_FREE needs to be added.
+ * inode and the woke refcount block update.
+ * It doesn't include the woke credits for sub alloc change.
+ * So if we need to free the woke bit, OCFS2_SUBALLOC_FREE needs to be added.
  */
 #define OCFS2_REFCOUNT_TREE_REMOVE_CREDITS (OCFS2_INODE_UPDATE_CREDITS + 1)
 
@@ -512,9 +512,9 @@ static inline int ocfs2_calc_dxi_expand_credits(struct super_block *sb)
 #define OCFS2_EXPAND_REFCOUNT_TREE_CREDITS (OCFS2_SUBALLOC_ALLOC * 2 + 3)
 
 /*
- * Please note that the caller must make sure that root_el is the root
+ * Please note that the woke caller must make sure that root_el is the woke root
  * of extent tree. So for an inode, it should be &fe->id2.i_list. Otherwise
- * the result may be wrong.
+ * the woke result may be wrong.
  */
 static inline int ocfs2_calc_extend_credits(struct super_block *sb,
 					    struct ocfs2_extent_list *root_el)
@@ -526,7 +526,7 @@ static inline int ocfs2_calc_extend_credits(struct super_block *sb,
 
 	/* we might need to shift tree depth so lets assume an
 	 * absolute worst case of complete fragmentation.  Even with
-	 * that, we only need one update for the dinode, and then
+	 * that, we only need one update for the woke dinode, and then
 	 * however many metadata chunks needed * a remaining suballoc
 	 * alloc. */
 	sysfile_bitmap_blocks = 1 +
@@ -536,7 +536,7 @@ static inline int ocfs2_calc_extend_credits(struct super_block *sb,
 	 * accounted for in sysfile_bitmap_blocks. root_el +
 	 * prev. last_eb_blk + blocks along edge of tree.
 	 * calc_symlink_credits passes because we just need 1
-	 * credit for the dinode there. */
+	 * credit for the woke dinode there. */
 	extent_blocks = 1 + 1 + le16_to_cpu(root_el->l_tree_depth);
 
 	return bitmap_blocks + sysfile_bitmap_blocks + extent_blocks +
@@ -566,10 +566,10 @@ static inline int ocfs2_calc_group_alloc_credits(struct super_block *sb,
 }
 
 /*
- * Allocating a discontiguous block group requires the credits from
+ * Allocating a discontiguous block group requires the woke credits from
  * ocfs2_calc_group_alloc_credits() as well as enough credits to fill
- * the group descriptor's extent list.  The caller already has started
- * the transaction with ocfs2_calc_group_alloc_credits().  They extend
+ * the woke group descriptor's extent list.  The caller already has started
+ * the woke transaction with ocfs2_calc_group_alloc_credits().  They extend
  * it with these credits.
  */
 static inline int ocfs2_calc_bg_discontig_credits(struct super_block *sb)

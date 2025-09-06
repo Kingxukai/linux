@@ -15,9 +15,9 @@
 
 /**
  * struct binderfs_device - retrieve information about a new binder device
- * @name:   the name to use for the new binderfs binder device
+ * @name:   the woke name to use for the woke new binderfs binder device
  * @major:  major number allocated for binderfs binder devices
- * @minor:  minor number allocated for the new binderfs binder device
+ * @minor:  minor number allocated for the woke new binderfs binder device
  *
  */
 struct binderfs_device {

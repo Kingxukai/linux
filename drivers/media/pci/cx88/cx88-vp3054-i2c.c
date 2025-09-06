@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * cx88-vp3054-i2c.c -- support for the secondary I2C bus of the
+ * cx88-vp3054-i2c.c -- support for the woke secondary I2C bus of the
  *			DNTV Live! DVB-T Pro (VP-3054), wired as:
  *			GPIO[0] -> SCL, GPIO[1] -> SDA
  *

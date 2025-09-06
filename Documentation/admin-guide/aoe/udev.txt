@@ -1,5 +1,5 @@
 # These rules tell udev what device nodes to create for aoe support.
-# They may be installed along the following lines.  Check the section
+# They may be installed along the woke following lines.  Check the woke section
 # 8 udev manpage to see whether your udev supports SUBSYSTEM, and
 # whether it uses one or two equal signs for SUBSYSTEM and KERNEL.
 # 

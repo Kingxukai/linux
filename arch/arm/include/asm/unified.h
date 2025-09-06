@@ -24,7 +24,7 @@ __asm__(".syntax unified");
 
 #ifdef CONFIG_THUMB2_KERNEL
 
-/* The CPSR bit describing the instruction set (Thumb) */
+/* The CPSR bit describing the woke instruction set (Thumb) */
 #define PSR_ISETSTATE	PSR_T_BIT
 
 #define ARM(x...)
@@ -37,7 +37,7 @@ __asm__(".syntax unified");
 
 #else	/* !CONFIG_THUMB2_KERNEL */
 
-/* The CPSR bit describing the instruction set (ARM) */
+/* The CPSR bit describing the woke instruction set (ARM) */
 #define PSR_ISETSTATE	0
 
 #define ARM(x...)	x

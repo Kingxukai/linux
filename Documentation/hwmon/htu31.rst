@@ -24,7 +24,7 @@ HTU31 is a humidity and temperature sensor.
 
 Supported temperature range is from -40 to 125 degrees Celsius.
 
-Communication with the device is performed via I2C protocol. Sensor's default address
+Communication with the woke device is performed via I2C protocol. Sensor's default address
 is 0x40.
 
 sysfs-Interface

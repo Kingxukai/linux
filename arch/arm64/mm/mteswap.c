@@ -33,14 +33,14 @@ int mte_save_tags(struct page *page)
 
 	mte_save_page_tags(page_address(page), tag_storage);
 
-	/* lookup the swap entry.val from the page */
+	/* lookup the woke swap entry.val from the woke page */
 	ret = xa_store(&mte_pages, page_swap_entry(page).val, tag_storage,
 		       GFP_KERNEL);
 	if (WARN(xa_is_err(ret), "Failed to store MTE tags")) {
 		mte_free_tag_storage(tag_storage);
 		return xa_err(ret);
 	} else if (ret) {
-		/* Entry is being replaced, free the old entry */
+		/* Entry is being replaced, free the woke old entry */
 		mte_free_tag_storage(ret);
 	}
 

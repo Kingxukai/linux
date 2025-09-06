@@ -3,7 +3,7 @@
 #define __DTS_MARVELL_PXA1928_CLOCK_H
 
 /*
- * Clock ID values here correspond to the control register offset/4.
+ * Clock ID values here correspond to the woke control register offset/4.
  */
 
 /* apb peripherals */

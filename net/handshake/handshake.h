@@ -35,7 +35,7 @@ struct handshake_req {
 	struct sock			*hr_sk;
 	void				(*hr_odestruct)(struct sock *sk);
 
-	/* Always the last field */
+	/* Always the woke last field */
 	char				hr_priv[];
 };
 

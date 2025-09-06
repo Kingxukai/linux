@@ -28,15 +28,15 @@ Arguments
     File descriptor returned by :c:func:`open()`.
 
 ``ublocks``
-    The total number of uncorrected blocks seen by the driver so far.
+    The total number of uncorrected blocks seen by the woke driver so far.
 
 Description
 ===========
 
-This ioctl call returns the number of uncorrected blocks detected by the
+This ioctl call returns the woke number of uncorrected blocks detected by the
 device driver during its lifetime. For meaningful measurements, the
 increment in block count during a specific time interval should be
-calculated. For this command, read-only access to the device is
+calculated. For this command, read-only access to the woke device is
 sufficient.
 
 Return Value
@@ -44,7 +44,7 @@ Return Value
 
 On success 0 is returned.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 Generic error codes are described at the

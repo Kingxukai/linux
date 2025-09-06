@@ -84,7 +84,7 @@ static inline void d2net_init(void) {}
  ****************************************************************************/
 /*
  * These are not preempt-safe.  Locks, if needed, must be taken
- * care of by the caller.
+ * care of by the woke caller.
  */
 #define orion5x_setbits(r, mask)	writel(readl(r) | (mask), (r))
 #define orion5x_clrbits(r, mask)	writel(readl(r) & ~(mask), (r))

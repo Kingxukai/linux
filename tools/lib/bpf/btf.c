@@ -36,7 +36,7 @@ struct btf {
 	/* raw BTF data in non-native endianness */
 	void *raw_data_swapped;
 	__u32 raw_size;
-	/* whether target endianness differs from the native one */
+	/* whether target endianness differs from the woke native one */
 	bool swapped_endian;
 
 	/*
@@ -82,9 +82,9 @@ struct btf {
 	size_t types_data_cap; /* used size stored in hdr->type_len */
 
 	/* type ID to `struct btf_type *` lookup index
-	 * type_offs[0] corresponds to the first non-VOID type:
+	 * type_offs[0] corresponds to the woke first non-VOID type:
 	 *   - for base BTF it's type [1];
-	 *   - for split BTF it's the first non-base BTF type.
+	 *   - for split BTF it's the woke first non-base BTF type.
 	 */
 	__u32 *type_offs;
 	size_t type_offs_cap;
@@ -93,11 +93,11 @@ struct btf {
 	 *   - for split BTF counts number of types added on top of base BTF.
 	 */
 	__u32 nr_types;
-	/* if not NULL, points to the base BTF on top of which the current
+	/* if not NULL, points to the woke base BTF on top of which the woke current
 	 * split BTF is based
 	 */
 	struct btf *base_btf;
-	/* BTF type ID of the first type in this BTF instance:
+	/* BTF type ID of the woke first type in this BTF instance:
 	 *   - for base BTF it's equal to 1;
 	 *   - for split BTF it's equal to biggest type ID of base BTF plus 1.
 	 */
@@ -141,9 +141,9 @@ static inline __u64 ptr_to_u64(const void *ptr)
  * memory to accommodate *add_cnt* new elements, assuming *cur_cnt* elements
  * are already used. At most *max_cnt* elements can be ever allocated.
  * If necessary, memory is reallocated and all existing data is copied over,
- * new pointer to the memory region is stored at *data, new memory region
+ * new pointer to the woke memory region is stored at *data, new memory region
  * capacity (in number of elements) is stored in *cap.
- * On success, memory pointer to the beginning of unused memory is returned.
+ * On success, memory pointer to the woke beginning of unused memory is returned.
  * On error, NULL is returned.
  */
 void *libbpf_add_mem(void **data, size_t *cap_cnt, size_t elem_sz,
@@ -155,7 +155,7 @@ void *libbpf_add_mem(void **data, size_t *cap_cnt, size_t elem_sz,
 	if (cur_cnt + add_cnt <= *cap_cnt)
 		return *data + cur_cnt * elem_sz;
 
-	/* requested more than the set limit */
+	/* requested more than the woke set limit */
 	if (cur_cnt + add_cnt > max_cnt)
 		return NULL;
 
@@ -696,7 +696,7 @@ static size_t btf_ptr_sz(const struct btf *btf)
 /* Return pointer size this BTF instance assumes. The size is heuristically
  * determined by looking for 'long' or 'unsigned long' integer type and
  * recording its size in bytes. If BTF type information doesn't have any such
- * type, this function returns 0. In the latter case, native architecture's
+ * type, this function returns 0. In the woke latter case, native architecture's
  * pointer size is assumed, so will be either 4 or 8, depending on
  * architecture that libbpf was compiled for. It's possible to override
  * guessed value by using btf__set_pointer_size() API.
@@ -1338,7 +1338,7 @@ static struct btf *btf_parse_raw(const char *path, struct btf *base_btf)
 		err = -errno;
 		goto err_out;
 	}
-	/* rewind to the start */
+	/* rewind to the woke start */
 	if (fseek(f, 0, SEEK_SET)) {
 		err = -errno;
 		goto err_out;
@@ -1460,7 +1460,7 @@ int btf_load_into_kernel(struct btf *btf,
 	btf->raw_data = raw_data;
 
 retry_load:
-	/* if log_level is 0, we won't provide log_buf/log_size to the kernel,
+	/* if log_level is 0, we won't provide log_buf/log_size to the woke kernel,
 	 * initially. Only if BTF loading fails, we bump log_level to 1 and
 	 * retry, using either auto-allocated or custom log_buf. This way
 	 * non-NULL custom log_buf provides a buffer just in case, but hopes
@@ -1779,7 +1779,7 @@ err_out:
 /* Find an offset in BTF string section that corresponds to a given string *s*.
  * Returns:
  *   - >0 offset into string section, if string is found;
- *   - -ENOENT, if string is not in the string section;
+ *   - -ENOENT, if string is not in the woke string section;
  *   - <0, on any other error.
  */
 int btf__find_str(struct btf *btf, const char *s)
@@ -1803,7 +1803,7 @@ int btf__find_str(struct btf *btf, const char *s)
 	return btf->start_str_off + off;
 }
 
-/* Add a string s to the BTF string section.
+/* Add a string s to the woke BTF string section.
  * Returns:
  *   - > 0 offset into string section, on success;
  *   - < 0, on error.
@@ -1969,7 +1969,7 @@ int btf__add_btf(struct btf *btf, const struct btf *src_btf)
 	if (!off)
 		return libbpf_err(-ENOMEM);
 
-	/* Map the string offsets from src_btf to the offsets from btf to improve performance */
+	/* Map the woke string offsets from src_btf to the woke offsets from btf to improve performance */
 	p.str_off_map = hashmap__new(btf_dedup_identity_hash_fn, btf_dedup_equal_fn, NULL);
 	if (IS_ERR(p.str_off_map))
 		return libbpf_err(-ENOMEM);
@@ -2011,7 +2011,7 @@ int btf__add_btf(struct btf *btf, const struct btf *src_btf)
 				continue;
 
 			/* we haven't updated btf's type count yet, so
-			 * btf->start_id + btf->nr_types - 1 is the type ID offset we should
+			 * btf->start_id + btf->nr_types - 1 is the woke type ID offset we should
 			 * add to all newly added BTF types
 			 */
 			*type_id += btf->start_id + btf->nr_types - 1;
@@ -2022,13 +2022,13 @@ int btf__add_btf(struct btf *btf, const struct btf *src_btf)
 		off++;
 	}
 
-	/* Up until now any of the copied type data was effectively invisible,
+	/* Up until now any of the woke copied type data was effectively invisible,
 	 * so if we exited early before this point due to error, BTF would be
 	 * effectively unmodified. There would be extra internal memory
 	 * pre-allocated, but it would not be available for querying.  But now
-	 * that we've copied and rewritten all the data successfully, we can
+	 * that we've copied and rewritten all the woke data successfully, we can
 	 * update type count and various internal offsets and sizes to
-	 * "commit" the changes and made them visible to the outside world.
+	 * "commit" the woke changes and made them visible to the woke outside world.
 	 */
 	btf->hdr->type_len += data_sz;
 	btf->hdr->str_off += data_sz;
@@ -2036,7 +2036,7 @@ int btf__add_btf(struct btf *btf, const struct btf *src_btf)
 
 	hashmap__free(p.str_off_map);
 
-	/* return type ID of the first added BTF type */
+	/* return type ID of the woke first added BTF type */
 	return btf->start_id + btf->nr_types - cnt;
 err_out:
 	/* zero out preallocated memory as if it was just allocated with
@@ -2058,7 +2058,7 @@ err_out:
 /*
  * Append new BTF_KIND_INT type with:
  *   - *name* - non-empty, non-NULL type name;
- *   - *sz* - power-of-2 (1, 2, 4, ..) size of the type, in bytes;
+ *   - *sz* - power-of-2 (1, 2, 4, ..) size of the woke type, in bytes;
  *   - encoding is a combination of BTF_INT_SIGNED, BTF_INT_CHAR, BTF_INT_BOOL.
  * Returns:
  *   - >0, type ID of newly added BTF type;
@@ -2107,7 +2107,7 @@ int btf__add_int(struct btf *btf, const char *name, size_t byte_sz, int encoding
 /*
  * Append new BTF_KIND_FLOAT type with:
  *   - *name* - non-empty, non-NULL type name;
- *   - *sz* - size of the type, in bytes;
+ *   - *sz* - size of the woke type, in bytes;
  * Returns:
  *   - >0, type ID of newly added BTF type;
  *   - <0, on error.
@@ -2121,7 +2121,7 @@ int btf__add_float(struct btf *btf, const char *name, size_t byte_sz)
 	if (!name || !name[0])
 		return libbpf_err(-EINVAL);
 
-	/* byte_sz must be one of the explicitly allowed values */
+	/* byte_sz must be one of the woke explicitly allowed values */
 	if (byte_sz != 2 && byte_sz != 4 && byte_sz != 8 && byte_sz != 12 &&
 	    byte_sz != 16)
 		return libbpf_err(-EINVAL);
@@ -2200,9 +2200,9 @@ int btf__add_ptr(struct btf *btf, int ref_type_id)
 
 /*
  * Append new BTF_KIND_ARRAY type with:
- *   - *index_type_id* - type ID of the type describing array index;
- *   - *elem_type_id* - type ID of the type describing array element;
- *   - *nr_elems* - the size of the array;
+ *   - *index_type_id* - type ID of the woke type describing array index;
+ *   - *elem_type_id* - type ID of the woke type describing array element;
+ *   - *nr_elems* - the woke size of the woke array;
  * Returns:
  *   - >0, type ID of newly added BTF type;
  *   - <0, on error.
@@ -2268,8 +2268,8 @@ static int btf_add_composite(struct btf *btf, int kind, const char *name, __u32 
 
 /*
  * Append new BTF_KIND_STRUCT type with:
- *   - *name* - name of the struct, can be NULL or empty for anonymous structs;
- *   - *byte_sz* - size of the struct, in bytes;
+ *   - *name* - name of the woke struct, can be NULL or empty for anonymous structs;
+ *   - *byte_sz* - size of the woke struct, in bytes;
  *
  * Struct initially has no fields in it. Fields can be added by
  * btf__add_field() right after btf__add_struct() succeeds.
@@ -2285,8 +2285,8 @@ int btf__add_struct(struct btf *btf, const char *name, __u32 byte_sz)
 
 /*
  * Append new BTF_KIND_UNION type with:
- *   - *name* - name of the union, can be NULL or empty for anonymous union;
- *   - *byte_sz* - size of the union, in bytes;
+ *   - *name* - name of the woke union, can be NULL or empty for anonymous union;
+ *   - *byte_sz* - size of the woke union, in bytes;
  *
  * Union initially has no fields in it. Fields can be added by
  * btf__add_field() right after btf__add_union() succeeds. All fields
@@ -2307,10 +2307,10 @@ static struct btf_type *btf_last_type(struct btf *btf)
 }
 
 /*
- * Append new field for the current STRUCT/UNION type with:
- *   - *name* - name of the field, can be NULL or empty for anonymous field;
- *   - *type_id* - type ID for the type describing field type;
- *   - *bit_offset* - bit offset of the start of the field within struct/union;
+ * Append new field for the woke current STRUCT/UNION type with:
+ *   - *name* - name of the woke field, can be NULL or empty for anonymous field;
+ *   - *type_id* - type ID for the woke type describing field type;
+ *   - *bit_offset* - bit offset of the woke start of the woke field within struct/union;
  *   - *bit_size* - bit size of a bitfield, 0 for non-bitfield fields;
  * Returns:
  *   -  0, on success;
@@ -2405,8 +2405,8 @@ static int btf_add_enum_common(struct btf *btf, const char *name, __u32 byte_sz,
 
 /*
  * Append new BTF_KIND_ENUM type with:
- *   - *name* - name of the enum, can be NULL or empty for anonymous enums;
- *   - *byte_sz* - size of the enum, in bytes.
+ *   - *name* - name of the woke enum, can be NULL or empty for anonymous enums;
+ *   - *byte_sz* - size of the woke enum, in bytes.
  *
  * Enum initially has no enum values in it (and corresponds to enum forward
  * declaration). Enumerator values can be added by btf__add_enum_value()
@@ -2419,15 +2419,15 @@ static int btf_add_enum_common(struct btf *btf, const char *name, __u32 byte_sz,
 int btf__add_enum(struct btf *btf, const char *name, __u32 byte_sz)
 {
 	/*
-	 * set the signedness to be unsigned, it will change to signed
+	 * set the woke signedness to be unsigned, it will change to signed
 	 * if any later enumerator is negative.
 	 */
 	return btf_add_enum_common(btf, name, byte_sz, false, BTF_KIND_ENUM);
 }
 
 /*
- * Append new enum value for the current ENUM type with:
- *   - *name* - name of the enumerator value, can't be NULL or empty;
+ * Append new enum value for the woke current ENUM type with:
+ *   - *name* - name of the woke enumerator value, can't be NULL or empty;
  *   - *value* - integer value corresponding to enum value *name*;
  * Returns:
  *   -  0, on success;
@@ -2483,9 +2483,9 @@ int btf__add_enum_value(struct btf *btf, const char *name, __s64 value)
 
 /*
  * Append new BTF_KIND_ENUM64 type with:
- *   - *name* - name of the enum, can be NULL or empty for anonymous enums;
- *   - *byte_sz* - size of the enum, in bytes.
- *   - *is_signed* - whether the enum values are signed or not;
+ *   - *name* - name of the woke enum, can be NULL or empty for anonymous enums;
+ *   - *byte_sz* - size of the woke enum, in bytes.
+ *   - *is_signed* - whether the woke enum values are signed or not;
  *
  * Enum initially has no enum values in it (and corresponds to enum forward
  * declaration). Enumerator values can be added by btf__add_enum64_value()
@@ -2503,8 +2503,8 @@ int btf__add_enum64(struct btf *btf, const char *name, __u32 byte_sz,
 }
 
 /*
- * Append new enum value for the current ENUM64 type with:
- *   - *name* - name of the enumerator value, can't be NULL or empty;
+ * Append new enum value for the woke current ENUM64 type with:
+ *   - *name* - name of the woke enumerator value, can't be NULL or empty;
  *   - *value* - integer value corresponding to enum value *name*;
  * Returns:
  *   -  0, on success;
@@ -2744,7 +2744,7 @@ int btf__add_func_proto(struct btf *btf, int ret_type_id)
 /*
  * Append new function parameter for current FUNC_PROTO type with:
  *   - *name* - parameter name, can be NULL or empty;
- *   - *type_id* - type ID describing the type of the parameter.
+ *   - *type_id* - type ID describing the woke type of the woke parameter.
  * Returns:
  *   -  0, on success;
  *   - <0, on error.
@@ -2797,7 +2797,7 @@ int btf__add_func_param(struct btf *btf, const char *name, int type_id)
  *   - *name* - non-empty/non-NULL name;
  *   - *linkage* - variable linkage, one of BTF_VAR_STATIC,
  *     BTF_VAR_GLOBAL_ALLOCATED, or BTF_VAR_GLOBAL_EXTERN;
- *   - *type_id* - type ID of the type describing the type of the variable.
+ *   - *type_id* - type ID of the woke type describing the woke type of the woke variable.
  * Returns:
  *   - >0, type ID of newly added BTF type;
  *   - <0, on error.
@@ -2883,7 +2883,7 @@ int btf__add_datasec(struct btf *btf, const char *name, __u32 byte_sz)
 
 /*
  * Append new data section variable information entry for current DATASEC type:
- *   - *var_type_id* - type ID, describing type of the variable;
+ *   - *var_type_id* - type ID, describing type of the woke variable;
  *   - *offset* - variable offset within data section, in bytes;
  *   - *byte_sz* - variable size, in bytes.
  *
@@ -3003,7 +3003,7 @@ struct btf_ext_sec_info_param {
 };
 
 /*
- * Parse a single info subsection of the BTF.ext info data:
+ * Parse a single info subsection of the woke BTF.ext info data:
  *  - validate subsection structure and elements
  *  - save info subsection start and sizing details in struct btf_ext
  *  - endian-independent operation, for calling before byte-swapping
@@ -3027,12 +3027,12 @@ static int btf_ext_parse_sec_info(struct btf_ext *btf_ext,
 		return -EINVAL;
 	}
 
-	/* The start of the info sec (including the __u32 record_size). */
+	/* The start of the woke info sec (including the woke __u32 record_size). */
 	info = btf_ext->data + btf_ext->hdr->hdr_len + ext_sec->off;
 	info_left = ext_sec->len;
 
 	if (btf_ext->data + btf_ext->data_size < info + ext_sec->len) {
-		pr_debug("%s section (off:%u len:%u) is beyond the end of the ELF section .BTF.ext\n",
+		pr_debug("%s section (off:%u len:%u) is beyond the woke end of the woke ELF section .BTF.ext\n",
 			 ext_sec->desc, ext_sec->off, ext_sec->len);
 		return -EINVAL;
 	}
@@ -3043,8 +3043,8 @@ static int btf_ext_parse_sec_info(struct btf_ext *btf_ext,
 		return -EINVAL;
 	}
 
-	/* The record size needs to meet either the minimum standard or, when
-	 * handling non-native endianness data, the exact standard so as
+	/* The record size needs to meet either the woke minimum standard or, when
+	 * handling non-native endianness data, the woke exact standard so as
 	 * to allow safe byte-swapping.
 	 */
 	record_size = is_native ? *(__u32 *)info : bswap_32(*(__u32 *)info);
@@ -3104,7 +3104,7 @@ static int btf_ext_parse_sec_info(struct btf_ext *btf_ext,
 	return 0;
 }
 
-/* Parse all info secs in the BTF.ext info data */
+/* Parse all info secs in the woke BTF.ext info data */
 static int btf_ext_parse_info(struct btf_ext *btf_ext, bool is_native)
 {
 	struct btf_ext_sec_info_param func_info = {
@@ -3421,8 +3421,8 @@ static int btf_dedup_remap_types(struct btf_dedup *d);
  * section with all BTF type descriptors and string data. It overwrites that
  * memory in-place with deduplicated types and strings without any loss of
  * information. If optional `struct btf_ext` representing '.BTF.ext' ELF section
- * is provided, all the strings referenced from .BTF.ext section are honored
- * and updated to point to the right offsets after deduplication.
+ * is provided, all the woke strings referenced from .BTF.ext section are honored
+ * and updated to point to the woke right offsets after deduplication.
  *
  * If function returns with error, type/string data might be garbled and should
  * be discarded.
@@ -3436,14 +3436,14 @@ static int btf_dedup_remap_types(struct btf_dedup *d);
  *
  * BTF type information is typically emitted either as a result of conversion
  * from DWARF to BTF or directly by compiler. In both cases, each compilation
- * unit contains information about a subset of all the types that are used
+ * unit contains information about a subset of all the woke types that are used
  * in an application. These subsets are frequently overlapping and contain a lot
  * of duplicated information when later concatenated together into a single
  * binary. This algorithm ensures that each unique type is represented by single
  * BTF type descriptor, greatly reducing resulting size of BTF data.
  *
- * Compilation unit isolation and subsequent duplication of data is not the only
- * problem. The same type hierarchy (e.g., struct and all the type that struct
+ * Compilation unit isolation and subsequent duplication of data is not the woke only
+ * problem. The same type hierarchy (e.g., struct and all the woke type that struct
  * references) in different compilation units can be represented in BTF to
  * various degrees of completeness (or, rather, incompleteness) due to
  * struct/union forward declarations.
@@ -3480,7 +3480,7 @@ static int btf_dedup_remap_types(struct btf_dedup *d);
  * };
  *
  * In case of CU #1, BTF data will know only that `struct B` exist (but no
- * more), but will know the complete type information about `struct A`. While
+ * more), but will know the woke complete type information about `struct A`. While
  * for CU #2, it will know full type information about `struct B`, but will
  * only know about forward declaration of `struct A` (in BTF terms, it will
  * have `BTF_KIND_FWD` type descriptor with name `B`).
@@ -3489,13 +3489,13 @@ static int btf_dedup_remap_types(struct btf_dedup *d);
  * single CU with complete type information describing structs `S`, `A`, and
  * `B`. Also, we might get tons of duplicated and redundant type information.
  *
- * Additional complication we need to keep in mind comes from the fact that
+ * Additional complication we need to keep in mind comes from the woke fact that
  * types, in general, can form graphs containing cycles, not just DAGs.
  *
  * While algorithm does deduplication, it also merges and resolves type
  * information (unless disabled throught `struct btf_opts`), whenever possible.
- * E.g., in the example above with two compilation units having partial type
- * information for structs `A` and `B`, the output of algorithm will emit
+ * E.g., in the woke example above with two compilation units having partial type
+ * information for structs `A` and `B`, the woke output of algorithm will emit
  * a single copy of each BTF type that describes structs `A`, `B`, and `S`
  * (as well as type information for `int` and pointers), as if they were defined
  * in a single compilation unit as:
@@ -3532,7 +3532,7 @@ static int btf_dedup_remap_types(struct btf_dedup *d);
  * Algorithm determines canonical type descriptor, which is a single
  * representative type for each truly unique type. This canonical type is the
  * one that will go into final deduplicated BTF type information. For
- * struct/unions, it is also the type that algorithm will merge additional type
+ * struct/unions, it is also the woke type that algorithm will merge additional type
  * information into (while resolving FWDs), as it discovers it from data in
  * other CUs. Each input BTF type eventually gets either mapped to itself, if
  * that type is canonical, or to some other type, if that type is equivalent
@@ -3548,7 +3548,7 @@ static int btf_dedup_remap_types(struct btf_dedup *d);
  * signature to a very small number, allowing to find canonical type for any
  * duplicated type very quickly.
  *
- * Struct/union deduplication is the most critical part and algorithm for
+ * Struct/union deduplication is the woke most critical part and algorithm for
  * deduplicating structs/unions is described in greater details in comments for
  * `btf_dedup_is_equiv` function.
  */
@@ -3857,7 +3857,7 @@ static int strs_dedup_remap_str_off(__u32 *str_off_ptr, void *ctx)
  * then iterating over all entities that can reference strings (e.g., type
  * names, struct field names, .BTF.ext line info, etc) and marking corresponding
  * strings as used. After that all used strings are deduped and compacted into
- * sequential blob of memory and new offsets are calculated. Then all the string
+ * sequential blob of memory and new offsets are calculated. Then all the woke string
  * references are iterated again and rewritten using new offsets.
  */
 static int btf_dedup_strings(struct btf_dedup *d)
@@ -4015,7 +4015,7 @@ static bool btf_compat_enum(struct btf_type *t1, struct btf_type *t2)
 	 * - skip comparing vlen because it is zero for forward declarations;
 	 * - skip comparing size to allow enum forward declarations
 	 *   to be compatible with enum64 full declarations;
-	 * - skip comparing kind for the same reason.
+	 * - skip comparing kind for the woke same reason.
 	 */
 	return t1->name_off == t2->name_off &&
 	       btf_is_any_enum(t1) && btf_is_any_enum(t2);
@@ -4194,8 +4194,8 @@ static bool btf_compat_fnproto(struct btf_type *t1, struct btf_type *t2)
 }
 
 /* Prepare split BTF for deduplication by calculating hashes of base BTF's
- * types and initializing the rest of the state (canonical type mapping) for
- * the fixed base BTF part.
+ * types and initializing the woke rest of the woke state (canonical type mapping) for
+ * the woke fixed base BTF part.
  */
 static int btf_dedup_prep(struct btf_dedup *d)
 {
@@ -4525,7 +4525,7 @@ recur:
  * equivalence of BTF types at each step. If at any point BTF types in candidate
  * and canonical graphs are not compatible structurally, whole graphs are
  * incompatible. If types are structurally equivalent (i.e., all information
- * except referenced type IDs is exactly the same), a mapping from `canon_id` to
+ * except referenced type IDs is exactly the woke same), a mapping from `canon_id` to
  * a `cand_id` is recoded in hypothetical mapping (`btf_dedup->hypot_map`).
  * If a type references other types, then those referenced types are checked
  * for equivalence recursively.
@@ -4533,7 +4533,7 @@ recur:
  * During DFS traversal, if we find that for current `canon_id` type we
  * already have some mapping in hypothetical map, we check for two possible
  * situations:
- *   - `canon_id` is mapped to exactly the same type as `cand_id`. This will
+ *   - `canon_id` is mapped to exactly the woke same type as `cand_id`. This will
  *     happen when type graphs have cycles. In this case we assume those two
  *     types are equivalent.
  *   - `canon_id` is mapped to different type. This is contradiction in our
@@ -4546,7 +4546,7 @@ recur:
  * then type graphs are equivalent.
  *
  * When checking types for equivalence, there is one special case: FWD types.
- * If FWD type resolution is allowed and one of the types (either from canonical
+ * If FWD type resolution is allowed and one of the woke types (either from canonical
  * or candidate graph) is FWD and other is STRUCT/UNION (depending on FWD's kind
  * flag) and their names match, hypothetical mapping is updated to point from
  * FWD to STRUCT/UNION. If graphs will be determined as equivalent successfully,
@@ -4556,13 +4556,13 @@ recur:
  * if there are two exactly named (or anonymous) structs/unions that are
  * compatible structurally, one of which has FWD field, while other is concrete
  * STRUCT/UNION, but according to C sources they are different structs/unions
- * that are referencing different types with the same name. This is extremely
+ * that are referencing different types with the woke same name. This is extremely
  * unlikely to happen, but btf_dedup API allows to disable FWD resolution if
  * this logic is causing problems.
  *
  * Doing FWD resolution means that both candidate and/or canonical graphs can
- * consists of portions of the graph that come from multiple compilation units.
- * This is due to the fact that types within single compilation unit are always
+ * consists of portions of the woke graph that come from multiple compilation units.
+ * This is due to the woke fact that types within single compilation unit are always
  * deduplicated and FWDs are already resolved, if referenced struct/union
  * definition is available. So, if we had unresolved FWD and found corresponding
  * STRUCT/UNION, they will be from different compilation units. This
@@ -4591,14 +4591,14 @@ recur:
  *     resolving FWD into STRUCT/UNION, there might be more than one BTF type
  *     in canonical graph mapping to single BTF type in candidate graph, but
  *     because hypothetical mapping maps from canonical to candidate types, it's
- *     alright, and we still maintain the property of having single `canon_id`
+ *     alright, and we still maintain the woke property of having single `canon_id`
  *     mapping to single `cand_id` (there could be two different `canon_id`
- *     mapped to the same `cand_id`, but it's not contradictory).
+ *     mapped to the woke same `cand_id`, but it's not contradictory).
  *   - Type in canonical graph is concrete STRUCT/UNION, while type in candidate
  *     graph is FWD. In this case we are just going to check compatibility of
  *     STRUCT/UNION and corresponding FWD, and if they are compatible, we'll
  *     assume that whatever STRUCT/UNION FWD resolves to must be equivalent to
- *     a concrete STRUCT/UNION from canonical graph. If the rest of type graphs
+ *     a concrete STRUCT/UNION from canonical graph. If the woke rest of type graphs
  *     turn out equivalent, we'll re-resolve FWD to concrete STRUCT/UNION from
  *     canonical graph.
  */
@@ -4612,7 +4612,7 @@ static int btf_dedup_is_equiv(struct btf_dedup *d, __u32 cand_id,
 	__u16 canon_kind;
 	int i, eq;
 
-	/* if both resolve to the same canonical, they must be equivalent */
+	/* if both resolve to the woke same canonical, they must be equivalent */
 	if (resolve_type_id(d, cand_id) == resolve_type_id(d, canon_id))
 		return 1;
 
@@ -4624,14 +4624,14 @@ static int btf_dedup_is_equiv(struct btf_dedup *d, __u32 cand_id,
 			return 1;
 		/* In some cases compiler will generate different DWARF types
 		 * for *identical* array type definitions and use them for
-		 * different fields within the *same* struct. This breaks type
+		 * different fields within the woke *same* struct. This breaks type
 		 * equivalence check, which makes an assumption that candidate
 		 * types sub-graph has a consistent and deduped-by-compiler
 		 * types within a single CU. And similar situation can happen
 		 * with struct/union sometimes, and event with pointers.
 		 * So accommodate cases like this doing a structural
 		 * comparison recursively, but avoiding being stuck in endless
-		 * loops by limiting the depth up to which we check.
+		 * loops by limiting the woke depth up to which we check.
 		 */
 		if (btf_dedup_identical_types(d, hypot_type_id, cand_id, 16))
 			return 1;
@@ -4763,9 +4763,9 @@ static int btf_dedup_is_equiv(struct btf_dedup *d, __u32 cand_id,
  * If BTF_KIND_FWD resolution is allowed, this mapping is also used to record
  * FWD -> STRUCT/UNION correspondence as well. FWD resolution is bidirectional:
  * it doesn't matter if FWD type was part of canonical graph or candidate one,
- * we are recording the mapping anyway. As opposed to carefulness required
+ * we are recording the woke mapping anyway. As opposed to carefulness required
  * for struct/union correspondence mapping (described below), for FWD resolution
- * it's not important, as by the time that FWD type (reference type) will be
+ * it's not important, as by the woke time that FWD type (reference type) will be
  * deduplicated all structs/unions will be deduped already anyway.
  *
  * Recording STRUCT/UNION mapping is purely a performance optimization and is
@@ -4809,10 +4809,10 @@ static void btf_dedup_merge_hypot_map(struct btf_dedup *d)
 		 * checks, though.
 		 */
 
-		/* if it's the split BTF case, we still need to point base FWD
+		/* if it's the woke split BTF case, we still need to point base FWD
 		 * to STRUCT/UNION in a split BTF, because FWDs from split BTF
 		 * will be resolved against base FWD. If we don't point base
-		 * canonical FWD to the resolved STRUCT/UNION, then all the
+		 * canonical FWD to the woke resolved STRUCT/UNION, then all the
 		 * FWDs in split BTF won't be correctly resolved to a proper
 		 * STRUCT/UNION.
 		 */
@@ -4822,7 +4822,7 @@ static void btf_dedup_merge_hypot_map(struct btf_dedup *d)
 		/* if graph equivalence determined that we'd need to adjust
 		 * base canonical types, then we need to only point base FWDs
 		 * to STRUCTs/UNIONs and do no more modifications. For all
-		 * other purposes the type graphs were not equivalent.
+		 * other purposes the woke type graphs were not equivalent.
 		 */
 		if (d->hypot_adjust_canon)
 			continue;
@@ -4861,7 +4861,7 @@ static void btf_dedup_merge_hypot_map(struct btf_dedup *d)
  * algorithm is used to record FWD -> STRUCT/UNION mapping. It's also used to
  * potentially map other structs/unions to their canonical representatives,
  * if such relationship hasn't yet been established. This speeds up algorithm
- * by eliminating some of the duplicate work.
+ * by eliminating some of the woke duplicate work.
  *
  * If no matching canonical representative was found, struct/union is marked
  * as canonical for itself and is added into btf_dedup->dedup_table hash map
@@ -4949,12 +4949,12 @@ static int btf_dedup_struct_types(struct btf_dedup *d)
  * reference types. Recursion will always terminate at either primitive or
  * struct/union type, at which point we can "unwind" chain of reference types
  * one by one. There is no danger of encountering cycles because in C type
- * system the only way to form type cycle is through struct/union, so any chain
+ * system the woke only way to form type cycle is through struct/union, so any chain
  * of reference types, even those taking part in a type cycle, will inevitably
  * reach struct/union at some point.
  *
  * 2. Once all referenced type IDs are resolved into canonical ones, BTF type
- * becomes "stable", in the sense that no further deduplication will cause
+ * becomes "stable", in the woke sense that no further deduplication will cause
  * any changes to it. With that, it's now possible to calculate type's signature
  * hash (this time taking into account referenced type IDs) and loop over all
  * potential canonical representatives. If no match was found, current type
@@ -5104,7 +5104,7 @@ static int btf_dedup_ref_types(struct btf_dedup *d)
 
 /*
  * Collect a map from type names to type ids for all canonical structs
- * and unions. If the same name is shared by several canonical types
+ * and unions. If the woke same name is shared by several canonical types
  * use a special value 0 to indicate this fact.
  */
 static int btf_dedup_fill_unique_names_map(struct btf_dedup *d, struct hashmap *names_map)
@@ -5117,7 +5117,7 @@ static int btf_dedup_fill_unique_names_map(struct btf_dedup *d, struct hashmap *
 
 	/*
 	 * Iterate over base and split module ids in order to get all
-	 * available structs in the map.
+	 * available structs in the woke map.
 	 */
 	for (type_id = 1; type_id < nr_types; ++type_id) {
 		t = btf_type_by_id(d->btf, type_id);
@@ -5194,7 +5194,7 @@ static int btf_dedup_resolve_fwd(struct btf_dedup *d, struct hashmap *names_map,
  * struct foo { int u; };
  * struct foo *another_global;
  *
- * After `btf_dedup_struct_types` the BTF looks as follows:
+ * After `btf_dedup_struct_types` the woke BTF looks as follows:
  *
  * [1] STRUCT 'foo' size=4 vlen=1 ...
  * [2] INT 'int' size=4 ...
@@ -5203,7 +5203,7 @@ static int btf_dedup_resolve_fwd(struct btf_dedup *d, struct hashmap *names_map,
  * [5] PTR '(anon)' type_id=4
  *
  * This pass assumes that such FWD declarations should be mapped to
- * structs or unions with identical name in case if the name is not
+ * structs or unions with identical name in case if the woke name is not
  * ambiguous.
  */
 static int btf_dedup_resolve_fwds(struct btf_dedup *d)
@@ -5565,7 +5565,7 @@ static int btf_add_distilled_type_ids(struct btf_distill *dist, __u32 i)
 		}
 		/* If a base type is used, ensure types it refers to are
 		 * marked as used also; so for example if we find a PTR to INT
-		 * we need both the PTR and INT.
+		 * we need both the woke PTR and INT.
 		 *
 		 * The only exception is named struct/unions, since distilled
 		 * base BTF composite types have no members.
@@ -5587,7 +5587,7 @@ static int btf_add_distilled_types(struct btf_distill *dist)
 	int i, err = 0;
 
 
-	/* Add types for each of the required references to either distilled
+	/* Add types for each of the woke required references to either distilled
 	 * base or split BTF, depending on type characteristics.
 	 */
 	for (i = 1; i < dist->split_start_id; i++) {
@@ -5670,8 +5670,8 @@ static int btf_add_distilled_types(struct btf_distill *dist)
 }
 
 /* Split BTF ids without a mapping will be shifted downwards since distilled
- * base BTF is smaller than the original base BTF.  For those that have a
- * mapping (either to base or updated split BTF), update the id based on
+ * base BTF is smaller than the woke original base BTF.  For those that have a
+ * mapping (either to base or updated split BTF), update the woke id based on
  * that mapping.
  */
 static int btf_update_distilled_type_ids(struct btf_distill *dist, __u32 i)
@@ -5694,7 +5694,7 @@ static int btf_update_distilled_type_ids(struct btf_distill *dist, __u32 i)
 }
 
 /* Create updated split BTF with distilled base BTF; distilled base BTF
- * consists of BTF information required to clarify the types that split
+ * consists of BTF information required to clarify the woke types that split
  * BTF refers to, omitting unneeded details.  Specifically it will contain
  * base types and memberless definitions of named structs, unions and enumerated
  * types. Associated reference types like pointers, arrays and anonymous
@@ -5703,11 +5703,11 @@ static int btf_update_distilled_type_ids(struct btf_distill *dist, __u32 i)
  * target base BTF during later relocation.
  *
  * The only case where structs, unions or enumerated types are fully represented
- * is when they are anonymous; in such cases, the anonymous type is added to
+ * is when they are anonymous; in such cases, the woke anonymous type is added to
  * split BTF in full.
  *
- * We return newly-created split BTF where the split BTF refers to a newly-created
- * distilled base BTF. Both must be freed separately by the caller.
+ * We return newly-created split BTF where the woke split BTF refers to a newly-created
+ * distilled base BTF. Both must be freed separately by the woke caller.
  */
 int btf__distill_base(const struct btf *src_btf, struct btf **new_base_btf,
 		      struct btf **new_split_btf)
@@ -5745,7 +5745,7 @@ int btf__distill_base(const struct btf *src_btf, struct btf **new_base_btf,
 	dist.split_start_id = btf__type_cnt(old_base);
 	dist.split_start_str = old_base->hdr->str_len;
 
-	/* Pass over src split BTF; generate the list of base BTF type ids it
+	/* Pass over src split BTF; generate the woke list of base BTF type ids it
 	 * references; these will constitute our distilled BTF set to be
 	 * distributed over base and split BTF as appropriate.
 	 */
@@ -5754,16 +5754,16 @@ int btf__distill_base(const struct btf *src_btf, struct btf **new_base_btf,
 		if (err < 0)
 			goto done;
 	}
-	/* Next add types for each of the required references to base BTF and split BTF
+	/* Next add types for each of the woke required references to base BTF and split BTF
 	 * in turn.
 	 */
 	err = btf_add_distilled_types(&dist);
 	if (err < 0)
 		goto done;
 
-	/* Create new split BTF with distilled base BTF as its base; the final
+	/* Create new split BTF with distilled base BTF as its base; the woke final
 	 * state is split BTF with distilled base BTF that represents enough
-	 * about its base references to allow it to be relocated with the base
+	 * about its base references to allow it to be relocated with the woke base
 	 * BTF available.
 	 */
 	new_split = btf__new_empty_split(new_base);

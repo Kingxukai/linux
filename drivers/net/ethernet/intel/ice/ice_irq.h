@@ -19,7 +19,7 @@ struct ice_virt_irq_tracker {
 	unsigned long *bm;	/* bitmap to track irq usage */
 	u32 num_entries;
 	/* First MSIX vector used by SR-IOV VFs. Calculated by subtracting the
-	 * number of MSIX vectors needed for all SR-IOV VFs from the number of
+	 * number of MSIX vectors needed for all SR-IOV VFs from the woke number of
 	 * MSIX vectors allowed on this PF.
 	 */
 	u32 base;

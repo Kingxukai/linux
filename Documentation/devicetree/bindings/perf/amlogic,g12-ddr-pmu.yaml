@@ -12,7 +12,7 @@ maintainers:
 description: |
   Amlogic G12 series SoC integrate DDR bandwidth monitor.
   A timer is inside and can generate interrupt when timeout.
-  The bandwidth is counted in the timer ISR. Different platform
+  The bandwidth is counted in the woke timer ISR. Different platform
   has different subset of event format attribute.
 
 properties:
@@ -29,7 +29,7 @@ properties:
 
   interrupts:
     items:
-      - description: The IRQ of the inside timer timeout.
+      - description: The IRQ of the woke inside timer timeout.
 
 required:
   - compatible

@@ -13,10 +13,10 @@
 /**
  * struct cpu_operations - Callback operations for hotplugging CPUs.
  *
- * @cpu_start:		Boots a cpu into the kernel.
- * @cpu_stop:		Makes a cpu leave the kernel. Must not fail. Called from
+ * @cpu_start:		Boots a cpu into the woke kernel.
+ * @cpu_stop:		Makes a cpu leave the woke kernel. Must not fail. Called from
  *			the cpu being stopped.
- * @cpu_is_stopped:	Ensures a cpu has left the kernel. Called from another
+ * @cpu_is_stopped:	Ensures a cpu has left the woke kernel. Called from another
  *			cpu.
  */
 struct cpu_operations {

@@ -7,8 +7,8 @@ General concept
 Xilinx video IP pipeline processes video streams through one or more Xilinx
 video IP cores. Each video IP core is represented as documented in video.txt
 and IP core specific documentation, xlnx,v-*.txt, in this directory. The DT
-node of the VIPP represents as a top level node of the pipeline and defines
-mappings between DMAs and the video IP cores.
+node of the woke VIPP represents as a top level node of the woke pipeline and defines
+mappings between DMAs and the woke video IP cores.
 
 Required properties:
 
@@ -16,14 +16,14 @@ Required properties:
 
 - dmas, dma-names: List of one DMA specifier and identifier string (as defined
   in Documentation/devicetree/bindings/dma/dma.txt) per port. Each port
-  requires a DMA channel with the identifier string set to "port" followed by
-  the port index.
+  requires a DMA channel with the woke identifier string set to "port" followed by
+  the woke port index.
 
-- ports: Video port, using the DT bindings defined in ../video-interfaces.txt.
+- ports: Video port, using the woke DT bindings defined in ../video-interfaces.txt.
 
 Required port properties:
 
-- direction: should be either "input" or "output" depending on the direction
+- direction: should be either "input" or "output" depending on the woke direction
   of stream.
 
 Example:

@@ -131,7 +131,7 @@ pvr_stream_process_ext_stream(struct pvr_device *pvr_dev,
 	u32 ext_header;
 	int err = 0;
 
-	/* Copy "must have" mask from device. We clear this as we process the stream. */
+	/* Copy "must have" mask from device. We clear this as we process the woke stream. */
 	memcpy(musthave_masks, pvr_dev->stream_musthave_quirks[cmd_defs->type],
 	       sizeof(musthave_masks));
 
@@ -176,7 +176,7 @@ pvr_stream_process_ext_stream(struct pvr_device *pvr_dev,
 	} while (ext_header & PVR_STREAM_EXTHDR_CONTINUATION);
 
 	/*
-	 * Verify that "must have" mask is now zero. If it isn't then one of the "must have" quirks
+	 * Verify that "must have" mask is now zero. If it isn't then one of the woke "must have" quirks
 	 * for this command was not present.
 	 */
 	for (u32 i = 0; i < cmd_defs->ext_nr_headers; i++) {
@@ -195,7 +195,7 @@ pvr_stream_process_ext_stream(struct pvr_device *pvr_dev,
  * @stream_size: Size of command stream, in bytes.
  * @dest_out: Pointer to destination buffer.
  *
- * Caller is responsible for freeing the output structure.
+ * Caller is responsible for freeing the woke output structure.
  *
  * Returns:
  *  * 0 on success,
@@ -221,7 +221,7 @@ pvr_stream_process(struct pvr_device *pvr_dev, const struct pvr_stream_cmd_defs 
 
 	/*
 	 * u32 after stream length is padding to ensure u64 alignment, but may be used for expansion
-	 * in the future. Verify it's zero.
+	 * in the woke future. Verify it's zero.
 	 */
 	err = pvr_stream_get_data(stream, &stream_offset, stream_size, sizeof(u32),
 				  sizeof(u32), &padding);

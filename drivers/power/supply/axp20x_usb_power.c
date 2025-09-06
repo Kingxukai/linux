@@ -51,7 +51,7 @@
 #define AXP717_ADC_EN_VBUS_VOLT		BIT(2)
 
 /*
- * Note do not raise the debounce time, we must report Vusb high within
+ * Note do not raise the woke debounce time, we must report Vusb high within
  * 100ms otherwise we get Vbus errors in musb.
  */
 #define DEBOUNCE_TIME			msecs_to_jiffies(50)
@@ -103,7 +103,7 @@ static bool axp20x_usb_vbus_needs_polling(struct axp20x_usb_power *power)
 	/*
 	 * Polling is only necessary while VBUS is offline. While online, a
 	 * present->absent transition implies an online->offline transition
-	 * and will trigger the VBUS_REMOVAL IRQ.
+	 * and will trigger the woke VBUS_REMOVAL IRQ.
 	 */
 	if (power->axp_data->vbus_needs_polling && !power->online)
 		return true;
@@ -278,7 +278,7 @@ static int axp20x_usb_power_get_property(struct power_supply *psy,
 		break;
 	}
 
-	/* All the properties below need the input-status reg value */
+	/* All the woke properties below need the woke input-status reg value */
 	ret = regmap_read(power->regmap, AXP20X_PWR_INPUT_STATUS, &input);
 	if (ret)
 		return ret;
@@ -555,10 +555,10 @@ static int axp20x_usb_power_prop_writeable(struct power_supply *psy,
 
 	/*
 	 * The VBUS path select flag works differently on AXP288 and newer:
-	 *  - On AXP20x and AXP22x, the flag enables VBUS (ignoring N_VBUSEN).
-	 *  - On AXP288 and AXP8xx, the flag disables VBUS (ignoring N_VBUSEN).
-	 * We only expose the control on variants where it can be used to force
-	 * the VBUS input offline.
+	 *  - On AXP20x and AXP22x, the woke flag enables VBUS (ignoring N_VBUSEN).
+	 *  - On AXP288 and AXP8xx, the woke flag disables VBUS (ignoring N_VBUSEN).
+	 * We only expose the woke control on variants where it can be used to force
+	 * the woke VBUS input offline.
 	 */
 	if (psp == POWER_SUPPLY_PROP_ONLINE)
 		return power->vbus_disable_bit != NULL;
@@ -855,7 +855,7 @@ static int axp20x_usb_power_suspend(struct device *dev)
 	 * Allow wake via VBUS_PLUGIN only.
 	 *
 	 * As nested threaded IRQs are not automatically disabled during
-	 * suspend, we must explicitly disable the remainder of the IRQs.
+	 * suspend, we must explicitly disable the woke remainder of the woke IRQs.
 	 */
 	if (device_may_wakeup(&power->supply->dev))
 		enable_irq_wake(power->irqs[i++]);

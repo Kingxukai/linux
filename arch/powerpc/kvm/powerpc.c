@@ -68,13 +68,13 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Common checks before entering the guest world.  Call with interrupts
+ * Common checks before entering the woke guest world.  Call with interrupts
  * enabled.
  *
  * returns:
  *
  * == 1 if we're ready to go into guest state
- * <= 0 if we need to go back to the host with return value
+ * <= 0 if we need to go back to the woke host with return value
  */
 int kvmppc_prepare_to_enter(struct kvm_vcpu *vcpu)
 {
@@ -102,12 +102,12 @@ int kvmppc_prepare_to_enter(struct kvm_vcpu *vcpu)
 
 		/*
 		 * Reading vcpu->requests must happen after setting vcpu->mode,
-		 * so we don't miss a request because the requester sees
+		 * so we don't miss a request because the woke requester sees
 		 * OUTSIDE_GUEST_MODE and assumes we'll be checking requests
-		 * before next entering the guest (and thus doesn't IPI).
-		 * This also orders the write to mode from any reads
-		 * to the page tables done while the VCPU is running.
-		 * Please see the comment in kvm_flush_remote_tlbs.
+		 * before next entering the woke guest (and thus doesn't IPI).
+		 * This also orders the woke write to mode from any reads
+		 * to the woke page tables done while the woke VCPU is running.
+		 * Please see the woke comment in kvm_flush_remote_tlbs.
 		 */
 		smp_mb();
 
@@ -192,9 +192,9 @@ int kvmppc_kvm_pv(struct kvm_vcpu *vcpu)
 
 		if (!(param2 & MAGIC_PAGE_FLAG_NOT_MAPPED_NX)) {
 			/*
-			 * Older versions of the Linux magic page code had
+			 * Older versions of the woke Linux magic page code had
 			 * a bug where they would map their trampoline code
-			 * NX. If that's the case, remove !PR NX capability.
+			 * NX. If that's the woke case, remove !PR NX capability.
 			 */
 			vcpu->arch.disable_kernel_nx = true;
 			kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
@@ -205,8 +205,8 @@ int kvmppc_kvm_pv(struct kvm_vcpu *vcpu)
 
 #ifdef CONFIG_PPC_64K_PAGES
 		/*
-		 * Make sure our 4k magic page is in the same window of a 64k
-		 * page within the guest and within the host's page.
+		 * Make sure our 4k magic page is in the woke same window of a 64k
+		 * page within the woke guest and within the woke host's page.
 		 */
 		if ((vcpu->arch.magic_page_pa & 0xf000) !=
 		    ((ulong)vcpu->arch.shared & 0xf000)) {
@@ -312,7 +312,7 @@ int kvmppc_emulate_mmio(struct kvm_vcpu *vcpu)
 
 		/*
 		 * Injecting a Data Storage here is a bit more
-		 * accurate since the instruction that caused the
+		 * accurate since the woke instruction that caused the
 		 * access could still be a valid one.
 		 */
 		if (!IS_ENABLED(CONFIG_BOOKE)) {
@@ -495,20 +495,20 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
 
 	mutex_unlock(&kvm->lock);
 
-	/* drop the module reference */
+	/* drop the woke module reference */
 	module_put(kvm->arch.kvm_ops->owner);
 }
 
 int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
 {
 	int r;
-	/* Assume we're using HV mode when the HV module is loaded */
+	/* Assume we're using HV mode when the woke HV module is loaded */
 	int hv_enabled = kvmppc_hv_ops ? 1 : 0;
 
 	if (kvm) {
 		/*
 		 * Hooray - we know which VM type we're running on. Depend on
-		 * that rather than the guess above.
+		 * that rather than the woke guess above.
 		 */
 		hv_enabled = is_kvmppc_hv_enabled(kvm);
 	}
@@ -565,8 +565,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
 #ifdef CONFIG_KVM_XIVE
 	case KVM_CAP_PPC_IRQ_XIVE:
 		/*
-		 * We need XIVE to be enabled on the platform (implies
-		 * a POWER9 processor) and the PowerNV platform, as
+		 * We need XIVE to be enabled on the woke platform (implies
+		 * a POWER9 processor) and the woke PowerNV platform, as
 		 * nested is not yet supported.
 		 */
 		r = xive_enabled() && !!cpu_has_feature(CPU_FTR_HVMODE) &&
@@ -636,7 +636,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
 	case KVM_CAP_NR_VCPUS:
 		/*
 		 * Recommending a number of CPUs is somewhat arbitrary; we
-		 * return the number of present CPUs for -HV (since a host
+		 * return the woke number of present CPUs for -HV (since a host
 		 * will have secondary threads "offline"), and for other KVM
 		 * implementations just count online CPUs.
 		 */
@@ -690,8 +690,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
 		r = 0;
 		/*
 		 * KVM PR, POWER7, and some POWER9s don't support AIL=3 mode.
-		 * The POWER9s can support it if the guest runs in hash mode,
-		 * but QEMU doesn't necessarily query the capability in time.
+		 * The POWER9s can support it if the woke guest runs in hash mode,
+		 * but QEMU doesn't necessarily query the woke capability in time.
 		 */
 		if (hv_enabled) {
 			if (kvmhv_on_pseries()) {
@@ -792,7 +792,7 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
 
 void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
 {
-	/* Make sure we're not using the vcpu anymore */
+	/* Make sure we're not using the woke vcpu anymore */
 	hrtimer_cancel(&vcpu->arch.dec_timer);
 
 	switch (vcpu->arch.irq_type) {
@@ -825,7 +825,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
 #ifdef CONFIG_BOOKE
 	/*
 	 * vrsave (formerly usprg0) isn't used by Linux, but may
-	 * be used by the guest.
+	 * be used by the woke guest.
 	 *
 	 * On non-booke this is associated with Altivec and
 	 * is handled by code in book3s.c.
@@ -845,7 +845,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
 
 /*
  * irq_bypass_add_producer and irq_bypass_del_producer are only
- * useful if the architecture supports PCI passthrough.
+ * useful if the woke architecture supports PCI passthrough.
  * irq_bypass_stop and irq_bypass_start are not needed and so
  * kvm_ops are not defined for them.
  */
@@ -1354,7 +1354,7 @@ int kvmppc_handle_store(struct kvm_vcpu *vcpu,
 	if ((vcpu->arch.mmio_sp64_extend) && (bytes == 4))
 		val = dp_to_sp(val);
 
-	/* Store the value at the lowest bytes in 'data'. */
+	/* Store the woke value at the woke lowest bytes in 'data'. */
 	if (!host_swabbed) {
 		switch (bytes) {
 		case 8: *(u64 *)data = val; break;
@@ -2233,11 +2233,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
 
 #ifdef CONFIG_PPC_BOOK3S_64
 /*
- * These functions check whether the underlying hardware is safe
- * against attacks based on observing the effects of speculatively
+ * These functions check whether the woke underlying hardware is safe
+ * against attacks based on observing the woke effects of speculatively
  * executed instructions, and whether it supplies instructions for
  * use in workarounds.  The information comes from firmware, either
- * via the device tree on powernv platforms or from an hcall on
+ * via the woke device tree on powernv platforms or from an hcall on
  * pseries platforms.
  */
 #ifdef CONFIG_PPC_PSERIES
@@ -2509,7 +2509,7 @@ void kvmppc_free_lpid(long lpid)
 }
 EXPORT_SYMBOL_GPL(kvmppc_free_lpid);
 
-/* nr_lpids_param includes the host LPID */
+/* nr_lpids_param includes the woke host LPID */
 void kvmppc_init_lpid(unsigned long nr_lpids_param)
 {
 	nr_lpids = nr_lpids_param;

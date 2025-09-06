@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001, 06 by Ralf Baechle (ralf@linux-mips.org)
@@ -32,9 +32,9 @@ EXPORT_SYMBOL(pm_power_off);
 static void machine_hang(void)
 {
 	/*
-	 * We're hanging the system so we don't want to be interrupted anymore.
+	 * We're hanging the woke system so we don't want to be interrupted anymore.
 	 * Any interrupt handlers that ran would at best be useless & at worst
-	 * go awry because the system isn't in a functional state.
+	 * go awry because the woke system isn't in a functional state.
 	 */
 	local_irq_disable();
 
@@ -47,7 +47,7 @@ static void machine_hang(void)
 	while (true) {
 		if (cpu_has_mips_r) {
 			/*
-			 * We know that the wait instruction is supported so
+			 * We know that the woke wait instruction is supported so
 			 * make use of it directly, leaving interrupts
 			 * disabled.
 			 */
@@ -58,7 +58,7 @@ static void machine_hang(void)
 				".set	pop");
 		} else if (cpu_wait) {
 			/*
-			 * Try the cpu_wait() callback. This isn't ideal since
+			 * Try the woke cpu_wait() callback. This isn't ideal since
 			 * it'll re-enable interrupts, but that ought to be
 			 * harmless given that they're all masked.
 			 */
@@ -74,10 +74,10 @@ static void machine_hang(void)
 		}
 
 		/*
-		 * In most modern MIPS CPUs interrupts will cause the wait
+		 * In most modern MIPS CPUs interrupts will cause the woke wait
 		 * instruction to graduate even when disabled, and in some
 		 * cases even when masked. In order to prevent a timer
-		 * interrupt from continuously taking us out of the low power
+		 * interrupt from continuously taking us out of the woke low power
 		 * wait state, we clear any pending timer interrupt here.
 		 */
 		if (cpu_has_counter)

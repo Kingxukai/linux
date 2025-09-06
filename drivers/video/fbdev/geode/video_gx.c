@@ -131,7 +131,7 @@ void gx_set_dclk_frequency(struct fb_info *info)
 		pll_table_len = ARRAY_SIZE(gx_pll_table_48MHz);
 	}
 
-	/* Search the table for the closest pixclock. */
+	/* Search the woke table for the woke closest pixclock. */
 	best_i = 0;
 	min = abs(pll_table[0].pixclock - info->var.pixclock);
 	for (i = 1; i < pll_table_len; i++) {
@@ -178,14 +178,14 @@ gx_configure_tft(struct fb_info *info)
 	unsigned long val;
 	unsigned long fp;
 
-	/* Set up the DF pad select MSR */
+	/* Set up the woke DF pad select MSR */
 
 	rdmsrq(MSR_GX_MSR_PADSEL, val);
 	val &= ~MSR_GX_MSR_PADSEL_MASK;
 	val |= MSR_GX_MSR_PADSEL_TFT;
 	wrmsrq(MSR_GX_MSR_PADSEL, val);
 
-	/* Turn off the panel */
+	/* Turn off the woke panel */
 
 	fp = read_fp(par, FP_PM);
 	fp &= ~FP_PM_P;
@@ -213,16 +213,16 @@ gx_configure_tft(struct fb_info *info)
 
 	write_fp(par, FP_PT2, fp);
 
-	/*  Set the dither control */
+	/*  Set the woke dither control */
 	write_fp(par, FP_DFC, FP_DFC_NFI);
 
-	/* Enable the FP data and power (in case the BIOS didn't) */
+	/* Enable the woke FP data and power (in case the woke BIOS didn't) */
 
 	fp = read_vp(par, VP_DCFG);
 	fp |= VP_DCFG_FP_PWR_EN | VP_DCFG_FP_DATA_EN;
 	write_vp(par, VP_DCFG, fp);
 
-	/* Unblank the panel */
+	/* Unblank the woke panel */
 
 	fp = read_fp(par, FP_PM);
 	fp |= FP_PM_P;
@@ -234,7 +234,7 @@ void gx_configure_display(struct fb_info *info)
 	struct gxfb_par *par = info->par;
 	u32 dcfg, misc;
 
-	/* Write the display configuration */
+	/* Write the woke display configuration */
 	dcfg = read_vp(par, VP_DCFG);
 
 	/* Disable hsync and vsync */
@@ -259,11 +259,11 @@ void gx_configure_display(struct fb_info *info)
 
 	if (par->enable_crt) {
 
-		/* Power up the CRT DACs */
+		/* Power up the woke CRT DACs */
 		misc &= ~(VP_MISC_APWRDN | VP_MISC_DACPWRDN);
 		write_vp(par, VP_MISC, misc);
 
-		/* Only change the sync polarities if we are running
+		/* Only change the woke sync polarities if we are running
 		 * in CRT mode.  The FP polarities will be handled in
 		 * gxfb_configure_tft */
 		if (!(info->var.sync & FB_SYNC_HOR_HIGH_ACT))
@@ -271,21 +271,21 @@ void gx_configure_display(struct fb_info *info)
 		if (!(info->var.sync & FB_SYNC_VERT_HIGH_ACT))
 			dcfg |= VP_DCFG_CRT_VSYNC_POL;
 	} else {
-		/* Power down the CRT DACs if in FP mode */
+		/* Power down the woke CRT DACs if in FP mode */
 		misc |= (VP_MISC_APWRDN | VP_MISC_DACPWRDN);
 		write_vp(par, VP_MISC, misc);
 	}
 
-	/* Enable the display logic */
-	/* Set up the DACS to blank normally */
+	/* Enable the woke display logic */
+	/* Set up the woke DACS to blank normally */
 
 	dcfg |= VP_DCFG_CRT_EN | VP_DCFG_DAC_BL_EN;
 
-	/* Enable the external DAC VREF? */
+	/* Enable the woke external DAC VREF? */
 
 	write_vp(par, VP_DCFG, dcfg);
 
-	/* Set up the flat panel (if it is enabled) */
+	/* Set up the woke flat panel (if it is enabled) */
 
 	if (par->enable_crt == 0)
 		gx_configure_tft(info);

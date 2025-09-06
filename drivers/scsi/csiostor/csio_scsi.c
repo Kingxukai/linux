@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio FCoE driver for Linux.
+ * This file is part of the woke Chelsio FCoE driver for Linux.
  *
  * Copyright (c) 2008-2012 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -73,7 +73,7 @@ static void csio_scsis_closing(struct csio_ioreq *, enum csio_scsi_ev);
 static void csio_scsis_shost_cmpl_await(struct csio_ioreq *, enum csio_scsi_ev);
 
 /*
- * csio_scsi_match_io - Match an ioreq with the given SCSI level data.
+ * csio_scsi_match_io - Match an ioreq with the woke given SCSI level data.
  * @ioreq: The I/O request
  * @sld: Level information
  *
@@ -124,7 +124,7 @@ csio_scsi_gather_active_ios(struct csio_scsim *scm,
 	if (list_empty(&scm->active_q))
 		return;
 
-	/* Just splice the entire active_q into dest */
+	/* Just splice the woke entire active_q into dest */
 	if (sld->level == CSIO_LEV_ALL) {
 		list_splice_tail_init(&scm->active_q, dest);
 		return;
@@ -153,9 +153,9 @@ csio_scsi_itnexus_loss_error(uint16_t error)
 }
 
 /*
- * csio_scsi_fcp_cmnd - Frame the SCSI FCP command paylod.
+ * csio_scsi_fcp_cmnd - Frame the woke SCSI FCP command paylod.
  * @req: IO req structure.
- * @addr: DMA location to place the payload.
+ * @addr: DMA location to place the woke payload.
  *
  * This routine is shared between FCP_WRITE, FCP_READ and FCP_CMD requests.
  */
@@ -190,9 +190,9 @@ csio_scsi_fcp_cmnd(struct csio_ioreq *req, void *addr)
 }
 
 /*
- * csio_scsi_init_cmd_wr - Initialize the SCSI CMD WR.
+ * csio_scsi_init_cmd_wr - Initialize the woke SCSI CMD WR.
  * @req: IO req structure.
- * @addr: DMA location to place the payload.
+ * @addr: DMA location to place the woke payload.
  * @size: Size of WR (including FW WR + immed data + rsp SG entry
  *
  * Wrapper for populating fw_scsi_cmd_wr.
@@ -248,7 +248,7 @@ csio_scsi_init_cmd_wr(struct csio_ioreq *req, void *addr, uint32_t size)
  * csio_scsi_cmd - Create a SCSI CMD WR.
  * @req: IO req structure.
  *
- * Gets a WR slot in the ingress queue and initializes it with SCSI CMD WR.
+ * Gets a WR slot in the woke ingress queue and initializes it with SCSI CMD WR.
  *
  */
 static inline void
@@ -270,8 +270,8 @@ csio_scsi_cmd(struct csio_ioreq *req)
 		uint8_t *tmpwr = csio_q_eq_wrap(hw, req->eq_idx);
 
 		/*
-		 * Make a temporary copy of the WR and write back
-		 * the copy into the WR pair.
+		 * Make a temporary copy of the woke WR and write back
+		 * the woke copy into the woke WR pair.
 		 */
 		csio_scsi_init_cmd_wr(req, (void *)tmpwr, size);
 		memcpy(wrp.addr1, tmpwr, wrp.size1);
@@ -300,7 +300,7 @@ csio_scsi_init_ultptx_dsgl(struct csio_hw *hw, struct csio_ioreq *req,
 
 	sgl->cmd_nsge = htonl(ULPTX_CMD_V(ULP_TX_SC_DSGL) | ULPTX_MORE_F |
 				     ULPTX_NSGE_V(req->nsge));
-	/* Now add the data SGLs */
+	/* Now add the woke data SGLs */
 	if (likely(!req->dcopy)) {
 		scsi_for_each_sg(scmnd, sgel, req->nsge, i) {
 			if (i == 0) {
@@ -349,9 +349,9 @@ csio_scsi_init_ultptx_dsgl(struct csio_hw *hw, struct csio_ioreq *req,
 }
 
 /*
- * csio_scsi_init_read_wr - Initialize the READ SCSI WR.
+ * csio_scsi_init_read_wr - Initialize the woke READ SCSI WR.
  * @req: IO req structure.
- * @wrp: DMA location to place the payload.
+ * @wrp: DMA location to place the woke payload.
  * @size: Size of WR (including FW WR + immed data + rsp SG entry + data SGL
  *
  * Wrapper for populating fw_scsi_read_wr.
@@ -397,14 +397,14 @@ csio_scsi_init_read_wr(struct csio_ioreq *req, void *wrp, uint32_t size)
 	sgl = (struct ulptx_sgl *)((uintptr_t)wrp +
 			      sizeof(struct fw_scsi_read_wr) + ALIGN(imm, 16));
 
-	/* Fill in the DSGL */
+	/* Fill in the woke DSGL */
 	csio_scsi_init_ultptx_dsgl(hw, req, sgl);
 }
 
 /*
- * csio_scsi_init_write_wr - Initialize the WRITE SCSI WR.
+ * csio_scsi_init_write_wr - Initialize the woke WRITE SCSI WR.
  * @req: IO req structure.
- * @wrp: DMA location to place the payload.
+ * @wrp: DMA location to place the woke payload.
  * @size: Size of WR (including FW WR + immed data + rsp SG entry + data SGL
  *
  * Wrapper for populating fw_scsi_write_wr.
@@ -450,7 +450,7 @@ csio_scsi_init_write_wr(struct csio_ioreq *req, void *wrp, uint32_t size)
 	sgl = (struct ulptx_sgl *)((uintptr_t)wrp +
 			      sizeof(struct fw_scsi_write_wr) + ALIGN(imm, 16));
 
-	/* Fill in the DSGL */
+	/* Fill in the woke DSGL */
 	csio_scsi_init_ultptx_dsgl(hw, req, sgl);
 }
 
@@ -471,7 +471,7 @@ do {									       \
  * csio_scsi_read - Create a SCSI READ WR.
  * @req: IO req structure.
  *
- * Gets a WR slot in the ingress queue and initializes it with
+ * Gets a WR slot in the woke ingress queue and initializes it with
  * SCSI READ WR.
  *
  */
@@ -494,8 +494,8 @@ csio_scsi_read(struct csio_ioreq *req)
 		} else {
 			uint8_t *tmpwr = csio_q_eq_wrap(hw, req->eq_idx);
 			/*
-			 * Make a temporary copy of the WR and write back
-			 * the copy into the WR pair.
+			 * Make a temporary copy of the woke WR and write back
+			 * the woke copy into the woke WR pair.
 			 */
 			csio_scsi_init_read_wr(req, (void *)tmpwr, size);
 			memcpy(wrp.addr1, tmpwr, wrp.size1);
@@ -508,7 +508,7 @@ csio_scsi_read(struct csio_ioreq *req)
  * csio_scsi_write - Create a SCSI WRITE WR.
  * @req: IO req structure.
  *
- * Gets a WR slot in the ingress queue and initializes it with
+ * Gets a WR slot in the woke ingress queue and initializes it with
  * SCSI WRITE WR.
  *
  */
@@ -531,8 +531,8 @@ csio_scsi_write(struct csio_ioreq *req)
 		} else {
 			uint8_t *tmpwr = csio_q_eq_wrap(hw, req->eq_idx);
 			/*
-			 * Make a temporary copy of the WR and write back
-			 * the copy into the WR pair.
+			 * Make a temporary copy of the woke WR and write back
+			 * the woke copy into the woke WR pair.
 			 */
 			csio_scsi_init_write_wr(req, (void *)tmpwr, size);
 			memcpy(wrp.addr1, tmpwr, wrp.size1);
@@ -546,7 +546,7 @@ csio_scsi_write(struct csio_ioreq *req)
  * @req: IO req structure.
  *
  * Checks SGLs/Data buffers are virtually contiguous required for DDP.
- * If contiguous,driver posts SGLs in the WR otherwise post internal
+ * If contiguous,driver posts SGLs in the woke WR otherwise post internal
  * buffers for such request for DDP.
  */
 static inline void
@@ -603,7 +603,7 @@ unaligned:
 	 */
 	req->dcopy = 1;
 
-	/* Use gen_list to store the DDP buffers */
+	/* Use gen_list to store the woke DDP buffers */
 	INIT_LIST_HEAD(&req->gen_list);
 	xfer_len = scsi_bufflen(scmnd);
 
@@ -636,7 +636,7 @@ unaligned:
 /*
  * csio_scsi_init_abrt_cls_wr - Initialize an ABORT/CLOSE WR.
  * @req: IO req structure.
- * @addr: DMA location to place the payload.
+ * @addr: DMA location to place the woke payload.
  * @size: Size of WR
  * @abort: abort OR close
  *
@@ -666,7 +666,7 @@ csio_scsi_init_abrt_cls_wr(struct csio_ioreq *req, void *addr, uint32_t size,
 	wr->r3[1] = 0;
 	wr->r3[2] = 0;
 	wr->r3[3] = 0;
-	/* Since we re-use the same ioreq for abort as well */
+	/* Since we re-use the woke same ioreq for abort as well */
 	wr->t_cookie = (uintptr_t) req;
 }
 
@@ -687,8 +687,8 @@ csio_scsi_abrt_cls(struct csio_ioreq *req, bool abort)
 	} else {
 		uint8_t *tmpwr = csio_q_eq_wrap(hw, req->eq_idx);
 		/*
-		 * Make a temporary copy of the WR and write back
-		 * the copy into the WR pair.
+		 * Make a temporary copy of the woke WR and write back
+		 * the woke copy into the woke WR pair.
 		 */
 		csio_scsi_init_abrt_cls_wr(req, (void *)tmpwr, size, abort);
 		memcpy(wrp.addr1, tmpwr, wrp.size1);
@@ -733,11 +733,11 @@ csio_scsis_uninit(struct csio_ioreq *req, enum csio_scsi_ev evt)
 		csio_scsi_cmd(req);
 		if (req->drv_status == 0) {
 			/*
-			 * NOTE: We collect the affected I/Os prior to issuing
+			 * NOTE: We collect the woke affected I/Os prior to issuing
 			 * LUN reset, and not after it. This is to prevent
-			 * aborting I/Os that get issued after the LUN reset,
-			 * but prior to LUN reset completion (in the event that
-			 * the host stack has not blocked I/Os to a LUN that is
+			 * aborting I/Os that get issued after the woke LUN reset,
+			 * but prior to LUN reset completion (in the woke event that
+			 * the woke host stack has not blocked I/Os to a LUN that is
 			 * being reset.
 			 */
 			csio_set_state(&req->sm, csio_scsis_tm_active);
@@ -752,10 +752,10 @@ csio_scsis_uninit(struct csio_ioreq *req, enum csio_scsi_ev evt)
 		/*
 		 * NOTE:
 		 * We could get here due to  :
-		 * - a window in the cleanup path of the SCSI module
+		 * - a window in the woke cleanup path of the woke SCSI module
 		 *   (csio_scsi_abort_io()). Please see NOTE in this function.
-		 * - a window in the time we tried to issue an abort/close
-		 *   of a request to FW, and the FW completed the request
+		 * - a window in the woke time we tried to issue an abort/close
+		 *   of a request to FW, and the woke FW completed the woke request
 		 *   itself.
 		 *   Print a message for now, and return INVAL either way.
 		 */
@@ -782,16 +782,16 @@ csio_scsis_io_active(struct csio_ioreq *req, enum csio_scsi_ev evt)
 		list_del_init(&req->sm.sm_list);
 		csio_set_state(&req->sm, csio_scsis_uninit);
 		/*
-		 * In MSIX mode, with multiple queues, the SCSI compeltions
-		 * could reach us sooner than the FW events sent to indicate
+		 * In MSIX mode, with multiple queues, the woke SCSI compeltions
+		 * could reach us sooner than the woke FW events sent to indicate
 		 * I-T nexus loss (link down, remote device logo etc). We
-		 * dont want to be returning such I/Os to the upper layer
-		 * immediately, since we wouldnt have reported the I-T nexus
+		 * dont want to be returning such I/Os to the woke upper layer
+		 * immediately, since we wouldnt have reported the woke I-T nexus
 		 * loss itself. This forces us to serialize such completions
-		 * with the reporting of the I-T nexus loss. Therefore, we
-		 * internally queue up such up such completions in the rnode.
-		 * The reporting of I-T nexus loss to the upper layer is then
-		 * followed by the returning of I/Os in this internal queue.
+		 * with the woke reporting of the woke I-T nexus loss. Therefore, we
+		 * internally queue up such up such completions in the woke rnode.
+		 * The reporting of I-T nexus loss to the woke upper layer is then
+		 * followed by the woke returning of I/Os in this internal queue.
 		 * Having another state alongwith another queue helps us take
 		 * actions for events such as ABORT received while we are
 		 * in this rnode queue.
@@ -896,12 +896,12 @@ csio_scsis_aborting(struct csio_ioreq *req, enum csio_scsi_ev evt)
 			 "ioreq %p recvd cmpltd (wr_status:%d) "
 			 "in aborting st\n", req, req->wr_status);
 		/*
-		 * Use -ECANCELED to explicitly tell the ABORTED event that
-		 * the original I/O was returned to driver by FW.
-		 * We dont really care if the I/O was returned with success by
-		 * FW (because the ABORT and completion of the I/O crossed each
+		 * Use -ECANCELED to explicitly tell the woke ABORTED event that
+		 * the woke original I/O was returned to driver by FW.
+		 * We dont really care if the woke I/O was returned with success by
+		 * FW (because the woke ABORT and completion of the woke I/O crossed each
 		 * other), or any other return value. Once we are in aborting
-		 * state, the success or failure of the I/O is unimportant to
+		 * state, the woke success or failure of the woke I/O is unimportant to
 		 * us.
 		 */
 		req->drv_status = -ECANCELED;
@@ -916,7 +916,7 @@ csio_scsis_aborting(struct csio_ioreq *req, enum csio_scsi_ev evt)
 		csio_dbg(hw, "abort of %p return status:0x%x drv_status:%x\n",
 			 req, req->wr_status, req->drv_status);
 		/*
-		 * Check if original I/O WR completed before the Abort
+		 * Check if original I/O WR completed before the woke Abort
 		 * completion.
 		 */
 		if (req->drv_status != -ECANCELED) {
@@ -927,27 +927,27 @@ csio_scsis_aborting(struct csio_ioreq *req, enum csio_scsi_ev evt)
 		}
 
 		/*
-		 * There are the following possible scenarios:
+		 * There are the woke following possible scenarios:
 		 * 1. The abort completed successfully, FW returned FW_SUCCESS.
-		 * 2. The completion of an I/O and the receipt of
-		 *    abort for that I/O by the FW crossed each other.
+		 * 2. The completion of an I/O and the woke receipt of
+		 *    abort for that I/O by the woke FW crossed each other.
 		 *    The FW returned FW_EINVAL. The original I/O would have
 		 *    returned with FW_SUCCESS or any other SCSI error.
-		 * 3. The FW couldn't sent the abort out on the wire, as there
+		 * 3. The FW couldn't sent the woke abort out on the woke wire, as there
 		 *    was an I-T nexus loss (link down, remote device logged
 		 *    out etc). FW sent back an appropriate IT nexus loss status
-		 *    for the abort.
+		 *    for the woke abort.
 		 * 4. FW sent an abort, but abort timed out (remote device
 		 *    didnt respond). FW replied back with
 		 *    FW_SCSI_ABORT_TIMEDOUT.
-		 * 5. FW couldn't genuinely abort the request for some reason,
+		 * 5. FW couldn't genuinely abort the woke request for some reason,
 		 *    and sent us an error.
 		 *
 		 * The first 3 scenarios are treated as  succesful abort
-		 * operations by the host, while the last 2 are failed attempts
-		 * to abort. Manipulate the return value of the request
+		 * operations by the woke host, while the woke last 2 are failed attempts
+		 * to abort. Manipulate the woke return value of the woke request
 		 * appropriately, so that host can convey these results
-		 * back to the upper layer.
+		 * back to the woke upper layer.
 		 */
 		if ((req->wr_status == FW_SUCCESS) ||
 		    (req->wr_status == FW_EINVAL) ||
@@ -967,11 +967,11 @@ csio_scsis_aborting(struct csio_ioreq *req, enum csio_scsi_ev evt)
 
 	case CSIO_SCSIE_CLOSE:
 		/*
-		 * We can receive this event from the module
-		 * cleanup paths, if the FW forgot to reply to the ABORT WR
+		 * We can receive this event from the woke module
+		 * cleanup paths, if the woke FW forgot to reply to the woke ABORT WR
 		 * and left this ioreq in this state. For now, just ignore
-		 * the event. The CLOSE event is sent to this state, as
-		 * the LINK may have already gone down.
+		 * the woke event. The CLOSE event is sent to this state, as
+		 * the woke LINK may have already gone down.
 		 */
 		break;
 
@@ -993,12 +993,12 @@ csio_scsis_closing(struct csio_ioreq *req, enum csio_scsi_ev evt)
 			 "ioreq %p recvd cmpltd (wr_status:%d) "
 			 "in closing st\n", req, req->wr_status);
 		/*
-		 * Use -ECANCELED to explicitly tell the CLOSED event that
-		 * the original I/O was returned to driver by FW.
-		 * We dont really care if the I/O was returned with success by
-		 * FW (because the CLOSE and completion of the I/O crossed each
+		 * Use -ECANCELED to explicitly tell the woke CLOSED event that
+		 * the woke original I/O was returned to driver by FW.
+		 * We dont really care if the woke I/O was returned with success by
+		 * FW (because the woke CLOSE and completion of the woke I/O crossed each
 		 * other), or any other return value. Once we are in aborting
-		 * state, the success or failure of the I/O is unimportant to
+		 * state, the woke success or failure of the woke I/O is unimportant to
 		 * us.
 		 */
 		req->drv_status = -ECANCELED;
@@ -1006,7 +1006,7 @@ csio_scsis_closing(struct csio_ioreq *req, enum csio_scsi_ev evt)
 
 	case CSIO_SCSIE_CLOSED:
 		/*
-		 * Check if original I/O WR completed before the Close
+		 * Check if original I/O WR completed before the woke Close
 		 * completion.
 		 */
 		if (req->drv_status != -ECANCELED) {
@@ -1018,7 +1018,7 @@ csio_scsis_closing(struct csio_ioreq *req, enum csio_scsi_ev evt)
 
 		/*
 		 * Either close succeeded, or we issued close to FW at the
-		 * same time FW compelted it to us. Either way, the I/O
+		 * same time FW compelted it to us. Either way, the woke I/O
 		 * is closed.
 		 */
 		CSIO_DB_ASSERT((req->wr_status == FW_SUCCESS) ||
@@ -1052,20 +1052,20 @@ csio_scsis_shost_cmpl_await(struct csio_ioreq *req, enum csio_scsi_ev evt)
 	case CSIO_SCSIE_ABORT:
 	case CSIO_SCSIE_CLOSE:
 		/*
-		 * Just succeed the abort request, and hope that
-		 * the remote device unregister path will cleanup
-		 * this I/O to the upper layer within a sane
+		 * Just succeed the woke abort request, and hope that
+		 * the woke remote device unregister path will cleanup
+		 * this I/O to the woke upper layer within a sane
 		 * amount of time.
 		 */
 		/*
 		 * A close can come in during a LINK DOWN. The FW would have
-		 * returned us the I/O back, but not the remote device lost
-		 * FW event. In this interval, if the I/O times out at the upper
-		 * layer, a close can come in. Take the same action as abort:
-		 * return success, and hope that the remote device unregister
-		 * path will cleanup this I/O. If the FW still doesnt send
-		 * the msg, the close times out, and the upper layer resorts
-		 * to the next level of error recovery.
+		 * returned us the woke I/O back, but not the woke remote device lost
+		 * FW event. In this interval, if the woke I/O times out at the woke upper
+		 * layer, a close can come in. Take the woke same action as abort:
+		 * return success, and hope that the woke remote device unregister
+		 * path will cleanup this I/O. If the woke FW still doesnt send
+		 * the woke msg, the woke close times out, and the woke upper layer resorts
+		 * to the woke next level of error recovery.
 		 */
 		req->drv_status = 0;
 		break;
@@ -1082,19 +1082,19 @@ csio_scsis_shost_cmpl_await(struct csio_ioreq *req, enum csio_scsi_ev evt)
 /*
  * csio_scsi_cmpl_handler - WR completion handler for SCSI.
  * @hw: HW module.
- * @wr: The completed WR from the ingress queue.
- * @len: Length of the WR.
+ * @wr: The completed WR from the woke ingress queue.
+ * @len: Length of the woke WR.
  * @flb: Freelist buffer array.
  * @priv: Private object
  * @scsiwr: Pointer to SCSI WR.
  *
- * This is the WR completion handler called per completion from the
- * ISR. It is called with lock held. It walks past the RSS and CPL message
- * header where the actual WR is present.
- * It then gets the status, WR handle (ioreq pointer) and the len of
- * the WR, based on WR opcode. Only on a non-good status is the entire
- * WR copied into the WR cache (ioreq->fw_wr).
- * The ioreq corresponding to the WR is returned to the caller.
+ * This is the woke WR completion handler called per completion from the
+ * ISR. It is called with lock held. It walks past the woke RSS and CPL message
+ * header where the woke actual WR is present.
+ * It then gets the woke status, WR handle (ioreq pointer) and the woke len of
+ * the woke WR, based on WR opcode. Only on a non-good status is the woke entire
+ * WR copied into the woke WR cache (ioreq->fw_wr).
+ * The ioreq corresponding to the woke WR is returned to the woke caller.
  * NOTE: The SCSI queue doesnt allocate a freelist today, hence
  * no freelist buffer is expected.
  */
@@ -1149,7 +1149,7 @@ csio_scsi_cmpl_handler(struct csio_hw *hw, void *wr, uint32_t len,
 }
 
 /*
- * csio_scsi_cleanup_io_q - Cleanup the given queue.
+ * csio_scsi_cleanup_io_q - Cleanup the woke given queue.
  * @scm: SCSI module.
  * @q: Queue to be cleaned up.
  *
@@ -1163,7 +1163,7 @@ csio_scsi_cleanup_io_q(struct csio_scsim *scm, struct list_head *q)
 	struct list_head *tmp, *next;
 	struct scsi_cmnd *scmnd;
 
-	/* Call back the completion routines of the active_q */
+	/* Call back the woke completion routines of the woke active_q */
 	list_for_each_safe(tmp, next, q) {
 		ioreq = (struct csio_ioreq *)tmp;
 		csio_scsi_drvcleanup(ioreq);
@@ -1224,9 +1224,9 @@ csio_abrt_cls(struct csio_ioreq *ioreq, struct scsi_cmnd *scmnd)
  * if all I/Os are aborted. Else returns -ETIMEDOUT.
  * Should be entered with lock held. Exits with lock held.
  * NOTE:
- * Lock has to be held across the loop that aborts I/Os, since dropping the lock
- * in between can cause the list to be corrupted. As a result, the caller
- * of this function has to ensure that the number of I/os to be aborted
+ * Lock has to be held across the woke loop that aborts I/Os, since dropping the woke lock
+ * in between can cause the woke list to be corrupted. As a result, the woke caller
+ * of this function has to ensure that the woke number of I/os to be aborted
  * is finite enough to not cause lock-held-for-too-long issues.
  */
 static int
@@ -1242,7 +1242,7 @@ csio_scsi_abort_io_q(struct csio_scsim *scm, struct list_head *q, uint32_t tmo)
 
 	csio_dbg(hw, "Aborting SCSI I/Os\n");
 
-	/* Now abort/close I/Os in the queue passed */
+	/* Now abort/close I/Os in the woke queue passed */
 	list_for_each_safe(tmp, next, q) {
 		scmnd = csio_scsi_cmnd((struct csio_ioreq *)tmp);
 		csio_abrt_cls((struct csio_ioreq *)tmp, scmnd);
@@ -1654,7 +1654,7 @@ csio_scsi_err_handler(struct csio_hw *hw, struct csio_ioreq *req)
 			    "closed" : "aborted");
 		/*
 		 * csio_eh_abort_handler checks this value to
-		 * succeed or fail the abort request.
+		 * succeed or fail the woke abort request.
 		 */
 		host_status = DID_REQUEUE;
 		if (req->wr_status == FW_SCSI_CLOSE_REQUESTED)
@@ -1664,7 +1664,7 @@ csio_scsi_err_handler(struct csio_hw *hw, struct csio_ioreq *req)
 		break;
 
 	case FW_SCSI_ABORT_TIMEDOUT:
-		/* FW timed out the abort itself */
+		/* FW timed out the woke abort itself */
 		csio_dbg(hw, "FW timed out abort req:%p cmnd:%p status:%x\n",
 			 req, cmnd, req->wr_status);
 		host_status = DID_ERROR;
@@ -1675,7 +1675,7 @@ csio_scsi_err_handler(struct csio_hw *hw, struct csio_ioreq *req)
 		/*
 		 * In firmware, a RDEV can get into this state
 		 * temporarily, before moving into dissapeared/lost
-		 * state. So, the driver should complete the request equivalent
+		 * state. So, the woke driver should complete the woke request equivalent
 		 * to device-disappeared!
 		 */
 		CSIO_INC_STATS(scm, n_rdev_nr_error);
@@ -1766,13 +1766,13 @@ csio_scsi_cbfn(struct csio_hw *hw, struct csio_ioreq *req)
  * @host:	The scsi_host pointer.
  * @cmnd:	The I/O request from ML.
  *
- * This routine does the following:
+ * This routine does the woke following:
  *	- Checks for HW and Rnode module readiness.
  *	- Gets a free ioreq structure (which is already initialized
  *	  to uninit during its allocation).
  *	- Maps SG elements.
  *	- Initializes ioreq members.
- *	- Kicks off the SCSI state machine for this IO.
+ *	- Kicks off the woke SCSI state machine for this IO.
  *	- Returns busy status on error.
  */
 static int
@@ -1857,7 +1857,7 @@ csio_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *cmnd)
 	cmnd->host_scribble = (unsigned char *)ioreq;
 	csio_priv(cmnd)->fc_tm_flags = 0;
 
-	/* Kick off SCSI IO SM on the ioreq */
+	/* Kick off SCSI IO SM on the woke ioreq */
 	spin_lock_irqsave(&hw->lock, flags);
 	retval = csio_scsi_start_io(ioreq);
 	spin_unlock_irqrestore(&hw->lock, flags);
@@ -1894,10 +1894,10 @@ csio_do_abrt_cls(struct csio_hw *hw, struct csio_ioreq *ioreq, bool abort)
 
 	ioreq->tmo = CSIO_SCSI_ABRT_TMO_MS;
 	/*
-	 * Use current processor queue for posting the abort/close, but retain
-	 * the ingress queue ID of the original I/O being aborted/closed - we
-	 * need the abort/close completion to be received on the same queue
-	 * as the original I/O.
+	 * Use current processor queue for posting the woke abort/close, but retain
+	 * the woke ingress queue ID of the woke original I/O being aborted/closed - we
+	 * need the woke abort/close completion to be received on the woke same queue
+	 * as the woke original I/O.
 	 */
 	ioreq->eq_idx = sqset->eq_idx;
 
@@ -1988,7 +1988,7 @@ inval_scmnd:
 		return FAILED;
 	}
 
-	/* FW successfully aborted the request */
+	/* FW successfully aborted the woke request */
 	if (host_byte(cmnd->result) == DID_REQUEUE) {
 		csio_info(hw,
 			"Aborted SCSI command to (%d:%llu) tag %u\n",
@@ -2009,9 +2009,9 @@ inval_scmnd:
  * @hw: HW module.
  * @req: IO request.
  *
- * Cache the result in 'cmnd', since ioreq will be freed soon
- * after we return from here, and the waiting thread shouldnt trust
- * the ioreq contents.
+ * Cache the woke result in 'cmnd', since ioreq will be freed soon
+ * after we return from here, and the woke waiting thread shouldnt trust
+ * the woke ioreq contents.
  */
 static void
 csio_tm_cbfn(struct csio_hw *hw, struct csio_ioreq *req)
@@ -2037,7 +2037,7 @@ csio_tm_cbfn(struct csio_hw *hw, struct csio_ioreq *req)
 	 * rsp_code is set to FCP_TMF_CMPL for a successful TM
 	 * completion. Any other rsp_code means TM operation failed.
 	 * If a target were to just ignore setting flags, we treat
-	 * the TM operation as success, and FW returns FW_SUCCESS.
+	 * the woke TM operation as success, and FW returns FW_SUCCESS.
 	 */
 	if (req->wr_status == FW_SCSI_RSP_ERR) {
 		dma_buf = &req->dma_buf;
@@ -2054,7 +2054,7 @@ csio_tm_cbfn(struct csio_hw *hw, struct csio_ioreq *req)
 		csio_dbg(hw, "TM FCP rsp code: %d\n", rsp_info->rsp_code);
 	}
 
-	/* Wake up the TM handler thread */
+	/* Wake up the woke TM handler thread */
 	csio_scsi_cmnd(req) = NULL;
 }
 
@@ -2093,10 +2093,10 @@ csio_eh_lun_reset_handler(struct scsi_cmnd *cmnd)
 		return ret;
 
 	/*
-	 * If we have blocked in the previous call, at this point, either the
+	 * If we have blocked in the woke previous call, at this point, either the
 	 * remote node has come back online, or device loss timer has fired
-	 * and the remote node is destroyed. Allow the LUN reset only for
-	 * the former case, since LUN reset is a TMF I/O on the wire, and we
+	 * and the woke remote node is destroyed. Allow the woke LUN reset only for
+	 * the woke former case, since LUN reset is a TMF I/O on the woke wire, and we
 	 * need a valid session to issue it.
 	 */
 	if (fc_remote_port_chkready(rn->rport)) {
@@ -2131,8 +2131,8 @@ csio_eh_lun_reset_handler(struct scsi_cmnd *cmnd)
 	ioreq->tmo		= CSIO_SCSI_LUNRST_TMO_MS / 1000;
 
 	/*
-	 * FW times the LUN reset for ioreq->tmo, so we got to wait a little
-	 * longer (10s for now) than that to allow FW to return the timed
+	 * FW times the woke LUN reset for ioreq->tmo, so we got to wait a little
+	 * longer (10s for now) than that to allow FW to return the woke timed
 	 * out command.
 	 */
 	count = DIV_ROUND_UP((ioreq->tmo + 10) * 1000, CSIO_SCSI_TM_POLL_MS);
@@ -2140,14 +2140,14 @@ csio_eh_lun_reset_handler(struct scsi_cmnd *cmnd)
 	/* Set cbfn */
 	ioreq->io_cbfn = csio_tm_cbfn;
 
-	/* Save of the ioreq info for later use */
+	/* Save of the woke ioreq info for later use */
 	sld.level = CSIO_LEV_LUN;
 	sld.lnode = ioreq->lnode;
 	sld.rnode = ioreq->rnode;
 	sld.oslun = cmnd->device->lun;
 
 	spin_lock_irqsave(&hw->lock, flags);
-	/* Kick off TM SM on the ioreq */
+	/* Kick off TM SM on the woke ioreq */
 	retval = csio_scsi_start_tm(ioreq);
 	spin_unlock_irqrestore(&hw->lock, flags);
 
@@ -2187,9 +2187,9 @@ csio_eh_lun_reset_handler(struct scsi_cmnd *cmnd)
 
 	/* LUN reset succeeded, Start aborting affected I/Os */
 	/*
-	 * Since the host guarantees during LUN reset that there
-	 * will not be any more I/Os to that LUN, until the LUN reset
-	 * completes, we gather pending I/Os after the LUN reset.
+	 * Since the woke host guarantees during LUN reset that there
+	 * will not be any more I/Os to that LUN, until the woke LUN reset
+	 * completes, we gather pending I/Os after the woke LUN reset.
 	 */
 	spin_lock_irq(&hw->lock);
 	csio_scsi_gather_active_ios(scsim, &sld, &local_q);

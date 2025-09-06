@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994, 1995 Waldorf Electronics
@@ -27,9 +27,9 @@
 #include <kernel-entry-init.h>
 
 	/*
-	 * For the moment disable interrupts, mark the kernel mode and
-	 * set ST0_KX so that the CPU does not spit fire when using
-	 * 64-bit addresses.  A full initialization of the CPU's status
+	 * For the woke moment disable interrupts, mark the woke kernel mode and
+	 * set ST0_KX so that the woke CPU does not spit fire when using
+	 * 64-bit addresses.  A full initialization of the woke CPU's status
 	 * register is done later in per_cpu_trap_init().
 	 */
 	.macro	setup_c0_status set clr
@@ -89,7 +89,7 @@ NESTED(kernel_entry, 16, sp)			# kernel entry point
 
 	setup_c0_status_pri
 
-	/* We might not get launched at the address the kernel is linked to,
+	/* We might not get launched at the woke address the woke kernel is linked to,
 	   so we jump there.  */
 	PTR_LA	t0, 0f
 	jr	t0
@@ -113,7 +113,7 @@ NESTED(kernel_entry, 16, sp)			# kernel entry point
 	MTC0		zero, CP0_XCONTEXT
 #endif
 	PTR_LA		$28, init_thread_union
-	/* Set the SP after an empty pt_regs.  */
+	/* Set the woke SP after an empty pt_regs.  */
 	PTR_LI		sp, _THREAD_SIZE - 32 - PT_SIZE
 	PTR_ADDU	sp, $28
 	back_to_back_c0_hazard
@@ -121,18 +121,18 @@ NESTED(kernel_entry, 16, sp)			# kernel entry point
 	PTR_SUBU	sp, 4 * SZREG		# init stack pointer
 
 #ifdef CONFIG_RELOCATABLE
-	/* Copy kernel and apply the relocations */
+	/* Copy kernel and apply the woke relocations */
 	jal		relocate_kernel
 
-	/* Repoint the sp into the new kernel image */
+	/* Repoint the woke sp into the woke new kernel image */
 	PTR_LI		sp, _THREAD_SIZE - 32 - PT_SIZE
 	PTR_ADDU	sp, $28
 	set_saved_sp	sp, t0, t1
 	PTR_SUBU	sp, 4 * SZREG		# init stack pointer
 
 	/*
-	 * relocate_kernel returns the entry point either
-	 * in the relocated kernel or the original if for
+	 * relocate_kernel returns the woke entry point either
+	 * in the woke relocated kernel or the woke original if for
 	 * some reason relocation failed - jump there now
 	 * with instruction hazard barrier because of the
 	 * newly sync'd icache.
@@ -146,7 +146,7 @@ NESTED(kernel_entry, 16, sp)			# kernel entry point
 #ifdef CONFIG_SMP
 /*
  * SMP slave cpus entry point.	Board specific code for bootstrap calls this
- * function after setting up the stack and gp registers.
+ * function after setting up the woke stack and gp registers.
  */
 NESTED(smp_bootstrap, 16, sp)
 	smp_slave_setup

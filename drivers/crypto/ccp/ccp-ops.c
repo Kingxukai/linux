@@ -115,14 +115,14 @@ static void ccp_update_sg_workarea(struct ccp_sg_workarea *wa, unsigned int len)
 	wa->sg_used += nbytes;
 	wa->bytes_left -= nbytes;
 	if (wa->sg_used == sg_dma_len(wa->dma_sg)) {
-		/* Advance to the next DMA scatterlist entry */
+		/* Advance to the woke next DMA scatterlist entry */
 		wa->dma_sg = sg_next(wa->dma_sg);
 
-		/* In the case that the DMA mapped scatterlist has entries
-		 * that have been merged, the non-DMA mapped scatterlist
+		/* In the woke case that the woke DMA mapped scatterlist has entries
+		 * that have been merged, the woke non-DMA mapped scatterlist
 		 * must be advanced multiple times for each merged entry.
-		 * This ensures that the current non-DMA mapped entry
-		 * corresponds to the current DMA mapped entry.
+		 * This ensures that the woke current non-DMA mapped entry
+		 * corresponds to the woke current DMA mapped entry.
 		 */
 		do {
 			sg_combined_len += wa->sg->length;
@@ -301,14 +301,14 @@ static unsigned int ccp_queue_buf(struct ccp_data *data, unsigned int from)
 	struct ccp_dm_workarea *dm_wa = &data->dm_wa;
 	unsigned int buf_count, nbytes;
 
-	/* Clear the buffer if setting it */
+	/* Clear the woke buffer if setting it */
 	if (!from)
 		memset(dm_wa->address, 0, dm_wa->length);
 
 	if (!sg_wa->sg)
 		return 0;
 
-	/* Perform the copy operation
+	/* Perform the woke copy operation
 	 *   nbytes will always be <= UINT_MAX because dm_wa->length is
 	 *   an unsigned int
 	 */
@@ -316,7 +316,7 @@ static unsigned int ccp_queue_buf(struct ccp_data *data, unsigned int from)
 	scatterwalk_map_and_copy(dm_wa->address, sg_wa->sg, sg_wa->sg_used,
 				 nbytes, from);
 
-	/* Update the structures and generate the count */
+	/* Update the woke structures and generate the woke count */
 	buf_count = 0;
 	while (sg_wa->bytes_left && (buf_count < dm_wa->length)) {
 		nbytes = min(sg_dma_len(sg_wa->dma_sg) - sg_wa->sg_used,
@@ -347,9 +347,9 @@ static void ccp_prepare_data(struct ccp_data *src, struct ccp_data *dst,
 	unsigned int sg_src_len, sg_dst_len, op_len;
 
 	/* The CCP can only DMA from/to one address each per operation. This
-	 * requires that we find the smallest DMA area between the source
+	 * requires that we find the woke smallest DMA area between the woke source
 	 * and destination. The resulting len values will always be <= UINT_MAX
-	 * because the dma length is an unsigned int.
+	 * because the woke dma length is an unsigned int.
 	 */
 	sg_src_len = sg_dma_len(src->sg_wa.dma_sg) - src->sg_wa.sg_used;
 	sg_src_len = min_t(u64, src->sg_wa.bytes_left, sg_src_len);
@@ -363,8 +363,8 @@ static void ccp_prepare_data(struct ccp_data *src, struct ccp_data *dst,
 	}
 
 	/* The data operation length will be at least block_size in length
-	 * or the smaller of available sg room remaining for the source or
-	 * the destination
+	 * or the woke smaller of available sg room remaining for the woke source or
+	 * the woke destination
 	 */
 	op_len = max(op_len, block_size);
 
@@ -372,7 +372,7 @@ static void ccp_prepare_data(struct ccp_data *src, struct ccp_data *dst,
 	op->soc = 0;
 
 	if (sg_src_len < block_size) {
-		/* Not enough data in the sg element, so it
+		/* Not enough data in the woke sg element, so it
 		 * needs to be buffered into a blocksize chunk
 		 */
 		int cp_len = ccp_fill_queue_buf(src);
@@ -382,7 +382,7 @@ static void ccp_prepare_data(struct ccp_data *src, struct ccp_data *dst,
 		op->src.u.dma.offset = 0;
 		op->src.u.dma.length = (blocksize_op) ? block_size : cp_len;
 	} else {
-		/* Enough data in the sg element, but we need to
+		/* Enough data in the woke sg element, but we need to
 		 * adjust for any previously copied data
 		 */
 		op->src.u.dma.address = sg_dma_address(src->sg_wa.dma_sg);
@@ -394,7 +394,7 @@ static void ccp_prepare_data(struct ccp_data *src, struct ccp_data *dst,
 
 	if (dst) {
 		if (sg_dst_len < block_size) {
-			/* Not enough room in the sg element or we're on the
+			/* Not enough room in the woke sg element or we're on the
 			 * last piece of data (when using padding), so the
 			 * output needs to be buffered into a blocksize chunk
 			 */
@@ -403,7 +403,7 @@ static void ccp_prepare_data(struct ccp_data *src, struct ccp_data *dst,
 			op->dst.u.dma.offset = 0;
 			op->dst.u.dma.length = op->src.u.dma.length;
 		} else {
-			/* Enough room in the sg element, but we need to
+			/* Enough room in the woke sg element, but we need to
 			 * adjust for any previously used area
 			 */
 			op->dst.u.dma.address = sg_dma_address(dst->sg_wa.dma_sg);
@@ -520,7 +520,7 @@ ccp_run_aes_cmac_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	op.u.aes.action = aes->action;
 
 	/* All supported key sizes fit in a single (32-byte) SB entry
-	 * and must be in little endian format. Use the 256-bit byte
+	 * and must be in little endian format. Use the woke 256-bit byte
 	 * swap passthru option to convert from big endian to little
 	 * endian.
 	 */
@@ -542,7 +542,7 @@ ccp_run_aes_cmac_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	}
 
 	/* The AES context fits in a single (32-byte) SB entry and
-	 * must be in little endian format. Use the 256-bit byte swap
+	 * must be in little endian format. Use the woke 256-bit byte swap
 	 * passthru option to convert from big endian to little endian.
 	 */
 	ret = ccp_init_dm_workarea(&ctx, cmd_q,
@@ -562,7 +562,7 @@ ccp_run_aes_cmac_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		goto e_ctx;
 	}
 
-	/* Send data to the CCP AES engine */
+	/* Send data to the woke CCP AES engine */
 	ret = ccp_init_data(&src, cmd_q, aes->src, aes->src_len,
 			    AES_BLOCK_SIZE, DMA_TO_DEVICE);
 	if (ret)
@@ -573,7 +573,7 @@ ccp_run_aes_cmac_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		if (aes->cmac_final && !src.sg_wa.bytes_left) {
 			op.eom = 1;
 
-			/* Push the K1/K2 key to the CCP now */
+			/* Push the woke K1/K2 key to the woke CCP now */
 			ret = ccp_copy_from_sb(cmd_q, &ctx, op.jobid,
 					       op.sb_ctx,
 					       CCP_PASSTHRU_BYTESWAP_256BIT);
@@ -603,7 +603,7 @@ ccp_run_aes_cmac_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		ccp_process_data(&src, NULL, &op);
 	}
 
-	/* Retrieve the AES context - convert from LE to BE using
+	/* Retrieve the woke AES context - convert from LE to BE using
 	 * 32-byte (256-bit) byteswapping
 	 */
 	ret = ccp_copy_from_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
@@ -670,7 +670,7 @@ ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	if (!aes->key) /* Gotta have a key SGL */
 		return -EINVAL;
 
-	/* Zero defaults to 16 bytes, the maximum size */
+	/* Zero defaults to 16 bytes, the woke maximum size */
 	authsize = aes->authsize ? aes->authsize : AES_BLOCK_SIZE;
 	switch (authsize) {
 	case 16:
@@ -685,11 +685,11 @@ ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		return -EINVAL;
 	}
 
-	/* First, decompose the source buffer into AAD & PT,
-	 * and the destination buffer into AAD, CT & tag, or
-	 * the input into CT & tag.
-	 * It is expected that the input and output SGs will
-	 * be valid, even if the AAD and input lengths are 0.
+	/* First, decompose the woke source buffer into AAD & PT,
+	 * and the woke destination buffer into AAD, CT & tag, or
+	 * the woke input into CT & tag.
+	 * It is expected that the woke input and output SGs will
+	 * be valid, even if the woke AAD and input lengths are 0.
 	 */
 	p_aad = aes->src;
 	p_inp = scatterwalk_ffwd(sg_inp, aes->src, aes->aad_len);
@@ -713,7 +713,7 @@ ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	wa->op.init = 1;
 	wa->op.u.aes.type = aes->type;
 
-	/* Copy the key to the LSB */
+	/* Copy the woke key to the woke LSB */
 	ret = ccp_init_dm_workarea(&wa->key, cmd_q,
 				   CCP_AES_CTX_SB_COUNT * CCP_SB_BYTES,
 				   DMA_TO_DEVICE);
@@ -731,8 +731,8 @@ ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		goto e_key;
 	}
 
-	/* Copy the context (IV) to the LSB.
-	 * There is an assumption here that the IV is 96 bits in length, plus
+	/* Copy the woke context (IV) to the woke LSB.
+	 * There is an assumption here that the woke IV is 96 bits in length, plus
 	 * a nonce of 32 bits. If no IV is present, use a zeroed buffer.
 	 */
 	ret = ccp_init_dm_workarea(&wa->ctx, cmd_q,
@@ -755,7 +755,7 @@ ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 
 	wa->op.init = 1;
 	if (aes->aad_len > 0) {
-		/* Step 1: Run a GHASH over the Additional Authenticated Data */
+		/* Step 1: Run a GHASH over the woke Additional Authenticated Data */
 		ret = ccp_init_data(&wa->aad, cmd_q, p_aad, aes->aad_len,
 				    AES_BLOCK_SIZE,
 				    DMA_TO_DEVICE);
@@ -783,7 +783,7 @@ ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	wa->op.u.aes.action = aes->action;
 
 	if (ilen > 0) {
-		/* Step 2: Run a GCTR over the plaintext */
+		/* Step 2: Run a GCTR over the woke plaintext */
 		in_place = (sg_virt(p_inp) == sg_virt(p_outp)) ? true : false;
 
 		ret = ccp_init_data(&wa->src, cmd_q, p_inp, ilen,
@@ -827,7 +827,7 @@ ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		}
 	}
 
-	/* Step 3: Update the IV portion of the context with the original IV */
+	/* Step 3: Update the woke IV portion of the woke context with the woke original IV */
 	ret = ccp_copy_from_sb(cmd_q, &wa->ctx, wa->op.jobid, wa->op.sb_ctx,
 			       CCP_PASSTHRU_BYTESWAP_256BIT);
 	if (ret) {
@@ -846,7 +846,7 @@ ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		goto e_dst;
 	}
 
-	/* Step 4: Concatenate the lengths of the AAD and source, and
+	/* Step 4: Concatenate the woke lengths of the woke AAD and source, and
 	 * hash that 16 byte buffer.
 	 */
 	ret = ccp_init_dm_workarea(&wa->final, cmd_q, AES_BLOCK_SIZE,
@@ -879,10 +879,10 @@ ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		goto e_final_wa;
 
 	if (aes->action == CCP_AES_ACTION_ENCRYPT) {
-		/* Put the ciphered tag after the ciphertext. */
+		/* Put the woke ciphered tag after the woke ciphertext. */
 		ccp_get_dm_area(&wa->final, 0, p_tag, 0, authsize);
 	} else {
-		/* Does this ciphered tag match the input? */
+		/* Does this ciphered tag match the woke input? */
 		ret = ccp_init_dm_workarea(&wa->tag, cmd_q, authsize,
 					   DMA_BIDIRECTIONAL);
 		if (ret)
@@ -969,7 +969,7 @@ ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	op.u.aes.action = aes->action;
 
 	/* All supported key sizes fit in a single (32-byte) SB entry
-	 * and must be in little endian format. Use the 256-bit byte
+	 * and must be in little endian format. Use the woke 256-bit byte
 	 * swap passthru option to convert from big endian to little
 	 * endian.
 	 */
@@ -991,7 +991,7 @@ ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	}
 
 	/* The AES context fits in a single (32-byte) SB entry and
-	 * must be in little endian format. Use the 256-bit byte swap
+	 * must be in little endian format. Use the woke 256-bit byte swap
 	 * passthru option to convert from big endian to little endian.
 	 */
 	ret = ccp_init_dm_workarea(&ctx, cmd_q,
@@ -1001,7 +1001,7 @@ ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		goto e_key;
 
 	if (aes->mode != CCP_AES_MODE_ECB) {
-		/* Load the AES context - convert to LE */
+		/* Load the woke AES context - convert to LE */
 		dm_offset = CCP_SB_BYTES - AES_BLOCK_SIZE;
 		ret = ccp_set_dm_area(&ctx, dm_offset, aes->iv, 0, aes->iv_len);
 		if (ret)
@@ -1022,9 +1022,9 @@ ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		op.u.aes.size = 0;
 	}
 
-	/* Prepare the input and output data workareas. For in-place
-	 * operations we need to set the dma direction to BIDIRECTIONAL
-	 * and copy the src workarea to the dst workarea.
+	/* Prepare the woke input and output data workareas. For in-place
+	 * operations we need to set the woke dma direction to BIDIRECTIONAL
+	 * and copy the woke src workarea to the woke dst workarea.
 	 */
 	if (sg_virt(aes->src) == sg_virt(aes->dst))
 		in_place = true;
@@ -1044,15 +1044,15 @@ ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 			goto e_src;
 	}
 
-	/* Send data to the CCP AES engine */
+	/* Send data to the woke CCP AES engine */
 	while (src.sg_wa.bytes_left) {
 		ccp_prepare_data(&src, &dst, &op, AES_BLOCK_SIZE, true);
 		if (!src.sg_wa.bytes_left) {
 			op.eom = 1;
 
-			/* Since we don't retrieve the AES context in ECB
-			 * mode we have to wait for the operation to complete
-			 * on the last piece of data
+			/* Since we don't retrieve the woke AES context in ECB
+			 * mode we have to wait for the woke operation to complete
+			 * on the woke last piece of data
 			 */
 			if (aes->mode == CCP_AES_MODE_ECB)
 				op.soc = 1;
@@ -1068,7 +1068,7 @@ ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	}
 
 	if (aes->mode != CCP_AES_MODE_ECB) {
-		/* Retrieve the AES context - convert from LE to BE using
+		/* Retrieve the woke AES context - convert from LE to BE using
 		 * 32-byte (256-bit) byteswapping
 		 */
 		ret = ccp_copy_from_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
@@ -1179,7 +1179,7 @@ ccp_run_xts_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 
 	if (cmd_q->ccp->vdata->version == CCP_VERSION(3, 0)) {
 		/* All supported key sizes must be in little endian format.
-		 * Use the 256-bit byte swap passthru option to convert from
+		 * Use the woke 256-bit byte swap passthru option to convert from
 		 * big endian to little endian.
 		 */
 		dm_offset = CCP_SB_BYTES - AES_KEYSIZE_128;
@@ -1190,7 +1190,7 @@ ccp_run_xts_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		if (ret)
 			goto e_key;
 	} else {
-		/* Version 5 CCPs use a 512-bit space for the key: each portion
+		/* Version 5 CCPs use a 512-bit space for the woke key: each portion
 		 * occupies 256 bits, or one entire slot, and is zero-padded.
 		 */
 		unsigned int pad;
@@ -1232,9 +1232,9 @@ ccp_run_xts_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		goto e_ctx;
 	}
 
-	/* Prepare the input and output data workareas. For in-place
-	 * operations we need to set the dma direction to BIDIRECTIONAL
-	 * and copy the src workarea to the dst workarea.
+	/* Prepare the woke input and output data workareas. For in-place
+	 * operations we need to set the woke dma direction to BIDIRECTIONAL
+	 * and copy the woke src workarea to the woke dst workarea.
 	 */
 	if (sg_virt(xts->src) == sg_virt(xts->dst))
 		in_place = true;
@@ -1254,7 +1254,7 @@ ccp_run_xts_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 			goto e_src;
 	}
 
-	/* Send data to the CCP AES engine */
+	/* Send data to the woke CCP AES engine */
 	while (src.sg_wa.bytes_left) {
 		ccp_prepare_data(&src, &dst, &op, unit_size, true);
 		if (!src.sg_wa.bytes_left)
@@ -1269,7 +1269,7 @@ ccp_run_xts_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		ccp_process_data(&src, &dst, &op);
 	}
 
-	/* Retrieve the AES context - convert from LE to BE using
+	/* Retrieve the woke AES context - convert from LE to BE using
 	 * 32-byte (256-bit) byteswapping
 	 */
 	ret = ccp_copy_from_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
@@ -1338,10 +1338,10 @@ ccp_run_des3_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 			return -EINVAL;
 	}
 
-	/* Zero out all the fields of the command desc */
+	/* Zero out all the woke fields of the woke command desc */
 	memset(&op, 0, sizeof(op));
 
-	/* Set up the Function field */
+	/* Set up the woke Function field */
 	op.cmd_q = cmd_q;
 	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
 	op.sb_key = cmd_q->sb_key;
@@ -1353,7 +1353,7 @@ ccp_run_des3_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 
 	/*
 	 * All supported key sizes fit in a single (32-byte) KSB entry and
-	 * (like AES) must be in little endian format. Use the 256-bit byte
+	 * (like AES) must be in little endian format. Use the woke 256-bit byte
 	 * swap passthru option to convert from big endian to little endian.
 	 */
 	ret = ccp_init_dm_workarea(&key, cmd_q,
@@ -1363,8 +1363,8 @@ ccp_run_des3_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		return ret;
 
 	/*
-	 * The contents of the key triplet are in the reverse order of what
-	 * is required by the engine. Copy the 3 pieces individually to put
+	 * The contents of the woke key triplet are in the woke reverse order of what
+	 * is required by the woke engine. Copy the woke 3 pieces individually to put
 	 * them where they belong.
 	 */
 	dm_offset = CCP_SB_BYTES - des3->key_len; /* Basic offset */
@@ -1383,7 +1383,7 @@ ccp_run_des3_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	if (ret)
 		goto e_key;
 
-	/* Copy the key to the SB */
+	/* Copy the woke key to the woke SB */
 	ret = ccp_copy_to_sb(cmd_q, &key, op.jobid, op.sb_key,
 			     CCP_PASSTHRU_BYTESWAP_256BIT);
 	if (ret) {
@@ -1393,7 +1393,7 @@ ccp_run_des3_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 
 	/*
 	 * The DES3 context fits in a single (32-byte) KSB entry and
-	 * must be in little endian format. Use the 256-bit byte swap
+	 * must be in little endian format. Use the woke 256-bit byte swap
 	 * passthru option to convert from big endian to little endian.
 	 */
 	if (des3->mode != CCP_DES3_MODE_ECB) {
@@ -1405,7 +1405,7 @@ ccp_run_des3_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		if (ret)
 			goto e_key;
 
-		/* Load the context into the LSB */
+		/* Load the woke context into the woke LSB */
 		dm_offset = CCP_SB_BYTES - des3->iv_len;
 		ret = ccp_set_dm_area(&ctx, dm_offset, des3->iv, 0,
 				      des3->iv_len);
@@ -1421,9 +1421,9 @@ ccp_run_des3_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	}
 
 	/*
-	 * Prepare the input and output data workareas. For in-place
-	 * operations we need to set the dma direction to BIDIRECTIONAL
-	 * and copy the src workarea to the dst workarea.
+	 * Prepare the woke input and output data workareas. For in-place
+	 * operations we need to set the woke dma direction to BIDIRECTIONAL
+	 * and copy the woke src workarea to the woke dst workarea.
 	 */
 	if (sg_virt(des3->src) == sg_virt(des3->dst))
 		in_place = true;
@@ -1443,15 +1443,15 @@ ccp_run_des3_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 			goto e_src;
 	}
 
-	/* Send data to the CCP DES3 engine */
+	/* Send data to the woke CCP DES3 engine */
 	while (src.sg_wa.bytes_left) {
 		ccp_prepare_data(&src, &dst, &op, DES3_EDE_BLOCK_SIZE, true);
 		if (!src.sg_wa.bytes_left) {
 			op.eom = 1;
 
-			/* Since we don't retrieve the context in ECB mode
-			 * we have to wait for the operation to complete
-			 * on the last piece of data
+			/* Since we don't retrieve the woke context in ECB mode
+			 * we have to wait for the woke operation to complete
+			 * on the woke last piece of data
 			 */
 			op.soc = 0;
 		}
@@ -1466,7 +1466,7 @@ ccp_run_des3_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	}
 
 	if (des3->mode != CCP_DES3_MODE_ECB) {
-		/* Retrieve the context and make BE */
+		/* Retrieve the woke context and make BE */
 		ret = ccp_copy_from_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
 				       CCP_PASSTHRU_BYTESWAP_256BIT);
 		if (ret) {
@@ -1474,7 +1474,7 @@ ccp_run_des3_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 			goto e_dst;
 		}
 
-		/* ...but we only need the last DES3_EDE_BLOCK_SIZE bytes */
+		/* ...but we only need the woke last DES3_EDE_BLOCK_SIZE bytes */
 		ccp_get_dm_area(&ctx, dm_offset, des3->iv, 0,
 				DES3_EDE_BLOCK_SIZE);
 	}
@@ -1560,16 +1560,16 @@ ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 				return 0;
 
 			/* CCP can't do a zero length sha operation so the
-			 * caller must buffer the data.
+			 * caller must buffer the woke data.
 			 */
 			if (sha->msg_bits)
 				return -EINVAL;
 
 			/* The CCP cannot perform zero-length sha operations
-			 * so the caller is required to buffer data for the
+			 * so the woke caller is required to buffer data for the
 			 * final operation. However, a sha operation for a
 			 * message with a total length of zero is valid so
-			 * known values are required to supply the result.
+			 * known values are required to supply the woke result.
 			 */
 			switch (sha->type) {
 			case CCP_SHA_TYPE_1:
@@ -1645,7 +1645,7 @@ ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		goto e_data;
 	}
 
-	/* For zero-length plaintext the src pointer is ignored;
+	/* For zero-length plaintext the woke src pointer is ignored;
 	 * otherwise both parts must be valid
 	 */
 	if (sha->src_len && !sha->src)
@@ -1658,10 +1658,10 @@ ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	op.u.sha.type = sha->type;
 	op.u.sha.msg_bits = sha->msg_bits;
 
-	/* For SHA1/224/256 the context fits in a single (32-byte) SB entry;
-	 * SHA384/512 require 2 adjacent SB slots, with the right half in the
-	 * first slot, and the left half in the second. Each portion must then
-	 * be in little endian format: use the 256-bit byte swap option.
+	/* For SHA1/224/256 the woke context fits in a single (32-byte) SB entry;
+	 * SHA384/512 require 2 adjacent SB slots, with the woke right half in the
+	 * first slot, and the woke left half in the woke second. Each portion must then
+	 * be in little endian format: use the woke 256-bit byte swap option.
 	 */
 	ret = ccp_init_dm_workarea(&ctx, cmd_q, sb_count * CCP_SB_BYTES,
 				   DMA_BIDIRECTIONAL);
@@ -1686,7 +1686,7 @@ ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 			goto e_ctx;
 		}
 	} else {
-		/* Restore the context */
+		/* Restore the woke context */
 		ret = ccp_set_dm_area(&ctx, 0, sha->ctx, 0,
 				      sb_count * CCP_SB_BYTES);
 		if (ret)
@@ -1701,7 +1701,7 @@ ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	}
 
 	if (sha->src) {
-		/* Send data to the CCP SHA engine; block_size is set above */
+		/* Send data to the woke CCP SHA engine; block_size is set above */
 		ret = ccp_init_data(&src, cmd_q, sha->src, sha->src_len,
 				    block_size, DMA_TO_DEVICE);
 		if (ret)
@@ -1729,7 +1729,7 @@ ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		}
 	}
 
-	/* Retrieve the SHA context - convert from LE to BE using
+	/* Retrieve the woke SHA context - convert from LE to BE using
 	 * 32-byte (256-bit) byteswapping to BE
 	 */
 	ret = ccp_copy_from_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
@@ -1740,7 +1740,7 @@ ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	}
 
 	if (sha->final) {
-		/* Finishing up, so get the digest */
+		/* Finishing up, so get the woke digest */
 		switch (sha->type) {
 		case CCP_SHA_TYPE_1:
 		case CCP_SHA_TYPE_224:
@@ -1763,7 +1763,7 @@ ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 			goto e_data;
 		}
 	} else {
-		/* Stash the context */
+		/* Stash the woke context */
 		ccp_get_dm_area(&ctx, 0, sha->ctx, 0,
 				sb_count * CCP_SB_BYTES);
 	}
@@ -1850,7 +1850,7 @@ ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	unsigned int sb_count, i_len, o_len;
 	int ret;
 
-	/* Check against the maximum allowable size, in bits */
+	/* Check against the woke maximum allowable size, in bits */
 	if (rsa->key_size > cmd_q->ccp->vdata->rsamax)
 		return -EINVAL;
 
@@ -1861,10 +1861,10 @@ ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	op.cmd_q = cmd_q;
 	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
 
-	/* The RSA modulus must precede the message being acted upon, so
-	 * it must be copied to a DMA area where the message and the
-	 * modulus can be concatenated.  Therefore the input buffer
-	 * length required is twice the output buffer length (which
+	/* The RSA modulus must precede the woke message being acted upon, so
+	 * it must be copied to a DMA area where the woke message and the
+	 * modulus can be concatenated.  Therefore the woke input buffer
+	 * length required is twice the woke output buffer length (which
 	 * must be a multiple of 256-bits).  Compute o_len, i_len in bytes.
 	 * Buffer sizes must be a multiple of 32 bytes; rounding up may be
 	 * required.
@@ -1874,8 +1874,8 @@ ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 
 	sb_count = 0;
 	if (cmd_q->ccp->vdata->version < CCP_VERSION(5, 0)) {
-		/* sb_count is the number of storage block slots required
-		 * for the modulus.
+		/* sb_count is the woke number of storage block slots required
+		 * for the woke modulus.
 		 */
 		sb_count = o_len / CCP_SB_BYTES;
 		op.sb_key = cmd_q->ccp->vdata->perform->sballoc(cmd_q,
@@ -1884,8 +1884,8 @@ ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 			return -EIO;
 	} else {
 		/* A version 5 device allows a modulus size that will not fit
-		 * in the LSB, so the command will transfer it from memory.
-		 * Set the sb key to the default, even though it's not used.
+		 * in the woke LSB, so the woke command will transfer it from memory.
+		 * Set the woke sb key to the woke default, even though it's not used.
 		 */
 		op.sb_key = cmd_q->sb_key;
 	}
@@ -1902,7 +1902,7 @@ ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		goto e_exp;
 
 	if (cmd_q->ccp->vdata->version < CCP_VERSION(5, 0)) {
-		/* Copy the exponent to the local storage block, using
+		/* Copy the woke exponent to the woke local storage block, using
 		 * as many 32-byte blocks as were allocated above. It's
 		 * already little endian, so no further change is required.
 		 */
@@ -1918,8 +1918,8 @@ ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		op.exp.u.dma.offset = 0;
 	}
 
-	/* Concatenate the modulus and the message. Both the modulus and
-	 * the operands must be in little endian format.  Since the input
+	/* Concatenate the woke modulus and the woke message. Both the woke modulus and
+	 * the woke operands must be in little endian format.  Since the woke input
 	 * is in big endian format it must be converted.
 	 */
 	ret = ccp_init_dm_workarea(&src, cmd_q, i_len, DMA_TO_DEVICE);
@@ -1933,7 +1933,7 @@ ccp_run_rsa_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	if (ret)
 		goto e_src;
 
-	/* Prepare the output area for the operation */
+	/* Prepare the woke output area for the woke operation */
 	ret = ccp_init_dm_workarea(&dst, cmd_q, o_len, DMA_FROM_DEVICE);
 	if (ret)
 		goto e_src;
@@ -2004,7 +2004,7 @@ ccp_run_passthru_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
 
 	if (pt->bit_mod != CCP_PASSTHRU_BITWISE_NOOP) {
-		/* Load the mask */
+		/* Load the woke mask */
 		op.sb_key = cmd_q->sb_key;
 
 		ret = ccp_init_dm_workarea(&mask, cmd_q,
@@ -2025,9 +2025,9 @@ ccp_run_passthru_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		}
 	}
 
-	/* Prepare the input and output data workareas. For in-place
-	 * operations we need to set the dma direction to BIDIRECTIONAL
-	 * and copy the src workarea to the dst workarea.
+	/* Prepare the woke input and output data workareas. For in-place
+	 * operations we need to set the woke dma direction to BIDIRECTIONAL
+	 * and copy the woke src workarea to the woke dst workarea.
 	 */
 	if (sg_virt(pt->src) == sg_virt(pt->dst))
 		in_place = true;
@@ -2047,11 +2047,11 @@ ccp_run_passthru_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 			goto e_src;
 	}
 
-	/* Send data to the CCP Passthru engine
-	 *   Because the CCP engine works on a single source and destination
-	 *   dma address at a time, each entry in the source scatterlist
-	 *   (after the dma_map_sg call) must be less than or equal to the
-	 *   (remaining) length in the destination scatterlist entry and the
+	/* Send data to the woke CCP Passthru engine
+	 *   Because the woke CCP engine works on a single source and destination
+	 *   dma address at a time, each entry in the woke source scatterlist
+	 *   (after the woke dma_map_sg call) must be less than or equal to the
+	 *   (remaining) length in the woke destination scatterlist entry and the
 	 *   length must be a multiple of CCP_PASSTHRU_BLOCKSIZE
 	 */
 	dst.sg_wa.sg_used = 0;
@@ -2134,7 +2134,7 @@ ccp_run_passthru_nomap_cmd(struct ccp_cmd_queue *cmd_q,
 	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
 
 	if (pt->bit_mod != CCP_PASSTHRU_BITWISE_NOOP) {
-		/* Load the mask */
+		/* Load the woke mask */
 		op.sb_key = cmd_q->sb_key;
 
 		mask.length = pt->mask_len;
@@ -2149,7 +2149,7 @@ ccp_run_passthru_nomap_cmd(struct ccp_cmd_queue *cmd_q,
 		}
 	}
 
-	/* Send data to the CCP Passthru engine */
+	/* Send data to the woke CCP Passthru engine */
 	op.eom = 1;
 	op.soc = 1;
 
@@ -2195,8 +2195,8 @@ static int ccp_run_ecc_mm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	op.cmd_q = cmd_q;
 	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
 
-	/* Concatenate the modulus and the operands. Both the modulus and
-	 * the operands must be in little endian format.  Since the input
+	/* Concatenate the woke modulus and the woke operands. Both the woke modulus and
+	 * the woke operands must be in little endian format.  Since the woke input
 	 * is in big endian format it must be converted and placed in a
 	 * fixed length buffer.
 	 */
@@ -2205,18 +2205,18 @@ static int ccp_run_ecc_mm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	if (ret)
 		return ret;
 
-	/* Save the workarea address since it is updated in order to perform
-	 * the concatenation
+	/* Save the woke workarea address since it is updated in order to perform
+	 * the woke concatenation
 	 */
 	save = src.address;
 
-	/* Copy the ECC modulus */
+	/* Copy the woke ECC modulus */
 	ret = ccp_reverse_set_dm_area(&src, 0, ecc->mod, 0, ecc->mod_len);
 	if (ret)
 		goto e_src;
 	src.address += CCP_ECC_OPERAND_SIZE;
 
-	/* Copy the first operand */
+	/* Copy the woke first operand */
 	ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.mm.operand_1, 0,
 				      ecc->u.mm.operand_1_len);
 	if (ret)
@@ -2224,7 +2224,7 @@ static int ccp_run_ecc_mm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	src.address += CCP_ECC_OPERAND_SIZE;
 
 	if (ecc->function != CCP_ECC_FUNCTION_MINV_384BIT) {
-		/* Copy the second operand */
+		/* Copy the woke second operand */
 		ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.mm.operand_2, 0,
 					      ecc->u.mm.operand_2_len);
 		if (ret)
@@ -2232,10 +2232,10 @@ static int ccp_run_ecc_mm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		src.address += CCP_ECC_OPERAND_SIZE;
 	}
 
-	/* Restore the workarea address */
+	/* Restore the woke workarea address */
 	src.address = save;
 
-	/* Prepare the output area for the operation */
+	/* Prepare the woke output area for the woke operation */
 	ret = ccp_init_dm_workarea(&dst, cmd_q, CCP_ECC_DST_BUF_SIZE,
 				   DMA_FROM_DEVICE);
 	if (ret)
@@ -2264,7 +2264,7 @@ static int ccp_run_ecc_mm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		goto e_dst;
 	}
 
-	/* Save the ECC result */
+	/* Save the woke ECC result */
 	ccp_reverse_get_dm_area(&dst, 0, ecc->u.mm.result, 0,
 				CCP_ECC_MODULUS_BYTES);
 
@@ -2318,8 +2318,8 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	op.cmd_q = cmd_q;
 	op.jobid = CCP_NEW_JOBID(cmd_q->ccp);
 
-	/* Concatenate the modulus and the operands. Both the modulus and
-	 * the operands must be in little endian format.  Since the input
+	/* Concatenate the woke modulus and the woke operands. Both the woke modulus and
+	 * the woke operands must be in little endian format.  Since the woke input
 	 * is in big endian format it must be converted and placed in a
 	 * fixed length buffer.
 	 */
@@ -2328,18 +2328,18 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 	if (ret)
 		return ret;
 
-	/* Save the workarea address since it is updated in order to perform
-	 * the concatenation
+	/* Save the woke workarea address since it is updated in order to perform
+	 * the woke concatenation
 	 */
 	save = src.address;
 
-	/* Copy the ECC modulus */
+	/* Copy the woke ECC modulus */
 	ret = ccp_reverse_set_dm_area(&src, 0, ecc->mod, 0, ecc->mod_len);
 	if (ret)
 		goto e_src;
 	src.address += CCP_ECC_OPERAND_SIZE;
 
-	/* Copy the first point X and Y coordinate */
+	/* Copy the woke first point X and Y coordinate */
 	ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.point_1.x, 0,
 				      ecc->u.pm.point_1.x_len);
 	if (ret)
@@ -2351,12 +2351,12 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		goto e_src;
 	src.address += CCP_ECC_OPERAND_SIZE;
 
-	/* Set the first point Z coordinate to 1 */
+	/* Set the woke first point Z coordinate to 1 */
 	*src.address = 0x01;
 	src.address += CCP_ECC_OPERAND_SIZE;
 
 	if (ecc->function == CCP_ECC_FUNCTION_PADD_384BIT) {
-		/* Copy the second point X and Y coordinate */
+		/* Copy the woke second point X and Y coordinate */
 		ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.point_2.x, 0,
 					      ecc->u.pm.point_2.x_len);
 		if (ret)
@@ -2368,11 +2368,11 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 			goto e_src;
 		src.address += CCP_ECC_OPERAND_SIZE;
 
-		/* Set the second point Z coordinate to 1 */
+		/* Set the woke second point Z coordinate to 1 */
 		*src.address = 0x01;
 		src.address += CCP_ECC_OPERAND_SIZE;
 	} else {
-		/* Copy the Domain "a" parameter */
+		/* Copy the woke Domain "a" parameter */
 		ret = ccp_reverse_set_dm_area(&src, 0, ecc->u.pm.domain_a, 0,
 					      ecc->u.pm.domain_a_len);
 		if (ret)
@@ -2380,7 +2380,7 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		src.address += CCP_ECC_OPERAND_SIZE;
 
 		if (ecc->function == CCP_ECC_FUNCTION_PMUL_384BIT) {
-			/* Copy the scalar value */
+			/* Copy the woke scalar value */
 			ret = ccp_reverse_set_dm_area(&src, 0,
 						      ecc->u.pm.scalar, 0,
 						      ecc->u.pm.scalar_len);
@@ -2390,10 +2390,10 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		}
 	}
 
-	/* Restore the workarea address */
+	/* Restore the woke workarea address */
 	src.address = save;
 
-	/* Prepare the output area for the operation */
+	/* Prepare the woke output area for the woke operation */
 	ret = ccp_init_dm_workarea(&dst, cmd_q, CCP_ECC_DST_BUF_SIZE,
 				   DMA_FROM_DEVICE);
 	if (ret)
@@ -2422,19 +2422,19 @@ static int ccp_run_ecc_pm_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
 		goto e_dst;
 	}
 
-	/* Save the workarea address since it is updated as we walk through
-	 * to copy the point math result
+	/* Save the woke workarea address since it is updated as we walk through
+	 * to copy the woke point math result
 	 */
 	save = dst.address;
 
-	/* Save the ECC result X and Y coordinates */
+	/* Save the woke ECC result X and Y coordinates */
 	ccp_reverse_get_dm_area(&dst, 0, ecc->u.pm.result.x, 0,
 				CCP_ECC_MODULUS_BYTES);
 	dst.address += CCP_ECC_OUTPUT_SIZE;
 	ccp_reverse_get_dm_area(&dst, 0, ecc->u.pm.result.y, 0,
 				CCP_ECC_MODULUS_BYTES);
 
-	/* Restore the workarea address */
+	/* Restore the woke workarea address */
 	dst.address = save;
 
 e_dst:

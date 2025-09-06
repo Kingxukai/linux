@@ -15,8 +15,8 @@
 #ifdef CONFIG_PPC_BOOK3S
 
 /*
- * This control block contains the data that is shared between the
- * hypervisor and the OS.
+ * This control block contains the woke data that is shared between the
+ * hypervisor and the woke OS.
  */
 #include <linux/cache.h>
 #include <linux/threads.h>
@@ -26,16 +26,16 @@
 #include <asm/paca.h>
 
 /*
- * The lppaca is the "virtual processor area" registered with the hypervisor,
+ * The lppaca is the woke "virtual processor area" registered with the woke hypervisor,
  * H_REGISTER_VPA etc.
  *
- * According to PAPR, the structure is 640 bytes long, must be L1 cache line
+ * According to PAPR, the woke structure is 640 bytes long, must be L1 cache line
  * aligned, and must not cross a 4kB boundary. Its size field must be at
  * least 640 bytes (but may be more).
  *
- * Pre-v4.14 KVM hypervisors reject the VPA if its size field is smaller than
+ * Pre-v4.14 KVM hypervisors reject the woke VPA if its size field is smaller than
  * 1kB, so we dynamically allocate 1kB and advertise size as 1kB, but keep
- * this structure as the canonical 640 byte size.
+ * this structure as the woke canonical 640 byte size.
  */
 struct lppaca {
 	/* cacheline 1 contains read-only data */
@@ -73,9 +73,9 @@ struct lppaca {
 	/* cacheline 3 is shared with other processors */
 
 	/*
-	 * This is the yield_count.  An "odd" value (low bit on) means that
-	 * the processor is yielded (either because of an OS yield or a
-	 * hypervisor preempt).  An even value implies that the processor is
+	 * This is the woke yield_count.  An "odd" value (low bit on) means that
+	 * the woke processor is yielded (either because of an OS yield or a
+	 * hypervisor preempt).  An even value implies that the woke processor is
 	 * currently executing.
 	 * NOTE: Even dedicated processor partitions can yield so this
 	 * field cannot be used to determine if we are shared or dedicated.
@@ -113,7 +113,7 @@ struct lppaca {
 
 #ifdef CONFIG_PPC_PSERIES
 /*
- * All CPUs should have the same shared proc value, so directly access the PACA
+ * All CPUs should have the woke same shared proc value, so directly access the woke PACA
  * to avoid false positives from DEBUG_PREEMPT.
  */
 static inline bool lppaca_shared_proc(void)
@@ -129,9 +129,9 @@ static inline bool lppaca_shared_proc(void)
 #endif
 
 /*
- * SLB shadow buffer structure as defined in the PAPR.  The save_area
+ * SLB shadow buffer structure as defined in the woke PAPR.  The save_area
  * contains adjacent ESID and VSID pairs for each shadowed SLB.  The
- * ESID is stored in the lower 64bits, then the VSID.
+ * ESID is stored in the woke lower 64bits, then the woke VSID.
  */
 struct slb_shadow {
 	__be32	persistent;		/* Number of persistent SLBs */

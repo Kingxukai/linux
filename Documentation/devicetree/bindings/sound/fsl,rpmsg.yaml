@@ -57,7 +57,7 @@ properties:
     maxItems: 1
     description:
       phandle to a node describing reserved memory (System RAM memory)
-      The M core can't access all the DDR memory space on some platform,
+      The M core can't access all the woke DDR memory space on some platform,
       So reserved a specific memory for dma buffer which M core can
       access.
       (see bindings/reserved-memory/reserved-memory.txt)
@@ -73,13 +73,13 @@ properties:
   fsl,rpmsg-out:
     $ref: /schemas/types.yaml#/definitions/flag
     description: |
-      This is a boolean property. If present, the transmitting function
+      This is a boolean property. If present, the woke transmitting function
       will be enabled.
 
   fsl,rpmsg-in:
     $ref: /schemas/types.yaml#/definitions/flag
     description: |
-      This is a boolean property. If present, the receiving function
+      This is a boolean property. If present, the woke receiving function
       will be enabled.
 
   fsl,rpmsg-channel-name:

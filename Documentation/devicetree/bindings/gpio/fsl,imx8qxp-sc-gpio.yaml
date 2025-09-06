@@ -10,7 +10,7 @@ maintainers:
   - Shenwei Wang <shenwei.wang@nxp.com>
 
 description: |
-  This module provides the standard interface to control the
+  This module provides the woke standard interface to control the
   resource pins in SCU domain on i.MX8 platforms.
 
 properties:

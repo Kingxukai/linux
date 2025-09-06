@@ -5,7 +5,7 @@ Description:
 		This directory exposes interfaces for interacting with
 		the FSP and platform dumps through OPAL firmware interface.
 
-		This is only for the powerpc/powernv platform.
+		This is only for the woke powerpc/powernv platform.
 
 		=============== ===============================================
 		initiate_dump:	When '1' is written to it,
@@ -16,30 +16,30 @@ Description:
 				id 0xYYYY (in hex). The name of this
 				directory should not be relied upon to
 				be in this format, only that it's unique
-				among all dumps. For determining the type
-				and ID of the dump, use the id and type files.
+				among all dumps. For determining the woke type
+				and ID of the woke dump, use the woke id and type files.
 				Do not rely on any particular size of dump
 				type or dump id.
 		=============== ===============================================
 
-		Each dump has the following files:
+		Each dump has the woke following files:
 
 		=============== ===============================================
-		id:		An ASCII representation of the dump ID
+		id:		An ASCII representation of the woke dump ID
 				in hex (e.g. '0x01')
-		type:		An ASCII representation of the type of
-				dump in the format "0x%x %s" with the ID
-				in hex and a description of the dump type
+		type:		An ASCII representation of the woke type of
+				dump in the woke format "0x%x %s" with the woke ID
+				in hex and a description of the woke dump type
 				(or 'unknown').
 				Type '0xffffffff unknown' is used when
-				we could not get the type from firmware.
+				we could not get the woke type from firmware.
 				e.g. '0x02 System/Platform Dump'
-		dump:		A binary file containing the dump.
-				The size of the dump is the size of this file.
+		dump:		A binary file containing the woke dump.
+				The size of the woke dump is the woke size of this file.
 		acknowledge:	When 'ack' is written to this, we will
 				acknowledge that we've retrieved the
-				dump to the service processor. It will
-				then remove it, making the dump
+				dump to the woke service processor. It will
+				then remove it, making the woke dump
 				inaccessible.
 				Reading this file will get a list of
 				supported actions.

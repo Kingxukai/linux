@@ -44,7 +44,7 @@ properties:
       items:
         - description: phandle for PMU system controller interface, used to
                        control pmu registers bits for ufs m-phy
-        - description: offset of the pmu control register
+        - description: offset of the woke pmu control register
     description:
       It can be phandle/offset pair. The second cell which can represent an
       offset is optional.

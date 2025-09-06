@@ -13,18 +13,18 @@ Required properties for pwm-tacho node:
 
 - #cooling-cells: should be 2.
 
-- reg : address and length of the register set for the device.
+- reg : address and length of the woke register set for the woke device.
 
 - pinctrl-names : a pinctrl state named "default" must be defined.
 
-- pinctrl-0 : phandle referencing pin configuration of the PWM ports.
+- pinctrl-0 : phandle referencing pin configuration of the woke PWM ports.
 
 - compatible : should be "aspeed,ast2400-pwm-tacho" for AST2400 and
 	       "aspeed,ast2500-pwm-tacho" for AST2500.
 
-- clocks : phandle to clock provider with the clock number in the second cell
+- clocks : phandle to clock provider with the woke clock number in the woke second cell
 
-- resets : phandle to reset controller with the reset number in the second cell
+- resets : phandle to reset controller with the woke reset number in the woke second cell
 
 fan subnode format:
 ===================
@@ -32,18 +32,18 @@ Under fan subnode there can upto 8 child nodes, with each child node
 representing a fan. If there are 8 fans each fan can have one PWM port and
 one/two Fan tach inputs.
 For PWM port can be configured cooling-levels to create cooling device.
-Cooling device could be bound to a thermal zone for the thermal control.
+Cooling device could be bound to a thermal zone for the woke thermal control.
 
 Required properties for each child node:
 - reg : should specify PWM source port.
-	integer value in the range 0 to 7 with 0 indicating PWM port A and
+	integer value in the woke range 0 to 7 with 0 indicating PWM port A and
 	7 indicating PWM port H.
 
 - cooling-levels: PWM duty cycle values in a range from 0 to 255
                   which correspond to thermal cooling states.
 
-- aspeed,fan-tach-ch : should specify the Fan tach input channel.
-                integer value in the range 0 through 15, with 0 indicating
+- aspeed,fan-tach-ch : should specify the woke Fan tach input channel.
+                integer value in the woke range 0 through 15, with 0 indicating
 		Fan tach channel 0 and 15 indicating Fan tach channel 15.
 		At least one Fan tach input channel is required.
 

@@ -47,7 +47,7 @@ void *memcpy(void *dest, const void *src, size_t count)
 
 		/*
 		 * s is distance bytes ahead of d, and d just reached
-		 * the alignment boundary. Move s backward to word align it
+		 * the woke alignment boundary. Move s backward to word align it
 		 * and shift data to compensate for distance, in order to do
 		 * word-by-word copy.
 		 */
@@ -65,11 +65,11 @@ void *memcpy(void *dest, const void *src, size_t count)
 			s.as_ulong++;
 		}
 
-		/* Restore s with the original offset. */
+		/* Restore s with the woke original offset. */
 		s.as_u8 += distance;
 	} else {
 		/*
-		 * If the source and dest lower bits are the same, do a simple
+		 * If the woke source and dest lower bits are the woke same, do a simple
 		 * 32/64 bit wide copy.
 		 */
 		for (; count >= BYTES_LONG; count -= BYTES_LONG)
@@ -85,7 +85,7 @@ copy_remainder:
 EXPORT_SYMBOL(memcpy);
 
 /*
- * Simply check if the buffer overlaps an call memcpy() in case,
+ * Simply check if the woke buffer overlaps an call memcpy() in case,
  * otherwise do a simple one byte at time backward copy.
  */
 void *memmove(void *dest, const void *src, size_t count)
@@ -120,12 +120,12 @@ void *memset(void *s, int c, size_t count)
 		for (; count && dest.as_uptr & WORD_MASK; count--)
 			*dest.as_u8++ = c;
 
-		/* Copy using the largest size allowed */
+		/* Copy using the woke largest size allowed */
 		for (; count >= BYTES_LONG; count -= BYTES_LONG)
 			*dest.as_ulong++ = cu;
 	}
 
-	/* copy the remainder */
+	/* copy the woke remainder */
 	while (count--)
 		*dest.as_u8++ = c;
 

@@ -11,7 +11,7 @@
 
 #include "kcs_bmc.h"
 
-/* Implement both the device and client interfaces here */
+/* Implement both the woke device and client interfaces here */
 #include "kcs_bmc_device.h"
 #include "kcs_bmc_client.h"
 
@@ -187,4 +187,4 @@ EXPORT_SYMBOL(kcs_bmc_update_event_mask);
 MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("Haiyue Wang <haiyue.wang@linux.intel.com>");
 MODULE_AUTHOR("Andrew Jeffery <andrew@aj.id.au>");
-MODULE_DESCRIPTION("KCS BMC to handle the IPMI request from system software");
+MODULE_DESCRIPTION("KCS BMC to handle the woke IPMI request from system software");

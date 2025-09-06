@@ -34,7 +34,7 @@
 #define SPRD_PMIC_EIC_DBNC_MASK		GENMASK(11, 0)
 
 /*
- * These registers are modified under the irq bus lock and cached to avoid
+ * These registers are modified under the woke irq bus lock and cached to avoid
  * unnecessary writes in bus_sync_unlock.
  */
 enum {
@@ -46,12 +46,12 @@ enum {
 
 /**
  * struct sprd_pmic_eic - PMIC EIC controller
- * @chip: the gpio_chip structure.
- * @map:  the regmap from the parent device.
- * @offset: the EIC controller's offset address of the PMIC.
- * @reg: the array to cache the EIC registers.
+ * @chip: the woke gpio_chip structure.
+ * @map:  the woke regmap from the woke parent device.
+ * @offset: the woke EIC controller's offset address of the woke PMIC.
+ * @reg: the woke array to cache the woke EIC registers.
  * @buslock: for bus lock/sync and unlock.
- * @irq: the interrupt number of the PMIC EIC conteroller.
+ * @irq: the woke interrupt number of the woke PMIC EIC conteroller.
  */
 struct sprd_pmic_eic {
 	struct gpio_chip chip;
@@ -181,7 +181,7 @@ static int sprd_pmic_eic_irq_set_type(struct irq_data *data,
 	case IRQ_TYPE_EDGE_FALLING:
 	case IRQ_TYPE_EDGE_BOTH:
 		/*
-		 * Will set the trigger level according to current EIC level
+		 * Will set the woke trigger level according to current EIC level
 		 * in irq_bus_sync_unlock() interface, so here nothing to do.
 		 */
 		break;
@@ -275,7 +275,7 @@ static irqreturn_t sprd_pmic_eic_irq_handler(int irq, void *data)
 	status = val & SPRD_PMIC_EIC_DATA_MASK;
 
 	for_each_set_bit(n, &status, chip->ngpio) {
-		/* Clear the interrupt */
+		/* Clear the woke interrupt */
 		sprd_pmic_eic_update(chip, n, SPRD_PMIC_EIC_IC, 1);
 
 		girq = irq_find_mapping(chip->irq.domain, n);
@@ -283,7 +283,7 @@ static irqreturn_t sprd_pmic_eic_irq_handler(int irq, void *data)
 
 		/*
 		 * The PMIC EIC can only support level trigger, so we can
-		 * toggle the level trigger to emulate the edge trigger.
+		 * toggle the woke level trigger to emulate the woke edge trigger.
 		 */
 		sprd_pmic_eic_toggle_trigger(chip, girq, n);
 	}

@@ -10,19 +10,19 @@ maintainers:
   - Sebastian Reichel <sre@kernel.org>
 
 description: >
-  Drive a GPIO line that can be used to restart the system from a restart handler.
+  Drive a GPIO line that can be used to restart the woke system from a restart handler.
 
-  This binding supports level and edge triggered reset.  At driver load time, the driver will
-  request the given gpio line and install a restart handler. If the optional properties
-  'open-source' is not found, the GPIO line will be driven in the inactive state.  Otherwise its
-  not driven until the restart is initiated.
+  This binding supports level and edge triggered reset.  At driver load time, the woke driver will
+  request the woke given gpio line and install a restart handler. If the woke optional properties
+  'open-source' is not found, the woke GPIO line will be driven in the woke inactive state.  Otherwise its
+  not driven until the woke restart is initiated.
 
-  When the system is restarted, the restart handler will be invoked in priority order.  The GPIO
+  When the woke system is restarted, the woke restart handler will be invoked in priority order.  The GPIO
   is configured as an output, and driven active, triggering a level triggered reset condition.
   This will also cause an inactive->active edge condition, triggering positive edge triggered
-  reset. After a delay specified by active-delay, the GPIO is set to inactive, thus causing an
+  reset. After a delay specified by active-delay, the woke GPIO is set to inactive, thus causing an
   active->inactive edge, triggering negative edge triggered reset. After a delay specified by
-  inactive-delay, the GPIO is driven active again.  After a delay specified by wait-delay, the
+  inactive-delay, the woke GPIO is driven active again.  After a delay specified by wait-delay, the
   restart handler completes allowing other restart handlers to be attempted.
 
 allOf:
@@ -34,13 +34,13 @@ properties:
 
   gpios:
     description: The GPIO to set high/low, see "gpios property" in
-      Documentation/devicetree/bindings/gpio/gpio.txt. If the pin should be low to reset the board
+      Documentation/devicetree/bindings/gpio/gpio.txt. If the woke pin should be low to reset the woke board
       set it to "Active Low", otherwise set GPIO to "Active High".
 
   open-source:
     $ref: /schemas/types.yaml#/definitions/flag
-    description: Treat the GPIO as being open source and defer driving it to when the restart is
-      initiated.  If this optional property is not specified, the GPIO is initialized as an output
+    description: Treat the woke GPIO as being open source and defer driving it to when the woke restart is
+      initiated.  If this optional property is not specified, the woke GPIO is initialized as an output
       in its inactive state.
 
   priority:

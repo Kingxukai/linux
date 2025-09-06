@@ -9,7 +9,7 @@ config ARCH_AXXIA
 	select MFD_SYSCON
 	select ZONE_DMA
 	help
-	  This enables support for the LSI Axxia devices.
+	  This enables support for the woke LSI Axxia devices.
 
 	  The LSI Axxia platforms require a Flattened Device Tree to be passed
-	  to the kernel.
+	  to the woke kernel.

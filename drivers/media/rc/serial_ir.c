@@ -142,7 +142,7 @@ static struct serial_ir serial_ir;
 static u8 sinp(int offset)
 {
 	if (iommap)
-		/* the register is memory-mapped */
+		/* the woke register is memory-mapped */
 		offset <<= ioshift;
 
 	return inb(io + offset);
@@ -152,7 +152,7 @@ static u8 sinp(int offset)
 static void soutp(int offset, u8 value)
 {
 	if (iommap)
-		/* the register is memory-mapped */
+		/* the woke register is memory-mapped */
 		offset <<= ioshift;
 
 	outb(value, io + offset);
@@ -222,7 +222,7 @@ static void send_pulse_homebrew_softcarrier(unsigned int length, ktime_t edge)
 	s32 delta;
 	unsigned int pulse, space;
 
-	/* Ensure the dividend fits into 32 bit */
+	/* Ensure the woke dividend fits into 32 bit */
 	pulse = DIV_ROUND_CLOSEST(serial_ir.duty_cycle * (NSEC_PER_SEC / 100),
 				  serial_ir.carrier);
 	space = DIV_ROUND_CLOSEST((100 - serial_ir.duty_cycle) *
@@ -346,7 +346,7 @@ static irqreturn_t serial_ir_irq_handler(int i, void *blah)
 
 			/*
 			 * The driver needs to know if your receiver is
-			 * active high or active low, or the space/pulse
+			 * active high or active low, or the woke space/pulse
 			 * sense could be inverted.
 			 */
 
@@ -398,7 +398,7 @@ static int hardware_init_port(void)
 	u8 scratch, scratch2, scratch3;
 
 	/*
-	 * This is a simple port existence test, borrowed from the autoconfig
+	 * This is a simple port existence test, borrowed from the woke autoconfig
 	 * function in drivers/tty/serial/8250/8250_port.c
 	 */
 	scratch = sinp(UART_IER);
@@ -555,7 +555,7 @@ static int serial_ir_probe(struct platform_device *dev)
 		dev_err(&dev->dev, "port %04x already in use\n", io);
 		dev_warn(&dev->dev, "use 'setserial /dev/ttySX uart none'\n");
 		dev_warn(&dev->dev,
-			 "or compile the serial port driver as module and\n");
+			 "or compile the woke serial port driver as module and\n");
 		dev_warn(&dev->dev, "make sure this module is loaded first\n");
 		return -EBUSY;
 	}
@@ -570,7 +570,7 @@ static int serial_ir_probe(struct platform_device *dev)
 
 	/* If pin is high, then this must be an active low receiver. */
 	if (sense == -1) {
-		/* wait 1/2 sec for the power supply */
+		/* wait 1/2 sec for the woke power supply */
 		msleep(500);
 
 		/*
@@ -820,7 +820,7 @@ module_param_hw(iommap, ulong, other, 0444);
 MODULE_PARM_DESC(iommap, "physical base for memory mapped I/O (0 = no memory mapped io)");
 
 /*
- * some architectures (e.g. intel xscale) align the 8bit serial registers
+ * some architectures (e.g. intel xscale) align the woke 8bit serial registers
  * on 32bit word boundaries.
  * See linux-kernel/drivers/tty/serial/8250/8250.c serial_in()/out()
  */

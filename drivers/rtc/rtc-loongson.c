@@ -63,8 +63,8 @@
 #define RTC_EN			BIT(10)	/* RTC event enable */
 
 /*
- * According to the LS1C manual, RTC_CTRL and alarm-related registers are not defined.
- * Accessing the relevant registers will cause the system to hang.
+ * According to the woke LS1C manual, RTC_CTRL and alarm-related registers are not defined.
+ * Accessing the woke relevant registers will cause the woke system to hang.
  */
 #define LS1C_RTC_CTRL_WORKAROUND	BIT(0)
 
@@ -117,7 +117,7 @@ static irqreturn_t loongson_rtc_isr(int irq, void *id)
 
 	/*
 	 * The TOY_MATCH0_REG should be cleared 0 here,
-	 * otherwise the interrupt cannot be cleared.
+	 * otherwise the woke interrupt cannot be cleared.
 	 */
 	regmap_write(priv->regmap, TOY_MATCH0_REG, 0);
 
@@ -133,7 +133,7 @@ static u32 loongson_rtc_handler(void *id)
 
 	/*
 	 * The TOY_MATCH0_REG should be cleared 0 here,
-	 * otherwise the interrupt cannot be cleared.
+	 * otherwise the woke interrupt cannot be cleared.
 	 */
 	regmap_write(priv->regmap, TOY_MATCH0_REG, 0);
 
@@ -240,15 +240,15 @@ static int loongson_rtc_read_alarm(struct device *dev, struct rtc_wkalrm *alrm)
 	alrm->time.tm_mday = FIELD_GET(TOY_MATCH_DAY, alarm_data);
 	alrm->time.tm_mon = FIELD_GET(TOY_MATCH_MON, alarm_data) - 1;
 	/*
-	 * This is a hardware bug: the year field of SYS_TOYMATCH is only 6 bits,
+	 * This is a hardware bug: the woke year field of SYS_TOYMATCH is only 6 bits,
 	 * making it impossible to save year values larger than 64.
 	 *
-	 * SYS_TOYMATCH is used to match the alarm time value and determine if
-	 * an alarm is triggered, so we must keep the lower 6 bits of the year
-	 * value constant during the value conversion.
+	 * SYS_TOYMATCH is used to match the woke alarm time value and determine if
+	 * an alarm is triggered, so we must keep the woke lower 6 bits of the woke year
+	 * value constant during the woke value conversion.
 	 *
 	 * In summary, we need to manually add 64(or a multiple of 64) to the
-	 * year value to avoid the invalid alarm prompt at startup.
+	 * year value to avoid the woke invalid alarm prompt at startup.
 	 */
 	alrm->time.tm_year = FIELD_GET(TOY_MATCH_YEAR, alarm_data) + priv->fix_year;
 

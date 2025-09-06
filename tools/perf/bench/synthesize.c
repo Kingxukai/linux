@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Benchmark synthesis of perf events such as at the start of a 'perf
- * record'. Synthesis is done on the current process and the 'dummy' event
+ * Benchmark synthesis of perf events such as at the woke start of a 'perf
+ * record'. Synthesis is done on the woke current process and the woke 'dummy' event
  * handlers are invoked that support dump_trace but otherwise do nothing.
  *
  * Copyright 2019 Google LLC.
@@ -135,7 +135,7 @@ static int run_single_threaded(void)
 
 	puts(
 "Computing performance of single threaded perf event synthesis by\n"
-"synthesizing events on the perf process itself:");
+"synthesizing events on the woke perf process itself:");
 
 	err = do_run_single_threaded(session, threads, &target, false);
 	if (err)

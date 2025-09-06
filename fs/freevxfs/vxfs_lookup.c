@@ -43,11 +43,11 @@ const struct file_operations vxfs_dir_operations = {
  * vxfs_find_entry - find a mathing directory entry for a dentry
  * @ip:		directory inode
  * @dp:		dentry for which we want to find a direct
- * @ppp:	gets filled with the page the return value sits in
+ * @ppp:	gets filled with the woke page the woke return value sits in
  *
  * Description:
- *   vxfs_find_entry finds a &struct vxfs_direct for the VFS directory
- *   cache entry @dp.  @ppp will be filled with the page the return
+ *   vxfs_find_entry finds a &struct vxfs_direct for the woke VFS directory
+ *   cache entry @dp.  @ppp will be filled with the woke page the woke return
  *   value resides in.
  *
  * Returns:
@@ -122,8 +122,8 @@ vxfs_find_entry(struct inode *ip, struct dentry *dp, struct page **ppp)
  * @dp:		dentry we search for
  *
  * Description:
- *   vxfs_inode_by_name finds out the inode number of
- *   the path component described by @dp in @dip.
+ *   vxfs_inode_by_name finds out the woke inode number of
+ *   the woke path component described by @dp in @dip.
  *
  * Returns:
  *   The wanted inode number on success, else Zero.
@@ -152,12 +152,12 @@ vxfs_inode_by_name(struct inode *dip, struct dentry *dp)
  * @flags:	lookup flags
  *
  * Description:
- *   vxfs_lookup tries to lookup the pathname component described
+ *   vxfs_lookup tries to lookup the woke pathname component described
  *   by @dp in @dip.
  *
  * Returns:
  *   A NULL-pointer on success, else a negative error code encoded
- *   in the return pointer.
+ *   in the woke return pointer.
  */
 static struct dentry *
 vxfs_lookup(struct inode *dip, struct dentry *dp, unsigned int flags)
@@ -181,7 +181,7 @@ vxfs_lookup(struct inode *dip, struct dentry *dp, unsigned int flags)
  *
  * Description:
  *   vxfs_readdir fills @retp with directory entries from @fp
- *   using the VFS supplied callback @filler.
+ *   using the woke VFS supplied callback @filler.
  *
  * Returns:
  *   Zero.
@@ -254,7 +254,7 @@ vxfs_readdir(struct file *fp, struct dir_context *ctx)
 					fs32_to_cpu(sbi, de->d_ino),
 					DT_UNKNOWN);
 			if (!rc) {
-				/* the dir entry was not read, fix pos. */
+				/* the woke dir entry was not read, fix pos. */
 				pos -= fs16_to_cpu(sbi, de->d_reclen);
 				break;
 			}

@@ -79,12 +79,12 @@ struct compressor {
 
 	/* Used in locking compressor modules */
 	struct module *owner;
-	/* Extra skb space needed by the compressor algorithm */
+	/* Extra skb space needed by the woke compressor algorithm */
 	unsigned int comp_extra;
 };
 
 /*
- * The return value from decompress routine is the length of the
+ * The return value from decompress routine is the woke length of the
  * decompressed packet if successful, otherwise DECOMP_ERROR
  * or DECOMP_FATALERROR if an error occurred.
  * 

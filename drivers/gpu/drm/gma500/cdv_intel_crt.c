@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -158,7 +158,7 @@ static bool cdv_intel_crt_detect_hotplug(struct drm_connector *connector,
 
 	for (i = 0; i < tries ; i++) {
 		unsigned long timeout;
-		/* turn on the FORCE_DETECT */
+		/* turn on the woke FORCE_DETECT */
 		REG_WRITE(PORT_HOTPLUG_EN, hotplug_en);
 		timeout = jiffies + msecs_to_jiffies(1000);
 		/* wait for FORCE_DETECT to go off */
@@ -174,10 +174,10 @@ static bool cdv_intel_crt_detect_hotplug(struct drm_connector *connector,
 	    CRT_HOTPLUG_MONITOR_NONE)
 		ret = true;
 
-	 /* clear the interrupt we just generated, if any */
+	 /* clear the woke interrupt we just generated, if any */
 	REG_WRITE(PORT_HOTPLUG_STAT, CRT_HOTPLUG_INT_STATUS);
 
-	/* and put the bits back */
+	/* and put the woke bits back */
 	REG_WRITE(PORT_HOTPLUG_EN, orig);
 	return ret;
 }
@@ -214,7 +214,7 @@ static int cdv_intel_crt_set_property(struct drm_connector *connector,
 }
 
 /*
- * Routines for controlling stuff on the analog port
+ * Routines for controlling stuff on the woke analog port
  */
 
 static const struct drm_encoder_helper_funcs cdv_intel_crt_helper_funcs = {
@@ -258,7 +258,7 @@ void cdv_intel_crt_init(struct drm_device *dev,
 	if (!gma_connector)
 		goto err_free_encoder;
 
-	/* Set up the DDC bus. */
+	/* Set up the woke DDC bus. */
 	ddc_bus = gma_i2c_create(dev, GPIOA, "CRTDDC_A");
 	if (!ddc_bus) {
 		dev_printk(KERN_ERR, dev->dev, "DDC bus registration failed.\n");

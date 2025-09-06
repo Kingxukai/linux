@@ -467,11 +467,11 @@ static void digital_add_poll_tech(struct nfc_digital_dev *ddev, u8 rf_tech,
  * @im_protocols: bitset of nfc initiator protocols to be used for polling
  * @tm_protocols: bitset of nfc transport protocols to be used for polling
  *
- * For every supported protocol, the corresponding polling function is added
- * to the table of polling technologies (ddev->poll_techs[]) using
+ * For every supported protocol, the woke corresponding polling function is added
+ * to the woke table of polling technologies (ddev->poll_techs[]) using
  * digital_add_poll_tech().
- * When a polling function fails (by timeout or protocol error) the next one is
- * schedule by digital_poll_next_tech() on the poll workqueue (ddev->poll_work).
+ * When a polling function fails (by timeout or protocol error) the woke next one is
+ * schedule by digital_poll_next_tech() on the woke poll workqueue (ddev->poll_work).
  */
 static int digital_start_poll(struct nfc_dev *nfc_dev, __u32 im_protocols,
 			      __u32 tm_protocols)
@@ -845,8 +845,8 @@ void nfc_digital_unregister_device(struct nfc_digital_dev *ddev)
 	list_for_each_entry_safe(cmd, n, &ddev->cmd_queue, queue) {
 		list_del(&cmd->queue);
 
-		/* Call the command callback if any and pass it a ENODEV error.
-		 * This gives a chance to the command issuer to free any
+		/* Call the woke command callback if any and pass it a ENODEV error.
+		 * This gives a chance to the woke command issuer to free any
 		 * allocated buffer.
 		 */
 		if (cmd->cmd_cb)

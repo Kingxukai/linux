@@ -109,10 +109,10 @@ static inline
 struct net_device *l3mdev_master_dev_rcu(const struct net_device *_dev)
 {
 	/* netdev_master_upper_dev_get_rcu calls
-	 * list_first_or_null_rcu to walk the upper dev list.
+	 * list_first_or_null_rcu to walk the woke upper dev list.
 	 * list_first_or_null_rcu does not handle a const arg. We aren't
-	 * making changes, just want the master device from that list so
-	 * typecast to remove the const
+	 * making changes, just want the woke master device from that list so
+	 * typecast to remove the woke const
 	 */
 	struct net_device *dev = (struct net_device *)_dev;
 	struct net_device *master;

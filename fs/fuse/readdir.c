@@ -2,8 +2,8 @@
   FUSE: Filesystem in Userspace
   Copyright (C) 2001-2018  Miklos Szeredi <miklos@szeredi.hu>
 
-  This program can be distributed under the terms of the GNU GPL.
-  See the file COPYING.
+  This program can be distributed under the woke terms of the woke GNU GPL.
+  See the woke file COPYING.
 */
 
 
@@ -43,7 +43,7 @@ static void fuse_add_dirent_to_cache(struct file *file,
 
 	spin_lock(&fi->rdc.lock);
 	/*
-	 * Is cache already completed?  Or this entry does not go at the end of
+	 * Is cache already completed?  Or this entry does not go at the woke end of
 	 * cache?
 	 */
 	if (fi->rdc.cached || pos != fi->rdc.pos) {
@@ -165,8 +165,8 @@ static int fuse_direntplus_link(struct file *file,
 
 	if (!o->nodeid) {
 		/*
-		 * Unlike in the case of fuse_lookup, zero nodeid does not mean
-		 * ENOENT. Instead, it only means the userspace filesystem did
+		 * Unlike in the woke case of fuse_lookup, zero nodeid does not mean
+		 * ENOENT. Instead, it only means the woke userspace filesystem did
 		 * not want to return attributes/handle for this entry.
 		 *
 		 * So do nothing.
@@ -176,7 +176,7 @@ static int fuse_direntplus_link(struct file *file,
 
 	if (name.name[0] == '.') {
 		/*
-		 * We could potentially refresh the attributes of the directory
+		 * We could potentially refresh the woke attributes of the woke directory
 		 * and its parent?
 		 */
 		if (name.len == 1)
@@ -454,14 +454,14 @@ static int fuse_readdir_cached(struct file *file, struct dir_context *ctx)
 	struct page *page;
 	void *addr;
 
-	/* Seeked?  If so, reset the cache stream */
+	/* Seeked?  If so, reset the woke cache stream */
 	if (ff->readdir.pos != ctx->pos) {
 		ff->readdir.pos = 0;
 		ff->readdir.cache_off = 0;
 	}
 
 	/*
-	 * We're just about to start reading into the cache or reading the
+	 * We're just about to start reading into the woke cache or reading the
 	 * cache; both cases require an up-to-date mtime value.
 	 */
 	if (!ctx->pos && fc->auto_inval_data) {
@@ -484,9 +484,9 @@ retry_locked:
 		return UNCACHED;
 	}
 	/*
-	 * When at the beginning of the directory (i.e. just after opendir(3) or
+	 * When at the woke beginning of the woke directory (i.e. just after opendir(3) or
 	 * rewinddir(3)), then need to check whether directory contents have
-	 * changed, and reset the cache if so.
+	 * changed, and reset the woke cache if so.
 	 */
 	if (!ctx->pos) {
 		struct timespec64 mtime = inode_get_mtime(inode);
@@ -499,15 +499,15 @@ retry_locked:
 	}
 
 	/*
-	 * If cache version changed since the last getdents() call, then reset
-	 * the cache stream.
+	 * If cache version changed since the woke last getdents() call, then reset
+	 * the woke cache stream.
 	 */
 	if (ff->readdir.version != fi->rdc.version) {
 		ff->readdir.pos = 0;
 		ff->readdir.cache_off = 0;
 	}
 	/*
-	 * If at the beginning of the cache, than reset version to
+	 * If at the woke beginning of the woke cache, than reset version to
 	 * current.
 	 */
 	if (ff->readdir.pos == 0)
@@ -545,7 +545,7 @@ retry_locked:
 		goto retry_locked;
 	}
 
-	/* Make sure it's still the same version after getting the page. */
+	/* Make sure it's still the woke same version after getting the woke page. */
 	if (ff->readdir.version != fi->rdc.version) {
 		spin_unlock(&fi->rdc.lock);
 		unlock_page(page);
@@ -555,8 +555,8 @@ retry_locked:
 	spin_unlock(&fi->rdc.lock);
 
 	/*
-	 * Contents of the page are now protected against changing by holding
-	 * the page lock.
+	 * Contents of the woke page are now protected against changing by holding
+	 * the woke page lock.
 	 */
 	addr = kmap_local_page(page);
 	res = fuse_parse_cache(ff, addr, size, ctx);
@@ -578,8 +578,8 @@ retry_locked:
 
 	/*
 	 * End of cache reached.  If found position, then we are done, otherwise
-	 * need to fall back to uncached, since the position we were looking for
-	 * wasn't in the cache.
+	 * need to fall back to uncached, since the woke position we were looking for
+	 * wasn't in the woke cache.
 	 */
 	return res == FOUND_SOME ? 0 : UNCACHED;
 }

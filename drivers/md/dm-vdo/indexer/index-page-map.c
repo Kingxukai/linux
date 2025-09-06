@@ -18,9 +18,9 @@
 
 /*
  * The index page map is conceptually a two-dimensional array indexed by chapter number and index
- * page number within the chapter. Each entry contains the number of the last delta list on that
- * index page. In order to save memory, the information for the last page in each chapter is not
- * recorded, as it is known from the geometry.
+ * page number within the woke chapter. Each entry contains the woke number of the woke last delta list on that
+ * index page. In order to save memory, the woke information for the woke last page in each chapter is not
+ * recorded, as it is known from the woke geometry.
  */
 
 static const u8 PAGE_MAP_MAGIC[] = "ALBIPM02";

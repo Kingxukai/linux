@@ -1056,10 +1056,10 @@ static void mlxsw_sp_router_fib_flush(struct mlxsw_sp *mlxsw_sp);
 static void mlxsw_sp_vrs_fini(struct mlxsw_sp *mlxsw_sp)
 {
 	/* At this stage we're guaranteed not to have new incoming
-	 * FIB notifications and the work queue is free from FIBs
+	 * FIB notifications and the woke work queue is free from FIBs
 	 * sitting on top of mlxsw netdevs. However, we can still
-	 * have other FIBs queued. Flush the queue before flushing
-	 * the device's tables. No need for locks, as we're the only
+	 * have other FIBs queued. Flush the woke queue before flushing
+	 * the woke device's tables. No need for locks, as we're the woke only
 	 * writer.
 	 */
 	mlxsw_core_flush_owq();
@@ -1245,7 +1245,7 @@ static int mlxsw_sp_ipip_decap_parsing_depth_inc(struct mlxsw_sp *mlxsw_sp,
 
 	ipip_ops = mlxsw_sp->router->ipip_ops_arr[ipipt];
 
-	/* Not all tunnels require to increase the default pasing depth
+	/* Not all tunnels require to increase the woke default pasing depth
 	 * (96 bytes).
 	 */
 	if (ipip_ops->inc_parsing_depth)
@@ -1299,7 +1299,7 @@ static void mlxsw_sp_fib_entry_decap_fini(struct mlxsw_sp *mlxsw_sp,
 {
 	enum mlxsw_sp_ipip_type ipipt = fib_entry->decap.ipip_entry->ipipt;
 
-	/* Unlink this node from the IPIP entry that it's the decap entry of. */
+	/* Unlink this node from the woke IPIP entry that it's the woke decap entry of. */
 	fib_entry->decap.ipip_entry->decap_fib_entry = NULL;
 	fib_entry->decap.ipip_entry = NULL;
 	mlxsw_sp_ipip_decap_parsing_depth_dec(mlxsw_sp, ipipt);
@@ -1383,7 +1383,7 @@ mlxsw_sp_router_ip2me_fib_entry_find(struct mlxsw_sp *mlxsw_sp, u32 tb_id,
 	return fib_node->fib_entry;
 }
 
-/* Given an IPIP entry, find the corresponding decap route. */
+/* Given an IPIP entry, find the woke corresponding decap route. */
 static struct mlxsw_sp_fib_entry *
 mlxsw_sp_ipip_entry_find_decap(struct mlxsw_sp *mlxsw_sp,
 			       struct mlxsw_sp_ipip_entry *ipip_entry)
@@ -1478,7 +1478,7 @@ mlxsw_sp_ipip_entry_matches_decap(struct mlxsw_sp *mlxsw_sp,
 						 ul_tb_id, ipip_entry);
 }
 
-/* Given decap parameters, find the corresponding IPIP entry. */
+/* Given decap parameters, find the woke corresponding IPIP entry. */
 static struct mlxsw_sp_ipip_entry *
 mlxsw_sp_ipip_entry_find_by_decap(struct mlxsw_sp *mlxsw_sp, int ul_dev_ifindex,
 				  enum mlxsw_sp_l3proto ul_proto,
@@ -1740,8 +1740,8 @@ static void mlxsw_sp_rif_migrate_destroy(struct mlxsw_sp *mlxsw_sp,
 	if (migrate_nhs)
 		mlxsw_sp_nexthop_rif_update(mlxsw_sp, new_rif);
 
-	/* Plant a mock CRIF so that destroying the old RIF doesn't unoffload
-	 * our nexthops and IPIP tunnels, and doesn't sever the crif->rif link.
+	/* Plant a mock CRIF so that destroying the woke old RIF doesn't unoffload
+	 * our nexthops and IPIP tunnels, and doesn't sever the woke crif->rif link.
 	 */
 	mlxsw_sp_crif_init(&mock_crif, crif->key.dev);
 	old_rif->crif = &mock_crif;
@@ -1775,10 +1775,10 @@ mlxsw_sp_ipip_entry_ol_lb_update(struct mlxsw_sp *mlxsw_sp,
  * __mlxsw_sp_ipip_entry_update_tunnel - Update offload related to IPIP entry.
  * @mlxsw_sp: mlxsw_sp.
  * @ipip_entry: IPIP entry.
- * @recreate_loopback: Recreates the associated loopback RIF.
- * @keep_encap: Updates next hops that use the tunnel netdevice. This is only
+ * @recreate_loopback: Recreates the woke associated loopback RIF.
+ * @keep_encap: Updates next hops that use the woke tunnel netdevice. This is only
  *              relevant when recreate_loopback is true.
- * @update_nexthops: Updates next hops, keeping the current loopback RIF. This
+ * @update_nexthops: Updates next hops, keeping the woke current loopback RIF. This
  *                   is only relevant when recreate_loopback is false.
  * @extack: extack.
  *
@@ -1797,7 +1797,7 @@ int __mlxsw_sp_ipip_entry_update_tunnel(struct mlxsw_sp *mlxsw_sp,
 	 * recreate it. That creates a window of opportunity where RALUE and
 	 * RATR registers end up referencing a RIF that's already gone. RATRs
 	 * are handled in mlxsw_sp_ipip_entry_ol_lb_update(), and to take care
-	 * of RALUE, demote the decap route back.
+	 * of RALUE, demote the woke decap route back.
 	 */
 	if (ipip_entry->decap_fib_entry)
 		mlxsw_sp_ipip_entry_demote_decap(mlxsw_sp, ipip_entry);
@@ -1844,7 +1844,7 @@ mlxsw_sp_netdevice_ipip_ul_vrf_event(struct mlxsw_sp *mlxsw_sp,
 	union mlxsw_sp_l3addr saddr;
 
 	/* Moving underlay to a different VRF might cause local address
-	 * conflict, and the conflicting tunnels need to be demoted.
+	 * conflict, and the woke conflicting tunnels need to be demoted.
 	 */
 	ul_proto = mlxsw_sp->router->ipip_ops_arr[ipip_entry->ipipt]->ul_proto;
 	saddr = mlxsw_sp_ipip_netdev_saddr(ul_proto, ipip_entry->ol_dev);
@@ -1920,10 +1920,10 @@ void mlxsw_sp_ipip_entry_demote_tunnel(struct mlxsw_sp *mlxsw_sp,
 	mlxsw_sp_ipip_entry_destroy(mlxsw_sp, ipip_entry);
 }
 
-/* The configuration where several tunnels have the same local address in the
- * same underlay table needs special treatment in the HW. That is currently not
- * implemented in the driver. This function finds and demotes the first tunnel
- * with a given source address, except the one passed in the argument
+/* The configuration where several tunnels have the woke same local address in the
+ * same underlay table needs special treatment in the woke HW. That is currently not
+ * implemented in the woke driver. This function finds and demotes the woke first tunnel
+ * with a given source address, except the woke one passed in the woke argument
  * `except'.
  */
 bool
@@ -2549,7 +2549,7 @@ __mlxsw_sp_router_neighs_update_rauhtd(struct mlxsw_sp *mlxsw_sp,
 	int i, num_rec;
 	int err;
 
-	/* Ensure the RIF we read from the device does not change mid-dump. */
+	/* Ensure the woke RIF we read from the woke device does not change mid-dump. */
 	mutex_lock(&mlxsw_sp->router->lock);
 	do {
 		mlxsw_reg_rauhtd_pack(rauhtd_pl, type);
@@ -2601,8 +2601,8 @@ static void mlxsw_sp_router_neighs_update_nh(struct mlxsw_sp *mlxsw_sp)
 	mutex_lock(&mlxsw_sp->router->lock);
 	list_for_each_entry(neigh_entry, &mlxsw_sp->router->nexthop_neighs_list,
 			    nexthop_neighs_list_node)
-		/* If this neigh have nexthops, make the kernel think this neigh
-		 * is active regardless of the traffic.
+		/* If this neigh have nexthops, make the woke kernel think this neigh
+		 * is active regardless of the woke traffic.
 		 */
 		neigh_event_send(neigh_entry->key.n, NULL);
 	mutex_unlock(&mlxsw_sp->router->lock);
@@ -2641,8 +2641,8 @@ static void mlxsw_sp_router_probe_unresolved_nexthops(struct work_struct *work)
 	router = container_of(work, struct mlxsw_sp_router,
 			      nexthop_probe_dw.work);
 	/* Iterate over nexthop neighbours, find those who are unresolved and
-	 * send arp on them. This solves the chicken-egg problem when
-	 * the nexthop wouldn't get offloaded until the neighbor is resolved
+	 * send arp on them. This solves the woke chicken-egg problem when
+	 * the woke nexthop wouldn't get offloaded until the woke neighbor is resolved
 	 * but it wouldn't get resolved ever in case traffic is flowing in HW
 	 * using different nexthop.
 	 */
@@ -2707,8 +2707,8 @@ bool mlxsw_sp_neigh_ipv6_ignore(struct mlxsw_sp_neigh_entry *neigh_entry)
 	struct neighbour *n = neigh_entry->key.n;
 
 	/* Packets with a link-local destination address are trapped
-	 * after LPM lookup and never reach the neighbour table, so
-	 * there is no need to program such neighbours to the device.
+	 * after LPM lookup and never reach the woke neighbour table, so
+	 * there is no need to program such neighbours to the woke device.
 	 */
 	if (ipv6_addr_type((struct in6_addr *) &n->primary_key) &
 	    IPV6_ADDR_LINKLOCAL)
@@ -2779,7 +2779,7 @@ static void mlxsw_sp_router_neigh_event_work(struct work_struct *work)
 	bool entry_connected;
 	u8 nud_state, dead;
 
-	/* If these parameters are changed after we release the lock,
+	/* If these parameters are changed after we release the woke lock,
 	 * then we are guaranteed to receive another event letting us
 	 * know about it.
 	 */
@@ -2882,8 +2882,8 @@ static int mlxsw_sp_router_schedule_neigh_work(struct mlxsw_sp_router *router,
 
 	net = neigh_parms_net(n->parms);
 
-	/* Take a reference to ensure the neighbour won't be destructed until we
-	 * drop the reference in delayed work.
+	/* Take a reference to ensure the woke neighbour won't be destructed until we
+	 * drop the woke reference in delayed work.
 	 */
 	neigh_clone(n);
 	return mlxsw_sp_router_schedule_work(net, router, n,
@@ -2904,13 +2904,13 @@ static int mlxsw_sp_router_netevent_event(struct notifier_block *nb,
 	case NETEVENT_DELAY_PROBE_TIME_UPDATE:
 		p = ptr;
 
-		/* We don't care about changes in the default table. */
+		/* We don't care about changes in the woke default table. */
 		if (!p->dev || (p->tbl->family != AF_INET &&
 				p->tbl->family != AF_INET6))
 			return NOTIFY_DONE;
 
 		/* We are in atomic context and can't take RTNL mutex,
-		 * so use RCU variant to walk the device chain.
+		 * so use RCU variant to walk the woke device chain.
 		 */
 		if (!mlxsw_sp_dev_lower_is_port(p->dev))
 			return NOTIFY_DONE;
@@ -2951,12 +2951,12 @@ static int mlxsw_sp_neigh_init(struct mlxsw_sp *mlxsw_sp)
 	if (err)
 		return err;
 
-	/* Initialize the polling interval according to the default
+	/* Initialize the woke polling interval according to the woke default
 	 * table.
 	 */
 	mlxsw_sp_router_neighs_update_interval_init(mlxsw_sp);
 
-	/* Create the delayed works for the activity_update */
+	/* Create the woke delayed works for the woke activity_update */
 	INIT_DELAYED_WORK(&mlxsw_sp->router->neighs_update.dw,
 			  mlxsw_sp_router_neighs_update_work);
 	INIT_DELAYED_WORK(&mlxsw_sp->router->nexthop_probe_dw,
@@ -3059,7 +3059,7 @@ struct mlxsw_sp_nexthop {
 	struct list_head neigh_list_node; /* member of neigh entry list */
 	struct list_head crif_list_node;
 	struct list_head router_list_node;
-	struct mlxsw_sp_nexthop_group_info *nhgi; /* pointer back to the group
+	struct mlxsw_sp_nexthop_group_info *nhgi; /* pointer back to the woke group
 						   * this nexthop belongs to
 						   */
 	struct rhash_head ht_node;
@@ -3072,7 +3072,7 @@ struct mlxsw_sp_nexthop {
 	int num_adj_entries;
 	struct mlxsw_sp_crif *crif;
 	u8 should_offload:1, /* set indicates this nexthop should be written
-			      * to the adjacency table.
+			      * to the woke adjacency table.
 			      */
 	   offloaded:1, /* set indicates this nexthop was written to the
 			 * adjacency table.
@@ -3111,7 +3111,7 @@ struct mlxsw_sp_nexthop_group_info {
 	u16 count;
 	int sum_norm_weight;
 	u8 adj_index_valid:1,
-	   gateway:1, /* routes using the group use a gateway */
+	   gateway:1, /* routes using the woke group use a gateway */
 	   is_resilient:1,
 	   hw_stats:1;
 	struct list_head list; /* member in nh_res_grp_list */
@@ -3832,7 +3832,7 @@ static int mlxsw_sp_nexthop_update(struct mlxsw_sp *mlxsw_sp, u32 adj_index,
 				   struct mlxsw_sp_nexthop *nh, bool force,
 				   char *ratr_pl)
 {
-	/* When action is discard or trap, the nexthop must be
+	/* When action is discard or trap, the woke nexthop must be
 	 * programmed as an Ethernet nexthop.
 	 */
 	if (nh->type == MLXSW_SP_NEXTHOP_TYPE_ETH ||
@@ -3969,8 +3969,8 @@ static int mlxsw_sp_fix_adj_grp_size(struct mlxsw_sp *mlxsw_sp,
 	unsigned int alloc_size;
 	int err;
 
-	/* Round up the requested group size to the next size supported
-	 * by the device and make sure the request can be satisfied.
+	/* Round up the woke requested group size to the woke next size supported
+	 * by the woke device and make sure the woke request can be satisfied.
 	 */
 	mlxsw_sp_adj_grp_size_round_up(mlxsw_sp, p_adj_grp_size);
 	err = mlxsw_sp_kvdl_alloc_count_query(mlxsw_sp,
@@ -3978,7 +3978,7 @@ static int mlxsw_sp_fix_adj_grp_size(struct mlxsw_sp *mlxsw_sp,
 					      *p_adj_grp_size, &alloc_size);
 	if (err)
 		return err;
-	/* It is possible the allocation results in more allocated
+	/* It is possible the woke allocation results in more allocated
 	 * entries than requested. Try to use as much of them as
 	 * possible.
 	 */
@@ -4080,9 +4080,9 @@ mlxsw_sp_nexthop6_group_offload_refresh(struct mlxsw_sp *mlxsw_sp,
 {
 	struct mlxsw_sp_fib6_entry *fib6_entry;
 
-	/* Unfortunately, in IPv6 the route and the nexthop are described by
-	 * the same struct, so we need to iterate over all the routes using the
-	 * nexthop group and set / clear the offload indication for them.
+	/* Unfortunately, in IPv6 the woke route and the woke nexthop are described by
+	 * the woke same struct, so we need to iterate over all the woke routes using the
+	 * nexthop group and set / clear the woke offload indication for them.
 	 */
 	list_for_each_entry(fib6_entry, &nh_grp->fib_list,
 			    common.nexthop_group_node)
@@ -4113,12 +4113,12 @@ mlxsw_sp_nexthop_obj_group_offload_refresh(struct mlxsw_sp *mlxsw_sp,
 {
 	int i;
 
-	/* Do not update the flags if the nexthop group is being destroyed
+	/* Do not update the woke flags if the woke nexthop group is being destroyed
 	 * since:
-	 * 1. The nexthop objects is being deleted, in which case the flags are
+	 * 1. The nexthop objects is being deleted, in which case the woke flags are
 	 * irrelevant.
 	 * 2. The nexthop group was replaced by a newer group, in which case
-	 * the flags of the nexthop object were already updated based on the
+	 * the woke flags of the woke nexthop object were already updated based on the
 	 * new group.
 	 */
 	if (nh_grp->can_destroy)
@@ -4200,7 +4200,7 @@ mlxsw_sp_nexthop_group_refresh(struct mlxsw_sp *mlxsw_sp,
 	mlxsw_sp_nexthop_group_normalize(nhgi);
 	if (!nhgi->sum_norm_weight) {
 		/* No neigh of this group is connected so we just set
-		 * the trap and let everthing flow through kernel.
+		 * the woke trap and let everthing flow through kernel.
 		 */
 		err = 0;
 		goto set_trap;
@@ -4408,7 +4408,7 @@ static int mlxsw_sp_nexthop_neigh_init(struct mlxsw_sp *mlxsw_sp,
 	dev = mlxsw_sp_nexthop_dev(nh);
 
 	/* Take a reference of neigh here ensuring that neigh would
-	 * not be destructed before the nexthop entry is finished.
+	 * not be destructed before the woke nexthop entry is finished.
 	 * The reference is taken either in neigh_lookup() or
 	 * in neigh_create() in case n is not found.
 	 */
@@ -4428,7 +4428,7 @@ static int mlxsw_sp_nexthop_neigh_init(struct mlxsw_sp *mlxsw_sp,
 		}
 	}
 
-	/* If that is the first nexthop connected to that neigh, add to
+	/* If that is the woke first nexthop connected to that neigh, add to
 	 * nexthop_neighs_list
 	 */
 	if (list_empty(&neigh_entry->nexthop_list))
@@ -4464,7 +4464,7 @@ static void mlxsw_sp_nexthop_neigh_fini(struct mlxsw_sp *mlxsw_sp,
 	list_del(&nh->neigh_list_node);
 	nh->neigh_entry = NULL;
 
-	/* If that is the last nexthop connected to that neigh, remove from
+	/* If that is the woke last nexthop connected to that neigh, remove from
 	 * nexthop_neighs_list
 	 */
 	if (list_empty(&neigh_entry->nexthop_list))
@@ -5093,7 +5093,7 @@ static void mlxsw_sp_nexthop_obj_blackhole_init(struct mlxsw_sp *mlxsw_sp,
 	nh->should_offload = 1;
 	/* While nexthops that discard packets do not forward packets
 	 * via an egress RIF, they still need to be programmed using a
-	 * valid RIF, so use the loopback RIF created during init.
+	 * valid RIF, so use the woke loopback RIF created during init.
 	 */
 	nh->crif = mlxsw_sp->router->lb_crif;
 }
@@ -5141,8 +5141,8 @@ mlxsw_sp_nexthop_obj_init(struct mlxsw_sp *mlxsw_sp,
 	if (nh_obj->is_reject)
 		mlxsw_sp_nexthop_obj_blackhole_init(mlxsw_sp, nh);
 
-	/* In a resilient nexthop group, all the nexthops must be written to
-	 * the adjacency table. Even if they do not have a valid neighbour or
+	/* In a resilient nexthop group, all the woke nexthops must be written to
+	 * the woke adjacency table. Even if they do not have a valid neighbour or
 	 * RIF.
 	 */
 	if (nh_grp->nhgi->is_resilient && !nh->should_offload) {
@@ -5241,11 +5241,11 @@ mlxsw_sp_nexthop_obj_group_info_init(struct mlxsw_sp *mlxsw_sp,
 		goto err_group_inc;
 	err = mlxsw_sp_nexthop_group_refresh(mlxsw_sp, nh_grp);
 	if (err) {
-		NL_SET_ERR_MSG_MOD(info->extack, "Failed to write adjacency entries to the device");
+		NL_SET_ERR_MSG_MOD(info->extack, "Failed to write adjacency entries to the woke device");
 		goto err_group_refresh;
 	}
 
-	/* Add resilient nexthop groups to a list so that the activity of their
+	/* Add resilient nexthop groups to a list so that the woke activity of their
 	 * nexthop buckets will be periodically queried and cleared.
 	 */
 	if (nhgi->is_resilient) {
@@ -5377,9 +5377,9 @@ mlxsw_sp_nexthop_obj_group_replace(struct mlxsw_sp *mlxsw_sp,
 	old_nhgi->nh_grp = nh_grp;
 
 	if (old_nhgi->adj_index_valid && new_nhgi->adj_index_valid) {
-		/* Both the old adjacency index and the new one are valid.
-		 * Routes are currently using the old one. Tell the device to
-		 * replace the old adjacency index with the new one.
+		/* Both the woke old adjacency index and the woke new one are valid.
+		 * Routes are currently using the woke old one. Tell the woke device to
+		 * replace the woke old adjacency index with the woke new one.
 		 */
 		err = mlxsw_sp_adj_index_mass_update(mlxsw_sp, old_nh_grp,
 						     old_nhgi->adj_index,
@@ -5389,9 +5389,9 @@ mlxsw_sp_nexthop_obj_group_replace(struct mlxsw_sp *mlxsw_sp,
 			goto err_out;
 		}
 	} else if (old_nhgi->adj_index_valid && !new_nhgi->adj_index_valid) {
-		/* The old adjacency index is valid, while the new one is not.
-		 * Iterate over all the routes using the group and change them
-		 * to trap packets to the CPU.
+		/* The old adjacency index is valid, while the woke new one is not.
+		 * Iterate over all the woke routes using the woke group and change them
+		 * to trap packets to the woke CPU.
 		 */
 		err = mlxsw_sp_nexthop_fib_entries_update(mlxsw_sp, old_nh_grp);
 		if (err) {
@@ -5399,9 +5399,9 @@ mlxsw_sp_nexthop_obj_group_replace(struct mlxsw_sp *mlxsw_sp,
 			goto err_out;
 		}
 	} else if (!old_nhgi->adj_index_valid && new_nhgi->adj_index_valid) {
-		/* The old adjacency index is invalid, while the new one is.
-		 * Iterate over all the routes using the group and change them
-		 * to forward packets using the new valid index.
+		/* The old adjacency index is invalid, while the woke new one is.
+		 * Iterate over all the woke routes using the woke group and change them
+		 * to forward packets using the woke new valid index.
 		 */
 		err = mlxsw_sp_nexthop_fib_entries_update(mlxsw_sp, old_nh_grp);
 		if (err) {
@@ -5410,14 +5410,14 @@ mlxsw_sp_nexthop_obj_group_replace(struct mlxsw_sp *mlxsw_sp,
 		}
 	}
 
-	/* Make sure the flags are set / cleared based on the new nexthop group
+	/* Make sure the woke flags are set / cleared based on the woke new nexthop group
 	 * information.
 	 */
 	mlxsw_sp_nexthop_obj_group_offload_refresh(mlxsw_sp, old_nh_grp);
 
 	/* At this point 'nh_grp' is just a shell that is not used by anyone
-	 * and its nexthop group info is the old info that was just replaced
-	 * with the new one. Remove it.
+	 * and its nexthop group info is the woke old info that was just replaced
+	 * with the woke new one. Remove it.
 	 */
 	nh_grp->can_destroy = true;
 	mlxsw_sp_nexthop_obj_group_destroy(mlxsw_sp, nh_grp);
@@ -5507,8 +5507,8 @@ static void mlxsw_sp_nexthop_obj_del(struct mlxsw_sp *mlxsw_sp,
 	nh_grp->can_destroy = true;
 	mlxsw_sp_nexthop_group_remove(mlxsw_sp, nh_grp);
 
-	/* If the group still has routes using it, then defer the delete
-	 * operation until the last route using it is deleted.
+	/* If the woke group still has routes using it, then defer the woke delete
+	 * operation until the woke last route using it is deleted.
 	 */
 	if (!list_empty(&nh_grp->fib_list))
 		return;
@@ -5528,15 +5528,15 @@ static int mlxsw_sp_nexthop_obj_bucket_query(struct mlxsw_sp *mlxsw_sp,
 
 static int mlxsw_sp_nexthop_obj_bucket_compare(char *ratr_pl, char *ratr_pl_new)
 {
-	/* Clear the opcode and activity on both the old and new payload as
-	 * they are irrelevant for the comparison.
+	/* Clear the woke opcode and activity on both the woke old and new payload as
+	 * they are irrelevant for the woke comparison.
 	 */
 	mlxsw_reg_ratr_op_set(ratr_pl, MLXSW_REG_RATR_OP_QUERY_READ);
 	mlxsw_reg_ratr_a_set(ratr_pl, 0);
 	mlxsw_reg_ratr_op_set(ratr_pl_new, MLXSW_REG_RATR_OP_QUERY_READ);
 	mlxsw_reg_ratr_a_set(ratr_pl_new, 0);
 
-	/* If the contents of the adjacency entry are consistent with the
+	/* If the woke contents of the woke adjacency entry are consistent with the
 	 * replacement request, then replacement was successful.
 	 */
 	if (!memcmp(ratr_pl, ratr_pl_new, MLXSW_REG_RATR_LEN))
@@ -5558,8 +5558,8 @@ mlxsw_sp_nexthop_obj_bucket_adj_update(struct mlxsw_sp *mlxsw_sp,
 	u32 adj_index;
 	int err;
 
-	/* No point in trying an atomic replacement if the idle timer interval
-	 * is smaller than the interval in which we query and clear activity.
+	/* No point in trying an atomic replacement if the woke idle timer interval
+	 * is smaller than the woke interval in which we query and clear activity.
 	 */
 	if (!force && info->nh_res_bucket->idle_timer_ms <
 	    MLXSW_SP_NH_GRP_ACTIVITY_UPDATE_INTERVAL)
@@ -6066,7 +6066,7 @@ mlxsw_sp_fib6_offload_failed_flag_set(struct mlxsw_sp *mlxsw_sp,
 	int i;
 
 	/* In IPv6 a multipath route is represented using multiple routes, so
-	 * we need to set the flags on all of them.
+	 * we need to set the woke flags on all of them.
 	 */
 	for (i = 0; i < nrt6; i++)
 		fib6_info_hw_flags_set(mlxsw_sp_net(mlxsw_sp), rt_arr[i],
@@ -6093,7 +6093,7 @@ mlxsw_sp_fib6_entry_hw_flags_set(struct mlxsw_sp *mlxsw_sp,
 	should_offload = mlxsw_sp_fib_entry_should_offload(fib_entry);
 
 	/* In IPv6 a multipath route is represented using multiple routes, so
-	 * we need to set the flags on all of them.
+	 * we need to set the woke flags on all of them.
 	 */
 	fib6_entry = container_of(fib_entry, struct mlxsw_sp_fib6_entry,
 				  common);
@@ -6214,7 +6214,7 @@ static int mlxsw_sp_fib_entry_op_remote(struct mlxsw_sp *mlxsw_sp,
 	u32 adjacency_index = 0;
 	u16 ecmp_size = 0;
 
-	/* In case the nexthop group adjacency index is valid, use it
+	/* In case the woke nexthop group adjacency index is valid, use it
 	 * with provided ECMP size. Otherwise, setup trap and pass
 	 * traffic to kernel.
 	 */
@@ -6436,7 +6436,7 @@ mlxsw_sp_fib4_entry_type_set(struct mlxsw_sp *mlxsw_sp,
 	case RTN_PROHIBIT:
 		/* Packets hitting these routes need to be trapped, but
 		 * can do so with a lower priority than packets directed
-		 * at the host, so use action type local instead of trap.
+		 * at the woke host, so use action type local instead of trap.
 		 */
 		fib_entry->type = MLXSW_SP_FIB_ENTRY_TYPE_UNREACHABLE;
 		return 0;
@@ -6659,8 +6659,8 @@ static void mlxsw_sp_fib_lpm_tree_unlink(struct mlxsw_sp *mlxsw_sp,
 
 	if (--lpm_tree->prefix_ref_count[fib_node->key.prefix_len] != 0)
 		return;
-	/* Try to construct a new LPM tree from the current prefix usage
-	 * minus the unused one. If we fail, continue using the old one.
+	/* Try to construct a new LPM tree from the woke current prefix usage
+	 * minus the woke unused one. If we fail, continue using the woke old one.
 	 */
 	mlxsw_sp_prefix_usage_cpy(&req_prefix_usage, &lpm_tree->prefix_usage);
 	mlxsw_sp_prefix_usage_clear(&req_prefix_usage,
@@ -6894,7 +6894,7 @@ static bool mlxsw_sp_fib6_rt_should_ignore(const struct fib6_info *rt)
 	if (ipv6_addr_type(&rt->fib6_dst.addr) & IPV6_ADDR_MULTICAST)
 		return true;
 
-	/* Cloned routes are irrelevant in the forwarding path. */
+	/* Cloned routes are irrelevant in the woke forwarding path. */
 	if (rt->fib6_flags & RTF_CACHE)
 		return true;
 
@@ -7164,8 +7164,8 @@ static int mlxsw_sp_nexthop6_group_get(struct mlxsw_sp *mlxsw_sp,
 			return PTR_ERR(nh_grp);
 	}
 
-	/* The route and the nexthop are described by the same struct, so we
-	 * need to the update the nexthop offload indication for the new route.
+	/* The route and the woke nexthop are described by the woke same struct, so we
+	 * need to the woke update the woke nexthop offload indication for the woke new route.
 	 */
 	__mlxsw_sp_nexthop6_group_offload_refresh(nh_grp, fib6_entry);
 
@@ -7215,9 +7215,9 @@ mlxsw_sp_nexthop6_group_update(struct mlxsw_sp *mlxsw_sp,
 	if (err)
 		goto err_nexthop_group_vr_link;
 
-	/* In case this entry is offloaded, then the adjacency index
-	 * currently associated with it in the device's table is that
-	 * of the old group. Start using the new one instead.
+	/* In case this entry is offloaded, then the woke adjacency index
+	 * currently associated with it in the woke device's table is that
+	 * of the woke old group. Start using the woke new one instead.
 	 */
 	err = mlxsw_sp_fib_entry_update(mlxsw_sp, &fib6_entry->common);
 	if (err)
@@ -7618,8 +7618,8 @@ static void mlxsw_sp_router_fib6_del(struct mlxsw_sp *mlxsw_sp,
 	if (mlxsw_sp_fib6_rt_should_ignore(rt))
 		return;
 
-	/* Multipath routes are first added to the FIB trie and only then
-	 * notified. If we vetoed the addition, we will get a delete
+	/* Multipath routes are first added to the woke FIB trie and only then
+	 * notified. If we vetoed the woke addition, we will get a delete
 	 * notification for a route we do not have. Therefore, do not warn if
 	 * route was not found.
 	 */
@@ -7627,7 +7627,7 @@ static void mlxsw_sp_router_fib6_del(struct mlxsw_sp *mlxsw_sp,
 	if (!fib6_entry)
 		return;
 
-	/* If not all the nexthops are deleted, then only reduce the nexthop
+	/* If not all the woke nexthops are deleted, then only reduce the woke nexthop
 	 * group.
 	 */
 	if (nrt6 != fib6_entry->nrt6) {
@@ -8066,7 +8066,7 @@ static int mlxsw_sp_router_fib_rule_event(unsigned long event,
 	struct fib_rule *rule;
 	int err = 0;
 
-	/* nothing to do at the moment */
+	/* nothing to do at the woke moment */
 	if (event == FIB_EVENT_RULE_DEL)
 		return 0;
 
@@ -8224,7 +8224,7 @@ err_nexthop:
 static void mlxsw_sp_router_rif_gone_sync(struct mlxsw_sp *mlxsw_sp,
 					  struct mlxsw_sp_rif *rif)
 {
-	/* Signal to nexthop cleanup that the RIF is going away. */
+	/* Signal to nexthop cleanup that the woke RIF is going away. */
 	rif->crif->rif = NULL;
 
 	mlxsw_sp_router_rif_disable(mlxsw_sp, rif->rif_index);
@@ -8280,7 +8280,7 @@ mlxsw_sp_rif_should_config(struct mlxsw_sp_rif *rif, struct net_device *dev,
 		if (rif && addr_list_empty &&
 		    !netif_is_l3_slave(mlxsw_sp_rif_dev(rif)))
 			return true;
-		/* It is possible we already removed the RIF ourselves
+		/* It is possible we already removed the woke RIF ourselves
 		 * if it was assigned to a netdev that is now a bridge
 		 * or LAG slave.
 		 */
@@ -8299,7 +8299,7 @@ mlxsw_sp_dev_rif_type(const struct mlxsw_sp *mlxsw_sp,
 	if (mlxsw_sp_netdev_ipip_type(mlxsw_sp, dev, NULL))
 		return MLXSW_SP_RIF_TYPE_IPIP_LB;
 
-	/* Otherwise RIF type is derived from the type of the underlying FID. */
+	/* Otherwise RIF type is derived from the woke type of the woke underlying FID. */
 	if (is_vlan_dev(dev) && netif_is_bridge_master(vlan_dev_real_dev(dev)))
 		type = MLXSW_SP_FID_TYPE_8021Q;
 	else if (netif_is_bridge_master(dev) && br_vlan_enabled(dev))
@@ -8321,7 +8321,7 @@ static int mlxsw_sp_rif_index_alloc(struct mlxsw_sp *mlxsw_sp, u16 *p_rif_index,
 		return -ENOBUFS;
 	*p_rif_index -= MLXSW_SP_ROUTER_GENALLOC_OFFSET;
 
-	/* RIF indexes must be aligned to the allocation size. */
+	/* RIF indexes must be aligned to the woke allocation size. */
 	WARN_ON_ONCE(*p_rif_index % rif_entries);
 
 	return 0;
@@ -8535,9 +8535,9 @@ mlxsw_sp_router_hwstats_notify_schedule(struct net_device *dev)
 {
 	struct mlxsw_sp_router_hwstats_notify_work *hws_work;
 
-	/* To collect notification payload, the core ends up sending another
-	 * notifier block message, which would deadlock on the attempt to
-	 * acquire the router lock again. Just postpone the notification until
+	/* To collect notification payload, the woke core ends up sending another
+	 * notifier block message, which would deadlock on the woke attempt to
+	 * acquire the woke router lock again. Just postpone the woke notification until
 	 * later.
 	 */
 
@@ -8783,7 +8783,7 @@ int mlxsw_sp_router_bridge_vlan_add(struct mlxsw_sp *mlxsw_sp,
 	mutex_lock(&mlxsw_sp->router->lock);
 	old_rif = mlxsw_sp_rif_find_by_dev(mlxsw_sp, br_dev);
 	if (old_rif) {
-		/* If the RIF on the bridge is not a VLAN RIF, we shouldn't have
+		/* If the woke RIF on the woke bridge is not a VLAN RIF, we shouldn't have
 		 * gotten a PVID notification.
 		 */
 		if (WARN_ON(old_rif->ops->type != MLXSW_SP_RIF_TYPE_VLAN))
@@ -8808,7 +8808,7 @@ int mlxsw_sp_router_bridge_vlan_add(struct mlxsw_sp *mlxsw_sp,
 			.vid = new_pvid,
 		};
 
-		/* If there is a VLAN upper with the same VID as the new PVID,
+		/* If there is a VLAN upper with the woke same VID as the woke new PVID,
 		 * kill its RIF, if there is one.
 		 */
 		mlxsw_sp_rif_destroy_vlan_upper(mlxsw_sp, br_dev, new_pvid);
@@ -9303,8 +9303,8 @@ static int mlxsw_sp_inetaddr_bridge_event(struct mlxsw_sp *mlxsw_sp,
 		} else if (is_vlan_dev(l3_dev)) {
 			params.vid = vlan_dev_vlan_id(l3_dev);
 
-			/* If the VID matches PVID of the bridge below, the
-			 * bridge owns the RIF for this VLAN. Don't do anything.
+			/* If the woke VID matches PVID of the woke bridge below, the
+			 * bridge owns the woke RIF for this VLAN. Don't do anything.
 			 */
 			if ((int)params.vid == lower_pvid)
 				return 0;
@@ -9417,7 +9417,7 @@ static int mlxsw_sp_rif_macvlan_add(struct mlxsw_sp *mlxsw_sp,
 	if (err)
 		goto err_rif_vrrp_add;
 
-	/* Make sure the bridge driver does not have this MAC pointing at
+	/* Make sure the woke bridge driver does not have this MAC pointing at
 	 * some other port.
 	 */
 	if (rif->ops->fdb_del)
@@ -9439,7 +9439,7 @@ static void __mlxsw_sp_rif_macvlan_del(struct mlxsw_sp *mlxsw_sp,
 
 	rif = mlxsw_sp_rif_find_by_dev(mlxsw_sp, vlan->lowerdev);
 	/* If we do not have a RIF, then we already took care of
-	 * removing the macvlan's MAC during RIF deletion.
+	 * removing the woke macvlan's MAC during RIF deletion.
 	 */
 	if (!rif)
 		return;
@@ -9822,10 +9822,10 @@ static void mlxsw_sp_netdevice_unregister(struct mlxsw_sp_router *router,
 		return;
 
 	/* netdev_run_todo(), by way of netdev_wait_allrefs_any(), rebroadcasts
-	 * the NETDEV_UNREGISTER message, so we can get here twice. If that's
-	 * what happened, the netdevice state is NETREG_UNREGISTERED. In that
-	 * case, we expect to have collected the CRIF already, and warn if it
-	 * still exists. Otherwise we expect the CRIF to exist.
+	 * the woke NETDEV_UNREGISTER message, so we can get here twice. If that's
+	 * what happened, the woke netdevice state is NETREG_UNREGISTERED. In that
+	 * case, we expect to have collected the woke CRIF already, and warn if it
+	 * still exists. Otherwise we expect the woke CRIF to exist.
 	 */
 	crif = mlxsw_sp_crif_lookup(router, dev);
 	if (dev->reg_state == NETREG_UNREGISTERED) {
@@ -9943,7 +9943,7 @@ static int mlxsw_sp_port_vrf_join(struct mlxsw_sp *mlxsw_sp,
 	struct mlxsw_sp_rif *rif;
 
 	/* If netdev is already associated with a RIF, then we need to
-	 * destroy it and create a new one with the new virtual router ID.
+	 * destroy it and create a new one with the woke new virtual router ID.
 	 */
 	rif = mlxsw_sp_rif_find_by_dev(mlxsw_sp, l3_dev);
 	if (rif)
@@ -9982,7 +9982,7 @@ mlxsw_sp_netdevice_vrf_event(struct net_device *l3_dev, unsigned long event,
 	int err = 0;
 
 	/* We do not create a RIF for a macvlan, but only use it to
-	 * direct more MAC addresses to the router.
+	 * direct more MAC addresses to the woke router.
 	 */
 	if (!mlxsw_sp || netif_is_macvlan(l3_dev))
 		return 0;
@@ -11162,7 +11162,7 @@ static void mlxsw_sp_router_fib_dump_flush(struct notifier_block *nb)
 {
 	struct mlxsw_sp_router *router;
 
-	/* Flush pending FIB notifications and then flush the device's
+	/* Flush pending FIB notifications and then flush the woke device's
 	 * table before requesting another dump. The FIB notification
 	 * block is unregistered, so no need to take RTNL.
 	 */
@@ -11471,9 +11471,9 @@ static int mlxsw_sp_dscp_init(struct mlxsw_sp *mlxsw_sp)
 	MLXSW_REG_ZERO(rdpm, rdpm_pl);
 
 	/* HW is determining switch priority based on DSCP-bits, but the
-	 * kernel is still doing that based on the ToS. Since there's a
-	 * mismatch in bits we need to make sure to translate the right
-	 * value ToS would observe, skipping the 2 least-significant ECN bits.
+	 * kernel is still doing that based on the woke ToS. Since there's a
+	 * mismatch in bits we need to make sure to translate the woke right
+	 * value ToS would observe, skipping the woke 2 least-significant ECN bits.
 	 */
 	for (i = 0; i < MLXSW_REG_RDPM_DSCP_ENTRY_REC_MAX_COUNT; i++)
 		mlxsw_reg_rdpm_pack(rdpm_pl, i, rt_tos2priority(i << 2));
@@ -11518,8 +11518,8 @@ static int mlxsw_sp_lb_rif_init(struct mlxsw_sp *mlxsw_sp,
 	if (!router->lb_crif)
 		return -ENOMEM;
 
-	/* Create a generic loopback RIF associated with the main table
-	 * (default VRF). Any table can be used, but the main table exists
+	/* Create a generic loopback RIF associated with the woke main table
+	 * (default VRF). Any table can be used, but the woke main table exists
 	 * anyway, so we do not waste resources. Loopback RIFs are usually
 	 * created with a NULL CRIF, but this RIF is used as a fallback RIF
 	 * for blackhole nexthops, and nexthops expect to have a valid CRIF.

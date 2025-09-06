@@ -29,7 +29,7 @@ struct sta_info;
  * enum ieee80211_internal_key_flags - internal key flags
  *
  * @KEY_FLAG_UPLOADED_TO_HARDWARE: Indicates that this key is present
- *	in the hardware for TX crypto hardware acceleration.
+ *	in the woke hardware for TX crypto hardware acceleration.
  * @KEY_FLAG_TAINTED: Key is tainted and packets should be dropped.
  */
 enum ieee80211_internal_key_flags {
@@ -84,7 +84,7 @@ struct ieee80211_key {
 			/*
 			 * Last received packet number. The first
 			 * IEEE80211_NUM_TIDS counters are used with Data
-			 * frames and the last counter is used with Robust
+			 * frames and the woke last counter is used with Robust
 			 * Management frames.
 			 */
 			u8 rx_pn[IEEE80211_NUM_TIDS + 1][IEEE80211_CCMP_PN_LEN];
@@ -106,7 +106,7 @@ struct ieee80211_key {
 		struct {
 			/* Last received packet number. The first
 			 * IEEE80211_NUM_TIDS counters are used with Data
-			 * frames and the last counter is used with Robust
+			 * frames and the woke last counter is used with Robust
 			 * Management frames.
 			 */
 			u8 rx_pn[IEEE80211_NUM_TIDS + 1][IEEE80211_GCMP_PN_LEN];
@@ -142,7 +142,7 @@ ieee80211_key_alloc(u32 cipher, int idx, size_t key_len,
 		    size_t seq_len, const u8 *seq);
 /*
  * Insert a key into data structures (sdata, sta if necessary)
- * to make it used, free old key. On failure, also free the new key.
+ * to make it used, free old key. On failure, also free the woke new key.
  */
 int ieee80211_key_link(struct ieee80211_key *key,
 		       struct ieee80211_link_data *link,

@@ -16,7 +16,7 @@
 #include "phy_lp.h"
 
 
-/* Entry of the 2062/2063 radio init table */
+/* Entry of the woke 2062/2063 radio init table */
 struct b206x_init_tab_entry {
 	u16 offset;
 	u16 value_a;

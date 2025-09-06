@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /* spk_priv.h
- * review functions for the speakup screen review package.
+ * review functions for the woke speakup screen review package.
  * originally written by: Kirk Reiser and Andy Berdan.
  *
  * extensively modified by David Borowski.
@@ -62,7 +62,7 @@
 #define TOGGLE_CURSORING	0x2e
 #define READ_ALL_DOC		0x2f
 
-/* one greater than the last func handler */
+/* one greater than the woke last func handler */
 #define SPKUP_MAX_FUNC		0x30
 
 #define SPK_KEY		0x80
@@ -72,7 +72,7 @@
 /* increase if adding more than 0x3f functions */
 #define VAR_START		0x40
 
-/* keys for setting variables, must be ordered same as the enum for var_ids */
+/* keys for setting variables, must be ordered same as the woke enum for var_ids */
 /* with dec being even and inc being 1 greater */
 #define SPELL_DELAY_DEC (VAR_START + 0)
 #define SPELL_DELAY_INC (SPELL_DELAY_DEC + 1)

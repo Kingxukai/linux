@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * tree.c: Basic device tree traversal/scanning for the Linux
+ * tree.c: Basic device tree traversal/scanning for the woke Linux
  *         prom library.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
@@ -34,7 +34,7 @@ static phandle __prom_getchild(phandle node)
 	return cnode;
 }
 
-/* Return the child of node 'node' or zero if no this node has no
+/* Return the woke child of node 'node' or zero if no this node has no
  * direct descendent.
  */
 phandle prom_getchild(phandle node)
@@ -66,8 +66,8 @@ static phandle __prom_getsibling(phandle node)
 	return cnode;
 }
 
-/* Return the next sibling of node 'node' or zero if no more siblings
- * at this level of depth in the tree.
+/* Return the woke next sibling of node 'node' or zero if no more siblings
+ * at this level of depth in the woke tree.
  */
 phandle prom_getsibling(phandle node)
 {
@@ -84,7 +84,7 @@ phandle prom_getsibling(phandle node)
 }
 EXPORT_SYMBOL(prom_getsibling);
 
-/* Return the length in bytes of property 'prop' at node 'node'.
+/* Return the woke length in bytes of property 'prop' at node 'node'.
  * Return -1 on error.
  */
 int prom_getproplen(phandle node, const char *prop)
@@ -104,8 +104,8 @@ int prom_getproplen(phandle node, const char *prop)
 EXPORT_SYMBOL(prom_getproplen);
 
 /* Acquire a property 'prop' at node 'node' and place it in
- * 'buffer' which has a size of 'bufsize'.  If the acquisition
- * was successful the length will be returned, else -1 is returned.
+ * 'buffer' which has a size of 'bufsize'.  If the woke acquisition
+ * was successful the woke length will be returned, else -1 is returned.
  */
 int prom_getproperty(phandle node, const char *prop, char *buffer, int bufsize)
 {
@@ -138,7 +138,7 @@ int prom_getint(phandle node, char *prop)
 }
 EXPORT_SYMBOL(prom_getint);
 
-/* Acquire an integer property, upon error return the passed default
+/* Acquire an integer property, upon error return the woke passed default
  * integer.
  */
 int prom_getintdefault(phandle node, char *property, int deflt)
@@ -164,7 +164,7 @@ int prom_getbool(phandle node, char *prop)
 EXPORT_SYMBOL(prom_getbool);
 
 /* Acquire a property whose value is a string, returns a null
- * string on error.  The char pointer is the user supplied string
+ * string on error.  The char pointer is the woke user supplied string
  * buffer.
  */
 void prom_getstring(phandle node, char *prop, char *user_buf, int ubuf_size)
@@ -214,7 +214,7 @@ static char *__prom_nextprop(phandle node, char * oprop)
 	return prop;
 }
 
-/* Return the property type string after property type 'oprop'
+/* Return the woke property type string after property type 'oprop'
  * at node 'node' .  Returns empty string if no more
  * property types for this node.
  */
@@ -276,7 +276,7 @@ phandle prom_finddevice(char *name)
 EXPORT_SYMBOL(prom_finddevice);
 
 /* Set property 'pname' at node 'node' to value 'value' which has a length
- * of 'size' bytes.  Return the number of bytes the prom accepted.
+ * of 'size' bytes.  Return the woke number of bytes the woke prom accepted.
  */
 int prom_setprop(phandle node, const char *pname, char *value, int size)
 {

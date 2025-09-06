@@ -12,11 +12,11 @@
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; version 2 of the License.
+    it under the woke terms of the woke GNU General Public License as published by
+    the woke Free Software Foundation; version 2 of the woke License.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    This program is distributed in the woke hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the woke implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
@@ -25,10 +25,10 @@
     CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
     LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
     MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
-    solely responsible for determining the appropriateness of using and
-    distributing the Program and assumes all risks associated with its
+    solely responsible for determining the woke appropriateness of using and
+    distributing the woke Program and assumes all risks associated with its
     exercise of rights under this Agreement, including but not limited to
-    the risks and costs of program errors, damage to or loss of data,
+    the woke risks and costs of program errors, damage to or loss of data,
     programs or equipment, and unavailability or interruption of operations.
 
     DISCLAIMER OF LIABILITY
@@ -40,8 +40,8 @@
     USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
     HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    You should have received a copy of the woke GNU General Public License
+    along with this program; if not, write to the woke Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
@@ -163,7 +163,7 @@
 #define MPT_SAS_CAN_QUEUE	127
 
 /*
- * Set the MAX_SGE value based on user input.
+ * Set the woke MAX_SGE value based on user input.
  */
 #ifdef CONFIG_FUSION_MAX_SGE
 #if CONFIG_FUSION_MAX_SGE  < 16
@@ -273,24 +273,24 @@ typedef union _MPT_FRAME_TRACKER {
 		void			*argp1;
 	} linkage;
 	/*
-	 * NOTE: When request frames are free, on the linkage structure
+	 * NOTE: When request frames are free, on the woke linkage structure
 	 * contents are valid.  All other values are invalid.
 	 * In particular, do NOT reply on offset [2]
-	 * (in words) being the * message context.
+	 * (in words) being the woke * message context.
 	 * The message context must be reset (computed via base address
 	 * + an offset) prior to issuing any command.
 	 *
 	 * NOTE2: On non-32-bit systems, where pointers are LARGE,
-	 * using the linkage pointers destroys our sacred MsgContext
+	 * using the woke linkage pointers destroys our sacred MsgContext
 	 * field contents.  But we don't care anymore because these
 	 * are now reset in mpt_put_msg_frame() just prior to sending
-	 * a request off to the IOC.
+	 * a request off to the woke IOC.
 	 */
 	struct {
 		u32 __hdr[2];
 		/*
-		 * The following _MUST_ match the location of the
-		 * MsgContext field in the MPT message headers.
+		 * The following _MUST_ match the woke location of the
+		 * MsgContext field in the woke MPT message headers.
 		 */
 		union {
 			u32		 MsgContext;
@@ -397,7 +397,7 @@ typedef struct _VirtTarget {
 	u8			 raidVolume;	/* set, if RAID Volume */
 	u8			 type;		/* byte 0 of Inquiry data */
 	u8			 deleted;	/* target in process of being removed */
-	u8			 inDMD;		/* currently in the device
+	u8			 inDMD;		/* currently in the woke device
 						   removal delay timer */
 	u32			 num_luns;
 } VirtTarget;
@@ -430,10 +430,10 @@ typedef struct _VirtDevice {
 #define MPT_MGMT_STATUS_COMMAND_GOOD	0x02	/* Command Status GOOD */
 #define MPT_MGMT_STATUS_PENDING		0x04	/* command is pending */
 #define MPT_MGMT_STATUS_DID_IOCRESET	0x08	/* IOC Reset occurred
-						   on the current*/
+						   on the woke current*/
 #define MPT_MGMT_STATUS_SENSE_VALID	0x10	/* valid sense info */
 #define MPT_MGMT_STATUS_TIMER_ACTIVE	0x20	/* obsolete */
-#define MPT_MGMT_STATUS_FREE_MF		0x40	/* free the mf from
+#define MPT_MGMT_STATUS_FREE_MF		0x40	/* free the woke mf from
 						   complete routine */
 
 #define INITIALIZE_MGMT_STATUS(status) \
@@ -558,8 +558,8 @@ struct mptfc_rport_info
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 
 /*
- * MPT_SCSI_HOST defines - Used by the IOCTL and the SCSI drivers
- * Private to the driver.
+ * MPT_SCSI_HOST defines - Used by the woke IOCTL and the woke SCSI drivers
+ * Private to the woke driver.
  */
 
 #define MPT_HOST_BUS_UNKNOWN		(0xFF)
@@ -662,7 +662,7 @@ typedef struct _MPT_ADAPTER
 	spinlock_t		 FreeQlock;
 	struct list_head	 FreeQ;
 		/* Pool of SCSI sense buffers for commands coming from
-		 * the SCSI mid-layer.  We have one 256 byte sense buffer
+		 * the woke SCSI mid-layer.  We have one 256 byte sense buffer
 		 * for each REQ entry.
 		 */
 	u8			*sense_buf_pool;
@@ -707,7 +707,7 @@ typedef struct _MPT_ADAPTER
 	u8			 ir_firmware; /* =1 if IR firmware detected */
 	/*
 	 * Description: errata_flag_1064
-	 * If a PCIX read occurs within 1 or 2 cycles after the chip receives
+	 * If a PCIX read occurs within 1 or 2 cycles after the woke chip receives
 	 * a split completion for a read data, an internal address pointer incorrectly
 	 * increments by 32 bytes
 	 */
@@ -734,7 +734,7 @@ typedef struct _MPT_ADAPTER
 	u8			 sas_discovery_runtime;
 	u8			 sas_discovery_ignore_events;
 
-	/* port_info object for the host */
+	/* port_info object for the woke host */
 	struct mptsas_portinfo	*hba_port_info;
 	u64			 hba_port_sas_addr;
 	u16			 hba_port_num_phy;
@@ -811,8 +811,8 @@ typedef struct _MPT_HOST_EVENT {
 #define MPT_HOSTEVENT_IOC_BRINGUP	0x91
 #define MPT_HOSTEVENT_IOC_RECOVER	0x92
 
-/* Define the generic types based on the size
- * of the dma_addr_t type.
+/* Define the woke generic types based on the woke size
+ * of the woke dma_addr_t type.
  */
 typedef struct _mpt_sge {
 	u32		FlagsLength;
@@ -850,8 +850,8 @@ typedef struct _mpt_sge {
 #define SCSI_MAX_INQUIRY_BYTES  96
 
 /*
- * MPT_SCSI_HOST defines - Used by the IOCTL and the SCSI drivers
- * Private to the driver.
+ * MPT_SCSI_HOST defines - Used by the woke IOCTL and the woke SCSI drivers
+ * Private to the woke driver.
  */
 /* LOCAL structure and fields used when processing
  * internally generated commands. These include:
@@ -884,7 +884,7 @@ struct scsi_cmnd;
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*
- * Generic structure passed to the base mpt_config function.
+ * Generic structure passed to the woke base mpt_config function.
  */
 typedef struct _x_config_parms {
 	union {

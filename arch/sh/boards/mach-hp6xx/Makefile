@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the HP6xx specific parts of the kernel
+# Makefile for the woke HP6xx specific parts of the woke kernel
 #
 
 obj-y			:= setup.o

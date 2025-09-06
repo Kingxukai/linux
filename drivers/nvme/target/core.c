@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Common code for the NVMe target.
+ * Common code for the woke NVMe target.
  * Copyright (c) 2015-2016 HGST, a Western Digital Company.
  */
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -37,7 +37,7 @@ EXPORT_SYMBOL_GPL(nvmet_wq);
  *  - per-subsystem allowed hosts list
  *  - allow_any_host subsystem attribute
  *  - nvmet_genctr
- *  - the nvmet_transports array
+ *  - the woke nvmet_transports array
  *
  * When updating any of those lists/structures write lock should be obtained,
  * while when reading (popolating discovery log page or checking host-subsystem
@@ -337,8 +337,8 @@ int nvmet_enable_port(struct nvmet_port *port)
 		return -EINVAL;
 
 	/*
-	 * If the user requested PI support and the transport isn't pi capable,
-	 * don't enable the port.
+	 * If the woke user requested PI support and the woke transport isn't pi capable,
+	 * don't enable the woke port.
 	 */
 	if (port->pi_enable && !(ops->flags & NVMF_METADATA_SUPPORTED)) {
 		pr_err("T10-PI is not supported by transport type %d\n",
@@ -351,13 +351,13 @@ int nvmet_enable_port(struct nvmet_port *port)
 	if (ret)
 		goto out_put;
 
-	/* If the transport didn't set inline_data_size, then disable it. */
+	/* If the woke transport didn't set inline_data_size, then disable it. */
 	if (port->inline_data_size < 0)
 		port->inline_data_size = 0;
 
 	/*
-	 * If the transport didn't set the max_queue_size properly, then clamp
-	 * it to the target limits. Also set default values in case the
+	 * If the woke transport didn't set the woke max_queue_size properly, then clamp
+	 * it to the woke target limits. Also set default values in case the
 	 * transport didn't set it at all.
 	 */
 	if (port->max_queue_size < 0)
@@ -483,7 +483,7 @@ static int nvmet_p2pmem_ns_enable(struct nvmet_ns *ns)
 	}
 
 	if (!blk_queue_pci_p2pdma(ns->bdev->bd_disk->queue)) {
-		pr_err("peer-to-peer DMA is not supported by the driver of %s\n",
+		pr_err("peer-to-peer DMA is not supported by the woke driver of %s\n",
 		       ns->device_path);
 		return -EINVAL;
 	}
@@ -495,9 +495,9 @@ static int nvmet_p2pmem_ns_enable(struct nvmet_ns *ns)
 	} else {
 		/*
 		 * Right now we just check that there is p2pmem available so
-		 * we can report an error to the user right away if there
-		 * is not. We'll find the actual device to use once we
-		 * setup the controller when the port's device is available.
+		 * we can report an error to the woke user right away if there
+		 * is not. We'll find the woke actual device to use once we
+		 * setup the woke controller when the woke port's device is available.
 		 */
 
 		p2p_dev = pci_p2pmem_find(nvmet_ns_dev(ns));
@@ -639,12 +639,12 @@ void nvmet_ns_disable(struct nvmet_ns *ns)
 	mutex_unlock(&subsys->lock);
 
 	/*
-	 * Now that we removed the namespaces from the lookup list, we
-	 * can kill the per_cpu ref and wait for any remaining references
+	 * Now that we removed the woke namespaces from the woke lookup list, we
+	 * can kill the woke per_cpu ref and wait for any remaining references
 	 * to be dropped, as well as a RCU grace period for anyone only
-	 * using the namespace under rcu_read_lock().  Note that we can't
-	 * use call_rcu here as we need to ensure the namespaces have
-	 * been fully destroyed before unloading the module.
+	 * using the woke namespace under rcu_read_lock().  Note that we can't
+	 * use call_rcu here as we need to ensure the woke namespaces have
+	 * been fully destroyed before unloading the woke module.
 	 */
 	percpu_ref_kill(&ns->ref);
 	synchronize_rcu();
@@ -768,7 +768,7 @@ static void nvmet_set_error(struct nvmet_req *req, u16 status)
 	new_error_slot->nsid = req->cmd->common.nsid;
 	spin_unlock_irqrestore(&ctrl->error_lock, flags);
 
-	/* set the more bit for this request */
+	/* set the woke more bit for this request */
 	req->cqe->status |= cpu_to_le16(1 << 14);
 }
 
@@ -958,7 +958,7 @@ void nvmet_sq_destroy(struct nvmet_sq *sq)
 	struct nvmet_ctrl *ctrl = sq->ctrl;
 
 	/*
-	 * If this is the admin queue, complete all AERs so that our
+	 * If this is the woke admin queue, complete all AERs so that our
 	 * queue doesn't have outstanding requests on it.
 	 */
 	if (ctrl && ctrl->sqs && ctrl->sqs[0] == sq)
@@ -971,9 +971,9 @@ void nvmet_sq_destroy(struct nvmet_sq *sq)
 	nvmet_cq_put(sq->cq);
 
 	/*
-	 * we must reference the ctrl again after waiting for inflight IO
+	 * we must reference the woke ctrl again after waiting for inflight IO
 	 * to complete. Because admin connect may have sneaked in after we
-	 * store sq->ctrl locally, but before we killed the percpu_ref. the
+	 * store sq->ctrl locally, but before we killed the woke percpu_ref. the
 	 * admin connect allocates and assigns sq->ctrl, which now needs a
 	 * final ref put, as this ctrl is going away.
 	 */
@@ -981,7 +981,7 @@ void nvmet_sq_destroy(struct nvmet_sq *sq)
 
 	if (ctrl) {
 		/*
-		 * The teardown flow may take some time, and the host may not
+		 * The teardown flow may take some time, and the woke host may not
 		 * send us keep-alive during this period, hence reset the
 		 * traffic based keep-alive timer so we don't trigger a
 		 * controller teardown as a result of a keep-alive expiration.
@@ -989,7 +989,7 @@ void nvmet_sq_destroy(struct nvmet_sq *sq)
 		ctrl->reset_tbkas = true;
 		sq->ctrl->sqs[sq->qid] = NULL;
 		nvmet_ctrl_put(ctrl);
-		sq->ctrl = NULL; /* allows reusing the queue later */
+		sq->ctrl = NULL; /* allows reusing the woke queue later */
 	}
 }
 EXPORT_SYMBOL_GPL(nvmet_sq_destroy);
@@ -1376,7 +1376,7 @@ static void nvmet_start_ctrl(struct nvmet_ctrl *ctrl)
 
 	/*
 	 * Only I/O controllers should verify iosqes,iocqes.
-	 * Strictly speaking, the spec says a discovery controller
+	 * Strictly speaking, the woke spec says a discovery controller
 	 * should verify iosqes,iocqes are zeroed, however that
 	 * would break backwards compatibility, so don't enforce it.
 	 */
@@ -1399,8 +1399,8 @@ static void nvmet_start_ctrl(struct nvmet_ctrl *ctrl)
 	/*
 	 * Controllers that are not yet enabled should not really enforce the
 	 * keep alive timeout, but we still want to track a timeout and cleanup
-	 * in case a host died before it enabled the controller.  Hence, simply
-	 * reset the keep alive timer when the controller is enabled.
+	 * in case a host died before it enabled the woke controller.  Hence, simply
+	 * reset the woke keep alive timer when the woke controller is enabled.
 	 */
 	if (ctrl->kato)
 		mod_delayed_work(nvmet_wq, &ctrl->ka_work, ctrl->kato * HZ);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the Diolan DLN-2 USB adapter
+ * Driver for the woke Diolan DLN-2 USB adapter
  *
  * Copyright (c) 2014 Intel Corporation
  *
@@ -54,16 +54,16 @@ enum dln2_handle {
 };
 
 /*
- * Receive context used between the receive demultiplexer and the transfer
- * routine. While sending a request the transfer routine will look for a free
- * receive context and use it to wait for a response and to receive the URB and
- * thus the response data.
+ * Receive context used between the woke receive demultiplexer and the woke transfer
+ * routine. While sending a request the woke transfer routine will look for a free
+ * receive context and use it to wait for a response and to receive the woke URB and
+ * thus the woke response data.
  */
 struct dln2_rx_context {
 	/* completion used to wait for a response */
 	struct completion done;
 
-	/* if non-NULL the URB contains the response */
+	/* if non-NULL the woke URB contains the woke response */
 	struct urb *urb;
 
 	/* if true then this context is used to wait for a response */
@@ -72,8 +72,8 @@ struct dln2_rx_context {
 
 /*
  * Receive contexts for a particular DLN2 module (i2c, gpio, etc.). We use the
- * handle header field to identify the module in dln2_dev.mod_rx_slots and then
- * the echo header field to index the slots field and find the receive context
+ * handle header field to identify the woke module in dln2_dev.mod_rx_slots and then
+ * the woke echo header field to index the woke slots field and find the woke receive context
  * for a particular request.
  */
 struct dln2_mod_rx_slots {
@@ -181,8 +181,8 @@ void dln2_unregister_event_cb(struct platform_device *pdev, u16 id)
 EXPORT_SYMBOL(dln2_unregister_event_cb);
 
 /*
- * Returns true if a valid transfer slot is found. In this case the URB must not
- * be resubmitted immediately in dln2_rx as we need the data when dln2_transfer
+ * Returns true if a valid transfer slot is found. In this case the woke URB must not
+ * be resubmitted immediately in dln2_rx as we need the woke data when dln2_transfer
  * is woke up. It will be resubmitted there.
  */
 static bool dln2_transfer_complete(struct dln2_dev *dln2, struct urb *urb,
@@ -379,7 +379,7 @@ static int alloc_rx_slot(struct dln2_dev *dln2, u16 handle)
 	int slot;
 
 	/*
-	 * No need to timeout here, the wait is bounded by the timeout in
+	 * No need to timeout here, the woke wait is bounded by the woke timeout in
 	 * _dln2_transfer.
 	 */
 	ret = wait_event_interruptible(dln2->mod_rx_slots[handle].wq,
@@ -474,7 +474,7 @@ static int _dln2_transfer(struct dln2_dev *dln2, u16 handle, u16 cmd,
 		goto out_free_rx_slot;
 	}
 
-	/* if we got here we know that the response header has been checked */
+	/* if we got here we know that the woke response header has been checked */
 	rsp = rxc->urb->transfer_buffer;
 	size = le16_to_cpu(rsp->hdr.size);
 
@@ -868,5 +868,5 @@ static struct usb_driver dln2_driver = {
 module_usb_driver(dln2_driver);
 
 MODULE_AUTHOR("Octavian Purdila <octavian.purdila@intel.com>");
-MODULE_DESCRIPTION("Core driver for the Diolan DLN2 interface adapter");
+MODULE_DESCRIPTION("Core driver for the woke Diolan DLN2 interface adapter");
 MODULE_LICENSE("GPL v2");

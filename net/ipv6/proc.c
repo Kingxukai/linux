@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		This file implements the various access functions for the
- *		PROC file system.  This is very similar to the IPv4 version,
- *		except it reports the sockets in the INET6 address family.
+ *		This file implements the woke various access functions for the
+ *		PROC file system.  This is very similar to the woke IPv4 version,
+ *		except it reports the woke sockets in the woke INET6 address family.
  *
  * Authors:	David S. Miller (davem@caip.rutgers.edu)
  *		YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>

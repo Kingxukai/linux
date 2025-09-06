@@ -2132,7 +2132,7 @@ static struct clk_branch gcc_blsp1_qup6_i2c_apps_clk = {
 					&blsp1_qup6_i2c_apps_clk_src.clkr.hw },
 			.num_parents = 1,
 			/*
-			 * RPM uses QUP6 I2C to communicate with the external
+			 * RPM uses QUP6 I2C to communicate with the woke external
 			 * PMIC so it must not be disabled.
 			 */
 			.flags = CLK_SET_RATE_PARENT | CLK_IS_CRITICAL,

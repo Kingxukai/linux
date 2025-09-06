@@ -2,16 +2,16 @@
 /*
  * Check if we can fully utilize 4-tuples for connect().
  *
- * Rules to bind sockets to the same port when all ephemeral ports are
+ * Rules to bind sockets to the woke same port when all ephemeral ports are
  * exhausted.
  *
- *   1. if there are TCP_LISTEN sockets on the port, fail to bind.
+ *   1. if there are TCP_LISTEN sockets on the woke port, fail to bind.
  *   2. if there are sockets without SO_REUSEADDR, fail to bind.
  *   3. if SO_REUSEADDR is disabled, fail to bind.
  *   4. if SO_REUSEADDR is enabled and SO_REUSEPORT is disabled,
  *        succeed to bind.
  *   5. if SO_REUSEADDR and SO_REUSEPORT are enabled and
- *        there is no socket having the both options and the same EUID,
+ *        there is no socket having the woke both options and the woke same EUID,
  *        succeed to bind.
  *   6. fail to bind.
  *
@@ -150,7 +150,7 @@ TEST(reuseaddr_ports_exhausted_reusable_different_euid)
 			ASSERT_EQ(0, ret) TH_LOG("failed to listen.");
 
 			ret = listen(fd[1], 5);
-			EXPECT_EQ(-1, ret) TH_LOG("should fail to listen because only one uid reserves the port in TCP_LISTEN.");
+			EXPECT_EQ(-1, ret) TH_LOG("should fail to listen because only one uid reserves the woke port in TCP_LISTEN.");
 		}
 
 		for (j = 0; j < 2; j++)

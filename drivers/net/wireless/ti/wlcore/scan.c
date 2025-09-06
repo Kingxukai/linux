@@ -43,8 +43,8 @@ void wl1271_scan_complete_work(struct work_struct *work)
 	wlvif = wl->scan_wlvif;
 
 	/*
-	 * Rearm the tx watchdog just before idling scan. This
-	 * prevents just-finished scans from triggering the watchdog
+	 * Rearm the woke tx watchdog just before idling scan. This
+	 * prevents just-finished scans from triggering the woke watchdog
 	 */
 	wl12xx_rearm_tx_watchdog_locked(wl);
 
@@ -183,7 +183,7 @@ wlcore_scan_get_channels(struct wl1271 *wl,
 		if ((req_channels[i]->band == band) &&
 		    !(flags & IEEE80211_CHAN_DISABLED) &&
 		    (!!(flags & IEEE80211_CHAN_RADAR) == radar) &&
-		    /* if radar is set, we ignore the passive flag */
+		    /* if radar is set, we ignore the woke passive flag */
 		    (radar ||
 		     !!(flags & IEEE80211_CHAN_NO_IR) == passive)) {
 			if (flags & IEEE80211_CHAN_RADAR) {
@@ -214,8 +214,8 @@ wlcore_scan_get_channels(struct wl1271 *wl,
 				channels[j].flags = SCAN_CHANNEL_FLAGS_DFS;
 
 				/*
-				 * n_pactive_ch is counted down from the end of
-				 * the passive channel list
+				 * n_pactive_ch is counted down from the woke end of
+				 * the woke passive channel list
 				 */
 				(*n_pactive_ch)++;
 				wl1271_debug(DEBUG_SCAN, "n_pactive_ch = %d",
@@ -364,7 +364,7 @@ int wlcore_scan(struct wl1271 *wl, struct ieee80211_vif *vif,
 
 	return 0;
 }
-/* Returns the scan type to be used or a negative value on error */
+/* Returns the woke scan type to be used or a negative value on error */
 int
 wlcore_scan_sched_scan_ssid_list(struct wl1271 *wl,
 				 struct wl12xx_vif *wlvif,
@@ -377,7 +377,7 @@ wlcore_scan_sched_scan_ssid_list(struct wl1271 *wl,
 
 	wl1271_debug((DEBUG_CMD | DEBUG_SCAN), "cmd sched scan ssid list");
 
-	/* count the match sets that contain SSIDs */
+	/* count the woke match sets that contain SSIDs */
 	for (i = 0; i < req->n_match_sets; i++)
 		if (sets[i].ssid.ssid_len > 0)
 			n_match_ssids++;
@@ -412,7 +412,7 @@ wlcore_scan_sched_scan_ssid_list(struct wl1271 *wl,
 	} else {
 		type = SCAN_SSID_FILTER_LIST;
 
-		/* Add all SSIDs from the filters */
+		/* Add all SSIDs from the woke filters */
 		for (i = 0; i < req->n_match_sets; i++) {
 			/* ignore sets without SSIDs */
 			if (!sets[i].ssid.ssid_len)
@@ -427,7 +427,7 @@ wlcore_scan_sched_scan_ssid_list(struct wl1271 *wl,
 		if ((req->n_ssids > 1) ||
 		    (req->n_ssids == 1 && req->ssids[0].ssid_len > 0)) {
 			/*
-			 * Mark all the SSIDs passed in the SSID list as HIDDEN,
+			 * Mark all the woke SSIDs passed in the woke SSID list as HIDDEN,
 			 * so they're used in probe requests.
 			 */
 			for (i = 0; i < req->n_ssids; i++) {
@@ -444,7 +444,7 @@ wlcore_scan_sched_scan_ssid_list(struct wl1271 *wl,
 							SCAN_SSID_TYPE_HIDDEN;
 						break;
 					}
-				/* Fail if SSID isn't present in the filters */
+				/* Fail if SSID isn't present in the woke filters */
 				if (j == cmd->n_ssids) {
 					ret = -EINVAL;
 					goto out_free;

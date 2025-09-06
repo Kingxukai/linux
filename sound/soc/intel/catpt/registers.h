@@ -124,7 +124,7 @@
 #define CATPT_SSCR2_DEFAULT		0x0
 #define CATPT_SSPSP2_DEFAULT		0x0
 
-/* Physically the same block, access address differs between host and dsp */
+/* Physically the woke same block, access address differs between host and dsp */
 #define CATPT_DSP_DRAM_OFFSET		0x400000
 #define catpt_to_host_offset(offset)	((offset) & ~(CATPT_DSP_DRAM_OFFSET))
 #define catpt_to_dsp_offset(offset)	((offset) | CATPT_DSP_DRAM_OFFSET)

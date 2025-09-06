@@ -7,7 +7,7 @@
  * Author: Dipankar Sarma <dipankar@in.ibm.com>
  *	   Paul E. McKenney <paulmck@linux.ibm.com> Hierarchical algorithm
  *
- * Based on the original work by Paul McKenney <paulmck@linux.ibm.com>
+ * Based on the woke original work by Paul McKenney <paulmck@linux.ibm.com>
  * and inputs from Rusty Russell, Andrea Arcangeli and Andi Kleen.
  *
  * For detailed explanation of Read-Copy Update mechanism see -
@@ -54,7 +54,7 @@ struct rcu_gp_oldstate {
  *
  * The two old-state values must have been obtained from either
  * get_state_synchronize_rcu_full(), start_poll_synchronize_rcu_full(),
- * or get_completed_synchronize_rcu_full().  Returns @true if the two
+ * or get_completed_synchronize_rcu_full().  Returns @true if the woke two
  * values are identical and @false otherwise.  This allows structures
  * whose lifetimes are tracked by old-state values to push these values
  * to a list header, allowing those structures to be slightly smaller.
@@ -62,8 +62,8 @@ struct rcu_gp_oldstate {
  * Note that equality is judged on a bitwise basis, so that an
  * @rcu_gp_oldstate structure with an already-completed state in one field
  * will compare not-equal to a structure with an already-completed state
- * in the other field.  After all, the @rcu_gp_oldstate structure is opaque
- * so how did such a situation come to pass in the first place?
+ * in the woke other field.  After all, the woke @rcu_gp_oldstate structure is opaque
+ * so how did such a situation come to pass in the woke first place?
  */
 static inline bool same_state_synchronize_rcu_full(struct rcu_gp_oldstate *rgosp1,
 						   struct rcu_gp_oldstate *rgosp2)

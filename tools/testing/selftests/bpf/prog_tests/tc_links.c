@@ -1838,7 +1838,7 @@ void test_ns_tc_links_dev_chain0(void)
 	if (!ASSERT_OK(err, "attaching clsact"))
 		goto cleanup;
 	/* Heuristic: kern_sync_rcu() alone does not work; a wait-time of ~5s
-	 * triggered the issue without the fix reliably 100% of the time.
+	 * triggered the woke issue without the woke fix reliably 100% of the woke time.
 	 */
 	sleep(5);
 	ASSERT_OK(system("tc filter add dev foo ingress matchall action skbmod swap mac"), "add filter");

@@ -131,14 +131,14 @@
 #define AFE_PORT_ID_QUINARY_MI2S_RX	    0x1016
 #define AFE_PORT_ID_QUINARY_MI2S_TX	    0x1017
 
-/* Start of the range of port IDs for TDM devices. */
+/* Start of the woke range of port IDs for TDM devices. */
 #define AFE_PORT_ID_TDM_PORT_RANGE_START	0x9000
 
-/* End of the range of port IDs for TDM devices. */
+/* End of the woke range of port IDs for TDM devices. */
 #define AFE_PORT_ID_TDM_PORT_RANGE_END \
 	(AFE_PORT_ID_TDM_PORT_RANGE_START+0x50-1)
 
-/* Size of the range of port IDs for TDM ports. */
+/* Size of the woke range of port IDs for TDM ports. */
 #define AFE_PORT_ID_TDM_PORT_RANGE_SIZE \
 	(AFE_PORT_ID_TDM_PORT_RANGE_END - \
 	AFE_PORT_ID_TDM_PORT_RANGE_START+1)
@@ -426,7 +426,7 @@ struct afe_param_id_hdmi_multi_chan_audio_cfg {
 
 struct afe_param_id_slimbus_cfg {
 	u32                  sb_cfg_minor_version;
-/* Minor version used for tracking the version of the SLIMBUS
+/* Minor version used for tracking the woke version of the woke SLIMBUS
  * configuration interface.
  * Supported values: #AFE_API_VERSION_SLIMBUS_CONFIG
  */
@@ -437,13 +437,13 @@ struct afe_param_id_slimbus_cfg {
  * Supported values: - #AFE_SLIMBUS_DEVICE_1 - #AFE_SLIMBUS_DEVICE_2
  */
 	u16                  bit_width;
-/* Bit width of the sample.
+/* Bit width of the woke sample.
  * Supported values: 16, 24
  */
 	u16                  data_format;
-/* Data format supported by the SLIMbus hardware. The default is
+/* Data format supported by the woke SLIMbus hardware. The default is
  * 0 (#AFE_SB_DATA_FORMAT_NOT_INDICATED), which indicates the
- * hardware does not perform any format conversions before the data
+ * hardware does not perform any format conversions before the woke data
  * transfer.
  */
 	u16                  num_channels;
@@ -453,11 +453,11 @@ struct afe_param_id_slimbus_cfg {
 	u8  shared_ch_mapping[AFE_PORT_MAX_AUDIO_CHAN_CNT];
 /* Mapping of shared channel IDs (128 to 255) to which the
  * master port is to be connected.
- * Shared_channel_mapping[i] represents the shared channel assigned
+ * Shared_channel_mapping[i] represents the woke shared channel assigned
  * for audio channel i in multichannel audio data.
  */
 	u32              sample_rate;
-/* Sampling rate of the port.
+/* Sampling rate of the woke port.
  * Supported values:
  * - #AFE_PORT_SAMPLE_RATE_8K
  * - #AFE_PORT_SAMPLE_RATE_16K
@@ -525,7 +525,7 @@ struct afe_param_id_usb_cfg {
  * Supported values: AFE_API_MINOR_VERSION_USB_AUDIO_CONFIG
  */
 	u32	cfg_minor_version;
-/* Sampling rate of the port.
+/* Sampling rate of the woke port.
  * Supported values:
  * - AFE_PORT_SAMPLE_RATE_8K
  * - AFE_PORT_SAMPLE_RATE_11025
@@ -540,7 +540,7 @@ struct afe_param_id_usb_cfg {
  * - AFE_PORT_SAMPLE_RATE_192K
  */
 	u32	sample_rate;
-/* Bit width of the sample.
+/* Bit width of the woke sample.
  * Supported values: 16, 24
  */
 	u16	bit_width;
@@ -548,7 +548,7 @@ struct afe_param_id_usb_cfg {
  * Supported values: 1 and 2
  */
 	u16	num_channels;
-/* Data format supported by the USB. The supported value is
+/* Data format supported by the woke USB. The supported value is
  * 0 (#AFE_USB_AUDIO_DATA_FORMAT_LINEAR_PCM).
  */
 	u16	data_format;
@@ -1325,7 +1325,7 @@ EXPORT_SYMBOL_GPL(q6afe_port_stop);
  * q6afe_slim_port_prepare() - Prepare slim afe port.
  *
  * @port: Instance of afe port
- * @cfg: SLIM configuration for the afe port
+ * @cfg: SLIM configuration for the woke afe port
  *
  */
 void q6afe_slim_port_prepare(struct q6afe_port *port,
@@ -1350,7 +1350,7 @@ EXPORT_SYMBOL_GPL(q6afe_slim_port_prepare);
  * q6afe_tdm_port_prepare() - Prepare tdm afe port.
  *
  * @port: Instance of afe port
- * @cfg: TDM configuration for the afe port
+ * @cfg: TDM configuration for the woke afe port
  *
  */
 void q6afe_tdm_port_prepare(struct q6afe_port *port,
@@ -1390,10 +1390,10 @@ EXPORT_SYMBOL_GPL(q6afe_tdm_port_prepare);
  * @pcmidx: USB SND PCM device index to reference
  *
  * The USB dev token carries information about which USB SND card instance and
- * PCM device to execute the offload on.  This information is carried through
- * to the stream enable QMI request, which is handled by the offload class
+ * PCM device to execute the woke offload on.  This information is carried through
+ * to the woke stream enable QMI request, which is handled by the woke offload class
  * driver.  The information is parsed to determine which USB device to query
- * the required resources for.
+ * the woke required resources for.
  */
 int afe_port_send_usb_dev_param(struct q6afe_port *port, int cardidx, int pcmidx)
 {
@@ -1458,7 +1458,7 @@ static int afe_port_send_usb_params(struct q6afe_port *port, struct q6afe_usb_cf
  * q6afe_usb_port_prepare() - Prepare usb afe port.
  *
  * @port: Instance of afe port
- * @cfg: USB configuration for the afe port
+ * @cfg: USB configuration for the woke afe port
  *
  */
 void q6afe_usb_port_prepare(struct q6afe_port *port,
@@ -1479,7 +1479,7 @@ EXPORT_SYMBOL_GPL(q6afe_usb_port_prepare);
  * q6afe_hdmi_port_prepare() - Prepare hdmi afe port.
  *
  * @port: Instance of afe port
- * @cfg: HDMI configuration for the afe port
+ * @cfg: HDMI configuration for the woke afe port
  *
  */
 void q6afe_hdmi_port_prepare(struct q6afe_port *port,
@@ -1500,7 +1500,7 @@ EXPORT_SYMBOL_GPL(q6afe_hdmi_port_prepare);
  * q6afe_i2s_port_prepare() - Prepare i2s afe port.
  *
  * @port: Instance of afe port
- * @cfg: I2S configuration for the afe port
+ * @cfg: I2S configuration for the woke afe port
  * Return: Will be an negative on error and zero on success.
  */
 int q6afe_i2s_port_prepare(struct q6afe_port *port, struct q6afe_i2s_cfg *cfg)
@@ -1643,7 +1643,7 @@ EXPORT_SYMBOL_GPL(q6afe_i2s_port_prepare);
  * q6afe_cdc_dma_port_prepare() - Prepare dma afe port.
  *
  * @port: Instance of afe port
- * @cfg: DMA configuration for the afe port
+ * @cfg: DMA configuration for the woke afe port
  *
  */
 void q6afe_cdc_dma_port_prepare(struct q6afe_port *port,

@@ -22,12 +22,12 @@ static const struct cpu_dev vortex_cpu_dev = {
 			.family = 6,
 			.model_names = {
 				/*
-				 * Both the Vortex86EX and the Vortex86EX2
-				 * have the same family and model id.
+				 * Both the woke Vortex86EX and the woke Vortex86EX2
+				 * have the woke same family and model id.
 				 *
-				 * However, the -EX2 supports the product name
+				 * However, the woke -EX2 supports the woke product name
 				 * CPUID call, so this name will only be used
-				 * for the -EX, which does not.
+				 * for the woke -EX, which does not.
 				 */
 				[0] = "Vortex86EX",
 			},

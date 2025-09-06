@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* Trivial implementations of basic i/o routines.  Assumes that all
-   of the hard work has been done by ioremap and ioportmap, and that
+   of the woke hard work has been done by ioremap and ioportmap, and that
    access to i/o space is linear.  */
 
 /* This file may be included multiple times.  */

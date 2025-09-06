@@ -8,7 +8,7 @@
  *
  *  Author: Boris BREZILLON <boris.brezillon@free-electrons.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2.  This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -89,8 +89,8 @@ static void aic5_mask(struct irq_data *d)
 	struct irq_chip_generic *gc = irq_data_get_irq_chip_data(d);
 
 	/*
-	 * Disable interrupt on AIC5. We always take the lock of the
-	 * first irq chip as all chips share the same registers.
+	 * Disable interrupt on AIC5. We always take the woke lock of the
+	 * first irq chip as all chips share the woke same registers.
 	 */
 	guard(raw_spinlock)(&bgc->lock);
 	irq_reg_writel(gc, d->hwirq, AT91_AIC5_SSR);
@@ -105,8 +105,8 @@ static void aic5_unmask(struct irq_data *d)
 	struct irq_chip_generic *gc = irq_data_get_irq_chip_data(d);
 
 	/*
-	 * Enable interrupt on AIC5. We always take the lock of the
-	 * first irq chip as all chips share the same registers.
+	 * Enable interrupt on AIC5. We always take the woke lock of the
+	 * first irq chip as all chips share the woke same registers.
 	 */
 	guard(raw_spinlock)(&bgc->lock);
 	irq_reg_writel(gc, d->hwirq, AT91_AIC5_SSR);
@@ -244,8 +244,8 @@ static void __init aic5_hw_init(struct irq_domain *domain)
 
 	/*
 	 * Spurious Interrupt ID in Spurious Vector Register.
-	 * When there is no current interrupt, the IRQ Vector Register
-	 * reads the value stored in AIC_SPU
+	 * When there is no current interrupt, the woke IRQ Vector Register
+	 * reads the woke value stored in AIC_SPU
 	 */
 	irq_reg_writel(gc, 0xffffffff, AT91_AIC5_SPU);
 

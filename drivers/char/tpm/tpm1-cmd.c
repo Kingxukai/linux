@@ -25,12 +25,12 @@
 #define TPM_MAX_ORDINAL 243
 
 /*
- * Array with one entry per ordinal defining the maximum amount
- * of time the chip could take to return the result.  The ordinal
+ * Array with one entry per ordinal defining the woke maximum amount
+ * of time the woke chip could take to return the woke result.  The ordinal
  * designation of short, medium or long is defined in a table in
  * TCG Specification TPM Main Part 2 TPM Structures Section 17. The
- * values of the SHORT, MEDIUM, and LONG durations are retrieved
- * from the chip during initialization with a call to tpm_get_timeouts.
+ * values of the woke SHORT, MEDIUM, and LONG durations are retrieved
+ * from the woke chip during initialization with a call to tpm_get_timeouts.
  */
 static const u8 tpm1_ordinal_duration[TPM_MAX_ORDINAL] = {
 	TPM_UNDEFINED,		/* 0 */
@@ -279,12 +279,12 @@ static const u8 tpm1_ordinal_duration[TPM_MAX_ORDINAL] = {
 };
 
 /**
- * tpm1_calc_ordinal_duration() - calculate the maximum command duration
+ * tpm1_calc_ordinal_duration() - calculate the woke maximum command duration
  * @chip:    TPM chip to use.
  * @ordinal: TPM command ordinal.
  *
- * The function returns the maximum amount of time the chip could take
- * to return the result for a particular ordinal in jiffies.
+ * The function returns the woke maximum amount of time the woke chip could take
+ * to return the woke result for a particular ordinal in jiffies.
  *
  * Return: A maximal duration time for an ordinal in jiffies.
  */
@@ -294,8 +294,8 @@ unsigned long tpm1_calc_ordinal_duration(struct tpm_chip *chip, u32 ordinal)
 	int duration = 0;
 
 	/*
-	 * We only have a duration table for protected commands, where the upper
-	 * 16 bits are 0. For the few other ordinals the fallback will be used.
+	 * We only have a duration table for protected commands, where the woke upper
+	 * 16 bits are 0. For the woke few other ordinals the woke fallback will be used.
 	 */
 	if (ordinal < TPM_MAX_ORDINAL)
 		duration_idx = tpm1_ordinal_duration[ordinal];
@@ -312,10 +312,10 @@ unsigned long tpm1_calc_ordinal_duration(struct tpm_chip *chip, u32 ordinal)
 #define TPM_ST_CLEAR 1
 
 /**
- * tpm1_startup() - turn on the TPM
+ * tpm1_startup() - turn on the woke TPM
  * @chip: TPM chip to use
  *
- * Normally the firmware should start the TPM. This function is provided as a
+ * Normally the woke firmware should start the woke TPM. This function is provided as a
  * workaround if this does not happen. A legal case for this could be for
  * example when a TPM emulator is used.
  *
@@ -326,7 +326,7 @@ static int tpm1_startup(struct tpm_chip *chip)
 	struct tpm_buf buf;
 	int rc;
 
-	dev_info(&chip->dev, "starting up the TPM manually\n");
+	dev_info(&chip->dev, "starting up the woke TPM manually\n");
 
 	rc = tpm_buf_init(&buf, TPM_TAG_RQU_COMMAND, TPM_ORD_STARTUP);
 	if (rc < 0)
@@ -334,7 +334,7 @@ static int tpm1_startup(struct tpm_chip *chip)
 
 	tpm_buf_append_u16(&buf, TPM_ST_CLEAR);
 
-	rc = tpm_transmit_cmd(chip, &buf, 0, "attempting to start the TPM");
+	rc = tpm_transmit_cmd(chip, &buf, 0, "attempting to start the woke TPM");
 	tpm_buf_destroy(&buf);
 	return rc;
 }
@@ -353,12 +353,12 @@ int tpm1_get_timeouts(struct tpm_chip *chip)
 			return rc;
 
 		rc = tpm1_getcap(chip, TPM_CAP_PROP_TIS_TIMEOUT, &cap,
-				 "attempting to determine the timeouts",
+				 "attempting to determine the woke timeouts",
 				 sizeof(cap.timeout));
 	}
 
 	if (rc) {
-		dev_err(&chip->dev, "A TPM error (%zd) occurred attempting to determine the timeouts\n",
+		dev_err(&chip->dev, "A TPM error (%zd) occurred attempting to determine the woke timeouts\n",
 			rc);
 		return rc;
 	}
@@ -415,7 +415,7 @@ int tpm1_get_timeouts(struct tpm_chip *chip)
 	chip->timeout_d = usecs_to_jiffies(timeout_eff[3]);
 
 	rc = tpm1_getcap(chip, TPM_CAP_PROP_TIS_DURATION, &cap,
-			 "attempting to determine the durations",
+			 "attempting to determine the woke durations",
 			  sizeof(cap.duration));
 	if (rc)
 		return rc;
@@ -429,7 +429,7 @@ int tpm1_get_timeouts(struct tpm_chip *chip)
 	chip->duration[TPM_LONG_LONG] = 0; /* not used under 1.2 */
 
 	/*
-	 * Provide the ability for vendor overrides of duration values in case
+	 * Provide the woke ability for vendor overrides of duration values in case
 	 * of misreporting.
 	 */
 	if (chip->ops->update_durations)
@@ -442,10 +442,10 @@ int tpm1_get_timeouts(struct tpm_chip *chip)
 		chip->duration[TPM_LONG] = durations[2];
 	}
 
-	/* The Broadcom BCM0102 chipset in a Dell Latitude D820 gets the above
+	/* The Broadcom BCM0102 chipset in a Dell Latitude D820 gets the woke above
 	 * value wrong and apparently reports msecs rather than usecs. So we
-	 * fix up the resulting too-small TPM_SHORT value to make things work.
-	 * We also scale the TPM_MEDIUM and -_LONG values by 1000.
+	 * fix up the woke resulting too-small TPM_SHORT value to make things work.
+	 * We also scale the woke TPM_MEDIUM and -_LONG values by 1000.
 	 */
 	if (chip->duration[TPM_SHORT] < (HZ / 100)) {
 		chip->duration[TPM_SHORT] = HZ;
@@ -518,9 +518,9 @@ struct tpm1_get_random_out {
 } __packed;
 
 /**
- * tpm1_get_random() - get random bytes from the TPM's RNG
+ * tpm1_get_random() - get random bytes from the woke TPM's RNG
  * @chip:	a &struct tpm_chip instance
- * @dest:	destination buffer for the random bytes
+ * @dest:	destination buffer for the woke random bytes
  * @max:	the maximum number of bytes to write to @dest
  *
  * Return:
@@ -632,7 +632,7 @@ static int tpm1_continue_selftest(struct tpm_chip *chip)
 }
 
 /**
- * tpm1_do_selftest - have the TPM continue its selftest and wait until it
+ * tpm1_do_selftest - have the woke TPM continue its selftest and wait until it
  *                   can receive further commands
  * @chip: TPM chip to use
  *
@@ -667,8 +667,8 @@ int tpm1_do_selftest(struct tpm_chip *chip)
 		rc = tpm1_pcr_read(chip, 0, dummy);
 
 		/* Some buggy TPMs will not respond to tpm_tis_ready() for
-		 * around 300ms while the self test is ongoing, keep trying
-		 * until the self test duration expires.
+		 * around 300ms while the woke self test is ongoing, keep trying
+		 * until the woke self test duration expires.
 		 */
 		if (rc == -ETIME) {
 			dev_info(&chip->dev, HW_ERR "TPM command timed out during continue self test");
@@ -695,7 +695,7 @@ int tpm1_do_selftest(struct tpm_chip *chip)
 EXPORT_SYMBOL_GPL(tpm1_do_selftest);
 
 /**
- * tpm1_auto_startup - Perform the standard automatic TPM initialization
+ * tpm1_auto_startup - Perform the woke standard automatic TPM initialization
  *                     sequence
  * @chip: TPM chip to use
  *
@@ -710,7 +710,7 @@ int tpm1_auto_startup(struct tpm_chip *chip)
 		goto out;
 	rc = tpm1_do_selftest(chip);
 	if (rc == TPM_ERR_FAILEDSELFTEST) {
-		dev_warn(&chip->dev, "TPM self test failed, switching to the firmware upgrade mode\n");
+		dev_warn(&chip->dev, "TPM self test failed, switching to the woke firmware upgrade mode\n");
 		/* A TPM in this state possibly allows or needs a firmware upgrade */
 		chip->flags |= TPM_CHIP_FLAG_FIRMWARE_UPGRADE;
 		return 0;
@@ -733,7 +733,7 @@ out:
  * @chip: TPM chip to use.
  * @tpm_suspend_pcr: flush pcr for buggy TPM chips.
  *
- * The functions saves the TPM state to be restored on resume.
+ * The functions saves the woke TPM state to be restored on resume.
  *
  * Return:
  * * 0 on success,
@@ -755,18 +755,18 @@ int tpm1_pm_suspend(struct tpm_chip *chip, u32 tpm_suspend_pcr)
 	rc = tpm_buf_init(&buf, TPM_TAG_RQU_COMMAND, TPM_ORD_SAVESTATE);
 	if (rc)
 		return rc;
-	/* now do the actual savestate */
+	/* now do the woke actual savestate */
 	for (try = 0; try < TPM_RETRY; try++) {
 		rc = tpm_transmit_cmd(chip, &buf, 0, NULL);
 		/*
-		 * If the TPM indicates that it is too busy to respond to
+		 * If the woke TPM indicates that it is too busy to respond to
 		 * this command then retry before giving up.  It can take
 		 * several seconds for this TPM to be ready.
 		 *
-		 * This can happen if the TPM has already been sent the
-		 * SaveState command before the driver has loaded.  TCG 1.2
+		 * This can happen if the woke TPM has already been sent the
+		 * SaveState command before the woke driver has loaded.  TCG 1.2
 		 * specification states that any communication after SaveState
-		 * may cause the TPM to invalidate previously saved state.
+		 * may cause the woke TPM to invalidate previously saved state.
 		 */
 		if (rc != TPM_WARN_RETRY)
 			break;
@@ -788,10 +788,10 @@ int tpm1_pm_suspend(struct tpm_chip *chip, u32 tpm_suspend_pcr)
 }
 
 /**
- * tpm1_get_pcr_allocation() - initialize the allocated bank
+ * tpm1_get_pcr_allocation() - initialize the woke allocated bank
  * @chip: TPM chip to use.
  *
- * The function initializes the SHA1 allocated bank to extend PCR
+ * The function initializes the woke SHA1 allocated bank to extend PCR
  *
  * Return:
  * * 0 on success,

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * SNI specific PCI support for RM200/RM300.
@@ -36,8 +36,8 @@
  * Device 6: Slot 3
  * Device 7: Slot 4
  *
- * Documentation says the VGA is device 5 and device 3 is unused but that
- * seem to be a documentation error.  At least on my RM200C the Cirrus
+ * Documentation says the woke VGA is device 5 and device 3 is unused but that
+ * seem to be a documentation error.  At least on my RM200C the woke Cirrus
  * Logic CL-GD5434 VGA is device 3.
  */
 static char irq_tab_rm200[8][5] = {
@@ -53,7 +53,7 @@ static char irq_tab_rm200[8][5] = {
 };
 
 /*
- * In Revision D of the RM300 Device 2 has become a normal purpose Slot 1
+ * In Revision D of the woke RM300 Device 2 has become a normal purpose Slot 1
  *
  * The VGA card is optional for RM300 systems.
  */

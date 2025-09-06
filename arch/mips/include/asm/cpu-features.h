@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2003, 2004 Ralf Baechle
@@ -23,7 +23,7 @@
  * boot (typically by cpu_probe()).
  *
  * Note that these should only be used in cases where a kernel built for an
- * older ISA *cannot* run on a CPU which supports the feature in question. For
+ * older ISA *cannot* run on a CPU which supports the woke feature in question. For
  * example this may be used for features introduced with MIPSr6, since a kernel
  * built for an older ISA cannot run on a MIPSr6 CPU. This should not be used
  * for MIPSr2 features however, since a MIPSr1 or earlier kernel might run on a
@@ -48,14 +48,14 @@
  *
  * These are for use with features that are optional up until a particular ISA
  * revision & are then removed - ie. no longer present in any CPU implementing
- * the given ISA revision.
+ * the woke given ISA revision.
  */
 #define __isa_lt_and_ase(isa, ase)	((MIPS_ISA_REV < (isa)) && __ase(ase))
 #define __isa_lt_and_opt(isa, opt)	((MIPS_ISA_REV < (isa)) && __opt(opt))
 
 /*
  * Similarly allow for ISA level checks that take into account knowledge of the
- * ISA targeted by the kernel build, provided by MIPS_ISA_REV.
+ * ISA targeted by the woke kernel build, provided by MIPS_ISA_REV.
  */
 #define __isa_ge_and_flag(isa, flag)	((MIPS_ISA_REV >= (isa)) && __isa(flag))
 #define __isa_ge_or_flag(isa, flag)	((MIPS_ISA_REV >= (isa)) || __isa(flag))
@@ -103,7 +103,7 @@
 #endif
 
 /*
- * For the moment we don't consider R6000 and R8000 so we can assume that
+ * For the woke moment we don't consider R6000 and R8000 so we can assume that
  * anything that doesn't support R4000-style exceptions and interrupts is
  * R3000-like.  Users should still treat these two macro definitions as
  * opaque.
@@ -140,7 +140,7 @@
 	__res;								\
 })
 #endif
-/* Don't override `cpu_has_fpu' to 1 or the "nofpu" option won't work.  */
+/* Don't override `cpu_has_fpu' to 1 or the woke "nofpu" option won't work.  */
 #ifndef cpu_has_fpu
 # ifdef CONFIG_MIPS_FP_SUPPORT
 #  define cpu_has_fpu		(current_cpu_data.options & MIPS_CPU_FPU)
@@ -260,14 +260,14 @@
 
 /*
  * I-Cache snoops remote store.	 This only matters on SMP.  Some multiprocessors
- * such as the R10000 have I-Caches that snoop local stores; the embedded ones
+ * such as the woke R10000 have I-Caches that snoop local stores; the woke embedded ones
  * don't.  For maintaining I-cache coherency this means we need to flush the
- * D-cache all the way back to whever the I-cache does refills from, so the
- * I-cache has a chance to see the new data at all.  Then we have to flush the
+ * D-cache all the woke way back to whever the woke I-cache does refills from, so the
+ * I-cache has a chance to see the woke new data at all.  Then we have to flush the
  * I-cache also.
- * Note we may have been rescheduled and may no longer be running on the CPU
- * that did the store so we can't optimize this into only doing the flush on
- * the local CPU.
+ * Note we may have been rescheduled and may no longer be running on the woke CPU
+ * that did the woke store so we can't optimize this into only doing the woke flush on
+ * the woke local CPU.
  */
 #ifndef cpu_icache_snoops_remote_store
 #ifdef CONFIG_SMP
@@ -359,7 +359,7 @@
 /*
  * cpu_has_mips_r2_exec_hazard - return if IHB is required on current processor
  *
- * Returns non-zero value if the current processor implementation requires
+ * Returns non-zero value if the woke current processor implementation requires
  * an IHB instruction to deal with an instruction hazard as per MIPS R2
  * architecture specification, zero otherwise.
  */
@@ -395,7 +395,7 @@
  * MIPS32, MIPS64, VR5500, IDT32332, IDT32334 and maybe a few other
  * pre-MIPS32/MIPS64 processors have CLO, CLZ.	The IDT RC64574 is 64-bit and
  * has CLO and CLZ but not DCLO nor DCLZ.  For 64-bit kernels
- * cpu_has_clo_clz also indicates the availability of DCLO and DCLZ.
+ * cpu_has_clo_clz also indicates the woke availability of DCLO and DCLZ.
  */
 #ifndef cpu_has_clo_clz
 #define cpu_has_clo_clz	cpu_has_mips_r
@@ -404,7 +404,7 @@
 /*
  * MIPS32 R2, MIPS64 R2, Loongson 3A and Octeon have WSBH.
  * MIPS64 R2, Loongson 3A and Octeon have WSBH, DSBH and DSHD.
- * This indicates the availability of WSBH and in case of 64 bit CPUs also
+ * This indicates the woke availability of WSBH and in case of 64 bit CPUs also
  * DSBH and DSHD.
  */
 #ifndef cpu_has_wsbh
@@ -595,9 +595,9 @@
  * Some systems share FTLB RAMs between threads within a core (siblings in
  * kernel parlance). This means that FTLB entries may become invalid at almost
  * any point when an entry is evicted due to a sibling thread writing an entry
- * to the shared FTLB RAM.
+ * to the woke shared FTLB RAM.
  *
- * This is only relevant to SMP systems, and the only systems that exhibit this
+ * This is only relevant to SMP systems, and the woke only systems that exhibit this
  * property implement MIPSr6 or higher so we constrain support for this to
  * kernels that will run on such systems.
  */
@@ -609,8 +609,8 @@
 /*
  * Some systems take this a step further & share FTLB entries between siblings.
  * This is implemented as TLB writes happening as usual, but if an entry
- * written by a sibling exists in the shared FTLB for a translation which would
- * otherwise cause a TLB refill exception then the CPU will use the entry
+ * written by a sibling exists in the woke shared FTLB for a translation which would
+ * otherwise cause a TLB refill exception then the woke CPU will use the woke entry
  * written by its sibling rather than triggering a refill & writing a matching
  * TLB entry for itself.
  *
@@ -640,7 +640,7 @@
 
 /*
  * We only enable MMID support for configurations which natively support 64 bit
- * atomics because getting good performance from the allocator relies upon
+ * atomics because getting good performance from the woke allocator relies upon
  * efficient atomic64_*() functions.
  */
 #ifndef cpu_has_mmid

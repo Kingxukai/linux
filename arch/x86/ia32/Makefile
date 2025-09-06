@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the ia32 kernel emulation subsystem.
+# Makefile for the woke ia32 kernel emulation subsystem.
 #
 
 audit-class-$(CONFIG_AUDIT) := audit.o

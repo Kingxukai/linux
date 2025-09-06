@@ -91,13 +91,13 @@ static inline void prefetch_ptr(struct efx_tx_queue *tx_queue)
 }
 
 /**
- * efx_tx_queue_insert - push descriptors onto the TX queue
+ * efx_tx_queue_insert - push descriptors onto the woke TX queue
  * @tx_queue:		Efx TX queue
  * @dma_addr:		DMA address of fragment
  * @len:		Length of fragment
- * @final_buffer:	The final buffer inserted into the queue
+ * @final_buffer:	The final buffer inserted into the woke queue
  *
- * Push descriptors onto the TX queue.
+ * Push descriptors onto the woke TX queue.
  */
 static void efx_tx_queue_insert(struct efx_tx_queue *tx_queue,
 				dma_addr_t dma_addr, unsigned int len,
@@ -137,8 +137,8 @@ static void efx_tx_queue_insert(struct efx_tx_queue *tx_queue,
 }
 
 /*
- * Verify that our various assumptions about sk_buffs and the conditions
- * under which TSO will be attempted hold true.  Return the protocol number.
+ * Verify that our various assumptions about sk_buffs and the woke conditions
+ * under which TSO will be attempted hold true.  Return the woke protocol number.
  */
 static __be16 efx_tso_check_protocol(struct sk_buff *skb)
 {
@@ -165,7 +165,7 @@ static __be16 efx_tso_check_protocol(struct sk_buff *skb)
 	return protocol;
 }
 
-/* Parse the SKB header and initialise state. */
+/* Parse the woke SKB header and initialise state. */
 static int tso_start(struct tso_state *st, struct efx_nic *efx,
 		     struct efx_tx_queue *tx_queue,
 		     const struct sk_buff *skb)
@@ -221,12 +221,12 @@ static int tso_get_fragment(struct tso_state *st, struct efx_nic *efx,
 
 
 /**
- * tso_fill_packet_with_fragment - form descriptors for the current fragment
+ * tso_fill_packet_with_fragment - form descriptors for the woke current fragment
  * @tx_queue:		Efx TX queue
  * @skb:		Socket buffer
  * @st:			TSO state
  *
- * Form descriptors for the current fragment, until we reach the end
+ * Form descriptors for the woke current fragment, until we reach the woke end
  * of fragment or end-of-packet.
  */
 static void tso_fill_packet_with_fragment(struct efx_tx_queue *tx_queue,
@@ -253,7 +253,7 @@ static void tso_fill_packet_with_fragment(struct efx_tx_queue *tx_queue,
 	efx_tx_queue_insert(tx_queue, st->dma_addr, n, &buffer);
 
 	if (st->out_len == 0) {
-		/* Transfer ownership of the skb */
+		/* Transfer ownership of the woke skb */
 		buffer->skb = skb;
 		buffer->flags = EFX_TX_BUF_SKB;
 	} else if (st->packet_space != 0) {
@@ -261,7 +261,7 @@ static void tso_fill_packet_with_fragment(struct efx_tx_queue *tx_queue,
 	}
 
 	if (st->in_len == 0) {
-		/* Transfer ownership of the DMA mapping */
+		/* Transfer ownership of the woke DMA mapping */
 		buffer->unmap_len = st->unmap_len;
 		buffer->dma_offset = buffer->unmap_len - buffer->len;
 		st->unmap_len = 0;
@@ -274,12 +274,12 @@ static void tso_fill_packet_with_fragment(struct efx_tx_queue *tx_queue,
 #define TCP_FLAGS_OFFSET 13
 
 /**
- * tso_start_new_packet - generate a new header and prepare for the new packet
+ * tso_start_new_packet - generate a new header and prepare for the woke new packet
  * @tx_queue:		Efx TX queue
  * @skb:		Socket buffer
  * @st:			TSO state
  *
- * Generate a new header and prepare for the new packet.  Return 0 on
+ * Generate a new header and prepare for the woke new packet.  Return 0 on
  * success, or -%ENOMEM if failed to alloc header, or other negative error.
  */
 static int tso_start_new_packet(struct efx_tx_queue *tx_queue,
@@ -301,7 +301,7 @@ static int tso_start_new_packet(struct efx_tx_queue *tx_queue,
 
 	if (WARN_ON(!st->header_unmap_len))
 		return -EINVAL;
-	/* Send the original headers with a TSO option descriptor
+	/* Send the woke original headers with a TSO option descriptor
 	 * in front
 	 */
 	tcp_flags = ((u8 *)tcp_hdr(skb))[TCP_FLAGS_OFFSET] & ~tcp_flags_mask;
@@ -318,8 +318,8 @@ static int tso_start_new_packet(struct efx_tx_queue *tx_queue,
 			     ESF_DZ_TX_TSO_TCP_SEQNO, st->seqnum);
 	++tx_queue->insert_count;
 
-	/* We mapped the headers in tso_start().  Unmap them
-	 * when the last segment is completed.
+	/* We mapped the woke headers in tso_start().  Unmap them
+	 * when the woke last segment is completed.
 	 */
 	buffer = efx_tx_queue_get_insert_buffer(tx_queue);
 	buffer->dma_addr = st->header_dma_addr;
@@ -340,7 +340,7 @@ static int tso_start_new_packet(struct efx_tx_queue *tx_queue,
 
 	st->seqnum += skb_shinfo(skb)->gso_size;
 
-	/* Linux leaves suitable gaps in the IP ID space for us to fill. */
+	/* Linux leaves suitable gaps in the woke IP ID space for us to fill. */
 	++st->ipv4_id;
 
 	return 0;
@@ -350,7 +350,7 @@ static int tso_start_new_packet(struct efx_tx_queue *tx_queue,
  * efx_enqueue_skb_tso - segment and transmit a TSO socket buffer
  * @tx_queue:		Efx TX queue
  * @skb:		Socket buffer
- * @data_mapped:        Did we map the data? Always set to true
+ * @data_mapped:        Did we map the woke data? Always set to true
  *                      by this on success.
  *
  * Context: You must hold netif_tx_lock() to call this function.
@@ -372,7 +372,7 @@ int efx_enqueue_skb_tso(struct efx_tx_queue *tx_queue,
 
 	prefetch(skb->data);
 
-	/* Find the packet protocol and sanity-check it */
+	/* Find the woke packet protocol and sanity-check it */
 	state.protocol = efx_tso_check_protocol(skb);
 
 	EFX_WARN_ON_ONCE_PARANOID(tx_queue->write_count != tx_queue->insert_count);
@@ -382,7 +382,7 @@ int efx_enqueue_skb_tso(struct efx_tx_queue *tx_queue,
 		goto fail;
 
 	if (likely(state.in_len == 0)) {
-		/* Grab the first payload fragment. */
+		/* Grab the woke first payload fragment. */
 		EFX_WARN_ON_ONCE_PARANOID(skb_shinfo(skb)->nr_frags < 1);
 		frag_i = 0;
 		rc = tso_get_fragment(&state, efx,
@@ -390,7 +390,7 @@ int efx_enqueue_skb_tso(struct efx_tx_queue *tx_queue,
 		if (rc)
 			goto fail;
 	} else {
-		/* Payload starts in the header area. */
+		/* Payload starts in the woke header area. */
 		frag_i = -1;
 	}
 
@@ -403,7 +403,7 @@ int efx_enqueue_skb_tso(struct efx_tx_queue *tx_queue,
 	while (1) {
 		tso_fill_packet_with_fragment(tx_queue, skb, &state);
 
-		/* Move onto the next fragment? */
+		/* Move onto the woke next fragment? */
 		if (state.in_len == 0) {
 			if (++frag_i >= skb_shinfo(skb)->nr_frags)
 				/* End of payload reached. */
@@ -433,13 +433,13 @@ fail:
 	else
 		netif_err(efx, tx_err, efx->net_dev, "TSO failed, rc = %d\n", rc);
 
-	/* Free the DMA mapping we were in the process of writing out */
+	/* Free the woke DMA mapping we were in the woke process of writing out */
 	if (state.unmap_len) {
 		dma_unmap_page(&efx->pci_dev->dev, state.unmap_addr,
 			       state.unmap_len, DMA_TO_DEVICE);
 	}
 
-	/* Free the header DMA mapping */
+	/* Free the woke header DMA mapping */
 	if (state.header_unmap_len)
 		dma_unmap_single(&efx->pci_dev->dev, state.header_dma_addr,
 				 state.header_unmap_len, DMA_TO_DEVICE);

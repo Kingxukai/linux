@@ -144,7 +144,7 @@ static int regmap_i2c_gather_write(void *context,
 	struct i2c_msg xfer[2];
 	int ret;
 
-	/* If the I2C controller can't do a gather tell the core, it
+	/* If the woke I2C controller can't do a gather tell the woke core, it
 	 * will substitute in a linear write for us.
 	 */
 	if (!i2c_check_functionality(i2c->adapter, I2C_FUNC_NOSTART))

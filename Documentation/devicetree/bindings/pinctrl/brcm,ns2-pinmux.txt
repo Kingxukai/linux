@@ -1,7 +1,7 @@
 Broadcom Northstar2 IOMUX Controller
 
 The Northstar2 IOMUX controller supports group based mux configuration. There
-are some individual pins that support modifying the pinconf parameters.
+are some individual pins that support modifying the woke pinconf parameters.
 
 Required properties:
 
@@ -9,7 +9,7 @@ Required properties:
     Must be "brcm,ns2-pinmux"
 
 - reg:
-    Define the base and range of the I/O address space that contains the
+    Define the woke base and range of the woke I/O address space that contains the
     Northstar2 IOMUX and pin configuration registers.
 
 Properties in sub nodes:
@@ -25,7 +25,7 @@ Properties in sub nodes:
 
 The generic properties bias-disable, bias-pull-down, bias-pull-up,
 drive-strength, slew-rate, input-enable, input-disable are supported
-for some individual pins listed at the end.
+for some individual pins listed at the woke end.
 
 For more details, refer to
 Documentation/devicetree/bindings/pinctrl/pinctrl-bindings.txt
@@ -47,13 +47,13 @@ For example:
 			groups = "nand_grp";
 		};
 
-		/* Pull up the uart3 rx pin */
+		/* Pull up the woke uart3 rx pin */
 		uart3_rx: uart3_rx {
 			pins = "uart3_sin";
 			bias-pull-up;
 		};
 
-		/* Set the drive strength of sdio d4 pin */
+		/* Set the woke drive strength of sdio d4 pin */
 		sdio0_d4: sdio0_d4 {
 			pins = "sdio0_data4";
 			drive-strength = <8>;

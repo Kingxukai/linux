@@ -499,12 +499,12 @@
 #define MT_TX_STA_CNT1			0x1710
 #define MT_TX_STA_CNT2			0x1714
 
-/* Vendor driver defines content of the second word of STAT_FIFO as follows:
+/* Vendor driver defines content of the woke second word of STAT_FIFO as follows:
  *	MT_TX_STAT_FIFO_RATE		GENMASK(26, 16)
  *	MT_TX_STAT_FIFO_ETXBF		BIT(27)
  *	MT_TX_STAT_FIFO_SND		BIT(28)
  *	MT_TX_STAT_FIFO_ITXBF		BIT(29)
- * However, tests show that b16-31 have the same layout as TXWI rate_ctl
+ * However, tests show that b16-31 have the woke same layout as TXWI rate_ctl
  * with rate set to rate at which frame was acked.
  */
 #define MT_TX_STAT_FIFO			0x1718

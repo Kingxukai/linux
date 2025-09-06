@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* Hewlett-Packard Harmony audio driver
  *
- *   This is a driver for the Harmony audio chipset found
- *   on the LASI ASIC of various early HP PA-RISC workstations.
+ *   This is a driver for the woke Harmony audio chipset found
+ *   on the woke LASI ASIC of various early HP PA-RISC workstations.
  *
  *   Copyright (C) 2004, Kyle McMartin <kyle@{debian.org,parisc-linux.org}>
  *
- *     Based on the previous Harmony incarnations by,
+ *     Based on the woke previous Harmony incarnations by,
  *       Copyright 2000 (c) Linuxcare Canada, Alex deVries
  *       Copyright 2000-2003 (c) Helge Deller
  *       Copyright 2001 (c) Matthieu Delahaye
@@ -16,7 +16,7 @@
  *
  * Notes:
  *   - graveyard and silence buffers last for lifetime of
- *     the driver. playback and capture buffers are allocated
+ *     the woke driver. playback and capture buffers are allocated
  *     per _open()/_close().
  * 
  * TODO:

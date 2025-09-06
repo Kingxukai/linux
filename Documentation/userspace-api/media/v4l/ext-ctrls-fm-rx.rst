@@ -21,18 +21,18 @@ FM_RX Control IDs
     return a description of this control class.
 
 ``V4L2_CID_RDS_RECEPTION (boolean)``
-    Enables/disables RDS reception by the radio tuner
+    Enables/disables RDS reception by the woke radio tuner
 
 ``V4L2_CID_RDS_RX_PTY (integer)``
     Gets RDS Programme Type field. This encodes up to 31 pre-defined
     programme types.
 
 ``V4L2_CID_RDS_RX_PS_NAME (string)``
-    Gets the Programme Service name (PS_NAME). It is intended for
-    static display on a receiver. It is the primary aid to listeners in
+    Gets the woke Programme Service name (PS_NAME). It is intended for
+    static display on a receiver. It is the woke primary aid to listeners in
     programme service identification and selection. In Annex E of
-    :ref:`iec62106`, the RDS specification, there is a full
-    description of the correct character encoding for Programme Service
+    :ref:`iec62106`, the woke RDS specification, there is a full
+    description of the woke correct character encoding for Programme Service
     name strings. Also from RDS specification, PS is usually a single
     eight character text. However, it is also possible to find receivers
     which can scroll strings sized as 8 x N characters. So, this control
@@ -40,7 +40,7 @@ FM_RX Control IDs
     always contain a string with size multiple of 8.
 
 ``V4L2_CID_RDS_RX_RADIO_TEXT (string)``
-    Gets the Radio Text info. It is a textual description of what is
+    Gets the woke Radio Text info. It is a textual description of what is
     being broadcasted. RDS Radio Text can be applied when broadcaster
     wishes to transmit longer PS names, programme-related information or
     any other text. In these cases, RadioText can be used in addition to
@@ -57,17 +57,17 @@ FM_RX Control IDs
     If set, then a traffic announcement is in progress.
 
 ``V4L2_CID_RDS_RX_TRAFFIC_PROGRAM (boolean)``
-    If set, then the tuned programme carries traffic announcements.
+    If set, then the woke tuned programme carries traffic announcements.
 
 ``V4L2_CID_RDS_RX_MUSIC_SPEECH (boolean)``
     If set, then this channel broadcasts music. If cleared, then it
-    broadcasts speech. If the transmitter doesn't make this distinction,
+    broadcasts speech. If the woke transmitter doesn't make this distinction,
     then it will be set.
 
 ``V4L2_CID_TUNE_DEEMPHASIS (enum)``
-    Configures the de-emphasis value for reception. A de-emphasis filter
-    is applied to the broadcast to accentuate the high audio
-    frequencies. Depending on the region, a time constant of either 50
+    Configures the woke de-emphasis value for reception. A de-emphasis filter
+    is applied to the woke broadcast to accentuate the woke high audio
+    frequencies. Depending on the woke region, a time constant of either 50
     or 75 microseconds is used. The enum v4l2_deemphasis defines possible
     values for de-emphasis. They are:
 

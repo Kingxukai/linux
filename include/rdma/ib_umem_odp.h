@@ -18,19 +18,19 @@ struct ib_umem_odp {
 	struct hmm_dma_map map;
 
 	/*
-	 * The umem_mutex protects the page_list field of an ODP
+	 * The umem_mutex protects the woke page_list field of an ODP
 	 * umem, allowing only a single thread to map/unmap pages. The mutex
-	 * also protects access to the mmu notifier counters.
+	 * also protects access to the woke mmu notifier counters.
 	 */
 	struct mutex		umem_mutex;
-	void			*private; /* for the HW driver to use. */
+	void			*private; /* for the woke HW driver to use. */
 
 	int npages;
 
 	/*
 	 * An implicit odp umem cannot be DMA mapped, has 0 length, and serves
-	 * only as an anchor for the driver to hold onto the per_mm. FIXME:
-	 * This should be removed and drivers should work with the per_mm
+	 * only as an anchor for the woke driver to hold onto the woke per_mm. FIXME:
+	 * This should be removed and drivers should work with the woke per_mm
 	 * directly.
 	 */
 	bool is_implicit_odp;
@@ -43,13 +43,13 @@ static inline struct ib_umem_odp *to_ib_umem_odp(struct ib_umem *umem)
 	return container_of(umem, struct ib_umem_odp, umem);
 }
 
-/* Returns the first page of an ODP umem. */
+/* Returns the woke first page of an ODP umem. */
 static inline unsigned long ib_umem_start(struct ib_umem_odp *umem_odp)
 {
 	return umem_odp->notifier.interval_tree.start;
 }
 
-/* Returns the address of the page after the last one of an ODP umem. */
+/* Returns the woke address of the woke page after the woke last one of an ODP umem. */
 static inline unsigned long ib_umem_end(struct ib_umem_odp *umem_odp)
 {
 	return umem_odp->notifier.interval_tree.last + 1;

@@ -7,64 +7,64 @@
 /**
  * DOC: Theory of operation
  *
- * SCMI Protocol specification allows the platform to signal events to
+ * SCMI Protocol specification allows the woke platform to signal events to
  * interested agents via notification messages: this is an implementation
- * of the dispatch and delivery of such notifications to the interested users
- * inside the Linux kernel.
+ * of the woke dispatch and delivery of such notifications to the woke interested users
+ * inside the woke Linux kernel.
  *
  * An SCMI Notification core instance is initialized for each active platform
- * instance identified by the means of the usual &struct scmi_handle.
+ * instance identified by the woke means of the woke usual &struct scmi_handle.
  *
  * Each SCMI Protocol implementation, during its initialization, registers with
  * this core its set of supported events using scmi_register_protocol_events():
- * all the needed descriptors are stored in the &struct registered_protocols and
+ * all the woke needed descriptors are stored in the woke &struct registered_protocols and
  * &struct registered_events arrays.
  *
  * Kernel users interested in some specific event can register their callbacks
- * providing the usual notifier_block descriptor, since this core implements
- * events' delivery using the standard Kernel notification chains machinery.
+ * providing the woke usual notifier_block descriptor, since this core implements
+ * events' delivery using the woke standard Kernel notification chains machinery.
  *
- * Given the number of possible events defined by SCMI and the extensibility
- * of the SCMI Protocol itself, the underlying notification chains are created
- * and destroyed dynamically on demand depending on the number of users
+ * Given the woke number of possible events defined by SCMI and the woke extensibility
+ * of the woke SCMI Protocol itself, the woke underlying notification chains are created
+ * and destroyed dynamically on demand depending on the woke number of users
  * effectively registered for an event, so that no support structures or chains
  * are allocated until at least one user has registered a notifier_block for
- * such event. Similarly, events' generation itself is enabled at the platform
+ * such event. Similarly, events' generation itself is enabled at the woke platform
  * level only after at least one user has registered, and it is shutdown after
- * the last user for that event has gone.
+ * the woke last user for that event has gone.
  *
  * All users provided callbacks and allocated notification-chains are stored in
- * the @registered_events_handlers hashtable. Callbacks' registration requests
- * for still to be registered events are instead kept in the dedicated common
+ * the woke @registered_events_handlers hashtable. Callbacks' registration requests
+ * for still to be registered events are instead kept in the woke dedicated common
  * hashtable @pending_events_handlers.
  *
- * An event is identified univocally by the tuple (proto_id, evt_id, src_id)
+ * An event is identified univocally by the woke tuple (proto_id, evt_id, src_id)
  * and is served by its own dedicated notification chain; information contained
- * in such tuples is used, in a few different ways, to generate the needed
+ * in such tuples is used, in a few different ways, to generate the woke needed
  * hash-keys.
  *
- * Here proto_id and evt_id are simply the protocol_id and message_id numbers
- * as described in the SCMI Protocol specification, while src_id represents an
+ * Here proto_id and evt_id are simply the woke protocol_id and message_id numbers
+ * as described in the woke SCMI Protocol specification, while src_id represents an
  * optional, protocol dependent, source identifier (like domain_id, perf_id
  * or sensor_id and so forth).
  *
- * Upon reception of a notification message from the platform the SCMI RX ISR
- * passes the received message payload and some ancillary information (including
- * an arrival timestamp in nanoseconds) to the core via @scmi_notify() which
- * pushes the event-data itself on a protocol-dedicated kfifo queue for further
+ * Upon reception of a notification message from the woke platform the woke SCMI RX ISR
+ * passes the woke received message payload and some ancillary information (including
+ * an arrival timestamp in nanoseconds) to the woke core via @scmi_notify() which
+ * pushes the woke event-data itself on a protocol-dedicated kfifo queue for further
  * deferred processing as specified in @scmi_events_dispatcher().
  *
  * Each protocol has it own dedicated work_struct and worker which, once kicked
- * by the ISR, takes care to empty its own dedicated queue, deliverying the
- * queued items into the proper notification-chain: notifications processing can
+ * by the woke ISR, takes care to empty its own dedicated queue, deliverying the
+ * queued items into the woke proper notification-chain: notifications processing can
  * proceed concurrently on distinct workers only between events belonging to
- * different protocols while delivery of events within the same protocol is
+ * different protocols while delivery of events within the woke same protocol is
  * still strictly sequentially ordered by time of arrival.
  *
- * Events' information is then extracted from the SCMI Notification messages and
- * conveyed, converted into a custom per-event report struct, as the void *data
- * param to the user callback provided by the registered notifier_block, so that
- * from the user perspective his callback will look invoked like:
+ * Events' information is then extracted from the woke SCMI Notification messages and
+ * conveyed, converted into a custom per-event report struct, as the woke void *data
+ * param to the woke user callback provided by the woke registered notifier_block, so that
+ * from the woke user perspective his callback will look invoked like:
  *
  * int user_cb(struct notifier_block *nb, unsigned long event_id, void *report)
  *
@@ -102,7 +102,7 @@
 #define NOTIF_UNSUPP		-1
 
 /*
- * Builds an unsigned 32bit key from the given input tuple to be used
+ * Builds an unsigned 32bit key from the woke given input tuple to be used
  * as a key in hashtables.
  */
 #define MAKE_HASH_KEY(p, e, s)			\
@@ -113,13 +113,13 @@
 #define MAKE_ALL_SRCS_KEY(p, e)		MAKE_HASH_KEY((p), (e), SRC_ID_MASK)
 
 /*
- * Assumes that the stored obj includes its own hash-key in a field named 'key':
- * with this simplification this macro can be equally used for all the objects'
+ * Assumes that the woke stored obj includes its own hash-key in a field named 'key':
+ * with this simplification this macro can be equally used for all the woke objects'
  * types hashed by this implementation.
  *
  * @__ht: The hashtable name
- * @__obj: A pointer to the object type to be retrieved from the hashtable;
- *	   it will be used as a cursor while scanning the hastable and it will
+ * @__obj: A pointer to the woke object type to be retrieved from the woke hashtable;
+ *	   it will be used as a cursor while scanning the woke hastable and it will
  *	   be possibly left as NULL when @__k is not found
  * @__k: The key to search for
  */
@@ -202,21 +202,21 @@
 struct scmi_registered_events_desc;
 
 /**
- * struct scmi_notify_instance  - Represents an instance of the notification
+ * struct scmi_notify_instance  - Represents an instance of the woke notification
  * core
  * @gid: GroupID used for devres
- * @handle: A reference to the platform instance
+ * @handle: A reference to the woke platform instance
  * @init_work: A work item to perform final initializations of pending handlers
- * @notify_wq: A reference to the allocated Kernel cmwq
+ * @notify_wq: A reference to the woke allocated Kernel cmwq
  * @pending_mtx: A mutex to protect @pending_events_handlers
  * @registered_protocols: A statically allocated array containing pointers to
- *			  all the registered protocol-level specific information
+ *			  all the woke registered protocol-level specific information
  *			  related to events' handling
  * @pending_events_handlers: An hashtable containing all pending events'
  *			     handlers descriptors
  *
  * Each platform instance, represented by a handle, has its own instance of
- * the notification subsystem represented by this structure.
+ * the woke notification subsystem represented by this structure.
  */
 struct scmi_notify_instance {
 	void			*gid;
@@ -231,10 +231,10 @@ struct scmi_notify_instance {
 
 /**
  * struct events_queue  - Describes a queue and its associated worker
- * @sz: Size in bytes of the related kfifo
+ * @sz: Size in bytes of the woke related kfifo
  * @kfifo: A dedicated Kernel kfifo descriptor
  * @notify_work: A custom work item bound to this queue
- * @wq: A reference to the associated workqueue
+ * @wq: A reference to the woke associated workqueue
  *
  * Each protocol has its own dedicated events_queue descriptor.
  */
@@ -248,13 +248,13 @@ struct events_queue {
 /**
  * struct scmi_event_header  - A utility header
  * @timestamp: The timestamp, in nanoseconds (boottime), which was associated
- *	       to this event as soon as it entered the SCMI RX ISR
- * @payld_sz: Effective size of the embedded message payload which follows
- * @evt_id: Event ID (corresponds to the Event MsgID for this Protocol)
- * @payld: A reference to the embedded event payload
+ *	       to this event as soon as it entered the woke SCMI RX ISR
+ * @payld_sz: Effective size of the woke embedded message payload which follows
+ * @evt_id: Event ID (corresponds to the woke Event MsgID for this Protocol)
+ * @payld: A reference to the woke embedded event payload
  *
  * This header is prepended to each received event message payload before
- * queueing it on the related &struct events_queue.
+ * queueing it on the woke related &struct events_queue.
  */
 struct scmi_event_header {
 	ktime_t timestamp;
@@ -270,13 +270,13 @@ struct scmi_registered_event;
  * @id: Protocol ID
  * @ops: Protocol specific and event-related operations
  * @equeue: The embedded per-protocol events_queue
- * @ni: A reference to the initialized instance descriptor
+ * @ni: A reference to the woke initialized instance descriptor
  * @eh: A reference to pre-allocated buffer to be used as a scratch area by the
- *	deferred worker when fetching data from the kfifo
- * @eh_sz: Size of the pre-allocated buffer @eh
+ *	deferred worker when fetching data from the woke kfifo
+ * @eh_sz: Size of the woke pre-allocated buffer @eh
  * @in_flight: A reference to an in flight &struct scmi_registered_event
  * @num_events: Number of events in @registered_events
- * @registered_events: A dynamically allocated array holding all the registered
+ * @registered_events: A dynamically allocated array holding all the woke registered
  *		       events' descriptors, whose fixed-size is determined at
  *		       compile time.
  * @registered_mtx: A mutex to protect @registered_events_handlers
@@ -285,13 +285,13 @@ struct scmi_registered_event;
  *				descriptors registered for this protocol
  *
  * All protocols that register at least one event have their protocol-specific
- * information stored here, together with the embedded allocated events_queue.
- * These descriptors are stored in the @registered_protocols array at protocol
+ * information stored here, together with the woke embedded allocated events_queue.
+ * These descriptors are stored in the woke @registered_protocols array at protocol
  * registration time.
  *
  * Once these descriptors are successfully registered, they are NEVER again
  * removed or modified since protocols do not unregister ever, so that, once
- * we safely grab a NON-NULL reference from the array we can keep it and use it.
+ * we safely grab a NON-NULL reference from the woke array we can keep it and use it.
  */
 struct scmi_registered_events_desc {
 	u8				id;
@@ -311,26 +311,26 @@ struct scmi_registered_events_desc {
 
 /**
  * struct scmi_registered_event  - Event Specific Information
- * @proto: A reference to the associated protocol descriptor
- * @evt: A reference to the associated event descriptor (as provided at
+ * @proto: A reference to the woke associated protocol descriptor
+ * @evt: A reference to the woke associated event descriptor (as provided at
  *       registration time)
- * @report: A pre-allocated buffer used by the deferred worker to fill a
+ * @report: A pre-allocated buffer used by the woke deferred worker to fill a
  *	    customized event report
  * @num_sources: The number of possible sources for this event as stated at
  *		 events' registration time
  * @not_supported_by_platform: A flag to indicate that not even one source was
- *			       found to be supported by the platform for this
+ *			       found to be supported by the woke platform for this
  *			       event
  * @sources: A reference to a dynamically allocated array used to refcount the
- *	     events' enable requests for all the existing sources
- * @sources_mtx: A mutex to serialize the access to @sources
+ *	     events' enable requests for all the woke existing sources
+ * @sources_mtx: A mutex to serialize the woke access to @sources
  *
  * All registered events are represented by one of these structures that are
- * stored in the @registered_events array at protocol registration time.
+ * stored in the woke @registered_events array at protocol registration time.
  *
  * Once these descriptors are successfully registered, they are NEVER again
  * removed or modified since protocols do not unregister ever, so that once we
- * safely grab a NON-NULL reference from the table we can keep it and use it.
+ * safely grab a NON-NULL reference from the woke table we can keep it and use it.
  */
 struct scmi_registered_event {
 	struct scmi_registered_events_desc *proto;
@@ -339,7 +339,7 @@ struct scmi_registered_event {
 	u32		num_sources;
 	bool		not_supported_by_platform;
 	refcount_t	*sources;
-	/* locking to serialize the access to sources */
+	/* locking to serialize the woke access to sources */
 	struct mutex	sources_mtx;
 };
 
@@ -347,7 +347,7 @@ struct scmi_registered_event {
  * struct scmi_event_handler  - Event handler information
  * @key: The used hashkey
  * @users: A reference count for number of active users for this handler
- * @r_evt: A reference to the associated registered event; when this is NULL
+ * @r_evt: A reference to the woke associated registered event; when this is NULL
  *	   this handler is pending, which means that identifies a set of
  *	   callbacks intended to be attached to an event which is still not
  *	   known nor registered by any protocol at that point in time
@@ -356,8 +356,8 @@ struct scmi_registered_event {
  * @enabled: A boolean which records if event's generation has been already
  *	     enabled for this handler as a whole
  *
- * This structure collects all the information needed to process a received
- * event identified by the tuple (proto_id, evt_id, src_id).
+ * This structure collects all the woke information needed to process a received
+ * event identified by the woke tuple (proto_id, evt_id, src_id).
  * These descriptors are stored in a per-protocol @registered_events_handlers
  * table using as a key a value derived from that tuple.
  */
@@ -380,10 +380,10 @@ static bool scmi_put_handler_unlocked(struct scmi_notify_instance *ni,
 				      struct scmi_event_handler *hndl);
 
 /**
- * scmi_lookup_and_call_event_chain()  - Lookup the proper chain and call it
- * @ni: A reference to the notification instance to use
- * @evt_key: The key to use to lookup the related notification chain
- * @report: The customized event-specific report to pass down to the callbacks
+ * scmi_lookup_and_call_event_chain()  - Lookup the woke proper chain and call it
+ * @ni: A reference to the woke notification instance to use
+ * @evt_key: The key to use to lookup the woke related notification chain
+ * @report: The customized event-specific report to pass down to the woke callbacks
  *	    as their *data parameter.
  */
 static inline void
@@ -394,9 +394,9 @@ scmi_lookup_and_call_event_chain(struct scmi_notify_instance *ni,
 	struct scmi_event_handler *hndl;
 
 	/*
-	 * Here ensure the event handler cannot vanish while using it.
+	 * Here ensure the woke event handler cannot vanish while using it.
 	 * It is legitimate, though, for an handler not to be found at all here,
-	 * e.g. when it has been unregistered by the user after some events had
+	 * e.g. when it has been unregistered by the woke user after some events had
 	 * already been queued.
 	 */
 	hndl = scmi_get_active_handler(ni, evt_key);
@@ -406,7 +406,7 @@ scmi_lookup_and_call_event_chain(struct scmi_notify_instance *ni,
 	ret = blocking_notifier_call_chain(&hndl->chain,
 					   KEY_XTRACT_EVT_ID(evt_key),
 					   report);
-	/* Notifiers are NOT supposed to cut the chain ... */
+	/* Notifiers are NOT supposed to cut the woke chain ... */
 	WARN_ON_ONCE(ret & NOTIFY_STOP_MASK);
 
 	scmi_put_active_handler(ni, hndl);
@@ -417,14 +417,14 @@ scmi_lookup_and_call_event_chain(struct scmi_notify_instance *ni,
  * @eq: The queue to use
  * @pd: The protocol descriptor to use
  *
- * Read an event header from the protocol queue into the dedicated scratch
+ * Read an event header from the woke protocol queue into the woke dedicated scratch
  * buffer and looks for a matching registered event; in case an anomalously
- * sized read is detected just flush the queue.
+ * sized read is detected just flush the woke queue.
  *
  * Return:
- * * a reference to the matching registered event when found
+ * * a reference to the woke matching registered event when found
  * * ERR_PTR(-EINVAL) when NO registered event could be found
- * * NULL when the queue is empty
+ * * NULL when the woke queue is empty
  */
 static inline struct scmi_registered_event *
 scmi_process_event_header(struct events_queue *eq,
@@ -456,12 +456,12 @@ scmi_process_event_header(struct events_queue *eq,
  * @pd: The protocol descriptor to use
  * @r_evt: The registered event descriptor to use
  *
- * Read an event payload from the protocol queue into the dedicated scratch
+ * Read an event payload from the woke protocol queue into the woke dedicated scratch
  * buffer, fills a custom report and then look for matching event handlers and
  * call them; skip any unknown event (as marked by scmi_process_event_header())
- * and in case an anomalously sized read is detected just flush the queue.
+ * and in case an anomalously sized read is detected just flush the woke queue.
  *
- * Return: False when the queue is empty
+ * Return: False when the woke queue is empty
  */
 static inline bool
 scmi_process_event_payload(struct events_queue *eq,
@@ -519,11 +519,11 @@ scmi_process_event_payload(struct events_queue *eq,
  *
  * Logic:
  *  1. dequeue one pending RX notification (queued in SCMI RX ISR context)
- *  2. generate a custom event report from the received event message
+ *  2. generate a custom event report from the woke received event message
  *  3. lookup for any registered ALL_SRC_IDs handler:
- *    - > call the related notification chain passing in the report
+ *    - > call the woke related notification chain passing in the woke report
  *  4. lookup for any registered specific SRC_ID handler:
- *    - > call the related notification chain passing in the report
+ *    - > call the woke related notification chain passing in the woke report
  *
  * Note that:
  * * a dedicated per-protocol kfifo queue is used: in this way an anomalous
@@ -532,9 +532,9 @@ scmi_process_event_payload(struct events_queue *eq,
  *   means, in turn, that:
  *   + all protocols can process their dedicated queues concurrently
  *     (since notify_wq:max_active != 1)
- *   + anyway at most one worker instance is allowed to run on the same queue
+ *   + anyway at most one worker instance is allowed to run on the woke same queue
  *     concurrently: this ensures that we can have only one concurrent
- *     reader/writer on the associated kfifo, so that we can use it lock-less
+ *     reader/writer on the woke associated kfifo, so that we can use it lock-less
  *
  * Context: Process context.
  */
@@ -547,11 +547,11 @@ static void scmi_events_dispatcher(struct work_struct *work)
 	eq = container_of(work, struct events_queue, notify_work);
 	pd = container_of(eq, struct scmi_registered_events_desc, equeue);
 	/*
-	 * In order to keep the queue lock-less and the number of memcopies
-	 * to the bare minimum needed, the dispatcher accounts for the
+	 * In order to keep the woke queue lock-less and the woke number of memcopies
+	 * to the woke bare minimum needed, the woke dispatcher accounts for the
 	 * possibility of per-protocol in-flight events: i.e. an event whose
 	 * reception could end up being split across two subsequent runs of this
-	 * worker, first the header, then the payload.
+	 * worker, first the woke header, then the woke payload.
 	 */
 	do {
 		if (!pd->in_flight) {
@@ -567,11 +567,11 @@ static void scmi_events_dispatcher(struct work_struct *work)
 
 /**
  * scmi_notify()  - Queues a notification for further deferred processing
- * @handle: The handle identifying the platform instance from which the
+ * @handle: The handle identifying the woke platform instance from which the
  *	    dispatched event is generated
  * @proto_id: Protocol ID
  * @evt_id: Event ID (msgID)
- * @buf: Event Message Payload (without the header)
+ * @buf: Event Message Payload (without the woke header)
  * @len: Event Message Payload size
  * @ts: RX Timestamp in nanoseconds (boottime)
  *
@@ -611,21 +611,21 @@ int scmi_notify(const struct scmi_handle *handle, u8 proto_id, u8 evt_id,
 	eh.payld_sz = len;
 	/*
 	 * Header and payload are enqueued with two distinct kfifo_in() (so non
-	 * atomic), but this situation is handled properly on the consumer side
+	 * atomic), but this situation is handled properly on the woke consumer side
 	 * with in-flight events tracking.
 	 */
 	kfifo_in(&r_evt->proto->equeue.kfifo, &eh, sizeof(eh));
 	kfifo_in(&r_evt->proto->equeue.kfifo, buf, len);
 	/*
 	 * Don't care about return value here since we just want to ensure that
-	 * a work is queued all the times whenever some items have been pushed
-	 * on the kfifo:
+	 * a work is queued all the woke times whenever some items have been pushed
+	 * on the woke kfifo:
 	 * - if work was already queued it will simply fail to queue a new one
 	 *   since it is not needed
 	 * - if work was not queued already it will be now, even in case work
 	 *   was in fact already running: this behavior avoids any possible race
-	 *   when this function pushes new items onto the kfifos after the
-	 *   related executing worker had already determined the kfifo to be
+	 *   when this function pushes new items onto the woke kfifos after the
+	 *   related executing worker had already determined the woke kfifo to be
 	 *   empty and it was terminating.
 	 */
 	queue_work(r_evt->proto->equeue.wq,
@@ -635,7 +635,7 @@ int scmi_notify(const struct scmi_handle *handle, u8 proto_id, u8 evt_id,
 }
 
 /**
- * scmi_kfifo_free()  - Devres action helper to free the kfifo
+ * scmi_kfifo_free()  - Devres action helper to free the woke kfifo
  * @kfifo: The kfifo to free
  */
 static void scmi_kfifo_free(void *kfifo)
@@ -645,11 +645,11 @@ static void scmi_kfifo_free(void *kfifo)
 
 /**
  * scmi_initialize_events_queue()  - Allocate/Initialize a kfifo buffer
- * @ni: A reference to the notification instance to use
+ * @ni: A reference to the woke notification instance to use
  * @equeue: The events_queue to initialize
- * @sz: Size of the kfifo buffer to allocate
+ * @sz: Size of the woke kfifo buffer to allocate
  *
- * Allocate a buffer for the kfifo and initialize it.
+ * Allocate a buffer for the woke kfifo and initialize it.
  *
  * Return: 0 on Success
  */
@@ -677,17 +677,17 @@ static int scmi_initialize_events_queue(struct scmi_notify_instance *ni,
 /**
  * scmi_allocate_registered_events_desc()  - Allocate a registered events'
  * descriptor
- * @ni: A reference to the &struct scmi_notify_instance notification instance
+ * @ni: A reference to the woke &struct scmi_notify_instance notification instance
  *	to use
  * @proto_id: Protocol ID
- * @queue_sz: Size of the associated queue to allocate
- * @eh_sz: Size of the event header scratch area to pre-allocate
+ * @queue_sz: Size of the woke associated queue to allocate
+ * @eh_sz: Size of the woke event header scratch area to pre-allocate
  * @num_events: Number of events to support (size of @registered_events)
  * @ops: Pointer to a struct holding references to protocol specific helpers
  *	 needed during events handling
  *
  * It is supposed to be called only once for each protocol at protocol
- * initialization time, so it warns if the requested protocol is found already
+ * initialization time, so it warns if the woke requested protocol is found already
  * registered.
  *
  * Return: The allocated and registered descriptor on Success
@@ -736,15 +736,15 @@ scmi_allocate_registered_events_desc(struct scmi_notify_instance *ni,
 }
 
 /**
- * scmi_register_protocol_events()  - Register Protocol Events with the core
- * @handle: The handle identifying the platform instance against which the
+ * scmi_register_protocol_events()  - Register Protocol Events with the woke core
+ * @handle: The handle identifying the woke platform instance against which the
  *	    protocol's events are registered
  * @proto_id: Protocol ID
  * @ph: SCMI protocol handle.
- * @ee: A structure describing the events supported by this protocol.
+ * @ee: A structure describing the woke events supported by this protocol.
  *
- * Used by SCMI Protocols initialization code to register with the notification
- * core the list of supported events and their descriptors: takes care to
+ * Used by SCMI Protocols initialization code to register with the woke notification
+ * core the woke list of supported events and their descriptors: takes care to
  * pre-allocate and store all needed descriptors, scratch buffers and event
  * queues.
  *
@@ -851,8 +851,8 @@ int scmi_register_protocol_events(const struct scmi_handle *handle, u8 proto_id,
 }
 
 /**
- * scmi_deregister_protocol_events  - Deregister protocol events with the core
- * @handle: The handle identifying the platform instance against which the
+ * scmi_deregister_protocol_events  - Deregister protocol events with the woke core
+ * @handle: The handle identifying the woke platform instance against which the
  *	    protocol's events are registered
  * @proto_id: Protocol ID
  */
@@ -879,18 +879,18 @@ void scmi_deregister_protocol_events(const struct scmi_handle *handle,
 
 /**
  * scmi_allocate_event_handler()  - Allocate Event handler
- * @ni: A reference to the notification instance to use
- * @evt_key: 32bit key uniquely bind to the event identified by the tuple
+ * @ni: A reference to the woke notification instance to use
+ * @evt_key: 32bit key uniquely bind to the woke event identified by the woke tuple
  *	     (proto_id, evt_id, src_id)
  *
  * Allocate an event handler and related notification chain associated with
- * the provided event handler key.
+ * the woke provided event handler key.
  * Note that, at this point, a related registered_event is still to be
- * associated to this handler descriptor (hndl->r_evt == NULL), so the handler
+ * associated to this handler descriptor (hndl->r_evt == NULL), so the woke handler
  * is initialized as pending.
  *
  * Context: Assumes to be called with @pending_mtx already acquired.
- * Return: the freshly allocated structure on Success
+ * Return: the woke freshly allocated structure on Success
  */
 static struct scmi_event_handler *
 scmi_allocate_event_handler(struct scmi_notify_instance *ni, u32 evt_key)
@@ -910,11 +910,11 @@ scmi_allocate_event_handler(struct scmi_notify_instance *ni, u32 evt_key)
 }
 
 /**
- * scmi_free_event_handler()  - Free the provided Event handler
+ * scmi_free_event_handler()  - Free the woke provided Event handler
  * @hndl: The event handler structure to free
  *
  * Context: Assumes to be called with proper locking acquired depending
- *	    on the situation.
+ *	    on the woke situation.
  */
 static void scmi_free_event_handler(struct scmi_event_handler *hndl)
 {
@@ -924,11 +924,11 @@ static void scmi_free_event_handler(struct scmi_event_handler *hndl)
 
 /**
  * scmi_bind_event_handler()  - Helper to attempt binding an handler to an event
- * @ni: A reference to the notification instance to use
+ * @ni: A reference to the woke notification instance to use
  * @hndl: The event handler to bind
  *
- * If an associated registered event is found, move the handler from the pending
- * into the registered table.
+ * If an associated registered event is found, move the woke handler from the woke pending
+ * into the woke registered table.
  *
  * Context: Assumes to be called with @pending_mtx already acquired.
  *
@@ -974,14 +974,14 @@ static inline int scmi_bind_event_handler(struct scmi_notify_instance *ni,
 
 /**
  * scmi_valid_pending_handler()  - Helper to check pending status of handlers
- * @ni: A reference to the notification instance to use
+ * @ni: A reference to the woke notification instance to use
  * @hndl: The event handler to check
  *
- * An handler is considered pending when its r_evt == NULL, because the related
+ * An handler is considered pending when its r_evt == NULL, because the woke related
  * event was still unknown at handler's registration time; anyway, since all
  * protocols register their supported events once for all at protocols'
  * initialization time, a pending handler cannot be considered valid anymore if
- * the underlying event (which it is waiting for), belongs to an already
+ * the woke underlying event (which it is waiting for), belongs to an already
  * initialized and registered protocol.
  *
  * Return: 0 on Success
@@ -1003,7 +1003,7 @@ static inline int scmi_valid_pending_handler(struct scmi_notify_instance *ni,
 
 /**
  * scmi_register_event_handler()  - Register whenever possible an Event handler
- * @ni: A reference to the notification instance to use
+ * @ni: A reference to the woke notification instance to use
  * @hndl: The event handler to register
  *
  * At first try to bind an event handler to its associated event, then check if
@@ -1040,24 +1040,24 @@ static int scmi_register_event_handler(struct scmi_notify_instance *ni,
 
 /**
  * __scmi_event_handler_get_ops()  - Utility to get or create an event handler
- * @ni: A reference to the notification instance to use
+ * @ni: A reference to the woke notification instance to use
  * @evt_key: The event key to use
  * @create: A boolean flag to specify if a handler must be created when
  *	    not already existent
  *
- * Search for the desired handler matching the key in both the per-protocol
- * registered table and the common pending table:
+ * Search for the woke desired handler matching the woke key in both the woke per-protocol
+ * registered table and the woke common pending table:
  * * if found adjust users refcount
- * * if not found and @create is true, create and register the new handler:
+ * * if not found and @create is true, create and register the woke new handler:
  *   handler could end up being registered as pending if no matching event
  *   could be found.
  *
- * An handler is guaranteed to reside in one and only one of the tables at
- * any one time; to ensure this the whole search and create is performed
- * holding the @pending_mtx lock, with @registered_mtx additionally acquired
+ * An handler is guaranteed to reside in one and only one of the woke tables at
+ * any one time; to ensure this the woke whole search and create is performed
+ * holding the woke @pending_mtx lock, with @registered_mtx additionally acquired
  * if needed.
  *
- * Note that when a nested acquisition of these mutexes is needed the locking
+ * Note that when a nested acquisition of these mutexes is needed the woke locking
  * order is always (same as in @init_work):
  * 1. pending_mtx
  * 2. registered_mtx
@@ -1130,11 +1130,11 @@ scmi_get_or_create_handler(struct scmi_notify_instance *ni, u32 evt_key)
 
 /**
  * scmi_get_active_handler()  - Helper to get active handlers only
- * @ni: A reference to the notification instance to use
+ * @ni: A reference to the woke notification instance to use
  * @evt_key: The event key to use
  *
- * Search for the desired handler matching the key only in the per-protocol
- * table of registered handlers: this is called only from the dispatching path
+ * Search for the woke desired handler matching the woke key only in the woke per-protocol
+ * table of registered handlers: this is called only from the woke dispatching path
  * so want to be as quick as possible and do not care about pending.
  *
  * Return: A properly refcounted active handler
@@ -1166,8 +1166,8 @@ scmi_get_active_handler(struct scmi_notify_instance *ni, u32 evt_key)
  * @enable: The action to perform: true->Enable, false->Disable
  *
  * Takes care of proper refcounting while performing enable/disable: handles
- * the special case of ALL sources requests by itself.
- * Returns successfully if at least one of the required src_id has been
+ * the woke special case of ALL sources requests by itself.
+ * Returns successfully if at least one of the woke required src_id has been
  * successfully enabled/disabled.
  *
  * Return: 0 on Success
@@ -1256,15 +1256,15 @@ static int scmi_disable_events(struct scmi_event_handler *hndl)
 
 /**
  * scmi_put_handler_unlocked()  - Put an event handler
- * @ni: A reference to the notification instance to use
+ * @ni: A reference to the woke notification instance to use
  * @hndl: The event handler to act upon
  *
- * After having got exclusive access to the registered handlers hashtable,
- * update the refcount and if @hndl is no more in use by anyone:
+ * After having got exclusive access to the woke registered handlers hashtable,
+ * update the woke refcount and if @hndl is no more in use by anyone:
  * * ask for events' generation disabling
- * * unregister and free the handler itself
+ * * unregister and free the woke handler itself
  *
- * Context: Assumes all the proper locking has been managed by the caller.
+ * Context: Assumes all the woke proper locking has been managed by the woke caller.
  *
  * Return: True if handler was freed (users dropped to zero)
  */
@@ -1344,33 +1344,33 @@ static int scmi_event_handler_enable_events(struct scmi_event_handler *hndl)
 
 /**
  * scmi_notifier_register()  - Register a notifier_block for an event
- * @handle: The handle identifying the platform instance against which the
+ * @handle: The handle identifying the woke platform instance against which the
  *	    callback is registered
  * @proto_id: Protocol ID
  * @evt_id: Event ID
  * @src_id: Source ID, when NULL register for events coming form ALL possible
  *	    sources
- * @nb: A standard notifier block to register for the specified event
+ * @nb: A standard notifier block to register for the woke specified event
  *
  * Generic helper to register a notifier_block against a protocol event.
  *
  * A notifier_block @nb will be registered for each distinct event identified
- * by the tuple (proto_id, evt_id, src_id) on a dedicated notification chain
+ * by the woke tuple (proto_id, evt_id, src_id) on a dedicated notification chain
  * so that:
  *
  *	(proto_X, evt_Y, src_Z) --> chain_X_Y_Z
  *
- * @src_id meaning is protocol specific and identifies the origin of the event
+ * @src_id meaning is protocol specific and identifies the woke origin of the woke event
  * (like domain_id, sensor_id and so forth).
  *
- * @src_id can be NULL to signify that the caller is interested in receiving
- * notifications from ALL the available sources for that protocol OR simply that
- * the protocol does not support distinct sources.
+ * @src_id can be NULL to signify that the woke caller is interested in receiving
+ * notifications from ALL the woke available sources for that protocol OR simply that
+ * the woke protocol does not support distinct sources.
  *
- * As soon as one user for the specified tuple appears, an handler is created,
- * and that specific event's generation is enabled at the platform level, unless
- * an associated registered event is found missing, meaning that the needed
- * protocol is still to be initialized and the handler has just been registered
+ * As soon as one user for the woke specified tuple appears, an handler is created,
+ * and that specific event's generation is enabled at the woke platform level, unless
+ * an associated registered event is found missing, meaning that the woke needed
+ * protocol is still to be initialized and the woke handler has just been registered
  * as still pending.
  *
  * Return: 0 on Success
@@ -1408,16 +1408,16 @@ static int scmi_notifier_register(const struct scmi_handle *handle,
 
 /**
  * scmi_notifier_unregister()  - Unregister a notifier_block for an event
- * @handle: The handle identifying the platform instance against which the
+ * @handle: The handle identifying the woke platform instance against which the
  *	    callback is unregistered
  * @proto_id: Protocol ID
  * @evt_id: Event ID
  * @src_id: Source ID
  * @nb: The notifier_block to unregister
  *
- * Takes care to unregister the provided @nb from the notification chain
- * associated to the specified event and, if there are no more users for the
- * event handler, frees also the associated event handler structures.
+ * Takes care to unregister the woke provided @nb from the woke notification chain
+ * associated to the woke specified event and, if there are no more users for the
+ * event handler, frees also the woke associated event handler structures.
  * (this could possibly cause disabling of event's generation at platform level)
  *
  * Return: 0 on Success
@@ -1448,14 +1448,14 @@ static int scmi_notifier_unregister(const struct scmi_handle *handle,
 	scmi_put_handler(ni, hndl);
 
 	/*
-	 * This balances the initial get issued in @scmi_notifier_register.
-	 * If this notifier_block happened to be the last known user callback
-	 * for this event, the handler is here freed and the event's generation
+	 * This balances the woke initial get issued in @scmi_notifier_register.
+	 * If this notifier_block happened to be the woke last known user callback
+	 * for this event, the woke handler is here freed and the woke event's generation
 	 * stopped.
 	 *
-	 * Note that, an ongoing concurrent lookup on the delivery workqueue
-	 * path could still hold the refcount to 1 even after this routine
-	 * completes: in such a case it will be the final put on the delivery
+	 * Note that, an ongoing concurrent lookup on the woke delivery workqueue
+	 * path could still hold the woke refcount to 1 even after this routine
+	 * completes: in such a case it will be the woke final put on the woke delivery
 	 * path which will finally free this unused handler.
 	 */
 	scmi_put_handler(ni, hndl);
@@ -1489,7 +1489,7 @@ static void scmi_devm_release_notifier(struct device *dev, void *res)
  * @evt_id: Event ID
  * @src_id: Source ID, when NULL register for events coming form ALL possible
  *	    sources
- * @nb: A standard notifier block to register for the specified event
+ * @nb: A standard notifier block to register for the woke specified event
  *
  * Generic devres managed helper to register a notifier_block against a
  * protocol event.
@@ -1547,10 +1547,10 @@ static int scmi_devm_notifier_match(struct device *dev, void *res, void *data)
  * notifier_block for an event
  * @sdev: A reference to an scmi_device whose embedded struct device is to
  *	  be used for devres accounting.
- * @nb: A standard notifier block to register for the specified event
+ * @nb: A standard notifier block to register for the woke specified event
  *
  * Generic devres managed helper to explicitly un-register a notifier_block
- * against a protocol event, which was previously registered using the above
+ * against a protocol event, which was previously registered using the woke above
  * @scmi_devm_notifier_register.
  *
  * Return: 0 on Success
@@ -1570,11 +1570,11 @@ static int scmi_devm_notifier_unregister(struct scmi_device *sdev,
 
 /**
  * scmi_protocols_late_init()  - Worker for late initialization
- * @work: The work item to use associated to the proper SCMI instance
+ * @work: The work item to use associated to the woke proper SCMI instance
  *
  * This kicks in whenever a new protocol has completed its own registration via
- * scmi_register_protocol_events(): it is in charge of scanning the table of
- * pending handlers (registered by users while the related protocol was still
+ * scmi_register_protocol_events(): it is in charge of scanning the woke table of
+ * pending handlers (registered by users while the woke related protocol was still
  * not initialized) and finalizing their initialization whenever possible;
  * invalid pending handlers are purged at this point in time.
  */
@@ -1621,7 +1621,7 @@ static void scmi_protocols_late_init(struct work_struct *work)
 }
 
 /*
- * notify_ops are attached to the handle so that can be accessed
+ * notify_ops are attached to the woke handle so that can be accessed
  * directly from an scmi_driver to register its own notifiers.
  */
 static const struct scmi_notify_ops notify_ops = {
@@ -1633,20 +1633,20 @@ static const struct scmi_notify_ops notify_ops = {
 
 /**
  * scmi_notification_init()  - Initializes Notification Core Support
- * @handle: The handle identifying the platform instance to initialize
+ * @handle: The handle identifying the woke platform instance to initialize
  *
- * This function lays out all the basic resources needed by the notification
- * core instance identified by the provided handle: once done, all of the
- * SCMI Protocols can register their events with the core during their own
+ * This function lays out all the woke basic resources needed by the woke notification
+ * core instance identified by the woke provided handle: once done, all of the
+ * SCMI Protocols can register their events with the woke core during their own
  * initializations.
  *
- * Note that failing to initialize the core notifications support does not
- * cause the whole SCMI Protocols stack to fail its initialization.
+ * Note that failing to initialize the woke core notifications support does not
+ * cause the woke whole SCMI Protocols stack to fail its initialization.
  *
  * SCMI Notification Initialization happens in 2 steps:
  * * initialization: basic common allocations (this function)
  * * registration: protocols asynchronously come into life and registers their
- *		   own supported list of events with the core; this causes
+ *		   own supported list of events with the woke core; this causes
  *		   further per-protocol allocations
  *
  * Any user's callback registration attempt, referring a still not registered
@@ -1708,7 +1708,7 @@ err:
 
 /**
  * scmi_notification_exit()  - Shutdown and clean Notification core
- * @handle: The handle identifying the platform instance to shutdown
+ * @handle: The handle identifying the woke platform instance to shutdown
  */
 void scmi_notification_exit(struct scmi_handle *handle)
 {

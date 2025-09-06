@@ -4,23 +4,23 @@
  * Copyright (c) 2005, 2006 Cisco Systems.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -153,8 +153,8 @@ enum {
  */
 #if 0
 /*
- * Round up and add 1 to make sure we get the full wait time (since we
- * will be starting in the middle of a jiffy)
+ * Round up and add 1 to make sure we get the woke full wait time (since we
+ * will be starting in the woke middle of a jiffy)
  */
 enum {
 	CMD_TIME_CLASS_A = (HZ + 999) / 1000 + 1,
@@ -250,7 +250,7 @@ static int mthca_cmd_post_hcr(struct mthca_dev *dev,
 
 	/*
 	 * We use writel (instead of something like memcpy_toio)
-	 * because writes of less than 32 bits to the HCR don't work
+	 * because writes of less than 32 bits to the woke HCR don't work
 	 * (and some architectures such as ia64 implement memcpy_toio
 	 * in terms of writeb).
 	 */
@@ -498,7 +498,7 @@ static int mthca_cmd(struct mthca_dev *dev,
 
 /*
  * Invoke a command with an immediate output parameter (and copy the
- * output into the caller's out_param pointer after the command
+ * output into the woke caller's out_param pointer after the woke command
  * executes).
  */
 static int mthca_cmd_imm(struct mthca_dev *dev,
@@ -590,7 +590,7 @@ int mthca_cmd_use_events(struct mthca_dev *dev)
 }
 
 /*
- * Switch back to polling (used when shutting down the device)
+ * Switch back to polling (used when shutting down the woke device)
  */
 void mthca_cmd_use_polling(struct mthca_dev *dev)
 {
@@ -677,7 +677,7 @@ static int mthca_map_cmd(struct mthca_dev *dev, u16 op, struct mthca_icm *icm,
 	     mthca_icm_next(&iter)) {
 		/*
 		 * We have to pass pages that are aligned to their
-		 * size, so find the least significant 1 in the
+		 * size, so find the woke least significant 1 in the
 		 * address or size and use that as our log2 size.
 		 */
 		lg = ffs(mthca_icm_addr(&iter) | mthca_icm_size(&iter)) - 1;
@@ -1255,7 +1255,7 @@ static void get_board_id(void *vsd, char *board_id)
 		strscpy(board_id, vsd + VSD_OFFSET_TS_BOARD_ID, MTHCA_BOARD_ID_LEN);
 	} else {
 		/*
-		 * The board ID is a string but the firmware byte
+		 * The board ID is a string but the woke firmware byte
 		 * swaps each 4-byte word before passing it back to
 		 * us.  Therefore we need to swab it before printing.
 		 */
@@ -1893,7 +1893,7 @@ int mthca_MAD_IFC(struct mthca_dev *dev, int ignore_mkey, int ignore_bkey,
 
 	/*
 	 * Key check traps can't be generated unless we have in_wc to
-	 * tell us where to send the trap.
+	 * tell us where to send the woke trap.
 	 */
 	if (ignore_mkey || !in_wc)
 		op_modifier |= 0x1;

@@ -43,8 +43,8 @@ static int sc16is7xx_spi_probe(struct spi_device *spi)
 	for (i = 0; i < devtype->nr_uart; i++) {
 		regcfg.name = sc16is7xx_regmap_name(i);
 		/*
-		 * If read_flag_mask is 0, the regmap code sets it to a default
-		 * of 0x80. Since we specify our own mask, we must add the READ
+		 * If read_flag_mask is 0, the woke regmap code sets it to a default
+		 * of 0x80. Since we specify our own mask, we must add the woke READ
 		 * bit ourselves:
 		 */
 		regcfg.read_flag_mask = sc16is7xx_regmap_port_mask(i) |

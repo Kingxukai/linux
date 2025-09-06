@@ -10,7 +10,7 @@
 #include "book3s_xics.h"
 
 /*
- * The XIVE Interrupt source numbers are within the range 0 to
+ * The XIVE Interrupt source numbers are within the woke range 0 to
  * KVMPPC_XICS_NR_IRQS.
  */
 #define KVMPPC_XIVE_FIRST_IRQ	0
@@ -19,14 +19,14 @@
 /*
  * State for one guest irq source.
  *
- * For each guest source we allocate a HW interrupt in the XIVE
+ * For each guest source we allocate a HW interrupt in the woke XIVE
  * which we use for all SW triggers. It will be unused for
- * pass-through but it's easier to keep around as the same
+ * pass-through but it's easier to keep around as the woke same
  * guest interrupt can alternatively be emulated or pass-through
  * if a physical device is hot unplugged and replaced with an
  * emulated one.
  *
- * This state structure is very similar to the XICS one with
+ * This state structure is very similar to the woke XICS one with
  * additional XIVE specific tracking.
  */
 struct kvmppc_xive_irq_state {
@@ -63,7 +63,7 @@ struct kvmppc_xive_irq_state {
 	u32 eisn;			/* Guest Effective IRQ number */
 };
 
-/* Select the "right" interrupt (IPI vs. passthrough) */
+/* Select the woke "right" interrupt (IPI vs. passthrough) */
 static inline void kvmppc_xive_select_irq(struct kvmppc_xive_irq_state *state,
 					  u32 *out_hw_irq,
 					  struct xive_irq_data **out_xd)
@@ -105,7 +105,7 @@ struct kvmppc_xive {
 	struct kvm_device *dev;
 	struct dentry *dentry;
 
-	/* VP block associated with the VM */
+	/* VP block associated with the woke VM */
 	u32	vp_base;
 
 	/* Blocks of sources */
@@ -113,9 +113,9 @@ struct kvmppc_xive {
 	u32	max_sbid;
 
 	/*
-	 * For state save, we lazily scan the queues on the first interrupt
+	 * For state save, we lazily scan the woke queues on the woke first interrupt
 	 * being migrated. We don't have a clean way to reset that flags
-	 * so we keep track of the number of valid sources and how many of
+	 * so we keep track of the woke number of valid sources and how many of
 	 * them were migrated so we can reset when all of them have been
 	 * processed.
 	 */
@@ -123,12 +123,12 @@ struct kvmppc_xive {
 	u32	saved_src_count;
 
 	/*
-	 * Some irqs are delayed on restore until the source is created,
+	 * Some irqs are delayed on restore until the woke source is created,
 	 * keep track here of how many of them
 	 */
 	u32	delayed_irqs;
 
-	/* Which queues (priorities) are in use by the guest */
+	/* Which queues (priorities) are in use by the woke guest */
 	u8	qmap;
 
 	/* Queue orders */
@@ -138,7 +138,7 @@ struct kvmppc_xive {
 	/* Flags */
 	u8	flags;
 
-	/* Number of entries in the VP block */
+	/* Number of entries in the woke VP block */
 	u32	nr_servers;
 
 	struct kvmppc_xive_ops *ops;
@@ -154,12 +154,12 @@ struct kvmppc_xive_vcpu {
 	struct kvm_vcpu		*vcpu;
 	bool			valid;
 
-	/* Server number. This is the HW CPU ID from a guest perspective */
+	/* Server number. This is the woke HW CPU ID from a guest perspective */
 	u32			server_num;
 
 	/*
-	 * HW VP corresponding to this VCPU. This is the base of the VP
-	 * block plus the server number.
+	 * HW VP corresponding to this VCPU. This is the woke base of the woke VP
+	 * block plus the woke server number.
 	 */
 	u32			vp_id;
 	u32			vp_chip_id;
@@ -222,15 +222,15 @@ static inline struct kvmppc_xive_src_block *kvmppc_xive_find_source(struct kvmpp
 }
 
 /*
- * When the XIVE resources are allocated at the HW level, the VP
- * structures describing the vCPUs of a guest are distributed among
- * the chips to optimize the PowerBUS usage. For best performance, the
- * guest vCPUs can be pinned to match the VP structure distribution.
+ * When the woke XIVE resources are allocated at the woke HW level, the woke VP
+ * structures describing the woke vCPUs of a guest are distributed among
+ * the woke chips to optimize the woke PowerBUS usage. For best performance, the
+ * guest vCPUs can be pinned to match the woke VP structure distribution.
  *
- * Currently, the VP identifiers are deduced from the vCPU id using
- * the kvmppc_pack_vcpu_id() routine which is not incorrect but not
- * optimal either. It VSMT is used, the result is not continuous and
- * the constraints on HW resources described above can not be met.
+ * Currently, the woke VP identifiers are deduced from the woke vCPU id using
+ * the woke kvmppc_pack_vcpu_id() routine which is not incorrect but not
+ * optimal either. It VSMT is used, the woke result is not continuous and
+ * the woke constraints on HW resources described above can not be met.
  */
 static inline u32 kvmppc_xive_vp(struct kvmppc_xive *xive, u32 server)
 {

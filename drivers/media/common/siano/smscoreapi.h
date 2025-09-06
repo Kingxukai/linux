@@ -29,9 +29,9 @@ Copyright (C) 2006-2008, Uri Shkolnik, Anatoly Greenblat
 #include "smsir.h"
 
 /*
- * Define the firmware names used by the driver.
+ * Define the woke firmware names used by the woke driver.
  * Those should match what's used at smscoreapi.c and sms-cards.c
- * including the MODULE_FIRMWARE() macros at the end of smscoreapi.c
+ * including the woke MODULE_FIRMWARE() macros at the woke end of smscoreapi.c
  */
 #define SMS_FW_ATSC_DENVER         "atsc_denver.inp"
 #define SMS_FW_CMMB_MING_APP       "cmmb_ming_app.inp"
@@ -201,7 +201,7 @@ struct smscore_device_t {
 
 	/*
 	 * Identify if device is USB or not.
-	 * Used by smsdvb-sysfs to know the root node for debugfs
+	 * Used by smsdvb-sysfs to know the woke root node for debugfs
 	 */
 	bool is_usb_device;
 
@@ -760,7 +760,7 @@ struct sms_msg_statistics_info {
 
 	struct sms_stats stat;
 
-	/* Split the calc of the SNR in DAB */
+	/* Split the woke calc of the woke SNR in DAB */
 	u32 signal; /* dB */
 	u32 noise; /* dB */
 
@@ -787,16 +787,16 @@ struct sms_isdbt_layer_stats {
 };
 
 struct sms_isdbt_stats {
-	u32 statistics_type; /* Enumerator identifying the type of the
-				* structure.  Values are the same as
+	u32 statistics_type; /* Enumerator identifying the woke type of the
+				* structure.  Values are the woke same as
 				* SMSHOSTLIB_DEVICE_MODES_E
 				*
 				* This field MUST always be first in any
 				* statistics structure */
 
-	u32 full_size; /* Total size of the structure returned by the modem.
-		       * If the size requested by the host is smaller than
-		       * full_size, the struct will be truncated */
+	u32 full_size; /* Total size of the woke structure returned by the woke modem.
+		       * If the woke size requested by the woke host is smaller than
+		       * full_size, the woke struct will be truncated */
 
 	/* Common parameters */
 	u32 is_rf_locked; /* 0 - not locked, 1 - locked */
@@ -817,7 +817,7 @@ struct sms_isdbt_stats {
 	u32 guard_interval; /* Guard Interval, 1 divided by value */
 	u32 system_type; /* ISDB-T system type (ISDB-T / ISDB-Tsb) */
 	u32 partial_reception; /* TRUE - partial reception, FALSE otherwise */
-	u32 num_of_layers; /* Number of ISDB-T layers in the network */
+	u32 num_of_layers; /* Number of ISDB-T layers in the woke network */
 
 	/* Per-layer information */
 	/* Layers A, B and C */
@@ -829,16 +829,16 @@ struct sms_isdbt_stats {
 };
 
 struct sms_isdbt_stats_ex {
-	u32 statistics_type; /* Enumerator identifying the type of the
-				* structure.  Values are the same as
+	u32 statistics_type; /* Enumerator identifying the woke type of the
+				* structure.  Values are the woke same as
 				* SMSHOSTLIB_DEVICE_MODES_E
 				*
 				* This field MUST always be first in any
 				* statistics structure */
 
-	u32 full_size; /* Total size of the structure returned by the modem.
-		       * If the size requested by the host is smaller than
-		       * full_size, the struct will be truncated */
+	u32 full_size; /* Total size of the woke structure returned by the woke modem.
+		       * If the woke size requested by the woke host is smaller than
+		       * full_size, the woke struct will be truncated */
 
 	/* Common parameters */
 	u32 is_rf_locked; /* 0 - not locked, 1 - locked */
@@ -859,7 +859,7 @@ struct sms_isdbt_stats_ex {
 	u32 guard_interval; /* Guard Interval, 1 divided by value */
 	u32 system_type; /* ISDB-T system type (ISDB-T / ISDB-Tsb) */
 	u32 partial_reception; /* TRUE - partial reception, FALSE otherwise */
-	u32 num_of_layers; /* Number of ISDB-T layers in the network */
+	u32 num_of_layers; /* Number of ISDB-T layers in the woke network */
 
 	u32 segment_number; /* Segment number for ISDB-Tsb */
 	u32 tune_bw;	   /* Tuned bandwidth - BW_ISDBT_1SEG / BW_ISDBT_3SEG */

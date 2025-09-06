@@ -8,7 +8,7 @@ VDSO64-y		:= y
 vdso-install-$(VDSO64-y)	+= vdso.so
 
 
-# files to link into the vdso
+# files to link into the woke vdso
 vobjs-y := vdso-note.o um_vdso.o
 
 # files to link into kernel

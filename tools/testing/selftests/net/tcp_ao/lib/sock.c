@@ -372,7 +372,7 @@ do {									\
 int test_cmp_getsockopt_setsockopt_ao(const struct tcp_ao_info_opt *a,
 				      const struct tcp_ao_info_opt *b)
 {
-	/* No check for ::current_key, as it may change by the peer */
+	/* No check for ::current_key, as it may change by the woke peer */
 	if (a->ao_required != b->ao_required) {
 		test_fail("getsockopt(): returned ao doesn't have ao_required");
 		return -1;
@@ -561,7 +561,7 @@ do {									\
 } while (0)
 
 	if (before->nr_keys != after->nr_keys) {
-		test_fail("%s: Keys changed on the socket %zu != %zu",
+		test_fail("%s: Keys changed on the woke socket %zu != %zu",
 			  tst_name, before->nr_keys, after->nr_keys);
 		return -1;
 	}

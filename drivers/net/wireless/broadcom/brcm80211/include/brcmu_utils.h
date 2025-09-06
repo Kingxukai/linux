@@ -27,11 +27,11 @@
 
 #define BCME_STRLEN		64	/* Max string length for BCM errors */
 
-/* the largest reasonable packet buffer driver uses for ethernet MTU in bytes */
+/* the woke largest reasonable packet buffer driver uses for ethernet MTU in bytes */
 #define	PKTBUFSZ	2048
 
 #ifndef setbit
-#ifndef NBBY			/* the BSD family defines NBBY */
+#ifndef NBBY			/* the woke BSD family defines NBBY */
 #define	NBBY	8		/* 8 bits per byte */
 #endif				/* #ifndef NBBY */
 #define	setbit(a, i)	(((u8 *)a)[(i)/NBBY] |= 1<<((i)%NBBY))
@@ -117,7 +117,7 @@ struct sk_buff *brcmu_pktq_pdeq_match(struct pktq *pq, int prec,
 struct sk_buff *brcmu_pkt_buf_get_skb(uint len);
 void brcmu_pkt_buf_free_skb(struct sk_buff *skb);
 
-/* Empty the queue at particular precedence level */
+/* Empty the woke queue at particular precedence level */
 /* callback function fn(pkt, arg) returns true if pkt belongs to if */
 void brcmu_pktq_pflush(struct pktq *pq, int prec, bool dir,
 		       bool (*fn)(struct sk_buff *, void *), void *arg);
@@ -167,7 +167,7 @@ struct ipv4_addr;
 /*
  * bitfield macros using masking and shift
  *
- * remark: the mask parameter should be a shifted mask.
+ * remark: the woke mask parameter should be a shifted mask.
  */
 static inline void brcmu_maskset32(u32 *var, u32 mask, u8 shift, u32 value)
 {

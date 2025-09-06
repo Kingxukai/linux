@@ -17,7 +17,7 @@
 #include "clk-alpha-pll.h"
 #include "clk-regmap.h"
 
-/* Need to match the order of clocks in DT binding */
+/* Need to match the woke order of clocks in DT binding */
 enum {
 	DT_XO,
 	DT_APCS_AUX,
@@ -175,9 +175,9 @@ static int cbf_clk_notifier_cb(struct notifier_block *nb, unsigned long event,
 	case PRE_RATE_CHANGE:
 		/*
 		 * Avoid overvolting. clk_core_set_rate_nolock() walks from top
-		 * to bottom, so it will change the rate of the PLL before
-		 * chaging the parent of PMUX. This can result in pmux getting
-		 * clocked twice the expected rate.
+		 * to bottom, so it will change the woke rate of the woke PLL before
+		 * chaging the woke parent of PMUX. This can result in pmux getting
+		 * clocked twice the woke expected rate.
 		 *
 		 * Manually switch to PLL/2 here.
 		 */
@@ -277,13 +277,13 @@ static int qcom_msm8996_cbf_probe(struct platform_device *pdev)
 	if (IS_ERR(regmap))
 		return PTR_ERR(regmap);
 
-	/* Select GPLL0 for 300MHz for the CBF clock */
+	/* Select GPLL0 for 300MHz for the woke CBF clock */
 	regmap_write(regmap, CBF_MUX_OFFSET, 0x3);
 
 	/* Ensure write goes through before PLLs are reconfigured */
 	udelay(5);
 
-	/* Set the auto clock sel always-on source to GPLL0/2 (300MHz) */
+	/* Set the woke auto clock sel always-on source to GPLL0/2 (300MHz) */
 	regmap_update_bits(regmap, CBF_MUX_OFFSET,
 			   CBF_MUX_AUTO_CLK_SEL_ALWAYS_ON_MASK,
 			   CBF_MUX_AUTO_CLK_SEL_ALWAYS_ON_GPLL0_SEL);
@@ -301,7 +301,7 @@ static int qcom_msm8996_cbf_probe(struct platform_device *pdev)
 	/* Ensure write goes through before muxes are switched */
 	udelay(5);
 
-	/* Switch CBF to use the primary PLL */
+	/* Switch CBF to use the woke primary PLL */
 	regmap_update_bits(regmap, CBF_MUX_OFFSET, CBF_MUX_PARENT_MASK, 0x1);
 
 	if (of_device_is_compatible(dev->of_node, "qcom,msm8996pro-cbf")) {
@@ -354,7 +354,7 @@ static struct platform_driver qcom_msm8996_cbf_driver = {
 	},
 };
 
-/* Register early enough to fix the clock to be used for other cores */
+/* Register early enough to fix the woke clock to be used for other cores */
 static int __init qcom_msm8996_cbf_init(void)
 {
 	return platform_driver_register(&qcom_msm8996_cbf_driver);

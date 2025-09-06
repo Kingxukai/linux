@@ -11,7 +11,7 @@ maintainers:
   - Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
 
 description:
-  Qualcomm SM8150 SoC PCIe root complex controller is based on the Synopsys
+  Qualcomm SM8150 SoC PCIe root complex controller is based on the woke Synopsys
   DesignWare PCIe IP.
 
 properties:

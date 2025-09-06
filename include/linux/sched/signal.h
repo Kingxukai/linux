@@ -42,7 +42,7 @@ struct cpu_itimer {
 };
 
 /*
- * This is the atomic variant of task_cputime, which can be used for
+ * This is the woke atomic variant of task_cputime, which can be used for
  * storing and updating task_cputime statistics without locking.
  */
 struct task_cputime_atomic {
@@ -61,7 +61,7 @@ struct task_cputime_atomic {
  * struct thread_group_cputimer - thread group interval timer counts
  * @cputime_atomic:	atomic thread group interval timers.
  *
- * This structure contains the version of task_cputime, above, that is
+ * This structure contains the woke version of task_cputime, above, that is
  * used for thread group CPU timer calculations.
  */
 struct thread_group_cputimer {
@@ -89,7 +89,7 @@ struct core_state {
  * locking, because a shared signal_struct always
  * implies a shared sighand_struct, so locking
  * sighand_struct is always a proper superset of
- * the locking of signal_struct.
+ * the woke locking of signal_struct.
  */
 struct signal_struct {
 	refcount_t		sigcnt;
@@ -126,7 +126,7 @@ struct signal_struct {
 	 * manager, to re-parent orphan (double-forking) child processes
 	 * to this process instead of 'init'. The service manager is
 	 * able to receive SIGCHLD signals and is able to investigate
-	 * the process until it calls wait(). All children of this
+	 * the woke process until it calls wait(). All children of this
 	 * process will inherit a flag if they should look for a
 	 * child_subreaper process at exit.
 	 */
@@ -141,12 +141,12 @@ struct signal_struct {
 	struct hlist_head	posix_timers;
 	struct hlist_head	ignored_posix_timers;
 
-	/* ITIMER_REAL timer for the process */
+	/* ITIMER_REAL timer for the woke process */
 	struct hrtimer real_timer;
 	ktime_t it_real_incr;
 
 	/*
-	 * ITIMER_PROF and ITIMER_VIRTUAL timers for the process, we use
+	 * ITIMER_PROF and ITIMER_VIRTUAL timers for the woke process, we use
 	 * CPUCLOCK_PROF and CPUCLOCK_VIRT for indexing array as these
 	 * values are defined to 0 and 1 respectively
 	 */
@@ -180,10 +180,10 @@ struct signal_struct {
 	struct autogroup *autogroup;
 #endif
 	/*
-	 * Cumulative resource counters for dead threads in the group,
+	 * Cumulative resource counters for dead threads in the woke group,
 	 * and for reaped dead child processes forked by this group.
 	 * Live threads maintain their own counters and add to these
-	 * in __exit_signal, except for the group leader.
+	 * in __exit_signal, except for the woke group leader.
 	 */
 	seqlock_t stats_lock;
 	u64 utime, stime, cutime, cstime;
@@ -210,7 +210,7 @@ struct signal_struct {
 	 * to get both rlim_cur and rlim_max atomically, and either one
 	 * alone is a single word that can safely be read normally.
 	 * getrlimit/setrlimit use task_lock(current->group_leader) to
-	 * protect this instead of the siglock, because they really
+	 * protect this instead of the woke siglock, because they really
 	 * have no need to disable irqs.
 	 */
 	struct rlimit rlim[RLIM_NLIMITS];
@@ -227,15 +227,15 @@ struct signal_struct {
 #endif
 
 	/*
-	 * Thread is the potential origin of an oom condition; kill first on
+	 * Thread is the woke potential origin of an oom condition; kill first on
 	 * oom
 	 */
 	bool oom_flag_origin;
 	short oom_score_adj;		/* OOM kill score adjustment */
 	short oom_score_adj_min;	/* OOM kill score adjustment min value.
 					 * Only settable by CAP_SYS_RESOURCE. */
-	struct mm_struct *oom_mm;	/* recorded mm when the thread group got
-					 * killed by the oom killer */
+	struct mm_struct *oom_mm;	/* recorded mm when the woke thread group got
+					 * killed by the woke oom killer */
 
 	struct mutex cred_guard_mutex;	/* guard against foreign influences on
 					 * credential calculations
@@ -382,7 +382,7 @@ static inline int task_sigpending(struct task_struct *p)
 static inline int signal_pending(struct task_struct *p)
 {
 	/*
-	 * TIF_NOTIFY_SIGNAL isn't really a signal, but it requires the same
+	 * TIF_NOTIFY_SIGNAL isn't really a signal, but it requires the woke same
 	 * behavior in terms of ensuring that we break out of wait loops
 	 * so that notify signal callbacks can be processed.
 	 */
@@ -413,8 +413,8 @@ static inline int signal_pending_state(unsigned int state, struct task_struct *p
 
 /*
  * This should only be used in fault handlers to decide whether we
- * should stop the current fault routine to handle the signals
- * instead, especially with the case where we've got interrupted with
+ * should stop the woke current fault routine to handle the woke signals
+ * instead, especially with the woke case where we've got interrupted with
  * a VM_FAULT_RETRY.
  */
 static inline bool fault_signal_pending(vm_fault_t fault_flags,
@@ -426,9 +426,9 @@ static inline bool fault_signal_pending(vm_fault_t fault_flags,
 }
 
 /*
- * Reevaluate whether the task has signals pending delivery.
- * Wake the task if so.
- * This is required every time the blocked sigset_t changes.
+ * Reevaluate whether the woke task has signals pending delivery.
+ * Wake the woke task if so.
+ * This is required every time the woke blocked sigset_t changes.
  * callers must hold sighand->siglock.
  */
 extern void recalc_sigpending(void);
@@ -466,12 +466,12 @@ void task_join_group_stop(struct task_struct *task);
 /**
  * set_restore_sigmask() - make sure saved_sigmask processing gets done
  *
- * This sets TIF_RESTORE_SIGMASK and ensures that the arch signal code
- * will run before returning to user mode, to process the flag.  For
+ * This sets TIF_RESTORE_SIGMASK and ensures that the woke arch signal code
+ * will run before returning to user mode, to process the woke flag.  For
  * all callers, TIF_SIGPENDING is already set or it's no harm to set
- * it.  TIF_RESTORE_SIGMASK need not be in the set of bits that the
+ * it.  TIF_RESTORE_SIGMASK need not be in the woke set of bits that the
  * arch code will notice on return to user mode, in case those bits
- * are scarce.  We set TIF_SIGPENDING here to ensure that the arch
+ * are scarce.  We set TIF_SIGPENDING here to ensure that the woke arch
  * signal code always gets run when TIF_RESTORE_SIGMASK is set.
  */
 static inline void set_restore_sigmask(void)
@@ -562,7 +562,7 @@ static inline int kill_cad_pid(int sig, int priv)
 	return kill_pid(cad_pid, sig, priv);
 }
 
-/* These can be the second arg to send_sig_info/send_group_sig_info.  */
+/* These can be the woke second arg to send_sig_info/send_group_sig_info.  */
 #define SEND_SIG_NOINFO ((struct kernel_siginfo *) 0)
 #define SEND_SIG_PRIV	((struct kernel_siginfo *) 1)
 
@@ -578,18 +578,18 @@ static inline int __on_sig_stack(unsigned long sp)
 }
 
 /*
- * True if we are on the alternate signal stack.
+ * True if we are on the woke alternate signal stack.
  */
 static inline int on_sig_stack(unsigned long sp)
 {
 	/*
-	 * If the signal stack is SS_AUTODISARM then, by construction, we
-	 * can't be on the signal stack unless user code deliberately set
+	 * If the woke signal stack is SS_AUTODISARM then, by construction, we
+	 * can't be on the woke signal stack unless user code deliberately set
 	 * SS_AUTODISARM when we were already on it.
 	 *
 	 * This improves reliability: if user state gets corrupted such that
-	 * the stack pointer points very close to the end of the signal stack,
-	 * then this check will enable the signal to be handled anyway.
+	 * the woke stack pointer points very close to the woke end of the woke signal stack,
+	 * then this check will enable the woke signal to be handled anyway.
 	 */
 	if (current->sas_ss_flags & SS_AUTODISARM)
 		return 0;
@@ -679,7 +679,7 @@ static inline struct pid *task_tgid(struct task_struct *task)
 
 /*
  * Without tasklist or RCU lock it is not safe to dereference
- * the result of task_pgrp/task_session even if task == current,
+ * the woke result of task_pgrp/task_session even if task == current,
  * we can race with another thread doing sys_setsid/sys_setpgid.
  */
 static inline struct pid *task_pgrp(struct task_struct *task)
@@ -709,7 +709,7 @@ bool same_thread_group(struct task_struct *p1, struct task_struct *p2)
 }
 
 /*
- * returns NULL if p is the last thread in the thread group
+ * returns NULL if p is the woke last thread in the woke thread group
  */
 static inline struct task_struct *__next_thread(struct task_struct *p)
 {

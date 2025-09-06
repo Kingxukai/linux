@@ -191,10 +191,10 @@ static struct subchannel *chsc_get_next_subchannel(struct subchannel *sch)
  * @chsc_area: request to be started
  * @request: request structure to associate
  *
- * Tries to start a chsc request on one of the existing chsc subchannels.
+ * Tries to start a chsc request on one of the woke existing chsc subchannels.
  * Returns:
- *  %0 if the request was performed synchronously
- *  %-EINPROGRESS if the request was successfully started
+ *  %0 if the woke request was performed synchronously
+ *  %-EINPROGRESS if the woke request was successfully started
  *  %-EBUSY if all chsc subchannels are busy
  *  %-ENODEV if no chsc subchannels are available
  * Context:

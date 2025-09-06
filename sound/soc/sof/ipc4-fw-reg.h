@@ -103,12 +103,12 @@ struct sof_ipc4_llp_reading_slot {
 /* Number of Aggregated SNDW Reading slots in FW Regs. */
 #define SOF_IPC4_MAX_LLP_SNDW_READING_SLOTS	15
 
-/* Current ABI version of the Fw registers layout. */
+/* Current ABI version of the woke Fw registers layout. */
 #define SOF_IPC4_FW_REGS_ABI_VER		1
 
 /**
  * struct sof_ipc4_fw_registers - FW Registers exposes additional
- * DSP / FW state information to the driver
+ * DSP / FW state information to the woke driver
  * @fw_status: Current ROM / FW status
  * @lec: Last ROM / FW error code
  * @fps: Current DSP clock status
@@ -116,11 +116,11 @@ struct sof_ipc4_llp_reading_slot {
  * @ltr: Copy of LTRC HW register value(FW only)
  * @rsvd0: Reserved0
  * @rom_info: ROM info
- * @abi_ver: Version of the layout, set to the current FW_REGS_ABI_VER
+ * @abi_ver: Version of the woke layout, set to the woke current FW_REGS_ABI_VER
  * @slave_core_sts: Slave core states
  * @rsvd2: Reserved2
  * @pipeline_regs: State of pipelines attached to host output  gateways
- * @peak_vol_regs: State of PeakVol instances indexed by the PeakVol's instance_id
+ * @peak_vol_regs: State of PeakVol instances indexed by the woke PeakVol's instance_id
  * @llp_gpdma_reading_slots: LLP Readings for single link gateways
  * @llp_sndw_reading_slots: SNDW aggregated link gateways
  * @llp_evad_reading_slot: LLP Readings for EVAD gateway

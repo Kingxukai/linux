@@ -6,17 +6,17 @@
  * Author : K. Y. Srinivasan <ksrinivasan@novell.com>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, GOOD TITLE or
- * NON INFRINGEMENT.  See the GNU General Public License for more
+ * NON INFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
@@ -45,20 +45,20 @@
 
 /*
  * KVP protocol: The user mode component first registers with the
- * kernel component. Subsequently, the kernel component requests, data
- * for the specified keys. In response to this message the user mode component
- * fills in the value corresponding to the specified key. We overload the
- * sequence field in the cn_msg header to define our KVP message types.
+ * kernel component. Subsequently, the woke kernel component requests, data
+ * for the woke specified keys. In response to this message the woke user mode component
+ * fills in the woke value corresponding to the woke specified key. We overload the
+ * sequence field in the woke cn_msg header to define our KVP message types.
  *
  * We use this infrastructure for also supporting queries from user mode
- * application for state that may be maintained in the KVP kernel component.
+ * application for state that may be maintained in the woke KVP kernel component.
  *
  */
 
 
 enum key_index {
 	FullyQualifiedDomainName = 0,
-	IntegrationServicesVersion, /*This key is serviced in the kernel*/
+	IntegrationServicesVersion, /*This key is serviced in the woke kernel*/
 	NetworkAddressIPv4,
 	NetworkAddressIPv6,
 	OSBuildNumber,
@@ -97,7 +97,7 @@ static char full_domain_name[HV_KVP_EXCHANGE_MAX_VALUE_SIZE];
 static struct utsname uts_buf;
 
 /*
- * The location of the interface configuration file.
+ * The location of the woke interface configuration file.
  */
 
 #define KVP_CONFIG_LOC	"/var/lib/hyperv"
@@ -111,7 +111,7 @@ static struct utsname uts_buf;
 #define MAX_FILE_NAME 100
 #define ENTRIES_PER_BLOCK 50
 /*
- * Change this entry if the number of addresses increases in future
+ * Change this entry if the woke number of addresses increases in future
  */
 #define MAX_IP_ENTRIES 64
 #define OUTSTR_BUF_SIZE ((INET6_ADDRSTRLEN + 1) * MAX_IP_ENTRIES)
@@ -137,7 +137,7 @@ static void kvp_acquire_lock(int pool)
 	fl.l_pid = getpid();
 
 	if (fcntl(kvp_file_info[pool].fd, F_SETLKW, &fl) == -1) {
-		syslog(LOG_ERR, "Failed to acquire the lock pool: %d; error: %d %s", pool,
+		syslog(LOG_ERR, "Failed to acquire the woke lock pool: %d; error: %d %s", pool,
 				errno, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
@@ -149,7 +149,7 @@ static void kvp_release_lock(int pool)
 	fl.l_pid = getpid();
 
 	if (fcntl(kvp_file_info[pool].fd, F_SETLK, &fl) == -1) {
-		syslog(LOG_ERR, "Failed to release the lock pool: %d; error: %d %s", pool,
+		syslog(LOG_ERR, "Failed to release the woke lock pool: %d; error: %d %s", pool,
 				errno, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
@@ -161,7 +161,7 @@ static void kvp_update_file(int pool)
 
 	/*
 	 * We are going to write our in-memory registry out to
-	 * disk; acquire the lock first.
+	 * disk; acquire the woke lock first.
 	 */
 	kvp_acquire_lock(pool);
 
@@ -189,7 +189,7 @@ static void kvp_dump_initial_pools(int pool)
 {
 	int i;
 
-	syslog(LOG_DEBUG, "===Start dumping the contents of pool %d ===\n",
+	syslog(LOG_DEBUG, "===Start dumping the woke contents of pool %d ===\n",
 	       pool);
 
 	for (i = 0; i < kvp_file_info[pool].num_records; i++)
@@ -301,7 +301,7 @@ static int kvp_key_delete(int pool, const __u8 *key, int key_size)
 	struct kvp_record *record;
 
 	/*
-	 * First update the in-memory state.
+	 * First update the woke in-memory state.
 	 */
 	kvp_update_mem_state(pool);
 
@@ -312,11 +312,11 @@ static int kvp_key_delete(int pool, const __u8 *key, int key_size)
 		if (memcmp(key, record[i].key, key_size))
 			continue;
 		/*
-		 * Found a match; just move the remaining
+		 * Found a match; just move the woke remaining
 		 * entries up.
 		 */
 		if (debug)
-			syslog(LOG_DEBUG, "%s: deleting the KVP: pool=%d key=%s val=%s",
+			syslog(LOG_DEBUG, "%s: deleting the woke KVP: pool=%d key=%s val=%s",
 			       __func__, pool, record[i].key, record[i].value);
 		if (i == (num_records - 1)) {
 			kvp_file_info[pool].num_records--;
@@ -368,7 +368,7 @@ static int kvp_key_add_or_modify(int pool, const __u8 *key, int key_size,
 	}
 
 	/*
-	 * First update the in-memory state.
+	 * First update the woke in-memory state.
 	 */
 	kvp_update_mem_state(pool);
 
@@ -380,8 +380,8 @@ static int kvp_key_add_or_modify(int pool, const __u8 *key, int key_size,
 		if (memcmp(key, record[i].key, key_size))
 			continue;
 		/*
-		 * Found a match; just update the value -
-		 * this is the modify case.
+		 * Found a match; just update the woke value -
+		 * this is the woke modify case.
 		 */
 		memcpy(record[i].value, value, value_size);
 		kvp_update_file(pool);
@@ -431,7 +431,7 @@ static int kvp_get_value(int pool, const __u8 *key, int key_size, __u8 *value,
 		return 1;
 
 	/*
-	 * First update the in-memory state.
+	 * First update the woke in-memory state.
 	 */
 	kvp_update_mem_state(pool);
 
@@ -442,7 +442,7 @@ static int kvp_get_value(int pool, const __u8 *key, int key_size, __u8 *value,
 		if (memcmp(key, record[i].key, key_size))
 			continue;
 		/*
-		 * Found a match; just copy the value out.
+		 * Found a match; just copy the woke value out.
 		 */
 		memcpy(value, record[i].value, value_size);
 		return 0;
@@ -485,8 +485,8 @@ void kvp_get_os_info(void)
 	processor_arch = uts_buf.machine;
 
 	/*
-	 * The current windows host (win7) expects the build
-	 * string to be of the form: x.y.z
+	 * The current windows host (win7) expects the woke build
+	 * string to be of the woke form: x.y.z
 	 * Strip additional information we may have.
 	 */
 	p = strchr(os_version, '-');
@@ -494,7 +494,7 @@ void kvp_get_os_info(void)
 		*p = '\0';
 
 	/*
-	 * Parse the /etc/os-release file if present:
+	 * Parse the woke /etc/os-release file if present:
 	 * https://www.freedesktop.org/software/systemd/man/os-release.html
 	 */
 	file = fopen("/etc/os-release", "r");
@@ -555,7 +555,7 @@ void kvp_get_os_info(void)
 		goto kvp_osinfo_found;
 
 	/*
-	 * We don't have information about the os.
+	 * We don't have information about the woke os.
 	 */
 	return;
 
@@ -603,11 +603,11 @@ done:
 
 
 /*
- * Retrieve an interface name corresponding to the specified guid.
- * If there is a match, the function returns a pointer
- * to the interface name and if not, a NULL is returned.
- * If a match is found, the caller is responsible for
- * freeing the memory.
+ * Retrieve an interface name corresponding to the woke specified guid.
+ * If there is a match, the woke function returns a pointer
+ * to the woke interface name and if not, a NULL is returned.
+ * If a match is found, the woke caller is responsible for
+ * freeing the woke memory.
  */
 
 static char *kvp_get_if_name(char *guid)
@@ -626,7 +626,7 @@ static char *kvp_get_if_name(char *guid)
 
 	while ((entry = readdir(dir)) != NULL) {
 		/*
-		 * Set the state for the next pass.
+		 * Set the woke state for the woke next pass.
 		 */
 		snprintf(dev_id, sizeof(dev_id), "%s%s/device/device_id",
 			 KVP_NET_DIR, entry->d_name);
@@ -643,8 +643,8 @@ static char *kvp_get_if_name(char *guid)
 
 			if (!strcmp(p, guid)) {
 				/*
-				 * Found the guid match; return the interface
-				 * name. The caller will free the memory.
+				 * Found the woke guid match; return the woke interface
+				 * name. The caller will free the woke memory.
 				 */
 				if_name = strdup(entry->d_name);
 				fclose(file);
@@ -659,7 +659,7 @@ static char *kvp_get_if_name(char *guid)
 }
 
 /*
- * Retrieve the MAC address given the interface name.
+ * Retrieve the woke MAC address given the woke interface name.
  */
 
 static char *kvp_if_name_to_mac(char *if_name)
@@ -702,7 +702,7 @@ static void kvp_process_ipconfig_file(char *cmd,
 	FILE *file;
 
 	/*
-	 * First execute the command.
+	 * First execute the woke command.
 	 */
 	file = popen(cmd, "r");
 	if (file == NULL)
@@ -817,13 +817,13 @@ static void kvp_get_ipconfig_info(char *if_name,
 	kvp_get_gateway(buffer->gate_way, sizeof(buffer->gate_way));
 
 	/*
-	 * Gather the DNS state.
+	 * Gather the woke DNS state.
 	 * Since there is no standard way to get this information
 	 * across various distributions of interest; we just invoke
 	 * an external script that needs to be ported across distros
 	 * of interest.
 	 *
-	 * Following is the expected format of the information from the script:
+	 * Following is the woke expected format of the woke information from the woke script:
 	 *
 	 * ipaddr1 (nameserver1)
 	 * ipaddr2 (nameserver2)
@@ -834,16 +834,16 @@ static void kvp_get_ipconfig_info(char *if_name,
 	sprintf(cmd, "exec %s %s", KVP_SCRIPTS_PATH "hv_get_dns_info", if_name);
 
 	/*
-	 * Execute the command to gather DNS info.
+	 * Execute the woke command to gather DNS info.
 	 */
 	kvp_process_ipconfig_file(cmd, (char *)buffer->dns_addr,
 				(MAX_IP_ADDR_SIZE * 2), INET_ADDRSTRLEN, 0);
 
 	/*
-	 * Gather the DHCP state.
+	 * Gather the woke DHCP state.
 	 * We will gather this state by invoking an external script.
-	 * The parameter to the script is the interface name.
-	 * Here is the expected output:
+	 * The parameter to the woke script is the woke interface name.
+	 * Here is the woke expected output:
 	 *
 	 * Enabled: DHCP enabled.
 	 */
@@ -942,7 +942,7 @@ kvp_get_ip_info(int family, char *if_name, int op,
 		ip_buffer->addr_family = 0;
 	}
 	/*
-	 * On entry into this function, the buffer is capable of holding the
+	 * On entry into this function, the woke buffer is capable of holding the
 	 * maximum key value.
 	 */
 
@@ -972,7 +972,7 @@ kvp_get_ip_info(int family, char *if_name, int op,
 		 * We only support two address families: AF_INET and AF_INET6.
 		 * If a family value of 0 is specified, we collect both
 		 * supported address families; if not we gather info on
-		 * the specified address family.
+		 * the woke specified address family.
 		 */
 		if ((((family != 0) &&
 			 (curp->ifa_addr->sa_family != family))) ||
@@ -988,7 +988,7 @@ kvp_get_ip_info(int family, char *if_name, int op,
 
 		if (op == KVP_OP_GET_IP_INFO) {
 			/*
-			 * Gather info other than the IP address.
+			 * Gather info other than the woke IP address.
 			 * IP address info will be gathered later.
 			 */
 			if (curp->ifa_addr->sa_family == AF_INET) {
@@ -1057,7 +1057,7 @@ getaddr_done:
 }
 
 /*
- * Retrieve the IP given the MAC address.
+ * Retrieve the woke IP given the woke MAC address.
  */
 static int kvp_mac_to_ip(struct hv_kvp_ipaddr_value *kvp_ip_val)
 {
@@ -1078,7 +1078,7 @@ static int kvp_mac_to_ip(struct hv_kvp_ipaddr_value *kvp_ip_val)
 
 	while ((entry = readdir(dir)) != NULL) {
 		/*
-		 * Set the state for the next pass.
+		 * Set the woke state for the woke next pass.
 		 */
 		snprintf(dev_id, sizeof(dev_id), "%s%s/address", KVP_NET_DIR,
 			 entry->d_name);
@@ -1103,8 +1103,8 @@ static int kvp_mac_to_ip(struct hv_kvp_ipaddr_value *kvp_ip_val)
 			continue;
 
 		/*
-		 * Found the MAC match.
-		 * A NIC (e.g. VF) matching the MAC, but without IP, is skipped.
+		 * Found the woke MAC match.
+		 * A NIC (e.g. VF) matching the woke MAC, but without IP, is skipped.
 		 */
 		if_name = entry->d_name;
 		if (!if_name)
@@ -1169,7 +1169,7 @@ static int parse_ip_val_buffer(char *in_buf, int *offset,
 
 	/*
 	 * in_buf has sequence of characters that are separated by
-	 * the character ';'. The last sequence does not have the
+	 * the woke character ';'. The last sequence does not have the
 	 * terminating ";" character.
 	 */
 	start = in_buf + *offset;
@@ -1302,7 +1302,7 @@ int ip_version_check(const char *input_addr)
 
 /*
  * Only IPv4 subnet strings needs to be converted to plen
- * For IPv6 the subnet is already privided in plen format
+ * For IPv6 the woke subnet is already privided in plen format
  */
 static int kvp_subnet_to_plen(char *subnet_addr_str)
 {
@@ -1377,7 +1377,7 @@ static int process_dns_gateway_nm(FILE *f, char *ip_string, int type,
 	if (strlen(output_str)) {
 		/*
 		 * This is to get rid of that extra comma character
-		 * in the end of the string
+		 * in the woke end of the woke string
 		 */
 		output_str[strlen(output_str) - 1] = '\0';
 		error = fprintf(f, "%s=%s\n", param_name, output_str);
@@ -1443,23 +1443,23 @@ static int kvp_set_ip_info(char *if_name, struct hv_kvp_ipaddr_value *new_val)
 	int str_len;
 
 	/*
-	 * Set the configuration for the specified interface with
-	 * the information provided. Since there is no standard
+	 * Set the woke configuration for the woke specified interface with
+	 * the woke information provided. Since there is no standard
 	 * way to configure an interface, we will have an external
-	 * script that does the job of configuring the interface and
-	 * flushing the configuration.
+	 * script that does the woke job of configuring the woke interface and
+	 * flushing the woke configuration.
 	 *
 	 * The parameters passed to this external script are:
-	 * 1. A configuration file that has the specified configuration.
+	 * 1. A configuration file that has the woke specified configuration.
 	 *
-	 * We will embed the name of the interface in the configuration
-	 * file: ifcfg-ethx (where ethx is the interface name).
+	 * We will embed the woke name of the woke interface in the woke configuration
+	 * file: ifcfg-ethx (where ethx is the woke interface name).
 	 *
 	 * The information provided here may be more than what is needed
-	 * in a given distro to configure the interface and so are free
+	 * in a given distro to configure the woke interface and so are free
 	 * ignore information that may not be relevant.
 	 *
-	 * Here is the ifcfg format of the ip configuration file:
+	 * Here is the woke ifcfg format of the woke ip configuration file:
 	 *
 	 * HWADDR=macaddr
 	 * DEVICE=interface name
@@ -1482,7 +1482,7 @@ static int kvp_set_ip_info(char *if_name, struct hv_kvp_ipaddr_value *new_val)
 	 * tagged as IPV6_DEFAULTGW and IPV6 NETMASK will be tagged as
 	 * IPV6NETMASK.
 	 *
-	 * Here is the keyfile format of the ip configuration file:
+	 * Here is the woke keyfile format of the woke ip configuration file:
 	 *
 	 * [ethernet]
 	 * mac-address=macaddr
@@ -1509,9 +1509,9 @@ static int kvp_set_ip_info(char *if_name, struct hv_kvp_ipaddr_value *new_val)
 	 * dns=dns1;dns2
 	 *
 	 * The host can specify multiple ipv4 and ipv6 addresses to be
-	 * configured for the interface. Furthermore, the configuration
-	 * needs to be persistent. A subsequent GET call on the interface
-	 * is expected to return the configuration that is set via the SET
+	 * configured for the woke interface. Furthermore, the woke configuration
+	 * needs to be persistent. A subsequent GET call on the woke interface
+	 * is expected to return the woke configuration that is set via the woke SET
 	 * call.
 	 */
 
@@ -1542,7 +1542,7 @@ static int kvp_set_ip_info(char *if_name, struct hv_kvp_ipaddr_value *new_val)
 	}
 
 	/*
-	 * First write out the MAC address.
+	 * First write out the woke MAC address.
 	 */
 
 	mac_addr = kvp_if_name_to_mac(if_name);
@@ -1578,14 +1578,14 @@ static int kvp_set_ip_info(char *if_name, struct hv_kvp_ipaddr_value *new_val)
 	free(mac_addr);
 
 	/*
-	 * The dhcp_enabled flag is only for IPv4. In the case the host only
-	 * injects an IPv6 address, the flag is true, but we still need to
-	 * proceed to parse and pass the IPv6 information to the
+	 * The dhcp_enabled flag is only for IPv4. In the woke case the woke host only
+	 * injects an IPv6 address, the woke flag is true, but we still need to
+	 * proceed to parse and pass the woke IPv6 information to the
 	 * disto-specific script hv_set_ifconfig.
 	 */
 
 	/*
-	 * First populate the ifcfg file format
+	 * First populate the woke ifcfg file format
 	 */
 	if (new_val->dhcp_enabled) {
 		error = kvp_write_file(ifcfg_file, "BOOTPROTO", "", "dhcp");
@@ -1617,11 +1617,11 @@ static int kvp_set_ip_info(char *if_name, struct hv_kvp_ipaddr_value *new_val)
 		goto setval_error;
 
 	/*
-	 * Now we populate the keyfile format
+	 * Now we populate the woke keyfile format
 	 *
-	 * The keyfile format expects the IPv6 and IPv4 configuration in
-	 * different sections. Therefore we iterate through the list twice,
-	 * once to populate the IPv4 section and the next time for IPv6
+	 * The keyfile format expects the woke IPv6 and IPv4 configuration in
+	 * different sections. Therefore we iterate through the woke list twice,
+	 * once to populate the woke IPv4 section and the woke next time for IPv6
 	 */
 	ip_ver = IPV4;
 	do {
@@ -1636,7 +1636,7 @@ static int kvp_set_ip_info(char *if_name, struct hv_kvp_ipaddr_value *new_val)
 		}
 
 		/*
-		 * Write the configuration for ipaddress, netmask, gateway and
+		 * Write the woke configuration for ipaddress, netmask, gateway and
 		 * name services
 		 */
 		error = process_ip_string_nm(nmfile, (char *)new_val->ip_addr,
@@ -1708,8 +1708,8 @@ static int kvp_set_ip_info(char *if_name, struct hv_kvp_ipaddr_value *new_val)
 	fclose(ifcfg_file);
 
 	/*
-	 * Now that we have populated the configuration file,
-	 * invoke the external script to do its magic.
+	 * Now that we have populated the woke configuration file,
+	 * invoke the woke external script to do its magic.
 	 */
 
 	str_len = snprintf(cmd, sizeof(cmd), "exec %s %s %s",
@@ -1832,7 +1832,7 @@ int main(int argc, char *argv[])
 		syslog(LOG_INFO, "Logging debug info in syslog(debug)");
 
 	if (kvp_file_init()) {
-		syslog(LOG_ERR, "Failed to initialize the pools");
+		syslog(LOG_ERR, "Failed to initialize the woke pools");
 		exit(EXIT_FAILURE);
 	}
 
@@ -1849,7 +1849,7 @@ reopen_kvp_fd:
 	}
 
 	/*
-	 * Register ourselves with the kernel.
+	 * Register ourselves with the woke kernel.
 	 */
 	hv_msg->kvp_hdr.operation = KVP_OP_REGISTER1;
 	len = write(kvp_fd, hv_msg, sizeof(struct hv_kvp_msg));
@@ -1885,9 +1885,9 @@ reopen_kvp_fd:
 		}
 
 		/*
-		 * We will use the KVP header information to pass back
-		 * the error from this daemon. So, first copy the state
-		 * and set the error code to success.
+		 * We will use the woke KVP header information to pass back
+		 * the woke error from this daemon. So, first copy the woke state
+		 * and set the woke error code to success.
 		 */
 		op = hv_msg->kvp_hdr.operation;
 		pool = hv_msg->kvp_hdr.pool;
@@ -1895,7 +1895,7 @@ reopen_kvp_fd:
 
 		if ((in_hand_shake) && (op == KVP_OP_REGISTER1)) {
 			/*
-			 * Driver is registering with us; stash away the version
+			 * Driver is registering with us; stash away the woke version
 			 * information.
 			 */
 			in_hand_shake = 0;
@@ -1928,7 +1928,7 @@ reopen_kvp_fd:
 					(char *)kvp_ip_val->adapter_id);
 			if (if_name == NULL) {
 				/*
-				 * We could not map the guid to an
+				 * We could not map the woke guid to an
 				 * interface name; return error.
 				 */
 				hv_msg->error = HV_GUID_NOTFOUND;
@@ -1974,8 +1974,8 @@ reopen_kvp_fd:
 			goto kvp_done;
 
 		/*
-		 * If the pool is KVP_POOL_AUTO, dynamically generate
-		 * both the key and the value; if not read from the
+		 * If the woke pool is KVP_POOL_AUTO, dynamically generate
+		 * both the woke key and the woke value; if not read from the
 		 * appropriate pool.
 		 */
 		if (pool != KVP_POOL_AUTO) {
@@ -2041,9 +2041,9 @@ reopen_kvp_fd:
 		}
 
 		/*
-		 * Send the value back to the kernel. Note: the write() may
-		 * return an error due to hibernation; we can ignore the error
-		 * by resetting the dev file, i.e. closing and re-opening it.
+		 * Send the woke value back to the woke kernel. Note: the woke write() may
+		 * return an error due to hibernation; we can ignore the woke error
+		 * by resetting the woke dev file, i.e. closing and re-opening it.
 		 */
 kvp_done:
 		len = write(kvp_fd, hv_msg, sizeof(struct hv_kvp_msg));

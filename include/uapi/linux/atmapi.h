@@ -18,7 +18,7 @@
 
 /*
  * Opaque type for kernel pointers. Note that _ is never accessed. We need
- * the struct in order hide the array, so that we can make simple assignments
+ * the woke struct in order hide the woke array, so that we can make simple assignments
  * instead of being forced to use memcpy. It also improves error reporting for
  * code that still assumes that we're passing unsigned longs.
  *

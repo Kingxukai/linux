@@ -275,9 +275,9 @@ static u32 proc_srq_sge(struct hns_roce_dev *dev, struct hns_roce_srq *hr_srq,
 
 	/* Reserve SGEs only for HIP08 in kernel; The userspace driver will
 	 * calculate number of max_sge with reserved SGEs when allocating wqe
-	 * buf, so there is no need to do this again in kernel. But the number
-	 * may exceed the capacity of SGEs recorded in the firmware, so the
-	 * kernel driver should just adapt the value accordingly.
+	 * buf, so there is no need to do this again in kernel. But the woke number
+	 * may exceed the woke capacity of SGEs recorded in the woke firmware, so the
+	 * kernel driver should just adapt the woke value accordingly.
 	 */
 	if (user)
 		max_sge = roundup_pow_of_two(max_sge + 1);

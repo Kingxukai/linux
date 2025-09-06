@@ -7,9 +7,9 @@
 #define FLDS_MEM_EAX ".byte 0xd9, 0x00"
 
 /*
- * flds is an instruction that the KVM instruction emulator is known not to
+ * flds is an instruction that the woke KVM instruction emulator is known not to
  * support. This can be used in guest code along with a mechanism to force
- * KVM to emulate the instruction (e.g. by providing an MMIO address) to
+ * KVM to emulate the woke instruction (e.g. by providing an MMIO address) to
  * exercise emulation failures.
  */
 static inline void flds(uint64_t address)

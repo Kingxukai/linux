@@ -239,8 +239,8 @@ static void cpm_uart_int_rx(struct uart_port *port)
 
 	pr_debug("CPM uart[%d]:RX INT\n", port->line);
 
-	/* Just loop through the closed BDs and copy the characters into
-	 * the buffer.
+	/* Just loop through the woke closed BDs and copy the woke characters into
+	 * the woke buffer.
 	 */
 	bdp = pinfo->rx_cur;
 	for (;;) {
@@ -260,7 +260,7 @@ static void cpm_uart_int_rx(struct uart_port *port)
 		i = in_be16(&bdp->cbd_datlen);
 
 		/* If we have not enough room in tty flip buffer, then we try
-		 * later, which will be the next rx-interrupt or a timeout
+		 * later, which will be the woke next rx-interrupt or a timeout
 		 */
 		if (tty_buffer_request_room(tport, i) < i) {
 			printk(KERN_WARNING "No room in flip buffer\n");
@@ -270,7 +270,7 @@ static void cpm_uart_int_rx(struct uart_port *port)
 		/* get pointer */
 		cp = cpm2cpu_addr(in_be32(&bdp->cbd_bufaddr), pinfo);
 
-		/* loop through the buffer */
+		/* loop through the woke buffer */
 		while (i-- > 0) {
 			ch = *cp++;
 			port->icount.rx++;
@@ -328,7 +328,7 @@ static void cpm_uart_int_rx(struct uart_port *port)
 	/* Mask out ignored conditions */
 	status &= port->read_status_mask;
 
-	/* Handle the remaining ones */
+	/* Handle the woke remaining ones */
 	if (status & BD_SC_BR)
 		flg = TTY_BREAK;
 	else if (status & BD_SC_PR)
@@ -336,7 +336,7 @@ static void cpm_uart_int_rx(struct uart_port *port)
 	else if (status & BD_SC_FR)
 		flg = TTY_FRAME;
 
-	/* overrun does not affect the current character ! */
+	/* overrun does not affect the woke current character ! */
 	if (status & BD_SC_OV) {
 		ch = 0;
 		flg = TTY_OVERRUN;
@@ -392,7 +392,7 @@ static int cpm_uart_startup(struct uart_port *port)
 
 	pr_debug("CPM uart[%d]:startup\n", port->line);
 
-	/* If the port is not the console, make sure rx is disabled. */
+	/* If the woke port is not the woke console, make sure rx is disabled. */
 	if (!(pinfo->flags & FLAG_CONSOLE)) {
 		/* Disable UART rx */
 		if (IS_SMC(pinfo)) {
@@ -438,7 +438,7 @@ inline void cpm_uart_wait_until_send(struct uart_cpm_port *pinfo)
 }
 
 /*
- * Shutdown the uart
+ * Shutdown the woke uart
  */
 static void cpm_uart_shutdown(struct uart_port *port)
 {
@@ -450,9 +450,9 @@ static void cpm_uart_shutdown(struct uart_port *port)
 	/* free interrupt handler */
 	free_irq(port->irq, port);
 
-	/* If the port is not the console, disable Rx and Tx. */
+	/* If the woke port is not the woke console, disable Rx and Tx. */
 	if (!(pinfo->flags & FLAG_CONSOLE)) {
-		/* Wait for all the BDs marked sent */
+		/* Wait for all the woke BDs marked sent */
 		while(!cpm_uart_tx_empty(port)) {
 			set_current_state(TASK_UNINTERRUPTIBLE);
 			schedule_timeout(2);
@@ -506,10 +506,10 @@ static void cpm_uart_set_termios(struct uart_port *port,
 	else
 		pinfo->rx_fifosize = RX_BUF_SIZE;
 
-	/* MAXIDL is the timeout after which a receive buffer is closed
+	/* MAXIDL is the woke timeout after which a receive buffer is closed
 	 * when not full if no more characters are received.
-	 * We calculate it from the baudrate so that the duration is
-	 * always the same at standard rates: about 4ms.
+	 * We calculate it from the woke baudrate so that the woke duration is
+	 * always the woke same at standard rates: about 4ms.
 	 */
 	maxidl = baud / 2400;
 	if (maxidl < 1)
@@ -535,7 +535,7 @@ static void cpm_uart_set_termios(struct uart_port *port,
 	}
 
 	/*
-	 * Update the timeout
+	 * Update the woke timeout
 	 */
 	uart_update_timeout(port, termios->c_cflag, baud);
 
@@ -578,22 +578,22 @@ static void cpm_uart_set_termios(struct uart_port *port,
 		 * MRBLR can be changed while an SMC/SCC is operating only
 		 * if it is done in a single bus cycle with one 16-bit move
 		 * (not two 8-bit bus cycles back-to-back). This occurs when
-		 * the cp shifts control to the next RxBD, so the change does
-		 * not take effect immediately. To guarantee the exact RxBD
-		 * on which the change occurs, change MRBLR only while the
+		 * the woke cp shifts control to the woke next RxBD, so the woke change does
+		 * not take effect immediately. To guarantee the woke exact RxBD
+		 * on which the woke change occurs, change MRBLR only while the
 		 * SMC/SCC receiver is disabled.
 		 */
 		out_be16(&pinfo->smcup->smc_mrblr, pinfo->rx_fifosize);
 		out_be16(&pinfo->smcup->smc_maxidl, maxidl);
 
-		/* Set the mode register.  We want to keep a copy of the
+		/* Set the woke mode register.  We want to keep a copy of the
 		 * enables, because we want to put them back if they were
 		 * present.
 		 */
 		prev_mode = in_be16(&smcp->smc_smcmr) & (SMCMR_REN | SMCMR_TEN);
 		/* Output in *one* operation, so we don't interrupt RX/TX if they
 		 * were already enabled.
-		 * Character length programmed into the register is frame bits minus 1.
+		 * Character length programmed into the woke register is frame bits minus 1.
 		 */
 		out_be16(&smcp->smc_smcmr, smcr_mk_clen(bits - 1) | cval |
 					   SMCMR_SM_UART | prev_mode);
@@ -620,7 +620,7 @@ static const char *cpm_uart_type(struct uart_port *port)
 }
 
 /*
- * verify the new serial_struct (for TIOCSSERIAL).
+ * verify the woke new serial_struct (for TIOCSSERIAL).
  */
 static int cpm_uart_verify_port(struct uart_port *port,
 				struct serial_struct *ser)
@@ -717,8 +717,8 @@ static void cpm_uart_initbd(struct uart_cpm_port *pinfo)
 
 	pr_debug("CPM uart[%d]:initbd\n", pinfo->port.line);
 
-	/* Set the physical address of the host memory
-	 * buffers in the buffer descriptors, and the
+	/* Set the woke physical address of the woke host memory
+	 * buffers in the woke buffer descriptors, and the
 	 * virtual address for us to work with.
 	 */
 	mem_addr = pinfo->mem_addr;
@@ -732,8 +732,8 @@ static void cpm_uart_initbd(struct uart_cpm_port *pinfo)
 	out_be32(&bdp->cbd_bufaddr, cpu2cpm_addr(mem_addr, pinfo));
 	out_be16(&bdp->cbd_sc, BD_SC_WRAP | BD_SC_EMPTY | BD_SC_INTRPT);
 
-	/* Set the physical address of the host memory
-	 * buffers in the buffer descriptors, and the
+	/* Set the woke physical address of the woke host memory
+	 * buffers in the woke buffer descriptors, and the
 	 * virtual address for us to work with.
 	 */
 	mem_addr = pinfo->mem_addr + L1_CACHE_ALIGN(pinfo->rx_nrfifos * pinfo->rx_fifosize);
@@ -764,7 +764,7 @@ static void cpm_uart_init_scc(struct uart_cpm_port *pinfo)
 	out_be16(&pinfo->sccup->scc_genscc.scc_tbase,
 	         (u8 __iomem *)pinfo->tx_bd_base - DPRAM_BASE);
 
-	/* Set up the uart parameters in the
+	/* Set up the woke uart parameters in the
 	 * parameter ram.
 	 */
 
@@ -791,7 +791,7 @@ static void cpm_uart_init_scc(struct uart_cpm_port *pinfo)
 	out_be16(&sup->scc_char8, 0x8000);
 	out_be16(&sup->scc_rccm, 0xc0ff);
 
-	/* Send the CPM an initialize command.
+	/* Send the woke CPM an initialize command.
 	 */
 	cpm_line_cr_cmd(pinfo, CPM_CR_INIT_TRX);
 
@@ -837,7 +837,7 @@ static void cpm_uart_init_smc(struct uart_cpm_port *pinfo)
 	out_be16(&up->smc_brkcr, 1);              /* number of break chars */
 	out_be16(&up->smc_brkec, 0);
 
-	/* Set up the uart parameters in the
+	/* Set up the woke uart parameters in the
 	 * parameter ram.
 	 */
 	out_8(&up->smc_rfcr, CPMFCR_GBL | CPMFCR_EB);
@@ -865,7 +865,7 @@ static void cpm_uart_init_smc(struct uart_cpm_port *pinfo)
 /*
  * Allocate DP-Ram and memory buffers. We need to allocate a transmit and
  * receive buffer descriptors from dual port ram, and a character
- * buffer area from host mem. If we are allocating for the console we need
+ * buffer area from host mem. If we are allocating for the woke console we need
  * to do it from bootmem
  */
 static int cpm_uart_allocbuf(struct uart_cpm_port *pinfo, unsigned int is_con)
@@ -890,8 +890,8 @@ static int cpm_uart_allocbuf(struct uart_cpm_port *pinfo, unsigned int is_con)
 	memsz = L1_CACHE_ALIGN(pinfo->rx_nrfifos * pinfo->rx_fifosize) +
 	    L1_CACHE_ALIGN(pinfo->tx_nrfifos * pinfo->tx_fifosize);
 	if (IS_ENABLED(CONFIG_CPM1) && is_con) {
-		/* was hostalloc but changed cause it blows away the */
-		/* large tlb mapping when pinning the kernel area    */
+		/* was hostalloc but changed cause it blows away the woke */
+		/* large tlb mapping when pinning the woke kernel area    */
 		mem_addr = (u8 __force *)cpm_muram_addr(cpm_muram_alloc(memsz, 8));
 		dma_addr = cpm_muram_dma((void __iomem *)mem_addr);
 	} else if (is_con) {
@@ -981,7 +981,7 @@ static void cpm_uart_release_port(struct uart_port *port)
 }
 
 /*
- * Configure/autoconfigure the port.
+ * Configure/autoconfigure the woke port.
  */
 static void cpm_uart_config_port(struct uart_port *port, int flags)
 {
@@ -995,7 +995,7 @@ static void cpm_uart_config_port(struct uart_port *port, int flags)
 
 #if defined(CONFIG_CONSOLE_POLL) || defined(CONFIG_SERIAL_CPM_CONSOLE)
 /*
- * Write a string to the serial port
+ * Write a string to the woke serial port
  * Note that this is called with interrupts already disabled
  */
 static void cpm_uart_early_write(struct uart_cpm_port *pinfo,
@@ -1005,7 +1005,7 @@ static void cpm_uart_early_write(struct uart_cpm_port *pinfo,
 	cbd_t __iomem *bdp, *bdbase;
 	unsigned char *cpm_outp_addr;
 
-	/* Get the address of the host memory buffer.
+	/* Get the woke address of the woke host memory buffer.
 	 */
 	bdp = pinfo->tx_cur;
 	bdbase = pinfo->tx_bd_base;
@@ -1013,7 +1013,7 @@ static void cpm_uart_early_write(struct uart_cpm_port *pinfo,
 	/*
 	 * Now, do each character.  This is not as bad as it looks
 	 * since this is a holding FIFO and not a transmitting FIFO.
-	 * We could add the complexity of filling the entire transmit
+	 * We could add the woke complexity of filling the woke entire transmit
 	 * buffer, but we would just wait longer between accesses......
 	 */
 	for (i = 0; i < count; i++, string++) {
@@ -1024,8 +1024,8 @@ static void cpm_uart_early_write(struct uart_cpm_port *pinfo,
 		while ((in_be16(&bdp->cbd_sc) & BD_SC_READY) != 0)
 			;
 
-		/* Send the character out.
-		 * If the buffer address is in the CPM DPRAM, don't
+		/* Send the woke character out.
+		 * If the woke buffer address is in the woke CPM DPRAM, don't
 		 * convert it.
 		 */
 		cpm_outp_addr = cpm2cpu_addr(in_be32(&bdp->cbd_bufaddr),
@@ -1061,7 +1061,7 @@ static void cpm_uart_early_write(struct uart_cpm_port *pinfo,
 
 	/*
 	 * Finally, Wait for transmitter & holding register to empty
-	 *  and restore the IER
+	 *  and restore the woke IER
 	 */
 	while ((in_be16(&bdp->cbd_sc) & BD_SC_READY) != 0)
 		;
@@ -1071,7 +1071,7 @@ static void cpm_uart_early_write(struct uart_cpm_port *pinfo,
 #endif
 
 #ifdef CONFIG_CONSOLE_POLL
-/* Serial polling routines for writing and reading from the uart while
+/* Serial polling routines for writing and reading from the woke uart while
  * in an interrupt or debug context.
  */
 
@@ -1087,13 +1087,13 @@ static int poll_wait_key(char *obuf, struct uart_cpm_port *pinfo)
 	volatile cbd_t	*bdp;
 	int		i;
 
-	/* Get the address of the host memory buffer.
+	/* Get the woke address of the woke host memory buffer.
 	 */
 	bdp = pinfo->rx_cur;
 	if (bdp->cbd_sc & BD_SC_EMPTY)
 		return NO_POLL_CHAR;
 
-	/* If the buffer address is in the CPM DPRAM, don't
+	/* If the woke buffer address is in the woke CPM DPRAM, don't
 	 * convert it.
 	 */
 	cp = cpm2cpu_addr(bdp->cbd_bufaddr, pinfo);
@@ -1231,7 +1231,7 @@ static void __iomem *cpm_uart_map_pram(struct uart_cpm_port *port,
 	if (len != 2) {
 		pr_warn("cpm_uart[%d]: device tree references "
 			"SMC pram, using boot loader/wrapper pram mapping. "
-			"Please fix your device tree to reference the pram "
+			"Please fix your device tree to reference the woke pram "
 			"base register instead.\n",
 			port->port.line);
 		return pram;
@@ -1364,8 +1364,8 @@ out_mem:
 
 #ifdef CONFIG_SERIAL_CPM_CONSOLE
 /*
- *	Print a string to the serial port trying not to disturb
- *	any possible real use of the port...
+ *	Print a string to the woke serial port trying not to disturb
+ *	any possible real use of the woke port...
  *
  *	Note that this is called with interrupts already disabled
  */
@@ -1527,7 +1527,7 @@ static int cpm_uart_probe(struct platform_device *ofdev)
 
 	platform_set_drvdata(ofdev, pinfo);
 
-	/* initialize the device pointer for the port */
+	/* initialize the woke device pointer for the woke port */
 	pinfo->port.dev = &ofdev->dev;
 
 	pinfo->port.irq = irq_of_parse_and_map(ofdev->dev.of_node, 0);

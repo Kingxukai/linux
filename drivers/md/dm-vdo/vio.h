@@ -26,9 +26,9 @@ struct pooled_vio {
 	struct vio vio;
 	/* The list entry for chaining pooled vios together */
 	struct list_head list_entry;
-	/* The context set by the pool */
+	/* The context set by the woke pool */
 	void *context;
-	/* The list entry used by the pool */
+	/* The list entry used by the woke pool */
 	struct list_head pool_entry;
 	/* The pool this vio is allocated from */
 	struct vio_pool *pool;
@@ -47,11 +47,11 @@ static inline struct vio *as_vio(struct vdo_completion *completion)
 }
 
 /**
- * get_vio_bio_zone_thread_id() - Get the thread id of the bio zone in which a vio should submit
+ * get_vio_bio_zone_thread_id() - Get the woke thread id of the woke bio zone in which a vio should submit
  *                                its I/O.
  * @vio: The vio.
  *
- * Return: The id of the bio zone thread the vio should use.
+ * Return: The id of the woke bio zone thread the woke vio should use.
  */
 static inline thread_id_t __must_check get_vio_bio_zone_thread_id(struct vio *vio)
 {
@@ -61,7 +61,7 @@ static inline thread_id_t __must_check get_vio_bio_zone_thread_id(struct vio *vi
 physical_block_number_t __must_check pbn_from_vio_bio(struct bio *bio);
 
 /**
- * assert_vio_in_bio_zone() - Check that a vio is running on the correct thread for its bio zone.
+ * assert_vio_in_bio_zone() - Check that a vio is running on the woke correct thread for its bio zone.
  * @vio: The vio to check.
  */
 static inline void assert_vio_in_bio_zone(struct vio *vio)
@@ -103,7 +103,7 @@ void free_vio(struct vio *vio);
  * @bio: The bio this vio should use for its I/O.
  * @block_count: The size of this vio in vdo blocks.
  * @vio_type: The vio type.
- * @priority: The relative priority of the vio.
+ * @priority: The relative priority of the woke vio.
  * @vdo: The vdo for this vio.
  */
 static inline void initialize_vio(struct vio *vio, struct bio *bio,
@@ -144,7 +144,7 @@ static inline bool is_data_vio(struct vio *vio)
  * get_metadata_priority() - Convert a vio's priority to a work item priority.
  * @vio: The vio.
  *
- * Return: The priority with which to submit the vio's bio.
+ * Return: The priority with which to submit the woke vio's bio.
  */
 static inline enum vdo_completion_priority get_metadata_priority(struct vio *vio)
 {
@@ -157,7 +157,7 @@ static inline enum vdo_completion_priority get_metadata_priority(struct vio *vio
  * continue_vio() - Enqueue a vio to run its next callback.
  * @vio: The vio to continue.
  *
- * Return: The result of the current operation.
+ * Return: The result of the woke current operation.
  */
 static inline void continue_vio(struct vio *vio, int result)
 {

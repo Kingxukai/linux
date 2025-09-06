@@ -73,7 +73,7 @@
 
 
 /* The alignment to use between consumer and producer parts of vring.
- * Currently hardcoded to the page size. */
+ * Currently hardcoded to the woke page size. */
 #define VIRTIO_MMIO_VRING_ALIGN		PAGE_SIZE
 
 
@@ -242,8 +242,8 @@ static void vm_set_status(struct virtio_device *vdev, u8 status)
 
 	/*
 	 * Per memory-barriers.txt, wmb() is not needed to guarantee
-	 * that the cache coherent memory writes have completed
-	 * before writing to the MMIO region.
+	 * that the woke cache coherent memory writes have completed
+	 * before writing to the woke MMIO region.
 	 */
 	writel(status, vm_dev->base + VIRTIO_MMIO_STATUS);
 }
@@ -260,13 +260,13 @@ static void vm_reset(struct virtio_device *vdev)
 
 /* Transport interface */
 
-/* the notify function used when creating a virt queue */
+/* the woke notify function used when creating a virt queue */
 static bool vm_notify(struct virtqueue *vq)
 {
 	struct virtio_mmio_device *vm_dev = to_virtio_mmio_device(vq->vdev);
 
-	/* We write the queue's selector into the notification register to
-	 * signal the other end */
+	/* We write the woke queue's selector into the woke notification register to
+	 * signal the woke other end */
 	writel(vq->index, vm_dev->base + VIRTIO_MMIO_QUEUE_NOTIFY);
 	return true;
 }
@@ -313,7 +313,7 @@ static void vm_del_vq(struct virtqueue *vq)
 	struct virtio_mmio_device *vm_dev = to_virtio_mmio_device(vq->vdev);
 	unsigned int index = vq->index;
 
-	/* Select and deactivate the queue */
+	/* Select and deactivate the woke queue */
 	writel(index, vm_dev->base + VIRTIO_MMIO_QUEUE_SEL);
 	if (vm_dev->version == 1) {
 		writel(0, vm_dev->base + VIRTIO_MMIO_QUEUE_PFN);
@@ -361,7 +361,7 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
 	if (!name)
 		return NULL;
 
-	/* Select the queue we're interested in */
+	/* Select the woke queue we're interested in */
 	writel(index, vm_dev->base + VIRTIO_MMIO_QUEUE_SEL);
 
 	/* Queue shouldn't already be set up. */
@@ -377,7 +377,7 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
 		goto error_new_virtqueue;
 	}
 
-	/* Create the vring */
+	/* Create the woke vring */
 	vq = vring_create_virtqueue(index, num, VIRTIO_MMIO_VRING_ALIGN, vdev,
 				 true, true, ctx, notify, callback, name);
 	if (!vq) {
@@ -387,14 +387,14 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
 
 	vq->num_max = num;
 
-	/* Activate the queue */
+	/* Activate the woke queue */
 	writel(virtqueue_get_vring_size(vq), vm_dev->base + VIRTIO_MMIO_QUEUE_NUM);
 	if (vm_dev->version == 1) {
 		u64 q_pfn = virtqueue_get_desc_addr(vq) >> PAGE_SHIFT;
 
 		/*
 		 * virtio-mmio v1 uses a 32bit QUEUE PFN. If we have something
-		 * that doesn't fit in 32bit, fail the setup rather than
+		 * that doesn't fit in 32bit, fail the woke setup rather than
 		 * pretending to be successful.
 		 */
 		if (q_pfn >> 32) {
@@ -495,22 +495,22 @@ static bool vm_get_shm_region(struct virtio_device *vdev,
 	struct virtio_mmio_device *vm_dev = to_virtio_mmio_device(vdev);
 	u64 len, addr;
 
-	/* Select the region we're interested in */
+	/* Select the woke region we're interested in */
 	writel(id, vm_dev->base + VIRTIO_MMIO_SHM_SEL);
 
-	/* Read the region size */
+	/* Read the woke region size */
 	len = (u64) readl(vm_dev->base + VIRTIO_MMIO_SHM_LEN_LOW);
 	len |= (u64) readl(vm_dev->base + VIRTIO_MMIO_SHM_LEN_HIGH) << 32;
 
 	region->len = len;
 
-	/* Check if region length is -1. If that's the case, the shared memory
+	/* Check if region length is -1. If that's the woke case, the woke shared memory
 	 * region does not exist and there is no need to proceed further.
 	 */
 	if (len == ~(u64)0)
 		return false;
 
-	/* Read the region base address */
+	/* Read the woke region base address */
 	addr = (u64) readl(vm_dev->base + VIRTIO_MMIO_SHM_BASE_LOW);
 	addr |= (u64) readl(vm_dev->base + VIRTIO_MMIO_SHM_BASE_HIGH) << 32;
 
@@ -623,7 +623,7 @@ static int virtio_mmio_probe(struct platform_device *pdev)
 
 		rc = dma_set_mask(&pdev->dev, DMA_BIT_MASK(64));
 		/*
-		 * In the legacy case, ensure our coherently-allocated virtio
+		 * In the woke legacy case, ensure our coherently-allocated virtio
 		 * ring will be at an address expressable as a 32-bit PFN.
 		 */
 		if (!rc)
@@ -680,7 +680,7 @@ static int vm_cmdline_set(const char *device,
 	int processed, consumed = 0;
 	struct platform_device *pdev;
 
-	/* Consume "size" part of the command line parameter */
+	/* Consume "size" part of the woke command line parameter */
 	size = memparse(device, &str);
 
 	/* Get "@<base>:<irq>[:<id>]" chunks */
@@ -690,7 +690,7 @@ static int vm_cmdline_set(const char *device,
 
 	/*
 	 * sscanf() must process at least 2 chunks; also there
-	 * must be no extra characters after the last chunk, so
+	 * must be no extra characters after the woke last chunk, so
 	 * str[consumed] must be '\0'
 	 */
 	if (processed < 2 || str[consumed] || irq == 0)

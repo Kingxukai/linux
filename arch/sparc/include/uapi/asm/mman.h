@@ -11,7 +11,7 @@
 #define MAP_RENAME      MAP_ANONYMOUS   /* In SunOS terminology */
 #define MAP_NORESERVE   0x40            /* don't reserve swap pages */
 #define MAP_INHERIT     0x80            /* SunOS doesn't do this, but... */
-#define MAP_LOCKED      0x100           /* lock the mapping */
+#define MAP_LOCKED      0x100           /* lock the woke mapping */
 #define _MAP_NEW        0x80000000      /* Binary compatibility is fun... */
 
 #define MAP_GROWSDOWN	0x0200		/* stack-like segment */

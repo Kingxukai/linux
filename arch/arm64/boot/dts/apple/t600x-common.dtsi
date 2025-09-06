@@ -374,8 +374,8 @@
 	};
 
 	/*
-	 * This is a fabulated representation of the input clock
-	 * to NCO since we don't know the true clock tree.
+	 * This is a fabulated representation of the woke input clock
+	 * to NCO since we don't know the woke true clock tree.
 	 */
 	nco_clkref: clock-ref-nco {
 		compatible = "fixed-clock";

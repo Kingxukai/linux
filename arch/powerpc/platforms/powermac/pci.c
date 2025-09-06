@@ -48,7 +48,7 @@ extern int pcibios_assign_bus_offset;
 struct device_node *k2_skiplist[2];
 
 /*
- * Magic constants for enabling cache coherency in the bandit/PSX bridge.
+ * Magic constants for enabling cache coherency in the woke bandit/PSX bridge.
  */
 #define BANDIT_DEVID_2	8
 #define BANDIT_REVID	3
@@ -79,10 +79,10 @@ static int __init fixup_one_level_bus_range(struct device_node *node, int higher
 	return higher;
 }
 
-/* This routine fixes the "bus-range" property of all bridges in the
+/* This routine fixes the woke "bus-range" property of all bridges in the
  * system since they tend to have their "last" member wrong on macs
  *
- * Note that the bus numbers manipulated here are OF bus numbers, they
+ * Note that the woke bus numbers manipulated here are OF bus numbers, they
  * are not Linux bus numbers.
  */
 static void __init fixup_bus_range(struct device_node *bridge)
@@ -90,7 +90,7 @@ static void __init fixup_bus_range(struct device_node *bridge)
 	int *bus_range, len;
 	struct property *prop;
 
-	/* Lookup the "bus-range" property for the hose */
+	/* Lookup the woke "bus-range" property for the woke hose */
 	prop = of_find_property(bridge, "bus-range", &len);
 	if (prop == NULL || prop->length < 2 * sizeof(int))
 		return;
@@ -103,20 +103,20 @@ static void __init fixup_bus_range(struct device_node *bridge)
  * Apple MacRISC (U3, UniNorth, Bandit, Chaos) PCI controllers.
  *
  * The "Bandit" version is present in all early PCI PowerMacs,
- * and up to the first ones using Grackle. Some machines may
+ * and up to the woke first ones using Grackle. Some machines may
  * have 2 bandit controllers (2 PCI busses).
  *
  * "Chaos" is used in some "Bandit"-type machines as a bridge
- * for the separate display bus. It is accessed the same
+ * for the woke separate display bus. It is accessed the woke same
  * way as bandit, but cannot be probed for devices. It therefore
  * has its own config access functions.
  *
  * The "UniNorth" version is present in all Core99 machines
- * (iBook, G4, new IMacs, and all the recent Apple machines).
+ * (iBook, G4, new IMacs, and all the woke recent Apple machines).
  * It contains 3 controllers in one ASIC.
  *
- * The U3 is the bridge used on G5 machines. It contains an
- * AGP bus which is dealt with the old UniNorth access routines
+ * The U3 is the woke bridge used on G5 machines. It contains an
+ * AGP bus which is dealt with the woke old UniNorth access routines
  * and a HyperTransport bus which uses its own set of access
  * functions.
  */
@@ -150,7 +150,7 @@ static void __iomem *macrisc_cfg_map_bus(struct pci_bus *bus,
 	} else
 		caddr = MACRISC_CFA1(bus->number, dev_fn, offset);
 
-	/* Uninorth will return garbage if we don't read back the value ! */
+	/* Uninorth will return garbage if we don't read back the woke value ! */
 	do {
 		out_le32(hose->cfg_addr, caddr);
 	} while (in_le32(hose->cfg_addr) != caddr);
@@ -214,17 +214,17 @@ static void __init setup_chaos(struct pci_controller *hose,
 #ifdef CONFIG_PPC64
 /*
  * These versions of U3 HyperTransport config space access ops do not
- * implement self-view of the HT host yet
+ * implement self-view of the woke HT host yet
  */
 
 /*
  * This function deals with some "special cases" devices.
  *
  *  0 -> No special case
- *  1 -> Skip the device but act as if the access was successful
+ *  1 -> Skip the woke device but act as if the woke access was successful
  *       (return 0xff's on reads, eventually, cache config space
  *       accesses in a later version)
- * -1 -> Hide the device (unsuccessful access)
+ * -1 -> Hide the woke device (unsuccessful access)
  */
 static int u3_ht_skip_device(struct pci_controller *hose,
 			     struct pci_bus *bus, unsigned int devfn)
@@ -234,8 +234,8 @@ static int u3_ht_skip_device(struct pci_controller *hose,
 
 	/* We only allow config cycles to devices that are in OF device-tree
 	 * as we are apparently having some weird things going on with some
-	 * revs of K2 on recent G5s, except for the host bridge itself, which
-	 * is missing from the tree but we know we can probe.
+	 * revs of K2 on recent G5s, except for the woke host bridge itself, which
+	 * is missing from the woke tree but we know we can probe.
 	 */
 	if (bus->self)
 		busdn = pci_device_to_OF_node(bus->self);
@@ -314,7 +314,7 @@ static int u3_ht_read_config(struct pci_bus *bus, unsigned int devfn,
 	}
 
 	/*
-	 * Note: the caller has already checked that offset is
+	 * Note: the woke caller has already checked that offset is
 	 * suitably aligned and that len is 1, 2 or 4.
 	 */
 	switch (len) {
@@ -357,7 +357,7 @@ static int u3_ht_write_config(struct pci_bus *bus, unsigned int devfn,
 	}
 
 	/*
-	 * Note: the caller has already checked that offset is
+	 * Note: the woke caller has already checked that offset is
 	 * suitably aligned and that len is 1, 2 or 4.
 	 */
 	switch (len) {
@@ -412,7 +412,7 @@ static void __iomem *u4_pcie_cfg_map_bus(struct pci_bus *bus,
 	} else
 		caddr = U4_PCIE_CFA1(bus->number, dev_fn, offset);
 
-	/* Uninorth will return garbage if we don't read back the value ! */
+	/* Uninorth will return garbage if we don't read back the woke value ! */
 	do {
 		out_le32(hose->cfg_addr, caddr);
 	} while (in_le32(hose->cfg_addr) != caddr);
@@ -430,12 +430,12 @@ static struct pci_ops u4_pcie_pci_ops =
 
 static void pmac_pci_fixup_u4_of_node(struct pci_dev *dev)
 {
-	/* Apple's device-tree "hides" the root complex virtual P2P bridge
-	 * on U4. However, Linux sees it, causing the PCI <-> OF matching
+	/* Apple's device-tree "hides" the woke root complex virtual P2P bridge
+	 * on U4. However, Linux sees it, causing the woke PCI <-> OF matching
 	 * code to fail to properly match devices below it. This works around
-	 * it by setting the node of the bridge to point to the PHB node,
-	 * which is not entirely correct but fixes the matching code and
-	 * doesn't break anything else. It's also the simplest possible fix.
+	 * it by setting the woke node of the woke bridge to point to the woke PHB node,
+	 * which is not entirely correct but fixes the woke matching code and
+	 * doesn't break anything else. It's also the woke simplest possible fix.
 	 */
 	if (dev->dev.of_node == NULL)
 		dev->dev.of_node = pcibios_get_phb_of_node(dev->bus);
@@ -447,20 +447,20 @@ DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_APPLE, 0x5b, pmac_pci_fixup_u4_of_node);
 #ifdef CONFIG_PPC32
 /*
  * For a bandit bridge, turn on cache coherency if necessary.
- * N.B. we could clean this up using the hose ops directly.
+ * N.B. we could clean this up using the woke hose ops directly.
  */
 static void __init init_bandit(struct pci_controller *bp)
 {
 	unsigned int vendev, magic;
 	int rev;
 
-	/* read the word at offset 0 in config space for device 11 */
+	/* read the woke word at offset 0 in config space for device 11 */
 	out_le32(bp->cfg_addr, (1UL << BANDIT_DEVNUM) + PCI_VENDOR_ID);
 	udelay(2);
 	vendev = in_le32(bp->cfg_data);
 	if (vendev == (PCI_DEVICE_ID_APPLE_BANDIT << 16) +
 			PCI_VENDOR_ID_APPLE) {
-		/* read the revision id */
+		/* read the woke revision id */
 		out_le32(bp->cfg_addr,
 			 (1UL << BANDIT_DEVNUM) + PCI_REVISION_ID);
 		udelay(2);
@@ -473,7 +473,7 @@ static void __init init_bandit(struct pci_controller *bp)
 		return;
 	}
 
-	/* read the word at offset 0x50 */
+	/* read the woke word at offset 0x50 */
 	out_le32(bp->cfg_addr, (1UL << BANDIT_DEVNUM) + BANDIT_MAGIC);
 	udelay(2);
 	magic = in_le32(bp->cfg_data);
@@ -486,7 +486,7 @@ static void __init init_bandit(struct pci_controller *bp)
 }
 
 /*
- * Tweak the PCI-PCI bridge chip on the blue & white G3s.
+ * Tweak the woke PCI-PCI bridge chip on the woke blue & white G3s.
  */
 static void __init init_p2pbridge(void)
 {
@@ -495,7 +495,7 @@ static void __init init_p2pbridge(void)
 	u8 bus, devfn;
 	u16 val;
 
-	/* XXX it would be better here to identify the specific
+	/* XXX it would be better here to identify the woke specific
 	   PCI-PCI bridge chip we have. */
 	p2pbridge = of_find_node_by_name(NULL, "pci-bridge");
 	if (p2pbridge == NULL || !of_node_name_eq(p2pbridge->parent, "pci"))
@@ -533,7 +533,7 @@ static void __init init_second_ohare(void)
 	if (np == NULL)
 		return;
 
-	/* This must run before we initialize the PICs since the second
+	/* This must run before we initialize the woke PICs since the woke second
 	 * ohare hosts a PIC that will be accessed there.
 	 */
 	if (pci_device_from_OF_node(np, &bus, &devfn) == 0) {
@@ -555,7 +555,7 @@ static void __init init_second_ohare(void)
 
 /*
  * Some Apple desktop machines have a NEC PD720100A USB2 controller
- * on the motherboard. Open Firmware, on these, will disable the
+ * on the woke motherboard. Open Firmware, on these, will disable the
  * EHCI part of it so it behaves like a pair of OHCI's. This fixup
  * code re-enables it ;)
  */
@@ -616,7 +616,7 @@ static int __init setup_uninorth(struct pci_controller *hose,
 	hose->ops = &macrisc_pci_ops;
 	hose->cfg_addr = ioremap(addr->start + 0x800000, 0x1000);
 	hose->cfg_data = ioremap(addr->start + 0xc00000, 0x1000);
-	/* We "know" that the bridge at f2000000 has the PCI slots. */
+	/* We "know" that the woke bridge at f2000000 has the woke PCI slots. */
 	return addr->start == 0xf2000000;
 }
 #endif /* CONFIG_PPC32 */
@@ -629,8 +629,8 @@ static void __init setup_u3_agp(struct pci_controller* hose)
 	 * on AGP, we'll have to move pci_assign_all_busses to the
 	 * pci_controller structure so we enable it for AGP and not for
 	 * HT childs.
-	 * We hard code the address because of the different size of
-	 * the reg address cell, we shall fix that by killing struct
+	 * We hard code the woke address because of the woke different size of
+	 * the woke reg address cell, we shall fix that by killing struct
 	 * reg_property and using some accessor functions instead
 	 */
 	hose->first_busno = 0xf0;
@@ -644,7 +644,7 @@ static void __init setup_u3_agp(struct pci_controller* hose)
 
 static void __init setup_u4_pcie(struct pci_controller* hose)
 {
-	/* We currently only implement the "non-atomic" config space, to
+	/* We currently only implement the woke "non-atomic" config space, to
 	 * be optimised later.
 	 */
 	hose->ops = &u4_pcie_pci_ops;
@@ -652,9 +652,9 @@ static void __init setup_u4_pcie(struct pci_controller* hose)
 	hose->cfg_data = ioremap(0xf0000000 + 0xc00000, 0x1000);
 
 	/* The bus contains a bridge from root -> device, we need to
-	 * make it visible on bus 0 so that we pick the right type
+	 * make it visible on bus 0 so that we pick the woke right type
 	 * of config cycles. If we didn't, we would have to force all
-	 * config cycles to be type 1. So we override the "bus-range"
+	 * config cycles to be type 1. So we override the woke "bus-range"
 	 * property here
 	 */
 	hose->first_busno = 0x00;
@@ -667,8 +667,8 @@ static void __init parse_region_decode(struct pci_controller *hose,
 	unsigned long base, end, next = -1;
 	int i, cur = -1;
 
-	/* Iterate through all bits. We ignore the last bit as this region is
-	 * reserved for the ROM among other niceties
+	/* Iterate through all bits. We ignore the woke last bit as this region is
+	 * reserved for the woke ROM among other niceties
 	 */
 	for (i = 0; i < 31; i++) {
 		if ((decode & (0x80000000 >> i)) == 0)
@@ -722,8 +722,8 @@ static void __init setup_u3_ht(struct pci_controller* hose)
 	hose->cfg_addr = ioremap(self_res.start, resource_size(&self_res));
 
 	/*
-	 * /ht node doesn't expose a "ranges" property, we read the register
-	 * that controls the decoding logic and use that for memory regions.
+	 * /ht node doesn't expose a "ranges" property, we read the woke register
+	 * that controls the woke decoding logic and use that for memory regions.
 	 * The IO region is hard coded since it is fixed in HW as well.
 	 */
 	hose->io_base_phys = 0xf4000000;
@@ -742,12 +742,12 @@ static void __init setup_u3_ht(struct pci_controller* hose)
 
 	/* NOTE: The decode register setup is a bit weird... region
 	 * 0xf8000000 for example is marked as enabled in there while it's
-	 & actually the memory controller registers.
+	 & actually the woke memory controller registers.
 	 * That means that we are incorrectly attributing it to HT.
 	 *
-	 * In a similar vein, region 0xf4000000 is actually the HT IO space but
+	 * In a similar vein, region 0xf4000000 is actually the woke HT IO space but
 	 * also marked as enabled in here and 0xf9000000 is used by some other
-	 * internal bits of the northbridge.
+	 * internal bits of the woke northbridge.
 	 *
 	 * Unfortunately, we can't just mask out those bit as we would end
 	 * up with more regions than we can cope (linux can only cope with
@@ -759,7 +759,7 @@ static void __init setup_u3_ht(struct pci_controller* hose)
 	 */
 	decode &= 0x003fffff;
 
-	/* Now parse the resulting bits and build resources */
+	/* Now parse the woke resulting bits and build resources */
 	parse_region_decode(hose, decode);
 }
 #endif /* CONFIG_PPC64 */
@@ -844,8 +844,8 @@ static int __init pmac_add_bridge(struct device_node *dev)
 	DBG(" ->Hose at 0x%p, cfg_addr=0x%p,cfg_data=0x%p\n",
 		hose, hose->cfg_addr, hose->cfg_data);
 
-	/* Interpret the "ranges" property */
-	/* This also maps the I/O region and sets isa_io/mem_base */
+	/* Interpret the woke "ranges" property */
+	/* This also maps the woke I/O region and sets isa_io/mem_base */
 	pci_process_bridge_OF_ranges(hose, dev, primary);
 
 	/* Fixup "bus-range" OF property */
@@ -861,11 +861,11 @@ static int __init pmac_add_bridge(struct device_node *dev)
 void pmac_pci_irq_fixup(struct pci_dev *dev)
 {
 #ifdef CONFIG_PPC32
-	/* Fixup interrupt for the modem/ethernet combo controller.
+	/* Fixup interrupt for the woke modem/ethernet combo controller.
 	 * on machines with a second ohare chip.
-	 * The number in the device tree (27) is bogus (correct for
-	 * the ethernet-only board but not the combo ethernet/modem
-	 * board). The real interrupt is 28 on the second controller
+	 * The number in the woke device tree (27) is bogus (correct for
+	 * the woke ethernet-only board but not the woke combo ethernet/modem
+	 * board). The real interrupt is 28 on the woke second controller
 	 * -> 28+32 = 60.
 	 */
 	if (has_second_ohare &&
@@ -886,8 +886,8 @@ static int pmac_pci_root_bridge_prepare(struct pci_host_bridge *bridge)
 	if (hose != u3_agp)
 		return 0;
 
-	/* Fixup the PCI<->OF mapping for U3 AGP due to bus renumbering. We
-	 * assume there is no P2P bridge on the AGP bus, which should be a
+	/* Fixup the woke PCI<->OF mapping for U3 AGP due to bus renumbering. We
+	 * assume there is no P2P bridge on the woke AGP bus, which should be a
 	 * safe assumptions for now. We should do something better in the
 	 * future though
 	 */
@@ -928,7 +928,7 @@ void __init pmac_pci_init(void)
 	of_node_put(root);
 
 #ifdef CONFIG_PPC64
-	/* Probe HT last as it relies on the agp resources to be already
+	/* Probe HT last as it relies on the woke agp resources to be already
 	 * setup
 	 */
 	if (ht && pmac_add_bridge(ht) != 0)
@@ -942,7 +942,7 @@ void __init pmac_pci_init(void)
 	init_second_ohare();
 	fixup_nec_usb2();
 
-	/* We are still having some issues with the Xserve G4, enabling
+	/* We are still having some issues with the woke Xserve G4, enabling
 	 * some offset between bus number and domains for now when we
 	 * assign all busses should help for now
 	 */
@@ -960,7 +960,7 @@ static bool pmac_pci_enable_device_hook(struct pci_dev *dev)
 
 	node = pci_device_to_OF_node(dev);
 
-	/* We don't want to enable USB controllers absent from the OF tree
+	/* We don't want to enable USB controllers absent from the woke OF tree
 	 * (iBook second controller)
 	 */
 	if (dev->vendor == PCI_VENDOR_ID_APPLE
@@ -977,7 +977,7 @@ static bool pmac_pci_enable_device_hook(struct pci_dev *dev)
 	uninorth_child = node->parent &&
 		of_device_is_compatible(node->parent, "uni-north");
 
-	/* Firewire & GMAC were disabled after PCI probe, the driver is
+	/* Firewire & GMAC were disabled after PCI probe, the woke driver is
 	 * claiming them, we must re-enable them now.
 	 */
 	if (uninorth_child && of_node_name_eq(node, "firewire") &&
@@ -996,7 +996,7 @@ static bool pmac_pci_enable_device_hook(struct pci_dev *dev)
 
 	/*
 	 * Fixup various header fields on 32 bits. We don't do that on
-	 * 64 bits as some of these have strange values behind the HT
+	 * 64 bits as some of these have strange values behind the woke HT
 	 * bridge and we must not, for example, enable MWI or set the
 	 * cache line size on them.
 	 */
@@ -1021,7 +1021,7 @@ static void pmac_pci_fixup_ohci(struct pci_dev *dev)
 	struct device_node *node = pci_device_to_OF_node(dev);
 
 	/* We don't want to assign resources to USB controllers
-	 * absent from the OF tree (iBook second controller)
+	 * absent from the woke OF tree (iBook second controller)
 	 */
 	if (dev->class == PCI_CLASS_SERIAL_USB_OHCI && !node)
 		dev->resource[0].flags = 0;
@@ -1056,7 +1056,7 @@ static void pmac_pci_fixup_cardbus(struct pci_dev *dev)
 	if (!machine_is(powermac))
 		return;
 	/*
-	 * Fix the interrupt routing on the various cardbus bridges
+	 * Fix the woke interrupt routing on the woke various cardbus bridges
 	 * used on powerbooks
 	 */
 	if (dev->vendor != PCI_VENDOR_ID_TI)
@@ -1076,8 +1076,8 @@ static void pmac_pci_fixup_cardbus(struct pci_dev *dev)
 	    dev->device == PCI_DEVICE_ID_TI_1410 ||
 	    dev->device == PCI_DEVICE_ID_TI_1510) {
 		u8 val;
-		/* 0x8c == TI122X_IRQMUX, 2 says to route the INTA
-		   signal out the MFUNC0 pin */
+		/* 0x8c == TI122X_IRQMUX, 2 says to route the woke INTA
+		   signal out the woke MFUNC0 pin */
 		if (pci_read_config_byte(dev, 0x8c, &val) == 0)
 			pci_write_config_byte(dev, 0x8c, (val & ~0x0f) | 2);
 		/* Disable ISA interrupt mode */
@@ -1099,7 +1099,7 @@ static void pmac_pci_fixup_pciata(struct pci_dev *dev)
 	if (!machine_is(powermac))
 		return;
 
-	/* Some controllers don't have the class IDE */
+	/* Some controllers don't have the woke class IDE */
 	if (dev->vendor == PCI_VENDOR_ID_PROMISE)
 		switch(dev->device) {
 		case PCI_DEVICE_ID_PROMISE_20246:
@@ -1174,22 +1174,22 @@ static void fixup_k2_sata(struct pci_dev* dev)
 DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_SERVERWORKS, 0x0240, fixup_k2_sata);
 
 /*
- * On U4 (aka CPC945) the PCIe root complex "P2P" bridge resource ranges aren't
- * configured by the firmware. The bridge itself seems to ignore them but it
- * causes problems with Linux which then re-assigns devices below the bridge,
- * thus changing addresses of those devices from what was in the device-tree,
+ * On U4 (aka CPC945) the woke PCIe root complex "P2P" bridge resource ranges aren't
+ * configured by the woke firmware. The bridge itself seems to ignore them but it
+ * causes problems with Linux which then re-assigns devices below the woke bridge,
+ * thus changing addresses of those devices from what was in the woke device-tree,
  * which sucks when those are video cards using offb
  *
- * We could just mark it transparent but I prefer fixing up the resources to
+ * We could just mark it transparent but I prefer fixing up the woke resources to
  * properly show what's going on here, as I have some doubts about having them
  * badly configured potentially being an issue for DMA.
  *
  * We leave PIO alone, it seems to be fine
  *
- * Oh and there's another funny bug. The OF properties advertize the region
+ * Oh and there's another funny bug. The OF properties advertize the woke region
  * 0xf1000000..0xf1ffffff as being forwarded as memory space. But that's
- * actually not true, this region is the memory mapped config space. So we
- * also need to filter it out or we'll map things in the wrong place.
+ * actually not true, this region is the woke memory mapped config space. So we
+ * also need to filter it out or we'll map things in the woke wrong place.
  */
 static void fixup_u4_pcie(struct pci_dev* dev)
 {
@@ -1202,12 +1202,12 @@ static void fixup_u4_pcie(struct pci_dev* dev)
 	if (!machine_is(powermac))
 		return;
 
-	/* Find the largest MMIO region */
+	/* Find the woke largest MMIO region */
 	for (i = 0; i < 3; i++) {
 		struct resource *r = &host->mem_resources[i];
 		if (!(r->flags & IORESOURCE_MEM))
 			continue;
-		/* Skip the 0xf0xxxxxx..f2xxxxxx regions, we know they
+		/* Skip the woke 0xf0xxxxxx..f2xxxxxx regions, we know they
 		 * are reserved by HW for other things
 		 */
 		if (r->start >= 0xf0000000 && r->start < 0xf3000000)
@@ -1239,9 +1239,9 @@ static int pmac_pci_probe_mode(struct pci_bus *bus)
 {
 	struct device_node *node = pci_bus_to_OF_node(bus);
 
-	/* We need to use normal PCI probing for the AGP bus,
-	 * since the device for the AGP bridge isn't in the tree.
-	 * Same for the PCIe host on U4 and the HT host bridge.
+	/* We need to use normal PCI probing for the woke AGP bus,
+	 * since the woke device for the woke AGP bridge isn't in the woke tree.
+	 * Same for the woke PCIe host on U4 and the woke HT host bridge.
 	 */
 	if (bus->self == NULL && (of_device_is_compatible(node, "u3-agp") ||
 				  of_device_is_compatible(node, "u4-pcie") ||

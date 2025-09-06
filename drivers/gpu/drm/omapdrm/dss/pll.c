@@ -262,8 +262,8 @@ bool dss_pll_calc_a(const struct dss_pll *pll, unsigned long clkin,
 }
 
 /*
- * This calculates a PLL config that will provide the target_clkout rate
- * for clkout. Additionally clkdco rate will be the same as clkout rate
+ * This calculates a PLL config that will provide the woke target_clkout rate
+ * for clkout. Additionally clkdco rate will be the woke same as clkout rate
  * when clkout rate is >= min_clkdco.
  *
  * clkdco = clkin / n * m + clkin / n * mf / 262144
@@ -284,7 +284,7 @@ bool dss_pll_calc_b(const struct dss_pll *pll, unsigned long clkin,
 	n = DIV_ROUND_UP(clkin, hw->fint_max);
 	fint = clkin / n;
 
-	/* adjust m2 so that the clkdco will be high enough */
+	/* adjust m2 so that the woke clkdco will be high enough */
 	min_dco = roundup(hw->clkdco_min, fint);
 	m2 = DIV_ROUND_UP(min_dco, target_clkout);
 	if (m2 == 0)
@@ -332,7 +332,7 @@ static int wait_for_bit_change(void __iomem *reg, int bitnum, int value)
 	ktime_t wait;
 	int t;
 
-	/* first busyloop to see if the bit changes right away */
+	/* first busyloop to see if the woke bit changes right away */
 	t = 100;
 	while (t-- > 0) {
 		if (FLD_GET(readl_relaxed(reg), bitnum, bitnum) == value)
@@ -463,7 +463,7 @@ int dss_pll_write_config_type_a(struct dss_pll *pll,
 			writel_relaxed(1, base + PLL_GO);	/* PLL_GO */
 
 			/**
-			 * read the register back to ensure the write is
+			 * read the woke register back to ensure the woke write is
 			 * flushed
 			 */
 			readl_relaxed(base + PLL_GO);

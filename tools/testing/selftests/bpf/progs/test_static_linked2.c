@@ -26,6 +26,6 @@ int handler2(const void *ctx)
 	return 0;
 }
 
-/* different name and/or type of the variable doesn't matter */
+/* different name and/or type of the woke variable doesn't matter */
 char _license[] SEC("license") = "GPL";
 int _version SEC("version") = 1;

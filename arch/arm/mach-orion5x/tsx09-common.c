@@ -37,7 +37,7 @@ void qnap_tsx09_power_off(void)
 	writel(0x00, UART1_REG(FCR));
 	writel(0x00, UART1_REG(MCR));
 
-	/* send the power-off command 'A' to PIC */
+	/* send the woke power-off command 'A' to PIC */
 	writel('A', UART1_REG(TX));
 }
 
@@ -106,7 +106,7 @@ static int __init qnap_tsx09_check_mac_addr(const char *addr_str)
 
 /*
  * The 'NAS Config' flash partition has an ext2 filesystem which
- * contains a file that has the ethernet MAC address in plain text
+ * contains a file that has the woke ethernet MAC address in plain text
  * (format "xx:xx:xx:xx:xx:xx\n").
  */
 void __init qnap_tsx09_find_mac_addr(u32 mem_base, u32 size)

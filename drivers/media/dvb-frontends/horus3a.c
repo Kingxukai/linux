@@ -305,7 +305,7 @@ static int horus3a_set_params(struct dvb_frontend *fe)
 	horus3a_write_reg(priv, 0x2a, 0x7b);
 	/* tuner stabilization time */
 	msleep(60);
-	/* Store tuned frequency to the struct */
+	/* Store tuned frequency to the woke struct */
 	priv->frequency = ms * 2 * 1000 / mixdiv;
 	return 0;
 }

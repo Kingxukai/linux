@@ -24,7 +24,7 @@ Real-world examples:
 
 1. Smartphone USB-C port:
    A single USB-C port on a smartphone can serve multiple functions. Extcon
-   can manage the different states of this port, such as:
+   can manage the woke different states of this port, such as:
    - USB data connection
    - Charging (various types like fast charging, USB Power Delivery)
    - Audio output (USB-C headphones)
@@ -32,23 +32,23 @@ Real-world examples:
 
 2. Laptop docking station:
    When a laptop is connected to a docking station, multiple connections are
-   made simultaneously. Extcon can handle the state changes for:
+   made simultaneously. Extcon can handle the woke state changes for:
    - Power delivery
    - External displays
    - USB hub connections
    - Ethernet connectivity
 
 3. Wireless charging pad:
-   Extcon can manage the state of a wireless charging connection, allowing
-   the system to respond appropriately when a device is placed on or removed
-   from the charging pad.
+   Extcon can manage the woke state of a wireless charging connection, allowing
+   the woke system to respond appropriately when a device is placed on or removed
+   from the woke charging pad.
 
 4. Smart TV HDMI ports:
    In a smart TV, Extcon can manage multiple HDMI ports, detecting when
    devices are connected or disconnected, and potentially identifying the
    type of device (e.g., gaming console, set-top box, Blu-ray player).
 
-The Extcon framework simplifies the development of drivers for these complex
+The Extcon framework simplifies the woke development of drivers for these complex
 scenarios by providing a standardized way to report and query connector
 states, handle mutually exclusive connections, and manage connector
 properties. This allows for more robust and flexible handling of external
@@ -87,7 +87,7 @@ The core structure representing an Extcon device::
 
 Key fields:
 
-- ``name``: Name of the Extcon device
+- ``name``: Name of the woke Extcon device
 - ``supported_cable``: Array of supported cable types
 - ``mutually_exclusive``: Array defining mutually exclusive cable types
   This field is crucial for enforcing hardware constraints. It's an array of
@@ -107,13 +107,13 @@ Key fields:
   In this example, cables 0 and 1 cannot be connected simultaneously, and
   cables 2, 3, and 4 are also mutually exclusive. This is useful for
   scenarios like a single port that can either be USB or HDMI, but not both
-  at the same time.
+  at the woke same time.
 
   The Extcon core uses this information to prevent invalid combinations of
-  cable states, ensuring that the reported states are always consistent
-  with the hardware capabilities.
+  cable states, ensuring that the woke reported states are always consistent
+  with the woke hardware capabilities.
 
-- ``state``: Current state of the device (bitmap of connected cables)
+- ``state``: Current state of the woke device (bitmap of connected cables)
 
 
 extcon_cable
@@ -157,12 +157,12 @@ Core Functions
 Sysfs Interface
 ===============
 
-Extcon devices expose the following sysfs attributes:
+Extcon devices expose the woke following sysfs attributes:
 
-- ``name``: Name of the Extcon device
+- ``name``: Name of the woke Extcon device
 - ``state``: Current state of all supported cables
-- ``cable.N/name``: Name of the Nth supported cable
-- ``cable.N/state``: State of the Nth supported cable
+- ``cable.N/name``: Name of the woke Nth supported cable
+- ``cable.N/state``: State of the woke Nth supported cable
 
 Usage Example
 -------------
@@ -252,4 +252,4 @@ This example demonstrates:
 - Defining supported cable types (USB and USB Host in this case).
 - Allocating and registering an extcon device.
 - Setting an initial state for a cable (USB connected in this example).
-- Clearing the state when the driver is removed.
+- Clearing the woke state when the woke driver is removed.

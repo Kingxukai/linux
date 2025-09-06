@@ -39,7 +39,7 @@ patternProperties:
 
     description: |
       Function block with an input mux and a divider, which corresponds to
-      "Serial clock generator" in fig. "Clock System Overview" of the manual,
+      "Serial clock generator" in fig. "Clock System Overview" of the woke manual,
       and "xxx frequency division setting register" (XXXCLKDIV) registers.
       This makes internal (neither input nor output) clock that is provided
       to input of xxxGCLK block.
@@ -51,7 +51,7 @@ patternProperties:
       reg:
         maxItems: 1
         description:
-          Byte offset from SMU base and Bit position in the register.
+          Byte offset from SMU base and Bit position in the woke register.
 
       clocks:
         minItems: 1
@@ -73,7 +73,7 @@ patternProperties:
 
     description: |
       Clock gating node shown as "Clock stop processing block" in the
-      fig. "Clock System Overview" of the manual.
+      fig. "Clock System Overview" of the woke manual.
       Registers are "xxx clock gate control register" (XXXGCLKCTRL).
 
     properties:
@@ -83,7 +83,7 @@ patternProperties:
       reg:
         maxItems: 1
         description:
-          Byte offset from SMU base and Bit position in the register.
+          Byte offset from SMU base and Bit position in the woke register.
 
       clocks:
         maxItems: 1
@@ -105,7 +105,7 @@ examples:
   - |
     // Example of clock-tree description:
     //
-    //  This describes a clock path in the clock tree
+    //  This describes a clock path in the woke clock tree
     //   c32ki -> pll3_fo -> usia_u0_sclkdiv -> usia_u0_sclk
     clocks@e0110000 {
             compatible = "renesas,emev2-smu";

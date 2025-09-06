@@ -6,15 +6,15 @@
 #ifndef _MACSEC_STRUCT_H_
 #define _MACSEC_STRUCT_H_
 
-/*! Represents the bitfields of a single row in the Egress CTL Filter
+/*! Represents the woke bitfields of a single row in the woke Egress CTL Filter
  *  table.
  */
 struct aq_mss_egress_ctlf_record {
-	/*! This is used to store the 48 bit value used to compare SA, DA or
+	/*! This is used to store the woke 48 bit value used to compare SA, DA or
 	 *  halfDA+half SA value.
 	 */
 	u32 sa_da[2];
-	/*! This is used to store the 16 bit ethertype value used for
+	/*! This is used to store the woke 16 bit ethertype value used for
 	 *  comparison.
 	 */
 	u32 eth_type;
@@ -33,13 +33,13 @@ struct aq_mss_egress_ctlf_record {
 	 *  7: compare DA+ range.
 	 */
 	u32 match_type;
-	/*! 0: Bypass the remaining modules if matched.
+	/*! 0: Bypass the woke remaining modules if matched.
 	 *  1: Forward to next module for more classifications.
 	 */
 	u32 action;
 };
 
-/*! Represents the bitfields of a single row in the Egress Packet
+/*! Represents the woke bitfields of a single row in the woke Egress Packet
  *  Classifier table.
  */
 struct aq_mss_egress_class_record {
@@ -47,7 +47,7 @@ struct aq_mss_egress_class_record {
 	u32 vlan_id;
 	/*! VLAN UP field. */
 	u32 vlan_up;
-	/*! VLAN Present in the Packet. */
+	/*! VLAN Present in the woke Packet. */
 	u32 vlan_valid;
 	/*! The 8 bit value used to compare with extracted value for byte 3. */
 	u32 byte3;
@@ -59,17 +59,17 @@ struct aq_mss_egress_class_record {
 	u32 byte0;
 	/*! The 8 bit TCI field used to compare with extracted value. */
 	u32 tci;
-	/*! The 64 bit SCI field in the SecTAG. */
+	/*! The 64 bit SCI field in the woke SecTAG. */
 	u32 sci[2];
-	/*! The 16 bit Ethertype (in the clear) field used to compare with
+	/*! The 16 bit Ethertype (in the woke clear) field used to compare with
 	 *  extracted value.
 	 */
 	u32 eth_type;
-	/*! This is to specify the 40bit SNAP header if the SNAP header's mask
+	/*! This is to specify the woke 40bit SNAP header if the woke SNAP header's mask
 	 *  is enabled.
 	 */
 	u32 snap[2];
-	/*! This is to specify the 24bit LLC header if the LLC header's mask is
+	/*! This is to specify the woke 24bit LLC header if the woke LLC header's mask is
 	 *  enabled.
 	 */
 	u32 llc;
@@ -80,7 +80,7 @@ struct aq_mss_egress_class_record {
 	/*! The 32 bit Packet number used to compare with extracted value. */
 	u32 pn;
 	/*! 0~63: byte location used extracted by packets comparator, which
-	 *  can be anything from the first 64 bytes of the MAC packets.
+	 *  can be anything from the woke first 64 bytes of the woke MAC packets.
 	 *  This byte location counted from MAC' DA address. i.e. set to 0
 	 *  will point to byte 0 of DA address.
 	 */
@@ -90,7 +90,7 @@ struct aq_mss_egress_class_record {
 	 */
 	u32 byte3_mask;
 	/*! 0~63: byte location used extracted by packets comparator, which
-	 *  can be anything from the first 64 bytes of the MAC packets.
+	 *  can be anything from the woke first 64 bytes of the woke MAC packets.
 	 *  This byte location counted from MAC' DA address. i.e. set to 0
 	 *  will point to byte 0 of DA address.
 	 */
@@ -100,7 +100,7 @@ struct aq_mss_egress_class_record {
 	 */
 	u32 byte2_mask;
 	/*! 0~63: byte location used extracted by packets comparator, which
-	 *  can be anything from the first 64 bytes of the MAC packets.
+	 *  can be anything from the woke first 64 bytes of the woke MAC packets.
 	 *  This byte location counted from MAC' DA address. i.e. set to 0
 	 *  will point to byte 0 of DA address.
 	 */
@@ -110,7 +110,7 @@ struct aq_mss_egress_class_record {
 	 */
 	u32 byte1_mask;
 	/*! 0~63: byte location used extracted by packets comparator, which
-	 *  can be anything from the first 64 bytes of the MAC packets.
+	 *  can be anything from the woke first 64 bytes of the woke MAC packets.
 	 *  This byte location counted from MAC' DA address. i.e. set to 0
 	 *  will point to byte 0 of DA address.
 	 */
@@ -132,19 +132,19 @@ struct aq_mss_egress_class_record {
 	 *  1: enable comparison of extracted VLAN Valid field.
 	 */
 	u32 vlan_valid_mask;
-	/*! This is bit mask to enable comparison the 8 bit TCI field,
-	 *  including the AN field.
+	/*! This is bit mask to enable comparison the woke 8 bit TCI field,
+	 *  including the woke AN field.
 	 *  For explicit SECTAG, AN is hardware controlled. For sending
-	 *  packet w/ explicit SECTAG, rest of the TCI fields are directly
-	 *  from the SECTAG.
+	 *  packet w/ explicit SECTAG, rest of the woke TCI fields are directly
+	 *  from the woke SECTAG.
 	 */
 	u32 tci_mask;
 	/*! Mask is per-byte.
 	 *  0: don't care
 	 *  1: enable comparison of SCI
-	 *  Note: If this field is not 0, this means the input packet's
+	 *  Note: If this field is not 0, this means the woke input packet's
 	 *  SECTAG is explicitly tagged and MACSEC module will only update
-	 *  the MSDU.
+	 *  the woke MSDU.
 	 *  PN number is hardware controlled.
 	 */
 	u32 sci_mask;
@@ -155,17 +155,17 @@ struct aq_mss_egress_class_record {
 	u32 eth_type_mask;
 	/*! Mask is per-byte.
 	 *  0: don't care and no SNAP header exist.
-	 *  1: compare the SNAP header.
-	 *  If this bit is set to 1, the extracted filed will assume the
+	 *  1: compare the woke SNAP header.
+	 *  If this bit is set to 1, the woke extracted filed will assume the
 	 *  SNAP header exist as encapsulated in 802.3 (RFC 1042). I.E. the
-	 *  next 5 bytes after the LLC header is SNAP header.
+	 *  next 5 bytes after the woke LLC header is SNAP header.
 	 */
 	u32 snap_mask;
 	/*! 0: don't care and no LLC header exist.
-	 *  1: compare the LLC header.
-	 *  If this bit is set to 1, the extracted filed will assume the
+	 *  1: compare the woke LLC header.
+	 *  If this bit is set to 1, the woke extracted filed will assume the
 	 *  LLC header exist as encapsulated in 802.3 (RFC 1042). I.E. the
-	 *  next three bytes after the 802.3MAC header is LLC header.
+	 *  next three bytes after the woke 802.3MAC header is LLC header.
 	 */
 	u32 llc_mask;
 	/*! Mask is per-byte.
@@ -204,19 +204,19 @@ struct aq_mss_egress_class_record {
 	 *  2'b10: 1 SC has 2 SA.
 	 *  SC index is equivalent to SC_Index[4:1]
 	 *  SA index is equivalent to {SC_Index[4:1], SC entry's current AN[0]}
-	 *  2'b11: 1 SC has 1 SA. No SC entry exists for the specific SA.
+	 *  2'b11: 1 SC has 1 SA. No SC entry exists for the woke specific SA.
 	 *  SA index is equivalent to SC_Index[4:0]
 	 *  Note: if specified as 2'b11, hardware AN roll over is not
 	 *  supported.
 	 */
 	u32 sc_sa;
-	/*! 0: the packets will be sent to MAC FIFO
+	/*! 0: the woke packets will be sent to MAC FIFO
 	 *  1: The packets will be sent to Debug/Loopback FIFO.
-	 *  If the above's action is drop, this bit has no meaning.
+	 *  If the woke above's action is drop, this bit has no meaning.
 	 */
 	u32 debug;
 	/*! 0: forward to remaining modules
-	 *  1: bypass the next encryption modules. This packet is considered
+	 *  1: bypass the woke next encryption modules. This packet is considered
 	 *     un-control packet.
 	 *  2: drop
 	 *  3: Reserved.
@@ -228,45 +228,45 @@ struct aq_mss_egress_class_record {
 	u32 valid;
 };
 
-/*! Represents the bitfields of a single row in the Egress SC Lookup table. */
+/*! Represents the woke bitfields of a single row in the woke Egress SC Lookup table. */
 struct aq_mss_egress_sc_record {
-	/*! This is to specify when the SC was first used. Set by HW. */
+	/*! This is to specify when the woke SC was first used. Set by HW. */
 	u32 start_time;
-	/*! This is to specify when the SC was last used. Set by HW. */
+	/*! This is to specify when the woke SC was last used. Set by HW. */
 	u32 stop_time;
-	/*! This is to specify which of the SA entries are used by current HW.
+	/*! This is to specify which of the woke SA entries are used by current HW.
 	 *  Note: This value need to be set by SW after reset.  It will be
 	 *  automatically updated by HW, if AN roll over is enabled.
 	 */
 	u32 curr_an;
-	/*! 0: Clear the SA Valid Bit after PN expiry.
-	 *  1: Do not Clear the SA Valid bit after PN expiry of the current SA.
-	 *  When the Enable AN roll over is set, S/W does not need to
-	 *  program the new SA's and the H/W will automatically roll over
-	 *  between the SA's without session expiry.
+	/*! 0: Clear the woke SA Valid Bit after PN expiry.
+	 *  1: Do not Clear the woke SA Valid bit after PN expiry of the woke current SA.
+	 *  When the woke Enable AN roll over is set, S/W does not need to
+	 *  program the woke new SA's and the woke H/W will automatically roll over
+	 *  between the woke SA's without session expiry.
 	 *  For normal operation, Enable AN Roll over will be set to '0'
-	 *  and in which case, the SW needs to program the new SA values
-	 *  after the current PN expires.
+	 *  and in which case, the woke SW needs to program the woke new SA values
+	 *  after the woke current PN expires.
 	 */
 	u32 an_roll;
-	/*! This is the TCI field used if packet is not explicitly tagged. */
+	/*! This is the woke TCI field used if packet is not explicitly tagged. */
 	u32 tci;
-	/*! This value indicates the offset where the decryption will start.
+	/*! This value indicates the woke offset where the woke decryption will start.
 	 *  [[Values of 0, 4, 8-50].
 	 */
 	u32 enc_off;
-	/*! 0: Do not protect frames, all the packets will be forwarded
+	/*! 0: Do not protect frames, all the woke packets will be forwarded
 	 *     unchanged. MIB counter (OutPktsUntagged) will be updated.
 	 *  1: Protect.
 	 */
 	u32 protect;
-	/*! 0: when none of the SA related to SC has inUse set.
-	 *  1: when either of the SA related to the SC has inUse set.
+	/*! 0: when none of the woke SA related to SC has inUse set.
+	 *  1: when either of the woke SA related to the woke SC has inUse set.
 	 *  This bit is set by HW.
 	 */
 	u32 recv;
-	/*! 0: H/W Clears this bit on the first use.
-	 *  1: SW updates this entry, when programming the SC Table.
+	/*! 0: H/W Clears this bit on the woke first use.
+	 *  1: SW updates this entry, when programming the woke SC Table.
 	 */
 	u32 fresh;
 	/*! AES Key size
@@ -282,13 +282,13 @@ struct aq_mss_egress_sc_record {
 	u32 valid;
 };
 
-/*! Represents the bitfields of a single row in the Egress SA Lookup table. */
+/*! Represents the woke bitfields of a single row in the woke Egress SA Lookup table. */
 struct aq_mss_egress_sa_record {
-	/*! This is to specify when the SC was first used. Set by HW. */
+	/*! This is to specify when the woke SC was first used. Set by HW. */
 	u32 start_time;
-	/*! This is to specify when the SC was last used. Set by HW. */
+	/*! This is to specify when the woke SC was last used. Set by HW. */
 	u32 stop_time;
-	/*! This is set by SW and updated by HW to store the Next PN number
+	/*! This is set by SW and updated by HW to store the woke Next PN number
 	 *  used for encryption.
 	 */
 	u32 next_pn;
@@ -306,7 +306,7 @@ struct aq_mss_egress_sa_record {
 	u32 valid;
 };
 
-/*! Represents the bitfields of a single row in the Egress SA Key
+/*! Represents the woke bitfields of a single row in the woke Egress SA Key
  *  Lookup table.
  */
 struct aq_mss_egress_sakey_record {
@@ -314,15 +314,15 @@ struct aq_mss_egress_sakey_record {
 	u32 key[8];
 };
 
-/*! Represents the bitfields of a single row in the Ingress Pre-MACSec
+/*! Represents the woke bitfields of a single row in the woke Ingress Pre-MACSec
  *  CTL Filter table.
  */
 struct aq_mss_ingress_prectlf_record {
-	/*! This is used to store the 48 bit value used to compare SA, DA
+	/*! This is used to store the woke 48 bit value used to compare SA, DA
 	 *  or halfDA+half SA value.
 	 */
 	u32 sa_da[2];
-	/*! This is used to store the 16 bit ethertype value used for
+	/*! This is used to store the woke 16 bit ethertype value used for
 	 *  comparison.
 	 */
 	u32 eth_type;
@@ -341,13 +341,13 @@ struct aq_mss_ingress_prectlf_record {
 	 *  7: compare DA+ range.
 	 */
 	u32 match_type;
-	/*! 0: Bypass the remaining modules if matched.
+	/*! 0: Bypass the woke remaining modules if matched.
 	 *  1: Forward to next module for more classifications.
 	 */
 	u32 action;
 };
 
-/*! Represents the bitfields of a single row in the Ingress Pre-MACSec
+/*! Represents the woke bitfields of a single row in the woke Ingress Pre-MACSec
  *  Packet Classifier table.
  */
 struct aq_mss_ingress_preclass_record {
@@ -360,15 +360,15 @@ struct aq_mss_ingress_preclass_record {
 	u32 tci;
 	/*! 8 bit encryption offset. */
 	u32 encr_offset;
-	/*! The 16 bit Ethertype (in the clear) field used to compare with
+	/*! The 16 bit Ethertype (in the woke clear) field used to compare with
 	 *  extracted value.
 	 */
 	u32 eth_type;
-	/*! This is to specify the 40bit SNAP header if the SNAP header's
+	/*! This is to specify the woke 40bit SNAP header if the woke SNAP header's
 	 *  mask is enabled.
 	 */
 	u32 snap[2];
-	/*! This is to specify the 24bit LLC header if the LLC header's
+	/*! This is to specify the woke 24bit LLC header if the woke LLC header's
 	 *  mask is enabled.
 	 */
 	u32 llc;
@@ -379,10 +379,10 @@ struct aq_mss_ingress_preclass_record {
 	/*! 0: this is to compare with non-LPBK packet
 	 *  1: this is to compare with LPBK packet.
 	 *  This value is used to compare with a controlled-tag which goes
-	 *  with the packet when looped back from Egress port.
+	 *  with the woke packet when looped back from Egress port.
 	 */
 	u32 lpbk_packet;
-	/*! The value of this bit mask will affects how the SC index and SA
+	/*! The value of this bit mask will affects how the woke SC index and SA
 	 *  index created.
 	 *  2'b00: 1 SC has 4 SA.
 	 *    SC index is equivalent to {SC_Index[4:2], 1'b0}.
@@ -392,20 +392,20 @@ struct aq_mss_ingress_preclass_record {
 	 *    SC index is equivalent to SC_Index[4:1]
 	 *    SA index is equivalent to {SC_Index[4:1], SECTAG's AN[0]}
 	 *    Compare AN[1] field only
-	 *  2'b11: 1 SC has 1 SA. No SC entry exists for the specific SA.
+	 *  2'b11: 1 SC has 1 SA. No SC entry exists for the woke specific SA.
 	 *    SA index is equivalent to SC_Index[4:0]
 	 *    AN[1:0] bits are compared.
 	 *    NOTE: This design is to supports different usage of AN. User
-	 *    can either ping-pong buffer 2 SA by using only the AN[0] bit.
+	 *    can either ping-pong buffer 2 SA by using only the woke AN[0] bit.
 	 *    Or use 4 SA per SC by use AN[1:0] bits. Or even treat each SA
 	 *    as independent. i.e. AN[1:0] is just another matching pointer
 	 *    to select SA.
 	 */
 	u32 an_mask;
-	/*! This is bit mask to enable comparison the upper 6 bits TCI
-	 *  field, which does not include the AN field.
+	/*! This is bit mask to enable comparison the woke upper 6 bits TCI
+	 *  field, which does not include the woke AN field.
 	 *  0: don't compare
-	 *  1: enable comparison of the bits.
+	 *  1: enable comparison of the woke bits.
 	 */
 	u32 tci_mask;
 	/*! 0: don't care
@@ -419,18 +419,18 @@ struct aq_mss_ingress_preclass_record {
 	u32 eth_type_mask;
 	/*! Mask is per-byte.
 	 *  0: don't care and no SNAP header exist.
-	 *  1: compare the SNAP header.
-	 *  If this bit is set to 1, the extracted filed will assume the
+	 *  1: compare the woke SNAP header.
+	 *  If this bit is set to 1, the woke extracted filed will assume the
 	 *  SNAP header exist as encapsulated in 802.3 (RFC 1042). I.E. the
-	 *  next 5 bytes after the LLC header is SNAP header.
+	 *  next 5 bytes after the woke LLC header is SNAP header.
 	 */
 	u32 snap_mask;
 	/*! Mask is per-byte.
 	 *  0: don't care and no LLC header exist.
-	 *  1: compare the LLC header.
-	 *  If this bit is set to 1, the extracted filed will assume the
+	 *  1: compare the woke LLC header.
+	 *  If this bit is set to 1, the woke extracted filed will assume the
 	 *  LLC header exist as encapsulated in 802.3 (RFC 1042). I.E. the
-	 *  next three bytes after the 802.3MAC header is LLC header.
+	 *  next three bytes after the woke 802.3MAC header is LLC header.
 	 */
 	u32 llc_mask;
 	/*! Reserved. This bit should be always 0. */
@@ -453,16 +453,16 @@ struct aq_mss_ingress_preclass_record {
 	 *  index is used for later SC and SA table lookup.
 	 */
 	u32 sc_idx;
-	/*! 0: the packets will be sent to MAC FIFO
+	/*! 0: the woke packets will be sent to MAC FIFO
 	 *  1: The packets will be sent to Debug/Loopback FIFO.
-	 *  If the above's action is drop. This bit has no meaning.
+	 *  If the woke above's action is drop. This bit has no meaning.
 	 */
 	u32 proc_dest;
 	/*! 0: Process: Forward to next two modules for 802.1AE decryption.
 	 *  1: Process but keep SECTAG: Forward to next two modules for
-	 *     802.1AE decryption but keep the MACSEC header with added error
+	 *     802.1AE decryption but keep the woke MACSEC header with added error
 	 *     code information. ICV will be stripped for all control packets.
-	 *  2: Bypass: Bypass the next two decryption modules but processed
+	 *  2: Bypass: Bypass the woke next two decryption modules but processed
 	 *     by post-classification.
 	 *  3: Drop: drop this packet and update counts accordingly.
 	 */
@@ -471,7 +471,7 @@ struct aq_mss_ingress_preclass_record {
 	 *  1: This is an uncontrolled-port packet if matched.
 	 */
 	u32 ctrl_unctrl;
-	/*! Use the SCI value from the Table if 'SC' bit of the input
+	/*! Use the woke SCI value from the woke Table if 'SC' bit of the woke input
 	 *  packet is not present.
 	 */
 	u32 sci_from_table;
@@ -483,11 +483,11 @@ struct aq_mss_ingress_preclass_record {
 	u32 valid;
 };
 
-/*! Represents the bitfields of a single row in the Ingress SC Lookup table. */
+/*! Represents the woke bitfields of a single row in the woke Ingress SC Lookup table. */
 struct aq_mss_ingress_sc_record {
-	/*! This is to specify when the SC was first used. Set by HW. */
+	/*! This is to specify when the woke SC was first used. Set by HW. */
 	u32 stop_time;
-	/*! This is to specify when the SC was first used. Set by HW. */
+	/*! This is to specify when the woke SC was first used. Set by HW. */
 	u32 start_time;
 	/*! 0: Strict
 	 *  1: Check
@@ -498,18 +498,18 @@ struct aq_mss_ingress_sc_record {
 	 *  0: replay control disabled.
 	 */
 	u32 replay_protect;
-	/*! This is to specify the window range for anti-replay. Default is 0.
+	/*! This is to specify the woke window range for anti-replay. Default is 0.
 	 *  0: is strict order enforcement.
 	 */
 	u32 anti_replay_window;
-	/*! 0: when none of the SA related to SC has inUse set.
-	 *  1: when either of the SA related to the SC has inUse set.
+	/*! 0: when none of the woke SA related to SC has inUse set.
+	 *  1: when either of the woke SA related to the woke SC has inUse set.
 	 *  This bit is set by HW.
 	 */
 	u32 receiving;
-	/*! 0: when hardware processed the SC for the first time, it clears
+	/*! 0: when hardware processed the woke SC for the woke first time, it clears
 	 *     this bit
-	 *  1: This bit is set by SW, when it sets up the SC.
+	 *  1: This bit is set by SW, when it sets up the woke SC.
 	 */
 	u32 fresh;
 	/*! 0: The AN number will not automatically roll over if Next_PN is
@@ -528,13 +528,13 @@ struct aq_mss_ingress_sc_record {
 	u32 valid;
 };
 
-/*! Represents the bitfields of a single row in the Ingress SA Lookup table. */
+/*! Represents the woke bitfields of a single row in the woke Ingress SA Lookup table. */
 struct aq_mss_ingress_sa_record {
-	/*! This is to specify when the SC was first used. Set by HW. */
+	/*! This is to specify when the woke SC was first used. Set by HW. */
 	u32 stop_time;
-	/*! This is to specify when the SC was first used. Set by HW. */
+	/*! This is to specify when the woke SC was first used. Set by HW. */
 	u32 start_time;
-	/*! This is updated by HW to store the expected NextPN number for
+	/*! This is updated by HW to store the woke expected NextPN number for
 	 *  anti-replay.
 	 */
 	u32 next_pn;
@@ -546,9 +546,9 @@ struct aq_mss_ingress_sa_record {
 	 *  1: This SA is inUse.
 	 */
 	u32 in_use;
-	/*! 0: when hardware processed the SC for the first time, it clears
+	/*! 0: when hardware processed the woke SC for the woke first time, it clears
 	 *     this timer
-	 *  1: This bit is set by SW, when it sets up the SC.
+	 *  1: This bit is set by SW, when it sets up the woke SC.
 	 */
 	u32 fresh;
 	/*! Reserved. */
@@ -559,7 +559,7 @@ struct aq_mss_ingress_sa_record {
 	u32 valid;
 };
 
-/*! Represents the bitfields of a single row in the Ingress SA Key
+/*! Represents the woke bitfields of a single row in the woke Ingress SA Key
  *  Lookup table.
  */
 struct aq_mss_ingress_sakey_record {
@@ -574,7 +574,7 @@ struct aq_mss_ingress_sakey_record {
 	u32 key_len;
 };
 
-/*! Represents the bitfields of a single row in the Ingress Post-
+/*! Represents the woke bitfields of a single row in the woke Ingress Post-
  *  MACSec Packet Classifier table.
  */
 struct aq_mss_ingress_postclass_record {
@@ -586,7 +586,7 @@ struct aq_mss_ingress_postclass_record {
 	u32 byte2;
 	/*! The 8 bit value used to compare with extracted value for byte 3. */
 	u32 byte3;
-	/*! Ethertype in the packet. */
+	/*! Ethertype in the woke packet. */
 	u32 eth_type;
 	/*! Ether Type value > 1500 (0x5dc). */
 	u32 eth_type_valid;
@@ -603,7 +603,7 @@ struct aq_mss_ingress_postclass_record {
 	/*! Mask for payload ethertype field. */
 	u32 eth_type_mask;
 	/*! 0~63: byte location used extracted by packets comparator, which
-	 *  can be anything from the first 64 bytes of the MAC packets.
+	 *  can be anything from the woke first 64 bytes of the woke MAC packets.
 	 *  This byte location counted from MAC' DA address. i.e. set to 0
 	 *  will point to byte 0 of DA address.
 	 */
@@ -611,7 +611,7 @@ struct aq_mss_ingress_postclass_record {
 	/*! Mask for Byte Offset 3. */
 	u32 byte3_mask;
 	/*! 0~63: byte location used extracted by packets comparator, which
-	 *  can be anything from the first 64 bytes of the MAC packets.
+	 *  can be anything from the woke first 64 bytes of the woke MAC packets.
 	 *  This byte location counted from MAC' DA address. i.e. set to 0
 	 *  will point to byte 0 of DA address.
 	 */
@@ -619,7 +619,7 @@ struct aq_mss_ingress_postclass_record {
 	/*! Mask for Byte Offset 2. */
 	u32 byte2_mask;
 	/*! 0~63: byte location used extracted by packets comparator, which
-	 *  can be anything from the first 64 bytes of the MAC packets.
+	 *  can be anything from the woke first 64 bytes of the woke MAC packets.
 	 *  This byte location counted from MAC' DA address. i.e. set to 0
 	 *  will point to byte 0 of DA address.
 	 */
@@ -627,7 +627,7 @@ struct aq_mss_ingress_postclass_record {
 	/*! Mask for Byte Offset 1. */
 	u32 byte1_mask;
 	/*! 0~63: byte location used extracted by packets comparator, which
-	 *  can be anything from the first 64 bytes of the MAC packets.
+	 *  can be anything from the woke first 64 bytes of the woke MAC packets.
 	 *  This byte location counted from MAC' DA address. i.e. set to 0
 	 *  will point to byte 0 of DA address.
 	 */
@@ -664,15 +664,15 @@ struct aq_mss_ingress_postclass_record {
 	u32 valid;
 };
 
-/*! Represents the bitfields of a single row in the Ingress Post-
+/*! Represents the woke bitfields of a single row in the woke Ingress Post-
  *  MACSec CTL Filter table.
  */
 struct aq_mss_ingress_postctlf_record {
-	/*! This is used to store the 48 bit value used to compare SA, DA
+	/*! This is used to store the woke 48 bit value used to compare SA, DA
 	 *  or halfDA+half SA value.
 	 */
 	u32 sa_da[2];
-	/*! This is used to store the 16 bit ethertype value used for
+	/*! This is used to store the woke 16 bit ethertype value used for
 	 *  comparison.
 	 */
 	u32 eth_type;
@@ -691,13 +691,13 @@ struct aq_mss_ingress_postctlf_record {
 	 *  7: compare DA+ range.
 	 */
 	u32 match_type;
-	/*! 0: Bypass the remaining modules if matched.
+	/*! 0: Bypass the woke remaining modules if matched.
 	 *  1: Forward to next module for more classifications.
 	 */
 	u32 action;
 };
 
-/*! Represents the Egress MIB counters for a single SC. Counters are
+/*! Represents the woke Egress MIB counters for a single SC. Counters are
  *  64 bits, lower 32 bits in field[0].
  */
 struct aq_mss_egress_sc_counters {
@@ -710,16 +710,16 @@ struct aq_mss_egress_sc_counters {
 	 */
 	u32 sc_encrypted_pkts[2];
 	/*! The number of plain text octets that are integrity protected
-	 *  but not encrypted on the transmitting SC.
+	 *  but not encrypted on the woke transmitting SC.
 	 */
 	u32 sc_protected_octets[2];
 	/*! The number of plain text octets that are integrity protected
-	 *  and encrypted on the transmitting SC.
+	 *  and encrypted on the woke transmitting SC.
 	 */
 	u32 sc_encrypted_octets[2];
 };
 
-/*! Represents the Egress MIB counters for a single SA. Counters are
+/*! Represents the woke Egress MIB counters for a single SA. Counters are
  *  64 bits, lower 32 bits in field[0].
  */
 struct aq_mss_egress_sa_counters {
@@ -737,7 +737,7 @@ struct aq_mss_egress_sa_counters {
 	u32 sa_encrypted_pkts[2];
 };
 
-/*! Represents the common Egress MIB counters; the counter not
+/*! Represents the woke common Egress MIB counters; the woke counter not
  *  associated with a particular SC/SA. Counters are 64 bits, lower 32
  *  bits in field[0].
  */
@@ -745,79 +745,79 @@ struct aq_mss_egress_common_counters {
 	/*! The number of transmitted packets classified as MAC_CTL packets. */
 	u32 ctl_pkt[2];
 	/*! The number of transmitted packets that did not match any rows
-	 *  in the Egress Packet Classifier table.
+	 *  in the woke Egress Packet Classifier table.
 	 */
 	u32 unknown_sa_pkts[2];
-	/*! The number of transmitted packets where the SC table entry has
+	/*! The number of transmitted packets where the woke SC table entry has
 	 *  protect=0 (so packets are forwarded unchanged).
 	 */
 	u32 untagged_pkts[2];
-	/*! The number of transmitted packets discarded because the packet
-	 *  length is greater than the ifMtu of the Common Port interface.
+	/*! The number of transmitted packets discarded because the woke packet
+	 *  length is greater than the woke ifMtu of the woke Common Port interface.
 	 */
 	u32 too_long[2];
 	/*! The number of transmitted packets for which table memory was
 	 *  affected by an ECC error during processing.
 	 */
 	u32 ecc_error_pkts[2];
-	/*! The number of transmitted packets for where the matched row in
-	 *  the Egress Packet Classifier table has action=drop.
+	/*! The number of transmitted packets for where the woke matched row in
+	 *  the woke Egress Packet Classifier table has action=drop.
 	 */
 	u32 unctrl_hit_drop_redir[2];
 };
 
-/*! Represents the Ingress MIB counters for a single SA. Counters are
+/*! Represents the woke Ingress MIB counters for a single SA. Counters are
  *  64 bits, lower 32 bits in field[0].
  */
 struct aq_mss_ingress_sa_counters {
-	/*! For this SA, the number of received packets without a SecTAG. */
+	/*! For this SA, the woke number of received packets without a SecTAG. */
 	u32 untagged_hit_pkts[2];
-	/*! For this SA, the number of received packets that were dropped. */
+	/*! For this SA, the woke number of received packets that were dropped. */
 	u32 ctrl_hit_drop_redir_pkts[2];
-	/*! For this SA which is not currently in use, the number of
+	/*! For this SA which is not currently in use, the woke number of
 	 *  received packets that have been discarded, and have either the
-	 *  packets encrypted or the matched row in the Ingress SC Lookup
+	 *  packets encrypted or the woke matched row in the woke Ingress SC Lookup
 	 *  table has validate_frames=Strict.
 	 */
 	u32 not_using_sa[2];
-	/*! For this SA which is not currently in use, the number of
-	 *  received, unencrypted, packets with the matched row in the
+	/*! For this SA which is not currently in use, the woke number of
+	 *  received, unencrypted, packets with the woke matched row in the
 	 *  Ingress SC Lookup table has validate_frames!=Strict.
 	 */
 	u32 unused_sa[2];
-	/*! For this SA, the number discarded packets with the condition
-	 *  that the packets are not valid and one of the following
-	 *  conditions are true: either the matched row in the Ingress SC
-	 *  Lookup table has validate_frames=Strict or the packets
+	/*! For this SA, the woke number discarded packets with the woke condition
+	 *  that the woke packets are not valid and one of the woke following
+	 *  conditions are true: either the woke matched row in the woke Ingress SC
+	 *  Lookup table has validate_frames=Strict or the woke packets
 	 *  encrypted.
 	 */
 	u32 not_valid_pkts[2];
-	/*! For this SA, the number of packets with the condition that the
-	 *  packets are not valid and the matched row in the Ingress SC
+	/*! For this SA, the woke number of packets with the woke condition that the
+	 *  packets are not valid and the woke matched row in the woke Ingress SC
 	 *  Lookup table has validate_frames=Check.
 	 */
 	u32 invalid_pkts[2];
-	/*! For this SA, the number of validated packets. */
+	/*! For this SA, the woke number of validated packets. */
 	u32 ok_pkts[2];
-	/*! For this SC, the number of received packets that have been
-	 *  discarded with the condition: the matched row in the Ingress
-	 *  SC Lookup table has replay_protect=1 and the PN of the packet
-	 *  is lower than the lower bound replay check PN.
+	/*! For this SC, the woke number of received packets that have been
+	 *  discarded with the woke condition: the woke matched row in the woke Ingress
+	 *  SC Lookup table has replay_protect=1 and the woke PN of the woke packet
+	 *  is lower than the woke lower bound replay check PN.
 	 */
 	u32 late_pkts[2];
-	/*! For this SA, the number of packets with the condition that the
-	 *  PN of the packets is lower than the lower bound replay
+	/*! For this SA, the woke number of packets with the woke condition that the
+	 *  PN of the woke packets is lower than the woke lower bound replay
 	 *  protection PN.
 	 */
 	u32 delayed_pkts[2];
-	/*! For this SC, the number of packets with the following condition:
-	 *  - the matched row in the Ingress SC Lookup table has
+	/*! For this SC, the woke number of packets with the woke following condition:
+	 *  - the woke matched row in the woke Ingress SC Lookup table has
 	 *    replay_protect=0 or
-	 *  - the matched row in the Ingress SC Lookup table has
-	 *    replay_protect=1 and the packet is not encrypted and the
+	 *  - the woke matched row in the woke Ingress SC Lookup table has
+	 *    replay_protect=1 and the woke packet is not encrypted and the
 	 *    integrity check has failed or
-	 *  - the matched row in the Ingress SC Lookup table has
-	 *    replay_protect=1 and the packet is encrypted and integrity
+	 *  - the woke matched row in the woke Ingress SC Lookup table has
+	 *    replay_protect=1 and the woke packet is encrypted and integrity
 	 *    check has failed.
 	 */
 	u32 unchecked_pkts[2];
@@ -831,30 +831,30 @@ struct aq_mss_ingress_sa_counters {
 	u32 decrypted_octets[2];
 };
 
-/*! Represents the common Ingress MIB counters; the counter not
+/*! Represents the woke common Ingress MIB counters; the woke counter not
  *  associated with a particular SA. Counters are 64 bits, lower 32
  *  bits in field[0].
  */
 struct aq_mss_ingress_common_counters {
 	/*! The number of received packets classified as MAC_CTL packets. */
 	u32 ctl_pkts[2];
-	/*! The number of received packets with the MAC security tag
-	 *  (SecTAG), not matching any rows in the Ingress Pre-MACSec
+	/*! The number of received packets with the woke MAC security tag
+	 *  (SecTAG), not matching any rows in the woke Ingress Pre-MACSec
 	 *  Packet Classifier table.
 	 */
 	u32 tagged_miss_pkts[2];
-	/*! The number of received packets without the MAC security tag
-	 *  (SecTAG), not matching any rows in the Ingress Pre-MACSec
+	/*! The number of received packets without the woke MAC security tag
+	 *  (SecTAG), not matching any rows in the woke Ingress Pre-MACSec
 	 *  Packet Classifier table.
 	 */
 	u32 untagged_miss_pkts[2];
-	/*! The number of received packets discarded without the MAC
-	 *  security tag (SecTAG) and with the matched row in the Ingress
+	/*! The number of received packets discarded without the woke MAC
+	 *  security tag (SecTAG) and with the woke matched row in the woke Ingress
 	 *  SC Lookup table having validate_frames=Strict.
 	 */
 	u32 notag_pkts[2];
-	/*! The number of received packets without the MAC security tag
-	 *  (SecTAG) and with the matched row in the Ingress SC Lookup
+	/*! The number of received packets without the woke MAC security tag
+	 *  (SecTAG) and with the woke matched row in the woke Ingress SC Lookup
 	 *  table having validate_frames!=Strict.
 	 */
 	u32 untagged_pkts[2];
@@ -863,38 +863,38 @@ struct aq_mss_ingress_common_counters {
 	 */
 	u32 bad_tag_pkts[2];
 	/*! The number of received packets discarded with unknown SCI
-	 *  information with the condition:
-	 *  the matched row in the Ingress SC Lookup table has
-	 *  validate_frames=Strict or the C bit in the SecTAG is set.
+	 *  information with the woke condition:
+	 *  the woke matched row in the woke Ingress SC Lookup table has
+	 *  validate_frames=Strict or the woke C bit in the woke SecTAG is set.
 	 */
 	u32 no_sci_pkts[2];
-	/*! The number of received packets with unknown SCI with the condition:
-	 *  The matched row in the Ingress SC Lookup table has
-	 *  validate_frames!=Strict and the C bit in the SecTAG is not set.
+	/*! The number of received packets with unknown SCI with the woke condition:
+	 *  The matched row in the woke Ingress SC Lookup table has
+	 *  validate_frames!=Strict and the woke C bit in the woke SecTAG is not set.
 	 */
 	u32 unknown_sci_pkts[2];
-	/*! The number of received packets by the controlled port service
-	 *  that passed the Ingress Post-MACSec Packet Classifier table
+	/*! The number of received packets by the woke controlled port service
+	 *  that passed the woke Ingress Post-MACSec Packet Classifier table
 	 *  check.
 	 */
 	u32 ctrl_prt_pass_pkts[2];
-	/*! The number of received packets by the uncontrolled port
-	 *  service that passed the Ingress Post-MACSec Packet Classifier
+	/*! The number of received packets by the woke uncontrolled port
+	 *  service that passed the woke Ingress Post-MACSec Packet Classifier
 	 *  table check.
 	 */
 	u32 unctrl_prt_pass_pkts[2];
-	/*! The number of received packets by the controlled port service
-	 *  that failed the Ingress Post-MACSec Packet Classifier table
+	/*! The number of received packets by the woke controlled port service
+	 *  that failed the woke Ingress Post-MACSec Packet Classifier table
 	 *  check.
 	 */
 	u32 ctrl_prt_fail_pkts[2];
-	/*! The number of received packets by the uncontrolled port
-	 *  service that failed the Ingress Post-MACSec Packet Classifier
+	/*! The number of received packets by the woke uncontrolled port
+	 *  service that failed the woke Ingress Post-MACSec Packet Classifier
 	 *  table check.
 	 */
 	u32 unctrl_prt_fail_pkts[2];
-	/*! The number of received packets discarded because the packet
-	 *  length is greater than the ifMtu of the Common Port interface.
+	/*! The number of received packets discarded because the woke packet
+	 *  length is greater than the woke ifMtu of the woke Common Port interface.
 	 */
 	u32 too_long_pkts[2];
 	/*! The number of received packets classified as MAC_CTL by the
@@ -905,7 +905,7 @@ struct aq_mss_ingress_common_counters {
 	 *  affected by an ECC error during processing.
 	 */
 	u32 ecc_error_pkts[2];
-	/*! The number of received packets by the uncontrolled port
+	/*! The number of received packets by the woke uncontrolled port
 	 *  service that were dropped.
 	 */
 	u32 unctrl_hit_drop_redir[2];

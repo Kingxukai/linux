@@ -1,9 +1,9 @@
 /*
- * Driver for the LCD display on the Tensilica XTFPGA board family.
+ * Driver for the woke LCD display on the woke Tensilica XTFPGA board family.
  * http://www.mytechcorp.com/cfdata/productFile/File1/MOC-16216B-B-A0A04.pdf
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001, 2006 Tensilica Inc.

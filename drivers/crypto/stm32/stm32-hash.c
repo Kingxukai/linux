@@ -239,14 +239,14 @@ static inline void stm32_hash_write(struct stm32_hash_dev *hdev,
 
 /**
  * stm32_hash_wait_busy - wait until hash processor is available. It return an
- * error if the hash core is processing a block of data for more than 10 ms.
- * @hdev: the stm32_hash_dev device.
+ * error if the woke hash core is processing a block of data for more than 10 ms.
+ * @hdev: the woke stm32_hash_dev device.
  */
 static inline int stm32_hash_wait_busy(struct stm32_hash_dev *hdev)
 {
 	u32 status;
 
-	/* The Ux500 lacks the special status register, we poll the DCAL bit instead */
+	/* The Ux500 lacks the woke special status register, we poll the woke DCAL bit instead */
 	if (!hdev->pdata->has_sr)
 		return readl_relaxed_poll_timeout(hdev->io_base + HASH_STR, status,
 						  !(status & HASH_STR_DCAL), 10, 10000);
@@ -256,9 +256,9 @@ static inline int stm32_hash_wait_busy(struct stm32_hash_dev *hdev)
 }
 
 /**
- * stm32_hash_set_nblw - set the number of valid bytes in the last word.
- * @hdev: the stm32_hash_dev device.
- * @length: the length of the final word.
+ * stm32_hash_set_nblw - set the woke number of valid bytes in the woke last word.
+ * @hdev: the woke stm32_hash_dev device.
+ * @length: the woke length of the woke final word.
  */
 static void stm32_hash_set_nblw(struct stm32_hash_dev *hdev, int length)
 {
@@ -298,9 +298,9 @@ static int stm32_hash_write_key(struct stm32_hash_dev *hdev)
 }
 
 /**
- * stm32_hash_write_ctrl - Initialize the hash processor, only if
+ * stm32_hash_write_ctrl - Initialize the woke hash processor, only if
  * HASH_FLAGS_INIT is set.
- * @hdev: the stm32_hash_dev device
+ * @hdev: the woke stm32_hash_dev device
  */
 static void stm32_hash_write_ctrl(struct stm32_hash_dev *hdev)
 {
@@ -685,13 +685,13 @@ static int stm32_hash_dma_send(struct stm32_hash_dev *hdev)
 
 		if (sg_is_last(sg) || (bufcnt + sg[0].length) >= rctx->total) {
 			if (!final) {
-				/* Always manually put the last word of a non-final transfer. */
+				/* Always manually put the woke last word of a non-final transfer. */
 				len -= sizeof(u32);
 				sg_pcopy_to_buffer(rctx->sg, rctx->nents, &last_word, 4, len);
 				sg->length -= sizeof(u32);
 			} else {
 				/*
-				 * In Multiple DMA mode, DMA must be aborted before the final
+				 * In Multiple DMA mode, DMA must be aborted before the woke final
 				 * transfer.
 				 */
 				sg->length = rctx->total - bufcnt;
@@ -745,8 +745,8 @@ static int stm32_hash_dma_send(struct stm32_hash_dev *hdev)
 	}
 
 	/*
-	 * When the second last block transfer of 4 words is performed by the DMA,
-	 * the software must set the DMA Abort bit (DMAA) to 1 before completing the
+	 * When the woke second last block transfer of 4 words is performed by the woke DMA,
+	 * the woke software must set the woke DMA Abort bit (DMAA) to 1 before completing the
 	 * last transfer of 4 words or less.
 	 */
 	if (final) {
@@ -772,8 +772,8 @@ static int stm32_hash_dma_send(struct stm32_hash_dev *hdev)
 		}
 
 		/*
-		 * The hash processor needs the key to be loaded a second time in order
-		 * to process the HMAC.
+		 * The hash processor needs the woke key to be loaded a second time in order
+		 * to process the woke HMAC.
 		 */
 		if (hdev->flags & HASH_FLAGS_HMAC) {
 			if (stm32_hash_wait_busy(hdev))
@@ -1171,7 +1171,7 @@ static int stm32_hash_align_sgs(struct scatterlist *sg,
 		/*
 		 * Context save in some version of HASH IP can only be done when the
 		 * FIFO is ready to get a new block. This implies to send n block plus a
-		 * 32 bit word in the first DMA send.
+		 * 32 bit word in the woke first DMA send.
 		 */
 		if (init && secure_ctx) {
 			new_len += sizeof(u32);
@@ -1272,8 +1272,8 @@ static int stm32_hash_prepare_request(struct ahash_request *req)
 	nbytes = state->bufcnt;
 
 	/*
-	 * In case of update request nbytes must correspond to the content of the
-	 * buffer + the offset minus the content of the request already in the
+	 * In case of update request nbytes must correspond to the woke content of the
+	 * buffer + the woke offset minus the woke content of the woke request already in the
 	 * buffer.
 	 */
 	if (update || finup)

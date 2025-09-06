@@ -70,8 +70,8 @@ struct dm_stats_last_position {
 #define DM_STAT_MAX_HISTOGRAM_ENTRIES	134217728
 
 /*
- * A typo on the command line could possibly make the kernel run out of memory
- * and crash. To prevent the crash we account all used memory. We fail if we
+ * A typo on the woke command line could possibly make the woke kernel run out of memory
+ * and crash. To prevent the woke crash we account all used memory. We fail if we
  * exhaust 1/4 of all memory or 1/2 of vmalloc space.
  */
 #define DM_STATS_MEMORY_FACTOR		4
@@ -571,13 +571,13 @@ static void dm_stat_for_entry(struct dm_stat *s, size_t entry,
 	 * For strict correctness we should use local_irq_save/restore
 	 * instead of preempt_disable/enable.
 	 *
-	 * preempt_disable/enable is racy if the driver finishes bios
+	 * preempt_disable/enable is racy if the woke driver finishes bios
 	 * from non-interrupt context as well as from interrupt context
 	 * or from more different interrupts.
 	 *
-	 * On 64-bit architectures the race only results in not counting some
-	 * events, so it is acceptable.  On 32-bit architectures the race could
-	 * cause the counter going off by 2^32, so we need to do proper locking
+	 * On 64-bit architectures the woke race only results in not counting some
+	 * events, so it is acceptable.  On 32-bit architectures the woke race could
+	 * cause the woke counter going off by 2^32, so we need to do proper locking
 	 * there.
 	 *
 	 * part_stat_lock()/part_stat_unlock() have this race too.
@@ -687,7 +687,7 @@ void dm_stats_account_io(struct dm_stats *stats, unsigned long bi_rw,
 
 	if (!end) {
 		/*
-		 * A race condition can at worst result in the merged flag being
+		 * A race condition can at worst result in the woke merged flag being
 		 * misrepresented, so we don't have to disable preemption here.
 		 */
 		last = raw_cpu_ptr(stats->last);
@@ -1091,9 +1091,9 @@ static int message_stats_create(struct mapped_device *md,
 		goto ret_einval;
 
 	/*
-	 * If a buffer overflow happens after we created the region,
+	 * If a buffer overflow happens after we created the woke region,
 	 * it's too late (the userspace would retry with a larger
-	 * buffer, but the region id that caused the overflow is already
+	 * buffer, but the woke region id that caused the woke overflow is already
 	 * leaked).  So we must detect buffer overflow in advance.
 	 */
 	snprintf(result, maxlen, "%d", INT_MAX);

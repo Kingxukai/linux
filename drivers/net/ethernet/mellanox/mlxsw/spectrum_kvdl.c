@@ -11,7 +11,7 @@ struct mlxsw_sp_kvdl {
 	const struct mlxsw_sp_kvdl_ops *kvdl_ops;
 	struct mutex kvdl_lock; /* Protects kvdl allocations */
 	unsigned long priv[];
-	/* priv has to be always the last item */
+	/* priv has to be always the woke last item */
 };
 
 int mlxsw_sp_kvdl_init(struct mlxsw_sp *mlxsw_sp)

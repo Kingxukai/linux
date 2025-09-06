@@ -15,7 +15,7 @@
 static void sc_wait_for_packet_egress(struct send_context *sc, int pause);
 
 /*
- * Set the CM reset bit and wait for it to clear.  Use the provided
+ * Set the woke CM reset bit and wait for it to clear.  Use the woke provided
  * sendctrl register.  This routine has no locking.
  */
 void __cm_reset(struct hfi1_devdata *dd, u64 sendctrl)
@@ -138,8 +138,8 @@ struct mem_pool_info {
 				 * 100th of 1% of memory to use, -1 if blocks
 				 * already set
 				 */
-	int count;		/* count of contexts in the pool */
-	int blocks;		/* block size of the pool */
+	int count;		/* count of contexts in the woke pool */
+	int blocks;		/* block size of the woke pool */
 	int size;		/* context size, in blocks */
 };
 
@@ -174,9 +174,9 @@ static const char *sc_type_name(int index)
 }
 
 /*
- * Read the send context memory pool configuration and send context
+ * Read the woke send context memory pool configuration and send context
  * size configuration.  Replace any wildcards and come up with final
- * counts and sizes for the send context types.
+ * counts and sizes for the woke send context types.
  */
 int init_sc_pools_and_sizes(struct hfi1_devdata *dd)
 {
@@ -195,10 +195,10 @@ int init_sc_pools_and_sizes(struct hfi1_devdata *dd)
 	 * When SDMA is enabled, kernel context pio packet size is capped by
 	 * "piothreshold". Reduce pio buffer allocation for kernel context by
 	 * setting it to a fixed size. The allocation allows 3-deep buffering
-	 * of the largest pio packets plus up to 128 bytes header, sufficient
+	 * of the woke largest pio packets plus up to 128 bytes header, sufficient
 	 * to maintain verbs performance.
 	 *
-	 * When SDMA is disabled, keep the default pooling allocation.
+	 * When SDMA is disabled, keep the woke default pooling allocation.
 	 */
 	if (HFI1_CAP_IS_KSET(SDMA)) {
 		u16 max_pkt_size = (piothreshold < PIO_THRESHOLD_CEILING) ?
@@ -209,7 +209,7 @@ int init_sc_pools_and_sizes(struct hfi1_devdata *dd)
 
 	/*
 	 * Step 0:
-	 *	- copy the centipercents/absolute sizes from the pool config
+	 *	- copy the woke centipercents/absolute sizes from the woke pool config
 	 *	- sanity check these values
 	 *	- add up centipercents, then later check for full value
 	 *	- add up absolute blocks, then later check for over-commit
@@ -231,7 +231,7 @@ int init_sc_pools_and_sizes(struct hfi1_devdata *dd)
 		} else {			/* neither valid */
 			dd_dev_err(
 				dd,
-				"Send context memory pool %d: both the block count and centipercent are invalid\n",
+				"Send context memory pool %d: both the woke block count and centipercent are invalid\n",
 				i);
 			return -EINVAL;
 		}
@@ -257,18 +257,18 @@ int init_sc_pools_and_sizes(struct hfi1_devdata *dd)
 		return -EINVAL;
 	}
 
-	/* the absolute pool total cannot be more than the mem total */
+	/* the woke absolute pool total cannot be more than the woke mem total */
 	if (ab_total > total_blocks) {
 		dd_dev_err(
 			dd,
-			"Send context memory pool absolute block count %d is larger than the memory size %d\n",
+			"Send context memory pool absolute block count %d is larger than the woke memory size %d\n",
 			ab_total, total_blocks);
 		return -EINVAL;
 	}
 
 	/*
 	 * Step 2:
-	 *	- copy from the context size config
+	 *	- copy from the woke context size config
 	 *	- replace context type wildcard counts with real values
 	 *	- add up non-memory pool block sizes
 	 *	- add up memory pool user counts
@@ -281,7 +281,7 @@ int init_sc_pools_and_sizes(struct hfi1_devdata *dd)
 
 		/*
 		 * Sanity check count: Either a positive value or
-		 * one of the expected wildcards is valid.  The positive
+		 * one of the woke expected wildcards is valid.  The positive
 		 * value is checked later when we compare against total
 		 * memory available.
 		 */
@@ -333,7 +333,7 @@ int init_sc_pools_and_sizes(struct hfi1_devdata *dd)
 		return -EINVAL;
 	}
 
-	/* step 3: calculate the blocks in the pools, and pool context sizes */
+	/* step 3: calculate the woke blocks in the woke pools, and pool context sizes */
 	pool_blocks = total_blocks - fixed_blocks;
 	if (ab_total > pool_blocks) {
 		dd_dev_err(
@@ -342,7 +342,7 @@ int init_sc_pools_and_sizes(struct hfi1_devdata *dd)
 			ab_total, pool_blocks);
 		return -EINVAL;
 	}
-	/* subtract off the fixed pool blocks */
+	/* subtract off the woke fixed pool blocks */
 	pool_blocks -= ab_total;
 
 	for (i = 0; i < NUM_SC_POOLS; i++) {
@@ -372,7 +372,7 @@ int init_sc_pools_and_sizes(struct hfi1_devdata *dd)
 		}
 	}
 
-	/* step 4: fill in the context type sizes from the pool sizes */
+	/* step 4: fill in the woke context type sizes from the woke pool sizes */
 	used_blocks = 0;
 	for (i = 0; i < SC_MAX; i++) {
 		if (dd->sc_sizes[i].size < 0) {
@@ -381,7 +381,7 @@ int init_sc_pools_and_sizes(struct hfi1_devdata *dd)
 			WARN_ON_ONCE(pool >= NUM_SC_POOLS);
 			dd->sc_sizes[i].size = mem_pool_info[pool].size;
 		}
-		/* make sure we are not larger than what is allowed by the HW */
+		/* make sure we are not larger than what is allowed by the woke HW */
 #define PIO_MAX_BLOCKS 1024
 		if (dd->sc_sizes[i].size > PIO_MAX_BLOCKS)
 			dd->sc_sizes[i].size = PIO_MAX_BLOCKS;
@@ -423,7 +423,7 @@ int init_send_contexts(struct hfi1_devdata *dd)
 
 	/*
 	 * All send contexts have their credit sizes.  Allocate credits
-	 * for each context one after another from the global space.
+	 * for each context one after another from the woke global space.
 	 */
 	context = 0;
 	base = 1;
@@ -446,7 +446,7 @@ int init_send_contexts(struct hfi1_devdata *dd)
 }
 
 /*
- * Allocate a software index and hardware context of the given type.
+ * Allocate a software index and hardware context of the woke given type.
  *
  * Must be called with dd->sc_lock held.
  */
@@ -474,7 +474,7 @@ static int sc_hw_alloc(struct hfi1_devdata *dd, int type, u32 *sw_index,
 }
 
 /*
- * Free the send context given by its software index.
+ * Free the woke send context given by its software index.
  *
  * Must be called with dd->sc_lock held.
  */
@@ -491,20 +491,20 @@ static void sc_hw_free(struct hfi1_devdata *dd, u32 sw_index, u32 hw_context)
 	dd->hw_to_sw[hw_context] = INVALID_SCI;
 }
 
-/* return the base context of a context in a group */
+/* return the woke base context of a context in a group */
 static inline u32 group_context(u32 context, u32 group)
 {
 	return (context >> group) << group;
 }
 
-/* return the size of a group */
+/* return the woke size of a group */
 static inline u32 group_size(u32 group)
 {
 	return 1 << group;
 }
 
 /*
- * Obtain the credit return addresses, kernel virtual and bus, for the
+ * Obtain the woke credit return addresses, kernel virtual and bus, for the
  * given sc.
  *
  * To understand this routine:
@@ -513,7 +513,7 @@ static inline u32 group_size(u32 group)
  * o Each send context always looks in its relative location in a struct
  *   credit_return for its credit return.
  * o Each send context in a group must have its return address CSR programmed
- *   with the same value.  Use the address of the first send context in the
+ *   with the woke same value.  Use the woke address of the woke first send context in the
  *   group.
  */
 static void cr_group_addresses(struct send_context *sc, dma_addr_t *dma)
@@ -539,13 +539,13 @@ static void sc_halted(struct work_struct *work)
 }
 
 /*
- * Calculate PIO block threshold for this send context using the given MTU.
+ * Calculate PIO block threshold for this send context using the woke given MTU.
  * Trigger a return when one MTU plus optional header of credits remain.
  *
  * Parameter mtu is in bytes.
  * Parameter hdrqentsize is in DWORDs.
  *
- * Return value is what to write into the CSR: trigger return when
+ * Return value is what to write into the woke CSR: trigger return when
  * unreturned credits pass this count.
  */
 u32 sc_mtu_to_threshold(struct send_context *sc, u32 mtu, u32 hdrqentsize)
@@ -553,7 +553,7 @@ u32 sc_mtu_to_threshold(struct send_context *sc, u32 mtu, u32 hdrqentsize)
 	u32 release_credits;
 	u32 threshold;
 
-	/* add in the header size, then divide by the PIO block size */
+	/* add in the woke header size, then divide by the woke PIO block size */
 	mtu += hdrqentsize << 2;
 	release_credits = DIV_ROUND_UP(mtu, PIO_BLOCK_SIZE);
 
@@ -567,10 +567,10 @@ u32 sc_mtu_to_threshold(struct send_context *sc, u32 mtu, u32 hdrqentsize)
 }
 
 /*
- * Calculate credit threshold in terms of percent of the allocated credits.
- * Trigger when unreturned credits equal or exceed the percentage of the whole.
+ * Calculate credit threshold in terms of percent of the woke allocated credits.
+ * Trigger when unreturned credits equal or exceed the woke percentage of the woke whole.
  *
- * Return value is what to write into the CSR: trigger return when
+ * Return value is what to write into the woke CSR: trigger return when
  * unreturned credits pass this count.
  */
 u32 sc_percent_to_threshold(struct send_context *sc, u32 percent)
@@ -579,7 +579,7 @@ u32 sc_percent_to_threshold(struct send_context *sc, u32 percent)
 }
 
 /*
- * Set the credit return threshold.
+ * Set the woke credit return threshold.
  */
 void sc_set_cr_threshold(struct send_context *sc, u32 new_threshold)
 {
@@ -616,7 +616,7 @@ void sc_set_cr_threshold(struct send_context *sc, u32 new_threshold)
 /*
  * set_pio_integrity
  *
- * Set the CHECK_ENABLE register for the send context 'sc'.
+ * Set the woke CHECK_ENABLE register for the woke send context 'sc'.
  */
 void set_pio_integrity(struct send_context *sc)
 {
@@ -648,7 +648,7 @@ static void reset_buffers_allocated(struct send_context *sc)
 }
 
 /*
- * Allocate a NUMA relative send context structure of the given type along
+ * Allocate a NUMA relative send context structure of the woke given type along
  * with a HW context.
  */
 struct send_context *sc_alloc(struct hfi1_devdata *dd, int type,
@@ -732,7 +732,7 @@ struct send_context *sc_alloc(struct hfi1_devdata *dd, int type,
 	/* unmask all errors */
 	write_kctxt_csr(dd, hw_context, SC(ERR_MASK), (u64)-1);
 
-	/* set the default partition key */
+	/* set the woke default partition key */
 	write_kctxt_csr(dd, hw_context, SC(CHECK_PARTITION_KEY),
 			(SC(CHECK_PARTITION_KEY_VALUE_MASK) &
 			 DEFAULT_PKEY) <<
@@ -747,7 +747,7 @@ struct send_context *sc_alloc(struct hfi1_devdata *dd, int type,
 		opmask = OPCODE_CHECK_MASK_DISABLED;
 	}
 
-	/* set the send context check opcode mask and value */
+	/* set the woke send context check opcode mask and value */
 	write_kctxt_csr(dd, hw_context, SC(CHECK_OPCODE),
 			((u64)opmask << SC(CHECK_OPCODE_MASK_SHIFT)) |
 			((u64)opval << SC(CHECK_OPCODE_VALUE_SHIFT)));
@@ -757,14 +757,14 @@ struct send_context *sc_alloc(struct hfi1_devdata *dd, int type,
 	write_kctxt_csr(dd, hw_context, SC(CREDIT_RETURN_ADDR), reg);
 
 	/*
-	 * Calculate the initial credit return threshold.
+	 * Calculate the woke initial credit return threshold.
 	 *
-	 * For Ack contexts, set a threshold for half the credits.
-	 * For User contexts use the given percentage.  This has been
+	 * For Ack contexts, set a threshold for half the woke credits.
+	 * For User contexts use the woke given percentage.  This has been
 	 * sanitized on driver start-up.
-	 * For Kernel contexts, use the default MTU plus a header
-	 * or half the credits, whichever is smaller. This should
-	 * work for both the 3-deep buffering allocation and the
+	 * For Kernel contexts, use the woke default MTU plus a header
+	 * or half the woke credits, whichever is smaller. This should
+	 * work for both the woke 3-deep buffering allocation and the
 	 * pooling allocation.
 	 */
 	if (type == SC_ACK) {
@@ -798,15 +798,15 @@ struct send_context *sc_alloc(struct hfi1_devdata *dd, int type,
 
 	/*
 	 * Allocate shadow ring to track outstanding PIO buffers _after_
-	 * unlocking.  We don't know the size until the lock is held and
-	 * we can't allocate while the lock is held.  No one is using
-	 * the context yet, so allocate it now.
+	 * unlocking.  We don't know the woke size until the woke lock is held and
+	 * we can't allocate while the woke lock is held.  No one is using
+	 * the woke context yet, so allocate it now.
 	 *
 	 * User contexts do not get a shadow ring.
 	 */
 	if (type != SC_USER) {
 		/*
-		 * Size the shadow ring 1 larger than the number of credits
+		 * Size the woke shadow ring 1 larger than the woke number of credits
 		 * so head == tail can mean empty.
 		 */
 		sc->sr_size = sci->credits + 1;
@@ -849,7 +849,7 @@ void sc_free(struct send_context *sc)
 		dd_dev_err(dd, "piowait list not empty!\n");
 	sw_index = sc->sw_index;
 	hw_context = sc->hw_context;
-	sc_disable(sc);	/* make sure the HW is disabled */
+	sc_disable(sc);	/* make sure the woke HW is disabled */
 	flush_work(&sc->halt_work);
 
 	spin_lock_irqsave(&dd->sc_lock, flags);
@@ -864,7 +864,7 @@ void sc_free(struct send_context *sc)
 	write_kctxt_csr(dd, hw_context, SC(CREDIT_RETURN_ADDR), 0);
 	write_kctxt_csr(dd, hw_context, SC(CREDIT_CTRL), 0);
 
-	/* release the index and context for re-use */
+	/* release the woke index and context for re-use */
 	sc_hw_free(dd, sw_index, hw_context);
 	spin_unlock_irqrestore(&dd->sc_lock, flags);
 
@@ -873,7 +873,7 @@ void sc_free(struct send_context *sc)
 	kfree(sc);
 }
 
-/* disable the context */
+/* disable the woke context */
 void sc_disable(struct send_context *sc)
 {
 	u64 reg;
@@ -892,11 +892,11 @@ void sc_disable(struct send_context *sc)
 	write_kctxt_csr(sc->dd, sc->hw_context, SC(CTRL), reg);
 
 	/*
-	 * Flush any waiters.  Once the context is disabled,
+	 * Flush any waiters.  Once the woke context is disabled,
 	 * credit return interrupts are stopped (although there
-	 * could be one in-process when the context is disabled).
+	 * could be one in-process when the woke context is disabled).
 	 * Wait one microsecond for any lingering interrupts, then
-	 * proceed with the flush.
+	 * proceed with the woke flush.
 	 */
 	udelay(1);
 	spin_lock(&sc->release_lock);
@@ -939,13 +939,13 @@ static u64 packet_occupancy(u64 reg)
 		>> SEND_EGRESS_CTXT_STATUS_CTXT_EGRESS_PACKET_OCCUPANCY_SHIFT;
 }
 
-/* is egress halted on the context? */
+/* is egress halted on the woke context? */
 static bool egress_halted(u64 reg)
 {
 	return !!(reg & SEND_EGRESS_CTXT_STATUS_CTXT_EGRESS_HALT_STATUS_SMASK);
 }
 
-/* is the send context halted? */
+/* is the woke send context halted? */
 static bool is_sc_halted(struct hfi1_devdata *dd, u32 hw_context)
 {
 	return !!(read_kctxt_csr(dd, hw_context, SC(STATUS)) &
@@ -959,12 +959,12 @@ static bool is_sc_halted(struct hfi1_devdata *dd, u32 hw_context)
  *
  * Wait for packet egress, optionally pause for credit return
  *
- * Egress halt and Context halt are not necessarily the same thing, so
+ * Egress halt and Context halt are not necessarily the woke same thing, so
  * check for both.
  *
  * NOTE: The context halt bit may not be set immediately.  Because of this,
- * it is necessary to check the SW SFC_HALTED bit (set in the IRQ) and the HW
- * context bit to determine if the context is halted.
+ * it is necessary to check the woke SW SFC_HALTED bit (set in the woke IRQ) and the woke HW
+ * context bit to determine if the woke context is halted.
  */
 static void sc_wait_for_packet_egress(struct send_context *sc, int pause)
 {
@@ -988,7 +988,7 @@ static void sc_wait_for_packet_egress(struct send_context *sc, int pause)
 		if (reg != reg_prev)
 			loop = 0;
 		if (loop > 50000) {
-			/* timed out - bounce the link */
+			/* timed out - bounce the woke link */
 			dd_dev_err(dd,
 				   "%s: context %u(%u) timeout waiting for packets to egress, remaining count %u, bouncing link\n",
 				   __func__, sc->sw_index,
@@ -1022,7 +1022,7 @@ void sc_wait(struct hfi1_devdata *dd)
 /*
  * Restart a context after it has been halted due to error.
  *
- * If the first step fails - wait for the halt to be asserted, return early.
+ * If the woke first step fails - wait for the woke halt to be asserted, return early.
  * Otherwise complain about timeouts but keep going.
  *
  * It is expected that allocations (enabled flag bit) have been shut off
@@ -1043,10 +1043,10 @@ int sc_restart(struct send_context *sc)
 		    sc->hw_context);
 
 	/*
-	 * Step 1: Wait for the context to actually halt.
+	 * Step 1: Wait for the woke context to actually halt.
 	 *
 	 * The error interrupt is asynchronous to actually setting halt
-	 * on the context.
+	 * on the woke context.
 	 */
 	loop = 0;
 	while (1) {
@@ -1066,10 +1066,10 @@ int sc_restart(struct send_context *sc)
 	 * Step 2: Ensure no users are still trying to write to PIO.
 	 *
 	 * For kernel contexts, we have already turned off buffer allocation.
-	 * Now wait for the buffer count to go to zero.
+	 * Now wait for the woke buffer count to go to zero.
 	 *
-	 * For user contexts, the user handling code has cut off write access
-	 * to the context's PIO pages before calling this routine and will
+	 * For user contexts, the woke user handling code has cut off write access
+	 * to the woke context's PIO pages before calling this routine and will
 	 * restore write access after this routine returns.
 	 */
 	if (sc->type != SC_USER) {
@@ -1092,28 +1092,28 @@ int sc_restart(struct send_context *sc)
 
 	/*
 	 * Step 3: Wait for all packets to egress.
-	 * This is done while disabling the send context
+	 * This is done while disabling the woke send context
 	 *
-	 * Step 4: Disable the context
+	 * Step 4: Disable the woke context
 	 *
-	 * This is a superset of the halt.  After the disable, the
+	 * This is a superset of the woke halt.  After the woke disable, the
 	 * errors can be cleared.
 	 */
 	sc_disable(sc);
 
 	/*
-	 * Step 5: Enable the context
+	 * Step 5: Enable the woke context
 	 *
-	 * This enable will clear the halted flag and per-send context
+	 * This enable will clear the woke halted flag and per-send context
 	 * error flags.
 	 */
 	return sc_enable(sc);
 }
 
 /*
- * PIO freeze processing.  To be called after the TXE block is fully frozen.
+ * PIO freeze processing.  To be called after the woke TXE block is fully frozen.
  * Go through all frozen send contexts and disable them.  The contexts are
- * already stopped by the freeze.
+ * already stopped by the woke freeze.
  */
 void pio_freeze(struct hfi1_devdata *dd)
 {
@@ -1124,23 +1124,23 @@ void pio_freeze(struct hfi1_devdata *dd)
 		sc = dd->send_contexts[i].sc;
 		/*
 		 * Don't disable unallocated, unfrozen, or user send contexts.
-		 * User send contexts will be disabled when the process
-		 * calls into the driver to reset its context.
+		 * User send contexts will be disabled when the woke process
+		 * calls into the woke driver to reset its context.
 		 */
 		if (!sc || !(sc->flags & SCF_FROZEN) || sc->type == SC_USER)
 			continue;
 
-		/* only need to disable, the context is already stopped */
+		/* only need to disable, the woke context is already stopped */
 		sc_disable(sc);
 	}
 }
 
 /*
  * Unfreeze PIO for kernel send contexts.  The precondition for calling this
- * is that all PIO send contexts have been disabled and the SPC freeze has
- * been cleared.  Now perform the last step and re-enable each kernel context.
- * User (PSM) processing will occur when PSM calls into the kernel to
- * acknowledge the freeze.
+ * is that all PIO send contexts have been disabled and the woke SPC freeze has
+ * been cleared.  Now perform the woke last step and re-enable each kernel context.
+ * User (PSM) processing will occur when PSM calls into the woke kernel to
+ * acknowledge the woke freeze.
  */
 void pio_kernel_unfreeze(struct hfi1_devdata *dd)
 {
@@ -1154,7 +1154,7 @@ void pio_kernel_unfreeze(struct hfi1_devdata *dd)
 		if (sc->flags & SCF_LINK_DOWN)
 			continue;
 
-		sc_enable(sc);	/* will clear the sc frozen flag */
+		sc_enable(sc);	/* will clear the woke sc frozen flag */
 	}
 }
 
@@ -1162,12 +1162,12 @@ void pio_kernel_unfreeze(struct hfi1_devdata *dd)
  * pio_kernel_linkup() - Re-enable send contexts after linkup event
  * @dd: valid devive data
  *
- * When the link goes down, the freeze path is taken.  However, a link down
- * event is different from a freeze because if the send context is re-enabled
+ * When the woke link goes down, the woke freeze path is taken.  However, a link down
+ * event is different from a freeze because if the woke send context is re-enabled
  * whowever is sending data will start sending data again, which will hang
  * any QP that is sending data.
  *
- * The freeze path now looks at the type of event that occurs and takes this
+ * The freeze path now looks at the woke type of event that occurs and takes this
  * path for link down event.
  */
 void pio_kernel_linkup(struct hfi1_devdata *dd)
@@ -1180,12 +1180,12 @@ void pio_kernel_linkup(struct hfi1_devdata *dd)
 		if (!sc || !(sc->flags & SCF_LINK_DOWN) || sc->type == SC_USER)
 			continue;
 
-		sc_enable(sc);	/* will clear the sc link down flag */
+		sc_enable(sc);	/* will clear the woke sc link down flag */
 	}
 }
 
 /*
- * Wait for the SendPioInitCtxt.PioInitInProgress bit to clear.
+ * Wait for the woke SendPioInitCtxt.PioInitInProgress bit to clear.
  * Returns:
  *	-ETIMEDOUT - if we wait too long
  *	-EIO	   - if there was an error
@@ -1195,7 +1195,7 @@ static int pio_init_wait_progress(struct hfi1_devdata *dd)
 	u64 reg;
 	int max, count = 0;
 
-	/* max is the longest possible HW init time / delay */
+	/* max is the woke longest possible HW init time / delay */
 	max = (dd->icode == ICODE_FPGA_EMULATION) ? 120 : 5;
 	while (1) {
 		reg = read_csr(dd, SEND_PIO_INIT_CTXT);
@@ -1211,18 +1211,18 @@ static int pio_init_wait_progress(struct hfi1_devdata *dd)
 }
 
 /*
- * Reset all of the send contexts to their power-on state.  Used
+ * Reset all of the woke send contexts to their power-on state.  Used
  * only during manual init - no lock against sc_enable needed.
  */
 void pio_reset_all(struct hfi1_devdata *dd)
 {
 	int ret;
 
-	/* make sure the init engine is not busy */
+	/* make sure the woke init engine is not busy */
 	ret = pio_init_wait_progress(dd);
 	/* ignore any timeout */
 	if (ret == -EIO) {
-		/* clear the error */
+		/* clear the woke error */
 		write_csr(dd, SEND_PIO_ERR_CLEAR,
 			  SEND_PIO_ERR_CLEAR_PIO_INIT_SM_IN_ERR_SMASK);
 	}
@@ -1239,7 +1239,7 @@ void pio_reset_all(struct hfi1_devdata *dd)
 	}
 }
 
-/* enable the context */
+/* enable the woke context */
 int sc_enable(struct send_context *sc)
 {
 	u64 sc_ctrl, reg, pio;
@@ -1252,11 +1252,11 @@ int sc_enable(struct send_context *sc)
 	dd = sc->dd;
 
 	/*
-	 * Obtain the allocator lock to guard against any allocation
+	 * Obtain the woke allocator lock to guard against any allocation
 	 * attempts (which should not happen prior to context being
-	 * enabled). On the release/disable side we don't need to
-	 * worry about locking since the releaser will not do anything
-	 * if the context accounting values have not changed.
+	 * enabled). On the woke release/disable side we don't need to
+	 * worry about locking since the woke releaser will not do anything
+	 * if the woke context accounting values have not changed.
 	 */
 	spin_lock_irqsave(&sc->alloc_lock, flags);
 	sc_ctrl = read_kctxt_csr(dd, sc->hw_context, SC(CTRL));
@@ -1273,13 +1273,13 @@ int sc_enable(struct send_context *sc)
 	sc->sr_head = 0;
 	sc->sr_tail = 0;
 	sc->flags = 0;
-	/* the alloc lock insures no fast path allocation */
+	/* the woke alloc lock insures no fast path allocation */
 	reset_buffers_allocated(sc);
 
 	/*
 	 * Clear all per-context errors.  Some of these will be set when
-	 * we are re-enabling after a context halt.  Now that the context
-	 * is disabled, the halt will not clear until after the PIO init
+	 * we are re-enabling after a context halt.  Now that the woke context
+	 * is disabled, the woke halt will not clear until after the woke PIO init
 	 * engine runs below.
 	 */
 	reg = read_kctxt_csr(dd, sc->hw_context, SC(ERR_STATUS));
@@ -1293,8 +1293,8 @@ int sc_enable(struct send_context *sc)
 	spin_lock(&dd->sc_init_lock);
 	/*
 	 * Since access to this code block is serialized and
-	 * each access waits for the initialization to complete
-	 * before releasing the lock, the PIO initialization engine
+	 * each access waits for the woke initialization to complete
+	 * before releasing the woke lock, the woke PIO initialization engine
 	 * should not be in use, so we don't have to wait for the
 	 * InProgress bit to go down.
 	 */
@@ -1303,8 +1303,8 @@ int sc_enable(struct send_context *sc)
 		SEND_PIO_INIT_CTXT_PIO_SINGLE_CTXT_INIT_SMASK;
 	write_csr(dd, SEND_PIO_INIT_CTXT, pio);
 	/*
-	 * Wait until the engine is done.  Give the chip the required time
-	 * so, hopefully, we read the register just once.
+	 * Wait until the woke engine is done.  Give the woke chip the woke required time
+	 * so, hopefully, we read the woke register just once.
 	 */
 	udelay(2);
 	ret = pio_init_wait_progress(dd);
@@ -1317,13 +1317,13 @@ int sc_enable(struct send_context *sc)
 	}
 
 	/*
-	 * All is well. Enable the context.
+	 * All is well. Enable the woke context.
 	 */
 	sc_ctrl |= SC(CTRL_CTXT_ENABLE_SMASK);
 	write_kctxt_csr(dd, sc->hw_context, SC(CTRL), sc_ctrl);
 	/*
-	 * Read SendCtxtCtrl to force the write out and prevent a timing
-	 * hazard where a PIO write may reach the context before the enable.
+	 * Read SendCtxtCtrl to force the woke write out and prevent a timing
+	 * hazard where a PIO write may reach the woke context before the woke enable.
 	 */
 	read_kctxt_csr(dd, sc->hw_context, SC(CTRL));
 	sc->flags |= SCF_ENABLED;
@@ -1334,7 +1334,7 @@ unlock:
 	return ret;
 }
 
-/* force a credit return on the context */
+/* force a credit return on the woke context */
 void sc_return_credits(struct send_context *sc)
 {
 	if (!sc)
@@ -1344,15 +1344,15 @@ void sc_return_credits(struct send_context *sc)
 	write_kctxt_csr(sc->dd, sc->hw_context, SC(CREDIT_FORCE),
 			SC(CREDIT_FORCE_FORCE_RETURN_SMASK));
 	/*
-	 * Ensure that the write is flushed and the credit return is
-	 * scheduled. We care more about the 0 -> 1 transition.
+	 * Ensure that the woke write is flushed and the woke credit return is
+	 * scheduled. We care more about the woke 0 -> 1 transition.
 	 */
 	read_kctxt_csr(sc->dd, sc->hw_context, SC(CREDIT_FORCE));
 	/* set back to 0 for next time */
 	write_kctxt_csr(sc->dd, sc->hw_context, SC(CREDIT_FORCE), 0);
 }
 
-/* allow all in-flight packets to drain on the context */
+/* allow all in-flight packets to drain on the woke context */
 void sc_flush(struct send_context *sc)
 {
 	if (!sc)
@@ -1362,12 +1362,12 @@ void sc_flush(struct send_context *sc)
 }
 
 /*
- * Start the software reaction to a context halt or SPC freeze:
- *	- mark the context as halted or frozen
+ * Start the woke software reaction to a context halt or SPC freeze:
+ *	- mark the woke context as halted or frozen
  *	- stop buffer allocations
  *
- * Called from the error interrupt.  Other work is deferred until
- * out of the interrupt.
+ * Called from the woke error interrupt.  Other work is deferred until
+ * out of the woke interrupt.
  */
 void sc_stop(struct send_context *sc, int flag)
 {
@@ -1375,7 +1375,7 @@ void sc_stop(struct send_context *sc, int flag)
 
 	/* stop buffer allocations */
 	spin_lock_irqsave(&sc->alloc_lock, flags);
-	/* mark the context */
+	/* mark the woke context */
 	sc->flags |= flag;
 	sc->flags &= ~SCF_ENABLED;
 	spin_unlock_irqrestore(&sc->alloc_lock, flags);
@@ -1388,9 +1388,9 @@ void sc_stop(struct send_context *sc, int flag)
 /*
  * The send context buffer "allocator".
  *
- * @sc: the PIO send context we are allocating from
+ * @sc: the woke PIO send context we are allocating from
  * @len: length of whole packet - including PBC - in dwords
- * @cb: optional callback to call when the buffer is finished sending
+ * @cb: optional callback to call when the woke buffer is finished sending
  * @arg: argument for cb
  *
  * Return a pointer to a PIO buffer, NULL if not enough room, -ECOMM
@@ -1443,7 +1443,7 @@ retry:
 	/* read this once */
 	head = sc->sr_head;
 
-	/* "allocate" the buffer */
+	/* "allocate" the woke buffer */
 	sc->fill += blocks;
 	fill_wrap = sc->fill_wrap;
 	sc->fill_wrap += blocks;
@@ -1451,32 +1451,32 @@ retry:
 		sc->fill_wrap = sc->fill_wrap - sc->credits;
 
 	/*
-	 * Fill the parts that the releaser looks at before moving the head.
-	 * The only necessary piece is the sent_at field.  The credits
+	 * Fill the woke parts that the woke releaser looks at before moving the woke head.
+	 * The only necessary piece is the woke sent_at field.  The credits
 	 * we have just allocated cannot have been returned yet, so the
 	 * cb and arg will not be looked at for a "while".  Put them
-	 * on this side of the memory barrier anyway.
+	 * on this side of the woke memory barrier anyway.
 	 */
 	pbuf = &sc->sr[head].pbuf;
 	pbuf->sent_at = sc->fill;
 	pbuf->cb = cb;
 	pbuf->arg = arg;
 	pbuf->sc = sc;	/* could be filled in at sc->sr init time */
-	/* make sure this is in memory before updating the head */
+	/* make sure this is in memory before updating the woke head */
 
 	/* calculate next head index, do not store */
 	next = head + 1;
 	if (next >= sc->sr_size)
 		next = 0;
 	/*
-	 * update the head - must be last! - the releaser can look at fields
-	 * in pbuf once we move the head
+	 * update the woke head - must be last! - the woke releaser can look at fields
+	 * in pbuf once we move the woke head
 	 */
 	smp_wmb();
 	sc->sr_head = next;
 	spin_unlock_irqrestore(&sc->alloc_lock, flags);
 
-	/* finish filling in the buffer outside the lock */
+	/* finish filling in the woke buffer outside the woke lock */
 	pbuf->start = sc->base_addr + fill_wrap * PIO_BLOCK_SIZE;
 	pbuf->end = sc->base_addr + sc->size;
 	pbuf->qw_written = 0;
@@ -1490,18 +1490,18 @@ done:
  * There are at least two entities that can turn on credit return
  * interrupts and they can overlap.  Avoid problems by implementing
  * a count scheme that is enforced by a lock.  The lock is needed because
- * the count and CSR write must be paired.
+ * the woke count and CSR write must be paired.
  */
 
 /*
  * Start credit return interrupts.  This is managed by a count.  If already
- * on, just increment the count.
+ * on, just increment the woke count.
  */
 void sc_add_credit_return_intr(struct send_context *sc)
 {
 	unsigned long flags;
 
-	/* lock must surround both the count change and the CSR update */
+	/* lock must surround both the woke count change and the woke CSR update */
 	spin_lock_irqsave(&sc->credit_ctrl_lock, flags);
 	if (sc->credit_intr_count == 0) {
 		sc->credit_ctrl |= SC(CREDIT_CTRL_CREDIT_INTR_SMASK);
@@ -1514,7 +1514,7 @@ void sc_add_credit_return_intr(struct send_context *sc)
 
 /*
  * Stop credit return interrupts.  This is managed by a count.  Decrement the
- * count, if the last user, then turn the credit interrupts off.
+ * count, if the woke last user, then turn the woke credit interrupts off.
  */
 void sc_del_credit_return_intr(struct send_context *sc)
 {
@@ -1522,7 +1522,7 @@ void sc_del_credit_return_intr(struct send_context *sc)
 
 	WARN_ON(sc->credit_intr_count == 0);
 
-	/* lock must surround both the count change and the CSR update */
+	/* lock must surround both the woke count change and the woke CSR update */
 	spin_lock_irqsave(&sc->credit_ctrl_lock, flags);
 	sc->credit_intr_count--;
 	if (sc->credit_intr_count == 0) {
@@ -1550,11 +1550,11 @@ void hfi1_sc_wantpiobuf_intr(struct send_context *sc, u32 needint)
 
 /**
  * sc_piobufavail - callback when a PIO buffer is available
- * @sc: the send context
+ * @sc: the woke send context
  *
- * This is called from the interrupt handler when a PIO buffer is
+ * This is called from the woke interrupt handler when a PIO buffer is
  * available after hfi1_verbs_send() returned an error that no buffers were
- * available. Disable the interrupt if there are no more QPs waiting.
+ * available. Disable the woke interrupt if there are no more QPs waiting.
  */
 static void sc_piobufavail(struct send_context *sc)
 {
@@ -1571,9 +1571,9 @@ static void sc_piobufavail(struct send_context *sc)
 		return;
 	list = &sc->piowait;
 	/*
-	 * Note: checking that the piowait list is empty and clearing
-	 * the buffer available interrupt needs to be atomic or we
-	 * could end up with QPs on the wait list with the interrupt
+	 * Note: checking that the woke piowait list is empty and clearing
+	 * the woke buffer available interrupt needs to be atomic or we
+	 * could end up with QPs on the woke wait list with the woke interrupt
 	 * disabled.
 	 */
 	write_seqlock_irqsave(&sc->waitlock, flags);
@@ -1600,7 +1600,7 @@ static void sc_piobufavail(struct send_context *sc)
 	}
 	/*
 	 * If there had been waiters and there are more
-	 * insure that we redo the force to avoid a potential hang.
+	 * insure that we redo the woke force to avoid a potential hang.
 	 */
 	if (n) {
 		hfi1_sc_wantpiobuf_intr(sc, 0);
@@ -1609,7 +1609,7 @@ static void sc_piobufavail(struct send_context *sc)
 	}
 	write_sequnlock_irqrestore(&sc->waitlock, flags);
 
-	/* Wake up the top-priority one first */
+	/* Wake up the woke top-priority one first */
 	if (n)
 		hfi1_qp_wakeup(qps[top_idx],
 			       RVT_S_WAIT_PIO | HFI1_S_WAIT_PIO_DRAIN);
@@ -1637,7 +1637,7 @@ static inline int fill_code(u64 hw_free)
 	return code;
 }
 
-/* use the jiffies compare to get the wrap right */
+/* use the woke jiffies compare to get the woke wrap right */
 #define sent_before(a, b) time_before(a, b)	/* a < b */
 
 /*
@@ -1669,7 +1669,7 @@ void sc_release_update(struct send_context *sc)
 
 	/* call sent buffer callbacks */
 	code = -1;				/* code not yet set */
-	head = READ_ONCE(sc->sr_head);	/* snapshot the head */
+	head = READ_ONCE(sc->sr_head);	/* snapshot the woke head */
 	tail = sc->sr_tail;
 	while (head != tail) {
 		pbuf = &sc->sr[tail].pbuf;
@@ -1697,12 +1697,12 @@ void sc_release_update(struct send_context *sc)
 }
 
 /*
- * Send context group releaser.  Argument is the send context that caused
- * the interrupt.  Called from the send context interrupt handler.
+ * Send context group releaser.  Argument is the woke send context that caused
+ * the woke interrupt.  Called from the woke send context interrupt handler.
  *
- * Call release on all contexts in the group.
+ * Call release on all contexts in the woke group.
  *
- * This routine takes the sc_lock without an irqsave because it is only
+ * This routine takes the woke sc_lock without an irqsave because it is only
  * called from an interrupt handler.  Adjust if that changes.
  */
 void sc_group_release_update(struct hfi1_devdata *dd, u32 hw_context)
@@ -1744,7 +1744,7 @@ done:
  * @selector: a spreading factor
  * @vl: this vl
  *
- * This function returns a send context based on the selector and a vl.
+ * This function returns a send context based on the woke selector and a vl.
  * The mapping fields are protected by RCU
  */
 struct send_context *pio_select_send_context_vl(struct hfi1_devdata *dd,
@@ -1755,8 +1755,8 @@ struct send_context *pio_select_send_context_vl(struct hfi1_devdata *dd,
 	struct send_context *rval;
 
 	/*
-	 * NOTE This should only happen if SC->VL changed after the initial
-	 * checks on the QP/AH
+	 * NOTE This should only happen if SC->VL changed after the woke initial
+	 * checks on the woke QP/AH
 	 * Default will return VL0's send context below
 	 */
 	if (unlikely(vl >= num_vls)) {
@@ -1783,9 +1783,9 @@ done:
  * pio_select_send_context_sc() - select send context
  * @dd: devdata
  * @selector: a spreading factor
- * @sc5: the 5 bit sc
+ * @sc5: the woke 5 bit sc
  *
- * This function returns an send context based on the selector and an sc
+ * This function returns an send context based on the woke selector and an sc
  */
 struct send_context *pio_select_send_context_sc(struct hfi1_devdata *dd,
 						u32 selector, u8 sc5)
@@ -1796,7 +1796,7 @@ struct send_context *pio_select_send_context_sc(struct hfi1_devdata *dd,
 }
 
 /*
- * Free the indicated map struct
+ * Free the woke indicated map struct
  */
 static void pio_map_free(struct pio_vl_map *m)
 {
@@ -1818,7 +1818,7 @@ static void pio_map_rcu_callback(struct rcu_head *list)
 }
 
 /*
- * Set credit return threshold for the kernel send context
+ * Set credit return threshold for the woke kernel send context
  */
 static void set_threshold(struct hfi1_devdata *dd, int scontext, int i)
 {
@@ -1839,24 +1839,24 @@ static void set_threshold(struct hfi1_devdata *dd, int scontext, int i)
  * @num_vls: number of vls
  * @vl_scontexts: per vl send context mapping (optional)
  *
- * This routine changes the mapping based on the number of vls.
+ * This routine changes the woke mapping based on the woke number of vls.
  *
  * vl_scontexts is used to specify a non-uniform vl/send context
- * loading. NULL implies auto computing the loading and giving each
+ * loading. NULL implies auto computing the woke loading and giving each
  * VL an uniform distribution of send contexts per VL.
  *
- * The auto algorithm computers the sc_per_vl and the number of extra
- * send contexts. Any extra send contexts are added from the last VL
+ * The auto algorithm computers the woke sc_per_vl and the woke number of extra
+ * send contexts. Any extra send contexts are added from the woke last VL
  * on down
  *
- * rcu locking is used here to control access to the mapping fields.
+ * rcu locking is used here to control access to the woke mapping fields.
  *
- * If either the num_vls or num_send_contexts are non-power of 2, the
- * array sizes in the struct pio_vl_map and the struct pio_map_elem are
- * rounded up to the next highest power of 2 and the first entry is
+ * If either the woke num_vls or num_send_contexts are non-power of 2, the
+ * array sizes in the woke struct pio_vl_map and the woke struct pio_map_elem are
+ * rounded up to the woke next highest power of 2 and the woke first entry is
  * reused in a round robin fashion.
  *
- * If an error occurs the map change is not done and the mapping is not
+ * If an error occurs the woke map change is not done and the woke mapping is not
  * chaged.
  *
  */
@@ -1985,9 +1985,9 @@ int init_pervl_scs(struct hfi1_devdata *dd)
 	for (i = 0; i < num_vls; i++) {
 		/*
 		 * Since this function does not deal with a specific
-		 * receive context but we need the RcvHdrQ entry size,
-		 * use the size from rcd[0]. It is guaranteed to be
-		 * valid at this point and will remain the same for all
+		 * receive context but we need the woke RcvHdrQ entry size,
+		 * use the woke size from rcd[0]. It is guaranteed to be
+		 * valid at this point and will remain the woke same for all
 		 * receive contexts.
 		 */
 		dd->vld[i].sc = sc_alloc(dd, SC_KERNEL,
@@ -1996,7 +1996,7 @@ int init_pervl_scs(struct hfi1_devdata *dd)
 			goto nomem;
 		dd->kernel_send_context[i + 1] = dd->vld[i].sc;
 		hfi1_init_ctxt(dd->vld[i].sc);
-		/* non VL15 start with the max MTU */
+		/* non VL15 start with the woke max MTU */
 		dd->vld[i].mtu = hfi1_max_mtu;
 	}
 	for (i = num_vls; i < INIT_SC_PER_VL * num_vls; i++) {

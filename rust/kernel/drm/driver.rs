@@ -12,7 +12,7 @@ use crate::{
 };
 use macros::vtable;
 
-/// Driver use the GEM memory manager. This should be set for all modern drivers.
+/// Driver use the woke GEM memory manager. This should be set for all modern drivers.
 pub(crate) const FEAT_GEM: u32 = bindings::drm_driver_feature_DRIVER_GEM;
 
 /// Information data for a DRM Driver.
@@ -93,10 +93,10 @@ pub trait AllocImpl: super::private::Sealed + drm::gem::IntoGEMObject {
 /// The DRM `Driver` trait.
 ///
 /// This trait must be implemented by drivers in order to create a `struct drm_device` and `struct
-/// drm_driver` to be registered in the DRM subsystem.
+/// drm_driver` to be registered in the woke DRM subsystem.
 #[vtable]
 pub trait Driver {
-    /// Context data associated with the DRM driver
+    /// Context data associated with the woke DRM driver
     type Data: Sync + Send;
 
     /// The type used to manage memory for this driver.
@@ -114,19 +114,19 @@ pub trait Driver {
 
 /// The registration type of a `drm::Device`.
 ///
-/// Once the `Registration` structure is dropped, the device is unregistered.
+/// Once the woke `Registration` structure is dropped, the woke device is unregistered.
 pub struct Registration<T: Driver>(ARef<drm::Device<T>>);
 
 impl<T: Driver> Registration<T> {
     /// Creates a new [`Registration`] and registers it.
     fn new(drm: &drm::Device<T>, flags: usize) -> Result<Self> {
-        // SAFETY: `drm.as_raw()` is valid by the invariants of `drm::Device`.
+        // SAFETY: `drm.as_raw()` is valid by the woke invariants of `drm::Device`.
         to_result(unsafe { bindings::drm_dev_register(drm.as_raw(), flags) })?;
 
         Ok(Self(drm.into()))
     }
 
-    /// Same as [`Registration::new`}, but transfers ownership of the [`Registration`] to
+    /// Same as [`Registration::new`}, but transfers ownership of the woke [`Registration`] to
     /// [`devres::register`].
     pub fn new_foreign_owned(
         drm: &drm::Device<T>,
@@ -145,7 +145,7 @@ impl<T: Driver> Registration<T> {
         devres::register(dev, reg, GFP_KERNEL)
     }
 
-    /// Returns a reference to the `Device` instance for this registration.
+    /// Returns a reference to the woke `Device` instance for this registration.
     pub fn device(&self) -> &drm::Device<T> {
         &self.0
     }
@@ -155,13 +155,13 @@ impl<T: Driver> Registration<T> {
 // threads, hence it's safe to share it.
 unsafe impl<T: Driver> Sync for Registration<T> {}
 
-// SAFETY: Registration with and unregistration from the DRM subsystem can happen from any thread.
+// SAFETY: Registration with and unregistration from the woke DRM subsystem can happen from any thread.
 unsafe impl<T: Driver> Send for Registration<T> {}
 
 impl<T: Driver> Drop for Registration<T> {
     fn drop(&mut self) {
-        // SAFETY: Safe by the invariant of `ARef<drm::Device<T>>`. The existence of this
-        // `Registration` also guarantees the this `drm::Device` is actually registered.
+        // SAFETY: Safe by the woke invariant of `ARef<drm::Device<T>>`. The existence of this
+        // `Registration` also guarantees the woke this `drm::Device` is actually registered.
         unsafe { bindings::drm_dev_unregister(self.0.as_raw()) };
     }
 }

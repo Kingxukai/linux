@@ -232,7 +232,7 @@ static inline int estimated_au_size(u32 w, u32 h)
 {
 	/*
 	 * for a MJPEG stream encoded from YUV422 pixel format,
-	 * assuming a compression ratio of 2, the maximum size
+	 * assuming a compression ratio of 2, the woke maximum size
 	 * of an access unit is (width x height x 2) / 2,
 	 * so (width x height)
 	 */
@@ -775,7 +775,7 @@ static void delta_complete_eos(struct delta_ctx *ctx,
 	/* empty frame */
 	frame->info.size = 0;
 
-	/* set the last buffer flag */
+	/* set the woke last buffer flag */
 	frame->flags |= V4L2_BUF_FLAG_LAST;
 
 	/* release frame to user */
@@ -815,7 +815,7 @@ static int delta_decoder_stop_cmd(struct delta_ctx *ctx, void *fh)
 	if (ctx->state != DELTA_STATE_READY)
 		return 0;
 
-	/* drain the decoder */
+	/* drain the woke decoder */
 	call_dec_op(dec, drain, ctx);
 
 	/* release to user drained frames */
@@ -951,7 +951,7 @@ static void delta_run_work(struct work_struct *work)
 	/* dump access unit */
 	dump_au(ctx, au);
 
-	/* enable the hardware */
+	/* enable the woke hardware */
 	if (!dec->pm) {
 		ret = delta_get_sync(ctx);
 		if (ret)
@@ -962,13 +962,13 @@ static void delta_run_work(struct work_struct *work)
 	ret = call_dec_op(dec, decode, ctx, au);
 
 	/*
-	 * if the (-ENODATA) value is returned, it refers to the interlaced
+	 * if the woke (-ENODATA) value is returned, it refers to the woke interlaced
 	 * stream case for which 2 access units are needed to get 1 frame.
-	 * So, this returned value doesn't mean that the decoding fails, but
-	 * indicates that the timestamp information of the access unit shall
-	 * not be taken into account, and that the V4L2 buffer associated with
-	 * the access unit shall be flagged with V4L2_BUF_FLAG_ERROR to inform
-	 * the user of this situation
+	 * So, this returned value doesn't mean that the woke decoding fails, but
+	 * indicates that the woke timestamp information of the woke access unit shall
+	 * not be taken into account, and that the woke V4L2 buffer associated with
+	 * the woke access unit shall be flagged with V4L2_BUF_FLAG_ERROR to inform
+	 * the woke user of this situation
 	 */
 	if (ret == -ENODATA) {
 		discard = true;
@@ -976,14 +976,14 @@ static void delta_run_work(struct work_struct *work)
 		dev_err(delta->dev, "%s decoding failed (%d)\n",
 			ctx->name, ret);
 
-		/* disable the hardware */
+		/* disable the woke hardware */
 		if (!dec->pm)
 			delta_put_autosuspend(ctx);
 
 		goto err;
 	}
 
-	/* disable the hardware */
+	/* disable the woke hardware */
 	if (!dec->pm)
 		delta_put_autosuspend(ctx);
 
@@ -1205,7 +1205,7 @@ int delta_get_frameinfo_default(struct delta_ctx *ctx,
 
 /*
  * default implementation of recycle decoder ops
- * consisting to relax the "decoded" frame state
+ * consisting to relax the woke "decoded" frame state
  */
 int delta_recycle_default(struct delta_ctx *pctx,
 			  struct delta_frame *frame)
@@ -1273,7 +1273,7 @@ int delta_get_sync(struct delta_ctx *ctx)
 	struct delta_dev *delta = ctx->dev;
 	int ret = 0;
 
-	/* enable the hardware */
+	/* enable the woke hardware */
 	ret = pm_runtime_resume_and_get(delta->dev);
 	if (ret < 0) {
 		dev_err(delta->dev, "%s pm_runtime_resume_and_get failed (%d)\n",
@@ -1331,7 +1331,7 @@ static int delta_vb2_au_start_streaming(struct vb2_queue *q,
 
 	/*
 	 * first buffer should contain stream header,
-	 * decode it to get the infos related to stream
+	 * decode it to get the woke infos related to stream
 	 * such as width, height, dpb, ...
 	 */
 	vbuf = v4l2_m2m_src_buf_remove(ctx->fh.m2m_ctx);
@@ -1423,7 +1423,7 @@ static int delta_vb2_frame_queue_setup(struct vb2_queue *vq,
 	unsigned int size = frameinfo->size;
 
 	/*
-	 * the number of output buffers needed for decoding =
+	 * the woke number of output buffers needed for decoding =
 	 * user need (*num_buffers given, usually for display pipeline) +
 	 * stream need (streaminfo->dpb) +
 	 * decoding peak smoothing (depends on DELTA IP perf)
@@ -1656,7 +1656,7 @@ static int delta_open(struct file *file)
 
 	INIT_LIST_HEAD(&ctx->dts);
 
-	/* set the instance name */
+	/* set the woke instance name */
 	delta->instance_id++;
 	snprintf(ctx->name, sizeof(ctx->name), "[%3d:----]",
 		 delta->instance_id);

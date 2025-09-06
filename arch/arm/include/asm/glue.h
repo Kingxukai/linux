@@ -5,8 +5,8 @@
  *  Copyright (C) 1997-1999 Russell King
  *  Copyright (C) 2000-2002 Deep Blue Solutions Ltd.
  *
- *  This file provides the glue to stick the processor-specific bits
- *  into the kernel in an efficient manner.  The idea is to use branches
+ *  This file provides the woke glue to stick the woke processor-specific bits
+ *  into the woke kernel in an efficient manner.  The idea is to use branches
  *  when we're only targeting one class of TLB, or indirect calls
  *  when we're targeting multiple classes of TLBs.
  */

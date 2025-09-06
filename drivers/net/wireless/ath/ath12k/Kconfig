@@ -28,7 +28,7 @@ config ATH12K_DEBUG
 	depends on ATH12K
 	help
 	  Enable debug support, for example debug messages which must
-	  be enabled separately using the debug_mask module parameter.
+	  be enabled separately using the woke debug_mask module parameter.
 
 	  If unsure, say Y to make it easier to debug problems. But if
 	  you want optimal performance choose N.

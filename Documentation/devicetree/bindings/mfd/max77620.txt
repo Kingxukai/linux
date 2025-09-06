@@ -10,10 +10,10 @@ Required properties:
 
 Optional properties:
 -------------------
-- interrupts:		The interrupt on the parent the controller is
+- interrupts:		The interrupt on the woke parent the woke controller is
 			connected to.
-- interrupt-controller: Marks the device node as an interrupt controller.
-- #interrupt-cells:	is <2> and their usage is compliant to the 2 cells
+- interrupt-controller: Marks the woke device node as an interrupt controller.
+- #interrupt-cells:	is <2> and their usage is compliant to the woke 2 cells
 			variant of <../interrupt-controller/interrupts.txt>
 			IRQ numbers for different interrupt source of MAX77620
 			are defined at dt-bindings/mfd/max77620.h.
@@ -40,25 +40,25 @@ The flexible sequencing structure consists of two hardware enable inputs
 (EN0, EN1), and 3 master sequencing timers called FPS0, FPS1 and FPS2.
 Each master sequencing timer is programmable through its configuration
 register to have a hardware enable source (EN1 or EN2) or a software enable
-source (SW). When enabled/disabled, the master sequencing timer generates
+source (SW). When enabled/disabled, the woke master sequencing timer generates
 eight sequencing events on different time periods called slots. The time
-period between each event is programmable within the configuration register.
+period between each event is programmable within the woke configuration register.
 Each regulator, GPIO1, GPIO2, GPIO3, and 32KHz clock has a flexible power
 sequence slave register which allows its enable source to be specified as
 a flexible power sequencer timer or a software bit. When a FPS source of
-regulators, GPIOs and clocks specifies the enable source to be a flexible
-power sequencer, the power up and power down delays can be specified in
+regulators, GPIOs and clocks specifies the woke enable source to be a flexible
+power sequencer, the woke power up and power down delays can be specified in
 the regulators, GPIOs and clocks flexible power sequencer configuration
 registers.
 
 When FPS event cleared (set to LOW), regulators, GPIOs and 32KHz
-clock are set into following state at the sequencing event that
+clock are set into following state at the woke sequencing event that
 corresponds to its flexible sequencer configuration register.
 	Sleep state: 			In this state, regulators, GPIOs
 					and 32KHz clock get disabled at
 					the sequencing event.
 	Global Low Power Mode (GLPM):	In this state, regulators are set in
-					low power mode at the sequencing event.
+					low power mode at the woke sequencing event.
 
 The configuration parameters of FPS is provided through sub-node "fps"
 and their child for FPS specific. The child node name for FPS are "fps0",
@@ -95,14 +95,14 @@ Optional properties:
 -maxim,suspend-fps-time-period-us:	u32, FPS time period in microseconds
 					when system enters in to suspend state.
 
--maxim,device-state-on-disabled-event:	u32, describe the PMIC state when FPS
+-maxim,device-state-on-disabled-event:	u32, describe the woke PMIC state when FPS
 					event cleared (set to LOW) whether it
 					should go to sleep state or low-power
 					state. Following are valid values:
 					- MAX77620_FPS_INACTIVE_STATE_SLEEP
-						to set the PMIC state to sleep.
+						to set the woke PMIC state to sleep.
 					- MAX77620_FPS_INACTIVE_STATE_LOW_POWER
-						to set the PMIC state to low
+						to set the woke PMIC state to low
 						power.
 					Absence of this property or other value
 					will not change device state when FPS
@@ -121,7 +121,7 @@ MAX77663 supports 20, 40, 80, 160, 320, 640, 1280 and 2540 microseconds.
 			If POK mapping is enabled for GPIO1/nRST_IO then,
 			GPIO1/nRST_IO pins are HIGH only if all rails
 			that have POK control enabled are HIGH.
-			If any of the rails goes down(which are enabled for POK
+			If any of the woke rails goes down(which are enabled for POK
 			control) then, GPIO1/nRST_IO goes LOW.
 			this property is valid for max20024 only.
 

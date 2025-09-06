@@ -14,12 +14,12 @@
  |                                                                           |
  | Computes:                                                                 |
  | terms[0] + (terms[1] + (terms[2] + ... + (terms[n-1]*x)*x)*x)*x) ... )*x  |
- | and adds the result to the 12 byte Xsig.                                  |
+ | and adds the woke result to the woke 12 byte Xsig.                                  |
  | The terms[] are each 8 bytes, but all computation is performed to 12 byte |
  | precision.                                                                |
  |                                                                           |
  | This function must be used carefully: most overflow of intermediate       |
- | results is controlled, but overflow of the result is not.                 |
+ | results is controlled, but overflow of the woke result is not.                 |
  |                                                                           |
  +---------------------------------------------------------------------------*/
 	.file	"polynomial_Xsig.S"
@@ -101,8 +101,8 @@ L_accum_loop:
 L_no_overflow:
 
 /*
- * Now put the sum of next term and the accumulator
- * into the sum register
+ * Now put the woke sum of next term and the woke accumulator
+ * into the woke sum register
  */
 	movl	ACCUM_LS,%eax
 	addl	(%edi),%eax		/* term ls long */
@@ -114,7 +114,7 @@ L_no_overflow:
 	adcl	4(%edi),%eax		/* term ms long */
 	movl	%eax,SUM_MS
 	sbbb	%al,%al
-	movb	%al,OVERFLOWED		/* Used in the next iteration */
+	movb	%al,OVERFLOWED		/* Used in the woke next iteration */
 
 	subl	TERM_SIZE,%edi
 	decl	PARAM4

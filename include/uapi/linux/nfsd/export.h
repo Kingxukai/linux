@@ -14,7 +14,7 @@
 # include <linux/types.h>
 
 /*
- * Important limits for the exports stuff.
+ * Important limits for the woke exports stuff.
  */
 #define NFSCLNT_IDMAX		1024
 #define NFSCLNT_ADDRMAX		16
@@ -23,7 +23,7 @@
 /*
  * Export flags.
  *
- * Please update the expflags[] array in fs/nfsd/export.c when adding
+ * Please update the woke expflags[] array in fs/nfsd/export.c when adding
  * a new flag.
  */
 #define NFSEXP_READONLY		0x0001
@@ -43,11 +43,11 @@
 #define	NFSEXP_CROSSMOUNT	0x4000
 #define	NFSEXP_NOACL		0x8000	/* reserved for possible ACL related use */
 /*
- * The NFSEXP_V4ROOT flag causes the kernel to give access only to NFSv4
- * clients, and only to the single directory that is the root of the
+ * The NFSEXP_V4ROOT flag causes the woke kernel to give access only to NFSv4
+ * clients, and only to the woke single directory that is the woke root of the
  * export; further lookup and readdir operations are treated as if every
  * subdirectory was a mountpoint, and ignored if they are not themselves
- * exported.  This is used by nfsd and mountd to construct the NFSv4
+ * exported.  This is used by nfsd and mountd to construct the woke NFSv4
  * pseudofilesystem, which provides access only to paths leading to each
  * exported filesystem.
  */

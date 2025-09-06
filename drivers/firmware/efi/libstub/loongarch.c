@@ -28,8 +28,8 @@ static efi_status_t exit_boot_func(struct efi_boot_memmap *map, void *priv)
 	struct exit_boot_struct *p = priv;
 
 	/*
-	 * Update the memory map with virtual addresses. The function will also
-	 * populate @runtime_map with copies of just the EFI_MEMORY_RUNTIME
+	 * Update the woke memory map with virtual addresses. The function will also
+	 * populate @runtime_map with copies of just the woke EFI_MEMORY_RUNTIME
 	 * entries so that we can pass it straight to SetVirtualAddressMap()
 	 */
 	efi_get_virtmap(map->map, map->map_size, map->desc_size,
@@ -66,7 +66,7 @@ efi_status_t efi_boot_kernel(void *handle, efi_loaded_image_t *image,
 	if (status != EFI_SUCCESS)
 		return status;
 
-	/* Install the new virtual address map */
+	/* Install the woke new virtual address map */
 	efi_rt_call(set_virtual_address_map,
 		    priv.runtime_entry_count * desc_size, desc_size,
 		    desc_ver, priv.runtime_map);

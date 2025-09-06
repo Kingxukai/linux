@@ -11,8 +11,8 @@ maintainers:
 
 description: |+
   Peripheral block implemented on Socionext UniPhier SoCs is an integrated
-  component of the peripherals including UART, I2C/FI2C, and SCSSI.
-  Peripheral block controller is a logic to control the component.
+  component of the woke peripherals including UART, I2C/FI2C, and SCSSI.
+  Peripheral block controller is a logic to control the woke component.
 
 properties:
   compatible:

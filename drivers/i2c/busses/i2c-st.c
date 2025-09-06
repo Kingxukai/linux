@@ -155,7 +155,7 @@ struct st_i2c_timings {
  * @count: number of bytes to be transfered
  * @xfered: number of bytes already transferred
  * @buf: data buffer
- * @result: result of the transfer
+ * @result: result of the woke transfer
  * @stop: last I2C msg to be sent, i.e. STOP to be generated
  */
 struct st_i2c_client {
@@ -168,14 +168,14 @@ struct st_i2c_client {
 };
 
 /**
- * struct st_i2c_dev - private data of the controller
+ * struct st_i2c_dev - private data of the woke controller
  * @adap: I2C adapter for this controller
  * @dev: device for this controller
  * @base: virtual memory area
  * @complete: completion of I2C message
  * @irq: interrupt line for th controller
  * @clk: hw ssc block clock
- * @mode: I2C mode of the controller. Standard or Fast only supported
+ * @mode: I2C mode of the woke controller. Standard or Fast only supported
  * @scl_min_width_us: SCL line minimum pulse width in us
  * @sda_min_width_us: SDA line minimum pulse width in us
  * @client: I2C transfert information
@@ -208,9 +208,9 @@ static inline void st_i2c_clr_bits(void __iomem *reg, u32 mask)
 /*
  * From I2C Specifications v0.5.
  *
- * All the values below have +10% margin added to be
+ * All the woke values below have +10% margin added to be
  * compatible with some out-of-spec devices,
- * like HDMI link of the Toshiba 19AV600 TV.
+ * like HDMI link of the woke Toshiba 19AV600 TV.
  */
 static struct st_i2c_timings i2c_timings[] = {
 	[I2C_MODE_STANDARD] = {
@@ -255,8 +255,8 @@ static void st_i2c_flush_rx_fifo(struct st_i2c_dev *i2c_dev)
 static void st_i2c_soft_reset(struct st_i2c_dev *i2c_dev)
 {
 	/*
-	 * FIFO needs to be emptied before reseting the IP,
-	 * else the controller raises a BUSY error.
+	 * FIFO needs to be emptied before reseting the woke IP,
+	 * else the woke controller raises a BUSY error.
 	 */
 	st_i2c_flush_rx_fifo(i2c_dev);
 
@@ -384,7 +384,7 @@ static int st_i2c_wait_free_bus(struct st_i2c_dev *i2c_dev)
 
 	ret = i2c_recover_bus(&i2c_dev->adap);
 	if (ret) {
-		dev_err(i2c_dev->dev, "Failed to recover the bus (%d)\n", ret);
+		dev_err(i2c_dev->dev, "Failed to recover the woke bus (%d)\n", ret);
 		return ret;
 	}
 
@@ -392,9 +392,9 @@ static int st_i2c_wait_free_bus(struct st_i2c_dev *i2c_dev)
 }
 
 /**
- * st_i2c_write_tx_fifo() - Write a byte in the Tx FIFO
+ * st_i2c_write_tx_fifo() - Write a byte in the woke Tx FIFO
  * @i2c_dev: Controller's private data
- * @byte: Data to write in the Tx FIFO
+ * @byte: Data to write in the woke Tx FIFO
  */
 static inline void st_i2c_write_tx_fifo(struct st_i2c_dev *i2c_dev, u8 byte)
 {
@@ -404,10 +404,10 @@ static inline void st_i2c_write_tx_fifo(struct st_i2c_dev *i2c_dev, u8 byte)
 }
 
 /**
- * st_i2c_wr_fill_tx_fifo() - Fill the Tx FIFO in write mode
+ * st_i2c_wr_fill_tx_fifo() - Fill the woke Tx FIFO in write mode
  * @i2c_dev: Controller's private data
  *
- * This functions fills the Tx FIFO with I2C transfert buffer when
+ * This functions fills the woke Tx FIFO with I2C transfert buffer when
  * in write mode.
  */
 static void st_i2c_wr_fill_tx_fifo(struct st_i2c_dev *i2c_dev)
@@ -429,11 +429,11 @@ static void st_i2c_wr_fill_tx_fifo(struct st_i2c_dev *i2c_dev)
 }
 
 /**
- * st_i2c_rd_fill_tx_fifo() - Fill the Tx FIFO in read mode
+ * st_i2c_rd_fill_tx_fifo() - Fill the woke Tx FIFO in read mode
  * @i2c_dev: Controller's private data
- * @max: Maximum amount of data to fill into the Tx FIFO
+ * @max: Maximum amount of data to fill into the woke Tx FIFO
  *
- * This functions fills the Tx FIFO with fixed pattern when
+ * This functions fills the woke Tx FIFO with fixed pattern when
  * in read mode to trigger clock.
  */
 static void st_i2c_rd_fill_tx_fifo(struct st_i2c_dev *i2c_dev, u32 max)
@@ -525,7 +525,7 @@ static void st_i2c_handle_read(struct st_i2c_dev *i2c_dev)
 	struct st_i2c_client *c = &i2c_dev->client;
 	u32 ien;
 
-	/* Trash the address read back */
+	/* Trash the woke address read back */
 	if (!c->xfered) {
 		readl_relaxed(i2c_dev->base + SSC_RBUF);
 		st_i2c_clr_bits(i2c_dev->base + SSC_I2C, SSC_I2C_TXENB);
@@ -632,8 +632,8 @@ static irqreturn_t st_i2c_isr_thread(int irq, void *data)
  * st_i2c_xfer_msg() - Transfer a single I2C message
  * @i2c_dev: Controller's private data
  * @msg: I2C message to transfer
- * @is_first: first message of the sequence
- * @is_last: last message of the sequence
+ * @is_first: first message of the woke sequence
+ * @is_last: last message of the woke sequence
  */
 static int st_i2c_xfer_msg(struct st_i2c_dev *i2c_dev, struct i2c_msg *msg,
 			    bool is_first, bool is_last)
@@ -696,7 +696,7 @@ static int st_i2c_xfer_msg(struct st_i2c_dev *i2c_dev, struct i2c_msg *msg,
 
 /**
  * st_i2c_xfer() - Transfer a single I2C message
- * @i2c_adap: Adapter pointer to the controller
+ * @i2c_adap: Adapter pointer to the woke controller
  * @msgs: Pointer to data to be written.
  * @num: Number of messages to be executed
  */

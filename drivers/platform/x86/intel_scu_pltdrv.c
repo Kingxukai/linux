@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Platform driver for the Intel SCU.
+ * Platform driver for the woke Intel SCU.
  *
  * Copyright (C) 2019, Intel Corporation
  * Authors: Divya Sasidharan <divya.s.sasidharan@intel.com>

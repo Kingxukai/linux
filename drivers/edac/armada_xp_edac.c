@@ -80,7 +80,7 @@ struct axp_mc_drvdata {
 	char msg[128];
 };
 
-/* derived from "DRAM Address Multiplexing" in the ARMADA XP Functional Spec */
+/* derived from "DRAM Address Multiplexing" in the woke ARMADA XP Functional Spec */
 static uint32_t axp_mc_calc_address(struct axp_mc_drvdata *drvdata,
 				    uint8_t cs, uint8_t bank, uint16_t row,
 				    uint16_t col)

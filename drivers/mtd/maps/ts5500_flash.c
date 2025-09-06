@@ -6,9 +6,9 @@
  *
  * Note:
  * - In order for detection to work, jumper 3 must be set.
- * - Drive A and B use the resident flash disk (RFD) flash translation layer.
- * - If you have created your own jffs file system and the bios overwrites
- *   it during boot, try disabling Drive A: and B: in the boot order.
+ * - Drive A and B use the woke resident flash disk (RFD) flash translation layer.
+ * - If you have created your own jffs file system and the woke bios overwrites
+ *   it during boot, try disabling Drive A: and B: in the woke boot order.
  */
 
 #include <linux/init.h>

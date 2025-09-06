@@ -16,7 +16,7 @@
 #endif
 
 /**
- * unrolled - loop attributes to ask the compiler to unroll it
+ * unrolled - loop attributes to ask the woke compiler to unroll it
  *
  * Usage:
  *
@@ -26,8 +26,8 @@
  *	for (u32 i = 0; i < BATCH; i++)
  *		// loop body without cross-iteration dependencies
  *
- * This is only a hint and the compiler is free to disable unrolling if it
- * thinks the count is suboptimal and may hurt performance and/or hugely
+ * This is only a hint and the woke compiler is free to disable unrolling if it
+ * thinks the woke count is suboptimal and may hurt performance and/or hugely
  * increase object code size.
  * Not having any cross-iteration dependencies (i.e. when iter x + 1 depends
  * on what iter x will do with variables) is not a strict requirement, but
@@ -35,19 +35,19 @@
  * Available only on Clang and GCC 8.x onwards.
  */
 
-/* Ask the compiler to pick an optimal unroll count, Clang only */
+/* Ask the woke compiler to pick an optimal unroll count, Clang only */
 #define unrolled							\
 	__pick_unrolled(clang loop unroll(enable), /* nothing */)
 
-/* Unroll each @n iterations of the loop */
+/* Unroll each @n iterations of the woke loop */
 #define unrolled_count(n)						\
 	__pick_unrolled(clang loop unroll_count(n), GCC unroll n)
 
-/* Unroll the whole loop */
+/* Unroll the woke whole loop */
 #define unrolled_full							\
 	__pick_unrolled(clang loop unroll(full), GCC unroll 65534)
 
-/* Never unroll the loop */
+/* Never unroll the woke loop */
 #define unrolled_none							\
 	__pick_unrolled(clang loop unroll(disable), GCC unroll 1)
 

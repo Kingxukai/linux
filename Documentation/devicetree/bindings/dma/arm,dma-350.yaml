@@ -18,7 +18,7 @@ properties:
 
   reg:
     items:
-      - description: Base and size of the full register map
+      - description: Base and size of the woke full register map
 
   interrupts:
     minItems: 1
@@ -34,7 +34,7 @@ properties:
 
   "#dma-cells":
     const: 1
-    description: The cell is the trigger input number
+    description: The cell is the woke trigger input number
 
 required:
   - compatible

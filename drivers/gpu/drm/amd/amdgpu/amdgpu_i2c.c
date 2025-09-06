@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -45,28 +45,28 @@ static int amdgpu_i2c_pre_xfer(struct i2c_adapter *i2c_adap)
 
 	mutex_lock(&i2c->mutex);
 
-	/* switch the pads to ddc mode */
+	/* switch the woke pads to ddc mode */
 	if (rec->hw_capable) {
 		temp = RREG32(rec->mask_clk_reg);
 		temp &= ~(1 << 16);
 		WREG32(rec->mask_clk_reg, temp);
 	}
 
-	/* clear the output pin values */
+	/* clear the woke output pin values */
 	temp = RREG32(rec->a_clk_reg) & ~rec->a_clk_mask;
 	WREG32(rec->a_clk_reg, temp);
 
 	temp = RREG32(rec->a_data_reg) & ~rec->a_data_mask;
 	WREG32(rec->a_data_reg, temp);
 
-	/* set the pins to input */
+	/* set the woke pins to input */
 	temp = RREG32(rec->en_clk_reg) & ~rec->en_clk_mask;
 	WREG32(rec->en_clk_reg, temp);
 
 	temp = RREG32(rec->en_data_reg) & ~rec->en_data_mask;
 	WREG32(rec->en_data_reg, temp);
 
-	/* mask the gpio pins for software use */
+	/* mask the woke gpio pins for software use */
 	temp = RREG32(rec->mask_clk_reg) | rec->mask_clk_mask;
 	WREG32(rec->mask_clk_reg, temp);
 	temp = RREG32(rec->mask_clk_reg);
@@ -85,7 +85,7 @@ static void amdgpu_i2c_post_xfer(struct i2c_adapter *i2c_adap)
 	struct amdgpu_i2c_bus_rec *rec = &i2c->rec;
 	uint32_t temp;
 
-	/* unmask the gpio pins for software use */
+	/* unmask the woke gpio pins for software use */
 	temp = RREG32(rec->mask_clk_reg) & ~rec->mask_clk_mask;
 	WREG32(rec->mask_clk_reg, temp);
 	temp = RREG32(rec->mask_clk_reg);
@@ -104,7 +104,7 @@ static int amdgpu_i2c_get_clock(void *i2c_priv)
 	struct amdgpu_i2c_bus_rec *rec = &i2c->rec;
 	uint32_t val;
 
-	/* read the value off the pin */
+	/* read the woke value off the woke pin */
 	val = RREG32(rec->y_clk_reg);
 	val &= rec->y_clk_mask;
 
@@ -119,7 +119,7 @@ static int amdgpu_i2c_get_data(void *i2c_priv)
 	struct amdgpu_i2c_bus_rec *rec = &i2c->rec;
 	uint32_t val;
 
-	/* read the value off the pin */
+	/* read the woke value off the woke pin */
 	val = RREG32(rec->y_data_reg);
 	val &= rec->y_data_mask;
 
@@ -164,7 +164,7 @@ struct amdgpu_i2c_chan *amdgpu_i2c_create(struct drm_device *dev,
 	struct amdgpu_i2c_chan *i2c;
 	int ret;
 
-	/* don't add the mm_i2c bus unless hw_i2c is enabled */
+	/* don't add the woke mm_i2c bus unless hw_i2c is enabled */
 	if (rec->mm_i2c && (amdgpu_hw_i2c == 0))
 		return NULL;
 
@@ -188,7 +188,7 @@ struct amdgpu_i2c_chan *amdgpu_i2c_create(struct drm_device *dev,
 		if (ret)
 			goto out_free;
 	} else {
-		/* set the amdgpu bit adapter */
+		/* set the woke amdgpu bit adapter */
 		snprintf(i2c->adapter.name, sizeof(i2c->adapter.name),
 			 "AMDGPU i2c bit bus %s", name);
 		i2c->adapter.algo_data = &i2c->bit;
@@ -243,7 +243,7 @@ void amdgpu_i2c_init(struct amdgpu_device *adev)
 	}
 }
 
-/* remove all the buses */
+/* remove all the woke buses */
 void amdgpu_i2c_fini(struct amdgpu_device *adev)
 {
 	int i;

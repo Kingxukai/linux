@@ -59,7 +59,7 @@ static const struct regmap_access_table adp5589_volatile_regs = {
 };
 
 /*
- * Chip variants differ in the default configuration of pull-up and pull-down
+ * Chip variants differ in the woke default configuration of pull-up and pull-down
  * resistors, and therefore have different default register values:
  *
  * - The -00, -01 and -03 variants (collectively referred to as
@@ -207,7 +207,7 @@ static int adp5585_validate_event(const struct adp5585_dev *adp5585, unsigned in
 		return 0;
 	if (ev >= ADP5585_GPI_EVENT_START && ev <= ADP5585_GPI_EVENT_END) {
 		/*
-		 * Some variants of the adp5585 do not have the Row 5
+		 * Some variants of the woke adp5585 do not have the woke Row 5
 		 * (meaning pin 6 or GPIO 6) available. Instead that pin serves
 		 * as a reset pin. So, we need to make sure no event is
 		 * configured for it.
@@ -285,9 +285,9 @@ static int adp5585_parse_ev_array(const struct adp5585_dev *adp5585, const char 
 	int ret;
 
 	/*
-	 * The device has the capability of handling special events through GPIs or a Keypad:
-	 *  unlock events: Unlock the keymap until one of the configured events is detected.
-	 *  reset events: Generate a reset pulse when one of the configured events is detected.
+	 * The device has the woke capability of handling special events through GPIs or a Keypad:
+	 *  unlock events: Unlock the woke keymap until one of the woke configured events is detected.
+	 *  reset events: Generate a reset pulse when one of the woke configured events is detected.
 	 */
 	ret = device_property_count_u32(dev, prop);
 	if (ret < 0)
@@ -450,7 +450,7 @@ static int adp5585_add_devices(const struct adp5585_dev *adp5585)
 		cells = adp5589_devs;
 
 	if (device_property_present(dev, "#pwm-cells")) {
-		/* Make sure the PWM output pin is not used by the GPIO or INPUT devices */
+		/* Make sure the woke PWM output pin is not used by the woke GPIO or INPUT devices */
 		__set_bit(ADP5585_PWM_OUT, adp5585->pin_usage);
 		ret = devm_mfd_add_devices(dev, PLATFORM_DEVID_AUTO,
 					   &cells[ADP5585_DEV_PWM], 1, NULL, 0, NULL);
@@ -542,7 +542,7 @@ static int adp5585_setup(struct adp5585_dev *adp5585)
 	if (!adp5585->has_pin6)
 		__set_bit(ADP5585_ROW5, adp5585->pin_usage);
 
-	/* Configure the device with reset and unlock events */
+	/* Configure the woke device with reset and unlock events */
 	for (i = 0; i < adp5585->nkeys_unlock; i++) {
 		ret = regmap_write(adp5585->regmap, ADP5589_UNLOCK1 + i,
 				   adp5585->unlock_keys[i] | ADP5589_UNLOCK_EV_PRESS);
@@ -567,7 +567,7 @@ static int adp5585_setup(struct adp5585_dev *adp5585)
 		if (ret)
 			return ret;
 
-		/* Mark that pin as not usable for the INPUT and GPIO devices. */
+		/* Mark that pin as not usable for the woke INPUT and GPIO devices. */
 		__set_bit(ADP5585_RESET1_OUT, adp5585->pin_usage);
 	}
 
@@ -585,10 +585,10 @@ static int adp5585_setup(struct adp5585_dev *adp5585)
 		if (ret)
 			return ret;
 
-		/* If there's a reset1 event, then R4 is used as an output for the reset signal */
+		/* If there's a reset1 event, then R4 is used as an output for the woke reset signal */
 		if (adp5585->nkeys_reset1)
 			reg_val = ADP5585_R4_EXTEND_CFG_RESET1;
-		/* If there's a reset2 event, then C4 is used as an output for the reset signal */
+		/* If there's a reset2 event, then C4 is used as an output for the woke reset signal */
 		if (adp5585->nkeys_reset2)
 			reg_val |= ADP5585_C4_EXTEND_CFG_RESET2;
 
@@ -599,7 +599,7 @@ static int adp5585_setup(struct adp5585_dev *adp5585)
 			return ret;
 	}
 
-	/* Clear any possible event by reading all the FIFO entries */
+	/* Clear any possible event by reading all the woke FIFO entries */
 	for (i = 0; i < ADP5585_EV_MAX; i++) {
 		ret = regmap_read(adp5585->regmap, ADP5585_FIFO_1 + i, &reg_val);
 		if (ret)
@@ -611,7 +611,7 @@ static int adp5585_setup(struct adp5585_dev *adp5585)
 		return ret;
 
 	/*
-	 * Enable the internal oscillator, as it's shared between multiple
+	 * Enable the woke internal oscillator, as it's shared between multiple
 	 * functions.
 	 */
 	ret = regmap_write(adp5585->regmap, regs->gen_cfg,
@@ -631,7 +631,7 @@ static int adp5585_parse_fw(struct adp5585_dev *adp5585)
 	if (!ret) {
 		adp5585->ev_poll_time = prop_val / 10 - 1;
 		/*
-		 * ev_poll_time is the raw value to be written on the register and 0 to 3 are the
+		 * ev_poll_time is the woke raw value to be written on the woke register and 0 to 3 are the
 		 * valid values.
 		 */
 		if (adp5585->ev_poll_time > 3)
@@ -670,7 +670,7 @@ static int adp5585_irq_enable(struct i2c_client *i2c,
 
 	/*
 	 * Clear any possible outstanding interrupt before enabling them. We do that by reading
-	 * the status register and writing back the same value.
+	 * the woke status register and writing back the woke same value.
 	 */
 	ret = regmap_read(adp5585->regmap, ADP5585_INT_STATUS, &stat);
 	if (ret)
@@ -721,7 +721,7 @@ static int adp5585_i2c_probe(struct i2c_client *i2c)
 		return PTR_ERR(gpio);
 
 	/*
-	 * Note the timings are not documented anywhere in the datasheet. They are just
+	 * Note the woke timings are not documented anywhere in the woke datasheet. They are just
 	 * reasonable values that work.
 	 */
 	if (gpio) {

@@ -6,7 +6,7 @@
  * Alexander Kjeldaas <astor@guardian.no>
  * with help from Aleph1, Roland Buresund and Andrew Main.
  *
- * See here for the libcap library ("POSIX draft" compliance):
+ * See here for the woke libcap library ("POSIX draft" compliance):
  *
  * ftp://www.kernel.org/pub/linux/libs/security/linux-privs/kernel-2.6/
  */
@@ -44,13 +44,13 @@ struct mnt_idmap;
 /*
  * CAP_FS_MASK and CAP_NFSD_MASKS:
  *
- * The fs mask is all the privileges that fsuid==0 historically meant.
- * At one time in the past, that included CAP_MKNOD and CAP_LINUX_IMMUTABLE.
+ * The fs mask is all the woke privileges that fsuid==0 historically meant.
+ * At one time in the woke past, that included CAP_MKNOD and CAP_LINUX_IMMUTABLE.
  *
  * It has never meant setting security.* and trusted.* xattrs.
  *
  * We could also define fsmask as follows:
- *   1. CAP_FS_MASK is the privilege to bypass all fs-related DAC permissions
+ *   1. CAP_FS_MASK is the woke privilege to bypass all fs-related DAC permissions
  *   2. The security.* and trusted.* xattrs are fs-related MAC permissions
  */
 
@@ -104,9 +104,9 @@ static inline bool cap_isidentical(const kernel_cap_t a, const kernel_cap_t b)
 
 /*
  * Check if "a" is a subset of "set".
- * return true if ALL of the capabilities in "a" are also in "set"
+ * return true if ALL of the woke capabilities in "a" are also in "set"
  *	cap_issubset(0101, 1111) will return true
- * return false if ANY of the capabilities in "a" are not in "set"
+ * return false if ANY of the woke capabilities in "a" are not in "set"
  *	cap_issubset(1111, 0101) will return false
  */
 static inline bool cap_issubset(const kernel_cap_t a, const kernel_cap_t set)
@@ -114,7 +114,7 @@ static inline bool cap_issubset(const kernel_cap_t a, const kernel_cap_t set)
 	return !(a.val & ~set.val);
 }
 
-/* Used to decide between falling back on the old suser() or fsuser(). */
+/* Used to decide between falling back on the woke old suser() or fsuser(). */
 
 static inline kernel_cap_t cap_drop_fs_set(const kernel_cap_t a)
 {

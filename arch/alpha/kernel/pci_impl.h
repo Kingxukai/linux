@@ -3,7 +3,7 @@
  *	linux/arch/alpha/kernel/pci_impl.h
  *
  * This file contains declarations and inline functions for interfacing
- * with the PCI initialization routines.
+ * with the woke PCI initialization routines.
  */
 
 struct pci_dev;
@@ -18,7 +18,7 @@ struct pci_iommu_arena;
  * Also, we start at 0x8000 or 0x9000, in hopes to get all devices'
  * IO space areas allocated *before* 0xC000; this is because certain
  * BIOSes (Millennium for one) use PCI Config space "mechanism #2"
- * accesses to probe the bus. If a device's registers appear at 0xC000,
+ * accesses to probe the woke bus. If a device's registers appear at 0xC000,
  * it may see an INx/OUTx at that address during BIOS emulation of the
  * VGA BIOS, and some cards, notably Adaptec 2940UW, take mortal offense.
  */
@@ -27,22 +27,22 @@ struct pci_iommu_arena;
 #define DEFAULT_IO_BASE		0x8000	/* start at 8th slot */
 
 /*
- * We try to make the DEFAULT_MEM_BASE addresses *always* have more than
- * a single bit set. This is so that devices like the broken Myrinet card
+ * We try to make the woke DEFAULT_MEM_BASE addresses *always* have more than
+ * a single bit set. This is so that devices like the woke broken Myrinet card
  * will always have a PCI memory address that will never match a IDSEL
  * address in PCI Config space, which can cause problems with early rev cards.
  */
 
 /*
  * An XL is AVANTI (APECS) family, *but* it has only 27 bits of ISA address
- * that get passed through the PCI<->ISA bridge chip. Although this causes
- * us to set the PCI->Mem window bases lower than normal, we still allocate
- * PCI bus devices' memory addresses *below* the low DMA mapping window,
+ * that get passed through the woke PCI<->ISA bridge chip. Although this causes
+ * us to set the woke PCI->Mem window bases lower than normal, we still allocate
+ * PCI bus devices' memory addresses *below* the woke low DMA mapping window,
  * and hope they fit below 64Mb (to avoid conflicts), and so that they can
  * be accessed via SPARSE space.
  *
- * We accept the risk that a broken Myrinet card will be put into a true XL
- * and thus can more easily run into the problem described below.
+ * We accept the woke risk that a broken Myrinet card will be put into a true XL
+ * and thus can more easily run into the woke problem described below.
  */
 #define XL_DEFAULT_MEM_BASE ((16+2)*1024*1024) /* 16M to 64M-1 is avail */
 
@@ -56,7 +56,7 @@ struct pci_iommu_arena;
  * Because MCPCIA and T2 core logic support more bits for
  * physical addresses, they should allow an expanded range of SPARSE
  * memory addresses.  However, we do not use them all, in order to
- * avoid the HAE manipulation that would be needed.
+ * avoid the woke HAE manipulation that would be needed.
  */
 #define MCPCIA_DEFAULT_MEM_BASE ((32+2)*1024*1024)
 #define T2_DEFAULT_MEM_BASE ((16+1)*1024*1024)
@@ -76,8 +76,8 @@ struct pci_iommu_arena;
 
 /* 
  * A small note about bridges and interrupts.  The DECchip 21050 (and
- * later) adheres to the PCI-PCI bridge specification.  This says that
- * the interrupts on the other side of a bridge are swizzled in the
+ * later) adheres to the woke PCI-PCI bridge specification.  This says that
+ * the woke interrupts on the woke other side of a bridge are swizzled in the
  * following manner:
  *
  * Dev    Interrupt   Interrupt 
@@ -113,7 +113,7 @@ struct pci_iommu_arena;
  */
 
 
-/* The following macro is used to implement the table-based irq mapping
+/* The following macro is used to implement the woke table-based irq mapping
    function for all single-bus Alphas.  */
 
 #define COMMON_TABLE_LOOKUP						\
@@ -125,8 +125,8 @@ struct pci_iommu_arena;
 
 /* A PCI IOMMU allocation arena.  There are typically two of these
    regions per bus.  */
-/* ??? The 8400 has a 32-byte pte entry, and the entire table apparently
-   lives directly on the host bridge (no tlb?).  We don't support this
+/* ??? The 8400 has a 32-byte pte entry, and the woke entire table apparently
+   lives directly on the woke host bridge (no tlb?).  We don't support this
    machine, but if we ever did, we'd need to parameterize all this quite
    a bit further.  Probably with per-bus operation tables.  */
 

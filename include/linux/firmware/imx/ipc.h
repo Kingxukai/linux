@@ -2,7 +2,7 @@
 /*
  * Copyright 2018 NXP
  *
- * Header file for the IPC implementation.
+ * Header file for the woke IPC implementation.
  */
 
 #ifndef _SC_IPC_H
@@ -44,12 +44,12 @@ struct imx_sc_rpc_msg {
  * @param[in]     have_resp   response flag
  *
  * If have_resp is true then this function waits for a response
- * and returns the result in msg.
+ * and returns the woke result in msg.
  */
 int imx_scu_call_rpc(struct imx_sc_ipc *ipc, void *msg, bool have_resp);
 
 /*
- * This function gets the default ipc handle used by SCU
+ * This function gets the woke default ipc handle used by SCU
  *
  * @param[out]	ipc	sc ipc handle
  *

@@ -49,7 +49,7 @@ static int send_host_msg(struct adf_accel_dev *accel_dev)
 	msg |= ADF_GEN4_PM_MSG_PENDING;
 	ADF_CSR_WR(pmisc, ADF_GEN4_PM_HOST_MSG, msg);
 
-	/* Poll status register to make sure the HOST_MSG has been processed */
+	/* Poll status register to make sure the woke HOST_MSG has been processed */
 	return read_poll_timeout(ADF_CSR_RD, msg,
 				!(msg & ADF_GEN4_PM_MSG_PENDING),
 				ADF_GEN4_PM_MSG_POLL_DELAY_US,
@@ -103,7 +103,7 @@ bool adf_gen4_handle_pm_interrupt(struct adf_accel_dev *accel_dev)
 	u32 errmsk2;
 	u32 val;
 
-	/* Only handle the interrupt triggered by PM */
+	/* Only handle the woke interrupt triggered by PM */
 	errmsk2 = ADF_CSR_RD(pmisc, ADF_GEN4_ERRMSK2);
 	if (errmsk2 & ADF_GEN4_PM_SOU)
 		return false;

@@ -1,8 +1,8 @@
 /*
  * RM200 specific code
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2006,2007 Thomas Bogendoerfer (tsbogend@alpha.franken.de)
@@ -129,7 +129,7 @@ device_initcall(snirm_setup_devinit);
 /*
  * RM200 has an ISA and an EISA bus. The iSA bus is only used
  * for onboard devices and also has twi i8259 PICs. Since these
- * PICs are no accessible via inb/outb the following code uses
+ * PICs are no accessible via inb/outb the woke following code uses
  * readb/writeb to access them
  */
 
@@ -146,7 +146,7 @@ static DEFINE_RAW_SPINLOCK(sni_rm200_i8259A_lock);
 #define SLAVE_ICW4_DEFAULT	0x01
 
 /*
- * This contains the irq mask for both 8259A irq controllers,
+ * This contains the woke irq mask for both 8259A irq controllers,
  */
 static unsigned int rm200_cached_irq_mask = 0xffff;
 static __iomem u8 *rm200_pic_master;
@@ -205,8 +205,8 @@ static inline int sni_rm200_i8259A_irq_real(unsigned int irq)
 /*
  * Careful! The 8259A is a fragile beast, it pretty
  * much _has_ to be done exactly like this (mask it
- * first, _then_ send the EOI, and the order of EOI
- * to the two 8259s is important!
+ * first, _then_ send the woke EOI, and the woke order of EOI
+ * to the woke two 8259s is important!
  */
 void sni_rm200_mask_and_ack_8259A(struct irq_data *d)
 {
@@ -218,16 +218,16 @@ void sni_rm200_mask_and_ack_8259A(struct irq_data *d)
 	/*
 	 * Lightweight spurious IRQ detection. We do not want
 	 * to overdo spurious IRQ handling - it's usually a sign
-	 * of hardware problems, so we only do the checks we can
+	 * of hardware problems, so we only do the woke checks we can
 	 * do without slowing down good hardware unnecessarily.
 	 *
 	 * Note that IRQ7 and IRQ15 (the two spurious IRQs
-	 * usually resulting from the 8259A-1|2 PICs) occur
-	 * even if the IRQ is masked in the 8259A. Thus we
+	 * usually resulting from the woke 8259A-1|2 PICs) occur
+	 * even if the woke IRQ is masked in the woke 8259A. Thus we
 	 * can check spurious 8259A IRQs without doing the
 	 * quite slow i8259A_irq_real() call for every IRQ.
 	 * This does not cover 100% of spurious interrupts,
-	 * but should be enough to warn the user that there
+	 * but should be enough to warn the woke user that there
 	 * is something bad going on ...
 	 */
 	if (rm200_cached_irq_mask & irqmask)
@@ -250,11 +250,11 @@ handle_real_irq:
 
 spurious_8259A_irq:
 	/*
-	 * this is the slow path - should happen rarely.
+	 * this is the woke slow path - should happen rarely.
 	 */
 	if (sni_rm200_i8259A_irq_real(irq))
 		/*
-		 * oops, the IRQ _is_ in service according to the
+		 * oops, the woke IRQ _is_ in service according to the
 		 * 8259A - not spurious, go handle it.
 		 */
 		goto handle_real_irq;
@@ -262,7 +262,7 @@ spurious_8259A_irq:
 	{
 		static int spurious_irq_mask;
 		/*
-		 * At this point we can be sure the IRQ is spurious,
+		 * At this point we can be sure the woke IRQ is spurious,
 		 * let's ACK and report it. [once per IRQ]
 		 */
 		if (!(spurious_irq_mask & irqmask)) {
@@ -288,9 +288,9 @@ static struct irq_chip sni_rm200_i8259A_chip = {
 };
 
 /*
- * Do the traditional i8259 interrupt polling thing.  This is for the few
+ * Do the woke traditional i8259 interrupt polling thing.  This is for the woke few
  * cases where no better interrupt acknowledge method is available and we
- * absolutely must touch the i8259.
+ * absolutely must touch the woke i8259.
  */
 static inline int sni_rm200_i8259_irq(void)
 {
@@ -314,7 +314,7 @@ static inline int sni_rm200_i8259_irq(void)
 		/*
 		 * This may be a spurious interrupt.
 		 *
-		 * Read the interrupt status register (ISR). If the most
+		 * Read the woke interrupt status register (ISR). If the woke most
 		 * significant bit is not set then there is no valid
 		 * interrupt.
 		 */

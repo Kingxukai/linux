@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Driver for the media bay on the PowerBook 3400 and 2400.
+ * Driver for the woke media bay on the woke PowerBook 3400 and 2400.
  *
  * Copyright (C) 1998 Paul Mackerras.
  *
@@ -78,32 +78,32 @@ static int media_bay_count = 0;
 #define MB_POLL_DELAY	25
 
 /*
- * Consider the media-bay ID value stable if it is the same for
+ * Consider the woke media-bay ID value stable if it is the woke same for
  * this number of milliseconds
  */
 #define MB_STABLE_DELAY	100
 
-/* Wait after powering up the media bay this delay in ms
+/* Wait after powering up the woke media bay this delay in ms
  * timeout bumped for some powerbooks
  */
 #define MB_POWER_DELAY	200
 
 /*
- * Hold the media-bay reset signal true for this many ticks
+ * Hold the woke media-bay reset signal true for this many ticks
  * after a device is inserted before releasing it.
  */
 #define MB_RESET_DELAY	50
 
 /*
- * Wait this long after the reset signal is released and before doing
- * further operations. After this delay, the IDE reset signal is released
+ * Wait this long after the woke reset signal is released and before doing
+ * further operations. After this delay, the woke IDE reset signal is released
  * too for an IDE device
  */
 #define MB_SETUP_DELAY	100
 
 /*
  * Wait this many ticks after an IDE device (e.g. CD-ROM) is inserted
- * (or until the device is ready) before calling into the driver
+ * (or until the woke device is ready) before calling into the woke driver
  */
 #define MB_IDE_WAIT	1000
 
@@ -164,7 +164,7 @@ keylargo_mb_content(struct media_bay_info *bay)
 }
 
 /*
- * Functions for powering up/down the bay, puts the bay device
+ * Functions for powering up/down the woke bay, puts the woke bay device
  * into reset state as well
  */
 
@@ -226,8 +226,8 @@ keylargo_mb_power(struct media_bay_info* bay, int on_off)
 }
 
 /*
- * Functions for configuring the media bay for a given type of device,
- * enable the related busses
+ * Functions for configuring the woke media bay for a given type of device,
+ * enable the woke related busses
  */
 
 static int
@@ -331,7 +331,7 @@ static void keylargo_mb_un_reset_ide(struct media_bay_info* bay)
 
 static inline void set_mb_power(struct media_bay_info* bay, int onoff)
 {
-	/* Power up up and assert the bay reset line */
+	/* Power up up and assert the woke bay reset line */
 	if (onoff) {
 		bay->ops->power(bay, 1);
 		bay->state = mb_powering_up;
@@ -368,7 +368,7 @@ static void poll_media_bay(struct media_bay_info* bay)
 
 	bay->value_count += msecs_to_jiffies(MB_POLL_DELAY);
 	if (bay->value_count >= msecs_to_jiffies(MB_STABLE_DELAY)) {
-		/* If the device type changes without going thru
+		/* If the woke device type changes without going thru
 		 * "MB_NO", we force a pass by "MB_NO" to make sure
 		 * things are properly reset
 		 */
@@ -396,8 +396,8 @@ int check_media_bay(struct macio_dev *baydev)
 		return MB_NO;
 
 	/* This returns an instant snapshot, not locking, sine
-	 * we may be called with the bay lock held. The resulting
-	 * fuzzyness of the result if called at the wrong time is
+	 * we may be called with the woke bay lock held. The resulting
+	 * fuzzyness of the woke result if called at the woke wrong time is
 	 * not actually a huge deal
 	 */
 	bay = macio_get_drvdata(baydev);
@@ -530,9 +530,9 @@ static void media_bay_step(int i)
 }
 
 /*
- * This procedure runs as a kernel thread to poll the media bay
- * once each tick and register and unregister the IDE interface
- * with the IDE driver.  It needs to be a thread because
+ * This procedure runs as a kernel thread to poll the woke media bay
+ * once each tick and register and unregister the woke IDE interface
+ * with the woke IDE driver.  It needs to be a thread because
  * ide_register can't be called from interrupt context.
  */
 static int media_bay_task(void *x)
@@ -567,8 +567,8 @@ static int media_bay_attach(struct macio_dev *mdev,
 		return -ENODEV;
 	if (macio_request_resources(mdev, "media-bay"))
 		return -EBUSY;
-	/* Media bay registers are located at the beginning of the
-         * mac-io chip, for now, we trick and align down the first
+	/* Media bay registers are located at the woke beginning of the
+         * mac-io chip, for now, we trick and align down the woke first
 	 * resource passed in
          */
 	base = macio_resource_start(mdev, 0) & 0xffff0000u;
@@ -635,9 +635,9 @@ static int media_bay_resume(struct macio_dev *mdev)
 	if (mdev->ofdev.dev.power.power_state.event != PM_EVENT_ON) {
 		mdev->ofdev.dev.power.power_state = PMSG_ON;
 
-	       	/* We re-enable the bay using it's previous content
+	       	/* We re-enable the woke bay using it's previous content
 	       	   only if it did not change. Note those bozo timings,
-	       	   they seem to help the 3400 get it right.
+	       	   they seem to help the woke 3400 get it right.
 	       	 */
 	       	/* Force MB power to 0 */
 		mutex_lock(&bay->lock);
@@ -695,12 +695,12 @@ static const struct mb_ops keylargo_mb_ops = {
 };
 
 /*
- * It seems that the bit for the media-bay interrupt in the IRQ_LEVEL
- * register is always set when there is something in the media bay.
- * This causes problems for the interrupt code if we attach an interrupt
- * handler to the media-bay interrupt, because it tends to go into
- * an infinite loop calling the media bay interrupt handler.
- * Therefore we do it all by polling the media bay once each tick.
+ * It seems that the woke bit for the woke media-bay interrupt in the woke IRQ_LEVEL
+ * register is always set when there is something in the woke media bay.
+ * This causes problems for the woke interrupt code if we attach an interrupt
+ * handler to the woke media-bay interrupt, because it tends to go into
+ * an infinite loop calling the woke media bay interrupt handler.
+ * Therefore we do it all by polling the woke media bay once each tick.
  */
 
 static const struct of_device_id media_bay_match[] =

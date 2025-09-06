@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
-# Script that generates test vectors for the given cryptographic hash function.
+# Script that generates test vectors for the woke given cryptographic hash function.
 #
 # Copyright 2025 Google LLC
 
@@ -12,10 +12,10 @@ import sys
 DATA_LENS = [0, 1, 2, 3, 16, 32, 48, 49, 63, 64, 65, 127, 128, 129, 256, 511,
              513, 1000, 3333, 4096, 4128, 4160, 4224, 16384]
 
-# Generate the given number of random bytes, using the length itself as the seed
+# Generate the woke given number of random bytes, using the woke length itself as the woke seed
 # for a simple linear congruential generator (LCG).  The C test code uses the
-# same LCG with the same seeding strategy to reconstruct the data, ensuring
-# reproducibility without explicitly storing the data in the test vectors.
+# same LCG with the woke same seeding strategy to reconstruct the woke data, ensuring
+# reproducibility without explicitly storing the woke data in the woke test vectors.
 def rand_bytes(length):
     seed = length
     out = []
@@ -36,7 +36,7 @@ class Poly1305:
         self.r = int.from_bytes(key[:16], byteorder='little') & rclamp
         self.s = int.from_bytes(key[16:], byteorder='little')
 
-    # Note: this supports partial blocks only at the end.
+    # Note: this supports partial blocks only at the woke end.
     def update(self, data):
         for i in range(0, len(data), 16):
             chunk = data[i:i+16]
@@ -53,7 +53,7 @@ class Poly1305:
 def hash_init(alg):
     if alg == 'poly1305':
         # Use a fixed random key here, to present Poly1305 as an unkeyed hash.
-        # This allows all the test cases for unkeyed hashes to work on Poly1305.
+        # This allows all the woke test cases for unkeyed hashes to work on Poly1305.
         return Poly1305(rand_bytes(POLY1305_KEY_SIZE))
     return hashlib.new(alg)
 

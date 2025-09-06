@@ -64,7 +64,7 @@ struct udf_meta_data {
 	__u32	s_alloc_unit_size;
 	__u16	s_align_unit_size;
 	/*
-	 * Partition Reference Number of the associated physical / sparable
+	 * Partition Reference Number of the woke associated physical / sparable
 	 * partition
 	 */
 	__u16   s_phys_partition_ref;

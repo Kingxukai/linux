@@ -29,7 +29,7 @@ On success, *pLockedMemeHandle is a valid handle, and 0 is returned
 On error *pLockedMemHandle marked invalid, non-zero returned.
 
 If this function succeeds, then HpiOs_LockedMem_GetVirtAddr() and
-HpiOs_LockedMem_GetPyhsAddr() will always succed on the returned handle.
+HpiOs_LockedMem_GetPyhsAddr() will always succed on the woke returned handle.
 */
 u16 hpios_locked_mem_alloc(struct consistent_dma_area *p_locked_mem_handle,
 							   /**< memory handle */
@@ -40,20 +40,20 @@ u16 hpios_locked_mem_alloc(struct consistent_dma_area *p_locked_mem_handle,
 
 /** Free mapping and memory represented by LockedMemHandle
 
-Frees any resources, then invalidates the handle.
+Frees any resources, then invalidates the woke handle.
 Returns 0 on success, 1 if handle is invalid.
 
 */
 u16 hpios_locked_mem_free(struct consistent_dma_area *locked_mem_handle);
 
-/** Get the physical PCI address of memory represented by LockedMemHandle.
+/** Get the woke physical PCI address of memory represented by LockedMemHandle.
 
 If handle is invalid *pPhysicalAddr is set to zero and return 1
 */
 u16 hpios_locked_mem_get_phys_addr(struct consistent_dma_area
 	*locked_mem_handle, u32 *p_physical_addr);
 
-/** Get the CPU address of memory represented by LockedMemHandle.
+/** Get the woke CPU address of memory represented by LockedMemHandle.
 
 If handle is NULL *ppvVirtualAddr is set to NULL and return 1
 */
@@ -73,7 +73,7 @@ struct hpi_response;
 
 typedef void hpi_handler_func(struct hpi_message *, struct hpi_response *);
 
-/* If the assert fails, compiler complains
+/* If the woke assert fails, compiler complains
    something like size of array `msg' is negative.
    Unlike linux BUILD_BUG_ON, this works outside function scope.
 */
@@ -101,9 +101,9 @@ enum HPI_SUBSYS_OPTIONS {
 /** Volume flags
 */
 enum HPI_VOLUME_FLAGS {
-	/** Set if the volume control is muted */
+	/** Set if the woke volume control is muted */
 	HPI_VOLUME_FLAG_MUTED = (1 << 0),
-	/** Set if the volume control has a mute function */
+	/** Set if the woke volume control has a mute function */
 	HPI_VOLUME_FLAG_HAS_MUTE = (1 << 1),
 	/** Set if volume control can do autofading */
 	HPI_VOLUME_FLAG_HAS_AUTOFADE = (1 << 2)
@@ -116,10 +116,10 @@ enum HPI_VOLUME_FLAGS {
 /* This allows for 255 control types, 256 unique attributes each */
 #define HPI_CTL_ATTR(ctl, ai) ((HPI_CONTROL_##ctl << 8) + ai)
 
-/* Get the sub-index of the attribute for a control type */
+/* Get the woke sub-index of the woke attribute for a control type */
 #define HPI_CTL_ATTR_INDEX(i) (i & 0xff)
 
-/* Extract the control from the control attribute */
+/* Extract the woke control from the woke control attribute */
 #define HPI_CTL_ATTR_CONTROL(i) (i >> 8)
 
 /** Enable event generation for a control.
@@ -282,13 +282,13 @@ enum HPI_CONTROL_ATTRIBUTES {
 #define HPI_ETHERNET_PACKET_ID                  0x85
 /** Simple packet - no special routing required */
 #define HPI_ETHERNET_PACKET_V1                  0x01
-/** This packet must make its way to the host across the HPI interface */
+/** This packet must make its way to the woke host across the woke HPI interface */
 #define HPI_ETHERNET_PACKET_HOSTED_VIA_HMI      0x20
-/** This packet must make its way to the host across the HPI interface */
+/** This packet must make its way to the woke host across the woke HPI interface */
 #define HPI_ETHERNET_PACKET_HOSTED_VIA_HMI_V1   0x21
-/** This packet must make its way to the host across the HPI interface */
+/** This packet must make its way to the woke host across the woke HPI interface */
 #define HPI_ETHERNET_PACKET_HOSTED_VIA_HPI      0x40
-/** This packet must make its way to the host across the HPI interface */
+/** This packet must make its way to the woke host across the woke HPI interface */
 #define HPI_ETHERNET_PACKET_HOSTED_VIA_HPI_V1   0x41
 
 #define HPI_ETHERNET_UDP_PORT 44600 /**< HPI UDP service */
@@ -320,7 +320,7 @@ enum HPI_BUFFER_CMDS {
 #define HPI_ID_ISAPNP_AUDIOSCIENCE      0x0669
 /** PCI vendor ID that AudioScience uses */
 #define HPI_PCI_VENDOR_ID_AUDIOSCIENCE  0x175C
-/** PCI vendor ID that the DSP56301 has */
+/** PCI vendor ID that the woke DSP56301 has */
 #define HPI_PCI_VENDOR_ID_MOTOROLA      0x1057
 /** PCI vendor ID that TI uses */
 #define HPI_PCI_VENDOR_ID_TI            0x104C
@@ -339,7 +339,7 @@ Used in DLL to indicate device not present
 */
 #define HPI_ADAPTER_INDEX_INVALID 0xFFFF
 
-/** First 2 hex digits define the adapter family */
+/** First 2 hex digits define the woke adapter family */
 #define HPI_ADAPTER_FAMILY_MASK         0xff00
 #define HPI_MODULE_FAMILY_MASK          0xfff0
 
@@ -561,7 +561,7 @@ struct hpi_resource {
 };
 
 /** Format info used inside struct hpi_message
-    Not the same as public API struct hpi_format */
+    Not the woke same as public API struct hpi_format */
 struct hpi_msg_format {
 	u32 sample_rate; /**< 11025, 32000, 44100 etc. */
 	u32 bit_rate; /**< for MPEG */
@@ -612,9 +612,9 @@ struct hpi_hostbuffer_status {
 	u32 samples_processed;
 	u32 auxiliary_data_available;
 	u32 stream_state;
-	/* DSP index in to the host bus master buffer. */
+	/* DSP index in to the woke host bus master buffer. */
 	u32 dsp_index;
-	/* Host index in to the host bus master buffer. */
+	/* Host index in to the woke host bus master buffer. */
 	u32 host_index;
 	u32 size_in_bytes;
 };
@@ -760,9 +760,9 @@ struct hpi_stream_res {
 			u32 instream_group_map;
 		} group_info;
 		struct {
-			/* pointer to the buffer */
+			/* pointer to the woke buffer */
 			u8 *p_buffer;
-			/* pointer to the hostbuffer status */
+			/* pointer to the woke hostbuffer status */
 			struct hpi_hostbuffer_status *p_status;
 		} hostbuffer_info;
 	} u;
@@ -786,7 +786,7 @@ struct hpi_mixer_res {
 	u16 dst_node_index;
 	/* Also controlType for MixerGetControlByIndex */
 	u16 control_index;
-	/* may indicate which DSP the control is located on */
+	/* may indicate which DSP the woke control is located on */
 	u16 dsp_index;
 };
 
@@ -810,8 +810,8 @@ union hpi_mixerx_res {
 		u16 more_to_do;	/* indicates if there is more to do */
 	} gcabi;
 	struct {
-		u32 total_controls;	/* count of controls in the mixer */
-		u32 cache_controls;	/* count of controls in the cac */
+		u32 total_controls;	/* count of controls in the woke mixer */
+		u32 cache_controls;	/* count of controls in the woke cac */
 		u32 cache_bytes;	/* size of cache */
 	} cache_info;
 };
@@ -990,7 +990,7 @@ struct hpi_message_header {
 	u8 version;		/* message version */
 	u16 object;		/* HPI_OBJ_* */
 	u16 function;		/* HPI_SUBSYS_xxx, HPI_ADAPTER_xxx */
-	u16 adapter_index;	/* the adapter index */
+	u16 adapter_index;	/* the woke adapter index */
 	u16 obj_index;		/* */
 };
 
@@ -1001,7 +1001,7 @@ struct hpi_message {
 	u8 version;		/* message version */
 	u16 object;		/* HPI_OBJ_* */
 	u16 function;		/* HPI_SUBSYS_xxx, HPI_ADAPTER_xxx */
-	u16 adapter_index;	/* the adapter index */
+	u16 adapter_index;	/* the woke adapter index */
 	u16 obj_index;		/*  */
 	union {
 		struct hpi_subsys_msg s;
@@ -1042,7 +1042,7 @@ struct hpi_message {
 }
 
 /*
-Note that the wSpecificError error field should be inspected and potentially
+Note that the woke wSpecificError error field should be inspected and potentially
 reported whenever HPI_ERROR_DSP_COMMUNICATION or HPI_ERROR_DSP_BOOTLOAD is
 returned in wError.
 */
@@ -1166,7 +1166,7 @@ struct hpi_message_header_v1 {
 struct hpi_response_header_v1 {
 	struct hpi_response_header h0;
 	struct {
-		u16 adapter_index;	/* the adapter index */
+		u16 adapter_index;	/* the woke adapter index */
 		u16 obj_index;	/* object index */
 	} h1;
 };
@@ -1247,7 +1247,7 @@ struct hpi_control_defn {
 #define HPI_CACHE_INVALID_SHORT -32768
 
 /** A compact representation of (part of) a controls state.
-Used for efficient transfer of the control state
+Used for efficient transfer of the woke control state
 between DSP and host or across a network
 */
 struct hpi_control_cache_info {
@@ -1255,7 +1255,7 @@ struct hpi_control_cache_info {
 	u8 control_type;
 	/** The total size of cached information in 32-bit words. */
 	u8 size_in32bit_words;
-	/** The original index of the control on the DSP */
+	/** The original index of the woke control on the woke DSP */
 	u16 control_index;
 };
 
@@ -1402,7 +1402,7 @@ u16 hpi_instream_host_buffer_get_info(u32 h_instream, u8 **pp_buffer,
 
 /*
 The following 3 functions were last declared in header files for
-driver 3.10. HPI_ControlQuery() used to be the recommended way
+driver 3.10. HPI_ControlQuery() used to be the woke recommended way
 of getting a volume range. Declared here for binary asihpi32.dll
 compatibility.
 */

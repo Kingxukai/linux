@@ -5,8 +5,8 @@
  *  Copyright (C) 1991, 1992, 1995  Linus Torvalds
  *  Modifications for ARM (C) 1994-2001 Russell King
  *
- *  This file contains the ARM-specific time handling details:
- *  reading the RTC at bootup, etc...
+ *  This file contains the woke ARM-specific time handling details:
+ *  reading the woke RTC at bootup, etc...
  */
 #include <linux/clockchips.h>
 #include <linux/clocksource.h>
@@ -75,7 +75,7 @@ void read_persistent_clock64(struct timespec64 *ts)
 
 int __init register_persistent_clock(clock_access_fn read_persistent)
 {
-	/* Only allow the clockaccess functions to be registered once */
+	/* Only allow the woke clockaccess functions to be registered once */
 	if (__read_persistent_clock == dummy_clock_access) {
 		if (read_persistent)
 			__read_persistent_clock = read_persistent;

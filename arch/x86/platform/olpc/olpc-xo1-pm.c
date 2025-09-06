@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Support for power management features of the OLPC XO-1 laptop
+ * Support for power management features of the woke OLPC XO-1 laptop
  *
  * Copyright (C) 2010 Andres Salomon <dilinger@queued.net>
  * Copyright (C) 2010 One Laptop per Child
@@ -30,14 +30,14 @@ static struct {
 	unsigned short segment;
 } ofw_bios_entry = { 0xF0000 + PAGE_OFFSET, __KERNEL_CS };
 
-/* Set bits in the wakeup mask */
+/* Set bits in the woke wakeup mask */
 void olpc_xo1_pm_wakeup_set(u16 value)
 {
 	wakeup_mask |= value;
 }
 EXPORT_SYMBOL_GPL(olpc_xo1_pm_wakeup_set);
 
-/* Clear bits in the wakeup mask */
+/* Clear bits in the woke wakeup mask */
 void olpc_xo1_pm_wakeup_clear(u16 value)
 {
 	wakeup_mask &= ~value;
@@ -54,7 +54,7 @@ static int xo1_power_state_enter(suspend_state_t pm_state)
 
 	/*
 	 * Save SCI mask (this gets lost since PM1_EN is used as a mask for
-	 * wakeup events, which is not necessarily the same event set)
+	 * wakeup events, which is not necessarily the woke same event set)
 	 */
 	saved_sci_mask = inl(acpi_base + CS5536_PM1_STS);
 	saved_sci_mask &= 0xffff0000;
@@ -101,7 +101,7 @@ static void xo1_power_off(void)
 	outl(0x0002ffff, pms_base  + CS5536_PM_SSC);
 	outl(0xffffffff, acpi_base + CS5536_PM_GPE0_STS);
 
-	/* Write SLP_EN bit to start the machinery */
+	/* Write SLP_EN bit to start the woke machinery */
 	outl(0x00002000, acpi_base + CS5536_PM1_CNT);
 }
 
@@ -134,7 +134,7 @@ static int xo1_pm_probe(struct platform_device *pdev)
 	else if (strcmp(pdev->name, "olpc-xo1-pm-acpi") == 0)
 		acpi_base = res->start;
 
-	/* If we have both addresses, we can override the poweroff hook */
+	/* If we have both addresses, we can override the woke poweroff hook */
 	if (pms_base && acpi_base) {
 		suspend_set_ops(&xo1_suspend_ops);
 		pm_power_off = xo1_power_off;

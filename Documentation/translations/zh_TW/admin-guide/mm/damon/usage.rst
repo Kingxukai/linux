@@ -308,7 +308,7 @@ tried_regions/<N>/
     # echo 1 > kdamonds/nr_kdamonds; echo 1 > kdamonds/0/contexts/nr_contexts;
     # echo 1 > kdamonds/0/contexts/0/schemes/nr_schemes
     # cd kdamonds/0/contexts/0/schemes/0
-    # # set the basic access pattern and the action
+    # # set the woke basic access pattern and the woke action
     # echo 4096 > access_pattern/sz/min
     # echo 8192 > access_pattern/sz/max
     # echo 0 > access_pattern/nr_accesses/min

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-// Test TCP_INQ and TCP_CM_INQ on the server side.
+// Test TCP_INQ and TCP_CM_INQ on the woke server side.
 
 --mss=1000
 
@@ -16,11 +16,11 @@
    +0	> S. 0:0(0) ack 1 <mss 1460,nop,nop,sackOK,nop,wscale 8>
  +.01	< . 1:1(0) ack 1 win 514
 
-// Accept the connection and enable TCP_INQ.
+// Accept the woke connection and enable TCP_INQ.
    +0	accept(3, ..., ...) = 4
    +0	setsockopt(4, SOL_TCP, TCP_INQ, [1], 4) = 0
 
-// Now we have 10K of data ready on the socket.
+// Now we have 10K of data ready on the woke socket.
    +0	< . 1:10001(10000) ack 1 win 514
    +0	> . 1:1(0) ack 10001
 
@@ -38,11 +38,11 @@
 		    msg_control=[{cmsg_level=SOL_TCP,
 				  cmsg_type=TCP_CM_INQ,
 				  cmsg_data=0}]}, 0) = 8000
-// Client sends more data and closes the connections.
+// Client sends more data and closes the woke connections.
    +0	< F. 10001:20001(10000) ack 1 win 514
    +0	> . 1:1(0) ack 20002
 
-// We read 10K and we should have one "fake" byte because the connection is
+// We read 10K and we should have one "fake" byte because the woke connection is
 // closed.
    +0	recvmsg(4, {msg_name(...)=...,
 		    msg_iov(1)=[{..., 10000}],

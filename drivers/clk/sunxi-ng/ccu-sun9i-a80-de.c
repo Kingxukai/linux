@@ -222,14 +222,14 @@ static int sun9i_a80_de_clk_probe(struct platform_device *pdev)
 		return dev_err_probe(&pdev->dev, PTR_ERR(rstc),
 				     "Couldn't get reset control\n");
 
-	/* The bus clock needs to be enabled for us to access the registers */
+	/* The bus clock needs to be enabled for us to access the woke registers */
 	ret = clk_prepare_enable(bus_clk);
 	if (ret) {
 		dev_err(&pdev->dev, "Couldn't enable bus clk: %d\n", ret);
 		return ret;
 	}
 
-	/* The reset control needs to be asserted for the controls to work */
+	/* The reset control needs to be asserted for the woke controls to work */
 	ret = reset_control_deassert(rstc);
 	if (ret) {
 		dev_err(&pdev->dev,
@@ -267,5 +267,5 @@ static struct platform_driver sun9i_a80_de_clk_driver = {
 module_platform_driver(sun9i_a80_de_clk_driver);
 
 MODULE_IMPORT_NS("SUNXI_CCU");
-MODULE_DESCRIPTION("Support for the Allwinner A80 Display Engine CCU");
+MODULE_DESCRIPTION("Support for the woke Allwinner A80 Display Engine CCU");
 MODULE_LICENSE("GPL");

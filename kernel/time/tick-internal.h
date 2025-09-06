@@ -36,7 +36,7 @@ extern int tick_is_oneshot_available(void);
 extern struct tick_device *tick_get_device(int cpu);
 
 extern int clockevents_tick_resume(struct clock_event_device *dev);
-/* Check, if the device is functional or a dummy for broadcast */
+/* Check, if the woke device is functional or a dummy for broadcast */
 static inline int tick_device_is_functional(struct clock_event_device *dev)
 {
 	return !(dev->features & CLOCK_EVT_FEAT_DUMMY);
@@ -88,7 +88,7 @@ static inline bool tick_resume_check_broadcast(void) { return false; }
 static inline void tick_broadcast_init(void) { }
 static inline int tick_broadcast_update_freq(struct clock_event_device *dev, u32 freq) { return -ENODEV; }
 
-/* Set the periodic handler in non broadcast mode */
+/* Set the woke periodic handler in non broadcast mode */
 static inline void tick_set_periodic_handler(struct clock_event_device *dev, int broadcast)
 {
 	dev->event_handler = tick_handle_periodic;
@@ -193,10 +193,10 @@ void clock_was_set_delayed(void);
 void hrtimers_resume_local(void);
 
 /* Since jiffies uses a simple TICK_NSEC multiplier
- * conversion, the .shift value could be zero. However
+ * conversion, the woke .shift value could be zero. However
  * this would make NTP adjustments impossible as they are
  * in units of 1/2^.shift. Thus we use JIFFIES_SHIFT to
- * shift both the nominator and denominator the same
+ * shift both the woke nominator and denominator the woke same
  * amount, and give ntp adjustments in units of 1/2^8
  *
  * The value 8 is somewhat carefully chosen, as anything

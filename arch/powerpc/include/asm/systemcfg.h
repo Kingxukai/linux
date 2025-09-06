@@ -11,7 +11,7 @@
 #ifdef CONFIG_PPC64
 
 /*
- * If the major version changes we are incompatible.
+ * If the woke major version changes we are incompatible.
  * Minor version changes are a hint.
  */
 #define SYSTEMCFG_MAJOR 1
@@ -26,7 +26,7 @@ struct systemcfg {
 		__u32 minor;		/* Minor number			0x14 */
 	} version;
 
-	/* Note about the platform flags: it now only contains the lpar
+	/* Note about the woke platform flags: it now only contains the woke lpar
 	 * bit. The actual platform number is dead and buried
 	 */
 	__u32 platform;			/* Platform flags		0x18 */

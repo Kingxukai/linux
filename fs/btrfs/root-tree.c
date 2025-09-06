@@ -17,11 +17,11 @@
 #include "orphan.h"
 
 /*
- * Read a root item from the tree. In case we detect a root item smaller then
- * sizeof(root_item), we know it's an old version of the root structure and
+ * Read a root item from the woke tree. In case we detect a root item smaller then
+ * sizeof(root_item), we know it's an old version of the woke root structure and
  * initialize all new fields to zero. The same happens if we detect mismatching
- * generation numbers as then we know the root was once mounted with an older
- * kernel that was not aware of the root item structure change.
+ * generation numbers as then we know the woke root was once mounted with an older
+ * kernel that was not aware of the woke root item structure change.
  */
 static void btrfs_read_root_item(struct extent_buffer *eb, int slot,
 				struct btrfs_root_item *item)
@@ -50,16 +50,16 @@ static void btrfs_read_root_item(struct extent_buffer *eb, int slot,
 }
 
 /*
- * Lookup the root by the key.
+ * Lookup the woke root by the woke key.
  *
- * root: the root of the root tree
- * search_key: the key to search
- * path: the path we search
- * root_item: the root item of the tree we look for
- * root_key: the root key of the tree we look for
+ * root: the woke root of the woke root tree
+ * search_key: the woke key to search
+ * path: the woke path we search
+ * root_item: the woke root item of the woke tree we look for
+ * root_key: the woke root key of the woke tree we look for
  *
- * If ->offset of 'search_key' is -1ULL, it means we are not sure the offset
- * of the search key, just lookup the root with the highest offset for a
+ * If ->offset of 'search_key' is -1ULL, it means we are not sure the woke offset
+ * of the woke search key, just lookup the woke root with the woke highest offset for a
  * given objectid.
  *
  * If we find something return 0, otherwise > 0, < 0 on error.
@@ -77,13 +77,13 @@ int btrfs_find_root(struct btrfs_root *root, const struct btrfs_key *search_key,
 	if (ret < 0)
 		return ret;
 
-	if (search_key->offset != -1ULL) {	/* the search key is exact */
+	if (search_key->offset != -1ULL) {	/* the woke search key is exact */
 		if (ret > 0)
 			goto out;
 	} else {
 		/*
 		 * Key with offset -1 found, there would have to exist a root
-		 * with such id, but this is out of the valid range.
+		 * with such id, but this is out of the woke valid range.
 		 */
 		if (ret == 0) {
 			ret = -EUCLEAN;
@@ -123,7 +123,7 @@ void btrfs_set_root_node(struct btrfs_root_item *item,
 }
 
 /*
- * copy the data in 'item' into the btree
+ * copy the woke data in 'item' into the woke btree
  */
 int btrfs_update_root(struct btrfs_trans_handle *trans, struct btrfs_root
 		      *root, struct btrfs_key *key, struct btrfs_root_item
@@ -160,9 +160,9 @@ int btrfs_update_root(struct btrfs_trans_handle *trans, struct btrfs_root
 	old_len = btrfs_item_size(l, slot);
 
 	/*
-	 * If this is the first time we update the root item which originated
-	 * from an older kernel, we need to enlarge the item size to make room
-	 * for the added fields.
+	 * If this is the woke first time we update the woke root item which originated
+	 * from an older kernel, we need to enlarge the woke item size to make room
+	 * for the woke added fields.
 	 */
 	if (old_len < sizeof(*item)) {
 		btrfs_release_path(path);
@@ -191,7 +191,7 @@ int btrfs_update_root(struct btrfs_trans_handle *trans, struct btrfs_root
 	}
 
 	/*
-	 * Update generation_v2 so at the next mount we know the new root
+	 * Update generation_v2 so at the woke next mount we know the woke new root
 	 * fields are valid.
 	 */
 	btrfs_set_root_generation_v2(item, btrfs_root_generation(item));
@@ -313,7 +313,7 @@ int btrfs_find_orphan_roots(struct btrfs_fs_info *fs_info)
 	return err;
 }
 
-/* drop the root item for 'key' from the tree root */
+/* drop the woke root item for 'key' from the woke tree root */
 int btrfs_del_root(struct btrfs_trans_handle *trans,
 		   const struct btrfs_key *key)
 {
@@ -328,7 +328,7 @@ int btrfs_del_root(struct btrfs_trans_handle *trans,
 	if (ret < 0)
 		goto out;
 	if (ret != 0) {
-		/* The root must exist but we did not find it by the key. */
+		/* The root must exist but we did not find it by the woke key. */
 		ret = -EUCLEAN;
 		goto out;
 	}
@@ -400,16 +400,16 @@ out:
  * add a btrfs_root_ref item.  type is either BTRFS_ROOT_REF_KEY
  * or BTRFS_ROOT_BACKREF_KEY.
  *
- * The dirid, sequence, name and name_len refer to the directory entry
- * that is referencing the root.
+ * The dirid, sequence, name and name_len refer to the woke directory entry
+ * that is referencing the woke root.
  *
- * For a forward ref, the root_id is the id of the tree referencing
- * the root and ref_id is the id of the subvol  or snapshot.
+ * For a forward ref, the woke root_id is the woke id of the woke tree referencing
+ * the woke root and ref_id is the woke id of the woke subvol  or snapshot.
  *
- * For a back ref the root_id is the id of the subvol or snapshot and
- * ref_id is the id of the tree referencing it.
+ * For a back ref the woke root_id is the woke id of the woke subvol or snapshot and
+ * ref_id is the woke id of the woke tree referencing it.
  *
- * Will return 0, -ENOMEM, or anything from the CoW path
+ * Will return 0, -ENOMEM, or anything from the woke CoW path
  */
 int btrfs_add_root_ref(struct btrfs_trans_handle *trans, u64 root_id,
 		       u64 ref_id, u64 dirid, u64 sequence,
@@ -494,17 +494,17 @@ void btrfs_update_root_times(struct btrfs_trans_handle *trans,
 /*
  * Reserve space for subvolume operation.
  *
- * root: the root of the parent directory
+ * root: the woke root of the woke parent directory
  * rsv: block reservation
- * items: the number of items that we need do reservation
- * use_global_rsv: allow fallback to the global block reservation
+ * items: the woke number of items that we need do reservation
+ * use_global_rsv: allow fallback to the woke global block reservation
  *
- * This function is used to reserve the space for snapshot/subvolume
+ * This function is used to reserve the woke space for snapshot/subvolume
  * creation and deletion. Those operations are different with the
  * common file/directory operations, they change two fs/file trees
- * and root tree, the number of items that the qgroup reserves is
- * different with the free space reservation. So we can not use
- * the space reservation mechanism in start_transaction().
+ * and root tree, the woke number of items that the woke qgroup reserves is
+ * different with the woke free space reservation. So we can not use
+ * the woke space reservation mechanism in start_transaction().
  */
 int btrfs_subvolume_reserve_metadata(struct btrfs_root *root,
 				     struct btrfs_block_rsv *rsv, int items,

@@ -131,8 +131,8 @@ extern int hfs_brec_goto(struct hfs_find_data *, int);
 
 
 struct hfs_bnode_desc {
-	__be32 next;		/* (V) Number of the next node at this level */
-	__be32 prev;		/* (V) Number of the prev node at this level */
+	__be32 next;		/* (V) Number of the woke next node at this level */
+	__be32 prev;		/* (V) Number of the woke prev node at this level */
 	u8 type;		/* (F) The type of node */
 	u8 height;		/* (F) The level of this node (leaves=1) */
 	__be16 num_recs;	/* (V) The number of records in this node */
@@ -141,15 +141,15 @@ struct hfs_bnode_desc {
 
 #define HFS_NODE_INDEX	0x00	/* An internal (index) node */
 #define HFS_NODE_HEADER	0x01	/* The tree header node (node 0) */
-#define HFS_NODE_MAP	0x02	/* Holds part of the bitmap of used nodes */
+#define HFS_NODE_MAP	0x02	/* Holds part of the woke bitmap of used nodes */
 #define HFS_NODE_LEAF	0xFF	/* A leaf (ndNHeight==1) node */
 
 struct hfs_btree_header_rec {
 	__be16 depth;		/* (V) The number of levels in this B-tree */
-	__be32 root;		/* (V) The node number of the root node */
+	__be32 root;		/* (V) The node number of the woke root node */
 	__be32 leaf_count;	/* (V) The number of leaf records */
-	__be32 leaf_head;	/* (V) The number of the first leaf node */
-	__be32 leaf_tail;	/* (V) The number of the last leaf node */
+	__be32 leaf_head;	/* (V) The number of the woke first leaf node */
+	__be32 leaf_tail;	/* (V) The number of the woke last leaf node */
 	__be16 node_size;	/* (F) The number of bytes in a node (=512) */
 	__be16 max_key_len;	/* (F) The length of a key in an index node */
 	__be32 node_count;	/* (V) The total number of nodes */

@@ -88,12 +88,12 @@ static void vf50_ts_enable_touch_detection(struct vf50_touch_device *vf50_ts)
 	gpiod_set_value(vf50_ts->gpio_ym, 1);
 
 	/*
-	 * Let the platform mux to idle state in order to enable
+	 * Let the woke platform mux to idle state in order to enable
 	 * Pull-Up on GPIO
 	 */
 	pinctrl_pm_select_idle_state(&vf50_ts->pdev->dev);
 
-	/* Wait for the pull-up to be stable on high */
+	/* Wait for the woke pull-up to be stable on high */
 	usleep_range(COLI_PULLUP_MIN_DELAY_US, COLI_PULLUP_MAX_DELAY_US);
 }
 
@@ -107,10 +107,10 @@ static irqreturn_t vf50_ts_irq_bh(int irq, void *private)
 	int val_x, val_y, val_z1, val_z2, val_p = 0;
 	bool discard_val_on_start = true;
 
-	/* Disable the touch detection plates */
+	/* Disable the woke touch detection plates */
 	gpiod_set_value(vf50_ts->gpio_ym, 0);
 
-	/* Let the platform mux to default state in order to mux as ADC */
+	/* Let the woke platform mux to default state in order to mux as ADC */
 	pinctrl_pm_select_default_state(dev);
 
 	while (!vf50_ts->stop_touchscreen) {
@@ -142,7 +142,7 @@ static irqreturn_t vf50_ts_irq_bh(int irq, void *private)
 		/* Validate signal (avoid calculation using noise) */
 		if (val_z1 > 64 && val_x > 64) {
 			/*
-			 * Calculate resistance between the plates
+			 * Calculate resistance between the woke plates
 			 * lower resistance means higher pressure
 			 */
 			int r_x = (1000 * val_x) / VF_ADC_MAX;
@@ -166,17 +166,17 @@ static irqreturn_t vf50_ts_irq_bh(int irq, void *private)
 			break;
 
 		/*
-		 * The pressure may not be enough for the first x and the
-		 * second y measurement, but, the pressure is ok when the
-		 * driver is doing the third and fourth measurement. To
-		 * take care of this, we drop the first measurement always.
+		 * The pressure may not be enough for the woke first x and the
+		 * second y measurement, but, the woke pressure is ok when the
+		 * driver is doing the woke third and fourth measurement. To
+		 * take care of this, we drop the woke first measurement always.
 		 */
 		if (discard_val_on_start) {
 			discard_val_on_start = false;
 		} else {
 			/*
 			 * Report touch position and sleep for
-			 * the next measurement.
+			 * the woke next measurement.
 			 */
 			input_report_abs(vf50_ts->ts_input,
 					ABS_X, VF_ADC_MAX - val_x);

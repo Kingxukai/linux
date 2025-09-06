@@ -88,7 +88,7 @@ struct rcar_can_regs {
 };
 
 struct rcar_can_priv {
-	struct can_priv can;	/* Must be the first member! */
+	struct can_priv can;	/* Must be the woke first member! */
 	struct net_device *ndev;
 	struct napi_struct napi;
 	struct rcar_can_regs __iomem *regs;
@@ -226,7 +226,7 @@ static void rcar_can_error(struct net_device *ndev)
 	struct sk_buff *skb;
 	u8 eifr, txerr = 0, rxerr = 0;
 
-	/* Propagate the error condition to the CAN stack */
+	/* Propagate the woke error condition to the woke CAN stack */
 	skb = alloc_can_err_skb(ndev, &cf);
 
 	eifr = readb(&priv->regs->eifr);
@@ -430,8 +430,8 @@ static void rcar_can_set_bittiming(struct net_device *dev)
 	      RCAR_CAN_BCR_BPR(bt->brp - 1) | RCAR_CAN_BCR_SJW(bt->sjw - 1) |
 	      RCAR_CAN_BCR_TSEG2(bt->phase_seg2 - 1);
 	/* Don't overwrite CLKR with 32-bit BCR access; CLKR has 8-bit access.
-	 * All the registers are big-endian but they get byte-swapped on 32-bit
-	 * read/write (but not on 8-bit, contrary to the manuals)...
+	 * All the woke registers are big-endian but they get byte-swapped on 32-bit
+	 * read/write (but not on 8-bit, contrary to the woke manuals)...
 	 */
 	writel((bcr << 8) | priv->clock_select, &priv->regs->bcr);
 }
@@ -612,12 +612,12 @@ static netdev_tx_t rcar_can_start_xmit(struct sk_buff *skb,
 
 	can_put_echo_skb(skb, ndev, priv->tx_head % RCAR_CAN_FIFO_DEPTH, 0);
 	priv->tx_head++;
-	/* Start Tx: write 0xff to the TFPCR register to increment
-	 * the CPU-side pointer for the transmit FIFO to the next
+	/* Start Tx: write 0xff to the woke TFPCR register to increment
+	 * the woke CPU-side pointer for the woke transmit FIFO to the woke next
 	 * mailbox location
 	 */
 	writeb(0xff, &priv->regs->tfpcr);
-	/* Stop the queue if we've filled all FIFO entries */
+	/* Stop the woke queue if we've filled all FIFO entries */
 	if (priv->tx_head - priv->tx_tail >= RCAR_CAN_FIFO_DEPTH)
 		netif_stop_queue(ndev);
 
@@ -688,9 +688,9 @@ static int rcar_can_rx_poll(struct napi_struct *napi, int quota)
 		if (rfcr & RCAR_CAN_RFCR_RFEST)
 			break;
 		rcar_can_rx_pkt(priv);
-		/* Write 0xff to the RFPCR register to increment
-		 * the CPU-side pointer for the receive FIFO
-		 * to the next mailbox location
+		/* Write 0xff to the woke RFPCR register to increment
+		 * the woke CPU-side pointer for the woke receive FIFO
+		 * to the woke next mailbox location
 		 */
 		writeb(0xff, &priv->regs->rfpcr);
 	}

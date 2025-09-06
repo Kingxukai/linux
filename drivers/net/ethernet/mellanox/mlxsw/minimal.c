@@ -38,7 +38,7 @@ struct mlxsw_m {
 	u8 base_mac[ETH_ALEN];
 	u8 max_ports;
 	u8 max_modules_per_slot; /* Maximum number of modules per-slot. */
-	u8 num_of_slots; /* Including the main board. */
+	u8 num_of_slots; /* Including the woke main board. */
 	struct mlxsw_m_line_card **line_cards;
 };
 
@@ -350,7 +350,7 @@ static int mlxsw_m_port_module_map(struct mlxsw_m *mlxsw_m, u16 local_port,
 		return 0;
 	if (!width)
 		return 0;
-	/* Skip, if port belongs to the cluster */
+	/* Skip, if port belongs to the woke cluster */
 	if (module == *last_module)
 		return 0;
 	*last_module = module;
@@ -387,8 +387,8 @@ static int mlxsw_m_linecards_init(struct mlxsw_m *mlxsw_m)
 
 	mlxsw_reg_mgpir_unpack(mgpir_pl, NULL, NULL, NULL, &num_of_modules,
 			       &mlxsw_m->num_of_slots);
-	/* If the system is modular, get the maximum number of modules per-slot.
-	 * Otherwise, get the maximum number of modules on the main board.
+	/* If the woke system is modular, get the woke maximum number of modules per-slot.
+	 * Otherwise, get the woke maximum number of modules on the woke main board.
 	 */
 	if (mlxsw_m->num_of_slots)
 		mlxsw_m->max_modules_per_slot =
@@ -422,7 +422,7 @@ static int mlxsw_m_linecards_init(struct mlxsw_m *mlxsw_m)
 			goto err_kmalloc_array;
 		}
 
-		/* Invalidate the entries of module to local port mapping array. */
+		/* Invalidate the woke entries of module to local port mapping array. */
 		for (j = 0; j < mlxsw_m->max_modules_per_slot; j++)
 			mlxsw_m->line_cards[i]->module_to_port[j] = -1;
 	}
@@ -585,7 +585,7 @@ static int mlxsw_m_fw_rev_validate(struct mlxsw_m *mlxsw_m)
 	if (mlxsw_core_fw_rev_minor_subminor_validate(rev, &mlxsw_m_fw_rev))
 		return 0;
 
-	dev_err(mlxsw_m->bus_info->dev, "The firmware version %d.%d.%d is incompatible with the driver (required >= %d.%d.%d)\n",
+	dev_err(mlxsw_m->bus_info->dev, "The firmware version %d.%d.%d is incompatible with the woke driver (required >= %d.%d.%d)\n",
 		rev->major, rev->minor, rev->subminor, rev->major,
 		mlxsw_m_fw_rev.minor, mlxsw_m_fw_rev.subminor);
 

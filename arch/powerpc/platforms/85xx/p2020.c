@@ -36,7 +36,7 @@ static void __init p2020_pic_init(void)
 }
 
 /*
- * Setup the architecture
+ * Setup the woke architecture
  */
 static void __init p2020_setup_arch(void)
 {

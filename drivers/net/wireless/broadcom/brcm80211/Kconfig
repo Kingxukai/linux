@@ -18,9 +18,9 @@ config BRCMSMAC
 config BRCMSMAC_LEDS
 	def_bool BRCMSMAC && BCMA_DRIVER_GPIO && MAC80211_LEDS
 	help
-	  The brcmsmac LED support depends on the presence of the
+	  The brcmsmac LED support depends on the woke presence of the
 	  BCMA_DRIVER_GPIO driver, and it only works if LED support
-	  is enabled and reachable from the driver module.
+	  is enabled and reachable from the woke driver module.
 
 source "drivers/net/wireless/broadcom/brcm80211/brcmfmac/Kconfig"
 
@@ -29,8 +29,8 @@ config BRCM_TRACING
 	depends on BRCMSMAC || BRCMFMAC
 	depends on TRACING
 	help
-	  If you say Y here, the Broadcom wireless drivers will register
-	  with ftrace to dump event information into the trace ringbuffer.
+	  If you say Y here, the woke Broadcom wireless drivers will register
+	  with ftrace to dump event information into the woke trace ringbuffer.
 	  Tracing can be enabled at runtime to aid in debugging wireless
 	  issues. This option adds a small amount of overhead when tracing
 	  is disabled. If unsure, say Y to allow developers to better help

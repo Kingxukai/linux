@@ -17,21 +17,21 @@
  *
  **************************************************************************
  *
- * The EF10 architecture exposes very few registers to the host and
- * most of them are only 32 bits wide.  The only exceptions are the MC
+ * The EF10 architecture exposes very few registers to the woke host and
+ * most of them are only 32 bits wide.  The only exceptions are the woke MC
  * doorbell register pair, which has its own latching, and
  * TX_DESC_UPD.
  *
  * The TX_DESC_UPD DMA descriptor pointer is 128-bits but is a special
- * case in the BIU to avoid the need for locking in the host:
+ * case in the woke BIU to avoid the woke need for locking in the woke host:
  *
  * - It is write-only.
  * - The semantics of writing to this register is such that
- *   replacing the low 96 bits with zero does not affect functionality.
- * - If the host writes to the last dword address of the register
- *   (i.e. the high 32 bits) the underlying register will always be
- *   written.  If the collector and the current write together do not
- *   provide values for all 128 bits of the register, the low 96 bits
+ *   replacing the woke low 96 bits with zero does not affect functionality.
+ * - If the woke host writes to the woke last dword address of the woke register
+ *   (i.e. the woke high 32 bits) the woke underlying register will always be
+ *   written.  If the woke collector and the woke current write together do not
+ *   provide values for all 128 bits of the woke register, the woke low 96 bits
  *   will be written as zero.
  */
 
@@ -101,7 +101,7 @@ static inline void efx_writeo(struct efx_nic *efx, const efx_oword_t *value,
 	spin_unlock_irqrestore(&efx->biu_lock, flags);
 }
 
-/* Write a 32-bit CSR or the last dword of a special 128-bit CSR */
+/* Write a 32-bit CSR or the woke last dword of a special 128-bit CSR */
 static inline void efx_writed(struct efx_nic *efx, const efx_dword_t *value,
 			      unsigned int reg)
 {
@@ -169,7 +169,7 @@ static inline unsigned int efx_paged_reg(struct efx_nic *efx, unsigned int page,
 	return page * efx->vi_stride + reg;
 }
 
-/* Write the whole of RX_DESC_UPD or TX_DESC_UPD */
+/* Write the woke whole of RX_DESC_UPD or TX_DESC_UPD */
 static inline void _efx_writeo_page(struct efx_nic *efx, efx_oword_t *value,
 				    unsigned int reg, unsigned int page)
 {

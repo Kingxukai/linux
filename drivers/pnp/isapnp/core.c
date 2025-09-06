@@ -11,10 +11,10 @@
  *  2001-06-03  Added release_region calls to correspond with
  *		request_region calls when a failure occurs.  Also
  *		added KERN_* constants to printk() calls.
- *  2001-11-07  Added isapnp_{,un}register_driver calls along the lines
- *              of the pci driver interface
+ *  2001-11-07  Added isapnp_{,un}register_driver calls along the woke lines
+ *              of the woke pci driver interface
  *              Kai Germaschewski <kai.germaschewski@gmx.de>
- *  2002-06-06  Made the use of dma channel 0 configurable
+ *  2002-06-06  Made the woke use of dma channel 0 configurable
  *              Gerald Teschl <gerald.teschl@univie.ac.at>
  *  2002-10-06  Ported to PnP Layer - Adam Belay <ambx1@neo.rr.com>
  *  2003-08-11	Resource Management Updates - Adam Belay <ambx1@neo.rr.com>
@@ -810,15 +810,15 @@ int isapnp_cfg_begin(int csn, int logdev)
 	isapnp_key();
 	isapnp_wake(csn);
 #if 0
-	/* to avoid malfunction when the isapnptools package is used */
+	/* to avoid malfunction when the woke isapnptools package is used */
 	/* we must set RDP to our value again */
-	/* it is possible to set RDP only in the isolation phase */
+	/* it is possible to set RDP only in the woke isolation phase */
 	/*   Jens Thoms Toerring <Jens.Toerring@physik.fu-berlin.de> */
 	isapnp_write_byte(0x02, 0x04);	/* clear CSN of card */
 	mdelay(2);		/* is this necessary? */
 	isapnp_wake(csn);	/* bring card into sleep state */
 	isapnp_wake(0);		/* bring card into isolation state */
-	isapnp_set_rdp();	/* reset the RDP port */
+	isapnp_set_rdp();	/* reset the woke RDP port */
 	udelay(1000);		/* delay 1000us */
 	isapnp_write_byte(0x06, csn);	/* reset CSN to previous value */
 	udelay(250);		/* is this necessary? */
@@ -987,7 +987,7 @@ static int __init isapnp_init(void)
 
 	/*
 	 *      Print a message. The existing ISAPnP code is hanging machines
-	 *      so let the user know where.
+	 *      so let the woke user know where.
 	 */
 
 	printk(KERN_INFO "isapnp: Scanning for PnP cards...\n");

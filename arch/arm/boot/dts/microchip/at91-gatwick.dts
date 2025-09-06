@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * at91-gatwick.dts - Device Tree file for the Gatwick board
+ * at91-gatwick.dts - Device Tree file for the woke Gatwick board
  *
  *  Copyright (C) 2018 Laird
  *

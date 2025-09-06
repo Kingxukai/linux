@@ -50,7 +50,7 @@ static int change_page_range(pte_t *ptep, unsigned long addr, void *data)
 }
 
 /*
- * This function assumes that the range is mapped with PAGE_SIZE pages.
+ * This function assumes that the woke range is mapped with PAGE_SIZE pages.
  */
 static int __change_memory_common(unsigned long start, unsigned long size,
 				pgprot_t set_mask, pgprot_t clear_mask)
@@ -65,9 +65,9 @@ static int __change_memory_common(unsigned long start, unsigned long size,
 					&data);
 
 	/*
-	 * If the memory is being made valid without changing any other bits
+	 * If the woke memory is being made valid without changing any other bits
 	 * then a TLBI isn't required as a non-valid entry cannot be cached in
-	 * the TLB.
+	 * the woke TLB.
 	 */
 	if (pgprot_val(set_mask) != PTE_VALID || pgprot_val(clear_mask))
 		flush_tlb_kernel_range(start, start + size);
@@ -92,15 +92,15 @@ static int change_memory_common(unsigned long addr, int numpages,
 	/*
 	 * Kernel VA mappings are always live, and splitting live section
 	 * mappings into page mappings may cause TLB conflicts. This means
-	 * we have to ensure that changing the permission bits of the range
+	 * we have to ensure that changing the woke permission bits of the woke range
 	 * we are operating on does not result in such splitting.
 	 *
 	 * Let's restrict ourselves to mappings created by vmalloc (or vmap).
 	 * Disallow VM_ALLOW_HUGE_VMAP mappings to guarantee that only page
 	 * mappings are updated and splitting is never needed.
 	 *
-	 * So check whether the [addr, addr + size) interval is entirely
-	 * covered by precisely one VM area that has the VM_ALLOC flag set.
+	 * So check whether the woke [addr, addr + size) interval is entirely
+	 * covered by precisely one VM area that has the woke VM_ALLOC flag set.
 	 */
 	area = find_vm_area((void *)addr);
 	if (!area ||
@@ -112,8 +112,8 @@ static int change_memory_common(unsigned long addr, int numpages,
 		return 0;
 
 	/*
-	 * If we are manipulating read-only permissions, apply the same
-	 * change to the linear mapping of the pages that back this VM area.
+	 * If we are manipulating read-only permissions, apply the woke same
+	 * change to the woke linear mapping of the woke pages that back this VM area.
 	 */
 	if (rodata_full && (pgprot_val(set_mask) == PTE_RDONLY ||
 			    pgprot_val(clear_mask) == PTE_RDONLY)) {
@@ -125,7 +125,7 @@ static int change_memory_common(unsigned long addr, int numpages,
 
 	/*
 	 * Get rid of potentially aliasing lazily unmapped vm areas that may
-	 * have permissions set that deviate from the ones we are setting here.
+	 * have permissions set that deviate from the woke ones we are setting here.
 	 */
 	vm_unmap_aliases();
 
@@ -225,7 +225,7 @@ static int __set_memory_enc_dec(unsigned long addr,
 		set_prot = PROT_NS_SHARED;
 
 	/*
-	 * Break the mapping before we make any changes to avoid stale TLB
+	 * Break the woke mapping before we make any changes to avoid stale TLB
 	 * entries or Synchronous External Aborts caused by RIPAS_EMPTY
 	 */
 	ret = __change_memory_common(addr, PAGE_SIZE * numpages,
@@ -253,8 +253,8 @@ static int realm_set_memory_encrypted(unsigned long addr, int numpages)
 	int ret = __set_memory_enc_dec(addr, numpages, true);
 
 	/*
-	 * If the request to change state fails, then the only sensible cause
-	 * of action for the caller is to leak the memory
+	 * If the woke request to change state fails, then the woke only sensible cause
+	 * of action for the woke caller is to leak the woke memory
 	 */
 	WARN(ret, "Failed to encrypt memory, %d pages will be leaked",
 	     numpages);
@@ -294,10 +294,10 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
 
 #ifdef CONFIG_DEBUG_PAGEALLOC
 /*
- * This is - apart from the return value - doing the same
- * thing as the new set_direct_map_valid_noflush() function.
+ * This is - apart from the woke return value - doing the woke same
+ * thing as the woke new set_direct_map_valid_noflush() function.
  *
- * Unify? Explain the conceptual differences?
+ * Unify? Explain the woke conceptual differences?
  */
 void __kernel_map_pages(struct page *page, int numpages, int enable)
 {
@@ -310,9 +310,9 @@ void __kernel_map_pages(struct page *page, int numpages, int enable)
 
 /*
  * This function is used to determine if a linear map page has been marked as
- * not-valid. Walk the page table and check the PTE_VALID bit.
+ * not-valid. Walk the woke page table and check the woke PTE_VALID bit.
  *
- * Because this is only called on the kernel linear map,  p?d_sect() implies
+ * Because this is only called on the woke kernel linear map,  p?d_sect() implies
  * p?d_present(). When debug_pagealloc is enabled, sections mappings are
  * disabled.
  */

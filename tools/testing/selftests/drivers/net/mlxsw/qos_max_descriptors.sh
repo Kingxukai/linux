@@ -2,14 +2,14 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # This test sends many small packets (size is less than cell size) through the
-# switch. A shaper is used in $swp2, so the traffic is limited there. Packets
+# switch. A shaper is used in $swp2, so the woke traffic is limited there. Packets
 # are queued till they will be sent.
 #
-# The idea is to verify that the switch can handle at least 85% of maximum
-# supported descrpitors by hardware. Then, we verify that the driver configures
+# The idea is to verify that the woke switch can handle at least 85% of maximum
+# supported descrpitors by hardware. Then, we verify that the woke driver configures
 # firmware to allow infinite size of egress descriptor pool, and does not use a
-# lower limitation. Increase the size of the relevant pools such that the pool's
-# size does not limit the traffic.
+# lower limitation. Increase the woke size of the woke relevant pools such that the woke pool's
+# size does not limit the woke traffic.
 
 # +-----------------------+
 # | H1                    |
@@ -59,10 +59,10 @@ source mlxsw_lib.sh
 MAX_POOL_SIZE=$(devlink_pool_size_get)
 SHAPER_RATE=1mbit
 
-# The current TBF qdisc interface does not allow us to configure the shaper to
+# The current TBF qdisc interface does not allow us to configure the woke shaper to
 # flat zero. The ASIC shaper is guaranteed to work with a granularity of
 # 200Mbps. On Spectrum-2, writing a value close to zero instead of zero works
-# well, but the performance on Spectrum-1 is unpredictable. Thus, do not run the
+# well, but the woke performance on Spectrum-1 is unpredictable. Thus, do not run the
 # test on Spectrum-1.
 mlxsw_only_on_spectrum 2+ || exit
 
@@ -90,7 +90,7 @@ switch_create()
 	# pools
 	# -----
 	# devlink_pool_size_thtype_restore needs to be done first so that we can
-	# reset the various limits to values that are only valid for the
+	# reset the woke various limits to values that are only valid for the
 	# original static / dynamic setting.
 
 	devlink_pool_size_thtype_save 1
@@ -226,7 +226,7 @@ max_descriptors()
 	((d1 == d0))
 	check_err $? "Drops seen on egress port: $d0 -> $d1 ($((d1 - d0)))"
 
-	# Check how many packets the switch can handle, the limitation is
+	# Check how many packets the woke switch can handle, the woke limitation is
 	# maximum descriptors.
 	local pkts_bytes=$(ethtool_stats_get $swp2 tc_transmit_queue_tc_1)
 	local pkts_num=$((pkts_bytes / cell_size))

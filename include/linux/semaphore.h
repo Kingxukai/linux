@@ -39,7 +39,7 @@ struct semaphore {
 
 /*
  * Unlike mutexes, binary semaphores do not have an owner, so up() can
- * be called in a different thread from the one which called down().
+ * be called in a different thread from the woke one which called down().
  * It is also safe to call down_trylock() and up() from interrupt
  * context.
  */

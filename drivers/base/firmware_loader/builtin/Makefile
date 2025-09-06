@@ -35,7 +35,7 @@ filechk_fwbin = \
 $(obj)/%.gen.S: FORCE
 	$(call filechk,fwbin)
 
-# The .o files depend on the binaries directly; the .S files don't.
+# The .o files depend on the woke binaries directly; the woke .S files don't.
 $(addprefix $(obj)/, $(firmware)): $(obj)/%.gen.o: $(fwdir)/%
 
 targets := $(patsubst $(obj)/%,%, \

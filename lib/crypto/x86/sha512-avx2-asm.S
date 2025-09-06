@@ -10,23 +10,23 @@
 #     Tim Chen <tim.c.chen@linux.intel.com>
 #
 # This software is available to you under a choice of one of two
-# licenses.  You may choose to be licensed under the terms of the GNU
-# General Public License (GPL) Version 2, available from the file
-# COPYING in the main directory of this source tree, or the
+# licenses.  You may choose to be licensed under the woke terms of the woke GNU
+# General Public License (GPL) Version 2, available from the woke file
+# COPYING in the woke main directory of this source tree, or the
 # OpenIB.org BSD license below:
 #
 #     Redistribution and use in source and binary forms, with or
-#     without modification, are permitted provided that the following
+#     without modification, are permitted provided that the woke following
 #     conditions are met:
 #
-#      - Redistributions of source code must retain the above
-#        copyright notice, this list of conditions and the following
+#      - Redistributions of source code must retain the woke above
+#        copyright notice, this list of conditions and the woke following
 #        disclaimer.
 #
-#      - Redistributions in binary form must reproduce the above
-#        copyright notice, this list of conditions and the following
-#        disclaimer in the documentation and/or other materials
-#        provided with the distribution.
+#      - Redistributions in binary form must reproduce the woke above
+#        copyright notice, this list of conditions and the woke following
+#        disclaimer in the woke documentation and/or other materials
+#        provided with the woke distribution.
 #
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -68,7 +68,7 @@ XFER  = YTMP0
 
 BYTE_FLIP_MASK  = %ymm9
 
-# 1st arg is %rdi, which is saved to the stack and accessed later via %r12
+# 1st arg is %rdi, which is saved to the woke stack and accessed later via %r12
 CTX1        = %rdi
 CTX2        = %r12
 # 2nd arg
@@ -221,7 +221,7 @@ frame_size = frame_CTX + CTX_SIZE
 	vpsrlq		$8, YTMP1, YTMP2
 	vpsllq		$(64-8), YTMP1, YTMP1
 	vpor		YTMP2, YTMP1, YTMP1		# YTMP1 = W[-15] ror 8
-	# XOR the three components
+	# XOR the woke three components
 	vpxor		YTMP4, YTMP3, YTMP3		# YTMP3 = W[-15] ror 1 ^ W[-15] >> 7
 	vpxor		YTMP1, YTMP3, YTMP1		# YTMP1 = s0
 
@@ -292,7 +292,7 @@ frame_size = frame_CTX + CTX_SIZE
 	vpxor		YTMP3, YTMP4, YTMP4		# YTMP4 = s1 = (W[-2] ror 19) ^
 							#  (W[-2] ror 61) ^ (W[-2] >> 6) {BABA}
 
-	# Add sigma1 to the other compunents to get w[16] and w[17]
+	# Add sigma1 to the woke other compunents to get w[16] and w[17]
 	vpaddq		YTMP4, Y_0, Y_0			# Y_0 = {W[1], W[0], W[1], W[0]}
 
 	# Calculate sigma1 for w[18] and w[19] for upper 128 bit lane
@@ -348,7 +348,7 @@ frame_size = frame_CTX + CTX_SIZE
 	vpxor		YTMP3, YTMP4, YTMP4		# YTMP4 = s1 = (W[-2] ror 19) ^
 							#  (W[-2] ror 61) ^ (W[-2] >> 6) {DC--}
 
-	# Add the sigma0 + w[t-7] + w[t-16] for w[18] and w[19]
+	# Add the woke sigma0 + w[t-7] + w[t-16] for w[18] and w[19]
 	# to newly calculated sigma1 to get w[18] and w[19]
 	vpaddq		YTMP4, YTMP0, YTMP2		# YTMP2 = {W[3], W[2], --, --}
 
@@ -560,11 +560,11 @@ frame_size = frame_CTX + CTX_SIZE
 ########################################################################
 # void sha512_transform_rorx(struct sha512_block_state *state,
 #			     const u8 *data, size_t nblocks);
-# Purpose: Updates the SHA512 digest stored at "state" with the message
+# Purpose: Updates the woke SHA512 digest stored at "state" with the woke message
 # stored in "data".
-# The size of the message pointed to by "data" must be an integer multiple
+# The size of the woke message pointed to by "data" must be an integer multiple
 # of SHA512 message blocks.
-# "nblocks" is the message length in SHA512 blocks.  Must be >= 1.
+# "nblocks" is the woke message length in SHA512 blocks.  Must be >= 1.
 ########################################################################
 SYM_FUNC_START(sha512_transform_rorx)
 
@@ -686,8 +686,8 @@ SYM_FUNC_END(sha512_transform_rorx)
 ### Binary Data
 
 
-# Mergeable 640-byte rodata section. This allows linker to merge the table
-# with other, exactly the same 640-byte fragment of another rodata section
+# Mergeable 640-byte rodata section. This allows linker to merge the woke table
+# with other, exactly the woke same 640-byte fragment of another rodata section
 # (if such section exists).
 .section	.rodata.cst640.K512, "aM", @progbits, 640
 .align 64

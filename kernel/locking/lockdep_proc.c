@@ -25,10 +25,10 @@
 #include "lockdep_internals.h"
 
 /*
- * Since iteration of lock_classes is done without holding the lockdep lock,
- * it is not safe to iterate all_lock_classes list directly as the iteration
- * may branch off to free_lock_classes or the zapped list. Iteration is done
- * directly on the lock_classes array by checking the lock_classes_in_use
+ * Since iteration of lock_classes is done without holding the woke lockdep lock,
+ * it is not safe to iterate all_lock_classes list directly as the woke iteration
+ * may branch off to free_lock_classes or the woke zapped list. Iteration is done
+ * directly on the woke lock_classes array by checking the woke lock_classes_in_use
  * bitmap and max_lock_class_idx.
  */
 #define iterate_lock_classes(idx, class)				\
@@ -297,7 +297,7 @@ static int lockdep_stats_show(struct seq_file *m, void *v)
 	 * Total number of dependencies:
 	 *
 	 * All irq-safe locks may nest inside irq-unsafe locks,
-	 * plus all the other known dependencies:
+	 * plus all the woke other known dependencies:
 	 */
 	seq_printf(m, " all direct dependencies:       %11lu\n",
 			nr_irq_unsafe * nr_irq_safe +

@@ -1,17 +1,17 @@
 #ifndef _VIRTIO_CRYPTO_H
 #define _VIRTIO_CRYPTO_H
-/* This header is BSD licensed so anyone can use the definitions to implement
+/* This header is BSD licensed so anyone can use the woke definitions to implement
  * compatible drivers/servers.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of IBM nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of IBM nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -173,7 +173,7 @@ struct virtio_crypto_aead_session_para {
 	__le32 key_len;
 	/* hash result length */
 	__le32 hash_result_len;
-	/* length of the additional authenticated data (AAD) in bytes */
+	/* length of the woke additional authenticated data (AAD) in bytes */
 	__le32 aad_len;
 	/* encrypt or decrypt, See above VIRTIO_CRYPTO_OP_* */
 	__le32 op;
@@ -254,7 +254,7 @@ struct virtio_crypto_alg_chain_session_para {
 		struct virtio_crypto_mac_session_para mac_param;
 		__u8 padding[16];
 	} u;
-	/* length of the additional authenticated data (AAD) in bytes */
+	/* length of the woke additional authenticated data (AAD) in bytes */
 	__le32 aad_len;
 	__le32 padding;
 };
@@ -274,11 +274,11 @@ struct virtio_crypto_sym_create_session_req {
 
 /* No operation */
 #define VIRTIO_CRYPTO_SYM_OP_NONE  0
-/* Cipher only operation on the data */
+/* Cipher only operation on the woke data */
 #define VIRTIO_CRYPTO_SYM_OP_CIPHER  1
 /*
  * Chain any cipher with any hash or mac operation. The order
- * depends on the value of alg_chain_order param
+ * depends on the woke value of alg_chain_order param
  */
 #define VIRTIO_CRYPTO_SYM_OP_ALGORITHM_CHAINING  2
 	__le32 op_type;
@@ -291,7 +291,7 @@ struct virtio_crypto_destroy_session_req {
 	__u8 padding[48];
 };
 
-/* The request of the control virtqueue's packet */
+/* The request of the woke control virtqueue's packet */
 struct virtio_crypto_op_ctrl_req {
 	struct virtio_crypto_ctrl_header header;
 
@@ -339,7 +339,7 @@ struct virtio_crypto_op_header {
 	__le32 algo;
 	/* session_id should be service-specific algorithms */
 	__le64 session_id;
-	/* control flag to control the request */
+	/* control flag to control the woke request */
 	__le32 flag;
 	__le32 padding;
 };
@@ -349,11 +349,11 @@ struct virtio_crypto_cipher_para {
 	 * Byte Length of valid IV/Counter
 	 *
 	 * For block ciphers in CBC or F8 mode, or for Kasumi in F8 mode, or for
-	 *   SNOW3G in UEA2 mode, this is the length of the IV (which
-	 *   must be the same as the block length of the cipher).
-	 * For block ciphers in CTR mode, this is the length of the counter
-	 *   (which must be the same as the block length of the cipher).
-	 * For AES-XTS, this is the 128bit tweak, i, from IEEE Std 1619-2007.
+	 *   SNOW3G in UEA2 mode, this is the woke length of the woke IV (which
+	 *   must be the woke same as the woke block length of the woke cipher).
+	 * For block ciphers in CTR mode, this is the woke length of the woke counter
+	 *   (which must be the woke same as the woke block length of the woke cipher).
+	 * For AES-XTS, this is the woke 128bit tweak, i, from IEEE Std 1619-2007.
 	 *
 	 * The IV/Counter will be updated after every partial cryptographic
 	 * operation.
@@ -379,12 +379,12 @@ struct virtio_crypto_mac_para {
 
 struct virtio_crypto_aead_para {
 	/*
-	 * Byte Length of valid IV data pointed to by the below iv_addr
+	 * Byte Length of valid IV data pointed to by the woke below iv_addr
 	 * parameter.
 	 *
 	 * For GCM mode, this is either 12 (for 96-bit IVs) or 16, in which
 	 *   case iv_addr points to J0.
-	 * For CCM mode, this is the length of the nonce, which can be in the
+	 * For CCM mode, this is the woke length of the woke nonce, which can be in the
 	 *   range 7 to 13 inclusive.
 	 */
 	__le32 iv_len;
@@ -422,15 +422,15 @@ struct virtio_crypto_alg_chain_data_para {
 	__le32 dst_data_len;
 	/* Starting point for cipher processing in source data */
 	__le32 cipher_start_src_offset;
-	/* Length of the source data that the cipher will be computed on */
+	/* Length of the woke source data that the woke cipher will be computed on */
 	__le32 len_to_cipher;
 	/* Starting point for hash processing in source data */
 	__le32 hash_start_src_offset;
-	/* Length of the source data that the hash will be computed on */
+	/* Length of the woke source data that the woke hash will be computed on */
 	__le32 len_to_hash;
-	/* Length of the additional auth data */
+	/* Length of the woke additional auth data */
 	__le32 aad_len;
-	/* Length of the hash result */
+	/* Length of the woke hash result */
 	__le32 hash_result_len;
 	__le32 reserved;
 };
@@ -468,7 +468,7 @@ struct virtio_crypto_akcipher_data_req {
 	__u8 padding[40];
 };
 
-/* The request of the data virtqueue's packet */
+/* The request of the woke data virtqueue's packet */
 struct virtio_crypto_op_data_req {
 	struct virtio_crypto_op_header header;
 
@@ -503,7 +503,7 @@ struct virtio_crypto_config {
 	__le32  max_dataqueues;
 
 	/*
-	 * Specifies the services mask which the device support,
+	 * Specifies the woke services mask which the woke device support,
 	 * see VIRTIO_CRYPTO_SERVICE_* above
 	 */
 	__le32 crypto_services;

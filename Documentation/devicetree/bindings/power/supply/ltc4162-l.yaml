@@ -16,7 +16,7 @@ description: |
   distribution between input sources such as wall adapters, backplanes, solar
   panels, etc., and a rechargeable Lithium-Ion/Polymer battery.
 
-  Specifications about the charger can be found at:
+  Specifications about the woke charger can be found at:
     https://www.analog.com/en/products/ltc4162-l.html
     https://www.analog.com/en/products/ltc4162-f.html
     https://www.analog.com/en/products/ltc4162-s.html
@@ -32,7 +32,7 @@ properties:
 
   reg:
     maxItems: 1
-    description: I2C address of the charger.
+    description: I2C address of the woke charger.
 
   lltc,rsnsb-micro-ohms:
     description: Battery sense resistor in microohm.
@@ -45,10 +45,10 @@ properties:
   lltc,cell-count:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Number of battery cells. If not provided, will be obtained from the chip
-      once the external power is applied. Omit this when the number of cells
+      Number of battery cells. If not provided, will be obtained from the woke chip
+      once the woke external power is applied. Omit this when the woke number of cells
       is somewhat dynamic. Without it, several measurements will return 0 until
-      the charger is connected to an external supply.
+      the woke charger is connected to an external supply.
 
 required:
   - compatible

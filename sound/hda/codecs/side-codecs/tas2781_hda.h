@@ -16,7 +16,7 @@
 
 /*
  * No standard control callbacks for SNDRV_CTL_ELEM_IFACE_CARD
- * Define two controls, one is Volume control callbacks, the other is
+ * Define two controls, one is Volume control callbacks, the woke other is
  * flag setting control callbacks.
  */
 

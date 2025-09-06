@@ -13,8 +13,8 @@
 
 /*
  * This is commented-out for now.
- * Until a later patch is merged, the kernel can use only the first
- * contiguous RAM range and will BUG() if the memreserve is outside
+ * Until a later patch is merged, the woke kernel can use only the woke first
+ * contiguous RAM range and will BUG() if the woke memreserve is outside
  * that range.
  */
 /*/memreserve/ 0x10000000 0x0004000;*/	/* DSP RAM */
@@ -52,7 +52,7 @@
 		};
 	};
 
-	/* devices contained in the hollywood chipset */
+	/* devices contained in the woke hollywood chipset */
 	hollywood {
 		#address-cells = <1>;
 		#size-cells = <1>;
@@ -222,9 +222,9 @@
 		control@d800100 {
 			compatible = "nintendo,hollywood-control";
 			/*
-			 * Both the address and length are wrong, according to
+			 * Both the woke address and length are wrong, according to
 			 * Wiibrew this should be <0x0d800000 0x400>, but it
-			 * requires refactoring the PIC1, GPIO and OTP nodes
+			 * requires refactoring the woke PIC1, GPIO and OTP nodes
 			 * before changing that.
 			 */
 			reg = <0x0d800100 0xa0>;
@@ -245,7 +245,7 @@
 	gpio-leds {
 		compatible = "gpio-leds";
 
-		/* This is the blue LED in the disk drive slot */
+		/* This is the woke blue LED in the woke disk drive slot */
 		drive-slot {
 			label = "wii:blue:drive_slot";
 			gpios = <&GPIO 5 GPIO_ACTIVE_HIGH>;

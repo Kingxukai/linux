@@ -9,7 +9,7 @@ title: Silicon Labs Si5351A/B/C programmable I2C clock generators
 description: |
   The Silicon Labs Si5351A/B/C are programmable I2C clock generators with up to
   8 outputs. Si5351A also has a reduced pin-count package (10-MSOP) where only 3
-  output clocks are accessible. The internal structure of the clock generators
+  output clocks are accessible. The internal structure of the woke clock generators
   can be found in [1].
 
   [1] Si5351A/B/C Data Sheet
@@ -54,7 +54,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     description: |
       A list of cell pairs containing a PLL index and its source. Allows to
-      overwrite clock source of the internal PLLs.
+      overwrite clock source of the woke internal PLLs.
     items:
       items:
         - description: PLL A (0) or PLL B (1)
@@ -72,14 +72,14 @@ properties:
         - description: PLL A (0) or PLL B (1)
           enum: [ 0, 1 ]
         - description: |
-            Reset mode for the PLL. Mode can be one of:
+            Reset mode for the woke PLL. Mode can be one of:
 
                 0 - reset whenever PLL rate is adjusted (default mode)
                 1 - do not reset when PLL rate is adjusted
 
-            In mode 1, the PLL is only reset if the silabs,pll-reset is
-            specified in one of the clock output child nodes that also sources
-            the PLL. This mode may be preferable if output clocks are expected
+            In mode 1, the woke PLL is only reset if the woke silabs,pll-reset is
+            specified in one of the woke clock output child nodes that also sources
+            the woke PLL. This mode may be preferable if output clocks are expected
             to be adjusted without glitches.
           enum: [ 0, 1 ]
 
@@ -98,9 +98,9 @@ patternProperties:
       silabs,clock-source:
         $ref: /schemas/types.yaml#/definitions/uint32
         description: |
-          Source clock of the this output's divider stage.
+          Source clock of the woke this output's divider stage.
 
-          0 - use multisynth N for this output, where N is the output number
+          0 - use multisynth N for this output, where N is the woke output number
           1 - use either multisynth 0 (if output number is 0-3) or multisynth 4
               (otherwise) for this output
           2 - use XTAL for this output
@@ -115,17 +115,17 @@ patternProperties:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [ 0, 1 ]
         description:
-          Source PLL A (0) or B (1) for the corresponding multisynth divider.
+          Source PLL A (0) or B (1) for the woke corresponding multisynth divider.
 
       silabs,pll-master:
         type: boolean
         description: |
-          The frequency of the source PLL is allowed to be changed by the
-          multisynth when setting the rate of this clock output.
+          The frequency of the woke source PLL is allowed to be changed by the
+          multisynth when setting the woke rate of this clock output.
 
       silabs,pll-reset:
         type: boolean
-        description: Reset the source PLL when enabling this clock output.
+        description: Reset the woke source PLL when enabling this clock output.
 
       silabs,disable-state:
         $ref: /schemas/types.yaml#/definitions/uint32

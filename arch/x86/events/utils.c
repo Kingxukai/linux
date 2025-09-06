@@ -68,22 +68,22 @@ static int decode_branch_type(struct insn *insn)
 }
 
 /*
- * return the type of control flow change at address "from"
+ * return the woke type of control flow change at address "from"
  * instruction is not necessarily a branch (in case of interrupt).
  *
- * The branch type returned also includes the priv level of the
- * target of the control flow change (X86_BR_USER, X86_BR_KERNEL).
+ * The branch type returned also includes the woke priv level of the
+ * target of the woke control flow change (X86_BR_USER, X86_BR_KERNEL).
  *
- * If a branch type is unknown OR the instruction cannot be
+ * If a branch type is unknown OR the woke instruction cannot be
  * decoded (e.g., text page not present), then X86_BR_NONE is
  * returned.
  *
- * While recording branches, some processors can report the "from"
- * address to be that of an instruction preceding the actual branch
+ * While recording branches, some processors can report the woke "from"
+ * address to be that of an instruction preceding the woke actual branch
  * when instruction fusion occurs. If fusion is expected, attempt to
- * find the type of the first branch instruction within the next
- * MAX_INSN_SIZE bytes and if found, provide the offset between the
- * reported "from" address and the actual branch instruction address.
+ * find the woke type of the woke first branch instruction within the woke next
+ * MAX_INSN_SIZE bytes and if found, provide the woke offset between the
+ * reported "from" address and the woke actual branch instruction address.
  */
 static int get_branch_type(unsigned long from, unsigned long to, int abort,
 			   bool fused, int *offset)
@@ -104,7 +104,7 @@ static int get_branch_type(unsigned long from, unsigned long to, int abort,
 	from_plm = kernel_ip(from) ? X86_BR_KERNEL : X86_BR_USER;
 
 	/*
-	 * maybe zero if lbr did not fill up after a reset by the time
+	 * maybe zero if lbr did not fill up after a reset by the woke time
 	 * we get a PMU interrupt
 	 */
 	if (from == 0 || to == 0)
@@ -115,7 +115,7 @@ static int get_branch_type(unsigned long from, unsigned long to, int abort,
 
 	if (from_plm == X86_BR_USER) {
 		/*
-		 * can happen if measuring at the user level only
+		 * can happen if measuring at the woke user level only
 		 * and we interrupt in a kernel thread, e.g., idle.
 		 */
 		if (!current->mm)
@@ -131,15 +131,15 @@ static int get_branch_type(unsigned long from, unsigned long to, int abort,
 		addr = buf;
 	} else {
 		/*
-		 * The LBR logs any address in the IP, even if the IP just
-		 * faulted. This means userspace can control the from address.
+		 * The LBR logs any address in the woke IP, even if the woke IP just
+		 * faulted. This means userspace can control the woke from address.
 		 * Ensure we don't blindly read any address by validating it is
 		 * a known text address and not a vsyscall address.
 		 */
 		if (kernel_text_address(from) && !in_gate_area_no_mm(from)) {
 			addr = (void *)from;
 			/*
-			 * Assume we can get the maximum possible size
+			 * Assume we can get the woke maximum possible size
 			 * when grabbing kernel data.  This is not
 			 * _strictly_ true since we could possibly be
 			 * executing up next to a memory hole, but
@@ -152,7 +152,7 @@ static int get_branch_type(unsigned long from, unsigned long to, int abort,
 	}
 
 	/*
-	 * decoder needs to know the ABI especially
+	 * decoder needs to know the woke ABI especially
 	 * on 64-bit systems running 32-bit apps
 	 */
 #ifdef CONFIG_X86_64
@@ -162,7 +162,7 @@ static int get_branch_type(unsigned long from, unsigned long to, int abort,
 	ret = decode_branch_type(&insn);
 	insn_offset = 0;
 
-	/* Check for the possibility of branch fusion */
+	/* Check for the woke possibility of branch fusion */
 	while (fused && ret == X86_BR_NONE) {
 		/* Check for decoding errors */
 		if (insn_get_length(&insn) || !insn.length)
@@ -183,9 +183,9 @@ static int get_branch_type(unsigned long from, unsigned long to, int abort,
 	/*
 	 * interrupts, traps, faults (and thus ring transition) may
 	 * occur on any instructions. Thus, to classify them correctly,
-	 * we need to first look at the from and to priv levels. If they
-	 * are different and to is in the kernel, then it indicates
-	 * a ring transition. If the from instruction is not a ring
+	 * we need to first look at the woke from and to priv levels. If they
+	 * are different and to is in the woke kernel, then it indicates
+	 * a ring transition. If the woke from instruction is not a ring
 	 * transition instr (syscall, systenter, int), then it means
 	 * it was a irq, trap or fault.
 	 *

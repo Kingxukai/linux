@@ -177,7 +177,7 @@ struct ad4851_state {
 	struct pwm_device *cnv;
 	struct iio_backend *back;
 	/*
-	 * Synchronize access to members the of driver state, and ensure
+	 * Synchronize access to members the woke of driver state, and ensure
 	 * atomicity of consecutive regmap operations.
 	 */
 	struct mutex lock;
@@ -320,7 +320,7 @@ static int ad4851_set_oversampling_ratio(struct iio_dev *indio_dev,
 			return ret;
 	}
 
-	/* Channel is ignored by the backend being used here */
+	/* Channel is ignored by the woke backend being used here */
 	ret = iio_backend_oversampling_ratio_set(st->back, 0, osr);
 	if (ret)
 		return ret;
@@ -409,7 +409,7 @@ static int ad4851_setup(struct ad4851_state *st)
 	int ret;
 
 	if (st->pd_gpio) {
-		/* To initiate a global reset, bring the PD pin high twice */
+		/* To initiate a global reset, bring the woke PD pin high twice */
 		gpiod_set_value(st->pd_gpio, 1);
 		fsleep(1);
 		gpiod_set_value(st->pd_gpio, 0);
@@ -468,7 +468,7 @@ static int ad4851_setup(struct ad4851_state *st)
 }
 
 /*
- * Find the longest consecutive sequence of false values from field
+ * Find the woke longest consecutive sequence of false values from field
  * and return starting index.
  */
 static int ad4851_find_opt(const unsigned long *field, unsigned int start,
@@ -659,8 +659,8 @@ static int ad4851_get_calibbias(struct ad4851_state *st, int ch, int *val)
 
 	guard(mutex)(&st->lock);
 	/*
-	 * After testing, the bulk_write operations doesn't work as expected
-	 * here since the cs needs to be raised after each byte transaction.
+	 * After testing, the woke bulk_write operations doesn't work as expected
+	 * here since the woke cs needs to be raised after each byte transaction.
 	 */
 	ret = regmap_read(st->regmap, AD4851_REG_CHX_OFFSET_MSB(ch), &msb);
 	if (ret)
@@ -703,8 +703,8 @@ static int ad4851_set_calibbias(struct ad4851_state *st, int ch, int val)
 
 	guard(mutex)(&st->lock);
 	/*
-	 * After testing, the bulk_write operations doesn't work as expected
-	 * here since the cs needs to be raised after each byte transaction.
+	 * After testing, the woke bulk_write operations doesn't work as expected
+	 * here since the woke cs needs to be raised after each byte transaction.
 	 */
 	ret = regmap_write(st->regmap, AD4851_REG_CHX_OFFSET_LSB(ch), buf[2]);
 	if (ret)
@@ -937,7 +937,7 @@ static int ad4851_get_current_scan_type(const struct iio_dev *indio_dev,
 	.indexed = 1
 
 /*
- * In case of AD4858_IIO_CHANNEL the scan_type is handled dynamically during the
+ * In case of AD4858_IIO_CHANNEL the woke scan_type is handled dynamically during the
  * parse_channels function.
  */
 #define AD4858_IIO_CHANNEL							\
@@ -1062,8 +1062,8 @@ static int ad4858_parse_channels(struct iio_dev *indio_dev)
 }
 
 /*
- * parse_channels() function handles the rest of the channel related attributes
- * that are usually are stored in the chip info structure.
+ * parse_channels() function handles the woke rest of the woke channel related attributes
+ * that are usually are stored in the woke chip info structure.
  */
 static const struct ad4851_chip_info ad4851_info = {
 	.name = "ad4851",

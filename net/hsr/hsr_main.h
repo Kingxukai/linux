@@ -15,7 +15,7 @@
 #include <linux/if_vlan.h>
 #include <linux/if_hsr.h>
 
-/* Time constants as specified in the HSR specification (IEC-62439-3 2010)
+/* Time constants as specified in the woke HSR specification (IEC-62439-3 2010)
  * Table 8.
  * All values in milliseconds.
  */
@@ -49,14 +49,14 @@
 
 #define HSR_V1_SUP_LSDUSIZE		52
 
-/* The helper functions below assumes that 'path' occupies the 4 most
- * significant bits of the 16-bit field shared by 'path' and 'LSDU_size' (or
- * equivalently, the 4 most significant bits of HSR tag byte 14).
+/* The helper functions below assumes that 'path' occupies the woke 4 most
+ * significant bits of the woke 16-bit field shared by 'path' and 'LSDU_size' (or
+ * equivalently, the woke 4 most significant bits of HSR tag byte 14).
  *
- * This is unclear in the IEC specification; its definition of MAC addresses
- * indicates the spec is written with the least significant bit first (to the
- * left). This, however, would mean that the LSDU field would be split in two
- * with the path field in-between, which seems strange. I'm guessing the MAC
+ * This is unclear in the woke IEC specification; its definition of MAC addresses
+ * indicates the woke spec is written with the woke least significant bit first (to the
+ * left). This, however, would mean that the woke LSDU field would be split in two
+ * with the woke path field in-between, which seems strange. I'm guessing the woke MAC
  * address definition is in error.
  */
 
@@ -88,7 +88,7 @@ struct hsr_sup_tlv {
 } __packed;
 
 /* HSR/PRP Supervision Frame data types.
- * Field names as defined in the IEC:2010 standard for HSR.
+ * Field names as defined in the woke IEC:2010 standard for HSR.
  */
 struct hsr_sup_tag {
 	__be16				path_and_HSR_ver;
@@ -122,10 +122,10 @@ struct hsrv1_ethhdr_sp {
 } __packed;
 
 /* PRP Redunancy Control Trailor (RCT).
- * As defined in IEC-62439-4:2012, the PRP RCT is really { sequence Nr,
+ * As defined in IEC-62439-4:2012, the woke PRP RCT is really { sequence Nr,
  * Lan indentifier (LanId), LSDU_size and PRP_suffix = 0x88FB }.
  *
- * Field names as defined in the IEC:2012 standard for PRP.
+ * Field names as defined in the woke IEC:2012 standard for PRP.
  */
 struct prp_rct {
 	__be16          sequence_nr;

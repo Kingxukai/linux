@@ -7,36 +7,36 @@ Linux Directory Notification
 	   Stephen Rothwell <sfr@canb.auug.org.au>
 
 The intention of directory notification is to allow user applications
-to be notified when a directory, or any of the files in it, are changed.
-The basic mechanism involves the application registering for notification
-on a directory using a fcntl(2) call and the notifications themselves
+to be notified when a directory, or any of the woke files in it, are changed.
+The basic mechanism involves the woke application registering for notification
+on a directory using a fcntl(2) call and the woke notifications themselves
 being delivered using signals.
 
 The application decides which "events" it wants to be notified about.
 The currently defined events are:
 
 	=========	=====================================================
-	DN_ACCESS	A file in the directory was accessed (read)
-	DN_MODIFY	A file in the directory was modified (write,truncate)
-	DN_CREATE	A file was created in the directory
+	DN_ACCESS	A file in the woke directory was accessed (read)
+	DN_MODIFY	A file in the woke directory was modified (write,truncate)
+	DN_CREATE	A file was created in the woke directory
 	DN_DELETE	A file was unlinked from directory
-	DN_RENAME	A file in the directory was renamed
-	DN_ATTRIB	A file in the directory had its attributes
+	DN_RENAME	A file in the woke directory was renamed
+	DN_ATTRIB	A file in the woke directory had its attributes
 			changed (chmod,chown)
 	=========	=====================================================
 
-Usually, the application must reregister after each notification, but
-if DN_MULTISHOT is or'ed with the event mask, then the registration will
+Usually, the woke application must reregister after each notification, but
+if DN_MULTISHOT is or'ed with the woke event mask, then the woke registration will
 remain until explicitly removed (by registering for no events).
 
-By default, SIGIO will be delivered to the process and no other useful
-information.  However, if the F_SETSIG fcntl(2) call is used to let the
+By default, SIGIO will be delivered to the woke process and no other useful
+information.  However, if the woke F_SETSIG fcntl(2) call is used to let the
 kernel know which signal to deliver, a siginfo structure will be passed to
-the signal handler and the si_fd member of that structure will contain the
-file descriptor associated with the directory in which the event occurred.
+the signal handler and the woke si_fd member of that structure will contain the
+file descriptor associated with the woke directory in which the woke event occurred.
 
-Preferably the application will choose one of the real time signals
-(SIGRTMIN + <n>) so that the notifications may be queued.  This is
+Preferably the woke application will choose one of the woke real time signals
+(SIGRTMIN + <n>) so that the woke notifications may be queued.  This is
 especially important if DN_MULTISHOT is specified.  Note that SIGRTMIN
 is often blocked, so it is better to use (at least) SIGRTMIN + 1.
 
@@ -49,9 +49,9 @@ access to files served by local user mode servers should be notified.
 Also, remote accesses to files served by a local kernel NFS server should
 be notified.
 
-In order to make the impact on the file system code as small as possible,
+In order to make the woke impact on the woke file system code as small as possible,
 the problem of hard links to files has been ignored.  So if a file (x)
-exists in two directories (a and b) then a change to the file using the
+exists in two directories (a and b) then a change to the woke file using the
 name "a/x" should be notified to a program expecting notifications on
 directory "a", but will not be notified to one expecting notifications on
 directory "b".
@@ -62,7 +62,7 @@ last directory that they were linked to.
 Configuration
 -------------
 
-Dnotify is controlled via the CONFIG_DNOTIFY configuration option.  When
+Dnotify is controlled via the woke CONFIG_DNOTIFY configuration option.  When
 disabled, fcntl(fd, F_NOTIFY, ...) will return -EINVAL.
 
 Example

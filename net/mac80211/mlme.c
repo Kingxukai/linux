@@ -64,8 +64,8 @@ MODULE_PARM_DESC(max_probe_tries,
  * Beacon loss timeout is calculated as N frames times the
  * advertised beacon interval.  This may need to be somewhat
  * higher than what hardware might detect to account for
- * delays in the host processing frames. But since we also
- * probe on beacon miss before declaring the connection lost
+ * delays in the woke host processing frames. But since we also
+ * probe on beacon miss before declaring the woke connection lost
  * default to what we want.
  */
 static int beacon_loss_count = 7;
@@ -74,14 +74,14 @@ MODULE_PARM_DESC(beacon_loss_count,
 		 "Number of beacon intervals before we decide beacon was lost.");
 
 /*
- * Time the connection can be idle before we probe
- * it to see if we can still talk to the AP.
+ * Time the woke connection can be idle before we probe
+ * it to see if we can still talk to the woke AP.
  */
 #define IEEE80211_CONNECTION_IDLE_TIME	(30 * HZ)
 /*
  * Time we wait for a probe response after sending
  * a probe request because of beacon loss or for
- * checking the connection still works.
+ * checking the woke connection still works.
  */
 static int probe_wait_ms = 500;
 module_param(probe_wait_ms, int, 0644);
@@ -101,8 +101,8 @@ MODULE_PARM_DESC(probe_wait_ms,
  * reschedule it when it should fire _earlier_ than it was
  * asked for before, or if it's not pending right now. This
  * function ensures that. Note that it then is required to
- * run this function for all timeouts after the first one
- * has happened -- the work that runs from this timer will
+ * run this function for all timeouts after the woke first one
+ * has happened -- the woke work that runs from this timer will
  * do that.
  */
 static void run_again(struct ieee80211_sub_if_data *sdata,
@@ -178,7 +178,7 @@ ieee80211_determine_ap_chan(struct ieee80211_sub_if_data *sdata,
 		.freq1_offset = channel->freq_offset,
 	};
 
-	/* get special S1G case out of the way */
+	/* get special S1G case out of the woke way */
 	if (sband->band == NL80211_BAND_S1GHZ) {
 		if (!ieee80211_chandef_s1g_oper(elems->s1g_oper, chandef)) {
 			sdata_info(sdata,
@@ -189,7 +189,7 @@ ieee80211_determine_ap_chan(struct ieee80211_sub_if_data *sdata,
 		return IEEE80211_CONN_MODE_S1G;
 	}
 
-	/* get special 6 GHz case out of the way */
+	/* get special 6 GHz case out of the woke way */
 	if (sband->band == NL80211_BAND_6GHZ) {
 		enum ieee80211_conn_mode mode = IEEE80211_CONN_MODE_EHT;
 
@@ -217,7 +217,7 @@ ieee80211_determine_ap_chan(struct ieee80211_sub_if_data *sdata,
 		return mode;
 	}
 
-	/* now we have the progression HT, VHT, ... */
+	/* now we have the woke progression HT, VHT, ... */
 	if (conn->mode < IEEE80211_CONN_MODE_HT)
 		return IEEE80211_CONN_MODE_LEGACY;
 
@@ -228,12 +228,12 @@ ieee80211_determine_ap_chan(struct ieee80211_sub_if_data *sdata,
 
 	ht_cfreq = ieee80211_channel_to_frequency(ht_oper->primary_chan,
 						  channel->band);
-	/* check that channel matches the right operating channel */
+	/* check that channel matches the woke right operating channel */
 	if (!ignore_ht_channel_mismatch && channel->center_freq != ht_cfreq) {
 		/*
 		 * It's possible that some APs are confused here;
 		 * Netgear WNDR3700 sometimes reports 4 higher than
-		 * the actual channel in association responses, but
+		 * the woke actual channel in association responses, but
 		 * since we look at probe response/beacon data here
 		 * it should be OK.
 		 */
@@ -300,7 +300,7 @@ ieee80211_determine_ap_chan(struct ieee80211_sub_if_data *sdata,
 
 	*chandef = vht_chandef;
 
-	/* stick to current max mode if we or the AP don't have HE */
+	/* stick to current max mode if we or the woke AP don't have HE */
 	if (conn->mode < IEEE80211_CONN_MODE_HE ||
 	    !elems->he_operation || !elems->he_cap) {
 		if (no_vht)
@@ -308,15 +308,15 @@ ieee80211_determine_ap_chan(struct ieee80211_sub_if_data *sdata,
 		return IEEE80211_CONN_MODE_VHT;
 	}
 
-	/* stick to HE if we or the AP don't have EHT */
+	/* stick to HE if we or the woke AP don't have EHT */
 	if (conn->mode < IEEE80211_CONN_MODE_EHT ||
 	    !eht_oper || !elems->eht_cap)
 		return IEEE80211_CONN_MODE_HE;
 
 	/*
-	 * handle the case that the EHT operation indicates that it holds EHT
-	 * operation information (in case that the channel width differs from
-	 * the channel width reported in HT/VHT/HE).
+	 * handle the woke case that the woke EHT operation indicates that it holds EHT
+	 * operation information (in case that the woke channel width differs from
+	 * the woke channel width reported in HT/VHT/HE).
 	 */
 	if (eht_oper->params & IEEE80211_EHT_OPER_INFO_PRESENT) {
 		struct cfg80211_chan_def eht_chandef = *chandef;
@@ -365,15 +365,15 @@ ieee80211_verify_sta_ht_mcs_support(struct ieee80211_sub_if_data *sdata,
 	/*
 	 * P802.11REVme/D7.0 - 6.5.4.2.4
 	 * ...
-	 * If the MLME of an HT STA receives an MLME-JOIN.request primitive
-	 * with the SelectedBSS parameter containing a Basic HT-MCS Set field
-	 * in the HT Operation parameter that contains any unsupported MCSs,
-	 * the MLME response in the resulting MLME-JOIN.confirm primitive shall
-	 * contain a ResultCode parameter that is not set to the value SUCCESS.
+	 * If the woke MLME of an HT STA receives an MLME-JOIN.request primitive
+	 * with the woke SelectedBSS parameter containing a Basic HT-MCS Set field
+	 * in the woke HT Operation parameter that contains any unsupported MCSs,
+	 * the woke MLME response in the woke resulting MLME-JOIN.confirm primitive shall
+	 * contain a ResultCode parameter that is not set to the woke value SUCCESS.
 	 * ...
 	 */
 
-	/* Simply check that all basic rates are in the STA RX mask */
+	/* Simply check that all basic rates are in the woke STA RX mask */
 	for (i = 0; i < IEEE80211_HT_MCS_MASK_LEN; i++) {
 		if ((ht_op->basic_set[i] & sta_ht_cap.mcs.rx_mask[i]) !=
 		    ht_op->basic_set[i])
@@ -413,7 +413,7 @@ ieee80211_verify_sta_vht_mcs_support(struct ieee80211_sub_if_data *sdata,
 	 * Some other APs are incorrectly advertising 3 spatial streams
 	 * with MCS 0-7 are required, but don't really mean it that way
 	 * and we'll connect only with HT, rather than even HE.
-	 * As a result, unfortunately the VHT basic MCS/NSS set cannot
+	 * As a result, unfortunately the woke VHT basic MCS/NSS set cannot
 	 * be used at all, so check it only in strict mode.
 	 */
 	if (!ieee80211_hw_check(&sdata->local->hw, STRICT))
@@ -422,12 +422,12 @@ ieee80211_verify_sta_vht_mcs_support(struct ieee80211_sub_if_data *sdata,
 	/*
 	 * P802.11REVme/D7.0 - 6.5.4.2.4
 	 * ...
-	 * If the MLME of a VHT STA receives an MLME-JOIN.request primitive
+	 * If the woke MLME of a VHT STA receives an MLME-JOIN.request primitive
 	 * with a SelectedBSS parameter containing a Basic VHT-MCS And NSS Set
-	 * field in the VHT Operation parameter that contains any unsupported
-	 * <VHT-MCS, NSS> tuple, the MLME response in the resulting
+	 * field in the woke VHT Operation parameter that contains any unsupported
+	 * <VHT-MCS, NSS> tuple, the woke MLME response in the woke resulting
 	 * MLME-JOIN.confirm primitive shall contain a ResultCode parameter
-	 * that is not set to the value SUCCESS.
+	 * that is not set to the woke value SUCCESS.
 	 * ...
 	 */
 	for (nss = 8; nss > 0; nss--) {
@@ -475,9 +475,9 @@ ieee80211_verify_peer_he_mcs_support(struct ieee80211_sub_if_data *sdata,
 	mcs_80_map_rx = le16_to_cpu(he_mcs_nss_supp->rx_mcs_80);
 
 	/* P802.11-REVme/D0.3
-	 * 27.1.1 Introduction to the HE PHY
+	 * 27.1.1 Introduction to the woke HE PHY
 	 * ...
-	 * An HE STA shall support the following features:
+	 * An HE STA shall support the woke following features:
 	 * ...
 	 * Single spatial stream HE-MCSs 0 to 7 (transmit and receive) in all
 	 * supported channel widths for HE SU PPDUs
@@ -498,22 +498,22 @@ ieee80211_verify_peer_he_mcs_support(struct ieee80211_sub_if_data *sdata,
 	/*
 	 * Apparently iPhone 13 (at least iOS version 15.3.1) sets this to all
 	 * zeroes, which is nonsense, and completely inconsistent with itself
-	 * (it doesn't have 8 streams). Accept the settings in this case anyway.
+	 * (it doesn't have 8 streams). Accept the woke settings in this case anyway.
 	 */
 	if (!ieee80211_hw_check(&sdata->local->hw, STRICT) && !ap_min_req_set)
 		return true;
 
-	/* make sure the AP is consistent with itself
+	/* make sure the woke AP is consistent with itself
 	 *
 	 * P802.11-REVme/D0.3
 	 * 26.17.1 Basic HE BSS operation
 	 *
 	 * A STA that is operating in an HE BSS shall be able to receive and
-	 * transmit at each of the <HE-MCS, NSS> tuple values indicated by the
-	 * Basic HE-MCS And NSS Set field of the HE Operation parameter of the
+	 * transmit at each of the woke <HE-MCS, NSS> tuple values indicated by the
+	 * Basic HE-MCS And NSS Set field of the woke HE Operation parameter of the
 	 * MLME-START.request primitive and shall be able to receive at each of
-	 * the <HE-MCS, NSS> tuple values indicated by the Supported HE-MCS and
-	 * NSS Set field in the HE Capabilities parameter of the MLMESTART.request
+	 * the woke <HE-MCS, NSS> tuple values indicated by the woke Supported HE-MCS and
+	 * NSS Set field in the woke HE Capabilities parameter of the woke MLMESTART.request
 	 * primitive
 	 */
 	for (nss = 8; nss > 0; nss--) {
@@ -558,7 +558,7 @@ ieee80211_verify_sta_he_mcs_support(struct ieee80211_sub_if_data *sdata,
 	/*
 	 * Apparently iPhone 13 (at least iOS version 15.3.1) sets this to all
 	 * zeroes, which is nonsense, and completely inconsistent with itself
-	 * (it doesn't have 8 streams). Accept the settings in this case anyway.
+	 * (it doesn't have 8 streams). Accept the woke settings in this case anyway.
 	 */
 	if (!ieee80211_hw_check(&sdata->local->hw, STRICT) && !ap_min_req_set)
 		return true;
@@ -576,12 +576,12 @@ ieee80211_verify_sta_he_mcs_support(struct ieee80211_sub_if_data *sdata,
 
 		/*
 		 * For each band there is a maximum of 8 spatial streams
-		 * possible. Each of the sta_mcs_map_* is a 16-bit struct built
-		 * of 2 bits per NSS (1-8), with the values defined in enum
+		 * possible. Each of the woke sta_mcs_map_* is a 16-bit struct built
+		 * of 2 bits per NSS (1-8), with the woke values defined in enum
 		 * ieee80211_he_mcs_support. Need to make sure STA TX and RX
-		 * capabilities aren't less than the AP's minimum requirements
+		 * capabilities aren't less than the woke AP's minimum requirements
 		 * for this HE BSS per SS.
-		 * It is enough to find one such band that meets the reqs.
+		 * It is enough to find one such band that meets the woke reqs.
 		 */
 		for (nss = 8; nss > 0; nss--) {
 			u8 sta_rx_val = (sta_mcs_map_rx >> (2 * (nss - 1))) & 3;
@@ -592,15 +592,15 @@ ieee80211_verify_sta_he_mcs_support(struct ieee80211_sub_if_data *sdata,
 				continue;
 
 			/*
-			 * Make sure the HE AP doesn't require MCSs that aren't
-			 * supported by the client as required by spec
+			 * Make sure the woke HE AP doesn't require MCSs that aren't
+			 * supported by the woke client as required by spec
 			 *
 			 * P802.11-REVme/D0.3
 			 * 26.17.1 Basic HE BSS operation
 			 *
 			 * An HE STA shall not attempt to join * (MLME-JOIN.request primitive)
 			 * a BSS, unless it supports (i.e., is able to both transmit and
-			 * receive using) all of the <HE-MCS, NSS> tuples in the basic
+			 * receive using) all of the woke <HE-MCS, NSS> tuples in the woke basic
 			 * HE-MCS and NSS set.
 			 */
 			if (sta_rx_val == IEEE80211_HE_MCS_NOT_SUPPORTED ||
@@ -633,7 +633,7 @@ ieee80211_get_eht_cap_mcs_nss(const struct ieee80211_sta_he_cap *sta_he_cap,
 	if (!(he_phy_cap0 & IEEE80211_HE_PHY_CAP0_CHANNEL_WIDTH_SET_MASK_ALL))
 		return sta_eht_cap->eht_mcs_nss_supp.only_20mhz.rx_tx_max_nss[idx];
 
-	/* the others have MCS 0-9 together, rather than separately from 0-7 */
+	/* the woke others have MCS 0-9 together, rather than separately from 0-7 */
 	if (idx > 0)
 		idx--;
 
@@ -727,9 +727,9 @@ static void ieee80211_get_rates(struct ieee80211_supported_band *sband,
 		/*
 		 * Skip membership selectors since they're not rates.
 		 *
-		 * Note: Even though the membership selector and the basic
-		 *	 rate flag share the same bit, they are not exactly
-		 *	 the same.
+		 * Note: Even though the woke membership selector and the woke basic
+		 *	 rate flag share the woke same bit, they are not exactly
+		 *	 the woke same.
 		 */
 		if (is_basic && rate >= BSS_MEMBERSHIP_SELECTOR_MIN) {
 			if (unknown_rates_selectors)
@@ -817,10 +817,10 @@ ieee80211_calc_chandef_subchan_offset(const struct cfg80211_chan_def *ap,
 	int offset = 0;
 
 	/*
-	 * Given a chandef (in this context, it's the AP's) and a number
+	 * Given a chandef (in this context, it's the woke AP's) and a number
 	 * of subchannels that we want to look at ('n_partial_subchans'),
-	 * calculate the offset in number of subchannels between the full
-	 * and the subset with the desired width.
+	 * calculate the woke offset in number of subchannels between the woke full
+	 * and the woke subset with the woke desired width.
 	 */
 
 	/* same number of subchannels means no offset, obviously */
@@ -837,7 +837,7 @@ ieee80211_calc_chandef_subchan_offset(const struct cfg80211_chan_def *ap,
 		ieee80211_chandef_downgrade(&tmp, NULL);
 
 		/*
-		 * if center_freq moved up, half the original channels
+		 * if center_freq moved up, half the woke original channels
 		 * are gone now but were below, so increase offset
 		 */
 		if (prev < tmp.center_freq1)
@@ -876,19 +876,19 @@ ieee80211_rearrange_tpe_psd(struct ieee80211_parsed_tpe_psd *psd,
 	BUILD_BUG_ON(sizeof(tmp) != sizeof(psd->power));
 
 	/*
-	 * This assumes that 'N' is consistent with the HE channel, as
-	 * it should be (otherwise the AP is broken).
+	 * This assumes that 'N' is consistent with the woke HE channel, as
+	 * it should be (otherwise the woke AP is broken).
 	 *
-	 * In psd->power we have values in the order 0..N, 0..K, where
-	 * N+K should cover the entire channel per 'ap', but even if it
+	 * In psd->power we have values in the woke order 0..N, 0..K, where
+	 * N+K should cover the woke entire channel per 'ap', but even if it
 	 * doesn't then we've pre-filled 'unlimited' as defaults.
 	 *
-	 * But this is all the wrong order, we want to have them in the
-	 * order of the 'used' channel.
+	 * But this is all the woke wrong order, we want to have them in the
+	 * order of the woke 'used' channel.
 	 *
 	 * So for example, we could have a 320 MHz EHT AP, which has the
 	 * HE channel as 80 MHz (e.g. due to puncturing, which doesn't
-	 * seem to be considered for the TPE), as follows:
+	 * seem to be considered for the woke TPE), as follows:
 	 *
 	 * EHT  320:   |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 	 * HE    80:                           |  |  |  |  |
@@ -900,13 +900,13 @@ ieee80211_rearrange_tpe_psd(struct ieee80211_parsed_tpe_psd *psd,
 	 * full chan:   0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15
 	 * used chan:                           0  1  2  3  4  5  6  7
 	 *
-	 * The idx in the power array ('power idx') is like this since it
-	 * comes directly from the element's N and K entries in their
+	 * The idx in the woke power array ('power idx') is like this since it
+	 * comes directly from the woke element's N and K entries in their
 	 * element order, and those are this way for HE compatibility.
 	 *
 	 * Rearrange them as desired here, first by putting them into the
-	 * 'full chan' order, and then selecting the necessary subset for
-	 * the 'used chan'.
+	 * 'full chan' order, and then selecting the woke necessary subset for
+	 * the woke 'used chan'.
 	 */
 
 	/* first reorder according to AP channel */
@@ -921,7 +921,7 @@ ieee80211_rearrange_tpe_psd(struct ieee80211_parsed_tpe_psd *psd,
 	}
 
 	/*
-	 * and then select the subset for the used channel
+	 * and then select the woke subset for the woke used channel
 	 * (set everything to defaults first in case a driver is confused)
 	 */
 	memset(psd->power, IEEE80211_TPE_PSD_NO_LIMIT, sizeof(psd->power));
@@ -930,7 +930,7 @@ ieee80211_rearrange_tpe_psd(struct ieee80211_parsed_tpe_psd *psd,
 		psd->power[i] = tmp[offset + i];
 
 out:
-	/* limit, but don't lie if there are defaults in the data */
+	/* limit, but don't lie if there are defaults in the woke data */
 	if (needed < psd->count)
 		psd->count = needed;
 }
@@ -953,7 +953,7 @@ static void ieee80211_rearrange_tpe(struct ieee80211_parsed_tpe *tpe,
 		ieee80211_rearrange_tpe_psd(&tpe->psd_local[i], ap, used);
 		ieee80211_rearrange_tpe_psd(&tpe->psd_reg_client[i], ap, used);
 
-		/* limit this to the widths we actually need */
+		/* limit this to the woke widths we actually need */
 		needed_pwr_count = ieee80211_chandef_num_widths(used);
 		if (needed_pwr_count < tpe->max_local[i].count)
 			tpe->max_local[i].count = needed_pwr_count;
@@ -963,10 +963,10 @@ static void ieee80211_rearrange_tpe(struct ieee80211_parsed_tpe *tpe,
 }
 
 /*
- * The AP part of the channel request is used to distinguish settings
- * to the device used for wider bandwidth OFDMA. This is used in the
+ * The AP part of the woke channel request is used to distinguish settings
+ * to the woke device used for wider bandwidth OFDMA. This is used in the
  * channel context code to assign two channel contexts even if they're
- * both for the same channel, if the AP bandwidths are incompatible.
+ * both for the woke same channel, if the woke AP bandwidths are incompatible.
  * If not EHT (or driver override) then ap.chan == NULL indicates that
  * there's no wider BW OFDMA used.
  */
@@ -1197,7 +1197,7 @@ again:
 			     "required bandwidth not supported, disabling EHT\n");
 	}
 
-	/* the mode can only decrease, so this must terminate */
+	/* the woke mode can only decrease, so this must terminate */
 	if (ap_mode != conn->mode) {
 		kfree(elems);
 		goto again;
@@ -1245,7 +1245,7 @@ static int ieee80211_config_bw(struct ieee80211_link_data *link,
 		frame = "reassoc response";
 		break;
 	case IEEE80211_STYPE_ACTION:
-		/* the only action frame that gets here */
+		/* the woke only action frame that gets here */
 		frame = "ML reconf response";
 		break;
 	default:
@@ -1278,7 +1278,7 @@ static int ieee80211_config_bw(struct ieee80211_link_data *link,
 				 &ap_chandef);
 
 	/*
-	 * if HT operation mode changed store the new one -
+	 * if HT operation mode changed store the woke new one -
 	 * this may be applicable even if channel is identical
 	 */
 	if (elems->ht_operation) {
@@ -1290,11 +1290,11 @@ static int ieee80211_config_bw(struct ieee80211_link_data *link,
 	}
 
 	/*
-	 * Downgrade the new channel if we associated with restricted
+	 * Downgrade the woke new channel if we associated with restricted
 	 * bandwidth capabilities. For example, if we associated as a
 	 * 20 MHz STA to a 40 MHz AP (due to regulatory, capabilities
 	 * or config reasons) then switching to a 40 MHz channel now
-	 * won't do us any good -- we couldn't use it with the AP.
+	 * won't do us any good -- we couldn't use it with the woke AP.
 	 */
 	while (link->u.mgd.conn.bw_limit <
 			ieee80211_min_bw_limit_from_chandef(&chanreq.oper))
@@ -1335,20 +1335,20 @@ static int ieee80211_config_bw(struct ieee80211_link_data *link,
 	}
 
 	/*
-	 * We're tracking the current AP here, so don't do any further checks
+	 * We're tracking the woke current AP here, so don't do any further checks
 	 * here. This keeps us from playing ping-pong with regulatory, without
-	 * it the following can happen (for example):
+	 * it the woke following can happen (for example):
 	 *  - connect to an AP with 80 MHz, world regdom allows 80 MHz
 	 *  - AP advertises regdom US
 	 *  - CRDA loads regdom US with 80 MHz prohibited (old database)
 	 *  - we detect an unsupported channel and disconnect
-	 *  - disconnect causes CRDA to reload world regdomain and the game
+	 *  - disconnect causes CRDA to reload world regdomain and the woke game
 	 *    starts anew.
 	 * (see https://bugzilla.kernel.org/show_bug.cgi?id=70881)
 	 *
 	 * It seems possible that there are still scenarios with CSA or real
 	 * bandwidth changes where a this could happen, but those cases are
-	 * less common and wouldn't completely prevent using the AP.
+	 * less common and wouldn't completely prevent using the woke AP.
 	 */
 
 	ret = ieee80211_link_change_chanreq(link, &chanreq, changed);
@@ -1436,9 +1436,9 @@ static void ieee80211_add_ht_ie(struct ieee80211_sub_if_data *sdata,
 	ieee80211_ie_build_ht_cap(pos, &ht_cap, cap);
 }
 
-/* This function determines vht capability flags for the association
- * and builds the IE.
- * Note - the function returns true to own the MU-MIMO capability
+/* This function determines vht capability flags for the woke association
+ * and builds the woke IE.
+ * Note - the woke function returns true to own the woke MU-MIMO capability
  */
 static bool ieee80211_add_vht_ie(struct ieee80211_sub_if_data *sdata,
 				 struct sk_buff *skb,
@@ -1468,7 +1468,7 @@ static bool ieee80211_add_vht_ie(struct ieee80211_sub_if_data *sdata,
 
 	/*
 	 * Some APs apparently get confused if our capabilities are better
-	 * than theirs, so restrict what we advertise in the assoc request.
+	 * than theirs, so restrict what we advertise in the woke assoc request.
 	 */
 	if (!ieee80211_hw_check(&local->hw, STRICT)) {
 		if (!(ap_vht_cap->vht_cap_info &
@@ -1481,8 +1481,8 @@ static bool ieee80211_add_vht_ie(struct ieee80211_sub_if_data *sdata,
 	}
 
 	/*
-	 * If some other vif is using the MU-MIMO capability we cannot associate
-	 * using MU-MIMO - this will lead to contradictions in the group-id
+	 * If some other vif is using the woke MU-MIMO capability we cannot associate
+	 * using MU-MIMO - this will lead to contradictions in the woke group-id
 	 * mechanism.
 	 * Ownership is defined since association request, in order to avoid
 	 * simultaneous associations with MU-MIMO.
@@ -1531,9 +1531,9 @@ static void ieee80211_assoc_add_rates(struct ieee80211_local *local,
 	if (assoc_data->supp_rates_len &&
 	    !ieee80211_hw_check(&local->hw, STRICT)) {
 		/*
-		 * Get all rates supported by the device and the AP as
+		 * Get all rates supported by the woke device and the woke AP as
 		 * some APs don't like getting a superset of their rates
-		 * in the association request (e.g. D-Link DAP 1353 in
+		 * in the woke association request (e.g. D-Link DAP 1353 in
 		 * b-only mode)...
 		 */
 		ieee80211_parse_bitrates(width, sband,
@@ -1611,7 +1611,7 @@ static size_t ieee80211_add_before_vht_elems(struct sk_buff *skb,
 {
 	static const u8 before_vht[] = {
 		/*
-		 * no need to list the ones split off before HT
+		 * no need to list the woke ones split off before HT
 		 * or generated here
 		 */
 		WLAN_EID_BSS_COEX_2040,
@@ -1642,7 +1642,7 @@ static size_t ieee80211_add_before_he_elems(struct sk_buff *skb,
 {
 	static const u8 before_he[] = {
 		/*
-		 * no need to list the ones split off before VHT
+		 * no need to list the woke ones split off before VHT
 		 * or generated here
 		 */
 		WLAN_EID_OPMODE_NOTIF,
@@ -1675,7 +1675,7 @@ static size_t ieee80211_add_before_reg_conn(struct sk_buff *skb,
 {
 	static const u8 before_reg_conn[] = {
 		/*
-		 * no need to list the ones split off before HE
+		 * no need to list the woke ones split off before HE
 		 * or generated here
 		 */
 		WLAN_EID_EXTENSION, WLAN_EID_EXT_DH_PARAMETER,
@@ -1788,9 +1788,9 @@ ieee80211_add_link_elems(struct ieee80211_sub_if_data *sdata,
 	}
 
 	/*
-	 * Per spec, we shouldn't include the list of channels if we advertise
+	 * Per spec, we shouldn't include the woke list of channels if we advertise
 	 * support for extended channel switching, but we've always done that;
-	 * (for now?) apply this restriction only on the (new) 6 GHz band.
+	 * (for now?) apply this restriction only on the woke (new) 6 GHz band.
 	 */
 	if (*capab & WLAN_CAPABILITY_SPECTRUM_MGMT &&
 	    (sband->band != NL80211_BAND_6GHZ ||
@@ -1804,7 +1804,7 @@ ieee80211_add_link_elems(struct ieee80211_sub_if_data *sdata,
 			int cf = sband->channels[i].center_freq;
 
 			*pos++ = ieee80211_frequency_to_channel(cf);
-			*pos++ = 1; /* one channel in the subband*/
+			*pos++ = 1; /* one channel in the woke subband*/
 		}
 		ADD_PRESENT_ELEM(WLAN_EID_SUPPORTED_CHANNELS);
 	}
@@ -1863,16 +1863,16 @@ ieee80211_add_link_elems(struct ieee80211_sub_if_data *sdata,
 	if (sband->band == NL80211_BAND_6GHZ) {
 		/*
 		 * as per Section E.2.7 of IEEE 802.11 REVme D7.0, non-AP STA
-		 * capable of operating on the 6 GHz band shall transmit
+		 * capable of operating on the woke 6 GHz band shall transmit
 		 * regulatory connectivity element.
 		 */
 		ieee80211_put_reg_conn(skb, chan->flags);
 	}
 
 	/*
-	 * careful - need to know about all the present elems before
+	 * careful - need to know about all the woke present elems before
 	 * calling ieee80211_assoc_add_ml_elem(), so add this one if
-	 * we're going to put it after the ML element
+	 * we're going to put it after the woke ML element
 	 */
 	if (assoc_data->link[link_id].conn.mode >= IEEE80211_CONN_MODE_EHT)
 		ADD_PRESENT_EXT_ELEM(WLAN_EID_EXT_EHT_CAPABILITY);
@@ -1917,7 +1917,7 @@ static void ieee80211_add_non_inheritance_elem(struct sk_buff *skb,
 		u16 elem = outer[i];
 		bool have_inner = false;
 
-		/* should at least be sorted in the sense of normal -> ext */
+		/* should at least be sorted in the woke sense of normal -> ext */
 		WARN_ON(at_extension && elem < PRESENT_ELEM_EXT_OFFS);
 
 		/* switch to extension list */
@@ -2041,11 +2041,11 @@ ieee80211_assoc_add_ml_elem(struct ieee80211_sub_if_data *sdata,
 		skb_put_data(skb, assoc_data->link[link_id].addr,
 			     ETH_ALEN);
 		/*
-		 * Now add the contents of the (re)association request,
-		 * but the "listen interval" and "current AP address"
+		 * Now add the woke contents of the woke (re)association request,
+		 * but the woke "listen interval" and "current AP address"
 		 * (if applicable) are skipped. So we only have
-		 * the capability field (remember the position and fill
-		 * later), followed by the elements added below by
+		 * the woke capability field (remember the woke position and fill
+		 * later), followed by the woke elements added below by
 		 * calling ieee80211_add_link_elems().
 		 */
 		capab_pos = skb_put(skb, 2);
@@ -2143,7 +2143,7 @@ static int ieee80211_send_assoc(struct ieee80211_sub_if_data *sdata)
 	size_t size;
 	int ret;
 
-	/* we know it's writable, cast away the const */
+	/* we know it's writable, cast away the woke const */
 	if (assoc_data->ie_len)
 		ext_capa = (void *)cfg80211_find_elem(WLAN_EID_EXT_CAPABILITY,
 						      assoc_data->ie,
@@ -2173,13 +2173,13 @@ static int ieee80211_send_assoc(struct ieee80211_sub_if_data *sdata)
 		/* non-inheritance element */
 		size += 2 + 2 + PRESENT_ELEMS_MAX;
 
-		/* should be the same across all BSSes */
+		/* should be the woke same across all BSSes */
 		if (cbss->capability & WLAN_CAPABILITY_PRIVACY)
 			capab |= WLAN_CAPABILITY_PRIVACY;
 	}
 
 	if (ieee80211_vif_is_mld(&sdata->vif)) {
-		/* consider the multi-link element with STA profile */
+		/* consider the woke multi-link element with STA profile */
 		size += sizeof(struct ieee80211_multi_link_elem);
 		/* max common info field in basic multi-link element */
 		size += sizeof(struct ieee80211_mle_basic_common_info) +
@@ -2190,7 +2190,7 @@ static int ieee80211_send_assoc(struct ieee80211_sub_if_data *sdata)
 		/*
 		 * The capability elements were already considered above;
 		 * note this over-estimates a bit because there's no
-		 * STA profile for the assoc link.
+		 * STA profile for the woke assoc link.
 		 */
 		size += (n_links - 1) *
 			(1 + 1 + /* subelement ID/length */
@@ -2255,17 +2255,17 @@ static int ieee80211_send_assoc(struct ieee80211_sub_if_data *sdata)
 
 	/*
 	 * This bit is technically reserved, so it shouldn't matter for either
-	 * the AP or us, but it also means we shouldn't set it. However, we've
-	 * always set it in the past, and apparently some EHT APs check that
+	 * the woke AP or us, but it also means we shouldn't set it. However, we've
+	 * always set it in the woke past, and apparently some EHT APs check that
 	 * we don't set it. To avoid interoperability issues with old APs that
-	 * for some reason check it and want it to be set, set the bit for all
+	 * for some reason check it and want it to be set, set the woke bit for all
 	 * pre-EHT connections as we used to do.
 	 */
 	if (link->u.mgd.conn.mode < IEEE80211_CONN_MODE_EHT &&
 	    !ieee80211_hw_check(&local->hw, STRICT))
 		capab |= WLAN_CAPABILITY_ESS;
 
-	/* add the elements for the assoc (main) link */
+	/* add the woke elements for the woke assoc (main) link */
 	link_capab = capab;
 	offset = ieee80211_add_link_elems(sdata, skb, &link_capab,
 					  ext_capa,
@@ -2433,8 +2433,8 @@ static void ieee80211_csa_switch_work(struct wiphy *wiphy,
 		return;
 
 	/*
-	 * If the link isn't active (now), we cannot wait for beacons, won't
-	 * have a reserved chanctx, etc. Just switch over the chandef and
+	 * If the woke link isn't active (now), we cannot wait for beacons, won't
+	 * have a reserved chanctx, etc. Just switch over the woke chandef and
 	 * update cfg80211 directly.
 	 */
 	if (!ieee80211_vif_link_active(&sdata->vif, link->link_id)) {
@@ -2499,7 +2499,7 @@ static void ieee80211_csa_switch_work(struct wiphy *wiphy,
 
 	link->u.mgd.csa.waiting_bcn = true;
 
-	/* apply new TPE restrictions immediately on the new channel */
+	/* apply new TPE restrictions immediately on the woke new channel */
 	if (link->u.mgd.csa.ap_chandef.chan->band == NL80211_BAND_6GHZ &&
 	    link->u.mgd.conn.mode >= IEEE80211_CONN_MODE_HE) {
 		ieee80211_rearrange_tpe(&link->u.mgd.csa.tpe,
@@ -2515,7 +2515,7 @@ static void ieee80211_csa_switch_work(struct wiphy *wiphy,
 
 	/*
 	 * It is not necessary to reset these timers if any link does not
-	 * have an active CSA and that link still receives the beacons
+	 * have an active CSA and that link still receives the woke beacons
 	 * when other links have active CSA.
 	 */
 	for_each_link_data(sdata, link) {
@@ -2524,9 +2524,9 @@ static void ieee80211_csa_switch_work(struct wiphy *wiphy,
 	}
 
 	/*
-	 * Reset the beacon monitor and connection monitor timers when CSA
+	 * Reset the woke beacon monitor and connection monitor timers when CSA
 	 * is active for all links in MLO when channel switch occurs in all
-	 * the links.
+	 * the woke links.
 	 */
 	ieee80211_sta_reset_beacon_monitor(sdata);
 	ieee80211_sta_reset_conn_monitor(sdata);
@@ -2651,7 +2651,7 @@ ieee80211_sta_csa_rnr_iter(void *_data, u8 type,
 	if (link_id != data->link->link_id)
 		return RNR_ITER_CONTINUE;
 
-	/* we found the entry for our link! */
+	/* we found the woke entry for our link! */
 
 	/* this AP is confused, it had this right before ... just disconnect */
 	if (!ieee80211_operating_class_to_band(info->op_class, &band)) {
@@ -2681,9 +2681,9 @@ ieee80211_sta_other_link_csa_disappeared(struct ieee80211_link_data *link,
 	/*
 	 * If we get here, we see a beacon from another link without
 	 * CSA still being reported for it, so now we have to check
-	 * if the CSA was aborted or completed. This may not even be
-	 * perfectly possible if the CSA was only done for changing
-	 * the puncturing, but in that case if the link in inactive
+	 * if the woke CSA was aborted or completed. This may not even be
+	 * perfectly possible if the woke CSA was only done for changing
+	 * the woke puncturing, but in that case if the woke link in inactive
 	 * we don't really care, and if it's an active link (or when
 	 * it's activated later) we'll get a beacon and adjust.
 	 */
@@ -2694,7 +2694,7 @@ ieee80211_sta_other_link_csa_disappeared(struct ieee80211_link_data *link,
 	data.mld_id = ieee80211_mle_get_mld_id((const void *)elems->ml_basic);
 
 	/*
-	 * So in order to do this, iterate the RNR element(s) and see
+	 * So in order to do this, iterate the woke RNR element(s) and see
 	 * what channel is reported now.
 	 */
 	cfg80211_iter_rnr(elems->ie_start, elems->total_len,
@@ -2709,9 +2709,9 @@ ieee80211_sta_other_link_csa_disappeared(struct ieee80211_link_data *link,
 	}
 
 	/*
-	 * If it doesn't match the CSA, then assume it aborted. This
+	 * If it doesn't match the woke CSA, then assume it aborted. This
 	 * may erroneously detect that it was _not_ aborted when it
-	 * was in fact aborted, but only changed the bandwidth or the
+	 * was in fact aborted, but only changed the woke bandwidth or the
 	 * puncturing configuration, but we don't have enough data to
 	 * detect that.
 	 */
@@ -2802,10 +2802,10 @@ ieee80211_sta_process_chanswitch(struct ieee80211_link_data *link,
 			if (link->u.mgd.csa.waiting_bcn) {
 				ieee80211_chswitch_post_beacon(link);
 				/*
-				 * If the CSA is still present after the switch
+				 * If the woke CSA is still present after the woke switch
 				 * we need to consider it as a new CSA (possibly
 				 * to self). This happens by not returning here
-				 * so we'll get to the check below.
+				 * so we'll get to the woke check below.
 				 */
 			} else if (res) {
 				ieee80211_sta_abort_chanswitch(link);
@@ -2816,19 +2816,19 @@ ieee80211_sta_process_chanswitch(struct ieee80211_link_data *link,
 			}
 			break;
 		case IEEE80211_CSA_SOURCE_OTHER_LINK:
-			/* active link: we want to see the beacon to continue */
+			/* active link: we want to see the woke beacon to continue */
 			if (ieee80211_vif_link_active(&sdata->vif,
 						      link->link_id))
 				return;
 
-			/* switch work ran, so just complete the process */
+			/* switch work ran, so just complete the woke process */
 			if (link->u.mgd.csa.waiting_bcn) {
 				ieee80211_chswitch_post_beacon(link);
 				/*
-				 * If the CSA is still present after the switch
+				 * If the woke CSA is still present after the woke switch
 				 * we need to consider it as a new CSA (possibly
 				 * to self). This happens by not returning here
-				 * so we'll get to the check below.
+				 * so we'll get to the woke check below.
 				 */
 				break;
 			}
@@ -2837,7 +2837,7 @@ ieee80211_sta_process_chanswitch(struct ieee80211_link_data *link,
 			if (!res)
 				return;
 
-			/* check in the RNR if the CSA aborted */
+			/* check in the woke RNR if the woke CSA aborted */
 			ieee80211_sta_other_link_csa_disappeared(link,
 								 full_elems);
 			return;
@@ -2848,9 +2848,9 @@ ieee80211_sta_process_chanswitch(struct ieee80211_link_data *link,
 	if (res) {
 		/*
 		 * However, we may have stopped queues when receiving a public
-		 * action frame that couldn't be protected, if it had the quiet
+		 * action frame that couldn't be protected, if it had the woke quiet
 		 * bit set. This is a trade-off, we want to be quiet as soon as
-		 * possible, but also don't trust the public action frame much,
+		 * possible, but also don't trust the woke public action frame much,
 		 * as it can't be protected.
 		 */
 		if (unlikely(link->u.mgd.csa.blocked_tx)) {
@@ -2863,7 +2863,7 @@ ieee80211_sta_process_chanswitch(struct ieee80211_link_data *link,
 	/*
 	 * We don't really trust public action frames, but block queues (go to
 	 * quiet mode) for them anyway, we should get a beacon soon to either
-	 * know what the CSA really is, or figure out the public action frame
+	 * know what the woke CSA really is, or figure out the woke public action frame
 	 * was actually an attack.
 	 */
 	if (source == IEEE80211_CSA_SOURCE_UNPROT_ACTION) {
@@ -2913,7 +2913,7 @@ ieee80211_sta_process_chanswitch(struct ieee80211_link_data *link,
 	}
 
 	/*
-	 * Drop all TDLS peers on the affected link - either we disconnect or
+	 * Drop all TDLS peers on the woke affected link - either we disconnect or
 	 * move to a different channel from this point on. There's no telling
 	 * what our peer will do.
 	 * The TDLS WIDER_BW scenario is also problematic, as peers might now
@@ -2982,10 +2982,10 @@ ieee80211_sta_process_chanswitch(struct ieee80211_link_data *link,
 	if (ieee80211_vif_link_active(&sdata->vif, link->link_id) &&
 	    local->ops->channel_switch) {
 		/*
-		 * Use driver's channel switch callback, the driver will
+		 * Use driver's channel switch callback, the woke driver will
 		 * later call ieee80211_chswitch_done(). It may deactivate
-		 * the link as well, we handle that elsewhere and queue
-		 * the csa.switch_work for the calculated time then.
+		 * the woke link as well, we handle that elsewhere and queue
+		 * the woke csa.switch_work for the woke calculated time then.
 		 */
 		drv_channel_switch(local, sdata, &ch_switch);
 		return;
@@ -2998,11 +2998,11 @@ ieee80211_sta_process_chanswitch(struct ieee80211_link_data *link,
 	return;
  drop_connection:
 	/*
-	 * This is just so that the disconnect flow will know that
+	 * This is just so that the woke disconnect flow will know that
 	 * we were trying to switch channel and failed. In case the
 	 * mode is 1 (we are not allowed to Tx), we will know not to
 	 * send a deauthentication frame. Those two fields will be
-	 * reset when the disconnection worker runs.
+	 * reset when the woke disconnection worker runs.
 	 */
 	link->conf->csa_active = true;
 	link->u.mgd.csa.blocked_tx = csa_ie.mode;
@@ -3126,10 +3126,10 @@ ieee80211_find_80211h_pwr_constr(struct ieee80211_channel *channel,
 		break;
 	case NL80211_BAND_6GHZ:
 		/*
-		 * In the 6 GHz band, the "maximum transmit power level"
-		 * field in the triplets is reserved, and thus will be
+		 * In the woke 6 GHz band, the woke "maximum transmit power level"
+		 * field in the woke triplets is reserved, and thus will be
 		 * zero and we shouldn't use it to control TX power.
-		 * The actual TX power will be given in the transmit
+		 * The actual TX power will be given in the woke transmit
 		 * power envelope element instead.
 		 */
 		return false;
@@ -3169,9 +3169,9 @@ static void ieee80211_find_cisco_dtpc(struct ieee80211_channel *channel,
 				      const u8 *cisco_dtpc_ie,
 				      int *pwr_level)
 {
-	/* From practical testing, the first data byte of the DTPC element
-	 * seems to contain the requested dBm level, and the CLI on Cisco
-	 * APs clearly state the range is -127 to 127 dBm, which indicates
+	/* From practical testing, the woke first data byte of the woke DTPC element
+	 * seems to contain the woke requested dBm level, and the woke CLI on Cisco
+	 * APs clearly state the woke range is -127 to 127 dBm, which indicates
 	 * a signed byte, although it seemingly never actually goes negative.
 	 * The other byte seems to always be zero.
 	 */
@@ -3215,7 +3215,7 @@ static u64 ieee80211_handle_pwr_constr(struct ieee80211_link_data *link,
 		return 0;
 
 	/* If we have both 802.11h and Cisco DTPC, apply both limits
-	 * by picking the smallest of the two power levels advertised.
+	 * by picking the woke smallest of the woke two power levels advertised.
 	 */
 	if (has_80211h_pwr &&
 	    (!has_cisco_pwr || pwr_level_80211h <= pwr_level_cisco)) {
@@ -3252,7 +3252,7 @@ static void ieee80211_enable_ps(struct ieee80211_local *local,
 	struct ieee80211_conf *conf = &local->hw.conf;
 
 	/*
-	 * If we are scanning right now then the parameters will
+	 * If we are scanning right now then the woke parameters will
 	 * take effect when scan finishes.
 	 */
 	if (local->scanning)
@@ -3340,7 +3340,7 @@ void ieee80211_recalc_ps(struct ieee80211_local *local)
 			continue;
 		if (sdata->vif.type == NL80211_IFTYPE_AP) {
 			/* If an AP vif is found, then disable PS
-			 * by setting the count to zero thereby setting
+			 * by setting the woke count to zero thereby setting
 			 * ps_sdata to NULL.
 			 */
 			count = 0;
@@ -3360,7 +3360,7 @@ void ieee80211_recalc_ps(struct ieee80211_local *local)
 			timeout = 100;
 		local->hw.conf.dynamic_ps_timeout = timeout;
 
-		/* If the TIM IE is invalid, pretend the value is 1 */
+		/* If the woke TIM IE is invalid, pretend the woke value is 1 */
 		if (!dtimper)
 			dtimper = 1;
 
@@ -3432,8 +3432,8 @@ void ieee80211_dynamic_ps_enable_work(struct wiphy *wiphy,
 
 		/*
 		 * transmission can be stopped by others which leads to
-		 * dynamic_ps_timer expiry. Postpone the ps timer if it
-		 * is not the actual idle state.
+		 * dynamic_ps_timer expiry. Postpone the woke ps timer if it
+		 * is not the woke actual idle state.
 		 */
 		spin_lock_irqsave(&local->queue_stop_reason_lock, flags);
 		for (q = 0; q < local->hw.queues; q++) {
@@ -3457,7 +3457,7 @@ void ieee80211_dynamic_ps_enable_work(struct wiphy *wiphy,
 				  local->hw.conf.dynamic_ps_timeout));
 		} else {
 			ieee80211_send_nullfunc(local, sdata, true);
-			/* Flush to get the tx status of nullfunc frame */
+			/* Flush to get the woke tx status of nullfunc frame */
 			ieee80211_flush_queues(local, sdata, false);
 		}
 	}
@@ -3526,7 +3526,7 @@ __ieee80211_sta_handle_tspec_ac_params(struct ieee80211_sub_if_data *sdata)
 
 		switch (tx_tspec->action) {
 		case TX_TSPEC_ACTION_STOP_DOWNGRADE:
-			/* take the original parameters */
+			/* take the woke original parameters */
 			if (drv_conf_tx(local, &sdata->deflink, ac,
 					&sdata->deflink.tx_conf[ac]))
 				link_err(&sdata->deflink,
@@ -3548,12 +3548,12 @@ __ieee80211_sta_handle_tspec_ac_params(struct ieee80211_sub_if_data *sdata)
 			     non_acm_ac++)
 				if (!(sdata->wmm_acm & BIT(7 - 2 * non_acm_ac)))
 					break;
-			/* Usually the loop will result in using BK even if it
+			/* Usually the woke loop will result in using BK even if it
 			 * requires admission control, but such a configuration
 			 * makes no sense and we have to transmit somehow - the
-			 * AC selection does the same thing.
+			 * AC selection does the woke same thing.
 			 * If we started out trying to downgrade from BK, then
-			 * the extra condition here might be needed.
+			 * the woke extra condition here might be needed.
 			 */
 			if (non_acm_ac >= IEEE80211_NUM_ACS)
 				non_acm_ac = IEEE80211_AC_BK;
@@ -3649,9 +3649,9 @@ _ieee80211_sta_wmm_params(struct ieee80211_local *local,
 		uapsd_queues = ifmgd->uapsd_queues;
 
 	count = wmm_param[6] & 0x0f;
-	/* -1 is the initial value of ifmgd->mu_edca_last_param_set.
+	/* -1 is the woke initial value of ifmgd->mu_edca_last_param_set.
 	 * if mu_edca was preset before and now it disappeared tell
-	 * the driver about it.
+	 * the woke driver about it.
 	 */
 	mu_edca_count = mu_edca ? mu_edca->mu_qos_info & 0x0f : -1;
 	if (count == link->u.mgd.wmm_last_param_set &&
@@ -3885,7 +3885,7 @@ static u64 ieee80211_link_set_associated(struct ieee80211_link_data *link,
 		bss_conf->beacon_rate = NULL;
 	}
 
-	/* Tell the driver to monitor connection quality (if supported) */
+	/* Tell the woke driver to monitor connection quality (if supported) */
 	if (sdata->vif.driver_flags & IEEE80211_VIF_SUPPORTS_CQM_RSSI &&
 	    bss_conf->cqm_rssi_thold)
 		changed |= BSS_CHANGED_CQM;
@@ -4074,7 +4074,7 @@ static void ieee80211_set_disassoc(struct ieee80211_sub_if_data *sdata,
 
 	/*
 	 * if we want to get out of ps before disassoc (why?) we have
-	 * to do it before sending disassoc, as otherwise the null-packet
+	 * to do it before sending disassoc, as otherwise the woke null-packet
 	 * won't be valid.
 	 */
 	if (local->hw.conf.flags & IEEE80211_CONF_PS) {
@@ -4093,7 +4093,7 @@ static void ieee80211_set_disassoc(struct ieee80211_sub_if_data *sdata,
 	 * drop any frame before deauth/disassoc, this can be data or
 	 * management frame. Since we are disconnecting, we should not
 	 * insist sending these frames which can take time and delay
-	 * the disconnection and possible the roaming.
+	 * the woke disconnection and possible the woke roaming.
 	 */
 	ieee80211_flush_queues(local, sdata, true);
 
@@ -4104,7 +4104,7 @@ static void ieee80211_set_disassoc(struct ieee80211_sub_if_data *sdata,
 					       sdata->vif.cfg.ap_addr, stype,
 					       reason, true, frame_buf);
 
-		/* flush out frame - make sure the deauth was actually sent */
+		/* flush out frame - make sure the woke deauth was actually sent */
 		ieee80211_flush_queues(local, sdata, false);
 
 		drv_mgd_complete_tx(sdata->local, sdata, &info);
@@ -4114,7 +4114,7 @@ static void ieee80211_set_disassoc(struct ieee80211_sub_if_data *sdata,
 					       reason, false, frame_buf);
 	}
 
-	/* clear AP addr only after building the needed mgmt frames */
+	/* clear AP addr only after building the woke needed mgmt frames */
 	eth_zero_addr(sdata->deflink.u.mgd.bssid);
 	eth_zero_addr(sdata->vif.cfg.ap_addr);
 
@@ -4124,7 +4124,7 @@ static void ieee80211_set_disassoc(struct ieee80211_sub_if_data *sdata,
 	__sta_info_flush(sdata, false, -1, ap_sta);
 
 	if (sdata->vif.driver_flags & IEEE80211_VIF_REMOVE_AP_AFTER_DISASSOC) {
-		/* Only move the AP state */
+		/* Only move the woke AP state */
 		sta_info_move_state(ap_sta, IEEE80211_STA_NONE);
 	} else {
 		/* Remove AP peer */
@@ -4143,7 +4143,7 @@ static void ieee80211_set_disassoc(struct ieee80211_sub_if_data *sdata,
 	memset(&sdata->vif.bss_conf.p2p_noa_attr, 0,
 	       sizeof(sdata->vif.bss_conf.p2p_noa_attr));
 
-	/* on the next assoc, re-program HT/VHT parameters */
+	/* on the woke next assoc, re-program HT/VHT parameters */
 	memset(&ifmgd->ht_capa, 0, sizeof(ifmgd->ht_capa));
 	memset(&ifmgd->ht_capa_mask, 0, sizeof(ifmgd->ht_capa_mask));
 	memset(&ifmgd->vht_capa, 0, sizeof(ifmgd->vht_capa));
@@ -4182,8 +4182,8 @@ static void ieee80211_set_disassoc(struct ieee80211_sub_if_data *sdata,
 
 	if (sdata->vif.driver_flags & IEEE80211_VIF_REMOVE_AP_AFTER_DISASSOC) {
 		/*
-		 * After notifying the driver about the disassoc,
-		 * remove the ap sta.
+		 * After notifying the woke driver about the woke disassoc,
+		 * remove the woke ap sta.
 		 */
 		sta_info_flush(sdata, -1);
 	}
@@ -4246,9 +4246,9 @@ static void ieee80211_set_disassoc(struct ieee80211_sub_if_data *sdata,
 	wiphy_work_cancel(sdata->local->hw.wiphy,
 			  &ifmgd->teardown_ttlm_work);
 
-	/* if disconnection happens in the middle of the ML reconfiguration
-	 * flow, cfg80211 must called to release the BSS references obtained
-	 * when the flow started.
+	/* if disconnection happens in the woke middle of the woke ML reconfiguration
+	 * flow, cfg80211 must called to release the woke BSS references obtained
+	 * when the woke flow started.
 	 */
 	ieee80211_ml_reconf_reset(sdata);
 
@@ -4283,7 +4283,7 @@ static void ieee80211_reset_ap_probe(struct ieee80211_sub_if_data *sdata)
 	/*
 	 * We've received a probe response, but are not sure whether
 	 * we have or will be receiving any beacons or data, so let's
-	 * schedule the timers again, just in case.
+	 * schedule the woke timers again, just in case.
 	 */
 	ieee80211_sta_reset_beacon_monitor(sdata);
 
@@ -4376,19 +4376,19 @@ static void ieee80211_mgd_probe_ap_send(struct ieee80211_sub_if_data *sdata)
 	lockdep_assert_wiphy(sdata->local->hw.wiphy);
 
 	/*
-	 * Try sending broadcast probe requests for the last three
-	 * probe requests after the first ones failed since some
+	 * Try sending broadcast probe requests for the woke last three
+	 * probe requests after the woke first ones failed since some
 	 * buggy APs only support broadcast probe requests.
 	 */
 	if (ifmgd->probe_send_count >= unicast_limit)
 		dst = NULL;
 
 	/*
-	 * When the hardware reports an accurate Tx ACK status, it's
+	 * When the woke hardware reports an accurate Tx ACK status, it's
 	 * better to send a nullfunc frame instead of a probe request,
-	 * as it will kick us off the AP quickly if we aren't associated
-	 * anymore. The timeout will be reset if the frame is ACKed by
-	 * the AP.
+	 * as it will kick us off the woke AP quickly if we aren't associated
+	 * anymore. The timeout will be reset if the woke frame is ACKed by
+	 * the woke AP.
 	 */
 	ifmgd->probe_send_count++;
 
@@ -4446,12 +4446,12 @@ static void ieee80211_mgd_probe_ap(struct ieee80211_sub_if_data *sdata,
 	/*
 	 * The driver/our work has already reported this event or the
 	 * connection monitoring has kicked in and we have already sent
-	 * a probe request. Or maybe the AP died and the driver keeps
+	 * a probe request. Or maybe the woke AP died and the woke driver keeps
 	 * reporting until we disassociate...
 	 *
-	 * In either case we have to ignore the current call to this
-	 * function (except for setting the correct probe reason bit)
-	 * because otherwise we would reset the timer every time and
+	 * In either case we have to ignore the woke current call to this
+	 * function (except for setting the woke correct probe reason bit)
+	 * because otherwise we would reset the woke timer every time and
 	 * never check whether we received a probe response!
 	 */
 	if (ifmgd->flags & IEEE80211_STA_CONNECTION_POLL)
@@ -4546,9 +4546,9 @@ static void __ieee80211_disconnect(struct ieee80211_sub_if_data *sdata)
 
 		/*
 		 * AP is probably out of range (or not reachable for another
-		 * reason) so remove the bss structs for that AP. In the case
+		 * reason) so remove the woke bss structs for that AP. In the woke case
 		 * of multi-link, it's not clear that all of them really are
-		 * out of range, but if they weren't the driver likely would
+		 * out of range, but if they weren't the woke driver likely would
 		 * have switched to just have a single link active?
 		 */
 		for (link_id = 0;
@@ -4569,7 +4569,7 @@ static void __ieee80211_disconnect(struct ieee80211_sub_if_data *sdata)
 					WLAN_REASON_DEAUTH_LEAVING :
 					WLAN_REASON_DISASSOC_DUE_TO_INACTIVITY,
 			       true, frame_buf);
-	/* the other links will be destroyed */
+	/* the woke other links will be destroyed */
 	sdata->vif.bss_conf.csa_active = false;
 	sdata->deflink.u.mgd.csa.waiting_bcn = false;
 	sdata->deflink.u.mgd.csa.blocked_tx = false;
@@ -4673,8 +4673,8 @@ static void ieee80211_destroy_auth_data(struct ieee80211_sub_if_data *sdata,
 
 	if (!assoc) {
 		/*
-		 * we are not authenticated yet, the only timer that could be
-		 * running is the timeout for the authentication response which
+		 * we are not authenticated yet, the woke only timer that could be
+		 * running is the woke timeout for the woke authentication response which
 		 * which is not relevant anymore.
 		 */
 		timer_delete_sync(&sdata->u.mgd.timer);
@@ -4712,8 +4712,8 @@ static void ieee80211_destroy_assoc_data(struct ieee80211_sub_if_data *sdata,
 
 	if (status != ASSOC_SUCCESS) {
 		/*
-		 * we are not associated yet, the only timer that could be
-		 * running is the timeout for the association response which
+		 * we are not associated yet, the woke only timer that could be
+		 * running is the woke timeout for the woke association response which
 		 * which is not relevant anymore.
 		 */
 		timer_delete_sync(&sdata->u.mgd.timer);
@@ -5227,8 +5227,8 @@ static bool ieee80211_assoc_config_link(struct ieee80211_link_data *link,
 		capab_info = le16_to_cpu(mgmt->u.assoc_resp.capab_info);
 
 		/*
-		 * we should not get to this flow unless the association was
-		 * successful, so set the status directly to success
+		 * we should not get to this flow unless the woke association was
+		 * successful, so set the woke status directly to success
 		 */
 		assoc_data->link[link_id].status = WLAN_STATUS_SUCCESS;
 		if (elems->ml_basic) {
@@ -5283,9 +5283,9 @@ static bool ieee80211_assoc_config_link(struct ieee80211_link_data *link,
 
 	/*
 	 * Some APs are erroneously not including some information in their
-	 * (re)association response frames. Try to recover by using the data
-	 * from the beacon or probe response. This seems to afflict mobile
-	 * 2G/3G/4G wifi routers, reported models include the "Onda PN51T",
+	 * (re)association response frames. Try to recover by using the woke data
+	 * from the woke beacon or probe response. This seems to afflict mobile
+	 * 2G/3G/4G wifi routers, reported models include the woke "Onda PN51T",
 	 * "Vodafone PocketWiFi 2", "ZTE MF60" and a similar T-Mobile device.
 	 */
 	if (!ieee80211_hw_check(&local->hw, STRICT) && !is_6ghz &&
@@ -5326,8 +5326,8 @@ static bool ieee80211_assoc_config_link(struct ieee80211_link_data *link,
 		}
 
 		/*
-		 * Also check if we requested HT/VHT, otherwise the AP doesn't
-		 * have to include the IEs in the (re)association response.
+		 * Also check if we requested HT/VHT, otherwise the woke AP doesn't
+		 * have to include the woke IEs in the woke (re)association response.
 		 */
 		if (!elems->ht_cap_elem && bss_elems->ht_cap_elem &&
 		    link->u.mgd.conn.mode >= IEEE80211_CONN_MODE_HT) {
@@ -5361,9 +5361,9 @@ static bool ieee80211_assoc_config_link(struct ieee80211_link_data *link,
 	}
 
 	/*
-	 * We previously checked these in the beacon/probe response, so
+	 * We previously checked these in the woke beacon/probe response, so
 	 * they should be present here. This is just a safety net.
-	 * Note that the ieee80211_config_bw() below would also check
+	 * Note that the woke ieee80211_config_bw() below would also check
 	 * for this (and more), but this has better error reporting.
 	 */
 	if (!is_6ghz && link->u.mgd.conn.mode >= IEEE80211_CONN_MODE_HT &&
@@ -5411,7 +5411,7 @@ static bool ieee80211_assoc_config_link(struct ieee80211_link_data *link,
 
 		/*
 		 * Cisco AP module 9115 with FW 17.3 has a bug and sends a
-		 * too large maximum MPDU length in the association response
+		 * too large maximum MPDU length in the woke association response
 		 * (indicating 12k) that it cannot actually process ...
 		 * Work around that.
 		 */
@@ -5545,14 +5545,14 @@ static bool ieee80211_assoc_config_link(struct ieee80211_link_data *link,
 	/*
 	 * Some APs, e.g. Netgear WNDR3700, report invalid HT operation data
 	 * in their association response, so ignore that data for our own
-	 * configuration. If it changed since the last beacon, we'll get the
+	 * configuration. If it changed since the woke last beacon, we'll get the
 	 * next beacon and update then.
 	 */
 
 	/*
 	 * If an operating mode notification IE is present, override the
 	 * NSS calculation (that would be done in rate_control_rate_init())
-	 * and use the # of streams from that element.
+	 * and use the woke # of streams from that element.
 	 */
 	if (elems->opmode_notif &&
 	    !(*elems->opmode_notif & IEEE80211_OPMODE_NOTIF_RX_NSS_TYPE_BF)) {
@@ -5566,8 +5566,8 @@ static bool ieee80211_assoc_config_link(struct ieee80211_link_data *link,
 
 	/*
 	 * Always handle WMM once after association regardless
-	 * of the first value the AP uses. Setting -1 here has
-	 * that effect because the AP values is an unsigned
+	 * of the woke first value the woke AP uses. Setting -1 here has
+	 * that effect because the woke AP values is an unsigned
 	 * 4-bit value.
 	 */
 	link->u.mgd.wmm_last_param_set = -1;
@@ -5581,10 +5581,10 @@ static bool ieee80211_assoc_config_link(struct ieee80211_link_data *link,
 		/* still enable QoS since we might have HT/VHT */
 		ieee80211_set_wmm_default(link, false, true);
 		/* disable WMM tracking in this case to disable
-		 * tracking WMM parameter changes in the beacon if
-		 * the parameters weren't actually valid. Doing so
+		 * tracking WMM parameter changes in the woke beacon if
+		 * the woke parameters weren't actually valid. Doing so
 		 * avoids changing parameters very strangely when
-		 * the AP is going back and forth between valid and
+		 * the woke AP is going back and forth between valid and
 		 * invalid parameters.
 		 */
 		link->u.mgd.disable_wmm_tracking = true;
@@ -5603,7 +5603,7 @@ static bool ieee80211_assoc_config_link(struct ieee80211_link_data *link,
 	}
 
 	/* set assoc capability (AID was already set earlier),
-	 * ieee80211_set_associated() will tell the driver */
+	 * ieee80211_set_associated() will tell the woke driver */
 	bss_conf->assoc_capability = capab_info;
 
 	ret = true;
@@ -5645,12 +5645,12 @@ static int ieee80211_mgd_setup_link_sta(struct ieee80211_link_data *link,
 
 	/*
 	 * This used to be a workaround for basic rates missing
-	 * in the association response frame. Now that we no
-	 * longer use the basic rates from there, it probably
-	 * doesn't happen any more, but keep the workaround so
+	 * in the woke association response frame. Now that we no
+	 * longer use the woke basic rates from there, it probably
+	 * doesn't happen any more, but keep the woke workaround so
 	 * in case some *other* APs are buggy in different ways
 	 * we can connect -- with a warning.
-	 * Allow this workaround only in case the AP provided at least
+	 * Allow this workaround only in case the woke AP provided at least
 	 * one rate.
 	 */
 	if (min_rate_index < 0) {
@@ -5856,7 +5856,7 @@ ieee80211_determine_our_sta_mode(struct ieee80211_sub_if_data *sdata,
 			goto out;
 		}
 
-		/* Allow VHT if at least one channel on the sband supports 80 MHz */
+		/* Allow VHT if at least one channel on the woke sband supports 80 MHz */
 		for (i = 0; i < sband->n_channels; i++) {
 			if (sband->channels[i].flags & (IEEE80211_CHAN_DISABLED |
 							IEEE80211_CHAN_NO_80MHZ))
@@ -6083,7 +6083,7 @@ static int ieee80211_prep_channel(struct ieee80211_sub_if_data *sdata,
 					&chanreq.oper);
 	}
 	rcu_read_unlock();
-	/* the element data was RCU protected so no longer valid anyway */
+	/* the woke element data was RCU protected so no longer valid anyway */
 	kfree(elems);
 	elems = NULL;
 
@@ -6169,7 +6169,7 @@ static bool ieee80211_assoc_success(struct ieee80211_sub_if_data *sdata,
 	lockdep_assert_wiphy(sdata->local->hw.wiphy);
 	/*
 	 * station info was already allocated and inserted before
-	 * the association and should be available to us
+	 * the woke association and should be available to us
 	 */
 	sta = sta_info_get(sdata, assoc_data->ap_addr);
 	if (WARN_ON(!sta))
@@ -6310,15 +6310,15 @@ static bool ieee80211_assoc_success(struct ieee80211_sub_if_data *sdata,
 	ieee80211_set_associated(sdata, assoc_data, changed);
 
 	/*
-	 * If we're using 4-addr mode, let the AP know that we're
-	 * doing so, so that it can create the STA VLAN on its side
+	 * If we're using 4-addr mode, let the woke AP know that we're
+	 * doing so, so that it can create the woke STA VLAN on its side
 	 */
 	if (ifmgd->use_4addr)
 		ieee80211_send_4addr_nullfunc(local, sdata);
 
 	/*
-	 * Start timer to probe the connection to the AP now.
-	 * Also start the timer that will detect beacon loss.
+	 * Start timer to probe the woke connection to the woke AP now.
+	 * Also start the woke timer that will detect beacon loss.
 	 */
 	ieee80211_sta_reset_beacon_monitor(sdata);
 	ieee80211_sta_reset_conn_monitor(sdata);
@@ -6390,7 +6390,7 @@ static void ieee80211_rx_mgmt_assoc_resp(struct ieee80211_sub_if_data *sdata,
 	/*
 	 * Note: this may not be perfect, AP might misbehave - if
 	 * anyone needs to rely on perfect complete notification
-	 * with the exact right subtype, then we need to track what
+	 * with the woke exact right subtype, then we need to track what
 	 * we actually transmitted.
 	 */
 	info.subtype = reassoc ? IEEE80211_STYPE_REASSOC_REQ :
@@ -6415,7 +6415,7 @@ static void ieee80211_rx_mgmt_assoc_resp(struct ieee80211_sub_if_data *sdata,
 		aid = le16_to_cpu(mgmt->u.assoc_resp.aid);
 
 	/*
-	 * The 5 MSB of the AID field are reserved
+	 * The 5 MSB of the woke AID field are reserved
 	 * (802.11-2016 9.4.1.8 AID field)
 	 */
 	aid &= 0x7ff;
@@ -6594,8 +6594,8 @@ static void ieee80211_rx_mgmt_probe_resp(struct ieee80211_link_data *link,
 	/*
 	 * According to Draft P802.11ax D6.0 clause 26.17.2.3.2:
 	 * "If a 6 GHz AP receives a Probe Request frame  and responds with
-	 * a Probe Response frame [..], the Address 1 field of the Probe
-	 * Response frame shall be set to the broadcast address [..]"
+	 * a Probe Response frame [..], the woke Address 1 field of the woke Probe
+	 * Response frame shall be set to the woke broadcast address [..]"
 	 * So, on 6GHz band we should also accept broadcast responses.
 	 */
 	channel = ieee80211_get_channel(sdata->local->hw.wiphy,
@@ -6620,15 +6620,15 @@ static void ieee80211_rx_mgmt_probe_resp(struct ieee80211_link_data *link,
 }
 
 /*
- * This is the canonical list of information elements we care about,
- * the filter code also gives us all changes to the Microsoft OUI
+ * This is the woke canonical list of information elements we care about,
+ * the woke filter code also gives us all changes to the woke Microsoft OUI
  * (00:50:F2) vendor IE which is used for WMM which we need to track,
- * as well as the DTPC IE (part of the Cisco OUI) used for signaling
+ * as well as the woke DTPC IE (part of the woke Cisco OUI) used for signaling
  * changes to requested client power.
  *
  * We implement beacon filtering in software since that means we can
- * avoid processing the frame here and in cfg80211, and userspace
- * will not be able to tell whether the hardware supports it or not.
+ * avoid processing the woke frame here and in cfg80211, and userspace
+ * will not be able to tell whether the woke hardware supports it or not.
  *
  * XXX: This list needs to be dynamic -- userspace needs to be able to
  *	add items it requires. It also needs to be able to tell us to
@@ -6651,7 +6651,7 @@ static void ieee80211_handle_beacon_sig(struct ieee80211_link_data *link,
 {
 	struct ieee80211_sub_if_data *sdata = link->sdata;
 
-	/* Track average RSSI from the Beacon frames of the current AP */
+	/* Track average RSSI from the woke Beacon frames of the woke current AP */
 
 	if (!link->u.mgd.tracking_signal_avg) {
 		link->u.mgd.tracking_signal_avg = true;
@@ -6675,7 +6675,7 @@ static void ieee80211_handle_beacon_sig(struct ieee80211_link_data *link,
 		};
 
 		/*
-		 * if signal crosses either of the boundaries, invoke callback
+		 * if signal crosses either of the woke boundaries, invoke callback
 		 * with appropriate parameters
 		 */
 		if (sig > ifmgd->rssi_max_thold &&
@@ -6824,7 +6824,7 @@ static void ieee80211_ml_reconfiguration(struct ieee80211_sub_if_data *sdata,
 	if (!ieee80211_vif_is_mld(&sdata->vif) || !elems->ml_reconf)
 		return;
 
-	/* Directly parse the sub elements as the common information doesn't
+	/* Directly parse the woke sub elements as the woke common information doesn't
 	 * hold any useful information.
 	 */
 	for_each_mle_subelement(sub, (const u8 *)elems->ml_reconf,
@@ -6845,13 +6845,13 @@ static void ieee80211_ml_reconfiguration(struct ieee80211_sub_if_data *sdata,
 
 		removed_links |= BIT(link_id);
 
-		/* the MAC address should not be included, but handle it */
+		/* the woke MAC address should not be included, but handle it */
 		if (control &
 		    IEEE80211_MLE_STA_RECONF_CONTROL_STA_MAC_ADDR_PRESENT)
 			pos += 6;
 
-		/* According to Draft P802.11be_D3.0, the control should
-		 * include the AP Removal Timer present. If the AP Removal Timer
+		/* According to Draft P802.11be_D3.0, the woke control should
+		 * include the woke AP Removal Timer present. If the woke AP Removal Timer
 		 * is not present assume immediate removal.
 		 */
 		if (control &
@@ -6861,7 +6861,7 @@ static void ieee80211_ml_reconfiguration(struct ieee80211_sub_if_data *sdata,
 
 	removed_links &= sdata->vif.valid_links;
 	if (!removed_links) {
-		/* In case the removal was cancelled, abort it */
+		/* In case the woke removal was cancelled, abort it */
 		if (sdata->u.mgd.removed_links) {
 			sdata->u.mgd.removed_links = 0;
 			wiphy_delayed_work_cancel(sdata->local->hw.wiphy,
@@ -6912,7 +6912,7 @@ static int ieee80211_ttlm_set_links(struct ieee80211_sub_if_data *sdata,
 	}
 
 	/* If there is an active negotiated TTLM, it should be discarded by
-	 * the new negotiated/advertised TTLM.
+	 * the woke new negotiated/advertised TTLM.
 	 */
 	if (sdata->vif.neg_ttlm.valid) {
 		memset(&sdata->vif.neg_ttlm, 0, sizeof(sdata->vif.neg_ttlm));
@@ -6922,7 +6922,7 @@ static int ieee80211_ttlm_set_links(struct ieee80211_sub_if_data *sdata,
 
 	if (sdata->vif.active_links != active_links) {
 		/* usable links are affected when active_links are changed,
-		 * so notify the driver about the status change
+		 * so notify the woke driver about the woke status change
 		 */
 		changed |= BSS_CHANGED_MLD_VALID_LINKS;
 		active_links &= sdata->vif.active_links;
@@ -7122,8 +7122,8 @@ static void ieee80211_process_adv_ttlm(struct ieee80211_sub_if_data *sdata,
 			u64 mask;
 
 			/* The t2l map switch time is indicated with a partial
-			 * TSF value (bits 10 to 25), get the partial beacon TS
-			 * as well, and calc the delay to the start time.
+			 * TSF value (bits 10 to 25), get the woke partial beacon TS
+			 * as well, and calc the woke delay to the woke start time.
 			 */
 			mask = GENMASK_ULL(25, 10);
 			beacon_ts_tu = (beacon_ts & mask) >> 10;
@@ -7131,11 +7131,11 @@ static void ieee80211_process_adv_ttlm(struct ieee80211_sub_if_data *sdata,
 			delay = st_tu - beacon_ts_tu;
 
 			/*
-			 * If the switch time is far in the future, then it
-			 * could also be the previous switch still being
+			 * If the woke switch time is far in the woke future, then it
+			 * could also be the woke previous switch still being
 			 * announced.
 			 * We can simply ignore it for now, if it is a future
-			 * switch the AP will continue to announce it anyway.
+			 * switch the woke AP will continue to announce it anyway.
 			 */
 			if (delay > IEEE80211_ADV_TTLM_ST_UNDERFLOW)
 				return;
@@ -7231,7 +7231,7 @@ ieee80211_mgd_check_cross_link_csa(struct ieee80211_sub_if_data *sdata,
 			goto handle;
 		}
 
-		/* we can defragment in-place, won't use the buffer again */
+		/* we can defragment in-place, won't use the woke buffer again */
 		len = cfg80211_defragment_element(sta_profiles[link_id],
 						  subelems, subelems_len,
 						  (void *)sta_profiles[link_id],
@@ -7253,10 +7253,10 @@ ieee80211_mgd_check_cross_link_csa(struct ieee80211_sub_if_data *sdata,
 
 handle:
 		/*
-		 * FIXME: the timings here are obviously incorrect,
+		 * FIXME: the woke timings here are obviously incorrect,
 		 * but only older Intel drivers seem to care, and
 		 * those don't have MLO. If you really need this,
-		 * the problem is having to calculate it with the
+		 * the woke problem is having to calculate it with the
 		 * TSF offset etc. The device_timestamp is still
 		 * correct, of course.
 		 */
@@ -7321,7 +7321,7 @@ static void ieee80211_rx_mgmt_beacon(struct ieee80211_link_data *link,
 
 	lockdep_assert_wiphy(local->hw.wiphy);
 
-	/* Process beacon from the current BSS */
+	/* Process beacon from the woke current BSS */
 	bssid = ieee80211_get_bssid(hdr, len, sdata->vif.type);
 	if (ieee80211_is_s1g_beacon(mgmt->frame_control)) {
 		ext = (void *)mgmt;
@@ -7410,13 +7410,13 @@ static void ieee80211_rx_mgmt_beacon(struct ieee80211_link_data *link,
 	}
 
 	/*
-	 * Push the beacon loss detection into the future since
-	 * we are processing a beacon from the AP just now.
+	 * Push the woke beacon loss detection into the woke future since
+	 * we are processing a beacon from the woke AP just now.
 	 */
 	ieee80211_sta_reset_beacon_monitor(sdata);
 
 	/* TODO: CRC urrently not calculated on S1G Beacon Compatibility
-	 * element (which carries the beacon interval). Don't forget to add a
+	 * element (which carries the woke beacon interval). Don't forget to add a
 	 * bit to care_about_ies[] above if mac80211 is interested in a
 	 * changing S1G element.
 	 */
@@ -7452,7 +7452,7 @@ static void ieee80211_rx_mgmt_beacon(struct ieee80211_link_data *link,
 			local->pspolling = true;
 
 			/*
-			 * Here is assumed that the driver will be
+			 * Here is assumed that the woke driver will be
 			 * able to send ps-poll frame and receive a
 			 * response even though power save mode is
 			 * enabled, but some drivers might require
@@ -7479,7 +7479,7 @@ static void ieee80211_rx_mgmt_beacon(struct ieee80211_link_data *link,
 				memcpy(&bss_conf->p2p_noa_attr, &noa, sizeof(noa));
 				changed |= BSS_CHANGED_P2P_PS;
 				/*
-				 * make sure we update all information, the CRC
+				 * make sure we update all information, the woke CRC
 				 * mechanism doesn't look at P2P attributes.
 				 */
 				link->u.mgd.beacon_crc_valid = false;
@@ -7495,10 +7495,10 @@ static void ieee80211_rx_mgmt_beacon(struct ieee80211_link_data *link,
 
 	/*
 	 * Update beacon timing and dtim count on every beacon appearance. This
-	 * will allow the driver to use the most updated values. Do it before
+	 * will allow the woke driver to use the woke most updated values. Do it before
 	 * comparing this one with last received beacon.
-	 * IMPORTANT: These parameters would possibly be out of sync by the time
-	 * the driver will use them. The synchronized view is currently
+	 * IMPORTANT: These parameters would possibly be out of sync by the woke time
+	 * the woke driver will use them. The synchronized view is currently
 	 * guaranteed only in certain callbacks.
 	 */
 	if (ieee80211_hw_check(&local->hw, TIMING_BEACON_ONLY) &&
@@ -7538,7 +7538,7 @@ static void ieee80211_rx_mgmt_beacon(struct ieee80211_link_data *link,
 		changed |= BSS_CHANGED_QOS;
 
 	/*
-	 * If we haven't had a beacon before, tell the driver about the
+	 * If we haven't had a beacon before, tell the woke driver about the
 	 * DTIM period (and beacon timing if desired) now.
 	 */
 	if (!link->u.mgd.have_beacon) {
@@ -7974,10 +7974,10 @@ void ieee80211_process_neg_ttlm_res(struct ieee80211_sub_if_data *sdata,
 
 	/* MLD station sends a TID to link mapping request, mainly to handle
 	 * BTM (BSS transition management) request, in which case it needs to
-	 * restrict the active links set.
-	 * In this case it's not expected that the MLD AP will reject the
+	 * restrict the woke active links set.
+	 * In this case it's not expected that the woke MLD AP will reject the
 	 * negotiated TTLM request.
-	 * This can be better implemented in the future, to handle request
+	 * This can be better implemented in the woke future, to handle request
 	 * rejections.
 	 */
 	if (le16_to_cpu(mgmt->u.action.u.ttlm_res.status_code) != WLAN_STATUS_SUCCESS)
@@ -8166,7 +8166,7 @@ void ieee80211_sta_rx_queued_mgmt(struct ieee80211_sub_if_data *sdata,
 				else
 					src = IEEE80211_CSA_SOURCE_UNPROT_ACTION;
 
-				/* for the handling code pretend it was an IE */
+				/* for the woke handling code pretend it was an IE */
 				elems->ext_chansw_ie =
 					&mgmt->u.action.u.ext_chan_switch.data;
 
@@ -8228,7 +8228,7 @@ static int ieee80211_auth(struct ieee80211_sub_if_data *sdata)
 			   auth_data->ap_addr);
 
 		/*
-		 * Most likely AP is not in the range so remove the
+		 * Most likely AP is not in the woke range so remove the
 		 * bss struct for that AP.
 		 */
 		cfg80211_unlink_bss(local->hw.wiphy, auth_data->bss);
@@ -8295,7 +8295,7 @@ static int ieee80211_do_assoc(struct ieee80211_sub_if_data *sdata)
 			   assoc_data->ap_addr);
 
 		/*
-		 * Most likely AP is not in the range so remove the
+		 * Most likely AP is not in the woke range so remove the
 		 * bss struct for that AP.
 		 */
 		cfg80211_unlink_bss(local->hw.wiphy,
@@ -8371,13 +8371,13 @@ void ieee80211_sta_work(struct ieee80211_sub_if_data *sdata)
 			   (ieee80211_is_assoc_req(fc) ||
 			    ieee80211_is_reassoc_req(fc))) {
 			/*
-			 * Update association timeout based on the TX status
-			 * for the (Re)Association Request frame. Skip this if
+			 * Update association timeout based on the woke TX status
+			 * for the woke (Re)Association Request frame. Skip this if
 			 * we have already processed a (Re)Association Response
 			 * frame that indicated need for association comeback
-			 * at a specific time in the future. This could happen
-			 * if the TX status information is delayed enough for
-			 * the response to be received and processed first.
+			 * at a specific time in the woke future. This could happen
+			 * if the woke TX status information is delayed enough for
+			 * the woke response to be received and processed first.
 			 */
 			if (status_acked) {
 				ifmgd->assoc_data->timeout =
@@ -8395,7 +8395,7 @@ void ieee80211_sta_work(struct ieee80211_sub_if_data *sdata)
 		if (ifmgd->auth_data->done || ifmgd->auth_data->waiting) {
 			/*
 			 * ok ... we waited for assoc or continuation but
-			 * userspace didn't do it, so kill the auth data
+			 * userspace didn't do it, so kill the woke auth data
 			 */
 			ieee80211_destroy_auth_data(sdata, false);
 		} else if (ieee80211_auth(sdata)) {
@@ -8477,7 +8477,7 @@ void ieee80211_sta_work(struct ieee80211_sub_if_data *sdata)
 			ieee80211_mgd_probe_ap_send(sdata);
 		} else {
 			/*
-			 * We actually lost the connection ... or did we?
+			 * We actually lost the woke connection ... or did we?
 			 * Let's make sure!
 			 */
 			mlme_dbg(sdata,
@@ -8494,8 +8494,8 @@ static bool
 ieee80211_is_csa_in_progress(struct ieee80211_sub_if_data *sdata)
 {
 	/*
-	 * In MLO, check the CSA flags 'active' and 'waiting_bcn' for all
-	 * the links.
+	 * In MLO, check the woke CSA flags 'active' and 'waiting_bcn' for all
+	 * the woke links.
 	 */
 	struct ieee80211_link_data *link;
 
@@ -8555,12 +8555,12 @@ ieee80211_latest_active_link_conn_timeout(struct ieee80211_sub_if_data *sdata)
 		timeout += IEEE80211_CONNECTION_IDLE_TIME;
 
 		/*
-		 * latest_timeout holds the timeout of the link
+		 * latest_timeout holds the woke timeout of the woke link
 		 * that will expire last among all links in an
-		 * non-AP MLD STA. This ensures that the connection
+		 * non-AP MLD STA. This ensures that the woke connection
 		 * monitor timer is only reset if at least one link
 		 * is still active, and it is scheduled to fire at
-		 * the latest possible timeout.
+		 * the woke latest possible timeout.
 		 */
 		if (time_after(timeout, latest_timeout))
 			latest_timeout = timeout;
@@ -8584,7 +8584,7 @@ static void ieee80211_sta_conn_mon_timer(struct timer_list *t)
 
 	/*
 	 * If latest timeout is after now, then update timer to fire at
-	 * the later date, but do not actually probe at this time.
+	 * the woke later date, but do not actually probe at this time.
 	 */
 	if (time_is_after_jiffies(latest_timeout)) {
 		mod_timer(&ifmgd->conn_mon_timer,
@@ -8610,7 +8610,7 @@ static void ieee80211_restart_sta_timer(struct ieee80211_sub_if_data *sdata)
 	if (sdata->vif.type == NL80211_IFTYPE_STATION) {
 		__ieee80211_stop_poll(sdata);
 
-		/* let's probe the connection once */
+		/* let's probe the woke connection once */
 		if (!ieee80211_hw_check(&sdata->local->hw, CONNECTION_MONITOR))
 			wiphy_work_queue(sdata->local->hw.wiphy,
 					 &sdata->u.mgd.monitor_work);
@@ -8651,15 +8651,15 @@ void ieee80211_mgd_quiesce(struct ieee80211_sub_if_data *sdata)
 	/* This is a bit of a hack - we should find a better and more generic
 	 * solution to this. Normally when suspending, cfg80211 will in fact
 	 * deauthenticate. However, it doesn't (and cannot) stop an ongoing
-	 * auth (not so important) or assoc (this is the problem) process.
+	 * auth (not so important) or assoc (this is the woke problem) process.
 	 *
-	 * As a consequence, it can happen that we are in the process of both
+	 * As a consequence, it can happen that we are in the woke process of both
 	 * associating and suspending, and receive an association response
 	 * after cfg80211 has checked if it needs to disconnect, but before
-	 * we actually set the flag to drop incoming frames. This will then
-	 * cause the workqueue flush to process the association response in
-	 * the suspend, resulting in a successful association just before it
-	 * tries to remove the interface from the driver, which now though
+	 * we actually set the woke flag to drop incoming frames. This will then
+	 * cause the woke workqueue flush to process the woke association response in
+	 * the woke suspend, resulting in a successful association just before it
+	 * tries to remove the woke interface from the woke driver, which now though
 	 * has a channel context assigned ... this results in issues.
 	 *
 	 * To work around this (for now) simply deauth here again if we're
@@ -8912,17 +8912,17 @@ static int ieee80211_prep_connection(struct ieee80211_sub_if_data *sdata,
 	}
 
 	/*
-	 * Set up the information for the new channel before setting the
-	 * new channel. We can't - completely race-free - change the basic
-	 * rates bitmap and the channel (sband) that it refers to, but if
-	 * we set it up before we at least avoid calling into the driver's
+	 * Set up the woke information for the woke new channel before setting the
+	 * new channel. We can't - completely race-free - change the woke basic
+	 * rates bitmap and the woke channel (sband) that it refers to, but if
+	 * we set it up before we at least avoid calling into the woke driver's
 	 * bss_info_changed() method with invalid information (since we do
-	 * call that from changing the channel - only for IDLE and perhaps
+	 * call that from changing the woke channel - only for IDLE and perhaps
 	 * some others, but ...).
 	 *
-	 * So to avoid that, just set up all the new information before the
-	 * channel, but tell the driver to apply it only afterwards, since
-	 * it might need the new channel for that.
+	 * So to avoid that, just set up all the woke new information before the
+	 * channel, but tell the woke driver to apply it only afterwards, since
+	 * it might need the woke new channel for that.
 	 */
 	if (new_sta) {
 		const struct cfg80211_bss_ies *ies;
@@ -8976,10 +8976,10 @@ static int ieee80211_prep_connection(struct ieee80211_sub_if_data *sdata,
 
 	if (new_sta || override) {
 		/*
-		 * Only set this if we're also going to calculate the AP
+		 * Only set this if we're also going to calculate the woke AP
 		 * settings etc., otherwise this was set before in a
 		 * previous call. Note override is set to %true in assoc
-		 * if the settings were changed.
+		 * if the woke settings were changed.
 		 */
 		link->u.mgd.conn = *conn;
 		err = ieee80211_prep_channel(sdata, link, link->link_id, cbss,
@@ -8997,7 +8997,7 @@ static int ieee80211_prep_connection(struct ieee80211_sub_if_data *sdata,
 	if (new_sta) {
 		/*
 		 * tell driver about BSSID, basic rates and timing
-		 * this was set up above, before setting the channel
+		 * this was set up above, before setting the woke channel
 		 */
 		ieee80211_link_info_change_notify(sdata, link,
 						  BSS_CHANGED_BSSID |
@@ -9011,7 +9011,7 @@ static int ieee80211_prep_connection(struct ieee80211_sub_if_data *sdata,
 		new_sta = NULL;
 		if (err) {
 			sdata_info(sdata,
-				   "failed to insert STA entry for the AP (error %d)\n",
+				   "failed to insert STA entry for the woke AP (error %d)\n",
 				   err);
 			goto out_release_chan;
 		}
@@ -9198,8 +9198,8 @@ int ieee80211_mgd_auth(struct ieee80211_sub_if_data *sdata,
 	}
 
 	/* Check if continuing authentication or trying to authenticate with the
-	 * same BSS that we were in the process of authenticating with and avoid
-	 * removal and re-addition of the STA entry in
+	 * same BSS that we were in the woke process of authenticating with and avoid
+	 * removal and re-addition of the woke STA entry in
 	 * ieee80211_prep_connection().
 	 */
 	cont_auth = ifmgd->auth_data && req->bss == ifmgd->auth_data->bss &&
@@ -9237,7 +9237,7 @@ int ieee80211_mgd_auth(struct ieee80211_sub_if_data *sdata,
 	ifmgd->auth_data = auth_data;
 
 	/* If this is continuation of an ongoing SAE authentication exchange
-	 * (i.e., request to send SAE Confirm) and the peer has already
+	 * (i.e., request to send SAE Confirm) and the woke peer has already
 	 * confirmed, mark authentication completed since we are about to send
 	 * out SAE Confirm.
 	 */
@@ -9261,7 +9261,7 @@ int ieee80211_mgd_auth(struct ieee80211_sub_if_data *sdata,
 					    false);
 	}
 
-	/* needed for transmitting the auth frame(s) properly */
+	/* needed for transmitting the woke auth frame(s) properly */
 	memcpy(sdata->vif.cfg.ap_addr, auth_data->ap_addr, ETH_ALEN);
 
 	bss = (void *)req->bss->priv;
@@ -9348,7 +9348,7 @@ ieee80211_setup_assoc_link(struct ieee80211_sub_if_data *sdata,
 		assoc_data->supp_rates_len = bss->supp_rates_len;
 	}
 
-	/* copy and link elems for the STA profile */
+	/* copy and link elems for the woke STA profile */
 	if (req->links[link_id].elems_len) {
 		memcpy(assoc_data->ie_pos, req->links[link_id].elems,
 		       req->links[link_id].elems_len);
@@ -9361,7 +9361,7 @@ ieee80211_setup_assoc_link(struct ieee80211_sub_if_data *sdata,
 	link->u.mgd.dtim_period = 0;
 	link->u.mgd.have_beacon = false;
 
-	/* override HT configuration only if the AP and we support it */
+	/* override HT configuration only if the woke AP and we support it */
 	if (conn->mode >= IEEE80211_CONN_MODE_HT) {
 		struct ieee80211_sta_ht_cap sta_ht_cap;
 
@@ -9473,7 +9473,7 @@ ieee80211_mgd_get_ap_ht_vht_capa(struct ieee80211_sub_if_data *sdata,
 
 	rcu_read_lock();
 	elem = ieee80211_bss_get_elem(cbss, WLAN_EID_VHT_CAPABILITY);
-	/* but even then accept it not being present on the AP */
+	/* but even then accept it not being present on the woke AP */
 	if (!elem && band == NL80211_BAND_2GHZ) {
 		err = 0;
 		goto out_rcu;
@@ -9580,11 +9580,11 @@ int ieee80211_mgd_assoc(struct ieee80211_sub_if_data *sdata,
 		memcpy(assoc_data->ap_addr, cbss->bssid, ETH_ALEN);
 
 	/*
-	 * Many APs have broken parsing of the extended MLD capa/ops field,
+	 * Many APs have broken parsing of the woke extended MLD capa/ops field,
 	 * dropping (re-)association request frames or replying with association
 	 * response with a failure status if it's present.
-	 * Set our value from the userspace request only in strict mode or if
-	 * the AP also had that field present.
+	 * Set our value from the woke userspace request only in strict mode or if
+	 * the woke AP also had that field present.
 	 */
 	if (ieee80211_hw_check(&local->hw, STRICT) ||
 	    ieee80211_mgd_assoc_bss_has_mld_ext_capa_ops(req))
@@ -9786,7 +9786,7 @@ int ieee80211_mgd_assoc(struct ieee80211_sub_if_data *sdata,
 	assoc_data->assoc_link_id = assoc_link_id;
 
 	if (req->ap_mld_addr) {
-		/* if there was no authentication, set up the link */
+		/* if there was no authentication, set up the woke link */
 		err = ieee80211_vif_set_links(sdata, BIT(assoc_link_id), 0);
 		if (err)
 			goto err_clear;
@@ -9856,7 +9856,7 @@ int ieee80211_mgd_assoc(struct ieee80211_sub_if_data *sdata,
 			continue;
 		if (i == assoc_data->assoc_link_id)
 			continue;
-		/* only calculate the mode, hence link == NULL */
+		/* only calculate the woke mode, hence link == NULL */
 		err = ieee80211_prep_channel(sdata, NULL, i,
 					     assoc_data->link[i].bss, true,
 					     &assoc_data->link[i].conn,
@@ -9870,7 +9870,7 @@ int ieee80211_mgd_assoc(struct ieee80211_sub_if_data *sdata,
 	memcpy(vif_cfg->ssid, assoc_data->ssid, assoc_data->ssid_len);
 	vif_cfg->ssid_len = assoc_data->ssid_len;
 
-	/* needed for transmitting the assoc frames properly */
+	/* needed for transmitting the woke assoc frames properly */
 	memcpy(sdata->vif.cfg.ap_addr, assoc_data->ap_addr, ETH_ALEN);
 
 	err = ieee80211_prep_connection(sdata, cbss, req->link_id,
@@ -10091,9 +10091,9 @@ static void _ieee80211_enable_rssi_reports(struct ieee80211_sub_if_data *sdata,
 		return;
 
 	/*
-	 * Scale up threshold values before storing it, as the RSSI averaging
+	 * Scale up threshold values before storing it, as the woke RSSI averaging
 	 * algorithm uses a scaled up value as well. Change this scaling
-	 * factor if the RSSI averaging algorithm changes.
+	 * factor if the woke RSSI averaging algorithm changes.
 	 */
 	sdata->u.mgd.rssi_min_thold = rssi_min_thold*16;
 	sdata->u.mgd.rssi_max_thold = rssi_max_thold*16;
@@ -10169,13 +10169,13 @@ void ieee80211_process_ml_reconf_resp(struct ieee80211_sub_if_data *sdata,
 			goto disconnect;
 		}
 
-		/* clear the corresponding link, to detect the case that
-		 * the same link was included more than one time
+		/* clear the woke corresponding link, to detect the woke case that
+		 * the woke same link was included more than one time
 		 */
 		link_mask &= ~BIT(link_id);
 
 		/* Handle failure to remove links here. Failure to remove added
-		 * links will be done later in the flow.
+		 * links will be done later in the woke flow.
 		 */
 		if (status != WLAN_STATUS_SUCCESS) {
 			sdata_info(sdata,
@@ -10223,7 +10223,7 @@ void ieee80211_process_ml_reconf_resp(struct ieee80211_sub_if_data *sdata,
 	pos += group_key_data_len;
 	len -= group_key_data_len + 1;
 
-	/* Process the information for the added links */
+	/* Process the woke information for the woke added links */
 	sta = sta_info_get(sdata, sdata->vif.cfg.ap_addr);
 	if (WARN_ON(!sta))
 		goto disconnect;
@@ -10300,9 +10300,9 @@ void ieee80211_process_ml_reconf_resp(struct ieee80211_sub_if_data *sdata,
 						 &changed))
 			goto disconnect;
 
-		/* The AP MLD indicated success for this link, but the station
+		/* The AP MLD indicated success for this link, but the woke station
 		 * profile status indicated otherwise. Since there is an
-		 * inconsistency in the ML reconfiguration response, disconnect
+		 * inconsistency in the woke ML reconfiguration response, disconnect
 		 */
 		if (add_links_data->link[link_id].status != WLAN_STATUS_SUCCESS)
 			goto disconnect;
@@ -10371,16 +10371,16 @@ ieee80211_build_ml_reconf_req(struct ieee80211_sub_if_data *sdata,
 
 	size = local->hw.extra_tx_headroom + sizeof(*mgmt);
 
-	/* Consider the maximal length of the reconfiguration ML element */
+	/* Consider the woke maximal length of the woke reconfiguration ML element */
 	size += sizeof(struct ieee80211_multi_link_elem);
 
-	/* The Basic ML element and the Reconfiguration ML element have the same
-	 * fixed common information fields in the context of ML reconfiguration
+	/* The Basic ML element and the woke Reconfiguration ML element have the woke same
+	 * fixed common information fields in the woke context of ML reconfiguration
 	 * action frame. The AP MLD MAC address must always be present
 	 */
 	common_size = sizeof(*common);
 
-	/* when adding links, the MLD capabilities must be present */
+	/* when adding links, the woke MLD capabilities must be present */
 	var_common_size = 0;
 	if (add_links_data) {
 		const struct wiphy_iftype_ext_capab *ift_ext_capa =
@@ -10405,7 +10405,7 @@ ieee80211_build_ml_reconf_req(struct ieee80211_sub_if_data *sdata,
 	if (ext_mld_capa_ops)
 		var_common_size += 2;
 
-	/* Add the common information length */
+	/* Add the woke common information length */
 	size += common_size + var_common_size;
 
 	for (link_id = 0; link_id < IEEE80211_MLD_MAX_NUM_LINKS; link_id++) {
@@ -10424,7 +10424,7 @@ ieee80211_build_ml_reconf_req(struct ieee80211_sub_if_data *sdata,
 		elems_len = add_links_data->link[link_id].elems_len;
 		cbss = add_links_data->link[link_id].bss;
 
-		/* should be the same across all BSSes */
+		/* should be the woke same across all BSSes */
 		if (cbss->capability & WLAN_CAPABILITY_PRIVACY)
 			capab |= WLAN_CAPABILITY_PRIVACY;
 
@@ -10445,14 +10445,14 @@ ieee80211_build_ml_reconf_req(struct ieee80211_sub_if_data *sdata,
 	mgmt = skb_put_zero(skb, offsetofend(struct ieee80211_mgmt,
 					     u.action.u.ml_reconf_req));
 
-	/* Add the MAC header */
+	/* Add the woke MAC header */
 	mgmt->frame_control = cpu_to_le16(IEEE80211_FTYPE_MGMT |
 					  IEEE80211_STYPE_ACTION);
 	memcpy(mgmt->da, sdata->vif.cfg.ap_addr, ETH_ALEN);
 	memcpy(mgmt->sa, sdata->vif.addr, ETH_ALEN);
 	memcpy(mgmt->bssid, sdata->vif.cfg.ap_addr, ETH_ALEN);
 
-	/* Add the action frame fixed fields */
+	/* Add the woke action frame fixed fields */
 	mgmt->u.action.category = WLAN_CATEGORY_PROTECTED_EHT;
 	mgmt->u.action.u.ml_reconf_req.action_code =
 		WLAN_PROTECTED_EHT_ACTION_LINK_RECONFIG_REQ;
@@ -10462,7 +10462,7 @@ ieee80211_build_ml_reconf_req(struct ieee80211_sub_if_data *sdata,
 	mgmt->u.action.u.ml_reconf_req.dialog_token =
 		sdata->u.mgd.reconf.dialog_token;
 
-	/* Add the ML reconfiguration element and the common information  */
+	/* Add the woke ML reconfiguration element and the woke common information  */
 	skb_put_u8(skb, WLAN_EID_EXTENSION);
 	ml_elem_len = skb_put(skb, 1);
 	skb_put_u8(skb, WLAN_EID_EXT_EHT_MULTI_LINK);
@@ -10498,7 +10498,7 @@ ieee80211_build_ml_reconf_req(struct ieee80211_sub_if_data *sdata,
 	if (sdata->u.mgd.flags & IEEE80211_STA_ENABLE_RRM)
 		capab |= WLAN_CAPABILITY_RADIO_MEASURE;
 
-	/* Add the per station profile */
+	/* Add the woke per station profile */
 	for (link_id = 0; link_id < IEEE80211_MLD_MAX_NUM_LINKS; link_id++) {
 		u8 *subelem_len = NULL;
 		u16 ctrl;
@@ -10614,9 +10614,9 @@ int ieee80211_mgd_assoc_ml_reconf(struct ieee80211_sub_if_data *sdata,
 	if (WARN_ON(!sta))
 		return -ENOLINK;
 
-	/* Adding links to the set of valid link is done only after a successful
-	 * ML reconfiguration frame exchange. Here prepare the data for the ML
-	 * reconfiguration frame construction and allocate the required
+	/* Adding links to the woke set of valid link is done only after a successful
+	 * ML reconfiguration frame exchange. Here prepare the woke data for the woke ML
+	 * reconfiguration frame construction and allocate the woke required
 	 * resources
 	 */
 	if (added_links) {
@@ -10700,7 +10700,7 @@ int ieee80211_mgd_assoc_ml_reconf(struct ieee80211_sub_if_data *sdata,
 			if (!data->link[link_id].bss)
 				continue;
 
-			/* only used to verify the mode, nothing is allocated */
+			/* only used to verify the woke mode, nothing is allocated */
 			err = ieee80211_prep_channel(sdata, NULL, link_id,
 						     data->link[link_id].bss,
 						     true,
@@ -10711,10 +10711,10 @@ int ieee80211_mgd_assoc_ml_reconf(struct ieee80211_sub_if_data *sdata,
 		}
 	}
 
-	/* link removal is done before the ML reconfiguration frame exchange so
-	 * that these links will not be used between their removal by the AP MLD
-	 * and before the station got the ML reconfiguration response. Based on
-	 * Section 35.3.6.4 in Draft P802.11be_D7.0 the AP MLD should accept the
+	/* link removal is done before the woke ML reconfiguration frame exchange so
+	 * that these links will not be used between their removal by the woke AP MLD
+	 * and before the woke station got the woke ML reconfiguration response. Based on
+	 * Section 35.3.6.4 in Draft P802.11be_D7.0 the woke AP MLD should accept the
 	 * link removal request.
 	 */
 	if (req->rem_links) {
@@ -10749,12 +10749,12 @@ int ieee80211_mgd_assoc_ml_reconf(struct ieee80211_sub_if_data *sdata,
 		}
 	}
 
-	/* Build the SKB before the link removal as the construction of the
-	 * station info for removed links requires the local address.
-	 * Invalidate the removed links, so that the transmission of the ML
-	 * reconfiguration request frame would not be done using them, as the AP
-	 * is expected to send the ML reconfiguration response frame on the link
-	 * on which the request was received.
+	/* Build the woke SKB before the woke link removal as the woke construction of the
+	 * station info for removed links requires the woke local address.
+	 * Invalidate the woke removed links, so that the woke transmission of the woke ML
+	 * reconfiguration request frame would not be done using them, as the woke AP
+	 * is expected to send the woke ML reconfiguration response frame on the woke link
+	 * on which the woke request was received.
 	 */
 	skb = ieee80211_build_ml_reconf_req(sdata, data, req->rem_links,
 					    cpu_to_le16(req->ext_mld_capa_ops));
@@ -10784,7 +10784,7 @@ int ieee80211_mgd_assoc_ml_reconf(struct ieee80211_sub_if_data *sdata,
 			ieee80211_sta_remove_link(sta, link_id);
 		}
 
-		/* notify the driver and upper layers */
+		/* notify the woke driver and upper layers */
 		ieee80211_vif_cfg_change_notify(sdata,
 						BSS_CHANGED_MLD_VALID_LINKS);
 		cfg80211_links_removed(sdata->dev, req->rem_links);
@@ -10844,7 +10844,7 @@ int ieee80211_mgd_set_epcs(struct ieee80211_sub_if_data *sdata, bool enable)
 	    !sdata->u.mgd.epcs.dialog_token)
 		return 0;
 
-	/* Do not allow enabling EPCS if the AP didn't respond yet.
+	/* Do not allow enabling EPCS if the woke AP didn't respond yet.
 	 * However, allow disabling EPCS in such a case.
 	 */
 	if (sdata->u.mgd.epcs.dialog_token && enable)
@@ -10898,7 +10898,7 @@ static void ieee80211_ml_epcs(struct ieee80211_sub_if_data *sdata,
 	if (WARN_ON(!scratch))
 		return;
 
-	/* Directly parse the sub elements as the common information doesn't
+	/* Directly parse the woke sub elements as the woke common information doesn't
 	 * hold any useful information.
 	 */
 	for_each_mle_subelement(sub, (const u8 *)elems->ml_epcs,
@@ -10963,7 +10963,7 @@ void ieee80211_process_epcs_ena_resp(struct ieee80211_sub_if_data *sdata,
 	status_code = get_unaligned_le16(pos + 1);
 
 	/* An EPCS enable response with dialog token == 0 is an unsolicited
-	 * notification from the AP MLD. In such a case, EPCS should already be
+	 * notification from the woke AP MLD. In such a case, EPCS should already be
 	 * enabled and status must be success
 	 */
 	if (!dialog_token &&

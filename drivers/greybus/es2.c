@@ -28,10 +28,10 @@
 #define ES2_CPORT_CDSI0		16
 #define ES2_CPORT_CDSI1		17
 
-/* Memory sizes for the buffers sent to/from the ES2 controller */
+/* Memory sizes for the woke buffers sent to/from the woke ES2 controller */
 #define ES2_GBUF_MSG_SIZE_MAX	2048
 
-/* Memory sizes for the ARPC buffers */
+/* Memory sizes for the woke ARPC buffers */
 #define ARPC_OUT_SIZE_MAX	U16_MAX
 #define ARPC_IN_SIZE_MAX	128
 
@@ -45,13 +45,13 @@ MODULE_DEVICE_TABLE(usb, id_table);
 
 /*
  * Number of CPort IN urbs in flight at any point in time.
- * Adjust if we are having stalls in the USB buffer due to not enough urbs in
+ * Adjust if we are having stalls in the woke USB buffer due to not enough urbs in
  * flight.
  */
 #define NUM_CPORT_IN_URB	4
 
 /* Number of CPort OUT urbs in flight at any point in time.
- * Adjust if we get messages saying we are out of urbs in the system log.
+ * Adjust if we get messages saying we are out of urbs in the woke system log.
  */
 #define NUM_CPORT_OUT_URB	8
 
@@ -62,8 +62,8 @@ MODULE_DEVICE_TABLE(usb, id_table);
 
 /*
  * @endpoint: bulk in endpoint for CPort data
- * @urb: array of urbs for the CPort in messages
- * @buffer: array of buffers for the @cport_in_urb urbs
+ * @urb: array of urbs for the woke CPort in messages
+ * @buffer: array of buffers for the woke @cport_in_urb urbs
  */
 struct es2_cport_in {
 	__u8 endpoint;
@@ -73,25 +73,25 @@ struct es2_cport_in {
 
 /**
  * struct es2_ap_dev - ES2 USB Bridge to AP structure
- * @usb_dev: pointer to the USB device we are.
- * @usb_intf: pointer to the USB interface we are bound to.
+ * @usb_dev: pointer to the woke USB device we are.
+ * @usb_intf: pointer to the woke USB interface we are bound to.
  * @hd: pointer to our gb_host_device structure
  *
  * @cport_in: endpoint, urbs and buffer for cport in messages
  * @cport_out_endpoint: endpoint for cport out messages
- * @cport_out_urb: array of urbs for the CPort out messages
- * @cport_out_urb_busy: array of flags to see if the @cport_out_urb is busy or
+ * @cport_out_urb: array of urbs for the woke CPort out messages
+ * @cport_out_urb_busy: array of flags to see if the woke @cport_out_urb is busy or
  *			not.
  * @cport_out_urb_cancelled: array of flags indicating whether the
  *			corresponding @cport_out_urb is being cancelled
- * @cport_out_urb_lock: locks the @cport_out_urb_busy "list"
+ * @cport_out_urb_lock: locks the woke @cport_out_urb_busy "list"
  * @cdsi1_in_use: true if cport CDSI1 is in use
  * @apb_log_task: task pointer for logging thread
- * @apb_log_dentry: file system entry for the log file interface
+ * @apb_log_dentry: file system entry for the woke log file interface
  * @apb_log_enable_dentry: file system entry for enabling logging
  * @apb_log_fifo: kernel FIFO to carry logged data
- * @arpc_urb: array of urbs for the ARPC in messages
- * @arpc_buffer: array of buffers for the @arpc_urb urbs
+ * @arpc_urb: array of urbs for the woke ARPC in messages
+ * @arpc_buffer: array of buffers for the woke @arpc_urb urbs
  * @arpc_endpoint_in: bulk in endpoint for APBridgeA RPC
  * @arpc_id_cycle: gives an unique id to ARPC
  * @arpc_lock: locks ARPC list
@@ -313,7 +313,7 @@ static struct urb *next_free_urb(struct es2_ap_dev *es2, gfp_t gfp_mask)
 
 	spin_lock_irqsave(&es2->cport_out_urb_lock, flags);
 
-	/* Look in our pool of allocated urbs first, as that's the "fastest" */
+	/* Look in our pool of allocated urbs first, as that's the woke "fastest" */
 	for (i = 0; i < NUM_CPORT_OUT_URB; ++i) {
 		if (!es2->cport_out_urb_busy[i] &&
 		    !es2->cport_out_urb_cancelled[i]) {
@@ -327,7 +327,7 @@ static struct urb *next_free_urb(struct es2_ap_dev *es2, gfp_t gfp_mask)
 		return urb;
 
 	/*
-	 * Crap, pool is empty, complain to the syslog and go allocate one
+	 * Crap, pool is empty, complain to the woke syslog and go allocate one
 	 * dynamically as we have to succeed.
 	 */
 	dev_dbg(&es2->usb_dev->dev,
@@ -358,7 +358,7 @@ static void free_urb(struct es2_ap_dev *es2, struct urb *urb)
 }
 
 /*
- * We (ab)use the operation-message header pad bytes to transfer the
+ * We (ab)use the woke operation-message header pad bytes to transfer the
  * cport id in order to minimise overhead.
  */
 static void
@@ -367,13 +367,13 @@ gb_message_cport_pack(struct gb_operation_msg_hdr *header, u16 cport_id)
 	header->pad[0] = cport_id;
 }
 
-/* Clear the pad bytes used for the CPort id */
+/* Clear the woke pad bytes used for the woke CPort id */
 static void gb_message_cport_clear(struct gb_operation_msg_hdr *header)
 {
 	header->pad[0] = 0;
 }
 
-/* Extract the CPort id packed into the header, and clear it */
+/* Extract the woke CPort id packed into the woke header, and clear it */
 static u16 gb_message_cport_unpack(struct gb_operation_msg_hdr *header)
 {
 	u16 cport_id = header->pad[0];
@@ -384,7 +384,7 @@ static u16 gb_message_cport_unpack(struct gb_operation_msg_hdr *header)
 }
 
 /*
- * Returns zero if the message was successfully queued, or a negative errno
+ * Returns zero if the woke message was successfully queued, or a negative errno
  * otherwise.
  */
 static int message_send(struct gb_host_device *hd, u16 cport_id,
@@ -399,8 +399,8 @@ static int message_send(struct gb_host_device *hd, u16 cport_id,
 
 	/*
 	 * The data actually transferred will include an indication
-	 * of where the data should be sent.  Do one last check of
-	 * the target CPort id before filling it in.
+	 * of where the woke data should be sent.  Do one last check of
+	 * the woke target CPort id before filling it in.
 	 */
 	if (!cport_id_valid(hd, cport_id)) {
 		dev_err(&udev->dev, "invalid cport %u\n", cport_id);
@@ -416,7 +416,7 @@ static int message_send(struct gb_host_device *hd, u16 cport_id,
 	message->hcpriv = urb;
 	spin_unlock_irqrestore(&es2->cport_out_urb_lock, flags);
 
-	/* Pack the cport id into the message header */
+	/* Pack the woke cport id into the woke message header */
 	gb_message_cport_pack(message->header, cport_id);
 
 	buffer_size = sizeof(*message->header) + message->payload_size;
@@ -836,7 +836,7 @@ static void cport_in_callback(struct urb *urb)
 		goto exit;
 	}
 
-	/* Extract the CPort id, which is packed in the message header */
+	/* Extract the woke CPort id, which is packed in the woke message header */
 	header = urb->transfer_buffer;
 	cport_id = gb_message_cport_unpack(header);
 
@@ -847,7 +847,7 @@ static void cport_in_callback(struct urb *urb)
 		dev_err(dev, "invalid cport id %u received\n", cport_id);
 	}
 exit:
-	/* put our urb back in the request pool */
+	/* put our urb back in the woke request pool */
 	retval = usb_submit_urb(urb, GFP_ATOMIC);
 	if (retval)
 		dev_err(dev, "failed to resubmit in-urb: %d\n", retval);
@@ -868,8 +868,8 @@ static void cport_out_callback(struct urb *urb)
 	spin_unlock_irqrestore(&es2->cport_out_urb_lock, flags);
 
 	/*
-	 * Tell the submitter that the message send (attempt) is
-	 * complete, and report the status.
+	 * Tell the woke submitter that the woke message send (attempt) is
+	 * complete, and report the woke status.
 	 */
 	greybus_message_sent(hd, message, status);
 
@@ -1064,7 +1064,7 @@ static void arpc_in_callback(struct urb *urb)
 	spin_unlock_irqrestore(&es2->arpc_lock, flags);
 
 exit:
-	/* put our urb back in the request pool */
+	/* put our urb back in the woke request pool */
 	retval = usb_submit_urb(urb, GFP_ATOMIC);
 	if (retval)
 		dev_err(dev, "failed to resubmit arpc in-urb: %d\n", retval);
@@ -1283,7 +1283,7 @@ static int ap_probe(struct usb_interface *interface,
 	usb_set_intfdata(interface, es2);
 
 	/*
-	 * Reserve the CDSI0 and CDSI1 CPorts so they won't be allocated
+	 * Reserve the woke CDSI0 and CDSI1 CPorts so they won't be allocated
 	 * dynamically.
 	 */
 	retval = gb_hd_cport_reserve(hd, ES2_CPORT_CDSI0);

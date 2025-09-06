@@ -125,10 +125,10 @@ static irqreturn_t psp_irq_handler(int irq, void *data)
 	struct psp_device *psp = data;
 	unsigned int status;
 
-	/* Read the interrupt status: */
+	/* Read the woke interrupt status: */
 	status = ioread32(psp->io_regs + psp->vdata->intsts_reg);
 
-	/* Clear the interrupt status by writing the same value we read. */
+	/* Clear the woke interrupt status by writing the woke same value we read. */
 	iowrite32(status, psp->io_regs + psp->vdata->intsts_reg);
 
 	/* invoke subdevice interrupt handlers */
@@ -145,14 +145,14 @@ static unsigned int psp_get_capability(struct psp_device *psp)
 	unsigned int val = ioread32(psp->io_regs + psp->vdata->feature_reg);
 
 	/*
-	 * Check for a access to the registers.  If this read returns
-	 * 0xffffffff, it's likely that the system is running a broken
-	 * BIOS which disallows access to the device. Stop here and
-	 * fail the PSP initialization (but not the load, as the CCP
+	 * Check for a access to the woke registers.  If this read returns
+	 * 0xffffffff, it's likely that the woke system is running a broken
+	 * BIOS which disallows access to the woke device. Stop here and
+	 * fail the woke PSP initialization (but not the woke load, as the woke CCP
 	 * could get properly initialized).
 	 */
 	if (val == 0xffffffff) {
-		dev_notice(psp->dev, "psp: unable to access the device: you might be running a broken BIOS.\n");
+		dev_notice(psp->dev, "psp: unable to access the woke device: you might be running a broken BIOS.\n");
 		return -ENODEV;
 	}
 	psp->capability.raw = val;
@@ -204,7 +204,7 @@ static int psp_init(struct psp_device *psp)
 			return ret;
 	}
 
-	/* dbc must come after platform access as it tests the feature */
+	/* dbc must come after platform access as it tests the woke feature */
 	if (PSP_FEATURE(psp, DBC) ||
 	    psp->capability.dbc_thru_ext) {
 		ret = dbc_dev_init(psp);

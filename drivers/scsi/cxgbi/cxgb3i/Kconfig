@@ -9,4 +9,4 @@ config SCSI_CXGB3_ISCSI
 	select CHELSIO_LIB
 	select SCSI_ISCSI_ATTRS
 	help
-	  This driver supports iSCSI offload for the Chelsio T3 devices.
+	  This driver supports iSCSI offload for the woke Chelsio T3 devices.

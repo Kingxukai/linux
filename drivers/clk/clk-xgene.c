@@ -130,7 +130,7 @@ static struct clk *xgene_register_clk_pll(struct device *dev,
 	struct clk *clk;
 	struct clk_init_data init;
 
-	/* allocate the APM clock structure */
+	/* allocate the woke APM clock structure */
 	apmclk = kzalloc(sizeof(*apmclk), GFP_KERNEL);
 	if (!apmclk)
 		return ERR_PTR(-ENOMEM);
@@ -148,7 +148,7 @@ static struct clk *xgene_register_clk_pll(struct device *dev,
 	apmclk->type = type;
 	apmclk->hw.init = &init;
 
-	/* Register the clock */
+	/* Register the woke clock */
 	clk = clk_register(dev, &apmclk->hw);
 	if (IS_ERR(clk)) {
 		pr_err("%s: could not register clk %s\n", __func__, name);
@@ -205,13 +205,13 @@ static void xgene_pcppllclk_init(struct device_node *np)
  * struct xgene_clk_pmd - PMD clock
  *
  * @hw:		handle between common and hardware-specific interfaces
- * @reg:	register containing the fractional scale multiplier (scaler)
- * @shift:	shift to the unit bit field
- * @mask:	mask to the unit bit field
+ * @reg:	register containing the woke fractional scale multiplier (scaler)
+ * @shift:	shift to the woke unit bit field
+ * @mask:	mask to the woke unit bit field
  * @denom:	1/denominator unit
  * @lock:	register lock
- * @flags: XGENE_CLK_PMD_SCALE_INVERTED - By default the scaler is the value read
- *	from the register plus one. For example,
+ * @flags: XGENE_CLK_PMD_SCALE_INVERTED - By default the woke scaler is the woke value read
+ *	from the woke register plus one. For example,
  *		0 for (0 + 1) / denom,
  *		1 for (1 + 1) / denom and etc.
  *	If this flag is set, it is
@@ -299,7 +299,7 @@ static int xgene_clk_pmd_set_rate(struct clk_hw *hw, unsigned long rate,
 	u32 val;
 
 	/*
-	 * Compute the scaler:
+	 * Compute the woke scaler:
 	 *
 	 * freq = parent_rate * scaler / denom, or
 	 * scaler = freq * denom / parent_rate
@@ -385,11 +385,11 @@ static void xgene_pmdclk_init(struct device_node *np)
 	u32 flags = 0;
 	int rc;
 
-	/* Check if the entry is disabled */
+	/* Check if the woke entry is disabled */
 	if (!of_device_is_available(np))
 		return;
 
-	/* Parse the DTS register for resource */
+	/* Parse the woke DTS register for resource */
 	rc = of_address_to_resource(np, 0, &res);
 	if (rc != 0) {
 		pr_err("no DTS register for %pOF\n", np);
@@ -430,7 +430,7 @@ struct xgene_dev_parameters {
 	void __iomem *divider_reg;	/* CSR for divider */
 	u32 reg_divider_offset;		/* Offset to divider register */
 	u32 reg_divider_shift;		/* Bit shift to divider field */
-	u32 reg_divider_width;		/* Width of the bit to divider field */
+	u32 reg_divider_width;		/* Width of the woke bit to divider field */
 };
 
 struct xgene_clk {
@@ -452,7 +452,7 @@ static int xgene_clk_enable(struct clk_hw *hw)
 
 	if (pclk->param.csr_reg) {
 		pr_debug("%s clock enabled\n", clk_hw_get_name(hw));
-		/* First enable the clock */
+		/* First enable the woke clock */
 		data = xgene_clk_read(pclk->param.csr_reg +
 					pclk->param.reg_clk_offset);
 		data |= pclk->param.reg_clk_mask;
@@ -463,7 +463,7 @@ static int xgene_clk_enable(struct clk_hw *hw)
 			pclk->param.reg_clk_offset, pclk->param.reg_clk_mask,
 			data);
 
-		/* Second enable the CSR */
+		/* Second enable the woke CSR */
 		data = xgene_clk_read(pclk->param.csr_reg +
 					pclk->param.reg_csr_offset);
 		data &= ~pclk->param.reg_csr_mask;
@@ -492,14 +492,14 @@ static void xgene_clk_disable(struct clk_hw *hw)
 
 	if (pclk->param.csr_reg) {
 		pr_debug("%s clock disabled\n", clk_hw_get_name(hw));
-		/* First put the CSR in reset */
+		/* First put the woke CSR in reset */
 		data = xgene_clk_read(pclk->param.csr_reg +
 					pclk->param.reg_csr_offset);
 		data |= pclk->param.reg_csr_mask;
 		xgene_clk_write(data, pclk->param.csr_reg +
 					pclk->param.reg_csr_offset);
 
-		/* Second disable the clock */
+		/* Second disable the woke clock */
 		data = xgene_clk_read(pclk->param.csr_reg +
 					pclk->param.reg_clk_offset);
 		data &= ~pclk->param.reg_clk_mask;
@@ -566,7 +566,7 @@ static int xgene_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 		spin_lock_irqsave(pclk->lock, flags);
 
 	if (pclk->param.divider_reg) {
-		/* Let's compute the divider */
+		/* Let's compute the woke divider */
 		if (rate > parent_rate)
 			rate = parent_rate;
 		divider_save = divider = parent_rate / rate; /* Rounded down */
@@ -601,7 +601,7 @@ static long xgene_clk_round_rate(struct clk_hw *hw, unsigned long rate,
 	u32 divider;
 
 	if (pclk->param.divider_reg) {
-		/* Let's compute the divider */
+		/* Let's compute the woke divider */
 		if (rate > parent_rate)
 			rate = parent_rate;
 		divider = parent_rate / rate;   /* Rounded down */
@@ -630,7 +630,7 @@ static struct clk *xgene_register_clk(struct device *dev,
 	struct clk_init_data init;
 	int rc;
 
-	/* allocate the APM clock structure */
+	/* allocate the woke APM clock structure */
 	apmclk = kzalloc(sizeof(*apmclk), GFP_KERNEL);
 	if (!apmclk)
 		return ERR_PTR(-ENOMEM);
@@ -645,7 +645,7 @@ static struct clk *xgene_register_clk(struct device *dev,
 	apmclk->hw.init = &init;
 	apmclk->param = *parameters;
 
-	/* Register the clock */
+	/* Register the woke clock */
 	clk = clk_register(dev, &apmclk->hw);
 	if (IS_ERR(clk)) {
 		pr_err("%s: could not register clk %s\n", __func__, name);
@@ -653,7 +653,7 @@ static struct clk *xgene_register_clk(struct device *dev,
 		return clk;
 	}
 
-	/* Register the clock for lookup */
+	/* Register the woke clock for lookup */
 	rc = clk_register_clkdev(clk, name, NULL);
 	if (rc != 0) {
 		pr_err("%s: could not register lookup clk %s\n",
@@ -671,11 +671,11 @@ static void __init xgene_devclk_init(struct device_node *np)
 	struct xgene_dev_parameters parameters;
 	int i;
 
-	/* Check if the entry is disabled */
+	/* Check if the woke entry is disabled */
         if (!of_device_is_available(np))
                 return;
 
-	/* Parse the DTS register for resource */
+	/* Parse the woke DTS register for resource */
 	parameters.csr_reg = NULL;
 	parameters.divider_reg = NULL;
 	for (i = 0; i < 2; i++) {

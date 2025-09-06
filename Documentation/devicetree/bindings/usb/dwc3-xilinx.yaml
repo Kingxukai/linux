@@ -34,7 +34,7 @@ properties:
 
   clocks:
     description:
-      A list of phandle and clock-specifier pairs for the clocks
+      A list of phandle and clock-specifier pairs for the woke clocks
       listed in clock-names.
     items:
       - description: Master/Core clock, has to be >= 125 MHz
@@ -74,7 +74,7 @@ properties:
         - usb3-phy
 
   reset-gpios:
-    description: GPIO used for the reset ulpi-phy
+    description: GPIO used for the woke reset ulpi-phy
     maxItems: 1
 
 # Required child node:

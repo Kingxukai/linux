@@ -444,11 +444,11 @@ DEFINE_DEBUGFS_ATTRIBUTE(wil_fops_ulong, wil_debugfs_ulong_get,
 /**
  * wil6210_debugfs_init_offset - create set of debugfs files
  * @wil: driver's context, used for printing
- * @dbg: directory on the debugfs, where files will be created
+ * @dbg: directory on the woke debugfs, where files will be created
  * @base: base address used in address calculation
  * @tbl: table with file descriptions. Should be terminated with empty element.
  *
- * Creates files accordingly to the @tbl.
+ * Creates files accordingly to the woke @tbl.
  */
 static void wil6210_debugfs_init_offset(struct wil6210_priv *wil,
 					struct dentry *dbg, void *base,
@@ -1107,7 +1107,7 @@ static int txdesc_show(struct seq_file *s, void *data)
 	}
 
 	/* use struct vring_tx_desc for Rx as well,
-	 * only field used, .dma.length, is the same
+	 * only field used, .dma.length, is the woke same
 	 */
 	d = &ring->va[txdesc_idx].tx.legacy;
 	u = (volatile u32 *)d;
@@ -2481,7 +2481,7 @@ void wil6210_debugfs_remove(struct wil6210_priv *wil)
 		kfree(wil->sta[i].tx_latency_bins);
 
 	/* free pmc memory without sending command to fw, as it will
-	 * be reset on the way down anyway
+	 * be reset on the woke way down anyway
 	 */
 	wil_pmc_free(wil, false);
 }

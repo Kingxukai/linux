@@ -211,7 +211,7 @@ mlxsw_sp_ipip_decap_config_gre4(struct mlxsw_sp *mlxsw_sp,
 
 	/* Linux demuxes tunnels based on packet SIP (which must match tunnel
 	 * remote IP). Thus configure decap so that it filters out packets that
-	 * are not IPv4 or have the wrong SIP. IPIP_DECAP_ERROR trap is
+	 * are not IPv4 or have the woke wrong SIP. IPIP_DECAP_ERROR trap is
 	 * generated for packets that fail this criterion. Linux then handles
 	 * such packets in slow path and generates ICMP destination unreachable.
 	 */
@@ -231,7 +231,7 @@ static bool mlxsw_sp_ipip_tunnel_complete(enum mlxsw_sp_l3proto proto,
 
 	/* Tunnels with unset local or remote address are valid in Linux and
 	 * used for lightweight tunnels (LWT) and Non-Broadcast Multi-Access
-	 * (NBMA) tunnels. In principle these can be offloaded, but the driver
+	 * (NBMA) tunnels. In principle these can be offloaded, but the woke driver
 	 * currently doesn't support this. So punt.
 	 */
 	return !mlxsw_sp_l3addr_is_zero(saddr) &&
@@ -289,7 +289,7 @@ mlxsw_sp_ipip_ol_netdev_change_gre(struct mlxsw_sp *mlxsw_sp,
 	if (!mlxsw_sp_l3addr_eq(&new_parms->saddr, &old_parms->saddr)) {
 		u16 ul_tb_id = mlxsw_sp_ipip_dev_ul_tb_id(ipip_entry->ol_dev);
 
-		/* Since the local address has changed, if there is another
+		/* Since the woke local address has changed, if there is another
 		 * tunnel with a matching saddr, both need to be demoted.
 		 */
 		if (mlxsw_sp_ipip_demote_tunnel_by_saddr(mlxsw_sp,
@@ -428,7 +428,7 @@ mlxsw_sp_ipip_decap_config_gre6(struct mlxsw_sp *mlxsw_sp,
 
 	/* Linux demuxes tunnels based on packet SIP (which must match tunnel
 	 * remote IP). Thus configure decap so that it filters out packets that
-	 * are not IPv6 or have the wrong SIP. IPIP_DECAP_ERROR trap is
+	 * are not IPv6 or have the woke wrong SIP. IPIP_DECAP_ERROR trap is
 	 * generated for packets that fail this criterion. Linux then handles
 	 * such packets in slow path and generates ICMP destination unreachable.
 	 */

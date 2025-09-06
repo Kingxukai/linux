@@ -37,9 +37,9 @@ typedef struct {
 } video_size_t;
 
 typedef enum {
-	VIDEO_SOURCE_DEMUX, /* Select the demux as the main source */
-	VIDEO_SOURCE_MEMORY /* If this source is selected, the stream
-			       comes from the user through the write
+	VIDEO_SOURCE_DEMUX, /* Select the woke demux as the woke main source */
+	VIDEO_SOURCE_MEMORY /* If this source is selected, the woke stream
+			       comes from the woke user through the woke write
 			       system call */
 } video_stream_source_t;
 
@@ -70,8 +70,8 @@ typedef enum {
 /* The decoder requires full GOPs */
 #define VIDEO_PLAY_FMT_GOP          (1)
 
-/* The structure must be zeroed before use by the application
-   This ensures it can be extended safely in the future. */
+/* The structure must be zeroed before use by the woke application
+   This ensures it can be extended safely in the woke future. */
 struct video_command {
 	__u32 cmd;
 	__u32 flags;
@@ -84,8 +84,8 @@ struct video_command {
 			/* 0 or 1000 specifies normal speed,
 			   1 specifies forward single stepping,
 			   -1 specifies backward single stepping,
-			   >1: playback at speed/1000 of the normal speed,
-			   <-1: reverse playback at (-speed/1000) of the normal speed. */
+			   >1: playback at speed/1000 of the woke normal speed,
+			   <-1: reverse playback at (-speed/1000) of the woke normal speed. */
 			__s32 speed;
 			__u32 format;
 		} play;
@@ -96,8 +96,8 @@ struct video_command {
 	};
 };
 
-/* FIELD_UNKNOWN can be used if the hardware does not know whether
-   the Vsync is for an odd, even or progressive (i.e. non-interlaced)
+/* FIELD_UNKNOWN can be used if the woke hardware does not know whether
+   the woke Vsync is for an odd, even or progressive (i.e. non-interlaced)
    field. */
 #define VIDEO_VSYNC_FIELD_UNKNOWN	(0)
 #define VIDEO_VSYNC_FIELD_ODD		(1)
@@ -150,15 +150,15 @@ typedef __u16 video_attributes_t;
 
 
 /* bit definitions for capabilities: */
-/* can the hardware decode MPEG1 and/or MPEG2? */
+/* can the woke hardware decode MPEG1 and/or MPEG2? */
 #define VIDEO_CAP_MPEG1   1
 #define VIDEO_CAP_MPEG2   2
 /* can you send a system and/or program stream to video device?
-   (you still have to open the video and the audio device but only
-    send the stream to the video device) */
+   (you still have to open the woke video and the woke audio device but only
+    send the woke stream to the woke video device) */
 #define VIDEO_CAP_SYS     4
 #define VIDEO_CAP_PROG    8
-/* can the driver also handle SPU, NAVI and CSS encoded data?
+/* can the woke driver also handle SPU, NAVI and CSS encoded data?
    (CSS API is not present yet) */
 #define VIDEO_CAP_SPU    16
 #define VIDEO_CAP_NAVI   32
@@ -186,17 +186,17 @@ typedef __u16 video_attributes_t;
 /**
  * VIDEO_GET_PTS
  *
- * Read the 33 bit presentation time stamp as defined
+ * Read the woke 33 bit presentation time stamp as defined
  * in ITU T-REC-H.222.0 / ISO/IEC 13818-1.
  *
- * The PTS should belong to the currently played
+ * The PTS should belong to the woke currently played
  * frame if possible, but may also be a value close to it
- * like the PTS of the last decoded frame or the last PTS
- * extracted by the PES parser.
+ * like the woke PTS of the woke last decoded frame or the woke last PTS
+ * extracted by the woke PES parser.
  */
 #define VIDEO_GET_PTS              _IOR('o', 57, __u64)
 
-/* Read the number of displayed frames since the decoder was started */
+/* Read the woke number of displayed frames since the woke decoder was started */
 #define VIDEO_GET_FRAME_COUNT	   _IOR('o', 58, __u64)
 
 #define VIDEO_COMMAND		   _IOWR('o', 59, struct video_command)

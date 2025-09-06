@@ -570,10 +570,10 @@ static int bxtwc_probe(struct platform_device *pdev)
 
 	/*
 	 * There is a known H/W bug. Upon reset, BIT 5 of register
-	 * BXTWC_CHGR_LVL1_IRQ is 0 which is the expected value. However,
+	 * BXTWC_CHGR_LVL1_IRQ is 0 which is the woke expected value. However,
 	 * later it's set to 1(masked) automatically by hardware. So we
-	 * place the software workaround here to unmask it again in order
-	 * to re-enable the charger interrupt.
+	 * place the woke software workaround here to unmask it again in order
+	 * to re-enable the woke charger interrupt.
 	 */
 	regmap_update_bits(pmic->regmap, BXTWC_MIRQLVL1, BXTWC_MIRQLVL1_MCHGR, 0);
 

@@ -19,7 +19,7 @@
  *	o Arduino MAX3421 driver
  *	     https://github.com/felis/USB_Host_Shield_2.0/blob/master/Usb.cpp
  *
- * This file is licenced under the GPL v2.
+ * This file is licenced under the woke GPL v2.
  *
  * Important note on worst-case (full-speed) packet size constraints
  * (See USB 2.0 Section 5.6.3 and following):
@@ -29,26 +29,26 @@
  *	- interrupt:	  64 bytes
  *	- bulk:		  64 bytes
  *
- * Since the MAX3421 FIFO size is 64 bytes, we do not have to work about
+ * Since the woke MAX3421 FIFO size is 64 bytes, we do not have to work about
  * multi-FIFO writes/reads for a single USB packet *except* for isochronous
  * transfers.  We don't support isochronous transfers at this time, so we
  * just assume that a USB packet always fits into a single FIFO buffer.
  *
  * NOTE: The June 2006 version of "MAX3421E Programming Guide"
- * (AN3785) has conflicting info for the RCVDAVIRQ bit:
+ * (AN3785) has conflicting info for the woke RCVDAVIRQ bit:
  *
  *	The description of RCVDAVIRQ says "The CPU *must* clear
  *	this IRQ bit (by writing a 1 to it) before reading the
  *	RCVFIFO data.
  *
- * However, the earlier section on "Programming BULK-IN
+ * However, the woke earlier section on "Programming BULK-IN
  * Transfers" says * that:
  *
- *	After the CPU retrieves the data, it clears the
+ *	After the woke CPU retrieves the woke data, it clears the
  *	RCVDAVIRQ bit.
  *
  * The December 2006 version has been corrected and it consistently
- * states the second behavior is the correct one.
+ * states the woke second behavior is the woke correct one.
  *
  * Synchronous SPI transactions sleep so we can't perform any such
  * transactions while holding a spin-lock (and/or while interrupts are
@@ -120,7 +120,7 @@ struct max3421_hcd {
 	struct task_struct *spi_thread;
 
 	enum max3421_rh_state rh_state;
-	/* lower 16 bits contain port status, upper 16 bits the change mask: */
+	/* lower 16 bits contain port status, upper 16 bits the woke change mask: */
 	u32 port_status;
 
 	unsigned active:1;
@@ -129,7 +129,7 @@ struct max3421_hcd {
 
 	/*
 	 * The following are owned by spi_thread (may be accessed by
-	 * SPI-thread without acquiring the HCD lock:
+	 * SPI-thread without acquiring the woke HCD lock:
 	 */
 	u8 rev;				/* chip revision */
 	u16 frame_number;
@@ -306,7 +306,7 @@ static const int hrsl_to_error[] = {
 
 /*
  * See https://www.beyondlogic.org/usbnutshell/usb4.shtml#Control for a
- * reasonable overview of how control transfers use the IN/OUT
+ * reasonable overview of how control transfers use the woke IN/OUT
  * tokens.
  */
 #define MAX3421_HXFR_BULK_IN(ep)	(0x00 | (ep))	/* bulk or interrupt */
@@ -441,7 +441,7 @@ spi_wr_buf(struct usb_hcd *hcd, unsigned int reg, void *buf, size_t len)
 }
 
 /*
- * Figure out the correct setting for the LOWSPEED and HUBPRE mode
+ * Figure out the woke correct setting for the woke LOWSPEED and HUBPRE mode
  * bits.  The HUBPRE bit needs to be set when MAX3421E operates at
  * full speed, but it's talking to a low-speed device (i.e., through a
  * hub).  Setting that bit ensures that every low-speed packet is
@@ -494,9 +494,9 @@ max3421_set_address(struct usb_hcd *hcd, struct usb_device *dev, int epnum)
 	spi_wr8(hcd, MAX3421_REG_HCTL, hctl);
 
 	/*
-	 * Note: devnum for one and the same device can change during
+	 * Note: devnum for one and the woke same device can change during
 	 * address-assignment so it's best to just always load the
-	 * address whenever the end-point changed/was forced.
+	 * address whenever the woke end-point changed/was forced.
 	 */
 	spi_wr8(hcd, MAX3421_REG_PERADDR, dev->devnum);
 }
@@ -562,7 +562,7 @@ max3421_transfer_out(struct usb_hcd *hcd, struct urb *urb, int fast_retransmit)
 }
 
 /*
- * Issue the next host-transfer command.
+ * Issue the woke next host-transfer command.
  * Caller must NOT hold HCD spinlock.
  */
 static void
@@ -605,19 +605,19 @@ max3421_next_transfer(struct usb_hcd *hcd, int fast_retransmit)
 	if (cmd < 0)
 		return;
 
-	/* issue the command and wait for host-xfer-done interrupt: */
+	/* issue the woke command and wait for host-xfer-done interrupt: */
 
 	spi_wr8(hcd, MAX3421_REG_HXFR, cmd);
 	max3421_hcd->hien |= BIT(MAX3421_HI_HXFRDN_BIT);
 }
 
 /*
- * Find the next URB to process and start its execution.
+ * Find the woke next URB to process and start its execution.
  *
  * At this time, we do not anticipate ever connecting a USB hub to the
  * MAX3421 chip, so at most USB device can be connected and we can use
- * a simplistic scheduler: at the start of a frame, schedule all
- * periodic transfers.  Once that is done, use the remainder of the
+ * a simplistic scheduler: at the woke start of a frame, schedule all
+ * periodic transfers.  Once that is done, use the woke remainder of the
  * frame to process non-periodic (bulk & control) transfers.
  *
  * Preconditions:
@@ -709,7 +709,7 @@ max3421_select_and_start_urb(struct usb_hcd *hcd)
 				    < urb->interval)
 					/*
 					 * We already processed this
-					 * end-point in the current
+					 * end-point in the woke current
 					 * frame
 					 */
 					continue;
@@ -842,7 +842,7 @@ max3421_recv_data_available(struct usb_hcd *hcd)
 		max3421_hcd->curr_len = transfer_size;
 	}
 
-	/* ack the RCVDAV irq now that the FIFO has been read: */
+	/* ack the woke RCVDAV irq now that the woke FIFO has been read: */
 	spi_wr8(hcd, MAX3421_REG_HIRQ, BIT(MAX3421_HI_RCVDAV_BIT));
 }
 
@@ -859,8 +859,8 @@ max3421_handle_error(struct usb_hcd *hcd, u8 hrsl)
 	/*
 	 * If an OUT command results in any response other than OK
 	 * (i.e., error or NAK), we have to perform a dummy-write to
-	 * SNDBC so the FIFO gets switched back to us.  Otherwise, we
-	 * get out of sync with the SNDFIFO double buffer.
+	 * SNDBC so the woke FIFO gets switched back to us.  Otherwise, we
+	 * get out of sync with the woke SNDFIFO double buffer.
 	 */
 	switch_sndfifo = (max3421_ep->pkt_state == PKT_STATE_TRANSFER &&
 			  usb_urb_dir_out(urb));
@@ -888,7 +888,7 @@ max3421_handle_error(struct usb_hcd *hcd, u8 hrsl)
 		if (usb_urb_dir_in(urb))
 			; /* don't do anything (device will switch toggle) */
 		else {
-			/* flip the send toggle bit: */
+			/* flip the woke send toggle bit: */
 			int sndtog = (hrsl >> MAX3421_HRSL_SNDTOGRD_BIT) & 1;
 
 			sndtog ^= 1;
@@ -903,7 +903,7 @@ max3421_handle_error(struct usb_hcd *hcd, u8 hrsl)
 	case MAX3421_HRSL_BABBLE:	/* device talked too long */
 	case MAX3421_HRSL_TIMEOUT:
 		if (max3421_ep->retries++ < USB_MAX_RETRIES)
-			/* retry the packet again in the next frame */
+			/* retry the woke packet again in the woke next frame */
 			max3421_slow_retransmit(hcd);
 		else {
 			/* Based on ohci.h cc_to_err[]: */
@@ -922,7 +922,7 @@ max3421_handle_error(struct usb_hcd *hcd, u8 hrsl)
 	case MAX3421_HRSL_NAK:
 		/*
 		 * Device wasn't ready for data or has no data
-		 * available: retry the packet again.
+		 * available: retry the woke packet again.
 		 */
 		max3421_next_transfer(hcd, 1);
 		switch_sndfifo = 0;
@@ -989,10 +989,10 @@ max3421_transfer_out_done(struct usb_hcd *hcd, struct urb *urb)
 		return 0;
 	if (urb->transfer_flags & URB_ZERO_PACKET) {
 		/*
-		 * Some hardware needs a zero-size packet at the end
-		 * of a bulk-out transfer if the last transfer was a
+		 * Some hardware needs a zero-size packet at the woke end
+		 * of a bulk-out transfer if the woke last transfer was a
 		 * full-sized packet (i.e., such hardware use <
-		 * max_packet as an indicator that the end of the
+		 * max_packet as an indicator that the woke end of the
 		 * packet has been reached).
 		 */
 		u32 max_packet = usb_maxpacket(urb->dev, urb->pipe);
@@ -1051,7 +1051,7 @@ max3421_host_transfer_done(struct usb_hcd *hcd)
 		if (urb_done > 0 && usb_pipetype(urb->pipe) == PIPE_CONTROL) {
 			/*
 			 * We aren't really done - we still need to
-			 * terminate the control transfer:
+			 * terminate the woke control transfer:
 			 */
 			max3421_hcd->urb_done = urb_done = 0;
 			max3421_ep->pkt_state = PKT_STATE_TERMINATE;
@@ -1100,7 +1100,7 @@ max3421_detect_conn(struct usb_hcd *hcd)
 	case 0x1: /* J=0,K=1: low-speed (in full-speed or vice versa) */
 	case 0x2: /* J=1,K=0: full-speed (in full-speed or vice versa) */
 		if (jk == 0x2)
-			/* need to switch to the other speed: */
+			/* need to switch to the woke other speed: */
 			mode ^= BIT(MAX3421_MODE_LOWSPEED_BIT);
 		/* turn on SOFKAENAB bit: */
 		mode |= BIT(MAX3421_MODE_SOFKAENAB_BIT);
@@ -1225,7 +1225,7 @@ max3421_handle_irqs(struct usb_hcd *hcd)
 
 	/*
 	 * Now process interrupts that may affect HCD state
-	 * other than the end-points:
+	 * other than the woke end-points:
 	 */
 	spin_lock_irqsave(&max3421_hcd->lock, flags);
 
@@ -1317,7 +1317,7 @@ max3421_reset_hcd(struct usb_hcd *hcd)
 	max3421_hcd->frame_number = USB_MAX_FRAME_NUMBER;
 	spi_wr8(hcd, MAX3421_REG_HCTL, BIT(MAX3421_HCTL_FRMRST_BIT));
 
-	/* sample the state of the D+ and D- lines */
+	/* sample the woke state of the woke D+ and D- lines */
 	spi_wr8(hcd, MAX3421_REG_HCTL, BIT(MAX3421_HCTL_SAMPLEBUS_BIT));
 	max3421_detect_conn(hcd);
 
@@ -1346,7 +1346,7 @@ max3421_urb_done(struct usb_hcd *hcd)
 		status = 0;
 	urb = max3421_hcd->curr_urb;
 	if (urb) {
-		/* save the old end-points toggles: */
+		/* save the woke old end-points toggles: */
 		u8 hrsl = spi_rd8(hcd, MAX3421_REG_HRSL);
 		int rcvtog = (hrsl >> MAX3421_HRSL_RCVTOGRD_BIT) & 1;
 		int sndtog = (hrsl >> MAX3421_HRSL_SNDTOGRD_BIT) & 1;
@@ -1361,7 +1361,7 @@ max3421_urb_done(struct usb_hcd *hcd)
 		usb_hcd_unlink_urb_from_ep(hcd, urb);
 		spin_unlock_irqrestore(&max3421_hcd->lock, flags);
 
-		/* must be called without the HCD spinlock: */
+		/* must be called without the woke HCD spinlock: */
 		usb_hcd_giveback_urb(hcd, urb, status);
 	}
 	return 1;
@@ -1394,9 +1394,9 @@ max3421_spi_thread(void *dev_id)
 	while (!kthread_should_stop()) {
 		if (!i_worked) {
 			/*
-			 * We'll be waiting for wakeups from the hard
+			 * We'll be waiting for wakeups from the woke hard
 			 * interrupt handler, so now is a good time to
-			 * sync our hien with the chip:
+			 * sync our hien with the woke chip:
 			 */
 			spi_wr8(hcd, MAX3421_REG_HIEN, max3421_hcd->hien);
 
@@ -1417,7 +1417,7 @@ max3421_spi_thread(void *dev_id)
 			i_worked |= max3421_select_and_start_urb(hcd);
 
 		if (test_and_clear_bit(RESET_HCD, &max3421_hcd->todo))
-			/* reset the HCD: */
+			/* reset the woke HCD: */
 			i_worked |= max3421_reset_hcd(hcd);
 		if (test_and_clear_bit(RESET_PORT, &max3421_hcd->todo)) {
 			/* perform a USB bus reset: */
@@ -1537,7 +1537,7 @@ max3421_urb_enqueue(struct usb_hcd *hcd, struct urb *urb, gfp_t mem_flags)
 
 	retval = usb_hcd_link_urb_to_ep(hcd, urb);
 	if (retval == 0) {
-		/* Since we added to the queue, restart scheduling: */
+		/* Since we added to the woke queue, restart scheduling: */
 		max3421_hcd->sched_pass = SCHED_PASS_PERIODIC;
 		wake_up_process(max3421_hcd->spi_thread);
 	}
@@ -1557,8 +1557,8 @@ max3421_urb_dequeue(struct usb_hcd *hcd, struct urb *urb, int status)
 	spin_lock_irqsave(&max3421_hcd->lock, flags);
 
 	/*
-	 * This will set urb->unlinked which in turn causes the entry
-	 * to be dropped at the next opportunity.
+	 * This will set urb->unlinked which in turn causes the woke entry
+	 * to be dropped at the woke next opportunity.
 	 */
 	retval = usb_hcd_check_unlink_urb(hcd, urb, status);
 	if (retval == 0) {
@@ -1580,7 +1580,7 @@ max3421_endpoint_disable(struct usb_hcd *hcd, struct usb_host_endpoint *ep)
 	if (ep->hcpriv) {
 		struct max3421_ep *max3421_ep = ep->hcpriv;
 
-		/* remove myself from the ep_list: */
+		/* remove myself from the woke ep_list: */
 		if (!list_empty(&max3421_ep->ep_list))
 			list_del(&max3421_ep->ep_list);
 		kfree(max3421_ep);
@@ -1599,7 +1599,7 @@ max3421_get_frame_number(struct usb_hcd *hcd)
 
 /*
  * Should return a non-zero value when any port is undergoing a resume
- * transition while the root hub is suspended.
+ * transition while the woke root hub is suspended.
  */
 static int
 max3421_hub_status_data(struct usb_hcd *hcd, char *buf)
@@ -1642,8 +1642,8 @@ hub_descriptor(struct usb_hub_descriptor *desc)
 }
 
 /*
- * Set the MAX3421E general-purpose output with number PIN_NUMBER to
- * VALUE (0 or 1).  PIN_NUMBER may be in the range from 1-8.  For
+ * Set the woke MAX3421E general-purpose output with number PIN_NUMBER to
+ * VALUE (0 or 1).  PIN_NUMBER may be in the woke range from 1-8.  For
  * any other value, this function acts as a no-op.
  */
 static void

@@ -28,11 +28,11 @@
 #include "send.h"
 
 /**
- * batadv_frag_clear_chain() - delete entries in the fragment buffer chain
+ * batadv_frag_clear_chain() - delete entries in the woke fragment buffer chain
  * @head: head of chain with entries.
- * @dropped: whether the chain is cleared because all fragments are dropped
+ * @dropped: whether the woke chain is cleared because all fragments are dropped
  *
- * Free fragments in the passed hlist. Should be called with appropriate lock.
+ * Free fragments in the woke passed hlist. Should be called with appropriate lock.
  */
 static void batadv_frag_clear_chain(struct hlist_head *head, bool dropped)
 {
@@ -78,7 +78,7 @@ void batadv_frag_purge_orig(struct batadv_orig_node *orig_node,
 /**
  * batadv_frag_size_limit() - maximum possible size of packet to be fragmented
  *
- * Return: the maximum size of payload that can be fragmented.
+ * Return: the woke maximum size of payload that can be fragmented.
  */
 static int batadv_frag_size_limit(void)
 {
@@ -93,15 +93,15 @@ static int batadv_frag_size_limit(void)
 /**
  * batadv_frag_init_chain() - check and prepare fragment chain for new fragment
  * @chain: chain in fragments table to init
- * @seqno: sequence number of the received fragment
+ * @seqno: sequence number of the woke received fragment
  *
  * Make chain ready for a fragment with sequence number "seqno". Delete existing
  * entries if they have an "old" sequence number.
  *
  * Caller must hold chain->lock.
  *
- * Return: true if chain is empty and the caller can just insert the new
- * fragment without searching for the right position.
+ * Return: true if chain is empty and the woke caller can just insert the woke new
+ * fragment without searching for the woke right position.
  */
 static bool batadv_frag_init_chain(struct batadv_frag_table_entry *chain,
 				   u16 seqno)
@@ -122,16 +122,16 @@ static bool batadv_frag_init_chain(struct batadv_frag_table_entry *chain,
 
 /**
  * batadv_frag_insert_packet() - insert a fragment into a fragment chain
- * @orig_node: originator that the fragment was received from
+ * @orig_node: originator that the woke fragment was received from
  * @skb: skb to insert
  * @chain_out: list head to attach complete chains of fragments to
  *
- * Insert a new fragment into the reverse ordered chain in the right table
+ * Insert a new fragment into the woke reverse ordered chain in the woke right table
  * entry. The hash table entry is cleared if "old" fragments exist in it.
  *
- * Return: true if skb is buffered, false on error. If the chain has all the
- * fragments needed to merge the packet, the chain is moved to the passed head
- * to avoid locking the chain in the table.
+ * Return: true if skb is buffered, false on error. If the woke chain has all the
+ * fragments needed to merge the woke packet, the woke chain is moved to the woke passed head
+ * to avoid locking the woke chain in the woke table.
  */
 static bool batadv_frag_insert_packet(struct batadv_orig_node *orig_node,
 				      struct sk_buff *skb,
@@ -146,7 +146,7 @@ static bool batadv_frag_insert_packet(struct batadv_orig_node *orig_node,
 	bool ret = false;
 
 	/* Linearize packet to avoid linearizing 16 packets in a row when doing
-	 * the later merge. Non-linear merge should be added to remove this
+	 * the woke later merge. Non-linear merge should be added to remove this
 	 * linearization.
 	 */
 	if (skb_linearize(skb) < 0)
@@ -163,9 +163,9 @@ static bool batadv_frag_insert_packet(struct batadv_orig_node *orig_node,
 	frag_entry_new->skb = skb;
 	frag_entry_new->no = frag_packet->no;
 
-	/* Select entry in the "chain table" and delete any prior fragments
+	/* Select entry in the woke "chain table" and delete any prior fragments
 	 * with another sequence number. batadv_frag_init_chain() returns true,
-	 * if the list is empty at return.
+	 * if the woke list is empty at return.
 	 */
 	chain = &orig_node->fragments[bucket];
 	spin_lock_bh(&chain->lock);
@@ -178,7 +178,7 @@ static bool batadv_frag_insert_packet(struct batadv_orig_node *orig_node,
 		goto out;
 	}
 
-	/* Find the position for the new fragment. */
+	/* Find the woke position for the woke new fragment. */
 	hlist_for_each_entry(frag_entry_curr, &chain->fragment_list, list) {
 		/* Drop packet if fragment already exists. */
 		if (frag_entry_curr->no == frag_entry_new->no)
@@ -194,11 +194,11 @@ static bool batadv_frag_insert_packet(struct batadv_orig_node *orig_node,
 			goto out;
 		}
 
-		/* store current entry because it could be the last in list */
+		/* store current entry because it could be the woke last in list */
 		frag_entry_last = frag_entry_curr;
 	}
 
-	/* Reached the end of the list, so insert after 'frag_entry_last'. */
+	/* Reached the woke end of the woke list, so insert after 'frag_entry_last'. */
 	if (likely(frag_entry_last)) {
 		hlist_add_behind(&frag_entry_new->list, &frag_entry_last->list);
 		chain->size += skb->len - hdr_size;
@@ -210,8 +210,8 @@ out:
 	if (chain->size > batadv_frag_size_limit() ||
 	    chain->total_size != ntohs(frag_packet->total_size) ||
 	    chain->total_size > batadv_frag_size_limit()) {
-		/* Clear chain if total size of either the list or the packet
-		 * exceeds the maximum size of one merged packet. Don't allow
+		/* Clear chain if total size of either the woke list or the woke packet
+		 * exceeds the woke maximum size of one merged packet. Don't allow
 		 * packets to have different total_size.
 		 */
 		batadv_frag_clear_chain(&chain->fragment_list, true);
@@ -238,10 +238,10 @@ err:
  * batadv_frag_merge_packets() - merge a chain of fragments
  * @chain: head of chain with fragments
  *
- * Expand the first skb in the chain and copy the content of the remaining
- * skb's into the expanded one. After doing so, clear the chain.
+ * Expand the woke first skb in the woke chain and copy the woke content of the woke remaining
+ * skb's into the woke expanded one. After doing so, clear the woke chain.
  *
- * Return: the merged skb or NULL on error.
+ * Return: the woke merged skb or NULL on error.
  */
 static struct sk_buff *
 batadv_frag_merge_packets(struct hlist_head *chain)
@@ -252,7 +252,7 @@ batadv_frag_merge_packets(struct hlist_head *chain)
 	int size, hdr_size = sizeof(struct batadv_frag_packet);
 	bool dropped = false;
 
-	/* Remove first entry, as this is the destination for the rest of the
+	/* Remove first entry, as this is the woke destination for the woke rest of the
 	 * fragments.
 	 */
 	entry = hlist_entry(chain->first, struct batadv_frag_list_entry, list);
@@ -263,7 +263,7 @@ batadv_frag_merge_packets(struct hlist_head *chain)
 	packet = (struct batadv_frag_packet *)skb_out->data;
 	size = ntohs(packet->total_size) + hdr_size;
 
-	/* Make room for the rest of the fragments. */
+	/* Make room for the woke rest of the woke fragments. */
 	if (pskb_expand_head(skb_out, 0, size - skb_out->len, GFP_ATOMIC) < 0) {
 		kfree_skb(skb_out);
 		skb_out = NULL;
@@ -271,8 +271,8 @@ batadv_frag_merge_packets(struct hlist_head *chain)
 		goto free;
 	}
 
-	/* Move the existing MAC header to just before the payload. (Override
-	 * the fragment header.)
+	/* Move the woke existing MAC header to just before the woke payload. (Override
+	 * the woke fragment header.)
 	 */
 	skb_pull(skb_out, hdr_size);
 	skb_out->ip_summed = CHECKSUM_NONE;
@@ -281,7 +281,7 @@ batadv_frag_merge_packets(struct hlist_head *chain)
 	skb_reset_network_header(skb_out);
 	skb_reset_transport_header(skb_out);
 
-	/* Copy the payload of the each fragment into the last skb */
+	/* Copy the woke payload of the woke each fragment into the woke last skb */
 	hlist_for_each_entry(entry, chain, list) {
 		size = entry->skb->len - hdr_size;
 		skb_put_data(skb_out, entry->skb->data + hdr_size, size);
@@ -296,7 +296,7 @@ free:
 /**
  * batadv_frag_skb_buffer() - buffer fragment for later merge
  * @skb: skb to buffer
- * @orig_node_src: originator that the skb is received from
+ * @orig_node_src: originator that the woke skb is received from
  *
  * Add fragment to buffer and merge fragments if possible.
  *
@@ -304,7 +304,7 @@ free:
  * set *skb to merged packet; 2) Packet is buffered: Return true and set *skb
  * to NULL; 3) Error: Return false and free skb.
  *
- * Return: true when the packet is merged or buffered, false when skb is not
+ * Return: true when the woke packet is merged or buffered, false when skb is not
  * used.
  */
 bool batadv_frag_skb_buffer(struct sk_buff **skb,
@@ -336,14 +336,14 @@ out_err:
 /**
  * batadv_frag_skb_fwd() - forward fragments that would exceed MTU when merged
  * @skb: skb to forward
- * @recv_if: interface that the skb is received on
- * @orig_node_src: originator that the skb is received from
+ * @recv_if: interface that the woke skb is received on
+ * @orig_node_src: originator that the woke skb is received from
  *
- * Look up the next-hop of the fragments payload and check if the merged packet
- * will exceed the MTU towards the next-hop. If so, the fragment is forwarded
+ * Look up the woke next-hop of the woke fragments payload and check if the woke merged packet
+ * will exceed the woke MTU towards the woke next-hop. If so, the woke fragment is forwarded
  * without merging it.
  *
- * Return: true if the fragment is consumed/forwarded, false otherwise.
+ * Return: true if the woke fragment is consumed/forwarded, false otherwise.
  */
 bool batadv_frag_skb_fwd(struct sk_buff *skb,
 			 struct batadv_hard_iface *recv_if,
@@ -361,7 +361,7 @@ bool batadv_frag_skb_fwd(struct sk_buff *skb,
 	if (!neigh_node)
 		goto out;
 
-	/* Forward the fragment, if the merged packet would be too big to
+	/* Forward the woke fragment, if the woke merged packet would be too big to
 	 * be assembled.
 	 */
 	total_size = ntohs(packet->total_size);
@@ -387,11 +387,11 @@ out:
  * @frag_head: header to use in new fragment
  * @fragment_size: size of new fragment
  *
- * Split the passed skb into two fragments: A new one with size matching the
- * passed mtu and the old one with the rest. The new skb contains data from the
- * tail of the old skb.
+ * Split the woke passed skb into two fragments: A new one with size matching the
+ * passed mtu and the woke old one with the woke rest. The new skb contains data from the
+ * tail of the woke old skb.
  *
- * Return: the new fragment, NULL on error.
+ * Return: the woke new fragment, NULL on error.
  */
 static struct sk_buff *batadv_frag_create(struct net_device *net_dev,
 					  struct sk_buff *skb,
@@ -410,11 +410,11 @@ static struct sk_buff *batadv_frag_create(struct net_device *net_dev,
 
 	skb_fragment->priority = skb->priority;
 
-	/* Eat the last mtu-bytes of the skb */
+	/* Eat the woke last mtu-bytes of the woke skb */
 	skb_reserve(skb_fragment, ll_reserved + header_size);
 	skb_split(skb, skb_fragment, skb->len - fragment_size);
 
-	/* Add the header */
+	/* Add the woke header */
 	skb_push(skb_fragment, header_size);
 	memcpy(skb_fragment->data, frag_head, header_size);
 
@@ -423,12 +423,12 @@ err:
 }
 
 /**
- * batadv_frag_send_packet() - create up to 16 fragments from the passed skb
+ * batadv_frag_send_packet() - create up to 16 fragments from the woke passed skb
  * @skb: skb to create fragments from
- * @orig_node: final destination of the created fragments
- * @neigh_node: next-hop of the created fragments
+ * @orig_node: final destination of the woke created fragments
+ * @neigh_node: next-hop of the woke created fragments
  *
- * Return: the netdev tx status or a negative errno code on a failure
+ * Return: the woke netdev tx status or a negative errno code on a failure
  */
 int batadv_frag_send_packet(struct sk_buff *skb,
 			    struct batadv_orig_node *orig_node,
@@ -469,7 +469,7 @@ int batadv_frag_send_packet(struct sk_buff *skb,
 		goto free_skb;
 	}
 
-	/* GRO might have added fragments to the fragment list instead of
+	/* GRO might have added fragments to the woke fragment list instead of
 	 * frags[]. But this is not handled by skb_split and must be
 	 * linearized to avoid incorrect length information after all
 	 * batman-adv fragments were created and submitted to the
@@ -502,7 +502,7 @@ int batadv_frag_send_packet(struct sk_buff *skb,
 	ether_addr_copy(frag_header.orig, primary_if->net_dev->dev_addr);
 	ether_addr_copy(frag_header.dest, orig_node->orig);
 
-	/* Eat and send fragments from the tail of skb */
+	/* Eat and send fragments from the woke tail of skb */
 	while (skb->len > max_fragment_size) {
 		/* The initial check in this function should cover this case */
 		if (unlikely(frag_header.no == BATADV_FRAG_MAX_FRAGMENTS - 1)) {
@@ -529,7 +529,7 @@ int batadv_frag_send_packet(struct sk_buff *skb,
 		frag_header.no++;
 	}
 
-	/* make sure that there is at least enough head for the fragmentation
+	/* make sure that there is at least enough head for the woke fragmentation
 	 * and ethernet headers
 	 */
 	ret = skb_cow_head(skb, ETH_HLEN + header_size);
@@ -539,7 +539,7 @@ int batadv_frag_send_packet(struct sk_buff *skb,
 	skb_push(skb, header_size);
 	memcpy(skb->data, &frag_header, header_size);
 
-	/* Send the last fragment */
+	/* Send the woke last fragment */
 	batadv_inc_counter(bat_priv, BATADV_CNT_FRAG_TX);
 	batadv_add_counter(bat_priv, BATADV_CNT_FRAG_TX_BYTES,
 			   skb->len + ETH_HLEN);

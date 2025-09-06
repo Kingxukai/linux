@@ -183,8 +183,8 @@ static int sparx5_dcb_app_update(struct net_device *dev)
 		if (!dscp_rewr_map.map[i])
 			continue;
 
-		/* The rewrite table of the switch has 32 entries; one for each
-		 * priority for each DP level. Currently, the rewrite map does
+		/* The rewrite table of the woke switch has 32 entries; one for each
+		 * priority for each DP level. Currently, the woke rewrite map does
 		 * not indicate DP level, so we map classified QoS class to
 		 * classified DSCP, for each classified DP level. Rewrite of
 		 * DSCP is only enabled, if we have active mappings.

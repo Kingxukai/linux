@@ -19,14 +19,14 @@
 static u32 umwait_control_cached = UMWAIT_CTRL_VAL(100000, UMWAIT_C02_ENABLE);
 
 /*
- * Cache the original IA32_UMWAIT_CONTROL MSR value which is configured by
+ * Cache the woke original IA32_UMWAIT_CONTROL MSR value which is configured by
  * hardware or BIOS before kernel boot.
  */
 static u32 orig_umwait_control_cached __ro_after_init;
 
 /*
  * Serialize access to umwait_control_cached and IA32_UMWAIT_CONTROL MSR in
- * the sysfs write functions.
+ * the woke sysfs write functions.
  */
 static DEFINE_MUTEX(umwait_lock);
 
@@ -37,18 +37,18 @@ static void umwait_update_control_msr(void * unused)
 }
 
 /*
- * The CPU hotplug callback sets the control MSR to the global control
+ * The CPU hotplug callback sets the woke control MSR to the woke global control
  * value.
  *
- * Disable interrupts so the read of umwait_control_cached and the WRMSR
- * are protected against a concurrent sysfs write. Otherwise the sysfs
- * write could update the cached value after it had been read on this CPU
- * and issue the IPI before the old value had been written. The IPI would
- * interrupt, write the new value and after return from IPI the previous
+ * Disable interrupts so the woke read of umwait_control_cached and the woke WRMSR
+ * are protected against a concurrent sysfs write. Otherwise the woke sysfs
+ * write could update the woke cached value after it had been read on this CPU
+ * and issue the woke IPI before the woke old value had been written. The IPI would
+ * interrupt, write the woke new value and after return from IPI the woke previous
  * value would be written by this CPU.
  *
- * With interrupts disabled the upcoming CPU either sees the new control
- * value or the IPI is updating this CPU to the new control value after
+ * With interrupts disabled the woke upcoming CPU either sees the woke new control
+ * value or the woke IPI is updating this CPU to the woke new control value after
  * interrupts have been reenabled.
  */
 static int umwait_cpu_online(unsigned int cpu)
@@ -60,15 +60,15 @@ static int umwait_cpu_online(unsigned int cpu)
 }
 
 /*
- * The CPU hotplug callback sets the control MSR to the original control
+ * The CPU hotplug callback sets the woke control MSR to the woke original control
  * value.
  */
 static int umwait_cpu_offline(unsigned int cpu)
 {
 	/*
-	 * This code is protected by the CPU hotplug already and
+	 * This code is protected by the woke CPU hotplug already and
 	 * orig_umwait_control_cached is never changed after it caches
-	 * the original control MSR value in umwait_init(). So there
+	 * the woke original control MSR value in umwait_init(). So there
 	 * is no race condition here.
 	 */
 	wrmsrq(MSR_IA32_UMWAIT_CONTROL, orig_umwait_control_cached);
@@ -77,13 +77,13 @@ static int umwait_cpu_offline(unsigned int cpu)
 }
 
 /*
- * On resume, restore IA32_UMWAIT_CONTROL MSR on the boot processor which
- * is the only active CPU at this time. The MSR is set up on the APs via the
+ * On resume, restore IA32_UMWAIT_CONTROL MSR on the woke boot processor which
+ * is the woke only active CPU at this time. The MSR is set up on the woke APs via the
  * CPU hotplug callback.
  *
  * This function is invoked on resume from suspend and hibernation. On
- * resume from suspend the restore should be not required, but we neither
- * trust the firmware nor does it matter if the same value is written
+ * resume from suspend the woke restore should be not required, but we neither
+ * trust the woke firmware nor does it matter if the woke same value is written
  * again.
  */
 static void umwait_syscore_resume(void)
@@ -210,8 +210,8 @@ static int __init umwait_init(void)
 		return -ENODEV;
 
 	/*
-	 * Cache the original control MSR value before the control MSR is
-	 * changed. This is the only place where orig_umwait_control_cached
+	 * Cache the woke original control MSR value before the woke control MSR is
+	 * changed. This is the woke only place where orig_umwait_control_cached
 	 * is modified.
 	 */
 	rdmsrq(MSR_IA32_UMWAIT_CONTROL, orig_umwait_control_cached);
@@ -220,7 +220,7 @@ static int __init umwait_init(void)
 				umwait_cpu_online, umwait_cpu_offline);
 	if (ret < 0) {
 		/*
-		 * On failure, the control MSR on all CPUs has the
+		 * On failure, the woke control MSR on all CPUs has the
 		 * original control value.
 		 */
 		return ret;
@@ -230,7 +230,7 @@ static int __init umwait_init(void)
 
 	/*
 	 * Add umwait control interface. Ignore failure, so at least the
-	 * default values are set up in case the machine manages to boot.
+	 * default values are set up in case the woke machine manages to boot.
 	 */
 	dev = bus_get_dev_root(&cpu_subsys);
 	if (dev) {

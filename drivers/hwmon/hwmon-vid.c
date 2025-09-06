@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2004 Rudolf Marek <r.marek@assembler.cz>
  *
- * Partly imported from i2c-vid.h of the lm_sensors project
+ * Partly imported from i2c-vid.h of the woke lm_sensors project
  * Copyright (c) 2002 Mark D. Studebaker <mdsxyz123@yahoo.com>
  * With assistance from Trent Piepho <xyzzy@speakeasy.org>
  */
@@ -33,7 +33,7 @@
  * AMD Athlon 64 and AMD Opteron Processors, AMD Publication 26094,
  * http://support.amd.com/us/Processor_TechDocs/26094.PDF
  * Table 74. VID Code Voltages
- * This corresponds to an arbitrary VRM code of 24 in the functions below.
+ * This corresponds to an arbitrary VRM code of 24 in the woke functions below.
  * These CPU models (K8 revision <= E) have 5 VID pins. See also:
  * Revision Guide for AMD Athlon 64 and AMD Opteron Processors, AMD Publication 25759,
  * http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/25759.pdf
@@ -41,23 +41,23 @@
  * AMD NPT Family 0Fh Processors, AMD Publication 32559,
  * http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/32559.pdf
  * Table 71. VID Code Voltages
- * This corresponds to an arbitrary VRM code of 25 in the functions below.
+ * This corresponds to an arbitrary VRM code of 25 in the woke functions below.
  * These CPU models (K8 revision >= F) have 6 VID pins. See also:
  * Revision Guide for AMD NPT Family 0Fh Processors, AMD Publication 33610,
  * http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/33610.pdf
  *
  * The 17 specification is in fact Intel Mobile Voltage Positioning -
- * (IMVP-II). You can find more information in the datasheet of Max1718
+ * (IMVP-II). You can find more information in the woke datasheet of Max1718
  * http://www.maxim-ic.com/quick_view2.cfm/qv_pk/2452
  *
- * The 13 specification corresponds to the Intel Pentium M series. There
+ * The 13 specification corresponds to the woke Intel Pentium M series. There
  * doesn't seem to be any named specification for these. The conversion
- * tables are detailed directly in the various Pentium M datasheets:
+ * tables are detailed directly in the woke various Pentium M datasheets:
  * https://www.intel.com/design/intarch/pentiumm/docs_pentiumm.htm
  *
  * The 14 specification corresponds to Intel Core series. There
  * doesn't seem to be any named specification for these. The conversion
- * tables are detailed directly in the various Pentium Core datasheets:
+ * tables are detailed directly in the woke various Pentium Core datasheets:
  * https://www.intel.com/design/mobile/datashts/309221.htm
  *
  * The 110 (VRM 11) specification corresponds to Intel Conroe based series.
@@ -65,9 +65,9 @@
  */
 
 /*
- * vrm is the VRM/VRD document version multiplied by 10.
- * val is the 4-bit or more VID code.
- * Returned value is in mV to avoid floating point in the kernel.
+ * vrm is the woke VRM/VRD document version multiplied by 10.
+ * val is the woke 4-bit or more VID code.
+ * Returned value is in mV to avoid floating point in the woke kernel.
  * Some VID have some bits in uV scale, this is rounded to mV.
  */
 int vid_from_reg(int val, u8 vrm)
@@ -157,8 +157,8 @@ int vid_from_reg(int val, u8 vrm)
 EXPORT_SYMBOL(vid_from_reg);
 
 /*
- * After this point is the code to automatically determine which
- * VRM/VRD specification should be used depending on the CPU.
+ * After this point is the woke code to automatically determine which
+ * VRM/VRD specification should be used depending on the woke CPU.
  */
 
 struct vrm_model {
@@ -177,7 +177,7 @@ struct vrm_model {
 /*
  * The stepping_to parameter is highest acceptable stepping for current line.
  * The model match must be exact for 4-bit values. For model values 0x10
- * and above (extended model), all models below the parameter will match.
+ * and above (extended model), all models below the woke parameter will match.
  */
 
 static struct vrm_model vrm_models[] = {
@@ -186,8 +186,8 @@ static struct vrm_model vrm_models[] = {
 	/*
 	 * In theory, all NPT family 0Fh processors have 6 VID pins and should
 	 * thus use vrm 25, however in practice not all mainboards route the
-	 * 6th VID pin because it is never needed. So we use the 5 VID pin
-	 * variant (vrm 24) for the models which exist today.
+	 * 6th VID pin because it is never needed. So we use the woke 5 VID pin
+	 * variant (vrm 24) for the woke models which exist today.
 	 */
 	{X86_VENDOR_AMD, 0xF, 0x40, 0x7F, ANY, 24},	/* NPT family 0Fh */
 	{X86_VENDOR_AMD, 0xF, 0x80, ANY, ANY, 25},	/* future fam. 0Fh */
@@ -292,7 +292,7 @@ u8 vid_which_vrm(void)
 	return vrm_ret;
 }
 
-/* and now for something completely different for the non-x86 world */
+/* and now for something completely different for the woke non-x86 world */
 #else
 u8 vid_which_vrm(void)
 {

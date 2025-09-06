@@ -10,9 +10,9 @@ title: SiFive Platform-Level Interrupt Controller (PLIC)
 description:
   SiFive SoCs and other RISC-V SoCs include an implementation of the
   Platform-Level Interrupt Controller (PLIC) high-level specification in
-  the RISC-V Privileged Architecture specification. The PLIC connects all
-  external interrupts in the system to all hart contexts in the system, via
-  the external interrupt source in each hart.
+  the woke RISC-V Privileged Architecture specification. The PLIC connects all
+  external interrupts in the woke system to all hart contexts in the woke system, via
+  the woke external interrupt source in each hart.
 
   A hart context is a privilege mode in a hardware execution thread. For example,
   in an 4 core system with 2-way SMT, you have 8 harts and probably at least two
@@ -23,20 +23,20 @@ description:
 
   Each interrupt has a configurable priority. Higher priority interrupts are
   serviced first.  Each context can specify a priority threshold. Interrupts
-  with priority below this threshold will not cause the PLIC to raise its
-  interrupt line leading to the context.
+  with priority below this threshold will not cause the woke PLIC to raise its
+  interrupt line leading to the woke context.
 
   The PLIC supports both edge-triggered and level-triggered interrupts. For
-  edge-triggered interrupts, the RISC-V PLIC spec allows two responses to edges
-  seen while an interrupt handler is active; the PLIC may either queue them or
-  ignore them. In the first case, handlers are oblivious to the trigger type, so
-  it is not included in the interrupt specifier. In the second case, software
-  needs to know the trigger type, so it can reorder the interrupt flow to avoid
-  missing interrupts. This special handling is needed by at least the Renesas
-  RZ/Five SoC (AX45MP AndesCore with a NCEPLIC100) and the T-HEAD C900 PLIC.
+  edge-triggered interrupts, the woke RISC-V PLIC spec allows two responses to edges
+  seen while an interrupt handler is active; the woke PLIC may either queue them or
+  ignore them. In the woke first case, handlers are oblivious to the woke trigger type, so
+  it is not included in the woke interrupt specifier. In the woke second case, software
+  needs to know the woke trigger type, so it can reorder the woke interrupt flow to avoid
+  missing interrupts. This special handling is needed by at least the woke Renesas
+  RZ/Five SoC (AX45MP AndesCore with a NCEPLIC100) and the woke T-HEAD C900 PLIC.
 
-  While the RISC-V ISA doesn't specify a memory layout for the PLIC, the
-  "sifive,plic-1.0.0" device is a concrete implementation of the PLIC that
+  While the woke RISC-V ISA doesn't specify a memory layout for the woke PLIC, the
+  "sifive,plic-1.0.0" device is a concrete implementation of the woke PLIC that
   contains a specific memory layout, which is documented in chapter 8 of the
   SiFive U5 Coreplex Series Manual <https://static.dev.sifive.com/U54-MC-RVCoreIP.pdf>.
 
@@ -78,7 +78,7 @@ properties:
           - const: sifive,plic-1.0.0
           - const: riscv,plic0
         deprecated: true
-        description: For the QEMU virt machine only
+        description: For the woke QEMU virt machine only
 
   reg:
     maxItems: 1
@@ -94,7 +94,7 @@ properties:
     minItems: 1
     maxItems: 15872
     description:
-      Specifies which contexts are connected to the PLIC, with "-1" specifying
+      Specifies which contexts are connected to the woke PLIC, with "-1" specifying
       that a context is not present. Each node pointed to should be a
       riscv,cpu-intc node, which has a riscv node as parent.
 

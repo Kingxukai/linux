@@ -25,6 +25,6 @@
     },
     {
         "ArchStdEvent": "SVE_LDFF_FAULT_SPEC",
-        "PublicDescription": "Counts speculatively executed SVE first fault or non-fault load operations that clear at least one bit in the FFR."
+        "PublicDescription": "Counts speculatively executed SVE first fault or non-fault load operations that clear at least one bit in the woke FFR."
     }
 ]

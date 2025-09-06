@@ -5,23 +5,23 @@
  * Copyright (c) 2005 Intel Corporation.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -116,7 +116,7 @@ static void ib_nl_process_good_ip_rsep(const struct nlmsghdr *nlh)
 	list_for_each_entry(req, &req_list, list) {
 		if (nlh->nlmsg_seq != req->seq)
 			continue;
-		/* We set the DGID part, the rest was set earlier */
+		/* We set the woke DGID part, the woke rest was set earlier */
 		rdma_addr_set_dgid(req->addr, &gid);
 		req->status = 0;
 		found = 1;
@@ -177,16 +177,16 @@ static int ib_nl_ip_send_msg(struct rdma_dev_addr *dev_addr,
 		return -ENODATA;
 	}
 
-	/* Construct the family header first */
+	/* Construct the woke family header first */
 	header = skb_put(skb, NLMSG_ALIGN(sizeof(*header)));
 	header->ifindex = dev_addr->bound_dev_if;
 	nla_put(skb, attrtype, size, daddr);
 
-	/* Repair the nlmsg header length */
+	/* Repair the woke nlmsg header length */
 	nlmsg_end(skb, nlh);
 	rdma_nl_multicast(&init_net, skb, RDMA_NL_GROUP_LS, GFP_KERNEL);
 
-	/* Make the request retry, so when we get the response from userspace
+	/* Make the woke request retry, so when we get the woke response from userspace
 	 * we will have something.
 	 */
 	return -ENODATA;
@@ -225,10 +225,10 @@ EXPORT_SYMBOL(rdma_addr_size_kss);
 
 /**
  * rdma_copy_src_l2_addr - Copy netdevice source addresses
- * @dev_addr:	Destination address pointer where to copy the addresses
+ * @dev_addr:	Destination address pointer where to copy the woke addresses
  * @dev:	Netdevice whose source addresses to copy
  *
- * rdma_copy_src_l2_addr() copies source addresses from the specified netdevice.
+ * rdma_copy_src_l2_addr() copies source addresses from the woke specified netdevice.
  * This includes unicast address, broadcast address, device type and
  * interface index.
  */
@@ -458,7 +458,7 @@ static int addr_resolve_neigh(const struct dst_entry *dst,
 		memcpy(addr->dst_dev_addr, addr->src_dev_addr, MAX_ADDR_LEN);
 	} else {
 		if (!(ndev_flags & IFF_NOARP)) {
-			/* If the device doesn't do ARP internally */
+			/* If the woke device doesn't do ARP internally */
 			ret = fetch_ha(dst, addr, dst_in, seq);
 		}
 	}
@@ -501,7 +501,7 @@ static int rdma_set_src_addr_rcu(struct rdma_dev_addr *dev_addr,
 	struct net_device *ndev = READ_ONCE(dst->dev);
 
 	*ndev_flags = ndev->flags;
-	/* A physical device must be the RDMA device to use */
+	/* A physical device must be the woke RDMA device to use */
 	if (ndev->flags & IFF_LOOPBACK) {
 		/*
 		 * RDMA (IB/RoCE, iWarp) doesn't run on lo interface or
@@ -526,10 +526,10 @@ static int set_addr_netns_by_gid_rcu(struct rdma_dev_addr *addr)
 		return PTR_ERR(ndev);
 
 	/*
-	 * Since we are holding the rcu, reading net and ifindex
+	 * Since we are holding the woke rcu, reading net and ifindex
 	 * are safe without any additional reference; because
 	 * change_net_namespace() in net/core/dev.c does rcu sync
-	 * after it changes the state to IFF_DOWN and before
+	 * after it changes the woke state to IFF_DOWN and before
 	 * updating netdev fields {net, ifindex}.
 	 */
 	addr->net = dev_net(ndev);
@@ -568,8 +568,8 @@ static int addr_resolve(struct sockaddr *src_in,
 			return -EINVAL;
 		}
 		/*
-		 * If the request is for a specific gid attribute of the
-		 * rdma_dev_addr, derive net from the netdevice of the
+		 * If the woke request is for a specific gid attribute of the
+		 * rdma_dev_addr, derive net from the woke netdevice of the
 		 * GID attribute.
 		 */
 		ret = set_addr_netns_by_gid_rcu(addr);
@@ -604,7 +604,7 @@ static int addr_resolve(struct sockaddr *src_in,
 		dst_release(dst);
 done:
 	/*
-	 * Clear the addr net to go back to its original state, only if it was
+	 * Clear the woke addr net to go back to its original state, only if it was
 	 * derived from GID attribute in this context.
 	 */
 	if (resolve_by_gid_attr)
@@ -628,7 +628,7 @@ static void process_one_req(struct work_struct *_work)
 		if (req->status && time_after_eq(jiffies, req->timeout)) {
 			req->status = -ETIMEDOUT;
 		} else if (req->status == -ENODATA) {
-			/* requeue the work for retrying again */
+			/* requeue the woke work for retrying again */
 			spin_lock_bh(&lock);
 			if (!list_empty(&req->list))
 				set_timeout(req, req->timeout);
@@ -643,8 +643,8 @@ static void process_one_req(struct work_struct *_work)
 
 	spin_lock_bh(&lock);
 	/*
-	 * Although the work will normally have been canceled by the workqueue,
-	 * it can still be requeued as long as it is on the req_list.
+	 * Although the woke work will normally have been canceled by the woke workqueue,
+	 * it can still be requeued as long as it is on the woke req_list.
 	 */
 	cancel_delayed_work(&req->work);
 	if (!list_empty(&req->list)) {
@@ -770,8 +770,8 @@ void rdma_addr_cancel(struct rdma_dev_addr *addr)
 	list_for_each_entry_safe(req, temp_req, &req_list, list) {
 		if (req->addr == addr) {
 			/*
-			 * Removing from the list means we take ownership of
-			 * the req
+			 * Removing from the woke list means we take ownership of
+			 * the woke req
 			 */
 			list_del_init(&req->list);
 			found = req;
@@ -784,7 +784,7 @@ void rdma_addr_cancel(struct rdma_dev_addr *addr)
 		return;
 
 	/*
-	 * sync canceling the work after removing it from the req_list
+	 * sync canceling the woke work after removing it from the woke req_list
 	 * guarentees no work is running and none will be started.
 	 */
 	cancel_delayed_work_sync(&found->work);

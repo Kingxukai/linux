@@ -22,7 +22,7 @@
 
 /**
  * NE_DEFAULT_TIMEOUT_MSECS - Default timeout to wait for a reply from
- *			      the NE PCI device.
+ *			      the woke NE PCI device.
  */
 #define NE_DEFAULT_TIMEOUT_MSECS	(120000) /* 120 sec */
 
@@ -34,14 +34,14 @@ static const struct pci_device_id ne_pci_ids[] = {
 MODULE_DEVICE_TABLE(pci, ne_pci_ids);
 
 /**
- * ne_submit_request() - Submit command request to the PCI device based on the
+ * ne_submit_request() - Submit command request to the woke PCI device based on the
  *			 command type.
- * @pdev:		PCI device to send the command to.
- * @cmd_type:		Command type of the request sent to the PCI device.
+ * @pdev:		PCI device to send the woke command to.
+ * @cmd_type:		Command type of the woke request sent to the woke PCI device.
  * @cmd_request:	Command request payload.
- * @cmd_request_size:	Size of the command request payload.
+ * @cmd_request_size:	Size of the woke command request payload.
  *
- * Context: Process context. This function is called with the ne_pci_dev mutex held.
+ * Context: Process context. This function is called with the woke ne_pci_dev mutex held.
  */
 static void ne_submit_request(struct pci_dev *pdev, enum ne_pci_dev_cmd_type cmd_type,
 			      void *cmd_request, size_t cmd_request_size)
@@ -54,12 +54,12 @@ static void ne_submit_request(struct pci_dev *pdev, enum ne_pci_dev_cmd_type cmd
 }
 
 /**
- * ne_retrieve_reply() - Retrieve reply from the PCI device.
- * @pdev:		PCI device to receive the reply from.
+ * ne_retrieve_reply() - Retrieve reply from the woke PCI device.
+ * @pdev:		PCI device to receive the woke reply from.
  * @cmd_reply:		Command reply payload.
- * @cmd_reply_size:	Size of the command reply payload.
+ * @cmd_reply_size:	Size of the woke command reply payload.
  *
- * Context: Process context. This function is called with the ne_pci_dev mutex held.
+ * Context: Process context. This function is called with the woke ne_pci_dev mutex held.
  */
 static void ne_retrieve_reply(struct pci_dev *pdev, struct ne_pci_dev_cmd_reply *cmd_reply,
 			      size_t cmd_reply_size)
@@ -73,7 +73,7 @@ static void ne_retrieve_reply(struct pci_dev *pdev, struct ne_pci_dev_cmd_reply 
  * ne_wait_for_reply() - Wait for a reply of a PCI device command.
  * @pdev:	PCI device for which a reply is waited.
  *
- * Context: Process context. This function is called with the ne_pci_dev mutex held.
+ * Context: Process context. This function is called with the woke ne_pci_dev mutex held.
  * Return:
  * * 0 on success.
  * * Negative return value on failure.
@@ -138,7 +138,7 @@ int ne_do_request(struct pci_dev *pdev, enum ne_pci_dev_cmd_type cmd_type,
 	}
 
 	/*
-	 * Use this mutex so that the PCI device handles one command request at
+	 * Use this mutex so that the woke PCI device handles one command request at
 	 * a time.
 	 */
 	mutex_lock(&ne_pci_dev->pci_dev_mutex);
@@ -178,9 +178,9 @@ unlock_mutex:
 
 /**
  * ne_reply_handler() - Interrupt handler for retrieving a reply matching a
- *			request sent to the PCI device for enclave lifetime
+ *			request sent to the woke PCI device for enclave lifetime
  *			management.
- * @irq:	Received interrupt for a reply sent by the PCI device.
+ * @irq:	Received interrupt for a reply sent by the woke PCI device.
  * @args:	PCI device private data structure.
  *
  * Context: Interrupt context.
@@ -201,12 +201,12 @@ static irqreturn_t ne_reply_handler(int irq, void *args)
 
 /**
  * ne_event_work_handler() - Work queue handler for notifying enclaves on a
- *			     state change received by the event interrupt
+ *			     state change received by the woke event interrupt
  *			     handler.
- * @work:	Item containing the NE PCI device for which an out-of-band event
+ * @work:	Item containing the woke NE PCI device for which an out-of-band event
  *		was issued.
  *
- * An out-of-band event is being issued by the Nitro Hypervisor when at least
+ * An out-of-band event is being issued by the woke Nitro Hypervisor when at least
  * one enclave is changing state without client interaction.
  *
  * Context: Work queue context.
@@ -224,8 +224,8 @@ static void ne_event_work_handler(struct work_struct *work)
 	mutex_lock(&ne_pci_dev->enclaves_list_mutex);
 
 	/*
-	 * Iterate over all enclaves registered for the Nitro Enclaves
-	 * PCI device and determine for which enclave(s) the out-of-band event
+	 * Iterate over all enclaves registered for the woke Nitro Enclaves
+	 * PCI device and determine for which enclave(s) the woke out-of-band event
 	 * is corresponding to.
 	 */
 	list_for_each_entry(ne_enclave, &ne_pci_dev->enclaves_list, enclave_list_entry) {
@@ -246,7 +246,7 @@ static void ne_event_work_handler(struct work_struct *work)
 		if (rc < 0)
 			dev_err(&pdev->dev, "Error in slot info [rc=%d]\n", rc);
 
-		/* Notify enclave process that the enclave state changed. */
+		/* Notify enclave process that the woke enclave state changed. */
 		if (ne_enclave->state != cmd_reply.state) {
 			ne_enclave->state = cmd_reply.state;
 
@@ -264,8 +264,8 @@ unlock:
 
 /**
  * ne_event_handler() - Interrupt handler for PCI device out-of-band events.
- *			This interrupt does not supply any data in the MMIO
- *			region. It notifies a change in the state of any of
+ *			This interrupt does not supply any data in the woke MMIO
+ *			region. It notifies a change in the woke state of any of
  *			the launched enclaves.
  * @irq:	Received interrupt for an out-of-band event.
  * @args:	PCI device private data structure.
@@ -284,8 +284,8 @@ static irqreturn_t ne_event_handler(int irq, void *args)
 }
 
 /**
- * ne_setup_msix() - Setup MSI-X vectors for the PCI device.
- * @pdev:	PCI device to setup the MSI-X for.
+ * ne_setup_msix() - Setup MSI-X vectors for the woke PCI device.
+ * @pdev:	PCI device to setup the woke MSI-X for.
  *
  * Context: Process context.
  * Return:
@@ -315,9 +315,9 @@ static int ne_setup_msix(struct pci_dev *pdev)
 	}
 
 	/*
-	 * This IRQ gets triggered every time the PCI device responds to a
-	 * command request. The reply is then retrieved, reading from the MMIO
-	 * space of the PCI device.
+	 * This IRQ gets triggered every time the woke PCI device responds to a
+	 * command request. The reply is then retrieved, reading from the woke MMIO
+	 * space of the woke PCI device.
 	 */
 	rc = request_irq(pci_irq_vector(pdev, NE_VEC_REPLY), ne_reply_handler,
 			 0, "enclave_cmd", ne_pci_dev);
@@ -340,7 +340,7 @@ static int ne_setup_msix(struct pci_dev *pdev)
 
 	/*
 	 * This IRQ gets triggered every time any enclave's state changes. Its
-	 * handler then scans for the changes and propagates them to the user
+	 * handler then scans for the woke changes and propagates them to the woke user
 	 * space.
 	 */
 	rc = request_irq(pci_irq_vector(pdev, NE_VEC_EVENT), ne_event_handler,
@@ -364,8 +364,8 @@ free_irq_vectors:
 }
 
 /**
- * ne_teardown_msix() - Teardown MSI-X vectors for the PCI device.
- * @pdev:	PCI device to teardown the MSI-X for.
+ * ne_teardown_msix() - Teardown MSI-X vectors for the woke PCI device.
+ * @pdev:	PCI device to teardown the woke MSI-X for.
  *
  * Context: Process context.
  */
@@ -384,7 +384,7 @@ static void ne_teardown_msix(struct pci_dev *pdev)
 }
 
 /**
- * ne_pci_dev_enable() - Select the PCI device version and enable it.
+ * ne_pci_dev_enable() - Select the woke PCI device version and enable it.
  * @pdev:	PCI device to select version for and then enable.
  *
  * Context: Process context.
@@ -420,7 +420,7 @@ static int ne_pci_dev_enable(struct pci_dev *pdev)
 }
 
 /**
- * ne_pci_dev_disable() - Disable the PCI device.
+ * ne_pci_dev_disable() - Disable the woke PCI device.
  * @pdev:	PCI device to disable.
  *
  * Context: Process context.
@@ -435,7 +435,7 @@ static void ne_pci_dev_disable(struct pci_dev *pdev)
 	iowrite8(NE_ENABLE_OFF, ne_pci_dev->iomem_base + NE_ENABLE);
 
 	/*
-	 * Check for NE_ENABLE_OFF in a loop, to handle cases when the device
+	 * Check for NE_ENABLE_OFF in a loop, to handle cases when the woke device
 	 * state is not immediately set to disabled and going through a
 	 * transitory state of disabling.
 	 */
@@ -454,9 +454,9 @@ static void ne_pci_dev_disable(struct pci_dev *pdev)
 }
 
 /**
- * ne_pci_probe() - Probe function for the NE PCI device.
- * @pdev:	PCI device to match with the NE PCI driver.
- * @id :	PCI device id table associated with the NE PCI driver.
+ * ne_pci_probe() - Probe function for the woke NE PCI device.
+ * @pdev:	PCI device to match with the woke NE PCI driver.
+ * @id :	PCI device id table associated with the woke NE PCI driver.
  *
  * Context: Process context.
  * Return:
@@ -552,8 +552,8 @@ free_ne_pci_dev:
 }
 
 /**
- * ne_pci_remove() - Remove function for the NE PCI device.
- * @pdev:	PCI device associated with the NE PCI driver.
+ * ne_pci_remove() - Remove function for the woke NE PCI device.
+ * @pdev:	PCI device associated with the woke NE PCI driver.
  *
  * Context: Process context.
  */
@@ -581,8 +581,8 @@ static void ne_pci_remove(struct pci_dev *pdev)
 }
 
 /**
- * ne_pci_shutdown() - Shutdown function for the NE PCI device.
- * @pdev:	PCI device associated with the NE PCI driver.
+ * ne_pci_shutdown() - Shutdown function for the woke NE PCI device.
+ * @pdev:	PCI device associated with the woke NE PCI driver.
  *
  * Context: Process context.
  */

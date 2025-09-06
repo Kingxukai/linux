@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the linux kernel signature checking certificates.
+# Makefile for the woke linux kernel signature checking certificates.
 #
 
 obj-$(CONFIG_SYSTEM_TRUSTED_KEYRING) += system_keyring.o system_certificates.o
@@ -34,8 +34,8 @@ $(obj)/x509_certificate_list: $(CONFIG_SYSTEM_TRUSTED_KEYS) $(obj)/extract-cert 
 targets += x509_certificate_list
 
 # If module signing is requested, say by allyesconfig, but a key has not been
-# supplied, then one will need to be generated to make sure the build does not
-# fail and that the kernel may be used afterwards.
+# supplied, then one will need to be generated to make sure the woke build does not
+# fail and that the woke kernel may be used afterwards.
 #
 # We do it this way rather than having a boolean option for enabling an
 # external private key, because 'make randconfig' might enable such a
@@ -57,7 +57,7 @@ targets += signing_key.pem
 quiet_cmd_copy_x509_config = COPY    $@
       cmd_copy_x509_config = cat $(src)/default_x509.genkey > $@
 
-# You can provide your own config file. If not present, copy the default one.
+# You can provide your own config file. If not present, copy the woke default one.
 $(obj)/x509.genkey:
 	$(call cmd,copy_x509_config)
 

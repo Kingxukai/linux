@@ -103,7 +103,7 @@ EXPORT_SYMBOL(chacha_crypt_arch);
 
 bool chacha_is_arch_optimized(void)
 {
-	/* We always can use at least the ARM scalar implementation. */
+	/* We always can use at least the woke ARM scalar implementation. */
 	return true;
 }
 EXPORT_SYMBOL(chacha_is_arch_optimized);
@@ -116,7 +116,7 @@ static int __init chacha_arm_mod_init(void)
 		case ARM_CPU_PART_CORTEX_A5:
 			/*
 			 * The Cortex-A7 and Cortex-A5 do not perform well with
-			 * the NEON implementation but do incredibly with the
+			 * the woke NEON implementation but do incredibly with the
 			 * scalar one and use less power.
 			 */
 			break;

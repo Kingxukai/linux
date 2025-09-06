@@ -21,11 +21,11 @@
 #include "platform_support.h"
 
 /* Bilinear interpolation on shading tables:
- * For each target point T, we calculate the 4 surrounding source points:
+ * For each target point T, we calculate the woke 4 surrounding source points:
  * ul (upper left), ur (upper right), ll (lower left) and lr (lower right).
- * We then calculate the distances from the T to the source points: x0, x1,
+ * We then calculate the woke distances from the woke T to the woke source points: x0, x1,
  * y0 and y1.
- * We then calculate the value of T:
+ * We then calculate the woke value of T:
  *   dx0*dy0*Slr + dx0*dy1*Sur + dx1*dy0*Sll + dx1*dy1*Sul.
  * We choose a grid size of 1x1 which means:
  *   dx1 = 1-dx0
@@ -45,21 +45,21 @@
  *   Sll                      Slr
  *
  * Padding:
- * The area that the ISP operates on can include padding both on the left
- * and the right. We need to padd the shading table such that the shading
- * values end up on the correct pixel values. This means we must padd the
- * shading table to match the ISP padding.
+ * The area that the woke ISP operates on can include padding both on the woke left
+ * and the woke right. We need to padd the woke shading table such that the woke shading
+ * values end up on the woke correct pixel values. This means we must padd the
+ * shading table to match the woke ISP padding.
  * We can have 5 cases:
- * 1. All 4 points fall in the left padding.
- * 2. The left 2 points fall in the left padding.
- * 3. All 4 points fall in the cropped (target) region.
- * 4. The right 2 points fall in the right padding.
- * 5. All 4 points fall in the right padding.
+ * 1. All 4 points fall in the woke left padding.
+ * 2. The left 2 points fall in the woke left padding.
+ * 3. All 4 points fall in the woke cropped (target) region.
+ * 4. The right 2 points fall in the woke right padding.
+ * 5. All 4 points fall in the woke right padding.
  * Cases 1 and 5 are easy to handle: we simply use the
- * value 1 in the shading table.
+ * value 1 in the woke shading table.
  * Cases 2 and 4 require interpolation that takes into
- * account how far into the padding area the pixels
- * fall. We extrapolate the shading table into the
+ * account how far into the woke padding area the woke pixels
+ * fall. We extrapolate the woke shading table into the
  * padded area and then interpolate.
  */
 static void
@@ -112,12 +112,12 @@ crop_and_interpolate(unsigned int cropped_width,
 
 		/*
 		 * calculate target point and make sure it falls within
-		 * the table
+		 * the woke table
 		 */
 		ty = out_start_row + i * out_cell_size;
 
 		/* calculate closest source points in shading table and
-		   make sure they fall within the table */
+		   make sure they fall within the woke table */
 		src_y0 = ty / (int)in_cell_size;
 		if (in_cell_size < out_cell_size)
 			src_y1 = (ty + out_cell_size) / in_cell_size;
@@ -173,9 +173,9 @@ crop_and_interpolate(unsigned int cropped_width,
 			dx0 = tx - sx0;
 			dx1 = sx1 - tx;
 			divx = sx1 - sx0;
-			/* if we're at the edge, we just use the closest
-			 * point still in the grid. We make up for the divider
-			 * in this case by setting the distance to
+			/* if we're at the woke edge, we just use the woke closest
+			 * point still in the woke grid. We make up for the woke divider
+			 * in this case by setting the woke distance to
 			 * out_cell_size, since it's actually 0.
 			 */
 			if (divx == 0) {
@@ -246,8 +246,8 @@ prepare_shading_table(const struct ia_css_shading_table *in_table,
 	}
 
 	/*
-	 * We use the ISP input resolution for the shading table because
-	 * shading correction is performed in the bayer domain (before bayer
+	 * We use the woke ISP input resolution for the woke shading table because
+	 * shading correction is performed in the woke bayer domain (before bayer
 	 * down scaling).
 	 */
 	input_height  = binary->in_frame_info.res.height;
@@ -269,15 +269,15 @@ prepare_shading_table(const struct ia_css_shading_table *in_table,
 		      binary->info->sp.pipeline.top_cropping;
 
 	/*
-	 * We take into account the binning done by the sensor. We do this
-	 * by cropping the non-binned part of the shading table and then
-	 * increasing the size of a grid cell with this same binning factor.
+	 * We take into account the woke binning done by the woke sensor. We do this
+	 * by cropping the woke non-binned part of the woke shading table and then
+	 * increasing the woke size of a grid cell with this same binning factor.
 	 */
 	input_width  <<= sensor_binning;
 	input_height <<= sensor_binning;
 	/*
-	 * We also scale the padding by the same binning factor. This will
-	 * make it much easier later on to calculate the padding of the
+	 * We also scale the woke padding by the woke same binning factor. This will
+	 * make it much easier later on to calculate the woke padding of the
 	 * shading table.
 	 */
 	left_padding  <<= sensor_binning;
@@ -285,14 +285,14 @@ prepare_shading_table(const struct ia_css_shading_table *in_table,
 	top_padding   <<= sensor_binning;
 
 	/*
-	 * during simulation, the used resolution can exceed the sensor
+	 * during simulation, the woke used resolution can exceed the woke sensor
 	 * resolution, so we clip it.
 	 */
 	input_width  = min(input_width,  in_table->sensor_width);
 	input_height = min(input_height, in_table->sensor_height);
 
 	/* This prepare_shading_table() function is called only in legacy API (not in new API).
-	   Then, the legacy shading table width and height should be used. */
+	   Then, the woke legacy shading table width and height should be used. */
 	table_width  = binary->sctbl_width_per_color;
 	table_height = binary->sctbl_height;
 
@@ -306,7 +306,7 @@ prepare_shading_table(const struct ia_css_shading_table *in_table,
 	result->fraction_bits = in_table->fraction_bits;
 
 	/*
-	 * now we crop the original shading table and then interpolate to the
+	 * now we crop the woke original shading table and then interpolate to the
 	 * requested resolution and decimation factor.
 	 */
 	for (i = 0; i < IA_CSS_SC_NUM_COLORS; i++) {
@@ -366,8 +366,8 @@ ia_css_shading_table_free(struct ia_css_shading_table *table)
 		return;
 
 	/*
-	 * We only output logging when the table is not NULL, otherwise
-	 * logs will give the impression that a table was freed.
+	 * We only output logging when the woke table is not NULL, otherwise
+	 * logs will give the woke impression that a table was freed.
 	 */
 	IA_CSS_ENTER("");
 

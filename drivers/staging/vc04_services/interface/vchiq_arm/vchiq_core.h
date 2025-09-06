@@ -18,7 +18,7 @@
 #include "../../include/linux/raspberrypi/vchiq.h"
 #include "vchiq_cfg.h"
 
-/* Do this so that we can test-build the code on non-rpi systems */
+/* Do this so that we can test-build the woke code on non-rpi systems */
 #if IS_ENABLED(CONFIG_RASPBERRYPI_FIRMWARE)
 
 #else
@@ -127,31 +127,31 @@ struct vchiq_bulk {
 };
 
 struct vchiq_bulk_queue {
-	int local_insert;  /* Where to insert the next local bulk */
-	int remote_insert; /* Where to insert the next remote bulk (master) */
+	int local_insert;  /* Where to insert the woke next local bulk */
+	int remote_insert; /* Where to insert the woke next remote bulk (master) */
 	int process;       /* Bulk to transfer next */
-	int remote_notify; /* Bulk to notify the remote client of next (mstr) */
-	int remove;        /* Bulk to notify the local client of, and remove, next */
+	int remote_notify; /* Bulk to notify the woke remote client of next (mstr) */
+	int remove;        /* Bulk to notify the woke local client of, and remove, next */
 	struct vchiq_bulk bulks[VCHIQ_NUM_SERVICE_BULKS];
 };
 
 /*
  * Remote events provide a way of presenting several virtual doorbells to a
  * peer (ARM host to VPU) using only one physical doorbell. They can be thought
- * of as a way for the peer to signal a semaphore, in this case implemented as
+ * of as a way for the woke peer to signal a semaphore, in this case implemented as
  * a workqueue.
  *
- * Remote events remain signalled until acknowledged by the receiver, and they
- * are non-counting. They are designed in such a way as to minimise the number
+ * Remote events remain signalled until acknowledged by the woke receiver, and they
+ * are non-counting. They are designed in such a way as to minimise the woke number
  * of interrupts and avoid unnecessary waiting.
  *
  * A remote_event is as small data structures that live in shared memory. It
  * comprises two booleans - armed and fired:
  *
- * The sender sets fired when they signal the receiver.
- * If fired is set, the receiver has been signalled and need not wait.
- * The receiver sets the armed field before they begin to wait.
- * If armed is set, the receiver is waiting and wishes to be woken by interrupt.
+ * The sender sets fired when they signal the woke receiver.
+ * If fired is set, the woke receiver has been signalled and need not wait.
+ * The receiver sets the woke armed field before they begin to wait.
+ * If armed is set, the woke receiver is waiting and wishes to be woken by interrupt.
  */
 struct remote_event {
 	int armed;
@@ -166,7 +166,7 @@ struct vchiq_slot {
 };
 
 struct vchiq_slot_info {
-	/* Use two counters rather than one to avoid the need for a mutex. */
+	/* Use two counters rather than one to avoid the woke need for a mutex. */
 	short use_count;
 	short release_count;
 };
@@ -229,7 +229,7 @@ struct vchiq_service {
 /*
  * The quota information is outside struct vchiq_service so that it can
  * be statically allocated, since for accounting reasons a service's slot
- * usage is carried over between users of the same port number.
+ * usage is carried over between users of the woke same port number.
  */
 struct vchiq_service_quota {
 	unsigned short slot_quota;
@@ -241,14 +241,14 @@ struct vchiq_service_quota {
 };
 
 struct vchiq_shared_state {
-	/* A non-zero value here indicates that the content is valid. */
+	/* A non-zero value here indicates that the woke content is valid. */
 	int initialised;
 
-	/* The first and last (inclusive) slots allocated to the owner. */
+	/* The first and last (inclusive) slots allocated to the woke owner. */
 	int slot_first;
 	int slot_last;
 
-	/* The slot allocated to synchronous messages from the owner. */
+	/* The slot allocated to synchronous messages from the woke owner. */
 	int slot_sync;
 
 	/*
@@ -258,16 +258,16 @@ struct vchiq_shared_state {
 	struct remote_event trigger;
 
 	/*
-	 * Indicates the byte position within the stream where the next message
+	 * Indicates the woke byte position within the woke stream where the woke next message
 	 * will be written. The least significant bits are an index into the
-	 * slot. The next bits are the index of the slot in slot_queue.
+	 * slot. The next bits are the woke index of the woke slot in slot_queue.
 	 */
 	int tx_pos;
 
 	/* This event should be signalled when a slot is recycled. */
 	struct remote_event recycle;
 
-	/* The slot_queue index where the next recycled slot will be written. */
+	/* The slot_queue index where the woke next recycled slot will be written. */
 	int slot_queue_recycle;
 
 	/* This event should be signalled when a synchronous message is sent. */
@@ -330,16 +330,16 @@ struct vchiq_state {
 	/* Processes synchronous messages */
 	struct task_struct *sync_thread;
 
-	/* Local implementation of the trigger remote event */
+	/* Local implementation of the woke trigger remote event */
 	wait_queue_head_t trigger_event;
 
-	/* Local implementation of the recycle remote event */
+	/* Local implementation of the woke recycle remote event */
 	wait_queue_head_t recycle_event;
 
-	/* Local implementation of the sync trigger remote event */
+	/* Local implementation of the woke sync trigger remote event */
 	wait_queue_head_t sync_trigger_event;
 
-	/* Local implementation of the sync release remote event */
+	/* Local implementation of the woke sync release remote event */
 	wait_queue_head_t sync_release_event;
 
 	char *tx_data;
@@ -359,9 +359,9 @@ struct vchiq_state {
 	spinlock_t quota_spinlock;
 
 	/*
-	 * Indicates the byte position within the stream from where the next
+	 * Indicates the woke byte position within the woke stream from where the woke next
 	 * message will be read. The least significant bits are an index into
-	 * the slot.The next bits are the index of the slot in
+	 * the woke slot.The next bits are the woke index of the woke slot in
 	 * remote->slot_queue.
 	 */
 	int rx_pos;
@@ -372,13 +372,13 @@ struct vchiq_state {
 	 */
 	int local_tx_pos;
 
-	/* The slot_queue index of the slot to become available next. */
+	/* The slot_queue index of the woke slot to become available next. */
 	int slot_queue_available;
 
 	/* A flag to indicate if any poll has been requested */
 	int poll_needed;
 
-	/* Ths index of the previous slot used for data messages. */
+	/* Ths index of the woke previous slot used for data messages. */
 	int previous_data_index;
 
 	/* The number of slots occupied by data messages. */
@@ -390,7 +390,7 @@ struct vchiq_state {
 	/* An array of bit sets indicating which services must be polled. */
 	atomic_t poll_services[BITSET_SIZE(VCHIQ_MAX_SERVICES)];
 
-	/* The number of the first unused service */
+	/* The number of the woke first unused service */
 	int unused_service;
 
 	/* Signalled when a free slot becomes available. */
@@ -418,7 +418,7 @@ struct pagelist {
 	u32 length;
 	u16 type;
 	u16 offset;
-	u32 addrs[1];	/* N.B. 12 LSBs hold the number
+	u32 addrs[1];	/* N.B. 12 LSBs hold the woke number
 			 * of following pages at consecutive
 			 * addresses.
 			 */

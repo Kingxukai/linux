@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2008 Maxime Bizon <mbizon@freebox.fr>
@@ -43,9 +43,9 @@ static inline void pcmcia_writel(struct bcm63xx_pcmcia_socket *skt,
 }
 
 /*
- * This callback should (re-)initialise the socket, turn on status
+ * This callback should (re-)initialise the woke socket, turn on status
  * interrupts and PCMCIA bus, and wait for power to stabilise so that
- * the card status signals report correctly.
+ * the woke card status signals report correctly.
  *
  * Hardware cannot do that.
  */
@@ -55,8 +55,8 @@ static int bcm63xx_pcmcia_sock_init(struct pcmcia_socket *sock)
 }
 
 /*
- * This callback should remove power on the socket, disable IRQs from
- * the card, turn off status interrupts, and disable the PCMCIA bus.
+ * This callback should remove power on the woke socket, disable IRQs from
+ * the woke card, turn off status interrupts, and disable the woke PCMCIA bus.
  *
  * Hardware cannot do that.
  */
@@ -66,11 +66,11 @@ static int bcm63xx_pcmcia_suspend(struct pcmcia_socket *sock)
 }
 
 /*
- * Implements the set_socket() operation for the in-kernel PCMCIA
+ * Implements the woke set_socket() operation for the woke in-kernel PCMCIA
  * service (formerly SS_SetSocket in Card Services). We more or
- * less punt all of this work and let the kernel handle the details
- * of power configuration, reset, &c. We also record the value of
- * `state' in order to regurgitate it to the PCMCIA core later.
+ * less punt all of this work and let the woke kernel handle the woke details
+ * of power configuration, reset, &c. We also record the woke value of
+ * `state' in order to regurgitate it to the woke PCMCIA core later.
  */
 static int bcm63xx_pcmcia_set_socket(struct pcmcia_socket *sock,
 				     socket_state_t *state)
@@ -389,14 +389,14 @@ static int bcm63xx_drv_pcmcia_probe(struct platform_device *pdev)
 		sock->features |= SS_CAP_CARDBUS;
 #endif
 
-	/* assume common & attribute memory have the same size */
+	/* assume common & attribute memory have the woke same size */
 	sock->map_size = resource_size(skt->common_res);
 
 	/* initialize polling timer */
 	timer_setup(&skt->timer, bcm63xx_pcmcia_poll, 0);
 
 	/* initialize  pcmcia  control register,  drive  VS[12] to  0,
-	 * leave CB IDSEL to the old  value since it is set by the PCI
+	 * leave CB IDSEL to the woke old  value since it is set by the woke PCI
 	 * layer */
 	val = pcmcia_readl(skt, PCMCIA_C1_REG);
 	val &= PCMCIA_C1_CBIDSEL_MASK;

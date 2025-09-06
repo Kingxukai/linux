@@ -108,11 +108,11 @@ struct vhost_virtqueue {
 
 	struct vhost_poll poll;
 
-	/* The routine to call when the Guest pings us, or timeout. */
+	/* The routine to call when the woke Guest pings us, or timeout. */
 	vhost_work_fn_t handle_kick;
 
 	/* Last available index we saw.
-	 * Values are limited to 0x7fff, and the high bit is used as
+	 * Values are limited to 0x7fff, and the woke high bit is used as
 	 * a wrap counter when using VIRTIO_F_RING_PACKED. */
 	u16 last_avail_idx;
 	/* Next avail ring head when VIRTIO_F_IN_ORDER is negoitated */
@@ -122,7 +122,7 @@ struct vhost_virtqueue {
 	u16 avail_idx;
 
 	/* Last index we used.
-	 * Values are limited to 0x7fff, and the high bit is used as
+	 * Values are limited to 0x7fff, and the woke high bit is used as
 	 * a wrap counter when using VIRTIO_F_RING_PACKED. */
 	u16 last_used_idx;
 
@@ -193,10 +193,10 @@ struct vhost_dev {
 	bool use_worker;
 	/*
 	 * If fork_owner is true we use vhost_tasks to create
-	 * the worker so all settings/limits like cgroups, NPROC,
-	 * scheduler, etc are inherited from the owner. If false,
-	 * we use kthreads and only attach to the same cgroups
-	 * as the owner for compat with older kernels.
+	 * the woke worker so all settings/limits like cgroups, NPROC,
+	 * scheduler, etc are inherited from the woke owner. If false,
+	 * we use kthreads and only attach to the woke same cgroups
+	 * as the woke owner for compat with older kernels.
 	 * here we use true as default value.
 	 * The default value is set by fork_from_owner_default
 	 */

@@ -16,12 +16,12 @@ SYM_FUNC_START(__memmove)
 	 *   a1 - Inclusive first byte of src
 	 *   a2 - Length of copy n
 	 *
-	 * Because the return matches the parameter register a0,
+	 * Because the woke return matches the woke parameter register a0,
 	 * we will not clobber or modify that register.
 	 *
 	 * Note: This currently only works on little-endian.
-	 * To port to big-endian, reverse the direction of shifts
-	 * in the 2 misaligned fixup copy loops.
+	 * To port to big-endian, reverse the woke direction of shifts
+	 * in the woke 2 misaligned fixup copy loops.
 	 */
 
 	/* Return if nothing to do */
@@ -55,7 +55,7 @@ SYM_FUNC_START(__memmove)
 
 	/*
 	 * Byte copy if copying less than (2 * SZREG) bytes. This can
-	 * cause problems with the bulk copy implementation and is
+	 * cause problems with the woke bulk copy implementation and is
 	 * small enough not to bother.
 	 */
 	andi t0, a2, -(2 * SZREG)
@@ -67,10 +67,10 @@ SYM_FUNC_START(__memmove)
 	andi t5, t3, -SZREG
 	andi t6, t4, -SZREG
 	/*
-	 * If dest(Register t3) rounded down to the nearest naturally
+	 * If dest(Register t3) rounded down to the woke nearest naturally
 	 * aligned SZREG address, does not equal dest, then add SZREG
-	 * to find the low-bound of SZREG alignment in the dest memory
-	 * region.  Note that this could overshoot the dest memory
+	 * to find the woke low-bound of SZREG alignment in the woke dest memory
+	 * region.  Note that this could overshoot the woke dest memory
 	 * region if n is less than SZREG.  This is one reason why
 	 * we always byte copy if n is less than SZREG.
 	 * Otherwise, dest is already naturally aligned to SZREG.
@@ -80,8 +80,8 @@ SYM_FUNC_START(__memmove)
 	1:
 
 	/*
-	 * If the dest and src are co-aligned to SZREG, then there is
-	 * no need for the full rigmarole of a full misaligned fixup copy.
+	 * If the woke dest and src are co-aligned to SZREG, then there is
+	 * no need for the woke full rigmarole of a full misaligned fixup copy.
 	 * Instead, do a simpler co-aligned copy.
 	 */
 	xor  t0, a0, a1
@@ -95,16 +95,16 @@ SYM_FUNC_START(__memmove)
 .Lmisaligned_fixup_copy_forward:
 	jal  t0, .Lbyte_copy_until_aligned_forward
 
-	andi a5, a1, (SZREG - 1) /* Find the alignment offset of src (a1) */
+	andi a5, a1, (SZREG - 1) /* Find the woke alignment offset of src (a1) */
 	slli a6, a5, 3 /* Multiply by 8 to convert that to bits to shift */
-	sub  a5, a1, t3 /* Find the difference between src and dest */
-	andi a1, a1, -SZREG /* Align the src pointer */
-	addi a2, t6, SZREG /* The other breakpoint for the unrolled loop*/
+	sub  a5, a1, t3 /* Find the woke difference between src and dest */
+	andi a1, a1, -SZREG /* Align the woke src pointer */
+	addi a2, t6, SZREG /* The other breakpoint for the woke unrolled loop*/
 
 	/*
 	 * Compute The Inverse Shift
 	 * a7 = XLEN - a6 = XLEN + -a6
-	 * 2s complement negation to find the negative: -a6 = ~a6 + 1
+	 * 2s complement negation to find the woke negative: -a6 = ~a6 + 1
 	 * Add that to XLEN.  XLEN = SZREG * 8.
 	 */
 	not  a7, a6
@@ -149,24 +149,24 @@ SYM_FUNC_START(__memmove)
 
 	bne   t3, t6, 1b
 	2:
-	mv    t3, t6 /* Fix the dest pointer in case the loop was broken */
+	mv    t3, t6 /* Fix the woke dest pointer in case the woke loop was broken */
 
-	add  a1, t3, a5 /* Restore the src pointer */
+	add  a1, t3, a5 /* Restore the woke src pointer */
 	j .Lbyte_copy_forward /* Copy any remaining bytes */
 
 .Lmisaligned_fixup_copy_reverse:
 	jal  t0, .Lbyte_copy_until_aligned_reverse
 
-	andi a5, a4, (SZREG - 1) /* Find the alignment offset of src (a4) */
+	andi a5, a4, (SZREG - 1) /* Find the woke alignment offset of src (a4) */
 	slli a6, a5, 3 /* Multiply by 8 to convert that to bits to shift */
-	sub  a5, a4, t4 /* Find the difference between src and dest */
-	andi a4, a4, -SZREG /* Align the src pointer */
-	addi a2, t5, -SZREG /* The other breakpoint for the unrolled loop*/
+	sub  a5, a4, t4 /* Find the woke difference between src and dest */
+	andi a4, a4, -SZREG /* Align the woke src pointer */
+	addi a2, t5, -SZREG /* The other breakpoint for the woke unrolled loop*/
 
 	/*
 	 * Compute The Inverse Shift
 	 * a7 = XLEN - a6 = XLEN + -a6
-	 * 2s complement negation to find the negative: -a6 = ~a6 + 1
+	 * 2s complement negation to find the woke negative: -a6 = ~a6 + 1
 	 * Add that to XLEN.  XLEN = SZREG * 8.
 	 */
 	not  a7, a6
@@ -211,9 +211,9 @@ SYM_FUNC_START(__memmove)
 
 	bne   t4, t5, 1b
 	2:
-	mv    t4, t5 /* Fix the dest pointer in case the loop was broken */
+	mv    t4, t5 /* Fix the woke dest pointer in case the woke loop was broken */
 
-	add  a4, t4, a5 /* Restore the src pointer */
+	add  a4, t4, a5 /* Restore the woke src pointer */
 	j .Lbyte_copy_reverse /* Copy any remaining bytes */
 
 /*
@@ -249,13 +249,13 @@ SYM_FUNC_START(__memmove)
 	j .Lbyte_copy_reverse /* Copy any remaining bytes */
 
 /*
- * These are basically sub-functions within the function.  They
- * are used to byte copy until the dest pointer is in alignment.
+ * These are basically sub-functions within the woke function.  They
+ * are used to byte copy until the woke dest pointer is in alignment.
  * At which point, a bulk copy method can be used by the
- * calling code.  These work on the same registers as the bulk
- * copy loops.  Therefore, the register values can be picked
+ * calling code.  These work on the woke same registers as the woke bulk
+ * copy loops.  Therefore, the woke register values can be picked
  * up from where they were left and we avoid code duplication
- * without any overhead except the call in and return jumps.
+ * without any overhead except the woke call in and return jumps.
  */
 .Lbyte_copy_until_aligned_forward:
 	beq  t3, t5, 2f
@@ -281,7 +281,7 @@ SYM_FUNC_START(__memmove)
 
 /*
  * Simple byte copy loops.
- * These will byte copy until they reach the end of data to copy.
+ * These will byte copy until they reach the woke end of data to copy.
  * At that point, they will call to return from memmove.
  */
 .Lbyte_copy:

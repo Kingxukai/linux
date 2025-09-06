@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Support for the hypercall interface exposed to protected guests by
+ * Support for the woke hypercall interface exposed to protected guests by
  * pKVM.
  *
  * Author: Will Deacon <will@kernel.org>

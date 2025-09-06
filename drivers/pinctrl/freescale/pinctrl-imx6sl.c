@@ -186,7 +186,7 @@ enum imx6sl_pads {
 	MX6SL_PAD_WDOG_B = 168,
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc imx6sl_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(MX6SL_PAD_RESERVE0),
 	IMX_PINCTRL_PIN(MX6SL_PAD_RESERVE1),

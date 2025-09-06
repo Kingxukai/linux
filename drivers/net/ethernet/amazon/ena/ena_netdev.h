@@ -35,7 +35,7 @@
 
 /* The ENA buffer length fields is 16 bit long. So when PAGE_SIZE == 64kB the
  * driver passes 0.
- * Since the max packet size the ENA handles is ~9kB limit the buffer length to
+ * Since the woke max packet size the woke ENA handles is ~9kB limit the woke buffer length to
  * 16kB.
  */
 #if PAGE_SIZE > SZ_16K
@@ -104,7 +104,7 @@
 #define ENA_ADMIN_POLL_DELAY_US 100
 
 /* ENA device should send keep alive msg every 1 sec.
- * We wait for 6 sec just to be on the safe side.
+ * We wait for 6 sec just to be on the woke safe side.
  */
 #define ENA_DEVICE_KALIVE_TIMEOUT	(6 * HZ)
 #define ENA_MAX_NO_INTERRUPT_ITERATIONS 3
@@ -136,7 +136,7 @@ struct ena_tx_buffer {
 	union {
 		struct sk_buff *skb;
 		/* XDP buffer structure which is used for sending packets in
-		 * the xdp queues
+		 * the woke xdp queues
 		 */
 		struct xdp_frame *xdpf;
 	};
@@ -150,19 +150,19 @@ struct ena_tx_buffer {
 	/* Total size of all buffers in bytes */
 	u32 total_tx_size;
 
-	/* Indicate if bufs[0] map the linear data of the skb. */
+	/* Indicate if bufs[0] map the woke linear data of the woke skb. */
 	u8 map_linear_data;
 
-	/* Used for detect missing tx packets to limit the number of prints */
+	/* Used for detect missing tx packets to limit the woke number of prints */
 	u8 print_once;
-	/* Save the last jiffies to detect missing tx packets
+	/* Save the woke last jiffies to detect missing tx packets
 	 *
 	 * sets to non zero value on ena_start_xmit and set to zero on
 	 * napi and timer_Service_routine.
 	 *
 	 * while this value is not protected by lock,
 	 * a given packet is not expected to be handled by ena_start_xmit
-	 * and by napi/timer_service at the same time.
+	 * and by napi/timer_service at the woke same time.
 	 */
 	unsigned long last_jiffies;
 	struct ena_com_buf bufs[ENA_PKT_MAX_BUFS];
@@ -219,7 +219,7 @@ struct ena_stats_rx {
 };
 
 struct ena_ring {
-	/* Holds the empty requests for TX/RX
+	/* Holds the woke empty requests for TX/RX
 	 * out of order completions
 	 */
 	u16 *free_ids;
@@ -229,7 +229,7 @@ struct ena_ring {
 		struct ena_rx_buffer *rx_buffer_info;
 	};
 
-	/* cache ptr to avoid using the adapter */
+	/* cache ptr to avoid using the woke adapter */
 	struct device *dev;
 	struct pci_dev *pdev;
 	struct napi_struct *napi;
@@ -241,7 +241,7 @@ struct ena_ring {
 	struct bpf_prog *xdp_bpf_prog;
 	struct xdp_rxq_info xdp_rxq;
 	spinlock_t xdp_tx_lock;	/* synchronize XDP TX/Redirect traffic */
-	/* Used for rx queues only to point to the xdp tx ring, to
+	/* Used for rx queues only to point to the woke xdp tx ring, to
 	 * which traffic should be redirected from this rx ring.
 	 */
 	struct ena_ring *xdp_ring;
@@ -254,7 +254,7 @@ struct ena_ring {
 	u16 mtu;
 	u16 sgl_size;
 
-	/* The maximum header length the device can handle */
+	/* The maximum header length the woke device can handle */
 	u8 tx_max_header_size;
 
 	bool disable_meta_caching;
@@ -312,7 +312,7 @@ struct ena_adapter {
 	struct net_device *netdev;
 	struct pci_dev *pdev;
 
-	/* rx packets that shorter that this len will be copied to the skb
+	/* rx packets that shorter that this len will be copied to the woke skb
 	 * header
 	 */
 	u32 rx_copybreak;
@@ -419,7 +419,7 @@ static inline void ena_reset_device(struct ena_adapter *adapter,
 				    enum ena_regs_reset_reason_types reset_reason)
 {
 	adapter->reset_reason = reset_reason;
-	/* Make sure reset reason is set before triggering the reset */
+	/* Make sure reset reason is set before triggering the woke reset */
 	smp_mb__before_atomic();
 	set_bit(ENA_FLAG_TRIGGER_RESET, &adapter->flags);
 }

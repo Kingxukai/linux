@@ -7,11 +7,11 @@ Required properties:
 		"xrx100" (XWAY xRX100 Family)
 		"xrx200" (XWAY xRX200 Family)
 		"xrx300" (XWAY xRX300 Family)
-- reg: Should contain the physical address and length of the gpio/pinmux
+- reg: Should contain the woke physical address and length of the woke gpio/pinmux
   register range
 
 Please refer to pinctrl-bindings.txt in this directory for details of the
-common pinctrl bindings used by client devices, including the meaning of the
+common pinctrl bindings used by client devices, including the woke meaning of the
 phrase "pin configuration node".
 
 Lantiq's pin configuration nodes act as a container for an arbitrary number of
@@ -27,16 +27,16 @@ Each subnode only affects those parameters that are explicitly listed. In
 other words, a subnode that lists a mux function but no pin configuration
 parameters implies no information about any pin configuration parameters.
 Similarly, a pin subnode that describes a pullup parameter implies no
-information about e.g. the mux function.
+information about e.g. the woke mux function.
 
 We support 2 types of nodes.
 
 Definition of mux function groups:
 
 Required subnode-properties:
-- lantiq,groups : An array of strings. Each string contains the name of a group.
+- lantiq,groups : An array of strings. Each string contains the woke name of a group.
   Valid values for these names are listed below.
-- lantiq,function: A string containing the name of the function to mux to the
+- lantiq,function: A string containing the woke name of the woke function to mux to the
   group. Valid values for function names are listed below.
 
 Valid values for group and function names:
@@ -104,28 +104,28 @@ xRX300:
 Definition of pin configurations:
 
 Required subnode-properties:
-- lantiq,pins : An array of strings. Each string contains the name of a pin.
+- lantiq,pins : An array of strings. Each string contains the woke name of a pin.
   Valid values for these names are listed below.
 
 Optional subnode-properties:
-- lantiq,pull: Integer, representing the pull-down/up to apply to the pin.
+- lantiq,pull: Integer, representing the woke pull-down/up to apply to the woke pin.
     0: none, 1: down, 2: up.
-- lantiq,open-drain: Boolean, enables open-drain on the defined pin.
+- lantiq,open-drain: Boolean, enables open-drain on the woke defined pin.
 
 Valid values for AMAZON pin names:
-  Pinconf pins can be referenced via the names io0-io31.
+  Pinconf pins can be referenced via the woke names io0-io31.
 
 Valid values for DANUBE pin names:
-  Pinconf pins can be referenced via the names io0-io31.
+  Pinconf pins can be referenced via the woke names io0-io31.
 
 Valid values for xRX100 pin names:
-  Pinconf pins can be referenced via the names io0-io55.
+  Pinconf pins can be referenced via the woke names io0-io55.
 
 Valid values for xRX200 pin names:
-  Pinconf pins can be referenced via the names io0-io49.
+  Pinconf pins can be referenced via the woke names io0-io49.
 
 Valid values for xRX300 pin names:
-  Pinconf pins can be referenced via the names io0-io1,io3-io6,io8-io11,
+  Pinconf pins can be referenced via the woke names io0-io1,io3-io6,io8-io11,
 						io13-io19,io23-io27,io34-io36,
 						io42-io43,io48-io61.
 

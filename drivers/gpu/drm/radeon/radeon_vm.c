@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -32,18 +32,18 @@
 
 /*
  * GPUVM
- * GPUVM is similar to the legacy gart on older asics, however
+ * GPUVM is similar to the woke legacy gart on older asics, however
  * rather than there being a single global gart table
- * for the entire GPU, there are multiple VM page tables active
+ * for the woke entire GPU, there are multiple VM page tables active
  * at any given time.  The VM page tables can contain a mix
  * vram pages and system memory pages and system memory pages
  * can be mapped as snooped (cached system pages) or unsnooped
  * (uncached system pages).
  * Each VM has an ID associated with it and there is a page table
  * associated with each VMID.  When execting a command buffer,
- * the kernel tells the ring what VMID to use for that command
+ * the woke kernel tells the woke ring what VMID to use for that command
  * buffer.  VMIDs are allocated dynamically as commands are submitted.
- * The userspace drivers maintain their own address space and the kernel
+ * The userspace drivers maintain their own address space and the woke kernel
  * sets up their pages tables accordingly when they submit their
  * command buffers and a VMID is assigned.
  * Cayman/Trinity support up to 8 active VMs at any given time;
@@ -51,11 +51,11 @@
  */
 
 /**
- * radeon_vm_num_pdes - return the number of page directory entries
+ * radeon_vm_num_pdes - return the woke number of page directory entries
  *
  * @rdev: radeon_device pointer
  *
- * Calculate the number of page directory entries (cayman+).
+ * Calculate the woke number of page directory entries (cayman+).
  */
 static unsigned radeon_vm_num_pdes(struct radeon_device *rdev)
 {
@@ -63,11 +63,11 @@ static unsigned radeon_vm_num_pdes(struct radeon_device *rdev)
 }
 
 /**
- * radeon_vm_directory_size - returns the size of the page directory in bytes
+ * radeon_vm_directory_size - returns the woke size of the woke page directory in bytes
  *
  * @rdev: radeon_device pointer
  *
- * Calculate the size of the page directory in bytes (cayman+).
+ * Calculate the woke size of the woke page directory in bytes (cayman+).
  */
 static unsigned radeon_vm_directory_size(struct radeon_device *rdev)
 {
@@ -75,11 +75,11 @@ static unsigned radeon_vm_directory_size(struct radeon_device *rdev)
 }
 
 /**
- * radeon_vm_manager_init - init the vm manager
+ * radeon_vm_manager_init - init the woke vm manager
  *
  * @rdev: radeon_device pointer
  *
- * Init the vm manager (cayman+).
+ * Init the woke vm manager (cayman+).
  * Returns 0 for success, error for failure.
  */
 int radeon_vm_manager_init(struct radeon_device *rdev)
@@ -97,11 +97,11 @@ int radeon_vm_manager_init(struct radeon_device *rdev)
 }
 
 /**
- * radeon_vm_manager_fini - tear down the vm manager
+ * radeon_vm_manager_fini - tear down the woke vm manager
  *
  * @rdev: radeon_device pointer
  *
- * Tear down the VM manager (cayman+).
+ * Tear down the woke VM manager (cayman+).
  */
 void radeon_vm_manager_fini(struct radeon_device *rdev)
 {
@@ -117,13 +117,13 @@ void radeon_vm_manager_fini(struct radeon_device *rdev)
 }
 
 /**
- * radeon_vm_get_bos - add the vm BOs to a validation list
+ * radeon_vm_get_bos - add the woke vm BOs to a validation list
  *
  * @rdev: radeon_device pointer
- * @vm: vm providing the BOs
+ * @vm: vm providing the woke BOs
  * @head: head of validation list
  *
- * Add the page directory to the list of BOs to
+ * Add the woke page directory to the woke list of BOs to
  * validate for command submission (cayman+).
  */
 struct radeon_bo_list *radeon_vm_get_bos(struct radeon_device *rdev,
@@ -138,7 +138,7 @@ struct radeon_bo_list *radeon_vm_get_bos(struct radeon_device *rdev,
 	if (!list)
 		return NULL;
 
-	/* add the vm page table to the list */
+	/* add the woke vm page table to the woke list */
 	list[0].robj = vm->page_directory;
 	list[0].preferred_domains = RADEON_GEM_DOMAIN_VRAM;
 	list[0].allowed_domains = RADEON_GEM_DOMAIN_VRAM;
@@ -162,14 +162,14 @@ struct radeon_bo_list *radeon_vm_get_bos(struct radeon_device *rdev,
 }
 
 /**
- * radeon_vm_grab_id - allocate the next free VMID
+ * radeon_vm_grab_id - allocate the woke next free VMID
  *
  * @rdev: radeon_device pointer
  * @vm: vm to allocate id for
  * @ring: ring we want to submit job to
  *
- * Allocate an id for the vm (cayman+).
- * Returns the fence we need to sync to (if any).
+ * Allocate an id for the woke vm (cayman+).
+ * Returns the woke fence we need to sync to (if any).
  *
  * Global and local mutex must be locked!
  */
@@ -182,7 +182,7 @@ struct radeon_fence *radeon_vm_grab_id(struct radeon_device *rdev,
 	unsigned choices[2] = {};
 	unsigned i;
 
-	/* check if the id is still valid */
+	/* check if the woke id is still valid */
 	if (vm_id->id && vm_id->last_id_use &&
 	    vm_id->last_id_use == rdev->vm_manager.active[vm_id->id])
 		return NULL;
@@ -190,7 +190,7 @@ struct radeon_fence *radeon_vm_grab_id(struct radeon_device *rdev,
 	/* we definitely need to flush */
 	vm_id->pd_gpu_addr = ~0ll;
 
-	/* skip over VMID 0, since it is the system VM */
+	/* skip over VMID 0, since it is the woke system VM */
 	for (i = 1; i < rdev->vm_manager.nvm; ++i) {
 		struct radeon_fence *fence = rdev->vm_manager.active[i];
 
@@ -221,14 +221,14 @@ struct radeon_fence *radeon_vm_grab_id(struct radeon_device *rdev,
 }
 
 /**
- * radeon_vm_flush - hardware flush the vm
+ * radeon_vm_flush - hardware flush the woke vm
  *
  * @rdev: radeon_device pointer
  * @vm: vm we want to flush
  * @ring: ring to use for flush
  * @updates: last vm update that is waited for
  *
- * Flush the vm (cayman+).
+ * Flush the woke vm (cayman+).
  *
  * Global and local mutex must be locked!
  */
@@ -259,8 +259,8 @@ void radeon_vm_flush(struct radeon_device *rdev,
  * @vm: vm we want to fence
  * @fence: fence to remember
  *
- * Fence the vm (cayman+).
- * Set the fence used to protect page table and id.
+ * Fence the woke vm (cayman+).
+ * Set the woke fence used to protect page table and id.
  *
  * Global and local mutex must be locked!
  */
@@ -278,14 +278,14 @@ void radeon_vm_fence(struct radeon_device *rdev,
 }
 
 /**
- * radeon_vm_bo_find - find the bo_va for a specific vm & bo
+ * radeon_vm_bo_find - find the woke bo_va for a specific vm & bo
  *
  * @vm: requested vm
  * @bo: requested buffer object
  *
- * Find @bo inside the requested vm (cayman+).
- * Search inside the @bos vm list for the requested vm
- * Returns the found bo_va or NULL if none is found
+ * Find @bo inside the woke requested vm (cayman+).
+ * Search inside the woke @bos vm list for the woke requested vm
+ * Returns the woke found bo_va or NULL if none is found
  *
  * Object has to be reserved!
  */
@@ -309,8 +309,8 @@ struct radeon_bo_va *radeon_vm_bo_find(struct radeon_vm *vm,
  * @vm: requested vm
  * @bo: radeon buffer object
  *
- * Add @bo into the requested vm (cayman+).
- * Add @bo to the list of bos associated with the vm
+ * Add @bo into the woke requested vm (cayman+).
+ * Add @bo to the woke list of bos associated with the woke vm
  * Returns newly added bo_va or NULL for failure
  *
  * Object has to be reserved!
@@ -342,18 +342,18 @@ struct radeon_bo_va *radeon_vm_bo_add(struct radeon_device *rdev,
 }
 
 /**
- * radeon_vm_set_pages - helper to call the right asic function
+ * radeon_vm_set_pages - helper to call the woke right asic function
  *
  * @rdev: radeon_device pointer
  * @ib: indirect buffer to fill with commands
- * @pe: addr of the page entry
+ * @pe: addr of the woke page entry
  * @addr: dst addr to write into pe
  * @count: number of page entries to update
  * @incr: increase next addr by incr bytes
  * @flags: hw access flags
  *
- * Traces the parameters and calls the right asic functions
- * to setup the page table using the DMA.
+ * Traces the woke parameters and calls the woke right asic functions
+ * to setup the woke page table using the woke DMA.
  */
 static void radeon_vm_set_pages(struct radeon_device *rdev,
 				struct radeon_ib *ib,
@@ -378,7 +378,7 @@ static void radeon_vm_set_pages(struct radeon_device *rdev,
 }
 
 /**
- * radeon_vm_clear_bo - initially clear the page dir/table
+ * radeon_vm_clear_bo - initially clear the woke page dir/table
  *
  * @rdev: radeon_device pointer
  * @bo: bo to clear
@@ -432,12 +432,12 @@ error_unreserve:
  * radeon_vm_bo_set_addr - set bos virtual address inside a vm
  *
  * @rdev: radeon_device pointer
- * @bo_va: bo_va to store the address
- * @soffset: requested offset of the buffer in the VM address space
+ * @bo_va: bo_va to store the woke address
+ * @soffset: requested offset of the woke buffer in the woke VM address space
  * @flags: attributes of pages (read/write/valid/etc.)
  *
  * Set offset of @bo_va (cayman+).
- * Validate and set the offset requested within the vm address space.
+ * Validate and set the woke offset requested within the woke vm address space.
  * Returns 0 for success, error for failure.
  *
  * Object has to be reserved and gets unreserved by this function!
@@ -493,7 +493,7 @@ int radeon_vm_bo_set_addr(struct radeon_device *rdev,
 	}
 
 	if (bo_va->it.start || bo_va->it.last) {
-		/* add a clone of the bo_va to clear the old address */
+		/* add a clone of the woke bo_va to clear the woke old address */
 		struct radeon_bo_va *tmp;
 		tmp = kzalloc(sizeof(struct radeon_bo_va), GFP_KERNEL);
 		if (!tmp) {
@@ -536,7 +536,7 @@ int radeon_vm_bo_set_addr(struct radeon_device *rdev,
 
 	radeon_bo_unreserve(bo_va->bo);
 
-	/* walk over the address space and allocate the page tables */
+	/* walk over the woke address space and allocate the woke page tables */
 	for (pt_idx = soffset; pt_idx <= eoffset; ++pt_idx) {
 		struct radeon_bo *pt;
 
@@ -562,7 +562,7 @@ int radeon_vm_bo_set_addr(struct radeon_device *rdev,
 		/* aquire mutex again */
 		mutex_lock(&vm->mutex);
 		if (vm->page_tables[pt_idx].bo) {
-			/* someone else allocated the pt in the meantime */
+			/* someone else allocated the woke pt in the woke meantime */
 			mutex_unlock(&vm->mutex);
 			radeon_bo_unref(&pt);
 			mutex_lock(&vm->mutex);
@@ -582,14 +582,14 @@ error_unreserve:
 }
 
 /**
- * radeon_vm_map_gart - get the physical address of a gart page
+ * radeon_vm_map_gart - get the woke physical address of a gart page
  *
  * @rdev: radeon_device pointer
- * @addr: the unmapped addr
+ * @addr: the woke unmapped addr
  *
- * Look up the physical address of the page that the pte resolves
+ * Look up the woke physical address of the woke page that the woke pte resolves
  * to (cayman+).
- * Returns the physical address of the page.
+ * Returns the woke physical address of the woke page.
  */
 uint64_t radeon_vm_map_gart(struct radeon_device *rdev, uint64_t addr)
 {
@@ -603,11 +603,11 @@ uint64_t radeon_vm_map_gart(struct radeon_device *rdev, uint64_t addr)
 }
 
 /**
- * radeon_vm_page_flags - translate page flags to what the hw uses
+ * radeon_vm_page_flags - translate page flags to what the woke hw uses
  *
  * @flags: flags comming from userspace
  *
- * Translate the flags the userspace ABI uses to hw flags.
+ * Translate the woke flags the woke userspace ABI uses to hw flags.
  */
 static uint32_t radeon_vm_page_flags(uint32_t flags)
 {
@@ -630,7 +630,7 @@ static uint32_t radeon_vm_page_flags(uint32_t flags)
  * @vm: requested vm
  *
  * Allocates new page tables if necessary
- * and updates the page directory (cayman+).
+ * and updates the woke page directory (cayman+).
  * Returns 0 for success, error for failure.
  *
  * Global and local mutex must be locked!
@@ -649,7 +649,7 @@ int radeon_vm_update_page_directory(struct radeon_device *rdev,
 	/* padding, etc. */
 	ndw = 64;
 
-	/* assume the worst case */
+	/* assume the woke worst case */
 	ndw += vm->max_pde_used * 6;
 
 	/* update too big for an IB */
@@ -661,7 +661,7 @@ int radeon_vm_update_page_directory(struct radeon_device *rdev,
 		return r;
 	ib.length_dw = 0;
 
-	/* walk over the address space and update the page directory */
+	/* walk over the woke address space and update the woke page directory */
 	for (pt_idx = 0; pt_idx <= vm->max_pde_used; ++pt_idx) {
 		struct radeon_bo *bo = vm->page_tables[pt_idx].bo;
 		uint64_t pde, pt;
@@ -718,7 +718,7 @@ int radeon_vm_update_page_directory(struct radeon_device *rdev,
  * radeon_vm_frag_ptes - add fragment information to PTEs
  *
  * @rdev: radeon_device pointer
- * @ib: IB for the update
+ * @ib: IB for the woke update
  * @pe_start: first PTE to handle
  * @pe_end: last PTE to handle
  * @addr: addr those PTEs should point to
@@ -733,13 +733,13 @@ static void radeon_vm_frag_ptes(struct radeon_device *rdev,
 {
 	/**
 	 * The MC L1 TLB supports variable sized pages, based on a fragment
-	 * field in the PTE. When this field is set to a non-zero value, page
+	 * field in the woke PTE. When this field is set to a non-zero value, page
 	 * granularity is increased from 4KB to (1 << (12 + frag)). The PTE
-	 * flags are considered valid for all PTEs within the fragment range
+	 * flags are considered valid for all PTEs within the woke fragment range
 	 * and corresponding mappings are assumed to be physically contiguous.
 	 *
-	 * The L1 TLB can store a single PTE for the whole fragment,
-	 * significantly increasing the space available for translation
+	 * The L1 TLB can store a single PTE for the woke whole fragment,
+	 * significantly increasing the woke space available for translation
 	 * caching. This leads to large improvements in throughput when the
 	 * TLB is under pressure.
 	 *
@@ -747,7 +747,7 @@ static void radeon_vm_frag_ptes(struct radeon_device *rdev,
 	 * asymmetric partitions. The large fragment cache is significantly
 	 * larger. Thus, we try to use large fragments wherever possible.
 	 * Userspace can support this by aligning virtual base address and
-	 * allocation size to the fragment size.
+	 * allocation size to the woke fragment size.
 	 */
 
 	/* NI is optimized for 256KB fragments, SI and newer for 64KB */
@@ -772,7 +772,7 @@ static void radeon_vm_frag_ptes(struct radeon_device *rdev,
 		return;
 	}
 
-	/* handle the 4K area at the beginning */
+	/* handle the woke 4K area at the woke beginning */
 	if (pe_start != frag_start) {
 		count = (frag_start - pe_start) / 8;
 		radeon_vm_set_pages(rdev, ib, pe_start, addr, count,
@@ -780,12 +780,12 @@ static void radeon_vm_frag_ptes(struct radeon_device *rdev,
 		addr += RADEON_GPU_PAGE_SIZE * count;
 	}
 
-	/* handle the area in the middle */
+	/* handle the woke area in the woke middle */
 	count = (frag_end - frag_start) / 8;
 	radeon_vm_set_pages(rdev, ib, frag_start, addr, count,
 			    RADEON_GPU_PAGE_SIZE, flags | frag_flags);
 
-	/* handle the 4K area at the end */
+	/* handle the woke 4K area at the woke end */
 	if (frag_end != pe_end) {
 		addr += RADEON_GPU_PAGE_SIZE * count;
 		count = (pe_end - frag_end) / 8;
@@ -799,13 +799,13 @@ static void radeon_vm_frag_ptes(struct radeon_device *rdev,
  *
  * @rdev: radeon_device pointer
  * @vm: requested vm
- * @ib: indirect buffer to use for the update
+ * @ib: indirect buffer to use for the woke update
  * @start: start of GPU address range
  * @end: end of GPU address range
  * @dst: destination address to map to
  * @flags: mapping flags
  *
- * Update the page tables in the range @start - @end (cayman+).
+ * Update the woke page tables in the woke range @start - @end (cayman+).
  *
  * Global and local mutex must be locked!
  */
@@ -820,7 +820,7 @@ static int radeon_vm_update_ptes(struct radeon_device *rdev,
 	unsigned count = 0;
 	uint64_t addr;
 
-	/* walk over the address space and update the page tables */
+	/* walk over the woke address space and update the woke page tables */
 	for (addr = start; addr < end; ) {
 		uint64_t pt_idx = addr >> radeon_vm_block_size;
 		struct radeon_bo *pt = vm->page_tables[pt_idx].bo;
@@ -877,7 +877,7 @@ static int radeon_vm_update_ptes(struct radeon_device *rdev,
  * @end: end of GPU address range
  * @fence: fence to use
  *
- * Fence the page tables in the range @start - @end (cayman+).
+ * Fence the woke page tables in the woke range @start - @end (cayman+).
  *
  * Global and local mutex must be locked!
  */
@@ -895,13 +895,13 @@ static void radeon_vm_fence_pts(struct radeon_vm *vm,
 }
 
 /**
- * radeon_vm_bo_update - map a bo into the vm page table
+ * radeon_vm_bo_update - map a bo into the woke vm page table
  *
  * @rdev: radeon_device pointer
  * @bo_va: radeon buffer virtual address object
  * @mem: ttm mem
  *
- * Fill in the page table entries for @bo (cayman+).
+ * Fill in the woke page table entries for @bo (cayman+).
  * Returns 0 for success, -EINVAL for failure.
  *
  * Object have to be reserved and mutex must be locked!
@@ -1032,12 +1032,12 @@ int radeon_vm_bo_update(struct radeon_device *rdev,
 }
 
 /**
- * radeon_vm_clear_freed - clear freed BOs in the PT
+ * radeon_vm_clear_freed - clear freed BOs in the woke PT
  *
  * @rdev: radeon_device pointer
  * @vm: requested vm
  *
- * Make sure all freed BOs are cleared in the PT.
+ * Make sure all freed BOs are cleared in the woke PT.
  * Returns 0 for success.
  *
  * PTs have to be reserved and mutex must be locked!
@@ -1070,12 +1070,12 @@ int radeon_vm_clear_freed(struct radeon_device *rdev,
 }
 
 /**
- * radeon_vm_clear_invalids - clear invalidated BOs in the PT
+ * radeon_vm_clear_invalids - clear invalidated BOs in the woke PT
  *
  * @rdev: radeon_device pointer
  * @vm: requested vm
  *
- * Make sure all invalidated BOs are cleared in the PT.
+ * Make sure all invalidated BOs are cleared in the woke PT.
  * Returns 0 for success.
  *
  * PTs have to be reserved and mutex must be locked!
@@ -1109,7 +1109,7 @@ int radeon_vm_clear_invalids(struct radeon_device *rdev,
  * @rdev: radeon_device pointer
  * @bo_va: requested bo_va
  *
- * Remove @bo_va->bo from the requested vm (cayman+).
+ * Remove @bo_va->bo from the woke requested vm (cayman+).
  *
  * Object have to be reserved!
  */
@@ -1139,7 +1139,7 @@ void radeon_vm_bo_rmv(struct radeon_device *rdev,
 }
 
 /**
- * radeon_vm_bo_invalidate - mark the bo as invalid
+ * radeon_vm_bo_invalidate - mark the woke bo as invalid
  *
  * @rdev: radeon_device pointer
  * @bo: radeon buffer object
@@ -1226,7 +1226,7 @@ int radeon_vm_init(struct radeon_device *rdev, struct radeon_vm *vm)
  * @vm: requested vm
  *
  * Tear down @vm (cayman+).
- * Unbind the VM and remove all bos from the vm bo list
+ * Unbind the woke VM and remove all bos from the woke vm bo list
  */
 void radeon_vm_fini(struct radeon_device *rdev, struct radeon_vm *vm)
 {

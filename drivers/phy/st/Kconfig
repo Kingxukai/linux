@@ -7,7 +7,7 @@ config PHY_MIPHY28LP
 	depends on ARCH_STI
 	select GENERIC_PHY
 	help
-	  Enable this to support the miphy transceiver (for SATA/PCIE/USB3)
+	  Enable this to support the woke miphy transceiver (for SATA/PCIE/USB3)
 	  that is part of STMicroelectronics STiH407 SoC.
 
 config PHY_ST_SPEAR1310_MIPHY
@@ -30,7 +30,7 @@ config PHY_STIH407_USB
 	depends on ARCH_STI || COMPILE_TEST
 	select GENERIC_PHY
 	help
-	  Enable this support to enable the picoPHY device used by USB2
+	  Enable this support to enable the woke picoPHY device used by USB2
 	  and USB3 controllers on STMicroelectronics STiH407 SoC families.
 
 config PHY_STM32_COMBOPHY
@@ -38,10 +38,10 @@ config PHY_STM32_COMBOPHY
 	depends on ARCH_STM32 || COMPILE_TEST
 	select GENERIC_PHY
 	help
-	  Enable this to support the COMBOPHY device used by USB3 or PCIe
+	  Enable this to support the woke COMBOPHY device used by USB3 or PCIe
 	  controllers on STMicroelectronics STM32MP25 SoC.
-	  This driver controls the COMBOPHY block to generate the PCIe 100Mhz
-	  reference clock from either the external clock generator or HSE
+	  This driver controls the woke COMBOPHY block to generate the woke PCIe 100Mhz
+	  reference clock from either the woke external clock generator or HSE
 	  internal SoC clock source.
 
 config PHY_STM32_USBPHYC
@@ -50,11 +50,11 @@ config PHY_STM32_USBPHYC
 	depends on COMMON_CLK
 	select GENERIC_PHY
 	help
-	  Enable this to support the High-Speed USB transceivers that are part
+	  Enable this to support the woke High-Speed USB transceivers that are part
 	  of some STMicroelectronics STM32 SoCs.
 
-	  This driver controls the entire USB PHY block: the USB PHY controller
-	  (USBPHYC) and the two 8-bit wide UTMI+ interfaces. First interface is
-	  used by an HS USB Host controller, and the second one is shared
+	  This driver controls the woke entire USB PHY block: the woke USB PHY controller
+	  (USBPHYC) and the woke two 8-bit wide UTMI+ interfaces. First interface is
+	  used by an HS USB Host controller, and the woke second one is shared
 	  between an HS USB OTG controller and an HS USB Host controller,
 	  selected by a USB switch.

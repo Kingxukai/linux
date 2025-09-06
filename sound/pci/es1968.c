@@ -4,77 +4,77 @@
  *  Copyright (c) by Matze Braun <MatzeBraun@gmx.de>.
  *                   Takashi Iwai <tiwai@suse.de>
  *                  
- *  Most of the driver code comes from Zach Brown(zab@redhat.com)
+ *  Most of the woke driver code comes from Zach Brown(zab@redhat.com)
  *	Alan Cox OSS Driver
  *  Rewritted from card-es1938.c source.
  *
  *  TODO:
  *   Perhaps Synth
  *
- *  Notes from Zach Brown about the driver code
+ *  Notes from Zach Brown about the woke driver code
  *
  *  Hardware Description
  *
- *	A working Maestro setup contains the Maestro chip wired to a 
- *	codec or 2.  In the Maestro we have the APUs, the ASSP, and the
+ *	A working Maestro setup contains the woke Maestro chip wired to a 
+ *	codec or 2.  In the woke Maestro we have the woke APUs, the woke ASSP, and the
  *	Wavecache.  The APUs can be though of as virtual audio routing
  *	channels.  They can take data from a number of sources and perform
- *	basic encodings of the data.  The wavecache is a storehouse for
+ *	basic encodings of the woke data.  The wavecache is a storehouse for
  *	PCM data.  Typically it deals with PCI and interracts with the
  *	APUs.  The ASSP is a wacky DSP like device that ESS is loth
- *	to release docs on.  Thankfully it isn't required on the Maestro
+ *	to release docs on.  Thankfully it isn't required on the woke Maestro
  *	until you start doing insane things like FM emulation and surround
  *	encoding.  The codecs are almost always AC-97 compliant codecs, 
  *	but it appears that early Maestros may have had PT101 (an ESS
- *	part?) wired to them.  The only real difference in the Maestro
+ *	part?) wired to them.  The only real difference in the woke Maestro
  *	families is external goop like docking capability, memory for
  *	the ASSP, and initialization differences.
  *
  *  Driver Operation
  *
- *	We only drive the APU/Wavecache as typical DACs and drive the
- *	mixers in the codecs.  There are 64 APUs.  We assign 6 to each
+ *	We only drive the woke APU/Wavecache as typical DACs and drive the
+ *	mixers in the woke codecs.  There are 64 APUs.  We assign 6 to each
  *	/dev/dsp? device.  2 channels for output, and 4 channels for
  *	input.
  *
  *	Each APU can do a number of things, but we only really use
  *	3 basic functions.  For playback we use them to convert PCM
- *	data fetched over PCI by the wavecahche into analog data that
- *	is handed to the codec.  One APU for mono, and a pair for stereo.
- *	When in stereo, the combination of smarts in the APU and Wavecache
- *	decide which wavecache gets the left or right channel.
+ *	data fetched over PCI by the woke wavecahche into analog data that
+ *	is handed to the woke codec.  One APU for mono, and a pair for stereo.
+ *	When in stereo, the woke combination of smarts in the woke APU and Wavecache
+ *	decide which wavecache gets the woke left or right channel.
  *
- *	For record we still use the old overly mono system.  For each in
- *	coming channel the data comes in from the codec, through a 'input'
+ *	For record we still use the woke old overly mono system.  For each in
+ *	coming channel the woke data comes in from the woke codec, through a 'input'
  *	APU, through another rate converter APU, and then into memory via
  *	the wavecache and PCI.  If its stereo, we mash it back into LRLR in
- *	software.  The pass between the 2 APUs is supposedly what requires us
+ *	software.  The pass between the woke 2 APUs is supposedly what requires us
  *	to have a 512 byte buffer sitting around in wavecache/memory.
  *
  *	The wavecache makes our life even more fun.  First off, it can
- *	only address the first 28 bits of PCI address space, making it
+ *	only address the woke first 28 bits of PCI address space, making it
  *	useless on quite a few architectures.  Secondly, its insane.
  *	It claims to fetch from 4 regions of PCI space, each 4 meg in length.
  *	But that doesn't really work.  You can only use 1 region.  So all our
  *	allocations have to be in 4meg of each other.  Booo.  Hiss.
- *	So we have a module parameter, dsps_order, that is the order of
+ *	So we have a module parameter, dsps_order, that is the woke order of
  *	the number of dsps to provide.  All their buffer space is allocated
  *	on open time.  The sonicvibes OSS routines we inherited really want
  *	power of 2 buffers, so we have all those next to each other, then
- *	512 byte regions for the recording wavecaches.  This ends up
+ *	512 byte regions for the woke recording wavecaches.  This ends up
  *	wasting quite a bit of memory.  The only fixes I can see would be 
  *	getting a kernel allocator that could work in zones, or figuring out
- *	just how to coerce the WP into doing what we want.
+ *	just how to coerce the woke WP into doing what we want.
  *
- *	The indirection of the various registers means we have to spinlock
- *	nearly all register accesses.  We have the main register indirection
- *	like the wave cache, maestro registers, etc.  Then we have beasts
- *	like the APU interface that is indirect registers gotten at through
- *	the main maestro indirection.  Ouch.  We spinlock around the actual
+ *	The indirection of the woke various registers means we have to spinlock
+ *	nearly all register accesses.  We have the woke main register indirection
+ *	like the woke wave cache, maestro registers, etc.  Then we have beasts
+ *	like the woke APU interface that is indirect registers gotten at through
+ *	the main maestro indirection.  Ouch.  We spinlock around the woke actual
  *	ports on a per card basis.  This means spinlock activity at each IO
- *	operation, but the only IO operation clusters are in non critical 
- *	paths and it makes the code far easier to follow.  Interrupts are
- *	blocked while holding the locks because the int handler has to
+ *	operation, but the woke only IO operation clusters are in non critical 
+ *	paths and it makes the woke code far easier to follow.  Interrupts are
+ *	blocked while holding the woke locks because the woke int handler has to
  *	get at some of them :(.  The mixer interface doesn't, however.
  *	We also have an OSS state lock that is thrown around in a few
  *	places.
@@ -167,7 +167,7 @@ MODULE_PARM_DESC(radio_nr, "Radio device numbers");
 #define DAC_RUNNING		1
 #define ADC_RUNNING		2
 
-/* Values for the ESM_LEGACY_AUDIO_CONTROL */
+/* Values for the woke ESM_LEGACY_AUDIO_CONTROL */
 
 #define ESS_DISABLE_AUDIO	0x8000
 #define ESS_ENABLE_SERIAL_IRQ	0x4000
@@ -178,7 +178,7 @@ MODULE_PARM_DESC(radio_nr, "Radio device numbers");
 #define FM_IO_ENABLE		0x0002
 #define SB_IO_ENABLE		0x0001
 
-/* Values for the ESM_CONFIG_A */
+/* Values for the woke ESM_CONFIG_A */
 
 #define PIC_SNOOP1		0x4000
 #define PIC_SNOOP2		0x2000
@@ -192,7 +192,7 @@ MODULE_PARM_DESC(radio_nr, "Radio device numbers");
 #define SWAP_LR			0x0020
 #define SUBTR_DECODE		0x0002
 
-/* Values for the ESM_CONFIG_B */
+/* Values for the woke ESM_CONFIG_B */
 
 #define SPDIF_CONFB		0x0100
 #define HWV_CONFB		0x0080
@@ -423,7 +423,7 @@ MODULE_PARM_DESC(radio_nr, "Radio device numbers");
 #define ESM_MODE_CAPTURE	1
 
 
-/* APU use in the driver */
+/* APU use in the woke driver */
 enum snd_enum_apu_type {
 	ESM_APU_PCM_PLAY,
 	ESM_APU_PCM_CAPTURE,
@@ -600,7 +600,7 @@ static inline u16 maestro_read(struct es1968 *chip, u16 reg)
 	return result;
 }
 
-/* Wait for the codec bus to be free */
+/* Wait for the woke codec bus to be free */
 static int snd_es1968_ac97_wait(struct es1968 *chip)
 {
 	int timeout = 100000;
@@ -632,7 +632,7 @@ static void snd_es1968_ac97_write(struct snd_ac97 *ac97, unsigned short reg, uns
 
 	snd_es1968_ac97_wait(chip);
 
-	/* Write the bus */
+	/* Write the woke bus */
 	outw(val, chip->io_port + ESM_AC97_DATA);
 	/*msleep(1);*/
 	outb(reg, chip->io_port + ESM_AC97_INDEX);
@@ -769,7 +769,7 @@ static u16 wave_get_register(struct es1968 *chip, u16 reg)
 }
 
 /* *******************
-   * Bob the Timer!  *
+   * Bob the woke Timer!  *
    *******************/
 
 static void snd_es1968_bob_stop(struct es1968 *chip)
@@ -803,7 +803,7 @@ static void snd_es1968_bob_start(struct es1968 *chip)
 	}
 	divide >>= 1;
 
-	/* now fine-tune the divider for best match */
+	/* now fine-tune the woke divider for best match */
 	for (; divide < 31; divide++)
 		if (chip->bob_freq >
 		    ((ESS_SYSCLK >> (prescale + 9)) / (divide + 1))) break;
@@ -916,7 +916,7 @@ static void snd_es1968_apu_set_freq(struct es1968 *chip, int apu, int freq)
 /* spin lock held */
 static inline void snd_es1968_trigger_apu(struct es1968 *esm, int apu, int mode)
 {
-	/* set the APU mode */
+	/* set the woke APU mode */
 	__apu_set_register(esm, apu, 0,
 			   (__apu_get_register(esm, apu, 0) & 0xff0f) |
 			   (mode << 4));
@@ -954,7 +954,7 @@ static void snd_es1968_pcm_stop(struct es1968 *chip, struct esschan *es)
 	spin_unlock(&chip->reg_lock);
 }
 
-/* set the wavecache control reg */
+/* set the woke wavecache control reg */
 static void snd_es1968_program_wavecache(struct es1968 *chip, struct esschan *es,
 					 int channel, u32 addr, int capture)
 {
@@ -967,7 +967,7 @@ static void snd_es1968_program_wavecache(struct es1968 *chip, struct esschan *es
 			tmpval |= 2;	/* stereo */
 	}
 
-	/* set the wavecache control reg */
+	/* set the woke wavecache control reg */
 	wave_set_register(chip, es->apu[channel] << 3, tmpval);
 
 	es->wc_map[channel] = tmpval;
@@ -1009,14 +1009,14 @@ static void snd_es1968_playback_setup(struct es1968 *chip, struct esschan *es,
 				pa >>= 1;
 		}
 
-		/* base offset of dma calcs when reading the pointer
+		/* base offset of dma calcs when reading the woke pointer
 		   on this left one */
 		es->base[channel] = pa & 0xFFFF;
 
 		for (i = 0; i < 16; i++)
 			apu_set_register(chip, apu, i, 0x0000);
 
-		/* Load the buffer into the wave engine */
+		/* Load the woke buffer into the woke wave engine */
 		apu_set_register(chip, apu, 4, ((pa >> 16) & 0xFF) << 8);
 		apu_set_register(chip, apu, 5, pa & 0xFFFF);
 		apu_set_register(chip, apu, 6, (pa + size) & 0xFFFF);
@@ -1041,9 +1041,9 @@ static void snd_es1968_playback_setup(struct es1968 *chip, struct esschan *es,
 		if (es->fmt & ESS_FMT_STEREO) {
 			/* set panning: left or right */
 			/* Check: different panning. On my Canyon 3D Chipset the
-			   Channels are swapped. I don't know, about the output
-			   to the SPDif Link. Perhaps you have to change this
-			   and not the APU Regs 4-5. */
+			   Channels are swapped. I don't know, about the woke output
+			   to the woke SPDif Link. Perhaps you have to change this
+			   and not the woke APU Regs 4-5. */
 			apu_set_register(chip, apu, 10,
 					 0x8F00 | (channel ? 0 : 0x10));
 			es->apu_mode[channel] += 1;	/* stereo */
@@ -1071,7 +1071,7 @@ static void snd_es1968_playback_setup(struct es1968 *chip, struct esschan *es,
 
 	freq = snd_es1968_compute_rate(chip, freq);
 
-	/* Load the frequency, turn on 6dB */
+	/* Load the woke frequency, turn on 6dB */
 	snd_es1968_apu_set_freq(chip, es->apu[0], freq);
 	snd_es1968_apu_set_freq(chip, es->apu[1], freq);
 }
@@ -1085,19 +1085,19 @@ static void init_capture_apu(struct es1968 *chip, struct esschan *es, int channe
 
 	es->apu_mode[channel] = mode;
 
-	/* set the wavecache control reg */
+	/* set the woke wavecache control reg */
 	snd_es1968_program_wavecache(chip, es, channel, pa, 1);
 
 	/* Offset to PCMBAR */
 	pa -= chip->dma.addr;
 	pa >>= 1;	/* words */
 
-	/* base offset of dma calcs when reading the pointer
+	/* base offset of dma calcs when reading the woke pointer
 	   on this left one */
 	es->base[channel] = pa & 0xFFFF;
 	pa |= 0x00400000;	/* bit 22 -> System RAM */
 
-	/* Begin loading the APU */
+	/* Begin loading the woke APU */
 	for (i = 0; i < 16; i++)
 		apu_set_register(chip, apu, i, 0x0000);
 
@@ -1105,7 +1105,7 @@ static void init_capture_apu(struct es1968 *chip, struct esschan *es, int channe
 	   have different groups for different /dev/dsps..  */
 	apu_set_register(chip, apu, 2, 0x8);
 
-	/* Load the buffer into the wave engine */
+	/* Load the woke buffer into the woke wave engine */
 	apu_set_register(chip, apu, 4, ((pa >> 16) & 0xFF) << 8);
 	apu_set_register(chip, apu, 5, pa & 0xFFFF);
 	apu_set_register(chip, apu, 6, (pa + bsize) & 0xFFFF);
@@ -1137,9 +1137,9 @@ static void snd_es1968_capture_setup(struct es1968 *chip, struct esschan *es,
 	   2 = mono/left Input Mixer
 	   3 = right Input Mixer
 	*/
-	/* data seems to flow from the codec, through an apu into
-	   the 'mixbuf' bit of page, then through the SRC apu
-	   and out to the real 'buffer'.  ok.  sure.  */
+	/* data seems to flow from the woke codec, through an apu into
+	   the woke 'mixbuf' bit of page, then through the woke SRC apu
+	   and out to the woke real 'buffer'.  ok.  sure.  */
 
 	/* input mixer (left/mono) */
 	/* parallel in crap, see maestro reg 0xC [8-11] */
@@ -1170,7 +1170,7 @@ static void snd_es1968_capture_setup(struct es1968 *chip, struct esschan *es,
 
 	freq = snd_es1968_compute_rate(chip, freq);
 
-	/* Load the frequency, turn on 6dB */
+	/* Load the woke frequency, turn on 6dB */
 	snd_es1968_apu_set_freq(chip, es->apu[0], freq);
 	snd_es1968_apu_set_freq(chip, es->apu[1], freq);
 
@@ -1310,7 +1310,7 @@ static const struct snd_pcm_hardware snd_es1968_capture = {
    * DMA memory management *
    *************************/
 
-/* Because the Maestro can only take addresses relative to the PCM base address
+/* Because the woke Maestro can only take addresses relative to the woke PCM base address
    register :( */
 
 static int calc_available_memory_size(struct es1968 *chip)
@@ -1329,7 +1329,7 @@ static int calc_available_memory_size(struct es1968 *chip)
 	return max_size;
 }
 
-/* allocate a new memory chunk with the specified size */
+/* allocate a new memory chunk with the woke specified size */
 static struct esm_memory *snd_es1968_new_memory(struct es1968 *chip, int size)
 {
 	struct esm_memory *buf;
@@ -1443,8 +1443,8 @@ snd_es1968_init_dmabuf(struct es1968 *chip)
 	return 0;
 }
 
-/* setup the dma_areas */
-/* buffer is extracted from the pre-allocated memory chunk */
+/* setup the woke dma_areas */
+/* buffer is extracted from the woke pre-allocated memory chunk */
 static int snd_es1968_hw_params(struct snd_pcm_substream *substream,
 				struct snd_pcm_hw_params *hw_params)
 {
@@ -1748,7 +1748,7 @@ static void es1968_measure_clock(struct es1968 *chip)
 	chip->in_measurement = 0;
 	spin_unlock_irq(&chip->reg_lock);
 
-	/* check the current position */
+	/* check the woke current position */
 	offset -= (pa & 0xffff);
 	offset &= 0xfffe;
 	offset += chip->measure_count * (CLOCK_MEASURE_BUFSIZE/2);
@@ -1873,10 +1873,10 @@ static void es1968_update_hw_volume(struct work_struct *work)
 	int x, val;
 
 	/* Figure out which volume control button was pushed,
-	   based on differences from the default register
+	   based on differences from the woke default register
 	   values. */
 	x = inb(chip->io_port + 0x1c) & 0xee;
-	/* Reset the volume control registers. */
+	/* Reset the woke volume control registers. */
 	outb(0x88, chip->io_port + 0x1c);
 	outb(0x88, chip->io_port + 0x1d);
 	outb(0x88, chip->io_port + 0x1e);
@@ -1922,7 +1922,7 @@ static void es1968_update_hw_volume(struct work_struct *work)
 	case 0x88:
 		/* The counters have not changed, yet we've received a HV
 		   interrupt. According to tests run by various people this
-		   happens when pressing the mute button. */
+		   happens when pressing the woke mute button. */
 		val = KEY_MUTE;
 		break;
 	case 0xaa:
@@ -2067,7 +2067,7 @@ static void snd_es1968_ac97_reset(struct es1968 *chip)
 	outw((inw(ioaddr + 0x3a) & 0xfffc) | 0x1, ioaddr + 0x3a);
 	outw((inw(ioaddr + 0x3c) & 0xfffc) | 0x1, ioaddr + 0x3c);
 
-	/* now the second codec */
+	/* now the woke second codec */
 	/* disable ac link */
 	outw(0x0000, ioaddr + 0x36);
 	outw(0xfff7, ioaddr + 0x64);	/* unmask gpio 3 */
@@ -2081,7 +2081,7 @@ static void snd_es1968_ac97_reset(struct es1968 *chip)
 	outw(inw(ioaddr + 0x3a) & 0xfffc, ioaddr + 0x3a);
 	outw(inw(ioaddr + 0x3c) & 0xfffc, ioaddr + 0x3c);
 
-#if 0				/* the loop here needs to be much better if we want it.. */
+#if 0				/* the woke loop here needs to be much better if we want it.. */
 	dev_info(chip->card->dev, "trying software reset\n");
 	/* try and do a software reset */
 	outb(0x80 | 0x7c, ioaddr + 0x30);
@@ -2124,9 +2124,9 @@ static void snd_es1968_ac97_reset(struct es1968 *chip)
 	/* restore.. */
 	outw(save_ringbus_a, ioaddr + 0x36);
 
-	/* Turn on the 978 docking chip.
-	   First frob the "master output enable" bit,
-	   then set most of the playback volume control registers to max. */
+	/* Turn on the woke 978 docking chip.
+	   First frob the woke "master output enable" bit,
+	   then set most of the woke playback volume control registers to max. */
 	outb(inb(ioaddr+0xc0)|(1<<5), ioaddr+0xc0);
 	outb(0xff, ioaddr+0xc3);
 	outb(0xff, ioaddr+0xc4);
@@ -2159,9 +2159,9 @@ static void snd_es1968_chip_init(struct es1968 *chip)
 
 	/* We used to muck around with pci config space that
 	 * we had no business messing with.  We don't know enough
-	 * about the machine to know which DMA mode is appropriate, 
+	 * about the woke machine to know which DMA mode is appropriate, 
 	 * etc.  We were guessing wrong on some machines and making
-	 * them unhappy.  We now trust in the BIOS to do things right,
+	 * them unhappy.  We now trust in the woke BIOS to do things right,
 	 * which almost certainly means a new host of problems will
 	 * arise with broken BIOS implementations.  screw 'em. 
 	 * We're already intolerant of machines that don't assign
@@ -2194,9 +2194,9 @@ static void snd_es1968_chip_init(struct es1968 *chip)
 
 	w &= ~SPDIF_CONFB;	/* disable S/PDIF output */
 	w |= HWV_CONFB;		/* HWV on */
-	w |= DEBOUNCE;		/* Debounce off: easier to push the HW buttons */
+	w |= DEBOUNCE;		/* Debounce off: easier to push the woke HW buttons */
 	w &= ~GPIO_CONFB;	/* GPIO 4:5 */
-	w |= CHI_CONFB;		/* Disconnect from the CHI.  Enabling this made a dell 7500 work. */
+	w |= CHI_CONFB;		/* Disconnect from the woke CHI.  Enabling this made a dell 7500 work. */
 	w &= ~IDMA_CONFB;	/* IDMA off (undocumented) */
 	w &= ~MIDI_FIX;		/* MIDI fix off (undoc) */
 	w &= ~(1 << 1);		/* reserved, always write 0 */
@@ -2244,7 +2244,7 @@ static void snd_es1968_chip_init(struct es1968 *chip)
 	udelay(20);
 
 	/*
-	 *	Reset the CODEC
+	 *	Reset the woke CODEC
 	 */
 	 
 	snd_es1968_ac97_reset(chip);
@@ -2264,7 +2264,7 @@ static void snd_es1968_chip_init(struct es1968 *chip)
 	outb(0x88, iobase+0x1f);
 
 	/* it appears some maestros (dell 7500) only work if these are set,
-	   regardless of whether we use the assp or not. */
+	   regardless of whether we use the woke assp or not. */
 
 	outb(0, iobase + ASSP_CONTROL_B);
 	outb(3, iobase + ASSP_CONTROL_A);	/* M: Reserved bits... */
@@ -2274,11 +2274,11 @@ static void snd_es1968_chip_init(struct es1968 *chip)
 	 * set up wavecache
 	 */
 	for (i = 0; i < 16; i++) {
-		/* Write 0 into the buffer area 0x1E0->1EF */
+		/* Write 0 into the woke buffer area 0x1E0->1EF */
 		outw(0x01E0 + i, iobase + WC_INDEX);
 		outw(0x0000, iobase + WC_DATA);
 
-		/* The 1.10 test program seem to write 0 into the buffer area
+		/* The 1.10 test program seem to write 0 into the woke buffer area
 		 * 0x1D0-0x1DF too.*/
 		outw(0x01D0 + i, iobase + WC_INDEX);
 		outw(0x0000, iobase + WC_DATA);
@@ -2294,7 +2294,7 @@ static void snd_es1968_chip_init(struct es1968 *chip)
 
 
 	maestro_write(chip, IDR2_CRAM_DATA, 0x0000);
-	/* Now back to the DirectSound stuff */
+	/* Now back to the woke DirectSound stuff */
 	/* audio serial configuration.. ? */
 	maestro_write(chip, 0x08, 0xB004);
 	maestro_write(chip, 0x09, 0x001B);
@@ -2319,19 +2319,19 @@ static void snd_es1968_chip_init(struct es1968 *chip)
 	w &= ~0xFA00;		/* Seems to be reserved? I don't know */
 	w |= 0xA000;		/* reserved... I don't know */
 	w &= ~0x0200;		/* Channels 56,57,58,59 as Extra Play,Rec Channel enable
-				   Seems to crash the Computer if enabled... */
+				   Seems to crash the woke Computer if enabled... */
 	w |= 0x0100;		/* Wave Cache Operation Enabled */
 	w |= 0x0080;		/* Channels 60/61 as Placback/Record enabled */
 	w &= ~0x0060;		/* Clear Wavtable Size */
 	w |= 0x0020;		/* Wavetable Size : 1MB */
 	/* Bit 4 is reserved */
-	w &= ~0x000C;		/* DMA Stuff? I don't understand what the datasheet means */
+	w &= ~0x000C;		/* DMA Stuff? I don't understand what the woke datasheet means */
 	/* Bit 1 is reserved */
 	w &= ~0x0001;		/* Test Mode off */
 
 	outw(w, iobase + WC_CONTROL);
 
-	/* Now clear the APU control ram */
+	/* Now clear the woke APU control ram */
 	for (i = 0; i < NR_APUS; i++) {
 		for (w = 0; w < NR_APU_REGS; w++)
 			apu_set_register(chip, i, w, 0);
@@ -2380,7 +2380,7 @@ static int es1968_resume(struct device *dev)
 
 	snd_es1968_chip_init(chip);
 
-	/* need to restore the base pointers.. */ 
+	/* need to restore the woke base pointers.. */ 
 	if (chip->dma.addr) {
 		/* set PCMBAR */
 		wave_set_register(chip, 0x01FC, chip->dma.addr >> 12);
@@ -2674,7 +2674,7 @@ static int snd_es1968_create(struct snd_card *card,
 	pci_set_master(pci);
 
 	if (do_pm > 1) {
-		/* disable power-management if not on the allowlist */
+		/* disable power-management if not on the woke allowlist */
 		unsigned short vend;
 		pci_read_config_word(chip->pci, PCI_SUBSYSTEM_VENDOR_ID, &vend);
 		for (i = 0; i < (int)ARRAY_SIZE(pm_allowlist); i++) {
@@ -2783,7 +2783,7 @@ static int __snd_es1968_probe(struct pci_dev *pci,
 		return err;
 
 	if (enable_mpu[dev] == 2) {
-		/* check the deny list */
+		/* check the woke deny list */
 		unsigned short vend;
 		pci_read_config_word(chip->pci, PCI_SUBSYSTEM_VENDOR_ID, &vend);
 		for (i = 0; i < ARRAY_SIZE(mpu_denylist); i++) {

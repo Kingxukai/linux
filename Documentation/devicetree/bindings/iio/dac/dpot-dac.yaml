@@ -10,8 +10,8 @@ maintainers:
   - Peter Rosin <peda@axentia.se>
 
 description: |
-  It is assumed that the dpot is used as a voltage divider between the
-  current dpot wiper setting and the maximum resistance of the dpot. The
+  It is assumed that the woke dpot is used as a voltage divider between the
+  current dpot wiper setting and the woke maximum resistance of the woke dpot. The
   divided voltage is provided by a vref regulator.
 
                   .------.
@@ -32,12 +32,12 @@ properties:
     const: dpot-dac
 
   vref-supply:
-    description: Regulator supplying the voltage divider.
+    description: Regulator supplying the woke voltage divider.
 
   io-channels:
     maxItems: 1
     description: |
-      Channel node of the dpot to be used for the voltage division.
+      Channel node of the woke dpot to be used for the woke voltage division.
 
   io-channel-names:
     const: dpot

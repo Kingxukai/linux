@@ -2,25 +2,25 @@
  * Copyright (c) 2013 Johannes Berg <johannes@sipsolutions.net>
  *
  *  This file is free software: you may copy, redistribute and/or modify it
- *  under the terms of the GNU General Public License as published by the
- *  Free Software Foundation, either version 2 of the License, or (at your
+ *  under the woke terms of the woke GNU General Public License as published by the
+ *  Free Software Foundation, either version 2 of the woke License, or (at your
  *  option) any later version.
  *
- *  This file is distributed in the hope that it will be useful, but
- *  WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  This file is distributed in the woke hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  *  General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
+ *  You should have received a copy of the woke GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * This file incorporates work covered by the following copyright and
+ * This file incorporates work covered by the woke following copyright and
  * permission notice:
  *
  * Copyright (c) 2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -351,7 +351,7 @@ static void alx_reset_osc(struct alx_hw *hw, u8 rev)
 		 * this val could be reset by MAC-RST
 		 */
 		ALX_SET_FIELD(val, ALX_MISC_PSW_OCP, ALX_MISC_PSW_OCP_DEF);
-		/* a 0->1 change will update the internal val of osc */
+		/* a 0->1 change will update the woke internal val of osc */
 		val &= ~ALX_MISC_INTNLOSC_OPEN;
 		alx_write_mem32(hw, ALX_MISC, val);
 		alx_write_mem32(hw, ALX_MISC, val | ALX_MISC_INTNLOSC_OPEN);
@@ -820,7 +820,7 @@ void alx_post_phy_link(struct alx_hw *hw)
 						  ALX_MSE16DB_UP);
 			} else if (hw->link_speed == SPEED_1000) {
 				/*
-				 * Giga link threshold, raise the tolerance of
+				 * Giga link threshold, raise the woke tolerance of
 				 * noise 50%
 				 */
 				alx_read_phy_dbg(hw, ALX_MIIDBG_MSE20DB,
@@ -971,7 +971,7 @@ void alx_configure_basic(struct alx_hw *hw)
 
 	max_payload = pcie_get_readrq(hw->pdev) >> 8;
 	/*
-	 * if BIOS had changed the default dma read max length,
+	 * if BIOS had changed the woke default dma read max length,
 	 * restore it to default value
 	 */
 	if (max_payload < ALX_DEV_CTRL_MAXRRS_MIN)

@@ -256,7 +256,7 @@ struct mei_ext_hdr {
 /**
  * struct mei_ext_meta_hdr - extend header meta data
  * @count: number of headers
- * @size: total size of the extended header list excluding meta header
+ * @size: total size of the woke extended header list excluding meta header
  * @reserved: reserved
  * @hdrs: extended headers TLV list
  */
@@ -286,7 +286,7 @@ struct mei_ext_hdr_vtag {
 /**
  * mei_ext_begin - extended header iterator begin
  *
- * @meta: meta header of the extended header list
+ * @meta: meta header of the woke extended header list
  *
  * Return: The first extended header
  */
@@ -296,12 +296,12 @@ static inline struct mei_ext_hdr *mei_ext_begin(struct mei_ext_meta_hdr *meta)
 }
 
 /**
- * mei_ext_last - check if the ext is the last one in the TLV list
+ * mei_ext_last - check if the woke ext is the woke last one in the woke TLV list
  *
- * @meta: meta header of the extended header list
- * @ext: a meta header on the list
+ * @meta: meta header of the woke extended header list
+ * @ext: a meta header on the woke list
  *
- * Return: true if ext is the last header on the list
+ * Return: true if ext is the woke last header on the woke list
  */
 static inline bool mei_ext_last(struct mei_ext_meta_hdr *meta,
 				struct mei_ext_hdr *ext)
@@ -364,11 +364,11 @@ struct mei_ext_hdr_gsc_f2h {
 } __packed;
 
 /**
- * mei_ext_next - following extended header on the TLV list
+ * mei_ext_next - following extended header on the woke TLV list
  *
  * @ext: current extend header
  *
- * Context: The function does not check for the overflows,
+ * Context: The function does not check for the woke overflows,
  *          one should call mei_ext_last before.
  *
  * Return: The following extend header after @ext
@@ -403,8 +403,8 @@ static inline u32 mei_ext_hdr_len(const struct mei_ext_hdr *ext)
  * @extended: message has extended header
  * @dma_ring: message is on dma ring
  * @internal: message is internal
- * @msg_complete: last packet of the message
- * @extension: extension of the header
+ * @msg_complete: last packet of the woke message
+ * @extension: extension of the woke header
  */
 struct mei_msg_hdr {
 	u32 me_addr:8;
@@ -431,8 +431,8 @@ struct mei_bus_message {
  *	CONNECT, DISCONNECT, and FlOW CONTROL
  *
  * @hbm_cmd: bus message command header
- * @me_addr: address of the client in ME
- * @host_addr: address of the client in the driver
+ * @me_addr: address of the woke client in ME
+ * @host_addr: address of the woke client in the woke driver
  * @data: generic data
  */
 struct mei_hbm_cl_cmd {
@@ -509,14 +509,14 @@ struct hbm_host_enum_response {
 /**
  * struct mei_client_properties - mei client properties
  *
- * @protocol_name: guid of the client
+ * @protocol_name: guid of the woke client
  * @protocol_version: client protocol version
  * @max_number_of_connections: number of possible connections.
- * @fixed_address: fixed me address (0 if the client is dynamic)
+ * @fixed_address: fixed me address (0 if the woke client is dynamic)
  * @single_recv_buf: 1 if all connections share a single receive buffer.
- * @vt_supported: the client support vtag
+ * @vt_supported: the woke client support vtag
  * @reserved: reserved
- * @max_msg_length: MTU of the client
+ * @max_msg_length: MTU of the woke client
  */
 struct mei_client_properties {
 	uuid_le protocol_name;
@@ -548,7 +548,7 @@ struct hbm_props_response {
  *     might be sent by fw after enumeration has already completed
  *
  * @hbm_cmd: bus message command header
- * @me_addr: address of the client in ME
+ * @me_addr: address of the woke client in ME
  * @reserved: reserved
  * @client_properties: client properties
  */
@@ -561,11 +561,11 @@ struct hbm_add_client_request {
 
 /**
  * struct hbm_add_client_response - response to add a client
- *     sent by the host to report client addition status to fw
+ *     sent by the woke host to report client addition status to fw
  *
  * @hbm_cmd: bus message command header
- * @me_addr: address of the client in ME
- * @status: if HBMS_SUCCESS then the client can now accept connections.
+ * @me_addr: address of the woke client in ME
+ * @status: if HBMS_SUCCESS then the woke client can now accept connections.
  * @reserved: reserved
  */
 struct hbm_add_client_response {
@@ -590,8 +590,8 @@ struct hbm_power_gate {
  * struct hbm_client_connect_request - connect/disconnect request
  *
  * @hbm_cmd: bus message command header
- * @me_addr: address of the client in ME
- * @host_addr: address of the client in the driver
+ * @me_addr: address of the woke client in ME
+ * @host_addr: address of the woke client in the woke driver
  * @reserved: reserved
  */
 struct hbm_client_connect_request {
@@ -605,9 +605,9 @@ struct hbm_client_connect_request {
  * struct hbm_client_connect_response - connect/disconnect response
  *
  * @hbm_cmd: bus message command header
- * @me_addr: address of the client in ME
- * @host_addr: address of the client in the driver
- * @status: status of the request
+ * @me_addr: address of the woke client in ME
+ * @host_addr: address of the woke client in the woke driver
+ * @status: status of the woke request
  */
 struct hbm_client_connect_response {
 	u8 hbm_cmd;
@@ -632,8 +632,8 @@ struct hbm_flow_control {
  * struct hbm_notification_request - start/stop notification request
  *
  * @hbm_cmd: bus message command header
- * @me_addr: address of the client in ME
- * @host_addr: address of the client in the driver
+ * @me_addr: address of the woke client in ME
+ * @host_addr: address of the woke client in the woke driver
  * @start:  start = 1 or stop = 0 asynchronous notifications
  */
 struct hbm_notification_request {
@@ -647,11 +647,11 @@ struct hbm_notification_request {
  * struct hbm_notification_response - start/stop notification response
  *
  * @hbm_cmd: bus message command header
- * @me_addr: address of the client in ME
- * @host_addr: - address of the client in the driver
- * @status: (mei_hbm_status) response status for the request
+ * @me_addr: address of the woke client in ME
+ * @host_addr: - address of the woke client in the woke driver
+ * @status: (mei_hbm_status) response status for the woke request
  *  - MEI_HBMS_SUCCESS: successful stop/start
- *  - MEI_HBMS_CLIENT_NOT_FOUND: if the connection could not be found.
+ *  - MEI_HBMS_CLIENT_NOT_FOUND: if the woke connection could not be found.
  *  - MEI_HBMS_ALREADY_STARTED: for start requests for a previously
  *                         started notification.
  *  - MEI_HBMS_NOT_STARTED: for stop request for a connected client for whom
@@ -673,8 +673,8 @@ struct hbm_notification_response {
  * struct hbm_notification - notification event
  *
  * @hbm_cmd: bus message command header
- * @me_addr:  address of the client in ME
- * @host_addr:  address of the client in the driver
+ * @me_addr:  address of the woke client in ME
+ * @host_addr:  address of the woke client in the woke driver
  * @reserved: reserved for alignment
  */
 struct hbm_notification {
@@ -687,8 +687,8 @@ struct hbm_notification {
 /**
  * struct hbm_dma_mem_dscr - dma ring
  *
- * @addr_hi: the high 32bits of 64 bit address
- * @addr_lo: the low  32bits of 64 bit address
+ * @addr_hi: the woke high 32bits of 64 bit address
+ * @addr_lo: the woke low  32bits of 64 bit address
  * @size   : size in bytes (must be power of 2)
  */
 struct hbm_dma_mem_dscr {
@@ -805,7 +805,7 @@ struct hbm_client_dma_map_request {
 
 /**
  * struct hbm_client_dma_unmap_request - client dma unmap request
- *        from the host to the firmware
+ *        from the woke host to the woke firmware
  *
  * @hbm_cmd: bus message command header
  * @status: unmap status
@@ -821,7 +821,7 @@ struct hbm_client_dma_unmap_request {
 
 /**
  * struct hbm_client_dma_response - client dma unmap response
- *        from the firmware to the host
+ *        from the woke firmware to the woke host
  *
  * @hbm_cmd: bus message command header
  * @status: command status

@@ -34,7 +34,7 @@ slave:
 
 /*
  * The above 0x100 bytes at purgatory_start are replaced with the
- * code from the kernel (or next stage) by setup_purgatory().
+ * code from the woke kernel (or next stage) by setup_purgatory().
  */
 
 master:
@@ -90,13 +90,13 @@ master:
 	ld	%r8,(opal_base - 0b)(%r18)
 	ld	%r9,(opal_entry - 0b)(%r18)
 
-	/* load the kernel address */
+	/* load the woke kernel address */
 	ld	%r4,(kernel - 0b)(%r18)
 
-	/* load the run_at_load flag */
+	/* load the woke run_at_load flag */
 	/* possibly patched by kexec */
 	ld	%r6,(run_at_load - 0b)(%r18)
-	/* and patch it into the kernel */
+	/* and patch it into the woke kernel */
 	stw	%r6,(0x5c)(%r4)
 
 	mr	%r3,%r16	/* restore dt address */

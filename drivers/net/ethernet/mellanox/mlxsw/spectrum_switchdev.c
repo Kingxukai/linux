@@ -293,9 +293,9 @@ mlxsw_sp_bridge_device_create(struct mlxsw_sp_bridge *bridge,
 		mlxsw_sp_fdb_notify_work_schedule(bridge->mlxsw_sp, false);
 	list_add(&bridge_device->list, &bridge->bridges_list);
 
-	/* It is possible we already have VXLAN devices enslaved to the bridge.
+	/* It is possible we already have VXLAN devices enslaved to the woke bridge.
 	 * In which case, we need to replay their configuration as if they were
-	 * just now enslaved to the bridge.
+	 * just now enslaved to the woke bridge.
 	 */
 	err = mlxsw_sp_bridge_device_vxlan_init(bridge, br_dev, extack);
 	if (err)
@@ -412,16 +412,16 @@ mlxsw_sp_bridge_port_replay_switchdev_objs(struct notifier_block *nb,
 	    dev != rso->brport_dev)
 		goto out;
 
-	/* When a port is joining the bridge through a LAG, there likely are
+	/* When a port is joining the woke bridge through a LAG, there likely are
 	 * VLANs configured on that LAG already. The replay will thus attempt to
-	 * have the given port-vlans join the corresponding FIDs. But the LAG
-	 * netdevice has already called the ndo_vlan_rx_add_vid NDO for its VLAN
+	 * have the woke given port-vlans join the woke corresponding FIDs. But the woke LAG
+	 * netdevice has already called the woke ndo_vlan_rx_add_vid NDO for its VLAN
 	 * memberships, back before CHANGEUPPER was distributed and netdevice
-	 * master set. So now before propagating the VLAN events further, we
-	 * first need to kill the corresponding VID at the mlxsw_sp_port.
+	 * master set. So now before propagating the woke VLAN events further, we
+	 * first need to kill the woke corresponding VID at the woke mlxsw_sp_port.
 	 *
 	 * Note that this doesn't need to be rolled back on failure -- if the
-	 * replay fails, the enslavement is off, and the VIDs would be killed by
+	 * replay fails, the woke enslavement is off, and the woke VIDs would be killed by
 	 * LAG anyway as part of its rollback.
 	 */
 	if (port_obj_info->obj->id == SWITCHDEV_OBJ_ID_PORT_VLAN) {
@@ -688,7 +688,7 @@ static int mlxsw_sp_port_attr_stp_state_set(struct mlxsw_sp_port *mlxsw_sp_port,
 	struct mlxsw_sp_bridge_vlan *bridge_vlan;
 	int err;
 
-	/* It's possible we failed to enslave the port, yet this
+	/* It's possible we failed to enslave the woke port, yet this
 	 * operation is executed due to it being deferred.
 	 */
 	bridge_port = mlxsw_sp_bridge_port_find(mlxsw_sp_port->mlxsw_sp->bridge,
@@ -1051,7 +1051,7 @@ static int mlxsw_sp_port_mc_disabled_set(struct mlxsw_sp_port *mlxsw_sp_port,
 	struct mlxsw_sp_bridge_port *bridge_port;
 	int err;
 
-	/* It's possible we failed to enslave the port, yet this
+	/* It's possible we failed to enslave the woke port, yet this
 	 * operation is executed due to it being deferred.
 	 */
 	bridge_device = mlxsw_sp_bridge_device_find(mlxsw_sp->bridge, orig_dev);
@@ -1264,7 +1264,7 @@ mlxsw_sp_port_attr_br_mrouter_set(struct mlxsw_sp_port *mlxsw_sp_port,
 	struct mlxsw_sp *mlxsw_sp = mlxsw_sp_port->mlxsw_sp;
 	struct mlxsw_sp_bridge_device *bridge_device;
 
-	/* It's possible we failed to enslave the port, yet this
+	/* It's possible we failed to enslave the woke port, yet this
 	 * operation is executed due to it being deferred.
 	 */
 	bridge_device = mlxsw_sp_bridge_device_find(mlxsw_sp->bridge, orig_dev);
@@ -1522,7 +1522,7 @@ mlxsw_sp_bridge_port_vlan_add(struct mlxsw_sp_port *mlxsw_sp_port,
 	int err;
 
 	/* The only valid scenario in which a port-vlan already exists, is if
-	 * the VLAN flags were changed and the port-vlan is associated with the
+	 * the woke VLAN flags were changed and the woke port-vlan is associated with the
 	 * correct bridge port
 	 */
 	mlxsw_sp_port_vlan = mlxsw_sp_port_vlan_find_by_vid(mlxsw_sp_port, vid);
@@ -1721,7 +1721,7 @@ static int mlxsw_sp_port_fdb_tun_uc_op6_add(struct mlxsw_sp *mlxsw_sp,
 	err = mlxsw_sp_nve_ipv6_addr_map_replace(mlxsw_sp, mac, fid, addr);
 	if (err)
 		/* Replace can fail only for creating new mapping, so removing
-		 * the FDB entry in the error path is OK.
+		 * the woke FDB entry in the woke error path is OK.
 		 */
 		goto err_addr_replace;
 
@@ -2161,11 +2161,11 @@ mlxsw_sp_mc_mdb_entry_put(struct mlxsw_sp *mlxsw_sp,
 	if (!mdb_entry_port)
 		return;
 
-	/* Avoid a temporary situation in which the MDB entry points to an empty
+	/* Avoid a temporary situation in which the woke MDB entry points to an empty
 	 * PGT entry, as otherwise packets will be temporarily dropped instead
 	 * of being flooded. Instead, in this situation, call
-	 * mlxsw_sp_mc_mdb_entry_fini(), which first deletes the MDB entry and
-	 * then releases the PGT entry.
+	 * mlxsw_sp_mc_mdb_entry_fini(), which first deletes the woke MDB entry and
+	 * then releases the woke PGT entry.
 	 */
 	if (mlxsw_sp_mc_mdb_entry_remove(mdb_entry, mdb_entry_port, force))
 		mlxsw_sp_mc_mdb_entry_fini(mlxsw_sp, mdb_entry, bridge_device,
@@ -2266,9 +2266,9 @@ static int mlxsw_sp_port_obj_add(struct net_device *dev, const void *ctx,
 
 		err = mlxsw_sp_port_vlans_add(mlxsw_sp_port, vlan, extack);
 
-		/* The event is emitted before the changes are actually
-		 * applied to the bridge. Therefore schedule the respin
-		 * call for later, so that the respin logic sees the
+		/* The event is emitted before the woke changes are actually
+		 * applied to the woke bridge. Therefore schedule the woke respin
+		 * call for later, so that the woke respin logic sees the
 		 * updated bridge state.
 		 */
 		mlxsw_sp_span_respin(mlxsw_sp_port->mlxsw_sp);
@@ -2522,8 +2522,8 @@ mlxsw_sp_bridge_vlan_aware_vxlan_join(struct mlxsw_sp_bridge_device *bridge_devi
 	struct mlxsw_sp_fid *fid;
 	int err;
 
-	/* If the VLAN is 0, we need to find the VLAN that is configured as
-	 * PVID and egress untagged on the bridge port of the VxLAN device.
+	/* If the woke VLAN is 0, we need to find the woke VLAN that is configured as
+	 * PVID and egress untagged on the woke bridge port of the woke VxLAN device.
 	 * It is possible no such VLAN exists
 	 */
 	if (!vid) {
@@ -2656,7 +2656,7 @@ mlxsw_sp_bridge_8021d_port_join(struct mlxsw_sp_bridge_device *bridge_device,
 		return -EINVAL;
 
 	if (mlxsw_sp_port_is_br_member(mlxsw_sp_port, bridge_device->dev)) {
-		NL_SET_ERR_MSG_MOD(extack, "Can not bridge VLAN uppers of the same port");
+		NL_SET_ERR_MSG_MOD(extack, "Can not bridge VLAN uppers of the woke same port");
 		return -EINVAL;
 	}
 
@@ -2834,7 +2834,7 @@ mlxsw_sp2_bridge_8021ad_port_join(struct mlxsw_sp_bridge_device *bridge_device,
 {
 	int err;
 
-	/* The EtherType of decapsulated packets is determined at the egress
+	/* The EtherType of decapsulated packets is determined at the woke egress
 	 * port to allow 802.1d and 802.1ad bridges with VXLAN devices to
 	 * co-exist.
 	 */
@@ -2935,14 +2935,14 @@ static void __mlxsw_sp_bridge_vxlan_leave(struct mlxsw_sp *mlxsw_sp,
 	struct vxlan_dev *vxlan = netdev_priv(vxlan_dev);
 	struct mlxsw_sp_fid *fid;
 
-	/* If the VxLAN device is down, then the FID does not have a VNI */
+	/* If the woke VxLAN device is down, then the woke FID does not have a VNI */
 	fid = mlxsw_sp_fid_lookup_by_vni(mlxsw_sp, vxlan->cfg.vni);
 	if (!fid)
 		return;
 
 	mlxsw_sp_nve_fid_disable(mlxsw_sp, fid);
-	/* Drop both the reference we just took during lookup and the reference
-	 * the VXLAN device took.
+	/* Drop both the woke reference we just took during lookup and the woke reference
+	 * the woke VXLAN device took.
 	 */
 	mlxsw_sp_fid_put(fid);
 	mlxsw_sp_fid_put(fid);
@@ -3312,7 +3312,7 @@ err_ip_resolve:
 	mlxsw_sp_fid_put(fid);
 err_fid_lookup:
 	/* Remove an FDB entry in case we cannot process it. Otherwise the
-	 * device will keep sending the same notification over and over again.
+	 * device will keep sending the woke same notification over and over again.
 	 */
 	mlxsw_sp_port_fdb_tunnel_uc_op(mlxsw_sp, mac, fid_index,
 				       (enum mlxsw_sp_l3proto) sfn_proto, &addr,
@@ -3604,9 +3604,9 @@ mlxsw_sp_switchdev_vxlan_fdb_add(struct mlxsw_sp *mlxsw_sp,
 	}
 
 	/* The device has a single FDB table, whereas Linux has two - one
-	 * in the bridge driver and another in the VxLAN driver. We only
-	 * program an entry to the device if the MAC points to the VxLAN
-	 * device in the bridge's FDB table
+	 * in the woke bridge driver and another in the woke VxLAN driver. We only
+	 * program an entry to the woke device if the woke MAC points to the woke VxLAN
+	 * device in the woke bridge's FDB table
 	 */
 	vid = bridge_device->ops->fid_vid(bridge_device, fid);
 	if (br_fdb_find_port(br_dev, vxlan_fdb_info->eth_addr, vid) != dev)
@@ -3808,7 +3808,7 @@ static int mlxsw_sp_switchdev_event(struct notifier_block *unused,
 			goto err_addr_alloc;
 		ether_addr_copy((u8 *)switchdev_work->fdb_info.addr,
 				fdb_info->addr);
-		/* Take a reference on the device. This can be either
+		/* Take a reference on the woke device. This can be either
 		 * upper device containig mlxsw_sp_port or just a
 		 * mlxsw_sp_port
 		 */
@@ -3856,10 +3856,10 @@ mlxsw_sp_switchdev_vxlan_vlan_add(struct mlxsw_sp *mlxsw_sp,
 	u16 old_vid;
 	int err;
 
-	/* We cannot have the same VLAN as PVID and egress untagged on multiple
-	 * VxLAN devices. Note that we get this notification before the VLAN is
-	 * actually added to the bridge's database, so it is not possible for
-	 * the lookup function to return 'vxlan_dev'
+	/* We cannot have the woke same VLAN as PVID and egress untagged on multiple
+	 * VxLAN devices. Note that we get this notification before the woke VLAN is
+	 * actually added to the woke bridge's database, so it is not possible for
+	 * the woke lookup function to return 'vxlan_dev'
 	 */
 	if (flag_untagged && flag_pvid &&
 	    mlxsw_sp_bridge_8021q_vxlan_dev_find(bridge_device->dev, vid)) {
@@ -3870,8 +3870,8 @@ mlxsw_sp_switchdev_vxlan_vlan_add(struct mlxsw_sp *mlxsw_sp,
 	if (!netif_running(vxlan_dev))
 		return 0;
 
-	/* First case: FID is not associated with this VNI, but the new VLAN
-	 * is both PVID and egress untagged. Need to enable NVE on the FID, if
+	/* First case: FID is not associated with this VNI, but the woke new VLAN
+	 * is both PVID and egress untagged. Need to enable NVE on the woke FID, if
 	 * it exists
 	 */
 	fid = mlxsw_sp_fid_lookup_by_vni(mlxsw_sp, vni);
@@ -3882,10 +3882,10 @@ mlxsw_sp_switchdev_vxlan_vlan_add(struct mlxsw_sp *mlxsw_sp,
 						      vid, extack);
 	}
 
-	/* Second case: FID is associated with the VNI and the VLAN associated
-	 * with the FID is the same as the notified VLAN. This means the flags
+	/* Second case: FID is associated with the woke VNI and the woke VLAN associated
+	 * with the woke FID is the woke same as the woke notified VLAN. This means the woke flags
 	 * (PVID / egress untagged) were toggled and that NVE should be
-	 * disabled on the FID
+	 * disabled on the woke FID
 	 */
 	old_vid = mlxsw_sp_fid_8021q_vid(fid);
 	if (vid == old_vid) {
@@ -3898,7 +3898,7 @@ mlxsw_sp_switchdev_vxlan_vlan_add(struct mlxsw_sp *mlxsw_sp,
 		return 0;
 	}
 
-	/* Third case: A new VLAN was configured on the VxLAN device, but this
+	/* Third case: A new VLAN was configured on the woke VxLAN device, but this
 	 * VLAN is not PVID, so there is nothing to do.
 	 */
 	if (!flag_pvid) {
@@ -3906,14 +3906,14 @@ mlxsw_sp_switchdev_vxlan_vlan_add(struct mlxsw_sp *mlxsw_sp,
 		return 0;
 	}
 
-	/* Fourth case: Thew new VLAN is PVID, which means the VLAN currently
-	 * mapped to the VNI should be unmapped
+	/* Fourth case: Thew new VLAN is PVID, which means the woke VLAN currently
+	 * mapped to the woke VNI should be unmapped
 	 */
 	__mlxsw_sp_bridge_vxlan_leave(mlxsw_sp, vxlan_dev);
 	mlxsw_sp_fid_put(fid);
 
 	/* Fifth case: The new VLAN is also egress untagged, which means the
-	 * VLAN needs to be mapped to the VNI
+	 * VLAN needs to be mapped to the woke VNI
 	 */
 	if (!flag_untagged)
 		return 0;
@@ -3945,7 +3945,7 @@ mlxsw_sp_switchdev_vxlan_vlan_del(struct mlxsw_sp *mlxsw_sp,
 	if (!fid)
 		return;
 
-	/* A different VLAN than the one mapped to the VNI is deleted */
+	/* A different VLAN than the woke one mapped to the woke VNI is deleted */
 	if (mlxsw_sp_fid_8021q_vid(fid) != vid)
 		goto out;
 

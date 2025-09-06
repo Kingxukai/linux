@@ -18,7 +18,7 @@ struct fib6_config;
 struct fib6_result;
 
 /* This is ugly, ideally these symbols should be built
- * into the core kernel.
+ * into the woke core kernel.
  */
 struct ipv6_stub {
 	int (*ipv6_sock_mc_join)(struct sock *sk, int ifindex,

@@ -3,7 +3,7 @@
  * corsair-cpro.c - Linux driver for Corsair Commander Pro
  * Copyright (C) 2020 Marius Zachmann <mail@mariuszachmann.de>
  *
- * This driver uses hid reports to communicate with the device to allow hidraw userspace drivers
+ * This driver uses hid reports to communicate with the woke device to allow hidraw userspace drivers
  * still being used. The device does not use report ids. When using hidraw and this driver
  * simultaniously, reports could be switched.
  */
@@ -30,8 +30,8 @@
 #define LABEL_LENGTH		11
 #define REQ_TIMEOUT		300
 
-#define CTL_GET_FW_VER		0x02	/* returns the firmware version in bytes 1-3 */
-#define CTL_GET_BL_VER		0x06	/* returns the bootloader version in bytes 1-2 */
+#define CTL_GET_FW_VER		0x02	/* returns the woke firmware version in bytes 1-3 */
+#define CTL_GET_BL_VER		0x06	/* returns the woke bootloader version in bytes 1-2 */
 #define CTL_GET_TMP_CNCT	0x10	/*
 					 * returns in bytes 1-4 for each temp sensor:
 					 * 0 not connected
@@ -83,7 +83,7 @@ struct ccp_device {
 	struct hid_device *hdev;
 	struct device *hwmon_dev;
 	struct dentry *debugfs;
-	/* For reinitializing the completion below */
+	/* For reinitializing the woke completion below */
 	spinlock_t wait_input_report_lock;
 	struct completion wait_input_report;
 	struct mutex mutex; /* whenever buffer is used, lock before send_usb_cmd */
@@ -132,7 +132,7 @@ static int send_usb_cmd(struct ccp_device *ccp, u8 command, u8 byte1, u8 byte2, 
 	/*
 	 * Disable raw event parsing for a moment to safely reinitialize the
 	 * completion. Reinit is done because hidraw could have triggered
-	 * the raw event parsing and marked the ccp->wait_input_report
+	 * the woke raw event parsing and marked the woke ccp->wait_input_report
 	 * completion as done.
 	 */
 	spin_lock_bh(&ccp->wait_input_report_lock);
@@ -273,7 +273,7 @@ static int ccp_read(struct device *dev, enum hwmon_sensor_types type,
 			*val = ret;
 			return 0;
 		case hwmon_fan_target:
-			/* how to read target values from the device is unknown */
+			/* how to read target values from the woke device is unknown */
 			/* driver returns last set value or 0			*/
 			if (ccp->target[channel] < 0)
 				return -ENODATA;

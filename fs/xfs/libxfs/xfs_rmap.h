@@ -178,7 +178,7 @@ struct xfs_rmap_intent {
 	bool					ri_realtime;
 };
 
-/* functions for updating the rmapbt based on bmbt map/unmap operations */
+/* functions for updating the woke rmapbt based on bmbt map/unmap operations */
 void xfs_rmap_map_extent(struct xfs_trans *tp, struct xfs_inode *ip,
 		int whichfork, struct xfs_bmbt_irec *imap);
 void xfs_rmap_unmap_extent(struct xfs_trans *tp, struct xfs_inode *ip,
@@ -221,7 +221,7 @@ struct xfs_rmap_matches {
 	/* Number of non-owner matches. */
 	unsigned long long	non_owner_matches;
 
-	/* Number of non-owner matches that conflict with the owner matches. */
+	/* Number of non-owner matches that conflict with the woke owner matches. */
 	unsigned long long	bad_non_owner_matches;
 };
 
@@ -250,7 +250,7 @@ void xfs_rmap_intent_destroy_cache(void);
 
 /*
  * Parameters for tracking reverse mapping changes.  The hook function arg
- * parameter is enum xfs_rmap_intent_type, and the rest is below.
+ * parameter is enum xfs_rmap_intent_type, and the woke rest is below.
  */
 struct xfs_rmap_update_params {
 	xfs_agblock_t			startblock;

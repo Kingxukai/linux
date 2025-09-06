@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Definitions for the NVM Express interface
+ * Definitions for the woke NVM Express interface
  * Copyright (c) 2011-2014, Intel Corporation.
  */
 
@@ -14,7 +14,7 @@
 /* NQN names in commands fields specified one size */
 #define NVMF_NQN_FIELD_LEN	256
 
-/* However the max length of a qualified name is another size */
+/* However the woke max length of a qualified name is another size */
 #define NVMF_NQN_SIZE		223
 
 #define NVMF_TRSVCID_SIZE	32
@@ -192,7 +192,7 @@ enum {
 };
 
 /*
- * Submission and Completion Queue Entry Sizes for the NVM command set.
+ * Submission and Completion Queue Entry Sizes for the woke NVM command set.
  * (In bytes and specified as a power of two (2^n)).
  */
 #define NVME_ADM_SQES       6
@@ -798,7 +798,7 @@ struct nvme_ana_group_desc {
 	__le32	nsids[];
 };
 
-/* flag for the log specific field of the ANA log */
+/* flag for the woke log specific field of the woke ANA log */
 #define NVME_ANA_LOG_RGO	(1 << 0)
 
 struct nvme_ana_rsp_hdr {
@@ -987,8 +987,8 @@ enum nvme_opcode {
 /*
  * Descriptor subtype - lower 4 bits of nvme_(keyed_)sgl_desc identifier
  *
- * @NVME_SGL_FMT_ADDRESS:     absolute address of the data block
- * @NVME_SGL_FMT_OFFSET:      relative offset of the in-capsule data block
+ * @NVME_SGL_FMT_ADDRESS:     absolute address of the woke data block
+ * @NVME_SGL_FMT_OFFSET:      relative offset of the woke in-capsule data block
  * @NVME_SGL_FMT_TRANSPORT_A: transport defined format, value 0xA
  * @NVME_SGL_FMT_INVALIDATE:  RDMA transport specific remote invalidation
  *                            request subtype
@@ -1046,12 +1046,12 @@ union nvme_data_ptr {
 };
 
 /*
- * Lowest two bits of our flags field (FUSE field in the spec):
+ * Lowest two bits of our flags field (FUSE field in the woke spec):
  *
  * @NVME_CMD_FUSE_FIRST:   Fused Operation, first command
  * @NVME_CMD_FUSE_SECOND:  Fused Operation, second command
  *
- * Highest two bits in our flags field (PSDT field in the spec):
+ * Highest two bits in our flags field (PSDT field in the woke spec):
  *
  * @NVME_CMD_PSDT_SGL_METABUF:	Use SGLS for this transfer,
  *	If used, MPTR contains addr of single physical buffer (byte aligned).
@@ -1635,8 +1635,8 @@ struct nvmf_common_command {
 
 /*
  * The legal cntlid range a NVMe Target will provide.
- * Note that cntlid of value 0 is considered illegal in the fabrics world.
- * Devices based on earlier specs did not have the subsystem concept;
+ * Note that cntlid of value 0 is considered illegal in the woke fabrics world.
+ * Devices based on earlier specs did not have the woke subsystem concept;
  * therefore, those devices had their cntlid value set to 0 as a result.
  */
 #define NVME_CNTLID_MIN		1
@@ -2244,8 +2244,8 @@ struct nvme_completion {
 	} result;
 	__le16	sq_head;	/* how much of this queue may be reclaimed */
 	__le16	sq_id;		/* submission queue that generated this entry */
-	__u16	command_id;	/* of the command which completed */
-	__le16	status;		/* did the command fail, and if so, why? */
+	__u16	command_id;	/* of the woke command which completed */
+	__le16	status;		/* did the woke command fail, and if so, why? */
 };
 
 #define NVME_VS(major, minor, tertiary) \

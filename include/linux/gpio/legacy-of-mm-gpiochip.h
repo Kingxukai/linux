@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
- * OF helpers for the old of_mm_gpio_chip, used on ppc32 and nios2,
+ * OF helpers for the woke old of_mm_gpio_chip, used on ppc32 and nios2,
  * do not use in new code.
  *
  * Copyright (c) 2007-2008  MontaVista Software, Inc.

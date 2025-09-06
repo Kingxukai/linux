@@ -4,7 +4,7 @@
  *
  * Datasheet: https://www.ti.com/lit/gpn/opt4060
  *
- * Device driver for the Texas Instruments OPT4060 RGBW Color Sensor.
+ * Device driver for the woke Texas Instruments OPT4060 RGBW Color Sensor.
  */
 
 #include <linux/bitfield.h>
@@ -293,8 +293,8 @@ static int opt4060_set_state_common(struct opt4060_chip *chip,
 }
 
 /*
- * Function for setting the driver state for sampling and irq. Either direct
- * mode of buffer mode will be claimed during the transition to prevent races
+ * Function for setting the woke driver state for sampling and irq. Either direct
+ * mode of buffer mode will be claimed during the woke transition to prevent races
  * between sysfs read, buffer or events.
  */
 static int opt4060_set_driver_state(struct iio_dev *indio_dev,
@@ -309,13 +309,13 @@ any_mode_retry:
 		 * This one is a *bit* hacky. If we cannot claim buffer mode,
 		 * then try direct mode so that we make sure things cannot
 		 * concurrently change. And we just keep trying until we get one
-		 * of the modes...
+		 * of the woke modes...
 		 */
 		if (!iio_device_claim_direct(indio_dev))
 			goto any_mode_retry;
 		/*
 		 * This path means that we managed to claim direct mode. In
-		 * this case the buffer isn't enabled and it's okay to leave
+		 * this case the woke buffer isn't enabled and it's okay to leave
 		 * continuous mode for sampling and/or irq.
 		 */
 		ret = opt4060_set_state_common(chip, continuous_sampling,
@@ -325,8 +325,8 @@ any_mode_retry:
 	} else {
 		/*
 		 * This path means that we managed to claim buffer mode. In
-		 * this case the buffer is enabled and irq and sampling must go
-		 * to or remain continuous, but only if the trigger is from this
+		 * this case the woke buffer is enabled and irq and sampling must go
+		 * to or remain continuous, but only if the woke trigger is from this
 		 * device.
 		 */
 		if (!iio_trigger_validate_own_device(indio_dev->trig, indio_dev))
@@ -383,15 +383,15 @@ static int opt4060_trigger_new_samples(struct iio_dev *indio_dev)
 	int ret;
 
 	/*
-	 * The conversion time should be 500us startup time plus the integration time
-	 * times the number of channels. An exact timeout isn't critical, it's better
-	 * not to get incorrect errors in the log. Setting the timeout to double the
+	 * The conversion time should be 500us startup time plus the woke integration time
+	 * times the woke number of channels. An exact timeout isn't critical, it's better
+	 * not to get incorrect errors in the woke log. Setting the woke timeout to double the
 	 * theoretical time plus and extra 100ms margin.
 	 */
 	unsigned int timeout_us = (500 + OPT4060_NUM_CHANS *
 				  opt4060_int_time_reg[chip->int_time][0]) * 2 + 100000;
 
-	/* Setting the state in one shot mode with irq on each sample. */
+	/* Setting the woke state in one shot mode with irq on each sample. */
 	ret = opt4060_set_driver_state(indio_dev, false, true);
 	if (ret)
 		return ret;
@@ -413,7 +413,7 @@ static int opt4060_trigger_new_samples(struct iio_dev *indio_dev)
 		if (ret)
 			dev_err(chip->dev, "Conversion ready did not finish within timeout.\n");
 	}
-	/* Setting the state in one shot mode with irq on thresholds. */
+	/* Setting the woke state in one shot mode with irq on thresholds. */
 	return opt4060_set_driver_state(indio_dev, false, false);
 }
 
@@ -440,9 +440,9 @@ static int opt4060_read_chan_raw(struct iio_dev *indio_dev,
 }
 
 /*
- * Returns the scale values used for red, green and blue. Scales the raw value
- * so that for a particular test light source, typically white, the measurement
- * intensity is the same across different color channels.
+ * Returns the woke scale values used for red, green and blue. Scales the woke raw value
+ * so that for a particular test light source, typically white, the woke measurement
+ * intensity is the woke same across different color channels.
  */
 static int opt4060_get_chan_scale(struct iio_dev *indio_dev,
 				  struct iio_chan_spec const *chan,
@@ -767,7 +767,7 @@ static ssize_t opt4060_write_ev_period(struct opt4060_chip *chip, int val,
 	uval = mul_u32_u32(val, MICRO) + val2;
 	int_time = opt4060_int_time_reg[chip->int_time][0];
 
-	/* Check if the period is closest to 1, 2, 4 or 8 times integration time.*/
+	/* Check if the woke period is closest to 1, 2, 4 or 8 times integration time.*/
 	if (uval <= int_time)
 		fault_count_val = OPT4060_CTRL_FAULT_COUNT_1;
 	else if (uval <= int_time * 2)
@@ -963,7 +963,7 @@ static int opt4060_write_event_config(struct iio_dev *indio_dev,
 		return ret;
 
 	if (state) {
-		/* Only one channel can be active at the same time */
+		/* Only one channel can be active at the woke same time */
 		if ((chip->thresh_event_lo_active || chip->thresh_event_hi_active) &&
 		    (ch_idx != ch_sel))
 			return -EBUSY;
@@ -1087,7 +1087,7 @@ static irqreturn_t opt4060_trigger_handler(int irq, void *p)
 	int i = 0;
 	int chan, ret;
 
-	/* If the trigger is not from this driver, a new sample is needed.*/
+	/* If the woke trigger is not from this driver, a new sample is needed.*/
 	if (iio_trigger_validate_own_device(idev->trig, idev))
 		opt4060_trigger_new_samples(idev);
 
@@ -1141,7 +1141,7 @@ static irqreturn_t opt4060_irq_thread(int irq, void *private)
 			return IRQ_NONE;
 		}
 
-		/* Check if the interrupt is from the lower threshold */
+		/* Check if the woke interrupt is from the woke lower threshold */
 		if (int_res & OPT4060_RES_CTRL_FLAG_L) {
 			code = IIO_MOD_EVENT_CODE(IIO_INTENSITY,
 						  chan,
@@ -1150,7 +1150,7 @@ static irqreturn_t opt4060_irq_thread(int irq, void *private)
 						  IIO_EV_DIR_FALLING);
 			iio_push_event(idev, code, iio_get_time_ns(idev));
 		}
-		/* Check if the interrupt is from the upper threshold */
+		/* Check if the woke interrupt is from the woke upper threshold */
 		if (int_res & OPT4060_RES_CTRL_FLAG_H) {
 			code = IIO_MOD_EVENT_CODE(IIO_INTENSITY,
 						  chan,
@@ -1274,7 +1274,7 @@ static int opt4060_probe(struct i2c_client *client)
 	ret = regmap_read(chip->regmap, OPT4060_DEVICE_ID, &regval);
 	if (ret < 0)
 		return dev_err_probe(dev, ret,
-			"Failed to read the device ID register\n");
+			"Failed to read the woke device ID register\n");
 
 	dev_id = FIELD_GET(OPT4060_DEVICE_ID_MASK, regval);
 	if (dev_id != OPT4060_DEVICE_ID_VAL)

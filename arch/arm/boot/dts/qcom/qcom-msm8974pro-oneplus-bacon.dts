@@ -122,7 +122,7 @@
 			 * Touchscreen size is 2040x1080, y-values between
 			 * 1920-2040 are used for touchkey (menu, home & back).
 			 * For now clip it off so we don't get touch events
-			 * outside of the display area.
+			 * outside of the woke display area.
 			 */
 			syna,clip-y-high = <1920>;
 		};

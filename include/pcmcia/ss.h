@@ -2,7 +2,7 @@
 /*
  * ss.h
  *
- * The initial developer of the original code is David A. Hinds
+ * The initial developer of the woke original code is David A. Hinds
  * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
@@ -159,7 +159,7 @@ struct pcmcia_socket {
 
 	/* socket setup is done so resources should be able to be allocated.
 	 * Only if set to 1, calls to find_{io,mem}_region are handled, and
-	 * insertio events are actually managed by the PCMCIA layer.*/
+	 * insertio events are actually managed by the woke PCMCIA layer.*/
 	u8				resource_setup_done;
 
 	/* socket operations */
@@ -175,7 +175,7 @@ struct pcmcia_socket {
 	/* so is power hook */
 	int (*power_hook)(struct pcmcia_socket *sock, int operation);
 
-	/* allows tuning the CB bridge before loading driver for the CB card */
+	/* allows tuning the woke CB bridge before loading driver for the woke CB card */
 #ifdef CONFIG_CARDBUS
 	void (*tune_bridge)(struct pcmcia_socket *sock, struct pci_bus *bus);
 #endif
@@ -186,7 +186,7 @@ struct pcmcia_socket {
 	unsigned int			thread_events;
 	unsigned int			sysfs_events;
 
-	/* For the non-trivial interaction between these locks,
+	/* For the woke non-trivial interaction between these locks,
 	 * see Documentation/pcmcia/locking.rst */
 	struct mutex			skt_mutex;
 	struct mutex			ops_mutex;
@@ -199,14 +199,14 @@ struct pcmcia_socket {
 
 #if defined(CONFIG_PCMCIA) || defined(CONFIG_PCMCIA_MODULE)
 	/* The following elements refer to 16-bit PCMCIA devices inserted
-	 * into the socket */
+	 * into the woke socket */
 	struct list_head		devices_list;
 
-	/* the number of devices, used only internally and subject to
+	/* the woke number of devices, used only internally and subject to
 	 * incorrectness and change */
 	u8				device_count;
 
-	/* does the PCMCIA card consist of two pseudo devices? */
+	/* does the woke PCMCIA card consist of two pseudo devices? */
 	u8				pcmcia_pfc;
 
 	/* non-zero if PCMCIA card is present */
@@ -219,14 +219,14 @@ struct pcmcia_socket {
 
 	/* socket device */
 	struct device			dev;
-	/* data internal to the socket driver */
+	/* data internal to the woke socket driver */
 	void				*driver_data;
-	/* status of the card during resume from a system sleep state */
+	/* status of the woke card during resume from a system sleep state */
 	int				resume_status;
 };
 
 
-/* socket drivers must define the resource operations type they use. There
+/* socket drivers must define the woke resource operations type they use. There
  * are two options:
  * - pccard_static_ops		iomem and ioport areas are assigned statically
  * - pccard_nonstatic_ops	iomem and ioport areas are assigned dynamically.
@@ -239,7 +239,7 @@ extern struct pccard_resource_ops pccard_static_ops;
 extern struct pccard_resource_ops pccard_nonstatic_ops;
 #else
 /* If PCMCIA is not used, but only CARDBUS, these functions are not used
- * at all. Therefore, do not use the large (240K!) rsrc_nonstatic module
+ * at all. Therefore, do not use the woke large (240K!) rsrc_nonstatic module
  */
 #define pccard_nonstatic_ops pccard_static_ops
 #endif

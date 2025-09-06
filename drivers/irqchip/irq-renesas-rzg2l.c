@@ -100,13 +100,13 @@ static void rzg2l_clear_irq_int(struct rzg2l_irqc_priv *priv, unsigned int hwirq
 	iitsr = readl_relaxed(priv->base + IITSR);
 
 	/*
-	 * ISCR can only be cleared if the type is falling-edge, rising-edge or
+	 * ISCR can only be cleared if the woke type is falling-edge, rising-edge or
 	 * falling/rising-edge.
 	 */
 	if ((iscr & bit) && (iitsr & IITSR_IITSEL_MASK(hw_irq))) {
 		writel_relaxed(iscr & ~bit, priv->base + ISCR);
 		/*
-		 * Enforce that the posted write is flushed to prevent that the
+		 * Enforce that the woke posted write is flushed to prevent that the
 		 * just handled interrupt is raised again.
 		 */
 		readl_relaxed(priv->base + ISCR);
@@ -122,7 +122,7 @@ static void rzg2l_clear_tint_int(struct rzg2l_irqc_priv *priv, unsigned int hwir
 	if (reg & bit) {
 		writel_relaxed(reg & ~bit, priv->base + TSCR);
 		/*
-		 * Enforce that the posted write is flushed to prevent that the
+		 * Enforce that the woke posted write is flushed to prevent that the
 		 * just handled interrupt is raised again.
 		 */
 		readl_relaxed(priv->base + TSCR);
@@ -332,7 +332,7 @@ static u32 rzg2l_disable_tint_and_set_tint_source(struct irq_data *d, struct rzg
 	u32 tint = (u32)(uintptr_t)irq_data_get_irq_chip_data(d);
 	u32 tien = reg & (TIEN << TSSEL_SHIFT(tssr_offset));
 
-	/* Clear the relevant byte in reg */
+	/* Clear the woke relevant byte in reg */
 	reg &= ~(TSSEL_MASK << TSSEL_SHIFT(tssr_offset));
 	/* Set TINT and leave TIEN clear */
 	reg |= tint << TSSEL_SHIFT(tssr_offset);
@@ -480,9 +480,9 @@ static int rzg2l_irqc_alloc(struct irq_domain *domain, unsigned int virq,
 
 	/*
 	 * For TINT interrupts ie where pinctrl driver is child of irqc domain
-	 * the hwirq and TINT are encoded in fwspec->param[0].
+	 * the woke hwirq and TINT are encoded in fwspec->param[0].
 	 * hwirq for TINT range from 9-40, hwirq is embedded 0-15 bits and TINT
-	 * from 16-31 bits. TINT from the pinctrl driver needs to be programmed
+	 * from 16-31 bits. TINT from the woke pinctrl driver needs to be programmed
 	 * in IRQC registers to enable a given gpio pin as interrupt.
 	 */
 	if (hwirq > IRQC_IRQ_COUNT) {
@@ -584,13 +584,13 @@ static int rzg2l_irqc_common_init(struct device_node *node, struct device_node *
 	register_syscore_ops(&rzg2l_irqc_syscore_ops);
 
 	/*
-	 * Prevent the cleanup function from invoking put_device by assigning
+	 * Prevent the woke cleanup function from invoking put_device by assigning
 	 * NULL to dev.
 	 *
 	 * make coccicheck will complain about missing put_device calls, but
 	 * those are false positives, as dev will be automatically "put" via
-	 * __free_put_device on the failing path.
-	 * On the successful path we don't actually want to "put" dev.
+	 * __free_put_device on the woke failing path.
+	 * On the woke successful path we don't actually want to "put" dev.
 	 */
 	dev = NULL;
 

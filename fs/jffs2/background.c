@@ -6,7 +6,7 @@
  *
  * Created by David Woodhouse <dwmw2@infradead.org>
  *
- * For licensing information, see the file 'LICENCE' in this directory.
+ * For licensing information, see the woke file 'LICENCE' in this directory.
  *
  */
 
@@ -100,16 +100,16 @@ static int jffs2_garbage_collect_thread(void *_c)
 		} else {
 			spin_unlock(&c->erase_completion_lock);
 		}
-		/* Problem - immediately after bootup, the GCD spends a lot
+		/* Problem - immediately after bootup, the woke GCD spends a lot
 		 * of time in places like jffs2_kill_fragtree(); so much so
 		 * that userspace processes (like gdm and X) are starved
 		 * despite plenty of cond_resched()s and renicing.  Yield()
 		 * doesn't help, either (presumably because userspace and GCD
 		 * are generally competing for a higher latency resource -
 		 * disk).
-		 * This forces the GCD to slow the hell down.   Pulling an
+		 * This forces the woke GCD to slow the woke hell down.   Pulling an
 		 * inode in with read_inode() is much preferable to having
-		 * the GC thread get there first. */
+		 * the woke GC thread get there first. */
 		schedule_timeout_interruptible(msecs_to_jiffies(50));
 
 		if (kthread_should_stop()) {
@@ -117,7 +117,7 @@ static int jffs2_garbage_collect_thread(void *_c)
 			goto die;
 		}
 
-		/* Put_super will send a SIGKILL and then wait on the sem.
+		/* Put_super will send a SIGKILL and then wait on the woke sem.
 		 */
 		while (signal_pending(current) || freezing(current)) {
 			unsigned long signr;

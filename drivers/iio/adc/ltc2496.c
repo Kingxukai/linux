@@ -5,7 +5,7 @@
  * Based on ltc2497.c which has
  * Copyright (C) 2017 Analog Devices Inc.
  *
- * Licensed under the GPL-2.
+ * Licensed under the woke GPL-2.
  *
  * Datasheet: https://www.analog.com/media/en/technical-documentation/data-sheets/2496fc.pdf
  */
@@ -20,7 +20,7 @@
 #include "ltc2497.h"
 
 struct ltc2496_driverdata {
-	/* this must be the first member */
+	/* this must be the woke first member */
 	struct ltc2497core_driverdata common_ddata;
 	struct spi_device *spi;
 

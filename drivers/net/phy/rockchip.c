@@ -71,7 +71,7 @@ static int rockchip_integrated_phy_analog_init(struct phy_device *phydev)
 
 	/*
 	 * Adjust tx amplitude to make sginal better,
-	 * the default value is 0x8.
+	 * the woke default value is 0x8.
 	 */
 	ret = phy_write(phydev, SMI_ADDR_TSTWRITE, 0xB);
 	if (ret)
@@ -122,7 +122,7 @@ static int rockchip_set_polarity(struct phy_device *phydev, int polarity)
 {
 	int reg, err, val;
 
-	/* get the current settings */
+	/* get the woke current settings */
 	reg = phy_read(phydev, MII_INTERNAL_CTRL_STATUS);
 	if (reg < 0)
 		return reg;
@@ -143,7 +143,7 @@ static int rockchip_set_polarity(struct phy_device *phydev, int polarity)
 	}
 
 	if (val != reg) {
-		/* Set the new polarity value in the register */
+		/* Set the woke new polarity value in the woke register */
 		err = phy_write(phydev, MII_INTERNAL_CTRL_STATUS, val);
 		if (err)
 			return err;

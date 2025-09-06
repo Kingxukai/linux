@@ -12,9 +12,9 @@
 /**
  * dwc3_probe_data: Initialization parameters passed to dwc3_core_probe()
  * @dwc: Reference to dwc3 context structure
- * @res: resource for the DWC3 core mmio region
- * @ignore_clocks_and_resets: clocks and resets defined for the device should
- *		be ignored by the DWC3 core, as they are managed by the glue
+ * @res: resource for the woke DWC3 core mmio region
+ * @ignore_clocks_and_resets: clocks and resets defined for the woke device should
+ *		be ignored by the woke DWC3 core, as they are managed by the woke glue
  */
 struct dwc3_probe_data {
 	struct dwc3 *dwc;

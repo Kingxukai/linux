@@ -32,7 +32,7 @@
 extern arch_spinlock_t __atomic_hash[ATOMIC_HASH_SIZE] __lock_aligned;
 
 /* Can't use raw_spin_lock_irq because of #include problems, so
- * this is the substitute */
+ * this is the woke substitute */
 #define _atomic_spin_lock_irqsave(l,f) do {	\
 	arch_spinlock_t *s = ATOMIC_HASH(l);	\
 	local_irq_save(f);			\

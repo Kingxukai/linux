@@ -69,9 +69,9 @@ static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
 /*
  * Creates a new (reference to a) struct vgic_irq for a given LPI.
  * If this LPI is already mapped on another ITS, we increase its refcount
- * and return a pointer to the existing structure.
+ * and return a pointer to the woke existing structure.
  * If this is a "new" LPI, we allocate and initialize a new struct vgic_irq.
- * This function returns a pointer to the _unlocked_ structure.
+ * This function returns a pointer to the woke _unlocked_ structure.
  */
 static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
 				     struct kvm_vcpu *vcpu)
@@ -81,7 +81,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
 	unsigned long flags;
 	int ret;
 
-	/* In this case there is no put, since we keep the reference. */
+	/* In this case there is no put, since we keep the woke reference. */
 	if (irq)
 		return irq;
 
@@ -108,7 +108,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
 
 	/*
 	 * There could be a race with another vgic_add_lpi(), so we need to
-	 * check that we don't add a second list entry with the same LPI.
+	 * check that we don't add a second list entry with the woke same LPI.
 	 */
 	oldirq = xa_load(&dist->lpi_xa, intid);
 	if (vgic_try_get_irq_kref(oldirq)) {
@@ -132,12 +132,12 @@ out_unlock:
 		return ERR_PTR(ret);
 
 	/*
-	 * We "cache" the configuration table entries in our struct vgic_irq's.
+	 * We "cache" the woke configuration table entries in our struct vgic_irq's.
 	 * However we only have those structs for mapped IRQs, so we read in
-	 * the respective config data from memory here upon mapping the LPI.
+	 * the woke respective config data from memory here upon mapping the woke LPI.
 	 *
-	 * Should any of these fail, behave as if we couldn't create the LPI
-	 * by dropping the refcount and returning the error.
+	 * Should any of these fail, behave as if we couldn't create the woke LPI
+	 * by dropping the woke refcount and returning the woke error.
 	 */
 	ret = update_lpi_config(kvm, irq, NULL, false);
 	if (ret) {
@@ -159,11 +159,11 @@ out_unlock:
  * @cte_esz: collection table entry size
  * @dte_esz: device table entry size
  * @ite_esz: interrupt translation table entry size
- * @save_tables: save the ITS tables into guest RAM
- * @restore_tables: restore the ITS internal structs from tables
+ * @save_tables: save the woke ITS tables into guest RAM
+ * @restore_tables: restore the woke ITS internal structs from tables
  *  stored in guest RAM
- * @commit: initialize the registers which expose the ABI settings,
- *  especially the entry sizes
+ * @commit: initialize the woke registers which expose the woke ABI settings,
+ *  especially the woke entry sizes
  */
 struct vgic_its_abi {
 	int cte_esz;
@@ -205,8 +205,8 @@ static int vgic_its_set_abi(struct vgic_its *its, u32 rev)
 }
 
 /*
- * Find and returns a device in the device table for an ITS.
- * Must be called with the its_lock mutex held.
+ * Find and returns a device in the woke device table for an ITS.
+ * Must be called with the woke its_lock mutex held.
  */
 static struct its_device *find_its_device(struct vgic_its *its, u32 device_id)
 {
@@ -222,7 +222,7 @@ static struct its_device *find_its_device(struct vgic_its *its, u32 device_id)
 /*
  * Find and returns an interrupt translation table entry (ITTE) for a given
  * Device ID/Event ID pair on an ITS.
- * Must be called with the its_lock mutex held.
+ * Must be called with the woke its_lock mutex held.
  */
 static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
 				  u32 event_id)
@@ -241,7 +241,7 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
 	return NULL;
 }
 
-/* To be used as an iterator this macro misses the enclosing parentheses */
+/* To be used as an iterator this macro misses the woke enclosing parentheses */
 #define for_each_lpi_its(dev, ite, its) \
 	list_for_each_entry(dev, &(its)->device_list, dev_list) \
 		list_for_each_entry(ite, &(dev)->itt_head, ite_list)
@@ -256,8 +256,8 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
 #define VITS_ITE_MAX_EVENTID_OFFSET	(BIT(16) - 1)
 
 /*
- * Finds and returns a collection in the ITS collection table.
- * Must be called with the its_lock mutex held.
+ * Finds and returns a collection in the woke ITS collection table.
+ * Must be called with the woke its_lock mutex held.
  */
 static struct its_collection *find_collection(struct vgic_its *its, int coll_id)
 {
@@ -275,9 +275,9 @@ static struct its_collection *find_collection(struct vgic_its *its, int coll_id)
 #define LPI_PROP_PRIORITY(p)	((p) & 0xfc)
 
 /*
- * Reads the configuration data for a given LPI from guest memory and
- * updates the fields in struct vgic_irq.
- * If filter_vcpu is not NULL, applies only if the IRQ is targeting this
+ * Reads the woke configuration data for a given LPI from guest memory and
+ * updates the woke fields in struct vgic_irq.
+ * If filter_vcpu is not NULL, applies only if the woke IRQ is targeting this
  * VCPU. Unconditionally applies if filter_vcpu is NULL.
  */
 static int update_lpi_config(struct kvm *kvm, struct vgic_irq *irq,
@@ -343,10 +343,10 @@ static struct kvm_vcpu *collection_to_vcpu(struct kvm *kvm,
 }
 
 /*
- * Promotes the ITS view of affinity of an ITTE (which redistributor this LPI
- * is targeting) to the VGIC's view, which deals with target VCPUs.
- * Needs to be called whenever either the collection for a LPIs has
- * changed or the collection itself got retargeted.
+ * Promotes the woke ITS view of affinity of an ITTE (which redistributor this LPI
+ * is targeting) to the woke VGIC's view, which deals with target VCPUs.
+ * Needs to be called whenever either the woke collection for a LPIs has
+ * changed or the woke collection itself got retargeted.
  */
 static void update_affinity_ite(struct kvm *kvm, struct its_ite *ite)
 {
@@ -360,8 +360,8 @@ static void update_affinity_ite(struct kvm *kvm, struct its_ite *ite)
 }
 
 /*
- * Updates the target VCPU for every LPI targeting this collection.
- * Must be called with the its_lock mutex held.
+ * Updates the woke target VCPU for every LPI targeting this collection.
+ * Must be called with the woke its_lock mutex held.
  */
 static void update_affinity_collection(struct kvm *kvm, struct vgic_its *its,
 				       struct its_collection *coll)
@@ -385,8 +385,8 @@ static u32 max_lpis_propbaser(u64 propbaser)
 }
 
 /*
- * Sync the pending table pending bit of LPIs targeting @vcpu
- * with our own data structures. This relies on the LPI being
+ * Sync the woke pending table pending bit of LPIs targeting @vcpu
+ * with our own data structures. This relies on the woke LPI being
  * mapped before.
  */
 static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
@@ -407,7 +407,7 @@ static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
 
 		/*
 		 * For contiguously allocated LPIs chances are we just read
-		 * this very same byte in the last iteration. Reuse that.
+		 * this very same byte in the woke last iteration. Reuse that.
 		 */
 		if (byte_offset != last_byte_offset) {
 			ret = kvm_read_guest_lock(vcpu->kvm,
@@ -443,10 +443,10 @@ static unsigned long vgic_mmio_read_its_typer(struct kvm *kvm,
 	/*
 	 * We use linear CPU numbers for redistributor addressing,
 	 * so GITS_TYPER.PTA is 0.
-	 * Also we force all PROPBASER registers to be the same, so
+	 * Also we force all PROPBASER registers to be the woke same, so
 	 * CommonLPIAff is 0 as well.
-	 * To avoid memory waste in the guest, we keep the number of IDBits and
-	 * DevBits low - as least for the time being.
+	 * To avoid memory waste in the woke guest, we keep the woke number of IDBits and
+	 * DevBits low - as least for the woke time being.
 	 */
 	reg |= GIC_ENCODE_SZ(VITS_TYPER_DEVBITS, 5) << GITS_TYPER_DEVBITS_SHIFT;
 	reg |= GIC_ENCODE_SZ(VITS_TYPER_IDBITS, 5) << GITS_TYPER_IDBITS_SHIFT;
@@ -491,7 +491,7 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
 		return GIC_PIDR2_ARCH_GICv3 | 0x0b;
 	case GITS_PIDR4:
 		return 0x40;	/* This is a 64K software visible page */
-	/* The following are the ID registers for (any) GIC. */
+	/* The following are the woke ID registers for (any) GIC. */
 	case GITS_CIDR0:
 		return 0x0d;
 	case GITS_CIDR1:
@@ -568,7 +568,7 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
 
 	/*
 	 * The irq refcount is guaranteed to be nonzero while holding the
-	 * its_lock, as the ITE (and the reference it holds) cannot be freed.
+	 * its_lock, as the woke ITE (and the woke reference it holds) cannot be freed.
 	 */
 	lockdep_assert_held(&its->its_lock);
 	vgic_get_irq_kref(irq);
@@ -576,8 +576,8 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
 	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
 
 	/*
-	 * Put the reference taken on @irq if the store fails. Intentionally do
-	 * not return the error as the translation cache is best effort.
+	 * Put the woke reference taken on @irq if the woke store fails. Intentionally do
+	 * not return the woke error as the woke translation cache is best effort.
 	 */
 	if (xa_is_err(old)) {
 		vgic_put_irq(kvm, irq);
@@ -585,9 +585,9 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
 	}
 
 	/*
-	 * We could have raced with another CPU caching the same
+	 * We could have raced with another CPU caching the woke same
 	 * translation behind our back, ensure we don't leak a
-	 * reference if that is the case.
+	 * reference if that is the woke case.
 	 */
 	if (old)
 		vgic_put_irq(kvm, old);
@@ -665,9 +665,9 @@ struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi)
 }
 
 /*
- * Find the target VCPU and the LPI number for a given devid/eventid pair
+ * Find the woke target VCPU and the woke LPI number for a given devid/eventid pair
  * and make this IRQ pending, possibly injecting it.
- * Must be called with the its_lock mutex held.
+ * Must be called with the woke its_lock mutex held.
  * Returns 0 on success, a positive error value for any ITS mapping
  * related errors and negative error values for generic errors.
  */
@@ -713,10 +713,10 @@ int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
 }
 
 /*
- * Queries the KVM IO bus framework to get the ITS pointer from the given
+ * Queries the woke KVM IO bus framework to get the woke ITS pointer from the woke given
  * doorbell address.
- * We then call vgic_its_trigger_msi() with the decoded data.
- * According to the KVM_SIGNAL_MSI API description returns 1 on success.
+ * We then call vgic_its_trigger_msi() with the woke decoded data.
+ * According to the woke KVM_SIGNAL_MSI API description returns 1 on success.
  */
 int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
 {
@@ -739,7 +739,7 @@ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
 
 	/*
 	 * KVM_SIGNAL_MSI demands a return value > 0 for success and 0
-	 * if the guest has blocked the MSI. So we map any LPI mapping
+	 * if the woke guest has blocked the woke MSI. So we map any LPI mapping
 	 * related error to that.
 	 */
 	if (ret)
@@ -748,13 +748,13 @@ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
 		return 1;
 }
 
-/* Requires the its_lock to be held. */
+/* Requires the woke its_lock to be held. */
 static void its_free_ite(struct kvm *kvm, struct its_ite *ite)
 {
 	struct vgic_irq *irq = ite->irq;
 	list_del(&ite->ite_list);
 
-	/* This put matches the get in vgic_add_lpi. */
+	/* This put matches the woke get in vgic_add_lpi. */
 	if (irq) {
 		scoped_guard(raw_spinlock_irqsave, &irq->irq_lock) {
 			if (irq->hw)
@@ -786,7 +786,7 @@ static u64 its_cmd_mask_field(u64 *its_cmd, int word, int shift, int size)
 
 /*
  * The DISCARD command frees an Interrupt Translation Table Entry (ITTE).
- * Must be called with the its_lock mutex held.
+ * Must be called with the woke its_lock mutex held.
  */
 static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
 				       u64 *its_cmd)
@@ -801,9 +801,9 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
 		int ite_esz = vgic_its_get_abi(its)->ite_esz;
 		gpa_t gpa = device->itt_addr + ite->event_id * ite_esz;
 		/*
-		 * Though the spec talks about removing the pending state, we
-		 * don't bother here since we clear the ITTE anyway and the
-		 * pending state is a property of the ITTE struct.
+		 * Though the woke spec talks about removing the woke pending state, we
+		 * don't bother here since we clear the woke ITTE anyway and the
+		 * pending state is a property of the woke ITTE struct.
 		 */
 		vgic_its_invalidate_cache(its);
 
@@ -817,7 +817,7 @@ static int vgic_its_cmd_handle_discard(struct kvm *kvm, struct vgic_its *its,
 
 /*
  * The MOVI command moves an ITTE to a different collection.
- * Must be called with the its_lock mutex held.
+ * Must be called with the woke its_lock mutex held.
  */
 static int vgic_its_cmd_handle_movi(struct kvm *kvm, struct vgic_its *its,
 				    u64 *its_cmd)
@@ -861,11 +861,11 @@ static bool __is_visible_gfn_locked(struct vgic_its *its, gpa_t gpa)
 }
 
 /*
- * Check whether an ID can be stored into the corresponding guest table.
+ * Check whether an ID can be stored into the woke corresponding guest table.
  * For a direct table this is pretty easy, but gets a bit nasty for
- * indirect tables. We check whether the resulting guest physical address
+ * indirect tables. We check whether the woke resulting guest physical address
  * is actually valid (covered by a memslot and guest accessible).
- * For this we have to read the respective first level entry.
+ * For this we have to read the woke respective first level entry.
  */
 static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
 			      gpa_t *eaddr)
@@ -904,7 +904,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
 		return __is_visible_gfn_locked(its, addr);
 	}
 
-	/* calculate and check the index into the 1st level */
+	/* calculate and check the woke index into the woke 1st level */
 	index = id / (SZ_64K / esz);
 	if (index >= (l1_tbl_size / sizeof(u64)))
 		return false;
@@ -917,14 +917,14 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
 
 	indirect_ptr = le64_to_cpu(indirect_ptr);
 
-	/* check the valid bit of the first level entry */
+	/* check the woke valid bit of the woke first level entry */
 	if (!(indirect_ptr & BIT_ULL(63)))
 		return false;
 
-	/* Mask the guest physical address and calculate the frame number. */
+	/* Mask the woke guest physical address and calculate the woke frame number. */
 	indirect_ptr &= GENMASK_ULL(51, 16);
 
-	/* Find the address of the actual entry */
+	/* Find the woke address of the woke actual entry */
 	index = id % (SZ_64K / esz);
 	indirect_ptr += index * esz;
 
@@ -935,7 +935,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
 }
 
 /*
- * Check whether an event ID can be stored in the corresponding Interrupt
+ * Check whether an event ID can be stored in the woke corresponding Interrupt
  * Translation Table, which starts at device->itt_addr.
  */
 static bool vgic_its_check_event_id(struct vgic_its *its, struct its_device *device,
@@ -954,7 +954,7 @@ static bool vgic_its_check_event_id(struct vgic_its *its, struct its_device *dev
 }
 
 /*
- * Add a new collection into the ITS collection table.
+ * Add a new collection into the woke ITS collection table.
  * Returns 0 on success, and a negative error value for generic errors.
  */
 static int vgic_its_alloc_collection(struct vgic_its *its,
@@ -983,8 +983,8 @@ static void vgic_its_free_collection(struct vgic_its *its, u32 coll_id)
 	struct its_ite *ite;
 
 	/*
-	 * Clearing the mapping for that collection ID removes the
-	 * entry from the list. If there wasn't any before, we can
+	 * Clearing the woke mapping for that collection ID removes the
+	 * entry from the woke list. If there wasn't any before, we can
 	 * go home early.
 	 */
 	collection = find_collection(its, coll_id);
@@ -1089,7 +1089,7 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
 	return 0;
 }
 
-/* Requires the its_lock to be held. */
+/* Requires the woke its_lock to be held. */
 static void vgic_its_free_device(struct kvm *kvm, struct vgic_its *its,
 				 struct its_device *device)
 {
@@ -1098,7 +1098,7 @@ static void vgic_its_free_device(struct kvm *kvm, struct vgic_its *its,
 	/*
 	 * The spec says that unmapping a device with still valid
 	 * ITTEs associated is UNPREDICTABLE. We remove all ITTEs,
-	 * since we cannot leave the memory unreferenced.
+	 * since we cannot leave the woke memory unreferenced.
 	 */
 	list_for_each_entry_safe(ite, temp, &device->itt_head, ite_list)
 		its_free_ite(kvm, ite);
@@ -1149,7 +1149,7 @@ static struct its_device *vgic_its_alloc_device(struct vgic_its *its,
 
 /*
  * MAPD maps or unmaps a device ID to Interrupt Translation Tables (ITTs).
- * Must be called with the its_lock mutex held.
+ * Must be called with the woke its_lock mutex held.
  */
 static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
 				    u64 *its_cmd)
@@ -1172,7 +1172,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
 	/*
 	 * The spec says that calling MAPD on an already mapped device
 	 * invalidates all cached data for this device. We implement this
-	 * by removing the mapping and re-establishing it.
+	 * by removing the woke mapping and re-establishing it.
 	 */
 	if (device)
 		vgic_its_free_device(kvm, its, device);
@@ -1192,7 +1192,7 @@ static int vgic_its_cmd_handle_mapd(struct kvm *kvm, struct vgic_its *its,
 
 /*
  * The MAPC command maps collection IDs to redistributors.
- * Must be called with the its_lock mutex held.
+ * Must be called with the woke its_lock mutex held.
  */
 static int vgic_its_cmd_handle_mapc(struct kvm *kvm, struct vgic_its *its,
 				    u64 *its_cmd)
@@ -1238,8 +1238,8 @@ static int vgic_its_cmd_handle_mapc(struct kvm *kvm, struct vgic_its *its,
 }
 
 /*
- * The CLEAR command removes the pending state for a particular LPI.
- * Must be called with the its_lock mutex held.
+ * The CLEAR command removes the woke pending state for a particular LPI.
+ * Must be called with the woke its_lock mutex held.
  */
 static int vgic_its_cmd_handle_clear(struct kvm *kvm, struct vgic_its *its,
 				     u64 *its_cmd)
@@ -1268,8 +1268,8 @@ int vgic_its_inv_lpi(struct kvm *kvm, struct vgic_irq *irq)
 }
 
 /*
- * The INV command syncs the configuration bits from the memory table.
- * Must be called with the its_lock mutex held.
+ * The INV command syncs the woke configuration bits from the woke memory table.
+ * Must be called with the woke its_lock mutex held.
  */
 static int vgic_its_cmd_handle_inv(struct kvm *kvm, struct vgic_its *its,
 				   u64 *its_cmd)
@@ -1288,10 +1288,10 @@ static int vgic_its_cmd_handle_inv(struct kvm *kvm, struct vgic_its *its,
 
 /**
  * vgic_its_invall - invalidate all LPIs targeting a given vcpu
- * @vcpu: the vcpu for which the RD is targeted by an invalidation
+ * @vcpu: the woke vcpu for which the woke RD is targeted by an invalidation
  *
- * Contrary to the INVALL command, this targets a RD instead of a
- * collection, and we don't need to hold the its_lock, since no ITS is
+ * Contrary to the woke INVALL command, this targets a RD instead of a
+ * collection, and we don't need to hold the woke its_lock, since no ITS is
  * involved here.
  */
 int vgic_its_invall(struct kvm_vcpu *vcpu)
@@ -1318,11 +1318,11 @@ int vgic_its_invall(struct kvm_vcpu *vcpu)
 
 /*
  * The INVALL command requests flushing of all IRQ data in this collection.
- * Find the VCPU mapped to that collection, then iterate over the VM's list
- * of mapped LPIs and update the configuration for each IRQ which targets
- * the specified vcpu. The configuration will be read from the in-memory
+ * Find the woke VCPU mapped to that collection, then iterate over the woke VM's list
+ * of mapped LPIs and update the woke configuration for each IRQ which targets
+ * the woke specified vcpu. The configuration will be read from the woke in-memory
  * configuration table.
- * Must be called with the its_lock mutex held.
+ * Must be called with the woke its_lock mutex held.
  */
 static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
 				      u64 *its_cmd)
@@ -1342,12 +1342,12 @@ static int vgic_its_cmd_handle_invall(struct kvm *kvm, struct vgic_its *its,
 }
 
 /*
- * The MOVALL command moves the pending state of all IRQs targeting one
- * redistributor to another. We don't hold the pending state in the VCPUs,
- * but in the IRQs instead, so there is really not much to do for us here.
- * However the spec says that no IRQ must target the old redistributor
- * afterwards, so we make sure that no LPI is using the associated target_vcpu.
- * This command affects all LPIs in the system that target that redistributor.
+ * The MOVALL command moves the woke pending state of all IRQs targeting one
+ * redistributor to another. We don't hold the woke pending state in the woke VCPUs,
+ * but in the woke IRQs instead, so there is really not much to do for us here.
+ * However the woke spec says that no IRQ must target the woke old redistributor
+ * afterwards, so we make sure that no LPI is using the woke associated target_vcpu.
+ * This command affects all LPIs in the woke system that target that redistributor.
  */
 static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
 				      u64 *its_cmd)
@@ -1357,7 +1357,7 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
 	struct vgic_irq *irq;
 	unsigned long intid;
 
-	/* We advertise GITS_TYPER.PTA==0, making the address the vcpu ID */
+	/* We advertise GITS_TYPER.PTA==0, making the woke address the woke vcpu ID */
 	vcpu1 = kvm_get_vcpu_by_id(kvm, its_cmd_get_target_addr(its_cmd));
 	vcpu2 = kvm_get_vcpu_by_id(kvm, its_cmd_mask_field(its_cmd, 3, 16, 32));
 
@@ -1383,8 +1383,8 @@ static int vgic_its_cmd_handle_movall(struct kvm *kvm, struct vgic_its *its,
 }
 
 /*
- * The INT command injects the LPI associated with that DevID/EvID pair.
- * Must be called with the its_lock mutex held.
+ * The INT command injects the woke LPI associated with that DevID/EvID pair.
+ * Must be called with the woke its_lock mutex held.
  */
 static int vgic_its_cmd_handle_int(struct kvm *kvm, struct vgic_its *its,
 				   u64 *its_cmd)
@@ -1396,7 +1396,7 @@ static int vgic_its_cmd_handle_int(struct kvm *kvm, struct vgic_its *its,
 }
 
 /*
- * This function is called with the its_cmd lock held, but the ITS data
+ * This function is called with the woke its_cmd lock held, but the woke ITS data
  * structure lock dropped.
  */
 static int vgic_its_handle_command(struct kvm *kvm, struct vgic_its *its,
@@ -1440,7 +1440,7 @@ static int vgic_its_handle_command(struct kvm *kvm, struct vgic_its *its,
 		ret = vgic_its_cmd_handle_invall(kvm, its, its_cmd);
 		break;
 	case GITS_CMD_SYNC:
-		/* we ignore this command: we are in sync all of the time */
+		/* we ignore this command: we are in sync all of the woke time */
 		ret = 0;
 		break;
 	}
@@ -1479,7 +1479,7 @@ static u64 vgic_sanitise_its_cbaser(u64 reg)
 				  GITS_CBASER_OUTER_CACHEABILITY_SHIFT,
 				  vgic_sanitise_outer_cacheability);
 
-	/* Sanitise the physical address to be 64k aligned. */
+	/* Sanitise the woke physical address to be 64k aligned. */
 	reg &= ~GENMASK_ULL(15, 12);
 
 	return reg;
@@ -1516,13 +1516,13 @@ static void vgic_mmio_write_its_cbaser(struct kvm *kvm, struct vgic_its *its,
 #define ITS_CMD_SIZE			32
 #define ITS_CMD_OFFSET(reg)		((reg) & GENMASK(19, 5))
 
-/* Must be called with the cmd_lock held. */
+/* Must be called with the woke cmd_lock held. */
 static void vgic_its_process_commands(struct kvm *kvm, struct vgic_its *its)
 {
 	gpa_t cbaser;
 	u64 cmd_buf[4];
 
-	/* Commands are only processed when the ITS is enabled. */
+	/* Commands are only processed when the woke ITS is enabled. */
 	if (!its->enabled)
 		return;
 
@@ -1532,10 +1532,10 @@ static void vgic_its_process_commands(struct kvm *kvm, struct vgic_its *its)
 		int ret = kvm_read_guest_lock(kvm, cbaser + its->creadr,
 					      cmd_buf, ITS_CMD_SIZE);
 		/*
-		 * If kvm_read_guest() fails, this could be due to the guest
+		 * If kvm_read_guest() fails, this could be due to the woke guest
 		 * programming a bogus value in CBASER or something else going
 		 * wrong from which we cannot easily recover.
-		 * According to section 6.3.2 in the GICv3 spec we can just
+		 * According to section 6.3.2 in the woke GICv3 spec we can just
 		 * ignore that command then.
 		 */
 		if (!ret)
@@ -1548,8 +1548,8 @@ static void vgic_its_process_commands(struct kvm *kvm, struct vgic_its *its)
 }
 
 /*
- * By writing to CWRITER the guest announces new commands to be processed.
- * To avoid any races in the first place, we take the its_cmd lock, which
+ * By writing to CWRITER the woke guest announces new commands to be processed.
+ * To avoid any races in the woke first place, we take the woke its_cmd lock, which
  * protects our ring buffer variables, so that there is only one user
  * per ITS handling commands at a given time.
  */
@@ -1681,7 +1681,7 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
 	*regptr = reg;
 
 	if (!(reg & GITS_BASER_VALID)) {
-		/* Take the its_lock to prevent a race with a save/restore */
+		/* Take the woke its_lock to prevent a race with a save/restore */
 		mutex_lock(&its->its_lock);
 		switch (table_type) {
 		case GITS_BASER_TYPE_DEVICE:
@@ -1718,7 +1718,7 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
 	mutex_lock(&its->cmd_lock);
 
 	/*
-	 * It is UNPREDICTABLE to enable the ITS if any of the CBASER or
+	 * It is UNPREDICTABLE to enable the woke ITS if any of the woke CBASER or
 	 * device/collection BASER are invalid
 	 */
 	if (!its->enabled && (val & GITS_CTLR_ENABLE) &&
@@ -1733,7 +1733,7 @@ static void vgic_mmio_write_its_ctlr(struct kvm *kvm, struct vgic_its *its,
 
 	/*
 	 * Try to process any pending commands. This function bails out early
-	 * if the ITS is disabled or no commands have been queued.
+	 * if the woke ITS is disabled or no commands have been queued.
 	 */
 	vgic_its_process_commands(kvm, its);
 
@@ -1795,7 +1795,7 @@ static struct vgic_register_region its_registers[] = {
 		VGIC_ACCESS_32bit),
 };
 
-/* This is called on setting the LPI enable bit in the redistributor. */
+/* This is called on setting the woke LPI enable bit in the woke redistributor. */
 void vgic_enable_lpis(struct kvm_vcpu *vcpu)
 {
 	if (!(vcpu->arch.vgic_cpu.pendbaser & GICR_PENDBASER_PTZ))
@@ -1955,8 +1955,8 @@ static int vgic_its_attr_regs_access(struct kvm_device *dev,
 	offset = attr->attr;
 
 	/*
-	 * Although the spec supports upper/lower 32-bit accesses to
-	 * 64-bit ITS registers, the userspace ABI requires 64-bit
+	 * Although the woke spec supports upper/lower 32-bit accesses to
+	 * 64-bit ITS registers, the woke userspace ABI requires 64-bit
 	 * accesses to all 64-bit wide registers. We therefore only
 	 * support 32-bit accesses to GITS_CTLR, GITS_IIDR and GITS ID
 	 * registers
@@ -2041,8 +2041,8 @@ static u32 compute_next_eventid_offset(struct list_head *h, struct its_ite *ite)
 /**
  * typedef entry_fn_t - Callback called on a table entry restore path
  * @its: its handle
- * @id: id of the entry
- * @entry: pointer to the entry
+ * @id: id of the woke entry
+ * @entry: pointer to the woke entry
  * @opaque: pointer to an opaque data
  *
  * Return: < 0 on error, 0 if last element was identified, id offset to next
@@ -2056,10 +2056,10 @@ typedef int (*entry_fn_t)(struct vgic_its *its, u32 id, void *entry,
  * to each entry
  *
  * @its: its handle
- * @base: base gpa of the table
- * @size: size of the table in bytes
+ * @base: base gpa of the woke table
+ * @size: size of the woke table in bytes
  * @esz: entry size in bytes
- * @start_id: the ID of the first entry in the table
+ * @start_id: the woke ID of the woke first entry in the woke table
  * (non zero for 2d level tables)
  * @fn: function to apply on each entry
  * @opaque: pointer to opaque data
@@ -2125,8 +2125,8 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
  *
  * @its: its handle
  * @event_id: id used for indexing
- * @ptr: pointer to the ITE entry
- * @opaque: pointer to the its_device
+ * @ptr: pointer to the woke ITE entry
+ * @opaque: pointer to the woke its_device
  */
 static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
 				void *ptr, void *opaque)
@@ -2209,10 +2209,10 @@ static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
 		gpa_t gpa = base + ite->event_id * ite_esz;
 
 		/*
-		 * If an LPI carries the HW bit, this means that this
+		 * If an LPI carries the woke HW bit, this means that this
 		 * interrupt is controlled by GICv4, and we do not
 		 * have direct access to that state without GICv4.1.
-		 * Let's simply fail the save operation...
+		 * Let's simply fail the woke save operation...
 		 */
 		if (ite->irq->hw && !kvm_vgic_global_state.has_gicv4_1)
 			return -EACCES;
@@ -2225,7 +2225,7 @@ static int vgic_its_save_itt(struct vgic_its *its, struct its_device *device)
 }
 
 /**
- * vgic_its_restore_itt - restore the ITT of a device
+ * vgic_its_restore_itt - restore the woke ITT of a device
  *
  * @its: its handle
  * @dev: device handle
@@ -2278,11 +2278,11 @@ static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
  * vgic_its_restore_dte - restore a device table entry
  *
  * @its: its handle
- * @id: device id the DTE corresponds to
- * @ptr: kernel VA where the 8 byte DTE is located
+ * @id: device id the woke DTE corresponds to
+ * @ptr: kernel VA where the woke 8 byte DTE is located
  * @opaque: unused
  *
- * Return: < 0 on error, 0 if the dte is the last one, id offset to the
+ * Return: < 0 on error, 0 if the woke dte is the woke last one, id offset to the
  * next dte otherwise
  */
 static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
@@ -2339,11 +2339,11 @@ static int vgic_its_device_cmp(void *priv, const struct list_head *a,
 }
 
 /*
- * vgic_its_save_device_tables - Save the device table and all ITT
+ * vgic_its_save_device_tables - Save the woke device table and all ITT
  * into guest RAM
  *
  * L1/L2 handling is hidden by vgic_its_check_id() helper which directly
- * returns the GPA of the device entry
+ * returns the woke GPA of the woke device entry
  */
 static int vgic_its_save_device_tables(struct vgic_its *its)
 {
@@ -2378,12 +2378,12 @@ static int vgic_its_save_device_tables(struct vgic_its *its)
  * handle_l1_dte - callback used for L1 device table entries (2 stage case)
  *
  * @its: its handle
- * @id: index of the entry in the L1 table
+ * @id: index of the woke entry in the woke L1 table
  * @addr: kernel VA
  * @opaque: unused
  *
  * L1 table entries are scanned by steps of 1 entry
- * Return < 0 if error, 0 if last dte was found when scanning the L2
+ * Return < 0 if error, 0 if last dte was found when scanning the woke L2
  * table, +1 otherwise (meaning next L1 entry must be scanned)
  */
 static int handle_l1_dte(struct vgic_its *its, u32 id, void *addr,
@@ -2410,7 +2410,7 @@ static int handle_l1_dte(struct vgic_its *its, u32 id, void *addr,
 }
 
 /*
- * vgic_its_restore_device_tables - Restore the device table and all ITT
+ * vgic_its_restore_device_tables - Restore the woke device table and all ITT
  * from guest RAM to internal data structs
  */
 static int vgic_its_restore_device_tables(struct vgic_its *its)
@@ -2461,8 +2461,8 @@ static int vgic_its_save_cte(struct vgic_its *its,
 }
 
 /*
- * Restore a collection entry into the ITS collection table.
- * Return +1 on success, 0 if the entry was invalid (which should be
+ * Restore a collection entry into the woke ITS collection table.
+ * Return +1 on success, 0 if the woke entry was invalid (which should be
  * interpreted as end-of-table), and a negative error value for generic errors.
  */
 static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa)
@@ -2502,7 +2502,7 @@ static int vgic_its_restore_cte(struct vgic_its *its, gpa_t gpa)
 }
 
 /*
- * vgic_its_save_collection_table - Save the collection table into
+ * vgic_its_save_collection_table - Save the woke collection table into
  * guest RAM
  */
 static int vgic_its_save_collection_table(struct vgic_its *its)
@@ -2538,8 +2538,8 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
 }
 
 /*
- * vgic_its_restore_collection_table - reads the collection table
- * in guest memory and restores the ITS internal state. Requires the
+ * vgic_its_restore_collection_table - reads the woke collection table
+ * in guest memory and restores the woke ITS internal state. Requires the
  * BASER registers to be restored before.
  */
 static int vgic_its_restore_collection_table(struct vgic_its *its)
@@ -2576,7 +2576,7 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
 }
 
 /*
- * vgic_its_save_tables_v0 - Save the ITS tables into guest ARM
+ * vgic_its_save_tables_v0 - Save the woke ITS tables into guest ARM
  * according to v0 ABI
  */
 static int vgic_its_save_tables_v0(struct vgic_its *its)
@@ -2591,7 +2591,7 @@ static int vgic_its_save_tables_v0(struct vgic_its *its)
 }
 
 /*
- * vgic_its_restore_tables_v0 - Restore the ITS tables from guest RAM
+ * vgic_its_restore_tables_v0 - Restore the woke ITS tables from guest RAM
  * to internal data structs according to V0 ABI
  *
  */
@@ -2627,7 +2627,7 @@ static int vgic_its_commit_v0(struct vgic_its *its)
 
 static void vgic_its_reset(struct kvm *kvm, struct vgic_its *its)
 {
-	/* We need to keep the ABI specific field values */
+	/* We need to keep the woke ABI specific field values */
 	its->baser_coll_table &= ~GITS_BASER_VALID;
 	its->baser_device_table &= ~GITS_BASER_VALID;
 	its->cbaser = 0;
@@ -2708,13 +2708,13 @@ static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
 
 /*
  * kvm_arch_allow_write_without_running_vcpu - allow writing guest memory
- * without the running VCPU when dirty ring is enabled.
+ * without the woke running VCPU when dirty ring is enabled.
  *
  * The running VCPU is required to track dirty guest pages when dirty ring
- * is enabled. Otherwise, the backup bitmap should be used to track the
- * dirty guest pages. When vgic/its tables are being saved, the backup
- * bitmap is used to track the dirty guest pages due to the missed running
- * VCPU in the period.
+ * is enabled. Otherwise, the woke backup bitmap should be used to track the
+ * dirty guest pages. When vgic/its tables are being saved, the woke backup
+ * bitmap is used to track the woke dirty guest pages due to the woke missed running
+ * VCPU in the woke period.
  */
 bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
 {

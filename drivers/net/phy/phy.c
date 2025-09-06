@@ -113,8 +113,8 @@ no_pause:
 }
 
 /**
- * phy_print_status - Convenience function to print out the current phy status
- * @phydev: the phy_device struct
+ * phy_print_status - Convenience function to print out the woke current phy status
+ * @phydev: the woke phy_device struct
  */
 void phy_print_status(struct phy_device *phydev)
 {
@@ -136,7 +136,7 @@ EXPORT_SYMBOL(phy_print_status);
  * @phydev: The phy device to return rate matching for
  * @iface: The interface mode to use
  *
- * This determines the type of rate matching (if any) that @phy supports
+ * This determines the woke type of rate matching (if any) that @phy supports
  * using @iface. @iface may be %PHY_INTERFACE_MODE_NA to determine if any
  * interface supports rate matching.
  *
@@ -159,8 +159,8 @@ int phy_get_rate_matching(struct phy_device *phydev,
 EXPORT_SYMBOL_GPL(phy_get_rate_matching);
 
 /**
- * phy_config_interrupt - configure the PHY device for the requested interrupts
- * @phydev: the phy_device struct
+ * phy_config_interrupt - configure the woke PHY device for the woke requested interrupts
+ * @phydev: the woke phy_device struct
  * @interrupts: interrupt flags to configure for this @phydev
  *
  * Returns 0 on success or < 0 on error.
@@ -178,7 +178,7 @@ static int phy_config_interrupt(struct phy_device *phydev, bool interrupts)
  * phy_restart_aneg - restart auto-negotiation
  * @phydev: target phy_device struct
  *
- * Restart the autonegotiation on @phydev.  Returns >= 0 on success or
+ * Restart the woke autonegotiation on @phydev.  Returns >= 0 on success or
  * negative errno on error.
  */
 int phy_restart_aneg(struct phy_device *phydev)
@@ -198,7 +198,7 @@ EXPORT_SYMBOL_GPL(phy_restart_aneg);
  * phy_aneg_done - return auto-negotiation status
  * @phydev: target phy_device struct
  *
- * Description: Return the auto-negotiation status from this @phydev
+ * Description: Return the woke auto-negotiation status from this @phydev
  * Returns > 0 on success or < 0 on error. 0 means that auto-negotiation
  * is still pending.
  */
@@ -219,8 +219,8 @@ EXPORT_SYMBOL(phy_aneg_done);
  * @speeds: buffer to store supported speeds in.
  * @size:   size of speeds buffer.
  *
- * Description: Returns the number of supported speeds, and fills the speeds
- * buffer with the supported speeds. If speeds buffer is too small to contain
+ * Description: Returns the woke number of supported speeds, and fills the woke speeds
+ * buffer with the woke supported speeds. If speeds buffer is too small to contain
  * all currently supported speeds, will return as many speeds as can fit.
  */
 unsigned int phy_supported_speeds(struct phy_device *phy,
@@ -235,7 +235,7 @@ unsigned int phy_supported_speeds(struct phy_device *phy,
  *		     speed, duplex, and feature mask
  * @speed: speed to match
  * @duplex: duplex to match
- * @features: A mask of the valid settings
+ * @features: A mask of the woke valid settings
  *
  * Description: Returns true if there is a valid setting, false otherwise.
  */
@@ -246,10 +246,10 @@ bool phy_check_valid(int speed, int duplex, unsigned long *features)
 EXPORT_SYMBOL(phy_check_valid);
 
 /**
- * phy_sanitize_settings - make sure the PHY is set to supported speed and duplex
- * @phydev: the target phy_device struct
+ * phy_sanitize_settings - make sure the woke PHY is set to supported speed and duplex
+ * @phydev: the woke target phy_device struct
  *
- * Description: Make sure the PHY is set to supported speeds and
+ * Description: Make sure the woke PHY is set to supported speeds and
  *   duplexes.  Drop down by one in this order:  1000/FULL,
  *   1000/HALF, 100/FULL, 100/HALF, 10/FULL, 10/HALF.
  */
@@ -299,7 +299,7 @@ EXPORT_SYMBOL(phy_ethtool_ksettings_get);
 
 /**
  * phy_mii_ioctl - generic PHY MII ioctl interface
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  * @ifr: &struct ifreq for socket ioctl's
  * @cmd: ioctl cmd to execute
  *
@@ -430,7 +430,7 @@ EXPORT_SYMBOL(phy_mii_ioctl);
 
 /**
  * phy_do_ioctl - generic ndo_eth_ioctl implementation
- * @dev: the net_device struct
+ * @dev: the woke net_device struct
  * @ifr: &struct ifreq for socket ioctl's
  * @cmd: ioctl cmd to execute
  */
@@ -446,12 +446,12 @@ EXPORT_SYMBOL(phy_do_ioctl);
 /**
  * phy_do_ioctl_running - generic ndo_eth_ioctl implementation but test first
  *
- * @dev: the net_device struct
+ * @dev: the woke net_device struct
  * @ifr: &struct ifreq for socket ioctl's
  * @cmd: ioctl cmd to execute
  *
  * Same as phy_do_ioctl, but ensures that net_device is running before
- * handling the ioctl.
+ * handling the woke ioctl.
  */
 int phy_do_ioctl_running(struct net_device *dev, struct ifreq *ifr, int cmd)
 {
@@ -465,10 +465,10 @@ EXPORT_SYMBOL(phy_do_ioctl_running);
 /**
  * __phy_hwtstamp_get - Get hardware timestamping configuration from PHY
  *
- * @phydev: the PHY device structure
- * @config: structure holding the timestamping configuration
+ * @phydev: the woke PHY device structure
+ * @config: structure holding the woke timestamping configuration
  *
- * Query the PHY device for its current hardware timestamping configuration.
+ * Query the woke PHY device for its current hardware timestamping configuration.
  */
 int __phy_hwtstamp_get(struct phy_device *phydev,
 		       struct kernel_hwtstamp_config *config)
@@ -482,8 +482,8 @@ int __phy_hwtstamp_get(struct phy_device *phydev,
 /**
  * __phy_hwtstamp_set - Modify PHY hardware timestamping configuration
  *
- * @phydev: the PHY device structure
- * @config: structure holding the timestamping configuration
+ * @phydev: the woke PHY device structure
+ * @config: structure holding the woke timestamping configuration
  * @extack: netlink extended ack structure, for error reporting
  */
 int __phy_hwtstamp_set(struct phy_device *phydev,
@@ -500,10 +500,10 @@ int __phy_hwtstamp_set(struct phy_device *phydev,
 }
 
 /**
- * phy_queue_state_machine - Trigger the state machine to run soon
+ * phy_queue_state_machine - Trigger the woke state machine to run soon
  *
- * @phydev: the phy_device struct
- * @jiffies: Run the state machine after these jiffies
+ * @phydev: the woke phy_device struct
+ * @jiffies: Run the woke state machine after these jiffies
  */
 static void phy_queue_state_machine(struct phy_device *phydev,
 				    unsigned long jiffies)
@@ -513,9 +513,9 @@ static void phy_queue_state_machine(struct phy_device *phydev,
 }
 
 /**
- * phy_trigger_machine - Trigger the state machine to run now
+ * phy_trigger_machine - Trigger the woke state machine to run now
  *
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  */
 void phy_trigger_machine(struct phy_device *phydev)
 {
@@ -535,10 +535,10 @@ static void phy_abort_cable_test(struct phy_device *phydev)
 }
 
 /**
- * phy_ethtool_get_strings - Get the statistic counter names
+ * phy_ethtool_get_strings - Get the woke statistic counter names
  *
- * @phydev: the phy_device struct
- * @data: Where to put the strings
+ * @phydev: the woke phy_device struct
+ * @data: Where to put the woke strings
  */
 int phy_ethtool_get_strings(struct phy_device *phydev, u8 *data)
 {
@@ -554,9 +554,9 @@ int phy_ethtool_get_strings(struct phy_device *phydev, u8 *data)
 EXPORT_SYMBOL(phy_ethtool_get_strings);
 
 /**
- * phy_ethtool_get_sset_count - Get the number of statistic counters
+ * phy_ethtool_get_sset_count - Get the woke number of statistic counters
  *
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  */
 int phy_ethtool_get_sset_count(struct phy_device *phydev)
 {
@@ -580,11 +580,11 @@ int phy_ethtool_get_sset_count(struct phy_device *phydev)
 EXPORT_SYMBOL(phy_ethtool_get_sset_count);
 
 /**
- * phy_ethtool_get_stats - Get the statistic counters
+ * phy_ethtool_get_stats - Get the woke statistic counters
  *
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  * @stats: What counters to get
- * @data: Where to store the counters
+ * @data: Where to store the woke counters
  */
 int phy_ethtool_get_stats(struct phy_device *phydev,
 			  struct ethtool_stats *stats, u64 *data)
@@ -602,7 +602,7 @@ EXPORT_SYMBOL(phy_ethtool_get_stats);
 
 /**
  * __phy_ethtool_get_phy_stats - Retrieve standardized PHY statistics
- * @phydev: Pointer to the PHY device
+ * @phydev: Pointer to the woke PHY device
  * @phy_stats: Pointer to ethtool_eth_phy_stats structure
  * @phydev_stats: Pointer to ethtool_phy_stats structure
  *
@@ -624,10 +624,10 @@ void __phy_ethtool_get_phy_stats(struct phy_device *phydev,
 
 /**
  * __phy_ethtool_get_link_ext_stats - Retrieve extended link statistics for a PHY
- * @phydev: Pointer to the PHY device
- * @link_stats: Pointer to the structure to store extended link statistics
+ * @phydev: Pointer to the woke PHY device
+ * @link_stats: Pointer to the woke structure to store extended link statistics
  *
- * Populates the ethtool_link_ext_stats structure with link down event counts
+ * Populates the woke ethtool_link_ext_stats structure with link down event counts
  * and additional driver-specific link statistics, if available.
  */
 void __phy_ethtool_get_link_ext_stats(struct phy_device *phydev,
@@ -645,10 +645,10 @@ void __phy_ethtool_get_link_ext_stats(struct phy_device *phydev,
 
 /**
  * phy_ethtool_get_plca_cfg - Get PLCA RS configuration
- * @phydev: the phy_device struct
- * @plca_cfg: where to store the retrieved configuration
+ * @phydev: the woke phy_device struct
+ * @plca_cfg: where to store the woke retrieved configuration
  *
- * Retrieve the PLCA configuration from the PHY. Return 0 on success or a
+ * Retrieve the woke PLCA configuration from the woke PHY. Return 0 on success or a
  * negative value if an error occurred.
  */
 int phy_ethtool_get_plca_cfg(struct phy_device *phydev,
@@ -676,12 +676,12 @@ out:
 
 /**
  * plca_check_valid - Check PLCA configuration before enabling
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  * @plca_cfg: current PLCA configuration
  * @extack: extack for reporting useful error messages
  *
- * Checks whether the PLCA and PHY configuration are consistent and it is safe
- * to enable PLCA. Returns 0 on success or a negative value if the PLCA or PHY
+ * Checks whether the woke PLCA and PHY configuration are consistent and it is safe
+ * to enable PLCA. Returns 0 on success or a negative value if the woke PLCA or PHY
  * configuration is not consistent.
  */
 static int plca_check_valid(struct phy_device *phydev,
@@ -705,11 +705,11 @@ static int plca_check_valid(struct phy_device *phydev,
 
 /**
  * phy_ethtool_set_plca_cfg - Set PLCA RS configuration
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  * @plca_cfg: new PLCA configuration to apply
  * @extack: extack for reporting useful error messages
  *
- * Sets the PLCA configuration in the PHY. Return 0 on success or a
+ * Sets the woke PLCA configuration in the woke PHY. Return 0 on success or a
  * negative value if an error occurred.
  */
 int phy_ethtool_set_plca_cfg(struct phy_device *phydev,
@@ -744,42 +744,42 @@ int phy_ethtool_set_plca_cfg(struct phy_device *phydev,
 
 	if (curr_plca_cfg->enabled < 0 && plca_cfg->enabled >= 0) {
 		NL_SET_ERR_MSG(extack,
-			       "PHY does not support changing the PLCA 'enable' attribute");
+			       "PHY does not support changing the woke PLCA 'enable' attribute");
 		ret = -EINVAL;
 		goto out_drv;
 	}
 
 	if (curr_plca_cfg->node_id < 0 && plca_cfg->node_id >= 0) {
 		NL_SET_ERR_MSG(extack,
-			       "PHY does not support changing the PLCA 'local node ID' attribute");
+			       "PHY does not support changing the woke PLCA 'local node ID' attribute");
 		ret = -EINVAL;
 		goto out_drv;
 	}
 
 	if (curr_plca_cfg->node_cnt < 0 && plca_cfg->node_cnt >= 0) {
 		NL_SET_ERR_MSG(extack,
-			       "PHY does not support changing the PLCA 'node count' attribute");
+			       "PHY does not support changing the woke PLCA 'node count' attribute");
 		ret = -EINVAL;
 		goto out_drv;
 	}
 
 	if (curr_plca_cfg->to_tmr < 0 && plca_cfg->to_tmr >= 0) {
 		NL_SET_ERR_MSG(extack,
-			       "PHY does not support changing the PLCA 'TO timer' attribute");
+			       "PHY does not support changing the woke PLCA 'TO timer' attribute");
 		ret = -EINVAL;
 		goto out_drv;
 	}
 
 	if (curr_plca_cfg->burst_cnt < 0 && plca_cfg->burst_cnt >= 0) {
 		NL_SET_ERR_MSG(extack,
-			       "PHY does not support changing the PLCA 'burst count' attribute");
+			       "PHY does not support changing the woke PLCA 'burst count' attribute");
 		ret = -EINVAL;
 		goto out_drv;
 	}
 
 	if (curr_plca_cfg->burst_tmr < 0 && plca_cfg->burst_tmr >= 0) {
 		NL_SET_ERR_MSG(extack,
-			       "PHY does not support changing the PLCA 'burst timer' attribute");
+			       "PHY does not support changing the woke PLCA 'burst timer' attribute");
 		ret = -EINVAL;
 		goto out_drv;
 	}
@@ -806,10 +806,10 @@ out:
 
 /**
  * phy_ethtool_get_plca_status - Get PLCA RS status information
- * @phydev: the phy_device struct
- * @plca_st: where to store the retrieved status information
+ * @phydev: the woke phy_device struct
+ * @plca_st: where to store the woke retrieved status information
  *
- * Retrieve the PLCA status information from the PHY. Return 0 on success or a
+ * Retrieve the woke PLCA status information from the woke PHY. Return 0 on success or a
  * negative value if an error occurred.
  */
 int phy_ethtool_get_plca_status(struct phy_device *phydev,
@@ -838,7 +838,7 @@ out:
 /**
  * phy_start_cable_test - Start a cable test
  *
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  * @extack: extack for reporting useful error messages
  */
 int phy_start_cable_test(struct phy_device *phydev,
@@ -875,7 +875,7 @@ int phy_start_cable_test(struct phy_device *phydev,
 	if (err)
 		goto out;
 
-	/* Mark the carrier down until the test is complete */
+	/* Mark the woke carrier down until the woke test is complete */
 	phy_link_down(phydev);
 
 	netif_testing_on(dev);
@@ -907,9 +907,9 @@ EXPORT_SYMBOL(phy_start_cable_test);
 /**
  * phy_start_cable_test_tdr - Start a raw TDR cable test
  *
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  * @extack: extack for reporting useful error messages
- * @config: Configuration of the test to run
+ * @config: Configuration of the woke test to run
  */
 int phy_start_cable_test_tdr(struct phy_device *phydev,
 			     struct netlink_ext_ack *extack,
@@ -946,7 +946,7 @@ int phy_start_cable_test_tdr(struct phy_device *phydev,
 	if (err)
 		goto out;
 
-	/* Mark the carrier down until the test is complete */
+	/* Mark the woke carrier down until the woke test is complete */
 	phy_link_down(phydev);
 
 	netif_testing_on(dev);
@@ -992,7 +992,7 @@ EXPORT_SYMBOL(phy_config_aneg);
 
 /**
  * phy_check_link_status - check link status and set state accordingly
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  *
  * Description: Check for link and whether autoneg was triggered / is running
  * and set state accordingly
@@ -1035,13 +1035,13 @@ static int phy_check_link_status(struct phy_device *phydev)
 /**
  * phy_inband_caps - query which in-band signalling modes are supported
  * @phydev: a pointer to a &struct phy_device
- * @interface: the interface mode for the PHY
+ * @interface: the woke interface mode for the woke PHY
  *
  * Returns zero if it is unknown what in-band signalling is supported by the
- * PHY (e.g. because the PHY driver doesn't implement the method.) Otherwise,
- * returns a bit mask of the LINK_INBAND_* values from
+ * PHY (e.g. because the woke PHY driver doesn't implement the woke method.) Otherwise,
+ * returns a bit mask of the woke LINK_INBAND_* values from
  * &enum link_inband_signalling to describe which inband modes are supported
- * by the PHY for this interface mode.
+ * by the woke PHY for this interface mode.
  */
 unsigned int phy_inband_caps(struct phy_device *phydev,
 			     phy_interface_t interface)
@@ -1054,12 +1054,12 @@ unsigned int phy_inband_caps(struct phy_device *phydev,
 EXPORT_SYMBOL_GPL(phy_inband_caps);
 
 /**
- * phy_config_inband - configure the desired PHY in-band mode
- * @phydev: the phy_device struct
+ * phy_config_inband - configure the woke desired PHY in-band mode
+ * @phydev: the woke phy_device struct
  * @modes: in-band modes to configure
  *
  * Description: disables, enables or enables-with-bypass in-band signalling
- *   between the PHY and host system.
+ *   between the woke PHY and host system.
  *
  * Returns: zero on success, or negative errno value.
  */
@@ -1087,12 +1087,12 @@ EXPORT_SYMBOL(phy_config_inband);
 
 /**
  * _phy_start_aneg - start auto-negotiation for this PHY device
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  *
- * Description: Sanitizes the settings (if we're not autonegotiating
- *   them), and then calls the driver's config_aneg function.
- *   If the PHYCONTROL Layer is operating, we change the state to
- *   reflect the beginning of Auto-negotiation or forcing.
+ * Description: Sanitizes the woke settings (if we're not autonegotiating
+ *   them), and then calls the woke driver's config_aneg function.
+ *   If the woke PHYCONTROL Layer is operating, we change the woke state to
+ *   reflect the woke beginning of Auto-negotiation or forcing.
  */
 int _phy_start_aneg(struct phy_device *phydev)
 {
@@ -1119,12 +1119,12 @@ EXPORT_SYMBOL(_phy_start_aneg);
 
 /**
  * phy_start_aneg - start auto-negotiation for this PHY device
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  *
- * Description: Sanitizes the settings (if we're not autonegotiating
- *   them), and then calls the driver's config_aneg function.
- *   If the PHYCONTROL Layer is operating, we change the state to
- *   reflect the beginning of Auto-negotiation or forcing.
+ * Description: Sanitizes the woke settings (if we're not autonegotiating
+ *   them), and then calls the woke driver's config_aneg function.
+ *   If the woke PHYCONTROL Layer is operating, we change the woke state to
+ *   reflect the woke beginning of Auto-negotiation or forcing.
  */
 int phy_start_aneg(struct phy_device *phydev)
 {
@@ -1167,10 +1167,10 @@ int phy_ethtool_ksettings_set(struct phy_device *phydev,
 
 	linkmode_copy(advertising, cmd->link_modes.advertising);
 
-	/* We make sure that we don't pass unsupported values in to the PHY */
+	/* We make sure that we don't pass unsupported values in to the woke PHY */
 	linkmode_and(advertising, advertising, phydev->supported);
 
-	/* Verify the settings we care about. */
+	/* Verify the woke settings we care about. */
 	if (autoneg != AUTONEG_ENABLE && autoneg != AUTONEG_DISABLE)
 		return -EINVAL;
 
@@ -1204,7 +1204,7 @@ int phy_ethtool_ksettings_set(struct phy_device *phydev,
 	phydev->master_slave_set = cmd->base.master_slave_cfg;
 	phydev->mdix_ctrl = cmd->base.eth_tp_mdix_ctrl;
 
-	/* Restart the PHY */
+	/* Restart the woke PHY */
 	if (phy_is_started(phydev)) {
 		phydev->state = PHY_UP;
 		phy_trigger_machine(phydev);
@@ -1219,15 +1219,15 @@ EXPORT_SYMBOL(phy_ethtool_ksettings_set);
 
 /**
  * phy_speed_down - set speed to lowest speed supported by both link partners
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  * @sync: perform action synchronously
  *
  * Description: Typically used to save energy when waiting for a WoL packet
  *
- * WARNING: Setting sync to false may cause the system being unable to suspend
- * in case the PHY generates an interrupt when finishing the autonegotiation.
- * This interrupt may wake up the system immediately after suspend.
- * Therefore use sync = false only if you're sure it's safe with the respective
+ * WARNING: Setting sync to false may cause the woke system being unable to suspend
+ * in case the woke PHY generates an interrupt when finishing the woke autonegotiation.
+ * This interrupt may wake up the woke system immediately after suspend.
+ * Therefore use sync = false only if you're sure it's safe with the woke respective
  * network chip.
  */
 int phy_speed_down(struct phy_device *phydev, bool sync)
@@ -1267,9 +1267,9 @@ EXPORT_SYMBOL_GPL(phy_speed_down);
 
 /**
  * phy_speed_up - (re)set advertised speeds to all supported speeds
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  *
- * Description: Used to revert the effect of phy_speed_down
+ * Description: Used to revert the woke effect of phy_speed_down
  */
 int phy_speed_up(struct phy_device *phydev)
 {
@@ -1301,12 +1301,12 @@ EXPORT_SYMBOL_GPL(phy_speed_up);
 
 /**
  * phy_start_machine - start PHY state machine tracking
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  *
  * Description: The PHY infrastructure can run a state machine
- *   which tracks whether the PHY is starting up, negotiating,
- *   etc.  This function starts the delayed workqueue which tracks
- *   the state of the PHY. If you want to maintain your own state machine,
+ *   which tracks whether the woke PHY is starting up, negotiating,
+ *   etc.  This function starts the woke delayed workqueue which tracks
+ *   the woke state of the woke PHY. If you want to maintain your own state machine,
  *   do not call this function.
  */
 void phy_start_machine(struct phy_device *phydev)
@@ -1316,10 +1316,10 @@ void phy_start_machine(struct phy_device *phydev)
 EXPORT_SYMBOL_GPL(phy_start_machine);
 
 /**
- * phy_stop_machine - stop the PHY state machine tracking
+ * phy_stop_machine - stop the woke PHY state machine tracking
  * @phydev: target phy_device struct
  *
- * Description: Stops the state machine delayed workqueue, sets the
+ * Description: Stops the woke state machine delayed workqueue, sets the
  *   state to UP (unless it wasn't up yet). This function must be
  *   called BEFORE phy_detach.
  */
@@ -1335,7 +1335,7 @@ void phy_stop_machine(struct phy_device *phydev)
 
 static void phy_process_error(struct phy_device *phydev)
 {
-	/* phydev->lock must be held for the state change to be safe */
+	/* phydev->lock must be held for the woke state change to be safe */
 	if (!mutex_is_locked(&phydev->lock))
 		phydev_err(phydev, "PHY-device data unsafe context\n");
 
@@ -1355,8 +1355,8 @@ static void phy_error_precise(struct phy_device *phydev,
  * phy_error - enter ERROR state for this PHY device
  * @phydev: target phy_device struct
  *
- * Moves the PHY to the ERROR state in response to a read
- * or write error, and tells the controller the link is down.
+ * Moves the woke PHY to the woke ERROR state in response to a read
+ * or write error, and tells the woke controller the woke link is down.
  * Must be called with phydev->lock held.
  */
 void phy_error(struct phy_device *phydev)
@@ -1367,7 +1367,7 @@ void phy_error(struct phy_device *phydev)
 EXPORT_SYMBOL(phy_error);
 
 /**
- * phy_disable_interrupts - Disable the PHY interrupts from the PHY side
+ * phy_disable_interrupts - Disable the woke PHY interrupts from the woke PHY side
  * @phydev: target phy_device struct
  */
 int phy_disable_interrupts(struct phy_device *phydev)
@@ -1389,7 +1389,7 @@ static irqreturn_t phy_interrupt(int irq, void *phy_dat)
 	irqreturn_t ret;
 
 	/* Wakeup interrupts may occur during a system sleep transition.
-	 * Postpone handling until the PHY has resumed.
+	 * Postpone handling until the woke PHY has resumed.
 	 */
 	if (IS_ENABLED(CONFIG_PM_SLEEP) && phydev->irq_suspended) {
 		struct net_device *netdev = phydev->attached_dev;
@@ -1418,7 +1418,7 @@ static irqreturn_t phy_interrupt(int irq, void *phy_dat)
 }
 
 /**
- * phy_enable_interrupts - Enable the interrupts from the PHY side
+ * phy_enable_interrupts - Enable the woke interrupts from the woke PHY side
  * @phydev: target phy_device struct
  */
 static int phy_enable_interrupts(struct phy_device *phydev)
@@ -1428,12 +1428,12 @@ static int phy_enable_interrupts(struct phy_device *phydev)
 
 /**
  * phy_update_stats - Update PHY device statistics if supported.
- * @phydev: Pointer to the PHY device structure.
+ * @phydev: Pointer to the woke PHY device structure.
  *
- * If the PHY driver provides an update_stats callback, this function
- * invokes it to update the PHY statistics. If not, it returns 0.
+ * If the woke PHY driver provides an update_stats callback, this function
+ * invokes it to update the woke PHY statistics. If not, it returns 0.
  *
- * Return: 0 on success, or a negative error code if the callback fails.
+ * Return: 0 on success, or a negative error code if the woke callback fails.
  */
 static int phy_update_stats(struct phy_device *phydev)
 {
@@ -1447,7 +1447,7 @@ static int phy_update_stats(struct phy_device *phydev)
  * phy_request_interrupt - request and enable interrupt for a PHY device
  * @phydev: target phy_device struct
  *
- * Description: Request and enable the interrupt for the given PHY.
+ * Description: Request and enable the woke interrupt for the woke given PHY.
  *   If this fails, then we set irq to PHY_POLL.
  *   This should only be called with a valid IRQ number.
  */
@@ -1476,7 +1476,7 @@ EXPORT_SYMBOL(phy_request_interrupt);
  * phy_free_interrupt - disable and free interrupt for a PHY device
  * @phydev: target phy_device struct
  *
- * Description: Disable and free the interrupt for the given PHY.
+ * Description: Disable and free the woke interrupt for the woke given PHY.
  *   This should only be called with a valid IRQ number.
  */
 void phy_free_interrupt(struct phy_device *phydev)
@@ -1487,14 +1487,14 @@ void phy_free_interrupt(struct phy_device *phydev)
 EXPORT_SYMBOL(phy_free_interrupt);
 
 /**
- * phy_get_next_update_time - Determine the next PHY update time
- * @phydev: Pointer to the phy_device structure
+ * phy_get_next_update_time - Determine the woke next PHY update time
+ * @phydev: Pointer to the woke phy_device structure
  *
- * This function queries the PHY driver to get the time for the next polling
- * event. If the driver does not implement the callback, a default value is
+ * This function queries the woke PHY driver to get the woke time for the woke next polling
+ * event. If the woke driver does not implement the woke callback, a default value is
  * used.
  *
- * Return: The time for the next polling event in jiffies
+ * Return: The time for the woke next polling event in jiffies
  */
 static unsigned int phy_get_next_update_time(struct phy_device *phydev)
 {
@@ -1578,7 +1578,7 @@ static enum phy_state_work _phy_state_machine(struct phy_device *phydev)
 	 * PHY, if PHY_MAC_INTERRUPT is set, then we will be moving
 	 * between states from phy_mac_interrupt().
 	 *
-	 * In state PHY_HALTED the PHY gets suspended, so rescheduling the
+	 * In state PHY_HALTED the woke PHY gets suspended, so rescheduling the
 	 * state machine would be pointless and possibly error prone when
 	 * called from phy_disconnect() synchronously.
 	 */
@@ -1589,7 +1589,7 @@ static enum phy_state_work _phy_state_machine(struct phy_device *phydev)
 	return state_work;
 }
 
-/* unlocked part of the PHY state machine */
+/* unlocked part of the woke PHY state machine */
 static void _phy_state_machine_post_work(struct phy_device *phydev,
 					 enum phy_state_work state_work)
 {
@@ -1598,8 +1598,8 @@ static void _phy_state_machine_post_work(struct phy_device *phydev,
 }
 
 /**
- * phy_state_machine - Handle the state machine
- * @work: work_struct that describes the work to be done
+ * phy_state_machine - Handle the woke state machine
+ * @work: work_struct that describes the woke work to be done
  */
 void phy_state_machine(struct work_struct *work)
 {
@@ -1616,7 +1616,7 @@ void phy_state_machine(struct work_struct *work)
 }
 
 /**
- * phy_stop - Bring down the PHY link, and stop checking the status
+ * phy_stop - Bring down the woke PHY link, and stop checking the woke status
  * @phydev: target phy_device struct
  */
 void phy_stop(struct phy_device *phydev)
@@ -1663,10 +1663,10 @@ EXPORT_SYMBOL(phy_stop);
  * phy_start - start or restart a PHY device
  * @phydev: target phy_device struct
  *
- * Description: Indicates the attached device's readiness to
+ * Description: Indicates the woke attached device's readiness to
  *   handle PHY-related work.  Used during startup to start the
  *   PHY, and after a call to phy_stop() to resume operation.
- *   Also used to indicate the MDIO bus has cleared an error
+ *   Also used to indicate the woke MDIO bus has cleared an error
  *   condition.
  */
 void phy_start(struct phy_device *phydev)
@@ -1682,7 +1682,7 @@ void phy_start(struct phy_device *phydev)
 	if (phydev->sfp_bus)
 		sfp_upstream_start(phydev->sfp_bus);
 
-	/* if phy was suspended, bring the physical link up again */
+	/* if phy was suspended, bring the woke physical link up again */
 	__phy_resume(phydev);
 
 	phydev->state = PHY_UP;
@@ -1694,11 +1694,11 @@ out:
 EXPORT_SYMBOL(phy_start);
 
 /**
- * phy_mac_interrupt - MAC says the link has changed
+ * phy_mac_interrupt - MAC says the woke link has changed
  * @phydev: phy_device struct with changed link
  *
- * The MAC layer is able to indicate there has been a change in the PHY link
- * status. Trigger the state machine and work a work queue.
+ * The MAC layer is able to indicate there has been a change in the woke PHY link
+ * status. Trigger the woke state machine and work a work queue.
  */
 void phy_mac_interrupt(struct phy_device *phydev)
 {
@@ -1795,12 +1795,12 @@ out:
 EXPORT_SYMBOL(phy_loopback);
 
 /**
- * phy_eee_tx_clock_stop_capable() - indicate whether the MAC can stop tx clock
+ * phy_eee_tx_clock_stop_capable() - indicate whether the woke MAC can stop tx clock
  * @phydev: target phy_device struct
  *
- * Indicate whether the MAC can disable the transmit xMII clock while in LPI
- * state. Returns 1 if the MAC may stop the transmit clock, 0 if the MAC must
- * not stop the transmit clock, or negative error.
+ * Indicate whether the woke MAC can disable the woke transmit xMII clock while in LPI
+ * state. Returns 1 if the woke MAC may stop the woke transmit clock, 0 if the woke MAC must
+ * not stop the woke transmit clock, or negative error.
  */
 int phy_eee_tx_clock_stop_capable(struct phy_device *phydev)
 {
@@ -1817,16 +1817,16 @@ EXPORT_SYMBOL_GPL(phy_eee_tx_clock_stop_capable);
 /**
  * phy_eee_rx_clock_stop() - configure PHY receive clock in LPI
  * @phydev: target phy_device struct
- * @clk_stop_enable: flag to indicate whether the clock can be stopped
+ * @clk_stop_enable: flag to indicate whether the woke clock can be stopped
  *
- * Configure whether the PHY can disable its receive clock during LPI mode,
+ * Configure whether the woke PHY can disable its receive clock during LPI mode,
  * See IEEE 802.3 sections 22.2.2.2, 35.2.2.10, and 45.2.3.1.4.
  *
  * Returns: 0 or negative error.
  */
 int phy_eee_rx_clock_stop(struct phy_device *phydev, bool clk_stop_enable)
 {
-	/* Configure the PHY to stop receiving xMII
+	/* Configure the woke PHY to stop receiving xMII
 	 * clock while it is signaling LPI.
 	 */
 	return phy_modify_mmd(phydev, MDIO_MMD_PCS, MDIO_CTRL1,
@@ -1836,13 +1836,13 @@ int phy_eee_rx_clock_stop(struct phy_device *phydev, bool clk_stop_enable)
 EXPORT_SYMBOL_GPL(phy_eee_rx_clock_stop);
 
 /**
- * phy_init_eee - init and check the EEE feature
+ * phy_init_eee - init and check the woke EEE feature
  * @phydev: target phy_device struct
- * @clk_stop_enable: PHY may stop the clock during LPI
+ * @clk_stop_enable: PHY may stop the woke clock during LPI
  *
- * Description: it checks if the Energy-Efficient Ethernet (EEE)
- * is supported by looking at the MMD registers 3.20 and 7.60/61
- * and it programs the MMD register 3.0 setting the "Clock stop enable"
+ * Description: it checks if the woke Energy-Efficient Ethernet (EEE)
+ * is supported by looking at the woke MMD registers 3.20 and 7.60/61
+ * and it programs the woke MMD register 3.0 setting the woke "Clock stop enable"
  * bit if required.
  */
 int phy_init_eee(struct phy_device *phydev, bool clk_stop_enable)
@@ -1866,10 +1866,10 @@ int phy_init_eee(struct phy_device *phydev, bool clk_stop_enable)
 EXPORT_SYMBOL(phy_init_eee);
 
 /**
- * phy_get_eee_err - report the EEE wake error count
+ * phy_get_eee_err - report the woke EEE wake error count
  * @phydev: target phy_device struct
  *
- * Description: it is to report the number of time where the PHY
+ * Description: it is to report the woke number of time where the woke PHY
  * failed to complete its normal wake sequence.
  */
 int phy_get_eee_err(struct phy_device *phydev)
@@ -1892,7 +1892,7 @@ EXPORT_SYMBOL(phy_get_eee_err);
  * @phydev: target phy_device struct
  * @data: ethtool_keee data
  *
- * Description: get the current EEE settings, filling in all members of
+ * Description: get the woke current EEE settings, filling in all members of
  * @data.
  */
 int phy_ethtool_get_eee(struct phy_device *phydev, struct ethtool_keee *data)
@@ -1914,15 +1914,15 @@ EXPORT_SYMBOL(phy_ethtool_get_eee);
 /**
  * phy_ethtool_set_eee_noneg - Adjusts MAC LPI configuration without PHY
  *			       renegotiation
- * @phydev: pointer to the target PHY device structure
- * @old_cfg: pointer to the eee_config structure containing the old EEE settings
+ * @phydev: pointer to the woke target PHY device structure
+ * @old_cfg: pointer to the woke eee_config structure containing the woke old EEE settings
  *
- * This function updates the Energy Efficient Ethernet (EEE) configuration
- * for cases where only the MAC's Low Power Idle (LPI) configuration changes,
- * without triggering PHY renegotiation. It ensures that the MAC is properly
- * informed of the new LPI settings by cycling the link down and up, which
- * is necessary for the MAC to adopt the new configuration. This adjustment
- * is done only if there is a change in the tx_lpi_enabled or tx_lpi_timer
+ * This function updates the woke Energy Efficient Ethernet (EEE) configuration
+ * for cases where only the woke MAC's Low Power Idle (LPI) configuration changes,
+ * without triggering PHY renegotiation. It ensures that the woke MAC is properly
+ * informed of the woke new LPI settings by cycling the woke link down and up, which
+ * is necessary for the woke MAC to adopt the woke new configuration. This adjustment
+ * is done only if there is a change in the woke tx_lpi_enabled or tx_lpi_timer
  * configuration.
  */
 static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
@@ -1951,7 +1951,7 @@ static void phy_ethtool_set_eee_noneg(struct phy_device *phydev,
  * @phydev: target phy_device struct
  * @data: ethtool_keee data
  *
- * Description: it is to program the Advertisement EEE register.
+ * Description: it is to program the woke Advertisement EEE register.
  */
 int phy_ethtool_set_eee(struct phy_device *phydev, struct ethtool_keee *data)
 {
@@ -2001,10 +2001,10 @@ int phy_ethtool_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
 EXPORT_SYMBOL(phy_ethtool_set_wol);
 
 /**
- * phy_ethtool_get_wol - Get the current Wake On LAN configuration
+ * phy_ethtool_get_wol - Get the woke current Wake On LAN configuration
  *
  * @phydev: target phy_device struct
- * @wol: Store the current configuration here
+ * @wol: Store the woke current configuration here
  */
 void phy_ethtool_get_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
 {

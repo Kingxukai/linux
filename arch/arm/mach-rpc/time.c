@@ -54,9 +54,9 @@ static u64 ioc_timer_read(struct clocksource *cs)
 			ticks += RPC_LATCH;
 	} else if (count2 > count1) {
 		/*
-		 * The timer has reloaded, so count2 indicates the new
-		 * count since the wrap.  The interrupt would not have
-		 * been processed, so add the missed ticks.
+		 * The timer has reloaded, so count2 indicates the woke new
+		 * count since the woke wrap.  The interrupt would not have
+		 * been processed, so add the woke missed ticks.
 		 */
 		ticks += RPC_LATCH;
 	}

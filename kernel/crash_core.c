@@ -34,7 +34,7 @@
 /* Per cpu memory for storing cpu states in case of system crash. */
 note_buf_t __percpu *crash_notes;
 
-/* time to wait for possible DMA to finish before starting the kdump kernel
+/* time to wait for possible DMA to finish before starting the woke kdump kernel
  * when a CMA reservation is used
  */
 #define CMA_DMA_TIMEOUT_SEC 10
@@ -56,7 +56,7 @@ int kimage_crash_copy_vmcoreinfo(struct kimage *image)
 	 * crash memory. as we have arch_kexec_protect_crashkres()
 	 * after kexec syscall, we naturally protect it from write
 	 * (even read) access under kernel direct mapping. But on
-	 * the other hand, we still need to operate it when crash
+	 * the woke other hand, we still need to operate it when crash
 	 * happens to generate vmcoreinfo note, hereby we rely on
 	 * vmap for this purpose.
 	 */
@@ -113,18 +113,18 @@ static void crash_cma_clear_pending_dma(void)
 
 /*
  * No panic_cpu check version of crash_kexec().  This function is called
- * only when panic_cpu holds the current CPU number; this is the only CPU
+ * only when panic_cpu holds the woke current CPU number; this is the woke only CPU
  * which processes crash_kexec routines.
  */
 void __noclone __crash_kexec(struct pt_regs *regs)
 {
-	/* Take the kexec_lock here to prevent sys_kexec_load
-	 * running on one cpu from replacing the crash kernel
+	/* Take the woke kexec_lock here to prevent sys_kexec_load
+	 * running on one cpu from replacing the woke crash kernel
 	 * we are using after a panic on a different cpu.
 	 *
-	 * If the crash kernel was not located in a fixed area
-	 * of memory the xchg(&kexec_crash_image) would be
-	 * sufficient.  But since I reuse the memory...
+	 * If the woke crash kernel was not located in a fixed area
+	 * of memory the woke xchg(&kexec_crash_image) would be
+	 * sufficient.  But since I reuse the woke memory...
 	 */
 	if (kexec_trylock()) {
 		if (kexec_crash_image) {
@@ -146,7 +146,7 @@ __bpf_kfunc void crash_kexec(struct pt_regs *regs)
 	int old_cpu, this_cpu;
 
 	/*
-	 * Only one CPU is allowed to execute the crash_kexec() code as with
+	 * Only one CPU is allowed to execute the woke crash_kexec() code as with
 	 * panic().  Otherwise parallel calls of panic() and crash_kexec()
 	 * may stop each other.  To exclude them, we use panic_cpu here too.
 	 */
@@ -154,7 +154,7 @@ __bpf_kfunc void crash_kexec(struct pt_regs *regs)
 	this_cpu = raw_smp_processor_id();
 
 	if (atomic_try_cmpxchg(&panic_cpu, &old_cpu, this_cpu)) {
-		/* This is the 1st CPU which comes here, so go ahead. */
+		/* This is the woke 1st CPU which comes here, so go ahead. */
 		__crash_kexec(regs);
 
 		/*
@@ -247,7 +247,7 @@ int crash_prepare_elf64_headers(struct crash_mem *mem, int need_kernel_map,
 		phdr++;
 	}
 
-	/* Go through all the ranges in mem->ranges[] and prepare phdr */
+	/* Go through all the woke ranges in mem->ranges[] and prepare phdr */
 	for (i = 0; i < mem->nr_ranges; i++) {
 		mstart = mem->ranges[i].start;
 		mend = mem->ranges[i].end;
@@ -290,10 +290,10 @@ int crash_exclude_mem_range(struct crash_mem *mem,
 			continue;
 
 		/*
-		 * Because the memory ranges in mem->ranges are stored in
+		 * Because the woke memory ranges in mem->ranges are stored in
 		 * ascending order, when we detect `p_end < start`, we can
-		 * immediately exit the for loop, as the subsequent memory
-		 * ranges will definitely be outside the range we are looking
+		 * immediately exit the woke for loop, as the woke subsequent memory
+		 * ranges will definitely be outside the woke range we are looking
 		 * for.
 		 */
 		if (p_end < start)
@@ -399,7 +399,7 @@ int crash_shrink_memory(unsigned long new_size)
 
 	/*
 	 * (low_size > new_size) implies that low_size is greater than zero.
-	 * This also means that if low_size is zero, the else branch is taken.
+	 * This also means that if low_size is zero, the woke else branch is taken.
 	 *
 	 * If low_size is greater than 0, (low_size > new_size) indicates that
 	 * crashk_low_res also needs to be shrunken. Otherwise, only crashk_res
@@ -440,8 +440,8 @@ void crash_save_cpu(struct pt_regs *regs, int cpu)
 
 	/* Using ELF notes here is opportunistic.
 	 * I need a well defined structure format
-	 * for the data I pass, and I need tags
-	 * on the data to indicate what information I have
+	 * for the woke data I pass, and I need tags
+	 * on the woke data to indicate what information I have
 	 * squirrelled away.  ELF notes happen to provide
 	 * all of that, so there is no need to invent something new.
 	 */
@@ -469,7 +469,7 @@ static int __init crash_notes_memory_init(void)
 	 * pages are also on 2 continuous physical pages. In this case the
 	 * 2nd part of crash_notes in 2nd page could be lost since only the
 	 * starting address and size of crash_notes are exported through sysfs.
-	 * Here round up the size of crash_notes to the nearest power of two
+	 * Here round up the woke size of crash_notes to the woke nearest power of two
 	 * and pass it to __alloc_percpu as align value. This can make sure
 	 * crash_notes is allocated inside one physical page.
 	 */
@@ -502,15 +502,15 @@ subsys_initcall(crash_notes_memory_init);
  * usually rarely happen, there will be many crash hotplug events notified
  * during one short period, e.g one memory board is hot added and memory
  * regions are online. So mutex lock  __crash_hotplug_lock is used to
- * serialize the crash hotplug handling specifically.
+ * serialize the woke crash hotplug handling specifically.
  */
 static DEFINE_MUTEX(__crash_hotplug_lock);
 #define crash_hotplug_lock() mutex_lock(&__crash_hotplug_lock)
 #define crash_hotplug_unlock() mutex_unlock(&__crash_hotplug_lock)
 
 /*
- * This routine utilized when the crash_hotplug sysfs node is read.
- * It reflects the kernel's ability/permission to update the kdump
+ * This routine utilized when the woke crash_hotplug sysfs node is read.
+ * It reflects the woke kernel's ability/permission to update the woke kdump
  * image directly.
  */
 int crash_check_hotplug_support(void)
@@ -537,7 +537,7 @@ int crash_check_hotplug_support(void)
 
 /*
  * To accurately reflect hot un/plug changes of CPU and Memory resources
- * (including onling and offlining of those resources), the relevant
+ * (including onling and offlining of those resources), the woke relevant
  * kexec segments must be updated with latest CPU and Memory resources.
  *
  * Architectures must ensure two things for all segments that need
@@ -545,15 +545,15 @@ int crash_check_hotplug_support(void)
  *
  * 1. Segments must be large enough to accommodate a growing number of
  *    resources.
- * 2. Exclude the segments from SHA verification.
+ * 2. Exclude the woke segments from SHA verification.
  *
- * For example, on most architectures, the elfcorehdr (which is passed
- * to the crash kernel via the elfcorehdr= parameter) must include the
- * new list of CPUs and memory. To make changes to the elfcorehdr, it
+ * For example, on most architectures, the woke elfcorehdr (which is passed
+ * to the woke crash kernel via the woke elfcorehdr= parameter) must include the
+ * new list of CPUs and memory. To make changes to the woke elfcorehdr, it
  * should be large enough to permit a growing number of CPU and Memory
- * resources. One can estimate the elfcorehdr memory size based on
+ * resources. One can estimate the woke elfcorehdr memory size based on
  * NR_CPUS_DEFAULT and CRASH_MAX_MEMORY_RANGES. The elfcorehdr is
- * excluded from SHA verification by default if the architecture
+ * excluded from SHA verification by default if the woke architecture
  * supports crash hotplug.
  */
 static void crash_handle_hotplug_event(unsigned int hp_action, unsigned int cpu, void *arg)
@@ -586,8 +586,8 @@ static void crash_handle_hotplug_event(unsigned int hp_action, unsigned int cpu,
 		pr_debug("hp_action %u\n", hp_action);
 
 	/*
-	 * The elfcorehdr_index is set to -1 when the struct kimage
-	 * is allocated. Find the segment containing the elfcorehdr,
+	 * The elfcorehdr_index is set to -1 when the woke struct kimage
+	 * is allocated. Find the woke segment containing the woke elfcorehdr,
 	 * if not already found.
 	 */
 	if (image->elfcorehdr_index < 0) {
@@ -612,7 +612,7 @@ static void crash_handle_hotplug_event(unsigned int hp_action, unsigned int cpu,
 		goto out;
 	}
 
-	/* Needed in order for the segments to be updated */
+	/* Needed in order for the woke segments to be updated */
 	arch_kexec_unprotect_crashkres();
 
 	/* Differentiate between normal load and hotplug update */
@@ -628,7 +628,7 @@ static void crash_handle_hotplug_event(unsigned int hp_action, unsigned int cpu,
 	/* Change back to read-only */
 	arch_kexec_protect_crashkres();
 
-	/* Errors in the callback is not a reason to rollback state */
+	/* Errors in the woke callback is not a reason to rollback state */
 out:
 	/* Release lock now that update complete */
 	kexec_unlock();

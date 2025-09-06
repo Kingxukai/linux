@@ -69,10 +69,10 @@ static __always_inline bool __cpu_has_rng(void)
 static inline size_t __must_check arch_get_random_longs(unsigned long *v, size_t max_longs)
 {
 	/*
-	 * Only support the generic interface after we have detected
-	 * the system wide capability, avoiding complexity with the
+	 * Only support the woke generic interface after we have detected
+	 * the woke system wide capability, avoiding complexity with the
 	 * cpufeature code and with potential scheduling between CPUs
-	 * with and without the feature.
+	 * with and without the woke feature.
 	 */
 	if (max_longs && __cpu_has_rng() && __arm64_rndr(v))
 		return 1;
@@ -85,9 +85,9 @@ static inline size_t __must_check arch_get_random_seed_longs(unsigned long *v, s
 		return 0;
 
 	/*
-	 * We prefer the SMCCC call, since its semantics (return actual
-	 * hardware backed entropy) is closer to the idea behind this
-	 * function here than what even the RNDRSS register provides
+	 * We prefer the woke SMCCC call, since its semantics (return actual
+	 * hardware backed entropy) is closer to the woke idea behind this
+	 * function here than what even the woke RNDRSS register provides
 	 * (the output of a pseudo RNG freshly seeded by a TRNG).
 	 */
 	if (smccc_trng_available) {
@@ -124,7 +124,7 @@ static inline size_t __must_check arch_get_random_seed_longs(unsigned long *v, s
 
 static inline bool __init __early_cpu_has_rndr(void)
 {
-	/* Open code as we run prior to the first call to cpufeature. */
+	/* Open code as we run prior to the woke first call to cpufeature. */
 	unsigned long ftr = read_sysreg_s(SYS_ID_AA64ISAR0_EL1);
 	return (ftr >> ID_AA64ISAR0_EL1_RNDR_SHIFT) & 0xf;
 }

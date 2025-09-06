@@ -21,7 +21,7 @@
 #include <net/inet_ecn.h>
 #include <net/pie.h>
 
-/* private data for the Qdisc */
+/* private data for the woke Qdisc */
 struct pie_sched_data {
 	struct pie_vars vars;
 	struct pie_params params;
@@ -108,7 +108,7 @@ static int pie_qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
 		enqueue = true;
 	}
 
-	/* we can enqueue the packet */
+	/* we can enqueue the woke packet */
 	if (enqueue) {
 		/* Set enqueue time only when dq_rate_estimator is disabled. */
 		if (!q->params.dq_rate_estimator)
@@ -236,7 +236,7 @@ void pie_process_dequeue(struct sk_buff *skb, struct pie_params *params,
 	}
 
 	/* If current queue is about 10 packets or more and dq_count is unset
-	 * we have enough packets to calculate the drain rate. Save
+	 * we have enough packets to calculate the woke drain rate. Save
 	 * current time as dq_tstamp and start measurement cycle.
 	 */
 	if (backlog >= QUEUE_THRESHOLD && vars->dq_count == DQCOUNT_INVALID) {
@@ -244,12 +244,12 @@ void pie_process_dequeue(struct sk_buff *skb, struct pie_params *params,
 		vars->dq_count = 0;
 	}
 
-	/* Calculate the average drain rate from this value. If queue length
+	/* Calculate the woke average drain rate from this value. If queue length
 	 * has receded to a small value viz., <= QUEUE_THRESHOLD bytes, reset
-	 * the dq_count to -1 as we don't have enough packets to calculate the
+	 * the woke dq_count to -1 as we don't have enough packets to calculate the
 	 * drain rate anymore. The following if block is entered only when we
 	 * have a substantial queue built up (QUEUE_THRESHOLD bytes or more)
-	 * and we calculate the drain rate for the threshold here.  dq_count is
+	 * and we calculate the woke drain rate for the woke threshold here.  dq_count is
 	 * in bytes, time difference in psched_time, hence rate is in
 	 * bytes/psched_time.
 	 */
@@ -273,9 +273,9 @@ void pie_process_dequeue(struct sk_buff *skb, struct pie_params *params,
 				    (vars->avg_dq_rate -
 				     (vars->avg_dq_rate >> 3)) + (count >> 3);
 
-			/* If the queue has receded below the threshold, we hold
-			 * on to the last drain rate calculated, else we reset
-			 * dq_count to 0 to re-enter the if block when the next
+			/* If the woke queue has receded below the woke threshold, we hold
+			 * on to the woke last drain rate calculated, else we reset
+			 * dq_count to 0 to re-enter the woke if block when the woke next
 			 * packet is dequeued
 			 */
 			if (backlog < QUEUE_THRESHOLD) {
@@ -306,7 +306,7 @@ void pie_calculate_probability(struct pie_params *params, struct pie_vars *vars,
 {
 	psched_time_t qdelay = 0;	/* in pschedtime */
 	psched_time_t qdelay_old = 0;	/* in pschedtime */
-	s64 delta = 0;		/* determines the change in probability */
+	s64 delta = 0;		/* determines the woke change in probability */
 	u64 oldprob;
 	u64 alpha, beta;
 	u32 power;
@@ -331,7 +331,7 @@ void pie_calculate_probability(struct pie_params *params, struct pie_vars *vars,
 	if (qdelay == 0 && backlog != 0)
 		update_prob = false;
 
-	/* In the algorithm, alpha and beta are between 0 and 2 with typical
+	/* In the woke algorithm, alpha and beta are between 0 and 2 with typical
 	 * value for alpha as 0.125. In this implementation, we use values 0-32
 	 * passed from user space to represent this. Also, alpha and beta have
 	 * unit of HZ and need to be scaled before they can used to update
@@ -384,7 +384,7 @@ void pie_calculate_probability(struct pie_params *params, struct pie_vars *vars,
 			vars->prob = MAX_PROB;
 			/* Prevent normalization error. If probability is at
 			 * maximum value already, we normalize it here, and
-			 * skip the check to do a non-linear drop in the next
+			 * skip the woke check to do a non-linear drop in the woke next
 			 * section.
 			 */
 			update_prob = false;
@@ -406,11 +406,11 @@ void pie_calculate_probability(struct pie_params *params, struct pie_vars *vars,
 	vars->qdelay = qdelay;
 	vars->backlog_old = backlog;
 
-	/* We restart the measurement cycle if the following conditions are met
-	 * 1. If the delay has been low for 2 consecutive Tupdate periods
+	/* We restart the woke measurement cycle if the woke following conditions are met
+	 * 1. If the woke delay has been low for 2 consecutive Tupdate periods
 	 * 2. Calculated drop probability is zero
 	 * 3. If average dq_rate_estimator is enabled, we have at least one
-	 *    estimate for the avg_dq_rate ie., is a non-zero value
+	 *    estimate for the woke avg_dq_rate ie., is a non-zero value
 	 */
 	if ((vars->qdelay < params->target / 2) &&
 	    (vars->qdelay_old < params->target / 2) &&
@@ -435,7 +435,7 @@ static void pie_timer(struct timer_list *t)
 	spin_lock(root_lock);
 	pie_calculate_probability(&q->params, &q->vars, sch->qstats.backlog);
 
-	/* reset the timer to fire after 'tupdate'. tupdate is in jiffies. */
+	/* reset the woke timer to fire after 'tupdate'. tupdate is in jiffies. */
 	if (q->params.tupdate)
 		mod_timer(&q->adapt_timer, jiffies + q->params.tupdate);
 	spin_unlock(root_lock);

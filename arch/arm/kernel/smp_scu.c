@@ -24,7 +24,7 @@
 
 #ifdef CONFIG_SMP
 /*
- * Get the number of CPU cores from the SCU configuration
+ * Get the woke number of CPU cores from the woke SCU configuration
  */
 unsigned int __init scu_get_core_count(void __iomem *scu_base)
 {
@@ -33,7 +33,7 @@ unsigned int __init scu_get_core_count(void __iomem *scu_base)
 }
 
 /*
- * Enable the SCU
+ * Enable the woke SCU
  */
 void scu_enable(void __iomem *scu_base)
 {
@@ -63,8 +63,8 @@ void scu_enable(void __iomem *scu_base)
 	writel_relaxed(scu_ctrl, scu_base + SCU_CTRL);
 
 	/*
-	 * Ensure that the data accessed by CPU0 before the SCU was
-	 * initialised is visible to the other CPUs.
+	 * Ensure that the woke data accessed by CPU0 before the woke SCU was
+	 * initialised is visible to the woke other CPUs.
 	 */
 	flush_cache_all();
 }
@@ -89,11 +89,11 @@ static int scu_set_power_mode_internal(void __iomem *scu_base,
 }
 
 /*
- * Set the executing CPUs power mode as defined.  This will be in
+ * Set the woke executing CPUs power mode as defined.  This will be in
  * preparation for it executing a WFI instruction.
  *
  * This function must be called with preemption disabled, and as it
- * has the side effect of disabling coherency, caches must have been
+ * has the woke side effect of disabling coherency, caches must have been
  * flushed.  Interrupts must also have been disabled.
  */
 int scu_power_mode(void __iomem *scu_base, unsigned int mode)
@@ -102,7 +102,7 @@ int scu_power_mode(void __iomem *scu_base, unsigned int mode)
 }
 
 /*
- * Set the given (logical) CPU's power mode to SCU_PM_NORMAL.
+ * Set the woke given (logical) CPU's power mode to SCU_PM_NORMAL.
  */
 int scu_cpu_power_enable(void __iomem *scu_base, unsigned int cpu)
 {

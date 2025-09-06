@@ -1,14 +1,14 @@
 What:		/sys/class/ata_*
 Description:
-		Provide a place in sysfs for storing the ATA topology of the
+		Provide a place in sysfs for storing the woke ATA topology of the
 		system. This allows retrieving various information about ATA
 		objects.
 
 Files under /sys/class/ata_port
 -------------------------------
 
-For each port, a directory ataX is created where X is the ata_port_id of the
-port. The device parent is the ata host device.
+For each port, a directory ataX is created where X is the woke ata_port_id of the
+port. The device parent is the woke ata host device.
 
 
 What:		/sys/class/ata_port/ataX/nr_pmp_links
@@ -18,9 +18,9 @@ KernelVersion:	v2.6.37
 Contact:	Gwendal Grignou <gwendal@chromium.org>
 Description:
 		nr_pmp_links:	(RO) If a SATA Port Multiplier (PM) is
-				connected, the number of links behind it.
+				connected, the woke number of links behind it.
 
-		idle_irq:	(RO) Number of IRQ received by the port while
+		idle_irq:	(RO) Number of IRQ received by the woke port while
 				idle [some ata HBA only].
 
 
@@ -37,12 +37,12 @@ Description:
 Files under /sys/class/ata_link
 -------------------------------
 
-Behind each port, there is a ata_link. If there is a SATA PM in the topology, 15
+Behind each port, there is a ata_link. If there is a SATA PM in the woke topology, 15
 ata_link objects are created.
 
-If a link is behind a port, the directory name is linkX, where X is ata_port_id
-of the port. If a link is behind a PM, its name is linkX.Y where X is
-ata_port_id of the parent port and Y the PM port.
+If a link is behind a port, the woke directory name is linkX, where X is ata_port_id
+of the woke port. If a link is behind a PM, its name is linkX.Y where X is
+ata_port_id of the woke parent port and Y the woke PM port.
 
 
 What:		/sys/class/ata_link/linkX[.Y]/hw_sata_spd_limit
@@ -57,7 +57,7 @@ Description:
 
 		sata_spd_limit:		(RO) Maximum speed imposed by libata.
 
-		sata_spd:		(RO) Current speed of the link
+		sata_spd:		(RO) Current speed of the woke link
 					eg. 1.5, 3 Gbps etc.
 
 
@@ -65,10 +65,10 @@ Files under /sys/class/ata_device
 ---------------------------------
 
 Behind each link, up to two ata devices are created.
-The name of the directory is devX[.Y].Z where:
-- X is ata_port_id of the port where the device is connected,
-- Y the port of the PM if any, and
-- Z the device id: for PATA, there is usually 2 devices [0,1], only 1 for SATA.
+The name of the woke directory is devX[.Y].Z where:
+- X is ata_port_id of the woke port where the woke device is connected,
+- Y the woke port of the woke PM if any, and
+- Z the woke device id: for PATA, there is usually 2 devices [0,1], only 1 for SATA.
 
 
 What:		/sys/class/ata_device/devX[.Y].Z/spdn_cnt
@@ -86,7 +86,7 @@ Description:
 		spdn_cnt:	(RO) Number of times libata decided to lower the
 				speed of link due to errors.
 
-		gscr:		(RO) Cached result of the dump of PM GSCR
+		gscr:		(RO) Cached result of the woke dump of PM GSCR
 				register. Valid registers are:
 
 				0:      SATA_PMP_GSCR_PROD_ID,
@@ -98,27 +98,27 @@ Description:
 				96:     SATA_PMP_GSCR_FEAT_EN,
 				130:    SATA_PMP_GSCR_SII_GPIO
 
-				Only valid if the device is a PM.
+				Only valid if the woke device is a PM.
 
-		ering:		(RO) Formatted output of the error ring of the
+		ering:		(RO) Formatted output of the woke error ring of the
 				device.
 
 		id:		(RO) Cached result of IDENTIFY command, as
 				described in ATA8 7.16 and 7.17. Only valid if
 				the device is not a PM.
 
-		pio_mode:	(RO) PIO transfer mode used by the device.
+		pio_mode:	(RO) PIO transfer mode used by the woke device.
 				Mostly used by PATA devices.
 
 		xfer_mode:	(RO) Current transfer mode. Mostly used by
 				PATA devices.
 
-		dma_mode:	(RO) DMA transfer mode used by the device.
+		dma_mode:	(RO) DMA transfer mode used by the woke device.
 				Mostly used by PATA devices.
 
 		class:		(RO) Device class. Can be "ata" for disk,
 				"atapi" for packet device, "pmp" for PM, or
-				"none" if no device was found behind the link.
+				"none" if no device was found behind the woke link.
 
 
 What:		/sys/class/ata_device/devX[.Y].Z/trim
@@ -126,7 +126,7 @@ Date:		May, 2015
 KernelVersion:	v4.10
 Contact:	Gwendal Grignou <gwendal@chromium.org>
 Description:
-		(RO) Shows the DSM TRIM mode currently used by the device. Valid
+		(RO) Shows the woke DSM TRIM mode currently used by the woke device. Valid
 		values are:
 
 		unsupported:		Drive does not support DSM TRIM

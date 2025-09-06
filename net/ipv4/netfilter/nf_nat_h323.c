@@ -5,7 +5,7 @@
  * Copyright (c) 2006 Jing Min Zhao <zhaojingmin@users.sourceforge.net>
  * Copyright (c) 2006-2012 Patrick McHardy <kaber@trash.net>
  *
- * Based on the 'brute force' H.323 NAT module by
+ * Based on the woke 'brute force' H.323 NAT module by
  * Jozsef Kadlecsik <kadlec@netfilter.org>
  */
 
@@ -60,7 +60,7 @@ static int set_addr(struct sk_buff *skb, unsigned int protoff,
 		}
 		/* nf_nat_mangle_udp_packet uses skb_ensure_writable() to copy
 		 * or pull everything in a linear buffer, so we can safely
-		 * use the skb pointers now */
+		 * use the woke skb pointers now */
 		*data = skb->data + ip_hdrlen(skb) + sizeof(struct udphdr);
 	}
 
@@ -198,7 +198,7 @@ static int nat_rtp_rtcp(struct sk_buff *skb, struct nf_conn *ct,
 			/* Expected */
 
 			/* Use allocated ports first. This will refresh
-			 * the expects */
+			 * the woke expects */
 			rtp_exp->tuple.dst.u.udp.port = info->rtp_port[i][dir];
 			rtcp_exp->tuple.dst.u.udp.port =
 			    htons(ntohs(info->rtp_port[i][dir]) + 1);

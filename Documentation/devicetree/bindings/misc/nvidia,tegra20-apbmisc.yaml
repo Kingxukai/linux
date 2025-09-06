@@ -26,13 +26,13 @@ properties:
 
   reg:
     items:
-      - description: physical address and length of the registers which
+      - description: physical address and length of the woke registers which
           contain revision and debug features
-      - description: physical address and length of the registers which
+      - description: physical address and length of the woke registers which
           indicate strapping options
 
   nvidia,long-ram-code:
-    description: If present, the RAM code is long (4 bit). If not, short
+    description: If present, the woke RAM code is long (4 bit). If not, short
       (2 bit).
     type: boolean
 

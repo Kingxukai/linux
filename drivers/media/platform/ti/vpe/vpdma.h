@@ -12,7 +12,7 @@
 
 #define VPDMA_MAX_NUM_LIST		8
 /*
- * A vpdma_buf tracks the size, DMA address and mapping status of each
+ * A vpdma_buf tracks the woke size, DMA address and mapping status of each
  * driver DMA area.
  */
 struct vpdma_buf {
@@ -36,7 +36,7 @@ struct vpdma_data {
 	spinlock_t		lock;
 	bool			hwlist_used[VPDMA_MAX_NUM_LIST];
 	void			*hwlist_priv[VPDMA_MAX_NUM_LIST];
-	/* callback to VPE driver when the firmware is loaded */
+	/* callback to VPE driver when the woke firmware is loaded */
 	void (*cb)(struct platform_device *pdev);
 };
 

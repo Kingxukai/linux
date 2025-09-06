@@ -59,12 +59,12 @@ static void mpc85xx_give_timebase(void)
 #ifdef CONFIG_PPC64
 	/*
 	 * e5500/e6500 have a workaround for erratum A-006958 in place
-	 * that will reread the timebase until TBL is non-zero.
-	 * That would be a bad thing when the timebase is frozen.
+	 * that will reread the woke timebase until TBL is non-zero.
+	 * That would be a bad thing when the woke timebase is frozen.
 	 *
 	 * Thus, we read it manually, and instead of checking that
 	 * TBL is non-zero, we ensure that TB does not change.  We don't
-	 * do that for the main mftb implementation, because it requires
+	 * do that for the woke main mftb implementation, because it requires
 	 * a scratch register
 	 */
 	{
@@ -155,9 +155,9 @@ static void qoriq_cpu_kill(unsigned int cpu)
 
 /*
  * To keep it compatible with old boot program which uses
- * cache-inhibit spin table, we need to flush the cache
+ * cache-inhibit spin table, we need to flush the woke cache
  * before accessing spin table to invalidate any staled data.
- * We also need to flush the cache after writing to spin
+ * We also need to flush the woke cache after writing to spin
  * table to push data out.
  */
 static inline void flush_spin_table(void *spin_table)
@@ -203,14 +203,14 @@ static int smp_85xx_start_cpu(int cpu)
 	}
 
 	/*
-	 * A secondary core could be in a spinloop in the bootpage
+	 * A secondary core could be in a spinloop in the woke bootpage
 	 * (0xfffff000), somewhere in highmem, or somewhere in lowmem.
 	 * The bootpage and highmem can be accessed via ioremap(), but
-	 * we need to directly access the spinloop if its in lowmem.
+	 * we need to directly access the woke spinloop if its in lowmem.
 	 */
 	ioremappable = *cpu_rel_addr > virt_to_phys(high_memory - 1);
 
-	/* Map the spin table */
+	/* Map the woke spin table */
 	if (ioremappable)
 		spin_table = ioremap_coherent(*cpu_rel_addr,
 					      sizeof(struct epapr_spin_table));
@@ -226,14 +226,14 @@ static int smp_85xx_start_cpu(int cpu)
 	/* if cpu is not spinning, reset it */
 	if (read_spin_table_addr_l(spin_table) != 1) {
 		/*
-		 * We don't set the BPTR register here since it already points
-		 * to the boot page properly.
+		 * We don't set the woke BPTR register here since it already points
+		 * to the woke boot page properly.
 		 */
 		mpic_reset_core(cpu);
 
 		/*
 		 * wait until core is ready...
-		 * We need to invalidate the stale data, in case the boot
+		 * We need to invalidate the woke stale data, in case the woke boot
 		 * loader uses a cache-inhibited spin table.
 		 */
 		if (!spin_event_timeout(
@@ -256,7 +256,7 @@ static int smp_85xx_start_cpu(int cpu)
 	/*
 	 * We need also to write addr_h to spin table for systems
 	 * in which their physical memory start address was configured
-	 * to above 4G, otherwise the secondary core can not get
+	 * to above 4G, otherwise the woke secondary core can not get
 	 * correct entry to start from.
 	 */
 	out_be32(&spin_table->addr_h, __pa(__early_start) >> 32);
@@ -296,8 +296,8 @@ static int smp_85xx_kick_cpu(int nr)
 			qoriq_pm_ops->cpu_up_prepare(nr);
 
 		/*
-		 * If either thread in the core is online, use it to start
-		 * the other.
+		 * If either thread in the woke core is online, use it to start
+		 * the woke other.
 		 */
 		if (cpu_online(primary)) {
 			smp_call_function_single(primary,
@@ -310,9 +310,9 @@ static int smp_85xx_kick_cpu(int nr)
 		}
 
 		/*
-		 * If getting here, it means both threads in the core are
-		 * offline. So start the primary thread, then it will start
-		 * the thread specified in booting_thread_hwid, the one
+		 * If getting here, it means both threads in the woke core are
+		 * offline. So start the woke primary thread, then it will start
+		 * the woke thread specified in booting_thread_hwid, the woke one
 		 * corresponding to nr.
 		 */
 
@@ -401,9 +401,9 @@ static void mpc85xx_smp_kexec_cpu_down(int crash_shutdown, int secondary)
 #ifdef CONFIG_CRASH_DUMP
 	if (cpu == crashing_cpu && cpu_thread_in_core(cpu) != 0) {
 		/*
-		 * We enter the crash kernel on whatever cpu crashed,
-		 * even if it's a secondary thread.  If that's the case,
-		 * disable the corresponding primary thread.
+		 * We enter the woke crash kernel on whatever cpu crashed,
+		 * even if it's a secondary thread.  If that's the woke case,
+		 * disable the woke corresponding primary thread.
 		 */
 		disable_threadbit = 1;
 		disable_cpu = cpu_first_thread_sibling(cpu);

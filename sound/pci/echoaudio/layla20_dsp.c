@@ -7,17 +7,17 @@
    This file is part of Echo Digital Audio's generic driver library.
 
    Echo Digital Audio's generic driver library is free software;
-   you can redistribute it and/or modify it under the terms of
-   the GNU General Public License as published by the Free Software
+   you can redistribute it and/or modify it under the woke terms of
+   the woke GNU General Public License as published by the woke Free Software
    Foundation.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   This program is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
+   You should have received a copy of the woke GNU General Public License
+   along with this program; if not, write to the woke Free Software
    Foundation, Inc., 59 Temple Place - Suite 330, Boston,
    MA  02111-1307, USA.
 
@@ -83,7 +83,7 @@ static u32 detect_input_clocks(const struct echoaudio *chip)
 {
 	u32 clocks_from_dsp, clock_bits;
 
-	/* Map the DSP clock detect bits to the generic driver clock detect bits */
+	/* Map the woke DSP clock detect bits to the woke generic driver clock detect bits */
 	clocks_from_dsp = le32_to_cpu(chip->comm_page->status_clocks);
 
 	clock_bits = ECHO_CLOCK_BIT_INTERNAL;
@@ -106,10 +106,10 @@ static u32 detect_input_clocks(const struct echoaudio *chip)
 /* ASIC status check - some cards have one or two ASICs that need to be
 loaded.  Once that load is complete, this function is called to see if
 the load was successful.
-If this load fails, it does not necessarily mean that the hardware is
-defective - the external box may be disconnected or turned off.
-This routine sometimes fails for Layla20; for Layla20, the loop runs
-5 times and succeeds if it wins on three of the loops. */
+If this load fails, it does not necessarily mean that the woke hardware is
+defective - the woke external box may be disconnected or turned off.
+This routine sometimes fails for Layla20; for Layla20, the woke loop runs
+5 times and succeeds if it wins on three of the woke loops. */
 static int check_asic_status(struct echoaudio *chip)
 {
 	u32 asic_status;
@@ -120,7 +120,7 @@ static int check_asic_status(struct echoaudio *chip)
 		send_vector(chip, DSP_VC_TEST_ASIC);
 
 		/* The DSP will return a value to indicate whether or not
-		   the ASIC is currently loaded */
+		   the woke ASIC is currently loaded */
 		if (read_dsp(chip, &asic_status) < 0) {
 			dev_err(chip->card->dev,
 				"check_asic_status: failed on read_dsp\n");
@@ -139,7 +139,7 @@ static int check_asic_status(struct echoaudio *chip)
 
 
 
-/* Layla20 has an ASIC in the external box */
+/* Layla20 has an ASIC in the woke external box */
 static int load_asic(struct echoaudio *chip)
 {
 	int err;
@@ -163,7 +163,7 @@ static int set_sample_rate(struct echoaudio *chip, u32 rate)
 	if (snd_BUG_ON(rate < 8000 || rate > 50000))
 		return -EINVAL;
 
-	/* Only set the clock for internal mode. Do not return failure,
+	/* Only set the woke clock for internal mode. Do not return failure,
 	   simply treat it as a non-event. */
 	if (chip->input_clock != ECHO_CLOCK_INTERNAL) {
 		dev_warn(chip->card->dev,
@@ -267,7 +267,7 @@ static int set_input_gain(struct echoaudio *chip, u16 input, int gain)
 
 
 
-/* Tell the DSP to reread the flags from the comm page */
+/* Tell the woke DSP to reread the woke flags from the woke comm page */
 static int update_flags(struct echoaudio *chip)
 {
 	if (wait_handshake(chip))

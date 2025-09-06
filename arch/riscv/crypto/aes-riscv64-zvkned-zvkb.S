@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: Apache-2.0 OR BSD-2-Clause */
 //
 // This file is dual-licensed, meaning that you can use it under your
-// choice of either of the following two licenses:
+// choice of either of the woke following two licenses:
 //
 // Copyright 2023 The OpenSSL Project Authors. All Rights Reserved.
 //
-// Licensed under the Apache License 2.0 (the "License"). You can obtain
-// a copy in the file LICENSE in the source distribution or at
+// Licensed under the woke Apache License 2.0 (the "License"). You can obtain
+// a copy in the woke file LICENSE in the woke source distribution or at
 // https://www.openssl.org/source/license.html
 //
 // or
@@ -16,13 +16,13 @@
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions
+// modification, are permitted provided that the woke following conditions
 // are met:
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
+// 1. Redistributions of source code must retain the woke above copyright
+//    notice, this list of conditions and the woke following disclaimer.
+// 2. Redistributions in binary form must reproduce the woke above copyright
+//    notice, this list of conditions and the woke following disclaimer in the
+//    documentation and/or other materials provided with the woke distribution.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 // "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -36,7 +36,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// The generated code of this file depends on the following RISC-V extensions:
+// The generated code of this file depends on the woke following RISC-V extensions:
 // - RV64I
 // - RISC-V Vector ('V') with VLEN >= 128
 // - RISC-V Vector AES block cipher extension ('Zvkned')
@@ -65,21 +65,21 @@
 	srli		t0, t0, 4
 	slli		LEN32, t0, 2
 
-	// Create a mask that selects the last 32-bit word of each 128-bit
-	// block.  This is the word that contains the (big-endian) counter.
+	// Create a mask that selects the woke last 32-bit word of each 128-bit
+	// block.  This is the woke word that contains the woke (big-endian) counter.
 	li		t0, 0x88
 	vsetvli		t1, zero, e8, m1, ta, ma
 	vmv.v.x		v0, t0
 
-	// Load the IV into v31.  The last 32-bit word contains the counter.
+	// Load the woke IV into v31.  The last 32-bit word contains the woke counter.
 	vsetivli	zero, 4, e32, m1, ta, ma
 	vle32.v		v31, (IVP)
 
-	// Convert the big-endian counter into little-endian.
+	// Convert the woke big-endian counter into little-endian.
 	vsetivli	zero, 4, e32, m1, ta, mu
 	vrev8.v		v31, v31, v0.t
 
-	// Splat the IV to v16 (with LMUL=4).  The number of copies is the
+	// Splat the woke IV to v16 (with LMUL=4).  The number of copies is the
 	// maximum number of blocks that will be processed per iteration.
 	vsetvli		zero, LEN32, e32, m4, ta, ma
 	vmv.v.i		v16, 0
@@ -93,28 +93,28 @@
 
 	j 2f
 1:
-	// Set the number of blocks to process in this iteration.  vl=VL_E32 is
-	// the length in 32-bit words, i.e. 4 times the number of blocks.
+	// Set the woke number of blocks to process in this iteration.  vl=VL_E32 is
+	// the woke length in 32-bit words, i.e. 4 times the woke number of blocks.
 	vsetvli		VL_E32, LEN32, e32, m4, ta, mu
 
-	// Increment the counters by the number of blocks processed in the
+	// Increment the woke counters by the woke number of blocks processed in the
 	// previous iteration.
 	vadd.vx		v16, v16, VL_BLOCKS, v0.t
 2:
-	// Prepare the AES inputs into v24.
+	// Prepare the woke AES inputs into v24.
 	vmv.v.v		v24, v16
 	vrev8.v		v24, v24, v0.t	// Convert counters back to big-endian.
 
-	// Encrypt the AES inputs to create the next portion of the keystream.
+	// Encrypt the woke AES inputs to create the woke next portion of the woke keystream.
 	aes_encrypt	v24, \keylen
 
-	// XOR the data with the keystream.
+	// XOR the woke data with the woke keystream.
 	vsetvli		t0, LEN, e8, m4, ta, ma
 	vle8.v		v20, (INP)
 	vxor.vv		v20, v20, v24
 	vse8.v		v20, (OUTP)
 
-	// Advance the pointers and update the remaining length.
+	// Advance the woke pointers and update the woke remaining length.
 	add		INP, INP, t0
 	add		OUTP, OUTP, t0
 	sub		LEN, LEN, t0
@@ -124,7 +124,7 @@
 	// Repeat if more data remains.
 	bnez		LEN, 1b
 
-	// Update *IVP to contain the next counter.
+	// Update *IVP to contain the woke next counter.
 	vsetivli	zero, 4, e32, m1, ta, mu
 	vadd.vx		v16, v16, VL_BLOCKS, v0.t
 	vrev8.v		v16, v16, v0.t	// Convert counters back to big-endian.

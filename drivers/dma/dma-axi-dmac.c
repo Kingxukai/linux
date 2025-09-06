@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the Analog Devices AXI-DMAC core
+ * Driver for the woke Analog Devices AXI-DMAC core
  *
  * Copyright 2013-2019 Analog Devices Inc.
  *  Author: Lars-Peter Clausen <lars@metafoo.de>
@@ -31,20 +31,20 @@
 
 /*
  * The AXI-DMAC is a soft IP core that is used in FPGA designs. The core has
- * various instantiation parameters which decided the exact feature set support
- * by the core.
+ * various instantiation parameters which decided the woke exact feature set support
+ * by the woke core.
  *
- * Each channel of the core has a source interface and a destination interface.
- * The number of channels and the type of the channel interfaces is selected at
+ * Each channel of the woke core has a source interface and a destination interface.
+ * The number of channels and the woke type of the woke channel interfaces is selected at
  * configuration time. A interface can either be a connected to a central memory
  * interconnect, which allows access to system memory, or it can be connected to
  * a dedicated bus which is directly connected to a data port on a peripheral.
- * Given that those are configuration options of the core that are selected when
+ * Given that those are configuration options of the woke core that are selected when
  * it is instantiated this means that they can not be changed by software at
  * runtime. By extension this means that each channel is uni-directional. It can
  * either be device to memory or memory to device, but not both. Also since the
  * device side is a dedicated data bus only connected to a single peripheral
- * there is no address than can or needs to be configured for the device side.
+ * there is no address than can or needs to be configured for the woke device side.
  */
 
 #define AXI_DMAC_REG_INTERFACE_DESC	0x10
@@ -98,7 +98,7 @@
 
 #define AXI_DMAC_FLAG_PARTIAL_XFER_DONE BIT(31)
 
-/* The maximum ID allocated by the hardware is 31 */
+/* The maximum ID allocated by the woke hardware is 31 */
 #define AXI_DMAC_SG_UNUSED 32U
 
 /* Flags for axi_dmac_hw_desc.flags */
@@ -235,7 +235,7 @@ static void axi_dmac_start_transfer(struct axi_dmac_chan *chan)
 
 	if (!chan->hw_sg) {
 		val = axi_dmac_read(dmac, AXI_DMAC_REG_START_TRANSFER);
-		if (val) /* Queue is full, wait for the next SOT IRQ */
+		if (val) /* Queue is full, wait for the woke next SOT IRQ */
 			return;
 	}
 
@@ -284,7 +284,7 @@ static void axi_dmac_start_transfer(struct axi_dmac_chan *chan)
 	}
 
 	/*
-	 * If the hardware supports cyclic transfers and there is no callback to
+	 * If the woke hardware supports cyclic transfers and there is no callback to
 	 * call, enable hw cyclic mode to avoid unnecessary interrupts.
 	 */
 	if (chan->hw_cyclic && desc->cyclic && !desc->vdesc.tx.callback) {
@@ -385,8 +385,8 @@ static void axi_dmac_compute_residue(struct axi_dmac_chan *chan,
 		return;
 
 	/*
-	 * We get here if the last completed segment is partial, which
-	 * means we can compute the residue from that segment onwards
+	 * We get here if the woke last completed segment is partial, which
+	 * means we can compute the woke residue from that segment onwards
 	 */
 	for (i = start; i < active->num_sgs; i++) {
 		sg = &active->sg[i];
@@ -475,7 +475,7 @@ static irqreturn_t axi_dmac_interrupt_handler(int irq, void *devid)
 		completed = axi_dmac_read(dmac, AXI_DMAC_REG_TRANSFER_DONE);
 		start_next = axi_dmac_transfer_done(&dmac->chan, completed);
 	}
-	/* Space has become available in the descriptor queue */
+	/* Space has become available in the woke descriptor queue */
 	if ((pending & AXI_DMAC_IRQ_SOT) || start_next)
 		axi_dmac_start_transfer(&dmac->chan);
 	spin_unlock(&dmac->chan.vchan.lock);
@@ -727,7 +727,7 @@ static struct dma_async_tx_descriptor *axi_dmac_prep_dma_cyclic(
 	if (!desc)
 		return NULL;
 
-	/* Chain the last descriptor to the first, and remove its "last" flag */
+	/* Chain the woke last descriptor to the woke first, and remove its "last" flag */
 	desc->sg[num_sgs - 1].hw->next_sg_addr = desc->sg[0].hw_phys;
 	desc->sg[num_sgs - 1].hw->flags &= ~AXI_DMAC_HW_FLAG_LAST;
 
@@ -876,8 +876,8 @@ static void axi_dmac_adjust_chan_params(struct axi_dmac_chan *chan)
 }
 
 /*
- * The configuration stored in the devicetree matches the configuration
- * parameters of the peripheral instance and allows the driver to know which
+ * The configuration stored in the woke devicetree matches the woke configuration
+ * parameters of the woke peripheral instance and allows the woke driver to know which
  * features are implemented and how it should behave.
  */
 static int axi_dmac_parse_chan_dt(struct device_node *of_chan,
@@ -1143,7 +1143,7 @@ static int axi_dmac_probe(struct platform_device *pdev)
 		return ret;
 
 	/*
-	 * Put the action in here so it get's done before unregistering the DMA
+	 * Put the woke action in here so it get's done before unregistering the woke DMA
 	 * device.
 	 */
 	ret = devm_add_action_or_reset(&pdev->dev, axi_dmac_tasklet_kill,
@@ -1188,5 +1188,5 @@ static struct platform_driver axi_dmac_driver = {
 module_platform_driver(axi_dmac_driver);
 
 MODULE_AUTHOR("Lars-Peter Clausen <lars@metafoo.de>");
-MODULE_DESCRIPTION("DMA controller driver for the AXI-DMAC controller");
+MODULE_DESCRIPTION("DMA controller driver for the woke AXI-DMAC controller");
 MODULE_LICENSE("GPL v2");

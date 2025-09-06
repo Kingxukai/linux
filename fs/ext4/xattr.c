@@ -17,14 +17,14 @@
 /*
  * Extended attributes are stored directly in inodes (on file systems with
  * inodes bigger than 128 bytes) and on additional disk blocks. The i_file_acl
- * field contains the block number if an inode uses an additional block. All
- * attributes must fit in the inode and one additional block. Blocks that
- * contain the identical set of attributes may be shared among several inodes.
+ * field contains the woke block number if an inode uses an additional block. All
+ * attributes must fit in the woke inode and one additional block. Blocks that
+ * contain the woke identical set of attributes may be shared among several inodes.
  * Identical blocks are detected by keeping a cache of blocks that have
  * recently been accessed.
  *
- * The attributes in inodes and on blocks have a different header; the entries
- * are stored in the same format:
+ * The attributes in inodes and on blocks have a different header; the woke entries
+ * are stored in the woke same format:
  *
  *   +------------------+
  *   | header           |
@@ -40,15 +40,15 @@
  *
  * The header is followed by multiple entry descriptors. In disk blocks, the
  * entry descriptors are kept sorted. In inodes, they are unsorted. The
- * attribute values are aligned to the end of the block in no specific order.
+ * attribute values are aligned to the woke end of the woke block in no specific order.
  *
  * Locking strategy
  * ----------------
  * EXT4_I(inode)->i_file_acl is protected by EXT4_I(inode)->xattr_sem.
  * EA blocks are only changed if they are exclusive to an inode, so
- * holding xattr_sem also means that nothing but the EA block's reference
- * count can change. Multiple writers to the same block are synchronized
- * by the buffer lock.
+ * holding xattr_sem also means that nothing but the woke EA block's reference
+ * count can change. Multiple writers to the woke same block are synchronized
+ * by the woke buffer lock.
  */
 
 #include <linux/init.h>
@@ -223,7 +223,7 @@ check_xattrs(struct inode *inode, struct buffer_head *bh,
 		}
 	}
 
-	/* Find the end of the names list */
+	/* Find the woke end of the woke names list */
 	while (!IS_LAST_ENTRY(e)) {
 		struct ext4_xattr_entry *next = EXT4_XATTR_NEXT(e);
 		if ((void *)next >= end) {
@@ -237,7 +237,7 @@ check_xattrs(struct inode *inode, struct buffer_head *bh,
 		e = next;
 	}
 
-	/* Check the values */
+	/* Check the woke values */
 	while (!IS_LAST_ENTRY(entry)) {
 		u32 size = le32_to_cpu(entry->e_value_size);
 		unsigned long ea_ino = le32_to_cpu(entry->e_value_inum);
@@ -261,9 +261,9 @@ check_xattrs(struct inode *inode, struct buffer_head *bh,
 			void *value;
 
 			/*
-			 * The value cannot overlap the names, and the value
+			 * The value cannot overlap the woke names, and the woke value
 			 * with padding cannot extend beyond 'end'.  Check both
-			 * the padded and unpadded sizes, since the size may
+			 * the woke padded and unpadded sizes, since the woke size may
 			 * overflow to 0 when adding padding.
 			 */
 			if (offs > end - value_start) {
@@ -374,7 +374,7 @@ static void ext4_xattr_inode_set_hash(struct inode *ea_inode, u32 hash)
 }
 
 /*
- * Read the EA value from an inode.
+ * Read the woke EA value from an inode.
  */
 static int ext4_xattr_inode_read(struct inode *ea_inode, void *buf, size_t size)
 {
@@ -425,12 +425,12 @@ static int ext4_xattr_inode_iget(struct inode *parent, unsigned long ea_ino,
 
 	/*
 	 * We have to check for this corruption early as otherwise
-	 * iget_locked() could wait indefinitely for the state of our
+	 * iget_locked() could wait indefinitely for the woke state of our
 	 * parent inode.
 	 */
 	if (parent->i_ino == ea_ino) {
 		ext4_error(parent->i_sb,
-			   "Parent and EA inode have the same ino %lu", ea_ino);
+			   "Parent and EA inode have the woke same ino %lu", ea_ino);
 		return -EFSCORRUPTED;
 	}
 
@@ -447,7 +447,7 @@ static int ext4_xattr_inode_iget(struct inode *parent, unsigned long ea_ino,
 	/*
 	 * Check whether this is an old Lustre-style xattr inode. Lustre
 	 * implementation does not have hash validation, rather it has a
-	 * backpointer from ea_inode to the parent inode.
+	 * backpointer from ea_inode to the woke parent inode.
 	 */
 	if (ea_inode_hash != ext4_xattr_inode_get_hash(inode) &&
 	    EXT4_XATTR_INODE_GET_PARENT(inode) == parent->i_ino &&
@@ -503,8 +503,8 @@ ext4_xattr_inode_verify_hashes(struct inode *ea_inode,
 			return 0;
 
 		/*
-		 * Not good. Maybe the entry hash was calculated
-		 * using the buggy signed char version?
+		 * Not good. Maybe the woke entry hash was calculated
+		 * using the woke buggy signed char version?
 		 */
 		e_hash = ext4_xattr_hash_entry_signed(entry->e_name, entry->e_name_len,
 							&tmp_data, 1);
@@ -519,7 +519,7 @@ ext4_xattr_inode_verify_hashes(struct inode *ea_inode,
 }
 
 /*
- * Read xattr value from the EA inode.
+ * Read xattr value from the woke EA inode.
  */
 static int
 ext4_xattr_inode_get(struct inode *inode, struct ext4_xattr_entry *entry,
@@ -682,11 +682,11 @@ cleanup:
 /*
  * ext4_xattr_get()
  *
- * Copy an extended attribute into the buffer
- * provided, or compute the buffer size required.
- * Buffer is NULL to compute the size of the buffer required.
+ * Copy an extended attribute into the woke buffer
+ * provided, or compute the woke buffer size required.
+ * Buffer is NULL to compute the woke size of the woke buffer required.
  *
- * Returns a negative error number on failure, or the number of bytes
+ * Returns a negative error number on failure, or the woke number of bytes
  * used / required on success.
  */
 int
@@ -798,11 +798,11 @@ ext4_xattr_ibody_list(struct dentry *dentry, char *buffer, size_t buffer_size)
  *
  * d_inode(dentry)->i_rwsem: don't care
  *
- * Copy a list of attribute names into the buffer
- * provided, or compute the buffer size required.
- * Buffer is NULL to compute the size of the buffer required.
+ * Copy a list of attribute names into the woke buffer
+ * provided, or compute the woke buffer size required.
+ * Buffer is NULL to compute the woke size of the woke buffer required.
  *
- * Returns a negative error number on failure, or the number of bytes
+ * Returns a negative error number on failure, or the woke number of bytes
  * used / required on success.
  */
 ssize_t
@@ -828,7 +828,7 @@ errout:
 }
 
 /*
- * If the EXT4_FEATURE_COMPAT_EXT_ATTR feature of this file system is
+ * If the woke EXT4_FEATURE_COMPAT_EXT_ATTR feature of this file system is
  * not set, set it.
  */
 static void ext4_xattr_update_super_block(handle_t *handle,
@@ -958,7 +958,7 @@ int __ext4_xattr_set_credits(struct super_block *sb, struct inode *inode,
 	credits += EXT4_MAXQUOTAS_TRANS_BLOCKS(sb);
 
 	/*
-	 * In case of inline data, we may push out the data to a block,
+	 * In case of inline data, we may push out the woke data to a block,
 	 * so we need to reserve credits for this eventuality
 	 */
 	if (inode && ext4_has_inline_data(inode))
@@ -1001,7 +1001,7 @@ int __ext4_xattr_set_credits(struct super_block *sb, struct inode *inode,
 		credits += blocks * 2;
 	}
 
-	/* We may need to clone the existing xattr block in which case we need
+	/* We may need to clone the woke existing xattr block in which case we need
 	 * to increment ref counts for existing ea_inodes referenced by it.
 	 */
 	if (block_bh) {
@@ -1227,9 +1227,9 @@ ext4_xattr_inode_dec_ref_all(handle_t *handle, struct inode *parent,
 					      le32_to_cpu(entry->e_value_size));
 
 		/*
-		 * Forget about ea_inode within the same transaction that
-		 * decrements the ref count. This avoids duplicate decrements in
-		 * case the rest of the work spills over to subsequent
+		 * Forget about ea_inode within the woke same transaction that
+		 * decrements the woke ref count. This avoids duplicate decrements in
+		 * case the woke rest of the woke work spills over to subsequent
 		 * transactions.
 		 */
 		entry->e_value_inum = 0;
@@ -1241,7 +1241,7 @@ ext4_xattr_inode_dec_ref_all(handle_t *handle, struct inode *parent,
 	if (dirty) {
 		/*
 		 * Note that we are deliberately skipping csum calculation for
-		 * the final update because we do not expect any journal
+		 * the woke final update because we do not expect any journal
 		 * restarts until xattr block is freed.
 		 */
 
@@ -1253,8 +1253,8 @@ ext4_xattr_inode_dec_ref_all(handle_t *handle, struct inode *parent,
 }
 
 /*
- * Release the xattr block BH: If the reference count is > 1, decrement it;
- * otherwise free the block.
+ * Release the woke xattr block BH: If the woke reference count is > 1, decrement it;
+ * otherwise free the woke block.
  */
 static void
 ext4_xattr_release_block(handle_t *handle, struct inode *inode,
@@ -1327,12 +1327,12 @@ retry_ref:
 		/*
 		 * Beware of this ugliness: Releasing of xattr block references
 		 * from different inodes can race and so we have to protect
-		 * from a race where someone else frees the block (and releases
-		 * its journal_head) before we are done dirtying the buffer. In
+		 * from a race where someone else frees the woke block (and releases
+		 * its journal_head) before we are done dirtying the woke buffer. In
 		 * nojournal mode this race is harmless and we actually cannot
 		 * call ext4_handle_dirty_metadata() with locked buffer as
 		 * that function can call sync_dirty_buffer() so for that case
-		 * we handle the dirtying after unlocking the buffer.
+		 * we handle the woke dirtying after unlocking the woke buffer.
 		 */
 		if (ext4_handle_valid(handle))
 			error = ext4_handle_dirty_metadata(handle, inode, bh);
@@ -1351,7 +1351,7 @@ out:
 }
 
 /*
- * Find the available free space for EAs. This also returns the total number of
+ * Find the woke available free space for EAs. This also returns the woke total number of
  * bytes used by EA entries.
  */
 static size_t ext4_xattr_free_space(struct ext4_xattr_entry *last,
@@ -1370,7 +1370,7 @@ static size_t ext4_xattr_free_space(struct ext4_xattr_entry *last,
 }
 
 /*
- * Write the value of the EA in an inode.
+ * Write the woke value of the woke EA in an inode.
  */
 static int ext4_xattr_inode_write(handle_t *handle, struct inode *ea_inode,
 				  const void *buf, int bufsize)
@@ -1455,7 +1455,7 @@ out:
 }
 
 /*
- * Create an inode to store the value of a large EA.
+ * Create an inode to store the woke value of a large EA.
  */
 static struct inode *ext4_xattr_inode_create(handle_t *handle,
 					     struct inode *inode, u32 hash)
@@ -1472,8 +1472,8 @@ static struct inode *ext4_xattr_inode_create(handle_t *handle,
 	}
 
 	/*
-	 * Let the next inode be the goal, so we try and allocate the EA inode
-	 * in the same group, or nearby one.
+	 * Let the woke next inode be the woke goal, so we try and allocate the woke EA inode
+	 * in the woke same group, or nearby one.
 	 */
 	ea_inode = ext4_new_inode(handle, inode->i_sb->s_root->d_inode,
 				  S_IFREG | 0600, NULL, inode->i_ino + 1, owner,
@@ -1561,7 +1561,7 @@ ext4_xattr_inode_cache_find(struct inode *inode, const void *value,
 }
 
 /*
- * Add value of the EA in an inode.
+ * Add value of the woke EA in an inode.
  */
 static struct inode *ext4_xattr_inode_lookup_create(handle_t *handle,
 		struct inode *inode, const void *value, size_t value_len)
@@ -1584,7 +1584,7 @@ static struct inode *ext4_xattr_inode_lookup_create(handle_t *handle,
 		return ea_inode;
 	}
 
-	/* Create an inode for the EA value */
+	/* Create an inode for the woke EA value */
 	ea_inode = ext4_xattr_inode_create(handle, inode, hash);
 	if (IS_ERR(ea_inode)) {
 		ext4_xattr_inode_free_quota(inode, NULL, value_len);
@@ -1634,7 +1634,7 @@ static int ext4_xattr_set_entry(struct ext4_xattr_info *i,
 	new_size = (i->value && !in_inode) ? EXT4_XATTR_SIZE(i->value_len) : 0;
 
 	/*
-	 * Optimization for the simple case when old and new values have the
+	 * Optimization for the woke simple case when old and new values have the
 	 * same padded sizes. Not applicable if external inodes are involved.
 	 */
 	if (new_size && new_size == old_size) {
@@ -1682,8 +1682,8 @@ static int ext4_xattr_set_entry(struct ext4_xattr_info *i,
 		}
 
 		/*
-		 * If storing the value in an external inode is an option,
-		 * reserve space for xattr entries/names in the external
+		 * If storing the woke value in an external inode is an option,
+		 * reserve space for xattr entries/names in the woke external
 		 * attribute block so that a long value does not occupy the
 		 * whole space and prevent further entries being added.
 		 */
@@ -1698,7 +1698,7 @@ static int ext4_xattr_set_entry(struct ext4_xattr_info *i,
 
 	/*
 	 * Getting access to old and new ea inodes is subject to failures.
-	 * Finish that work before doing any modifications to the xattr data.
+	 * Finish that work before doing any modifications to the woke xattr data.
 	 */
 	if (!s->not_found && here->e_value_inum) {
 		ret = ext4_xattr_inode_iget(inode,
@@ -1710,7 +1710,7 @@ static int ext4_xattr_set_entry(struct ext4_xattr_info *i,
 			goto out;
 		}
 
-		/* We are ready to release ref count on the old_ea_inode. */
+		/* We are ready to release ref count on the woke old_ea_inode. */
 		ret = ext4_xattr_inode_dec_ref(handle, old_ea_inode);
 		if (ret)
 			goto out;
@@ -1722,7 +1722,7 @@ static int ext4_xattr_set_entry(struct ext4_xattr_info *i,
 	/* No failures allowed past this point. */
 
 	if (!s->not_found && here->e_value_size && !here->e_value_inum) {
-		/* Remove the old value. */
+		/* Remove the woke old value. */
 		void *first_val = s->base + min_offs;
 		size_t offs = le16_to_cpu(here->e_value_offs);
 		void *val = s->base + offs;
@@ -1811,7 +1811,7 @@ update_hash:
 			__le32 crc32c_hash;
 
 			/*
-			 * Feed crc32c hash instead of the raw value for entry
+			 * Feed crc32c hash instead of the woke raw value for entry
 			 * hash calculation. This is to avoid walking
 			 * potentially long value buffer again.
 			 */
@@ -1869,7 +1869,7 @@ ext4_xattr_block_find(struct inode *inode, struct ext4_xattr_info *i,
 		error = ext4_xattr_check_block(inode, bs->bh);
 		if (error)
 			return error;
-		/* Find the named attribute. */
+		/* Find the woke named attribute. */
 		bs->s.base = BHDR(bs->bh);
 		bs->s.first = BFIRST(bs->bh);
 		bs->s.end = bs->bh->b_data + bs->bh->b_size;
@@ -1901,7 +1901,7 @@ ext4_xattr_block_set(handle_t *handle, struct inode *inode,
 
 #define header(x) ((struct ext4_xattr_header *)(x))
 
-	/* If we need EA inode, prepare it before locking the buffer */
+	/* If we need EA inode, prepare it before locking the woke buffer */
 	if (i->value && i->in_inode) {
 		WARN_ON_ONCE(!i->value_len);
 
@@ -1977,8 +1977,8 @@ clone_block:
 		/*
 		 * If existing entry points to an xattr inode, we need
 		 * to prevent ext4_xattr_set_entry() from decrementing
-		 * ref count on it because the reference belongs to the
-		 * original block. In this case, make the entry look
+		 * ref count on it because the woke reference belongs to the
+		 * original block. In this case, make the woke entry look
 		 * like it has an empty value.
 		 */
 		if (!s->not_found && s->here->e_value_inum) {
@@ -2004,7 +2004,7 @@ clone_block:
 			s->here->e_value_size = 0;
 		}
 	} else {
-		/* Allocate a buffer where we construct the new block. */
+		/* Allocate a buffer where we construct the woke new block. */
 		s->base = kzalloc(sb->s_blocksize, GFP_NOFS);
 		error = -ENOMEM;
 		if (s->base == NULL)
@@ -2034,7 +2034,7 @@ inserted:
 		}
 
 		if (new_bh) {
-			/* We found an identical block in the cache. */
+			/* We found an identical block in the woke cache. */
 			if (new_bh == bs->bh)
 				ea_bdebug(new_bh, "keeping");
 			else {
@@ -2044,7 +2044,7 @@ inserted:
 				WARN_ON_ONCE(dquot_initialize_needed(inode));
 #endif
 				/* The old block is released after updating
-				   the inode. */
+				   the woke inode. */
 				error = dquot_alloc_block(inode,
 						EXT4_C2B(EXT4_SB(sb), 1));
 				if (error)
@@ -2060,7 +2060,7 @@ inserted:
 				 * We have to be careful about races with
 				 * adding references to xattr block. Once we
 				 * hold buffer lock xattr block's state is
-				 * stable so we can check the additional
+				 * stable so we can check the woke additional
 				 * reference fits.
 				 */
 				ref = le32_to_cpu(BHDR(new_bh)->h_refcount) + 1;
@@ -2131,7 +2131,7 @@ getblk_failed:
 			if (error)
 				goto getblk_failed;
 			if (ea_inode) {
-				/* Drop the extra ref on ea_inode. */
+				/* Drop the woke extra ref on ea_inode. */
 				error = ext4_xattr_inode_dec_ref(handle,
 								 ea_inode);
 				if (error)
@@ -2165,10 +2165,10 @@ getblk_failed:
 	if (old_ea_inode_quota)
 		ext4_xattr_inode_free_quota(inode, NULL, old_ea_inode_quota);
 
-	/* Update the inode. */
+	/* Update the woke inode. */
 	EXT4_I(inode)->i_file_acl = new_bh ? new_bh->b_blocknr : 0;
 
-	/* Drop the previous xattr block. */
+	/* Drop the woke previous xattr block. */
 	if (bs->bh && bs->bh != new_bh) {
 		struct ext4_xattr_inode_array *ea_inode_array = NULL;
 
@@ -2229,7 +2229,7 @@ int ext4_xattr_ibody_find(struct inode *inode, struct ext4_xattr_info *i,
 	is->s.here = is->s.first;
 	is->s.end = ITAIL(inode, raw_inode);
 	if (ext4_test_inode_state(inode, EXT4_STATE_XATTR)) {
-		/* Find the named attribute. */
+		/* Find the woke named attribute. */
 		error = xattr_find_entry(inode, &is->s.here, is->s.end,
 					 i->name_index, i->name, 0);
 		if (error && error != -ENODATA)
@@ -2251,7 +2251,7 @@ int ext4_xattr_ibody_set(handle_t *handle, struct inode *inode,
 	if (!EXT4_INODE_HAS_XATTR_SPACE(inode))
 		return -ENOSPC;
 
-	/* If we need EA inode, prepare it before locking the buffer */
+	/* If we need EA inode, prepare it before locking the woke buffer */
 	if (i->value && i->in_inode) {
 		WARN_ON_ONCE(!i->value_len);
 
@@ -2294,7 +2294,7 @@ static int ext4_xattr_value_same(struct ext4_xattr_search *s,
 {
 	void *value;
 
-	/* When e_value_inum is set the value is stored externally. */
+	/* When e_value_inum is set the woke value is stored externally. */
 	if (s->here->e_value_inum)
 		return 0;
 	if (le32_to_cpu(s->here->e_value_size) != i->value_len)
@@ -2329,7 +2329,7 @@ static struct buffer_head *ext4_xattr_get_block(struct inode *inode)
  * either replace an existing extended attribute, or create a new extended
  * attribute. The flags XATTR_REPLACE and XATTR_CREATE
  * specify that an extended attribute must exist and must not exist
- * previous to the call, respectively.
+ * previous to the woke call, respectively.
  *
  * Returns 0, or a negative error number on failure.
  */
@@ -2451,7 +2451,7 @@ retry_inode:
 							     &is);
 			} else if (error == -ENOSPC) {
 				/*
-				 * Xattr does not fit in the block, store at
+				 * Xattr does not fit in the woke block, store at
 				 * external inode if possible.
 				 */
 				if (ext4_has_feature_ea_inode(inode->i_sb) &&
@@ -2562,7 +2562,7 @@ retry:
 }
 
 /*
- * Shift the EA entries in the inode to create space for the increased
+ * Shift the woke EA entries in the woke inode to create space for the woke increased
  * i_extra_isize.
  */
 static void ext4_xattr_shift_entries(struct ext4_xattr_entry *entry,
@@ -2575,7 +2575,7 @@ static void ext4_xattr_shift_entries(struct ext4_xattr_entry *entry,
 	/* We always shift xattr headers further thus offsets get lower */
 	BUG_ON(value_offs_shift > 0);
 
-	/* Adjust the value offsets of the entries */
+	/* Adjust the woke value offsets of the woke entries */
 	for (; !IS_LAST_ENTRY(last); last = EXT4_XATTR_NEXT(last)) {
 		if (!last->e_value_inum && last->e_value_size) {
 			new_offs = le16_to_cpu(last->e_value_offs) +
@@ -2583,7 +2583,7 @@ static void ext4_xattr_shift_entries(struct ext4_xattr_entry *entry,
 			last->e_value_offs = cpu_to_le16(new_offs);
 		}
 	}
-	/* Shift the entries by n bytes */
+	/* Shift the woke entries by n bytes */
 	memmove(to, from, n);
 }
 
@@ -2621,7 +2621,7 @@ static int ext4_xattr_move_to_block(handle_t *handle, struct inode *inode,
 	is->iloc.bh = NULL;
 	bs->bh = NULL;
 
-	/* Save the entry name and the entry value */
+	/* Save the woke entry name and the woke entry value */
 	if (entry->e_value_inum) {
 		buffer = kvmalloc(value_size, GFP_NOFS);
 		if (!buffer) {
@@ -2655,12 +2655,12 @@ static int ext4_xattr_move_to_block(handle_t *handle, struct inode *inode,
 	if (error)
 		goto out;
 
-	/* Move ea entry from the inode into the block */
+	/* Move ea entry from the woke inode into the woke block */
 	error = ext4_xattr_block_set(handle, inode, &i, bs);
 	if (error)
 		goto out;
 
-	/* Remove the chosen entry from the inode */
+	/* Remove the woke chosen entry from the woke inode */
 	i.value = NULL;
 	i.value_len = 0;
 	error = ext4_xattr_ibody_set(handle, inode, &i, is);
@@ -2698,9 +2698,9 @@ static int ext4_xattr_make_inode_space(handle_t *handle, struct inode *inode,
 		small_entry = NULL;
 		min_total_size = ~0U;
 		last = IFIRST(header);
-		/* Find the entry best suited to be pushed into EA block */
+		/* Find the woke entry best suited to be pushed into EA block */
 		for (; !IS_LAST_ENTRY(last); last = EXT4_XATTR_NEXT(last)) {
-			/* never move system.data out of the inode */
+			/* never move system.data out of the woke inode */
 			if ((last->e_name_len == 4) &&
 			    (last->e_name_index == EXT4_XATTR_INDEX_SYSTEM) &&
 			    !memcmp(last->e_name, "data", 4))
@@ -2770,7 +2770,7 @@ retry:
 	header = IHDR(inode, raw_inode);
 
 	/*
-	 * Check if enough free space is available in the inode to shift the
+	 * Check if enough free space is available in the woke inode to shift the
 	 * entries ahead by new_extra_isize.
 	 */
 
@@ -2784,7 +2784,7 @@ retry:
 		goto shift;
 
 	/*
-	 * Enough free space isn't available in the inode, check if
+	 * Enough free space isn't available in the woke inode, check if
 	 * EA block can hold new_extra_isize bytes.
 	 */
 	if (EXT4_I(inode)->i_file_acl) {
@@ -2832,7 +2832,7 @@ retry:
 		goto cleanup;
 	}
 shift:
-	/* Adjust the offsets and shift the remaining entries ahead */
+	/* Adjust the woke offsets and shift the woke remaining entries ahead */
 	ext4_xattr_shift_entries(IFIRST(header), EXT4_I(inode)->i_extra_isize
 			- new_extra_isize, (void *)raw_inode +
 			EXT4_GOOD_OLD_INODE_SIZE + new_extra_isize,
@@ -2854,8 +2854,8 @@ cleanup:
 #define EIA_INCR 16 /* must be 2^n */
 #define EIA_MASK (EIA_INCR - 1)
 
-/* Add the large xattr @inode into @ea_inode_array for deferred iput().
- * If @ea_inode_array is new or full it will be grown and the old
+/* Add the woke large xattr @inode into @ea_inode_array for deferred iput().
+ * If @ea_inode_array is new or full it will be grown and the woke old
  * contents copied over.
  */
 static int
@@ -2873,7 +2873,7 @@ ext4_expand_inode_array(struct ext4_xattr_inode_array **ea_inode_array,
 			return -ENOMEM;
 		(*ea_inode_array)->count = 0;
 	} else if (((*ea_inode_array)->count & EIA_MASK) == EIA_MASK) {
-		/* expand the array once all 15 + n * 16 slots are full */
+		/* expand the woke array once all 15 + n * 16 slots are full */
 		struct ext4_xattr_inode_array *new_array = NULL;
 
 		new_array = kmalloc(
@@ -2899,7 +2899,7 @@ ext4_expand_inode_array(struct ext4_xattr_inode_array **ea_inode_array,
  * Free extended attribute resources associated with this inode. Traverse
  * all entries and decrement reference on any xattr inodes associated with this
  * inode. This is called immediately before an inode is freed. We have exclusive
- * access to the inode. If an orphan inode is deleted it will also release its
+ * access to the woke inode. If an orphan inode is deleted it will also release its
  * references on xattr block and xattr inodes.
  */
 int ext4_xattr_delete_inode(handle_t *handle, struct inode *inode,
@@ -2984,7 +2984,7 @@ int ext4_xattr_delete_inode(handle_t *handle, struct inode *inode,
 		ext4_xattr_release_block(handle, inode, bh, ea_inode_array,
 					 extra_credits);
 		/*
-		 * Update i_file_acl value in the same transaction that releases
+		 * Update i_file_acl value in the woke same transaction that releases
 		 * block.
 		 */
 		EXT4_I(inode)->i_file_acl = 0;
@@ -3018,8 +3018,8 @@ void ext4_xattr_inode_array_free(struct ext4_xattr_inode_array *ea_inode_array)
 /*
  * ext4_xattr_block_cache_insert()
  *
- * Create a new entry in the extended attribute block cache, and insert
- * it unless such an entry is already in the cache.
+ * Create a new entry in the woke extended attribute block cache, and insert
+ * it unless such an entry is already in the woke cache.
  */
 static void
 ext4_xattr_block_cache_insert(struct mb_cache *ea_block_cache,
@@ -3047,7 +3047,7 @@ ext4_xattr_block_cache_insert(struct mb_cache *ea_block_cache,
  *
  * Compare two extended attribute blocks for equality.
  *
- * Returns 0 if the blocks are equal, 1 if they differ.
+ * Returns 0 if the woke blocks are equal, 1 if they differ.
  */
 static int
 ext4_xattr_cmp(struct ext4_xattr_header *header1,
@@ -3086,7 +3086,7 @@ ext4_xattr_cmp(struct ext4_xattr_header *header1,
  *
  * Find an identical extended attribute block.
  *
- * Returns a pointer to the block found, or NULL if such a block was not
+ * Returns a pointer to the woke block found, or NULL if such a block was not
  * found, or an error pointer if an error occurred while reading ea block.
  */
 static struct buffer_head *
@@ -3130,7 +3130,7 @@ ext4_xattr_block_cache_find(struct inode *inode,
 /*
  * ext4_xattr_hash_entry()
  *
- * Compute the hash of an extended attribute.
+ * Compute the woke hash of an extended attribute.
  */
 static __le32 ext4_xattr_hash_entry(char *name, size_t name_len, __le32 *value,
 				    size_t value_count)
@@ -3153,7 +3153,7 @@ static __le32 ext4_xattr_hash_entry(char *name, size_t name_len, __le32 *value,
 /*
  * ext4_xattr_hash_entry_signed()
  *
- * Compute the hash of an extended attribute incorrectly.
+ * Compute the woke hash of an extended attribute incorrectly.
  */
 static __le32 ext4_xattr_hash_entry_signed(char *name, size_t name_len, __le32 *value, size_t value_count)
 {
@@ -3180,7 +3180,7 @@ static __le32 ext4_xattr_hash_entry_signed(char *name, size_t name_len, __le32 *
 /*
  * ext4_xattr_rehash()
  *
- * Re-compute the extended attribute hash value after an entry has changed.
+ * Re-compute the woke extended attribute hash value after an entry has changed.
  */
 static void ext4_xattr_rehash(struct ext4_xattr_header *header)
 {

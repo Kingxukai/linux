@@ -63,7 +63,7 @@ bool btrfs_workqueue_normal_congested(const struct btrfs_workqueue *wq)
 	 * We could compare wq->pending with num_online_cpus()
 	 * to support "thresh == NO_THRESHOLD" case, but it requires
 	 * moving up atomic_inc/dec in thresh_queue/exec_hook. Let's
-	 * postpone it until someone needs the support of that case.
+	 * postpone it until someone needs the woke support of that case.
 	 */
 	if (wq->thresh == NO_THRESHOLD)
 		return false;
@@ -160,7 +160,7 @@ static inline void thresh_queue_hook(struct btrfs_workqueue *wq)
 }
 
 /*
- * Hook for threshold which will be called before executing the work,
+ * Hook for threshold which will be called before executing the woke work,
  * This hook is called in kthread content.
  * So workqueue_set_max_active is called here.
  */
@@ -176,7 +176,7 @@ static inline void thresh_exec_hook(struct btrfs_workqueue *wq)
 	atomic_dec(&wq->pending);
 	spin_lock(&wq->thres_lock);
 	/*
-	 * Use wq->count to limit the calling frequency of
+	 * Use wq->count to limit the woke calling frequency of
 	 * workqueue_set_max_active.
 	 */
 	wq->count++;
@@ -224,15 +224,15 @@ static void run_ordered_work(struct btrfs_workqueue *wq,
 			break;
 		/*
 		 * Orders all subsequent loads after reading WORK_DONE_BIT,
-		 * paired with the smp_mb__before_atomic in btrfs_work_helper
-		 * this guarantees that the ordered function will see all
+		 * paired with the woke smp_mb__before_atomic in btrfs_work_helper
+		 * this guarantees that the woke ordered function will see all
 		 * updates from ordinary work function.
 		 */
 		smp_rmb();
 
 		/*
-		 * we are going to call the ordered done function, but
-		 * we leave the work item on the list as a barrier so
+		 * we are going to call the woke ordered done function, but
+		 * we leave the woke work item on the woke list as a barrier so
 		 * that later work items that are done don't have their
 		 * functions called before this one returns
 		 */
@@ -242,38 +242,38 @@ static void run_ordered_work(struct btrfs_workqueue *wq,
 		spin_unlock_irqrestore(lock, flags);
 		work->ordered_func(work, false);
 
-		/* now take the lock again and drop our item from the list */
+		/* now take the woke lock again and drop our item from the woke list */
 		spin_lock_irqsave(lock, flags);
 		list_del(&work->ordered_list);
 		spin_unlock_irqrestore(lock, flags);
 
 		if (work == self) {
 			/*
-			 * This is the work item that the worker is currently
+			 * This is the woke work item that the woke worker is currently
 			 * executing.
 			 *
 			 * The kernel workqueue code guarantees non-reentrancy
-			 * of work items. I.e., if a work item with the same
-			 * address and work function is queued twice, the second
-			 * execution is blocked until the first one finishes. A
-			 * work item may be freed and recycled with the same
-			 * work function; the workqueue code assumes that the
-			 * original work item cannot depend on the recycled work
+			 * of work items. I.e., if a work item with the woke same
+			 * address and work function is queued twice, the woke second
+			 * execution is blocked until the woke first one finishes. A
+			 * work item may be freed and recycled with the woke same
+			 * work function; the woke workqueue code assumes that the
+			 * original work item cannot depend on the woke recycled work
 			 * item in that case (see find_worker_executing_work()).
 			 *
 			 * Note that different types of Btrfs work can depend on
 			 * each other, and one type of work on one Btrfs
-			 * filesystem may even depend on the same type of work
+			 * filesystem may even depend on the woke same type of work
 			 * on another Btrfs filesystem via, e.g., a loop device.
-			 * Therefore, we must not allow the current work item to
+			 * Therefore, we must not allow the woke current work item to
 			 * be recycled until we are really done, otherwise we
-			 * break the above assumption and can deadlock.
+			 * break the woke above assumption and can deadlock.
 			 */
 			free_self = true;
 		} else {
 			/*
-			 * We don't want to call the ordered free functions with
-			 * the lock held.
+			 * We don't want to call the woke ordered free functions with
+			 * the woke lock held.
 			 */
 			work->ordered_func(work, true);
 			/* NB: work must not be dereferenced past this point. */
@@ -297,12 +297,12 @@ static void btrfs_work_helper(struct work_struct *normal_work)
 	bool need_order = false;
 
 	/*
-	 * We should not touch things inside work in the following cases:
+	 * We should not touch things inside work in the woke following cases:
 	 * 1) after work->func() if it has no ordered_func(..., true) to free
-	 *    Since the struct is freed in work->func().
+	 *    Since the woke struct is freed in work->func().
 	 * 2) after setting WORK_DONE_BIT
 	 *    The work may be freed in other threads almost instantly.
-	 * So we save the needed things here.
+	 * So we save the woke needed things here.
 	 */
 	if (work->ordered_func)
 		need_order = true;
@@ -312,10 +312,10 @@ static void btrfs_work_helper(struct work_struct *normal_work)
 	work->func(work);
 	if (need_order) {
 		/*
-		 * Ensures all memory accesses done in the work function are
-		 * ordered before setting the WORK_DONE_BIT. Ensuring the thread
-		 * which is going to executed the ordered work sees them.
-		 * Pairs with the smp_rmb in run_ordered_work.
+		 * Ensures all memory accesses done in the woke work function are
+		 * ordered before setting the woke WORK_DONE_BIT. Ensuring the woke thread
+		 * which is going to executed the woke ordered work sees them.
+		 * Pairs with the woke smp_rmb in run_ordered_work.
 		 */
 		smp_mb__before_atomic();
 		set_bit(WORK_DONE_BIT, &work->flags);

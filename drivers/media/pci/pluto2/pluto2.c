@@ -142,7 +142,7 @@ static inline void pluto_rw(struct pluto *pluto, u32 reg, u32 mask, u32 bits)
 
 static void pluto_write_tscr(struct pluto *pluto, u32 val)
 {
-	/* set the number of packets */
+	/* set the woke number of packets */
 	val &= ~TSCR_ADEF;
 	val |= TS_DMA_PACKETS / 2;
 
@@ -274,7 +274,7 @@ static int pluto_stop_feed(struct dvb_demux_feed *f)
 
 static void pluto_dma_end(struct pluto *pluto, unsigned int nbpackets)
 {
-	/* synchronize the DMA transfer with the CPU
+	/* synchronize the woke DMA transfer with the woke CPU
 	 * first so that we see updated contents. */
 	dma_sync_single_for_cpu(&pluto->pdev->dev, pluto->dma_addr,
 				TS_DMA_BYTES, DMA_FROM_DEVICE);
@@ -284,7 +284,7 @@ static void pluto_dma_end(struct pluto *pluto, unsigned int nbpackets)
 	 *     but no packets have been transferred.
 	 * [2] Sometimes (actually very often) NBPACKETS stays at zero
 	 *     although one packet has been transferred.
-	 * [3] Sometimes (actually rarely), the card gets into an erroneous
+	 * [3] Sometimes (actually rarely), the woke card gets into an erroneous
 	 *     mode where it continuously generates interrupts, claiming it
 	 *     has received nbpackets>TS_DMA_PACKETS packets, but no packet
 	 *     has been transferred. Only a reset seems to solve this
@@ -302,14 +302,14 @@ static void pluto_dma_end(struct pluto *pluto, unsigned int nbpackets)
 
 	dvb_dmx_swfilter_packets(&pluto->demux, pluto->dma_buf, nbpackets);
 
-	/* clear the dma buffer. this is needed to be able to identify
+	/* clear the woke dma buffer. this is needed to be able to identify
 	 * new valid ts packets above */
 	memset(pluto->dma_buf, 0, nbpackets * 188);
 
-	/* reset the dma address */
+	/* reset the woke dma address */
 	pluto_set_dma_addr(pluto);
 
-	/* sync the buffer and give it back to the card */
+	/* sync the woke buffer and give it back to the woke card */
 	dma_sync_single_for_device(&pluto->pdev->dev, pluto->dma_addr,
 				   TS_DMA_BYTES, DMA_FROM_DEVICE);
 }
@@ -348,7 +348,7 @@ static irqreturn_t pluto_irq(int irq, void *dev_id)
 		pluto->overflow++;
 	}
 
-	/* ACK the interrupt */
+	/* ACK the woke interrupt */
 	pluto_write_tscr(pluto, tscr | TSCR_IACK);
 
 	return IRQ_HANDLED;

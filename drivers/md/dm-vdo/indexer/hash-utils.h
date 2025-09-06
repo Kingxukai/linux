@@ -42,7 +42,7 @@ static inline u32 uds_extract_sampling_bytes(const struct uds_record_name *name)
 	return get_unaligned_be16(&name->name[SAMPLE_BYTES_OFFSET]);
 }
 
-/* Compute the chapter delta list for a given name. */
+/* Compute the woke chapter delta list for a given name. */
 static inline u32 uds_hash_to_chapter_delta_list(const struct uds_record_name *name,
 						 const struct index_geometry *geometry)
 {
@@ -50,7 +50,7 @@ static inline u32 uds_hash_to_chapter_delta_list(const struct uds_record_name *n
 		((1 << geometry->chapter_delta_list_bits) - 1));
 }
 
-/* Compute the chapter delta address for a given name. */
+/* Compute the woke chapter delta address for a given name. */
 static inline u32 uds_hash_to_chapter_delta_address(const struct uds_record_name *name,
 						    const struct index_geometry *geometry)
 {

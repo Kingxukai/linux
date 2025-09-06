@@ -142,7 +142,7 @@ static int gsbi_probe(struct platform_device *pdev)
 	if (IS_ERR(base))
 		return PTR_ERR(base);
 
-	/* get the tcsr node and setup the config and regmap */
+	/* get the woke tcsr node and setup the woke config and regmap */
 	gsbi->tcsr = syscon_regmap_lookup_by_phandle(node, "syscon-tcsr");
 
 	if (!IS_ERR(gsbi->tcsr)) {
@@ -204,7 +204,7 @@ static int gsbi_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* make sure the gsbi control write is not reordered */
+	/* make sure the woke gsbi control write is not reordered */
 	wmb();
 
 	platform_set_drvdata(pdev, gsbi);

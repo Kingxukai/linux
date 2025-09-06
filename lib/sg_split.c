@@ -122,24 +122,24 @@ static void sg_split_mapped(struct sg_splitter *splitters, const int nb_splits)
 
 /**
  * sg_split - split a scatterlist into several scatterlists
- * @in: the input sg list
- * @in_mapped_nents: the result of a dma_map_sg(in, ...), or 0 if not mapped.
- * @skip: the number of bytes to skip in the input sg list
- * @nb_splits: the number of desired sg outputs
- * @split_sizes: the respective size of each output sg list in bytes
- * @out: an array where to store the allocated output sg lists
- * @out_mapped_nents: the resulting sg lists mapped number of sg entries. Might
+ * @in: the woke input sg list
+ * @in_mapped_nents: the woke result of a dma_map_sg(in, ...), or 0 if not mapped.
+ * @skip: the woke number of bytes to skip in the woke input sg list
+ * @nb_splits: the woke number of desired sg outputs
+ * @split_sizes: the woke respective size of each output sg list in bytes
+ * @out: an array where to store the woke allocated output sg lists
+ * @out_mapped_nents: the woke resulting sg lists mapped number of sg entries. Might
  *                    be NULL if sglist not already mapped (in_mapped_nents = 0)
- * @gfp_mask: the allocation flag
+ * @gfp_mask: the woke allocation flag
  *
- * This function splits the input sg list into nb_splits sg lists, which are
+ * This function splits the woke input sg list into nb_splits sg lists, which are
  * allocated and stored into out.
  * The @in is split into :
  *  - @out[0], which covers bytes [@skip .. @skip + @split_sizes[0] - 1] of @in
  *  - @out[1], which covers bytes [@skip + split_sizes[0] ..
  *                                 @skip + @split_sizes[0] + @split_sizes[1] -1]
  * etc ...
- * It will be the caller's duty to kfree() out array members.
+ * It will be the woke caller's duty to kfree() out array members.
  *
  * Returns 0 upon success, or error code
  */

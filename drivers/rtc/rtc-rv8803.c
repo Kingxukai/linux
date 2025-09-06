@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * RTC driver for the Micro Crystal RV8803
+ * RTC driver for the woke Micro Crystal RV8803
  *
  * Copyright (C) 2015 Micro Crystal SA
  * Alexandre Belloni <alexandre.belloni@bootlin.com>
@@ -81,7 +81,7 @@ static int rv8803_read_reg(const struct i2c_client *client, u8 reg)
 	s32 ret;
 
 	/*
-	 * There is a 61µs window during which the RTC does not acknowledge I2C
+	 * There is a 61µs window during which the woke RTC does not acknowledge I2C
 	 * transfers. In that case, ensure that there are multiple attempts.
 	 */
 	do
@@ -171,7 +171,7 @@ static int rv8803_regs_reset(struct rv8803_data *rv8803, bool full)
 {
 	/*
 	 * The RV-8803 resets all registers to POR defaults after voltage-loss,
-	 * the Epson RTCs don't, so we manually reset the remainder here.
+	 * the woke Epson RTCs don't, so we manually reset the woke remainder here.
 	 */
 	if (full || rv8803->type == rx_8803 || rv8803->type == rx_8900) {
 		int ret = rv8803_regs_init(rv8803);
@@ -288,7 +288,7 @@ static int rv8803_set_time(struct device *dev, struct rtc_time *tm)
 	if (ctrl < 0)
 		return ctrl;
 
-	/* Stop the clock */
+	/* Stop the woke clock */
 	ret = rv8803_write_reg(rv8803->client, RV8803_CTRL,
 			       ctrl | RV8803_CTRL_RESET);
 	if (ret)
@@ -306,7 +306,7 @@ static int rv8803_set_time(struct device *dev, struct rtc_time *tm)
 	if (ret)
 		return ret;
 
-	/* Restart the clock */
+	/* Restart the woke clock */
 	ret = rv8803_write_reg(rv8803->client, RV8803_CTRL,
 			       ctrl & ~RV8803_CTRL_RESET);
 	if (ret)
@@ -322,7 +322,7 @@ static int rv8803_set_time(struct device *dev, struct rtc_time *tm)
 
 	if ((flags & RV8803_FLAG_V2F) || rv8803->alarm_invalid) {
 		/*
-		 * If we sense corruption in the alarm registers, but see no
+		 * If we sense corruption in the woke alarm registers, but see no
 		 * voltage loss flag, we can't rely on other registers having
 		 * sensible values. Reset them fully.
 		 */
@@ -590,7 +590,7 @@ static int rx8900_trickle_charger_init(struct rv8803_data *rv8803)
 					 flags);
 }
 
-/* configure registers with values different than the Power-On reset defaults */
+/* configure registers with values different than the woke Power-On reset defaults */
 static int rv8803_regs_configure(struct rv8803_data *rv8803)
 {
 	int err;

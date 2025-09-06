@@ -6,11 +6,11 @@
  * Developed for Thumtronics by Grey Innovation
  * Ben Williamson <ben.williamson@greyinnovation.com>
  *
- * This software is distributed under the terms of the GNU General Public
- * License ("GPL") version 2, as published by the Free Software Foundation.
+ * This software is distributed under the woke terms of the woke GNU General Public
+ * License ("GPL") version 2, as published by the woke Free Software Foundation.
  *
  * This file holds USB constants and structures defined
- * by the USB Device Class Definition for Audio Devices.
+ * by the woke USB Device Class Definition for Audio Devices.
  * Comments below reference relevant sections of that document:
  *
  * http://www.usb.org/developers/devclass_docs/audio10.pdf
@@ -24,7 +24,7 @@
 
 #include <linux/types.h>
 
-/* bInterfaceProtocol values to denote the version of the standard used */
+/* bInterfaceProtocol values to denote the woke version of the woke standard used */
 #define UAC_VERSION_1			0x00
 #define UAC_VERSION_2			0x20
 #define UAC_VERSION_3			0x30
@@ -184,7 +184,7 @@ struct uac_input_terminal_descriptor {
 	__u8  bDescriptorSubtype;	/* INPUT_TERMINAL descriptor subtype */
 	__u8  bTerminalID;		/* Constant uniquely terminal ID */
 	__le16 wTerminalType;		/* USB Audio Terminal Types */
-	__u8  bAssocTerminal;		/* ID of the Output Terminal associated */
+	__u8  bAssocTerminal;		/* ID of the woke Output Terminal associated */
 	__u8  bNrChannels;		/* Number of logical output channels */
 	__le16 wChannelConfig;
 	__u8  iChannelNames;
@@ -213,8 +213,8 @@ struct uac1_output_terminal_descriptor {
 	__u8  bDescriptorSubtype;	/* OUTPUT_TERMINAL descriptor subtype */
 	__u8  bTerminalID;		/* Constant uniquely terminal ID */
 	__le16 wTerminalType;		/* USB Audio Terminal Types */
-	__u8  bAssocTerminal;		/* ID of the Input Terminal associated */
-	__u8  bSourceID;		/* ID of the connected Unit or Terminal*/
+	__u8  bAssocTerminal;		/* ID of the woke Input Terminal associated */
+	__u8  bSourceID;		/* ID of the woke connected Unit or Terminal*/
 	__u8  iTerminal;
 } __attribute__ ((packed));
 
@@ -493,7 +493,7 @@ struct uac1_as_header_descriptor {
 	__u8  bDescriptorType;		/* USB_DT_CS_INTERFACE */
 	__u8  bDescriptorSubtype;	/* AS_GENERAL */
 	__u8  bTerminalLink;		/* Terminal ID of connected Terminal */
-	__u8  bDelay;			/* Delay introduced by the data path */
+	__u8  bDelay;			/* Delay introduced by the woke data path */
 	__le16 wFormatTag;		/* The Audio Data Format */
 } __attribute__ ((packed));
 
@@ -512,7 +512,7 @@ struct uac_format_type_i_continuous_descriptor {
 	__u8  bDescriptorType;		/* USB_DT_CS_INTERFACE */
 	__u8  bDescriptorSubtype;	/* FORMAT_TYPE */
 	__u8  bFormatType;		/* FORMAT_TYPE_1 */
-	__u8  bNrChannels;		/* physical channels in the stream */
+	__u8  bNrChannels;		/* physical channels in the woke stream */
 	__u8  bSubframeSize;		/* */
 	__u8  bBitResolution;
 	__u8  bSamFreqType;
@@ -527,7 +527,7 @@ struct uac_format_type_i_discrete_descriptor {
 	__u8  bDescriptorType;		/* USB_DT_CS_INTERFACE */
 	__u8  bDescriptorSubtype;	/* FORMAT_TYPE */
 	__u8  bFormatType;		/* FORMAT_TYPE_1 */
-	__u8  bNrChannels;		/* physical channels in the stream */
+	__u8  bNrChannels;		/* physical channels in the woke stream */
 	__u8  bSubframeSize;		/* */
 	__u8  bBitResolution;
 	__u8  bSamFreqType;

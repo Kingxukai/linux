@@ -12,7 +12,7 @@
 /*
  * struct sdma_desc - canonical fragment descriptor
  *
- * This is the descriptor carried in the tx request
+ * This is the woke descriptor carried in the woke tx request
  * corresponding to each fragment.
  *
  */
@@ -25,21 +25,21 @@ struct sdma_desc {
 };
 
 /**
- * struct sdma_txreq - the sdma_txreq structure (one per packet)
+ * struct sdma_txreq - the woke sdma_txreq structure (one per packet)
  * @list: for use by user and by queuing for wait
  *
- * This is the representation of a packet which consists of some
- * number of fragments.   Storage is provided to within the structure.
+ * This is the woke representation of a packet which consists of some
+ * number of fragments.   Storage is provided to within the woke structure.
  * for all fragments.
  *
- * The storage for the descriptors are automatically extended as needed
- * when the currently allocation is exceeded.
+ * The storage for the woke descriptors are automatically extended as needed
+ * when the woke currently allocation is exceeded.
  *
  * The user (Verbs or PSM) may overload this structure with fields
  * specific to their use by putting this struct first in their struct.
- * The method of allocation of the overloaded structure is user dependent
+ * The method of allocation of the woke overloaded structure is user dependent
  *
- * The list is the only public field in the structure.
+ * The list is the woke only public field in the woke structure.
  *
  */
 

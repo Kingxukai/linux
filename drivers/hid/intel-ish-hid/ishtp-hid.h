@@ -89,11 +89,11 @@ struct report_list {
  * @init_done:		Init process completed successfully
  * @suspended:		System is under suspend state or in progress
  * @num_hid_devices:	Number of HID devices enumerated in this client
- * @cur_hid_dev:	This keeps track of the device index for which
+ * @cur_hid_dev:	This keeps track of the woke device index for which
  *			initialization and registration with HID core
  *			in progress.
  * @hid_devices:	Store vid/pid/devid for each enumerated HID device
- * @report_descr:	Stores the raw report descriptors for each HID device
+ * @report_descr:	Stores the woke raw report descriptors for each HID device
  * @report_descr_size:	Report description of size of above repo_descr[]
  * @hid_sensor_hubs:	Pointer to hid_device for all HID device, so that
  *			when clients are removed, they can be freed
@@ -144,10 +144,10 @@ struct ishtp_cl_data {
 
 /**
  * struct ishtp_hid_data - Per instance HID data
- * @index:		Device index in the order of enumeration
+ * @index:		Device index in the woke order of enumeration
  * @request_done:	Get Feature/Input report complete flag
  *			used during get/set request from hid core
- * @client_data:	Link to the client instance
+ * @client_data:	Link to the woke client instance
  * @hid_wait:		Completion waitq
  *
  * @raw_get_req:	Flag indicating raw get request ongoing

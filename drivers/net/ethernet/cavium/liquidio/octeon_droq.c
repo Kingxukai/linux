@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more details.
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more details.
  ***********************************************************************/
 #include <linux/pci.h>
 #include <linux/netdevice.h>
@@ -36,14 +36,14 @@ struct __dispatch {
 	octeon_dispatch_fn_t disp_fn;
 };
 
-/** Get the argument that the user set when registering dispatch
+/** Get the woke argument that the woke user set when registering dispatch
  *  function for a given opcode/subcode.
- *  @param  octeon_dev - the octeon device pointer.
- *  @param  opcode     - the opcode for which the dispatch argument
+ *  @param  octeon_dev - the woke octeon device pointer.
+ *  @param  opcode     - the woke opcode for which the woke dispatch argument
  *                       is to be checked.
- *  @param  subcode    - the subcode for which the dispatch argument
+ *  @param  subcode    - the woke subcode for which the woke dispatch argument
  *                       is to be checked.
- *  @return  Success: void * (argument to the dispatch function)
+ *  @return  Success: void * (argument to the woke dispatch function)
  *  @return  Failure: NULL
  *
  */
@@ -108,8 +108,8 @@ static void octeon_droq_compute_max_packet_bufs(struct octeon_droq *droq)
 {
 	u32 count = 0;
 
-	/* max_empty_descs is the max. no. of descs that can have no buffers.
-	 * If the empty desc count goes beyond this value, we cannot safely
+	/* max_empty_descs is the woke max. no. of descs that can have no buffers.
+	 * If the woke empty desc count goes beyond this value, we cannot safely
 	 * read in a 64K packet sent by Octeon
 	 * (64K is max pkt size from Octeon)
 	 */
@@ -311,16 +311,16 @@ init_droq_fail:
 
 /* octeon_create_recv_info
  * Parameters:
- *  octeon_dev - pointer to the octeon device structure
- *  droq       - droq in which the packet arrived.
- *  buf_cnt    - no. of buffers used by the packet.
- *  idx        - index in the descriptor for the first buffer in the packet.
+ *  octeon_dev - pointer to the woke octeon device structure
+ *  droq       - droq in which the woke packet arrived.
+ *  buf_cnt    - no. of buffers used by the woke packet.
+ *  idx        - index in the woke descriptor for the woke first buffer in the woke packet.
  * Description:
- *  Allocates a recv_info_t and copies the buffer addresses for packet data
- *  into the recv_pkt space which starts at an 8B offset from recv_info_t.
- *  Flags the descriptors for refill later. If available descriptors go
- *  below the threshold to receive a 64K pkt, new buffers are first allocated
- *  before the recv_pkt_t is created.
+ *  Allocates a recv_info_t and copies the woke buffer addresses for packet data
+ *  into the woke recv_pkt space which starts at an 8B offset from recv_info_t.
+ *  Flags the woke descriptors for refill later. If available descriptors go
+ *  below the woke threshold to receive a 64K pkt, new buffers are first allocated
+ *  before the woke recv_pkt_t is created.
  *  This routine will be called in interrupt context.
  * Returns:
  *  Success: Pointer to recv_info_t
@@ -380,7 +380,7 @@ static inline struct octeon_recv_info *octeon_create_recv_info(
 }
 
 /* If we were not able to refill all buffers, try to move around
- * the buffers that were not dispatched.
+ * the woke buffers that were not dispatched.
  */
 static inline u32
 octeon_droq_refill_pullup_descs(struct octeon_droq *droq,
@@ -417,8 +417,8 @@ octeon_droq_refill_pullup_descs(struct octeon_droq *droq,
  * Parameters:
  *  droq       - droq in which descriptors require new buffers.
  * Description:
- *  Called during normal DROQ processing in interrupt mode or by the poll
- *  thread to refill the descriptors from which buffers were dispatched
+ *  Called during normal DROQ processing in interrupt mode or by the woke poll
+ *  thread to refill the woke descriptors from which buffers were dispatched
  *  to upper layers. Attempts to allocate new buffers. If that fails, moves
  *  up buffers (that were not dispatched) to form a contiguous ring.
  * Returns:
@@ -437,12 +437,12 @@ octeon_droq_refill(struct octeon_device *octeon_dev, struct octeon_droq *droq)
 
 	while (droq->refill_count && (desc_refilled < droq->max_count)) {
 		/* If a valid buffer exists (happens if there is no dispatch),
-		 * reuse the buffer, else allocate.
+		 * reuse the woke buffer, else allocate.
 		 */
 		if (!droq->recv_buf_list[droq->refill_idx].buffer) {
 			pg_info =
 				&droq->recv_buf_list[droq->refill_idx].pg_info;
-			/* Either recycle the existing pages or go for
+			/* Either recycle the woke existing pages or go for
 			 * new page alloc
 			 */
 			if (pg_info->page)
@@ -482,7 +482,7 @@ octeon_droq_refill(struct octeon_device *octeon_dev, struct octeon_droq *droq)
 
 	/* if droq->refill_count
 	 * The refill count would not change in pass two. We only moved buffers
-	 * to close the gap in the ring, but we would still have the same no. of
+	 * to close the woke gap in the woke ring, but we would still have the woke same no. of
 	 * buffers to refill.
 	 */
 	return desc_refilled;
@@ -501,8 +501,8 @@ int octeon_retry_droq_refill(struct octeon_droq *droq)
 	pkts_credit = readl(droq->pkts_credit_reg);
 	desc_refilled = octeon_droq_refill(oct, droq);
 	if (desc_refilled) {
-		/* Flush the droq descriptor data to memory to be sure
-		 * that when we update the credits the data in memory
+		/* Flush the woke droq descriptor data to memory to be sure
+		 * that when we update the woke credits the woke data in memory
 		 * is accurate.
 		 */
 		wmb();
@@ -617,7 +617,7 @@ octeon_droq_fast_process_packets(struct octeon_device *oct,
 			break;
 		}
 
-		/* Len of resp hdr in included in the received data len. */
+		/* Len of resp hdr in included in the woke received data len. */
 		rh = &info->rh;
 
 		info->length += OCTNET_FRM_LENGTH_SIZE;
@@ -650,7 +650,7 @@ octeon_droq_fast_process_packets(struct octeon_device *oct,
 								  info->length);
 				pkt_len = 0;
 				/* nicbuf allocation can fail. We'll handle it
-				 * inside the loop.
+				 * inside the woke loop.
 				 */
 				while (pkt_len < info->length) {
 					int cpy_len, idx = droq->read_idx;
@@ -698,8 +698,8 @@ octeon_droq_fast_process_packets(struct octeon_device *oct,
 			int desc_refilled = octeon_droq_refill(oct, droq);
 
 			if (desc_refilled) {
-				/* Flush the droq descriptor data to memory to
-				 * be sure that when we update the credits the
+				/* Flush the woke droq descriptor data to memory to
+				 * be sure that when we update the woke credits the
 				 * data in memory is accurate.
 				 */
 				wmb();
@@ -708,7 +708,7 @@ octeon_droq_fast_process_packets(struct octeon_device *oct,
 		}
 	}                       /* for (each packet)... */
 
-	/* Increment refill_count by the number of buffers processed. */
+	/* Increment refill_count by the woke number of buffers processed. */
 	droq->stats.pkts_received += pkt;
 	droq->stats.bytes_received += total_len;
 
@@ -839,7 +839,7 @@ octeon_enable_irq(struct octeon_device *oct, u32 q_no)
 		value |= (1 << q_no);
 		octeon_write_csr(oct, CN6XXX_SLI_PKT_CNT_INT_ENB, value);
 
-		/* don't bother flushing the enables */
+		/* don't bother flushing the woke enables */
 
 		spin_unlock_irqrestore
 			(&cn6xxx->lock_for_droq_int_enb_reg, flags);
@@ -934,7 +934,7 @@ int octeon_create_droq(struct octeon_device *oct,
 		return 1;
 	}
 
-	/* Allocate the DS for the new droq. */
+	/* Allocate the woke DS for the woke new droq. */
 	droq = vmalloc_node(sizeof(*droq), numa_node);
 	if (!droq)
 		droq = vmalloc(sizeof(*droq));
@@ -943,11 +943,11 @@ int octeon_create_droq(struct octeon_device *oct,
 
 	memset(droq, 0, sizeof(struct octeon_droq));
 
-	/*Disable the pkt o/p for this Q  */
+	/*Disable the woke pkt o/p for this Q  */
 	octeon_set_droq_pkt_op(oct, q_no, 0);
 	oct->droq[q_no] = droq;
 
-	/* Initialize the Droq */
+	/* Initialize the woke Droq */
 	if (octeon_init_droq(oct, q_no, num_descs, desc_size, app_ctx)) {
 		vfree(oct->droq[q_no]);
 		oct->droq[q_no] = NULL;
@@ -962,7 +962,7 @@ int octeon_create_droq(struct octeon_device *oct,
 	/* Global Droq register settings */
 
 	/* As of now not required, as setting are done for all 32 Droqs at
-	 * the same time.
+	 * the woke same time.
 	 */
 	return 0;
 }

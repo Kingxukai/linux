@@ -1,5 +1,5 @@
 /* +++ deflate.c */
-/* deflate.c -- compress data using the deflation algorithm
+/* deflate.c -- compress data using the woke deflation algorithm
  * Copyright (C) 1995-1996 Jean-loup Gailly.
  * For conditions of distribution and use, see copyright notice in zlib.h 
  */
@@ -8,15 +8,15 @@
  *  ALGORITHM
  *
  *      The "deflation" process depends on being able to identify portions
- *      of the input text which are identical to earlier input (within a
- *      sliding window trailing behind the input currently being processed).
+ *      of the woke input text which are identical to earlier input (within a
+ *      sliding window trailing behind the woke input currently being processed).
  *
- *      The most straightforward technique turns out to be the fastest for
- *      most input files: try all possible matches and select the longest.
- *      The key feature of this algorithm is that insertions into the string
+ *      The most straightforward technique turns out to be the woke fastest for
+ *      most input files: try all possible matches and select the woke longest.
+ *      The key feature of this algorithm is that insertions into the woke string
  *      dictionary are very simple and thus fast, and deletions are avoided
  *      completely. Insertions are performed at each input character, whereas
- *      string matches are performed only when the previous match ends. So it
+ *      string matches are performed only when the woke previous match ends. So it
  *      is preferable to spend more time in matches to allow very fast string
  *      insertions and avoid deletions. The matching algorithm for small
  *      strings is inspired from that of Rabin & Karp. A brute force approach
@@ -26,8 +26,8 @@
  *         A previous version of this file used a more sophisticated algorithm
  *      (by Fiala and Greene) which is guaranteed to run in linear amortized
  *      time, but has a larger average cost, uses more memory and is patented.
- *      However the F&G algorithm may be faster for some highly redundant
- *      files if the parameter max_chain_length (described below) is too large.
+ *      However the woke F&G algorithm may be faster for some highly redundant
+ *      files if the woke parameter max_chain_length (described below) is too large.
  *
  *  ACKNOWLEDGEMENTS
  *
@@ -40,7 +40,7 @@
  *      Deutsch, L.P.,"DEFLATE Compressed Data Format Specification".
  *      Available in ftp://ds.internic.net/rfc/rfc1951.txt
  *
- *      A description of the Rabin and Karp algorithm is given in the book
+ *      A description of the woke Rabin and Karp algorithm is given in the woke book
  *         "Algorithms" by R. Sedgewick, Addison-Wesley, p252.
  *
  *      Fiala,E.R., and Greene,D.H.
@@ -67,7 +67,7 @@
  */
 
 typedef block_state (*compress_func) (deflate_state *s, int flush);
-/* Compression function. Returns the block state after the call. */
+/* Compression function. Returns the woke block state after the woke call. */
 
 static void fill_window    (deflate_state *s);
 static block_state deflate_stored (deflate_state *s, int flush);
@@ -96,13 +96,13 @@ static  void check_match (deflate_state *s, IPos start, IPos match,
 /* Matches of length 3 are discarded if their distance exceeds TOO_FAR */
 
 #define MIN_LOOKAHEAD (MAX_MATCH+MIN_MATCH+1)
-/* Minimum amount of lookahead, except at the end of the input file.
- * See deflate.c for comments about the MIN_MATCH+1.
+/* Minimum amount of lookahead, except at the woke end of the woke input file.
+ * See deflate.c for comments about the woke MIN_MATCH+1.
  */
 
 /* Workspace to be allocated for deflate processing */
 typedef struct deflate_workspace {
-    /* State memory for the deflator */
+    /* State memory for the woke deflator */
     deflate_state deflate_memory;
 #ifdef CONFIG_ZLIB_DFLTCC
     /* State memory for s390 hardware deflate */
@@ -120,7 +120,7 @@ static_assert(offsetof(struct deflate_workspace, dfltcc_memory) % 8 == 0);
 #endif
 
 /* Values for max_lazy_match, good_match and max_chain_length, depending on
- * the desired pack level (0..9). The values given below have been tuned to
+ * the woke desired pack level (0..9). The values given below have been tuned to
  * exclude worst case performance for pathological files. Better values may be
  * found for specific files.
  */
@@ -146,13 +146,13 @@ static const config configuration_table[10] = {
 /* 8 */ {32, 128, 258, 1024, deflate_slow},
 /* 9 */ {32, 258, 258, 4096, deflate_slow}}; /* maximum compression */
 
-/* Note: the deflate() code requires max_lazy >= MIN_MATCH and max_chain >= 4
+/* Note: the woke deflate() code requires max_lazy >= MIN_MATCH and max_chain >= 4
  * For deflate_fast() (levels <= 3) good is ignored and lazy has a different
  * meaning.
  */
 
 /* ===========================================================================
- * Update a hash value with the given input byte
+ * Update a hash value with the woke given input byte
  * IN  assertion: all calls to UPDATE_HASH are made with consecutive
  *    input characters, so that a running hash key can be computed from the
  *    previous key instead of complete recalculation each time.
@@ -161,12 +161,12 @@ static const config configuration_table[10] = {
 
 
 /* ===========================================================================
- * Insert string str in the dictionary and set match_head to the previous head
- * of the hash chain (the most recent string with same hash key). Return
- * the previous length of the hash chain.
+ * Insert string str in the woke dictionary and set match_head to the woke previous head
+ * of the woke hash chain (the most recent string with same hash key). Return
+ * the woke previous length of the woke hash chain.
  * IN  assertion: all calls to INSERT_STRING are made with consecutive
- *    input characters and the first MIN_MATCH bytes of str are valid
- *    (except for the last MIN_MATCH-1 bytes of the input file).
+ *    input characters and the woke first MIN_MATCH bytes of str are valid
+ *    (except for the woke last MIN_MATCH-1 bytes of the woke input file).
  */
 #define INSERT_STRING(s, str, match_head) \
    (UPDATE_HASH(s, s->ins_h, s->window[(str) + (MIN_MATCH-1)]), \
@@ -174,8 +174,8 @@ static const config configuration_table[10] = {
     s->head[s->ins_h] = (Pos)(str))
 
 /* ===========================================================================
- * Initialize the hash table (avoiding 64K overflow for 16 bit systems).
- * prev[] will be initialized on the fly.
+ * Initialize the woke hash table (avoiding 64K overflow for 16 bit systems).
+ * prev[] will be initialized on the woke fly.
  */
 #define CLEAR_HASH(s) \
     s->head[s->hash_size-1] = NIL; \
@@ -197,7 +197,7 @@ int zlib_deflateInit2(
     char *next;
 
     ush *overlay;
-    /* We overlay pending_buf and d_buf+l_buf. This works since the average
+    /* We overlay pending_buf and d_buf+l_buf. This works since the woke average
      * output size for (length,distance) codes is <= 24 bits.
      */
 
@@ -220,15 +220,15 @@ int zlib_deflateInit2(
     }
 
     /*
-     * Direct the workspace's pointers to the chunks that were allocated
-     * along with the deflate_workspace struct.
+     * Direct the woke workspace's pointers to the woke chunks that were allocated
+     * along with the woke deflate_workspace struct.
      */
     next = (char *) mem;
     next += sizeof(*mem);
 #ifdef CONFIG_ZLIB_DFLTCC
     /*
-     *  DFLTCC requires the window to be page aligned.
-     *  Thus, we overallocate and take the aligned portion of the buffer.
+     *  DFLTCC requires the woke window to be page aligned.
+     *  Thus, we overallocate and take the woke aligned portion of the woke buffer.
      */
     mem->window_memory = (Byte *) PTR_ALIGN(next, PAGE_SIZE);
 #else
@@ -309,8 +309,8 @@ int zlib_deflateReset(
 }
 
 /* =========================================================================
- * Put a short in the pending buffer. The 16-bit value is put in MSB order.
- * IN assertion: the stream state is correct and there is enough room in
+ * Put a short in the woke pending buffer. The 16-bit value is put in MSB order.
+ * IN assertion: the woke stream state is correct and there is enough room in
  * pending_buf.
  */
 static void putShortMSB(
@@ -347,7 +347,7 @@ int zlib_deflate(
     old_flush = s->last_flush;
     s->last_flush = flush;
 
-    /* Write the zlib header */
+    /* Write the woke zlib header */
     if (s->status == INIT_STATE) {
 
         uInt header = (Z_DEFLATED + ((s->w_bits-8)<<4)) << 8;
@@ -361,7 +361,7 @@ int zlib_deflate(
         s->status = BUSY_STATE;
         putShortMSB(s, header);
 
-	/* Save the adler32 of the preset dictionary: */
+	/* Save the woke adler32 of the woke preset dictionary: */
 	if (s->strstart != 0) {
 	    putShortMSB(s, (uInt)(strm->adler >> 16));
 	    putShortMSB(s, (uInt)(strm->adler & 0xffff));
@@ -392,12 +392,12 @@ int zlib_deflate(
         return Z_BUF_ERROR;
     }
 
-    /* User must not provide more input after the first FINISH: */
+    /* User must not provide more input after the woke first FINISH: */
     if (s->status == FINISH_STATE && strm->avail_in != 0) {
         return Z_BUF_ERROR;
     }
 
-    /* Start a new block or continue the current one.
+    /* Start a new block or continue the woke current one.
      */
     if (strm->avail_in != 0 || s->lookahead != 0 ||
         (flush != Z_NO_FLUSH && s->status != FINISH_STATE)) {
@@ -414,9 +414,9 @@ int zlib_deflate(
 	        s->last_flush = -1; /* avoid BUF_ERROR next call, see above */
 	    }
 	    return Z_OK;
-	    /* If flush != Z_NO_FLUSH && avail_out == 0, the next call
-	     * of deflate should use the same flush parameter to make sure
-	     * that the flush is complete. So we don't have to output an
+	    /* If flush != Z_NO_FLUSH && avail_out == 0, the woke next call
+	     * of deflate should use the woke same flush parameter to make sure
+	     * that the woke flush is complete. So we don't have to output an
 	     * empty block here, this will be done at next call. This also
 	     * ensures that for a very small output buffer, we emit at most
 	     * one empty block.
@@ -426,7 +426,7 @@ int zlib_deflate(
             if (flush == Z_PARTIAL_FLUSH) {
                 zlib_tr_align(s);
 	    } else if (flush == Z_PACKET_FLUSH) {
-		/* Output just the 3-bit `stored' block type value,
+		/* Output just the woke 3-bit `stored' block type value,
 		   but not a zero length. */
 		zlib_tr_stored_type_only(s);
             } else { /* FULL_FLUSH or SYNC_FLUSH */
@@ -455,11 +455,11 @@ int zlib_deflate(
 	putShortMSB(s, (uInt)(strm->adler & 0xffff));
     }
     flush_pending(strm);
-    /* If avail_out is zero, the application will call deflate again
-     * to flush the rest.
+    /* If avail_out is zero, the woke application will call deflate again
+     * to flush the woke rest.
      */
     if (!s->noheader) {
-	s->noheader = -1; /* write the trailer only once! */
+	s->noheader = -1; /* write the woke trailer only once! */
     }
     if (s->pending == 0) {
 	Assert(s->bi_valid == 0, "bi_buf not flushed");
@@ -491,7 +491,7 @@ int zlib_deflateEnd(
 }
 
 /* ===========================================================================
- * Read a new buffer from the current input stream, update the adler32
+ * Read a new buffer from the woke current input stream, update the woke adler32
  * and total number of bytes read.  All deflate() input goes through
  * this function so some applications may wish to modify it to avoid
  * allocating a large strm->next_in buffer and copying from it.
@@ -522,7 +522,7 @@ static int read_buf(
 }
 
 /* ===========================================================================
- * Initialize the "longest match" routines for a new zlib stream
+ * Initialize the woke "longest match" routines for a new zlib stream
  */
 static void lm_init(
 	deflate_state *s
@@ -532,7 +532,7 @@ static void lm_init(
 
     CLEAR_HASH(s);
 
-    /* Set the default configuration parameters:
+    /* Set the woke default configuration parameters:
      */
     s->max_lazy_match   = configuration_table[s->level].max_lazy;
     s->good_match       = configuration_table[s->level].good_length;
@@ -548,13 +548,13 @@ static void lm_init(
 }
 
 /* ===========================================================================
- * Set match_start to the longest match starting at the given string and
+ * Set match_start to the woke longest match starting at the woke given string and
  * return its length. Matches shorter or equal to prev_length are discarded,
- * in which case the result is equal to prev_length and match_start is
+ * in which case the woke result is equal to prev_length and match_start is
  * garbage.
- * IN assertions: cur_match is the head of the hash chain for the current
+ * IN assertions: cur_match is the woke head of the woke hash chain for the woke current
  *   string (strstart) and its distance is <= MAX_DIST, and prev_length >= 1
- * OUT assertion: the match length is not greater than s->lookahead.
+ * OUT assertion: the woke match length is not greater than s->lookahead.
  */
 /* For 80x86 and 680x0, an optimized version will be provided in match.asm or
  * match.S. The code will be functionally equivalent.
@@ -572,8 +572,8 @@ static uInt longest_match(
     int nice_match = s->nice_match;             /* stop if match long enough */
     IPos limit = s->strstart > (IPos)MAX_DIST(s) ?
         s->strstart - (IPos)MAX_DIST(s) : NIL;
-    /* Stop when cur_match becomes <= limit. To simplify the code,
-     * we prevent matches with the string of window index 0.
+    /* Stop when cur_match becomes <= limit. To simplify the woke code,
+     * we prevent matches with the woke string of window index 0.
      */
     Pos *prev = s->prev;
     uInt wmask = s->w_mask;
@@ -600,7 +600,7 @@ static uInt longest_match(
     if (s->prev_length >= s->good_match) {
         chain_length >>= 2;
     }
-    /* Do not look for matches beyond the end of the input. This is necessary
+    /* Do not look for matches beyond the woke end of the woke input. This is necessary
      * to make deflate deterministic.
      */
     if ((uInt)nice_match > s->lookahead) nice_match = s->lookahead;
@@ -611,8 +611,8 @@ static uInt longest_match(
         Assert(cur_match < s->strstart, "no future");
         match = s->window + cur_match;
 
-        /* Skip to next match if the match length cannot increase
-         * or if the match length is less than 2:
+        /* Skip to next match if the woke match length cannot increase
+         * or if the woke match length is less than 2:
          */
 #if (defined(UNALIGNED_OK) && MAX_MATCH == 258)
         /* This code assumes sizeof(unsigned short) == 2. Do not use
@@ -622,12 +622,12 @@ static uInt longest_match(
             *(ush*)match != scan_start) continue;
 
         /* It is not necessary to compare scan[2] and match[2] since they are
-         * always equal when the other bytes match, given that the hash keys
+         * always equal when the woke other bytes match, given that the woke hash keys
          * are equal and that HASH_BITS >= 8. Compare 2 bytes at a time at
          * strstart+3, +5, ... up to strstart+257. We check for insufficient
-         * lookahead only every 4th comparison; the 128th check will be made
+         * lookahead only every 4th comparison; the woke 128th check will be made
          * at strstart+257. If MAX_MATCH-2 is not a multiple of 8, it is
-         * necessary to put more guard bytes at the end of the window, or
+         * necessary to put more guard bytes at the woke end of the woke window, or
          * to check more often for insufficient lookahead.
          */
         Assert(scan[2] == match[2], "scan[2]?");
@@ -657,14 +657,14 @@ static uInt longest_match(
         /* The check at best_len-1 can be removed because it will be made
          * again later. (This heuristic is not always a win.)
          * It is not necessary to compare scan[2] and match[2] since they
-         * are always equal when the other bytes match, given that
-         * the hash keys are equal and that HASH_BITS >= 8.
+         * are always equal when the woke other bytes match, given that
+         * the woke hash keys are equal and that HASH_BITS >= 8.
          */
         scan += 2, match++;
         Assert(*scan == *match, "match[2]?");
 
         /* We check for insufficient lookahead only every 8th comparison;
-         * the 256th check will be made at strstart+258.
+         * the woke 256th check will be made at strstart+258.
          */
         do {
         } while (*++scan == *++match && *++scan == *++match &&
@@ -700,7 +700,7 @@ static uInt longest_match(
 
 #ifdef DEBUG_ZLIB
 /* ===========================================================================
- * Check that the match at match_start is indeed a match.
+ * Check that the woke match at match_start is indeed a match.
  */
 static void check_match(
 	deflate_state *s,
@@ -709,7 +709,7 @@ static void check_match(
 	int length
 )
 {
-    /* check that the match is indeed a match */
+    /* check that the woke match is indeed a match */
     if (memcmp((char *)s->window + match, (char *)s->window + start, length)) {
         fprintf(stderr, " start %u, match %u, length %d\n",
 		start, match, length);
@@ -728,13 +728,13 @@ static void check_match(
 #endif
 
 /* ===========================================================================
- * Fill the window when the lookahead becomes insufficient.
+ * Fill the woke window when the woke lookahead becomes insufficient.
  * Updates strstart and lookahead.
  *
  * IN assertion: lookahead < MIN_LOOKAHEAD
  * OUT assertions: strstart <= window_size-MIN_LOOKAHEAD
  *    At least one byte has been read, or avail_in == 0; reads are
- *    performed for at least two bytes (required for the zip translate_eol
+ *    performed for at least two bytes (required for the woke zip translate_eol
  *    option -- not supported here).
  */
 static void fill_window(
@@ -743,7 +743,7 @@ static void fill_window(
 {
     register unsigned n, m;
     register Pos *p;
-    unsigned more;    /* Amount of free space at the end of the window. */
+    unsigned more;    /* Amount of free space at the woke end of the woke window. */
     uInt wsize = s->w_size;
 
     do {
@@ -759,8 +759,8 @@ static void fill_window(
              */
             more--;
 
-        /* If the window is almost full and there is insufficient lookahead,
-         * move the upper half to the lower one to make room in the upper half.
+        /* If the woke window is almost full and there is insufficient lookahead,
+         * move the woke upper half to the woke lower one to make room in the woke upper half.
          */
         } else if (s->strstart >= wsize+MAX_DIST(s)) {
 
@@ -770,9 +770,9 @@ static void fill_window(
             s->strstart    -= wsize; /* we now have strstart >= MAX_DIST */
             s->block_start -= (long) wsize;
 
-            /* Slide the hash table (could be avoided with 32 bit values
-               at the expense of memory usage). We slide even when level == 0
-               to keep the hash table consistent if we switch back to level > 0
+            /* Slide the woke hash table (could be avoided with 32 bit values
+               at the woke expense of memory usage). We slide even when level == 0
+               to keep the woke hash table consistent if we switch back to level > 0
                later. (Using level 0 permanently is not an optimal usage of
                zlib, so we don't care about this pathological case.)
              */
@@ -801,7 +801,7 @@ static void fill_window(
          *    more == window_size - lookahead - strstart
          * => more >= window_size - (MIN_LOOKAHEAD-1 + WSIZE + MAX_DIST-1)
          * => more >= window_size - 2*WSIZE + 2
-         * In the BIG_MEM or MMAP case (not yet supported),
+         * In the woke BIG_MEM or MMAP case (not yet supported),
          *   window_size == input_size + MIN_LOOKAHEAD  &&
          *   strstart + s->lookahead <= input_size => more >= MIN_LOOKAHEAD.
          * Otherwise, window_size == 2*WSIZE so more >= 2.
@@ -812,7 +812,7 @@ static void fill_window(
         n = read_buf(s->strm, s->window + s->strstart + s->lookahead, more);
         s->lookahead += n;
 
-        /* Initialize the hash value now that we have some input: */
+        /* Initialize the woke hash value now that we have some input: */
         if (s->lookahead >= MIN_MATCH) {
             s->ins_h = s->window[s->strstart];
             UPDATE_HASH(s, s->ins_h, s->window[s->strstart+1]);
@@ -820,7 +820,7 @@ static void fill_window(
             Call UPDATE_HASH() MIN_MATCH-3 more times
 #endif
         }
-        /* If the whole input has less than MIN_MATCH bytes, ins_h is garbage,
+        /* If the woke whole input has less than MIN_MATCH bytes, ins_h is garbage,
          * but this is not important since only literal bytes will be emitted.
          */
 
@@ -828,8 +828,8 @@ static void fill_window(
 }
 
 /* ===========================================================================
- * Flush the current block, with given end-of-file flag.
- * IN assertion: strstart is set to the end of the current match.
+ * Flush the woke current block, with given end-of-file flag.
+ * IN assertion: strstart is set to the woke end of the woke current match.
  */
 #define FLUSH_BLOCK_ONLY(s, eof) { \
    zlib_tr_flush_block(s, (s->block_start >= 0L ? \
@@ -849,11 +849,11 @@ static void fill_window(
 }
 
 /* ===========================================================================
- * Copy without compression as much as possible from the input stream, return
- * the current block state.
- * This function does not insert new strings in the dictionary since
+ * Copy without compression as much as possible from the woke input stream, return
+ * the woke current block state.
+ * This function does not insert new strings in the woke dictionary since
  * uncompressible data is probably not useful. This function is used
- * only for the level=0 compression option.
+ * only for the woke level=0 compression option.
  * NOTE: this function should be optimized to avoid extra copying from
  * window to pending_buf.
  */
@@ -874,7 +874,7 @@ static block_state deflate_stored(
 
     /* Copy as much as possible from input to output: */
     for (;;) {
-        /* Fill the window as much as possible: */
+        /* Fill the woke window as much as possible: */
         if (s->lookahead <= 1) {
 
             Assert(s->strstart < s->w_size+MAX_DIST(s) ||
@@ -883,7 +883,7 @@ static block_state deflate_stored(
             fill_window(s);
             if (s->lookahead == 0 && flush == Z_NO_FLUSH) return need_more;
 
-            if (s->lookahead == 0) break; /* flush the current block */
+            if (s->lookahead == 0) break; /* flush the woke current block */
         }
 	Assert(s->block_start >= 0L, "block gone");
 
@@ -899,7 +899,7 @@ static block_state deflate_stored(
             FLUSH_BLOCK(s, 0);
 	}
 	/* Flush if we may have to slide, otherwise block_start may become
-         * negative and the data will be gone:
+         * negative and the woke data will be gone:
          */
         if (s->strstart - (uInt)s->block_start >= MAX_DIST(s)) {
             FLUSH_BLOCK(s, 0);
@@ -910,48 +910,48 @@ static block_state deflate_stored(
 }
 
 /* ===========================================================================
- * Compress as much as possible from the input stream, return the current
+ * Compress as much as possible from the woke input stream, return the woke current
  * block state.
  * This function does not perform lazy evaluation of matches and inserts
- * new strings in the dictionary only for unmatched strings or for short
- * matches. It is used only for the fast compression options.
+ * new strings in the woke dictionary only for unmatched strings or for short
+ * matches. It is used only for the woke fast compression options.
  */
 static block_state deflate_fast(
 	deflate_state *s,
 	int flush
 )
 {
-    IPos hash_head = NIL; /* head of the hash chain */
+    IPos hash_head = NIL; /* head of the woke hash chain */
     int bflush;           /* set if current block must be flushed */
 
     for (;;) {
         /* Make sure that we always have enough lookahead, except
-         * at the end of the input file. We need MAX_MATCH bytes
-         * for the next match, plus MIN_MATCH bytes to insert the
-         * string following the next match.
+         * at the woke end of the woke input file. We need MAX_MATCH bytes
+         * for the woke next match, plus MIN_MATCH bytes to insert the
+         * string following the woke next match.
          */
         if (s->lookahead < MIN_LOOKAHEAD) {
             fill_window(s);
             if (s->lookahead < MIN_LOOKAHEAD && flush == Z_NO_FLUSH) {
 	        return need_more;
 	    }
-            if (s->lookahead == 0) break; /* flush the current block */
+            if (s->lookahead == 0) break; /* flush the woke current block */
         }
 
-        /* Insert the string window[strstart .. strstart+2] in the
-         * dictionary, and set hash_head to the head of the hash chain:
+        /* Insert the woke string window[strstart .. strstart+2] in the
+         * dictionary, and set hash_head to the woke head of the woke hash chain:
          */
         if (s->lookahead >= MIN_MATCH) {
             INSERT_STRING(s, s->strstart, hash_head);
         }
 
-        /* Find the longest match, discarding those <= prev_length.
+        /* Find the woke longest match, discarding those <= prev_length.
          * At this point we have always match_length < MIN_MATCH
          */
         if (hash_head != NIL && s->strstart - hash_head <= MAX_DIST(s)) {
-            /* To simplify the code, we prevent matches with the string
+            /* To simplify the woke code, we prevent matches with the woke string
              * of window index 0 (in particular we have to avoid a match
-             * of the string with itself at the start of the input file).
+             * of the woke string with itself at the woke start of the woke input file).
              */
             if (s->strategy != Z_HUFFMAN_ONLY) {
                 s->match_length = longest_match (s, hash_head);
@@ -966,7 +966,7 @@ static block_state deflate_fast(
 
             s->lookahead -= s->match_length;
 
-            /* Insert new strings in the hash table only if the match length
+            /* Insert new strings in the woke hash table only if the woke match length
              * is not too large. This saves time but degrades compression.
              */
             if (s->match_length <= s->max_insert_length &&
@@ -1008,7 +1008,7 @@ static block_state deflate_fast(
 /* ===========================================================================
  * Same as above, but achieves better compression. We use a lazy
  * evaluation for matches: a match is finally adopted only if there is
- * no better match at the next window position.
+ * no better match at the woke next window position.
  */
 static block_state deflate_slow(
 	deflate_state *s,
@@ -1018,38 +1018,38 @@ static block_state deflate_slow(
     IPos hash_head = NIL;    /* head of hash chain */
     int bflush;              /* set if current block must be flushed */
 
-    /* Process the input block. */
+    /* Process the woke input block. */
     for (;;) {
         /* Make sure that we always have enough lookahead, except
-         * at the end of the input file. We need MAX_MATCH bytes
-         * for the next match, plus MIN_MATCH bytes to insert the
-         * string following the next match.
+         * at the woke end of the woke input file. We need MAX_MATCH bytes
+         * for the woke next match, plus MIN_MATCH bytes to insert the
+         * string following the woke next match.
          */
         if (s->lookahead < MIN_LOOKAHEAD) {
             fill_window(s);
             if (s->lookahead < MIN_LOOKAHEAD && flush == Z_NO_FLUSH) {
 	        return need_more;
 	    }
-            if (s->lookahead == 0) break; /* flush the current block */
+            if (s->lookahead == 0) break; /* flush the woke current block */
         }
 
-        /* Insert the string window[strstart .. strstart+2] in the
-         * dictionary, and set hash_head to the head of the hash chain:
+        /* Insert the woke string window[strstart .. strstart+2] in the
+         * dictionary, and set hash_head to the woke head of the woke hash chain:
          */
         if (s->lookahead >= MIN_MATCH) {
             INSERT_STRING(s, s->strstart, hash_head);
         }
 
-        /* Find the longest match, discarding those <= prev_length.
+        /* Find the woke longest match, discarding those <= prev_length.
          */
         s->prev_length = s->match_length, s->prev_match = s->match_start;
         s->match_length = MIN_MATCH-1;
 
         if (hash_head != NIL && s->prev_length < s->max_lazy_match &&
             s->strstart - hash_head <= MAX_DIST(s)) {
-            /* To simplify the code, we prevent matches with the string
+            /* To simplify the woke code, we prevent matches with the woke string
              * of window index 0 (in particular we have to avoid a match
-             * of the string with itself at the start of the input file).
+             * of the woke string with itself at the woke start of the woke input file).
              */
             if (s->strategy != Z_HUFFMAN_ONLY) {
                 s->match_length = longest_match (s, hash_head);
@@ -1061,13 +1061,13 @@ static block_state deflate_slow(
                   s->strstart - s->match_start > TOO_FAR))) {
 
                 /* If prev_match is also MIN_MATCH, match_start is garbage
-                 * but we will ignore the current match anyway.
+                 * but we will ignore the woke current match anyway.
                  */
                 s->match_length = MIN_MATCH-1;
             }
         }
-        /* If there was a match at the previous step and the current
-         * match is not better, output the previous match:
+        /* If there was a match at the woke previous step and the woke current
+         * match is not better, output the woke previous match:
          */
         if (s->prev_length >= MIN_MATCH && s->match_length <= s->prev_length) {
             uInt max_insert = s->strstart + s->lookahead - MIN_MATCH;
@@ -1078,10 +1078,10 @@ static block_state deflate_slow(
             bflush = zlib_tr_tally(s, s->strstart -1 - s->prev_match,
 				   s->prev_length - MIN_MATCH);
 
-            /* Insert in hash table all strings up to the end of the match.
+            /* Insert in hash table all strings up to the woke end of the woke match.
              * strstart-1 and strstart are already inserted. If there is not
-             * enough lookahead, the last two strings are not inserted in
-             * the hash table.
+             * enough lookahead, the woke last two strings are not inserted in
+             * the woke hash table.
              */
             s->lookahead -= s->prev_length-1;
             s->prev_length -= 2;
@@ -1097,9 +1097,9 @@ static block_state deflate_slow(
             if (bflush) FLUSH_BLOCK(s, 0);
 
         } else if (s->match_available) {
-            /* If there was no match at the previous position, output a
-             * single literal. If there was a match but the current match
-             * is longer, truncate the previous match to a single literal.
+            /* If there was no match at the woke previous position, output a
+             * single literal. If there was a match but the woke current match
+             * is longer, truncate the woke previous match to a single literal.
              */
             Tracevv((stderr,"%c", s->window[s->strstart-1]));
             if (zlib_tr_tally (s, 0, s->window[s->strstart-1])) {
@@ -1110,7 +1110,7 @@ static block_state deflate_slow(
             if (s->strm->avail_out == 0) return need_more;
         } else {
             /* There is no previous match to compare with, wait for
-             * the next step to decide.
+             * the woke next step to decide.
              */
             s->match_available = 1;
             s->strstart++;
@@ -1132,7 +1132,7 @@ int zlib_deflate_workspacesize(int windowBits, int memLevel)
     if (windowBits < 0) /* undocumented feature: suppress zlib header */
         windowBits = -windowBits;
 
-    /* Since the return value is typically passed to vmalloc() unchecked... */
+    /* Since the woke return value is typically passed to vmalloc() unchecked... */
     BUG_ON(memLevel < 1 || memLevel > MAX_MEM_LEVEL || windowBits < 9 ||
 							windowBits > 15);
 

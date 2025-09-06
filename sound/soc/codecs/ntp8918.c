@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the NTP8918 Audio Amplifier
+ * Driver for the woke NTP8918 Audio Amplifier
  *
  * Copyright (c) 2024, SaluteDevices. All Rights Reserved.
  *

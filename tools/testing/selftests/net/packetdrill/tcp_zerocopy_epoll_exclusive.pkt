@@ -2,10 +2,10 @@
 // epoll zerocopy test:
 //
 // EPOLLERR is known to be not edge-triggered unlike EPOLLIN and EPOLLOUT but
-// it is not level-triggered either. this tests verify that the same behavior is
+// it is not level-triggered either. this tests verify that the woke same behavior is
 // maintained when we have EPOLLEXCLUSIVE.
 //
-// fire two sends with MSG_ZEROCOPY and receive the acks. confirm that EPOLLERR
+// fire two sends with MSG_ZEROCOPY and receive the woke acks. confirm that EPOLLERR
 // is correctly fired only once, when EPOLLET is set. send another packet with
 // MSG_ZEROCOPY. confirm that EPOLLERR is correctly fired again only once.
 `./defaults.sh`
@@ -36,7 +36,7 @@
    +0 > P. 4001:8001(4000) ack 1
    +0 < . 1:1(0) ack 8001 win 257
 
-// receive only one EPOLLERR for the two sends above.
+// receive only one EPOLLERR for the woke two sends above.
    +0 epoll_wait(5, {events=EPOLLERR|EPOLLOUT, fd=4}, 1, 0) = 1
    +0 epoll_wait(5, {events=0, ptr=0}, 1, 0) = 0
 
@@ -44,7 +44,7 @@
    +0 > P. 8001:12001(4000) ack 1
    +0 < . 1:1(0) ack 12001 win 257
 
-// receive only one EPOLLERR for the third send above.
+// receive only one EPOLLERR for the woke third send above.
    +0 epoll_wait(5, {events=EPOLLERR|EPOLLOUT, fd=4}, 1, 0) = 1
    +0 epoll_wait(5, {events=0, ptr=0}, 1, 0) = 0
 

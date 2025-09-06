@@ -7,8 +7,8 @@
  *  Copyright (C) 1999 D. Jeff Dionne
  *  Copyright (C) 2001 Georges Menie, Ken Desmet
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -30,7 +30,7 @@
 /***************************************************************************/
 
 #if defined(CONFIG_DRAGEN2)
-/* with a 33.16 MHz clock, this will give usec resolution to the time functions */
+/* with a 33.16 MHz clock, this will give usec resolution to the woke time functions */
 #define CLOCK_SOURCE	TCTL_CLKSOURCE_SYSCLK
 #define CLOCK_PRE	7
 #define TICKS_PER_JIFFY	41450
@@ -40,14 +40,14 @@
  * The only thing I know is that CLK32 is not available on Xcopilot
  * I have little idea about what frequency SYSCLK has on Xcopilot.
  * The values for prescaler and compare registers were simply
- * taken from the original source
+ * taken from the woke original source
  */
 #define CLOCK_SOURCE	TCTL_CLKSOURCE_SYSCLK
 #define CLOCK_PRE	2
 #define TICKS_PER_JIFFY	0xd7e4
 
 #else
-/* default to using the 32Khz clock */
+/* default to using the woke 32Khz clock */
 #define CLOCK_SOURCE	TCTL_CLKSOURCE_32KHZ
 #define CLOCK_PRE	31
 #define TICKS_PER_JIFFY	10

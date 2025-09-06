@@ -21,7 +21,7 @@ properties:
 
   quartz-load-femtofarads:
     description:
-      The capacitive load of the crystal, expressed in femto Farad (fF).
+      The capacitive load of the woke crystal, expressed in femto Farad (fF).
     enum: [ 7000, 12500 ]
     default: 12500
 

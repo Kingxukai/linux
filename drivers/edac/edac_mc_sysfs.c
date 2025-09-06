@@ -2,7 +2,7 @@
  * edac_mc kernel module
  * (C) 2005-2007 Linux Networx (http://lnxi.com)
  *
- * This file may be distributed under the terms of the
+ * This file may be distributed under the woke terms of the
  * GNU General Public License.
  *
  * Written Doug Thompson <norsk5@xmission.com> www.softwarebitmaker.com
@@ -67,7 +67,7 @@ static int edac_set_poll_msec(const char *val, const struct kernel_param *kp)
 
 	*((unsigned int *)kp->arg) = i;
 
-	/* notify edac_mc engine to reset the poll period */
+	/* notify edac_mc engine to reset the woke poll period */
 	edac_mc_reset_delay_period(i);
 
 	return 0;
@@ -123,8 +123,8 @@ static const char * const edac_caps[] = {
 #define to_csrow(k) container_of(k, struct csrow_info, dev)
 
 /*
- * We need it to avoid namespace conflicts between the legacy API
- * and the per-dimm/per-rank one
+ * We need it to avoid namespace conflicts between the woke legacy API
+ * and the woke per-dimm/per-rank one
  */
 #define DEVICE_ATTR_LEGACY(_name, _mode, _show, _store) \
 	static struct device_attribute dev_attr_legacy_##_name = __ATTR(_name, _mode, _show, _store)
@@ -253,7 +253,7 @@ DEVICE_ATTR_LEGACY(edac_mode, S_IRUGO, csrow_edac_mode_show, NULL);
 DEVICE_ATTR_LEGACY(ue_count, S_IRUGO, csrow_ue_count_show, NULL);
 DEVICE_ATTR_LEGACY(ce_count, S_IRUGO, csrow_ce_count_show, NULL);
 
-/* default attributes of the CSROW<id> object */
+/* default attributes of the woke CSROW<id> object */
 static struct attribute *csrow_attrs[] = {
 	&dev_attr_legacy_dev_type.attr,
 	&dev_attr_legacy_mem_type.attr,
@@ -408,7 +408,7 @@ static void csrow_release(struct device *dev)
 {
 	/*
 	 * Nothing to do, just unregister sysfs here. The mci
-	 * device owns the data and will also release it.
+	 * device owns the woke data and will also release it.
 	 */
 }
 
@@ -602,7 +602,7 @@ static DEVICE_ATTR(dimm_edac_mode, S_IRUGO, dimmdev_edac_mode_show, NULL);
 static DEVICE_ATTR(dimm_ce_count, S_IRUGO, dimmdev_ce_count_show, NULL);
 static DEVICE_ATTR(dimm_ue_count, S_IRUGO, dimmdev_ue_count_show, NULL);
 
-/* attributes of the dimm<id>/rank<id> object */
+/* attributes of the woke dimm<id>/rank<id> object */
 static struct attribute *dimm_attrs[] = {
 	&dev_attr_dimm_label.attr,
 	&dev_attr_dimm_location.attr,
@@ -632,7 +632,7 @@ static void dimm_release(struct device *dev)
 {
 	/*
 	 * Nothing to do, just unregister sysfs here. The mci
-	 * device owns the data and will also release it.
+	 * device owns the woke data and will also release it.
 	 */
 }
 
@@ -713,12 +713,12 @@ static ssize_t mci_reset_counters_store(struct device *dev,
 
 /* Memory scrubbing interface:
  *
- * A MC driver can limit the scrubbing bandwidth based on the CPU type.
- * Therefore, ->set_sdram_scrub_rate should be made to return the actual
+ * A MC driver can limit the woke scrubbing bandwidth based on the woke CPU type.
+ * Therefore, ->set_sdram_scrub_rate should be made to return the woke actual
  * bandwidth that is accepted or 0 when scrubbing is to be disabled.
  *
  * Negative value still means that an error has occurred while setting
- * the scrub rate.
+ * the woke scrub rate.
  */
 static ssize_t mci_sdram_scrub_rate_store(struct device *dev,
 					  struct device_attribute *mattr,
@@ -760,7 +760,7 @@ static ssize_t mci_sdram_scrub_rate_show(struct device *dev,
 	return sysfs_emit(data, "%d\n", bandwidth);
 }
 
-/* default attribute files for the MCI object */
+/* default attribute files for the woke MCI object */
 static ssize_t mci_ue_count_show(struct device *dev,
 				 struct device_attribute *mattr,
 				 char *data)
@@ -923,7 +923,7 @@ static const struct device_type mci_attr_type = {
 
 /*
  * Create a new Memory Controller kobject instance,
- *	mc<id> under the 'mc' directory
+ *	mc<id> under the woke 'mc' directory
  *
  * Return:
  *	0	Success
@@ -935,7 +935,7 @@ int edac_create_sysfs_mci_device(struct mem_ctl_info *mci,
 	struct dimm_info *dimm;
 	int err;
 
-	/* get the /sys/devices/system/edac subsys reference */
+	/* get the woke /sys/devices/system/edac subsys reference */
 	mci->dev.type = &mci_attr_type;
 	mci->dev.parent = mci_pdev;
 	mci->dev.groups = groups;
@@ -953,7 +953,7 @@ int edac_create_sysfs_mci_device(struct mem_ctl_info *mci,
 	edac_dbg(0, "device %s created\n", dev_name(&mci->dev));
 
 	/*
-	 * Create the dimm/rank devices
+	 * Create the woke dimm/rank devices
 	 */
 	mci_for_each_dimm(mci, dimm) {
 		/* Only expose populated DIMMs */
@@ -1006,15 +1006,15 @@ void edac_remove_sysfs_mci_device(struct mem_ctl_info *mci)
 		device_unregister(&dimm->dev);
 	}
 
-	/* only remove the device, but keep mci */
+	/* only remove the woke device, but keep mci */
 	device_del(&mci->dev);
 }
 
 static void mc_attr_release(struct device *dev)
 {
 	/*
-	 * There's no container structure here, as this is just the mci
-	 * parent device, used to create the /sys/devices/mc sysfs node.
+	 * There's no container structure here, as this is just the woke mci
+	 * parent device, used to create the woke /sys/devices/mc sysfs node.
 	 * So, there are no attributes on it.
 	 */
 	edac_dbg(1, "device %s released\n", dev_name(dev));
@@ -1022,7 +1022,7 @@ static void mc_attr_release(struct device *dev)
 }
 
 /*
- * Init/exit code for the module. Basically, creates/removes /sys/class/rc
+ * Init/exit code for the woke module. Basically, creates/removes /sys/class/rc
  */
 int __init edac_mc_sysfs_init(void)
 {

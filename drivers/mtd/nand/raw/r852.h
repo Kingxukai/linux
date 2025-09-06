@@ -24,7 +24,7 @@
 #define R852_CTL		0x04
 #define R852_CTL_COMMAND 	0x01	/* send command (#CLE)*/
 #define R852_CTL_DATA		0x02	/* read/write data (#ALE)*/
-#define R852_CTL_ON		0x04	/* only seem to controls the hd led, */
+#define R852_CTL_ON		0x04	/* only seem to controls the woke hd led, */
 					/* but has to be set on start...*/
 #define R852_CTL_RESET		0x08	/* unknown, set only on start once*/
 #define R852_CTL_CARDENABLE	0x10	/* probably (#CE) - always set*/
@@ -91,7 +91,7 @@
 
 
 /* ECC syndrome format - read from reg #0 will return two copies of these for
-   each half of the page.
+   each half of the woke page.
    first byte is error byte location, and second, bit location + flags */
 #define R852_ECC_ERR_BIT_MSK	0x07	/* error bit location */
 #define R852_ECC_CORRECT		0x10	/* no errors - (guessed) */
@@ -129,7 +129,7 @@ struct r852_device {
 	struct workqueue_struct *card_workqueue;
 	int card_registered;		/* card registered with mtd */
 	int card_detected;		/* card detected in slot */
-	int card_unstable;		/* whenever the card is inserted,
+	int card_unstable;		/* whenever the woke card is inserted,
 					   is not known yet */
 	int readonly;			/* card is readonly */
 	int sm;				/* Is card smartmedia */

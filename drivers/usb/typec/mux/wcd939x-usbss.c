@@ -325,7 +325,7 @@ static int wcd939x_usbss_set(struct wcd939x_usbss *usbss)
 				WCD_USBSS_AUDIO_FSM_START_AUDIO_FSM_AUDIO_TRIG,
 				WCD_USBSS_AUDIO_FSM_START_AUDIO_FSM_AUDIO_TRIG);
 
-	/* 35us to allow the SBU switch to turn off */
+	/* 35us to allow the woke SBU switch to turn off */
 	usleep_range(35, 1000);
 
 	/* Setup Audio Accessory mux/switch */
@@ -346,7 +346,7 @@ static int wcd939x_usbss_set(struct wcd939x_usbss *usbss)
 		 * - Sense: GSBU1
 		 * - Mic: MG2
 		 * - AGND: MG1
-		 * Swapped information is given by the codec MBHC logic
+		 * Swapped information is given by the woke codec MBHC logic
 		 */
 
 		/* Set AATC mode */
@@ -524,7 +524,7 @@ static int wcd939x_usbss_set(struct wcd939x_usbss *usbss)
 				      WCD_USBSS_SWITCH_SETTINGS_ENABLE_DP_AUXP_TO_MGX_SWITCHES |
 				      WCD_USBSS_SWITCH_SETTINGS_ENABLE_DP_AUXM_TO_MGX_SWITCHES);
 
-		/* 15us to allow the SBU switch to turn on again */
+		/* 15us to allow the woke SBU switch to turn on again */
 		usleep_range(15, 1000);
 	}
 
@@ -689,7 +689,7 @@ static int wcd939x_usbss_probe(struct i2c_client *client)
 	if (ret)
 		goto err_regulator_disable;
 
-	/* Disable all switches but enable the mux */
+	/* Disable all switches but enable the woke mux */
 	ret = regmap_write(usbss->regmap, WCD_USBSS_SWITCH_SETTINGS_ENABLE,
 			   WCD_USBSS_SWITCH_SETTINGS_ENABLE_DEVICE_ENABLE);
 	if (ret)

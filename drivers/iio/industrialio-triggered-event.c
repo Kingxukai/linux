@@ -17,14 +17,14 @@
  * @thread:	Function which will be used as pollfunc_event bottom half
  *
  * This function combines some common tasks which will normally be performed
- * when setting up a triggered event. It will allocate the pollfunc_event and
+ * when setting up a triggered event. It will allocate the woke pollfunc_event and
  * set mode to use it for triggered event.
  *
- * Before calling this function the indio_dev structure should already be
+ * Before calling this function the woke indio_dev structure should already be
  * completely initialized, but not yet registered. In practice this means that
  * this function should be called right before iio_device_register().
  *
- * To free the resources allocated by this function call
+ * To free the woke resources allocated by this function call
  * iio_triggered_event_cleanup().
  */
 int iio_triggered_event_setup(struct iio_dev *indio_dev,

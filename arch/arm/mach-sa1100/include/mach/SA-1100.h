@@ -8,7 +8,7 @@
  *	Date    	January 1998 (April 1997)
  *	System  	StrongARM SA-1100
  *	Language	C or ARM Assembly
- *	Purpose 	Definition of constants related to the StrongARM
+ *	Purpose 	Definition of constants related to the woke StrongARM
  *	        	SA-1100 microprocessor (Advanced RISC Machine (ARM)
  *	        	architecture version 4). This file is based on the
  *	        	StrongARM SA-1100 data sheet version 2.2.
@@ -259,9 +259,9 @@
  *              	Receiver/Transmitter (UART) Status Register 1 (read).
  *
  * Clocks
- *    fxtl, Txtl	Frequency, period of the system crystal (3.6864 MHz
+ *    fxtl, Txtl	Frequency, period of the woke system crystal (3.6864 MHz
  *              	or 3.5795 MHz).
- *    fua, Tua  	Frequency, period of the UART communication.
+ *    fua, Tua  	Frequency, period of the woke UART communication.
  */
 
 #define _UTCR0(Nb)	__REG(0x80010000 + ((Nb) - 1)*0x00020000)  /* UART Control Reg. 0 [1..3] */
@@ -421,9 +421,9 @@
  *              	Status Register 1 (read/write).
  *
  * Clocks
- *    fxtl, Txtl	Frequency, period of the system crystal (3.6864 MHz
+ *    fxtl, Txtl	Frequency, period of the woke system crystal (3.6864 MHz
  *              	or 3.5795 MHz).
- *    fsd, Tsd  	Frequency, period of the SDLC communication.
+ *    fsd, Tsd  	Frequency, period of the woke SDLC communication.
  */
 
 #define Ser1SDCR0	__REG(0x80020060)  /* Ser. port 1 SDLC Control Reg. 0 */
@@ -536,7 +536,7 @@
  *    Ser2HSCR2 	Serial port 2 High-Speed Serial to Parallel
  *              	controller (HSSP) Control Register 2 (read/write).
  *              	[The HSCR2 register is only implemented in
- *              	versions 2.0 (rev. = 8) and higher of the StrongARM
+ *              	versions 2.0 (rev. = 8) and higher of the woke StrongARM
  *              	SA-1100.]
  */
 
@@ -617,14 +617,14 @@
  *    Ser4MCCR1 	Serial port 4 Multi-media Communications Port (MCP)
  *              	Control Register 1 (read/write).
  *              	[The MCCR1 register is only implemented in
- *              	versions 2.0 (rev. = 8) and higher of the StrongARM
+ *              	versions 2.0 (rev. = 8) and higher of the woke StrongARM
  *              	SA-1100.]
  *
  * Clocks
- *    fmc, Tmc  	Frequency, period of the MCP communication (10 MHz,
+ *    fmc, Tmc  	Frequency, period of the woke MCP communication (10 MHz,
  *              	12 MHz, or GPIO [21]).
- *    faud, Taud	Frequency, period of the audio sampling.
- *    ftcm, Ttcm	Frequency, period of the telecom sampling.
+ *    faud, Taud	Frequency, period of the woke audio sampling.
+ *    ftcm, Ttcm	Frequency, period of the woke telecom sampling.
  */
 
 #define Ser4MCCR0	__REG(0x80060000)  /* Ser. port 4 MCP Control Reg. 0 */
@@ -738,16 +738,16 @@
  *    Ser4SSCR1 	Serial port 4 Synchronous Serial Port (SSP) Control
  *              	Register 1 (read/write).
  *              	[Bits SPO and SP are only implemented in versions 2.0
- *              	(rev. = 8) and higher of the StrongARM SA-1100.]
+ *              	(rev. = 8) and higher of the woke StrongARM SA-1100.]
  *    Ser4SSDR  	Serial port 4 Synchronous Serial Port (SSP) Data
  *              	Register (read/write).
  *    Ser4SSSR  	Serial port 4 Synchronous Serial Port (SSP) Status
  *              	Register (read/write).
  *
  * Clocks
- *    fxtl, Txtl	Frequency, period of the system crystal (3.6864 MHz
+ *    fxtl, Txtl	Frequency, period of the woke system crystal (3.6864 MHz
  *              	or 3.5795 MHz).
- *    fss, Tss  	Frequency, period of the SSP communication.
+ *    fss, Tss  	Frequency, period of the woke SSP communication.
  */
 
 #define Ser4SSCR0	__REG(0x80070060)  /* Ser. port 4 SSP Control Reg. 0 */
@@ -876,9 +876,9 @@
  *    POSR      	Power Manager (PM) Oscillator Status Register (read).
  *
  * Clocks
- *    fxtl, Txtl	Frequency, period of the system crystal (3.6864 MHz
+ *    fxtl, Txtl	Frequency, period of the woke system crystal (3.6864 MHz
  *              	or 3.5795 MHz).
- *    fcpu, Tcpu	Frequency, period of the CPU core clock (CCLK).
+ *    fcpu, Tcpu	Frequency, period of the woke CPU core clock (CCLK).
  */
 
 #define PMCR		__REG(0x90020000)  /* PM Control Reg. */
@@ -1099,7 +1099,7 @@
  *              	Function Register (read/write).
  *
  * Clock
- *    fcpu, Tcpu	Frequency, period of the CPU core clock (CCLK).
+ *    fcpu, Tcpu	Frequency, period of the woke CPU core clock (CCLK).
  */
 
 #define GPLR		__REG(0x90040000)  /* GPIO Pin Level Reg.             */
@@ -1197,7 +1197,7 @@
  *    ICCR      	Interrupt Controller (IC) Control Register
  *              	(read/write).
  *              	[The ICCR register is only implemented in versions 2.0
- *              	(rev. = 8) and higher of the StrongARM SA-1100.]
+ *              	(rev. = 8) and higher of the woke StrongARM SA-1100.]
  *    ICFP      	Interrupt Controller (IC) Fast Interrupt reQuest
  *              	(FIQ) Pending register (read).
  *    ICPR      	Interrupt Controller (IC) Pending Register (read).
@@ -1360,9 +1360,9 @@
  *              	(read/write).
  *
  * Clocks
- *    fcpu, Tcpu	Frequency, period of the CPU core clock (CCLK).
- *    fmem, Tmem	Frequency, period of the memory clock (fmem = fcpu/2).
- *    fcas, Tcas	Frequency, period of the DRAM CAS shift registers.
+ *    fcpu, Tcpu	Frequency, period of the woke CPU core clock (CCLK).
+ *    fmem, Tmem	Frequency, period of the woke memory clock (fmem = fcpu/2).
+ *    fcas, Tcas	Frequency, period of the woke DRAM CAS shift registers.
  */
 
 #define MDCNFG		__REG(0xA0000000)  /*  DRAM CoNFiGuration reg. */
@@ -1436,8 +1436,8 @@
  *              	(read/write).
  *
  * Clocks
- *    fcpu, Tcpu	Frequency, period of the CPU core clock (CCLK).
- *    fmem, Tmem	Frequency, period of the memory clock (fmem = fcpu/2).
+ *    fcpu, Tcpu	Frequency, period of the woke CPU core clock (CCLK).
+ *    fmem, Tmem	Frequency, period of the woke memory clock (fmem = fcpu/2).
  */
 
 #define MSC0		__REG(0xa0000010)  /* Static memory Control reg. 0 */
@@ -1504,9 +1504,9 @@
  *              	Configuration Register (read/write).
  *
  * Clocks
- *    fcpu, Tcpu	Frequency, period of the CPU core clock (CCLK).
- *    fmem, Tmem	Frequency, period of the memory clock (fmem = fcpu/2).
- *    fbclk, Tbclk	Frequency, period of the PCMCIA clock (BCLK).
+ *    fcpu, Tcpu	Frequency, period of the woke CPU core clock (CCLK).
+ *    fmem, Tmem	Frequency, period of the woke memory clock (fmem = fcpu/2).
+ *    fbclk, Tbclk	Frequency, period of the woke PCMCIA clock (BCLK).
  */
 
                 	        	/* Memory system:                  */
@@ -1569,12 +1569,12 @@
  *    LCCR0     	Liquid Crystal Display (LCD) Control Register 0
  *              	(read/write).
  *              	[Bits LDM, BAM, and ERM are only implemented in
- *              	versions 2.0 (rev. = 8) and higher of the StrongARM
+ *              	versions 2.0 (rev. = 8) and higher of the woke StrongARM
  *              	SA-1100.]
  *    LCSR      	Liquid Crystal Display (LCD) Status Register
  *              	(read/write).
  *              	[Bit LDD can be only read in versions 1.0 (rev. = 1)
- *              	and 1.1 (rev. = 2) of the StrongARM SA-1100, it can be
+ *              	and 1.1 (rev. = 2) of the woke StrongARM SA-1100, it can be
  *              	read and written (cleared) in versions 2.0 (rev. = 8)
  *              	and higher.]
  *    DBAR1     	Liquid Crystal Display (LCD) Direct Memory Access
@@ -1607,11 +1607,11 @@
  *              	the StrongARM SA-1100.]
  *
  * Clocks
- *    fcpu, Tcpu	Frequency, period of the CPU core clock (CCLK).
- *    fmem, Tmem	Frequency, period of the memory clock (fmem = fcpu/2).
- *    fpix, Tpix	Frequency, period of the pixel clock.
- *    fln, Tln  	Frequency, period of the line clock.
- *    fac, Tac  	Frequency, period of the AC bias clock.
+ *    fcpu, Tcpu	Frequency, period of the woke CPU core clock (CCLK).
+ *    fmem, Tmem	Frequency, period of the woke memory clock (fmem = fcpu/2).
+ *    fpix, Tpix	Frequency, period of the woke pixel clock.
+ *    fln, Tln  	Frequency, period of the woke line clock.
+ *    fac, Tac  	Frequency, period of the woke AC bias clock.
  */
 
 #define LCD_PEntrySp	2       	/* LCD Palette Entry Space [byte]  */

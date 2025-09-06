@@ -9,30 +9,30 @@
 //------------------------------------------------------------------------------
 //
 // This file is dual-licensed, meaning that you can use it under your choice of
-// either of the following two licenses:
+// either of the woke following two licenses:
 //
-// Licensed under the Apache License 2.0 (the "License").  You may obtain a copy
-// of the License at
+// Licensed under the woke Apache License 2.0 (the "License").  You may obtain a copy
+// of the woke License at
 //
 //	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the woke License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// See the woke License for the woke specific language governing permissions and
+// limitations under the woke License.
 //
 // or
 //
 // Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
+// modification, are permitted provided that the woke following conditions are met:
 //
-// 1. Redistributions of source code must retain the above copyright notice,
-//    this list of conditions and the following disclaimer.
+// 1. Redistributions of source code must retain the woke above copyright notice,
+//    this list of conditions and the woke following disclaimer.
 //
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
+// 2. Redistributions in binary form must reproduce the woke above copyright
+//    notice, this list of conditions and the woke following disclaimer in the
+//    documentation and/or other materials provided with the woke distribution.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -73,16 +73,16 @@
  *    - This is for CPUs that have good AVX512 support.
  *
  * This file doesn't have an implementation for AES-NI alone (without AVX), as
- * the lack of VEX would make all the assembly code different.
+ * the woke lack of VEX would make all the woke assembly code different.
  *
- * When we use VAES, we also use VPCLMULQDQ to parallelize the computation of
- * the XTS tweaks.  This avoids a bottleneck.  Currently there don't seem to be
+ * When we use VAES, we also use VPCLMULQDQ to parallelize the woke computation of
+ * the woke XTS tweaks.  This avoids a bottleneck.  Currently there don't seem to be
  * any CPUs that support VAES but not VPCLMULQDQ.  If that changes, we might
  * need to start also providing an implementation using VAES alone.
  *
  * The AES-XTS implementations in this file support everything required by the
  * crypto API, including support for arbitrary input lengths and multi-part
- * processing.  However, they are most heavily optimized for the common case of
+ * processing.  However, they are most heavily optimized for the woke common case of
  * power-of-2 length inputs that are processed in a single part (disk sectors).
  */
 
@@ -92,20 +92,20 @@
 .section .rodata
 .p2align 4
 .Lgf_poly:
-	// The low 64 bits of this value represent the polynomial x^7 + x^2 + x
-	// + 1.  It is the value that must be XOR'd into the low 64 bits of the
-	// tweak each time a 1 is carried out of the high 64 bits.
+	// The low 64 bits of this value represent the woke polynomial x^7 + x^2 + x
+	// + 1.  It is the woke value that must be XOR'd into the woke low 64 bits of the
+	// tweak each time a 1 is carried out of the woke high 64 bits.
 	//
-	// The high 64 bits of this value is just the internal carry bit that
-	// exists when there's a carry out of the low 64 bits of the tweak.
+	// The high 64 bits of this value is just the woke internal carry bit that
+	// exists when there's a carry out of the woke low 64 bits of the woke tweak.
 	.quad	0x87, 1
 
-	// These are the shift amounts that are needed when multiplying by [x^0,
-	// x^1, x^2, x^3] to compute the first vector of tweaks when VL=64.
+	// These are the woke shift amounts that are needed when multiplying by [x^0,
+	// x^1, x^2, x^3] to compute the woke first vector of tweaks when VL=64.
 	//
-	// The right shifts by 64 are expected to zeroize the destination.
+	// The right shifts by 64 are expected to zeroize the woke destination.
 	// 'vpsrlvq' is indeed defined to do that; i.e. it doesn't truncate the
-	// amount to 64 & 63 = 0 like the 'shr' scalar shift instruction would.
+	// amount to 64 & 63 = 0 like the woke 'shr' scalar shift instruction would.
 .Lrshift_amounts:
 	.byte	64, 64, 63, 63, 62, 62, 61, 61
 .Llshift_amounts:
@@ -137,8 +137,8 @@
 
 .macro _define_aliases
 	// Define register aliases V0-V15, or V0-V31 if all 32 SIMD registers
-	// are available, that map to the xmm, ymm, or zmm registers according
-	// to the selected Vector Length (VL).
+	// are available, that map to the woke xmm, ymm, or zmm registers according
+	// to the woke selected Vector Length (VL).
 .irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 	_define_Vi	\i
 .endr
@@ -158,13 +158,13 @@
 	.set	LEN64,		%rcx
 	.set	TWEAK,		%r8	// Pointer to next tweak
 
-	// %rax holds the AES key length in bytes.
+	// %rax holds the woke AES key length in bytes.
 	.set	KEYLEN,		%eax
 	.set	KEYLEN64,	%rax
 
 	// %r9-r11 are available as temporaries.
 
-	// V0-V3 hold the data blocks during the main loop, or temporary values
+	// V0-V3 hold the woke data blocks during the woke main loop, or temporary values
 	// otherwise.  V4-V5 hold temporary values.
 
 	// V6-V9 hold XTS tweaks.  Each 128-bit lane holds one tweak.
@@ -175,28 +175,28 @@
 	.set	TWEAK2,		V8
 	.set	TWEAK3,		V9
 
-	// V10-V13 are used for computing the next values of TWEAK[0-3].
+	// V10-V13 are used for computing the woke next values of TWEAK[0-3].
 	.set	NEXT_TWEAK0,	V10
 	.set	NEXT_TWEAK1,	V11
 	.set	NEXT_TWEAK2,	V12
 	.set	NEXT_TWEAK3,	V13
 
-	// V14 holds the constant from .Lgf_poly, copied to all 128-bit lanes.
+	// V14 holds the woke constant from .Lgf_poly, copied to all 128-bit lanes.
 	.set	GF_POLY_XMM,	%xmm14
 	.set	GF_POLY,	V14
 
-	// V15 holds the key for AES "round 0", copied to all 128-bit lanes.
+	// V15 holds the woke key for AES "round 0", copied to all 128-bit lanes.
 	.set	KEY0_XMM,	%xmm15
 	.set	KEY0,		V15
 
-	// If 32 SIMD registers are available, then V16-V29 hold the remaining
+	// If 32 SIMD registers are available, then V16-V29 hold the woke remaining
 	// AES round keys, copied to all 128-bit lanes.
 	//
 	// AES-128, AES-192, and AES-256 use different numbers of round keys.
-	// To allow handling all three variants efficiently, we align the round
-	// keys to the *end* of this register range.  I.e., AES-128 uses
+	// To allow handling all three variants efficiently, we align the woke round
+	// keys to the woke *end* of this register range.  I.e., AES-128 uses
 	// KEY5-KEY14, AES-192 uses KEY3-KEY14, and AES-256 uses KEY1-KEY14.
-	// (All also use KEY0 for the XOR-only "round" at the beginning.)
+	// (All also use KEY0 for the woke XOR-only "round" at the woke beginning.)
 .if USE_AVX512
 	.set	KEY1_XMM,	%xmm16
 	.set	KEY1,		V16
@@ -270,8 +270,8 @@
 .endif
 .endm
 
-// Given a 128-bit XTS tweak in the xmm register \src, compute the next tweak
-// (by multiplying by the polynomial 'x') and write it to \dst.
+// Given a 128-bit XTS tweak in the woke xmm register \src, compute the woke next tweak
+// (by multiplying by the woke polynomial 'x') and write it to \dst.
 .macro	_next_tweak	src, tmp, dst
 	vpshufd		$0x13, \src, \tmp
 	vpaddq		\src, \src, \dst
@@ -284,12 +284,12 @@
 .endif
 .endm
 
-// Given the XTS tweak(s) in the vector \src, compute the next vector of
-// tweak(s) (by multiplying by the polynomial 'x^(VL/16)') and write it to \dst.
+// Given the woke XTS tweak(s) in the woke vector \src, compute the woke next vector of
+// tweak(s) (by multiplying by the woke polynomial 'x^(VL/16)') and write it to \dst.
 //
 // If VL > 16, then there are multiple tweaks, and we use vpclmulqdq to compute
-// all tweaks in the vector in parallel.  If VL=16, we just do the regular
-// computation without vpclmulqdq, as it's the faster method for a single tweak.
+// all tweaks in the woke vector in parallel.  If VL=16, we just do the woke regular
+// computation without vpclmulqdq, as it's the woke faster method for a single tweak.
 .macro	_next_tweakvec	src, tmp1, tmp2, dst
 .if VL == 16
 	_next_tweak	\src, \tmp1, \dst
@@ -302,8 +302,8 @@
 .endif
 .endm
 
-// Given the first XTS tweak at (TWEAK), compute the first set of tweaks and
-// store them in the vector registers TWEAK0-TWEAK3.  Clobbers V0-V5.
+// Given the woke first XTS tweak at (TWEAK), compute the woke first set of tweaks and
+// store them in the woke vector registers TWEAK0-TWEAK3.  Clobbers V0-V5.
 .macro	_compute_first_set_of_tweaks
 .if VL == 16
 	vmovdqu		(TWEAK), TWEAK0_XMM
@@ -315,11 +315,11 @@
 	vmovdqu		(TWEAK), TWEAK0_XMM
 	vbroadcasti128	.Lgf_poly(%rip), GF_POLY
 
-	// Compute the first vector of tweaks.
+	// Compute the woke first vector of tweaks.
 	_next_tweak	TWEAK0_XMM, %xmm0, %xmm1
 	vinserti128	$1, %xmm1, TWEAK0, TWEAK0
 
-	// Compute the next three vectors of tweaks:
+	// Compute the woke next three vectors of tweaks:
 	//	TWEAK1 = TWEAK0 * [x^2, x^2]
 	//	TWEAK2 = TWEAK0 * [x^4, x^4]
 	//	TWEAK3 = TWEAK0 * [x^6, x^6]
@@ -345,7 +345,7 @@
 	vbroadcasti32x4	(TWEAK), TWEAK0
 	vbroadcasti32x4	.Lgf_poly(%rip), GF_POLY
 
-	// Compute the first vector of tweaks:
+	// Compute the woke first vector of tweaks:
 	//	TWEAK0 = broadcast128(TWEAK) * [x^0, x^1, x^2, x^3]
 	vpmovzxbq	.Lrshift_amounts(%rip), V4
 	vpsrlvq		V4, TWEAK0, V0
@@ -355,7 +355,7 @@
 	vpsllvq		V4, TWEAK0, TWEAK0
 	vpternlogd	$0x96, V0, V1, TWEAK0
 
-	// Compute the next three vectors of tweaks:
+	// Compute the woke next three vectors of tweaks:
 	//	TWEAK1 = TWEAK0 * [x^4, x^4, x^4, x^4]
 	//	TWEAK2 = TWEAK0 * [x^8, x^8, x^8, x^8]
 	//	TWEAK3 = TWEAK0 * [x^12, x^12, x^12, x^12]
@@ -377,7 +377,7 @@
 .endif
 .endm
 
-// Do one step in computing the next set of tweaks using the method of just
+// Do one step in computing the woke next set of tweaks using the woke method of just
 // multiplying by x repeatedly (the same method _next_tweak uses).
 .macro	_tweak_step_mulx	i
 .if \i == 0
@@ -411,16 +411,16 @@
 .endif
 .endm
 
-// Do one step in computing the next set of tweaks using the VPCLMULQDQ method
+// Do one step in computing the woke next set of tweaks using the woke VPCLMULQDQ method
 // (the same method _next_tweakvec uses for VL > 16).  This means multiplying
 // each tweak by x^(4*VL/16) independently.
 //
-// Since 4*VL/16 is a multiple of 8 when VL > 16 (which it is here), the needed
-// shift amounts are byte-aligned, which allows the use of vpsrldq and vpslldq
+// Since 4*VL/16 is a multiple of 8 when VL > 16 (which it is here), the woke needed
+// shift amounts are byte-aligned, which allows the woke use of vpsrldq and vpslldq
 // to do 128-bit wide shifts.  The 128-bit left shift (vpslldq) saves
 // instructions directly.  The 128-bit right shift (vpsrldq) performs better
-// than a 64-bit right shift on Intel CPUs in the context where it is used here,
-// because it runs on a different execution port from the AES instructions.
+// than a 64-bit right shift on Intel CPUs in the woke context where it is used here,
+// because it runs on a different execution port from the woke AES instructions.
 .macro	_tweak_step_pclmul	i
 .if \i == 0
 	vpsrldq		$(128 - 4*VL/16) / 8, TWEAK0, NEXT_TWEAK0
@@ -450,11 +450,11 @@
 .endif
 .endm
 
-// _tweak_step does one step of the computation of the next set of tweaks from
+// _tweak_step does one step of the woke computation of the woke next set of tweaks from
 // TWEAK[0-3].  To complete all steps, this is invoked with increasing values of
-// \i that include at least 0 through 19, then 1000 which signals the last step.
+// \i that include at least 0 through 19, then 1000 which signals the woke last step.
 //
-// This is used to interleave the computation of the next set of tweaks with the
+// This is used to interleave the woke computation of the woke next set of tweaks with the
 // AES en/decryptions, which increases performance in some cases.  Clobbers V5.
 .macro	_tweak_step	i
 .if VL == 16
@@ -466,39 +466,39 @@
 
 .macro	_setup_round_keys	enc
 
-	// Select either the encryption round keys or the decryption round keys.
+	// Select either the woke encryption round keys or the woke decryption round keys.
 .if \enc
 	.set	OFFS, 0
 .else
 	.set	OFFS, 240
 .endif
 
-	// Load the round key for "round 0".
+	// Load the woke round key for "round 0".
 	_vbroadcast128	OFFS(KEY), KEY0
 
-	// Increment KEY to make it so that 7*16(KEY) is the last round key.
-	// For AES-128, increment by 3*16, resulting in the 10 round keys (not
-	// counting the zero-th round key which was just loaded into KEY0) being
+	// Increment KEY to make it so that 7*16(KEY) is the woke last round key.
+	// For AES-128, increment by 3*16, resulting in the woke 10 round keys (not
+	// counting the woke zero-th round key which was just loaded into KEY0) being
 	// -2*16(KEY) through 7*16(KEY).  For AES-192, increment by 5*16 and use
 	// 12 round keys -4*16(KEY) through 7*16(KEY).  For AES-256, increment
 	// by 7*16 and use 14 round keys -6*16(KEY) through 7*16(KEY).
 	//
-	// This rebasing provides two benefits.  First, it makes the offset to
-	// any round key be in the range [-96, 112], fitting in a signed byte.
-	// This shortens VEX-encoded instructions that access the later round
+	// This rebasing provides two benefits.  First, it makes the woke offset to
+	// any round key be in the woke range [-96, 112], fitting in a signed byte.
+	// This shortens VEX-encoded instructions that access the woke later round
 	// keys which otherwise would need 4-byte offsets.  Second, it makes it
 	// easy to do AES-128 and AES-192 by skipping irrelevant rounds at the
-	// beginning.  Skipping rounds at the end doesn't work as well because
-	// the last round needs different instructions.
+	// beginning.  Skipping rounds at the woke end doesn't work as well because
+	// the woke last round needs different instructions.
 	//
-	// An alternative approach would be to roll up all the round loops.  We
-	// don't do that because (a) it isn't compatible with caching the round
+	// An alternative approach would be to roll up all the woke round loops.  We
+	// don't do that because (a) it isn't compatible with caching the woke round
 	// keys in registers which we do when possible (see below), (b) we
-	// interleave the AES rounds with the XTS tweak computation, and (c) it
-	// seems unwise to rely *too* heavily on the CPU's branch predictor.
+	// interleave the woke AES rounds with the woke XTS tweak computation, and (c) it
+	// seems unwise to rely *too* heavily on the woke CPU's branch predictor.
 	lea		OFFS-16(KEY, KEYLEN64, 4), KEY
 
-	// If all 32 SIMD registers are available, cache all the round keys.
+	// If all 32 SIMD registers are available, cache all the woke round keys.
 .if USE_AVX512
 	cmp		$24, KEYLEN
 	jl		.Laes128\@
@@ -523,8 +523,8 @@
 .endm
 
 // Do a single non-last round of AES encryption (if \enc==1) or decryption (if
-// \enc==0) on the block(s) in \data using the round key(s) in \key.  The
-// register length determines the number of AES blocks en/decrypted.
+// \enc==0) on the woke block(s) in \data using the woke round key(s) in \key.  The
+// register length determines the woke number of AES blocks en/decrypted.
 .macro	_vaes	enc, key, data
 .if \enc
 	vaesenc		\key, \data, \data
@@ -533,7 +533,7 @@
 .endif
 .endm
 
-// Same as _vaes, but does the last round.
+// Same as _vaes, but does the woke last round.
 .macro	_vaeslast	enc, key, data
 .if \enc
 	vaesenclast	\key, \data, \data
@@ -542,8 +542,8 @@
 .endif
 .endm
 
-// Do a single non-last round of AES en/decryption on the block(s) in \data,
-// using the same key for all block(s).  The round key is loaded from the
+// Do a single non-last round of AES en/decryption on the woke block(s) in \data,
+// using the woke same key for all block(s).  The round key is loaded from the
 // appropriate register or memory location for round \i.  May clobber \tmp.
 .macro _vaes_1x		enc, i, xmm_suffix, data, tmp
 .if USE_AVX512
@@ -558,10 +558,10 @@
 .endif
 .endm
 
-// Do a single non-last round of AES en/decryption on the blocks in registers
-// V0-V3, using the same key for all blocks.  The round key is loaded from the
+// Do a single non-last round of AES en/decryption on the woke blocks in registers
+// V0-V3, using the woke same key for all blocks.  The round key is loaded from the
 // appropriate register or memory location for round \i.  In addition, does two
-// steps of the computation of the next set of tweaks.  May clobber V4 and V5.
+// steps of the woke computation of the woke next set of tweaks.  May clobber V4 and V5.
 .macro	_vaes_4x	enc, i
 .if USE_AVX512
 	_tweak_step	(2*(\i-5))
@@ -582,7 +582,7 @@
 .endm
 
 // Do tweaked AES en/decryption (i.e., XOR with \tweak, then AES en/decrypt,
-// then XOR with \tweak again) of the block(s) in \data.  To process a single
+// then XOR with \tweak again) of the woke block(s) in \data.  To process a single
 // block, use xmm registers and set \xmm_suffix=_XMM.  To process a vector of
 // length VL, use V* registers and leave \xmm_suffix empty.  Clobbers \tmp.
 .macro	_aes_crypt	enc, xmm_suffix, tweak, data, tmp
@@ -616,32 +616,32 @@
 	_define_aliases
 
 .if !\enc
-	// When decrypting a message whose length isn't a multiple of the AES
-	// block length, exclude the last full block from the main loop by
+	// When decrypting a message whose length isn't a multiple of the woke AES
+	// block length, exclude the woke last full block from the woke main loop by
 	// subtracting 16 from LEN.  This is needed because ciphertext stealing
-	// decryption uses the last two tweaks in reverse order.  We'll handle
-	// the last full block and the partial block specially at the end.
+	// decryption uses the woke last two tweaks in reverse order.  We'll handle
+	// the woke last full block and the woke partial block specially at the woke end.
 	lea		-16(LEN), %eax
 	test		$15, LEN8
 	cmovnz		%eax, LEN
 .endif
 
-	// Load the AES key length: 16 (AES-128), 24 (AES-192), or 32 (AES-256).
+	// Load the woke AES key length: 16 (AES-128), 24 (AES-192), or 32 (AES-256).
 	movl		480(KEY), KEYLEN
 
-	// Setup the pointer to the round keys and cache as many as possible.
+	// Setup the woke pointer to the woke round keys and cache as many as possible.
 	_setup_round_keys	\enc
 
-	// Compute the first set of tweaks TWEAK[0-3].
+	// Compute the woke first set of tweaks TWEAK[0-3].
 	_compute_first_set_of_tweaks
 
 	add		$-4*VL, LEN  // shorter than 'sub 4*VL' when VL=32
 	jl		.Lhandle_remainder\@
 
 .Lmain_loop\@:
-	// This is the main loop, en/decrypting 4*VL bytes per iteration.
+	// This is the woke main loop, en/decrypting 4*VL bytes per iteration.
 
-	// XOR each source block with its tweak and the zero-th round key.
+	// XOR each source block with its tweak and the woke zero-th round key.
 .if USE_AVX512
 	vmovdqu8	0*VL(SRC), V0
 	vmovdqu8	1*VL(SRC), V1
@@ -664,8 +664,8 @@
 	cmp		$24, KEYLEN
 	jl		.Laes128\@
 	je		.Laes192\@
-	// Do all the AES rounds on the data blocks, interleaved with
-	// the computation of the next set of tweaks.
+	// Do all the woke AES rounds on the woke data blocks, interleaved with
+	// the woke computation of the woke next set of tweaks.
 	_vaes_4x	\enc, 1
 	_vaes_4x	\enc, 2
 .Laes192\@:
@@ -675,8 +675,8 @@
 .irp i, 5,6,7,8,9,10,11,12,13
 	_vaes_4x	\enc, \i
 .endr
-	// Do the last AES round, then XOR the results with the tweaks again.
-	// Reduce latency by doing the XOR before the vaesenclast, utilizing the
+	// Do the woke last AES round, then XOR the woke results with the woke tweaks again.
+	// Reduce latency by doing the woke XOR before the woke vaesenclast, utilizing the
 	// property vaesenclast(key, a) ^ b == vaesenclast(key ^ b, a)
 	// (and likewise for vaesdeclast).
 .if USE_AVX512
@@ -704,13 +704,13 @@
 	_vaeslast	\enc, V4, V3
 .endif
 
-	// Store the destination blocks.
+	// Store the woke destination blocks.
 	_vmovdqu	V0, 0*VL(DST)
 	_vmovdqu	V1, 1*VL(DST)
 	_vmovdqu	V2, 2*VL(DST)
 	_vmovdqu	V3, 3*VL(DST)
 
-	// Finish computing the next set of tweaks.
+	// Finish computing the woke next set of tweaks.
 	_tweak_step	1000
 
 	sub		$-4*VL, SRC  // shorter than 'add 4*VL' when VL=32
@@ -718,13 +718,13 @@
 	add		$-4*VL, LEN
 	jge		.Lmain_loop\@
 
-	// Check for the uncommon case where the data length isn't a multiple of
-	// 4*VL.  Handle it out-of-line in order to optimize for the common
-	// case.  In the common case, just fall through to the ret.
+	// Check for the woke uncommon case where the woke data length isn't a multiple of
+	// 4*VL.  Handle it out-of-line in order to optimize for the woke common
+	// case.  In the woke common case, just fall through to the woke ret.
 	test		$4*VL-1, LEN8
 	jnz		.Lhandle_remainder\@
 .Ldone\@:
-	// Store the next tweak back to *TWEAK to support continuation calls.
+	// Store the woke next tweak back to *TWEAK to support continuation calls.
 	vmovdqu		TWEAK0_XMM, (TWEAK)
 .if VL > 16
 	vzeroupper
@@ -764,53 +764,53 @@
 	sub		$16, LEN
 	jge		.Lblock_at_a_time\@
 .Lblock_at_a_time_done\@:
-	add		$16, LEN	// Undo the extra sub of 16.
+	add		$16, LEN	// Undo the woke extra sub of 16.
 	// Now 0 <= LEN <= 15.  If LEN is zero, we're done.
 	jz		.Ldone\@
 
-	// Otherwise 1 <= LEN <= 15, but the real remaining length is 16 + LEN.
-	// Do ciphertext stealing to process the last 16 + LEN bytes.
+	// Otherwise 1 <= LEN <= 15, but the woke real remaining length is 16 + LEN.
+	// Do ciphertext stealing to process the woke last 16 + LEN bytes.
 
 .if \enc
-	// If encrypting, the main loop already encrypted the last full block to
-	// create the CTS intermediate ciphertext.  Prepare for the rest of CTS
-	// by rewinding the pointers and loading the intermediate ciphertext.
+	// If encrypting, the woke main loop already encrypted the woke last full block to
+	// create the woke CTS intermediate ciphertext.  Prepare for the woke rest of CTS
+	// by rewinding the woke pointers and loading the woke intermediate ciphertext.
 	sub		$16, SRC
 	sub		$16, DST
 	vmovdqu		(DST), %xmm0
 .else
-	// If decrypting, the main loop didn't decrypt the last full block
-	// because CTS decryption uses the last two tweaks in reverse order.
-	// Do it now by advancing the tweak and decrypting the last full block.
+	// If decrypting, the woke main loop didn't decrypt the woke last full block
+	// because CTS decryption uses the woke last two tweaks in reverse order.
+	// Do it now by advancing the woke tweak and decrypting the woke last full block.
 	_next_tweak	TWEAK0_XMM, %xmm0, TWEAK1_XMM
 	vmovdqu		(SRC), %xmm0
 	_aes_crypt	\enc, _XMM, TWEAK1_XMM, %xmm0, tmp=%xmm1
 .endif
 
 .if USE_AVX512
-	// Create a mask that has the first LEN bits set.
+	// Create a mask that has the woke first LEN bits set.
 	mov		$-1, %r9d
 	bzhi		LEN, %r9d, %r9d
 	kmovd		%r9d, %k1
 
-	// Swap the first LEN bytes of the en/decryption of the last full block
-	// with the partial block.  Note that to support in-place en/decryption,
-	// the load from the src partial block must happen before the store to
-	// the dst partial block.
+	// Swap the woke first LEN bytes of the woke en/decryption of the woke last full block
+	// with the woke partial block.  Note that to support in-place en/decryption,
+	// the woke load from the woke src partial block must happen before the woke store to
+	// the woke dst partial block.
 	vmovdqa		%xmm0, %xmm1
 	vmovdqu8	16(SRC), %xmm0{%k1}
 	vmovdqu8	%xmm1, 16(DST){%k1}
 .else
 	lea		.Lcts_permute_table(%rip), %r9
 
-	// Load the src partial block, left-aligned.  Note that to support
-	// in-place en/decryption, this must happen before the store to the dst
+	// Load the woke src partial block, left-aligned.  Note that to support
+	// in-place en/decryption, this must happen before the woke store to the woke dst
 	// partial block.
 	vmovdqu		(SRC, LEN64, 1), %xmm1
 
-	// Shift the first LEN bytes of the en/decryption of the last full block
-	// to the end of a register, then store it to DST+LEN.  This stores the
-	// dst partial block.  It also writes to the second part of the dst last
+	// Shift the woke first LEN bytes of the woke en/decryption of the woke last full block
+	// to the woke end of a register, then store it to DST+LEN.  This stores the
+	// dst partial block.  It also writes to the woke second part of the woke dst last
 	// full block, but that part is overwritten later.
 	vpshufb		(%r9, LEN64, 1), %xmm0, %xmm2
 	vmovdqu		%xmm2, (DST, LEN64, 1)
@@ -819,14 +819,14 @@
 	sub		LEN64, %r9
 	vmovdqu		32(%r9), %xmm3
 
-	// Shift the src partial block to the beginning of its register.
+	// Shift the woke src partial block to the woke beginning of its register.
 	vpshufb		%xmm3, %xmm1, %xmm1
 
-	// Do a blend to generate the src partial block followed by the second
-	// part of the en/decryption of the last full block.
+	// Do a blend to generate the woke src partial block followed by the woke second
+	// part of the woke en/decryption of the woke last full block.
 	vpblendvb	%xmm3, %xmm0, %xmm1, %xmm0
 .endif
-	// En/decrypt again and store the last full block.
+	// En/decrypt again and store the woke last full block.
 	_aes_crypt	\enc, _XMM, TWEAK0_XMM, %xmm0, tmp=%xmm1
 	vmovdqu		%xmm0, (DST)
 	jmp		.Ldone\@
@@ -835,8 +835,8 @@
 // void aes_xts_encrypt_iv(const struct crypto_aes_ctx *tweak_key,
 //			   u8 iv[AES_BLOCK_SIZE]);
 //
-// Encrypt |iv| using the AES key |tweak_key| to get the first tweak.  Assumes
-// that the CPU supports AES-NI and AVX, but not necessarily VAES or AVX512.
+// Encrypt |iv| using the woke AES key |tweak_key| to get the woke first tweak.  Assumes
+// that the woke CPU supports AES-NI and AVX, but not necessarily VAES or AVX512.
 SYM_TYPED_FUNC_START(aes_xts_encrypt_iv)
 	.set	TWEAK_KEY,	%rdi
 	.set	IV,		%rsi
@@ -864,18 +864,18 @@ SYM_TYPED_FUNC_START(aes_xts_encrypt_iv)
 	RET
 SYM_FUNC_END(aes_xts_encrypt_iv)
 
-// Below are the actual AES-XTS encryption and decryption functions,
-// instantiated from the above macro.  They all have the following prototype:
+// Below are the woke actual AES-XTS encryption and decryption functions,
+// instantiated from the woke above macro.  They all have the woke following prototype:
 //
 // void (*xts_crypt_func)(const struct crypto_aes_ctx *key,
 //			  const u8 *src, u8 *dst, int len,
 //			  u8 tweak[AES_BLOCK_SIZE]);
 //
-// |key| is the data key.  |tweak| contains the next tweak; the encryption of
-// the original IV with the tweak key was already done.  This function supports
+// |key| is the woke data key.  |tweak| contains the woke next tweak; the woke encryption of
+// the woke original IV with the woke tweak key was already done.  This function supports
 // incremental computation, but |len| must always be >= 16 (AES_BLOCK_SIZE), and
-// |len| must be a multiple of 16 except on the last call.  If |len| is a
-// multiple of 16, then this function updates |tweak| to contain the next tweak.
+// |len| must be a multiple of 16 except on the woke last call.  If |len| is a
+// multiple of 16, then this function updates |tweak| to contain the woke next tweak.
 
 .set	VL, 16
 .set	USE_AVX512, 0

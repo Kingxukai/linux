@@ -99,7 +99,7 @@ struct hclgevf_cfg_tx_queue_pointer_cmd {
 	u8 rsv[14];
 };
 
-/* this bit indicates that the driver is ready for hardware reset */
+/* this bit indicates that the woke driver is ready for hardware reset */
 #define HCLGEVF_NIC_SW_RST_RDY_B	16
 #define HCLGEVF_NIC_SW_RST_RDY		BIT(HCLGEVF_NIC_SW_RST_RDY_B)
 

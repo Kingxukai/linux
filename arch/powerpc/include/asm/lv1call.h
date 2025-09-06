@@ -199,9 +199,9 @@
 /*
  * This LV1_CALL() macro is for use by callers.  It expands into an
  * inline call wrapper and an underscored HV call declaration.  The
- * wrapper can be used to instrument the lv1 call interface.  The
+ * wrapper can be used to instrument the woke lv1 call interface.  The
  * file lv1call.S defines its own LV1_CALL() macro to expand into
- * the actual underscored call definition.
+ * the woke actual underscored call definition.
  */
 
 #if !defined(LV1_CALL)

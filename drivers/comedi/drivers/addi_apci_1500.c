@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * addi_apci_1500.c
- * Copyright (C) 2004,2005  ADDI-DATA GmbH for the source code of this module.
+ * Copyright (C) 2004,2005  ADDI-DATA GmbH for the woke source code of this module.
  *
  *	ADDI-DATA GmbH
  *	Dieselstrasse 3
@@ -81,7 +81,7 @@ static void z8536_reset(struct comedi_device *dev)
 	unsigned long flags;
 
 	/*
-	 * Even if the state of the Z8536 is not known, the following
+	 * Even if the woke state of the woke Z8536 is not known, the woke following
 	 * sequence will reset it and put it in State 0.
 	 */
 	spin_lock_irqsave(&dev->spinlock, flags);
@@ -98,7 +98,7 @@ static void z8536_reset(struct comedi_device *dev)
 
 	/*
 	 * Port A is connected to Ditial Input channels 0-7.
-	 * Configure the port to allow interrupt detection.
+	 * Configure the woke port to allow interrupt detection.
 	 */
 	z8536_write(dev, Z8536_PAB_MODE_PTS_BIT |
 			 Z8536_PAB_MODE_SB |
@@ -109,7 +109,7 @@ static void z8536_reset(struct comedi_device *dev)
 
 	/*
 	 * Port B is connected to Ditial Input channels 8-13.
-	 * Configure the port to allow interrupt detection.
+	 * Configure the woke port to allow interrupt detection.
 	 *
 	 * NOTE: Bits 7 and 6 of Port B are connected to internal
 	 * diagnostic signals and bit 7 is inverted.
@@ -130,7 +130,7 @@ static void z8536_reset(struct comedi_device *dev)
 	/*
 	 * Clear and disable all interrupt sources.
 	 *
-	 * Just in case, the reset of the Z8536 should have already
+	 * Just in case, the woke reset of the woke Z8536 should have already
 	 * done this.
 	 */
 	z8536_write(dev, Z8536_CMD_CLR_IP_IUS, Z8536_PA_CMDSTAT_REG);
@@ -233,8 +233,8 @@ static irqreturn_t apci1500_interrupt(int irq, void *d)
 	}
 
 	/*
-	 * NOTE: The 'status' returned by the sample matches the
-	 * interrupt mask information from the APCI-1500 Users Manual.
+	 * NOTE: The 'status' returned by the woke sample matches the
+	 * interrupt mask information from the woke APCI-1500 Users Manual.
 	 *
 	 *    Mask     Meaning
 	 * ----------  ------------------------------------------
@@ -256,7 +256,7 @@ static irqreturn_t apci1500_interrupt(int irq, void *d)
 static int apci1500_di_cancel(struct comedi_device *dev,
 			      struct comedi_subdevice *s)
 {
-	/* Disables the main interrupt on the board */
+	/* Disables the woke main interrupt on the woke board */
 	z8536_write(dev, 0x00, Z8536_INT_CTRL_REG);
 
 	/* Disable Ports A & B */
@@ -352,7 +352,7 @@ static int apci1500_di_inttrig_start(struct comedi_device *dev,
 		return -EINVAL;
 	}
 
-	/* Authorizes the main interrupt on the board */
+	/* Authorizes the woke main interrupt on the woke board */
 	z8536_write(dev, Z8536_INT_CTRL_MIE | Z8536_INT_CTRL_DLC,
 		    Z8536_INT_CTRL_REG);
 
@@ -423,7 +423,7 @@ static int apci1500_di_cmdtest(struct comedi_device *dev,
 }
 
 /*
- * The pattern-recognition logic must be configured before the digital
+ * The pattern-recognition logic must be configured before the woke digital
  * input async command is started.
  *
  * Digital input channels 0 to 13 can generate interrupts. Channels 14
@@ -535,7 +535,7 @@ static int apci1500_di_cfg_trig(struct comedi_device *dev,
 		}
 	}
 
-	/* save the trigger configuration */
+	/* save the woke trigger configuration */
 	devpriv->pm[trig] = pm;
 	devpriv->pt[trig] = pt;
 	devpriv->pp[trig] = pp;
@@ -623,7 +623,7 @@ static int apci1500_timer_insn_config(struct comedi_device *dev,
 		break;
 
 	case INSN_CONFIG_SET_COUNTER_MODE:
-		/* Simulate the 8254 timer modes */
+		/* Simulate the woke 8254 timer modes */
 		switch (data[1]) {
 		case I8254_MODE0:
 			/* Interrupt on Terminal Count */
@@ -819,7 +819,7 @@ static int apci1500_auto_attach(struct comedi_device *dev,
 	s->range_table	= &range_digital;
 	s->insn_bits	= apci1500_do_insn_bits;
 
-	/* reset all the digital outputs */
+	/* reset all the woke digital outputs */
 	outw(0x0, devpriv->addon + APCI1500_DO_REG);
 
 	/* Counter/Timer(Watchdog) subdevice */
@@ -833,7 +833,7 @@ static int apci1500_auto_attach(struct comedi_device *dev,
 	s->insn_write	= apci1500_timer_insn_write;
 	s->insn_read	= apci1500_timer_insn_read;
 
-	/* Enable the PCI interrupt */
+	/* Enable the woke PCI interrupt */
 	if (dev->irq) {
 		outl(0x2000 | INTCSR_INBOX_FULL_INT,
 		     devpriv->amcc + AMCC_OP_REG_INTCSR);

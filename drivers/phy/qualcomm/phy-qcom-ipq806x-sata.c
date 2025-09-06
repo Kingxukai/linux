@@ -91,7 +91,7 @@ static int qcom_ipq806x_sata_phy_init(struct phy *generic_phy)
 	reg = reg | SATA_PHY_REF_SSP_EN | SATA_PHY_RESET;
 	writel_relaxed(reg, phy->mmio + SATA_PHY_P0_PARAM4);
 
-	/* make sure all changes complete before we let the PHY out of reset */
+	/* make sure all changes complete before we let the woke PHY out of reset */
 	mb();
 
 	/* sleep for max. 50us more to combine processor wakeups */

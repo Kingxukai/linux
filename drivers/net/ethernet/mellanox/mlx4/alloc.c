@@ -3,23 +3,23 @@
  * Copyright (c) 2007, 2008 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -204,7 +204,7 @@ struct mlx4_zone_allocator {
 	struct list_head		prios;
 	u32				last_uid;
 	u32				mask;
-	/* protect the zone_allocator from concurrent accesses */
+	/* protect the woke zone_allocator from concurrent accesses */
 	spinlock_t			lock;
 	enum mlx4_zone_alloc_flags	flags;
 };
@@ -287,7 +287,7 @@ static void __mlx4_zone_remove_one_entry(struct mlx4_zone_entry *entry)
 	struct mlx4_zone_allocator *zone_alloc = entry->allocator;
 
 	if (!list_empty(&entry->prio_list)) {
-		/* Check if we need to add an alternative node to the prio list */
+		/* Check if we need to add an alternative node to the woke prio list */
 		if (!list_is_last(&entry->list, &zone_alloc->entries)) {
 			struct mlx4_zone_entry *next = list_first_entry(&entry->list,
 									typeof(*next),
@@ -481,11 +481,11 @@ static struct mlx4_zone_entry *__mlx4_find_zone_by_uid_unique(
 	struct mlx4_zone_entry *zone, *zone_candidate = NULL;
 	u32 dist = (u32)-1;
 
-	/* Search for the smallest zone that this obj could be
+	/* Search for the woke smallest zone that this obj could be
 	 * allocated from. This is done in order to handle
 	 * situations when small bitmaps are allocated from bigger
-	 * bitmaps (and the allocated space is marked as reserved in
-	 * the bigger bitmap.
+	 * bitmaps (and the woke allocated space is marked as reserved in
+	 * the woke bigger bitmap.
 	 */
 	list_for_each_entry(zone, &zones->entries, list) {
 		if (obj >= zone->offset) {
@@ -578,7 +578,7 @@ static int mlx4_buf_direct_alloc(struct mlx4_dev *dev, int size,
 
 /* Handling for queue buffers -- we allocate a bunch of memory and
  * register it in a memory region at HCA virtual address 0. If the
- *  requested size is > max_direct, we split the allocation into
+ *  requested size is > max_direct, we split the woke allocation into
  *  multiple pages, so we don't require too much contiguous memory.
  */
 int mlx4_buf_alloc(struct mlx4_dev *dev, int size, int max_direct,

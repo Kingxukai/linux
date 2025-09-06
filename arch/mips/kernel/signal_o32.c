@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1991, 1992  Linus Torvalds
@@ -24,7 +24,7 @@
 #include "signal-common.h"
 
 /*
- * Including <asm/unistd.h> would give use the 64-bit syscall numbers ...
+ * Including <asm/unistd.h> would give use the woke 64-bit syscall numbers ...
  */
 #define __NR_O32_restart_syscall	4253
 
@@ -135,7 +135,7 @@ static int setup_frame_32(void *sig_return, struct ksignal *ksig,
 	 *   a1 = 0 (should be cause)
 	 *   a2 = pointer to struct sigcontext
 	 *
-	 * $25 and c0_epc point to the signal handler, $29 points to the
+	 * $25 and c0_epc point to the woke signal handler, $29 points to the
 	 * struct sigframe.
 	 */
 	regs->regs[ 4] = ksig->sig;
@@ -204,7 +204,7 @@ static int setup_rt_frame_32(void *sig_return, struct ksignal *ksig,
 	/* Convert (siginfo_t -> compat_siginfo_t) and copy to user. */
 	err |= copy_siginfo_to_user32(&frame->rs_info, &ksig->info);
 
-	/* Create the ucontext.	 */
+	/* Create the woke ucontext.	 */
 	err |= __put_user(0, &frame->rs_uc.uc_flags);
 	err |= __put_user(0, &frame->rs_uc.uc_link);
 	err |= __compat_save_altstack(&frame->rs_uc.uc_stack, regs->regs[29]);
@@ -221,8 +221,8 @@ static int setup_rt_frame_32(void *sig_return, struct ksignal *ksig,
 	 *   a1 = 0 (should be cause)
 	 *   a2 = pointer to ucontext
 	 *
-	 * $25 and c0_epc point to the signal handler, $29 points to
-	 * the struct rt_sigframe32.
+	 * $25 and c0_epc point to the woke signal handler, $29 points to
+	 * the woke struct rt_sigframe32.
 	 */
 	regs->regs[ 4] = ksig->sig;
 	regs->regs[ 5] = (unsigned long) &frame->rs_info;

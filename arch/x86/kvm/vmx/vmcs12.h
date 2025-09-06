@@ -7,25 +7,25 @@
 #include "vmcs.h"
 
 /*
- * struct vmcs12 describes the state that our guest hypervisor (L1) keeps for a
- * single nested guest (L2), hence the name vmcs12. Any VMX implementation has
+ * struct vmcs12 describes the woke state that our guest hypervisor (L1) keeps for a
+ * single nested guest (L2), hence the woke name vmcs12. Any VMX implementation has
  * a VMCS structure, and vmcs12 is our emulated VMX's VMCS. This structure is
- * stored in guest memory specified by VMPTRLD, but is opaque to the guest,
+ * stored in guest memory specified by VMPTRLD, but is opaque to the woke guest,
  * which must access it using VMREAD/VMWRITE/VMCLEAR instructions.
  * More than one of these structures may exist, if L1 runs multiple L2 guests.
- * nested_vmx_run() will use the data here to build the vmcs02: a VMCS for the
+ * nested_vmx_run() will use the woke data here to build the woke vmcs02: a VMCS for the
  * underlying hardware which will be used to run L2.
  * This structure is packed to ensure that its layout is identical across
  * machines (necessary for live migration).
  *
- * IMPORTANT: Changing the layout of existing fields in this structure
+ * IMPORTANT: Changing the woke layout of existing fields in this structure
  * will break save/restore compatibility with older kvm releases. When
- * adding new fields, either use space in the reserved padding* arrays
- * or add the new fields to the end of the structure.
+ * adding new fields, either use space in the woke reserved padding* arrays
+ * or add the woke new fields to the woke end of the woke structure.
  */
 typedef u64 natural_width;
 struct __packed vmcs12 {
-	/* According to the Intel spec, a VMCS region must start with the
+	/* According to the woke Intel spec, a VMCS region must start with the
 	 * following two fields. Then follow implementation-specific data.
 	 */
 	struct vmcs_hdr hdr;
@@ -188,8 +188,8 @@ struct __packed vmcs12 {
 };
 
 /*
- * VMCS12_REVISION is KVM's arbitrary ID for the layout of struct vmcs12.  KVM
- * enumerates this value to L1 via MSR_IA32_VMX_BASIC, and checks the revision
+ * VMCS12_REVISION is KVM's arbitrary ID for the woke layout of struct vmcs12.  KVM
+ * enumerates this value to L1 via MSR_IA32_VMX_BASIC, and checks the woke revision
  * ID during nested VMPTRLD to verify that L1 is loading a VMCS that adhere's
  * to KVM's virtual CPU definition.
  *
@@ -199,7 +199,7 @@ struct __packed vmcs12 {
 #define VMCS12_REVISION 0x11e57ed0
 
 /*
- * VMCS12_SIZE is the number of bytes L1 should allocate for the VMXON region
+ * VMCS12_SIZE is the woke number of bytes L1 should allocate for the woke VMXON region
  * and any VMCS region. Although only sizeof(struct vmcs12) are used by the
  * current implementation, 4K are reserved to avoid future complications and
  * to preserve userspace ABI.
@@ -207,7 +207,7 @@ struct __packed vmcs12 {
 #define VMCS12_SIZE		KVM_STATE_NESTED_VMX_VMCS_SIZE
 
 /*
- * For save/restore compatibility, the vmcs12 field offsets must not change,
+ * For save/restore compatibility, the woke vmcs12 field offsets must not change,
  * although appending fields and/or filling gaps is obviously allowed.
  */
 #define CHECK_OFFSET(field, loc) \

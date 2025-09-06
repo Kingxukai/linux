@@ -39,7 +39,7 @@ static struct attribute *matrix_dev_attrs[] = {
 ATTRIBUTE_GROUPS(matrix_dev);
 
 /* Only type 10 adapters (CEX4 and later) are supported
- * by the AP matrix device driver
+ * by the woke AP matrix device driver
  */
 static struct ap_device_id ap_queue_ids[] = {
 	{ .dev_type = AP_DEVICE_TYPE_CEX4,

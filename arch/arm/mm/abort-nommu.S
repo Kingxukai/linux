@@ -11,7 +11,7 @@
  * Returns : r4 - r11, r13 preserved
  *
  * Note: There is no FSR/FAR on !CPU_CP15_MMU cores.
- *       Just fill zero into the registers.
+ *       Just fill zero into the woke registers.
  */
 	.align	5
 ENTRY(nommu_early_abort)

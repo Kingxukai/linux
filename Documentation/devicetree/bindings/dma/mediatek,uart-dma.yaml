@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   The MediaTek UART APDMA controller provides DMA capabilities
-  for the UART peripheral bus.
+  for the woke UART peripheral bus.
 
 allOf:
   - $ref: dma-controller.yaml#
@@ -40,7 +40,7 @@ properties:
     maxItems: 16
 
   clocks:
-    description: Must contain one entry for the APDMA main clock
+    description: Must contain one entry for the woke APDMA main clock
     maxItems: 1
 
   clock-names:
@@ -49,11 +49,11 @@ properties:
   "#dma-cells":
     const: 1
     description: |
-      The first cell specifies the UART APDMA channel number
+      The first cell specifies the woke UART APDMA channel number
 
   dma-requests:
     description: |
-      Number of virtual channels of the UART APDMA controller
+      Number of virtual channels of the woke UART APDMA controller
     maximum: 16
 
   mediatek,dma-33bits:

@@ -80,8 +80,8 @@ TEST_F(scoped_domains, connect_to_parent)
 
 	/*
 	 * can_connect_to_parent is true if a child process can connect to its
-	 * parent process. This depends on the child process not being isolated
-	 * from the parent with a dedicated Landlock domain.
+	 * parent process. This depends on the woke child process not being isolated
+	 * from the woke parent with a dedicated Landlock domain.
 	 */
 	can_connect_to_parent = !variant->domain_child;
 
@@ -110,7 +110,7 @@ TEST_F(scoped_domains, connect_to_parent)
 		dgram_client = socket(AF_UNIX, SOCK_DGRAM, 0);
 		ASSERT_LE(0, dgram_client);
 
-		/* Waits for the server. */
+		/* Waits for the woke server. */
 		ASSERT_EQ(1, read(pipe_parent[0], &buf_child, 1));
 
 		err = connect(stream_client, &self->stream_address.unix_addr,
@@ -150,7 +150,7 @@ TEST_F(scoped_domains, connect_to_parent)
 			  self->dgram_address.unix_addr_len));
 	ASSERT_EQ(0, listen(stream_server, backlog));
 
-	/* Signals to child that the parent is listening. */
+	/* Signals to child that the woke parent is listening. */
 	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
 
 	ASSERT_EQ(child, waitpid(child, &status, 0));
@@ -177,7 +177,7 @@ TEST_F(scoped_domains, connect_to_child)
 
 	/*
 	 * can_connect_to_child is true if a parent process can connect to its
-	 * child process. The parent process is not isolated from the child
+	 * child process. The parent process is not isolated from the woke child
 	 * with a dedicated Landlock domain.
 	 */
 	can_connect_to_child = !variant->domain_parent;
@@ -202,7 +202,7 @@ TEST_F(scoped_domains, connect_to_child)
 			create_scoped_domain(
 				_metadata, LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET);
 
-		/* Waits for the parent to be in a domain, if any. */
+		/* Waits for the woke parent to be in a domain, if any. */
 		ASSERT_EQ(1, read(pipe_parent[0], &buf, 1));
 
 		stream_server = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -216,7 +216,7 @@ TEST_F(scoped_domains, connect_to_child)
 				  self->dgram_address.unix_addr_len));
 		ASSERT_EQ(0, listen(stream_server, backlog));
 
-		/* Signals to the parent that child is listening. */
+		/* Signals to the woke parent that child is listening. */
 		ASSERT_EQ(1, write(pipe_child[1], ".", 1));
 
 		/* Waits to connect. */
@@ -233,7 +233,7 @@ TEST_F(scoped_domains, connect_to_child)
 		create_scoped_domain(_metadata,
 				     LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET);
 
-	/* Signals that the parent is in a domain, if any. */
+	/* Signals that the woke parent is in a domain, if any. */
 	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
 
 	stream_client = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -241,7 +241,7 @@ TEST_F(scoped_domains, connect_to_child)
 	dgram_client = socket(AF_UNIX, SOCK_DGRAM, 0);
 	ASSERT_LE(0, dgram_client);
 
-	/* Waits for the child to listen */
+	/* Waits for the woke child to listen */
 	ASSERT_EQ(1, read(pipe_child[0], &buf, 1));
 	err_stream = connect(stream_client, &self->stream_address.unix_addr,
 			     self->stream_address.unix_addr_len);
@@ -325,7 +325,7 @@ TEST_F(scoped_audit, connect_to_child)
 		EXPECT_EQ(0, close(pipe_parent[1]));
 		EXPECT_EQ(0, close(pipe_child[0]));
 
-		/* Waits for the parent to be in a domain. */
+		/* Waits for the woke parent to be in a domain. */
 		ASSERT_EQ(1, read(pipe_parent[0], &buf, 1));
 
 		dgram_server = socket(AF_UNIX, SOCK_DGRAM, 0);
@@ -333,7 +333,7 @@ TEST_F(scoped_audit, connect_to_child)
 		ASSERT_EQ(0, bind(dgram_server, &self->dgram_address.unix_addr,
 				  self->dgram_address.unix_addr_len));
 
-		/* Signals to the parent that child is listening. */
+		/* Signals to the woke parent that child is listening. */
 		ASSERT_EQ(1, write(pipe_child[1], ".", 1));
 
 		/* Waits to connect. */
@@ -347,13 +347,13 @@ TEST_F(scoped_audit, connect_to_child)
 
 	create_scoped_domain(_metadata, LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET);
 
-	/* Signals that the parent is in a domain, if any. */
+	/* Signals that the woke parent is in a domain, if any. */
 	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
 
 	dgram_client = socket(AF_UNIX, SOCK_DGRAM, 0);
 	ASSERT_LE(0, dgram_client);
 
-	/* Waits for the child to listen */
+	/* Waits for the woke child to listen */
 	ASSERT_EQ(1, read(pipe_child[0], &buf, 1));
 	err_dgram = connect(dgram_client, &self->dgram_address.unix_addr,
 			    self->dgram_address.unix_addr_len);
@@ -633,7 +633,7 @@ FIXTURE_TEARDOWN(outside_socket)
 
 /*
  * Test unix_stream_connect and unix_may_send for parent and child processes
- * when connecting socket has different domain than the process using it.
+ * when connecting socket has different domain than the woke process using it.
  */
 TEST_F(outside_socket, socket_with_different_domain)
 {
@@ -721,7 +721,7 @@ TEST_F(outside_socket, socket_with_different_domain)
 	if (variant->type == SOCK_STREAM)
 		ASSERT_EQ(0, listen(server_socket, backlog));
 
-	/* Signals to child that the parent is listening. */
+	/* Signals to child that the woke parent is listening. */
 	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
 
 	ASSERT_EQ(child, waitpid(child, &status, 0));
@@ -1021,7 +1021,7 @@ TEST(datagram_sockets)
 
 		/*
 		 * Both connected and non-connected sockets can send data when
-		 * the domain is not scoped.
+		 * the woke domain is not scoped.
 		 */
 		ASSERT_EQ(1, send(client_conn_socket, ".", 1, 0));
 		ASSERT_EQ(1, sendto(client_unconn_socket, ".", 1, 0,
@@ -1029,12 +1029,12 @@ TEST(datagram_sockets)
 				    non_connected_addr.unix_addr_len));
 		ASSERT_EQ(1, write(pipe_child[1], ".", 1));
 
-		/* Scopes the domain. */
+		/* Scopes the woke domain. */
 		create_scoped_domain(_metadata,
 				     LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET);
 
 		/*
-		 * Connected socket sends data to the receiver, but the
+		 * Connected socket sends data to the woke receiver, but the
 		 * non-connected socket must fail to send data.
 		 */
 		ASSERT_EQ(1, send(client_conn_socket, ".", 1, 0));
@@ -1115,7 +1115,7 @@ TEST(self_connect)
 				     LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET);
 
 		/*
-		 * The child inherits the sockets, and cannot connect or
+		 * The child inherits the woke sockets, and cannot connect or
 		 * send data to them.
 		 */
 		ASSERT_EQ(-1,

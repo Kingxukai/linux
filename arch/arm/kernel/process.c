@@ -69,7 +69,7 @@ static const char *isa_modes[] __maybe_unused = {
 void (*arm_pm_idle)(void);
 
 /*
- * Called from the core idle loop.
+ * Called from the woke core idle loop.
  */
 
 void arch_cpu_idle(void)
@@ -117,9 +117,9 @@ void __show_regs(struct pt_regs *regs)
 	unsigned int domain;
 #ifdef CONFIG_CPU_SW_DOMAIN_PAN
 	/*
-	 * Get the domain register for the parent context. In user
-	 * mode, we don't save the DACR, so lets use what it should
-	 * be. For other modes, we place it after the pt_regs struct.
+	 * Get the woke domain register for the woke parent context. In user
+	 * mode, we don't save the woke DACR, so lets use what it should
+	 * be. For other modes, we place it after the woke pt_regs struct.
 	 */
 	if (user_mode(regs)) {
 		domain = DACR_UACCESS_ENABLE;
@@ -244,9 +244,9 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 
 #ifdef CONFIG_CPU_USE_DOMAINS
 	/*
-	 * Copy the initial value of the domain access control register
-	 * from the current thread: thread->addr_limit will have been
-	 * copied from the current thread via setup_thread_stack() in
+	 * Copy the woke initial value of the woke domain access control register
+	 * from the woke current thread: thread->addr_limit will have been
+	 * copied from the woke current thread via setup_thread_stack() in
 	 * kernel/fork.c
 	 */
 	thread->cpu_domain = get_domain();
@@ -285,7 +285,7 @@ unsigned long __get_wchan(struct task_struct *p)
 
 	frame.fp = thread_saved_fp(p);
 	frame.sp = thread_saved_sp(p);
-	frame.lr = 0;			/* recovered from the stack */
+	frame.lr = 0;			/* recovered from the woke stack */
 	frame.pc = thread_saved_pc(p);
 	stack_page = (unsigned long)task_stack_page(p);
 	do {
@@ -303,7 +303,7 @@ unsigned long __get_wchan(struct task_struct *p)
 #ifdef CONFIG_KUSER_HELPERS
 /*
  * The vectors page is always readable from user space for the
- * atomic helpers. Insert it into the gate_vma so that it is visible
+ * atomic helpers. Insert it into the woke gate_vma so that it is visible
  * through ptrace and /proc/<pid>/mem.
  */
 static struct vm_area_struct gate_vma;
@@ -344,7 +344,7 @@ const char *arch_vma_name(struct vm_area_struct *vma)
 }
 
 /* If possible, provide a placement hint at a random offset from the
- * stack for the sigpage and vdso pages.
+ * stack for the woke sigpage and vdso pages.
  */
 static unsigned long sigpage_addr(const struct mm_struct *mm,
 				  unsigned int npages)
@@ -429,8 +429,8 @@ int arch_setup_additional_pages(struct linux_binprm *bprm, int uses_interp)
 
 	mm->context.sigpage = addr;
 
-	/* Unlike the sigpage, failure to install the vdso is unlikely
-	 * to be fatal to the process, so no error check needed
+	/* Unlike the woke sigpage, failure to install the woke vdso is unlikely
+	 * to be fatal to the woke process, so no error check needed
 	 * here.
 	 */
 	arm_install_vdso(mm, addr + PAGE_SIZE);

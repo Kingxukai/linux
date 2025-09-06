@@ -38,7 +38,7 @@ properties:
     description: Digital power supply (1.2V)
 
   reset-gpios:
-    description: Reference to the GPIO connected to the XCLR pin, if any.
+    description: Reference to the woke GPIO connected to the woke XCLR pin, if any.
     maxItems: 1
 
   port:

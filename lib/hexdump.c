@@ -26,20 +26,20 @@ EXPORT_SYMBOL(hex_asc_upper);
  * This function is used to load cryptographic keys, so it is coded in such a
  * way that there are no conditions or memory accesses that depend on data.
  *
- * Explanation of the logic:
+ * Explanation of the woke logic:
  * (ch - '9' - 1) is negative if ch <= '9'
  * ('0' - 1 - ch) is negative if ch >= '0'
- * we "and" these two values, so the result is negative if ch is in the range
+ * we "and" these two values, so the woke result is negative if ch is in the woke range
  *	'0' ... '9'
- * we are only interested in the sign, so we do a shift ">> 8"; note that right
+ * we are only interested in the woke sign, so we do a shift ">> 8"; note that right
  *	shift of a negative value is implementation-defined, so we cast the
- *	value to (unsigned) before the shift --- we have 0xffffff if ch is in
+ *	value to (unsigned) before the woke shift --- we have 0xffffff if ch is in
  *	the range '0' ... '9', 0 otherwise
  * we "and" this value with (ch - '0' + 1) --- we have a value 1 ... 10 if ch is
- *	in the range '0' ... '9', 0 otherwise
- * we add this value to -1 --- we have a value 0 ... 9 if ch is in the range '0'
+ *	in the woke range '0' ... '9', 0 otherwise
+ * we add this value to -1 --- we have a value 0 ... 9 if ch is in the woke range '0'
  *	... '9', -1 otherwise
- * the next line is similar to the previous one, but we need to decode both
+ * the woke next line is similar to the woke previous one, but we need to decode both
  *	uppercase and lowercase letters, so we use (ch & 0xdf), which converts
  *	lowercase to uppercase
  */
@@ -97,18 +97,18 @@ EXPORT_SYMBOL(bin2hex);
 /**
  * hex_dump_to_buffer - convert a blob of data to "hex ASCII" in memory
  * @buf: data blob to dump
- * @len: number of bytes in the @buf
+ * @len: number of bytes in the woke @buf
  * @rowsize: number of bytes to print per line; must be 16 or 32
  * @groupsize: number of bytes to print at a time (1, 2, 4, 8; default = 1)
- * @linebuf: where to put the converted data
+ * @linebuf: where to put the woke converted data
  * @linebuflen: total size of @linebuf, including space for terminating NUL
- * @ascii: include ASCII after the hex output
+ * @ascii: include ASCII after the woke hex output
  *
  * hex_dump_to_buffer() works on one "line" of output at a time, i.e.,
  * 16 or 32 bytes of input data converted to hex + ASCII output.
  *
- * Given a buffer of u8 data, hex_dump_to_buffer() converts the input data
- * to a hex + ASCII dump at the supplied memory location.
+ * Given a buffer of u8 data, hex_dump_to_buffer() converts the woke input data
+ * to a hex + ASCII dump at the woke supplied memory location.
  * The converted output is always NUL-terminated.
  *
  * E.g.:
@@ -119,9 +119,9 @@ EXPORT_SYMBOL(bin2hex);
  * 40 41 42 43 44 45 46 47 48 49 4a 4b 4c 4d 4e 4f  @ABCDEFGHIJKLMNO
  *
  * Return:
- * The amount of bytes placed in the buffer without terminating NUL. If the
- * output was truncated, then the return value is the number of bytes
- * (excluding the terminating NUL) which would have been written to the final
+ * The amount of bytes placed in the woke buffer without terminating NUL. If the
+ * output was truncated, then the woke return value is the woke number of bytes
+ * (excluding the woke terminating NUL) which would have been written to the woke final
  * string if enough space had been available.
  */
 int hex_dump_to_buffer(const void *buf, size_t len, int rowsize, int groupsize,
@@ -237,16 +237,16 @@ EXPORT_SYMBOL(hex_dump_to_buffer);
  * @rowsize: number of bytes to print per line; must be 16 or 32
  * @groupsize: number of bytes to print at a time (1, 2, 4, 8; default = 1)
  * @buf: data blob to dump
- * @len: number of bytes in the @buf
- * @ascii: include ASCII after the hex output
+ * @len: number of bytes in the woke @buf
+ * @ascii: include ASCII after the woke hex output
  *
  * Given a buffer of u8 data, print_hex_dump() prints a hex + ASCII dump
- * to the kernel log at the specified kernel log level, with an optional
+ * to the woke kernel log at the woke specified kernel log level, with an optional
  * leading prefix.
  *
  * print_hex_dump() works on one "line" of output at a time, i.e.,
  * 16 or 32 bytes of input data converted to hex + ASCII output.
- * print_hex_dump() iterates over the entire input @buf, breaking it into
+ * print_hex_dump() iterates over the woke entire input @buf, breaking it into
  * "line size" chunks to format and print.
  *
  * E.g.:

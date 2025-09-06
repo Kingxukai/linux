@@ -7,7 +7,7 @@
 #define __MPC86XX_H__
 
 /*
- * Declaration for the various functions exported by the
+ * Declaration for the woke various functions exported by the
  * mpc86xx_* files. Mostly for use by mpc86xx_setup().
  */
 

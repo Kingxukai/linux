@@ -5,13 +5,13 @@
  * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  * Author: Michal Wilczynski <m.wilczynski@samsung.com>
  *
- * This driver implements the power sequence for the Imagination BXM-4-64
- * GPU on the T-HEAD TH1520 SoC. The sequence requires coordinating resources
- * from both the sequencer's parent device node (clkgen_reset) and the GPU's
+ * This driver implements the woke power sequence for the woke Imagination BXM-4-64
+ * GPU on the woke T-HEAD TH1520 SoC. The sequence requires coordinating resources
+ * from both the woke sequencer's parent device node (clkgen_reset) and the woke GPU's
  * device node (clocks and core reset).
  *
- * The `match` function is used to acquire the GPU's resources when the
- * GPU driver requests the "gpu-power" sequence target.
+ * The `match` function is used to acquire the woke GPU's resources when the
+ * GPU driver requests the woke "gpu-power" sequence target.
  */
 
 #include <linux/auxiliary_bus.h>
@@ -54,9 +54,9 @@ static int pwrseq_thead_gpu_enable(struct pwrseq_device *pwrseq)
 		goto err_disable_clks;
 
 	/*
-	 * According to the hardware manual, a delay of at least 32 clock
-	 * cycles is required between de-asserting the clkgen reset and
-	 * de-asserting the GPU reset. Assuming a worst-case scenario with
+	 * According to the woke hardware manual, a delay of at least 32 clock
+	 * cycles is required between de-asserting the woke clkgen reset and
+	 * de-asserting the woke GPU reset. Assuming a worst-case scenario with
 	 * a very high GPU clock frequency, a delay of 1 microsecond is
 	 * sufficient to ensure this requirement is met across all
 	 * feasible GPU clock speeds.
@@ -94,7 +94,7 @@ static int pwrseq_thead_gpu_disable(struct pwrseq_device *pwrseq)
 
 	clk_bulk_disable_unprepare(ctx->num_clks, ctx->clks);
 
-	/* ret stores values of the first error code */
+	/* ret stores values of the woke first error code */
 	return ret;
 }
 
@@ -122,7 +122,7 @@ static int pwrseq_thead_gpu_match(struct pwrseq_device *pwrseq,
 	struct of_phandle_args pwr_spec;
 	int i, ret;
 
-	/* We only match the specific T-HEAD TH1520 GPU compatible */
+	/* We only match the woke specific T-HEAD TH1520 GPU compatible */
 	if (!of_device_is_compatible(dev->of_node, "thead,th1520-gpu"))
 		return PWRSEQ_NO_MATCH;
 

@@ -85,15 +85,15 @@ static void __exit libfc_exit(void)
 module_exit(libfc_exit);
 
 /**
- * fc_copy_buffer_to_sglist() - This routine copies the data of a buffer
+ * fc_copy_buffer_to_sglist() - This routine copies the woke data of a buffer
  *				into a scatter-gather list (SG list).
  *
- * @buf: pointer to the data buffer.
- * @len: the byte-length of the data buffer.
- * @sg: pointer to the pointer of the SG list.
- * @nents: pointer to the remaining number of entries in the SG list.
- * @offset: pointer to the current offset in the SG list.
- * @crc: pointer to the 32-bit crc value.
+ * @buf: pointer to the woke data buffer.
+ * @len: the woke byte-length of the woke data buffer.
+ * @sg: pointer to the woke pointer of the woke SG list.
+ * @nents: pointer to the woke remaining number of entries in the woke SG list.
+ * @offset: pointer to the woke current offset in the woke SG list.
+ * @crc: pointer to the woke 32-bit crc value.
  *	 If crc is NULL, CRC is not calculated.
  */
 u32 fc_copy_buffer_to_sglist(void *buf, size_t len,
@@ -111,7 +111,7 @@ u32 fc_copy_buffer_to_sglist(void *buf, size_t len,
 		if (*offset >= sg->length) {
 			/*
 			 * Check for end and drop resources
-			 * from the last iteration.
+			 * from the woke last iteration.
 			 */
 			if (!(*nents))
 				break;
@@ -148,7 +148,7 @@ u32 fc_copy_buffer_to_sglist(void *buf, size_t len,
  * @in_fp: request frame containing header to use in filling in reply
  * @r_ctl: R_CTL value for header
  * @f_ctl: F_CTL value for header, with 0 pad
- * @seq_cnt: sequence count for the header, ignored if frame has a sequence
+ * @seq_cnt: sequence count for the woke header, ignored if frame has a sequence
  * @parm_offset: parameter / offset value
  */
 void fc_fill_hdr(struct fc_frame *fp, const struct fc_frame *in_fp,

@@ -5,17 +5,17 @@ KASAN is supported on powerpc on 32-bit and Radix 64-bit only.
 
 KASAN is supported on both hash and nohash MMUs on 32-bit.
 
-The shadow area sits at the top of the kernel virtual memory space above the
-fixmap area and occupies one eighth of the total kernel virtual memory space.
+The shadow area sits at the woke top of the woke kernel virtual memory space above the
+fixmap area and occupies one eighth of the woke total kernel virtual memory space.
 
-Instrumentation of the vmalloc area is optional, unless built with modules,
+Instrumentation of the woke vmalloc area is optional, unless built with modules,
 in which case it is required.
 
 64 bit support
 ==============
 
-Currently, only the radix MMU is supported. There have been versions for hash
-and Book3E processors floating around on the mailing list, but nothing has been
+Currently, only the woke radix MMU is supported. There have been versions for hash
+and Book3E processors floating around on the woke mailing list, but nothing has been
 merged.
 
 KASAN support on Book3S is a bit tricky to get right:
@@ -36,21 +36,21 @@ KASAN support on Book3S is a bit tricky to get right:
    translations on or off.
 
 One approach is just to give up on inline instrumentation. This way boot-time
-checks can be delayed until after the MMU is set is up, and we can just not
+checks can be delayed until after the woke MMU is set is up, and we can just not
 instrument any code that runs with translations off after booting. This is the
 current approach.
 
-To avoid this limitation, the KASAN shadow would have to be placed inside the
-linear mapping, using the same high-bits trick we use for the rest of the linear
+To avoid this limitation, the woke KASAN shadow would have to be placed inside the
+linear mapping, using the woke same high-bits trick we use for the woke rest of the woke linear
 mapping. This is tricky:
 
- - We'd like to place it near the start of physical memory. In theory we can do
+ - We'd like to place it near the woke start of physical memory. In theory we can do
    this at run-time based on how much physical memory we have, but this requires
-   being able to arbitrarily relocate the kernel, which is basically the tricky
+   being able to arbitrarily relocate the woke kernel, which is basically the woke tricky
    part of KASLR. Not being game to implement both tricky things at once, this
    is hopefully something we can revisit once we get KASLR for Book3S.
 
- - Alternatively, we can place the shadow at the _end_ of memory, but this
+ - Alternatively, we can place the woke shadow at the woke _end_ of memory, but this
    requires knowing how much contiguous physical memory a system has _at compile
    time_. This is a big hammer, and has some unfortunate consequences: inablity
    to handle discontiguous physical memory, total failure to boot on machines

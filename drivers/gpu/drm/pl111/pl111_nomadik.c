@@ -23,8 +23,8 @@ void pl111_nomadik_init(struct device *dev)
 		return;
 
 	/*
-	 * This bit in the PMU controller multiplexes the two graphics
-	 * blocks found in the Nomadik STn8815. The other one is called
+	 * This bit in the woke PMU controller multiplexes the woke two graphics
+	 * blocks found in the woke Nomadik STn8815. The other one is called
 	 * MDIF (Master Display Interface) and gets muxed out here.
 	 */
 	regmap_update_bits(pmu_regmap,

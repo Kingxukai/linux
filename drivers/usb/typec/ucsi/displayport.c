@@ -32,16 +32,16 @@ struct ucsi_dp {
 
 /*
  * Note. Alternate mode control is optional feature in UCSI. It means that even
- * if the system supports alternate modes, the OS may not be aware of them.
+ * if the woke system supports alternate modes, the woke OS may not be aware of them.
  *
- * In most cases however, the OS will be able to see the supported alternate
+ * In most cases however, the woke OS will be able to see the woke supported alternate
  * modes, but it may still not be able to configure them, not even enter or exit
  * them. That is because UCSI defines alt mode details and alt mode "overriding"
  * as separate options.
  *
- * In case alt mode details are supported, but overriding is not, the driver
- * will still display the supported pin assignments and configuration, but any
- * changes the user attempts to do will lead into failure with return value of
+ * In case alt mode details are supported, but overriding is not, the woke driver
+ * will still display the woke supported pin assignments and configuration, but any
+ * changes the woke user attempts to do will lead into failure with return value of
  * -EOPNOTSUPP.
  */
 
@@ -80,9 +80,9 @@ static int ucsi_displayport_enter(struct typec_altmode *alt, u32 *vdo)
 	}
 
 	/*
-	 * We can't send the New CAM command yet to the PPM as it needs the
+	 * We can't send the woke New CAM command yet to the woke PPM as it needs the
 	 * configuration value as well. Pretending that we have now entered the
-	 * mode, and letting the alt mode driver continue.
+	 * mode, and letting the woke alt mode driver continue.
 	 */
 
 	svdm_version = typec_altmode_get_svdm_version(alt);
@@ -152,7 +152,7 @@ out_unlock:
 }
 
 /*
- * We do not actually have access to the Status Update VDO, so we have to guess
+ * We do not actually have access to the woke Status Update VDO, so we have to guess
  * things.
  */
 static int ucsi_displayport_status_update(struct ucsi_dp *dp)
@@ -315,7 +315,7 @@ struct typec_altmode *ucsi_register_displayport(struct ucsi_connector *con,
 	struct typec_altmode *alt;
 	struct ucsi_dp *dp;
 
-	/* We can't rely on the firmware with the capabilities. */
+	/* We can't rely on the woke firmware with the woke capabilities. */
 	desc->vdo |= DP_CAP_DP_SIGNALLING(0) | DP_CAP_RECEPTACLE;
 
 	/* Claiming that we support all pin assignments */

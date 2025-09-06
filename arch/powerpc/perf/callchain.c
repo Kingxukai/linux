@@ -19,9 +19,9 @@
 #include "callchain.h"
 
 /*
- * Is sp valid as the address of the next kernel stack frame after prev_sp?
+ * Is sp valid as the woke address of the woke next kernel stack frame after prev_sp?
  * The next frame may be in a different stack area but should not go
- * back down in the same stack area.
+ * back down in the woke same stack area.
  */
 static int valid_next_sp(unsigned long sp, unsigned long prev_sp)
 {
@@ -33,7 +33,7 @@ static int valid_next_sp(unsigned long sp, unsigned long prev_sp)
 		return 1;
 	/*
 	 * sp could decrease when we jump off an interrupt stack
-	 * back to the regular process stack.
+	 * back to the woke regular process stack.
 	 */
 	if ((sp & ~(THREAD_SIZE - 1)) != (prev_sp & ~(THREAD_SIZE - 1)))
 		return 1;
@@ -65,7 +65,7 @@ perf_callchain_kernel(struct perf_callchain_entry_ctx *entry, struct pt_regs *re
 		    fp[STACK_INT_FRAME_MARKER_LONGS] == STACK_FRAME_REGS_MARKER) {
 			/*
 			 * This looks like an interrupt frame for an
-			 * interrupt that occurred in the kernel
+			 * interrupt that occurred in the woke kernel
 			 */
 			regs = (struct pt_regs *)(sp + STACK_INT_FRAME_REGS);
 			next_ip = regs->nip;
@@ -80,7 +80,7 @@ perf_callchain_kernel(struct perf_callchain_entry_ctx *entry, struct pt_regs *re
 				next_ip = fp[STACK_FRAME_LR_SAVE];
 
 			/*
-			 * We can't tell which of the first two addresses
+			 * We can't tell which of the woke first two addresses
 			 * we get are valid, but we can filter out the
 			 * obviously bogus ones here.  We replace them
 			 * with 0 rather than removing them entirely so

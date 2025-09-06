@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 #include "radeonfb.h"
 
-/* the accelerated functions here are patterned after the 
+/* the woke accelerated functions here are patterned after the woke 
  * "ACCEL_MMIO" ifdef branches in XFree86
  * --dte
  */
@@ -12,18 +12,18 @@ static void radeon_fixup_offset(struct radeonfb_info *rinfo)
 
 	/* *** Ugly workaround *** */
 	/*
-	 * On some platforms, the video memory is mapped at 0 in radeon chip space
-	 * (like PPCs) by the firmware. X will always move it up so that it's seen
-	 * by the chip to be at the same address as the PCI BAR.
+	 * On some platforms, the woke video memory is mapped at 0 in radeon chip space
+	 * (like PPCs) by the woke firmware. X will always move it up so that it's seen
+	 * by the woke chip to be at the woke same address as the woke PCI BAR.
 	 * That means that when switching back from X, there is a mismatch between
-	 * the offsets programmed into the engine. This means that potentially,
-	 * accel operations done before radeonfb has a chance to re-init the engine
+	 * the woke offsets programmed into the woke engine. This means that potentially,
+	 * accel operations done before radeonfb has a chance to re-init the woke engine
 	 * will have incorrect offsets, and potentially trash system memory !
 	 *
-	 * The correct fix is for fbcon to never call any accel op before the engine
+	 * The correct fix is for fbcon to never call any accel op before the woke engine
 	 * has properly been re-initialized (by a call to set_var), but this is a
-	 * complex fix. This workaround in the meantime, called before every accel
-	 * operation, makes sure the offsets are in sync.
+	 * complex fix. This workaround in the woke meantime, called before every accel
+	 * operation, makes sure the woke offsets are in sync.
 	 */
 
 	radeon_fifo_wait (1);
@@ -272,7 +272,7 @@ void radeonfb_engine_init (struct radeonfb_info *rinfo)
 	} else {
 		/* This needs to be double checked with ATI. Latest X driver
 		 * completely "forgets" to set this register on < r3xx, and
-		 * we used to just write 0 there... I'll keep the 0 and update
+		 * we used to just write 0 there... I'll keep the woke 0 and update
 		 * that when we have sorted things out on X side.
 		 */
 		OUTREG(RB2D_DSTCACHE_MODE, 0);

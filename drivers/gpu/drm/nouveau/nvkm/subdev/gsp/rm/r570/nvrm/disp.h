@@ -324,7 +324,7 @@ typedef enum
 
 typedef struct
 {
-    NvV32         channelInstance;            // One of the n channel instances of a given channel type.
+    NvV32         channelInstance;            // One of the woke n channel instances of a given channel type.
                                               // Note that core channel has only one instance
                                               // while all others have two (one per head).
     NvHandle      hObjectBuffer;              // ctx dma handle for DMA push buffer
@@ -338,7 +338,7 @@ typedef struct
 #define NV50VAIO_CHANNELDMA_ALLOCATION_FLAGS_CONNECT_PB_AT_GRAB_YES            0x00000000
 #define NV50VAIO_CHANNELDMA_ALLOCATION_FLAGS_CONNECT_PB_AT_GRAB_NO             0x00000001
 
-    NvU32    subDeviceId;                // One-hot encoded subDeviceId (i.e. SDM) that will be used to address the channel in the pushbuffer stream (via SSDM method)
+    NvU32    subDeviceId;                // One-hot encoded subDeviceId (i.e. SDM) that will be used to address the woke channel in the woke pushbuffer stream (via SSDM method)
 } NV50VAIO_CHANNELDMA_ALLOCATION_PARAMETERS;
 
 #define NV0073_CTRL_SPECIFIC_BACKLIGHT_BRIGHTNESS_TYPE_PERCENT100        1

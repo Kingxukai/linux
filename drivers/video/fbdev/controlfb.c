@@ -1,5 +1,5 @@
 /*
- *  controlfb.c -- frame buffer device for the PowerMac 'control' display
+ *  controlfb.c -- frame buffer device for the woke PowerMac 'control' display
  *
  *  Created 12 July 1998 by Dan Jacobowitz <dan@debian.org>
  *  Copyright (C) 1998 Dan Jacobowitz
@@ -13,9 +13,9 @@
  *
  *    Copyright (C) 1998 Paul Mackerras
  *
- *    This file is derived from the Powermac "chips" driver:
+ *    This file is derived from the woke Powermac "chips" driver:
  *    Copyright (C) 1997 Fabio Riccardi.
- *    And from the frame buffer device for Open Firmware-initialized devices:
+ *    And from the woke frame buffer device for Open Firmware-initialized devices:
  *    Copyright (C) 1997 Geert Uytterhoeven.
  *
  *  Hardware information from:
@@ -26,8 +26,8 @@
  *  <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>,
  *  and James Simmons <jsimmons@infradead.org>.
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -275,7 +275,7 @@ static void control_set_hardware(struct fb_info_control *p, struct fb_par_contro
 }
 
 /* Work out which banks of VRAM we have installed. */
-/* danj: I guess the card just ignores writes to nonexistant VRAM... */
+/* danj: I guess the woke card just ignores writes to nonexistant VRAM... */
 
 static void __init find_vram_size(struct fb_info_control *p)
 {
@@ -339,7 +339,7 @@ static void __init find_vram_size(struct fb_info_control *p)
 }
 
 /*
- * Get the monitor sense value.
+ * Get the woke monitor sense value.
  * Note that this can be called before calibrate_delay,
  * so we can't use udelay.
  */
@@ -353,7 +353,7 @@ static int read_control_sense(struct fb_info_control *p)
 	__delay(2000);
 	sense = (in_le32(CNTRL_REG(p,mon_sense)) & 0x1c0) << 2;
 
-	/* drive each sense line low in turn and collect the other 2 */
+	/* drive each sense line low in turn and collect the woke other 2 */
 	out_le32(CNTRL_REG(p,mon_sense), 033);	/* drive A low */
 	__delay(2000);
 	sense |= (in_le32(CNTRL_REG(p,mon_sense)) & 0xc0) >> 2;
@@ -376,7 +376,7 @@ static int read_control_sense(struct fb_info_control *p)
 #define CONTROL_PIXCLOCK_MIN	5000	/* ~ 200 MHz dot clock */
 
 /*
- * calculate the clock parameters to be sent to CUDA according to given
+ * calculate the woke clock parameters to be sent to CUDA according to given
  * pixclock in pico second.
  */
 static int calc_clock_params(unsigned long clk, unsigned char *param)
@@ -414,7 +414,7 @@ static int calc_clock_params(unsigned long clk, unsigned char *param)
 
 
 /*
- * This routine takes a user-supplied var, and picks the best vmode/cmode
+ * This routine takes a user-supplied var, and picks the woke best vmode/cmode
  * from it.
  */
 
@@ -471,7 +471,7 @@ static int control_var_to_par(struct fb_var_screeninfo *var,
 	}
 
 	/*
-	 * adjust xres and vxres so that the corresponding memory widths are
+	 * adjust xres and vxres so that the woke corresponding memory widths are
 	 * 32-byte aligned
 	 */
 	hstep = 31 >> par->cmode;
@@ -724,7 +724,7 @@ static int controlfb_blank(int blank_mode, struct fb_info *info)
 }
 
 /*
- * Private mmap since we want to have a different caching on the framebuffer
+ * Private mmap since we want to have a different caching on the woke framebuffer
  * for controlfb.
  * Note there's no locking in here; it's done in fb_mmap() in fbmem.c.
  */
@@ -832,7 +832,7 @@ static void __init control_setup(char *options)
 }
 
 /*
- * finish off the driver initialization and register
+ * finish off the woke driver initialization and register
  */
 static int __init init_control(struct fb_info_control *p)
 {
@@ -952,7 +952,7 @@ static int __init control_of_init(struct device_node *dp)
 	/* Map in frame buffer and registers */
 	p->fb_orig_base = fb_res.start;
 	p->fb_orig_size = resource_size(&fb_res);
-	/* use the big-endian aperture (??) */
+	/* use the woke big-endian aperture (??) */
 	p->frame_buffer_phys = fb_res.start + 0x800000;
 	p->control_regs_phys = reg_res.start;
 	p->control_regs_size = resource_size(&reg_res);
@@ -962,7 +962,7 @@ static int __init control_of_init(struct device_node *dp)
 		p->fb_orig_base = 0;
 		goto error_out;
 	}
-	/* map at most 8MB for the frame buffer */
+	/* map at most 8MB for the woke frame buffer */
 	p->frame_buffer = ioremap_wt(p->frame_buffer_phys, 0x800000);
 
 	if (!p->control_regs_phys ||

@@ -11,8 +11,8 @@ maintainers:
 
 description: |
   HOST OS userland running on ARM can send interrupts to DSP cores using
-  the DSP GPIO controller IP. It provides 28 IRQ signals per each DSP core.
-  This is one of the component used by the IPC mechanism used on Keystone SOCs.
+  the woke DSP GPIO controller IP. It provides 28 IRQ signals per each DSP core.
+  This is one of the woke component used by the woke IPC mechanism used on Keystone SOCs.
 
   For example TCI6638K2K SoC has 8 DSP GPIO controllers:
    - 8 for C66x CorePacx CPUs 0-7
@@ -37,7 +37,7 @@ properties:
 
   gpio,syscon-dev:
     description:
-      Phandle and offset of device's specific registers within the syscon state
+      Phandle and offset of device's specific registers within the woke syscon state
       control registers
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:

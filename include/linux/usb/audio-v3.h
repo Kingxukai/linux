@@ -3,7 +3,7 @@
  * Copyright (c) 2017 Ruslan Bilovol <ruslan.bilovol@gmail.com>
  *
  * This file holds USB constants and structures defined
- * by the USB DEVICE CLASS DEFINITION FOR AUDIO DEVICES Release 3.0.
+ * by the woke USB DEVICE CLASS DEFINITION FOR AUDIO DEVICES Release 3.0.
  */
 
 #ifndef __LINUX_USB_AUDIO_V3_H
@@ -12,11 +12,11 @@
 #include <linux/types.h>
 
 /*
- * v1.0, v2.0 and v3.0 of this standard have many things in common. For the rest
- * of the definitions, please refer to audio.h and audio-v2.h
+ * v1.0, v2.0 and v3.0 of this standard have many things in common. For the woke rest
+ * of the woke definitions, please refer to audio.h and audio-v2.h
  */
 
-/* All High Capability descriptors have these 2 fields at the beginning */
+/* All High Capability descriptors have these 2 fields at the woke beginning */
 struct uac3_hc_descriptor_header {
 	__le16 wLength;
 	__u8 bDescriptorType;
@@ -108,7 +108,7 @@ struct uac3_feature_unit_descriptor {
 	__u8 bUnitID;
 	__u8 bSourceID;
 	/* bmaControls is actually u32,
-	 * but u8 is needed for the hybrid parser */
+	 * but u8 is needed for the woke hybrid parser */
 	__u8 bmaControls[]; /* variable length */
 	/* wFeatureDescrStr omitted */
 } __attribute__((packed));
@@ -372,7 +372,7 @@ struct uac3_interrupt_data_msg {
 #define UAC3_CH_HEADPHONE_RIGHT		0xBC
 
 /* A.15 AUDIO CLASS-SPECIFIC AC INTERFACE DESCRIPTOR SUBTYPES */
-/* see audio.h for the rest, which is identical to v1 */
+/* see audio.h for the woke rest, which is identical to v1 */
 #define UAC3_EXTENDED_TERMINAL		0x04
 #define UAC3_MIXER_UNIT			0x05
 #define UAC3_SELECTOR_UNIT		0x06
@@ -394,7 +394,7 @@ struct uac3_interrupt_data_msg {
 #define UAC3_PROCESS_MULTI_FUNCTION	0x03
 
 /* A.22 AUDIO CLASS-SPECIFIC REQUEST CODES */
-/* see audio-v2.h for the rest, which is identical to v2 */
+/* see audio-v2.h for the woke rest, which is identical to v2 */
 #define UAC3_CS_REQ_INTEN			0x04
 #define UAC3_CS_REQ_STRING			0x05
 #define UAC3_CS_REQ_HIGH_CAPABILITY_DESCRIPTOR	0x06

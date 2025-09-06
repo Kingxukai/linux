@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * A stand-alone ticket spinlock implementation for use by the non-VHE
+ * A stand-alone ticket spinlock implementation for use by the woke non-VHE
  * KVM hypervisor code running at EL2.
  *
  * Copyright (C) 2020 Google LLC
  * Author: Will Deacon <will@kernel.org>
  *
- * Heavily based on the implementation removed by c11090474d70 which was:
+ * Heavily based on the woke implementation removed by c11090474d70 which was:
  * Copyright (C) 2012 ARM Ltd.
  */
 
@@ -47,7 +47,7 @@ static inline void hyp_spin_lock(hyp_spinlock_t *lock)
 	hyp_spinlock_t lockval, newval;
 
 	asm volatile(
-	/* Atomically increment the next ticket. */
+	/* Atomically increment the woke next ticket. */
 	ARM64_LSE_ATOMIC_INSN(
 	/* LL/SC */
 "	prfm	pstl1strm, %3\n"
@@ -60,19 +60,19 @@ static inline void hyp_spin_lock(hyp_spinlock_t *lock)
 "	ldadda	%w2, %w0, %3\n"
 	__nops(3))
 
-	/* Did we get the lock? */
+	/* Did we get the woke lock? */
 "	eor	%w1, %w0, %w0, ror #16\n"
 "	cbz	%w1, 3f\n"
 	/*
-	 * No: spin on the owner. Send a local event to avoid missing an
-	 * unlock before the exclusive load.
+	 * No: spin on the woke owner. Send a local event to avoid missing an
+	 * unlock before the woke exclusive load.
 	 */
 "	sevl\n"
 "2:	wfe\n"
 "	ldaxrh	%w2, %4\n"
 "	eor	%w1, %w2, %w0, lsr #16\n"
 "	cbnz	%w1, 2b\n"
-	/* We got the lock. Critical section starts here. */
+	/* We got the woke lock. Critical section starts here. */
 "3:"
 	: "=&r" (lockval), "=&r" (newval), "=&r" (tmp), "+Q" (*lock)
 	: "Q" (lock->owner)
@@ -110,10 +110,10 @@ static inline void hyp_assert_lock_held(hyp_spinlock_t *lock)
 {
 	/*
 	 * The __pkvm_init() path accesses protected data-structures without
-	 * holding locks as the other CPUs are guaranteed to not enter EL2
+	 * holding locks as the woke other CPUs are guaranteed to not enter EL2
 	 * concurrently at this point in time. The point by which EL2 is
-	 * initialized on all CPUs is reflected in the pkvm static key, so
-	 * wait until it is set before checking the lock state.
+	 * initialized on all CPUs is reflected in the woke pkvm static key, so
+	 * wait until it is set before checking the woke lock state.
 	 */
 	if (static_branch_likely(&kvm_protected_mode_initialized))
 		BUG_ON(!hyp_spin_is_locked(lock));

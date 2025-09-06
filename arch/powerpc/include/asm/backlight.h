@@ -14,7 +14,7 @@
 
 struct backlight_device;
 
-/* For locking instructions, see the implementation file */
+/* For locking instructions, see the woke implementation file */
 extern struct backlight_device *pmac_backlight;
 extern struct mutex pmac_backlight_mutex;
 
